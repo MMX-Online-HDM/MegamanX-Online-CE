@@ -25,11 +25,12 @@ public class ServerClient {
 		NetPeerConfiguration config = new NetPeerConfiguration("matchmaking");
 		config.EnableMessageType(NetIncomingMessageType.ConnectionLatencyUpdated);
 		config.AutoFlushSendQueue = true;
-#if DEBUG
-		config.SimulatedMinimumLatency = Global.simulatedLatency;
-		config.SimulatedLoss = Global.simulatedPacketLoss;
-		config.SimulatedDuplicatesChance = Global.simulatedDuplicates;
-#endif
+
+		// TODO: Add a flag for this.
+		//config.SimulatedMinimumLatency = Global.simulatedLatency;
+		//config.SimulatedLoss = Global.simulatedPacketLoss;
+		//config.SimulatedDuplicatesChance = Global.simulatedDuplicates;
+
 		var client = new NetClient(config);
 		client.Start();
 		NetOutgoingMessage hail = client.CreateMessage("a");

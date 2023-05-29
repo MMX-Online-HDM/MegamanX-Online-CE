@@ -921,13 +921,13 @@ public class OptionsMenu : IMainMenu {
 		string presetMessage = "Based on your detected video card texture size of {0}, a Graphics setting of {1} has been automatically selected.\n\nYou can change this in the Settings menu.";
 		if (textureSize <= 1024) {
 			setPresetQuality(0);
-			//Helpers.showMessageBox(string.Format(presetMessage, textureSize, "Low"), "Graphics settings preset");
+			Helpers.showMessageBox(string.Format(presetMessage, textureSize, "Low"), "Graphics settings preset");
 		} else if (textureSize <= 2048) {
 			setPresetQuality(1);
-			//Helpers.showMessageBox(string.Format(presetMessage, textureSize, "Medium"), "Graphics settings preset");
+			Helpers.showMessageBox(string.Format(presetMessage, textureSize, "Medium"), "Graphics settings preset");
 		} else {
 			setPresetQuality(2);
-			//Helpers.showMessageBox(string.Format(presetMessage, textureSize, "High"), "Graphics settings preset");
+			Helpers.showMessageBox(string.Format(presetMessage, textureSize, "High"), "Graphics settings preset");
 		}
 	}
 
