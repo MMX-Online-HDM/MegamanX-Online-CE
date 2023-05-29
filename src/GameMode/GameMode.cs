@@ -1073,12 +1073,24 @@ public class GameMode {
 	}
 
 	const int grayAmmoIndex = 30;
-	public void renderAmmo(float baseX, ref float baseY, int baseIndex, int barIndex, float ammo, float grayAmmo = 0) {
+	public void renderAmmo(float baseX, ref float baseY, int baseIndex, int barIndex, float ammo, float grayAmmo = 0, float maxAmmo = 32) {
 		baseY += 25;
 		Global.sprites["hud_weapon_base"].drawToHUD(baseIndex, baseX, baseY);
 		baseY -= 16;
-		for (var i = 0; i < MathF.Ceiling(32); i++) {
-			if (i < Math.Ceiling(ammo)) {
+
+		// Puppeteer small energy bars.
+		bool forceSmallBarsOff = false;
+		if (!Options.main.smallBarsEx) {
+			forceSmallBarsOff = true;
+		}
+
+		// Small Bars option.
+		float ammoDisplayMultiplier = 1;
+		if (Options.main.enableSmallBars && !forceSmallBarsOff) {
+			ammoDisplayMultiplier = 0.5f;
+		}
+		for (var i = 0; i < MathF.Ceiling(maxAmmo * ammoDisplayMultiplier); i++) {
+			if ((double)i < Math.Ceiling(ammo * ammoDisplayMultiplier)) {
 				if (ammo < grayAmmo) Global.sprites["hud_weapon_full"].drawToHUD(grayAmmoIndex, baseX, baseY);
 				else Global.sprites["hud_weapon_full"].drawToHUD(barIndex, baseX, baseY);
 			} else {
@@ -1106,6 +1118,13 @@ public class GameMode {
 		var hudHealthPosition = getHUDHealthPosition(position, false);
 		float baseX = hudHealthPosition.x;
 		float baseY = hudHealthPosition.y;
+		bool forceSmallBarsOff = false;
+
+		// Small Bars option.
+		float ammoDisplayMultiplier = 1;
+		if (Options.main.enableSmallBars && !forceSmallBarsOff) {
+			ammoDisplayMultiplier = 0.5f;
+		}
 
 		if (player.isSigma) {
 			if (player.character == null || (player.isSigma3() && player.currentMaverick == null) || (player.isSigma1() && player.character.isHyperSigmaBS.getValue())) {
@@ -1155,17 +1174,17 @@ public class GameMode {
 			} else if (player.isMainPlayer && player.currentMaverick == null) {
 				int hudWeaponBaseIndex = 50;
 				int hudWeaponFullIndex = 39;
-				int floorOrCeil = MathF.Ceiling(player.sigmaMaxAmmo);
+				int floorOrCeil = MathF.Ceiling(player.sigmaMaxAmmo * ammoDisplayMultiplier);
 				if (player.isSigma2()) {
 					hudWeaponBaseIndex = 51;
 					hudWeaponFullIndex = player.sigmaAmmo < 16 ? 30 : 40;
-					floorOrCeil = MathF.Floor(player.sigmaMaxAmmo);
+					floorOrCeil = MathF.Floor(player.sigmaMaxAmmo * ammoDisplayMultiplier);
 				}
 				baseY += 25;
 				Global.sprites["hud_weapon_base"].drawToHUD(hudWeaponBaseIndex, baseX, baseY);
 				baseY -= 16;
 				for (var i = 0; i < floorOrCeil; i++) {
-					if (i < Math.Ceiling(player.sigmaAmmo)) {
+					if (i < Math.Ceiling(player.sigmaAmmo * ammoDisplayMultiplier)) {
 						Global.sprites["hud_weapon_full"].drawToHUD(hudWeaponFullIndex, baseX, baseY);
 					} else {
 						Global.sprites["hud_health_empty"].drawToHUD(0, baseX, baseY);
@@ -1182,8 +1201,8 @@ public class GameMode {
 			baseY += 25;
 			Global.sprites["hud_weapon_base"].drawToHUD(39, baseX, baseY);
 			baseY -= 16;
-			for (var i = 0; i < MathF.Ceiling(player.vileMaxAmmo); i++) {
-				if (i < Math.Ceiling(player.vileAmmo)) {
+			for (var i = 0; i < MathF.Ceiling(player.vileMaxAmmo * ammoDisplayMultiplier); i++) {
+				if (i < Math.Ceiling(player.vileAmmo * ammoDisplayMultiplier)) {
 					Global.sprites["hud_weapon_full"].drawToHUD(32, baseX, baseY);
 				} else {
 					Global.sprites["hud_health_empty"].drawToHUD(0, baseX, baseY);
@@ -1203,11 +1222,11 @@ public class GameMode {
 			baseY += 25;
 			Global.sprites["hud_weapon_base"].drawToHUD(weapon.weaponBarBaseIndex, baseX, baseY);
 			baseY -= 16;
-			for (var i = 0; i < MathF.Ceiling(weapon.maxAmmo); i++) {
-				var floorOrCeiling = Math.Ceiling(weapon.ammo);
+			for (var i = 0; i < MathF.Ceiling(weapon.maxAmmo * ammoDisplayMultiplier); i++) {
+				var floorOrCeiling = Math.Ceiling(weapon.ammo * ammoDisplayMultiplier);
 				// Weapons that cost the whole bar go here, so they don't show up as full but still grayed out
 				if (weapon is RekkohaWeapon || weapon is GigaCrush) {
-					floorOrCeiling = Math.Floor(weapon.ammo);
+					floorOrCeiling = Math.Floor(weapon.ammo * ammoDisplayMultiplier);
 				}
 				if (i < floorOrCeiling) {
 					int spriteIndex = weapon.weaponBarIndex;

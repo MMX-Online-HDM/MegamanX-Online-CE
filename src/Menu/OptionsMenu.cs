@@ -287,9 +287,36 @@ public class OptionsMenu : IMainMenu {
 						},
 						(Point pos, int index) =>
 						{
-							Helpers.drawTextStd(TCat.Option, "ENABLE MAP SPRITES: " + Helpers.boolYesNo(Options.main.enableMapSprites), pos.x, pos.y, fontSize: fontSize, color: getVideoSettingColor(), selected: selectedArrowPosY == index, optionPadding: 26);
+							Helpers.drawTextStd(TCat.Option, 
+								"ENABLE MAP SPRITES: " + Helpers.boolYesNo(Options.main.enableMapSprites), 
+								pos.x, pos.y, 
+								fontSize: fontSize, color: getVideoSettingColor(), 
+								selected: selectedArrowPosY == index, optionPadding: 26);
 						},
 						"Enable or disable map sprites.\nDisabling map sprites results in faster performance."),
+					
+					// Small Bars
+					new MenuOption(40, startY,
+						() =>
+						{
+							if (Global.input.isPressedMenu(Control.MenuLeft))
+							{
+								Options.main.enableSmallBars = false;
+							}
+							else if (Global.input.isPressedMenu(Control.MenuRight))
+							{
+								Options.main.enableSmallBars = true;
+							}
+						},
+						(Point pos, int index) =>
+						{
+							Helpers.drawTextStd(TCat.Option, 
+								"ENABLE SMALL BARS: " + Helpers.boolYesNo(Options.main.enableSmallBars), 
+								pos.x, pos.y, 
+								fontSize: fontSize, 
+								selected: selectedArrowPosY == index, optionPadding: 26);
+						},
+						"Makes the energy bars smaller."),
 				};
 		} else if (charNum == null) {
 			if (!Global.regionPingTask.IsCompleted) {
@@ -891,9 +918,24 @@ public class OptionsMenu : IMainMenu {
 							Helpers.drawTextStd(TCat.Option, "PUPPETEER CANCEL: " + (Options.main.puppeteerCancel ? "Yes" : "No"), pos.x, pos.y, fontSize: fontSize, selected: selectedArrowPosY == index, optionPadding: 26);
 						},
 						"If set to Yes, Mavericks will revert to their idle state\nwhen switched to in Puppeteer mode."),
+
+					// Small Bars for Pup Sigma
+					new MenuOption(30, startY,
+						() =>
+						{
+							Helpers.menuLeftRightBool(ref Options.main.smallBarsEx);
+						},
+						(Point pos, int index) =>
+						{
+							Helpers.drawTextStd(TCat.Option, 
+								"PUP SMALL ENERGY BARS: " + (Options.main.smallBarsEx ? "Yes" : "No"),
+								pos.x, pos.y,
+								fontSize: fontSize,
+								selected: selectedArrowPosY == index, optionPadding: 26);
+						},
+						"Makes the energy bars smaller for Puppeteer.\nRequires the \"small\" bars option to work.")
 				};
 		}
-
 		for (int i = 0; i < menuOptions.Count; i++) {
 			menuOptions[i].pos.y = startY + lineH * i;
 		}

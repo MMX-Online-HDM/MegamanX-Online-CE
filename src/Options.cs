@@ -54,11 +54,13 @@ public class Options {
 	public bool enablePostProcessing = true;
 	public int particleQuality = 0;
 	public bool enableMapSprites = true;
+	public bool enableSmallBars;
+	public bool smallBarsEx;
 
 	public bool lowQualityParticles() { return particleQuality == 0; }
 
 	public bool shouldUseOptimizedAssets() {
-		return Global.useOptimizedAssetsOverride ?? useOptimizedAssets;
+		return false; //Global.useOptimizedAssetsOverride ?? useOptimizedAssets;
 	}
 
 	// X
