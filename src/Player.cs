@@ -1328,7 +1328,7 @@ public partial class Player {
 		if (axlBulletType == (int)AxlBulletWeaponType.AncientGun && isAxl) return;
 		if (character?.isCCImmuneHyperMode() == true) return;
 		if (character != null && (character.isNightmareZero)) return;
-		if (character != null && character.isBlackZero2()) return;
+		//if (character != null && character.isBlackZero2()) return;
 		if (character != null && character.rideArmor != null && character.charState is InRideArmor && character.rideArmor.raNum == 4) return;
 		if (isX && hasUltimateArmor()) return;
 		//if (isX && hasAnyChip() && !hasGoldenArmor()) return;
