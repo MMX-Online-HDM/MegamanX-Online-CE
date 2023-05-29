@@ -9,7 +9,6 @@
 
 		<UseWindowsForms>true</UseWindowsForms>
 		<ImplicitUsings>false</ImplicitUsings>
-		<Nullable>false</Nullable>
 		<SelfContained>false</SelfContained>
 		<!--OutDir>./bin/test/<OutDir-->
 		<!--RunWorkingDirectory>./bin/test/</RunWorkingDirectory-->
