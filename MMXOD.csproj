@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<AssemblyName>MMXOD</AssemblyName>
+		<OutputType>WinExe</OutputType>
+		<Version>19.12</Version>
+		<AssemblyVersion>19.12</AssemblyVersion>
+		<ApplicationIcon>app.ico</ApplicationIcon>
+		<TargetFramework>net6.0-windows</TargetFramework>
+
+		<UseWindowsForms>true</UseWindowsForms>
+		<ImplicitUsings>false</ImplicitUsings>
+		<Nullable>false</Nullable>
+		<SelfContained>false</SelfContained>
+		<!--OutDir>./bin/test/<OutDir-->
+		<!--RunWorkingDirectory>./bin/test/</RunWorkingDirectory-->
+		<OutputPath>./bin/</OutputPath>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="protobuf-net" Version="3.1.33" />
+		<PackageReference Include="protobuf-net.Core" Version="3.1.33" />
+		<PackageReference Include="SFML.Graphics" Version="2.5.0" />
+		<PackageReference Include="SFML.Window" Version="2.5.0" />
+		<PackageReference Include="SFML.System" Version="2.5.0" />
+		<PackageReference Include="SFML.Audio" Version="2.5.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="DeviceId" Version="6.3.0" />
+		<PackageReference Include="Profanity.Detector" Version="0.1.8" />
+		<PackageReference Include="SpaceWizards.Lidgren.Network" Version="0.2.4" />
+		<PackageReference Include="GoogleAnalyticsTracker.Simple" Version="6.0.5" />
+	</ItemGroup>
+</Project>

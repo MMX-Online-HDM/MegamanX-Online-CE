@@ -1,0 +1,7 @@
+# VSCode
+.vscode/*
+
+# C-Sharp
+[Bb]in/*
+[Oo]bj/*
+omnisharp.json
