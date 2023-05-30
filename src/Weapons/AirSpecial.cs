@@ -183,12 +183,14 @@ public class HyorogaStartState : CharState {
 		character.gravityModifier = -1;
 		character.dashedInAir = 0;
 		character.quakeBlazerBounces = 0;
+		character.specialState = (int)SpecialStateIds.HyorogaStart;
 	}
 
 	public override void onExit(CharState newState) {
 		character.useGravity = true;
 		character.gravityModifier = 1;
 		base.onExit(newState);
+		character.specialState = (int)SpecialStateIds.None;
 	}
 }
 

@@ -1665,11 +1665,13 @@ public class DodgeRoll : CharState {
 		initialDashDir = character.xDir;
 		if (player.input.isHeld(Control.Left, player)) initialDashDir = -1;
 		else if (player.input.isHeld(Control.Right, player)) initialDashDir = 1;
+		character.specialState = (int)SpecialStateIds.AxlRoll;
 	}
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		character.dodgeRollCooldown = Character.maxDodgeRollCooldown;
+		character.specialState = (int)SpecialStateIds.None;
 	}
 
 	public override void update() {

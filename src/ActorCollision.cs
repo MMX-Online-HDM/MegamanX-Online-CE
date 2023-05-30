@@ -66,9 +66,19 @@ public partial class Actor {
 
 	public Collider collider {
 		get {
-			return getAllColliders().FirstOrDefault();
+			Collider stdColl = getAllColliders().FirstOrDefault();
+			if (stdColl == null) {
+				return stdColl;
+			}
+			Collider lvColl = getTerrainCollider();
+			if (lvColl != null) {
+				return lvColl;
+			}
+			return stdColl;
 		}
 	}
+
+	public Collider standartCollider => getAllColliders().FirstOrDefault();
 
 	public Collider physicsCollider {
 		get {
@@ -95,16 +105,31 @@ public partial class Actor {
 	}
 
 	public void renderHitboxes() {
-		if (Global.showHitboxes) {
-			var allColliders = getAllColliders();
-			foreach (var collider in allColliders) {
-				Color hitboxColor = new Color(173, 216, 230, 128);
-				if (collider.isAttack()) hitboxColor = new Color(255, 0, 0, 128);
-				DrawWrappers.DrawPolygon(collider.shape.points, hitboxColor, true, zIndex + 1, true);
-			}
-
-			//DrawWrappers.DrawCircle(collider.shape, Color.Blue, true, zIndex + 1, false, true);
+		if (!Global.showHitboxes) {
+			return;
 		}
+		bool hasNonAttackColider = false;
+		foreach (Collider allCollider in getAllColliders()) {
+			Color hitboxColor = new Color(173, 216, 230, 128);
+			if (allCollider.isAttack()) {
+				hitboxColor = new Color(byte.MaxValue, 0, 0, 128);
+			} else {
+				hasNonAttackColider = true;
+			}
+			DrawWrappers.DrawPolygon(allCollider.shape.points, hitboxColor, fill: true, zIndex + 1);
+		}
+		if (hasNonAttackColider) {
+			Collider terrainCollider = getTerrainCollider();
+			if (terrainCollider == null) {
+				return;
+			}
+			DrawWrappers.DrawPolygon(
+				terrainCollider.shape.points,
+				new Color(178, 0, 216, 200),
+				fill: false, zIndex + 1, true
+			);
+		}
+		//DrawWrappers.DrawCircle(collider.shape, Color.Blue, true, zIndex + 1, false, true);
 	}
 
 	public HashSet<Tuple<Collider, Collider>> collidedInFrame = new HashSet<Tuple<Collider, Collider>>();
@@ -117,6 +142,14 @@ public partial class Actor {
 	}
 
 	public virtual void onCollision(CollideData other) {
+	}
+
+	// Terrain colider.
+	// This is used for stage collision.
+	// If this is Null it defaults to the Global collider.
+	// Generally if a global collider does not exist this is disabled too.
+	public virtual Collider getTerrainCollider() {
+		return null;
 	}
 
 	// The default global collider. This can be thought of the one that is used most often, in the most sprites.
@@ -252,7 +285,9 @@ public partial class Actor {
 	public void move(Point amount, bool useDeltaTime = true, bool pushIncline = true, bool useIce = true, MoveClampMode clampMode = MoveClampMode.None) {
 		var times = useDeltaTime ? Global.spf : 1;
 
-		if (grounded && groundedIce && useIce && this is Character) {
+		if (grounded && groundedIce && useIce && (
+			this is Character || this is Maverick || this is RideArmor
+		)) {
 			if (amount.x > 0) {
 				if (xIceVel < amount.x) {
 					xIceVel += amount.x * Global.spf * 5;

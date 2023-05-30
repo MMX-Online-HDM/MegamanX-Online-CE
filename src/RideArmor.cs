@@ -539,6 +539,16 @@ public class RideArmor : Actor, IDamagable {
 		if (isExploding) return;
 		if (enterCooldown > 0) return;
 
+		// Move zone movement.
+		if (other.gameObject is MoveZone moveZone) {
+			if (moveZone.moveVel.x != 0) {
+				xPushVel = moveZone.moveVel.x;
+			}
+			if (moveZone.moveVel.y != 0) {
+				yPushVel = moveZone.moveVel.y;
+			}
+		}
+
 		if (canBeEntered()) {
 			var chr = other.otherCollider.actor as Character;
 			if (chr != null && chr.canEnterRideArmor() && chr.charState is Fall fallState && MathF.Abs(chr.pos.x - pos.x) < 10) {
@@ -757,10 +767,21 @@ public class RideArmor : Actor, IDamagable {
 		this.healAmount = healAmount;
 	}
 
+	public override Collider getTerrainCollider() {
+		if (physicsCollider == null) {
+			return null;
+		}
+		return new Collider(
+			new Rect(0f, 0f, 26, 46).getPoints(),
+			false, this, false, false,
+			HitboxFlag.Hurtbox, new Point(0, 0)
+		);
+	}
+
 	public override Collider getGlobalCollider() {
 		int yHeight = 50;
 		if (raNum == 5) yHeight = 60;
-		//if (raNum == 0 || raNum == 4) yHeight = 52;
+		if (raNum == 0 || raNum == 4) yHeight = 52;
 		var rect = new Rect(0, 0, 26, yHeight);
 		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
 	}
@@ -782,9 +803,13 @@ public class RideArmor : Actor, IDamagable {
 	}
 
 	public float getRunSpeed() {
-		if (xPushVel != 0) return 15;
-		if (rideArmorState is RAFall raFall && raFall.hovering && (raNum == 0 || raNum == 4)) return 30;
-
+		// Slow down the ride on push.
+		if (xFlinchPushVel != 0) {
+			return 15;
+		}
+		if (rideArmorState is RAFall raFall && raFall.hovering && raNum != 2) {
+			return 30;
+		}
 		if (raNum == 3) {
 			if (isSwimming) {
 				return 150;
@@ -1694,6 +1719,7 @@ public class RACalldown : RideArmorState {
 		rideArmor.vel = Point.zero;
 		rideArmor.xIceVel = 0;
 		rideArmor.xPushVel = 0;
+		rideArmor.xFlinchPushVel = 0;
 		rideArmor.useGravity = false;
 		origYPos = rideArmor.pos.y;
 		if (rideArmor.character != null && !rideArmor.character.isVileMK5) {

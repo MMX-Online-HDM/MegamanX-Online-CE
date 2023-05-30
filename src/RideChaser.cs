@@ -531,7 +531,7 @@ public class RideChaser : Actor, IDamagable {
 			//slowdownTime = 0.25f;
 		}
 
-		if (owner != null && weaponIndex != null) {
+		if (owner != null && weaponIndex != null && damage > 0) {
 			damageHistory.Add(new DamageEvent(owner, weaponIndex.Value, projId, false, Global.time));
 		}
 

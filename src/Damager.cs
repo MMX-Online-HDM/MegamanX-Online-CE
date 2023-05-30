@@ -451,24 +451,29 @@ public class Damager {
 		}
 		// Ride armor section
 		else if (rideArmor != null) {
-			// Ride armor v. ride armor punch knockback
-			if (flinch > 0 && rideArmor.ownedByLocalPlayer && owner != null) {
-				float pushDirection = -victim.xDir;
-				if (owner?.character != null) {
-					if (victim.pos.x > owner.character.pos.x) pushDirection = 1;
-					if (victim.pos.x < owner.character.pos.x) pushDirection = -1;
-				}
-				rideArmor.xPushVel = pushDirection * 240f * (flinch / 26f);
-				if (rideArmor.raNum == 1 || rideArmor.raNum == 4) rideArmor.xPushVel *= 0.5f;
-				rideArmor.playHurtAnim();
-			}
-
+			// Beast Killer damage amp
 			if (projId == (int)ProjIds.BeastKiller || projId == (int)ProjIds.AncientGun) {
 				damage *= 2;
 			}
-
-			if (damage > 0) {
+			// Ride armor flinch push system.
+			float tempPush = 0;
+			if (flinch > 0 && rideArmor.ownedByLocalPlayer && owner != null) {
+				tempPush = 240f * (flinch / 26f);
+			}
+			// Apply push only if the new push is stronger than the current one.
+			if (tempPush > System.Math.Abs(rideArmor.xFlinchPushVel)) {
+				float pushDirection = -victim.xDir;
+				if (owner != null && owner.character != null) {
+					if (victim.pos.x > owner.character.pos.x) pushDirection = 1;
+					if (victim.pos.x < owner.character.pos.x) pushDirection = -1;
+				}
+				rideArmor.xFlinchPushVel = pushDirection * tempPush;
+			}
+			if (damage > 1 || flinch > 0) {
 				victim.playSound("hurt");
+				rideArmor.playHurtAnim();
+			} else {
+				victim.playSound("hit");
 			}
 		}
 		// Maverick section
