@@ -35,6 +35,7 @@ public class Projectile : Actor {
 	public bool shouldVortexSuck = true;
 	bool damagedOnce;
 	public ShaderWrapper nightmareZeroShader;
+	public bool useTransparentFade;
 	//public int? destroyFrames;
 
 	public Projectile(Weapon weapon, Point pos, int xDir, float speed, float damage, Player player, string sprite, int flinch, float hitCooldown, ushort? netId, bool ownedByLocalPlayer) : base(sprite, pos, netId, ownedByLocalPlayer, false) {
@@ -87,8 +88,14 @@ public class Projectile : Actor {
 		*/
 
 		if (time > maxTime || moveDistance > maxDistance || pos.x > Global.level.width + leeway || pos.x < -leeway || pos.y > Global.level.height + leeway || pos.y < -leeway) {
-			if (fadeOnAutoDestroy) destroySelf();
-			else destroySelfNoEffect();
+			if (fadeOnAutoDestroy) {
+				destroySelf();
+			} else {
+				if (useTransparentFade) {
+					new ProjFadeAnim(pos, vel, sprite.name, sprite.frameIndex, xDir, zIndex, null, true);
+				}
+				destroySelfNoEffect();
+			}
 			return;
 		}
 	}

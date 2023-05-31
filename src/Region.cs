@@ -15,6 +15,8 @@ public class Region {
 	[ProtoMember(1)] public string name;
 	[ProtoMember(2)] public string ip;
 	[ProtoMember(3)] public int? ping;
+	
+	public string url;
 
 	private NetClient pingClient;
 	public NetClient getPingClient() {
