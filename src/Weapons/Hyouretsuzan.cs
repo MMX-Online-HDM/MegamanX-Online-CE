@@ -56,7 +56,7 @@ public class QuakeBlazerWeapon : Weapon {
 		weaponBarBaseIndex = 38;
 		killFeedIndex = 82;
 		type = (int)HyouretsuzanType.QuakeBlazer;
-		displayName = "Quake Blazer";
+		displayName = "Danchien";
 		description = new string[] { "A dive attack that can burn enemies", "and knock them downwards." };
 	}
 }

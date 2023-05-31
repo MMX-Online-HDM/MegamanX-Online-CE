@@ -635,7 +635,7 @@ public class OptionsMenu : IMainMenu {
 						{
 							Helpers.drawTextStd(TCat.Option, "SWAP AIR ATTACKS: " + Helpers.boolYesNo(Options.main.swapAirAttacks), pos.x, pos.y, fontSize: fontSize, selected: selectedArrowPosY == index, optionPadding: 26);
 						},
-						"You can swap the inputs for air slash attack (default ATTACK),\nand Kuuenbu (air spin attack, default SPECIAL)."),
+						"You can swap the inputs for air slash attack (default ATTACK),\nand Kuuenzan (air spin attack, default SPECIAL)."),
 					new MenuOption(30, startY,
 						() =>
 						{

@@ -39,7 +39,7 @@ public class Napalm : Weapon {
 			vileWeight = 3;
 		}
 		if (napalmType == NapalmType.FireGrenade) {
-			displayName = "Fire Grenade";
+			displayName = "Flame Round";
 			vileAmmoUsage = 16;
 			rateOfFire = 4f;
 			description = new string[] { "This napalm travels along the", "ground, laying a path of fire." };
@@ -243,7 +243,7 @@ public class NapalmAttack : CharState {
 				}
 			}
 		} else if (napalmAttackType == NapalmAttackType.Ball) {
-			if (player.vileBallWeapon.type == (int)VileBallType.AirBombs) {
+			if (player.vileBallWeapon.type == (int)VileBallType.ExplosiveRound) {
 				if (shootCount < 3 && character.sprite.frameIndex == 2) {
 					if (!character.tryUseVileAmmo(player.vileBallWeapon.vileAmmoUsage)) {
 						character.changeState(new Crouch(""), true);
@@ -258,7 +258,7 @@ public class NapalmAttack : CharState {
 					proj.maxTime = 0.6f;
 					character.sprite.frameIndex = 0;
 				}
-			} else if (player.vileBallWeapon.type == (int)VileBallType.StunBalls) {
+			} else if (player.vileBallWeapon.type == (int)VileBallType.SpreadShot) {
 				shootTime += Global.spf;
 				var poi = character.getFirstPOI();
 				if (shootTime > 0.06f && poi != null && shootCount <= 4) {

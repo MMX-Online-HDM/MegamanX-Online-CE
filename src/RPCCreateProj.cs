@@ -75,14 +75,14 @@ public class RPCCreateProj : RPC {
 			proj = new RakuhouhaProj(new CFlasher(player), pos, true, 0, 0, player, netProjByte, 0);
 		} else if (projId == (int)ProjIds.Hadouken) {
 			proj = new HadoukenProj(new HadoukenWeapon(player), pos, xDir, player, netProjByte);
-		} else if (projId == (int)ProjIds.StunShot) {
-			proj = new StunShotProj(new VileMissile(VileMissileType.StunShot), pos, xDir, 0, player, netProjByte);
+		} else if (projId == (int)ProjIds.ElectricShock) {
+			proj = new StunShotProj(new VileMissile(VileMissileType.ElectricShock), pos, xDir, 0, player, netProjByte);
 		} else if (projId == (int)ProjIds.MK2StunShot) {
 			proj = new VileMK2StunShotProj(new VileMK2StunShot(), pos, xDir, player, netProjByte);
 		} else if (projId == (int)ProjIds.VileBomb) {
-			proj = new VileBombProj(new VileBall(VileBallType.AirBombs), pos, xDir, player, 0, netProjByte);
+			proj = new VileBombProj(new VileBall(VileBallType.ExplosiveRound), pos, xDir, player, 0, netProjByte);
 		} else if (projId == (int)ProjIds.VileBombSplit) {
-			proj = new VileBombProj(new VileBall(VileBallType.AirBombs), pos, xDir, player, 1, netProjByte);
+			proj = new VileBombProj(new VileBall(VileBallType.ExplosiveRound), pos, xDir, player, 1, netProjByte);
 		} else if (projId == (int)ProjIds.MK2Cannon) {
 			proj = new VileCannonProj(new VileCannon(VileCannonType.FrontRunner), pos, xDir, 0, player, netProjByte);
 		} else if (projId == (int)ProjIds.LongshotGizmo) {

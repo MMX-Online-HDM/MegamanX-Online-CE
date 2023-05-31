@@ -57,7 +57,7 @@ public class Weapon {
 				new NovaStrike(null),
 				new DoubleBullet(),
 				new DNACore(null),
-				new VileMissile(VileMissileType.StunShot),
+				new VileMissile(VileMissileType.ElectricShock),
 				new VileCannon(VileCannonType.FrontRunner),
 				new Vulcan(VulcanType.CherryBlast),
 			};

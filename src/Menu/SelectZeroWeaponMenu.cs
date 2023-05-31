@@ -29,7 +29,7 @@ public class SelectZeroWeaponMenu : IMainMenu {
 
 	public static List<Weapon> airSpecialWeapons = new List<Weapon>()
 	{
-			new KuuenbuWeapon(null),
+			new KuuenzanWeapon(null),
 			new FSplasherWeapon(null),
 			new HyorogaWeapon(null)
 		};

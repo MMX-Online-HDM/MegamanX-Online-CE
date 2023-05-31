@@ -42,7 +42,7 @@ public class EBladeWeapon : Weapon {
 		weaponBarBaseIndex = 41;
 		killFeedIndex = 36;
 		type = (int)RyuenjinType.EBlade;
-		displayName = "E-Blade";
+		displayName = "Denjin";
 		description = new string[] { "An electrical uppercut that flinches enemies", "and can hit multiple times." };
 	}
 }

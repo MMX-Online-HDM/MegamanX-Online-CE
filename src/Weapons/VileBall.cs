@@ -8,8 +8,8 @@ namespace MMXOnline;
 
 public enum VileBallType {
 	NoneNapalm = -1,
-	AirBombs,
-	StunBalls,
+	ExplosiveRound,
+	SpreadShot,
 	PeaceOutRoller,
 	NoneFlamethrower,
 }
@@ -32,22 +32,22 @@ public class VileBall : Weapon {
 			displayName = "None(FLAMETHROWER)";
 			description = new string[] { "Do not equip a Ball.", "FLAMETHROWER will be used instead." };
 			killFeedIndex = 126;
-		} else if (vileBallType == VileBallType.AirBombs) {
-			displayName = "Knee Bombs";
+		} else if (vileBallType == VileBallType.ExplosiveRound) {
+			displayName = "Explosive Round";
 			vileAmmoUsage = 8;
 			description = new string[] { "These bombs split into two", "upon contact with the ground." };
 			vileWeight = 3;
-		} else if (vileBallType == VileBallType.StunBalls) {
-			displayName = "Stun Balls";
+		} else if (vileBallType == VileBallType.SpreadShot) {
+			displayName = "Spread Shot";
 			vileAmmoUsage = 5;
-			description = new string[] { "Unleash a fan of energy balls", "that stun enemies in their tracks." };
+			description = new string[] { "Unleash a fan of energy shots", "that stun enemies in their tracks." };
 			killFeedIndex = 55;
 			vileWeight = 3;
 		} else if (vileBallType == VileBallType.PeaceOutRoller) {
 			displayName = "Peace Out Roller";
 			vileAmmoUsage = 16;
 			rateOfFire = 1.25f;
-			description = new string[] { "This electric ball splits into two upon", "upon contact with the ground." };
+			description = new string[] { "This electric bombs splits into two upon", "upon contact with the ground." };
 			killFeedIndex = 80;
 			vileWeight = 3;
 		}
@@ -225,7 +225,7 @@ public class AirBombAttack : CharState {
 			return;
 		}
 
-		if (player.vileBallWeapon.type == (int)VileBallType.AirBombs) {
+		if (player.vileBallWeapon.type == (int)VileBallType.ExplosiveRound) {
 			if (bombNum > 0 && player.input.isPressed(Control.Special1, player)) {
 				character.changeState(new Fall(), true);
 				return;
@@ -257,7 +257,7 @@ public class AirBombAttack : CharState {
 			if (stateTime > 0.68f) {
 				character.changeToIdleOrFall();
 			}
-		} else if (player.vileBallWeapon.type == (int)VileBallType.StunBalls) {
+		} else if (player.vileBallWeapon.type == (int)VileBallType.SpreadShot) {
 			var ebw = new VileElectricBomb();
 			if (bombNum > 0 && player.input.isPressed(Control.Special1, player)) {
 				character.changeToIdleOrFall();

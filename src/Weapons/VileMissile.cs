@@ -8,7 +8,7 @@ namespace MMXOnline;
 
 public enum VileMissileType {
 	None = -1,
-	StunShot,
+	ElectricShock,
 	HumerusCrush,
 	PopcornDemon
 }
@@ -17,7 +17,7 @@ public class VileMissile : Weapon {
 	public string projSprite;
 	public float vileAmmo;
 	public VileMissile(VileMissileType vileMissileType) : base() {
-		index = (int)WeaponIds.StunShot;
+		index = (int)WeaponIds.ElectricShock;
 		weaponBarBaseIndex = 26;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 42;
@@ -29,9 +29,9 @@ public class VileMissile : Weapon {
 			description = new string[] { "Do not equip a Missile." };
 			vileAmmo = 8;
 			killFeedIndex = 126;
-		} else if (vileMissileType == VileMissileType.StunShot) {
+		} else if (vileMissileType == VileMissileType.ElectricShock) {
 			rateOfFire = 0.75f;
-			displayName = "Stun Shot";
+			displayName = "Electric Shock";
 			vileAmmo = 8;
 			description = new string[] { "Stops enemies in their tracks,", "but deals no damage." };
 			vileWeight = 3;
@@ -65,7 +65,7 @@ public class VileMissile : Weapon {
 					character.changeState(new MissileAttack(), true);
 				} else if (!character.charState.isGrabbing) {
 					character.setVileShootTime(this);
-					MissileAttack.mk2ShootLogic(character, player.vileMissileWeapon.type == (int)VileMissileType.StunShot);
+					MissileAttack.mk2ShootLogic(character, player.vileMissileWeapon.type == (int)VileMissileType.ElectricShock);
 				}
 			}
 		} else if (character.charState is InRideArmor) {
@@ -179,7 +179,7 @@ public class StunShotProj : Projectile {
 	public StunShotProj(Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, Point? vel = null, bool rpc = false) :
 		base(weapon, pos, xDir, 150, 0, player, type == 0 ? "vile_stun_shot" : "vile_ebomb_start", 0, 0.15f, netProjId, player.ownedByLocalPlayer) {
 		fadeSprite = "vile_stun_shot_fade";
-		projId = (int)ProjIds.StunShot;
+		projId = (int)ProjIds.ElectricShock;
 		maxTime = 0.75f;
 		destroyOnHit = true;
 
@@ -253,7 +253,7 @@ public class MissileAttack : CharState {
 
 	public static void shootLogic(Character character) {
 		Player player = character.player;
-		bool isStunShot = player.vileMissileWeapon.type == (int)VileMissileType.StunShot;
+		bool isStunShot = player.vileMissileWeapon.type == (int)VileMissileType.ElectricShock;
 		if (character.sprite.getCurrentFrame().POIs.IsNullOrEmpty()) return;
 		Point shootVel = character.getVileShootVel(isStunShot);
 

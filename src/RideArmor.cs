@@ -2078,14 +2078,14 @@ public class InRideArmor : CharState {
 		/*
 		else if (player.vileNapalmWeapon.type == (int)NapalmType.NoneBall)
 		{
-			if (player.vileBallWeapon.type == (int)VileBallType.AirBombs)
+			if (player.vileBallWeapon.type == (int)VileBallType.ExplosiveRound)
 			{
 				if (player.vileBallWeapon.shootTime == 0) character.setVileShootTime(player.vileBallWeapon);
 				else return;
 				grenade = new VileBombProj(player.vileBallWeapon, character.pos.addxy(0, -3), character.xDir, player, 0, character.player.getNextActorNetId(), rpc: true);
 				grenade.maxTime = 1f;
 			}
-			else if (player.vileBallWeapon.type == (int)VileBallType.StunBalls)
+			else if (player.vileBallWeapon.type == (int)VileBallType.SpreadShot)
 			{
 				if (player.vileBallWeapon.shootTime == 0) character.setVileShootTime(player.vileBallWeapon);
 				else return;

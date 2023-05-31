@@ -537,14 +537,14 @@ public partial class Player {
 
 		if (!hasKnuckle()) {
 			raijingekiWeapon = RaijingekiWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.groundSpecial);
-			zeroAirSpecialWeapon = KuuenbuWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.airSpecial);
+			zeroAirSpecialWeapon = KuuenzanWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.airSpecial);
 			zeroUppercutWeaponA = RyuenjinWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.uppercutA);
 			zeroUppercutWeaponS = RyuenjinWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.uppercutS);
 			zeroDownThrustWeaponA = HyouretsuzanWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.downThrustA);
 			zeroDownThrustWeaponS = HyouretsuzanWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.downThrustS);
 		} else {
 			raijingekiWeapon = new MegaPunchWeapon(this);
-			zeroAirSpecialWeapon = KuuenbuWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.airSpecial);
+			zeroAirSpecialWeapon = KuuenzanWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.airSpecial);
 			zeroUppercutWeaponA = new ZeroShoryukenWeapon(this);
 			zeroUppercutWeaponS = new ZeroShoryukenWeapon(this);
 			zeroDownThrustWeaponA = new DropKickWeapon(this);
@@ -556,7 +556,7 @@ public partial class Player {
 
 		hadoukenWeapon = new HadoukenWeapon(this);
 		shoryukenWeapon = new ShoryukenWeapon(this);
-		vileStunShotWeapon = new VileMissile(VileMissileType.StunShot);
+		vileStunShotWeapon = new VileMissile(VileMissileType.ElectricShock);
 		vileCannonWeapon = new VileCannon((VileCannonType)loadout.vileLoadout.cannon);
 		vileVulcanWeapon = new Vulcan((VulcanType)loadout.vileLoadout.vulcan);
 		vileMissileWeapon = new VileMissile((VileMissileType)loadout.vileLoadout.missile);

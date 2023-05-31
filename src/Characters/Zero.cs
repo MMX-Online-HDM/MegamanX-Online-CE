@@ -259,7 +259,7 @@ public partial class Character {
 		bool isMidairRising = ((lenientAttackPressed && player.zeroUppercutWeaponA is RisingWeapon) || (spcPressed && player.zeroUppercutWeaponS is RisingWeapon)) && canAirDash() && flag == null;
 
 		bool notUpLogic = !player.input.isHeld(Control.Up, player) || !isMidairRising;
-		if (player.zeroAirSpecialWeapon.type != (int)AirSpecialType.Kuuenbu && spcPressed && !player.input.isHeld(Control.Down, player) && !isAttacking() && !player.hasKnuckle() &&
+		if (player.zeroAirSpecialWeapon.type != (int)AirSpecialType.Kuuenzan && spcPressed && !player.input.isHeld(Control.Down, player) && !isAttacking() && !player.hasKnuckle() &&
 			(charState is Jump || charState is Fall || charState is WallKick) && !isInvulnerableAttack() &&
 			(player.zeroUppercutWeaponS.type != (int)RyuenjinType.Rising || !player.input.isHeld(Control.Up, player))) {
 			player.zeroAirSpecialWeapon.attack(this);
@@ -332,7 +332,7 @@ public partial class Character {
 						else changeState(new DropKickState(), true);
 					}
 				} else if ((Options.main.swapAirAttacks || airAttackCooldown == 0) && !lenientAttackPressed && !player.hasKnuckle()) {
-					if (player.zeroAirSpecialWeapon.type == (int)AirSpecialType.Kuuenbu || !spcPressed) {
+					if (player.zeroAirSpecialWeapon.type == (int)AirSpecialType.Kuuenzan || !spcPressed) {
 						playSound("saber1", sendRpc: true);
 						changeState(new Fall(), true);
 						changeSprite(Options.main.getSpecialAirAttack(), true);

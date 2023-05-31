@@ -73,7 +73,7 @@ public class CFlasher : Weapon {
 		killFeedIndex = 81;
 		weaponSlotIndex = 64;
 		type = (int)RakuhouhaType.CFlasher;
-		displayName = "C-Flasher";
+		displayName = "Messenkou";
 		description = new string[] { "A less damaging blast that can pierce enemies.", "Energy cost: 8" };
 	}
 

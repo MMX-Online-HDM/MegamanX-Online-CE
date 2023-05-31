@@ -219,7 +219,7 @@ public class Damager {
 			//else if (projId == (int)ProjIds.TSeahorsePuddle) damagerMessage = onAcidDamage(damagable, owner, 1);
 			//else if (projId == (int)ProjIds.TSeahorseEmerge) damagerMessage = onAcidDamage(damagable, owner, 2);
 			else if (projId == (int)ProjIds.ParasiticBomb) damagerMessage = onParasiticBombDamage(damagable, owner);
-			else if (projId == (int)ProjIds.StunShot || projId == (int)ProjIds.MK2StunShot || projId == (int)ProjIds.MorphMPowder) damagerMessage = onStunShotDamage(damagable, owner);
+			else if (projId == (int)ProjIds.ElectricShock || projId == (int)ProjIds.MK2StunShot || projId == (int)ProjIds.MorphMPowder) damagerMessage = onStunShotDamage(damagable, owner);
 
 			if (damagerMessage?.flinch != null) flinch = damagerMessage.flinch.Value;
 			if (damagerMessage?.damage != null) damage = damagerMessage.damage.Value;

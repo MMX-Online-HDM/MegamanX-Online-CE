@@ -188,11 +188,11 @@ public partial class Character {
 				if (stunShotPressed && !player.input.isHeld(Control.Down, player) && invulnTime == 0) {
 					if (player.vileMissileWeapon.type == 1 || player.vileMissileWeapon.type == 2) {
 						if (tryUseVileAmmo(player.vileMissileWeapon.vileAmmo)) {
-							player.vileMissileWeapon.vileShoot(WeaponIds.StunShot, this);
+							player.vileMissileWeapon.vileShoot(WeaponIds.ElectricShock, this);
 						}
 					} else if (player.vileStunShotWeapon.type == -1 || player.vileStunShotWeapon.type == 0) {
 						if (tryUseVileAmmo(player.vileMissileWeapon.vileAmmo)) {
-							player.vileStunShotWeapon.vileShoot(WeaponIds.StunShot, this);
+							player.vileStunShotWeapon.vileShoot(WeaponIds.ElectricShock, this);
 						}
 					}
 				}
@@ -350,7 +350,7 @@ public partial class Character {
 				} else if (charState is not RocketPunchAttack) {
 					if (!player.input.isHeld(Control.Up, player) || player.vileCutterWeapon.type == -1) {
 						if (player.vileMissileWeapon.type > -1) {
-							player.vileMissileWeapon.vileShoot(WeaponIds.StunShot, this);
+							player.vileMissileWeapon.vileShoot(WeaponIds.ElectricShock, this);
 						}
 					} else {
 						player.vileCutterWeapon.vileShoot(WeaponIds.VileCutter, this);

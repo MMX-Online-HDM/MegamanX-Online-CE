@@ -7,26 +7,26 @@ using System.Threading.Tasks;
 namespace MMXOnline;
 
 public enum AirSpecialType {
-	Kuuenbu,
+	Kuuenzan,
 	FSplasher,
 	Hyoroga
 }
 
-public class KuuenbuWeapon : Weapon {
-	public KuuenbuWeapon(Player player) : base() {
+public class KuuenzanWeapon : Weapon {
+	public KuuenzanWeapon(Player player) : base() {
 		damager = new Damager(player, 3, 0, 0.5f);
-		index = (int)WeaponIds.Kuuenbu;
+		index = (int)WeaponIds.Kuuenzan;
 		weaponBarBaseIndex = 21;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 48;
 		killFeedIndex = 121;
-		type = (int)AirSpecialType.Kuuenbu;
-		displayName = "Kuuenbu";
+		type = (int)AirSpecialType.Kuuenzan;
+		displayName = "Kuuenzan";
 		description = new string[] { "Standard spin attack in the air." };
 	}
 
 	public static Weapon getWeaponFromIndex(Player player, int index) {
-		if (index == (int)AirSpecialType.Kuuenbu) return new KuuenbuWeapon(player);
+		if (index == (int)AirSpecialType.Kuuenzan) return new KuuenzanWeapon(player);
 		else if (index == (int)AirSpecialType.FSplasher) return new FSplasherWeapon(player);
 		else if (index == (int)AirSpecialType.Hyoroga) return new HyorogaWeapon(player);
 		else throw new Exception("Invalid Zero air special weapon index!");
@@ -39,7 +39,7 @@ public class FSplasherWeapon : Weapon {
 		index = (int)WeaponIds.FSplasher;
 		killFeedIndex = 109;
 		type = (int)AirSpecialType.FSplasher;
-		displayName = "F-Splasher";
+		displayName = "Hisuishou";
 		description = new string[] { "An aerial dash attack forward.", "Also provides a good speed boost." };
 	}
 
