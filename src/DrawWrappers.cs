@@ -190,24 +190,30 @@ public partial class DrawWrappers {
 		DrawRect(x1, y1, x1 + w, y1 + h, filled, color, thickness, depth, isWorldPos, outlineColor);
 	}
 
-	public static void DrawPolygon(List<Point> points, Color color, bool fill, long depth, bool isWorldPos = true) {
+	public static void DrawPolygon(
+		List<Point> points, Color color, bool fill, long depth,
+		bool isWorldPos = true, Color? outlineColor = null, int thickness = 1
+	) {
 		if (isWorldPos && Options.main.enablePostProcessing) {
 			for (int i = 0; i < points.Count; i++) {
 				points[i] = new Point(points[i].x - Global.level.camX, points[i].y - Global.level.camY);
 			}
 		}
-
 		ConvexShape shape = new ConvexShape((uint)points.Count);
 		for (int i = 0; i < points.Count; i++) {
 			shape.SetPoint((uint)i, new Vector2f(points[i].x, points[i].y));
 		}
-		if (fill) {
+		if (fill || outlineColor != null) {
 			shape.FillColor = color;
 		} else {
 			shape.OutlineColor = color;
-			shape.OutlineThickness = 1;
+			shape.OutlineThickness = thickness;
+			shape.FillColor = Color.Transparent;
 		}
-
+		if (outlineColor != null) {
+			shape.OutlineColor = outlineColor.Value;
+			shape.OutlineThickness = thickness;
+		}
 		if (isWorldPos) {
 			DrawLayer drawLayer = getDrawLayer(depth);
 			drawLayer.oneOffs.Add(new DrawableWrapper(null, shape));

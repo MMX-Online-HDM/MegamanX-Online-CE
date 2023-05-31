@@ -128,11 +128,20 @@ public partial class Level {
 	}
 
 	public void addGameObjectToGrid(GameObject go) {
-		if (!gameObjects.Contains(go)) return;
+		if (!gameObjects.Contains(go)) {
+			return;
+		}
 		Shape? allCollidersShape = go.getAllCollidersShape();
-		if (allCollidersShape == null) return;
-		var cells = getGridCells(allCollidersShape.Value);
-		foreach (var cell in cells) {
+		if (!allCollidersShape.HasValue) {
+			return;
+		}
+		if (go is Actor actor) {
+			Collider terrainCollider = actor.getTerrainCollider();
+			if (terrainCollider != null) {
+				allCollidersShape = terrainCollider.shape;
+			}
+		}
+		foreach (Cell cell in getGridCells(allCollidersShape.Value)) {
 			if (grid.InRange(cell.i) && grid[cell.i].InRange(cell.j) && !grid[cell.i][cell.j].Contains(go)) {
 				grid[cell.i][cell.j].Add(go);
 				occupiedGridSets.Add(grid[cell.i][cell.j]);
@@ -383,10 +392,20 @@ public partial class Level {
 	}
 
 	public List<CollideData> checkCollisionsActor(Actor actor, float incX, float incY, Point? vel = null, bool autoVel = false, bool returnOne = false, bool checkPlatforms = false) {
-		var collideDatas = new List<CollideData>();
-		if (actor.collider == null) return collideDatas;
-
-		if (autoVel && vel == null) vel = new Point(incX, incY);
+		List<CollideData> collideDatas = new List<CollideData>();
+		// Use custom terrain collider by default.
+		Collider terrainCollider = actor.getTerrainCollider();
+		// If terrain collider is not used or is null we use the default colliders.
+		if (terrainCollider == null) {
+			terrainCollider = actor.standartCollider;
+		}
+		// If there is no collider we return.
+		if (actor.standartCollider == null) {
+			return collideDatas;
+		}
+		if (autoVel && vel == null) {
+			vel = new Point(incX, incY);
+		}
 		var actorShape = actor.collider.shape.clone(incX, incY);
 		var gameObjects = getGameObjectsInSameCell(actorShape);
 		foreach (var go in gameObjects) {

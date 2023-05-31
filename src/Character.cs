@@ -123,8 +123,17 @@ public partial class Character : Actor, IDamagable {
 	public RideChaser rideChaser;
 	public Player lastGravityWellDamager;
 
-	public Character(Player player, float x, float y, int xDir, bool isVisible, ushort? netId, bool ownedByLocalPlayer, bool isWarpIn = true, bool mk2VileOverride = false, bool mk5VileOverride = false)
-		: base(null, new Point(x, y), netId, ownedByLocalPlayer, dontAddToLevel: true) {
+	// For states with special propieties.
+	public int specialState = 0;
+
+	// Main character class starts here.
+	public Character(
+		Player player, float x, float y, int xDir,
+		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
+		bool isWarpIn = true, bool mk2VileOverride = false, bool mk5VileOverride = false
+	) : base(
+		null, new Point(x, y), netId, ownedByLocalPlayer, dontAddToLevel: true
+	) {
 		this.player = player;
 		this.xDir = xDir;
 		initNetCharState1();
@@ -645,18 +654,20 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public float getRunSpeed(bool isAirDash = false) {
-		float runSpeed;
+		float runSpeed = 90;
 		if (player.isX) {
-			if (charState is XHover) runSpeed = 125;
-			else runSpeed = 100;
-		} else if (player.isVile && player.speedDevil) {
-			runSpeed = speedDevilRunSpeed;
-		} else if (isBlackZero() || isBlackZero2()) {
-			runSpeed = 115;
-		} else if (player.isAxl && shootTime > 0) {
+			if (charState is XHover) {
+				runSpeed = 125;
+			}
+		}
+		else if (player.isVile && player.speedDevil) {
+			runSpeed *= 1.1f;
+		}
+		else if (isBlackZero() || isBlackZero2()) {
+			runSpeed *= 1.15f;
+		}
+		else if (player.isAxl && shootTime > 0) {
 			runSpeed = 100 - getAimBackwardsAmount() * 25;
-		} else {
-			runSpeed = 100;
 		}
 		if (slowdownTime > 0) runSpeed *= 0.75f;
 		if (igFreezeProgress == 1) runSpeed *= 0.75f;
@@ -669,7 +680,7 @@ public partial class Character : Actor, IDamagable {
 		if (flag != null) return 1;
 		if (isDashing) {
 			if (player.axlWeapon != null && player.axlWeapon.isTwoHanded(false)) return 1.75f;
-			return 2f;
+			return 2.3f;
 		}
 		return 1;
 	}
@@ -690,6 +701,46 @@ public partial class Character : Actor, IDamagable {
 		bool isChargedStrikeChain = strikeChainProj is StrikeChainProj scp && scp.isCharged;
 		bool flinch = isChargedStrikeChain || strikeChainProj is WSpongeSideChainProj || (player.isX && player.weapon is SpinWheel);
 		changeState(new StrikeChainHooked(strikeChainProj, flinch), true);
+	}
+
+	// For terrain collision.
+	public override Collider getTerrainCollider() {
+		if (physicsCollider == null || isHyperSigma) {
+			return null;
+		}
+		float hSize = 30;
+		if (sprite.name.Contains("crouch")) {
+			hSize = 22;
+		}
+		if (sprite.name.Contains("dash")) {
+			hSize = 22;
+		}
+		if (player.isSigma) {
+			hSize += 10;
+		}
+		if (sprite.name.Contains("_ra_")) {
+			hSize = 20;
+		}
+		if (player.isZero) {
+			if (specialState == (int)SpecialStateIds.HyorogaStart) {
+				return new Collider(
+					new Rect(0f, 0f, 18, 40).getPoints(),
+					false, this, false, false,
+					HitboxFlag.Hurtbox, new Point(0, 0)
+				);
+			} else if (sprite.name.Contains("hyoroga")) {
+				return new Collider(
+					new Rect(0f, 0f, 18, hSize).getPoints(),
+					false, this, false, false,
+					HitboxFlag.Hurtbox, new Point(0, 40 - hSize)
+				);
+			}
+		}
+		return new Collider(
+			new Rect(0f, 0f, 18, hSize).getPoints(),
+			false, this, false, false,
+			HitboxFlag.Hurtbox, new Point(0, 0)
+		);
 	}
 
 	public override Collider getGlobalCollider() {
@@ -785,10 +836,16 @@ public partial class Character : Actor, IDamagable {
 			Damager.applyDamage(player, 3, 1f, Global.defFlinch, character, false, (int)WeaponIds.CrystalHunter, 20, player.character, (int)ProjIds.CrystalHunterDash);
 		}
 
-		var moveZone = other.gameObject as MoveZone;
-		if (moveZone != null) {
-			xPushVel = moveZone.moveVel.x;
+		// Move zone movement.
+		if (other.gameObject is MoveZone moveZone) {
+			if (moveZone.moveVel.x != 0) {
+				xPushVel = moveZone.moveVel.x;
+			}
+			if (moveZone.moveVel.y != 0) {
+				yPushVel = moveZone.moveVel.y;
+			}
 		}
+
 		if (ownedByLocalPlayer && other.gameObject is Flag flag && flag.alliance != player.alliance) {
 			if (!Global.level.players.Any(p => p != player && p.character?.flag == flag)) {
 				if (charState is SpeedBurnerCharState || charState is SigmaWallDashState || charState is FSplasherState) {
@@ -1394,7 +1451,7 @@ public partial class Character : Actor, IDamagable {
 		if (factorHyperMode && isInvulnBS.getValue() && !isCCImmuneHyperMode()) return true;
 		if (!ignoreRideArmorHide && charState is InRideArmor && (charState as InRideArmor).isHiding) return true;
 		if (!ignoreRideArmorHide && !string.IsNullOrEmpty(sprite?.name) && sprite.name.Contains("ra_hide")) return true;
-		if (sprite.name == "axl_roll") return true;
+		if (specialState == (int)SpecialStateIds.AxlRoll) return true;
 		if (sprite.name.Contains("viral_exit")) return true;
 		if (charState is WarpOut) return true;
 		if (charState is WolfSigmaRevive || charState is ViralSigmaRevive || charState is KaiserSigmaRevive) return true;
@@ -1631,10 +1688,10 @@ public partial class Character : Actor, IDamagable {
 		float topY = float.MaxValue;
 		float leftX = float.MaxValue;
 		float rightX = float.MinValue;
-		if (collider != null) {
-			topY = collider.shape.getRect().y1 - 1;
-			//leftX = collider.shape.getRect().x1 - 1;
-			//rightX = collider.shape.getRect().x2 + 1;
+		if (standartCollider != null) {
+			topY = standartCollider.shape.getRect().y1 - 1;
+			//leftX = standartCollider.shape.getRect().x1 - 1;
+			//rightX = standartCollider.shape.getRect().x2 + 1;
 		}
 
 		return new Rect(
@@ -2430,6 +2487,8 @@ public partial class Character : Actor, IDamagable {
 
 	public void applyDamage(Player attacker, int? weaponIndex, float damage, int? projId) {
 		if (!ownedByLocalPlayer) return;
+		float originalDamage = damage;
+
 		if (attacker == player && isWhiteAxl()) {
 			damage = 0;
 		}
@@ -2499,7 +2558,7 @@ public partial class Character : Actor, IDamagable {
 
 		player.health -= damage;
 
-		if (player.showTrainingDps && player.health > 0 && damage > 0) {
+		if (player.showTrainingDps && player.health > 0 && originalDamage > 0) {
 			if (player.trainingDpsStartTime == 0) {
 				player.trainingDpsStartTime = Global.time;
 				Global.level.gameMode.dpsString = "";
@@ -2546,7 +2605,7 @@ public partial class Character : Actor, IDamagable {
 			}
 		}
 
-		if (attacker != null && weaponIndex != null) {
+		if (attacker != null && weaponIndex != null && damage > 0) {
 			damageHistory.Add(new DamageEvent(attacker, weaponIndex.Value, projId, false, Global.time));
 		}
 
@@ -3049,4 +3108,10 @@ public struct DamageEvent {
 		this.envKillOnly = envKillOnly;
 		this.time = time;
 	}
+}
+
+public enum SpecialStateIds {
+	None,
+	AxlRoll,
+	HyorogaStart
 }

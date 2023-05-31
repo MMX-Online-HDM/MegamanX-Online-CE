@@ -40,6 +40,10 @@ public partial class Actor : GameObject {
 	public bool immuneToKnockback;
 	public bool isPlatform;
 
+	public float xFlinchPushVel = 0;
+
+	public float yPushVel = 0;
+
 	public Dictionary<int, SoundWrapper> netSounds = new Dictionary<int, SoundWrapper>();
 	public string startSound;
 	public bool isStatic;
@@ -517,6 +521,19 @@ public partial class Actor : GameObject {
 				xPushVel = 0;
 			}
 
+			// Heavy Flinch Push
+			if (Math.Abs(xFlinchPushVel) > 5) {
+				xFlinchPushVel = Helpers.lerp(xFlinchPushVel, 0f, Global.spf * 5);
+			} else if (xFlinchPushVel != 0f) {
+				xFlinchPushVel = 0f;
+			}
+
+			if (Math.Abs(yPushVel) > 5) {
+				yPushVel = Helpers.lerp(yPushVel, 0f, Global.spf * 5);
+			} else if (yPushVel != 0f) {
+				yPushVel = 0f;
+			}
+
 			if (Math.Abs(xSwingVel) > 0) {
 				if (chr != null) {
 					if (chr.player.isX) {
@@ -549,16 +566,24 @@ public partial class Actor : GameObject {
 				}
 			}
 
-			if (!grounded) xIceVel = 0;
-			if (xIceVel != 0) {
-				xIceVel = Helpers.lerp(xIceVel, 0, Global.spf);
-				if (MathF.Abs(xIceVel) < 1) {
-					xIceVel = 0;
+			if (!grounded) {
+				xIceVel = 0;
+			}
+			if (xIceVel != 0f) {
+				xIceVel = Helpers.lerp(xIceVel, 0f, Global.spf);
+				if (MathF.Abs(xIceVel) < 1f) {
+					xIceVel = 0f;
 				} else {
-					var wall = Global.level.checkCollisionActor(this, xIceVel * Global.spf, 0);
-					if (wall != null && wall.gameObject is Wall) {
-						xIceVel = 0;
+					// Gacel's notes:
+					// There must be a better way to do this, really.
+					Point oldPos = pos;
+					Point oldDeltaPos = deltaPos;
+					move(new Point(xIceVel, 0), useDeltaTime: true, useIce: false);
+					if (oldPos.x == pos.x && oldPos.y == pos.y) {
+						xIceVel = 0f;
 					}
+					pos = oldPos;
+					deltaPos = oldDeltaPos;
 				}
 			}
 
@@ -569,9 +594,11 @@ public partial class Actor : GameObject {
 			}
 
 			if (this is Character) {
-				move(vel.addxy(xIceVel + xPushVel + xSwingVel, 0), true, false, false);
+				move(vel.addxy(xFlinchPushVel + xIceVel + xPushVel + xSwingVel, 0), true, true, false);
+				move(new Point(0, yPushVel), true, false, false);
 			} else if (!isStatic) {
-				move(vel.addxy(xIceVel + xPushVel + xSwingVel, 0), true, true, false);
+				move(vel.addxy(xFlinchPushVel + xIceVel + xPushVel + xSwingVel, 0), true, true, false);
+				move(new Point(0, yPushVel), true, false, false);
 			}
 
 			float yMod = reversedGravity ? -1 : 1;
@@ -743,15 +770,16 @@ public partial class Actor : GameObject {
 			}
 		}
 
-		for (int i = damageHistory.Count - 1; i >= 0; i--) {
-			if (Global.time - damageHistory[i].time > 15) {
+		for (int i = 0; i < damageHistory.Count - 1; i++) {
+			if (Global.time - damageHistory[i].time > 15f && (damageHistory.Count > 1 || Global.level.isTraining())) {
 				damageHistory.RemoveAt(i);
+				i--;
 			}
 		}
 	}
 
 	public float getTopY() {
-		var collider = this.collider;
+		var collider = this.standartCollider;
 
 		float cy = 0;
 		if (sprite.alignment == "topleft") {
@@ -909,7 +937,7 @@ public partial class Actor : GameObject {
 		} else {
 			// 5 seconds since last net update: destroy the object
 			if (Global.tickRate > 1 && Global.time - lastNetUpdate > 5 && cleanUpOnNoResponse()) {
-				destroySelf(rpc: true);
+				destroySelf(disableRpc: true);
 				return;
 			}
 
@@ -1102,7 +1130,7 @@ public partial class Actor : GameObject {
 	}
 
 	//Optionally take in a sprite to draw when destroyed
-	public virtual void destroySelf(string spriteName = null, string fadeSound = null, bool rpc = false, bool doRpcEvenIfNotOwned = false, bool favorDefenderProjDestroy = false) {
+	public virtual void destroySelf(string spriteName = null, string fadeSound = null, bool disableRpc = false, bool doRpcEvenIfNotOwned = false, bool favorDefenderProjDestroy = false) {
 		// These should never be destroyed and can break the match if so
 		if (this is Flag || this is FlagPedestal || this is ControlPoint || this is VictoryPoint) {
 			return;
@@ -1136,7 +1164,7 @@ public partial class Actor : GameObject {
 		// Character should not run destroy RPC. The destroyCharacter RPC handles that already
 		var character = this as Character;
 		if (character == null) {
-			if ((ownedByLocalPlayer || doRpcEvenIfNotOwned) && netId != null && !rpc) {
+			if ((ownedByLocalPlayer || doRpcEvenIfNotOwned) && netId != null && !disableRpc) {
 				float speed = vel.magnitude;
 				if (speed == 0) speed = deltaPos.magnitude / Global.spf;
 				RPC.destroyActor.sendRpc(netId.Value, (ushort)Global.spriteNames.IndexOf(spriteName), (ushort)Global.soundNames.IndexOf(fadeSound), pos, favorDefenderProjDestroy, speed);
@@ -1266,14 +1294,16 @@ public partial class Actor : GameObject {
 	// GMTODO must be more generic, account for other alignments
 	// Then find all places using this and ajust as necessary
 	public virtual Point getCenterPos() {
-		if (collider == null) return pos;
-		var rect = collider.shape.getNullableRect();
-		if (rect == null) return pos;
-
+		if (standartCollider == null) {
+			return pos;
+		}
+		Rect? rect = standartCollider.shape.getNullableRect();
+		if (rect == null) {
+			return pos;
+		}
 		if (sprite.alignment.Contains("bot")) {
 			return pos.addxy(0, -rect.Value.h() / 2);
 		}
-
 		return pos;
 	}
 

@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 namespace MMXOnline;
 
 public class BadWords {
-	public static readonly string[] badWords =
-	{
+	public static readonly string[] badWords = {
 			 "2 girls 1 cup",
 			 "2 girls one cup",
 			 "2g1c",

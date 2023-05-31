@@ -968,6 +968,8 @@ public class Dash : CharState {
 	public float dashTime = 0;
 	public string initialDashButton;
 	public int initialDashDir;
+	public bool stop;
+	public Anim dashSpark;
 
 	public Dash(string initialDashButton) : base("dash", "dash_shoot", "attack_dash") {
 		enterSound = "dash";
@@ -986,7 +988,7 @@ public class Dash : CharState {
 
 		character.isDashing = true;
 		character.globalCollider = character.getDashingCollider();
-		new Anim(character.getDashSparkEffectPos(initialDashDir), "dash_sparks", initialDashDir, player.getNextActorNetId(), true, sendRpc: true);
+		dashSpark = new Anim(character.getDashSparkEffectPos(initialDashDir), "dash_sparks", initialDashDir, player.getNextActorNetId(), true, sendRpc: true);
 	}
 
 	public override void onExit(CharState newState) {
@@ -1013,27 +1015,49 @@ public class Dash : CharState {
 		base.update();
 		groundCode();
 
-		if (!player.input.isHeld(initialDashButton, player)) {
-			changeToIdle();
-			return;
+		if (!player.input.isHeld(initialDashButton, player) && !stop) {
+			dashTime = 50;
+			stop = true;
+			character.frameIndex = 0;
+			character.sprite.frameTime = 0;
+			character.sprite.animTime = 0;
+			if (!dashSpark.destroyed) {
+				dashSpark.destroySelf();
+			}
 		}
 
-		if (player.isSigma && player.input.isPressed(Control.Special1, player) && character.flag == null && character.leapSlashCooldown == 0) {
+		if (!stop && player.isSigma && player.input.isPressed(Control.Special1, player) &&
+			character.flag == null && character.leapSlashCooldown == 0
+		) {
 			character.changeState(new SigmaWallDashState(-1, true), true);
 			return;
 		}
 
-		dashTime += Global.spf;
-		float modifier = 1;
-		if (dashTime > 0.6 * modifier) {
-			changeToIdle();
-			return;
+		float speedModifier = 1;
+		float distanceModifier = 1;
+		if (dashTime > Global.spf * 32 * distanceModifier) {
+			if (!stop) {
+				character.frameIndex = 0;
+				stop = true;
+			} else if (character.frameIndex > 0) {
+				changeToIdle();
+				return;
+			}
 		}
 		var move = new Point(0, 0);
-		if (player.isX && player.hasBootsArmor(1)) modifier = 1.15f;
-		if (player.character.sprite.name.EndsWith("unpo_grab_dash")) modifier = 1.25f;
-		move.x = character.getRunSpeed() * character.getDashSpeed() * initialDashDir * modifier;
-		character.move(move);
+		if (player.isX && player.hasBootsArmor(1)) {
+			speedModifier = 1.15f;
+			distanceModifier = 1.15f;
+		}
+		if (player.character.sprite.name.EndsWith("unpo_grab_dash")) {
+			speedModifier = 1.25f;
+			distanceModifier = 1.25f;
+		}
+		move.x = character.getRunSpeed() * character.getDashSpeed() * initialDashDir * speedModifier;
+		if (!stop) {
+			character.move(move);
+			dashTime += Global.spf;
+		}
 		if (stateTime > 0.1) {
 			stateTime = 0;
 			new Anim(character.getDashDustEffectPos(initialDashDir), "dust", initialDashDir, player.getNextActorNetId(), true, sendRpc: true);
@@ -1045,6 +1069,7 @@ public class AirDash : CharState {
 	public float dashTime = 0;
 	public string initialDashButton;
 	public int initialDashDir;
+	public bool stop;
 
 	public AirDash(string initialDashButton) : base("dash", "dash_shoot") {
 		enterSound = "dash";
@@ -1057,23 +1082,39 @@ public class AirDash : CharState {
 
 		base.update();
 
-		if (!player.input.isHeld(initialDashButton, player)) {
-			character.changeState(new Fall());
-			return;
+		if (!player.input.isHeld(initialDashButton, player) && character.frameIndex >= 0 && !stop) {
+			dashTime = 50;
+			if (character.frameIndex == 0) {
+				stop = true;
+				character.sprite.frameTime = 0; 
+			}
 		}
 
-		float modifier = 1;
-		if (player.isX && player.hasBootsArmor(2)) modifier = 1.15f;
-		if (player.character.sprite.name.EndsWith("unpo_grab_dash")) modifier = 1.25f;
-		dashTime += Global.spf;
-		if (dashTime > 0.6 * modifier) {
-			character.changeState(new Fall());
-			return;
+		float speedModifier = 1;
+		float distanceModifier = 1;
+		if (player.isX && player.hasBootsArmor(2)) {
+			speedModifier = 1.15f;
+			distanceModifier = 1.25f;
 		}
-
+		if (player.character.sprite.name.EndsWith("unpo_grab_dash")) {
+			speedModifier = 1.25f;
+			distanceModifier = 1.25f;
+		}
+		if (dashTime > Global.spf * 28 * distanceModifier) {
+			if (!stop) {
+				character.frameIndex = 0;
+				stop = true;
+			} else if (character.frameIndex > 0) {
+				character.changeState(new Fall());
+				return;
+			}
+		}
 		var move = new Point(0, 0);
-		move.x = character.getRunSpeed(true) * character.getDashSpeed() * initialDashDir * modifier;
-		character.move(move);
+		move.x = character.getRunSpeed(true) * character.getDashSpeed() * initialDashDir * speedModifier;
+		if (character.frameIndex > 0 || stop) {
+			character.move(move);
+			dashTime += Global.spf;
+		}
 		if (stateTime > 0.1) {
 			stateTime = 0;
 		}

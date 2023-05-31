@@ -297,6 +297,16 @@ public class Maverick : Actor, IDamagable {
 		base.onCollision(other);
 		if (other.myCollider?.flag == (int)HitboxFlag.Hitbox || other.myCollider?.flag == (int)HitboxFlag.None) return;
 
+		// Move zone movement.
+		if (other.gameObject is MoveZone moveZone) {
+			if (moveZone.moveVel.x != 0) {
+				xPushVel = moveZone.moveVel.x;
+			}
+			if (moveZone.moveVel.y != 0) {
+				yPushVel = moveZone.moveVel.y;
+			}
+		}
+
 		var killZone = other.gameObject as KillZone;
 		if (killZone != null) {
 			if (!killZone.killInvuln && this is StingChameleon sc && sc.isInvisible) return;
@@ -479,6 +489,31 @@ public class Maverick : Actor, IDamagable {
 		return new MaverickState[] { };
 	}
 
+	// For terrain collision.
+	public override Collider getTerrainCollider() {
+		float hSize = Math.Min(height, 30);
+		float wSize = width;
+		Rect? physicsRect = physicsCollider?.shape.getRect();
+		if (physicsRect != null) {
+			hSize = Math.Min(hSize, physicsRect.Value.h());
+		} else {
+			return null;
+		}
+
+		if (reversedGravity && this is MagnaCentipede) {
+			return new Collider(
+				new Rect(0f, 0f, wSize, hSize).getPoints(),
+				false, this, false, false,
+				HitboxFlag.Hurtbox, new Point(0f, -50 + hSize)
+			);
+		}
+		return new Collider(
+			new Rect(0f, 0f, wSize, hSize).getPoints(),
+			false, this, false, false,
+			HitboxFlag.Hurtbox, new Point(0f, 0f)
+		);
+	}
+
 	public override Collider getGlobalCollider() {
 		var rect = new Rect(0, 0, width, height);
 		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
@@ -591,7 +626,7 @@ public class Maverick : Actor, IDamagable {
 
 		health -= damage;
 
-		if (owner != null && weaponIndex != null) {
+		if (owner != null && weaponIndex != null && damage > 0) {
 			damageHistory.Add(new DamageEvent(owner, weaponIndex.Value, projId, false, Global.time));
 		}
 

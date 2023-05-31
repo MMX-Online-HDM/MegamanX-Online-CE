@@ -245,12 +245,12 @@ public class Projectile : Actor {
 		return false;
 	}
 
-	public override void destroySelf(string spriteName = null, string fadeSound = null, bool rpc = false, bool doRpcEvenIfNotOwned = false, bool favorDefenderProjDestroy = false) {
-		base.destroySelf(fadeSprite, this.fadeSound, rpc, doRpcEvenIfNotOwned, favorDefenderProjDestroy: favorDefenderProjDestroy);
+	public override void destroySelf(string spriteName = null, string fadeSound = null, bool disableRpc = false, bool doRpcEvenIfNotOwned = false, bool favorDefenderProjDestroy = false) {
+		base.destroySelf(fadeSprite, this.fadeSound, disableRpc, doRpcEvenIfNotOwned, favorDefenderProjDestroy: favorDefenderProjDestroy);
 	}
 
-	public void destroySelfNoEffect(bool rpc = false, bool doRpcEvenIfNotOwned = false) {
-		base.destroySelf(null, null, rpc, doRpcEvenIfNotOwned);
+	public void destroySelfNoEffect(bool disableRpc = false, bool doRpcEvenIfNotOwned = false) {
+		base.destroySelf(null, null, disableRpc, doRpcEvenIfNotOwned);
 	}
 
 	public static bool charsCanClang(Character attacker, Character defender) {

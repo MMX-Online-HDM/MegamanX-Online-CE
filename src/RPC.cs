@@ -89,6 +89,9 @@ public class RPC {
 	public static RPCFeedWheelGator feedWheelGator;
 	public static RPCHealDoppler healDoppler;
 	public static RPCResetFlag resetFlags;
+	// For mods and stuff.
+	// It allow to not override stuff when developing mods.
+	public static RPCCustom custom;
 
 	public static List<RPC> templates = new List<RPC>()
 	{
@@ -165,6 +168,7 @@ public class RPC {
 			(feedWheelGator = new RPCFeedWheelGator()),
 			(healDoppler = new RPCHealDoppler()),
 			(resetFlags = new RPCResetFlag()),
+			(custom = new RPCCustom()),
 		};
 
 	public virtual void invoke(params byte[] arguments) {
@@ -434,9 +438,9 @@ public class RPCDestroyActor : RPC {
 			if (actor is Character) {
 				(actor as Character).destroySelf(destroySprite, destroySound, rpc: true);
 			} else if (actor is RollingShieldProjCharged) {
-				(actor as RollingShieldProjCharged).destroySelf(destroySprite, destroySound, rpc: true);
+				(actor as RollingShieldProjCharged).destroySelf(destroySprite, destroySound, disableRpc: true);
 			} else {
-				actor.destroySelf(destroySprite, destroySound, rpc: true);
+				actor.destroySelf(destroySprite, destroySound, disableRpc: true);
 			}
 		} else {
 			Global.level.bufferedDestroyActors.Add(new BufferedDestroyActor(netId, destroySprite, destroySound));

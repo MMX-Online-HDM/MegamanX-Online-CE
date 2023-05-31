@@ -323,35 +323,81 @@ public class Rekkoha : CharState {
 
 public class RekkohaProj : Projectile {
 	float len = 0;
-	public RekkohaProj(Weapon weapon, Point pos, Player player, ushort netProjId, bool rpc = false) : base(weapon, pos, 1, 0, 3, player, "rekkoha_proj", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	private float reverseLen;
+	private bool updatedDamager = false;
+
+	public RekkohaProj(
+		Weapon weapon, Point pos, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, 1, 0, 3, player, "rekkoha_proj", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.Rekkoha;
 		vel.y = 400;
-		maxTime = 1f;
+		maxTime = 1.6f;
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		netcodeOverride = NetcodeModel.FavorDefender;
 	}
 
 	public override void update() {
 		base.update();
-		len += Global.spf * 200;
-		if (len > 230) len = 230;
-
-		var newRect = new Rect(0, 0, 16, 63 + len);
+		len += Global.spf * 300;
+		if (time >= 1f && !updatedDamager) {
+			updateDamager(0, 0);
+			updatedDamager = true;
+		}
+		if (len >= 200) {
+			len = 200;
+			reverseLen += Global.spf * 200 * 2;
+			if (reverseLen > 200) {
+				reverseLen = 200;
+			}
+			vel.y = 100;
+		}
+		Rect newRect = new Rect(0, 0, 16, 63 + len - reverseLen);
 		globalCollider = new Collider(newRect.getPoints(), true, this, false, false, 0, new Point(0, 0));
 	}
 
 	public override void render(float x, float y) {
-		base.render(x, y);
-		int intLen = (int)len / 23;
-		int i;
-		for (i = 0; i < intLen; i++) {
-			Global.sprites["rekkoha_proj_mid"].draw(sprite.frameIndex, pos.x + x, pos.y + y - 63 - (i * 23), 1, 1, null, alpha, 1, 1, zIndex);
+		float finalLen = len - reverseLen;
+
+		float newAlpha = 1;
+		if (len <= 50) {
+			newAlpha = len / 50;
 		}
-		Global.sprites["rekkoha_proj_top"].draw(sprite.frameIndex, pos.x + x, pos.y + y - 63 - (i * 23), 1, 1, null, alpha, 1, 1, zIndex);
+		if (reverseLen >= 100) {
+			newAlpha = (200 - reverseLen) / 100;
+		}
+
+		alpha = newAlpha;
+
+		float basePosY = System.MathF.Floor(pos.y + y);
+
+		Global.sprites["rekkoha_proj_mid"].draw(
+			sprite.frameIndex,
+			pos.x + x,
+			basePosY - 63f,
+			1, 1, null, alpha,
+			1f, finalLen / 23f + 0.01f, zIndex
+		);
+		Global.sprites["rekkoha_proj_top"].draw(
+			sprite.frameIndex,
+			pos.x + x,
+			basePosY - 63f - finalLen,
+			1, 1, null, alpha,
+			1f, 1f, zIndex
+		);
+		Global.sprites["rekkoha_proj"].draw(
+			sprite.frameIndex,
+			pos.x + x,
+			basePosY,
+			1, 1, null, alpha,
+			1f, 1f, zIndex
+		);
 	}
 }
 
@@ -371,29 +417,45 @@ public class RekkohaEffect : Effect {
 	}
 
 	public override void render(float offsetX, float offsetY) {
-		if (Global.level.server.fixedCamera) return;
+		float scale = 1;
+		if (Global.level.server.fixedCamera) {
+			scale = 2;
+		}
 
 		offsetX += pos.x;
 		offsetY += pos.y;
-		if (effectTime < 0.15f) {
-			byte alpha = (byte)(255 * (effectTime * 4));
-			DrawWrappers.DrawRect(offsetX, offsetY, offsetX + Global.screenW, offsetY + Global.screenH, true, new Color(0, 0, 0, alpha), 0, ZIndex.Background, true);
-			return;
-		} else if (effectTime < 0.2f) {
-			DrawWrappers.DrawRect(offsetX, offsetY, offsetX + Global.screenW, offsetY + Global.screenH, true, new Color(255, 255, 255), 0, ZIndex.Background, true);
-			return;
-		}
 
-		for (int i = 0; i < 38; i++) {
+		float alpha = 0.5f;
+		if (effectTime < 0.25f) {
+			alpha = 0.5f * (effectTime * 4);
+		}
+		if (effectTime > 1.75f) {
+			alpha = 0.5f - 0.5f * ((effectTime - 1.75f) * 4);
+		}
+		alpha *= 2;
+
+		for (int i = 0; i < 38 * scale; i++) {
 			float offY = (effectTime * 448) * (i % 2 == 0 ? 1 : -1);
 			while (offY > 596) offY -= 596;
 			while (offY < -596) offY += 596;
 
 			int index = i + (int)(effectTime * 20);
 
-			Global.sprites["rekkoha_effect_strip"].draw(index % 3, offsetX + i * 8, offsetY + offY - 596, 1, 1, null, 1, 1, 1, ZIndex.Background + 10);
-			Global.sprites["rekkoha_effect_strip"].draw(index % 3, offsetX + i * 8, offsetY + offY, 1, 1, null, 1, 1, 1, ZIndex.Background + 10);
-			Global.sprites["rekkoha_effect_strip"].draw(index % 3, offsetX + i * 8, offsetY + offY + 596, 1, 1, null, 1, 1, 1, ZIndex.Background + 10);
+			Global.sprites["rekkoha_effect_strip"].draw(
+				index % 3,
+				offsetX + i * 8, offsetY + offY - 596,
+				1, 1, null, alpha, 1, 1, ZIndex.Background + 5
+			);
+			Global.sprites["rekkoha_effect_strip"].draw(
+				index % 3,
+				offsetX + i * 8, offsetY + offY,
+				1, 1, null, alpha, 1, 1, ZIndex.Background + 5
+			);
+			Global.sprites["rekkoha_effect_strip"].draw(
+				index % 3,
+				offsetX + i * 8, offsetY + offY + 596,
+				1, 1, null, alpha, 1, 1, ZIndex.Background + 5
+			);
 		}
 	}
 }

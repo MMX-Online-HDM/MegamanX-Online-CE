@@ -1299,7 +1299,7 @@ public partial class Level {
 				bufferedDestroyedActor.time += Global.spf;
 				var actor = getActorByNetId(bufferedDestroyedActor.netId);
 				if (actor != null) {
-					actor.destroySelf(bufferedDestroyedActor.destroySprite, bufferedDestroyedActor.destroySound, rpc: true);
+					actor.destroySelf(bufferedDestroyedActor.destroySprite, bufferedDestroyedActor.destroySound, disableRpc: true);
 					bufferedDestroyActors.RemoveAt(i);
 				} else if (bufferedDestroyedActor.time > 5) {
 					bufferedDestroyActors.RemoveAt(i);
