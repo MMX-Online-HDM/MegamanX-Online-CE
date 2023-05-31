@@ -618,16 +618,22 @@ public partial class Global {
 						}
 
 						// Validate
-						if (string.IsNullOrEmpty(region.name) || string.IsNullOrEmpty(region.ip)) {
-							return new List<Region>();
+						if (!string.IsNullOrEmpty(region.url)) {
+							region.ip = System.Net.Dns.GetHostAddresses(region.url)[0].ToString();
 						}
-
-						if (region.name.Length > 8) {
-							region.name = region.name.Substring(0, 8);
+						if (string.IsNullOrEmpty(region.name) || string.IsNullOrEmpty(region.ip))
+						{
+							//throw new Exception("region.txt has missing fields.");
+							region = new Region();
 						}
-
-						if (!region.ip.IsValidIpAddress()) throw new Exception("region.txt has invalid ip.");
-
+						else {
+							if (!region.ip.IsValidIpAddress()) {
+								throw new Exception("region.txt has invalid ip.");
+							}
+							if (region.name.Length > 10) {
+								region.name = region.name.Substring(0, 10);
+							}
+						}
 						_regions = new List<Region>() { region };
 					} else {
 						return new List<Region>();

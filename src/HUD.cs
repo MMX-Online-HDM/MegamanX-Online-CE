@@ -297,8 +297,8 @@ public partial class DrawWrappers {
 	public static void DrawTitleTexture(Texture texture) {
 		if (texture == null) return;
 		var sprite = new SFML.Graphics.Sprite(texture);
-		sprite.Position = new Vector2f(-20, 0);
-		sprite.Scale = new Vector2f(0.75f, 0.75f);
+		sprite.Position = new Vector2f(0, 0);
+		//sprite.Scale = new Vector2f(0.75f, 0.75f);
 		drawToHUD(sprite);
 	}
 }

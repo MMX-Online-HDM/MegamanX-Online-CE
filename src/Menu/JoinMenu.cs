@@ -196,7 +196,7 @@ public class JoinMenu : IMainMenu {
 					Menu.change(new ErrorMenu(new string[] { "Private server not found.", "Note: match names are case sensitive." }, this));
 				}));
 			} else {
-				Menu.change(new EnterTextMenu("Enter IP Address", 15, (ipAddressStr) => {
+				Menu.change(new EnterTextMenu("Enter IP Address or URL", 30, (ipAddressStr) => {
 					if (ipAddressStr.IsValidIpAddress()) {
 						lock (Global.lanRegions) {
 							if (!Global.lanRegions.Any(r => r.ip == ipAddressStr)) {
@@ -206,7 +206,16 @@ public class JoinMenu : IMainMenu {
 						queueRefresh();
 						Menu.change(this);
 					} else {
-						Menu.change(new ErrorMenu(new string[] { "Invalid IP address." }, this));
+						string urlIP = System.Net.Dns.GetHostAddresses(ipAddressStr)[0].ToString();
+						if (String.IsNullOrEmpty(urlIP)) {
+							Menu.change(new ErrorMenu(new string[] { "Invalid IP address or URL." }, this));
+						} else {
+							lock (Global.lanRegions) {
+								if (!Global.lanRegions.Any(r => r.ip == urlIP)) {
+									Global.lanRegions.Add(new Region("LAN", urlIP));
+								}
+							}
+						}
 					}
 				}));
 			}
