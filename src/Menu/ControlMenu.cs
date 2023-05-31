@@ -52,6 +52,7 @@ public class ControlMenu : IMainMenu {
 				new string[] { Control.Special1, "Special" },
 				new string[] { Control.WeaponLeft, "WeaponL" },
 				new string[] { Control.WeaponRight, "WeaponR" },
+				new string[] { Control.Special2, "Command"},
 			};
 
 		// General menu controls not to be overridden on characters
@@ -70,9 +71,9 @@ public class ControlMenu : IMainMenu {
 			bindableControls.Add(new string[] { Control.Taunt, "Taunt" });
 		}
 
-		if (charNum == 4) {
+		/* if (charNum == 4) {
 			bindableControls.Add(new string[] { Control.SigmaCommand, "Command Button" });
-		}
+		} */
 
 		// Axl specific settings
 		if (charNum == 3) {
@@ -163,8 +164,8 @@ public class ControlMenu : IMainMenu {
 				if (inputName.StartsWith("menu", StringComparison.OrdinalIgnoreCase)) continue;
 				if (kvp.Key.StartsWith("aim", StringComparison.OrdinalIgnoreCase)) continue;
 				if (inputName.StartsWith("aim", StringComparison.OrdinalIgnoreCase)) continue;
-				if (kvp.Key.StartsWith("sigmacommand", StringComparison.OrdinalIgnoreCase)) continue;
-				if (inputName.StartsWith("sigmacommand", StringComparison.OrdinalIgnoreCase)) continue;
+				if (kvp.Key.StartsWith("command", StringComparison.OrdinalIgnoreCase)) continue;
+				if (inputName.StartsWith("command", StringComparison.OrdinalIgnoreCase)) continue;
 				// Jump and up are the only only other exceptions to the "can't bind multiple with one key" rule
 				if ((kvp.Key == Control.Jump && inputName == Control.Up) || kvp.Key == Control.Up && inputName == Control.Jump) continue;
 

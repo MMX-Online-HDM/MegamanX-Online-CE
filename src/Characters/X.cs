@@ -154,6 +154,8 @@ public partial class Character {
 				player.changeWeaponSlot(oldSlot);
 			}
 		}
+		// Fast Hyper Activation.
+		quickArmorUpgrade();
 
 		if (charState is not Die && player.input.isPressed(Control.Special1, player) && player.hasAllX3Armor() && !player.hasGoldenArmor() && !player.hasUltimateArmor() && player.hasAnyChip()) {
 			if (player.input.isHeld(Control.Down, player)) {
@@ -598,6 +600,39 @@ public partial class Character {
 			}
 
 			Global.serverClient?.rpc(shootRpc, playerIdByte, xBytes[0], xBytes[1], yBytes[0], yBytes[1], xDirByte, chargeLevelByte, netProjIdBytes[0], netProjIdBytes[1], weaponIndexByte);
+		}
+	}
+
+	// Fast upgrading via command key.
+	public void quickArmorUpgrade() {
+		if (!player.input.isPressed(Control.Special2, player)) {
+			return;
+		}
+		if (player.health <= 0) {
+			return;
+		}
+
+		if (!(charState is WarpIn)) {
+			if (player.canUpgradeGoldenX()) {
+				if (!player.character.boughtGoldenArmorOnce) {
+					player.scrap -= Player.goldenArmorCost;
+					player.character.boughtGoldenArmorOnce = true;
+				}
+				player.setGoldenArmor(true);
+				Global.playSound("ching");
+
+				return;
+			}
+			if (player.canUpgradeUltimateX()) {
+				if (!player.character.boughtUltimateArmorOnce) {
+					player.scrap -= Player.ultimateArmorCost;
+					player.character.boughtUltimateArmorOnce = true;
+				}
+				player.setUltimateArmor(true);
+				Global.playSound("ching");
+				
+				return;
+			}
 		}
 	}
 

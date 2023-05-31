@@ -39,6 +39,7 @@ public class RideArmor : Actor, IDamagable {
 
 	public float consecutiveJumpTimeout;
 	public int consecutiveJump;
+	public bool manualDisabled = false;
 
 	public RideArmor(Player owner, Point pos, int raNum, int neutralId, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) : base(null, pos, netId, ownedByLocalPlayer, true) {
 		netOwner = owner;
@@ -1198,6 +1199,11 @@ public class RADeactive : RideArmorState {
 		rideArmor.consecutiveJumpTimeout = 0;
 		rideArmor.consecutiveJump = 0;
 	}
+
+    public override void onExit(RideArmorState newState) {
+        base.onExit(newState);
+		rideArmor.manualDisabled = false;
+    }
 }
 
 public class RAIdle : RideArmorState {

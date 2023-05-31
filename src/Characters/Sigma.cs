@@ -110,7 +110,10 @@ public partial class Character {
 		}
 
 		// "Global" command prototype
-		if (player.weapon is SigmaMenuWeapon && player.currentMaverick == null && player.mavericks.Count > 0 && grounded && player.input.isHeld(Control.Down, player) && (isPuppeteer || isSummoner) && charState is not IssueGlobalCommand) {
+		if (player.weapon is SigmaMenuWeapon && 
+			player.currentMaverick == null && player.mavericks.Count > 0 && 
+			grounded && player.input.isHeld(Control.Down, player) && 
+			(isPuppeteer || isSummoner) && charState is not IssueGlobalCommand) {
 			if (player.input.isCommandButtonPressed(player)) {
 				Global.level.gameMode.hudErrorMsgTime = 0;
 				if (player.currentMaverickCommand == MaverickAIBehavior.Defend) {

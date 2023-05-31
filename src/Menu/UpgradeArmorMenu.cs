@@ -416,7 +416,7 @@ public class UpgradeArmorMenu : IMainMenu {
 		if (Global.input.isPressedMenu(Control.Special1)) {
 			if (mainPlayer.canUpgradeUltimateX()) {
 				if (!mainPlayer.character.boughtUltimateArmorOnce) {
-					mainPlayer.scrap -= 10;
+					mainPlayer.scrap -= Player.ultimateArmorCost;
 					mainPlayer.character.boughtUltimateArmorOnce = true;
 				}
 				mainPlayer.setUltimateArmor(true);
@@ -424,7 +424,7 @@ public class UpgradeArmorMenu : IMainMenu {
 				return true;
 			} else if (mainPlayer.canUpgradeGoldenX()) {
 				if (!mainPlayer.character.boughtGoldenArmorOnce) {
-					mainPlayer.scrap -= 5;
+					mainPlayer.scrap -= Player.goldenArmorCost;
 					mainPlayer.character.boughtGoldenArmorOnce = true;
 				}
 				mainPlayer.setGoldenArmor(true);

@@ -629,7 +629,11 @@ public class Input {
 	}
 
 	public bool isCommandButtonPressed(Player player) {
-		return isPressed(Control.SigmaCommand, player);
+		return isPressed(Control.Special2, player);
+	}
+
+	public bool isCommandButtonHeld(Player player) {
+		return isHeld(Control.Special2, player);
 	}
 
 	public Point getInputDir(Player player) {

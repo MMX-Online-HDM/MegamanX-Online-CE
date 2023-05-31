@@ -110,9 +110,14 @@ public partial class Player {
 	public bool lastDeathWasVileMK5;
 	public bool lastDeathWasSigmaHyper;
 	public bool lastDeathWasXHyper;
+	public const int zeroHyperCost = 10;
+	public const int zBusterZeroHyperCost = 10;
+	public const int AxlHyperCost = 10;
 	public const int reviveVileScrapCost = 5;
 	public const int reviveSigmaScrapCost = 10;
 	public const int reviveXScrapCost = 10;
+	public const int goldenArmorCost = 5;
+	public const int ultimateArmorCost = 10;
 	public bool lastDeathCanRevive;
 	public int vileFormToRespawnAs;
 	public bool hyperSigmaRespawn;
@@ -739,7 +744,7 @@ public partial class Player {
 			if (canReviveVile()) {
 				if (input.isPressed(Control.Special1, this) || Global.shouldAiAutoRevive) {
 					reviveVile(false);
-				} else if (input.isPressed(Control.Shoot, this) && !lastDeathWasVileMK2) {
+				} else if (input.isPressed(Control.Special2, this) && !lastDeathWasVileMK2) {
 					reviveVile(true);
 				}
 			}
@@ -782,7 +787,7 @@ public partial class Player {
 				reviveSigma(spawnPoint);
 			}
 		} else if (isX) {
-			if (canReviveX() && (input.isPressed(Control.Special1, this) || Global.shouldAiAutoRevive)) {
+			if (canReviveX() && (input.isPressed(Control.Special2, this) || Global.shouldAiAutoRevive)) {
 				reviveX();
 			}
 		}
@@ -1197,11 +1202,18 @@ public partial class Player {
 	}
 
 	public bool canUpgradeGoldenX() {
-		return character != null && isX && !isDisguisedAxl && character.charState is not Die && !Global.level.is1v1() && hasAllX3Armor() && !hasAnyChip() && !hasUltimateArmor() && !hasGoldenArmor() && scrap >= 5 && !usedChipOnce;
+		return character != null && 
+			isX && !isDisguisedAxl && 
+			character.charState is not Die && !Global.level.is1v1() && 
+			hasAllX3Armor() && !hasAnyChip() && !hasUltimateArmor() && 
+			!hasGoldenArmor() && scrap >= goldenArmorCost && !usedChipOnce;
 	}
 
 	public bool canUpgradeUltimateX() {
-		return character != null && isX && !isDisguisedAxl && character.charState is not Die && !Global.level.is1v1() && !hasUltimateArmor() && !canUpgradeGoldenX() && hasAllArmor() && scrap >= 10;
+		return character != null && 
+			isX && !isDisguisedAxl && 
+			character.charState is not Die && !Global.level.is1v1() && 
+			!hasUltimateArmor() && !canUpgradeGoldenX() && hasAllArmor() && scrap >= ultimateArmorCost;
 	}
 
 	public void destroy() {

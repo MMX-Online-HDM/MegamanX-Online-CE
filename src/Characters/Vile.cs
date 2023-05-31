@@ -239,18 +239,26 @@ public partial class Character {
 		lastFrameWeaponRightHeld = wR;
 
 		var mmw = player.weapon as MechMenuWeapon;
+
+		// Vile V Ride control.
+
 		if (!isVileMK5 || vileStartRideArmor == null) {
 			if (player.input.isPressed(Control.Shoot, player) && mmw != null && calldownMechCooldown == 0) {
 				onMechSlotSelect(mmw);
 				return;
 			}
-		} else if (mmw != null) {
+		} else if (player.input.isPressed(Control.Special2, player) && !player.input.isHeld(Control.Down, player)) {
+			onMechSlotSelect(mmw);
+			return;
+		}
+		
+		/* else if (mmw != null) {
 			if (player.input.isPressed(Control.Up, player)) {
 				onMechSlotSelect(mmw);
 				player.changeWeaponSlot(player.prevWeaponSlot);
 				return;
 			}
-		}
+		} */
 
 		if (isVileMK5 && vileStartRideArmor != null) {
 			if (canLinkMK5()) {
@@ -264,19 +272,31 @@ public partial class Character {
 			}
 		}
 
-		if (isVileMK5 && vileStartRideArmor != null && mmw != null && vileStartRideArmor.rideArmorState is RADeactive) {
-			vileStartRideArmor.changeState(new RAIdle("ridearmor_activating"), true);
-			return;
+		if (isVileMK5 && vileStartRideArmor != null &&
+			player.input.isPressed(Control.Special2, player) &&
+			player.input.isHeld(Control.Down, player)
+		) {
+			if (vileStartRideArmor.rideArmorState is RADeactive) {
+				vileStartRideArmor.manualDisabled = false;
+				vileStartRideArmor.changeState(new RAIdle("ridearmor_activating"), true);
+			} else {
+				vileStartRideArmor.manualDisabled = true;
+				vileStartRideArmor.changeState(new RADeactive(), true);
+				Global.level.gameMode.setHUDErrorMessage(
+					player, "Deactivated Ride Armor.",
+					playSound: false, resetCooldown: true
+				);
+			}
 		}
 
-		if (isVileMK5 && vileStartRideArmor != null && mmw != null && grounded && vileStartRideArmor.grounded && player.input.isPressed(Control.Down, player)) {
+		/* if (isVileMK5 && vileStartRideArmor != null && mmw != null && grounded && vileStartRideArmor.grounded && player.input.isPressed(Control.Down, player)) {
 			if (vileStartRideArmor.rideArmorState is not RADeactive) {
 				vileStartRideArmor.changeState(new RADeactive(), true);
 				player.changeWeaponSlot(player.prevWeaponSlot);
 				Global.level.gameMode.setHUDErrorMessage(player, "Deactivated Ride Armor.", playSound: false, resetCooldown: true);
 				return;
 			}
-		}
+		} */
 
 		if (isInvulnerableAttack()) return;
 		if (!player.canControl) return;
@@ -352,7 +372,7 @@ public partial class Character {
 
 	public bool canLinkMK5() {
 		if (vileStartRideArmor == null) return false;
-		if (vileStartRideArmor.rideArmorState is RADeactive) return false;
+		if (vileStartRideArmor.rideArmorState is RADeactive && vileStartRideArmor.manualDisabled) return false;
 		if (vileStartRideArmor.pos.distanceTo(pos) > Global.screenW * 0.75f) return false;
 		return charState is not Die && charState is not VileRevive && charState is not CallDownMech && charState is not HexaInvoluteState;
 	}

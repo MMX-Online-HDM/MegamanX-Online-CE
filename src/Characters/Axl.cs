@@ -462,7 +462,7 @@ public partial class Character {
 			if (altShootHeld && !bothHeld && (player.weapon is AxlBullet || player.weapon is DoubleBullet) && invulnTime == 0 && flag == null) {
 				increaseCharge();
 			} else {
-				if (isCharging() && getChargeLevel() >= 3 && player.scrap >= 10 && !isWhiteAxl() && !hyperAxlUsed && (player.axlHyperMode > 0 || player.axlBulletType == 0)) {
+				/* if (isCharging() && getChargeLevel() >= 3 && player.scrap >= 10 && !isWhiteAxl() && !hyperAxlUsed && (player.axlHyperMode > 0 || player.axlBulletType == 0)) {
 					if (player.axlHyperMode == 0) {
 						changeState(new HyperAxlStart(grounded), true);
 					} else {
@@ -476,7 +476,8 @@ public partial class Character {
 							playSound("stingCharge", sendRpc: true);
 						}
 					}
-				} else if (isCharging() && getChargeLevel() >= 3 && isStealthMode()) {
+				} */
+				if (isCharging() && getChargeLevel() >= 3 && isStealthMode()) {
 					stingChargeTime = 0;
 					playSound("stingCharge", sendRpc: true);
 				} else if (isCharging()) {
@@ -491,6 +492,33 @@ public partial class Character {
 					}
 				}
 				stopCharge();
+
+				// Handles Hyper activation.
+
+				if (player.input.isHeld(Control.Special2, player) &&
+					player.scrap >= 10 && (!(charState is HyperAxlStart)) &&
+					(!hyperAxlUsed) && (!(charState is WarpIn))
+				) {
+					hyperProgress += Global.spf;
+				} else {
+					hyperProgress = 0;
+				}
+				if (hyperProgress >= 1 && player.scrap >= 10) {
+					hyperProgress = 0;
+					if (player.axlHyperMode == 0) {
+						changeState(new HyperAxlStart(grounded), true);
+					} else {
+						if (!hyperAxlUsed) {
+							hyperAxlUsed = true;
+							//addHealth(player.maxHealth);
+							foreach (var weapon in player.weapons) {
+								weapon.ammo = weapon.maxAmmo;
+							}
+							stingChargeTime = 12;
+							playSound("stingCharge", sendRpc: true);
+						}
+					}
+				}
 			}
 		} else {
 			if (shootHeld) {

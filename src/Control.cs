@@ -45,7 +45,7 @@ public class Control {
 	public const string TeamChat = "menuteamchat";
 	public const string AllChat = "menuallchat";
 	public const string Taunt = "taunt";
-	public const string SigmaCommand = "sigmacommand";
+	public const string Special2 = "command";
 
 	public static JoystickInfo joystick;
 
@@ -232,6 +232,7 @@ public class Control {
 									{ TeamChat, (int)Key.T },
 									{ AllChat, (int)Key.Y },
 									{ Taunt, (int)Key.G },
+									{ Special2, (int)Key.M}
 							   }
 							},
                             // Sigma specific controls
@@ -239,7 +240,7 @@ public class Control {
 							   getCharSpecificName(KeyboardName, 4, 0),
 							   new Dictionary<string, int?>()
 							   {
-									{ SigmaCommand, (int)Key.LControl },
+									{ Special2, (int)Key.LControl },
 							   }
 							},
                             // Axl directional aim controls

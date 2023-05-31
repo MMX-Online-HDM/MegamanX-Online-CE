@@ -2324,7 +2324,7 @@ public class GameMode {
 
 	public void drawRespawnHUD() {
 		if (level.mainPlayer.character != null && level.mainPlayer.readyTextOver && level.mainPlayer.canReviveX()) {
-			Helpers.drawTextStd(TCat.HUD, Helpers.controlText("[D]: Activate Unlimited Potential"), Global.screenW / 2, 10 + Global.screenH / 2, Alignment.Center, fontSize: 21);
+			Helpers.drawTextStd(TCat.HUD, Helpers.controlText("[CMD]: Activate Raging Charge"), Global.screenW / 2, 10 + Global.screenH / 2, Alignment.Center, fontSize: 21);
 		}
 
 		if (level.mainPlayer.randomTip == null) return;
@@ -2346,7 +2346,7 @@ public class GameMode {
 					Helpers.drawTextStd(TCat.HUD, respawnStr, Global.screenW / 2, -10 + Global.screenH / 2, Alignment.Center);
 					string reviveText = Helpers.controlText("[D]: Revive as MK-II (5 scrap)");
 					Helpers.drawTextStd(TCat.HUD, reviveText, Global.screenW / 2, 10 + Global.screenH / 2, Alignment.Center, fontSize: 24);
-					string reviveText2 = Helpers.controlText("[C]: Revive as MK-V (5 scrap)");
+					string reviveText2 = Helpers.controlText("[CMD]: Revive as MK-V (5 scrap)");
 					Helpers.drawTextStd(TCat.HUD, reviveText2, Global.screenW / 2, 22 + Global.screenH / 2, Alignment.Center, fontSize: 24);
 				}
 			} else if (level.mainPlayer.canReviveSigma(out _)) {

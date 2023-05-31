@@ -126,11 +126,12 @@ public partial class Character {
 				} else if (chargeLevel == 2) {
 					zeroShoot(2);
 				} else if (chargeLevel >= 3) {
-					if (player.scrap >= 10 && !hyperZeroUsed && flag == null && !player.isZBusterZero()) {
+					zeroShoot(chargeLevel);
+					/* if (player.scrap >= 10 && !hyperZeroUsed && flag == null && !player.isZBusterZero()) {
 						changeState(new HyperZeroStart(player.zeroHyperMode), true);
 					} else {
 						zeroShoot(chargeLevel);
-					}
+					} */
 				}
 			}
 			stopCharge();
@@ -138,6 +139,35 @@ public partial class Character {
 		chargeLogic();
 
 		Helpers.decrementTime(ref zeroLemonCooldown);
+
+		// Handles Standard Hypermode Activations.
+
+		if (player.scrap >= Player.zeroHyperCost &&
+			player.input.isHeld(Control.Special2, player) &&
+			charState is not HyperZeroStart && (
+				!isNightmareZero &&
+				!isAwakenedZero() &&
+				!isBlackZero() &&
+				!isBlackZero2()
+			) && !(charState is WarpIn)
+		) {
+			if (!player.isZBusterZero()) {
+				hyperProgress += Global.spf;
+			}
+		} else {
+			hyperProgress = 0;
+		}
+		if (hyperProgress >= 1 && player.scrap >= Player.zeroHyperCost) {
+			hyperProgress = 0;
+			changeState(new HyperZeroStart(player.zeroHyperMode), true);
+		}
+		if (player.scrap < Player.zeroHyperCost && player.input.isHeld(Control.Special2, player)) {
+			Global.level.gameMode.setHUDErrorMessage(
+				player, Player.zeroHyperCost + " scrap needed to enter hypermode.",
+				playSound: false, resetCooldown: true
+			);
+		}
+		
 		if (player.isZBusterZero()) {
 			if (charState.canShoot() && !isCharging()) {
 				var shootPressed = player.input.isPressed(Control.Shoot, player);
@@ -179,17 +209,30 @@ public partial class Character {
 					}
 				}
 			}
+			
+			// Handles ZBusterZero's Hyper activations.
 
-			if (player.input.isWeaponLeftOrRightHeld(player) && player.scrap >= 10 && !isBlackZero2() && charState is not HyperZeroStart && invulnTime == 0 && rideChaser == null && rideArmor == null && charState is not WarpIn) {
+			if (player.input.isHeld(Control.Special2, player) && 
+				player.scrap >= Player.zBusterZeroHyperCost && !isBlackZero2() && 
+				charState is not HyperZeroStart && invulnTime == 0 && 
+				rideChaser == null && rideArmor == null && charState is not WarpIn) {
 				hyperProgress += Global.spf;
 			} else {
 				hyperProgress = 0;
 			}
 
-			if (hyperProgress >= 1 && player.scrap >= 10 && !isBlackZero2()) {
+			if (hyperProgress >= 1 && player.scrap >= Player.zBusterZeroHyperCost && 
+				!isBlackZero2()) {
 				hyperProgress = 0;
 				changeState(new HyperZeroStart(0), true);
 			}
+
+			if (player.scrap < Player.zBusterZeroHyperCost && player.input.isHeld(Control.Special2, player)) {
+				Global.level.gameMode.setHUDErrorMessage(
+				player, Player.zBusterZeroHyperCost + " scrap needed to enter hypermode.",
+				playSound: false, resetCooldown: true
+			);
+		}
 
 			return;
 		}
@@ -695,7 +738,7 @@ public class HyperZeroStart : CharState {
 				drWilyAnim = new Anim(character.pos.addxy(30 * character.xDir, -30), "gate", -character.xDir, player.getNextActorNetId(), false, sendRpc: true);
 				drWilyAnim.fadeIn = true;
 				drWilyAnim.blink = true;
-				character.player.awakenedScrapEnd = (character.player.scrap - 10);
+				character.player.scrap -= 10;
 			}
 			character.hyperZeroUsed = true;
 		}
@@ -710,6 +753,7 @@ public class HyperZeroStart : CharState {
 		if (character != null) {
 			character.invulnTime = 0.5f;
 		}
+		character.hyperZeroUsed = false;
 	}
 
 	public override void render(float x, float y) {
