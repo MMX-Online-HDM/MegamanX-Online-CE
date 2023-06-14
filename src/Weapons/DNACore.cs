@@ -38,6 +38,7 @@ public class DNACore : AxlWeapon {
 	public DNACoreHyperMode hyperMode;
 	public float rakuhouhaAmmo;
 	public List<Weapon> weapons = new List<Weapon>();
+	public bool usedOnce = false;
 
 	public DNACore(Character character) : base(0) {
 		if (character != null) {
@@ -69,7 +70,7 @@ public class DNACore : AxlWeapon {
 			// For any hyper modes added here, be sure to de-apply them if "preserve undisguise" is used in: axl.updateDisguisedAxl()
 			if (character.sprite.name.Contains("vilemk2")) hyperMode = DNACoreHyperMode.VileMK2;
 			else if (character.sprite.name.Contains("vilemk5")) hyperMode = DNACoreHyperMode.VileMK5;
-			else if (character.isBlackZero()) hyperMode = DNACoreHyperMode.BlackZero;
+			else if (character is Zero zero && zero.isBlackZero()) hyperMode = DNACoreHyperMode.BlackZero;
 			else if (character.isWhiteAxl()) hyperMode = DNACoreHyperMode.WhiteAxl;
 			else if (character.isAwakenedZeroBS.getValue()) hyperMode = DNACoreHyperMode.AwakenedZero;
 			else if (character.isNightmareZeroBS.getValue()) hyperMode = DNACoreHyperMode.NightmareZero;

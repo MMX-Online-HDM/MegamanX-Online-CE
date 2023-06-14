@@ -350,8 +350,8 @@ public class WolfSigmaHand : Actor, IDamagable {
 	public float lungeReturnTime;
 	public const float lungeSpeed = 300;
 	public const float moveSpeed = 200;
-	public const float maxDistFromHeadX = Global.screenW * 2;
-	public const float maxDistFromHeadY = Global.screenW * 2;
+	public static float maxDistFromHeadX = Global.screenW * 2;
+	public static float maxDistFromHeadY = Global.screenW * 2;
 	public float offScreenTime;
 	public float maxOffscreenTime = 16;
 
@@ -739,7 +739,7 @@ public class WolfSigmaBeam : Projectile {
 
 	private int getPiecesThatFit() {
 		float yDistFromOrigin = MathF.Abs(pos.y - origin.y);
-		int piecesThatFit = MathF.Floor(yDistFromOrigin / beamMidHeight);
+		int piecesThatFit = MathInt.Floor(yDistFromOrigin / beamMidHeight);
 		if (piecesThatFit > 6) piecesThatFit = 6;
 		return piecesThatFit;
 	}

@@ -1057,6 +1057,17 @@ public partial class Actor : GameObject {
 		damageTexts.Add(new DamageText(text, 0, pos, new Point(xOff, yOff), isHeal));
 	}
 
+	public void addDamageText(string text, bool isHeal) {
+		int xOff = 0;
+		int yOff = 0;
+		for (int i = damageTexts.Count - 1; i >= 0; i--) {
+			if (damageTexts[i].time < 0.1f) {
+				yOff -= 8;
+			}
+		}
+		damageTexts.Add(new DamageText(text, 0, pos, new Point(xOff, yOff), isHeal));
+	}
+
 	public void renderDamageText(float yOff) {
 		for (int i = damageTexts.Count - 1; i >= 0; i--) {
 			var dt = damageTexts[i];

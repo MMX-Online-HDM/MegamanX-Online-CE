@@ -232,17 +232,17 @@ public class Control {
 									{ TeamChat, (int)Key.T },
 									{ AllChat, (int)Key.Y },
 									{ Taunt, (int)Key.G },
-									{ Special2, (int)Key.M}
+									{ Special2, (int)Key.V }
 							   }
 							},
                             // Sigma specific controls
-                            {
+                            /*{
 							   getCharSpecificName(KeyboardName, 4, 0),
 							   new Dictionary<string, int?>()
 							   {
 									{ Special2, (int)Key.LControl },
 							   }
-							},
+							},*/
                             // Axl directional aim controls
                             {
 							   getCharSpecificName(KeyboardName, 3, 0),

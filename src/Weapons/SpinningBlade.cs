@@ -160,7 +160,7 @@ public class SpinningBladeProjCharged : Projectile {
 		var sPos = character.getShootPos();
 		DrawWrappers.DrawLine(sPos.x, sPos.y, pos.x, pos.y, new Color(0, 224, 0), 3, zIndex - 100);
 		DrawWrappers.DrawLine(sPos.x, sPos.y, pos.x, pos.y, new Color(224, 224, 96), 1, zIndex - 100);
-		Global.sprites["spinningblade_base"].draw(MathF.Round(Global.frameCount * 0.25f) % 3, sPos.x, sPos.y, 1, 1, null, 1, 1, 1, zIndex);
+		Global.sprites["spinningblade_base"].draw(MathInt.Round(Global.frameCount * 0.25f) % 3, sPos.x, sPos.y, 1, 1, null, 1, 1, 1, zIndex);
 	}
 
 	public override void onDestroy() {

@@ -274,7 +274,7 @@ public class GameMode {
 			}
 
 			if (setupTime > 0 && Global.isHost) {
-				int time = MathF.Round(setupTime.Value);
+				int time = MathInt.Round(setupTime.Value);
 				byte[] timeBytes = BitConverter.GetBytes((ushort)time);
 				if (setupTime > 0) {
 					setupTime -= Global.spf;
@@ -286,11 +286,11 @@ public class GameMode {
 				if (setupTime.Value < lastSetupTimeInt) {
 					Global.serverClient?.rpc(RPC.syncSetupTime, timeBytes);
 				}
-				lastSetupTimeInt = MathF.Floor(setupTime.Value);
+				lastSetupTimeInt = MathInt.Floor(setupTime.Value);
 			} else if (remainingTime != null && Global.isHost) {
-				int time = MathF.Round(remainingTime.Value);
+				int time = MathInt.Round(remainingTime.Value);
 				byte[] timeBytes = BitConverter.GetBytes((ushort)time);
-				int elimTime = MathF.Round(eliminationTime);
+				int elimTime = MathInt.Round(eliminationTime);
 				byte[] elimTimeBytes = BitConverter.GetBytes((ushort)elimTime);
 
 				if (remainingTime > 0) {
@@ -309,7 +309,7 @@ public class GameMode {
 					else Global.serverClient?.rpc(RPC.syncGameTime, timeBytes[0], timeBytes[1]);
 				}
 
-				lastTimeInt = MathF.Floor(remainingTime.Value);
+				lastTimeInt = MathInt.Floor(remainingTime.Value);
 			} else if (level.isNon1v1Elimination() && !Global.isHost) {
 				remainingTime -= Global.spf;
 			}
@@ -514,7 +514,7 @@ public class GameMode {
 				DrawWrappers.DrawCircle(charPos.x, charPos.y, p.zoomRange, false, Color.Red, 1f, ZIndex.HUD, outlineColor: Color.Red, pointCount: 250);
 
 				if (!c.isZoomingIn && !c.isZoomingOut) {
-					int zoomChargePercent = MathF.Round(c.zoomCharge * 100);
+					int zoomChargePercent = MathInt.Round(c.zoomCharge * 100);
 					DrawWrappers.DrawText(zoomChargePercent.ToString() + "%", cursorPos.x + 5, cursorPos.y + 5, Alignment.Left, true, 0.75f, Color.White, Color.Black, Text.Styles.Regular, 1, false, ZIndex.HUD);
 				}
 
@@ -540,12 +540,11 @@ public class GameMode {
 
 		if (!Global.level.mainPlayer.isSpectator) {
 			renderHealthAndWeapons();
-
 			// Scrap
-			if (!Global.level.is1v1()) {
+			/*if (!Global.level.is1v1()) {
 				Global.sprites["hud_scrap"].drawToHUD(0, 4, 138);
-				Helpers.drawTextStd(TCat.HUD, "x" + Global.level.mainPlayer.scrap.ToString(), 17, 140, Alignment.Left, fontSize: 24);
-			}
+				Helpers.drawTextStd(TCat.HUD, "x" + Global.level.mainPlayer.scrap.ToString(), 17, 139, Alignment.Left, fontSize: 32u);
+			}*/
 
 			if (mainPlayer.character != null && mainPlayer.character.unpoShotCount > 0) {
 				int x = 10, y = 156;
@@ -567,10 +566,10 @@ public class GameMode {
 			drawKillFeed();
 		}
 
-		drawTopHUD();
-
 		if (Global.level.isTraining()) {
 			drawDpsIfSet(40);
+		} else {
+			drawTopHUD();
 		}
 
 		if (isOver) {
@@ -892,7 +891,7 @@ public class GameMode {
 		draw1v1PlayerTopHUD(hudBotRightPlayer, HUDHealthPosition.BotRight);
 
 		if (remainingTime != null) {
-			var timespan = new TimeSpan(0, 0, MathF.Ceiling(remainingTime.Value));
+			var timespan = new TimeSpan(0, 0, MathInt.Ceiling(remainingTime.Value));
 			string timeStr = timespan.ToString(@"m\:ss");
 			Helpers.drawTextStd(TCat.HUD, timeStr, Global.halfScreenW, 5, Alignment.Center, fontSize: (uint)32, color: getTimeColor());
 		}
@@ -1174,11 +1173,11 @@ public class GameMode {
 			} else if (player.isMainPlayer && player.currentMaverick == null) {
 				int hudWeaponBaseIndex = 50;
 				int hudWeaponFullIndex = 39;
-				int floorOrCeil = MathF.Ceiling(player.sigmaMaxAmmo * ammoDisplayMultiplier);
+				int floorOrCeil = MathInt.Ceiling(player.sigmaMaxAmmo * ammoDisplayMultiplier);
 				if (player.isSigma2()) {
 					hudWeaponBaseIndex = 51;
 					hudWeaponFullIndex = player.sigmaAmmo < 16 ? 30 : 40;
-					floorOrCeil = MathF.Floor(player.sigmaMaxAmmo * ammoDisplayMultiplier);
+					floorOrCeil = MathInt.Floor(player.sigmaMaxAmmo * ammoDisplayMultiplier);
 				}
 				baseY += 25;
 				Global.sprites["hud_weapon_base"].drawToHUD(hudWeaponBaseIndex, baseX, baseY);
@@ -1266,7 +1265,7 @@ public class GameMode {
 		var fromRight = Global.screenW - 10;
 		var fromTop = 10;
 		var yDist = 12;
-		for (var i = 0; i < this.killFeed.Count; i++) {
+		for (var i = 0; i < this.killFeed.Count && i < 3; i++) {
 			var killFeed = this.killFeed[i];
 
 			string victimName = killFeed.victim?.name ?? "";
@@ -1454,8 +1453,8 @@ public class GameMode {
 			if (mainPlayer.weapons[0].type == (int)AxlBulletWeaponType.RevolverBarrel) index = 4;
 			if (mainPlayer.weapons[0].type == (int)AxlBulletWeaponType.AncientGun) index = 5;
 			Global.sprites["hud_axl_ammo"].drawToHUD(index, x, y);
-			int currentAmmo = MathF.Ceiling(mainPlayer.weapons[0].ammo);
-			int totalAmmo = MathF.Ceiling(mainPlayer.axlBulletTypeAmmo[mainPlayer.weapons[0].type]);
+			int currentAmmo = MathInt.Ceiling(mainPlayer.weapons[0].ammo);
+			int totalAmmo = MathInt.Ceiling(mainPlayer.axlBulletTypeAmmo[mainPlayer.weapons[0].type]);
 			Helpers.drawTextStd(TCat.HUD, totalAmmo.ToString(), x + 10, y - 4, fontSize: 24, color: Color.White);
 		}
 
@@ -2236,15 +2235,15 @@ public class GameMode {
 	float goTime;
 	public void drawTimeIfSet(int yPos) {
 		if (setupTime > 0) {
-			var timespan = new TimeSpan(0, 0, MathF.Ceiling(setupTime.Value));
+			var timespan = new TimeSpan(0, 0, MathInt.Ceiling(setupTime.Value));
 			string timeStr = timespan.ToString(@"m\:ss");
 			Helpers.drawTextStd(TCat.HUD, timeStr, 5, yPos, Alignment.Left, fontSize: (uint)32, color: getTimeColor());
 		} else if (setupTime == 0 && goTime < 1) {
 			goTime += Global.spf;
-			var timespan = new TimeSpan(0, 0, MathF.Ceiling(setupTime.Value));
+			var timespan = new TimeSpan(0, 0, MathInt.Ceiling(setupTime.Value));
 			Helpers.drawTextStd(TCat.HUD, "GO!", 5, yPos, Alignment.Left, fontSize: (uint)32, color: getTimeColor());
 		} else if (remainingTime != null) {
-			var timespan = new TimeSpan(0, 0, MathF.Ceiling(remainingTime.Value));
+			var timespan = new TimeSpan(0, 0, MathInt.Ceiling(remainingTime.Value));
 			string timeStr = timespan.ToString(@"m\:ss");
 			if (!level.isNon1v1Elimination() || virusStarted >= 2) timeStr += " Left";
 			if (isOvertime()) timeStr = "Overtime!";
@@ -2263,7 +2262,7 @@ public class GameMode {
 	}
 
 	public void drawVirusTime(int yPos) {
-		var timespan = new TimeSpan(0, 0, MathF.Ceiling(remainingTime.Value));
+		var timespan = new TimeSpan(0, 0, MathInt.Ceiling(remainingTime.Value));
 		string timeStr = "Sigma Virus: " + timespan.ToString(@"m\:ss");
 		Helpers.drawTextStd(TCat.HUD, timeStr, 5, yPos, Alignment.Left, fontSize: (uint)32, color: getTimeColor());
 	}

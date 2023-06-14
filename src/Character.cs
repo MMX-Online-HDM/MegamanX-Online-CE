@@ -29,7 +29,7 @@ public partial class Character : Actor, IDamagable {
 	public bool changedStateInFrame;
 	public bool pushedByTornadoInFrame;
 	public float chargeTime;
-	public const float charge1Time = 0.75f;
+	public const float charge1Time = 0.5f;
 	public const float charge2Time = 1.75f;
 	public const float charge3Time = 3f;
 	public const float charge4Time = 4.25f;
@@ -123,6 +123,16 @@ public partial class Character : Actor, IDamagable {
 	public RideChaser rideChaser;
 	public Player lastGravityWellDamager;
 
+	// Some things previously in other char files used by multiple characters.
+	public int lastShootPressed;
+	public int lastShootReleased;
+	public int framesSinceLastAttack = 1000;
+
+	public float dashAttackCooldown;
+	public float maxDashAttackCooldown = 0.75f;
+	public float airAttackCooldown;
+	public float maxAirAttackCooldown = 0.5f;
+
 	// For states with special propieties.
 	public int specialState = 0;
 
@@ -201,8 +211,6 @@ public partial class Character : Actor, IDamagable {
 
 		xPaletteShader = Helpers.cloneShaderSafe("palette");
 		invisibleShader = Helpers.cloneShaderSafe("invisible");
-		zeroPaletteShader = Helpers.cloneShaderSafe("hyperzero");
-		nightmareZeroShader = Helpers.cloneNightmareZeroPaletteShader("paletteNightmareZero");
 		axlPaletteShader = Helpers.cloneShaderSafe("hyperaxl");
 		viralSigmaShader = Helpers.cloneShaderSafe("viralsigma");
 		sigmaShieldShader = Helpers.cloneGenericPaletteShader("paletteSigma3Shield");
@@ -381,14 +389,14 @@ public partial class Character : Actor, IDamagable {
 				palette?.SetUniform("palette", cStingPaletteIndex % 9);
 				palette?.SetUniform("paletteTexture", Global.textures["cStingPalette"]);
 			}
-		} else if (player.isZero) {
+		} else if (this is Zero zero) {
 			int paletteNum = 0;
-			if (blackZeroTime > 3) paletteNum = 1;
-			else if (blackZeroTime > 0) {
-				int mod = MathF.Ceiling(blackZeroTime) * 2;
+			if (zero.blackZeroTime > 3) paletteNum = 1;
+			else if (zero.blackZeroTime > 0) {
+				int mod = MathInt.Ceiling(zero.blackZeroTime) * 2;
 				paletteNum = (Global.frameCount % (mod * 2)) < mod ? 0 : 1;
 			}
-			palette = zeroPaletteShader;
+			palette = zero.zeroPaletteShader;
 			palette?.SetUniform("palette", paletteNum);
 			if (!player.isZBusterZero()) {
 				palette?.SetUniform("paletteTexture", Global.textures["hyperZeroPalette"]);
@@ -396,20 +404,20 @@ public partial class Character : Actor, IDamagable {
 				palette?.SetUniform("paletteTexture", Global.textures["hyperBusterZeroPalette"]);
 			}
 			if (isNightmareZeroBS.getValue()) {
-				palette = nightmareZeroShader;
+				palette = zero.nightmareZeroShader;
 			}
 		} else if (player.isAxl) {
 			int paletteNum = 0;
 			if (whiteAxlTime > 3) paletteNum = 1;
 			else if (whiteAxlTime > 0) {
-				int mod = MathF.Ceiling(whiteAxlTime) * 2;
+				int mod = MathInt.Ceiling(whiteAxlTime) * 2;
 				paletteNum = (Global.frameCount % (mod * 2)) < mod ? 0 : 1;
 			}
 			palette = axlPaletteShader;
 			palette?.SetUniform("palette", paletteNum);
 			palette?.SetUniform("paletteTexture", Global.textures["hyperAxlPalette"]);
 		} else if (player.isViralSigma()) {
-			int paletteNum = 6 - MathF.Ceiling((player.health / player.maxHealth) * 6);
+			int paletteNum = 6 - MathInt.Ceiling((player.health / player.maxHealth) * 6);
 			if (sprite.name.Contains("_enter")) paletteNum = 0;
 			palette = viralSigmaShader;
 			palette?.SetUniform("palette", paletteNum);
@@ -554,7 +562,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public bool canAirJump() {
-		return dashedInAir == 0 || (dashedInAir == 1 && player.isZero && isBlackZero2());
+		return dashedInAir == 0 || (dashedInAir == 1 && this is Zero zero && zero.isBlackZero2());
 	}
 
 	public bool canClimb() {
@@ -663,7 +671,7 @@ public partial class Character : Actor, IDamagable {
 		else if (player.isVile && player.speedDevil) {
 			runSpeed *= 1.1f;
 		}
-		else if (isBlackZero() || isBlackZero2()) {
+		else if (this is Zero zero && (zero.isBlackZero() || zero.isBlackZero2())) {
 			runSpeed *= 1.15f;
 		}
 		else if (player.isAxl && shootTime > 0) {
@@ -1048,11 +1056,6 @@ public partial class Character : Actor, IDamagable {
 		if (isHyperSigmaBS.getValue() || isHyperXBS.getValue()) {
 			flattenedTime = 0;
 		}
-
-		if (awakenedZeroTime > 0) {
-			updateAwakenedZero();
-		}
-		Helpers.decrementTime(ref blackZeroTime);
 		Helpers.decrementTime(ref slowdownTime);
 
 		if (whiteAxlTime > 0) {
@@ -1073,9 +1076,7 @@ public partial class Character : Actor, IDamagable {
 
 		if (!ownedByLocalPlayer) {
 			if (isCharging()) {
-				chargeSound.play();
-				addRenderEffect(RenderEffectType.Flash, 0.05f, 0.1f);
-				chargeEffect.update(getChargeLevel());
+				chargeLogic();
 			} else {
 				stopCharge();
 			}
@@ -1123,11 +1124,14 @@ public partial class Character : Actor, IDamagable {
 		}
 
 		if (stockedCharge) {
-			addRenderEffect(RenderEffectType.StockedCharge, 0.05f, 0.1f);
+			if (player.hasArmArmor(3)) {
+				addRenderEffect(RenderEffectType.ChargeOrange, 0.033333f, 0.1f);
+			} else {
+				addRenderEffect(RenderEffectType.ChargePink, 0.033333f, 0.1f);
+			}
 		}
-
 		if (stockedXSaber) {
-			addRenderEffect(RenderEffectType.StockedSaber, 0.05f, 0.1f);
+			addRenderEffect(RenderEffectType.ChargeGreen, 0.05f, 0.1f);
 		}
 
 		/*
@@ -1147,16 +1151,6 @@ public partial class Character : Actor, IDamagable {
 			}
 		}
 		*/
-
-		if (player.isZero && !Global.level.is1v1()) {
-			if (isBlackZero()) {
-				if (musicSource == null) {
-					addMusicSource("blackzero", getCenterPos(), true);
-				}
-			} else {
-				destroyMusicSource();
-			}
-		}
 
 		if (cStingPaletteTime > 5) {
 			cStingPaletteTime = 0;
@@ -1190,10 +1184,6 @@ public partial class Character : Actor, IDamagable {
 				if (nonOwnerScopeEndPos.distanceTo(framePos) > 0.001f) {
 					nonOwnerScopeEndPos = framePos;
 				}
-			}
-
-			if (isAwakenedZeroBS.getValue()) {
-				updateAwakenedAura();
 			}
 
 			if (sprite.name.Contains("sigma2_viral")) {
@@ -1292,24 +1282,20 @@ public partial class Character : Actor, IDamagable {
 			ai.update();
 		}
 
-		if (player.isZero) {
-			updateZero();
-		}
-
-		if (player.isSigma) {
-			updateSigma();
-		}
-
 		if (slideVel != 0) {
 			slideVel = Helpers.toZero(slideVel, Global.spf * 350, Math.Sign(slideVel));
 			move(new Point(slideVel, 0), true);
 		}
 
-		charState.update();
 		base.update();
+		charState.update();
 
 		if (player.isDisguisedAxl) {
 			updateDisguisedAxl();
+		}
+
+		if (player.isSigma) {
+			updateSigma();
 		}
 
 		if (player.isX) {
@@ -1363,19 +1349,13 @@ public partial class Character : Actor, IDamagable {
 
 	public override void changeSprite(string spriteName, bool resetFrame) {
 		cannonAimNum = 0;
-		if (sprite != null && sprite.name != "zero_attack" && spriteName == "zero_attack") {
-			zero3SwingComboStartTime = Global.time;
-		}
-		if (sprite != null && sprite.name != "zero_attack3" && spriteName == "zero_attack3") {
-			zero3SwingComboEndTime = Global.time;
-		}
+
 		if (!isHeadbuttSprite(sprite?.name) && isHeadbuttSprite(spriteName)) {
 			headbuttAirTime = Global.spf;
 		}
 		if (isHeadbuttSprite(sprite?.name) && !isHeadbuttSprite(spriteName)) {
 			headbuttAirTime = 0;
 		}
-
 		base.changeSprite(spriteName, resetFrame);
 	}
 
@@ -1406,14 +1386,33 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public void chargeLogic() {
-		chargeEffect.stop();
-
+		if (ownedByLocalPlayer) {
+			chargeEffect.stop();
+		}
 		if (isCharging()) {
 			chargeSound.play();
-			if (!sprite.name.Contains("ra_hide")) {
-				addRenderEffect(RenderEffectType.Flash, 0.05f, 0.1f);
+			int chargeType = 0;
+			if (player.isZBusterZero()) {
+				chargeType = 1;
+			} else if (player.isX && player.hasArmArmor(3)) {
+				if (player.hasGoldenArmor()) {
+					chargeType = 2;
+				}
 			}
-			chargeEffect.update(getChargeLevel());
+			if (!sprite.name.Contains("ra_hide")) {
+				int level = getChargeLevel();
+				var renderGfx = RenderEffectType.ChargeBlue;
+				renderGfx = level switch {
+					1 => RenderEffectType.ChargeBlue,
+					2 => RenderEffectType.ChargeYellow,
+					3 when (chargeType == 2) => RenderEffectType.ChargeOrange,
+					3 => RenderEffectType.ChargePink,
+					_ when (chargeType == 1) => RenderEffectType.ChargeGreen,
+					_ => RenderEffectType.ChargeOrange
+				};
+				addRenderEffect(renderGfx, 0.033333f, 0.1f);
+			}
+			chargeEffect.update(getChargeLevel(), chargeType);
 		}
 	}
 
@@ -1430,8 +1429,8 @@ public partial class Character : Actor, IDamagable {
 		return isAwakenedGenmuZeroBS.getValue() || (isInvisibleBS.getValue() && player.isAxl) || isHyperSigmaBS.getValue() || isHyperXBS.getValue();
 	}
 
-	public bool isToughGuyHyperMode() {
-		return isBlackZero() || isWhiteAxl();
+	public virtual bool isToughGuyHyperMode() {
+		return isWhiteAxl();
 	}
 
 	public bool isImmuneToKnockback() {
@@ -1561,7 +1560,7 @@ public partial class Character : Actor, IDamagable {
 		if (player.isSigma1AndSigma()) dashXPos = -35;
 		if (player.isSigma2AndSigma()) dashXPos = -35;
 		if (player.isSigma3AndSigma()) dashXPos = -35;
-		return pos.addxy(dashXPos * xDir, -4);
+		return pos.addxy(dashXPos * xDir + (5 * xDir), -4);
 	}
 
 	public override Point getCenterPos() {
@@ -1789,7 +1788,7 @@ public partial class Character : Actor, IDamagable {
 
 	public int getChargeLevel() {
 		bool clampTo3 = true;
-		if (player.isZero) clampTo3 = !canUseDoubleBusterCombo();
+		if (this is Zero zero) clampTo3 = !zero.canUseDoubleBusterCombo();
 		if (player.isVile) clampTo3 = !isVileMK5;
 		if (player.isX) clampTo3 = !isHyperX;
 
@@ -1892,7 +1891,9 @@ public partial class Character : Actor, IDamagable {
 		if (player.isVile && isSpeedDevilActiveBS.getValue()) addRenderEffect(RenderEffectType.SpeedDevilTrail);
 		else removeRenderEffect(RenderEffectType.SpeedDevilTrail);
 
-		if (player.isZero && isAwakenedZeroBS.getValue() && visible) {
+		Zero zero = (this as Zero);
+
+		if (zero != null && isAwakenedZeroBS.getValue() && visible) {
 			float xOff = 0;
 			int auraXDir = 1;
 			float yOff = 5;
@@ -1906,7 +1907,7 @@ public partial class Character : Actor, IDamagable {
 			if (isAwakenedGenmuZeroBS.getValue() && Global.frameCount % Global.normalizeFrames(6) > Global.normalizeFrames(3) && Global.shaderWrappers.ContainsKey("awakened")) {
 				shaders.Add(Global.shaderWrappers["awakened"]);
 			}
-			Global.sprites[auraSprite].draw(awakenedAuraFrame, pos.x + x + (xOff * auraXDir), pos.y + y + yOff, auraXDir, 1, null, 1, 1, 1, zIndex - 1, shaders: shaders);
+			Global.sprites[auraSprite].draw(zero.awakenedAuraFrame, pos.x + x + (xOff * auraXDir), pos.y + y + yOff, auraXDir, 1, null, 1, 1, 1, zIndex - 1, shaders: shaders);
 		}
 
 		if (player.isX && isHyperChargeActiveBS.getValue() && visible) {
@@ -1920,7 +1921,7 @@ public partial class Character : Actor, IDamagable {
 			var sprite1 = Global.sprites["hypercharge_part_1"];
 			float distFromCenter = 12;
 			float posOffset = hyperChargeAnimTime * 50;
-			int hyperChargeAnimFrame = MathF.Floor((hyperChargeAnimTime / maxHyperChargeAnimTime) * sprite1.frames.Count);
+			int hyperChargeAnimFrame = MathInt.Floor((hyperChargeAnimTime / maxHyperChargeAnimTime) * sprite1.frames.Count);
 			sprite1.draw(hyperChargeAnimFrame, sx + distFromCenter + posOffset, sy, 1, 1, null, 1, 1, 1, zIndex + 1);
 			sprite1.draw(hyperChargeAnimFrame, sx - distFromCenter - posOffset, sy, 1, 1, null, 1, 1, 1, zIndex + 1);
 			sprite1.draw(hyperChargeAnimFrame, sx, sy + distFromCenter + posOffset, 1, 1, null, 1, 1, 1, zIndex + 1);
@@ -1931,7 +1932,7 @@ public partial class Character : Actor, IDamagable {
 			var sprite2 = Global.sprites["hypercharge_part_2"];
 			float distFromCenter2 = 12;
 			float posOffset2 = hyperChargeAnimTime2 * 50;
-			int hyperChargeAnimFrame2 = MathF.Floor((hyperChargeAnimTime2 / maxHyperChargeAnimTime) * sprite2.frames.Count);
+			int hyperChargeAnimFrame2 = MathInt.Floor((hyperChargeAnimTime2 / maxHyperChargeAnimTime) * sprite2.frames.Count);
 			float xOff = Helpers.cosd(45) * (distFromCenter2 + posOffset2);
 			float yOff = Helpers.sind(45) * (distFromCenter2 + posOffset2);
 			sprite2.draw(hyperChargeAnimFrame2, sx - xOff, sy + yOff, 1, 1, null, 1, 1, 1, zIndex + 1);
@@ -2082,12 +2083,20 @@ public partial class Character : Actor, IDamagable {
 				}
 				Global.sprites["hud_weapon_icon"].draw(overrideIndex, pos.x, pos.y - 8 + currentLabelY, 1, 1, null, 1, 1, 1, ZIndex.HUD);
 				deductLabelY(labelWeaponIconOffY);
-			} else if (player.isZero && isBlackZero() && !Global.shaderWrappers.ContainsKey("hyperzero")) {
-				Global.sprites["hud_killfeed_weapon"].draw(125, pos.x, pos.y - 6 + currentLabelY, 1, 1, null, 1, 1, 1, ZIndex.HUD);
-				deductLabelY(labelKillFeedIconOffY);
-			} else if (player.isZero && isNightmareZeroBS.getValue() && nightmareZeroShader == null) {
-				Global.sprites["hud_killfeed_weapon"].draw(174, pos.x, pos.y - 6 + currentLabelY, 1, 1, null, 1, 1, 1, ZIndex.HUD);
-				deductLabelY(labelKillFeedIconOffY);
+			} else if (zero != null) {
+				if (zero.isBlackZero() && !Global.shaderWrappers.ContainsKey("hyperzero")) {
+					Global.sprites["hud_killfeed_weapon"].draw(
+						125, pos.x, pos.y - 6 + currentLabelY,
+						1, 1, null, 1, 1, 1, ZIndex.HUD
+					);
+					deductLabelY(labelKillFeedIconOffY);
+				} else if (player.isZero && isNightmareZeroBS.getValue() && zero.nightmareZeroShader == null) {
+					Global.sprites["hud_killfeed_weapon"].draw(
+						174, pos.x, pos.y - 6 + currentLabelY,
+						1, 1, null, 1, 1, 1, ZIndex.HUD
+					);
+					deductLabelY(labelKillFeedIconOffY);
+				}
 			} else if (player.isAxl && isWhiteAxl() && !Global.shaderWrappers.ContainsKey("hyperaxl")) {
 				Global.sprites["hud_killfeed_weapon"].draw(123, pos.x, pos.y - 4 + currentLabelY, 1, 1, null, 1, 1, 1, ZIndex.HUD);
 				deductLabelY(labelKillFeedIconOffY);
@@ -2182,10 +2191,22 @@ public partial class Character : Actor, IDamagable {
 				Point topLeft = new Point(pos.x - 16, pos.y - 5 + currentLabelY - 2.5f);
 				Point botRight = new Point(pos.x + 16, pos.y + currentLabelY - 2.5f);
 
-				DrawWrappers.DrawRect(topLeft.x, topLeft.y, botRight.x, botRight.y, true, Color.Black, 0, ZIndex.HUD - 1, outlineColor: Color.White);
-				DrawWrappers.DrawRect(topLeft.x + 1, topLeft.y + 1, topLeft.x + 1 + width, botRight.y - 1, true, Color.Yellow, 0, ZIndex.HUD - 1);
+				DrawWrappers.DrawRect(
+					topLeft.x, topLeft.y, botRight.x, botRight.y,
+					true, Color.Black, 0, ZIndex.HUD - 1, outlineColor: Color.White
+				);
+				DrawWrappers.DrawRect(
+					topLeft.x + 1, topLeft.y + 1, topLeft.x + 1 + width, botRight.y - 1,
+					true, Color.Yellow, 0, ZIndex.HUD - 1
+				);
 
-				Global.sprites["hud_killfeed_weapon"].draw(125, pos.x, pos.y - 6 + currentLabelY, 1, 1, null, 1, 1, 1, ZIndex.HUD);
+				int label = 125;
+				if (player.isAxl || player.isDisguisedAxl) {
+					label = 123;
+				}
+				Global.sprites["hud_killfeed_weapon"].draw(
+					label, pos.x, pos.y - 6 + currentLabelY, 1, 1, null, 1, 1, 1, ZIndex.HUD
+				);
 				deductLabelY(labelCooldownOffY);
 			}
 		}
@@ -2731,7 +2752,7 @@ public partial class Character : Actor, IDamagable {
 			foreach (var weapon in player.weapons) {
 				if (weapon == player.weapon) continue;
 				if (weapon.ammo == weapon.maxAmmo) continue;
-				weapon.ammo = MathF.Clamp(weapon.ammo + amount, 0, weapon.maxAmmo);
+				weapon.ammo = Math.Clamp(weapon.ammo + amount, 0, weapon.maxAmmo);
 				break;
 			}
 			return;
@@ -2740,11 +2761,10 @@ public partial class Character : Actor, IDamagable {
 		weaponHealAmount += amount;
 	}
 
-	public void increaseCharge() {
+	public virtual void increaseCharge() {
 		float factor = 1;
 		if (player.isX && player.hasArmArmor(1)) factor = 1.5f;
 		//if (player.isX && isHyperX) factor = 1.5f;
-		if (isBlackZero2()) factor = 1.5f;
 		//if (player.isZero && isAttacking()) factor = 0f;
 		chargeTime += Global.spf * factor;
 	}
@@ -3061,7 +3081,7 @@ public partial class Character : Actor, IDamagable {
 
 	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (player.isX) return getXProjFromHitbox(centerPoint);
-		else if (player.isZero) return getZeroProjFromHitbox(hitbox, centerPoint);
+		else if (this is Zero zero) return zero.getZeroProjFromHitbox(hitbox, centerPoint);
 		else if (player.isVile) return getVileProjFromHitbox(centerPoint);
 		//else if (player.isAxl) return getAxlProjFromHitbox(centerPoint);
 		else if (player.isSigma) return getSigmaProjFromHitbox(hitbox, centerPoint);
@@ -3091,6 +3111,10 @@ public partial class Character : Actor, IDamagable {
 		}
 
 		return false;
+	}
+
+	public virtual bool isAttacking() {
+		return sprite.name.Contains("attack");
 	}
 }
 

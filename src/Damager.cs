@@ -380,7 +380,7 @@ public class Damager {
 				flinchCooldown = projectileFlinchCooldowns[projId];
 			}
 
-			if (owner.character != null && owner.character.isBlackZero() && projId != (int)ProjIds.Burn) {
+			if (owner.character is Zero zero && zero.isBlackZero() && projId != (int)ProjIds.Burn) {
 				if (flinch >= Global.halfFlinch) {
 					flinch = Global.defFlinch;
 				} else {
@@ -561,7 +561,10 @@ public class Damager {
 						flinch = 0;
 						damage = 0;
 						maverick.playSound("ding");
-						if (owner.isZero && owner.character != null && owner.ownedByLocalPlayer && !owner.character.isHyperZero()) {
+						if (owner.ownedByLocalPlayer &&
+							owner.character is Zero zero &&
+							!zero.isHyperZero()
+						) {
 							if (projId == (int)ProjIds.ZSaber || projId == (int)ProjIds.ZSaber1 || projId == (int)ProjIds.ZSaber2 || projId == (int)ProjIds.ZSaber3) {
 								owner.character.changeState(new ZeroClang(-owner.character.xDir));
 							}

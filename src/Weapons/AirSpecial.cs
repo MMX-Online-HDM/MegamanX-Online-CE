@@ -182,7 +182,9 @@ public class HyorogaStartState : CharState {
 		character.vel = new Point(0, 0);
 		character.gravityModifier = -1;
 		character.dashedInAir = 0;
-		character.quakeBlazerBounces = 0;
+		if (character is Zero zero) {
+			zero.quakeBlazerBounces = 0;
+		}
 		character.specialState = (int)SpecialStateIds.HyorogaStart;
 	}
 

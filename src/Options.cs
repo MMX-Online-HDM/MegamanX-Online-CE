@@ -35,7 +35,7 @@ public class Options {
 
 	public int getNetworkTimeoutMs() {
 		networkTimeoutSeconds = Helpers.clamp(networkTimeoutSeconds, 1, 5);
-		return MathF.Round(networkTimeoutSeconds * 1000);
+		return MathInt.Round(networkTimeoutSeconds * 1000);
 	}
 
 	// Video settings
@@ -125,7 +125,7 @@ public class Options {
 				if (Global.debug) {
 					_main.axlAimMode = Global.overrideAimMode ?? _main.axlAimMode;
 					_main.fullScreen = Global.overrideFullscreen ?? _main.fullScreen;
-					_main.maxFPS = MathF.Clamp(_main.maxFPS, 30, Global.fpsCap);
+					_main.maxFPS = MathInt.Clamp(_main.maxFPS, 30, Global.fpsCap);
 					_main.fontType = Global.fontTypeOverride ?? _main.fontType;
 				}
 			}

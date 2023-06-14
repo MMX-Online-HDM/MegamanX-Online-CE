@@ -251,19 +251,19 @@ public class MorphMSweepState : MaverickState {
 		var inputDir = input.getInputDir(player);
 
 		if (inputDir.x != 0 && MathF.Sign(inputDir.x) != maverick.xDir) {
-			xVel = MathF.Clamp(xVel + (inputDir.x * 1000 * Global.spf), -maxSpeed, maxSpeed);
+			xVel = Math.Clamp(xVel + (inputDir.x * 1000 * Global.spf), -maxSpeed, maxSpeed);
 			if (xVel < 0) maverick.xDir = -1;
 			else if (xVel > 0) maverick.xDir = 1;
 		} else {
-			xVel = MathF.Clamp(xVel + (maverick.xDir * 400 * Global.spf), -maxSpeed, maxSpeed);
+			xVel = Math.Clamp(xVel + (maverick.xDir * 400 * Global.spf), -maxSpeed, maxSpeed);
 		}
 
 		if (inputDir.y == 0) {
 			float yVelSign = MathF.Sign(yVel);
 			if (yVelSign == 0) yVelSign = 1;
-			yVel = MathF.Clamp(yVel + (yVelSign * 1000 * Global.spf), -100, 100);
+			yVel = Math.Clamp(yVel + (yVelSign * 1000 * Global.spf), -100, 100);
 		} else {
-			yVel = MathF.Clamp(yVel + (inputDir.y * 1000 * Global.spf), -100, 100);
+			yVel = Math.Clamp(yVel + (inputDir.y * 1000 * Global.spf), -100, 100);
 		}
 
 		Point moveAmount = new Point(xVel, yVel);

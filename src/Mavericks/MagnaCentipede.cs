@@ -466,7 +466,7 @@ public class MagnaCTeleportState : MaverickState {
 			else if (input.isHeld(Control.Right, player)) dir.x = 1;
 
 			float moveAmount = dir.x * 200 * Global.spf;
-			if (dir.x != 0) clone.xDir = MathF.Round(dir.x);
+			if (dir.x != 0) clone.xDir = MathInt.Round(dir.x);
 
 			if (dir.y == -1 && !inverted) {
 				var hits = Global.level.raycastAllSorted(clone.getCenterPos(), clone.getCenterPos().addxy(0, -200), new List<Type> { typeof(Wall) });

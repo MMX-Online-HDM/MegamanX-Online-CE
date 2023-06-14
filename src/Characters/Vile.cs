@@ -759,7 +759,7 @@ public class VileHover : CharState {
 			flyVel = Point.lerp(flyVel, Point.zero, Global.spf * 5f);
 		} else {
 			float ang = flyVel.angleWith(inputDir);
-			float modifier = MathF.Clamp(ang / 90f, 1, 2);
+			float modifier = Math.Clamp(ang / 90f, 1, 2);
 
 			flyVel.inc(inputDir.times(Global.spf * flyVelAcc * modifier));
 			if (flyVel.magnitude > flyVelMaxSpeed) {

@@ -354,18 +354,33 @@ public class Sprite {
 			if (renderEffects.Contains(RenderEffectType.Hit)) {
 				shader = Global.shaderWrappers.GetValueOrDefault("hit");
 				if (shaders.Count > 1) shaders.RemoveAt(1);
-			} else if (renderEffects.Contains(RenderEffectType.Flash)) {
+			}
+			else if (renderEffects.Contains(RenderEffectType.Flash)) {
 				shader = Global.shaderWrappers.GetValueOrDefault("flash");
-			} else if (renderEffects.Contains(RenderEffectType.StockedCharge)) {
-				shader = Global.shaderWrappers.GetValueOrDefault("stockedcharge");
-			} else if (renderEffects.Contains(RenderEffectType.StockedSaber)) {
-				shader = Global.shaderWrappers.GetValueOrDefault("stockedsaber");
-			} else if (renderEffects.Contains(RenderEffectType.InvisibleFlash) && alpha == 1) {
+			}
+			else if (renderEffects.Contains(RenderEffectType.InvisibleFlash) && alpha == 1) {
 				shader = Global.shaderWrappers.GetValueOrDefault("invisible");
 				shader?.SetUniform("alpha", 0.5f - (MathF.Sin(Global.level.time * 5) * 0.25f));
-			} else if (renderEffects.Contains(RenderEffectType.StealthModeBlue)) {
+			}
+			else if (renderEffects.Contains(RenderEffectType.ChargeGreen)) {
+				shader = Global.shaderWrappers.GetValueOrDefault("chargeGreen");
+			}
+			else if (renderEffects.Contains(RenderEffectType.ChargeOrange)) {
+				shader = Global.shaderWrappers.GetValueOrDefault("chargeOrange");
+			}
+			else if (renderEffects.Contains(RenderEffectType.ChargePink)) {
+				shader = Global.shaderWrappers.GetValueOrDefault("chargePink");
+			}
+			else if (renderEffects.Contains(RenderEffectType.ChargeYellow)) {
+				shader = Global.shaderWrappers.GetValueOrDefault("chargeYellow");
+			}
+			else if (renderEffects.Contains(RenderEffectType.ChargeBlue)) {
+				shader = Global.shaderWrappers.GetValueOrDefault("chargeBlue");
+			}
+			else if (renderEffects.Contains(RenderEffectType.StealthModeBlue)) {
 				shader = Global.shaderWrappers.GetValueOrDefault("stealthmode_blue");
-			} else if (renderEffects.Contains(RenderEffectType.StealthModeRed)) {
+			}
+			else if (renderEffects.Contains(RenderEffectType.StealthModeRed)) {
 				shader = Global.shaderWrappers.GetValueOrDefault("stealthmode_red");
 			}
 			if (shader != null) {
@@ -385,6 +400,7 @@ public class Sprite {
 
 		if (renderEffects != null && !renderEffects.Contains(RenderEffectType.Invisible)) {
 			if (renderEffects.Contains(RenderEffectType.BlueShadow) && alpha >= 1) {
+				/*
 				var blueShader = Global.shaderWrappers.GetValueOrDefault("outline_blue");
 				if (blueShader != null) {
 					DrawWrappers.DrawTexture(bitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX - 1, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, new List<ShaderWrapper>() { blueShader }, true);
@@ -392,6 +408,7 @@ public class Sprite {
 					DrawWrappers.DrawTexture(bitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY - 1, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, new List<ShaderWrapper>() { blueShader }, true);
 					DrawWrappers.DrawTexture(bitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY + 1, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, new List<ShaderWrapper>() { blueShader }, true);
 				}
+				*/
 			} else if (renderEffects.Contains(RenderEffectType.RedShadow) && alpha >= 1) {
 				var redShader = Global.shaderWrappers.GetValueOrDefault("outline_red");
 				if (redShader != null) {

@@ -88,11 +88,11 @@ public partial class Actor {
 			if (weaponIndex == (int)WeaponIds.HyperBuster) {
 				weaponIndex = character.player.weapons[character.player.hyperChargeSlot].index;
 			}
-			int health = MathF.Ceiling(character.player.health);
-			int maxHealth = MathF.Ceiling(character.player.maxHealth);
+			int health = MathInt.Ceiling(character.player.health);
+			int maxHealth = MathInt.Ceiling(character.player.maxHealth);
 			if (character.player.currentMaverick != null) {
-				health = MathF.Ceiling(character.player.currentMaverick.health);
-				maxHealth = MathF.Ceiling(character.player.currentMaverick.maxHealth);
+				health = MathInt.Ceiling(character.player.currentMaverick.health);
+				maxHealth = MathInt.Ceiling(character.player.currentMaverick.maxHealth);
 			}
 
 			int ammo = character.player.weapon == null ? 0 : (int)character.player.weapon.ammo;
@@ -101,7 +101,7 @@ public partial class Actor {
 			if (character.player.isZero) ammo = (int)character.player.zeroGigaAttackWeapon.ammo;
 			if (character.player.isVile) ammo = (int)character.player.vileAmmo;
 			if (character.player.isSigma) ammo = (int)character.player.sigmaAmmo;
-			if (character.rideArmor != null) ammo = MathF.Ceiling(character.rideArmor.health);
+			if (character.rideArmor != null) ammo = MathInt.Ceiling(character.rideArmor.health);
 
 			args.Add(charMaskByte);
 			args.Add((byte)weaponIndex);

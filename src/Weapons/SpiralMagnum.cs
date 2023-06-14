@@ -213,7 +213,7 @@ public class SpiralMagnumProj : Projectile {
 			damager.applyDamage(hitTarget, false, weapon, this, projId, overrideDamage: overrideDamage);
 
 			if (weakness) {
-				//hitChar.damageTexts.Add(new DamageText("headshot!", 0));
+				(hitTarget as Character).addDamageText("Headshot!", false);
 				playSound("hurt", sendRpc: true);
 			}
 
@@ -300,7 +300,7 @@ public class SpiralMagnumProj : Projectile {
 				damager.applyDamage(victim, false, weapon, this, projId, overrideDamage: overrideDamage);
 				if (hitChar != null) {
 					if (weakness) {
-						//hitChar.damageTexts.Add(new DamageText("headshot!", 0));
+						hitChar.addDamageText("Headshot!", false);
 						playSound("hurt");
 					}
 				}

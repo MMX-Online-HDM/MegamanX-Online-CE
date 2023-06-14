@@ -432,9 +432,9 @@ public class RekkohaEffect : Effect {
 		if (effectTime > 1.75f) {
 			alpha = 0.5f - 0.5f * ((effectTime - 1.75f) * 4);
 		}
-		alpha *= 2;
+		alpha *= 1.5f;
 
-		for (int i = 0; i < 38 * scale; i++) {
+		for (int i = 0; i < 50 * scale; i++) {
 			float offY = (effectTime * 448) * (i % 2 == 0 ? 1 : -1);
 			while (offY > 596) offY -= 596;
 			while (offY < -596) offY += 596;

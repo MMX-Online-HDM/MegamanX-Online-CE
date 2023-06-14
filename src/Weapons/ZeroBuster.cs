@@ -189,10 +189,12 @@ public class ZeroDoubleBuster : CharState {
 
 		if (!fired2 && character.frameIndex == 7) {
 			fired2 = true;
-			if (!isPinkCharge) {
-				character.doubleBusterDone = true;
-			} else {
-				character.stockCharge(false);
+			if (character is Zero zero) {
+				if (!isPinkCharge) {
+					zero.doubleBusterDone = true;
+				} else {
+					character.stockCharge(false);
+				}
 			}
 			character.playSound("buster3", sendRpc: true);
 			new ZBuster4Proj(player.zeroBusterWeapon, character.getShootPos(), character.getShootXDir(), type, player, player.getNextActorNetId(), rpc: true);
@@ -227,8 +229,8 @@ public class ZeroDoubleBuster : CharState {
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
-		if (isSecond) {
-			character.doubleBusterDone = true;
+		if (isSecond && character is Zero zero) {
+			zero.doubleBusterDone = true;
 		}
 	}
 }

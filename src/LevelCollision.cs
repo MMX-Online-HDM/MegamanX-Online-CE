@@ -52,8 +52,8 @@ public partial class Level {
 			float mag = cellWidth / 2;
 			HashSet<int> usedCoords = new HashSet<int>();
 			while (dist < maxDist) {
-				int i = MathF.Floor((curY / height) * grid.Count);
-				int j = MathF.Floor((curX / width) * grid[0].Count);
+				int i = MathInt.Floor((curY / height) * grid.Count);
+				int j = MathInt.Floor((curX / width) * grid[0].Count);
 				curX += dir.x * mag;
 				curY += dir.y * mag;
 				dist += mag;
@@ -66,10 +66,10 @@ public partial class Level {
 			return cells;
 		}
 
-		int minI = Helpers.clamp(MathF.Floor((shape.minY / height) * grid.Count), 0, grid.Count - 1);
-		int minJ = Helpers.clamp(MathF.Floor((shape.minX / width) * grid[0].Count), 0, grid[0].Count - 1);
-		int maxI = Helpers.clamp(MathF.Floor((shape.maxY / height) * grid.Count), 0, grid.Count - 1);
-		int maxJ = Helpers.clamp(MathF.Floor((shape.maxX / width) * grid[0].Count), 0, grid[0].Count - 1);
+		int minI = MathInt.Round(Math.Clamp(MathF.Floor((shape.minY / height) * grid.Count), 0, grid.Count - 1));
+		int minJ = MathInt.Round(Math.Clamp(MathF.Floor((shape.minX / width) * grid[0].Count), 0, grid[0].Count - 1));
+		int maxI = MathInt.Round(Math.Clamp(MathF.Floor((shape.maxY / height) * grid.Count), 0, grid.Count - 1));
+		int maxJ = MathInt.Round(Math.Clamp(MathF.Floor((shape.maxX / width) * grid[0].Count), 0, grid[0].Count - 1));
 
 		for (int i = minI; i <= maxI; i++) {
 			for (int j = minJ; j <= maxJ; j++) {

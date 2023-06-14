@@ -39,8 +39,8 @@ public partial class Global {
 	public static View view;
 	public static View backgroundView;
 
-	public const uint screenW = 298;
-	public const uint screenH = 224;
+	public static uint screenW = 298;
+	public static uint screenH = 224;
 
 	public static uint viewScreenW { get { return screenW * (uint)viewSize; } }
 	public static uint viewScreenH { get { return screenH * (uint)viewSize; } }

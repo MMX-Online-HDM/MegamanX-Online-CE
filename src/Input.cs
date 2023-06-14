@@ -135,87 +135,107 @@ public class Input {
 		return afterGapFound;
 	}
 
-	public bool checkQCF(Player player, string triggerBtn) {
-		return checkQCFHelper(Control.Left, player, triggerBtn) || checkQCFHelper(Control.Right, player, triggerBtn);
-	}
-
-	public bool checkDragonPunch(Player player, int xDir, string triggerBtn) {
-		if (xDir == -1) return checkDragonPunchHelper(Control.Left, player, triggerBtn);
-		else return checkDragonPunchHelper(Control.Right, player, triggerBtn);
-	}
-
-	private bool checkQCFHelper(string forwardDir, Player player, string triggerBtn) {
-		var downIndices = new List<int>();
-		var downForwardIndices = new List<int>();
-		var shootIndices = new List<int>();
-		for (int i = 20; i >= 0; i--) {
-			if (frameToHeldControls[i].Contains(Control.Down) && !frameToHeldControls[i].Contains(forwardDir)) {
-				downIndices.Add(i);
-			}
-
-			if (frameToHeldControls[i].Contains(Control.Down) && frameToHeldControls[i].Contains(forwardDir)) {
-				downForwardIndices.Add(i);
-			}
-
-			if (frameToPressedControls[i].Contains(triggerBtn)) {
-				shootIndices.Add(i);
-			}
+	public bool checkHadoken(Player player, int xDir, string triggerBtn) {
+		if (xDir == 1) {
+			return checkHadokenHelper("right", player, triggerBtn);
+		} else if (xDir == -1) {
+			return checkHadokenHelper("left", player, triggerBtn);
 		}
-
-		bool detected = false;
-		foreach (var downIndex in downIndices) {
-			if (downForwardIndices.Any(dfi => dfi < downIndex)) {
-				detected = true;
-			}
-		}
-
-		if (!detected) return false;
-
-		if (!shootIndices.Any(si => si < 10)) return false;
-		if (shootIndices.Any(si => si > 10)) return false;
-
-		if (isHeld(forwardDir, player) && !isHeld(Control.Down, player)) {
-			return true;
-		}
-
 		return false;
 	}
 
-	private bool checkDragonPunchHelper(string forwardDir, Player player, string triggerBtn) {
-		var downIndices = new List<int>();
-		var downForwardIndices = new List<int>();
-		var shootIndices = new List<int>();
-		for (int i = 20; i >= 0; i--) {
-			if (frameToHeldControls[i].Contains(forwardDir) && !frameToHeldControls[i].Contains(Control.Down)) {
-				downIndices.Add(i);
-			}
-
-			if (frameToHeldControls[i].Contains(Control.Down) && !frameToHeldControls[i].Contains(forwardDir)) {
-				downForwardIndices.Add(i);
-			}
-
-			if (frameToPressedControls[i].Contains(triggerBtn)) {
-				shootIndices.Add(i);
-			}
+	public bool checkShoryuken(Player player, int xDir, string triggerBtn) {
+		if (xDir == 1) {
+			return checkShoryukenHelper("right", player, triggerBtn);
+		} else if (xDir == -1) {
+			return checkShoryukenHelper("left", player, triggerBtn);
 		}
-
-		bool detected = false;
-		foreach (var downIndex in downIndices) {
-			if (downForwardIndices.Any(dfi => dfi < downIndex)) {
-				detected = true;
-			}
-		}
-
-		if (!detected) return false;
-
-		if (!shootIndices.Any(si => si < 10)) return false;
-		if (shootIndices.Any(si => si > 10)) return false;
-
-		if (isHeld(forwardDir, player) && isHeld(Control.Down, player)) {
-			return true;
-		}
-
 		return false;
+	}
+
+	private int[][] commandList = {
+		new int[3],
+		new int[3]
+	};
+
+	// TODO: Un-hardcode the input check.
+	private bool checkHadokenHelper(string forwardDir, Player player, string triggerBtn)
+	{
+		int[] command = commandList[0];
+		int time = 30;
+		bool completed = false;
+
+		if (command[2] > 0) {
+			if (isPressed(triggerBtn, player)) {
+				command[2] = 0;
+				completed = true;
+			}
+			else {
+				command[2]--;
+			}
+		}
+		if (command[1] > 0) {
+			if (!isHeld("down", player) && isHeld(forwardDir, player)) {
+				command[2] = command[1];
+				command[1] = 0;
+			}
+			else {
+				command[1]--;
+			}
+		}
+		if (command[0] > 0) {
+			if (isHeld("down", player) && isHeld(forwardDir, player)) {
+				command[1] = command[0];
+				command[0] = 0;
+			}
+			else {
+				command[0]--;
+			}
+		}
+		if (isHeld("down", player) && !isHeld(forwardDir, player)) {
+			command[0] = time;
+		}
+
+		return completed;
+	}
+
+	private bool checkShoryukenHelper(string forwardDir, Player player, string triggerBtn)
+	{
+		int[] command = commandList[1];
+		int time = 30;
+		bool completed = false;
+
+		if (command[2] > 0)	{
+			if (isPressed(triggerBtn, player)) {
+				command[2] = 0;
+				completed = true;
+			}
+			else {
+				command[2]--;
+			}
+		}
+		if (command[1] > 0) {
+			if (isHeld("down", player) && isHeld(forwardDir, player)) {
+				command[2] = command[1];
+				command[1] = 0;
+			}
+			else {
+				command[1]--;
+			}
+		}
+		if (command[0] > 0) {
+			if (isHeld("down", player) && !isHeld(forwardDir, player)) {
+				command[1] = command[0];
+				command[0] = 0;
+			}
+			else {
+				command[0]--;
+			}
+		}
+		if (!isHeld("down", player) && isHeld(forwardDir, player)) {
+			command[0] = time;
+		}
+		return completed;
 	}
 
 	public Dictionary<Key, char> capsLockMapping = new Dictionary<Key, char>()

@@ -160,7 +160,10 @@ public class Ryuenjin : CharState {
 	}
 
 	public bool canDownSpecial() {
-		if (character.airAttackCooldown == 0) return false;
+		if (character is not Zero zero) {
+			return false;
+		}
+		if (zero.airAttackCooldown == 0) return false;
 		int fc = character.sprite.frames.Count;
 		if (type == RyuenjinType.Rising) return character.sprite.frameIndex >= fc - 1;
 		return character.sprite.frameIndex >= fc - 3;

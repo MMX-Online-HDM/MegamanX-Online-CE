@@ -40,7 +40,7 @@ public class KingOfTheHill : GameMode {
 			perc = Math.Max(hill.redCaptureTime, hill.blueCaptureTime) / hill.maxCaptureTime;
 		}
 
-		int barsFull = MathF.Round(perc * 16f);
+		int barsFull = MathInt.Round(perc * 16f);
 		for (int i = 0; i < barsFull; i++) {
 			int hudCpBarIndex = 2;
 			if (hill.alliance == redAlliance) hudCpBarIndex = 1;

@@ -276,7 +276,6 @@ public partial class Character {
 		Helpers.decrementTime(ref wallKickCooldown);
 		Helpers.decrementTime(ref saberCooldown);
 		Helpers.decrementTime(ref xSaberCooldown);
-		Helpers.decrementTime(ref genmuCooldown);
 		Helpers.decrementTime(ref noBlockTime);
 		Helpers.decrementTime(ref leapSlashCooldown);
 		Helpers.decrementTime(ref viralSigmaTackleCooldown);

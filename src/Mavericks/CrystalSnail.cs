@@ -1,4 +1,6 @@
-﻿namespace MMXOnline;
+﻿using System;
+
+namespace MMXOnline;
 
 public class CrystalSnail : Maverick {
 	public static Weapon getWeapon() { return new Weapon(WeaponIds.CSnailGeneric, 148); }

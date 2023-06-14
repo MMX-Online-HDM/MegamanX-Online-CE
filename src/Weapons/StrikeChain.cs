@@ -206,7 +206,7 @@ public class StrikeChainProj : Projectile {
 	public override void render(float x, float y) {
 		float length = distMoved - distRetracted;
 		int chainFrame = Helpers.clamp((int)(5 * length / maxDist), 0, 5);
-		int maxI = MathF.Ceiling(length / 8);
+		int maxI = MathInt.Ceiling(length / 8);
 		for (int i = 0; i < maxI; i++) {
 			if (i >= spriteMids.Count) break;
 			if (i == maxI - 1 && xDir == -1) break;

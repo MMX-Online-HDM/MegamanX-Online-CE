@@ -70,7 +70,7 @@ public class ChargeEffect {
 		chargeParts[7].time = -1.5f;
 	}
 
-	public void update(float chargeLevel) {
+	public void update(float chargeLevel, int chargeType) {
 		active = true;
 		for (int i = 0; i < chargeParts.Count; i++) {
 			var part = chargeParts[i];
@@ -79,6 +79,9 @@ public class ChargeEffect {
 				part.pos.y = Helpers.moveTo(part.pos.y, 0, Global.spf * 70);
 			}
 			var chargePart = "charge_part_" + chargeLevel.ToString();
+			if (chargeType != 1 && chargeLevel >= 4) {
+				chargePart = "hypercharge_part_1";
+			}
 			part.changeSprite(chargePart, true);
 			part.time += Global.spf * 20;
 			if (part.time > 3) {

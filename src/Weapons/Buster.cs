@@ -290,9 +290,13 @@ public class X2ChargeShot : CharState {
 		base.onEnter(oldState);
 		bool air = !character.grounded;
 		if (type == 0 && !air) {
+			sprite = "x2_shot";
+			defaultSprite = sprite;
 			character.changeSpriteFromName("x2_shot", true);
 		}
 		if (type == 1 && !air) {
+			sprite = "x2_shot2";
+			defaultSprite = sprite;
 			character.changeSpriteFromName("x2_shot2", true);
 		}
 		if (type == 0 && air) {
@@ -306,6 +310,7 @@ public class X2ChargeShot : CharState {
 	}
 
 	public override void onExit(CharState newState) {
+		character.shootAnimTime = 0;
 		base.onExit(newState);
 	}
 }
@@ -382,6 +387,7 @@ public class X3ChargeShot : CharState {
 	}
 
 	public override void onExit(CharState newState) {
+		character.shootAnimTime = 0;
 		base.onExit(newState);
 	}
 }

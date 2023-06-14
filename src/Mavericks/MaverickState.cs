@@ -806,7 +806,7 @@ public class MFly : MaverickState {
 			flyVel = Point.lerp(flyVel, Point.zero, Global.spf * 5f);
 		} else {
 			float ang = flyVel.angleWith(inputDir);
-			float modifier = MathF.Clamp(ang / 90f, 1, 2);
+			float modifier = Math.Clamp(ang / 90f, 1, 2);
 
 			flyVel.inc(inputDir.times(Global.spf * flyVelAcc * modifier));
 			if (flyVel.magnitude > flyVelMaxSpeed) {
@@ -919,11 +919,10 @@ public class MLand : MaverickState {
 			if (oo.getRunSpeed() > 100) maverick.frameSpeed = 2;
 			if (oo.getRunSpeed() > 200) maverick.frameSpeed = 3;
 			if (maverick.isAnimOver() || oo.getRunSpeed() > 300) {
-				if (input.isHeld(Control.Left, player) || input.isHeld(Control.Right, player)) {
-					maverick.changeState(new MRun());
-				} else {
-					maverick.changeState(new MIdle());
-				}
+				maverick.changeState(new MIdle());
+			}
+			if (input.isHeld(Control.Left, player) || input.isHeld(Control.Right, player)) {
+				maverick.changeState(new MRun());
 			}
 		} else if (maverick is BubbleCrab bc && bc.shield != null) {
 			jumpHeldOnce = jumpHeldOnce || input.isHeld(Control.Jump, player);
@@ -943,6 +942,19 @@ public class MLand : MaverickState {
 		} else {
 			if (maverick.isAnimOver()) {
 				maverick.changeState(new MIdle());
+			}
+		}
+		if (input.isHeld(Control.Left, player) || input.isHeld(Control.Right, player)) {
+			Point move = new(0, 0);
+			if (input.isHeld(Control.Left, player)) {
+				maverick.xDir = -1;
+				move.x = -maverick.getRunSpeed();
+			} else if (input.isHeld(Control.Right, player)) {
+				maverick.xDir = 1;
+				move.x = maverick.getRunSpeed();
+			}
+			if (move.magnitude > 0) {
+				maverick.move(move);
 			}
 		}
 	}

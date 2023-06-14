@@ -125,7 +125,7 @@ public class JoinMenu : IMainMenu {
 		}
 
 		if (selServerIndex >= allServers.Count) {
-			selServerIndex = MathF.Clamp(allServers.Count - 1, 0, int.MaxValue);
+			selServerIndex = Math.Clamp(allServers.Count - 1, 0, int.MaxValue);
 		}
 	}
 

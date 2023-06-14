@@ -14,9 +14,9 @@ public partial class Character {
 	public bool fgMotion;
 	public bool isHyperX;
 
-	public const int headArmorCost = 1;
+	public const int headArmorCost = 2;
 	public const int bodyArmorCost = 3;
-	public const int armArmorCost = 4;
+	public const int armArmorCost = 3;
 	public const int bootsArmorCost = 2;
 
 	public RollingShieldProjCharged chargedRollingShieldProj;
@@ -24,12 +24,10 @@ public partial class Character {
 	public List<BubbleSplashProjCharged> chargedBubbles = new List<BubbleSplashProjCharged>();
 	public StrikeChainProj strikeChainProj;
 	public GravityWellProjCharged chargedGravityWell;
-	public RayGunAltProj rayGunAltProj;
 	public PlasmaGunAltProj plasmaGunAltProj;
-	public SpinningBladeProjCharged chargedSpinningBlade;
+	public SpinningBladeProjCharged chargedSpinningBlade; 
 	public FrostShieldProjCharged chargedFrostShield;
 	public TunnelFangProjCharged chargedTunnelFang;
-	public GaeaShieldProj gaeaShield;
 	public GravityWellProj gravityWell;
 	public int totalChipHealAmount;
 	public const int maxTotalChipHealAmount = 32;
@@ -42,8 +40,6 @@ public partial class Character {
 	public ShaderWrapper xPaletteShader;
 
 	public float streamCooldown;
-	int lastShootPressed;
-	int lastShootReleased;
 	float noDamageTime;
 	float rechargeHealthTime;
 	public float scannerCooldown;
@@ -605,34 +601,38 @@ public partial class Character {
 
 	// Fast upgrading via command key.
 	public void quickArmorUpgrade() {
-		if (!player.input.isPressed(Control.Special2, player)) {
+		if (!player.input.isHeld(Control.Special2, player)) {
+			hyperProgress = 0;
 			return;
 		}
 		if (player.health <= 0) {
+			hyperProgress = 0;
 			return;
 		}
-
-		if (!(charState is WarpIn)) {
-			if (player.canUpgradeGoldenX()) {
-				if (!player.character.boughtGoldenArmorOnce) {
-					player.scrap -= Player.goldenArmorCost;
-					player.character.boughtGoldenArmorOnce = true;
-				}
-				player.setGoldenArmor(true);
-				Global.playSound("ching");
-
-				return;
+		if (!(charState is WarpIn) && (player.canUpgradeGoldenX() || player.canUpgradeUltimateX())) {
+			hyperProgress += Global.spf;
+		}
+		if (hyperProgress < 1) {
+			return;
+		}
+		hyperProgress = 0;
+		if (player.canUpgradeGoldenX()) {
+			if (!player.character.boughtGoldenArmorOnce) {
+				player.scrap -= Player.goldenArmorCost;
+				player.character.boughtGoldenArmorOnce = true;
 			}
-			if (player.canUpgradeUltimateX()) {
-				if (!player.character.boughtUltimateArmorOnce) {
-					player.scrap -= Player.ultimateArmorCost;
-					player.character.boughtUltimateArmorOnce = true;
-				}
-				player.setUltimateArmor(true);
-				Global.playSound("ching");
-				
-				return;
+			player.setGoldenArmor(true);
+			Global.playSound("ching");
+			return;
+		}
+		if (player.canUpgradeUltimateX()) {
+			if (!player.character.boughtUltimateArmorOnce) {
+				player.scrap -= Player.ultimateArmorCost;
+				player.character.boughtUltimateArmorOnce = true;
 			}
+			player.setUltimateArmor(true);
+			Global.playSound("ching");
+			return;
 		}
 	}
 

@@ -9,19 +9,24 @@ namespace MMXOnline;
 public enum RenderEffectType {
 	Hit,
 	Flash,
-	StockedCharge,
+	//StockedCharge,
 	Invisible,
 	InvisibleFlash,
 	BlueShadow,
 	RedShadow,
 	Trail,
 	GreenShadow,
-	StockedSaber,
+	//StockedSaber,
 	BoomerKTrail,
 	SpeedDevilTrail,
 	StealthModeBlue,
 	StealthModeRed,
 	Shake,
+	ChargeGreen,
+	ChargeOrange,
+	ChargePink,
+	ChargeYellow,
+	ChargeBlue,
 }
 
 public class RenderEffect {

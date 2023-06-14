@@ -7,15 +7,11 @@ using System.Threading.Tasks;
 
 namespace MMXOnline;
 
-public partial class Character {
+public class Zero : Character {
 	public float rakuhouhaCooldown { get { return player.zeroGigaAttackWeapon.shootTime; } }
 	public float ryuenjinCooldown { get { return Math.Max(player.zeroUppercutWeaponA.shootTime, player.zeroUppercutWeaponS.shootTime); } }
 	public float hyouretsuzanCooldown { get { return Math.Max(player.zeroDownThrustWeaponA.shootTime, player.zeroDownThrustWeaponS.shootTime); } }
 
-	public float dashAttackCooldown;
-	public float maxDashAttackCooldown = 0.75f;
-	public float airAttackCooldown;
-	public float maxAirAttackCooldown = 0.5f;
 	public float genmuCooldown;
 
 	public float zSaberShotCooldown;
@@ -37,7 +33,19 @@ public partial class Character {
 	public float zeroLemonCooldown;
 	public bool doubleBusterDone;
 
-	public bool isAttacking() {
+	public Zero(
+		Player player, float x, float y, int xDir,
+		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
+		bool isWarpIn = true
+	) : base(
+		player, x, y, xDir, isVisible,
+		netId, ownedByLocalPlayer, isWarpIn, false, false
+	) {
+		zeroPaletteShader = Helpers.cloneShaderSafe("hyperzero");
+		nightmareZeroShader = Helpers.cloneNightmareZeroPaletteShader("paletteNightmareZero");
+	}
+
+	public override bool isAttacking() {
 		return sprite.name.Contains("attack") ||
 			   sprite.name.Contains("zero_hyouretsuzan") ||
 			   sprite.name.Contains("zero_raijingeki") ||
@@ -56,9 +64,8 @@ public partial class Character {
 			   sprite.name.Contains("zero_dropkick");
 	}
 
-	int framesSinceLastAttack = 1000;
-
-	public void updateZero() {
+	public override void update() {
+		base.update();
 		player.raijingekiWeapon.update();
 		player.zeroAirSpecialWeapon.update();
 		player.zeroUppercutWeaponA.update();
@@ -76,6 +83,24 @@ public partial class Character {
 		Helpers.decrementTime(ref zSaberShotCooldown);
 		Helpers.decrementTime(ref knuckleSoundCooldown);
 		Helpers.decrementTime(ref hyorogaCooldown);
+
+		if (awakenedZeroTime > 0) {
+			updateAwakenedZero();
+		}
+		if (isAwakenedZeroBS.getValue()) {
+			updateAwakenedAura();
+		}
+		Helpers.decrementTime(ref blackZeroTime);
+
+		if (player.isZero && !Global.level.is1v1()) {
+			if (isBlackZero()) {
+				if (musicSource == null) {
+					addMusicSource("blackzero", getCenterPos(), true);
+				}
+			} else {
+				destroyMusicSource();
+			}
+		}
 
 		if (shootAnimTime > 0) {
 			shootAnimTime -= Global.spf;
@@ -141,7 +166,6 @@ public partial class Character {
 		Helpers.decrementTime(ref zeroLemonCooldown);
 
 		// Handles Standard Hypermode Activations.
-
 		if (player.scrap >= Player.zeroHyperCost &&
 			player.input.isHeld(Control.Special2, player) &&
 			charState is not HyperZeroStart && (
@@ -167,7 +191,7 @@ public partial class Character {
 				playSound: false, resetCooldown: true
 			);
 		}
-		
+
 		if (player.isZBusterZero()) {
 			if (charState.canShoot() && !isCharging()) {
 				var shootPressed = player.input.isPressed(Control.Shoot, player);
@@ -238,7 +262,6 @@ public partial class Character {
 		}
 
 		// Cutoff point for non-zero buster loadouts
-
 		bool lenientAttackPressed = (attackPressed || framesSinceLastAttack < 5);
 		bool spcPressed = player.input.isPressed(Control.Special1, player);
 		bool spcActivated = false;
@@ -633,25 +656,25 @@ public partial class Character {
 
 	// isBlackZero below can be used by non-owners as these times are sync'd
 	public bool isBlackZero() {
-		return player.isZero && blackZeroTime > 0 && !player.isZBusterZero();
+		return blackZeroTime > 0 && !player.isZBusterZero();
 	}
 
 	public bool isBlackZero2() {
-		return player.isZero && blackZeroTime > 0 && player.isZBusterZero();
+		return blackZeroTime > 0 && player.isZBusterZero();
 	}
 
 	// These methods below can't be used by non-owners of the character since the times aren't sync'd. Use the BS states instead
 	public bool isAwakenedZero() {
-		return player.isZero && awakenedZeroTime > 0;
+		return awakenedZeroTime > 0;
 	}
 
 	public bool isAwakenedGenmuZero() {
-		return player.isZero && awakenedZeroTime > 30;
+		return awakenedZeroTime > 30;
 	}
 
 	float awakenedScrapTime;
 	float awakenedAuraAnimTime;
-	int awakenedAuraFrame;
+	public int awakenedAuraFrame;
 	public void updateAwakenedZero() {
 		awakenedZeroTime += Global.spf;
 		awakenedScrapTime += Global.spf;
@@ -681,6 +704,25 @@ public partial class Character {
 			if (awakenedAuraFrame > 3) awakenedAuraFrame = 0;
 		}
 	}
+
+	public override bool isToughGuyHyperMode() {
+		return isBlackZero();
+	}
+	public override void increaseCharge() {
+		float factor = 1;
+		if (isBlackZero2()) factor = 1.5f;
+		chargeTime += Global.spf * factor;
+	}
+
+	public override void changeSprite(string spriteName, bool resetFrame) {
+		if (sprite != null && sprite.name != "zero_attack" && spriteName == "zero_attack") {
+			zero3SwingComboStartTime = Global.time;
+		}
+		if (sprite != null && sprite.name != "zero_attack3" && spriteName == "zero_attack3") {
+			zero3SwingComboEndTime = Global.time;
+		}
+		base.changeSprite(spriteName, resetFrame);
+	}
 }
 
 public class HyperZeroStart : CharState {
@@ -696,20 +738,20 @@ public class HyperZeroStart : CharState {
 		if (time == 0) {
 			if (radius >= 0) {
 				radius -= Global.spf * 200;
-			} else {
+			} else if (character is Zero zero) {
 				time = Global.spf;
 				radius = 0;
 				if (player.isZBusterZero()) {
-					character.blackZeroTime = 9999;
+					zero.blackZeroTime = 9999;
 					RPC.actorToggle.sendRpc(character.netId, RPCActorToggleType.ActivateBlackZero2);
 				} else if (player.zeroHyperMode == 0) {
-					character.blackZeroTime = character.maxHyperZeroTime + 1;
-					RPC.setHyperZeroTime.sendRpc(character.player.id, character.blackZeroTime, 0);
+					zero.blackZeroTime = zero.maxHyperZeroTime + 1;
+					RPC.setHyperZeroTime.sendRpc(character.player.id, zero.blackZeroTime, 0);
 				} else if (player.zeroHyperMode == 1) {
-					character.awakenedZeroTime = Global.spf;
-					RPC.setHyperZeroTime.sendRpc(character.player.id, character.awakenedZeroTime, 2);
+					zero.awakenedZeroTime = Global.spf;
+					RPC.setHyperZeroTime.sendRpc(character.player.id, zero.awakenedZeroTime, 2);
 				} else if (player.zeroHyperMode == 2) {
-					character.isNightmareZero = true;
+					zero.isNightmareZero = true;
 				}
 				character.playSound("ching");
 				character.fillHealthToMax();
@@ -724,7 +766,7 @@ public class HyperZeroStart : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		if (!character.hyperZeroUsed) {
+		if (character is Zero zero && !zero.hyperZeroUsed) {
 			if (player.isZBusterZero()) {
 				character.player.scrap -= 10;
 			} else if (player.zeroHyperMode == 0) {
@@ -740,7 +782,7 @@ public class HyperZeroStart : CharState {
 				drWilyAnim.blink = true;
 				character.player.scrap -= 10;
 			}
-			character.hyperZeroUsed = true;
+			zero.hyperZeroUsed = true;
 		}
 		character.useGravity = false;
 		character.vel = new Point();
@@ -753,7 +795,9 @@ public class HyperZeroStart : CharState {
 		if (character != null) {
 			character.invulnTime = 0.5f;
 		}
-		character.hyperZeroUsed = false;
+		if (character is Zero zero) {
+			zero.hyperZeroUsed = false;
+		}
 	}
 
 	public override void render(float x, float y) {

@@ -480,7 +480,7 @@ public partial class Global {
 	public static int frameCount = 0;
 	public static int normalizeFrames(int frames) {
 		float fpsRatio = currentFPS / 60;
-		frames = MathF.Round(frames * fpsRatio);
+		frames = MathInt.Round(frames * fpsRatio);
 		if (frames <= 0) frames = 1;
 		return frames;
 	}

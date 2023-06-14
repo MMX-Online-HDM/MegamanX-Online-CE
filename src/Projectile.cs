@@ -265,7 +265,7 @@ public class Projectile : Actor {
 		if (attacker.player.alliance == defender.player.alliance) return false;
 		if (!defender.sprite.name.Contains("attack") && !defender.sprite.name.Contains("block")) return false;
 		if (defender.sprite.name.Contains("sigma2")) return false;
-		if (attacker.isHyperZero()) return false;
+		if ((attacker as Zero)?.isHyperZero() == true) return false;
 
 		// Not facing each other
 		if (attacker.pos.x >= defender.pos.x && (attacker.xDir != -1 || defender.xDir != 1)) return false;

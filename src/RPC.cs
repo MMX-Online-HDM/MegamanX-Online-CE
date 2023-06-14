@@ -537,7 +537,9 @@ public class RPCPlayerToggle : RPC {
 		} else if (toggleId == RPCToggleType.UnstockSaber) {
 			player.character.stockedXSaber = false;
 		} else if (toggleId == RPCToggleType.SetBlackZero) {
-			player.character.blackZeroTime = player.character.maxHyperZeroTime;
+			if (player.character is Zero zero) {
+				zero.blackZeroTime = zero.maxHyperZeroTime;
+			}
 		} else if (toggleId == RPCToggleType.SetWhiteAxl) {
 			player.character.whiteAxlTime = player.character.maxHyperAxlTime;
 		} else if (toggleId == RPCToggleType.ReviveVileTo2) {
@@ -663,8 +665,8 @@ public class RPCActorToggle : RPC {
 		} else if (toggleId == RPCActorToggleType.AddVaccineTime) {
 			(actor as Character)?.addVaccineTime(2);
 		} else if (toggleId == RPCActorToggleType.ActivateBlackZero2) {
-			if (actor is Character chr) {
-				chr.blackZeroTime = 9999;
+			if (actor is Zero zero) {
+				zero.blackZeroTime = 9999;
 			}
 		}
 	}
@@ -1102,10 +1104,12 @@ public class RPCSetHyperZeroTime : RPC {
 		int time = arguments[1];
 		int type = arguments[2];
 		var player = Global.level.getPlayerById(playerId);
-		if (player?.character == null) return;
-		if (type == 0) player.character.blackZeroTime = time;
-		if (type == 1) player.character.whiteAxlTime = time;
-		if (type == 2) player.character.awakenedZeroTime = time;
+		if (player?.character is not Zero zero) {
+			return;
+		}
+		if (type == 0) zero.blackZeroTime = time;
+		if (type == 1) zero.whiteAxlTime = time;
+		if (type == 2) zero.awakenedZeroTime = time;
 	}
 
 	public void sendRpc(int playerId, float time, int type) {

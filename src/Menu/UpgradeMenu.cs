@@ -36,7 +36,7 @@ public class UpgradeMenu : IMainMenu {
 
 	public int getMaxIndex() {
 		var mainPlayer = Global.level.mainPlayer;
-		return MathF.Clamp(2 + mainPlayer.subtanks.Count, 1, getMaxSubTanks() + 1);
+		return Math.Clamp(2 + mainPlayer.subtanks.Count, 1, getMaxSubTanks() + 1);
 	}
 
 	public int getHeartTankCost() {

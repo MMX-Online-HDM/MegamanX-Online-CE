@@ -52,7 +52,7 @@ public partial class Player {
 	public List<bool> axlBulletTypeBought = new List<bool>() { true, false, false, false, false, false, false };
 	public List<float> axlBulletTypeAmmo = new List<float>() { 0, 0, 0, 0, 0, 0, 0 };
 	public List<float> axlBulletTypeLastAmmo = new List<float>() { 32, 32, 32, 32, 32, 32, 32 };
-	public int lastDNACoreIndex;
+	public int lastDNACoreIndex = 4;
 	public DNACore lastDNACore;
 	public Point axlCursorPos;
 	public Point? assassinCursorPos;
@@ -889,20 +889,26 @@ public partial class Player {
 				}
 			}
 
-			character = new Character(this, pos.x, pos.y, xDir, false, charNetId, ownedByLocalPlayer, mk2VileOverride: mk2VileOverride, mk5VileOverride: false);
-
+			if (charNum == 1) {
+				character = new Zero(
+					this, pos.x, pos.y, xDir,
+					false, charNetId, ownedByLocalPlayer
+				);
+			} else {
+				character = new Character(this, pos.x, pos.y, xDir, false, charNetId, ownedByLocalPlayer, mk2VileOverride: mk2VileOverride, mk5VileOverride: false);
+			}
 			// Hyper mode overrides (POST)
 			if (Global.level.isHyper1v1() && ownedByLocalPlayer) {
 				if (isX) {
 					setUltimateArmor(true);
 				}
-				if (isZero) {
+				if (character is Zero zero) {
 					if (loadout.zeroLoadout.hyperMode == 0) {
-						character.blackZeroTime = 100000;
-						character.hyperZeroUsed = true;
+						zero.blackZeroTime = 100000;
+						zero.hyperZeroUsed = true;
 					} else {
-						character.awakenedZeroTime = Global.spf;
-						character.hyperZeroUsed = true;
+						zero.awakenedZeroTime = Global.spf;
+						zero.hyperZeroUsed = true;
 						scrap = 9999;
 					}
 				}
@@ -1032,6 +1038,15 @@ public partial class Player {
 	}
 
 	public void transformAxl(DNACore dnaCore) {
+		// Reload weapons at transform if not used before.
+		if (!dnaCore.usedOnce && weapons != null) {
+			foreach (var weapon in weapons) {
+				if (!weapon.isCmWeapon()) {
+					weapon.ammo = weapon.maxAmmo;
+				}
+			}
+		}
+		// Transform.
 		disguise = new Disguise(dnaCore.name);
 		charNum = dnaCore.charNum;
 
@@ -1075,8 +1090,19 @@ public partial class Player {
 
 		bool isVileMK2 = charNum == 2 && dnaCore.hyperMode == DNACoreHyperMode.VileMK2;
 		bool isVileMK5 = charNum == 2 && dnaCore.hyperMode == DNACoreHyperMode.VileMK5;
-		var retChar = new Character(this, character.pos.x, character.pos.y, character.xDir, true, character.netId, true, isWarpIn: false, mk2VileOverride: isVileMK2, mk5VileOverride: isVileMK5);
-
+		Character retChar = null;
+		if (charNum == 2) {
+			retChar = new Character(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, character.netId, true, isWarpIn: false,
+				mk2VileOverride: isVileMK2, mk5VileOverride: isVileMK5
+			);
+		} else {
+			retChar = new Zero(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, character.netId, true, isWarpIn: false
+			);
+		}
 		if (isVileMK5) retChar.vileForm = 2;
 		else if (isVileMK2) retChar.vileForm = 1;
 
@@ -1098,17 +1124,22 @@ public partial class Player {
 			weapon.shootTime = 0.25f;
 		}
 
-		if (charNum == 1 && dnaCore.hyperMode == DNACoreHyperMode.BlackZero) {
-			character.blackZeroTime = character.maxHyperZeroTime;
-			RPC.playerToggle.sendRpc(id, RPCToggleType.SetBlackZero);
+		if (character is Zero zero) {
+		 	if (dnaCore.hyperMode == DNACoreHyperMode.BlackZero) {
+				zero.blackZeroTime = zero.maxHyperZeroTime;
+				RPC.playerToggle.sendRpc(id, RPCToggleType.SetBlackZero);
+			} else if (dnaCore.hyperMode == DNACoreHyperMode.AwakenedZero) {
+				zero.awakenedZeroTime = Global.spf;
+			} else if (dnaCore.hyperMode == DNACoreHyperMode.NightmareZero) {
+				zero.isNightmareZero = true;
+			}
 		} else if (charNum == 3 && dnaCore.hyperMode == DNACoreHyperMode.WhiteAxl) {
 			character.whiteAxlTime = character.maxHyperAxlTime;
 			RPC.playerToggle.sendRpc(id, RPCToggleType.SetWhiteAxl);
-		} else if (charNum == 1 && dnaCore.hyperMode == DNACoreHyperMode.AwakenedZero) {
-			character.awakenedZeroTime = Global.spf;
-		} else if (charNum == 1 && dnaCore.hyperMode == DNACoreHyperMode.NightmareZero) {
-			character.isNightmareZero = true;
 		}
+
+		dnaCore.usedOnce = true;
+		dnaCore.hyperMode = DNACoreHyperMode.None;
 	}
 
 	// If you change this method change revertToAxlDeath() too
@@ -1118,8 +1149,18 @@ public partial class Player {
 		if (ownedByLocalPlayer) {
 			string json = JsonConvert.SerializeObject(new RPCAxlDisguiseJson(id, ""));
 			Global.serverClient?.rpc(RPC.axlDisguise, json);
-		}
 
+			if (character is Zero zero) {
+				if (zero.isNightmareZero) {
+					lastDNACore.rakuhouhaAmmo = zeroDarkHoldWeapon.ammo;
+				} else {
+					lastDNACore.rakuhouhaAmmo = zeroGigaAttackWeapon.ammo;
+				}
+			}
+			else if (isSigma) {
+				lastDNACore.rakuhouhaAmmo = sigmaAmmo;
+			}
+		}
 		var oldPos = character.pos;
 		var oldDir = character.xDir;
 		character.destroySelf();
@@ -1142,13 +1183,8 @@ public partial class Player {
 		frozenCastle = oldFrozenCastle;
 		ultimateArmor = oldUltimateArmor;
 
-		if (weapons != null) {
-			foreach (var weapon in weapons) {
-				if (!weapon.isCmWeapon()) {
-					weapon.ammo = weapon.maxAmmo;
-				}
-			}
-		}
+		lastDNACore = null;
+		lastDNACoreIndex = 4;
 		character.changeSpriteFromName("idle", true);
 	}
 
@@ -1159,8 +1195,18 @@ public partial class Player {
 		if (ownedByLocalPlayer) {
 			string json = JsonConvert.SerializeObject(new RPCAxlDisguiseJson(id, ""));
 			Global.serverClient?.rpc(RPC.axlDisguise, json);
-		}
 
+			if (character is Zero zero) {
+				if (zero.isNightmareZero) {
+					lastDNACore.rakuhouhaAmmo = zeroDarkHoldWeapon.ammo;
+				} else {
+					lastDNACore.rakuhouhaAmmo = zeroGigaAttackWeapon.ammo;
+				}
+			}
+			else if (isSigma) {
+				lastDNACore.rakuhouhaAmmo = sigmaAmmo;
+			}
+		}
 		preTransformedAxl = null;
 		charNum = 3;
 		maxHealth = 16;
@@ -1174,6 +1220,8 @@ public partial class Player {
 		frozenCastle = oldFrozenCastle;
 		ultimateArmor = oldUltimateArmor;
 
+		lastDNACore = null;
+		lastDNACoreIndex = 4;
 		character.addTransformAnim();
 	}
 
@@ -1210,9 +1258,9 @@ public partial class Player {
 	}
 
 	public bool canUpgradeUltimateX() {
-		return character != null && 
-			isX && !isDisguisedAxl && 
-			character.charState is not Die && !Global.level.is1v1() && 
+		return character != null &&
+			isX && !isDisguisedAxl &&
+			character.charState is not Die && !Global.level.is1v1() &&
 			!hasUltimateArmor() && !canUpgradeGoldenX() && hasAllArmor() && scrap >= ultimateArmorCost;
 	}
 
@@ -1339,7 +1387,7 @@ public partial class Player {
 	public void awardScrap() {
 		if (axlBulletType == (int)AxlBulletWeaponType.AncientGun && isAxl) return;
 		if (character?.isCCImmuneHyperMode() == true) return;
-		if (character != null && (character.isNightmareZero)) return;
+		if (character is Zero zero && (zero.isNightmareZero)) return;
 		//if (character != null && character.isBlackZero2()) return;
 		if (character != null && character.rideArmor != null && character.charState is InRideArmor && character.rideArmor.raNum == 4) return;
 		if (isX && hasUltimateArmor()) return;

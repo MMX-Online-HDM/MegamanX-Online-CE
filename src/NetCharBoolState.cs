@@ -61,8 +61,12 @@ public partial class Character {
 		isFrozenCastleActiveBS = new NetCharBoolState(this, 0, NetCharBoolStateNum.One, (character) => { return character.hasFrozenCastleBarrier(); });
 		isStrikeChainHookedBS = new NetCharBoolState(this, 1, NetCharBoolStateNum.One, (character) => { return character.charState is StrikeChainHooked; });
 		shouldDrawArmBS = new NetCharBoolState(this, 2, NetCharBoolStateNum.One, (character) => { return character.shouldDrawArm(); });
-		isAwakenedZeroBS = new NetCharBoolState(this, 3, NetCharBoolStateNum.One, (character) => { return character.isAwakenedZero(); });
-		isAwakenedGenmuZeroBS = new NetCharBoolState(this, 4, NetCharBoolStateNum.One, (character) => { return character.isAwakenedGenmuZero(); });
+		isAwakenedZeroBS = new NetCharBoolState(this, 3, NetCharBoolStateNum.One, (character) => {
+			return (character as Zero)?.isAwakenedZero() == true;
+		});
+		isAwakenedGenmuZeroBS = new NetCharBoolState(this, 4, NetCharBoolStateNum.One, (character) => {
+			return (character as Zero)?.isAwakenedGenmuZero() == true;
+		});
 		isInvisibleBS = new NetCharBoolState(this, 5, NetCharBoolStateNum.One, (character) => { return character.isInvisible(); });
 		isHyperXBS = new NetCharBoolState(this, 6, NetCharBoolStateNum.One, (character) => { return character.isHyperX; });
 		isHyperSigmaBS = new NetCharBoolState(this, 7, NetCharBoolStateNum.One, (character) => { return character.isHyperSigma; });
@@ -99,7 +103,9 @@ public partial class Character {
 		hasUltimateArmorBS = new NetCharBoolState(this, 3, NetCharBoolStateNum.Two, (character) => { return character.player.hasUltimateArmor(); });
 		isDefenderFavoredBS = new NetCharBoolState(this, 4, NetCharBoolStateNum.Two, (character) => { return character.player.isDefenderFavored; });
 		hasSubtankCapacityBS = new NetCharBoolState(this, 5, NetCharBoolStateNum.Two, (character) => { return character.player.hasSubtankCapacity(); });
-		isNightmareZeroBS = new NetCharBoolState(this, 6, NetCharBoolStateNum.Two, (character) => { return character.isNightmareZero; });
+		isNightmareZeroBS = new NetCharBoolState(this, 6, NetCharBoolStateNum.Two, (character) => {
+			return (character as Zero)?.isNightmareZero == true;
+		});
 		isDarkHoldBS = new NetCharBoolState(this, 7, NetCharBoolStateNum.Two, (character) => { return character.charState is DarkHoldState; });
 	}
 

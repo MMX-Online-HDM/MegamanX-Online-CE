@@ -39,6 +39,9 @@ public class CharState {
 	// For grabbed states (I am the grabbed)
 	public float grabTime = 4;
 
+	// Gacel notes.
+	// This should be inside the character object to sync while online.
+
 	public virtual void releaseGrab() {
 		grabTime = 0;
 	}
@@ -226,7 +229,9 @@ public class CharState {
 		}
 
 		//character.player.vileBallWeapon.shootTime = 0;
-		character.quakeBlazerBounces = 0;
+		if (character is Zero zero) {
+			zero.quakeBlazerBounces = 0;
+		}
 		character.dashedInAir = 0;
 		changeToIdle(ts);
 		if (character.ai != null) character.ai.jumpTime = 0;
@@ -386,21 +391,26 @@ public class CharState {
 			return;
 		}
 
-		if (player.isX && character.hasHadoukenEquipped() && character.canUseFgMove()) {
-			if (player.input.checkQCF(player, Control.Shoot)) {
-				if (!player.hasAllItems()) player.scrap -= 3;
-				player.fgMoveAmmo = 0;
-				character.changeState(new Hadouken(), true);
-				return;
-			}
+		bool hadokenCheck = false;
+		bool shoryukenCheck = false;
+		if (character.hasHadoukenEquipped()) {
+			hadokenCheck = player.input.checkHadoken(player, character.xDir, Control.Shoot);
 		}
-		if (player.isX && character.hasShoryukenEquipped() && character.canUseFgMove()) {
-			if (player.input.checkDragonPunch(player, character.xDir, Control.Shoot)) {
-				if (!player.hasAllItems()) player.scrap -= 3;
-				player.fgMoveAmmo = 0;
-				character.changeState(new Shoryuken(character.isUnderwater()), true);
-				return;
-			}
+		if (character.hasShoryukenEquipped()) {
+			shoryukenCheck = player.input.checkShoryuken(player, character.xDir, Control.Shoot);
+		}
+
+		if (player.isX && hadokenCheck && character.canUseFgMove()) {
+			if (!player.hasAllItems()) player.scrap -= 3;
+			player.fgMoveAmmo = 0;
+			character.changeState(new Hadouken(), true);
+			return;
+		}
+		if (player.isX && shoryukenCheck && character.canUseFgMove()) {
+			if (!player.hasAllItems()) player.scrap -= 3;
+			player.fgMoveAmmo = 0;
+			character.changeState(new Shoryuken(character.isUnderwater()), true);
+			return;
 		}
 
 		if (player.input.isPressed(Control.Jump, player) && player.input.isHeld(Control.Up, player) && character.mk5RideArmorPlatform != null && character.canEjectFromRideArmor()) {
@@ -750,6 +760,14 @@ public class Run : CharState {
 	public override void update() {
 		base.update();
 		var move = new Point(0, 0);
+		float runSpeed = character.getRunSpeed();
+		if (stateTime <= 5) {
+			runSpeed = 60; 
+			if (character.slowdownTime > 0) runSpeed *= 0.75f;
+			if (character.igFreezeProgress == 1) runSpeed *= 0.75f;
+			if (character.igFreezeProgress == 2) runSpeed *= 0.5f;
+			if (character.igFreezeProgress == 3) runSpeed *= 0.25f;
+		}
 		if (player.input.isHeld(Control.Left, player)) {
 			character.xDir = -1;
 			if (player.character.canMove()) move.x = -character.getRunSpeed();
@@ -988,11 +1006,18 @@ public class Dash : CharState {
 
 		character.isDashing = true;
 		character.globalCollider = character.getDashingCollider();
-		dashSpark = new Anim(character.getDashSparkEffectPos(initialDashDir), "dash_sparks", initialDashDir, player.getNextActorNetId(), true, sendRpc: true);
+		dashSpark = new Anim(
+			character.getDashSparkEffectPos(initialDashDir),
+			"dash_sparks", initialDashDir, player.getNextActorNetId(),
+			true, sendRpc: true
+		);
 	}
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
+		if (!dashSpark.destroyed) {
+			dashSpark.destroySelf();
+		}
 	}
 
 	public static void dashBackwardsCode(Character character, int initialDashDir) {
@@ -1017,34 +1042,15 @@ public class Dash : CharState {
 
 		if (!player.input.isHeld(initialDashButton, player) && !stop) {
 			dashTime = 50;
-			stop = true;
-			character.frameIndex = 0;
-			character.sprite.frameTime = 0;
-			character.sprite.animTime = 0;
-			if (!dashSpark.destroyed) {
-				dashSpark.destroySelf();
-			}
 		}
-
 		if (!stop && player.isSigma && player.input.isPressed(Control.Special1, player) &&
 			character.flag == null && character.leapSlashCooldown == 0
 		) {
 			character.changeState(new SigmaWallDashState(-1, true), true);
 			return;
 		}
-
 		float speedModifier = 1;
 		float distanceModifier = 1;
-		if (dashTime > Global.spf * 32 * distanceModifier) {
-			if (!stop) {
-				character.frameIndex = 0;
-				stop = true;
-			} else if (character.frameIndex > 0) {
-				changeToIdle();
-				return;
-			}
-		}
-		var move = new Point(0, 0);
 		if (player.isX && player.hasBootsArmor(1)) {
 			speedModifier = 1.15f;
 			distanceModifier = 1.15f;
@@ -1053,14 +1059,32 @@ public class Dash : CharState {
 			speedModifier = 1.25f;
 			distanceModifier = 1.25f;
 		}
-		move.x = character.getRunSpeed() * character.getDashSpeed() * initialDashDir * speedModifier;
+		if (dashTime > Global.spf * 32 * distanceModifier || stop) {
+			if (!stop) {
+				dashTime = 0;
+				character.frameIndex = 0;
+				character.sprite.frameTime = 0;
+				character.sprite.animTime = 0;
+				character.sprite.frameSpeed = 0.1f;
+				stop = true;
+			} else if (dashTime >= Global.spf * 4) {
+				changeToIdle();
+				return;
+			}
+		}
+		dashTime += Global.spf;
 		if (!stop) {
+			var move = new Point(0, 0);
+			move.x = character.getRunSpeed() * character.getDashSpeed() * initialDashDir * speedModifier;
 			character.move(move);
-			dashTime += Global.spf;
 		}
 		if (stateTime > 0.1) {
 			stateTime = 0;
-			new Anim(character.getDashDustEffectPos(initialDashDir), "dust", initialDashDir, player.getNextActorNetId(), true, sendRpc: true);
+			new Anim(
+				character.getDashDustEffectPos(initialDashDir),
+				"dust", initialDashDir, player.getNextActorNetId(), true,
+				sendRpc: true
+			);
 		}
 	}
 }
@@ -1082,42 +1106,39 @@ public class AirDash : CharState {
 
 		base.update();
 
-		if (!player.input.isHeld(initialDashButton, player) && character.frameIndex >= 0 && !stop) {
+		if (!player.input.isHeld(initialDashButton, player) && !stop) {
 			dashTime = 50;
-			if (character.frameIndex == 0) {
-				stop = true;
-				character.sprite.frameTime = 0; 
-			}
 		}
-
 		float speedModifier = 1;
 		float distanceModifier = 1;
 		if (player.isX && player.hasBootsArmor(2)) {
 			speedModifier = 1.15f;
-			distanceModifier = 1.25f;
+			distanceModifier = 1.15f;
 		}
 		if (player.character.sprite.name.EndsWith("unpo_grab_dash")) {
 			speedModifier = 1.25f;
 			distanceModifier = 1.25f;
 		}
-		if (dashTime > Global.spf * 28 * distanceModifier) {
+		if (dashTime > Global.spf * 28 * distanceModifier || stop) {
 			if (!stop) {
-				character.frameIndex = 0;
+				dashTime = 0;
 				stop = true;
-			} else if (character.frameIndex > 0) {
+				character.frameIndex = 0;
+				character.sprite.frameTime = 0;
+				character.sprite.animTime = 0;
+				character.sprite.frameSpeed = 0.1f;
+				stop = true;
+			} else if (dashTime >= Global.spf * 4) {
 				character.changeState(new Fall());
 				return;
 			}
 		}
-		var move = new Point(0, 0);
-		move.x = character.getRunSpeed(true) * character.getDashSpeed() * initialDashDir * speedModifier;
-		if (character.frameIndex > 0 || stop) {
+		if (dashTime >= Global.spf * 4 || stop) {
+			var move = new Point(0, 0);
+			move.x = character.getRunSpeed(true) * character.getDashSpeed() * initialDashDir * speedModifier;
 			character.move(move);
-			dashTime += Global.spf;
 		}
-		if (stateTime > 0.1) {
-			stateTime = 0;
-		}
+		dashTime += Global.spf;
 	}
 
 	public override void onEnter(CharState oldState) {
@@ -1207,7 +1228,9 @@ public class WallSlide : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.dashedInAir = 0;
-		character.quakeBlazerBounces = 0;
+		if (character is Zero zero) {
+			zero.quakeBlazerBounces = 0;
+		}
 		if (player.isAI) {
 			character.ai.jumpTime = 0;
 		}

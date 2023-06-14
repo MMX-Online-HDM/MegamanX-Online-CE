@@ -1,4 +1,6 @@
-﻿namespace MMXOnline;
+﻿using System;
+
+namespace MMXOnline;
 
 public class TunnelRhino : Maverick {
 	public static Weapon getWeapon() { return new Weapon(WeaponIds.TunnelRGeneric, 153); }
@@ -142,7 +144,7 @@ public class TunnelRTornadoFang : Projectile {
 			}
 		} else if (state == 1) {
 			vel.x += Global.spf * 500 * xDir;
-			if (MathF.Abs(vel.x) > 350) vel.x = 350 * xDir;
+			if (Math.Abs(vel.x) > 350) vel.x = 350 * xDir;
 		}
 	}
 

@@ -65,6 +65,8 @@ public class Hyouretsuzan : CharState {
 	public Weapon weapon;
 	public HyouretsuzanType type { get { return (HyouretsuzanType)weapon.type; } }
 	public bool canFreeze;
+	public Zero zero;
+
 	public Hyouretsuzan(Weapon weapon) : base(getSpriteName(weapon.type) + "_fall", "", "", getSpriteName(weapon.type) + "_start") {
 		this.weapon = weapon;
 	}
@@ -117,9 +119,9 @@ public class Hyouretsuzan : CharState {
 		}
 
 		if (!hitGround) {
-			if (player.input.isHeld(Control.Jump, player) && character.quakeBlazerBounces < 1) {
+			if (player.input.isHeld(Control.Jump, player) && zero.quakeBlazerBounces < 1) {
 				character.vel.y = -300;
-				character.quakeBlazerBounces++;
+				zero.quakeBlazerBounces++;
 				// character.airAttackCooldown = character.maxAirAttackCooldown;
 			} else {
 				// weapon.shootTime = weapon.rateOfFire * 2;
@@ -137,6 +139,7 @@ public class Hyouretsuzan : CharState {
 		if (ground == null) {
 			canFreeze = true;
 		}
+		zero = character as Zero;
 	}
 
 	public override void onExit(CharState newState) {

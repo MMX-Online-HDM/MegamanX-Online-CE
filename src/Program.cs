@@ -333,7 +333,7 @@ class Program {
 		}
 
 		if (Options.main.showFPS && Global.level != null && Global.level.started) {
-			int fps = MathF.Round(Global.currentFPS);
+			int fps = MathInt.Round(Global.currentFPS);
 			float yPos = 215;
 			if (Global.level.gameMode.shouldDrawRadar()) yPos = 219;
 			Helpers.drawTextStd(TCat.HUD, "FPS:" + fps.ToString(), Global.screenW - 5, yPos, Alignment.Right, fontSize: 18);

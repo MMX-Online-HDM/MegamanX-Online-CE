@@ -41,9 +41,9 @@ public class ZSaberProj : Projectile {
 		//this.fadeSprite = "zsaber_shot_fade";
 		reflectable = true;
 		projId = (int)ProjIds.ZSaberProj;
-		if (player.character?.isBlackZero2() == true) {
+		if (player.character is Zero zero && zero.isBlackZero2() == true) {
 			damager.damage = 4;
-			genericShader = player.character.zeroPaletteShader;
+			genericShader = zero.zeroPaletteShader;
 		}
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
@@ -87,7 +87,9 @@ public class ZeroSpinKickState : CharState {
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
-		character.dashAttackCooldown = 0.5f;
+		if (character is Zero zero) {
+			zero.dashAttackCooldown = 0.5f;
+		}
 	}
 
 	public override void update() {

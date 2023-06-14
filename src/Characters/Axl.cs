@@ -74,6 +74,9 @@ public partial class Character {
 	public float maxHyperAxlTime = 30;
 	public List<int> ammoUsages = new List<int>();
 
+	public RayGunAltProj rayGunAltProj;
+	public GaeaShieldProj gaeaShield;
+
 	// Used to be 0.5, 100
 	public const float maxStealthRevealTime = 0.25f;
 	public const float stealthRevealPingDenom = 200;    // The ping divided by this number indicates stealth reveal time in online
@@ -260,20 +263,26 @@ public partial class Character {
 			bool altShootPressed = player.input.isPressed(Control.Special1, player);
 			if ((shootPressed || altShootPressed) && !isCCImmuneHyperMode()) {
 				undisguiseTime = 0.33f;
+				DNACore lastDNA = player.lastDNACore;
+				int lastDNAIndex = player.lastDNACoreIndex;
 				player.revertToAxl();
 				player.character.undisguiseTime = 0.33f;
-				if (altShootPressed && player.scrap >= 2) {
-					player.scrap -= 2;
-					player.lastDNACore.hyperMode = DNACoreHyperMode.None;
+				// To keep DNA.
+				if (altShootPressed && player.scrap >= 1) {
+					player.scrap -= 1;
+					lastDNA.hyperMode = DNACoreHyperMode.None;
 					// Turn ultimate and golden armor into naked X
-					if (player.lastDNACore.armorFlag >= byte.MaxValue - 1) {
-						player.lastDNACore.armorFlag = 0;
+					if (lastDNA.armorFlag >= byte.MaxValue - 1) {
+						lastDNA.armorFlag = 0;
 					}
 					// Turn ancient gun into regular axl bullet
-					if (player.lastDNACore.weapons.Count > 0 && player.lastDNACore.weapons[0] is AxlBullet ab && ab.type == (int)AxlBulletWeaponType.AncientGun) {
-						player.lastDNACore.weapons[0] = player.getAxlBulletWeapon(0);
+					if (lastDNA.weapons.Count > 0 &&
+						lastDNA.weapons[0] is AxlBullet ab &&
+						ab.type == (int)AxlBulletWeaponType.AncientGun
+					) {
+						lastDNA.weapons[0] = player.getAxlBulletWeapon(0);
 					}
-					player.weapons.Insert(player.lastDNACoreIndex, player.lastDNACore);
+					player.weapons.Insert(lastDNAIndex, lastDNA);
 				}
 				return;
 			}
@@ -1573,8 +1582,6 @@ public partial class Character {
 				stingChargeTime = 0;
 			}
 		}
-
-		updateAwakenedAura();
 	}
 }
 

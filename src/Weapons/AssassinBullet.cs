@@ -109,7 +109,7 @@ public class AssassinBulletProj : Projectile {
 		damager.applyDamage(damagable, false, weapon, this, projId, overrideDamage: overrideDamage);
 
 		if (weakness) {
-			//hitChar.damageTexts.Add(new DamageText("headshot!", 0));
+			(damagable as Character).addDamageText("Headshot!", false);
 			playSound("hurt");
 		}
 	}

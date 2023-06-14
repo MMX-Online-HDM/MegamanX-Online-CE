@@ -103,7 +103,7 @@ public partial class Player {
 	private Weapon _zeroGigaAttackWeapon;
 	public Weapon zeroGigaAttackWeapon {
 		get {
-			if (character?.isAwakenedZero() == true) return zeroShinMessenkouWeapon;
+			if ((character as Zero)?.isAwakenedZero() == true) return zeroShinMessenkouWeapon;
 			if (character?.isNightmareZeroBS.getValue() == true) return zeroDarkHoldWeapon;
 			return _zeroGigaAttackWeapon;
 		}

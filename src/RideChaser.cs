@@ -606,7 +606,6 @@ public class RideChaser : Actor, IDamagable {
 
 	public void creditKill(Player killer, Player assister, int? weaponIndex) {
 		if (killer != null && killer != player) {
-			/*
 			killer.addKill();
 			if (Global.level.gameMode is TeamDeathMatch)
 			{
@@ -617,14 +616,13 @@ public class RideChaser : Actor, IDamagable {
 					Global.level.gameMode.syncTeamScores();
 				}
 			}
-			*/
 
 			killer.awardScrap();
 		}
 
 		if (assister != null && assister != player) {
-			//assister.addAssist();
-			//assister.addKill();
+			assister.addAssist();
+			assister.addKill();
 			assister.awardScrap();
 		}
 
