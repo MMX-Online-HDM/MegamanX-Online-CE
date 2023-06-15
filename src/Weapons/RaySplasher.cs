@@ -70,6 +70,10 @@ public class RaySplasherTurret : Actor, IDamagable {
 	int raySplasherMod;
 
 	float velY;
+	static ShaderWrapper replaceColorShaderAlly = Helpers.cloneShaderSafe("replacecolor");
+	static ShaderWrapper replaceColorShaderBlue = Helpers.cloneShaderSafe("replacecolor");
+	static ShaderWrapper replaceColorShaderRed = Helpers.cloneShaderSafe("replacecolor");
+
 	ShaderWrapper replaceColorShader;
 
 	public RaySplasherTurret(Point pos, Player player, int xDir, ushort netId, bool ownedByLocalPlayer, bool rpc = false) :
@@ -82,17 +86,19 @@ public class RaySplasherTurret : Actor, IDamagable {
 		removeRenderEffect(RenderEffectType.BlueShadow);
 		removeRenderEffect(RenderEffectType.RedShadow);
 
-
-		replaceColorShader = Helpers.cloneShaderSafe("replacecolor");
+		replaceColorShader = replaceColorShaderAlly;
 		if (replaceColorShader != null) {
 			Vec4 origColor = new Vec4(8 / 255f, 8 / 255f, 8 / 255f, 0);
 			if (player.isMainPlayer) {
+				replaceColorShader = replaceColorShaderAlly;
 				replaceColorShader.SetUniform("origColor", origColor);
 				replaceColorShader.SetUniform("replaceColor", new Vec4(0, 0.75f, 0, 0.5f));
 			} else if (Global.level.gameMode.isTeamMode && player.alliance == GameMode.redAlliance) {
+				replaceColorShader = replaceColorShaderRed;
 				replaceColorShader.SetUniform("origColor", origColor);
 				replaceColorShader.SetUniform("replaceColor", new Vec4(0.75f, 0, 0, 0.5f));
 			} else if (Global.level.gameMode.isTeamMode && player.alliance == GameMode.blueAlliance) {
+				replaceColorShader = replaceColorShaderBlue;
 				replaceColorShader.SetUniform("origColor", origColor);
 				replaceColorShader.SetUniform("replaceColor", new Vec4(0, 0, 0.75f, 0.5f));
 			}

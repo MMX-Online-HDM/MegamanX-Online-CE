@@ -41,6 +41,11 @@ public class RideArmor : Actor, IDamagable {
 	public int consecutiveJump;
 	public bool manualDisabled = false;
 
+	public static ShaderWrapper paletteEG01 = Helpers.cloneGenericPaletteShader("paletteEG01");
+	public static ShaderWrapper paletteKangaroo = Helpers.cloneGenericPaletteShader("paletteKangaroo");
+	public static ShaderWrapper paletteHawk = Helpers.cloneGenericPaletteShader("paletteHawk");
+	public static ShaderWrapper paletteFrog = Helpers.cloneGenericPaletteShader("paletteFrog");
+
 	public RideArmor(Player owner, Point pos, int raNum, int neutralId, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) : base(null, pos, netId, ownedByLocalPlayer, true) {
 		netOwner = owner;
 		setRaNum(raNum);
@@ -94,17 +99,17 @@ public class RideArmor : Actor, IDamagable {
 		// If adding a palette here it must be added to RPCActorToggleType.ChangeRAPieceColor check to sync
 		if (raNum == 0 && isNeutral) {
 			if (neutralId % 2 == 1) {
-				colorShader = Helpers.cloneGenericPaletteShader("paletteChimera");
+				colorShader = paletteEG01;
 				colorShader?.SetUniform("palette", 1);
 			}
 		} else if (raNum == 1 && isNeutral) {
-			colorShader = Helpers.cloneGenericPaletteShader("paletteKangaroo");
+			colorShader = paletteKangaroo;
 			colorShader?.SetUniform("palette", 1);
 		} else if (raNum == 2 && !isNeutral) {
-			colorShader = Helpers.cloneGenericPaletteShader("paletteHawk");
+			colorShader = paletteHawk;
 			colorShader?.SetUniform("palette", 1);
 		} else if (raNum == 3 && !isNeutral) {
-			colorShader = Helpers.cloneGenericPaletteShader("paletteFrog");
+			colorShader = paletteFrog;
 			colorShader?.SetUniform("palette", 1);
 		}
 	}

@@ -34,8 +34,8 @@ public partial class Character {
 	public int lastHyperSigmaXDir;
 	public float lastViralSigmaAngle;
 	public float viralSigmaAngle;
-	public ShaderWrapper viralSigmaShader;
-	public ShaderWrapper sigmaShieldShader;
+	//public ShaderWrapper viralSigmaShader;
+	//public ShaderWrapper sigmaShieldShader;
 	public float viralSigmaBeamLength;
 	public int lastViralSigmaXDir = 1;
 	public Character possessTarget;

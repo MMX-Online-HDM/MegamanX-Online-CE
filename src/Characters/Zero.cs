@@ -23,8 +23,8 @@ public class Zero : Character {
 	public float awakenedZeroTime;
 	public bool hyperZeroUsed;
 	public bool isNightmareZero;
-	public ShaderWrapper zeroPaletteShader;
-	public ShaderWrapper nightmareZeroShader;
+	//public ShaderWrapper zeroPaletteShader;
+	//public ShaderWrapper nightmareZeroShader;
 	public int quakeBlazerBounces;
 	public float zero3SwingComboStartTime;
 	public float zero3SwingComboEndTime;
@@ -41,8 +41,7 @@ public class Zero : Character {
 		player, x, y, xDir, isVisible,
 		netId, ownedByLocalPlayer, isWarpIn, false, false
 	) {
-		zeroPaletteShader = Helpers.cloneShaderSafe("hyperzero");
-		nightmareZeroShader = Helpers.cloneNightmareZeroPaletteShader("paletteNightmareZero");
+
 	}
 
 	public override bool isAttacking() {

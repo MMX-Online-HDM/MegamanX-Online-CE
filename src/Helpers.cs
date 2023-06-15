@@ -837,7 +837,7 @@ public class Helpers {
 
 	public static bool isOfClass(object go, Type type) {
 		if (go == null) return false;
-		if (go.GetType() == type || go.GetType().IsSubclassOf(type)) {
+		if (go is Type) {
 			return true;
 		}
 		return false;

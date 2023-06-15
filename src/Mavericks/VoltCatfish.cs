@@ -9,7 +9,7 @@ public class VoltCatfish : Maverick {
 
 	public Weapon meleeWeapon;
 	public List<VoltCTriadThunderProj> mines = new List<VoltCTriadThunderProj>();
-	public ShaderWrapper chargeShader;
+	//public ShaderWrapper chargeShader;
 	public bool bouncedOnce;
 
 	public VoltCatfish(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
@@ -27,8 +27,6 @@ public class VoltCatfish : Maverick {
 		ammo = 0;
 		netActorCreateId = NetActorCreateId.VoltCatfish;
 		bouncedOnce = true;
-
-		chargeShader = Helpers.cloneGenericPaletteShader("paletteVoltCatfishCharge");
 
 		netOwner = player;
 		if (sendRpc) {
@@ -103,12 +101,14 @@ public class VoltCatfish : Maverick {
 	}
 
 	public override List<ShaderWrapper> getShaders() {
-		if (chargeShader == null || !sprite.name.EndsWith("_charge")) return new List<ShaderWrapper>();
+		if (player.catfishChargeShader == null || !sprite.name.EndsWith("_charge")) return new List<ShaderWrapper>();
 
-		if (Global.isOnFrameCycle(4)) chargeShader.SetUniform("palette", 1);
-		else chargeShader.SetUniform("palette", 2);
-
-		return new List<ShaderWrapper>() { chargeShader };
+		if (Global.isOnFrameCycle(4)) {
+			player.catfishChargeShader.SetUniform("palette", 1);
+		} else {
+			player.catfishChargeShader.SetUniform("palette", 2);
+		}
+		return new List<ShaderWrapper>() { player.catfishChargeShader };
 	}
 
 	public MaverickState getShootState(bool isAI) {

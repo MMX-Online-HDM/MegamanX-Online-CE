@@ -43,7 +43,7 @@ public class ZSaberProj : Projectile {
 		projId = (int)ProjIds.ZSaberProj;
 		if (player.character is Zero zero && zero.isBlackZero2() == true) {
 			damager.damage = 4;
-			genericShader = zero.zeroPaletteShader;
+			genericShader = player.zeroPaletteShader;
 		}
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);

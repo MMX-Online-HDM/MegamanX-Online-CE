@@ -83,7 +83,7 @@ public class CrystalHunterCharged : Actor {
 		isSnails = overrideTime != null;
 
 		if (Options.main.enablePostProcessing) {
-			timeSlowShader = Helpers.cloneShaderSafe("timeslow");
+			timeSlowShader = owner.timeSlowShader;
 		}
 
 		Global.level.chargedCrystalHunters.Add(this);

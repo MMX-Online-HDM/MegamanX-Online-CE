@@ -345,6 +345,35 @@ public partial class Player {
 		}
 	}
 
+	// Shaders
+	public ShaderWrapper xPaletteShader = Helpers.cloneShaderSafe("palette");
+	public ShaderWrapper invisibleShader = Helpers.cloneShaderSafe("invisible");
+	public ShaderWrapper zeroPaletteShader = Helpers.cloneShaderSafe("hyperzero");
+	public ShaderWrapper nightmareZeroShader = Helpers.cloneNightmareZeroPaletteShader("paletteNightmareZero");
+	public ShaderWrapper axlPaletteShader = Helpers.cloneShaderSafe("hyperaxl");
+	public ShaderWrapper viralSigmaShader = Helpers.cloneShaderSafe("viralsigma");
+	public ShaderWrapper sigmaShieldShader = Helpers.cloneGenericPaletteShader("paletteSigma3Shield");
+	public ShaderWrapper acidShader = Helpers.cloneShaderSafe("acid");
+	public ShaderWrapper oilShader = Helpers.cloneShaderSafe("oil");
+	public ShaderWrapper igShader = Helpers.cloneShaderSafe("igIce");
+	public ShaderWrapper infectedShader = Helpers.cloneShaderSafe("infected");
+	public ShaderWrapper frozenCastleShader = Helpers.cloneShaderSafe("frozenCastle");
+	public ShaderWrapper possessedShader = Helpers.cloneShaderSafe("possessed");
+	public ShaderWrapper vaccineShader = Helpers.cloneShaderSafe("vaccine");
+	public ShaderWrapper darkHoldShader = Helpers.cloneShaderSafe("darkhold");
+	public ShaderWrapper speedDevilShader = Helpers.cloneShaderSafe("speedDevilTrail");
+
+	// Maverick shaders.
+	// Duplicated mavericks are not a thing so this should not be a problem.
+	public ShaderWrapper catfishChargeShader = Helpers.cloneGenericPaletteShader("paletteVoltCatfishCharge");
+	public ShaderWrapper gatorArmorShader = Helpers.cloneShaderSafe("wheelgEaten");
+	public ShaderWrapper spongeChargeShader = Helpers.cloneShaderSafe("wspongeCharge");
+	
+	// Projectile shaders.
+	public ShaderWrapper timeSlowShader = Helpers.cloneShaderSafe("timeslow");
+	public ShaderWrapper darkHoldScreenShader = Helpers.cloneShaderSafe("darkHoldScreen");
+
+
 	// Character specific data populated on RPC request
 	public ushort? charNetId;
 	public ushort? charRollingShieldNetId;

@@ -31,7 +31,7 @@ public class StingChameleon : Maverick {
 		weapon = new Weapon(WeaponIds.StingCGeneric, 98);
 
 		canClimb = true;
-		invisibleShader = Helpers.cloneShaderSafe("invisible");
+		//invisibleShader = Helpers.cloneShaderSafe("invisible");
 
 		awardWeaponId = WeaponIds.Sting;
 		weakWeaponId = WeaponIds.Boomerang;

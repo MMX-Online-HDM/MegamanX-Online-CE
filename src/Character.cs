@@ -85,14 +85,14 @@ public partial class Character : Actor, IDamagable {
 	public List<Trail> lastFiveTrailDraws = new List<Trail>();
 	public LoopingSound chargeSound;
 
-	public ShaderWrapper possessedShader;
-	public ShaderWrapper acidShader;
-	public ShaderWrapper igShader;
-	public ShaderWrapper oilShader;
-	public ShaderWrapper infectedShader;
-	public ShaderWrapper frozenCastleShader;
-	public ShaderWrapper vaccineShader;
-	public ShaderWrapper darkHoldShader;
+	//public ShaderWrapper possessedShader;
+	//public ShaderWrapper acidShader;
+	//public ShaderWrapper igShader;
+	//public ShaderWrapper oilShader;
+	//public ShaderWrapper infectedShader;
+	//public ShaderWrapper frozenCastleShader;
+	//public ShaderWrapper vaccineShader;
+	//public ShaderWrapper darkHoldShader;
 
 	public float headshotRadius {
 		get {
@@ -208,20 +208,6 @@ public partial class Character : Actor, IDamagable {
 		Global.level.addGameObject(this);
 
 		chargeEffect = new ChargeEffect();
-
-		xPaletteShader = Helpers.cloneShaderSafe("palette");
-		invisibleShader = Helpers.cloneShaderSafe("invisible");
-		axlPaletteShader = Helpers.cloneShaderSafe("hyperaxl");
-		viralSigmaShader = Helpers.cloneShaderSafe("viralsigma");
-		sigmaShieldShader = Helpers.cloneGenericPaletteShader("paletteSigma3Shield");
-		acidShader = Helpers.cloneShaderSafe("acid");
-		oilShader = Helpers.cloneShaderSafe("oil");
-		igShader = Helpers.cloneShaderSafe("igIce");
-		infectedShader = Helpers.cloneShaderSafe("infected");
-		frozenCastleShader = Helpers.cloneShaderSafe("frozenCastle");
-		possessedShader = Helpers.cloneShaderSafe("possessed");
-		vaccineShader = Helpers.cloneShaderSafe("vaccine");
-		darkHoldShader = Helpers.cloneShaderSafe("darkhold");
 
 		muzzleFlash = new Anim(new Point(), "axl_pistol_flash", xDir, null, false);
 		muzzleFlash.visible = false;
@@ -380,7 +366,7 @@ public partial class Character : Actor, IDamagable {
 			}
 			if (player.hasGoldenArmor()) index = 25;
 			if (hasUltimateArmorBS.getValue()) index = 0;
-			palette = xPaletteShader;
+			palette = player.xPaletteShader;
 
 			if (!isCStingInvisibleGraphics()) {
 				palette?.SetUniform("palette", index);
@@ -396,7 +382,7 @@ public partial class Character : Actor, IDamagable {
 				int mod = MathInt.Ceiling(zero.blackZeroTime) * 2;
 				paletteNum = (Global.frameCount % (mod * 2)) < mod ? 0 : 1;
 			}
-			palette = zero.zeroPaletteShader;
+			palette = player.zeroPaletteShader;
 			palette?.SetUniform("palette", paletteNum);
 			if (!player.isZBusterZero()) {
 				palette?.SetUniform("paletteTexture", Global.textures["hyperZeroPalette"]);
@@ -404,7 +390,7 @@ public partial class Character : Actor, IDamagable {
 				palette?.SetUniform("paletteTexture", Global.textures["hyperBusterZeroPalette"]);
 			}
 			if (isNightmareZeroBS.getValue()) {
-				palette = zero.nightmareZeroShader;
+				palette = player.nightmareZeroShader;
 			}
 		} else if (player.isAxl) {
 			int paletteNum = 0;
@@ -413,76 +399,76 @@ public partial class Character : Actor, IDamagable {
 				int mod = MathInt.Ceiling(whiteAxlTime) * 2;
 				paletteNum = (Global.frameCount % (mod * 2)) < mod ? 0 : 1;
 			}
-			palette = axlPaletteShader;
+			palette = player.axlPaletteShader;
 			palette?.SetUniform("palette", paletteNum);
 			palette?.SetUniform("paletteTexture", Global.textures["hyperAxlPalette"]);
 		} else if (player.isViralSigma()) {
 			int paletteNum = 6 - MathInt.Ceiling((player.health / player.maxHealth) * 6);
 			if (sprite.name.Contains("_enter")) paletteNum = 0;
-			palette = viralSigmaShader;
+			palette = player.viralSigmaShader;
 			palette?.SetUniform("palette", paletteNum);
 			palette?.SetUniform("paletteTexture", Global.textures["paletteViralSigma"]);
 		} else if (player.isSigma3()) {
-			if (Global.isOnFrameCycle(8)) palette = sigmaShieldShader;
+			if (Global.isOnFrameCycle(8)) palette = player.sigmaShieldShader;
 		}
 
 		if (palette != null) shaders.Add(palette);
 
 		if (player.isPossessed()) {
-			possessedShader?.SetUniform("palette", 1);
-			possessedShader?.SetUniform("paletteTexture", Global.textures["palettePossessed"]);
-			shaders.Add(possessedShader);
+			player.possessedShader?.SetUniform("palette", 1);
+			player.possessedShader?.SetUniform("paletteTexture", Global.textures["palettePossessed"]);
+			shaders.Add(player.possessedShader);
 		}
 
-		if (isDarkHoldBS.getValue() && darkHoldShader != null) {
+		if (isDarkHoldBS.getValue() && player.darkHoldShader != null) {
 			// If we are not already being affected by a dark hold shader, apply it. Otherwise for a brief period,
 			// victims will be double color inverted, appearing normal
 			if (!Global.level.darkHoldProjs.Any(dhp => dhp.screenShader != null && dhp.inRange(this))) {
-				shaders.Add(darkHoldShader);
+				shaders.Add(player.darkHoldShader);
 			}
 		}
 
-		if (darkHoldShader != null) {
+		if (player.darkHoldShader != null) {
 			// Invert the zero who used a dark hold so he appears to be drawn normally on top of it
 			var myDarkHold = Global.level.darkHoldProjs.FirstOrDefault(dhp => dhp.owner == player);
 			if (myDarkHold != null && myDarkHold.inRange(this)) {
-				shaders.Add(darkHoldShader);
+				shaders.Add(player.darkHoldShader);
 			}
 		}
 
-		if (acidTime > 0 && acidShader != null) {
-			acidShader?.SetUniform("acidFactor", 0.25f + (acidTime / 8f) * 0.75f);
-			shaders.Add(acidShader);
+		if (acidTime > 0 && player.acidShader != null) {
+			player.acidShader?.SetUniform("acidFactor", 0.25f + (acidTime / 8f) * 0.75f);
+			shaders.Add(player.acidShader);
 		}
-		if (oilTime > 0 && oilShader != null) {
-			oilShader?.SetUniform("oilFactor", 0.25f + (oilTime / 8f) * 0.75f);
-			shaders.Add(oilShader);
+		if (oilTime > 0 && player.oilShader != null) {
+			player.oilShader?.SetUniform("oilFactor", 0.25f + (oilTime / 8f) * 0.75f);
+			shaders.Add(player.oilShader);
 		}
-		if (vaccineTime > 0 && vaccineShader != null) {
-			vaccineShader?.SetUniform("vaccineFactor", vaccineTime / 8f);
+		if (vaccineTime > 0 && player.vaccineShader != null) {
+			player.vaccineShader?.SetUniform("vaccineFactor", vaccineTime / 8f);
 			//vaccineShader?.SetUniform("vaccineFactor", 1f);
-			shaders.Add(vaccineShader);
+			shaders.Add(player.vaccineShader);
 		}
-		if (igFreezeProgress > 0 && !sprite.name.Contains("frozen") && igShader != null) {
-			igShader?.SetUniform("igFreezeProgress", igFreezeProgress / 4);
-			shaders.Add(igShader);
+		if (igFreezeProgress > 0 && !sprite.name.Contains("frozen") && player.igShader != null) {
+			player.igShader?.SetUniform("igFreezeProgress", igFreezeProgress / 4);
+			shaders.Add(player.igShader);
 		}
-		if (infectedTime > 0 && infectedShader != null) {
-			infectedShader?.SetUniform("infectedFactor", infectedTime / 8f);
-			shaders.Add(infectedShader);
+		if (infectedTime > 0 && player.infectedShader != null) {
+			player.infectedShader?.SetUniform("infectedFactor", infectedTime / 8f);
+			shaders.Add(player.infectedShader);
 		} else if (player.isVile && isFrozenCastleActiveBS.getValue()) {
-			shaders.Add(frozenCastleShader);
+			shaders.Add(player.frozenCastleShader);
 		}
 
 		if (!isCStingInvisibleGraphics()) {
 			if (renderEffects.ContainsKey(RenderEffectType.Invisible) && alpha == 1) {
-				invisibleShader?.SetUniform("alpha", 0.33f);
-				shaders.Add(invisibleShader);
+				player.invisibleShader?.SetUniform("alpha", 0.33f);
+				shaders.Add(player.invisibleShader);
 			}
 			// alpha float doesn't work if one or more shaders exist. So need to use the invisible shader instead
 			else if (alpha < 1 && shaders.Count > 0) {
-				invisibleShader?.SetUniform("alpha", alpha);
-				shaders.Add(invisibleShader);
+				player.invisibleShader?.SetUniform("alpha", alpha);
+				shaders.Add(player.invisibleShader);
 			}
 		}
 
@@ -2090,7 +2076,7 @@ public partial class Character : Actor, IDamagable {
 						1, 1, null, 1, 1, 1, ZIndex.HUD
 					);
 					deductLabelY(labelKillFeedIconOffY);
-				} else if (player.isZero && isNightmareZeroBS.getValue() && zero.nightmareZeroShader == null) {
+				} else if (isNightmareZeroBS.getValue() && player.nightmareZeroShader == null) {
 					Global.sprites["hud_killfeed_weapon"].draw(
 						174, pos.x, pos.y - 6 + currentLabelY,
 						1, 1, null, 1, 1, 1, ZIndex.HUD

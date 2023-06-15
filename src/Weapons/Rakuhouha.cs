@@ -491,7 +491,7 @@ public class DarkHoldProj : Projectile {
 		Global.level.darkHoldProjs.Add(this);
 
 		if (Options.main.enablePostProcessing) {
-			screenShader = Helpers.cloneShaderSafe("darkHoldScreen");
+			screenShader = player.darkHoldScreenShader;
 			updateShader();
 		}
 

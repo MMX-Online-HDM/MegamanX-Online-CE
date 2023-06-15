@@ -37,7 +37,7 @@ public partial class Character {
 	public float maxHadoukenCooldownTime = 1f;
 	public float shoryukenCooldownTime;
 	public float maxShoryukenCooldownTime = 1f;
-	public ShaderWrapper xPaletteShader;
+	//public ShaderWrapper xPaletteShader;
 
 	public float streamCooldown;
 	float noDamageTime;

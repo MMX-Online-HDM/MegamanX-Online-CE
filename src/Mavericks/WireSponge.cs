@@ -10,7 +10,7 @@ public class WireSponge : Maverick {
 	public static Weapon getChainWeapon(Player player) { return new Weapon(WeaponIds.WSpongeStrikeChain, 141, new Damager(player, 4, Global.defFlinch, 0.5f)); }
 	public Weapon chainWeapon;
 
-	public ShaderWrapper chargeShader;
+	//public ShaderWrapper chargeShader;
 	public float chargeTime;
 
 	public WireSponge(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
@@ -27,7 +27,7 @@ public class WireSponge : Maverick {
 		weakWeaponId = WeaponIds.SonicSlicer;
 		weakMaverickWeaponId = WeaponIds.OverdriveOstrich;
 
-		chargeShader = Helpers.cloneShaderSafe("wspongeCharge");
+		//chargeShader = Helpers.cloneShaderSafe("wspongeCharge");
 
 		netActorCreateId = NetActorCreateId.WireSponge;
 		netOwner = player;
@@ -68,11 +68,11 @@ public class WireSponge : Maverick {
 	}
 
 	public override List<ShaderWrapper> getShaders() {
-		if (sprite.name.EndsWith("angry_start") && chargeShader != null) {
-			chargeShader.SetUniform("chargeTexture", Global.textures["wspongeChargeRed"]);
+		if (sprite.name.EndsWith("angry_start") && player.spongeChargeShader != null) {
+			player.spongeChargeShader.SetUniform("chargeTexture", Global.textures["wspongeChargeRed"]);
 			float chargeFactor = Helpers.clamp01(1 - (chargeTime / WSpongeChargeState.maxChargeTime));
-			chargeShader.SetUniform("chargeFactor", chargeFactor);
-			return new List<ShaderWrapper>() { chargeShader };
+			player.spongeChargeShader.SetUniform("chargeFactor", chargeFactor);
+			return new List<ShaderWrapper>() { player.spongeChargeShader };
 		}
 		return base.getShaders();
 	}

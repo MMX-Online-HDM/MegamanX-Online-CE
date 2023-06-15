@@ -10,7 +10,7 @@ public class WheelGator : Maverick {
 	public Weapon upBiteWeapon;
 
 	public float damageEaten;
-	public ShaderWrapper eatenShader;
+	//public ShaderWrapper eatenShader;
 
 	public WheelGator(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
 		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
@@ -25,8 +25,8 @@ public class WheelGator : Maverick {
 		weakWeaponId = WeaponIds.StrikeChain;
 		weakMaverickWeaponId = WeaponIds.WireSponge;
 
-		eatenShader = Helpers.cloneShaderSafe("wheelgEaten");
-		eatenShader?.SetUniform("paletteTexture", Global.textures["paletteWheelGator"]);
+		//eatenShader = Helpers.cloneShaderSafe("wheelgEaten");
+		player.gatorArmorShader?.SetUniform("paletteTexture", Global.textures["paletteWheelGator"]);
 
 		netActorCreateId = NetActorCreateId.WheelGator;
 		netOwner = player;
@@ -76,10 +76,10 @@ public class WheelGator : Maverick {
 	}
 
 	public override List<ShaderWrapper> getShaders() {
-		if (eatenShader == null || Global.isOnFrameCycle(4)) return new List<ShaderWrapper>();
+		if (player.gatorArmorShader == null || Global.isOnFrameCycle(4)) return new List<ShaderWrapper>();
 
 		if (damageEaten > 0) {
-			return new List<ShaderWrapper>() { eatenShader };
+			return new List<ShaderWrapper>() { player.gatorArmorShader };
 		}
 		return new List<ShaderWrapper>();
 	}

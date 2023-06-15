@@ -70,7 +70,7 @@ public partial class Character {
 	public const float maxDodgeRollCooldown = 1.5f;
 	public bool disguiseCoverBlown;
 	public bool hyperAxlUsed;
-	public ShaderWrapper axlPaletteShader;
+	//public ShaderWrapper axlPaletteShader;
 	public float maxHyperAxlTime = 30;
 	public List<int> ammoUsages = new List<int>();
 

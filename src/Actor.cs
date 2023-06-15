@@ -75,7 +75,7 @@ public partial class Actor : GameObject {
 	public MusicWrapper musicSource;
 	public bool checkLadderDown = false;
 	public List<DamageText> damageTexts = new List<DamageText>();
-	public ShaderWrapper invisibleShader;
+	//public ShaderWrapper invisibleShader;
 	public List<DamageEvent> damageHistory = new List<DamageEvent>();
 	public NetcodeModel? netcodeOverride;
 

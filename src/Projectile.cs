@@ -38,6 +38,8 @@ public class Projectile : Actor {
 	public bool useTransparentFade;
 	//public int? destroyFrames;
 
+	public Player ownerPlayer;
+
 	public Projectile(Weapon weapon, Point pos, int xDir, float speed, float damage, Player player, string sprite, int flinch, float hitCooldown, ushort? netId, bool ownedByLocalPlayer) : base(sprite, pos, netId, ownedByLocalPlayer, false) {
 		this.weapon = weapon;
 		this.speed = speed;
@@ -52,6 +54,7 @@ public class Projectile : Actor {
 				addRenderEffect(RenderEffectType.RedShadow);
 			}
 		}
+		this.ownerPlayer = player;
 	}
 
 	public void setIndestructableProperties() {
@@ -118,7 +121,7 @@ public class Projectile : Actor {
 		var shaders = new List<ShaderWrapper>();
 		if (owner?.character?.isNightmareZeroBS.getValue() == true && Global.shaders.ContainsKey("nightmareZero")) {
 			if (nightmareZeroShader == null) {
-				nightmareZeroShader = Helpers.cloneNightmareZeroPaletteShader("paletteNightmareZero");
+				nightmareZeroShader = ownerPlayer.nightmareZeroShader;
 			}
 			shaders.Add(nightmareZeroShader);
 		}

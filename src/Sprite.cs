@@ -491,7 +491,7 @@ public class Sprite {
 
 				var shaderList = new List<ShaderWrapper>();
 
-				var speedDevilShader = Helpers.cloneShaderSafe("speedDevilTrail");
+				var speedDevilShader = character.player.speedDevilShader;
 				shaderList.Add(speedDevilShader);
 
 				if (character.lastFiveTrailDraws.Count > 1) character.lastFiveTrailDraws.PopFirst();
