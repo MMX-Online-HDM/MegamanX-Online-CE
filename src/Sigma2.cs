@@ -71,7 +71,7 @@ public class SigmaClawState : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		if (oldState is Dash) {
-			slideVel = character.xDir * character.getDashSpeed() * character.getRunSpeed();
+			slideVel = character.xDir * character.getDashSpeed();
 		}
 		character.playSound("sigma2slash", sendRpc: true);
 	}

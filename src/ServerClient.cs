@@ -45,11 +45,13 @@ public class ServerClient {
 		config.EnableMessageType(NetIncomingMessageType.ConnectionLatencyUpdated);
 		config.AutoFlushSendQueue = false;
 		config.ConnectionTimeout = Server.connectionTimeoutSeconds;
-#if DEBUG
+		/*
+		#if DEBUG
 		config.SimulatedMinimumLatency = Global.simulatedLatency;
 		config.SimulatedLoss = Global.simulatedPacketLoss;
 		config.SimulatedDuplicatesChance = Global.simulatedDuplicates;
-#endif
+		#endif
+		*/
 		var client = new NetClient(config);
 		client.Start();
 		NetOutgoingMessage hail = client.CreateMessage(JsonConvert.SerializeObject(inputServerPlayer));
@@ -110,7 +112,7 @@ public class ServerClient {
 	float gameLoopLagTime;
 	public bool isLagging() {
 		//Global.debugString1 = packetLossStopwatch.ElapsedMilliseconds.ToString();
-		if (packetLossStopwatch.ElapsedMilliseconds > 2000 || gameLoopLagTime > 0) {
+		if (packetLossStopwatch.ElapsedMilliseconds > 1500 || gameLoopLagTime > 0) {
 			return true;
 		}
 		return false;

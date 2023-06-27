@@ -18,11 +18,20 @@ public partial class Player {
 	public float fgMoveAmmo = 32;
 	public bool isDefenderFavored {
 		get {
-			if (character != null && !character.ownedByLocalPlayer) return character.isDefenderFavoredBS.getValue();
-			if (Global.level?.server == null) return false;
-			if (Global.serverClient == null) return false;
+			if (character != null && !character.ownedByLocalPlayer) {
+				return character.isDefenderFavoredBS.getValue();
+			}
+			if (Global.level?.server == null) {
+				return false;
+			}
+			if (Global.serverClient == null) {
+				return false;
+			}
 			if (Global.level.server.netcodeModel == NetcodeModel.FavorAttacker) {
-				return getPingOrStartPing() >= Global.level.server.netcodeModelPing;
+				if (Global.serverClient?.isLagging() == true) {
+					return true;
+				}
+				return (getPingOrStartPing() >= Global.level.server.netcodeModelPing);
 			}
 			return true;
 		}
@@ -352,6 +361,7 @@ public partial class Player {
 	public ShaderWrapper nightmareZeroShader = Helpers.cloneNightmareZeroPaletteShader("paletteNightmareZero");
 	public ShaderWrapper axlPaletteShader = Helpers.cloneShaderSafe("hyperaxl");
 	public ShaderWrapper viralSigmaShader = Helpers.cloneShaderSafe("viralsigma");
+	public ShaderWrapper viralSigmaShader2 = Helpers.cloneShaderSafe("viralsigma");
 	public ShaderWrapper sigmaShieldShader = Helpers.cloneGenericPaletteShader("paletteSigma3Shield");
 	public ShaderWrapper acidShader = Helpers.cloneShaderSafe("acid");
 	public ShaderWrapper oilShader = Helpers.cloneShaderSafe("oil");
@@ -1838,15 +1848,20 @@ public partial class Player {
 		set { setArmorNum(3, value); }
 	}
 
+	public bool hasBootsArmor(ArmorId armorId) { return bootsArmorNum == (int)armorId; }
+	public bool hasBodyArmor(ArmorId armorId) { return bodyArmorNum == (int)armorId; }
+	public bool hasHelmetArmor(ArmorId armorId) { return helmetArmorNum == (int)armorId; }
+	public bool hasArmArmor(ArmorId armorId) { return armArmorNum == (int)armorId; }
+
 	public bool hasBootsArmor(int xGame) { return bootsArmorNum == xGame; }
 	public bool hasBodyArmor(int xGame) { return bodyArmorNum == xGame; }
 	public bool hasHelmetArmor(int xGame) { return helmetArmorNum == xGame; }
 	public bool hasArmArmor(int xGame) { return armArmorNum == xGame; }
 
-	public bool[] headArmorsPurchased = new bool[3] { false, false, false };
-	public bool[] bodyArmorsPurchased = new bool[3] { false, false, false };
-	public bool[] armArmorsPurchased = new bool[3] { false, false, false };
-	public bool[] bootsArmorsPurchased = new bool[3] { false, false, false };
+	public bool[] headArmorsPurchased = new bool[] { false, false, false };
+	public bool[] bodyArmorsPurchased = new bool[] { false, false, false };
+	public bool[] armArmorsPurchased = new bool[] { false, false, false };
+	public bool[] bootsArmorsPurchased = new bool[] { false, false, false };
 
 	public bool isHeadArmorPurchased(int xGame) { return headArmorsPurchased[xGame - 1]; }
 	public bool isBodyArmorPurchased(int xGame) { return bodyArmorsPurchased[xGame - 1]; }

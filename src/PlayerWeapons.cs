@@ -283,10 +283,8 @@ public partial class Player {
 				} else {
 					newWeapon.shootTime = Math.Max(newWeapon.shootTime, oldWeapon.shootTime);
 				}
-
 				/*
-				if (newWeapon is NovaStrike ns)
-				{
+				if (newWeapon is NovaStrike ns) {
 					ns.shootTime = 0;
 				}
 				*/

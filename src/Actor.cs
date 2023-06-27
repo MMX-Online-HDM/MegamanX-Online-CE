@@ -415,11 +415,11 @@ public partial class Actor : GameObject {
 	}
 
 	public void addGravity(ref float yVar) {
-		float maxVelY = Physics.maxFallSpeed;
-		float gravity = Physics.gravity;
+		float maxVelY = Physics.MaxFallSpeed;
+		float gravity = Physics.Gravity;
 
 		if (isUnderwater()) {
-			maxVelY = Physics.maxUnderwaterFallSpeed;
+			maxVelY = Physics.MaxUnderwaterFallSpeed;
 			gravity *= 0.5f;
 		}
 
@@ -481,9 +481,9 @@ public partial class Actor : GameObject {
 
 		bool wading = isWading();
 		bool underwater = isUnderwater();
-		float terminalVelUp = Physics.maxFallSpeed;
-		float terminalVelDown = Physics.maxFallSpeed;
-		if (underwater) terminalVelDown = Physics.maxUnderwaterFallSpeed;
+		float terminalVelUp = Physics.MaxFallSpeed;
+		float terminalVelDown = Physics.MaxFallSpeed;
+		if (underwater) terminalVelDown = Physics.MaxUnderwaterFallSpeed;
 
 		var chr = this as Character;
 		var ra = this as RideArmor;
@@ -1107,7 +1107,9 @@ public partial class Actor : GameObject {
 	}
 
 	public bool isAnimOver() {
-		return frameIndex == sprite.frames.Count - 1 && frameTime >= currentFrame.duration;
+		return (frameIndex == sprite.frames.Count - 1 && frameTime >= currentFrame.duration ||
+			frameIndex >= sprite.frames.Count
+		);
 	}
 
 	public void takeOwnership() {

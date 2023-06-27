@@ -100,9 +100,6 @@ public class Maverick : Actor, IDamagable {
 		if (this is CrystalSnail cs && cs.sprite.name.EndsWith("shell_end")) {
 			return false;
 		}
-		if (state != null && state.inTransition() && this is GravityBeetle) {
-			return false;
-		}
 		return true;
 	}
 
@@ -897,7 +894,7 @@ public class Maverick : Actor, IDamagable {
 	}
 
 	public virtual float getJumpPower() {
-		return Physics.jumpPower;
+		return Physics.JumpPower;
 	}
 
 	public bool canDash() {

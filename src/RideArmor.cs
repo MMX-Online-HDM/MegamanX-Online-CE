@@ -46,7 +46,11 @@ public class RideArmor : Actor, IDamagable {
 	public static ShaderWrapper paletteHawk = Helpers.cloneGenericPaletteShader("paletteHawk");
 	public static ShaderWrapper paletteFrog = Helpers.cloneGenericPaletteShader("paletteFrog");
 
-	public RideArmor(Player owner, Point pos, int raNum, int neutralId, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) : base(null, pos, netId, ownedByLocalPlayer, true) {
+	public RideArmor(
+		Player owner, Point pos, int raNum, int neutralId, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(
+		null, pos, netId, ownedByLocalPlayer, true
+	) {
 		netOwner = owner;
 		setRaNum(raNum);
 		health = maxHealth;
@@ -307,15 +311,6 @@ public class RideArmor : Actor, IDamagable {
 
 		// Cutoff point
 		if (!ownedByLocalPlayer) {
-			if (sprite.name.Contains("_run")) {
-				soundTime += Global.spf;
-				if (soundTime > 0.45f) {
-					soundTime = 0;
-					if (Helpers.randomRange(0, 1) == 0) playSound("rideArmorWalk");
-					else playSound("rideArmorWalk2");
-				}
-			}
-
 			return;
 		}
 
@@ -834,10 +829,10 @@ public class RideArmor : Actor, IDamagable {
 
 	public float getJumpPower() {
 		if (isNeutral) {
-			if (raNum == 0) return Physics.jumpPower * 1.15f;
-			if (raNum == 1) return Physics.jumpPower * 1.075f;
+			if (raNum == 0) return Physics.JumpPower * 1.15f;
+			if (raNum == 1) return Physics.JumpPower * 1.075f;
 		}
-		return Physics.jumpPower;
+		return Physics.JumpPower;
 	}
 
 	public bool canDash() {

@@ -556,7 +556,13 @@ public class Sprite {
 			}
 
 			if (armors[2] == 1) DrawWrappers.DrawTexture(xArmorHelmetBitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true);
-			if (armors[2] == 2) DrawWrappers.DrawTexture(xArmorHelmetBitmap2, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true);
+			if (armors[2] == 2) DrawWrappers.DrawTexture(
+				xArmorHelmetBitmap2,
+				currentFrame.rect.x1, currentFrame.rect.y1-1,
+				currentFrame.rect.w(), currentFrame.rect.h() + 1,
+				x + frameOffsetX, y + frameOffsetY - 1, zIndex,
+				cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true
+			);
 			if (armors[2] == 3) DrawWrappers.DrawTexture(xArmorHelmetBitmap3, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true);
 
 			if (armors[0] == 1) DrawWrappers.DrawTexture(xArmorBootsBitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true);
@@ -565,7 +571,13 @@ public class Sprite {
 
 			if (armors[1] == 1) DrawWrappers.DrawTexture(xArmorBodyBitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true);
 			if (armors[1] == 3) DrawWrappers.DrawTexture(xArmorBodyBitmap3, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true);
-			if (armors[1] == 2) DrawWrappers.DrawTexture(xArmorBodyBitmap2, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true);
+			if (armors[1] == 2) DrawWrappers.DrawTexture(
+				xArmorBodyBitmap2,
+				currentFrame.rect.x1, currentFrame.rect.y1,
+				currentFrame.rect.w(), currentFrame.rect.h(),
+				x + frameOffsetX, y + frameOffsetY,
+				zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true
+			);
 
 			if (armors[3] == 1) DrawWrappers.DrawTexture(xArmorArmBitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true);
 			if (armors[3] == 2) DrawWrappers.DrawTexture(xArmorArmBitmap2, currentFrame.rect.x1 - flippedExtraW, currentFrame.rect.y1, currentFrame.rect.w() + extraW, currentFrame.rect.h(), x + frameOffsetX + xOff, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true);
@@ -666,6 +678,73 @@ public class Sprite {
 		y += alignOffY;
 
 		return new Point(x + offset.x * (int)flipX, y + offset.y * (int)flipY);
+	}
+
+	public void drawWindow(
+		int frameIndex, float x, float y,
+		int flipX, int flipY, float alpha,
+		float scaleX, float scaleY, long zIndex,
+		Rect drawRect,
+		Actor actor = null, bool useFrameOffsets = false
+	) {
+		if (!visible) return;
+		if (actor != null) {
+			if (!actor.shouldDraw()) return;
+		}
+		Frame currentFrame = getCurrentFrame(frameIndex);
+		if (currentFrame == null) return;
+
+		float cx = 0;
+		float cy = 0;
+		if (alignment == "topleft") {
+			cx = 0; cy = 0;
+		} else if (alignment == "topmid") {
+			cx = 0.5f; cy = 0;
+		} else if (alignment == "topright") {
+			cx = 1; cy = 0;
+		} else if (alignment == "midleft") {
+			cx = 0; cy = 0.5f;
+		} else if (alignment == "center") {
+			cx = 0.5f; cy = 0.5f;
+		} else if (alignment == "midright") {
+			cx = 1; cy = 0.5f;
+		} else if (alignment == "botleft") {
+			cx = 0; cy = 1;
+		} else if (alignment == "botmid") {
+			cx = 0.5f; cy = 1;
+		} else if (alignment == "botright") {
+			cx = 1; cy = 1;
+		}
+
+		cx = cx * currentFrame.rect.w();
+		cy = cy * currentFrame.rect.h();
+		cx += alignOffX;
+		cy += alignOffY;
+		cx = MathF.Floor(cx);
+		cy = MathF.Floor(cy);
+
+		float frameOffsetX = 0;
+		float frameOffsetY = 0;
+
+		if (useFrameOffsets) {
+			frameOffsetX = currentFrame.offset.x * flipX;
+			frameOffsetY = currentFrame.offset.y * flipY;
+		}
+
+		float xDirArg = flipX * scaleX;
+		float yDirArg = flipY * scaleY;
+
+		Texture bitmap = this.bitmap;
+
+		DrawWrappers.DrawTexture(
+			bitmap,
+			drawRect.x1, drawRect.y1,
+			drawRect.w(), drawRect.h(),
+			x + frameOffsetX, y + frameOffsetY,
+			zIndex, cx, cy,
+			xDirArg, yDirArg,
+			0, alpha, null, true
+		);
 	}
 }
 

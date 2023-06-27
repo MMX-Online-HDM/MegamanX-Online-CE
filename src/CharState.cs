@@ -343,12 +343,12 @@ public class CharState {
 		if (this is not VileHover) {
 			if (player.input.isHeld(Control.Left, player)) {
 				if (wallKick == null || wallKick.kickSpeed <= 0) {
-					if (player.character.canMove()) move.x = -character.getRunSpeed() * character.getDashSpeed();
+					if (player.character.canMove()) move.x = -character.getDashSpeed();
 					if (player.character.canTurn()) character.xDir = -1;
 				}
 			} else if (player.input.isHeld(Control.Right, player)) {
 				if (wallKick == null || wallKick.kickSpeed >= 0) {
-					if (player.character.canMove()) move.x = character.getRunSpeed() * character.getDashSpeed();
+					if (player.character.canMove()) move.x = character.getDashSpeed();
 					if (player.character.canTurn()) character.xDir = 1;
 				}
 			}
@@ -762,11 +762,7 @@ public class Run : CharState {
 		var move = new Point(0, 0);
 		float runSpeed = character.getRunSpeed();
 		if (stateTime <= 5) {
-			runSpeed = 60; 
-			if (character.slowdownTime > 0) runSpeed *= 0.75f;
-			if (character.igFreezeProgress == 1) runSpeed *= 0.75f;
-			if (character.igFreezeProgress == 2) runSpeed *= 0.5f;
-			if (character.igFreezeProgress == 3) runSpeed *= 0.25f;
+			runSpeed = 60 * character.getRunDebuffs();
 		}
 		if (player.input.isHeld(Control.Left, player)) {
 			character.xDir = -1;
@@ -1051,6 +1047,7 @@ public class Dash : CharState {
 		}
 		float speedModifier = 1;
 		float distanceModifier = 1;
+		float inputXDir = player.input.getInputDir(player).x;
 		if (player.isX && player.hasBootsArmor(1)) {
 			speedModifier = 1.15f;
 			distanceModifier = 1.15f;
@@ -1067,17 +1064,21 @@ public class Dash : CharState {
 				character.sprite.animTime = 0;
 				character.sprite.frameSpeed = 0.1f;
 				stop = true;
-			} else if (dashTime >= Global.spf * 4) {
+			} else if (dashTime > Global.spf * 3) {
 				changeToIdle();
 				return;
 			}
 		}
-		dashTime += Global.spf;
-		if (!stop) {
+		if (dashTime > Global.spf * 3 || stop && inputXDir == initialDashDir) {
 			var move = new Point(0, 0);
-			move.x = character.getRunSpeed() * character.getDashSpeed() * initialDashDir * speedModifier;
+			move.x = character.getDashSpeed() * initialDashDir * speedModifier;
+			character.move(move);
+		} else {
+			var move = new Point(0, 0);
+			move.x = 60 * character.getRunDebuffs() * initialDashDir;
 			character.move(move);
 		}
+		dashTime += Global.spf;
 		if (stateTime > 0.1) {
 			stateTime = 0;
 			new Anim(
@@ -1128,14 +1129,18 @@ public class AirDash : CharState {
 				character.sprite.animTime = 0;
 				character.sprite.frameSpeed = 0.1f;
 				stop = true;
-			} else if (dashTime >= Global.spf * 4) {
+			} else if (dashTime > Global.spf * 3) {
 				character.changeState(new Fall());
 				return;
 			}
 		}
-		if (dashTime >= Global.spf * 4 || stop) {
+		if (dashTime > Global.spf * 3 || stop) {
 			var move = new Point(0, 0);
-			move.x = character.getRunSpeed(true) * character.getDashSpeed() * initialDashDir * speedModifier;
+			move.x = character.getDashSpeed() * initialDashDir * speedModifier;
+			character.move(move);
+		} else {
+			var move = new Point(0, 0);
+			move.x = 60 * character.getRunDebuffs() * initialDashDir;
 			character.move(move);
 		}
 		dashTime += Global.spf;

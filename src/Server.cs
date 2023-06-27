@@ -309,11 +309,13 @@ public class Server {
 			config.AutoFlushSendQueue = false;
 			config.ConnectionTimeout = connectionTimeoutSeconds;
 			config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
-#if DEBUG
+			/*
+			#if DEBUG
 			config.SimulatedMinimumLatency = Global.simulatedLatency;
 			config.SimulatedLoss = Global.simulatedPacketLoss;
 			config.SimulatedDuplicatesChance = Global.simulatedDuplicates;
-#endif
+			#endif
+			*/
 			s_server = new NetServer(config);
 			s_server.Start();
 			if (isLAN) {

@@ -42,19 +42,30 @@ public class SpinningBlade : Weapon {
 public class SpinningBladeProj : Projectile {
 	Sound spinSound;
 	bool once;
+
 	public SpinningBladeProj(Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, xDir, 250, 2, player, "spinningblade_proj", 0, 0, netProjId, player.ownedByLocalPlayer) {
 		maxTime = 2f;
 		projId = (int)ProjIds.SpinningBlade;
 		fadeSprite = "explosion";
 		fadeSound = "crush";
-		try {
+		/*try {
 			spinSound = new Sound(Global.soundBuffers["spinningBlade"].soundBuffer);
 			spinSound.Volume = 50f;
 		} catch {
-			// Sometimes code above throws for some users with "External component has thrown an exception." error, could investigate more on why
-		}
+			// GM19:
+			// Sometimes code above throws for some users with
+			// "External component has thrown an exception." error,
+			// could investigate more on why
+			// Gacel Notes:
+			// WTF GM19?
+			// You know this is because you use it at object creation.
+			// I'm moving this to on onStart().
+		}*/
 		vel.y = (type == 0 ? -37 : 37);
+		if (type == 0) {
+			yScale = -1;
+		}
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
@@ -68,6 +79,11 @@ public class SpinningBladeProj : Projectile {
 		}
 		if (spinSound != null) {
 			spinSound.Volume = getSoundVolume() * 0.5f;
+			if (spinSound.Volume < 0.1) {
+				spinSound.Stop();
+				spinSound.Dispose();
+				spinSound = null;
+			}
 		}
 		if (!ownedByLocalPlayer) return;
 
@@ -85,6 +101,12 @@ public class SpinningBladeProj : Projectile {
 		float randFlipX = Helpers.randomRange(0.75f, 1.5f);
 		new Anim(pos, "spinningblade_piece1", xDir, null, false) { useGravity = true, vel = new Point(-100 * xDir * randFlipX, Helpers.randomRange(-100, -50)), ttl = 2 };
 		new Anim(pos, "spinningblade_piece2", xDir, null, false) { useGravity = true, vel = new Point(100 * xDir * randFlipX, Helpers.randomRange(-100, -50)), ttl = 2 };
+	}
+
+	public override void onStart() {
+		base.onStart();
+		spinSound = new Sound(Global.soundBuffers["spinningBlade"].soundBuffer);
+		spinSound.Volume = 50f;
 	}
 }
 

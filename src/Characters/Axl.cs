@@ -1723,7 +1723,7 @@ public class DodgeRoll : CharState {
 		dashTime += Global.spf;
 
 		var move = new Point(0, 0);
-		move.x = character.getRunSpeed() * character.getDashSpeed() * initialDashDir;
+		move.x = character.getDashSpeed() * initialDashDir;
 		character.move(move);
 		if (stateTime > 0.1) {
 			stateTime = 0;

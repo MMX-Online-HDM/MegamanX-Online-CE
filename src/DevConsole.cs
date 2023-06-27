@@ -231,7 +231,8 @@ public class DevConsole {
 			new Command("musicend", (args) => setMusicNearEnd()),
             // GMTODO remove
             new Command("dumpflagdata", (args) => Helpers.WriteToFile("flagDataDump.txt", Global.level.getFlagDataDump()), offlineOnly: false),
-#if DEBUG
+			/*
+			#if DEBUG
             new Command("autofire", (args) => Global.autoFire = !Global.autoFire),
 			new Command("breakpoint", (args) => Global.breakpoint = !Global.breakpoint),
 			new Command("r", (args) => Global.level.mainPlayer.kills = Global.level.gameMode.playingTo - 1, offlineOnly: false),
@@ -241,7 +242,8 @@ public class DevConsole {
 			new Command("changeteam", (args) => changeTeam()),
 			new Command("ftd", (args) => toggleFTD()),
 			new Command("invuln", (args) => toggleInvulnFrames(10)),
-#endif
+			#endif
+			*/
         };
 
 	public static void runCommand(string commandStr) {

@@ -259,12 +259,44 @@ public class Weapon {
 		return currentDamage;
 	}
 
-	public void createBuster4Line(float x, float y, int xDir, Player player, float offsetTime) {
-		new Buster4Proj(this, new Point(x + xDir, y), xDir, player, 3, 4, offsetTime, player.getNextActorNetId(true));
-		new Buster4Proj(this, new Point(x + xDir * 8, y), xDir, player, 2, 3, offsetTime, player.getNextActorNetId(true));
-		new Buster4Proj(this, new Point(x + xDir * 18, y), xDir, player, 2, 2, offsetTime, player.getNextActorNetId(true));
-		new Buster4Proj(this, new Point(x + xDir * 32, y), xDir, player, 1, 1, offsetTime, player.getNextActorNetId(true));
-		new Buster4Proj(this, new Point(x + xDir * 46, y), xDir, player, 0, 0, offsetTime, player.getNextActorNetId(true));
+	public void createBuster4Line(float x, float y, int xDir, Player player, float offsetTime, bool smoothStart = false) {
+		new Buster4Proj(
+			this, new Point(x + xDir, y), xDir,
+			player, 0, offsetTime,
+			player.getNextActorNetId(allowNonMainPlayer: true), smoothStart
+		);
+		Global.level.delayedActions.Add(new DelayedAction(delegate{
+			new Buster4Proj(
+				this, new Point(x + xDir, y), xDir,
+				player, 1, offsetTime,
+				player.getNextActorNetId(allowNonMainPlayer: true), smoothStart
+			);
+		}, 1.8f/60f
+		));
+		Global.level.delayedActions.Add(new DelayedAction(delegate{ 
+			new Buster4Proj(
+				this, new Point(x + xDir, y), xDir,
+				player, 2, offsetTime,
+				player.getNextActorNetId(allowNonMainPlayer: true), smoothStart
+			);
+		}, 3.8f/60f
+		));
+		Global.level.delayedActions.Add(new DelayedAction(delegate{ 
+			new Buster4Proj(
+				this, new Point(x + xDir, y), xDir,
+				player, 2, offsetTime,
+				player.getNextActorNetId(allowNonMainPlayer: true), smoothStart
+			);
+		}, 5.8f/60f
+		));
+		Global.level.delayedActions.Add(new DelayedAction(delegate{ 
+			new Buster4Proj(
+				this, new Point(x + xDir, y), xDir,
+				player, 3, offsetTime,
+				player.getNextActorNetId(allowNonMainPlayer: true), smoothStart
+			);
+		}, 7.8f/60f
+		));
 	}
 
 	public bool isCooldownPercentDone(float percent) {

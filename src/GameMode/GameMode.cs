@@ -541,11 +541,10 @@ public class GameMode {
 		if (!Global.level.mainPlayer.isSpectator) {
 			renderHealthAndWeapons();
 			// Scrap
-			/*if (!Global.level.is1v1()) {
+			if (!Global.level.is1v1()) {
 				Global.sprites["hud_scrap"].drawToHUD(0, 4, 138);
 				Helpers.drawTextStd(TCat.HUD, "x" + Global.level.mainPlayer.scrap.ToString(), 17, 139, Alignment.Left, fontSize: 32u);
-			}*/
-
+			}
 			if (mainPlayer.character != null && mainPlayer.character.unpoShotCount > 0) {
 				int x = 10, y = 156;
 				int count = mainPlayer.character.unpoShotCount;

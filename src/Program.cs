@@ -20,41 +20,37 @@ using System.Text;
 namespace MMXOnline;
 
 class Program {
-#if WINDOWS
+	#if WINDOWS
 	[STAThread]
-#endif
+	#endif
 	static void Main(string[] args) {
-#if !DEBUG
-            try
-            {
-                Run();
-            }
-            catch (Exception e)
-            {
-                Logger.LogFatalException(e);
-                Logger.logException(e, false, "Fatal exception", true);
-                Thread.Sleep(3000);
-            }
-#else
 		if (Debugger.IsAttached) {
 			Run();
 		} else {
 			try {
 				Run();
 			} catch (Exception e) {
-				string crashDump = e.Message + "\n\n" + e.StackTrace + "\n\nInner exception: " + e.InnerException?.Message + "\n\n" + e.InnerException?.StackTrace;
+				/*
+				string crashDump = e.Message + "\n\n" +
+					e.StackTrace + "\n\nInner exception: " +
+					e.InnerException?.Message + "\n\n" +
+					e.InnerException?.StackTrace;
 				Helpers.showMessageBox(crashDump.Truncate(1000), "Fatal Error!");
+				throw;
+				*/
+				Logger.LogFatalException(e);
+                Logger.logException(e, false, "Fatal exception", true);
+                Thread.Sleep(1000);
 				throw;
 			}
 		}
-#endif
 	}
 
 	static void Run() {
-#if MAC
-            Global.assetPath = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName) + "/";
-            Global.writePath = Global.assetPath;
-#endif
+		#if MAC
+		Global.assetPath = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName) + "/";
+		Global.writePath = Global.assetPath;
+		#endif
 		Global.Init();
 		if (Global.debug) {
 			if (Enum.GetNames(typeof(WeaponIds)).Length > 256) {
@@ -69,21 +65,31 @@ class Program {
 		if (!Global.debug || Global.testDocumentsInDebug) {
 			string baseDocumentsPath = Helpers.getBaseDocumentsPath();
 			string mmxodDocumentsPath = Helpers.getMMXODDocumentsPath();
-
-#if WINDOWS
-			if (string.IsNullOrEmpty(mmxodDocumentsPath) && !string.IsNullOrEmpty(baseDocumentsPath) && !Options.main.autoCreateDocFolderPromptShown) {
+			/*
+			#if WINDOWS
+			if (string.IsNullOrEmpty(mmxodDocumentsPath) &&
+				!string.IsNullOrEmpty(baseDocumentsPath) &&
+				!Options.main.autoCreateDocFolderPromptShown
+			) {
 				Options.main.autoCreateDocFolderPromptShown = true;
-				if (Helpers.showMessageBoxYesNo("Auto-create MMXOD folder in Documents folder?\nThis will be used to store settings, controls, logs and more and will persist across updates.", "MMXOD folder not found in Documents")) {
+				if (Helpers.showMessageBoxYesNo(
+					"Auto-create MMXOD folder in Documents folder?\n" +
+					"This will be used to store settings, controls, logs and more " +
+					"and will persist across updates.", "MMXOD folder not found in Documents"
+				)) {
 					try {
 						Directory.CreateDirectory(baseDocumentsPath + "/MMXOD");
 						mmxodDocumentsPath = Helpers.getMMXODDocumentsPath();
 					} catch (Exception e) {
-						Helpers.showMessageBox("Could not create MMXOD folder in Documents. Error details:\n\n" + e.Message, "Error creating MMXOD folder");
+						Helpers.showMessageBox(
+							"Could not create MMXOD folder in Documents. Error details:\n\n" +
+							e.Message, "Error creating MMXOD folder"
+						);
 					}
 				}
 			}
-#endif
-
+			#endif
+			*/
 			if (!string.IsNullOrEmpty(mmxodDocumentsPath)) {
 				Global.writePath = mmxodDocumentsPath;
 				if (Directory.Exists(mmxodDocumentsPath + "/assets")) {
@@ -272,7 +278,11 @@ class Program {
 			} else if (Global.leaveMatchSignal.leaveMatchScenario == LeaveMatchScenario.ServerShutdown) {
 				Menu.change(new ErrorMenu(disconnectMessage, new MainMenu()));
 			} else if (Global.leaveMatchSignal.leaveMatchScenario == LeaveMatchScenario.Kicked) {
-				Menu.change(new ErrorMenu(new string[] { "You were kicked from the server.", "Reason: " + Global.leaveMatchSignal.kickReason }, new MainMenu()));
+				Menu.change(new ErrorMenu(new string[] {
+					"You were kicked from the server.", "Reason: " + Global.leaveMatchSignal.kickReason
+					},
+					new MainMenu()
+				));
 			} else {
 				Menu.change(new MainMenu());
 			}
@@ -293,18 +303,11 @@ class Program {
 				if (Global.debug) {
 					Global.cheats();
 				}
-
 				if (Options.main.isDeveloperConsoleEnabled() && Menu.chatMenu != null) {
-#if MAC
-                        if (Global.input.isPressed(Key.F1))
-#else
-					if (Global.input.isPressed(Key.Tilde))
-#endif
-					{
+					if (Global.input.isPressed(Key.F12)) {
 						DevConsole.toggleShow();
 					}
 				}
-
 				for (int i = Global.sounds.Count - 1; i >= 0; i--) {
 					Global.sounds[i].update();
 					if (!Global.sounds[i].deleted && Global.sounds[i].sound.Status == SoundStatus.Stopped) {
@@ -336,14 +339,19 @@ class Program {
 			int fps = MathInt.Round(Global.currentFPS);
 			float yPos = 215;
 			if (Global.level.gameMode.shouldDrawRadar()) yPos = 219;
-			Helpers.drawTextStd(TCat.HUD, "FPS:" + fps.ToString(), Global.screenW - 5, yPos, Alignment.Right, fontSize: 18);
+			Helpers.drawTextStd(
+				TCat.HUD, "FPS:" + fps.ToString(), Global.screenW - 5, yPos,
+				Alignment.Right, fontSize: 18
+			);
 		}
 
 		if (Global.debug) {
 			//Draw debug strings
 			//Global.debugString1 = ((int)Math.Round(1.0f / Global.spf2)).ToString();
-			//if(Global.level != null && Global.level.character != null) Global.debugString2 = Mathf.Floor(Global.level.character.pos.x / 8).ToString("0") + "," + Mathf.Floor(Global.level.character.pos.y / 8).ToString("0");
-
+			/*if (Global.level != null && Global.level.character != null) {
+				Global.debugString2 = Mathf.Floor(Global.level.character.pos.x / 8).ToString("0") + "," +
+				Mathf.Floor(Global.level.character.pos.y / 8).ToString("0");
+			}*/
 			Helpers.drawTextStd(Global.debugString1, 20, 20);
 			Helpers.drawTextStd(Global.debugString2, 20, 40);
 			Helpers.drawTextStd(Global.debugString3, 20, 60);
@@ -425,8 +433,12 @@ class Program {
 						Global.level.mainPlayer.isAI = true;
 						Global.level.mainPlayer.character?.addAI();
 					} else {
-						if (AI.trainingBehavior == AITrainingBehavior.Attack) AI.trainingBehavior = AITrainingBehavior.Jump;
-						else if (AI.trainingBehavior == AITrainingBehavior.Jump) AI.trainingBehavior = AITrainingBehavior.Default;
+						if (AI.trainingBehavior == AITrainingBehavior.Attack) {
+							AI.trainingBehavior = AITrainingBehavior.Jump;
+						}
+						else if (AI.trainingBehavior == AITrainingBehavior.Jump) {
+							AI.trainingBehavior = AITrainingBehavior.Default;
+						}
 						else if (AI.trainingBehavior == AITrainingBehavior.Default) {
 							AI.trainingBehavior = AITrainingBehavior.Idle;
 							Global.level.mainPlayer.aiTakeover = false;
@@ -785,10 +797,20 @@ class Program {
 			int pieceIndex = 1;
 			double startPos = 0;
 			double endPos = 0;
-			if (pieceIndex < pieces.Length && double.TryParse(pieces[pieceIndex].Replace(',', '.'), NumberStyles.Any, CultureInfo.InvariantCulture, out startPos)) {
+			if (pieceIndex < pieces.Length &&
+				double.TryParse(
+					pieces[pieceIndex].Replace(',', '.'), NumberStyles.Any,
+					CultureInfo.InvariantCulture, out startPos
+				)
+			) {
 				pieceIndex++;
 			}
-			if (pieceIndex < pieces.Length && double.TryParse(pieces[pieceIndex].Replace(',', '.'), NumberStyles.Any, CultureInfo.InvariantCulture, out endPos)) {
+			if (pieceIndex < pieces.Length &&
+				double.TryParse(
+					pieces[pieceIndex].Replace(',', '.'), NumberStyles.Any,
+					CultureInfo.InvariantCulture, out endPos
+				)
+			) {
 				pieceIndex++;
 			}
 			string charOverride = pieceIndex < pieces.Length ? ("." + pieces[pieceIndex]) : "";
@@ -839,7 +861,11 @@ class Program {
 
 		uint maxTextureSize = Texture.MaximumSize;
 		if (maxTextureSize < 1024) {
-			errors.Add("Your GPU max texture size (" + maxTextureSize + ") is too small. Required is 1024. The game cannot be played as most visuals require a larger GPU max texture size.\nAttempt to launch game anyway?");
+			errors.Add(
+				"Your GPU max texture size (" + maxTextureSize + ") is too small. " +
+				"Required is 1024. The game cannot be played as most visuals require a larger " +
+				"GPU max texture size.\nAttempt to launch game anyway?"
+			);
 			string errorMsg = string.Join(Environment.NewLine, errors);
 			bool result = Helpers.showMessageBoxYesNo(errorMsg, "System Requirements Not Met");
 			return result;
@@ -851,10 +877,16 @@ class Program {
 
 		if (Options.main.showSysReqPrompt) {
 			if (Global.shadersNotSupported) {
-				errors.Add("Your system does not support shaders. You can still play the game, but you will not see special effects or weapon palettes.");
+				errors.Add(
+					"Your system does not support shaders. You can still play the game, " +
+					"but you will not see special effects or weapon palettes."
+				);
 			} else if (Global.shadersFailed.Count > 0) {
 				string failedShaderStr = string.Join(",", Global.shadersFailed);
-				errors.Add("Failed to compile the following shaders:\n\n" + failedShaderStr + "\n\nYou can still play the game, but you will not see these shaders' special effects.");
+				errors.Add(
+					"Failed to compile the following shaders:\n\n" + failedShaderStr +
+					"\n\nYou can still play the game, but you will not see these shaders' special effects."
+				);
 			}
 		}
 

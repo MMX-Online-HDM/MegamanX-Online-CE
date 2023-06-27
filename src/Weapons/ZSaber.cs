@@ -117,7 +117,7 @@ public class ZeroSpinKickState : CharState {
 			return;
 		}
 		var move = new Point(0, 0);
-		move.x = character.getRunSpeed() * character.getDashSpeed() * modifier * character.xDir;
+		move.x = character.getDashSpeed() * modifier * character.xDir;
 		character.move(move);
 	}
 }

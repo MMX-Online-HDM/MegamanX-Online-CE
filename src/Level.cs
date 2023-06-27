@@ -198,7 +198,7 @@ public partial class Level {
 	public Level(LevelData levelData, PlayerCharData playerData, ExtraCpuCharData extraCpuCharData, bool joinedLate) {
 		this.levelData = levelData;
 		zoomScale = 3;
-		gravity = Physics.gravity;
+		gravity = Physics.Gravity;
 		frameCount = 0;
 		this.joinedLate = joinedLate;
 

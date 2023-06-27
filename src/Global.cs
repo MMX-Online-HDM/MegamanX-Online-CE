@@ -19,18 +19,18 @@ public partial class Global {
 
 	// THIS VALUE MUST ALWAYS MANUALLY BE SET AFTER UPDATING ASSETS BEFORE BUILDING A RELEASE BUILD. Obtain it by pressing F1 in main menu.
 	// This step could be automated as future improvement in build scripts
-	private const string assetChecksum = "ADAAE6E35872FEA518698E314DC8BE6F";
+	private const string assetChecksum = "A2D23D2747609654EAF0D19DF228F57B";
 
 	// For forks/mods of the game, add a prefix here so that different forks
 	// don't conflict with each other or the base game
-	public const string checksumPrefix = "[DEVTEST]";
+	public const string checksumPrefix = "[Base Mod]";
 	// Use this to make sure the checksum varies.
 	// Better to use together with "checksumPrefix" and be diferent from it.
-	public const string checksumKey = "DEVTEST_KEY";
+	public const string checksumKey = "DEVTEST-23-06-2023";
 	// For displaying the name of the mod in the version string.
-	public static string forkName = "DevTest";
+	public static string forkName = "Base Mod Beta 1";
 
-	public static string prodChecksum = checksumPrefix + assetChecksum;
+	public static string prodChecksum = checksumPrefix + " " + assetChecksum;
 
 	public static void promptDebugSettings() {
 		//testDocumentsInDebug = Helpers.showMessageBoxYesNo("Test documents in debug?", "Debug Settings");
@@ -423,7 +423,7 @@ public partial class Global {
 	private static string _checksum;
 	public static string checksum {
 		get {
-			return checksumPrefix + _checksum;
+			return checksumPrefix + " " + _checksum;
 		}
 		set {
 			_checksum = value;
@@ -525,7 +525,9 @@ public partial class Global {
 	private static string _deviceId;
 	public static string deviceId {
 		get {
-#if !RELAYSERVER
+			#if RELAYSERVER
+			return "";
+			#endif
 			if (_deviceId == null) {
 				try {
 					_deviceId = new DeviceIdBuilder()
@@ -552,9 +554,6 @@ public partial class Global {
 				}
 			}
 			return _deviceId;
-#else
-                return "";
-#endif
 		}
 	}
 
@@ -563,7 +562,7 @@ public partial class Global {
 
 	public const int defFlinch = 26;
 	public const int halfFlinch = 13;
-	public const int miniFlinch = 1;
+	public const int miniFlinch = 6;
 
 	public static bool levelStarted() {
 		return level != null && level.started;

@@ -145,8 +145,7 @@ public class Damager {
 			var actorNetIdBytes = BitConverter.GetBytes(damagingActor?.netId ?? 0);
 			var projIdBytes = BitConverter.GetBytes(projId);
 
-			var byteParams = new List<byte>
-			{
+			var byteParams = new List<byte> {
 					(byte)owner.id,
 					damageBytes[0],
 					damageBytes[1],

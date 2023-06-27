@@ -366,7 +366,7 @@ public class Zero : Character {
 				if (!player.hasKnuckle()) {
 					if (dashAttackCooldown > 0) return;
 					dashAttackCooldown = maxDashAttackCooldown;
-					slideVel = xDir * getDashSpeed() * getRunSpeed();
+					slideVel = xDir * getDashSpeed();
 					changeState(new Idle(), true);
 					playSound("saber1", sendRpc: true);
 					changeSprite("zero_attack_dash2", true);
@@ -411,7 +411,7 @@ public class Zero : Character {
 					else if (charState is Dash) {
 						if (dashAttackCooldown > 0) return;
 						dashAttackCooldown = maxDashAttackCooldown;
-						slideVel = xDir * getDashSpeed() * getRunSpeed();
+						slideVel = xDir * getDashSpeed();
 						changeState(new Idle(), true);
 					}
 					if (charState is Fall) {

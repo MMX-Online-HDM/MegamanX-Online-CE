@@ -112,7 +112,7 @@ public class FSplasherState : CharState {
 		}
 
 		var move = new Point(0, 0);
-		move.x = character.getRunSpeed(true) * character.getDashSpeed() * character.xDir * modifier;
+		move.x = character.getDashSpeed() * character.xDir * modifier;
 		move.y = upSpeed * 100;
 		character.move(move);
 		if (stateTime > 0.1) {

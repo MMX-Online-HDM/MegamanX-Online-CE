@@ -53,10 +53,41 @@ public class Buster : Weapon {
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
 		string shootSound = "buster";
-		if (chargeLevel >= 1) shootSound = "buster2";
-		if (chargeLevel >= 2) shootSound = "buster3";
-		if (chargeLevel >= 3) shootSound = "buster4";
-
+		shootSound = chargeLevel switch {
+			_ when (
+					player.character.stockedCharge
+			) => "",
+			0 => "buster",
+			1 => "buster2",
+			2 => "buster3",
+			_ => "buster4"
+		};
+		if (player.hasArmArmor(ArmorId.Giga)) {
+			shootSound = chargeLevel switch {
+				_ when (
+					player.character.stockedCharge
+				) => "",
+				1 => "buster2X2",
+				2 => "buster3X2",
+				3 => "",
+				_ => shootSound
+			};
+		} else if (player.hasArmArmor(ArmorId.Max)) {
+			shootSound = chargeLevel switch {
+				_ when (
+					player.character.stockedCharge
+				) => "",
+				_ when (
+					player.character.stockedX3Buster
+				) => "",
+				1 => "buster2X3",
+				3 => "",
+				_ => shootSound
+			};
+		}
+		if (player.character.stockedX3Buster) {
+			chargeLevel = 3;
+		}
 		bool hasUltArmor = player.character.hasUltimateArmorBS.getValue();
 		if (player.character?.isHyperX == true && chargeLevel > 0) {
 			new BusterUnpoProj(this, pos, xDir, player, netProjId);
@@ -77,20 +108,37 @@ public class Buster : Weapon {
 				} else {
 					new Anim(pos.clone(), "buster4_muzzle_flash", xDir, null, true);
 					new BusterPlasmaProj(this, pos, xDir, player, netProjId);
+					shootSound = "plasmaShot";
 				}
-				shootSound = "plasmaShot";
 			} else if (player.hasArmArmor(0) || player.hasArmArmor(1)) {
 				new Anim(pos.clone(), "buster4_muzzle_flash", xDir, null, true);
 				//Create the buster effect
-				var xOff = -50 * xDir;
+				int xOff = xDir * -5;
 				player.setNextActorNetId(netProjId);
-				createBuster4Line(pos.x + xOff, pos.y, xDir, player, 0);
-				createBuster4Line(pos.x + xOff + 15 * xDir, pos.y, xDir, player, 1);
-				createBuster4Line(pos.x + xOff + 30 * xDir, pos.y, xDir, player, 2);
+				// Create first line instantly.
+				createBuster4Line(pos.x + (float)xOff, pos.y, xDir, player, 0f);
+				// Create 2nd with a delay.
+				Global.level.delayedActions.Add(new DelayedAction(delegate{
+					createBuster4Line(pos.x + (float)xOff, pos.y, xDir, player, 10f / 60f);
+				}, 2.8f/60f));
+				// Use smooth spawn on the 3rd.
+				Global.level.delayedActions.Add(new DelayedAction(delegate{
+					createBuster4Line(pos.x + (float)xOff, pos.y, xDir, player, 5f / 60f, true);
+				}, 5.8f/60f));
 			} else if (player.hasArmArmor(2)) {
-				player.character.changeState(new X2ChargeShot(0), true);
+				if (player.ownedByLocalPlayer) {
+					if (player.character.charState is not WallSlide) {
+						shootTime = 0;
+					}
+					player.character.changeState(new X2ChargeShot(0), true);
+				}
 			} else if (player.hasArmArmor(3)) {
-				player.character.changeState(new X3ChargeShot(null), true);
+				if (player.ownedByLocalPlayer) {
+					if (player.character.charState is not WallSlide) {
+						shootTime = 0;
+					}
+					player.character.changeState(new X3ChargeShot(null), true);
+				}
 			}
 		}
 
@@ -101,16 +149,32 @@ public class Buster : Weapon {
 }
 
 public class BusterProj : Projectile {
-	public BusterProj(Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 350, 1, player, "buster1", 0, 0, netProjId, player.ownedByLocalPlayer) {
+	public BusterProj(
+		Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 240, 1, player, "buster1", 0, 0, netProjId, player.ownedByLocalPlayer
+	) {
 		fadeSprite = "buster1_fade";
 		reflectable = true;
-		maxTime = 0.5f;
+		maxTime = 0.5175f;
 		if (type == 0) projId = (int)ProjIds.Buster;
 		else if (type == 1) projId = (int)ProjIds.ZBuster;
 
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
+		}
+	}
+
+	public override void update() {
+		base.update();
+		if (!ownedByLocalPlayer) {
+			return;
+		}
+		if (System.MathF.Abs(vel.x) < 360) {
+			vel.x += Global.spf * (float)xDir * 900f;
+			if (System.MathF.Abs(vel.x) >= 360) {
+				vel.x = (float)xDir * 360;
+			}
 		}
 	}
 }
@@ -121,10 +185,12 @@ public class Buster2Proj : Projectile {
 		reflectable = true;
 		maxTime = 0.5f;
 		projId = (int)ProjIds.Buster2;
+		/*
 		var busterWeapon = weapon as Buster;
 		if (busterWeapon != null) {
 			damager.damage = busterWeapon.getDamage(damager.damage);
 		}
+		*/
 	}
 }
 
@@ -141,13 +207,16 @@ public class BusterUnpoProj : Projectile {
 public class Buster3Proj : Projectile {
 	public int type;
 	public List<Sprite> spriteMids = new List<Sprite>();
-	public List<Sprite> spriteMids2 = new List<Sprite>();
 	float partTime;
+
 	public Buster3Proj(Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, xDir, 350, 3, player, "buster3", Global.defFlinch, 0f, netProjId, player.ownedByLocalPlayer) {
 		this.type = type;
 		maxTime = 0.5f;
 		fadeSprite = "buster3_fade";
+		projId = (int)ProjIds.Buster3;
+		reflectable = true;
+
 		// Regular yellow charge
 		if (type == 0) {
 			damager.flinch = Global.halfFlinch;
@@ -156,18 +225,20 @@ public class Buster3Proj : Projectile {
 		if (type == 1) {
 			damager.damage = 4;
 			changeSprite("buster3_x2", true);
+			projId = (int)ProjIds.Buster4;
+			reflectable = false;
 		}
 		// Double buster part 2
 		if (type == 2) {
 			damager.damage = 4;
 			changeSprite("buster4_x2", true);
 			fadeSprite = "buster4_x2_fade";
-			for (int i = 0; i < 4; i++) {
+			for (int i = 0; i < 6; i++) {
 				var midSprite = Global.sprites["buster4_x2_orbit"].clone();
 				spriteMids.Add(midSprite);
-				midSprite = Global.sprites["buster4_x2_orbit"].clone();
-				spriteMids2.Add(midSprite);
 			}
+			projId = (int)ProjIds.Buster4;
+			reflectable = false;
 		}
 		// X3 buster part 1
 		if (type == 3) {
@@ -176,14 +247,14 @@ public class Buster3Proj : Projectile {
 			fadeSprite = "buster4_x2_fade";
 			vel.x = 0;
 			maxTime = 0.75f;
+			projId = (int)ProjIds.Buster4;
+			reflectable = false;
 		}
-
-		reflectable = true;
-		projId = (int)ProjIds.Buster3;
-		var busterWeapon = weapon as Buster;
+		/*var busterWeapon = weapon as Buster;
 		if (busterWeapon != null) {
 			damager.damage = busterWeapon.getDamage(damager.damage);
-		}
+		}*/
+		fadeOnAutoDestroy = true;
 
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir, (byte)type);
@@ -206,19 +277,35 @@ public class Buster3Proj : Projectile {
 	public override void render(float x, float y) {
 		base.render(x, y);
 		if (type == 2) {
-			for (int i = 0; i < 4; i++) {
-				float t = Global.time - (i * 0.05f);
-				float sinX = 10 * MathF.Sin(Global.time * 15);
+			float piHalf = MathF.PI / 2;
+			float xOffset = 8;
+			float partTime = (time * 0.75f);
+			for (int i = 0; i < 6; i++) {
+				float t = 0;
+				float xOff2 = 0;
+				float sinX = 0;
+				if (i < 3) {
+					t = partTime - (i * 0.025f);
+					xOff2 = i * xDir * 3;
+					sinX = 5 * MathF.Cos(partTime * 20);
+				} else {
+					t = partTime + (MathF.PI / 4) - ((i - 3) * 0.025f);
+					xOff2 = (i - 3) * xDir * 3;
+					sinX = 5 * MathF.Sin((partTime) * 20);
+				}
 				float sinY = 15 * MathF.Sin(t * 20);
-				spriteMids[i].draw(spriteMids[i].frameIndex, pos.x + x + sinX - (i * xDir * 3), pos.y + y + sinY, xDir, yDir, getRenderEffectSet(), 1, 1, 1, zIndex);
+				long zIndexTarget = zIndex - 1;
+				float currentOffset = (t * 20) % (MathF.PI * 2);
+				if (currentOffset > piHalf && currentOffset < piHalf * 3) {
+					zIndexTarget = zIndex + 1;
+				}
+				spriteMids[i].draw(
+					spriteMids[i].frameIndex,
+					pos.x + x + sinX - xOff2 + xOffset,
+					pos.y + y + sinY, xDir, yDir,
+					getRenderEffectSet(), 1, 1, 1, zIndexTarget
+				);
 				spriteMids[i].update();
-			}
-			for (int i = 0; i < 4; i++) {
-				float t = Global.time - 1 - (i * 0.05f);
-				float sinX = 10 * MathF.Sin((Global.time - 1) * 15);
-				float sinY = 15 * MathF.Sin(t * 20);
-				spriteMids2[i].draw(spriteMids2[i].frameIndex, pos.x + x + sinX - (i * xDir * 3), pos.y + y + sinY, xDir, yDir, getRenderEffectSet(), 1, 1, 1, zIndex);
-				spriteMids2[i].update();
 			}
 		}
 	}
@@ -226,31 +313,44 @@ public class Buster3Proj : Projectile {
 
 public class Buster4Proj : Projectile {
 	public int type = 0;
-	public float num = 0;
 	public float offsetTime = 0;
 	public float initY = 0;
+	bool smoothStart = false;
 
-	public Buster4Proj(Weapon weapon, Point pos, int xDir, Player player, int type, float num, float offsetTime, ushort netProjId) : base(weapon, pos, xDir, 400, 4, player, "buster4", Global.defFlinch, 1f, netProjId, player.ownedByLocalPlayer) {
+	public Buster4Proj(
+		Weapon weapon, Point pos, int xDir, Player player,
+		int type, float offsetTime, ushort netProjId,
+		bool smoothStart = false
+	) : base(
+		weapon, pos, xDir, 396, 4, player, "buster4",
+		Global.defFlinch, 1f, netProjId, player.ownedByLocalPlayer
+	) {
 		fadeSprite = "buster4_fade";
 		this.type = type;
 		//this.vel.x = 0;
 		initY = this.pos.y;
 		this.offsetTime = offsetTime;
-		this.num = num;
-		reflectable = true;
-		maxTime = 0.5f;
+		this.smoothStart = smoothStart;
+		maxTime = 0.6f;
 		projId = (int)ProjIds.Buster4;
-		var busterWeapon = weapon as Buster;
+		useTransparentFade = true;
+		/*var busterWeapon = weapon as Buster;
 		if (busterWeapon != null) {
 			damager.damage = busterWeapon.getDamage(damager.damage);
-		}
+		}*/
 	}
 
 	public override void update() {
 		base.update();
-
-		frameIndex = type;
-		var y = initY + MathF.Sin(Global.level.time * 18 - num * 0.5f + offsetTime * 2.09f) * 15;
+		base.frameIndex = type;
+		if (!ownedByLocalPlayer) {
+			return;
+		}
+		float currentOffsetTime = offsetTime;
+		if (smoothStart && time < 5f/60f) {
+			currentOffsetTime *= (time / 5f) * 60f;
+		}
+		float y = initY + (MathF.Sin((time + currentOffsetTime) * (MathF.PI * 6)) * 15f);
 		changePos(new Point(pos.x, y));
 	}
 }
@@ -258,6 +358,8 @@ public class Buster4Proj : Projectile {
 public class X2ChargeShot : CharState {
 	bool fired;
 	int type;
+	bool pressFire;
+
 	public X2ChargeShot(int type) : base("x2_shot", "", "", "") {
 		this.type = type;
 	}
@@ -273,44 +375,91 @@ public class X2ChargeShot : CharState {
 		if (!fired && character.currentFrame.getBusterOffset() != null) {
 			fired = true;
 			if (type == 0) {
-				new Buster3Proj(player.weapon, character.getShootPos(), character.getShootXDir(), 1, player, player.getNextActorNetId(), rpc: true);
+				new Buster3Proj(
+					player.weapon, character.getShootPos(), character.getShootXDir(), 1,
+					player, player.getNextActorNetId(), rpc: true
+				);
+				character.playSound("buster4X2", sendRpc: true);
 			} else if (type == 1) {
-				new Buster3Proj(player.weapon, character.getShootPos(), character.getShootXDir(), 2, player, player.getNextActorNetId(), rpc: true);
+				new Buster3Proj(
+					player.weapon, character.getShootPos(), character.getShootXDir(), 2,
+					player, player.getNextActorNetId(), rpc: true
+				);
+				character.playSound("buster4X2", sendRpc: true);
 			} else if (type == 2) {
-				new Anim(character.getShootPos(), "buster4_muzzle_flash", character.getShootXDir(), player.getNextActorNetId(), true, sendRpc: true);
-				new BusterPlasmaProj(player.weapon, character.getShootPos(), character.getShootXDir(), player, player.getNextActorNetId(), rpc: true);
+				new BusterPlasmaProj(
+					player.weapon, character.getShootPos(), character.getShootXDir(),
+					player, player.getNextActorNetId(), rpc: true
+				);
+				character.playSound("plasmaShot", sendRpc: true);
 			}
 		}
 		if (character.isAnimOver()) {
-			character.changeState(new Idle(), true);
+			if (type == 0 && pressFire) {
+				fired = false;
+				type = 1;
+				character.stockedCharge = false;
+				Global.serverClient?.rpc(RPC.playerToggle, (byte)player.id, (int)RPCToggleType.UnstockCharge);
+				sprite = "x2_shot2";
+				defaultSprite = sprite;
+				landSprite = "x2_shot2";
+				if (!character.grounded || character.vel.y < 0) {
+					sprite = "x2_air_shot2";
+					defaultSprite = sprite;
+				}
+				character.changeSpriteFromName(sprite, true);
+			}
+			else {
+				character.changeToIdleOrFall();
+			}
+		} else {
+			if (!pressFire && stateTime > Global.spf && player.input.isPressed(Control.Shoot, player)) {
+				pressFire = true;
+			}
+			if (character.grounded && player.input.isPressed(Control.Jump, player)) {
+				character.vel.y = -character.getJumpPower();
+				if (type == 0) {
+					sprite = "x2_air_shot";
+					defaultSprite = sprite;
+				} else {
+					sprite = "x2_air_shot2";
+					defaultSprite = sprite;
+				}
+				character.changeSpriteFromName(sprite, false);
+			}
 		}
 	}
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		bool air = !character.grounded;
-		if (type == 0 && !air) {
+		bool air = !character.grounded || character.vel.y < 0;
+		if (type == 0) {
 			sprite = "x2_shot";
 			defaultSprite = sprite;
-			character.changeSpriteFromName("x2_shot", true);
+			landSprite = "x2_shot";
+			if (air) {
+				sprite = "x2_air_shot";
+				defaultSprite = sprite;
+			}
 		}
-		if (type == 1 && !air) {
+		if (type == 1) {
 			sprite = "x2_shot2";
 			defaultSprite = sprite;
-			character.changeSpriteFromName("x2_shot2", true);
-		}
-		if (type == 0 && air) {
-			character.changeSpriteFromName("x2_air_shot", true);
-			landSprite = "x2_shot";
-		}
-		if (type == 1 && air) {
-			character.changeSpriteFromName("x2_air_shot2", true);
 			landSprite = "x2_shot2";
+			if (air) {
+				sprite = "x2_air_shot2";
+				defaultSprite = sprite;
+			}
 		}
+		character.changeSpriteFromName(sprite, true);
 	}
 
 	public override void onExit(CharState newState) {
-		character.shootAnimTime = 0;
+		if (newState is not AirDash && newState is not WallSlide) {
+			character.shootAnimTime = 0;
+		} else {
+			character.shootAnimTime = 0.334f - character.animTime;
+		}
 		base.onExit(newState);
 	}
 }
@@ -318,6 +467,8 @@ public class X2ChargeShot : CharState {
 public class X3ChargeShot : CharState {
 	bool fired;
 	int state = 0;
+	bool pressFire;
+
 	public HyperBuster hyperBusterWeapon;
 	public X3ChargeShot(HyperBuster hyperBusterWeapon) : base("x3_shot", "", "", "") {
 		this.hyperBusterWeapon = hyperBusterWeapon;
@@ -335,58 +486,116 @@ public class X3ChargeShot : CharState {
 		} else {
 			character.turnToInput(player.input, player);
 		}
-
 		if (!fired && character.currentFrame.getBusterOffset() != null) {
 			fired = true;
 			if (state == 0) {
-				new Anim(character.getShootPos(), "buster4_x3_muzzle", character.getShootXDir(), player.getNextActorNetId(), true, sendRpc: true);
-				new Buster3Proj(player.weapon, character.getShootPos(), character.getShootXDir(), 3, player, player.getNextActorNetId(), rpc: true);
+				new Anim(
+					character.getShootPos(), "buster4_x3_muzzle", character.getShootXDir(),
+					player.getNextActorNetId(), true, sendRpc: true
+				);
+				new Buster3Proj(
+					player.weapon, character.getShootPos(), character.getShootXDir(),
+					3, player, player.getNextActorNetId(), rpc: true
+				);
+				character.playSound("buster3X3", sendRpc: true);
 			} else {
 				if (hyperBusterWeapon != null) {
 					hyperBusterWeapon.ammo -= hyperBusterWeapon.getChipFactoredAmmoUsage(player);
 				}
-				character.playSound("buster4", sendRpc: true);
-				new BusterX3Proj2(player.weapon, character.getShootPos(), character.getShootXDir(), 0, player, player.getNextActorNetId(), rpc: true);
-				new BusterX3Proj2(player.weapon, character.getShootPos(), character.getShootXDir(), 1, player, player.getNextActorNetId(), rpc: true);
-				new BusterX3Proj2(player.weapon, character.getShootPos(), character.getShootXDir(), 2, player, player.getNextActorNetId(), rpc: true);
-				new BusterX3Proj2(player.weapon, character.getShootPos(), character.getShootXDir(), 3, player, player.getNextActorNetId(), rpc: true);
+				character.playSound("buster3X3", sendRpc: true);
+				float xDir = character.getShootXDir();
+				new BusterX3Proj2(
+					player.weapon, character.getShootPos().addxy(6*xDir, -2), character.getShootXDir(), 0,
+					player, player.getNextActorNetId(), rpc: true
+				);
+				new BusterX3Proj2(
+					player.weapon, character.getShootPos().addxy(6*xDir, -2), character.getShootXDir(), 1,
+					player, player.getNextActorNetId(), rpc: true
+				);
+				new BusterX3Proj2(
+					player.weapon, character.getShootPos().addxy(6*xDir, -2), character.getShootXDir(), 2,
+					player, player.getNextActorNetId(), rpc: true
+				);
+				new BusterX3Proj2(
+					player.weapon, character.getShootPos().addxy(6*xDir, -2), character.getShootXDir(), 3,
+					player, player.getNextActorNetId(), rpc: true
+				);
 			}
 		}
 		if (character.isAnimOver()) {
-			if (state == 0) {
+			if (state == 0 && pressFire) {
 				if (hyperBusterWeapon != null) {
 					if (hyperBusterWeapon.ammo < hyperBusterWeapon.getChipFactoredAmmoUsage(player)) {
 						if (character.grounded) character.changeState(new Idle(), true);
 						else character.changeState(new Fall(), true);
 						return;
 					}
+				} else {
+					character.stockedX3Buster = false;
 				}
-
-				if (character.grounded) character.changeSpriteFromName("x3_shot2", true);
-				else character.changeSpriteFromName("x3_air_shot2", true);
+				sprite = "x3_shot2";
 				landSprite = "x3_shot2";
+				if (!character.grounded || character.vel.y < 0) {
+					sprite = "x3_air_shot2";
+					defaultSprite = sprite;
+				}
+				defaultSprite = sprite;
+				character.changeSpriteFromName(sprite, true);
 				state = 1;
 				fired = false;
 			} else {
-				if (character.grounded) character.changeState(new Idle(), true);
-				else character.changeState(new Fall(), true);
+				character.changeToIdleOrFall();
+			}
+		}  else {
+			if (!pressFire && stateTime > Global.spf && player.input.isPressed(Control.Shoot, player)) {
+				pressFire = true;
+			}
+			if (character.grounded && player.input.isPressed(Control.Jump, player)) {
+				character.vel.y = -character.getJumpPower();
+				if (state == 0) {
+					sprite = "x2_air_shot";
+					defaultSprite = sprite;
+				} else {
+					sprite = "x2_air_shot2";
+					defaultSprite = sprite;
+				}
+				character.changeSpriteFromName(sprite, false);
 			}
 		}
 	}
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		if (character.grounded) {
+		if (!character.stockedX3Buster) {
+			if (hyperBusterWeapon == null) {
+				character.stockedX3Buster = true;
+			}
 			sprite = "x3_shot";
+			defaultSprite = sprite;
+			landSprite = "x3_shot";
+			if (!character.grounded) {
+				sprite = "x3_air_shot";
+			}
 			character.changeSpriteFromName(sprite, true);
 		} else {
-			sprite = "x3_air_shot";
-			landSprite = "x3_shot";
+			character.stockedX3Buster = false;
+			state = 1;
+			sprite = "x3_shot2";
+			defaultSprite = sprite;
+			landSprite = "x3_shot2";
+			if (!character.grounded) {
+				sprite = "x3_air_shot2";
+			}
 			character.changeSpriteFromName(sprite, true);
 		}
 	}
 
 	public override void onExit(CharState newState) {
+		if (state == 0) {
+			character.stockedX3Buster = true;
+		} else {
+			character.stockedX3Buster = false;
+		}
 		character.shootAnimTime = 0;
 		base.onExit(newState);
 	}
@@ -395,8 +604,14 @@ public class X3ChargeShot : CharState {
 public class BusterX3Proj2 : Projectile {
 	public int type = 0;
 	public List<Point> lastPositions = new List<Point>();
-	public BusterX3Proj2(Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 400, 1, player, type == 0 || type == 3 ? "buster4_x3_orbit" : "buster4_x3_orbit2", 0, 0, netProjId, player.ownedByLocalPlayer) {
+	public BusterX3Proj2(
+		Weapon weapon, Point pos, int xDir, int type,
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 400, 1,
+		player, type == 0 || type == 3 ? "buster4_x3_orbit" : "buster4_x3_orbit2",
+		0, 0, netProjId, player.ownedByLocalPlayer
+	) {
 		fadeSprite = "buster4_fade";
 		this.type = type;
 		reflectable = true;
@@ -408,6 +623,7 @@ public class BusterX3Proj2 : Projectile {
 		if (type == 3) vel = new Point(-200 * xDir, 100);
 		frameSpeed = 0;
 		frameIndex = 0;
+		useTransparentFade = true;
 
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir, (byte)type);
@@ -439,6 +655,9 @@ public class BusterPlasmaProj : Projectile {
 		maxTime = 0.5f;
 		projId = (int)ProjIds.BusterX3Plasma;
 		destroyOnHit = false;
+		useTransparentFade = true;
+		xScale = 0.75f;
+		yScale = 0.75f;
 
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
@@ -467,6 +686,7 @@ public class BusterPlasmaHitProj : Projectile {
 		maxTime = 2f;
 		projId = (int)ProjIds.BusterX3PlasmaHit;
 		destroyOnHit = false;
+		netcodeOverride = NetcodeModel.FavorDefender;
 
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);

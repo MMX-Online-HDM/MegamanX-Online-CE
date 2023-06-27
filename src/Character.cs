@@ -79,6 +79,9 @@ public partial class Character : Actor, IDamagable {
 			RPC.playerToggle.sendRpc(player.id, stockOrUnstock ? RPCToggleType.StockSaber : RPCToggleType.UnstockSaber);
 		}
 	}
+
+	public bool stockedX3Buster;
+
 	public float xSaberCooldown;
 	public float stockedChargeFlashTime;
 
@@ -651,7 +654,7 @@ public partial class Character : Actor, IDamagable {
 		float runSpeed = 90;
 		if (player.isX) {
 			if (charState is XHover) {
-				runSpeed = 125;
+				runSpeed = 129;
 			}
 		}
 		else if (player.isVile && player.speedDevil) {
@@ -661,26 +664,50 @@ public partial class Character : Actor, IDamagable {
 			runSpeed *= 1.15f;
 		}
 		else if (player.isAxl && shootTime > 0) {
-			runSpeed = 100 - getAimBackwardsAmount() * 25;
+			runSpeed = 90 - getAimBackwardsAmount() * 25;
 		}
 		if (slowdownTime > 0) runSpeed *= 0.75f;
-		if (igFreezeProgress == 1) runSpeed *= 0.75f;
-		if (igFreezeProgress == 2) runSpeed *= 0.5f;
-		if (igFreezeProgress == 3) runSpeed *= 0.25f;
+		if (igFreezeProgress >= 3) runSpeed *= 0.25f;
+		else if (igFreezeProgress >= 2) runSpeed *= 0.75f;
+		else if (igFreezeProgress >= 1) runSpeed *= 0.5f;
+		return runSpeed;
+	}
+
+	public float getRunDebuffs() {
+		float runSpeed = 1;
+		if (slowdownTime > 0) runSpeed *= 0.75f;
+		if (igFreezeProgress >= 3) runSpeed *= 0.25f;
+		else if (igFreezeProgress >= 2) runSpeed *= 0.75f;
+		else if (igFreezeProgress >= 1) runSpeed *= 0.5f;
 		return runSpeed;
 	}
 
 	public float getDashSpeed() {
-		if (flag != null) return 1;
-		if (isDashing) {
-			if (player.axlWeapon != null && player.axlWeapon.isTwoHanded(false)) return 1.75f;
-			return 2.3f;
+		if (flag != null || !isDashing) {
+			return getRunSpeed();
 		}
-		return 1;
+		float dashSpeed = 210;
+
+		if (player.axlWeapon != null && player.axlWeapon.isTwoHanded(false)) {
+			dashSpeed *= 0.875f;
+		}
+		if (charState is XHover) {
+			dashSpeed *= 1.25f;
+		}
+		else if (player.isVile && player.speedDevil) {
+			dashSpeed *= 1.1f;
+		}
+		else if (this is Zero zero && (zero.isBlackZero() || zero.isBlackZero2())) {
+			dashSpeed *= 1.15f;
+		}
+		else if (player.isAxl && shootTime > 0) {
+			dashSpeed = 210 - getAimBackwardsAmount() * 50;
+		}
+		return dashSpeed * getRunDebuffs();
 	}
 
 	public float getJumpPower() {
-		float jp = Physics.jumpPower;
+		float jp = Physics.JumpPower;
 		jp += (chargedBubbles.Count / 6.0f) * 50;
 
 		if (slowdownTime > 0) jp *= 0.75f;
@@ -693,7 +720,7 @@ public partial class Character : Actor, IDamagable {
 
 	public void hook(Projectile strikeChainProj) {
 		bool isChargedStrikeChain = strikeChainProj is StrikeChainProj scp && scp.isCharged;
-		bool flinch = isChargedStrikeChain || strikeChainProj is WSpongeSideChainProj || (player.isX && player.weapon is SpinWheel);
+		bool flinch = (isChargedStrikeChain || strikeChainProj is WSpongeSideChainProj);
 		changeState(new StrikeChainHooked(strikeChainProj, flinch), true);
 	}
 
@@ -1110,14 +1137,17 @@ public partial class Character : Actor, IDamagable {
 		}
 
 		if (stockedCharge) {
-			if (player.hasArmArmor(3)) {
-				addRenderEffect(RenderEffectType.ChargeOrange, 0.033333f, 0.1f);
-			} else {
-				addRenderEffect(RenderEffectType.ChargePink, 0.033333f, 0.1f);
-			}
+			addRenderEffect(RenderEffectType.ChargePink, 0.033333f, 0.1f);
 		}
 		if (stockedXSaber) {
 			addRenderEffect(RenderEffectType.ChargeGreen, 0.05f, 0.1f);
+		}
+		if (stockedX3Buster) {
+			if (player.weapon is not Buster) {
+				stockedX3Buster = false;
+			} else {
+				addRenderEffect(RenderEffectType.ChargeOrange, 0.05f, 0.1f);
+			}
 		}
 
 		/*
@@ -3118,10 +3148,4 @@ public struct DamageEvent {
 		this.envKillOnly = envKillOnly;
 		this.time = time;
 	}
-}
-
-public enum SpecialStateIds {
-	None,
-	AxlRoll,
-	HyorogaStart
 }

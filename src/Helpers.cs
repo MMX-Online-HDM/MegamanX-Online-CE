@@ -273,21 +273,18 @@ public class Helpers {
 	}
 
 	public static void tryWrap(Action action, bool isServer) {
-#if !DEBUG
-            try
-            {
-                action.Invoke();
-            }
-            catch (AccessViolationException) { throw; }
-            catch (StackOverflowException) { throw; }
-            catch (OutOfMemoryException) { throw; }
-            catch (Exception e)
-            {
-                Logger.logException(e, isServer);
-            }
-#else
+		/*
+		try {
+			action.Invoke();
+		}
+		catch (AccessViolationException) { throw; }
+		catch (StackOverflowException) { throw; }
+		catch (OutOfMemoryException) { throw; }
+		catch (Exception e) {
+			Logger.logException(e, isServer);
+		}
+		*/
 		action.Invoke();
-#endif
 	}
 
 	public static List<T> getRandomSubarray<T>(List<T> list, int count) {
@@ -564,17 +561,18 @@ public class Helpers {
 	}
 
 	public static void showMessageBox(string message, string caption) {
-#if WINDOWS
+		// TODO: Stop using C# Windows Forms for this.
+		#if WINDOWS
 		if (Global.window != null) Global.window.SetMouseCursorVisible(true);
 		System.Windows.Forms.MessageBox.Show(message, caption);
 		if (Global.window != null && Options.main != null) Global.window.SetMouseCursorVisible(!Options.main.fullScreen);
-#else
-            Console.WriteLine(caption + Environment.NewLine + message);
-#endif
+		#else
+		Console.WriteLine(caption + Environment.NewLine + message);
+		#endif
 	}
 
 	public static bool showMessageBoxYesNo(string message, string caption) {
-#if WINDOWS
+		#if WINDOWS
 		if (Global.window != null) Global.window.SetMouseCursorVisible(true);
 		System.Windows.Forms.DialogResult dialogResult = System.Windows.Forms.MessageBox.Show(message, caption, System.Windows.Forms.MessageBoxButtons.YesNo);
 		if (Global.window != null && Options.main != null) Global.window.SetMouseCursorVisible(!Options.main.fullScreen);
@@ -584,10 +582,10 @@ public class Helpers {
 		} else {
 			return false;
 		}
-#else
-            Console.WriteLine(caption + Environment.NewLine + message);
-            return true;
-#endif
+		#else
+        Console.WriteLine(caption + Environment.NewLine + message);
+    	return true;
+		#endif
 	}
 
 	public static void menuUpDown(ref int val, int minVal, int maxVal, bool wrap = true, bool playSound = true) {

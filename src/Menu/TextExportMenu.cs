@@ -14,11 +14,11 @@ public class TextExportMenu : IMainMenu {
 	string fileError;
 	float fileTime;
 	float clipboardTime;
-#if WINDOWS
+	#if WINDOWS
 	bool canCopyToClipboard = true;
-#else
-        bool canCopyToClipboard = false;
-#endif
+	#else
+	bool canCopyToClipboard = false;
+	#endif
 
 	public TextExportMenu(string[] lines, string textFileName, string text, IMainMenu prevMenu, bool inGame = false, uint textSize = 24) {
 		this.lines = new List<string>(lines);
@@ -37,10 +37,10 @@ public class TextExportMenu : IMainMenu {
 		if (Global.input.isPressedMenu(Control.MenuBack)) {
 			Menu.change(prevMenu);
 		} else if (Global.input.isPressedMenu(Control.MenuSelectPrimary) && canCopyToClipboard && clipboardTime == 0) {
-#if WINDOWS
+			#if WINDOWS
 			System.Windows.Forms.Clipboard.SetText(text);
 			clipboardTime = 2;
-#endif
+			#endif
 		} else if (Global.input.isPressedMenu(Control.MenuSelectSecondary) && fileTime == 0) {
 			fileError = Helpers.WriteToFile(textFileName + ".txt", text);
 			fileTime = 2;
