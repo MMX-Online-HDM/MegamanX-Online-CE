@@ -1,5 +1,7 @@
 ﻿using SFML.Graphics;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace MMXOnline;
 
@@ -14,11 +16,11 @@ public class TextExportMenu : IMainMenu {
 	string fileError;
 	float fileTime;
 	float clipboardTime;
-	#if WINDOWS
+#if WINDOWS
 	bool canCopyToClipboard = true;
-	#else
+#else
 	bool canCopyToClipboard = false;
-	#endif
+#endif
 
 	public TextExportMenu(string[] lines, string textFileName, string text, IMainMenu prevMenu, bool inGame = false, uint textSize = 24) {
 		this.lines = new List<string>(lines);
@@ -30,17 +32,43 @@ public class TextExportMenu : IMainMenu {
 		this.inGame = inGame;
 	}
 
+	/// <summary>
+	/// Sets clipboard to value.
+	/// </summary>
+	/// <param name="value">String to set the clipboard to.</param>
+	public static void SetClipboard(string value) {
+		if (value == null) {
+			throw new ArgumentNullException("Attempt to set clipboard with null");
+		}
+		Process clipboardExecutable = new Process();
+		// Creates the process
+		clipboardExecutable.StartInfo = new ProcessStartInfo {
+			RedirectStandardInput = true,
+			FileName = @"clip",
+		};
+		clipboardExecutable.Start();
+
+		// CLIP uses STDIN as input.
+		// When we are done writing all the string, close it so clip doesn't wait and get stuck
+		clipboardExecutable.StandardInput.Write(value);
+		clipboardExecutable.StandardInput.Close();
+
+		return;
+	}
+
 	public void update() {
 		Helpers.decrementTime(ref fileTime);
 		Helpers.decrementTime(ref clipboardTime);
 
 		if (Global.input.isPressedMenu(Control.MenuBack)) {
 			Menu.change(prevMenu);
-		} else if (Global.input.isPressedMenu(Control.MenuSelectPrimary) && canCopyToClipboard && clipboardTime == 0) {
-			#if WINDOWS
-			System.Windows.Forms.Clipboard.SetText(text);
+		} else if (Global.input.isPressedMenu(Control.MenuSelectPrimary) &&
+			canCopyToClipboard && clipboardTime == 0
+		) {
+		#if WINDOWS
+			SetClipboard(text);
 			clipboardTime = 2;
-			#endif
+		#endif
 		} else if (Global.input.isPressedMenu(Control.MenuSelectSecondary) && fileTime == 0) {
 			fileError = Helpers.WriteToFile(textFileName + ".txt", text);
 			fileTime = 2;

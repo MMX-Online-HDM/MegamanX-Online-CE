@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using static SFML.Graphics.Text;
@@ -559,32 +560,42 @@ public class Helpers {
 	public static int getGridCoordKey(ushort x, ushort y) {
 		return x << 16 | y;
 	}
+	
+	# if WINDOWS
+		[DllImport("user32.dll", SetLastError = true, CharSet= CharSet.Auto)]
+		public static extern int MessageBox(IntPtr hWnd, String text, String caption, uint type);
+	#endif
 
 	public static void showMessageBox(string message, string caption) {
 		// TODO: Stop using C# Windows Forms for this.
-		#if WINDOWS
+			#if WINDOWS
 		if (Global.window != null) Global.window.SetMouseCursorVisible(true);
-		System.Windows.Forms.MessageBox.Show(message, caption);
-		if (Global.window != null && Options.main != null) Global.window.SetMouseCursorVisible(!Options.main.fullScreen);
+			MessageBox(IntPtr.Zero, message, caption, 0);
+			if (Global.window != null && Options.main != null) {
+				Global.window.SetMouseCursorVisible(!Options.main.fullScreen);
+			}
 		#else
-		Console.WriteLine(caption + Environment.NewLine + message);
+			Console.WriteLine(caption + Environment.NewLine + message);
 		#endif
 	}
 
 	public static bool showMessageBoxYesNo(string message, string caption) {
 		#if WINDOWS
-		if (Global.window != null) Global.window.SetMouseCursorVisible(true);
-		System.Windows.Forms.DialogResult dialogResult = System.Windows.Forms.MessageBox.Show(message, caption, System.Windows.Forms.MessageBoxButtons.YesNo);
-		if (Global.window != null && Options.main != null) Global.window.SetMouseCursorVisible(!Options.main.fullScreen);
-
-		if (dialogResult == System.Windows.Forms.DialogResult.Yes) {
-			return true;
-		} else {
-			return false;
-		}
+			if (Global.window != null) {
+				Global.window.SetMouseCursorVisible(true);
+			}
+			int dialogResult = MessageBox(IntPtr.Zero, message, caption, 4);
+			if (Global.window != null && Options.main != null) {
+				Global.window.SetMouseCursorVisible(!Options.main.fullScreen);
+			}
+			if (dialogResult == 6) {
+				return true;
+			} else {
+				return false;
+			}
 		#else
-        Console.WriteLine(caption + Environment.NewLine + message);
-    	return true;
+       		Console.WriteLine(caption + Environment.NewLine + message);
+    		return true;
 		#endif
 	}
 

@@ -3,6 +3,7 @@ using SFML.Window;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using static SFML.Window.Keyboard;
 
@@ -662,11 +663,25 @@ public class Input {
 		return dir;
 	}
 
+	#if WINDOWS
+		[DllImport(
+			"user32.dll", CharSet = CharSet.Auto,
+			ExactSpelling = true,
+			CallingConvention = CallingConvention.Winapi)
+		]
+		public static extern short GetKeyState(int keyCode);
+		enum LockKeys {
+			CapsLock = 0x14,
+			NumLock = 0x90,
+			ScrollLock = 0x91
+		}
+	#endif
+
 	public char? getKeyCharPressed() {
 		foreach (var kvp in keyToCharMapping) {
 			if (keyPressed.ContainsKey(kvp.Key) && keyPressed[kvp.Key]) {
 			#if WINDOWS
-				if (System.Windows.Forms.Control.IsKeyLocked(System.Windows.Forms.Keys.CapsLock)) {
+				if (((ushort)GetKeyState((int)LockKeys.CapsLock) & 0xffff) != 0) {
 					if (capsLockMapping.ContainsKey(kvp.Key)) return capsLockMapping[kvp.Key];
 				}
 			#endif
