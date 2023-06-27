@@ -23,12 +23,12 @@ public partial class Global {
 
 	// For forks/mods of the game, add a prefix here so that different forks
 	// don't conflict with each other or the base game
-	public const string checksumPrefix = "[Base Mod]";
+	public const string checksumPrefix = "[DEVTEST]";
 	// Use this to make sure the checksum varies.
 	// Better to use together with "checksumPrefix" and be diferent from it.
-	public const string checksumKey = "DEVTEST-23-06-2023";
+	public const string checksumKey = "DEVTEST";
 	// For displaying the name of the mod in the version string.
-	public static string forkName = "Base Mod Beta 1";
+	public static string forkName = "Base Mod Beta 2";
 
 	public static string prodChecksum = checksumPrefix + " " + assetChecksum;
 
