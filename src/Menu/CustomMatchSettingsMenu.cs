@@ -20,8 +20,8 @@ public class CustomMatchSettings {
 	[ProtoMember(8)] public int redDamageModifier = 1;
 	[ProtoMember(9)] public int sameCharNum = -1;
 	[ProtoMember(10)] public int redSameCharNum = -1;
-	[ProtoMember(11)] public int maxHeartTanks = 8;
-	[ProtoMember(12)] public int maxSubTanks = 4;
+	[ProtoMember(11)] public int maxHeartTanks = 4;
+	[ProtoMember(12)] public int maxSubTanks = 2;
 	[ProtoMember(13)] public int heartTankHp = 1;
 
 	public CustomMatchSettings() {

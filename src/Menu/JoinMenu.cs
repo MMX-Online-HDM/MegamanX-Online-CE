@@ -206,7 +206,12 @@ public class JoinMenu : IMainMenu {
 						queueRefresh();
 						Menu.change(this);
 					} else {
-						string urlIP = System.Net.Dns.GetHostAddresses(ipAddressStr)[0].ToString();
+						string urlIP = null;
+						try {
+							urlIP = System.Net.Dns.GetHostAddresses(ipAddressStr)[0].ToString();
+						} catch {
+							// Do nothing if it's a invalid url.
+						}
 						if (String.IsNullOrEmpty(urlIP)) {
 							Menu.change(new ErrorMenu(new string[] { "Invalid IP address or URL." }, this));
 						} else {

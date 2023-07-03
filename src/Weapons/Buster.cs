@@ -217,6 +217,10 @@ public class Buster3Proj : Projectile {
 		projId = (int)ProjIds.Buster3;
 		reflectable = true;
 
+		if (rpc) {
+			rpcCreate(pos, player, netProjId, xDir, (byte)type);
+		}
+
 		// Regular yellow charge
 		if (type == 0) {
 			damager.flinch = Global.halfFlinch;
@@ -255,10 +259,6 @@ public class Buster3Proj : Projectile {
 			damager.damage = busterWeapon.getDamage(damager.damage);
 		}*/
 		fadeOnAutoDestroy = true;
-
-		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir, (byte)type);
-		}
 	}
 
 	public override void update() {
@@ -333,7 +333,6 @@ public class Buster4Proj : Projectile {
 		this.smoothStart = smoothStart;
 		maxTime = 0.6f;
 		projId = (int)ProjIds.Buster4;
-		useTransparentFade = true;
 		/*var busterWeapon = weapon as Buster;
 		if (busterWeapon != null) {
 			damager.damage = busterWeapon.getDamage(damager.damage);
@@ -623,7 +622,6 @@ public class BusterX3Proj2 : Projectile {
 		if (type == 3) vel = new Point(-200 * xDir, 100);
 		frameSpeed = 0;
 		frameIndex = 0;
-		useTransparentFade = true;
 
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir, (byte)type);
@@ -655,7 +653,6 @@ public class BusterPlasmaProj : Projectile {
 		maxTime = 0.5f;
 		projId = (int)ProjIds.BusterX3Plasma;
 		destroyOnHit = false;
-		useTransparentFade = true;
 		xScale = 0.75f;
 		yScale = 0.75f;
 

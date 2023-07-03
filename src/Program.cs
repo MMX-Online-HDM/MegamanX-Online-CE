@@ -16,6 +16,7 @@ using System.Globalization;
 using Lidgren.Network;
 using System.Collections.Specialized;
 using System.Text;
+using System.Runtime.InteropServices;
 
 namespace MMXOnline;
 
@@ -24,6 +25,23 @@ class Program {
 	[STAThread]
 	#endif
 	static void Main(string[] args) {
+		if (args.Length > 0 && args.Any(arg => arg == "-server")) {
+			#if WINDOWS
+				AllocConsole();
+			#endif
+			RelayServer.ServerMain(args);
+		} else {
+			GameMain(args);
+		}
+	}
+
+	#if WINDOWS
+		[DllImport("kernel32.dll", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		static extern bool AllocConsole();
+	#endif
+
+	static void GameMain(string[] args) {
 		if (Debugger.IsAttached) {
 			Run();
 		} else {

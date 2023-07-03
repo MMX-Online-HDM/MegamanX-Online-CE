@@ -45,26 +45,50 @@ public class Zero : Character {
 	}
 
 	public override bool isAttacking() {
-		return sprite.name.Contains("attack") ||
-			   sprite.name.Contains("zero_hyouretsuzan") ||
-			   sprite.name.Contains("zero_raijingeki") ||
-			   sprite.name.Contains("zero_ryuenjin") ||
-			   sprite.name.Contains("zero_rakukojin") ||
-			   sprite.name.Contains("zero_raijingeki2") ||
-			   sprite.name.Contains("zero_eblade") ||
-			   sprite.name.Contains("zero_rising") ||
-			   sprite.name.Contains("zero_quakeblazer") ||
-			   sprite.name.Contains("zero_genmu") ||
-			   sprite.name.Contains("zero_projswing") ||
-			   sprite.name.Contains("zero_tbreaker") ||
-			   sprite.name.Contains("zero_spear") ||
-			   sprite.name.Contains("punch") ||
-			   sprite.name.Contains("zero_kick_air") ||
-			   sprite.name.Contains("zero_dropkick");
+		return (
+			sprite.name.Contains("attack") ||
+			sprite.name.Contains("zero_hyouretsuzan") ||
+			sprite.name.Contains("zero_raijingeki") ||
+			sprite.name.Contains("zero_ryuenjin") ||
+			sprite.name.Contains("zero_rakukojin") ||
+			sprite.name.Contains("zero_raijingeki2") ||
+			sprite.name.Contains("zero_eblade") ||
+			sprite.name.Contains("zero_rising") ||
+			sprite.name.Contains("zero_quakeblazer") ||
+			sprite.name.Contains("zero_genmu") ||
+			sprite.name.Contains("zero_projswing") ||
+			sprite.name.Contains("zero_tbreaker") ||
+			sprite.name.Contains("zero_spear") ||
+			sprite.name.Contains("punch") ||
+			sprite.name.Contains("zero_kick_air") ||
+			sprite.name.Contains("zero_dropkick")
+		);
 	}
 
 	public override void update() {
 		base.update();
+
+		if (awakenedZeroTime > 0) {
+			updateAwakenedZero();
+		}
+		if (isAwakenedZeroBS.getValue()) {
+			updateAwakenedAura();
+		}
+		Helpers.decrementTime(ref blackZeroTime);
+		if (!Global.level.is1v1()) {
+			if (isBlackZero()) {
+				if (musicSource == null) {
+					addMusicSource("blackzero", getCenterPos(), true);
+				}
+			} else {
+				destroyMusicSource();
+			}
+		}
+		if (!ownedByLocalPlayer) {
+			return;
+		}
+
+		// All code here bellow is only executed by local players.
 		player.raijingekiWeapon.update();
 		player.zeroAirSpecialWeapon.update();
 		player.zeroUppercutWeaponA.update();
@@ -82,24 +106,6 @@ public class Zero : Character {
 		Helpers.decrementTime(ref zSaberShotCooldown);
 		Helpers.decrementTime(ref knuckleSoundCooldown);
 		Helpers.decrementTime(ref hyorogaCooldown);
-
-		if (awakenedZeroTime > 0) {
-			updateAwakenedZero();
-		}
-		if (isAwakenedZeroBS.getValue()) {
-			updateAwakenedAura();
-		}
-		Helpers.decrementTime(ref blackZeroTime);
-
-		if (player.isZero && !Global.level.is1v1()) {
-			if (isBlackZero()) {
-				if (musicSource == null) {
-					addMusicSource("blackzero", getCenterPos(), true);
-				}
-			} else {
-				destroyMusicSource();
-			}
-		}
 
 		if (shootAnimTime > 0) {
 			shootAnimTime -= Global.spf;
@@ -136,7 +142,10 @@ public class Zero : Character {
 			}
 		}
 
-		if (player.chargeButtonHeld() && (player.scrap > 0 || player.isZBusterZero() || player.weapon is AssassinBullet) && flag == null && rideChaser == null && rideArmor == null) {
+		if (player.chargeButtonHeld() && (
+			player.scrap > 0 || player.isZBusterZero() || player.weapon is AssassinBullet
+			) && flag == null && rideChaser == null && rideArmor == null
+		) {
 			if (!stockedXSaber && !isInvulnerableAttack()) {
 				increaseCharge();
 			}
@@ -151,11 +160,6 @@ public class Zero : Character {
 					zeroShoot(2);
 				} else if (chargeLevel >= 3) {
 					zeroShoot(chargeLevel);
-					/* if (player.scrap >= 10 && !hyperZeroUsed && flag == null && !player.isZBusterZero()) {
-						changeState(new HyperZeroStart(player.zeroHyperMode), true);
-					} else {
-						zeroShoot(chargeLevel);
-					} */
 				}
 			}
 			stopCharge();
@@ -232,9 +236,8 @@ public class Zero : Character {
 					}
 				}
 			}
-			
-			// Handles ZBusterZero's Hyper activations.
 
+			// Handles ZBusterZero's Hyper activations.
 			if (player.input.isHeld(Control.Special2, player) && 
 				player.scrap >= Player.zBusterZeroHyperCost && !isBlackZero2() && 
 				charState is not HyperZeroStart && invulnTime == 0 && 
@@ -252,11 +255,10 @@ public class Zero : Character {
 
 			if (player.scrap < Player.zBusterZeroHyperCost && player.input.isHeld(Control.Special2, player)) {
 				Global.level.gameMode.setHUDErrorMessage(
-				player, Player.zBusterZeroHyperCost + " scrap needed to enter hypermode.",
-				playSound: false, resetCooldown: true
-			);
-		}
-
+					player, Player.zBusterZeroHyperCost + " scrap needed to enter hypermode.",
+					playSound: false, resetCooldown: true
+				);
+			}
 			return;
 		}
 

@@ -1309,11 +1309,9 @@ public partial class Character : Actor, IDamagable {
 		if (player.isDisguisedAxl) {
 			updateDisguisedAxl();
 		}
-
 		if (player.isSigma) {
 			updateSigma();
 		}
-
 		if (player.isX) {
 			updateX();
 		} else if (player.isVile) {

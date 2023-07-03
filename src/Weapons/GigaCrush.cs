@@ -54,7 +54,6 @@ public class GigaCrushProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
-		netcodeOverride = NetcodeModel.FavorDefender;
 	}
 
 	public override void update() {

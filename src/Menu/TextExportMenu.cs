@@ -45,6 +45,7 @@ public class TextExportMenu : IMainMenu {
 		clipboardExecutable.StartInfo = new ProcessStartInfo {
 			RedirectStandardInput = true,
 			FileName = @"clip",
+			CreateNoWindow = true
 		};
 		clipboardExecutable.Start();
 

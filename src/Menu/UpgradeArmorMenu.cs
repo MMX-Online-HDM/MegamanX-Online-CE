@@ -451,13 +451,13 @@ public class UpgradeArmorMenu : IMainMenu {
 		if (mainPlayer.canUpgradeUltimateX() && mainPlayer.isX && !mainPlayer.isDisguisedAxl) {
 			specialText = "[D]: Ultimate Armor" + (mainPlayer.character.boughtUltimateArmorOnce ? "" : " (10 scrap)");
 		} else if (mainPlayer.canUpgradeGoldenX() && mainPlayer.isX && !mainPlayer.isDisguisedAxl) {
-			specialText = "[D]: Gold Armor" + (mainPlayer.character.boughtGoldenArmorOnce ? "" : " (5 scrap)");
+			specialText = "[D]: Hyper Chip" + (mainPlayer.character.boughtGoldenArmorOnce ? "" : " (5 scrap)");
 		}
 
 		if (mainPlayer.hasUltimateArmor()) {
 			specialText += "\n[C]: Take Off Ultimate Armor";
 		} else if (mainPlayer.hasGoldenArmor()) {
-			specialText += "\n[C]: Take Off Golden Armor";
+			specialText += "\n[C]: Disable Hyper Chip";
 		}
 
 		if (!string.IsNullOrEmpty(specialText)) {

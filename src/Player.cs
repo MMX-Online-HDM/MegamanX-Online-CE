@@ -934,7 +934,10 @@ public partial class Player {
 					false, charNetId, ownedByLocalPlayer
 				);
 			} else {
-				character = new Character(this, pos.x, pos.y, xDir, false, charNetId, ownedByLocalPlayer, mk2VileOverride: mk2VileOverride, mk5VileOverride: false);
+				character = new Character(
+					this, pos.x, pos.y, xDir, false, charNetId,
+					ownedByLocalPlayer, mk2VileOverride: mk2VileOverride, mk5VileOverride: false
+				);
 			}
 			// Hyper mode overrides (POST)
 			if (Global.level.isHyper1v1() && ownedByLocalPlayer) {
@@ -1130,7 +1133,7 @@ public partial class Player {
 		bool isVileMK2 = charNum == 2 && dnaCore.hyperMode == DNACoreHyperMode.VileMK2;
 		bool isVileMK5 = charNum == 2 && dnaCore.hyperMode == DNACoreHyperMode.VileMK5;
 		Character retChar = null;
-		if (charNum == 2) {
+		if (charNum != 1) {
 			retChar = new Character(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, character.netId, true, isWarpIn: false,

@@ -17,18 +17,19 @@ namespace MMXOnline;
 public partial class Global {
 	public static decimal version = 19.12m;
 
-	// THIS VALUE MUST ALWAYS MANUALLY BE SET AFTER UPDATING ASSETS BEFORE BUILDING A RELEASE BUILD. Obtain it by pressing F1 in main menu.
-	// This step could be automated as future improvement in build scripts
-	private const string assetChecksum = "A2D23D2747609654EAF0D19DF228F57B";
+	// THIS VALUE MUST ALWAYS MANUALLY BE SET AFTER UPDATING ASSETS BEFORE BUILDING A RELEASE BUILD.
+	// Obtain it by pressing F1 in main menu.
+	// This step could be automated as future improvement in build scripts.
+	private const string assetChecksum = "83E3CC4894E07CAF97CDBE2B36654180";
 
 	// For forks/mods of the game, add a prefix here so that different forks
 	// don't conflict with each other or the base game
 	public const string checksumPrefix = "[Base Mod]";
 	// Use this to make sure the checksum varies.
 	// Better to use together with "checksumPrefix" and be diferent from it.
-	public const string checksumKey = "DEVTEST-23-06-2023";
+	public const string checksumKey = "DEVTEST--03-07-2023";
 	// For displaying the name of the mod in the version string.
-	public static string forkName = "Base Mod Beta 2";
+	public static string forkName = "Base Mod Public Beta 3";
 
 	public static string prodChecksum = checksumPrefix + " " + assetChecksum;
 
@@ -603,8 +604,8 @@ public partial class Global {
 				if (debug && useLocalIp) {
 					_regions = new List<Region>()
 					{
-							new Region("LAN", LANIPHelper.GetLocalIPAddress()),
-						};
+						new Region("LAN", LANIPHelper.GetLocalIPAddress()),
+					};
 				} else {
 					string text = Helpers.ReadFromFile("region.txt");
 					if (!string.IsNullOrEmpty(text)) {
@@ -711,12 +712,4 @@ public partial class Global {
 		}
 	}
 	*/
-}
-
-public class FastWebClient : WebClient {
-	protected override WebRequest GetWebRequest(Uri uri) {
-		WebRequest w = base.GetWebRequest(uri);
-		w.Timeout = 10000;
-		return w;
-	}
 }
