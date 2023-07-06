@@ -1080,11 +1080,19 @@ public class Dash : CharState {
 				character.sprite.frameSpeed = 0.1f;
 				stop = true;
 			} else {
-				changeToIdle();
+				if (character.grounded) {
+					if (inputXDir != 0) {
+						character.changeState(new Idle(), true);
+					} else {
+						character.changeState(new Run(), true);
+					}
+				} else {
+					character.changeState(new Fall(), true);
+				}
 				return;
 			}
 		}
-		if (dashTime > Global.spf * 3 || stop && inputXDir == initialDashDir) {
+		if (dashTime > Global.spf * 3 || stop) {
 			var move = new Point(0, 0);
 			move.x = character.getDashSpeed() * initialDashDir * speedModifier;
 			character.move(move);
@@ -1092,6 +1100,12 @@ public class Dash : CharState {
 			var move = new Point(0, 0);
 			move.x = 60 * character.getRunDebuffs() * initialDashDir * speedModifier;;
 			character.move(move);
+		}
+		if (dashTime <= Global.spf * 3 || stop) {
+			if (inputXDir != 0 && inputXDir != initialDashDir) {
+				character.xDir = (int)inputXDir;
+				initialDashDir = (int)inputXDir;
+			}
 		}
 		dashTime += Global.spf;
 		if (stateTime > 0.1) {

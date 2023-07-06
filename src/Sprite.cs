@@ -400,15 +400,17 @@ public class Sprite {
 
 		if (renderEffects != null && !renderEffects.Contains(RenderEffectType.Invisible)) {
 			if (renderEffects.Contains(RenderEffectType.BlueShadow) && alpha >= 1) {
-				/*
 				var blueShader = Global.shaderWrappers.GetValueOrDefault("outline_blue");
 				if (blueShader != null) {
-					DrawWrappers.DrawTexture(bitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX - 1, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, new List<ShaderWrapper>() { blueShader }, true);
+					DrawWrappers.DrawTexture(
+						bitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(),
+						currentFrame.rect.h(), x + frameOffsetX - 1, y + frameOffsetY, zIndex, cx,
+						cy, xDirArg, yDirArg, angle, alpha, new List<ShaderWrapper>() { blueShader }, true
+					);
 					DrawWrappers.DrawTexture(bitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX + 1, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, new List<ShaderWrapper>() { blueShader }, true);
 					DrawWrappers.DrawTexture(bitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY - 1, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, new List<ShaderWrapper>() { blueShader }, true);
 					DrawWrappers.DrawTexture(bitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY + 1, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, new List<ShaderWrapper>() { blueShader }, true);
 				}
-				*/
 			} else if (renderEffects.Contains(RenderEffectType.RedShadow) && alpha >= 1) {
 				var redShader = Global.shaderWrappers.GetValueOrDefault("outline_red");
 				if (redShader != null) {

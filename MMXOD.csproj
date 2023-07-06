@@ -9,8 +9,8 @@
 
 		<ImplicitUsings>false</ImplicitUsings>
 		<SelfContained>false</SelfContained>
-		<!--OutDir>./bin/test/<OutDir-->
-		<!--RunWorkingDirectory>./bin/test/</RunWorkingDirectory-->
+		<OutDir>C:/Games/MMXOnline/</OutDir>
+		<RunWorkingDirectory>C:/Games/MMXOnline/</RunWorkingDirectory>
 		<OutputPath>./bin/</OutputPath>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	</PropertyGroup>
