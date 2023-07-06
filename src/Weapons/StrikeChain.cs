@@ -392,7 +392,9 @@ public class StrikeChainHooked : CharState {
 		base.onEnter(oldState);
 		player.character.useGravity = false;
 		player.character.vel.y = 0;
-		player.character.mk5RideArmorPlatform = null;
+		if (player.character is Vile vile) {
+			vile.mk5RideArmorPlatform = null;
+		}
 	}
 
 	public override void onExit(CharState newState) {

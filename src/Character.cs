@@ -130,11 +130,18 @@ public partial class Character : Actor, IDamagable {
 	public int lastShootPressed;
 	public int lastShootReleased;
 	public int framesSinceLastAttack = 1000;
+	public float grabCooldown;
 
 	public float dashAttackCooldown;
 	public float maxDashAttackCooldown = 0.75f;
 	public float airAttackCooldown;
 	public float maxAirAttackCooldown = 0.5f;
+
+	public RideArmor vileStartRideArmor;
+	public RideArmor mk5RideArmorPlatform;
+	public float calldownMechCooldown;
+	public const float maxCalldownMechCooldown = 2;
+	public bool alreadySummonedNewMech;
 
 	// For states with special propieties.
 	public int specialState = 0;
@@ -156,17 +163,6 @@ public partial class Character : Actor, IDamagable {
 		splashable = true;
 
 		CharState charState;
-
-		if (player.isVile && isWarpIn) {
-			if (mk5VileOverride) vileForm = 2;
-			else if (mk2VileOverride) vileForm = 1;
-
-			if (player.vileFormToRespawnAs == 2 || Global.quickStartVileMK5 == true) {
-				vileForm = 2;
-			} else if (player.vileFormToRespawnAs == 1 || Global.quickStartVileMK2 == true) {
-				vileForm = 1;
-			}
-		}
 
 		if (ownedByLocalPlayer) {
 			if (player.maverick1v1 != null) {
@@ -499,20 +495,22 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	// Stuck in place and can't do any action but still can activate controls, etc.
-	public bool isSoftLocked() {
+	public virtual bool isSoftLocked() {
 		if (isAnyZoom() || sniperMissileProj != null) return true;
-		if (isShootingLongshotGizmo) return true;
 		if (charState is WarpOut) return true;
 		if (player.currentMaverick != null) return true;
-		if (isVileMK5 && player.weapon is MechMenuWeapon && vileStartRideArmor != null) return true;
-		if (player.isVile && sprite.name.EndsWith("_idle_shoot") && sprite.frameTime < 0.1f) return true;
 		//if (player.weapon is MaverickWeapon mw && mw.isMenuOpened) return true;
 		return false;
 	}
 
 	public bool canTurn() {
-		if (mk5RideArmorPlatform != null) return false;
-		return !isShootingLongshotGizmo;
+		if (mk5RideArmorPlatform != null) {
+			return false;
+		}
+		if (this is Vile vile && vile.isShootingLongshotGizmo) {
+			return false;
+		}
+		return true;
 	}
 
 	public bool canMove() {
@@ -569,9 +567,21 @@ public partial class Character : Actor, IDamagable {
 		return true;
 	}
 
-	public bool canClimbLadder() {
-		if (mk5RideArmorPlatform != null) return false;
-		return vileLadderShootCooldown == 0 && shootAnimTime == 0 && !isAttacking() && recoilTime == 0 && !hasBusterProj() && !isShootingRaySplasher && !isSoftLocked() && !isSigmaShooting();
+	public virtual bool canClimbLadder() {
+		if (mk5RideArmorPlatform != null) {
+			return false;
+		}
+		if (shootAnimTime > 0 ||
+			isAttacking() ||
+			recoilTime > 0 ||
+			hasBusterProj() ||
+			isShootingRaySplasher ||
+			isSoftLocked() ||
+			isSigmaShooting()
+		) {
+			return false;
+		}
+		return true;
 	}
 
 	public bool canCharge() {
@@ -597,7 +607,7 @@ public partial class Character : Actor, IDamagable {
 		return true;
 	}
 
-	public bool canChangeWeapons() {
+	public virtual bool canChangeWeapons() {
 		if (strikeChainProj != null) return false;
 		if (isShootingRaySplasher) return false;
 		if (chargedSpinningBlade != null) return false;
@@ -608,7 +618,6 @@ public partial class Character : Actor, IDamagable {
 		if (player.weapon is TriadThunder triadThunder && triadThunder.shootTime > 0.75f) return false;
 		if (player.weapon is AssassinBullet && chargeTime > 0) return false;
 		if (revTime > 0.5f) return false;
-		if (isShootingLongshotGizmo) return false;
 		if (charState is XRevive || charState is XReviveStart) return false;
 		if (charState is ViralSigmaPossess) return false;
 		if (charState is InRideChaser) return false;
@@ -1314,8 +1323,6 @@ public partial class Character : Actor, IDamagable {
 		}
 		if (player.isX) {
 			updateX();
-		} else if (player.isVile) {
-			updateVile();
 		} else if (player.isAxl) {
 			updateAxl();
 		}
@@ -1331,8 +1338,14 @@ public partial class Character : Actor, IDamagable {
 		burnHurtCooldown = 0;
 	}
 
-	public bool canEnterRideArmor() {
-		return charState is Fall fall && rideArmor == null && rideChaser == null && !isVileMK5 && fall.limboVehicleCheckTime == 0;
+	public virtual bool canEnterRideArmor() {
+		if (rideArmor != null || rideChaser != null) {
+			return false;
+		}
+		if (charState is not Fall fall || fall.limboVehicleCheckTime > 0) {
+			return false;
+		}
+		return true;
 	}
 
 	public bool canEnterRideChaser() {
@@ -1362,8 +1375,6 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public override void changeSprite(string spriteName, bool resetFrame) {
-		cannonAimNum = 0;
-
 		if (!isHeadbuttSprite(sprite?.name) && isHeadbuttSprite(spriteName)) {
 			headbuttAirTime = Global.spf;
 		}
@@ -1766,7 +1777,7 @@ public partial class Character : Actor, IDamagable {
 		chargeEffect.stop();
 	}
 
-	public string getSprite(string spriteName) {
+	public virtual string getSprite(string spriteName) {
 		if (player.isAxl) {
 			if (spriteName == "crystalized" || spriteName == "die" || spriteName == "hurt" || spriteName == "hyper_start" || spriteName == "hyper_start_air" || spriteName == "knocked_down" || spriteName == "roll" || spriteName == "warp_in" || spriteName == "win") {
 				if (player.axlBulletType == 1) spriteName += "_mc";
@@ -1777,16 +1788,14 @@ public partial class Character : Actor, IDamagable {
 			}
 
 			return "axl_" + spriteName;
-		} else if (player.isVile) {
-			if (isVileMK5) return "vilemk5_" + spriteName;
-			if (isVileMK2) return "vilemk2_" + spriteName;
-			return "vile_" + spriteName;
-		} else if (player.isZero) return "zero_" + spriteName;
+		}
 		else if (player.isSigma) {
 			if (player.loadout.sigmaLoadout.sigmaForm == 0) return "sigma_" + spriteName;
 			else if (player.loadout.sigmaLoadout.sigmaForm == 1) return "sigma2_" + spriteName;
 			else return "sigma3_" + spriteName;
-		} else return "mmx_" + spriteName;
+		} else {
+			return "mmx_" + spriteName;
+		}
 	}
 
 	public void changeSpriteFromName(string spriteName, bool resetFrame) {
@@ -1803,7 +1812,7 @@ public partial class Character : Actor, IDamagable {
 	public int getChargeLevel() {
 		bool clampTo3 = true;
 		if (this is Zero zero) clampTo3 = !zero.canUseDoubleBusterCombo();
-		if (player.isVile) clampTo3 = !isVileMK5;
+		if (this is Vile vile) clampTo3 = !vile.isVileMK5;
 		if (player.isX) clampTo3 = !isHyperX;
 
 		if (chargeTime < charge1Time) {
@@ -1820,11 +1829,11 @@ public partial class Character : Actor, IDamagable {
 		return -1;
 	}
 
-	public void changeToIdleOrFall() {
-		if (grounded) changeState(new Idle(), true);
-		else {
-			if (charState.wasVileHovering && canVileHover()) changeState(new VileHover(), true);
-			else changeState(new Fall(), true);
+	public virtual void changeToIdleOrFall() {
+		if (grounded) {
+			changeState(new Idle(), true);
+		} else {
+			changeState(new Fall(), true);
 		}
 	}
 
@@ -1899,31 +1908,6 @@ public partial class Character : Actor, IDamagable {
 	public override void render(float x, float y) {
 		currentLabelY = -getLabelOffY();
 
-		if (isNightmareZeroBS.getValue()) addRenderEffect(RenderEffectType.Trail);
-		else removeRenderEffect(RenderEffectType.Trail);
-
-		if (player.isVile && isSpeedDevilActiveBS.getValue()) addRenderEffect(RenderEffectType.SpeedDevilTrail);
-		else removeRenderEffect(RenderEffectType.SpeedDevilTrail);
-
-		Zero zero = (this as Zero);
-
-		if (zero != null && isAwakenedZeroBS.getValue() && visible) {
-			float xOff = 0;
-			int auraXDir = 1;
-			float yOff = 5;
-			string auraSprite = "zero_awakened_aura";
-			if (sprite.name.Contains("dash")) {
-				auraSprite = "zero_awakened_aura2";
-				auraXDir = xDir;
-				yOff = 8;
-			}
-			var shaders = new List<ShaderWrapper>();
-			if (isAwakenedGenmuZeroBS.getValue() && Global.frameCount % Global.normalizeFrames(6) > Global.normalizeFrames(3) && Global.shaderWrappers.ContainsKey("awakened")) {
-				shaders.Add(Global.shaderWrappers["awakened"]);
-			}
-			Global.sprites[auraSprite].draw(zero.awakenedAuraFrame, pos.x + x + (xOff * auraXDir), pos.y + y + yOff, auraXDir, 1, null, 1, 1, 1, zIndex - 1, shaders: shaders);
-		}
-
 		if (player.isX && isHyperChargeActiveBS.getValue() && visible) {
 			addRenderEffect(RenderEffectType.Flash, 0.05f, 0.1f);
 
@@ -1953,11 +1937,6 @@ public partial class Character : Actor, IDamagable {
 			sprite2.draw(hyperChargeAnimFrame2, sx + xOff, sy - yOff, 1, 1, null, 1, 1, 1, zIndex + 1);
 			sprite2.draw(hyperChargeAnimFrame2, sx + xOff, sy - yOff, 1, 1, null, 1, 1, 1, zIndex + 1);
 			sprite2.draw(hyperChargeAnimFrame2, sx - xOff, sy - yOff, 1, 1, null, 1, 1, 1, zIndex + 1);
-		}
-
-		if (player.isVile && currentFrame?.POIs?.Count > 0) {
-			Sprite cannonSprite = getCannonSprite(out Point poiPos, out int zIndexDir);
-			cannonSprite?.draw(cannonAimNum, poiPos.x, poiPos.y, getShootXDirSynced(), 1, getRenderEffectSet(), alpha, 1, 1, zIndex + zIndexDir, getShaders(), actor: this);
 		}
 
 		if (player.isSigma && visible) {
@@ -2097,20 +2076,6 @@ public partial class Character : Actor, IDamagable {
 				}
 				Global.sprites["hud_weapon_icon"].draw(overrideIndex, pos.x, pos.y - 8 + currentLabelY, 1, 1, null, 1, 1, 1, ZIndex.HUD);
 				deductLabelY(labelWeaponIconOffY);
-			} else if (zero != null) {
-				if (zero.isBlackZero() && !Global.shaderWrappers.ContainsKey("hyperzero")) {
-					Global.sprites["hud_killfeed_weapon"].draw(
-						125, pos.x, pos.y - 6 + currentLabelY,
-						1, 1, null, 1, 1, 1, ZIndex.HUD
-					);
-					deductLabelY(labelKillFeedIconOffY);
-				} else if (isNightmareZeroBS.getValue() && player.nightmareZeroShader == null) {
-					Global.sprites["hud_killfeed_weapon"].draw(
-						174, pos.x, pos.y - 6 + currentLabelY,
-						1, 1, null, 1, 1, 1, ZIndex.HUD
-					);
-					deductLabelY(labelKillFeedIconOffY);
-				}
 			} else if (player.isAxl && isWhiteAxl() && !Global.shaderWrappers.ContainsKey("hyperaxl")) {
 				Global.sprites["hud_killfeed_weapon"].draw(123, pos.x, pos.y - 4 + currentLabelY, 1, 1, null, 1, 1, 1, ZIndex.HUD);
 				deductLabelY(labelKillFeedIconOffY);
@@ -2235,14 +2200,6 @@ public partial class Character : Actor, IDamagable {
 			renderDamageText(100);
 		} else {
 			renderDamageText(35);
-		}
-
-		if (player.isMainPlayer && isVileMK5 && vileHoverTime > 0 && charState is not HexaInvoluteState) {
-			float healthPct = Helpers.clamp01((vileMaxHoverTime - vileHoverTime) / vileMaxHoverTime);
-			float sy = -27;
-			float sx = 20;
-			if (xDir == -1) sx = 90 - 20;
-			drawFuelMeter(healthPct, sx, sy);
 		}
 
 		if (player.isMainPlayer && player.isKaiserNonViralSigma() && kaiserHoverTime > 0) {
@@ -2574,8 +2531,8 @@ public partial class Character : Actor, IDamagable {
 				damageSavings += damage / 8f;
 			}
 
-			if (player.isVile && hasFrozenCastleBarrier()) {
-				damageSavings += damage * frozenCastlePercent;
+			if (this is Vile vile && vile.hasFrozenCastleBarrier()) {
+				damageSavings += damage * Vile.frozenCastlePercent;
 			}
 
 			while (damageSavings >= 1) {
@@ -3095,8 +3052,6 @@ public partial class Character : Actor, IDamagable {
 
 	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (player.isX) return getXProjFromHitbox(centerPoint);
-		else if (this is Zero zero) return zero.getZeroProjFromHitbox(hitbox, centerPoint);
-		else if (player.isVile) return getVileProjFromHitbox(centerPoint);
 		//else if (player.isAxl) return getAxlProjFromHitbox(centerPoint);
 		else if (player.isSigma) return getSigmaProjFromHitbox(hitbox, centerPoint);
 		return null;
@@ -3129,6 +3084,53 @@ public partial class Character : Actor, IDamagable {
 
 	public virtual bool isAttacking() {
 		return sprite.name.Contains("attack");
+	}
+
+	public void getOffMK5Platform() {
+		if (mk5RideArmorPlatform != null) {
+			mk5RideArmorPlatform.character = null;
+			mk5RideArmorPlatform = null;
+		}
+	}
+
+	public bool canAffordRideArmor() {
+		if (Global.level.is1v1()) return player.health > (player.maxHealth / 2);
+		return player.scrap >= Vile.callNewMechScrapCost;
+	}
+
+	public void buyRideArmor() {
+		if (Global.level.is1v1()) player.health -= (player.maxHealth / 2);
+		else player.scrap -= Vile.callNewMechScrapCost * (player.selectedRAIndex >= 4 ? 2 : 1);
+	}
+
+	public virtual void onMechSlotSelect(MechMenuWeapon mmw) {
+		if (vileStartRideArmor == null) {
+			if (!mmw.isMenuOpened) {
+				mmw.isMenuOpened = true;
+				return;
+			}
+		}
+
+		if (player.isAI) {
+			calldownMechCooldown = maxCalldownMechCooldown;
+		}
+		if (vileStartRideArmor == null) {
+			if (alreadySummonedNewMech) {
+				Global.level.gameMode.setHUDErrorMessage(player, "Can only summon a mech once per life");
+			} else if (canAffordRideArmor()) {
+				if (!(charState is Idle || charState is Run || charState is Crouch)) return;
+				alreadySummonedNewMech = true;
+				if (vileStartRideArmor != null) vileStartRideArmor.selfDestructTime = 1000;
+				buyRideArmor();
+				mmw.isMenuOpened = false;
+				int raIndex = player.selectedRAIndex;
+				vileStartRideArmor = new RideArmor(
+					player, pos, raIndex, 0, player.getNextActorNetId(), true, sendRpc: true
+				);
+			}
+		} else {
+			rideArmor.changeState(new RACalldown(pos, false), true);
+		}
 	}
 }
 

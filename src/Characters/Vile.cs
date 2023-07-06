@@ -7,13 +7,9 @@ using System.Threading.Tasks;
 
 namespace MMXOnline;
 
-public partial class Character {
+public class Vile : Character {
 	public float vulcanLingerTime;
-	public float calldownMechCooldown;
-	public float grabCooldown;
-	public const float maxCalldownMechCooldown = 2;
 	public const int callNewMechScrapCost = 5;
-	public bool alreadySummonedNewMech;
 	float mechBusterCooldown;
 	public bool usedAmmoLastFrame;
 	public float vileLadderShootCooldown;
@@ -26,9 +22,8 @@ public partial class Character {
 		return player.frozenCastle;
 	}
 	public bool summonedGoliath;
-	public RideArmor vileStartRideArmor;
-	public RideArmor mk5RideArmorPlatform;
 	public int vileForm;
+	public bool isVileMK1 { get { return vileForm == 0; } }
 	public bool isVileMK2 { get { return vileForm == 1; } }
 	public bool isVileMK5 { get { return vileForm == 2; } }
 	public float vileHoverTime;
@@ -41,6 +36,28 @@ public partial class Character {
 	public bool lastFrameWeaponLeftHeld;
 	public bool lastFrameWeaponRightHeld;
 	public int cannonAimNum;
+
+	public Vile(
+		Player player, float x, float y, int xDir,
+		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
+		bool isWarpIn = true, bool mk2VileOverride = false, bool mk5VileOverride = false
+	) : base(
+		player, x, y, xDir, isVisible,
+		netId, ownedByLocalPlayer, isWarpIn, false, false
+	) {
+		if (isWarpIn) {
+			if (mk5VileOverride) {
+				vileForm = 2;
+			} else if (mk2VileOverride) {
+				vileForm = 1;
+			}
+			if (player.vileFormToRespawnAs == 2 || Global.quickStartVileMK5 == true) {
+				vileForm = 2;
+			} else if (player.vileFormToRespawnAs == 1 || Global.quickStartVileMK2 == true) {
+				vileForm = 1;
+			}
+		}
+	}
 
 	public Sprite getCannonSprite(out Point poiPos, out int zIndexDir) {
 		poiPos = getCenterPos();
@@ -87,7 +104,11 @@ public partial class Character {
 		return poiPos.addxy(cannonSpritePOI.x * getShootXDir(), cannonSpritePOI.y);
 	}
 
-	public void updateVile() {
+	public override void update() {
+		base.update();
+		if (!ownedByLocalPlayer) {
+			return;
+		}
 		if (mk5RideArmorPlatform != null && mk5RideArmorPlatform.destroyed) {
 			mk5RideArmorPlatform = null;
 		}
@@ -381,18 +402,11 @@ public partial class Character {
 		return isVileMK5 && vileStartRideArmor?.character == this;
 	}
 
-	public void getOffMK5Platform() {
-		if (mk5RideArmorPlatform != null) {
-			mk5RideArmorPlatform.character = null;
-			mk5RideArmorPlatform = null;
-		}
-	}
-
 	public bool canVileHover() {
 		return isVileMK5 && player.vileAmmo > 0 && flag == null;
 	}
 
-	public void onMechSlotSelect(MechMenuWeapon mmw) {
+	public override void onMechSlotSelect(MechMenuWeapon mmw) {
 		if (vileStartRideArmor == null) {
 			if (!mmw.isMenuOpened) {
 				mmw.isMenuOpened = true;
@@ -400,7 +414,9 @@ public partial class Character {
 			}
 		}
 
-		if (player.isAI) calldownMechCooldown = maxCalldownMechCooldown;
+		if (player.isAI) {
+			calldownMechCooldown = maxCalldownMechCooldown;
+		}
 		if (vileStartRideArmor == null) {
 			if (alreadySummonedNewMech) {
 				Global.level.gameMode.setHUDErrorMessage(player, "Can only summon a mech once per life");
@@ -428,8 +444,12 @@ public partial class Character {
 				}
 			} else {
 				if (player.selectedRAIndex == 4 && player.scrap < 10) {
-					if (isVileMK2) Global.level.gameMode.setHUDErrorMessage(player, "Goliath armor requires 10 scrap");
-					else Global.level.gameMode.setHUDErrorMessage(player, "Devil Bear armor requires 10 scrap");
+					if (isVileMK2) Global.level.gameMode.setHUDErrorMessage(
+						player, "Goliath armor requires 10 scrap"
+					);
+					else Global.level.gameMode.setHUDErrorMessage(
+						player, "Devil Bear armor requires 10 scrap"
+					);
 				} else {
 					cantAffordRideArmorMessage();
 				}
@@ -455,19 +475,9 @@ public partial class Character {
 		return false;
 	}
 
-	private void buyRideArmor() {
-		if (Global.level.is1v1()) player.health -= (player.maxHealth / 2);
-		else player.scrap -= callNewMechScrapCost * (player.selectedRAIndex == 4 ? 2 : 1);
-	}
-
 	private void cantAffordRideArmorMessage() {
 		if (Global.level.is1v1()) Global.level.gameMode.setHUDErrorMessage(player, "Ride Armor requires 16 HP");
 		else Global.level.gameMode.setHUDErrorMessage(player, "Ride Armor requires " + callNewMechScrapCost + " scrap");
-	}
-
-	private bool canAffordRideArmor() {
-		if (Global.level.is1v1()) return player.health > (player.maxHealth / 2);
-		return player.scrap >= callNewMechScrapCost;
 	}
 
 	public Point getVileShootVel(bool aimable) {
@@ -535,18 +545,102 @@ public partial class Character {
 		}
 	}
 
-	public Projectile getVileProjFromHitbox(Point centerPoint) {
+	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		Projectile proj = null;
 		if (sprite.name.Contains("dash_grab")) {
 			proj = new GenericMeleeProj(new VileMK2Grab(), centerPoint, ProjIds.VileMK2Grab, player, 0, 0, 0);
 		}
 		return proj;
 	}
+
+	public override bool isSoftLocked() {
+		if (isShootingLongshotGizmo) {
+			return true;
+		}
+		if (isVileMK5 && player.weapon is MechMenuWeapon && vileStartRideArmor != null) {
+			return true;
+		}
+		if (sprite.name.EndsWith("_idle_shoot") && sprite.frameTime < 0.1f) {
+			return true;
+		}
+		return base.isSoftLocked();
+	}
+
+	public override bool canClimbLadder() {
+		if (vileLadderShootCooldown > 0) {
+			return false;
+		}
+		return base.canClimbLadder();
+	}
+
+	public override bool canChangeWeapons() {
+		if (isShootingLongshotGizmo) {
+			return false;
+		}
+		return base.canChangeWeapons();
+	}
+
+	public override bool canEnterRideArmor() {
+		if (isVileMK5) {
+			return false;
+		}
+		return base.canEnterRideArmor();
+	}
+
+	public override void changeSprite(string spriteName, bool resetFrame) {
+		cannonAimNum = 0;
+		base.changeSprite(spriteName, resetFrame);
+	}
+
+	public override string getSprite(string spriteName) {
+		if (isVileMK5) {
+			return "vilemk5_" + spriteName;
+		}
+		if (isVileMK2) {
+			return "vilemk2_" + spriteName;
+		}
+		return "vile_" + spriteName;
+	}
+
+	public override void changeToIdleOrFall() {
+		if (!grounded && charState.wasVileHovering && canVileHover()) {
+			changeState(new VileHover(), true);
+			return;
+		}
+		base.changeToIdleOrFall();
+	}
+
+	public override void render(float x, float y) {
+		if (isSpeedDevilActiveBS.getValue()) {
+			addRenderEffect(RenderEffectType.SpeedDevilTrail);
+		}
+		else {
+			removeRenderEffect(RenderEffectType.SpeedDevilTrail);
+		}
+		if (currentFrame?.POIs?.Count > 0) {
+			Sprite cannonSprite = getCannonSprite(out Point poiPos, out int zIndexDir);
+			cannonSprite?.draw(
+				cannonAimNum, poiPos.x, poiPos.y, getShootXDirSynced(),
+				1, getRenderEffectSet(), alpha, 1, 1, zIndex + zIndexDir,
+				getShaders(), actor: this
+			);
+		}
+
+		if (player.isMainPlayer && isVileMK5 && vileHoverTime > 0 && charState is not HexaInvoluteState) {
+			float healthPct = Helpers.clamp01((vileMaxHoverTime - vileHoverTime) / vileMaxHoverTime);
+			float sy = -27;
+			float sx = 20;
+			if (xDir == -1) sx = 90 - 20;
+			drawFuelMeter(healthPct, sx, sy);
+		}
+		base.render(x, y);
+	}
 }
 
 public class CallDownMech : CharState {
 	RideArmor rideArmor;
 	bool isNew;
+
 	public CallDownMech(RideArmor rideArmor, bool isNew, string transitionSprite = "") : base("call_down_mech", "", "", transitionSprite) {
 		this.rideArmor = rideArmor;
 		this.isNew = isNew;
@@ -572,7 +666,7 @@ public class CallDownMech : CharState {
 			}
 			*/
 
-			if (!character.isVileMK5 && MathF.Abs(character.pos.x - rideArmor.pos.x) < 10) {
+			if (vile.isVileMK5 != true && MathF.Abs(character.pos.x - rideArmor.pos.x) < 10) {
 				rideArmor.putCharInRideArmor(character);
 			} else {
 				character.changeState(new Idle(), true);
@@ -595,6 +689,7 @@ public class VileRevive : CharState {
 	public float radius = 200;
 	Anim drDopplerAnim;
 	bool isMK5;
+	
 	public VileRevive(bool isMK5) : base(isMK5 ? "revive_to5" : "revive") {
 		invincible = true;
 		this.isMK5 = isMK5;
@@ -635,9 +730,9 @@ public class VileRevive : CharState {
 
 	public void setFlags() {
 		if (!isMK5) {
-			character.vileForm = 1;
+			vile.vileForm = 1;
 		} else {
-			character.vileForm = 2;
+			vile.vileForm = 2;
 		}
 	}
 
@@ -651,8 +746,8 @@ public class VileRevive : CharState {
 			drDopplerAnim.fadeIn = true;
 			drDopplerAnim.blink = true;
 		} else {
-			if (character.vileStartRideArmor != null) {
-				character.vileStartRideArmor.ownedByMK5 = true;
+			if (vile.vileStartRideArmor != null) {
+				vile.vileStartRideArmor.ownedByMK5 = true;
 			}
 		}
 	}
@@ -685,6 +780,7 @@ public class VileHover : CharState {
 	float flyVelAcc = 500;
 	float flyVelMaxSpeed = 200;
 	public float fallY;
+	
 	public VileHover(string transitionSprite = "") : base("hover", "hover_shoot", "", transitionSprite) {
 	}
 
@@ -697,8 +793,8 @@ public class VileHover : CharState {
 			return;
 		}
 
-		if (character.vileHoverTime > character.vileMaxHoverTime) {
-			character.vileHoverTime = character.vileMaxHoverTime;
+		if (vile.vileHoverTime > vile.vileMaxHoverTime) {
+			vile.vileHoverTime = vile.vileMaxHoverTime;
 			character.changeToIdleOrFall();
 			return;
 		}
@@ -752,7 +848,7 @@ public class VileHover : CharState {
 		} else {
 			character.frameSpeed = 1;
 			fallY = Helpers.lerp(fallY, 0, Global.spf * 10);
-			character.vileHoverTime += Global.spf;
+			vile.vileHoverTime += Global.spf;
 		}
 
 		if (inputDir.isZero()) {

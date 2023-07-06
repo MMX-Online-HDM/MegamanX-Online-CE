@@ -1940,8 +1940,9 @@ public class GameMode {
 
 		float startY = Global.screenH - 12;
 		float height = 15;
-		bool isMK2 = level.mainPlayer?.character?.isVileMK2 == true;
-		bool isMK5 = level.mainPlayer?.character?.isVileMK5 == true;
+		Vile vile = level.mainPlayer?.character as Vile;
+		bool isMK2 = vile?.isVileMK2 == true;
+		bool isMK5 = vile?.isVileMK5 == true;
 		bool isMK2Or5 = isMK2 || isMK5;
 		int maxIndex = isMK2Or5 ? 5 : 4;
 

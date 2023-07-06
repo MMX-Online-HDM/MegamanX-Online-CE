@@ -58,7 +58,12 @@ public partial class Character {
 	public NetCharBoolState isHyperSigmaBS;
 
 	public void initNetCharState1() {
-		isFrozenCastleActiveBS = new NetCharBoolState(this, 0, NetCharBoolStateNum.One, (character) => { return character.hasFrozenCastleBarrier(); });
+		isFrozenCastleActiveBS = new NetCharBoolState(this, 0, NetCharBoolStateNum.One, (character) => {
+			if (character is not Vile vile) {
+				return false;
+			}
+			return vile.hasFrozenCastleBarrier(); 
+		});
 		isStrikeChainHookedBS = new NetCharBoolState(this, 1, NetCharBoolStateNum.One, (character) => { return character.charState is StrikeChainHooked; });
 		shouldDrawArmBS = new NetCharBoolState(this, 2, NetCharBoolStateNum.One, (character) => { return character.shouldDrawArm(); });
 		isAwakenedZeroBS = new NetCharBoolState(this, 3, NetCharBoolStateNum.One, (character) => {

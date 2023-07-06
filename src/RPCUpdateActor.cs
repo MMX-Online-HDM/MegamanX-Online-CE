@@ -119,7 +119,8 @@ public partial class Actor {
 			}
 
 			if (charMask[1]) {
-				args.Add((byte)character.cannonAimNum);
+				Vile vile = character as Vile;
+				args.Add((byte)vile.cannonAimNum);
 			}
 
 			if (charMask[2]) {
@@ -147,6 +148,7 @@ public partial class Actor {
 			}
 
 			// We don't have room for more individual status flags. So just cram all the rarest statuses in the 7th flag
+			// Gacel: What the actual hell GM19. We have room.
 			if (charMask[7]) {
 				args.Add((byte)(int)(character.oilTime * 20));
 				args.Add((byte)(int)(character.infectedTime * 20));
@@ -379,7 +381,8 @@ public class RPCUpdateActor : RPC {
 					// vile section
 					if (charMaskBools[1]) {
 						byte cannonByte = arguments[i++];
-						character.cannonAimNum = cannonByte;
+						Vile vile = character as Vile;
+						vile.cannonAimNum = cannonByte;
 					}
 
 					// axl section

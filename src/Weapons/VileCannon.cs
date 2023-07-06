@@ -62,61 +62,61 @@ public class VileCannon : Weapon {
 		}
 	}
 
-	public override void vileShoot(WeaponIds weaponInput, Character character) {
+	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
 		bool isLongshotGizmo = type == (int)VileCannonType.LongshotGizmo;
-		if (isLongshotGizmo && character.gizmoCooldown > 0) return;
+		if (isLongshotGizmo && vile.gizmoCooldown > 0) return;
 
-		Player player = character.player;
+		Player player = vile.player;
 		if (shootTime > 0 || !player.vileMissileWeapon.isCooldownPercentDone(0.5f)) return;
-		if (character.charState is MissileAttack || character.charState is RocketPunchAttack) return;
-		float overrideAmmoUsage = (isLongshotGizmo && character.isVileMK2) ? 6 : vileAmmoUsage;
+		if (vile.charState is MissileAttack || vile.charState is RocketPunchAttack) return;
+		float overrideAmmoUsage = (isLongshotGizmo && vile.isVileMK2) ? 6 : vileAmmoUsage;
 
-		if (isLongshotGizmo && character.longshotGizmoCount > 0) {
-			character.usedAmmoLastFrame = true;
-			if (character.weaponHealAmount == 0) {
+		if (isLongshotGizmo && vile.longshotGizmoCount > 0) {
+			vile.usedAmmoLastFrame = true;
+			if (vile.weaponHealAmount == 0) {
 				player.vileAmmo -= vileAmmoUsage;
 				if (player.vileAmmo < 0) player.vileAmmo = 0;
 			}
-		} else if (!character.tryUseVileAmmo(overrideAmmoUsage)) return;
+		} else if (!vile.tryUseVileAmmo(overrideAmmoUsage)) return;
 
 		if (isLongshotGizmo) {
-			character.isShootingLongshotGizmo = true;
+			vile.isShootingLongshotGizmo = true;
 		}
 
-		bool gizmoStart = (isLongshotGizmo && character.charState is not CannonAttack);
-		if (gizmoStart || character.charState is Idle || character.charState is Run || character.charState is Dash || character.charState is VileMK2GrabState) {
-			character.setVileShootTime(this);
-			character.changeState(new CannonAttack(isLongshotGizmo, character.grounded), true);
+		bool gizmoStart = (isLongshotGizmo && vile.charState is not CannonAttack);
+		if (gizmoStart || vile.charState is Idle || vile.charState is Run || vile.charState is Dash || vile.charState is VileMK2GrabState) {
+			vile.setVileShootTime(this);
+			vile.changeState(new CannonAttack(isLongshotGizmo, vile.grounded), true);
 		} else {
-			if (character.charState is LadderClimb) {
-				if (player.input.isHeld(Control.Left, player)) character.xDir = -1;
-				if (player.input.isHeld(Control.Right, player)) character.xDir = 1;
-				character.changeSpriteFromName("ladder_shoot2", true);
-				character.vileLadderShootCooldown = 0.35f;
+			if (vile.charState is LadderClimb) {
+				if (player.input.isHeld(Control.Left, player)) vile.xDir = -1;
+				if (player.input.isHeld(Control.Right, player)) vile.xDir = 1;
+				vile.changeSpriteFromName("ladder_shoot2", true);
+				vile.vileLadderShootCooldown = 0.35f;
 			}
 
-			if (character.charState is Jump || character.charState is Fall || character.charState is WallKick || character.charState is VileHover || character.charState is AirDash) {
-				character.setVileShootTime(this);
+			if (vile.charState is Jump || vile.charState is Fall || vile.charState is WallKick || vile.charState is VileHover || vile.charState is AirDash) {
+				vile.setVileShootTime(this);
 				if (!Options.main.lockInAirCannon) {
-					if (character.charState is AirDash) {
-						character.changeState(new Fall(), true);
+					if (vile.charState is AirDash) {
+						vile.changeState(new Fall(), true);
 					}
-					character.changeSpriteFromName("cannon_air", true);
-					CannonAttack.shootLogic(character);
+					vile.changeSpriteFromName("cannon_air", true);
+					CannonAttack.shootLogic(vile);
 				} else {
-					character.changeState(new CannonAttack(false, false), true);
+					vile.changeState(new CannonAttack(false, false), true);
 				}
 			} else {
-				character.setVileShootTime(this);
-				CannonAttack.shootLogic(character);
+				vile.setVileShootTime(this);
+				CannonAttack.shootLogic(vile);
 			}
 		}
 
 		if (isLongshotGizmo) {
-			character.longshotGizmoCount++;
-			if (character.longshotGizmoCount >= 5 || player.vileAmmo <= 3) {
-				character.longshotGizmoCount = 0;
-				character.isShootingLongshotGizmo = false;
+			vile.longshotGizmoCount++;
+			if (vile.longshotGizmoCount >= 5 || player.vileAmmo <= 3) {
+				vile.longshotGizmoCount = 0;
+				vile.isShootingLongshotGizmo = false;
 			}
 		}
 	}
@@ -175,6 +175,7 @@ public class VileCannonProj : Projectile {
 
 public class CannonAttack : CharState {
 	bool isGizmo;
+	
 	public CannonAttack(bool isGizmo, bool grounded) : base(getSprite(isGizmo, grounded), "", "", "") {
 		this.isGizmo = isGizmo;
 	}
@@ -189,7 +190,7 @@ public class CannonAttack : CharState {
 	public override void update() {
 		base.update();
 
-		if (character.isShootingLongshotGizmo) {
+		if (vile.isShootingLongshotGizmo) {
 			return;
 		}
 
@@ -200,41 +201,43 @@ public class CannonAttack : CharState {
 		}
 	}
 
-	public static void shootLogic(Character character) {
-		if (character.sprite.getCurrentFrame().POIs.IsNullOrEmpty()) return;
-		Point shootVel = character.getVileShootVel(true);
+	public static void shootLogic(Vile vile) {
+		if (vile.sprite.getCurrentFrame().POIs.IsNullOrEmpty()) {
+			return;
+		}
+        Point shootVel = vile.getVileShootVel(true);
 
-		var player = character.player;
-		character.playSound("frontrunner", sendRpc: true);
+		var player = vile.player;
+		vile.playSound("frontrunner", sendRpc: true);
 
 		string muzzleSprite = "cannon_muzzle";
 		if (player.cannonWeapon.type == (int)VileCannonType.FatBoy) muzzleSprite += "_fb";
 		if (player.cannonWeapon.type == (int)VileCannonType.LongshotGizmo) muzzleSprite += "_lg";
 
-		Point shootPos = character.setCannonAim(new Point(shootVel.x, shootVel.y));
-		if (character.sprite.name.EndsWith("_grab")) {
-			shootPos = character.getFirstPOIOrDefault("s");
+		Point shootPos = vile.setCannonAim(new Point(shootVel.x, shootVel.y));
+		if (vile.sprite.name.EndsWith("_grab")) {
+			shootPos = vile.getFirstPOIOrDefault("s");
 		}
 
-		var muzzle = new Anim(shootPos, muzzleSprite, character.getShootXDir(), player.getNextActorNetId(), true, true, host: character);
-		muzzle.angle = new Point(shootVel.x, character.getShootXDir() * shootVel.y).angle;
+		var muzzle = new Anim(shootPos, muzzleSprite, vile.getShootXDir(), player.getNextActorNetId(), true, true, host: vile);
+		muzzle.angle = new Point(shootVel.x, vile.getShootXDir() * shootVel.y).angle;
 
-		new VileCannonProj(player.weapons.FirstOrDefault(w => w is VileCannon) as VileCannon, shootPos, character.getShootXDir(), character.longshotGizmoCount, player, player.getNextActorNetId(), shootVel, rpc: true);
+		new VileCannonProj(player.weapons.FirstOrDefault(w => w is VileCannon) as VileCannon, shootPos, vile.getShootXDir(), vile.longshotGizmoCount, player, player.getNextActorNetId(), shootVel, rpc: true);
 	}
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		shootLogic(character);
+		shootLogic(vile);
 		character.useGravity = false;
 		character.stopMoving();
 	}
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
-		character.isShootingLongshotGizmo = false;
+		vile.isShootingLongshotGizmo = false;
 		character.useGravity = true;
 		if (isGizmo) {
-			character.gizmoCooldown = 0.5f;
+			vile.gizmoCooldown = 0.5f;
 		}
 	}
 }

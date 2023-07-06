@@ -61,32 +61,32 @@ public class Vulcan : Weapon {
 		}
 	}
 
-	public override void vileShoot(WeaponIds weaponInput, Character character) {
+	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
 		if (type == (int)VulcanType.DistanceNeedler && shootTime > 0) return;
-		if (string.IsNullOrEmpty(character.charState.shootSprite)) return;
+		if (string.IsNullOrEmpty(vile.charState.shootSprite)) return;
 
-		Player player = character.player;
-		if (character.tryUseVileAmmo(vileAmmoUsage)) {
-			if (character.charState is LadderClimb) {
-				if (player.input.isHeld(Control.Left, player)) character.xDir = -1;
-				if (player.input.isHeld(Control.Right, player)) character.xDir = 1;
+		Player player = vile.player;
+		if (vile.tryUseVileAmmo(vileAmmoUsage)) {
+			if (vile.charState is LadderClimb) {
+				if (player.input.isHeld(Control.Left, player)) vile.xDir = -1;
+				if (player.input.isHeld(Control.Right, player)) vile.xDir = 1;
 			}
-			character.changeSpriteFromName(character.charState.shootSprite, false);
-			shootVulcan(character);
+			vile.changeSpriteFromName(vile.charState.shootSprite, false);
+			shootVulcan(vile);
 		}
 	}
 
-	public void shootVulcan(Character character) {
-		Player player = character.player;
+	public void shootVulcan(Vile vile) {
+		Player player = vile.player;
 		if (shootTime <= 0) {
-			character.vulcanLingerTime = 0f;
-			new VulcanMuzzleAnim(this, character.getShootPos(), character.getShootXDir(), character, player.getNextActorNetId(), true, true);
-			new VulcanProj(this, character.getShootPos(), character.getShootXDir(), player, player.getNextActorNetId(), rpc: true);
+			vile.vulcanLingerTime = 0f;
+			new VulcanMuzzleAnim(this, vile.getShootPos(), vile.getShootXDir(), vile, player.getNextActorNetId(), true, true);
+			new VulcanProj(this, vile.getShootPos(), vile.getShootXDir(), player, player.getNextActorNetId(), rpc: true);
 			if (type == (int)VulcanType.BuckshotDance && Global.isOnFrame(3)) {
-				new VulcanProj(this, character.getShootPos(), character.getShootXDir(), player, player.getNextActorNetId(), rpc: true);
+				new VulcanProj(this, vile.getShootPos(), vile.getShootXDir(), player, player.getNextActorNetId(), rpc: true);
 			}
-			character.playSound("vulcan", sendRpc: true);
-			character.vileLadderShootCooldown = rateOfFire;
+			vile.playSound("vulcan", sendRpc: true);
+			vile.vileLadderShootCooldown = rateOfFire;
 			shootTime = rateOfFire;
 		}
 	}
@@ -110,9 +110,9 @@ public class VulcanProj : Projectile {
 			//this.xDir = 1;
 			//pixelPerfectRotation = true;
 			int rand = 0;
-			if (player?.character != null) {
-				rand = player.character.buckshotDanceNum % 3;
-				player.character.buckshotDanceNum++;
+			if (player.character is Vile vile) {
+				rand = vile.buckshotDanceNum % 3;
+				vile.buckshotDanceNum++;
 			}
 			float angle = 0;
 			if (rand == 0) angle = 0;

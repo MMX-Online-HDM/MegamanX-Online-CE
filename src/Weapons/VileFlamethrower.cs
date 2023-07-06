@@ -67,28 +67,28 @@ public class VileFlamethrower : Weapon {
 		return vileAmmoUsage;
 	}
 
-	public override void vileShoot(WeaponIds weaponInput, Character character) {
+	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
 		if (type == (int)VileFlamethrowerType.NoneNapalm || type == (int)VileFlamethrowerType.NoneBall) return;
 		if (shootTime == 0) {
 			if (weaponInput == WeaponIds.VileFlamethrower) {
-				var ground = Global.level.raycast(character.pos, character.pos.addxy(0, 25), new List<Type>() { typeof(Wall) });
+				var ground = Global.level.raycast(vile.pos, vile.pos.addxy(0, 25), new List<Type>() { typeof(Wall) });
 				if (ground == null) {
-					if (character.player.vileAmmo > 0) {
-						character.setVileShootTime(this);
-						character.changeState(new FlamethrowerState(), true);
+					if (vile.player.vileAmmo > 0) {
+						vile.setVileShootTime(this);
+						vile.changeState(new FlamethrowerState(), true);
 					}
 				}
 			} else if (weaponInput == WeaponIds.VileBomb) {
-				var ground = Global.level.raycast(character.pos, character.pos.addxy(0, 25), new List<Type>() { typeof(Wall) });
+				var ground = Global.level.raycast(vile.pos, vile.pos.addxy(0, 25), new List<Type>() { typeof(Wall) });
 				if (ground == null) {
-					if (character.player.vileAmmo > 0) {
-						character.setVileShootTime(this);
-						character.changeState(new FlamethrowerState(), true);
+					if (vile.player.vileAmmo > 0) {
+						vile.setVileShootTime(this);
+						vile.changeState(new FlamethrowerState(), true);
 					}
 				}
 			} else if (weaponInput == WeaponIds.Napalm) {
-				if (character.player.vileAmmo > 0) {
-					character.changeState(new NapalmAttack(NapalmAttackType.Flamethrower), true);
+				if (vile.player.vileAmmo > 0) {
+					vile.changeState(new NapalmAttack(NapalmAttackType.Flamethrower), true);
 				}
 			}
 		}
@@ -98,6 +98,7 @@ public class VileFlamethrower : Weapon {
 public class FlamethrowerState : CharState {
 	public float shootTime;
 	public Point shootPOI = new Point(-1, -1);
+	
 	public FlamethrowerState(string transitionSprite = "") : base("flamethrower", "", "", transitionSprite) {
 	}
 
@@ -108,7 +109,7 @@ public class FlamethrowerState : CharState {
 
 		shootTime += Global.spf;
 		if (shootTime > 0.06f) {
-			if (!character.tryUseVileAmmo(2)) {
+			if (!vile.tryUseVileAmmo(2)) {
 				character.changeToIdleOrFall();
 				return;
 			}

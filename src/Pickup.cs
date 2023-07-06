@@ -68,7 +68,10 @@ public class Pickup : Actor {
 			if (rideArmor.character != null) {
 				if (pickupType == PickupType.Health) {
 					if (rideArmor.health >= rideArmor.maxHealth) {
-						if (rideArmor.character != null && (rideArmor.character.player.health >= rideArmor.character.player.maxHealth || rideArmor.character.isVileMK5)) {
+						if (rideArmor.character != null && (
+							rideArmor.character.player.health >= rideArmor.character.player.maxHealth ||
+							rideArmor.character.mk5RideArmorPlatform != null
+						)) {
 							return;
 						} else {
 							rideArmor.character.addHealth(healAmount);

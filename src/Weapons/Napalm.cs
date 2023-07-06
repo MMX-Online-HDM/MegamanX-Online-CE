@@ -56,27 +56,27 @@ public class Napalm : Weapon {
 		}
 	}
 
-	public override void vileShoot(WeaponIds weaponInput, Character character) {
+	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
 		if (type == (int)NapalmType.NoneBall || type == (int)NapalmType.NoneFlamethrower) return;
 		if (shootTime == 0) {
 			if (weaponInput == WeaponIds.Napalm) {
-				if (character.tryUseVileAmmo(vileAmmoUsage)) {
-					character.changeState(new NapalmAttack(NapalmAttackType.Napalm), true);
+				if (vile.tryUseVileAmmo(vileAmmoUsage)) {
+					vile.changeState(new NapalmAttack(NapalmAttackType.Napalm), true);
 				}
 			} else if (weaponInput == WeaponIds.VileFlamethrower) {
-				var ground = Global.level.raycast(character.pos, character.pos.addxy(0, 25), new List<Type>() { typeof(Wall) });
+				var ground = Global.level.raycast(vile.pos, vile.pos.addxy(0, 25), new List<Type>() { typeof(Wall) });
 				if (ground == null) {
-					if (character.tryUseVileAmmo(vileAmmoUsage)) {
-						character.setVileShootTime(this);
-						character.changeState(new AirBombAttack(true), true);
+					if (vile.tryUseVileAmmo(vileAmmoUsage)) {
+						vile.setVileShootTime(this);
+						vile.changeState(new AirBombAttack(true), true);
 					}
 				}
 			} else if (weaponInput == WeaponIds.VileBomb) {
-				var ground = Global.level.raycast(character.pos, character.pos.addxy(0, 25), new List<Type>() { typeof(Wall) });
+				var ground = Global.level.raycast(vile.pos, vile.pos.addxy(0, 25), new List<Type>() { typeof(Wall) });
 				if (ground == null) {
-					if (character.player.vileAmmo >= vileAmmoUsage) {
-						character.setVileShootTime(this);
-						character.changeState(new AirBombAttack(true), true);
+					if (vile.player.vileAmmo >= vileAmmoUsage) {
+						vile.setVileShootTime(this);
+						vile.changeState(new AirBombAttack(true), true);
 					}
 				}
 			}
@@ -211,7 +211,7 @@ public class NapalmAttack : CharState {
 	NapalmAttackType napalmAttackType;
 	float shootTime;
 	int shootCount;
-
+	
 	public NapalmAttack(NapalmAttackType napalmAttackType, string transitionSprite = "") :
 		base(getSprite(napalmAttackType), "", "", transitionSprite) {
 		this.napalmAttackType = napalmAttackType;
@@ -227,7 +227,7 @@ public class NapalmAttack : CharState {
 		if (napalmAttackType == NapalmAttackType.Napalm) {
 			if (!shot && character.sprite.frameIndex == 2) {
 				shot = true;
-				character.setVileShootTime(player.vileNapalmWeapon);
+				vile.setVileShootTime(player.vileNapalmWeapon);
 				var poi = character.sprite.getCurrentFrame().POIs[0];
 				poi.x *= character.xDir;
 
@@ -245,12 +245,12 @@ public class NapalmAttack : CharState {
 		} else if (napalmAttackType == NapalmAttackType.Ball) {
 			if (player.vileBallWeapon.type == (int)VileBallType.ExplosiveRound) {
 				if (shootCount < 3 && character.sprite.frameIndex == 2) {
-					if (!character.tryUseVileAmmo(player.vileBallWeapon.vileAmmoUsage)) {
+					if (!vile.tryUseVileAmmo(player.vileBallWeapon.vileAmmoUsage)) {
 						character.changeState(new Crouch(""), true);
 						return;
 					}
 					shootCount++;
-					character.setVileShootTime(player.vileBallWeapon);
+					vile.setVileShootTime(player.vileBallWeapon);
 					var poi = character.sprite.getCurrentFrame().POIs[0];
 					poi.x *= character.xDir;
 					Projectile proj = new VileBombProj(player.vileBallWeapon, character.pos.add(poi), character.xDir, player, 0, character.player.getNextActorNetId(), rpc: true);
@@ -262,7 +262,7 @@ public class NapalmAttack : CharState {
 				shootTime += Global.spf;
 				var poi = character.getFirstPOI();
 				if (shootTime > 0.06f && poi != null && shootCount <= 4) {
-					if (!character.tryUseVileAmmo(player.vileBallWeapon.vileAmmoUsage)) {
+					if (!vile.tryUseVileAmmo(player.vileBallWeapon.vileAmmoUsage)) {
 						character.changeState(new Crouch(""), true);
 						return;
 					}
@@ -278,12 +278,12 @@ public class NapalmAttack : CharState {
 				}
 			} else if (player.vileBallWeapon.type == (int)VileBallType.PeaceOutRoller) {
 				if (!shot && character.sprite.frameIndex == 2) {
-					if (!character.tryUseVileAmmo(player.vileBallWeapon.vileAmmoUsage)) {
+					if (!vile.tryUseVileAmmo(player.vileBallWeapon.vileAmmoUsage)) {
 						character.changeState(new Crouch(""), true);
 						return;
 					}
 					shot = true;
-					character.setVileShootTime(player.vileBallWeapon);
+					vile.setVileShootTime(player.vileBallWeapon);
 					var poi = character.sprite.getCurrentFrame().POIs[0];
 					poi.x *= character.xDir;
 					Projectile proj = new PeaceOutRollerProj(player.vileBallWeapon, character.pos.add(poi), character.xDir, player, 0, character.player.getNextActorNetId(), rpc: true);
@@ -295,7 +295,7 @@ public class NapalmAttack : CharState {
 			shootTime += Global.spf;
 			var poi = character.getFirstPOI();
 			if (shootTime > 0.06f && poi != null) {
-				if (!character.tryUseVileAmmo(2)) {
+				if (!vile.tryUseVileAmmo(2)) {
 					character.changeState(new Crouch(""), true);
 					return;
 				}

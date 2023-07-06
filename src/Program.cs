@@ -413,11 +413,9 @@ class Program {
 	}
 
 	private static void onWindowResized(object sender, SizeEventArgs e) {
-		if (Global.debug) {
-			if (e.Width / (float)e.Height > 1.33f) {
-				e.Width = (uint)(e.Height * (298 / 224f));
-				Global.window.Size = new Vector2u(e.Width, e.Height);
-			}
+		if (e.Width / (float)e.Height > 1.33f) {
+			e.Width = (uint)(e.Height * (298 / 224f));
+			Global.window.Size = new Vector2u(e.Width, e.Height);
 		}
 	}
 

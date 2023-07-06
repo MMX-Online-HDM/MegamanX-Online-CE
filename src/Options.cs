@@ -42,7 +42,7 @@ public class Options {
 	public bool fullScreen = false;
 	public bool integerFullscreen;
 	public int? graphicsPreset = null;  // 0 = low, 1 = medium, 2 = high, 3 = custom
-	public uint windowScale = 4;
+	public uint windowScale = 2;
 	public bool disableShaders;
 	public bool vsync;
 	public bool areShadersDisabled() {

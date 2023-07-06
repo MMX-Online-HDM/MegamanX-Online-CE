@@ -57,26 +57,26 @@ public class VileBall : Weapon {
 		return vileAmmoUsage;
 	}
 
-	public override void vileShoot(WeaponIds weaponInput, Character character) {
+	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
 		if (type == (int)VileBallType.NoneNapalm || type == (int)VileBallType.NoneFlamethrower) return;
 		if (shootTime == 0) {
 			if (weaponInput == WeaponIds.VileBomb) {
-				var ground = Global.level.raycast(character.pos, character.pos.addxy(0, 25), new List<Type>() { typeof(Wall) });
+				var ground = Global.level.raycast(vile.pos, vile.pos.addxy(0, 25), new List<Type>() { typeof(Wall) });
 				if (ground == null) {
-					if (character.tryUseVileAmmo(vileAmmoUsage)) {
-						character.setVileShootTime(this);
-						character.changeState(new AirBombAttack(false), true);
+					if (vile.tryUseVileAmmo(vileAmmoUsage)) {
+						vile.setVileShootTime(this);
+						vile.changeState(new AirBombAttack(false), true);
 					}
 				}
 			} else if (weaponInput == WeaponIds.Napalm) {
-				character.setVileShootTime(this);
-				character.changeState(new NapalmAttack(NapalmAttackType.Ball), true);
+				vile.setVileShootTime(this);
+				vile.changeState(new NapalmAttack(NapalmAttackType.Ball), true);
 			} else if (weaponInput == WeaponIds.VileFlamethrower) {
-				var ground = Global.level.raycast(character.pos, character.pos.addxy(0, 25), new List<Type>() { typeof(Wall) });
+				var ground = Global.level.raycast(vile.pos, vile.pos.addxy(0, 25), new List<Type>() { typeof(Wall) });
 				if (ground == null) {
-					if (character.tryUseVileAmmo(vileAmmoUsage)) {
-						character.setVileShootTime(this);
-						character.changeState(new AirBombAttack(false), true);
+					if (vile.tryUseVileAmmo(vileAmmoUsage)) {
+						vile.setVileShootTime(this);
+						vile.changeState(new AirBombAttack(false), true);
 					}
 				}
 			}
@@ -193,6 +193,7 @@ public class PeaceOutRollerProj : Projectile {
 public class AirBombAttack : CharState {
 	int bombNum;
 	bool isNapalm;
+	
 	public AirBombAttack(bool isNapalm, string transitionSprite = "") : base("air_bomb_attack", "", "", transitionSprite) {
 		this.isNapalm = isNapalm;
 	}
@@ -238,7 +239,7 @@ public class AirBombAttack : CharState {
 				new VileBombProj(player.vileBallWeapon, character.pos, (int)inputDir.x, player, 0, character.player.getNextActorNetId(), rpc: true);
 			}
 			if (stateTime > 0.23f && bombNum == 1) {
-				if (!character.tryUseVileAmmo(player.vileBallWeapon.getAmmoUsage(0))) {
+				if (!vile.tryUseVileAmmo(player.vileBallWeapon.getAmmoUsage(0))) {
 					character.changeState(new Fall(), true);
 					return;
 				}
@@ -246,7 +247,7 @@ public class AirBombAttack : CharState {
 				new VileBombProj(player.vileBallWeapon, character.pos, (int)inputDir.x, player, 0, character.player.getNextActorNetId(), rpc: true);
 			}
 			if (stateTime > 0.45f && bombNum == 2) {
-				if (!character.tryUseVileAmmo(player.vileBallWeapon.getAmmoUsage(0))) {
+				if (!vile.tryUseVileAmmo(player.vileBallWeapon.getAmmoUsage(0))) {
 					character.changeState(new Fall(), true);
 					return;
 				}
@@ -269,7 +270,7 @@ public class AirBombAttack : CharState {
 				new StunShotProj(ebw, character.pos, character.xDir, 1, character.player, character.player.getNextActorNetId(), new Point(150 * character.xDir, 0), rpc: true);
 			}
 			if (stateTime > 0.1f && bombNum == 1) {
-				if (!character.tryUseVileAmmo(player.vileBallWeapon.getAmmoUsage(0))) {
+				if (!vile.tryUseVileAmmo(player.vileBallWeapon.getAmmoUsage(0))) {
 					character.changeToIdleOrFall();
 					return;
 				}
@@ -277,7 +278,7 @@ public class AirBombAttack : CharState {
 				new StunShotProj(ebw, character.pos, character.xDir, 1, character.player, character.player.getNextActorNetId(), new Point(133 * character.xDir, 75), rpc: true);
 			}
 			if (stateTime > 0.2f && bombNum == 2) {
-				if (!character.tryUseVileAmmo(player.vileBallWeapon.getAmmoUsage(0))) {
+				if (!vile.tryUseVileAmmo(player.vileBallWeapon.getAmmoUsage(0))) {
 					character.changeToIdleOrFall();
 					return;
 				}
@@ -285,7 +286,7 @@ public class AirBombAttack : CharState {
 				new StunShotProj(ebw, character.pos, character.xDir, 1, character.player, character.player.getNextActorNetId(), new Point(75 * character.xDir, 133), rpc: true);
 			}
 			if (stateTime > 0.3f && bombNum == 3) {
-				if (!character.tryUseVileAmmo(player.vileBallWeapon.getAmmoUsage(0))) {
+				if (!vile.tryUseVileAmmo(player.vileBallWeapon.getAmmoUsage(0))) {
 					character.changeToIdleOrFall();
 					return;
 				}
@@ -293,7 +294,7 @@ public class AirBombAttack : CharState {
 				new StunShotProj(ebw, character.pos, character.xDir, 1, character.player, character.player.getNextActorNetId(), new Point(0, 150), rpc: true);
 			}
 			if (stateTime > 0.4f && bombNum == 4) {
-				if (!character.tryUseVileAmmo(player.vileBallWeapon.getAmmoUsage(0))) {
+				if (!vile.tryUseVileAmmo(player.vileBallWeapon.getAmmoUsage(0))) {
 					character.changeToIdleOrFall();
 					return;
 				}
@@ -301,7 +302,7 @@ public class AirBombAttack : CharState {
 				new StunShotProj(ebw, character.pos, character.xDir, 1, character.player, character.player.getNextActorNetId(), new Point(-75 * character.xDir, 133), rpc: true);
 			}
 			if (stateTime > 0.5f && bombNum == 5) {
-				if (!character.tryUseVileAmmo(player.vileBallWeapon.getAmmoUsage(0))) {
+				if (!vile.tryUseVileAmmo(player.vileBallWeapon.getAmmoUsage(0))) {
 					character.changeToIdleOrFall();
 					return;
 				}
@@ -309,7 +310,7 @@ public class AirBombAttack : CharState {
 				new StunShotProj(ebw, character.pos, character.xDir, 1, character.player, character.player.getNextActorNetId(), new Point(-133 * character.xDir, 75), rpc: true);
 			}
 			if (stateTime > 0.6f && bombNum == 6) {
-				if (!character.tryUseVileAmmo(player.vileBallWeapon.getAmmoUsage(0))) {
+				if (!vile.tryUseVileAmmo(player.vileBallWeapon.getAmmoUsage(0))) {
 					character.changeToIdleOrFall();
 					return;
 				}

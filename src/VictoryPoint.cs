@@ -37,7 +37,7 @@ public class VictoryPoint : Actor {
 			onWin(chr.player);
 		} else if (other.gameObject is RideArmor) {
 			var rideArmor = other.gameObject as RideArmor;
-			if (rideArmor.character != null && !rideArmor.character.isVileMK5) {
+			if (rideArmor.character != null && (rideArmor.character as Vile)?.isVileMK5 != true) {
 				onWin(rideArmor.character.player);
 			}
 		} else if (other.gameObject is RideChaser) {

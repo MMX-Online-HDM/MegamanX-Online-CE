@@ -153,7 +153,7 @@ public class RideArmor : Actor, IDamagable {
 		}
 
 		// Health bar
-		if (ownedByLocalPlayer && character != null && character.isVileMK5 && !isInvincible(null, null)) {
+		if (ownedByLocalPlayer && character != null && ownedByMK5 && !isInvincible(null, null)) {
 			float healthBarInnerWidth = 30;
 			Color color = new Color();
 
@@ -169,7 +169,7 @@ public class RideArmor : Actor, IDamagable {
 		}
 
 		// Tether
-		if (character != null && character.isVileMK5) {
+		if (character != null && ownedByMK5) {
 			Point charPos = character.getCenterPos().addxy(0, -10);
 			Point raPos = getCenterPos().addxy(0, -10);
 			Point dirTo = charPos.directionTo(raPos);
@@ -229,7 +229,13 @@ public class RideArmor : Actor, IDamagable {
 			var mk5Pos = getMK5Pos();
 			var hitsAbove = Global.level.getTriggerList(this, 0, -2);
 			foreach (var hit in hitsAbove) {
-				if (hit.gameObject is Character chr && chr.isVileMK5 && chr.player == netOwner && chr.pos.y <= mk5Pos.y + 10 && chr.canLandOnRideArmor()) {
+				if (ownedByMK5 &&
+					hit.gameObject is Vile chr &&
+					chr.isVileMK5 &&
+					chr.player == netOwner &&
+					chr.pos.y <= mk5Pos.y + 10 &&
+					chr.canLandOnRideArmor()
+				) {
 					mk5Rider = chr;
 					chr.mk5RideArmorPlatform = this;
 					if (rideArmorState is RADeactive) {
@@ -446,14 +452,23 @@ public class RideArmor : Actor, IDamagable {
 				attackSprite = "hawk_attack_air_down";
 			}
 			changeSprite(attackSprite, false);
-		} else if (canAttack() && player.isVile && player.input.isPressed(Control.Special1, player) && punchCooldown == 0 && player.input.isHeld(Control.Down, player) && raNum == 2 &&
-			  player.vileNapalmWeapon.shootTime == 0 && !rideArmorState.inTransition() && hawkBombCount > 0) {
+		} else if (
+			hawkBombCount > 0 &&
+			canAttack() &&
+			player.isVile &&
+			punchCooldown == 0 &&
+			raNum == 2 &&
+			player.vileNapalmWeapon.shootTime == 0 &&
+			player.input.isPressed(Control.Special1, player) &&
+			player.input.isHeld(Control.Down, player) &&
+			!rideArmorState.inTransition()
+		) {
 			hawkBombCount--;
 			var targetCooldownWeapon = player.vileNapalmWeapon;
 			if (targetCooldownWeapon.type == (int)NapalmType.NoneFlamethrower || targetCooldownWeapon.type == (int)NapalmType.NoneBall) {
 				targetCooldownWeapon = new Napalm(NapalmType.RumblingBang);
 			}
-			character.setVileShootTime(player.vileNapalmWeapon, 2, targetCooldownWeapon);
+			(character as Vile).setVileShootTime(player.vileNapalmWeapon, 2, targetCooldownWeapon);
 			punchCooldown = 0.56f;
 			changeSprite("hawk_attack_air_down2", false);
 		}
@@ -464,19 +479,25 @@ public class RideArmor : Actor, IDamagable {
 			}
 		}
 
-		if (character != null && !character.isVileMK5 && (character.destroyed || character.charState is not InRideArmor)) {
+		if (character != null &&
+			!ownedByMK5 &&
+			(character.destroyed || character.charState is not InRideArmor)
+		) {
 			enterCooldown = 0.5f;
 			character.rideArmor = null;
 			removeCharacter();
 			changeState(new RADeactive(), true);
-		} else if (character != null && character.isVileMK5 && (character.destroyed || !character.canLinkMK5())) {
+		} else if (character != null &&
+			ownedByMK5 &&
+			(character.destroyed || character is Vile vile && !vile.canLinkMK5()
+		)) {
 			enterCooldown = 0.5f;
 			unlinkMK5();
 		} else {
 			rideArmorState.update();
 		}
 
-		if (character != null && !character.isVileMK5) {
+		if (character != null && !ownedByMK5) {
 			var charPos = character.getCharRideArmorPos();
 			character.xDir = xDir;
 			character.changePos(pos.add(charPos));
@@ -677,7 +698,7 @@ public class RideArmor : Actor, IDamagable {
 			health = 0;
 		}
 		if (health <= 0) {
-			if (character != null && !character.isVileMK5 && character.vileStartRideArmor == this) {
+			if (character != null && !ownedByMK5 && character.vileStartRideArmor == this) {
 				character.invulnTime = 1;
 			}
 
@@ -902,7 +923,7 @@ public class RideArmor : Actor, IDamagable {
 		else if (raNum == 4) return "Goliath Armor";
 		else if (raNum == 5) return "Devil Bear";
 		else {
-			return "Ride Armor";
+			return "Black Bear";
 		}
 	}
 
@@ -923,7 +944,7 @@ public class RideArmor : Actor, IDamagable {
 				player.weapons.RemoveAll(w => w is MechMenuWeapon);
 			}
 
-			if (!character.isVileMK5) {
+			if (!ownedByMK5) {
 				character.changeState(new Fall(), true);
 				character.player.vileBallWeapon.shootTime = 1;
 				character.changePos(pos.addxy(0, -10));
@@ -1220,7 +1241,7 @@ public class RAIdle : RideArmorState {
 			}
 		}
 
-		if (character == null || (character.charState is not InRideArmor && !character.isVileMK5)) {
+		if (character == null || (character.charState is not InRideArmor && !rideArmor.ownedByMK5)) {
 			return;
 		}
 
@@ -1728,7 +1749,7 @@ public class RACalldown : RideArmorState {
 		rideArmor.xFlinchPushVel = 0;
 		rideArmor.useGravity = false;
 		origYPos = rideArmor.pos.y;
-		if (rideArmor.character != null && !rideArmor.character.isVileMK5) {
+		if (rideArmor.character != null && !rideArmor.ownedByMK5 && (rideArmor.character as Vile).isVileMK5 != true) {
 			rideArmor.character.changeState(new Fall(), true);
 			rideArmor.character.changePos(rideArmor.pos.addxy(0, -10));
 			rideArmor.removeCharacter();
@@ -2046,8 +2067,8 @@ public class InRideArmor : CharState {
 				character.changeSpriteFromName("ra_idle", true);
 			}
 		} else {
-			if (player.isVile && player.input.isPressed(Control.Special1, player)) {
-				tossGrenade();
+			if (character is Vile vile && player.input.isPressed(Control.Special1, player)) {
+				tossGrenade(vile);
 			}
 		}
 
@@ -2060,20 +2081,29 @@ public class InRideArmor : CharState {
 		}
 	}
 
-	public void tossGrenade() {
+	public void tossGrenade(Vile vile) {
 		Projectile grenade = null;
+		if (player.vileNapalmWeapon.shootTime > 0) {
+			return;
+		}
 		if (player.vileNapalmWeapon.type == (int)NapalmType.SplashHit) {
-			if (player.vileNapalmWeapon.shootTime == 0) character.setVileShootTime(player.vileNapalmWeapon);
-			else return;
-			grenade = new SplashHitGrenadeProj(player.vileNapalmWeapon, character.pos.addxy(0, -3), character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
+			vile.setVileShootTime(player.vileNapalmWeapon);
+			grenade = new SplashHitGrenadeProj(
+				player.vileNapalmWeapon, character.pos.addxy(0, -3),
+				character.xDir, character.player, character.player.getNextActorNetId(), rpc: true
+			);
 		} else if (player.vileNapalmWeapon.type == (int)NapalmType.FireGrenade) {
-			if (player.vileNapalmWeapon.shootTime == 0) character.setVileShootTime(player.vileNapalmWeapon);
-			else return;
-			grenade = new MK2NapalmGrenadeProj(player.vileNapalmWeapon, character.pos.addxy(0, -3), character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
+			vile.setVileShootTime(player.vileNapalmWeapon);
+			grenade = new MK2NapalmGrenadeProj(
+				player.vileNapalmWeapon, character.pos.addxy(0, -3), character.xDir,
+				character.player, character.player.getNextActorNetId(), rpc: true
+			);
 		} else {
-			if (player.vileNapalmWeapon.shootTime == 0) character.setVileShootTime(player.vileNapalmWeapon, targetCooldownWeapon: new Napalm(NapalmType.RumblingBang));
-			else return;
-			grenade = new NapalmGrenadeProj(new Napalm(NapalmType.RumblingBang), character.pos.addxy(0, -3), character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
+			vile.setVileShootTime(player.vileNapalmWeapon, targetCooldownWeapon: new Napalm(NapalmType.RumblingBang));
+			grenade = new NapalmGrenadeProj(
+				new Napalm(NapalmType.RumblingBang), character.pos.addxy(0, -3),
+				character.xDir, character.player, character.player.getNextActorNetId(), rpc: true
+			);
 		}
 		/*
 		else if (player.vileNapalmWeapon.type == (int)NapalmType.NoneBall)
@@ -2149,8 +2179,9 @@ public class InRideArmor : CharState {
 			Global.serverClient?.rpc(RPC.playerToggle, (byte)player.id, (byte)RPCToggleType.StopCrystalize);
 		}
 		character.incPos(new Point(0, 30));
-		if (player.isAI) character.calldownMechCooldown = Character.maxCalldownMechCooldown;
-
+		if (player.isAI) {
+			character.calldownMechCooldown = Character.maxCalldownMechCooldown;
+		}
 		base.onExit(newState);
 	}
 

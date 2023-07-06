@@ -401,7 +401,7 @@ public class Damager {
 				}
 			}
 
-			if (character.isVileMK2 && damage > 0 && !isArmorPiercing(projId)) {
+			if ((character as Vile)?.isVileMK2 == true && damage > 0 && !isArmorPiercing(projId)) {
 				if (hitFromBehind(character, damagingActor, owner)) {
 					damage--;
 

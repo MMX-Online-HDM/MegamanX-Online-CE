@@ -18,6 +18,7 @@ public class HexaInvoluteState : CharState {
 	HexaInvoluteProj proj;
 	bool startGrounded;
 	float ammoTime;
+
 	public HexaInvoluteState() : base("super", "", "", "") {
 		superArmor = true;
 		immuneToWind = true;
@@ -37,7 +38,7 @@ public class HexaInvoluteState : CharState {
 		}
 
 		if (proj != null) {
-			character.usedAmmoLastFrame = true;
+			vile.usedAmmoLastFrame = true;
 			Helpers.decrementTime(ref ammoTime);
 			if (ammoTime == 0) {
 				ammoTime = 0.125f;
@@ -58,8 +59,8 @@ public class HexaInvoluteState : CharState {
 		character.useGravity = false;
 		character.grounded = false;
 		character.stopMoving();
-		character.vileHoverTime = character.vileMaxHoverTime;
-		character.getOffMK5Platform();
+		vile.vileHoverTime = vile.vileMaxHoverTime;
+		vile.getOffMK5Platform();
 	}
 
 	public override void onExit(CharState newState) {

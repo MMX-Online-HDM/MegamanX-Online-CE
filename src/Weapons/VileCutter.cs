@@ -59,11 +59,11 @@ public class VileCutter : Weapon {
 		return vileAmmoUsage;
 	}
 
-	public override void vileShoot(WeaponIds weaponInput, Character character) {
+	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
 		if (shootTime == 0) {
-			if (character.tryUseVileAmmo(vileAmmoUsage)) {
-				character.setVileShootTime(this);
-				character.changeState(new CutterAttackState(), true);
+			if (vile.tryUseVileAmmo(vileAmmoUsage)) {
+				vile.setVileShootTime(this);
+				vile.changeState(new CutterAttackState(), true);
 			}
 		}
 	}
@@ -71,6 +71,7 @@ public class VileCutter : Weapon {
 
 public class CutterAttackState : CharState {
 	VileCutterProj proj;
+
 	public CutterAttackState() : base("idle_shoot", "", "", "") {
 	}
 
@@ -88,21 +89,21 @@ public class CutterAttackState : CharState {
 		}
 	}
 
-	public void shootLogic(Character character) {
-		if (character.sprite.getCurrentFrame().POIs.IsNullOrEmpty()) return;
-		Point shootVel = character.getVileShootVel(true);
-		var poi = character.sprite.getCurrentFrame().POIs[0];
-		poi.x *= character.xDir;
-		var player = character.player;
-		Point muzzlePos = character.pos.add(poi);
-		character.playSound("frontrunner", sendRpc: true);
+	public void shootLogic(Vile vile) {
+		if (vile.sprite.getCurrentFrame().POIs.IsNullOrEmpty()) return;
+		Point shootVel = vile.getVileShootVel(true);
+		var poi = vile.sprite.getCurrentFrame().POIs[0];
+		poi.x *= vile.xDir;
+		var player = vile.player;
+		Point muzzlePos = vile.pos.add(poi);
+		vile.playSound("frontrunner", sendRpc: true);
 
-		proj = new VileCutterProj(player.vileCutterWeapon, muzzlePos, character.getShootXDir(), player, player.getNextActorNetId(), shootVel, rpc: true);
+		proj = new VileCutterProj(player.vileCutterWeapon, muzzlePos, vile.getShootXDir(), player, player.getNextActorNetId(), shootVel, rpc: true);
 	}
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		shootLogic(character);
+		shootLogic(character as Vile);
 	}
 
 	public override void onExit(CharState newState) {

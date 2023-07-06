@@ -304,7 +304,7 @@ public class Weapon {
 		return (shootTime / rateOfFire) < (1 - percent);
 	}
 
-	public virtual void vileShoot(WeaponIds weaponInput, Character character) {
+	public virtual void vileShoot(WeaponIds weaponInput, Vile vile) {
 	}
 
 	// For melee / zero weapons, etc.

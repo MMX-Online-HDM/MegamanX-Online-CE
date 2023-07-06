@@ -41,10 +41,12 @@ public class CharState {
 
 	// Gacel notes.
 	// This should be inside the character object to sync while online.
-
 	public virtual void releaseGrab() {
 		grabTime = 0;
 	}
+
+	// For character specific code.
+	public Vile vile;
 
 	public CharState(string sprite, string shootSprite = null, string attackSprite = null, string transitionSprite = null) {
 		this.sprite = string.IsNullOrEmpty(transitionSprite) ? sprite : transitionSprite;
@@ -92,8 +94,11 @@ public class CharState {
 			newState is X2ChargeShot || newState is X3ChargeShot || newState is GravityWellChargedState || newState is RaySplasherChargedState || newState is TriadThunderChargedState)) {
 			character.iceSled = null;
 		}
-		if (newState is Hurt || newState is Die || newState is CallDownMech || newState?.isGrabbedState == true) {
-			character.mk5RideArmorPlatform = null;
+		if (character is Vile vile && (
+			newState is Hurt || newState is Die ||
+			newState is CallDownMech || newState?.isGrabbedState == true
+		)) {
+			vile.mk5RideArmorPlatform = null;
 		}
 		if (string.IsNullOrEmpty(newState?.shootSprite)) {
 			character.setShootRaySplasher(false);
@@ -107,6 +112,8 @@ public class CharState {
 	}
 
 	public virtual void onEnter(CharState oldState) {
+		vile = character as Vile;
+		
 		if (!string.IsNullOrEmpty(enterSound)) {
 			character.playSound(enterSound, sendRpc: true);
 		}
@@ -248,7 +255,11 @@ public class CharState {
 			character.changeSpriteFromName("fall", true);
 		}
 
-		if (character.canVileHover() && player.input.isPressed(Control.Jump, player) && character.charState is not VileHover) {
+		if (vile != null &&
+			vile.canVileHover() &&
+			player.input.isPressed(Control.Jump, player) &&
+			character.charState is not VileHover
+		) {
 			character.changeState(new VileHover(), true);
 		}
 
@@ -413,7 +424,11 @@ public class CharState {
 			return;
 		}
 
-		if (player.input.isPressed(Control.Jump, player) && player.input.isHeld(Control.Up, player) && character.mk5RideArmorPlatform != null && character.canEjectFromRideArmor()) {
+		if (character.mk5RideArmorPlatform != null &&
+			player.input.isPressed(Control.Jump, player) &&
+			player.input.isHeld(Control.Up, player) &&
+			character.canEjectFromRideArmor()
+		) {
 			character.getOffMK5Platform();
 		}
 
@@ -1064,7 +1079,7 @@ public class Dash : CharState {
 				character.sprite.animTime = 0;
 				character.sprite.frameSpeed = 0.1f;
 				stop = true;
-			} else if (dashTime > Global.spf * 3) {
+			} else {
 				changeToIdle();
 				return;
 			}
@@ -1075,7 +1090,7 @@ public class Dash : CharState {
 			character.move(move);
 		} else {
 			var move = new Point(0, 0);
-			move.x = 60 * character.getRunDebuffs() * initialDashDir;
+			move.x = 60 * character.getRunDebuffs() * initialDashDir * speedModifier;;
 			character.move(move);
 		}
 		dashTime += Global.spf;
@@ -1129,9 +1144,8 @@ public class AirDash : CharState {
 				character.sprite.animTime = 0;
 				character.sprite.frameSpeed = 0.1f;
 				stop = true;
-			} else if (dashTime > Global.spf * 3) {
+			} else {
 				character.changeState(new Fall());
-				return;
 			}
 		}
 		if (dashTime > Global.spf * 3 || stop) {
@@ -1140,7 +1154,7 @@ public class AirDash : CharState {
 			character.move(move);
 		} else {
 			var move = new Point(0, 0);
-			move.x = 60 * character.getRunDebuffs() * initialDashDir;
+			move.x = 60 * character.getRunDebuffs() * initialDashDir * speedModifier;
 			character.move(move);
 		}
 		dashTime += Global.spf;
@@ -1404,7 +1418,7 @@ public class LadderClimb : CharState {
 			return;
 		}
 
-		if (player.isVile && character.vileLadderShootCooldown == 0) {
+		if (player.isVile && vile != null && vile.vileLadderShootCooldown == 0) {
 			character.changeSpriteFromName(sprite, true);
 		}
 
@@ -1805,8 +1819,8 @@ public class Die : CharState {
 			character.player.revertToAxlDeath();
 			character.changeSpriteFromName("die", true);
 		}
-		player.lastDeathWasVileMK2 = character.isVileMK2;
-		player.lastDeathWasVileMK5 = character.isVileMK5;
+		player.lastDeathWasVileMK2 = (vile != null && vile.isVileMK2);
+		player.lastDeathWasVileMK5 = (vile != null && vile.isVileMK5);
 		player.lastDeathWasSigmaHyper = character.isHyperSigma;
 		player.lastDeathWasXHyper = character.isHyperX;
 		player.lastDeathPos = character.getCenterPos();

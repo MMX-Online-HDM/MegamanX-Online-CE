@@ -769,8 +769,11 @@ public partial class Player {
 		hyperXRespawn = false;
 
 		if (isVile) {
-			int maxRAIndex = (character?.isVileMK2 == true || character?.isVileMK5 == true) ? 4 : 3;
 			if (isSelectingRA()) {
+				int maxRAIndex = 3;
+				if (character is Vile vile && !vile.isVileMK1) {
+					maxRAIndex = 4;
+				}
 				if (input.isPressedMenu(Control.MenuDown)) {
 					selectedRAIndex--;
 					if (selectedRAIndex < 0) selectedRAIndex = maxRAIndex;
@@ -932,6 +935,12 @@ public partial class Player {
 				character = new Zero(
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer
+				);
+			}
+			else if (charNum == 2) {
+				character = new Vile(
+					this, pos.x, pos.y, xDir, false, charNetId,
+					ownedByLocalPlayer, mk2VileOverride: mk2VileOverride
 				);
 			} else {
 				character = new Character(
@@ -1133,20 +1142,28 @@ public partial class Player {
 		bool isVileMK2 = charNum == 2 && dnaCore.hyperMode == DNACoreHyperMode.VileMK2;
 		bool isVileMK5 = charNum == 2 && dnaCore.hyperMode == DNACoreHyperMode.VileMK5;
 		Character retChar = null;
-		if (charNum != 1) {
-			retChar = new Character(
+		if (charNum == 1) {
+			retChar = new Zero(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, character.netId, true, isWarpIn: false
+			);
+		} else if (charNum == 2) {
+			retChar = new Vile(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, character.netId, true, isWarpIn: false,
 				mk2VileOverride: isVileMK2, mk5VileOverride: isVileMK5
 			);
 		} else {
-			retChar = new Zero(
+			retChar = new Character(
 				this, character.pos.x, character.pos.y, character.xDir,
-				true, character.netId, true, isWarpIn: false
+				true, character.netId, true, isWarpIn: false,
+				mk2VileOverride: isVileMK2, mk5VileOverride: isVileMK5
 			);
 		}
-		if (isVileMK5) retChar.vileForm = 2;
-		else if (isVileMK2) retChar.vileForm = 1;
+		if (retChar is Vile vile) {
+			if (isVileMK5) vile.vileForm = 2;
+			else if (isVileMK2) vile.vileForm = 1;
+		}
 
 		retChar.addTransformAnim();
 
@@ -1467,7 +1484,18 @@ public partial class Player {
 	public Character limboChar;
 
 	public bool canReviveVile() {
-		return !Global.level.isElimination() && limboChar != null && lastDeathCanRevive && isVile && newCharNum == 2 && scrap >= reviveVileScrapCost && !lastDeathWasVileMK5 && !limboChar.summonedGoliath;
+		if (Global.level.isElimination() ||
+			!lastDeathCanRevive ||
+			newCharNum != 2 ||
+			scrap < reviveVileScrapCost ||
+			lastDeathWasVileMK5
+		) {
+			return false;
+		}
+		if (limboChar is not Vile vile || vile.summonedGoliath) {
+			return false;
+		}
+		return true;
 	}
 
 	public bool canReviveSigma(out Point spawnPoint) {
@@ -1526,17 +1554,19 @@ public partial class Player {
 
 	public void reviveVile(bool toMK5) {
 		scrap -= reviveVileScrapCost;
+		Vile vile = (limboChar as Vile);
+
 		if (toMK5) {
 			vileFormToRespawnAs = 2;
-		} else if (limboChar.vileForm == 0) {
+		} else if (vile.vileForm == 0) {
 			vileFormToRespawnAs = 1;
-		} else if (limboChar.vileForm == 1) {
+		} else if (vile.vileForm == 1) {
 			vileFormToRespawnAs = 2;
 		}
 
 		respawnTime = 0;
 		character = limboChar;
-		character.alreadySummonedNewMech = false;
+		vile.alreadySummonedNewMech = false;
 		character.visible = true;
 		if (explodeDieEffect != null) {
 			explodeDieEffect.destroySelf();
@@ -1551,6 +1581,8 @@ public partial class Player {
 	}
 
 	public void reviveVileNonOwner(bool toMK5) {
+		Vile vile = (character as Vile);
+
 		if (toMK5) {
 			vileFormToRespawnAs = 2;
 		} else {
@@ -1558,7 +1590,7 @@ public partial class Player {
 		}
 
 		respawnTime = 0;
-		character.alreadySummonedNewMech = false;
+		vile.alreadySummonedNewMech = false;
 		character.visible = true;
 		if (explodeDieEffect != null) {
 			explodeDieEffect.destroySelf();

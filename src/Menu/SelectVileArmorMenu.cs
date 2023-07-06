@@ -33,16 +33,16 @@ public class SelectVileArmorMenu : IMainMenu {
 
 		if (Global.input.isPressedMenu(Control.MenuSelectPrimary)) {
 			if (selectArrowPosY == 0) {
-				if (!mainPlayer.frozenCastle && mainPlayer.scrap >= Character.frozenCastleCost) {
+				if (!mainPlayer.frozenCastle && mainPlayer.scrap >= Vile.frozenCastleCost) {
 					mainPlayer.frozenCastle = true;
 					Global.playSound("ching");
-					mainPlayer.scrap -= Character.frozenCastleCost;
+					mainPlayer.scrap -= Vile.frozenCastleCost;
 				}
 			} else if (selectArrowPosY == 1) {
-				if (!mainPlayer.speedDevil && mainPlayer.scrap >= Character.speedDevilCost) {
+				if (!mainPlayer.speedDevil && mainPlayer.scrap >= Vile.speedDevilCost) {
 					mainPlayer.speedDevil = true;
 					Global.playSound("ching");
-					mainPlayer.scrap -= Character.speedDevilCost;
+					mainPlayer.scrap -= Vile.speedDevilCost;
 				}
 			}
 		} else if (Global.input.isPressedMenu(Control.MenuBack)) {
@@ -72,12 +72,12 @@ public class SelectVileArmorMenu : IMainMenu {
 		Helpers.drawTextStd("Scrap: " + mainPlayer.scrap, Global.screenW * 0.5f, 25, Alignment.Center, fontSize: 24);
 
 		Helpers.drawTextStd(TCat.Option, "Frozen Castle", optionPos1.x, optionPos1.y, fontSize: 24, color: mainPlayer.frozenCastle ? Helpers.Gray : Color.White, selected: selectArrowPosY == 0);
-		Helpers.drawTextStd(string.Format(" ({0} scrap)", Character.frozenCastleCost), optionPos1.x + 80, optionPos1.y, fontSize: 24, color: mainPlayer.frozenCastle ? Helpers.Gray : (mainPlayer.scrap < Character.frozenCastleCost ? Color.Red : Color.Green));
+		Helpers.drawTextStd(string.Format(" ({0} scrap)", Vile.frozenCastleCost), optionPos1.x + 80, optionPos1.y, fontSize: 24, color: mainPlayer.frozenCastle ? Helpers.Gray : (mainPlayer.scrap < Vile.frozenCastleCost ? Color.Red : Color.Green));
 		Helpers.drawTextStd("By utilizing a thin layer of ice,", optionPos1.x + 5, optionPos1.y + 11, fontSize: 18, color: mainPlayer.frozenCastle ? Helpers.Gray : Color.White);
 		Helpers.drawTextStd("this armor reduces damage by 1/8.", optionPos1.x + 5, optionPos1.y + 18, fontSize: 18, color: mainPlayer.frozenCastle ? Helpers.Gray : Color.White);
 
 		Helpers.drawTextStd(TCat.Option, "Speed Devil", optionPos2.x, optionPos2.y, fontSize: 24, color: mainPlayer.speedDevil ? Helpers.Gray : Color.White, selected: selectArrowPosY == 1);
-		Helpers.drawTextStd(string.Format(" ({0} scrap)", Character.speedDevilCost), optionPos2.x + 80, optionPos2.y, fontSize: 24, color: mainPlayer.speedDevil ? Helpers.Gray : (mainPlayer.scrap < Character.speedDevilCost ? Color.Red : Color.Green));
+		Helpers.drawTextStd(string.Format(" ({0} scrap)", Vile.speedDevilCost), optionPos2.x + 80, optionPos2.y, fontSize: 24, color: mainPlayer.speedDevil ? Helpers.Gray : (mainPlayer.scrap < Vile.speedDevilCost ? Color.Red : Color.Green));
 		Helpers.drawTextStd("A layer of atmospheric pressure", optionPos2.x + 5, optionPos2.y + 11, fontSize: 18, color: mainPlayer.speedDevil ? Helpers.Gray : Color.White);
 		Helpers.drawTextStd("increases movement speed by 10%.", optionPos2.x + 5, optionPos2.y + 18, fontSize: 18, color: mainPlayer.speedDevil ? Helpers.Gray : Color.White);
 

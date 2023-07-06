@@ -472,7 +472,7 @@ public class Zero : Character {
 	}
 
 	// This can run on both owners and non-owners. So data used must be in sync
-	public Projectile getZeroProjFromHitbox(Collider collider, Point centerPoint) {
+	public override Projectile getProjFromHitbox(Collider collider, Point centerPoint) {
 		Projectile proj = null;
 
 		if (sprite.name == "zero_attack") proj = new GenericMeleeProj(player.zSaberWeapon, centerPoint, ProjIds.ZSaber1, player, 2, 0, 0.25f, isReflectShield: true);
@@ -723,6 +723,62 @@ public class Zero : Character {
 			zero3SwingComboEndTime = Global.time;
 		}
 		base.changeSprite(spriteName, resetFrame);
+	}
+
+	public override string getSprite(string spriteName) {
+		return "zero_" + spriteName;
+	}
+
+	public override void render(float x, float y) {
+		if (isNightmareZeroBS.getValue()) {
+			addRenderEffect(RenderEffectType.Trail);
+		} else {
+			removeRenderEffect(RenderEffectType.Trail);
+		}
+		if (isAwakenedZeroBS.getValue() && visible) {
+			float xOff = 0;
+			int auraXDir = 1;
+			float yOff = 5;
+			string auraSprite = "zero_awakened_aura";
+			if (sprite.name.Contains("dash")) {
+				auraSprite = "zero_awakened_aura2";
+				auraXDir = xDir;
+				yOff = 8;
+			}
+			var shaders = new List<ShaderWrapper>();
+			if (isAwakenedGenmuZeroBS.getValue() &&
+				Global.frameCount % Global.normalizeFrames(6) > Global.normalizeFrames(3) &&
+				Global.shaderWrappers.ContainsKey("awakened")
+			) {
+				shaders.Add(Global.shaderWrappers["awakened"]);
+			}
+			Global.sprites[auraSprite].draw(
+				awakenedAuraFrame,
+				pos.x + x + (xOff * auraXDir),
+				pos.y + y + yOff, auraXDir,
+				1, null, 1, 1, 1,
+				zIndex - 1, shaders: shaders
+			);
+		}
+
+		if (!hideNoShaderIcon()) {
+			float dummy = 0;
+			getHealthNameOffsets(out bool shieldDrawn, ref dummy);
+			if (isBlackZero() && !Global.shaderWrappers.ContainsKey("hyperzero")) {
+				Global.sprites["hud_killfeed_weapon"].draw(
+					125, pos.x, pos.y - 6 + currentLabelY,
+					1, 1, null, 1, 1, 1, ZIndex.HUD
+				);
+				deductLabelY(labelKillFeedIconOffY);
+			} else if (isNightmareZeroBS.getValue() && player.nightmareZeroShader == null) {
+				Global.sprites["hud_killfeed_weapon"].draw(
+					174, pos.x, pos.y - 6 + currentLabelY,
+					1, 1, null, 1, 1, 1, ZIndex.HUD
+				);
+				deductLabelY(labelKillFeedIconOffY);
+			}
+		}
+		base.render(x, y);
 	}
 }
 

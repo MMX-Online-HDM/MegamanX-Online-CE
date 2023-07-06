@@ -307,7 +307,9 @@ public class GravityWellProjCharged : Projectile, IDamagable {
 
 				if (chr != null) {
 					chr.damageHistory.Add(new DamageEvent(owner, weapon.killFeedIndex, projId, true, Global.time));
-					chr.mk5RideArmorPlatform = null;
+					if (chr is Vile vile) {
+						vile.mk5RideArmorPlatform = null;
+					}
 				}
 			}
 		}

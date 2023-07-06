@@ -55,16 +55,16 @@ public class RocketPunch : Weapon {
 		}
 	}
 
-	public override void vileShoot(WeaponIds weaponInput, Character character) {
-		if (character.charState is RocketPunchAttack && type != (int)RocketPunchType.SpoiledBrat) return;
+	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+		if (vile.charState is RocketPunchAttack && type != (int)RocketPunchType.SpoiledBrat) return;
 
-		if (shootTime == 0 && character.charState is not Dash && character.charState is not AirDash) {
-			if (character.tryUseVileAmmo(vileAmmoUsage)) {
-				character.setVileShootTime(this);
-				if (character.charState is RocketPunchAttack rpa) {
+		if (shootTime == 0 && vile.charState is not Dash && vile.charState is not AirDash) {
+			if (vile.tryUseVileAmmo(vileAmmoUsage)) {
+				vile.setVileShootTime(this);
+				if (vile.charState is RocketPunchAttack rpa) {
 					rpa.shoot();
 				} else {
-					character.changeState(new RocketPunchAttack(), true);
+					vile.changeState(new RocketPunchAttack(), true);
 				}
 			}
 		}

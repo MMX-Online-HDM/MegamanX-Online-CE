@@ -56,17 +56,17 @@ public class VileLaser : Weapon {
 		}
 	}
 
-	public override void vileShoot(WeaponIds weaponInput, Character character) {
-		if (type == (int)VileLaserType.NecroBurst && character.charState is InRideArmor inRideArmor) {
-			NecroBurstAttack.shoot(character);
-			character.rideArmor.explode(shrapnel: inRideArmor.isHiding);
+	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+		if (type == (int)VileLaserType.NecroBurst && vile.charState is InRideArmor inRideArmor) {
+			NecroBurstAttack.shoot(vile);
+			vile.rideArmor.explode(shrapnel: inRideArmor.isHiding);
 		} else {
 			if (type == (int)VileLaserType.NecroBurst) {
-				character.changeState(new NecroBurstAttack(character.grounded), true);
+				vile.changeState(new NecroBurstAttack(vile.grounded), true);
 			} else if (type == (int)VileLaserType.RisingSpecter) {
-				character.changeState(new RisingSpecterState(character.grounded), true);
+				vile.changeState(new RisingSpecterState(vile.grounded), true);
 			} else if (type == (int)VileLaserType.StraightNightmare) {
-				character.changeState(new StraightNightmareAttack(character.grounded), true);
+				vile.changeState(new StraightNightmareAttack(vile.grounded), true);
 			}
 		}
 	}
@@ -96,7 +96,7 @@ public class RisingSpecterState : CharState {
 
 		if (!shot) {
 			shot = true;
-			shoot(character);
+			shoot(character as Vile);
 		}
 
 		if (stateTime > 0.5f) {
@@ -104,12 +104,12 @@ public class RisingSpecterState : CharState {
 		}
 	}
 
-	public void shoot(Character character) {
-		Point shootPos = character.setCannonAim(new Point(1.5f, -1));
+	public void shoot(Vile vile) {
+		Point shootPos = vile.setCannonAim(new Point(1.5f, -1));
 
-		if (character.tryUseVileAmmo(character.player.vileLaserWeapon.getAmmoUsage(0))) {
-			new RisingSpecterProj(new VileLaser(VileLaserType.RisingSpecter), shootPos, character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
-			character.playSound("risingSpecter", sendRpc: true);
+		if (vile.tryUseVileAmmo(vile.player.vileLaserWeapon.getAmmoUsage(0))) {
+			new RisingSpecterProj(new VileLaser(VileLaserType.RisingSpecter), shootPos, vile.xDir, vile.player, vile.player.getNextActorNetId(), rpc: true);
+			vile.playSound("risingSpecter", sendRpc: true);
 		}
 	}
 }
@@ -199,6 +199,7 @@ public class RisingSpecterProj : Projectile {
 
 public class NecroBurstAttack : CharState {
 	bool shot = false;
+
 	public NecroBurstAttack(bool grounded) : base(grounded ? "idle_shoot" : "cannon_air", "", "", "") {
 	}
 
@@ -207,7 +208,7 @@ public class NecroBurstAttack : CharState {
 
 		if (!shot) {
 			shot = true;
-			shoot(character);
+			shoot(vile);
 		}
 
 		if (character.sprite.isAnimOver()) {
@@ -215,13 +216,17 @@ public class NecroBurstAttack : CharState {
 		}
 	}
 
-	public static void shoot(Character character) {
-		if (character.tryUseVileAmmo(character.player.vileLaserWeapon.getAmmoUsage(0))) {
-			Point shootPos = character.setCannonAim(new Point(1, 0));
+	public static void shoot(Vile vile) {
+		if (vile.tryUseVileAmmo(vile.player.vileLaserWeapon.getAmmoUsage(0))) {
+			Point shootPos = vile.setCannonAim(new Point(1, 0));
 			//character.vileAmmoRechargeCooldown = 3;
-			new NecroBurstProj(new VileLaser(VileLaserType.NecroBurst), shootPos, character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
-			character.playSound("necroburst", sendRpc: true);
+			new NecroBurstProj(new VileLaser(VileLaserType.NecroBurst), shootPos, vile.xDir, vile.player, vile.player.getNextActorNetId(), rpc: true);
+			vile.playSound("necroburst", sendRpc: true);
 		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
 	}
 }
 
@@ -313,7 +318,7 @@ public class StraightNightmareAttack : CharState {
 
 		if (!shot) {
 			shot = true;
-			shoot(character);
+			shoot(character as Vile);
 		}
 
 		if (character.sprite.isAnimOver()) {
@@ -321,10 +326,10 @@ public class StraightNightmareAttack : CharState {
 		}
 	}
 
-	public static void shoot(Character character) {
-		if (character.tryUseVileAmmo(character.player.vileLaserWeapon.getAmmoUsage(0))) {
-			Point shootPos = character.setCannonAim(new Point(1, 0));
-			new StraightNightmareProj(new VileLaser(VileLaserType.StraightNightmare), shootPos.addxy(-8 * character.xDir, 0), character.xDir, character.player, character.player.getNextActorNetId(), sendRpc: true);
+	public static void shoot(Vile vile) {
+		if (vile.tryUseVileAmmo(vile.player.vileLaserWeapon.getAmmoUsage(0))) {
+			Point shootPos = vile.setCannonAim(new Point(1, 0));
+			new StraightNightmareProj(new VileLaser(VileLaserType.StraightNightmare), shootPos.addxy(-8 * vile.xDir, 0), vile.xDir, vile.player, vile.player.getNextActorNetId(), sendRpc: true);
 		}
 	}
 }
