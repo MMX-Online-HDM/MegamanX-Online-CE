@@ -13,6 +13,7 @@ public class ShaderWrapper {
 	public Dictionary<string, Texture> textureUniforms = new Dictionary<string, Texture>();
 	public Dictionary<string, float> floatUniforms = new Dictionary<string, float>();
 	public Dictionary<string, Vec4> vec4Uniforms = new Dictionary<string, Vec4>();
+	public Dictionary<string, Vec2> vec2Uniforms = new();
 	public Dictionary<string, int> intUniforms = new Dictionary<string, int>();
 	public ShaderWrapper(string shaderName) {
 		shader = Global.shaders[shaderName];
@@ -24,6 +25,10 @@ public class ShaderWrapper {
 
 	public void SetUniform(string key, float val) {
 		floatUniforms[key] = val;
+	}
+
+	public void SetUniform(string key, Vec2 val) {
+		vec2Uniforms[key] = val;
 	}
 
 	public void SetUniform(string key, Vec4 vec4) {
@@ -42,6 +47,9 @@ public class ShaderWrapper {
 			shader.SetUniform(kvp.Key, kvp.Value);
 		}
 		foreach (var kvp in vec4Uniforms) {
+			shader.SetUniform(kvp.Key, kvp.Value);
+		}
+		foreach (var kvp in vec2Uniforms) {
 			shader.SetUniform(kvp.Key, kvp.Value);
 		}
 		foreach (var kvp in intUniforms) {

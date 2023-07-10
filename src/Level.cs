@@ -174,6 +174,12 @@ public partial class Level {
 		return players.Where(p => !p.isSpectator).ToList();
 	}
 
+	bool unlockfollow;
+
+	bool[] fastfollow = new bool[] { false, false };
+
+	Point lastCamPos = new Point(0, 0);
+
 	public bool isHost {
 		get {
 			if (Global.serverClient == null) return true;
@@ -1209,20 +1215,47 @@ public partial class Level {
 				Point camPos = camPlayer.character.getCamCenterPos();
 				Point expectedCamPos = computeCamPos(camPos, new Point(playerX, playerY));
 
-				var moveDeltaX = camPos.x - playerX;
-				var moveDeltaY = camPos.y - playerY;
+				var moveDeltaX = camPos.x - MathF.Round(playerX);
+				var moveDeltaY = camPos.y - MathF.Round(playerY);
 
-				var fullDeltaX = expectedCamPos.x - camX;
-				var fullDeltaY = expectedCamPos.y - camY;
+				var fullDeltaX = MathF.Round(expectedCamPos.x) - camX;
+				var fullDeltaY = MathF.Round(expectedCamPos.y) - camY;
 
-				var deltaX = moveDeltaX;
-				var deltaY = moveDeltaY;
-
-				if (MathF.Abs(moveDeltaX) > 0) {
-					deltaX = Helpers.lerp(deltaX, fullDeltaX, Global.spf * 3);
+				if (camPlayer.character != null && camPlayer.character.grounded == false) {
+					if (fullDeltaY > -30 && fullDeltaY < 20 && 
+						camPlayer.character.charState is not WallKick && 
+						camPlayer.character.charState is not WallSlide && 
+						camPlayer.character.charState is not LadderClimb 
+					) {
+						if (!unlockfollow) {
+							moveDeltaY = 0;
+							fullDeltaY = 0;
+						}
+					} else {
+						unlockfollow = true;
+					}
+				} else {
+					unlockfollow = false;
 				}
-				if (MathF.Abs(moveDeltaY) > 0) {
-					deltaY = Helpers.lerp(deltaY, fullDeltaY, Global.spf * 3);
+
+				var deltaX = fullDeltaX;
+				var deltaY = fullDeltaY;
+
+				if (MathF.Abs(fullDeltaX) > 3) {
+					if (MathF.Abs(fullDeltaX) > 30) {
+						deltaX = fullDeltaX - 30 * MathF.Sign(fullDeltaX);
+					} else {
+						deltaX = 3 * MathF.Sign(fullDeltaX);
+					}
+				}
+				if (MathF.Abs(fullDeltaY) > 3) {
+					if (fullDeltaY > 30) {
+						deltaY = fullDeltaY - 30 * MathF.Sign(fullDeltaY);
+					} else if (fullDeltaY < -40) {
+						deltaY = fullDeltaY - 40 * MathF.Sign(fullDeltaY);
+					} else {
+						deltaY = 3 * MathF.Sign(fullDeltaY);
+					}
 				}
 
 				updateCamPos(deltaX, deltaY);
@@ -1241,6 +1274,8 @@ public partial class Level {
 			shakeX = 0;
 			shakeY = 0;
 		}
+		lastCamPos.x = camX;
+		lastCamPos.y = camY;
 
 		foreach (var effect in effects.ToList()) {
 			effect.update();

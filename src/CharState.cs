@@ -1915,7 +1915,8 @@ public class Die : CharState {
 
 			if (once) {
 				/*
-				// This code would allow controlling Mavs after death, but would result in camera issues and spectate issues that need to be resolved first
+				// This code would allow controlling Mavs after death,
+				// but would result in camera issues and spectate issues that need to be resolved first.
 				if (player.currentMaverick == null)
 				{
 					if (player.isPuppeteer())

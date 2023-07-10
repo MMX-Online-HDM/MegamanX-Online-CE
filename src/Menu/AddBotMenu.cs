@@ -64,7 +64,7 @@ public class AddBotMenu : IMainMenu {
 					}
 				}
 
-				for (int i = 0; i < 12; i++) {
+				for (int i = 0; i < Global.level.players.Count + 1; i++) {
 					if (!Global.level.players.Any(p => p.id == i)) {
 						id = i;
 						if (!Global.level.gameMode.isTeamMode) {

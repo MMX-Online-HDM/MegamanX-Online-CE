@@ -72,6 +72,10 @@ public class NavMeshNode {
 			return;
 		}
 
+		if (curNode == null || curNode.neighbors == null || curNode.neighbors.Count == 0) {
+			return;
+		}
+
 		var neighbors = curNode.neighbors.Shuffle();
 		foreach (var neighbor in neighbors) {
 			pathToNode.Add(neighbor.neighborNode);

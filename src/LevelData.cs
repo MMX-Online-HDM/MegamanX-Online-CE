@@ -71,7 +71,7 @@ public class LevelData {
 	public string path;
 	public bool fixedCam;
 	public float? killY;
-	public int maxPlayers = 10;
+	public int maxPlayers = Server.maxPlayerCap;
 	public double playToMultiplier;
 	public int width;
 	public int height;
@@ -114,7 +114,7 @@ public class LevelData {
 		path = levelJson.path;
 		width = levelJson.width;
 		height = levelJson.height;
-		maxPlayers = levelJson.maxPlayers ?? 10;
+		maxPlayers = levelJson.maxPlayers ?? Server.maxPlayerCap;
 		killY = levelJson.killY;
 		mirrorMapImages = levelJson.mirrorMapImages ?? true;
 		this.isCustomMap = isCustomMap;
@@ -213,11 +213,11 @@ public class LevelData {
 		var supportedGameModesSet = new HashSet<string>();
 
 		if (is1v1()) {
-			maxPlayers = 2;
+			maxPlayers = 4;
 			supportedGameModesSet.Add(GameMode.Elimination);
 			supportedGameModesSet.Add(GameMode.TeamElimination);
 		} else if (isMedium()) {
-			maxPlayers = 4;
+			//maxPlayers = 4;
 			supportedGameModesSet.Add(GameMode.Deathmatch);
 			supportedGameModesSet.Add(GameMode.TeamDeathmatch);
 		} else {

@@ -77,7 +77,7 @@ public class Server {
 	public const byte getServersQueryByte = 0;
 	public const byte getServerQueryByte = 1;
 
-	public const int maxPlayerCap = 10;
+	public const int maxPlayerCap = 50;
 
 	[JsonIgnore]
 	public ServerPlayer host { get; set; }
@@ -483,7 +483,7 @@ public class Server {
 		var player = addPlayer(playerContract.name, playerContract, im.SenderConnection, false);
 
 		if (playerContract.isHost && players.Count(p => p.isBot) == 0) {
-			for (int i = 0; i < botCount && players.Count < 10; i++) {
+			for (int i = 0; i < botCount; i++) {
 				var cpuData = extraCpuCharData.cpuDatas.ElementAtOrDefault(i);
 				int? overrideCharNum = null;
 				if (cpuData != null && !cpuData.isRandom) overrideCharNum = cpuData?.charNum;

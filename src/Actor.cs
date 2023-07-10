@@ -1218,12 +1218,20 @@ public partial class Actor : GameObject {
 		Point originPoint = Global.level.getSoundListenerOrigin();
 
 		var dist = originPoint.distanceTo(pos);
-		var volume = 1 - (dist / (Global.screenW));
+		var volume = 1f - (dist / Global.screenW);
 
 		volume = volume * 100 * Options.main.soundVolume;
 		volume = Helpers.clamp(volume, 0, 100);
 
 		return volume;
+	}
+
+	public float getSoundDist() {
+		if (Global.level == null || Global.level.is1v1()) return 100 * Options.main.soundVolume;
+
+		Point originPoint = Global.level.getSoundListenerOrigin();
+
+		return originPoint.distanceTo(pos);
 	}
 
 	public Point getSoundPos() {
@@ -1268,6 +1276,9 @@ public partial class Actor : GameObject {
 		}
 		if (getSoundVolume() > 0) {
 			recentClipCount[soundBuffer.soundKey].Add(0);
+		}
+		if (getSoundDist() > 600) {
+			return null;
 		}
 
 		int? charNum = null;
