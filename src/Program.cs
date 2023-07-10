@@ -80,10 +80,11 @@ class Program {
 			Global.promptDebugSettings();
 		}
 
+		/*
 		if (!Global.debug || Global.testDocumentsInDebug) {
 			string baseDocumentsPath = Helpers.getBaseDocumentsPath();
 			string mmxodDocumentsPath = Helpers.getMMXODDocumentsPath();
-			/*
+
 			#if WINDOWS
 			if (string.IsNullOrEmpty(mmxodDocumentsPath) &&
 				!string.IsNullOrEmpty(baseDocumentsPath) &&
@@ -107,7 +108,6 @@ class Program {
 				}
 			}
 			#endif
-			*/
 			if (!string.IsNullOrEmpty(mmxodDocumentsPath)) {
 				Global.writePath = mmxodDocumentsPath;
 				if (Directory.Exists(mmxodDocumentsPath + "/assets")) {
@@ -115,6 +115,7 @@ class Program {
 				}
 			}
 		}
+		*/
 
 		if (!checkSystemRequirements()) {
 			return;
