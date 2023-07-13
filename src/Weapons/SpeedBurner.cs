@@ -43,6 +43,7 @@ public class SpeedBurnerProj : Projectile {
 	public SpeedBurnerProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, xDir, 275, 2, player, "speedburner_start", 0, 0, netProjId, player.ownedByLocalPlayer) {
 		maxTime = 0.6f;
+		fadeSprite = "speedburner_fade";
 		projId = (int)ProjIds.SpeedBurner;
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
@@ -102,7 +103,7 @@ public class SpeedBurnerProjWater : Projectile {
 		smokeTime += Global.spf;
 		if (smokeTime > 0.1f) {
 			smokeTime = 0;
-			new Anim(pos, "torpedo_smoke", xDir, null, true);
+			new Anim(pos, "dust", xDir, null, true);
 		}
 
 		var y = initY + MathF.Sin((Global.level.time + offsetTime) * 10) * 15;

@@ -136,9 +136,9 @@ public class GravityWellProj : Projectile, IDamagable {
 		  else if (state == 2) {
 			activeTime += Global.spf;
 
-			int xDir = Helpers.randomRange(0, 1) == 0 ? 1 : -1;
+			//int xDir = Helpers.randomRange(0, 1) == 0 ? 1 : -1;
 			int yDir = Helpers.randomRange(0, 1) == 0 ? 1 : -1;
-			wellAnim.xDir = xDir;
+			//wellAnim.xDir = xDir;
 			wellAnim.yDir = yDir;
 
 			if (activeTime > maxActiveTime || (activeTime > 0.01f && commandShoot())) {

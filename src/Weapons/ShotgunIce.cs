@@ -76,10 +76,12 @@ public class ShotgunIceProj : Projectile {
 		base.update();
 
 		sparkleTime += Global.spf;
-		if (sparkleTime > 0.05) {
-			sparkleTime = 0;
-			new Anim(pos, "shotgun_ice_sparkles", 1, null, true);
-		}
+		if (type == 0) {
+			if (sparkleTime > 0.10) {
+				sparkleTime = 0;
+				new Anim(pos, "shotgun_ice_sparkles", 1, null, true);
+			}
+		}	
 	}
 
 	public void onHit() {
