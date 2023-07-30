@@ -1215,14 +1215,14 @@ public partial class Level {
 				Point camPos = camPlayer.character.getCamCenterPos();
 				Point expectedCamPos = computeCamPos(camPos, new Point(playerX, playerY));
 
-				var moveDeltaX = camPos.x - MathF.Round(playerX);
-				var moveDeltaY = camPos.y - MathF.Round(playerY);
+				var moveDeltaX = camX - MathF.Round(playerX);
+				var moveDeltaY = camY - MathF.Round(playerY);
 
 				var fullDeltaX = MathF.Round(expectedCamPos.x) - camX;
 				var fullDeltaY = MathF.Round(expectedCamPos.y) - camY;
 
 				if (camPlayer.character != null && camPlayer.character.grounded == false) {
-					if (fullDeltaY > -30 && fullDeltaY < 20 && 
+					if (fullDeltaY > -55 && fullDeltaY < 20 && 
 						camPlayer.character.charState is not WallKick && 
 						camPlayer.character.charState is not WallSlide && 
 						camPlayer.character.charState is not LadderClimb 
@@ -1242,20 +1242,10 @@ public partial class Level {
 				var deltaY = fullDeltaY;
 
 				if (MathF.Abs(fullDeltaX) > 3) {
-					if (MathF.Abs(fullDeltaX) > 30) {
-						deltaX = fullDeltaX - 30 * MathF.Sign(fullDeltaX);
-					} else {
-						deltaX = 3 * MathF.Sign(fullDeltaX);
-					}
+					deltaX = 3 * MathF.Sign(fullDeltaX);
 				}
 				if (MathF.Abs(fullDeltaY) > 3) {
-					if (fullDeltaY > 30) {
-						deltaY = fullDeltaY - 30 * MathF.Sign(fullDeltaY);
-					} else if (fullDeltaY < -40) {
-						deltaY = fullDeltaY - 40 * MathF.Sign(fullDeltaY);
-					} else {
-						deltaY = 3 * MathF.Sign(fullDeltaY);
-					}
+					deltaY = 3 * MathF.Sign(fullDeltaY);
 				}
 
 				updateCamPos(deltaX, deltaY);

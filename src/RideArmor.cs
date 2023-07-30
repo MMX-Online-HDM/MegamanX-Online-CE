@@ -152,8 +152,10 @@ public class RideArmor : Actor, IDamagable {
 			}
 		}
 
+		bool isVileMk5 = ownedByMK5 && character != null && character is Vile vile && vile.isVileMK5;
+
 		// Health bar
-		if (ownedByLocalPlayer && character != null && ownedByMK5 && !isInvincible(null, null)) {
+		if (ownedByLocalPlayer && isVileMk5 && !isInvincible(null, null)) {
 			float healthBarInnerWidth = 30;
 			Color color = new Color();
 
@@ -169,7 +171,7 @@ public class RideArmor : Actor, IDamagable {
 		}
 
 		// Tether
-		if (character != null && ownedByMK5) {
+		if (isVileMk5) {
 			Point charPos = character.getCenterPos().addxy(0, -10);
 			Point raPos = getCenterPos().addxy(0, -10);
 			Point dirTo = charPos.directionTo(raPos);
@@ -230,8 +232,7 @@ public class RideArmor : Actor, IDamagable {
 			var hitsAbove = Global.level.getTriggerList(this, 0, -2);
 			foreach (var hit in hitsAbove) {
 				if (ownedByMK5 &&
-					hit.gameObject is Vile chr &&
-					chr.isVileMK5 &&
+					hit.gameObject is Character chr &&
 					chr.player == netOwner &&
 					chr.pos.y <= mk5Pos.y + 10 &&
 					chr.canLandOnRideArmor()
@@ -245,10 +246,12 @@ public class RideArmor : Actor, IDamagable {
 				}
 			}
 			if (mk5Rider != null) {
-				mk5Rider.changePos(mk5Pos);
+				mk5Rider.changePos(mk5Pos.addxy(0, 1));
 			}
 			if (mk5Rider?.mk5RideArmorPlatform == null) {
 				mk5Rider = null;
+			} else {
+				character = mk5Rider;
 			}
 		}
 	}
@@ -553,7 +556,10 @@ public class RideArmor : Actor, IDamagable {
 
 	//canEnterRideArmor
 	public bool canBeEntered() {
-		return rideArmorState is RADeactive && !rideArmorState.inTransition() && character == null && raNum != 5;
+		return !ownedByMK5 &&
+			rideArmorState is RADeactive &&
+			!rideArmorState.inTransition() &&
+			character == null;
 	}
 
 	public override void onCollision(CollideData other) {

@@ -109,14 +109,6 @@ public class Vile : Character {
 		if (!ownedByLocalPlayer) {
 			return;
 		}
-		if (mk5RideArmorPlatform != null && mk5RideArmorPlatform.destroyed) {
-			mk5RideArmorPlatform = null;
-		}
-		if (mk5RideArmorPlatform != null) {
-			changePos(mk5RideArmorPlatform.getMK5Pos());
-			xDir = mk5RideArmorPlatform.xDir;
-			grounded = true;
-		}
 
 		if ((grounded || charState is LadderClimb || charState is LadderEnd || charState is WallSlide) && vileHoverTime > 0) {
 			vileHoverTime -= Global.spf * 6;
@@ -383,12 +375,6 @@ public class Vile : Character {
 				player.weapon.vileShoot(0, this);
 			}
 		}
-	}
-
-	public bool canLandOnRideArmor() {
-		if (charState is Fall) return true;
-		if (charState is VileHover vh && vh.fallY > 0) return true;
-		return false;
 	}
 
 	public bool canLinkMK5() {

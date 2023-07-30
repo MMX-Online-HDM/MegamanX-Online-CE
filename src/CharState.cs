@@ -94,11 +94,11 @@ public class CharState {
 			newState is X2ChargeShot || newState is X3ChargeShot || newState is GravityWellChargedState || newState is RaySplasherChargedState || newState is TriadThunderChargedState)) {
 			character.iceSled = null;
 		}
-		if (character is Vile vile && (
+		if (character.mk5RideArmorPlatform != null && (
 			newState is Hurt || newState is Die ||
 			newState is CallDownMech || newState?.isGrabbedState == true
 		)) {
-			vile.mk5RideArmorPlatform = null;
+			character.mk5RideArmorPlatform = null;
 		}
 		if (string.IsNullOrEmpty(newState?.shootSprite)) {
 			character.setShootRaySplasher(false);
