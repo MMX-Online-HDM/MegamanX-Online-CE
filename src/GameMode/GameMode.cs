@@ -1025,6 +1025,18 @@ public class GameMode {
 			baseX = getHUDHealthPosition(position, false).x;
 			mechBarExists = true;
 		}
+		if (isMech && player.character?.mk5RideArmorPlatform != null) {
+			spriteName = "hud_health_base_mech";
+			health = player.character.mk5RideArmorPlatform.health;
+			maxHealth = player.character.mk5RideArmorPlatform.maxHealth;
+			twoLayerHealth = player.character.mk5RideArmorPlatform.goliathHealth;
+			frameIndex = player.character.mk5RideArmorPlatform.raNum;
+			baseX = getHUDHealthPosition(position, false).x;
+			if (player.weapon is not Buster) {
+				baseX += 15;
+			}
+			mechBarExists = false;
+		}
 
 		if (isMech && player.character?.rideChaser != null) {
 			spriteName = "hud_health_base_bike";

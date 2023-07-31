@@ -1311,9 +1311,21 @@ public partial class Character : Actor, IDamagable {
 			slideVel = Helpers.toZero(slideVel, Global.spf * 350, Math.Sign(slideVel));
 			move(new Point(slideVel, 0), true);
 		}
-
 		base.update();
+
+		// This overrides the ground checks made by Actor.update();
+		if (mk5RideArmorPlatform != null) {
+			changePos(mk5RideArmorPlatform.getMK5Pos().addxy(0, 1));
+			xDir = mk5RideArmorPlatform.xDir;
+			grounded = true;
+
+			if (mk5RideArmorPlatform.destroyed) {
+				mk5RideArmorPlatform = null;
+			}
+		}
+
 		charState.update();
+
 
 		if (player.isDisguisedAxl) {
 			updateDisguisedAxl();
@@ -1635,7 +1647,7 @@ public partial class Character : Actor, IDamagable {
 
 	public float camOffsetX;
 	public Point getCamCenterPos(bool ignoreZoom = false) {
-		if (player.isVile && mk5RideArmorPlatform != null) {
+		if (mk5RideArmorPlatform != null) {
 			return mk5RideArmorPlatform.pos.addxy(0, -70);
 		}
 		if (player.isSigma) {
@@ -1956,7 +1968,7 @@ public partial class Character : Actor, IDamagable {
 			base.render(x, y);
 		} else if (mk5RideArmorPlatform != null) {
 			var rideArmorPos = mk5RideArmorPlatform.pos;
-			var charPos = getMK5RideArmorPos();
+			var charPos = getMK5RideArmorPos().addxy(0, 1);
 			base.render(rideArmorPos.x + charPos.x - pos.x, rideArmorPos.y + charPos.y - pos.y);
 		} else if (rideArmor != null) {
 			var rideArmorPos = rideArmor.pos;
@@ -3086,9 +3098,18 @@ public partial class Character : Actor, IDamagable {
 		return sprite.name.Contains("attack");
 	}
 
+	public bool canLandOnRideArmor() {
+		if (charState is Fall) return true;
+		if (charState is VileHover vh && vh.fallY > 0) return true;
+		return false;
+	}
+
 	public void getOffMK5Platform() {
 		if (mk5RideArmorPlatform != null) {
-			mk5RideArmorPlatform.character = null;
+			if (mk5RideArmorPlatform != vileStartRideArmor) {
+				mk5RideArmorPlatform.character = null;
+				mk5RideArmorPlatform.changeState(new RADeactive(), true);
+			}
 			mk5RideArmorPlatform = null;
 		}
 	}
