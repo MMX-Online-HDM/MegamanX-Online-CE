@@ -400,32 +400,58 @@ public class Sprite {
 
 		if (renderEffects != null && !renderEffects.Contains(RenderEffectType.Invisible)) {
 			if (renderEffects.Contains(RenderEffectType.BlueShadow) && alpha >= 1) {
-				var blueShader = Global.shaderWrappers.GetValueOrDefault("outline_blue");
+				var blueShader = Helpers.cloneShaderSafe("outline_blue");
 				if (blueShader != null) {
-					DrawWrappers.DrawTexture(
-						bitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(),
-						currentFrame.rect.h(), x + frameOffsetX - 1, y + frameOffsetY, zIndex, cx,
-						cy, xDirArg, yDirArg, angle, alpha, new List<ShaderWrapper>() { blueShader }, true
+					blueShader.SetUniform(
+						"textureSize",
+						new SFML.Graphics.Glsl.Vec2(bitmap.Size.X, bitmap.Size.Y)
 					);
-					DrawWrappers.DrawTexture(bitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX + 1, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, new List<ShaderWrapper>() { blueShader }, true);
-					DrawWrappers.DrawTexture(bitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY - 1, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, new List<ShaderWrapper>() { blueShader }, true);
-					DrawWrappers.DrawTexture(bitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY + 1, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, new List<ShaderWrapper>() { blueShader }, true);
+					DrawWrappers.DrawTexture(
+						bitmap,
+						currentFrame.rect.x1 - 1, currentFrame.rect.y1 - 1,
+						currentFrame.rect.w() + 2, currentFrame.rect.h() + 2,
+						x + frameOffsetX - (1 * xDirArg),
+						y + frameOffsetY - (1 * yDirArg),
+						zIndex,
+						cx, cy, xDirArg, yDirArg, angle, alpha,
+						new List<ShaderWrapper>() { blueShader }, true
+					);
 				}
 			} else if (renderEffects.Contains(RenderEffectType.RedShadow) && alpha >= 1) {
-				var redShader = Global.shaderWrappers.GetValueOrDefault("outline_red");
+				var redShader = Helpers.cloneShaderSafe("outline_red");
 				if (redShader != null) {
-					DrawWrappers.DrawTexture(bitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX - 1, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, new List<ShaderWrapper>() { redShader }, true);
-					DrawWrappers.DrawTexture(bitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX + 1, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, new List<ShaderWrapper>() { redShader }, true);
-					DrawWrappers.DrawTexture(bitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY - 1, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, new List<ShaderWrapper>() { redShader }, true);
-					DrawWrappers.DrawTexture(bitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY + 1, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, new List<ShaderWrapper>() { redShader }, true);
+					redShader.SetUniform(
+						"textureSize",
+						new SFML.Graphics.Glsl.Vec2(bitmap.Size.X, bitmap.Size.Y)
+					);
+					DrawWrappers.DrawTexture(
+						bitmap,
+						currentFrame.rect.x1 - 1, currentFrame.rect.y1 - 1,
+						currentFrame.rect.w() + 2, currentFrame.rect.h() + 2,
+						x + frameOffsetX - (1 * xDirArg),
+						y + frameOffsetY - (1 * yDirArg),
+						zIndex-10,
+						cx, cy, xDirArg, yDirArg, angle, alpha,
+						new List<ShaderWrapper>() { redShader }, true
+					);
 				}
 			} else if (renderEffects.Contains(RenderEffectType.GreenShadow) && alpha >= 1) {
-				var greenShader = Global.shaderWrappers.GetValueOrDefault("outline_green");
+				var greenShader = Helpers.cloneShaderSafe("outline_green");
 				if (greenShader != null) {
-					DrawWrappers.DrawTexture(bitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX - 1, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, new List<ShaderWrapper>() { greenShader }, true);
-					DrawWrappers.DrawTexture(bitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX + 1, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, new List<ShaderWrapper>() { greenShader }, true);
-					DrawWrappers.DrawTexture(bitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY - 1, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, new List<ShaderWrapper>() { greenShader }, true);
-					DrawWrappers.DrawTexture(bitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY + 1, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, new List<ShaderWrapper>() { greenShader }, true);
+					greenShader.SetUniform(
+						"textureSize",
+						new SFML.Graphics.Glsl.Vec2(bitmap.Size.X, bitmap.Size.Y)
+					);
+					DrawWrappers.DrawTexture(
+						bitmap,
+						currentFrame.rect.x1 - 1, currentFrame.rect.y1 - 1,
+						currentFrame.rect.w() + 2, currentFrame.rect.h() + 2,
+						x + frameOffsetX - (1 * xDirArg),
+						y + frameOffsetY - (1 * yDirArg),
+						zIndex,
+						cx, cy, xDirArg, yDirArg, angle, alpha,
+						new List<ShaderWrapper>() { greenShader }, true
+					);
 				}
 			}
 

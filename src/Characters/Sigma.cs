@@ -36,14 +36,15 @@ public partial class Character {
 	public float viralSigmaAngle;
 	//public ShaderWrapper viralSigmaShader;
 	//public ShaderWrapper sigmaShieldShader;
+	
+	
+	// TODO: Move this to a diferent class.
 	public float viralSigmaBeamLength;
 	public int lastViralSigmaXDir = 1;
 	public Character possessTarget;
 	public float possessEnemyTime;
 	public float maxPossessEnemyTime;
 	public int numPossesses;
-	public float kaiserHoverTime;
-	public float kaiserMaxHoverTime = 4;
 
 	public WolfSigmaHead head;
 	public WolfSigmaHand leftHand;

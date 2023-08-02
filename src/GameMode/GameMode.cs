@@ -601,7 +601,7 @@ public class GameMode {
 			Helpers.drawTextStd(TCat.HUD, hudErrorMsg, Global.halfScreenW - 2, 50, Alignment.Center, fontSize: 24);
 		} else if (mainPlayer?.isKaiserViralSigma() == true) {
 			string msg = "";
-			if (mainPlayer.character.canKaiserSpawn(out _)) msg += "[JUMP]: Relocate";
+			if (KaiserSigma.canKaiserSpawn(mainPlayer.character, out _)) msg += "[JUMP]: Relocate";
 			if (msg != "") Helpers.drawTextStd(TCat.HUD, Helpers.controlText(msg), Global.halfScreenW - 2, 50, Alignment.Center, fontSize: 24);
 		} else if (mainPlayer?.character?.charState is ViralSigmaPossess vsp && vsp.target != null) {
 			Helpers.drawTextStd(TCat.HUD, $"Controlling possessed player {vsp.target.player.name}", Global.halfScreenW - 2, 50, Alignment.Center, fontSize: 24);

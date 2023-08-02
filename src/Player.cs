@@ -287,12 +287,19 @@ public partial class Player {
 		return false;
 	}
 
-	// Things needed to be synced to late joiners. Note: these are not automatically applied, you need to add code in Global.level.joinedLateSyncPlayers and update PlayerSync class at top of this file
+	// Things needed to be synced to late joiners.
+	// Note: these are not automatically applied,
+	// you need to add code in Global.level.joinedLateSyncPlayers
+	// and update PlayerSync class at top of this file
 	public int kills;
 	public int assists;
 	public int deaths;
 	public string getDeathScore() {
-		if (Global.level.gameMode is Elimination || Global.level.gameMode is TeamElimination) return (Global.level.gameMode.playingTo - deaths).ToString();
+		if (Global.level.gameMode is Elimination ||
+			Global.level.gameMode is TeamElimination
+		) {
+			return (Global.level.gameMode.playingTo - deaths).ToString();
+		}
 		return deaths.ToString();
 	}
 	public ushort curMaxNetId;
@@ -309,7 +316,7 @@ public partial class Player {
 	public bool frozenCastlePurchased;
 	public bool speedDevilPurchased;
 
-	// Every time you add an armor, add an "old" version and update DNA Core code appropriately
+	// Note: Every time you add an armor, add an "old" version and update DNA Core code appropriately
 	public ushort armorFlag;
 	public ushort oldArmorFlag;
 	public bool ultimateArmor;
@@ -1542,7 +1549,7 @@ public partial class Player {
 		} else if (isSigma2()) {
 			return true;
 		} else if (isSigma3()) {
-			return limboChar != null && limboChar.canKaiserSpawn(out spawnPoint);
+			return limboChar != null && KaiserSigma.canKaiserSpawn(limboChar, out spawnPoint);
 		}
 
 		return true;

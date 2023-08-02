@@ -229,7 +229,8 @@ public class DevConsole {
             new Command("diagnostics", (args) => Global.showDiagnostics = !Global.showDiagnostics, offlineOnly: false),
 			new Command("clear", (args) => consoleLog.Clear(), offlineOnly: false),
 			new Command("musicend", (args) => setMusicNearEnd()),
-            // GMTODO remove
+            // GMTODO: remove
+			// Gacel: Not. This could be usefull for bug reports with flags.
             new Command("dumpflagdata", (args) => Helpers.WriteToFile("flagDataDump.txt", Global.level.getFlagDataDump()), offlineOnly: false),
 			/*
 			#if DEBUG
