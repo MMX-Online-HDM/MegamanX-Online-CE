@@ -774,9 +774,6 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public override Collider getGlobalCollider() {
-		if (player.isKaiserSigma()) {
-			return getKaiserSigmaGlobalCollider();
-		}
 		var rect = new Rect(0, 0, 18, 34);
 		if (player.isZero) rect.y2 = 40;
 		if (player.isVile) rect.y2 = 43;
@@ -1604,21 +1601,15 @@ public partial class Character : Actor, IDamagable {
 		if (player.isSigma) {
 			if (player.isWolfSigma()) return pos.addxy(0, -7);
 			else if (player.isViralSigma()) return pos.addxy(0, 0);
-			else if (player.isKaiserSigma()) {
-				if (sprite.name.StartsWith("sigma3_kaiser_virus")) return pos.addxy(0, -16);
-				else return pos.addxy(0, -60);
-			}
 			return pos.addxy(0, -32);
 		}
 		return pos.addxy(0, -18);
 	}
 
-	public Point getAimCenterPos() {
+	public virtual Point getAimCenterPos() {
 		if (sprite.name.Contains("_ra_")) {
 			return pos.addxy(0, -10);
 		}
-		if (player.isZero) return pos.addxy(0, -21);
-		if (player.isVile) return pos.addxy(0, -24);
 		if (player.isSigma) {
 			if (player.isKaiserSigma() && !player.isKaiserViralSigma()) {
 				return pos.addxy(13 * xDir, -95);
@@ -2214,14 +2205,6 @@ public partial class Character : Actor, IDamagable {
 			renderDamageText(35);
 		}
 
-		if (player.isMainPlayer && player.isKaiserNonViralSigma() && kaiserHoverTime > 0) {
-			float healthPct = Helpers.clamp01((kaiserMaxHoverTime - kaiserHoverTime) / kaiserMaxHoverTime);
-			float sy = -70;
-			float sx = 0;
-			if (xDir == -1) sx = 90 - sx;
-			drawFuelMeter(healthPct, sx, sy);
-		}
-
 		if (Global.showAIDebug) {
 			float textPosX = pos.x;// (pos.x - Global.level.camX) / Global.viewSize;
 			float textPosY = pos.y - 50;// (pos.y - 50 - Global.level.camY) / Global.viewSize;
@@ -2799,7 +2782,11 @@ public partial class Character : Actor, IDamagable {
 		}
 	}
 
-	public override void destroySelf(string spriteName = null, string fadeSound = null, bool rpc = false, bool doRpcEvenIfNotOwned = false, bool favorDefenderProjDestroy = false) {
+	public override void destroySelf(
+		string spriteName = null, string fadeSound = null,
+		bool rpc = false, bool doRpcEvenIfNotOwned = false,
+		bool favorDefenderProjDestroy = false
+	) {
 		base.destroySelf(spriteName, fadeSound, rpc, doRpcEvenIfNotOwned);
 
 		player.removeOwnedMines();
@@ -2820,8 +2807,6 @@ public partial class Character : Actor, IDamagable {
 		parasiteAnim?.destroySelf();
 		barrierAnim?.destroySelf();
 		sniperMissileProj?.destroySelf();
-		kaiserExhaustL?.destroySelf();
-		kaiserExhaustR?.destroySelf();
 		destroyBusterProjs();
 		setShootRaySplasher(false);
 

@@ -247,7 +247,7 @@ public class MorphMothCocoon : Maverick {
 				return chr.player.alliance != player.alliance || chr.player.health < chr.player.maxHealth;
 			}
 			/*
-			// GMTODO use an "isAtMaxHealth" boolstate
+			// GMTODO: use an "isAtMaxHealth" boolstate
 			else if (t is Maverick mvk)
 			{
 				return mvk.player.alliance != player.alliance || mvk.health < mvk.maxHealth;

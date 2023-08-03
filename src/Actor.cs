@@ -1315,7 +1315,7 @@ public partial class Actor : GameObject {
 		return ((pos.x < other.pos.x && xDir == 1) || (pos.x >= other.pos.x && xDir == -1));
 	}
 
-	// GMTODO must be more generic, account for other alignments
+	// GMTODO: must be more generic, account for other alignments
 	// Then find all places using this and ajust as necessary
 	public virtual Point getCenterPos() {
 		if (standartCollider == null) {
