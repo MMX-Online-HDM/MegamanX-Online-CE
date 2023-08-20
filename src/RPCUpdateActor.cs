@@ -98,7 +98,9 @@ public partial class Actor {
 			int ammo = character.player.weapon == null ? 0 : (int)character.player.weapon.ammo;
 			int charIndex = character.player.charNum;
 			int alliance = character.player.alliance;
-			if (character.player.isZero) ammo = (int)character.player.zeroGigaAttackWeapon.ammo;
+			if (character is Zero zero) {
+				ammo = MathInt.Ceiling(zero.zeroGigaAttackWeapon.ammo);
+			}
 			if (character.player.isVile) ammo = (int)character.player.vileAmmo;
 			if (character.player.isSigma) ammo = (int)character.player.sigmaAmmo;
 			if (character.rideArmor != null) ammo = MathInt.Ceiling(character.rideArmor.health);
@@ -356,8 +358,8 @@ public class RPCUpdateActor : RPC {
 					character.player.changeWeaponFromWi(weaponIndex);
 					character.player.health = health;
 					character.player.maxHealth = maxHealth;
-					if (character.player.isZero) {
-						character.player.zeroGigaAttackWeapon.ammo = ammo;
+					if (character is Zero zero) {
+						zero.zeroGigaAttackWeapon.ammo = ammo;
 					} else if (character.player.isX) {
 						character.player.weapon.ammo = ammo;
 					} else if (character.player.isVile) {

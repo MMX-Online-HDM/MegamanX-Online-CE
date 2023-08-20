@@ -54,6 +54,7 @@ public class FSplasherWeapon : Weapon {
 public class FSplasherState : CharState {
 	public float dashTime = 0;
 	public Projectile fSplasherProj;
+	Zero zero;
 
 	public FSplasherState() : base("dash", "") {
 		enterSound = "fsplasher";
@@ -61,13 +62,17 @@ public class FSplasherState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		zero = character as Zero;
 
 		character.isDashing = true;
 		character.useGravity = false;
 		character.vel = new Point(0, 0);
 		character.dashedInAir++;
 		character.lastAirDashWasSide = true;
-		fSplasherProj = new FSplasherProj(player.zeroAirSpecialWeapon, character.pos, character.xDir, player, player.getNextActorNetId(), sendRpc: true);
+		fSplasherProj = new FSplasherProj(
+			zero.zeroAirSpecialWeapon, character.pos, character.xDir,
+			player, player.getNextActorNetId(), sendRpc: true
+		);
 	}
 
 	public override void onExit(CharState newState) {
@@ -76,7 +81,7 @@ public class FSplasherState : CharState {
 			fSplasherProj.destroySelf();
 			fSplasherProj = null;
 		}
-		character.player.zeroAirSpecialWeapon.shootTime = 1;
+		zero.zeroAirSpecialWeapon.shootTime = 1;
 		base.onExit(newState);
 	}
 
@@ -198,6 +203,7 @@ public class HyorogaStartState : CharState {
 
 public class HyorogaState : CharState {
 	float shootCooldown;
+	Zero zero;
 
 	public HyorogaState() : base("hyoroga", "hyoroga_shoot", "hyoroga_attack") {
 	}
@@ -207,6 +213,8 @@ public class HyorogaState : CharState {
 		character.vel = new Point(0, 0);
 		character.useGravity = false;
 		character.gravityModifier = 0;
+
+		zero = character as Zero;
 	}
 
 	public override void onExit(CharState newState) {
@@ -223,9 +231,18 @@ public class HyorogaState : CharState {
 		if (character.sprite.name == "zero_hyoroga_attack") {
 			if (pois != null && pois.Count > 0 && shootCooldown == 0) {
 				var poi = character.getFirstPOIOrDefault();
-				new HyorogaProj(player.zeroAirSpecialWeapon, poi, new Point(0, 1), player, player.getNextActorNetId(), sendRpc: true);
-				new HyorogaProj(player.zeroAirSpecialWeapon, poi, new Point(0.375f, 1), player, player.getNextActorNetId(), sendRpc: true);
-				new HyorogaProj(player.zeroAirSpecialWeapon, poi, new Point(-0.375f, 1), player, player.getNextActorNetId(), sendRpc: true);
+				new HyorogaProj(
+					zero.zeroAirSpecialWeapon, poi, new Point(0, 1),
+					player, player.getNextActorNetId(), sendRpc: true
+				);
+				new HyorogaProj(
+					zero.zeroAirSpecialWeapon, poi, new Point(0.375f, 1),
+					player, player.getNextActorNetId(), sendRpc: true
+				);
+				new HyorogaProj(
+					zero.zeroAirSpecialWeapon, poi, new Point(-0.375f, 1),
+					player, player.getNextActorNetId(), sendRpc: true
+				);
 				//shootCooldown = 1f;
 			}
 		} else {

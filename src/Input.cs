@@ -160,8 +160,7 @@ public class Input {
 	};
 
 	// TODO: Un-hardcode the input check.
-	private bool checkHadokenHelper(string forwardDir, Player player, string triggerBtn)
-	{
+	private bool checkHadokenHelper(string forwardDir, Player player, string triggerBtn) {
 		int[] command = commandList[0];
 		int time = 30;
 		bool completed = false;

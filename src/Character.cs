@@ -2102,12 +2102,6 @@ public partial class Character : Actor, IDamagable {
 				}
 			}
 
-			if (!drewStatusProgress && !drewSubtankHealing && player.isZero) {
-				if (Options.main.showGigaAttackCooldown && player.zeroGigaAttackWeapon.shootTime > 0) {
-					drawSpinner(Helpers.progress(player.zeroGigaAttackWeapon.shootTime, player.zeroGigaAttackWeapon.rateOfFire));
-				}
-			}
-
 			if (!drewStatusProgress && !drewSubtankHealing && player.isSigma && tagTeamSwapProgress > 0) {
 				float healthBarInnerWidth = 30;
 
@@ -2479,17 +2473,21 @@ public partial class Character : Actor, IDamagable {
 		if (attacker == player && isWhiteAxl()) {
 			damage = 0;
 		}
-		if (Global.level.isRace() && damage != Damager.envKillDamage && damage != Damager.switchKillDamage && attacker != player) {
+		if (Global.level.isRace() &&
+			damage != Damager.envKillDamage &&
+			damage != Damager.switchKillDamage &&
+			attacker != player
+		) {
 			damage = 0;
 		}
 
 		bool isArmorPiercing = Damager.isArmorPiercing(projId);
 
-		if (projId == (int)ProjIds.CrystalHunterDash) {
-			var crystalizedState = charState as Crystalized;
-			if (crystalizedState != null) {
-				if (damage > 0) crystalizedState.crystalizedTime = 0; //Dash to destroy crystal   
-			}
+		if (projId == (int)ProjIds.CrystalHunterDash &&
+			charState is Crystalized crystalizedState &&
+			damage > 0
+		) {
+			crystalizedState.crystalizedTime = 0; //Dash to destroy crystal
 		}
 
 		var inRideArmor = charState as InRideArmor;
@@ -2568,8 +2566,8 @@ public partial class Character : Actor, IDamagable {
 		if (player.health > 0 && damage > 0) {
 			float modifier = player.maxHealth > 0 ? (16 / player.maxHealth) : 1;
 			float gigaAmmoToAdd = 1 + (damage * 2 * modifier);
-			if (player.isZero && ownedByLocalPlayer) {
-				player.zeroGigaAttackWeapon.addAmmo(gigaAmmoToAdd, player);
+			if (this is Zero zero && ownedByLocalPlayer) {
+				zero.zeroGigaAttackWeapon.addAmmo(gigaAmmoToAdd, player);
 			}
 			if (player.isX && ownedByLocalPlayer) {
 				var gigaCrush = player.weapons.FirstOrDefault(w => w is GigaCrush);
@@ -2950,20 +2948,7 @@ public partial class Character : Actor, IDamagable {
 	public override Dictionary<int, Func<Projectile>> getGlobalProjs() {
 		var retProjs = new Dictionary<int, Func<Projectile>>();
 
-		if (player.isZero && isAwakenedZeroBS.getValue() && globalCollider != null) {
-			retProjs[(int)ProjIds.AwakenedAura] = () => {
-				Point centerPoint = globalCollider.shape.getRect().center();
-				float damage = 2;
-				int flinch = 0;
-				if (isAwakenedGenmuZeroBS.getValue()) {
-					damage = 4;
-					flinch = Global.defFlinch;
-				}
-				Projectile proj = new GenericMeleeProj(player.awakenedAuraWeapon, centerPoint, ProjIds.AwakenedAura, player, damage, flinch, 0.5f);
-				proj.globalCollider = globalCollider.clone();
-				return proj;
-			};
-		} else if (canHeadbutt() && getHeadPos() != null) {
+		if (canHeadbutt() && getHeadPos() != null) {
 			retProjs[(int)ProjIds.Headbutt] = () => {
 				Point centerPoint = getHeadPos().Value.addxy(0, -6);
 				float damage = 2;

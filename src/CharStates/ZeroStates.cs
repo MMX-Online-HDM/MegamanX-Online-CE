@@ -7,6 +7,8 @@ public class HyperZeroStart : CharState {
 	public float radius = 200;
 	public float time;
 	Anim drWilyAnim;
+	Zero zero;
+
 	public HyperZeroStart(int type) : base(type == 1 ? "hyper_start2" : "hyper_start", "", "", "") {
 		invincible = true;
 	}
@@ -22,13 +24,13 @@ public class HyperZeroStart : CharState {
 				if (player.isZBusterZero()) {
 					zero.blackZeroTime = 9999;
 					RPC.actorToggle.sendRpc(character.netId, RPCActorToggleType.ActivateBlackZero2);
-				} else if (player.zeroHyperMode == 0) {
+				} else if (zero.zeroHyperMode == 0) {
 					zero.blackZeroTime = zero.maxHyperZeroTime + 1;
 					RPC.setHyperZeroTime.sendRpc(character.player.id, zero.blackZeroTime, 0);
-				} else if (player.zeroHyperMode == 1) {
+				} else if (zero.zeroHyperMode == 1) {
 					zero.awakenedZeroTime = Global.spf;
 					RPC.setHyperZeroTime.sendRpc(character.player.id, zero.awakenedZeroTime, 2);
-				} else if (player.zeroHyperMode == 2) {
+				} else if (zero.zeroHyperMode == 2) {
 					zero.isNightmareZero = true;
 				}
 				character.playSound("ching");
@@ -44,26 +46,36 @@ public class HyperZeroStart : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		if (character is Zero zero && !zero.hyperZeroUsed) {
-			if (player.isZBusterZero()) {
-				character.player.scrap -= 10;
-			} else if (player.zeroHyperMode == 0) {
-				character.player.scrap -= 10;
-			} else if (player.zeroHyperMode == 1) {
-				drWilyAnim = new Anim(character.pos.addxy(30 * character.xDir, -30), "drwily", -character.xDir, player.getNextActorNetId(), false, sendRpc: true);
-				drWilyAnim.fadeIn = true;
-				drWilyAnim.blink = true;
-				character.player.awakenedScrapEnd = (character.player.scrap - 10);
-			} else if (player.zeroHyperMode == 2) {
-				drWilyAnim = new Anim(character.pos.addxy(30 * character.xDir, -30), "gate", -character.xDir, player.getNextActorNetId(), false, sendRpc: true);
-				drWilyAnim.fadeIn = true;
-				drWilyAnim.blink = true;
-				character.player.scrap -= 10;
-			}
-			zero.hyperZeroUsed = true;
-		}
+		zero = character as Zero;
+
 		character.useGravity = false;
 		character.vel = new Point();
+
+		if (zero.hyperZeroUsed) {
+			return;
+		}
+		if (player.isZBusterZero()) {
+			character.player.scrap -= 10;
+		} else if (zero.zeroHyperMode == 0) {
+			character.player.scrap -= 10;
+		} else if (zero.zeroHyperMode == 1) {
+			drWilyAnim = new Anim(
+				character.pos.addxy(30 * character.xDir, -30), "drwily", -character.xDir,
+				player.getNextActorNetId(), false, sendRpc: true
+			);
+			drWilyAnim.fadeIn = true;
+			drWilyAnim.blink = true;
+			character.player.awakenedScrapEnd = (character.player.scrap - 10);
+		} else if (zero.zeroHyperMode == 2) {
+			drWilyAnim = new Anim(
+				character.pos.addxy(30 * character.xDir, -30), "gate", -character.xDir,
+				player.getNextActorNetId(), false, sendRpc: true
+			);
+			drWilyAnim.fadeIn = true;
+			drWilyAnim.blink = true;
+			character.player.scrap -= 10;
+		}
+		zero.hyperZeroUsed = true;
 	}
 
 	public override void onExit(CharState newState) {

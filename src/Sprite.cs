@@ -178,7 +178,6 @@ public class Sprite {
 				}
 			}
 			this.frames.Add(frame);
-
 		}
 	}
 

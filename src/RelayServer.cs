@@ -95,7 +95,11 @@ public class RelayServer {
 		server.Start();
 
 		while (true) {
-			Helpers.tryWrap(iteration, true);
+			try {
+				iteration();
+			} catch (Exception exception) {
+				Console.WriteLine(exception.Message);
+			}
 		}
 	}
 

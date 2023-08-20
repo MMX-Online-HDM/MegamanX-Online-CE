@@ -1223,9 +1223,10 @@ public class GameMode {
 			return;
 		}
 
+		// TODO: Add limbochar checks
 		Weapon weapon = player.weapon;
-		if (player.isZero && !player.isZBusterZero()) {
-			weapon = player.zeroGigaAttackWeapon;
+		if (player.isZero && player.character is Zero zero && !player.isZBusterZero()) {
+			weapon = zero.zeroGigaAttackWeapon;
 		}
 
 		if (shouldDrawWeaponAmmo(player, weapon)) {

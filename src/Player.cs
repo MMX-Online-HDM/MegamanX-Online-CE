@@ -1142,8 +1142,6 @@ public partial class Player {
 		weapons.Add(new UndisguiseWeapon());
 		weaponSlot = 0;
 
-		zeroGigaAttackWeapon.ammo = dnaCore.rakuhouhaAmmo;
-		zeroDarkHoldWeapon.ammo = dnaCore.rakuhouhaAmmo;
 		sigmaAmmo = dnaCore.rakuhouhaAmmo;
 
 		bool isVileMK2 = charNum == 2 && dnaCore.hyperMode == DNACoreHyperMode.VileMK2;
@@ -1171,7 +1169,6 @@ public partial class Player {
 			if (isVileMK5) vile.vileForm = 2;
 			else if (isVileMK2) vile.vileForm = 1;
 		}
-
 		retChar.addTransformAnim();
 
 		if (isAI) {
@@ -1191,7 +1188,10 @@ public partial class Player {
 		}
 
 		if (character is Zero zero) {
-		 	if (dnaCore.hyperMode == DNACoreHyperMode.BlackZero) {
+			zero.zeroGigaAttackWeapon.ammo = dnaCore.rakuhouhaAmmo;
+			zero.zeroDarkHoldWeapon.ammo = dnaCore.rakuhouhaAmmo;
+
+			if (dnaCore.hyperMode == DNACoreHyperMode.BlackZero) {
 				zero.blackZeroTime = zero.maxHyperZeroTime;
 				RPC.playerToggle.sendRpc(id, RPCToggleType.SetBlackZero);
 			} else if (dnaCore.hyperMode == DNACoreHyperMode.AwakenedZero) {
@@ -1218,9 +1218,9 @@ public partial class Player {
 
 			if (character is Zero zero) {
 				if (zero.isNightmareZero) {
-					lastDNACore.rakuhouhaAmmo = zeroDarkHoldWeapon.ammo;
+					lastDNACore.rakuhouhaAmmo = zero.zeroDarkHoldWeapon.ammo;
 				} else {
-					lastDNACore.rakuhouhaAmmo = zeroGigaAttackWeapon.ammo;
+					lastDNACore.rakuhouhaAmmo = zero.zeroGigaAttackWeapon.ammo;
 				}
 			}
 			else if (isSigma) {
@@ -1264,9 +1264,9 @@ public partial class Player {
 
 			if (character is Zero zero) {
 				if (zero.isNightmareZero) {
-					lastDNACore.rakuhouhaAmmo = zeroDarkHoldWeapon.ammo;
+					lastDNACore.rakuhouhaAmmo = zero.zeroDarkHoldWeapon.ammo;
 				} else {
-					lastDNACore.rakuhouhaAmmo = zeroGigaAttackWeapon.ammo;
+					lastDNACore.rakuhouhaAmmo = zero.zeroGigaAttackWeapon.ammo;
 				}
 			}
 			else if (isSigma) {

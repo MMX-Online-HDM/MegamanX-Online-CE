@@ -113,16 +113,15 @@ public class SuiretsusenWeapon : Weapon {
 
 public class SuiretsusanState : CharState {
 	public bool isAlt;
+	public Zero zero;
+
 	public SuiretsusanState(bool isAlt) : base("spear", "") {
 		this.isAlt = isAlt;
 	}
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
+		zero = character as Zero;
 	}
 
 	public override void update() {
@@ -136,7 +135,7 @@ public class SuiretsusanState : CharState {
 		var pois = character.sprite.getCurrentFrame().POIs;
 		if (pois != null && pois.Count > 0 && !once) {
 			once = true;
-			new SuiretsusenProj(player.raijingekiWeapon, character.getFirstPOIOrDefault(), character.xDir, player, player.getNextActorNetId(), sendRpc: true);
+			new SuiretsusenProj(zero.raijingekiWeapon, character.getFirstPOIOrDefault(), character.xDir, player, player.getNextActorNetId(), sendRpc: true);
 			character.playSound("spear", sendRpc: true);
 		}
 
@@ -196,6 +195,7 @@ public class TBreakerState : CharState {
 	public float dashTime = 0;
 	public Projectile fSplasherProj;
 	public bool isAlt;
+	public Zero zero;
 
 	public TBreakerState(bool isAlt) : base("tbreaker", "") {
 		this.isAlt = isAlt;
@@ -203,6 +203,7 @@ public class TBreakerState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		zero = character as Zero;
 	}
 
 	public override void onExit(CharState newState) {
@@ -225,7 +226,10 @@ public class TBreakerState : CharState {
 			Shape shape = rect.getShape();
 			var hit = Global.level.checkCollisionShape(shape, null);
 			if (hit != null && hit.gameObject is Wall) {
-				new TBreakerProj(player.raijingekiWeapon, poi, character.xDir, player, player.getNextActorNetId(), sendRpc: true);
+				new TBreakerProj(
+					zero.raijingekiWeapon, poi, character.xDir,
+					player, player.getNextActorNetId(), sendRpc: true
+				);
 			}
 		}
 

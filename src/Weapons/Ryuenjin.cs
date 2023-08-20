@@ -77,6 +77,7 @@ public class Ryuenjin : CharState {
 	public bool isHeld = true;
 	public float holdTime;
 	public RyuenjinType type { get { return (RyuenjinType)weapon.type; } }
+	public Zero zero;
 
 	public Ryuenjin(Weapon weapon, bool isUnderwater) : base(getSprite(weapon.type, isUnderwater), "", "") {
 		this.weapon = weapon;
@@ -144,11 +145,11 @@ public class Ryuenjin : CharState {
 
 		if (canDownSpecial()) {
 			if (player.input.isPressed(Control.Shoot, player) && player.input.isHeld(Control.Down, player)) {
-				if (!player.hasKnuckle()) character.changeState(new Hyouretsuzan(player.zeroDownThrustWeaponA), true);
+				if (!player.hasKnuckle()) character.changeState(new Hyouretsuzan(zero.zeroDownThrustWeaponA), true);
 				else character.changeState(new DropKickState(), true);
 				return;
 			} else if (player.input.isPressed(Control.Special1, player) && player.input.isHeld(Control.Down, player)) {
-				if (!player.hasKnuckle()) character.changeState(new Hyouretsuzan(player.zeroDownThrustWeaponS), true);
+				if (!player.hasKnuckle()) character.changeState(new Hyouretsuzan(zero.zeroDownThrustWeaponS), true);
 				else character.changeState(new DropKickState(), true);
 				return;
 			}
@@ -174,6 +175,7 @@ public class Ryuenjin : CharState {
 		if (!character.grounded) {
 			character.sprite.frameIndex = 3;
 		}
+		zero = character as Zero;
 	}
 
 	public override void onExit(CharState newState) {

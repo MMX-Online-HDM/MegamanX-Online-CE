@@ -26,9 +26,10 @@ class Program {
 	#endif
 	static void Main(string[] args) {
 		if (args.Length > 0 && args.Any(arg => arg == "-server")) {
-			#if WINDOWS
+			/*#if WINDOWS
 				AllocConsole();
 			#endif
+			*/
 			RelayServer.ServerMain(args);
 		} else {
 			GameMain(args);
