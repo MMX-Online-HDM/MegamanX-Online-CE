@@ -45,6 +45,8 @@ public partial class Player {
 		}
 	}
 
+	public Weapon lastHudWeapon = null;
+
 	public AxlWeapon axlWeapon {
 		get {
 			return weapon as AxlWeapon;

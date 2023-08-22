@@ -25,7 +25,10 @@ public class GameMode {
 	public const string TeamElimination = "team elimination";
 	public const string KingOfTheHill = "king of the hill";
 	public const string Race = "race";
-	public static List<string> allGameModes = new List<string>() { Deathmatch, TeamDeathmatch, CTF, KingOfTheHill, ControlPoint, Elimination, TeamElimination };
+	public static List<string> allGameModes = new List<string>() {
+		Deathmatch, TeamDeathmatch, CTF, KingOfTheHill,
+		ControlPoint, Elimination, TeamElimination
+	};
 
 	public static bool isStringTeamMode(string selectedGameMode) {
 		if (selectedGameMode == CTF || selectedGameMode == TeamDeathmatch || selectedGameMode == ControlPoint || selectedGameMode == TeamElimination || selectedGameMode == KingOfTheHill) {
@@ -1223,10 +1226,14 @@ public class GameMode {
 			return;
 		}
 
-		// TODO: Add limbochar checks
-		Weapon weapon = player.weapon;
-		if (player.isZero && player.character is Zero zero && !player.isZBusterZero()) {
-			weapon = zero.zeroGigaAttackWeapon;
+		// This runs once per character.
+		Weapon weapon = player.lastHudWeapon;
+		if (player.character != null) {
+			weapon = player.weapon;
+			if (player.character is Zero zero && !player.isZBusterZero()) {
+				weapon = zero.zeroGigaAttackWeapon;
+			}
+			player.lastHudWeapon = weapon;
 		}
 
 		if (shouldDrawWeaponAmmo(player, weapon)) {
