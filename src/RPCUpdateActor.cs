@@ -126,9 +126,12 @@ public partial class Actor {
 			}
 
 			if (charMask[2]) {
-				byte axlArmAngle = Helpers.angleToByte(character.netArmAngle);
+				Axl axl = character as Axl;
+				byte axlArmAngle = Helpers.angleToByte(axl.netArmAngle);
 				args.Add(axlArmAngle);
-				byte[] netAxlArmSpriteIndexBytes = BitConverter.GetBytes((ushort)Global.spriteNames.IndexOf(character.getAxlArmSpriteName()));
+				byte[] netAxlArmSpriteIndexBytes = BitConverter.GetBytes(
+					(ushort)Global.spriteNames.IndexOf(axl.getAxlArmSpriteName())
+				);
 				args.AddRange(netAxlArmSpriteIndexBytes);
 				args.Add((byte)character.player.axlBulletType);
 			}
@@ -372,7 +375,7 @@ public class RPCUpdateActor : RPC {
 					character.netCharState1 = (byte)netCharState1;
 					character.netCharState2 = (byte)netCharState2;
 
-					// x section
+					// X section
 					if (charMaskBools[0]) {
 						byte armorByte = arguments[i++];
 						byte armorByte2 = arguments[i++];
@@ -380,22 +383,25 @@ public class RPCUpdateActor : RPC {
 						character.player.armorFlag = BitConverter.ToUInt16(new byte[] { armorByte, armorByte2 });
 					}
 
-					// vile section
+					// Vile section
 					if (charMaskBools[1]) {
 						byte cannonByte = arguments[i++];
 						Vile vile = character as Vile;
 						vile.cannonAimNum = cannonByte;
 					}
 
-					// axl section
+					// Axl section
 					if (charMaskBools[2]) {
+						Axl axl = character as Axl;
 						int axlArmAngle = arguments[i++];
-						character.netArmAngle = axlArmAngle * 2;
+						axl.netArmAngle = axlArmAngle * 2;
 						byte netAxlArmSpriteIndexByte = arguments[i++];
 						byte netAxlArmSpriteIndexByte2 = arguments[i++];
-						character.netAxlArmSpriteIndex = BitConverter.ToUInt16(new byte[] { netAxlArmSpriteIndexByte, netAxlArmSpriteIndexByte2 });
+						axl.netAxlArmSpriteIndex = BitConverter.ToUInt16(new byte[] {
+							netAxlArmSpriteIndexByte, netAxlArmSpriteIndexByte2
+						});
 						int axlBulletType = arguments[i++];
-						character.player.axlBulletType = axlBulletType;
+						axl.player.axlBulletType = axlBulletType;
 					}
 
 					// acid section

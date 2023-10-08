@@ -50,6 +50,9 @@ public class RayGun : AxlWeapon {
 	}
 
 	public override void axlGetProjectile(Weapon weapon, Point bulletPos, int xDir, Player player, float angle, IDamagable target, Character headshotTarget, Point cursorPos, int chargeLevel, ushort netId) {
+		if (player.character is not Axl axl) {
+			return;
+		}
 		Point bulletDir = Point.createFromAngle(angle);
 		Projectile bullet = null;
 		if (chargeLevel < 3) {
@@ -63,13 +66,13 @@ public class RayGun : AxlWeapon {
 				}
 				return;
 			} else {
-				if (player.character.rayGunAltProj == null) {
-					player.character.rayGunAltProj = new RayGunAltProj(weapon, bulletPos, cursorPos, 1, player, netId);
+				if (axl.rayGunAltProj == null) {
+					axl.rayGunAltProj = new RayGunAltProj(weapon, bulletPos, cursorPos, 1, player, netId);
 				} else {
-					netId = player.character.rayGunAltProj.netId.Value;
+					netId = axl.rayGunAltProj.netId.Value;
 				}
-				bullet = player.character.rayGunAltProj;
-				laserChargeLevel = player.character.rayGunAltProj.getChargeLevel();
+				bullet = axl.rayGunAltProj;
+				laserChargeLevel = axl.rayGunAltProj.getChargeLevel();
 			}
 		}
 
@@ -87,7 +90,7 @@ public class RayGunProj : Projectile {
 	public RayGunProj(Weapon weapon, Point pos, int xDir, Player player, Point bulletDir, ushort netProjId) :
 		base(weapon, pos, xDir, 400, 1, player, "axl_raygun_laser", 0, 0f, netProjId, player.ownedByLocalPlayer) {
 		reflectable = true;
-		if (player?.character?.isWhiteAxl() == true) {
+		if ((player?.character as Axl)?.isWhiteAxl() == true) {
 			speed = 525;
 			damager.hitCooldown = 0;
 			maxTime *= 1.5f;
@@ -176,6 +179,8 @@ public class RayGunAltProj : Projectile {
 	float soundCooldown;
 	float chargeTime;
 	float chargeDecreaseCooldown;
+	Axl axl;
+	
 	public RayGunAltProj(Weapon weapon, Point pos, Point cursorPos, int xDir, Player player, ushort netProjId) :
 		base(weapon, pos, xDir, 0, 1, player, "axl_raygun_laser", 0, 0.33f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.RayGun2;
@@ -186,14 +191,16 @@ public class RayGunAltProj : Projectile {
 		netcodeOverride = NetcodeModel.FavorAttacker;
 		angle = 0;
 
-		if (player.character != null) {
-			if (player.character.isWhiteAxl()) {
+		axl = (player.character as Axl);
+
+		if (axl != null) {
+			if (axl.isWhiteAxl()) {
 				damager.damage = 4;
 				damager.hitCooldown = 0.125f;
 			}
 		}
-		if (!ownedByLocalPlayer) {
-			player.character.nonOwnerAxlBulletPos = pos;
+		if (!ownedByLocalPlayer && axl != null) {
+			axl.nonOwnerAxlBulletPos = pos;
 		}
 	}
 
@@ -203,7 +210,7 @@ public class RayGunAltProj : Projectile {
 			else return 1;
 		}
 
-		if (player.character?.isWhiteAxl() == true) {
+		if (axl?.isWhiteAxl() == true) {
 			return 1;
 		}
 		if (chargeTime >= 1.5f && chargeTime < 3f) return 1;
@@ -238,10 +245,11 @@ public class RayGunAltProj : Projectile {
 			chr?.playSound(laserSound);
 		}
 
-		if (!ownedByLocalPlayer) return;
+		if (!ownedByLocalPlayer) { return; }
+		if (axl == null) { return; }
 
-		Point bulletPos = chr.getAxlBulletPos();
-		Point destPos = chr.getAxlHitscanPoint(range);
+		Point bulletPos = axl.getAxlBulletPos();
+		Point destPos = axl.getAxlHitscanPoint(range);
 		var hits = Global.level.raycastAll(bulletPos, destPos, new List<Type>() { typeof(Actor), typeof(Wall) }, isChargeBeam: true);
 
 		CollideData closestHit = null;
@@ -302,7 +310,7 @@ public class RayGunAltProj : Projectile {
 	}
 
 	public override void render(float x, float y) {
-		if (player?.character == null) {
+		if (axl == null) {
 			return;
 		}
 
@@ -320,9 +328,9 @@ public class RayGunAltProj : Projectile {
 
 		Point origin;
 		if (ownedByLocalPlayer) {
-			origin = player.character.getAxlBulletPos();
+			origin = axl.getAxlBulletPos();
 		} else {
-			origin = player.character.nonOwnerAxlBulletPos;
+			origin = axl.nonOwnerAxlBulletPos;
 		}
 
 		int chargeFactor = 0;

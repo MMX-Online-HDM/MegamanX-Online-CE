@@ -27,7 +27,8 @@ public class AssassinBullet : AxlWeapon {
 
 	public override void axlGetProjectile(Weapon weapon, Point bulletPos, int xDir, Player player, float angle, IDamagable target, Character headshotTarget, Point cursorPos, int chargeLevel, ushort netId) {
 		if (player.assassinHitPos == null) {
-			player.assassinHitPos = player.character.getFirstHitPos(AssassinBulletProj.range);
+			// URGENT TODO
+			// player.assassinHitPos = player.character.getFirstHitPos(AssassinBulletProj.range);
 		}
 		var bullet = new AssassinBulletProj(weapon, bulletPos, player.assassinHitPos.hitPos, xDir, player, target, headshotTarget, netId);
 		bullet.applyDamage(player.assassinHitPos.hitGos.ElementAtOrDefault(0), player.assassinHitPos.isHeadshot);

@@ -419,35 +419,51 @@ public class Input {
 	}
 
 	public bool isAimingBackwards(Player player) {
-		if (player.character?.aimBackwardsToggle == true) return true;
+		if (player.character is not Axl axl) {
+			return false;
+		}
+		if (axl.aimBackwardsToggle == true) {
+			return true;
+		}
 		return Options.main.aimKeyFunction == 0 && isHeld(Control.AxlAimBackwards, player);
 	}
 
 	public bool isPositionLocked(Player player) {
-		if (player.character?.positionLockToggle == true) return true;
+		if (player.character is not Axl axl) {
+			return false;
+		}
+		if (axl.positionLockToggle == true) {
+			return true;
+		}
 		return Options.main.aimKeyFunction == 1 && isHeld(Control.AxlAimBackwards, player);
 	}
 
 	public bool isCursorLocked(Player player) {
-		if (player.character?.cursorLockToggle == true) return true;
+		if (player.character is not Axl axl) {
+			return false;
+		}
+		if (axl.cursorLockToggle == true) {
+			return true;
+		}
 		return Options.main.aimKeyFunction == 2 && isHeld(Control.AxlAimBackwards, player);
 	}
 
 	public void updateAimToggle(Player player) {
-		if (player.character == null) return;
+		if (!player.ownedByLocalPlayer) return;
+		if (player.character is not Axl axl) return;
 
 		if (!Options.main.aimKeyToggle || Options.main.axlAimMode == 2) {
-			player.character.resetToggle();
+			axl.resetToggle();
 			return;
 		}
 
 		if (isPressed(Control.AxlAimBackwards, player)) {
 			if (Options.main.aimKeyFunction == 0) {
-				player.character.aimBackwardsToggle = !player.character.aimBackwardsToggle;
+				axl.aimBackwardsToggle = !axl.aimBackwardsToggle;
 			} else if (Options.main.aimKeyFunction == 1) {
-				player.character.positionLockToggle = !player.character.positionLockToggle;
+				axl.positionLockToggle = !axl.positionLockToggle;
 			} else if (Options.main.aimKeyFunction == 2) {
-				player.character.cursorLockToggle = !player.character.cursorLockToggle;
+				axl.cursorLockToggle = !axl.cursorLockToggle;
 			}
 		}
 	}

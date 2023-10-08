@@ -270,14 +270,14 @@ public partial class Player {
 			}
 		}
 
-		if (isAxl) {
+		if (character is Axl axl) {
 			if (oldWeapon is AxlWeapon aw) {
-				character.axlSwapTime = character.switchTime;
-				character.axlAltSwapTime = character.altSwitchTime;
+				axl.axlSwapTime = axl.switchTime;
+				axl.axlAltSwapTime = axl.altSwitchTime;
 			}
 
-			if (character.isZooming()) {
-				character.zoomOut();
+			if (axl.isZooming()) {
+				axl.zoomOut();
 			}
 		}
 	}

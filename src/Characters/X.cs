@@ -268,7 +268,11 @@ public partial class Character {
 		}
 
 		if (charState.canShoot()) {
-			bool specialBusterOnBuster = Buster.isNormalBuster(player.weapon) && player.input.isPressed(Control.Special1, player) && canShootSpecialBusterOnBuster();
+			bool specialBusterOnBuster = (
+				Buster.isNormalBuster(player.weapon) &&
+				player.input.isPressed(Control.Special1, player) &&
+				canShootSpecialBusterOnBuster()
+			);
 			var shootPressed = player.input.isPressed(Control.Shoot, player) || specialBusterOnBuster;
 			if (shootPressed) {
 				lastShotWasSpecialBuster = false;

@@ -674,7 +674,7 @@ public class Helpers {
 	}
 
 	public static void debugLog(string message) {
-		if (Global.debug) {
+		if (Global.debug || Global.consoleDebugLogging) {
 			Console.WriteLine(message);
 		}
 	}

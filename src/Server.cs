@@ -563,7 +563,7 @@ public class Server {
 					}
 					RPC.hostPromotion.sendFromServer(s_server, new byte[] { (byte)host.id });
 
-					//Remove all bots if host leaves, to prevent a class of unmaintainable bugs
+					// Remove all bots if host leaves, to prevent a class of unmaintainable bugs
 					foreach (var player in players.ToList()) {
 						if (player.isBot) {
 							players.Remove(player);

@@ -743,8 +743,12 @@ public class HostMenu : IMainMenu {
 
 		var response = Global.matchmakingQuerier.createServer(serverData);
 		if (response.server != null) {
-			var inputServerPlayer = new ServerPlayer(playerName, -1, true, charNum, hostTeam, Global.deviceId, null, serverData.region.getPing());
-			Global.serverClient = ServerClient.Create(serverData.region.ip, serverData.name, response.server.port, inputServerPlayer, out JoinServerResponse joinServerResponse, out string error);
+			var inputServerPlayer = new ServerPlayer(
+				playerName, -1, true, charNum, hostTeam, Global.deviceId, null, serverData.region.getPing()
+				);
+			Global.serverClient = ServerClient.Create(
+				serverData.region.ip, serverData.name, response.server.port, inputServerPlayer, out JoinServerResponse joinServerResponse, out string error
+			);
 			if (Global.serverClient == null) {
 				Menu.change(new ErrorMenu(new string[] { error, "Please try recreating match." }, new HostMenu(new MainMenu(), null, false, serverData.isLAN)));
 				return;

@@ -191,7 +191,9 @@ class Program {
 			}
 
 			var clearColor = Color.Black;
-			if (Global.level?.levelData?.bgColor != null) clearColor = Global.level.levelData.bgColor;
+			if (Global.level?.levelData?.bgColor != null) {
+				clearColor = Global.level.levelData.bgColor;
+			}
 			window.Clear(clearColor);
 
 			long prevPackets = 0;
@@ -324,7 +326,7 @@ class Program {
 					Global.cheats();
 				}
 				if (Options.main.isDeveloperConsoleEnabled() && Menu.chatMenu != null) {
-					if (Global.input.isPressed(Key.F12)) {
+					if (Global.input.isPressed(Key.F11)) {
 						DevConsole.toggleShow();
 					}
 				}

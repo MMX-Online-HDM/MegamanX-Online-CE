@@ -296,7 +296,9 @@ public class JoinMenu : IMainMenu {
 		string playerName = Options.main.playerName;
 
 		var inputServerPlayer = new ServerPlayer(playerName, -1, false, SelectCharacterMenu.playerData.charNum, null, Global.deviceId, null, serverToJoin.region.getPing());
-		Global.serverClient = ServerClient.Create(serverToJoin.region.ip, serverToJoin.name, serverToJoin.port, inputServerPlayer, out JoinServerResponse joinServerResponse, out string error);
+		Global.serverClient = ServerClient.Create(
+			serverToJoin.region.ip, serverToJoin.name, serverToJoin.port, inputServerPlayer, out JoinServerResponse joinServerResponse, out string error
+		);
 		if (Global.serverClient == null) {
 			Menu.change(new ErrorMenu(new string[] { error, "Please try rejoining." }, new JoinMenu(serverToJoin.isLAN)));
 			return;

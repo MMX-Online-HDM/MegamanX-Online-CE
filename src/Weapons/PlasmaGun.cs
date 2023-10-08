@@ -65,7 +65,7 @@ public class PlasmaGun : AxlWeapon {
 }
 
 public class PlasmaGunProj : Projectile {
-	Player player;
+	Axl axl;
 	float dist;
 	public PlasmaGunProj(Weapon weapon, Point pos, int xDir, Player player, Point bulletDir, ushort netProjId, bool sendRpc = false) :
 		base(weapon, pos, 1, 600, 3, player, "plasmagun_proj", Global.defFlinch, 0.25f, netProjId, player.ownedByLocalPlayer) {
@@ -74,7 +74,7 @@ public class PlasmaGunProj : Projectile {
 		shouldVortexSuck = false;
 		destroyOnHit = false;
 		maxTime = 0.125f;
-		this.player = player;
+		axl = (player.character as Axl);
 
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
@@ -84,10 +84,9 @@ public class PlasmaGunProj : Projectile {
 	public override void update() {
 		base.update();
 		if (!ownedByLocalPlayer) return;
-		if (player.character == null) return;
+		if (axl == null) return;
 		dist += speed * Global.spf;
-		Character c = player.character;
-		Point newPos = c.getAxlBulletPos().add(c.getAxlBulletDir().times(dist));
+		Point newPos = axl.getAxlBulletPos().add(axl.getAxlBulletDir().times(dist));
 		changePos(newPos);
 	}
 }
@@ -101,16 +100,17 @@ public class PlasmaGunAltProj : Projectile {
 	public PlasmaGunAltProj(Weapon weapon, Point pos, Point cursorPos, int xDir, Player player, ushort netProjId, bool sendRpc = false) :
 		base(weapon, pos, xDir, 0, 1, player, "plasmagun_alt_proj", 1, 0.25f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.PlasmaGun2;
-		if (player.character?.isWhiteAxl() == true) {
-			projId = (int)ProjIds.PlasmaGun2Hyper;
-		}
+		
 		destroyOnHit = false;
 		shouldVortexSuck = false;
 		shouldShieldBlock = false;
 		this.player = player;
 
-		if (player.character != null) {
-			player.character.nonOwnerAxlBulletPos = pos;
+		if (player.character is Axl axl && player.character != null) {
+			axl.nonOwnerAxlBulletPos = pos;
+			if (axl.isWhiteAxl() == true) {
+				projId = (int)ProjIds.PlasmaGun2Hyper;
+			}
 		}
 
 		if (sendRpc) {
@@ -129,14 +129,14 @@ public class PlasmaGunAltProj : Projectile {
 
 		if (!ownedByLocalPlayer) return;
 
-		Character chr = player?.character;
-		if (chr == null || chr.destroyed == true) {
+		Axl axl = player?.character as Axl;
+		if (axl == null || axl.destroyed == true) {
 			destroySelf();
 			return;
 		}
 
-		Point bulletDir = chr.getAxlBulletDir();
-		Point bulletPos = chr.getAxlBulletPos();
+		Point bulletDir = axl.getAxlBulletDir();
+		Point bulletPos = axl.getAxlBulletPos();
 		float closestAngle = float.MaxValue;
 		Character closestEnemy = null;
 		foreach (var player in Global.level.players) {
@@ -156,7 +156,7 @@ public class PlasmaGunAltProj : Projectile {
 		}
 
 		if (closestEnemy == null) {
-			Point destPos = chr.getAxlHitscanPoint(range);
+			Point destPos = axl.getAxlHitscanPoint(range);
 			var hits = Global.level.raycastAll(bulletPos, destPos, new List<Type>() { typeof(Actor), typeof(Wall) });
 
 			CollideData closestHit = null;
@@ -201,7 +201,14 @@ public class PlasmaGunAltProj : Projectile {
 	public List<Point> getNodes() {
 		List<Point> nodes = new List<Point>();
 		int nodeCount = 8;
-		Point origin = ownedByLocalPlayer ? player.character.getAxlBulletPos() : player.character.nonOwnerAxlBulletPos;
+		Point origin = player.character.getCenterPos();
+		if (player.character is Axl axl) {
+			if (ownedByLocalPlayer) {
+				origin = axl.getAxlBulletPos();
+			} else {
+				origin = axl.nonOwnerAxlBulletPos;
+			}
+		}
 		Point dirTo = origin.directionTo(pos).normalize();
 		float len = origin.distanceTo(pos);
 		Point lastNode = origin;
@@ -252,7 +259,7 @@ public class VoltTornadoProj : Projectile {
 		base(weapon, pos, xDir, 0, 1, player, "volt_tornado_proj", 1, 0.25f, netProjId, player.ownedByLocalPlayer) {
 		fadeSprite = "volt_tornado_fade";
 		projId = (int)ProjIds.VoltTornado;
-		if (player.character?.isWhiteAxl() == true) {
+		if ((player.character as Axl)?.isWhiteAxl() == true) {
 			projId = (int)ProjIds.VoltTornadoHyper;
 		}
 		shouldShieldBlock = false;

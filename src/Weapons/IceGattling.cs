@@ -28,14 +28,17 @@ public class IceGattling : AxlWeapon {
 	}
 
 	public override void axlGetProjectile(Weapon weapon, Point bulletPos, int xDir, Player player, float angle, IDamagable target, Character headshotTarget, Point cursorPos, int chargeLevel, ushort netId) {
-		if (!player.ownedByLocalPlayer) return;
+		if (!player.ownedByLocalPlayer) { return; }
+		if (player.character is not Axl axl) {
+			return;
+		}
 		Point bulletDir = Point.createFromAngle(angle);
 		Projectile bullet = null;
 		if (chargeLevel == 0) {
 			bullet = new IceGattlingProj(weapon, bulletPos, xDir, player, bulletDir, netId);
 			RPC.axlShoot.sendRpc(player.id, bullet.projId, netId, bulletPos, xDir, angle);
 		} else if (chargeLevel == 3) {
-			player.character.gaeaShield = new GaeaShieldProj(weapon, bulletPos, xDir, player, netId, rpc: true);
+			axl.gaeaShield = new GaeaShieldProj(weapon, bulletPos, xDir, player, netId, rpc: true);
 			RPC.playSound.sendRpc(shootSounds[3], player.character?.netId);
 		}
 	}
@@ -53,7 +56,7 @@ public class IceGattlingProj : Projectile {
 		projId = (int)ProjIds.IceGattling;
 		fadeSprite = "icegattling_proj_fade";
 		updateAngle();
-		if (player.character?.isWhiteAxl() == true) {
+		if ((player.character as Axl)?.isWhiteAxl() == true) {
 			projId = (int)ProjIds.IceGattlingHyper;
 		}
 	}
@@ -90,11 +93,13 @@ public class IceGattlingProj : Projectile {
 
 
 public class GaeaShieldProj : Projectile {
-	public Character character;
+	public Axl axl;
 	public GaeaShieldProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, 1, 0, 0, player, "gaea_shield_proj", 0, 1, netProjId, player.ownedByLocalPlayer) {
 		maxTime = 10;
-		if (player.character?.isWhiteAxl() == true) {
+		axl = (player.character as Axl);
+		
+		if (axl?.isWhiteAxl() == true) {
 			maxTime = 10;
 		}
 		fadeSound = "explosion";
@@ -103,7 +108,6 @@ public class GaeaShieldProj : Projectile {
 		projId = (int)ProjIds.GaeaShield;
 		destroyOnHit = false;
 		shouldVortexSuck = false;
-		character = player.character;
 		isReflectShield = true;
 		isShield = true;
 		shouldShieldBlock = false;
@@ -116,28 +120,32 @@ public class GaeaShieldProj : Projectile {
 		base.update();
 		if (!ownedByLocalPlayer) return;
 
-		if (character == null || character.destroyed) {
+		if (axl == null || axl.destroyed) {
 			destroySelf();
 			return;
 		}
 
-		if (character.player.input.isPressed(Control.Special1, character.player)) {
+		if (axl.player.input.isPressed(Control.Special1, axl.player)) {
 			destroySelf();
 		}
 	}
 
 	public override void postUpdate() {
 		base.postUpdate();
-		if (!ownedByLocalPlayer) return;
-		if (destroyed) return;
+		if (!ownedByLocalPlayer ||
+			destroyed || 
+			axl == null
+		) {
+			return;
+		}
 
-		Point bulletPos = character.getAxlBulletPos(1);
-		angle = character.getShootAngle(true);
+		Point bulletPos = axl.getAxlBulletPos(1);
+		angle = axl.getShootAngle(true);
 		changePos(bulletPos);
 	}
 
 	public override void onDestroy() {
 		base.onDestroy();
-		character.gaeaShield = null;
+		axl.gaeaShield = null;
 	}
 }

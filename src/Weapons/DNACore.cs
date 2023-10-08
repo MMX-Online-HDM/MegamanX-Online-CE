@@ -72,7 +72,7 @@ public class DNACore : AxlWeapon {
 			if (character.sprite.name.Contains("vilemk2")) hyperMode = DNACoreHyperMode.VileMK2;
 			else if (character.sprite.name.Contains("vilemk5")) hyperMode = DNACoreHyperMode.VileMK5;
 			else if (character is Zero zero && zero.isBlackZero()) hyperMode = DNACoreHyperMode.BlackZero;
-			else if (character.isWhiteAxl()) hyperMode = DNACoreHyperMode.WhiteAxl;
+			else if (character is Axl axl && axl.isWhiteAxl()) hyperMode = DNACoreHyperMode.WhiteAxl;
 			else if (character.isAwakenedZeroBS.getValue()) hyperMode = DNACoreHyperMode.AwakenedZero;
 			else if (character.isNightmareZeroBS.getValue()) hyperMode = DNACoreHyperMode.NightmareZero;
 		}

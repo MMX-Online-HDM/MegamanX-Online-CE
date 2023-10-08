@@ -95,11 +95,7 @@ public class RelayServer {
 		server.Start();
 
 		while (true) {
-			try {
-				iteration();
-			} catch (Exception exception) {
-				Console.WriteLine(exception.Message);
-			}
+			iteration();
 		}
 	}
 
@@ -110,8 +106,13 @@ public class RelayServer {
 			client.ReceiveTimeout = 5000;
 			client.SendTimeout = 5000;
 
-			string message = client.ReadStringMessage(networkStream);
-
+			string message = "";
+			try	{
+				message = client.ReadStringMessage(networkStream);
+			} catch {
+				client.Close();
+				return;
+			}
 			Helpers.debugLog("Client sent data message: " + message);
 
 			if (message.StartsWith("CheckBan:")) {

@@ -103,9 +103,6 @@ public class CharState {
 		if (string.IsNullOrEmpty(newState?.shootSprite)) {
 			character.setShootRaySplasher(false);
 		}
-		if (character.isZooming()) {
-			character.zoomOut();
-		}
 		if (invincible) {
 			player.delaySubtank();
 		}
@@ -397,11 +394,6 @@ public class CharState {
 			return;
 		}
 
-		if (!Options.main.disableDoubleDash && player.input.isPressed(Control.Dash, player) && player.input.checkDoubleTap(Control.Dash) && character.canDash() && character.dodgeRollCooldown == 0 && player.isAxl && player.canControl) {
-			character.changeState(new DodgeRoll(), true);
-			return;
-		}
-
 		bool hadokenCheck = false;
 		bool shoryukenCheck = false;
 		if (character.hasHadoukenEquipped()) {
@@ -479,7 +471,7 @@ public class CharState {
 			} else if (!character.isAttacking() && character.noBlockTime == 0) {
 				character.changeState(new SwordBlock());
 			}
-		} else if (player.input.isPressed(Control.Taunt, player) && !character.isAnyZoom() && character.sniperMissileProj == null) {
+		} else if (player.input.isPressed(Control.Taunt, player)) {
 			character.changeState(new Taunt());
 		} else if (character.canClimb()) {
 			checkLadder(true);
@@ -821,12 +813,6 @@ public class Crouch : CharState {
 		if (!player.isCrouchHeld() && !(player.isZero && character.isAttacking())) {
 			character.changeState(new Idle(transitionSprite: "crouch_start"));
 			return;
-		}
-
-		if (player.isAxl) {
-			if (player.input.isHeld(Control.Dash, player) && character.canDash() && character.dodgeRollCooldown == 0) {
-				character.changeState(new DodgeRoll());
-			}
 		}
 
 		if (Global.level.gameMode.isOver) {
@@ -1827,8 +1813,6 @@ public class Die : CharState {
 		new Anim(character.pos.addxy(0, -12), "die_sparks", 1, null, true);
 		character.stingChargeTime = 0;
 		character.removeBarrier();
-		character.sniperMissileProj?.destroySelf();
-		character.sniperMissileProj = null;
 		if (character.ownedByLocalPlayer && character.player.isDisguisedAxl) {
 			character.player.revertToAxlDeath();
 			character.changeSpriteFromName("die", true);

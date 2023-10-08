@@ -72,7 +72,7 @@ public partial class Player {
 	public Point axlLockOnCursorPos;
 	public Point axlGenericCursorWorldPos {
 		get {
-			if (character == null || !character.isZooming() || character.isZoomingIn || character.isZoomOutPhase1Done) {
+			if (character is not Axl axl || !axl.isZooming() || axl.isZoomingIn || axl.isZoomOutPhase1Done) {
 				return axlCursorWorldPos;
 			}
 			return axlScopeCursorWorldPos;
@@ -80,7 +80,7 @@ public partial class Player {
 	}
 	public float zoomRange {
 		get {
-			if (character != null && (character.isWhiteAxl() || character.hyperAxlStillZoomed)) return 100000;
+			if (character is Axl axl && (axl.isWhiteAxl() || axl.hyperAxlStillZoomed)) return 100000;
 			return Global.viewScreenW * 2.5f;
 		}
 	}
@@ -529,7 +529,11 @@ public partial class Player {
 			charScrap[i] = getStartScrap();
 		}
 		foreach (var key in charHeartTanks.Keys) {
-			int htCount = key == charNum ? getStartHeartTanksForChar() : getStartHeartTanks();
+			int htCount = getStartHeartTanksForChar();
+			int altHtCount =  getStartHeartTanks();
+			if (altHtCount > htCount) {
+				htCount = altHtCount;
+			}
 			charHeartTanks[key] = htCount;
 		}
 		foreach (var key in charSubTanks.Keys) {
@@ -949,6 +953,11 @@ public partial class Player {
 					this, pos.x, pos.y, xDir, false, charNetId,
 					ownedByLocalPlayer, mk2VileOverride: mk2VileOverride
 				);
+			} else if (charNum == 3) {
+				character = new Axl(
+					this, pos.x, pos.y, xDir,
+					false, charNetId, ownedByLocalPlayer
+				);
 			} else {
 				character = new Character(
 					this, pos.x, pos.y, xDir, false, charNetId,
@@ -970,15 +979,15 @@ public partial class Player {
 						scrap = 9999;
 					}
 				}
-				if (isAxl) {
+				if (character is Axl axl) {
 					if (loadout.axlLoadout.hyperMode == 0) {
-						character.whiteAxlTime = 100000;
-						character.hyperAxlUsed = true;
+						axl.whiteAxlTime = 100000;
+						axl.hyperAxlUsed = true;
 						var db = new DoubleBullet();
 						weapons[0] = db;
 					} else {
-						character.stingChargeTime = 8;
-						character.hyperAxlUsed = true;
+						axl.stingChargeTime = 8;
+						axl.hyperAxlUsed = true;
 						scrap = 9999;
 					}
 				}
@@ -1158,6 +1167,11 @@ public partial class Player {
 				true, character.netId, true, isWarpIn: false,
 				mk2VileOverride: isVileMK2, mk5VileOverride: isVileMK5
 			);
+		} else if (charNum == 3) {
+			retChar = new Axl(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, character.netId, true, isWarpIn: false
+			);
 		} else {
 			retChar = new Character(
 				this, character.pos.x, character.pos.y, character.xDir,
@@ -1180,12 +1194,7 @@ public partial class Player {
 
 		character.changeState(new Idle(), true);
 		character = retChar;
-
-		if (charNum == 3) {
-			character.axlSwapTime = 0.25f;
-		} else {
-			weapon.shootTime = 0.25f;
-		}
+		weapon.shootTime = 0.25f;
 
 		if (character is Zero zero) {
 			zero.zeroGigaAttackWeapon.ammo = dnaCore.rakuhouhaAmmo;
@@ -1199,9 +1208,13 @@ public partial class Player {
 			} else if (dnaCore.hyperMode == DNACoreHyperMode.NightmareZero) {
 				zero.isNightmareZero = true;
 			}
-		} else if (charNum == 3 && dnaCore.hyperMode == DNACoreHyperMode.WhiteAxl) {
-			character.whiteAxlTime = character.maxHyperAxlTime;
-			RPC.playerToggle.sendRpc(id, RPCToggleType.SetWhiteAxl);
+		}
+		else if (charNum == 3 && character is Axl axl) {
+			if (dnaCore.hyperMode == DNACoreHyperMode.WhiteAxl) {
+				axl.whiteAxlTime = axl.maxHyperAxlTime;
+				RPC.playerToggle.sendRpc(id, RPCToggleType.SetWhiteAxl);
+			}
+			axl.axlSwapTime = 0.25f;
 		}
 
 		dnaCore.usedOnce = true;
@@ -1418,7 +1431,9 @@ public partial class Player {
 			}
 			if (character != null && currentMaverick == null) {
 				InRideArmor inRideArmor = character?.charState as InRideArmor;
-				if (inRideArmor != null && (inRideArmor.frozenTime > 0 || inRideArmor.stunTime > 0 || inRideArmor.crystalizeTime > 0)) {
+				if (inRideArmor != null &&
+					(inRideArmor.frozenTime > 0 || inRideArmor.stunTime > 0 || inRideArmor.crystalizeTime > 0)
+				) {
 					return false;
 				}
 				if (character.shotgunIceChargeTime > 0 || character.charState is Frozen) {
@@ -1427,7 +1442,7 @@ public partial class Player {
 				if (character.charState is Stunned || character.charState is Crystalized) {
 					return false;
 				}
-				if (character.aiming) {
+				if (character?.charState is SniperAimAxl) {
 					return false;
 				}
 				if (character.rideArmor?.rideArmorState is RADropIn) {

@@ -817,13 +817,15 @@ public partial class Actor : GameObject {
 		yScale *= -1;
 	}
 
-	// The code here needs to work for non-owners too. So all variables in it needs to be synced
+	// The code here needs to work for non-owners too. So all variables in it needs to be synced.
 	public bool shouldDraw() {
 		if (!visible) return false;
 		if (this is Character character) {
-			if (character.isStealthModeSynced() && character.isInvisibleEnemy()) {
+			/*
+			if (this is Axl axl && axl.isStealthModeSynced() && character.isInvisibleEnemy()) {
 				return false;
 			}
+			*/
 			if (character.isCStingInvisibleGraphics() && character.cStingPaletteTime % 3 == 0) {
 				return false;
 			}

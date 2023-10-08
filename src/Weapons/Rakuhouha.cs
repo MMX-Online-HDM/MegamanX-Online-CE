@@ -358,7 +358,7 @@ public class RekkohaProj : Projectile {
 			}
 			vel.y = 100;
 		}
-		Rect newRect = new Rect(0, 0, 16, 63 + len - reverseLen);
+		Rect newRect = new Rect(0, 0, 16, 60 + len - reverseLen);
 		globalCollider = new Collider(newRect.getPoints(), true, this, false, false, 0, new Point(0, 0));
 	}
 
@@ -559,14 +559,16 @@ public class DarkHoldState : CharState {
 	public float stunTime = totalStunTime;
 	public const float totalStunTime = 5;
 	int frameIndex;
-	public bool shouldDrawAxlArm;
-	public float lastArmAngle;
+	public bool shouldDrawAxlArm = true;
+	public float lastArmAngle = 0;
 	public DarkHoldState(Character character) : base(character?.sprite?.name ?? "grabbed") {
 		immuneToWind = true;
 
 		this.frameIndex = character.frameIndex;
-		this.shouldDrawAxlArm = character.shouldDrawArm();
-		this.lastArmAngle = character.netArmAngle;
+		if (character is Axl axl) {
+			this.shouldDrawAxlArm = axl.shouldDrawArm();
+			this.lastArmAngle = axl.netArmAngle;
+		}
 	}
 
 	public override void update() {

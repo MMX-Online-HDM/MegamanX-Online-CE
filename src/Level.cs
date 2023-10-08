@@ -1254,7 +1254,7 @@ public partial class Level {
 				shakeY = 0;
 			}
 
-			if (camPlayer.character.isZooming()) {
+			if (camPlayer.character is Axl axl && axl.isZooming()) {
 				Player p = camPlayer.character.player;
 
 				p.axlScopeCursorWorldPos.x = Helpers.clamp(p.axlScopeCursorWorldPos.x, camCenterX - Global.halfViewScreenW, camCenterX + Global.halfViewScreenW);
@@ -1751,7 +1751,7 @@ public partial class Level {
 	}
 
 	public bool ignoreNoScrolls() {
-		return mainPlayer.weapon is WolfSigmaHandWeapon || mainPlayer.character?.isAnyZoom() == true;
+		return mainPlayer.weapon is WolfSigmaHandWeapon || (mainPlayer.character as Axl)?.isAnyZoom() == true;
 	}
 
 	public void updateCamPos(float deltaX, float deltaY) {

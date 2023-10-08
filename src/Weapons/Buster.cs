@@ -48,7 +48,7 @@ public class Buster : Weapon {
 			}
 		}
 		if (player.character?.isHyperX == true) return true;
-		return lemonsOnField.Count < 3;
+		return lemonsOnField.Count < 2;
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {

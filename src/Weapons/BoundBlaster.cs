@@ -73,6 +73,7 @@ public class BoundBlasterProj : Projectile {
 	const float circleRadius = 14;
 	const float maxLen = 60;
 	float partTime;
+	bool isWaProj;
 
 	public BoundBlasterProj(Weapon weapon, Point pos, int xDir, Player player, Point bulletDir, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, xDir, 250, 1, player, "boundblaster_proj", 0, 0.1f, netProjId, player.ownedByLocalPlayer) {
@@ -80,8 +81,9 @@ public class BoundBlasterProj : Projectile {
 		vel.x = bulletDir.x * speed;
 		vel.y = bulletDir.y * speed;
 		maxTime = 1.5f;
-		if (player.character?.isWhiteAxl() == true) {
+		if (player.character is Axl axl && axl.isWhiteAxl() == true) {
 			maxTime = 3f;
+			isWaProj = true;
 		}
 		projId = (int)ProjIds.BoundBlaster;
 		updateAngle();
@@ -156,7 +158,7 @@ public class BoundBlasterProj : Projectile {
 				len = 0;
 				lenDelay = 0;
 				updateAngle();
-				if (owner?.character?.isWhiteAxl() == true) {
+				if (isWaProj) {
 					increasePower();
 				}
 			}
@@ -248,7 +250,7 @@ public class BoundBlasterAltProj : Projectile {
 		vel.x = bulletDir.x * speed;
 		vel.y = bulletDir.y * speed;
 		maxTime = 2f;
-		if (!ownedByLocalPlayer || player.character?.isWhiteAxl() == true) {
+		if (!ownedByLocalPlayer || player.character is Axl axl && axl.isWhiteAxl() == true) {
 			maxTime = float.MaxValue;
 		}
 		projId = (int)ProjIds.BoundBlaster2;
@@ -344,7 +346,7 @@ public class MovingWheelProj : Projectile {
 	public MovingWheelProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, xDir, 0, 3, player, "movingwheel_proj", Global.defFlinch, 1, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.MovingWheel;
-		if (player.character?.isWhiteAxl() == true) {
+		if (player.character is Axl axl && axl.isWhiteAxl() == true) {
 			startMaxTime = 5;
 		}
 		maxTime = startMaxTime;

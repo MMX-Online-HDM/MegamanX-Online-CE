@@ -324,7 +324,9 @@ public class GameMode {
 
 		if (!isOver) {
 			if (!Menu.inMenu && ((level.mainPlayer.warpedIn && !isWarpIn) || Global.level.mainPlayer.isSpectator) && Global.input.isPressedMenu(Control.MenuEnter) && !chatMenu.recentlyExited) {
-				level.mainPlayer.character?.resetToggle();
+				if (mainPlayer.character is Axl axl) {
+					axl.resetToggle();
+				}
 				Menu.change(new InGameMainMenu());
 			} else if (Menu.inMenu && Global.input.isPressedMenu(Control.MenuEnter) && !isBindingControl()) {
 				Menu.exit();
@@ -332,7 +334,9 @@ public class GameMode {
 		} else if (Global.serverClient != null) {
 			if (!Global.isHost && !level.is1v1()) {
 				if (!Menu.inMenu && Global.input.isPressedMenu(Control.MenuEnter) && !chatMenu.recentlyExited) {
-					level.mainPlayer.character?.resetToggle();
+					if (mainPlayer.character is Axl axl) {
+						axl.resetToggle();
+					}
 					Menu.change(new InGameMainMenu());
 				} else if (Menu.inMenu && Global.input.isPressedMenu(Control.MenuEnter) && !isBindingControl()) {
 					Menu.exit();
@@ -344,7 +348,9 @@ public class GameMode {
 			} else {
 				if (Global.isHost) {
 					if ((Menu.mainMenu is HostMenu || Menu.mainMenu is SelectCharacterMenu) && Global.input.isPressedMenu(Control.MenuEnter) && !chatMenu.recentlyExited) {
-						level.mainPlayer.character?.resetToggle();
+						if (mainPlayer.character is Axl axl) {
+							axl.resetToggle();
+						}
 						Menu.change(new InGameMainMenu());
 					} else if (Menu.inMenu && Global.input.isPressedMenu(Control.MenuEnter) && !chatMenu.recentlyExited) {
 						if (nextMatchHostMenu != null) Menu.change(nextMatchHostMenu);
@@ -476,34 +482,32 @@ public class GameMode {
 	public virtual void render() {
 		if (level.mainPlayer == null) return;
 
-		Character c = level.mainPlayer.character;
-		if (c != null) {
-			Player p = c.player;
-			if (c.isZooming() && !c.isZoomOutPhase1Done) {
-				Point charPos = c.getCenterPos();
+		if (level.mainPlayer.character is Axl axl) {
+			if (axl.isZooming() && !axl.isZoomOutPhase1Done) {
+				Point charPos = axl.getCenterPos();
 
-				float xOff = p.axlScopeCursorWorldPos.x - level.camCenterX;
-				float yOff = p.axlScopeCursorWorldPos.y - level.camCenterY;
+				float xOff = level.mainPlayer.axlScopeCursorWorldPos.x - level.camCenterX;
+				float yOff = level.mainPlayer.axlScopeCursorWorldPos.y - level.camCenterY;
 
-				Point bulletPos = c.getAxlBulletPos();
-				Point scopePos = c.getAxlScopePos();
-				Point hitPos = c.getCorrectedCursorPos();
-				//Point hitPos = bulletPos.add(c.getAxlBulletDir().times(Global.level.adjustedZoomRange));
-				var hitData = c.getFirstHitPos(p.adjustedZoomRange, ignoreDamagables: true);
+				Point bulletPos = axl.getAxlBulletPos();
+				Point scopePos = axl.getAxlScopePos();
+				Point hitPos = axl.getCorrectedCursorPos();
+				//Point hitPos = bulletPos.add(axl.getAxlBulletDir().times(Global.level.adjustedZoomRange));
+				var hitData = axl.getFirstHitPos(level.mainPlayer.adjustedZoomRange, ignoreDamagables: true);
 				Point hitPos2 = hitData.hitPos;
 				if (hitPos2.distanceTo(charPos) < hitPos.distanceTo(charPos)) hitPos = hitPos2;
-				if (!c.isZoomingOut && !c.isZoomingIn) {
+				if (!axl.isZoomingOut && !axl.isZoomingIn) {
 					Color laserColor = new Color(255, 0, 0, 160);
 					DrawWrappers.DrawLine(scopePos.x, scopePos.y, hitPos.x, hitPos.y, laserColor, 2, ZIndex.HUD);
 					DrawWrappers.DrawCircle(hitPos.x, hitPos.y, 2f, true, laserColor, 1, ZIndex.HUD);
-					if (c.ownedByLocalPlayer && Global.level.isSendMessageFrame()) {
-						RPC.syncAxlScopePos.sendRpc(p.id, true, scopePos, hitPos);
+					if (axl.ownedByLocalPlayer && Global.level.isSendMessageFrame()) {
+						RPC.syncAxlScopePos.sendRpc(level.mainPlayer.id, true, scopePos, hitPos);
 					}
 				}
 
 				Point cursorPos = new Point(Global.halfScreenW + (xOff / Global.viewSize), Global.halfScreenH + (yOff / Global.viewSize));
 				string scopeSprite = "scope";
-				if (c.hasScopedTarget()) scopeSprite = "scope2";
+				if (axl.hasScopedTarget()) scopeSprite = "scope2";
 				Global.sprites[scopeSprite].drawToHUD(0, cursorPos.x, cursorPos.y);
 				float w = 298;
 				float h = 224;
@@ -514,15 +518,15 @@ public class GameMode {
 				DrawWrappers.DrawRect(cursorPos.x - w, cursorPos.y - hh, cursorPos.x - hw, cursorPos.y + hh, true, Color.Black, 1, ZIndex.HUD, false, outlineColor: Color.Black);
 				DrawWrappers.DrawRect(cursorPos.x + hw, cursorPos.y - hh, cursorPos.x + w, cursorPos.y + hh, true, Color.Black, 1, ZIndex.HUD, false, outlineColor: Color.Black);
 
-				DrawWrappers.DrawCircle(charPos.x, charPos.y, p.zoomRange, false, Color.Red, 1f, ZIndex.HUD, outlineColor: Color.Red, pointCount: 250);
+				DrawWrappers.DrawCircle(charPos.x, charPos.y, level.mainPlayer.zoomRange, false, Color.Red, 1f, ZIndex.HUD, outlineColor: Color.Red, pointCount: 250);
 
-				if (!c.isZoomingIn && !c.isZoomingOut) {
-					int zoomChargePercent = MathInt.Round(c.zoomCharge * 100);
+				if (!axl.isZoomingIn && !axl.isZoomingOut) {
+					int zoomChargePercent = MathInt.Round(axl.zoomCharge * 100);
 					DrawWrappers.DrawText(zoomChargePercent.ToString() + "%", cursorPos.x + 5, cursorPos.y + 5, Alignment.Left, true, 0.75f, Color.White, Color.Black, Text.Styles.Regular, 1, false, ZIndex.HUD);
 				}
 
 				Helpers.decrementTime(ref flashCooldown);
-				if (c.renderEffects.ContainsKey(RenderEffectType.Hit) && flashTime == 0 && flashCooldown == 0) {
+				if (axl.renderEffects.ContainsKey(RenderEffectType.Hit) && flashTime == 0 && flashCooldown == 0) {
 					flashTime = 0.075f;
 				}
 				if (flashTime > 0) {
@@ -535,8 +539,8 @@ public class GameMode {
 					}
 				}
 			} else {
-				if (c.isAnyZoom() && Global.level.isSendMessageFrame()) {
-					RPC.syncAxlScopePos.sendRpc(p.id, false, new Point(), new Point());
+				if (axl.isAnyZoom() && Global.level.isSendMessageFrame()) {
+					RPC.syncAxlScopePos.sendRpc(level.mainPlayer.id, false, new Point(), new Point());
 				}
 			}
 		}
@@ -1005,10 +1009,16 @@ public class GameMode {
 		string spriteName = "hud_health_base";
 		float health = player.health;
 		float maxHealth = player.maxHealth;
+		float damageSavings = 0;
+
+		if (player.character != null && player.health > 0 && player.health < player.maxHealth) {
+			damageSavings = MathInt.Floor(player.character.damageSavings);
+		}
 
 		if (player.currentMaverick != null) {
 			health = player.currentMaverick.health;
 			maxHealth = player.currentMaverick.maxHealth;
+			damageSavings = 0;
 		}
 
 		int frameIndex = player.charNum;
@@ -1027,6 +1037,7 @@ public class GameMode {
 			frameIndex = player.character.rideArmor.raNum;
 			baseX = getHUDHealthPosition(position, false).x;
 			mechBarExists = true;
+			damageSavings = 0;
 		}
 		if (isMech && player.character?.mk5RideArmorPlatform != null) {
 			spriteName = "hud_health_base_mech";
@@ -1039,6 +1050,7 @@ public class GameMode {
 				baseX += 15;
 			}
 			mechBarExists = false;
+			damageSavings = 0;
 		}
 
 		if (isMech && player.character?.rideChaser != null) {
@@ -1048,16 +1060,19 @@ public class GameMode {
 			frameIndex = 0;
 			baseX = getHUDHealthPosition(position, false).x;
 			mechBarExists = true;
+			damageSavings = 0;
 		}
 
 		maxHealth /= player.getHealthModifier();
 		health /= player.getHealthModifier();
+		damageSavings /= player.getHealthModifier();
 
 		baseY += 25;
 		var healthBaseSprite = spriteName;
 		Global.sprites[healthBaseSprite].drawToHUD(frameIndex, baseX, baseY);
 		baseY -= 16;
 		for (var i = 0; i < MathF.Ceiling(maxHealth); i++) {
+			// Draw HP
 			if (i < MathF.Ceiling(health)) {
 				int barIndex = 0;
 				bool isHyperX = player.character?.isHyperX == true || player.character?.charState is XRevive;
@@ -1068,10 +1083,15 @@ public class GameMode {
 					else barIndex = 5;
 				}
 				Global.sprites["hud_health_full"].drawToHUD(barIndex, baseX, baseY);
-			} else {
+			}
+			else if (i < MathInt.Ceiling(health) + damageSavings) {
+				Global.sprites["hud_health_full"].drawToHUD(4, baseX, baseY);
+			}
+			else {
 				Global.sprites["hud_health_empty"].drawToHUD(0, baseX, baseY);
 			}
 
+			// 2-layer health
 			if (twoLayerHealth > 0 && i < MathF.Ceiling(twoLayerHealth)) {
 				Global.sprites["hud_health_full"].drawToHUD(2, baseX, baseY);
 			}
@@ -1079,8 +1099,6 @@ public class GameMode {
 			baseY -= 2;
 		}
 		Global.sprites["hud_health_top"].drawToHUD(0, baseX, baseY);
-
-		// 2-layer health
 
 		return mechBarExists;
 	}

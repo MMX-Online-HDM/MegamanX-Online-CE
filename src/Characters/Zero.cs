@@ -982,4 +982,24 @@ public class Zero : Character {
 		}
 		return base.getGlobalProjs();
 	}
+
+	public override float getRunSpeed() {
+		float runSpeed = 90;
+		if (isBlackZero() || isBlackZero2()) {
+			runSpeed *= 1.15f;
+		}
+		return runSpeed * getRunDebuffs();
+	}
+
+	public override float getDashSpeed() {
+		if (flag != null || !isDashing) {
+			return getRunSpeed();
+		}
+		float dashSpeed = 210;
+
+		if (isBlackZero() || isBlackZero2()) {
+			dashSpeed *= 1.15f;
+		}
+		return dashSpeed * getRunDebuffs();
+	}
 }
