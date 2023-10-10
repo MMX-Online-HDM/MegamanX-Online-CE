@@ -575,7 +575,7 @@ class Program {
 		int rawAxisNum = (int)e.Axis;
 		int axisNum = 1000 + rawAxisNum;   //1000 = x, 1001 = y
 
-		var cMap = Control.getControllerMapping(currentPlayer?.realCharNum ?? -1, Options.main.axlAimMode);
+		var cMap = Control.getControllerMapping(currentPlayer?.charNum ?? -1, Options.main.axlAimMode);
 		if (cMap != null) {
 			int? rightAxis = cMap.GetValueOrDefault(Control.AimRight);
 			int? downAxis = cMap.GetValueOrDefault(Control.AimDown);

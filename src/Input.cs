@@ -526,7 +526,7 @@ public class Input {
 			return true;
 		}
 		if (Control.isJoystick()) {
-			var controllerMapping = Control.getControllerMapping(player?.realCharNum ?? -1, Options.main.axlAimMode);
+			var controllerMapping = Control.getControllerMapping(player?.charNum ?? -1, Options.main.axlAimMode);
 			if (!controllerMapping.ContainsKey(inputName)) return false;
 			int? buttonKey = controllerMapping[inputName];
 			return isHeld(buttonKey);
@@ -564,7 +564,7 @@ public class Input {
 			}
 		}
 
-		var keyboardMapping = Control.getKeyboardMapping(player?.realCharNum ?? -1, Options.main.axlAimMode);
+		var keyboardMapping = Control.getKeyboardMapping(player?.charNum ?? -1, Options.main.axlAimMode);
 
 		int? keyboardKey = keyboardMapping.GetValueOrDefault(inputName);
 
@@ -578,7 +578,7 @@ public class Input {
 			return true;
 		}
 		if (Control.isJoystick()) {
-			var controllerMapping = Control.getControllerMapping(player?.realCharNum ?? -1, Options.main.axlAimMode);
+			var controllerMapping = Control.getControllerMapping(player?.charNum ?? -1, Options.main.axlAimMode);
 			int? buttonKey = controllerMapping.GetValueOrDefault(inputName);
 			return isPressed(buttonKey);
 		}
