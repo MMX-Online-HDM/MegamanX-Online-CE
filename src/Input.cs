@@ -415,7 +415,7 @@ public class Input {
 
 	public bool useAxlCursorControls(Player player) {
 		if (player != Global.level.mainPlayer) return false;
-		return (Global.level.mainPlayer.isAxl || Global.level.mainPlayer.isDisguisedAxl) && Options.main.useMouseAim;
+		return (Global.level.mainPlayer.isAxl) && Options.main.useMouseAim;
 	}
 
 	public bool isAimingBackwards(Player player) {
@@ -519,7 +519,7 @@ public class Input {
 			}
 		}
 
-		var keyboardMapping = Control.getKeyboardMapping(player?.realCharNum ?? -1, Options.main.axlAimMode);
+		var keyboardMapping = Control.getKeyboardMapping(player?.charNum ?? -1, Options.main.axlAimMode);
 
 		int? keyboardKey = keyboardMapping.GetValueOrDefault(inputName);
 		if (keyboardKey != null && isHeld((Key)keyboardKey)) {
