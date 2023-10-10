@@ -958,6 +958,11 @@ public partial class Player {
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer
 				);
+			} else if (charNum == 4) {
+				character = new Sigma(
+					this, pos.x, pos.y, xDir,
+					false, charNetId, ownedByLocalPlayer
+				);
 			} else {
 				character = new Character(
 					this, pos.x, pos.y, xDir, false, charNetId,
@@ -1169,6 +1174,11 @@ public partial class Player {
 			);
 		} else if (charNum == 3) {
 			retChar = new Axl(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, character.netId, true, isWarpIn: false
+			);
+		}  else if (charNum == 4) {
+			retChar = new Sigma(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, character.netId, true, isWarpIn: false
 			);
@@ -1450,7 +1460,7 @@ public partial class Player {
 					return false;
 				}
 			}
-			if (isSigma && character != null && character.tagTeamSwapProgress > 0) {
+			if (character is Sigma sigma && sigma.tagTeamSwapProgress > 0) {
 				return false;
 			}
 			if (isPossessed()) {

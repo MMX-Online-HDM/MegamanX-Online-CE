@@ -234,7 +234,7 @@ public class AI {
 
 		target = Global.level.getClosestTarget(character.pos, player.alliance, true, isRequesterAI: true);
 
-		if (character.isHyperSigma) {
+		if (character is KaiserSigma || character is Sigma sigma && sigma.isHyperSigma) {
 			int attack = Helpers.randomRange(0, 1);
 			if (attack == 0) {
 				player.release(Control.Special1);

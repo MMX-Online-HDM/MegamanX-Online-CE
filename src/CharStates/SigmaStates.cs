@@ -173,6 +173,8 @@ public class SigmaBallProj : Projectile {
 
 public class SigmaBallShoot : CharState {
 	bool shot;
+	public Sigma sigma;
+
 	public SigmaBallShoot(string transitionSprite = "") : base("shoot", "", "", transitionSprite) {
 	}
 
@@ -220,7 +222,7 @@ public class SigmaBallShoot : CharState {
 
 			player.sigmaAmmo -= 7;
 			if (player.sigmaAmmo < 0) player.sigmaAmmo = 0;
-			character.sigmaAmmoRechargeCooldown = character.sigmaHeadBeamTimeBeforeRecharge;
+			sigma.sigmaAmmoRechargeCooldown = sigma.sigmaHeadBeamTimeBeforeRecharge;
 			character.playSound("energyBall", sendRpc: true);
 			new SigmaBallProj(player.sigmaBallWeapon, poi, character.xDir, player, player.getNextActorNetId(), vel.normalize(), rpc: true);
 			new Anim(poi, "sigma_proj_ball_muzzle", character.xDir, player.getNextActorNetId(), true, sendRpc: true);
@@ -233,6 +235,7 @@ public class SigmaBallShoot : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		sigma = character as Sigma;
 		character.vel = new Point();
 	}
 }
@@ -242,6 +245,8 @@ public class SigmaWallDashState : CharState {
 	int yDir;
 	Point vel;
 	bool fromGround;
+	public Sigma sigma;
+
 	public SigmaWallDashState(int yDir, bool fromGround) : base("wall_dash", "", "", "") {
 		this.yDir = yDir;
 		this.fromGround = fromGround;
@@ -255,6 +260,7 @@ public class SigmaWallDashState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		sigma = character as Sigma;
 		float xSpeed = 350;
 		if (!fromGround) {
 			character.xDir *= -1;
@@ -271,7 +277,7 @@ public class SigmaWallDashState : CharState {
 
 	public override void onExit(CharState newState) {
 		character.useGravity = true;
-		character.leapSlashCooldown = Character.maxLeapSlashCooldown;
+		sigma.leapSlashCooldown = Sigma.maxLeapSlashCooldown;
 		base.onExit(newState);
 	}
 
@@ -306,7 +312,7 @@ public class SigmaWallDashState : CharState {
 			}
 
 			fired = true;
-			character.saberCooldown = character.sigmaSaberMaxCooldown;
+			character.saberCooldown = sigma.sigmaSaberMaxCooldown;
 
 			character.playSound("saberShot", sendRpc: true);
 			character.changeSpriteFromName("wall_dash_attack", true);

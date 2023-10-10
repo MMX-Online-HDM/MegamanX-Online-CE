@@ -24,6 +24,7 @@ public class ViralSigmaBeamWeapon : Weapon {
 
 public class ViralSigmaIdle : CharState {
 	bool winTauntOnce;
+	public Sigma sigma;
 
 	public ViralSigmaIdle() : base("viral_idle") {
 		immuneToWind = true;
@@ -40,8 +41,8 @@ public class ViralSigmaIdle : CharState {
 		clampViralSigmaPos();
 
 		if (character.angle == 0) {
-			if (player.input.isPressed(Control.Dash, player) && character.viralSigmaTackleCooldown == 0) {
-				character.viralSigmaTackleCooldown = character.viralSigmaTackleMaxCooldown;
+			if (player.input.isPressed(Control.Dash, player) && sigma.viralSigmaTackleCooldown == 0) {
+				sigma.viralSigmaTackleCooldown = sigma.viralSigmaTackleMaxCooldown;
 				character.changeState(new ViralSigmaTackle(inputDir), true);
 				return;
 			}
@@ -52,12 +53,12 @@ public class ViralSigmaIdle : CharState {
 			}
 
 			if (player.input.isPressed(Control.Shoot, player) && player.sigmaAmmo >= player.weapon.getAmmoUsage(0)) {
-				character.changeState(new ViralSigmaShoot(inputDir.x != 0 ? inputDir.x : character.lastViralSigmaXDir), true);
+				character.changeState(new ViralSigmaShoot(inputDir.x != 0 ? inputDir.x : sigma.lastViralSigmaXDir), true);
 				return;
 			}
 
-			if (player.input.isPressed(Control.Jump, player) && character.possessTarget != null) {
-				character.changeState(new ViralSigmaPossessStart(character.possessTarget), true);
+			if (player.input.isPressed(Control.Jump, player) && sigma.possessTarget != null) {
+				character.changeState(new ViralSigmaPossessStart(sigma.possessTarget), true);
 				return;
 			}
 
@@ -70,6 +71,11 @@ public class ViralSigmaIdle : CharState {
 				character.changeState(new ViralSigmaTaunt(false), true);
 			}
 		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		sigma = character as Sigma;
 	}
 }
 
@@ -98,6 +104,8 @@ public class ViralSigmaTaunt : CharState {
 
 public class ViralSigmaPossessStart : CharState {
 	Character target;
+	public Sigma sigma;
+
 	public ViralSigmaPossessStart(Character target) : base("viral_possess") {
 		immuneToWind = true;
 		this.target = target;
@@ -110,10 +118,10 @@ public class ViralSigmaPossessStart : CharState {
 		//character.move(inputDir.times(125));
 		character.changePos(target.pos.addxy(0, -20));
 
-		character.possessEnemyTime += Global.spf;
-		if (character.possessEnemyTime > character.maxPossessEnemyTime) {
-			character.possessEnemyTime = 0;
-			character.numPossesses++;
+		sigma.possessEnemyTime += Global.spf;
+		if (sigma.possessEnemyTime > sigma.maxPossessEnemyTime) {
+			sigma.possessEnemyTime = 0;
+			sigma.numPossesses++;
 			float ammoToRefill = 32; //character.player.health
 			player.sigmaAmmo += ammoToRefill;
 			if (player.sigmaAmmo > player.sigmaMaxAmmo) player.sigmaAmmo = player.sigmaMaxAmmo;
@@ -122,20 +130,23 @@ public class ViralSigmaPossessStart : CharState {
 			return;
 		}
 
-		if ((stateTime > 0.2f && !player.input.isHeld(Control.Jump, player)) || !character.canPossess(target)) {
+		if ((stateTime > 0.2f && !player.input.isHeld(Control.Jump, player)) || !sigma.canPossess(target)) {
 			character.changeState(new ViralSigmaIdle(), true);
 		}
 	}
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.possessEnemyTime = 0;
+		sigma = character as Sigma;
+		sigma.possessEnemyTime = 0;
 	}
 }
 
 public class ViralSigmaPossess : CharState {
 	public Character target;
 	int state;
+	public Sigma sigma;
+
 	public ViralSigmaPossess(Character target) : base("viral_exit") {
 		immuneToWind = true;
 		this.target = target;
@@ -164,9 +175,14 @@ public class ViralSigmaPossess : CharState {
 		}
 	}
 
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		sigma = character as Sigma;
+	}
+
 	public void unpossess() {
 		target.player.unpossess(sendRpc: true);
-		character.possessTarget = null;
+		sigma.possessTarget = null;
 		target = null;
 		state = 1;
 	}
@@ -174,7 +190,7 @@ public class ViralSigmaPossess : CharState {
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		target?.player?.unpossess(sendRpc: true);
-		character.possessTarget = null;
+		sigma.possessTarget = null;
 	}
 }
 
@@ -264,6 +280,8 @@ public class ViralSigmaShootProj : Projectile {
 
 public class ViralSigmaTackle : CharState {
 	Point tackleDir;
+	public Sigma sigma;
+
 	public ViralSigmaTackle(Point tackleDir) : base("viral_tackle") {
 		immuneToWind = true;
 		this.tackleDir = tackleDir;
@@ -271,8 +289,8 @@ public class ViralSigmaTackle : CharState {
 
 	public override void update() {
 		base.update();
-		if (tackleDir.x > 0) character.viralSigmaAngle = Helpers.to360(tackleDir.angle + 90);
-		else character.viralSigmaAngle = Helpers.to360(tackleDir.angle + 90);
+		if (tackleDir.x > 0) sigma.viralSigmaAngle = Helpers.to360(tackleDir.angle + 90);
+		else sigma.viralSigmaAngle = Helpers.to360(tackleDir.angle + 90);
 		if (!character.tryMove(tackleDir.times(225), out _) || stateTime > 0.6f) {
 			character.changeState(new ViralSigmaIdle(), true);
 			return;
@@ -283,22 +301,25 @@ public class ViralSigmaTackle : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		sigma = character as Sigma;
 		character.frameSpeed = 2f;
-		character.xDir = tackleDir.x != 0 ? MathF.Sign(tackleDir.x) : character.lastViralSigmaXDir;
+		character.xDir = tackleDir.x != 0 ? MathF.Sign(tackleDir.x) : sigma.lastViralSigmaXDir;
 		if (tackleDir.isZero()) {
-			tackleDir = new Point(character.lastViralSigmaXDir, 0);
+			tackleDir = new Point(sigma.lastViralSigmaXDir, 0);
 		}
 	}
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
-		character.viralSigmaAngle = 0;
+		sigma.viralSigmaAngle = 0;
 		character.frameSpeed = 1;
 	}
 }
 
 public class ViralSigmaBeamState : CharState {
 	ViralSigmaBeamProj proj;
+	public Sigma sigma;
+
 	public ViralSigmaBeamState() : base("viral_shoot") {
 		immuneToWind = true;
 	}
@@ -311,9 +332,9 @@ public class ViralSigmaBeamState : CharState {
 		character.move(inputDir.times(125));
 		clampViralSigmaPos();
 
-		character.viralSigmaBeamLength -= Global.spf * 0.1f;
-		if (character.viralSigmaBeamLength <= 0) {
-			character.viralSigmaBeamLength = 0;
+		sigma.viralSigmaBeamLength -= Global.spf * 0.1f;
+		if (sigma.viralSigmaBeamLength <= 0) {
+			sigma.viralSigmaBeamLength = 0;
 			character.changeState(new ViralSigmaIdle(), true);
 			return;
 		}
@@ -326,6 +347,7 @@ public class ViralSigmaBeamState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		sigma = character as Sigma;
 		character.frameSpeed = 2f;
 		proj = new ViralSigmaBeamProj(new ViralSigmaBeamWeapon(), character.getFirstPOIOrDefault(), player, player.getNextActorNetId(), rpc: true);
 	}
@@ -342,8 +364,13 @@ public class ViralSigmaBeamProj : Projectile {
 	float soundTime;
 	public float bottomY;
 	float explosionTime;
-	public ViralSigmaBeamProj(Weapon weapon, Point pos, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, 1, 0, 1, player, "empty", Global.halfFlinch, 0.15f, netProjId, player.ownedByLocalPlayer) {
+	public Sigma sigma;
+
+	public ViralSigmaBeamProj(
+		Weapon weapon, Point pos, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, 1, 0, 1, player, "empty", Global.halfFlinch, 0.15f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.Sigma2ViralBeam;
 		destroyOnHit = false;
 		reflectable = false;
@@ -355,12 +382,16 @@ public class ViralSigmaBeamProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+
+		sigma = owner?.character as Sigma;
 	}
 
 	public void getBottomY() {
 		if (ownedByLocalPlayer) {
-			float beamLength = owner?.character == null ? 150 : owner.character.viralSigmaBeamLength * 150;
-			var hit = Global.level.raycast(pos.addxy(0, -10), pos.addxy(0, beamLength), new List<Type>() { typeof(Wall) });
+			float beamLength = sigma != null ? 150 : sigma.viralSigmaBeamLength * 150;
+			var hit = Global.level.raycast(
+				pos.addxy(0, -10), pos.addxy(0, beamLength), new List<Type>() { typeof(Wall) }
+			);
 			bottomY = hit?.hitData?.hitPoint?.y ?? pos.y + beamLength;
 		}
 
@@ -408,6 +439,8 @@ public class ViralSigmaBeamProj : Projectile {
 public class ViralSigmaRevive : CharState {
 	int state = 0;
 	public ExplodeDieEffect explodeDieEffect;
+	public Sigma sigma;
+
 	public ViralSigmaRevive(ExplodeDieEffect explodeDieEffect) : base("viral_enter") {
 		this.explodeDieEffect = explodeDieEffect;
 	}
@@ -482,8 +515,9 @@ public class ViralSigmaRevive : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		sigma = character as Sigma;
 		character.syncScale = true;
-		character.isHyperSigma = true;
+		sigma.isHyperSigma = true;
 		character.frameSpeed = 0;
 		character.frameIndex = 0;
 		character.xScale = 0;

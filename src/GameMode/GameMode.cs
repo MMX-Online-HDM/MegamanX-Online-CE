@@ -602,8 +602,11 @@ public class GameMode {
 			Helpers.drawTextStd(TCat.HUD, "Warning: Time before AFK Kick: " + Global.level.afkWarnTimeAmount(), Global.halfScreenW - 2, 50, Alignment.Center, fontSize: 24);
 		} else if (Global.serverClient != null && Global.serverClient.isLagging() && hudErrorMsgTime == 0) {
 			Helpers.drawTextStd(TCat.HUD, Helpers.controlText("Connectivity issues detected."), Global.halfScreenW - 2, 50, Alignment.Center, fontSize: 24);
-		} else if (mainPlayer?.character?.possessTarget != null) {
-			Helpers.drawTextStd(TCat.HUD, Helpers.controlText($"Hold [JUMP] to possess {mainPlayer.character.possessTarget.player.name}"), Global.halfScreenW - 2, 50, Alignment.Center, fontSize: 24);
+		} else if (mainPlayer?.character is Sigma sigma && sigma.possessTarget != null) {
+			Helpers.drawTextStd(TCat.HUD, Helpers.controlText(
+				$"Hold [JUMP] to possess {sigma.possessTarget.player.name}"),
+				Global.halfScreenW - 2, 50, Alignment.Center, fontSize: 24
+			);
 		} else if (hudErrorMsgTime > 0) {
 			Helpers.drawTextStd(TCat.HUD, hudErrorMsg, Global.halfScreenW - 2, 50, Alignment.Center, fontSize: 24);
 		} else if (mainPlayer?.isKaiserViralSigma() == true) {

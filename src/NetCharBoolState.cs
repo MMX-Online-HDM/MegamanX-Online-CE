@@ -76,7 +76,9 @@ public partial class Character {
 		});
 		isInvisibleBS = new NetCharBoolState(this, 5, NetCharBoolStateNum.One, (character) => { return character.isInvisible(); });
 		isHyperXBS = new NetCharBoolState(this, 6, NetCharBoolStateNum.One, (character) => { return character.isHyperX; });
-		isHyperSigmaBS = new NetCharBoolState(this, 7, NetCharBoolStateNum.One, (character) => { return character.isHyperSigma; });
+		isHyperSigmaBS = new NetCharBoolState(this, 7, NetCharBoolStateNum.One, (character) => { 
+			return (character as Sigma)?.isHyperSigma == true;
+		});
 	}
 
 	public byte updateAndGetNetCharState1() {

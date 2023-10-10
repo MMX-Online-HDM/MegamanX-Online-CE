@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MMXOnline;
 
-public partial class Character {
+public class Sigma : Character {
 	public const float sigmaHeight = 50;
 	public float sigmaSaberMaxCooldown = 1f;
 	public float noBlockTime = 0;
@@ -49,12 +49,26 @@ public partial class Character {
 	public WolfSigmaHand leftHand;
 	public WolfSigmaHand rightHand;
 
+	public Sigma(
+		Player player, float x, float y, int xDir,
+		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
+		bool isWarpIn = true
+	) : base(
+		player, x, y, xDir, isVisible,
+		netId, ownedByLocalPlayer, isWarpIn, false, false
+	) {
+		
+	}
+
 	public void getViralSigmaPossessTarget() {
 		var collideDatas = Global.level.getTriggerList(this, 0, 0);
 		foreach (var collideData in collideDatas) {
-			if (collideData?.gameObject is Character chr && chr.canBeDamaged(player.alliance, player.id, (int)ProjIds.Sigma2ViralPossess) && chr.player.canBePossessed()) {
+			if (collideData?.gameObject is Character chr &&
+				chr.canBeDamaged(player.alliance, player.id, (int)ProjIds.Sigma2ViralPossess) &&
+				chr.player.canBePossessed()) {
 				possessTarget = chr;
-				maxPossessEnemyTime = 2 + (Helpers.clampMax(numPossesses, 4) * 0.5f); //2 - Helpers.progress(chr.player.health, chr.player.maxHealth);
+				maxPossessEnemyTime = 2 + (Helpers.clampMax(numPossesses, 4) * 0.5f);
+				//2 - Helpers.progress(chr.player.health, chr.player.maxHealth);
 				return;
 			}
 		}
@@ -65,7 +79,9 @@ public partial class Character {
 		if (!target.player.canBePossessed()) return false;
 		var collideDatas = Global.level.getTriggerList(this, 0, 0);
 		foreach (var collideData in collideDatas) {
-			if (collideData.gameObject is Character chr && chr.canBeDamaged(player.alliance, player.id, (int)ProjIds.Sigma2ViralPossess)) {
+			if (collideData.gameObject is Character chr &&
+				chr.canBeDamaged(player.alliance, player.id, (int)ProjIds.Sigma2ViralPossess)
+			) {
 				if (target == chr) {
 					return true;
 				}
@@ -78,7 +94,13 @@ public partial class Character {
 		return sprite.name.Contains("_shoot_") || sprite.name.EndsWith("_shoot");
 	}
 
-	public void preUpdateSigma() {
+	public override void preUpdate() {
+		base.preUpdate();
+
+		if (!ownedByLocalPlayer) {
+			return;
+		}
+
 		bool isSummoner = player.isSummoner();
 		bool isPuppeteer = player.isPuppeteer();
 		bool isStriker = player.isStriker();
@@ -268,7 +290,13 @@ public partial class Character {
 		}
 	}
 
-	public void updateSigma() {
+	public override void update() {
+		base.update();
+
+		if (!ownedByLocalPlayer) {
+			return;
+		}
+
 		sigmaSaberMaxCooldown = (player.isSigma1() ? 1 : 0.5f);
 
 		if (dashAttackCooldown > 0) dashAttackCooldown = Helpers.clampMin0(dashAttackCooldown - Global.spf);
@@ -302,7 +330,9 @@ public partial class Character {
 			}
 		}
 
-		if (player.maverick1v1 != null && player.readyTextOver && !player.maverick1v1Spawned && player.respawnTime <= 0 && player.weapons.Count > 0) {
+		if (player.maverick1v1 != null && player.readyTextOver &&
+			!player.maverick1v1Spawned && player.respawnTime <= 0 && player.weapons.Count > 0
+		) {
 			player.maverick1v1Spawned = true;
 			var mw = player.weapons[0] as MaverickWeapon;
 			if (mw != null) {
@@ -347,9 +377,13 @@ public partial class Character {
 			}
 			if (player.weapons.Count >= 3) {
 				if (isWading()) {
-					if (player.weapons[2] is MechaniloidWeapon meW && meW.mechaniloidType != MechaniloidType.Fish) player.weapons[2] = new MechaniloidWeapon(player, MechaniloidType.Fish);
+					if (player.weapons[2] is MechaniloidWeapon meW && meW.mechaniloidType != MechaniloidType.Fish) {
+						player.weapons[2] = new MechaniloidWeapon(player, MechaniloidType.Fish);
+					}
 				} else {
-					if (player.weapons[2] is MechaniloidWeapon meW && meW.mechaniloidType != MechaniloidType.Bird) player.weapons[2] = new MechaniloidWeapon(player, MechaniloidType.Bird);
+					if (player.weapons[2] is MechaniloidWeapon meW && meW.mechaniloidType != MechaniloidType.Bird) {
+						player.weapons[2] = new MechaniloidWeapon(player, MechaniloidType.Bird);
+					}
 				}
 			}
 		}
@@ -364,7 +398,9 @@ public partial class Character {
 			return;
 		}
 
-		if (player.weapon is MaverickWeapon && (player.input.isHeld(Control.Shoot, player) || player.input.isHeld(Control.Special1, player))) {
+		if (player.weapon is MaverickWeapon && (
+			player.input.isHeld(Control.Shoot, player) || player.input.isHeld(Control.Special1, player))
+		) {
 			return;
 		}
 
@@ -385,7 +421,9 @@ public partial class Character {
 		}
 
 		if (player.isSigma3()) {
-			if (!string.IsNullOrEmpty(charState?.shootSprite) && sprite?.name?.EndsWith(charState.shootSprite) == true) {
+			if (!string.IsNullOrEmpty(charState?.shootSprite) &&
+				sprite?.name?.EndsWith(charState.shootSprite) == true
+			) {
 				if (isAnimOver() && charState is not Sigma3Shoot) {
 					changeSpriteFromName(charState.sprite, true);
 				} else {
@@ -394,11 +432,20 @@ public partial class Character {
 						player.sigmaFireWeapon.shootTime = 0.15f;
 						int upDownDir = MathF.Sign(player.input.getInputDir(player).y);
 						float ang = getShootXDir() == 1 ? 0 : 180;
-						if (charState.shootSprite.EndsWith("jump_shoot_downdiag")) ang = getShootXDir() == 1 ? 45 : 135;
-						if (charState.shootSprite.EndsWith("jump_shoot_down")) ang = 90;
-						if (ang != 0 && ang != 180) upDownDir = 0;
+						if (charState.shootSprite.EndsWith("jump_shoot_downdiag")) {
+							ang = getShootXDir() == 1 ? 45 : 135;
+						}
+						if (charState.shootSprite.EndsWith("jump_shoot_down")) {
+							ang = 90;
+						}
+						if (ang != 0 && ang != 180) {
+							upDownDir = 0;
+						}
 						playSound("sigma3shoot", sendRpc: true);
-						new Sigma3FireProj(player.sigmaFireWeapon, shootPOI.Value, ang, upDownDir, player, player.getNextActorNetId(), sendRpc: true);
+						new Sigma3FireProj(
+							player.sigmaFireWeapon, shootPOI.Value,
+							ang, upDownDir, player, player.getNextActorNetId(), sendRpc: true
+						);
 					}
 				}
 			}
@@ -432,10 +479,14 @@ public partial class Character {
 				}
 
 				if (player.isSigma3()) {
-					if (!string.IsNullOrEmpty(charState.shootSprite) && player.sigmaFireWeapon.shootTime == 0 && !isSigmaShooting() && sigma3FireballCooldown == 0) {
+					if (!string.IsNullOrEmpty(charState.shootSprite) && player.sigmaFireWeapon.shootTime == 0
+						&& !isSigmaShooting() && sigma3FireballCooldown == 0
+					) {
 						if (charState is Fall || charState is Jump || charState is WallKick) {
 							changeState(new Sigma3ShootAir(player.input.getInputDir(player)), true);
-						} else if (charState is Idle || charState is Run || charState is Dash || charState is SwordBlock) {
+						} else if (charState is Idle || charState is Run || charState is Dash
+							|| charState is SwordBlock
+						) {
 							changeState(new Sigma3Shoot(), true);
 						}
 						sigma3FireballCooldown = maxSigma3FireballCooldown;
@@ -447,7 +498,9 @@ public partial class Character {
 				var attackSprite = charState.attackSprite;
 
 				saberCooldown = sigmaSaberMaxCooldown;
-				if (charState is Run || charState is Dash || charState is Idle || charState is Jump || charState is Fall || charState is AirDash) {
+				if (charState is Run || charState is Dash || charState is Idle ||
+					charState is Jump || charState is Fall || charState is AirDash
+				) {
 					if (player.loadout.sigmaLoadout.sigmaForm == 0) {
 						changeState(new SigmaSlashState(charState), true);
 					} else if (player.loadout.sigmaLoadout.sigmaForm == 1) {
@@ -465,7 +518,11 @@ public partial class Character {
 				sigmaAmmoRechargeCooldown = 0.5f;
 				changeState(new SigmaBallShoot(), true);
 				return;
-			} else if (player.isSigma2() && player.input.isPressed(Control.Special1, player) && player.sigmaAmmo >= 16 && flag == null) {
+			}
+			else if (player.isSigma2() &&
+				player.input.isPressed(Control.Special1, player) &&
+				player.sigmaAmmo >= 16 && flag == null
+			) {
 				if (player.sigmaAmmo < 32) {
 					player.sigmaAmmo -= 16;
 					changeState(new SigmaElectricBallState(), true);
@@ -475,15 +532,27 @@ public partial class Character {
 					changeState(new SigmaElectricBall2State(), true);
 					return;
 				}
-			} else if (player.isSigma3() && player.input.isPressed(Control.Special1, player) && charState is not SigmaThrowShieldState && sigma3ShieldCooldown == 0) {
+			} else if (player.isSigma3() && player.input.isPressed(Control.Special1, player) &&
+				charState is not SigmaThrowShieldState && sigma3ShieldCooldown == 0
+			) {
 				sigma3ShieldCooldown = maxSigma3ShieldCooldown;
 				changeState(new SigmaThrowShieldState(), true);
 			}
 		}
+		if (player.isSigma1() && charState is Dash dashState) {
+			if (!dashState.stop && player.isSigma && player.input.isPressed(Control.Special1, player) &&
+				flag == null && leapSlashCooldown == 0
+			) {
+				changeState(new SigmaWallDashState(-1, true), true);
+			}
+		}
 
 		/*
-		if (charState.canAttack() && player.input.isHeld(Control.Shoot, player) && player.weapon is not MaverickWeapon && !isAttacking() && player.isSigma2() && saberCooldown == 0)
-		{
+		if (charState.canAttack() &&
+			player.input.isHeld(Control.Shoot, player) &&
+			player.weapon is not MaverickWeapon && !isAttacking() &&
+			player.isSigma2() && saberCooldown == 0
+		) {
 			saberCooldown = 0.2f;
 			changeState(new SigmaClawState(charState, !grounded), true);
 			playSound("sigma2slash", sendRpc: true);
@@ -515,26 +584,84 @@ public partial class Character {
 	}
 
 	// This can run on both owners and non-owners. So data used must be in sync
-	public Projectile getSigmaProjFromHitbox(Collider collider, Point centerPoint) {
+	public override Projectile getProjFromHitbox(Collider collider, Point centerPoint) {
 		Projectile proj = null;
 		if (sprite.name.Contains("sigma3_kaiser_fall") && collider.isAttack()) {
-			return new GenericMeleeProj(new KaiserStompWeapon(player), centerPoint, ProjIds.Sigma3KaiserStomp, player, damage: 12 * getKaiserStompDamage(), flinch: Global.defFlinch, hitCooldown: 1f);
+			return new GenericMeleeProj(
+				new KaiserStompWeapon(player), centerPoint, ProjIds.Sigma3KaiserStomp, player,
+				damage: 12 * getKaiserStompDamage(), flinch: Global.defFlinch, hitCooldown: 1f
+			);
 		} else if (sprite.name.StartsWith("sigma3_kaiser_") && collider.name == "body") {
-			return new GenericMeleeProj(new Weapon(), centerPoint, ProjIds.Sigma3KaiserSuit, player, damage: 0, flinch: 0, hitCooldown: 1, isShield: true);
+			return new GenericMeleeProj(
+				new Weapon(), centerPoint, ProjIds.Sigma3KaiserSuit, player,
+				damage: 0, flinch: 0, hitCooldown: 1, isShield: true
+			);
 		} else if (sprite.name.StartsWith("sigma3_") && collider.name == "shield") {
-			return new GenericMeleeProj(new Weapon(), centerPoint, ProjIds.Sigma3ShieldBlock, player, damage: 0, flinch: 0, hitCooldown: 1, isDeflectShield: true, isShield: true);
-		} else if (sprite.name == "sigma_ladder_attack") proj = new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSlash, player, 3, 0, 0.25f);
-		else if (sprite.name == "sigma_wall_slide_attack") proj = new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSlash, player, 3, 0, 0.25f);
-		else if (sprite.name.Contains("sigma_block") && !collider.isHurtBox()) {
-			proj = new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player, 0, 0, 0, isDeflectShield: true);
-		} else if (sprite.name == "sigma2_attack") proj = new GenericMeleeProj(player.sigmaClawWeapon, centerPoint, ProjIds.Sigma2Claw, player, 2, 0, 0.2f);
-		else if (sprite.name == "sigma2_attack2") proj = new GenericMeleeProj(player.sigmaClawWeapon, centerPoint, ProjIds.Sigma2Claw2, player, 2, Global.halfFlinch, 0.5f);
-		else if (sprite.name == "sigma2_attack_air") proj = new GenericMeleeProj(player.sigmaClawWeapon, centerPoint, ProjIds.Sigma2Claw, player, 3, 0, 0.375f);
-		else if (sprite.name == "sigma2_attack_dash") proj = new GenericMeleeProj(player.sigmaClawWeapon, centerPoint, ProjIds.Sigma2Claw, player, 3, 0, 0.375f);
-		else if (sprite.name == "sigma2_upslash" || sprite.name == "sigma2_downslash") proj = new GenericMeleeProj(player.sigmaClawWeapon, centerPoint, ProjIds.Sigma2UpDownClaw, player, 3, Global.defFlinch, 0.5f);
-		else if (sprite.name == "sigma2_ladder_attack") proj = new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.Sigma2Claw, player, 3, 0, 0.25f);
-		else if (sprite.name == "sigma2_wall_slide_attack") proj = new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.Sigma2Claw, player, 3, 0, 0.25f);
-		else if (sprite.name == "sigma2_shoot2") proj = new GenericMeleeProj(new SigmaElectricBall2Weapon(), centerPoint, ProjIds.Sigma2Ball2, player, 6, Global.defFlinch, 1f);
+			return new GenericMeleeProj(
+				new Weapon(), centerPoint, ProjIds.Sigma3ShieldBlock, player,
+				damage: 0, flinch: 0, hitCooldown: 1, isDeflectShield: true, isShield: true
+			);
+		} else if (sprite.name == "sigma_ladder_attack") {
+			proj = new GenericMeleeProj(
+				player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSlash, player,
+				3, 0, 0.25f
+			);
+		} else if (sprite.name == "sigma_wall_slide_attack") {
+			proj = new GenericMeleeProj(
+				player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSlash, player,
+				3, 0, 0.25f
+			);
+		} else if (sprite.name.Contains("sigma_block") && !collider.isHurtBox()) {
+			proj = new GenericMeleeProj(
+				player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player,
+				0, 0, 0, isDeflectShield: true
+			);
+		} else if (sprite.name == "sigma2_attack") {
+			proj = new GenericMeleeProj(
+				player.sigmaClawWeapon, centerPoint, ProjIds.Sigma2Claw, player,
+				2, 0, 0.2f
+			);
+		} else if (sprite.name == "sigma2_attack2") {
+			proj = new GenericMeleeProj(
+				player.sigmaClawWeapon, centerPoint, ProjIds.Sigma2Claw2, player,
+				2, Global.halfFlinch, 0.5f
+			);
+		} else if (sprite.name == "sigma2_attack_air") {
+			proj = new GenericMeleeProj(
+				player.sigmaClawWeapon, centerPoint, ProjIds.Sigma2Claw, player,
+				3, 0, 0.375f
+			);
+		}
+		else if (sprite.name == "sigma2_attack_dash") {
+			proj = new GenericMeleeProj(
+				player.sigmaClawWeapon, centerPoint, ProjIds.Sigma2Claw, player,
+				3, 0, 0.375f
+			);
+		}
+		else if (sprite.name == "sigma2_upslash" || sprite.name == "sigma2_downslash") {
+			proj = new GenericMeleeProj(
+				player.sigmaClawWeapon, centerPoint, ProjIds.Sigma2UpDownClaw, player,
+				3, Global.defFlinch, 0.5f
+			);
+		}
+		else if (sprite.name == "sigma2_ladder_attack") {
+			proj = new GenericMeleeProj(
+				player.sigmaSlashWeapon, centerPoint, ProjIds.Sigma2Claw, player,
+				3, 0, 0.25f
+			);
+		}
+		else if (sprite.name == "sigma2_wall_slide_attack") {
+			proj = new GenericMeleeProj(
+				player.sigmaSlashWeapon, centerPoint, ProjIds.Sigma2Claw, player,
+				3, 0, 0.25f
+			);
+		}
+		else if (sprite.name == "sigma2_shoot2") {
+			proj = new GenericMeleeProj(
+				new SigmaElectricBall2Weapon(), centerPoint, ProjIds.Sigma2Ball2, player,
+				6, Global.defFlinch, 1f
+			);
+		}
 		return proj;
 	}
 
@@ -615,5 +742,156 @@ public partial class Character {
 		if (player.isStriker()) return 0;
 		if (player.isTagTeam()) return 5;
 		return 3;
+	}
+
+	public override bool canClimbLadder() {
+		if (isSigmaShooting()) {
+			return false;
+		}
+		return base.canClimbLadder();
+	}
+
+	public override bool isSoundCentered() {
+		if (isHyperSigma) return false;
+		return base.isSoundCentered();
+	}
+
+	public override Collider getGlobalCollider() {
+		Rect rect = new Rect(0, 0, 18, Sigma.sigmaHeight);
+		if (sprite.name.Contains("_ra_")) {
+			rect.y2 = 20;
+		}
+		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
+	}
+
+	public override Collider getTerrainCollider() {
+		if (physicsCollider == null || isHyperSigma) {
+			return null;
+		}
+		float hSize = 40;
+		if (sprite.name.Contains("crouch")) {
+			hSize = 32;
+		}
+		if (sprite.name.Contains("dash")) {
+			hSize = 32;
+		}
+		if (sprite.name.Contains("_ra_")) {
+			hSize = 20;
+		}
+		return new Collider(
+			new Rect(0f, 0f, 18, hSize).getPoints(),
+			false, this, false, false,
+			HitboxFlag.Hurtbox, new Point(0, 0)
+		);
+	}
+
+	public override Collider getDashingCollider() {
+		var rect = new Rect(0, 0, 18, 40);
+		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
+	}
+
+	public override Collider getCrouchingCollider() {
+		var rect = new Rect(0, 0, 18, 40);
+		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
+	}
+
+	public override Collider getRaCollider() {
+		var rect = new Rect(0, 0, 18, 30);
+		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
+	}
+
+	public override Collider getRcCollider() {
+		var rect = new Rect(0, -24, 18, 0);
+		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
+	}
+
+	public override Collider getBlockCollider() {
+		var rect = new Rect(0, 0, 18, 34);
+		if (player.isSigma1()) rect = Rect.createFromWH(0, 0, 16, 35);
+		if (player.isSigma2()) rect = Rect.createFromWH(0, 0, 18, 50);
+		if (player.isSigma3()) rect = Rect.createFromWH(0, 0, 23, 55);
+		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
+	}
+
+	public override void render(float x, float y) {
+		base.render(x, y);
+
+		bool drewStatusProgress = drawStatusProgress();
+		bool drewSubtankHealing = drawSubtankHealing();
+
+		if (!drewStatusProgress && !drewSubtankHealing && player.isSigma && tagTeamSwapProgress > 0) {
+			float healthBarInnerWidth = 30;
+
+			float progress = 1 - (tagTeamSwapProgress / 1);
+			float width = progress * healthBarInnerWidth;
+
+			getHealthNameOffsets(out bool shieldDrawn, ref progress);
+
+			Point topLeft = new Point(pos.x - 16, pos.y - 5 + currentLabelY);
+			Point botRight = new Point(pos.x + 16, pos.y + currentLabelY);
+
+			DrawWrappers.DrawRect(
+				topLeft.x, topLeft.y, botRight.x, botRight.y,
+				true, Color.Black, 0, ZIndex.HUD - 1, outlineColor: Color.White
+			);
+			DrawWrappers.DrawRect(
+				topLeft.x + 1, topLeft.y + 1, topLeft.x + 1 + width, botRight.y - 1,
+				true, Color.Yellow, 0, ZIndex.HUD - 1
+			);
+
+			DrawWrappers.DrawText(
+				"Swapping...", pos.x, pos.y - 15 + currentLabelY, Alignment.Center,
+				true, 0.75f, Color.White, Helpers.getAllianceColor(),
+				Text.Styles.Regular, 1, true, ZIndex.HUD
+			);
+			deductLabelY(labelCooldownOffY);
+		}
+
+		if (!drewStatusProgress && !drewSubtankHealing &&
+			player.isViralSigma() && charState is ViralSigmaPossessStart
+		) {
+			float healthBarInnerWidth = 30;
+
+			float progress = (possessEnemyTime / maxPossessEnemyTime);
+			float width = progress * healthBarInnerWidth;
+
+			getHealthNameOffsets(out bool shieldDrawn, ref progress);
+
+			Point topLeft = new Point(pos.x - 16, pos.y - 5 + currentLabelY);
+			Point botRight = new Point(pos.x + 16, pos.y + currentLabelY);
+
+			DrawWrappers.DrawRect(
+				topLeft.x, topLeft.y, botRight.x, botRight.y,
+				true, Color.Black, 0, ZIndex.HUD - 1, outlineColor: Color.White
+			);
+			DrawWrappers.DrawRect(
+				topLeft.x + 1, topLeft.y + 1, topLeft.x + 1 + width, botRight.y - 1,
+				true, Color.Yellow, 0, ZIndex.HUD - 1
+			);
+			DrawWrappers.DrawText(
+				"Possessing...", pos.x, pos.y - 15 + currentLabelY, Alignment.Center,
+				true, 0.75f, Color.White, Helpers.getAllianceColor(),
+				Text.Styles.Regular, 1, true, ZIndex.HUD
+			);
+			deductLabelY(labelCooldownOffY);
+		}
+	}
+
+	public override void destroySelf(
+		string spriteName = null, string fadeSound = null, bool disableRpc = false,
+		bool doRpcEvenIfNotOwned = false, bool favorDefenderProjDestroy = false
+	) {
+		head?.explode();
+		leftHand?.destroySelf();
+		rightHand?.destroySelf();
+
+		base.destroySelf(spriteName, fadeSound, disableRpc, doRpcEvenIfNotOwned, favorDefenderProjDestroy);
+	}
+
+	public override bool isAttacking() {
+		if (isSigmaShooting()) {
+			return true;
+		}
+		return base.isAttacking();
 	}
 }

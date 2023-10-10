@@ -10,15 +10,13 @@ using static SFML.Window.Keyboard;
 namespace MMXOnline;
 
 public partial class Character : Actor, IDamagable {
-	public static string[] charDisplayNames =
-	{
-			"X",
-			"Zero",
-			"Vile",
-			"Axl",
-			"Sigma"
-		};
-
+	public static string[] charDisplayNames = {
+		"X",
+		"Zero",
+		"Vile",
+		"Axl",
+		"Sigma"
+	};
 	public CharState charState;
 	public Player player;
 	public bool isDashing;
@@ -570,8 +568,7 @@ public partial class Character : Actor, IDamagable {
 			isAttacking() ||
 			hasBusterProj() ||
 			isShootingRaySplasher ||
-			isSoftLocked() ||
-			isSigmaShooting()
+			isSoftLocked()
 		) {
 			return false;
 		}
@@ -630,9 +627,10 @@ public partial class Character : Actor, IDamagable {
 		return true;
 	}
 
-	public bool isSoundCentered() {
-		if (charState is WarpOut) return false;
-		if (isHyperSigma) return false;
+	public virtual bool isSoundCentered() {
+		if (charState is WarpOut) {
+			return false;
+		}
 		return true;
 	}
 
@@ -706,7 +704,7 @@ public partial class Character : Actor, IDamagable {
 
 	// For terrain collision.
 	public override Collider getTerrainCollider() {
-		if (physicsCollider == null || isHyperSigma) {
+		if (physicsCollider == null) {
 			return null;
 		}
 		float hSize = 30;
@@ -716,26 +714,8 @@ public partial class Character : Actor, IDamagable {
 		if (sprite.name.Contains("dash")) {
 			hSize = 22;
 		}
-		if (player.isSigma) {
-			hSize += 10;
-		}
 		if (sprite.name.Contains("_ra_")) {
 			hSize = 20;
-		}
-		if (player.isZero) {
-			if (specialState == (int)SpecialStateIds.HyorogaStart) {
-				return new Collider(
-					new Rect(0f, 0f, 18, 40).getPoints(),
-					false, this, false, false,
-					HitboxFlag.Hurtbox, new Point(0, 0)
-				);
-			} else if (sprite.name.Contains("hyoroga")) {
-				return new Collider(
-					new Rect(0f, 0f, 18, hSize).getPoints(),
-					false, this, false, false,
-					HitboxFlag.Hurtbox, new Point(0, 40 - hSize)
-				);
-			}
 		}
 		return new Collider(
 			new Rect(0f, 0f, 18, hSize).getPoints(),
@@ -746,41 +726,29 @@ public partial class Character : Actor, IDamagable {
 
 	public override Collider getGlobalCollider() {
 		var rect = new Rect(0, 0, 18, 34);
-		if (player.isZero) rect.y2 = 40;
-		if (player.isVile) rect.y2 = 43;
-		if (player.isSigma) rect.y2 = sigmaHeight;
-		if (sprite.name.Contains("_ra_")) rect.y2 = 20;
+		if (sprite.name.Contains("_ra_")) {
+			rect.y2 = 20;
+		}
 		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
 	}
 
-	public Collider getDashingCollider() {
+	public virtual Collider getDashingCollider() {
 		var rect = new Rect(0, 0, 18, 22);
-		if (player.isZero) rect.y2 = 27;
-		if (player.isVile) rect.y2 = 30;
-		if (player.isSigma) rect.y2 = 40;
 		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
 	}
 
-	public Collider getCrouchingCollider() {
+	public virtual Collider getCrouchingCollider() {
 		var rect = new Rect(0, 0, 18, 22);
-		if (player.isZero) rect.y2 = 27;
-		if (player.isVile) rect.y2 = 30;
 		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
 	}
 
-	public Collider getRaCollider() {
+	public virtual Collider getRaCollider() {
 		var rect = new Rect(0, 0, 18, 15);
-		if (player.isZero) rect.y2 = 20;
-		if (player.isVile) rect.y2 = 23;
-		if (player.isSigma) rect.y2 = 30;
 		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
 	}
 
-	public Collider getRcCollider() {
+	public virtual Collider getRcCollider() {
 		var rect = new Rect(0, -20, 18, 0);
-		if (player.isZero) rect.y1 = -21;
-		if (player.isVile) rect.y1 = -21;
-		if (player.isSigma) rect.y1 = -24;
 		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
 	}
 
@@ -789,22 +757,13 @@ public partial class Character : Actor, IDamagable {
 		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
 	}
 
-	public Collider getBlockCollider() {
+	public virtual Collider getBlockCollider() {
 		var rect = new Rect(0, 0, 18, 34);
-		if (player.isZero) rect = Rect.createFromWH(0, 0, 16, 16);
-		if (player.isSigma) {
-			if (player.isSigma1()) rect = Rect.createFromWH(0, 0, 16, 35);
-			if (player.isSigma2()) rect = Rect.createFromWH(0, 0, 18, 50);
-			if (player.isSigma3()) rect = Rect.createFromWH(0, 0, 23, 55);
-		}
 		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
 	}
 
 	public override void preUpdate() {
 		base.preUpdate();
-		if (player.isSigma) {
-			preUpdateSigma();
-		}
 		insideCharacter = false;
 		changedStateInFrame = false;
 		pushedByTornadoInFrame = false;
@@ -1218,7 +1177,6 @@ public partial class Character : Actor, IDamagable {
 		}
 		if (healAmount > 0 && player.health > 0) {
 			healTime += Global.spf;
-			if (isHyperSigma) healTime += Global.spf;
 			if (healTime > 0.05) {
 				healTime = 0;
 				healAmount--;
@@ -1263,18 +1221,14 @@ public partial class Character : Actor, IDamagable {
 			}
 		}
 
-		charState.update();
-
-
 		if (player.isDisguisedAxl) {
 			updateDisguisedAxl();
-		}
-		if (player.isSigma) {
-			updateSigma();
 		}
 		if (player.isX) {
 			updateX();
 		}
+
+		charState.update();
 	}
 
 	public void removeAcid() {
@@ -2019,41 +1973,6 @@ public partial class Character : Actor, IDamagable {
 		bool drewSubtankHealing = drawSubtankHealing();
 		if (player.isMainPlayer && !player.isDead) {
 			bool drewStatusProgress = drawStatusProgress();
-			if (!drewStatusProgress && !drewSubtankHealing && player.isSigma && tagTeamSwapProgress > 0) {
-				float healthBarInnerWidth = 30;
-
-				float progress = 1 - (tagTeamSwapProgress / 1);
-				float width = progress * healthBarInnerWidth;
-
-				getHealthNameOffsets(out bool shieldDrawn, ref progress);
-
-				Point topLeft = new Point(pos.x - 16, pos.y - 5 + currentLabelY);
-				Point botRight = new Point(pos.x + 16, pos.y + currentLabelY);
-
-				DrawWrappers.DrawRect(topLeft.x, topLeft.y, botRight.x, botRight.y, true, Color.Black, 0, ZIndex.HUD - 1, outlineColor: Color.White);
-				DrawWrappers.DrawRect(topLeft.x + 1, topLeft.y + 1, topLeft.x + 1 + width, botRight.y - 1, true, Color.Yellow, 0, ZIndex.HUD - 1);
-
-				DrawWrappers.DrawText("Swapping...", pos.x, pos.y - 15 + currentLabelY, Alignment.Center, true, 0.75f, Color.White, Helpers.getAllianceColor(), Text.Styles.Regular, 1, true, ZIndex.HUD);
-				deductLabelY(labelCooldownOffY);
-			}
-
-			if (!drewStatusProgress && !drewSubtankHealing && player.isViralSigma() && charState is ViralSigmaPossessStart) {
-				float healthBarInnerWidth = 30;
-
-				float progress = (possessEnemyTime / maxPossessEnemyTime);
-				float width = progress * healthBarInnerWidth;
-
-				getHealthNameOffsets(out bool shieldDrawn, ref progress);
-
-				Point topLeft = new Point(pos.x - 16, pos.y - 5 + currentLabelY);
-				Point botRight = new Point(pos.x + 16, pos.y + currentLabelY);
-
-				DrawWrappers.DrawRect(topLeft.x, topLeft.y, botRight.x, botRight.y, true, Color.Black, 0, ZIndex.HUD - 1, outlineColor: Color.White);
-				DrawWrappers.DrawRect(topLeft.x + 1, topLeft.y + 1, topLeft.x + 1 + width, botRight.y - 1, true, Color.Yellow, 0, ZIndex.HUD - 1);
-
-				DrawWrappers.DrawText("Possessing...", pos.x, pos.y - 15 + currentLabelY, Alignment.Center, true, 0.75f, Color.White, Helpers.getAllianceColor(), Text.Styles.Regular, 1, true, ZIndex.HUD);
-				deductLabelY(labelCooldownOffY);
-			}
 
 			if (!drewStatusProgress && !drewSubtankHealing && dropFlagProgress > 0) {
 				float healthBarInnerWidth = 30;
@@ -2745,9 +2664,6 @@ public partial class Character : Actor, IDamagable {
 		if (player.isX && player.hasGoldenArmor()) {
 			player.setGoldenArmor(false);
 		}
-		head?.explode();
-		leftHand?.destroySelf();
-		rightHand?.destroySelf();
 
 		// This ensures that the "onExit" charState function can do any cleanup it needs to do without having to copy-paste that code here, too
 		charState?.onExit(null);
@@ -2968,15 +2884,15 @@ public partial class Character : Actor, IDamagable {
 
 	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (player.isX) return getXProjFromHitbox(centerPoint);
-		//else if (player.isAxl) return getAxlProjFromHitbox(centerPoint);
-		else if (player.isSigma) return getSigmaProjFromHitbox(hitbox, centerPoint);
 		return null;
 	}
 
 	public void releaseGrab(Actor grabber) {
 		charState?.releaseGrab();
 		if (!ownedByLocalPlayer) {
-			RPC.commandGrabPlayer.sendRpc(grabber.netId, netId, CommandGrabScenario.Release, grabber.isDefenderFavored());
+			RPC.commandGrabPlayer.sendRpc(
+				grabber.netId, netId, CommandGrabScenario.Release, grabber.isDefenderFavored()
+			);
 		}
 	}
 

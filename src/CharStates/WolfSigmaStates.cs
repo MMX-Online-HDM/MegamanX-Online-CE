@@ -11,6 +11,7 @@ namespace MMXOnline;
 public class WolfSigma : CharState {
 	bool winTauntOnce;
 	Point startPos;
+	public Sigma sigma;
 
 	public WolfSigma() : base("head") {
 		immuneToWind = true;
@@ -23,19 +24,23 @@ public class WolfSigma : CharState {
 		if (Global.level.gameMode.isOver && Global.level.gameMode.playerWon(player)) {
 			if (!winTauntOnce) {
 				winTauntOnce = true;
-				character.head.tauntTime = Global.spf;
-				character.head.changeSprite("sigma_wolf_head_taunt", true);
+				sigma.head.tauntTime = Global.spf;
+				sigma.head.changeSprite("sigma_wolf_head_taunt", true);
 				character.visible = false;
 			}
-		} else if (stateTime > 0.5f && player.input.isPressed(Control.Taunt, player) && character.head.shootTime == 0 && character.head.tauntTime == 0) {
-			character.head.tauntTime = Global.spf;
-			character.head.changeSprite("sigma_wolf_head_taunt", true);
+		} else if (
+			stateTime > 0.5f && player.input.isPressed(Control.Taunt, player) &&
+			sigma.head.shootTime == 0 && sigma.head.tauntTime == 0
+		) {
+			sigma.head.tauntTime = Global.spf;
+			sigma.head.changeSprite("sigma_wolf_head_taunt", true);
 			character.visible = false;
 		}
 	}
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		sigma = character as Sigma;
 		character.invulnTime = 0.5f;
 		character.stopMoving();
 		startPos = character.pos;
@@ -43,17 +48,21 @@ public class WolfSigma : CharState {
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
-		character.leftHand.destroySelf();
-		character.rightHand.destroySelf();
-		var leftHandExplodeEffect = ExplodeDieEffect.createFromActor(player, character.leftHand, 10, 3, false);
-		var rightHandExplodeEffect = ExplodeDieEffect.createFromActor(player, character.rightHand, 10, 3, false);
+		sigma.leftHand.destroySelf();
+		sigma.rightHand.destroySelf();
+		var leftHandExplodeEffect = ExplodeDieEffect.createFromActor(player, sigma.leftHand, 10, 3, false);
+		var rightHandExplodeEffect = ExplodeDieEffect.createFromActor(player, sigma.rightHand, 10, 3, false);
 
-		leftHandExplodeEffect.silent = Helpers.clamp01(character.leftHand.pos.distanceTo(character.head.pos) / Global.screenW) < 1;
-		rightHandExplodeEffect.silent = Helpers.clamp01(character.rightHand.pos.distanceTo(character.head.pos) / Global.screenW) < 1;
+		leftHandExplodeEffect.silent = Helpers.clamp01(
+			sigma.leftHand.pos.distanceTo(sigma.head.pos) / Global.screenW
+		) < 1;
+		rightHandExplodeEffect.silent = Helpers.clamp01(
+			sigma.rightHand.pos.distanceTo(sigma.head.pos) / Global.screenW
+		) < 1;
 
 		Global.level.addEffect(leftHandExplodeEffect);
 		Global.level.addEffect(rightHandExplodeEffect);
-		character.head.explode();
+		sigma.head.explode();
 	}
 
 	public override bool canExit(Character character, CharState newState) {
@@ -753,6 +762,7 @@ public class WolfSigmaRevive : CharState {
 	public ExplodeDieEffect explodeDieEffect;
 	public bool groundStart;
 	Point destPos;
+	public Sigma sigma;
 
 	float speed = 1;
 
@@ -817,10 +827,10 @@ public class WolfSigmaRevive : CharState {
 				}
 			}
 		} else if (state == 4) {
-			if (stateTime > 1.2 && character.head == null) {
-				character.head = new WolfSigmaHead(destPos, player, player.getNextActorNetId(), true, rpc: true);
-				character.leftHand = new WolfSigmaHand(destPos.addxy(-85, 25), player, true, player.getNextActorNetId(), true, rpc: true);
-				character.rightHand = new WolfSigmaHand(destPos.addxy(85, 25), player, false, player.getNextActorNetId(), true, rpc: true);
+			if (stateTime > 1.2 && sigma.head == null) {
+				sigma.head = new WolfSigmaHead(destPos, player, player.getNextActorNetId(), true, rpc: true);
+				sigma.leftHand = new WolfSigmaHand(destPos.addxy(-85, 25), player, true, player.getNextActorNetId(), true, rpc: true);
+				sigma.rightHand = new WolfSigmaHand(destPos.addxy(85, 25), player, false, player.getNextActorNetId(), true, rpc: true);
 			}
 			if (stateTime > 4) {
 				character.frameSpeed = 1;
@@ -832,9 +842,9 @@ public class WolfSigmaRevive : CharState {
 			}
 		} else if (state == 5) {
 			if (player.health >= player.maxHealth) {
-				player.weapons.Add(new WolfSigmaHandWeapon(player, character.leftHand));
+				player.weapons.Add(new WolfSigmaHandWeapon(player, sigma.leftHand));
 				player.weapons.Add(new WolfSigmaHeadWeapon());
-				player.weapons.Add(new WolfSigmaHandWeapon(player, character.rightHand));
+				player.weapons.Add(new WolfSigmaHandWeapon(player, sigma.rightHand));
 
 				player.weaponSlot = 1;
 
@@ -845,10 +855,11 @@ public class WolfSigmaRevive : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		sigma = character as Sigma;
 		character.stopMoving();
 		character.visible = false;
 		character.useGravity = false;
-		character.isHyperSigma = true;
+		sigma.isHyperSigma = true;
 		character.frameSpeed = 0;
 		character.immuneToKnockback = true;
 

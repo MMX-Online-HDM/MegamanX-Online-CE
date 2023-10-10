@@ -1002,4 +1002,66 @@ public class Zero : Character {
 		}
 		return dashSpeed * getRunDebuffs();
 	}
+
+	public override Collider getGlobalCollider() {
+		var rect = new Rect(0, 0, 18, 40);
+		if (sprite.name.Contains("_ra_")) {
+			rect.y2 = 20;
+		}
+		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
+	}
+
+	public override Collider getTerrainCollider() {
+		if (physicsCollider == null) {
+			return null;
+		}
+		float hSize = 30;
+		if (sprite.name.Contains("crouch")) {
+			hSize = 22;
+		}
+		if (sprite.name.Contains("dash")) {
+			hSize = 22;
+		}
+		if (sprite.name.Contains("_ra_")) {
+			hSize = 20;
+		}
+		if (specialState == (int)SpecialStateIds.HyorogaStart) {
+			return new Collider(
+				new Rect(0f, 0f, 18, 40).getPoints(),
+				false, this, false, false,
+				HitboxFlag.Hurtbox, new Point(0, 0)
+			);
+		} else if (sprite.name.Contains("hyoroga")) {
+			return new Collider(
+				new Rect(0f, 0f, 18, hSize).getPoints(),
+				false, this, false, false,
+				HitboxFlag.Hurtbox, new Point(0, 40 - hSize)
+			);
+		}
+		return new Collider(
+			new Rect(0f, 0f, 18, hSize).getPoints(),
+			false, this, false, false,
+			HitboxFlag.Hurtbox, new Point(0, 0)
+		);
+	}
+
+	public override Collider getDashingCollider() {
+		var rect = new Rect(0, 0, 18, 26);
+		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
+	}
+
+	public override Collider getCrouchingCollider() {
+		var rect = new Rect(0, 0, 18, 26);
+		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
+	}
+
+	public override Collider getRaCollider() {
+		var rect = new Rect(0, 0, 18, 20);
+		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
+	}
+
+	public override Collider getBlockCollider() {
+		var rect = new Rect(0, 0, 16, 16);
+		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
+	}
 }

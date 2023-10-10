@@ -17,6 +17,8 @@ public class SigmaClawState : CharState {
 	CharState prevCharState;
 	float slideVel;
 	bool isAir;
+	public Sigma sigma;
+
 	public SigmaClawState(CharState prevCharState, bool isAir) : base(prevCharState.attackSprite, "", "", "") {
 		this.prevCharState = prevCharState;
 		this.isAir = isAir;
@@ -56,7 +58,7 @@ public class SigmaClawState : CharState {
 			once = true;
 			sprite = "attack2";
 			defaultSprite = sprite;
-			character.saberCooldown = character.sigmaSaberMaxCooldown;
+			character.saberCooldown = sigma.sigmaSaberMaxCooldown;
 			character.changeSpriteFromName(sprite, true);
 			character.playSound("sigma2slash", sendRpc: true);
 			return;
@@ -70,6 +72,7 @@ public class SigmaClawState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		sigma = character as Sigma;
 		if (oldState is Dash) {
 			slideVel = character.xDir * character.getDashSpeed();
 		}

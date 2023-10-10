@@ -117,7 +117,7 @@ public class Maverick : Actor, IDamagable {
 
 		Rect idleRect = Global.sprites[getMaverickPrefix() + "_idle"].frames[0].rect;
 		width = Math.Min(idleRect.w() - 20, maxWidth);
-		height = Math.Min(idleRect.h(), Character.sigmaHeight);
+		height = Math.Min(idleRect.h(), Sigma.sigmaHeight);
 		if (this is MorphMothCocoon) width = 20;
 		if (this is MorphMoth) width = 18;
 		if (this is BlizzardBuffalo) width = 30;
@@ -126,10 +126,10 @@ public class Maverick : Actor, IDamagable {
 
 		if (ownedByLocalPlayer) {
 			// Sort mavericks by their height. Unless the maverick height is >= sigma height it should go above sigma
-			zIndex = ZIndex.MainPlayer - (heightInt - (int)Character.sigmaHeight);
+			zIndex = ZIndex.MainPlayer - (heightInt - (int)Sigma.sigmaHeight);
 			if (zIndex == ZIndex.MainPlayer) zIndex = ZIndex.Character - 100;
 		} else {
-			zIndex = ZIndex.Character - (heightInt - (int)Character.sigmaHeight);
+			zIndex = ZIndex.Character - (heightInt - (int)Sigma.sigmaHeight);
 			if (zIndex == ZIndex.Character) zIndex = ZIndex.Character - 100;
 		}
 
