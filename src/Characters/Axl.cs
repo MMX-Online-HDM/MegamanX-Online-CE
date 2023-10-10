@@ -276,9 +276,13 @@ public class Axl : Character {
 				Helpers.decrementTime(ref revTime);
 			}
 			if (netNonOwnerScopeEndPos != null) {
-				var incPos = netNonOwnerScopeEndPos.Value.subtract(nonOwnerScopeEndPos).times(1f / Global.tickRate);
+				float frameSmooth = Global.tickRate;
+				if (frameSmooth < 2) {
+					frameSmooth = 2;
+				}
+				var incPos = netNonOwnerScopeEndPos.Value.subtract(nonOwnerScopeEndPos).times(1f / frameSmooth);
 				var framePos = nonOwnerScopeEndPos.add(incPos);
-				if (nonOwnerScopeEndPos.distanceTo(framePos) > 0.001f) {
+				if (nonOwnerScopeEndPos.distanceTo(framePos) > float.Epsilon) {
 					nonOwnerScopeEndPos = framePos;
 				}
 			}
@@ -347,12 +351,11 @@ public class Axl : Character {
 		updateAxlAim();
 
 		if (dodgeRollCooldown == 0 && player.canControl) {
-			if (charState is Crouch && player.input.isHeld(Control.Dash, player) && canDash()) {
+			if (charState is Crouch && player.input.isPressed(Control.Dash, player) && canDash()) {
 				changeState(new DodgeRoll());
 			}
-			if (player.input.checkDoubleTap(Control.Dash) && canDash() && dodgeRollCooldown == 0) {
+			else if (player.input.isPressed(Control.Dash, player) && player.input.checkDoubleTap(Control.Dash)) {
 				changeState(new DodgeRoll(), true);
-				return;
 			}
 		}
 
@@ -1183,8 +1186,8 @@ public class Axl : Character {
 			muzzleFlash.angle = netArmAngle;
 			muzzleFlash.pos = getAxlBulletPos();
 			if (muzzleFlash.sprite.name.StartsWith("axl_raygun_flash")) {
-				muzzleFlash.xScale = 0.75f;
-				muzzleFlash.yScale = 0.75f;
+				muzzleFlash.xScale = 1f;
+				muzzleFlash.yScale = 1f;
 				muzzleFlash.setzIndex(zIndex - 2);
 			} else {
 				muzzleFlash.xScale = 1f;
@@ -1582,15 +1585,16 @@ public class Axl : Character {
 	}
 
 	public override bool isSoftLocked() {
-		if (isAnyZoom() || sniperMissileProj != null || isRevving) {
+		if (isAnyZoom() || sniperMissileProj != null) {
 			return true;
 		}
 		return base.isSoftLocked();
 	}
 
 	public override bool canDash() {
-		if (isAnyZoom() || sniperMissileProj != null) return false;
-
+		if (isAnyZoom() || sniperMissileProj != null || isRevving) {
+			return false;
+		}
 		return base.canDash();
 	}
 

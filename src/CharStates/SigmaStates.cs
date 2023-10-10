@@ -123,8 +123,12 @@ public class SigmaSlashState : CharState {
 }
 
 public class SigmaSlashProj : Projectile {
-	public SigmaSlashProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, float damage = 6, int flinch = Global.defFlinch, bool rpc = false) :
-		base(weapon, pos, xDir, 0, damage, player, "sigma_proj_slash", flinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public SigmaSlashProj(
+		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId,
+		float damage = 6, int flinch = 26, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, damage, player, "sigma_proj_slash", flinch, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		reflectable = false;
 		destroyOnHit = false;
 		shouldShieldBlock = false;

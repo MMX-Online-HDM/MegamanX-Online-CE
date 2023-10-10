@@ -1243,6 +1243,7 @@ public partial class Player {
 		var oldPos = character.pos;
 		var oldDir = character.xDir;
 		character.destroySelf();
+		character.netId = null;
 		Global.level.gameObjects.Add(preTransformedAxl);
 		character = preTransformedAxl;
 		character.addTransformAnim();

@@ -375,7 +375,7 @@ public class SniperMissileProj : Projectile, IDamagable {
 		base(weapon, pos, 1, 150, 0, player, "snipermissile_proj", 0, 0f, netProjId, player.ownedByLocalPlayer) {
 		maxTime = maxTimeConst;
 		axl = (player.character as Axl);
-		
+
 		if (axl?.isWhiteAxl() == true) {
 			maxTime = 1000;
 			health = 12;
@@ -385,8 +385,6 @@ public class SniperMissileProj : Projectile, IDamagable {
 		vel.x = bulletDir.x * speed;
 		vel.y = bulletDir.y * speed;
 		projId = (int)ProjIds.SniperMissile;
-		xScale = 0.75f;
-		yScale = 0.75f;
 		blinkTime = maxBlinkTime;
 		updateAngle();
 

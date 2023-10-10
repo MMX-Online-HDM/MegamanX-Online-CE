@@ -1205,8 +1205,6 @@ public class RPCAxlShoot : RPC {
 			if (Global.level.gameMode.isTeamMode && player.alliance == GameMode.redAlliance) fs = "axl_raygun_flash2";
 			var flash = new Anim(pos, fs, 1, null, true);
 			flash.setzIndex(player.character.zIndex - 100);
-			flash.xScale = 0.75f;
-			flash.yScale = 0.75f;
 			flash.angle = angle;
 			flash.frameSpeed = 1;
 		} else if (projId == (int)ProjIds.SpiralMagnum || projId == (int)ProjIds.SpiralMagnumScoped) {

@@ -64,6 +64,7 @@ public partial class Level {
 	public float camY;
 	public float zoomScale;
 	public int frameCount;
+	public int nonSkippedframeCount;
 	public float twoFrameCycle;
 	public string debugString;
 	public string debugString2;
@@ -1021,7 +1022,10 @@ public partial class Level {
 	}
 
 	public bool isSendMessageFrame() {
-		return Global.level.frameCount % Global.normalizeFrames(Global.tickRate) == 0;
+		return (
+			!Global.isSkippingFrames &&
+			Global.level.nonSkippedframeCount % Global.tickRate == 0
+		);
 	}
 
 	public bool isAfkWarn() {
@@ -1286,10 +1290,17 @@ public partial class Level {
 			pickupSpawner.update();
 		}
 
+		// This would mostly be reliable to sync based on time.
 		frameCount++;
 
+		// DO NOT use this thing for anything except "isSendMessageFrame()".
+		// This is unreliable as hell and it will desync.
+		if (!Global.isSkippingFrames) {
+			nonSkippedframeCount++;
+		}
+
 		twoFrameCycle++;
-		if (twoFrameCycle > 2) twoFrameCycle = -2;
+		if (twoFrameCycle > 2) { twoFrameCycle = -2; }
 
 		gameMode.update();
 

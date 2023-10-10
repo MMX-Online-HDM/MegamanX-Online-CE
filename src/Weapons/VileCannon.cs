@@ -131,8 +131,7 @@ public class VileCannonProj : Projectile {
 		destroyOnHit = true;
 
 		if (weapon.type == (int)VileCannonType.FrontRunner) {
-			xScale = 0.75f * xDir;
-			yScale = 0.75f;
+			// Nothing.
 		} else if (weapon.type == (int)VileCannonType.FatBoy) {
 			xScale = xDir;
 			damager.damage = 4;
@@ -140,17 +139,12 @@ public class VileCannonProj : Projectile {
 			projId = (int)ProjIds.FatBoy;
 			maxTime = 0.35f;
 		} else if (weapon.type == (int)VileCannonType.LongshotGizmo) {
-			xScale = 0.75f * xDir;
-			yScale = 0.75f;
-
 			damager.damage = 1;
-
 			/*
 			if (player.vileAmmo >= 32 - weapon.vileAmmoUsage) damager.damage = 3;
 			else if (player.vileAmmo >= 32 - weapon.vileAmmoUsage * 2) damager.damage = 2;
 			else damager.damage = 1;
 			*/
-
 			projId = (int)ProjIds.LongshotGizmo;
 		}
 

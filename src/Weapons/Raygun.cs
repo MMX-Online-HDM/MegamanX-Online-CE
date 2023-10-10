@@ -356,8 +356,6 @@ public class SplashLaserProj : Projectile {
 		maxTime = 0.4f;
 		useGravity = false;
 		gravityModifier = 0.5f;
-		xScale = 0.5f;
-		yScale = 0.5f;
 		vel.x = bulletDir.x * speed;
 		vel.y = bulletDir.y * speed;
 		destroyOnHit = true;

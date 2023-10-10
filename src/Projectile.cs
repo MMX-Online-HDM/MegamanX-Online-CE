@@ -88,7 +88,14 @@ public class Projectile : Actor {
 		}
 		*/
 
-		if (time > maxTime || moveDistance > maxDistance || pos.x > Global.level.width + leeway || pos.x < -leeway || pos.y > Global.level.height + leeway || pos.y < -leeway) {
+		if (ownedByLocalPlayer && (
+			time > maxTime ||
+			moveDistance > maxDistance ||
+			pos.x > Global.level.width + leeway ||
+			pos.x < -leeway ||
+			pos.y > Global.level.height + leeway ||
+			pos.y < -leeway
+		)) {
 			if (fadeOnAutoDestroy) destroySelf();
 			else destroySelfNoEffect();
 			return;

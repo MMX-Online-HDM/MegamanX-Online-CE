@@ -26,10 +26,9 @@ class Program {
 	#endif
 	static void Main(string[] args) {
 		if (args.Length > 0 && args.Any(arg => arg == "-server")) {
-			/*#if WINDOWS
+			#if WINDOWS
 				AllocConsole();
 			#endif
-			*/
 			RelayServer.ServerMain(args);
 		} else {
 			GameMain(args);
@@ -358,9 +357,16 @@ class Program {
 		}
 
 		if (Options.main.showFPS && Global.level != null && Global.level.started) {
-			int fps = MathInt.Round(Global.currentFPS);
+			int vfps = MathInt.Round(Global.currentFPS);
+			int fps = MathInt.Round(Global.logicFPS);
 			float yPos = 215;
-			if (Global.level.gameMode.shouldDrawRadar()) yPos = 219;
+			if (Global.level.gameMode.shouldDrawRadar()) {
+				yPos = 219;
+			}
+			Helpers.drawTextStd(
+				TCat.HUD, "VFPS:" + vfps.ToString(), Global.screenW - 5, yPos - 6,
+				Alignment.Right, fontSize: 18
+			);
 			Helpers.drawTextStd(
 				TCat.HUD, "FPS:" + fps.ToString(), Global.screenW - 5, yPos,
 				Alignment.Right, fontSize: 18
@@ -916,5 +922,118 @@ class Program {
 		}
 
 		return true;
+	}
+
+	
+	// Main loop.
+	// GM19 used some deltatime system.
+	// This leads to massive inconsistencies on high lag.
+	// We instead we use frameskip.
+	public static void mainLoop(RenderWindow window) {
+		// Variables for stuff.
+		decimal deltaTime = 0;
+		decimal deltaTimeSavings = 0;
+		decimal lastUpdateTime = 0;
+		decimal fpsLimit = (TimeSpan.TicksPerSecond / 60m);
+		long lastSecondFPS = 0;
+		int videoUpdatesThisSecond = 0;
+		int framesUpdatesThisSecond = 0;
+		bool useFrameSkip = false;
+		DateTimeOffset UnixEpoch = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
+
+		// Main loop itself.
+		while (window.IsOpen) {
+			var timeSpam = (DateTimeOffset.UtcNow - UnixEpoch);
+			long timeNow = timeSpam.Ticks;
+			long timeSecondsNow = (long)Math.Floor(timeSpam.TotalSeconds);
+
+			// Framerate calculations.
+			deltaTime = deltaTimeSavings + ((timeNow - lastUpdateTime) / fpsLimit);
+			if (timeSecondsNow > lastSecondFPS) {
+				Global.currentFPS = videoUpdatesThisSecond;
+				Global.logicFPS = framesUpdatesThisSecond;
+				lastSecondFPS = timeSecondsNow;
+				videoUpdatesThisSecond = 0;
+				framesUpdatesThisSecond = 0;
+			}
+
+			// Disable frameskip in the menu.
+			if (Global.level != null) {
+				useFrameSkip = true;
+			} else {
+				useFrameSkip = false;
+			}
+
+			window.DispatchEvents();
+			if (Global.isMouseLocked) {
+				Mouse.SetPosition(new Vector2i((int)Global.halfScreenW, (int)Global.halfScreenH), Global.window);
+			}
+
+			var clearColor = Color.Black;
+			if (Global.level?.levelData?.bgColor != null) {
+				clearColor = Global.level.levelData.bgColor;
+			}
+			/*
+			long prevPackets = 0;
+			if (Global.showDiagnostics) {
+				diagnosticsClock.Restart();
+				prevPackets = getBytesPerFrame();
+			}
+			*/
+			if (deltaTime >= 1) {
+				if (!useFrameSkip) {
+					update();
+					framesUpdatesThisSecond++;
+					deltaTime = 0;
+				} else {
+					while (deltaTime >= 1) {
+						if (deltaTime >= 2) {
+							Global.isSkippingFrames = true;
+						} else {
+							Global.isSkippingFrames = false;
+						}
+						update();
+						deltaTime--;
+						framesUpdatesThisSecond++;
+					}
+				}
+				if (deltaTime <= 0) {
+					deltaTime = 0;
+				}
+				deltaTimeSavings = deltaTime;
+				videoUpdatesThisSecond++;
+				Global.isSkippingFrames = false;
+				Global.input.clearInput();
+				lastUpdateTime = timeNow;
+				window.Clear(clearColor);
+				render();
+				window.Display();
+			}
+			/*
+			if (Global.showDiagnostics) {
+				Global.lastFrameProcessTime = diagnosticsClock.ElapsedTime.AsMilliseconds();
+				Global.lastFrameProcessTimes.Add(Global.lastFrameProcessTime);
+				if (Global.lastFrameProcessTimes.Count > 120) Global.lastFrameProcessTimes.RemoveAt(0);
+
+				long packetIncrease = getBytesPerFrame() - prevPackets;
+				Global.lastFramePacketIncreases.Add(packetIncrease);
+				if (Global.lastFramePacketIncreases.Count > 120) {
+					Global.lastFramePacketIncreases.RemoveAt(0);
+				}
+				if (!packetDiagStopwatch.IsRunning) {
+					packetDiagStopwatch.Start();
+				}
+				if (packetDiagStopwatch.ElapsedMilliseconds > 1000) {
+					long packetTotalDelta = getPacketsReceived() - Global.packetTotal1SecondAgo;
+					Global.packetTotal1SecondAgo = getPacketsReceived();
+					packetDiagStopwatch.Restart();
+					Global.last10SecondsPacketsReceived.Add(packetTotalDelta);
+					if (Global.last10SecondsPacketsReceived.Count > 10) {
+						Global.last10SecondsPacketsReceived.RemoveAt(0);
+					}
+				}
+			}
+			*/
+		}
 	}
 }

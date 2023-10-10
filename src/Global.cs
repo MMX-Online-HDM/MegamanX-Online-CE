@@ -469,6 +469,7 @@ public partial class Global {
 
 	public const int fpsCap = 60;
 	public static float currentFPS = 60;
+	public static float logicFPS = 60;
 	public static float crystalSlowAmount = 1;
 	private static float _spf = 1f / 60;
 	public static float spf {
@@ -482,8 +483,10 @@ public partial class Global {
 	public static float time;
 	public static int frameCount = 0;
 	public static int normalizeFrames(int frames) {
-		float fpsRatio = currentFPS / 60;
+		/*
+		float fpsRatio = 1;
 		frames = MathInt.Round(frames * fpsRatio);
+		*/
 		if (frames <= 0) frames = 1;
 		return frames;
 	}
@@ -495,6 +498,8 @@ public partial class Global {
 		int frames = normalizeFrames(cycle);
 		return frameCount % frames * 2 < frames;
 	}
+
+	public static bool isSkippingFrames = false;
 
 	public static bool paused = false;
 
@@ -561,11 +566,11 @@ public partial class Global {
 	}
 
 	public const int maxServers = 5;
-	public const int tickRate = 2;
+	public static int tickRate = 2;
 
-	public const int defFlinch = 26;
-	public const int halfFlinch = 13;
-	public const int miniFlinch = 6;
+	public static readonly int defFlinch = 26;
+	public static readonly int halfFlinch = 13;
+	public static readonly int miniFlinch = 6;
 
 	public static bool levelStarted() {
 		return level != null && level.started;
