@@ -542,7 +542,17 @@ public partial class Character : Actor, IDamagable {
 		return dashedInAir == 0 || (dashedInAir == 1 && this is Zero zero && zero.isBlackZero2());
 	}
 
-	public bool canClimb() {
+	public virtual bool canWallClimb() {
+		if (charState is ZSaberProjSwingState || charState is ZeroDoubleBuster) return false;
+		if (mk5RideArmorPlatform != null) return false;
+		if (isSoftLocked()) return false;
+		if (charState is VileHover) {
+			return !player.input.isHeld(Control.Jump, player);
+		}
+		return true;
+	}
+
+	public virtual bool canUseLadder() {
 		if (charState is ZSaberProjSwingState || charState is ZeroDoubleBuster) return false;
 		if (mk5RideArmorPlatform != null) return false;
 		if (isSoftLocked()) return false;

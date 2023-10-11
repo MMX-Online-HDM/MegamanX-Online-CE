@@ -366,7 +366,7 @@ public class CharState {
 			character.move(move);
 		}
 
-		if (character.canClimb()) {
+		if (character.canWallClimb()) {
 			bool velYRequirementMet = character.vel.y > 0 || (this is VileHover vh && vh.fallY > 0);
 			//This logic can be abit confusing, but we are trying to mirror the actual Mega man X wall climb physics
 			//In the actual game, X will not initiate a climb if you directly hugging a wall, jump and push in its direction UNTIL you start falling OR you move away and jump into it
@@ -427,12 +427,16 @@ public class CharState {
 		if (player.input.isPressed(Control.Jump, player) && character.canJump()) {
 			bool hasIceSled = (character.iceSled != null);
 			character.vel.y = -character.getJumpPower();
-			character.isDashing = character.isDashing || player.dashPressed(out string dashControl);
+			character.isDashing = (
+				character.isDashing || player.dashPressed(out string dashControl) && character.canDash()
+			);
 			character.changeState(new Jump(), hasIceSled);
 			return;
 		} else if (player.dashPressed(out string dashControl)) {
-			if (character.canDash() && !(this is Crouch && player.isAxl)) character.changeState(new Dash(dashControl), true);
-			return;
+			if (character.canDash() && !(this is Crouch && player.isAxl)) {
+				character.changeState(new Dash(dashControl), true);
+				return;
+			}
 		} else if (player.isZero && !player.isZBusterZero() && !character.isDashing && !player.hasKnuckle() && (player.input.isHeld(Control.WeaponLeft, player) || player.input.isHeld(Control.WeaponRight, player)) &&
 			  (!player.isDisguisedAxl || player.input.isHeld(Control.Down, player))) {
 			character.changeState(new SwordBlock());
@@ -443,7 +447,7 @@ public class CharState {
 			} else if (character.parryCooldown == 0) {
 				character.changeState(new KKnuckleParryStartState());
 			}
-		} else if (player.input.isPressed(Control.Down, player) && character.canClimb()) {
+		} else if (player.input.isPressed(Control.Down, player) && character.canWallClimb()) {
 			character.checkLadderDown = true;
 			var ladders = Global.level.getTriggerList(character, 0, 1, null, typeof(Ladder));
 			if (ladders.Count > 0) {
@@ -473,7 +477,7 @@ public class CharState {
 			}
 		} else if (player.input.isPressed(Control.Taunt, player)) {
 			character.changeState(new Taunt());
-		} else if (character.canClimb()) {
+		} else if (character.canWallClimb()) {
 			checkLadder(true);
 		}
 	}

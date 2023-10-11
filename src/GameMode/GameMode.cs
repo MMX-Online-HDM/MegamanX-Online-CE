@@ -1025,6 +1025,9 @@ public class GameMode {
 		}
 
 		int frameIndex = player.charNum;
+		if (player.charNum == 5) {
+			frameIndex = 0;
+		}
 		if (player.isDisguisedAxl) frameIndex = 3;
 
 		var hudHealthPosition = getHUDHealthPosition(position, true);

@@ -207,7 +207,8 @@ public partial class Player {
 			{ 1, new List<SubTank>() },
 			{ 2, new List<SubTank>() },
 			{ 3, new List<SubTank>() },
-			{ 4, new List<SubTank>() }
+			{ 4, new List<SubTank>() },
+			{ 5, new List<SubTank>() },
 		};
 	public List<SubTank> subtanks {
 		get {
@@ -226,6 +227,7 @@ public partial class Player {
 			{ 2, 0 },
 			{ 3, 0 },
 			{ 4, 0 },
+			{ 5, 0 },
 		};
 	public int heartTanks {
 		get {
@@ -528,7 +530,7 @@ public partial class Player {
 			armArmorNum = xArmor1v1;
 		}
 
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i <= 5; i++) {
 			charScrap[i] = getStartScrap();
 		}
 		foreach (var key in charHeartTanks.Keys) {
@@ -966,6 +968,11 @@ public partial class Player {
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer
 				);
+			} else if (charNum == 5) {
+				character = new Rock(
+					this, pos.x, pos.y, xDir,
+					false, charNetId, ownedByLocalPlayer
+				);
 			} else {
 				character = new Character(
 					this, pos.x, pos.y, xDir, false, charNetId,
@@ -1180,8 +1187,13 @@ public partial class Player {
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, character.netId, true, isWarpIn: false
 			);
-		}  else if (charNum == 4) {
+		} else if (charNum == 4) {
 			retChar = new Sigma(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, character.netId, true, isWarpIn: false
+			);
+		} else if (charNum == 5) {
+			retChar = new Rock(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, character.netId, true, isWarpIn: false
 			);
