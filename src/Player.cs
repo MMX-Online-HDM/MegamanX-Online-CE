@@ -493,7 +493,10 @@ public partial class Player {
 		return -1;
 	}
 
-	public Player(string name, int id, int charNum, PlayerCharData playerData, bool isAI, bool ownedByLocalPlayer, int alliance, Input input, ServerPlayer serverPlayer) {
+	public Player(
+		string name, int id, int charNum, PlayerCharData playerData,
+		bool isAI, bool ownedByLocalPlayer, int alliance, Input input, ServerPlayer serverPlayer
+	) {
 		this.name = name;
 		this.id = id;
 		curMaxNetId = getFirstAvailableNetId();
@@ -502,9 +505,9 @@ public partial class Player {
 		this.isAI = isAI;
 
 		if (getSameCharNum() != -1) charNum = getSameCharNum();
-		if (charNum > 4) {
+		if (charNum >= 210) {
 			if (Global.level.is1v1()) {
-				maverick1v1 = charNum - 5;
+				maverick1v1 = charNum - 210;
 				charNum = 4;
 			} else {
 				charNum = 4;

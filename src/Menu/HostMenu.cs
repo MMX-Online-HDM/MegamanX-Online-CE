@@ -840,7 +840,7 @@ public class HostMenu : IMainMenu {
 
 	private void removeMaverickCpuDatas() {
 		foreach (var cpuData in savedMatchSettings.extraCpuCharData.cpuDatas) {
-			if (cpuData.charNum > 4) cpuData.charNum = 4;
+			if (cpuData.charNum >= 210) cpuData.charNum = 4;
 		}
 	}
 

@@ -146,7 +146,6 @@ public class OptionsMenu : IMainMenu {
 							Helpers.drawTextStd(TCat.Option, "MAX FPS: " + Options.main.maxFPS.ToString(), pos.x, pos.y, fontSize: fontSize, color: getColor(), selected: selectedArrowPosY == index, optionPadding: 26);
 						},
 						"Controls the max framerate the game can run.\nLower values are more choppy but use less CPU."),
-                    
                     // VSYNC
                      new MenuOption(30, startY,
 						() =>
@@ -294,9 +293,8 @@ public class OptionsMenu : IMainMenu {
 								selected: selectedArrowPosY == index, optionPadding: 26);
 						},
 						"Enable or disable map sprites.\nDisabling map sprites results in faster performance."),
-					
 					// Small Bars
-					new MenuOption(40, startY,
+					new MenuOption(30, startY,
 						() =>
 						{
 							if (Global.input.isPressedMenu(Control.MenuLeft))
@@ -382,8 +380,6 @@ public class OptionsMenu : IMainMenu {
 							Helpers.drawTextStd(TCat.Option, "MULTIPLAYER NAME: " + playerName, pos.x, pos.y, fontSize: fontSize, color: getColor(), selected: selectedArrowPosY == index, optionPadding: 26);
 						},
 						"Your name that appears to others when you play online."),
-
-                    /*
                     // Multiplayer region
                     new MenuOption(30, startY,
                         () =>
@@ -406,8 +402,6 @@ public class OptionsMenu : IMainMenu {
                                 pos.x, pos.y, fontSize: fontSize, color: isRegionDisabled() ? Helpers.Gray : Color.White, selected: selectedArrowPosY == index, optionPadding: 26);
                         },
                         "Preferred server region for hosting matches.\nChoose the one with lowest ping."),
-                    */
-
                     // Preferred character
                     new MenuOption(30, startY,
 						() =>
@@ -1064,13 +1058,10 @@ public class OptionsMenu : IMainMenu {
 			}
 
 			Options.main.saveToFile();
-
-			/*
 			if (oldWindowScale != Options.main.windowScale)
 			{
 				Global.changeWindowSize(Options.main.windowScale);
 			}
-			*/
 
 			if (oldFullscreen != Options.main.fullScreen || oldWindowScale != Options.main.windowScale || oldMaxFPS != Options.main.maxFPS || oldDisableShaders != Options.main.disableShaders || oldEnablePostprocessing != Options.main.enablePostProcessing ||
 				oldUseOptimizedAssets != Options.main.useOptimizedAssets || oldParticleQuality != Options.main.particleQuality || oldIntegerFullscreen != Options.main.integerFullscreen || oldVsync != Options.main.vsync) {

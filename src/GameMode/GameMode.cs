@@ -573,7 +573,7 @@ public class GameMode {
 		}
 
 		if (Global.level.isTraining()) {
-			drawDpsIfSet(40);
+			drawDpsIfSet(5);
 		} else {
 			drawTopHUD();
 		}
@@ -2298,7 +2298,10 @@ public class GameMode {
 
 	public void drawDpsIfSet(int yPos) {
 		if (!string.IsNullOrEmpty(dpsString)) {
-			Helpers.drawTextStd(TCat.HUD, dpsString, 5, yPos, Alignment.Left, fontSize: (uint)32, color: getTimeColor());
+			Helpers.drawTextStd(
+				TCat.HUD, dpsString, 5, yPos,
+				Alignment.Left, fontSize: (uint)32, color: getTimeColor()
+			);
 		}
 	}
 

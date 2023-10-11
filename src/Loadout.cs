@@ -336,24 +336,18 @@ public class SigmaLoadout {
 	}
 
 	public static SigmaLoadout createRandom() {
-		/*
 		List<int> weaponPool = new List<int>();
-		for (int i = (int)WeaponIds.ChillPenguin; i <= (int)WeaponIds.DrDoppler; i++)
-		{
+		for (int i = (int)WeaponIds.ChillPenguin; i <= (int)WeaponIds.DrDoppler; i++) {
 			weaponPool.Add(i);
 		}
 
-		var randPool = Helpers.getRandomSubarray(weaponPool, 3);
+		var randPool = Helpers.getRandomSubarray(weaponPool, 2);
 		return new SigmaLoadout()
 		{
-			maverick1 = randPool[0],
-			maverick2 = randPool[1],
-			maverick3 = randPool[2],
-		};
-		*/
-		return new SigmaLoadout() {
-			maverick1 = 0,
-			maverick2 = 1
+			maverick1 = randPool[0] - (int)WeaponIds.ChillPenguin,
+			maverick2 = randPool[1] - (int)WeaponIds.ChillPenguin
+			// Gacel: So it was an option for third maverick before?
+			//maverick3 = randPool[2],
 		};
 	}
 }
