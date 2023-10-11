@@ -92,7 +92,8 @@ public partial class Actor : GameObject {
 	public float? netAngle;
 	public bool stopSyncingNetPos;
 	public bool syncScale;
-	public bool interplorateNetPos = false;
+	public Point? targetNetPos;
+	public bool interplorateNetPos = true;
 
 	private Point lastPos;
 	private int lastSpriteIndex;
@@ -944,31 +945,39 @@ public partial class Actor : GameObject {
 				return;
 			}
 
-			float frameSmooth = Global.tickRate;
-			if (frameSmooth < 2) {
-				frameSmooth = 2;
-			}
+			float frameSmooth = 2; //Global.tickRate;
 
 			if (interplorateNetPos) {
-				var netPos = pos;
-				if (netXPos != null) {
-					netPos.x = (float)netXPos;
+				if (targetNetPos != null) {
+					changePos(targetNetPos.Value);
+					targetNetPos = null;
 				}
-				if (netYPos != null) {
-					netPos.y = (float)netYPos;
-				}
+				if (!stopSyncingNetPos && (netXPos != null || netYPos != null)) {
+					var netPos = pos;
+					if (netXPos != null && !stopSyncingNetPos) {
+						netPos.x = (float)netXPos;
+					}
+					if (netYPos != null && !stopSyncingNetPos) {
+						netPos.y = (float)netYPos;
+					}
 
-				var incPos = deltaPos.times(1f / frameSmooth);
-				var framePos = pos.add(incPos);
+					var incPos = netPos.subtract(pos).times(1f / frameSmooth);
+					var framePos = pos.add(incPos);
 
-				if (pos.distanceTo(framePos) > 0.001f && !stopSyncingNetPos) {
-					changePos(framePos);
-				} else if (!stopSyncingNetPos) {
-					changePos(netPos);
+					netXPos = null;
+					netYPos = null;
+					if (pos.distanceTo(framePos) > 0.001f) {
+						changePos(framePos);
+						netXPos = null;
+						netYPos = null;
+						targetNetPos = netPos;
+					} else {
+						changePos(netPos);
+						targetNetPos = null;
+					}
 				}
 			}
-			else
-			{
+			else if (!stopSyncingNetPos) {
 				var netPos = pos;
 				if (netXPos != null) {
 					netPos.x = (float)netXPos;

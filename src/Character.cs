@@ -166,15 +166,13 @@ public partial class Character : Actor, IDamagable {
 		isDashing = false;
 		splashable = true;
 
-		CharState charState;
+		CharState initialCharState;
 
 		if (ownedByLocalPlayer) {
-			if (player.maverick1v1 != null) {
-				charState = new WarpOut(true);
-			} else if (isWarpIn) charState = new WarpIn();
-			else charState = new Idle();
+			if (isWarpIn) initialCharState = new WarpIn();
+			else initialCharState = new Idle();
 		} else {
-			charState = new Idle();
+			initialCharState = new Idle();
 		}
 
 		spriteToCollider["roll"] = getDashingCollider();
@@ -182,7 +180,6 @@ public partial class Character : Actor, IDamagable {
 		spriteToCollider["crouch*"] = getCrouchingCollider();
 		spriteToCollider["ra_*"] = getRaCollider();
 		spriteToCollider["rc_*"] = getRcCollider();
-		spriteToCollider["head*"] = getSigmaHeadCollider();
 		spriteToCollider["warp_beam"] = null;
 		spriteToCollider["warp_out"] = null;
 		spriteToCollider["warp_in"] = null;
@@ -191,7 +188,7 @@ public partial class Character : Actor, IDamagable {
 		spriteToCollider["die"] = null;
 		spriteToCollider["block"] = getBlockCollider();
 
-		changeState(charState);
+		changeState(initialCharState);
 
 		visible = isVisible;
 

@@ -57,7 +57,23 @@ public class Sigma : Character {
 		player, x, y, xDir, isVisible,
 		netId, ownedByLocalPlayer, isWarpIn, false, false
 	) {
-		
+		// Special Sigma-only colider.
+		spriteToCollider["head*"] = getSigmaHeadCollider();
+
+		// For 1v1 mavericks.
+		CharState intialCharState;
+		if (ownedByLocalPlayer) {
+			if (player.maverick1v1 != null) {
+				intialCharState = new WarpOut(true);
+			} else if (isWarpIn) {
+				intialCharState = new WarpIn();
+			} else {
+				intialCharState = new Idle();
+			}
+		} else {
+			intialCharState = new Idle();
+		}
+		changeState(intialCharState);
 	}
 
 	public void getViralSigmaPossessTarget() {
