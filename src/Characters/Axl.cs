@@ -3,9 +3,6 @@ using SFML.Window;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static SFML.Window.Keyboard;
 
 namespace MMXOnline;
 
@@ -15,25 +12,20 @@ public class RaycastHitData {
 	public bool isHeadshot;
 }
 
-public partial class Character {
+public class Axl : Character {
 	public bool aiming;
 	public IDamagable axlCursorTarget = null;
 	public Character axlHeadshotTarget = null;
 	public Anim muzzleFlash;
-	public Anim transformAnim;
 	public float recoilTime;
 	public float axlSwapTime;
 	public float axlAltSwapTime;
 	public float switchTime;
 	public float altSwitchTime;
-	public int lastXDir;
 	public float netArmAngle;
-	public float assassinTime;
-	public bool isQuickAssassinate;
 	float targetSoundCooldown;
 	public Point nonOwnerAxlBulletPos;
 	public float stealthRevealTime;
-	float transformSmokeTime;
 
 	public bool aimBackwardsToggle;
 	public bool positionLockToggle;
@@ -68,7 +60,6 @@ public partial class Character {
 	public float whiteAxlTime;
 	public float dodgeRollCooldown;
 	public const float maxDodgeRollCooldown = 1.5f;
-	public bool disguiseCoverBlown;
 	public bool hyperAxlUsed;
 	//public ShaderWrapper axlPaletteShader;
 	public float maxHyperAxlTime = 30;
@@ -79,7 +70,22 @@ public partial class Character {
 
 	// Used to be 0.5, 100
 	public const float maxStealthRevealTime = 0.25f;
-	public const float stealthRevealPingDenom = 200;    // The ping divided by this number indicates stealth reveal time in online
+	// The ping divided by this number indicates stealth reveal time in online
+	public const float stealthRevealPingDenom = 200;
+
+	public Axl(
+		Player player, float x, float y, int xDir,
+		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
+		bool isWarpIn = true
+	) : base(
+		player, x, y, xDir, isVisible,
+		netId, ownedByLocalPlayer, isWarpIn, false, false
+	) {
+		iceGattlingSound = new LoopingSound("iceGattlingLoopStart", "iceGattlingLoopStop", "iceGattlingLoop", this);
+
+		muzzleFlash = new Anim(new Point(), "axl_pistol_flash", xDir, null, false);
+		muzzleFlash.visible = false;
+	}
 
 	public void zoomIn() {
 		if (isZoomingIn) return;
@@ -241,105 +247,48 @@ public partial class Character {
 		return !(charState is InRideArmor) && !(charState is Die) && !(charState is Frozen) && !(charState is Stunned);
 	}
 
-	public void updateDisguisedAxl() {
-		if (player.weapon is AssassinBullet) {
-			player.assassinHitPos = player.character.getFirstHitPos(AssassinBulletProj.range);
-		}
-
-		if (!player.isAxl) {
-			if (Options.main.axlAimMode == 2) {
-				updateAxlCursorPos();
-			} else {
-				updateAxlDirectionalAim();
-			}
-		}
-
-		if (player.isZero) {
-			player.changeWeaponControls();
-		}
-
-		if (player.weapon is UndisguiseWeapon) {
-			bool shootPressed = player.input.isPressed(Control.Shoot, player);
-			bool altShootPressed = player.input.isPressed(Control.Special1, player);
-			if ((shootPressed || altShootPressed) && !isCCImmuneHyperMode()) {
-				undisguiseTime = 0.33f;
-				DNACore lastDNA = player.lastDNACore;
-				int lastDNAIndex = player.lastDNACoreIndex;
-				player.revertToAxl();
-				player.character.undisguiseTime = 0.33f;
-				// To keep DNA.
-				if (altShootPressed && player.scrap >= 1) {
-					player.scrap -= 1;
-					lastDNA.hyperMode = DNACoreHyperMode.None;
-					// Turn ultimate and golden armor into naked X
-					if (lastDNA.armorFlag >= byte.MaxValue - 1) {
-						lastDNA.armorFlag = 0;
-					}
-					// Turn ancient gun into regular axl bullet
-					if (lastDNA.weapons.Count > 0 &&
-						lastDNA.weapons[0] is AxlBullet ab &&
-						ab.type == (int)AxlBulletWeaponType.AncientGun
-					) {
-						lastDNA.weapons[0] = player.getAxlBulletWeapon(0);
-					}
-					player.weapons.Insert(lastDNAIndex, lastDNA);
-				}
-				return;
-			}
-		}
-
-		if (player.weapon is AssassinBullet) {
-			if (player.input.isPressed(Control.Special1, player) && !isCharging()) {
-				if (player.scrap >= 2) {
-					player.scrap -= 2;
-					shootAssassinShot(isAltFire: true);
-					return;
-				} else {
-					Global.level.gameMode.setHUDErrorMessage(player, "Quick assassinate requires 2 scrap");
-				}
-			}
-		}
-
-		if (player.weapon is AssassinBullet && (player.isVile || player.isSigma)) {
-			if (player.input.isHeld(Control.Shoot, player)) {
-				increaseCharge();
-			} else {
-				if (isCharging()) {
-					shootAssassinShot();
-				}
-				stopCharge();
-			}
-			chargeLogic();
-		}
-
-		/*
-		if (player.weapon is AssassinBullet && chargeTime > 7)
-		{
-			shootAssassinShot();
-			stopCharge();
-		}
-		*/
-	}
-
-	public void shootAssassinShot(bool isAltFire = false) {
-		if (getChargeLevel() >= 3 || isAltFire) {
-			player.revertToAxl();
-			assassinTime = 0.5f;
-			player.character.assassinTime = 0.5f;
-			player.character.useGravity = false;
-			player.character.vel = new Point();
-			player.character.isQuickAssassinate = isAltFire;
-			player.character.changeState(new Assassinate(grounded), true);
-		} else {
-			stopCharge();
-		}
-	}
-
 	float assassinSmokeTime;
-	float undisguiseTime;
 	float lastAltShootPressedTime;
 	float voltTornadoTime;
-	public void updateAxl() {
+	public override void update() {
+		base.update();
+
+		if (whiteAxlTime > 0) {
+			whiteAxlTime -= Global.spf;
+			if (whiteAxlTime < 0) {
+				whiteAxlTime = 0;
+				if (ownedByLocalPlayer) {
+					player.weapons[0] = new AxlBullet();
+				}
+			}
+		}
+
+		// Cutoff point for things not controlled by the local player.
+		if (!ownedByLocalPlayer) {
+			if (isNonOwnerRev) {
+				iceGattlingSound.play();
+				revTime += Global.spf;
+				if (revTime > 1) revTime = 1;
+			} else {
+				if (!iceGattlingSound.destroyed) {
+					iceGattlingSound.stopRev(revTime);
+				}
+				Helpers.decrementTime(ref revTime);
+			}
+			if (netNonOwnerScopeEndPos != null) {
+				float frameSmooth = Global.tickRate;
+				if (frameSmooth < 2) {
+					frameSmooth = 2;
+				}
+				var incPos = netNonOwnerScopeEndPos.Value.subtract(nonOwnerScopeEndPos).times(1f / frameSmooth);
+				var framePos = nonOwnerScopeEndPos.add(incPos);
+				if (nonOwnerScopeEndPos.distanceTo(framePos) > float.Epsilon) {
+					nonOwnerScopeEndPos = framePos;
+				}
+			}
+			return;
+		}
+
 		isRevving = false;
 		bool altRayGunHeld = false;
 		bool altPlasmaGunHeld = false;
@@ -400,6 +349,15 @@ public partial class Character {
 		player.changeWeaponControls();
 
 		updateAxlAim();
+
+		if (dodgeRollCooldown == 0 && player.canControl) {
+			if (charState is Crouch && player.input.isPressed(Control.Dash, player) && canDash()) {
+				changeState(new DodgeRoll());
+			}
+			else if (player.input.isPressed(Control.Dash, player) && player.input.checkDoubleTap(Control.Dash)) {
+				changeState(new DodgeRoll(), true);
+			}
+		}
 
 		sprite.reversed = false;
 		if (player.axlWeapon != null && (player.axlWeapon.isTwoHanded(false) || isZooming()) && canChangeDir() && charState is not WallSlide) {
@@ -1182,7 +1140,9 @@ public partial class Character {
 		return false;
 	}
 
-	public void renderAxl() {
+	public override void render(float x, float y) {
+		base.render(x, y);
+
 		if (!ownedByLocalPlayer) {
 			if (shouldDrawArmBS.getValue()) {
 				drawArm(netArmAngle);
@@ -1226,8 +1186,8 @@ public partial class Character {
 			muzzleFlash.angle = netArmAngle;
 			muzzleFlash.pos = getAxlBulletPos();
 			if (muzzleFlash.sprite.name.StartsWith("axl_raygun_flash")) {
-				muzzleFlash.xScale = 0.75f;
-				muzzleFlash.yScale = 0.75f;
+				muzzleFlash.xScale = 1f;
+				muzzleFlash.yScale = 1f;
 				muzzleFlash.setzIndex(zIndex - 2);
 			} else {
 				muzzleFlash.xScale = 1f;
@@ -1242,10 +1202,35 @@ public partial class Character {
 			drawArm(netArmAngle);
 		}
 
+		if (!hideNoShaderIcon()) {
+			if (isWhiteAxl() && !Global.shaderWrappers.ContainsKey("hyperaxl")) {
+				Global.sprites["hud_killfeed_weapon"].draw(
+					123, pos.x, pos.y - 4 + currentLabelY, 1, 1, null, 1, 1, 1, ZIndex.HUD
+				);
+				deductLabelY(labelKillFeedIconOffY);
+			}
+		}
+
+		if (player.isMainPlayer && !player.isDead && !drawStatusProgress() && !drawSubtankHealing()) {
+			if (Options.main.aimKeyToggle) {
+			if (player.input.isAimingBackwards(player)) {
+				Global.sprites["hud_axl_aim"].draw(0, pos.x, pos.y + currentLabelY, xDir, 1, null, 1, 1, 1, ZIndex.HUD);
+				deductLabelY(labelAxlAimModeIconOffY);
+			} else if (player.input.isPositionLocked(player)) {
+				Global.sprites["hud_axl_aim"].draw(1, pos.x, pos.y + currentLabelY, 1, 1, null, 1, 1, 1, ZIndex.HUD);
+				deductLabelY(labelAxlAimModeIconOffY);
+			}
+			} else if (Options.main.showRollCooldown && dodgeRollCooldown > 0) {
+				drawSpinner(Helpers.progress(dodgeRollCooldown, maxDodgeRollCooldown));
+			}
+		}
+
 		if (Global.showHitboxes) {
 			Point bulletPos = getAxlBulletPos();
 			DrawWrappers.DrawLine(bulletPos.x, bulletPos.y, player.axlGenericCursorWorldPos.x, player.axlGenericCursorWorldPos.y, Color.Magenta, 1, ZIndex.Default + 1);
 		}
+
+		drawAxlCursor();
 
 		//DEBUG CODE
 		/*
@@ -1390,7 +1375,7 @@ public partial class Character {
 	}
 
 	public Point getAxlBulletDir() {
-		Point origin = player.character.getAxlBulletPos();
+		Point origin = getAxlBulletPos();
 		Point cursorPos = getCorrectedCursorPos();
 		return origin.directionTo(cursorPos).normalize();
 	}
@@ -1549,14 +1534,6 @@ public partial class Character {
 		return xDir;
 	}
 
-	public void addTransformAnim() {
-		transformAnim = new Anim(pos, "axl_transform", xDir, null, true);
-		playSound("transform");
-		if (ownedByLocalPlayer) {
-			Global.serverClient?.rpc(RPC.playerToggle, (byte)player.id, (byte)RPCToggleType.AddTransformEffect);
-		}
-	}
-
 	public bool isWhiteAxl() {
 		return player.isAxl && whiteAxlTime > 0;
 	}
@@ -1583,151 +1560,128 @@ public partial class Character {
 			}
 		}
 	}
-}
 
-public class HyperAxlStart : CharState {
-	public float radius = 200;
-	public float time;
-	public HyperAxlStart(bool isGrounded) : base(isGrounded ? "hyper_start" : "hyper_start_air", "", "", "") {
-		invincible = true;
-	}
+	// New data starts here.
+	public override List<ShaderWrapper> getShaders() {
+		var shaders = new List<ShaderWrapper>();
+		ShaderWrapper palette = null;
 
-	public override void update() {
-		base.update();
-
-		foreach (var weapon in player.weapons) {
-			for (int i = 0; i < 10; i++) weapon.rechargeAmmo(0.1f);
+		int paletteNum = 0;
+		if (whiteAxlTime > 3) paletteNum = 1;
+		else if (whiteAxlTime > 0) {
+			int mod = MathInt.Ceiling(whiteAxlTime) * 2;
+			paletteNum = (Global.frameCount % (mod * 2)) < mod ? 0 : 1;
 		}
+		palette = player.axlPaletteShader;
+		palette?.SetUniform("palette", paletteNum);
+		palette?.SetUniform("paletteTexture", Global.textures["hyperAxlPalette"]);
 
-		if (character.loopCount > 8) {
-			character.whiteAxlTime = character.maxHyperAxlTime;
-			RPC.setHyperZeroTime.sendRpc(character.player.id, character.whiteAxlTime, 1);
-			character.playSound("ching");
-			if (player.input.isHeld(Control.Jump, player)) character.changeState(new Hover(), true);
-			else character.changeState(new Idle(), true);
+		if (palette != null) {
+			shaders.Add(palette);
+		}
+		shaders.AddRange(base.getShaders());
+
+		return shaders;
+	}
+
+	public override bool isSoftLocked() {
+		if (isAnyZoom() || sniperMissileProj != null) {
+			return true;
+		}
+		return base.isSoftLocked();
+	}
+
+	public override bool canDash() {
+		if (isAnyZoom() || sniperMissileProj != null || isRevving) {
+			return false;
+		}
+		return base.canDash();
+	}
+
+	public override bool canClimbLadder() {
+		if (recoilTime > 0) {
+			return false;
+		}
+		return base.canClimbLadder();
+	}
+
+	public override bool canChangeWeapons() {
+		if (gaeaShield != null) return false;
+		if (sniperMissileProj != null) return false;
+		if (revTime > 0.5f) return false;
+
+		return base.canChangeWeapons();
+	}
+
+	public override float getRunSpeed() {
+		float runSpeed = 90;
+		if (player.isAxl && shootTime > 0) {
+			runSpeed = 90 - getAimBackwardsAmount() * 25;
+		}
+		return runSpeed * getRunDebuffs();
+	}
+
+	public override float getDashSpeed() {
+		if (flag != null || !isDashing) {
+			return getRunSpeed();
+		}
+		float dashSpeed = 210;
+
+		if (player.axlWeapon != null && player.axlWeapon.isTwoHanded(false)) {
+			dashSpeed *= 0.875f;
+		}
+		if (shootTime > 0) {
+			dashSpeed = dashSpeed - getAimBackwardsAmount() * 50;
+		}
+		return dashSpeed * getRunDebuffs();
+	}
+
+	public override bool canShoot() {
+		if (sniperMissileProj != null) { return false; }
+		return base.canShoot();
+	}
+
+	public override bool isToughGuyHyperMode() {
+		if (isWhiteAxl()) { return true; }
+
+		return base.isToughGuyHyperMode();
+	}
+
+	public override Point getCamCenterPos(bool ignoreZoom = false) {
+		if (sniperMissileProj != null) {
+			return sniperMissileProj.getCenterPos();
+		}
+		if (isZooming() && !ignoreZoom) {
+			return player.axlScopeCursorWorldPos;
+		}
+		return base.getCamCenterPos(ignoreZoom);
+	}
+
+	public override void changeState(CharState newState, bool forceChange = false) {
+		base.changeState(newState, forceChange);
+
+		if (gaeaShield != null && shouldDrawArm() == false) {
+			gaeaShield.destroySelf();
+			gaeaShield = null;
 		}
 	}
 
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		if (!character.hyperAxlUsed) {
-			character.hyperAxlUsed = true;
-			character.player.scrap -= 10;
-		}
-		character.useGravity = false;
-		character.vel = new Point();
-		character.fillHealthToMax();
+	public override void destroySelf(
+		string spriteName = null, string fadeSound = null,
+		bool disableRpc = false, bool doRpcEvenIfNotOwned = false,
+		bool favorDefenderProjDestroy = false
+	) {
+		iceGattlingSound?.destroy();
+		gaeaShield?.destroySelf();
+		muzzleFlash?.destroySelf();
+		sniperMissileProj?.destroySelf();
+
+		base.destroySelf(
+			spriteName, fadeSound, disableRpc, doRpcEvenIfNotOwned, favorDefenderProjDestroy
+		);
 	}
 
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-		character.useGravity = true;
-		if (character != null) {
-			character.invulnTime = 0.5f;
-		}
-	}
-}
-
-public class Hover : CharState {
-	float hoverTime;
-	Anim hoverExhaust;
-	public Hover() : base("hover", "hover", "hover", "hover") {
-	}
-
-	public override void update() {
-		base.update();
-
-		accuracy = 0;
-		Point prevPos = character.pos;
-		airCode();
-		if (character.pos.x != prevPos.x) {
-			accuracy = 5;
-		}
-
-		if (character.vel.y < 0) {
-			character.vel.y += Global.spf * Global.level.gravity;
-			if (character.vel.y > 0) character.vel.y = 0;
-		}
-
-		if (character.gravityWellModifier > 1) {
-			character.vel.y = 53;
-		}
-
-		hoverTime += Global.spf;
-		hoverExhaust.changePos(exhaustPos());
-		hoverExhaust.xDir = character.getAxlXDir();
-		if ((hoverTime > 2 && !character.isWhiteAxl()) || !character.player.input.isHeld(Control.Jump, character.player)) {
-			character.changeState(new Fall(), true);
-		}
-	}
-
-	public Point exhaustPos() {
-		if (character.currentFrame.POIs.Count == 0) return character.pos;
-		Point exhaustPOI = character.currentFrame.POIs.Last();
-		return character.pos.addxy(exhaustPOI.x * character.getAxlXDir(), exhaustPOI.y);
-	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		character.useGravity = false;
-		character.vel = new Point();
-		hoverExhaust = new Anim(exhaustPos(), "hover_exhaust", character.getAxlXDir(), player.getNextActorNetId(), false, sendRpc: true);
-		hoverExhaust.setzIndex(ZIndex.Character - 1);
-	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-		character.useGravity = true;
-		hoverExhaust.destroySelf();
-	}
-}
-
-public class DodgeRoll : CharState {
-	public float dashTime = 0;
-	public int initialDashDir;
-
-	public DodgeRoll() : base("roll", "", "") {
-	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		character.isDashing = true;
-		character.burnTime -= 2;
-		if (character.burnTime < 0) {
-			character.burnTime = 0;
-		}
-
-		initialDashDir = character.xDir;
-		if (player.input.isHeld(Control.Left, player)) initialDashDir = -1;
-		else if (player.input.isHeld(Control.Right, player)) initialDashDir = 1;
-		character.specialState = (int)SpecialStateIds.AxlRoll;
-	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-		character.dodgeRollCooldown = Character.maxDodgeRollCooldown;
-		character.specialState = (int)SpecialStateIds.None;
-	}
-
-	public override void update() {
-		base.update();
-		groundCode();
-
-		if (character.isAnimOver()) {
-			character.changeState(new Idle(), true);
-			return;
-		}
-
-		if (character.frameIndex >= 4) return;
-
-		dashTime += Global.spf;
-
-		var move = new Point(0, 0);
-		move.x = character.getDashSpeed() * initialDashDir;
-		character.move(move);
-		if (stateTime > 0.1) {
-			stateTime = 0;
-			//new Anim(this.character.pos.addxy(0, -4), "dust", this.character.xDir, null, true);
-		}
+	public override bool isInvisible() {
+		return stingChargeTime > 0 && stealthRevealTime == 0;
 	}
 }

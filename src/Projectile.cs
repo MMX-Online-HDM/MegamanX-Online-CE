@@ -88,10 +88,30 @@ public class Projectile : Actor {
 		}
 		*/
 
-		if (time > maxTime || moveDistance > maxDistance || pos.x > Global.level.width + leeway || pos.x < -leeway || pos.y > Global.level.height + leeway || pos.y < -leeway) {
-			if (fadeOnAutoDestroy) destroySelf();
-			else destroySelfNoEffect();
-			return;
+		if (ownedByLocalPlayer) {
+			if (time > maxTime ||
+				moveDistance > maxDistance ||
+				pos.x > Global.level.width + leeway ||
+				pos.x < -leeway ||
+				pos.y > Global.level.height + leeway ||
+				pos.y < -leeway
+			) {
+				if (fadeOnAutoDestroy) destroySelf();
+				else destroySelfNoEffect();
+				return;
+			}
+		} else {
+			if (time > maxTime * 1.5 ||
+				moveDistance > maxDistance ||
+				pos.x > Global.level.width + leeway ||
+				pos.x < -leeway ||
+				pos.y > Global.level.height + leeway ||
+				pos.y < -leeway
+			) {
+				if (fadeOnAutoDestroy) destroySelf();
+				else destroySelfNoEffect();
+				return;
+			}
 		}
 	}
 

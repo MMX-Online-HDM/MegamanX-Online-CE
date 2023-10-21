@@ -436,7 +436,7 @@ public class RPCDestroyActor : RPC {
 			actor.changePos(destroyPos);
 			// Any actors with custom destroySelf methods that are invoked by RPC need to be specified here
 			if (actor is Character) {
-				(actor as Character).destroySelf(destroySprite, destroySound, rpc: true);
+				(actor as Character).destroySelf(destroySprite, destroySound, disableRpc: true);
 			} else if (actor is RollingShieldProjCharged) {
 				(actor as RollingShieldProjCharged).destroySelf(destroySprite, destroySound, disableRpc: true);
 			} else {
@@ -541,7 +541,9 @@ public class RPCPlayerToggle : RPC {
 				zero.blackZeroTime = zero.maxHyperZeroTime;
 			}
 		} else if (toggleId == RPCToggleType.SetWhiteAxl) {
-			player.character.whiteAxlTime = player.character.maxHyperAxlTime;
+			if (player.character is Axl axl) {
+				axl.whiteAxlTime = axl.maxHyperAxlTime;
+			}
 		} else if (toggleId == RPCToggleType.ReviveVileTo2) {
 			player.reviveVileNonOwner(false);
 		} else if (toggleId == RPCToggleType.ReviveVileTo5) {
@@ -549,9 +551,13 @@ public class RPCPlayerToggle : RPC {
 		} else if (toggleId == RPCToggleType.ReviveX) {
 			player.reviveXNonOwner();
 		} else if (toggleId == RPCToggleType.StartRev) {
-			player.character.isNonOwnerRev = true;
+			if (player.character is Axl axl) {
+				axl.isNonOwnerRev = true;
+			}
 		} else if (toggleId == RPCToggleType.StopRev) {
-			player.character.isNonOwnerRev = false;
+			if (player.character is Axl axl) {
+				axl.isNonOwnerRev = false;
+			}
 		}
 	}
 
@@ -1104,12 +1110,14 @@ public class RPCSetHyperZeroTime : RPC {
 		int time = arguments[1];
 		int type = arguments[2];
 		var player = Global.level.getPlayerById(playerId);
-		if (player?.character is not Zero zero) {
-			return;
+		if (player?.character is Zero zero) {
+			if (type == 0) zero.blackZeroTime = time;
+			if (type == 2) zero.awakenedZeroTime = time;
 		}
-		if (type == 0) zero.blackZeroTime = time;
-		if (type == 1) zero.whiteAxlTime = time;
-		if (type == 2) zero.awakenedZeroTime = time;
+		if (player?.character is Axl axl) {
+			if (type == 1) axl.whiteAxlTime = time;
+		}
+
 	}
 
 	public void sendRpc(int playerId, float time, int type) {
@@ -1197,8 +1205,6 @@ public class RPCAxlShoot : RPC {
 			if (Global.level.gameMode.isTeamMode && player.alliance == GameMode.redAlliance) fs = "axl_raygun_flash2";
 			var flash = new Anim(pos, fs, 1, null, true);
 			flash.setzIndex(player.character.zIndex - 100);
-			flash.xScale = 0.75f;
-			flash.yScale = 0.75f;
 			flash.angle = angle;
 			flash.frameSpeed = 1;
 		} else if (projId == (int)ProjIds.SpiralMagnum || projId == (int)ProjIds.SpiralMagnumScoped) {
@@ -1813,9 +1819,10 @@ public class RPCSyncAxlBulletPos : RPC {
 		short yPos = BitConverter.ToInt16(new byte[] { arguments[3], arguments[4] }, 0);
 
 		var player = Global.level.getPlayerById(playerId);
-		if (player?.character == null) return;
+		Axl axl = player?.character as Axl;
+		if (axl == null) { return; }
 
-		player.character.nonOwnerAxlBulletPos = new Point(xPos, yPos);
+		axl.nonOwnerAxlBulletPos = new Point(xPos, yPos);
 	}
 
 	public void sendRpc(int playerId, Point bulletPos) {
@@ -1834,11 +1841,13 @@ public class RPCSyncAxlScopePos : RPC {
 		int playerId = arguments[0];
 
 		var player = Global.level.getPlayerById(playerId);
-		if (player?.character == null) return;
-
+		Axl axl = player?.character as Axl;
+		if (axl == null) {
+			return;
+		}
 		bool isZooming = arguments[1] == 1 ? true : false;
 
-		player.character.isNonOwnerZoom = isZooming;
+		axl.isNonOwnerZoom = isZooming;
 
 		short sxPos = BitConverter.ToInt16(new byte[] { arguments[2], arguments[3] }, 0);
 		short syPos = BitConverter.ToInt16(new byte[] { arguments[4], arguments[5] }, 0);
@@ -1846,8 +1855,8 @@ public class RPCSyncAxlScopePos : RPC {
 		short exPos = BitConverter.ToInt16(new byte[] { arguments[6], arguments[7] }, 0);
 		short eyPos = BitConverter.ToInt16(new byte[] { arguments[8], arguments[9] }, 0);
 
-		player.character.nonOwnerScopeStartPos = new Point(sxPos, syPos);
-		player.character.netNonOwnerScopeEndPos = new Point(exPos, eyPos);
+		axl.nonOwnerScopeStartPos = new Point(sxPos, syPos);
+		axl.netNonOwnerScopeEndPos = new Point(exPos, eyPos);
 	}
 
 	public void sendRpc(int playerId, bool isZooming, Point startScopePos, Point endScopePos) {

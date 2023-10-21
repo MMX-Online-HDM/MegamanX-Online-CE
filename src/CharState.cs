@@ -103,9 +103,6 @@ public class CharState {
 		if (string.IsNullOrEmpty(newState?.shootSprite)) {
 			character.setShootRaySplasher(false);
 		}
-		if (character.isZooming()) {
-			character.zoomOut();
-		}
 		if (invincible) {
 			player.delaySubtank();
 		}
@@ -369,7 +366,7 @@ public class CharState {
 			character.move(move);
 		}
 
-		if (character.canClimb()) {
+		if (character.canWallClimb()) {
 			bool velYRequirementMet = character.vel.y > 0 || (this is VileHover vh && vh.fallY > 0);
 			//This logic can be abit confusing, but we are trying to mirror the actual Mega man X wall climb physics
 			//In the actual game, X will not initiate a climb if you directly hugging a wall, jump and push in its direction UNTIL you start falling OR you move away and jump into it
@@ -394,11 +391,6 @@ public class CharState {
 		}
 
 		if (character.isAttacking()) {
-			return;
-		}
-
-		if (!Options.main.disableDoubleDash && player.input.isPressed(Control.Dash, player) && player.input.checkDoubleTap(Control.Dash) && character.canDash() && character.dodgeRollCooldown == 0 && player.isAxl && player.canControl) {
-			character.changeState(new DodgeRoll(), true);
 			return;
 		}
 
@@ -435,12 +427,16 @@ public class CharState {
 		if (player.input.isPressed(Control.Jump, player) && character.canJump()) {
 			bool hasIceSled = (character.iceSled != null);
 			character.vel.y = -character.getJumpPower();
-			character.isDashing = character.isDashing || player.dashPressed(out string dashControl);
+			character.isDashing = (
+				character.isDashing || player.dashPressed(out string dashControl) && character.canDash()
+			);
 			character.changeState(new Jump(), hasIceSled);
 			return;
 		} else if (player.dashPressed(out string dashControl)) {
-			if (character.canDash() && !(this is Crouch && player.isAxl)) character.changeState(new Dash(dashControl), true);
-			return;
+			if (character.canDash() && !(this is Crouch && player.isAxl)) {
+				character.changeState(new Dash(dashControl), true);
+				return;
+			}
 		} else if (player.isZero && !player.isZBusterZero() && !character.isDashing && !player.hasKnuckle() && (player.input.isHeld(Control.WeaponLeft, player) || player.input.isHeld(Control.WeaponRight, player)) &&
 			  (!player.isDisguisedAxl || player.input.isHeld(Control.Down, player))) {
 			character.changeState(new SwordBlock());
@@ -451,7 +447,7 @@ public class CharState {
 			} else if (character.parryCooldown == 0) {
 				character.changeState(new KKnuckleParryStartState());
 			}
-		} else if (player.input.isPressed(Control.Down, player) && character.canClimb()) {
+		} else if (player.input.isPressed(Control.Down, player) && character.canWallClimb()) {
 			character.checkLadderDown = true;
 			var ladders = Global.level.getTriggerList(character, 0, 1, null, typeof(Ladder));
 			if (ladders.Count > 0) {
@@ -474,14 +470,14 @@ public class CharState {
 		  }
 		  */
 		  else if (player.isCrouchHeld() && !character.isDashing) {
-			if (!player.isSigma) {
+			if (player.character is not Sigma sigma) {
 				character.changeState(new Crouch());
-			} else if (!character.isAttacking() && character.noBlockTime == 0) {
+			} else if (!character.isAttacking() && sigma.noBlockTime == 0) {
 				character.changeState(new SwordBlock());
 			}
-		} else if (player.input.isPressed(Control.Taunt, player) && !character.isAnyZoom() && character.sniperMissileProj == null) {
+		} else if (player.input.isPressed(Control.Taunt, player)) {
 			character.changeState(new Taunt());
-		} else if (character.canClimb()) {
+		} else if (character.canWallClimb()) {
 			checkLadder(true);
 		}
 	}
@@ -823,12 +819,6 @@ public class Crouch : CharState {
 			return;
 		}
 
-		if (player.isAxl) {
-			if (player.input.isHeld(Control.Dash, player) && character.canDash() && character.dodgeRollCooldown == 0) {
-				character.changeState(new DodgeRoll());
-			}
-		}
-
 		if (Global.level.gameMode.isOver) {
 			if (Global.level.gameMode.playerWon(player)) {
 				if (!character.sprite.name.Contains("_win")) {
@@ -844,6 +834,8 @@ public class Crouch : CharState {
 }
 
 public class SwordBlock : CharState {
+	public Sigma sigma;
+
 	public SwordBlock() : base("block") {
 		immuneToWind = true;
 		superArmor = true;
@@ -874,7 +866,9 @@ public class SwordBlock : CharState {
 		}
 
 		if (player.input.isPressed(Control.Shoot, player) && character.saberCooldown == 0 && !player.isControllingPuppet()) {
-			character.noBlockTime = 0.25f;
+			if (sigma != null) {
+				sigma.noBlockTime = 0.25f;
+			}
 			character.changeState(new Idle());
 			return;
 		}
@@ -1053,12 +1047,6 @@ public class Dash : CharState {
 
 		if (!player.input.isHeld(initialDashButton, player) && !stop) {
 			dashTime = 50;
-		}
-		if (!stop && player.isSigma && player.input.isPressed(Control.Special1, player) &&
-			character.flag == null && character.leapSlashCooldown == 0
-		) {
-			character.changeState(new SigmaWallDashState(-1, true), true);
-			return;
 		}
 		float speedModifier = 1;
 		float distanceModifier = 1;
@@ -1436,7 +1424,7 @@ public class LadderClimb : CharState {
 			character.changeSpriteFromName(sprite, true);
 		}
 
-		if (character.isAttacking() || character.isSigmaShooting()) {
+		if (character.isAttacking()) {
 			character.frameSpeed = 1;
 		} else {
 			character.frameSpeed = 0;
@@ -1816,32 +1804,33 @@ public class Crystalized : CharState {
 
 public class Die : CharState {
 	bool sigmaHasMavericks;
+	Sigma sigma;
+
 	public Die() : base("die") {
 	}
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		sigma = character as Sigma;
 		character.useGravity = false;
 		character.stopMoving();
 		character.stopCharge();
 		new Anim(character.pos.addxy(0, -12), "die_sparks", 1, null, true);
 		character.stingChargeTime = 0;
 		character.removeBarrier();
-		character.sniperMissileProj?.destroySelf();
-		character.sniperMissileProj = null;
 		if (character.ownedByLocalPlayer && character.player.isDisguisedAxl) {
 			character.player.revertToAxlDeath();
 			character.changeSpriteFromName("die", true);
 		}
 		player.lastDeathWasVileMK2 = (vile != null && vile.isVileMK2);
 		player.lastDeathWasVileMK5 = (vile != null && vile.isVileMK5);
-		player.lastDeathWasSigmaHyper = character.isHyperSigma;
+		player.lastDeathWasSigmaHyper = sigma?.isHyperSigma == true;
 		player.lastDeathWasXHyper = character.isHyperX;
 		player.lastDeathPos = character.getCenterPos();
 		if (player.isAI) player.selectedRAIndex = Helpers.randomRange(0, 3);
 		sigmaHasMavericks = player.isSigma && player.mavericks.Count > 0;
 
-		if (player.isSigma && character.ownedByLocalPlayer && character.isHyperSigma) {
+		if (sigma != null && character.ownedByLocalPlayer && sigma.isHyperSigma == true) {
 			player.destroyCharacter();
 			Global.serverClient?.rpc(RPC.destroyCharacter, (byte)player.id);
 			if (player.isSigma1()) {
@@ -1854,24 +1843,24 @@ public class Die : CharState {
 				ede.host = anim;
 				Global.level.addEffect(ede);
 			} else if (player.isSigma2()) {
-				var anim = new Anim(character.pos, character.lastHyperSigmaSprite, 1, player.getNextActorNetId(), false, sendRpc: true);
+				var anim = new Anim(character.pos, sigma.lastHyperSigmaSprite, 1, player.getNextActorNetId(), false, sendRpc: true);
 				anim.ttl = 3;
 				anim.blink = true;
-				anim.frameIndex = character.lastHyperSigmaFrameIndex;
+				anim.frameIndex = sigma.lastHyperSigmaFrameIndex;
 				anim.frameSpeed = 0;
-				anim.angle = character.lastViralSigmaAngle;
+				anim.angle = sigma.lastViralSigmaAngle;
 				var ede = new ExplodeDieEffect(player, character.pos, character.pos, "empty", 1, character.zIndex, false, 20, 3, false);
 				ede.host = anim;
 				Global.level.addEffect(ede);
 			} else if (player.isSigma3()) {
 				string deathSprite = "";
-				if (character.lastHyperSigmaSprite.StartsWith("sigma3_kaiser_virus")) {
-					deathSprite = character.lastHyperSigmaSprite;
+				if (sigma.lastHyperSigmaSprite.StartsWith("sigma3_kaiser_virus")) {
+					deathSprite = sigma.lastHyperSigmaSprite;
 					Point explodeCenterPos = character.pos.addxy(0, -16);
 					var ede = new ExplodeDieEffect(player, explodeCenterPos, explodeCenterPos, "empty", 1, character.zIndex, false, 16, 3, false);
 					Global.level.addEffect(ede);
 				} else {
-					deathSprite = character.lastHyperSigmaSprite + "_body";
+					deathSprite = sigma.lastHyperSigmaSprite + "_body";
 					if (!Global.sprites.ContainsKey(deathSprite)) {
 						deathSprite = "sigma3_kaiser_idle";
 					}
@@ -1879,19 +1868,19 @@ public class Die : CharState {
 					var ede = new ExplodeDieEffect(player, explodeCenterPos, explodeCenterPos, "empty", 1, character.zIndex, false, 60, 3, false);
 					Global.level.addEffect(ede);
 
-					var headAnim = new Anim(character.pos, character.lastHyperSigmaSprite, 1, player.getNextActorNetId(), false, sendRpc: true);
+					var headAnim = new Anim(character.pos, sigma.lastHyperSigmaSprite, 1, player.getNextActorNetId(), false, sendRpc: true);
 					headAnim.ttl = 3;
 					headAnim.blink = true;
-					headAnim.setFrameIndexSafe(character.lastHyperSigmaFrameIndex);
-					headAnim.xDir = character.lastHyperSigmaXDir;
+					headAnim.setFrameIndexSafe(sigma.lastHyperSigmaFrameIndex);
+					headAnim.xDir = sigma.lastHyperSigmaXDir;
 					headAnim.frameSpeed = 0;
 				}
 
 				var anim = new Anim(character.pos, deathSprite, 1, player.getNextActorNetId(), false, sendRpc: true, zIndex: ZIndex.Background + 1000);
 				anim.ttl = 3;
 				anim.blink = true;
-				anim.setFrameIndexSafe(character.lastHyperSigmaFrameIndex);
-				anim.xDir = character.lastHyperSigmaXDir;
+				anim.setFrameIndexSafe(sigma.lastHyperSigmaFrameIndex);
+				anim.xDir = sigma.lastHyperSigmaXDir;
 				anim.frameSpeed = 0;
 			}
 		}

@@ -234,7 +234,7 @@ public class AI {
 
 		target = Global.level.getClosestTarget(character.pos, player.alliance, true, isRequesterAI: true);
 
-		if (character.isHyperSigma) {
+		if (character is KaiserSigma || character is Sigma sigma && sigma.isHyperSigma) {
 			int attack = Helpers.randomRange(0, 1);
 			if (attack == 0) {
 				player.release(Control.Special1);
@@ -354,7 +354,7 @@ public class AI {
 							framesChargeHeld = 0;
 						}
 					} else {
-						if (player.isZero && character.charState is not LadderClimb) {
+						if (player.isZero && player.character is Zero zero && character.charState is not LadderClimb) {
 							int attack = Helpers.randomRange(0, 10);
 							if (isTargetInAir) attack = 1;
 
@@ -363,7 +363,7 @@ public class AI {
 								player.press(Control.Special1);
 								player.press(Control.Up);
 							} else if (attack == 2) {
-								if (!character.grounded || player.zeroGigaAttackWeapon.ammo >= 16) {
+								if (!character.grounded || zero.zeroGigaAttackWeapon.ammo >= 16) {
 									player.press(Control.Special1);
 									player.press(Control.Down);
 								} else {

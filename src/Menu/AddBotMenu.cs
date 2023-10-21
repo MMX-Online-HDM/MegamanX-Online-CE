@@ -35,7 +35,7 @@ public class AddBotMenu : IMainMenu {
 				if (botCharNum < -1) botCharNum = -1;
 			} else if (Global.input.isPressedMenu(Control.MenuRight)) {
 				botCharNum++;
-				if (botCharNum > 4) botCharNum = 4;
+				if (botCharNum >= 210) botCharNum = 4;
 			}
 		}
 		if (selectArrowPosY == 1 && teamOptionEnabled()) {

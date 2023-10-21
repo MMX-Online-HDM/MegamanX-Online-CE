@@ -147,9 +147,6 @@ public class PeaceOutRollerProj : Projectile {
 		destroyOnHit = false;
 		this.type = type;
 
-		xScale = 0.75f * xDir;
-		yScale = 0.75f;
-
 		if (vel != null) this.vel = (Point)vel;
 		if (type == 0) {
 			this.vel.y = 50;

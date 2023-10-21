@@ -160,8 +160,7 @@ public class Input {
 	};
 
 	// TODO: Un-hardcode the input check.
-	private bool checkHadokenHelper(string forwardDir, Player player, string triggerBtn)
-	{
+	private bool checkHadokenHelper(string forwardDir, Player player, string triggerBtn) {
 		int[] command = commandList[0];
 		int time = 30;
 		bool completed = false;
@@ -416,39 +415,55 @@ public class Input {
 
 	public bool useAxlCursorControls(Player player) {
 		if (player != Global.level.mainPlayer) return false;
-		return (Global.level.mainPlayer.isAxl || Global.level.mainPlayer.isDisguisedAxl) && Options.main.useMouseAim;
+		return (Global.level.mainPlayer.isAxl) && Options.main.useMouseAim;
 	}
 
 	public bool isAimingBackwards(Player player) {
-		if (player.character?.aimBackwardsToggle == true) return true;
+		if (player.character is not Axl axl) {
+			return false;
+		}
+		if (axl.aimBackwardsToggle == true) {
+			return true;
+		}
 		return Options.main.aimKeyFunction == 0 && isHeld(Control.AxlAimBackwards, player);
 	}
 
 	public bool isPositionLocked(Player player) {
-		if (player.character?.positionLockToggle == true) return true;
+		if (player.character is not Axl axl) {
+			return false;
+		}
+		if (axl.positionLockToggle == true) {
+			return true;
+		}
 		return Options.main.aimKeyFunction == 1 && isHeld(Control.AxlAimBackwards, player);
 	}
 
 	public bool isCursorLocked(Player player) {
-		if (player.character?.cursorLockToggle == true) return true;
+		if (player.character is not Axl axl) {
+			return false;
+		}
+		if (axl.cursorLockToggle == true) {
+			return true;
+		}
 		return Options.main.aimKeyFunction == 2 && isHeld(Control.AxlAimBackwards, player);
 	}
 
 	public void updateAimToggle(Player player) {
-		if (player.character == null) return;
+		if (!player.ownedByLocalPlayer) return;
+		if (player.character is not Axl axl) return;
 
 		if (!Options.main.aimKeyToggle || Options.main.axlAimMode == 2) {
-			player.character.resetToggle();
+			axl.resetToggle();
 			return;
 		}
 
 		if (isPressed(Control.AxlAimBackwards, player)) {
 			if (Options.main.aimKeyFunction == 0) {
-				player.character.aimBackwardsToggle = !player.character.aimBackwardsToggle;
+				axl.aimBackwardsToggle = !axl.aimBackwardsToggle;
 			} else if (Options.main.aimKeyFunction == 1) {
-				player.character.positionLockToggle = !player.character.positionLockToggle;
+				axl.positionLockToggle = !axl.positionLockToggle;
 			} else if (Options.main.aimKeyFunction == 2) {
-				player.character.cursorLockToggle = !player.character.cursorLockToggle;
+				axl.cursorLockToggle = !axl.cursorLockToggle;
 			}
 		}
 	}
@@ -504,14 +519,14 @@ public class Input {
 			}
 		}
 
-		var keyboardMapping = Control.getKeyboardMapping(player?.realCharNum ?? -1, Options.main.axlAimMode);
+		var keyboardMapping = Control.getKeyboardMapping(player?.charNum ?? -1, Options.main.axlAimMode);
 
 		int? keyboardKey = keyboardMapping.GetValueOrDefault(inputName);
 		if (keyboardKey != null && isHeld((Key)keyboardKey)) {
 			return true;
 		}
 		if (Control.isJoystick()) {
-			var controllerMapping = Control.getControllerMapping(player?.realCharNum ?? -1, Options.main.axlAimMode);
+			var controllerMapping = Control.getControllerMapping(player?.charNum ?? -1, Options.main.axlAimMode);
 			if (!controllerMapping.ContainsKey(inputName)) return false;
 			int? buttonKey = controllerMapping[inputName];
 			return isHeld(buttonKey);
@@ -549,7 +564,7 @@ public class Input {
 			}
 		}
 
-		var keyboardMapping = Control.getKeyboardMapping(player?.realCharNum ?? -1, Options.main.axlAimMode);
+		var keyboardMapping = Control.getKeyboardMapping(player?.charNum ?? -1, Options.main.axlAimMode);
 
 		int? keyboardKey = keyboardMapping.GetValueOrDefault(inputName);
 
@@ -563,7 +578,7 @@ public class Input {
 			return true;
 		}
 		if (Control.isJoystick()) {
-			var controllerMapping = Control.getControllerMapping(player?.realCharNum ?? -1, Options.main.axlAimMode);
+			var controllerMapping = Control.getControllerMapping(player?.charNum ?? -1, Options.main.axlAimMode);
 			int? buttonKey = controllerMapping.GetValueOrDefault(inputName);
 			return isPressed(buttonKey);
 		}

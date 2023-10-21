@@ -98,7 +98,9 @@ public partial class Actor {
 			int ammo = character.player.weapon == null ? 0 : (int)character.player.weapon.ammo;
 			int charIndex = character.player.charNum;
 			int alliance = character.player.alliance;
-			if (character.player.isZero) ammo = (int)character.player.zeroGigaAttackWeapon.ammo;
+			if (character is Zero zero) {
+				ammo = MathInt.Ceiling(zero.zeroGigaAttackWeapon.ammo);
+			}
 			if (character.player.isVile) ammo = (int)character.player.vileAmmo;
 			if (character.player.isSigma) ammo = (int)character.player.sigmaAmmo;
 			if (character.rideArmor != null) ammo = MathInt.Ceiling(character.rideArmor.health);
@@ -124,9 +126,12 @@ public partial class Actor {
 			}
 
 			if (charMask[2]) {
-				byte axlArmAngle = Helpers.angleToByte(character.netArmAngle);
+				Axl axl = character as Axl;
+				byte axlArmAngle = Helpers.angleToByte(axl.netArmAngle);
 				args.Add(axlArmAngle);
-				byte[] netAxlArmSpriteIndexBytes = BitConverter.GetBytes((ushort)Global.spriteNames.IndexOf(character.getAxlArmSpriteName()));
+				byte[] netAxlArmSpriteIndexBytes = BitConverter.GetBytes(
+					(ushort)Global.spriteNames.IndexOf(axl.getAxlArmSpriteName())
+				);
 				args.AddRange(netAxlArmSpriteIndexBytes);
 				args.Add((byte)character.player.axlBulletType);
 			}
@@ -356,8 +361,8 @@ public class RPCUpdateActor : RPC {
 					character.player.changeWeaponFromWi(weaponIndex);
 					character.player.health = health;
 					character.player.maxHealth = maxHealth;
-					if (character.player.isZero) {
-						character.player.zeroGigaAttackWeapon.ammo = ammo;
+					if (character is Zero zero) {
+						zero.zeroGigaAttackWeapon.ammo = ammo;
 					} else if (character.player.isX) {
 						character.player.weapon.ammo = ammo;
 					} else if (character.player.isVile) {
@@ -370,7 +375,7 @@ public class RPCUpdateActor : RPC {
 					character.netCharState1 = (byte)netCharState1;
 					character.netCharState2 = (byte)netCharState2;
 
-					// x section
+					// X section
 					if (charMaskBools[0]) {
 						byte armorByte = arguments[i++];
 						byte armorByte2 = arguments[i++];
@@ -378,22 +383,25 @@ public class RPCUpdateActor : RPC {
 						character.player.armorFlag = BitConverter.ToUInt16(new byte[] { armorByte, armorByte2 });
 					}
 
-					// vile section
+					// Vile section
 					if (charMaskBools[1]) {
 						byte cannonByte = arguments[i++];
 						Vile vile = character as Vile;
 						vile.cannonAimNum = cannonByte;
 					}
 
-					// axl section
+					// Axl section
 					if (charMaskBools[2]) {
+						Axl axl = character as Axl;
 						int axlArmAngle = arguments[i++];
-						character.netArmAngle = axlArmAngle * 2;
+						axl.netArmAngle = axlArmAngle * 2;
 						byte netAxlArmSpriteIndexByte = arguments[i++];
 						byte netAxlArmSpriteIndexByte2 = arguments[i++];
-						character.netAxlArmSpriteIndex = BitConverter.ToUInt16(new byte[] { netAxlArmSpriteIndexByte, netAxlArmSpriteIndexByte2 });
+						axl.netAxlArmSpriteIndex = BitConverter.ToUInt16(new byte[] {
+							netAxlArmSpriteIndexByte, netAxlArmSpriteIndexByte2
+						});
 						int axlBulletType = arguments[i++];
-						character.player.axlBulletType = axlBulletType;
+						axl.player.axlBulletType = axlBulletType;
 					}
 
 					// acid section

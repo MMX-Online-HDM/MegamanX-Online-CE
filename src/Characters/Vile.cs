@@ -624,4 +624,27 @@ public class Vile : Character {
 		}
 		return pos.addxy(0, -24);
 	}
+
+	public override Collider getGlobalCollider() {
+		var rect = new Rect(0, 0, 18, 42);
+		if (sprite.name.Contains("_ra_")) {
+			rect.y2 = 20;
+		}
+		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
+	}
+
+	public override Collider getDashingCollider() {
+		Rect rect = new Rect(0, 0, 18, 30);
+		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
+	}
+
+	public override Collider getCrouchingCollider() {
+		Rect rect = new Rect(0, 0, 18, 30);
+		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
+	}
+
+	public override Collider getRaCollider() {
+		var rect = new Rect(0, 0, 18, 22);
+		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
+	}
 }

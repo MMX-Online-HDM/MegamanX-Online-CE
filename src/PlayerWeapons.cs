@@ -45,6 +45,8 @@ public partial class Player {
 		}
 	}
 
+	public Weapon lastHudWeapon = null;
+
 	public AxlWeapon axlWeapon {
 		get {
 			return weapon as AxlWeapon;
@@ -85,33 +87,8 @@ public partial class Player {
 		}
 	}
 
-	public ZSaber zSaberWeapon;
-	public KKnuckleWeapon kKnuckleWeapon;
-	public ZeroBuster zeroBusterWeapon;
-	public ZSaberProjSwing zSaberProjSwingWeapon;
-	public ShippuugaWeapon shippuugaWeapon;
-	public Weapon raijingekiWeapon;
-	public Raijingeki2Weapon raijingeki2Weapon;
-	public ShinMessenkou zeroShinMessenkouWeapon;
-	public AwakenedAura awakenedAuraWeapon;
-	public DarkHoldWeapon zeroDarkHoldWeapon;
-	public Weapon zeroAirSpecialWeapon;
-	public Weapon zeroUppercutWeaponA;
-	public Weapon zeroUppercutWeaponS;
-	public Weapon zeroDownThrustWeaponA;
-	public Weapon zeroDownThrustWeaponS;
-	private Weapon _zeroGigaAttackWeapon;
-	public Weapon zeroGigaAttackWeapon {
-		get {
-			if ((character as Zero)?.isAwakenedZero() == true) return zeroShinMessenkouWeapon;
-			if (character?.isNightmareZeroBS.getValue() == true) return zeroDarkHoldWeapon;
-			return _zeroGigaAttackWeapon;
-		}
-		set {
-			_zeroGigaAttackWeapon = value;
-		}
-	}
-	public int zeroHyperMode;
+	// TODO:
+	// Migrate this to Zero character.
 	public int axlHyperMode;
 
 	public HadoukenWeapon hadoukenWeapon;
@@ -293,14 +270,14 @@ public partial class Player {
 			}
 		}
 
-		if (isAxl) {
+		if (character is Axl axl) {
 			if (oldWeapon is AxlWeapon aw) {
-				character.axlSwapTime = character.switchTime;
-				character.axlAltSwapTime = character.altSwitchTime;
+				axl.axlSwapTime = axl.switchTime;
+				axl.axlAltSwapTime = axl.altSwitchTime;
 			}
 
-			if (character.isZooming()) {
-				character.zoomOut();
+			if (axl.isZooming()) {
+				axl.zoomOut();
 			}
 		}
 	}
@@ -525,34 +502,26 @@ public partial class Player {
 	public void configureStaticWeapons() {
 		headbuttWeapon = new Headbutt(this);
 
-		zSaberWeapon = new ZSaber(this);
-		kKnuckleWeapon = new KKnuckleWeapon(this);
-		shippuugaWeapon = new ShippuugaWeapon(this);
-		raijingeki2Weapon = new Raijingeki2Weapon(this);
-		zeroShinMessenkouWeapon = new ShinMessenkou(this);
-		zeroDarkHoldWeapon = new DarkHoldWeapon();
-		zeroBusterWeapon = new ZeroBuster();
-		zSaberProjSwingWeapon = new ZSaberProjSwing(this);
-		awakenedAuraWeapon = new AwakenedAura(this);
+		if (character is Zero zero) {
+			if (!hasKnuckle()) {
+				zero.raijingekiWeapon = RaijingekiWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.groundSpecial);
+				zero.zeroAirSpecialWeapon = KuuenzanWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.airSpecial);
+				zero.zeroUppercutWeaponA = RyuenjinWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.uppercutA);
+				zero.zeroUppercutWeaponS = RyuenjinWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.uppercutS);
+				zero.zeroDownThrustWeaponA = HyouretsuzanWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.downThrustA);
+				zero.zeroDownThrustWeaponS = HyouretsuzanWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.downThrustS);
+			} else {
+				zero.raijingekiWeapon = new MegaPunchWeapon(this);
+				zero.zeroAirSpecialWeapon = KuuenzanWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.airSpecial);
+				zero.zeroUppercutWeaponA = new ZeroShoryukenWeapon(this);
+				zero.zeroUppercutWeaponS = new ZeroShoryukenWeapon(this);
+				zero.zeroDownThrustWeaponA = new DropKickWeapon(this);
+				zero.zeroDownThrustWeaponS = new DropKickWeapon(this);
+			}
 
-		if (!hasKnuckle()) {
-			raijingekiWeapon = RaijingekiWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.groundSpecial);
-			zeroAirSpecialWeapon = KuuenzanWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.airSpecial);
-			zeroUppercutWeaponA = RyuenjinWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.uppercutA);
-			zeroUppercutWeaponS = RyuenjinWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.uppercutS);
-			zeroDownThrustWeaponA = HyouretsuzanWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.downThrustA);
-			zeroDownThrustWeaponS = HyouretsuzanWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.downThrustS);
-		} else {
-			raijingekiWeapon = new MegaPunchWeapon(this);
-			zeroAirSpecialWeapon = KuuenzanWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.airSpecial);
-			zeroUppercutWeaponA = new ZeroShoryukenWeapon(this);
-			zeroUppercutWeaponS = new ZeroShoryukenWeapon(this);
-			zeroDownThrustWeaponA = new DropKickWeapon(this);
-			zeroDownThrustWeaponS = new DropKickWeapon(this);
+			zero.zeroGigaAttackWeapon = RakuhouhaWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.gigaAttack);
+			zero.zeroHyperMode = loadout.zeroLoadout.hyperMode;
 		}
-
-		zeroGigaAttackWeapon = RakuhouhaWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.gigaAttack);
-		zeroHyperMode = loadout.zeroLoadout.hyperMode;
 
 		hadoukenWeapon = new HadoukenWeapon(this);
 		shoryukenWeapon = new ShoryukenWeapon(this);

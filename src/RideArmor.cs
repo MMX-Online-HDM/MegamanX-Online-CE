@@ -307,7 +307,7 @@ public class RideArmor : Actor, IDamagable {
 			}
 		}
 
-		if (raNum == 2 && isUnderwater() && selfDestructTime == 0) {
+		if (raNum == 2 && isUnderwater() && character != null && character.isUnderwater() && selfDestructTime == 0) {
 			if (hawkElec == null) {
 				hawkElec = new Anim(pos.addxy(0, -20), "hawk_elec", 1, null, false);
 			}

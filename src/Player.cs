@@ -72,7 +72,7 @@ public partial class Player {
 	public Point axlLockOnCursorPos;
 	public Point axlGenericCursorWorldPos {
 		get {
-			if (character == null || !character.isZooming() || character.isZoomingIn || character.isZoomOutPhase1Done) {
+			if (character is not Axl axl || !axl.isZooming() || axl.isZoomingIn || axl.isZoomOutPhase1Done) {
 				return axlCursorWorldPos;
 			}
 			return axlScopeCursorWorldPos;
@@ -80,7 +80,7 @@ public partial class Player {
 	}
 	public float zoomRange {
 		get {
-			if (character != null && (character.isWhiteAxl() || character.hyperAxlStillZoomed)) return 100000;
+			if (character is Axl axl && (axl.isWhiteAxl() || axl.hyperAxlStillZoomed)) return 100000;
 			return Global.viewScreenW * 2.5f;
 		}
 	}
@@ -207,7 +207,8 @@ public partial class Player {
 			{ 1, new List<SubTank>() },
 			{ 2, new List<SubTank>() },
 			{ 3, new List<SubTank>() },
-			{ 4, new List<SubTank>() }
+			{ 4, new List<SubTank>() },
+			{ 5, new List<SubTank>() },
 		};
 	public List<SubTank> subtanks {
 		get {
@@ -226,6 +227,7 @@ public partial class Player {
 			{ 2, 0 },
 			{ 3, 0 },
 			{ 4, 0 },
+			{ 5, 0 },
 		};
 	public int heartTanks {
 		get {
@@ -493,7 +495,10 @@ public partial class Player {
 		return -1;
 	}
 
-	public Player(string name, int id, int charNum, PlayerCharData playerData, bool isAI, bool ownedByLocalPlayer, int alliance, Input input, ServerPlayer serverPlayer) {
+	public Player(
+		string name, int id, int charNum, PlayerCharData playerData,
+		bool isAI, bool ownedByLocalPlayer, int alliance, Input input, ServerPlayer serverPlayer
+	) {
 		this.name = name;
 		this.id = id;
 		curMaxNetId = getFirstAvailableNetId();
@@ -502,9 +507,9 @@ public partial class Player {
 		this.isAI = isAI;
 
 		if (getSameCharNum() != -1) charNum = getSameCharNum();
-		if (charNum > 4) {
+		if (charNum >= 210) {
 			if (Global.level.is1v1()) {
-				maverick1v1 = charNum - 5;
+				maverick1v1 = charNum - 210;
 				charNum = 4;
 			} else {
 				charNum = 4;
@@ -525,11 +530,15 @@ public partial class Player {
 			armArmorNum = xArmor1v1;
 		}
 
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i <= 5; i++) {
 			charScrap[i] = getStartScrap();
 		}
 		foreach (var key in charHeartTanks.Keys) {
-			int htCount = key == charNum ? getStartHeartTanksForChar() : getStartHeartTanks();
+			int htCount = getStartHeartTanksForChar();
+			int altHtCount =  getStartHeartTanks();
+			if (altHtCount > htCount) {
+				htCount = altHtCount;
+			}
 			charHeartTanks[key] = htCount;
 		}
 		foreach (var key in charSubTanks.Keys) {
@@ -949,6 +958,21 @@ public partial class Player {
 					this, pos.x, pos.y, xDir, false, charNetId,
 					ownedByLocalPlayer, mk2VileOverride: mk2VileOverride
 				);
+			} else if (charNum == 3) {
+				character = new Axl(
+					this, pos.x, pos.y, xDir,
+					false, charNetId, ownedByLocalPlayer
+				);
+			} else if (charNum == 4) {
+				character = new Sigma(
+					this, pos.x, pos.y, xDir,
+					false, charNetId, ownedByLocalPlayer
+				);
+			} else if (charNum == 5) {
+				character = new Rock(
+					this, pos.x, pos.y, xDir,
+					false, charNetId, ownedByLocalPlayer
+				);
 			} else {
 				character = new Character(
 					this, pos.x, pos.y, xDir, false, charNetId,
@@ -970,15 +994,15 @@ public partial class Player {
 						scrap = 9999;
 					}
 				}
-				if (isAxl) {
+				if (character is Axl axl) {
 					if (loadout.axlLoadout.hyperMode == 0) {
-						character.whiteAxlTime = 100000;
-						character.hyperAxlUsed = true;
+						axl.whiteAxlTime = 100000;
+						axl.hyperAxlUsed = true;
 						var db = new DoubleBullet();
 						weapons[0] = db;
 					} else {
-						character.stingChargeTime = 8;
-						character.hyperAxlUsed = true;
+						axl.stingChargeTime = 8;
+						axl.hyperAxlUsed = true;
 						scrap = 9999;
 					}
 				}
@@ -1142,8 +1166,6 @@ public partial class Player {
 		weapons.Add(new UndisguiseWeapon());
 		weaponSlot = 0;
 
-		zeroGigaAttackWeapon.ammo = dnaCore.rakuhouhaAmmo;
-		zeroDarkHoldWeapon.ammo = dnaCore.rakuhouhaAmmo;
 		sigmaAmmo = dnaCore.rakuhouhaAmmo;
 
 		bool isVileMK2 = charNum == 2 && dnaCore.hyperMode == DNACoreHyperMode.VileMK2;
@@ -1160,6 +1182,21 @@ public partial class Player {
 				true, character.netId, true, isWarpIn: false,
 				mk2VileOverride: isVileMK2, mk5VileOverride: isVileMK5
 			);
+		} else if (charNum == 3) {
+			retChar = new Axl(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, character.netId, true, isWarpIn: false
+			);
+		} else if (charNum == 4) {
+			retChar = new Sigma(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, character.netId, true, isWarpIn: false
+			);
+		} else if (charNum == 5) {
+			retChar = new Rock(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, character.netId, true, isWarpIn: false
+			);
 		} else {
 			retChar = new Character(
 				this, character.pos.x, character.pos.y, character.xDir,
@@ -1171,7 +1208,6 @@ public partial class Player {
 			if (isVileMK5) vile.vileForm = 2;
 			else if (isVileMK2) vile.vileForm = 1;
 		}
-
 		retChar.addTransformAnim();
 
 		if (isAI) {
@@ -1183,15 +1219,13 @@ public partial class Player {
 
 		character.changeState(new Idle(), true);
 		character = retChar;
-
-		if (charNum == 3) {
-			character.axlSwapTime = 0.25f;
-		} else {
-			weapon.shootTime = 0.25f;
-		}
+		weapon.shootTime = 0.25f;
 
 		if (character is Zero zero) {
-		 	if (dnaCore.hyperMode == DNACoreHyperMode.BlackZero) {
+			zero.zeroGigaAttackWeapon.ammo = dnaCore.rakuhouhaAmmo;
+			zero.zeroDarkHoldWeapon.ammo = dnaCore.rakuhouhaAmmo;
+
+			if (dnaCore.hyperMode == DNACoreHyperMode.BlackZero) {
 				zero.blackZeroTime = zero.maxHyperZeroTime;
 				RPC.playerToggle.sendRpc(id, RPCToggleType.SetBlackZero);
 			} else if (dnaCore.hyperMode == DNACoreHyperMode.AwakenedZero) {
@@ -1199,9 +1233,13 @@ public partial class Player {
 			} else if (dnaCore.hyperMode == DNACoreHyperMode.NightmareZero) {
 				zero.isNightmareZero = true;
 			}
-		} else if (charNum == 3 && dnaCore.hyperMode == DNACoreHyperMode.WhiteAxl) {
-			character.whiteAxlTime = character.maxHyperAxlTime;
-			RPC.playerToggle.sendRpc(id, RPCToggleType.SetWhiteAxl);
+		}
+		else if (charNum == 3 && character is Axl axl) {
+			if (dnaCore.hyperMode == DNACoreHyperMode.WhiteAxl) {
+				axl.whiteAxlTime = axl.maxHyperAxlTime;
+				RPC.playerToggle.sendRpc(id, RPCToggleType.SetWhiteAxl);
+			}
+			axl.axlSwapTime = 0.25f;
 		}
 
 		dnaCore.usedOnce = true;
@@ -1218,9 +1256,9 @@ public partial class Player {
 
 			if (character is Zero zero) {
 				if (zero.isNightmareZero) {
-					lastDNACore.rakuhouhaAmmo = zeroDarkHoldWeapon.ammo;
+					lastDNACore.rakuhouhaAmmo = zero.zeroDarkHoldWeapon.ammo;
 				} else {
-					lastDNACore.rakuhouhaAmmo = zeroGigaAttackWeapon.ammo;
+					lastDNACore.rakuhouhaAmmo = zero.zeroGigaAttackWeapon.ammo;
 				}
 			}
 			else if (isSigma) {
@@ -1230,6 +1268,7 @@ public partial class Player {
 		var oldPos = character.pos;
 		var oldDir = character.xDir;
 		character.destroySelf();
+		character.netId = null;
 		Global.level.gameObjects.Add(preTransformedAxl);
 		character = preTransformedAxl;
 		character.addTransformAnim();
@@ -1264,9 +1303,9 @@ public partial class Player {
 
 			if (character is Zero zero) {
 				if (zero.isNightmareZero) {
-					lastDNACore.rakuhouhaAmmo = zeroDarkHoldWeapon.ammo;
+					lastDNACore.rakuhouhaAmmo = zero.zeroDarkHoldWeapon.ammo;
 				} else {
-					lastDNACore.rakuhouhaAmmo = zeroGigaAttackWeapon.ammo;
+					lastDNACore.rakuhouhaAmmo = zero.zeroGigaAttackWeapon.ammo;
 				}
 			}
 			else if (isSigma) {
@@ -1418,7 +1457,9 @@ public partial class Player {
 			}
 			if (character != null && currentMaverick == null) {
 				InRideArmor inRideArmor = character?.charState as InRideArmor;
-				if (inRideArmor != null && (inRideArmor.frozenTime > 0 || inRideArmor.stunTime > 0 || inRideArmor.crystalizeTime > 0)) {
+				if (inRideArmor != null &&
+					(inRideArmor.frozenTime > 0 || inRideArmor.stunTime > 0 || inRideArmor.crystalizeTime > 0)
+				) {
 					return false;
 				}
 				if (character.shotgunIceChargeTime > 0 || character.charState is Frozen) {
@@ -1427,14 +1468,14 @@ public partial class Player {
 				if (character.charState is Stunned || character.charState is Crystalized) {
 					return false;
 				}
-				if (character.aiming) {
+				if (character?.charState is SniperAimAxl) {
 					return false;
 				}
 				if (character.rideArmor?.rideArmorState is RADropIn) {
 					return false;
 				}
 			}
-			if (isSigma && character != null && character.tagTeamSwapProgress > 0) {
+			if (character is Sigma sigma && sigma.tagTeamSwapProgress > 0) {
 				return false;
 			}
 			if (isPossessed()) {

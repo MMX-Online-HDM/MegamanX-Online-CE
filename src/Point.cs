@@ -30,7 +30,7 @@ public struct Point {
 		return point;
 	}
 
-	//Avoid calls to this, if called a lot may be bottleneck
+	// Avoid calls to this, if called a lot may be bottleneck
 	public Point normalize() {
 		x = Helpers.RoundEpsilon(x);
 		y = Helpers.RoundEpsilon(y);

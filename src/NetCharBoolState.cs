@@ -65,7 +65,9 @@ public partial class Character {
 			return vile.hasFrozenCastleBarrier(); 
 		});
 		isStrikeChainHookedBS = new NetCharBoolState(this, 1, NetCharBoolStateNum.One, (character) => { return character.charState is StrikeChainHooked; });
-		shouldDrawArmBS = new NetCharBoolState(this, 2, NetCharBoolStateNum.One, (character) => { return character.shouldDrawArm(); });
+		shouldDrawArmBS = new NetCharBoolState(this, 2, NetCharBoolStateNum.One, (character) => {
+			return (character as Axl)?.shouldDrawArm() == true; 
+		});
 		isAwakenedZeroBS = new NetCharBoolState(this, 3, NetCharBoolStateNum.One, (character) => {
 			return (character as Zero)?.isAwakenedZero() == true;
 		});
@@ -74,7 +76,9 @@ public partial class Character {
 		});
 		isInvisibleBS = new NetCharBoolState(this, 5, NetCharBoolStateNum.One, (character) => { return character.isInvisible(); });
 		isHyperXBS = new NetCharBoolState(this, 6, NetCharBoolStateNum.One, (character) => { return character.isHyperX; });
-		isHyperSigmaBS = new NetCharBoolState(this, 7, NetCharBoolStateNum.One, (character) => { return character.isHyperSigma; });
+		isHyperSigmaBS = new NetCharBoolState(this, 7, NetCharBoolStateNum.One, (character) => { 
+			return (character as Sigma)?.isHyperSigma == true;
+		});
 	}
 
 	public byte updateAndGetNetCharState1() {

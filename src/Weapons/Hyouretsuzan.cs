@@ -276,7 +276,8 @@ public class DropKickState : CharState {
 		base.onExit(newState);
 		character.useGravity = true;
 		character.stopMoving();
-		player.zeroDownThrustWeaponA.shootTime = 1;
-		player.zeroDownThrustWeaponS.shootTime = 1;
+		Zero zero = character as Zero;
+		zero.zeroDownThrustWeaponA.shootTime = 1;
+		zero.zeroDownThrustWeaponS.shootTime = 1;
 	}
 }

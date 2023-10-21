@@ -302,6 +302,8 @@ public class SelectAxlWeaponMenu : IMainMenu {
 		bool backPressed = Global.input.isPressedMenu(Control.MenuBack);
 		bool selectPressed = Global.input.isPressedMenu(Control.MenuSelectPrimary) || (backPressed && !inGame);
 		if (selectPressed) {
+			Axl axl = mainPlayer?.character as Axl;
+
 			if (duplicateWeapons()) {
 				error = "Cannot select same weapon more than once!";
 				return;
@@ -312,14 +314,16 @@ public class SelectAxlWeaponMenu : IMainMenu {
 				return;
 			}
 
-			if (mainPlayer != null && (mainPlayer.character?.charState is HyperAxlStart || mainPlayer.character?.isWhiteAxl() == true) && selectedWeaponIndices[0] > 0) {
+			if (mainPlayer != null && (mainPlayer.character?.charState is HyperAxlStart || axl?.isWhiteAxl() == true) && selectedWeaponIndices[0] > 0) {
 				error = "Cannot use craftable guns as White Axl.";
 				return;
 			}
 
 			if (mainPlayer != null && mainPlayer.axlBulletType != selectedWeaponIndices[0]) {
 				mainPlayer.axlBulletType = selectedWeaponIndices[0];
-				if (mainPlayer.character != null) mainPlayer.character.ammoUsages.Clear();
+				if (axl != null) {
+					axl.ammoUsages.Clear();
+				}
 				float oldAmmo = mainPlayer.weapons[0].ammo;
 
 				mainPlayer.weapons[0] = mainPlayer.getAxlBulletWeapon(selectedWeaponIndices[0]);
@@ -336,7 +340,9 @@ public class SelectAxlWeaponMenu : IMainMenu {
 
 				if (mainPlayer != null) {
 					mainPlayer.axlBulletType = selectedWeaponIndices[0];
-					if (mainPlayer.character != null) mainPlayer.character.ammoUsages.Clear();
+					if (axl != null) {
+						axl.ammoUsages.Clear();
+					}
 				}
 				Options.main.axlLoadout.weapon2 = selectedWeaponIndices[1];
 				Options.main.axlLoadout.weapon3 = selectedWeaponIndices[2];

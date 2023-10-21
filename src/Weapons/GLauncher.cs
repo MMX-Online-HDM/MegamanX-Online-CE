@@ -273,7 +273,7 @@ public class GrenadeExplosionProj : Projectile {
 			if (character == attacker.character) {
 				character.xSwingVel += dirTo.x * 10 * distFactor;
 				float damage = damager.damage;
-				if (character.isWhiteAxl()) damage = 0;
+				if ((character as Axl)?.isWhiteAxl() == true) { damage = 0; }
 				return new DamagerMessage() {
 					damage = damage,
 					flinch = 0
@@ -382,7 +382,7 @@ public class GrenadeExplosionProjCharged : Projectile {
 			if (character == attacker.character) {
 				character.xSwingVel = dirTo.x * 12 * distFactor * ownAxlFactor;
 				float damage = damager.damage;
-				if (character.isWhiteAxl()) damage = 0;
+				if ((character as Axl)?.isWhiteAxl() == true) damage = 0;
 				return new DamagerMessage() {
 					damage = damage,
 					flinch = 0

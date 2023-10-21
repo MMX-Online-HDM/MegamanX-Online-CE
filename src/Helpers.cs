@@ -567,9 +567,10 @@ public class Helpers {
 	#endif
 
 	public static void showMessageBox(string message, string caption) {
-		// TODO: Stop using C# Windows Forms for this.
-			#if WINDOWS
-		if (Global.window != null) Global.window.SetMouseCursorVisible(true);
+		#if WINDOWS
+			if (Global.window != null) {
+				Global.window.SetMouseCursorVisible(true);
+			}
 			MessageBox(IntPtr.Zero, message, caption, 0);
 			if (Global.window != null && Options.main != null) {
 				Global.window.SetMouseCursorVisible(!Options.main.fullScreen);
@@ -673,7 +674,7 @@ public class Helpers {
 	}
 
 	public static void debugLog(string message) {
-		if (Global.debug) {
+		if (Global.debug || Global.consoleDebugLogging) {
 			Console.WriteLine(message);
 		}
 	}

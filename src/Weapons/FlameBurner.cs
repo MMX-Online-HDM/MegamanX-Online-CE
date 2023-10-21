@@ -63,7 +63,7 @@ public class FlameBurnerProj : Projectile {
 		base(weapon, pos, xDir, 150, 1, player, "flameburner_proj", 0, 0.2f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.FlameBurner;
 		maxTime = 0.5f;
-		if (player.character?.isWhiteAxl() == true) {
+		if (player.character is Axl axl && axl.isWhiteAxl() == true) {
 			projId = (int)ProjIds.FlameBurnerHyper;
 		}
 		vel.x = bulletDir.x * speed;
@@ -84,9 +84,9 @@ public class FlameBurnerProj : Projectile {
 		base.update();
 		float progress = (time / maxTime);
 		if (!Options.main.lowQualityParticles()) {
-			alpha = 1 - progress;
-			xScale = 1 + progress * 2;
-			yScale = 1 + progress * 2;
+			alpha = 1f - (progress / 1.25f);
+			xScale = 1f + progress * 1.5f;
+			yScale = 1f + progress * 1.5f;
 		}
 		if (!ownedByLocalPlayer) return;
 	}
@@ -118,7 +118,7 @@ public class FlameBurnerAltProj : Projectile {
 		base(weapon, pos, xDir, 100, 0, player, "airblast_proj", 0, 0.15f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.FlameBurner2;
 		maxTime = 0.15f;
-		if (player.character?.isWhiteAxl() == true) {
+		if (player.character is Axl axl && axl.isWhiteAxl() == true) {
 			maxTime *= 2;
 		}
 		xScale = 1;
@@ -141,8 +141,8 @@ public class FlameBurnerAltProj : Projectile {
 		base.onStart();
 		if (!ownedByLocalPlayer) return;
 		Character chr = owner.character;
-		if (chr != null) {
-			Point moveVel = chr.getAxlBulletDir().times(-250);
+		if (chr is Axl axl) {
+			Point moveVel = axl.getAxlBulletDir().times(-250);
 			chr.vel.y = moveVel.y;
 			chr.xSwingVel = moveVel.x * 0.66f;
 		}

@@ -24,12 +24,12 @@ public partial class Global {
 
 	// For forks/mods of the game, add a prefix here so that different forks
 	// don't conflict with each other or the base game
-	public const string checksumPrefix = "[Base Mod]";
+	public const string checksumPrefix = "[Community Edition]";
 	// Use this to make sure the checksum varies.
 	// Better to use together with "checksumPrefix" and be diferent from it.
-	public const string checksumKey = "DEVTEST--03-07-2023";
+	public const string checksumKey = "DEVTEST--10-10-2023";
 	// For displaying the name of the mod in the version string.
-	public static string forkName = "Base Mod Public Beta 3";
+	public static string forkName = "Community Edition - Rockman Test 1";
 
 	public static string prodChecksum = checksumPrefix + " " + assetChecksum;
 
@@ -113,6 +113,8 @@ public partial class Global {
 	public static bool maverickWallClimb = false;
 
 	public static bool debug = false;
+	
+	public static bool consoleDebugLogging = false;
 
 	public static bool showHitboxes = false;
 	public static bool showGridHitboxes = false;
@@ -467,6 +469,7 @@ public partial class Global {
 
 	public const int fpsCap = 60;
 	public static float currentFPS = 60;
+	public static float logicFPS = 60;
 	public static float crystalSlowAmount = 1;
 	private static float _spf = 1f / 60;
 	public static float spf {
@@ -480,8 +483,10 @@ public partial class Global {
 	public static float time;
 	public static int frameCount = 0;
 	public static int normalizeFrames(int frames) {
-		float fpsRatio = currentFPS / 60;
+		/*
+		float fpsRatio = 1;
 		frames = MathInt.Round(frames * fpsRatio);
+		*/
 		if (frames <= 0) frames = 1;
 		return frames;
 	}
@@ -493,6 +498,8 @@ public partial class Global {
 		int frames = normalizeFrames(cycle);
 		return frameCount % frames * 2 < frames;
 	}
+
+	public static bool isSkippingFrames = false;
 
 	public static bool paused = false;
 
@@ -559,11 +566,11 @@ public partial class Global {
 	}
 
 	public const int maxServers = 5;
-	public const int tickRate = 2;
+	public static int tickRate = 2;
 
-	public const int defFlinch = 26;
-	public const int halfFlinch = 13;
-	public const int miniFlinch = 6;
+	public static readonly int defFlinch = 26;
+	public static readonly int halfFlinch = 13;
+	public static readonly int miniFlinch = 6;
 
 	public static bool levelStarted() {
 		return level != null && level.started;

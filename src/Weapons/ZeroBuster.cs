@@ -176,6 +176,8 @@ public class ZeroDoubleBuster : CharState {
 	bool isSecond;
 	bool shootPressedAgain;
 	bool isPinkCharge;
+	Zero zero;
+
 	public ZeroDoubleBuster(bool isSecond, bool isPinkCharge) : base("doublebuster", "", "", "") {
 		this.isSecond = isSecond;
 		superArmor = true;
@@ -203,29 +205,27 @@ public class ZeroDoubleBuster : CharState {
 			if (!isPinkCharge) {
 				character.playSound("buster3", sendRpc: true);
 				new ZBuster4Proj(
-					player.zeroBusterWeapon, character.getShootPos(),
+					zero.zeroBusterWeapon, character.getShootPos(),
 					character.getShootXDir(), type, player, player.getNextActorNetId(), rpc: true
 				);
 			} else {
 				character.playSound("buster2", sendRpc: true);
 				new ZBuster2Proj(
-					player.zeroBusterWeapon, character.getShootPos(), character.getShootXDir(),
+					zero.zeroBusterWeapon, character.getShootPos(), character.getShootXDir(),
 					type, player, player.getNextActorNetId(), rpc: true
 				);
 			}
 		}
 		if (!fired2 && character.frameIndex == 7) {
 			fired2 = true;
-			if (character is Zero zero) {
-				if (!isPinkCharge) {
-					zero.doubleBusterDone = true;
-				} else {
-					character.stockCharge(false);
-				}
+			if (!isPinkCharge) {
+				zero.doubleBusterDone = true;
+			} else {
+				character.stockCharge(false);
 			}
 			character.playSound("buster3", sendRpc: true);
 			new ZBuster4Proj(
-				player.zeroBusterWeapon, character.getShootPos(), character.getShootXDir(),
+				zero.zeroBusterWeapon, character.getShootPos(), character.getShootXDir(),
 				type, player, player.getNextActorNetId(), rpc: true
 			);
 		}
@@ -251,6 +251,8 @@ public class ZeroDoubleBuster : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		zero = character as Zero;
+
 		if (!isPinkCharge) {
 			character.stockSaber(true);
 		} else {

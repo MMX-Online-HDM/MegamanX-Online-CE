@@ -129,7 +129,7 @@ public class BlackArrowProj : Projectile {
 		if (type != 2) {
 			useGravity = false;
 			maxTime = 4;
-			if (owner.character?.isWhiteAxl() == true) {
+			if ((owner.character as Axl)?.isWhiteAxl() == true) {
 				maxTime = 10;
 			}
 			time = 0;
@@ -226,7 +226,7 @@ public class WindCutterProj : Projectile {
 				vel.x = Helpers.cosd((float)angle) * speed;
 				vel.y = Helpers.sind((float)angle) * speed;
 			} else if (owner.character != null) {
-				Point destPos = owner.character.getAxlBulletPos();
+				Point destPos = owner.character.getCenterPos();
 				var dTo = pos.directionTo(destPos).normalize();
 				var destAngle = MathF.Atan2(dTo.y, dTo.x) * 180 / MathF.PI;
 				destAngle = Helpers.to360(destAngle);

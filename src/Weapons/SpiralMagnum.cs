@@ -34,23 +34,27 @@ public class SpiralMagnum : AxlWeapon {
 		return 4;
 	}
 
-	public override void axlGetProjectile(Weapon weapon, Point bulletPos, int xDir, Player player, float angle, IDamagable target, Character headshotTarget, Point cursorPos, int chargeLevel, ushort netId) {
+	public override void axlGetProjectile(
+		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
+		IDamagable target, Character headshotTarget, Point cursorPos, int chargeLevel, ushort netId
+	) {
 		if (!player.ownedByLocalPlayer) return;
 		if (player.character == null) return;
+		if (player.character is not Axl axl) return;
 		Point bulletDir = Point.createFromAngle(angle);
 		Projectile bullet = null;
 		Point origPos = bulletPos;
 
 		if (chargeLevel == 3 && altFire == 0) {
-			player.character.sniperMissileProj = new SniperMissileProj(weapon, bulletPos, player, bulletDir, netId, rpc: true);
-			RPC.playSound.sendRpc(shootSounds[3], player.character.netId);
+			axl.sniperMissileProj = new SniperMissileProj(weapon, bulletPos, player, bulletDir, netId, rpc: true);
+			RPC.playSound.sendRpc(shootSounds[3], axl.netId);
 			return;
 		}
 
-		Point shellPos = bulletPos.add(player.character.getAxlBulletDir().times(-20));
-		var spiralMagnumShell = new SpiralMagnumShell(shellPos, -player.character.xDir, player.getNextActorNetId(), sendRpc: true);
+		Point shellPos = bulletPos.add(axl.getAxlBulletDir().times(-20));
+		var spiralMagnumShell = new SpiralMagnumShell(shellPos, -axl.xDir, player.getNextActorNetId(), sendRpc: true);
 
-		if (player.character.isZooming() == false) {
+		if (axl.isZooming() == false) {
 			bullet = new SpiralMagnumProj(weapon, bulletPos, 0, 0, player, bulletDir, target, headshotTarget, netId);
 		} else {
 			float jumpDist = 0;
@@ -60,7 +64,7 @@ public class SpiralMagnum : AxlWeapon {
 			}
 			bullet = new SpiralMagnumProj(weapon, bulletPos, jumpDist, 1, player, bulletDir, target, headshotTarget, netId);
 			AssassinBulletTrailAnim trail = new AssassinBulletTrailAnim(origPos, bullet);
-			player.character.zoomCharge = 0;
+			axl.zoomCharge = 0;
 		}
 
 		RPC.axlShoot.sendRpc(player.id, bullet.projId, netId, origPos, xDir, angle);
@@ -163,8 +167,10 @@ public class SpiralMagnumProj : Projectile {
 		this.player = player;
 		this.headshotChar = headshotChar;
 
+		Axl axl = (player.character as Axl);
+
 		if (type == 0) damager.damage = 1.5f;
-		isHyper = player.character?.isWhiteAxl() == true;
+		isHyper = axl?.isWhiteAxl() == true;
 		isScoped = type == 1;
 		maxTime = float.MaxValue;
 		maxDist = Global.screenW / 2;
@@ -175,8 +181,8 @@ public class SpiralMagnumProj : Projectile {
 			projId = (int)ProjIds.SpiralMagnumScoped;
 			maxDist = player.adjustedZoomRange;
 			dist = jumpDist;
-			damager.damage += MathF.Round(6 * player.character.zoomCharge);
-			if (!player.character.hasScopedTarget()) {
+			damager.damage += MathF.Round(6 * (axl?.zoomCharge ?? 0));
+			if (axl?.hasScopedTarget() != true) {
 				damager.damage = 0;
 			}
 		}
@@ -213,7 +219,6 @@ public class SpiralMagnumProj : Projectile {
 			damager.applyDamage(hitTarget, false, weapon, this, projId, overrideDamage: overrideDamage);
 
 			if (weakness) {
-				(hitTarget as Character).addDamageText("Headshot!", false);
 				playSound("hurt", sendRpc: true);
 			}
 
@@ -364,11 +369,14 @@ public class SniperMissileProj : Projectile, IDamagable {
 	float? holdStartAngle;
 	const float maxTimeConst = 5f;
 	float turnSpeed = 1;
+	Axl axl;
 
 	public SniperMissileProj(Weapon weapon, Point pos, Player player, Point bulletDir, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, 1, 150, 0, player, "snipermissile_proj", 0, 0f, netProjId, player.ownedByLocalPlayer) {
 		maxTime = maxTimeConst;
-		if (player.character?.isWhiteAxl() == true) {
+		axl = (player.character as Axl);
+
+		if (axl?.isWhiteAxl() == true) {
 			maxTime = 1000;
 			health = 12;
 			speed *= 1.5f;
@@ -377,8 +385,6 @@ public class SniperMissileProj : Projectile, IDamagable {
 		vel.x = bulletDir.x * speed;
 		vel.y = bulletDir.y * speed;
 		projId = (int)ProjIds.SniperMissile;
-		xScale = 0.75f;
-		yScale = 0.75f;
 		blinkTime = maxBlinkTime;
 		updateAngle();
 
@@ -466,9 +472,17 @@ public class SniperMissileProj : Projectile, IDamagable {
 
 	public override void onDestroy() {
 		base.onDestroy();
-		if (!ownedByLocalPlayer) return;
-		if (owner.character != null && owner.character.sniperMissileProj == this) owner.character.playSound("grenadeExplode");
-		new SniperMissileExplosionProj(weapon, pos, xDir, Helpers.clamp(MathF.Ceiling(1 + time), 2, 1000), owner, owner.getNextActorNetId());
+		if (!ownedByLocalPlayer) {
+			return;
+		}
+		if (axl != null && axl.sniperMissileProj == this) {
+			axl.playSound("grenadeExplode");
+		}
+		new SniperMissileExplosionProj(
+			weapon, pos, xDir,
+			Helpers.clamp(MathF.Ceiling(1 + time), 2, 1000),
+			owner, owner.getNextActorNetId()
+		);
 	}
 
 	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
@@ -497,6 +511,8 @@ public class SniperMissileProj : Projectile, IDamagable {
 public class SniperMissileExplosionProj : Projectile {
 	public IDamagable directHit;
 	public int directHitXDir;
+	Axl axl;
+
 	public SniperMissileExplosionProj(Weapon weapon, Point pos, int xDir, float damage, Player player, ushort netProjId) :
 		base(weapon, pos, xDir, 0, damage, player, "axl_grenade_explosion2", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
 		this.xDir = xDir;
@@ -504,6 +520,7 @@ public class SniperMissileExplosionProj : Projectile {
 		projId = (int)ProjIds.SniperMissileBlast;
 		playSound("grenadeExplode");
 		shouldShieldBlock = false;
+		axl = (player.character as Axl);
 
 		if (ownedByLocalPlayer) {
 			rpcCreate(pos, owner, netProjId, xDir);
@@ -521,7 +538,9 @@ public class SniperMissileExplosionProj : Projectile {
 	public override void onDestroy() {
 		base.onDestroy();
 		if (!ownedByLocalPlayer) return;
-		if (owner?.character != null) owner.character.sniperMissileProj = null;
+		if (axl != null) {
+			axl.sniperMissileProj = null;
+		}
 	}
 
 	public override DamagerMessage onDamage(IDamagable damagable, Player attacker) {
@@ -544,7 +563,9 @@ public class SniperMissileExplosionProj : Projectile {
 			if (character == attacker.character) {
 				character.xSwingVel = dirTo.x * 12 * distFactor * ownAxlFactor;
 				float damage = damager.damage;
-				if (character.isWhiteAxl()) damage = 0;
+				if (axl?.isWhiteAxl() == true) {
+					damage = 0;
+				}
 				return new DamagerMessage() {
 					damage = damage,
 					flinch = 0
