@@ -719,23 +719,18 @@ public partial class Player {
 		if (isControllingPuppet()) {
 			return true;
 		}
-
-		if (character != null) {
+		if (character == null) {
 			return false;
 		}
-
-		if (!isAxl || Options.main.axlAimMode == 2) {
+		if (character is not Axl || Options.main.axlAimMode == 2) {
 			return input.isHeld(Control.Down, this);
 		}
-
 		if (input.isHeld(Control.AxlCrouch, this)) {
 			return true;
 		}
-
-		if (Options.main.axlSeparateAimDownAndCrouch) {
+		if (!Options.main.axlSeparateAimDownAndCrouch) {
 			return input.isHeld(Control.Down, this);
 		}
-
 		if (Options.main.axlAimMode == 1) {
 			return input.isHeld(Control.Down, this) && !input.isHeld(Control.AimAngleDown, this);
 		} else {

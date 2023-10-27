@@ -609,17 +609,15 @@ public class Crouch : CharState {
 	public override void update() {
 		base.update();
 
-		if (player.input.isHeld(Control.Right, player)) {
-			character.xDir = 1;
-		} else if (player.input.isHeld(Control.Left, player)) {
-			character.xDir = -1;
+		var dpadXDir = player.input.getXDir(player);
+		if (dpadXDir != 0) {
+			character.xDir = dpadXDir;
 		}
 
 		if (!player.isCrouchHeld() && !(player.isZero && character.isAttacking())) {
 			character.changeState(new Idle(transitionSprite: "crouch_start"));
 			return;
 		}
-
 		if (Global.level.gameMode.isOver) {
 			if (Global.level.gameMode.playerWon(player)) {
 				if (!character.sprite.name.Contains("_win")) {

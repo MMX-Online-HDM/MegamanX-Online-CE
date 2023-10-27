@@ -142,6 +142,7 @@ public class ShotgunIceProjSled : Projectile {
 		projId = (int)ProjIds.ShotgunIceSled;
 		fadeSound = "iceBreak";
 		shouldShieldBlock = false;
+		isPlatform = true;
 		//this.collider.wallOnly = true;
 	}
 

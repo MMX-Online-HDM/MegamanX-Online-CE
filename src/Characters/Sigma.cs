@@ -604,7 +604,10 @@ public class Sigma : Character {
 		if (changedState) {
 			return true;
 		}
-		if (player.isCrouchHeld() && canCrouch() && !isAttacking() && noBlockTime == 0) {
+		if (player.isCrouchHeld() && canCrouch() &&
+			!isAttacking() && noBlockTime == 0 &&
+			charState is not SwordBlock
+		) {
 			changeState(new SwordBlock());
 			return true;
 		}

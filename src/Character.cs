@@ -1285,7 +1285,7 @@ public partial class Character : Actor, IDamagable {
 				getOffMK5Platform();
 				return true;
 			}
-			if (player.isCrouchHeld() && canCrouch()) {
+			if (player.isCrouchHeld() && canCrouch() && charState is not Crouch) {
 				changeState(new Crouch());
 				return true;
 			}
