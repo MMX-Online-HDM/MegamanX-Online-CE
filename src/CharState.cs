@@ -219,11 +219,6 @@ public class CharState {
 			character.sprite.frameIndex = oldFrameIndex;
 			character.sprite.frameTime = oldFrameTime;
 		}
-
-		if (exitOnLanding && character.grounded) {
-			landingCode();
-			return;
-		}
 	}
 
 	public void landingCode() {
@@ -251,14 +246,14 @@ public class CharState {
 		if (character.sprite.name.Contains("dropkick") && character.charState is DropKickState d) {
 			ts = "dropkick_land";
 		}
-
-		//character.player.vileBallWeapon.shootTime = 0;
 		if (character is Zero zero) {
 			zero.quakeBlazerBounces = 0;
 		}
 		character.dashedInAir = 0;
 		changeToIdle(ts);
-		if (character.ai != null) character.ai.jumpTime = 0;
+		if (character.ai != null) {
+			character.ai.jumpTime = 0;
+		}
 	}
 
 	public void groundCodeWithMove() {

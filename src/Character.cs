@@ -1233,7 +1233,7 @@ public partial class Character : Actor, IDamagable {
 			return false;
 		}
 		if (charState.exitOnLanding && grounded) {
-			changeState(new Fall());
+			charState.landingCode();
 		}
 		if (charState.exitOnAirborne && !grounded) {
 			if (vel.y >= 0) {
@@ -1242,7 +1242,7 @@ public partial class Character : Actor, IDamagable {
 				changeState(new Jump() { enterSound = null });
 			}
 		}
-		if (charState.airMove) {
+		if (charState.airMove && !grounded) {
 			airMove();
 		}
 		if (charState.normalCtrl) {
