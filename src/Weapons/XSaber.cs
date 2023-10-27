@@ -41,12 +41,12 @@ public class XSaberState : CharState {
 	public XSaberState(bool grounded) : base(grounded ? "beam_saber" : "beam_saber_air", "", "", "") {
 		this.grounded = grounded;
 		landSprite = "beam_saber";
+		airMove = true;
 	}
 
 	public override void update() {
 		base.update();
 		if (!character.grounded) {
-			airCode();
 			if (player.input.isHeld(Control.Dash, player)) {
 				character.isDashing = true;
 			}
@@ -71,12 +71,12 @@ public class X6SaberState : CharState {
 	public X6SaberState(bool grounded) : base(grounded ? "beam_saber2" : "beam_saber_air2", "", "", "") {
 		this.grounded = grounded;
 		landSprite = "beam_saber2";
+		airMove = true;
 	}
 
 	public override void update() {
 		base.update();
 		if (!character.grounded) {
-			airCode();
 			if (player.input.isHeld(Control.Dash, player)) {
 				character.isDashing = true;
 			}

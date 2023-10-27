@@ -25,7 +25,7 @@ public class FlameBurner : AxlWeapon {
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
-		if (chargeLevel == 3) {
+		if (chargeLevel >= 3) {
 			if (altFire == 0) {
 				return 8;
 			}

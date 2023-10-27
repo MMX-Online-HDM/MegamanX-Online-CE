@@ -273,6 +273,7 @@ public class RideArmor : Actor, IDamagable {
 
 	public override void postUpdate() {
 		Player player = this.player ?? netOwner;
+		MegamanX mmx = character as MegamanX;
 
 		base.postUpdate();
 
@@ -353,7 +354,7 @@ public class RideArmor : Actor, IDamagable {
 
 		if (punchCooldown > 0) {
 			punchCooldown -= Global.spf;
-			if (character?.isHyperX == true) punchCooldown -= Global.spf;
+			if (mmx?.isHyperX == true) punchCooldown -= Global.spf;
 			if (punchCooldown < 0) punchCooldown = 0;
 		}
 
@@ -386,7 +387,7 @@ public class RideArmor : Actor, IDamagable {
 		}
 
 		Helpers.decrementTime(ref missileCooldown);
-		if (character?.isHyperX == true) Helpers.decrementTime(ref missileCooldown);
+		if (mmx?.isHyperX == true) Helpers.decrementTime(ref missileCooldown);
 
 		if (consecutiveJumpTimeout > 0) {
 			consecutiveJumpTimeout -= Global.spf;
@@ -856,10 +857,10 @@ public class RideArmor : Actor, IDamagable {
 
 	public float getJumpPower() {
 		if (isNeutral) {
-			if (raNum == 0) return Physics.JumpPower * 1.15f;
-			if (raNum == 1) return Physics.JumpPower * 1.075f;
+			if (raNum == 0) return Physics.JumpSpeed * 1.15f;
+			if (raNum == 1) return Physics.JumpSpeed * 1.075f;
 		}
-		return Physics.JumpPower;
+		return Physics.JumpSpeed;
 	}
 
 	public bool canDash() {
@@ -1179,7 +1180,7 @@ public class RADropIn : RideArmorState {
 			rideArmor.frameSpeed = 1;
 		}
 
-		yVel += Global.level.gravity * Global.spf;
+		yVel += Global.speedMul * rideArmor.getGravity();
 		float yInc = Global.spf * yVel;
 		rideArmor.incPos(new Point(0, yInc));
 		if (rideArmor.pos.y >= spawnPos.y) {

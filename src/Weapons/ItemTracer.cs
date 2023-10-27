@@ -18,12 +18,12 @@ public class ItemTracer : Weapon {
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-		if (player?.character == null || !player.character.ownedByLocalPlayer) return;
+		if (player?.character is not MegamanX mmx || !player.character.ownedByLocalPlayer) return;
 
-		player.character.scannerCooldown = 1;
+		mmx.scannerCooldown = 1;
 		ammo -= 3;
 		Character target = null;
-		player.character.playSound("itemTracer", sendRpc: true);
+		mmx.playSound("itemTracer", sendRpc: true);
 		CollideData hit = Global.level.raycast(pos, pos.addxy(150 * xDir, 0), new List<Type>() { typeof(Actor) });
 		if (hit?.gameObject is Character chr && chr.player.alliance != player.alliance && !chr.player.scanned) {
 			target = chr;

@@ -22,7 +22,7 @@ public class ParasiticBomb : Weapon {
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-		if (chargeLevel != 3) {
+		if (chargeLevel < 3) {
 			player.character.playSound("buster");
 			new ParasiticBombProj(this, pos, xDir, player, netProjId);
 		} else {
@@ -33,7 +33,7 @@ public class ParasiticBomb : Weapon {
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
-		if (chargeLevel != 3) return 1;
+		if (chargeLevel < 3) return 1;
 		else return 2;
 	}
 }
@@ -226,11 +226,11 @@ public class BeeSwarm {
 
 public class BeeCursorAnim : Anim {
 	public int state = 0;
-	Character character;
+	MegamanX character;
 	public Actor target;
 	public BeeCursorAnim(Point pos, Character character)
 		: base(pos, "parasite_cursor_start", 1, character.player.getNextActorNetId(), false, true, character.ownedByLocalPlayer) {
-		this.character = character;
+		this.character = character as MegamanX;
 	}
 
 	public override void update() {

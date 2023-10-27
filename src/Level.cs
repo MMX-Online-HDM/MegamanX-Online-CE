@@ -1168,17 +1168,23 @@ public partial class Level {
 		bool isNon1v1Elimination = Global.level.isNon1v1Elimination();
 		var gos = gameObjects.ToList();
 		try {
-			foreach (var go in gos) {
-				if (isTimeSlowed(go, out float slowAmount)) Global.crystalSlowAmount = slowAmount;
+			foreach (GameObject go in gos) {
+				if (isTimeSlowed(go, out float slowAmount)) {
+					Global.speedMul = slowAmount;
+				}
 				go.preUpdate();
-				Global.crystalSlowAmount = 1;
+				go.statePreUpdate();
+				Global.speedMul = 1;
 			}
 			foreach (var ms in mapSprites) {
 				ms.sprite?.update();
 			}
 			foreach (var go in gos) {
-				if (isTimeSlowed(go, out float slowAmount)) Global.crystalSlowAmount = slowAmount;
+				if (isTimeSlowed(go, out float slowAmount)) {
+					Global.speedMul = slowAmount;
+				}
 				go.update();
+				go.stateUpdate();
 				if (isNon1v1Elimination && gameMode.virusStarted > 0 && go is Actor actor && actor.ownedByLocalPlayer && go is IDamagable damagable) {
 					Rect szRect = gameMode.safeZoneRect;
 					if (actor.collider != null) {
@@ -1202,16 +1208,19 @@ public partial class Level {
 						}
 					}
 				}
-				Global.crystalSlowAmount = 1;
+				Global.speedMul = 1;
 			}
 			foreach (var go in gos) {
-				if (isTimeSlowed(go, out float slowAmount)) Global.crystalSlowAmount = slowAmount;
+				if (isTimeSlowed(go, out float slowAmount)) {
+					Global.speedMul = slowAmount;
+				}
 				go.postUpdate();
-				Global.crystalSlowAmount = 1;
+				go.statePostUpdate();
+				Global.speedMul = 1;
 				go.netUpdate();
 			}
 		} finally {
-			Global.crystalSlowAmount = 1;
+			Global.speedMul = 1;
 		}
 
 		if (camPlayer.character != null) {
@@ -1245,11 +1254,11 @@ public partial class Level {
 				var deltaX = fullDeltaX;
 				var deltaY = fullDeltaY;
 
-				if (MathF.Abs(fullDeltaX) > 3) {
-					deltaX = 3 * MathF.Sign(fullDeltaX);
+				if (MathF.Abs(fullDeltaX) > 6) {
+					deltaX = 6 * MathF.Sign(fullDeltaX);
 				}
-				if (MathF.Abs(fullDeltaY) > 3) {
-					deltaY = 3 * MathF.Sign(fullDeltaY);
+				if (MathF.Abs(fullDeltaY) > 6) {
+					deltaY = 6 * MathF.Sign(fullDeltaY);
 				}
 
 				updateCamPos(deltaX, deltaY);
@@ -1802,6 +1811,8 @@ public partial class Level {
 			camY += deltaY;
 		}
 
+
+
 		var camRect = new Rect(camX, camY, camX + scaledCanvasW, camY + scaledCanvasH);
 		var camRectShape = camRect.getShape();
 
@@ -1863,7 +1874,10 @@ public partial class Level {
 		if (Global.level.isRace() && server.fixedCamera && Global.level.height < 448) {
 			yOff = (448 - Global.level.height) / 2;
 		}
-		Global.view.Center = new Vector2f(camCenterX + offsetX, camCenterY + offsetY + yOff);
+		Global.view.Center = new Vector2f(
+			camCenterX + offsetX,
+			camCenterY + offsetY + yOff
+		);
 		Global.window.SetView(Global.view);
 		camSetFirstTime = true;
 	}

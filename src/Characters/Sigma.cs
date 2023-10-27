@@ -599,6 +599,18 @@ public class Sigma : Character {
 		}
 	}
 
+	public override bool normalCtrl() {
+		var changedState = base.normalCtrl();
+		if (changedState) {
+			return true;
+		}
+		if (player.isCrouchHeld() && canCrouch() && !isAttacking() && noBlockTime == 0) {
+			changeState(new SwordBlock());
+			return true;
+		}
+		return false;
+	}
+
 	// This can run on both owners and non-owners. So data used must be in sync
 	public override Projectile getProjFromHitbox(Collider collider, Point centerPoint) {
 		Projectile proj = null;
@@ -909,5 +921,15 @@ public class Sigma : Character {
 			return true;
 		}
 		return base.isAttacking();
+	}
+
+	public override string getSprite(string spriteName) {
+		if (player.loadout.sigmaLoadout.sigmaForm == 2) {
+			return "sigma3_" + spriteName;
+		}
+		if (player.loadout.sigmaLoadout.sigmaForm == 1) {
+			return "sigma2_" + spriteName;
+		}
+		return "sigma_" + spriteName;
 	}
 }

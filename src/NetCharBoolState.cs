@@ -75,7 +75,9 @@ public partial class Character {
 			return (character as Zero)?.isAwakenedGenmuZero() == true;
 		});
 		isInvisibleBS = new NetCharBoolState(this, 5, NetCharBoolStateNum.One, (character) => { return character.isInvisible(); });
-		isHyperXBS = new NetCharBoolState(this, 6, NetCharBoolStateNum.One, (character) => { return character.isHyperX; });
+		isHyperXBS = new NetCharBoolState(this, 6, NetCharBoolStateNum.One, (character) => {
+			return (character as MegamanX)?.isHyperX == true;
+		});
 		isHyperSigmaBS = new NetCharBoolState(this, 7, NetCharBoolStateNum.One, (character) => { 
 			return (character as Sigma)?.isHyperSigma == true;
 		});

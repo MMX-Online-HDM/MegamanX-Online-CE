@@ -27,7 +27,7 @@ public class BubbleSplash : Weapon {
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
-		if (chargeLevel == 3) {
+		if (chargeLevel >= 3) {
 			return base.getAmmoUsage(chargeLevel);
 		} else {
 			return 0.5f;// return Global.spf * 10;
@@ -64,18 +64,18 @@ public class BubbleSplash : Weapon {
 
 	// Friendly reminder that this method MUST be deterministic across all clients, i.e. don't vary it on a field that could vary locally.
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-		if (chargeLevel != 3) {
+		if (chargeLevel < 3) {
 			var proj = new BubbleSplashProj(this, pos, xDir, player, netProjId);
 			bubblesOnField.Add(proj);
-		} else if (chargeLevel == 3) {
+		} else if (chargeLevel >= 3 && player.character is MegamanX mmx) {
 			player.setNextActorNetId(netProjId);
-			player.character.popAllBubbles();
-			player.character.chargedBubbles.Add(new BubbleSplashProjCharged(this, pos, xDir, player, 0, player.getNextActorNetId(true)));
-			player.character.chargedBubbles.Add(new BubbleSplashProjCharged(this, pos, xDir, player, 0.2f, player.getNextActorNetId(true)));
-			player.character.chargedBubbles.Add(new BubbleSplashProjCharged(this, pos, xDir, player, 0.4f, player.getNextActorNetId(true)));
-			player.character.chargedBubbles.Add(new BubbleSplashProjCharged(this, pos, xDir, player, 0.6f, player.getNextActorNetId(true)));
-			player.character.chargedBubbles.Add(new BubbleSplashProjCharged(this, pos, xDir, player, 0.8f, player.getNextActorNetId(true)));
-			player.character.chargedBubbles.Add(new BubbleSplashProjCharged(this, pos, xDir, player, 1f, player.getNextActorNetId(true)));
+			mmx.popAllBubbles();
+			mmx.chargedBubbles.Add(new BubbleSplashProjCharged(this, pos, xDir, player, 0, player.getNextActorNetId(true)));
+			mmx.chargedBubbles.Add(new BubbleSplashProjCharged(this, pos, xDir, player, 0.2f, player.getNextActorNetId(true)));
+			mmx.chargedBubbles.Add(new BubbleSplashProjCharged(this, pos, xDir, player, 0.4f, player.getNextActorNetId(true)));
+			mmx.chargedBubbles.Add(new BubbleSplashProjCharged(this, pos, xDir, player, 0.6f, player.getNextActorNetId(true)));
+			mmx.chargedBubbles.Add(new BubbleSplashProjCharged(this, pos, xDir, player, 0.8f, player.getNextActorNetId(true)));
+			mmx.chargedBubbles.Add(new BubbleSplashProjCharged(this, pos, xDir, player, 1f, player.getNextActorNetId(true)));
 		}
 	}
 }
@@ -118,7 +118,7 @@ public class BubbleSplashProj : Projectile {
 }
 
 public class BubbleSplashProjCharged : Projectile {
-	public Character character;
+	public MegamanX character;
 	public float yPos;
 	public float initTime;
 	public BubbleSplashProjCharged(Weapon weapon, Point pos, int xDir, Player player, float time, ushort netProjId, bool rpc = false) :
@@ -129,7 +129,7 @@ public class BubbleSplashProjCharged : Projectile {
 		int randColor = Helpers.randomRange(0, 2);
 		if (randColor == 0) changeSprite("bubblesplash_proj2", true);
 		if (randColor == 1) changeSprite("bubblesplash_proj3", true);
-		character = player.character;
+		character = (player.character as MegamanX);
 		initTime = time;
 		this.time = time;
 		sprite.wrapMode = "loop";

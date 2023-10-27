@@ -22,7 +22,7 @@ public class FireWave : Weapon {
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
 		if (player.character != null && player.character.isUnderwater()) return;
-		if (chargeLevel != 3) {
+		if (chargeLevel < 3) {
 			var proj = new FireWaveProj(this, pos, xDir, player, netProjId);
 			proj.vel.inc(player.character.vel.times(-0.5f));
 		} else {

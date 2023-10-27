@@ -418,14 +418,14 @@ public partial class Actor : GameObject {
 
 	public void addGravity(ref float yVar) {
 		float maxVelY = Physics.MaxFallSpeed;
-		float gravity = Physics.Gravity;
+		float gravity = getGravity();
 
 		if (isUnderwater()) {
 			maxVelY = Physics.MaxUnderwaterFallSpeed;
 			gravity *= 0.5f;
 		}
 
-		yVar += Global.spf * gravity;
+		yVar += Global.speedMul * gravity;
 		if (yVar > maxVelY) yVar = maxVelY;
 	}
 
@@ -490,12 +490,12 @@ public partial class Actor : GameObject {
 		var chr = this as Character;
 		var ra = this as RideArmor;
 
-		float grav = Global.level.gravity * gravityModifier * gravityWellModifier;
+		float grav = getGravity();
 		if (ownedByLocalPlayer) {
 			if (useGravity && !grounded) {
 				if (underwater) grav *= 0.5f;
-				if (this is Character) {
-					int bubbleCount = (this as Character).chargedBubbles.Count;
+				if (this is MegamanX mmx) {
+					int bubbleCount = mmx.chargedBubbles.Count;
 					float modifier = 1;
 					if (underwater) {
 						modifier = 1 - (0.01f * bubbleCount);
@@ -504,7 +504,7 @@ public partial class Actor : GameObject {
 					}
 					grav *= modifier;
 				}
-				vel.y += grav * Global.spf;
+				vel.y += grav * Global.speedMul;
 				if (vel.y > terminalVelDown) {
 					vel.y = terminalVelDown;
 				} else if (vel.y < -terminalVelUp) {
@@ -668,15 +668,12 @@ public partial class Actor : GameObject {
 					CollideData collideDataCloseCheck = Global.level.checkCollisionActor(this, 0, 0.05f * yMod);
 					if (collideDataCloseCheck == null) {
 						var yVel = new Point(0, yDist);
-						var mtv = Global.level.getMtvDir(this, 0, yDist, yVel, false, new List<CollideData>() { collideData });
+						var mtv = Global.level.getMtvDir(
+							this, 0, yDist, yVel, false, new List<CollideData>() { collideData }
+						);
 						if (mtv != null) {
 							incPos(yVel);
 							incPos(mtv.Value.unitInc(0.01f));
-						}
-
-						var iceSled = this as ShotgunIceProjSled;
-						if (iceSled != null) {
-							iceSled.increaseVel();
 						}
 					}
 				} else {
@@ -828,7 +825,7 @@ public partial class Actor : GameObject {
 				return false;
 			}
 			*/
-			if (character.isCStingInvisibleGraphics() && character.cStingPaletteTime % 3 == 0) {
+			if (character.isCStingInvisibleGraphics() && this is MegamanX mmx && mmx.cStingPaletteTime % 3 == 0) {
 				return false;
 			}
 			if (character.isInvulnBS.getValue()) {
@@ -1017,32 +1014,54 @@ public partial class Actor : GameObject {
 	public bool isRollingShield() {
 		return this is RollingShieldProj;
 	}
+	
+	public virtual bool shouldRender(float x, float y) {
+		// Don't draw things without sprites.
+		if (sprite == null || currentFrame == null) {
+			return false;
+		}
+		// Don't draw actors out of the screen for optimization
+		var alignOffset = sprite.getAlignOffset(frameIndex, xDir, yDir);
+		var rx = pos.x + x + alignOffset.x;
+		var ry = pos.y + y + alignOffset.y;
+		var rect = new Rect(
+			rx,
+			ry,
+			rx + currentFrame.rect.w(),
+			ry + currentFrame.rect.h()
+		);
+		var camRect = new Rect(
+			Global.level.camX - 50, Global.level.camY - 50,
+			Global.level.camX + Global.viewScreenW + 50,
+			Global.level.camY + Global.viewScreenH + 50
+		);
+		if (!rect.overlaps(camRect)) {
+			return false;
+		}
+
+		return true;
+	}
 
 	public virtual void render(float x, float y) {
-		if (sprite == null || currentFrame == null) return;
-
+		if (!shouldRender(x, y)) {
+			return;
+		}
 		//console.log(this.pos.x + "," + this.pos.y);
 
 		var offsetX = xDir * currentFrame.offset.x;
 		var offsetY = yDir * currentFrame.offset.y;
 
-		// Don't draw actors out of the screen for optimization
-		var alignOffset = sprite.getAlignOffset(frameIndex, xDir, yDir);
-		var rx = pos.x + alignOffset.x;
-		var ry = pos.y + alignOffset.y;
-		var rect = new Rect(rx, ry, rx + currentFrame.rect.w(), ry + currentFrame.rect.h());
-		var camRect = new Rect(Global.level.camX, Global.level.camY, Global.level.camX + Global.viewScreenW, Global.level.camY + Global.viewScreenH);
-		if (!rect.overlaps(camRect)) {
-			return;
-		}
-
-		var drawX = pos.x + x + offsetX;
-		var drawY = pos.y + y + offsetY;
+		var drawX = MathInt.Round(pos.x) + x + offsetX;
+		var drawY = MathInt.Round(pos.y) + y + offsetY;
 
 		if (customAngleRendering) {
 			renderFromAngle(x, y);
 		} else {
-			sprite.draw(frameIndex, drawX, drawY, xDir, yDir, getRenderEffectSet(), alpha, xScale, yScale, zIndex, getShaders(), angle: angle ?? 0, actor: this);
+			sprite.draw(
+				frameIndex, drawX, drawY, xDir, yDir,
+				getRenderEffectSet(), alpha, xScale, yScale, zIndex,
+				getShaders(), angle: angle ?? 0, actor: this
+			);
 		}
 
 		renderHitboxes();
@@ -1580,5 +1599,19 @@ public partial class Actor : GameObject {
 			genericShader = Helpers.cloneGenericPaletteShader("paletteFrog");
 			genericShader?.SetUniform("palette", 1);
 		}
+	}
+
+	public virtual void statePreUpdate() {
+	}
+
+	public virtual void stateUpdate() {
+		// For object specific state-machine code.
+	}
+
+		public virtual void statePostUpdate() {
+	}
+
+	public virtual float getGravity() {
+		return Global.level.gravity * gravityModifier * gravityWellModifier;
 	}
 }

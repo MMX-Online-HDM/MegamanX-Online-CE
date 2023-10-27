@@ -20,12 +20,12 @@ public class Tornado : Weapon {
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
-		if (chargeLevel != 3) return 2;
+		if (chargeLevel < 3) return 2;
 		return 8;
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-		if (chargeLevel != 3) {
+		if (chargeLevel < 3) {
 			new TornadoProj(this, pos, xDir, false, player, netProjId);
 		} else {
 			new TornadoProjCharged(this, pos, xDir, player, netProjId);

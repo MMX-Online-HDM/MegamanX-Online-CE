@@ -22,7 +22,7 @@ public class MagnetMine : Weapon {
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-		if (chargeLevel != 3) {
+		if (chargeLevel < 3) {
 			int yDir = 0;
 			if (player.input.isHeld(Control.Down, player)) yDir = 1;
 			else if (player.input.isHeld(Control.Up, player)) yDir = -1;

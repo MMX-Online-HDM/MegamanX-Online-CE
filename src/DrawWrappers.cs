@@ -252,15 +252,16 @@ public partial class DrawWrappers {
 		float origX = x;
 		float origY = y;
 		if (textureMDA == null) return;
-		if (screenRenderTexture == null) Global.window.SetView(Global.view);
-		else {
+		if (screenRenderTexture == null) {
+			Global.window.SetView(Global.view);
+		} else {
 			x = x - Global.level.camX;
 			y = y - Global.level.camY;
 
 			// High speed scrolling may look better with this code. Might cause issues elsewhere so limiting to race
 			if (Global.level?.gameMode is Race) {
-				x = MathF.Floor(x);
-				y = MathF.Floor(y);
+				x = MathInt.Round(x);
+				y = MathInt.Round(y);
 			}
 		}
 

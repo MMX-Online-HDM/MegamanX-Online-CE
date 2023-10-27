@@ -21,8 +21,7 @@ public class AssassinBullet : AxlWeapon {
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
-		if (chargeLevel == 3) return 0;
-		else return 0;
+		return 0;
 	}
 
 	public override void axlGetProjectile(Weapon weapon, Point bulletPos, int xDir, Player player, float angle, IDamagable target, Character headshotTarget, Point cursorPos, int chargeLevel, ushort netId) {

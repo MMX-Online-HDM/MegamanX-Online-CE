@@ -182,6 +182,7 @@ public class ZeroDoubleBuster : CharState {
 		this.isSecond = isSecond;
 		superArmor = true;
 		this.isPinkCharge = isPinkCharge;
+		airMove = true;
 	}
 
 	public override void update() {
@@ -193,7 +194,6 @@ public class ZeroDoubleBuster : CharState {
 		}
 
 		if (!character.grounded) {
-			airCode();
 			if (player.input.isHeld(Control.Dash, player)) {
 				character.isDashing = true;
 			}
@@ -294,12 +294,12 @@ public class ZSaberProjSwingState : CharState {
 		if (shootProj) {
 			superArmor = true;
 		}
+		airMove = true;
 	}
 
 	public override void update() {
 		base.update();
 		if (!character.grounded) {
-			airCode();
 			if (player.input.isHeld(Control.Dash, player)) {
 				character.isDashing = true;
 			}

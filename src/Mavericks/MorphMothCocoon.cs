@@ -585,7 +585,7 @@ public class MorphMCHangState : MaverickState {
 
 		float swingMod = Helpers.clamp01(len / 75);
 
-		swingVel.y += Physics.Gravity * Global.spf * swingMod;
+		swingVel.y += Global.speedMul * maverick.getGravity() * swingMod;
 		Point vec = latchPos.directionToNorm(maverick.pos);
 		Point leftNorm = vec.leftNormal();
 		Point rightNorm = vec.rightNormal();

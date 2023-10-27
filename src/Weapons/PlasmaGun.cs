@@ -41,6 +41,8 @@ public class PlasmaGun : AxlWeapon {
 
 	public override void axlGetProjectile(Weapon weapon, Point bulletPos, int xDir, Player player, float angle, IDamagable target, Character headshotTarget, Point cursorPos, int chargeLevel, ushort netId) {
 		if (!player.ownedByLocalPlayer) return;
+		if (player?.character is not Axl axl) return;
+
 		Point bulletDir = Point.createFromAngle(angle);
 		Projectile bullet = null;
 		if (chargeLevel < 3) {
@@ -55,8 +57,8 @@ public class PlasmaGun : AxlWeapon {
 				new VoltTornadoProj(weapon, player.character.pos, xDir, player, netId, sendRpc: true);
 				RPC.playSound.sendRpc(shootSounds[3], player.character?.netId);
 			} else {
-				if (player.character.plasmaGunAltProj == null) {
-					player.character.plasmaGunAltProj = new PlasmaGunAltProj(weapon, bulletPos, cursorPos, 1, player, netId, sendRpc: true);
+				if (axl.plasmaGunAltProj == null) {
+					axl.plasmaGunAltProj = new PlasmaGunAltProj(weapon, bulletPos, cursorPos, 1, player, netId, sendRpc: true);
 				}
 				return;
 			}

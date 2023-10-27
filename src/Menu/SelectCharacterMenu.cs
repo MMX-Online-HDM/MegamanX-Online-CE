@@ -50,7 +50,7 @@ public class CharSelection {
 					new CharSelection("Vile", 2, 1, 0, "menu_vile", 0),
 					new CharSelection("Axl", 3, 1, 0, "menu_axl", 0),
 					new CharSelection("Sigma", 4, 1, 0, "menu_sigma", sigmaIndex),
-					new CharSelection("Rock", 5, 1, 0, "menu_megaman", 0),
+					new CharSelection("Rockman", 5, 1, 0, "rock_idle", 0),
 				};
 		}
 	}

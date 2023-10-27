@@ -87,7 +87,13 @@ public partial class Player {
 	public RaycastHitData assassinHitPos;
 
 	public bool canUpgradeXArmor() {
-		return charNum == 0 && !isDisguisedAxl && character?.isHyperX != true && character?.charState is not XRevive && character?.charState is not XReviveStart;
+		return (
+			character is MegamanX mmx &&
+			!isDisguisedAxl &&
+			mmx.isHyperX != true &&
+			mmx.charState is not XRevive &&
+			mmx.charState is not XReviveStart
+		);
 	}
 
 	public float adjustedZoomRange { get { return zoomRange - 40; } }
@@ -714,7 +720,7 @@ public partial class Player {
 			return true;
 		}
 
-		if (character != null && !character.canCrouch()) {
+		if (character != null) {
 			return false;
 		}
 
@@ -738,8 +744,6 @@ public partial class Player {
 	}
 
 	public void update() {
-		if (character != null) character.fgMotion = false;
-
 		for (int i = copyShotDamageEvents.Count - 1; i >= 0; i--) {
 			if (Global.time - copyShotDamageEvents[i].time > 2) {
 				copyShotDamageEvents.RemoveAt(i);
@@ -947,7 +951,12 @@ public partial class Player {
 				}
 			}
 
-			if (charNum == 1) {
+			if (charNum == 0) {
+				character = new MegamanX(
+					this, pos.x, pos.y, xDir,
+					false, charNetId, ownedByLocalPlayer
+				);
+			} else if (charNum == 1) {
 				character = new Zero(
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer
@@ -1171,7 +1180,12 @@ public partial class Player {
 		bool isVileMK2 = charNum == 2 && dnaCore.hyperMode == DNACoreHyperMode.VileMK2;
 		bool isVileMK5 = charNum == 2 && dnaCore.hyperMode == DNACoreHyperMode.VileMK5;
 		Character retChar = null;
-		if (charNum == 1) {
+		if (charNum == 0) {
+			retChar = new MegamanX(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, character.netId, true, isWarpIn: false
+			);
+		} else if (charNum == 1) {
 			retChar = new Zero(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, character.netId, true, isWarpIn: false
@@ -1462,10 +1476,10 @@ public partial class Player {
 				) {
 					return false;
 				}
-				if (character.shotgunIceChargeTime > 0 || character.charState is Frozen) {
-					return false;
-				}
-				if (character.charState is Stunned || character.charState is Crystalized) {
+				if (character.charState is Frozen ||
+					character.charState is Stunned ||
+					character.charState is Crystalized
+				) {
 					return false;
 				}
 				if (character?.charState is SniperAimAxl) {
@@ -2030,26 +2044,6 @@ public partial class Player {
 		return false;
 	}
 
-	public bool isSpecialBuster() {
-		return loadout.xLoadout.melee == 0 && (character == null || !character.isHyperX);
-	}
-
-	public bool isSpecialSaber() {
-		return character?.isHyperX == true || loadout.xLoadout.melee == 1;
-	}
-
-	public bool chargeButtonHeld() {
-		if (isX || isZero) {
-			if (isX && isSpecialBuster() && input.isHeld(Control.Special1, this)) {
-				return true;
-			}
-			return input.isHeld(Control.Shoot, this);
-		} else if (isAxl) {
-			return input.isHeld(Control.Special1, this);
-		}
-		return false;
-	}
-
 	public void promoteToHost() {
 		if (this == Global.level.mainPlayer) {
 			Global.serverClient.isHost = true;
@@ -2150,6 +2144,10 @@ public partial class Player {
 	public bool showHyperBusterCharge() {
 		if (character?.flag != null) return false;
 		return weapon is HyperBuster hb && hb.canShootIncludeCooldown(this);
+	}
+
+	public bool isZSaber() {
+		return loadout?.zeroLoadout?.melee == 0;
 	}
 
 	public bool hasKnuckle() {

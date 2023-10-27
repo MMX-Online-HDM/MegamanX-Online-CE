@@ -22,13 +22,13 @@ public class SigmaClawState : CharState {
 	public SigmaClawState(CharState prevCharState, bool isAir) : base(prevCharState.attackSprite, "", "", "") {
 		this.prevCharState = prevCharState;
 		this.isAir = isAir;
+		airMove = true;
 	}
 
 	public override void update() {
 		base.update();
 
 		if (!character.grounded) {
-			airCode();
 			landSprite = "attack";
 		} else if (isAir && character.grounded) {
 			once = true;
@@ -54,7 +54,11 @@ public class SigmaClawState : CharState {
 		}
 		*/
 
-		if (player.input.isPressed(Control.Shoot, player) && character.grounded && character.frameIndex >= 4 && sprite != "attack2" && !once) {
+		if (player.input.isPressed(Control.Shoot, player) &&
+			character.grounded && character.frameIndex >= 4 &&
+			sprite != "attack2" &&
+			!once
+		) {
 			once = true;
 			sprite = "attack2";
 			defaultSprite = sprite;
@@ -195,6 +199,7 @@ public class SigmaUpDownSlashState : CharState {
 	public SigmaUpDownSlashState(bool isUp) : base(isUp ? "upslash" : "downslash", "", "", "") {
 		this.isUp = isUp;
 		enterSound = "sigma2slash";
+		exitOnLanding = true;
 	}
 
 	public override void update() {

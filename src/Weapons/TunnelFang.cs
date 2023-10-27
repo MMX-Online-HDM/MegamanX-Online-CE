@@ -19,7 +19,7 @@ public class TunnelFang : Weapon {
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
-		if (chargeLevel != 3) {
+		if (chargeLevel < 3) {
 			if (timeSinceLastShoot != null && timeSinceLastShoot < rateOfFire) return 1;
 			else return 2;
 		}
@@ -27,7 +27,7 @@ public class TunnelFang : Weapon {
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-		if (chargeLevel != 3) {
+		if (chargeLevel < 3) {
 			if (player.character.ownedByLocalPlayer) {
 				if (timeSinceLastShoot != null && timeSinceLastShoot < rateOfFire) {
 					new TunnelFangProj(this, pos, xDir, 1, player, netProjId, rpc: true);
@@ -41,7 +41,9 @@ public class TunnelFang : Weapon {
 			}
 		} else {
 			var ct = new TunnelFangProjCharged(this, pos, xDir, player, netProjId);
-			if (player.character.ownedByLocalPlayer) player.character.chargedTunnelFang = ct;
+			if (player.character.ownedByLocalPlayer && player.character is MegamanX mmx) {
+				mmx.chargedTunnelFang = ct;
+			}
 		}
 	}
 }
@@ -130,7 +132,7 @@ public class TunnelFangProj : Projectile {
 }
 
 public class TunnelFangProjCharged : Projectile {
-	public Character character;
+	public MegamanX character;
 	float sparksCooldown;
 	public TunnelFangProjCharged(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, xDir, 300, 1, player, "tunnelfang_charged", Global.defFlinch, 0.125f, netProjId, player.ownedByLocalPlayer) {
@@ -138,7 +140,7 @@ public class TunnelFangProjCharged : Projectile {
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 		shouldVortexSuck = false;
-		character = player.character;
+		character = (player.character as MegamanX);
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}

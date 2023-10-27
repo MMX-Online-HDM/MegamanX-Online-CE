@@ -85,13 +85,13 @@ public class SigmaSlashState : CharState {
 		if (prevCharState is Dash || prevCharState is AirDash) {
 			attackFrame = 1;
 		}
+		airMove = true;
 	}
 
 	public override void update() {
 		base.update();
 
 		if (!character.grounded) {
-			airCode();
 			landSprite = "attack";
 		}
 

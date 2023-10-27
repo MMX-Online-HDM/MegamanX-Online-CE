@@ -40,6 +40,8 @@ public class HadoukenProj : Projectile {
 
 public class Hadouken : CharState {
 	bool fired = false;
+	MegamanX mmx;
+
 	public Hadouken() : base("hadouken", "", "", "") {
 		superArmor = true;
 	}
@@ -66,11 +68,12 @@ public class Hadouken : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		mmx = character as MegamanX;
 		character.stopCharge();
 	}
 
 	public override void onExit(CharState newState) {
-		character.hadoukenCooldownTime = character.maxHadoukenCooldownTime;
+		mmx.hadoukenCooldownTime = mmx.maxHadoukenCooldownTime;
 		base.onExit(newState);
 	}
 }

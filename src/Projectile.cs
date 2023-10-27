@@ -26,6 +26,7 @@ public class Projectile : Actor {
 	public bool reflectable2 = false;
 	public int reflectCount;
 	public bool shouldShieldBlock = true;
+	public bool neverReflect = false;
 	public int projId;
 	public float speed;
 	public int healAmount;
@@ -145,6 +146,9 @@ public class Projectile : Actor {
 	}
 
 	public void reflect(Player player, bool playDingSound = true) {
+		if (neverReflect) {
+			return;
+		}
 		if (reflectCount > 0) return;
 		reflectCount++;
 		if (playDingSound) playSound("ding");
@@ -178,6 +182,9 @@ public class Projectile : Actor {
 	}
 
 	public void deflect(Player player, bool playDingSound = true) {
+		if (neverReflect) {
+			return;
+		}
 		if (reflectCount > 0) return;
 		reflectCount++;
 		if (playDingSound) playSound("ding");
@@ -210,6 +217,9 @@ public class Projectile : Actor {
 
 	// Airblast reflect
 	public void reflect2(Player player, float reflectAngle, bool sendRpc = false) {
+		if (neverReflect) {
+			return;
+		}
 		if (reflectCount > 0) return;
 		reflectCount++;
 

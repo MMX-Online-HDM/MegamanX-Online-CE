@@ -272,12 +272,11 @@ public class Sigma3ShootAir : CharState {
 	public RideArmor limboRA;
 
 	public Sigma3ShootAir(Point inputDir) : base("fall", getShootSprite(inputDir), "", "") {
-
+		airMove = true;
 	}
 
 	public override void update() {
 		base.update();
-		airCode();
 	}
 
 	public static string getShootSprite(Point inputDir) {

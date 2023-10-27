@@ -143,7 +143,8 @@ public partial class Global {
 
 	// IF YOU ADD ANY DEBUG SETTINGS YOU MUST SET THEM TO INACTIVE VALUE IN THIS FUNCTION
 	public static void Init() {
-		spf = 1 / 60.0f;
+		// Notes: This is not needed anymore.
+		// spf = 1f / 60f;
 		if (!debug) {
 			showDiagnostics = false;
 			_quickStart = false;
@@ -470,16 +471,16 @@ public partial class Global {
 	public const int fpsCap = 60;
 	public static float currentFPS = 60;
 	public static float logicFPS = 60;
-	public static float crystalSlowAmount = 1;
-	private static float _spf = 1f / 60;
+	public static float speedMul = 1;
+	private static float secondsFrameDuration = 1f / 60f;
 	public static float spf {
 		get {
-			if (crystalSlowAmount != 1) return _spf * crystalSlowAmount;
-			return _spf;
+			if (speedMul != 1) {
+				return secondsFrameDuration * speedMul;
+			}
+			return secondsFrameDuration;
 		}
-		set { _spf = value; }
 	}
-	public static float spf2 = 1f / 60;
 	public static float time;
 	public static int frameCount = 0;
 	public static int normalizeFrames(int frames) {
@@ -674,46 +675,47 @@ public partial class Global {
 		});
 	}
 
-	// Since the official game is no longer under development, we won't fetch the server version for an update check anymore.
+	// Since the official game is no longer under development,
+	// we won't fetch the server version for an update check anymore.
 	/*
 	public static decimal serverVersion = decimal.MaxValue;
 
 	public static decimal officialServerVersion = decimal.MaxValue;
-	public static void fetchServerVersion()
-	{
+	public static void fetchServerVersion() {
 		var mainRegion = Options.main.getRegionOrDefault();
 		if (mainRegion == null) return;
 
 		int timeoutMs = debug ? 500 : 5000;
 		var response = matchmakingQuerier.send(mainRegion.ip, "GetVersion", "GetVersion", timeoutMs);
-		if (response != null)
-		{
+		if (response != null) {
 			officialServerVersion = decimal.Parse(response, CultureInfo.InvariantCulture);
 		}
 	}
 
 	public static decimal githubServerVersion = decimal.MaxValue;
-	public static void fetchLaunchDataFromGithub()
-	{
+	public static void fetchLaunchDataFromGithub() {
 		if (Global.debug) return;
 
 		var stopWatch = new Stopwatch();
-		try
-		{
+		try {
 			stopWatch.Start();
 			ServicePointManager.Expect100Continue = true;
-			ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
-			using (FastWebClient wc = new FastWebClient())
-			{
-				string launchDataStr = wc.DownloadString("http://gamemaker19.github.io/MMXOnlineDesktop/launchData.txt");
+			ServicePointManager.SecurityProtocol = (
+				SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls
+			);
+			using (FastWebClient wc = new FastWebClient()) {
+				string launchDataStr = wc.DownloadString(
+					"http://gamemaker19.github.io/MMXOnlineDesktop/launchData.txt"
+				);
 				var pieces = launchDataStr.Split(',');
 
 				githubServerVersion = decimal.Parse(pieces[0], CultureInfo.InvariantCulture);
 			}
-		}
-		catch (Exception e)
-		{
-			//string additionalDetails = "Failed to fetch github server version. Elapsed ms: " + stopWatch.ElapsedMilliseconds.ToString();
+		} catch (Exception e) {
+			//string additionalDetails = (
+			"Failed to fetch github server version. Elapsed ms: " +
+			stopWatch.ElapsedMilliseconds.ToString()
+  			);
 			string additionalDetails = "Failed to fetch github server version.";
 			Logger.logException(e, false, additionalDetails);
 		}

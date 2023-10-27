@@ -20,15 +20,16 @@ public class GravityWell : Weapon {
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
-		if (chargeLevel != 3) return 2;
+		if (chargeLevel < 3) return 2;
 		return 8;
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-		if (chargeLevel != 3) {
+
+		if (chargeLevel < 3) {
 			var proj = new GravityWellProj(this, pos, xDir, player, netProjId);
-			if (player.character.ownedByLocalPlayer) {
-				player.character.gravityWell = proj;
+			if (player.character.ownedByLocalPlayer && player.character is MegamanX mmx) {
+				mmx.gravityWell = proj;
 			}
 		} else {
 			if (!player.character.ownedByLocalPlayer) return;
@@ -37,10 +38,15 @@ public class GravityWell : Weapon {
 	}
 
 	public override bool canShoot(int chargeLevel, Player player) {
-		if (chargeLevel == 3 || player?.character?.stockedCharge == true) {
-			return base.canShoot(chargeLevel, player) && (player?.character?.chargedGravityWell == null || player.character.chargedGravityWell.destroyed);
+		if (player.character is not MegamanX mmx) {
+			return false;
 		}
-		return base.canShoot(chargeLevel, player) && (player?.character?.gravityWell == null || player.character.gravityWell.destroyed);
+		if (chargeLevel >= 3 || player?.character?.stockedCharge == true) {
+			return base.canShoot(chargeLevel, player) && (
+				mmx.chargedGravityWell == null || mmx.chargedGravityWell.destroyed
+			);
+		}
+		return base.canShoot(chargeLevel, player) && (mmx.gravityWell == null || mmx.gravityWell.destroyed);
 	}
 }
 
@@ -319,8 +325,8 @@ public class GravityWellProjCharged : Projectile, IDamagable {
 		base.onDestroy();
 		if (!ownedByLocalPlayer) return;
 
-		if (damager.owner.character != null) {
-			damager.owner.character.chargedGravityWell = null;
+		if (damager.owner.character is MegamanX mmx) {
+			mmx.chargedGravityWell = null;
 		}
 	}
 
@@ -342,6 +348,8 @@ public class GravityWellProjCharged : Projectile, IDamagable {
 
 public class GravityWellChargedState : CharState {
 	bool fired = false;
+	MegamanX mmx;
+
 	public GravityWellChargedState() : base("point_up", "", "", "") {
 		superArmor = true;
 	}
@@ -352,7 +360,11 @@ public class GravityWellChargedState : CharState {
 		if (character.frameIndex >= 3 && !fired) {
 			fired = true;
 			stateTime = 0;
-			character.chargedGravityWell = new GravityWellProjCharged(player.weapon, character.getShootPos(), 1, player.input.isHeld(Control.Down, player) ? -1 : 1, player, player.getNextActorNetId(), rpc: true);
+			mmx.chargedGravityWell = new GravityWellProjCharged(
+				player.weapon, character.getShootPos(), 1,
+				player.input.isHeld(Control.Down, player) ? -1 : 1,
+				player, player.getNextActorNetId(), rpc: true
+			);
 		}
 
 		if (stateTime > 0.65f) {
@@ -362,6 +374,7 @@ public class GravityWellChargedState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		mmx = character as MegamanX;
 		character.useGravity = false;
 		character.vel = new Point();
 	}
