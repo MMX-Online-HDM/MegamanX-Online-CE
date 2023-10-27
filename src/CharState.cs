@@ -19,7 +19,10 @@ public class CharState {
 	public Collider lastRightWallCollider;
 	public Wall lastLeftWall;
 	public Wall lastRightWall;
+	public Collider wallKickLeftWall;
+	public Collider wallKickRigthWall;
 	public float stateTime;
+	public float frameTime;
 	public string enterSound;
 	public float framesJumpNotHeld = 0;
 	public bool once;
@@ -53,8 +56,10 @@ public class CharState {
 	public bool attackCtrl;
 	public bool normalCtrl;
 	public bool airMove;
+	public bool canStopJump;
 	public bool exitOnLanding;
 	public bool exitOnAirborne;
+	public bool useDashJumpSpeed;
 
 	public CharState(string sprite, string shootSprite = null, string attackSprite = null, string transitionSprite = null) {
 		this.sprite = string.IsNullOrEmpty(transitionSprite) ? sprite : transitionSprite;
@@ -85,23 +90,17 @@ public class CharState {
 		}
 		// Stop the dash speed on transition to any frame except jump/fall (dash lingers in air) or dash itself
 		// TODO: Add a bool here to charstate.
-		if (newState is not Jump &&
+		if (newState is not Dash &&
+			newState is not Jump &&
 			newState is not Fall &&
-			newState is not WallKick &&
-			newState is not Dash &&
-			newState is not X2ChargeShot &&
-			newState is not VulcanCharState &&
-			newState is not StrikeChainPullToWall &&
-			newState is not SigmaSlashState &&
-			newState is not SigmaClawState &&
-			newState is not SigmaWallDashState &&
-			newState is not X6SaberState &&
-			newState is not Sigma3ShootAir &&
-			newState is not XUPPunchState &&
-			newState is not VileHover
+			!(newState.useDashJumpSpeed && (character.grounded || character.vel.y < 0))
 		) {
-			if (character.isDashing && newState is AirDash) character.dashedInAir++;
-			if (character.isDashing && newState is UpDash) character.dashedInAir++;
+			if (character.isDashing && newState is AirDash) {
+				character.dashedInAir++;
+			}
+			if (character.isDashing && newState is UpDash) {
+				character.dashedInAir++;
+			}
 			character.isDashing = false;
 		}
 		if (newState is Hurt || newState is Die || newState is Frozen || newState is Crystalized || newState is Stunned) {
@@ -180,19 +179,33 @@ public class CharState {
 
 		stateTime += Global.spf;
 
-		var lastLeftWallData = character.getHitWall(-Global.spf * 60, 0);
+		var lastLeftWallData = character.getHitWall(-1, 0);
 		lastLeftWallCollider = lastLeftWallData != null ? lastLeftWallData.otherCollider : null;
 		if (lastLeftWallCollider != null && !lastLeftWallCollider.isClimbable) {
 			lastLeftWallCollider = null;
 		}
 		lastLeftWall = lastLeftWallData?.gameObject as Wall;
 
-		var lastRightWallData = character.getHitWall(Global.spf * 60, 0);
+		var lastRightWallData = character.getHitWall(1, 0);
 		lastRightWallCollider = lastRightWallData != null ? lastRightWallData.otherCollider : null;
 		if (lastRightWallCollider != null && !lastRightWallCollider.isClimbable) {
 			lastRightWallCollider = null;
 		}
 		lastRightWall = lastRightWallData?.gameObject as Wall;
+
+		var wallKickLeftData = character.getHitWall(-6, 0);
+		if (wallKickLeftData?.otherCollider?.isClimbable == true && wallKickLeftData?.gameObject is Wall) {
+			wallKickLeftWall = wallKickLeftData.otherCollider;
+		} else {
+			wallKickLeftWall = null;
+		}
+		var wallKickRigthData = character.getHitWall(6, 0);
+		if (wallKickRigthData?.otherCollider?.isClimbable == true && wallKickRigthData?.gameObject is Wall) {
+			wallKickRigthWall = wallKickRigthData.otherCollider;
+		} else {
+			wallKickRigthData = null;
+		}
+
 
 		// Moving platforms detection
 		CollideData leftWallPlat = character.getHitWall(-Global.spf * 300, 0);
@@ -569,15 +582,15 @@ public class Run : CharState {
 		base.update();
 		var move = new Point(0, 0);
 		float runSpeed = character.getRunSpeed();
-		if (stateTime <= 5) {
+		if (frameTime <= 4) {
 			runSpeed = 60 * character.getRunDebuffs();
 		}
 		if (player.input.isHeld(Control.Left, player)) {
 			character.xDir = -1;
-			if (player.character.canMove()) move.x = -character.getRunSpeed();
+			if (player.character.canMove()) move.x = -runSpeed;
 		} else if (player.input.isHeld(Control.Right, player)) {
 			character.xDir = 1;
-			if (player.character.canMove()) move.x = character.getRunSpeed();
+			if (player.character.canMove()) move.x = runSpeed;
 		}
 		if (move.magnitude > 0) {
 			character.move(move);
@@ -724,7 +737,9 @@ public class Jump : CharState {
 		accuracy = 5;
 		enterSound = "jump";
 		exitOnLanding = true;
+		useDashJumpSpeed = true;
 		airMove = true;
+		canStopJump = true;
 		attackCtrl = true;
 		normalCtrl = true;
 	}
@@ -751,12 +766,13 @@ public class Jump : CharState {
 public class Fall : CharState {
 	public float limboVehicleCheckTime;
 	public Actor limboVehicle;
-	public bool? oldLandingFlag = null;
 
 	public Fall() : base("fall", "fall_shoot", Options.main.getAirAttack(), "fall_start") {
 		accuracy = 5;
 		exitOnLanding = true;
+		useDashJumpSpeed = true;
 		airMove = true;
+		canStopJump = true;
 		attackCtrl = true;
 		normalCtrl = true;
 	}
@@ -764,16 +780,11 @@ public class Fall : CharState {
 	public override void update() {
 		base.update();
 		if (limboVehicleCheckTime > 0) {
-			if (oldLandingFlag == null) {
-				oldLandingFlag = exitOnLanding;
-			}
 			limboVehicleCheckTime -= Global.spf;
 			if (limboVehicle.destroyed || limboVehicleCheckTime <= 0) {
 				limboVehicleCheckTime = 0;
 				character.useGravity = true;
 				character.limboRACheckCooldown = 1;
-				exitOnLanding = oldLandingFlag.Value;
-				oldLandingFlag = null;
 				limboVehicleCheckTime = 0;
 			}
 		}
@@ -1085,6 +1096,7 @@ public class WallSlide : CharState {
 			character.changeState(new Idle());
 			return;
 		}
+		/*
 		if (player.input.isPressed(Control.Jump, player)) {
 			if (player.input.isHeld(Control.Dash, player)) {
 				character.isDashing = true;
@@ -1093,6 +1105,7 @@ public class WallSlide : CharState {
 			character.changeState(new WallKick(wallDir * -1));
 			return;
 		}
+		*/
 		if (player.isSigma && player.input.isPressed(Control.Special1, player) && character.flag == null) {
 			int yDir = player.input.isHeld(Control.Down, player) ? 1 : -1;
 			character.changeState(new SigmaWallDashState(yDir, false), true);
@@ -1116,12 +1129,12 @@ public class WallSlide : CharState {
 		}
 		*/
 
-		if (stateTime > 0.15) {
+		if (stateTime >= 0.15) {
 			if (mmx == null || mmx.strikeChainProj == null) {
 				var hit = character.getHitWall(wallDir, 0);
 				var hitWall = hit?.gameObject as Wall;
 
-				if (wallDir == -player.input.getXDir(player)) {
+				if (wallDir != player.input.getXDir(player)) {
 					player.character.changeState(new Fall());
 				} else if (hitWall == null || !hitWall.collider.isClimbable) {
 					var hitActor = hit?.gameObject as Actor;
@@ -1153,28 +1166,19 @@ public class WallSlide : CharState {
 }
 
 public class WallKick : CharState {
-	public int kickDir;
-	public float kickSpeed;
-	public WallKick(int kickDir) : base("wall_kick", "wall_kick_shoot") {
+	public WallKick() : base("wall_kick", "wall_kick_shoot") {
 		enterSound = "wallkick";
-		this.kickDir = kickDir;
-		kickSpeed = kickDir * 150;
 		accuracy = 5;
 		exitOnLanding = true;
+		useDashJumpSpeed = true;
 		airMove = true;
+		canStopJump = true;
 		attackCtrl = true;
 		normalCtrl = true;
 	}
 
 	public override void update() {
 		base.update();
-		if (kickSpeed != 0) {
-			kickSpeed = Helpers.toZero(kickSpeed, 800 * Global.spf, kickDir);
-			bool stopMove = false;
-			if (player.input.isHeld(Control.Left, player) && !player.input.isHeld(Control.Right, player) && kickSpeed < 0) stopMove = true;
-			if (player.input.isHeld(Control.Right, player) && !player.input.isHeld(Control.Left, player) && kickSpeed > 0) stopMove = true;
-			if (!stopMove) character.move(new Point(kickSpeed, 0));
-		}
 		if (character.vel.y > 0) {
 			character.changeState(new Fall());
 		}
@@ -1182,19 +1186,6 @@ public class WallKick : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-
-		var wallSparkPoint = character.pos.addxy(12 * character.xDir, 0);
-		var rect = new Rect(wallSparkPoint.addxy(-2, -2), wallSparkPoint.addxy(2, 2));
-		if (Global.level.checkCollisionShape(rect.getShape(), null) != null) {
-			new Anim(wallSparkPoint, "wall_sparks", character.xDir, player.getNextActorNetId(), true, sendRpc: true);
-		}
-		//character.isDashing = false;
-
-		character.wallKickCooldown = 0.35f;
-
-		if (character.isDashing) {
-			kickSpeed *= 1.25f;
-		}
 	}
 
 	public override void onExit(CharState newState) {

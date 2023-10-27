@@ -1226,16 +1226,17 @@ public partial class Level {
 		if (camPlayer.character != null) {
 			if (!camPlayer.character.stopCamUpdate) {
 				Point camPos = camPlayer.character.getCamCenterPos();
+				Actor followActor = camPlayer.character?.getFollowActor();
 				Point expectedCamPos = computeCamPos(camPos, new Point(playerX, playerY));
 
-				var moveDeltaX = camX - MathF.Round(playerX);
-				var moveDeltaY = camY - MathF.Round(playerY);
+				var moveDeltaX = camX - playerX;
+				var moveDeltaY = camY - playerY;
 
-				var fullDeltaX = MathF.Round(expectedCamPos.x) - camX;
-				var fullDeltaY = MathF.Round(expectedCamPos.y) - camY;
+				var fullDeltaX = expectedCamPos.x - camX;
+				var fullDeltaY = expectedCamPos.y - camY;
 
-				if (camPlayer.character != null && camPlayer.character.grounded == false) {
-					if (fullDeltaY > -55 && fullDeltaY < 20 && 
+				if (followActor != null && followActor.grounded == false) {
+					if (fullDeltaY > -54 && fullDeltaY < 20 && 
 						camPlayer.character.charState is not WallKick && 
 						camPlayer.character.charState is not WallSlide && 
 						camPlayer.character.charState is not LadderClimb 
@@ -1254,11 +1255,11 @@ public partial class Level {
 				var deltaX = fullDeltaX;
 				var deltaY = fullDeltaY;
 
-				if (MathF.Abs(fullDeltaX) > 6) {
-					deltaX = 6 * MathF.Sign(fullDeltaX);
+				if (MathF.Abs(deltaX) > 4) {
+					deltaX = 4 * MathF.Sign(fullDeltaX);
 				}
-				if (MathF.Abs(fullDeltaY) > 6) {
-					deltaY = 6 * MathF.Sign(fullDeltaY);
+				if (MathF.Abs(deltaY) > 4) {
+					deltaY = 4 * MathF.Sign(fullDeltaY);
 				}
 
 				updateCamPos(deltaX, deltaY);
@@ -1810,8 +1811,6 @@ public partial class Level {
 		if (!dontMoveY) {
 			camY += deltaY;
 		}
-
-
 
 		var camRect = new Rect(camX, camY, camX + scaledCanvasW, camY + scaledCanvasH);
 		var camRectShape = camRect.getShape();

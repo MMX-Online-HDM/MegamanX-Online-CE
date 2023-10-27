@@ -1051,8 +1051,8 @@ public partial class Actor : GameObject {
 		var offsetX = xDir * currentFrame.offset.x;
 		var offsetY = yDir * currentFrame.offset.y;
 
-		var drawX = MathInt.Round(pos.x) + x + offsetX;
-		var drawY = MathInt.Round(pos.y) + y + offsetY;
+		var drawX = pos.x + x + offsetX;
+		var drawY = pos.y + y + offsetY;
 
 		if (customAngleRendering) {
 			renderFromAngle(x, y);

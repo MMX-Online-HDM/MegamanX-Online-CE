@@ -537,9 +537,12 @@ public class Input {
 	}
 
 	public bool isPressed(string inputName, Player player) {
-		if (possessedControlPressed.ContainsKey(inputName)) return possessedControlPressed[inputName];
-
-		if (player != null && !player.canControl) return false;
+		if (possessedControlPressed.ContainsKey(inputName)) {
+			return possessedControlPressed[inputName];
+		}
+		if (player != null && !player.canControl) {
+			return false;
+		}
 		if (player == null || player.isAI) {
 			var keyboardMapping2 = Control.getKeyboardMapping(-1, 0);
 			int? keyboardKey2 = keyboardMapping2.GetValueOrDefault(inputName);

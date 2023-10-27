@@ -85,6 +85,7 @@ public class SigmaSlashState : CharState {
 		if (prevCharState is Dash || prevCharState is AirDash) {
 			attackFrame = 1;
 		}
+		useDashJumpSpeed = true;
 		airMove = true;
 	}
 
@@ -251,6 +252,7 @@ public class SigmaWallDashState : CharState {
 		this.yDir = yDir;
 		this.fromGround = fromGround;
 		superArmor = true;
+		useDashJumpSpeed = true;
 	}
 
 	public override bool canEnter(Character character) {
@@ -305,7 +307,9 @@ public class SigmaWallDashState : CharState {
 			character.changeState(new Fall(), true);
 		}
 
-		if (player.input.isPressed(Control.Shoot, player) && !fired && character.saberCooldown == 0 && character.invulnTime == 0) {
+		if (player.input.isPressed(Control.Shoot, player) &&
+			!fired && character.saberCooldown == 0 && character.invulnTime == 0
+		) {
 			if (yDir == 0) {
 				character.changeState(new SigmaSlashState(new Dash(Control.Dash)), true);
 				return;

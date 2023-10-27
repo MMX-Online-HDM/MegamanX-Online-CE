@@ -252,31 +252,22 @@ public class Sigma3FireProj : Projectile {
 }
 
 public class Sigma3Shoot : CharState {
-	public float limboRACheckTime;
-	public RideArmor limboRA;
-
-	public Sigma3Shoot() : base("idle", "shoot", "", "") {
-
-	}
-
-	public override void update() {
-		base.update();
-		if (character.isAnimOver()) {
-			character.changeToIdleOrFall();
-		}
-	}
-}
-
-public class Sigma3ShootAir : CharState {
-	public float limboRACheckTime;
-	public RideArmor limboRA;
-
-	public Sigma3ShootAir(Point inputDir) : base("fall", getShootSprite(inputDir), "", "") {
+	public Sigma3Shoot(Point inputDir) : base(getShootSprite(inputDir)) {
 		airMove = true;
+		useDashJumpSpeed = true;
+		landSprite = "shot";
 	}
 
 	public override void update() {
 		base.update();
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (character.grounded && character.vel.y >= 0) {
+			sprite = "shot";
+			defaultSprite = sprite;
+		}
 	}
 
 	public static string getShootSprite(Point inputDir) {

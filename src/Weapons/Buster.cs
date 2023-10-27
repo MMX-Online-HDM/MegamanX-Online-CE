@@ -365,6 +365,7 @@ public class X2ChargeShot : CharState {
 
 	public X2ChargeShot(int type) : base("x2_shot", "", "", "") {
 		this.type = type;
+		useDashJumpSpeed = true;
 		airMove = true;
 	}
 

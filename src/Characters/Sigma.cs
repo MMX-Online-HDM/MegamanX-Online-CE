@@ -309,6 +309,8 @@ public class Sigma : Character {
 	public override void update() {
 		base.update();
 
+		Global.level.gameMode.setHUDErrorMessage(player, charState.GetType().ToString(), false, true);
+
 		if (!ownedByLocalPlayer) {
 			return;
 		}
@@ -499,11 +501,11 @@ public class Sigma : Character {
 						&& !isSigmaShooting() && sigma3FireballCooldown == 0
 					) {
 						if (charState is Fall || charState is Jump || charState is WallKick) {
-							changeState(new Sigma3ShootAir(player.input.getInputDir(player)), true);
+							changeState(new Sigma3Shoot(player.input.getInputDir(player)), true);
 						} else if (charState is Idle || charState is Run || charState is Dash
 							|| charState is SwordBlock
 						) {
-							changeState(new Sigma3Shoot(), true);
+							changeState(new Sigma3Shoot(player.input.getInputDir(player)), true);
 						}
 						sigma3FireballCooldown = maxSigma3FireballCooldown;
 						changeSpriteFromName(charState.shootSprite, true);

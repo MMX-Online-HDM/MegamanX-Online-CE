@@ -149,7 +149,12 @@ public partial class Character : Actor, IDamagable {
 	// For states with special propieties.
 	public int specialState = 0;
 	// For doublejump.
-	float lastJumpPressedTime;
+	public float lastJumpPressedTime;
+
+	// For wallkick.
+	public float wallKickTimer;
+	public int wallKickDir;
+	public float maxWallKickTime = 12;
 
 	// Main character class starts here.
 	public Character(
@@ -545,11 +550,13 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public bool canAirJump() {
-		return dashedInAir == 0 || (dashedInAir == 1 && this is Zero zero && zero.isBlackZero2());
+		if (this is not Zero zero) {
+			return false;
+		}
+		return dashedInAir == 0 || (dashedInAir == 1 && zero.isBlackZero2());
 	}
 
 	public virtual bool canWallClimb() {
-		if (charState is WallSlide) return false;
 		if (charState is ZSaberProjSwingState || charState is ZeroDoubleBuster) return false;
 		if (mk5RideArmorPlatform != null) return false;
 		if (isSoftLocked()) return false;
@@ -1228,6 +1235,11 @@ public partial class Character : Actor, IDamagable {
 		charState.update();
 	}
 
+	public override void statePostUpdate() {
+		base.statePostUpdate();
+		charState.frameTime += 1f * Global.speedMul;
+	}
+
 	public virtual bool updateCtrl() {
 		if (!ownedByLocalPlayer) {
 			return false;
@@ -1236,11 +1248,54 @@ public partial class Character : Actor, IDamagable {
 			charState.landingCode();
 		}
 		if (charState.exitOnAirborne && !grounded) {
-			if (vel.y >= 0) {
-				changeState(new Fall());
-			} else {
-				changeState(new Jump() { enterSound = null });
+			changeState(new Fall());
+		}
+		if (canWallClimb() && !grounded &&
+			(charState.airMove && vel.y > 0 || charState is WallSlide) &&
+			wallKickTimer <= 0 &&
+			player.input.isPressed(Control.Jump, player) &&
+			(charState.wallKickLeftWall != null || charState.wallKickRigthWall != null)
+		) {
+			if (player.input.isHeld(Control.Dash, player) &&
+				(charState.useDashJumpSpeed || charState is WallSlide)
+			) {
+				isDashing = true;
 			}
+			vel.y = -getJumpPower();
+			wallKickDir = 0;
+			if (charState.wallKickLeftWall != null) {
+				wallKickDir += 1;
+			}
+			if (charState.wallKickRigthWall != null) {
+				wallKickDir -= 1;
+			}
+			if (wallKickDir == 0) {
+				if (charState.lastLeftWall != null) {
+					wallKickDir += 1;
+				}
+				if (charState.lastRightWall != null) {
+					wallKickDir -= 1;
+				}
+			}
+			if (wallKickDir != 0) {
+				xDir = -wallKickDir;
+			}
+			wallKickTimer = maxWallKickTime;
+			changeState(new WallKick(), true);
+			var wallSparkPoint = pos.addxy(12 * xDir, 0);
+			var rect = new Rect(wallSparkPoint.addxy(-2, -2), wallSparkPoint.addxy(2, 2));
+			if (Global.level.checkCollisionShape(rect.getShape(), null) != null) {
+				new Anim(wallSparkPoint, "wall_sparks", xDir,
+					player.getNextActorNetId(), true, sendRpc: true
+				);
+			}
+			return true;
+		}
+		if (charState.canStopJump &&
+			!grounded && vel.y < 0 &&
+			!player.input.isHeld(Control.Jump, player)
+		) {
+			vel.y = 0;
 		}
 		if (charState.airMove && !grounded) {
 			airMove();
@@ -1249,7 +1304,7 @@ public partial class Character : Actor, IDamagable {
 			normalCtrl();
 		}
 		if (charState.attackCtrl) {
-			attackCtrl();
+			return attackCtrl();
 		}
 		return false;
 	}
@@ -1273,7 +1328,7 @@ public partial class Character : Actor, IDamagable {
 				changeState(new Jump());
 				return true;
 			}
-			else if (player.dashPressed(out string dashControl) && canDash()) {
+			else if (player.dashPressed(out string dashControl) && canDash() && charState is not Dash) {
 				changeState(new Dash(dashControl), true);
 				return true;
 			}
@@ -1306,21 +1361,21 @@ public partial class Character : Actor, IDamagable {
 				if (player.input.isPressed(Control.Jump, player) && canJump()) {
 					lastJumpPressedTime = Global.time;
 				}
-				if (!grounded && Global.time - lastJumpPressedTime < 0.1f &&
-					!isDashing && canAirJump() &&
-					wallKickCooldown == 0 && flag == null &&
+				if ((player.input.isPressed(Control.Jump, player) ||
+					Global.time - lastJumpPressedTime < 0.1f) &&
+					!isDashing && wallKickTimer <= 0 && flag == null &&
 					!sprite.name.Contains("kick_air")
 				) {
 					dashedInAir++;
 					vel.y = -getJumpPower();
-					changeState(new Jump());
+					changeState(new Jump(), true);
 					return true;
 				}
 			} else {
 				lastJumpPressedTime = 0;
 			}
 			// Wallclimb code.
-			if (canWallClimb() && charState is not WallSlide) {
+			if (canWallClimb() && charState is not WallSlide && wallKickTimer <= 0) {
 				bool velYRequirementMet = vel.y > 0 || (charState is VileHover vh && vh.fallY > 0);
 				// This logic can be abit confusing,
 				// but we are trying to mirror the actual Mega man X wall climb physics.
@@ -1344,7 +1399,23 @@ public partial class Character : Actor, IDamagable {
 
 	public virtual void airMove() {
 		int xDpadDir = player.input.getXDir(player);
-		if (xDpadDir != 0) {
+		bool wallKickMove = (wallKickTimer > 0);
+		if (wallKickMove) {
+			if (wallKickDir == xDpadDir || vel.y > 0) {
+				wallKickMove = false;
+				wallKickTimer = 0;
+			} else {
+				float kickSpeed;
+				if (isDashing) {
+					kickSpeed = 200 * (wallKickTimer / 12);
+				} else {
+					kickSpeed = 150 * (wallKickTimer / 12);
+				}
+				move(new Point(kickSpeed * wallKickDir, 0));
+			}
+			wallKickTimer -= 1 * Global.speedMul;
+		}
+		if (!wallKickMove && xDpadDir != 0) {
 			Point moveSpeed = new Point();
 			if (player.character.canMove()) { moveSpeed.x = getDashSpeed() * xDpadDir; }
 			if (player.character.canTurn()) { xDir = xDpadDir; }
@@ -1656,6 +1727,21 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public float camOffsetX;
+	
+	
+	public virtual Actor getFollowActor() {
+		if (mk5RideArmorPlatform != null) {
+			return mk5RideArmorPlatform;
+		}
+		if (player.currentMaverick != null && player.isTagTeam()) {
+			return player.currentMaverick;
+		}
+		if (rideArmor != null) {
+			return rideArmor;
+		}
+		return this;
+	}
+
 	public virtual Point getCamCenterPos(bool ignoreZoom = false) {
 		if (mk5RideArmorPlatform != null) {
 			return mk5RideArmorPlatform.pos.addxy(0, -70);
@@ -1715,7 +1801,7 @@ public partial class Character : Actor, IDamagable {
 			}
 			return rideArmor.pos.addxy(camOffsetX, -24);
 		}
-		return pos.addxy(camOffsetX, -24);
+		return pos.addxy(camOffsetX, -30);
 	}
 
 	public Point? getHeadPos() {
@@ -1854,9 +1940,12 @@ public partial class Character : Actor, IDamagable {
 			return;
 		}
 
-		if (charState != null && !charState.canExit(this, newState)) return;
-		if (newState != null && !newState.canEnter(this)) return;
-
+		if (charState != null && !charState.canExit(this, newState)) {
+			return;
+		}
+		if (newState != null && !newState.canEnter(this)) {
+			return;
+		}
 		changedStateInFrame = true;
 		newState.character = this;
 
@@ -1866,7 +1955,9 @@ public partial class Character : Actor, IDamagable {
 			changeSprite(getSprite(newState.shootSprite), true);
 		}
 		var oldState = charState;
-		if (oldState != null) oldState.onExit(newState);
+		if (oldState != null) {
+			oldState.onExit(newState);
+		}
 		charState = newState;
 		newState.onEnter(oldState);
 

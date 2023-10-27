@@ -72,6 +72,7 @@ public class X6SaberState : CharState {
 		this.grounded = grounded;
 		landSprite = "beam_saber2";
 		airMove = true;
+		useDashJumpSpeed = true;
 	}
 
 	public override void update() {

@@ -547,6 +547,7 @@ public class GameMode {
 
 		if (!Global.level.mainPlayer.isSpectator) {
 			renderHealthAndWeapons();
+
 			// Scrap
 			if (!Global.level.is1v1()) {
 				Global.sprites["hud_scrap"].drawToHUD(0, 4, 138);

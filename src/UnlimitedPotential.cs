@@ -287,6 +287,7 @@ public class XUPPunchState : CharState {
 		this.isGrounded = isGrounded;
 		landSprite = "unpo_punch";
 		airMove = true;
+		useDashJumpSpeed = true;
 	}
 
 	public override void update() {

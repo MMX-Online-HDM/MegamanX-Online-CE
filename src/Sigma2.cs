@@ -22,6 +22,7 @@ public class SigmaClawState : CharState {
 	public SigmaClawState(CharState prevCharState, bool isAir) : base(prevCharState.attackSprite, "", "", "") {
 		this.prevCharState = prevCharState;
 		this.isAir = isAir;
+		useDashJumpSpeed = true;
 		airMove = true;
 	}
 

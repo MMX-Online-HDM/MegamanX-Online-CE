@@ -151,6 +151,7 @@ public class VileHover : CharState {
 		exitOnLanding = true;
 		attackCtrl = true;
 		normalCtrl = true;
+		useDashJumpSpeed = true;
 	}
 
 	public override void update() {
