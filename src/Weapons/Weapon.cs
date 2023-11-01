@@ -211,7 +211,7 @@ public class Weapon {
 	}
 
 	public virtual float getAmmoUsage(int chargeLevel) {
-		if (chargeLevel == 3) return 8;
+		if (chargeLevel >= 3) return 8;
 		else return 1;
 	}
 
@@ -337,10 +337,10 @@ public class Weapon {
 		// Only deduct ammo if owned by local player
 		if (player.character.ownedByLocalPlayer) {
 			float ammoUsage;
-			if (player.character.isInvisibleBS.getValue() && chargeLevel != 3) {
+			if (player.character.isInvisibleBS.getValue() && chargeLevel < 3) {
 				ammoUsage = 4;
 			} else if (this is FireWave) {
-				if (chargeLevel != 3) {
+				if (chargeLevel < 3) {
 					float chargeTime = player.character.chargeTime;
 					if (chargeTime < 1) {
 						ammoUsage = Global.spf * 10;

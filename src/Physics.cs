@@ -7,8 +7,10 @@ using System.Threading.Tasks;
 namespace MMXOnline;
 
 public class Physics {
-	public const float JumpPower = 305;
-	public const float Gravity = 900;
-	public const float MaxFallSpeed = 480;
-	public const float MaxUnderwaterFallSpeed = 172.5f;
+	public static float JumpSpeed = 5 * 60;
+	public static float Gravity = 0.25f * 60;
+	public static float MaxFallSpeed = 7.75f * 60;
+	public static float MaxUnderwaterFallSpeed = 2.875f * 69;
+	public static float WalkSpeed = 1.475f * 60;
+	public static float DashStartSpeed = 1.25f * 60;
 }

@@ -19,7 +19,7 @@ public class SilkShot : Weapon {
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-		if (chargeLevel != 3) {
+		if (chargeLevel < 3) {
 			new SilkShotProj(this, pos, xDir, player, netProjId);
 		} else {
 			new SilkShotProjCharged(this, pos, xDir, player, netProjId);

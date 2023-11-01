@@ -894,7 +894,7 @@ public class Maverick : Actor, IDamagable {
 	}
 
 	public virtual float getJumpPower() {
-		return Physics.JumpPower;
+		return Physics.JumpSpeed;
 	}
 
 	public bool canDash() {

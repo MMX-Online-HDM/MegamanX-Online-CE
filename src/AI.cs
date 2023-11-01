@@ -202,18 +202,20 @@ public class AI {
 		if (Global.level.gameMode.isOver) return;
 
 		var gameMode = Global.level.gameMode;
-		if (!player.isMainPlayer && player.isX && player.aiArmorUpgradeIndex < player.aiArmorUpgradeOrder.Count && !Global.level.is1v1()) {
+		if (!player.isMainPlayer && player.isX &&
+			player.aiArmorUpgradeIndex < player.aiArmorUpgradeOrder.Count && !Global.level.is1v1()
+		) {
 			var upgradeNumber = player.aiArmorUpgradeOrder[player.aiArmorUpgradeIndex];
-			if (upgradeNumber == 0 && player.scrap >= Character.bootsArmorCost) {
+			if (upgradeNumber == 0 && player.scrap >= MegamanX.bootsArmorCost) {
 				UpgradeArmorMenu.upgradeBootsArmor(player, player.aiArmorPath);
 				player.aiArmorUpgradeIndex++;
-			} else if (upgradeNumber == 1 && player.scrap >= Character.bodyArmorCost) {
+			} else if (upgradeNumber == 1 && player.scrap >= MegamanX.bodyArmorCost) {
 				UpgradeArmorMenu.upgradeBodyArmor(player, player.aiArmorPath);
 				player.aiArmorUpgradeIndex++;
-			} else if (upgradeNumber == 2 && player.scrap >= Character.headArmorCost) {
+			} else if (upgradeNumber == 2 && player.scrap >= MegamanX.headArmorCost) {
 				UpgradeArmorMenu.upgradeHelmetArmor(player, player.aiArmorPath);
 				player.aiArmorUpgradeIndex++;
-			} else if (upgradeNumber == 3 && player.scrap >= Character.armArmorCost) {
+			} else if (upgradeNumber == 3 && player.scrap >= MegamanX.armArmorCost) {
 				UpgradeArmorMenu.upgradeArmArmor(player, player.aiArmorPath);
 				player.aiArmorUpgradeIndex++;
 			}
@@ -455,7 +457,11 @@ public class AI {
 				jumpTime = Helpers.randomRange(0.25f, 0.75f);
 			}
 		}
-		if (aiState.randomlyChangeWeapon && (player.isX || player.isAxl || player.isVile) && !player.lockWeapon && !character.isInvisibleBS.getValue() && character.chargedRollingShieldProj == null) {
+		if (aiState.randomlyChangeWeapon &&
+			(player.isX || player.isAxl || player.isVile) &&
+			!player.lockWeapon && !character.isInvisibleBS.getValue() &&
+			(character as MegamanX)?.chargedRollingShieldProj == null
+		) {
 			weaponTime += Global.spf;
 			if (weaponTime > 5) {
 				weaponTime = 0;

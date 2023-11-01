@@ -32,7 +32,9 @@ public class LeaveMatchSignal {
 		stopWatch.Start();
 		byte[] serverResponse = null;
 		do {
-			serverResponse = Global.matchmakingQuerier.send(newServerData.region.ip, "GetServer:" + newServerData.name, 1000);
+			serverResponse = Global.matchmakingQuerier.send(
+				newServerData.region.ip, "GetServer:" + newServerData.name, 1000
+			);
 			if (stopWatch.ElapsedMilliseconds > 5000) {
 				Menu.change(new ErrorMenu("Error: Could not create new server.", new MainMenu()));
 				return;
@@ -40,11 +42,17 @@ public class LeaveMatchSignal {
 		}
 		while (!serverResponse.IsNullOrEmpty());
 
-		HostMenu.createServer(SelectCharacterMenu.playerData.charNum, newServerData, null, true, new MainMenu(), out string errorMessage);
+		HostMenu.createServer(
+			SelectCharacterMenu.playerData.charNum, newServerData,
+			null, true, new MainMenu(), out string errorMessage
+		);
 
 		if (!string.IsNullOrEmpty(errorMessage)) {
 			// Retry once
-			HostMenu.createServer(SelectCharacterMenu.playerData.charNum, newServerData, null, true, new MainMenu(), out errorMessage);
+			HostMenu.createServer(
+				SelectCharacterMenu.playerData.charNum, newServerData,
+				null, true, new MainMenu(), out errorMessage
+			);
 			if (!string.IsNullOrEmpty(errorMessage)) {
 				Menu.change(new ErrorMenu(errorMessage, new MainMenu()));
 			}
@@ -56,7 +64,9 @@ public class LeaveMatchSignal {
 		stopWatch.Start();
 		byte[] serverResponse;
 		do {
-			serverResponse = Global.matchmakingQuerier.send(newServerData.region.ip, "GetServer:" + newServerData.name, 1000);
+			serverResponse = Global.matchmakingQuerier.send(
+				newServerData.region.ip, "GetServer:" + newServerData.name, 1000
+			);
 			if (stopWatch.ElapsedMilliseconds > 5000) {
 				Menu.change(new ErrorMenu("Error: Could not rejoin new server.", new MainMenu()));
 				return;

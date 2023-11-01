@@ -16,5 +16,8 @@ public interface GameObject {
 	Shape? getAllCollidersShape();
 	void onCollision(CollideData other);
 	void netUpdate();
+	void statePreUpdate();
+	void stateUpdate();
+	void statePostUpdate();
 }
 

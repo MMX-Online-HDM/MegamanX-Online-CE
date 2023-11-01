@@ -73,6 +73,8 @@ public class Axl : Character {
 	// The ping divided by this number indicates stealth reveal time in online
 	public const float stealthRevealPingDenom = 200;
 
+	public PlasmaGunAltProj plasmaGunAltProj;
+
 	public Axl(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
@@ -729,6 +731,17 @@ public class Axl : Character {
 			plasmaGunAltProj?.destroySelf();
 			plasmaGunAltProj = null;
 		}
+	}
+
+	public override bool normalCtrl() {
+		if (!player.isAI && player.input.isPressed(Control.Jump, player) &&
+			canJump() && !isDashing && canAirDash() && flag == null
+		) {
+			dashedInAir++;
+			changeState(new Hover(), true);
+			return true;
+		}
+		return base.normalCtrl();
 	}
 
 	public float getAimBackwardsAmount() {
@@ -1592,7 +1605,7 @@ public class Axl : Character {
 	}
 
 	public override bool canDash() {
-		if (isAnyZoom() || sniperMissileProj != null || isRevving) {
+		if (isAnyZoom() || sniperMissileProj != null || isRevving || charState is Crouch) {
 			return false;
 		}
 		return base.canDash();
@@ -1658,6 +1671,12 @@ public class Axl : Character {
 	}
 
 	public override void changeState(CharState newState, bool forceChange = false) {
+		if (!forceChange && charState != null && newState != null &&
+			charState.GetType() == newState.GetType() ||
+			 !forceChange && changedStateInFrame
+		) {
+			return;
+		}
 		base.changeState(newState, forceChange);
 
 		if (gaeaShield != null && shouldDrawArm() == false) {
@@ -1683,5 +1702,20 @@ public class Axl : Character {
 
 	public override bool isInvisible() {
 		return stingChargeTime > 0 && stealthRevealTime == 0;
+	}
+
+	public override string getSprite(string spriteName) {
+		if (spriteName == "crystalized" || spriteName == "die" ||
+			spriteName == "hurt" || spriteName == "hyper_start" ||
+			spriteName == "hyper_start_air" || spriteName == "knocked_down" ||
+			spriteName == "roll" || spriteName == "warp_in" || spriteName == "win"
+		) {
+			if (player.axlBulletType == 1) spriteName += "_mc";
+			else if (player.axlBulletType == 2) spriteName += "_bk";
+			else if (player.axlBulletType == 3) spriteName += "_mb";
+			else if (player.axlBulletType == 5) spriteName += "_rb";
+			else if (player.axlBulletType == 6) spriteName += "_ag";
+		}
+		return "axl_" + spriteName;
 	}
 }

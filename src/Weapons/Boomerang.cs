@@ -19,7 +19,7 @@ public class Boomerang : Weapon {
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-		if (chargeLevel != 3) new BoomerangProj(this, pos, xDir, player, netProjId);
+		if (chargeLevel < 3) new BoomerangProj(this, pos, xDir, player, netProjId);
 		else {
 			player.setNextActorNetId(netProjId);
 

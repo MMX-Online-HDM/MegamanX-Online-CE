@@ -24,7 +24,7 @@ public class Torpedo : Weapon {
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-		if (chargeLevel != 3) {
+		if (chargeLevel < 3) {
 			new TorpedoProj(this, pos, xDir, player, 0, netProjId);
 		} else {
 			player.setNextActorNetId(netProjId);

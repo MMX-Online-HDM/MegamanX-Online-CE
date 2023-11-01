@@ -19,7 +19,7 @@ public class SonicSlicer : Weapon {
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-		if (chargeLevel != 3) {
+		if (chargeLevel < 3) {
 			new SonicSlicerStart(this, pos, xDir, player, netProjId);
 		} else {
 			new Anim(pos, "sonicslicer_charge_start", xDir, null, true);
@@ -139,7 +139,7 @@ public class SonicSlicerProjCharged : Projectile {
 
 	public override void update() {
 		base.update();
-		vel.y += Global.spf * Global.level.gravity;
+		vel.y += Global.speedMul * getGravity();
 		if (!fall) {
 			float x = Helpers.lerp(pos.x, dest.x, Global.spf * 10);
 			changePos(new Point(x, pos.y));

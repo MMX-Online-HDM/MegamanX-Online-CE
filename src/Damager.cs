@@ -259,7 +259,15 @@ public class Damager {
 		bool spiked = false;
 		bool playHurtSound = false;
 		if (character != null) {
-			bool isStompWeapon = (weaponKillFeedIndex == 19 || weaponKillFeedIndex == 58 || weaponKillFeedIndex == 51 || weaponKillFeedIndex == 59 || weaponKillFeedIndex == 60) && projId != (int)ProjIds.MechFrogStompShockwave;
+			MegamanX mmx = character as MegamanX;
+			
+			bool isStompWeapon = (
+				weaponKillFeedIndex == 19 ||
+				weaponKillFeedIndex == 58 ||
+				weaponKillFeedIndex == 51 ||
+				weaponKillFeedIndex == 59 ||
+				weaponKillFeedIndex == 60
+			) && projId != (int)ProjIds.MechFrogStompShockwave;
 			if (projId == (int)ProjIds.FlameMStomp || projId == (int)ProjIds.TBreaker || projId == (int)ProjIds.SparkMStomp || projId == (int)ProjIds.WheelGStomp || projId == (int)ProjIds.GBeetleStomp ||
 				projId == (int)ProjIds.TunnelRStomp || projId == (int)ProjIds.Sigma3KaiserStomp || projId == (int)ProjIds.BBuffaloStomp) {
 				isStompWeapon = true;
@@ -324,8 +332,10 @@ public class Damager {
 			} else if (projId == (int)ProjIds.BBuffaloBeam) {
 				character.freeze(2);
 			} else if (projId == (int)ProjIds.PlasmaGun) {
-				character.barrierCooldown = 3;
-				character.barrierTime = 0;
+				if (mmx != null) {
+					mmx.barrierCooldown = 3;
+					mmx.barrierTime = 0;
+				}
 			} else if (projId == (int)ProjIds.ShotgunIceCharged) {
 				character.addIgFreezeProgress(4, 5);
 			} else if (projId == (int)ProjIds.ChillPIceBlow) {
@@ -366,11 +376,13 @@ public class Damager {
 
 			#endregion
 
-			if (character.player.isX) {
-				if (character.checkMaverickWeakness((ProjIds)projId)) {
+			if (mmx != null) {
+				if (mmx.checkMaverickWeakness((ProjIds)projId)) {
 					weakness = true;
 					flinch = Global.defFlinch;
-					if (damage == 0) damage = 4;
+					if (damage == 0) {
+						damage = 1;
+					}
 				}
 			}
 
@@ -488,7 +500,9 @@ public class Damager {
 					flinch = 0;
 				}
 				// Small mavericks
-				else if (maverick is ChillPenguin || maverick is Velguarder || maverick is MorphMothCocoon || maverick is BubbleCrab || maverick is CrystalSnail) {
+				else if (maverick is ChillPenguin || maverick is Velguarder || maverick is MorphMothCocoon ||
+					maverick is BubbleCrab || maverick is CrystalSnail
+				) {
 
 				}
 				// Medium mavericks
@@ -531,6 +545,10 @@ public class Damager {
 
 			if (weakness) {
 				flinch = Global.defFlinch;
+				if (isOnFlinchCooldown) {
+					flinch = Global.miniFlinch;
+					isOnFlinchCooldown = false;
+				}
 			} else {
 				if (maverick is ArmoredArmadillo aa) {
 					if ((hitFromBehind(maverick, damagingActor, owner) || maverick.sprite.name == "armoreda_roll") && !aa.hasNoArmor() && !isArmorPiercingOrElectric(projId)) {
@@ -574,7 +592,11 @@ public class Damager {
 
 			if (damage > 0) {
 				if (flinch > 0 && !isOnFlinchCooldown) {
-					victim.playSound("weakness");
+					if (weakness) {
+						victim.playSound("weakness");
+					} else {
+						victim.playSound("hurt");
+					}
 					if (newState == null) {
 						int hurtDir = -maverick.xDir;
 						if (damagingActor != null) {
@@ -600,7 +622,7 @@ public class Damager {
 			victim.addRenderEffect(RenderEffectType.Hit, 0.05f, 0.1f);
 		}
 
-		float finalDamage = damage * (weakness ? 2 : 1) * owner.getDamageModifier();
+		float finalDamage = damage * owner.getDamageModifier();
 
 		if (finalDamage > 0 && character != null && character.ownedByLocalPlayer && character.charState is XUPParryStartState parryState && parryState.canParry() && !isDot(projId)) {
 			parryState.counterAttack(owner, damagingActor, Math.Max(finalDamage * 2, 4));

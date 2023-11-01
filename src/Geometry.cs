@@ -23,6 +23,10 @@ public class Geometry : GameObject {
 
 	}
 
+	public virtual void statePreUpdate() {}
+	public virtual void stateUpdate() {}
+	public virtual void statePostUpdate() {}
+
 	public virtual void netUpdate() {
 
 	}

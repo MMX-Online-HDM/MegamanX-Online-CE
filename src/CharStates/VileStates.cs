@@ -148,6 +148,10 @@ public class VileHover : CharState {
 	public float fallY;
 	
 	public VileHover(string transitionSprite = "") : base("hover", "hover_shoot", "", transitionSprite) {
+		exitOnLanding = true;
+		attackCtrl = true;
+		normalCtrl = true;
+		useDashJumpSpeed = true;
 	}
 
 	public override void update() {
@@ -164,8 +168,6 @@ public class VileHover : CharState {
 			character.changeToIdleOrFall();
 			return;
 		}
-
-		airCode();
 
 		if (character.charState is not VileHover) return;
 

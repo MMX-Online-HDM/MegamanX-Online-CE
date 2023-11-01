@@ -58,6 +58,10 @@ public class Hover : CharState {
 	Axl axl;
 
 	public Hover() : base("hover", "hover", "hover", "hover") {
+		exitOnLanding = true;
+		airMove = true;
+		attackCtrl = true;
+		normalCtrl = true;
 	}
 
 	public override void update() {
@@ -65,13 +69,13 @@ public class Hover : CharState {
 
 		accuracy = 0;
 		Point prevPos = character.pos;
-		airCode();
+		
 		if (character.pos.x != prevPos.x) {
 			accuracy = 5;
 		}
 
 		if (character.vel.y < 0) {
-			character.vel.y += Global.spf * Global.level.gravity;
+			character.vel.y += Global.speedMul * character.getGravity();
 			if (character.vel.y > 0) character.vel.y = 0;
 		}
 
@@ -119,6 +123,8 @@ public class DodgeRoll : CharState {
 	Axl axl;
 
 	public DodgeRoll() : base("roll", "", "") {
+		attackCtrl = true;
+		normalCtrl = true;
 	}
 
 	public override void onEnter(CharState oldState) {
@@ -144,7 +150,6 @@ public class DodgeRoll : CharState {
 
 	public override void update() {
 		base.update();
-		groundCode();
 
 		if (character.isAnimOver()) {
 			character.changeState(new Idle(), true);

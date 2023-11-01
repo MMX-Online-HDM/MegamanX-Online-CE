@@ -201,7 +201,7 @@ public class Zero : Character {
 			}
 		}
 
-		if (player.chargeButtonHeld() && (
+		if (chargeButtonHeld() && (
 			player.scrap > 0 || player.isZBusterZero() || player.weapon is AssassinBullet
 			) && flag == null && rideChaser == null && rideArmor == null
 		) {
@@ -542,6 +542,40 @@ public class Zero : Character {
 		}
 	}
 
+	public override bool normalCtrl() {
+		bool changedState = base.normalCtrl();
+		if (changedState) {
+			return true;
+		}
+		if (player.isZSaber() && (
+				player.input.isHeld(Control.WeaponLeft, player) ||
+				player.input.isHeld(Control.WeaponRight, player)
+			) && (
+				!player.isDisguisedAxl ||
+				player.input.isHeld(Control.Down, player)
+			)
+		) {
+			changeState(new SwordBlock());
+			return true;
+		}
+		else if (!player.isZBusterZero() && !isDashing && (
+				player.input.isPressed(Control.WeaponLeft, player) ||
+				player.input.isPressed(Control.WeaponRight, player)
+			) && (
+				!player.isDisguisedAxl || player.input.isHeld(Control.Down, player)
+			)
+		) {
+			if (!player.hasKnuckle()) {
+				changeState(new SwordBlock());
+				return true;
+			} else if (parryCooldown == 0) {
+				changeState(new KKnuckleParryStartState());
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public void swingStockedSaber() {
 		xSaberCooldown = 1;
 		doubleBusterDone = false;
@@ -784,14 +818,14 @@ public class Zero : Character {
 						zeroBusterWeapon, shootPos, xDir, type, player, player.getNextActorNetId(), rpc: true
 					);
 				}
-			} else if (chargeLevel == 3 || chargeLevel == 4) {
+			} else if (chargeLevel == 3 || chargeLevel >= 4) {
 				if (type == 0) player.scrap -= 1;
 				if (chargeLevel == 3 && player.isZBusterZero()) {
 					changeState(new ZeroDoubleBuster(false, true), true);
 					//playSound("zbuster2", sendRpc: true);
 					//new ZBuster2Proj(player.zeroBusterWeapon, shootPos, xDir, type, player, player.getNextActorNetId(), rpc: true);
 					//stockedCharge = true;
-				} else if (chargeLevel == 4 && canUseDoubleBusterCombo()) {
+				} else if (chargeLevel >= 4 && canUseDoubleBusterCombo()) {
 					//if (!isBlackZero2()) player.scrap -= 1;
 					changeState(new ZeroDoubleBuster(false, false), true);
 				} else {
@@ -1063,5 +1097,9 @@ public class Zero : Character {
 	public override Collider getBlockCollider() {
 		var rect = new Rect(0, 0, 16, 16);
 		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
+	}
+
+	public override bool chargeButtonHeld() {
+		return player.input.isHeld(Control.Shoot, player);
 	}
 }

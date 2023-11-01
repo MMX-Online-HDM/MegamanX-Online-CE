@@ -309,6 +309,8 @@ public class Sigma : Character {
 	public override void update() {
 		base.update();
 
+		Global.level.gameMode.setHUDErrorMessage(player, charState.GetType().ToString(), false, true);
+
 		if (!ownedByLocalPlayer) {
 			return;
 		}
@@ -499,11 +501,11 @@ public class Sigma : Character {
 						&& !isSigmaShooting() && sigma3FireballCooldown == 0
 					) {
 						if (charState is Fall || charState is Jump || charState is WallKick) {
-							changeState(new Sigma3ShootAir(player.input.getInputDir(player)), true);
+							changeState(new Sigma3Shoot(player.input.getInputDir(player)), true);
 						} else if (charState is Idle || charState is Run || charState is Dash
 							|| charState is SwordBlock
 						) {
-							changeState(new Sigma3Shoot(), true);
+							changeState(new Sigma3Shoot(player.input.getInputDir(player)), true);
 						}
 						sigma3FireballCooldown = maxSigma3FireballCooldown;
 						changeSpriteFromName(charState.shootSprite, true);
@@ -597,6 +599,21 @@ public class Sigma : Character {
 				}
 			}
 		}
+	}
+
+	public override bool normalCtrl() {
+		var changedState = base.normalCtrl();
+		if (changedState) {
+			return true;
+		}
+		if (player.isCrouchHeld() && canCrouch() &&
+			!isAttacking() && noBlockTime == 0 &&
+			charState is not SwordBlock
+		) {
+			changeState(new SwordBlock());
+			return true;
+		}
+		return false;
 	}
 
 	// This can run on both owners and non-owners. So data used must be in sync
@@ -909,5 +926,15 @@ public class Sigma : Character {
 			return true;
 		}
 		return base.isAttacking();
+	}
+
+	public override string getSprite(string spriteName) {
+		if (player.loadout.sigmaLoadout.sigmaForm == 2) {
+			return "sigma3_" + spriteName;
+		}
+		if (player.loadout.sigmaLoadout.sigmaForm == 1) {
+			return "sigma2_" + spriteName;
+		}
+		return "sigma_" + spriteName;
 	}
 }

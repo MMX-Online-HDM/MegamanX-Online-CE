@@ -78,6 +78,10 @@ public class ZeroSpinKickState : CharState {
 	public float soundTime = 0;
 
 	public ZeroSpinKickState() : base("spinkick") {
+		exitOnAirborne = true;
+		airMove = true;
+		attackCtrl = false;
+		normalCtrl = true;
 	}
 
 	public override void onEnter(CharState oldState) {
@@ -94,7 +98,6 @@ public class ZeroSpinKickState : CharState {
 
 	public override void update() {
 		base.update();
-		groundCode();
 		soundTime -= Global.spf;
 		if (soundTime <= 0) {
 			soundTime = 0.15f;

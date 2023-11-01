@@ -21,20 +21,20 @@ public class SpinningBlade : Weapon {
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-		if (chargeLevel != 3) {
+		if (chargeLevel < 3) {
 			player.setNextActorNetId(netProjId);
 			new SpinningBladeProj(this, pos, xDir, 0, player, player.getNextActorNetId(true));
 			new SpinningBladeProj(this, pos, xDir, 1, player, player.getNextActorNetId(true));
-		} else if (player.character != null) {
+		} else if (player?.character is MegamanX mmx) {
 			var csb = new SpinningBladeProjCharged(this, pos, xDir, player, netProjId);
-			if (player.character.ownedByLocalPlayer) {
-				player.character.chargedSpinningBlade = csb;
+			if (mmx.ownedByLocalPlayer) {
+				mmx.chargedSpinningBlade = csb;
 			}
 		}
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
-		if (chargeLevel != 3) return 2;
+		if (chargeLevel < 3) return 2;
 		return base.getAmmoUsage(chargeLevel);
 	}
 }
@@ -111,7 +111,7 @@ public class SpinningBladeProj : Projectile {
 }
 
 public class SpinningBladeProjCharged : Projectile {
-	public Character character;
+	public MegamanX character;
 	public float xDist;
 	const float maxXDist = 90;
 	public float spinAngle;
@@ -122,7 +122,7 @@ public class SpinningBladeProjCharged : Projectile {
 		projId = (int)ProjIds.SpinningBladeCharged;
 		shouldShieldBlock = false;
 		destroyOnHit = false;
-		character = player.character;
+		character = (player.character as MegamanX);
 		shouldVortexSuck = false;
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);

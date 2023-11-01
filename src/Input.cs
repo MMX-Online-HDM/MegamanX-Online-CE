@@ -385,6 +385,8 @@ public class Input {
 	public static float aimX2;
 	public static float aimY2;
 
+	public (int x, int y) lastDirPressed = (1, 1);
+
 	public bool isAI;
 
 	public bool isPressedMenu(string inputName) {
@@ -535,9 +537,12 @@ public class Input {
 	}
 
 	public bool isPressed(string inputName, Player player) {
-		if (possessedControlPressed.ContainsKey(inputName)) return possessedControlPressed[inputName];
-
-		if (player != null && !player.canControl) return false;
+		if (possessedControlPressed.ContainsKey(inputName)) {
+			return possessedControlPressed[inputName];
+		}
+		if (player != null && !player.canControl) {
+			return false;
+		}
 		if (player == null || player.isAI) {
 			var keyboardMapping2 = Control.getKeyboardMapping(-1, 0);
 			int? keyboardKey2 = keyboardMapping2.GetValueOrDefault(inputName);
@@ -644,9 +649,7 @@ public class Input {
 	}
 
 	public bool isXDirHeld(int xDir, Player player) {
-		if (xDir == 1 && isHeld(Control.Right, player)) return true;
-		if (xDir == -1 && isHeld(Control.Left, player)) return true;
-		return false;
+		return (getXDir(player) == xDir);
 	}
 
 	public bool isWeaponLeftOrRightPressed(Player player) {
@@ -657,8 +660,10 @@ public class Input {
 		return isHeld(Control.WeaponLeft, player) || isHeld(Control.WeaponRight, player);
 	}
 
+	// Return if left or rigth is pressed. Not both.
+	// We use XOR (^) for this.
 	public bool isLeftOrRightHeld(Player player) {
-		return isHeld(Control.Left, player) || isHeld(Control.Right, player);
+		return (isHeld(Control.Left, player) ^ isHeld(Control.Right, player));
 	}
 
 	public bool isCommandButtonPressed(Player player) {
@@ -670,12 +675,33 @@ public class Input {
 	}
 
 	public Point getInputDir(Player player) {
-		Point dir = new Point();
-		if (isHeld(Control.Left, player)) dir.x = -1;
-		else if (isHeld(Control.Right, player)) dir.x = 1;
-		if (isHeld(Control.Up, player)) dir.y = -1;
-		else if (isHeld(Control.Down, player)) dir.y = 1;
-		return dir;
+		return new Point(getXDir(player), getYDir(player));
+	}
+
+	public int getXDir(Player player) {
+		int xDir = 0;
+		bool pressedDir = false;
+		if (isHeld(Control.Left, player)) { xDir--; pressedDir = true; }
+		if (isHeld(Control.Right, player)) { xDir++; pressedDir = true; }
+		if (xDir == 0 && pressedDir) {
+			xDir = -lastDirPressed.y;
+		} else {
+			lastDirPressed.y = xDir;
+		}
+		return xDir;
+	}
+
+	public int getYDir(Player player) {
+		int yDir = 0;
+		bool pressedDir = false;
+		if (isHeld(Control.Up, player)) { yDir--; pressedDir = true; }
+		if (isHeld(Control.Down, player)) { yDir++; pressedDir = true; }
+		if (yDir == 0 && pressedDir) {
+			yDir = -lastDirPressed.y;
+		} else {
+			lastDirPressed.y = yDir;
+		}
+		return yDir;
 	}
 
 	#if WINDOWS

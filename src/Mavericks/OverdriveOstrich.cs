@@ -220,7 +220,7 @@ public class OverdriveOSonicSlicerUpProj : Projectile {
 		base.update();
 		if (!ownedByLocalPlayer) return;
 
-		vel.y += Global.spf * Global.level.gravity;
+		vel.y += Global.speedMul * getGravity();
 		if (!fall) {
 			float x = Helpers.lerp(pos.x, dest.x, Global.spf * 10);
 			changePos(new Point(x, pos.y));

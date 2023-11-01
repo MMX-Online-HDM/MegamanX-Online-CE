@@ -27,7 +27,7 @@ public class StrikeChain : Weapon {
 		else if (player.input.isHeld(Control.Down, player)) {
 			if ((player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) && player.character.grounded) { } else upOrDown = 1;
 		}
-		if (chargeLevel != 3) {
+		if (chargeLevel < 3) {
 			new StrikeChainProj(this, pos, xDir, 0, upOrDown, player, netProjId, rpc: true);
 		} else {
 			new StrikeChainProj(this, pos, xDir, 1, upOrDown, player, netProjId, rpc: true);
@@ -52,13 +52,21 @@ public class StrikeChainProj : Projectile {
 	public int upOrDown;
 	public Point chainVel;
 	public Actor anchorActor;
-	public StrikeChainProj(Weapon weapon, Point pos, int xDir, int type, int upOrDown, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 400, 2, player, xDir == 1 ? "strikechain_proj" : "strikechain_proj_left", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public MegamanX megamanX;
+
+	public StrikeChainProj(
+		Weapon weapon, Point pos, int xDir, int type,
+		int upOrDown, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 400, 2, player, xDir == 1 ? "strikechain_proj" : "strikechain_proj_left",
+		0, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		destroyOnHit = false;
 		this.player = player;
 		this.type = type;
-		if (player?.character != null) {
-			player.character.strikeChainProj = this;
+		if (player?.character is MegamanX mmx) {
+			mmx.strikeChainProj = this;
+			megamanX = mmx;
 		}
 		origXDir = xDir;
 		projId = (int)ProjIds.StrikeChain;
@@ -187,8 +195,8 @@ public class StrikeChainProj : Projectile {
 	}
 
 	public override void onDestroy() {
-		if (player.character != null) {
-			player.character.strikeChainProj = null;
+		if (megamanX != null) {
+			megamanX.strikeChainProj = null;
 		}
 		var hookedChar = hookedActor as Character;
 
@@ -327,6 +335,7 @@ public class StrikeChainPullToWall : CharState {
 	public StrikeChainPullToWall(StrikeChainProj scp, string lastSprite, bool isUp) : base(string.IsNullOrEmpty(lastSprite) ? "shoot" : lastSprite, "", "", "") {
 		this.scp = scp;
 		this.isUp = isUp;
+		useDashJumpSpeed = true;
 	}
 
 	public override void update() {

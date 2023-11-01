@@ -19,19 +19,21 @@ public class FrostShield : Weapon {
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
-		if (chargeLevel != 3) return 2;
+		if (chargeLevel < 3) return 2;
 		return 8;
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-		if (chargeLevel != 3) {
+		if (chargeLevel < 3) {
 			new FrostShieldProj(this, pos, xDir, player, netProjId);
 		} else {
 			if (player.character?.isUnderwater() == true) {
 				var cfs = new FrostShieldProjPlatform(this, pos, xDir, player, netProjId);
 			} else {
 				var cfs = new FrostShieldProjCharged(this, pos, xDir, player, netProjId);
-				if (player.character.ownedByLocalPlayer) player.character.chargedFrostShield = cfs;
+				if (player.character.ownedByLocalPlayer && player.character is MegamanX mmx) {
+					mmx.chargedFrostShield = cfs;
+				}
 			}
 		}
 	}
@@ -226,7 +228,9 @@ public class FrostShieldProjCharged : Projectile {
 		breakFreeze(owner);
 		if (!ownedByLocalPlayer) return;
 
-		character.removeBusterProjs();
+		if (owner.character is MegamanX mmx) {
+			mmx.chargedFrostShield = null;
+		}
 		new FrostShieldProjChargedGround(weapon, pos, character.xDir, owner, owner.getNextActorNetId(), rpc: true);
 	}
 }

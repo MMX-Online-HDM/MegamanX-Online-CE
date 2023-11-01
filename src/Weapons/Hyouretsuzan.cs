@@ -67,8 +67,11 @@ public class Hyouretsuzan : CharState {
 	public bool canFreeze;
 	public Zero zero;
 
-	public Hyouretsuzan(Weapon weapon) : base(getSpriteName(weapon.type) + "_fall", "", "", getSpriteName(weapon.type) + "_start") {
+	public Hyouretsuzan(Weapon weapon) : base(
+		getSpriteName(weapon.type) + "_fall", "", "", getSpriteName(weapon.type) + "_start"
+	) {
 		this.weapon = weapon;
+		exitOnLanding = true;
 	}
 
 	public static string getSpriteName(int type) {
@@ -90,8 +93,6 @@ public class Hyouretsuzan : CharState {
 		}
 
 		base.update();
-
-		airCode();
 
 		if (type == HyouretsuzanType.QuakeBlazer) {
 			if (player.input.isHeld(Control.Left, player)) {
@@ -236,6 +237,8 @@ public class DropKickWeapon : Weapon {
 public class DropKickState : CharState {
 	float stuckTime;
 	public DropKickState() : base("dropkick", "", "") {
+		exitOnLanding = true;
+		airMove = true;
 	}
 
 	public override void update() {
@@ -251,7 +254,6 @@ public class DropKickState : CharState {
 		}
 
 		base.update();
-		airCode();
 
 		var hit = Global.level.checkCollisionActor(character, character.vel.x * Global.spf, character.vel.y * Global.spf);
 		if (hit?.isSideWallHit() == true) {

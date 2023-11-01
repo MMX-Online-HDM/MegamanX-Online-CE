@@ -172,59 +172,8 @@ class Program {
 		Menu.change(new MainMenu());
 		Global.changeMusic("menu");
 
-		Clock fpsClock = new Clock();
-		Clock diagnosticsClock = new Clock();
-		Stopwatch packetDiagStopwatch = new Stopwatch();
-
 		while (window.IsOpen) {
-			if (Global.level != null && Global.level.started) {
-				Global.spf = fpsClock.ElapsedTime.AsSeconds();
-				if (Global.spf != 0 && Global.frameCount % 60 == 0) Global.currentFPS = 1 / Global.spf;
-				if (Global.spf > 0.033f) Global.spf = 0.033f;
-				fpsClock.Restart();
-			}
-
-			window.DispatchEvents();
-			if (Global.isMouseLocked) {
-				Mouse.SetPosition(new Vector2i((int)Global.halfScreenW, (int)Global.halfScreenH), Global.window);
-			}
-
-			var clearColor = Color.Black;
-			if (Global.level?.levelData?.bgColor != null) {
-				clearColor = Global.level.levelData.bgColor;
-			}
-			window.Clear(clearColor);
-
-			long prevPackets = 0;
-			if (Global.showDiagnostics) {
-				diagnosticsClock.Restart();
-				prevPackets = getBytesPerFrame();
-			}
-
-			update();
-			render();
-
-			if (Global.showDiagnostics) {
-				Global.lastFrameProcessTime = diagnosticsClock.ElapsedTime.AsMilliseconds();
-				Global.lastFrameProcessTimes.Add(Global.lastFrameProcessTime);
-				if (Global.lastFrameProcessTimes.Count > 120) Global.lastFrameProcessTimes.RemoveAt(0);
-
-				long packetIncrease = getBytesPerFrame() - prevPackets;
-				Global.lastFramePacketIncreases.Add(packetIncrease);
-				if (Global.lastFramePacketIncreases.Count > 120) Global.lastFramePacketIncreases.RemoveAt(0);
-
-				if (!packetDiagStopwatch.IsRunning) packetDiagStopwatch.Start();
-				if (packetDiagStopwatch.ElapsedMilliseconds > 1000) {
-					long packetTotalDelta = getPacketsReceived() - Global.packetTotal1SecondAgo;
-					Global.packetTotal1SecondAgo = getPacketsReceived();
-					packetDiagStopwatch.Restart();
-					Global.last10SecondsPacketsReceived.Add(packetTotalDelta);
-					if (Global.last10SecondsPacketsReceived.Count > 10) Global.last10SecondsPacketsReceived.RemoveAt(0);
-
-				}
-			}
-
-			window.Display();
+			mainLoop(window);
 		}
 	}
 
@@ -423,10 +372,30 @@ class Program {
 	}
 
 	private static void onWindowResized(object sender, SizeEventArgs e) {
-		if (e.Width / (float)e.Height > 1.33f) {
-			e.Width = (uint)(e.Height * (298 / 224f));
-			Global.window.Size = new Vector2u(e.Width, e.Height);
+		// Compares the aspect ratio of the window to the aspect ratio of the view,
+		// and sets the view's viewport accordingly in order to archieve a letterbox effect.
+		float windowRatio = (float)Global.window.Size.X / (float)Global.window.Size.Y;
+		float viewRatio = (float)Global.view.Size.X / (float)Global.view.Size.Y;
+		float sizeX = 1;
+		float sizeY = 1;
+		float posX = 0;
+		float posY = 0;
+
+		bool horizontalSpacing = true;
+		if (windowRatio < viewRatio) {
+			horizontalSpacing = false;
 		}
+		// If horizontalSpacing is true, the black bars will appear on the left and right side.
+		// Otherwise, the black bars will appear on the top and bottom.
+		if (horizontalSpacing) {
+			sizeX = viewRatio / windowRatio;
+			posX = (1f - sizeX) / 2f;
+		} else {
+			sizeY = windowRatio / viewRatio;
+			posY = (1f - sizeY) / 2f;
+		}
+		Global.view.Viewport = new FloatRect(posX, posY, sizeX, sizeY);
+		DrawWrappers.hudView.Viewport = new FloatRect(posX, posY, sizeX, sizeY);
 	}
 
 	/// <summary>

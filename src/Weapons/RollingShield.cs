@@ -19,8 +19,10 @@ public class RollingShield : Weapon {
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-		if (chargeLevel != 3 || player.character.chargedRollingShieldProj != null) {
-			new RollingShieldProj(this, pos, xDir, player, netProjId);
+		if (chargeLevel < 3) {
+			if (player.character is MegamanX mmx && mmx.chargedRollingShieldProj != null) {
+				new RollingShieldProj(this, pos, xDir, player, netProjId);
+			}
 		} else {
 			new RollingShieldProjCharged(this, pos, xDir, player, netProjId);
 		}
@@ -70,20 +72,26 @@ public class RollingShieldProj : Projectile {
 }
 
 public class RollingShieldProjCharged : Projectile {
-	public Character character;
+	public MegamanX mmx;
 	public LoopingSound rollingShieldSound;
 	public float ammoDecCooldown = 0;
-	public RollingShieldProjCharged(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId) : base(weapon, pos, xDir, 0, 1, player, "rolling_shield_charge_flash", 0, 0.33f, netProjId, player.ownedByLocalPlayer) {
+	public RollingShieldProjCharged(
+		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId
+	) : base(
+		weapon, pos, xDir, 0, 1, player, "rolling_shield_charge_flash",
+		0, 0.33f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.RollingShieldCharged;
 		fadeSprite = "rolling_shield_charge_break";
 		fadeSound = "hit";
 		useGravity = false;
-		character = player.character;
+		mmx = (player.character as MegamanX);
 		rollingShieldSound = new LoopingSound("rollingShieldCharge", "rollingShieldChargeLoop", this);
-		player.character.chargedRollingShieldProj = this;
+		mmx.chargedRollingShieldProj = this;
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 		shouldVortexSuck = false;
+		neverReflect = true;
 	}
 
 	public override void update() {
@@ -94,21 +102,26 @@ public class RollingShieldProjCharged : Projectile {
 			}
 			return;
 		}
-
-		if (isAnimOver() && sprite.name == "rolling_shield_charge_flash") {
-			changeSprite("rolling_shield_charge", true);
-		}
-		if (character == null || character.charState is Die || (character.player.weapon is not RollingShield)) {
+		// In case it gets reflected (somehow) it implodes.
+		// This to prevent it from killing X when reflected.
+		if (mmx.player != owner) {
 			destroySelf();
 			return;
 		}
-		if (character.player.weapon.ammo == 0) {
+		if (isAnimOver() && sprite.name == "rolling_shield_charge_flash") {
+			changeSprite("rolling_shield_charge", true);
+		}
+		if (mmx == null || mmx.charState is Die || (mmx.player.weapon is not RollingShield)) {
+			destroySelf();
+			return;
+		}
+		if (mmx.player.weapon.ammo == 0) {
 			destroySelf();
 		}
 		if (rollingShieldSound != null) {
 			rollingShieldSound.play();
 		}
-		changePos(character.getCenterPos());
+		changePos(mmx.getCenterPos());
 		if (ammoDecCooldown > 0) {
 			ammoDecCooldown += Global.spf;
 			if (ammoDecCooldown > 0.2) ammoDecCooldown = 0;
@@ -116,7 +129,7 @@ public class RollingShieldProjCharged : Projectile {
 	}
 
 	public override void onHitDamagable(IDamagable damagable) {
-		base.onHitDamagable(character);
+		base.onHitDamagable(mmx);
 		decAmmo(1);
 	}
 
@@ -128,7 +141,9 @@ public class RollingShieldProjCharged : Projectile {
 	}
 
 	public override void onDestroy() {
-		if (damager.owner.character != null) damager.owner.character.chargedRollingShieldProj = null;
+		if (damager.owner.character != null) {
+			mmx.chargedRollingShieldProj = null;
+		}
 		if (rollingShieldSound != null) {
 			rollingShieldSound.destroy();
 			rollingShieldSound = null;

@@ -17,6 +17,8 @@ public class XUPParry : Weapon {
 
 // If fixing parry code also fix kknuckle parry
 public class XUPParryStartState : CharState {
+	MegamanX mmx;
+
 	public XUPParryStartState() : base("unpo_parry_start", "", "", "") {
 	}
 
@@ -50,13 +52,13 @@ public class XUPParryStartState : CharState {
 				bool absorbThenShoot = false;
 				character.playSound("upParryAbsorb", sendRpc: true);
 				if (!player.input.isWeaponLeftOrRightHeld(player)) {
-					character.unpoAbsorbedProj = absorbedProj;
+					mmx.unpoAbsorbedProj = absorbedProj;
 					//character.player.weapons.Add(new AbsorbWeapon(absorbedProj));
 				} else {
 					shootProj = true;
 					absorbThenShoot = true;
 				}
-				character.refillUnpoBuster();
+				mmx.refillUnpoBuster();
 				character.changeState(new XUPParryProjState(absorbedProj, shootProj, absorbThenShoot), true);
 			}
 
@@ -74,13 +76,18 @@ public class XUPParryStartState : CharState {
 				chr.changeState(new ParriedState(), true);
 			}
 		}
-		character.refillUnpoBuster();
+		mmx.refillUnpoBuster();
 		character.playSound("upParry", sendRpc: true);
 		character.changeState(new XUPParryMeleeState(counterAttackTarget, damage), true);
 	}
 
 	public bool canParry() {
 		return character.frameIndex == 0;
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		mmx = character as MegamanX;
 	}
 
 	public override void onExit(CharState newState) {
@@ -278,15 +285,15 @@ public class XUPPunchState : CharState {
 	bool isGrounded;
 	public XUPPunchState(bool isGrounded) : base(isGrounded ? "unpo_punch" : "unpo_air_punch", "", "", "") {
 		this.isGrounded = isGrounded;
+		landSprite = "unpo_punch";
+		airMove = true;
+		useDashJumpSpeed = true;
 	}
 
 	public override void update() {
 		base.update();
 		character.move(new Point(slideVelX, 0));
 		slideVelX = Helpers.lerp(slideVelX, 0, Global.spf * 5);
-		if (!character.grounded) {
-			airCode();
-		}
 
 		if (character.isAnimOver() || (!isGrounded && character.grounded)) {
 			character.changeToIdleOrFall();
@@ -433,10 +440,9 @@ public class XReviveStart : CharState {
 	public float boxHeight;
 	public float boxOffset = 30;
 	const float boxSpeed = 90;
-	public string dialogLine1Content = "X, I gave you the power to grow";
-	public string dialogLine2Content = "stronger than you could have ever imagined.";
-	public string dialogLine3Content = "Now, activate your unlimited";
-	public string dialogLine4Content = "evolutionary potential!";
+	public string dialogLine1Content = "X, I want you want you to figth";
+	public string dialogLine2Content = "for the people of the future.";
+	public string dialogLine3Content = "You are the world one true hope.";
 	public int dialogType;
 	public float dialogTime;
 
@@ -447,13 +453,11 @@ public class XReviveStart : CharState {
 	int dialogIndex;
 	float subStateTime;
 	Anim drLightAnim;
+
+	MegamanX mmx;
+
 	public XReviveStart() : base("revive_start") {
 		invincible = true;
-		dialogType = Helpers.randomRange(0, 1);
-		if (dialogType == 1) {
-			dialogLine3Content = "You are the world's one true hope,";
-			dialogLine4Content = "X...";
-		}
 	}
 
 	public bool cancellable() {
@@ -547,8 +551,6 @@ public class XReviveStart : CharState {
 				dialogTime = 0;
 				if (dialogLine1.Length < dialogLine3Content.Length) {
 					dialogLine1 += dialogLine3Content[dialogIndex];
-				} else if (dialogLine2.Length < dialogLine4Content.Length) {
-					dialogLine2 += dialogLine4Content[dialogIndex - dialogLine3Content.Length];
 				} else {
 					state = 4;
 					return;
@@ -560,24 +562,28 @@ public class XReviveStart : CharState {
 			drLightAnim.frameIndex = 0;
 		}
 
-		if (stateTime > 2) character.unpoShotCount = Math.Max(character.unpoShotCount, 1);
-		if (stateTime > 3.75f) character.unpoShotCount = Math.Max(character.unpoShotCount, 2);
-		if (stateTime > 5.75f) character.unpoShotCount = Math.Max(character.unpoShotCount, 3);
+		if (stateTime > 2) mmx.unpoShotCount = Math.Max(mmx.unpoShotCount, 1);
+		if (stateTime > 3.75f) mmx.unpoShotCount = Math.Max(mmx.unpoShotCount, 2);
+		if (stateTime > 5.75f) mmx.unpoShotCount = Math.Max(mmx.unpoShotCount, 3);
 
 		if (stateTime > 7.75f) {
-			character.unpoShotCount = Math.Max(character.unpoShotCount, 4);
+			mmx.unpoShotCount = Math.Max(mmx.unpoShotCount, 4);
 			character.changeState(new XRevive(), true);
 		}
 	}
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		drLightAnim = new Anim(character.pos.addxy(30 * character.xDir, -15), "drlight", -character.xDir, player.getNextActorNetId(), false, sendRpc: true);
+		drLightAnim = new Anim(
+			character.pos.addxy(30 * character.xDir, -15),
+			"drlight", -character.xDir, player.getNextActorNetId(), false, sendRpc: true
+		);
 		drLightAnim.blink = true;
 		int busterIndex = player.weapons.FindIndex(w => w is Buster);
 		if (busterIndex >= 0) {
 			player.changeWeaponSlot(busterIndex);
 		}
+		mmx = character as MegamanX;
 	}
 
 	public override void onExit(CharState newState) {
@@ -589,6 +595,8 @@ public class XReviveStart : CharState {
 public class XRevive : CharState {
 	public float radius = 200;
 	XReviveAnim reviveAnim;
+	MegamanX mmx;
+
 	public XRevive() : base("revive_shake") {
 		invincible = true;
 	}
@@ -618,7 +626,7 @@ public class XRevive : CharState {
 		}
 
 		if (character.isAnimOver()) {
-			character.isHyperX = true;
+			mmx.isHyperX = true;
 			if (character.grounded) character.changeState(new Idle(), true);
 			else character.changeState(new Fall(), true);
 		}
@@ -636,12 +644,13 @@ public class XRevive : CharState {
 		base.onEnter(oldState);
 		reviveAnim = new XReviveAnim(character.getCenterPos(), player.getNextActorNetId(), sendRpc: true);
 		character.playSound("xRevive", sendRpc: true);
+		mmx = character as MegamanX;
 	}
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		character.useGravity = true;
-		character.isHyperX = true;
+		mmx.isHyperX = true;
 		Global.level.addGameObjectToGrid(character);
 		if (character != null) {
 			character.invulnTime = character.maxParryCooldown;

@@ -20,7 +20,7 @@ public class SpeedBurner : Weapon {
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-		if (chargeLevel != 3) {
+		if (chargeLevel < 3) {
 			if (!player.character.isUnderwater()) {
 				new SpeedBurnerProj(this, pos, xDir, player, netProjId);
 			} else {

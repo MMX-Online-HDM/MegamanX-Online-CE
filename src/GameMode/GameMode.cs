@@ -547,14 +547,17 @@ public class GameMode {
 
 		if (!Global.level.mainPlayer.isSpectator) {
 			renderHealthAndWeapons();
+
 			// Scrap
 			if (!Global.level.is1v1()) {
 				Global.sprites["hud_scrap"].drawToHUD(0, 4, 138);
 				Helpers.drawTextStd(TCat.HUD, "x" + Global.level.mainPlayer.scrap.ToString(), 17, 139, Alignment.Left, fontSize: 32u);
 			}
-			if (mainPlayer.character != null && mainPlayer.character.unpoShotCount > 0) {
+			MegamanX mmx = mainPlayer.character as MegamanX;
+			
+			if (mmx != null && mmx.unpoShotCount > 0) {
 				int x = 10, y = 156;
-				int count = mainPlayer.character.unpoShotCount;
+				int count = mmx.unpoShotCount;
 				if (count >= 1) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x, y);
 				if (count >= 2) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x + 13, y);
 				if (count >= 3) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x, y + 11);
@@ -1077,17 +1080,19 @@ public class GameMode {
 		var healthBaseSprite = spriteName;
 		Global.sprites[healthBaseSprite].drawToHUD(frameIndex, baseX, baseY);
 		baseY -= 16;
+		int barIndex = 0;
+		
+		MegamanX mmx = mainPlayer.character as MegamanX;
+		if (mmx != null && (mmx.isHyperX == true || player.character?.charState is XRevive)) {
+			if (mmx.unpoDamageMaxCooldown >= 2) barIndex = 1;
+			else if (mmx.unpoDamageMaxCooldown >= 1) barIndex = 3;
+			else if (mmx.unpoDamageMaxCooldown >= 0.5f) barIndex = 4;
+			else barIndex = 5;
+		}
+		
 		for (var i = 0; i < MathF.Ceiling(maxHealth); i++) {
 			// Draw HP
 			if (i < MathF.Ceiling(health)) {
-				int barIndex = 0;
-				bool isHyperX = player.character?.isHyperX == true || player.character?.charState is XRevive;
-				if (isHyperX) {
-					if (player.character.unpoDamageMaxCooldown >= 2) barIndex = 1;
-					else if (player.character.unpoDamageMaxCooldown >= 1) barIndex = 3;
-					else if (player.character.unpoDamageMaxCooldown >= 0.5f) barIndex = 4;
-					else barIndex = 5;
-				}
 				Global.sprites["hud_health_full"].drawToHUD(barIndex, baseX, baseY);
 			}
 			else if (i < MathInt.Ceiling(health) + damageSavings) {
@@ -1479,9 +1484,10 @@ public class GameMode {
 		var startX = getWeaponSlotStartX(ref iconW, ref iconH, ref width);
 		var startY = Global.screenH - 12;
 
-		if (mainPlayer.character != null && mainPlayer.character.hasFgMoveEquipped() && mainPlayer.character.canAffordFgMove()) {
+		MegamanX mmx = mainPlayer.character as MegamanX;
+		if (mmx != null && mmx.hasFgMoveEquipped() && mmx.canAffordFgMove()) {
 			int x = 10, y = 159;
-			Global.sprites["hud_weapon_icon"].drawToHUD(mainPlayer.character.hasHadoukenEquipped() ? 112 : 113, x, y);
+			Global.sprites["hud_weapon_icon"].drawToHUD(mmx.hasHadoukenEquipped() ? 112 : 113, x, y);
 			float cooldown = Helpers.progress(mainPlayer.fgMoveAmmo, 32f);
 			drawWeaponSlotCooldown(x, y, cooldown);
 		}

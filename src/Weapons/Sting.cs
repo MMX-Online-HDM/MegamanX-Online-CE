@@ -19,7 +19,7 @@ public class Sting : Weapon {
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-		if (chargeLevel != 3) {
+		if (chargeLevel < 3) {
 			new StingProj(this, pos, xDir, player, 0, netProjId);
 		} else {
 			player.character.stingChargeTime = 8;

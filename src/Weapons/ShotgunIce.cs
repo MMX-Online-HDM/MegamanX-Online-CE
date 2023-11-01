@@ -19,13 +19,13 @@ public class ShotgunIce : Weapon {
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-		if (chargeLevel != 3) {
+		if (chargeLevel < 3) {
 			new ShotgunIceProj(this, pos, xDir, player, 0, netProjId);
-		} else {
+		} else if (player?.character is MegamanX mmx) {
 			pos = pos.addxy(xDir * 25, 0);
-			pos.y = player.character.pos.y;
+			pos.y = mmx.pos.y;
 
-			player.character.shotgunIceChargeTime = 1.5f;
+			mmx.shotgunIceChargeTime = 1.5f;
 
 			/*
 			var rect = new Rect(pos.x - 20, pos.y - 16, pos.x + 20, pos.y);
@@ -136,10 +136,15 @@ public class ShotgunIceProjSled : Projectile {
 	int heightIncreaseDir = 0;
 	float nonRideTime = 0;
 	public bool ridden;
-	public ShotgunIceProjSled(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId) : base(weapon, pos, xDir, 0, 2, player, "shotgun_ice_charge", 0, 1, netProjId, player.ownedByLocalPlayer) {
+	public ShotgunIceProjSled(
+		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId
+	) : base(
+		weapon, pos, xDir, 0, 2, player, "shotgun_ice_charge", 0, 1, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.ShotgunIceSled;
 		fadeSound = "iceBreak";
 		shouldShieldBlock = false;
+		isPlatform = true;
 		//this.collider.wallOnly = true;
 	}
 
@@ -147,14 +152,15 @@ public class ShotgunIceProjSled : Projectile {
 		if (time > 3) {
 			float increaseFactor = 1;
 			vel.x += MathF.Sign(vel.x) * Global.spf * 100 * increaseFactor;
-			if (MathF.Abs(vel.x) > 200) damager.damage = 5;
-			if (MathF.Abs(vel.x) > 225) damager.damage = 6;
-			if (MathF.Abs(vel.x) > 250) damager.damage = 7;
-			if (MathF.Abs(vel.x) > 275) damager.damage = 8;
-			if (MathF.Abs(vel.x) > 300) damager.damage = 9;
-			if (MathF.Abs(vel.x) > 325) damager.damage = 10;
-			if (MathF.Abs(vel.x) > 350) damager.damage = 11;
-			if (MathF.Abs(vel.x) > 375) damager.damage = 12;
+
+			float absVelX = MathF.Abs(vel.x);
+			if (absVelX > 200) {
+				damager.damage = 5 + MathInt.Floor((absVelX - 200f) / 25f);
+
+				if (damager.damage > 12) {
+					damager.damage = 12;
+				}
+			}
 		}
 	}
 
@@ -195,24 +201,9 @@ public class ShotgunIceProjSled : Projectile {
 				}
 			}
 
-			var hit = Global.level.checkCollisionActor(this, Math.Sign(vel.x), 0);
-			if (hit != null && hit.gameObject is Wall && hit.hitData.normal != null && MathF.Abs(hit.hitData.normal.Value.x) > 0.5f) {
-				destroySelf();
-				return;
+			if (grounded) {
+				increaseVel();
 			}
-		}
-
-		var hitAbove = Global.level.checkCollisionActor(this, 0, -2);
-		if (hitAbove != null && hitAbove.gameObject is Character chr && chr.player == damager.owner && chr.charState is Fall) {
-			character = chr;
-			character.iceSled = this;
-		}
-
-		if (character != null) {
-			character.changePos(pos.addxy(0, -16));
-		}
-		if (character?.iceSled == null) {
-			character = null;
 		}
 
 		if (character == null) {
@@ -226,10 +217,15 @@ public class ShotgunIceProjSled : Projectile {
 		ridden = (character != null);
 	}
 
-	public override void onDestroy() {
-		if (Global.level.gameObjects.Contains(character)) {
-			character.iceSled = null;
+	public override void onHitWall(CollideData other) {
+		base.onHitWall(other);
+		if (other.isSideWallHit()) {
+			destroySelf();
+			return;
 		}
+	}
+
+	public override void onDestroy() {
 		breakFreeze(owner);
 	}
 }

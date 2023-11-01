@@ -362,8 +362,8 @@ public class RPCDecShieldAmmo : RPC {
 
 		var player = Global.level.getPlayerById(playerId);
 
-		if (player?.character?.chargedRollingShieldProj != null) {
-			player.character.chargedRollingShieldProj.decAmmo(decAmmoAmount);
+		if ((player?.character as MegamanX)?.chargedRollingShieldProj != null) {
+			(player.character as MegamanX).chargedRollingShieldProj.decAmmo(decAmmoAmount);
 		}
 	}
 }
@@ -383,7 +383,9 @@ public class RPCShoot : RPC {
 		int weaponIndex = (int)arguments[9];
 
 		var player = Global.level.getPlayerById(playerId);
-		player?.character?.shootRpc(new Point(xPos, yPos), weaponIndex, xDir, chargeLevel, projNetId, false);
+		(player?.character as MegamanX)?.shootRpc(
+			new Point(xPos, yPos), weaponIndex, xDir, chargeLevel, projNetId, false
+		);
 	}
 }
 
@@ -519,19 +521,19 @@ public class RPCPlayerToggle : RPC {
 		} else if (toggleId == RPCToggleType.StopCrystalize) {
 			player.character?.crystalizeEnd();
 		} else if (toggleId == RPCToggleType.StrikeChainReversed) {
-			player.character?.strikeChainProj?.reverseDir();
+			(player?.character as MegamanX)?.strikeChainProj?.reverseDir();
 		} else if (toggleId == RPCToggleType.StockCharge) {
 			player.character.stockedCharge = true;
 		} else if (toggleId == RPCToggleType.UnstockCharge) {
 			player.character.stockedCharge = false;
 		} else if (toggleId == RPCToggleType.StartRaySplasher) {
-			player.character.isShootingRaySplasher = true;
+			(player?.character as MegamanX).isShootingRaySplasher = true;
 		} else if (toggleId == RPCToggleType.StopRaySplasher) {
-			player.character.isShootingRaySplasher = false;
+			(player?.character as MegamanX).isShootingRaySplasher = false;
 		} else if (toggleId == RPCToggleType.StartBarrier) {
-			player.character.barrierTime = player.character.barrierDuration;
+			(player?.character as MegamanX).barrierTime = (player?.character as MegamanX).barrierDuration;
 		} else if (toggleId == RPCToggleType.StopBarrier) {
-			player.character.barrierTime = 0;
+			(player?.character as MegamanX).barrierTime = 0;
 		} else if (toggleId == RPCToggleType.StockSaber) {
 			player.character.stockedXSaber = true;
 		} else if (toggleId == RPCToggleType.UnstockSaber) {
@@ -849,7 +851,7 @@ public class RPCJoinLateRequest : RPC {
 				player.charXPos = player.character.pos.x;
 				player.charYPos = player.character.pos.y;
 				player.charXDir = player.character.xDir;
-				player.charRollingShieldNetId = player.character.chargedRollingShieldProj?.netId;
+				player.charRollingShieldNetId = (player?.character as MegamanX)?.chargedRollingShieldProj?.netId;
 			}
 		}
 

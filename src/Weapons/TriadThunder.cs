@@ -19,12 +19,12 @@ public class TriadThunder : Weapon {
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
-		if (chargeLevel != 3) return 3;
+		if (chargeLevel < 3) return 3;
 		return 8;
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-		if (chargeLevel != 3) {
+		if (chargeLevel < 3) {
 			player.setNextActorNetId(netProjId);
 			var triadThunder = new TriadThunderProj(this, pos, xDir, player.input.isHeld(Control.Down, player) ? -1 : 1, player, player.getNextActorNetId(true));
 			// Clockwise from top

@@ -19,12 +19,12 @@ public class SpinWheel : Weapon {
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
-		if (chargeLevel != 3) return 2;
+		if (chargeLevel < 3) return 2;
 		return 8;
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-		if (chargeLevel != 3) {
+		if (chargeLevel < 3) {
 			new SpinWheelProj(this, pos, xDir, player, netProjId);
 		} else {
 			new SpinWheelProjChargedStart(this, pos, xDir, player, netProjId);

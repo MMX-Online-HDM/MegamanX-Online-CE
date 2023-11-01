@@ -47,7 +47,9 @@ public class Buster : Weapon {
 				continue;
 			}
 		}
-		if (player.character?.isHyperX == true) return true;
+		if ((player.character as MegamanX)?.isHyperX == true) {
+			return true;
+		}
 		return lemonsOnField.Count < 2;
 	}
 
@@ -89,7 +91,9 @@ public class Buster : Weapon {
 			chargeLevel = 3;
 		}
 		bool hasUltArmor = player.character.hasUltimateArmorBS.getValue();
-		if (player.character?.isHyperX == true && chargeLevel > 0) {
+		bool isHyperX = ((player.character as MegamanX)?.isHyperX == true);
+
+		if (isHyperX && chargeLevel > 0) {
 			new BusterUnpoProj(this, pos, xDir, player, netProjId);
 			new Anim(pos, "buster_unpo_muzzle", xDir, null, true);
 			shootSound = "buster2";
@@ -101,7 +105,7 @@ public class Buster : Weapon {
 			new Buster2Proj(this, pos, xDir, player, netProjId);
 		} else if (chargeLevel == 2) {
 			new Buster3Proj(this, pos, xDir, 0, player, netProjId);
-		} else if (chargeLevel == 3) {
+		} else if (chargeLevel >= 3) {
 			if (hasUltArmor) {
 				if (player.hasArmArmor(2)) {
 					player.character.changeState(new X2ChargeShot(2), true);
@@ -361,12 +365,13 @@ public class X2ChargeShot : CharState {
 
 	public X2ChargeShot(int type) : base("x2_shot", "", "", "") {
 		this.type = type;
+		useDashJumpSpeed = true;
+		airMove = true;
 	}
 
 	public override void update() {
 		base.update();
 		if (!character.grounded) {
-			airCode();
 			if (player.input.isHeld(Control.Dash, player)) {
 				character.isDashing = true;
 			}
@@ -471,6 +476,7 @@ public class X3ChargeShot : CharState {
 	public HyperBuster hyperBusterWeapon;
 	public X3ChargeShot(HyperBuster hyperBusterWeapon) : base("x3_shot", "", "", "") {
 		this.hyperBusterWeapon = hyperBusterWeapon;
+		airMove = true;
 	}
 
 	public override void update() {
@@ -478,7 +484,6 @@ public class X3ChargeShot : CharState {
 		if (!character.ownedByLocalPlayer) return;
 
 		if (!character.grounded) {
-			airCode();
 			if (player.input.isHeld(Control.Dash, player)) {
 				character.isDashing = true;
 			}

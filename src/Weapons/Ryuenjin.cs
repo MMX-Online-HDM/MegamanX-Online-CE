@@ -130,7 +130,7 @@ public class Ryuenjin : CharState {
 			if (type == RyuenjinType.EBlade) speed = 120;
 			character.move(new Point(character.xDir * speed, 0));
 			if (type == RyuenjinType.Shoryuken && jumpedYet) {
-				character.vel.y += Physics.Gravity * Global.spf * 0.5f;
+				character.vel.y += Global.speedMul * character.getGravity() * 0.5f;
 			}
 		}
 

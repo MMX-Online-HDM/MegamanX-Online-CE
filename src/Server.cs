@@ -90,9 +90,17 @@ public class Server {
 
 	public Server() { }
 
-	public Server(decimal gameVersion, Region region, string name, string level, string shortLevelName, string gameMode, int playTo, int botCount, int maxPlayers,
-		int timeLimit, bool fixedCamera, bool hidden, NetcodeModel netcodeModel, int netcodeModelPing, bool isLAN, bool mirrored, bool useLoadout,
-		string gameChecksum, string customMapChecksum, string customMapUrl, ExtraCpuCharData extra1v1CpuCharData, CustomMatchSettings customMatchSettings, bool disableHtSt, bool disableVehicles) {
+	public Server(
+		decimal gameVersion, Region region,
+		string name, string level, string shortLevelName,
+		string gameMode, int playTo, int botCount, int maxPlayers,
+		int timeLimit, bool fixedCamera, bool hidden,
+		NetcodeModel netcodeModel, int netcodeModelPing, bool isLAN,
+		bool mirrored, bool useLoadout,
+		string gameChecksum, string customMapChecksum, string customMapUrl,
+		ExtraCpuCharData extra1v1CpuCharData, CustomMatchSettings customMatchSettings,
+		bool disableHtSt, bool disableVehicles
+	) {
 		this.gameVersion = gameVersion;
 		this.region = region;
 		this.name = name;
@@ -184,7 +192,11 @@ public class Server {
 		return playerName;
 	}
 
-	public ServerPlayer addPlayer(string name, ServerPlayer serverPlayer, NetConnection connection, bool isBot, int? overrideCharNum = null, int? overrideAlliance = null) {
+	public ServerPlayer addPlayer(
+		string name, ServerPlayer serverPlayer,
+		NetConnection connection, bool isBot,
+		int? overrideCharNum = null, int? overrideAlliance = null
+	) {
 		if (isBot) {
 			serverPlayer = serverPlayer.clone();
 			serverPlayer.isHost = false;
@@ -214,7 +226,9 @@ public class Server {
 						} else if (redScore < blueScore) {
 							serverPlayer.alliance = GameMode.redAlliance;
 						} else {
-							serverPlayer.alliance = Helpers.randomRange(0, 1) == 0 ? GameMode.blueAlliance : GameMode.redAlliance;
+							serverPlayer.alliance = (
+								Helpers.randomRange(0, 1) == 0 ? GameMode.blueAlliance : GameMode.redAlliance
+							);
 						}
 					}
 				}
@@ -240,7 +254,9 @@ public class Server {
 			player.ping = (int)MathF.Round(player.connection.AverageRoundtripTime * 1000);
 		}
 
-		if (!hidden && GameMode.isStringTeamMode(gameMode) && gameMode != GameMode.TeamElimination && level != "training") {
+		if (!hidden && GameMode.isStringTeamMode(gameMode) &&
+			gameMode != GameMode.TeamElimination && level != "training"
+		) {
 			GameMode.getAllianceCounts(players, out int redCount, out int blueCount);
 			bool tooManyReds = redCount > blueCount + 1;
 			bool tooManyBlues = blueCount > redCount + 1;
@@ -262,11 +278,15 @@ public class Server {
 				}
 			} else {
 				if (tooManyReds) {
-					playerToAutobalance = selectPlayerToAutobalance(GameMode.redAlliance, prioritizedAutobalancePlayer);
+					playerToAutobalance = (
+						selectPlayerToAutobalance(GameMode.redAlliance, prioritizedAutobalancePlayer)
+					);
 					if (!playerToAutobalance.isBot) playerToAutobalance.alreadyAutobalanced = true;
 					playerToAutobalance.autobalanceAlliance = GameMode.blueAlliance;
 				} else if (tooManyBlues) {
-					playerToAutobalance = selectPlayerToAutobalance(GameMode.blueAlliance, prioritizedAutobalancePlayer);
+					playerToAutobalance = (
+						selectPlayerToAutobalance(GameMode.blueAlliance, prioritizedAutobalancePlayer)
+					);
 					if (!playerToAutobalance.isBot) playerToAutobalance.alreadyAutobalanced = true;
 					playerToAutobalance.autobalanceAlliance = GameMode.redAlliance;
 				}
@@ -278,7 +298,9 @@ public class Server {
 		RPC.periodicServerSync.sendFromServer(s_server, bytes);
 	}
 
-	public ServerPlayer selectPlayerToAutobalance(int allianceToChooseFrom, ServerPlayer prioritizedAutobalancePlayer) {
+	public ServerPlayer selectPlayerToAutobalance(
+		int allianceToChooseFrom, ServerPlayer prioritizedAutobalancePlayer
+	) {
 		var pool = players.FindAll(p => p.alliance == allianceToChooseFrom && !p.isSpectator);
 
 		// Bots take first priority, even over the prioritized autobalance player
@@ -382,8 +404,8 @@ public class Server {
 		//s_server.MessageReceivedEvent.WaitOne();
 		NetIncomingMessage im;
 
-		Stopwatch stopWatch = new Stopwatch();
-		stopWatch.Start();
+		//Stopwatch stopWatch = new Stopwatch();
+		//stopWatch.Start();
 
 		while ((im = s_server.ReadMessage()) != null) {
 			var all = s_server.Connections; // get copy
@@ -392,7 +414,10 @@ public class Server {
 			if (im.MessageType == NetIncomingMessageType.StatusChanged) {
 				NetConnectionStatus status = (NetConnectionStatus)im.ReadByte();
 				string reason = im.ReadString();
-				Helpers.debugLog(NetUtility.ToHexString(im.SenderConnection.RemoteUniqueIdentifier) + " " + status + ": " + reason);
+				Helpers.debugLog(
+					NetUtility.ToHexString(im.SenderConnection.RemoteUniqueIdentifier) +
+					" " + status + ": " + reason
+				);
 				if (status == NetConnectionStatus.Connected) {
 					onConnect(im);
 				} else if (status == NetConnectionStatus.Disconnected) {
@@ -430,7 +455,7 @@ public class Server {
 			s_server.Recycle(im);
 		}
 
-		stopWatch.Stop();
+		//stopWatch.Stop();
 		//Helpers.logDebug(stopWatch.Elapsed.TotalMilliseconds);
 
 		s_server.FlushSendQueue();
@@ -487,7 +512,9 @@ public class Server {
 				var cpuData = extraCpuCharData.cpuDatas.ElementAtOrDefault(i);
 				int? overrideCharNum = null;
 				if (cpuData != null && !cpuData.isRandom) overrideCharNum = cpuData?.charNum;
-				int? overrideAlliance = GameMode.isStringTeamMode(gameMode) && cpuData?.alliance >= 0 ? cpuData?.alliance : null;
+				int? overrideAlliance = (
+					GameMode.isStringTeamMode(gameMode) && cpuData?.alliance >= 0 ? cpuData?.alliance : null
+				);
 				addPlayer("BOT", playerContract, im.SenderConnection, true, overrideCharNum, overrideAlliance);
 			}
 		}
@@ -554,7 +581,7 @@ public class Server {
 				// Host promotion: find the first non-bot player and promote them to host
 				host = players.FirstOrDefault(p => !p.isBot);
 				if (host != null) {
-					// Host found: send this message to clients and make all bot share the host's connection
+					// Host found: send this message to clients and make all bot share the host's connection.
 					host.isHost = true;
 					foreach (var player in players) {
 						if (player.isBot) {
@@ -601,7 +628,9 @@ public class Server {
 			if (player != null) {
 				NetOutgoingMessage om = s_server.CreateMessage();
 				om.Write((byte)RPC.templates.IndexOf(RPC.reportPlayerResponse));
-				var reportedPlayer = new ReportedPlayer(player.name, player.connection.RemoteEndPoint?.Address?.ToString(), player.deviceId);
+				var reportedPlayer = new ReportedPlayer(
+					player.name, player.connection.RemoteEndPoint?.Address?.ToString(), player.deviceId
+				);
 				string reportedPlayerJson = JsonConvert.SerializeObject(reportedPlayer);
 				om.Write(reportedPlayerJson);
 				s_server.SendMessage(om, im.SenderConnection, rpcTemplate.netDeliveryMethod, 0);
@@ -646,7 +675,9 @@ public class Server {
 				int? preferredAlliance = null;
 
 				if (team == 0 || team == 1) preferredAlliance = team;
-				var serverPlayer = new ServerPlayer("BOT", 0, false, charNum, preferredAlliance, "", im.SenderConnection, host?.startPing);
+				var serverPlayer = new ServerPlayer(
+					"BOT", 0, false, charNum, preferredAlliance, "", im.SenderConnection, host?.startPing
+				);
 				addPlayer("BOT", serverPlayer, im.SenderConnection, true, overrideCharNum: charNum);
 				periodicPing(s_server);
 			}
@@ -672,7 +703,9 @@ public class Server {
 		}
 	}
 
-	public void processClientMessage(NetIncomingMessage im, RPC rpcTemplate, byte rpcIndexByte, List<NetConnection> all) {
+	public void processClientMessage(
+		NetIncomingMessage im, RPC rpcTemplate, byte rpcIndexByte, List<NetConnection> all
+	) {
 		NetOutgoingMessage om = s_server.CreateMessage();
 
 		if (!rpcTemplate.isString) {
@@ -703,12 +736,18 @@ public class Server {
 				if (hasOwnerId != 0 && weaponIndex != null && projId != null) {
 					var killer = players.FirstOrDefault(p => p.id == killerId);
 					var assister = players.FirstOrDefault(p => p.id == assisterId);
-					if ((killer != null && !killer.isBot) || (assister != null && !assister.isBot)) addWeaponKillStat(projId, weaponIndex);
+					if ((killer != null && !killer.isBot) ||
+						(assister != null && !assister.isBot)
+					) {
+						addWeaponKillStat(projId, weaponIndex);
+					}
 				}
 			}
 
 			// Team score update
-			if ((gameMode == GameMode.CTF || gameMode == GameMode.TeamDeathmatch) && rpcIndexByte == RPC.templates.IndexOf(RPC.syncTeamScores)) {
+			if ((gameMode == GameMode.CTF || gameMode == GameMode.TeamDeathmatch) &&
+				rpcIndexByte == RPC.templates.IndexOf(RPC.syncTeamScores)
+			) {
 				redScore = bytes[0];
 				blueScore = bytes[1];
 			}
@@ -726,7 +765,11 @@ public class Server {
 				}
 			}
 
-			//Helpers.logDebug(NetUtility.ToHexString(im.SenderConnection.RemoteUniqueIdentifier) + " broadcasted: " + message);
+			/*
+			Helpers.logDebug(
+				NetUtility.ToHexString(im.SenderConnection.RemoteUniqueIdentifier) + " broadcasted: " + message)
+			);
+			*/
 		}
 
 		if (rpcTemplate.toHostOnly) s_server.SendMessage(om, host.connection, rpcTemplate.netDeliveryMethod, 0);

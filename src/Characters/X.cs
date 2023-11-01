@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MMXOnline;
 
-public partial class Character {
+public partial class MegamanX : Character {
 	public float shotgunIceChargeTime = 0;
 	public float shotgunIceChargeCooldown = 0;
 	public int shotgunIceChargeMod = 0;
@@ -20,11 +20,9 @@ public partial class Character {
 	public const int bootsArmorCost = 2;
 
 	public RollingShieldProjCharged chargedRollingShieldProj;
-	public ShotgunIceProjSled iceSled;
 	public List<BubbleSplashProjCharged> chargedBubbles = new List<BubbleSplashProjCharged>();
 	public StrikeChainProj strikeChainProj;
 	public GravityWellProjCharged chargedGravityWell;
-	public PlasmaGunAltProj plasmaGunAltProj;
 	public SpinningBladeProjCharged chargedSpinningBlade; 
 	public FrostShieldProjCharged chargedFrostShield;
 	public TunnelFangProjCharged chargedTunnelFang;
@@ -40,8 +38,8 @@ public partial class Character {
 	//public ShaderWrapper xPaletteShader;
 
 	public float streamCooldown;
-	float noDamageTime;
-	float rechargeHealthTime;
+	public float noDamageTime;
+	public float rechargeHealthTime;
 	public float scannerCooldown;
 	float UPDamageCooldown;
 	public float unpoDamageMaxCooldown = 2;
@@ -54,32 +52,81 @@ public partial class Character {
 	public float upPunchCooldown;
 	public Projectile unpoAbsorbedProj;
 
+	float hyperChargeAnimTime;
+	float hyperChargeAnimTime2 = 0.125f;
+	const float maxHyperChargeAnimTime = 0.25f;
+
+	public MegamanX(
+		Player player, float x, float y, int xDir,
+		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
+		bool isWarpIn = true
+	) : base(
+		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn
+	) {
+
+	}
+
 	public bool canShootSpecialBuster() {
-		if (isHyperX && (charState is Dash || charState is AirDash)) return false;
-		return player.isSpecialBuster() && !Buster.isNormalBuster(player.weapon) && !isInvisibleBS.getValue() && player.armorFlag == 0 && streamCooldown == 0;
+		if (isHyperX && (charState is Dash || charState is AirDash)) {
+			return false;
+		}
+		return isSpecialBuster() &&
+			!Buster.isNormalBuster(player.weapon) &&
+			!isInvisibleBS.getValue() &&
+			player.armorFlag == 0 &&
+			streamCooldown == 0;
 	}
 
 	public bool canShootSpecialBusterOnBuster() {
-		return player.isSpecialBuster() && !isInvisibleBS.getValue() && player.armorFlag == 0;
+		return isSpecialBuster() && !isInvisibleBS.getValue() && player.armorFlag == 0;
 	}
 
 	public void refillUnpoBuster() {
 		if (player.weapons.Count > 0) player.weapons[0].ammo = 32;
 	}
 
-	public void updateX() {
+	public override void update() {
+		fgMotion = false;
+		base.update();
+
+		Helpers.decrementTime(ref barrierCooldown);
+
+		if (cStingPaletteTime > 5) {
+			cStingPaletteTime = 0;
+			cStingPaletteIndex++;
+		}
+		cStingPaletteTime++;
+
+		if (headbuttAirTime > 0) {
+			headbuttAirTime += Global.spf;
+		}
+
+		if (!ownedByLocalPlayer) {
+			Helpers.decrementTime(ref barrierTime);
+			return;
+		}
+		updateBarrier();
+
 		if (hasFgMoveEquipped()) {
 			player.fgMoveAmmo += Global.spf;
 			if (player.fgMoveAmmo > 32) player.fgMoveAmmo = 32;
 		}
+
+		if (stingChargeTime > 0) {
+			hadoukenCooldownTime = maxHadoukenCooldownTime;
+			shoryukenCooldownTime = maxShoryukenCooldownTime;
+		}
+
 		Helpers.decrementTime(ref xSaberCooldown);
 		Helpers.decrementTime(ref scannerCooldown);
 		Helpers.decrementTime(ref hadoukenCooldownTime);
 		Helpers.decrementTime(ref shoryukenCooldownTime);
 		Helpers.decrementTime(ref streamCooldown);
+
 		if (player.weapon.ammo >= player.weapon.maxAmmo) {
 			weaponHealAmount = 0;
 		}
+
 		if (weaponHealAmount > 0 && player.health > 0) {
 			weaponHealTime += Global.spf;
 			if (weaponHealTime > 0.05) {
@@ -115,7 +162,11 @@ public partial class Character {
 
 		Point inputDir = player.input.getInputDir(player);
 
-		if (!isHyperX && canShoot() && charState is not Die && charState is not Hurt && charState?.canShoot() == true) {
+		if (!isHyperX && canShoot() &&
+			charState is not Die &&
+			charState is not Hurt &&
+			charState?.canShoot() == true
+		) {
 			if (Global.level.is1v1() && player.weapons.Count == 10) {
 				if (player.weaponSlot != 9) {
 					player.weapons[9].update();
@@ -132,14 +183,24 @@ public partial class Character {
 				}
 			}
 
-			if (Options.main.gigaCrushSpecial && player.input.isPressed(Control.Special1, player) && player.input.isHeld(Control.Down, player) && player.weapons.Any(w => w is GigaCrush)) {
+			if (Options.main.gigaCrushSpecial &&
+				player.input.isPressed(Control.Special1, player) &&
+				player.input.isHeld(Control.Down, player) &&
+				player.weapons.Any(w => w is GigaCrush)
+			) {
 				int oldSlot = player.weaponSlot;
 				int gCrushSlot = player.weapons.FindIndex(w => w is GigaCrush);
 				player.changeWeaponSlot(gCrushSlot);
 				shoot(false);
 				player.weaponSlot = oldSlot;
 				player.changeWeaponSlot(oldSlot);
-			} else if (Options.main.novaStrikeSpecial && player.input.isPressed(Control.Special1, player) && player.weapons.Any(w => w is NovaStrike) && !inputDir.isZero()) {
+			}
+			else if (
+				Options.main.novaStrikeSpecial &&
+				player.input.isPressed(Control.Special1, player) &&
+				player.weapons.Any(w => w is NovaStrike) &&
+				!inputDir.isZero()
+			) {
 				int oldSlot = player.weaponSlot;
 				int novaStrikeSlot = player.weapons.FindIndex(w => w is NovaStrike);
 				player.changeWeaponSlot(novaStrikeSlot);
@@ -153,27 +214,38 @@ public partial class Character {
 		// Fast Hyper Activation.
 		quickArmorUpgrade();
 
-		if (charState is not Die && player.input.isPressed(Control.Special1, player) && player.hasAllX3Armor() && !player.hasGoldenArmor() && !player.hasUltimateArmor() && player.hasAnyChip()) {
+		if (charState is not Die &&
+			player.input.isPressed(Control.Special1, player) &&
+			player.hasAllX3Armor() && !player.hasGoldenArmor()
+			&& player.hasUltimateArmor()
+		) {
 			if (player.input.isHeld(Control.Down, player)) {
 				player.setChipNum(0, false);
-				Global.level.gameMode.setHUDErrorMessage(player, "Equipped foot chip.", playSound: false, resetCooldown: true);
+				Global.level.gameMode.setHUDErrorMessage(
+					player, "Equipped foot chip.", playSound: false, resetCooldown: true
+				);
 			} else if (player.input.isHeld(Control.Up, player)) {
 				player.setChipNum(2, false);
-				Global.level.gameMode.setHUDErrorMessage(player, "Equipped head chip.", playSound: false, resetCooldown: true);
+				Global.level.gameMode.setHUDErrorMessage(
+					player, "Equipped head chip.", playSound: false, resetCooldown: true
+				);
 			} else if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
 				player.setChipNum(3, false);
-				Global.level.gameMode.setHUDErrorMessage(player, "Equipped arm chip.", playSound: false, resetCooldown: true);
+				Global.level.gameMode.setHUDErrorMessage(
+					player, "Equipped arm chip.", playSound: false, resetCooldown: true
+				);
 			} else {
 				player.setChipNum(1, false);
-				Global.level.gameMode.setHUDErrorMessage(player, "Equipped body chip.", playSound: false, resetCooldown: true);
+				Global.level.gameMode.setHUDErrorMessage(
+					player, "Equipped body chip.", playSound: false, resetCooldown: true
+				);
 			}
 		}
 
 		Helpers.decrementTime(ref upPunchCooldown);
 
 		if (isHyperX && !isInvulnerableAttack()) {
-			if (player.input.isPressed(Control.Shoot, player) &&
-				(charState is Idle || charState is Run || charState is Fall || charState is Jump || charState is Dash)) {
+			if (charState.attackCtrl && player.input.isPressed(Control.Shoot, player)) {
 				if (unpoShotCount <= 0) {
 					upPunchCooldown = 0.5f;
 					changeState(new XUPPunchState(grounded), true);
@@ -203,8 +275,13 @@ public partial class Character {
 			}
 		}
 
-		if (player.isSpecialSaber() && canShoot() && canChangeWeapons() && player.armorFlag == 0 && player.input.isPressed(Control.Special1, player) && !isAttacking() && !isInvisible() && !charState.isGrabbing && !isHyperX &&
-			(charState is Idle || charState is Run || charState is Fall || charState is Jump || charState is Dash)) {
+		if (charState.attackCtrl &&
+			isSpecialSaber() && canShoot() &&
+			canChangeWeapons() && player.armorFlag == 0 &&
+			player.input.isPressed(Control.Special1, player) &&
+			!isAttacking() && !isInvisible() &&
+			!charState.isGrabbing && !isHyperX
+		) {
 			if (xSaberCooldown == 0) {
 				xSaberCooldown = 1f;
 				changeState(new X6SaberState(grounded), true);
@@ -228,7 +305,7 @@ public partial class Character {
 			}
 		}
 
-		if (player.hasHelmetArmor(2) && scannerCooldown == 0 && canScan() && inputDir.isZero()) {
+		if (charState.attackCtrl && player.hasHelmetArmor(2) && scannerCooldown == 0 && canScan()) {
 			Point scanPos;
 			Point? headPos = getHeadPos();
 			if (headPos != null) {
@@ -236,8 +313,14 @@ public partial class Character {
 			} else {
 				scanPos = getCenterPos().addxy(0, -10);
 			}
-			CollideData hit = Global.level.raycast(scanPos, scanPos.addxy(getShootXDir() * 150, 0), new List<Type>() { typeof(Actor) });
-			if (hit?.gameObject is Character chr && chr.player.alliance != player.alliance && !chr.player.scanned && !chr.isStealthy(player.alliance)) {
+			CollideData hit = Global.level.raycast(
+				scanPos, scanPos.addxy(getShootXDir() * 150, 0), new List<Type>() { typeof(Actor) }
+			);
+			if (hit?.gameObject is Character chr &&
+				chr.player.alliance != player.alliance &&
+				!chr.player.scanned &&
+				!chr.isStealthy(player.alliance)
+			) {
 				new ItemTracer().getProjectile(scanPos, getShootXDir(), player, 0, player.getNextActorNetId());
 			} else if (player.input.isPressed(Control.Special1, player)) {
 				new ItemTracer().getProjectile(scanPos, getShootXDir(), player, 0, player.getNextActorNetId());
@@ -304,10 +387,12 @@ public partial class Character {
 				offCooldown = oldWeapon.shootTime < oldWeapon.rateOfFire * 0.5f && shootTime == 0;
 			}
 
-			bool shootCondition =
+			bool shootCondition = (
 				shootPressed ||
-				(framesSinceLastShootPressed < Global.normalizeFrames(6) && framesSinceLastShootReleased > Global.normalizeFrames(30)) ||
-				(shootHeld && player.weapon.isStream && chargeTime < charge1Time);
+				(framesSinceLastShootPressed < Global.normalizeFrames(6) &&
+				framesSinceLastShootReleased > Global.normalizeFrames(30)) ||
+				(shootHeld && player.weapon.isStream && chargeTime < charge1Time)
+			);
 			if (!fgMotion && offCooldown && shootCondition) {
 				shoot(false);
 			}
@@ -317,7 +402,11 @@ public partial class Character {
 			} else {
 				unpoChargeControls();
 			}
-		} else if (charState is Dash || charState is AirDash || charState is XUPParryMeleeState || charState is XUPParryProjState || charState is XUPParryStartState || charState is XUPGrabState) {
+		} else if (
+			charState is Dash || charState is AirDash ||
+			charState is XUPParryMeleeState || charState is XUPParryProjState ||
+			charState is XUPParryStartState || charState is XUPGrabState
+		) {
 			if (isHyperX) {
 				unpoChargeControls();
 			}
@@ -348,7 +437,11 @@ public partial class Character {
 			shotgunIceChargeTime -= Global.spf;
 			var busterPos = getShootPos().addxy(xDir * 10, 0);
 			if (shotgunIceChargeCooldown == 0) {
-				new ShotgunIceProjCharged(player.weapon, busterPos, xDir, player, shotgunIceChargeMod % 2, false, player.getNextActorNetId(), rpc: true);
+				new ShotgunIceProjCharged(
+					player.weapon, busterPos, xDir,
+					player, shotgunIceChargeMod % 2, false,
+					player.getNextActorNetId(), rpc: true
+				);
 				shotgunIceChargeMod++;
 			}
 			shotgunIceChargeCooldown += Global.spf;
@@ -375,7 +468,11 @@ public partial class Character {
 				if (raySplasherCooldown2 == 0) {
 					player.weapon.addAmmo(-0.15f, player);
 					raySplasherCooldown2 = 0.03f;
-					new RaySplasherProj(player.weapon, busterPos, getShootXDir(), raySplasherMod % 3, (raySplasherMod / 3) % 3, false, player, player.getNextActorNetId(), rpc: true);
+					new RaySplasherProj(
+						player.weapon, busterPos,
+						getShootXDir(), raySplasherMod % 3, (raySplasherMod / 3) % 3,
+						false, player, player.getNextActorNetId(), rpc: true
+					);
 					raySplasherMod++;
 					if (raySplasherMod % 3 == 0) {
 						if (raySplasherMod >= 21) {
@@ -393,17 +490,73 @@ public partial class Character {
 				}
 			}
 		}
+	}
 
-		if (iceSled != null && !Global.level.gameObjects.Contains(iceSled)) {
-			iceSled = null;
+	public override bool normalCtrl() {
+		if (!grounded) {
+			if (player.dashPressed(out string dashControl) && canAirDash() && canDash()) {
+				CharState dashState;
+				if (player.input.isHeld(Control.Up, player) && player.hasBootsArmor(3)) {
+					dashState = new UpDash(Control.Dash);
+				} else {
+					dashState = new AirDash(dashControl);
+				}
+				if (!isDashing) {
+					changeState(dashState);
+					return true;
+				} else if (player.hasChip(0)) {
+					changeState(dashState);
+					return true;
+				}
+			}
+			if (player.input.isPressed(Control.Jump, player) &&
+				canJump() && isUnderwater() &&
+				chargedBubbles.Count > 0 && flag == null
+			) {
+				vel.y = -getJumpPower();
+				changeState(new Jump());
+				return true;
+			}
+			if (!player.isAI && player.hasUltimateArmor() &&
+				player.input.isPressed(Control.Jump, player) &&
+				canJump() && !isDashing && canAirDash() && flag == null
+			) {
+				dashedInAir++;
+				changeState(new XHover(), true);
+			}
 		}
-		if (iceSled != null) {
-			changePos(iceSled.pos.addxy(0, -16.1f));
+		return base.normalCtrl();
+	}
+
+	public override bool attackCtrl() {
+		if (!grounded) {
+			return false;
 		}
+		bool hadokenCheck = false;
+		bool shoryukenCheck = false;
+		if (hasHadoukenEquipped()) {
+			hadokenCheck = player.input.checkHadoken(player, xDir, Control.Shoot);
+		}
+		if (hasShoryukenEquipped()) {
+			shoryukenCheck = player.input.checkShoryuken(player, xDir, Control.Shoot);
+		}
+		if (player.isX && hadokenCheck && canUseFgMove()) {
+			if (!player.hasAllItems()) player.scrap -= 3;
+			player.fgMoveAmmo = 0;
+			changeState(new Hadouken(), true);
+			return true;
+		}
+		if (player.isX && shoryukenCheck && canUseFgMove()) {
+			if (!player.hasAllItems()) player.scrap -= 3;
+			player.fgMoveAmmo = 0;
+			changeState(new Shoryuken(isUnderwater()), true);
+			return true;
+		}
+		return false;
 	}
 
 	public void chargeControls() {
-		if (player.chargeButtonHeld() && canCharge()) {
+		if (chargeButtonHeld() && canCharge()) {
 			increaseCharge();
 
 			if (player.weapon is ParasiticBomb && getChargeLevel() == 3) {
@@ -427,7 +580,7 @@ public partial class Character {
 	}
 
 	public void unpoChargeControls() {
-		if (player.chargeButtonHeld() && canCharge()) {
+		if (chargeButtonHeld() && canCharge()) {
 			increaseCharge();
 			if (getChargeLevel() == 1) unpoShotCount = Math.Max(unpoShotCount, 1);
 			if (getChargeLevel() == 2) unpoShotCount = Math.Max(unpoShotCount, 2);
@@ -444,7 +597,7 @@ public partial class Character {
 
 	public void shoot(bool doCharge) {
 		int chargeLevel = getChargeLevel();
-		if (!doCharge && chargeLevel == 3) return;
+		if (!doCharge && chargeLevel >= 3) return;
 
 		if (isHyperX && unpoShotCount <= 0) return;
 
@@ -471,7 +624,7 @@ public partial class Character {
 			shootTime = player.weapon.rateOfFire;
 		}
 
-		if (chargeLevel == 2 || chargeLevel == 3) {
+		if (chargeLevel == 2 || chargeLevel >= 3) {
 			var hbWep = player.weapons.FirstOrDefault(w => w is HyperBuster) as HyperBuster;
 			if (hbWep != null) {
 				hbWep.shootTime = hbWep.getRateOfFire(player);
@@ -525,12 +678,12 @@ public partial class Character {
 
 		shootRpc(getShootPos(), player.weapon.index, xDir, cl, player.getNextActorNetId(), true);
 
-		if (chargeLevel == 3 && player.hasGoldenArmor() && player.weapon is Buster) {
+		if (chargeLevel >= 3 && player.hasGoldenArmor() && player.weapon is Buster) {
 			stockSaber(true);
 			xSaberCooldown = 0.66f;
 		}
 
-		if (chargeLevel == 3 && player.hasArmArmor(2)) {
+		if (chargeLevel >= 3 && player.hasArmArmor(2)) {
 			stockedCharge = true;
 			if (player.weapon is Buster) {
 				shootTime = hasUltimateArmorBS.getValue() ? 0.5f : 0.25f;
@@ -758,7 +911,8 @@ public partial class Character {
 		} else if (player.weapon is BubbleSplash) {
 			return projId == ProjIds.WheelGSpinWheel;
 		} else if (player.weapon is SilkShot) {
-			return projId == ProjIds.FStagFireball || projId == ProjIds.FStagDash || projId == ProjIds.FStagDashCharge || projId == ProjIds.FStagDashTrail;
+			return projId == ProjIds.FStagFireball || projId == ProjIds.FStagDash ||
+				projId == ProjIds.FStagDashCharge || projId == ProjIds.FStagDashTrail;
 		} else if (player.weapon is SpinWheel) {
 			return projId == ProjIds.WSpongeChain || projId == ProjIds.WSpongeUpChain;
 		} else if (player.weapon is SonicSlicer) {
@@ -790,7 +944,7 @@ public partial class Character {
 		return false;
 	}
 
-	public Projectile getXProjFromHitbox(Point centerPoint) {
+	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		Projectile proj = null;
 
 		if (sprite.name.Contains("beam_saber") && sprite.name.Contains("2")) {
@@ -817,75 +971,243 @@ public partial class Character {
 
 		return proj;
 	}
-}
 
-public class XHover : CharState {
-	float hoverTime;
-	int startXDir;
-	public XHover() : base("hover", "hover_shoot", "", "") {
+	public void popAllBubbles() {
+		for (int i = chargedBubbles.Count - 1; i >= 0; i--) {
+			chargedBubbles[i].destroySelf();
+		}
 	}
 
-	public override void update() {
-		base.update();
+	public override bool canClimbLadder() {
+		if (hasBusterProj() || isShootingRaySplasher) {
+			return false;
+		}
+		return base.canClimbLadder();
+	}
 
-		airCode();
-		character.xDir = startXDir;
-		Point inputDir = player.input.getInputDir(player);
+	public override bool canCharge() {
+		if (beeSwarm != null) return false;
+		Weapon weapon = player.weapon;
+		if (weapon is RollingShield && chargedRollingShieldProj != null) return false;
+		if (isInvisibleBS.getValue()) return false;
+		if (flag != null) return false;
+		if (player.weapons.Count == 0) return false;
+		if (weapon is AbsorbWeapon) return false;
+		
+		return true;
+	}
 
-		if (inputDir.x == character.xDir) {
-			if (!sprite.StartsWith("hover_forward")) {
-				sprite = "hover_forward";
-				shootSprite = sprite + "_shoot";
-				character.changeSpriteFromName(sprite, true);
-			}
-		} else if (inputDir.x == -character.xDir) {
-			if (player.input.isHeld(Control.Jump, player)) {
-				if (!sprite.StartsWith("hover_backward")) {
-					sprite = "hover_backward";
-					shootSprite = sprite + "_shoot";
-					character.changeSpriteFromName(sprite, true);
+	public override bool canShoot() {
+		if (isInvulnerableAttack()) return false;
+		if (chargedSpinningBlade != null) return false;
+		if (isShootingRaySplasher) return false;
+		if (chargedFrostShield != null) return false;
+		if (chargedTunnelFang != null) return false;
+
+		return base.canShoot();
+	}
+
+	public override bool canChangeWeapons() {
+		if (strikeChainProj != null) return false;
+		if (isShootingRaySplasher) return false;
+		if (chargedSpinningBlade != null) return false;
+		if (chargedFrostShield != null) return false;
+		if (charState is GravityWellChargedState) return false;
+		if (player.weapon is TriadThunder triadThunder && triadThunder.shootTime > 0.75f) return false;
+		if (charState is XRevive || charState is XReviveStart) return false;
+
+		return base.canChangeWeapons();
+	}
+
+	public override float getJumpModifier() {
+		float jumpModifier = 1;
+		jumpModifier += (chargedBubbles.Count / 6.0f) * 50;
+
+		return jumpModifier * base.getJumpModifier();
+	}
+
+	public override void changeState(CharState newState, bool forceChange = false) {
+		if (!forceChange && charState != null && newState != null &&
+			charState.GetType() == newState.GetType() ||
+			 !forceChange && changedStateInFrame
+		) {
+			return;
+		}
+		base.changeState(newState, forceChange);
+
+		if (hasBusterProj() && string.IsNullOrEmpty(newState.shootSprite) && newState is not Hurt) {
+			destroyBusterProjs();
+		}
+	}
+
+	public void drawHyperCharge(float x, float y) {
+		addRenderEffect(RenderEffectType.Flash, 0.05f, 0.1f);
+		hyperChargeAnimTime += Global.spf;
+		if (hyperChargeAnimTime >= maxHyperChargeAnimTime) hyperChargeAnimTime = 0;
+		float sx = pos.x + x;
+		float sy = pos.y + y - 18;
+
+		var sprite1 = Global.sprites["hypercharge_part_1"];
+		float distFromCenter = 12;
+		float posOffset = hyperChargeAnimTime * 50;
+		int hyperChargeAnimFrame = MathInt.Floor((hyperChargeAnimTime / maxHyperChargeAnimTime) * sprite1.frames.Count);
+		sprite1.draw(hyperChargeAnimFrame, sx + distFromCenter + posOffset, sy, 1, 1, null, 1, 1, 1, zIndex + 1);
+		sprite1.draw(hyperChargeAnimFrame, sx - distFromCenter - posOffset, sy, 1, 1, null, 1, 1, 1, zIndex + 1);
+		sprite1.draw(hyperChargeAnimFrame, sx, sy + distFromCenter + posOffset, 1, 1, null, 1, 1, 1, zIndex + 1);
+		sprite1.draw(hyperChargeAnimFrame, sx, sy - distFromCenter - posOffset, 1, 1, null, 1, 1, 1, zIndex + 1);
+
+		hyperChargeAnimTime2 += Global.spf;
+		if (hyperChargeAnimTime2 >= maxHyperChargeAnimTime) hyperChargeAnimTime2 = 0;
+		var sprite2 = Global.sprites["hypercharge_part_2"];
+		float distFromCenter2 = 12;
+		float posOffset2 = hyperChargeAnimTime2 * 50;
+		int hyperChargeAnimFrame2 = MathInt.Floor(
+			(hyperChargeAnimTime2 / maxHyperChargeAnimTime) * sprite2.frames.Count
+		);
+		float xOff = Helpers.cosd(45) * (distFromCenter2 + posOffset2);
+		float yOff = Helpers.sind(45) * (distFromCenter2 + posOffset2);
+		sprite2.draw(hyperChargeAnimFrame2, sx - xOff, sy + yOff, 1, 1, null, 1, 1, 1, zIndex + 1);
+		sprite2.draw(hyperChargeAnimFrame2, sx + xOff, sy - yOff, 1, 1, null, 1, 1, 1, zIndex + 1);
+		sprite2.draw(hyperChargeAnimFrame2, sx + xOff, sy - yOff, 1, 1, null, 1, 1, 1, zIndex + 1);
+		sprite2.draw(hyperChargeAnimFrame2, sx - xOff, sy - yOff, 1, 1, null, 1, 1, 1, zIndex + 1);
+	}
+
+	public override void render(float x, float y) {
+		if (!shouldRender(x, y)) {
+			return;
+		}
+		if (isShootingRaySplasher) {
+			var shootPos = getShootPos();
+			var muzzleFrameCount = Global.sprites["raysplasher_muzzle"].frames.Count;
+			Global.sprites["raysplasher_muzzle"].draw(
+				Global.frameCount % muzzleFrameCount,
+				shootPos.x + x + (3 * xDir), shootPos.y + y, 1, 1, null, 1, 1, 1, zIndex
+			);
+		}
+		if (isHyperChargeActiveBS.getValue() && visible) {
+			drawHyperCharge(x, y);
+		}
+		base.render(x, y);
+	}
+
+	public override void destroySelf(
+		string spriteName = null, string fadeSound = null,
+		bool disableRpc = false, bool doRpcEvenIfNotOwned = false,
+		bool favorDefenderProjDestroy = false
+	) {
+		base.destroySelf(spriteName, fadeSound, disableRpc, doRpcEvenIfNotOwned, favorDefenderProjDestroy);
+
+		chargedRollingShieldProj?.destroySelfNoEffect();
+		strikeChainProj?.destroySelf();
+		barrierAnim?.destroySelf();
+		beeSwarm?.destroy();
+		destroyBusterProjs();
+		setShootRaySplasher(false);
+
+		player.removeOwnedMines();
+		player.removeOwnedTurrets();
+
+		if (player.hasUltimateArmor()) {
+			player.setUltimateArmor(false);
+		}
+		if (player.hasGoldenArmor()) {
+			player.setGoldenArmor(false);
+		}
+	}
+
+	
+	public bool canHeadbutt() {
+		if (!player.isX) return false;
+		if (!player.hasHelmetArmor(1)) return false;
+		if (isInvisibleBS.getValue()) return false;
+		if (isInvulnerableAttack()) return false;
+		if (headbuttAirTime < 0.04f) return false;
+		if (sprite.name.Contains("jump") && deltaPos.y < -100 * Global.spf) return true;
+		if (sprite.name.Contains("up_dash") || sprite.name.Contains("wall_kick")) return true;
+		if (charState is StrikeChainPullToWall scptw && scptw.isUp) return true;
+		return false;
+	}
+
+	public bool hasHadoukenEquipped() {
+		return !Global.level.is1v1() && player.hasArmArmor(1) && player.hasBootsArmor(1) && player.hasHelmetArmor(1) && player.hasBodyArmor(1) && player.weapons.Any(w => w is Buster);
+	}
+
+	public bool hasShoryukenEquipped() {
+		return !Global.level.is1v1() && player.hasArmArmor(2) && player.hasBootsArmor(2) && player.hasHelmetArmor(2) && player.hasBodyArmor(2) && player.weapons.Any(w => w is Buster);
+	}
+
+	public bool hasFgMoveEquipped() {
+		return hasHadoukenEquipped() || hasShoryukenEquipped();
+	}
+
+	public bool canAffordFgMove() {
+		return player.scrap >= 3 || player.hasAllItems();
+	}
+
+	public bool canUseFgMove() {
+		return !isInvulnerableAttack() && chargedRollingShieldProj == null && !isInvisibleBS.getValue() && canAffordFgMove() && hadoukenCooldownTime == 0 && player.weapon is Buster && player.fgMoveAmmo >= 32;
+	}
+
+	public bool shouldDrawFgCooldown() {
+		return !isInvulnerableAttack() && chargedRollingShieldProj == null && !isInvisibleBS.getValue() && canAffordFgMove() && hadoukenCooldownTime == 0;
+	}
+
+	public override Dictionary<int, Func<Projectile>> getGlobalProjs() {
+		var retProjs = new Dictionary<int, Func<Projectile>>();
+
+		if (canHeadbutt() && getHeadPos() != null) {
+			retProjs[(int)ProjIds.Headbutt] = () => {
+				Point centerPoint = getHeadPos().Value.addxy(0, -6);
+				float damage = 2;
+				int flinch = Global.halfFlinch;
+				if (sprite.name.Contains("up_dash")) {
+					damage = 4;
+					flinch = Global.defFlinch;
 				}
-			} else {
-				character.xDir = -character.xDir;
-				startXDir = character.xDir;
-				if (!sprite.StartsWith("hover_forward")) {
-					sprite = "hover_forward";
-					shootSprite = sprite + "_shoot";
-					character.changeSpriteFromName(sprite, true);
-				}
-			}
+				Projectile proj = new GenericMeleeProj(
+					player.headbuttWeapon, centerPoint, ProjIds.Headbutt, player,
+					damage, flinch, 0.5f
+				);
+				var rect = new Rect(0, 0, 14, 4);
+				proj.globalCollider = new Collider(rect.getPoints(), false, proj, false, false, 0, Point.zero);
+				return proj;
+			};
+		}
+		return retProjs;
+	}
+
+	public override void onFlinchOrStun(CharState newState) {
+		strikeChainProj?.destroySelf();
+		if (newState is not Hurt hurtState) {
+			beeSwarm?.destroy();
 		} else {
-			if (sprite != "hover") {
-				sprite = "hover";
-				shootSprite = sprite + "_shoot";
-				character.changeSpriteFromName(sprite, true);
-			}
+			beeSwarm?.reset(hurtState.isMiniFlinch());
 		}
+		base.onFlinchOrStun(newState);
+	}
 
-		if (character.vel.y < 0) {
-			character.vel.y += Global.spf * Global.level.gravity;
-			if (character.vel.y > 0) character.vel.y = 0;
-		}
-
-		if (character.gravityWellModifier > 1) {
-			character.vel.y = 53;
-		}
-
-		hoverTime += Global.spf;
-		if (hoverTime > 2 || character.player.input.isPressed(Control.Jump, character.player)) {
-			character.changeState(new Fall(), true);
+	public override void onExitState(CharState oldState, CharState newState) {
+		if (string.IsNullOrEmpty(newState?.shootSprite)) {
+			setShootRaySplasher(false);
 		}
 	}
 
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		character.useGravity = false;
-		character.vel = new Point();
-		startXDir = character.xDir;
+	public bool isSpecialBuster() {
+		return player.loadout.xLoadout.melee == 0 && !isHyperX;
 	}
 
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-		character.useGravity = true;
+	public bool isSpecialSaber() {
+		return isHyperX || player.loadout.xLoadout.melee == 1;
+	}
+
+	public override bool chargeButtonHeld() {
+		if (isSpecialBuster() && player.input.isHeld(Control.Special1, player)) {
+			return true;
+		}
+		return player.input.isHeld(Control.Shoot, player);
+	}
+
+	public override string getSprite(string spriteName) {
+		return "mmx_" + spriteName;
 	}
 }

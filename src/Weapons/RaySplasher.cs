@@ -21,10 +21,14 @@ public class RaySplasher : Weapon {
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-		if (chargeLevel != 3) {
-			player.character.setShootRaySplasher(true);
+		if (chargeLevel < 3) {
+			if (player.character is MegamanX mmx) {
+				mmx.setShootRaySplasher(true);
+			}
 		} else {
-			if (player.character.ownedByLocalPlayer) player.character.changeState(new RaySplasherChargedState(), true);
+			if (player.character.ownedByLocalPlayer) {
+				player.character.changeState(new RaySplasherChargedState(), true);
+			}
 		}
 	}
 }

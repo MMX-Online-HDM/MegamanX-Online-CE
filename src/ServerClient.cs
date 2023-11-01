@@ -39,7 +39,11 @@ public class ServerClient {
 		return client;
 	}
 
-	public static ServerClient Create(string serverIp, string serverName, int serverPort, ServerPlayer inputServerPlayer, out JoinServerResponse joinServerResponse, out string error) {
+	public static ServerClient Create(
+		string serverIp, string serverName, int serverPort,
+		ServerPlayer inputServerPlayer, out JoinServerResponse joinServerResponse,
+		out string error
+	) {
 		error = null;
 		NetPeerConfiguration config = new NetPeerConfiguration(serverName);
 		config.EnableMessageType(NetIncomingMessageType.ConnectionLatencyUpdated);
@@ -64,7 +68,12 @@ public class ServerClient {
 			serverClient.getMessages(out var messages, false);
 			foreach (var message in messages) {
 				if (message.StartsWith("joinservertargetedresponse:")) {
-					joinServerResponse = JsonConvert.DeserializeObject<JoinServerResponse>(message.RemovePrefix("joinservertargetedresponse:"));
+					joinServerResponse = (
+						JsonConvert.DeserializeObject<JoinServerResponse>(
+							message.RemovePrefix("joinservertargetedresponse:"
+							)
+						)
+					);
 					serverClient.serverPlayer = joinServerResponse.getLastPlayer();
 					return serverClient;
 				} else if (message.StartsWith("hostdisconnect:")) {

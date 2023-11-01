@@ -373,6 +373,20 @@ public class Vile : Character {
 		}
 	}
 
+	public override bool normalCtrl() {
+		if (sprite.name.EndsWith("cannon_air") && isAnimOver()) {
+			changeSpriteFromName("fall", true);
+		}
+		if (canVileHover() &&
+			player.input.isPressed(Control.Jump, player) &&
+			charState is not VileHover
+		) {
+			changeState(new VileHover(), true);
+			return true;
+		}
+		return base.normalCtrl();
+	}
+
 	public bool canLinkMK5() {
 		if (vileStartRideArmor == null) return false;
 		if (vileStartRideArmor.rideArmorState is RADeactive && vileStartRideArmor.manualDisabled) return false;

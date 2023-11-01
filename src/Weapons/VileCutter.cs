@@ -73,6 +73,8 @@ public class CutterAttackState : CharState {
 	VileCutterProj proj;
 
 	public CutterAttackState() : base("idle_shoot", "", "", "") {
+		exitOnAirborne = true;
+		normalCtrl = true;
 	}
 
 	public override void update() {

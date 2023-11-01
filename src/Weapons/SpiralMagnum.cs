@@ -291,9 +291,9 @@ public class SpiralMagnumProj : Projectile {
 				}
 			}
 
-			if (hitChar?.chargedRollingShieldProj != null) {
+			if (hitChar is MegamanX rockmanX && rockmanX.chargedRollingShieldProj != null) {
 				float decAmount = damager.damage * 2;
-				hitChar.chargedRollingShieldProj.decAmmo(decAmount);
+				rockmanX.chargedRollingShieldProj.decAmmo(decAmount);
 				var bytes = BitConverter.GetBytes(decAmount);
 				Global.serverClient?.rpc(RPC.decShieldAmmo, (byte)hitChar.player.id, bytes[0], bytes[1], bytes[2], bytes[3]);
 			} else {
