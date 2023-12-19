@@ -30,8 +30,14 @@ public class ElectricSpark : Weapon {
 public class ElectricSparkProj : Projectile {
 	public int type = 0;
 	public bool split = false;
-	public ElectricSparkProj(Weapon weapon, Point pos, int xDir, Player player, int type, ushort netProjId, Point? vel = null, bool rpc = false) :
-		base(weapon, pos, xDir, 150, 2, player, "electric_spark", 4, 0, netProjId, player.ownedByLocalPlayer) {
+	public ElectricSparkProj(
+		Weapon weapon, Point pos, int xDir,
+		Player player, int type, ushort netProjId,
+		Point? vel = null, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 150, 2, player, "electric_spark",
+		Global.fourFrameFlinch, 0, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.ElectricSpark;
 		maxTime = 1.2f;
 

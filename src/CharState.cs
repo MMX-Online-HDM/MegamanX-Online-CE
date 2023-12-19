@@ -120,7 +120,7 @@ public class CharState {
 
 	public virtual void onEnter(CharState oldState) {
 		vile = character as Vile;
-		
+
 		if (!string.IsNullOrEmpty(enterSound)) {
 			character.playSound(enterSound, sendRpc: true);
 		}
@@ -169,6 +169,10 @@ public class CharState {
 	}
 
 	public virtual void update() {
+		stateTime += Global.spf;
+		if (!character.ownedByLocalPlayer) {
+			return;
+		}
 		if (inTransition()) {
 			character.frameSpeed = 1;
 			if (character.isAnimOver() && !Global.level.gameMode.isOver) {
@@ -176,9 +180,6 @@ public class CharState {
 				character.changeSpriteFromName(sprite, true);
 			}
 		}
-
-		stateTime += Global.spf;
-
 		var lastLeftWallData = character.getHitWall(-1, 0);
 		lastLeftWallCollider = lastLeftWallData != null ? lastLeftWallData.otherCollider : null;
 		if (lastLeftWallCollider != null && !lastLeftWallCollider.isClimbable) {
@@ -252,7 +253,7 @@ public class CharState {
 				character.playSound("swordthud", sendRpc: true);
 			}
 		}
-		if (character.sprite.name.Contains("quakeblazer") && character.charState is Hyouretsuzan h) {
+		if (character.sprite.name.Contains("quakeblazer") && character.charState is ZeroFallStab h) {
 			ts = "quakeblazer_land";
 			h.quakeBlazerExplode(true);
 		}
@@ -911,7 +912,7 @@ public class Dash : CharState {
 			character.move(move);
 		} else {
 			var move = new Point(0, 0);
-			move.x = Physics.DashStartSpeed * character.getRunDebuffs() * initialDashDir * speedModifier;;
+			move.x = Physics.DashStartSpeed * character.getRunDebuffs() * initialDashDir * speedModifier; ;
 			character.move(move);
 		}
 		if (dashTime <= Global.spf * 3 || stop) {
@@ -1651,7 +1652,7 @@ public class Die : CharState {
 		player.lastDeathWasVileMK2 = vile?.isVileMK2 == true;
 		player.lastDeathWasVileMK5 = vile?.isVileMK5 == true;
 		player.lastDeathWasSigmaHyper = sigma?.isHyperSigma == true;
-		player.lastDeathWasXHyper = mmx?.isHyperX == true;;
+		player.lastDeathWasXHyper = mmx?.isHyperX == true; ;
 		player.lastDeathPos = character.getCenterPos();
 		if (player.isAI) player.selectedRAIndex = Helpers.randomRange(0, 3);
 		sigmaHasMavericks = player.isSigma && player.mavericks.Count > 0;
@@ -1720,7 +1721,9 @@ public class Die : CharState {
 		character.vel.x = 0;
 		character.vel.y = 0;
 		base.update();
-
+		if (!character.ownedByLocalPlayer) {
+			return;
+		}
 		if (sigmaHasMavericks) {
 			if (stateTime > 0.75f && !once) {
 				once = true;

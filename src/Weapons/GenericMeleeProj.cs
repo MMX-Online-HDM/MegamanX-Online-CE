@@ -77,7 +77,7 @@ public class GenericMeleeProj : Projectile {
 		base.onHitDamagable(damagable);
 
 		if (projId == (int)ProjIds.QuakeBlazer) {
-			if (owner.character?.charState is Hyouretsuzan hyouretsuzanState) {
+			if (owner.character?.charState is ZeroFallStab hyouretsuzanState) {
 				hyouretsuzanState.quakeBlazerExplode(false);
 			}
 		}

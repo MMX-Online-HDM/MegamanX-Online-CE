@@ -47,8 +47,12 @@ public class TriadThunderProj : Projectile {
 	int state;
 	Character character;
 	public List<TriadThunderBall> balls;
-	public TriadThunderProj(Weapon weapon, Point pos, int xDir, int yDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 1, player, "triadthunder_proj", 4, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public TriadThunderProj(
+		Weapon weapon, Point pos, int xDir, int yDir, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 1, player, "triadthunder_proj",
+		Global.fourFrameFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.TriadThunder;
 		character = player.character;
 		destroyOnHit = false;
@@ -125,8 +129,12 @@ public class TriadThunderProj : Projectile {
 
 public class TriadThunderBall : Projectile {
 	public float startDropTime;
-	public TriadThunderBall(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 2, player, "triadthunder_ball", 4, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public TriadThunderBall(
+		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 2, player, "triadthunder_ball",
+		Global.fourFrameFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.TriadThunder;
 		destroyOnHit = false;
 		shouldShieldBlock = false;

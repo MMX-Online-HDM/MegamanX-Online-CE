@@ -69,7 +69,7 @@ public class ZeroShoryukenWeapon : Weapon {
 	}
 }
 
-public class Ryuenjin : CharState {
+public class ZeroUppercut : CharState {
 	bool jumpedYet;
 	float timeInWall;
 	bool isUnderwater;
@@ -79,7 +79,7 @@ public class Ryuenjin : CharState {
 	public RyuenjinType type { get { return (RyuenjinType)weapon.type; } }
 	public Zero zero;
 
-	public Ryuenjin(Weapon weapon, bool isUnderwater) : base(getSprite(weapon.type, isUnderwater), "", "") {
+	public ZeroUppercut(Weapon weapon, bool isUnderwater) : base(getSprite(weapon.type, isUnderwater), "", "") {
 		this.weapon = weapon;
 		this.isUnderwater = type == RyuenjinType.Ryuenjin && isUnderwater;
 	}
@@ -145,11 +145,11 @@ public class Ryuenjin : CharState {
 
 		if (canDownSpecial()) {
 			if (player.input.isPressed(Control.Shoot, player) && player.input.isHeld(Control.Down, player)) {
-				if (!player.hasKnuckle()) character.changeState(new Hyouretsuzan(zero.zeroDownThrustWeaponA), true);
+				if (!player.hasKnuckle()) character.changeState(new ZeroFallStab(zero.zeroDownThrustWeaponA), true);
 				else character.changeState(new DropKickState(), true);
 				return;
 			} else if (player.input.isPressed(Control.Special1, player) && player.input.isHeld(Control.Down, player)) {
-				if (!player.hasKnuckle()) character.changeState(new Hyouretsuzan(zero.zeroDownThrustWeaponS), true);
+				if (!player.hasKnuckle()) character.changeState(new ZeroFallStab(zero.zeroDownThrustWeaponS), true);
 				else character.changeState(new DropKickState(), true);
 				return;
 			}

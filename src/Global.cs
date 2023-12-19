@@ -526,7 +526,7 @@ public partial class Global {
 	public static bool firstTimeVersionCheck = false;
 
 	public static string encryptionKey;
-	public static string secretPrefix;
+	public static string secretPrefix = null;
 	public static List<BanEntry> banList = new List<BanEntry>();
 	public static bool checkBan;
 	public static BanEntry banEntry;
@@ -567,11 +567,14 @@ public partial class Global {
 	}
 
 	public const int maxServers = 5;
-	public static int tickRate = 2;
+	public static int tickRate = 1;
 
 	public static readonly int defFlinch = 26;
 	public static readonly int halfFlinch = 13;
 	public static readonly int miniFlinch = 6;
+	public static readonly int fourFrameFlinch = 4;
+
+	public static DateTimeOffset UnixEpoch = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
 	public static bool levelStarted() {
 		return level != null && level.started;

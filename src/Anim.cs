@@ -32,13 +32,13 @@ public class Anim : Actor {
 			setzIndex(ZIndex.Character - 1);
 			playSound("maverickDie", sendRpc: true);
 		}
-
+		// TODO: Remove all the harcoded sprites shenanigans.
 		if (spriteName.StartsWith("drlight")) {
 			addMusicSource("drlight", getCenterPos(), false);
 		}
 
 		if (spriteName.StartsWith("cannon_muzzle")) {
-			angle = 0;
+			byteAngle = 0;
 			//if (host != null)
 			{
 				setzIndex(ZIndex.HUD);
@@ -52,12 +52,12 @@ public class Anim : Actor {
 		}
 
 		if (spriteName == "csnail_shell_spin") {
-			angle = 0;
+			byteAngle = 0;
 		}
 
 		if (!ownedByLocalPlayer) {
 			if (spriteName == "spiralmagnum_shell" || spriteName == "plasmagun_effect") {
-				angle = 0;
+				byteAngle = 0;
 			}
 			if (spriteName == "spiralmagnum_shell") {
 				if (collider != null) {
@@ -215,7 +215,7 @@ public class Anim : Actor {
 				if (ownedByLocalPlayer) {
 					Axl axl = host as Axl;
 					Point bulletPos = axl.getAxlBulletPos();
-					angle = axl.getShootAngle(true);
+					byteAngle = axl.getShootAngle(true);
 					changePos(bulletPos);
 				}
 			} else {

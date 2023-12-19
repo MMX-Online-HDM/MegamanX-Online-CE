@@ -705,9 +705,18 @@ public class HostMenu : IMainMenu {
 	public void completeAction() {
 		if (inGame) {
 			var oldServer = Global.level.server;
-			var server = new Server(oldServer.gameVersion, oldServer.region, serverName, selectedLevel.name, selectedLevel.shortName, selectedGameMode, playTo, botCount, oldServer.maxPlayers, timeLimit, fixedCamera, hidden, (NetcodeModel)netcodeModel, netcodeModelUnderPing,
-				isLAN, mirrored, useLoadout, Global.checksum, selectedLevel.checksum, selectedLevel.customMapUrl, savedMatchSettings.extraCpuCharData, getCustomMatchSettings(), disableHtSt, disableVehicles);
-
+			var server = new Server(
+				oldServer.gameVersion, oldServer.region,
+				serverName, selectedLevel.name,
+				selectedLevel.shortName, selectedGameMode,
+				playTo, botCount, oldServer.maxPlayers,
+				timeLimit, fixedCamera, hidden,
+				(NetcodeModel)netcodeModel, netcodeModelUnderPing,
+				isLAN, mirrored, useLoadout, Global.checksum,
+				selectedLevel.checksum, selectedLevel.customMapUrl,
+				savedMatchSettings.extraCpuCharData, getCustomMatchSettings(),
+				disableHtSt, disableVehicles
+			);
 			Global.leaveMatchSignal = new LeaveMatchSignal(LeaveMatchScenario.Recreate, server, null);
 		} else if (!isOffline) {
 			Region region;
@@ -716,9 +725,17 @@ public class HostMenu : IMainMenu {
 			} else {
 				region = Options.main.getRegion();
 			}
-
-			var serverData = new Server(Global.version, region, serverName, selectedLevel.name, selectedLevel.shortName, selectedGameMode, playTo, botCount, 10, timeLimit, fixedCamera, hidden, (NetcodeModel)netcodeModel, netcodeModelUnderPing, isLAN, mirrored, useLoadout,
-				Global.checksum, selectedLevel.checksum, selectedLevel.customMapUrl, savedMatchSettings.extraCpuCharData, getCustomMatchSettings(), disableHtSt, disableVehicles);
+			// TODO: Unhardcode max players.
+			var serverData = new Server(
+				Global.version, region, serverName,
+				selectedLevel.name, selectedLevel.shortName,
+				selectedGameMode, playTo, botCount, Server.maxPlayerCap,
+				timeLimit, fixedCamera, hidden, (NetcodeModel)netcodeModel,
+				netcodeModelUnderPing, isLAN, mirrored, useLoadout,
+				Global.checksum, selectedLevel.checksum, selectedLevel.customMapUrl,
+				savedMatchSettings.extraCpuCharData, getCustomMatchSettings(),
+				disableHtSt, disableVehicles
+			);
 			createServer(SelectCharacterMenu.playerData.charNum, serverData, team, false, previous, out errorMessage);
 		} else {
 			//Global.playSound("menuConfirm");

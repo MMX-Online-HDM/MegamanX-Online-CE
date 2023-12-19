@@ -36,9 +36,12 @@ public class ShippuugaWeapon : Weapon {
 }
 
 public class ZSaberProj : Projectile {
-	public ZSaberProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 300, 3, player, "zsaber_shot", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
-		//this.fadeSprite = "zsaber_shot_fade";
+	public ZSaberProj(
+		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 300, 3, player, "zsaber_shot", 0, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
+		fadeSprite = "zsaber_shot_fade";
 		reflectable = true;
 		projId = (int)ProjIds.ZSaberProj;
 		if (player.character is Zero zero && zero.isBlackZero2() == true) {

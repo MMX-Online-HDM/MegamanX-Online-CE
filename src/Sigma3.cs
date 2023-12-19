@@ -215,7 +215,7 @@ public class Sigma3FireProj : Projectile {
 		if (startedWallCrawl) {
 			updateWallCrawl();
 			if (spriteXDir == -1) {
-				angle -= 180;
+				byteAngle -= 128;
 			}
 		} else if (upDownDir != 0) {
 			if (owner.input.isHeld(Control.Down, owner)) {

@@ -28,7 +28,7 @@ public partial class Actor {
 		mask[1] = !isStatic;                    // pos y
 		mask[2] = syncScale;                    // scale data
 		mask[3] = (sprite.frames.Count > 1);    // frame index data
-		mask[4] = angle != null;                // angle
+		mask[4] = byteAngle != null;                // angle
 
 		// The rest are just always sent and contain actual bool data
 		mask[5] = visible;                      // visibility
@@ -60,7 +60,7 @@ public partial class Actor {
 		}
 		// add angle
 		if (mask[4]) {
-			byte[] angleBytes = BitConverter.GetBytes((float)angle);
+			byte[] angleBytes = BitConverter.GetBytes((float)byteAngle);
 			args.AddRange(angleBytes);
 		}
 
@@ -267,7 +267,7 @@ public partial class Actor {
 		lastFrameIndex = frameIndex;
 		lastXDir = xDir;
 		lastYDir = yDir;
-		lastAngle = angle;
+		lastAngle = byteAngle;
 	}
 }
 
@@ -300,7 +300,7 @@ public class RPCUpdateActor : RPC {
 		bool visible = maskBools[5];
 		int? xDir = maskBools[6] ? 1 : -1;
 		int? yDir = maskBools[7] ? 1 : -1;
-		float? angle = null;
+		float? byteAngle = null;
 
 		if (maskBools[0]) {
 			xPos = BitConverter.ToSingle(new byte[] { arguments[i], arguments[i + 1], arguments[i + 2], arguments[i + 3] }, 0);
@@ -319,7 +319,7 @@ public class RPCUpdateActor : RPC {
 			i++;
 		}
 		if (maskBools[4]) {
-			angle = BitConverter.ToSingle(new byte[] { arguments[i], arguments[i + 1], arguments[i + 2], arguments[i + 3] }, 0);
+			byteAngle = BitConverter.ToSingle(new byte[] { arguments[i], arguments[i + 1], arguments[i + 2], arguments[i + 3] }, 0);
 			i += 4;
 		}
 
@@ -336,7 +336,7 @@ public class RPCUpdateActor : RPC {
 				if (frameIndex != null) actor.netFrameIndex = (int)frameIndex;
 				if (xDir != null) actor.netXDir = (int)xDir;
 				if (yDir != null) actor.netYDir = (int)yDir;
-				if (angle != null) actor.netAngle = (float)angle;
+				if (byteAngle != null) actor.netAngle = (float)byteAngle;
 				if (xScale != null) actor.xScale = xScale.Value;
 				if (yScale != null) actor.yScale = yScale.Value;
 

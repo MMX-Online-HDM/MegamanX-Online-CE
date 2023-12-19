@@ -908,11 +908,10 @@ class Program {
 		int videoUpdatesThisSecond = 0;
 		int framesUpdatesThisSecond = 0;
 		bool useFrameSkip = false;
-		DateTimeOffset UnixEpoch = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
 		// Main loop itself.
 		while (window.IsOpen) {
-			var timeSpam = (DateTimeOffset.UtcNow - UnixEpoch);
+			var timeSpam = (DateTimeOffset.UtcNow - Global.UnixEpoch);
 			long timeNow = timeSpam.Ticks;
 			long timeSecondsNow = (long)Math.Floor(timeSpam.TotalSeconds);
 

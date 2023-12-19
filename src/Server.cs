@@ -77,7 +77,7 @@ public class Server {
 	public const byte getServersQueryByte = 0;
 	public const byte getServerQueryByte = 1;
 
-	public const int maxPlayerCap = 50;
+	public const int maxPlayerCap = 64;
 
 	[JsonIgnore]
 	public ServerPlayer host { get; set; }
@@ -373,7 +373,12 @@ public class Server {
 
 	public bool killServer;
 	public void runIteration() {
-		Thread.Sleep(16);
+		long timeNow = (DateTimeOffset.UtcNow - Global.UnixEpoch).Ticks;
+		long deltaTime = timeNow - lastUpdateTime;
+		if (deltaTime < fpsLimit) {
+			return;
+		}
+		lastUpdateTime = timeNow;
 		iterations++;
 
 		if (killServer) {
@@ -383,7 +388,7 @@ public class Server {
 
 		if (s_server.Connections.Count == 0) {
 			framesZeroPlayers++;
-			if (framesZeroPlayers > 300) {
+			if (framesZeroPlayers > 600) {
 				Helpers.debugLog("Zero players for 5 second. Shutting down server");
 				shutdown("Zero players, shutting down server.");
 				return;
@@ -782,6 +787,10 @@ public class Server {
 		}
 		return "D";
 	}
+
+	private long lastUpdateTime = 0L;
+
+	private long fpsLimit = 83333;
 
 	public Dictionary<string, int> weaponKillStats = new Dictionary<string, int>();
 	public void addWeaponKillStat(int? projId, int? weaponIndex) {

@@ -395,7 +395,7 @@ public class Zero : Character {
 					spcActivated = true;
 					if (ryuenjinCooldown <= 0) {
 						changeState(
-							new Ryuenjin(
+							new ZeroUppercut(
 								lenientAttackPressed ? zeroUppercutWeaponA : zeroUppercutWeaponS,
 								isUnderwater()
 							),
@@ -425,12 +425,12 @@ public class Zero : Character {
 				if (player.input.isHeld(Control.Up, player) && isMidairRising) {
 					spcActivated = true;
 					if (ryuenjinCooldown <= 0) {
-						changeState(new Ryuenjin(zeroUppercutWeaponA is RisingWeapon ? zeroUppercutWeaponA : zeroUppercutWeaponS, isUnderwater()), true);
+						changeState(new ZeroUppercut(zeroUppercutWeaponA is RisingWeapon ? zeroUppercutWeaponA : zeroUppercutWeaponS, isUnderwater()), true);
 					}
 				} else if (player.input.isHeld(Control.Down, player)) {
 					spcActivated = true;
 					if (hyouretsuzanCooldown <= 0) {
-						if (!player.hasKnuckle()) changeState(new Hyouretsuzan(lenientAttackPressed ? zeroDownThrustWeaponA : zeroDownThrustWeaponS), true);
+						if (!player.hasKnuckle()) changeState(new ZeroFallStab(lenientAttackPressed ? zeroDownThrustWeaponA : zeroDownThrustWeaponS), true);
 						else changeState(new DropKickState(), true);
 					}
 				} else if ((Options.main.swapAirAttacks || airAttackCooldown == 0) && !lenientAttackPressed && !player.hasKnuckle()) {
