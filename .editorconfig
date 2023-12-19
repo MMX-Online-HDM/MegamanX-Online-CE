@@ -13,10 +13,18 @@ charset = utf-8-bom
 [*.{cs,vb}]
 # Naming Conventions          #
 dotnet_diagnostic.IDE1006.severity = none
+# Disable "can be simplifed" on "new" use
+dotnet_diagnostic.IDE0090.severity = none
 ###############################
 # C# Coding Conventions       #
 ###############################
 [*.cs]
+# Disable "can be static" on Linter.
+dotnet_diagnostic.CA1822.severity = none
+# Allow visible non-constant fields.
+dotnet_diagnostic.CA2211.severity = none
+# Stop warning of "unused objects" that are actually used.
+dotnet_diagnostic.CA1806.severity = none
 # New line preferences
 csharp_new_line_before_open_brace = none
 csharp_new_line_before_else = false
