@@ -46,6 +46,7 @@ public class HostMenu : IMainMenu {
 	public string serverName;
 	public bool isOffline;
 	public bool isLAN;
+	public bool isP2P;
 	public string localIPAddress;
 
 	public SavedMatchSettings savedMatchSettings {
@@ -149,10 +150,14 @@ public class HostMenu : IMainMenu {
 		return hidden || isLAN;
 	}
 
-	public HostMenu(MainMenu mainMenu, Server inGameServer, bool isOffline, bool isLAN) {
+	public HostMenu(
+		MainMenu mainMenu, Server inGameServer,
+		bool isOffline, bool isLAN, bool isP2P = false
+	) {
 		inGame = (inGameServer != null);
 		this.isOffline = isOffline;
 		this.isLAN = isLAN;
+		this.isP2P = isP2P;
 		if (isLAN) hidden = false;
 
 		prevMapSizeIndex = mapSizeIndex;
@@ -718,6 +723,8 @@ public class HostMenu : IMainMenu {
 				disableHtSt, disableVehicles
 			);
 			Global.leaveMatchSignal = new LeaveMatchSignal(LeaveMatchScenario.Recreate, server, null);
+		} else if (isP2P) {
+			createP2PMatch();
 		} else if (!isOffline) {
 			Region region;
 			if (isLAN) {
@@ -748,7 +755,11 @@ public class HostMenu : IMainMenu {
 		}
 	}
 
-	public static void createServer(int charNum, Server serverData, int? hostTeam, bool isRecreate, IMainMenu menu, out string errorMessage) {
+	public static void createServer(
+		int charNum, Server serverData,
+		int? hostTeam, bool isRecreate,
+		IMainMenu menu, out string errorMessage
+	) {
 		serverData.name = serverData.name.Trim();
 		errorMessage = null;
 		if (string.IsNullOrWhiteSpace(serverData.name)) {
@@ -789,12 +800,71 @@ public class HostMenu : IMainMenu {
 			gameMode = GameMode.Deathmatch;
 		}
 
-		var localServer = new Server(Global.version, null, null, selectedLevel.name, selectedLevel.shortName, gameMode, playTo, botCount, selectedLevel.maxPlayers, timeLimit, fixedCamera, false, (NetcodeModel)netcodeModel, netcodeModelUnderPing,
-			isLAN, mirrored, useLoadout, Global.checksum, selectedLevel.checksum, selectedLevel.customMapUrl, savedMatchSettings.extraCpuCharData, getCustomMatchSettings(), disableHtSt, disableVehicles);
+		var localServer = new Server(
+			Global.version, null, null, selectedLevel.name, selectedLevel.shortName,
+			gameMode, playTo, botCount, selectedLevel.maxPlayers, timeLimit, fixedCamera,
+			false, (NetcodeModel)netcodeModel, netcodeModelUnderPing,
+			isLAN, mirrored, useLoadout, Global.checksum, selectedLevel.checksum,
+			selectedLevel.customMapUrl, savedMatchSettings.extraCpuCharData, getCustomMatchSettings(),
+			disableHtSt, disableVehicles
+		);
 		localServer.players = new List<ServerPlayer>() { me };
 
-		Global.level = new Level(localServer.getLevelData(), SelectCharacterMenu.playerData, localServer.extraCpuCharData, false);
+		Global.level = new Level(
+			localServer.getLevelData(), SelectCharacterMenu.playerData, localServer.extraCpuCharData, false
+		);
 		Global.level.startLevel(localServer, false);
+	}
+
+	public void createP2PMatch() {
+		serverName = serverName.Trim();
+		if (string.IsNullOrWhiteSpace(serverName)) {
+			errorMessage = "Error: Empty match name.";
+			return;
+		}
+		string gameMode = selectedGameMode;
+		if (selectedLevel.isTraining()) {
+			playTo = 9999;
+			gameMode = GameMode.Deathmatch;
+		}
+		var localServer = new Server(
+			Global.version, null, serverName, selectedLevel.name,
+			selectedLevel.shortName, gameMode,
+			playTo, botCount, selectedLevel.maxPlayers,
+			timeLimit, fixedCamera, false,
+			(NetcodeModel)netcodeModel, netcodeModelUnderPing,
+			false, mirrored, useLoadout,
+			Global.checksum, selectedLevel.checksum,
+			selectedLevel.customMapUrl, savedMatchSettings.extraCpuCharData,
+			getCustomMatchSettings(), disableHtSt, disableVehicles
+		) {
+			isP2P = true
+		};
+		localServer.start();
+		System.Threading.Thread.Sleep(400);
+
+		var me = new ServerPlayer(
+			Options.main.playerName, 0, true,
+			SelectCharacterMenu.playerData.charNum, team, Global.deviceId, null, 0
+		);
+		if (GameMode.isStringTeamMode(selectedGameMode)) {
+			me.alliance = team;
+		}
+		System.Threading.Thread.Sleep(500);
+
+		Global.serverClient = ServerClient.CreateHolePunch(
+			localServer.s_server.UniqueIdentifier, me,
+			out JoinServerResponse joinServerResponse, out string error
+		);
+
+		if (joinServerResponse != null && error == null) {
+			Menu.change(new WaitMenu(new MainMenu(), localServer, false));
+		} else {
+			errorMessage = error;
+			if (string.IsNullOrEmpty(errorMessage)) {
+				errorMessage = "Could not connect to P2P Server.";
+			}
+		}
 	}
 
 	public void onMapSizeChange(int prevMapSizeIndex, int newMapSizeIndex) {

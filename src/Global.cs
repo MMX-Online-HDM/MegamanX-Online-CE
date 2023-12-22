@@ -30,6 +30,7 @@ public partial class Global {
 	public const string checksumKey = "DEVTEST--10-10-2023";
 	// For displaying the name of the mod in the version string.
 	public static string forkName = "Community Edition - Rockman Test 1";
+	public static string shortForkName = "CE";
 
 	public static string prodChecksum = checksumPrefix + " " + assetChecksum;
 

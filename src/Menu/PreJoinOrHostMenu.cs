@@ -11,8 +11,7 @@ namespace MMXOnline;
 
 public class PreJoinOrHostMenu : IMainMenu {
 	public int selectY;
-	public Point optionPos1;
-	public Point optionPos2;
+	public Point[] optionPos;
 	public const int lineH = 15;
 	public MainMenu prevMenu;
 	public bool isJoin;
@@ -23,20 +22,30 @@ public class PreJoinOrHostMenu : IMainMenu {
 	public PreJoinOrHostMenu(MainMenu prevMenu, bool isJoin) {
 		this.prevMenu = prevMenu;
 		this.isJoin = isJoin;
-		optionPos1 = new Point(40, 70);
-		optionPos2 = new Point(40, 70 + lineH);
+		optionPos = new Point[] {
+			new Point(40, 70),
+			new Point(40, 70 + lineH),
+			new Point(40, 70 + (lineH * 2))
+		};
 	}
 
 	public void update() {
 		if (state == 0) {
-			Helpers.menuUpDown(ref selectY, 0, 1);
+			Helpers.menuUpDown(ref selectY, 0, 2);
 			if (Global.input.isPressedMenu(Control.MenuSelectPrimary)) {
 				if (selectY == 0) {
 					state = 1;
-				} else {
+				} else if (selectY == 2) {
 					IMainMenu nextMenu = null;
 					if (isJoin) nextMenu = new JoinMenu(true);
 					else nextMenu = new HostMenu(prevMenu, null, false, true);
+
+					Menu.change(nextMenu);
+				} else if (selectY == 1) {
+					IMainMenu nextMenu = null;
+					if (isJoin) nextMenu = new JoinMenuP2P();
+					// TODO: Make a menu for new host.
+					else nextMenu = new HostMenu(prevMenu, null, false, false, true);
 
 					Menu.change(nextMenu);
 				}
@@ -46,8 +55,7 @@ public class PreJoinOrHostMenu : IMainMenu {
 		} else if (state == 1) {
 			if (Global.regions.Count == 0) {
 				state = 0;
-				Menu.change(new ErrorMenu(new string[]
-				{
+				Menu.change(new ErrorMenu(new string[] {
 						"No multiplayer regions configured.",
 						"Please add a region name/ip to region.txt",
 						"in game or MMXOD folder, then restart the game.",
@@ -58,7 +66,8 @@ public class PreJoinOrHostMenu : IMainMenu {
 				IMainMenu nextMenu = null;
 				if (isJoin) nextMenu = new JoinMenu(false);
 				else nextMenu = new HostMenu(prevMenu, null, false, false);
-
+				// Bans are useless and do not work without a main relay so are disabled.
+				/*
 				if (canPlayOnline(out string[] warningMessage)) {
 					if (warningMessage != null) {
 						Menu.change(new ErrorMenu(warningMessage, nextMenu));
@@ -66,6 +75,8 @@ public class PreJoinOrHostMenu : IMainMenu {
 						Menu.change(nextMenu);
 					}
 				}
+				*/
+				Menu.change(nextMenu);
 			}
 		}
 	}
@@ -159,20 +170,21 @@ public class PreJoinOrHostMenu : IMainMenu {
 		Helpers.drawTextStd(TCat.Title, "SELECT OPTION", Global.screenW * 0.5f, 20, Alignment.Center, fontSize: 40);
 
 		if (state == 0) {
-			Helpers.drawTextStd(TCat.Option, "INTERNET", startX, optionPos1.y, fontSize: 24, selected: selectY == 0);
+			Helpers.drawTextStd(TCat.Option, "RELAY", startX, optionPos[0].y, fontSize: 24, selected: selectY == 0);
 		} else {
-			Helpers.drawTextStd(TCat.Option, "LOADING...", startX, optionPos1.y, fontSize: 24, selected: selectY == 0);
+			Helpers.drawTextStd(TCat.Option, "LOADING...", startX, optionPos[0].y, fontSize: 24, selected: selectY == 0);
 		}
 
 		int msgPos = 140;
 		DrawWrappers.DrawLine(10, msgPos - 20, Global.screenW - 10, msgPos - 20, Color.White, 0.5f, ZIndex.HUD, isWorldPos: false);
 		Helpers.drawTextStd(TCat.Default, "NOTICE", Global.halfScreenW, msgPos - 14, Alignment.Center, fontSize: 24);
-		Helpers.drawTextStd(TCat.Default, "Official servers have been shut down.", Global.halfScreenW, msgPos, Alignment.Center, fontSize: 18);
-		Helpers.drawTextStd(TCat.Default, "See link below for self hosting guide:", Global.halfScreenW, msgPos + 10, Alignment.Center, fontSize: 18);
-		Helpers.drawTextStd(TCat.Default, "https://gamemaker19.github.io/MMXOnlineDesktop/decom.html", Global.halfScreenW, msgPos + 20, Alignment.Center, fontSize: 18);
+		Helpers.drawTextStd(TCat.Default, "See link below for self hosting guide:", Global.halfScreenW, msgPos, Alignment.Center, fontSize: 18);
+		Helpers.drawTextStd(TCat.Default, "https://gamemaker19.github.io/MMXOnlineDesktop/decom.html", Global.halfScreenW, msgPos + 10, Alignment.Center, fontSize: 18);
 		DrawWrappers.DrawLine(10, msgPos + 32, Global.screenW - 10, msgPos + 32, Color.White, 0.5f, ZIndex.HUD, isWorldPos: false);
 
-		Helpers.drawTextStd(TCat.Option, "LAN", startX, optionPos2.y, fontSize: 24, selected: selectY == 1);
+		Helpers.drawTextStd(TCat.Option, "LAN", startX, optionPos[2].y, fontSize: 24, selected: selectY == 2);
+
+		Helpers.drawTextStd(TCat.Option, "P2P", startX, optionPos[1].y, fontSize: 24, selected: selectY == 1);
 
 		Helpers.drawTextStd(TCat.BotHelp, "[X]: Choose, [Z]: Back", Global.halfScreenW, 200, Alignment.Center, fontSize: 24);
 	}

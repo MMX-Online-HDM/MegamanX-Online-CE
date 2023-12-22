@@ -321,7 +321,7 @@ public class RelayServer {
 	}
 
 	static void udpMain() {
-		config = new NetPeerConfiguration("matchmaking");
+		config = new NetPeerConfiguration("XOD-Matchmaking");
 		config.MaximumConnections = 10000;
 		config.MaximumTransmissionUnit = 8191;
 		config.Port = 14242;

@@ -60,7 +60,10 @@ public class MainMenu : IMainMenu {
 		}
 
 		if (Global.input.isPressed(Key.F1)) {
-			Menu.change(new TextExportMenu(new string[] { "Below is your checksum version:" }, "checksum", Global.checksum, this));
+			Menu.change(new TextExportMenu(
+				new string[] { "Below is your checksum version:" },
+				"checksum", Global.checksum, this)
+			);
 			return;
 		}
 

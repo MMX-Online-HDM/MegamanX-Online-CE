@@ -90,6 +90,10 @@ public class CharState {
 		}
 		// Stop the dash speed on transition to any frame except jump/fall (dash lingers in air) or dash itself
 		// TODO: Add a bool here to charstate.
+		if (newState == null) {
+			character.mk5RideArmorPlatform = null;
+			return;
+		}
 		if (newState is not Dash &&
 			newState is not Jump &&
 			newState is not Fall &&
@@ -1882,5 +1886,11 @@ public class GenericGrabbedState : CharState {
 		character.grabInvulnTime = 2;
 		character.useGravity = true;
 		character.setzIndex(savedZIndex);
+	}
+}
+
+public class NetLimbo : CharState {
+	public NetLimbo() : base("idle", "", "", "") {
+
 	}
 }

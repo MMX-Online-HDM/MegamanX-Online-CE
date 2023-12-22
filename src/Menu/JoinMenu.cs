@@ -276,7 +276,12 @@ public class JoinMenu : IMainMenu {
 			double minutes = (nextJoinTime - DateTime.UtcNow).TotalMinutes;
 			if (minutes > 0) {
 				int min = (int)Math.Ceiling(minutes);
-				Menu.change(new ErrorMenu(new string[] { "You have joined/disconnected too many times.", "Can rejoin in " + min.ToString() + " minutes." }, new MainMenu()));
+				Menu.change(new ErrorMenu(
+					new string[] {
+						"You have joined/disconnected too many times.",
+						"Can rejoin in " + min.ToString() + " minutes." },
+						new MainMenu())
+					);
 				return;
 			}
 		}
@@ -289,15 +294,22 @@ public class JoinMenu : IMainMenu {
 				double minutes = (banEntry.bannedUntil.Value - DateTime.UtcNow).TotalMinutes;
 				nextJoinTime = string.Format("Can rejoin in {0} minutes.", (int)Math.Ceiling(minutes));
 			}
-			Menu.change(new ErrorMenu(new string[] { "You were kicked from this server!", nextJoinTime }, new MainMenu()));
+			Menu.change(new ErrorMenu(
+				new string[] { "You were kicked from this server!", nextJoinTime }, new MainMenu())
+			);
 			return;
 		}
 
 		string playerName = Options.main.playerName;
 
-		var inputServerPlayer = new ServerPlayer(playerName, -1, false, SelectCharacterMenu.playerData.charNum, null, Global.deviceId, null, serverToJoin.region.getPing());
+		var inputServerPlayer = new ServerPlayer(
+			playerName, -1, false, SelectCharacterMenu.playerData.charNum,
+			null, Global.deviceId, null, serverToJoin.region.getPing()
+		);
 		Global.serverClient = ServerClient.Create(
-			serverToJoin.region.ip, serverToJoin.name, serverToJoin.port, inputServerPlayer, out JoinServerResponse joinServerResponse, out string error
+			serverToJoin.region.ip, serverToJoin.name, serverToJoin.port,
+			inputServerPlayer, out JoinServerResponse joinServerResponse,
+			out string error
 		);
 		if (Global.serverClient == null) {
 			Menu.change(new ErrorMenu(new string[] { error, "Please try rejoining." }, new JoinMenu(serverToJoin.isLAN)));

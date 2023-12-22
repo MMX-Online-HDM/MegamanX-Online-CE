@@ -2029,7 +2029,19 @@ public class GameMode {
 
 	public void drawNetcodeData() {
 		int top2 = -3;
-		Helpers.drawTextStd(TCat.HUD, Global.level.server.region.name, Global.screenW - 12, top2 + 12, Alignment.Right, fontSize: 24, style: Text.Styles.Italic);
+		if (!Global.level.server.isP2P) {
+			Helpers.drawTextStd(
+				TCat.HUD, Global.level.server.region.name,
+				Global.screenW - 12, top2 + 12, Alignment.Right,
+				fontSize: 24, style: Text.Styles.Italic
+			);
+		} else {
+			Helpers.drawTextStd(
+				TCat.HUD, "P2P Server",
+				Global.screenW - 12, top2 + 12, Alignment.Right,
+				fontSize: 24, style: Text.Styles.Italic
+			);
+		}
 
 		string netcodePingStr = "";
 		int iconXPos = 280;

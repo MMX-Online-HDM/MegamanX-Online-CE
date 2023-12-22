@@ -178,7 +178,7 @@ public partial class Character : Actor, IDamagable {
 			if (isWarpIn) initialCharState = new WarpIn();
 			else initialCharState = new Idle();
 		} else {
-			initialCharState = new Idle();
+			initialCharState = new NetLimbo(); 
 		}
 
 		spriteToCollider["roll"] = getDashingCollider();
@@ -2780,7 +2780,10 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public void setHurt(int dir, int flinchFrames, float miniFlinchTime, bool spiked) {
-		// tough guy
+		if (!ownedByLocalPlayer) {
+			return;
+		}
+		// Tough Guy.
 		if (player.isSigma || isToughGuyHyperMode()) {
 			if (miniFlinchTime > 0) return;
 			else {
