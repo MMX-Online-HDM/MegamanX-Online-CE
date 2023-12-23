@@ -1015,10 +1015,6 @@ public partial class Character : Actor, IDamagable {
 		Helpers.decrementTime(ref slowdownTime);
 
 		if (!ownedByLocalPlayer) {
-			return;
-		}
-
-		if (!ownedByLocalPlayer) {
 			if (isCharging()) {
 				chargeLogic();
 			} else {

@@ -156,7 +156,7 @@ public class SelectZeroWeaponMenu : IMainMenu {
 			DrawWrappers.DrawRect(5, 5, Global.screenW - 5, Global.screenH - 5, true, Helpers.MenuBgColor, 0, ZIndex.HUD + 200, false);
 		}
 
-		Helpers.drawTextStd(TCat.Title, "Zero Loadout", Global.screenW * 0.5f, 12, Alignment.Center, fontSize: 48);
+		Fonts.drawText(FontType.OrangeMenu, "Zero Loadout", Global.screenW * 0.5f, 20, Alignment.Center);
 		var outlineColor = inGame ? Color.White : Helpers.LoadoutBorderColor;
 		float botOffY = inGame ? 0 : -2;
 
@@ -164,8 +164,8 @@ public class SelectZeroWeaponMenu : IMainMenu {
 		int startX = 30;
 		int wepH = 15;
 
-		float wepPosX = 155;
-		float wepTextX = 167;
+		float wepPosX = 195;
+		float wepTextX = 207;
 
 		Global.sprites["cursor"].drawToHUD(0, startX, startY + (selCursorIndex * wepH) - 2);
 		Color color;
@@ -174,9 +174,15 @@ public class SelectZeroWeaponMenu : IMainMenu {
 			color = isIndexDisabled(i) ? Helpers.Gray : Color.White;
 			alpha = isIndexDisabled(i) ? 0.5f : 1f;
 			float yPos = startY - 6 + (i * wepH);
-			Helpers.drawTextStd(TCat.Option, zeroWeaponCategories[i].Item1 + ": ", 40, yPos, color: color, fontSize: 24, selected: selCursorIndex == i);
+			Fonts.drawText(
+				FontType.BlueMenu, zeroWeaponCategories[i].Item1 + ":", 40,
+				yPos, selected: selCursorIndex == i
+			);
 			var weapon = zeroWeaponCategories[i].Item2[cursors[i].index];
-			Helpers.drawTextStd(TCat.Option, weapon.displayName, wepTextX, yPos, color: color, fontSize: 24, selected: selCursorIndex == i);
+			Fonts.drawText(
+				FontType.BlueMenu, weapon.displayName, wepTextX, yPos,
+				selected: selCursorIndex == i
+			);
 			Global.sprites["hud_killfeed_weapon"].drawToHUD(weapon.killFeedIndex, wepPosX, yPos + 3, alpha);
 		}
 
@@ -184,26 +190,45 @@ public class SelectZeroWeaponMenu : IMainMenu {
 		alpha = isIndexDisabled(8) ? 0.5f : 1f;
 
 		float hyperModeYPos = startY - 6 + (wepH * 8);
-		Helpers.drawTextStd(TCat.Option, "Hyper Mode:", 40, hyperModeYPos, color: color, fontSize: 24, selected: selCursorIndex == 8);
+		Fonts.drawText(
+			FontType.BlueMenu, "Hyper Mode:", 40, hyperModeYPos,
+			selected: selCursorIndex == 8
+		);
 		if (cursors[8].index == 0) {
-			Helpers.drawTextStd(TCat.Option, "Black Zero", wepTextX, hyperModeYPos, color: color, fontSize: 24, selected: selCursorIndex == 8);
+			Fonts.drawText(
+				FontType.BlueMenu, "Black Zero", wepTextX, hyperModeYPos,
+				selected: selCursorIndex == 8
+			);
 			Global.sprites["hud_killfeed_weapon"].drawToHUD(122, wepPosX, hyperModeYPos + 3, alpha);
 		} else if (cursors[8].index == 1) {
-			Helpers.drawTextStd(TCat.Option, "Awakened Zero", wepTextX, hyperModeYPos, color: color, fontSize: 24, selected: selCursorIndex == 8);
+			Fonts.drawText(
+				FontType.BlueMenu, "Awakened Zero", wepTextX, hyperModeYPos,
+				selected: selCursorIndex == 8
+			);
 			Global.sprites["hud_killfeed_weapon"].drawToHUD(87, wepPosX, hyperModeYPos + 3, alpha);
 		} else if (cursors[8].index == 2) {
-			Helpers.drawTextStd(TCat.Option, "Nightmare Zero", wepTextX, hyperModeYPos, color: color, fontSize: 24, selected: selCursorIndex == 8);
+			Fonts.drawText(
+				FontType.BlueMenu, "Viral Zero", wepTextX, hyperModeYPos,
+				selected: selCursorIndex == 8
+			);
 			Global.sprites["hud_killfeed_weapon"].drawToHUD(173, wepPosX, hyperModeYPos + 3, alpha);
 		}
 
 		int wsy = 167;
-		DrawWrappers.DrawRect(25, wsy + 2, Global.screenW - 30, wsy + 28, true, new Color(0, 0, 0, 100), 0.5f, ZIndex.HUD, false, outlineColor: outlineColor);
+		DrawWrappers.DrawRect(
+			25, wsy + 2, Global.screenW - 30, wsy + 28, true, new Color(0, 0, 0, 100), 1,
+			ZIndex.HUD, false, outlineColor: outlineColor
+		);
 
 		if (selCursorIndex < 8) {
 			var wep = zeroWeaponCategories[selCursorIndex].Item2[cursors[selCursorIndex].index];
-			if (wep.description?.Length == 1) Helpers.drawTextStd(wep.description[0], 40, wsy + 12, Alignment.Left, style: Text.Styles.Italic, fontSize: 18);
-			else if (wep.description?.Length > 0) Helpers.drawTextStd(wep.description[0], 40, wsy + 8, Alignment.Left, style: Text.Styles.Italic, fontSize: 18);
-			if (wep.description?.Length > 1) Helpers.drawTextStd(wep.description[1], 40, wsy + 17, Alignment.Left, style: Text.Styles.Italic, fontSize: 18);
+			int posY = 6;
+			foreach (string description in wep.description) {
+				Fonts.drawText(
+					FontType.BlueMenu, wep.description[0], 30, wsy + 6, Alignment.Left
+				);
+				posY += 9;
+			}
 		} else {
 			if (cursors[8].index == 0) {
 				Helpers.drawTextStd("This hyper form increases speed and damage.", 40, wsy + 8, Alignment.Left, style: Text.Styles.Italic, fontSize: 18);
@@ -216,12 +241,13 @@ public class SelectZeroWeaponMenu : IMainMenu {
 				Helpers.drawTextStd("Lasts until death.", 40, wsy + 17, Alignment.Left, style: Text.Styles.Italic, fontSize: 18);
 			}
 		}
-
+		/*
 		Helpers.drawTextStd(TCat.BotHelp, "Left/Right: Change Technique", Global.screenW * 0.5f, 200 + botOffY, Alignment.Center, fontSize: 18);
 		Helpers.drawTextStd(TCat.BotHelp, "Up/Down: Change Category", Global.screenW * 0.5f, 205 + botOffY, Alignment.Center, fontSize: 18);
 		string helpText = "[Z]: Back, [X]: Confirm";
 		if (!inGame) helpText = "[Z]: Save and back";
 		Helpers.drawTextStd(TCat.BotHelp, helpText, Global.screenW * 0.5f, 210 + botOffY, Alignment.Center, fontSize: 18);
+		*/
 		if (!string.IsNullOrEmpty(error)) {
 			float top = Global.screenH * 0.4f;
 			DrawWrappers.DrawRect(5, 5, Global.screenW - 5, Global.screenH - 5, true, new Color(0, 0, 0, 224), 0, ZIndex.HUD, false);

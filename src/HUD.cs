@@ -51,7 +51,7 @@ public partial class DrawWrappers {
 		string fontPath = Global.assetPath + "assets/fonts/Mega Man X.ttf";
 		font = new Font(fontPath);
 	}
-	private static void drawToHUD(Drawable drawable) {
+	public static void drawToHUD(Drawable drawable) {
 		Global.window.SetView(hudView);
 		Global.window.Draw(drawable);
 		Global.window.SetView(Global.view);
@@ -159,10 +159,13 @@ public partial class DrawWrappers {
 				int whPadding = wh + padding;
 				int rx = charInt % 16;
 				int ry = charInt / 16;
+				int customOffset = 0;
 
-				var textSprite = new SFML.Graphics.Sprite(bitmapFontTexture, new IntRect(rx * whPadding, ry * whPadding, 11, 11));
+				var textSprite = new SFML.Graphics.Sprite(
+					bitmapFontTexture, new IntRect(rx * whPadding, ry * whPadding, 11, 11)
+				);
 
-				float xPos = MathF.Round(x) + (i * fontSize * 8f) - 1;
+				float xPos = MathF.Round(x) + (i * fontSize * 8f) - 1 + customOffset;
 				float yPos = MathF.Round(y) + (j * fontSize * (8f + lineMargin)) - 1;
 				textSprite.Position = new Vector2f(xPos, yPos);
 				textSprite.Color = color ?? Color.White;

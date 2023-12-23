@@ -13,17 +13,19 @@ using static SFML.Window.Keyboard;
 namespace MMXOnline;
 
 public class MainMenu : IMainMenu {
-	public const int startPos = 105;
+	public const int startPos = 107;
 	public const int yDistance = 13;
 
 	public int selectY;
-	public Point optionPos1 = new Point(90, startPos);
-	public Point optionPos2 = new Point(90, startPos + yDistance);
-	public Point optionPos3 = new Point(90, startPos + yDistance * 2);
-	public Point optionPos4 = new Point(90, startPos + yDistance * 3);
-	public Point optionPos5 = new Point(90, startPos + yDistance * 4);
-	public Point optionPos6 = new Point(90, startPos + yDistance * 5);
-	public Point optionPos7 = new Point(90, startPos + yDistance * 6);
+	public Point[] optionPos = {
+		new Point(90, startPos),
+		new Point(90, startPos + yDistance),
+		new Point(90, startPos + yDistance * 2),
+		new Point(90, startPos + yDistance * 3),
+		new Point(90, startPos + yDistance * 4),
+		new Point(90, startPos + yDistance * 5),
+		new Point(90, startPos + yDistance * 6)
+	};
 
 	public float blinkTime = 0;
 
@@ -160,7 +162,7 @@ public class MainMenu : IMainMenu {
 	}
 
 	public void render() {
-		float startX = 35;
+		float startX = 75;
 
 		string selectionImage = "";
 		if (selectY == 0) selectionImage = "joinserver";
@@ -173,19 +175,22 @@ public class MainMenu : IMainMenu {
 
 		DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0);
 		DrawWrappers.DrawTitleTexture(Global.textures["mainmenutitle"]);
-		DrawWrappers.DrawTextureHUD(Global.textures["cursor"], startX - 10, startPos + 1 + (selectY * yDistance));
-		DrawWrappers.DrawTextureHUD(Global.textures[selectionImage], 165, 107);
-		DrawWrappers.DrawTextureHUD(Global.textures["mainmenubox"], 156, 98);
+		DrawWrappers.DrawTextureHUD(Global.textures["cursor"], startX - 10, startPos - 2 + (selectY * yDistance));
+		DrawWrappers.DrawTextureHUD(Global.textures[selectionImage], 208, 107);
+		DrawWrappers.DrawTextureHUD(Global.textures["mainmenubox"], 199, 98);
 
-		Helpers.drawTextStd(TCat.Option, "JOIN MATCH", startX, optionPos1.y, selected: selectY == 0);
-		Helpers.drawTextStd(TCat.Option, "CREATE MATCH", startX, optionPos2.y, selected: selectY == 1);
-		Helpers.drawTextStd(TCat.Option, "VS. CPU", startX, optionPos3.y, selected: selectY == 2);
-		Helpers.drawTextStd(TCat.Option, "LOADOUT", startX, optionPos4.y, selected: selectY == 3);
-		Helpers.drawTextStd(TCat.Option, "CONTROLS", startX, optionPos5.y, selected: selectY == 4);
-		Helpers.drawTextStd(TCat.Option, "SETTINGS", startX, optionPos6.y, selected: selectY == 5);
-		Helpers.drawTextStd(TCat.Option, "QUIT", startX, optionPos7.y, selected: selectY == 6);
+		Fonts.drawText(FontType.BlueMenu, "Join Match", startX, optionPos[0].y, selected: selectY == 0);
+		Fonts.drawText(FontType.BlueMenu, "Create Match", startX, optionPos[1].y, selected: selectY == 1);
+		Fonts.drawText(FontType.BlueMenu, "VS. CPU", startX, optionPos[2].y, selected: selectY == 2);
+		Fonts.drawText(FontType.BlueMenu, "Loadout", startX, optionPos[3].y, selected: selectY == 3);
+		Fonts.drawText(FontType.BlueMenu, "Controls", startX, optionPos[4].y, selected: selectY == 4);
+		Fonts.drawText(FontType.BlueMenu, "Settings", startX, optionPos[5].y, selected: selectY == 5);
+		Fonts.drawText(FontType.BlueMenu, "Quit", startX, optionPos[6].y, selected: selectY == 6);
 
-		Helpers.drawTextStd(TCat.BotHelp, "Up/down: Change selection, [X]: Choose", Global.screenW / 2, 209, Alignment.Center, fontSize: 24);
+		Fonts.drawText(
+			FontType.BlueMenu, "Up/down: Change selection, [X]: Choose",
+			Global.screenW / 2, Global.screenH - 12, Alignment.Center
+		);
 
 		if (state == 0) {
 			float top = Global.screenH * 0.4f;

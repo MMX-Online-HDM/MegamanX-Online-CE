@@ -828,7 +828,7 @@ public class KaiserSigmaRevive : CharState {
 		}
 		character.frameIndex = 0;
 		character.frameSpeed = 0;
-		character.immuneToKnockback = true;
+		//character.immuneToKnockback = true;
 		character.alpha = 0;
 		player.sigmaAmmo = player.sigmaMaxAmmo;
 		KaiserSigma kaiserSigma = character as KaiserSigma;

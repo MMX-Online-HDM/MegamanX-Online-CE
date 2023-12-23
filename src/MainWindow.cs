@@ -93,6 +93,10 @@ public partial class Global {
 			viewPort = getFullScreenViewPort();
 		}
 
+		if (!File.Exists(Global.assetPath + "assets/menu/icon.png")) {
+			throw new Exception("Error loading icon asset file, posible missing assets.");
+		}
+
 		var image = new Image(Global.assetPath + "assets/menu/icon.png");
 		window.SetIcon(image.Size.X, image.Size.Y, image.Pixels);
 
