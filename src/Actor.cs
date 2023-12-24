@@ -48,7 +48,9 @@ public partial class Actor : GameObject {
 	public string startSound;
 	public bool isStatic;
 	public bool startMethodCalled;
-	public float? _angle;
+	// Angle stuff.
+	// We a 256 for a full turn to make easier to send over netcode.
+	public float? _byteAngle;
 	public bool customAngleRendering;
 	public bool useGravity;
 	public bool gravityWellable { get { return this is Character || this is RideArmor || this is Maverick || this is RideChaser; } }
@@ -307,13 +309,25 @@ public partial class Actor : GameObject {
 
 	public float? angle {
 		get {
-			return _angle;
+			return _byteAngle * 1.40625f;
 		}
 		set {
-			_angle = value;
-			if (value == null) return;
-			if (_angle < 0) _angle += 360;
-			if (_angle > 360) _angle -= 360;
+			if (value == null) {
+				return;
+			}
+			_byteAngle = (value / 1.40625f) % 256;
+		}
+	}
+
+	public float? byteAngle {
+		get {
+			return _byteAngle;
+		}
+		set {
+			if (value == null) {
+				return;
+			}
+			_byteAngle =  value % 256;
 		}
 	}
 
@@ -942,9 +956,9 @@ public partial class Actor : GameObject {
 				return;
 			}
 
-			float frameSmooth = 2; //Global.tickRate;
+			float frameSmooth = Global.tickRate;
 
-			if (interplorateNetPos) {
+			if (frameSmooth > 1 && interplorateNetPos) {
 				if (targetNetPos != null) {
 					changePos(targetNetPos.Value);
 					targetNetPos = null;
@@ -976,13 +990,18 @@ public partial class Actor : GameObject {
 			}
 			else if (!stopSyncingNetPos) {
 				var netPos = pos;
+				bool posChanged = false;
 				if (netXPos != null) {
 					netPos.x = (float)netXPos;
+					posChanged = true;
 				}
 				if (netYPos != null) {
 					netPos.y = (float)netYPos;
+					posChanged = true;
 				}
-				changePos(netPos);
+				if (posChanged) {
+					changePos(netPos);
+				}
 			}
 
 			int spriteIndex = Global.spriteNames.IndexOf(sprite.name);
@@ -1006,7 +1025,7 @@ public partial class Actor : GameObject {
 				yDir = (int)netYDir;
 			}
 			if (netAngle != null && netAngle != lastAngle) {
-				angle = netAngle;
+				byteAngle = netAngle;
 			}
 		}
 	}
@@ -1198,7 +1217,11 @@ public partial class Actor : GameObject {
 	}
 
 	//Optionally take in a sprite to draw when destroyed
-	public virtual void destroySelf(string spriteName = null, string fadeSound = null, bool disableRpc = false, bool doRpcEvenIfNotOwned = false, bool favorDefenderProjDestroy = false) {
+	public virtual void destroySelf(
+		string spriteName = null, string fadeSound = null,
+		bool disableRpc = false, bool doRpcEvenIfNotOwned = false,
+		bool favorDefenderProjDestroy = false
+	) {
 		// These should never be destroyed and can break the match if so
 		if (this is Flag || this is FlagPedestal || this is ControlPoint || this is VictoryPoint) {
 			return;
@@ -1215,8 +1238,9 @@ public partial class Actor : GameObject {
 		Global.level.removeGameObject(this);
 		if (spriteName != null) {
 			var anim = new Anim(getCenterPos(), spriteName, xDir, null, true);
+			// TODO: Fix this. WTF GM19.
 			if (spriteName != "explosion") {
-				anim.angle = angle;
+				anim.byteAngle = byteAngle;
 				if (anim.angle != null) {
 					anim.xDir = 1;
 				}

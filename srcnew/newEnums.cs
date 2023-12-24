@@ -1,3 +1,5 @@
+namespace MMXOnline;
+
 public enum ArmorId {
 	None = 0,
 	Light = 1,
@@ -19,7 +21,7 @@ public enum SpecialStateIds {
 }
 
 public static class ArmorParts {
-	public static string[] name = {
+	public static readonly string[] name = {
 		"Leg",
 		"Body",
 		"Helm",

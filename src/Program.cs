@@ -142,6 +142,7 @@ class Program {
 		loadLevels();
 		loadSounds();
 		loadMusics();
+		Fonts.loadFontSizes();
 
 		Global.computeChecksum();
 
@@ -601,7 +602,9 @@ class Program {
 		var spritesheets = Helpers.getFiles(Global.assetPath + spritesheetPath, false, "png", "psd");
 
 		var menuImages = Helpers.getFiles(Global.assetPath + "assets/menu", true, "png", "psd");
+		var fontSprites = Helpers.getFiles(Global.assetPath + "assets/fonts", true, "png", "psd");
 		spritesheets.AddRange(menuImages);
+		spritesheets.AddRange(fontSprites);
 
 		for (int i = 0; i < spritesheets.Count; i++) {
 			string path = spritesheets[i];
@@ -908,11 +911,10 @@ class Program {
 		int videoUpdatesThisSecond = 0;
 		int framesUpdatesThisSecond = 0;
 		bool useFrameSkip = false;
-		DateTimeOffset UnixEpoch = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
 		// Main loop itself.
 		while (window.IsOpen) {
-			var timeSpam = (DateTimeOffset.UtcNow - UnixEpoch);
+			var timeSpam = (DateTimeOffset.UtcNow - Global.UnixEpoch);
 			long timeNow = timeSpam.Ticks;
 			long timeSecondsNow = (long)Math.Floor(timeSpam.TotalSeconds);
 

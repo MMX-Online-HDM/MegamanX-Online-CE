@@ -61,13 +61,13 @@ public class QuakeBlazerWeapon : Weapon {
 	}
 }
 
-public class Hyouretsuzan : CharState {
+public class ZeroFallStab : CharState {
 	public Weapon weapon;
 	public HyouretsuzanType type { get { return (HyouretsuzanType)weapon.type; } }
 	public bool canFreeze;
 	public Zero zero;
 
-	public Hyouretsuzan(Weapon weapon) : base(
+	public ZeroFallStab(Weapon weapon) : base(
 		getSpriteName(weapon.type) + "_fall", "", "", getSpriteName(weapon.type) + "_start"
 	) {
 		this.weapon = weapon;

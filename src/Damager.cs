@@ -351,7 +351,7 @@ public class Damager {
 					character.splashLaserKnockback(damagingActor.deltaPos);
 				}
 			} else if (projId == (int)ProjIds.MechFrogStompShockwave || projId == (int)ProjIds.FlameMStompShockwave || projId == (int)ProjIds.TBreakerProj) {
-				if (character.grounded) {
+				if (character.grounded && character.ownedByLocalPlayer) {
 					character.changeState(new KnockedDown(character.pos.x < damagingActor?.pos.x ? -1 : 1), true);
 				}
 			} else if (projId == (int)ProjIds.MechFrogGroundPound) {
@@ -572,7 +572,9 @@ public class Damager {
 
 				if (maverick.sprite.name == "armoreda_block" && damage > 0 && !isArmorPiercingOrElectric(projId)) {
 					if (isArmoredAGuardBlocking(maverick, damagingActor, owner)) {
-						if (maverick.ownedByLocalPlayer && damage > 2 && damagingActor is Projectile proj && proj.shouldVortexSuck && proj.destroyOnHit) {
+						if (maverick.ownedByLocalPlayer && damage > 2 &&
+							damagingActor is Projectile proj && proj.shouldVortexSuck && proj.destroyOnHit
+						) {
 							maverick.changeState(new ArmoredAGuardChargeState(damage * 2));
 						}
 						flinch = 0;
@@ -582,7 +584,9 @@ public class Damager {
 							owner.character is Zero zero &&
 							!zero.isHyperZero()
 						) {
-							if (projId == (int)ProjIds.ZSaber || projId == (int)ProjIds.ZSaber1 || projId == (int)ProjIds.ZSaber2 || projId == (int)ProjIds.ZSaber3) {
+							if (projId == (int)ProjIds.ZSaber || projId == (int)ProjIds.ZSaber1 ||
+								projId == (int)ProjIds.ZSaber2 || projId == (int)ProjIds.ZSaber3
+							) {
 								owner.character.changeState(new ZeroClang(-owner.character.xDir));
 							}
 						}
@@ -808,7 +812,10 @@ public class Damager {
 
 	public static DamagerMessage onStunShotDamage(IDamagable damagable, Player attacker) {
 		var character = damagable as Character;
-		if (character != null && !character.isInvulnerable() && !(character.charState is Hurt) && !(character.charState is Die) && character.player.alliance != attacker.alliance) {
+		if (character != null && character.ownedByLocalPlayer && !character.isInvulnerable() &&
+			!(character.charState is Hurt) && !(character.charState is Die) &&
+			character.player.alliance != attacker.alliance
+		) {
 			if (!(character.charState is Stunned)) {
 				character.changeState(new Stunned(), true);
 			}

@@ -146,7 +146,12 @@ public class WaitMenu : IMainMenu {
 		}
 
 		autoRefreshTime += Global.spf;
-		if (Global.input.isPressedMenu(Control.MenuSelectSecondary) || (autoRefreshTime > autoRefreshInterval && autoRefreshCount < maxAutoRefreshCount)) {
+		if (server.isP2P) {
+			return;
+		}
+		if (Global.input.isPressedMenu(Control.MenuSelectSecondary) ||
+			(autoRefreshTime > autoRefreshInterval && autoRefreshCount < maxAutoRefreshCount)
+		) {
 			autoRefreshTime = 0;
 			autoRefreshCount++;
 			byte[] serverBytes = Global.matchmakingQuerier.send(server.region.ip, "GetServer:" + server.name);

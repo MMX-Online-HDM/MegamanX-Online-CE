@@ -25,16 +25,15 @@ public class MatchmakingQuerier {
 
 	private string sendHelper(string ip, string query, int? timeoutMs = null) {
 		try {
-			if (timeoutMs == null) timeoutMs = Options.main.getNetworkTimeoutMs();
-			using (TcpClient client = getTcpClient(ip, timeoutMs.Value)) {
-				using NetworkStream networkStream = client.GetStream();
-				client.SendTimeout = timeoutMs.Value;
-				client.ReceiveTimeout = timeoutMs.Value;
+			timeoutMs ??= Options.main.getNetworkTimeoutMs();
+			using TcpClient client = getTcpClient(ip, timeoutMs.Value);
+			using NetworkStream networkStream = client.GetStream();
+			client.SendTimeout = timeoutMs.Value;
+			client.ReceiveTimeout = timeoutMs.Value;
 
-				client.SendStringMessage(query, networkStream);
-				string response = client.ReadStringMessage(networkStream);
-				return response;
-			}
+			client.SendStringMessage(query, networkStream);
+			string response = client.ReadStringMessage(networkStream);
+			return response;
 		} catch {
 			return null;
 		}
@@ -42,16 +41,15 @@ public class MatchmakingQuerier {
 
 	private byte[] sendHelperGetBytes(string ip, string query, int? timeoutMs = null) {
 		try {
-			if (timeoutMs == null) timeoutMs = Options.main.getNetworkTimeoutMs();
-			using (TcpClient client = getTcpClient(ip, timeoutMs.Value)) {
-				using NetworkStream networkStream = client.GetStream();
-				client.SendTimeout = timeoutMs.Value;
-				client.ReceiveTimeout = timeoutMs.Value;
+			timeoutMs ??= Options.main.getNetworkTimeoutMs();
+			using TcpClient client = getTcpClient(ip, timeoutMs.Value);
+			using NetworkStream networkStream = client.GetStream();
+			client.SendTimeout = timeoutMs.Value;
+			client.ReceiveTimeout = timeoutMs.Value;
 
-				client.SendStringMessage(query, networkStream);
-				byte[] response = client.ReadMessage(networkStream);
-				return response;
-			}
+			client.SendStringMessage(query, networkStream);
+			byte[] response = client.ReadMessage(networkStream);
+			return response;
 		} catch {
 			return null;
 		}

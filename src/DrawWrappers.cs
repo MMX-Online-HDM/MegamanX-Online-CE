@@ -229,8 +229,8 @@ public partial class DrawWrappers {
 		if (isWorldPos && Options.main.enablePostProcessing) {
 			dx -= Global.level.camX;
 			dy -= Global.level.camY;
-			dx = MathF.Round(dx);
-			dy = MathF.Round(dy);
+			dx = MathF.Floor(dx);
+			dy = MathF.Floor(dy);
 		}
 
 		var sprite = new SFML.Graphics.Sprite(texture, new IntRect((int)sx, (int)sy, (int)sw, (int)sh));

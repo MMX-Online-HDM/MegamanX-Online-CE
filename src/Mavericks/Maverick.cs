@@ -431,7 +431,9 @@ public class Maverick : Actor, IDamagable {
 						assignedDist = 40 * (i + 1);
 					}
 				}
-
+				if (!grounded) {
+					assignedDist = 10f;
+				}
 				if (MathF.Abs(dist) > assignedDist) {
 					if (dist < 0) press(Control.Left);
 					else press(Control.Right);

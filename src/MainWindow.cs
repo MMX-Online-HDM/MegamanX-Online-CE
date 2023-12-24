@@ -39,8 +39,8 @@ public partial class Global {
 	public static View view;
 	public static View backgroundView;
 
-	public static uint screenW = 298;
-	public static uint screenH = 224;
+	public static uint screenW = 384;
+	public static uint screenH = 216;
 
 	public static uint viewScreenW { get { return screenW * (uint)viewSize; } }
 	public static uint viewScreenH { get { return screenH * (uint)viewSize; } }
@@ -91,6 +91,10 @@ public partial class Global {
 			window = new RenderWindow(new VideoMode(desktopWidth, desktopHeight), "MMX Online: Deathmatch", Styles.Fullscreen);
 			window.SetMouseCursorVisible(false);
 			viewPort = getFullScreenViewPort();
+		}
+
+		if (!File.Exists(Global.assetPath + "assets/menu/icon.png")) {
+			throw new Exception("Error loading icon asset file, posible missing assets.");
 		}
 
 		var image = new Image(Global.assetPath + "assets/menu/icon.png");

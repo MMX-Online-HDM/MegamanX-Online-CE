@@ -416,7 +416,7 @@ public class KillZone : Geometry {
 			if (damagable is Character chr) {
 				chr.playSound(flinch ? "hurt" : "hit", sendRpc: true);
 				chr.addRenderEffect(RenderEffectType.Hit, 0.05f, 0.1f);
-				if (flinch) {
+				if (flinch && chr.ownedByLocalPlayer) {
 					chr.changeState(new Hurt(-chr.xDir, flinch ? Global.defFlinch : 0, 0));
 				}
 			} else {

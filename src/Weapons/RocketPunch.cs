@@ -93,9 +93,6 @@ public class RocketPunchProj : Projectile {
 		projId = (int)ProjIds.RocketPunch;
 		this.player = player;
 		shooter = player.character;
-		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
-		}
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 		if (player.character != null) setzIndex(player.character.zIndex - 100);
@@ -115,6 +112,9 @@ public class RocketPunchProj : Projectile {
 			projId = (int)ProjIds.SpoiledBrat;
 		} else if (weapon.type == (int)RocketPunchType.InfinityGig) {
 			projId = (int)ProjIds.InfinityGig;
+		}
+		if (rpc) {
+			rpcCreate(pos, player, netProjId, xDir);
 		}
 	}
 

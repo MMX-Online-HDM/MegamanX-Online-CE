@@ -123,9 +123,13 @@ public class Helpers {
 		drawTextStd(TCat.Default, textStr, x, y, alignment, outline, fontSize, color, outlineColor, style, outlineThickness, alpha, lineMargin, vAlignment, useVectorFont, isWorldPos);
 	}
 
-	public static void drawTextStd(TCat textCategory, string textStr, float x, float y, Alignment alignment = Alignment.Left, bool outline = true, uint fontSize = 36, Color? color = null,
+	public static void drawTextStd(
+		TCat textCategory, string textStr, float x, float y,
+		Alignment alignment = Alignment.Left, bool outline = true, uint fontSize = 32, Color? color = null,
 		Color? outlineColor = null, Styles style = Styles.Regular, float? outlineThickness = null, float alpha = 1,
-		float lineMargin = DrawWrappers.defaultLineMargin, VAlignment vAlignment = VAlignment.Top, bool selected = false, bool isWorldPos = false, int optionPadding = 0) {
+		float lineMargin = DrawWrappers.defaultLineMargin, VAlignment vAlignment = VAlignment.Top,
+		bool selected = false, bool isWorldPos = false, int optionPadding = 0
+	) {
 		if (shouldUseVectorFont(textCategory)) {
 			if (color == null) {
 				color = new Color(255, 255, 255, Helpers.toColorByte(alpha));
@@ -143,7 +147,8 @@ public class Helpers {
 			else outlineThickness = 2;
 		}
 
-		// Pipeline step 2: sizes are "normalized" at 4x what they are supposed to be. This is a mistake but to avoid massive refactor, will "shim" it for now
+		// Pipeline step 2: sizes are "normalized" at 4x what they are supposed to be.
+		// This is a mistake but to avoid massive refactor, will "shim" it for now
 		fontSize = normalizeFontSize(fontSize);
 		outlineThickness = outlineThickness / 4f;
 
@@ -165,14 +170,14 @@ public class Helpers {
 				if (optionPadding > 0) {
 					padding = new string(' ', optionPadding - pieces[0].Length);
 				}
-				textStr = pieces[0].ToUpperInvariant() + ": " + padding + pieces[1];
-			} else {
-				textStr = textStr.ToUpperInvariant();
-			}
+				textStr = pieces[0] + ": " + padding + pieces[1];
+			}/* else {
+				textStr = textStr;
+			}*/
 		}
 		if (textCategory == TCat.OptionNoSplit) {
 			font = MMXFont.Menu;
-			textStr = textStr.ToUpperInvariant();
+			//textStr = textStr;
 		}
 		if (textCategory == TCat.BotHelp) {
 			textStr = Helpers.menuControlText(textStr);
@@ -180,7 +185,7 @@ public class Helpers {
 		}
 		if (textCategory == TCat.Title) {
 			font = MMXFont.Title;
-			textStr = textStr.ToUpperInvariant();
+			//textStr = textStr.ToUpperInvariant();
 		}
 		if (textCategory == TCat.Default) {
 			font = MMXFont.Gray;
@@ -674,9 +679,9 @@ public class Helpers {
 	}
 
 	public static void debugLog(string message) {
-		if (Global.debug || Global.consoleDebugLogging) {
+		//if (Global.debug || Global.consoleDebugLogging) {
 			Console.WriteLine(message);
-		}
+		//}
 	}
 
 	private static ProfanityFilter.ProfanityFilter _profanityFilter;

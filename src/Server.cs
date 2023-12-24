@@ -21,6 +21,7 @@ public enum NetcodeModel {
 [ProtoContract]
 public class Server {
 	// Must be a thread safe list
+	[JsonIgnore]
 	public static ConcurrentDictionary<Server, bool> servers = new ConcurrentDictionary<Server, bool>();
 
 	[ProtoMember(1)] public string name;
@@ -59,11 +60,31 @@ public class Server {
 	[ProtoMember(29)] public string ip;
 	[ProtoMember(30)] public bool disableHtSt;
 	[ProtoMember(31)] public bool disableVehicles;
+	[ProtoMember(32)] public bool isP2P;
 
+	[JsonIgnore]
 	public int redScore;
+	[JsonIgnore]
 	public int blueScore;
-
+	[JsonIgnore]
 	public int nonSpecPlayerCountOnStart;
+	[JsonIgnore]
+	public ServerPlayer host { get; set; }
+	[JsonIgnore]
+	public int framesZeroPlayers;
+	[JsonIgnore]
+	public ServerPlayer playerToAutobalance;
+	[JsonIgnore]
+	public NetServer s_server;
+	[JsonIgnore]
+	public bool killServer;
+	[JsonIgnore]
+	public Dictionary<string, int> weaponKillStats = new Dictionary<string, int>();
+	
+	long iterations = 0;
+	private long lastUpdateTime = 0L;
+	private long fpsLimit = 83333;
+	private bool loggedOnce = false;
 
 	public bool isCustomMap() {
 		return !string.IsNullOrEmpty(customMapChecksum);
@@ -77,16 +98,7 @@ public class Server {
 	public const byte getServersQueryByte = 0;
 	public const byte getServerQueryByte = 1;
 
-	public const int maxPlayerCap = 50;
-
-	[JsonIgnore]
-	public ServerPlayer host { get; set; }
-
-	[JsonIgnore]
-	public int framesZeroPlayers;
-
-	[JsonIgnore]
-	public ServerPlayer playerToAutobalance;
+	public const int maxPlayerCap = 64;
 
 	public Server() { }
 
@@ -109,7 +121,7 @@ public class Server {
 		this.gameMode = gameMode;
 		this.playTo = playTo;
 		this.botCount = botCount;
-		this.maxPlayers = Helpers.clamp(maxPlayers, 10, maxPlayerCap);
+		this.maxPlayers = Helpers.clamp(maxPlayers, 12, maxPlayerCap);
 		this.timeLimit = (timeLimit == 0 ? null : (int?)timeLimit);
 		this.fixedCamera = fixedCamera;
 		this.hidden = hidden;
@@ -320,17 +332,23 @@ public class Server {
 		return pool.GetRandomItem();
 	}
 
-	long iterations = 0;
-	NetServer s_server;
 	public void work() {
 		try {
 			Helpers.debugLog("Starting server " + name + " on port " + port);
-			NetPeerConfiguration config = new NetPeerConfiguration(name);
+			string appID = name;
+			if (isP2P) {
+				appID = "XOD-P2P";
+			}
+			NetPeerConfiguration config = new NetPeerConfiguration(appID);
 			config.MaximumConnections = maxPlayers + maxOverflowSpectatorCount;
 			config.Port = port;
 			config.AutoFlushSendQueue = false;
 			config.ConnectionTimeout = connectionTimeoutSeconds;
 			config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
+			if (isP2P) {
+				config.EnableMessageType(NetIncomingMessageType.NatIntroductionSuccess);
+				config.EnableMessageType(NetIncomingMessageType.UnconnectedData);
+			}
 			/*
 			#if DEBUG
 			config.SimulatedMinimumLatency = Global.simulatedLatency;
@@ -341,7 +359,47 @@ public class Server {
 			s_server = new NetServer(config);
 			s_server.Start();
 			if (isLAN) {
+				// This will get our LAN IP. Not our internet IP.
 				ip = LANIPHelper.GetLocalIPAddress();
+			}
+			if (isP2P) {
+				// If we are a P2P server we cannot use a public IP as the masterserver handles that.
+				ip = null;
+				// Send our info to masterserver to say that we are open now.
+				IPEndPoint masterServerLocation = NetUtility.Resolve(
+					MasterServerData.serverIp, MasterServerData.serverPort
+				);
+				// First. The basic info.
+				NetOutgoingMessage basicInfoMsg = s_server.CreateMessage();
+				basicInfoMsg.Write((byte)MasterServerMsg.RegisterHost);
+				basicInfoMsg.Write(s_server.UniqueIdentifier);
+				basicInfoMsg.Write(new IPEndPoint(NetUtility.GetMyAddress(out _), 14242));
+
+				// Second. The match list info.
+				NetOutgoingMessage listInfoMsg = s_server.CreateMessage();
+				listInfoMsg.Write((byte)MasterServerMsg.RegisterInfo);
+				listInfoMsg.Write(s_server.UniqueIdentifier);
+				listInfoMsg.Write(name);
+				listInfoMsg.Write((byte)maxPlayers);
+				listInfoMsg.Write((byte)1); // Current players.
+				listInfoMsg.Write(gameMode);
+				listInfoMsg.Write(level);
+				listInfoMsg.Write(Global.shortForkName);
+
+				// Finally. The detailed info about the match to others to connect.
+				NetOutgoingMessage detailedInfoMsg = s_server.CreateMessage();
+				detailedInfoMsg.Write((byte)MasterServerMsg.RegisterDetails);
+				detailedInfoMsg.Write(s_server.UniqueIdentifier);
+				var simpleServerData = new SimpleServerData(
+					name, level, gameVersion, gameChecksum, customMapChecksum, customMapUrl
+				);
+				string jsonString = JsonConvert.SerializeObject(simpleServerData);
+				detailedInfoMsg.Write(jsonString);
+
+				// Then Send all of these in a row.
+				s_server.SendUnconnectedMessage(basicInfoMsg, masterServerLocation);
+				s_server.SendUnconnectedMessage(listInfoMsg, masterServerLocation);
+				s_server.SendUnconnectedMessage(detailedInfoMsg, masterServerLocation);
 			}
 		} catch (Exception ex) {
 			if (Global.debug) {
@@ -352,7 +410,6 @@ public class Server {
 				return;
 			}
 		}
-
 		while (true) {
 			try {
 				runIteration();
@@ -371,29 +428,41 @@ public class Server {
 		throw new ShutdownException();
 	}
 
-	public bool killServer;
 	public void runIteration() {
-		Thread.Sleep(16);
+		long timeNow = (DateTimeOffset.UtcNow - Global.UnixEpoch).Ticks;
+		long deltaTime = timeNow - lastUpdateTime;
+		if (deltaTime < fpsLimit) {
+			return;
+		}
+		lastUpdateTime = timeNow;
 		iterations++;
 
 		if (killServer) {
 			shutdown("Server shut down by in-game mod.");
 			return;
 		}
+		byte playerNum = (byte)s_server.Connections.Count;
 
-		if (s_server.Connections.Count == 0) {
+		if (playerNum == 0) {
 			framesZeroPlayers++;
-			if (framesZeroPlayers > 300) {
+			if (framesZeroPlayers > 600) {
 				Helpers.debugLog("Zero players for 5 second. Shutting down server");
 				shutdown("Zero players, shutting down server.");
 				return;
 			}
 		} else {
+			// We inform the masterServer that we are still alive.
+			if (isP2P && iterations % 120 == 0) {
+				NetOutgoingMessage msg = s_server.CreateMessage();
+				msg.Write((byte)MasterServerMsg.UpdatePlayerNum);
+				msg.Write(s_server.UniqueIdentifier);
+				msg.Write(playerNum);
+				s_server.SendUnconnectedMessage(msg, MasterServerData.serverIp, MasterServerData.serverPort);
+			}
 			if (iterations % 120 == 0) {
 				periodicPing(s_server);
 				s_server.FlushSendQueue();
 			}
-
 			if (iterations % 6 == 0) {
 				RPC.periodicServerPing.sendFromServer(s_server, new byte[] { });
 			}
@@ -403,10 +472,6 @@ public class Server {
 
 		//s_server.MessageReceivedEvent.WaitOne();
 		NetIncomingMessage im;
-
-		//Stopwatch stopWatch = new Stopwatch();
-		//stopWatch.Start();
-
 		while ((im = s_server.ReadMessage()) != null) {
 			var all = s_server.Connections; // get copy
 			all.Remove(im.SenderConnection);
@@ -532,7 +597,7 @@ public class Server {
 
 		player.isSpectator = shouldSpec;
 
-		string joinMsg = string.Format("player {0} with id {1} and alliance {2} joined {3}",
+		string joinMsg = string.Format("Player {0} with id {1} and alliance {2} joined {3}",
 			player.name,
 			player.id.ToString(),
 			player.alliance.ToString(),
@@ -543,13 +608,15 @@ public class Server {
 		NetOutgoingMessage om = s_server.CreateMessage();
 		om.Write(sendStringRPCByte);
 		om.Write("joinserverresponse:" + JsonConvert.SerializeObject(player));
-		s_server.SendMessage(om, s_server.Connections, NetDeliveryMethod.ReliableOrdered, 0);
+		s_server.SendToAll(om, NetDeliveryMethod.ReliableOrdered);
+		Helpers.debugLog("Sending general response");
 
 		NetOutgoingMessage omTargeted = s_server.CreateMessage();
 		omTargeted.Write(sendStringRPCByte);
 		var joinServerResponse = new JoinServerResponse(this);
 		omTargeted.Write("joinservertargetedresponse:" + JsonConvert.SerializeObject(joinServerResponse));
-		s_server.SendMessage(omTargeted, im.SenderConnection, NetDeliveryMethod.ReliableOrdered, 0);
+		Helpers.debugLog("Sending response to: " + im.SenderConnection.RemoteEndPoint.ToString());
+		s_server.SendMessage(omTargeted, im.SenderConnection, NetDeliveryMethod.ReliableOrdered);
 	}
 
 	public void onDisconnect(NetIncomingMessage im, string reason) {
@@ -559,7 +626,7 @@ public class Server {
 		bool hostDisconnectBeforeStart = (disconnectedPlayer != null && disconnectedPlayer.isHost && !started);
 		if (players.Count == 0 || reason == "Recreate" || host == null || hostDisconnectBeforeStart) {
 			NetOutgoingMessage om = s_server.CreateMessage();
-			Helpers.debugLog("host left, shutting down server " + name);
+			Helpers.debugLog("Host left, shutting down server " + name);
 
 			if (Global.showDiagnostics && s_server?.Statistics != null) {
 				float downloadedBytes = s_server.Statistics.ReceivedBytes / 1000000f;
@@ -783,7 +850,6 @@ public class Server {
 		return "D";
 	}
 
-	public Dictionary<string, int> weaponKillStats = new Dictionary<string, int>();
 	public void addWeaponKillStat(int? projId, int? weaponIndex) {
 		if (projId == null) return;
 		try {
@@ -805,7 +871,6 @@ public class Server {
 		} catch { }
 	}
 
-	bool loggedOnce = false;
 	public void logWeaponKills() {
 		if (!loggedOnce) loggedOnce = true;
 		else return;
