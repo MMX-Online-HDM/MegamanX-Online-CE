@@ -92,7 +92,7 @@ public class SpinWheelProj : Projectile {
 			if (sparks == null) {
 				sparks = new Anim(pos, "spinwheel_sparks", xDir, null, false);
 			}
-			sparks.pos = pos.addxy(-xDir * 10, 11);
+			sparks.pos = pos.addxy(-xDir * 10, 10);
 			sparks.visible = true;
 		} else {
 			if (sparks != null) sparks.visible = false;

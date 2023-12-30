@@ -135,7 +135,7 @@ public class TorpedoProj : Projectile, IDamagable {
 		smokeTime += Global.spf;
 		if (smokeTime > 0.2) {
 			smokeTime = 0;
-			if (homing) new Anim(pos.addxy((-5 * xDir), 0), "torpedo_smoke", 1, null, true);
+			if (homing) new Anim(pos, "torpedo_smoke", 1, null, true);
 		}
 	}
 
