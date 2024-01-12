@@ -8,14 +8,16 @@ namespace MMXOnline;
 
 public class InGameMainMenu : IMainMenu {
 	public static int selectY = 0;
-	public Point optionPos1 = new Point(80, 50);
-	public Point optionPos2 = new Point(80, 70);
-	public Point optionPos3 = new Point(80, 90);
-	public Point optionPos4 = new Point(80, 110);
-	public Point optionPos5 = new Point(80, 130);
-	public Point optionPos6 = new Point(80, 150);
-	public Point optionPos7 = new Point(80, 170);
-	public const float startX = 92;
+	public int[] optionPos = {
+		50,
+		70,
+		90,
+		110,
+		130,
+		150,
+		170
+	};
+	public float startX = 92;
 
 	public InGameMainMenu() {
 	}
@@ -118,18 +120,30 @@ public class InGameMainMenu : IMainMenu {
 	}
 
 	public void render() {
-		DrawWrappers.DrawRect(5, 5, Global.screenW - 5, Global.screenH - 5, true, Helpers.MenuBgColor, 0, ZIndex.HUD + 200, false);
-		Helpers.drawTextStd(TCat.Title, "Menu", Global.screenW * 0.5f, 20, Alignment.Center, fontSize: 48);
+		DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
+		Fonts.drawText(FontType.Yellow, "MENU", Global.screenW * 0.5f, 20, Alignment.Center);
 
-		Global.sprites["cursor"].drawToHUD(0, startX - 10, optionPos1.y + 6 + (selectY * 20));
+		Global.sprites["cursor"].drawToHUD(0, startX - 10, optionPos[0] + 3 + (selectY * 20));
 
-		Helpers.drawTextStd(TCat.Option, "Edit Loadout", startX, optionPos1.y, color: !isSelWepDisabled() ? Color.White : Helpers.Gray, selected: selectY == 0);
-		Helpers.drawTextStd(TCat.Option, "Upgrade Menu", startX, optionPos2.y, color: !isSelArmorDisabled() ? Color.White : Helpers.Gray, selected: selectY == 1);
-		Helpers.drawTextStd(TCat.Option, "Switch Character", startX, optionPos3.y, color: !isSelCharDisabled() ? Color.White : Helpers.Gray, selected: selectY == 2);
-		Helpers.drawTextStd(TCat.Option, "Match Options", startX, optionPos4.y, color: !isMatchOptionsDisabled() ? Color.White : Helpers.Gray, selected: selectY == 3);
-		Helpers.drawTextStd(TCat.Option, "Controls", startX, optionPos5.y, selected: selectY == 4);
-		Helpers.drawTextStd(TCat.Option, "Settings", startX, optionPos6.y, selected: selectY == 5);
-		Helpers.drawTextStd(TCat.Option, "Leave Match", startX, optionPos7.y, selected: selectY == 6);
-		Helpers.drawTextStd(TCat.BotHelp, "[X]: Choose, [ESC]: Cancel", Global.halfScreenW, 200, Alignment.Center, fontSize: 24);
+		Fonts.drawText(
+			isSelWepDisabled() ? FontType.DarkBlue : FontType.Blue,
+			"Edit Loadout", startX, optionPos[0], selected: selectY == 0
+		);
+		Fonts.drawText(
+			isSelArmorDisabled() ? FontType.DarkBlue : FontType.Blue,
+			"Upgrade Menu", startX, optionPos[1], selected: selectY == 1
+		);
+		Fonts.drawText(
+			isSelCharDisabled() ? FontType.DarkBlue : FontType.Blue,
+			"Switch Character", startX, optionPos[2], selected: selectY == 2
+		);
+		Fonts.drawText(
+			isMatchOptionsDisabled() ? FontType.DarkBlue : FontType.Blue,
+			"Match Options", startX, optionPos[3], selected: selectY == 3
+		);
+		Fonts.drawText(FontType.Blue, "Controls", startX, optionPos[4], selected: selectY == 4);
+		Fonts.drawText(FontType.Blue, "Settings", startX, optionPos[5], selected: selectY == 5);
+		Fonts.drawText(FontType.Blue, "Leave Match", startX, optionPos[6], selected: selectY == 6);
+		Fonts.drawText(FontType.Grey, "[X]: Choose, [ESC]: Cancel", Global.halfScreenW, 198, Alignment.Center);
 	}
 }

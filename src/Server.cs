@@ -98,7 +98,7 @@ public class Server {
 	public const byte getServersQueryByte = 0;
 	public const byte getServerQueryByte = 1;
 
-	public const int maxPlayerCap = 64;
+	public const int maxPlayerCap = 24;
 
 	public Server() { }
 
@@ -121,7 +121,7 @@ public class Server {
 		this.gameMode = gameMode;
 		this.playTo = playTo;
 		this.botCount = botCount;
-		this.maxPlayers = Helpers.clamp(maxPlayers, 12, maxPlayerCap);
+		this.maxPlayers = maxPlayerCap;//Helpers.clamp(maxPlayers, 12, maxPlayerCap);
 		this.timeLimit = (timeLimit == 0 ? null : (int?)timeLimit);
 		this.fixedCamera = fixedCamera;
 		this.hidden = hidden;

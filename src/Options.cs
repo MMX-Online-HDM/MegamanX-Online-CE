@@ -18,7 +18,7 @@ public class Options {
 	public int? regionIndex;
 	public bool logTelemetry = true;
 	public bool showFPS = false;
-	public bool showInGameMenuHUD = true;
+	public bool showInGameMenuHUD = false;
 	public bool showSysReqPrompt = true;
 	public bool enableDeveloperConsole;
 	public bool disableChat;
@@ -88,11 +88,11 @@ public class Options {
 	public bool aimAnalog = false;
 	public float aimSensitivity = 0.5f;
 	public int axlAimMode = 0;
-	public bool lockOnSound = true;
+	public bool lockOnSound = false;
 	public bool backwardsAimInvert = false;
-	public bool axlSeparateAimDownAndCrouch;
-	public bool moveInDiagAim = false;
-	public int aimKeyFunction = 0;  //0 = aim backwards, 1 = lock position, 2 = lock aim
+	public bool axlSeparateAimDownAndCrouch = false;
+	public bool moveInDiagAim = true;
+	public int aimKeyFunction = 1;  //0 = aim backwards, 1 = lock position, 2 = lock aim
 	public bool aimKeyToggle = false;
 	public bool showRollCooldown;
 	public AxlLoadout axlLoadout = new AxlLoadout();
@@ -101,7 +101,7 @@ public class Options {
 	public int sigmaWeaponSlot;
 	public bool puppeteerHoldOrToggle;
 	public SigmaLoadout sigmaLoadout = new SigmaLoadout();
-	public bool maverickStartFollow;
+	public bool maverickStartFollow = true;
 	public bool puppeteerCancel;
 
 	private static Options _main;

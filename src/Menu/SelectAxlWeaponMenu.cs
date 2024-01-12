@@ -369,7 +369,7 @@ public class SelectAxlWeaponMenu : IMainMenu {
 		if (!inGame) {
 			DrawWrappers.DrawTextureHUD(Global.textures["loadoutbackground"], 0, 0);
 		} else {
-			DrawWrappers.DrawRect(5, 5, Global.screenW - 5, Global.screenH - 5, true, Helpers.MenuBgColor, 0, ZIndex.HUD + 200, false);
+			DrawWrappers.DrawTextureHUD(Global.textures["pausemenuload"], 0, 0);
 		}
 
 		Helpers.drawTextStd(TCat.Title, "AXL LOADOUT", Global.screenW * 0.5f, 12, Alignment.Center, fontSize: 48);

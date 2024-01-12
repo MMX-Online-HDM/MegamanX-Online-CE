@@ -79,9 +79,11 @@ public class TextExportMenu : IMainMenu {
 	public void render() {
 		float top = Global.screenH * 0.4f;
 
-		if (!inGame) DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0);
-
-		DrawWrappers.DrawRect(5, 5, Global.screenW - 5, Global.screenH - 5, true, new Color(0, 0, 0, 224), 0, ZIndex.HUD, false);
+		if (inGame) {
+			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0);
+		} else {
+			DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
+		}
 
 		int i = 0;
 		for (; i < lines.Count; i++) {

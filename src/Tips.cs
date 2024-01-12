@@ -578,7 +578,7 @@ public class Tips {
 			},
 			new string[]
 			{
-				"As Boomer Kuwanger, you can teleport",
+				"As Boomerang Kuwanger, you can teleport",
 				"straight through thin walls."
 			},
 			new string[]

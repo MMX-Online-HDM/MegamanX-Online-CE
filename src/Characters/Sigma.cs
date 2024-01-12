@@ -308,9 +308,6 @@ public class Sigma : Character {
 
 	public override void update() {
 		base.update();
-
-		Global.level.gameMode.setHUDErrorMessage(player, charState.GetType().ToString(), false, true);
-
 		if (!ownedByLocalPlayer) {
 			return;
 		}

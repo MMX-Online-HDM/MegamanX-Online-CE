@@ -226,7 +226,10 @@ public partial class Level {
 
 	//Should actor collide with gameobject?
 	//Note: return true to indicate NOT to collide, and instead only trigger
-	public bool shouldTrigger(Actor actor, GameObject gameObject, Collider actorCollider, Collider gameObjectCollider, Point intersection, bool otherway = false) {
+	public bool shouldTrigger(
+		Actor actor, GameObject gameObject, Collider actorCollider, Collider gameObjectCollider,
+		Point intersection, bool otherway = false
+	) {
 		if (actor is Character && gameObject is Character) {
 			var actorChar = actor as Character;
 			var goChar = gameObject as Character;
@@ -236,9 +239,9 @@ public partial class Level {
 			return true;
 		}
 
-		if (actor is Character chr3 && (chr3.player.isViralSigma() || chr3.player.isKaiserViralSigma()) && gameObject is Ladder) {
+		/*if (actor is Character chr3 && (chr3.player.isViralSigma() || chr3.player.isKaiserViralSigma()) && gameObject is Ladder) {
 			return true;
-		}
+		}*/
 
 		if (actorCollider.isTrigger == false && gameObject is Ladder) {
 			if (actor.pos.y < gameObject.collider.shape.getRect().y1 && intersection.y > 0) {
@@ -387,11 +390,18 @@ public partial class Level {
 	// Checks for collisions and returns the first one collided.
 	// A collision requires at least one of the colliders not to be a trigger.
 	// The vel parameter ensures we return normals that make sense, that are against the direction of vel.
-	public CollideData checkCollisionActor(Actor actor, float incX, float incY, Point? vel = null, bool autoVel = false, bool checkPlatforms = false) {
-		return checkCollisionsActor(actor, incX, incY, vel, autoVel, returnOne: true, checkPlatforms: checkPlatforms).FirstOrDefault();
+	public CollideData checkCollisionActor(
+		Actor actor, float incX, float incY, Point? vel = null, bool autoVel = false, bool checkPlatforms = false
+	) {
+		return checkCollisionsActor(
+			actor, incX, incY, vel, autoVel, returnOne: true, checkPlatforms: checkPlatforms
+		).FirstOrDefault();
 	}
 
-	public List<CollideData> checkCollisionsActor(Actor actor, float incX, float incY, Point? vel = null, bool autoVel = false, bool returnOne = false, bool checkPlatforms = false) {
+	public List<CollideData> checkCollisionsActor(
+		Actor actor, float incX, float incY, Point? vel = null, bool autoVel = false,
+		bool returnOne = false, bool checkPlatforms = false
+	) {
 		List<CollideData> collideDatas = new List<CollideData>();
 		// Use custom terrain collider by default.
 		Collider terrainCollider = actor.getTerrainCollider();

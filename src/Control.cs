@@ -205,8 +205,8 @@ public class Control {
 				if (string.IsNullOrEmpty(text)) {
 					_controllerNameToMapping = new Dictionary<string, Dictionary<string, int?>>()
 					{
-                            // Default keyboard controls
-                            {
+							// Default keyboard controls
+							{
 							   KeyboardName,
 							   new Dictionary<string, int?>()
 							   {
@@ -221,9 +221,9 @@ public class Control {
 									{ Jump, (int)Key.X },
 									{ Shoot, (int)Key.C },
 									{ Dash, (int)Key.Z },
-									{ Special1, (int)Key.D },
-									{ WeaponLeft, (int)Key.A },
-									{ WeaponRight, (int)Key.S },
+									{ Special1, (int)Key.V },
+									{ WeaponLeft, (int)Key.D },
+									{ WeaponRight, (int)Key.F },
 									{ Scoreboard, (int)Key.Tab },
 									{ MenuEnter, (int)Key.Escape },
 									{ MenuSelectPrimary, (int)Key.Enter },
@@ -232,19 +232,11 @@ public class Control {
 									{ TeamChat, (int)Key.T },
 									{ AllChat, (int)Key.Y },
 									{ Taunt, (int)Key.G },
-									{ Special2, (int)Key.V }
+									{ Special2, (int)Key.A }
 							   }
 							},
-                            // Sigma specific controls
-                            /*{
-							   getCharSpecificName(KeyboardName, 4, 0),
-							   new Dictionary<string, int?>()
-							   {
-									{ Special2, (int)Key.LControl },
-							   }
-							},*/
-                            // Axl directional aim controls
-                            {
+							// Axl directional aim controls
+							{
 							   getCharSpecificName(KeyboardName, 3, 0),
 							   new Dictionary<string, int?>()
 							   {
@@ -252,26 +244,22 @@ public class Control {
 									{ AimDown, (int)Key.Down },
 									{ AimLeft, (int)Key.Left },
 									{ AimRight, (int)Key.Right },
-									{ AimLock, (int)Key.LControl },
-									{ AxlAimBackwards, (int)Key.LShift },
-									{ AxlCrouch, (int)Key.LControl },
+									{ AxlAimBackwards, (int)Key.S }
 							   }
 							},
-                            // Axl angular aim controls
-                            {
+							// Axl angular aim controls
+							{
 							   getCharSpecificName(KeyboardName, 3, 1),
 							   new Dictionary<string, int?>()
 							   {
 									{ AimAngleUp, (int)Key.Up },
 									{ AimAngleDown, (int)Key.Down },
 									{ AimAngleReset, (int)Key.Space },
-									{ AimLock, (int)Key.LControl },
-									{ AxlAimBackwards, (int)Key.LShift },
-									{ AxlCrouch, (int)Key.LControl },
+									{ AxlAimBackwards, (int)Key.LShift }
 							   }
 							},
-                            // Axl cursor aim controls
-                            {
+							// Axl cursor aim controls
+							{
 							   getCharSpecificName(KeyboardName, 3, 2),
 							   new Dictionary<string, int?>()
 							   {
@@ -301,6 +289,7 @@ public class Control {
 									{ AimLeft, (int)Key.Left },
 									{ AimRight, (int)Key.Right },
 									{ Taunt, (int)Key.G },
+									{ Special2, (int)Key.C },
 							   }
 							}
 						};

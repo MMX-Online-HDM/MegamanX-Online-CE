@@ -44,13 +44,14 @@ public class FFADeathMatch : GameMode {
 	}
 
 	public override void drawTopHUD() {
-		var placeStr = "";
-		var place = level.players.IndexOf(level.mainPlayer) + 1;
+		string placeStr = "";
+		List<Player> playerList = GameMode.getOrderedPlayerList();
+		int place = playerList.IndexOf(level.mainPlayer) + 1;
 		placeStr = Helpers.getNthString(place);
-		var topText = "Leader: " + level.players[0].kills.ToString();
-		var botText = "Kills: " + level.mainPlayer.kills.ToString() + "(" + placeStr + ")";
-		Helpers.drawTextStd(TCat.HUD, topText, 5, 5, Alignment.Left, fontSize: (uint)32);
-		Helpers.drawTextStd(TCat.HUD, botText, 5, 15, Alignment.Left, fontSize: (uint)32);
+		var topText = "Leader: " + playerList[0].kills.ToString();
+		var botText = "Kills: " + level.mainPlayer.kills.ToString() + " [" + placeStr + "]";
+		Fonts.drawText(FontType.BlueMenu, topText, 5, 5, Alignment.Left);
+		Fonts.drawText(FontType.BlueMenu, botText, 5, 15, Alignment.Left);
 
 		drawTimeIfSet(30);
 	}

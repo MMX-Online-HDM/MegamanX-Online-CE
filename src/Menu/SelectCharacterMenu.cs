@@ -50,7 +50,8 @@ public class CharSelection {
 					new CharSelection("Vile", 2, 1, 0, "menu_vile", 0),
 					new CharSelection("Axl", 3, 1, 0, "menu_axl", 0),
 					new CharSelection("Sigma", 4, 1, 0, "menu_sigma", sigmaIndex),
-					new CharSelection("Rockman", 5, 1, 0, "rock_idle", 0),
+					new CharSelection("Zero Nightmare", 0, 1, 0, "menu_megaman", 0),
+					//new CharSelection("Rockman", 5, 1, 0, "rock_idle", 0),
 				};
 		}
 	}
@@ -111,7 +112,7 @@ public class SelectCharacterMenu : IMainMenu {
 	public IMainMenu prevMenu;
 	public int selectArrowPosY;
 	public const int startX = 30;
-	public int startY = 50;
+	public int startY = 46;
 	public const int lineH = 10;
 	public const uint fontSize = 24;
 
@@ -233,20 +234,38 @@ public class SelectCharacterMenu : IMainMenu {
 		CharSelection charSelection = charSelections[playerData.uiSelectedCharIndex];
 
 		if (!isInGame) {
-			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0);
+			DrawWrappers.DrawTextureHUD(Global.textures["severbrowser"], 0, 0);
 		} else {
-			DrawWrappers.DrawRect(5, 5, Global.screenW - 5, Global.screenH - 5, true, Helpers.MenuBgColor, 0, ZIndex.HUD + 200, false);
+			DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
 		}
 
-		// DrawWrappers.DrawTextureHUD(Global.textures["cursor"], startX - 10, menuOptions[(int)selectArrowPosY].pos.y - 1);
-
+		// DrawWrappers.DrawTextureHUD(
+		//	Global.textures["cursor"], startX - 10, menuOptions[(int)selectArrowPosY].pos.y - 1
+		//);
 		if (!isInGame) {
-			Helpers.drawTextStd(TCat.Title, "Select Character", Global.halfScreenW, 15, fontSize: 48, alignment: Alignment.Center);
+			Fonts.drawText(
+				FontType.Yellow, "Select Character".ToUpper(),
+				Global.halfScreenW, 22, alignment: Alignment.Center
+			);
 		} else {
 			if (Global.level.gameMode.isOver) {
-				Helpers.drawTextStd(TCat.Title, "Select Character For Next Match", Global.halfScreenW, 16, fontSize: 32, alignment: Alignment.Center);
+				DrawWrappers.DrawRect(
+					Global.halfScreenW - 90, 18, Global.halfScreenW + 90, 33,
+					true, new Color(0, 0, 0, 100), 1, ZIndex.HUD, false, outlineColor: Color.White
+				);
+				Fonts.drawText(
+					FontType.Yellow, "Select Character For Next Match".ToUpper(),
+					Global.halfScreenW, 22, alignment: Alignment.Center
+				);
 			} else {
-				Helpers.drawTextStd(TCat.Title, "Select Character", Global.halfScreenW, 12, fontSize: 48, alignment: Alignment.Center);
+				DrawWrappers.DrawRect(
+					Global.halfScreenW - 67, 18, Global.halfScreenW + 67, 33,
+					true, new Color(0, 0, 0, 100), 1, ZIndex.HUD, false, outlineColor: Color.White
+				);
+				Fonts.drawText(
+					FontType.Yellow, "Select Character".ToUpper(),
+					Global.halfScreenW, 22, alignment: Alignment.Center
+				);
 			}
 		}
 
@@ -263,34 +282,64 @@ public class SelectCharacterMenu : IMainMenu {
 		// Draw text
 
 		if (Global.frameCount % 60 < 30) {
-			Helpers.drawTextStd(TCat.Option, "<", Global.halfScreenW - 50, Global.halfScreenH + 19, Alignment.Center, fontSize: 32, selected: true);
-			Helpers.drawTextStd(TCat.Option, ">", Global.halfScreenW + 50, Global.halfScreenH + 19, Alignment.Center, fontSize: 32, selected: true);
+			Fonts.drawText(
+				FontType.Orange, "<", Global.halfScreenW - 60, Global.halfScreenH + 22,
+				Alignment.Center
+			);
+			Fonts.drawText(
+				FontType.Orange, ">", Global.halfScreenW + 60, Global.halfScreenH + 22,
+				Alignment.Center
+			);
 		}
-
-		Helpers.drawTextStd(TCat.Option, charSelection.name, Global.halfScreenW, Global.halfScreenH + 19, alignment: Alignment.Center, fontSize: 32, selected: true);
+		Fonts.drawText(
+			FontType.Orange, charSelection.name, Global.halfScreenW, Global.halfScreenH + 22,
+			alignment: Alignment.Center
+		);
 
 		string[] description = { };
-		if (playerData.charNum == 0) description = new string[] { "All-around ranged shooter.", "Can equip a variety of weapons and armor." };
-		if (playerData.charNum == 1) description = new string[] { "Powerful melee warrior", "with high damage combos." };
-		if (playerData.charNum == 2) description = new string[] { "Unpredictable threat that can self-revive", "and call down Ride Armors." };
-		if (playerData.charNum == 3) description = new string[] { "Precise and deadly ranged assassin", "with aiming and rapid fire capabilities." };
-		if (playerData.charNum == 4) description = new string[] { "A fearsome military commander that can", "summon Mavericks on the battlefield." };
-
+		if (playerData.charNum == 0) {
+			description = new string[] {"All-around ranged shooter.", "Can equip a variety of weapons and armor." };
+		} else if (playerData.charNum == 1) {
+			description = new string[] { "Powerful melee warrior", "with high damage combos." };
+		} else if (playerData.charNum == 2) {
+			description = new string[] { "Unpredictable threat that can self-revive", "and call down Ride Armors." };
+		} else if (playerData.charNum == 3) {
+			description = new string[] { 
+				"Precise and deadly ranged assassin", "with aiming and rapid fire capabilities."
+			};
+		} else if (playerData.charNum == 4) {
+			description = new string[] {
+				"A fearsome military commander that can", "summon Mavericks on the battlefield."
+			};
+		}
 		if (description.Length > 0) {
-			DrawWrappers.DrawRect(25, startY + 98, Global.screenW - 25, startY + 140, true, new Color(0, 0, 0, 100), 0.5f, ZIndex.HUD, false, outlineColor: Color.White);
+			DrawWrappers.DrawRect(
+				25, startY + 98, Global.screenW - 25, startY + 127,
+				true, new Color(0, 0, 0, 100), 1, ZIndex.HUD, false, outlineColor: Color.White
+			);
 			for (int i = 0; i < description.Length; i++) {
-				Helpers.drawTextStd(description[i], Global.halfScreenW, startY + 94 + (14 * (i + 1)), alignment: Alignment.Center, fontSize: 21, style: Text.Styles.Italic);
+				Fonts.drawText(
+					FontType.Green, description[i],
+					Global.halfScreenW, startY + 94 + (10 * (i + 1)), alignment: Alignment.Center
+				);
 			}
 		}
-
-		Helpers.drawTextStd(TCat.BotHelp, "Left/Right: Change character", Global.screenW * 0.5f, 200, Alignment.Center, fontSize: 24);
 		if (!isInGame) {
-			Helpers.drawTextStd(TCat.BotHelp, "[X]: Continue, [Z]: Back", Global.screenW * 0.5f, 210, Alignment.Center, fontSize: 24);
+			Fonts.drawText(
+				FontType.LigthGrey, "[X]: Continue, [Z]: Back\nLeft/Right: Change character",
+				Global.screenW * 0.5f, 178, Alignment.Center
+			);
 		} else {
 			if (!Global.isHost) {
-				Helpers.drawTextStd(TCat.BotHelp, "[ESC]: Quit", Global.screenW * 0.5f, 210, Alignment.Center, fontSize: 24);
+				Fonts.drawText(
+					FontType.LigthGrey, "[ESC]: Quit\nLeft/Right: Change character",
+					Global.screenW * 0.5f, 190, Alignment.Center
+				);
 			} else {
-				Helpers.drawTextStd(TCat.BotHelp, "[X]: Continue, [Z]: Back", Global.screenW * 0.5f, 210, Alignment.Center, fontSize: 24);
+				Fonts.drawText(
+					FontType.LigthGrey, "[X]: Continue, [Z]: Back\nLeft/Right: Change character",
+					Global.screenW * 0.5f, 190, Alignment.Center
+				);
 			}
 		}
 	}

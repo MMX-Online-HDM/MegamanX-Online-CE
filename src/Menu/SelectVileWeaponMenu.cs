@@ -119,12 +119,19 @@ public class SelectVileWeaponMenu : IMainMenu {
 		if (!inGame) {
 			DrawWrappers.DrawTextureHUD(Global.textures["loadoutbackground"], 0, 0);
 		} else {
-			DrawWrappers.DrawRect(5, 5, Global.screenW - 5, Global.screenH - 5, true, Helpers.MenuBgColor, 0, ZIndex.HUD + 200, false);
+			DrawWrappers.DrawTextureHUD(Global.textures["pausemenuload"], 0, 0);
 		}
 
-		Helpers.drawTextStd(TCat.Title, "Vile Loadout", Global.screenW * 0.5f, 12, Alignment.Center, fontSize: 48);
-		//Helpers.drawTextStd("Weight: ", (Global.screenW * 0.5f) - 35, 26, Alignment.Left, fontSize: 24);
-		//Helpers.drawTextStd(getWeightSum() + "/" + VileLoadout.maxWeight, (Global.screenW * 0.5f) + 10, 26, Alignment.Left, fontSize: 24, color: getWeightSum() > VileLoadout.maxWeight ? Color.Red : Color.White);
+		Fonts.drawText(FontType.Yellow, "Vile Loadout", Global.screenW * 0.5f, 20, Alignment.Center);
+		Fonts.drawText(
+			FontType.DarkOrange, "Weight: ", Global.screenW - 60, 20, Alignment.Right
+		);
+		Fonts.drawText(
+			getWeightSum() > VileLoadout.maxWeight ? FontType.RedishOrange : FontType.DarkPurple,
+			getWeightSum() + "/" + 28,
+			Global.screenW - 60, 20,
+			Alignment.Left
+		);
 		var outlineColor = inGame ? Color.White : Helpers.LoadoutBorderColor;
 		float botOffY = inGame ? 0 : -2;
 
@@ -138,16 +145,23 @@ public class SelectVileWeaponMenu : IMainMenu {
 		Global.sprites["cursor"].drawToHUD(0, startX, startY + (selCursorIndex * wepH) - 2);
 		for (int i = 0; i < vileWeaponCategories.Count; i++) {
 			float yPos = startY - 6 + (i * wepH);
-			Helpers.drawTextStd(TCat.Option, vileWeaponCategories[i].Item1 + ": ", startX + 10, yPos, color: Color.White, fontSize: 24, selected: selCursorIndex == i);
+			Fonts.drawText(
+				FontType.Blue, vileWeaponCategories[i].Item1 + ": ",
+				startX + 10, yPos, selected: selCursorIndex == i
+			);
 			var weapon = vileWeaponCategories[i].Item2[cursors[i].index];
 			if (weapon.killFeedIndex != 0) {
 				Global.sprites["hud_killfeed_weapon"].drawToHUD(weapon.killFeedIndex, wepPosX, yPos + 3);
-				Helpers.drawTextStd(TCat.Option, weapon.displayName, wepTextX, yPos, color: Color.White, fontSize: 24, selected: selCursorIndex == i);
+				Fonts.drawText(FontType.Blue, weapon.displayName, wepTextX, yPos, selected: selCursorIndex == i);
 			} else {
-				Helpers.drawTextStd(TCat.Option, weapon.displayName, wepPosX - 5, yPos, color: Color.White, fontSize: 24, selected: selCursorIndex == i);
+				Fonts.drawText(FontType.Blue, weapon.displayName, wepPosX - 5, yPos, selected: selCursorIndex == i);
 			}
 
-			//Helpers.drawTextStd(TCat.Option, "W:" + weapon.vileWeight.ToString(), Global.screenW - 30, yPos, alignment: Alignment.Right, color: Color.White, fontSize: 24, selected: selCursorIndex == i);
+			Fonts.drawText(
+				FontType.Purple, "W:" + weapon.vileWeight.ToString(),
+				Global.screenW - 30, yPos, alignment: Alignment.Right,
+				selected: selCursorIndex == i
+			);
 		}
 
 		var wep = vileWeaponCategories[selCursorIndex].Item2[cursors[selCursorIndex].index];
@@ -183,11 +197,11 @@ public class SelectVileWeaponMenu : IMainMenu {
 			Helpers.drawTextStd(wep.description[1], 40, descLine2, Alignment.Left, style: Text.Styles.Italic, fontSize: 18);
 		}
 
-		Helpers.drawTextStd(TCat.BotHelp, "Left/Right: Change Weapon", Global.screenW * 0.5f, 200 + botOffY, Alignment.Center, fontSize: 18);
-		Helpers.drawTextStd(TCat.BotHelp, "Up/Down: Change Category", Global.screenW * 0.5f, 205 + botOffY, Alignment.Center, fontSize: 18);
-		string helpText = "[Z]: Back, [X]: Confirm";
-		if (!inGame) helpText = "[Z]: Save and back";
-		Helpers.drawTextStd(TCat.BotHelp, helpText, Global.screenW * 0.5f, 210 + botOffY, Alignment.Center, fontSize: 18);
+		//Helpers.drawTextStd(TCat.BotHelp, "Left/Right: Change Weapon", Global.screenW * 0.5f, 200 + botOffY, Alignment.Center, fontSize: 18);
+		//.drawTextStd(TCat.BotHelp, "Up/Down: Change Category", Global.screenW * 0.5f, 205 + botOffY, Alignment.Center, fontSize: 18);
+		//string helpText = "[Z]: Back, [X]: Confirm";
+		//if (!inGame) helpText = "[Z]: Save and back";
+		//Helpers.drawTextStd(TCat.BotHelp, helpText, Global.screenW * 0.5f, 210 + botOffY, Alignment.Center, fontSize: 18);
 
 		if (!string.IsNullOrEmpty(error)) {
 			float top = Global.screenH * 0.4f;

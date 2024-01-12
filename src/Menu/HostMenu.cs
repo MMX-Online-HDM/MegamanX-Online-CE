@@ -34,10 +34,9 @@ public class HostMenuSettings {
 public class HostMenu : IMainMenu {
 	public List<MenuOption> menuOptions;
 	public int selectArrowPosY;
-	public const int startX = 20;
-	public const int startY = 45;
-	public const int lineH = 10;
-	public const uint fontSize = 24;
+	public static int startX = 20;
+	public static int startY = 40;
+	public static int lineH = 10;
 
 	public MainMenu previous;
 	public bool listenForKey = false;
@@ -57,8 +56,14 @@ public class HostMenu : IMainMenu {
 	}
 
 	// Match settings that persist. If adding a setting here add it to HostMenuSettings class
-	public int gameModeIndex { get { return savedMatchSettings.hostMenuSettings.gameModeIndex; } set { savedMatchSettings.hostMenuSettings.gameModeIndex = value; } }
-	public int mapSizeIndex { get { return savedMatchSettings.hostMenuSettings.mapSizeIndex; } set { savedMatchSettings.hostMenuSettings.mapSizeIndex = value; } }
+	public int gameModeIndex {
+		get { return savedMatchSettings.hostMenuSettings.gameModeIndex; }
+		set { savedMatchSettings.hostMenuSettings.gameModeIndex = value; }
+	}
+	public int mapSizeIndex {
+		get { return savedMatchSettings.hostMenuSettings.mapSizeIndex; }
+		set { savedMatchSettings.hostMenuSettings.mapSizeIndex = value; }
+	}
 	public int mapIndex {
 		get {
 			return savedMatchSettings.hostMenuSettings.mapIndex.Value;
@@ -68,26 +73,68 @@ public class HostMenu : IMainMenu {
 			savedMatchSettings.hostMenuSettings.mapName = selectedLevel.name;
 		}
 	}
-	public int botCount { get { return savedMatchSettings.hostMenuSettings.botCount; } set { savedMatchSettings.hostMenuSettings.botCount = value; } }
-	public int playTo { get { return savedMatchSettings.hostMenuSettings.playTo; } set { savedMatchSettings.hostMenuSettings.playTo = value; } }
-	public bool hidden { get { return savedMatchSettings.hostMenuSettings.hidden; } set { savedMatchSettings.hostMenuSettings.hidden = value; } }
-	public int netcodeModel { get { return savedMatchSettings.hostMenuSettings.netcodeModel; } set { savedMatchSettings.hostMenuSettings.netcodeModel = value; } }
-	public int netcodeModelUnderPing { get { return savedMatchSettings.hostMenuSettings.netcodeModelUnderPing; } set { savedMatchSettings.hostMenuSettings.netcodeModelUnderPing = value; } }
-	public bool mirrored { get { return savedMatchSettings.hostMenuSettings.mirrored; } set { savedMatchSettings.hostMenuSettings.mirrored = value; } }
-	public bool useLoadout { get { return savedMatchSettings.hostMenuSettings.useLoadout; } set { savedMatchSettings.hostMenuSettings.useLoadout = value; } }
-	public bool isCustomMapPool { get { return savedMatchSettings.hostMenuSettings.isCustomMapPool; } set { savedMatchSettings.hostMenuSettings.isCustomMapPool = value; } }
-	public bool useCustomMatchSettings { get { return savedMatchSettings.hostMenuSettings.useCustomMatchSettings; } set { savedMatchSettings.hostMenuSettings.useCustomMatchSettings = value; } }
-	public int team { get { return savedMatchSettings.hostMenuSettings.team; } set { savedMatchSettings.hostMenuSettings.team = value; } }
-	public int timeLimit { get { return savedMatchSettings.hostMenuSettings.timeLimit; } set { savedMatchSettings.hostMenuSettings.timeLimit = value; } }
-	public bool fixedCamera { get { return savedMatchSettings.hostMenuSettings.fixedCamera; } set { savedMatchSettings.hostMenuSettings.fixedCamera = value; } }
-	public bool disableHtSt { get { return savedMatchSettings.hostMenuSettings.disableHtSt; } set { savedMatchSettings.hostMenuSettings.disableHtSt = value; } }
-	public bool disableVehicles { get { return savedMatchSettings.hostMenuSettings.disableVehicles; } set { savedMatchSettings.hostMenuSettings.disableVehicles = value; } }
+	public int botCount {
+		get { return savedMatchSettings.hostMenuSettings.botCount; }
+		set { savedMatchSettings.hostMenuSettings.botCount = value; }
+	}
+	public int playTo {
+		get { return savedMatchSettings.hostMenuSettings.playTo; }
+		set { savedMatchSettings.hostMenuSettings.playTo = value; }
+	}
+	public bool hidden {
+		get { return savedMatchSettings.hostMenuSettings.hidden; }
+		set { savedMatchSettings.hostMenuSettings.hidden = value; }
+	}
+	public int netcodeModel {
+		get { return savedMatchSettings.hostMenuSettings.netcodeModel; }
+		set { savedMatchSettings.hostMenuSettings.netcodeModel = value; }
+	}
+	public int netcodeModelUnderPing {
+		get { return savedMatchSettings.hostMenuSettings.netcodeModelUnderPing; }
+		set { savedMatchSettings.hostMenuSettings.netcodeModelUnderPing = value; }
+	}
+	public bool mirrored {
+		get { return savedMatchSettings.hostMenuSettings.mirrored; }
+		set { savedMatchSettings.hostMenuSettings.mirrored = value; }
+	}
+	public bool useLoadout {
+		get { return savedMatchSettings.hostMenuSettings.useLoadout; }
+		set { savedMatchSettings.hostMenuSettings.useLoadout = value; }
+	}
+	public bool isCustomMapPool {
+		get { return savedMatchSettings.hostMenuSettings.isCustomMapPool; }
+		set { savedMatchSettings.hostMenuSettings.isCustomMapPool = value; }
+	}
+	public bool useCustomMatchSettings {
+		get { return savedMatchSettings.hostMenuSettings.useCustomMatchSettings; }
+		set { savedMatchSettings.hostMenuSettings.useCustomMatchSettings = value; }
+	}
+	public int team {
+		get { return savedMatchSettings.hostMenuSettings.team; }
+		set { savedMatchSettings.hostMenuSettings.team = value; }
+	}
+	public int timeLimit {
+		get { return savedMatchSettings.hostMenuSettings.timeLimit; }
+		set { savedMatchSettings.hostMenuSettings.timeLimit = value; }
+	}
+	public bool fixedCamera {
+		get { return savedMatchSettings.hostMenuSettings.fixedCamera; }
+		set { savedMatchSettings.hostMenuSettings.fixedCamera = value; }
+	}
+	public bool disableHtSt {
+		get { return savedMatchSettings.hostMenuSettings.disableHtSt; }
+		set { savedMatchSettings.hostMenuSettings.disableHtSt = value; }
+	}
+	public bool disableVehicles {
+		get { return savedMatchSettings.hostMenuSettings.disableVehicles; }
+		set { savedMatchSettings.hostMenuSettings.disableVehicles = value; }
+	}
 
 	public static int prevMapSizeIndex;
 	public bool playToDirty;
 	public bool timeLimitDirty;
 
-	public string[] mapSizes = new string[] { "1v1", "Medium", "Large" };
+	public string[] mapSizes = new string[] { "1v1", "Small", "Medium" };
 	public string selectedMapSize {
 		get {
 			if (!mapSizes.InRange(mapSizeIndex)) mapSizeIndex = 0;
@@ -191,8 +238,12 @@ public class HostMenu : IMainMenu {
 		}
 
 		if (!string.IsNullOrEmpty(savedMatchSettings.hostMenuSettings.mapName)) {
-			savedMatchSettings.hostMenuSettings.mapIndex = currentMapSizePool.FindIndex(m => m.name == savedMatchSettings.hostMenuSettings.mapName);
-			if (savedMatchSettings.hostMenuSettings.mapIndex == -1) savedMatchSettings.hostMenuSettings.mapIndex = 0;
+			savedMatchSettings.hostMenuSettings.mapIndex = currentMapSizePool.FindIndex(
+				m => m.name == savedMatchSettings.hostMenuSettings.mapName
+			);
+			if (savedMatchSettings.hostMenuSettings.mapIndex == -1) {
+				savedMatchSettings.hostMenuSettings.mapIndex = 0;
+			}
 		} else if (savedMatchSettings.hostMenuSettings.mapIndex == null) {
 			savedMatchSettings.hostMenuSettings.mapIndex = 0;
 		}
@@ -232,7 +283,6 @@ public class HostMenu : IMainMenu {
 
 	public void setMenuOptions() {
 		menuOptions = new List<MenuOption>();
-
 		// Match name
 		if (!isOffline && !inGame) {
 			menuOptions.Add(
@@ -246,12 +296,15 @@ public class HostMenu : IMainMenu {
 						}
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(TCat.Option, "MATCH NAME: " + serverName, pos.x, pos.y, fontSize: fontSize, selected: index == selectArrowPosY);
+						Fonts.drawText(
+							FontType.Blue, "Match name: " + serverName, pos.x, pos.y,
+							selected: index == selectArrowPosY
+						);
 					},
-					"Change Name")
-				);
+					"Change Name"
+				)
+			);
 		}
-
 		// Custom map pool
 		menuOptions.Add(
 			new MenuOption(startX, startY,
@@ -271,10 +324,13 @@ public class HostMenu : IMainMenu {
 					}
 				},
 				(Point pos, int index) => {
-					Helpers.drawTextStd(TCat.Option, "MAP POOL: " + (isCustomMapPool ? "Custom" : "Official"), pos.x, pos.y, fontSize: fontSize, selected: index == selectArrowPosY);
-				})
-			);
-
+					Fonts.drawText(
+						FontType.Blue, "Map pool: " + (isCustomMapPool ? "Custom" : "Official"),
+						pos.x, pos.y, selected: index == selectArrowPosY
+					);
+				}
+			)
+		);
 		// Map size
 		menuOptions.Add(
 			new MenuOption(startX, startY,
@@ -286,10 +342,13 @@ public class HostMenu : IMainMenu {
 					}
 				},
 				(Point pos, int index) => {
-					Helpers.drawTextStd(TCat.Option, "MAP SIZE: " + selectedMapSize, pos.x, pos.y, fontSize: fontSize, selected: index == selectArrowPosY);
-				})
-			);
-
+					Fonts.drawText(
+						FontType.Blue, "Map size: " + selectedMapSize, pos.x, pos.y,
+						selected: index == selectArrowPosY
+					);
+				}
+			)
+		);
 		// Map
 		menuOptions.Add(
 			new MenuOption(startX, startY,
@@ -308,11 +367,14 @@ public class HostMenu : IMainMenu {
 					}
 				},
 				(Point pos, int index) => {
-					Helpers.drawTextStd(TCat.Option, "MAP: " + (isMapSelected ? selectedLevel.displayName : "[Select]"), pos.x, pos.y, fontSize: fontSize, selected: index == selectArrowPosY);
+					Fonts.drawText(
+						FontType.Blue, "Map: " + (isMapSelected ? selectedLevel.displayName : "[Select]"),
+						pos.x, pos.y, selected: index == selectArrowPosY
+					);
 				},
-				"Random Map")
-			);
-
+				"Random Map"
+			)
+		);
 		if (isTraining) {
 			menuOptions.Add(
 				new MenuOption(startX, startY,
@@ -324,11 +386,14 @@ public class HostMenu : IMainMenu {
 						}
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(TCat.Option, "USE LOADOUT: " + Helpers.boolYesNo(useLoadout), pos.x, pos.y, fontSize: fontSize, color: Color.White, selected: index == selectArrowPosY);
-					})
-				);
+						Fonts.drawText(
+							FontType.Blue, "Use loadout: " + Helpers.boolYesNo(useLoadout),
+							pos.x, pos.y, selected: index == selectArrowPosY
+						);
+					}
+				)
+			);
 		}
-
 		// Mode
 		if (!isTraining) {
 			menuOptions.Add(
@@ -337,17 +402,23 @@ public class HostMenu : IMainMenu {
 						if (Global.input.isPressedMenu(Control.MenuLeft) && gameModeIndex > 0) {
 							gameModeIndex--;
 							onModeChange();
-						} else if (Global.input.isPressedMenu(Control.MenuRight) && gameModeIndex < currentGameModePool.Count - 1) {
+						} else if (
+							Global.input.isPressedMenu(Control.MenuRight) &&
+							gameModeIndex < currentGameModePool.Count - 1
+						) {
 							gameModeIndex++;
 							onModeChange();
 						}
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(TCat.Option, "MODE: " + selectedGameMode, pos.x, pos.y, fontSize: fontSize, color: Color.White, selected: index == selectArrowPosY);
-					})
-				);
+						Fonts.drawText(
+							FontType.Blue, "Mode: " + selectedGameMode, pos.x, pos.y,
+							selected: index == selectArrowPosY
+						);
+					}
+				)
+			);
 		}
-
 		// Team
 		if (changeTeamEnabled()) {
 			menuOptions.Add(
@@ -362,11 +433,14 @@ public class HostMenu : IMainMenu {
 						}
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(TCat.Option, "TEAM: " + GameMode.getTeamName(team), pos.x, pos.y, fontSize: fontSize, color: changeTeamEnabled() ? Color.White : Helpers.Gray, selected: index == selectArrowPosY);
-					})
-				);
+						Fonts.drawText(
+							FontType.Blue, "Team: " + GameMode.getTeamName(team),
+							pos.x, pos.y, selected: index == selectArrowPosY
+						);
+					}
+				)
+			);
 		}
-
 		if (playToSupported()) {
 			// Play to
 			menuOptions.Add(
@@ -383,11 +457,20 @@ public class HostMenu : IMainMenu {
 						}
 					},
 					(Point pos, int index) => {
-						string playToStr = "PLAY TO: ";
-						if (selectedGameMode == GameMode.Elimination || selectedGameMode == GameMode.TeamElimination) playToStr = "Lives: ";
-						Helpers.drawTextStd(TCat.Option, playToStr + playTo, pos.x, pos.y, fontSize: fontSize, color: playToSupported() ? Color.White : Helpers.Gray, selected: index == selectArrowPosY);
-					})
-				);
+						string playToStr = "Play to: ";
+						if (selectedGameMode == GameMode.Elimination ||
+							selectedGameMode == GameMode.TeamElimination
+						) {
+							playToStr = "Lives: ";
+						}
+						Fonts.drawText(
+							FontType.Blue,
+							playToStr + playTo, pos.x, pos.y,
+							selected: index == selectArrowPosY
+						);
+					}
+				)
+			);
 		}
 
 		// CPU Count
@@ -397,20 +480,31 @@ public class HostMenu : IMainMenu {
 					if (Global.input.isPressedOrHeldMenu(Control.MenuLeft) && botCount > 0) {
 						botCount--;
 						resetCpuDataTeams();
-					} else if (Global.input.isPressedOrHeldMenu(Control.MenuRight) && botCount < Math.Max(selectedLevel.maxPlayers - 1, 3)) {
+					} else if (
+						Global.input.isPressedOrHeldMenu(Control.MenuRight) &&
+						botCount < Math.Max(selectedLevel.maxPlayers - 1, 3)
+					) {
 						botCount++;
 						resetCpuDataTeams();
 					}
 					if (Global.input.isPressedMenu(Control.MenuSelectSecondary) && botCount > 0) {
-						Menu.change(new ConfigureCPUMenu(this, botCount, is1v1, isOffline, inGame, inGame, GameMode.isStringTeamMode(selectedGameMode), true));
+						Menu.change(
+							new ConfigureCPUMenu(
+								this, botCount, is1v1, isOffline, inGame, inGame,
+								GameMode.isStringTeamMode(selectedGameMode), true
+							)
+						);
 					}
 				},
 				(Point pos, int index) => {
-					Helpers.drawTextStd(TCat.Option, "CPU COUNT: " + botCount, pos.x, pos.y, fontSize: fontSize, selected: index == selectArrowPosY);
+					Fonts.drawText(
+						FontType.Blue, "CPU count: " + botCount, pos.x, pos.y,
+						selected: index == selectArrowPosY
+					);
 				},
-				"Configure CPUs")
-			);
-
+				"Configure CPUs"
+			)
+		);
 		// Time limit
 		if (!isTraining && !isRace) {
 			menuOptions.Add(
@@ -433,13 +527,17 @@ public class HostMenu : IMainMenu {
 						}
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(TCat.Option, "TIME LIMIT: " + (timeLimit > 0 ? timeLimit.ToString() + " minutes" : "None"), pos.x, pos.y, fontSize: fontSize, selected: index == selectArrowPosY);
-					})
-				);
+						Fonts.drawText(
+							FontType.Blue,
+							"Time limit: " + (timeLimit > 0 ? timeLimit.ToString() + " minutes" : "None"),
+							pos.x, pos.y, selected: index == selectArrowPosY
+						);
+					}
+				)
+			);
 		}
-
+		// Mirrored
 		if (selectedLevel.canChangeMirror(selectedGameMode)) {
-			// Mirrored
 			menuOptions.Add(
 				new MenuOption(startX, startY,
 					() => {
@@ -452,13 +550,16 @@ public class HostMenu : IMainMenu {
 						}
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(TCat.Option, "MIRRORED: " + Helpers.boolYesNo(mirrored), pos.x, pos.y, fontSize: fontSize, color: selectedLevel.canChangeMirror(selectedGameMode) ? Color.White : Helpers.Gray, selected: index == selectArrowPosY);
-					})
-				);
+						Fonts.drawText(
+							FontType.Blue, "Mirrored: " + Helpers.boolYesNo(mirrored),
+							pos.x, pos.y, selected: index == selectArrowPosY
+						);
+					}
+				)
+			);
 		}
-
+		// Large camera
 		if (selectedLevel.supportsLargeCam) {
-			// Large camera
 			menuOptions.Add(
 				new MenuOption(startX, startY,
 					() => {
@@ -471,11 +572,15 @@ public class HostMenu : IMainMenu {
 						}
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(TCat.Option, "LARGE CAMERA: " + (fixedCamera ? "yes" : "no"), pos.x, pos.y, fontSize: fontSize, color: selectedLevel.supportsLargeCam ? Color.White : Helpers.Gray, selected: index == selectArrowPosY);
-					})
-				);
+						Fonts.drawText(
+							FontType.Blue, "Large camera: " + (fixedCamera ? "Yes" : "No"),
+							pos.x, pos.y,
+							selected: index == selectArrowPosY
+						);
+					}
+				)
+			);
 		}
-
 		// Disable HT/ST
 		if (!is1v1) {
 			menuOptions.Add(
@@ -488,13 +593,16 @@ public class HostMenu : IMainMenu {
 						}
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(TCat.Option, "HEART/SUB TANKS: " + (disableHtSt ? "Disabled" : "Enabled"), pos.x, pos.y, fontSize: fontSize, color: Color.White, selected: index == selectArrowPosY);
-					})
-				);
+						Fonts.drawText(
+							FontType.Blue, "Heart/Sub tanks: " + (disableHtSt ? "Disabled" : "Enabled"),
+							pos.x, pos.y, selected: index == selectArrowPosY
+						);
+					}
+				)
+			);
 		}
-
+		// Disable vehicles
 		if (selectedLevel.supportsVehicles) {
-			// Disable vehicles
 			menuOptions.Add(
 				new MenuOption(startX, startY,
 					() => {
@@ -505,13 +613,16 @@ public class HostMenu : IMainMenu {
 						}
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(TCat.Option, "VEHICLES: " + (disableVehicles ? "Disabled" : "Enabled"), pos.x, pos.y, fontSize: fontSize, color: Color.White, selected: index == selectArrowPosY);
-					})
-				);
+						Fonts.drawText(
+							FontType.Blue, "Vehicles: " + (disableVehicles ? "Disabled" : "Enabled"),
+							pos.x, pos.y, selected: index == selectArrowPosY
+						);
+					}
+				)
+			);
 		}
-
+		// Private match
 		if (!isOffline && !isLAN) {
-			// Private match
 			menuOptions.Add(
 				new MenuOption(startX, startY,
 					() => {
@@ -526,13 +637,16 @@ public class HostMenu : IMainMenu {
 						}
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(TCat.Option, "PRIVATE MATCH: " + (hidden ? "yes" : "no"), pos.x, pos.y, fontSize: fontSize, color: isOffline ? Helpers.Gray : Color.White, selected: index == selectArrowPosY);
-					})
-				);
+						Fonts.drawText(
+							FontType.Blue, "Private match: " + (hidden ? "Yes" : "No"),
+							pos.x, pos.y, selected: index == selectArrowPosY
+						);
+					}
+				)
+			);
 		}
-
+		// Netcode model
 		if (!isOffline) {
-			// Netcode model
 			menuOptions.Add(
 				new MenuOption(startX, startY,
 					() => {
@@ -553,13 +667,16 @@ public class HostMenu : IMainMenu {
 						}
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(TCat.Option, "NETCODE: " + Helpers.getNetcodeModelString((NetcodeModel)netcodeModel), pos.x, pos.y, fontSize: fontSize, color: isOffline ? Helpers.Gray : Color.White, selected: index == selectArrowPosY);
-					})
-				);
+						Fonts.drawText(
+							FontType.Blue, "Netcode: " + Helpers.getNetcodeModelString((NetcodeModel)netcodeModel),
+							pos.x, pos.y, selected: index == selectArrowPosY
+						);
+					}
+				)
+			);
 		}
-
+		// Netcode model ping
 		if (netcodePingEnabled()) {
-			// Netcode model ping
 			menuOptions.Add(
 				new MenuOption(startX, startY,
 					() => {
@@ -574,13 +691,16 @@ public class HostMenu : IMainMenu {
 						}
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(TCat.Option, "FAVOR BELOW PING: " + netcodeModelUnderPing.ToString(), pos.x, pos.y, fontSize: fontSize,
-							color: netcodePingEnabled() ? Color.White : Helpers.Gray, selected: index == selectArrowPosY);
-					})
-				);
+						Fonts.drawText(
+							FontType.Blue, "Favor below ping: " + netcodeModelUnderPing.ToString(),
+							pos.x, pos.y, selected: index == selectArrowPosY
+						);
+					}
+				)
+			);
 		}
-
-		if (isOffline || isHiddenOrLan()) {
+		// Custom match settings
+		if (isOffline || isP2P || isHiddenOrLan()) {
 			menuOptions.Add(
 				new MenuOption(startX, startY,
 					() => {
@@ -590,22 +710,32 @@ public class HostMenu : IMainMenu {
 						}
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(TCat.Option, "CUSTOM SETTINGS: " + Helpers.boolYesNo(useCustomMatchSettings), pos.x, pos.y, fontSize: fontSize, selected: index == selectArrowPosY);
+						Fonts.drawText(
+							FontType.Blue, "Custom settings: " + Helpers.boolYesNo(useCustomMatchSettings),
+							pos.x, pos.y, selected: index == selectArrowPosY
+						);
 					},
-					"Configure Custom Settings")
-				);
+					"Configure Custom Settings"
+				)
+			);
 		}
-
 		for (int i = 0; i < menuOptions.Count; i++) {
 			menuOptions[i].pos.y = startY + lineH * i;
 		}
 	}
 
-	public string[] mapSortOrder = new string[] { "factory_md", "airport_md", "maverickfactory_md", "desertbase_md", "weathercontrol_md",
-			"centralcomputer_1v1", "zerovirus_1v1", "sigma4_1v1", "dopplerlab_1v1", "sigma1_1v1", "airport_1v1", "factory_1v1", "hunterbase_1v1", "forest_1v1", "highway", "highway2", "bossroom", "powerplant", "factory", "gallery", "tower", "mountain", "ocean", "forest", "forest2", "airport", "sigma", "sigma2", "japetribute_1v1", "training",
-			"maverickfactory", "weathercontrol", "dinosaurtank", "deepseabase", "volcaniczone", "robotjunkyard", "desertbase", "desertbase2", "crystalmine", "centralcomputer", "xhunter1", "xhunter2",
-			"hunterbase", "highway2", "giantdam", "giantdam2", "weaponsfactory", "frozentown", "aircraftcarrier", "powercenter", "shipyard", "quarry", "safaripark", "dopplerlab", "hunterbase2",
-		};
+	public string[] mapSortOrder = new string[] {
+		"factory_md", "airport_md", "maverickfactory_md", "desertbase_md", "weathercontrol_md",
+		"centralcomputer_1v1", "zerovirus_1v1", "sigma4_1v1", "dopplerlab_1v1", "sigma1_1v1",
+		"airport_1v1", "factory_1v1", "hunterbase_1v1", "forest_1v1", "highway", "highway2",
+		"bossroom", "powerplant", "factory", "gallery", "tower", "mountain", "ocean", "forest",
+		"forest2", "airport", "sigma", "sigma2", "japetribute_1v1", "training",
+		"maverickfactory", "weathercontrol", "dinosaurtank", "deepseabase", "volcaniczone",
+		"robotjunkyard", "desertbase", "desertbase2", "crystalmine", "centralcomputer",
+		"xhunter1", "xhunter2", "hunterbase", "highway2", "giantdam", "giantdam2",
+		"weaponsfactory", "frozentown", "aircraftcarrier", "powercenter", "shipyard",
+		"quarry", "safaripark", "dopplerlab", "hunterbase2",
+	};
 	public int mapSortFunc(LevelData a, LevelData b) {
 		int aIndex = -1;
 		int bIndex = -1;
@@ -903,9 +1033,9 @@ public class HostMenu : IMainMenu {
 
 		if (!selectedLevel.supportsLargeCam) {
 			fixedCamera = false;
-		} else if (selectedLevel.defaultLargeCam) {
+		} /*else if (selectedLevel.defaultLargeCam) {
 			fixedCamera = true;
-		} else {
+		}*/ else {
 			fixedCamera = false;
 		}
 
@@ -1039,15 +1169,22 @@ public class HostMenu : IMainMenu {
 
 	public void render() {
 		if (!inGame) {
-			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0);
-			DrawWrappers.DrawTextureHUD(Global.textures["cursor"], menuOptions[selectArrowPosY].pos.x - 8, menuOptions[selectArrowPosY].pos.y - 1);
+			DrawWrappers.DrawTextureHUD(Global.textures["severbrowser"], 0, 0);
+			DrawWrappers.DrawTextureHUD(
+				Global.textures["cursor"],
+				menuOptions[selectArrowPosY].pos.x,
+				menuOptions[selectArrowPosY].pos.y - 2
+			);
 		} else {
-			DrawWrappers.DrawRect(5, 5, Global.screenW - 5, Global.screenH - 5, true, Helpers.MenuBgColor, 0, ZIndex.HUD + 200, false);
-			Global.sprites["cursor"].drawToHUD(0, menuOptions[selectArrowPosY].pos.x - 8, menuOptions[selectArrowPosY].pos.y + 5);
+			DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
+			Global.sprites["cursor"].drawToHUD(
+				0, menuOptions[selectArrowPosY].pos.x,
+				menuOptions[selectArrowPosY].pos.y - 2
+			);
 		}
+		DrawWrappers.DrawTextureHUD(selectedLevel.getMapThumbnail(), 254, 38);
 
 		string titleText = "";
-		DrawWrappers.DrawTextureHUD(selectedLevel.getMapThumbnail(), mapPos.x, mapPos.y);
 		if (!inGame) {
 			if (isOffline) titleText = "VS. CPU";
 			else {
@@ -1058,11 +1195,11 @@ public class HostMenu : IMainMenu {
 			titleText = "Create Mext Match";
 		}
 
-		Helpers.drawTextStd(TCat.Title, titleText, Global.halfScreenW, 20, alignment: Alignment.Center, vAlignment: VAlignment.Center, fontSize: 48);
+		Fonts.drawText(FontType.Yellow, titleText, Global.halfScreenW, 20, Alignment.Center);
 
 		int i = 0;
-		foreach (var menuOption in menuOptions) {
-			menuOption.render(menuOption.pos, i++);
+		foreach (MenuOption menuOption in menuOptions) {
+			menuOption.render(menuOption.pos.addxy(8, 0), i++);
 		}
 
 		string msg;
@@ -1071,11 +1208,16 @@ public class HostMenu : IMainMenu {
 			else msg = "[X]: Next, [C]: Change Name, [Z]: Back";
 		} else msg = "[X]: Next, [ESC]: Menu";
 
-		Helpers.drawTextStd(TCat.BotHelp, msg, Global.screenW * 0.5f, 210, Alignment.Center, fontSize: 24);
-		Helpers.drawTextStd(TCat.BotHelp, "Left/Right: Change setting", Global.screenW * 0.5f, 200, Alignment.Center, fontSize: 24);
+		Fonts.drawText(
+			FontType.Grey, msg + "\nLeft/Right: Change setting",
+			Global.screenW * 0.5f, 178, Alignment.Center
+		);
 
 		if (!string.IsNullOrEmpty(menuOptions[selectArrowPosY].configureMessage)) {
-			Helpers.drawTextStd(TCat.BotHelp, "[C]: " + menuOptions[selectArrowPosY].configureMessage, Global.screenW * 0.5f, 190, Alignment.Center, fontSize: 24);
+			Fonts.drawText(
+				FontType.Grey, "[C]: " + menuOptions[selectArrowPosY].configureMessage,
+				Global.screenW * 0.5f, 168, Alignment.Center
+			);
 		}
 
 		if (errorMessage != null) {

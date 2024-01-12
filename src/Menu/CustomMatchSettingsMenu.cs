@@ -207,7 +207,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0);
 			DrawWrappers.DrawTextureHUD(Global.textures["cursor"], menuOptions[selectArrowPosY].pos.x - 8, menuOptions[selectArrowPosY].pos.y - 1);
 		} else {
-			DrawWrappers.DrawRect(5, 5, Global.screenW - 5, Global.screenH - 5, true, Helpers.MenuBgColor, 0, ZIndex.HUD + 200, false);
+			DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
 			Global.sprites["cursor"].drawToHUD(0, menuOptions[selectArrowPosY].pos.x - 8, menuOptions[selectArrowPosY].pos.y + 5);
 		}
 

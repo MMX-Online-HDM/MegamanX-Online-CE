@@ -34,6 +34,9 @@ public class OptionsMenu : IMainMenu {
 	public bool oldIntegerFullscreen;
 	public bool oldVsync;
 
+	public FontType optionFontText = FontType.Blue;
+	public FontType optionFontValue = FontType.Blue;
+
 	public OptionsMenu(IMainMenu mainMenu, bool inGame, int? charNum, bool isGraphics) {
 		previous = mainMenu;
 		this.inGame = inGame;
@@ -55,6 +58,10 @@ public class OptionsMenu : IMainMenu {
 		if (!isGraphics && charNum == null) {
 			startY = 35;
 		}
+		if (!inGame) {
+			optionFontText = FontType.DarkBlue;
+			optionFontValue = FontType.DarkBlue;
+		}
 
 		if (isGraphics) {
 			menuOptions = new List<MenuOption>() {
@@ -74,11 +81,13 @@ public class OptionsMenu : IMainMenu {
 						}
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"FULLSCREEN: " + (Options.main.fullScreen ? "Yes" : "No"),
-							pos.x, pos.y, fontSize: fontSize, color: getColor(),
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Fullscreen:",
+							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Options.main.fullScreen ? "Yes" : "No",
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"Set to Yes to make the game render fullscreen."
@@ -98,11 +107,13 @@ public class OptionsMenu : IMainMenu {
 						}
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"WINDOWED RESOLUTION: " + getWindowedResolution(),
-							pos.x, pos.y, fontSize: fontSize, color: Color.White,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Windowed Resolution:",
+							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, getWindowedResolution(),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"Change the windowed resolution of the game."
@@ -118,11 +129,13 @@ public class OptionsMenu : IMainMenu {
 						}
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"SHOW FPS: " + Helpers.boolYesNo(Options.main.showFPS),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Show FPS:",
+							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.showFPS),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"Show the frames per second (FPS) in the bottom right."
@@ -133,19 +146,19 @@ public class OptionsMenu : IMainMenu {
 					() => {
 						if (inGame) return;
 						if (Global.input.isHeldMenu(Control.MenuLeft)) {
-							Options.main.maxFPS--;
-							if (Options.main.maxFPS < 30) Options.main.maxFPS = 30;
+							Options.main.maxFPS = 30;
 						} else if (Global.input.isHeldMenu(Control.MenuRight)) {
-							Options.main.maxFPS++;
-							if (Options.main.maxFPS > Global.fpsCap) Options.main.maxFPS = Global.fpsCap;
+							Options.main.maxFPS = Global.fpsCap;
 						}
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"MAX FPS: " + Options.main.maxFPS.ToString(),
-							pos.x, pos.y, fontSize: fontSize, color: getColor(),
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Max FPS:",
+							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Options.main.maxFPS.ToString(),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"Controls the max framerate the game can run.\nLower values are more choppy but use less GPU."
@@ -158,11 +171,13 @@ public class OptionsMenu : IMainMenu {
 						Helpers.menuLeftRightBool(ref Options.main.vsync);
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"ENABLE VSYNC: " + Helpers.boolYesNo(Options.main.vsync),
-							pos.x, pos.y, fontSize: fontSize, color: getColor(),
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Enable VSYNC:",
+							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.vsync),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"Set to Yes to enable vsync.\nMakes movement/scrolling smoother, but adds input lag."
@@ -175,11 +190,13 @@ public class OptionsMenu : IMainMenu {
 						Helpers.menuLeftRightBool(ref Options.main.useOptimizedAssets);
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"USE OPTIMIZED ASSETS: " + Helpers.boolYesNo(Options.main.useOptimizedAssets),
-							pos.x, pos.y, fontSize: fontSize, color: getColor(),
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Use optimized assets:",
+							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.useOptimizedAssets),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"Set to Yes to use optimized assets.\nThis can result in better performance."
@@ -191,15 +208,17 @@ public class OptionsMenu : IMainMenu {
 						Helpers.menuLeftRightBool(ref Options.main.integerFullscreen);
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"FULLSCREEN ROUNDING: " + Helpers.boolYesNo(Options.main.integerFullscreen),
-							pos.x, pos.y, fontSize: fontSize, color: Color.White,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Integer fullscreen:", 
+							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue,Helpers.boolYesNo(Options.main.integerFullscreen),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Set to Yes to round down fullscreen pixels to the nearest integer.\n" +
-					"Reduces distortion on lower resolution monitors."
+					"Rounds down fullscreen pixels to the nearest integer.\n" +
+					"Reduces distortion when going fullscreen."
 				),
 				// Preset
 				new MenuOption(
@@ -220,11 +239,13 @@ public class OptionsMenu : IMainMenu {
 						}
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"PRESET QUALITY: " + qualityToString(Options.main.graphicsPreset.Value),
-							pos.x, pos.y, fontSize: fontSize, color: getColor(),
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Preset Quality: " + qualityToString(Options.main.graphicsPreset.Value),
+							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, qualityToString(Options.main.graphicsPreset.Value),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"Choose a pre-configured set of graphics settings."
@@ -241,11 +262,13 @@ public class OptionsMenu : IMainMenu {
 						}
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"ENABLE SHADERS: " + Helpers.boolYesNo(!Options.main.disableShaders),
-							pos.x, pos.y, fontSize: fontSize, color: getVideoSettingColor(),
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Enable shaders:",
+							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(!Options.main.disableShaders),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"Enables special effects like weapon palettes.\nNot all PCs support this."
@@ -258,11 +281,13 @@ public class OptionsMenu : IMainMenu {
 						Helpers.menuLeftRightBool(ref Options.main.enablePostProcessing);
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"ENABLE POST PROCESSING: " + Helpers.boolYesNo(Options.main.enablePostProcessing),
-							pos.x, pos.y, fontSize: fontSize, color: getVideoSettingColor(),
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Enable post-processing: ",
+							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.enablePostProcessing),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"Enables special screen distortion effects.\nNot all PCs support this."
@@ -275,11 +300,13 @@ public class OptionsMenu : IMainMenu {
 						Helpers.menuLeftRightInc(ref Options.main.fontType, 0, 2);
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"FONT TYPE: " + fontTypeToString(Options.main.fontType),
-							pos.x, pos.y, fontSize: fontSize, color: getVideoSettingColor(),
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Font type:",
+							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, fontTypeToString(Options.main.fontType),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"Set the font type. Bitmap uses PNG, Vector uses TFF.\n" +
@@ -293,11 +320,13 @@ public class OptionsMenu : IMainMenu {
 						Helpers.menuLeftRightInc(ref Options.main.particleQuality, 0, 2);
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"PARTICLE QUALITY: " + qualityToString(Options.main.particleQuality),
-							pos.x, pos.y, fontSize: fontSize, color: getVideoSettingColor(),
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Particle quality:",
+							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, qualityToString(Options.main.particleQuality),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"Set the particle effect quality.\nLower quality results in faster performance."
@@ -310,11 +339,13 @@ public class OptionsMenu : IMainMenu {
 						Helpers.menuLeftRightBool(ref Options.main.enableMapSprites);
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"ENABLE MAP SPRITES: " + Helpers.boolYesNo(Options.main.enableMapSprites),
-							pos.x, pos.y, fontSize: fontSize, color: getVideoSettingColor(),
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Enable map sprites:",
+							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.enableMapSprites),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"Enable or disable map sprites.\nDisabling map sprites results in faster performance."
@@ -330,14 +361,16 @@ public class OptionsMenu : IMainMenu {
 						}
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"ENABLE SMALL BARS: " + Helpers.boolYesNo(Options.main.enableSmallBars),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Enable small bars:",
+							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.enableSmallBars),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Makes the energy bars smaller."
+					"Makes some of the energy bars smaller."
 				),
 			};
 		} else if (charNum == null) {
@@ -360,11 +393,13 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						var musicVolume100 = (int) Math.Round(Options.main.musicVolume * 100);
-						Helpers.drawTextStd(
-							TCat.Option,
-							"MUSIC VOLUME: " + musicVolume100.ToString(),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Music Volume:",
+							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, musicVolume100.ToString(),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"Adjust the game music volume."
@@ -381,11 +416,13 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						var soundVolume100 = (int) Math.Round(Options.main.soundVolume * 100);
-						Helpers.drawTextStd(
-							TCat.Option,
-							"SOUND VOLUME: " + soundVolume100.ToString(),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Sound Volume:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, soundVolume100.ToString(),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"Adjust the game sound volume."
@@ -405,11 +442,13 @@ public class OptionsMenu : IMainMenu {
 						}
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"MULTIPLAYER NAME: " + playerName,
-							pos.x, pos.y, fontSize: fontSize, color: getColor(),
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Multiplayer name:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, playerName,
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"Your name that appears to others when you play online."
@@ -430,14 +469,16 @@ public class OptionsMenu : IMainMenu {
 						}
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"MULTIPLAYER REGION: " + Options.main.getRegion().name + (
-								" (" + Options.main.getRegion().getDisplayPing() + " ping)"
+						Fonts.drawText(
+							optionFontText, "Multiplayer region:",
+							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue,
+							Options.main.getRegion().name + (
+								"(" + Options.main.getRegion().getDisplayPing() + " ping)"
 							),
-							pos.x, pos.y, fontSize: fontSize,
-							color: isRegionDisabled() ? Helpers.Gray : Color.White,
-							selected: selectedArrowPosY == index, optionPadding: 26
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"Preferred server region for hosting matches.\nChoose the one with lowest ping."
@@ -450,11 +491,13 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						string preferredChar = Character.charDisplayNames[Options.main.preferredCharacter];
-						Helpers.drawTextStd(
-							TCat.Option,
-							"PREFERRED CHARACTER: " + preferredChar,
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Referred character:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, preferredChar,
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"Choose a default character the game will\npre-select for you."
@@ -470,11 +513,13 @@ public class OptionsMenu : IMainMenu {
 						}
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"SHOW IN-GAME MENU KEYS: " + Helpers.boolYesNo(Options.main.showInGameMenuHUD),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Show in-game menu keys:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.showInGameMenuHUD),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"Show or hide additional menu help text in\nbottom right of the in-match HUD."
@@ -490,11 +535,13 @@ public class OptionsMenu : IMainMenu {
 						}
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"SHOW STARTUP WARNINGS: " + Helpers.boolYesNo(Options.main.showSysReqPrompt),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Show startup warnings:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.showSysReqPrompt),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"On launch, check for system requirements\nand other startup warnings."
@@ -510,11 +557,13 @@ public class OptionsMenu : IMainMenu {
 						}
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"DISABLE CHAT: " + Helpers.boolYesNo(Options.main.disableChat),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Disable chat:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.disableChat),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"Set to Yes to disable sending and receiving\nchat messages in online matches."
@@ -530,11 +579,9 @@ public class OptionsMenu : IMainMenu {
 						}
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"DISABLE DOUBLE TAP DASH: " + Helpers.boolYesNo(Options.main.disableDoubleDash),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "DISABLE DOUBLE TAP DASH: " + Helpers.boolYesNo(Options.main.disableDoubleDash),
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"Disables ability to dash by quickly\ntapping LEFT or RIGHT twice."
@@ -546,11 +593,13 @@ public class OptionsMenu : IMainMenu {
 						Helpers.menuLeftRightBool(ref Options.main.showMashProgress);
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"SHOW MASH PROGRESS: " + Helpers.boolYesNo(Options.main.showMashProgress),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Show mash progress:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.showMashProgress),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"When hit by moves that can be mashed out of, like grabs,\n" +
@@ -563,11 +612,13 @@ public class OptionsMenu : IMainMenu {
 						Helpers.menuLeftRightBool(ref Options.main.killOnLoadoutChange);
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"KILL ON LOADOUT CHANGE: " + Helpers.boolYesNo(Options.main.killOnLoadoutChange),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Kill on loadout change:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.killOnLoadoutChange),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"If Yes, will instantly die on loadout change mid-match.\n" +
@@ -580,11 +631,13 @@ public class OptionsMenu : IMainMenu {
 						Helpers.menuLeftRightBool(ref Options.main.killOnCharChange);
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"KILL ON CHARACTER CHANGE: " + Helpers.boolYesNo(Options.main.killOnCharChange),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Kill on character change:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.killOnCharChange),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"If Yes, will instantly die on character change mid-match.\n" +
@@ -605,12 +658,13 @@ public class OptionsMenu : IMainMenu {
 						}
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"MATCHMAKING TIMEOUT: " +
-							Options.main.networkTimeoutSeconds.ToString("0.0") + " seconds",
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Matchmaking timeout:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Options.main.networkTimeoutSeconds.ToString("0.0") + " seconds",
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"How long match search will take before erroring out.\n" +
@@ -623,11 +677,13 @@ public class OptionsMenu : IMainMenu {
 						Helpers.menuLeftRightBool(ref Options.main.enableDeveloperConsole);
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"ENABLE DEV CONSOLE: " + Helpers.boolYesNo(Options.main.enableDeveloperConsole),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Enable dev console:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.enableDeveloperConsole),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"If enabled, press BACKQUOTE to open the dev-console in-match.\n" +
@@ -642,11 +698,13 @@ public class OptionsMenu : IMainMenu {
 						Helpers.menuLeftRightInc(ref Options.main.gridModeX, 0, 2);
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"WEAPON SWITCH GRID MODE: " + gridModeToStr(Options.main.gridModeX),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Weapon switch grid mode:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, gridModeToStr(Options.main.gridModeX),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"Enable Grid Mode for weapon switch in certain or all modes.\n" +
@@ -659,11 +717,14 @@ public class OptionsMenu : IMainMenu {
 						Helpers.menuLeftRightInc(ref Options.main.hyperChargeSlot, 0, 2);
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"HYPER CHARGE SLOT: " + (Options.main.hyperChargeSlot + 1),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						// ToDo: Implement "Buster" option for hypercharge like HDM.
+						Fonts.drawText(
+							optionFontText, "Hyper charge slot:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, (Options.main.hyperChargeSlot + 1).ToString(),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"Weapon slot number which Hyper Charge uses."
@@ -675,11 +736,13 @@ public class OptionsMenu : IMainMenu {
 						Helpers.menuLeftRightBool(ref Options.main.gigaCrushSpecial);
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"G.CRUSH DOWN SPECIAL: " + Helpers.boolYesNo(Options.main.gigaCrushSpecial),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "G.Crush down special:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.gigaCrushSpecial),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"If Yes, you can perform Giga Crush by pressing DOWN + SPECIAL,\n" +
@@ -692,11 +755,13 @@ public class OptionsMenu : IMainMenu {
 						Helpers.menuLeftRightBool(ref Options.main.novaStrikeSpecial);
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"N.STRIKE SIDE SPECIAL: " + Helpers.boolYesNo(Options.main.novaStrikeSpecial),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "N.Strike side special:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.novaStrikeSpecial),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"If Yes, you can perform Nova Strike by pressing ARROW KEY + SPECIAL,\n" +
@@ -715,11 +780,13 @@ public class OptionsMenu : IMainMenu {
 						if (Options.main.xSpecialOrdering == 3) s = "H.Buster,N.Strike,G.Crush";
 						if (Options.main.xSpecialOrdering == 4) s = "N.Strike,G.Crush,H.Buster";
 						if (Options.main.xSpecialOrdering == 5) s = "N.Strike,H.Buster,G.Crush";
-						Helpers.drawTextStd(
-							TCat.Option,
-							"Special Slot Order: " + s,
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Special Slot Order:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, s,
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					}
 				)
@@ -733,11 +800,13 @@ public class OptionsMenu : IMainMenu {
 						Helpers.menuLeftRightBool(ref Options.main.swapAirAttacks);
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"SWAP AIR ATTACKS: " + Helpers.boolYesNo(Options.main.swapAirAttacks),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Swap air attacks:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.swapAirAttacks),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"You can swap the inputs for air slash attack (default ATTACK),\n" +
@@ -750,11 +819,13 @@ public class OptionsMenu : IMainMenu {
 						Helpers.menuLeftRightBool(ref Options.main.showGigaAttackCooldown);
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"SHOW GIGA COOLDOWN: " + Helpers.boolYesNo(Options.main.showGigaAttackCooldown),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Show giga cooldown:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.showGigaAttackCooldown),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"If Yes, shows a cooldown circle of giga moves like Rakuhouha."
@@ -769,11 +840,13 @@ public class OptionsMenu : IMainMenu {
 						Helpers.menuLeftRightBool(ref Options.main.swapGoliathInputs);
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"SWAP GOLIATH SHOOT: " + Helpers.boolYesNo(Options.main.swapGoliathInputs),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Swap goliath shoot:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.swapGoliathInputs),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"You can swap the inputs for Goliath buster (default WEAPON L/R),\nand missiles (default SPECIAL)."
@@ -785,11 +858,13 @@ public class OptionsMenu : IMainMenu {
 						Helpers.menuLeftRightBool(ref Options.main.blockMechSlotScroll);
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"BLOCK MECH SCROLL: " + Helpers.boolYesNo(Options.main.blockMechSlotScroll),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Block mech scroll:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.blockMechSlotScroll),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"Prevents ability to scroll to the Ride Armor slot.\n" +
@@ -802,13 +877,17 @@ public class OptionsMenu : IMainMenu {
 						Helpers.menuLeftRightInc(ref Options.main.weaponOrderingVile, 0, 1);
 					},
 					(Point pos, int index) => {
-						string s = "F.Runner,Vulcan,R.Armors";
-						if (Options.main.weaponOrderingVile == 1) s = "Vulcan,F.Runner,R.Armors";
-						Helpers.drawTextStd(
-							TCat.Option,
-							"WEAPON ORDER: " + s,
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						string str = "F.Runner,Vulcan,R.Armors";
+						if (Options.main.weaponOrderingVile == 1) {
+							str = "Vulcan,F.Runner,R.Armors";
+						}
+						Fonts.drawText(
+							optionFontText, "Weapon order:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, str,
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"Choose the order in which Vile's weapons are arranged."
@@ -820,11 +899,13 @@ public class OptionsMenu : IMainMenu {
 						Helpers.menuLeftRightBool(ref Options.main.mk5PuppeteerHoldOrToggle);
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"VILE V RIDE CONTROL: " + (Options.main.mk5PuppeteerHoldOrToggle ? "Hold" : "Toggle"),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Vile V ride control:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, (Options.main.mk5PuppeteerHoldOrToggle ? "Hold" : "Toggle"),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"If set to Hold, Vile V will control the Mech as long as\nWEAPON L/R is held."
@@ -836,11 +917,13 @@ public class OptionsMenu : IMainMenu {
 						Helpers.menuLeftRightBool(ref Options.main.lockInAirCannon);
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"LOCK IN AIR CANNON: " + (Options.main.lockInAirCannon ? "Yes" : "No"),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Lock in air cannon:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, (Options.main.lockInAirCannon ? "Yes" : "No"),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"If No, Front Runner and Fat Boy cannons will not\nroot Vile in the air when shot."
@@ -862,11 +945,13 @@ public class OptionsMenu : IMainMenu {
 						string aimMode = "Directional";
 						if (Options.main.axlAimMode == 1) aimMode = "Directional";
 						else if (Options.main.axlAimMode == 2) aimMode = "Cursor";
-						Helpers.drawTextStd(
-							TCat.Option,
-							"AIM MODE: " + aimMode,
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Aim mode:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, aimMode,
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"Change Axl's aim controls to either use\nARROW KEYS (Directional) or mouse aim (Cursor)."
@@ -882,12 +967,14 @@ public class OptionsMenu : IMainMenu {
 						}
 					},
 					(Point pos, int index) => {
-						var setting100 = (int) Math.Round(Options.main.aimSensitivity * 100);
-						Helpers.drawTextStd(
-							TCat.Option,
-							"AIM SENSITIVITY: " + setting100.ToString(),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						var str = (int)Math.Round(Options.main.aimSensitivity * 100);
+						Fonts.drawText(
+							optionFontText, "Aim sensitivity:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, str.ToString(),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"Change aim sensitivity (for Cursor aim mode only.)"
@@ -903,11 +990,14 @@ public class OptionsMenu : IMainMenu {
 						}
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"AUTO AIM: " + Helpers.boolYesNo(Options.main.lockOnSound),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						//ToDo: Add an actual option for the sound.
+						Fonts.drawText(
+							optionFontText, "Auto aim:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.lockOnSound),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"Enable/disable auto-aim (for Directional aim mode only.)"
@@ -923,11 +1013,13 @@ public class OptionsMenu : IMainMenu {
 						}
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"ANALOG STICK AIM: " + Helpers.boolYesNo(Options.main.aimAnalog),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Analog stick aim:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.aimAnalog),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"If Yes, enables 360 degree aim if binding Axl aim controls\nto a controller analog stick."
@@ -939,11 +1031,13 @@ public class OptionsMenu : IMainMenu {
 						Helpers.menuLeftRightInc(ref Options.main.aimKeyFunction, 0, 2);
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"AIM KEY FUNCTION: " + aimKeyFunctionToStr(Options.main.aimKeyFunction),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Aim key function:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, aimKeyFunctionToStr(Options.main.aimKeyFunction),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"Change the behavior of Axl's \"aim key\" (default SHIFT)."
@@ -955,11 +1049,13 @@ public class OptionsMenu : IMainMenu {
 						Helpers.menuLeftRightBool(ref Options.main.aimKeyToggle);
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"AIM KEY BEHAVIOR: " + (Options.main.aimKeyToggle ? "Toggle" : "Hold"),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Aim key behavior:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, (Options.main.aimKeyToggle ? "Toggle" : "Hold"),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"Change whether Axl's \"aim key\" is toggle or hold based."
@@ -971,11 +1067,13 @@ public class OptionsMenu : IMainMenu {
 						Helpers.menuLeftRightBool(ref Options.main.moveInDiagAim);
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"MOVE IN DIAGONAL AIM: " + Helpers.boolYesNo(Options.main.moveInDiagAim),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Move in diagonal aim:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.moveInDiagAim),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"If Yes, Axl can move when aiming diagonally, otherwise he is\nlocked in place."
@@ -991,11 +1089,13 @@ public class OptionsMenu : IMainMenu {
 						}
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"SEPARATE AIM DOWN & CROUCH: " + Helpers.boolYesNo(Options.main.axlSeparateAimDownAndCrouch),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Separate aim down & crouch:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.axlSeparateAimDownAndCrouch),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"If Yes, aim down and crouch bindings will not conflict,\n" +
@@ -1008,11 +1108,13 @@ public class OptionsMenu : IMainMenu {
 						Helpers.menuLeftRightInc(ref Options.main.gridModeAxl, 0, 2);
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"WEAPON SWITCH GRID MODE: " + gridModeToStr(Options.main.gridModeAxl),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "weapon switch grid mode:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, gridModeToStr(Options.main.gridModeAxl),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"Enables Grid Mode for Axl, which works the same way as X's."
@@ -1024,11 +1126,13 @@ public class OptionsMenu : IMainMenu {
 						Helpers.menuLeftRightBool(ref Options.main.showRollCooldown);
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"SHOW ROLL COOLDOWN: " + Helpers.boolYesNo(Options.main.showRollCooldown),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Show roll cooldown:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.showRollCooldown),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"If enabled, shows a cooldown circle above Axl's head\n" +
@@ -1043,11 +1147,13 @@ public class OptionsMenu : IMainMenu {
 						Helpers.menuLeftRightInc(ref Options.main.sigmaWeaponSlot, 0, 2);
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"SIGMA SLOT: " + (Options.main.sigmaWeaponSlot + 1).ToString(),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Sigma slot:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, (Options.main.sigmaWeaponSlot + 1).ToString(),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"Changes the position of the Sigma slot in Sigma's hotbar."
@@ -1059,11 +1165,13 @@ public class OptionsMenu : IMainMenu {
 						Helpers.menuLeftRightBool(ref Options.main.puppeteerHoldOrToggle);
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"PUPPETEER CONTROL: " + (Options.main.puppeteerHoldOrToggle ? "Hold" : "Toggle"),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Puppeteer control:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, (Options.main.puppeteerHoldOrToggle ? "Hold" : "Toggle"),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"If set to Hold, Puppeteer Sigma will control a Maverick as long as\nWEAPON L/R is held."
@@ -1075,11 +1183,13 @@ public class OptionsMenu : IMainMenu {
 						Helpers.menuLeftRightBool(ref Options.main.maverickStartFollow);
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"MAVERICK START MODE: " + (Options.main.maverickStartFollow ? "Follow" : "Hold Position"),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Maverick start mode:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, (Options.main.maverickStartFollow ? "Follow" : "Hold Position"),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"Change whether Mavericks will follow Sigma, or hold position,\nafter summoned."
@@ -1091,11 +1201,13 @@ public class OptionsMenu : IMainMenu {
 						Helpers.menuLeftRightBool(ref Options.main.puppeteerCancel);
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"PUPPETEER CANCEL: " + (Options.main.puppeteerCancel ? "Yes" : "No"),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Puppeteer cancel:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, (Options.main.puppeteerCancel ? "Yes" : "No"),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"If set to Yes, Mavericks will revert to their idle state\nwhen switched to in Puppeteer mode."
@@ -1107,11 +1219,13 @@ public class OptionsMenu : IMainMenu {
 						Helpers.menuLeftRightBool(ref Options.main.smallBarsEx);
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(
-							TCat.Option,
-							"PUP SMALL ENERGY BARS: " + (Options.main.smallBarsEx ? "Yes" : "No"),
-							pos.x, pos.y, fontSize: fontSize,
-							selected: selectedArrowPosY == index, optionPadding: 26
+						Fonts.drawText(
+							optionFontText, "Pup small energy bars:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, (Options.main.smallBarsEx ? "Yes" : "No"),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"Makes the energy bars smaller for Puppeteer.\nRequires the \"small\" bars option to work.")
@@ -1290,20 +1404,18 @@ public class OptionsMenu : IMainMenu {
 
 	public string helpText = "";
 	public void render() {
-		float cursorPos = 20;
-		if (isGraphics && selectedArrowPosY > presetYPos) {
-			cursorPos = 32;
+		float cursorPos = 24;
+		if (isGraphics && selectedArrowPosY > presetYPos && selectedArrowPosY < presetYPos + 6) {
+			cursorPos = 24;
 		}
 		if (!inGame) {
 			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0);
 			DrawWrappers.DrawTextureHUD(
-				Global.textures["cursor"], cursorPos, startY + (selectedArrowPosY * lineH) - 2
+				Global.textures["cursor"], cursorPos, 30 + (selectedArrowPosY * 10) - 2
 			);
 		} else {
-			DrawWrappers.DrawRect(
-				5, 5, Global.screenW - 5, Global.screenH - 5, true, Helpers.MenuBgColor, 0, ZIndex.HUD + 200, false
-			);
-			Global.sprites["cursor"].drawToHUD(0, cursorPos, startY + (selectedArrowPosY * lineH) + 3);
+			DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
+			Global.sprites["cursor"].drawToHUD(0, cursorPos, 30 + (selectedArrowPosY * 10) + 3);
 		}
 
 		string subtitle = "GENERAL SETTINGS";
@@ -1313,33 +1425,24 @@ public class OptionsMenu : IMainMenu {
 		else if (charNum == 2) subtitle = "VILE SETTINGS";
 		else if (charNum == 3) subtitle = "AXL SETTINGS";
 		else if (charNum == 4) subtitle = "SIGMA SETTINGS";
-		Helpers.drawTextStd(TCat.Title, subtitle, Global.halfScreenW, 15, Alignment.Center, fontSize: 32);
-		Helpers.drawTextStd(
-			TCat.BotHelp, "Left/Right: Change", Global.halfScreenW, 200, Alignment.Center, fontSize: 24
-		);
-		Helpers.drawTextStd(
-			TCat.BotHelp, "[Z]: Save and Back", Global.halfScreenW, 210, Alignment.Center, fontSize: 24
-		);
+		Fonts.drawText(FontType.Yellow, subtitle, Global.halfScreenW, 15, Alignment.Center);
+		Fonts.drawText(FontType.Grey, "Left/Right: Change\n[Z]: Save and Back", Global.halfScreenW, 188, Alignment.Center);
 
 		for (int i = 0; i < menuOptions.Count; i++) {
-			menuOptions[i].render(menuOptions[i].pos, i);
+			menuOptions[i].render(new Point(32, 30 + (i * 10)), i);
 		}
 
 		float rectY = 180;
 		if (!string.IsNullOrEmpty(helpText)) {
 			DrawWrappers.DrawRect(
-				10, rectY - 15, Global.screenW - 10, rectY + 15, true,
-				new Color(0, 0, 0, 224), 0.5f, ZIndex.HUD, false, outlineColor: Color.White
+				20, rectY, Global.screenW - 20, rectY + 24, true,
+				new Color(0, 0, 0, 224), 1, ZIndex.HUD, false, outlineColor: Color.White
 			);
-			float yOff = 0;
-			if (Options.main.fontType == 2) yOff = -5;
-			Helpers.drawTextStd(
-				helpText, Global.halfScreenW, rectY + yOff,
-				alignment: Alignment.Center, vAlignment: VAlignment.Center,
-				fontSize: 16, style: Text.Styles.Italic, lineMargin: 24
+			Fonts.drawText(
+				FontType.Green, helpText, Global.halfScreenW, rectY + 4,
+				alignment: Alignment.Center
 			);
 		}
-
 		if (isChangingName) {
 			float top = Global.screenH * 0.4f;
 

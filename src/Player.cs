@@ -660,7 +660,7 @@ public partial class Player {
 		return charNum + (maverick1v1 ?? -1) + 1;
 	}
 
-	public const int netIdsPerPlayer = 5000;
+	public const int netIdsPerPlayer = 1250;
 
 	// The first net id this player could possibly own. This includes the "reserved" ones
 	public ushort getStartNetId() {
