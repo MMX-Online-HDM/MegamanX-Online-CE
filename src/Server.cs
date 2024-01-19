@@ -83,7 +83,7 @@ public class Server {
 	
 	long iterations = 0;
 	private long lastUpdateTime = 0L;
-	private long fpsLimit = 83333;
+	private long fpsLimit = TimeSpan.TicksPerSecond / 240;
 	private bool loggedOnce = false;
 
 	public bool isCustomMap() {

@@ -54,6 +54,7 @@ public class Projectile : Actor {
 			}
 		}
 		this.ownerPlayer = player;
+		canBeLocal = true;
 	}
 
 	public void setIndestructableProperties() {
@@ -89,7 +90,7 @@ public class Projectile : Actor {
 		}
 		*/
 
-		if (ownedByLocalPlayer) {
+		if (locallyControlled) {
 			if (time > maxTime ||
 				moveDistance > maxDistance ||
 				pos.x > Global.level.width + leeway ||
@@ -97,8 +98,8 @@ public class Projectile : Actor {
 				pos.y > Global.level.height + leeway ||
 				pos.y < -leeway
 			) {
-				if (fadeOnAutoDestroy) destroySelf();
-				else destroySelfNoEffect();
+				if (fadeOnAutoDestroy) destroySelf(disableRpc: true);
+				else destroySelfNoEffect(disableRpc: true);
 				return;
 			}
 		} else {
@@ -565,11 +566,17 @@ public class Projectile : Actor {
 			RPC.changeDamage.sendRpc(netId.Value, damager.damage, damager.flinch);
 		}
 	}
+	public void updateLocalDamager(float? damage = null, int? flinch = null) {
+		if (damager == null) { return; }
+		damager.damage = damage ?? damager.damage;
+		damager.flinch = flinch ?? damager.flinch;
+	}
+
 
 	// Run on non-owners as well
 	public virtual void onHitWall(CollideData other) {
-		if (ownedByLocalPlayer && destroyOnHitWall) {
-			destroySelf();
+		if (locallyControlled && destroyOnHitWall) {
+			destroySelf(disableRpc: true);
 		}
 	}
 

@@ -169,8 +169,6 @@ public class BCrabBubbleSplashProj : Projectile {
 
 	public override void update() {
 		base.update();
-		if (!ownedByLocalPlayer) return;
-
 		if (type == 1 && once) {
 			vel.y -= Global.spf * 500;
 			speed = vel.magnitude;

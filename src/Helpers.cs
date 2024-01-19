@@ -679,9 +679,9 @@ public class Helpers {
 	}
 
 	public static void debugLog(string message) {
-		//if (Global.debug || Global.consoleDebugLogging) {
+		if (Global.debug || Global.consoleDebugLogging) {
 			Console.WriteLine(message);
-		//}
+		}
 	}
 
 	private static ProfanityFilter.ProfanityFilter _profanityFilter;

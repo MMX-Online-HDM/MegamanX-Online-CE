@@ -296,6 +296,7 @@ public class ParasiticBombProjCharged : Projectile, IDamagable {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 
 	public override void update() {

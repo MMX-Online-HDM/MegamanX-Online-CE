@@ -347,7 +347,7 @@ public class RekkohaProj : Projectile {
 		base.update();
 		len += Global.spf * 300;
 		if (time >= 1f && !updatedDamager) {
-			updateDamager(0, 0);
+			updateLocalDamager(0, 0);
 			updatedDamager = true;
 		}
 		if (len >= 200) {

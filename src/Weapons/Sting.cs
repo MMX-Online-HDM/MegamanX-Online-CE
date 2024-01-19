@@ -67,17 +67,16 @@ public class StingProj : Projectile {
 
 	public override void update() {
 		base.update();
-
-		if (!ownedByLocalPlayer) return;
-
 		if (type == 0 && time > 0.05) {
 			vel.x = 0;
 		}
 		if (type == 0) {
 			if (isAnimOver()) {
-				new StingProj(weapon, pos.addxy(15 * xDir, 0), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(), origVel, rpc: true);
-				new StingProj(weapon, pos.addxy(15 * xDir, -8), xDir, damager.owner, 2, Global.level.mainPlayer.getNextActorNetId(), origVel.addxy(0, -150), rpc: true);
-				new StingProj(weapon, pos.addxy(15 * xDir, 8), xDir, damager.owner, 3, Global.level.mainPlayer.getNextActorNetId(), origVel.addxy(0, 150), rpc: true);
+				if (ownedByLocalPlayer) {
+					new StingProj(weapon, pos.addxy(15 * xDir, 0), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(), origVel, rpc: true);
+					new StingProj(weapon, pos.addxy(15 * xDir, -8), xDir, damager.owner, 2, Global.level.mainPlayer.getNextActorNetId(), origVel.addxy(0, -150), rpc: true);
+					new StingProj(weapon, pos.addxy(15 * xDir, 8), xDir, damager.owner, 3, Global.level.mainPlayer.getNextActorNetId(), origVel.addxy(0, 150), rpc: true);
+				}
 				destroySelfNoEffect();
 			}
 		}

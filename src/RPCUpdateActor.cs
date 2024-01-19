@@ -329,6 +329,9 @@ public class RPCUpdateActor : RPC {
 		Actor actor = Global.level.getActorByNetId(netId);
 		try {
 			if (actor != null && !actor.ownedByLocalPlayer) {
+				// In case we are updating a local object.
+				actor.forceNetUpdateNextFrame = true;
+				// Update data.
 				if (spriteIndex != null) actor.netSpriteIndex = (int)spriteIndex;
 				if (xPos != null) actor.netXPos = (float)xPos;
 				if (yPos != null) actor.netYPos = (float)yPos;

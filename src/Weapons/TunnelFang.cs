@@ -54,6 +54,7 @@ public class TunnelFangProj : Projectile {
 	public Anim exhaust;
 	int type;
 	float sparksCooldown;
+
 	public TunnelFangProj(Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, xDir, 100, 1, player, "tunnelfang_proj", 0, 0.25f, netProjId, player.ownedByLocalPlayer) {
 		maxTime = 1.5f;
@@ -78,9 +79,6 @@ public class TunnelFangProj : Projectile {
 		Helpers.decrementTime(ref sparksCooldown);
 		exhaust.pos = pos;
 		exhaust.xDir = xDir;
-
-		if (!ownedByLocalPlayer) return;
-
 		if (state == 0) {
 			if (type == 0) {
 				if (stateTime > 0.15f) {
@@ -105,7 +103,11 @@ public class TunnelFangProj : Projectile {
 
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
-		if (ownedByLocalPlayer) vel.x = 4 * xDir;
+		vel.x = 4 * xDir;
+		// To update the reduced speed.
+		if (ownedByLocalPlayer) {
+			forceNetUpdateNextFrame = true;
+		}
 
 		if (damagable is not CrackedWall) {
 			time -= Global.spf;
@@ -144,6 +146,7 @@ public class TunnelFangProjCharged : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 
 	public override void update() {

@@ -58,7 +58,6 @@ public class ElectricSparkProj : Projectile {
 	}
 
 	public override void onHitWall(CollideData other) {
-		if (!ownedByLocalPlayer) return;
 		if (!other.gameObject.collider.isClimbable) return;
 		if (split) return;
 		if (type == 0) {
@@ -76,6 +75,9 @@ public class ElectricSparkProj : Projectile {
 			normal2.multiply(getSpeed() * 3);
 			destroySelf(fadeSprite);
 			split = true;
+			if (ownedByLocalPlayer) {
+				return;
+			}
 			new ElectricSparkProj(weapon, pos.clone(), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(), normal2, rpc: true);
 			new ElectricSparkProj(weapon, pos.clone(), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(), normal2.times(-1), rpc: true);
 		}

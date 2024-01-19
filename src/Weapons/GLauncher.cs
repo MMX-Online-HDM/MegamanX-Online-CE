@@ -92,13 +92,9 @@ public class GrenadeProj : Projectile, IDamagable {
 	int framesNotMoved;
 	public override void update() {
 		base.update();
-
 		updateProjectileCooldown();
 
-		if (!ownedByLocalPlayer) return;
-
 		updateAngle();
-
 		if (MathF.Abs(vel.y) < 0.5f && grounded) {
 			vel.y = 0;
 			vel.x *= 0.5f;
@@ -124,7 +120,7 @@ public class GrenadeProj : Projectile, IDamagable {
 		}
 
 		if (time > 2 && type == 0) {
-			destroySelf();
+			destroySelf(disableRpc: true);
 		}
 	}
 
@@ -136,14 +132,16 @@ public class GrenadeProj : Projectile, IDamagable {
 	}
 
 	public override void onCollision(CollideData other) {
-		if (!ownedByLocalPlayer) return;
 		if (planted) return;
-
 		base.onCollision(other);
-		var damagable = other.gameObject as IDamagable;
-		if (damagable != null && damagable.canBeDamaged(owner.alliance, owner.id, projId) && !vel.isZero() && type == 0) {
-			destroySelf();
-			return;
+		if (ownedByLocalPlayer) {
+			var damagable = other.gameObject as IDamagable;
+			if (damagable != null && damagable.canBeDamaged(owner.alliance, owner.id, projId) &&
+				!vel.isZero() && type == 0
+			) {
+				destroySelf();
+				return;
+			}
 		}
 		var wall = other.gameObject as Wall;
 		if (wall != null) {
@@ -303,25 +301,25 @@ public class GrenadeProjCharged : Projectile {
 	}
 
 	public override void update() {
-		if (!ownedByLocalPlayer) return;
 		base.update();
 		if (grounded) {
-			destroySelf();
+			destroySelf(disableRpc: true);
 			return;
 		}
 	}
 
 	public override void onCollision(CollideData other) {
-		if (!ownedByLocalPlayer) return;
 		base.onCollision(other);
-		var damagable = other.gameObject as IDamagable;
-		if (damagable != null && damagable.canBeDamaged(owner.alliance, owner.id, projId)) {
-			destroySelf();
-			return;
+		if (ownedByLocalPlayer) {
+			var damagable = other.gameObject as IDamagable;
+			if (damagable != null && damagable.canBeDamaged(owner.alliance, owner.id, projId)) {
+				destroySelf();
+				return;
+			}
 		}
 		var wall = other.gameObject as Wall;
 		if (wall != null) {
-			destroySelf();
+			destroySelf(disableRpc: true);
 			return;
 		}
 	}

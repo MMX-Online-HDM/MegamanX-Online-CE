@@ -56,12 +56,12 @@ public class MagnetMineProj : Projectile, IDamagable {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
+		destroyOnHit = true;
 	}
 
 	public override void update() {
 		base.update();
-		if (!ownedByLocalPlayer) time = 0;
-
 		updateProjectileCooldown();
 
 		if (landed && ownedByLocalPlayer) {
@@ -89,7 +89,7 @@ public class MagnetMineProj : Projectile, IDamagable {
 		if (!ownedByLocalPlayer) return;
 		if (!landed && other.gameObject is Wall) {
 			landed = true;
-			damager.damage *= 2;
+			updateDamager(4);
 
 			if (player.isMainPlayer) {
 				removeRenderEffect(RenderEffectType.BlueShadow);
@@ -106,13 +106,6 @@ public class MagnetMineProj : Projectile, IDamagable {
 			if (triggers.Any(t => t.gameObject is MagnetMineProj)) {
 				incPos(new Point(Helpers.randomRange(-2, 2), Helpers.randomRange(-2, 2)));
 			}
-		}
-	}
-
-	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
-		health -= damage;
-		if (health <= 0) {
-			destroySelf();
 		}
 	}
 

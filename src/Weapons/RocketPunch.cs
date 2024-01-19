@@ -116,13 +116,14 @@ public class RocketPunchProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		if (projId != (int)ProjIds.RocketPunch) {
+			canBeLocal = false;
+		}
 	}
 
 	public override void update() {
 		base.update();
-		if (!ownedByLocalPlayer) return;
-
-		if (shooter == null || shooter.destroyed) {
+		if (ownedByLocalPlayer && (shooter == null || shooter.destroyed)) {
 			destroySelf("explosion", "explosion", true);
 			return;
 		}
@@ -132,6 +133,7 @@ public class RocketPunchProj : Projectile {
 			var smoke = new Anim(pos, "torpedo_smoke", xDir, null, true);
 			smoke.setzIndex(zIndex - 100);
 		}
+		if (!locallyControlled) return;
 
 		if (rocketPunchWeapon.type == (int)RocketPunchType.SpoiledBrat) {
 			if (time > maxTime) {
@@ -139,7 +141,6 @@ public class RocketPunchProj : Projectile {
 			}
 			return;
 		}
-
 		if (rocketPunchWeapon.type == (int)RocketPunchType.InfinityGig && target == null) {
 			if (player.vileRocketPunchWeapon.type == (int)RocketPunchType.InfinityGig) {
 				var targets = Global.level.getTargets(shooter.pos, player.alliance, true);
@@ -150,10 +151,8 @@ public class RocketPunchProj : Projectile {
 					}
 				}
 			}
-
 			maxReverseTime = 0.4f;
 		}
-
 		if (!reversed && target != null) {
 			vel = new Point(0, 0);
 			if (pos.x > target.pos.x) xDir = -1;
@@ -199,8 +198,7 @@ public class RocketPunchProj : Projectile {
 	}
 
 	/*
-	public override void onHitWall(CollideData other)
-	{
+	public override void onHitWall(CollideData other) {
 		if (!ownedByLocalPlayer) return;
 		reversed = true;
 	}
@@ -208,6 +206,9 @@ public class RocketPunchProj : Projectile {
 
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
+		if (locallyControlled) {
+			reversed = true;
+		}
 		if (isRunByLocalPlayer()) {
 			reversed = true;
 			RPC.actorToggle.sendRpc(netId, RPCActorToggleType.ReverseRocketPunch);

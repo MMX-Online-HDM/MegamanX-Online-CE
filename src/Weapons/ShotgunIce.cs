@@ -66,7 +66,6 @@ public class ShotgunIceProj : Projectile {
 		}
 		reflectable = true;
 		//this.fadeSound = "explosion";
-
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
@@ -74,7 +73,6 @@ public class ShotgunIceProj : Projectile {
 
 	public override void update() {
 		base.update();
-
 		sparkleTime += Global.spf;
 		if (sparkleTime > 0.05) {
 			sparkleTime = 0;
@@ -83,9 +81,12 @@ public class ShotgunIceProj : Projectile {
 	}
 
 	public void onHit() {
-		if (!ownedByLocalPlayer) return;
+		if (!ownedByLocalPlayer) {
+			destroySelf(disableRpc: true);
+			return;
+		}
 		if (type == 0) {
-			destroySelf();
+			destroySelf(disableRpc: true);
 			Character chr = null;
 			new ShotgunIceProj(weapon, pos.clone(), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(), new Point(-vel.x, -maxSpeed), chr, rpc: true);
 			new ShotgunIceProj(weapon, pos.clone(), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(), new Point(-vel.x, -maxSpeed * 0.5f), chr, rpc: true);
@@ -96,7 +97,6 @@ public class ShotgunIceProj : Projectile {
 	}
 
 	public override void onHitWall(CollideData other) {
-		if (!ownedByLocalPlayer) return;
 		if (!other.gameObject.collider.isClimbable) return;
 		onHit();
 	}
@@ -144,6 +144,7 @@ public class ShotgunIceProjSled : Projectile {
 		shouldShieldBlock = false;
 		isPlatform = true;
 		//this.collider.wallOnly = true;
+		canBeLocal = true;
 	}
 
 	public void increaseVel() {

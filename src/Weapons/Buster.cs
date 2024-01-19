@@ -171,9 +171,6 @@ public class BusterProj : Projectile {
 
 	public override void update() {
 		base.update();
-		if (!ownedByLocalPlayer) {
-			return;
-		}
 		if (System.MathF.Abs(vel.x) < 360) {
 			vel.x += Global.spf * (float)xDir * 900f;
 			if (System.MathF.Abs(vel.x) >= 360) {
@@ -346,9 +343,6 @@ public class Buster4Proj : Projectile {
 	public override void update() {
 		base.update();
 		base.frameIndex = type;
-		if (!ownedByLocalPlayer) {
-			return;
-		}
 		float currentOffsetTime = offsetTime;
 		if (smoothStart && time < 5f/60f) {
 			currentOffsetTime *= (time / 5f) * 60f;
@@ -481,8 +475,6 @@ public class X3ChargeShot : CharState {
 
 	public override void update() {
 		base.update();
-		if (!character.ownedByLocalPlayer) return;
-
 		if (!character.grounded) {
 			if (player.input.isHeld(Control.Dash, player)) {
 				character.isDashing = true;

@@ -25,7 +25,6 @@ public class GravityWell : Weapon {
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-
 		if (chargeLevel < 3) {
 			var proj = new GravityWellProj(this, pos, xDir, player, netProjId);
 			if (player.character.ownedByLocalPlayer && player.character is MegamanX mmx) {
@@ -83,6 +82,7 @@ public class GravityWellProj : Projectile, IDamagable {
 		if (!ownedByLocalPlayer) {
 			vel = new Point();
 		}
+		canBeLocal = false;
 	}
 
 	public bool active() {
@@ -245,6 +245,7 @@ public class GravityWellProjCharged : Projectile, IDamagable {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 
 	public override void update() {

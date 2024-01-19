@@ -100,6 +100,7 @@ public class RayGunProj : Projectile {
 		maxTime = 0.35f;
 		projId = (int)ProjIds.RayGun;
 		updateAngle();
+		destroyOnHitWall = true;
 	}
 
 	public void updateAngle() {
@@ -108,30 +109,11 @@ public class RayGunProj : Projectile {
 
 	public override void update() {
 		base.update();
-
-		if (!ownedByLocalPlayer) {
-			if (destroyPosSet) return;
-
-			vel.x = Helpers.cosd(angle.Value);
-			vel.y = Helpers.sind(angle.Value);
-			if (angle.Value != lastAngle) {
-				len = 0;
-				lenDelay = 0;
-			}
-			lastAngle = angle.Value;
-		}
-
 		if (lenDelay > 0.01f) {
 			len += Global.spf * 300;
 			if (len > maxLen) len = maxLen;
 		}
 		lenDelay += Global.spf;
-	}
-
-	public override void onHitWall(CollideData other) {
-		base.onHitWall(other);
-		if (!ownedByLocalPlayer) return;
-		destroySelf();
 	}
 
 	public void reflectSide() {
@@ -202,6 +184,7 @@ public class RayGunAltProj : Projectile {
 		if (!ownedByLocalPlayer && axl != null) {
 			axl.nonOwnerAxlBulletPos = pos;
 		}
+		canBeLocal = false;
 	}
 
 	public int getChargeLevel() {
@@ -364,6 +347,7 @@ public class SplashLaserProj : Projectile {
 		if (sendRpc) {
 			rpcCreateAngle(pos, player, netProjId, getRpcAngle());
 		}
+		destroyOnHitWall = true;
 	}
 
 	public void updateAngle() {
@@ -373,12 +357,6 @@ public class SplashLaserProj : Projectile {
 	public override void update() {
 		base.update();
 		updateAngle();
-		if (!ownedByLocalPlayer) return;
-	}
-
-	public override void onHitWall(CollideData other) {
-		base.onHitWall(other);
-		destroySelf();
 	}
 
 	public override void onCollision(CollideData other) {

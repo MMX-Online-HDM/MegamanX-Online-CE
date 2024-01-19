@@ -135,6 +135,7 @@ public class TriadThunderBall : Projectile {
 		weapon, pos, xDir, 0, 2, player, "triadthunder_ball",
 		Global.fourFrameFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
+		canBeLocal = false;
 		projId = (int)ProjIds.TriadThunder;
 		destroyOnHit = false;
 		shouldShieldBlock = false;
@@ -168,6 +169,7 @@ public class TriadThunderBeam : Actor {
 		this.type = type;
 		this.player = player;
 		useGravity = false;
+		canBeLocal = false;
 	}
 
 	public override void update() {

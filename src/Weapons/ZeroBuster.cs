@@ -70,6 +70,7 @@ public class ShingetsurinProj : Projectile {
 					vel = pos.directionToNorm(target.getCenterPos()).times(speed);
 				}
 			}
+			forceNetUpdateNextFrame = true;
 		}
 	}
 }

@@ -186,6 +186,7 @@ public class SpiralMagnumProj : Projectile {
 				damager.damage = 0;
 			}
 		}
+		canBeLocal = false;
 	}
 
 	public bool playZing() {
@@ -391,6 +392,7 @@ public class SniperMissileProj : Projectile, IDamagable {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 
 	public void updateAngle() {

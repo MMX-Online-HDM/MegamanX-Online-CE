@@ -91,6 +91,7 @@ public class BoundBlasterProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = true;
 	}
 
 	public void updateAngle() {
@@ -111,7 +112,7 @@ public class BoundBlasterProj : Projectile {
 	}
 
 	public override void update() {
-		if (!ownedByLocalPlayer) {
+		if (!locallyControlled) {
 			if (destroyPosSet) {
 				base.update();
 				return;
@@ -140,7 +141,7 @@ public class BoundBlasterProj : Projectile {
 			}
 		}
 
-		if (ownedByLocalPlayer) {
+		if (locallyControlled) {
 			bool reflected = false;
 			var wall = Global.level.checkCollisionPoint(pos.addxy(vel.x * Global.spf, 0), new List<GameObject>() { this });
 			if (wall?.gameObject is Wall) {
@@ -169,7 +170,7 @@ public class BoundBlasterProj : Projectile {
 
 	public void increasePower() {
 		speed += 50;
-		updateDamager(damager.damage + 0.5f);
+		updateLocalDamager(damager.damage + 0.5f);
 	}
 
 	public override void render(float x, float y) {
@@ -257,10 +258,10 @@ public class BoundBlasterAltProj : Projectile {
 		if (ownedByLocalPlayer) {
 			Global.level.boundBlasterAltProjs.Add(this);
 		}
-
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 
 	public override void update() {

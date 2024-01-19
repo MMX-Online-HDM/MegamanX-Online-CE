@@ -74,6 +74,7 @@ public class TorpedoProj : Projectile, IDamagable {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 
 	bool homing = true;
