@@ -102,14 +102,12 @@ public class NapalmGrenadeProj : Projectile {
 
 	public override void update() {
 		base.update();
-		if (!ownedByLocalPlayer) return;
 		if (grounded) {
 			explode();
 		}
 	}
 
 	public override void onHitWall(CollideData other) {
-		if (!ownedByLocalPlayer) return;
 		xDir *= -1;
 		explode();
 	}
@@ -122,9 +120,11 @@ public class NapalmGrenadeProj : Projectile {
 	public void explode() {
 		if (exploded) return;
 		exploded = true;
-		for (int i = -3; i <= 3; i++) {
-			new NapalmPartProj(weapon, pos.addxy(0, 0), 1, owner, owner.getNextActorNetId(), false, i * 10, rpc: true);
-			new NapalmPartProj(weapon, pos.addxy(0, 0), 1, owner, owner.getNextActorNetId(), true, i * 10, rpc: true);
+		if (ownedByLocalPlayer) {
+			for (int i = -3; i <= 3; i++) {
+				new NapalmPartProj(weapon, pos.addxy(0, 0), 1, owner, owner.getNextActorNetId(), false, i * 10, rpc: true);
+				new NapalmPartProj(weapon, pos.addxy(0, 0), 1, owner, owner.getNextActorNetId(), true, i * 10, rpc: true);
+			}
 		}
 		destroySelf();
 	}
@@ -160,7 +160,7 @@ public class NapalmPartProj : Projectile {
 		base.update();
 
 		if (isUnderwater()) {
-			destroySelf();
+			destroySelf(disableRpc: true);
 			return;
 		}
 
@@ -175,28 +175,18 @@ public class NapalmPartProj : Projectile {
 			yScale = 1 + (napalmTime * 2);
 		}
 
-		if (ownedByLocalPlayer) {
-			if (xDist < MathF.Abs(maxXDist)) {
-				xDist += MathF.Abs(maxXDist * 0.25f);
-				move(new Point(maxXDist * 0.25f, 0), useDeltaTime: false);
-			}
+		if (xDist < MathF.Abs(maxXDist)) {
+			xDist += MathF.Abs(maxXDist * 0.25f);
+			move(new Point(maxXDist * 0.25f, 0), useDeltaTime: false);
 		}
 
 		if (napalmTime > napalmPeriod) {
 			napalmTime = 0;
 			times++;
-			if (ownedByLocalPlayer && times >= 8) {
-				destroySelf();
+			if (times >= 8) {
+				destroySelf(disableRpc: false);
 			}
 		}
-	}
-
-	public override void onHitWall(CollideData other) {
-		if (!ownedByLocalPlayer) return;
-	}
-
-	public override void onHitDamagable(IDamagable damagable) {
-		base.onHitDamagable(damagable);
 	}
 }
 
@@ -341,7 +331,6 @@ public class MK2NapalmGrenadeProj : Projectile {
 
 	public override void update() {
 		base.update();
-		if (!ownedByLocalPlayer) return;
 		if (grounded) {
 			destroySelf();
 		}
@@ -349,7 +338,6 @@ public class MK2NapalmGrenadeProj : Projectile {
 
 	public override void onHitWall(CollideData other) {
 		base.onHitWall(other);
-		if (!ownedByLocalPlayer) return;
 		Point destroyPos = other?.hitData?.hitPoint ?? pos;
 		changePos(destroyPos);
 		destroySelf();
@@ -379,21 +367,21 @@ public class MK2NapalmProj : Projectile {
 
 	public override void update() {
 		base.update();
-		if (!ownedByLocalPlayer) return;
-
-		flameCreateTime += Global.spf;
-		if (flameCreateTime > 0.1f) {
-			flameCreateTime = 0;
-			new MK2NapalmFlame(weapon, pos, xDir, owner, owner.getNextActorNetId(), rpc: true);
+		if (ownedByLocalPlayer) {
+			flameCreateTime += Global.spf;
+			if (flameCreateTime > 0.1f) {
+				flameCreateTime = 0;
+				new MK2NapalmFlame(weapon, pos, xDir, owner, owner.getNextActorNetId(), rpc: true);
+			}
 		}
 
 		var hit = Global.level.checkCollisionActor(this, vel.x * Global.spf, 0, null);
 		if (hit?.gameObject is Wall && hit?.hitData?.normal != null && !(hit.hitData.normal.Value.isAngled())) {
-			new MK2NapalmWallProj(weapon, pos, xDir, owner, owner.getNextActorNetId(), rpc: true);
+			if (ownedByLocalPlayer) {
+				new MK2NapalmWallProj(weapon, pos, xDir, owner, owner.getNextActorNetId(), rpc: true);
+			}
 			destroySelf();
-			return;
 		}
-		if (isUnderwater()) destroySelf();
 	}
 }
 
@@ -414,23 +402,15 @@ public class MK2NapalmFlame : Projectile {
 
 	public override void update() {
 		base.update();
-		if (!ownedByLocalPlayer) return;
-
 		if (isUnderwater()) {
-			destroySelf();
+			destroySelf(disableRpc: true);
 			return;
 		}
-
 		if (loopCount > 8) {
-			destroySelf();
+			destroySelf(disableRpc: true);
 			return;
 		}
 	}
-
-	public override void onHitWall(CollideData other) {
-		if (!ownedByLocalPlayer) return;
-	}
-
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
 	}
@@ -452,8 +432,9 @@ public class MK2NapalmWallProj : Projectile {
 
 	public override void update() {
 		base.update();
-		if (!ownedByLocalPlayer) return;
-		if (isUnderwater()) destroySelf();
+		if (isUnderwater()) {
+			destroySelf(disableRpc: true);
+		}
 	}
 }
 
@@ -476,27 +457,30 @@ public class SplashHitGrenadeProj : Projectile {
 
 	public override void update() {
 		base.update();
-		if (!ownedByLocalPlayer) return;
 		if (grounded) {
 			explode();
 		}
 	}
 
 	public override void onHitWall(CollideData other) {
-		if (!ownedByLocalPlayer) return;
 		explode();
 	}
 
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
-		if (ownedByLocalPlayer) explode();
+		explode();
 	}
 
 	public void explode() {
 		if (exploded) return;
 		exploded = true;
-		var hit = Global.level.raycast(pos.addxy(0, -10), pos.addxy(0, 100), new List<Type>() { typeof(Wall) });
-		new SplashHitProj(weapon, hit?.getHitPointSafe() ?? pos, xDir, owner, owner.getNextActorNetId(), sendRpc: true);
+		if (ownedByLocalPlayer) {
+			var hit = Global.level.raycast(pos.addxy(0, -10), pos.addxy(0, 100), new List<Type>() { typeof(Wall) });
+			new SplashHitProj(
+				weapon, hit?.getHitPointSafe() ?? pos, xDir,
+				owner, owner.getNextActorNetId(), sendRpc: true
+			);
+		}
 		destroySelf();
 	}
 }
@@ -519,7 +503,6 @@ public class SplashHitProj : Projectile {
 
 	public override void update() {
 		base.update();
-		if (!ownedByLocalPlayer) return;
 	}
 
 	public override bool shouldDealDamage(IDamagable damagable) {

@@ -51,13 +51,12 @@ public class SpeedBurnerProj : Projectile {
 
 	public override void update() {
 		base.update();
-		if (!ownedByLocalPlayer) return;
-
 		if (sprite.name == "speedburner_start") {
-			if (isAnimOver()) changeSprite("speedburner_proj", true);
-			else return;
+			if (isAnimOver()) {
+				changeSprite("speedburner_proj", true);
+			}
 		}
-
+		if (!ownedByLocalPlayer) return;
 		Helpers.decrementTime(ref groundSpawnTime);
 		Helpers.decrementTime(ref airSpawnTime);
 

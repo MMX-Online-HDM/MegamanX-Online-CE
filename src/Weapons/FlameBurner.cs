@@ -88,7 +88,6 @@ public class FlameBurnerProj : Projectile {
 			xScale = 1f + progress * 1.5f;
 			yScale = 1f + progress * 1.5f;
 		}
-		if (!ownedByLocalPlayer) return;
 	}
 
 	public override void onHitDamagable(IDamagable damagable) {
@@ -157,9 +156,8 @@ public class FlameBurnerAltProj : Projectile {
 		yScale = 1 + (3 * timeFactor);
 		alpha = 1 - timeFactor;
 
-		if (!ownedByLocalPlayer) return;
 		if (isAnimOver()) {
-			destroySelf();
+			destroySelf(disableRpc: true);
 		}
 	}
 
@@ -218,7 +216,6 @@ public class CircleBlazeProj : Projectile {
 
 	public override void update() {
 		base.update();
-		if (!ownedByLocalPlayer) return;
 	}
 
 	public override void onHitDamagable(IDamagable damagable) {

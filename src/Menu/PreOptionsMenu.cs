@@ -22,7 +22,7 @@ public class PreOptionsMenu : IMainMenu {
 	public Action yesAction;
 	public bool inGame;
 	public bool isAxl;
-	public float startX = 100;
+	public float startX = 140;
 
 	public PreOptionsMenu(IMainMenu prevMenu, bool inGame) {
 		this.prevMenu = prevMenu;
@@ -56,23 +56,31 @@ public class PreOptionsMenu : IMainMenu {
 	public void render() {
 		if (!inGame) {
 			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0);
-			//DrawWrappers.DrawTextureMenu(Global.textures["cursor"], 20, topLeft.y + ySpace + (selectArrowPosY * ySpace));
+			//DrawWrappers.DrawTextureMenu(
+				//Global.textures["cursor"], 20, topLeft.y + ySpace + (selectArrowPosY * ySpace)
+			//);
 			Global.sprites["cursor"].drawToHUD(0, startX - 10, 73 + (selectY * lineH));
 		} else {
-			DrawWrappers.DrawRect(5, 5, Global.screenW - 5, Global.screenH - 5, true, Helpers.MenuBgColor, 0, ZIndex.HUD + 200, false);
+			DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
 			Global.sprites["cursor"].drawToHUD(0, startX - 10, 73 + (selectY * lineH));
 		}
+		FontType tileFont = FontType.Golden;
+		FontType menuFont = FontType.DarkBlue;
+		if (inGame) {
+			tileFont = FontType.Yellow;
+			menuFont = FontType.Blue;
+		}
 
-		Helpers.drawTextStd(TCat.Title, "SELECT SETTINGS TO CONFIGURE", Global.screenW * 0.5f, 20, Alignment.Center, fontSize: 32);
+		Fonts.drawText(tileFont, "SELECT SETTINGS TO CONFIGURE", Global.screenW * 0.5f, 20, Alignment.Center);
 
-		Helpers.drawTextStd(TCat.Option, "GENERAL SETTINGS", startX, optionPos1.y, fontSize: 24, selected: selectY == 0);
-		Helpers.drawTextStd(TCat.Option, "GRAPHICS SETTINGS", startX, optionPos2.y, fontSize: 24, selected: selectY == 1);
-		Helpers.drawTextStd(TCat.Option, "X SETTINGS", startX, optionPos3.y, fontSize: 24, selected: selectY == 2);
-		Helpers.drawTextStd(TCat.Option, "ZERO SETTINGS", startX, optionPos4.y, fontSize: 24, selected: selectY == 3);
-		Helpers.drawTextStd(TCat.Option, "VILE SETTINGS", startX, optionPos5.y, fontSize: 24, selected: selectY == 4);
-		Helpers.drawTextStd(TCat.Option, "AXL SETTINGS", startX, optionPos6.y, fontSize: 24, selected: selectY == 5);
-		Helpers.drawTextStd(TCat.Option, "SIGMA SETTINGS", startX, optionPos7.y, fontSize: 24, selected: selectY == 6);
+		Fonts.drawText(menuFont, "General settings", startX, optionPos1.y, selected: selectY == 0);
+		Fonts.drawText(menuFont, "Graphics settings", startX, optionPos2.y, selected: selectY == 1);
+		Fonts.drawText(menuFont, "X settings", startX, optionPos3.y, selected: selectY == 2);
+		Fonts.drawText(menuFont, "Zero settings", startX, optionPos4.y, selected: selectY == 3);
+		Fonts.drawText(menuFont, "Vile settings", startX, optionPos5.y, selected: selectY == 4);
+		Fonts.drawText(menuFont, "Axl settings", startX, optionPos6.y, selected: selectY == 5);
+		Fonts.drawText(menuFont, "Sigma settings", startX, optionPos7.y, selected: selectY == 6);
 
-		Helpers.drawTextStd(TCat.BotHelp, "[X]: Choose, [Z]: Back", Global.halfScreenW, 200, Alignment.Center, fontSize: 24);
+		Fonts.drawText(FontType.Grey, "[X]: Choose, [Z]: Back", Global.halfScreenW, 198, Alignment.Center);
 	}
 }

@@ -82,6 +82,12 @@ public partial class Actor : GameObject {
 	public NetcodeModel? netcodeOverride;
 
 	public bool ownedByLocalPlayer;
+	public bool locallyControlled {
+		get { return (canBeLocal || ownedByLocalPlayer); }
+	}
+	public bool canBeLocal;
+	public bool forceNetUpdateNextFrame;
+
 	public ushort? netId;
 
 	public float? netXPos;
@@ -478,12 +484,12 @@ public partial class Actor : GameObject {
 			renderEffects.Remove(renderEffect);
 		}
 
-		if (!ownedByLocalPlayer) {
+		if (!locallyControlled) {
 			frameSpeed = 0;
 			sprite.time += Global.spf;
 		}
 
-		if (ownedByLocalPlayer && sprite != null) {
+		if (locallyControlled && sprite != null) {
 			int oldFrameIndex = sprite.frameIndex;
 			sprite?.update();
 
@@ -505,7 +511,7 @@ public partial class Actor : GameObject {
 		var ra = this as RideArmor;
 
 		float grav = getGravity();
-		if (ownedByLocalPlayer) {
+		if (locallyControlled) {
 			if (useGravity && !grounded) {
 				if (underwater) grav *= 0.5f;
 				if (this is MegamanX mmx) {
@@ -945,7 +951,10 @@ public partial class Actor : GameObject {
 			}
 			return;
 		}
-
+		if (canBeLocal && !forceNetUpdateNextFrame) {
+			return;
+		}
+		forceNetUpdateNextFrame = false;
 		if (ownedByLocalPlayer) {
 			if (!Global.level.isSendMessageFrame()) return;
 			sendActorNetData();

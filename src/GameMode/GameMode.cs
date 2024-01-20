@@ -549,10 +549,10 @@ public class GameMode {
 			renderHealthAndWeapons();
 
 			// Scrap
-			if (!Global.level.is1v1()) {
+			/*if (!Global.level.is1v1()) {
 				Global.sprites["hud_scrap"].drawToHUD(0, 4, 138);
 				Helpers.drawTextStd(TCat.HUD, "x" + Global.level.mainPlayer.scrap.ToString(), 17, 139, Alignment.Left, fontSize: 32u);
-			}
+			}*/
 			MegamanX mmx = mainPlayer.character as MegamanX;
 			
 			if (mmx != null && mmx.unpoShotCount > 0) {
@@ -909,6 +909,29 @@ public class GameMode {
 		}
 	}
 
+	public static List<Player> getOrderedPlayerList() {
+		List<Player> playerList = Global.level.players.Where(p => !p.isSpectator).ToList();
+		playerList.Sort((a, b) => {
+			if (a.kills > b.kills) {
+				return -1;
+			}
+			if (a.kills < b.kills) {
+				return 1;
+			}
+			if (a.kills == b.kills) {
+				if (a.deaths < b.deaths) {
+					return -1;
+				}
+				if (a.deaths < b.deaths) {
+					return 0;
+				}
+				return 1;
+			}
+			return 0;
+		});
+		return playerList;
+	}
+
 	public void assignPlayerHUDPositions() {
 		var nonSpecPlayers = level.players.FindAll(p => p.is1v1Combatant && p != mainPlayer);
 		if (mainPlayer != null) {
@@ -997,7 +1020,7 @@ public class GameMode {
 		if (position == HUDHealthPosition.Left || position == HUDHealthPosition.TopLeft || position == HUDHealthPosition.BotLeft) {
 			x = isHealth ? 10 : 25;
 		} else {
-			x = isHealth ? 288 : 273;
+			x = isHealth ? Global.screenW - 10 : Global.screenW - 25;
 		}
 		float y = Global.screenH / 2;
 		if (position == HUDHealthPosition.TopLeft || position == HUDHealthPosition.TopRight) {
@@ -2058,81 +2081,82 @@ public class GameMode {
 	}
 
 	public virtual void drawScoreboard() {
-		var padding = 5;
-		var top = padding + 2;
-		var fontSize = 32;
-		var col1x = padding + 10;
-		var col2x = Global.screenW * 0.33f;
-		var col3x = Global.screenW * 0.475f;
-		var col4x = Global.screenW * 0.65f;
-		var col5x = Global.screenW * 0.85f;
-		var lineY = padding + 35;
-		var labelY = lineY - 1;
-		var labelTextY = labelY + 2;
-		var line2Y = labelY + 12;
-		var topPlayerY = line2Y + 2;
-		DrawWrappers.DrawRect(padding, padding, Global.screenW - padding, Global.screenH - padding, true, Helpers.MenuBgColor, 0, ZIndex.HUD, false);
+		int padding = 16;
+		int top = 16;
+		int col1x = padding;
+		int col2x = (int)Math.Floor(Global.screenW * 0.33);
+		int col3x = (int)Math.Floor(Global.screenW * 0.475);
+		int col4x = (int)Math.Floor(Global.screenW * 0.65);
+		int col5x = (int)Math.Floor(Global.screenW * 0.85);
+		int lineY = padding + 20;
+		var labelTextY = lineY + 2;
+		int line2Y = lineY + 12;	
+		int topPlayerY = line2Y + 2;
+		DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
 
 		if (this is FFADeathMatch) {
-			Helpers.drawTextStd(TCat.HUD, string.Format("Mode: Deathmatch(to {0})", playingTo.ToString()), padding + 10, top, Alignment.Left, fontSize: (uint)fontSize);
+			Fonts.drawText(
+				FontType.BlueMenu, string.Format("Mode: Deathmatch(to {0})", playingTo.ToString()),
+				padding, top, Alignment.Left
+			);
 		} else if (this is Elimination) {
-			Helpers.drawTextStd(TCat.HUD, "Mode: Elimination", padding + 10, top, Alignment.Left, fontSize: (uint)fontSize);
+			Fonts.drawText(FontType.BlueMenu, "Mode: Elimination", padding, top, Alignment.Left);
 		} else if (this is Race) {
-			Helpers.drawTextStd(TCat.HUD, "Mode: Race", padding + 10, top, Alignment.Left, fontSize: (uint)fontSize);
+			Fonts.drawText(FontType.BlueMenu, "Mode: Race", padding, top, Alignment.Left);
 		}
-
-		drawMapName(padding + 10, top + 10, (uint)fontSize);
-
+		drawMapName(padding, top + 10);
 		if (Global.serverClient != null) {
-			Helpers.drawTextStd(TCat.HUD, "Match: " + Global.level.server.name, padding + 10, top + 20, Alignment.Left, fontSize: (uint)fontSize);
+			Fonts.drawText(
+				FontType.BlueMenu, "Match: " + Global.level.server.name, padding + 10, top + 20, Alignment.Left
+			);
 			drawNetcodeData();
 		}
 
-		DrawWrappers.DrawLine(padding + 10, lineY, Global.screenW - padding - 10, lineY, Color.White, 1, ZIndex.HUD, false);
-		Helpers.drawTextStd(TCat.HUD, "Player", col1x, labelTextY, Alignment.Left, fontSize: (uint)fontSize);
-		Helpers.drawTextStd(TCat.HUD, "Char", col2x, labelTextY, Alignment.Left, fontSize: (uint)fontSize);
-		Helpers.drawTextStd(TCat.HUD, "Kills", col3x, labelTextY, Alignment.Left, fontSize: (uint)fontSize);
-		Helpers.drawTextStd(TCat.HUD, this is Elimination ? "Lives" : "Deaths", col4x, labelTextY, Alignment.Left, fontSize: (uint)fontSize);
+		DrawWrappers.DrawLine(
+			padding - 2, lineY, Global.screenW - padding + 2, lineY, new Color(232, 232, 232, 224), 1, ZIndex.HUD, false
+		);
+		Fonts.drawText(FontType.OrangeMenu, "Player", col1x, labelTextY, Alignment.Left);
+		Fonts.drawText(FontType.OrangeMenu, "Char", col2x, labelTextY, Alignment.Left);
+		Fonts.drawText(FontType.OrangeMenu, "Kills", col3x, labelTextY, Alignment.Left);
+		Fonts.drawText(FontType.OrangeMenu, this is Elimination ? "Lives" : "Deaths", col4x, labelTextY, Alignment.Left);
 
-		if (Global.serverClient != null) Helpers.drawTextStd(TCat.HUD, "Ping", col5x, labelTextY, Alignment.Left, fontSize: (uint)fontSize);
+		if (Global.serverClient != null) Helpers.drawTextStd(TCat.HUD, "Ping", col5x, labelTextY, Alignment.Left);
 
-		DrawWrappers.DrawLine(padding + 10, line2Y, Global.screenW - padding - 10, line2Y, Color.White, 1, ZIndex.HUD, false);
+		DrawWrappers.DrawLine(
+			padding - 2, line2Y, Global.screenW - padding + 2, line2Y, Color.White, 1, ZIndex.HUD, false
+		);
 		var rowH = 10;
-		var players = level.players.Where(p => !p.isSpectator).ToList();
+		var players = getOrderedPlayerList();
 		if (this is Race race) {
 			players = race.getSortedPlayers();
 		}
+		for (var i = 0; i < players.Count && i <= 14; i++) {
+			var player = players[i];
+			var color = getCharFont(player);
 
-		for (var i = 0; i < 12; i++) {
-			if (i < players.Count) {
-				var player = players[i];
-				var color = getCharColor(player);
-				var alpha = getCharAlpha(player);
-
-				if (Global.serverClient != null && player.serverPlayer.isHost) {
-					Helpers.drawTextStd(TCat.HUD, "H", col1x - 8, 3 + topPlayerY + i * rowH, Alignment.Left, style: Text.Styles.Italic, fontSize: 20, color: Color.Yellow);
-				} else if (Global.serverClient != null && player.serverPlayer.isBot) {
-					Helpers.drawTextStd(TCat.HUD, "B", col1x - 8, 3 + topPlayerY + i * rowH, Alignment.Left, style: Text.Styles.Italic, fontSize: 20, color: Helpers.Gray);
-				}
-
-				Helpers.drawTextStd(TCat.HUD, player.name, col1x, topPlayerY + (i) * rowH, Alignment.Left, fontSize: (uint)fontSize, color: color, alpha: alpha);
-				Helpers.drawTextStd(TCat.HUD, player.kills.ToString(), col3x, topPlayerY + (i) * rowH, Alignment.Left, fontSize: (uint)fontSize, color: color, alpha: alpha);
-				Helpers.drawTextStd(TCat.HUD, player.getDeathScore(), col4x, topPlayerY + (i) * rowH, Alignment.Left, fontSize: (uint)fontSize, color: color, alpha: alpha);
-
-				if (Global.serverClient != null) {
-					Helpers.drawTextStd(TCat.HUD, player.getDisplayPing(), col5x, topPlayerY + (i) * rowH, Alignment.Left, fontSize: (uint)fontSize, color: getPingColor(player), alpha: alpha);
-				}
-
-				Global.sprites[getCharIcon(player)].drawToHUD(player.realCharNum, col2x + 4, topPlayerY + i * rowH, alpha: alpha);
-
-				if (player.eliminated()) {
-					//int elimLineY = 5 + topPlayerY + i * rowH;
-					//DrawWrappers.DrawLine(col1x, elimLineY, Global.screenW - padding - 10, elimLineY, Color.Red, 1, ZIndex.HUD, false);
-				}
+			if (Global.serverClient != null && player.serverPlayer.isHost) {
+				Helpers.drawTextStd(
+					TCat.HUD, "H", col1x - 8, 3 + topPlayerY + i * rowH,
+					Alignment.Left, style: Text.Styles.Italic, fontSize: 20, color: Color.Yellow
+				);
+			} else if (Global.serverClient != null && player.serverPlayer.isBot) {
+				Helpers.drawTextStd(
+					TCat.HUD, "B", col1x - 8, 3 + topPlayerY + i * rowH,
+					Alignment.Left, style: Text.Styles.Italic, fontSize: 20, color: Helpers.Gray
+				);
 			}
-		}
 
-		drawSpectators();
+			Fonts.drawText(color, player.name, col1x, topPlayerY + (i) * rowH, Alignment.Left);
+			Fonts.drawText(FontType.Blue, player.kills.ToString(), col3x, topPlayerY + (i) * rowH, Alignment.Left);
+			Fonts.drawText(FontType.Blue, player.getDeathScore(), col4x, topPlayerY + (i) * rowH, Alignment.Left);
+
+			if (Global.serverClient != null) {
+				Fonts.drawText(FontType.Blue, player.getDisplayPing(), col5x, topPlayerY + (i) * rowH, Alignment.Left);
+			}
+
+			Global.sprites[getCharIcon(player)].drawToHUD(player.realCharNum, col2x + 4, topPlayerY + i * rowH);
+		}
+		//drawSpectators();
 	}
 
 	public void drawTeamScoreboard() {
@@ -2165,7 +2189,7 @@ public class GameMode {
 			Helpers.drawTextStd(TCat.HUD, string.Format("Mode: {0}", Global.level.server.gameMode), padding + 5, top, Alignment.Left, fontSize: fontSize);
 		}
 
-		drawMapName(padding + 5, top + 10, fontSize);
+		drawMapName(padding + 5, top + 10);
 
 		if (Global.serverClient != null) {
 			Helpers.drawTextStd(TCat.HUD, "Match: " + Global.level.server.name, padding + 5, top + 20, Alignment.Left, fontSize: fontSize);
@@ -2253,12 +2277,12 @@ public class GameMode {
 		drawSpectators();
 	}
 
-	private void drawMapName(int x, int y, uint fontSize) {
+	private void drawMapName(int x, int y) {
 		string displayName = "Map: " + level.levelData.displayName.Replace("_mirrored", "");
-		Helpers.drawTextStd(TCat.HUD, displayName, x, y, Alignment.Left, fontSize: fontSize);
+		Fonts.drawText(FontType.BlueMenu, displayName, x, y, Alignment.Left);
 		if (level.levelData.isMirrored) {
-			var size = Helpers.measureTextStd(TCat.HUD, displayName, fontSize: fontSize);
-			Global.sprites["hud_mirror_icon"].drawToHUD(0, x + size.x + 9, y + 5);
+			int size = Fonts.measureText(Fonts.getFontSrt(FontType.BlueMenu), displayName);
+			Global.sprites["hud_mirror_icon"].drawToHUD(0, x + size + 9, y + 5);
 		}
 	}
 
@@ -2276,6 +2300,25 @@ public class GameMode {
 		return 1;
 	}
 
+	public FontType getCharFont(Player player) {
+		if (player.isDead && !isOver) {
+			return FontType.Grey;
+		} else if (player.eliminated()) {
+			return FontType.DarkOrange;
+		} else if (player.isX) {
+			return FontType.Blue;
+		} else if (player.isZero) {
+			return FontType.Red;
+		} else if (player.isAxl) {
+			return FontType.Yellow;
+		} else if (player.isVile) {
+			return FontType.Pink;
+		} else if (player.isSigma) {
+			return FontType.Green;
+		}
+		return FontType.Grey;
+	}
+
 	public string getCharIcon(Player player) {
 		return "char_icon";
 		//if (isOver) return "char_icon";
@@ -2283,8 +2326,8 @@ public class GameMode {
 	}
 
 	public static string getTeamName(int alliance) {
-		if (alliance == redAlliance) return "red";
-		else return "blue";
+		if (alliance == redAlliance) return "Red";
+		else return "Blue";
 	}
 
 	public Color getTimeColor() {

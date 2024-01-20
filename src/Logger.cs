@@ -1,12 +1,6 @@
-﻿using GoogleAnalyticsTracker.Core.Interface;
-using GoogleAnalyticsTracker.Simple;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MMXOnline;
 
@@ -45,7 +39,8 @@ public class Logger {
 			return;
 		}
 
-		// Does not log anything anywhere right now. Can add logging code here with analytics system of your choice or a custom solution.
+		// Does not log anything anywhere right now.
+		/// TODO: Can add logging code here with analytics system of your choice or a custom solution.
 	}
 
 	public static string getMatchLabel(string selectedLevel, string gameMode) {
@@ -74,7 +69,10 @@ public class Logger {
 	}
 
 	public static void LogFatalException(Exception e) {
-		string crashDump = e.Message + "\n\n" + e.StackTrace + "\n\nInner exception: " + e.InnerException?.Message + "\n\n" + e.InnerException?.StackTrace;
+		string crashDump = e.Message + "\n\n" +
+			e.StackTrace + "\n\nInner exception: " +
+			e.InnerException?.Message + "\n\n" +
+			e.InnerException?.StackTrace;
 
 		Helpers.showMessageBox(crashDump.Truncate(1000), "Fatal Error!");
 

@@ -81,6 +81,7 @@ public class PlasmaGunProj : Projectile {
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 
 	public override void update() {
@@ -118,6 +119,7 @@ public class PlasmaGunAltProj : Projectile {
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 
 	public override void postUpdate() {
@@ -282,7 +284,6 @@ public class VoltTornadoProj : Projectile {
 
 	public override void update() {
 		base.update();
-		if (!ownedByLocalPlayer) return;
 		if (time > 1f) {
 			vel.x = xDir * 300;
 		}

@@ -309,17 +309,17 @@ class Program {
 		if (Options.main.showFPS && Global.level != null && Global.level.started) {
 			int vfps = MathInt.Round(Global.currentFPS);
 			int fps = MathInt.Round(Global.logicFPS);
-			float yPos = 215;
+			float yPos = 200;
 			if (Global.level.gameMode.shouldDrawRadar()) {
 				yPos = 219;
 			}
-			Helpers.drawTextStd(
-				TCat.HUD, "VFPS:" + vfps.ToString(), Global.screenW - 5, yPos - 6,
-				Alignment.Right, fontSize: 18
+			Fonts.drawText(
+				FontType.BlueMenu, "VFPS:" + vfps.ToString(), Global.screenW - 5, yPos - 10,
+				Alignment.Right
 			);
-			Helpers.drawTextStd(
-				TCat.HUD, "FPS:" + fps.ToString(), Global.screenW - 5, yPos,
-				Alignment.Right, fontSize: 18
+			Fonts.drawText(
+				FontType.BlueMenu, "FPS:" + fps.ToString(), Global.screenW - 5, yPos,
+				Alignment.Right
 			);
 		}
 
@@ -957,6 +957,9 @@ class Program {
 					framesUpdatesThisSecond++;
 					deltaTime = 0;
 				} else {
+					if (deltaTime > 60) {
+						deltaTime = 1;
+					}
 					while (deltaTime >= 1) {
 						if (deltaTime >= 2) {
 							Global.isSkippingFrames = true;

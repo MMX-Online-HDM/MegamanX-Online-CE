@@ -62,7 +62,6 @@ public class CrystalHunterProj : Projectile {
 
 	public override void update() {
 		base.update();
-		if (!ownedByLocalPlayer) return;
 	}
 }
 
@@ -96,6 +95,7 @@ public class CrystalHunterCharged : Actor {
 				createActorRpc(owner.id);
 			}
 		}
+		canBeLocal = true;
 	}
 
 	public override void update() {
@@ -124,12 +124,9 @@ public class CrystalHunterCharged : Actor {
 			drawRadius = 120 + 0.5f * MathF.Sin(Global.time * 10);
 			drawAlpha = 64f + 32f * MathF.Sin(Global.time * 10);
 		}
-
-		if (!ownedByLocalPlayer) return;
-
 		time += Global.spf;
 		if (time > maxTime) {
-			destroySelf();
+			destroySelf(disableRpc: true);
 		}
 	}
 

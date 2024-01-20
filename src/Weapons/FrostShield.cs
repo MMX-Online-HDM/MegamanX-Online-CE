@@ -61,7 +61,6 @@ public class FrostShieldProj : Projectile {
 
 		exhaust.pos = pos;
 		exhaust.xDir = xDir;
-		if (!ownedByLocalPlayer) return;
 
 		if (state == 0) {
 			stateTime += Global.spf;
@@ -111,13 +110,11 @@ public class FrostShieldProjAir : Projectile {
 
 	public override void update() {
 		base.update();
-		if (!ownedByLocalPlayer) return;
-
 		var wall = Global.level.checkCollisionActor(this, vel.x * Global.spf, vel.y * Global.spf, vel);
 		if (wall != null && wall.gameObject is Wall) {
 			vel.x *= -1;
 		}
-
+		if (!ownedByLocalPlayer) return;
 		if (grounded) {
 			destroySelf();
 			new FrostShieldProjGround(weapon, pos, xDir, owner, owner.getNextActorNetId(), rpc: true);
@@ -142,10 +139,7 @@ public class FrostShieldProjGround : Projectile, IDamagable {
 	public override void update() {
 		base.update();
 		updateProjectileCooldown();
-
-		if (ownedByLocalPlayer) {
-			moveWithMovingPlatform();
-		}
+		moveWithMovingPlatform();
 	}
 
 	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
@@ -190,6 +184,7 @@ public class FrostShieldProjCharged : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 
 	public override void update() {
@@ -259,8 +254,6 @@ public class FrostShieldProjChargedGround : Projectile {
 		base.update();
 		slideAnim.visible = grounded;
 		slideAnim.changePos(pos.addxy(-xDir * 5, 0));
-
-		if (!ownedByLocalPlayer) return;
 	}
 
 	public override void onHitWall(CollideData other) {
@@ -277,7 +270,6 @@ public class FrostShieldProjChargedGround : Projectile {
 		base.onDestroy();
 		breakFreeze(owner);
 		slideAnim?.destroySelf();
-		if (!ownedByLocalPlayer) return;
 	}
 }
 
@@ -301,10 +293,10 @@ public class FrostShieldProjPlatform : Projectile {
 
 	public override void update() {
 		base.update();
-		if (!ownedByLocalPlayer) return;
-
 		if (isAnimOver() && isUnderwater()) {
-			if (damager.damage != 0) updateDamager(0);
+			if (damager.damage != 0) {
+				updateLocalDamager(0);
+			}
 			move(new Point(0, -100));
 		}
 	}

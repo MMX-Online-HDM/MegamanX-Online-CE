@@ -35,17 +35,8 @@ public class FireWaveProj : Projectile {
 	public FireWaveProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId) : base(weapon, pos, xDir, 400, 1, player, "fire_wave", 0, 0.2f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.FireWave;
 		fadeSprite = "fire_wave_fade";
+		maxTime = 0.1f;
 	}
-
-	public override void update() {
-		base.update();
-		if (!ownedByLocalPlayer) return;
-
-		if (time > 0.1) {
-			destroySelf(fadeSprite);
-		}
-	}
-
 	public override void onHitDamagable(IDamagable damagable) {
 		var character = damagable as Character;
 		character?.unfreezeIfFrozen();
@@ -62,18 +53,20 @@ public class FireWaveProjChargedStart : Projectile {
 
 	public override void update() {
 		base.update();
-
-		if (!ownedByLocalPlayer) return;
-
 		if (isUnderwater()) {
-			destroySelf();
+			destroySelf(disableRpc: true);
 			return;
 		}
 		incPos(new Point(0, Global.spf * 100));
 		if (grounded) {
 			destroySelf();
-			new FireWaveProjCharged(weapon, pos, xDir, damager.owner, 0, Global.level.mainPlayer.getNextActorNetId(), 0, rpc: true);
-			playSound("fireWave");
+			if (ownedByLocalPlayer) {
+				new FireWaveProjCharged(
+					weapon, pos, xDir, damager.owner, 0,
+					Global.level.mainPlayer.getNextActorNetId(), 0, rpc: true
+				);
+				playSound("fireWave");
+			}
 		}
 	}
 
@@ -115,6 +108,7 @@ public class FireWaveProjCharged : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		maxTime = 0.48f;
 	}
 
 	public override void render(float x, float y) {
@@ -126,7 +120,7 @@ public class FireWaveProjCharged : Projectile {
 	public override void update() {
 		base.update();
 		if (isUnderwater()) {
-			destroySelf();
+			destroySelf(disableRpc: true);
 			return;
 		}
 		if (soundCooldown > 0) {
@@ -137,9 +131,6 @@ public class FireWaveProjCharged : Projectile {
 			spriteTop.visible = true;
 			spriteMid.visible = true;
 			riseY += (Global.spf * 75);
-		}
-		if (time >= 0.48f) {
-			destroySelf();
 		}
 		if (time > 0.2f && child == null && parentTime < 3) {
 			if (soundCooldown == 0) {
@@ -160,8 +151,11 @@ public class FireWaveProjCharged : Projectile {
 					destroySelf();
 					return;
 				}
-
-				child = new FireWaveProjCharged(weapon, pos.addxy(16 * xDir, 0), xDir * sign, damager.owner, time + parentTime, Global.level.mainPlayer.getNextActorNetId(), timesReversed, rpc: true);
+				child = new FireWaveProjCharged(
+					weapon, pos.addxy(16 * xDir, 0), xDir * sign,
+					damager.owner, time + parentTime, Global.level.mainPlayer.getNextActorNetId(),
+					timesReversed, rpc: true
+				);
 			}
 		}
 	}

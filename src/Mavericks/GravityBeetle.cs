@@ -126,14 +126,10 @@ public class GBeetleBallProj : Projectile {
 
 	public override void update() {
 		base.update();
-		if (!ownedByLocalPlayer) return;
-
 		Helpers.decrementTime(ref hitWallCooldown);
 	}
 
 	public void increaseSize() {
-		if (!ownedByLocalPlayer) return;
-
 		if (size >= 2) return;
 		if (size == 0) changeSprite("gbeetle_proj2", true);
 		else if (size == 1) changeSprite("gbeetle_proj3", true);
@@ -148,7 +144,6 @@ public class GBeetleBallProj : Projectile {
 
 	public override void onHitWall(CollideData other) {
 		base.onHitWall(other);
-		if (!ownedByLocalPlayer) return;
 		if (hitWallCooldown > 0) return;
 		if (other.myCollider.isTrigger) return;
 

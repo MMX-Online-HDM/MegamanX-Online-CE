@@ -14,7 +14,7 @@ public class Fonts {
 	public static void drawText(
 		FontType fontType, string textStr, float x, float y,
 		Alignment alignment = Alignment.Left, bool isWorldPos = false, bool selected = false,
-		FontType selectedFont = FontType.BlueMenu, long depth = 0
+		FontType? selectedFont = null, long depth = 0
 	) {
 		// To prevent crashes.
 		if (string.IsNullOrEmpty(textStr)) { return; }
@@ -23,22 +23,19 @@ public class Fonts {
 		string[] textLines = textStr.Split('\n');
 		string fontStr = "";
 		if (!selected) {
-			fontStr = fontType switch {
-				FontType.BlueMenu => "BlueMenu",
-				FontType.OrangeMenu => "OrangeMenu",
-				_ => "FixedBlueX1"
-			};
+			fontStr = getFontSrt(fontType);
 		} else {
-			fontStr = fontType switch {
-				FontType.BlueMenu or FontType.OrangeMenu => "OrangeMenu",
-				_ => "FixedOrangeX1"
-			};
+			if (selectedFont == null) {
+				selectedFont = getFontAlt(fontType);
+			}
+			fontStr = getFontSrt(selectedFont.Value);
 		}
 		bool deferred = false;
 		int fontTextureSize = 8;
 		int fontGridSpacing = 1;
 		int fontDefaultWidth = 7;
 		int fontSpacing  = 1;
+		int newLineSpacing  = 10;
 		if (baseFontData.ContainsKey(fontStr)) {
 			fontTextureSize = baseFontData[fontStr][0];
 			fontGridSpacing = baseFontData[fontStr][1];
@@ -69,7 +66,11 @@ public class Fonts {
 			}
 			for (int i = 0; i < textLine.Length; i++) {
 				char letter = textLine[i];
-				int charInt = letter;
+				int charInt = (int)letter;
+				if (letter > 191) {
+					letter = '?';
+					charInt = (int)letter;
+				}
 				int rx = charInt % 16;
 				int ry = MathInt.Floor(charInt / 16);
 
@@ -85,7 +86,7 @@ public class Fonts {
 				if (fontSizes.ContainsKey(fontStr)) {
 					fontWidth = fontSizes[fontStr][charInt];
 				}
-				float yPos = MathF.Round(y) + (j * fontWidth + fontSpacing);
+				float yPos = MathF.Round(y) + (j * newLineSpacing);
 				textSprite.Position = new Vector2f(currentXOff, yPos);
 				if (Char.IsWhiteSpace(letter)) {
 					currentXOff += fontWidth;
@@ -120,17 +121,16 @@ public class Fonts {
 			fontDefaultWidth = baseFontData[fontStr][2];
 			fontSpacing = baseFontData[fontStr][3];
 		}
-		for (int i = 0; i < text.Length - 1; i++) {
+		for (int i = 0; i < text.Length; i++) {
 			char letter = text[i];
 			int charInt = (int)letter;
 			int fontWidth = fontDefaultWidth;
 			if (fontSizes.ContainsKey(fontStr)) {
 				fontWidth = fontSizes[fontStr][charInt];
 			}
-			if (Char.IsWhiteSpace(letter)) {
-				size += fontWidth;
-			} else {
-				size += fontWidth + fontSpacing;
+			size += fontWidth;
+			if (!Char.IsWhiteSpace(letter) && i < text.Length - 1) {
+				size += fontSpacing;
 			}
 		}
 		return size;
@@ -175,11 +175,63 @@ public class Fonts {
 
 		return str;
 	}
+
+	public static string getFontSrt(FontType fontType) {
+		return fontType switch {
+			FontType.Blue => "Blue",
+			FontType.DarkBlue => "DarkBlue",
+			FontType.Golden => "Golden",
+			FontType.Green => "Green",
+			FontType.DarkGreen => "DarkGreen",
+			FontType.Grey => "Grey",
+			FontType.LigthGrey => "LigthGrey",
+			FontType.Orange => "Orange",
+			FontType.DarkOrange => "DarkOrange",
+			FontType.Pink => "Pink",
+			FontType.Purple => "Purple",
+			FontType.DarkPurple => "DarkPurple",
+			FontType.Red => "Red",
+			FontType.RedishOrange => "RedishOrange",
+			FontType.Yellow => "Yellow",
+			FontType.FBlue => "FBlue",
+			FontType.FOrange => "FOrange",
+			FontType.BlueMenu => "BlueMenu",
+			FontType.OrangeMenu => "OrangeMenu",
+			_ => "Blue"
+		};
+	}
+
+	public static FontType getFontAlt(FontType fontType) {
+		return fontType switch {
+			FontType.Orange => FontType.Red,
+			FontType.FBlue => FontType.FOrange,
+			FontType.FOrange => FontType.FBlue,
+			FontType.BlueMenu => FontType.OrangeMenu,
+			FontType.OrangeMenu => FontType.BlueMenu,
+			FontType.DarkBlue => FontType.DarkOrange,
+			_ => FontType.Orange
+		};
+	}
 }
 
 public enum FontType {
+	Blue,
+	DarkBlue,
+	Golden,
+	Green,
+	DarkGreen,
+	Grey,
+	LigthGrey,
+	Orange,
+	DarkOrange,
+	Pink,
+	Purple,
+	DarkPurple,
+	Red,
+	RedishOrange,
+	Yellow,
 	FBlue,
-	FOrangeMenu,
+	FOrange,
 	BlueMenu,
 	OrangeMenu
 }

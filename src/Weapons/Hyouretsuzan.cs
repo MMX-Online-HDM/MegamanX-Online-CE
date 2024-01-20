@@ -81,8 +81,7 @@ public class ZeroFallStab : CharState {
 	}
 
 	public override void update() {
-		if (!character.ownedByLocalPlayer) return;
-
+		base.update();
 		if (isUnderwaterQuakeBlazer()) {
 			if (!sprite.EndsWith("_water")) {
 				transitionSprite += "";
@@ -91,9 +90,6 @@ public class ZeroFallStab : CharState {
 				character.changeSpriteFromName(sprite, false);
 			}
 		}
-
-		base.update();
-
 		if (type == HyouretsuzanType.QuakeBlazer) {
 			if (player.input.isHeld(Control.Left, player)) {
 				character.xDir = -1;
@@ -176,9 +172,8 @@ public class QuakeBlazerExplosionProj : Projectile {
 
 	public override void update() {
 		base.update();
-		if (!ownedByLocalPlayer) return;
 		if (isAnimOver()) {
-			destroySelf();
+			destroySelf(disableRpc: true);
 		}
 	}
 }
@@ -199,27 +194,17 @@ public class QuakeBlazerFlamePart : Projectile {
 
 	public override void update() {
 		base.update();
-		if (!ownedByLocalPlayer) return;
-
 		if (grounded) vel = new Point();
 
 		if (isUnderwater()) {
-			destroySelf();
+			destroySelf(disableRpc: true);
 			return;
 		}
 
 		if (isAnimOver()) {
-			destroySelf();
+			destroySelf(disableRpc: true);
 			return;
 		}
-	}
-
-	public override void onHitWall(CollideData other) {
-		if (!ownedByLocalPlayer) return;
-	}
-
-	public override void onHitDamagable(IDamagable damagable) {
-		base.onHitDamagable(damagable);
 	}
 }
 
@@ -242,8 +227,6 @@ public class DropKickState : CharState {
 	}
 
 	public override void update() {
-		if (!character.ownedByLocalPlayer) return;
-
 		if (character.frameIndex >= 3) {
 			character.vel.x = character.xDir * 300;
 			character.vel.y = 450;

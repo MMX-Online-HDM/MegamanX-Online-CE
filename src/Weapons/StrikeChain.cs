@@ -110,6 +110,7 @@ public class StrikeChainProj : Projectile {
 			var midSprite = Global.sprites[sprite].clone();
 			spriteMids.Add(midSprite);
 		}
+		canBeLocal = false;
 	}
 
 	public override void postUpdate() {

@@ -822,7 +822,11 @@ public class Axl : Character {
 		bool aimLeft = player.input.isHeld(Control.AimLeft, player);
 		bool aimRight = player.input.isHeld(Control.AimRight, player);
 		bool aimUp = player.input.isHeld(Control.AimUp, player);
-		bool aimDown = player.input.isHeld(Control.AimDown, player);
+		bool aimDown = (
+			player.input.isHeld(Control.AimDown, player) &&
+			(Options.main.axlSeparateAimDownAndCrouch ||
+			charState is not Idle && charState is not Crouch)
+		);
 
 		if (aimDir.magnitude < 10) {
 			if (aimLeft) {
@@ -1717,5 +1721,12 @@ public class Axl : Character {
 			else if (player.axlBulletType == 6) spriteName += "_ag";
 		}
 		return "axl_" + spriteName;
+	}
+
+	public override bool canCrouch() {
+		if (player.input.getXDir(player) != 0 || isSoftLocked() || isDashing) {
+			return false;
+		}
+		return true;
 	}
 }

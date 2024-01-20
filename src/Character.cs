@@ -1093,7 +1093,6 @@ public partial class Character : Actor, IDamagable {
 			}
 		}
 		*/
-
 		// Cutoff point for things that run but aren't owned by the player
 		if (!ownedByLocalPlayer) {
 			base.update();

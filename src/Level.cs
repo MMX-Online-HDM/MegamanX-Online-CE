@@ -792,7 +792,9 @@ public partial class Level {
 					charNum = Global.quickStartSameChar.Value;
 				}
 
-				var cpu = new Player("CPU" + (i + 1).ToString(), id, charNum, playerData, true, true, alliance, new Input(true), null);
+				var cpu = new Player(
+					"CPU" + (i + 1).ToString(), id, charNum, playerData, true, true, alliance, new Input(true), null
+				);
 				players.Add(cpu);
 			}
 		}
@@ -1137,8 +1139,8 @@ public partial class Level {
 
 		//this.gameMode.checkIfWin();
 
-		//Sort players by score
-		players.Sort((a, b) => {
+		// Sort players by score
+		/*players.Sort((a, b) => {
 			if (a.kills > b.kills) return -1;
 			else if (a.kills == b.kills) {
 				if (a.deaths < b.deaths) return -1;
@@ -1147,7 +1149,7 @@ public partial class Level {
 			} else {
 				return 1;
 			}
-		});
+		});*/
 
 		for (int i = delayedActions.Count - 1; i >= 0; i--) {
 			delayedActions[i].time -= Global.spf;

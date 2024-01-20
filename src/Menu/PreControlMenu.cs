@@ -80,7 +80,7 @@ public class PreControlMenu : IMainMenu {
 			//DrawWrappers.DrawTextureMenu(Global.textures["cursor"], 20, topLeft.y + ySpace + (selectArrowPosY * ySpace));
 			Global.sprites["cursor"].drawToHUD(0, optionPos1.x - 10, 73 + (selArrowPosY * 20));
 		} else {
-			DrawWrappers.DrawRect(5, 5, Global.screenW - 5, Global.screenH - 5, true, Helpers.MenuBgColor, 0, ZIndex.HUD + 200, false);
+			DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
 			Global.sprites["cursor"].drawToHUD(0, optionPos1.x - 10, 73 + (selArrowPosY * 20));
 		}
 

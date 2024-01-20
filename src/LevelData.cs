@@ -218,9 +218,11 @@ public class LevelData {
 			supportedGameModesSet.Add(GameMode.TeamElimination);
 		} else if (isMedium()) {
 			//maxPlayers = 4;
+			maxPlayers = 12;
 			supportedGameModesSet.Add(GameMode.Deathmatch);
 			supportedGameModesSet.Add(GameMode.TeamDeathmatch);
 		} else {
+			maxPlayers = 12;
 			supportedGameModesSet.Add(GameMode.Deathmatch);
 			supportedGameModesSet.Add(GameMode.TeamDeathmatch);
 		}

@@ -27,6 +27,5 @@
 		<PackageReference Include="DeviceId" Version="6.3.0" />
 		<PackageReference Include="Profanity.Detector" Version="0.1.8" />
 		<PackageReference Include="SpaceWizards.Lidgren.Network" Version="0.2.4" />
-		<PackageReference Include="GoogleAnalyticsTracker.Simple" Version="6.0.7" />
 	</ItemGroup>
 </Project>

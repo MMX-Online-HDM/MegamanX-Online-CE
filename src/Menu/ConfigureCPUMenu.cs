@@ -62,7 +62,7 @@ public class ConfigureCPUMenu : IMainMenu {
 		charSelections = new List<CharSelection>(charSelections);
 		charSelections.Insert(0, new CharSelection("Random", 0, 1, 0, "", 0));
 
-		for (int i = 0; i < Math.Min(savedMatchSettings.extraCpuCharData.cpuDatas.Count, 9); i++) {
+		for (int i = 0; i < savedMatchSettings.extraCpuCharData.cpuDatas.Count; i++) {
 			var cpuData = savedMatchSettings.extraCpuCharData.cpuDatas[i];
 			cpuData.uiSelectedCharIndex = Helpers.clamp(cpuData.uiSelectedCharIndex, 0, charSelections.Count - 1);
 
@@ -79,8 +79,14 @@ public class ConfigureCPUMenu : IMainMenu {
 						cpuData.isRandom = charSelections[cpuData.uiSelectedCharIndex].name == "Random";
 					},
 					(Point pos, int index) => {
-						Helpers.drawTextStd(TCat.Title, "CPU" + (iCopy + 1).ToString(), pos.x - 40, pos.y, fontSize: fontSize, color: Color.White);
-						Helpers.drawTextStd(TCat.Option, "Character: " + charSelections[cpuData.uiSelectedCharIndex].name, pos.x, pos.y, fontSize: fontSize, color: Color.White, selected: index == selectArrowPosY);
+						Fonts.drawText(
+							FontType.Blue, "CPU" + (iCopy + 1).ToString(),
+							pos.x - 40, pos.y
+						);
+						Fonts.drawText(
+							FontType.Blue, "Character: " + charSelections[cpuData.uiSelectedCharIndex].name,
+							pos.x + 10, pos.y, selected: index == selectArrowPosY
+						);
 					})
 				);
 
@@ -95,7 +101,10 @@ public class ConfigureCPUMenu : IMainMenu {
 							string allianceStr = "auto";
 							if (cpuData.alliance == GameMode.blueAlliance) allianceStr = "blue";
 							if (cpuData.alliance == GameMode.redAlliance) allianceStr = "red";
-							Helpers.drawTextStd(TCat.Option, "Team: " + allianceStr, pos.x, pos.y, fontSize: fontSize, color: Color.White, selected: index == selectArrowPosY);
+							Fonts.drawText(
+								FontType.Blue, "Team: " + allianceStr, pos.x, pos.y,
+								selected: index == selectArrowPosY
+							);
 						})
 					);
 			}

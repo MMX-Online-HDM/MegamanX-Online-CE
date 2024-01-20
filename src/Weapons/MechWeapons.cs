@@ -144,10 +144,8 @@ public class MechFrogStompShockwave : Projectile {
 
 	public override void update() {
 		base.update();
-		if (!ownedByLocalPlayer) return;
-
 		if (isAnimOver()) {
-			destroySelf();
+			destroySelf(disableRpc: true);
 		}
 	}
 }
@@ -291,17 +289,8 @@ public class MechChainProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
-
-	public override void update() {
-		if (!ownedByLocalPlayer) return;
-		base.update();
-	}
-
-	public override void onHitWall(CollideData other) {
-		if (!ownedByLocalPlayer) return;
-	}
-
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
 	}
@@ -345,7 +334,6 @@ public class MechBusterProj2 : Projectile {
 	}
 
 	public override void update() {
-		if (!ownedByLocalPlayer) return;
 		base.update();
 		float offsetY;
 		if (type == 0) {

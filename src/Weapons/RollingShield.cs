@@ -39,6 +39,7 @@ public class RollingShieldProj : Projectile {
 		useGravity = true;
 		collider.wallOnly = true;
 		vel.x = 0;
+		canBeLocal = false;
 	}
 
 	public override void update() {
@@ -92,6 +93,7 @@ public class RollingShieldProjCharged : Projectile {
 		shouldShieldBlock = false;
 		shouldVortexSuck = false;
 		neverReflect = true;
+		canBeLocal = false;
 	}
 
 	public override void update() {

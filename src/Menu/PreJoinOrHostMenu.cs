@@ -167,25 +167,40 @@ public class PreJoinOrHostMenu : IMainMenu {
 		//DrawWrappers.DrawTextureMenu(Global.textures["cursor"], 20, topLeft.y + ySpace + (selectArrowPosY * ySpace));
 		Global.sprites["cursor"].drawToHUD(0, startX - 10, 73 + (selectY * lineH));
 
-		Helpers.drawTextStd(TCat.Title, "SELECT OPTION", Global.screenW * 0.5f, 20, Alignment.Center, fontSize: 40);
+		Fonts.drawText(
+			FontType.Golden, "SELECT OPTION", Global.screenW * 0.5f, 20, Alignment.Center
+		);
 
 		if (state == 0) {
-			Helpers.drawTextStd(TCat.Option, "RELAY", startX, optionPos[0].y, fontSize: 24, selected: selectY == 0);
+			Fonts.drawText(FontType.DarkBlue, "RELAY", startX, optionPos[0].y, selected: selectY == 0);
 		} else {
-			Helpers.drawTextStd(TCat.Option, "LOADING...", startX, optionPos[0].y, fontSize: 24, selected: selectY == 0);
+			Fonts.drawText(FontType.DarkBlue, "LOADING...", startX, optionPos[0].y, selected: selectY == 0);
 		}
 
 		int msgPos = 140;
-		DrawWrappers.DrawLine(10, msgPos - 20, Global.screenW - 10, msgPos - 20, Color.White, 0.5f, ZIndex.HUD, isWorldPos: false);
-		Helpers.drawTextStd(TCat.Default, "NOTICE", Global.halfScreenW, msgPos - 14, Alignment.Center, fontSize: 24);
-		Helpers.drawTextStd(TCat.Default, "See link below for self hosting guide:", Global.halfScreenW, msgPos, Alignment.Center, fontSize: 18);
-		Helpers.drawTextStd(TCat.Default, "https://gamemaker19.github.io/MMXOnlineDesktop/decom.html", Global.halfScreenW, msgPos + 10, Alignment.Center, fontSize: 18);
-		DrawWrappers.DrawLine(10, msgPos + 32, Global.screenW - 10, msgPos + 32, Color.White, 0.5f, ZIndex.HUD, isWorldPos: false);
+		DrawWrappers.DrawLine(
+			10, msgPos - 5, Global.screenW - 10, msgPos - 5, Color.White, 1, ZIndex.HUD, isWorldPos: false
+		);
+		Fonts.drawText(
+			FontType.DarkOrange, "NOTICE", Global.halfScreenW,
+			msgPos, Alignment.Center
+		);
+		Fonts.drawText(
+			FontType.DarkBlue, "See link below for self hosting guide:",
+			Global.halfScreenW, msgPos + 10, Alignment.Center
+		);
+		Fonts.drawText(
+			FontType.DarkBlue, "https://gamemaker19.github.io/MMXOnlineDesktop/decom.html",
+			Global.halfScreenW, msgPos + 20, Alignment.Center
+		);
+		DrawWrappers.DrawLine(
+			10, msgPos + 32, Global.screenW - 10, msgPos + 32, Color.White, 1, ZIndex.HUD, isWorldPos: false
+		);
 
-		Helpers.drawTextStd(TCat.Option, "LAN", startX, optionPos[2].y, fontSize: 24, selected: selectY == 2);
+		Fonts.drawText(FontType.DarkBlue, "LAN", startX, optionPos[2].y, selected: selectY == 2);
 
-		Helpers.drawTextStd(TCat.Option, "P2P", startX, optionPos[1].y, fontSize: 24, selected: selectY == 1);
+		Fonts.drawText(FontType.DarkBlue, "P2P", startX, optionPos[1].y, selected: selectY == 1);
 
-		Helpers.drawTextStd(TCat.BotHelp, "[X]: Choose, [Z]: Back", Global.halfScreenW, 200, Alignment.Center, fontSize: 24);
+		Fonts.drawText(FontType.Grey, "[X]: Choose, [Z]: Back", Global.halfScreenW, 206, Alignment.Center);
 	}
 }

@@ -85,8 +85,6 @@ public class SpinningBladeProj : Projectile {
 				spinSound = null;
 			}
 		}
-		if (!ownedByLocalPlayer) return;
-
 		if (MathF.Abs(vel.x) < 400) {
 			vel.x -= Global.spf * 450 * xDir;
 		}
@@ -127,6 +125,7 @@ public class SpinningBladeProjCharged : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 
 	public override void update() {

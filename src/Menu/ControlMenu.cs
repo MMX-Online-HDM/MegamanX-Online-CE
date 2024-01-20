@@ -194,7 +194,7 @@ public class ControlMenu : IMainMenu {
 			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0);
 			DrawWrappers.DrawTextureHUD(Global.textures["cursor"], startX, topLeft.y + startYOff + (selectArrowPosY * ySpace) + cursorYOff);
 		} else {
-			DrawWrappers.DrawRect(5, 5, Global.screenW - 5, Global.screenH - 5, true, Helpers.MenuBgColor, 0, ZIndex.HUD + 200, false);
+			DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
 			Global.sprites["cursor"].drawToHUD(0, startX, topLeft.y + startYOff + (selectArrowPosY * ySpace) + cursorYOff + 5);
 		}
 

@@ -45,13 +45,15 @@ public class SilkShotProj : Projectile {
 	}
 
 	public override void onHitWall(CollideData other) {
+		destroySelf(disableRpc: true);
 		if (!ownedByLocalPlayer) return;
 		split();
-		destroySelf();
 	}
 
 	public override void onHitDamagable(IDamagable damagable) {
-		if (ownedByLocalPlayer) split();
+		if (ownedByLocalPlayer) {
+			split();
+		}
 		base.onHitDamagable(damagable);
 	}
 
@@ -96,9 +98,9 @@ public class SilkShotProjCharged : Projectile {
 	}
 
 	public override void onHitWall(CollideData other) {
+		destroySelf(disableRpc: true);
 		if (!ownedByLocalPlayer) return;
 		split();
-		destroySelf();
 	}
 
 	public override void onHitDamagable(IDamagable damagable) {

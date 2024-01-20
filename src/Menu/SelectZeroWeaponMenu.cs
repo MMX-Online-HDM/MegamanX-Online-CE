@@ -153,10 +153,10 @@ public class SelectZeroWeaponMenu : IMainMenu {
 		if (!inGame) {
 			DrawWrappers.DrawTextureHUD(Global.textures["loadoutbackground"], 0, 0);
 		} else {
-			DrawWrappers.DrawRect(5, 5, Global.screenW - 5, Global.screenH - 5, true, Helpers.MenuBgColor, 0, ZIndex.HUD + 200, false);
+			DrawWrappers.DrawTextureHUD(Global.textures["pausemenuload"], 0, 0);
 		}
 
-		Fonts.drawText(FontType.OrangeMenu, "Zero Loadout", Global.screenW * 0.5f, 20, Alignment.Center);
+		Fonts.drawText(FontType.Yellow, "Zero Loadout", Global.screenW * 0.5f, 20, Alignment.Center);
 		var outlineColor = inGame ? Color.White : Helpers.LoadoutBorderColor;
 		float botOffY = inGame ? 0 : -2;
 
@@ -175,12 +175,12 @@ public class SelectZeroWeaponMenu : IMainMenu {
 			alpha = isIndexDisabled(i) ? 0.5f : 1f;
 			float yPos = startY - 6 + (i * wepH);
 			Fonts.drawText(
-				FontType.BlueMenu, zeroWeaponCategories[i].Item1 + ":", 40,
+				FontType.Blue, zeroWeaponCategories[i].Item1 + ":", 40,
 				yPos, selected: selCursorIndex == i
 			);
 			var weapon = zeroWeaponCategories[i].Item2[cursors[i].index];
 			Fonts.drawText(
-				FontType.BlueMenu, weapon.displayName, wepTextX, yPos,
+				FontType.Purple, weapon.displayName, wepTextX, yPos,
 				selected: selCursorIndex == i
 			);
 			Global.sprites["hud_killfeed_weapon"].drawToHUD(weapon.killFeedIndex, wepPosX, yPos + 3, alpha);
@@ -202,13 +202,13 @@ public class SelectZeroWeaponMenu : IMainMenu {
 			Global.sprites["hud_killfeed_weapon"].drawToHUD(122, wepPosX, hyperModeYPos + 3, alpha);
 		} else if (cursors[8].index == 1) {
 			Fonts.drawText(
-				FontType.BlueMenu, "Awakened Zero", wepTextX, hyperModeYPos,
+				FontType.DarkPurple, "Awakened Zero", wepTextX, hyperModeYPos,
 				selected: selCursorIndex == 8
 			);
 			Global.sprites["hud_killfeed_weapon"].drawToHUD(87, wepPosX, hyperModeYPos + 3, alpha);
 		} else if (cursors[8].index == 2) {
 			Fonts.drawText(
-				FontType.BlueMenu, "Viral Zero", wepTextX, hyperModeYPos,
+				FontType.DarkPurple, "Viral Zero", wepTextX, hyperModeYPos,
 				selected: selCursorIndex == 8
 			);
 			Global.sprites["hud_killfeed_weapon"].drawToHUD(173, wepPosX, hyperModeYPos + 3, alpha);
@@ -225,20 +225,20 @@ public class SelectZeroWeaponMenu : IMainMenu {
 			int posY = 6;
 			foreach (string description in wep.description) {
 				Fonts.drawText(
-					FontType.BlueMenu, wep.description[0], 30, wsy + 6, Alignment.Left
+					FontType.Green, wep.description[0], 30, wsy + 6, Alignment.Left
 				);
 				posY += 9;
 			}
 		} else {
 			if (cursors[8].index == 0) {
-				Helpers.drawTextStd("This hyper form increases speed and damage.", 40, wsy + 8, Alignment.Left, style: Text.Styles.Italic, fontSize: 18);
-				Helpers.drawTextStd("Lasts 12 seconds.", 40, wsy + 17, Alignment.Left, style: Text.Styles.Italic, fontSize: 18);
+				Fonts.drawText(FontType.Green, "This hyper form increases speed and damage.", 40, wsy + 6);
+				Fonts.drawText(FontType.Green, "Lasts 12 seconds.", 40, wsy + 15);
 			} else if (cursors[8].index == 1) {
-				Helpers.drawTextStd("This hyper form grants powerful ranged attacks.", 40, wsy + 8, Alignment.Left, style: Text.Styles.Italic, fontSize: 18);
-				Helpers.drawTextStd("Lasts until scrap is depleted.", 40, wsy + 17, Alignment.Left, style: Text.Styles.Italic, fontSize: 18);
+				Fonts.drawText(FontType.Green, "This hyper form grants powerful ranged attacks.", 40, wsy + 6);
+				Fonts.drawText(FontType.Green, "Lasts until scrap is depleted.", 40, wsy + 15);
 			} else if (cursors[8].index == 2) {
-				Helpers.drawTextStd("This hyper form infects and disrupts foes on each hit.", 40, wsy + 8, Alignment.Left, style: Text.Styles.Italic, fontSize: 18);
-				Helpers.drawTextStd("Lasts until death.", 40, wsy + 17, Alignment.Left, style: Text.Styles.Italic, fontSize: 18);
+				Fonts.drawText(FontType.Green, "This hyper form infects and disrupts foes on each hit.", 40, wsy + 6);
+				Fonts.drawText(FontType.Green, "Lasts until death.", 40, wsy + 15);
 			}
 		}
 		/*

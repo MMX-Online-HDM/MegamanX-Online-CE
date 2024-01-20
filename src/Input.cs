@@ -487,7 +487,9 @@ public class Input {
 	public bool isHeld(string inputName, Player player) { 
 		if (possessedControlHeld.ContainsKey(inputName)) return possessedControlHeld[inputName];
 
-		if (player != null && !player.canControl) return false;
+		if (player != null && !player.canControl) {
+			return false;
+		}
 		if (player == null || player.isAI) {
 			var keyboardMapping2 = Control.getKeyboardMapping(-1, 0);
 			int? keyboardKey2 = keyboardMapping2.GetValueOrDefault(inputName);
