@@ -84,6 +84,16 @@ public class MagnetMineProj : Projectile, IDamagable {
 		}
 	}
 
+	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
+		if (!ownedByLocalPlayer) {
+			return;
+		}
+		health -= damage;
+		if (health <= 0) {
+			destroySelf();
+		}
+	}
+
 	public override void onCollision(CollideData other) {
 		base.onCollision(other);
 		if (!ownedByLocalPlayer) return;

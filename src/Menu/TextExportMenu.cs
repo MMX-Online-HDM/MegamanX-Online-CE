@@ -63,37 +63,58 @@ public class TextExportMenu : IMainMenu {
 
 		if (Global.input.isPressedMenu(Control.MenuBack)) {
 			Menu.change(prevMenu);
-		} else if (Global.input.isPressedMenu(Control.MenuSelectPrimary) &&
+		} else if (Global.input.isPressedMenu(Control.MenuConfirm) &&
 			canCopyToClipboard && clipboardTime == 0
 		) {
 		#if WINDOWS
 			SetClipboard(text);
 			clipboardTime = 2;
 		#endif
-		} else if (Global.input.isPressedMenu(Control.MenuSelectSecondary) && fileTime == 0) {
+		} else if (Global.input.isPressedMenu(Control.MenuAlt) && fileTime == 0) {
 			fileError = Helpers.WriteToFile(textFileName + ".txt", text);
 			fileTime = 2;
 		}
 	}
 
 	public void render() {
-		float top = Global.screenH * 0.4f;
+		int top = MathInt.Round(Global.screenH * 0.475f) - (lines.Count * 10 / 2) - 5;
+		int bot = 198;
 
 		if (inGame) {
-			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0);
-		} else {
 			DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
+		} else {
+			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0);
 		}
 
 		int i = 0;
 		for (; i < lines.Count; i++) {
-			Helpers.drawTextStd(lines[i], Global.screenW / 2, top + (i * 20), alignment: Alignment.Center, fontSize: (i == lines.Count - 1 ? textSize : 24));
+			Fonts.drawText(
+				FontType.Green, lines[i], Global.screenW / 2, top + (i * 10),
+				alignment: Alignment.Center
+			);
 		}
+		Fonts.drawText(
+			FontType.Orange, "TEXT EXPORT",
+			Global.screenW / 2, 20, alignment: Alignment.Center
+		);
 		if (canCopyToClipboard) {
-			Helpers.drawTextStd(TCat.BotHelp, clipboardTime == 0 ? "[X]: copy to clipboard" : "Copied to clipboard.", Global.screenW / 2, top + (i * 20), alignment: Alignment.Center, fontSize: 24);
+			Fonts.drawTextEX(
+				FontType.Grey, clipboardTime == 0 ? "[X]: copy to clipboard" : "Copied to clipboard.",
+				Global.screenW / 2, bot - 20, alignment: Alignment.Center
+			);
 		}
-		string fileMessage = string.IsNullOrEmpty(fileError) ? ("Wrote to file " + textFileName + ".txt in game folder") : "Failed to write to file.";
-		Helpers.drawTextStd(TCat.BotHelp, fileTime == 0 ? "[C]: export to file" : fileMessage, Global.screenW / 2, top + (i * 20) + 10, alignment: Alignment.Center, fontSize: 24);
-		Helpers.drawTextStd(TCat.BotHelp, "[Z]: back", Global.screenW / 2, top + (i * 20) + 20, alignment: Alignment.Center, fontSize: 24);
+		string fileMessage = (
+			string.IsNullOrEmpty(fileError)
+			? ("Wrote to file " + textFileName + ".txt in game folder")
+			: "Failed to write to file."
+		);
+		Fonts.drawTextEX(
+			FontType.Grey, fileTime == 0 ? "[C]: export to file" : fileMessage,
+			Global.screenW / 2, bot - 10, alignment: Alignment.Center
+		);
+		Fonts.drawTextEX(
+			FontType.Grey, "[Z]: back", Global.screenW / 2,
+			bot, alignment: Alignment.Center
+		);
 	}
 }

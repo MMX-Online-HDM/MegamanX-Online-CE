@@ -42,6 +42,13 @@ public class StingChameleon : Maverick {
 		if (sendRpc) {
 			createActorRpc(player.id);
 		}
+
+		usesAmmo = true;
+		canHealAmmo = true;
+		ammo = 32;
+		maxAmmo = 32;
+		grayAmmoLevel = 8;
+		barIndexes = (57, 46);
 	}
 
 	public bool isCloakTransition() {

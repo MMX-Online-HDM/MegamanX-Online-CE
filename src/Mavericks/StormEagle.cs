@@ -19,8 +19,6 @@ public class StormEagle : Maverick {
 		stateCooldowns.Add(typeof(StormEGustState), new MaverickStateCooldown(false, true, 0.75f));
 		stateCooldowns.Add(typeof(StormEDiveState), new MaverickStateCooldown(false, false, 1f));
 
-		canFly = true;
-
 		weapon = new Weapon(WeaponIds.StormEGeneric, 99);
 
 		awardWeaponId = WeaponIds.Tornado;
@@ -32,6 +30,11 @@ public class StormEagle : Maverick {
 		if (sendRpc) {
 			createActorRpc(player.id);
 		}
+
+		canFly = true;
+		flyBarIndexes = (44, 38);
+		maxFlyBar = 960;
+		flyBar = 960;
 	}
 
 	public override void update() {

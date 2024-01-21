@@ -88,7 +88,7 @@ public class SelectZeroWeaponMenu : IMainMenu {
 
 	public void update() {
 		if (!string.IsNullOrEmpty(error)) {
-			if (Global.input.isPressedMenu(Control.MenuSelectPrimary)) {
+			if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 				error = null;
 			}
 			return;
@@ -106,7 +106,7 @@ public class SelectZeroWeaponMenu : IMainMenu {
 		Helpers.menuUpDown(ref selCursorIndex, 0, 8);
 
 		bool backPressed = Global.input.isPressedMenu(Control.MenuBack);
-		bool selectPressed = Global.input.isPressedMenu(Control.MenuSelectPrimary) || (backPressed && !inGame);
+		bool selectPressed = Global.input.isPressedMenu(Control.MenuConfirm) || (backPressed && !inGame);
 		if (selectPressed) {
 			if (duplicateTechniques()) {
 				error = "Cannot select same technique in two slots!";

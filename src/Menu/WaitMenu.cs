@@ -68,7 +68,7 @@ public class WaitMenu : IMainMenu {
 		selCursorY = Helpers.clamp(selCursorY, 0, server.players.Count - 1);
 
 		if (Global.serverClient.isHost) {
-			if ((Global.input.isPressedMenu(Control.MenuSelectPrimary) || Global.quickStartOnline) && recreateWaitTime <= 0) {
+			if ((Global.input.isPressedMenu(Control.MenuConfirm) || Global.quickStartOnline) && recreateWaitTime <= 0) {
 				Action onCreate = new Action(() => {
 					if (server.players.Count > 1) {
 						Logger.logEvent("host_2ormore", Logger.getMatchLabel(server.level, server.gameMode), server.players.Count);
@@ -149,7 +149,7 @@ public class WaitMenu : IMainMenu {
 		if (server.isP2P) {
 			return;
 		}
-		if (Global.input.isPressedMenu(Control.MenuSelectSecondary) ||
+		if (Global.input.isPressedMenu(Control.MenuAlt) ||
 			(autoRefreshTime > autoRefreshInterval && autoRefreshCount < maxAutoRefreshCount)
 		) {
 			autoRefreshTime = 0;

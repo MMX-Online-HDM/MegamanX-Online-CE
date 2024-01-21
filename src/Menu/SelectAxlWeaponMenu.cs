@@ -231,7 +231,7 @@ public class SelectAxlWeaponMenu : IMainMenu {
 
 	public void update() {
 		if (!string.IsNullOrEmpty(error)) {
-			if (Global.input.isPressedMenu(Control.MenuSelectPrimary)) {
+			if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 				error = null;
 			}
 			return;
@@ -249,7 +249,7 @@ public class SelectAxlWeaponMenu : IMainMenu {
 					craftingRecipeSelections[index]++;
 					if (craftingRecipeSelections[index] >= craftingRecipes[index].Count) craftingRecipeSelections[index] = craftingRecipes[index].Count - 1;
 				}
-				if (Global.input.isPressedMenu(Control.MenuSelectSecondary)) {
+				if (Global.input.isPressedMenu(Control.MenuAlt)) {
 					int crsIndex = craftingRecipeSelections[index];
 					string recipe = craftingRecipes[index][crsIndex];
 					recipeManager(recipe, true, out bool canAfford, out int _, out int[] _);
@@ -269,7 +269,7 @@ public class SelectAxlWeaponMenu : IMainMenu {
 		} else if (selCursorIndex > 0 && selCursorIndex < 3) {
 			Helpers.menuLeftRightInc(ref cursors[selCursorIndex].index, 1, 8, wrap: true, playSound: true);
 
-			if (Global.input.isPressedMenu(Control.MenuSelectSecondary)) {
+			if (Global.input.isPressedMenu(Control.MenuAlt)) {
 				int wi = cursors[selCursorIndex].index;
 				if (selCursorIndex > 0 && wi > 0) {
 					altCustomizeArray[wi] = (altCustomizeArray[wi] == 0 ? 1 : 0);
@@ -300,7 +300,7 @@ public class SelectAxlWeaponMenu : IMainMenu {
 		}
 
 		bool backPressed = Global.input.isPressedMenu(Control.MenuBack);
-		bool selectPressed = Global.input.isPressedMenu(Control.MenuSelectPrimary) || (backPressed && !inGame);
+		bool selectPressed = Global.input.isPressedMenu(Control.MenuConfirm) || (backPressed && !inGame);
 		if (selectPressed) {
 			Axl axl = mainPlayer?.character as Axl;
 

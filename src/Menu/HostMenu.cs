@@ -288,7 +288,7 @@ public class HostMenu : IMainMenu {
 			menuOptions.Add(
 				new MenuOption(startX, startY,
 					() => {
-						if (Global.input.isPressedMenu(Control.MenuSelectSecondary)) {
+						if (Global.input.isPressedMenu(Control.MenuAlt)) {
 							Menu.change(new EnterTextMenu("Enter a custom server name", 10, (string text) => {
 								serverName = text;
 								Menu.change(this);
@@ -361,7 +361,7 @@ public class HostMenu : IMainMenu {
 						mapIndex++;
 						if (mapIndex >= currentMapSizePool.Count) mapIndex = 0;
 						onMapChange();
-					} else if (Global.input.isPressedMenu(Control.MenuSelectSecondary)) {
+					} else if (Global.input.isPressedMenu(Control.MenuAlt)) {
 						mapIndex = Helpers.randomRange(0, currentMapSizePool.Count - 1);
 						onMapChange();
 					}
@@ -487,7 +487,7 @@ public class HostMenu : IMainMenu {
 						botCount++;
 						resetCpuDataTeams();
 					}
-					if (Global.input.isPressedMenu(Control.MenuSelectSecondary) && botCount > 0) {
+					if (Global.input.isPressedMenu(Control.MenuAlt) && botCount > 0) {
 						Menu.change(
 							new ConfigureCPUMenu(
 								this, botCount, is1v1, isOffline, inGame, inGame,
@@ -705,7 +705,7 @@ public class HostMenu : IMainMenu {
 				new MenuOption(startX, startY,
 					() => {
 						Helpers.menuLeftRightBool(ref savedMatchSettings.hostMenuSettings.useCustomMatchSettings);
-						if (Global.input.isPressedMenu(Control.MenuSelectSecondary)) {
+						if (Global.input.isPressedMenu(Control.MenuAlt)) {
 							Menu.change(new CustomMatchSettingsMenu(this, inGame, isOffline));
 						}
 					},
@@ -773,7 +773,7 @@ public class HostMenu : IMainMenu {
 			Helpers.menuUpDown(ref selectArrowPosY, 0, menuOptions.Count - 1);
 		}
 
-		if (Global.input.isPressedMenu(Control.MenuSelectPrimary)) {
+		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 			if (!string.IsNullOrEmpty(errorMessage)) {
 				errorMessage = null;
 				return;
@@ -1208,13 +1208,13 @@ public class HostMenu : IMainMenu {
 			else msg = "[X]: Next, [C]: Change Name, [Z]: Back";
 		} else msg = "[X]: Next, [ESC]: Menu";
 
-		Fonts.drawText(
+		Fonts.drawTextEX(
 			FontType.Grey, msg + "\nLeft/Right: Change setting",
 			Global.screenW * 0.5f, 178, Alignment.Center
 		);
 
 		if (!string.IsNullOrEmpty(menuOptions[selectArrowPosY].configureMessage)) {
-			Fonts.drawText(
+			Fonts.drawTextEX(
 				FontType.Grey, "[C]: " + menuOptions[selectArrowPosY].configureMessage,
 				Global.screenW * 0.5f, 168, Alignment.Center
 			);
@@ -1225,8 +1225,14 @@ public class HostMenu : IMainMenu {
 
 			//DrawWrappers.DrawRect(5, top - 20, Global.screenW - 5, top + 60, true, new Color(0, 0, 0, 224), 0, ZIndex.HUD, false);
 			DrawWrappers.DrawRect(5, 5, Global.screenW - 5, Global.screenH - 5, true, new Color(0, 0, 0, 224), 0, ZIndex.HUD, false);
-			Helpers.drawTextStd(errorMessage, Global.screenW / 2, top, alignment: Alignment.Center, fontSize: 24);
-			Helpers.drawTextStd(Helpers.controlText("Press [X] to continue"), Global.screenW * 0.5f, 20 + top, alignment: Alignment.Center, fontSize: 24);
+			Fonts.drawText(
+				FontType.Red, errorMessage, Global.screenW / 2, top,
+				alignment: Alignment.Center
+			);
+			Fonts.drawTextEX(
+				FontType.Red, "Press [X] to continue",
+				Global.screenW * 0.5f, 20 + top, alignment: Alignment.Center
+			);
 		}
 	}
 }

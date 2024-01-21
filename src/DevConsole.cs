@@ -47,10 +47,15 @@ public class DevConsole {
 
 	public static void drawConsole() {
 		if (showConsole || showLogOnly) {
-			DrawWrappers.DrawRect(10, 10, Global.screenW - 10, Global.screenH - 10, true, new Color(32, 32, 32, 128), 0, ZIndex.HUD + 200, false);
+			int posX = MathInt.Round(Global.level.camX);
+			int posY = MathInt.Round(Global.level.camY);
+			DrawWrappers.DrawTexture(
+				Global.textures["pausemenuload"],
+				0, 0, 384, 216, posX, posY, ZIndex.HUD
+			);
 			for (int i = 0; i < consoleLog.Count; i++) {
 				string line = consoleLog[i];
-				Helpers.drawTextStd(line, 20, 20 + (i * 12), fontSize: 24, color: Color.White);
+				Fonts.drawText(FontType.LigthGrey, line, 20, 20 + (i * 10));
 			}
 		}
 	}

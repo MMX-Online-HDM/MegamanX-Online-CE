@@ -74,7 +74,7 @@ public class JoinMenuP2P : IMainMenu {
 		// To move the cursor.
 		Helpers.menuUpDown(ref selServerIndex, 0, serverCount - 1);
 		// We pick a server with this.
-		if (Global.input.isPressedMenu(Control.MenuSelectPrimary)) {
+		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 			refreshing = true;
 			requestServerDetails(serverIndexes[selServerIndex]);
 		}
@@ -85,30 +85,30 @@ public class JoinMenuP2P : IMainMenu {
 		// Draw background.
 		DrawWrappers.DrawTextureHUD(Global.textures["severbrowser"], 0, 0);
 
-		Helpers.drawTextStd(
-			TCat.BotHelp, "ENTR: Join, SPC: Refresh, BSPC: Back",
-			Global.halfScreenW, Global.screenH - 32, Alignment.Center, fontSize: 32
+		Fonts.drawText(
+			FontType.Grey, "ENTR: Join, SPC: Refresh, BSPC: Back",
+			Global.halfScreenW, Global.screenH - 32, Alignment.Center
 		);
-		Helpers.drawTextStd(
-			TCat.HUD, " Name     Map        Plyrs Mode       Fork",
-			22, 20, fontSize: 32
+		Fonts.drawText(
+			FontType.OrangeMenu, " Name     Map        Plyrs Mode       Fork",
+			22, 20
 		);
 		int offset = 0;
 		DrawWrappers.DrawTextureHUD(Global.textures["cursor"], 21, 32 + (selServerIndex * 12));
 		if (refreshing) {
-			Helpers.drawTextStd("Refreshing...", 30, 32, fontSize: 32);
+			Fonts.drawText(FontType.Grey, "Refreshing...", 30, 32);
 			return;
 		}
 		foreach (long serverId in serverIndexes) {
-			Helpers.drawTextStd(serverInfo[serverId].name, 30, 32 + offset, fontSize: 32);
-			Helpers.drawTextStd(serverInfo[serverId].map, 102, 32 + offset, fontSize: 32);
-			Helpers.drawTextStd(
+			Fonts.drawText(FontType.Grey, serverInfo[serverId].name, 30, 32 + offset);
+			Fonts.drawText(FontType.Grey, serverInfo[serverId].map, 102, 32 + offset);
+			Fonts.drawText(FontType.Grey, 
 				serverInfo[serverId].playerCount + "/" + serverInfo[serverId].maxPlayer,
-				190, 32, fontSize: 32
+				190, 32
 			);
-			Helpers.drawTextStd(serverInfo[serverId].mode, 238, 32 + offset, fontSize: 32);
-			Helpers.drawTextStd(serverInfo[serverId].fork, 326, 32 + offset, fontSize: 32);
-			offset += 12;
+			Fonts.drawText(FontType.Grey, serverInfo[serverId].mode, 238, 32 + offset);
+			Fonts.drawText(FontType.Grey, serverInfo[serverId].fork, 326, 32 + offset);
+			offset += 10;
 		}
 	}
 

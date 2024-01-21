@@ -900,14 +900,25 @@ public partial class Actor : GameObject {
 	///  Indicates whether this player's attacks should be defender-favored to everyone else
 	/// </summary>
 	public bool isDefenderFavored() {
-		if (Global.isOffline) return false;
-		if (netcodeOverride != null) {
-			if (netcodeOverride == NetcodeModel.FavorDefender) return true;
-			else return false;
+		if (Global.isOffline) {
+			return false;
 		}
-		if (this is Character chr) return chr.player?.isDefenderFavored == true;
-		if (netOwner != null) return netOwner.isDefenderFavored;
-		if (this is Projectile proj) return proj.owner?.isDefenderFavored == true;
+		if (netcodeOverride != null) {
+			if (netcodeOverride == NetcodeModel.FavorDefender) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+		if (this is Character chr) {
+			return chr.player?.isDefenderFavored == true;
+		}
+		if (netOwner != null) {
+			return netOwner.isDefenderFavored;
+		}
+		if (this is Projectile proj) {
+			return proj.owner?.isDefenderFavored == true;
+		}
 		return false;
 	}
 
@@ -1263,8 +1274,7 @@ public partial class Actor : GameObject {
 		}
 
 		// Character should not run destroy RPC. The destroyCharacter RPC handles that already
-		var character = this as Character;
-		if (character == null) {
+		if (this is not Character) {
 			if ((ownedByLocalPlayer || doRpcEvenIfNotOwned) && netId != null && !disableRpc) {
 				float speed = vel.magnitude;
 				if (speed == 0) speed = deltaPos.magnitude / Global.spf;

@@ -262,7 +262,7 @@ public class Helpers {
 	}
 
 	public static void drawWeaponSlotSymbol(float topLeftSlotX, float topLeftSlotY, string symbol) {
-		drawTextStd(symbol, topLeftSlotX + 16, topLeftSlotY + 12, Alignment.Right, fontSize: 12);
+		Fonts.drawText(FontType.Grey, symbol, topLeftSlotX + 16, topLeftSlotY + 12, Alignment.Right);
 	}
 
 	static Random rnd = new Random();
@@ -542,12 +542,12 @@ public class Helpers {
 	public static string controlText(string text, bool isController = false) {
 		if (isController) isController = Control.isJoystick();
 
-		text = text.Replace("[X]", Control.getKeyOrButtonName(Control.MenuSelectPrimary, isController));
-		text = text.Replace("[C]", Control.getKeyOrButtonName(Control.MenuSelectSecondary, isController));
+		text = text.Replace("[X]", Control.getKeyOrButtonName(Control.MenuConfirm, isController));
+		text = text.Replace("[C]", Control.getKeyOrButtonName(Control.MenuAlt, isController));
 		text = text.Replace("[ATTACK]", Control.getKeyOrButtonName(Control.Shoot, isController));
 		text = text.Replace("[Z]", Control.getKeyOrButtonName(Control.MenuBack, isController));
 		text = text.Replace("[D]", Control.getKeyOrButtonName(Control.Special1, isController));
-		text = text.Replace("[ESC]", Control.getKeyOrButtonName(Control.MenuEnter, isController));
+		text = text.Replace("[ESC]", Control.getKeyOrButtonName(Control.MenuPause, isController));
 		text = text.Replace("[TAB]", Control.getKeyOrButtonName(Control.Scoreboard, isController));
 		text = text.Replace("[JUMP]", Control.getKeyOrButtonName(Control.Jump, isController));
 		text = text.Replace("[DASH]", Control.getKeyOrButtonName(Control.Dash, isController));

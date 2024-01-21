@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using SFML.Graphics;
 using System;
 using System.Collections.Generic;
+using System.IO.Hashing;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
@@ -218,9 +219,9 @@ public partial class Global {
 			DevConsole.toggleInvulnFrames(10);
 		}
 
-		if (Global.input.isPressed(Key.F8)) {
+		//if (Global.input.isPressed(Key.F8)) {
 			//DevConsole.changeTeam();
-		}
+		//}
 
 		if (Global.input.isPressed(Key.F9)) {
 			if (AI.trainingBehavior == AITrainingBehavior.Default) AI.trainingBehavior = AITrainingBehavior.Idle;
@@ -228,7 +229,7 @@ public partial class Global {
 			else if (AI.trainingBehavior == AITrainingBehavior.Attack) AI.trainingBehavior = AITrainingBehavior.Jump;
 			else if (AI.trainingBehavior == AITrainingBehavior.Jump) AI.trainingBehavior = AITrainingBehavior.Default;
 		}
-		if (Global.input.isPressed(Key.F10)) {
+		if (Global.input.isPressed(Key.F8)) {
 			var aiPlayer = Global.level.players[1];
 			if (aiPlayer?.character != null) {
 				if (Global.level.mainPlayer.input == Global.input) {
@@ -434,6 +435,9 @@ public partial class Global {
 			_checksum = value;
 		}
 	}
+	public static string MD5Checksum => (_checksum);
+	
+	public static string CRC32Checksum;
 
 	public static string getShortChecksum() {
 		string retStr = "";
@@ -455,7 +459,7 @@ public partial class Global {
 		using (MD5 md5 = MD5.Create()) {
 			checksum = BitConverter.ToString(md5.ComputeHash(checksumBytes)).Replace("-", String.Empty);
 		}
-
+		CRC32Checksum = BitConverter.ToString(Crc32.Hash(checksumBytes)).Replace("-", String.Empty);
 		fileChecksumBlob = "";
 	}
 

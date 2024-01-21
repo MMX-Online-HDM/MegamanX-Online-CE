@@ -271,6 +271,8 @@ public class Sprite {
 		if (actor != null) {
 			if (!actor.shouldDraw()) return;
 		}
+		x = MathF.Round(x);
+		y = MathF.Round(y);
 
 		// Character-specific draw section
 		int[] armors = null;

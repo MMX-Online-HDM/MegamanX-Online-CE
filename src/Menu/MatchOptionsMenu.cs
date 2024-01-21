@@ -43,7 +43,7 @@ public class MatchOptionsMenu : IMainMenu {
                 new MenuOption(startX, startY + (lineH * lineNum++),
 					() =>
 					{
-						if (Global.input.isPressedMenu(Control.MenuSelectPrimary))
+						if (Global.input.isPressedMenu(Control.MenuConfirm))
 						{
 							if (canSuicide())
 							{
@@ -60,7 +60,7 @@ public class MatchOptionsMenu : IMainMenu {
                 new MenuOption(startX, startY + (lineH * lineNum++),
 					() =>
 					{
-						if (Global.input.isPressedMenu(Control.MenuSelectPrimary))
+						if (Global.input.isPressedMenu(Control.MenuConfirm))
 						{
 							if (canChangeToTeam())
 							{
@@ -84,7 +84,7 @@ public class MatchOptionsMenu : IMainMenu {
 
 						var otherPlayers = Global.level.spectatablePlayers();
 
-						if (Global.input.isPressedMenu(Control.MenuSelectPrimary))
+						if (Global.input.isPressedMenu(Control.MenuConfirm))
 						{
 							Global.level.setMainPlayerSpectate();
 							Menu.exit();
@@ -101,7 +101,7 @@ public class MatchOptionsMenu : IMainMenu {
 					() =>
 					{
 						if (!canAddBot()) return;
-						if (Global.input.isPressedMenu(Control.MenuSelectPrimary))
+						if (Global.input.isPressedMenu(Control.MenuConfirm))
 						{
 							Menu.change(new AddBotMenu(this));
 						}
@@ -127,7 +127,7 @@ public class MatchOptionsMenu : IMainMenu {
 							removeBotIndex++;
 							if (removeBotIndex >= bots.Count) removeBotIndex = 0;
 						}
-						else if (Global.input.isPressedMenu(Control.MenuSelectPrimary))
+						else if (Global.input.isPressedMenu(Control.MenuConfirm))
 						{
                             // Don't allow removing a bot if it would unbalance the teams
                             if (isPublicMatch() && Global.level.gameMode.isTeamMode)
@@ -158,7 +158,7 @@ public class MatchOptionsMenu : IMainMenu {
                 new MenuOption(startX, startY + (lineH * lineNum++),
 					() =>
 					{
-						if (Global.input.isPressedMenu(Control.MenuSelectPrimary))
+						if (Global.input.isPressedMenu(Control.MenuConfirm))
 						{
 							Menu.change(new ChatHistoryMenu(this));
 						}
@@ -171,7 +171,7 @@ public class MatchOptionsMenu : IMainMenu {
                 new MenuOption(startX, startY + (lineH * lineNum++),
 					() =>
 					{
-						if (Global.input.isPressedMenu(Control.MenuSelectPrimary))
+						if (Global.input.isPressedMenu(Control.MenuConfirm))
 						{
 							Global.level.gameMode.chatMenu.chatEnabled = !Global.level.gameMode.chatMenu.chatEnabled;
 						}
@@ -196,7 +196,7 @@ public class MatchOptionsMenu : IMainMenu {
 							playerMuteIndex++;
 							if (playerMuteIndex >= players.Count) playerMuteIndex = 0;
 						}
-						if (Global.input.isPressedMenu(Control.MenuSelectPrimary))
+						if (Global.input.isPressedMenu(Control.MenuConfirm))
 						{
 							if (muteCooldown == 0)
 							{
@@ -235,7 +235,7 @@ public class MatchOptionsMenu : IMainMenu {
 							playerReportIndex++;
 							if (playerReportIndex >= playersIncludingSelf.Count) playerReportIndex = 0;
 						}
-						if (Global.input.isPressedMenu(Control.MenuSelectPrimary))
+						if (Global.input.isPressedMenu(Control.MenuConfirm))
 						{
 							var oldMenu = this;
 							Menu.change(new ConfirmLeaveMenu(this, "Report player " + playerToReport.name + "?\nThis will generate a report_[name].txt\nfile in your game folder;\nsend it to your server admin.", () =>
@@ -266,7 +266,7 @@ public class MatchOptionsMenu : IMainMenu {
 							playerKickIndex++;
 							if (playerKickIndex >= players.Count) playerKickIndex = 0;
 						}
-						if (Global.input.isPressedMenu(Control.MenuSelectPrimary))
+						if (Global.input.isPressedMenu(Control.MenuConfirm))
 						{
 							Menu.change(new KickMenu(this, playerToKick));
 						}
@@ -283,7 +283,7 @@ public class MatchOptionsMenu : IMainMenu {
 					{
 						if (!canResetFlags()) return;
 
-						if (Global.input.isPressedMenu(Control.MenuSelectPrimary))
+						if (Global.input.isPressedMenu(Control.MenuConfirm))
 						{
 							string confirmMsg = "Vote Reset Flags: are you sure?";
 							Menu.change(new ConfirmLeaveMenu(this, confirmMsg, () =>
@@ -304,7 +304,7 @@ public class MatchOptionsMenu : IMainMenu {
 					{
 						if (!canEndMatch()) return;
 
-						if (Global.input.isPressedMenu(Control.MenuSelectPrimary))
+						if (Global.input.isPressedMenu(Control.MenuConfirm))
 						{
 							string confirmMsg = canEndMatchWithoutVote() ? "End Match: are you sure?" : "Vote End Match: are you sure?";
 							Menu.change(new ConfirmLeaveMenu(this, confirmMsg, () =>

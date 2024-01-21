@@ -63,15 +63,21 @@ public class MainMenu : IMainMenu {
 
 		if (Global.input.isPressed(Key.F1)) {
 			Menu.change(new TextExportMenu(
-				new string[] { "Below is your checksum version:" },
-				"checksum", Global.checksum, this)
+				new string[] {
+					"Below is your checksum versions.",
+					"",
+					"CRC32:",
+					Global.CRC32Checksum,
+					"MD5:"
+				},
+				"checksum", Global.MD5Checksum, this)
 			);
 			return;
 		}
 
 		Helpers.menuUpDown(ref selectY, 0, 6);
 
-		if (Global.input.isPressedMenu(Control.MenuSelectPrimary)) {
+		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 			// Before joining or creating make sure client is up to date
 			if (selectY == 0 || selectY == 1) {
 				Menu.change(new PreJoinOrHostMenu(this, selectY == 0));
@@ -187,42 +193,60 @@ public class MainMenu : IMainMenu {
 		Fonts.drawText(FontType.BlueMenu, "Settings", startX, optionPos[5].y, selected: selectY == 5);
 		Fonts.drawText(FontType.BlueMenu, "Quit", startX, optionPos[6].y, selected: selectY == 6);
 
-		Fonts.drawText(
-			FontType.Grey, "Up/down: Change selection, [X]: Choose",
+		Fonts.drawTextEX(
+			FontType.Grey, "[UP]/[DOWN]: Change selection, [X]: Choose",
 			Global.screenW / 2, Global.screenH - 12, Alignment.Center
 		);
 
 		if (state == 0) {
 			float top = Global.screenH * 0.4f;
 
-			//DrawWrappers.DrawRect(5, top - 20, Global.screenW - 5, top + 60, true, new Color(0, 0, 0), 0, ZIndex.HUD, false);
-			DrawWrappers.DrawRect(5, 5, Global.screenW - 5, Global.screenH - 5, true, new Color(0, 0, 0), 0, ZIndex.HUD, false);
-			Helpers.drawTextStd("Type in a multiplayer name", Global.screenW / 2, top, alignment: Alignment.Center);
+			//DrawWrappers.DrawRect(
+			//	5, top - 20, Global.screenW - 5, top + 60, true, new Color(0, 0, 0), 0, ZIndex.HUD, false
+			//);
+			DrawWrappers.DrawRect(
+				5, 5, Global.screenW - 5, Global.screenH - 5,
+				true, new Color(0, 0, 0), 0, ZIndex.HUD, false
+			);
+			Fonts.drawText(
+				FontType.DarkBlue, "Type in a multiplayer name", Global.screenW / 2, top, alignment: Alignment.Center
+			);
 
 			float xPos = Global.screenW * 0.33f;
-			Helpers.drawTextStd(playerName, xPos, 20 + top, alignment: Alignment.Left);
+			Fonts.drawText(FontType.DarkGreen, playerName, xPos, 20 + top, alignment: Alignment.Left);
 			if (blinkTime >= 0.5f) {
-				float width = Helpers.measureTextStd(TCat.Default, playerName).x;
-				Helpers.drawTextStd("<", xPos + width + 3, 20 + top, alignment: Alignment.Left);
+				int width = Fonts.measureText(FontType.DarkGreen, playerName);
+				Fonts.drawText(FontType.DarkGreen, "|", xPos + width + 3, 20 + top, alignment: Alignment.Left);
 			}
 
-			Helpers.drawTextStd("Press Enter to continue", Global.screenW / 2, 40 + top, alignment: Alignment.Center);
+			Fonts.drawText(
+				FontType.Grey,
+				"Press Enter to continue", Global.screenW / 2, 40 + top, alignment: Alignment.Center
+			);
 		} else if (state == 1) {
 			float top = Global.screenH * 0.25f;
-			DrawWrappers.DrawRect(5, 5, Global.screenW - 5, Global.screenH - 5, true, new Color(0, 0, 0), 0, ZIndex.HUD, false);
-			Helpers.drawTextStd("Loading...", Global.screenW / 2, top, alignment: Alignment.Center, fontSize: 24);
+			DrawWrappers.DrawRect(
+				5, 5, Global.screenW - 5, Global.screenH - 5, true, new Color(0, 0, 0), 0, ZIndex.HUD, false
+			);
+			Fonts.drawText(
+				FontType.Blue, "Loading...", Global.screenW / 2, top, alignment: Alignment.Center
+			);
 		} else {
-			string versionText = "v" + Global.version + " [" + Global.forkName + "]";
+			string versionText = "v" + "20" + " " + Global.shortForkName;
 			/*
-			if (Helpers.compareVersions(Global.version, Global.serverVersion) == -1 && Global.serverVersion != decimal.MaxValue)
-			{
+			if (Helpers.compareVersions(Global.version, Global.serverVersion) == -1 &&
+				Global.serverVersion != decimal.MaxValue
+			) {
 				versionText += "(Update available)";
 			}
 			*/
+			int offset = 2;
 			if (Global.checksum != Global.prodChecksum) {
-				versionText = $"{versionText}\n{Global.checksum}";
+				Fonts.drawText(FontType.DarkPurple, Global.CRC32Checksum, 2, offset);
+				offset += 10;
 			}
-			Helpers.drawTextStd(versionText, 2, 1, Alignment.Left, fontSize: 16);
+			Fonts.drawText(FontType.DarkBlue, versionText, 2, offset);
+			
 		}
 	}
 }

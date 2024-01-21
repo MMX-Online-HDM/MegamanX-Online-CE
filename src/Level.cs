@@ -1231,11 +1231,11 @@ public partial class Level {
 				Actor followActor = camPlayer.character?.getFollowActor();
 				Point expectedCamPos = computeCamPos(camPos, new Point(playerX, playerY));
 
-				var moveDeltaX = camX - playerX;
-				var moveDeltaY = camY - playerY;
+				float moveDeltaX = camX - playerX;
+				float moveDeltaY = camY - playerY;
 
-				var fullDeltaX = expectedCamPos.x - camX;
-				var fullDeltaY = expectedCamPos.y - camY;
+				float fullDeltaX = expectedCamPos.x - camX;
+				float fullDeltaY = expectedCamPos.y - camY;
 
 				if (followActor != null && followActor.grounded == false) {
 					if (fullDeltaY > -54 && fullDeltaY < 20 && 
@@ -1254,8 +1254,8 @@ public partial class Level {
 					unlockfollow = false;
 				}
 
-				var deltaX = fullDeltaX;
-				var deltaY = fullDeltaY;
+				float deltaX = fullDeltaX;
+				float deltaY = fullDeltaY;
 
 				if (MathF.Abs(deltaX) > 4) {
 					deltaX = 4 * MathF.Sign(fullDeltaX);
@@ -1651,8 +1651,16 @@ public partial class Level {
 					if (grid[i][j].Count > 0) {
 						gridItemCount += grid[i][j].Count;
 						DrawWrappers.DrawRect(j * gridSize, i * gridSize, gridSize + (j * gridSize), gridSize + (i * gridSize), true, new Color(0, 255, 0, 128), 1, ZIndex.HUD + 100, true, Color.Magenta);
-						Helpers.drawTextStd("i:" + i.ToString() + ",j:" + j.ToString(), (j * gridSize) - Global.level.camX / Global.viewSize, 10 + (i * gridSize) - Global.level.camY / Global.viewSize, fontSize: 18);
-						Helpers.drawTextStd("count:" + grid[i][j].Count.ToString(), (j * gridSize) - Global.level.camX / Global.viewSize, (i * gridSize) - Global.level.camY / Global.viewSize, fontSize: 18);
+						Fonts.drawText(
+							FontType.DarkBlue, "i:" + i.ToString() + ",j:" + j.ToString(),
+							(j * gridSize) - Global.level.camX / Global.viewSize,
+							10 + (i * gridSize) - Global.level.camY / Global.viewSize
+						);
+						Fonts.drawText(
+							FontType.DarkPurple, "count:" + grid[i][j].Count.ToString(),
+							(j * gridSize) - Global.level.camX / Global.viewSize,
+							(i * gridSize) - Global.level.camY / Global.viewSize
+						);
 					}
 				}
 			}
@@ -1859,8 +1867,8 @@ public partial class Level {
 			}
 		}
 
-		camX = Helpers.clamp(camX, 0, width - scaledCanvasW);
-		camY = Helpers.clamp(camY, 0, height - scaledCanvasH);
+		camX = MathInt.Round(Helpers.clamp(camX, 0, width - scaledCanvasW));
+		camY = MathInt.Round(Helpers.clamp(camY, 0, height - scaledCanvasH));
 
 		float offsetX = 0;
 		float offsetY = 0;
@@ -1876,8 +1884,8 @@ public partial class Level {
 			yOff = (448 - Global.level.height) / 2;
 		}
 		Global.view.Center = new Vector2f(
-			camCenterX + offsetX,
-			camCenterY + offsetY + yOff
+			MathInt.Round(camCenterX + offsetX),
+			MathInt.Round(camCenterY + offsetY + yOff)
 		);
 		Global.window.SetView(Global.view);
 		camSetFirstTime = true;

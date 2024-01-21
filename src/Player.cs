@@ -885,7 +885,7 @@ public partial class Player {
 			spawnedOnce = true;
 			return true;
 		}
-		if (!Menu.inMenu && input.isPressedMenu(Control.MenuSelectPrimary)) {
+		if (!Menu.inMenu && input.isPressedMenu(Control.MenuConfirm)) {
 			return true;
 		}
 		if (respawnTime < -10) {

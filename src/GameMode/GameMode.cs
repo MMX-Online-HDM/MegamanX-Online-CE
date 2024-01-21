@@ -7,15 +7,6 @@ using System.Linq;
 
 namespace MMXOnline;
 
-public enum HUDHealthPosition {
-	Left,
-	Right,
-	TopLeft,
-	TopRight,
-	BotLeft,
-	BotRight
-}
-
 public class GameMode {
 	public const string Deathmatch = "deathmatch";
 	public const string TeamDeathmatch = "team deathmatch";
@@ -29,40 +20,6 @@ public class GameMode {
 		Deathmatch, TeamDeathmatch, CTF, KingOfTheHill,
 		ControlPoint, Elimination, TeamElimination
 	};
-
-	public static bool isStringTeamMode(string selectedGameMode) {
-		if (selectedGameMode == CTF || selectedGameMode == TeamDeathmatch || selectedGameMode == ControlPoint || selectedGameMode == TeamElimination || selectedGameMode == KingOfTheHill) {
-			return true;
-		}
-		return false;
-	}
-
-	public static string abbreviatedMode(string mode) {
-		if (mode == TeamDeathmatch) return "tdm";
-		else if (mode == CTF) return "ctf";
-		else if (mode == ControlPoint) return "cp";
-		else if (mode == Elimination) return "elim";
-		else if (mode == TeamElimination) return "t.elim";
-		else if (mode == KingOfTheHill) return "koth";
-		else if (mode == Race) return "race";
-		else return "dm";
-	}
-
-	public bool useTeamSpawns() {
-		return (this is CTF) || (this is ControlPoints) || (this is KingOfTheHill);
-	}
-
-	public float getAmmoModifier() {
-		/*
-		if (level.is1v1())
-		{
-			if (Global.level.server.playTo == 1) return 0.25f;
-			if (Global.level.server.playTo == 2) return 0.5f;
-		}
-		return 1;
-		*/
-		return 1;
-	}
 
 	public const int blueAlliance = 0;
 	public const int redAlliance = 1;
@@ -91,6 +48,56 @@ public class GameMode {
 	public float localElimTimeInc;  // Used to "client side predict" the elimination time increase.
 	public byte virusStarted;
 	public byte safeZoneSpawnIndex;
+
+	bool loggedStatsOnce;
+	float goTime;
+
+	public Player mainPlayer { get { return level?.mainPlayer; } }
+
+	public RPCMatchOverResponse matchOverResponse;
+	public bool isOver { get { return matchOverResponse != null; } }
+
+	public int lastTimeInt;
+	public int lastSetupTimeInt;
+	public float periodicHostSyncTime;
+	public float syncValueTime;
+
+	bool changedEndMenuOnce;
+	bool changedEndMenuOnceHost;
+
+	public ChatMenu chatMenu;
+
+	public List<KillFeedEntry> killFeed = new List<KillFeedEntry>();
+	public List<string> killFeedHistory = new List<string>();
+
+	bool removedGates;
+	public HostMenu nextMatchHostMenu;
+
+	float flashTime;
+	float flashCooldown;
+
+	public float hudErrorMsgTime;
+	string hudErrorMsg;
+
+	public Player hudTopLeftPlayer;
+	public Player hudTopRightPlayer;
+	public Player hudLeftPlayer;
+	public Player hudRightPlayer;
+	public Player hudBotLeftPlayer;
+	public Player hudBotRightPlayer;
+
+	bool hudPositionsAssigned;
+	int currentLineH;
+
+	public enum HUDHealthPosition {
+		Left,
+		Right,
+		TopLeft,
+		TopRight,
+		BotLeft,
+		BotRight
+	}
+
 	public Point safeZonePoint {
 		get {
 			return level.spawnPoints[safeZoneSpawnIndex].pos;
@@ -126,18 +133,39 @@ public class GameMode {
 		}
 	}
 
-	public RPCMatchOverResponse matchOverResponse;
-	public bool isOver { get { return matchOverResponse != null; } }
+	public static bool isStringTeamMode(string selectedGameMode) {
+		if (selectedGameMode == CTF || selectedGameMode == TeamDeathmatch || selectedGameMode == ControlPoint || selectedGameMode == TeamElimination || selectedGameMode == KingOfTheHill) {
+			return true;
+		}
+		return false;
+	}
 
-	public int lastTimeInt;
-	public int lastSetupTimeInt;
-	public float periodicHostSyncTime;
-	public float syncValueTime;
+	public static string abbreviatedMode(string mode) {
+		if (mode == TeamDeathmatch) return "tdm";
+		else if (mode == CTF) return "ctf";
+		else if (mode == ControlPoint) return "cp";
+		else if (mode == Elimination) return "elim";
+		else if (mode == TeamElimination) return "t.elim";
+		else if (mode == KingOfTheHill) return "koth";
+		else if (mode == Race) return "race";
+		else return "dm";
+	}
 
-	bool changedEndMenuOnce;
-	bool changedEndMenuOnceHost;
+	public bool useTeamSpawns() {
+		return (this is CTF) || (this is ControlPoints) || (this is KingOfTheHill);
+	}
 
-	public ChatMenu chatMenu;
+	public float getAmmoModifier() {
+		/*
+		if (level.is1v1())
+		{
+			if (Global.level.server.playTo == 1) return 0.25f;
+			if (Global.level.server.playTo == 2) return 0.5f;
+		}
+		return 1;
+		*/
+		return 1;
+	}
 
 	public static void getAllianceCounts(List<Player> players, out int redCount, out int blueCount) {
 		redCount = players.Count(p => p.alliance == redAlliance && !p.isSpectator);
@@ -149,8 +177,6 @@ public class GameMode {
 		blueCount = players.Count(p => p.alliance == blueAlliance && !p.isSpectator);
 	}
 
-	public Player mainPlayer { get { return level?.mainPlayer; } }
-
 	public GameMode(Level level, int? timeLimit) {
 		this.level = level;
 		if (timeLimit != null) {
@@ -160,8 +186,6 @@ public class GameMode {
 		chatMenu = new ChatMenu();
 	}
 
-	public List<KillFeedEntry> killFeed = new List<KillFeedEntry>();
-	public List<string> killFeedHistory = new List<string>();
 	static List<ChatEntry> getTestChatHistory() {
 		var test = new List<ChatEntry>();
 		for (int i = 0; i < 30; i++) {
@@ -170,7 +194,6 @@ public class GameMode {
 		return test;
 	}
 
-	bool removedGates;
 	public void removeAllGates() {
 		if (!removedGates) removedGates = true;
 		else return;
@@ -188,7 +211,6 @@ public class GameMode {
 		}
 	}
 
-	public HostMenu nextMatchHostMenu;
 	public virtual void update() {
 		Helpers.decrementTime(ref hudErrorMsgTime);
 
@@ -323,22 +345,22 @@ public class GameMode {
 		Helpers.decrementTime(ref UpgradeMenu.subtankDelay);
 
 		if (!isOver) {
-			if (!Menu.inMenu && ((level.mainPlayer.warpedIn && !isWarpIn) || Global.level.mainPlayer.isSpectator) && Global.input.isPressedMenu(Control.MenuEnter) && !chatMenu.recentlyExited) {
+			if (!Menu.inMenu && ((level.mainPlayer.warpedIn && !isWarpIn) || Global.level.mainPlayer.isSpectator) && Global.input.isPressedMenu(Control.MenuPause) && !chatMenu.recentlyExited) {
 				if (mainPlayer.character is Axl axl) {
 					axl.resetToggle();
 				}
 				Menu.change(new InGameMainMenu());
-			} else if (Menu.inMenu && Global.input.isPressedMenu(Control.MenuEnter) && !isBindingControl()) {
+			} else if (Menu.inMenu && Global.input.isPressedMenu(Control.MenuPause) && !isBindingControl()) {
 				Menu.exit();
 			}
 		} else if (Global.serverClient != null) {
 			if (!Global.isHost && !level.is1v1()) {
-				if (!Menu.inMenu && Global.input.isPressedMenu(Control.MenuEnter) && !chatMenu.recentlyExited) {
+				if (!Menu.inMenu && Global.input.isPressedMenu(Control.MenuPause) && !chatMenu.recentlyExited) {
 					if (mainPlayer.character is Axl axl) {
 						axl.resetToggle();
 					}
 					Menu.change(new InGameMainMenu());
-				} else if (Menu.inMenu && Global.input.isPressedMenu(Control.MenuEnter) && !isBindingControl()) {
+				} else if (Menu.inMenu && Global.input.isPressedMenu(Control.MenuPause) && !isBindingControl()) {
 					Menu.exit();
 				}
 			}
@@ -347,12 +369,12 @@ public class GameMode {
 
 			} else {
 				if (Global.isHost) {
-					if ((Menu.mainMenu is HostMenu || Menu.mainMenu is SelectCharacterMenu) && Global.input.isPressedMenu(Control.MenuEnter) && !chatMenu.recentlyExited) {
+					if ((Menu.mainMenu is HostMenu || Menu.mainMenu is SelectCharacterMenu) && Global.input.isPressedMenu(Control.MenuPause) && !chatMenu.recentlyExited) {
 						if (mainPlayer.character is Axl axl) {
 							axl.resetToggle();
 						}
 						Menu.change(new InGameMainMenu());
-					} else if (Menu.inMenu && Global.input.isPressedMenu(Control.MenuEnter) && !chatMenu.recentlyExited) {
+					} else if (Menu.inMenu && Global.input.isPressedMenu(Control.MenuPause) && !chatMenu.recentlyExited) {
 						if (nextMatchHostMenu != null) Menu.change(nextMatchHostMenu);
 					}
 					if (!Menu.inMenu) {
@@ -412,7 +434,7 @@ public class GameMode {
 						}
 					}
 				} else {
-					if (Global.input.isPressedMenu(Control.MenuEnter)) {
+					if (Global.input.isPressedMenu(Control.MenuPause)) {
 						Global.leaveMatchSignal = new LeaveMatchSignal(LeaveMatchScenario.MatchOver, null, null);
 					}
 				}
@@ -477,8 +499,6 @@ public class GameMode {
 		}
 	}
 
-	float flashTime;
-	float flashCooldown;
 	public virtual void render() {
 		if (level.mainPlayer == null) return;
 
@@ -544,6 +564,9 @@ public class GameMode {
 				}
 			}
 		}
+		if (DevConsole.showConsole) {
+			return;
+		}
 
 		if (!Global.level.mainPlayer.isSpectator) {
 			renderHealthAndWeapons();
@@ -554,7 +577,7 @@ public class GameMode {
 				Helpers.drawTextStd(TCat.HUD, "x" + Global.level.mainPlayer.scrap.ToString(), 17, 139, Alignment.Left, fontSize: 32u);
 			}*/
 			MegamanX mmx = mainPlayer.character as MegamanX;
-			
+
 			if (mmx != null && mmx.unpoShotCount > 0) {
 				int x = 10, y = 156;
 				int count = mmx.unpoShotCount;
@@ -710,8 +733,6 @@ public class GameMode {
 		}
 	}
 
-	public float hudErrorMsgTime;
-	string hudErrorMsg;
 	public void setHUDErrorMessage(Player player, string message, bool playSound = true, bool resetCooldown = false) {
 		if (player != level.mainPlayer) return;
 		if (resetCooldown) hudErrorMsgTime = 0;
@@ -865,13 +886,6 @@ public class GameMode {
 		DrawWrappers.DrawRect(radarX + camStartX, radarY + camStartY, radarX + camEndX, radarY + camEndY, true, new Color(0, 0, 0, 0), borderThickness * 0.5f, ZIndex.HUD, isWorldPos: false, outlineColor: new Color(255, 255, 255));
 	}
 
-	public Player hudTopLeftPlayer;
-	public Player hudTopRightPlayer;
-	public Player hudLeftPlayer;
-	public Player hudRightPlayer;
-	public Player hudBotLeftPlayer;
-	public Player hudBotRightPlayer;
-
 	public void draw1v1PlayerTopHUD(Player player, HUDHealthPosition position) {
 		if (player == null) return;
 
@@ -983,7 +997,6 @@ public class GameMode {
 		}
 	}
 
-	bool hudPositionsAssigned;
 	public void renderHealthAndWeapons() {
 		bool is1v1OrTraining = level.is1v1() || level.levelData.isTraining();
 		if (!is1v1OrTraining) {
@@ -1104,7 +1117,7 @@ public class GameMode {
 		Global.sprites[healthBaseSprite].drawToHUD(frameIndex, baseX, baseY);
 		baseY -= 16;
 		int barIndex = 0;
-		
+
 		MegamanX mmx = mainPlayer.character as MegamanX;
 		if (mmx != null && (mmx.isHyperX == true || player.character?.charState is XRevive)) {
 			if (mmx.unpoDamageMaxCooldown >= 2) barIndex = 1;
@@ -1112,16 +1125,14 @@ public class GameMode {
 			else if (mmx.unpoDamageMaxCooldown >= 0.5f) barIndex = 4;
 			else barIndex = 5;
 		}
-		
+
 		for (var i = 0; i < MathF.Ceiling(maxHealth); i++) {
 			// Draw HP
 			if (i < MathF.Ceiling(health)) {
 				Global.sprites["hud_health_full"].drawToHUD(barIndex, baseX, baseY);
-			}
-			else if (i < MathInt.Ceiling(health) + damageSavings) {
+			} else if (i < MathInt.Ceiling(health) + damageSavings) {
 				Global.sprites["hud_health_full"].drawToHUD(4, baseX, baseY);
-			}
-			else {
+			} else {
 				Global.sprites["hud_health_empty"].drawToHUD(0, baseX, baseY);
 			}
 
@@ -1138,14 +1149,18 @@ public class GameMode {
 	}
 
 	const int grayAmmoIndex = 30;
-	public void renderAmmo(float baseX, ref float baseY, int baseIndex, int barIndex, float ammo, float grayAmmo = 0, float maxAmmo = 32) {
+	public void renderAmmo(
+		float baseX, ref float baseY, int baseIndex,
+		int barIndex, float ammo, float grayAmmo = 0, float maxAmmo = 32,
+		bool allowSmall = true
+	) {
 		baseY += 25;
 		Global.sprites["hud_weapon_base"].drawToHUD(baseIndex, baseX, baseY);
 		baseY -= 16;
 
 		// Puppeteer small energy bars.
 		bool forceSmallBarsOff = false;
-		if (!Options.main.smallBarsEx) {
+		if (!Options.main.smallBarsEx || !allowSmall && maxAmmo > 16) {
 			forceSmallBarsOff = true;
 		}
 
@@ -1192,51 +1207,37 @@ public class GameMode {
 		}
 
 		if (player.isSigma) {
-			if (player.character == null || (player.isSigma3() && player.currentMaverick == null) || (player.isSigma1() && player.character.isHyperSigmaBS.getValue())) {
+			if (player.character == null ||
+				(player.isSigma3() && player.currentMaverick == null) ||
+				(player.isSigma1() && player.character.isHyperSigmaBS.getValue())
+			) {
 				return;
 			}
-
-			if (player.isMainPlayer && player.currentMaverick is StormEagle se && se.ammo < 32) {
-				renderAmmo(baseX, ref baseY, 44, 38, player.currentMaverick.ammo);
-			} else if (player.isMainPlayer && player.currentMaverick is MorphMoth me && player.currentMaverick.ammo < 32) {
-				renderAmmo(baseX, ref baseY, 53, 42, player.currentMaverick.ammo);
-			} else if (player.isMainPlayer && player.currentMaverick is MorphMothCocoon mmc) {
-				renderAmmo(baseX, ref baseY, 52, 41, player.currentMaverick.ammo);
-			} else if (player.isMainPlayer && player.currentMaverick is CrystalSnail cs && player.currentMaverick.ammo < 32 && !cs.noShell) {
-				renderAmmo(baseX, ref baseY, 54, 43, player.currentMaverick.ammo);
+			if (player.isMainPlayer && player.currentMaverick.canFly &&
+				player.currentMaverick.flyBar < player.currentMaverick.maxFlyBar
+			) {
+				renderAmmo(
+					baseX, ref baseY,
+					player.currentMaverick.flyBarIndexes.icon,
+					player.currentMaverick.flyBarIndexes.units,
+					MathF.Ceiling((player.currentMaverick.flyBar / player.currentMaverick.maxAmmo) * 28),
+					maxAmmo: 28, allowSmall: false
+				);
 			}
-			  /*
-			  else if (player.isMainPlayer && player.currentMaverick is SparkMandrill)
-			  {
-				  renderAmmo(baseX, ref baseY, 55, 44, player.currentMaverick.ammo, grayAmmo: 31);
-			  }
-			  */
-			  else if (player.isMainPlayer && player.currentMaverick is ArmoredArmadillo) {
-				renderAmmo(baseX, ref baseY, 56, 45, player.currentMaverick.ammo, grayAmmo: 8);
-			} else if (player.isMainPlayer && player.currentMaverick is StingChameleon) {
-				renderAmmo(baseX, ref baseY, 57, 46, player.currentMaverick.ammo, grayAmmo: 8);
-			} else if (player.isMainPlayer && player.currentMaverick is BoomerKuwanger) {
-				renderAmmo(baseX, ref baseY, 58, 47, player.currentMaverick.ammo, grayAmmo: 8);
-			} else if (player.isMainPlayer && player.currentMaverick is MagnaCentipede) {
-				renderAmmo(baseX, ref baseY, 59, 48, player.currentMaverick.ammo, grayAmmo: 8);
-			} else if (player.isMainPlayer && player.currentMaverick is FakeZero) {
-				renderAmmo(baseX, ref baseY, 60, 49, player.currentMaverick.ammo, grayAmmo: 2);
+			if (player.isMainPlayer && player.currentMaverick.usesAmmo) {
+				renderAmmo(
+					baseX, ref baseY,
+					player.currentMaverick.barIndexes.icon,
+					player.currentMaverick.barIndexes.units,
+					player.currentMaverick.ammo,
+					player.currentMaverick.grayAmmoLevel,
+					player.currentMaverick.maxAmmo
+				);
 			}
 			if (player.isSigma2() && player.character.isHyperSigmaBS.getValue() && player.currentMaverick == null) {
 				renderAmmo(baseX, ref baseY, 61, 50, player.sigmaAmmo, grayAmmo: player.weapon.getAmmoUsage(0));
-			} else if (player.isMainPlayer && player.currentMaverick is BubbleCrab) {
-				renderAmmo(baseX, ref baseY, 62, 51, player.currentMaverick.ammo, grayAmmo: 8);
-			} else if (player.isMainPlayer && player.currentMaverick is VoltCatfish) {
-				renderAmmo(baseX, ref baseY, 65, 54, player.currentMaverick.ammo, grayAmmo: 8);
-			} else if (player.isMainPlayer && player.currentMaverick is DrDoppler) {
-				renderAmmo(baseX, ref baseY, 66, 55, player.currentMaverick.ammo, grayAmmo: 8);
-			} else if (player.isMainPlayer && player.currentMaverick is ToxicSeahorse) {
-				renderAmmo(baseX, ref baseY, 67, 56, player.currentMaverick.ammo, grayAmmo: 8);
-			} else if (player.isMainPlayer && player.currentMaverick is BlastHornet bh && bh.ammo < 32) {
-				renderAmmo(baseX, ref baseY, 68, 57, player.currentMaverick.ammo);
-			} else if (player.isMainPlayer && player.currentMaverick is LaunchOctopus lo) {
-				renderAmmo(baseX, ref baseY, 71, 60, player.currentMaverick.ammo);
-			} else if (player.isMainPlayer && player.currentMaverick == null) {
+			}
+			else if (player.isMainPlayer && player.currentMaverick == null) {
 				int hudWeaponBaseIndex = 50;
 				int hudWeaponFullIndex = 39;
 				int floorOrCeil = MathInt.Ceiling(player.sigmaMaxAmmo * ammoDisplayMultiplier);
@@ -1412,7 +1413,6 @@ public class GameMode {
 		}
 	}
 
-	int currentLineH;
 	public void drawDiagnostics() {
 		if (Global.showDiagnostics) {
 			double? downloadedBytes = 0;
@@ -1744,9 +1744,7 @@ public class GameMode {
 				float alpha = Helpers.clamp01(1 - animProgress);
 				Global.sprites["hud_scrap"].drawToHUD(0, x - 6, y - yOff - 10, alpha);
 				//DrawWrappers.DrawText("+1", x - 6, y - yOff - 10, Alignment.Center, )
-				Color color = new Color(0, 255, 0, (byte)(int)(alpha * 255));
-				Color outlineColor = new Color(0, 0, 0, (byte)(int)(alpha * 255));
-				Helpers.drawTextStd("+1", x - 4, y - yOff - 15, Alignment.Left, fontSize: 18, color: color, outlineColor: outlineColor);
+				Fonts.drawText(FontType.RedishOrange, "+1", x - 4, y - yOff - 15, Alignment.Left);
 			}
 		}
 
@@ -1848,7 +1846,7 @@ public class GameMode {
 		int sigmaForm = dnaCore.loadout?.sigmaLoadout?.sigmaForm ?? 0;
 
 		sy += 5;
-		Helpers.drawTextStd(dnaCore.name, x, sy, fontSize: 24, alignment: Alignment.Center);
+		Fonts.drawText(FontType.RedishOrange, dnaCore.name, x, sy);
 		sy += 30;
 		if (dnaCore.charNum == 0) {
 			if (dnaCore.ultimateArmor) {
@@ -1895,10 +1893,10 @@ public class GameMode {
 			if (dnaCore.hyperMode == DNACoreHyperMode.VileMK5) index = 2;
 			Global.sprites["menu_vile"].drawToHUD(index, x, sy + 2);
 			if (dnaCore.frozenCastle) {
-				Helpers.drawTextStd("F", x - 25, sy, fontSize: 24, color: new Color(23, 232, 255));
+				Fonts.drawText(FontType.DarkBlue, "F", x - 25, sy);
 			}
 			if (dnaCore.speedDevil) {
-				Helpers.drawTextStd("S", x + 20, sy, fontSize: 24, color: new Color(213, 154, 245));
+				Fonts.drawText(FontType.DarkPurple, "S", x + 20, sy);
 			}
 		} else if (dnaCore.charNum == 3) {
 			Global.sprites["menu_axl"].drawToHUD(dnaCore.hyperMode == DNACoreHyperMode.WhiteAxl ? 1 : 0, x, sy + 4);
@@ -2090,7 +2088,7 @@ public class GameMode {
 		int col5x = (int)Math.Floor(Global.screenW * 0.85);
 		int lineY = padding + 20;
 		var labelTextY = lineY + 2;
-		int line2Y = lineY + 12;	
+		int line2Y = lineY + 12;
 		int topPlayerY = line2Y + 2;
 		DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
 
@@ -2337,7 +2335,6 @@ public class GameMode {
 		return Color.White;
 	}
 
-	float goTime;
 	public void drawTimeIfSet(int yPos) {
 		if (setupTime > 0) {
 			var timespan = new TimeSpan(0, 0, MathInt.Ceiling(setupTime.Value));
@@ -2503,7 +2500,6 @@ public class GameMode {
 		}
 	}
 
-	bool loggedStatsOnce;
 	public void logStats() {
 		if (loggedStatsOnce) return;
 		loggedStatsOnce = true;

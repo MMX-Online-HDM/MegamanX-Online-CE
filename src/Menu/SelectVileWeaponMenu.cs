@@ -47,7 +47,7 @@ public class SelectVileWeaponMenu : IMainMenu {
 
 	public void update() {
 		if (!string.IsNullOrEmpty(error)) {
-			if (Global.input.isPressedMenu(Control.MenuSelectPrimary)) {
+			if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 				error = null;
 			}
 			return;
@@ -65,7 +65,7 @@ public class SelectVileWeaponMenu : IMainMenu {
 		Helpers.menuUpDown(ref selCursorIndex, 0, vileWeaponCategories.Count - 1);
 
 		bool backPressed = Global.input.isPressedMenu(Control.MenuBack);
-		bool selectPressed = Global.input.isPressedMenu(Control.MenuSelectPrimary) || (backPressed && !inGame);
+		bool selectPressed = Global.input.isPressedMenu(Control.MenuConfirm) || (backPressed && !inGame);
 		if (selectPressed) {
 			if (getWeightSum() > VileLoadout.maxWeight) {
 				error = "Cannot exceed maximum loadout weight.";

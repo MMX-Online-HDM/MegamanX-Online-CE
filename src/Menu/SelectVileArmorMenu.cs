@@ -31,7 +31,7 @@ public class SelectVileArmorMenu : IMainMenu {
 
 		Helpers.menuUpDown(ref selectArrowPosY, 0, 1);
 
-		if (Global.input.isPressedMenu(Control.MenuSelectPrimary)) {
+		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 			if (selectArrowPosY == 0) {
 				if (!mainPlayer.frozenCastle && mainPlayer.scrap >= Vile.frozenCastleCost) {
 					mainPlayer.frozenCastle = true;

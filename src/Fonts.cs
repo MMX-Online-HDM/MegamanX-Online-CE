@@ -11,6 +11,18 @@ using static SFML.Graphics.Text;
 namespace MMXOnline;
 
 public class Fonts {
+	public static void drawTextEX(
+		FontType fontType, string textStr, float x, float y,
+		Alignment alignment = Alignment.Left, bool isWorldPos = false, bool selected = false,
+		FontType? selectedFont = null, long depth = 0
+	) {
+		drawText(
+			fontType, Helpers.controlText(textStr), x, y,
+			alignment, isWorldPos, selected,
+			selectedFont, depth
+		);
+	}
+
 	public static void drawText(
 		FontType fontType, string textStr, float x, float y,
 		Alignment alignment = Alignment.Left, bool isWorldPos = false, bool selected = false,
@@ -134,6 +146,10 @@ public class Fonts {
 			}
 		}
 		return size;
+	}
+
+	public static int measureText(FontType fontType, string text) {
+		return measureText(getFontSrt(fontType), text);
 	}
 
 	public static Dictionary<string, int[]> fontSizes = new();

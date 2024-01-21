@@ -275,7 +275,7 @@ class Program {
 					Global.cheats();
 				}
 				if (Options.main.isDeveloperConsoleEnabled() && Menu.chatMenu != null) {
-					if (Global.input.isPressed(Key.F11)) {
+					if (Global.input.isPressed(Key.F10)) {
 						DevConsole.toggleShow();
 					}
 				}
@@ -313,16 +313,16 @@ class Program {
 			if (Global.level.gameMode.shouldDrawRadar()) {
 				yPos = 219;
 			}
-			Fonts.drawText(
-				FontType.BlueMenu, "VFPS:" + vfps.ToString(), Global.screenW - 5, yPos - 10,
-				Alignment.Right
-			);
+			//Fonts.drawText(
+			//	FontType.BlueMenu, "VFPS:" + vfps.ToString(), Global.screenW - 5, yPos - 10,
+			//	Alignment.Right
+			//);
 			Fonts.drawText(
 				FontType.BlueMenu, "FPS:" + fps.ToString(), Global.screenW - 5, yPos,
 				Alignment.Right
 			);
 		}
-
+		// TODO: Make this work for errors.
 		if (Global.debug) {
 			//Draw debug strings
 			//Global.debugString1 = ((int)Math.Round(1.0f / Global.spf2)).ToString();
@@ -330,9 +330,9 @@ class Program {
 				Global.debugString2 = Mathf.Floor(Global.level.character.pos.x / 8).ToString("0") + "," +
 				Mathf.Floor(Global.level.character.pos.y / 8).ToString("0");
 			}*/
-			Helpers.drawTextStd(Global.debugString1, 20, 20);
-			Helpers.drawTextStd(Global.debugString2, 20, 40);
-			Helpers.drawTextStd(Global.debugString3, 20, 60);
+			Fonts.drawText(FontType.Red, Global.debugString1, 20, 20);
+			Fonts.drawText(FontType.Red, Global.debugString2, 20, 30);
+			Fonts.drawText(FontType.Red, Global.debugString3, 20, 40);
 		}
 
 		DevConsole.drawConsole();
@@ -904,9 +904,11 @@ class Program {
 	public static void mainLoop(RenderWindow window) {
 		// Variables for stuff.
 		decimal deltaTime = 0;
+		decimal deltaTimeAlt = 0;
 		decimal deltaTimeSavings = 0;
 		decimal lastUpdateTime = 0;
 		decimal fpsLimit = (TimeSpan.TicksPerSecond / 60m);
+		decimal fpsLimitAlt = (TimeSpan.TicksPerSecond / 240m);
 		long lastSecondFPS = 0;
 		int videoUpdatesThisSecond = 0;
 		int framesUpdatesThisSecond = 0;
@@ -914,12 +916,20 @@ class Program {
 
 		// Main loop itself.
 		while (window.IsOpen) {
-			var timeSpam = (DateTimeOffset.UtcNow - Global.UnixEpoch);
+			TimeSpan timeSpam = (DateTimeOffset.UtcNow - Global.UnixEpoch);
 			long timeNow = timeSpam.Ticks;
-			long timeSecondsNow = (long)Math.Floor(timeSpam.TotalSeconds);
 
 			// Framerate calculations.
 			deltaTime = deltaTimeSavings + ((timeNow - lastUpdateTime) / fpsLimit);
+			deltaTimeAlt = deltaTimeSavings + ((timeNow - lastUpdateTime) / fpsLimitAlt);
+			if (deltaTime >= 1 || deltaTimeAlt >= 1) {
+				window.DispatchEvents();
+			}
+			if (deltaTime >= 1) {
+			} else {
+				continue;
+			}
+			long timeSecondsNow = (long)Math.Floor(timeSpam.TotalSeconds);
 			if (timeSecondsNow > lastSecondFPS) {
 				Global.currentFPS = videoUpdatesThisSecond;
 				Global.logicFPS = framesUpdatesThisSecond;
@@ -927,63 +937,55 @@ class Program {
 				videoUpdatesThisSecond = 0;
 				framesUpdatesThisSecond = 0;
 			}
-
 			// Disable frameskip in the menu.
 			if (Global.level != null) {
 				useFrameSkip = true;
 			} else {
 				useFrameSkip = false;
 			}
-
-			window.DispatchEvents();
 			if (Global.isMouseLocked) {
 				Mouse.SetPosition(new Vector2i((int)Global.halfScreenW, (int)Global.halfScreenH), Global.window);
 			}
-
 			var clearColor = Color.Black;
 			if (Global.level?.levelData?.bgColor != null) {
 				clearColor = Global.level.levelData.bgColor;
 			}
+			if (!useFrameSkip) {
+				update();
+				framesUpdatesThisSecond++;
+				deltaTime = 0;
+			} else {
+				// Logic update happens here.
+				while (deltaTime >= 1) {
+					// This is to only send RPC is when not frameskipping.
+					if (deltaTime >= 2) {
+						Global.isSkippingFrames = true;
+					} else {
+						Global.isSkippingFrames = false;
+					}
+					// Main update loop.
+					update();
+					deltaTime--;
+					framesUpdatesThisSecond++;
+				}
+			}
+			if (deltaTime < 0.001m) {
+				deltaTime = 0;
+			}
+			//deltaTimeSavings = deltaTime;
+			videoUpdatesThisSecond++;
+			Global.isSkippingFrames = false;
+			Global.input.clearInput();
+			lastUpdateTime = timeNow;
+			window.Clear(clearColor);
+			render();
+			window.Display();
 			/*
 			long prevPackets = 0;
 			if (Global.showDiagnostics) {
 				diagnosticsClock.Restart();
 				prevPackets = getBytesPerFrame();
 			}
-			*/
-			if (deltaTime >= 1) {
-				if (!useFrameSkip) {
-					update();
-					framesUpdatesThisSecond++;
-					deltaTime = 0;
-				} else {
-					if (deltaTime > 60) {
-						deltaTime = 1;
-					}
-					while (deltaTime >= 1) {
-						if (deltaTime >= 2) {
-							Global.isSkippingFrames = true;
-						} else {
-							Global.isSkippingFrames = false;
-						}
-						update();
-						deltaTime--;
-						framesUpdatesThisSecond++;
-					}
-				}
-				if (deltaTime <= 0) {
-					deltaTime = 0;
-				}
-				deltaTimeSavings = deltaTime;
-				videoUpdatesThisSecond++;
-				Global.isSkippingFrames = false;
-				Global.input.clearInput();
-				lastUpdateTime = timeNow;
-				window.Clear(clearColor);
-				render();
-				window.Display();
-			}
-			/*
 			if (Global.showDiagnostics) {
 				Global.lastFrameProcessTime = diagnosticsClock.ElapsedTime.AsMilliseconds();
 				Global.lastFrameProcessTimes.Add(Global.lastFrameProcessTime);

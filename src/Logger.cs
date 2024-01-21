@@ -7,6 +7,10 @@ namespace MMXOnline;
 // A logging class designed to log analytics and stats to some analytics server for analysis of game balance, trends, etc.
 public class Logger {
 	public static void logException(Exception ex, bool isServer, string additionalDetails = "", bool forceLog = false) {
+		// TODO: Add normal data logging.
+		if (!Global.debug) {
+			return;
+		}
 		// Don't log this benign error
 		if (ex.Message != null && ex.Message.ToLower().Contains("unable to read data from the transport connection")) {
 			return;

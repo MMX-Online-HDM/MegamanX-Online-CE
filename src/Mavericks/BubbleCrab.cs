@@ -30,6 +30,13 @@ public class BubbleCrab : Maverick {
 		if (sendRpc) {
 			createActorRpc(player.id);
 		}
+
+		usesAmmo = true;
+		canHealAmmo = true;
+		ammo = 32;
+		maxAmmo = 32;
+		grayAmmoLevel = 8;
+		barIndexes = (62, 51);
 	}
 
 	public override void update() {

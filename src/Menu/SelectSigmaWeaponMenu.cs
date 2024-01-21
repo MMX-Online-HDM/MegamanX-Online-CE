@@ -66,7 +66,7 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 
 	public void update() {
 		if (!string.IsNullOrEmpty(error)) {
-			if (Global.input.isPressedMenu(Control.MenuSelectPrimary)) {
+			if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 				error = null;
 			}
 			return;
@@ -101,7 +101,7 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 		Helpers.menuUpDown(ref selCursorIndex, 0, 3);
 
 		bool backPressed = Global.input.isPressedMenu(Control.MenuBack);
-		bool selectPressed = Global.input.isPressedMenu(Control.MenuSelectPrimary) || (backPressed && !inGame);
+		bool selectPressed = Global.input.isPressedMenu(Control.MenuConfirm) || (backPressed && !inGame);
 		if (selectPressed) {
 			if (cursors[0].index == cursors[1].index) {
 				error = "Cannot select same maverick more than once!";

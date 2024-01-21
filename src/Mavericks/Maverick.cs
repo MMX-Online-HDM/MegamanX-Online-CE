@@ -39,14 +39,33 @@ public class SavedMaverickData {
 public class Maverick : Actor, IDamagable {
 	public float health;
 	public float maxHealth;
-	public float ammo = 32;
-	public float maxAmmo = 32;
 	private float healAmount = 0;
 	public float healTime = 0;
 	public float weaponHealAmount = 0;
 	public float weaponHealTime = 0;
 	public bool playHealSound;
 
+	// New ammo variables.
+	public float ammo = 32;
+	public float maxAmmo = 32;
+	public float grayAmmoLevel = 0;
+	public bool usesAmmo = false;
+	public bool canHealAmmo = false;
+	public float? ammoHealScale = null;
+	public bool ammoRoundDown = false;
+	public (int icon, int units) barIndexes = (0, 0);
+
+	// Movement.
+	public float dashSpeed = 1;
+	public bool isHeavy;
+	public bool canClimb;
+	public bool canClimbWall;
+	public bool canFly;
+	public float maxFlyBar = 16;
+	public float flyBar = 16;
+	public (int icon, int units) flyBarIndexes = (0, 0);
+
+	// Other vars.
 	public float width;
 	public float height;
 	public float time;
@@ -54,12 +73,7 @@ public class Maverick : Actor, IDamagable {
 	public MaverickState state;
 	public Player player;
 	public bool changedStateInFrame;
-	public float dashSpeed = 1;
-	public bool isHeavy;
 	public Dictionary<Type, MaverickStateCooldown> stateCooldowns = new Dictionary<Type, MaverickStateCooldown>();
-	public bool canFly;
-	public bool canClimb;
-	public bool canClimbWall;
 	public Point? lastGroundedPos;
 	public bool autoExit;
 	public float autoExitTime;
@@ -202,9 +216,9 @@ public class Maverick : Actor, IDamagable {
 
 		if (grounded) {
 			lastGroundedPos = pos;
-			if (canFly) {
-				ammo += Global.spf * 10;
-				if (ammo > 32) ammo = 32;
+			if (canFly && flyBar < maxFlyBar) {
+				flyBar += 1 * Global.speedMul;
+				if (flyBar > maxFlyBar) { flyBar = maxFlyBar; }
 			}
 		}
 

@@ -340,7 +340,7 @@ public class RekkohaProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
-		netcodeOverride = NetcodeModel.FavorDefender;
+		netcodeOverride = NetcodeModel.FavorDefender; 
 	}
 
 	public override void update() {

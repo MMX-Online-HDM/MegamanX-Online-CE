@@ -32,7 +32,7 @@ public class PreJoinOrHostMenu : IMainMenu {
 	public void update() {
 		if (state == 0) {
 			Helpers.menuUpDown(ref selectY, 0, 2);
-			if (Global.input.isPressedMenu(Control.MenuSelectPrimary)) {
+			if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 				if (selectY == 0) {
 					state = 1;
 				} else if (selectY == 2) {
@@ -201,6 +201,6 @@ public class PreJoinOrHostMenu : IMainMenu {
 
 		Fonts.drawText(FontType.DarkBlue, "P2P", startX, optionPos[1].y, selected: selectY == 1);
 
-		Fonts.drawText(FontType.Grey, "[X]: Choose, [Z]: Back", Global.halfScreenW, 206, Alignment.Center);
+		Fonts.drawTextEX(FontType.Grey, "[X]: Choose, [Z]: Back", Global.halfScreenW, 206, Alignment.Center);
 	}
 }

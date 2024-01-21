@@ -10,7 +10,7 @@ namespace MMXOnline;
 public class ChatHistoryMenu : IMainMenu {
 	IMainMenu prevMenu;
 	int yOffset = 0;
-	const int lines = 14;
+	int lines = 12;
 	public ChatHistoryMenu(IMainMenu prevMenu) {
 		this.prevMenu = prevMenu;
 	}
@@ -40,19 +40,19 @@ public class ChatHistoryMenu : IMainMenu {
 		var ch = Global.level.gameMode.chatMenu.chatHistory;
 		if (ch.Count > lines) {
 			if (yOffset == maxYOffset) {
-				Helpers.drawTextStd("[No more]", 20, 30, Alignment.Left, fontSize: 24);
+				Fonts.drawText(FontType.RedishOrange, "[No more]", 20, 30, Alignment.Left);
 			} else {
-				Helpers.drawTextStd("...", 20, 30, Alignment.Left, fontSize: 24);
+				Fonts.drawText(FontType.RedishOrange, "...", 20, 30, Alignment.Left);
 			}
 		}
 
 		int y = 0;
 		for (int i = Math.Max(0, ch.Count - lines - yOffset); i < ch.Count - yOffset; i++) {
 			string line = ch[i].getDisplayMessage();
-			Helpers.drawTextStd(line, 20, 40 + (y * 12), fontSize: 24, color: Color.White);
+			Fonts.drawText(FontType.Grey, line, 20, 40 + (y * 10));
 			y++;
 		}
 
-		Helpers.drawTextStd(TCat.BotHelp, "Up/Down: Scroll, [Z]: Back", Global.halfScreenW, 210, Alignment.Center, fontSize: 24);
+		Fonts.drawTextEX(FontType.Grey, "[UP]/[DOWN]: Scroll, [Z]: Back", Global.halfScreenW, 210, Alignment.Center);
 	}
 }

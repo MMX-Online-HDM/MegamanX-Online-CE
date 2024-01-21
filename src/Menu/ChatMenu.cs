@@ -16,7 +16,7 @@ public class ChatMenu : IMainMenu {
 	public string currentTypedChat = "";
 	public float chatBlinkTime = 0;
 	public List<int> lastNChatFrames = new List<int>();
-	public const int chatLines = 7;
+	public int chatLines = 4;
 	public int exitedChatFrames;
 	public bool recentlyExited { get { return exitedChatFrames > 0; } }
 	public List<ChatEntry> chatHistory = new List<ChatEntry>();
@@ -52,7 +52,7 @@ public class ChatMenu : IMainMenu {
 			if (typingChat) {
 				chatBlinkTime += Global.spf;
 				if (chatBlinkTime >= 1f) chatBlinkTime = 0;
-				currentTypedChat = Helpers.getTypedString(currentTypedChat, 35);
+				currentTypedChat = Helpers.getTypedString(currentTypedChat, 24);
 				if (Global.input.isPressed(Key.Enter) && !string.IsNullOrWhiteSpace(currentTypedChat)) {
 					currentTypedChat = Helpers.censor(currentTypedChat);
 					typingChat = false;
@@ -61,7 +61,7 @@ public class ChatMenu : IMainMenu {
 					lastNChatFrames.Add(Global.frameCount);
 					if (lastNChatFrames.Count > 5) lastNChatFrames.PopFirst();
 				}
-				if (Global.input.isPressedMenu(Control.MenuEnter) || (Global.input.isPressed(Key.Enter) && string.IsNullOrWhiteSpace(currentTypedChat))) {
+				if (Global.input.isPressedMenu(Control.MenuPause) || (Global.input.isPressed(Key.Enter) && string.IsNullOrWhiteSpace(currentTypedChat))) {
 					typingChat = false;
 					exitedChatFrames = 3;
 				}
@@ -128,24 +128,27 @@ public class ChatMenu : IMainMenu {
 
 		chatFeed.Add(chatEntry);
 		chatHistory.Add(chatEntry);
-		if (chatFeed.Count > ChatMenu.chatLines) chatFeed.PopFirst();
+		if (chatFeed.Count > chatLines) chatFeed.PopFirst();
 		if (sendRpc) {
 			chatEntry.sendRpc();
 		}
 	}
 
 	public void render() {
-		int topLeftX = 5;
-		int chatLineHeight = 5;
-		int topLeftY = 216 - (chatLineHeight * chatLines);
-		uint chatFontSize = 12;
+		int topLeftX = 6;
+		int chatLineHeight = 10;
+		int typedChatY = 203;
+		int topLeftY = typedChatY - (chatLineHeight * chatLines) - 2;
 		for (var i = 0; i < chatFeed.Count; i++) {
 			var chat = chatFeed[i];
-			Color outlineColor = Color.Black;
+			FontType color = FontType.DarkGreen;
 			if (chat.alliance != null) {
-				outlineColor = (chat.alliance == GameMode.redAlliance ? Helpers.DarkRed : Helpers.DarkBlue);
+				color = (chat.alliance == GameMode.redAlliance ? FontType.DarkBlue : FontType.RedishOrange);
 			}
-			Helpers.drawTextStd(TCat.Chat, chat.getDisplayMessage(), topLeftX, topLeftY + (i * chatLineHeight), Alignment.Left, fontSize: chatFontSize, outlineColor: outlineColor);
+			Fonts.drawText(
+				color, chat.getDisplayMessage(),
+				topLeftX, topLeftY + (i * chatLineHeight), Alignment.Left
+			);
 		}
 
 		if (typingChat) {
@@ -156,15 +159,27 @@ public class ChatMenu : IMainMenu {
 				chatDisplay = "Console:" + currentTypedChat;
 				outlineColor = Color.Black;
 			}
+			int width = Fonts.measureText(Fonts.getFontSrt(FontType.Blue), chatDisplay);
 
-			int typedChatY = topLeftY + (chatLines * chatLineHeight) + 2;
-			float width = Helpers.measureTextStd(TCat.Chat, chatDisplay, fontSize: chatFontSize).x;
-
-			DrawWrappers.DrawRect(topLeftX - 2, typedChatY - 2, topLeftX + 125, typedChatY + chatLineHeight, true, new Color(0, 0, 0, 128), 1, ZIndex.HUD, isWorldPos: false);
-			Helpers.drawTextStd(TCat.Chat, chatDisplay, topLeftX, typedChatY, alignment: Alignment.Left, fontSize: chatFontSize, outlineColor: outlineColor);
+			int bgWidth = width + 4;
+			if (bgWidth < 77) {
+				bgWidth = 77;
+			}
+			DrawWrappers.DrawRect(
+				topLeftX - 3, typedChatY - 3,
+				topLeftX + bgWidth + 3, typedChatY + chatLineHeight,
+				false, new Color(16, 16, 16), 1, ZIndex.HUD, false
+			);
+			DrawWrappers.DrawRect(
+				topLeftX - 2, typedChatY - 2,
+				topLeftX + bgWidth + 2, typedChatY + chatLineHeight - 1,
+				true, new Color(16, 16, 16), 1, ZIndex.HUD, false,
+				new Color(255, 255, 255)
+			);
+			Fonts.drawText(FontType.Golden, chatDisplay, topLeftX, typedChatY);
 
 			if (chatBlinkTime >= 0.5f) {
-				Helpers.drawTextStd(TCat.Chat, "<", topLeftX + width, typedChatY, alignment: Alignment.Left, fontSize: chatFontSize, outlineColor: outlineColor);
+				Fonts.drawText(FontType.LigthGrey, "|", topLeftX + width + 1, typedChatY);
 			}
 		}
 	}

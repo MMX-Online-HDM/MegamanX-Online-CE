@@ -48,7 +48,7 @@ public class AddBotMenu : IMainMenu {
 			}
 		}
 
-		if (Global.input.isPressedMenu(Control.MenuSelectPrimary)) {
+		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 			if (Global.serverClient != null) {
 				RPC.addBot.sendRpc(botCharNum, botTeamNum);
 			} else {

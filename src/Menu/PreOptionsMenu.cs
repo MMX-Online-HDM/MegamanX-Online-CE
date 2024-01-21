@@ -38,7 +38,7 @@ public class PreOptionsMenu : IMainMenu {
 
 	public void update() {
 		Helpers.menuUpDown(ref selectY, 0, 6);
-		if (Global.input.isPressedMenu(Control.MenuSelectPrimary)) {
+		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 			int? charNum = null;
 			bool isGraphics = selectY == 1;
 			if (selectY == 2) charNum = 0;
@@ -81,6 +81,6 @@ public class PreOptionsMenu : IMainMenu {
 		Fonts.drawText(menuFont, "Axl settings", startX, optionPos6.y, selected: selectY == 5);
 		Fonts.drawText(menuFont, "Sigma settings", startX, optionPos7.y, selected: selectY == 6);
 
-		Fonts.drawText(FontType.Grey, "[X]: Choose, [Z]: Back", Global.halfScreenW, 198, Alignment.Center);
+		Fonts.drawTextEX(FontType.Grey, "[X]: Choose, [Z]: Back", Global.halfScreenW, 198, Alignment.Center);
 	}
 }

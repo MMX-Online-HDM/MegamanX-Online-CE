@@ -98,7 +98,7 @@ public class Server {
 	public const byte getServersQueryByte = 0;
 	public const byte getServerQueryByte = 1;
 
-	public const int maxPlayerCap = 24;
+	public const int maxPlayerCap = 22;
 
 	public Server() { }
 

@@ -435,7 +435,7 @@ public class OptionsMenu : IMainMenu {
 						if (!isChangingName && (
 								Global.input.isPressedMenu(Control.MenuLeft) ||
 								Global.input.isPressedMenu(Control.MenuRight) ||
-								Global.input.isPressedMenu(Control.MenuSelectPrimary)
+								Global.input.isPressedMenu(Control.MenuConfirm)
 							)
 						) {
 							isChangingName = true;
@@ -602,7 +602,7 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"When hit by moves that can be mashed out of, like grabs,\n" +
+					"When hit by moves that can be mashed out of,\n" +
 					"shows the mash progress above your head."
 				),
 				// Kill on Loadout change.
@@ -640,7 +640,7 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"If Yes, will instantly die on character change mid-match.\n" +
+					"If Yes, will instantly die on character change.\n" +
 					"If No, on next death character change will apply."
 				),
 				// Matchmaking Timeout
@@ -686,7 +686,7 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"If enabled, press BACKQUOTE to open the dev-console in-match.\n" +
+					"If enabled, press F10 to open the dev-console in-match.\n" +
 					"See the game website for a list of commands."
 				),
 			};
@@ -707,8 +707,8 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Enable Grid Mode for weapon switch in certain or all modes.\n" +
-					"In Grid Mode, hold WEAPON L/R and use ARROW KEYS to switch weapon."
+					"For weapon switch in certain or all modes.\n" +
+					"Hold WEAPON L/R and use ARROW KEYS to switch weapon."
 				),
 				// Hyper Charge slot.
 				new MenuOption(
@@ -737,7 +737,7 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "G.Crush down special:",
+							optionFontText, "Giga Attack down special:",
  							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
@@ -745,8 +745,8 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"If Yes, you can perform Giga Crush by pressing DOWN + SPECIAL,\n" +
-					"but you lose the ability to switch to Giga Crush manually."
+					"Allows to perform Giga Crush by pressing DOWN + SP,\n" +
+					"but you lose the ability to switch to Giga Crush."
 				),
 				// Nova Strike special.
 				new MenuOption(
@@ -764,8 +764,8 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"If Yes, you can perform Nova Strike by pressing ARROW KEY + SPECIAL,\n" +
-					"but you lose the ability to switch to Nova Strike manually."
+					"Allows to perform Nova Strike by pressing SPC,\n" +
+					"but you lose the ability to switch to Nova Strike."
 				),
 				/*
 				new MenuOption(
@@ -809,8 +809,8 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"You can swap the inputs for air slash attack (default ATTACK),\n" +
-					"and Kuuenzan (air spin attack, default SPECIAL)."
+					"Swaps the inputs for air slash attack,\n" +
+					"and Kuuenzan (or any other air special)."
 				),
 				// Zero Giga cooldown.
 				new MenuOption(
@@ -828,7 +828,7 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"If Yes, shows a cooldown circle of giga moves like Rakuhouha."
+					"Shows a cooldown circle for giga attacks."
 				),
 			};
 		} else if (charNum == 2) {
@@ -849,7 +849,7 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"You can swap the inputs for Goliath buster (default WEAPON L/R),\nand missiles (default SPECIAL)."
+					"You can swap the inputs for\nGoliath buster and missiles."
 				),
 				// Block ride armor scroll
 				new MenuOption(
@@ -904,11 +904,11 @@ public class OptionsMenu : IMainMenu {
  							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
-							optionFontValue, (Options.main.mk5PuppeteerHoldOrToggle ? "Hold" : "Toggle"),
+							optionFontValue, (Options.main.mk5PuppeteerHoldOrToggle ? "Hold" : "Simul"),
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"If set to Hold, Vile V will control the Mech as long as\nWEAPON L/R is held."
+					"If set to Hold, Vile V will control the Ride\nonly as long as WEAPON L/R is held."
 				),
 				// Lock Cannon Air
 				new MenuOption(
@@ -1000,7 +1000,7 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Enable/disable auto-aim (for Directional aim mode only.)"
+					"Enable/disable auto-aim-\n(For Directional aim mode only.)"
 				),
 				// Axl Backwards Aim Invert
 				new MenuOption(
@@ -1022,7 +1022,7 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"If Yes, enables 360 degree aim if binding Axl aim controls\nto a controller analog stick."
+					"Enables 360 degree aim if binding Axl aim controls\nto a controller analog stick."
 				),
 				// Aim key function
 				new MenuOption(
@@ -1040,7 +1040,7 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Change the behavior of Axl's \"aim key\" (default SHIFT)."
+					"Change the behavior of Axl's \"aim key\"."
 				),
 				// Aim key toggle
 				new MenuOption(
@@ -1058,7 +1058,7 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Change whether Axl's \"aim key\" is toggle or hold based."
+					"Change whether Axl's \"aim key\"\nis toggle or hold based."
 				),
 				// Diag aim movement
 				new MenuOption(
@@ -1076,7 +1076,7 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"If Yes, Axl can move when aiming diagonally, otherwise he is\nlocked in place."
+					"Allows Axl tomove when aiming diagonally,\notherwise he is locked in place when shooting."
 				),
 				// Axl Separate aim crouch
 				new MenuOption(
@@ -1090,16 +1090,16 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Separate aim down & crouch:",
+							optionFontText, "Aim down & crouch:",
  							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
-							optionFontValue, Helpers.boolYesNo(Options.main.axlSeparateAimDownAndCrouch),
+							optionFontValue, Options.main.axlSeparateAimDownAndCrouch ? "Separate" : "Mixed",
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"If Yes, aim down and crouch bindings will not conflict,\n" +
-					"but you will need to bind the Axl Crouch control to something else."
+					"If \"mixed\" Aim down and crounch will bind to\n" +
+					"the same button and crouching will not aim down."
 				),
 				// Grid mode Axl
 				new MenuOption(
@@ -1117,7 +1117,7 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Enables Grid Mode for Axl, which works the same way as X's."
+					"Enables Grid Mode for Axl,\nwhich works the same way as X's."
 				),
 				// Roll Cooldown HUD.
 				new MenuOption(
@@ -1136,7 +1136,7 @@ public class OptionsMenu : IMainMenu {
 						);
 					},
 					"If enabled, shows a cooldown circle above Axl's head\n" +
-					"after Dodge Roll is used, indicating time until next available roll."
+					"indicating Dodge Roll cooldown."
 				),
 			};
 		} else if (charNum == 4) {
@@ -1156,7 +1156,7 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Changes the position of the Sigma slot in Sigma's hotbar."
+					"Changes the position of the\nSigma slot in Sigma's hotbar."
 				),
 				// Pupeteer control mode.
 				new MenuOption(
@@ -1174,7 +1174,7 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"If set to Hold, Puppeteer Sigma will control a Maverick as long as\nWEAPON L/R is held."
+					"If set to Hold, Puppeteer Sigma will control\na Maverick only as long as WEAPON L/R is held."
 				),
 				// Maverick follow start.
 				new MenuOption(
@@ -1192,7 +1192,7 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Change whether Mavericks will follow Sigma, or hold position,\nafter summoned."
+					"Change whether Mavericks will follow Sigma,\nor hold position, after summoned."
 				),
 				// Pupeteer cancel.
 				new MenuOption(
@@ -1210,7 +1210,7 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"If set to Yes, Mavericks will revert to their idle state\nwhen switched to in Puppeteer mode."
+					"If set to Yes, Mavericks will revert to\ntheir idle state when switched to in Puppeteer mode."
 				),
 				// Small Bars for Pup Sigma
 				new MenuOption(
@@ -1426,7 +1426,10 @@ public class OptionsMenu : IMainMenu {
 		else if (charNum == 3) subtitle = "AXL SETTINGS";
 		else if (charNum == 4) subtitle = "SIGMA SETTINGS";
 		Fonts.drawText(FontType.Yellow, subtitle, Global.halfScreenW, 15, Alignment.Center);
-		Fonts.drawText(FontType.Grey, "Left/Right: Change\n[Z]: Save and Back", Global.halfScreenW, 188, Alignment.Center);
+		Fonts.drawTextEX(
+			FontType.Grey, "[LEFT]/[RIGHT]: Change\n[Z]: Save and Back",
+			Global.halfScreenW, 188, Alignment.Center
+		);
 
 		for (int i = 0; i < menuOptions.Count; i++) {
 			menuOptions[i].render(new Point(32, 30 + (i * 10)), i);

@@ -34,6 +34,14 @@ public class SparkMandrill : Maverick {
 		if (sendRpc) {
 			createActorRpc(player.id);
 		}
+
+		usesAmmo = false;
+		canHealAmmo = false;
+		ammo = 32;
+		maxAmmo = 32;
+		grayAmmoLevel = 31;
+		ammoRoundDown = true;
+		barIndexes = (55, 44);
 	}
 
 	public override void update() {

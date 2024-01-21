@@ -30,6 +30,11 @@ public class BlastHornet : Maverick {
 		if (sendRpc) {
 			createActorRpc(player.id);
 		}
+
+		canFly = true;
+		maxFlyBar = 960;
+		flyBar = 960;
+		flyBarIndexes = (68, 57);
 	}
 
 	public override void update() {

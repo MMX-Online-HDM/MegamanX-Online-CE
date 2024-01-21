@@ -64,7 +64,7 @@ public class UpgradeArmorMenu : IMainMenu {
 			return;
 		}
 
-		if (Global.input.isPressedMenu(Control.MenuSelectPrimary)) {
+		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 			if (selectArrowPosY == 0) {
 				if (mainPlayer.helmetArmorNum != xGame) {
 					if (!mainPlayer.isHeadArmorPurchased(xGame)) {
@@ -145,7 +145,7 @@ public class UpgradeArmorMenu : IMainMenu {
 					Global.playSound("ching");
 				}
 			}
-		} else if (Global.input.isPressedMenu(Control.MenuSelectSecondary)) {
+		} else if (Global.input.isPressedMenu(Control.MenuAlt)) {
 			if (selectArrowPosY == 0) {
 				if (mainPlayer.helmetArmorNum == xGame) {
 					if (mainPlayer.hasAllX3Armor() && mainPlayer.hasChip(2)) {
@@ -431,7 +431,7 @@ public class UpgradeArmorMenu : IMainMenu {
 				Global.playSound("ching");
 				return true;
 			}
-		} else if (Global.input.isPressedMenu(Control.MenuSelectSecondary)) {
+		} else if (Global.input.isPressedMenu(Control.MenuAlt)) {
 			if (mainPlayer.hasUltimateArmor()) {
 				mainPlayer.setUltimateArmor(false);
 				return true;
