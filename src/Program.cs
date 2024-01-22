@@ -907,6 +907,7 @@ class Program {
 		decimal deltaTimeAlt = 0;
 		decimal deltaTimeSavings = 0;
 		decimal lastUpdateTime = 0;
+		decimal lastAltUpdateTime = 0;
 		decimal fpsLimit = (TimeSpan.TicksPerSecond / 60m);
 		decimal fpsLimitAlt = (TimeSpan.TicksPerSecond / 240m);
 		long lastSecondFPS = 0;
@@ -921,9 +922,10 @@ class Program {
 
 			// Framerate calculations.
 			deltaTime = deltaTimeSavings + ((timeNow - lastUpdateTime) / fpsLimit);
-			deltaTimeAlt = deltaTimeSavings + ((timeNow - lastUpdateTime) / fpsLimitAlt);
+			deltaTimeAlt = deltaTimeSavings + ((timeNow - lastAltUpdateTime) / fpsLimitAlt);
 			if (deltaTime >= 1 || deltaTimeAlt >= 1) {
 				window.DispatchEvents();
+				lastAltUpdateTime = timeNow;
 			}
 			if (deltaTime >= 1) {
 			} else {
@@ -957,6 +959,9 @@ class Program {
 			} else {
 				// Logic update happens here.
 				while (deltaTime >= 1) {
+					if (deltaTime >= 10) {
+						deltaTime = 10;
+					}
 					// This is to only send RPC is when not frameskipping.
 					if (deltaTime >= 2) {
 						Global.isSkippingFrames = true;
