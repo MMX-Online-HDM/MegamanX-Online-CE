@@ -922,7 +922,7 @@ class Program {
 
 			// Framerate calculations.
 			deltaTime = deltaTimeSavings + ((timeNow - lastUpdateTime) / fpsLimit);
-			deltaTimeAlt = deltaTimeSavings + ((timeNow - lastAltUpdateTime) / fpsLimitAlt);
+			deltaTimeAlt = ((timeNow - lastAltUpdateTime) / fpsLimitAlt);
 			if (deltaTime >= 1 || deltaTimeAlt >= 1) {
 				window.DispatchEvents();
 				lastAltUpdateTime = timeNow;
