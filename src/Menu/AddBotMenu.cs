@@ -88,9 +88,7 @@ public class AddBotMenu : IMainMenu {
 		DrawWrappers.DrawRect(5, 5, Global.screenW - 5, Global.screenH - 5, true, Helpers.MenuBgColor, 0, ZIndex.HUD + 200, false);
 		Global.sprites["cursor"].drawToHUD(0, 15, optionPoses[(int)selectArrowPosY].y + 5);
 
-		Helpers.drawTextStd(TCat.Title, "Add Bot", Global.halfScreenW, 15, fontSize: 48, alignment: Alignment.Center);
-
-		uint fontSize = 24;
+		Fonts.drawText(FontType.Orange, "Add Bot", Global.halfScreenW, 15, alignment: Alignment.Center);
 
 		string botTeamStr = "(Auto)";
 		if (botTeamNum == GameMode.blueAlliance) botTeamStr = "Blue";
@@ -103,10 +101,20 @@ public class AddBotMenu : IMainMenu {
 		else if (botCharNum == 3) botCharStr = "Axl";
 		else if (botCharNum == 4) botCharStr = "Sigma";
 
-		Helpers.drawTextStd(TCat.Option, "Character: " + botCharStr, optionPoses[0].x, optionPoses[0].y, fontSize: fontSize, selected: selectArrowPosY == 0);
-		Helpers.drawTextStd(TCat.Option, "Team: " + botTeamStr, optionPoses[1].x, optionPoses[1].y, fontSize: fontSize, color: teamOptionEnabled() ? Color.White : Helpers.Gray, selected: selectArrowPosY == 1);
+		Fonts.drawText(
+			FontType.Blue, "Character: " + botCharStr,
+			optionPoses[0].x, optionPoses[0].y, selected: selectArrowPosY == 0
+		);
+		Fonts.drawText(
+			teamOptionEnabled() ? FontType.Green: FontType.DarkGreen, "Team: " + botTeamStr,
+			optionPoses[1].x, optionPoses[1].y,
+			selected: selectArrowPosY == 1
+		);
 
-		Helpers.drawTextStd(TCat.BotHelp, "Left/Right: Change, [X]: Add, [Z]: Back", Global.screenW * 0.5f, 200, Alignment.Center, fontSize: 21);
+		Fonts.drawTextEX(
+			FontType.Grey, "Left/Right: Change, [X]: Add, [Z]: Back",
+			Global.screenW * 0.5f, 200, Alignment.Center
+		);
 	}
 
 	public bool teamOptionEnabled() {

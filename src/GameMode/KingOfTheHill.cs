@@ -51,7 +51,7 @@ public class KingOfTheHill : GameMode {
 			Global.sprites["hud_cp_bar"].drawToHUD(hudCpBarIndex, 5 + 17 + (i * 2), 5 + 3 + hudcpY);
 		}
 
-		Helpers.drawTextStd(TCat.HUD, hillText, 38, 10 + hudcpY, Alignment.Center, fontSize: (uint)17, color: textColor, outlineColor: Color.Black);
+		Fonts.drawText(FontType.Grey, hillText, 38, 10 + hudcpY, Alignment.Center);
 		hudcpY += 16;
 
 		drawTimeIfSet(4 + hudcpY);

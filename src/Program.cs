@@ -6,16 +6,12 @@ using SFML.Graphics;
 using SFML.System;
 using SFML.Audio;
 using SFML.Window;
-using Newtonsoft.Json;
 using static SFML.Window.Keyboard;
-using SFML.Graphics.Glsl;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Globalization;
 using Lidgren.Network;
-using System.Collections.Specialized;
-using System.Text;
 using System.Runtime.InteropServices;
 
 namespace MMXOnline;
@@ -133,20 +129,51 @@ class Program {
 		window.MouseButtonReleased += new EventHandler<MouseButtonEventArgs>(onMouseReleased);
 		window.MouseWheelScrolled += new EventHandler<MouseWheelScrollEventArgs>(onMouseScrolled);
 
+		// Loading starts here.
+		// We load font first as we are gonna render these.
+		Fonts.loadFontSizes();
+		Fonts.loadFontSprites();
+
+		List<string> loadText = new();
+		loadText.Add("NOM BIOS v20");
+		loadText.Add("Copyrigth 2114, NOM Corporation");
+		loadText.Add("");
+
+		// Input
+		Global.input = new Input(false);
+		setupControllers(window);
+
 		if (Options.main.areShadersDisabled() == false) {
 			loadShaders();
+			loadText.Add("Shaders OK.");
+		} else {
+			loadText.Add("Shaders disabled, skipping.");
 		}
 
-		loadImages();
-		loadSprites();
-		loadLevels();
-		loadSounds();
-		loadMusics();
-		Fonts.loadFontSizes();
+		// Loading with GUI.
+		loadText.Add("Loading Sprites...");
+		loadMultiThread(loadText, window, loadImages);
+		loadText[loadText.Count - 1] = "Loaded Sprites.";
 
-		Global.computeChecksum();
+		loadText.Add("Loading Sprite JSONS...");
+		loadMultiThread(loadText, window, loadSprites);
+		loadText[loadText.Count - 1] = "Sprite JSONS OK.";
 
-		Global.input = new Input(false);
+		loadText.Add("Loading Maps...");
+		loadMultiThread(loadText, window, loadLevels);
+		loadText[loadText.Count - 1] = "Maps Loaded.";
+
+		loadText.Add("Loading SFX...");
+		loadMultiThread(loadText, window, loadSounds);
+		loadText[loadText.Count - 1] = "SFX Loaded.";
+
+		loadText.Add("Loading Music...");
+		loadMultiThread(loadText, window, loadMusics);
+		loadText[loadText.Count - 1] = "Music Loaded.";
+
+		loadText.Add("Calculating checksum...");
+		loadMultiThread(loadText, window, Global.computeChecksum);
+		loadText[loadText.Count - 1] = "Checksum OK.";
 
 		string regionJson =
 @"{
@@ -166,10 +193,7 @@ class Program {
 			}
 		});
 
-		setupControllers(window);
-
 		// Force startup config to be fetched
-
 		Menu.change(new MainMenu());
 		Global.changeMusic("menu");
 
@@ -1015,6 +1039,41 @@ class Program {
 				}
 			}
 			*/
+		}
+	}
+	public static void loadMultiThread(List<String> loadText, RenderWindow window, ThreadStart loadFunct) {
+		Thread loadTread = new Thread(loadFunct);
+		loadTread.Start();
+		loadLoop(loadText, window, loadTread);
+	}
+
+	public static void loadLoop(List<String> loadText, RenderWindow window, Thread loadTread) {
+		// Variables for stuff.
+		decimal deltaTime = 0;
+		decimal lastUpdateTime = 0;
+		decimal fpsLimit = (TimeSpan.TicksPerSecond / 60m);
+		bool exit = false;
+
+		// Main loop itself.
+		while (window.IsOpen && !exit) {
+			TimeSpan timeSpam = (DateTimeOffset.UtcNow - Global.UnixEpoch);
+			long timeNow = timeSpam.Ticks;
+
+			// Framerate calculations.
+			deltaTime = (timeNow - lastUpdateTime) / fpsLimit;
+			if (deltaTime >= 1) {
+			} else {
+				continue;
+			}
+			Color clearColor = Color.Black;
+			window.Clear(clearColor);
+			for (int i = 0; i < loadText.Count; i++) {
+				Fonts.drawText(FontType.DarkBlue, loadText[i], 8, 8 + (10 * i), isLoading: true);
+			}
+			lastUpdateTime = timeNow;
+			window.DispatchEvents();
+			window.Display();
+			exit = (loadTread.ThreadState == System.Threading.ThreadState.Stopped);
 		}
 	}
 }

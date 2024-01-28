@@ -266,6 +266,7 @@ public partial class Global {
 
 	public static Dictionary<string, LevelData> levelDatas = new Dictionary<string, LevelData>();
 	public static Dictionary<string, Texture> textures = new Dictionary<string, Texture>();
+	public static Dictionary<string, Texture> fontTextures = new Dictionary<string, Texture>();
 	public static Dictionary<string, Texture[,]> mapTextures = new Dictionary<string, Texture[,]>();
 	public static Dictionary<string, Sprite> sprites = new Dictionary<string, Sprite>();
 	public static Dictionary<string, SoundBufferWrapper> soundBuffers = new Dictionary<string, SoundBufferWrapper>();
