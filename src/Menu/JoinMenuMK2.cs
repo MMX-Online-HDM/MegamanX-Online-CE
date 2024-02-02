@@ -305,7 +305,7 @@ public static class MasterServerData {
 			return _serverIp;
 		}
 	}
-	public static string serverUrl = "mmxodce-masterserver.onrender.com";
+	public static string serverUrl = "127.0.0.1";
 }
 
 public enum MasterServerMsg {
