@@ -21,13 +21,24 @@ class Program {
 	[STAThread]
 	#endif
 	static void Main(string[] args) {
-		if (args.Length > 0 && args.Any(arg => arg == "-server")) {
+		if (args.Length > 0 && args[0] == "-relay") {
 			#if WINDOWS
 				AllocConsole();
 			#endif
 			RelayServer.ServerMain(args);
 		} else {
-			GameMain(args);
+			int mode = 0;
+			if (args.Length > 0 && args[0] == "-server") {
+				mode = 1;
+				args = new string[] {};
+			}
+			if (args.Length >= 2 && args[0] == "-connect") {
+				mode = 2;
+				args = args[1..];
+			} else {
+				args = new string[] {};
+			}
+			GameMain(args, mode);
 		}
 	}
 
@@ -37,12 +48,12 @@ class Program {
 		static extern bool AllocConsole();
 	#endif
 
-	static void GameMain(string[] args) {
+	static void GameMain(string[] args, int mode) {
 		if (Debugger.IsAttached) {
-			Run();
+			Run(args, mode);
 		} else {
 			try {
-				Run();
+				Run(args, mode);
 			} catch (Exception e) {
 				/*
 				string crashDump = e.Message + "\n\n" +
@@ -60,7 +71,7 @@ class Program {
 		}
 	}
 
-	static void Run() {
+	static void Run(string[] args, int mode) {
 		#if MAC
 		Global.assetPath = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName) + "/";
 		Global.writePath = Global.assetPath;
@@ -206,8 +217,16 @@ class Program {
 		// Force startup config to be fetched
 		Menu.change(new MainMenu());
 		Global.changeMusic("menu");
-
-		Thread.Sleep(5000);
+		if (mode == 1) {
+			HostMenu menu = new HostMenu(new MainMenu(), null, false, false, true); 
+			Menu.change(menu);
+			menu.completeAction();
+		} else if (mode == 2) {
+			// TODO: Fix this.
+			// Somehow we need to get the data before we connect.
+			JoinMenuP2P menu = new(); 
+			Menu.change(new JoinMenuP2P());
+		}
 
 		while (window.IsOpen) {
 			mainLoop(window);

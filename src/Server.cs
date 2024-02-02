@@ -138,7 +138,7 @@ public class Server {
 		this.disableHtSt = disableHtSt;
 		this.disableVehicles = disableVehicles;
 		players = new List<ServerPlayer>();
-		port = getNextAvailablePort();
+		port = 65535;
 	}
 
 	public LevelData getLevelData() {

@@ -89,7 +89,7 @@ public class ServerClient {
 			Thread.Sleep(100);
 		}
 
-		error = "Failed to get connect response from server.";
+		error = "Failed to get connect response from relay server.";
 		joinServerResponse = null;
 		serverClient.disconnect("client couldn't get response");
 		return null;
@@ -181,6 +181,66 @@ public class ServerClient {
 		}
 
 		error = "Failed to get connect response from P2P server.";
+		joinServerResponse = null;
+		serverClient.disconnect("Client couldn't get response");
+		return null;
+	}
+
+	public static ServerClient CreateDirect(
+		string serverIp, int port, ServerPlayer inputServerPlayer,
+		out JoinServerResponse joinServerResponse, out string error
+	) {
+		error = null;
+		NetPeerConfiguration config = new NetPeerConfiguration("XOD-P2P");
+		config.EnableMessageType(NetIncomingMessageType.ConnectionLatencyUpdated);
+		config.EnableMessageType(NetIncomingMessageType.NatIntroductionSuccess);
+		config.EnableMessageType(NetIncomingMessageType.UnconnectedData);
+		config.AutoFlushSendQueue = false;
+		config.ConnectionTimeout = Server.connectionTimeoutSeconds;
+		// Create client.
+		var client = new NetClient(config);
+		client.Start();
+		client.Connect(serverIp, port);
+		// Wait for connection.
+		Thread.Sleep(100);
+		Console.WriteLine("Starting Serverclient.");
+		int count = 0;
+		while (count < 20 && client.ConnectionsCount == 0) {
+			Thread.Sleep(100);
+			client.FlushSendQueue();
+		}
+		var serverClient = new ServerClient(client, inputServerPlayer.isHost);
+		// Now try to connect to get server connect response after conection.
+		count = 0;
+		while (count < 20) {
+			serverClient.getMessages(out var messages, false);
+			foreach (var message in messages) {
+				if (message.StartsWith("joinservertargetedresponse:")) {
+					Console.WriteLine("Got connection response.");
+					joinServerResponse = (
+						JsonConvert.DeserializeObject<JoinServerResponse>(
+							message.RemovePrefix("joinservertargetedresponse:")
+						)
+					);
+					serverClient.serverPlayer = joinServerResponse.getLastPlayer();
+					return serverClient;
+				} else if (message.StartsWith("hostdisconnect:")) {
+					var reason = message.Split(':')[1];
+					error = "Could not join: " + reason;
+					joinServerResponse = null;
+					serverClient.disconnect("Client couldn't get response");
+					return null;
+				} else if (message.StartsWith("joinserverresponse:")) {
+					Console.WriteLine("Got general response.");
+				} else {
+					Console.WriteLine("Message: " + message);
+				}
+			}
+			count++;
+			Thread.Sleep(100);
+		}
+
+		error = "Failed to get connect response from server.";
 		joinServerResponse = null;
 		serverClient.disconnect("Client couldn't get response");
 		return null;

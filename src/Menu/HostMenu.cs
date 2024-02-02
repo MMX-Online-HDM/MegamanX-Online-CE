@@ -982,8 +982,8 @@ public class HostMenu : IMainMenu {
 		}
 		System.Threading.Thread.Sleep(500);
 
-		Global.serverClient = ServerClient.CreateHolePunch(
-			localServer.s_server.UniqueIdentifier, me,
+		Global.serverClient = ServerClient.CreateDirect(
+			"127.0.0.1", 65535, me,
 			out JoinServerResponse joinServerResponse, out string error
 		);
 
@@ -992,7 +992,7 @@ public class HostMenu : IMainMenu {
 		} else {
 			errorMessage = error;
 			if (string.IsNullOrEmpty(errorMessage)) {
-				errorMessage = "Could not connect to P2P Server.";
+				errorMessage = "Could not connect to self.";
 			}
 		}
 	}
