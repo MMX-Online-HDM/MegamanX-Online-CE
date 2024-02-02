@@ -135,8 +135,18 @@ class Program {
 		Fonts.loadFontSprites();
 
 		List<string> loadText = new();
-		loadText.Add("NOM BIOS v20");
-		loadText.Add("Copyrigth 2114, NOM Corporation");
+		loadText.Add("NOM BIOS v" + Global.version + ", An Energy Sunstar Ally");
+		loadText.Add("Copyrigth ©2114, NOM Corporation");
+		loadText.Add("");
+		loadText.Add("MMXOD " + Global.shortForkName + " Revision 20 Beta 4");
+		loadText.Add("");
+		if (String.IsNullOrEmpty(Options.main.playerName)) {
+			loadText.Add("User: Dr. Cain");
+		} else {
+			loadText.Add("User: " + Options.main.playerName);
+		}
+		loadText.Add("CPU: " + System.Environment.GetEnvironmentVariable("PROCESSOR_IDENTIFIER").Split(",")[0]);
+		loadText.Add("Memory: " + (GC.GetGCMemoryInfo().TotalAvailableMemoryBytes / 1024) + "kb");
 		loadText.Add("");
 
 		// Input
@@ -144,8 +154,8 @@ class Program {
 		setupControllers(window);
 
 		if (Options.main.areShadersDisabled() == false) {
-			loadShaders();
 			loadText.Add("Shaders OK.");
+			loadShaders();
 		} else {
 			loadText.Add("Shaders disabled, skipping.");
 		}
@@ -196,6 +206,8 @@ class Program {
 		// Force startup config to be fetched
 		Menu.change(new MainMenu());
 		Global.changeMusic("menu");
+
+		Thread.Sleep(5000);
 
 		while (window.IsOpen) {
 			mainLoop(window);
@@ -1056,6 +1068,7 @@ class Program {
 
 		// Main loop itself.
 		while (window.IsOpen && !exit) {
+			DateTimeOffset UtcNow = DateTimeOffset.UtcNow;
 			TimeSpan timeSpam = (DateTimeOffset.UtcNow - Global.UnixEpoch);
 			long timeNow = timeSpam.Ticks;
 
@@ -1068,8 +1081,15 @@ class Program {
 			Color clearColor = Color.Black;
 			window.Clear(clearColor);
 			for (int i = 0; i < loadText.Count; i++) {
-				Fonts.drawText(FontType.DarkBlue, loadText[i], 8, 8 + (10 * i), isLoading: true);
+				Fonts.drawText(FontType.LigthGrey, loadText[i], 8, 8 + (10 * i), isLoading: true);
 			}
+			Fonts.drawText(
+				FontType.LigthGrey,
+				UtcNow.Day + "/" + UtcNow.Month + "/" + UtcNow.Year + " " +
+				UtcNow.ToString("0:hh:mm:sstt", CultureInfo.InvariantCulture),
+				8, Global.screenH - 15, isLoading: true
+			);
+
 			lastUpdateTime = timeNow;
 			window.DispatchEvents();
 			window.Display();

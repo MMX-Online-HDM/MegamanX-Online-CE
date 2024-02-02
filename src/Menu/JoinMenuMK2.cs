@@ -292,9 +292,20 @@ public class SimpleServerInfo {
 
 public static class MasterServerData {
 	public static int serverPort = 17788;
-	public static string serverIp = "127.0.0.1";
-
-
+	private static string _serverIp = null;
+	public static string serverIp {
+		get {
+			if (_serverIp == null) {
+				try {
+					_serverIp = System.Net.Dns.GetHostAddresses(serverUrl)[0].ToString();
+				} catch {
+					_serverIp = "127.0.0.1";
+				}
+			}
+			return _serverIp;
+		}
+	}
+	public static string serverUrl = "mmxodce-masterserver.onrender.com";
 }
 
 public enum MasterServerMsg {

@@ -16,7 +16,8 @@ using static SFML.Window.Keyboard;
 namespace MMXOnline;
 
 public partial class Global {
-	public static decimal version = 19.12m;
+	public static decimal version = 20m;
+	public static decimal gameVersion = 20m;
 
 	// THIS VALUE MUST ALWAYS MANUALLY BE SET AFTER UPDATING ASSETS BEFORE BUILDING A RELEASE BUILD.
 	// Obtain it by pressing F1 in main menu.
@@ -636,7 +637,11 @@ public partial class Global {
 
 						// Validate
 						if (!string.IsNullOrEmpty(region.url)) {
-							region.ip = System.Net.Dns.GetHostAddresses(region.url)[0].ToString();
+							try {
+								region.ip = System.Net.Dns.GetHostAddresses(region.url)[0].ToString();
+							} catch {
+								region.ip = null;
+							}
 						}
 						if (string.IsNullOrEmpty(region.name) || string.IsNullOrEmpty(region.ip))
 						{

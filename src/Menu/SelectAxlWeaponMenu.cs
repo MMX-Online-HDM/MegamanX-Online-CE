@@ -41,14 +41,14 @@ public class SelectAxlWeaponMenu : IMainMenu {
 	public static List<AltFireData> altFireDatas = new List<AltFireData>()
 	{
 			new AltFireData(0, "Copy Shot", "N/A"),
-			new AltFireData(1, "A. Splash Laser", "B. Charge Beam"),
-			new AltFireData(2, "A. Explosion", "B. Detonate"),
-			new AltFireData(3, "A. Wind Cutter", "B. Triple Arrow"),
-			new AltFireData(4, "A. Sniper Missile", "B. Zoom Scope"),
-			new AltFireData(5, "A. Moving Wheel", "B. Sonar Beacon"),
-			new AltFireData(6, "A. Volt Tornado", "B. Plasma Beam"),
-			new AltFireData(7, "A. Gaea Shield", "B. Rev Minigun"),
-			new AltFireData(8, "A. Circle Blaze", "B. Air Blast"),
+			new AltFireData(1, "Splash Laser", "Charge Beam"),
+			new AltFireData(2, "Shockwave", "Detonate"),
+			new AltFireData(3, "Wind Cutter", "Triple Arrow"),
+			new AltFireData(4, "Sniper Missile", "Zoom Scope"),
+			new AltFireData(5, "Moving Wheel", "Sonar Beacon"),
+			new AltFireData(6, "Volt Tornado", "Plasma Beam"),
+			new AltFireData(7, "A. Gaea Shield", "Rev Minigun"),
+			new AltFireData(8, "Circle Blaze", "Air Blast"),
 		};
 	public static string getAltFireDesc(int index, int altFireNum) {
 		if (altFireNum == 0) return altFireDatas[index].alt1Name;
@@ -372,7 +372,7 @@ public class SelectAxlWeaponMenu : IMainMenu {
 			DrawWrappers.DrawTextureHUD(Global.textures["pausemenuload"], 0, 0);
 		}
 
-		Helpers.drawTextStd(TCat.Title, "AXL LOADOUT", Global.screenW * 0.5f, 12, Alignment.Center, fontSize: 48);
+		Fonts.drawText(FontType.Yellow, "Axl Loadout", Global.screenW * 0.5f, 24, Alignment.Center);
 
 		var outlineColor = inGame ? Color.White : Helpers.LoadoutBorderColor;
 		float botOffY = inGame ? 0 : -1;
@@ -388,67 +388,93 @@ public class SelectAxlWeaponMenu : IMainMenu {
 		Global.sprites["cursor"].drawToHUD(0, startX, startY + (selCursorIndex * wepH));
 		for (int i = 0; i < 3; i++) {
 			float yPos = startY - 6 + (i * wepH);
-			if (i == 0) Helpers.drawTextStd(TCat.Option, "PRIMARY", 40, yPos, color: Color.White, selected: selCursorIndex == i);
-			else Helpers.drawTextStd(TCat.Option, "Slot " + (i).ToString(), 40, yPos, color: Color.White, selected: selCursorIndex == i);
-
+			if (i == 0) {
+				Fonts.drawText(FontType.Blue, "Sidearm", 40, yPos + 2, selected: selCursorIndex == i);
+			} else {
+				Fonts.drawText(FontType.Blue, "Main " + (i).ToString(), 40, yPos + 2, selected: selCursorIndex == i);
+			}
 			if (i == 0) {
 				for (int j = 0; j < craftableWeapons.Count; j++) {
-					Global.sprites["hud_weapon_icon"].drawToHUD(craftableWeapons[j].weaponSlotIndex, startX2 + (j * wepW), startY + (i * wepH));
+					Global.sprites["hud_weapon_icon"].drawToHUD(
+						craftableWeapons[j].weaponSlotIndex, startX2 + (j * wepW), startY + (i * wepH)
+					);
 					if (Global.level?.mainPlayer != null && mainPlayer.axlBulletTypeBought[j] == false) {
 						//DrawWrappers.DrawRectWH(startX2 + (j * wepW) - 7, startY + (i * wepH) - 7, 14, 14, true, new Color(0, 0, 0, 128), 0, ZIndex.HUD, false);
 						Global.sprites["hud_weapon_locked"].drawToHUD(0, startX2 + (j * wepW), startY + (i * wepH));
 					}
-					if (selectedWeaponIndices[i] == j) {
-						DrawWrappers.DrawRectWH(startX2 + (j * wepW) - 7, startY + (i * wepH) - 7, 14, 14, false, Helpers.DarkGreen, 1, ZIndex.HUD, false);
-					} else {
-						DrawWrappers.DrawRectWH(startX2 + (j * wepW) - 7, startY + (i * wepH) - 7, 14, 14, true, Helpers.FadedIconColor, 1, ZIndex.HUD, false);
+					if (selectedWeaponIndices[i] != j) {
+						DrawWrappers.DrawRectWH(
+							startX2 + (j * wepW) - 7, startY + (i * wepH) - 7,
+							14, 14, true, Helpers.FadedIconColor, 1, ZIndex.HUD, false
+						);
 					}
 				}
 				continue;
 			}
 
 			for (int j = 0; j < 8; j++) {
-				Global.sprites["hud_weapon_icon"].drawToHUD(Weapon.fiToAxlWep(j + 1).weaponSlotIndex, startX2 + (j * wepW), startY + (i * wepH));
-				if (selectedWeaponIndices[i] == j + 1) {
-					DrawWrappers.DrawRectWH(startX2 + (j * wepW) - 7, startY + (i * wepH) - 7, 14, 14, false, Helpers.DarkGreen, 1, ZIndex.HUD, false);
-				} else {
-					DrawWrappers.DrawRectWH(startX2 + (j * wepW) - 7, startY + (i * wepH) - 7, 14, 14, true, Helpers.FadedIconColor, 1, ZIndex.HUD, false);
+				Global.sprites["hud_weapon_icon"].drawToHUD(
+					Weapon.fiToAxlWep(j + 1).weaponSlotIndex, startX2 + (j * wepW), startY + (i * wepH)
+				);
+				if (selectedWeaponIndices[i] != j + 1) {
+					DrawWrappers.DrawRectWH(
+						startX2 + (j * wepW) - 7, startY + (i * wepH) - 7,
+						14, 14, true, Helpers.FadedIconColor, 1, ZIndex.HUD, false
+					);
 				}
-
-				if (altCustomizeArray[j + 1] == 1 && selectedWeaponIndices[i] == j + 1) {
-					Helpers.drawWeaponSlotSymbol(startX2 + (j * wepW) - 8, startY + (i * wepH) - 8, "B");
+				if (selectedWeaponIndices[i] == j + 1) {
+					if (altCustomizeArray[j + 1] == 1) {
+						Helpers.drawWeaponSlotSymbol(startX2 + (j * wepW) - 8, startY + (i * wepH) - 8, "²");
+					} else {
+						Helpers.drawWeaponSlotSymbol(startX2 + (j * wepW) - 8, startY + (i * wepH) - 8, "¹");
+					}
 				}
 			}
 		}
 
-		Helpers.drawTextStd(TCat.Option, "Hyper", 40, startY - 6 + (wepH * 3), color: Color.White, selected: selCursorIndex == 3);
+		Fonts.drawText(FontType.Blue, "Hyper Mode", 40, startY - 4 + (wepH * 3), selected: selCursorIndex == 3);
 		//Helpers.drawTextStd((cursors[3].index == 0 ? "White Axl" : "Stealth Mode"), 112, startY - 6 + (wepH * 3), color: Color.White);
 		for (int j = 0; j < 2; j++) {
 			Global.sprites["hud_weapon_icon"].drawToHUD(103 + j, startX2 + (j * wepW), startY + (wepH * 3));
-			if (cursors[3].index == j) {
-				DrawWrappers.DrawRectWH(startX2 + (j * wepW) - 7, startY - 7 + (wepH * 3), 14, 14, false, Helpers.DarkGreen, 1, ZIndex.HUD, false);
-			} else {
-				DrawWrappers.DrawRectWH(startX2 + (j * wepW) - 7, startY - 7 + (wepH * 3), 14, 14, true, Helpers.FadedIconColor, 1, ZIndex.HUD, false);
+			if (cursors[3].index != j) {
+				DrawWrappers.DrawRectWH(
+					startX2 + (j * wepW) - 7, startY - 7 + (wepH * 3),
+					14, 14, true, Helpers.FadedIconColor, 1, ZIndex.HUD, false
+				);
 			}
 		}
 
 		int wsy = 162;
-		DrawWrappers.DrawRect(25, wsy - 42, Global.screenW - 25, wsy + 30, true, new Color(0, 0, 0, 100), 0.5f, ZIndex.HUD, false, outlineColor: outlineColor);
-		DrawWrappers.DrawRect(25, wsy - 42, Global.screenW - 25, wsy - 24, true, new Color(0, 0, 0, 100), 0.5f, ZIndex.HUD, false, outlineColor: outlineColor);
+		DrawWrappers.DrawRect(
+			25, wsy - 42, Global.screenW - 25, wsy + 30, true, new Color(0, 0, 0, 100), 1,
+			ZIndex.HUD, false, outlineColor: outlineColor
+		);
+		DrawWrappers.DrawRect(
+			25, wsy - 42, Global.screenW - 25, wsy - 27, true, new Color(0, 0, 0, 100), 1,
+			ZIndex.HUD, false, outlineColor: outlineColor
+		);
 
-		float row1Y = 162;
-		float row2Y = 175;
+		float titleY1 = 124;
+		float titleY2 = 140;
+		float row1Y = 153;
+		float row2Y = 181;
 
 		string description = "";
 		if (selCursorIndex == 0) {
 			var weapon = craftableWeapons[selectedWeaponIndices[0]];
-			Helpers.drawTextStd(TCat.Title, "PRIMARY WEAPON", Global.halfScreenW, 125, Alignment.Center, fontSize: 32);
+			Fonts.drawText(FontType.Purple, "Sidearm", Global.halfScreenW, titleY1, Alignment.Center);
 
 			if (selectedWeaponIndices[0] == 0) {
-				Helpers.drawTextStd(TCat.Option, weapon.displayName, Global.halfScreenW, 144, Alignment.Center, selected: true);
-				description = "Basic pistol with infinite ammo.";
-				Helpers.drawTextStd(description, Global.halfScreenW, row1Y + 3, Alignment.Center, style: Text.Styles.Italic, fontSize: 24);
-				//Helpers.drawTextStd("Alt Fire: Copy Shot", Global.halfScreenW, row2Y, Alignment.Center, style: Text.Styles.Italic, fontSize: 24);
+				Fonts.drawText(FontType.Orange, "Axl Bullet", Global.halfScreenW, titleY2, Alignment.Center);
+				description = (
+					"Fully automatic pistol with a self-regenerating\n" +
+					"ammo chamber and reliable bullet trajectory."
+				);
+				Fonts.drawText(FontType.Green, description, Global.halfScreenW, row1Y, Alignment.Center);
+				Fonts.drawText(
+					FontType.Blue, "Can charge the alt fire for more damage.",
+					Global.halfScreenW, row2Y, Alignment.Center
+				);
 			} else {
 				if (selectedWeaponIndices[0] == 1) description = "Pierces enemies, walls and defenses.";
 				if (selectedWeaponIndices[0] == 2) description = "2x damage vs Mavericks and Ride Armors.";
@@ -462,7 +488,10 @@ public class SelectAxlWeaponMenu : IMainMenu {
 					description = "Remaining Ammo: " + MathF.Ceiling(ammo);
 				}
 
-				Helpers.drawTextStd(TCat.Option, weapon.displayName, Global.halfScreenW, 140, Alignment.Center, selected: true);
+				Fonts.drawText(
+					FontType.Orange, weapon.displayName,
+					Global.halfScreenW, titleY2, Alignment.Center
+				);
 				Helpers.drawTextStd(description, Global.halfScreenW, row1Y - 9, Alignment.Center, style: Text.Styles.Italic, fontSize: 24);
 				//Helpers.drawTextStd(line2, Global.halfScreenW, row1Y + 10, Alignment.Center, style: Text.Styles.Italic, fontSize: 24);
 			}
@@ -477,40 +506,76 @@ public class SelectAxlWeaponMenu : IMainMenu {
 			}
 		} else if (selCursorIndex < 3) {
 			int friendlyWi = selectedWeaponIndices[selCursorIndex];
+			string title = selCursorIndex == 1 ? "1st main" : "2nd main";
 
-			Helpers.drawTextStd(TCat.Title, "SLOT " + (selCursorIndex).ToString() + " WEAPON", Global.halfScreenW, 125, Alignment.Center, fontSize: 32);
-			Helpers.drawTextStd(TCat.Option, weaponNames[friendlyWi], Global.halfScreenW, 144, Alignment.Center, selected: true);
+			Fonts.drawText(
+				FontType.Purple, title + " weapon",
+				Global.halfScreenW, titleY1, Alignment.Center
+			);
+			Fonts.drawText(FontType.Orange, weaponNames[friendlyWi], Global.halfScreenW, titleY2, Alignment.Center);
 
-			/*
-			if (friendlyWi == 1) description = "Highly damaging beam weapon.";
-			if (friendlyWi == 2) description = "Grenade launcher with blast knockback.";
-			if (friendlyWi == 3) description = "Shoots homing arrows. Can headshot.";
-			if (friendlyWi == 4) description = "Can headshot and go through walls.";
-			if (friendlyWi == 5) description = "Shots rebound off walls and gain power.";
-			if (friendlyWi == 6) description = "Electric gun that disables barriers.";
-			if (friendlyWi == 7) description = "Icy minigun that freezes foes.";
-			if (friendlyWi == 8) description = "Powerful flamethrower that burns foes.";
-			string altFireDesc = altCustomizeArray[friendlyWi] == 0 ? altFireDatas[friendlyWi].alt1Name : altFireDatas[friendlyWi].alt2Name;
-			Helpers.drawTextStd("Alt Fire: " + altFireDesc, Global.halfScreenW, row2Y, Alignment.Center, style: Text.Styles.Italic, fontSize: 24);
-			*/
+			if (friendlyWi == 1) description = (
+				"Eapid-fire energy weapon with long range."
+			);
+			if (friendlyWi == 2) description = (
+				"Pump-action grenade launcher with AOE\nand blast knockback."
+			);
+			if (friendlyWi == 3) description = (
+				"Ballista with arrows that can embed into walls\nand homing to the enemy head. Can headshot."
+			);
+			if (friendlyWi == 4) description = (
+				"Long range revolver with piercing bullets that\nignore defense, go through walls and headshot."
+			);
+			if (friendlyWi == 5) description = (
+				"Semi-automatic pistol with specialized ammo\nmade to ricochet off of walls."
+			);
+			if (friendlyWi == 6) description = (
+				"Electroshock shotgun whose shots ignore defense,\n flinches the enemy, and disables barriers."
+			);
+			if (friendlyWi == 7) description = (
+				"Nitogen-based rotatory machinegun that fires\nshots that can freeze targets."
+			);
+			if (friendlyWi == 8) description = (
+				"Portable flamethrower that burns foes."
+			);
+			string altFireDesc = (
+				altCustomizeArray[friendlyWi] == 0 ? altFireDatas[friendlyWi].alt1Name : altFireDatas[friendlyWi].alt2Name
+			);
+			Fonts.drawText(
+				FontType.Green, description,
+				Global.halfScreenW, row1Y, Alignment.Center
+			);
 
 			float alt1X = Global.screenW * 0.3f;
 			float alt2X = Global.screenW * 0.7f;
-			Helpers.drawTextStd("Customize Alt Fire:", Global.halfScreenW, row1Y - 2, Alignment.Center, style: Text.Styles.Italic, fontSize: 24);
-			Helpers.drawTextStd(TCat.Option, altFireDatas[friendlyWi].alt1Name, alt1X, row2Y + 3, Alignment.Center, style: Text.Styles.Italic, fontSize: 24, selected: altCustomizeArray[friendlyWi] == 0);
-			Helpers.drawTextStd(TCat.Option, altFireDatas[friendlyWi].alt2Name, alt2X, row2Y + 3, Alignment.Center, style: Text.Styles.Italic, fontSize: 24, selected: altCustomizeArray[friendlyWi] == 1);
-
-			DrawWrappers.DrawLine(Global.halfScreenW, row2Y - 4, Global.halfScreenW, row2Y + 17, outlineColor, 0.5f, ZIndex.HUD, false);
-			DrawWrappers.DrawLine(25, row2Y - 4, Global.screenW - 25, row2Y - 4, outlineColor, 0.5f, ZIndex.HUD, false);
-
-			int padding = 2;
-			if (altCustomizeArray[friendlyWi] == 0) {
-				DrawWrappers.DrawRect(25 + padding, row2Y - 4 + padding, Global.halfScreenW - padding, row2Y + 17 - padding, false, Color.Green, 1, ZIndex.HUD, false);
-			} else {
-				DrawWrappers.DrawRect(Global.halfScreenW + padding, row2Y - 4 + padding, Global.screenW - 25 - padding, row2Y + 17 - padding, false, Color.Green, 1, ZIndex.HUD, false);
-			}
+			//Helpers.drawTextStd(
+			//	"Customize Alt Fire:", Global.halfScreenW, row1Y - 2, Alignment.Center,
+			//	style: Text.Styles.Italic, fontSize: 24
+			//);
+			Fonts.drawText(
+				FontType.DarkPurple, altFireDatas[friendlyWi].alt1Name,
+				alt1X, row2Y, Alignment.Center, selected: altCustomizeArray[friendlyWi] == 0,
+				selectedFont: FontType.Yellow
+			);
+			Fonts.drawText(
+				FontType.DarkPurple, altFireDatas[friendlyWi].alt2Name,
+				alt2X, row2Y, Alignment.Center, selected: altCustomizeArray[friendlyWi] == 1,
+				selectedFont: FontType.Yellow
+			);
+			DrawWrappers.DrawLine(
+				Global.halfScreenW, 176,
+				Global.halfScreenW, 192,
+				outlineColor, 1, ZIndex.HUD, false
+			);
+			DrawWrappers.DrawLine(
+				25, 176,
+				Global.screenW - 25, 176,
+				outlineColor, 1, ZIndex.HUD, false
+			);
 		} else {
-			Helpers.drawTextStd(TCat.Title, "HYPER MODE", Global.halfScreenW, 125, Alignment.Center, fontSize: 30);
+			Fonts.drawText(
+				FontType.Purple, "Hyper Mode", Global.halfScreenW, titleY1, Alignment.Center
+			);
 			Helpers.drawTextStd(TCat.Option, (cursors[3].index == 0 ? "White Axl" : "Stealth Mode"), Global.halfScreenW, 144, Alignment.Center, selected: true);
 
 			if (cursors[3].index == 0) {
@@ -521,7 +586,7 @@ public class SelectAxlWeaponMenu : IMainMenu {
 				Helpers.drawTextStd("invincible while still allowing attacks.", Global.halfScreenW, 175, Alignment.Center, style: Text.Styles.Italic, fontSize: 20);
 			}
 		}
-
+		/*
 		if (selCursorIndex == 0) {
 			if (mainPlayer != null && selectedWeaponIndices[0] > 0 && mainPlayer.axlBulletTypeBought[selectedWeaponIndices[0]] == false) {
 				Helpers.drawTextStd(TCat.BotHelp, "WeaponL/R: Change Recipe", Global.screenW * 0.5f, 195 + botOffY, Alignment.Center, fontSize: 18);
@@ -540,11 +605,19 @@ public class SelectAxlWeaponMenu : IMainMenu {
 		string helpText = "[Z]: Back, [X]: Confirm";
 		if (!inGame) helpText = "[Z]: Save and back";
 		Helpers.drawTextStd(TCat.BotHelp, helpText, Global.screenW * 0.5f, 210 + botOffY, Alignment.Center, fontSize: 18);
+		*/
 		if (!string.IsNullOrEmpty(error)) {
 			float top = Global.screenH * 0.4f;
-			DrawWrappers.DrawRect(5, 5, Global.screenW - 5, Global.screenH - 5, true, new Color(0, 0, 0, 224), 0, ZIndex.HUD, false);
-			Helpers.drawTextStd(error, Global.screenW / 2, top, alignment: Alignment.Center, fontSize: 24);
-			Helpers.drawTextStd(TCat.BotHelp, Helpers.controlText("Press [X] to continue"), Global.screenW / 2, 20 + top, alignment: Alignment.Center, fontSize: 24);
+			DrawWrappers.DrawRect(
+				17, 17, Global.screenW - 17, Global.screenH - 17, true,
+				new Color(0, 0, 0, 224), 0, ZIndex.HUD, false
+			);
+			Fonts.drawText(FontType.Red, "ERROR", Global.screenW / 2, top - 20, alignment: Alignment.Center);
+			Fonts.drawText(FontType.RedishOrange, error, Global.screenW / 2, top, alignment: Alignment.Center);
+			Fonts.drawTextEX(
+				FontType.Grey, Helpers.controlText("Press [X] to continue"),
+				Global.screenW / 2, 20 + top, alignment: Alignment.Center
+			);
 		}
 	}
 

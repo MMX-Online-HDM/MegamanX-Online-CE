@@ -262,7 +262,7 @@ public class Helpers {
 	}
 
 	public static void drawWeaponSlotSymbol(float topLeftSlotX, float topLeftSlotY, string symbol) {
-		Fonts.drawText(FontType.Grey, symbol, topLeftSlotX + 16, topLeftSlotY + 12, Alignment.Right);
+		Fonts.drawText(FontType.Yellow, symbol, topLeftSlotX + 16, topLeftSlotY + 11, Alignment.Right);
 	}
 
 	static Random rnd = new Random();

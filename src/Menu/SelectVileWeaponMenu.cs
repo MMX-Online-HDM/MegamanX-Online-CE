@@ -205,9 +205,16 @@ public class SelectVileWeaponMenu : IMainMenu {
 
 		if (!string.IsNullOrEmpty(error)) {
 			float top = Global.screenH * 0.4f;
-			DrawWrappers.DrawRect(5, 5, Global.screenW - 5, Global.screenH - 5, true, new Color(0, 0, 0, 224), 0, ZIndex.HUD, false);
-			Helpers.drawTextStd(error, Global.screenW / 2, top, alignment: Alignment.Center, fontSize: 24);
-			Helpers.drawTextStd(TCat.BotHelp, "Press [X] to continue", Global.screenW / 2, 20 + top, alignment: Alignment.Center, fontSize: 24);
+			DrawWrappers.DrawRect(
+				17, 17, Global.screenW - 17, Global.screenH - 17, true,
+				new Color(0, 0, 0, 224), 0, ZIndex.HUD, false
+			);
+			Fonts.drawText(FontType.Red, "ERROR", Global.screenW / 2, top - 20, alignment: Alignment.Center);
+			Fonts.drawText(FontType.RedishOrange, error, Global.screenW / 2, top, alignment: Alignment.Center);
+			Fonts.drawTextEX(
+				FontType.Grey, Helpers.controlText("Press [X] to continue"),
+				Global.screenW / 2, 20 + top, alignment: Alignment.Center
+			);
 		}
 	}
 }
