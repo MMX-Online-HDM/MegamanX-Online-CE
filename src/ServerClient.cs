@@ -200,7 +200,8 @@ public class ServerClient {
 		// Create client.
 		var client = new NetClient(config);
 		client.Start();
-		client.Connect(serverIp, port);
+		NetOutgoingMessage hail = client.CreateMessage(JsonConvert.SerializeObject(inputServerPlayer));
+		client.Connect(serverIp, port, hail);
 		// Wait for connection.
 		Thread.Sleep(100);
 		Console.WriteLine("Starting Serverclient.");
@@ -208,6 +209,11 @@ public class ServerClient {
 		while (count < 20 && client.ConnectionsCount == 0) {
 			Thread.Sleep(100);
 			client.FlushSendQueue();
+		}
+		if (client.ConnectionsCount == 0) {
+			error = "Failed initial connection.";
+			joinServerResponse = null;
+			return null;
 		}
 		var serverClient = new ServerClient(client, inputServerPlayer.isHost);
 		// Now try to connect to get server connect response after conection.
