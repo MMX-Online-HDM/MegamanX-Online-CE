@@ -222,16 +222,24 @@ public partial class DrawWrappers {
 		}
 	}
 
-	public static void DrawTexture(Texture texture, float sx, float sy, float sw, float sh, float dx, float dy, long depth,
-		float cx = 0, float cy = 0, float xScale = 1, float yScale = 1, float angle = 0, float alpha = 1, List<ShaderWrapper> shaders = null, bool isWorldPos = true) {
+	public static void DrawTexture(
+		Texture texture, float sx, float sy, float sw, float sh,
+		float dx, float dy, long depth,
+		float cx = 0, float cy = 0,
+		float xScale = 1, float yScale = 1,
+		float angle = 0, float alpha = 1,
+		List<ShaderWrapper> shaders = null, bool isWorldPos = true
+	) {
 		if (texture == null) return;
 
 		if (isWorldPos && Options.main.enablePostProcessing) {
 			dx -= Global.level.camX;
 			dy -= Global.level.camY;
-			dx = MathF.Floor(dx);
-			dy = MathF.Floor(dy);
 		}
+		dx = MathF.Round(dx);
+		dy = MathF.Round(dy);
+		cx = MathF.Floor(cx);
+		cy = MathF.Floor(cy);
 
 		var sprite = new SFML.Graphics.Sprite(texture, new IntRect((int)sx, (int)sy, (int)sw, (int)sh));
 		sprite.Position = new Vector2f(dx, dy);

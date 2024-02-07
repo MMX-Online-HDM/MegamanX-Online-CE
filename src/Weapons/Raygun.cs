@@ -85,7 +85,7 @@ public class RayGun : AxlWeapon {
 public class RayGunProj : Projectile {
 	float len = 0;
 	float lenDelay = 0;
-	float lastAngle;
+	//float lastAngle;
 	const float maxLen = 50;
 	public RayGunProj(Weapon weapon, Point pos, int xDir, Player player, Point bulletDir, ushort netProjId) :
 		base(weapon, pos, xDir, 400, 1, player, "axl_raygun_laser", 0, 0f, netProjId, player.ownedByLocalPlayer) {

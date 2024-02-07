@@ -43,7 +43,7 @@ public class FFADeathMatch : GameMode {
 		}
 	}
 
-	public override void drawTopHUD() {
+	public override void drawTopHUD() { 
 		string placeStr = "";
 		List<Player> playerList = GameMode.getOrderedPlayerList();
 		int place = playerList.IndexOf(level.mainPlayer) + 1;
@@ -53,7 +53,7 @@ public class FFADeathMatch : GameMode {
 		Fonts.drawText(FontType.BlueMenu, topText, 5, 5, Alignment.Left);
 		Fonts.drawText(FontType.BlueMenu, botText, 5, 15, Alignment.Left);
 
-		drawTimeIfSet(30);
+		drawTimeIfSet(25);
 	}
 
 	public override void drawScoreboard() {

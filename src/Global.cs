@@ -29,9 +29,8 @@ public partial class Global {
 	public const string checksumPrefix = "[Community Edition]";
 	// Use this to make sure the checksum varies.
 	// Better to use together with "checksumPrefix" and be diferent from it.
-	public const string checksumKey = "DEVTEST--10-10-2023";
+	public const string checksumKey = checksumPrefix + " DEVTEST-06-02-2024";
 	// For displaying the name of the mod in the version string.
-	public static string forkName = "Community Edition - Rockman Test 1";
 	public static string shortForkName = "CE";
 
 	public static string prodChecksum = checksumPrefix + " " + assetChecksum;
@@ -526,6 +525,7 @@ public partial class Global {
 	public static int defaultThresholdPing = 200;
 	public static Level level;
 	public static ServerClient serverClient;
+	public static Server localServer;
 	public static bool isOffline { get { return serverClient == null; } }
 	public static bool isHost { get { return level != null && level.isHost; } }
 	public static LeaveMatchSignal leaveMatchSignal;

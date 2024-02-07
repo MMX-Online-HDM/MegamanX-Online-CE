@@ -169,38 +169,37 @@ public class WaitMenu : IMainMenu {
 	public float col4Pos = 230;
 
 	public float headerPos = 60;
-	public float rowHeight = 20;
-	public float rowHeight2 = 12;
+	public float rowHeight = 10;
+	public float rowHeight2 = 10;
 
 	public void render() {
-		DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0);
-
+		DrawWrappers.DrawTextureHUD(Global.textures["severbrowser"], 0, 0);
 		string titleText = "Waiting for host...";
 		if (Global.serverClient.isHost) {
 			titleText = "Waiting for players...";
 		}
-		Helpers.drawTextStd(TCat.Title, titleText, Global.halfScreenW, 10, alignment: Alignment.Center, vAlignment: VAlignment.Center, fontSize: 48);
-
-		DrawWrappers.DrawTextureHUD(Global.textures["border"], 15, 30);
+		Fonts.drawText(FontType.RedishOrange, titleText, col1Pos, 20);
 		if (!server.isLAN) {
-			Helpers.drawTextStd("Match Name: " + server.name, col1Pos, headerPos - 20, outline: false, fontSize: 24);
-			Helpers.drawTextStd("Map: " + server.getMapDisplayName(), col1Pos, headerPos - 10, outline: false, fontSize: 24);
+			Fonts.drawText(FontType.Orange, "Match Name: " + server.name, col1Pos, headerPos - 30);
+			Fonts.drawText(FontType.Orange, "Map: " + server.getMapDisplayName(), col1Pos, headerPos - 20);
 		} else {
-			Helpers.drawTextStd("Match Name: " + server.name, col1Pos, headerPos - 20, outline: false, fontSize: 24);
-			Helpers.drawTextStd("Match IP: " + server.ip, col1Pos, headerPos - 13, outline: false, fontSize: 24);
-			Helpers.drawTextStd("Map: " + server.getMapDisplayName(), col1Pos, headerPos - 6, outline: false, fontSize: 24);
+			Fonts.drawText(FontType.Orange, "Match Name: " + server.name, col1Pos, headerPos - 30);
+			Fonts.drawText(FontType.Orange, "Match IP: " + server.ip, col1Pos + 40, headerPos - 20);
+			Fonts.drawText(FontType.Orange, "Map: " + server.getMapDisplayName(), col1Pos, headerPos - 20);
 		}
 
-		Helpers.drawTextStd(TCat.Title, "Player", col1Pos, headerPos, outline: false);
-		Helpers.drawTextStd(TCat.Title, "Id", col2Pos, headerPos, outline: false);
-		Helpers.drawTextStd(TCat.Title, "Host?", col3Pos, headerPos, outline: false);
-		if (isTeamMode()) Helpers.drawTextStd(TCat.Title, "Team", col4Pos, headerPos, outline: false);
-		else Helpers.drawTextStd(TCat.Title, "Spec?", col4Pos, headerPos, outline: false);
+		Fonts.drawText(FontType.Yellow, "Player", col1Pos, headerPos);
+		Fonts.drawText(FontType.Yellow, "Id", col2Pos, headerPos);
+		Fonts.drawText(FontType.Yellow, "Host?", col3Pos, headerPos);
+		if (isTeamMode()) Fonts.drawText(FontType.Yellow, "Team", col4Pos, headerPos);
+		else Fonts.drawText(FontType.Yellow, "Spec?", col4Pos, headerPos);
 
-		var startServerRow = rowHeight + headerPos - 2;
+		var startServerRow = rowHeight + headerPos;
 
 		if (Global.serverClient.isHost) {
-			DrawWrappers.DrawTextureHUD(Global.textures["cursor"], 26, startServerRow - 1 + (selCursorY * rowHeight2));
+			DrawWrappers.DrawTextureHUD(
+				Global.textures["cursor"], 26, startServerRow - 2 + (selCursorY * rowHeight2)
+			);
 		}
 
 		for (int i = 0; i < server.players.Count; i++) {
@@ -210,29 +209,53 @@ public class WaitMenu : IMainMenu {
 				color = Color.Green;
 			}
 
-			Helpers.drawTextStd(player.name, col1Pos, startServerRow + (i * rowHeight2), outline: false, fontSize: 24, color: color);
-			Helpers.drawTextStd(player.id.ToString(), col2Pos, startServerRow + (i * rowHeight2), outline: false, fontSize: 24, color: color);
-			Helpers.drawTextStd(player.isHost ? "yes" : "no", col3Pos, startServerRow + (i * rowHeight2), outline: false, fontSize: 24, color: color);
+			Fonts.drawText(FontType.Blue, player.name, col1Pos, startServerRow + (i * rowHeight2));
+			Fonts.drawText(FontType.Blue,player.id.ToString(), col2Pos, startServerRow + (i * rowHeight2));
+			Fonts.drawText(
+				FontType.Blue, player.isHost ? "yes" : "no",
+				col3Pos, startServerRow + (i * rowHeight2)
+			);
 			if (isTeamMode()) {
 				string team = player.alliance == GameMode.redAlliance ? "red" : "blue";
 				if (player.isSpectator) team = "spec";
-				Helpers.drawTextStd(team, col4Pos, startServerRow + (i * rowHeight2), outline: false, fontSize: 24, color: color);
+				Fonts.drawText(FontType.Blue, team, col4Pos, startServerRow + (i * rowHeight2));
 			} else {
-				Helpers.drawTextStd(player.isSpectator ? "yes" : "no", col4Pos, startServerRow + (i * rowHeight2), outline: false, fontSize: 24, color: color);
+				Fonts.drawText(
+					FontType.Blue, player.isSpectator ? "yes" : "no",
+					col4Pos, startServerRow + (i * rowHeight2)
+				);
 			}
 		}
 
 		if (!Global.serverClient.isHost) {
-			Helpers.drawTextStd(Helpers.menuControlText("[Z]: Leave, [C]: Refresh"), Global.halfScreenW, 210, Alignment.Center, fontSize: 24);
+			Fonts.drawTextEX(
+				FontType.Grey, "[Z]: Leave, [C]: Refresh",
+				Global.halfScreenW, 190, Alignment.Center
+			);
 		} else {
 			string helpLegend = "[X]: Start, [Z]: Leave, [C]: Refresh";
 			if (recreateWaitTime > 0) {
-				helpLegend = string.Format("Can Start in {0}s, [Z]: Leave, [C]: Refresh", MathF.Ceiling(recreateWaitTime));
+				helpLegend = string.Format(
+					"Can Start in {0}s, [Z]: Leave, [C]: Refresh",
+					MathF.Ceiling(recreateWaitTime)
+				);
 			}
-
-			Helpers.drawTextStd(Helpers.menuControlText(helpLegend), Global.halfScreenW, 208, Alignment.Center, fontSize: 24);
-			if (isTeamMode() && Global.serverClient.isHost) Helpers.drawTextStd(Helpers.controlText("[Left/Right: change player team]"), Global.halfScreenW, 216, Alignment.Center, fontSize: 24);
-			else if (!isTeamMode() && Global.serverClient.isHost) Helpers.drawTextStd(Helpers.controlText("[Left/Right: change player spectator]"), Global.halfScreenW, 216, Alignment.Center, fontSize: 24);
+			Fonts.drawTextEX(
+				FontType.Grey, helpLegend,
+				Global.halfScreenW, 190, Alignment.Center
+			);
+			if (isTeamMode() && Global.serverClient.isHost) {
+				Fonts.drawTextEX(
+					FontType.Grey, "[Left/Right: change player team]",
+					Global.halfScreenW, 180, Alignment.Center
+				);
+			}
+			else if (
+				!isTeamMode() && Global.serverClient.isHost)
+				Fonts.drawTextEX(
+					FontType.Grey, "[Left/Right: change player spectator]",
+					Global.halfScreenW, 180, Alignment.Center
+				);
 		}
 	}
 

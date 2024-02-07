@@ -1326,10 +1326,21 @@ public partial class Level {
 			foreach (var message in messages) {
 				if (message.StartsWith("hostdisconnect:")) {
 					string reason = message.Split(':')[1];
-					if (reason != "Recreate") {
-						Global.leaveMatchSignal = new LeaveMatchSignal(LeaveMatchScenario.ServerShutdown, null, null);
+					if (reason == "RecreateMS" &&
+						Global.serverClient.serverId != null
+					) {
+						server.uniqueID = Global.serverClient.serverId.Value;
+						Global.leaveMatchSignal = new LeaveMatchSignal(
+							LeaveMatchScenario.RejoinMS, server, null, true
+						);
+					} else if (reason == "Recreate") {
+						Global.leaveMatchSignal = new LeaveMatchSignal(
+							LeaveMatchScenario.Rejoin, server, null
+						);
 					} else {
-						Global.leaveMatchSignal = new LeaveMatchSignal(LeaveMatchScenario.Rejoin, server, null);
+						Global.leaveMatchSignal = new LeaveMatchSignal(
+							LeaveMatchScenario.ServerShutdown, null, null
+						);
 					}
 				} else if (message.StartsWith("clientdisconnect:")) {
 					var playerLeft = JsonConvert.DeserializeObject<ServerPlayer>(message.RemovePrefix("clientdisconnect:"));

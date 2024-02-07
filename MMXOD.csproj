@@ -10,7 +10,7 @@
 		<ImplicitUsings>false</ImplicitUsings>
 		<SelfContained>false</SelfContained>
 		<!--OutDir>./bin/test/<OutDir-->
-		<!--RunWorkingDirectory>./bin/test/</RunWorkingDirectory-->
+		<!--RunWorkingDirectory>./bin/win7-x64/</RunWorkingDirectory-->
 		<OutputPath>./bin/</OutputPath>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	</PropertyGroup>

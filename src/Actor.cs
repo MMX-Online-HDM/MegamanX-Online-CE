@@ -1087,11 +1087,8 @@ public partial class Actor : GameObject {
 		}
 		//console.log(this.pos.x + "," + this.pos.y);
 
-		var offsetX = xDir * currentFrame.offset.x;
-		var offsetY = yDir * currentFrame.offset.y;
-
-		var drawX = pos.x + x + offsetX;
-		var drawY = pos.y + y + offsetY;
+		var drawX = pos.x;
+		var drawY = pos.y;
 
 		if (customAngleRendering) {
 			renderFromAngle(x, y);
@@ -1099,7 +1096,7 @@ public partial class Actor : GameObject {
 			sprite.draw(
 				frameIndex, drawX, drawY, xDir, yDir,
 				getRenderEffectSet(), alpha, xScale, yScale, zIndex,
-				getShaders(), angle: angle ?? 0, actor: this
+				getShaders(), angle: angle ?? 0, actor: this, useFrameOffsets: true
 			);
 		}
 

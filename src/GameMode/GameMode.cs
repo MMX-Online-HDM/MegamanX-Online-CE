@@ -572,10 +572,13 @@ public class GameMode {
 			renderHealthAndWeapons();
 
 			// Scrap
-			/*if (!Global.level.is1v1()) {
+			if (!Global.level.is1v1()) {
 				Global.sprites["hud_scrap"].drawToHUD(0, 4, 138);
-				Helpers.drawTextStd(TCat.HUD, "x" + Global.level.mainPlayer.scrap.ToString(), 17, 139, Alignment.Left, fontSize: 32u);
-			}*/
+				Fonts.drawText(
+					FontType.LigthGrey,
+					"x" + Global.level.mainPlayer.scrap.ToString(), 17, 141, Alignment.Left
+				);
+			}
 			MegamanX mmx = mainPlayer.character as MegamanX;
 
 			if (mmx != null && mmx.unpoShotCount > 0) {
@@ -904,8 +907,8 @@ public class GameMode {
 		float deathY = (isTop ? 18 : Global.screenH - 26);
 
 		Global.sprites["hud_life"].drawToHUD(player.getHudLifeSpriteIndex(), lifeX, lifeY);
-		Helpers.drawTextStd(TCat.HUD, player.name, nameX, nameY, (isLeft ? Alignment.Left : Alignment.Right), fontSize: 24, outlineColor: outlineColor);
-		Helpers.drawTextStd(TCat.HUD, player.getDeathScore(), deathX, deathY, Alignment.Center, fontSize: 24, outlineColor: outlineColor);
+		Fonts.drawText(FontType.BlueMenu, player.name, nameX, nameY, (isLeft ? Alignment.Left : Alignment.Right));
+		Fonts.drawText(FontType.BlueMenu, player.getDeathScore(), deathX, deathY, Alignment.Center);
 	}
 
 	public void draw1v1TopHUD() {
@@ -918,8 +921,8 @@ public class GameMode {
 
 		if (remainingTime != null) {
 			var timespan = new TimeSpan(0, 0, MathInt.Ceiling(remainingTime.Value));
-			string timeStr = timespan.ToString(@"m\:ss");
-			Helpers.drawTextStd(TCat.HUD, timeStr, Global.halfScreenW, 5, Alignment.Center, fontSize: (uint)32, color: getTimeColor());
+			string timeStr = timespan.ToString(@"mm\:ss");
+			Fonts.drawText(FontType.Golden, timeStr, Global.halfScreenW, 5, Alignment.Center);
 		}
 	}
 
@@ -2336,21 +2339,33 @@ public class GameMode {
 	}
 
 	public void drawTimeIfSet(int yPos) {
+		FontType fontColor = FontType.LigthGrey;
+		string timeStr = "";
 		if (setupTime > 0) {
 			var timespan = new TimeSpan(0, 0, MathInt.Ceiling(setupTime.Value));
-			string timeStr = timespan.ToString(@"m\:ss");
-			Helpers.drawTextStd(TCat.HUD, timeStr, 5, yPos, Alignment.Left, fontSize: (uint)32, color: getTimeColor());
+			timeStr = timespan.ToString(@"m\:ss");
+			fontColor = FontType.OrangeMenu;
 		} else if (setupTime == 0 && goTime < 1) {
 			goTime += Global.spf;
-			var timespan = new TimeSpan(0, 0, MathInt.Ceiling(setupTime.Value));
-			Helpers.drawTextStd(TCat.HUD, "GO!", 5, yPos, Alignment.Left, fontSize: (uint)32, color: getTimeColor());
+			timeStr = "GO!";
+			fontColor = FontType.RedishOrange;
 		} else if (remainingTime != null) {
+			if (remainingTime <= 10) {
+				fontColor = FontType.OrangeMenu;
+			}
 			var timespan = new TimeSpan(0, 0, MathInt.Ceiling(remainingTime.Value));
-			string timeStr = timespan.ToString(@"m\:ss");
-			if (!level.isNon1v1Elimination() || virusStarted >= 2) timeStr += " Left";
-			if (isOvertime()) timeStr = "Overtime!";
-			Helpers.drawTextStd(TCat.HUD, timeStr, 5, yPos, Alignment.Left, fontSize: (uint)32, color: getTimeColor());
+			timeStr = timespan.ToString(@"m\:ss");
+			if (!level.isNon1v1Elimination() || virusStarted >= 2) {
+				timeStr += " Left";
+			}
+			if (isOvertime()) {
+				timeStr = "Overtime!";
+				fontColor = FontType.Red;
+			}
+		} else {
+			return;
 		}
+		Fonts.drawText(fontColor, timeStr, 5, yPos, Alignment.Left);
 	}
 
 	public bool isOvertime() {
@@ -2368,8 +2383,8 @@ public class GameMode {
 
 	public void drawVirusTime(int yPos) {
 		var timespan = new TimeSpan(0, 0, MathInt.Ceiling(remainingTime.Value));
-		string timeStr = "Sigma Virus: " + timespan.ToString(@"m\:ss");
-		Helpers.drawTextStd(TCat.HUD, timeStr, 5, yPos, Alignment.Left, fontSize: (uint)32, color: getTimeColor());
+		string timeStr = "Nightmare Virus: " + timespan.ToString(@"m\:ss");
+		Fonts.drawText(FontType.Purple, timeStr, 5, yPos, Alignment.Left);
 	}
 
 	public void drawWinScreen() {
@@ -2598,14 +2613,14 @@ public class GameMode {
 		var blueText = "Blue: " + bluePoints.ToString();
 
 		if (redPoints >= bluePoints) {
-			Helpers.drawTextStd(TCat.HUDColored, redText, 5, 2, Alignment.Left, fontSize: (uint)32, outlineColor: Helpers.DarkRed);
-			Helpers.drawTextStd(TCat.HUDColored, blueText, 5, 12, Alignment.Left, fontSize: (uint)32, outlineColor: Helpers.DarkBlue);
+			Fonts.drawText(FontType.Red, redText, 5, 5, Alignment.Left);
+			Fonts.drawText(FontType.Blue, blueText, 5, 15, Alignment.Left);
 		} else {
-			Helpers.drawTextStd(TCat.HUDColored, blueText, 5, 2, Alignment.Left, fontSize: (uint)32, outlineColor: Helpers.DarkBlue);
-			Helpers.drawTextStd(TCat.HUDColored, redText, 5, 12, Alignment.Left, fontSize: (uint)32, outlineColor: Helpers.DarkRed);
+			Fonts.drawText(FontType.Blue, blueText, 5, 5, Alignment.Left);
+			Fonts.drawText(FontType.Red, redText, 5, 15, Alignment.Left);
 		}
 
-		drawTimeIfSet(27);
+		drawTimeIfSet(25);
 	}
 
 	public void drawObjectiveNavpoint(string label, Point objPos) {

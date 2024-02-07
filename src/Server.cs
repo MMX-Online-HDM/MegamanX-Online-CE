@@ -80,8 +80,11 @@ public class Server {
 	public bool killServer;
 	[JsonIgnore]
 	public Dictionary<string, int> weaponKillStats = new Dictionary<string, int>();
+	[JsonIgnore]
+	public long uniqueID = 0;
 	
-	long iterations = 0;
+	private bool shutdownVar;
+	private long iterations = 0;
 	private long lastUpdateTime = 0L;
 	private long fpsLimit = TimeSpan.TicksPerSecond / 240;
 	private bool loggedOnce = false;
@@ -138,7 +141,7 @@ public class Server {
 		this.disableHtSt = disableHtSt;
 		this.disableVehicles = disableVehicles;
 		players = new List<ServerPlayer>();
-		port = 65535;
+		port = getNextAvailablePort();
 	}
 
 	public LevelData getLevelData() {
@@ -358,11 +361,14 @@ public class Server {
 			*/
 			s_server = new NetServer(config);
 			s_server.Start();
+			if (uniqueID == 0) {
+				uniqueID = s_server.UniqueIdentifier;
+			}
 			if (isLAN) {
 				// This will get our LAN IP. Not our internet IP.
 				ip = LANIPHelper.GetLocalIPAddress();
 			}
-			if (isP2P) {
+			if (isP2P && uniqueID != 0) {
 				// If we are a P2P server we cannot use a public IP as the masterserver handles that.
 				ip = null;
 				// Send our info to masterserver to say that we are open now.
@@ -372,13 +378,13 @@ public class Server {
 				// First. The basic info.
 				NetOutgoingMessage basicInfoMsg = s_server.CreateMessage();
 				basicInfoMsg.Write((byte)MasterServerMsg.RegisterHost);
-				basicInfoMsg.Write(s_server.UniqueIdentifier);
+				basicInfoMsg.Write(uniqueID);
 				basicInfoMsg.Write(new IPEndPoint(NetUtility.GetMyAddress(out _), 14242));
 
 				// Second. The match list info.
 				NetOutgoingMessage listInfoMsg = s_server.CreateMessage();
 				listInfoMsg.Write((byte)MasterServerMsg.RegisterInfo);
-				listInfoMsg.Write(s_server.UniqueIdentifier);
+				listInfoMsg.Write(uniqueID);
 				listInfoMsg.Write(name);
 				listInfoMsg.Write((byte)maxPlayers);
 				listInfoMsg.Write((byte)1); // Current players.
@@ -389,7 +395,7 @@ public class Server {
 				// Finally. The detailed info about the match to others to connect.
 				NetOutgoingMessage detailedInfoMsg = s_server.CreateMessage();
 				detailedInfoMsg.Write((byte)MasterServerMsg.RegisterDetails);
-				detailedInfoMsg.Write(s_server.UniqueIdentifier);
+				detailedInfoMsg.Write(uniqueID);
 				var simpleServerData = new SimpleServerData(
 					name, level, gameVersion, gameChecksum, customMapChecksum, customMapUrl
 				);
@@ -410,11 +416,9 @@ public class Server {
 				return;
 			}
 		}
-		while (true) {
+		while (!shutdownVar) {
 			try {
 				runIteration();
-			} catch (ShutdownException) {
-				return;
 			} catch (Exception ex) {
 				Logger.logException(ex, true);
 			}
@@ -422,10 +426,20 @@ public class Server {
 	}
 
 	public void shutdown(string reason) {
+		if (isP2P && uniqueID != 0) {
+			IPEndPoint masterServerLocation = NetUtility.Resolve(
+				MasterServerData.serverIp, MasterServerData.serverPort
+			);
+			NetOutgoingMessage netMsg = s_server.CreateMessage();
+			netMsg.Write((byte)MasterServerMsg.DeleteHost);
+			netMsg.Write(uniqueID);
+			s_server.SendUnconnectedMessage(netMsg, masterServerLocation);
+		}
+		s_server.FlushSendQueue();
 		s_server.Shutdown(reason);
 		s_server.FlushSendQueue();
 		servers.Remove(this, out _);
-		throw new ShutdownException();
+		shutdownVar = true;
 	}
 
 	public void runIteration() {
@@ -455,7 +469,7 @@ public class Server {
 			if (isP2P && iterations % 120 == 0) {
 				NetOutgoingMessage msg = s_server.CreateMessage();
 				msg.Write((byte)MasterServerMsg.UpdatePlayerNum);
-				msg.Write(s_server.UniqueIdentifier);
+				msg.Write(uniqueID);
 				msg.Write(playerNum);
 				s_server.SendUnconnectedMessage(msg, MasterServerData.serverIp, MasterServerData.serverPort);
 			}
@@ -624,7 +638,12 @@ public class Server {
 		players.Remove(disconnectedPlayer);
 
 		bool hostDisconnectBeforeStart = (disconnectedPlayer != null && disconnectedPlayer.isHost && !started);
-		if (players.Count == 0 || reason == "Recreate" || host == null || hostDisconnectBeforeStart) {
+		if (players.Count == 0 ||
+			reason == "Recreate" ||
+			reason == "RecreateMS" ||
+			host == null ||
+			hostDisconnectBeforeStart
+		) {
 			NetOutgoingMessage om = s_server.CreateMessage();
 			Helpers.debugLog("Host left, shutting down server " + name);
 
@@ -635,12 +654,13 @@ public class Server {
 				Helpers.debugLog("Sent: " + uploadedBytes.ToString("0.00") + " mb");
 			}
 
-			if (reason == "Recreate") {
+			if (reason == "RecreateMS") {
+				shutdown("RecreateMS");
+			} else if (reason == "Recreate") {
 				shutdown("Recreate");
 			} else {
-				shutdown("host left, shutting down server.");
+				shutdown("Host left, shutting down server.");
 			}
-
 			return;
 		} else if (s_server.Connections.Count > 0) {
 			NetOutgoingMessage om;

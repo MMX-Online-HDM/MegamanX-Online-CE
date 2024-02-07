@@ -85,29 +85,34 @@ public class JoinMenuP2P : IMainMenu {
 		// Draw background.
 		DrawWrappers.DrawTextureHUD(Global.textures["severbrowser"], 0, 0);
 
-		Fonts.drawText(
-			FontType.Grey, "ENTR: Join, SPC: Refresh, BSPC: Back",
+		Fonts.drawTextEX(
+			FontType.Grey, "[X]: Join, [Z]: Back",
 			Global.halfScreenW, Global.screenH - 32, Alignment.Center
 		);
-		Fonts.drawText(
-			FontType.OrangeMenu, " Name     Map        Plyrs Mode       Fork",
-			22, 20
-		);
+		Fonts.drawText(FontType.Orange, "Name", 30, 22);
+		Fonts.drawText(FontType.Orange, "Map", 102, 22);
+		Fonts.drawText(FontType.Orange, "PNJ", 190, 22);
+		Fonts.drawText(FontType.Orange, "Mode", 238, 22);
+		Fonts.drawText(FontType.Orange, "Fork", 326, 22);
 		int offset = 0;
-		DrawWrappers.DrawTextureHUD(Global.textures["cursor"], 21, 32 + (selServerIndex * 12));
+		DrawWrappers.DrawTextureHUD(Global.textures["cursor"], 21, 30 + (selServerIndex * 10));
 		if (refreshing) {
-			Fonts.drawText(FontType.Grey, "Refreshing...", 30, 32);
+			Fonts.drawText(FontType.RedishOrange, "Refreshing...", 30, 32);
+			return;
+		}
+		if (serverIndexes.Length == 0) {
+			Fonts.drawText(FontType.Blue, "No servers found.", 30, 32);
 			return;
 		}
 		foreach (long serverId in serverIndexes) {
-			Fonts.drawText(FontType.Grey, serverInfo[serverId].name, 30, 32 + offset);
-			Fonts.drawText(FontType.Grey, serverInfo[serverId].map, 102, 32 + offset);
-			Fonts.drawText(FontType.Grey, 
+			Fonts.drawText(FontType.Blue, serverInfo[serverId].name, 30, 32 + offset);
+			Fonts.drawText(FontType.Blue, serverInfo[serverId].map, 102, 32 + offset);
+			Fonts.drawText(FontType.Blue, 
 				serverInfo[serverId].playerCount + "/" + serverInfo[serverId].maxPlayer,
 				190, 32
 			);
-			Fonts.drawText(FontType.Grey, serverInfo[serverId].mode, 238, 32 + offset);
-			Fonts.drawText(FontType.Grey, serverInfo[serverId].fork, 326, 32 + offset);
+			Fonts.drawText(FontType.Blue, serverInfo[serverId].mode, 238, 32 + offset);
+			Fonts.drawText(FontType.Blue, serverInfo[serverId].fork, 326, 32 + offset);
 			offset += 10;
 		}
 	}
@@ -292,20 +297,24 @@ public class SimpleServerInfo {
 
 public static class MasterServerData {
 	public static int serverPort = 17788;
-	private static string _serverIp = null;
-	public static string serverIp {
-		get {
-			if (_serverIp == null) {
-				try {
-					_serverIp = System.Net.Dns.GetHostAddresses(serverUrl)[0].ToString();
-				} catch {
-					_serverIp = "127.0.0.1";
-				}
+	public static string serverIp = "127.0.0.1";
+
+	#pragma warning disable SYSLIB0014
+	public static void updateMasterServerURL() {
+		try {
+			string contents;
+			using (var wc = new System.Net.WebClient()) {
+				contents = wc.DownloadString(
+					"https://mmx-online-hdm.github.io/serverinfo/serverurl.txt"
+				);
 			}
-			return _serverIp;
+			string[] portUrl = contents.Split(":");
+			serverIp = System.Net.Dns.GetHostAddresses(portUrl[0])[0].ToString();
+			serverPort = Int32.Parse(portUrl[1]);
+		} catch {
 		}
 	}
-	public static string serverUrl = "127.0.0.1";
+	#pragma warning restore  SYSLIB0014
 }
 
 public enum MasterServerMsg {
@@ -315,5 +324,6 @@ public enum MasterServerMsg {
 	RegisterHost,
 	RegisterDetails,
 	RegisterInfo,
-	UpdatePlayerNum
+	UpdatePlayerNum,
+	DeleteHost
 }

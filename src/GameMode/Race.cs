@@ -40,11 +40,7 @@ public class Race : GameMode {
 		int place = getPlace(Global.level.mainPlayer);
 		string placeStr = Helpers.getNthString(place);
 		var topText = "Place: " + placeStr + "/" + level.nonSpecPlayers().Count;
-		Helpers.drawTextStd(TCat.HUD, topText, 5, 5, Alignment.Left, fontSize: (uint)32);
-
-		//var botText = "Kills: " + level.mainPlayer.kills.ToString() + "(" + placeStr + ")";
-		//Helpers.drawTextStd(TCat.HUD, botText, 5, 15, Alignment.Left, fontSize: (uint)32);
-
-		drawTimeIfSet(30);
+		Fonts.drawText(FontType.BlueMenu, topText, 5, 5, Alignment.Left);
+		drawTimeIfSet(15);
 	}
 }

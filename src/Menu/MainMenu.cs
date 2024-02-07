@@ -42,7 +42,7 @@ public class MainMenu : IMainMenu {
 		}
 	}
 
-	float state1Time;
+	//float state1Time;
 	public void update() {
 		if (state == 0) {
 			blinkTime += Global.spf;

@@ -182,27 +182,31 @@ public class ControlPoint : Actor {
 		}
 	}
 
-	public string getHillText() {
+	public (string text, FontType color) getHillText() {
+		string text = "";
+		FontType textColor = FontType.Grey;
 		if (Global.isHost) {
 			if (attacked()) {
 				hillAttackerCountSync = (byte)getAttackerCount();
-				return string.Format("{0}x", getAttackerCount());
+				text = string.Format("{0}x", getAttackerCount());
+				textColor = FontType.Pink;
 			} else if (contested()) {
 				hillAttackerCountSync = 255;
-				return string.Format("blocked");
+				text = "Block";
+				textColor = FontType.DarkPurple;
 			} else {
 				hillAttackerCountSync = 0;
-				return "";
 			}
 		} else {
 			if (hillAttackerCountSync == 255) {
-				return string.Format("blocked");
+				text = "Block";
+				textColor = FontType.DarkPurple;
 			} else if (hillAttackerCountSync > 0) {
-				return string.Format("{0}x", hillAttackerCountSync);
-			} else {
-				return "";
+				text = string.Format("{0}x", hillAttackerCountSync);
+				textColor = FontType.Pink;
 			}
 		}
+		return (text, textColor);
 	}
 
 	public bool contested() {

@@ -271,8 +271,6 @@ public class Sprite {
 		if (actor != null) {
 			if (!actor.shouldDraw()) return;
 		}
-		x = MathF.Round(x);
-		y = MathF.Round(y);
 
 		// Character-specific draw section
 		int[] armors = null;
@@ -332,13 +330,9 @@ public class Sprite {
 		cx += alignOffX;
 		cy += alignOffY;
 
-
 		if (scaleY == -1 && (actor is MagnaCentipede ms || name.Contains("magnac_teleport") || name.Contains("magnac_notail_teleport"))) {
 			cy -= MagnaCentipede.constHeight;
 		}
-
-		cx = MathF.Floor(cx);
-		cy = MathF.Floor(cy);
 
 		float frameOffsetX = 0;
 		float frameOffsetY = 0;

@@ -15,6 +15,7 @@ public class ServerClient {
 	Stopwatch packetLossStopwatch = new Stopwatch();
 	Stopwatch gameLoopStopwatch = new Stopwatch();
 	public long packetsReceived;
+	public long? serverId = null;
 
 	private ServerClient(NetClient client, bool isHost) {
 		this.client = client;
@@ -150,6 +151,7 @@ public class ServerClient {
 		Console.WriteLine("Starting Serverclient.");
 		Console.WriteLine("Conections active: " + client.Connections.Count);
 		var serverClient = new ServerClient(client, inputServerPlayer.isHost);
+		serverClient.serverId = serverId;
 		// Now try to connect to get server connect response after conection.
 		count = 0;
 		while (count < 20) {

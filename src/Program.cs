@@ -149,7 +149,7 @@ class Program {
 		loadText.Add("NOM BIOS v" + Global.version + ", An Energy Sunstar Ally");
 		loadText.Add("Copyrigth ©2114, NOM Corporation");
 		loadText.Add("");
-		loadText.Add("MMXOD " + Global.shortForkName + " Revision 20 Beta 4");
+		loadText.Add("MMXOD " + Global.shortForkName + " Revision " + Global.version + " Beta 4");
 		loadText.Add("");
 		if (String.IsNullOrEmpty(Options.main.playerName)) {
 			loadText.Add("User: Dr. Cain");
@@ -172,6 +172,14 @@ class Program {
 		}
 
 		// Loading with GUI.
+		loadText.Add("Getting Masterserver URL...");
+		loadMultiThread(loadText, window, MasterServerData.updateMasterServerURL);
+		if (MasterServerData.serverIp == "127.0.0.1") {
+			loadText[loadText.Count - 1] = "Using local conection.";
+		} else {
+			loadText[loadText.Count - 1] = "Masterserver OK.";
+		}
+
 		loadText.Add("Loading Sprites...");
 		loadMultiThread(loadText, window, loadImages);
 		loadText[loadText.Count - 1] = "Loaded Sprites.";
@@ -286,6 +294,9 @@ class Program {
 				case LeaveMatchScenario.Recreate:
 					disconnectMessage = "Recreate";
 					break;
+				case LeaveMatchScenario.RecreateMS:
+					disconnectMessage = "RecreateMS";
+					break;
 				case LeaveMatchScenario.Rejoin:
 					disconnectMessage = "Rejoin";
 					break;
@@ -309,6 +320,10 @@ class Program {
 					},
 					new MainMenu()
 				));
+			} else if (Global.leaveMatchSignal.leaveMatchScenario == LeaveMatchScenario.RecreateMS) {
+				Global.leaveMatchSignal.reCreateMS();
+			} else if (Global.leaveMatchSignal.leaveMatchScenario == LeaveMatchScenario.RejoinMS) {
+				Global.leaveMatchSignal.rejoinNewServerMS();
 			} else {
 				Menu.change(new MainMenu());
 			}

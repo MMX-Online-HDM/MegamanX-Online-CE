@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Lidgren.Network;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,18 +14,26 @@ public enum LeaveMatchScenario {
 	ServerShutdown,
 	Recreate,
 	Rejoin,
-	Kicked
+	Kicked,
+	RecreateMS,
+	RejoinMS,
 }
 
 public class LeaveMatchSignal {
 	public LeaveMatchScenario leaveMatchScenario;
 	public Server newServerData;
 	public string kickReason;
+	public bool isMasterServer;
 
-	public LeaveMatchSignal(LeaveMatchScenario leaveMatchScenario, Server newServerData, string kickReason) {
+	public LeaveMatchSignal(
+		LeaveMatchScenario leaveMatchScenario,
+		Server newServerData, string kickReason,
+		bool isMasterServer = false
+	) {
 		this.leaveMatchScenario = leaveMatchScenario;
 		this.newServerData = newServerData;
 		this.kickReason = kickReason;
+		this.isMasterServer = isMasterServer;
 	}
 
 	public void createNewServer() {
@@ -77,5 +86,44 @@ public class LeaveMatchSignal {
 		Server server = Helpers.deserialize<Server>(serverResponse);
 
 		JoinMenu.joinServer(server);
+	}
+
+	public void rejoinNewServerMS() {
+		Thread.Sleep(500);
+		JoinMenuP2P joinMenu = new();
+		joinMenu.requestServerDetails(newServerData.uniqueID);
+
+		NetIncomingMessage msg;
+		// Respond to connection messages.
+		for (int i = 0; i <= 50; i++) {
+			while ((msg = joinMenu.netClient.ReadMessage()) != null) {
+				if (msg.MessageType == NetIncomingMessageType.UnconnectedData &&
+					msg.ReadByte() == 101
+				) {
+					(long, SimpleServerData) serverData = joinMenu.receiveServerDetails(msg);
+					if (serverData.Item2 != null) {
+						joinMenu.netClient.Shutdown("Bye");
+						System.Threading.Thread.Sleep(100);
+						JoinMenuP2P.joinServer(serverData.Item1, serverData.Item2);
+						return;
+					}
+				}
+			}
+			if (i == 20) {
+				joinMenu.requestServerDetails(newServerData.uniqueID);
+			}
+			Thread.Sleep(100);
+		}
+	}
+
+	public void reCreateMS() {
+		HostMenu.reCreateP2PMatch(
+			SelectCharacterMenu.playerData.charNum, newServerData,
+			new MainMenu(), out string errorMessage
+		);
+
+		if (!string.IsNullOrEmpty(errorMessage)) {
+			Menu.change(new ErrorMenu(errorMessage, new MainMenu()));
+		}
 	}
 }
