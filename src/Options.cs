@@ -40,7 +40,7 @@ public class Options {
 
 	// Video settings
 	public bool fullScreen = false;
-	public bool integerFullscreen;
+	public bool integerFullscreen = true;
 	public int? graphicsPreset = null;  // 0 = low, 1 = medium, 2 = high, 3 = custom
 	public uint windowScale = 2;
 	public bool disableShaders;
@@ -109,14 +109,14 @@ public class Options {
 	public static Options main {
 		get {
 			if (_main == null) {
-				string text = Helpers.ReadFromFile("options.txt");
+				string text = Helpers.ReadFromFile("options.json");
 				if (string.IsNullOrEmpty(text)) {
 					_main = new Options();
 				} else {
 					try {
 						_main = JsonConvert.DeserializeObject<Options>(text);
 					} catch {
-						throw new Exception("Your options.txt file is corrupted, or does no longer work with this version. Please delete it and launch the game again.");
+						throw new Exception("Your options.json file is corrupted, or does no longer work with this version. Please delete it and launch the game again.");
 					}
 				}
 
@@ -173,7 +173,7 @@ public class Options {
 
 	public void saveToFile() {
 		string text = JsonConvert.SerializeObject(_main);
-		Helpers.WriteToFile("options.txt", text);
+		Helpers.WriteToFile("options.json", text);
 	}
 
 	public Region getRegion() {

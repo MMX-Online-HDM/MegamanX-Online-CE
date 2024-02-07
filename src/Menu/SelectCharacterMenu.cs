@@ -50,7 +50,6 @@ public class CharSelection {
 					new CharSelection("Vile", 2, 1, 0, "menu_vile", 0),
 					new CharSelection("Axl", 3, 1, 0, "menu_axl", 0),
 					new CharSelection("Sigma", 4, 1, 0, "menu_sigma", sigmaIndex),
-					new CharSelection("Zero Nightmare", 0, 1, 0, "menu_megaman", 0),
 					//new CharSelection("Rockman", 5, 1, 0, "rock_idle", 0),
 				};
 		}
@@ -326,18 +325,18 @@ public class SelectCharacterMenu : IMainMenu {
 		}
 		if (!isInGame) {
 			Fonts.drawTextEX(
-				FontType.LigthGrey, "[X]: Continue, [Z]: Back\n[LEFT]/[RIGHT]: Change character",
+				FontType.Grey, "[X]: Continue, [Z]: Back\n[LEFT]/[RIGHT]: Change character",
 				Global.screenW * 0.5f, 178, Alignment.Center
 			);
 		} else {
 			if (!Global.isHost) {
 				Fonts.drawTextEX(
-					FontType.LigthGrey, "[ESC]: Quit\n[LEFT]/[RIGHT]: Change character",
+					FontType.Grey, "[ESC]: Quit\n[LEFT]/[RIGHT]: Change character",
 					Global.screenW * 0.5f, 190, Alignment.Center
 				);
 			} else {
 				Fonts.drawTextEX(
-					FontType.LigthGrey, "[X]: Continue, [Z]: Back\n[LEFT]/[RIGHT]: Change character",
+					FontType.Grey, "[X]: Continue, [Z]: Back\n[LEFT]/[RIGHT]: Change character",
 					Global.screenW * 0.5f, 190, Alignment.Center
 				);
 			}

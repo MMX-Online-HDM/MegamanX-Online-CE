@@ -346,6 +346,7 @@ public class Server {
 			config.MaximumConnections = maxPlayers + maxOverflowSpectatorCount;
 			config.Port = port;
 			config.AutoFlushSendQueue = false;
+			config.EnableUPnP = true;
 			config.ConnectionTimeout = connectionTimeoutSeconds;
 			config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
 			if (isP2P) {

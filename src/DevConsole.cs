@@ -55,7 +55,7 @@ public class DevConsole {
 			);
 			for (int i = 0; i < consoleLog.Count; i++) {
 				string line = consoleLog[i];
-				Fonts.drawText(FontType.LigthGrey, line, 20, 20 + (i * 10));
+				Fonts.drawText(FontType.Grey, line, 20, 20 + (i * 10));
 			}
 		}
 	}

@@ -11,13 +11,17 @@ public class SelectVileArmorMenu : IMainMenu {
 	public int selectArrowPosY;
 	public IMainMenu prevMenu;
 
-	public Point optionPos1 = new Point(25, 40);
-	public Point optionPos2 = new Point(25, 80);
-	public Point optionPos3 = new Point(25, 110);
-	public Point optionPos4 = new Point(25, 170);
+	public int optionPosX = 20;
+	public int[] optionPosY;
 
 	public SelectVileArmorMenu(IMainMenu prevMenu) {
 		this.prevMenu = prevMenu;
+		optionPosY = new int[] {
+			40,
+			50,
+			80,
+			90
+		};
 	}
 
 	public void update() {
@@ -53,36 +57,52 @@ public class SelectVileArmorMenu : IMainMenu {
 	public void render() {
 		var mainPlayer = Global.level.mainPlayer;
 		var gameMode = Global.level.gameMode;
-
-		DrawWrappers.DrawRect(5, 5, Global.screenW - 5, Global.screenH - 5, true, Helpers.MenuBgColor, 0, ZIndex.HUD + 200, false);
-
-		Global.sprites["menu_viledefault"].drawToHUD(0, 230, 115);
+		DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
+		Global.sprites["menu_viledefault"].drawToHUD(0, 310, 110);
 
 		if (!Global.level.server.disableHtSt && Global.frameCount % 60 < 30) {
-			Helpers.drawTextStd(TCat.Option, "<", 12, Global.halfScreenH, Alignment.Center, fontSize: 32);
-			Helpers.drawTextStd(TCat.Option, "Items", 12, Global.halfScreenH + 15, Alignment.Center, fontSize: 20);
+			Fonts.drawText(FontType.DarkPurple, "<", 18, Global.halfScreenH + 10, Alignment.Center);
+			Fonts.drawText(FontType.DarkPurple, "Items", 18, Global.halfScreenH + 20, Alignment.Center);
 		}
 
-		if (mainPlayer.speedDevil) Global.sprites["menu_vilespeeddevil"].drawToHUD(0, 230, 115);
-		if (mainPlayer.frozenCastle) Global.sprites["menu_vilefrozencastle"].drawToHUD(0, 230, 115);
+		if (mainPlayer.speedDevil) Global.sprites["menu_vilespeeddevil"].drawToHUD(0, 310, 110);
+		if (mainPlayer.frozenCastle) Global.sprites["menu_vilefrozencastle"].drawToHUD(0, 310, 110);
 
-		Global.sprites["cursor"].drawToHUD(0, optionPos1.x - 8, optionPos1.y + 4 + selectArrowPosY * 40);
+		Global.sprites["cursor"].drawToHUD(0, optionPosX - 6, optionPosY[0] + selectArrowPosY * 40 + 3);
 
-		Helpers.drawTextStd(TCat.Title, "Vile Armor", Global.screenW * 0.5f, 8, Alignment.Center, fontSize: 48);
-		Helpers.drawTextStd("Scrap: " + mainPlayer.scrap, Global.screenW * 0.5f, 25, Alignment.Center, fontSize: 24);
+		Fonts.drawText(FontType.Yellow, "Vile Armor", Global.screenW * 0.5f, 10, Alignment.Center);
+		Fonts.drawText(FontType.Golden, "Scrap: " + mainPlayer.scrap, Global.screenW * 0.5f, 20, Alignment.Center);
 
-		Helpers.drawTextStd(TCat.Option, "Frozen Castle", optionPos1.x, optionPos1.y, fontSize: 24, color: mainPlayer.frozenCastle ? Helpers.Gray : Color.White, selected: selectArrowPosY == 0);
-		Helpers.drawTextStd(string.Format(" ({0} scrap)", Vile.frozenCastleCost), optionPos1.x + 80, optionPos1.y, fontSize: 24, color: mainPlayer.frozenCastle ? Helpers.Gray : (mainPlayer.scrap < Vile.frozenCastleCost ? Color.Red : Color.Green));
-		Helpers.drawTextStd("By utilizing a thin layer of ice,", optionPos1.x + 5, optionPos1.y + 11, fontSize: 18, color: mainPlayer.frozenCastle ? Helpers.Gray : Color.White);
-		Helpers.drawTextStd("this armor reduces damage by 1/8.", optionPos1.x + 5, optionPos1.y + 18, fontSize: 18, color: mainPlayer.frozenCastle ? Helpers.Gray : Color.White);
+		Fonts.drawText(FontType.Blue, "Frozen Castle", optionPosX, optionPosY[0],
+			selected: selectArrowPosY == 0
+		);
+		Fonts.drawText(
+			FontType.Purple, string.Format(" ({0} scrap)", Vile.frozenCastleCost),
+			optionPosX + 110, optionPosY[0]
+		);
+		Fonts.drawText(
+			FontType.Green, "By utilizing a thin layer of ice," +
+			"\nthis armor reduces damage by 12.5%",
+			optionPosX, optionPosY[1]
+		);
 
-		Helpers.drawTextStd(TCat.Option, "Speed Devil", optionPos2.x, optionPos2.y, fontSize: 24, color: mainPlayer.speedDevil ? Helpers.Gray : Color.White, selected: selectArrowPosY == 1);
-		Helpers.drawTextStd(string.Format(" ({0} scrap)", Vile.speedDevilCost), optionPos2.x + 80, optionPos2.y, fontSize: 24, color: mainPlayer.speedDevil ? Helpers.Gray : (mainPlayer.scrap < Vile.speedDevilCost ? Color.Red : Color.Green));
-		Helpers.drawTextStd("A layer of atmospheric pressure", optionPos2.x + 5, optionPos2.y + 11, fontSize: 18, color: mainPlayer.speedDevil ? Helpers.Gray : Color.White);
-		Helpers.drawTextStd("increases movement speed by 10%.", optionPos2.x + 5, optionPos2.y + 18, fontSize: 18, color: mainPlayer.speedDevil ? Helpers.Gray : Color.White);
+		Fonts.drawText(
+			FontType.Blue, "Speed Devil", optionPosX, optionPosY[2],
+			selected: selectArrowPosY == 1
+		);
+		Fonts.drawText(
+			FontType.Purple, string.Format(" ({0} scrap)", Vile.speedDevilCost),
+			optionPosX + 110, optionPosY[2]
+		);
+		Fonts.drawText(
+			FontType.Green, "A layer of atmospheric pressure\nincreases movement speed by 10%.",
+			optionPosX, optionPosY[3]
+		);
 
-		Helpers.drawTextStd(TCat.BotHelp, "Left/Right: Change Armor", Global.halfScreenW, 208, Alignment.Center, fontSize: 16);
-		Helpers.drawTextStd(TCat.BotHelp, "[X]: Upgrade, [C]: Unupgrade, [Z]: Back", Global.halfScreenW, 214, Alignment.Center, fontSize: 16);
+		Fonts.drawTextEX(FontType.Grey, "[LEFT]/[RIGHT]: Change Armor", 40, 188);
+		Fonts.drawTextEX(FontType.Grey,
+			"[X]: Upgrade, [C]: Unupgrade, [Z]: Back", 40, 198
+		);
 	}
 
 }

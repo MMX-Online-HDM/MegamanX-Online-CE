@@ -23,6 +23,9 @@ public class Menu {
 
 	public static void change(IMainMenu newMenu) {
 		//if (Global.level?.mainPlayer?.isUsingSubTank() == true) return;
+		if (mainMenu is JoinMenuP2P joinMenu) {
+			joinMenu.onExit(newMenu);
+		}
 		mainMenu = newMenu;
 	}
 

@@ -201,7 +201,7 @@ public class Control {
 	public static Dictionary<string, Dictionary<string, int?>> controllerNameToMapping {
 		get {
 			if (_controllerNameToMapping == null) {
-				string text = Helpers.ReadFromFile("controls.txt");
+				string text = Helpers.ReadFromFile("controls.json");
 				if (string.IsNullOrEmpty(text)) {
 					_controllerNameToMapping = new Dictionary<string, Dictionary<string, int?>>()
 					{
@@ -287,7 +287,7 @@ public class Control {
 					try {
 						_controllerNameToMapping = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, int?>>>(text);
 					} catch {
-						throw new Exception("Your controls.txt file is corrupted, or no longer works with this version. Please delete it, launch the game again and rebind your controls.");
+						throw new Exception("Your controls.json file is corrupted, or no longer works with this version. Please delete it, launch the game again and rebind your controls.");
 					}
 				}
 			}
@@ -297,7 +297,7 @@ public class Control {
 
 	public static void saveToFile() {
 		string text = JsonConvert.SerializeObject(_controllerNameToMapping);
-		Helpers.WriteToFile("controls.txt", text);
+		Helpers.WriteToFile("controls.json", text);
 	}
 
 	public static bool isNumberBound(int charNum, int axlAimMode) {

@@ -17,19 +17,19 @@ namespace MMXOnline;
 
 public partial class Global {
 	public static decimal version = 20m;
-	public static decimal gameVersion = 20m;
+	public const string versionName = "Alpha 6";
 
 	// THIS VALUE MUST ALWAYS MANUALLY BE SET AFTER UPDATING ASSETS BEFORE BUILDING A RELEASE BUILD.
 	// Obtain it by pressing F1 in main menu.
 	// This step could be automated as future improvement in build scripts.
-	private const string assetChecksum = "83E3CC4894E07CAF97CDBE2B36654180";
+	private const string assetChecksum = "712C30F769442BAF01DF6977C712DC84";
 
 	// For forks/mods of the game, add a prefix here so that different forks
 	// don't conflict with each other or the base game
 	public const string checksumPrefix = "[Community Edition]";
 	// Use this to make sure the checksum varies.
 	// Better to use together with "checksumPrefix" and be diferent from it.
-	public const string checksumKey = checksumPrefix + " DEVTEST-06-02-2024";
+	public const string checksumKey = checksumPrefix + versionName + " DEVTEST-07-02-2024-v1";
 	// For displaying the name of the mod in the version string.
 	public static string shortForkName = "CE";
 
@@ -110,6 +110,13 @@ public partial class Global {
 
 	public static bool quickStart { get { return _quickStart && !quickStartOnline; } }
 	public static bool anyQuickStart { get { return _quickStart || quickStartOnline; } }
+
+	// Default region JSON.
+	public static string defaultRegionJson =
+@"{
+   ""name"": """",
+   ""ip"": """"
+}";
 
 	// Feature switches
 	public static bool maverickWallClimb = false;
@@ -625,14 +632,17 @@ public partial class Global {
 						new Region("LAN", LANIPHelper.GetLocalIPAddress()),
 					};
 				} else {
-					string text = Helpers.ReadFromFile("region.txt");
+					string text = Global.defaultRegionJson;
+					if (Helpers.FileExists("region.json")) {
+						text = Helpers.ReadFromFile("region.json");
+					}
 					if (!string.IsNullOrEmpty(text)) {
 						Region region;
 
 						try {
 							region = JsonConvert.DeserializeObject<Region>(text);
 						} catch {
-							throw new Exception("region.txt has improper format and could not be parsed. Must be valid JSON.");
+							throw new Exception("region.json has improper format and could not be parsed. Must be valid JSON.");
 						}
 
 						// Validate
@@ -645,12 +655,12 @@ public partial class Global {
 						}
 						if (string.IsNullOrEmpty(region.name) || string.IsNullOrEmpty(region.ip))
 						{
-							//throw new Exception("region.txt has missing fields.");
+							//throw new Exception("region.json has missing fields.");
 							region = new Region();
 						}
 						else {
 							if (!region.ip.IsValidIpAddress()) {
-								throw new Exception("region.txt has invalid ip.");
+								throw new Exception("region.json has an invalid IP.");
 							}
 							if (region.name.Length > 10) {
 								region.name = region.name.Substring(0, 10);

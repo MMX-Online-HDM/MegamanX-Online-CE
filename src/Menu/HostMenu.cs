@@ -1010,8 +1010,8 @@ public class HostMenu : IMainMenu {
 			out JoinServerResponse joinServerResponse, out string error
 		);
 		*/
-		Global.serverClient = ServerClient.CreateHolePunch(
-			localServer.uniqueID, me,
+		Global.serverClient = ServerClient.CreateDirect(
+			"127.0.0.1", localServer.port, me,
 			out JoinServerResponse joinServerResponse, out string error
 		);
 
@@ -1057,8 +1057,8 @@ public class HostMenu : IMainMenu {
 			Options.main.playerName, 0, true,
 			SelectCharacterMenu.playerData.charNum, null, Global.deviceId, null, 0
 		);
-		Global.serverClient = ServerClient.CreateHolePunch(
-			localServer.uniqueID, me,
+		Global.serverClient = ServerClient.CreateDirect(
+			"127.0.0.1", localServer.port, me,
 			out JoinServerResponse joinServerResponse, out string error
 		);
 		if (joinServerResponse != null && error == null) {

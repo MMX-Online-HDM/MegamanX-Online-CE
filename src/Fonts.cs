@@ -79,7 +79,7 @@ public class Fonts {
 			for (int i = 0; i < textLine.Length; i++) {
 				char letter = textLine[i];
 				int charInt = (int)letter;
-				if (letter > 191) {
+				if (charInt > 191) {
 					letter = '?';
 					charInt = (int)letter;
 				}

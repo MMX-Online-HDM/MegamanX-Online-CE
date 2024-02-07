@@ -483,26 +483,27 @@ public class SelectAxlWeaponMenu : IMainMenu {
 				if (selectedWeaponIndices[0] == 5) description = "Can headshot, but 1/2 damage on body.";
 				if (selectedWeaponIndices[0] == 6) description = "Has all bonuses in one.";
 
-				if (mainPlayer.axlBulletTypeBought[selectedWeaponIndices[0]] == true) {
-					float ammo = mainPlayer.axlBulletTypeAmmo[selectedWeaponIndices[0]];
-					description = "Remaining Ammo: " + MathF.Ceiling(ammo);
-				}
-
 				Fonts.drawText(
 					FontType.Orange, weapon.displayName,
 					Global.halfScreenW, titleY2, Alignment.Center
 				);
-				Helpers.drawTextStd(description, Global.halfScreenW, row1Y - 9, Alignment.Center, style: Text.Styles.Italic, fontSize: 24);
-				//Helpers.drawTextStd(line2, Global.halfScreenW, row1Y + 10, Alignment.Center, style: Text.Styles.Italic, fontSize: 24);
+				Fonts.drawText(
+					FontType.Green, description,
+					Global.halfScreenW, row1Y, Alignment.Center
+				);
+				string ammoString = "Not purchased.";
+				if (mainPlayer.axlBulletTypeBought[selectedWeaponIndices[0]] == true) {
+					float ammo = mainPlayer.axlBulletTypeAmmo[selectedWeaponIndices[0]];
+					ammoString = "Remaining Ammo: " + MathF.Ceiling(ammo);
+				}
+				Fonts.drawText(
+					FontType.DarkPurple, ammoString,
+					Global.halfScreenW, row1Y + 10, Alignment.Center
+				);
 			}
 
 			if (selectedWeaponIndices[0] > 0) {
-				string label = "[C]: Craft Weapon";
-				if (mainPlayer.axlBulletTypeBought[selectedWeaponIndices[0]] == true) {
-					label = "[C]: Craft More Ammo";
-				}
-				Helpers.drawTextStd(Helpers.controlText(label), Global.halfScreenW, 163, Alignment.Center, style: Text.Styles.Italic, fontSize: 24);
-				drawCraftingRecipes(selectedWeaponIndices[0], 172);
+				drawCraftingRecipes(selectedWeaponIndices[0]);
 			}
 		} else if (selCursorIndex < 3) {
 			int friendlyWi = selectedWeaponIndices[selCursorIndex];
@@ -576,15 +577,26 @@ public class SelectAxlWeaponMenu : IMainMenu {
 			Fonts.drawText(
 				FontType.Purple, "Hyper Mode", Global.halfScreenW, titleY1, Alignment.Center
 			);
-			Helpers.drawTextStd(TCat.Option, (cursors[3].index == 0 ? "White Axl" : "Stealth Mode"), Global.halfScreenW, 144, Alignment.Center, selected: true);
+			Fonts.drawText(
+				FontType.Orange, (cursors[3].index == 0 ? "White Axl" : "Stealth Axl"),
+				Global.halfScreenW, titleY2, Alignment.Center
+			);
 
 			if (cursors[3].index == 0) {
-				Helpers.drawTextStd("This hyper form grants infinite hover", Global.halfScreenW, 165, Alignment.Center, style: Text.Styles.Italic, fontSize: 20);
-				Helpers.drawTextStd("and powered up weapons.", Global.halfScreenW, 175, Alignment.Center, style: Text.Styles.Italic, fontSize: 20);
+				Fonts.drawText(
+					FontType.Green, "Grants infinite hover\nand powered up weapons.",
+					Global.halfScreenW, row1Y, Alignment.Center
+				);
 			} else {
-				Helpers.drawTextStd("This hyper form turns Axl invisible and", Global.halfScreenW, 165, Alignment.Center, style: Text.Styles.Italic, fontSize: 20);
-				Helpers.drawTextStd("invincible while still allowing attacks.", Global.halfScreenW, 175, Alignment.Center, style: Text.Styles.Italic, fontSize: 20);
+				Fonts.drawText(
+					FontType.Green, "Turns Axl invisible and\ninvincible while still allowing attacks.",
+					Global.halfScreenW, row1Y, Alignment.Center
+				);
 			}
+			Fonts.drawText(
+				FontType.Blue, "Cost: 10 metal",
+				Global.halfScreenW, row2Y, Alignment.Center
+			);
 		}
 		/*
 		if (selCursorIndex == 0) {
@@ -621,27 +633,40 @@ public class SelectAxlWeaponMenu : IMainMenu {
 		}
 	}
 
-	private void drawCraftingRecipes(int index, float y) {
+	private void drawCraftingRecipes(int index) {
 		var recipes = craftingRecipes[index];
-		float startX = 40;
-		var outlineColor = inGame ? Color.White : Helpers.LoadoutBorderColor;
-
+		int posY = 176;
+		DrawWrappers.DrawLine(
+			25, posY,
+			Global.screenW - 25, posY,
+			Color.White, 1, ZIndex.HUD, false
+		);
 		var rects = new List<Rect>();
-		float w = 248 / recipes.Count;
 		for (int i = 0; i < recipes.Count; i++) {
-			float secondX = i == recipes.Count - 1 ? 25 : 24.5f;
-			var rect = new Rect(25 + i * w, y, secondX + (i + 1) * w, y + 20);
-			rects.Add(rect);
-			DrawWrappers.DrawRect(rect.x1, rect.y1, rect.x2, rect.y2, false, outlineColor, 0.5f, ZIndex.HUD, false, outlineColor);
-		}
+			DrawWrappers.DrawLine(
+				25 + MathInt.Floor(83.5f * i), posY,
+				25 + MathInt.Floor(83.5f * i), 192,
+				Color.White, 1, ZIndex.HUD, false
+			);
+			int offset = 0;
+			if (recipes.Count == 2 && i == 1) {
+				offset = 167;
+			}
+			rects.Add(new Rect(
+				25 + MathInt.Floor(83.5f * i),
+				posY,
+				25 + MathInt.Floor(83.5f * (i + 1)) + offset,
+				192
+			));
 
+		}
 		for (int i = 0; i < recipes.Count; i++) {
 			var recipe = recipes[i];
-			float rx = rects[i].x1 + (recipe.Length == 2 ? 20 : 8);
-			if (recipes.Count == 2) {
-				rx = rects[i].x1 + (recipe.Length == 2 ? 53 : 1);
+			float rx = rects[i].x1 + 8 + (recipe.Length == 2 ? 20 : 8);
+			if (recipes.Count == 2 && i == 1) {
+				rx += 35;
 			}
-			float ry = rects[i].y1 + 4;
+			float ry = rects[i].y1 + 3;
 			recipeManager(recipe, false, out bool canAfford, out int missingScrap, out int[] missingCores);
 			for (int j = 0; j < recipe.Length - 1; j += 2) {
 				char curChar = recipe[j];
@@ -653,15 +678,16 @@ public class SelectAxlWeaponMenu : IMainMenu {
 					int charToInt = curChar - '0';
 					Global.sprites["char_icon"].drawToHUD(charToInt, rx + 6, 1 + ry, alpha: !canAfford ? 0.5f : 1);
 				}
-				Helpers.drawTextStd("x" + count.ToString(), rx + 12, 3 + ry, fontSize: 21, alpha: !canAfford ? 0.5f : 1);
+				Fonts.drawText(
+					canAfford ? FontType.Blue : FontType.DarkBlue, "x" + count.ToString(),
+					rx + 12, 3 + ry
+				);
 				rx += 25;
 			}
 			int selCraftRecipeIndex = craftingRecipeSelections[index];
 			if (selCraftRecipeIndex == i) {
-				DrawWrappers.DrawRect(rects[i].x1 + 2, rects[i].y1 + 2, rects[i].x2 - 2, rects[i].y2 - 2, false, Color.Green, 1, ZIndex.HUD, false);
+				DrawWrappers.DrawRect(rects[i].x1, rects[i].y1, rects[i].x2, rects[i].y2, false, Color.Green, 1, ZIndex.HUD, false);
 			}
-			startX += 56;
-			//if (i < recipes.Count - 1) DrawWrappers.DrawLine(startX - 6, y - 2, startX - 6, y + 14, outlineColor, 0.5f, ZIndex.HUD, false);
 		}
 	}
 }

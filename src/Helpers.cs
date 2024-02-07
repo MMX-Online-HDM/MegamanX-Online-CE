@@ -554,6 +554,8 @@ public class Helpers {
 		text = text.Replace("[WeaponL]", Control.getKeyOrButtonName(Control.WeaponLeft, isController));
 		text = text.Replace("[WeaponR]", Control.getKeyOrButtonName(Control.WeaponRight, isController));
 		text = text.Replace("[CMD]", Control.getKeyOrButtonName(Control.Special2, isController));
+		text = text.Replace("[LEFT]", Control.getKeyOrButtonName(Control.MenuLeft, isController));
+		text = text.Replace("[RIGHT]", Control.getKeyOrButtonName(Control.MenuRight, isController));
 
 		return text;
 	}

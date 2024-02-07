@@ -40,6 +40,13 @@ class Program {
 			}
 			GameMain(args, mode);
 		}
+		if (Global.localServer != null && (
+			Global.localServer.s_server.Status == NetPeerStatus.Running ||
+			Global.localServer.s_server.Status == NetPeerStatus.Starting
+		)) {
+			Global.localServer.shutdown("Host closed the game.");
+		}
+		Environment.Exit(0);
 	}
 
 	#if WINDOWS
@@ -149,7 +156,7 @@ class Program {
 		loadText.Add("NOM BIOS v" + Global.version + ", An Energy Sunstar Ally");
 		loadText.Add("Copyrigth ©2114, NOM Corporation");
 		loadText.Add("");
-		loadText.Add("MMXOD " + Global.shortForkName + " Revision " + Global.version + " Beta 4");
+		loadText.Add("MMXOD " + Global.shortForkName + " Revision " + Global.version + " " + Global.versionName);
 		loadText.Add("");
 		if (String.IsNullOrEmpty(Options.main.playerName)) {
 			loadText.Add("User: Dr. Cain");
@@ -204,14 +211,9 @@ class Program {
 		loadMultiThread(loadText, window, Global.computeChecksum);
 		loadText[loadText.Count - 1] = "Checksum OK.";
 
-		string regionJson =
-@"{
-   ""name"": """",
-   ""ip"": """"
-}";
-		if (!Helpers.FileExists("region.txt")) {
-			Helpers.WriteToFile("region.txt", regionJson);
-		}
+		/*if (!Helpers.FileExists("region.json")) {
+			Helpers.WriteToFile("region.json", regionJson);
+		}*/
 
 		// Only used to initialize the Global.ignoreUpgradeChecks variable
 		var primeRegions = Global.regions;
@@ -232,8 +234,7 @@ class Program {
 		} else if (mode == 2) {
 			// TODO: Fix this.
 			// Somehow we need to get the data before we connect.
-			JoinMenuP2P menu = new(); 
-			Menu.change(new JoinMenuP2P());
+			Menu.change(new JoinMenuP2P(true));
 		}
 
 		while (window.IsOpen) {
@@ -1115,10 +1116,10 @@ class Program {
 			Color clearColor = Color.Black;
 			window.Clear(clearColor);
 			for (int i = 0; i < loadText.Count; i++) {
-				Fonts.drawText(FontType.LigthGrey, loadText[i], 8, 8 + (10 * i), isLoading: true);
+				Fonts.drawText(FontType.Grey, loadText[i], 8, 8 + (10 * i), isLoading: true);
 			}
 			Fonts.drawText(
-				FontType.LigthGrey,
+				FontType.Grey,
 				UtcNow.Day + "/" + UtcNow.Month + "/" + UtcNow.Year + " " +
 				UtcNow.ToString("0:hh:mm:sstt", CultureInfo.InvariantCulture),
 				8, Global.screenH - 15, isLoading: true

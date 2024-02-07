@@ -575,7 +575,7 @@ public class GameMode {
 			if (!Global.level.is1v1()) {
 				Global.sprites["hud_scrap"].drawToHUD(0, 4, 138);
 				Fonts.drawText(
-					FontType.LigthGrey,
+					FontType.Grey,
 					"x" + Global.level.mainPlayer.scrap.ToString(), 17, 141, Alignment.Left
 				);
 			}
@@ -2054,16 +2054,14 @@ public class GameMode {
 	public void drawNetcodeData() {
 		int top2 = -3;
 		if (!Global.level.server.isP2P) {
-			Helpers.drawTextStd(
-				TCat.HUD, Global.level.server.region.name,
-				Global.screenW - 12, top2 + 12, Alignment.Right,
-				fontSize: 24, style: Text.Styles.Italic
+			Fonts.drawText(
+				FontType.DarkPurple, Global.level.server.region.name,
+				Global.screenW - 12, top2 + 12, Alignment.Right
 			);
 		} else {
-			Helpers.drawTextStd(
-				TCat.HUD, "P2P Server",
-				Global.screenW - 12, top2 + 12, Alignment.Right,
-				fontSize: 24, style: Text.Styles.Italic
+			Fonts.drawText(
+				FontType.DarkPurple, "P2P Server",
+				Global.screenW - 12, top2 + 12, Alignment.Right
 			);
 		}
 
@@ -2074,10 +2072,16 @@ public class GameMode {
 			if (level.server.netcodeModelPing < 100) iconXPos = 260;
 			else iconXPos = 253;
 		}
-		Helpers.drawTextStd(TCat.HUD, netcodePingStr, Global.screenW - 12, top2 + 22, Alignment.Right, fontSize: 24, style: Text.Styles.Italic);
+		Fonts.drawText(
+			FontType.DarkPurple, netcodePingStr,
+			Global.screenW - 12, top2 + 22, Alignment.Right
+		);
 		Global.sprites["hud_netcode"].drawToHUD((int)level.server.netcodeModel, iconXPos, top2 + 26);
 		if (Global.level.server.isLAN) {
-			Helpers.drawTextStd(TCat.HUD, "IP: " + Global.level.server.ip, Global.screenW - 12, top2 + 32, Alignment.Right, fontSize: 24, style: Text.Styles.Italic);
+			Fonts.drawText(
+				FontType.DarkPurple, "IP: " + Global.level.server.ip,
+				Global.screenW - 12, top2 + 32, Alignment.Right
+			);
 		}
 	}
 
@@ -2108,7 +2112,7 @@ public class GameMode {
 		drawMapName(padding, top + 10);
 		if (Global.serverClient != null) {
 			Fonts.drawText(
-				FontType.BlueMenu, "Match: " + Global.level.server.name, padding + 10, top + 20, Alignment.Left
+				FontType.BlueMenu, "Match: " + Global.level.server.name, padding + 100, top + 10
 			);
 			drawNetcodeData();
 		}
@@ -2121,8 +2125,9 @@ public class GameMode {
 		Fonts.drawText(FontType.OrangeMenu, "Kills", col3x, labelTextY, Alignment.Left);
 		Fonts.drawText(FontType.OrangeMenu, this is Elimination ? "Lives" : "Deaths", col4x, labelTextY, Alignment.Left);
 
-		if (Global.serverClient != null) Helpers.drawTextStd(TCat.HUD, "Ping", col5x, labelTextY, Alignment.Left);
-
+		if (Global.serverClient != null) {
+			Fonts.drawText(FontType.OrangeMenu, "Ping", col5x, labelTextY, Alignment.Left);
+		}
 		DrawWrappers.DrawLine(
 			padding - 2, line2Y, Global.screenW - padding + 2, line2Y, Color.White, 1, ZIndex.HUD, false
 		);
@@ -2339,7 +2344,7 @@ public class GameMode {
 	}
 
 	public void drawTimeIfSet(int yPos) {
-		FontType fontColor = FontType.LigthGrey;
+		FontType fontColor = FontType.Grey;
 		string timeStr = "";
 		if (setupTime > 0) {
 			var timespan = new TimeSpan(0, 0, MathInt.Ceiling(setupTime.Value));

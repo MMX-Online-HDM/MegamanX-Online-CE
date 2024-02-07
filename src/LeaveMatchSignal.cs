@@ -90,8 +90,9 @@ public class LeaveMatchSignal {
 
 	public void rejoinNewServerMS() {
 		Thread.Sleep(500);
-		JoinMenuP2P joinMenu = new();
+		JoinMenuP2P joinMenu = new JoinMenuP2P(false);
 		joinMenu.requestServerDetails(newServerData.uniqueID);
+		joinMenu.netClient.FlushSendQueue();
 
 		NetIncomingMessage msg;
 		// Respond to connection messages.
@@ -102,15 +103,14 @@ public class LeaveMatchSignal {
 				) {
 					(long, SimpleServerData) serverData = joinMenu.receiveServerDetails(msg);
 					if (serverData.Item2 != null) {
-						joinMenu.netClient.Shutdown("Bye");
-						System.Threading.Thread.Sleep(100);
-						JoinMenuP2P.joinServer(serverData.Item1, serverData.Item2);
+						joinMenu.joinServer(serverData.Item1, serverData.Item2);
 						return;
 					}
 				}
 			}
 			if (i == 20) {
 				joinMenu.requestServerDetails(newServerData.uniqueID);
+				joinMenu.netClient.FlushSendQueue();
 			}
 			Thread.Sleep(100);
 		}

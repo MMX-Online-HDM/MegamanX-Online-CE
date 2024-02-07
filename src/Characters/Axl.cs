@@ -735,7 +735,7 @@ public class Axl : Character {
 
 	public override bool normalCtrl() {
 		if (!player.isAI && player.input.isPressed(Control.Jump, player) &&
-			canJump() && !isDashing && canAirDash() && flag == null
+			canJump() && !grounded && !isDashing && canAirDash() && flag == null
 		) {
 			dashedInAir++;
 			changeState(new Hover(), true);
@@ -1332,7 +1332,11 @@ public class Axl : Character {
 		Point gunArmOrigin;
 		if (charState is Assassinate assasinate) {
 			gunArmOrigin = getAxlGunArmOrigin();
-			getAxlArmSprite().draw(0, gunArmOrigin.x, gunArmOrigin.y, axlXDir, 1, getRenderEffectSet(), 1, 1, 1, zIndex, angle: angle, shaders: getShaders());
+			getAxlArmSprite().draw(
+				0, gunArmOrigin.x, gunArmOrigin.y,
+				axlXDir, 1, getRenderEffectSet(), 1, 1, 1,
+				zIndex, angle: angle, shaders: getShaders()
+			);
 			return;
 		}
 
@@ -1519,9 +1523,10 @@ public class Axl : Character {
 		Point retPoint;
 		var pois = sprite.getCurrentFrame().POIs;
 		Point offset = getTwoHandedOffset();
+		Point roundPos = new Point(MathInt.Round(pos.x), MathInt.Round(pos.y));
 		if (pois.Count > 0) {
-			retPoint = pos.addxy((offset.x + pois[0].x) * axlXDir, pois[0].y + offset.y);
-		} else retPoint = pos.addxy((offset.x + 3) * axlXDir, -21 + offset.y);
+			retPoint = roundPos.addxy((offset.x + pois[0].x) * axlXDir, pois[0].y + offset.y);
+		} else retPoint = roundPos.addxy((offset.x + 3) * axlXDir, -21 + offset.y);
 
 		return retPoint;
 	}
