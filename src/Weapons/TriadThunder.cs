@@ -308,7 +308,7 @@ public class TriadThunderChargedState : CharState {
 			new TriadThunderProjCharged(weapon, new Point(x, y), 1, 0, player, player.getNextActorNetId(), rpc: true);
 			new TriadThunderQuake(weapon, new Point(x, y), 1, player, player.getNextActorNetId(), rpc: true);
 
-			character.playSound("triadThunderCharged", sendRpc: true);
+			character.playSound("crashX3", forcePlay: false, sendRpc: true);
 		}
 
 		if (stateTime > 0.75f) {

@@ -104,7 +104,7 @@ public class SigmaSlashState : CharState {
 
 		if (character.frameIndex >= attackFrame && !fired) {
 			fired = true;
-			character.playSound("saberShot", sendRpc: true);
+			character.playSound("SigmaSaber", sendRpc: true);
 
 			Point off = new Point(30, -20);
 			if (character.sprite.name == "sigma_attack_air") {
@@ -318,7 +318,7 @@ public class SigmaWallDashState : CharState {
 			fired = true;
 			character.saberCooldown = sigma.sigmaSaberMaxCooldown;
 
-			character.playSound("saberShot", sendRpc: true);
+			character.playSound("SigmaSaber", sendRpc: true);
 			character.changeSpriteFromName("wall_dash_attack", true);
 
 			Point off = new Point(30, -20);

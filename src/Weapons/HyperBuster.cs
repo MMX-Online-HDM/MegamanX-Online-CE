@@ -16,7 +16,7 @@ public class HyperBuster : Weapon {
 		weaponBarBaseIndex = 32;
 		weaponBarIndex = 31;
 		weaponSlotIndex = 36;
-		shootSounds = new List<string>() { "buster4", "buster4", "buster4", "buster4" };
+		shootSounds = new List<string>() { "buster3X3", "buster3X3", "buster3X3", "buster3X3" };
 		rateOfFire = 2f;
 		switchCooldown = 0.25f;
 		ammo = 0;

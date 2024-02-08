@@ -54,11 +54,17 @@ public class HyperZeroStart : CharState {
 		if (zero.hyperZeroUsed) {
 			return;
 		}
-		if (player.isZBusterZero()) {
+		if (base.player.isZBusterZero() || zero.zeroHyperMode == 0) {
 			character.player.scrap -= 10;
-		} else if (zero.zeroHyperMode == 0) {
-			character.player.scrap -= 10;
-		} else if (zero.zeroHyperMode == 1) {
+			drWilyAnim = new Anim(
+				character.pos.addxy(50 * character.xDir, 0f),
+				"LightX3", -character.xDir,
+				player.getNextActorNetId(),
+				destroyOnEnd: false, sendRpc: true
+			);
+			drWilyAnim.fadeIn = true;
+			character.playSound("BlackZeroEntry", forcePlay: false, sendRpc: true);	
+		}else if (zero.zeroHyperMode == 1) {
 			drWilyAnim = new Anim(
 				character.pos.addxy(30 * character.xDir, -30), "drwily", -character.xDir,
 				player.getNextActorNetId(), false, sendRpc: true
@@ -66,6 +72,7 @@ public class HyperZeroStart : CharState {
 			drWilyAnim.fadeIn = true;
 			drWilyAnim.blink = true;
 			character.player.awakenedScrapEnd = (character.player.scrap - 10);
+			character.playSound("AwakenedZeroEntry", forcePlay: false, sendRpc: true);
 		} else if (zero.zeroHyperMode == 2) {
 			drWilyAnim = new Anim(
 				character.pos.addxy(30 * character.xDir, -30), "gate", -character.xDir,
@@ -74,6 +81,7 @@ public class HyperZeroStart : CharState {
 			drWilyAnim.fadeIn = true;
 			drWilyAnim.blink = true;
 			character.player.scrap -= 10;
+			character.playSound("NightmareZeroEntry", forcePlay: false, sendRpc: true);
 		}
 		zero.hyperZeroUsed = true;
 	}
@@ -141,8 +149,11 @@ public class KKnuckleParryStartState : CharState {
 				chr.changeState(new ParriedState(), true);
 			}
 		}
-
-		character.playSound("zeroParry", sendRpc: true);
+		if (Helpers.randomRange(0, 10) < 10) {
+			character.playSound("zeroParry", forcePlay: false, sendRpc: true);
+		} else {
+			character.playSound("zeroParry2", forcePlay: false, sendRpc: true);
+		}
 		character.changeState(new KKnuckleParryMeleeState(counterAttackTarget), true);
 	}
 

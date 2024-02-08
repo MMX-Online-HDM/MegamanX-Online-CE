@@ -525,7 +525,7 @@ public class Sigma : Character {
 				}
 
 				changeSprite(getSprite(attackSprite), true);
-				if (player.isSigma1()) playSound("saberShot", sendRpc: true);
+				if (player.isSigma1()) playSound("SigmaSaber", sendRpc: true);
 				if (player.isSigma2()) playSound("sigma2slash", sendRpc: true);
 			}
 		} else if (!isAttacking() && !isInvulnerableAttack() && (charState is Idle || charState is Run)) {

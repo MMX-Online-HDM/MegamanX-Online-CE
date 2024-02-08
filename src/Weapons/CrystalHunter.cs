@@ -104,13 +104,13 @@ public class CrystalHunterCharged : Actor {
 		var screenCoords = new Point(pos.x - Global.level.camX, pos.y - Global.level.camY);
 		var normalizedCoords = new Point(screenCoords.x / Global.viewScreenW, 1 - screenCoords.y / Global.viewScreenH);
 
-		if (isSnails) {
+		//if (isSnails) {
 			Helpers.decrementTime(ref soundTime);
 			if (soundTime == 0) {
 				playSound("csnailSlowLoop");
 				soundTime = 1.09f;
 			}
-		}
+		//} Why only snail gets the cool sound???
 
 		if (timeSlowShader != null) {
 			timeSlowShader.SetUniform("x", normalizedCoords.x);

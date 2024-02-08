@@ -275,7 +275,7 @@ public class MissileAttack : CharState {
 		Point? headPosNullable = vile.getVileMK2StunShotPos();
 		if (headPosNullable == null) return;
 
-		vile.playSound("mk2rocket", sendRpc: true);
+		vile.playSound("MK2Stunshot", sendRpc: true);
 		new Anim(headPosNullable.Value, "dust", 1, vile.player.getNextActorNetId(), true, true);
 
 		if (isStunShot) {

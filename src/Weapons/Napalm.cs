@@ -226,6 +226,7 @@ public class NapalmAttack : CharState {
 					if (player.vileNapalmWeapon.type == (int)NapalmType.RumblingBang) {
 						proj = new NapalmGrenadeProj(player.vileNapalmWeapon, character.pos.add(poi), character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
 					} else if (player.vileNapalmWeapon.type == (int)NapalmType.FireGrenade) {
+						character.playSound("FireNappalmMK2", forcePlay: false, sendRpc: true);
 						proj = new MK2NapalmGrenadeProj(player.vileNapalmWeapon, character.pos.add(poi), character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
 					} else if (player.vileNapalmWeapon.type == (int)NapalmType.SplashHit) {
 						proj = new SplashHitGrenadeProj(player.vileNapalmWeapon, character.pos.add(poi), character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
