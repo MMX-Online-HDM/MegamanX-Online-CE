@@ -29,6 +29,12 @@ public class CrystalSnail : Maverick {
 		if (sendRpc) {
 			createActorRpc(player.id);
 		}
+
+		usesAmmo = true;
+		canHealAmmo = true;
+		ammo = 32;
+		maxAmmo = 32;
+		barIndexes = (54, 43);
 	}
 
 	public override void update() {

@@ -249,7 +249,9 @@ public class MaverickState {
 			}
 		}
 
-		if (maverick.canFly && (input.isPressed(Control.Up, player) || (input.isPressed(Control.Jump, player) && !isAI))) {
+		if (maverick.canFly && (input.isPressed(Control.Up, player) ||
+			(input.isPressed(Control.Jump, player) && !isAI))
+		) {
 			maverick.changeState(new MFly());
 			return;
 		}
@@ -814,8 +816,8 @@ public class MFly : MaverickState {
 			}
 		}
 
-		Helpers.decrementTime(ref maverick.ammo);
-		if (maverick.ammo <= 0 || maverick.gravityWellModifier > 1) {
+		maverick.flyBar =- 1 * Global.speedMul;
+		if (maverick.flyBar <= 0 || maverick.gravityWellModifier > 1) {
 			flyVel.y = 100;
 		}
 

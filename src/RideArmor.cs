@@ -264,7 +264,7 @@ public class RideArmor : Actor, IDamagable {
 		return raNum == 0 && !isNeutral;
 	}
 
-	float soundTime;
+	//float soundTime;
 	float punchCooldown;
 	float missileCooldown;
 	public float chainSoundTime;

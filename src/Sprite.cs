@@ -330,13 +330,9 @@ public class Sprite {
 		cx += alignOffX;
 		cy += alignOffY;
 
-
 		if (scaleY == -1 && (actor is MagnaCentipede ms || name.Contains("magnac_teleport") || name.Contains("magnac_notail_teleport"))) {
 			cy -= MagnaCentipede.constHeight;
 		}
-
-		cx = MathF.Floor(cx);
-		cy = MathF.Floor(cy);
 
 		float frameOffsetX = 0;
 		float frameOffsetY = 0;

@@ -24,7 +24,6 @@ public class VoltCatfish : Maverick {
 		weakWeaponId = WeaponIds.TunnelFang;
 		weakMaverickWeaponId = WeaponIds.TunnelRhino;
 
-		ammo = 0;
 		netActorCreateId = NetActorCreateId.VoltCatfish;
 		bouncedOnce = true;
 
@@ -32,6 +31,13 @@ public class VoltCatfish : Maverick {
 		if (sendRpc) {
 			createActorRpc(player.id);
 		}
+
+		usesAmmo = true;
+		canHealAmmo = true;
+		ammo = 0;
+		maxAmmo = 32;
+		grayAmmoLevel = 8;
+		barIndexes = (65, 54);
 	}
 
 	public override void update() {

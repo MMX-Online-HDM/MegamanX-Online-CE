@@ -70,9 +70,19 @@ public class RPCCreateProj : RPC {
 		} else if (projId == (int)ProjIds.ChillPIceBlow) {
 			proj = new ShotgunIceProjCharged(new ShotgunIce(), pos, xDir, player, 1, true, netProjByte);
 		} else if (projId == (int)ProjIds.Rakuhouha) {
-			proj = new RakuhouhaProj(new RakuhouhaWeapon(player), pos, false, 0, 0, player, netProjByte, 0);
+			float velX = (float)arguments[extraDataIndex+1] * 100;
+			float velY = (float)arguments[extraDataIndex+2] * 100;
+			proj = new RakuhouhaProj(
+				new RakuhouhaWeapon(player), pos, false,
+				velX, velY, player, netProjByte, arguments[extraDataIndex]
+			);
 		} else if (projId == (int)ProjIds.CFlasher) {
-			proj = new RakuhouhaProj(new CFlasher(player), pos, true, 0, 0, player, netProjByte, 0);
+			float velX = (float)arguments[extraDataIndex+1] * 100;
+			float velY = (float)arguments[extraDataIndex+2] * 100;
+			proj = new RakuhouhaProj(
+				new CFlasher(player), pos, true,
+				velX, velY, player, netProjByte, arguments[extraDataIndex]
+			);
 		} else if (projId == (int)ProjIds.Hadouken) {
 			proj = new HadoukenProj(new HadoukenWeapon(player), pos, xDir, player, netProjByte);
 		} else if (projId == (int)ProjIds.ElectricShock) {

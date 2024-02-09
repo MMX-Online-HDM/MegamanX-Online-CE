@@ -55,7 +55,6 @@ public class Elimination : GameMode {
 			draw1v1TopHUD();
 			return;
 		}
-
 		var playersStillAlive = level.players.Where(p => !p.isSpectator && p.deaths < playingTo).ToList();
 		int lives = playingTo - level.mainPlayer.deaths;
 		var topText = "Lives: " + lives.ToString();

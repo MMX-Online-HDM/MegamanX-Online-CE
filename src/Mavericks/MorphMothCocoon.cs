@@ -21,7 +21,6 @@ public class MorphMothCocoon : Maverick {
 
 		weapon = getWeapon();
 		angle = 0;
-		ammo = 0;
 
 		spriteToCollider["*_hang"] = getDashCollider();
 
@@ -34,6 +33,12 @@ public class MorphMothCocoon : Maverick {
 		if (sendRpc) {
 			createActorRpc(player.id);
 		}
+
+		usesAmmo = true;
+		canHealAmmo = true;
+		ammo = 0;
+		maxAmmo = 32;
+		barIndexes = (52, 41);
 	}
 
 	public float selfDestructTime;

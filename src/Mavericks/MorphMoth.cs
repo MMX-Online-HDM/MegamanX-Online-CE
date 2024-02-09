@@ -29,6 +29,11 @@ public class MorphMoth : Maverick {
 		if (sendRpc) {
 			createActorRpc(player.id);
 		}
+
+		canFly = true;
+		flyBarIndexes = (53, 42);
+		maxFlyBar = 960;
+		flyBar = 960;
 	}
 
 	public override void update() {

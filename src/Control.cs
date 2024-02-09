@@ -38,9 +38,9 @@ public class Control {
 	public const string MenuDown = "menudown";
 	public const string MenuLeft = "menuleft";
 	public const string MenuRight = "menuright";
-	public const string MenuEnter = "menuenter";
-	public const string MenuSelectPrimary = "menuselectprimary";
-	public const string MenuSelectSecondary = "menuselectsecondary";
+	public const string MenuPause = "menuenter";
+	public const string MenuConfirm = "menuselectprimary";
+	public const string MenuAlt = "menuselectsecondary";
 	public const string MenuBack = "menuback";
 	public const string TeamChat = "menuteamchat";
 	public const string AllChat = "menuallchat";
@@ -184,9 +184,9 @@ public class Control {
 				{ WeaponLeft, 4 },
 				{ WeaponRight, 5 },
 				{ Scoreboard, 8 },
-				{ MenuEnter, 9 },
-				{ MenuSelectPrimary, 0 },
-				{ MenuSelectSecondary, 2 },
+				{ MenuPause, 9 },
+				{ MenuConfirm, 0 },
+				{ MenuAlt, 2 },
 				{ MenuBack, 1 },
 				{ AimUp, -1001 },
 				{ AimDown, 1001 },
@@ -201,7 +201,7 @@ public class Control {
 	public static Dictionary<string, Dictionary<string, int?>> controllerNameToMapping {
 		get {
 			if (_controllerNameToMapping == null) {
-				string text = Helpers.ReadFromFile("controls.txt");
+				string text = Helpers.ReadFromFile("controls.json");
 				if (string.IsNullOrEmpty(text)) {
 					_controllerNameToMapping = new Dictionary<string, Dictionary<string, int?>>()
 					{
@@ -214,10 +214,6 @@ public class Control {
 									{ Down, (int)Key.Down },
 									{ Left, (int)Key.Left },
 									{ Right, (int)Key.Right },
-									{ MenuUp, (int)Key.Up },
-									{ MenuDown, (int)Key.Down },
-									{ MenuLeft, (int)Key.Left },
-									{ MenuRight, (int)Key.Right },
 									{ Jump, (int)Key.X },
 									{ Shoot, (int)Key.C },
 									{ Dash, (int)Key.Z },
@@ -225,14 +221,19 @@ public class Control {
 									{ WeaponLeft, (int)Key.D },
 									{ WeaponRight, (int)Key.F },
 									{ Scoreboard, (int)Key.Tab },
-									{ MenuEnter, (int)Key.Escape },
-									{ MenuSelectPrimary, (int)Key.Enter },
-									{ MenuSelectSecondary, (int)Key.Space },
-									{ MenuBack, (int)Key.Backspace },
 									{ TeamChat, (int)Key.T },
 									{ AllChat, (int)Key.Y },
 									{ Taunt, (int)Key.G },
-									{ Special2, (int)Key.A }
+									{ Special2, (int)Key.A },
+									// Weird special keys
+									{ MenuUp, (int)Key.Up },
+									{ MenuDown, (int)Key.Down },
+									{ MenuLeft, (int)Key.Left },
+									{ MenuRight, (int)Key.Right },
+									{ MenuPause, (int)Key.Escape },
+									{ MenuConfirm, (int)Key.X },
+									{ MenuAlt, (int)Key.Z },
+									{ MenuBack, (int)Key.C },
 							   }
 							},
 							// Axl directional aim controls
@@ -267,23 +268,12 @@ public class Control {
 									{ Down, (int)Key.S },
 									{ Left, (int)Key.A },
 									{ Right, (int)Key.D },
-									{ MenuUp, (int)Key.Up },
-									{ MenuDown, (int)Key.Down },
-									{ MenuLeft, (int)Key.Left },
-									{ MenuRight, (int)Key.Right },
 									{ Jump, (int)Key.Space },
 									{ Shoot, (int)Key.RControl },
 									{ Dash, (int)Key.LShift },
 									{ Special1, (int)Key.F },
 									{ WeaponLeft, (int)Key.Q },
 									{ WeaponRight, (int)Key.E },
-									{ Scoreboard, (int)Key.Tab },
-									{ MenuEnter, (int)Key.Escape },
-									{ MenuSelectPrimary, (int)Key.Enter },
-									{ MenuSelectSecondary, (int)Key.Space },
-									{ MenuBack, (int)Key.Backspace },
-									{ TeamChat, (int)Key.T },
-									{ AllChat, (int)Key.Y },
 									{ AimUp, (int)Key.Up },
 									{ AimDown, (int)Key.Down },
 									{ AimLeft, (int)Key.Left },
@@ -297,7 +287,7 @@ public class Control {
 					try {
 						_controllerNameToMapping = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, int?>>>(text);
 					} catch {
-						throw new Exception("Your controls.txt file is corrupted, or no longer works with this version. Please delete it, launch the game again and rebind your controls.");
+						throw new Exception("Your controls.json file is corrupted, or no longer works with this version. Please delete it, launch the game again and rebind your controls.");
 					}
 				}
 			}
@@ -307,7 +297,7 @@ public class Control {
 
 	public static void saveToFile() {
 		string text = JsonConvert.SerializeObject(_controllerNameToMapping);
-		Helpers.WriteToFile("controls.txt", text);
+		Helpers.WriteToFile("controls.json", text);
 	}
 
 	public static bool isNumberBound(int charNum, int axlAimMode) {

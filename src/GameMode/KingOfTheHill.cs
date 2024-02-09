@@ -26,9 +26,9 @@ public class KingOfTheHill : GameMode {
 		ControlPoint hill = level?.hill;
 		if (hill == null) return;
 
-		Color textColor = Color.Green;
-
-		string hillText = hill.getHillText();
+		string hillText;
+		FontType textColor;
+		(hillText, textColor) = hill.getHillText();
 
 		int allianceFactor = (hill.alliance == redAlliance ? 0 : 2);
 		int hudCpFrameIndex = (hill.num - 1) + allianceFactor;
@@ -50,11 +50,10 @@ public class KingOfTheHill : GameMode {
 			}
 			Global.sprites["hud_cp_bar"].drawToHUD(hudCpBarIndex, 5 + 17 + (i * 2), 5 + 3 + hudcpY);
 		}
-
-		Helpers.drawTextStd(TCat.HUD, hillText, 38, 10 + hudcpY, Alignment.Center, fontSize: (uint)17, color: textColor, outlineColor: Color.Black);
-		hudcpY += 16;
-
-		drawTimeIfSet(4 + hudcpY);
+		if (hillText != "") {
+			Fonts.drawText(textColor, hillText, 38, 9 + hudcpY, Alignment.Center);
+		}
+		drawTimeIfSet(22);
 	}
 
 	public override void checkIfWinLogic() {

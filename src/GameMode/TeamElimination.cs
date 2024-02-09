@@ -15,25 +15,32 @@ public class TeamElimination : GameMode {
 			startTimeLimit = remainingTime;
 		}
 	}
-
 	public override void drawTopHUD() {
 		if (level.is1v1()) {
 			draw1v1TopHUD();
 			return;
 		}
-
-		var redPlayersStillAlive = level.players.Where(p => !p.isSpectator && p.deaths < playingTo && p.alliance == redAlliance).ToList();
-		var bluePlayersStillAlive = level.players.Where(p => !p.isSpectator && p.deaths < playingTo && p.alliance == blueAlliance).ToList();
+		var redPlayersAlive = (
+			level.players.Where(
+				p => !p.isSpectator && p.deaths < playingTo && p.alliance == redAlliance
+			).ToList()
+		);
+		var bluePlayersAlive = (
+			level.players.Where(
+				p => !p.isSpectator && p.deaths < playingTo && p.alliance == blueAlliance
+			).ToList()
+		);
 		int lives = playingTo - level.mainPlayer.deaths;
-		Helpers.drawTextStd(TCat.HUD, "Lives: " + lives.ToString(), 5, 5, Alignment.Left, fontSize: (uint)32);
-		Helpers.drawTextStd(TCat.HUD, "Alive: ", 5, 15, Alignment.Left, fontSize: (uint)32);
-		Helpers.drawTextStd(TCat.HUDColored, (redPlayersStillAlive.Count).ToString(), 62, 15, Alignment.Left, fontSize: (uint)32, outlineColor: Helpers.DarkRed);
-		Helpers.drawTextStd(TCat.HUDColored, "/" + (bluePlayersStillAlive.Count).ToString(), 70, 15, Alignment.Left, fontSize: (uint)32, outlineColor: Helpers.DarkBlue);
-
+		Fonts.drawText(FontType.BlueMenu, "Lives: " + lives.ToString(), 5, 5, Alignment.Left);
+		Fonts.drawText(
+			FontType.BlueMenu,
+			"Alive: " + (redPlayersAlive.Count).ToString() + "/" + (bluePlayersAlive.Count).ToString(),
+			5, 15, Alignment.Left
+		);
 		if (virusStarted != 1) {
-			drawTimeIfSet(40);
+			drawTimeIfSet(25);
 		} else {
-			drawVirusTime(40);
+			drawVirusTime(25);
 		}
 	}
 

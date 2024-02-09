@@ -120,7 +120,7 @@ public class SelectWeaponMenu : IMainMenu {
 
 	public void update() {
 		if (!string.IsNullOrEmpty(error)) {
-			if (Global.input.isPressedMenu(Control.MenuSelectPrimary)) {
+			if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 				error = null;
 			}
 			return;
@@ -156,7 +156,7 @@ public class SelectWeaponMenu : IMainMenu {
 		}
 
 		bool backPressed = Global.input.isPressedMenu(Control.MenuBack);
-		bool selectPressed = Global.input.isPressedMenu(Control.MenuSelectPrimary) || (backPressed && !inGame);
+		bool selectPressed = Global.input.isPressedMenu(Control.MenuConfirm) || (backPressed && !inGame);
 		if (selectPressed) {
 			if (duplicateWeapons()) {
 				error = "Cannot select same weapon more than once!";
@@ -361,7 +361,7 @@ public class SelectWeaponMenu : IMainMenu {
 			);
 			Fonts.drawText(FontType.Red, "ERROR", Global.screenW / 2, top - 20, alignment: Alignment.Center);
 			Fonts.drawText(FontType.RedishOrange, error, Global.screenW / 2, top, alignment: Alignment.Center);
-			Fonts.drawText(
+			Fonts.drawTextEX(
 				FontType.Grey, Helpers.controlText("Press [X] to continue"),
 				Global.screenW / 2, 20 + top, alignment: Alignment.Center
 			);

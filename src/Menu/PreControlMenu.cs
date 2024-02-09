@@ -41,7 +41,7 @@ public class PreControlMenu : IMainMenu {
 		}
 
 		Helpers.menuUpDown(ref selArrowPosY, 0, 1);
-		if (Global.input.isPressedMenu(Control.MenuSelectPrimary)) {
+		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 			getCharNumAndAimMode(cursorToCharNum[selArrowPosY], out int charNum, out int aimMode);
 			if (selArrowPosY == 0) {
 				Menu.change(new ControlMenu(this, inGame, false, charNum, aimMode));

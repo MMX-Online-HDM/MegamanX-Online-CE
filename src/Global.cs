@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using SFML.Graphics;
 using System;
 using System.Collections.Generic;
+using System.IO.Hashing;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
@@ -15,21 +16,21 @@ using static SFML.Window.Keyboard;
 namespace MMXOnline;
 
 public partial class Global {
-	public static decimal version = 19.12m;
+	public static decimal version = 20m;
+	public const string versionName = "Alpha 6";
 
 	// THIS VALUE MUST ALWAYS MANUALLY BE SET AFTER UPDATING ASSETS BEFORE BUILDING A RELEASE BUILD.
 	// Obtain it by pressing F1 in main menu.
 	// This step could be automated as future improvement in build scripts.
-	private const string assetChecksum = "83E3CC4894E07CAF97CDBE2B36654180";
+	private const string assetChecksum = "712C30F769442BAF01DF6977C712DC84";
 
 	// For forks/mods of the game, add a prefix here so that different forks
 	// don't conflict with each other or the base game
 	public const string checksumPrefix = "[Community Edition]";
 	// Use this to make sure the checksum varies.
 	// Better to use together with "checksumPrefix" and be diferent from it.
-	public const string checksumKey = "DEVTEST--10-10-2023";
+	public const string checksumKey = checksumPrefix + versionName + " DEVTEST-07-02-2024-v1";
 	// For displaying the name of the mod in the version string.
-	public static string forkName = "Community Edition - Rockman Test 1";
 	public static string shortForkName = "CE";
 
 	public static string prodChecksum = checksumPrefix + " " + assetChecksum;
@@ -109,6 +110,13 @@ public partial class Global {
 
 	public static bool quickStart { get { return _quickStart && !quickStartOnline; } }
 	public static bool anyQuickStart { get { return _quickStart || quickStartOnline; } }
+
+	// Default region JSON.
+	public static string defaultRegionJson =
+@"{
+   ""name"": """",
+   ""ip"": """"
+}";
 
 	// Feature switches
 	public static bool maverickWallClimb = false;
@@ -218,9 +226,9 @@ public partial class Global {
 			DevConsole.toggleInvulnFrames(10);
 		}
 
-		if (Global.input.isPressed(Key.F8)) {
+		//if (Global.input.isPressed(Key.F8)) {
 			//DevConsole.changeTeam();
-		}
+		//}
 
 		if (Global.input.isPressed(Key.F9)) {
 			if (AI.trainingBehavior == AITrainingBehavior.Default) AI.trainingBehavior = AITrainingBehavior.Idle;
@@ -228,7 +236,7 @@ public partial class Global {
 			else if (AI.trainingBehavior == AITrainingBehavior.Attack) AI.trainingBehavior = AITrainingBehavior.Jump;
 			else if (AI.trainingBehavior == AITrainingBehavior.Jump) AI.trainingBehavior = AITrainingBehavior.Default;
 		}
-		if (Global.input.isPressed(Key.F10)) {
+		if (Global.input.isPressed(Key.F8)) {
 			var aiPlayer = Global.level.players[1];
 			if (aiPlayer?.character != null) {
 				if (Global.level.mainPlayer.input == Global.input) {
@@ -265,6 +273,7 @@ public partial class Global {
 
 	public static Dictionary<string, LevelData> levelDatas = new Dictionary<string, LevelData>();
 	public static Dictionary<string, Texture> textures = new Dictionary<string, Texture>();
+	public static Dictionary<string, Texture> fontTextures = new Dictionary<string, Texture>();
 	public static Dictionary<string, Texture[,]> mapTextures = new Dictionary<string, Texture[,]>();
 	public static Dictionary<string, Sprite> sprites = new Dictionary<string, Sprite>();
 	public static Dictionary<string, SoundBufferWrapper> soundBuffers = new Dictionary<string, SoundBufferWrapper>();
@@ -434,6 +443,9 @@ public partial class Global {
 			_checksum = value;
 		}
 	}
+	public static string MD5Checksum => (_checksum);
+	
+	public static string CRC32Checksum;
 
 	public static string getShortChecksum() {
 		string retStr = "";
@@ -455,7 +467,7 @@ public partial class Global {
 		using (MD5 md5 = MD5.Create()) {
 			checksum = BitConverter.ToString(md5.ComputeHash(checksumBytes)).Replace("-", String.Empty);
 		}
-
+		CRC32Checksum = BitConverter.ToString(Crc32.Hash(checksumBytes)).Replace("-", String.Empty);
 		fileChecksumBlob = "";
 	}
 
@@ -520,6 +532,7 @@ public partial class Global {
 	public static int defaultThresholdPing = 200;
 	public static Level level;
 	public static ServerClient serverClient;
+	public static Server localServer;
 	public static bool isOffline { get { return serverClient == null; } }
 	public static bool isHost { get { return level != null && level.isHost; } }
 	public static LeaveMatchSignal leaveMatchSignal;
@@ -619,28 +632,35 @@ public partial class Global {
 						new Region("LAN", LANIPHelper.GetLocalIPAddress()),
 					};
 				} else {
-					string text = Helpers.ReadFromFile("region.txt");
+					string text = Global.defaultRegionJson;
+					if (Helpers.FileExists("region.json")) {
+						text = Helpers.ReadFromFile("region.json");
+					}
 					if (!string.IsNullOrEmpty(text)) {
 						Region region;
 
 						try {
 							region = JsonConvert.DeserializeObject<Region>(text);
 						} catch {
-							throw new Exception("region.txt has improper format and could not be parsed. Must be valid JSON.");
+							throw new Exception("region.json has improper format and could not be parsed. Must be valid JSON.");
 						}
 
 						// Validate
 						if (!string.IsNullOrEmpty(region.url)) {
-							region.ip = System.Net.Dns.GetHostAddresses(region.url)[0].ToString();
+							try {
+								region.ip = System.Net.Dns.GetHostAddresses(region.url)[0].ToString();
+							} catch {
+								region.ip = null;
+							}
 						}
 						if (string.IsNullOrEmpty(region.name) || string.IsNullOrEmpty(region.ip))
 						{
-							//throw new Exception("region.txt has missing fields.");
+							//throw new Exception("region.json has missing fields.");
 							region = new Region();
 						}
 						else {
 							if (!region.ip.IsValidIpAddress()) {
-								throw new Exception("region.txt has invalid ip.");
+								throw new Exception("region.json has an invalid IP.");
 							}
 							if (region.name.Length > 10) {
 								region.name = region.name.Substring(0, 10);

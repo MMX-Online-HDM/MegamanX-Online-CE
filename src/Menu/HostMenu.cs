@@ -1,4 +1,5 @@
-﻿using SFML.Graphics;
+﻿using Lidgren.Network;
+using SFML.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +7,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json.Serialization;
+using System.Threading;
 using static SFML.Window.Keyboard;
 
 namespace MMXOnline;
@@ -288,7 +290,7 @@ public class HostMenu : IMainMenu {
 			menuOptions.Add(
 				new MenuOption(startX, startY,
 					() => {
-						if (Global.input.isPressedMenu(Control.MenuSelectSecondary)) {
+						if (Global.input.isPressedMenu(Control.MenuAlt)) {
 							Menu.change(new EnterTextMenu("Enter a custom server name", 10, (string text) => {
 								serverName = text;
 								Menu.change(this);
@@ -361,7 +363,7 @@ public class HostMenu : IMainMenu {
 						mapIndex++;
 						if (mapIndex >= currentMapSizePool.Count) mapIndex = 0;
 						onMapChange();
-					} else if (Global.input.isPressedMenu(Control.MenuSelectSecondary)) {
+					} else if (Global.input.isPressedMenu(Control.MenuAlt)) {
 						mapIndex = Helpers.randomRange(0, currentMapSizePool.Count - 1);
 						onMapChange();
 					}
@@ -487,7 +489,7 @@ public class HostMenu : IMainMenu {
 						botCount++;
 						resetCpuDataTeams();
 					}
-					if (Global.input.isPressedMenu(Control.MenuSelectSecondary) && botCount > 0) {
+					if (Global.input.isPressedMenu(Control.MenuAlt) && botCount > 0) {
 						Menu.change(
 							new ConfigureCPUMenu(
 								this, botCount, is1v1, isOffline, inGame, inGame,
@@ -705,7 +707,7 @@ public class HostMenu : IMainMenu {
 				new MenuOption(startX, startY,
 					() => {
 						Helpers.menuLeftRightBool(ref savedMatchSettings.hostMenuSettings.useCustomMatchSettings);
-						if (Global.input.isPressedMenu(Control.MenuSelectSecondary)) {
+						if (Global.input.isPressedMenu(Control.MenuAlt)) {
 							Menu.change(new CustomMatchSettingsMenu(this, inGame, isOffline));
 						}
 					},
@@ -773,7 +775,7 @@ public class HostMenu : IMainMenu {
 			Helpers.menuUpDown(ref selectArrowPosY, 0, menuOptions.Count - 1);
 		}
 
-		if (Global.input.isPressedMenu(Control.MenuSelectPrimary)) {
+		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 			if (!string.IsNullOrEmpty(errorMessage)) {
 				errorMessage = null;
 				return;
@@ -852,7 +854,13 @@ public class HostMenu : IMainMenu {
 				savedMatchSettings.extraCpuCharData, getCustomMatchSettings(),
 				disableHtSt, disableVehicles
 			);
-			Global.leaveMatchSignal = new LeaveMatchSignal(LeaveMatchScenario.Recreate, server, null);
+			server.uniqueID = oldServer.uniqueID;
+			server.isP2P = oldServer.isP2P;
+			if (server.isP2P) {
+				Global.leaveMatchSignal = new LeaveMatchSignal(LeaveMatchScenario.RecreateMS, server, null);
+			} else {
+				Global.leaveMatchSignal = new LeaveMatchSignal(LeaveMatchScenario.Recreate, server, null);
+			}
 		} else if (isP2P) {
 			createP2PMatch();
 		} else if (!isOffline) {
@@ -957,6 +965,16 @@ public class HostMenu : IMainMenu {
 			playTo = 9999;
 			gameMode = GameMode.Deathmatch;
 		}
+		if (Global.localServer != null && Global.localServer.s_server.Status == NetPeerStatus.Running) {
+			Global.localServer.shutdown("Host left the match.");
+			for (int i = 0; i < 10; i++) {
+				if (Global.localServer.s_server.Status != NetPeerStatus.NotRunning) {
+					Thread.Sleep(20);
+				} else {
+					break;
+				}
+			}
+		}
 		var localServer = new Server(
 			Global.version, null, serverName, selectedLevel.name,
 			selectedLevel.shortName, gameMode,
@@ -967,12 +985,17 @@ public class HostMenu : IMainMenu {
 			Global.checksum, selectedLevel.checksum,
 			selectedLevel.customMapUrl, savedMatchSettings.extraCpuCharData,
 			getCustomMatchSettings(), disableHtSt, disableVehicles
-		) {
-			isP2P = true
-		};
+		);
+		localServer.isP2P = true;
+		Global.localServer = localServer;
 		localServer.start();
-		System.Threading.Thread.Sleep(400);
-
+		Thread.Sleep(100);
+		int waitLoops = 0;
+		while ((localServer.s_server?.Status != NetPeerStatus.Running || localServer.uniqueID == 0) &&
+			waitLoops <= 10
+		) {
+			Thread.Sleep(100);
+		}
 		var me = new ServerPlayer(
 			Options.main.playerName, 0, true,
 			SelectCharacterMenu.playerData.charNum, team, Global.deviceId, null, 0
@@ -980,10 +1003,15 @@ public class HostMenu : IMainMenu {
 		if (GameMode.isStringTeamMode(selectedGameMode)) {
 			me.alliance = team;
 		}
-		System.Threading.Thread.Sleep(500);
-
-		Global.serverClient = ServerClient.CreateHolePunch(
-			localServer.s_server.UniqueIdentifier, me,
+		System.Threading.Thread.Sleep(50);
+		/*
+		Global.serverClient = ServerClient.CreateDirect(
+			"127.0.0.1", 65535, me,
+			out JoinServerResponse joinServerResponse, out string error
+		);
+		*/
+		Global.serverClient = ServerClient.CreateDirect(
+			"127.0.0.1", localServer.port, me,
 			out JoinServerResponse joinServerResponse, out string error
 		);
 
@@ -992,7 +1020,53 @@ public class HostMenu : IMainMenu {
 		} else {
 			errorMessage = error;
 			if (string.IsNullOrEmpty(errorMessage)) {
-				errorMessage = "Could not connect to P2P Server.";
+				errorMessage = "Could not connect to self.";
+			}
+		}
+	}
+
+	public static void reCreateP2PMatch(
+		int charNum, Server localServer,
+		IMainMenu menu, out string errorMessage
+	) {
+		errorMessage = "";
+
+		if (Global.serverClient != null) {
+			Global.serverClient.disconnect("RecreateMS");
+		}
+		if (Global.localServer.s_server.Status == NetPeerStatus.Running) {
+			Global.localServer.shutdown("RecreateMS");
+			for (int i = 0; i < 10; i++) {
+				if (Global.localServer.s_server.Status != NetPeerStatus.NotRunning) {
+					Thread.Sleep(20);
+				} else {
+					break;
+				}
+			}
+		}
+		localServer.isP2P = true;
+		localServer.uniqueID = Global.localServer.uniqueID; // Reuse the old ID.
+		Global.localServer = localServer;
+		localServer.start();
+		Thread.Sleep(100);
+		int waitLoops = 0;
+		while (localServer.s_server?.Status != NetPeerStatus.Running && waitLoops <= 10) {
+			Thread.Sleep(100);
+		}
+		var me = new ServerPlayer(
+			Options.main.playerName, 0, true,
+			SelectCharacterMenu.playerData.charNum, null, Global.deviceId, null, 0
+		);
+		Global.serverClient = ServerClient.CreateDirect(
+			"127.0.0.1", localServer.port, me,
+			out JoinServerResponse joinServerResponse, out string error
+		);
+		if (joinServerResponse != null && error == null) {
+			Menu.change(new WaitMenu(new MainMenu(), localServer, false));
+		} else {
+			errorMessage = error;
+			if (string.IsNullOrEmpty(errorMessage)) {
+				errorMessage = "Could not connect to self.";
 			}
 		}
 	}
@@ -1208,13 +1282,13 @@ public class HostMenu : IMainMenu {
 			else msg = "[X]: Next, [C]: Change Name, [Z]: Back";
 		} else msg = "[X]: Next, [ESC]: Menu";
 
-		Fonts.drawText(
+		Fonts.drawTextEX(
 			FontType.Grey, msg + "\nLeft/Right: Change setting",
 			Global.screenW * 0.5f, 178, Alignment.Center
 		);
 
 		if (!string.IsNullOrEmpty(menuOptions[selectArrowPosY].configureMessage)) {
-			Fonts.drawText(
+			Fonts.drawTextEX(
 				FontType.Grey, "[C]: " + menuOptions[selectArrowPosY].configureMessage,
 				Global.screenW * 0.5f, 168, Alignment.Center
 			);
@@ -1225,8 +1299,14 @@ public class HostMenu : IMainMenu {
 
 			//DrawWrappers.DrawRect(5, top - 20, Global.screenW - 5, top + 60, true, new Color(0, 0, 0, 224), 0, ZIndex.HUD, false);
 			DrawWrappers.DrawRect(5, 5, Global.screenW - 5, Global.screenH - 5, true, new Color(0, 0, 0, 224), 0, ZIndex.HUD, false);
-			Helpers.drawTextStd(errorMessage, Global.screenW / 2, top, alignment: Alignment.Center, fontSize: 24);
-			Helpers.drawTextStd(Helpers.controlText("Press [X] to continue"), Global.screenW * 0.5f, 20 + top, alignment: Alignment.Center, fontSize: 24);
+			Fonts.drawText(
+				FontType.Red, errorMessage, Global.screenW / 2, top,
+				alignment: Alignment.Center
+			);
+			Fonts.drawTextEX(
+				FontType.Red, "Press [X] to continue",
+				Global.screenW * 0.5f, 20 + top, alignment: Alignment.Center
+			);
 		}
 	}
 }

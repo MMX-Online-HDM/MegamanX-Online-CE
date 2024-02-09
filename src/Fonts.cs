@@ -11,10 +11,22 @@ using static SFML.Graphics.Text;
 namespace MMXOnline;
 
 public class Fonts {
-	public static void drawText(
+	public static void drawTextEX(
 		FontType fontType, string textStr, float x, float y,
 		Alignment alignment = Alignment.Left, bool isWorldPos = false, bool selected = false,
 		FontType? selectedFont = null, long depth = 0
+	) {
+		drawText(
+			fontType, Helpers.controlText(textStr), x, y,
+			alignment, isWorldPos, selected,
+			selectedFont, depth
+		);
+	}
+
+	public static void drawText(
+		FontType fontType, string textStr, float x, float y,
+		Alignment alignment = Alignment.Left, bool isWorldPos = false, bool selected = false,
+		FontType? selectedFont = null, long depth = 0, bool isLoading = false
 	) {
 		// To prevent crashes.
 		if (string.IsNullOrEmpty(textStr)) { return; }
@@ -43,7 +55,7 @@ public class Fonts {
 			fontSpacing = baseFontData[fontStr][3];
 		}
 		// Set up drawing texture.
-		Texture bitmapFontTexture = Global.textures[fontStr];
+		Texture bitmapFontTexture = Global.fontTextures[fontStr];
 		BatchDrawable batchDrawable = new BatchDrawable(bitmapFontTexture);
 		// For in-stage drawing.
 		if (isWorldPos) {
@@ -67,7 +79,7 @@ public class Fonts {
 			for (int i = 0; i < textLine.Length; i++) {
 				char letter = textLine[i];
 				int charInt = (int)letter;
-				if (letter > 191) {
+				if (charInt > 191) {
 					letter = '?';
 					charInt = (int)letter;
 				}
@@ -95,6 +107,11 @@ public class Fonts {
 				}
 				DrawWrappers.addToVertexArray(batchDrawable, textSprite);
 			}
+		}
+		// For the loading screen.
+		if (isLoading) {
+			DrawWrappers.drawToHUD(batchDrawable);
+			return;
 		}
 		// Draw on HUD or inside the stage (AKA: worldPos).
 		if (isWorldPos) {
@@ -136,6 +153,10 @@ public class Fonts {
 		return size;
 	}
 
+	public static int measureText(FontType fontType, string text) {
+		return measureText(getFontSrt(fontType), text);
+	}
+
 	public static Dictionary<string, int[]> fontSizes = new();
 	public static Dictionary<string, int[]> baseFontData = new();
 
@@ -165,6 +186,15 @@ public class Fonts {
 				sizeData[i] = Int32.Parse(strSData[i]);
 			}
 			fontSizes[fileName] = sizeData;
+		}
+	}
+
+	public static void loadFontSprites() {
+		var fontSprites = Helpers.getFiles(Global.assetPath + "assets/fonts", true, "png", "psd");
+		for (int i = 0; i < fontSprites.Count; i++) {
+			string path = fontSprites[i];
+			Texture texture = new Texture(path);
+			Global.fontTextures[Path.GetFileNameWithoutExtension(path)] = texture;
 		}
 	}
 

@@ -32,6 +32,13 @@ public class LaunchOctopus : Maverick {
 		if (sendRpc) {
 			createActorRpc(player.id);
 		}
+
+		usesAmmo = true;
+		canHealAmmo = true;
+		ammo = 32;
+		maxAmmo = 32;
+		grayAmmoLevel = 8;
+		barIndexes = (71, 60);
 	}
 
 	float timeBeforeRecharge;

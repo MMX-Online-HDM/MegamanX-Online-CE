@@ -23,7 +23,7 @@ public class ConfirmLeaveMenu : IMainMenu {
 
 	public void update() {
 		Helpers.menuUpDown(ref selectY, 0, 1);
-		if (Global.input.isPressedMenu(Control.MenuSelectPrimary)) {
+		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 			if (selectY == 0) {
 				Menu.change(prevMenu);
 			} else if (selectY == 1) {

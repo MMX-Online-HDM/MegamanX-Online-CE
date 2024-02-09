@@ -30,7 +30,7 @@ public class InGameMainMenu : IMainMenu {
 		}
 
 		Helpers.menuUpDown(ref selectY, 0, 6);
-		if (Global.input.isPressedMenu(Control.MenuSelectPrimary)) {
+		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 			if (selectY == 0) {
 				if (isSelWepDisabled()) return;
 				if (Global.level.mainPlayer.realCharNum == 4) {
@@ -144,6 +144,6 @@ public class InGameMainMenu : IMainMenu {
 		Fonts.drawText(FontType.Blue, "Controls", startX, optionPos[4], selected: selectY == 4);
 		Fonts.drawText(FontType.Blue, "Settings", startX, optionPos[5], selected: selectY == 5);
 		Fonts.drawText(FontType.Blue, "Leave Match", startX, optionPos[6], selected: selectY == 6);
-		Fonts.drawText(FontType.Grey, "[X]: Choose, [ESC]: Cancel", Global.halfScreenW, 198, Alignment.Center);
+		Fonts.drawTextEX(FontType.Grey, "[X]: Choose, [ESC]: Cancel", Global.halfScreenW, 198, Alignment.Center);
 	}
 }

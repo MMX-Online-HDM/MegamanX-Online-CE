@@ -131,19 +131,28 @@ public class VoteKick {
 			string message = string.Format("Vote Kick player {0}? Yes: {1} No: {2} Needed: {3}", player.name, yesVotes, noVotes, neededVotes());
 			string reason = string.Format("Reason: {0}, Minutes: {1}", kickReason, kickDuration);
 			string instructions = getInstructions();
-			Helpers.drawTextStd(TCat.HUD, message, Global.halfScreenW, 174, Alignment.Center, fontSize: 20);
-			Helpers.drawTextStd(TCat.HUD, reason, Global.halfScreenW, 182, Alignment.Center, fontSize: 20);
-			Helpers.drawTextStd(TCat.HUD, instructions, Global.halfScreenW, 190, Alignment.Center, fontSize: 20);
+			Fonts.drawText(
+				FontType.RedishOrange, message,
+				Global.halfScreenW, 170, Alignment.Center
+		);
+			Fonts.drawText(
+				FontType.RedishOrange, reason,
+				Global.halfScreenW, 180, Alignment.Center
+			);
+			Fonts.drawText(
+				FontType.RedishOrange, instructions, 
+				Global.halfScreenW, 190, Alignment.Center
+			);
 		} else if (type == VoteType.EndMatch) {
 			string message = string.Format("Vote End Match? Yes: {0} No: {1} Needed: {2}", yesVotes, noVotes, neededVotes());
 			string instructions = getInstructions();
-			Helpers.drawTextStd(TCat.HUD, message, Global.halfScreenW, 174, Alignment.Center, fontSize: 20);
-			Helpers.drawTextStd(TCat.HUD, instructions, Global.halfScreenW, 190, Alignment.Center, fontSize: 20);
+			Fonts.drawText(FontType.RedishOrange, message, Global.halfScreenW, 180, Alignment.Center);
+			Fonts.drawText(FontType.RedishOrange, instructions, Global.halfScreenW, 190, Alignment.Center);
 		} else if (type == VoteType.ResetFlags) {
 			string message = string.Format("Vote Reset Flags? Yes: {0} No: {1} Needed: {2}", yesVotes, noVotes, neededVotes());
 			string instructions = getInstructions();
-			Helpers.drawTextStd(TCat.HUD, message, Global.halfScreenW, 174, Alignment.Center, fontSize: 20);
-			Helpers.drawTextStd(TCat.HUD, instructions, Global.halfScreenW, 190, Alignment.Center, fontSize: 20);
+			Fonts.drawText(FontType.RedishOrange, message, Global.halfScreenW, 180, Alignment.Center);
+			Fonts.drawText(FontType.RedishOrange, instructions, Global.halfScreenW, 190, Alignment.Center);
 		}
 	}
 

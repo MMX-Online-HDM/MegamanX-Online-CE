@@ -32,18 +32,18 @@ public class PreJoinOrHostMenu : IMainMenu {
 	public void update() {
 		if (state == 0) {
 			Helpers.menuUpDown(ref selectY, 0, 2);
-			if (Global.input.isPressedMenu(Control.MenuSelectPrimary)) {
-				if (selectY == 0) {
+			if (Global.input.isPressedMenu(Control.MenuConfirm)) {
+				if (selectY == 2) {
 					state = 1;
-				} else if (selectY == 2) {
+				} else if (selectY == 1) {
 					IMainMenu nextMenu = null;
 					if (isJoin) nextMenu = new JoinMenu(true);
 					else nextMenu = new HostMenu(prevMenu, null, false, true);
 
 					Menu.change(nextMenu);
-				} else if (selectY == 1) {
+				} else if (selectY == 0) {
 					IMainMenu nextMenu = null;
-					if (isJoin) nextMenu = new JoinMenuP2P();
+					if (isJoin) nextMenu = new JoinMenuP2P(true);
 					// TODO: Make a menu for new host.
 					else nextMenu = new HostMenu(prevMenu, null, false, false, true);
 
@@ -57,7 +57,7 @@ public class PreJoinOrHostMenu : IMainMenu {
 				state = 0;
 				Menu.change(new ErrorMenu(new string[] {
 						"No multiplayer regions configured.",
-						"Please add a region name/ip to region.txt",
+						"Please add a region name/ip to region.json",
 						"in game or MMXOD folder, then restart the game.",
 				}, this));
 			} else {
@@ -121,7 +121,7 @@ public class PreJoinOrHostMenu : IMainMenu {
 			}
 		}
 		if (!Global.checkBan) {
-			Menu.change(new ErrorMenu(new string[] { "Unable to connect to server in region.txt." }, new MainMenu()));
+			Menu.change(new ErrorMenu(new string[] { "Unable to connect to server in region.json" }, new MainMenu()));
 			return false;
 		}
 		if (Global.banEntry != null) {
@@ -172,9 +172,9 @@ public class PreJoinOrHostMenu : IMainMenu {
 		);
 
 		if (state == 0) {
-			Fonts.drawText(FontType.DarkBlue, "RELAY", startX, optionPos[0].y, selected: selectY == 0);
+			Fonts.drawText(FontType.DarkBlue, "RELAY", startX, optionPos[2].y, selected: selectY == 2);
 		} else {
-			Fonts.drawText(FontType.DarkBlue, "LOADING...", startX, optionPos[0].y, selected: selectY == 0);
+			Fonts.drawText(FontType.DarkBlue, "LOADING...", startX, optionPos[2].y, selected: selectY == 2);
 		}
 
 		int msgPos = 140;
@@ -197,10 +197,10 @@ public class PreJoinOrHostMenu : IMainMenu {
 			10, msgPos + 32, Global.screenW - 10, msgPos + 32, Color.White, 1, ZIndex.HUD, isWorldPos: false
 		);
 
-		Fonts.drawText(FontType.DarkBlue, "LAN", startX, optionPos[2].y, selected: selectY == 2);
+		Fonts.drawText(FontType.DarkBlue, "LAN", startX, optionPos[1].y, selected: selectY == 1);
 
-		Fonts.drawText(FontType.DarkBlue, "P2P", startX, optionPos[1].y, selected: selectY == 1);
+		Fonts.drawText(FontType.DarkBlue, "P2P", startX, optionPos[0].y, selected: selectY == 0);
 
-		Fonts.drawText(FontType.Grey, "[X]: Choose, [Z]: Back", Global.halfScreenW, 206, Alignment.Center);
+		Fonts.drawTextEX(FontType.Grey, "[X]: Choose, [Z]: Back", Global.halfScreenW, 206, Alignment.Center);
 	}
 }

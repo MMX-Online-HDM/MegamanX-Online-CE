@@ -20,7 +20,7 @@ public class SavedMatchSettings {
 	}
 
 	public static SavedMatchSettings createMatchSettingsFromFile(string fileName) {
-		string text = Helpers.ReadFromFile(fileName + ".txt");
+		string text = Helpers.ReadFromFile(fileName + ".json");
 		if (string.IsNullOrEmpty(text)) {
 			return new SavedMatchSettings() {
 				configName = fileName
@@ -31,7 +31,7 @@ public class SavedMatchSettings {
 				result.configName = fileName;
 				return result;
 			} catch {
-				throw new Exception("Your matchSettings.txt file is corrupted, or does no longer work with this version. Please delete it and launch the game again.");
+				throw new Exception("Your matchSettings.json file is corrupted, or does no longer work with this version. Please delete it and launch the game again.");
 			}
 		}
 	}
@@ -58,6 +58,6 @@ public class SavedMatchSettings {
 
 	public void saveToFile() {
 		string text = JsonConvert.SerializeObject(this, Formatting.Indented);
-		Helpers.WriteToFile(configName + ".txt", text);
+		Helpers.WriteToFile(configName + ".json", text);
 	}
 }

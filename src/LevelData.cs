@@ -222,7 +222,7 @@ public class LevelData {
 			supportedGameModesSet.Add(GameMode.Deathmatch);
 			supportedGameModesSet.Add(GameMode.TeamDeathmatch);
 		} else {
-			maxPlayers = 12;
+			maxPlayers = 22;
 			supportedGameModesSet.Add(GameMode.Deathmatch);
 			supportedGameModesSet.Add(GameMode.TeamDeathmatch);
 		}

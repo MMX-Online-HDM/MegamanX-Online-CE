@@ -66,7 +66,7 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 
 	public void update() {
 		if (!string.IsNullOrEmpty(error)) {
-			if (Global.input.isPressedMenu(Control.MenuSelectPrimary)) {
+			if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 				error = null;
 			}
 			return;
@@ -101,7 +101,7 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 		Helpers.menuUpDown(ref selCursorIndex, 0, 3);
 
 		bool backPressed = Global.input.isPressedMenu(Control.MenuBack);
-		bool selectPressed = Global.input.isPressedMenu(Control.MenuSelectPrimary) || (backPressed && !inGame);
+		bool selectPressed = Global.input.isPressedMenu(Control.MenuConfirm) || (backPressed && !inGame);
 		if (selectPressed) {
 			if (cursors[0].index == cursors[1].index) {
 				error = "Cannot select same maverick more than once!";
@@ -252,17 +252,25 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 			}
 		}
 
-		Helpers.drawTextStd(Helpers.menuControlText("Left/Right: Change Weapon/Mode"), Global.screenW * 0.5f, 200 + botOffY, Alignment.Center, fontSize: 18);
-		Helpers.drawTextStd(Helpers.menuControlText("Up/Down: Change Slot"), Global.screenW * 0.5f, 205 + botOffY, Alignment.Center, fontSize: 18);
+		//Helpers.drawTextStd(Helpers.menuControlText("Left/Right: Change Weapon/Mode"), Global.screenW * 0.5f, 200 + botOffY, Alignment.Center, fontSize: 18);
+		//Helpers.drawTextStd(Helpers.menuControlText("Up/Down: Change Slot"), Global.screenW * 0.5f, 205 + botOffY, Alignment.Center, fontSize: 18);
 		//Helpers.drawTextStd(Helpers.menuControlText("WeaponL/WeaponR: Quick cycle X1/X2/X3 weapons"), Global.screenW * 0.5f, 205, Alignment.Center, fontSize: 18);
-		string helpText = Helpers.menuControlText("[Z]: Back, [X]: Confirm");
-		if (!inGame) helpText = Helpers.menuControlText("[Z]: Save and back");
-		Helpers.drawTextStd(helpText, Global.screenW * 0.5f, 210 + botOffY, Alignment.Center, fontSize: 18);
+		//string helpText = Helpers.menuControlText("[Z]: Back, [X]: Confirm");
+		//if (!inGame) helpText = Helpers.menuControlText("[Z]: Save and back");
+		//Helpers.drawTextStd(helpText, Global.screenW * 0.5f, 210 + botOffY, Alignment.Center, fontSize: 18);
+
 		if (!string.IsNullOrEmpty(error)) {
 			float top = Global.screenH * 0.4f;
-			DrawWrappers.DrawRect(5, 5, Global.screenW - 5, Global.screenH - 5, true, new Color(0, 0, 0, 224), 0, ZIndex.HUD, false);
-			Helpers.drawTextStd(error, Global.screenW / 2, top, alignment: Alignment.Center, fontSize: 24);
-			Helpers.drawTextStd(Helpers.controlText("Press [X] to continue"), Global.screenW / 2, 20 + top, alignment: Alignment.Center, fontSize: 24);
+			DrawWrappers.DrawRect(
+				17, 17, Global.screenW - 17, Global.screenH - 17, true,
+				new Color(0, 0, 0, 224), 0, ZIndex.HUD, false
+			);
+			Fonts.drawText(FontType.Red, "ERROR", Global.screenW / 2, top - 20, alignment: Alignment.Center);
+			Fonts.drawText(FontType.RedishOrange, error, Global.screenW / 2, top, alignment: Alignment.Center);
+			Fonts.drawTextEX(
+				FontType.Grey, Helpers.controlText("Press [X] to continue"),
+				Global.screenW / 2, 20 + top, alignment: Alignment.Center
+			);
 		}
 	}
 

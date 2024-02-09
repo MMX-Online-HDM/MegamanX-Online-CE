@@ -57,7 +57,7 @@ public class KickMenu : IMainMenu {
 			}
 		}
 
-		if (Global.input.isPressedMenu(Control.MenuSelectPrimary)) {
+		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 			string voteKickPrefix = "";
 			if (!hasDirectKickPower()) voteKickPrefix = "Start Vote ";
 			string kickMsg = string.Format(voteKickPrefix + "Kick player {0}\nfor {1} minutes?", player.name, kickDuration);

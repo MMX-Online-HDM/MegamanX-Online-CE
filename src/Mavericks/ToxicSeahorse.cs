@@ -27,6 +27,13 @@ public class ToxicSeahorse : Maverick {
 		if (sendRpc) {
 			createActorRpc(player.id);
 		}
+
+		usesAmmo = true;
+		canHealAmmo = true;
+		ammo = 32;
+		maxAmmo = 32;
+		grayAmmoLevel = 8;
+		barIndexes = (67, 56);
 	}
 
 	public override void update() {

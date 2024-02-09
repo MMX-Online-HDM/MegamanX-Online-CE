@@ -58,19 +58,20 @@ public class ControlMenu : IMainMenu {
 		// General menu controls not to be overridden on characters
 		if (charNum == -1) {
 			bindableControls.Add(new string[] { Control.Scoreboard, "Scoreboard" });
-			bindableControls.Add(new string[] { Control.MenuSelectPrimary, "Menu Select" });
-			bindableControls.Add(new string[] { Control.MenuSelectSecondary, "Menu Secondary" });
-			bindableControls.Add(new string[] { Control.MenuBack, "Menu Back" });
-			bindableControls.Add(new string[] { Control.MenuUp, "Menu Up" });
-			bindableControls.Add(new string[] { Control.MenuDown, "Menu Down" });
-			bindableControls.Add(new string[] { Control.MenuLeft, "Menu Left" });
-			bindableControls.Add(new string[] { Control.MenuRight, "Menu Right" });
-			bindableControls.Add(new string[] { Control.MenuEnter, "In-Game Menu" });
 			bindableControls.Add(new string[] { Control.AllChat, "All Chat" });
 			bindableControls.Add(new string[] { Control.TeamChat, "Team Chat" });
 			bindableControls.Add(new string[] { Control.Taunt, "Taunt" });
 		}
-
+		if (charNum == -2) {
+			bindableControls.Add(new string[] { Control.MenuUp, "Up" });
+			bindableControls.Add(new string[] { Control.MenuDown, "Down" });
+			bindableControls.Add(new string[] { Control.MenuLeft, "Left" });
+			bindableControls.Add(new string[] { Control.MenuRight, "Right" });
+			bindableControls.Add(new string[] { Control.MenuPause, "Start" });
+			bindableControls.Add(new string[] { Control.MenuConfirm, "Confirm" });
+			bindableControls.Add(new string[] { Control.MenuBack, "Back/Cancel" });
+			bindableControls.Add(new string[] { Control.MenuAlt, "Alt/Switch" });
+		}
 		/* if (charNum == 4) {
 			bindableControls.Add(new string[] { Control.SigmaCommand, "Command Button" });
 		} */
@@ -110,7 +111,7 @@ public class ControlMenu : IMainMenu {
 		}
 
 		if (!listenForKey && !string.IsNullOrEmpty(error)) {
-			if (Global.input.isPressedMenu(Control.MenuSelectPrimary)) {
+			if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 				error = null;
 			}
 			return;
@@ -146,9 +147,9 @@ public class ControlMenu : IMainMenu {
 			Control.saveToFile();
 
 			Menu.change(previous);
-		} else if (Global.input.isPressedMenu(Control.MenuSelectPrimary)) {
+		} else if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 			listenForKey = true;
-		} else if (Global.input.isPressedMenu(Control.MenuSelectSecondary)) {
+		} else if (Global.input.isPressedMenu(Control.MenuAlt)) {
 			string inputName = bindableControls[selectArrowPosY][0];
 			if (mappingClone.ContainsKey(inputName)) mappingClone[inputName] = null;
 		}
@@ -235,9 +236,16 @@ public class ControlMenu : IMainMenu {
 
 		if (!string.IsNullOrEmpty(error)) {
 			float top = Global.screenH * 0.4f;
-			DrawWrappers.DrawRect(5, 5, Global.screenW - 5, Global.screenH - 5, true, new Color(0, 0, 0, 224), 0, ZIndex.HUD, false);
-			Helpers.drawTextStd(error, Global.screenW / 2, top, alignment: Alignment.Center);
-			Helpers.drawTextStd(TCat.BotHelp, "Press [X] to continue", Global.screenW / 2, 20 + top, alignment: Alignment.Center);
+			DrawWrappers.DrawRect(
+				17, 17, Global.screenW - 17, Global.screenH - 17, true,
+				new Color(0, 0, 0, 224), 0, ZIndex.HUD, false
+			);
+			Fonts.drawText(FontType.Red, "ERROR", Global.screenW / 2, top - 20, alignment: Alignment.Center);
+			Fonts.drawText(FontType.RedishOrange, error, Global.screenW / 2, top, alignment: Alignment.Center);
+			Fonts.drawTextEX(
+				FontType.Grey, Helpers.controlText("Press [X] to continue"),
+				Global.screenW / 2, 20 + top, alignment: Alignment.Center
+			);
 		}
 	}
 }

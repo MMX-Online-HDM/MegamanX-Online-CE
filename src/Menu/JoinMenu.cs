@@ -153,7 +153,7 @@ public class JoinMenu : IMainMenu {
 
 		if (publicServers.Count > 0) {
 			Helpers.menuUpDown(ref selServerIndex, 0, publicServers.Count - 1);
-			if (Global.input.isPressedMenu(Control.MenuSelectPrimary) || Global.quickStartOnline) {
+			if (Global.input.isPressedMenu(Control.MenuConfirm) || Global.quickStartOnline) {
 				var server = publicServers[selServerIndex];
 				Menu.change(new SelectCharacterMenu(this, server.level.EndsWith("1v1"), false, false, false, GameMode.isStringTeamMode(server.gameMode), false, () => joinServer(server)));
 			}
@@ -165,11 +165,11 @@ public class JoinMenu : IMainMenu {
 			rowHeight2 = 14;
 		}
 
-		if (Global.input.isPressedMenu(Control.MenuSelectSecondary)) {
+		if (Global.input.isPressedMenu(Control.MenuAlt)) {
 			queueRefresh();
 		} else if (Global.input.isPressedMenu(Control.MenuBack)) {
 			Menu.change(new MainMenu());
-		} else if (Global.input.isPressedMenu(Control.MenuEnter)) {
+		} else if (Global.input.isPressedMenu(Control.MenuPause)) {
 			if (!isLAN) {
 				Menu.change(new EnterTextMenu("Enter private server name", 10, (string text) => {
 					Server server = allServers.Where(s => s.hidden && s.name == text).FirstOrDefault();

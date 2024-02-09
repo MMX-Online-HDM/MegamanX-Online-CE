@@ -31,7 +31,7 @@ public class PreLoadoutMenu : IMainMenu {
 	public void update() {
 		Helpers.menuUpDown(ref selectY, 0, 4);
 
-		if (Global.input.isPressedMenu(Control.MenuSelectPrimary)) {
+		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 			if (selectY == 0) {
 				Menu.change(new SelectWeaponMenu(this, false));
 			}
@@ -70,6 +70,6 @@ public class PreLoadoutMenu : IMainMenu {
 		Fonts.drawText(FontType.DarkBlue, "Axl Loadout", startX, optionPos[3], selected: selectY == 3);
 		Fonts.drawText(FontType.DarkBlue, "Sigma Loadout", startX, optionPos[4], selected: selectY == 4);
 
-		Fonts.drawText(FontType.Grey, "[X]: Choose, [Z]: Back", Global.halfScreenW, 200, Alignment.Center);
+		Fonts.drawTextEX(FontType.Grey, "[X]: Choose, [Z]: Back", Global.halfScreenW, 200, Alignment.Center);
 	}
 }

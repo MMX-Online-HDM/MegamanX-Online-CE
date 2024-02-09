@@ -10,7 +10,7 @@
 		<ImplicitUsings>false</ImplicitUsings>
 		<SelfContained>false</SelfContained>
 		<!--OutDir>./bin/test/<OutDir-->
-		<!--RunWorkingDirectory>./bin/test/</RunWorkingDirectory-->
+		<!--RunWorkingDirectory>./bin/win7-x64/</RunWorkingDirectory-->
 		<OutputPath>./bin/</OutputPath>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	</PropertyGroup>
@@ -27,5 +27,6 @@
 		<PackageReference Include="DeviceId" Version="6.3.0" />
 		<PackageReference Include="Profanity.Detector" Version="0.1.8" />
 		<PackageReference Include="SpaceWizards.Lidgren.Network" Version="0.2.4" />
+		<PackageReference Include="System.IO.Hashing" Version="8.0.0" />
 	</ItemGroup>
 </Project>

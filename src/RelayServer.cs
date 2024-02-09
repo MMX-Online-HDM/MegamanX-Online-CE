@@ -325,6 +325,7 @@ public class RelayServer {
 		config.MaximumConnections = 10000;
 		config.MaximumTransmissionUnit = 8191;
 		config.Port = 14242;
+		config.EnableUPnP = true;
 		config.EnableMessageType(NetIncomingMessageType.UnconnectedData);
 		netServer = new NetServer(config);
 		netServer.Start();

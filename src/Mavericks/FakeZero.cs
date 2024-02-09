@@ -32,6 +32,13 @@ public class FakeZero : Maverick {
 		if (sendRpc) {
 			createActorRpc(player.id);
 		}
+
+		usesAmmo = true;
+		canHealAmmo = true;
+		ammo = 32;
+		maxAmmo = 32;
+		grayAmmoLevel = 2;
+		barIndexes = (60, 49);
 	}
 
 	public override void preUpdate() {

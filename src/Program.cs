@@ -6,16 +6,12 @@ using SFML.Graphics;
 using SFML.System;
 using SFML.Audio;
 using SFML.Window;
-using Newtonsoft.Json;
 using static SFML.Window.Keyboard;
-using SFML.Graphics.Glsl;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Globalization;
 using Lidgren.Network;
-using System.Collections.Specialized;
-using System.Text;
 using System.Runtime.InteropServices;
 
 namespace MMXOnline;
@@ -25,14 +21,32 @@ class Program {
 	[STAThread]
 	#endif
 	static void Main(string[] args) {
-		if (args.Length > 0 && args.Any(arg => arg == "-server")) {
+		if (args.Length > 0 && args[0] == "-relay") {
 			#if WINDOWS
 				AllocConsole();
 			#endif
 			RelayServer.ServerMain(args);
 		} else {
-			GameMain(args);
+			int mode = 0;
+			if (args.Length > 0 && args[0] == "-server") {
+				mode = 1;
+				args = new string[] {};
+			}
+			if (args.Length >= 2 && args[0] == "-connect") {
+				mode = 2;
+				args = args[1..];
+			} else {
+				args = new string[] {};
+			}
+			GameMain(args, mode);
 		}
+		if (Global.localServer != null && (
+			Global.localServer.s_server.Status == NetPeerStatus.Running ||
+			Global.localServer.s_server.Status == NetPeerStatus.Starting
+		)) {
+			Global.localServer.shutdown("Host closed the game.");
+		}
+		Environment.Exit(0);
 	}
 
 	#if WINDOWS
@@ -41,12 +55,12 @@ class Program {
 		static extern bool AllocConsole();
 	#endif
 
-	static void GameMain(string[] args) {
+	static void GameMain(string[] args, int mode) {
 		if (Debugger.IsAttached) {
-			Run();
+			Run(args, mode);
 		} else {
 			try {
-				Run();
+				Run(args, mode);
 			} catch (Exception e) {
 				/*
 				string crashDump = e.Message + "\n\n" +
@@ -64,7 +78,7 @@ class Program {
 		}
 	}
 
-	static void Run() {
+	static void Run(string[] args, int mode) {
 		#if MAC
 		Global.assetPath = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName) + "/";
 		Global.writePath = Global.assetPath;
@@ -133,29 +147,73 @@ class Program {
 		window.MouseButtonReleased += new EventHandler<MouseButtonEventArgs>(onMouseReleased);
 		window.MouseWheelScrolled += new EventHandler<MouseWheelScrollEventArgs>(onMouseScrolled);
 
-		if (Options.main.areShadersDisabled() == false) {
-			loadShaders();
-		}
-
-		loadImages();
-		loadSprites();
-		loadLevels();
-		loadSounds();
-		loadMusics();
+		// Loading starts here.
+		// We load font first as we are gonna render these.
 		Fonts.loadFontSizes();
+		Fonts.loadFontSprites();
 
-		Global.computeChecksum();
-
-		Global.input = new Input(false);
-
-		string regionJson =
-@"{
-   ""name"": """",
-   ""ip"": """"
-}";
-		if (!Helpers.FileExists("region.txt")) {
-			Helpers.WriteToFile("region.txt", regionJson);
+		List<string> loadText = new();
+		loadText.Add("NOM BIOS v" + Global.version + ", An Energy Sunstar Ally");
+		loadText.Add("Copyrigth ©2114, NOM Corporation");
+		loadText.Add("");
+		loadText.Add("MMXOD " + Global.shortForkName + " Revision " + Global.version + " " + Global.versionName);
+		loadText.Add("");
+		if (String.IsNullOrEmpty(Options.main.playerName)) {
+			loadText.Add("User: Dr. Cain");
+		} else {
+			loadText.Add("User: " + Options.main.playerName);
 		}
+		loadText.Add("CPU: " + System.Environment.GetEnvironmentVariable("PROCESSOR_IDENTIFIER").Split(",")[0]);
+		loadText.Add("Memory: " + (GC.GetGCMemoryInfo().TotalAvailableMemoryBytes / 1024) + "kb");
+		loadText.Add("");
+
+		// Input
+		Global.input = new Input(false);
+		setupControllers(window);
+
+		if (Options.main.areShadersDisabled() == false) {
+			loadText.Add("Shaders OK.");
+			loadShaders();
+		} else {
+			loadText.Add("Shaders disabled, skipping.");
+		}
+
+		// Loading with GUI.
+		loadText.Add("Getting Masterserver URL...");
+		loadMultiThread(loadText, window, MasterServerData.updateMasterServerURL);
+		if (MasterServerData.serverIp == "127.0.0.1") {
+			loadText[loadText.Count - 1] = "Using local conection.";
+		} else {
+			loadText[loadText.Count - 1] = "Masterserver OK.";
+		}
+
+		loadText.Add("Loading Sprites...");
+		loadMultiThread(loadText, window, loadImages);
+		loadText[loadText.Count - 1] = "Loaded Sprites.";
+
+		loadText.Add("Loading Sprite JSONS...");
+		loadMultiThread(loadText, window, loadSprites);
+		loadText[loadText.Count - 1] = "Sprite JSONS OK.";
+
+		loadText.Add("Loading Maps...");
+		loadMultiThread(loadText, window, loadLevels);
+		loadText[loadText.Count - 1] = "Maps Loaded.";
+
+		loadText.Add("Loading SFX...");
+		loadMultiThread(loadText, window, loadSounds);
+		loadText[loadText.Count - 1] = "SFX Loaded.";
+
+		loadText.Add("Loading Music...");
+		loadMultiThread(loadText, window, loadMusics);
+		loadText[loadText.Count - 1] = "Music Loaded.";
+
+		loadText.Add("Calculating checksum...");
+		loadMultiThread(loadText, window, Global.computeChecksum);
+		loadText[loadText.Count - 1] = "Checksum OK.";
+
+		/*if (!Helpers.FileExists("region.json")) {
+			Helpers.WriteToFile("region.json", regionJson);
+		}*/
 
 		// Only used to initialize the Global.ignoreUpgradeChecks variable
 		var primeRegions = Global.regions;
@@ -166,12 +224,18 @@ class Program {
 			}
 		});
 
-		setupControllers(window);
-
 		// Force startup config to be fetched
-
 		Menu.change(new MainMenu());
 		Global.changeMusic("menu");
+		if (mode == 1) {
+			HostMenu menu = new HostMenu(new MainMenu(), null, false, false, true); 
+			Menu.change(menu);
+			menu.completeAction();
+		} else if (mode == 2) {
+			// TODO: Fix this.
+			// Somehow we need to get the data before we connect.
+			Menu.change(new JoinMenuP2P(true));
+		}
 
 		while (window.IsOpen) {
 			mainLoop(window);
@@ -231,6 +295,9 @@ class Program {
 				case LeaveMatchScenario.Recreate:
 					disconnectMessage = "Recreate";
 					break;
+				case LeaveMatchScenario.RecreateMS:
+					disconnectMessage = "RecreateMS";
+					break;
 				case LeaveMatchScenario.Rejoin:
 					disconnectMessage = "Rejoin";
 					break;
@@ -254,6 +321,10 @@ class Program {
 					},
 					new MainMenu()
 				));
+			} else if (Global.leaveMatchSignal.leaveMatchScenario == LeaveMatchScenario.RecreateMS) {
+				Global.leaveMatchSignal.reCreateMS();
+			} else if (Global.leaveMatchSignal.leaveMatchScenario == LeaveMatchScenario.RejoinMS) {
+				Global.leaveMatchSignal.rejoinNewServerMS();
 			} else {
 				Menu.change(new MainMenu());
 			}
@@ -275,7 +346,7 @@ class Program {
 					Global.cheats();
 				}
 				if (Options.main.isDeveloperConsoleEnabled() && Menu.chatMenu != null) {
-					if (Global.input.isPressed(Key.F11)) {
+					if (Global.input.isPressed(Key.F10)) {
 						DevConsole.toggleShow();
 					}
 				}
@@ -313,16 +384,16 @@ class Program {
 			if (Global.level.gameMode.shouldDrawRadar()) {
 				yPos = 219;
 			}
-			Fonts.drawText(
-				FontType.BlueMenu, "VFPS:" + vfps.ToString(), Global.screenW - 5, yPos - 10,
-				Alignment.Right
-			);
+			//Fonts.drawText(
+			//	FontType.BlueMenu, "VFPS:" + vfps.ToString(), Global.screenW - 5, yPos - 10,
+			//	Alignment.Right
+			//);
 			Fonts.drawText(
 				FontType.BlueMenu, "FPS:" + fps.ToString(), Global.screenW - 5, yPos,
 				Alignment.Right
 			);
 		}
-
+		// TODO: Make this work for errors.
 		if (Global.debug) {
 			//Draw debug strings
 			//Global.debugString1 = ((int)Math.Round(1.0f / Global.spf2)).ToString();
@@ -330,9 +401,9 @@ class Program {
 				Global.debugString2 = Mathf.Floor(Global.level.character.pos.x / 8).ToString("0") + "," +
 				Mathf.Floor(Global.level.character.pos.y / 8).ToString("0");
 			}*/
-			Helpers.drawTextStd(Global.debugString1, 20, 20);
-			Helpers.drawTextStd(Global.debugString2, 20, 40);
-			Helpers.drawTextStd(Global.debugString3, 20, 60);
+			Fonts.drawText(FontType.Red, Global.debugString1, 20, 20);
+			Fonts.drawText(FontType.Red, Global.debugString2, 20, 30);
+			Fonts.drawText(FontType.Red, Global.debugString3, 20, 40);
 		}
 
 		DevConsole.drawConsole();
@@ -904,9 +975,12 @@ class Program {
 	public static void mainLoop(RenderWindow window) {
 		// Variables for stuff.
 		decimal deltaTime = 0;
+		decimal deltaTimeAlt = 0;
 		decimal deltaTimeSavings = 0;
 		decimal lastUpdateTime = 0;
+		decimal lastAltUpdateTime = 0;
 		decimal fpsLimit = (TimeSpan.TicksPerSecond / 60m);
+		decimal fpsLimitAlt = (TimeSpan.TicksPerSecond / 240m);
 		long lastSecondFPS = 0;
 		int videoUpdatesThisSecond = 0;
 		int framesUpdatesThisSecond = 0;
@@ -914,12 +988,21 @@ class Program {
 
 		// Main loop itself.
 		while (window.IsOpen) {
-			var timeSpam = (DateTimeOffset.UtcNow - Global.UnixEpoch);
+			TimeSpan timeSpam = (DateTimeOffset.UtcNow - Global.UnixEpoch);
 			long timeNow = timeSpam.Ticks;
-			long timeSecondsNow = (long)Math.Floor(timeSpam.TotalSeconds);
 
 			// Framerate calculations.
 			deltaTime = deltaTimeSavings + ((timeNow - lastUpdateTime) / fpsLimit);
+			deltaTimeAlt = ((timeNow - lastAltUpdateTime) / fpsLimitAlt);
+			if (deltaTime >= 1 || deltaTimeAlt >= 1) {
+				window.DispatchEvents();
+				lastAltUpdateTime = timeNow;
+			}
+			if (deltaTime >= 1) {
+			} else {
+				continue;
+			}
+			long timeSecondsNow = (long)Math.Floor(timeSpam.TotalSeconds);
 			if (timeSecondsNow > lastSecondFPS) {
 				Global.currentFPS = videoUpdatesThisSecond;
 				Global.logicFPS = framesUpdatesThisSecond;
@@ -927,63 +1010,58 @@ class Program {
 				videoUpdatesThisSecond = 0;
 				framesUpdatesThisSecond = 0;
 			}
-
 			// Disable frameskip in the menu.
 			if (Global.level != null) {
 				useFrameSkip = true;
 			} else {
 				useFrameSkip = false;
 			}
-
-			window.DispatchEvents();
 			if (Global.isMouseLocked) {
 				Mouse.SetPosition(new Vector2i((int)Global.halfScreenW, (int)Global.halfScreenH), Global.window);
 			}
-
 			var clearColor = Color.Black;
 			if (Global.level?.levelData?.bgColor != null) {
 				clearColor = Global.level.levelData.bgColor;
 			}
+			if (!useFrameSkip) {
+				update();
+				framesUpdatesThisSecond++;
+				deltaTime = 0;
+			} else {
+				// Logic update happens here.
+				while (deltaTime >= 1) {
+					if (deltaTime >= 10) {
+						deltaTime = 10;
+					}
+					// This is to only send RPC is when not frameskipping.
+					if (deltaTime >= 2) {
+						Global.isSkippingFrames = true;
+					} else {
+						Global.isSkippingFrames = false;
+					}
+					// Main update loop.
+					update();
+					deltaTime--;
+					framesUpdatesThisSecond++;
+				}
+			}
+			if (deltaTime < 0.001m) {
+				deltaTime = 0;
+			}
+			//deltaTimeSavings = deltaTime;
+			videoUpdatesThisSecond++;
+			Global.isSkippingFrames = false;
+			Global.input.clearInput();
+			lastUpdateTime = timeNow;
+			window.Clear(clearColor);
+			render();
+			window.Display();
 			/*
 			long prevPackets = 0;
 			if (Global.showDiagnostics) {
 				diagnosticsClock.Restart();
 				prevPackets = getBytesPerFrame();
 			}
-			*/
-			if (deltaTime >= 1) {
-				if (!useFrameSkip) {
-					update();
-					framesUpdatesThisSecond++;
-					deltaTime = 0;
-				} else {
-					if (deltaTime > 60) {
-						deltaTime = 1;
-					}
-					while (deltaTime >= 1) {
-						if (deltaTime >= 2) {
-							Global.isSkippingFrames = true;
-						} else {
-							Global.isSkippingFrames = false;
-						}
-						update();
-						deltaTime--;
-						framesUpdatesThisSecond++;
-					}
-				}
-				if (deltaTime <= 0) {
-					deltaTime = 0;
-				}
-				deltaTimeSavings = deltaTime;
-				videoUpdatesThisSecond++;
-				Global.isSkippingFrames = false;
-				Global.input.clearInput();
-				lastUpdateTime = timeNow;
-				window.Clear(clearColor);
-				render();
-				window.Display();
-			}
-			/*
 			if (Global.showDiagnostics) {
 				Global.lastFrameProcessTime = diagnosticsClock.ElapsedTime.AsMilliseconds();
 				Global.lastFrameProcessTimes.Add(Global.lastFrameProcessTime);
@@ -1008,6 +1086,49 @@ class Program {
 				}
 			}
 			*/
+		}
+	}
+	public static void loadMultiThread(List<String> loadText, RenderWindow window, ThreadStart loadFunct) {
+		Thread loadTread = new Thread(loadFunct);
+		loadTread.Start();
+		loadLoop(loadText, window, loadTread);
+	}
+
+	public static void loadLoop(List<String> loadText, RenderWindow window, Thread loadTread) {
+		// Variables for stuff.
+		decimal deltaTime = 0;
+		decimal lastUpdateTime = 0;
+		decimal fpsLimit = (TimeSpan.TicksPerSecond / 60m);
+		bool exit = false;
+
+		// Main loop itself.
+		while (window.IsOpen && !exit) {
+			DateTimeOffset UtcNow = DateTimeOffset.UtcNow;
+			TimeSpan timeSpam = (DateTimeOffset.UtcNow - Global.UnixEpoch);
+			long timeNow = timeSpam.Ticks;
+
+			// Framerate calculations.
+			deltaTime = (timeNow - lastUpdateTime) / fpsLimit;
+			if (deltaTime >= 1) {
+			} else {
+				continue;
+			}
+			Color clearColor = Color.Black;
+			window.Clear(clearColor);
+			for (int i = 0; i < loadText.Count; i++) {
+				Fonts.drawText(FontType.Grey, loadText[i], 8, 8 + (10 * i), isLoading: true);
+			}
+			Fonts.drawText(
+				FontType.Grey,
+				UtcNow.Day + "/" + UtcNow.Month + "/" + UtcNow.Year + " " +
+				UtcNow.ToString("0:hh:mm:sstt", CultureInfo.InvariantCulture),
+				8, Global.screenH - 15, isLoading: true
+			);
+
+			lastUpdateTime = timeNow;
+			window.DispatchEvents();
+			window.Display();
+			exit = (loadTread.ThreadState == System.Threading.ThreadState.Stopped);
 		}
 	}
 }

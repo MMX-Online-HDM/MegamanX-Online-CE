@@ -112,7 +112,7 @@ public class UpgradeMenu : IMainMenu {
 
 		Helpers.menuUpDown(ref selectArrowPosY, 0, getMaxIndex() - 1);
 
-		if (Global.input.isPressedMenu(Control.MenuSelectPrimary)) {
+		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 			if (selectArrowPosY == 0) {
 				if (mainPlayer.heartTanks < getMaxHeartTanks() && mainPlayer.scrap >= getHeartTankCost()) {
 					mainPlayer.scrap -= getHeartTankCost();

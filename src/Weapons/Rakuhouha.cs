@@ -133,11 +133,11 @@ public class Rakuhouha : CharState {
 			} else {
 				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, -1, 0, player, player.getNextActorNetId(), 180, rpc: true);
 				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, -0.92f, -0.38f, player, player.getNextActorNetId(), 135, rpc: true);
-				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, -0.707f, -0.707f, player, player.getNextActorNetId(), 135, rpc: true);
+				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, -0.7f, -0.7f, player, player.getNextActorNetId(), 135, rpc: true);
 				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, -0.38f, -0.92f, player, player.getNextActorNetId(), 135, rpc: true);
 				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, 0, -1, player, player.getNextActorNetId(), 90, rpc: true);
 				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, 0.92f, -0.38f, player, player.getNextActorNetId(), 45, rpc: true);
-				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, 0.707f, -0.707f, player, player.getNextActorNetId(), 45, rpc: true);
+				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, 0.71f, -0.71f, player, player.getNextActorNetId(), 45, rpc: true);
 				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, 0.38f, -0.92f, player, player.getNextActorNetId(), 45, rpc: true);
 				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, 1, 0, player, player.getNextActorNetId(), 0, rpc: true);
 			}
@@ -179,8 +179,13 @@ public class Rakuhouha : CharState {
 
 public class RakuhouhaProj : Projectile {
 	bool isCFlasher;
-	public RakuhouhaProj(Weapon weapon, Point pos, bool isCFlasher, float xVel, float yVel, Player player, ushort netProjId, int angle, bool rpc = false) :
-		base(weapon, pos, xVel >= 0 ? 1 : -1, 300, 4, player, isCFlasher ? "cflasher" : "rakuhouha", Global.defFlinch, 1f, netProjId, player.ownedByLocalPlayer) {
+	public RakuhouhaProj(
+		Weapon weapon, Point pos, bool isCFlasher, float xVel,
+		float yVel, Player player, ushort netProjId, int angle, bool rpc = false
+	) : base(
+		weapon, pos, xVel >= 0 ? 1 : -1, 300, 4, player, isCFlasher ? "cflasher" : "rakuhouha",
+		Global.defFlinch, 1f, netProjId, player.ownedByLocalPlayer
+	) {
 		this.isCFlasher = isCFlasher;
 
 		if (angle == 45) {
@@ -213,7 +218,14 @@ public class RakuhouhaProj : Projectile {
 		vel.y = yVel * 300;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(
+				pos, player, netProjId, xDir,
+				new Byte[]{
+					(byte)angle,
+					(byte)MathInt.Round(xVel * 100),
+					(byte)MathInt.Round(yVel * 100)
+				}
+			);
 		}
 	}
 
@@ -340,7 +352,7 @@ public class RekkohaProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
-		netcodeOverride = NetcodeModel.FavorDefender;
+		netcodeOverride = NetcodeModel.FavorDefender; 
 	}
 
 	public override void update() {

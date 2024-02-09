@@ -50,7 +50,6 @@ public class CharSelection {
 					new CharSelection("Vile", 2, 1, 0, "menu_vile", 0),
 					new CharSelection("Axl", 3, 1, 0, "menu_axl", 0),
 					new CharSelection("Sigma", 4, 1, 0, "menu_sigma", sigmaIndex),
-					new CharSelection("Zero Nightmare", 0, 1, 0, "menu_megaman", 0),
 					//new CharSelection("Rockman", 5, 1, 0, "rock_idle", 0),
 				};
 		}
@@ -171,7 +170,7 @@ public class SelectCharacterMenu : IMainMenu {
 	public Player mainPlayer { get { return Global.level.mainPlayer; } }
 
 	public void update() {
-		if (Global.input.isPressedMenu(Control.MenuSelectPrimary) || (Global.quickStartOnline && !isInGame)) {
+		if (Global.input.isPressedMenu(Control.MenuConfirm) || (Global.quickStartOnline && !isInGame)) {
 			if (!isInGame && Global.quickStartOnline) {
 				playerData.charNum = Global.quickStartOnlineClientCharNum;
 			}
@@ -216,7 +215,7 @@ public class SelectCharacterMenu : IMainMenu {
 				if (Global.isHost) {
 					Menu.change(prevMenu);
 				}
-			} else if (Global.input.isPressedMenu(Control.MenuEnter)) {
+			} else if (Global.input.isPressedMenu(Control.MenuPause)) {
 				if (!Global.isHost) {
 					Menu.change(new ConfirmLeaveMenu(this, "Are you sure you want to leave?", () => {
 						Global._quickStart = false;
@@ -325,19 +324,19 @@ public class SelectCharacterMenu : IMainMenu {
 			}
 		}
 		if (!isInGame) {
-			Fonts.drawText(
-				FontType.LigthGrey, "[X]: Continue, [Z]: Back\nLeft/Right: Change character",
+			Fonts.drawTextEX(
+				FontType.Grey, "[X]: Continue, [Z]: Back\n[LEFT]/[RIGHT]: Change character",
 				Global.screenW * 0.5f, 178, Alignment.Center
 			);
 		} else {
 			if (!Global.isHost) {
-				Fonts.drawText(
-					FontType.LigthGrey, "[ESC]: Quit\nLeft/Right: Change character",
+				Fonts.drawTextEX(
+					FontType.Grey, "[ESC]: Quit\n[LEFT]/[RIGHT]: Change character",
 					Global.screenW * 0.5f, 190, Alignment.Center
 				);
 			} else {
-				Fonts.drawText(
-					FontType.LigthGrey, "[X]: Continue, [Z]: Back\nLeft/Right: Change character",
+				Fonts.drawTextEX(
+					FontType.Grey, "[X]: Continue, [Z]: Back\n[LEFT]/[RIGHT]: Change character",
 					Global.screenW * 0.5f, 190, Alignment.Center
 				);
 			}

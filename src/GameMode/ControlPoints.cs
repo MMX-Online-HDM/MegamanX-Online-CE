@@ -28,14 +28,22 @@ public class ControlPoints : GameMode {
 		foreach (var controlPoint in level.controlPoints) {
 			var redText = "";
 
-			Color textColor = Color.Green;
-			if (controlPoint.attacked()) {
+			FontType textColor = FontType.RedishOrange;
+			if (controlPoint.captureTime == controlPoint.maxCaptureTime) {
+				redText = "Lock";
+				textColor = FontType.Blue;
+			} else if (controlPoint.attacked()) {
 				redText += string.Format("{0}x", controlPoint.getAttackerCount());
 			} else if (controlPoint.contested()) {
-				redText += string.Format("blocked");
+				redText = "Block";
+				textColor = FontType.Red;
 			} else if (controlPoint.locked) {
-				redText += string.Format("locked");
-				textColor = Helpers.Gray;
+				redText = "Lock";
+				if (controlPoint.captureTime > 0) {
+					textColor = FontType.Green;
+				} else {
+					textColor = FontType.Grey;
+				}
 			}
 
 			int allianceFactor = (controlPoint.alliance == GameMode.redAlliance ? 0 : 2);
@@ -46,7 +54,7 @@ public class ControlPoints : GameMode {
 				Global.sprites["hud_cp_bar"].drawToHUD(1, 5 + 17 + (i * 2), 5 + 3 + hudcpY);
 			}
 
-			Helpers.drawTextStd(TCat.HUD, redText, 38, 10 + hudcpY, Alignment.Center, fontSize: (uint)17, color: textColor, outlineColor: Color.Black);
+			Fonts.drawText(textColor, redText, 38, 9 + hudcpY, Alignment.Center);
 			hudcpY += 16;
 		}
 
