@@ -20,7 +20,7 @@ public class RollingShield : Weapon {
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
 		if (chargeLevel < 3) {
-			if (player.character is MegamanX mmx && mmx.chargedRollingShieldProj != null) {
+			if (player.character is MegamanX mmx) {
 				new RollingShieldProj(this, pos, xDir, player, netProjId);
 			}
 		} else {
