@@ -55,6 +55,7 @@ public class Buster : Weapon {
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
 		string shootSound = "buster";
+		if (player.hasArmArmor(ArmorId.Light) || player.hasArmArmor(ArmorId.None) || player.hasUltimateArmor())
 		shootSound = chargeLevel switch {
 			_ when (
 					player.character.stockedCharge
@@ -62,16 +63,17 @@ public class Buster : Weapon {
 			0 => "buster",
 			1 => "buster2",
 			2 => "buster3",
-			_ => "buster4"
+			3 => "buster4"
 		};
 		if (player.hasArmArmor(ArmorId.Giga)) {
 			shootSound = chargeLevel switch {
 				_ when (
 					player.character.stockedCharge
 				) => "",
+				0 => "buster", //i have to rip the sound of this one
 				1 => "buster2X2",
 				2 => "buster3X2",
-				3 => "",
+				3 => "", //haha this causes bugs
 				_ => shootSound
 			};
 		} else if (player.hasArmArmor(ArmorId.Max)) {
@@ -82,8 +84,10 @@ public class Buster : Weapon {
 				_ when (
 					player.character.stockedX3Buster
 				) => "",
+				0 => "busterX3",
 				1 => "buster2X3",
-				3 => "",
+				2 => "buster3X3",
+				3 => "buster3X3",
 				_ => shootSound
 			};
 		}
@@ -493,7 +497,7 @@ public class X3ChargeShot : CharState {
 					player.weapon, character.getShootPos(), character.getShootXDir(),
 					3, player, player.getNextActorNetId(), rpc: true
 				);
-				character.playSound("buster3X3", sendRpc: true);
+				//character.playSound("buster3X3", sendRpc: true);
 			} else {
 				if (hyperBusterWeapon != null) {
 					hyperBusterWeapon.ammo -= hyperBusterWeapon.getChipFactoredAmmoUsage(player);

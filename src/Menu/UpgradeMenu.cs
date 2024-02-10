@@ -117,7 +117,7 @@ public class UpgradeMenu : IMainMenu {
 				if (mainPlayer.heartTanks < getMaxHeartTanks() && mainPlayer.scrap >= getHeartTankCost()) {
 					mainPlayer.scrap -= getHeartTankCost();
 					mainPlayer.heartTanks++;
-					Global.playSound("upgrade");
+					Global.playSound("hearthX1");
 					mainPlayer.maxHealth += mainPlayer.getHeartTankModifier();
 					mainPlayer.character?.addHealth(mainPlayer.getHeartTankModifier());
 					/*

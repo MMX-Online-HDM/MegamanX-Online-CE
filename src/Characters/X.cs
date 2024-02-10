@@ -788,7 +788,7 @@ public partial class MegamanX : Character {
 				player.character.boughtUltimateArmorOnce = true;
 			}
 			player.setUltimateArmor(true);
-			Global.playSound("ching");
+			Global.playSound("chingX4");
 			return;
 		}
 	}
@@ -1041,7 +1041,7 @@ public partial class MegamanX : Character {
 	}
 
 	public void drawHyperCharge(float x, float y) {
-		addRenderEffect(RenderEffectType.Flash, 0.05f, 0.1f);
+		addRenderEffect(RenderEffectType.ChargeOrange, 0.05f, 0.1f);
 		hyperChargeAnimTime += Global.spf;
 		if (hyperChargeAnimTime >= maxHyperChargeAnimTime) hyperChargeAnimTime = 0;
 		float sx = pos.x + x;

@@ -944,7 +944,7 @@ public class AirDash : CharState {
 	public bool stop;
 
 	public AirDash(string initialDashButton) : base("dash", "dash_shoot") {
-		enterSound = "dash";
+		enterSound = "DashX2";
 		this.initialDashButton = initialDashButton;
 		accuracy = 10;
 		attackCtrl = true;
@@ -1077,7 +1077,7 @@ public class WallSlide : CharState {
 	) : base(
 		"wall_slide", "wall_slide_shoot", "wall_slide_attack"
 	) {
-		enterSound = "wallslide";
+		enterSound = "land";
 		this.wallDir = wallDir;
 		this.wallCollider = wallCollider;
 		accuracy = 2;
@@ -1172,7 +1172,7 @@ public class WallSlide : CharState {
 
 public class WallKick : CharState {
 	public WallKick() : base("wall_kick", "wall_kick_shoot") {
-		enterSound = "wallkick";
+		enterSound = "jump";
 		accuracy = 5;
 		exitOnLanding = true;
 		useDashJumpSpeed = true;

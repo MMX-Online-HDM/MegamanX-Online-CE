@@ -48,7 +48,7 @@ public class SpinningBladeProj : Projectile {
 		maxTime = 2f;
 		projId = (int)ProjIds.SpinningBlade;
 		fadeSprite = "explosion";
-		fadeSound = "crush";
+		fadeSound = "explosion";
 		/*try {
 			spinSound = new Sound(Global.soundBuffers["spinningBlade"].soundBuffer);
 			spinSound.Volume = 50f;

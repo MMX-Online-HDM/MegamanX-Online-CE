@@ -156,6 +156,7 @@ public class MagnetMineProjCharged : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		playSound("magnetminechargedtravelX2", forcePlay: false, sendRpc: true);
 	}
 
 	public override void update() {

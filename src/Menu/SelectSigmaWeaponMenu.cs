@@ -79,13 +79,13 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 				if (cursors[selCursorIndex].index == -1) cursors[selCursorIndex].index = 26;
 				else if (cursors[selCursorIndex].index == 8) cursors[selCursorIndex].index = 8;
 				else if (cursors[selCursorIndex].index == 17) cursors[selCursorIndex].index = 17;
-				Global.playSound("menu");
+				Global.playSound("menuX2");
 			} else if (Global.input.isPressedMenu(Control.MenuRight)) {
 				cursors[selCursorIndex].index++;
 				if (cursors[selCursorIndex].index == 9) cursors[selCursorIndex].index = 9;
 				else if (cursors[selCursorIndex].index == 18) cursors[selCursorIndex].index = 18;
 				else if (cursors[selCursorIndex].index == 27) cursors[selCursorIndex].index = 0;
-				Global.playSound("menu");
+				Global.playSound("menuX2");
 			}
 			if (Global.input.isPressedMenu(Control.WeaponLeft)) {
 				cursors[selCursorIndex].cycleLeft();

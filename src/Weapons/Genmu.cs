@@ -51,7 +51,7 @@ public class GenmuState : CharState {
 
 		if (character.frameIndex >= 8 && !fired) {
 			fired = true;
-			character.playSound("saberShot", sendRpc: true);
+			character.playSound("GenmureiX5", sendRpc: true);
 			new GenmuProj(new Genmu(), character.pos.addxy(30 * character.xDir, -25), character.xDir, 0, player, player.getNextActorNetId(), rpc: true);
 			new GenmuProj(new Genmu(), character.pos.addxy(30 * character.xDir, -25), character.xDir, 1, player, player.getNextActorNetId(), rpc: true);
 		}

@@ -2844,7 +2844,7 @@ public partial class Character : Actor, IDamagable {
 
 	public void crystalizeEnd() {
 		isCrystalized = false;
-		playSound("freezebreak2");
+		playSound("CrystalizeDashingX2");
 		for (int i = 0; i < 8; i++) {
 			var anim = new Anim(getCenterPos().addxy(Helpers.randomRange(-20, 20), Helpers.randomRange(-20, 20)), "crystalhunter_piece", Helpers.randomRange(0, 1) == 0 ? -1 : 1, null, false);
 			anim.frameIndex = Helpers.randomRange(0, 1);

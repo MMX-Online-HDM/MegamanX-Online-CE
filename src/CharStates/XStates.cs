@@ -1,6 +1,7 @@
 namespace MMXOnline;
 
 public class XHover : CharState {
+	public SoundWrapper sound;
 	float hoverTime;
 	int startXDir;
 	public XHover() : base("hover", "hover_shoot", "", "") {
@@ -63,10 +64,18 @@ public class XHover : CharState {
 		character.useGravity = false;
 		character.vel = new Point();
 		startXDir = character.xDir;
+		if (stateTime <= 0.1f) {
+			sound = character.playSound("UAHover", forcePlay: false, sendRpc: true);
+		}
 	}
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		character.useGravity = true;
+		if (sound != null && !sound.deleted) {
+			sound.sound?.Stop();
+		}
+		RPC.stopSound.sendRpc("UAHover", character.netId);
+
 	}
 }

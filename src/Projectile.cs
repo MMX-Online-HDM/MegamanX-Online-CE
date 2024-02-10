@@ -414,7 +414,7 @@ public class Projectile : Actor {
 			if (otherProj != null && otherProj.isDeflectShield && reflectable && damager.owner.alliance != otherProj.damager.owner.alliance) {
 				if (deltaPos.x != 0 && Math.Sign(deltaPos.x) != otherProj.xDir) {
 					deflect(otherProj.owner, playDingSound: false);
-					playSound("ding", sendRpc: true);
+					playSound("SigmaSaberBlock", forcePlay: false, sendRpc: true);
 				}
 			}
 

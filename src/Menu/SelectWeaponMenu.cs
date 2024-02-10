@@ -132,13 +132,13 @@ public class SelectWeaponMenu : IMainMenu {
 				if (cursors[selCursorIndex].index == -1) cursors[selCursorIndex].index = 24; //8;
 				else if (cursors[selCursorIndex].index == 8) cursors[selCursorIndex].index = 8; //16;
 				else if (cursors[selCursorIndex].index == 16) cursors[selCursorIndex].index = 16; //24;
-				Global.playSound("menu");
+				Global.playSound("menuX2");
 			} else if (Global.input.isPressedMenu(Control.MenuRight)) {
 				cursors[selCursorIndex].index++;
 				if (cursors[selCursorIndex].index == 9) cursors[selCursorIndex].index = 9; //0;
 				else if (cursors[selCursorIndex].index == 17) cursors[selCursorIndex].index = 17; //9;
 				else if (cursors[selCursorIndex].index == 25) cursors[selCursorIndex].index = 0; //17;
-				Global.playSound("menu");
+				Global.playSound("menuX2");
 			}
 			if (Global.input.isPressedMenu(Control.WeaponLeft)) {
 				cursors[selCursorIndex].cycleLeft();

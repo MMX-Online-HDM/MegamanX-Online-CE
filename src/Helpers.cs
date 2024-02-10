@@ -645,17 +645,17 @@ public class Helpers {
 			val--;
 			if (val < min) {
 				val = wrap ? max : min;
-				if (wrap && playSound) Global.playSound("menu");
+				if (wrap && playSound) Global.playSound("menuX2");
 			} else {
-				if (playSound) Global.playSound("menu");
+				if (playSound) Global.playSound("menuX2");
 			}
 		} else if (Global.input.isPressedMenu(Control.MenuRight)) {
 			val++;
 			if (val > max) {
 				val = wrap ? min : max;
-				if (wrap && playSound) Global.playSound("menu");
+				if (wrap && playSound) Global.playSound("menuX2");
 			} else {
-				if (playSound) Global.playSound("menu");
+				if (playSound) Global.playSound("menuX2");
 			}
 		}
 	}

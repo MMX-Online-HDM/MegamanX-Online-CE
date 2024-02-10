@@ -103,6 +103,7 @@ public class ShotgunIceProj : Projectile {
 
 	public override void onHitDamagable(IDamagable damagable) {
 		if (ownedByLocalPlayer) onHit();
+		playSound("shotgunicehitX1", forcePlay: false, sendRpc: true);
 		base.onHitDamagable(damagable);
 	}
 }
