@@ -103,7 +103,7 @@ public class Projectile : Actor {
 				return;
 			}
 		} else {
-			if (time > maxTime * 1.5 ||
+			if (time > maxTime + 0.2 ||
 				moveDistance > maxDistance ||
 				pos.x > Global.level.width + leeway ||
 				pos.x < -leeway ||
