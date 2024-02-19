@@ -55,8 +55,11 @@ public class TunnelFangProj : Projectile {
 	int type;
 	float sparksCooldown;
 
-	public TunnelFangProj(Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 100, 1, player, "tunnelfang_proj", 0, 0.25f, netProjId, player.ownedByLocalPlayer) {
+	public TunnelFangProj(
+		Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 100, 1, player, "tunnelfang_proj", 0, 0.25f, netProjId, player.ownedByLocalPlayer
+	) {
 		maxTime = 1.5f;
 		projId = (int)ProjIds.TunnelFang;
 		exhaust = new Anim(pos, "tunnelfang_exhaust", xDir, null, false);
@@ -69,8 +72,8 @@ public class TunnelFangProj : Projectile {
 			projId = (int)ProjIds.TunnelFang2;
 		}
 
-		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+		if (rpc) { 
+			rpcCreate(pos, player, netProjId, xDir, new byte[] { (byte)type });
 		}
 	}
 

@@ -62,7 +62,11 @@ public class RPCCreateProj : RPC {
 		} else if (projId == (int)ProjIds.ZBuster4b) {
 			proj = new ZBuster4Proj(new ZeroBuster(), pos, xDir, 1, player, netProjByte);
 		} else if (projId == (int)ProjIds.Sting || projId == (int)ProjIds.StingDiag) {
-			proj = new StingProj(new Sting(), pos, xDir, player, 1, netProjByte);
+			Point? vel = null;
+			if (extraArgs.Length >= 3) {
+				vel = new Point(extraArgs[1], extraArgs[2]);
+			}
+			proj = new StingProj(new Sting(), pos, xDir, player, extraArgs[0], netProjByte, vel);
 		} else if (projId == (int)ProjIds.FireWaveCharged) {
 			proj = new FireWaveProjCharged(new FireWave(), pos, xDir, player, 0, netProjByte, 0);
 		} else if (projId == (int)ProjIds.ElectricSpark) {
@@ -184,7 +188,7 @@ public class RPCCreateProj : RPC {
 		} else if (projId == (int)ProjIds.FrostShieldChargedPlatform) {
 			proj = new FrostShieldProjPlatform(new FrostShield(), pos, xDir, player, netProjByte);
 		} else if (projId == (int)ProjIds.TunnelFang || projId == (int)ProjIds.TunnelFang2) {
-			proj = new TunnelFangProj(new TunnelFang(), pos, xDir, 0, player, netProjByte);
+			proj = new TunnelFangProj(new TunnelFang(), pos, xDir, extraArgs[0], player, netProjByte);
 		} else if (projId == (int)ProjIds.SplashLaser) {
 			proj = new SplashLaserProj(new RayGun(0), pos, player, bulletDir, netProjByte);
 		} else if (projId == (int)ProjIds.BlackArrow) {
