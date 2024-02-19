@@ -1231,11 +1231,11 @@ public partial class Level {
 				Actor followActor = camPlayer.character?.getFollowActor();
 				Point expectedCamPos = computeCamPos(camPos, new Point(playerX, playerY));
 
-				float moveDeltaX = camX - playerX;
-				float moveDeltaY = camY - playerY;
+				float moveDeltaX = camX - MathF.Round(playerX);
+				float moveDeltaY = camY - MathF.Round(playerY);
 
-				float fullDeltaX = expectedCamPos.x - camX;
-				float fullDeltaY = expectedCamPos.y - camY;
+				float fullDeltaX = MathF.Round(expectedCamPos.x) - camX;
+				float fullDeltaY = MathF.Round(expectedCamPos.y) - camY;
 
 				if (followActor != null && followActor.grounded == false) {
 					if (fullDeltaY > -54 && fullDeltaY < 20 && 

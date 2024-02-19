@@ -20,6 +20,12 @@ public class RPCCreateProj : RPC {
 		int flinch = arguments[18];
 
 		int extraDataIndex = 19;
+		byte[] extraArgs;
+		if (arguments.Length >= 20) {
+			extraArgs = arguments[19..];
+		} else {
+			extraArgs = new byte[0];
+		}
 		Point bulletDir = Point.createFromAngle(angle);
 
 		var player = Global.level.getPlayerById(playerId);
@@ -60,7 +66,9 @@ public class RPCCreateProj : RPC {
 		} else if (projId == (int)ProjIds.FireWaveCharged) {
 			proj = new FireWaveProjCharged(new FireWave(), pos, xDir, player, 0, netProjByte, 0);
 		} else if (projId == (int)ProjIds.ElectricSpark) {
-			proj = new ElectricSparkProj(new ElectricSpark(), pos, xDir, player, 1, netProjByte);
+			proj = new ElectricSparkProj(
+				new ElectricSpark(), pos, xDir, player, extraArgs[0], netProjByte
+			);
 		} else if (projId == (int)ProjIds.ElectricSparkCharged) {
 			proj = new ElectricSparkProjCharged(new ElectricSpark(), pos, xDir, player, netProjByte);
 		} else if (projId == (int)ProjIds.ShotgunIce) {

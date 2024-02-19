@@ -53,7 +53,13 @@ public class ElectricSparkProj : Projectile {
 		shouldShieldBlock = false;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			byte[] extraArgs;
+			if (vel != null) {
+				extraArgs = new byte[] { (byte)type, (byte)vel.Value.x, (byte)vel.Value.y };
+			} else {
+				extraArgs = new byte[] { (byte)type };
+			}
+			rpcCreate(pos, player, netProjId, xDir, extraArgs);
 		}
 	}
 
@@ -75,11 +81,17 @@ public class ElectricSparkProj : Projectile {
 			normal2.multiply(getSpeed() * 3);
 			destroySelf(fadeSprite);
 			split = true;
-			if (ownedByLocalPlayer) {
+			if (!ownedByLocalPlayer) {
 				return;
 			}
-			new ElectricSparkProj(weapon, pos.clone(), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(), normal2, rpc: true);
-			new ElectricSparkProj(weapon, pos.clone(), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(), normal2.times(-1), rpc: true);
+			new ElectricSparkProj(
+				weapon, pos.clone(), xDir, damager.owner, 1,
+				Global.level.mainPlayer.getNextActorNetId(), normal2, rpc: true
+			);
+			new ElectricSparkProj(
+				weapon, pos.clone(), xDir, damager.owner, 1,
+				Global.level.mainPlayer.getNextActorNetId(), normal2.times(-1), rpc: true
+			);
 		}
 	}
 

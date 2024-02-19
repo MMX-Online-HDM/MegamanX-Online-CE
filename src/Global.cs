@@ -17,7 +17,7 @@ namespace MMXOnline;
 
 public partial class Global {
 	public static decimal version = 20m;
-	public const string versionName = "Alpha 6";
+	public const string versionName = "Alpha 7";
 
 	// THIS VALUE MUST ALWAYS MANUALLY BE SET AFTER UPDATING ASSETS BEFORE BUILDING A RELEASE BUILD.
 	// Obtain it by pressing F1 in main menu.
@@ -29,7 +29,7 @@ public partial class Global {
 	public const string checksumPrefix = "[Community Edition]";
 	// Use this to make sure the checksum varies.
 	// Better to use together with "checksumPrefix" and be diferent from it.
-	public const string checksumKey = checksumPrefix + versionName + " DEVTEST-07-02-2024-v1";
+	public const string checksumKey = checksumPrefix + versionName + " DEVTEST-11-02-2024";
 	// For displaying the name of the mod in the version string.
 	public static string shortForkName = "CE";
 

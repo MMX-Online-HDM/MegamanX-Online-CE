@@ -652,7 +652,7 @@ public partial class Character : Actor, IDamagable {
 		float runSpeed = Physics.WalkSpeed;
 		if (player.isX) {
 			if (charState is XHover) {
-				runSpeed = 129;
+				runSpeed = Physics.WalkSpeed;
 			}
 		}
 		else if (player.isVile && player.speedDevil) {
@@ -674,7 +674,7 @@ public partial class Character : Actor, IDamagable {
 		if (flag != null || !isDashing) {
 			return getRunSpeed();
 		}
-		float dashSpeed = 210;
+		float dashSpeed = 3.45f * 60f;
 
 		if (charState is XHover) {
 			dashSpeed *= 1.25f;

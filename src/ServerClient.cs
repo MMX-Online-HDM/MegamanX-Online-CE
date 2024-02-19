@@ -114,11 +114,11 @@ public class ServerClient {
 		NetOutgoingMessage regMsg = client.CreateMessage();
 		regMsg.Write((byte)MasterServerMsg.ConnectPeers);
 		regMsg.Write(serverId);
-		regMsg.Write(new IPEndPoint(NetUtility.GetMyAddress(out _), Global.basePort));
+		regMsg.Write(new IPEndPoint(NetUtility.GetMyAddress(out _), client.Port));
 		IPEndPoint masterServerLocation = NetUtility.Resolve(MasterServerData.serverIp, MasterServerData.serverPort);
 		client.SendUnconnectedMessage(regMsg, masterServerLocation);
 		NetOutgoingMessage hail = client.CreateMessage(JsonConvert.SerializeObject(inputServerPlayer));
-		// Wait for hole punching to happen,
+		// Wait for hole punching to happen.
 		int count = 0;
 		bool connected = false;
 		NetIncomingMessage msg;
@@ -197,9 +197,10 @@ public class ServerClient {
 		NetOutgoingMessage regMsg = client.CreateMessage();
 		regMsg.Write((byte)MasterServerMsg.ConnectPeers);
 		regMsg.Write(serverId);
-		regMsg.Write(new IPEndPoint(NetUtility.GetMyAddress(out _), Global.basePort));
+		regMsg.Write(new IPEndPoint(NetUtility.GetMyAddress(out _), client.Port));
 		IPEndPoint masterServerLocation = NetUtility.Resolve(MasterServerData.serverIp, MasterServerData.serverPort);
 		client.SendUnconnectedMessage(regMsg, masterServerLocation);
+		client.FlushSendQueue();
 		NetOutgoingMessage hail = client.CreateMessage(JsonConvert.SerializeObject(inputServerPlayer));
 		// Wait for hole punching to happen,
 		int count = 0;
@@ -215,6 +216,9 @@ public class ServerClient {
 					Console.WriteLine("IP: " + hostIpPort[0]);
 					Console.WriteLine("Port: " + hostIpPort[1]);
 					goto exitLoop;
+				} else {
+					Console.WriteLine("Got other message.");
+					Console.WriteLine("MSG type:" + msg.MessageType.ToString());
 				}
 			}
 			count++;
@@ -224,7 +228,7 @@ public class ServerClient {
 		exitLoop:
 		// Do this if hole punch fails.
 		if (!connected) {
-			error = "Failed to connect to P2P server.";
+			error = "Failed to get response from masterserver.";
 			joinServerResponse = null;
 			return null;
 		}

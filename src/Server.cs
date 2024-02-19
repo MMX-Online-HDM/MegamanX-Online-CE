@@ -380,7 +380,7 @@ public class Server {
 				NetOutgoingMessage basicInfoMsg = s_server.CreateMessage();
 				basicInfoMsg.Write((byte)MasterServerMsg.RegisterHost);
 				basicInfoMsg.Write(uniqueID);
-				basicInfoMsg.Write(new IPEndPoint(NetUtility.GetMyAddress(out _), 14242));
+				basicInfoMsg.Write(new IPEndPoint(NetUtility.GetMyAddress(out _), s_server.Port));
 
 				// Second. The match list info.
 				NetOutgoingMessage listInfoMsg = s_server.CreateMessage();
