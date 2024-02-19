@@ -164,7 +164,10 @@ public class FlameBurnerAltProj : Projectile {
 	// Airblast reflect should favor both attacker and defender
 	public override void onCollision(CollideData other) {
 		base.onCollision(other);
-		if (other.gameObject is Projectile proj && proj.owner.alliance != owner.alliance && proj.reflectCount == 0 && proj.reflectable2) {
+		if (other.gameObject is Projectile proj &&
+			proj.owner.alliance != owner.alliance &&
+			proj.reflectCount == 0 && proj.reflectableFBurner
+		) {
 			proj.reflect2(owner, deltaPos.angle, sendRpc: true);
 		}
 	}

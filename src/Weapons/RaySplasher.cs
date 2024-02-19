@@ -78,6 +78,15 @@ public class RaySplasherProj : Projectile {
 			arg.player, arg.netId
 		);
 	}
+
+	public override void onReflect() {
+		base.onReflect();
+		if (ownedByLocalPlayer) {
+			float randY = Helpers.randomRange(-2f, 1f);
+			vel.y *= randY;
+			forceNetUpdateNextFrame = true;
+		}
+	}
 }
 
 public class RaySplasherTurret : Actor, IDamagable {

@@ -18,7 +18,7 @@ public class BlastLauncher : AxlWeapon {
 		switchCooldown = 0.1f;
 		rateOfFire = 0.75f;
 
-		sprite = "axl_arm_blauncher";
+		sprite = "axl_arm_blastlauncher";
 		flashSprite = "axl_pistol_flash_charged";
 		chargedFlashSprite = "axl_pistol_flash_charged";
 		altFireCooldown = 1.5f;
@@ -48,7 +48,7 @@ public class BlastLauncher : AxlWeapon {
 				player.grenades.RemoveAt(0);
 			}
 		} else {
-			grenade = new GrenadeProjCharged(weapon, bulletPos, xDir, player, bulletDir, target, netId);
+			grenade = new GreenSpinnerProj(weapon, bulletPos, xDir, player, bulletDir, target, netId);
 		}
 
 		if (player.ownedByLocalPlayer) {
@@ -61,9 +61,15 @@ public class GrenadeProj : Projectile, IDamagable {
 	public IDamagable target;
 	int type = 0;
 	bool planted;
-	Player player;  // We use player here due to airblast reflect potential. The explosion should still be the original owner's
-	public GrenadeProj(Weapon weapon, Point pos, int xDir, Player player, Point bulletDir, IDamagable target, Point cursorPos, int chargeLevel, ushort netProjId) :
-		base(weapon, pos, xDir, 300, 0, player, "axl_grenade", 0, 0, netProjId, player.ownedByLocalPlayer) {
+	// We use player here due to airblast reflect potential.
+	// The explosion should still be the original owner's.
+	Player player; 
+	public GrenadeProj(
+		Weapon weapon, Point pos, int xDir, Player player, Point bulletDir,
+		IDamagable target, Point cursorPos, int chargeLevel, ushort netProjId
+	) : base(
+		weapon, pos, xDir, 300, 0, player, "axl_grenade", 0, 0, netProjId, player.ownedByLocalPlayer
+	) {
 		this.target = target;
 
 		if (player?.axlLoadout?.blastLauncherAlt == 1) {
@@ -79,12 +85,12 @@ public class GrenadeProj : Projectile, IDamagable {
 		vel.x = speed * bulletDir.x;
 		vel.y = speed * bulletDir.y;
 
-		projId = (int)ProjIds.GLauncher;
+		projId = (int)ProjIds.BlastLauncher;
 		useGravity = true;
 		collider.wallOnly = true;
 		destroyOnHit = false;
 		shouldShieldBlock = false;
-		reflectable2 = true;
+		reflectableFBurner = true;
 		this.player = player;
 		updateAngle();
 	}
@@ -160,7 +166,9 @@ public class GrenadeProj : Projectile, IDamagable {
 	public override void onDestroy() {
 		if (!ownedByLocalPlayer) return;
 		if (type == 0) {
-			new GrenadeExplosionProj(weapon, pos, xDir, player, type, target, Math.Sign(vel.x), player.getNextActorNetId());
+			new GrenadeExplosionProj(
+				weapon, pos, xDir, player, type, target, Math.Sign(vel.x), player.getNextActorNetId()
+			);
 		}
 	}
 
@@ -185,7 +193,9 @@ public class GrenadeProj : Projectile, IDamagable {
 
 	public void detonate() {
 		playSound("detonate", sendRpc: true);
-		new GrenadeExplosionProj(weapon, pos, xDir, player, type, target, Math.Sign(vel.x), player.getNextActorNetId());
+		new GrenadeExplosionProj(
+			weapon, pos, xDir, player, type, target, Math.Sign(vel.x), player.getNextActorNetId()
+		);
 		destroySelfNoEffect();
 	}
 }
@@ -196,14 +206,18 @@ public class GrenadeExplosionProj : Projectile {
 	public int type;
 	public List<int> rands;
 
-	public GrenadeExplosionProj(Weapon weapon, Point pos, int xDir, Player player, int type, IDamagable directHit, int directHitXDir, ushort netProjId) :
-		base(weapon, pos, xDir, 0, 2, player, "axl_grenade_explosion2", 0, 0.25f, netProjId, player.ownedByLocalPlayer) {
+	public GrenadeExplosionProj(
+		Weapon weapon, Point pos, int xDir, Player player, int type,
+		IDamagable directHit, int directHitXDir, ushort netProjId
+	) : base(
+		weapon, pos, xDir, 0, 2, player, "axl_grenade_explosion2", 0, 0.25f, netProjId, player.ownedByLocalPlayer
+	) {
 		this.xDir = xDir;
 		this.directHit = directHit;
 		this.directHitXDir = directHitXDir;
 		this.type = type;
 		destroyOnHit = false;
-		projId = (int)ProjIds.GLauncherSplash;
+		projId = (int)ProjIds.BlastLauncherSplash;
 		playSound("grenadeExplode");
 		shouldShieldBlock = false;
 		rands = new List<int>();
@@ -244,7 +258,9 @@ public class GrenadeExplosionProj : Projectile {
 				float oy = (len * time * 25) * Helpers.sind(angle);
 				float ox2 = len * Helpers.cosd(angle);
 				float oy2 = len * Helpers.sind(angle);
-				DrawWrappers.DrawLine(pos.x + ox, pos.y + oy, pos.x + ox + ox2, pos.y + oy + oy2, Color.Yellow, 1, zIndex, true);
+				DrawWrappers.DrawLine(
+					pos.x + ox, pos.y + oy, pos.x + ox + ox2, pos.y + oy + oy2, Color.Yellow, 1, zIndex, true
+				);
 			}
 		}
 	}
@@ -285,9 +301,13 @@ public class GrenadeExplosionProj : Projectile {
 	}
 }
 
-public class GrenadeProjCharged : Projectile {
+public class GreenSpinnerProj : Projectile {
 	IDamagable target;
-	public GrenadeProjCharged(Weapon weapon, Point pos, int xDir, Player player, Point bulletDir, IDamagable target, ushort netProjId) : base(weapon, pos, xDir, 400, 0, player, "axl_rocket", 0, 0, netProjId, player.ownedByLocalPlayer) {
+	public GreenSpinnerProj(
+		Weapon weapon, Point pos, int xDir, Player player, Point bulletDir, IDamagable target, ushort netProjId
+	) : base(
+		weapon, pos, xDir, 400, 0, player, "axl_rocket", 0, 0, netProjId, player.ownedByLocalPlayer
+	) {
 		this.target = target;
 		vel.x = speed * bulletDir.x;
 		vel.y = speed * bulletDir.y;
@@ -295,7 +315,7 @@ public class GrenadeProjCharged : Projectile {
 		destroyOnHit = false;
 		this.xDir = xDir;
 		angle = MathF.Atan2(vel.y, vel.x) * 180 / MathF.PI;
-		projId = (int)ProjIds.Explosion;
+		projId = (int)ProjIds.GreenSpinner;
 		maxTime = 0.35f;
 		shouldShieldBlock = false;
 	}
@@ -328,22 +348,26 @@ public class GrenadeProjCharged : Projectile {
 		if (!ownedByLocalPlayer) return;
 		if (time >= maxTime) return;
 		var netId = owner.getNextActorNetId();
-		new GrenadeExplosionProjCharged(weapon, pos, xDir, owner, angle.Value, target, Math.Sign(vel.x), netId);
+		new GreenSpinnerExplosionProj(weapon, pos, xDir, owner, angle.Value, target, Math.Sign(vel.x), netId);
 	}
 }
 
-public class GrenadeExplosionProjCharged : Projectile {
+public class GreenSpinnerExplosionProj : Projectile {
 	public IDamagable directHit;
 	public int directHitXDir;
-	public GrenadeExplosionProjCharged(Weapon weapon, Point pos, int xDir, Player player, float angle, IDamagable directHit, int directHitXDir, ushort netProjId) :
-		base(weapon, pos, xDir, 0, 3, player, "axl_rocket_explosion", 13, 0.25f, netProjId, player.ownedByLocalPlayer) {
+	public GreenSpinnerExplosionProj(
+		Weapon weapon, Point pos, int xDir, Player player, float angle,
+		IDamagable directHit, int directHitXDir, ushort netProjId
+	) : base(
+		weapon, pos, xDir, 0, 3, player, "axl_rocket_explosion", 13, 0.25f, netProjId, player.ownedByLocalPlayer
+	) {
 		this.xDir = xDir;
 		this.angle = angle;
 		this.directHit = directHit;
 		this.directHitXDir = directHitXDir;
 		destroyOnHit = false;
 		playSound("rocketExplode");
-		projId = (int)ProjIds.ExplosionSplash;
+		projId = (int)ProjIds.GreenSpinnerSplash;
 		shouldShieldBlock = false;
 		if (ownedByLocalPlayer) {
 			rpcCreate(pos, owner, netProjId, xDir);

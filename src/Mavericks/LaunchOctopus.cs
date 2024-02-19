@@ -162,7 +162,7 @@ public class LaunchOMissile : Projectile, IDamagable {
 		fadeSound = "explosion";
 		vel = unitVel.times(speed);
 		vel.x *= xDir;
-		reflectable2 = true;
+		reflectableFBurner = true;
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}

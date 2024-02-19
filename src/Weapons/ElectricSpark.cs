@@ -95,6 +95,10 @@ public class ElectricSparkProj : Projectile {
 		}
 	}
 
+	public override void onReflect() {
+		vel.y *= -1;
+		base.onReflect();
+	}
 }
 
 public class ElectricSparkProjChargedStart : Projectile {

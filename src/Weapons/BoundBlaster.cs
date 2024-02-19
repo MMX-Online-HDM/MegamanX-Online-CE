@@ -105,7 +105,11 @@ public class BoundBlasterProj : Projectile {
 		updateAngle();
 	}
 
-	public void onDeflect() {
+	public override void onReflect() {
+		reflectSide();
+	}
+
+	public override void onDeflect() {
 		len = 0;
 		lenDelay = 0;
 		updateAngle();

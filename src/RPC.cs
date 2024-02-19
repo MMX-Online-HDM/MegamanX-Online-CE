@@ -92,6 +92,10 @@ public class RPC {
 	// For mods and stuff.
 	// It allow to not override stuff when developing mods.
 	public static RPCCustom custom;
+	public static RpcChangeOwnership changeOwnership = new();
+	public static RpcReflect reflect = new();
+	public static RpcDeflect deflect = new();
+	public static RpcUpdateMaxTime updateMaxTime = new();
 
 	public static List<RPC> templates = new List<RPC>()
 	{
@@ -1178,16 +1182,16 @@ public class RPCAxlShoot : RPC {
 			flash.angle = angle;
 			flash.frameSpeed = 3;
 			player.character.playSound("axlBulletCharged");
-		} else if (projId == (int)ProjIds.GLauncher) {
+		} else if (projId == (int)ProjIds.BlastLauncher) {
 			var pos = new Point(x, y);
 			var bullet = new GrenadeProj(new BlastLauncher(0), pos, xDir, player, Point.createFromAngle(angle), null, new Point(), 0, netId);
 			var flash = new Anim(pos, "axl_pistol_flash", 1, null, true);
 			flash.angle = angle;
 			flash.frameSpeed = 1;
 			player.character.playSound("grenadeShoot");
-		} else if (projId == (int)ProjIds.Explosion) {
+		} else if (projId == (int)ProjIds.GreenSpinner) {
 			var pos = new Point(x, y);
-			var bullet = new GrenadeProjCharged(new BlastLauncher(0), pos, xDir, player, Point.createFromAngle(angle), null, netId);
+			var bullet = new GreenSpinnerProj(new BlastLauncher(0), pos, xDir, player, Point.createFromAngle(angle), null, netId);
 			var flash = new Anim(pos, "axl_pistol_flash_charged", 1, null, true);
 			flash.angle = angle;
 			flash.frameSpeed = 3;

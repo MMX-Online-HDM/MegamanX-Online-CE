@@ -117,7 +117,7 @@ public class Damager {
 		if (projId == (int)ProjIds.Hyouretsuzan2) {
 			key = ((int)ProjIds.Hyouretsuzan).ToString() + "_" + owner.id.ToString();
 		}
-		if (projId == (int)ProjIds.GLauncherSplash) {
+		if (projId == (int)ProjIds.BlastLauncherSplash) {
 			key += "_" + damagingActor?.netId?.ToString();
 		}
 
@@ -794,8 +794,8 @@ public class Damager {
 			   projId == (int)ProjIds.Napalm ||
 			   projId == (int)ProjIds.CircleBlaze ||
 			   projId == (int)ProjIds.CircleBlazeExplosion ||
-			   projId == (int)ProjIds.GLauncher ||
-			   projId == (int)ProjIds.GLauncherSplash ||
+			   projId == (int)ProjIds.BlastLauncher ||
+			   projId == (int)ProjIds.BlastLauncherSplash ||
 			   projId == (int)ProjIds.BoundBlaster2 ||
 			   projId == (int)ProjIds.NapalmSplashHit;
 	}

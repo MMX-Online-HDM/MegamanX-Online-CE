@@ -104,7 +104,7 @@ public class VileMissileProj : Projectile {
 		destroyOnHit = true;
 		fadeOnAutoDestroy = true;
 		missileWeapon = weapon;
-		reflectable2 = true;
+		reflectableFBurner = true;
 		this.type = type;
 		canBeLocal = false; // TODO: Remove the need for this.
 

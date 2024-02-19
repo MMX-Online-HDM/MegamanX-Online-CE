@@ -54,7 +54,7 @@ public class TorpedoProj : Projectile, IDamagable {
 
 		maxTime = 2f;
 		fadeOnAutoDestroy = true;
-		reflectable2 = true;
+		reflectableFBurner = true;
 		customAngleRendering = true;
 		if (type == 1 || type == 3) {
 			damager.damage = (type == 1 ? 1 : 2);

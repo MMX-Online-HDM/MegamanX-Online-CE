@@ -100,4 +100,13 @@ public class StingProj : Projectile {
 			}
 		}
 	}
+
+	public override void onReflect() {
+		base.onReflect();
+		if (sprite.name == "sting_up") {
+			yDir *= -1;
+		}
+		vel.y *= -1;
+	
+	}
 }

@@ -304,10 +304,10 @@ public class CrackedWall : Actor, IDamagable {
 		if (projId == (int)ProjIds.TorpedoCharged) return null;
 		if (projId == (int)ProjIds.MechTorpedo) return null;
 		if (projId == (int)ProjIds.MagnetMine) return null;
-		if (projId == (int)ProjIds.ExplosionSplash) return null;
-		if (projId == (int)ProjIds.Explosion) return null;
-		if (projId == (int)ProjIds.GLauncher) return null;
-		if (projId == (int)ProjIds.GLauncherSplash) return null;
+		if (projId == (int)ProjIds.GreenSpinnerSplash) return null;
+		if (projId == (int)ProjIds.GreenSpinner) return null;
+		if (projId == (int)ProjIds.BlastLauncher) return null;
+		if (projId == (int)ProjIds.BlastLauncherSplash) return null;
 		if (projId == (int)ProjIds.SpinWheel) return 1;
 		if (projId == (int)ProjIds.TunnelFang) return null;
 		if (projId == (int)ProjIds.TunnelFang2) return null;

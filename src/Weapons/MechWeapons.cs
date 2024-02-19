@@ -215,7 +215,7 @@ public class MechMissileProj : Projectile, IDamagable {
 		fadeOnAutoDestroy = true;
 		fadeSprite = "explosion";
 		fadeSound = "explosion";
-		reflectable2 = true;
+		reflectableFBurner = true;
 		this.isDown = isDown;
 		if (isDown) {
 			this.xDir = 1;

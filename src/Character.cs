@@ -1619,8 +1619,8 @@ public partial class Character : Actor, IDamagable {
 
 		// Self damaging projIds can go thru alliance check
 		bool isSelfDamaging =
-			projId == (int)ProjIds.GLauncherSplash ||
-			projId == (int)ProjIds.ExplosionSplash ||
+			projId == (int)ProjIds.BlastLauncherSplash ||
+			projId == (int)ProjIds.GreenSpinnerSplash ||
 			projId == (int)ProjIds.NecroBurst ||
 			projId == (int)ProjIds.SniperMissileBlast ||
 			projId == (int)ProjIds.SpeedBurnerRecoil;

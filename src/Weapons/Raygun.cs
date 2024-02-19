@@ -123,7 +123,13 @@ public class RayGunProj : Projectile {
 		updateAngle();
 	}
 
-	public void onDeflect() {
+	public override void onReflect() {
+		reflectSide();
+		time = 0;
+	}
+
+	public override void onDeflect() {
+		base.onDeflect();
 		len = 0;
 		lenDelay = 0;
 		updateAngle();

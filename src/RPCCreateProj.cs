@@ -136,10 +136,10 @@ public partial class RPCCreateProj : RPC {
 			proj = new MechBusterProj(new MechBusterWeapon(player), pos, xDir, player, netProjByte);
 		} else if (projId == (int)ProjIds.MechBuster2) {
 			proj = new MechBusterProj2(new MechBusterWeapon(player), pos, xDir, 0, player, netProjByte);
-		} else if (projId == (int)ProjIds.GLauncherSplash) {
+		} else if (projId == (int)ProjIds.BlastLauncherSplash) {
 			proj = new GrenadeExplosionProj(new Weapon(), pos, xDir, player, 0, null, 0, netProjByte);
-		} else if (projId == (int)ProjIds.ExplosionSplash) {
-			proj = new GrenadeExplosionProjCharged(new Weapon(), pos, xDir, player, 0, null, 1, netProjByte);
+		} else if (projId == (int)ProjIds.GreenSpinnerSplash) {
+			proj = new GreenSpinnerExplosionProj(new Weapon(), pos, xDir, player, 0, null, 1, netProjByte);
 		} else if (projId == (int)ProjIds.NapalmGrenade) {
 			proj = new NapalmGrenadeProj(new Weapon(), pos, xDir, player, netProjByte);
 		} else if (projId == (int)ProjIds.Napalm) {

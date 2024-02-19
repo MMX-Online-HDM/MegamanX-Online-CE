@@ -485,7 +485,7 @@ public partial class Actor : GameObject {
 		}
 
 		if (!locallyControlled) {
-			frameSpeed = 0;
+			//frameSpeed = 0;
 			sprite.time += Global.spf;
 		}
 

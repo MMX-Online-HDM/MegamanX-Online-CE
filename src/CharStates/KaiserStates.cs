@@ -600,7 +600,7 @@ public class KaiserSigmaMissileProj : Projectile {
 		projId = (int)ProjIds.Sigma3KaiserMissile;
 		maxTime = 2f;
 		fadeOnAutoDestroy = true;
-		reflectable2 = true;
+		reflectableFBurner = true;
 		netcodeOverride = NetcodeModel.FavorDefender;
 
 		fadeSprite = "explosion";

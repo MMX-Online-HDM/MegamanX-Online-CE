@@ -23,7 +23,7 @@ public class Projectile : Actor {
 	public bool destroyOnHit = true;
 	public bool destroyOnHitWall = false;
 	public bool reflectable = false;
-	public bool reflectable2 = false;
+	public bool reflectableFBurner = false;
 	public int reflectCount;
 	public bool shouldShieldBlock = true;
 	public bool neverReflect = false;
@@ -146,56 +146,60 @@ public class Projectile : Actor {
 		}
 	}
 
-	public void reflect(Player player, bool playDingSound = true) {
+	public void reflect(Player player, bool sendRpc = false) {
 		if (neverReflect) {
 			return;
 		}
-		if (reflectCount > 0) return;
-		reflectCount++;
-		if (playDingSound) playSound("ding");
-		if (this is RayGunProj) {
-			(this as RayGunProj).reflectSide();
-			damager.owner = player;
+		if (reflectCount > 0) {
 			return;
 		}
-		if (this is BoundBlasterProj) {
-			(this as BoundBlasterProj).reflectSide();
-			damager.owner = player;
-			return;
-		}
-
+		// Change damager ownership.
 		damager.owner = player;
-
-		xDir *= -1;
-		time = 0;
-		if (this is ElectricSparkProj) {
-			vel.y *= -1;
+		reflectCount++;
+		// Run this only if online.
+		if (Global.serverClient != null) {
+			ownedByLocalPlayer = false;
+			if (Global.level.mainPlayer == player) {
+				takeOwnership();
+			}
 		}
-		if (this is RaySplasherProj) {
-			float randY = Helpers.randomRange(-2f, 1f);
-			vel.y *= randY;
+		onReflect();
+		// Send RPC.
+		if (netId != null && sendRpc) {
+			RPC.reflect.sendRpc(player.id, netId.Value);
 		}
-		if (this is StingProj) {
-			vel.y *= -1;
-			yDir *= -1;
-		}
-		vel.x *= -1;
 	}
 
-	public void deflect(Player player, bool playDingSound = true) {
+	public void deflect(Player player, bool sendRpc = false) {
 		if (neverReflect) {
 			return;
 		}
-		if (reflectCount > 0) return;
-		reflectCount++;
-		if (playDingSound) playSound("ding");
-		damager.owner = player;
-		time = 0;
-
-		if (damager.damage > 1) {
-			destroySelf();
+		if (reflectCount > 0) {
+			return;
 		}
+		// Change damager ownership.
+		damager.owner = player;
+		reflectCount++;
+		// Run this only if online.
+		if (Global.serverClient != null) {
+			ownedByLocalPlayer = false;
+			if (Global.level.mainPlayer == player) {
+				takeOwnership();
+			}
+		}
+		onDeflect();
 
+		if (netId != null && sendRpc) {
+			RPC.deflect.sendRpc(player.id, netId.Value);
+		}
+	}
+
+	public virtual void onReflect() {
+		xDir *= -1;
+		vel.x *= -1;
+		time = 0;
+	}
+	public virtual void onDeflect() {
 		float velAngle = vel.angle;
 		if ((velAngle > 45 && velAngle < 135) || (velAngle > 225 && velAngle < 315)) {
 			angle = Helpers.to360(velAngle + Helpers.SignOr1(vel.x) * 135);
@@ -206,14 +210,7 @@ public class Projectile : Actor {
 			vel = Point.createFromAngle(angle.Value).times(vel.magnitude);
 			xDir = 1;
 		}
-
-		if (this is RayGunProj) {
-			(this as RayGunProj).onDeflect();
-			return;
-		} else if (this is BoundBlasterProj) {
-			(this as BoundBlasterProj).onDeflect();
-			return;
-		}
+		time = 0;
 	}
 
 	// Airblast reflect
@@ -248,6 +245,7 @@ public class Projectile : Actor {
 		if (sendRpc) {
 			RPC.reflectProj.sendRpc(netId, owner.id, reflectAngle);
 		}
+		forceNetUpdateNextFrame = true;
 	}
 
 	public bool getHeadshotVictim(Player player, out IDamagable victim, out Point? hitPoint) {
@@ -404,16 +402,20 @@ public class Projectile : Actor {
 				}
 			}
 
-			if (otherProj != null && otherProj.isReflectShield && reflectable && damager.owner.alliance != otherProj.damager.owner.alliance) {
+			if (otherProj != null && otherProj.isReflectShield &&
+				reflectable && damager.owner.alliance != otherProj.damager.owner.alliance
+			) {
 				if (deltaPos.x != 0 && Math.Sign(deltaPos.x) != otherProj.xDir) {
-					reflect(otherProj.owner, playDingSound: false);
+					reflect(otherProj.owner, sendRpc: true);
 					playSound("ding", sendRpc: true);
 				}
 			}
 
-			if (otherProj != null && otherProj.isDeflectShield && reflectable && damager.owner.alliance != otherProj.damager.owner.alliance) {
+			if (otherProj != null && otherProj.isDeflectShield && reflectable &&
+				damager.owner.alliance != otherProj.damager.owner.alliance
+			) {
 				if (deltaPos.x != 0 && Math.Sign(deltaPos.x) != otherProj.xDir) {
-					deflect(otherProj.owner, playDingSound: false);
+					deflect(otherProj.owner, sendRpc: true);
 					playSound("SigmaSaberBlock", forcePlay: false, sendRpc: true);
 				}
 			}
