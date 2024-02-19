@@ -19,8 +19,10 @@ public class TriadThunder : Weapon {
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
-		if (chargeLevel < 3) return 3;
-		return 8;
+		if (chargeLevel >= 3) {
+			return 8;
+		}
+		return 3;
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
