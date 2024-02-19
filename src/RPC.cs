@@ -529,7 +529,9 @@ public class RPCPlayerToggle : RPC {
 		} else if (toggleId == RPCToggleType.StartRaySplasher) {
 			(player?.character as MegamanX).isShootingRaySplasher = true;
 		} else if (toggleId == RPCToggleType.StopRaySplasher) {
-			(player?.character as MegamanX).isShootingRaySplasher = false;
+			if (player.character is MegamanX mmx) {
+				mmx.isShootingRaySplasher = false;
+			}
 		} else if (toggleId == RPCToggleType.StartBarrier) {
 			(player?.character as MegamanX).barrierTime = (player?.character as MegamanX).barrierDuration;
 		} else if (toggleId == RPCToggleType.StopBarrier) {
