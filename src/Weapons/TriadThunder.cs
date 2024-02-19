@@ -26,17 +26,15 @@ public class TriadThunder : Weapon {
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
+		if (!player.ownedByLocalPlayer) {
+			return;
+		}
 		if (chargeLevel < 3) {
 			player.setNextActorNetId(netProjId);
-			var triadThunder = new TriadThunderProj(this, pos, xDir, player.input.isHeld(Control.Down, player) ? -1 : 1, player, player.getNextActorNetId(true));
-			// Clockwise from top
-			var balls = new List<TriadThunderBall>()
-			{
-					new TriadThunderBall(this, pos, xDir, player, player.getNextActorNetId(true)),
-					new TriadThunderBall(this, pos, xDir, player, player.getNextActorNetId(true)),
-					new TriadThunderBall(this, pos, xDir, player, player.getNextActorNetId(true)),
-				};
-			triadThunder.balls = balls;
+			var triadThunder = new TriadThunderProj(
+				this, pos, xDir, player.input.isHeld(Control.Down, player) ? -1 : 1,
+				player, player.getNextActorNetId(true), true
+			);
 		} else {
 			if (player.character != null && player.character.ownedByLocalPlayer) {
 				player.character.changeState(new TriadThunderChargedState(player.character.grounded), true);
@@ -64,14 +62,28 @@ public class TriadThunderProj : Projectile {
 
 		visible = false;
 
+		// Clockwise from top
+		player.setNextActorNetId(netProjId);
+		balls = new List<TriadThunderBall>() {
+			new TriadThunderBall(weapon, pos, xDir, player, player.getNextActorNetId(true)),
+			new TriadThunderBall(weapon, pos, xDir, player, player.getNextActorNetId(true)),
+			new TriadThunderBall(weapon, pos, xDir, player, player.getNextActorNetId(true)),
+		};
+
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, player, netProjId, xDir, new byte[] { (byte)(yDir + 2) });
 		}
+	}
+
+	public static Projectile projCreate(ProjParameters arg) {
+		return new TriadThunderProj(
+			new TriadThunder(), arg.pos, arg.xDir, arg.extraData[0], arg.player, arg.netID
+		); 
 	}
 
 	public override void update() {
 		base.update();
-		if (!ownedByLocalPlayer) {
+		/*if (!ownedByLocalPlayer) {
 			if (time > 0.125f) {
 				foreach (var ball in balls) {
 					ball.visible = false;
@@ -79,7 +91,7 @@ public class TriadThunderProj : Projectile {
 				visible = true;
 			}
 			return;
-		}
+		}*/
 
 		Point incAmount = pos.directionTo(character.getCenterPos());
 		incPos(incAmount);

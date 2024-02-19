@@ -3,7 +3,7 @@ using System;
 
 namespace MMXOnline;
 
-public class RPCCreateProj : RPC {
+public partial class RPCCreateProj : RPC {
 	public RPCCreateProj() {
 		netDeliveryMethod = NetDeliveryMethod.ReliableOrdered;
 	}
@@ -33,6 +33,21 @@ public class RPCCreateProj : RPC {
 
 		Point pos = new Point(xPos, yPos);
 		Projectile proj = null;
+
+		if (functs.ContainsKey(projId)) {
+			ProjParameters args = new() {
+				projId = projId,
+				pos = pos,
+				xDir = xDir,
+				player = player,
+				netID = netProjByte,
+				angle = angle,
+				extraData = extraArgs
+			};
+			functs[(int)projId](args);
+			goto skipYanDev;
+		}
+
 		if (projId == (int)ProjIds.ItemTracer) {
 			proj = new ItemTracerProj(new ItemTracer(), pos, xDir, player, null, netProjByte);
 		} else if (projId == (int)ProjIds.ZSaberProj) {
@@ -502,6 +517,7 @@ public class RPCCreateProj : RPC {
 			proj = new PROJ(new WEP(), pos, xDir, player, netProjByte);
 		}
 		*/
+		skipYanDev:
 
 		if (proj.damager != null) {
 			proj.damager.damage = damage;
