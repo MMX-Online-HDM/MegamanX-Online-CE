@@ -1216,7 +1216,8 @@ public class GameMode {
 			) {
 				return;
 			}
-			if (player.isMainPlayer && player.currentMaverick.canFly &&
+			if (player.currentMaverick != null && player.isMainPlayer &&
+				player.currentMaverick.canFly &&
 				player.currentMaverick.flyBar < player.currentMaverick.maxFlyBar
 			) {
 				renderAmmo(
@@ -1227,7 +1228,7 @@ public class GameMode {
 					maxAmmo: 28, allowSmall: false
 				);
 			}
-			if (player.isMainPlayer && player.currentMaverick.usesAmmo) {
+			if (player.currentMaverick != null && player.isMainPlayer && player.currentMaverick.usesAmmo) {
 				renderAmmo(
 					baseX, ref baseY,
 					player.currentMaverick.barIndexes.icon,

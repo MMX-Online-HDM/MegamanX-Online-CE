@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 namespace MMXOnline;
 
 public class RaySplasher : Weapon {
+	public static RaySplasher netWeapon = new RaySplasher();
+
 	public RaySplasher() : base() {
 		shootSounds = new List<string>() { "raySplasher", "raySplasher", "raySplasher", "warpIn" };
 		rateOfFire = 1f;
@@ -34,8 +36,13 @@ public class RaySplasher : Weapon {
 }
 
 public class RaySplasherProj : Projectile {
-	public RaySplasherProj(Weapon weapon, Point pos, int xDir, int spriteType, int dirType, bool isTurret, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 600, 1, player, "raysplasher_proj", 0, 0.075f, netProjId, player.ownedByLocalPlayer) {
+	public RaySplasherProj(
+		Weapon weapon, Point pos, int xDir, int spriteType, int dirType,
+		bool isTurret, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 600, 1, player, "raysplasher_proj",
+		0, 0.075f, netProjId, player.ownedByLocalPlayer
+	) {
 		maxTime = 0.25f;
 		projId = (int)ProjIds.RaySplasher;
 		if (isTurret) {
@@ -57,8 +64,19 @@ public class RaySplasherProj : Projectile {
 		}
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(
+				pos, player, netProjId, xDir,
+				new byte[] { (byte)spriteType, (byte)dirType, isTurret ? (byte)1 : (byte)0 }
+			);
 		}
+	}
+
+	public static Projectile projCreate(ProjParameters arg) {
+		return new RaySplasherProj(
+			RaySplasher.netWeapon, arg.pos, arg.xDir,
+			arg.extraData[0], arg.extraData[1], (arg.extraData[2] == 1),
+			arg.player, arg.netId
+		);
 	}
 }
 

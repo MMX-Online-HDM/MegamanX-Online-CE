@@ -133,6 +133,7 @@ public class FSplasherProj : Projectile {
 		destroyOnHit = false;
 		shouldVortexSuck = false;
 		shouldShieldBlock = false;
+		canBeLocal = false;
 
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
@@ -262,6 +263,7 @@ public class HyorogaProj : Projectile {
 		destroyOnHit = true;
 		this.vel = vel.times(250);
 		maxTime = 0.4f;
+		canBeLocal = false; // TODO: Implement local.
 
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);

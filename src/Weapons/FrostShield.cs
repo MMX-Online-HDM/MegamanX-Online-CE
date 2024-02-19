@@ -44,8 +44,11 @@ public class FrostShieldProj : Projectile {
 	float stateTime;
 	public Anim exhaust;
 	public bool noSpawn;
-	public FrostShieldProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 3, 2, player, "frostshield_start", 0, 0, netProjId, player.ownedByLocalPlayer) {
+	public FrostShieldProj(
+		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 3, 2, player, "frostshield_start", 0, 0, netProjId, player.ownedByLocalPlayer
+	) {
 		maxTime = 3;
 		projId = (int)ProjIds.FrostShield;
 		destroyOnHit = true;
@@ -76,7 +79,6 @@ public class FrostShieldProj : Projectile {
 
 	public override void onHitWall(CollideData other) {
 		base.onHitWall(other);
-		if (!ownedByLocalPlayer) return;
 		destroySelf();
 	}
 
@@ -95,13 +97,17 @@ public class FrostShieldProj : Projectile {
 }
 
 public class FrostShieldProjAir : Projectile {
-	public FrostShieldProjAir(Weapon weapon, Point pos, int xDir, float xVel, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 100, 0, player, "frostshield_air", 0, 0, netProjId, player.ownedByLocalPlayer) {
+	public FrostShieldProjAir(
+		Weapon weapon, Point pos, int xDir, float xVel, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 100, 0, player, "frostshield_air", 0, 0, netProjId, player.ownedByLocalPlayer
+	) {
 		maxTime = 3;
 		projId = (int)ProjIds.FrostShieldAir;
 		useGravity = true;
 		destroyOnHit = false;
 		collider.wallOnly = true;
+		canBeLocal = false; // TODO: Allow local.
 		vel = new Point(-xVel * 0.5f, -150);
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
@@ -124,8 +130,11 @@ public class FrostShieldProjAir : Projectile {
 
 public class FrostShieldProjGround : Projectile, IDamagable {
 	float health = 4;
-	public FrostShieldProjGround(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 2, player, "frostshield_ground_start", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public FrostShieldProjGround(
+		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 2, player, "frostshield_ground_start", 0, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		maxTime = 5;
 		projId = (int)ProjIds.FrostShieldGround;
 		destroyOnHit = true;

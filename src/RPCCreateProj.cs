@@ -40,11 +40,11 @@ public partial class RPCCreateProj : RPC {
 				pos = pos,
 				xDir = xDir,
 				player = player,
-				netID = netProjByte,
+				netId = netProjByte,
 				angle = angle,
 				extraData = extraArgs
 			};
-			functs[(int)projId](args);
+			proj = functs[(int)projId](args);
 			goto skipYanDev;
 		}
 
@@ -184,14 +184,8 @@ public partial class RPCCreateProj : RPC {
 			proj = new ParasiticBombProjCharged(new ParasiticBomb(), pos, xDir, player, netProjByte, null);
 		} else if (projId == (int)ProjIds.TriadThunderBeam) {
 			proj = new TriadThunderBeamPiece(new TriadThunder(), pos, xDir, 1, player, 0, netProjByte);
-		} else if (projId == (int)ProjIds.TriadThunderCharged) {
-			proj = new TriadThunderProjCharged(new TriadThunder(), pos, xDir, 0, player, netProjByte);
 		} else if (projId == (int)ProjIds.SparkMSpark) {
 			proj = new TriadThunderProjCharged(new TriadThunder(), pos, xDir, 1, player, netProjByte);
-		} else if (projId == (int)ProjIds.TriadThunderQuake) {
-			proj = new TriadThunderQuake(new TriadThunder(), pos, xDir, player, netProjByte);
-		} else if (projId == (int)ProjIds.RaySplasher || projId == (int)ProjIds.RaySplasherChargedProj) {
-			proj = new RaySplasherProj(new RaySplasher(), pos, xDir, 0, 0, false, player, netProjByte);
 		} else if (projId == (int)ProjIds.GravityWellCharged) {
 			proj = new GravityWellProjCharged(new GravityWell(), pos, xDir, 1, player, netProjByte);
 		} else if (projId == (int)ProjIds.FrostShieldAir) {

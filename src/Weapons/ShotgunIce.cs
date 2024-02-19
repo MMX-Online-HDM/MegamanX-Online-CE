@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 namespace MMXOnline;
 
 public class ShotgunIce : Weapon {
+	public static ShotgunIce netWeapon = new ShotgunIce();
+
 	public ShotgunIce() : base() {
 		index = (int)WeaponIds.ShotgunIce;
 		killFeedIndex = 8;
@@ -51,7 +53,12 @@ public class ShotgunIceProj : Projectile {
 	public float sparkleTime = 0;
 	public Character hitChar;
 	public float maxSpeed = 400;
-	public ShotgunIceProj(Weapon weapon, Point pos, int xDir, Player player, int type, ushort netProjId, Point? vel = null, Character hitChar = null, bool rpc = false) : base(weapon, pos, xDir, 400, 2, player, "shotgun_ice", 0, 0.01f, netProjId, player.ownedByLocalPlayer) {
+	public ShotgunIceProj(
+		Weapon weapon, Point pos, int xDir, Player player, int type, ushort netProjId,
+		(int x, int y)? velOverride = null, Character hitChar = null, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 400, 2, player, "shotgun_ice", 0, 0.01f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.ShotgunIce;
 		maxTime = 0.4f;
 		this.hitChar = hitChar;
@@ -61,13 +68,22 @@ public class ShotgunIceProj : Projectile {
 
 		fadeSprite = "buster1_fade";
 		this.type = type;
-		if (vel != null) {
-			this.vel = (Point)vel;
+		if (velOverride != null) {
+			vel = new Point(maxSpeed * velOverride.Value.x, maxSpeed * (velOverride.Value.y / 0.5f));
 		}
 		reflectable = true;
 		//this.fadeSound = "explosion";
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			byte[] extraArgs;
+			if (velOverride != null) {
+				extraArgs = new byte[] {
+					(byte)(velOverride.Value.x + 128),
+					(byte)(velOverride.Value.y + 128)
+				};
+			} else {
+				extraArgs = new byte[] { (byte)129, (byte)0 };
+			}
+			rpcCreate(pos, player, netProjId, xDir, extraArgs);
 		}
 	}
 
@@ -88,11 +104,26 @@ public class ShotgunIceProj : Projectile {
 		if (type == 0) {
 			destroySelf(disableRpc: true);
 			Character chr = null;
-			new ShotgunIceProj(weapon, pos.clone(), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(), new Point(-vel.x, -maxSpeed), chr, rpc: true);
-			new ShotgunIceProj(weapon, pos.clone(), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(), new Point(-vel.x, -maxSpeed * 0.5f), chr, rpc: true);
-			new ShotgunIceProj(weapon, pos.clone(), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(), new Point(-vel.x, 0), chr, rpc: true);
-			new ShotgunIceProj(weapon, pos.clone(), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(), new Point(-vel.x, maxSpeed * 0.5f), chr, rpc: true);
-			new ShotgunIceProj(weapon, pos.clone(), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(), new Point(-vel.x, maxSpeed), chr, rpc: true);
+			new ShotgunIceProj(
+				weapon, pos.clone(), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
+				(-1, -2), chr, rpc: true
+			);
+			new ShotgunIceProj(
+				weapon, pos.clone(), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
+				(-1, -1), chr, rpc: true
+			);
+			new ShotgunIceProj(
+				weapon, pos.clone(), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
+				(-1, 0), chr, rpc: true
+			);
+			new ShotgunIceProj(
+				weapon, pos.clone(), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
+				(-1, 1), chr, rpc: true
+			);
+			new ShotgunIceProj(
+				weapon, pos.clone(), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
+				(-1, 2), chr, rpc: true
+			);
 		}
 	}
 
@@ -105,6 +136,13 @@ public class ShotgunIceProj : Projectile {
 		if (ownedByLocalPlayer) onHit();
 		playSound("shotgunicehitX1", forcePlay: false, sendRpc: true);
 		base.onHitDamagable(damagable);
+	}
+
+	public static Projectile projCreate(ProjParameters arg) {
+		return new ShotgunIceProj(
+			ShotgunIce.netWeapon, arg.pos, arg.xDir, arg.player,
+			arg.extraData[0], arg.netId, (arg.extraData[1] - 128, arg.extraData[2] - 128)
+		); 
 	}
 }
 

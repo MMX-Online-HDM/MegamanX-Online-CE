@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 namespace MMXOnline;
 
 public class TriadThunder : Weapon {
+	public static TriadThunder netWeapon = new TriadThunder();
+
 	public TriadThunder() : base() {
 		shootSounds = new List<string>() { "triadThunder", "triadThunder", "triadThunder", "" };
 		rateOfFire = 2.25f;
@@ -77,7 +79,7 @@ public class TriadThunderProj : Projectile {
 
 	public static Projectile projCreate(ProjParameters arg) {
 		return new TriadThunderProj(
-			new TriadThunder(), arg.pos, arg.xDir, arg.extraData[0], arg.player, arg.netID
+			TriadThunder.netWeapon, arg.pos, arg.xDir, arg.extraData[0], arg.player, arg.netId
 		); 
 	}
 
@@ -258,17 +260,20 @@ public class TriadThunderProjCharged : Projectile {
 		setupWallCrawl(new Point(xDir, 0));
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, player, netProjId, xDir, new byte[] { (byte)type });
 		}
 	}
 
 	public override void update() {
 		base.update();
-		if (!ownedByLocalPlayer) return;
-
 		updateWallCrawl();
 	}
 
+	public static Projectile projCreate(ProjParameters arg) {
+		return new TriadThunderProjCharged(
+			TriadThunder.netWeapon, arg.pos, arg.xDir, arg.extraData[0], arg.player, arg.netId
+		); 
+	}
 }
 
 public class TriadThunderQuake : Projectile {
@@ -284,6 +289,12 @@ public class TriadThunderQuake : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+	}
+
+	public static Projectile projCreate(ProjParameters arg) {
+		return new TriadThunderQuake(
+			TriadThunder.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
+		); 
 	}
 }
 

@@ -51,6 +51,8 @@ public class ShingetsurinProj : Projectile {
 		//vel.x *= (1 - startTime);
 		projId = (int)ProjIds.Shingetsurin;
 		ZBuster2Proj.hyorogaCode(this, player);
+		canBeLocal = false;
+
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}

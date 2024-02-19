@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 namespace MMXOnline;
 
 public class Boomerang : Weapon {
+	public static Boomerang netWeapon = new Boomerang();
+
 	public Boomerang() : base() {
 		index = (int)WeaponIds.Boomerang;
 		killFeedIndex = 7;
@@ -19,8 +21,13 @@ public class Boomerang : Weapon {
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-		if (chargeLevel < 3) new BoomerangProj(this, pos, xDir, player, netProjId);
-		else {
+		if (chargeLevel < 3) {
+			if (player.character?.ownedByLocalPlayer == true) {
+				new BoomerangProj(
+					this, pos, xDir, player, netProjId, player.character?.grounded != false ? 1 : -1, sendRpc: true
+				);
+			}
+		} else {
 			player.setNextActorNetId(netProjId);
 
 			var twin1 = new BoomerangProjCharged(this, pos.addxy(0, 5), null, xDir, player, 90, 1, player.getNextActorNetId(true), null);
@@ -46,13 +53,19 @@ public class BoomerangProj : Projectile {
 	public float turnDir = 1;
 	public Pickup pickup;
 	public float maxSpeed = 250;
-	public BoomerangProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId) : base(weapon, pos, xDir, 250, 2, player, "boomerang", 0, 0, netProjId, player.ownedByLocalPlayer) {
+	public BoomerangProj(
+		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, int turnDir, bool sendRpc = false
+	) : base(
+		weapon, pos, xDir, 250, 2, player, "boomerang", 0, 0, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.Boomerang;
 		customAngleRendering = true;
 		angle = 0;
 		if (xDir == -1) angle = -180;
-		if (!player.character.grounded) {
-			turnDir = -1;
+		this.turnDir = turnDir;
+
+		if (sendRpc) {
+			rpcCreate(pos, player, netProjId, xDir, new byte[] { (byte)(turnDir + 1) });
 		}
 	}
 
@@ -123,6 +136,11 @@ public class BoomerangProj : Projectile {
 		}
 	}
 
+	public static Projectile projCreate(ProjParameters arg) {
+		return new BoomerangProj(
+			Boomerang.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId, arg.extraData[0] - 1
+		); 
+	}
 }
 
 public class BoomerangProjCharged : Projectile {
@@ -147,6 +165,8 @@ public class BoomerangProjCharged : Projectile {
 		shouldShieldBlock = false;
 		this.twin = twin;
 		destroyOnHit = false;
+		canBeLocal = false;
+
 		if (lerpToPos != null) {
 			lerpOffset = lerpToPos.Value.subtract(pos);
 		}
