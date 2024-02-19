@@ -58,7 +58,7 @@ public class VileMK2GrabState : CharState {
 			damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.VileMK2Grab);
 		}
 
-		if (player.input.isPressed(Control.Special1, player)) {
+		if (frameTime >= 2 && player.input.isPressed(Control.Special1, player)) {
 			character.changeState(new Idle(), true);
 			return;
 		}
@@ -76,8 +76,10 @@ public class VileMK2GrabState : CharState {
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		character.grabCooldown = 1;
-		victim.grabInvulnTime = 2;
-		victim?.releaseGrab(character);
+		if (newState is not VileMK2GrabState && victim != null) {
+			victim.grabInvulnTime = 2;
+			victim?.releaseGrab(character, true);
+		}
 	}
 }
 

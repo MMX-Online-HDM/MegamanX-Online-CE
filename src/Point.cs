@@ -134,6 +134,12 @@ public struct Point {
 		return new Point(x, y);
 	}
 
+		public static Point createFromByteAngle(float angle) {
+		float x = Helpers.cosd(angle);
+		float y = Helpers.sind(angle);
+		return new Point(x, y);
+	}
+
 	public float angleWith(Point other) {
 		var ang = MathF.Atan2(other.y, other.x) - MathF.Atan2(y, x);
 		ang *= 180 / MathF.PI;

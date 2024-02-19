@@ -1811,14 +1811,20 @@ public class GenericGrabbedState : CharState {
 	public float notGrabbedTime;
 	public float maxNotGrabbedTime;
 	public bool customUpdate;
-	public GenericGrabbedState(Actor grabber, float maxGrabTime, string grabSpriteSuffix,
-		bool reverseZIndex = false, bool freeOnHitWall = true, bool lerp = true, string additionalGrabSprite = null, float maxNotGrabbedTime = 0.5f) : base("grabbed") {
+	public GenericGrabbedState(
+		Actor grabber, float maxGrabTime, string grabSpriteSuffix,
+		bool reverseZIndex = false, bool freeOnHitWall = true,
+		bool lerp = true, string additionalGrabSprite = null, float maxNotGrabbedTime = 0.5f
+	) : base(
+		"grabbed"
+	) {
 		this.isGrabbedState = true;
 		this.grabber = grabber;
 		grabTime = maxGrabTime;
 		this.grabSpriteSuffix = grabSpriteSuffix;
 		this.reverseZIndex = reverseZIndex;
-		//this.freeOnHitWall = freeOnHitWall;   //Don't use this unless absolutely needed, it causes issues with octopus grab in FTD
+		//Don't use this unless absolutely needed, it causes issues with octopus grab in FTD
+		//this.freeOnHitWall = freeOnHitWall;
 		this.lerp = lerp;
 		this.additionalGrabSprite = additionalGrabSprite;
 		this.maxNotGrabbedTime = maxNotGrabbedTime;
@@ -1828,9 +1834,13 @@ public class GenericGrabbedState : CharState {
 		base.update();
 		if (customUpdate) return;
 
-		if (grabber.sprite?.name.EndsWith(grabSpriteSuffix) == true ||
-			(!string.IsNullOrEmpty(additionalGrabSprite) && grabber.sprite?.name.EndsWith(additionalGrabSprite) == true)) {
-			if (!trySnapToGrabPoint(lerp) && freeOnHitWall) {
+		if (grabber.sprite?.name.EndsWith(grabSpriteSuffix) == true || (
+				!string.IsNullOrEmpty(additionalGrabSprite) &&
+				grabber.sprite?.name.EndsWith(additionalGrabSprite) == true
+			)
+		) {
+			bool didNotHitWall = trySnapToGrabPoint(lerp);
+			if (!didNotHitWall && freeOnHitWall) {
 				character.changeToIdleOrFall();
 				return;
 			}
@@ -1866,14 +1876,16 @@ public class GenericGrabbedState : CharState {
 	}
 
 	public override bool canEnter(Character character) {
-		if (!base.canEnter(character)) return false;
+		if (!base.canEnter(character)) {
+			return false;
+		}
 		return !character.isInvulnerable() && !character.charState.invincible;
 	}
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.stopMoving();
-		character.stopCharge();
+		//character.stopCharge();
 		character.useGravity = false;
 		character.grounded = false;
 		savedZIndex = character.zIndex;

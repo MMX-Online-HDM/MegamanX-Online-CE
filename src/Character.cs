@@ -179,6 +179,7 @@ public partial class Character : Actor, IDamagable {
 			else initialCharState = new Idle();
 		} else {
 			initialCharState = new NetLimbo(); 
+			useGravity = false;
 		}
 
 		spriteToCollider["roll"] = getDashingCollider();
@@ -2982,7 +2983,7 @@ public partial class Character : Actor, IDamagable {
 		return base.getProjFromHitbox(hitbox, centerPoint);
 	}
 
-	public void releaseGrab(Actor grabber) {
+	public void releaseGrab(Actor grabber, bool sendRpc = false) {
 		charState?.releaseGrab();
 		if (!ownedByLocalPlayer) {
 			RPC.commandGrabPlayer.sendRpc(

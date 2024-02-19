@@ -1139,11 +1139,14 @@ public partial class Actor : GameObject {
 				yOff -= 8;
 			}
 		}
-		string text = "-" + damage.ToString();
+		string text = damage.ToString();
 		bool isHeal = false;
 		if (damage < 0) {
-			text = "+" + (damage * -1).ToString();
+			text = (damage * -1).ToString();
 			isHeal = true;
+		}
+		if (damage != 0 && damage < 1 && damage > -1) {
+			text = text[1..];
 		}
 		damageTexts.Add(new DamageText(text, 0, pos, new Point(xOff, yOff), isHeal));
 	}
@@ -1168,14 +1171,15 @@ public partial class Actor : GameObject {
 			}
 			float textPosX = dt.pos.x;
 			float textPosY = dt.pos.y - yOff - (dt.time * 60);
-			Color col = new Color(255, 32, 32, (byte)(255f - (dt.time * 0.00f * 255f)));
-			Color outlineCol = new Color(Helpers.DarkBlue.R, Helpers.DarkBlue.G, Helpers.DarkBlue.B, (byte)(255f - (dt.time * 0.00f * 255f)));
+			FontType color = FontType.Red;
 			if (dt.isHeal) {
-				col = new Color(32, 255, 32, (byte)(255f - (dt.time * 0.00f * 255f)));
-				outlineCol = new Color(Helpers.DarkBlue.R, Helpers.DarkBlue.G, Helpers.DarkBlue.B, (byte)(255f - (dt.time * 0.00f * 255f)));
+				color = FontType.Green;
 			}
 
-			DrawWrappers.DrawText(dt.text, dt.offset.x + textPosX, dt.offset.y + textPosY, Alignment.Center, true, fontSize: 0.75f, color: col, outlineColor: outlineCol, Text.Styles.Regular, 1, true, ZIndex.HUD);
+			Fonts.drawText(
+				color, dt.text, dt.offset.x + textPosX, dt.offset.y + textPosY,
+				Alignment.Center, isWorldPos: true, depth: ZIndex.HUD
+			);
 		}
 	}
 

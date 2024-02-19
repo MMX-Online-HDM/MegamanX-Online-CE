@@ -209,7 +209,7 @@ public partial class RPCCreateProj : RPC {
 		} else if (projId == (int)ProjIds.SniperMissileBlast) {
 			proj = new SniperMissileExplosionProj(new SpiralMagnum(0), pos, xDir, 1, player, netProjByte);
 		} else if (projId == (int)ProjIds.BoundBlaster) {
-			proj = new BoundBlasterProj(new BoundBlaster(0), pos, xDir, player, bulletDir, netProjByte);
+			proj = new BoundBlasterProj(new BoundBlaster(0), pos, angle, player, netProjByte);
 		} else if (projId == (int)ProjIds.BoundBlaster2) {
 			proj = new BoundBlasterAltProj(new BoundBlaster(0), pos, xDir, player, bulletDir, netProjByte);
 		} else if (projId == (int)ProjIds.MovingWheel) {

@@ -34,7 +34,10 @@ public class BoundBlaster : AxlWeapon {
 		return 4;
 	}
 
-	public override void axlGetProjectile(Weapon weapon, Point bulletPos, int xDir, Player player, float angle, IDamagable target, Character headshotTarget, Point cursorPos, int chargeLevel, ushort netId) {
+	public override void axlGetProjectile(
+		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
+		IDamagable target, Character headshotTarget, Point cursorPos, int chargeLevel, ushort netId
+	) {
 		if (!player.ownedByLocalPlayer) return;
 		Point bulletDir = Point.createFromAngle(angle);
 		Projectile bullet = null;
@@ -52,7 +55,7 @@ public class BoundBlaster : AxlWeapon {
 		}
 
 		if (chargeLevel < 3) {
-			bullet = new BoundBlasterProj(weapon, bulletPos, xDir, player, bulletDir, netId, rpc: true);
+			bullet = new BoundBlasterProj(weapon, bulletPos, angle, player, netId, rpc: true);
 			RPC.playSound.sendRpc(shootSounds[0], player.character?.netId);
 		} else {
 			if (altFire == 0) {
@@ -75,11 +78,15 @@ public class BoundBlasterProj : Projectile {
 	float partTime;
 	bool isWaProj;
 
-	public BoundBlasterProj(Weapon weapon, Point pos, int xDir, Player player, Point bulletDir, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 250, 1, player, "boundblaster_proj", 0, 0.1f, netProjId, player.ownedByLocalPlayer) {
+	public BoundBlasterProj(
+		Weapon weapon, Point pos, float angle, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, 1, 250, 1, player, "boundblaster_proj", 0, 0.1f, netProjId, player.ownedByLocalPlayer
+	) {
 		reflectable = true;
-		vel.x = bulletDir.x * speed;
-		vel.y = bulletDir.y * speed;
+		Point anglePoint = Point.createFromAngle(angle);
+		vel.x = anglePoint.x * speed;
+		vel.y = anglePoint.y * speed;
 		maxTime = 1.5f;
 		if (player.character is Axl axl && axl.isWhiteAxl() == true) {
 			maxTime = 3f;
