@@ -146,7 +146,7 @@ public class Weapon {
 		{
 				new AxlBullet(),
 				new RayGun(axlLoadout.rayGunAlt),
-				new GLauncher(axlLoadout.blastLauncherAlt),
+				new BlastLauncher(axlLoadout.blastLauncherAlt),
 				new BlackArrow(axlLoadout.blackArrowAlt),
 				new SpiralMagnum(axlLoadout.spiralMagnumAlt),
 				new BoundBlaster(axlLoadout.boundBlasterAlt),
@@ -161,7 +161,7 @@ public class Weapon {
 	public static AxlWeapon fiToAxlWep(int friendlyIndex) {
 		if (friendlyIndex == 0) return new AxlBullet();
 		if (friendlyIndex == 1) return new RayGun(0);
-		if (friendlyIndex == 2) return new GLauncher(0);
+		if (friendlyIndex == 2) return new BlastLauncher(0);
 		if (friendlyIndex == 3) return new BlackArrow(0);
 		if (friendlyIndex == 4) return new SpiralMagnum(0);
 		if (friendlyIndex == 5) return new BoundBlaster(0);
@@ -174,7 +174,7 @@ public class Weapon {
 	public static int wiToFi(int weaponIndex) {
 		if (weaponIndex == (int)WeaponIds.AxlBullet) return 0;
 		if (weaponIndex == (int)WeaponIds.RayGun) return 1;
-		if (weaponIndex == (int)WeaponIds.GLauncher) return 2;
+		if (weaponIndex == (int)WeaponIds.BlastLauncher) return 2;
 		if (weaponIndex == (int)WeaponIds.BlackArrow) return 3;
 		if (weaponIndex == (int)WeaponIds.SpiralMagnum) return 4;
 		if (weaponIndex == (int)WeaponIds.BoundBlaster) return 5;

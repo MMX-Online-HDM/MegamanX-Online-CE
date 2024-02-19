@@ -532,7 +532,7 @@ public partial class Character : Actor, IDamagable {
 		return flag == null;
 	}
 
-	public bool canJump() {
+	public virtual bool canJump() {
 		if (mk5RideArmorPlatform != null) return false;
 		if (isSoftLocked()) return false;
 		return true;

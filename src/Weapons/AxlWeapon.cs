@@ -26,7 +26,7 @@ public class AxlWeapon : Weapon {
 
 	public bool isTwoHanded(bool includeDoubleBullet) {
 		if (includeDoubleBullet && this is DoubleBullet) return true;
-		return this is GLauncher || this is IceGattling || this is FlameBurner;
+		return this is BlastLauncher || this is IceGattling || this is FlameBurner;
 	}
 	public bool isSecondShot;
 

@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace MMXOnline;
 
-public class GLauncher : AxlWeapon {
-	public GLauncher(int altFire) : base(altFire) {
+public class BlastLauncher : AxlWeapon {
+	public BlastLauncher(int altFire) : base(altFire) {
 		shootSounds = new List<string>() { "grenadeShoot", "grenadeShoot", "grenadeShoot", "rocketShoot" };
-		index = (int)WeaponIds.GLauncher;
+		index = (int)WeaponIds.BlastLauncher;
 		weaponBarBaseIndex = 29;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 29;
@@ -18,7 +18,7 @@ public class GLauncher : AxlWeapon {
 		switchCooldown = 0.1f;
 		rateOfFire = 0.75f;
 
-		sprite = "axl_arm_glauncher";
+		sprite = "axl_arm_blauncher";
 		flashSprite = "axl_pistol_flash_charged";
 		chargedFlashSprite = "axl_pistol_flash_charged";
 		altFireCooldown = 1.5f;

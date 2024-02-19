@@ -429,7 +429,7 @@ public partial class Player {
 				} else if (Global.level.is1v1()) {
 					weapons.Add(new AxlBullet());
 					weapons.Add(new RayGun(axlLoadout.rayGunAlt));
-					weapons.Add(new GLauncher(axlLoadout.blastLauncherAlt));
+					weapons.Add(new BlastLauncher(axlLoadout.blastLauncherAlt));
 					weapons.Add(new BlackArrow(axlLoadout.blackArrowAlt));
 					weapons.Add(new SpiralMagnum(axlLoadout.spiralMagnumAlt));
 					weapons.Add(new BoundBlaster(axlLoadout.boundBlasterAlt));

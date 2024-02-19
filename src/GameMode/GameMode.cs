@@ -1642,7 +1642,7 @@ public class GameMode {
 			// drawWeaponText(x, y, level.mainPlayer.turrets.Count.ToString());
 		}
 
-		if (weapon is GLauncher && level.mainPlayer.axlLoadout.blastLauncherAlt == 1 && level.mainPlayer.grenades.Count > 0) {
+		if (weapon is BlastLauncher && level.mainPlayer.axlLoadout.blastLauncherAlt == 1 && level.mainPlayer.grenades.Count > 0) {
 			drawWeaponText(x, y, level.mainPlayer.grenades.Count.ToString());
 		}
 

@@ -185,7 +185,7 @@ public enum WeaponIds {
 	HexaInvolute,
 
 	AxlBullet,
-	GLauncher,
+	BlastLauncher,
 	RayGun,
 	DoubleBullet,
 	AssassinBullet,

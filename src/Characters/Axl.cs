@@ -532,7 +532,7 @@ public class Axl : Character {
 					}
 				}
 
-				if (player.weapon is GLauncher && charState.canShoot() && !(charState is LadderClimb)) {
+				if (player.weapon is BlastLauncher && charState.canShoot() && !(charState is LadderClimb)) {
 					if (shootHeld && shootTime == 0 && player.weapon.ammo >= 1) {
 						recoilTime = 0.2f;
 						player.axlWeapon.axlShoot(player);

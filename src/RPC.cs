@@ -1180,14 +1180,14 @@ public class RPCAxlShoot : RPC {
 			player.character.playSound("axlBulletCharged");
 		} else if (projId == (int)ProjIds.GLauncher) {
 			var pos = new Point(x, y);
-			var bullet = new GrenadeProj(new GLauncher(0), pos, xDir, player, Point.createFromAngle(angle), null, new Point(), 0, netId);
+			var bullet = new GrenadeProj(new BlastLauncher(0), pos, xDir, player, Point.createFromAngle(angle), null, new Point(), 0, netId);
 			var flash = new Anim(pos, "axl_pistol_flash", 1, null, true);
 			flash.angle = angle;
 			flash.frameSpeed = 1;
 			player.character.playSound("grenadeShoot");
 		} else if (projId == (int)ProjIds.Explosion) {
 			var pos = new Point(x, y);
-			var bullet = new GrenadeProjCharged(new GLauncher(0), pos, xDir, player, Point.createFromAngle(angle), null, netId);
+			var bullet = new GrenadeProjCharged(new BlastLauncher(0), pos, xDir, player, Point.createFromAngle(angle), null, netId);
 			var flash = new Anim(pos, "axl_pistol_flash_charged", 1, null, true);
 			flash.angle = angle;
 			flash.frameSpeed = 3;
