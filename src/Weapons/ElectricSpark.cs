@@ -112,9 +112,11 @@ public class ElectricSparkProjChargedStart : Projectile {
 	public override void update() {
 		base.update();
 		if (sprite.isAnimOver()) {
-			new ElectricSparkProjCharged(weapon, pos.addxy(-1, 0), -1, damager.owner, damager.owner.getNextActorNetId(true), rpc: true);
-			new ElectricSparkProjCharged(weapon, pos.addxy(1, 0), 1, damager.owner, damager.owner.getNextActorNetId(true), rpc: true);
 			destroySelf();
+			if (ownedByLocalPlayer) {
+				new ElectricSparkProjCharged(weapon, pos.addxy(-1, 0), -1, damager.owner, damager.owner.getNextActorNetId(true), rpc: true);
+				new ElectricSparkProjCharged(weapon, pos.addxy(1, 0), 1, damager.owner, damager.owner.getNextActorNetId(true), rpc: true);
+			}	
 		}
 	}
 }
