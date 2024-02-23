@@ -20,6 +20,7 @@ public class DamageText {
 	public float time;
 	public Point pos;
 	public Point offset;
+	public Point vel;
 	public bool isHeal;
 	public DamageText(string text, float time, Point pos, Point offset, bool isHeal) {
 		this.text = text;
@@ -27,5 +28,6 @@ public class DamageText {
 		this.pos = pos;
 		this.offset = offset;
 		this.isHeal = isHeal;
+		this.vel = new Point(0, 0);
 	}
 }

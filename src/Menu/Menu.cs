@@ -21,9 +21,9 @@ public class Menu {
 		}
 	}
 
-	public static void change(IMainMenu newMenu) {
+	public static void change(IMainMenu newMenu, bool callOnExit = true) {
 		//if (Global.level?.mainPlayer?.isUsingSubTank() == true) return;
-		if (mainMenu is JoinMenuP2P joinMenu) {
+		if (callOnExit && mainMenu is JoinMenuP2P joinMenu) {
 			joinMenu.onExit(newMenu);
 		}
 		mainMenu = newMenu;

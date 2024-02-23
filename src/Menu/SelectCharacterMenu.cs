@@ -147,7 +147,10 @@ public class SelectCharacterMenu : IMainMenu {
 
 	public List<CharSelection> charSelections;
 
-	public SelectCharacterMenu(IMainMenu prevMenu, bool is1v1, bool isOffline, bool isInGame, bool isInGameEndSelect, bool isTeamMode, bool isHost, Action completeAction) {
+	public SelectCharacterMenu(
+		IMainMenu prevMenu, bool is1v1, bool isOffline, bool isInGame,
+		bool isInGameEndSelect, bool isTeamMode, bool isHost, Action completeAction
+	) {
 		this.prevMenu = prevMenu;
 		this.is1v1 = is1v1;
 		this.isOffline = isOffline;

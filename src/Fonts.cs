@@ -26,7 +26,7 @@ public class Fonts {
 	public static void drawText(
 		FontType fontType, string textStr, float x, float y,
 		Alignment alignment = Alignment.Left, bool isWorldPos = false, bool selected = false,
-		FontType? selectedFont = null, long depth = 0, bool isLoading = false
+		FontType? selectedFont = null, long depth = 0, byte? alpha = null, bool isLoading = false
 	) {
 		// To prevent crashes.
 		if (string.IsNullOrEmpty(textStr)) { return; }
@@ -93,6 +93,9 @@ public class Fonts {
 						fontTextureSize, fontTextureSize
 					)
 				);
+				if (alpha != null) {
+					textSprite.Color = new(255, 255, 255, alpha.Value);
+				}
 				// For variable width fonts.
 				int fontWidth = fontDefaultWidth;
 				if (fontSizes.ContainsKey(fontStr)) {

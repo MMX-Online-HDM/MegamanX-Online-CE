@@ -5,6 +5,7 @@ using Lidgren.Network;
 using ProtoBuf;
 using Newtonsoft.Json;
 using System.Linq;
+using System.Threading;
 
 namespace MMXOnline;
 
@@ -78,8 +79,16 @@ public class JoinMenuP2P : IMainMenu {
 		Helpers.menuUpDown(ref selServerIndex, 0, serverCount - 1);
 		// We pick a server with this.
 		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
-			refreshing = true;
-			requestServerDetails(serverIndexes[selServerIndex]);
+			Action exitAction = () =>  {
+				Menu.change(new ConnectionWaitMenuP2P(this, serverIndexes[selServerIndex]));
+			};
+			Menu.change(
+				new SelectCharacterMenu(
+					new MainMenu(), false, false, false,
+					false, false, false, exitAction
+				),
+				false
+			);
 		}
 	}
 
@@ -346,4 +355,53 @@ public enum MasterServerMsg {
 	RegisterInfo,
 	UpdatePlayerNum,
 	DeleteHost
+}
+
+public class ConnectionWaitMenuP2P : IMainMenu {
+	public JoinMenuP2P joinMenu;
+	public long serverID;
+	public bool triedJoinOnce;
+
+	public ConnectionWaitMenuP2P(JoinMenuP2P joinMenu, long serverID) {
+		this.joinMenu = joinMenu;
+		this.serverID = serverID;
+	}
+
+	public void update() {
+		if (!triedJoinOnce) {
+			joinMenu.requestServerDetails(serverID);
+			joinMenu.netClient.FlushSendQueue();
+		}
+		joinServerLoop();
+	}
+	public void render() {
+		DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0);
+		Fonts.drawText(
+			FontType.Grey, "Connecting... ",
+			Global.screenH - 12, Global.screenW - 8, alignment: Alignment.Right
+		);
+	}
+
+	public void joinServerLoop() {
+		NetIncomingMessage msg;
+		// Respond to connection messages.
+		for (int i = 0; i <= 50; i++) {
+			while ((msg = joinMenu.netClient.ReadMessage()) != null) {
+				if (msg.MessageType == NetIncomingMessageType.UnconnectedData &&
+					msg.ReadByte() == 101
+				) {
+					(long, SimpleServerData) serverData = joinMenu.receiveServerDetails(msg);
+					if (serverData.Item2 != null) {
+						joinMenu.joinServer(serverData.Item1, serverData.Item2);
+						return;
+					}
+				}
+			}
+			if (i == 20) {
+				joinMenu.requestServerDetails(serverID);
+				joinMenu.netClient.FlushSendQueue();
+			}
+			Thread.Sleep(100);
+		}
+	}
 }

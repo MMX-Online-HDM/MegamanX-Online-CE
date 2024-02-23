@@ -1064,8 +1064,7 @@ public partial class Player {
 		input.possessedControlHeld[Control.Dash] = Global.input.isHeld(Control.Dash, Global.level.mainPlayer);
 		input.possessedControlHeld[Control.Taunt] = Global.input.isHeld(Control.Taunt, Global.level.mainPlayer);
 
-		byte inputHeldByte = Helpers.boolArrayToByte(new bool[]
-		{
+		byte inputHeldByte = Helpers.boolArrayToByte(new bool[] {
 				input.possessedControlHeld[Control.Left],
 				input.possessedControlHeld[Control.Right],
 				input.possessedControlHeld[Control.Up],
@@ -1085,8 +1084,7 @@ public partial class Player {
 		input.possessedControlPressed[Control.Dash] = Global.input.isPressed(Control.Dash, Global.level.mainPlayer);
 		input.possessedControlPressed[Control.Taunt] = Global.input.isPressed(Control.Taunt, Global.level.mainPlayer);
 
-		byte inputPressedByte = Helpers.boolArrayToByte(new bool[]
-		{
+		byte inputPressedByte = Helpers.boolArrayToByte(new bool[] {
 				input.possessedControlPressed[Control.Left],
 				input.possessedControlPressed[Control.Right],
 				input.possessedControlPressed[Control.Up],

@@ -2257,8 +2257,9 @@ public class RPCSyncPossessInput : RPC {
 		int playerId = arguments[0];
 		var player = Global.level.getPlayerById(playerId);
 		if (player == null) return;
-		if (!player.isPossessed()) return;
-
+		if (!player.isPossessed()) {
+			return;
+		}
 		bool[] inputHeldArray = Helpers.byteToBoolArray(arguments[1]);
 		bool[] inputPressedArray = Helpers.byteToBoolArray(arguments[2]);
 

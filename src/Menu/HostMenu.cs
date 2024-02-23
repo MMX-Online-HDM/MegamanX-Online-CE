@@ -789,10 +789,10 @@ public class HostMenu : IMainMenu {
 				errorMessage = "Can't select training in public matches.";
 				return;
 			}
-			if (!selectedLevel.isCustomMap && !isOffline && !isHiddenOrLan() && selectedGameMode == GameMode.Race) {
+			/*if (!selectedLevel.isCustomMap && !isOffline && !isHiddenOrLan() && selectedGameMode == GameMode.Race) {
 				errorMessage = "Race only in private match or custom maps.";
 				return;
-			}
+			}*/
 
 			if (isLAN) {
 				localIPAddress = LANIPHelper.GetLocalIPAddress();
@@ -832,7 +832,7 @@ public class HostMenu : IMainMenu {
 
 	public CustomMatchSettings getCustomMatchSettings() {
 		if (Global.quickStart) return null;
-		if (!isHiddenOrLan() && !isOffline) return null;
+		if (!isHiddenOrLan() && !isOffline && !isP2P) return null;
 		if (useCustomMatchSettings) {
 			return savedMatchSettings.customMatchSettings;
 		}
@@ -1277,22 +1277,20 @@ public class HostMenu : IMainMenu {
 		}
 
 		string msg;
+		string extraMsg = "";
+		if (!string.IsNullOrEmpty(menuOptions[selectArrowPosY].configureMessage)) {
+			extraMsg = "[C]: " + menuOptions[selectArrowPosY].configureMessage + ", ";
+		}
 		if (!inGame) {
 			if (isOffline) msg = "[X]: Next, [Z]: Back";
-			else msg = "[X]: Next, [C]: Change Name, [Z]: Back";
-		} else msg = "[X]: Next, [ESC]: Menu";
-
+			else msg = "[X]: Next, " + extraMsg + "[Z]: Back";
+		} else {
+			msg = "[X]: Next, [ESC]: Menu";
+		}
 		Fonts.drawTextEX(
 			FontType.Grey, msg + "\nLeft/Right: Change setting",
 			Global.screenW * 0.5f, 178, Alignment.Center
 		);
-
-		if (!string.IsNullOrEmpty(menuOptions[selectArrowPosY].configureMessage)) {
-			Fonts.drawTextEX(
-				FontType.Grey, "[C]: " + menuOptions[selectArrowPosY].configureMessage,
-				Global.screenW * 0.5f, 168, Alignment.Center
-			);
-		}
 
 		if (errorMessage != null) {
 			float top = Global.screenH * 0.4f;

@@ -670,8 +670,8 @@ public class RideArmor : Actor, IDamagable {
 		int yOff = 0;
 
 		for (int i = damageTexts.Count - 1; i >= 0; i--) {
-			if (damageTexts[i].time < 0.1f) {
-				yOff -= 8;
+			if (damageTexts[i].time < 6) {
+				yOff -= (6 - (int)damageTexts[i].time);
 			}
 		}
 		damageTexts.Add(new DamageText(text, 0, pos, new Point(xOff, yOff), false));
