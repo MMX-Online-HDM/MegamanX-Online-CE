@@ -275,96 +275,111 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 	}
 
 	private string getMaverickName(int wi) {
-		if (wi == 0) return "Chill Penguin";
-		if (wi == 1) return "Spark Mandrill";
-		if (wi == 2) return "Armored Armadillo";
-		if (wi == 3) return "Launch Octopus";
-		if (wi == 4) return "Boomerang Kuwanger";
-		if (wi == 5) return "Sting Chameleon";
-		if (wi == 6) return "Storm Eagle";
-		if (wi == 7) return "Flame Mammoth";
-		if (wi == 8) return "Velguarder";
-		if (wi == 9) return "Wire Sponge";
-		if (wi == 10) return "Wheel Gator";
-		if (wi == 11) return "Bubble Crab";
-		if (wi == 12) return "Flame Stag";
-		if (wi == 13) return "Morph Moth";
-		if (wi == 14) return "Magna Centipede";
-		if (wi == 15) return "Crystal Snail";
-		if (wi == 16) return "Overdrive Ostrich";
-		if (wi == 17) return "Fake Zero";
-		if (wi == 18) return "Blizzard Buffalo";
-		if (wi == 19) return "Toxic Seahorse";
-		if (wi == 20) return "Tunnel Rhino";
-		if (wi == 21) return "Volt Catfish";
-		if (wi == 22) return "Crush Crawfish";
-		if (wi == 23) return "Neon Tiger";
-		if (wi == 24) return "Gravity Beetle";
-		if (wi == 25) return "Blast Hornet";
-		if (wi == 26) return "Dr. Doppler";
-		return "";
+		return wi switch {
+			0 => "Chill Penguin",
+			1 => "Spark Mandrill",
+			2 => "Armored Armadillo",
+			3 => "Launch Octopus",
+			4 => "Boomerang Kuwanger",
+			5 => "Sting Chameleon",
+			6 => "Storm Eagle",
+			7 => "Flame Mammoth",
+			8 => "Velguarder",
+			9 => "Wire Sponge",
+			10 => "Wheel Gator",
+			11 => "Bubble Crab",
+			12 => "Flame Stag",
+			13 => "Morph Moth",
+			14 => "Magna Centipede",
+			15 => "Crystal Snail",
+			16 => "Overdrive Ostrich",
+			17 => "Fake Zero",
+			18 => "Blizzard Buffalo",
+			19 => "Toxic Seahorse",
+			20 => "Tunnel Rhino",
+			21 => "Volt Catfish",
+			22 => "Crush Crawfish",
+			23 => "Neon Tiger",
+			24 => "Gravity Beetle",
+			25 => "Blast Hornet",
+			26 => "Dr. Doppler",
+			_ => ""
+		};
 	}
 
 	private int[] getWeakAgainstFrameIndices(int wi) {
-		if (wi == 0) return new int[] { new FlameMammothWeapon(null).weaponSlotIndex, new FireWave().weaponSlotIndex };
-		if (wi == 1) return new int[] { new ChillPenguinWeapon(null).weaponSlotIndex, new ShotgunIce().weaponSlotIndex };
-		if (wi == 2) return new int[] { new SparkMandrillWeapon(null).weaponSlotIndex, new ElectricSpark().weaponSlotIndex };
-		if (wi == 3) return new int[] { new ArmoredArmadilloWeapon(null).weaponSlotIndex, new RollingShield().weaponSlotIndex };
-		if (wi == 4) return new int[] { new LaunchOctopusWeapon(null).weaponSlotIndex, new Torpedo().weaponSlotIndex };
-		if (wi == 5) return new int[] { new BoomerangKuwangerWeapon(null).weaponSlotIndex, new Boomerang().weaponSlotIndex };
-		if (wi == 6) return new int[] { new StingChameleonWeapon(null).weaponSlotIndex, new Sting().weaponSlotIndex };
-		if (wi == 7) return new int[] { new StormEagleWeapon(null).weaponSlotIndex, new Tornado().weaponSlotIndex };
-		if (wi == 8) return new int[] { new ChillPenguinWeapon(null).weaponSlotIndex, new ShotgunIce().weaponSlotIndex };
-
-		if (wi == 9) return new int[] { new OverdriveOstrichWeapon(null).weaponSlotIndex, new SonicSlicer().weaponSlotIndex };
-		if (wi == 10) return new int[] { new WireSpongeWeapon(null).weaponSlotIndex, new StrikeChain().weaponSlotIndex };
-		if (wi == 11) return new int[] { new WheelGatorWeapon(null).weaponSlotIndex, new SpinWheel().weaponSlotIndex };
-		if (wi == 12) return new int[] { new BubbleCrabWeapon(null).weaponSlotIndex, new BubbleSplash().weaponSlotIndex };
-		if (wi == 13) return new int[] { new FlameStagWeapon(null).weaponSlotIndex, new SpeedBurner(null).weaponSlotIndex };
-		if (wi == 14) return new int[] { new MorphMothWeapon(null).weaponSlotIndex, new SilkShot().weaponSlotIndex };
-		if (wi == 15) return new int[] { new MagnaCentipedeWeapon(null).weaponSlotIndex, new MagnetMine().weaponSlotIndex };
-		if (wi == 16) return new int[] { new CrystalSnailWeapon(null).weaponSlotIndex, new CrystalHunter().weaponSlotIndex };
-		if (wi == 17) return new int[] { new FlameStagWeapon(null).weaponSlotIndex, new SpeedBurner(null).weaponSlotIndex };
-
-		if (wi == 18) return new int[] { new BlastHornetWeapon(null).weaponSlotIndex, new ParasiticBomb().weaponSlotIndex };
-		if (wi == 19) return new int[] { new BlizzardBuffaloWeapon(null).weaponSlotIndex, new FrostShield().weaponSlotIndex };
-		if (wi == 20) return new int[] { new ToxicSeahorseWeapon(null).weaponSlotIndex, new AcidBurst().weaponSlotIndex };
-		if (wi == 21) return new int[] { new TunnelRhinoWeapon(null).weaponSlotIndex, new TunnelFang().weaponSlotIndex };
-		if (wi == 22) return new int[] { new VoltCatfishWeapon(null).weaponSlotIndex, new TriadThunder().weaponSlotIndex };
-		if (wi == 23) return new int[] { new CrushCrawfishWeapon(null).weaponSlotIndex, new SpinningBlade().weaponSlotIndex };
-		if (wi == 24) return new int[] { new NeonTigerWeapon(null).weaponSlotIndex, new RaySplasher().weaponSlotIndex };
-		if (wi == 25) return new int[] { new GravityBeetleWeapon(null).weaponSlotIndex, new GravityWell().weaponSlotIndex };
-		if (wi == 26) return new int[] { new ToxicSeahorseWeapon(null).weaponSlotIndex, new AcidBurst().weaponSlotIndex };
-		return new int[] { 0 };
+		return wi switch {
+			0 => new int[] { new FlameMammothWeapon(null).weaponSlotIndex, new FireWave().weaponSlotIndex },
+			1 => new int[] { new ChillPenguinWeapon(null).weaponSlotIndex, new ShotgunIce().weaponSlotIndex },
+			2 => new int[] { new SparkMandrillWeapon(null).weaponSlotIndex, new ElectricSpark().weaponSlotIndex },
+			3 => new int[] { new ArmoredArmadilloWeapon(null).weaponSlotIndex, new RollingShield().weaponSlotIndex },
+			4 => new int[] { new LaunchOctopusWeapon(null).weaponSlotIndex, new Torpedo().weaponSlotIndex },
+			5 => new int[] { new BoomerangKuwangerWeapon(null).weaponSlotIndex, new Boomerang().weaponSlotIndex },
+			6 => new int[] { new StingChameleonWeapon(null).weaponSlotIndex, new Sting().weaponSlotIndex },
+			7 => new int[] { new StormEagleWeapon(null).weaponSlotIndex, new Tornado().weaponSlotIndex },
+			8 => new int[] { new ChillPenguinWeapon(null).weaponSlotIndex, new ShotgunIce().weaponSlotIndex },
+			9 => new int[] { new OverdriveOstrichWeapon(null).weaponSlotIndex, new SonicSlicer().weaponSlotIndex },
+			10 => new int[] { new WireSpongeWeapon(null).weaponSlotIndex, new StrikeChain().weaponSlotIndex },
+			11 => new int[] { new WheelGatorWeapon(null).weaponSlotIndex, new SpinWheel().weaponSlotIndex },
+			12 => new int[] { new BubbleCrabWeapon(null).weaponSlotIndex, new BubbleSplash().weaponSlotIndex },
+			13 => new int[] { new FlameStagWeapon(null).weaponSlotIndex, new SpeedBurner(null).weaponSlotIndex },
+			14 => new int[] { new MorphMothWeapon(null).weaponSlotIndex, new SilkShot().weaponSlotIndex },
+			15 => new int[] { new MagnaCentipedeWeapon(null).weaponSlotIndex, new MagnetMine().weaponSlotIndex },
+			16 => new int[] { new CrystalSnailWeapon(null).weaponSlotIndex, new CrystalHunter().weaponSlotIndex },
+			17 => new int[] { new FlameStagWeapon(null).weaponSlotIndex, new SpeedBurner(null).weaponSlotIndex },
+			18 => new int[] { new BlastHornetWeapon(null).weaponSlotIndex, new ParasiticBomb().weaponSlotIndex },
+			19 => new int[] { new BlizzardBuffaloWeapon(null).weaponSlotIndex, new FrostShield().weaponSlotIndex },
+			20 => new int[] { new ToxicSeahorseWeapon(null).weaponSlotIndex, new AcidBurst().weaponSlotIndex },
+			21 => new int[] { new TunnelRhinoWeapon(null).weaponSlotIndex, new TunnelFang().weaponSlotIndex },
+			22 => new int[] { new VoltCatfishWeapon(null).weaponSlotIndex, new TriadThunder().weaponSlotIndex },
+			23 => new int[] { new CrushCrawfishWeapon(null).weaponSlotIndex, new SpinningBlade().weaponSlotIndex },
+			24 => new int[] { new NeonTigerWeapon(null).weaponSlotIndex, new RaySplasher().weaponSlotIndex },
+			25 => new int[] { new GravityBeetleWeapon(null).weaponSlotIndex, new GravityWell().weaponSlotIndex },
+			26 => new int[] { new ToxicSeahorseWeapon(null).weaponSlotIndex, new AcidBurst().weaponSlotIndex },
+			_ => new int[] { 0 }
+		};
 	}
 
 	private int[] getStrongAgainstFrameIndices(int wi) {
-		if (wi == 0) return new int[] { new SparkMandrillWeapon(null).weaponSlotIndex, new ElectricSpark().weaponSlotIndex, new VelguarderWeapon(null).weaponSlotIndex };
-		if (wi == 1) return new int[] { new ArmoredArmadilloWeapon(null).weaponSlotIndex, new RollingShield().weaponSlotIndex };
-		if (wi == 2) return new int[] { new LaunchOctopusWeapon(null).weaponSlotIndex, new Torpedo().weaponSlotIndex };
-		if (wi == 3) return new int[] { new BoomerangKuwangerWeapon(null).weaponSlotIndex, new Boomerang().weaponSlotIndex };
-		if (wi == 4) return new int[] { new StingChameleonWeapon(null).weaponSlotIndex, new Sting().weaponSlotIndex };
-		if (wi == 5) return new int[] { new StormEagleWeapon(null).weaponSlotIndex, new Tornado().weaponSlotIndex };
-		if (wi == 6) return new int[] { new FlameMammothWeapon(null).weaponSlotIndex, new FireWave().weaponSlotIndex };
-		if (wi == 7) return new int[] { new ChillPenguinWeapon(null).weaponSlotIndex, new ShotgunIce().weaponSlotIndex };
-
-		if (wi == 9) return new int[] { new WheelGatorWeapon(null).weaponSlotIndex, new SpinWheel().weaponSlotIndex };
-		if (wi == 10) return new int[] { new BubbleCrabWeapon(null).weaponSlotIndex, new BubbleSplash().weaponSlotIndex };
-		if (wi == 11) return new int[] { new FlameStagWeapon(null).weaponSlotIndex, new SpeedBurner(null).weaponSlotIndex };
-		if (wi == 12) return new int[] { new MorphMothWeapon(null).weaponSlotIndex, new SilkShot().weaponSlotIndex, new FakeZeroWeapon(null).weaponSlotIndex };
-		if (wi == 13) return new int[] { new MagnaCentipedeWeapon(null).weaponSlotIndex, new MagnetMine().weaponSlotIndex };
-		if (wi == 14) return new int[] { new CrystalSnailWeapon(null).weaponSlotIndex, new CrystalHunter().weaponSlotIndex };
-		if (wi == 15) return new int[] { new OverdriveOstrichWeapon(null).weaponSlotIndex, new SonicSlicer().weaponSlotIndex };
-		if (wi == 16) return new int[] { new WireSpongeWeapon(null).weaponSlotIndex, new StrikeChain().weaponSlotIndex };
-
-		if (wi == 18) return new int[] { new ToxicSeahorseWeapon(null).weaponSlotIndex, new AcidBurst().weaponSlotIndex };
-		if (wi == 19) return new int[] { new TunnelRhinoWeapon(null).weaponSlotIndex, new TunnelFang().weaponSlotIndex, new DrDopplerWeapon(null).weaponSlotIndex };
-		if (wi == 20) return new int[] { new VoltCatfishWeapon(null).weaponSlotIndex, new TriadThunder().weaponSlotIndex };
-		if (wi == 21) return new int[] { new CrushCrawfishWeapon(null).weaponSlotIndex, new SpinningBlade().weaponSlotIndex };
-		if (wi == 22) return new int[] { new NeonTigerWeapon(null).weaponSlotIndex, new RaySplasher().weaponSlotIndex };
-		if (wi == 23) return new int[] { new GravityBeetleWeapon(null).weaponSlotIndex, new GravityWell().weaponSlotIndex };
-		if (wi == 24) return new int[] { new BlastHornetWeapon(null).weaponSlotIndex, new ParasiticBomb().weaponSlotIndex };
-		if (wi == 25) return new int[] { new BlizzardBuffaloWeapon(null).weaponSlotIndex, new FrostShield().weaponSlotIndex };
-		return new int[] { 0 };
+		return wi switch {
+			0 => new int[] {
+				new SparkMandrillWeapon(null).weaponSlotIndex,
+				new ElectricSpark().weaponSlotIndex, new VelguarderWeapon(null).weaponSlotIndex
+			},
+			1 => new int[] {
+				new ArmoredArmadilloWeapon(null).weaponSlotIndex, new RollingShield().weaponSlotIndex
+			},
+			2 => new int[] {
+				new LaunchOctopusWeapon(null).weaponSlotIndex, new Torpedo().weaponSlotIndex
+			},
+			3 => new int[] { new BoomerangKuwangerWeapon(null).weaponSlotIndex, new Boomerang().weaponSlotIndex },
+			4 => new int[] { new StingChameleonWeapon(null).weaponSlotIndex, new Sting().weaponSlotIndex },
+			5 => new int[] { new StormEagleWeapon(null).weaponSlotIndex, new Tornado().weaponSlotIndex },
+			6 => new int[] { new FlameMammothWeapon(null).weaponSlotIndex, new FireWave().weaponSlotIndex },
+			7 => new int[] { new ChillPenguinWeapon(null).weaponSlotIndex, new ShotgunIce().weaponSlotIndex },
+			9 => new int[] { new WheelGatorWeapon(null).weaponSlotIndex, new SpinWheel().weaponSlotIndex },
+			10 => new int[] { new BubbleCrabWeapon(null).weaponSlotIndex, new BubbleSplash().weaponSlotIndex },
+			11 => new int[] { new FlameStagWeapon(null).weaponSlotIndex, new SpeedBurner(null).weaponSlotIndex },
+			12 => new int[] {
+				new MorphMothWeapon(null).weaponSlotIndex, new SilkShot().weaponSlotIndex,
+				new FakeZeroWeapon(null).weaponSlotIndex
+			},
+			13 => new int[] {new MagnaCentipedeWeapon(null).weaponSlotIndex, new MagnetMine().weaponSlotIndex },
+			14 => new int[] { new CrystalSnailWeapon(null).weaponSlotIndex, new CrystalHunter().weaponSlotIndex },
+			15 => new int[] { new OverdriveOstrichWeapon(null).weaponSlotIndex, new SonicSlicer().weaponSlotIndex },
+			16 => new int[] { new WireSpongeWeapon(null).weaponSlotIndex, new StrikeChain().weaponSlotIndex },
+			18 => new int[] { new ToxicSeahorseWeapon(null).weaponSlotIndex, new AcidBurst().weaponSlotIndex },
+			19 => new int[] {
+				new TunnelRhinoWeapon(null).weaponSlotIndex,
+				new TunnelFang().weaponSlotIndex, new DrDopplerWeapon(null).weaponSlotIndex
+			},
+			20 => new int[] { new VoltCatfishWeapon(null).weaponSlotIndex, new TriadThunder().weaponSlotIndex },
+			21 => new int[] { new CrushCrawfishWeapon(null).weaponSlotIndex, new SpinningBlade().weaponSlotIndex },
+			22 => new int[] { new NeonTigerWeapon(null).weaponSlotIndex, new RaySplasher().weaponSlotIndex },
+			23 => new int[] { new GravityBeetleWeapon(null).weaponSlotIndex, new GravityWell().weaponSlotIndex },
+			24 => new int[] { new BlastHornetWeapon(null).weaponSlotIndex, new ParasiticBomb().weaponSlotIndex },
+			25 => new int[] { new BlizzardBuffaloWeapon(null).weaponSlotIndex, new FrostShield().weaponSlotIndex },
+			_ => new int[] { 0 }
+		};
 	}
 }
