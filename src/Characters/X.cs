@@ -893,7 +893,7 @@ public partial class MegamanX : Character {
 		if (player.weapon is Torpedo) {
 			return projId == ProjIds.ArmoredARoll;
 		} else if (player.weapon is Sting) {
-			return projId == ProjIds.BoomerKBoomerang;
+			return projId == ProjIds.BoomerangKBoomerang;
 		} else if (player.weapon is RollingShield) {
 			return projId == ProjIds.SparkMSpark;
 		} else if (player.weapon is FireWave) {

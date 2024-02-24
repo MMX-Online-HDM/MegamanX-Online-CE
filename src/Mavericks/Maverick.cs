@@ -336,7 +336,7 @@ public class Maverick : Actor, IDamagable {
 		if (this is SparkMandrill) return 94;
 		if (this is ArmoredArmadillo) return 95;
 		if (this is LaunchOctopus) return 96;
-		if (this is BoomerKuwanger) return 97;
+		if (this is BoomerangKuwanger) return 97;
 		if (this is StingChameleon) return 98;
 		if (this is StormEagle) return 99;
 		if (this is FlameMammoth) return 100;
@@ -606,7 +606,7 @@ public class Maverick : Actor, IDamagable {
 
 	public void changeSpriteFromName(string spriteBaseName, bool resetFrame) {
 		string spriteName = getMaverickPrefix() + "_" + spriteBaseName;
-		if (this is BoomerKuwanger bk && bk.bald) {
+		if (this is BoomerangKuwanger bk && bk.bald) {
 			string newSpriteName = getMaverickPrefix() + "_bald_" + spriteBaseName;
 			if (Global.sprites.ContainsKey(newSpriteName)) {
 				spriteName = newSpriteName;
@@ -756,10 +756,10 @@ public class Maverick : Actor, IDamagable {
 		if ((weaponId == WeaponIds.RollingShield || projId == ProjIds.ArmoredARoll) && this is LaunchOctopus lo) {
 			return true;
 		}
-		if ((weaponId == WeaponIds.Torpedo || projId == ProjIds.LaunchOMissle || projId == ProjIds.LaunchOTorpedo) && this is BoomerKuwanger bk) {
+		if ((weaponId == WeaponIds.Torpedo || projId == ProjIds.LaunchOMissle || projId == ProjIds.LaunchOTorpedo) && this is BoomerangKuwanger bk) {
 			return true;
 		}
-		if ((weaponId == WeaponIds.Boomerang || projId == ProjIds.BoomerKBoomerang) && this is StingChameleon sc) {
+		if ((weaponId == WeaponIds.Boomerang || projId == ProjIds.BoomerangKBoomerang) && this is StingChameleon sc) {
 			if (sc.isInvisible && sc.ownedByLocalPlayer) {
 				sc.decloak();
 			}
@@ -852,7 +852,7 @@ public class Maverick : Actor, IDamagable {
 	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
 		if (Global.level.isRace()) return false;
 
-		if (this is BoomerKuwanger bk && bk.sprite.name.Contains("teleport")) {
+		if (this is BoomerangKuwanger bk && bk.sprite.name.Contains("teleport")) {
 			return false;
 		}
 		if (this is StingChameleon sc && sc.isInvisible && !Damager.isBoomerang(projId)) {

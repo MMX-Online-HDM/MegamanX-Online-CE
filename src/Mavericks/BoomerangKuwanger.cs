@@ -7,28 +7,28 @@ using System.Threading.Tasks;
 
 namespace MMXOnline;
 
-public class BoomerKuwanger : Maverick {
-	public BoomerKBoomerangWeapon boomerangWeapon = new BoomerKBoomerangWeapon();
-	public BoomerKDeadLiftWeapon deadLiftWeapon;
+public class BoomerangKuwanger : Maverick {
+	public BoomerangKBoomerangWeapon boomerangWeapon = new BoomerangKBoomerangWeapon();
+	public BoomerangKDeadLiftWeapon deadLiftWeapon;
 	public bool bald;
 	public float dashSoundCooldown;
 	public float teleportCooldown;
 
-	public BoomerKuwanger(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
+	public BoomerangKuwanger(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
 		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
 		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
 		//stateCooldowns.Add(typeof(BoomerKDeadLiftState), new MaverickStateCooldown(false, true, 0.75f));
-		deadLiftWeapon = new BoomerKDeadLiftWeapon(player);
+		deadLiftWeapon = new BoomerangKDeadLiftWeapon(player);
 
 		gravityModifier = 1.25f;
 
-		weapon = new Weapon(WeaponIds.BoomerKGeneric, 97);
+		weapon = new Weapon(WeaponIds.BoomerangKGeneric, 97);
 
 		awardWeaponId = WeaponIds.Boomerang;
 		weakWeaponId = WeaponIds.Torpedo;
 		weakMaverickWeaponId = WeaponIds.LaunchOctopus;
 
-		netActorCreateId = NetActorCreateId.BoomerKuwanger;
+		netActorCreateId = NetActorCreateId.BoomerangKuwanger;
 		netOwner = player;
 		if (sendRpc) {
 			createActorRpc(player.id);
@@ -114,7 +114,7 @@ public class BoomerKuwanger : Maverick {
 			if (inputDir.x != 0 && inputDir.y == 0) inputAngle = 0;
 			else if (inputDir.x != 0 && inputDir.y != 0) inputAngle = 30 * MathF.Sign(inputDir.y);
 			else if (inputDir.x == 0 && inputDir.y != 0) inputAngle = 60 * MathF.Sign(inputDir.y);
-			new BoomerKBoomerangProj(boomerangWeapon, pos, xDir, this, inputAngle, player, player.getNextActorNetId(), sendRpc: true);
+			new BoomerangKBoomerangProj(boomerangWeapon, pos, xDir, this, inputAngle, player, player.getNextActorNetId(), sendRpc: true);
 		}, null);
 	}
 
@@ -138,7 +138,7 @@ public class BoomerKuwanger : Maverick {
 
 	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (sprite.name.Contains("boomerk_deadlift")) {
-			return new GenericMeleeProj(deadLiftWeapon, centerPoint, ProjIds.BoomerKDeadLift, player, damage: 0, flinch: 0, hitCooldown: 0, owningActor: this);
+			return new GenericMeleeProj(deadLiftWeapon, centerPoint, ProjIds.BoomerangKDeadLift, player, damage: 0, flinch: 0, hitCooldown: 0, owningActor: this);
 		}
 		return null;
 	}
@@ -149,33 +149,33 @@ public class BoomerKuwanger : Maverick {
 }
 
 #region weapons
-public class BoomerKBoomerangWeapon : Weapon {
-	public BoomerKBoomerangWeapon() {
-		index = (int)WeaponIds.BoomerKBoomerang;
+public class BoomerangKBoomerangWeapon : Weapon {
+	public BoomerangKBoomerangWeapon() {
+		index = (int)WeaponIds.BoomerangKBoomerang;
 		killFeedIndex = 97;
 	}
 }
 
-public class BoomerKDeadLiftWeapon : Weapon {
-	public BoomerKDeadLiftWeapon(Player player) {
+public class BoomerangKDeadLiftWeapon : Weapon {
+	public BoomerangKDeadLiftWeapon(Player player) {
 		damager = new Damager(player, 6, Global.defFlinch, 0.5f);
-		index = (int)WeaponIds.BoomerKDeadLift;
+		index = (int)WeaponIds.BoomerangKDeadLift;
 		killFeedIndex = 97;
 	}
 }
 #endregion
 
 #region projectiles
-public class BoomerKBoomerangProj : Projectile {
+public class BoomerangKBoomerangProj : Projectile {
 	public float angleDist = 0;
 	public float turnDir = 1;
 	public Pickup pickup;
 	public float maxSpeed = 400;
 	float returnTime = 0.15f;
-	public BoomerKuwanger maverick;
-	public BoomerKBoomerangProj(Weapon weapon, Point pos, int xDir, BoomerKuwanger maverick, float throwDirAngle, Player player, ushort netProjId, bool sendRpc = false) :
+	public BoomerangKuwanger maverick;
+	public BoomerangKBoomerangProj(Weapon weapon, Point pos, int xDir, BoomerangKuwanger maverick, float throwDirAngle, Player player, ushort netProjId, bool sendRpc = false) :
 		base(weapon, pos, xDir, 250, 3, player, "boomerk_proj_horn", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
-		projId = (int)ProjIds.BoomerKBoomerang;
+		projId = (int)ProjIds.BoomerangKBoomerang;
 		angle = throwDirAngle;
 		this.maverick = maverick;
 		if (xDir == -1) angle = -180 - angle;
@@ -201,7 +201,7 @@ public class BoomerKBoomerangProj : Projectile {
 			}
 		}
 
-		var bk = other.gameObject as BoomerKuwanger;
+		var bk = other.gameObject as BoomerangKuwanger;
 		if (time > returnTime && bk != null && bk.player == damager.owner) {
 			if (pickup != null) {
 				pickup.changePos(bk.pos);
@@ -351,7 +351,7 @@ public class BoomerKTeleportState : MaverickState {
 		base.onExit(newState);
 		maverick.visible = true;
 		maverick.useGravity = true;
-		if (maverick is BoomerKuwanger bk) {
+		if (maverick is BoomerangKuwanger bk) {
 			bk.setTeleportCooldown();
 		}
 		if (clone != null) {
@@ -377,7 +377,7 @@ public class BoomerKDashState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		if (maverick is BoomerKuwanger bk && bk.dashSoundCooldown == 0) {
+		if (maverick is BoomerangKuwanger bk && bk.dashSoundCooldown == 0) {
 			maverick.playSound("boomerkDash", sendRpc: true);
 			bk.dashSoundCooldown = 0.25f;
 		}
@@ -448,7 +448,7 @@ public class DeadLiftGrabbed : GenericGrabbedState {
 	public Character grabbedChar;
 	public bool launched;
 	float launchTime;
-	public DeadLiftGrabbed(BoomerKuwanger grabber) : base(grabber, 1, "") {
+	public DeadLiftGrabbed(BoomerangKuwanger grabber) : base(grabber, 1, "") {
 		customUpdate = true;
 	}
 
@@ -462,7 +462,7 @@ public class DeadLiftGrabbed : GenericGrabbedState {
 				return;
 			}
 			if (character.stopCeiling()) {
-				new BoomerKDeadLiftWeapon((grabber as Maverick).player).applyDamage(character, false, character, (int)ProjIds.BoomerKDeadLift);
+				new BoomerangKDeadLiftWeapon((grabber as Maverick).player).applyDamage(character, false, character, (int)ProjIds.BoomerangKDeadLift);
 			}
 			return;
 		}

@@ -17,7 +17,7 @@ public enum RenderEffectType {
 	Trail,
 	GreenShadow,
 	//StockedSaber,
-	BoomerKTrail,
+	BoomerangKTrail,
 	SpeedDevilTrail,
 	StealthModeBlue,
 	StealthModeRed,

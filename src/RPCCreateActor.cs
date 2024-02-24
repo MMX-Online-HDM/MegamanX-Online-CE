@@ -11,7 +11,7 @@ public enum NetActorCreateId {
 	SparkMandrill,
 	ArmoredArmadillo,
 	LaunchOctopus,
-	BoomerKuwanger,
+	BoomerangKuwanger,
 	StingChameleon,
 	StormEagle,
 	FlameMammoth,
@@ -82,8 +82,8 @@ public class RPCCreateActor : RPC {
 			new ArmoredArmadillo(player, pos, pos, xDir, netProjByte, false);
 		} else if (createId == (int)NetActorCreateId.LaunchOctopus) {
 			new LaunchOctopus(player, pos, pos, xDir, netProjByte, false);
-		} else if (createId == (int)NetActorCreateId.BoomerKuwanger) {
-			new BoomerKuwanger(player, pos, pos, xDir, netProjByte, false);
+		} else if (createId == (int)NetActorCreateId.BoomerangKuwanger) {
+			new BoomerangKuwanger(player, pos, pos, xDir, netProjByte, false);
 		} else if (createId == (int)NetActorCreateId.StingChameleon) {
 			new StingChameleon(player, pos, pos, xDir, netProjByte, false);
 		} else if (createId == (int)NetActorCreateId.StormEagle) {

@@ -279,7 +279,7 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 		if (wi == 1) return "Spark Mandrill";
 		if (wi == 2) return "Armored Armadillo";
 		if (wi == 3) return "Launch Octopus";
-		if (wi == 4) return "Boomer Kuwanger";
+		if (wi == 4) return "Boomerang Kuwanger";
 		if (wi == 5) return "Sting Chameleon";
 		if (wi == 6) return "Storm Eagle";
 		if (wi == 7) return "Flame Mammoth";
@@ -311,7 +311,7 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 		if (wi == 2) return new int[] { new SparkMandrillWeapon(null).weaponSlotIndex, new ElectricSpark().weaponSlotIndex };
 		if (wi == 3) return new int[] { new ArmoredArmadilloWeapon(null).weaponSlotIndex, new RollingShield().weaponSlotIndex };
 		if (wi == 4) return new int[] { new LaunchOctopusWeapon(null).weaponSlotIndex, new Torpedo().weaponSlotIndex };
-		if (wi == 5) return new int[] { new BoomerKuwangerWeapon(null).weaponSlotIndex, new Boomerang().weaponSlotIndex };
+		if (wi == 5) return new int[] { new BoomerangKuwangerWeapon(null).weaponSlotIndex, new Boomerang().weaponSlotIndex };
 		if (wi == 6) return new int[] { new StingChameleonWeapon(null).weaponSlotIndex, new Sting().weaponSlotIndex };
 		if (wi == 7) return new int[] { new StormEagleWeapon(null).weaponSlotIndex, new Tornado().weaponSlotIndex };
 		if (wi == 8) return new int[] { new ChillPenguinWeapon(null).weaponSlotIndex, new ShotgunIce().weaponSlotIndex };
@@ -342,7 +342,7 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 		if (wi == 0) return new int[] { new SparkMandrillWeapon(null).weaponSlotIndex, new ElectricSpark().weaponSlotIndex, new VelguarderWeapon(null).weaponSlotIndex };
 		if (wi == 1) return new int[] { new ArmoredArmadilloWeapon(null).weaponSlotIndex, new RollingShield().weaponSlotIndex };
 		if (wi == 2) return new int[] { new LaunchOctopusWeapon(null).weaponSlotIndex, new Torpedo().weaponSlotIndex };
-		if (wi == 3) return new int[] { new BoomerKuwangerWeapon(null).weaponSlotIndex, new Boomerang().weaponSlotIndex };
+		if (wi == 3) return new int[] { new BoomerangKuwangerWeapon(null).weaponSlotIndex, new Boomerang().weaponSlotIndex };
 		if (wi == 4) return new int[] { new StingChameleonWeapon(null).weaponSlotIndex, new Sting().weaponSlotIndex };
 		if (wi == 5) return new int[] { new StormEagleWeapon(null).weaponSlotIndex, new Tornado().weaponSlotIndex };
 		if (wi == 6) return new int[] { new FlameMammothWeapon(null).weaponSlotIndex, new FireWave().weaponSlotIndex };

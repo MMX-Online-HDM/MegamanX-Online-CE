@@ -78,7 +78,7 @@ public class Weapon {
 			weapons.Add(new SparkMandrillWeapon(player));
 			weapons.Add(new ArmoredArmadilloWeapon(player));
 			weapons.Add(new LaunchOctopusWeapon(player));
-			weapons.Add(new BoomerKuwangerWeapon(player));
+			weapons.Add(new BoomerangKuwangerWeapon(player));
 			weapons.Add(new StingChameleonWeapon(player));
 			weapons.Add(new StormEagleWeapon(player));
 			weapons.Add(new FlameMammothWeapon(player));

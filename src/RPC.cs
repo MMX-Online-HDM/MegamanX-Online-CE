@@ -1680,7 +1680,7 @@ public class RPCCommandGrabPlayer : RPC {
 		} else if (hookScenario == CommandGrabScenario.WhirlpoolGrab) {
 			maverickGrabCode(grabberMaverick, victimChar, new WhirlpoolGrabbed(grabber as LaunchOctopus), isDefenderFavored);
 		} else if (hookScenario == CommandGrabScenario.DeadLiftGrab) {
-			maverickGrabCode(grabberMaverick, victimChar, new DeadLiftGrabbed(grabber as BoomerKuwanger), isDefenderFavored);
+			maverickGrabCode(grabberMaverick, victimChar, new DeadLiftGrabbed(grabber as BoomerangKuwanger), isDefenderFavored);
 		} else if (hookScenario == CommandGrabScenario.WheelGGrab) {
 			maverickGrabCode(grabberMaverick, victimChar, new WheelGGrabbed(grabber as WheelGator), isDefenderFavored);
 		} else if (hookScenario == CommandGrabScenario.FStagGrab) {

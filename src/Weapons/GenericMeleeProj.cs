@@ -97,7 +97,7 @@ public class GenericMeleeProj : Projectile {
 			maverickGrabCode(CommandGrabScenario.WheelGGrab, wg, damagable, new WheelGGrabbed(wg));
 		} else if (projId == (int)ProjIds.MagnaCTail && owningActor is MagnaCentipede ms) {
 			maverickGrabCode(CommandGrabScenario.MagnaCGrab, ms, damagable, new MagnaCDrainGrabbed(ms));
-		} else if (projId == (int)ProjIds.BoomerKDeadLift && owningActor is BoomerKuwanger bk) {
+		} else if (projId == (int)ProjIds.BoomerangKDeadLift && owningActor is BoomerangKuwanger bk) {
 			maverickGrabCode(CommandGrabScenario.DeadLiftGrab, bk, damagable, new DeadLiftGrabbed(bk));
 		} else if (projId == (int)ProjIds.GBeetleLift && owningActor is GravityBeetle gb) {
 			maverickGrabCode(CommandGrabScenario.BeetleLiftGrab, gb, damagable, new BeetleGrabbedState(gb));

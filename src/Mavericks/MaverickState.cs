@@ -454,7 +454,7 @@ public class MIdle : MaverickState {
 		// if (maverick is FakeZero) dashCondition = input.isPressed(Control.Left, player) || input.isPressed(Control.Right, player);
 
 		if (dashCondition) {
-			if (!maverick.isAttacking() && (maverick.aiBehavior != MaverickAIBehavior.Control || maverick is not BoomerKuwanger)) {
+			if (!maverick.isAttacking() && (maverick.aiBehavior != MaverickAIBehavior.Control || maverick is not BoomerangKuwanger)) {
 				if (input.isHeld(Control.Left, player)) maverick.xDir = -1;
 				if (input.isHeld(Control.Right, player)) maverick.xDir = 1;
 
@@ -671,7 +671,7 @@ public class MJumpStart : MaverickState {
 	public override void update() {
 		base.update();
 
-		if (maverick is BoomerKuwanger ||
+		if (maverick is BoomerangKuwanger ||
 			(maverick is OverdriveOstrich oo && oo.deltaPos.magnitude > 100 * Global.spf) ||
 			(maverick is FakeZero fz)) {
 			maverick.vel.y = -maverick.getJumpPower() * getJumpModifier() * maverick.getYMod();

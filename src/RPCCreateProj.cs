@@ -277,8 +277,8 @@ public partial class RPCCreateProj : RPC {
 			proj = new LaunchOWhirlpoolProj(new LaunchOWhirlpoolWeapon(), pos, xDir, player, netProjByte);
 		} else if (projId == (int)ProjIds.LaunchOTorpedo) {
 			proj = new TorpedoProj(new LaunchOHomingTorpedoWeapon(), pos, xDir, player, 3, netProjByte);
-		} else if (projId == (int)ProjIds.BoomerKBoomerang) {
-			proj = new BoomerKBoomerangProj(new BoomerKBoomerangWeapon(), pos, xDir, null, 0, player, netProjByte);
+		} else if (projId == (int)ProjIds.BoomerangKBoomerang) {
+			proj = new BoomerangKBoomerangProj(new BoomerangKBoomerangWeapon(), pos, xDir, null, 0, player, netProjByte);
 		} else if (projId == (int)ProjIds.StingCSting) {
 			proj = new StingCStingProj(new StingCStingWeapon(), pos, xDir, 0, player, netProjByte);
 		} else if (projId == (int)ProjIds.StingCSpike) {

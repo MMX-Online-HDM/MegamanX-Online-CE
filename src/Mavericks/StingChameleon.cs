@@ -35,7 +35,7 @@ public class StingChameleon : Maverick {
 
 		awardWeaponId = WeaponIds.Sting;
 		weakWeaponId = WeaponIds.Boomerang;
-		weakMaverickWeaponId = WeaponIds.BoomerKuwanger;
+		weakMaverickWeaponId = WeaponIds.BoomerangKuwanger;
 
 		netActorCreateId = NetActorCreateId.StingChameleon;
 		netOwner = player;

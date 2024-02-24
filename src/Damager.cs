@@ -359,7 +359,7 @@ public class Damager {
 					character.vel.y += 300;
 					spiked = true;
 				}
-			} else if (weaponIndex == (int)WeaponIds.Boomerang || weaponIndex == (int)WeaponIds.BoomerKBoomerang) {
+			} else if (weaponIndex == (int)WeaponIds.Boomerang || weaponIndex == (int)WeaponIds.BoomerangKBoomerang) {
 				if (character.player.isX) character.stingChargeTime = 0;
 			} else if (projId == (int)ProjIds.FlameMOil) {
 				character.addOilTime(owner, 8);
@@ -849,7 +849,7 @@ public class Damager {
 
 	public static bool isBoomerang(int? projId) {
 		if (projId == null) return false;
-		return projId == (int)ProjIds.Boomerang || projId == (int)ProjIds.BoomerangCharged || projId == (int)ProjIds.BoomerKBoomerang;
+		return projId == (int)ProjIds.Boomerang || projId == (int)ProjIds.BoomerangCharged || projId == (int)ProjIds.BoomerangKBoomerang;
 	}
 
 	public static bool isSonicSlicer(int? projId) {

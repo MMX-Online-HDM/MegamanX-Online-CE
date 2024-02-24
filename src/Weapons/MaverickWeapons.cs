@@ -84,8 +84,8 @@ public class MaverickWeapon : Weapon {
 			maverick = new ArmoredArmadillo(player, pos, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
 		} else if (this is LaunchOctopusWeapon) {
 			maverick = new LaunchOctopus(player, pos, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
-		} else if (this is BoomerKuwangerWeapon) {
-			maverick = new BoomerKuwanger(player, pos, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
+		} else if (this is BoomerangKuwangerWeapon) {
+			maverick = new BoomerangKuwanger(player, pos, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
 		} else if (this is StingChameleonWeapon) {
 			maverick = new StingChameleon(player, pos, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
 		} else if (this is StormEagleWeapon) {
@@ -202,11 +202,11 @@ public class LaunchOctopusWeapon : MaverickWeapon {
 	}
 }
 
-public class BoomerKuwangerWeapon : MaverickWeapon {
-	public BoomerKuwangerWeapon(Player player) : base(player) {
-		index = (int)WeaponIds.BoomerKuwanger;
+public class BoomerangKuwangerWeapon : MaverickWeapon {
+	public BoomerangKuwangerWeapon(Player player) : base(player) {
+		index = (int)WeaponIds.BoomerangKuwanger;
 		weaponSlotIndex = 70;
-		displayName = "Boomer Kuwanger";
+		displayName = "Boomerang Kuwanger";
 	}
 }
 

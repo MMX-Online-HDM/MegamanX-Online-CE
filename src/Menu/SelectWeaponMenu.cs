@@ -370,7 +370,7 @@ public class SelectWeaponMenu : IMainMenu {
 
 	private int getWeakAgainstMaverickFrameIndex(int wi) {
 		if (wi == (int)WeaponIds.Torpedo) return new ArmoredArmadilloWeapon(null).weaponSlotIndex;
-		if (wi == (int)WeaponIds.Sting) return new BoomerKuwangerWeapon(null).weaponSlotIndex;
+		if (wi == (int)WeaponIds.Sting) return new BoomerangKuwangerWeapon(null).weaponSlotIndex;
 		if (wi == (int)WeaponIds.RollingShield) return new SparkMandrillWeapon(null).weaponSlotIndex;
 		if (wi == (int)WeaponIds.FireWave) return new StormEagleWeapon(null).weaponSlotIndex;
 		if (wi == (int)WeaponIds.Tornado) return new StingChameleonWeapon(null).weaponSlotIndex;
@@ -401,7 +401,7 @@ public class SelectWeaponMenu : IMainMenu {
 
 	private int[] getStrongAgainstMaverickFrameIndex(int weaponIndex) {
 		return weaponIndex switch {
-			(int)WeaponIds.Torpedo => new int[] { new BoomerKuwangerWeapon(null).weaponSlotIndex },
+			(int)WeaponIds.Torpedo => new int[] { new BoomerangKuwangerWeapon(null).weaponSlotIndex },
 			(int)WeaponIds.Sting => new int[] { new StormEagleWeapon(null).weaponSlotIndex },
 			(int)WeaponIds.RollingShield => new int[] { new LaunchOctopusWeapon(null).weaponSlotIndex },
 			(int)WeaponIds.FireWave => new int[] { new ChillPenguinWeapon(null).weaponSlotIndex },
