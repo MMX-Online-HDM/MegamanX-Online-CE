@@ -136,7 +136,7 @@ public class BoomerangProj : Projectile {
 		}
 	}
 
-	public static Projectile projCreate(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new BoomerangProj(
 			Boomerang.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId, arg.extraData[0] - 1
 		); 

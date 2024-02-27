@@ -17,7 +17,8 @@ public enum ArmorP {
 public enum SpecialStateIds {
 	None,
 	AxlRoll,
-	HyorogaStart
+	HyorogaStart,
+	XTeleport
 }
 
 public static class ArmorParts {

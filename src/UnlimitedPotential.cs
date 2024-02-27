@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 namespace MMXOnline;
 
 public class XUPParry : Weapon {
+	public static XUPParry netWeapon = new XUPParry();
+
 	public XUPParry() : base() {
 		rateOfFire = 0.75f;
 		index = (int)WeaponIds.UPParry;
@@ -117,14 +119,19 @@ public class ParriedState : CharState {
 }
 
 public class UPParryMeleeProj : Projectile {
-	public UPParryMeleeProj(Weapon weapon, Point pos, int xDir, float damage, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, damage, player, "mmx_unpo_parry_proj", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public UPParryMeleeProj(
+		Weapon weapon, Point pos, int xDir, float damage,
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, damage, player, "mmx_unpo_parry_proj",
+		Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.UPParryMelee;
 		setIndestructableProperties();
 		maxTime = 0.25f;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, player, netProjId, xDir, (byte)damage);
 		}
 	}
 
@@ -132,6 +139,14 @@ public class UPParryMeleeProj : Projectile {
 		base.onStart();
 		new Anim(pos.addxy(-10, 0), "explosion", xDir, null, true);
 		new Anim(pos.addxy(10, 0), "explosion", xDir, null, true);
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new UPParryMeleeProj(
+			XUPParry.netWeapon, args.pos,
+			args.xDir, args.extraData[0],
+			args.player, args.netId
+		);
 	}
 }
 
@@ -195,15 +210,40 @@ public class AbsorbWeapon : Weapon {
 }
 
 public class UPParryRangedProj : Projectile {
-	public UPParryRangedProj(Weapon weapon, Point pos, int xDir, string sprite, float damage, int flinch, float hitCooldown, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 350, damage, player, sprite, flinch, hitCooldown, netProjId, player.ownedByLocalPlayer) {
+	public UPParryRangedProj(
+		Weapon weapon, Point pos, int xDir, string sprite,
+		float damage, int flinch, float hitCooldown, Player player,
+		ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 350, damage, player, sprite, flinch, hitCooldown, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.UPParryProj;
 		maxDistance = 150;
+		damager.damage = MathInt.Ceiling(damage);
 
 		if (rpc) {
-			byte[] hitCooldownBytes = BitConverter.GetBytes(hitCooldown);
-			rpcCreate(pos, player, netProjId, xDir, hitCooldownBytes[0], hitCooldownBytes[1], hitCooldownBytes[2], hitCooldownBytes[3]);
+			List<Byte> extraBytes = new List<Byte> {
+				(byte)damager.damage,
+				(byte)damager.flinch
+			};
+			extraBytes.AddRange(BitConverter.GetBytes(hitCooldown));
+			extraBytes.AddRange(Encoding.ASCII.GetBytes(sprite));
+			rpcCreate(
+				pos, player, netProjId, xDir, extraBytes.ToArray()
+			);
 		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		float hitCooldown = BitConverter.ToUInt16(args.extraData[2..5], 0);
+		string sprite = Encoding.ASCII.GetString(args.extraData[6..]);
+
+		return new UPParryRangedProj(
+			XUPParry.netWeapon, args.pos,
+			args.xDir, sprite,
+			args.extraData[0], args.extraData[1], hitCooldown,
+			args.player, args.netId
+		);
 	}
 }
 

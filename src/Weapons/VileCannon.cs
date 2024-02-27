@@ -17,6 +17,9 @@ public class VileCannon : Weapon {
 	public string projSprite;
 	public string fadeSprite;
 	public float vileAmmoUsage;
+	public static VileCannon netWeaponFR = new VileCannon(VileCannonType.FrontRunner);
+	public static VileCannon netWeaponLG = new VileCannon(VileCannonType.LongshotGizmo);
+	public static VileCannon netWeaponFB = new VileCannon(VileCannonType.FatBoy);
 
 	public VileCannon(VileCannonType vileCannonType) : base() {
 		index = (int)WeaponIds.FrontRunner;
@@ -123,10 +126,14 @@ public class VileCannon : Weapon {
 }
 
 public class VileCannonProj : Projectile {
-	public VileCannonProj(VileCannon weapon, Point pos, int xDir, int gizmoNum, Player player, ushort netProjId, Point? vel = null, bool rpc = false) :
-		base(weapon, pos, xDir, 300, 3, player, weapon.projSprite, 0, 0f, netProjId, player.ownedByLocalPlayer) {
+	public VileCannonProj(
+		VileCannon weapon, Point pos, float byteAngle, Player player,
+		ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, 1, 300, 3, player, weapon.projSprite, 0, 0f, netProjId, player.ownedByLocalPlayer
+	) {
 		fadeSprite = weapon.fadeSprite;
-		projId = (int)ProjIds.MK2Cannon;
+		projId = (int)ProjIds.FrontRunner;
 		maxTime = 0.5f;
 		destroyOnHit = true;
 
@@ -141,29 +148,36 @@ public class VileCannonProj : Projectile {
 		} else if (weapon.type == (int)VileCannonType.LongshotGizmo) {
 			damager.damage = 1;
 			/*
-			if (player.vileAmmo >= 32 - weapon.vileAmmoUsage) damager.damage = 3;
-			else if (player.vileAmmo >= 32 - weapon.vileAmmoUsage * 2) damager.damage = 2;
-			else damager.damage = 1;
-			*/
+			if (ownedByLocalPlayer) {
+				if (player.vileAmmo >= 32 - weapon.vileAmmoUsage) { damager.damage = 3; }
+				else if (player.vileAmmo >= 32 - weapon.vileAmmoUsage * 2) { damager.damage = 2; }
+				else { damager.damage = 1; }
+			}*/
 			projId = (int)ProjIds.LongshotGizmo;
 		}
-
-		if (vel != null) {
-			var norm = vel.Value.normalize();
-			this.vel.x = norm.x * speed * xDir;
-			this.vel.y = norm.y * speed;
-		}
-
-		angle = this.vel.angle;
+		// Speed and angle.
+		Point norm = Point.createFromByteAngle(byteAngle);
+		this.vel.x = norm.x * speed * xDir;
+		this.vel.y = norm.y * speed;
+		this.byteAngle = byteAngle;
 
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
 	}
 
-	public override void update() {
-		base.update();
-		angle = this.vel.angle;
+	public static Projectile rpcInvoke(ProjParameters args) {
+		VileCannon vileCannon;
+		if (args.projId == (int)ProjIds.LongshotGizmo) {
+			vileCannon = VileCannon.netWeaponLG;
+		} else if (args.projId == (int)ProjIds.FatBoy) {
+			vileCannon = VileCannon.netWeaponFB;
+		} else {
+			vileCannon = VileCannon.netWeaponFR;
+		}
+		return new VileCannonProj(
+			vileCannon, args.pos, args.byteAngle, args.player, args.netId
+		);
 	}
 }
 
@@ -213,10 +227,16 @@ public class CannonAttack : CharState {
 			shootPos = vile.getFirstPOIOrDefault("s");
 		}
 
-		var muzzle = new Anim(shootPos, muzzleSprite, vile.getShootXDir(), player.getNextActorNetId(), true, true, host: vile);
+		var muzzle = new Anim(
+			shootPos, muzzleSprite, vile.getShootXDir(), player.getNextActorNetId(), true, true, host: vile
+		);
 		muzzle.angle = new Point(shootVel.x, vile.getShootXDir() * shootVel.y).angle;
 
-		new VileCannonProj(player.weapons.FirstOrDefault(w => w is VileCannon) as VileCannon, shootPos, vile.getShootXDir(), vile.longshotGizmoCount, player, player.getNextActorNetId(), shootVel, rpc: true);
+		new VileCannonProj(
+			player.weapons.FirstOrDefault(w => w is VileCannon) as VileCannon,
+			shootPos, MathF.Round(shootVel.byteAngle), //vile.longshotGizmoCount,
+			player, player.getNextActorNetId(), rpc: true
+		);
 	}
 
 	public override void onEnter(CharState oldState) {

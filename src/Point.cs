@@ -134,7 +134,7 @@ public struct Point {
 		return new Point(x, y);
 	}
 
-		public static Point createFromByteAngle(float angle) {
+	public static Point createFromByteAngle(float angle) {
 		float x = Helpers.cosd(angle);
 		float y = Helpers.sind(angle);
 		return new Point(x, y);

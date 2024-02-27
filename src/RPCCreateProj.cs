@@ -9,22 +9,31 @@ public partial class RPCCreateProj : RPC {
 	}
 
 	public override void invoke(params byte[] arguments) {
-		ushort projId = BitConverter.ToUInt16(new byte[] { arguments[0], arguments[1] }, 0);
-		float xPos = BitConverter.ToSingle(new byte[] { arguments[2], arguments[3], arguments[4], arguments[5] }, 0);
-		float yPos = BitConverter.ToSingle(new byte[] { arguments[6], arguments[7], arguments[8], arguments[9] }, 0);
-		var playerId = arguments[10];
-		var netProjByte = BitConverter.ToUInt16(new byte[] { arguments[11], arguments[12] }, 0);
-		int xDir = (int)arguments[13] - 128;
-		float angle = arguments[13] * 2;    // Can alternatively use xDir for angle for angled projectiles
-		float damage = BitConverter.ToSingle(new byte[] { arguments[14], arguments[15], arguments[16], arguments[17] }, 0);
-		int flinch = arguments[18];
-
-		int extraDataIndex = 19;
-		byte[] extraArgs;
-		if (arguments.Length >= 20) {
-			extraArgs = arguments[19..];
+		// Data of the array.
+		bool[] dataInf = Helpers.byteToBoolArray(arguments[0]);
+		// Always present values.
+		ushort projId = BitConverter.ToUInt16(new byte[] { arguments[1], arguments[2] }, 0);
+		float xPos = BitConverter.ToSingle(new byte[] { arguments[3], arguments[4], arguments[5], arguments[6] }, 0);
+		float yPos = BitConverter.ToSingle(new byte[] { arguments[7], arguments[8], arguments[9], arguments[10] }, 0);
+		var playerId = arguments[11];
+		var netProjByte = BitConverter.ToUInt16(new byte[] { arguments[12], arguments[13] }, 0);
+		// Angle or Dir
+		int xDir = 1;
+		float angle = 0;
+		float byteAngle = 0;
+		if (dataInf[0]) {
+			xDir = (int)arguments[14] - 128;
 		} else {
-			extraArgs = new byte[0];
+			byteAngle = arguments[14];
+			angle = byteAngle * 1.40625f;
+		}
+		// Extra arguments.
+		int extraDataIndex = 15;
+		byte[] extraData;
+		if (dataInf[1] && arguments.Length >= extraDataIndex + 1) {
+			extraData = arguments[extraDataIndex..];
+		} else {
+			extraData = new byte[0];
 		}
 		Point bulletDir = Point.createFromAngle(angle);
 
@@ -42,10 +51,11 @@ public partial class RPCCreateProj : RPC {
 				player = player,
 				netId = netProjByte,
 				angle = angle,
-				extraData = extraArgs
+				byteAngle = byteAngle,
+				extraData = extraData
 			};
 			proj = functs[(int)projId](args);
-			goto skipYanDev;
+			return;
 		}
 
 		if (projId == (int)ProjIds.ItemTracer) {
@@ -78,15 +88,15 @@ public partial class RPCCreateProj : RPC {
 			proj = new ZBuster4Proj(new ZeroBuster(), pos, xDir, 1, player, netProjByte);
 		} else if (projId == (int)ProjIds.Sting || projId == (int)ProjIds.StingDiag) {
 			Point? vel = null;
-			if (extraArgs.Length >= 3) {
-				vel = new Point(extraArgs[1], extraArgs[2]);
+			if (extraData.Length >= 3) {
+				vel = new Point(extraData[1], extraData[2]);
 			}
-			proj = new StingProj(new Sting(), pos, xDir, player, extraArgs[0], netProjByte, vel);
+			proj = new StingProj(new Sting(), pos, xDir, player, extraData[0], netProjByte, vel);
 		} else if (projId == (int)ProjIds.FireWaveCharged) {
 			proj = new FireWaveProjCharged(new FireWave(), pos, xDir, player, 0, netProjByte, 0);
 		} else if (projId == (int)ProjIds.ElectricSpark) {
 			proj = new ElectricSparkProj(
-				new ElectricSpark(), pos, xDir, player, extraArgs[0], netProjByte
+				new ElectricSpark(), pos, xDir, player, extraData[0], netProjByte
 			);
 		} else if (projId == (int)ProjIds.ElectricSparkCharged) {
 			proj = new ElectricSparkProjCharged(new ElectricSpark(), pos, xDir, player, netProjByte);
@@ -120,13 +130,7 @@ public partial class RPCCreateProj : RPC {
 			proj = new VileBombProj(new VileBall(VileBallType.ExplosiveRound), pos, xDir, player, 0, netProjByte);
 		} else if (projId == (int)ProjIds.VileBombSplit) {
 			proj = new VileBombProj(new VileBall(VileBallType.ExplosiveRound), pos, xDir, player, 1, netProjByte);
-		} else if (projId == (int)ProjIds.MK2Cannon) {
-			proj = new VileCannonProj(new VileCannon(VileCannonType.FrontRunner), pos, xDir, 0, player, netProjByte);
-		} else if (projId == (int)ProjIds.LongshotGizmo) {
-			proj = new VileCannonProj(new VileCannon(VileCannonType.LongshotGizmo), pos, xDir, 0, player, netProjByte);
-		} else if (projId == (int)ProjIds.FatBoy) {
-			proj = new VileCannonProj(new VileCannon(VileCannonType.FatBoy), pos, xDir, 0, player, netProjByte);
-		} else if (projId == (int)ProjIds.MechMissile) {
+		}  else if (projId == (int)ProjIds.MechMissile) {
 			proj = new MechMissileProj(new MechMissileWeapon(player), pos, xDir, false, player, netProjByte);
 		} else if (projId == (int)ProjIds.MechTorpedo) {
 			proj = new TorpedoProj(new MechTorpedoWeapon(player), pos, xDir, player, 2, netProjByte);
@@ -197,7 +201,7 @@ public partial class RPCCreateProj : RPC {
 		} else if (projId == (int)ProjIds.FrostShieldChargedPlatform) {
 			proj = new FrostShieldProjPlatform(new FrostShield(), pos, xDir, player, netProjByte);
 		} else if (projId == (int)ProjIds.TunnelFang || projId == (int)ProjIds.TunnelFang2) {
-			proj = new TunnelFangProj(new TunnelFang(), pos, xDir, extraArgs[0], player, netProjByte);
+			proj = new TunnelFangProj(new TunnelFang(), pos, xDir, extraData[0], player, netProjByte);
 		} else if (projId == (int)ProjIds.SplashLaser) {
 			proj = new SplashLaserProj(new RayGun(0), pos, player, bulletDir, netProjByte);
 		} else if (projId == (int)ProjIds.BlackArrow) {
@@ -477,11 +481,6 @@ public partial class RPCCreateProj : RPC {
 			proj = new RCProj(RideChaser.getGunWeapon(), pos, xDir, 0, player, netProjByte);
 		} else if (projId == (int)ProjIds.Buster) {
 			proj = new RCProj(RideChaser.getGunWeapon(), pos, xDir, 0, player, netProjByte);
-		} else if (projId == (int)ProjIds.UPParryMelee) {
-			proj = new UPParryMeleeProj(new XUPParry(), pos, xDir, damage, player, netProjByte);
-		} else if (projId == (int)ProjIds.UPParryProj) {
-			float hitCooldown = BitConverter.ToUInt16(new byte[] { arguments[extraDataIndex], arguments[extraDataIndex + 1], arguments[extraDataIndex + 2], arguments[extraDataIndex + 3] }, 0);
-			proj = new UPParryRangedProj(new XUPParry(), pos, xDir, "empty", damage, flinch, hitCooldown, player, netProjByte);
 		} else if (projId == (int)ProjIds.BBuffaloCrash) {
 			proj = new BBuffaloCrashProj(BlizzardBuffalo.getWeapon(), pos, xDir, player, netProjByte);
 		} else if (projId == (int)ProjIds.BBuffaloIceProj) {
@@ -511,11 +510,11 @@ public partial class RPCCreateProj : RPC {
 			proj = new PROJ(new WEP(), pos, xDir, player, netProjByte);
 		}
 		*/
-		skipYanDev:
-
+		/*
 		if (proj.damager != null) {
 			proj.damager.damage = damage;
 			proj.damager.flinch = flinch;
 		}
+		*/
 	}
 }

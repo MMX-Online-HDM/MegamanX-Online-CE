@@ -582,39 +582,54 @@ public class Projectile : Actor {
 		}
 	}
 
-	private void rpcCreateHelper(Point pos, Player player, ushort netProjId, int xDirOrAngle, bool isAngle, float damage, int flinch, params byte[] extraData) {
+	private void rpcCreateHelper(
+		Point pos, Player player, ushort netProjId,
+		int xDirOrAngle, bool isAngle,
+		params byte[] extraData
+	) {
 		byte[] projIdBytes = BitConverter.GetBytes((ushort)projId);
 		byte[] xBytes = BitConverter.GetBytes(pos.x);
 		byte[] yBytes = BitConverter.GetBytes(pos.y);
 		byte[] netProjIdByte = BitConverter.GetBytes(netProjId);
-		byte[] damageBytes = BitConverter.GetBytes(damage);
-		byte flinchByte = (byte)flinch;
-
-		var bytes = new List<byte>()
-		{
-				projIdBytes[0], projIdBytes[1],
-				xBytes[0], xBytes[1], xBytes[2], xBytes[3],
-				yBytes[0], yBytes[1], yBytes[2], yBytes[3],
-				(byte)player.id,
-				netProjIdByte[0], netProjIdByte[1],
-				isAngle ? (byte)xDirOrAngle : (byte)(xDir + 128),
-				damageBytes[0], damageBytes[1], damageBytes[2], damageBytes[3],
-				flinchByte,
-			};
-
+		// Create bools of data.
+		byte dataInf = 0;
+		if (isAngle) { dataInf += (byte)(1 << 7); }
+		if (extraData != null && extraData.Length > 0) { dataInf += (byte)(1 << 6); }
+		// Create byte list.
+		var bytes = new List<byte>() {
+			dataInf,
+			projIdBytes[0], projIdBytes[1],
+			xBytes[0], xBytes[1], xBytes[2], xBytes[3],
+			yBytes[0], yBytes[1], yBytes[2], yBytes[3],
+			(byte)player.id,
+			netProjIdByte[0], netProjIdByte[1],
+			(byte)(xDir + 128),
+			(byte)angle,
+		};
 		if (extraData != null && extraData.Length > 0) {
 			bytes.AddRange(extraData);
 		}
-
 		Global.serverClient?.rpc(RPC.createProj, bytes.ToArray());
 	}
 
 	public virtual void rpcCreate(Point pos, Player player, ushort netProjId, int xDir, params byte[] extraData) {
-		rpcCreateHelper(pos, player, netProjId, xDir, false, damager.damage, damager.flinch, extraData);
+		rpcCreateHelper(pos, player, netProjId, xDir, false, extraData);
 	}
 
-	public virtual void rpcCreateAngle(Point pos, Player player, ushort netProjId, int angle, params byte[] extraData) {
-		rpcCreateHelper(pos, player, netProjId, angle, true, damager.damage, damager.flinch, extraData);
+	public virtual void rpcCreateAngle(
+		Point pos, Player player, ushort netProjId,
+		float angle, params byte[] extraData
+	) {
+		int byteAngle = MathInt.Round((angle / 1.40625f) % 256f);
+		rpcCreateHelper(pos, player, netProjId, byteAngle, true, extraData);
+	}
+
+	public virtual void rpcCreateByteAngle(
+		Point pos, Player player, ushort netProjId,
+		float angle, params byte[] extraData
+	) {
+		int byteAngle = MathInt.Round(angle % 256f);
+		rpcCreateHelper(pos, player, netProjId, byteAngle, true, extraData);
 	}
 
 	bool acidFadeOnce;

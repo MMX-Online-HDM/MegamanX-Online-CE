@@ -814,19 +814,24 @@ public class Helpers {
 	}
 
 	public static byte boolArrayToByte(bool[] boolArray) {
-		string bitString = "";
-		for (int i = 0; i < 8; i++) {
-			bitString += boolArray[i] ? '1' : '0';
+		if (boolArray.Length > 8) {
+			throw new Exception("Bool array is too big to convert to byte.");
 		}
-		return Convert.ToByte(string.Join("", bitString), 2);
+		byte byteVal = 0;
+		for (int i = 0; i < boolArray.Length; i++) {
+			if (boolArray[i]) {
+				byteVal += (byte)(1 << 7-i);
+			}
+		}
+		return byteVal;
 	}
 
 	public static bool[] byteToBoolArray(byte byteValue) {
-		List<bool> bits = Convert.ToString(byteValue, 2).Select(s => s == '0' ? false : true).ToList();
-		while (bits.Count < 8) {
-			bits.Insert(0, false);
+		bool[] boolArray = new bool[8]; 
+		for (int i = 0; i < 8; i++) {
+			boolArray[i] = (byteValue & (1 << 7-i)) != 0;
 		}
-		return bits.ToArray();
+		return boolArray;
 	}
 
 	public static Point? getClosestHitPoint(List<CollideData> hits, Point pos, params Type[] types) {

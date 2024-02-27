@@ -1570,7 +1570,11 @@ public partial class Character : Actor, IDamagable {
 		if (factorHyperMode && isInvulnBS.getValue() && !isCCImmuneHyperMode()) return true;
 		if (!ignoreRideArmorHide && charState is InRideArmor && (charState as InRideArmor).isHiding) return true;
 		if (!ignoreRideArmorHide && !string.IsNullOrEmpty(sprite?.name) && sprite.name.Contains("ra_hide")) return true;
-		if (specialState == (int)SpecialStateIds.AxlRoll) return true;
+		if (specialState == (int)SpecialStateIds.AxlRoll ||
+			specialState == (int)SpecialStateIds.XTeleport
+		) {
+			return true;
+		}
 		if (sprite.name.Contains("viral_exit")) return true;
 		if (charState is WarpOut) return true;
 		if (charState is WolfSigmaRevive || charState is ViralSigmaRevive || charState is KaiserSigmaRevive) return true;

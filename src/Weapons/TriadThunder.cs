@@ -77,7 +77,7 @@ public class TriadThunderProj : Projectile {
 		}
 	}
 
-	public static Projectile projCreate(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new TriadThunderProj(
 			TriadThunder.netWeapon, arg.pos, arg.xDir, arg.extraData[0], arg.player, arg.netId
 		); 
@@ -269,7 +269,7 @@ public class TriadThunderProjCharged : Projectile {
 		updateWallCrawl();
 	}
 
-	public static Projectile projCreate(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new TriadThunderProjCharged(
 			TriadThunder.netWeapon, arg.pos, arg.xDir, arg.extraData[0], arg.player, arg.netId
 		); 
@@ -291,7 +291,7 @@ public class TriadThunderQuake : Projectile {
 		}
 	}
 
-	public static Projectile projCreate(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new TriadThunderQuake(
 			TriadThunder.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
 		); 

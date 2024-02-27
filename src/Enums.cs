@@ -451,7 +451,7 @@ public enum ProjIds {
 	MechStomp,
 	MechFrogGroundPound,
 	MechFrogStompShockwave,
-	MK2Cannon,
+	FrontRunner,
 	LongshotGizmo,
 	FatBoy,
 	MechChain,

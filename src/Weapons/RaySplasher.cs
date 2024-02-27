@@ -71,11 +71,11 @@ public class RaySplasherProj : Projectile {
 		}
 	}
 
-	public static Projectile projCreate(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters args) {
 		return new RaySplasherProj(
-			RaySplasher.netWeapon, arg.pos, arg.xDir,
-			arg.extraData[0], arg.extraData[1], (arg.extraData[2] == 1),
-			arg.player, arg.netId
+			RaySplasher.netWeapon, args.pos, args.xDir,
+			args.extraData[0], args.extraData[1], (args.extraData[2] == 1),
+			args.player, args.netId
 		);
 	}
 
