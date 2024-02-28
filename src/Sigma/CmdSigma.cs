@@ -38,7 +38,7 @@ public class CmdSigma : BaseSigma {
 			}
 		}
 
-		if (isAttacking() && charState.normalCtrl && !isSigmaShooting()) {
+		if (isAttacking() && charState is WallSlide or LadderClimb && !isSigmaShooting()) {
 			if (isAnimOver() && charState != null && charState is not SigmaSlashState) {
 				changeSprite(getSprite(charState.defaultSprite), true);
 				if (charState is WallSlide && sprite != null) {
@@ -70,7 +70,7 @@ public class CmdSigma : BaseSigma {
 		if (lenientAttackPressed && saberCooldown == 0) {
 			saberCooldown = sigmaSaberMaxCooldown;
 
-			if (charState is WallSlide || charState is LadderClimb) {
+			if (charState is WallSlide or LadderClimb) {
 				if (charState is LadderClimb) {
 					int inputXDir = player.input.getXDir(player);
 					if (inputXDir != 0) {

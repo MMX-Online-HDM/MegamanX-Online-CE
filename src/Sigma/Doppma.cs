@@ -29,6 +29,36 @@ public class Doppma : BaseSigma {
 		player.sigmaFireWeapon.update();
 		Helpers.decrementTime(ref sigma3FireballCooldown);
 		Helpers.decrementTime(ref sigma3ShieldCooldown);
+
+		if (charState is WallSlide or LadderClimb &&
+			!string.IsNullOrEmpty(charState?.shootSprite) &&
+			sprite?.name?.EndsWith(charState.shootSprite) == true
+		) {
+			if (isAnimOver() && charState is not Sigma3Shoot) {
+				changeSpriteFromName(charState.sprite, true);
+			} else {
+				var shootPOI = getFirstPOI();
+				if (shootPOI != null && player.sigmaFireWeapon.shootTime == 0) {
+					player.sigmaFireWeapon.shootTime = 0.15f;
+					int upDownDir = MathF.Sign(player.input.getInputDir(player).y);
+					float ang = getShootXDir() == 1 ? 0 : 180;
+					if (charState.shootSprite.EndsWith("jump_shoot_downdiag")) {
+						ang = getShootXDir() == 1 ? 45 : 135;
+					}
+					if (charState.shootSprite.EndsWith("jump_shoot_down")) {
+						ang = 90;
+					}
+					if (ang != 0 && ang != 180) {
+						upDownDir = 0;
+					}
+					playSound("sigma3shoot", sendRpc: true);
+					new Sigma3FireProj(
+						player.sigmaFireWeapon, shootPOI.Value,
+						ang, upDownDir, player, player.getNextActorNetId(), sendRpc: true
+					);
+				}
+			}
+		}
 	}
 
 	public override Collider getBlockCollider() {
@@ -61,9 +91,12 @@ public class Doppma : BaseSigma {
 			}
 
 			if (player.sigmaFireWeapon.shootTime == 0 && sigma3FireballCooldown == 0) {
-				changeState(new Sigma3Shoot(player.input.getInputDir(player)), true);
+				if (charState is WallSlide or LadderClimb) {
+					changeSpriteFromName(charState.shootSprite, true);
+				} else {
+					changeState(new Sigma3Shoot(player.input.getInputDir(player)), true);
+				}
 				sigma3FireballCooldown = maxSigma3FireballCooldown;
-				changeSpriteFromName(charState.shootSprite, true);
 				return true;
 			}
 		}
