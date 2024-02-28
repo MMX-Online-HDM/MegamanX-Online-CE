@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MMXOnline;
 
-public class BaseSigma : Character {
+public abstract class BaseSigma : Character {
 	public const float sigmaHeight = 50;
 	public float sigmaSaberMaxCooldown = 1f;
 	public float noBlockTime = 0;
