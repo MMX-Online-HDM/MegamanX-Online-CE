@@ -1045,10 +1045,10 @@ class Program {
 					framesUpdatesThisSecond++;
 				}
 			}
-			if (deltaTime < 0.001m) {
+			if (deltaTime < 0.01m) {
 				deltaTime = 0;
 			}
-			//deltaTimeSavings = deltaTime;
+			deltaTimeSavings = deltaTime;
 			videoUpdatesThisSecond++;
 			Global.isSkippingFrames = false;
 			Global.input.clearInput();
