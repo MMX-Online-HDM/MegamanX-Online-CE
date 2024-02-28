@@ -160,9 +160,9 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 
 			if (i == 2) {
 				Helpers.drawTextStd(TCat.Option, "Sigma Form: ", 40, yPos, color: Color.White, fontSize: 24, selected: selCursorIndex == i);
-				string form = "Commander Sigma (X1)";
-				if (cursors[i].index == 1) form = "Neo Sigma (X2)";
-				if (cursors[i].index == 2) form = "Doppler Sigma (X3)";
+				string form = "Commander Sigma";
+				if (cursors[i].index == 1) form = "Neo Sigma";
+				if (cursors[i].index == 2) form = "Dopple Sigma";
 				Helpers.drawTextStd(TCat.Option, form, startX2 - 6, yPos, color: Color.White, fontSize: 24, selected: selCursorIndex == i);
 				continue;
 			}

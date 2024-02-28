@@ -17,7 +17,7 @@ public class SigmaClawState : CharState {
 	CharState prevCharState;
 	float slideVel;
 	bool isAir;
-	public Sigma sigma;
+	public NeoSigma neoSigma;
 
 	public SigmaClawState(CharState prevCharState, bool isAir) : base(prevCharState.attackSprite, "", "", "") {
 		this.prevCharState = prevCharState;
@@ -63,7 +63,7 @@ public class SigmaClawState : CharState {
 			once = true;
 			sprite = "attack2";
 			defaultSprite = sprite;
-			character.saberCooldown = sigma.sigmaSaberMaxCooldown;
+			character.saberCooldown = neoSigma.sigmaSaberMaxCooldown;
 			character.changeSpriteFromName(sprite, true);
 			character.playSound("sigma2slash", sendRpc: true);
 			return;
@@ -77,7 +77,7 @@ public class SigmaClawState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		sigma = character as Sigma;
+		neoSigma = character as NeoSigma;
 		if (oldState is Dash) {
 			slideVel = character.xDir * character.getDashSpeed();
 		}
@@ -93,8 +93,13 @@ public class SigmaElectricBallWeapon : Weapon {
 }
 
 public class SigmaElectricBallProj : Projectile {
-	public SigmaElectricBallProj(Weapon weapon, Point pos, float angle, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, 1, 0, 3, player, "sigma2_ball", 0, 0.2f, netProjId, player.ownedByLocalPlayer) {
+	public SigmaElectricBallProj(
+		Weapon weapon, Point pos, float angle, Player
+		player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, 1, 0, 3, player, "sigma2_ball", 0, 0.2f,
+		netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.Sigma2Ball;
 		destroyOnHit = false;
 		maxTime = 0.5f;
@@ -143,8 +148,13 @@ public class SigmaElectricBall2Weapon : Weapon {
 }
 
 public class SigmaElectricBall2Proj : Projectile {
-	public SigmaElectricBall2Proj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 300, 6, player, "sigma2_ball2", Global.defFlinch, 0.2f, netProjId, player.ownedByLocalPlayer) {
+	public SigmaElectricBall2Proj(
+		Weapon weapon, Point pos, int xDir,
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 300, 6, player, "sigma2_ball2",
+		Global.defFlinch, 0.2f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.Sigma2Ball2;
 		destroyOnHit = false;
 		maxTime = 0.4f;
@@ -174,7 +184,10 @@ public class SigmaElectricBall2State : CharState {
 
 		if (!fired && character.getFirstPOI() != null) {
 			fired = true;
-			new SigmaElectricBall2Proj(new SigmaElectricBall2Weapon(), character.getFirstPOI().Value, character.xDir, player, player.getNextActorNetId(), rpc: true);
+			new SigmaElectricBall2Proj(
+				new SigmaElectricBall2Weapon(), character.getFirstPOI().Value,
+				character.xDir, player, player.getNextActorNetId(), rpc: true
+			);
 		}
 
 		if (character.isAnimOver()) {
@@ -209,8 +222,12 @@ public class SigmaUpDownSlashState : CharState {
 		var moveAmount = new Point(0, isUp ? -1 : 1);
 
 		float maxStateTime = isUp ? 0.35f : 0.5f;
-		if (stateTime > maxStateTime || Global.level.checkCollisionActor(character, moveAmount.x, moveAmount.y, moveAmount) != null) {
-			character.changeState(character.grounded ? new SigmaCooldownState("downslash_land") : new Fall(), true);
+		if (stateTime > maxStateTime ||
+			Global.level.checkCollisionActor(character, moveAmount.x, moveAmount.y, moveAmount) != null
+		) {
+			character.changeState(
+				character.grounded ? new SigmaCooldownState("downslash_land") : new Fall(), true
+			);
 			return;
 		}
 

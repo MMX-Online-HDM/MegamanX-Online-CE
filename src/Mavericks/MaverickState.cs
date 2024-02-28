@@ -1088,7 +1088,7 @@ public class MDie : MaverickState {
 						spawnPos = closestSpawnPoint;
 					}
 
-					(player.character as Sigma)?.becomeSigma(spawnPos, maverick.xDir);
+					(player.character as BaseSigma)?.becomeSigma(spawnPos, maverick.xDir);
 					player.removeWeaponSlot(player.weapons.FindIndex(w => w is MaverickWeapon mw && mw.maverick == maverick));
 					player.changeWeaponSlot(player.weapons.FindIndex(w => w is SigmaMenuWeapon));
 				}

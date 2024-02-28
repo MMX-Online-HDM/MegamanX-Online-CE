@@ -2,73 +2,6 @@ using System;
 
 namespace MMXOnline;
 
-public class IssueGlobalCommand : CharState {
-	public IssueGlobalCommand(string transitionSprite = "") :
-		base("summon_maverick", "", "", transitionSprite) {
-		superArmor = true;
-	}
-
-	public override void update() {
-		base.update();
-
-		if (character.isAnimOver()) {
-			character.changeState(new Idle(), true);
-		}
-	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-	}
-}
-
-public class CallDownMaverick : CharState {
-	Maverick maverick;
-	bool isNew;
-	bool isRecall;
-	int frame;
-	public CallDownMaverick(Maverick maverick, bool isNew, bool isRecall, string transitionSprite = "") :
-		base("summon_maverick", "", "", transitionSprite) {
-		this.maverick = maverick;
-		this.isNew = isNew;
-		this.isRecall = isRecall;
-		superArmor = true;
-	}
-
-	public override void update() {
-		base.update();
-
-		frame++;
-
-		if (frame > 0 && frame < 10 && (player.isStriker() || player.isSummoner())) {
-			if (player.input.isPressed(Control.Shoot, player) && maverick.startMoveControl == Control.Special1) {
-				maverick.startMoveControl = Control.Dash;
-			} else if (player.input.isPressed(Control.Special1, player) && maverick.startMoveControl == Control.Shoot) {
-				maverick.startMoveControl = Control.Dash;
-			}
-		}
-
-		if (character.isAnimOver()) {
-			character.changeState(new Idle(), true);
-		}
-	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		if (!isNew) {
-			if (maverick.state is not MExit) maverick.changeState(new MExit(character.pos, isRecall));
-			else maverick.changeState(new MEnter(character.pos));
-		}
-	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-	}
-}
-
 public class SigmaSlashWeapon : Weapon {
 	public SigmaSlashWeapon() : base() {
 		index = (int)WeaponIds.SigmaSlash;
@@ -113,7 +46,10 @@ public class SigmaSlashState : CharState {
 
 			float damage = character.grounded ? 4 : 3;
 			int flinch = character.grounded ? Global.defFlinch : 13;
-			new SigmaSlashProj(player.sigmaSlashWeapon, character.pos.addxy(off.x * character.xDir, off.y), character.xDir, player, player.getNextActorNetId(), damage: damage, flinch: flinch, rpc: true);
+			new SigmaSlashProj(
+				player.sigmaSlashWeapon, character.pos.addxy(off.x * character.xDir, off.y),
+				character.xDir, player, player.getNextActorNetId(), damage: damage, flinch: flinch, rpc: true
+			);
 		}
 
 		if (character.isAnimOver()) {
@@ -122,6 +58,8 @@ public class SigmaSlashState : CharState {
 		}
 	}
 }
+
+
 
 public class SigmaSlashProj : Projectile {
 	public SigmaSlashProj(
@@ -157,8 +95,13 @@ public class SigmaBallWeapon : Weapon {
 }
 
 public class SigmaBallProj : Projectile {
-	public SigmaBallProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, Point? vel = null, bool rpc = false) :
-		base(weapon, pos, xDir, 400, 2, player, "sigma_proj_ball", 0, 0.2f, netProjId, player.ownedByLocalPlayer) {
+	public SigmaBallProj(
+		Weapon weapon, Point pos, int xDir, Player player,
+		ushort netProjId, Point? vel = null, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 400, 2, player, "sigma_proj_ball",
+		0, 0.2f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.SigmaBall;
 		maxTime = 0.5f;
 		destroyOnHit = true;
@@ -174,7 +117,7 @@ public class SigmaBallProj : Projectile {
 
 public class SigmaBallShoot : CharState {
 	bool shot;
-	public Sigma sigma;
+	public CmdSigma sigma;
 
 	public SigmaBallShoot(string transitionSprite = "") : base("shoot", "", "", transitionSprite) {
 	}
@@ -225,8 +168,14 @@ public class SigmaBallShoot : CharState {
 			if (player.sigmaAmmo < 0) player.sigmaAmmo = 0;
 			sigma.sigmaAmmoRechargeCooldown = sigma.sigmaHeadBeamTimeBeforeRecharge;
 			character.playSound("energyBall", sendRpc: true);
-			new SigmaBallProj(player.sigmaBallWeapon, poi, character.xDir, player, player.getNextActorNetId(), vel.normalize(), rpc: true);
-			new Anim(poi, "sigma_proj_ball_muzzle", character.xDir, player.getNextActorNetId(), true, sendRpc: true);
+			new SigmaBallProj(
+				player.sigmaBallWeapon, poi, character.xDir, player,
+				player.getNextActorNetId(), vel.normalize(), rpc: true
+			);
+			new Anim(
+				poi, "sigma_proj_ball_muzzle", character.xDir,
+				player.getNextActorNetId(), true, sendRpc: true
+			);
 		}
 
 		if (character.sprite.loopCount > 5 || player.sigmaAmmo <= 0) {
@@ -236,7 +185,7 @@ public class SigmaBallShoot : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		sigma = character as Sigma;
+		sigma = character as CmdSigma;
 		character.vel = new Point();
 	}
 }
@@ -246,7 +195,7 @@ public class SigmaWallDashState : CharState {
 	int yDir;
 	Point vel;
 	bool fromGround;
-	public Sigma sigma;
+	public CmdSigma sigma;
 
 	public SigmaWallDashState(int yDir, bool fromGround) : base("wall_dash", "", "", "") {
 		this.yDir = yDir;
@@ -262,7 +211,7 @@ public class SigmaWallDashState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		sigma = character as Sigma;
+		sigma = character as CmdSigma;
 		float xSpeed = 350;
 		if (!fromGround) {
 			character.xDir *= -1;
@@ -279,7 +228,7 @@ public class SigmaWallDashState : CharState {
 
 	public override void onExit(CharState newState) {
 		character.useGravity = true;
-		sigma.leapSlashCooldown = Sigma.maxLeapSlashCooldown;
+		sigma.leapSlashCooldown = CmdSigma.maxLeapSlashCooldown;
 		base.onExit(newState);
 	}
 
@@ -322,7 +271,10 @@ public class SigmaWallDashState : CharState {
 			character.changeSpriteFromName("wall_dash_attack", true);
 
 			Point off = new Point(30, -20);
-			new SigmaSlashProj(player.sigmaSlashWeapon, character.pos.addxy(off.x * character.xDir, off.y), character.xDir, player, player.getNextActorNetId(), damage: 4, rpc: true);
+			new SigmaSlashProj(
+				player.sigmaSlashWeapon, character.pos.addxy(off.x * character.xDir, off.y),
+				character.xDir, player, player.getNextActorNetId(), damage: 4, rpc: true
+			);
 		}
 	}
 }

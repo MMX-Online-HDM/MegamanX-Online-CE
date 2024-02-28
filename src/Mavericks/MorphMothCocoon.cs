@@ -105,7 +105,7 @@ public class MorphMothCocoon : Maverick {
 					mmw.maverick.health = health;
 
 					if (wasCocoon) {
-						(player.character as Sigma)?.becomeMaverick(mmw.maverick);
+						(player.character as BaseSigma)?.becomeMaverick(mmw.maverick);
 					}
 
 					playSound("morphmHatch", sendRpc: true);

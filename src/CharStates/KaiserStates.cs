@@ -823,7 +823,7 @@ public class KaiserSigmaRevive : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.syncScale = true;
-		if (character is Sigma sigma) {
+		if (character is BaseSigma sigma) {
 			sigma.isHyperSigma = true;
 		}
 		character.frameIndex = 0;

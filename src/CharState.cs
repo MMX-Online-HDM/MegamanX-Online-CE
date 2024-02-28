@@ -651,7 +651,7 @@ public class Crouch : CharState {
 }
 
 public class SwordBlock : CharState {
-	public Sigma sigma;
+	public BaseSigma sigma;
 
 	public SwordBlock() : base("block") {
 		immuneToWind = true;
@@ -1631,7 +1631,7 @@ public class Crystalized : CharState {
 
 public class Die : CharState {
 	bool sigmaHasMavericks;
-	Sigma sigma;
+	BaseSigma sigma;
 	MegamanX mmx;
 
 	public Die() : base("die") {
@@ -1639,7 +1639,7 @@ public class Die : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		sigma = character as Sigma;
+		sigma = character as BaseSigma;
 		mmx = character as MegamanX;
 		character.useGravity = false;
 		character.stopMoving();

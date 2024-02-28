@@ -107,7 +107,6 @@ public partial class Character : Actor, IDamagable {
 	public bool stopCamUpdate = false;
 	public Anim warpBeam;
 	public float flattenedTime;
-	public float wallKickCooldown;
 	public float saberCooldown;
 
 	public const float maxLastAttackerTime = 5;
@@ -129,11 +128,6 @@ public partial class Character : Actor, IDamagable {
 	public int lastShootReleased;
 	public int framesSinceLastAttack = 1000;
 	public float grabCooldown;
-
-	public float dashAttackCooldown;
-	public float maxDashAttackCooldown = 0.75f;
-	public float airAttackCooldown;
-	public float maxAirAttackCooldown = 0.5f;
 
 	public RideArmor vileStartRideArmor;
 	public RideArmor mk5RideArmorPlatform;

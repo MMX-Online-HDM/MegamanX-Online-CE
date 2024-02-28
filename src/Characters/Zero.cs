@@ -14,6 +14,11 @@ public class Zero : Character {
 		get => Math.Max(zeroDownThrustWeaponA.shootTime, zeroDownThrustWeaponS.shootTime);
 	}
 
+	public float dashAttackCooldown;
+	public float maxDashAttackCooldown = 0.75f;
+	public float airAttackCooldown;
+	public float maxAirAttackCooldown = 0.5f;
+
 	public float genmuCooldown;
 
 	public float zSaberShotCooldown;
@@ -158,7 +163,6 @@ public class Zero : Character {
 
 		if (dashAttackCooldown > 0) dashAttackCooldown = Helpers.clampMin0(dashAttackCooldown - Global.spf);
 		if (airAttackCooldown > 0) airAttackCooldown = Helpers.clampMin0(airAttackCooldown - Global.spf);
-		Helpers.decrementTime(ref wallKickCooldown);
 		Helpers.decrementTime(ref saberCooldown);
 		Helpers.decrementTime(ref xSaberCooldown);
 		Helpers.decrementTime(ref genmuCooldown);

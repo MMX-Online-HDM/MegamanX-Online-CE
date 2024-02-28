@@ -11,7 +11,7 @@ namespace MMXOnline;
 public class WolfSigma : CharState {
 	bool winTauntOnce;
 	Point startPos;
-	public Sigma sigma;
+	public BaseSigma sigma;
 
 	public WolfSigma() : base("head") {
 		immuneToWind = true;
@@ -40,7 +40,7 @@ public class WolfSigma : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		sigma = character as Sigma;
+		sigma = character as BaseSigma;
 		character.invulnTime = 0.5f;
 		character.stopMoving();
 		startPos = character.pos;
@@ -762,7 +762,7 @@ public class WolfSigmaRevive : CharState {
 	public ExplodeDieEffect explodeDieEffect;
 	public bool groundStart;
 	Point destPos;
-	public Sigma sigma;
+	public BaseSigma sigma;
 
 	float speed = 1;
 
@@ -855,7 +855,7 @@ public class WolfSigmaRevive : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		sigma = character as Sigma;
+		sigma = character as BaseSigma;
 		character.stopMoving();
 		character.visible = false;
 		character.useGravity = false;

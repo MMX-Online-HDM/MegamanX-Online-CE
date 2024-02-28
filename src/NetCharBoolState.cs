@@ -79,7 +79,7 @@ public partial class Character {
 			return (character as MegamanX)?.isHyperX == true;
 		});
 		isHyperSigmaBS = new NetCharBoolState(this, 7, NetCharBoolStateNum.One, (character) => { 
-			return (character as Sigma)?.isHyperSigma == true;
+			return (character as BaseSigma)?.isHyperSigma == true;
 		});
 	}
 

@@ -7,20 +7,16 @@ using System.Threading.Tasks;
 
 namespace MMXOnline;
 
-public class Sigma : Character {
+public class BaseSigma : Character {
 	public const float sigmaHeight = 50;
 	public float sigmaSaberMaxCooldown = 1f;
 	public float noBlockTime = 0;
 	public bool isHyperSigma;
-	public float leapSlashCooldown;
 	public const float maxLeapSlashCooldown = 2;
 	public float tagTeamSwapProgress;
 	public int tagTeamSwapCase;
 	public float sigmaAmmoRechargeCooldown = 0.5f;
 	public float sigmaAmmoRechargeTime;
-	public float sigmaUpSlashCooldown;
-	public float sigmaDownSlashCooldown;
-	public float sigma3FireballCooldown;
 	public float maxSigma3FireballCooldown = 0.39f;
 	public float sigma3ShieldCooldown;
 	public float maxSigma3ShieldCooldown = 1.125f;
@@ -49,7 +45,7 @@ public class Sigma : Character {
 	public WolfSigmaHand leftHand;
 	public WolfSigmaHand rightHand;
 
-	public Sigma(
+	public BaseSigma(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
 		bool isWarpIn = true
@@ -311,27 +307,13 @@ public class Sigma : Character {
 		if (!ownedByLocalPlayer) {
 			return;
 		}
-
-		sigmaSaberMaxCooldown = (player.isSigma1() ? 1 : 0.5f);
-
-		if (dashAttackCooldown > 0) dashAttackCooldown = Helpers.clampMin0(dashAttackCooldown - Global.spf);
-		if (airAttackCooldown > 0) airAttackCooldown = Helpers.clampMin0(airAttackCooldown - Global.spf);
-		Helpers.decrementTime(ref wallKickCooldown);
 		Helpers.decrementTime(ref saberCooldown);
-		Helpers.decrementTime(ref xSaberCooldown);
 		Helpers.decrementTime(ref noBlockTime);
-		Helpers.decrementTime(ref leapSlashCooldown);
 		Helpers.decrementTime(ref viralSigmaTackleCooldown);
-		Helpers.decrementTime(ref sigmaUpSlashCooldown);
-		Helpers.decrementTime(ref sigmaDownSlashCooldown);
-		Helpers.decrementTime(ref sigma3FireballCooldown);
-		Helpers.decrementTime(ref sigma3ShieldCooldown);
-		player.sigmaFireWeapon.update();
 		if (viralSigmaBeamLength < 1 && charState is not ViralSigmaBeamState) {
 			viralSigmaBeamLength += Global.spf * 0.1f;
 			if (viralSigmaBeamLength > 1) viralSigmaBeamLength = 1;
 		}
-
 		if (player.sigmaAmmo >= player.sigmaMaxAmmo) {
 			weaponHealAmount = 0;
 		}
@@ -344,7 +326,6 @@ public class Sigma : Character {
 				playSound("heal", forcePlay: true);
 			}
 		}
-
 		if (player.maverick1v1 != null && player.readyTextOver &&
 			!player.maverick1v1Spawned && player.respawnTime <= 0 && player.weapons.Count > 0
 		) {
@@ -356,24 +337,11 @@ public class Sigma : Character {
 				becomeMaverick(mw.maverick);
 			}
 		}
-
-		if (player.isSigma1()) {
-			Helpers.decrementTime(ref sigmaAmmoRechargeCooldown);
-			if (sigmaAmmoRechargeCooldown == 0) {
-				Helpers.decrementTime(ref sigmaAmmoRechargeTime);
-				if (sigmaAmmoRechargeTime == 0) {
-					player.sigmaAmmo = Helpers.clampMax(player.sigmaAmmo + 1, player.sigmaMaxAmmo);
-					sigmaAmmoRechargeTime = sigmaHeadBeamRechargePeriod;
-				}
-			}
-		}
-
 		if (isHyperSigmaBS.getValue() && player.isSigma3() && charState is not Die) {
 			lastHyperSigmaSprite = sprite?.name;
 			lastHyperSigmaFrameIndex = frameIndex;
 			lastHyperSigmaXDir = xDir;
 		}
-
 		if (isHyperSigmaBS.getValue() && player.isSigma2() && charState is not Die) {
 			lastHyperSigmaSprite = sprite?.name;
 			lastHyperSigmaFrameIndex = frameIndex;
@@ -402,9 +370,9 @@ public class Sigma : Character {
 				}
 			}
 		}
-
-		if (invulnTime > 0) return;
-
+		if (invulnTime > 0) {
+			return;
+		}
 		if ((charState is Die || charState is WarpOut) && player.currentMaverick != null && !visible) {
 			changePos(player.currentMaverick.pos);
 		}
@@ -412,156 +380,11 @@ public class Sigma : Character {
 		if (player.currentMaverick != null) {
 			return;
 		}
-
 		if (player.weapon is MaverickWeapon && (
 			player.input.isHeld(Control.Shoot, player) || player.input.isHeld(Control.Special1, player))
 		) {
 			return;
 		}
-
-		bool attackPressed = false;
-		if (player.weapon is not AssassinBullet) {
-			if (player.input.isPressed(Control.Shoot, player)) {
-				attackPressed = true;
-				framesSinceLastAttack = 0;
-			} else {
-				framesSinceLastAttack++;
-			}
-		}
-
-		bool lenientAttackPressed = (attackPressed || framesSinceLastAttack < 5);
-
-		if (player.isDisguisedAxl && player.axlWeapon is UndisguiseWeapon) {
-			lenientAttackPressed = false;
-		}
-
-		if (player.isSigma3()) {
-			if (!string.IsNullOrEmpty(charState?.shootSprite) &&
-				sprite?.name?.EndsWith(charState.shootSprite) == true
-			) {
-				if (isAnimOver() && charState is not Sigma3Shoot) {
-					changeSpriteFromName(charState.sprite, true);
-				} else {
-					var shootPOI = getFirstPOI();
-					if (shootPOI != null && player.sigmaFireWeapon.shootTime == 0) {
-						player.sigmaFireWeapon.shootTime = 0.15f;
-						int upDownDir = MathF.Sign(player.input.getInputDir(player).y);
-						float ang = getShootXDir() == 1 ? 0 : 180;
-						if (charState.shootSprite.EndsWith("jump_shoot_downdiag")) {
-							ang = getShootXDir() == 1 ? 45 : 135;
-						}
-						if (charState.shootSprite.EndsWith("jump_shoot_down")) {
-							ang = 90;
-						}
-						if (ang != 0 && ang != 180) {
-							upDownDir = 0;
-						}
-						playSound("sigma3shoot", sendRpc: true);
-						new Sigma3FireProj(
-							player.sigmaFireWeapon, shootPOI.Value,
-							ang, upDownDir, player, player.getNextActorNetId(), sendRpc: true
-						);
-					}
-				}
-			}
-		}
-
-		if (charState?.canAttack() == true && lenientAttackPressed && player.weapon is not MaverickWeapon) {
-			if (!isAttacking()) {
-				if (player.isSigma2()) {
-					if (player.input.isHeld(Control.Up, player) && flag == null && grounded) {
-						if (sigmaUpSlashCooldown == 0) {
-							sigmaUpSlashCooldown = 0.75f;
-							changeState(new SigmaUpDownSlashState(true), true);
-						}
-						return;
-					} else if (player.input.isHeld(Control.Down, player) && !grounded && getDistFromGround() > 25) {
-						if (sigmaDownSlashCooldown == 0) {
-							sigmaUpSlashCooldown += 0.5f;
-							sigmaDownSlashCooldown = 1f;
-							changeState(new SigmaUpDownSlashState(false), true);
-						}
-						return;
-					}
-				}
-
-				if (charState is LadderClimb) {
-					if (player.input.isHeld(Control.Left, player)) {
-						xDir = -1;
-					} else if (player.input.isHeld(Control.Right, player)) {
-						xDir = 1;
-					}
-				}
-
-				if (player.isSigma3()) {
-					if (!string.IsNullOrEmpty(charState.shootSprite) && player.sigmaFireWeapon.shootTime == 0
-						&& !isSigmaShooting() && sigma3FireballCooldown == 0
-					) {
-						if (charState is Fall || charState is Jump || charState is WallKick) {
-							changeState(new Sigma3Shoot(player.input.getInputDir(player)), true);
-						} else if (charState is Idle || charState is Run || charState is Dash
-							|| charState is SwordBlock
-						) {
-							changeState(new Sigma3Shoot(player.input.getInputDir(player)), true);
-						}
-						sigma3FireballCooldown = maxSigma3FireballCooldown;
-						changeSpriteFromName(charState.shootSprite, true);
-						return;
-					}
-				}
-
-				var attackSprite = charState.attackSprite;
-
-				saberCooldown = sigmaSaberMaxCooldown;
-				if (charState is Run || charState is Dash || charState is Idle ||
-					charState is Jump || charState is Fall || charState is AirDash
-				) {
-					if (player.loadout.sigmaLoadout.sigmaForm == 0) {
-						changeState(new SigmaSlashState(charState), true);
-					} else if (player.loadout.sigmaLoadout.sigmaForm == 1) {
-						changeState(new SigmaClawState(charState, !grounded), true);
-					}
-					return;
-				}
-
-				changeSprite(getSprite(attackSprite), true);
-				if (player.isSigma1()) playSound("SigmaSaber", sendRpc: true);
-				if (player.isSigma2()) playSound("sigma2slash", sendRpc: true);
-			}
-		} else if (!isAttacking() && !isInvulnerableAttack() && (charState is Idle || charState is Run)) {
-			if (player.isSigma1() && player.input.isHeld(Control.Special1, player) && player.sigmaAmmo > 0) {
-				sigmaAmmoRechargeCooldown = 0.5f;
-				changeState(new SigmaBallShoot(), true);
-				return;
-			}
-			else if (player.isSigma2() &&
-				player.input.isPressed(Control.Special1, player) &&
-				player.sigmaAmmo >= 16 && flag == null
-			) {
-				if (player.sigmaAmmo < 32) {
-					player.sigmaAmmo -= 16;
-					changeState(new SigmaElectricBallState(), true);
-					return;
-				} else {
-					player.sigmaAmmo = 0;
-					changeState(new SigmaElectricBall2State(), true);
-					return;
-				}
-			} else if (player.isSigma3() && player.input.isPressed(Control.Special1, player) &&
-				charState is not SigmaThrowShieldState && sigma3ShieldCooldown == 0
-			) {
-				sigma3ShieldCooldown = maxSigma3ShieldCooldown;
-				changeState(new SigmaThrowShieldState(), true);
-			}
-		}
-		if (player.isSigma1() && charState is Dash dashState) {
-			if (!dashState.stop && player.isSigma && player.input.isPressed(Control.Special1, player) &&
-				flag == null && leapSlashCooldown == 0
-			) {
-				changeState(new SigmaWallDashState(-1, true), true);
-			}
-		}
-
 		/*
 		if (charState.canAttack() &&
 			player.input.isHeld(Control.Shoot, player) &&
@@ -574,28 +397,6 @@ public class Sigma : Character {
 			return;
 		}
 		*/
-
-		if (isAttacking()) {
-			if (player.isSigma1()) {
-				if (isAnimOver() && charState != null && charState is not SigmaSlashState) {
-					changeSprite(getSprite(charState.defaultSprite), true);
-					if (charState is WallSlide && sprite != null) {
-						frameIndex = sprite.frames.Count - 1;
-					}
-				} else if (grounded && sprite?.name != "sigma_attack") {
-					changeSprite("sigma_attack", false);
-				}
-			} else if (player.isSigma2()) {
-				if (isAnimOver() && charState != null && charState is not SigmaClawState) {
-					changeSprite(getSprite(charState.defaultSprite), true);
-					if (charState is WallSlide && sprite != null) {
-						frameIndex = sprite.frames.Count - 1;
-					}
-				} else if (grounded && sprite?.name != "sigma2_attack" && sprite?.name != "sigma2_attack2") {
-					changeSprite("sigma2_attack", false);
-				}
-			}
-		}
 	}
 
 	public override bool normalCtrl() {
@@ -615,7 +416,6 @@ public class Sigma : Character {
 
 	// This can run on both owners and non-owners. So data used must be in sync
 	public override Projectile getProjFromHitbox(Collider collider, Point centerPoint) {
-		Projectile proj = null;
 		if (sprite.name.Contains("sigma3_kaiser_fall") && collider.isAttack()) {
 			return new GenericMeleeProj(
 				new KaiserStompWeapon(player), centerPoint, ProjIds.Sigma3KaiserStomp, player,
@@ -626,73 +426,13 @@ public class Sigma : Character {
 				new Weapon(), centerPoint, ProjIds.Sigma3KaiserSuit, player,
 				damage: 0, flinch: 0, hitCooldown: 1, isShield: true
 			);
-		} else if (sprite.name.StartsWith("sigma3_") && collider.name == "shield") {
-			return new GenericMeleeProj(
-				new Weapon(), centerPoint, ProjIds.Sigma3ShieldBlock, player,
-				damage: 0, flinch: 0, hitCooldown: 1, isDeflectShield: true, isShield: true
-			);
-		} else if (sprite.name == "sigma_ladder_attack") {
-			proj = new GenericMeleeProj(
-				player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSlash, player,
-				3, 0, 0.25f
-			);
-		} else if (sprite.name == "sigma_wall_slide_attack") {
-			proj = new GenericMeleeProj(
-				player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSlash, player,
-				3, 0, 0.25f
-			);
 		} else if (sprite.name.Contains("sigma_block") && !collider.isHurtBox()) {
-			proj = new GenericMeleeProj(
+			return new GenericMeleeProj(
 				player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player,
 				0, 0, 0, isDeflectShield: true
 			);
-		} else if (sprite.name == "sigma2_attack") {
-			proj = new GenericMeleeProj(
-				player.sigmaClawWeapon, centerPoint, ProjIds.Sigma2Claw, player,
-				2, 0, 0.2f
-			);
-		} else if (sprite.name == "sigma2_attack2") {
-			proj = new GenericMeleeProj(
-				player.sigmaClawWeapon, centerPoint, ProjIds.Sigma2Claw2, player,
-				2, Global.halfFlinch, 0.5f
-			);
-		} else if (sprite.name == "sigma2_attack_air") {
-			proj = new GenericMeleeProj(
-				player.sigmaClawWeapon, centerPoint, ProjIds.Sigma2Claw, player,
-				3, 0, 0.375f
-			);
 		}
-		else if (sprite.name == "sigma2_attack_dash") {
-			proj = new GenericMeleeProj(
-				player.sigmaClawWeapon, centerPoint, ProjIds.Sigma2Claw, player,
-				3, 0, 0.375f
-			);
-		}
-		else if (sprite.name == "sigma2_upslash" || sprite.name == "sigma2_downslash") {
-			proj = new GenericMeleeProj(
-				player.sigmaClawWeapon, centerPoint, ProjIds.Sigma2UpDownClaw, player,
-				3, Global.defFlinch, 0.5f
-			);
-		}
-		else if (sprite.name == "sigma2_ladder_attack") {
-			proj = new GenericMeleeProj(
-				player.sigmaSlashWeapon, centerPoint, ProjIds.Sigma2Claw, player,
-				3, 0, 0.25f
-			);
-		}
-		else if (sprite.name == "sigma2_wall_slide_attack") {
-			proj = new GenericMeleeProj(
-				player.sigmaSlashWeapon, centerPoint, ProjIds.Sigma2Claw, player,
-				3, 0, 0.25f
-			);
-		}
-		else if (sprite.name == "sigma2_shoot2") {
-			proj = new GenericMeleeProj(
-				new SigmaElectricBall2Weapon(), centerPoint, ProjIds.Sigma2Ball2, player,
-				6, Global.defFlinch, 1f
-			);
-		}
-		return proj;
+		return null;
 	}
 
 	public void becomeSigma(Point pos, int xDir) {
@@ -787,7 +527,7 @@ public class Sigma : Character {
 	}
 
 	public override Collider getGlobalCollider() {
-		Rect rect = new Rect(0, 0, 18, Sigma.sigmaHeight);
+		Rect rect = new Rect(0, 0, 18, BaseSigma.sigmaHeight);
 		if (sprite.name.Contains("_ra_")) {
 			rect.y2 = 20;
 		}
@@ -835,11 +575,9 @@ public class Sigma : Character {
 		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
 	}
 
+	// This is not used... tecnically.
 	public override Collider getBlockCollider() {
 		var rect = new Rect(0, 0, 18, 34);
-		if (player.isSigma1()) rect = Rect.createFromWH(0, 0, 16, 35);
-		if (player.isSigma2()) rect = Rect.createFromWH(0, 0, 18, 50);
-		if (player.isSigma3()) rect = Rect.createFromWH(0, 0, 23, 55);
 		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
 	}
 
@@ -923,15 +661,5 @@ public class Sigma : Character {
 			return true;
 		}
 		return base.isAttacking();
-	}
-
-	public override string getSprite(string spriteName) {
-		if (player.loadout.sigmaLoadout.sigmaForm == 2) {
-			return "sigma3_" + spriteName;
-		}
-		if (player.loadout.sigmaLoadout.sigmaForm == 1) {
-			return "sigma2_" + spriteName;
-		}
-		return "sigma_" + spriteName;
 	}
 }
