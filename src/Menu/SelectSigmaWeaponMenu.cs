@@ -121,7 +121,9 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 					if (Options.main.killOnLoadoutChange) {
 						Global.level.mainPlayer.forceKill();
 					} else if (!Global.level.mainPlayer.isDead) {
-						Global.level.gameMode.setHUDErrorMessage(Global.level.mainPlayer, "Change will apply on next death", playSound: false);
+						Global.level.gameMode.setHUDErrorMessage(
+							Global.level.mainPlayer, "Change will apply on next death", playSound: false
+						);
 					}
 				}
 			}
@@ -140,116 +142,166 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 			DrawWrappers.DrawTextureHUD(Global.textures["pausemenuload"], 0, 0);
 		}
 
-		Helpers.drawTextStd(TCat.Title, "Sigma Loadout", Global.screenW * 0.5f, 12, Alignment.Center, fontSize: 48);
+		Fonts.drawText(FontType.Yellow, "Sigma Loadout", Global.screenW * 0.5f, 24, Alignment.Center);
 
 		var outlineColor = inGame ? Color.White : Helpers.LoadoutBorderColor;
 		float botOffY = inGame ? 0 : -2;
 
-		int startY = 50;
-		int startX = 30;
-		int startX2 = 120;
+		int startY = 48;
+		int startX = 40;
+		int startX2 = 128;
+		int startY2 = 88;
 		int wepW = 18;
-		int wepH = 20;
+		int wepH = 24;
 
-		float rightArrowPos = Global.screenW - 20;
-		float leftArrowPos = startX2 - 12;
-
-		Global.sprites["cursor"].drawToHUD(0, startX, startY + (selCursorIndex * wepH));
+		float leftArrowPos = startX2 - 16;
+		float rightArrowPos = startX2 + (wepW * 9) - 8;
+		if (selCursorIndex < 2) {
+			Global.sprites["cursor"].drawToHUD(0, startX - 6, startY + (selCursorIndex * wepH) - 1);
+		} else {
+			float curPos2 = startY2 + ((selCursorIndex - 2) * 16);
+			Global.sprites["cursor"].drawToHUD(0, startX - 6, curPos2 + 3);
+		}
 		for (int i = 0; i < 4; i++) {
 			float yPos = startY - 4 + (i * wepH);
+			float yPos2 = startY2 + ((i - 2) * 16);
 
 			if (i == 2) {
-				Helpers.drawTextStd(TCat.Option, "Sigma Form: ", 40, yPos, color: Color.White, fontSize: 24, selected: selCursorIndex == i);
+				Fonts.drawText(FontType.Blue, "Main Body: ", 40, yPos2, selected: selCursorIndex == i);
 				string form = "Commander Sigma";
-				if (cursors[i].index == 1) form = "Neo Sigma";
-				if (cursors[i].index == 2) form = "Dopple Sigma";
-				Helpers.drawTextStd(TCat.Option, form, startX2 - 6, yPos, color: Color.White, fontSize: 24, selected: selCursorIndex == i);
+				if (cursors[i].index == 1) { form = "Neo Sigma"; }
+				if (cursors[i].index == 2) { form = "Dopple Sigma"; }
+				if (cursors[i].index == 3) { form = "Dr. Doppler"; }
+				Fonts.drawText(FontType.Blue, form, startX2 - 6, yPos2, selected: selCursorIndex == i);
 				continue;
 			}
 
 			if (i == 3) {
-				Helpers.drawTextStd(TCat.Option, "Command Mode: ", 40, yPos, color: Color.White, fontSize: 24, selected: selCursorIndex == i);
+				Fonts.drawText(FontType.Blue, "Command Mode: ", 40, yPos2, selected: selCursorIndex == i);
 				string commandModeStr = "Summoner";
 				if (cursors[i].index == 1) commandModeStr = "Puppeteer";
 				if (cursors[i].index == 2) commandModeStr = "Striker";
 				if (cursors[i].index == 3) commandModeStr = "Tag Team";
-				Helpers.drawTextStd(TCat.Option, commandModeStr, startX2 + 8, yPos, color: Color.White, fontSize: 24, selected: selCursorIndex == i);
+				Fonts.drawText(FontType.Blue, commandModeStr, startX2 + 8, yPos2, selected: selCursorIndex == i);
 				continue;
 			}
 
-			Helpers.drawTextStd(TCat.Option, "Maverick " + (i + 1).ToString(), 40, yPos, fontSize: 24, selected: selCursorIndex == i);
-
-			if (Global.frameCount % 60 < 30) {
-				Helpers.drawTextStd(TCat.Option, ">", rightArrowPos, yPos - 2, Alignment.Center, fontSize: 32, selected: selCursorIndex == i);
-				Helpers.drawTextStd(TCat.Option, "<", leftArrowPos, yPos - 2, Alignment.Center, fontSize: 32, selected: selCursorIndex == i);
-			}
+			Fonts.drawText(FontType.Blue, "Maverick " + (i + 1), 40, yPos, selected: selCursorIndex == i);
 
 			for (int j = 0; j < cursors[i].numWeapons(); j++) {
 				int jIndex = j + cursors[i].startOffset();
 				Global.sprites["hud_weapon_icon"].drawToHUD(66 + jIndex, startX2 + (j * wepW), startY + (i * wepH));
-				//Helpers.drawTextStd((j + 1).ToString(), startX2 + (j * wepW), startY + (i * wepH) + 10, Alignment.Center, fontSize: 12);
-				if (cursors[i].index == jIndex) {
-					DrawWrappers.DrawRectWH(startX2 + (j * wepW) - 7, startY + (i * wepH) - 7, 14, 14, false, Helpers.DarkGreen, 1, ZIndex.HUD, false);
-				} else {
-					DrawWrappers.DrawRectWH(startX2 + (j * wepW) - 7, startY + (i * wepH) - 7, 14, 14, true, Helpers.FadedIconColor, 1, ZIndex.HUD, false);
+				if (cursors[i].index != jIndex) {
+					DrawWrappers.DrawRectWH(
+						startX2 + (j * wepW) - 7, startY + (i * wepH) - 7, 14, 14, true,
+						Helpers.FadedIconColor, 1, ZIndex.HUD, false
+					);
 				}
 			}
+
+			if (Global.frameCount % 60 < 30) {
+				Fonts.drawText(FontType.Blue, ">", rightArrowPos, yPos, selected: selCursorIndex == i);
+				Fonts.drawText(FontType.Blue, "<", leftArrowPos, yPos, selected: selCursorIndex == i);
+			}
+
 		}
 
-		int wsy = 160;
+		int wsx = 32;
+		int wsy = 128;
 		if (selCursorIndex < 2) {
-			wsy = 150;
 			int wi = cursors[selCursorIndex].index;
 			int[] strongAgainstIndices = getStrongAgainstFrameIndices(wi);
 			int[] weakAgainstIndices = getWeakAgainstFrameIndices(wi);
 
-			DrawWrappers.DrawRect(25, wsy - 22, Global.screenW - 30, wsy + 30, true, new Color(0, 0, 0, 100), 0.5f, ZIndex.HUD, false, outlineColor: outlineColor);
+			DrawWrappers.DrawRect(
+				wsx, wsy - 8, Global.screenW - wsx, wsy + 48 + 8, true,
+				new Color(0, 0, 0, 100), 1, ZIndex.HUD, false, outlineColor: outlineColor
+			);
+			Global.sprites["hud_maverick"].drawToHUD(wi, startX, wsy);
 
-			Helpers.drawTextStd(TCat.Title, getMaverickName(wi), startX + 56, wsy - 17, Alignment.Left);
-			Helpers.drawTextStd("Strong against: ", 199, wsy, Alignment.Right, style: Text.Styles.Italic, fontSize: 30);
+			Fonts.drawText(FontType.Purple, getMaverickName(wi), startX + 48 + 8, wsy);
+			Fonts.drawText(FontType.Green, "Strong aganist:", startX + 48 + 8, wsy + 16);
 
-			Global.sprites["hud_maverick"].drawToHUD(wi, startX - 1, wsy - 18);
 			for (int i = 0; i < strongAgainstIndices.Length; i++) {
-				if (strongAgainstIndices[i] == 0) continue;
-				Global.sprites["hud_weapon_icon"].drawToHUD(strongAgainstIndices[i], 210 + i * 18, wsy + 5);
+				int drawIndex = strongAgainstIndices[i];
+				if (strongAgainstIndices[i] == 0) {
+					drawIndex = 118;
+				}
+				Global.sprites["hud_weapon_icon"].drawToHUD(
+					drawIndex,
+					startX + 152 + i * 16  + 8,
+					wsy + 18
+				);
 			}
-			Helpers.drawTextStd("Weak against: ", 185, wsy + 15, Alignment.Right, style: Text.Styles.Italic, fontSize: 30);
+			Fonts.drawText(FontType.Green, "Weak against:", startX + 138 + 8, wsy + 32, Alignment.Right);
 			for (int i = 0; i < weakAgainstIndices.Length; i++) {
-				if (weakAgainstIndices[i] == 0) continue;
-				Global.sprites["hud_weapon_icon"].drawToHUD(weakAgainstIndices[i], 210 + i * 18, wsy + 20);
+				int drawIndex = weakAgainstIndices[i];
+				if (weakAgainstIndices[i] == 0) {
+					drawIndex = 118;
+				}
+				Global.sprites["hud_weapon_icon"].drawToHUD(
+					drawIndex,
+					startX + 152 + i * 16  + 8,
+					wsy + 34
+				);
 			}
 		} else if (selCursorIndex == 2) {
-			DrawWrappers.DrawRect(25, wsy - 5 - 17, Global.screenW - 30, wsy + 30 - 17, true, new Color(0, 0, 0, 100), 0.5f, ZIndex.HUD, false, outlineColor: outlineColor);
-			if (cursors[2].index == 0) {
-				Helpers.drawTextStd("Balanced in melee/range and offense/defense.", 40, wsy + 5 - 17, Alignment.Left, style: Text.Styles.Italic, fontSize: 18);
-				Helpers.drawTextStd("Hyper Mode: Wolf Sigma", 40, wsy + 15 - 17, Alignment.Left, style: Text.Styles.Italic, fontSize: 18);
-			}
-			if (cursors[2].index == 1) {
-				Helpers.drawTextStd("Highly offensive with short range.", 40, wsy + 5 - 17, Alignment.Left, style: Text.Styles.Italic, fontSize: 18);
-				Helpers.drawTextStd("Hyper Mode: Viral Sigma", 40, wsy + 15 - 17, Alignment.Left, style: Text.Styles.Italic, fontSize: 18);
-			}
-			if (cursors[2].index == 2) {
-				Helpers.drawTextStd("Highly defensive with ranged attacks.", 40, wsy + 5 - 17, Alignment.Left, style: Text.Styles.Italic, fontSize: 18);
-				Helpers.drawTextStd("Hyper Mode: Kaiser Sigma", 40, wsy + 15 - 17, Alignment.Left, style: Text.Styles.Italic, fontSize: 18);
-			}
+			DrawWrappers.DrawRect(
+				wsx, wsy - 8, Global.screenW - wsx, wsy + 48 + 8, true,
+				new Color(0, 0, 0, 100), 1, ZIndex.HUD, false, outlineColor: outlineColor
+			);
+			string title = cursors[2].index switch {
+				0 => "Commander Sigma",
+				1 => "Neo Sigma",
+				2 => "Dopple Sigma",
+				_ => "ERROR"
+			};
+			string text = cursors[2].index switch {
+				0 => "Sigma original body created by Dr. Cain.\nBalanced in melee/range and offense/defense.",
+				1 => "Agile body create by Serges.\nHighly offensive with short range.",
+				2 => "Battle body created by Dr. Doppler.\nHighly defensive with long range.",
+				_ => "ERROR"
+			};
+			string hypermode = cursors[2].index switch {
+				0 => "Hyper Mode: Wolf Sigma",
+				1 => "Hyper Mode: Viral Sigma",
+				2 or 3 => "Hyper Mode: Kaiser Sigma",
+				_ => "ERROR"
+			};
+			Fonts.drawText(FontType.Purple, title, startX, wsy);
+			Fonts.drawText(FontType.Green, text, startX, wsy + 16);
+			Fonts.drawText(FontType.Orange, hypermode, startX, wsy + 40);
 		} else if (selCursorIndex == 3) {
-			DrawWrappers.DrawRect(25, wsy - 5 - 17, Global.screenW - 30, wsy + 30 - 17, true, new Color(0, 0, 0, 100), 0.5f, ZIndex.HUD, false, outlineColor: outlineColor);
-			if (cursors[3].index == 0) {
-				Helpers.drawTextStd("Once purchased, Mavericks will attack on their own.", 40, wsy + 5 - 17, Alignment.Left, style: Text.Styles.Italic, fontSize: 18);
-				Helpers.drawTextStd("Mavericks cost 3 scrap in this mode.", 40, wsy + 15 - 17, Alignment.Left, style: Text.Styles.Italic, fontSize: 18);
-			}
-			if (cursors[3].index == 1) {
-				Helpers.drawTextStd("Once purchased, Mavericks can be controlled directly.", 40, wsy + 5 - 17, Alignment.Left, style: Text.Styles.Italic, fontSize: 18);
-				Helpers.drawTextStd("Mavericks cost 3 scrap in this mode.", 40, wsy + 15 - 17, Alignment.Left, style: Text.Styles.Italic, fontSize: 18);
-			}
-			if (cursors[3].index == 2) {
-				Helpers.drawTextStd("Mavericks will come in, do one attack, then leave.", 40, wsy + 5 - 17, Alignment.Left, style: Text.Styles.Italic, fontSize: 18);
-				Helpers.drawTextStd("Mavericks don't cost scrap in this mode.", 40, wsy + 15 - 17, Alignment.Left, style: Text.Styles.Italic, fontSize: 18);
-			}
-			if (cursors[3].index == 3) {
-				Helpers.drawTextStd("Once purchased, the Maverick will swap out with Sigma.", 40, wsy + 5 - 17, Alignment.Left, style: Text.Styles.Italic, fontSize: 18);
-				Helpers.drawTextStd("Mavericks cost 5 scrap in this mode.", 40, wsy + 15 - 17, Alignment.Left, style: Text.Styles.Italic, fontSize: 18);
-			}
+			DrawWrappers.DrawRect(
+				wsx, wsy - 8, Global.screenW - wsx, wsy + 48 + 8, true,
+				new Color(0, 0, 0, 100), 1, ZIndex.HUD, false, outlineColor: outlineColor
+			);
+			string cost = cursors[3].index switch {
+				0 => "3 Metal",
+				1 => "3 Metal",
+				2 => "Free",
+				3 => "5 Metal",
+				_ => "ERROR"
+			};
+			string title = cursors[3].index switch {
+				0 => "Summoner",
+				1 => "Puppteer",
+				2 => "Striker",
+				3 => "Tag Team",
+				_ => "ERROR"
+			};
+			string text = cursors[3].index switch {
+				0 => "Mavericks will attack on their own.",
+				1 => "Mavericks need be controlled manually.",
+				2 => "Mavericks will do one attack, then leave.",
+				3 => "Mavericks will swap out with Sigma.",
+				_ => ""
+			};
+			
+			Fonts.drawText(FontType.Purple, title, startX, wsy);
+			Fonts.drawText(FontType.Green, text, startX, wsy + 16);
+			Fonts.drawText(FontType.Orange, "Maverick cost: " + cost, startX, wsy + 40);
+			Fonts.drawText(FontType.Orange, "Maverick cost: " + cost, startX, wsy + 40);
 		}
 
 		//Helpers.drawTextStd(Helpers.menuControlText("Left/Right: Change Weapon/Mode"), Global.screenW * 0.5f, 200 + botOffY, Alignment.Center, fontSize: 18);
