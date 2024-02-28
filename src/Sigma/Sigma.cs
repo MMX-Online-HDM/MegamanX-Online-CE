@@ -118,7 +118,10 @@ public abstract class BaseSigma : Character {
 		bool isStriker = player.isStriker();
 		bool isTagTeam = player.isTagTeam();
 
-		if (isPuppeteer && Options.main.puppeteerHoldOrToggle && !player.input.isHeld(Control.WeaponLeft, player) && !player.input.isHeld(Control.WeaponRight, player)) {
+		if (isPuppeteer && Options.main.puppeteerHoldOrToggle &&
+			!player.input.isHeld(Control.WeaponLeft, player) &&
+			!player.input.isHeld(Control.WeaponRight, player)
+		) {
 			player.changeToSigmaSlot();
 		}
 
@@ -164,7 +167,11 @@ public abstract class BaseSigma : Character {
 
 				changeState(new IssueGlobalCommand(), true);
 			}
-		} else if (player.weapon is SigmaMenuWeapon && player.currentMaverick == null && player.mavericks.Count > 0 && grounded && player.input.isHeld(Control.Up, player) && (isPuppeteer || isSummoner) && charState is not IssueGlobalCommand) {
+		} else if (player.weapon is SigmaMenuWeapon &&
+			player.currentMaverick == null && player.mavericks.Count > 0 &&
+			grounded && player.input.isHeld(Control.Up, player) &&
+			(isPuppeteer || isSummoner) && charState is not IssueGlobalCommand
+		) {
 			if (player.input.isCommandButtonPressed(player)) {
 				foreach (var maverick in player.mavericks) {
 					maverick.changeState(new MExit(maverick.pos, true), ignoreCooldown: true);
@@ -173,8 +180,11 @@ public abstract class BaseSigma : Character {
 			}
 		}
 
-		if (player.weapon is SigmaMenuWeapon && player.currentMaverick == null && player.mavericks.Count > 0 && grounded && (player.input.isHeld(Control.Right, player) || player.input.isHeld(Control.Left, player)) && isSummoner
-			&& charState is not IssueGlobalCommand && charState is not Dash) {
+		if (player.weapon is SigmaMenuWeapon && player.currentMaverick == null &&
+			player.mavericks.Count > 0 && grounded &&
+			(player.input.isHeld(Control.Right, player) || player.input.isHeld(Control.Left, player))
+			&& isSummoner && charState is not IssueGlobalCommand && charState is not Dash
+		) {
 			if (player.input.isCommandButtonPressed(player)) {
 				Global.level.gameMode.hudErrorMsgTime = 0;
 
@@ -191,7 +201,9 @@ public abstract class BaseSigma : Character {
 		}
 
 		if (player.currentMaverick == null && !isTagTeam) {
-			if (player.weapon is MaverickWeapon mw && (!isStriker || mw.cooldown == 0) && (shootPressed || spcPressed)) {
+			if (player.weapon is MaverickWeapon mw &&
+			(!isStriker || mw.cooldown == 0) && (shootPressed || spcPressed)
+		) {
 				if (mw.maverick == null) {
 					if (canAffordMaverick(mw)) {
 						if (!(charState is Idle || charState is Run || charState is Crouch)) return;
@@ -249,10 +261,15 @@ public abstract class BaseSigma : Character {
 
 		bool isSigmaIdle = charState is Idle;
 		if (isTagTeam && shootPressed) {
-			if (isMaverickIdle && player.weapon is SigmaMenuWeapon sw && sw.shootTime == 0 && charState is not Die && tagTeamSwapProgress == 0) {
+			if (isMaverickIdle && player.weapon is SigmaMenuWeapon sw &&
+				sw.shootTime == 0 && charState is not Die && tagTeamSwapProgress == 0
+			) {
 				tagTeamSwapProgress = Global.spf;
 				tagTeamSwapCase = 0;
-			} else if (player.weapon is MaverickWeapon mw && (mw.maverick == null || mw.maverick != player.currentMaverick) && mw.cooldown == 0 && (isSigmaIdle || isMaverickIdle)) {
+			} else if (player.weapon is MaverickWeapon mw &&
+				(mw.maverick == null || mw.maverick != player.currentMaverick) &&
+				mw.cooldown == 0 && (isSigmaIdle || isMaverickIdle)
+			) {
 				if (canAffordMaverick(mw)) {
 					tagTeamSwapProgress = Global.spf;
 					tagTeamSwapCase = 1;
