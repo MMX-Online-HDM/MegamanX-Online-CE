@@ -603,7 +603,7 @@ public class Projectile : Actor {
 			yBytes[0], yBytes[1], yBytes[2], yBytes[3],
 			(byte)player.id,
 			netProjIdByte[0], netProjIdByte[1],
-			(byte)xDirOrAngle
+			isAngle ? (byte)angle : (byte)(xDir + 128)
 		};
 		if (extraData != null && extraData.Length > 0) {
 			bytes.AddRange(extraData);
