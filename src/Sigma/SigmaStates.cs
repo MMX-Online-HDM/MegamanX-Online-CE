@@ -79,3 +79,43 @@ public class CallDownMaverick : CharState {
 		base.onExit(newState);
 	}
 }
+
+public class SigmaBlock : CharState {
+	public BaseSigma sigma;
+
+	public SigmaBlock() : base("block") {
+		immuneToWind = true;
+		superArmor = true;
+		exitOnAirborne = true;
+		attackCtrl = true;
+		normalCtrl = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		bool isHoldingGuard = player.isCrouchHeld();
+		if (!player.isControllingPuppet()) {
+			bool leftGuard = player.input.isHeld(Control.Left, player);
+			bool rightGuard = player.input.isHeld(Control.Right, player);
+
+			if (leftGuard) character.xDir = -1;
+			else if (rightGuard) character.xDir = 1;
+		}
+		if (!isHoldingGuard) {
+			character.changeState(new Idle());
+			return;
+		}
+		if (Global.level.gameMode.isOver) {
+			if (Global.level.gameMode.playerWon(player)) {
+				if (!character.sprite.name.Contains("_win")) {
+					character.changeSpriteFromName("win", true);
+				}
+			} else {
+				if (!character.sprite.name.Contains("lose")) {
+					character.changeSpriteFromName("lose", true);
+				}
+			}
+		}
+	}
+}

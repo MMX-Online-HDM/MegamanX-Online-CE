@@ -252,21 +252,51 @@ public class Sigma3FireProj : Projectile {
 }
 
 public class Sigma3Shoot : CharState {
+	bool hasShot;
+
 	public Sigma3Shoot(Point inputDir) : base(getShootSprite(inputDir)) {
 		airMove = true;
+		canStopJump = true;
 		useDashJumpSpeed = true;
-		landSprite = "shot";
+		landSprite = "shoot";
+		shootSprite = sprite;
 	}
 
 	public override void update() {
 		base.update();
+		Point? shootPOI = character.getFirstPOI();
+		if (!hasShot && shootPOI != null) {
+			hasShot = true;
+			player.sigmaFireWeapon.shootTime = 0.15f;
+			int upDownDir = MathF.Sign(player.input.getInputDir(player).y);
+			float ang = character.getShootXDir() == 1 ? 0 : 180;
+			if (shootSprite.EndsWith("jump_shoot_downdiag")) {
+				ang = character.getShootXDir() == 1 ? 45 : 135;
+			}
+			if (shootSprite.EndsWith("jump_shoot_down")) {
+				ang = 90;
+			}
+			if (ang != 0 && ang != 180) {
+				upDownDir = 0;
+			}
+			character.playSound("sigma3shoot", sendRpc: true);
+			new Sigma3FireProj(
+				player.sigmaFireWeapon, shootPOI.Value,
+				ang, upDownDir, player, player.getNextActorNetId(), sendRpc: true
+			);
+		}
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
 	}
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		if (character.grounded && character.vel.y >= 0) {
+		if (character.grounded) {
 			sprite = "shot";
 			defaultSprite = sprite;
+			shootSprite = sprite;
+			character.changeSprite(sprite, true);
 		}
 	}
 

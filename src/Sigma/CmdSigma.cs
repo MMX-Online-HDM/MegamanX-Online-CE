@@ -38,7 +38,7 @@ public class CmdSigma : BaseSigma {
 			}
 		}
 
-		if (isAttacking()) {
+		if (isAttacking() && charState.normalCtrl && !isSigmaShooting()) {
 			if (isAnimOver() && charState != null && charState is not SigmaSlashState) {
 				changeSprite(getSprite(charState.defaultSprite), true);
 				if (charState is WallSlide && sprite != null) {
@@ -61,11 +61,10 @@ public class CmdSigma : BaseSigma {
 		if (player.weapon is not AssassinBullet) {
 			if (player.input.isPressed(Control.Shoot, player)) {
 				attackPressed = true;
-				framesSinceLastAttack = 0;
-			} else {
-				framesSinceLastAttack++;
+				lastAttackFrame = Global.level.frameCount;
 			}
 		}
+		framesSinceLastAttack = Global.level.frameCount - lastAttackFrame;
 		bool lenientAttackPressed = (attackPressed || framesSinceLastAttack < 5);
 
 		if (lenientAttackPressed && saberCooldown == 0) {

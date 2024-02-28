@@ -278,7 +278,7 @@ public class Damager {
 				character.flattenedTime = 0.5f;
 			}
 
-			if (character.charState is SwordBlock) {
+			if (character.charState is SwordBlock || character.charState is SigmaBlock) {
 				weakness = false;
 			}
 

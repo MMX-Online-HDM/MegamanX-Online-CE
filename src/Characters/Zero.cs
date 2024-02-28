@@ -199,11 +199,10 @@ public class Zero : Character {
 		if (player.weapon is not AssassinBullet) {
 			if (player.input.isPressed(Control.Shoot, player)) {
 				attackPressed = true;
-				framesSinceLastAttack = 0;
-			} else {
-				framesSinceLastAttack++;
+				lastAttackFrame = Global.level.frameCount;
 			}
 		}
+		framesSinceLastAttack = Global.level.frameCount - lastAttackFrame;
 
 		if (chargeButtonHeld() && (
 			player.scrap > 0 || player.isZBusterZero() || player.weapon is AssassinBullet

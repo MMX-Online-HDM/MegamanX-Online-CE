@@ -401,16 +401,27 @@ public abstract class BaseSigma : Character {
 
 	public override bool normalCtrl() {
 		var changedState = base.normalCtrl();
-		if (changedState) {
+		if (changedState || !charState.normalCtrl) {
 			return true;
 		}
-		if (player.isCrouchHeld() && canCrouch() &&
+		if (grounded && player.isCrouchHeld() && canGuard() &&
 			!isAttacking() && noBlockTime == 0 &&
-			charState is not SwordBlock
+			charState is not SigmaBlock
 		) {
-			changeState(new SwordBlock());
+			changeState(new SigmaBlock());
 			return true;
 		}
+		return false;
+	}
+
+	public virtual bool canGuard() {
+		if (isSoftLocked() || isDashing) {
+			return false;
+		}
+		return true;
+	}
+
+	public override bool canCrouch() {
 		return false;
 	}
 

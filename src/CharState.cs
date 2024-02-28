@@ -29,6 +29,7 @@ public class CharState {
 	public bool useGravity = true;
 
 	public bool invincible;
+	public bool stunResistant;
 	public bool superArmor;
 	public bool immuneToWind;
 	public int accuracy;
@@ -651,8 +652,6 @@ public class Crouch : CharState {
 }
 
 public class SwordBlock : CharState {
-	public BaseSigma sigma;
-
 	public SwordBlock() : base("block") {
 		immuneToWind = true;
 		superArmor = true;
@@ -664,34 +663,14 @@ public class SwordBlock : CharState {
 	public override void update() {
 		base.update();
 
-		bool isHoldingGuard;
-		if (!player.isSigma) {
-			isHoldingGuard = player.input.isHeld(Control.WeaponLeft, player) || player.input.isHeld(Control.WeaponRight, player);
-		} else {
-			isHoldingGuard = player.isCrouchHeld();
-		}
-
-		if (!player.isControllingPuppet()) {
-			bool leftGuard = player.input.isHeld(Control.Left, player);
-			bool rightGuard = player.input.isHeld(Control.Right, player);
-
-			if (leftGuard) character.xDir = -1;
-			else if (rightGuard) character.xDir = 1;
-		}
-
+		bool isHoldingGuard = (
+			player.input.isHeld(Control.WeaponLeft, player) ||
+			player.input.isHeld(Control.WeaponRight, player)
+		);
 		if (!isHoldingGuard) {
 			character.changeState(new Idle());
 			return;
 		}
-
-		if (player.input.isPressed(Control.Shoot, player) && character.saberCooldown == 0 && !player.isControllingPuppet()) {
-			if (sigma != null) {
-				sigma.noBlockTime = 0.25f;
-			}
-			character.changeState(new Idle());
-			return;
-		}
-
 		if (Global.level.gameMode.isOver) {
 			if (Global.level.gameMode.playerWon(player)) {
 				if (!character.sprite.name.Contains("_win")) {
@@ -1543,10 +1522,10 @@ public class Stunned : CharState {
 		if (!base.canEnter(character) ||
 			character.stunInvulnTime > 0 ||
 			character.isInvulnerable() ||
-			character.charState is SwordBlock ||
+			character.charState.stunResistant ||
 			character.grabInvulnTime > 0 ||
 			character.isVaccinated() ||
-			character.charState is Frozen ||
+			//character.charState is Frozen ||
 			character.charState is VileMK2Grabbed ||
 			(character as MegamanX).chargedRollingShieldProj == null ||
 			character.charState.invincible

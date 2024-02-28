@@ -190,7 +190,7 @@ public class AI {
 			}
 			if (trainingBehavior == AITrainingBehavior.Crouch) {
 				if (player.isSigma) {
-					character?.changeState(new SwordBlock(), true);
+					character?.changeState(new SigmaBlock(), true);
 					player.press(Control.Down);
 				} else {
 					player.press(Control.Down);

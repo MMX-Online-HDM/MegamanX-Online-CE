@@ -126,6 +126,7 @@ public partial class Character : Actor, IDamagable {
 	// Some things previously in other char files used by multiple characters.
 	public int lastShootPressed;
 	public int lastShootReleased;
+	public int lastAttackFrame = -100;
 	public int framesSinceLastAttack = 1000;
 	public float grabCooldown;
 
@@ -1486,7 +1487,7 @@ public partial class Character : Actor, IDamagable {
 
 	public void freeze(int timeToFreeze = 5) {
 		if ((this as MegamanX)?.chargedRollingShieldProj != null) return;
-		if (charState is SwordBlock) return;
+		if (charState.stunResistant) return;
 		if (charState is Frozen) return;
 
 		changeState(new Frozen(timeToFreeze), true);
@@ -1494,7 +1495,7 @@ public partial class Character : Actor, IDamagable {
 
 	public bool canCrystalize() {
 		if ((this as MegamanX)?.chargedRollingShieldProj != null) return false;
-		if (charState is SwordBlock) return false;
+		if (charState.stunResistant) return false;
 		if (isCrystalized) return false;
 		return true;
 	}
