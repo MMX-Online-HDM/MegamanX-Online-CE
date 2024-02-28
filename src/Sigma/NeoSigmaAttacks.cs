@@ -19,7 +19,7 @@ public class SigmaClawState : CharState {
 	bool isAir;
 	public NeoSigma neoSigma;
 
-	public SigmaClawState(CharState prevCharState, bool isAir) : base(prevCharState.attackSprite, "", "", "") {
+	public SigmaClawState(CharState prevCharState, bool isAir) : base("attack", "", "", "") {
 		this.prevCharState = prevCharState;
 		this.isAir = isAir;
 		useDashJumpSpeed = true;
@@ -81,6 +81,16 @@ public class SigmaClawState : CharState {
 		if (oldState is Dash) {
 			slideVel = character.xDir * character.getDashSpeed();
 		}
+		if (character.grounded) {
+			sprite = "attack";
+		} else {
+			sprite = "attack_air";
+		}
+		if (!String.IsNullOrEmpty(prevCharState.attackSprite)) {
+			sprite = prevCharState.attackSprite;
+		}
+		defaultSprite = sprite;
+		character.changeSprite(sprite, true);
 		character.playSound("sigma2slash", sendRpc: true);
 	}
 }
@@ -114,7 +124,7 @@ public class SigmaElectricBallProj : Projectile {
 
 public class SigmaElectricBallState : CharState {
 	bool fired;
-	public SigmaElectricBallState(string transitionSprite = "") : base("shoot", "", "", transitionSprite) {
+	public SigmaElectricBallState() : base("shoot") {
 		enterSound = "sigma2shoot";
 		invincible = true;
 	}

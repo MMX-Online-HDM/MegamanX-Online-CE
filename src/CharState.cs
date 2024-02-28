@@ -1060,6 +1060,7 @@ public class WallSlide : CharState {
 		this.wallDir = wallDir;
 		this.wallCollider = wallCollider;
 		accuracy = 2;
+		attackCtrl = true;
 	}
 
 	public override void onEnter(CharState oldState) {
@@ -1185,6 +1186,7 @@ public class LadderClimb : CharState {
 		this.ladder = ladder;
 		this.snapX = MathF.Round(snapX);
 		this.incY = incY;
+		attackCtrl = true;
 	}
 
 	public override void onEnter(CharState oldState) {

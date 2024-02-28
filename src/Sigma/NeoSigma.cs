@@ -32,7 +32,7 @@ public class NeoSigma : BaseSigma {
 		Helpers.decrementTime(ref sigmaUpSlashCooldown);
 		Helpers.decrementTime(ref sigmaDownSlashCooldown);
 		// After update stuff.
-		if (isAttacking() && charState.normalCtrl) {
+		if (isAttacking() && charState is WallSlide or LadderClimb) {
 			if (isAnimOver() && charState != null && charState is not SigmaClawState) {
 				changeSprite(getSprite(charState.defaultSprite), true);
 				if (charState is WallSlide && sprite != null) {
@@ -45,7 +45,7 @@ public class NeoSigma : BaseSigma {
 	}
 
 	public override bool attackCtrl() {
-		if (isAttacking() || isInvulnerableAttack()) {
+		if (isInvulnerableAttack() || player.weapon is MaverickWeapon) {
 			return false;
 		}
 		if (player.weapon is MaverickWeapon) {
@@ -94,7 +94,7 @@ public class NeoSigma : BaseSigma {
 			return true;
 		}
 		if (grounded && player.input.isPressed(Control.Special1, player) &&
-			player.sigmaAmmo >= 16 && flag == null
+			flag == null && player.sigmaAmmo >= 16
 		) {
 			if (player.sigmaAmmo < 32) {
 				player.sigmaAmmo -= 16;
