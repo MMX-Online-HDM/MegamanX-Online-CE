@@ -31,7 +31,7 @@ public class NeoSigma : BaseSigma {
 		// Cooldowns.
 		Helpers.decrementTime(ref sigmaUpSlashCooldown);
 		Helpers.decrementTime(ref sigmaDownSlashCooldown);
-		// After update stuff.
+		// For ladder and slide attacks.
 		if (isAttacking() && charState is WallSlide or LadderClimb) {
 			if (isAnimOver() && charState != null && charState is not SigmaClawState) {
 				changeSprite(getSprite(charState.defaultSprite), true);

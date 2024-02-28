@@ -29,7 +29,7 @@ public class Doppma : BaseSigma {
 		player.sigmaFireWeapon.update();
 		Helpers.decrementTime(ref sigma3FireballCooldown);
 		Helpers.decrementTime(ref sigma3ShieldCooldown);
-
+		// For ladder and slide shoot.
 		if (charState is WallSlide or LadderClimb &&
 			!string.IsNullOrEmpty(charState?.shootSprite) &&
 			sprite?.name?.EndsWith(charState.shootSprite) == true

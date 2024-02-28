@@ -27,9 +27,10 @@ public class CmdSigma : BaseSigma {
 		if (!ownedByLocalPlayer) {
 			return;
 		}
+		// Cooldowns.
 		Helpers.decrementTime(ref leapSlashCooldown);
 		Helpers.decrementTime(ref sigmaAmmoRechargeCooldown);
-
+		// Ammo reload.
 		if (sigmaAmmoRechargeCooldown == 0) {
 			Helpers.decrementTime(ref sigmaAmmoRechargeTime);
 			if (sigmaAmmoRechargeTime == 0) {
@@ -37,7 +38,7 @@ public class CmdSigma : BaseSigma {
 				sigmaAmmoRechargeTime = sigmaHeadBeamRechargePeriod;
 			}
 		}
-
+		// For ladder and slide attacks.
 		if (isAttacking() && charState is WallSlide or LadderClimb && !isSigmaShooting()) {
 			if (isAnimOver() && charState != null && charState is not SigmaSlashState) {
 				changeSprite(getSprite(charState.defaultSprite), true);
