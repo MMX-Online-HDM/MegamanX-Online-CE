@@ -219,6 +219,6 @@ public class CustomMatchSettingsMenu : IMainMenu {
 			i++;
 		}
 
-		Helpers.drawTextStd(TCat.BotHelp, "Left/Right: Change setting, [Z]: Back", Global.screenW * 0.5f, 200, Alignment.Center, fontSize: 24);
+		Helpers.drawTextStd(TCat.BotHelp, "Left/Right: Change setting, [BACK]: Back", Global.screenW * 0.5f, 200, Alignment.Center, fontSize: 24);
 	}
 }

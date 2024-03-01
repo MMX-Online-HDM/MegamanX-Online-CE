@@ -502,6 +502,7 @@ public enum RPCToggleType {
 	ReviveX,
 	StartRev,
 	StopRev,
+	ReviveSigma
 }
 
 public class RPCPlayerToggle : RPC {
@@ -565,6 +566,10 @@ public class RPCPlayerToggle : RPC {
 		} else if (toggleId == RPCToggleType.StopRev) {
 			if (player.character is Axl axl) {
 				axl.isNonOwnerRev = false;
+			}
+		} else if (toggleId == RPCToggleType.ReviveSigma) {
+			if (player.character is BaseSigma) {
+				player.reviveSigma(player.character.pos);
 			}
 		}
 	}

@@ -70,6 +70,6 @@ public class PreOptionsMenu : IMainMenu {
 		Fonts.drawText(menuFont, "Axl settings", startX, optionPos[6], selected: selectY == 6);
 		Fonts.drawText(menuFont, "Sigma settings", startX, optionPos[7], selected: selectY == 7);
 
-		Fonts.drawTextEX(FontType.Grey, "[X]: Choose, [Z]: Back", Global.halfScreenW, 198, Alignment.Center);
+		Fonts.drawTextEX(FontType.Grey, "[OK]: Choose, [BACK]: Back", Global.halfScreenW, 198, Alignment.Center);
 	}
 }

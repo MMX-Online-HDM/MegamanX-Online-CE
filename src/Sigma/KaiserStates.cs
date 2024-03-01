@@ -16,7 +16,7 @@ public class KaiserSigmaBaseState : CharState {
 
 	public override void update() {
 		base.update();
-		character.stopMoving();
+		character.stopMovingWeak();
 
 		if (this is not KaiserSigmaHoverState &&
 			this is not KaiserSigmaFallState &&
@@ -41,25 +41,6 @@ public class KaiserSigmaBaseState : CharState {
 				kaiserSigma.kaiserWinTauntOnce = true;
 				character.changeState(new KaiserSigmaTauntState(), true);
 			}
-		}
-
-		if (showExhaust) {
-			kaiserSigma.kaiserExhaustL.visible = true;
-			kaiserSigma.kaiserExhaustR.visible = true;
-			kaiserSigma.kaiserExhaustL.changePos(character.getFirstPOIOrDefault("exhaustL"));
-			kaiserSigma.kaiserExhaustR.changePos(character.getFirstPOIOrDefault("exhaustR"));
-			if (exhaustMoveDir != 0) {
-				kaiserSigma.kaiserExhaustL.changeSpriteIfDifferent("sigma3_kaiser_exhaust2", true);
-				kaiserSigma.kaiserExhaustR.changeSpriteIfDifferent("sigma3_kaiser_exhaust2", true);
-				kaiserSigma.kaiserExhaustL.xDir = -exhaustMoveDir;
-				kaiserSigma.kaiserExhaustR.xDir = -exhaustMoveDir;
-			} else {
-				kaiserSigma.kaiserExhaustL.changeSpriteIfDifferent("sigma3_kaiser_exhaust", true);
-				kaiserSigma.kaiserExhaustR.changeSpriteIfDifferent("sigma3_kaiser_exhaust", true);
-			}
-		} else {
-			kaiserSigma.kaiserExhaustL.visible = false;
-			kaiserSigma.kaiserExhaustR.visible = false;
 		}
 
 		if (canShootBallistics) {
@@ -150,7 +131,7 @@ public class KaiserSigmaBaseState : CharState {
 }
 
 public class KaiserSigmaIdleState : KaiserSigmaBaseState {
-	public KaiserSigmaIdleState() : base("kaiser_idle") {
+	public KaiserSigmaIdleState() : base("idle") {
 		canShootBallistics = true;
 		immuneToWind = true;
 	}
@@ -188,7 +169,7 @@ public class KaiserSigmaIdleState : KaiserSigmaBaseState {
 }
 
 public class KaiserSigmaTauntState : KaiserSigmaBaseState {
-	public KaiserSigmaTauntState() : base("kaiser_taunt") {
+	public KaiserSigmaTauntState() : base("taunt") {
 		immuneToWind = true;
 	}
 
@@ -202,7 +183,7 @@ public class KaiserSigmaTauntState : KaiserSigmaBaseState {
 }
 
 public class KaiserSigmaHoverState : KaiserSigmaBaseState {
-	public KaiserSigmaHoverState() : base("kaiser_hover") {
+	public KaiserSigmaHoverState() : base("hover") {
 		immuneToWind = true;
 		showExhaust = true;
 		canShootBallistics = true;
@@ -254,7 +235,7 @@ public class KaiserSigmaHoverState : KaiserSigmaBaseState {
 
 public class KaiserSigmaFallState : KaiserSigmaBaseState {
 	public float velY;
-	public KaiserSigmaFallState() : base("kaiser_fall") {
+	public KaiserSigmaFallState() : base("fall") {
 		immuneToWind = true;
 	}
 
@@ -309,7 +290,7 @@ public class KaiserSigmaVirusState : CharState {
 
 	public KaiserSigma kaiserSigma;
 
-	public KaiserSigmaVirusState() : base("kaiser_virus") {
+	public KaiserSigmaVirusState() : base("virus") {
 		immuneToWind = true;
 	}
 
@@ -317,7 +298,7 @@ public class KaiserSigmaVirusState : CharState {
 		if (!isLerpingBack) {
 			this.isRelocating = isRelocating;
 			isLerpingBack = true;
-			character.changeSpriteFromName("kaiser_virus_return", true);
+			character.changeSpriteFromName("virus_return", true);
 			kaiserSigmaDestPos = destPos;
 			if (!isRelocating) {
 				character.xDir = origXDir;
@@ -356,7 +337,7 @@ public class KaiserSigmaVirusState : CharState {
 				};
 				character.visible = false;
 				character.changePos(kaiserSigmaDestPos);
-				character.changeSpriteFromName("kaiser_idle", true);
+				character.changeSpriteFromName("idle", true);
 			}
 
 			// Note: Code to shrink is in Anim.cs
@@ -449,7 +430,7 @@ public class KaiserSigmaBeamState : KaiserSigmaBaseState {
 	bool isDown;
 	SoundWrapper chargeSound;
 	SoundWrapper beamSound;
-	public KaiserSigmaBeamState(bool isDown) : base(isDown ? "kaiser_shoot" : "kaiser_shoot2") {
+	public KaiserSigmaBeamState(bool isDown) : base(isDown ? "shoot" : "shoot2") {
 		immuneToWind = true;
 		canShootBallistics = true;
 		this.isDown = isDown;
@@ -760,7 +741,7 @@ public class KaiserSigmaRevive : CharState {
 	int state = 0;
 	public ExplodeDieEffect explodeDieEffect;
 	public Point spawnPoint;
-	public KaiserSigmaRevive(ExplodeDieEffect explodeDieEffect, Point spawnPoint) : base("kaiser_enter") {
+	public KaiserSigmaRevive(ExplodeDieEffect explodeDieEffect, Point spawnPoint) : base("enter") {
 		this.explodeDieEffect = explodeDieEffect;
 		this.spawnPoint = spawnPoint;
 	}
@@ -823,21 +804,30 @@ public class KaiserSigmaRevive : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.syncScale = true;
-		if (character is BaseSigma sigma) {
-			sigma.isHyperSigma = true;
-		}
 		character.frameIndex = 0;
 		character.frameSpeed = 0;
 		//character.immuneToKnockback = true;
 		character.alpha = 0;
 		player.sigmaAmmo = player.sigmaMaxAmmo;
 		KaiserSigma kaiserSigma = character as KaiserSigma;
-
+		if (!player.ownedByLocalPlayer) {
+			return;
+		}
 		if (kaiserSigma.kaiserExhaustL == null) {
-			kaiserSigma.kaiserExhaustL = new Anim(character.pos, "sigma3_kaiser_exhaust", character.xDir, player.getNextActorNetId(), false, sendRpc: true) { visible = false };
+			kaiserSigma.kaiserExhaustL = new Anim(
+				character.pos, "sigma3_kaiser_exhaust", character.xDir,
+				player.getNextActorNetId(), false, sendRpc: true
+			) {
+				visible = false
+			};
 		}
 		if (kaiserSigma.kaiserExhaustR == null) {
-			kaiserSigma.kaiserExhaustR = new Anim(character.pos, "sigma3_kaiser_exhaust", character.xDir, player.getNextActorNetId(), false, sendRpc: true) { visible = false };
+			kaiserSigma.kaiserExhaustR = new Anim(
+				character.pos, "sigma3_kaiser_exhaust", character.xDir,
+				player.getNextActorNetId(), false, sendRpc: true
+			) {
+				visible = false
+			};
 		}
 	}
 }

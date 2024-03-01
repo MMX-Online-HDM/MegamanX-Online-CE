@@ -228,22 +228,30 @@ public class SelectWeaponMenu : IMainMenu {
 				for (int j = 0; j < 2; j++) {
 					if (j == 0) {
 						Global.sprites["hud_weapon_icon"].drawToHUD(0, startX2 + (j * wepW), startY + (i * wepH));
-						Helpers.drawWeaponSlotSymbol(startX2 + (j * wepW) - 8, startY + (i * wepH) - 8, "S");
 					} else if (j == 1) {
 						Global.sprites["hud_weapon_icon"].drawToHUD(102, startX2 + (j * wepW), startY + (i * wepH));
 					}
 
-					if (cursors[3].index == j) {
-						DrawWrappers.DrawRectWH(startX2 + (j * wepW) - 7, startY + (i * wepH) - 7, 14, 14, false, Helpers.DarkGreen, 1, ZIndex.HUD, false);
-					} else {
-						DrawWrappers.DrawRectWH(startX2 + (j * wepW) - 7, startY + (i * wepH) - 7, 14, 14, true, Helpers.FadedIconColor, 1, ZIndex.HUD, false);
+					if (cursors[3].index != j) {
+						DrawWrappers.DrawRectWH(
+							startX2 + (j * wepW) - 7, startY + (i * wepH) - 7, 14, 14,
+							true, Helpers.FadedIconColor, 1, ZIndex.HUD, false
+						);
 					}
 				}
-
+				Helpers.drawWeaponSlotSymbol(
+					startX2 - 8, startY + (i * wepH) - 8, "²"
+				);
+				if (cursors[3].index != 0) {
+					DrawWrappers.DrawRectWH(
+						startX2 + 4, startY + (i * wepH) + 3, 4, 5,
+						true, Helpers.FadedIconColor, 1, ZIndex.HUD, false
+					);
+				}
 				break;
 			}
 
-			Fonts.drawText(FontType.Blue,"Slot " + (i + 1).ToString(), 40, yPos + 2, selected: selCursorIndex == i);
+			Fonts.drawText(FontType.Blue, "Slot " + (i + 1).ToString(), 40, yPos + 2, selected: selCursorIndex == i);
 
 			if (Global.frameCount % 60 < 30) {
 				Fonts.drawText(
@@ -349,8 +357,8 @@ public class SelectWeaponMenu : IMainMenu {
 		Helpers.drawTextStd(Helpers.menuControlText("Left/Right: Change Weapon"), Global.screenW * 0.5f, 195 + botOffY, Alignment.Center, fontSize: 16);
 		Helpers.drawTextStd(Helpers.menuControlText("Up/Down: Change Slot"), Global.screenW * 0.5f, 200 + botOffY, Alignment.Center, fontSize: 16);
 		Helpers.drawTextStd(Helpers.menuControlText("WeaponL/WeaponR: Quick cycle X1/X2/X3 weapons"), Global.screenW * 0.5f, 205 + botOffY, Alignment.Center, fontSize: 16);
-		string helpText = Helpers.menuControlText("[Z]: Back, [X]: Confirm");
-		if (!inGame) helpText = Helpers.menuControlText("[Z]: Save and back");
+		string helpText = Helpers.menuControlText("[BACK]: Back, [OK]: Confirm");
+		if (!inGame) helpText = Helpers.menuControlText("[BACK]: Save and back");
 		Helpers.drawTextStd(helpText, Global.screenW * 0.5f, 210 + botOffY, Alignment.Center, fontSize: 16);
 		*/
 		if (!string.IsNullOrEmpty(error)) {
@@ -362,7 +370,7 @@ public class SelectWeaponMenu : IMainMenu {
 			Fonts.drawText(FontType.Red, "ERROR", Global.screenW / 2, top - 20, alignment: Alignment.Center);
 			Fonts.drawText(FontType.RedishOrange, error, Global.screenW / 2, top, alignment: Alignment.Center);
 			Fonts.drawTextEX(
-				FontType.Grey, Helpers.controlText("Press [X] to continue"),
+				FontType.Grey, Helpers.controlText("Press [OK] to continue"),
 				Global.screenW / 2, 20 + top, alignment: Alignment.Center
 			);
 		}

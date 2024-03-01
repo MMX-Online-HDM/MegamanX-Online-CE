@@ -53,6 +53,6 @@ public class ChatHistoryMenu : IMainMenu {
 			y++;
 		}
 
-		Fonts.drawTextEX(FontType.Grey, "[UP]/[DOWN]: Scroll, [Z]: Back", Global.halfScreenW, 210, Alignment.Center);
+		Fonts.drawTextEX(FontType.Grey, "[MUP]/[MDOWN]: Scroll, [BACK]: Back", Global.halfScreenW, 210, Alignment.Center);
 	}
 }

@@ -99,9 +99,9 @@ public class SelectVileArmorMenu : IMainMenu {
 			optionPosX, optionPosY[3]
 		);
 
-		Fonts.drawTextEX(FontType.Grey, "[LEFT]/[RIGHT]: Change Armor", 40, 188);
+		Fonts.drawTextEX(FontType.Grey, "[MLEFT]/[MRIGHT]: Change Armor", 40, 188);
 		Fonts.drawTextEX(FontType.Grey,
-			"[X]: Upgrade, [C]: Unupgrade, [Z]: Back", 40, 198
+			"[OK]: Upgrade, [ALT]: Unupgrade, [BACK]: Back", 40, 198
 		);
 	}
 

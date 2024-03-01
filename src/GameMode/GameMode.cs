@@ -1725,7 +1725,7 @@ public class GameMode {
 
 		if (weapon is SigmaMenuWeapon) {
 			if ((level.mainPlayer.isPuppeteer() || level.mainPlayer.isSummoner()) && level.mainPlayer.currentMaverickCommand == MaverickAIBehavior.Follow) {
-				Helpers.drawWeaponSlotSymbol(x - 8, y - 8, "F");
+				Helpers.drawWeaponSlotSymbol(x - 8, y - 8, "ª");
 			}
 
 			/*
@@ -2457,7 +2457,7 @@ public class GameMode {
 
 		if (level.mainPlayer.character == null && level.mainPlayer.readyTextOver) {
 			string respawnStr = (level.mainPlayer.respawnTime > 0) ? "Respawn in " + Math.Round(level.mainPlayer.respawnTime).ToString() :
-				Helpers.controlText("Press [X] to respawn");
+				Helpers.controlText("Press [OK] to respawn");
 
 			if (level.mainPlayer.eliminated()) {
 				Helpers.drawTextStd(TCat.HUD, "You were eliminated!", Global.screenW / 2, -15 + Global.screenH / 2, Alignment.Center);
@@ -2465,11 +2465,11 @@ public class GameMode {
 			} else if (level.mainPlayer.canReviveVile()) {
 				if (level.mainPlayer.lastDeathWasVileMK2) {
 					Helpers.drawTextStd(TCat.HUD, respawnStr, Global.screenW / 2, -10 + Global.screenH / 2, Alignment.Center);
-					string reviveText = Helpers.controlText("[D]: Revive as Vile V (5 scrap)");
+					string reviveText = Helpers.controlText("[SPC]: Revive as Vile V (5 scrap)");
 					Helpers.drawTextStd(TCat.HUD, reviveText, Global.screenW / 2, 10 + Global.screenH / 2, Alignment.Center, fontSize: 24);
 				} else {
 					Helpers.drawTextStd(TCat.HUD, respawnStr, Global.screenW / 2, -10 + Global.screenH / 2, Alignment.Center);
-					string reviveText = Helpers.controlText("[D]: Revive as MK-II (5 scrap)");
+					string reviveText = Helpers.controlText("[SPC]: Revive as MK-II (5 scrap)");
 					Helpers.drawTextStd(TCat.HUD, reviveText, Global.screenW / 2, 10 + Global.screenH / 2, Alignment.Center, fontSize: 24);
 					string reviveText2 = Helpers.controlText("[CMD]: Revive as MK-V (5 scrap)");
 					Helpers.drawTextStd(TCat.HUD, reviveText2, Global.screenW / 2, 22 + Global.screenH / 2, Alignment.Center, fontSize: 24);

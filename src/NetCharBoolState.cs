@@ -79,6 +79,9 @@ public partial class Character {
 			return (character as MegamanX)?.isHyperX == true;
 		});
 		isHyperSigmaBS = new NetCharBoolState(this, 7, NetCharBoolStateNum.One, (character) => { 
+			if (character is KaiserSigma) {
+				return true;
+			}
 			return (character as BaseSigma)?.isHyperSigma == true;
 		});
 	}

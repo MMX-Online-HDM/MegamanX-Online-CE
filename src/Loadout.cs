@@ -13,7 +13,7 @@ public class XLoadout {
 	[ProtoMember(1)] public int weapon1;    //0 indexed
 	[ProtoMember(2)] public int weapon2;
 	[ProtoMember(3)] public int weapon3;
-	[ProtoMember(4)] public int melee;
+	[ProtoMember(4)] public int melee = 1;
 
 	public List<int> getXWeaponIndices() {
 		return new List<int>() { weapon1, weapon2, weapon3 };

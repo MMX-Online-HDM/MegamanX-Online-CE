@@ -1279,13 +1279,13 @@ public class HostMenu : IMainMenu {
 		string msg;
 		string extraMsg = "";
 		if (!string.IsNullOrEmpty(menuOptions[selectArrowPosY].configureMessage)) {
-			extraMsg = "[C]: " + menuOptions[selectArrowPosY].configureMessage + ", ";
+			extraMsg = "[ALT]: " + menuOptions[selectArrowPosY].configureMessage + ", ";
 		}
 		if (!inGame) {
-			if (isOffline) msg = "[X]: Next, [Z]: Back";
-			else msg = "[X]: Next, " + extraMsg + "[Z]: Back";
+			if (isOffline) msg = "[OK]: Next, [BACK]: Back";
+			else msg = "[OK]: Next, " + extraMsg + "[BACK]: Back";
 		} else {
-			msg = "[X]: Next, [ESC]: Menu";
+			msg = "[OK]: Next, [ESC]: Menu";
 		}
 		Fonts.drawTextEX(
 			FontType.Grey, msg + "\nLeft/Right: Change setting",
@@ -1302,7 +1302,7 @@ public class HostMenu : IMainMenu {
 				alignment: Alignment.Center
 			);
 			Fonts.drawTextEX(
-				FontType.Red, "Press [X] to continue",
+				FontType.Red, "Press [OK] to continue",
 				Global.screenW * 0.5f, 20 + top, alignment: Alignment.Center
 			);
 		}

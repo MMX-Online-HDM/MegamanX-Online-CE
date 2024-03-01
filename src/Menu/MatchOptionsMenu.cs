@@ -388,7 +388,7 @@ public class MatchOptionsMenu : IMainMenu {
 		if (selectY == 5 || selectY == 6 || selectY == 7 || selectY == 9) {
 			Helpers.drawTextStd(TCat.BotHelp, "Left/Right: Change", Global.halfScreenW, 210, Alignment.Center, fontSize: 24);
 		}
-		Helpers.drawTextStd(TCat.BotHelp, "[X]: Select, [Z]: Back", Global.halfScreenW, 200, Alignment.Center, fontSize: 24);
+		Helpers.drawTextStd(TCat.BotHelp, "[OK]: Select, [BACK]: Back", Global.halfScreenW, 200, Alignment.Center, fontSize: 24);
 	}
 
 	public Player playerToMute {

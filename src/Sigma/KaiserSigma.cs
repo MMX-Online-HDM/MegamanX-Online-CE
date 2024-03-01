@@ -18,13 +18,54 @@ public partial class KaiserSigma : Character {
 	public float kaiserHoverTime;
 	public float kaiserMaxHoverTime = 4;
 
+	public string lastHyperSigmaSprite;
+	public int lastHyperSigmaFrameIndex;
+	public int lastHyperSigmaXDir;
+
 	public KaiserSigma(
 		Player player, float x, float y, int xDir, bool isVisible,
-		ushort? netId, bool ownedByLocalPlayer, bool isWarpIn = true
+		ushort? netId, bool ownedByLocalPlayer, bool isWarpIn = false
 	) : base(
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, false, false
 	) {
 		// Spawn code.
+	}
+
+	public override void update() {
+		base.update();
+
+		if (charState is not Die) {
+			lastHyperSigmaSprite = sprite?.name;
+			lastHyperSigmaFrameIndex = frameIndex;
+			lastHyperSigmaXDir = xDir;
+		}
+
+		if (!ownedByLocalPlayer) {
+			return;
+		}
+
+		if (charState is KaiserSigmaBaseState ksState && ksState.showExhaust) {
+			kaiserExhaustL.visible = true;
+			kaiserExhaustR.visible = true;
+			kaiserExhaustL.changePos(getFirstPOIOrDefault("exhaustL"));
+			kaiserExhaustR.changePos(getFirstPOIOrDefault("exhaustR"));
+			if (ksState.exhaustMoveDir != 0) {
+				kaiserExhaustL.changeSpriteIfDifferent("sigma3_kaiser_exhaust2", true);
+				kaiserExhaustR.changeSpriteIfDifferent("sigma3_kaiser_exhaust2", true);
+				kaiserExhaustL.xDir = -ksState.exhaustMoveDir;
+				kaiserExhaustR.xDir = -ksState.exhaustMoveDir;
+			} else {
+				kaiserExhaustL.changeSpriteIfDifferent("sigma3_kaiser_exhaust", true);
+				kaiserExhaustR.changeSpriteIfDifferent("sigma3_kaiser_exhaust", true);
+			}
+		} else {
+			kaiserExhaustL.visible = false;
+			kaiserExhaustR.visible = false;
+		}
+	}
+
+	public override bool normalCtrl() {
+		return false;
 	}
 
 	public override Collider getGlobalCollider() {
@@ -147,5 +188,24 @@ public partial class KaiserSigma : Character {
 			return pos.addxy(13 * xDir, -95);
 		}
 		return getCenterPos();
+	}
+
+	public override string getSprite(string spriteName) {
+		return "sigma3_kaiser_" + spriteName;
+	}
+
+	public override Projectile getProjFromHitbox(Collider collider, Point centerPoint) {
+		if (sprite.name.Contains("sigma3_kaiser_fall") && collider.isAttack()) {
+			return new GenericMeleeProj(
+				new KaiserStompWeapon(player), centerPoint, ProjIds.Sigma3KaiserStomp, player,
+				damage: 12 * getKaiserStompDamage(), flinch: Global.defFlinch, hitCooldown: 1f
+			);
+		} else if (sprite.name.StartsWith("sigma3_kaiser_") && collider.name == "body") {
+			return new GenericMeleeProj(
+				new Weapon(), centerPoint, ProjIds.Sigma3KaiserSuit, player,
+				damage: 0, flinch: 0, hitCooldown: 1, isShield: true
+			);
+		}
+		return null;
 	}
 }

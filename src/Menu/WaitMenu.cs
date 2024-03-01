@@ -229,14 +229,14 @@ public class WaitMenu : IMainMenu {
 
 		if (!Global.serverClient.isHost) {
 			Fonts.drawTextEX(
-				FontType.Grey, "[Z]: Leave, [C]: Refresh",
+				FontType.Grey, "[BACK]: Leave, [ALT]: Refresh",
 				Global.halfScreenW, 190, Alignment.Center
 			);
 		} else {
-			string helpLegend = "[X]: Start, [Z]: Leave, [C]: Refresh";
+			string helpLegend = "[OK]: Start, [BACK]: Leave, [ALT]: Refresh";
 			if (recreateWaitTime > 0) {
 				helpLegend = string.Format(
-					"Can Start in {0}s, [Z]: Leave, [C]: Refresh",
+					"Can Start in {0}s, [BACK]: Leave, [ALT]: Refresh",
 					MathF.Ceiling(recreateWaitTime)
 				);
 			}

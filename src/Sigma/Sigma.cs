@@ -354,11 +354,7 @@ public abstract class BaseSigma : Character {
 				becomeMaverick(mw.maverick);
 			}
 		}
-		if (isHyperSigmaBS.getValue() && player.isSigma3() && charState is not Die) {
-			lastHyperSigmaSprite = sprite?.name;
-			lastHyperSigmaFrameIndex = frameIndex;
-			lastHyperSigmaXDir = xDir;
-		}
+
 		if (isHyperSigmaBS.getValue() && player.isSigma2() && charState is not Die) {
 			lastHyperSigmaSprite = sprite?.name;
 			lastHyperSigmaFrameIndex = frameIndex;
@@ -444,17 +440,7 @@ public abstract class BaseSigma : Character {
 
 	// This can run on both owners and non-owners. So data used must be in sync
 	public override Projectile getProjFromHitbox(Collider collider, Point centerPoint) {
-		if (sprite.name.Contains("sigma3_kaiser_fall") && collider.isAttack()) {
-			return new GenericMeleeProj(
-				new KaiserStompWeapon(player), centerPoint, ProjIds.Sigma3KaiserStomp, player,
-				damage: 12 * getKaiserStompDamage(), flinch: Global.defFlinch, hitCooldown: 1f
-			);
-		} else if (sprite.name.StartsWith("sigma3_kaiser_") && collider.name == "body") {
-			return new GenericMeleeProj(
-				new Weapon(), centerPoint, ProjIds.Sigma3KaiserSuit, player,
-				damage: 0, flinch: 0, hitCooldown: 1, isShield: true
-			);
-		} else if (sprite.name.Contains("sigma_block") && !collider.isHurtBox()) {
+		if (sprite.name.Contains("sigma_block") && !collider.isHurtBox()) {
 			return new GenericMeleeProj(
 				player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player,
 				0, 0, 0, isDeflectShield: true

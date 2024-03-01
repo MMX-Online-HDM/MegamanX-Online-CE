@@ -194,7 +194,7 @@ public class MainMenu : IMainMenu {
 		Fonts.drawText(FontType.BlueMenu, "Quit", startX, optionPos[6].y, selected: selectY == 6);
 
 		Fonts.drawTextEX(
-			FontType.Grey, "[UP]/[DOWN]: Change selection, [X]: Choose",
+			FontType.Grey, "[MUP]/[MDOWN]: Change selection, [OK]: Choose",
 			Global.screenW / 2, Global.screenH - 12, Alignment.Center
 		);
 

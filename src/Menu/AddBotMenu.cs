@@ -112,7 +112,7 @@ public class AddBotMenu : IMainMenu {
 		);
 
 		Fonts.drawTextEX(
-			FontType.Grey, "Left/Right: Change, [X]: Add, [Z]: Back",
+			FontType.Grey, "Left/Right: Change, [OK]: Add, [BACK]: Back",
 			Global.screenW * 0.5f, 200, Alignment.Center
 		);
 	}

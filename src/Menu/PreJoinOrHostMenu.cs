@@ -201,6 +201,6 @@ public class PreJoinOrHostMenu : IMainMenu {
 
 		Fonts.drawText(FontType.DarkBlue, "P2P", startX, optionPos[0].y, selected: selectY == 0);
 
-		Fonts.drawTextEX(FontType.Grey, "[X]: Choose, [Z]: Back", Global.halfScreenW, 206, Alignment.Center);
+		Fonts.drawTextEX(FontType.Grey, "[OK]: Choose, [BACK]: Back", Global.halfScreenW, 206, Alignment.Center);
 	}
 }

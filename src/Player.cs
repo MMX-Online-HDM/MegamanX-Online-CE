@@ -1691,14 +1691,39 @@ public partial class Player {
 		} else if (isSigma2()) {
 			explodeDieEffect.changeSprite("sigma2_revive");
 			character.changeState(new ViralSigmaRevive(explodeDieEffect), true);
-		} else if (isSigma3()) {
+		}
+		else if (character is Doppma) {
+			character.destroySelf();
+			KaiserSigma kaiserSigma = new KaiserSigma(
+				this, spawnPoint.x, spawnPoint.y, character.xDir, true,
+				character.netId, character.ownedByLocalPlayer
+			);
+			character = kaiserSigma;
+			character.changeSprite("sigma3_kaiser_enter", true);
 			explodeDieEffect.changeSprite("sigma3_revive");
 			if (Global.level.is1v1() && spawnPoint.isZero()) {
-				var closestSpawn = Global.level.spawnPoints.OrderBy(s => s.pos.distanceTo(character.pos)).FirstOrDefault();
+				var closestSpawn = Global.level.spawnPoints.OrderBy(
+					s => s.pos.distanceTo(character.pos)
+				).FirstOrDefault();
 				spawnPoint = closestSpawn?.pos ?? new Point(Global.level.width / 2, character.pos.y);
 			}
 			character.changeState(new KaiserSigmaRevive(explodeDieEffect, spawnPoint), true);
 		}
+		RPC.playerToggle.sendRpc(id, RPCToggleType.ReviveSigma);
+	}
+
+	public void reviveSigmaNonOwner(Point spawnPoint) {
+		clearSigmaWeapons();
+		maxHealth = 32 * getHealthModifier();
+		if (character is Doppma) {
+			character.destroySelf();
+			KaiserSigma kaiserSigma = new KaiserSigma(
+				this, spawnPoint.x, spawnPoint.y, character.xDir, true,
+				character.netId, character.ownedByLocalPlayer
+			);
+			character = kaiserSigma;
+		}
+		character.changeSprite("sigma3_kaiser_enter", true);
 	}
 
 	public void reviveX() {
@@ -1906,7 +1931,9 @@ public partial class Player {
 	}
 
 	public void setChipNum(int armorIndex, bool remove) {
-		if (!remove) usedChipOnce = true;
+		if (!remove) {
+			usedChipOnce = true;
+		}
 		setArmorNum(0, 3);
 		setArmorNum(1, 3);
 		setArmorNum(2, 3);

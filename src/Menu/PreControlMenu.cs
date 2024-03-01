@@ -30,7 +30,7 @@ public class PreControlMenu : IMainMenu {
 	public void update() {
 		if (Global.input.isPressedMenu(Control.MenuLeft)) {
 			cursorToCharNum[selArrowPosY]--;
-			if (cursorToCharNum[selArrowPosY] < -1) {
+			if (cursorToCharNum[selArrowPosY] < -2) {
 				cursorToCharNum[selArrowPosY] = 5;
 			}
 		} else if (Global.input.isPressedMenu(Control.MenuRight)) {
@@ -77,39 +77,61 @@ public class PreControlMenu : IMainMenu {
 	public void render() {
 		if (!inGame) {
 			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0);
-			//DrawWrappers.DrawTextureMenu(Global.textures["cursor"], 20, topLeft.y + ySpace + (selectArrowPosY * ySpace));
 			Global.sprites["cursor"].drawToHUD(0, optionPos1.x - 10, 73 + (selArrowPosY * 20));
 		} else {
 			DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
 			Global.sprites["cursor"].drawToHUD(0, optionPos1.x - 10, 73 + (selArrowPosY * 20));
 		}
 
-		Helpers.drawTextStd(TCat.Title, "SELECT INPUT TO CONFIGURE", Global.screenW * 0.5f, 20, Alignment.Center, fontSize: 32);
+		Fonts.drawText(
+			FontType.Yellow, "SELECT INPUT TO CONFIGURE",
+			Global.screenW * 0.5f, 24, Alignment.Center
+		);
 
-		Helpers.drawTextStd(TCat.Option, getLeftRightStr("KEYBOARD " + getCharStr(0)), optionPos1.x, optionPos1.y, fontSize: 24, selected: selArrowPosY == 0);
+		Fonts.drawText(
+			FontType.FBlue, getLeftRightStr("KEYBOARD " + getCharStr(0)),
+			optionPos1.x, optionPos1.y, selected: selArrowPosY == 0
+		);
 
 		if (Control.isJoystick()) {
-			Helpers.drawTextStd(TCat.Option, getLeftRightStr("CONTROLLER " + getCharStr(1)), optionPos2.x, optionPos2.y, fontSize: 24, selected: selArrowPosY == 1);
+			Fonts.drawText(
+				FontType.FBlue, getLeftRightStr("CONTROLLER " + getCharStr(1)),
+				optionPos2.x, optionPos2.y, selected: selArrowPosY == 1
+			);
 		} else {
-			Helpers.drawTextStd(TCat.Option, "CONTROLLER (NOT DETECTED)", optionPos2.x, optionPos2.y, color: Helpers.Gray, fontSize: 24, selected: selArrowPosY == 1);
+			Fonts.drawText(
+				FontType.Grey, "CONTROLLER (NOT DETECTED)",
+				optionPos2.x, optionPos2.y, selected: selArrowPosY == 1
+			);
 		}
 
-		Helpers.drawTextStd(Helpers.controlText("Use LEFT/RIGHT to switch character to configure controls for."), Global.halfScreenW, 130, Alignment.Center, fontSize: 16);
-		Helpers.drawTextStd(Helpers.controlText("If a binding does not exist on a char-specific control config,"), Global.halfScreenW, 140, Alignment.Center, fontSize: 16);
-		Helpers.drawTextStd(Helpers.controlText("it will fall back to the ALL config, if applicable."), Global.halfScreenW, 150, Alignment.Center, fontSize: 16);
+		Fonts.drawTextEX(
+			FontType.Grey, "Use [MLEFT]/[MRIGHT] to switch\n" +
+			"character to configure controls for.\n" +
+			"If a binding does not exist on\n" +
+			"a char-specific control config,\n" +
+			"it will fall back to the ALL config.",
+			Global.halfScreenW, 130, Alignment.Center
+		);
 
-		Helpers.drawTextStd(TCat.BotHelp, "[X]: Choose, [Z]: Back", Global.halfScreenW, optionPos5.y + 20, Alignment.Center, fontSize: 24);
+		Fonts.drawTextEX(
+			FontType.Grey, "[OK]: Choose, [BACK]: Back",
+			Global.halfScreenW,Global.screenH - 16, Alignment.Center
+		);
 	}
 
 	public string getCharStr(int yPos) {
 		int charNum = cursorToCharNum[yPos];
-		if (charNum == -1) return "(ALL)";
-		if (charNum == 0) return "(X)";
-		if (charNum == 1) return "(ZERO)";
-		if (charNum == 2) return "(VILE)";
-		if (charNum == 3) return "(AXL, DIRECTIONAL)";
-		if (charNum == 4) return "(AXL, CURSOR)";
-		if (charNum == 5) return "(SIGMA)";
-		return "(ERROR)";
+		return charNum switch {
+			-2 => "(Menu)",
+			-1 => "(All)",
+			0 => "(X)",
+			1 => "(Zero)",
+			2 => "(Vile)",
+			3 => "(Directional Axl)",
+			4 => "(Cursor Axl)",
+			5 => "(Sigma)",
+			_ => "(ERROR)"
+		};
 	}
 }

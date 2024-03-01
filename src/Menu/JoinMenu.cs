@@ -401,7 +401,7 @@ public class JoinMenu : IMainMenu {
 
 		if (!refreshing) {
 			string escText = isLAN ? "[ESC]: Search by IP" : "[ESC]: Join private match";
-			Helpers.drawTextStd(TCat.BotHelp, "[X]: Join, [C]: Refresh, [Z]: Back", Global.halfScreenW, 208, Alignment.Center, fontSize: 24);
+			Helpers.drawTextStd(TCat.BotHelp, "[OK]: Join, [ALT]: Refresh, [BACK]: Back", Global.halfScreenW, 208, Alignment.Center, fontSize: 24);
 			Helpers.drawTextStd(TCat.BotHelp, escText, Global.halfScreenW, 216, Alignment.Center, fontSize: 24);
 		}
 	}

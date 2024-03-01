@@ -233,7 +233,11 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 					wsy + 18
 				);
 			}
-			Fonts.drawText(FontType.Green, "Weak against:", startX + 138 + 8, wsy + 32, Alignment.Right);
+			int weakOffset = Fonts.measureText(FontType.Green, "Strong aganist:");
+			Fonts.drawText(
+				FontType.Green, "Weak against:",
+				startX + weakOffset + 48 + 8, wsy + 32, Alignment.Right
+			);
 			for (int i = 0; i < weakAgainstIndices.Length; i++) {
 				int drawIndex = weakAgainstIndices[i];
 				if (weakAgainstIndices[i] == 0) {
@@ -307,8 +311,8 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 		//Helpers.drawTextStd(Helpers.menuControlText("Left/Right: Change Weapon/Mode"), Global.screenW * 0.5f, 200 + botOffY, Alignment.Center, fontSize: 18);
 		//Helpers.drawTextStd(Helpers.menuControlText("Up/Down: Change Slot"), Global.screenW * 0.5f, 205 + botOffY, Alignment.Center, fontSize: 18);
 		//Helpers.drawTextStd(Helpers.menuControlText("WeaponL/WeaponR: Quick cycle X1/X2/X3 weapons"), Global.screenW * 0.5f, 205, Alignment.Center, fontSize: 18);
-		//string helpText = Helpers.menuControlText("[Z]: Back, [X]: Confirm");
-		//if (!inGame) helpText = Helpers.menuControlText("[Z]: Save and back");
+		//string helpText = Helpers.menuControlText("[BACK]: Back, [OK]: Confirm");
+		//if (!inGame) helpText = Helpers.menuControlText("[BACK]: Save and back");
 		//Helpers.drawTextStd(helpText, Global.screenW * 0.5f, 210 + botOffY, Alignment.Center, fontSize: 18);
 
 		if (!string.IsNullOrEmpty(error)) {
@@ -320,7 +324,7 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 			Fonts.drawText(FontType.Red, "ERROR", Global.screenW / 2, top - 20, alignment: Alignment.Center);
 			Fonts.drawText(FontType.RedishOrange, error, Global.screenW / 2, top, alignment: Alignment.Center);
 			Fonts.drawTextEX(
-				FontType.Grey, Helpers.controlText("Press [X] to continue"),
+				FontType.Grey, Helpers.controlText("Press [OK] to continue"),
 				Global.screenW / 2, 20 + top, alignment: Alignment.Center
 			);
 		}

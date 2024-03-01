@@ -1484,6 +1484,11 @@ public partial class Actor : GameObject {
 		vel.y = 0;
 	}
 
+	public void stopMovingWeak() {
+		vel.x = 0;
+		vel.y = 0;
+	}
+
 	public void unstickFromGround() {
 		useGravity = false;
 		grounded = false;

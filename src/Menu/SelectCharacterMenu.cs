@@ -328,18 +328,18 @@ public class SelectCharacterMenu : IMainMenu {
 		}
 		if (!isInGame) {
 			Fonts.drawTextEX(
-				FontType.Grey, "[X]: Continue, [Z]: Back\n[LEFT]/[RIGHT]: Change character",
+				FontType.Grey, "[OK]: Continue, [BACK]: Back\n[MLEFT]/[MRIGHT]: Change character",
 				Global.screenW * 0.5f, 178, Alignment.Center
 			);
 		} else {
 			if (!Global.isHost) {
 				Fonts.drawTextEX(
-					FontType.Grey, "[ESC]: Quit\n[LEFT]/[RIGHT]: Change character",
+					FontType.Grey, "[ESC]: Quit\n[MLEFT]/[MRIGHT]: Change character",
 					Global.screenW * 0.5f, 190, Alignment.Center
 				);
 			} else {
 				Fonts.drawTextEX(
-					FontType.Grey, "[X]: Continue, [Z]: Back\n[LEFT]/[RIGHT]: Change character",
+					FontType.Grey, "[OK]: Continue, [BACK]: Back\n[MLEFT]/[MRIGHT]: Change character",
 					Global.screenW * 0.5f, 190, Alignment.Center
 				);
 			}

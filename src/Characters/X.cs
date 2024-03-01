@@ -1107,6 +1107,8 @@ public partial class MegamanX : Character {
 		player.removeOwnedMines();
 		player.removeOwnedTurrets();
 
+		player.usedChipOnce = false;
+
 		if (player.hasUltimateArmor()) {
 			player.setUltimateArmor(false);
 		}

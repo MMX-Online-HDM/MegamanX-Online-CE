@@ -161,16 +161,20 @@ public class UpgradeMenu : IMainMenu {
 		var mainPlayer = Global.level.mainPlayer;
 		var gameMode = Global.level.gameMode;
 
-		DrawWrappers.DrawRect(5, 5, Global.screenW - 5, Global.screenH - 5, true, Helpers.MenuBgColor, 0, ZIndex.HUD + 200, false);
+		DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
 
 		Global.sprites["cursor"].drawToHUD(0, optionPositions[0].x - 8, optionPositions[selectArrowPosY].y + 4);
 
-		Helpers.drawTextStd(TCat.Title, "Upgrade Menu", Global.screenW * 0.5f, 8, Alignment.Center, fontSize: 48);
-		Helpers.drawTextStd("Scrap: " + mainPlayer.scrap, Global.screenW * 0.5f, 25, Alignment.Center, fontSize: 24);
+		Fonts.drawText(FontType.Yellow, "Upgrade Menu", Global.screenW * 0.5f, 16, Alignment.Center);
+		Fonts.drawText(FontType.Golden, "Metal: " + mainPlayer.scrap, Global.screenW * 0.5f, 26, Alignment.Center);
 		int maxHeartTanks = getMaxHeartTanks();
 		for (int i = 0; i < maxHeartTanks; i++) {
 			bool isBought = mainPlayer.heartTanks > i;
-			Global.sprites["menu_hearttank"].drawToHUD(isBought ? 0 : 2, 71 + (i * 20) + ((8 - maxHeartTanks) * 10), 37);
+			Global.sprites["menu_hearttank"].drawToHUD(
+				isBought ? 0 : 2,
+				70 + (i * 20) + ((8 - maxHeartTanks) * 20),
+				37
+			);
 		}
 
 		if (Global.frameCount % 60 < 30 && mainPlayer.realCharNum == 2) {
@@ -185,14 +189,18 @@ public class UpgradeMenu : IMainMenu {
 		}
 
 		bool soldOut = false;
-		if (mainPlayer.heartTanks == getMaxHeartTanks()) soldOut = true;
+		int textX = 48;
+
+		if (mainPlayer.heartTanks >= getMaxHeartTanks()) soldOut = true;
 		string heartTanksStr = soldOut ? "SOLD OUT" : "Buy Heart Tank";
-		Global.sprites["menu_hearttank"].drawToHUD(heartTanksStr == "SOLD OUT" ? 1 : 0, optionPositions[0].x, optionPositions[0].y - 4);
-		Point size = Helpers.measureTextStd(TCat.Option, heartTanksStr, fontSize: 24);
-		Helpers.drawTextStd(TCat.Option, heartTanksStr, optionPositions[0].x + 20, optionPositions[0].y, fontSize: 24, color: soldOut ? Helpers.Gray : Color.White, selected: selectArrowPosY == 0);
+		Global.sprites["menu_hearttank"].drawToHUD(
+			heartTanksStr == "SOLD OUT" ? 1 : 0, optionPositions[0].x, optionPositions[0].y - 4
+		);
+		Fonts.drawText(FontType.Blue, heartTanksStr, textX, optionPositions[0].y, selected: selectArrowPosY == 0);
 		if (!soldOut) {
-			string heartTankCostStr = string.Format(" ({0} scrap)", getHeartTankCost());
-			Helpers.drawTextStd(heartTankCostStr, optionPositions[0].x + 20 + size.x, optionPositions[0].y, fontSize: 24, color: soldOut ? Helpers.Gray : (mainPlayer.scrap < getHeartTankCost() ? Color.Red : Color.Green));
+			string costStr = string.Format(" ({0} Metal)", getHeartTankCost());
+			int posOffset = Fonts.measureText(FontType.Blue, heartTanksStr);
+			Fonts.drawText(FontType.Green, costStr, textX + posOffset, optionPositions[0].y);
 		}
 
 		for (int i = 0; i < getMaxSubTanks(); i++) {
@@ -208,19 +216,24 @@ public class UpgradeMenu : IMainMenu {
 					canUseSubtank = mainPlayer.currentMaverickWeapon.canUseSubtank(subtank);
 				}
 
-				Global.sprites["menu_subtank"].drawToHUD(1, optionPos.x - 1, optionPos.y - 4);
-				Global.sprites["menu_subtank_bar"].drawToHUD(0, optionPos.x + 5, optionPos.y - 3);
+				Global.sprites["menu_subtank"].drawToHUD(1, optionPos.x - 2, optionPos.y - 4);
+				Global.sprites["menu_subtank_bar"].drawToHUD(0, optionPos.x + 4, optionPos.y - 3);
 				float yPos = 14 * (subtank.health / SubTank.maxHealth);
-				DrawWrappers.DrawRect(optionPos.x + 5, optionPos.y - 3, optionPos.x + 9, optionPos.y + 11 - yPos, true, Color.Black, 1, ZIndex.HUD, isWorldPos: false);
+				DrawWrappers.DrawRect(
+					optionPos.x + 4, optionPos.y - 3, optionPos.x + 9,
+					optionPos.y + 11 - yPos, true, Color.Black, 1, ZIndex.HUD, isWorldPos: false
+				);
 
 				if (!canUseSubtankInMenu(canUseSubtank)) {
 					if (canUseSubtank) {
-						GameMode.drawWeaponSlotCooldown(optionPos.x + 7, optionPos.y + 4, subtankDelay / maxSubtankDelay);
+						GameMode.drawWeaponSlotCooldown(
+							optionPos.x + 6, optionPos.y + 4, subtankDelay / maxSubtankDelay
+						);
 						if (subtankTargets.Count == 0) {
 							buyOrUseStr = "Cannot Use Sub Tank In Battle";
 						}
 					} else {
-						Global.sprites["menu_subtank"].drawToHUD(2, optionPos.x - 1, optionPos.y - 4, 0.5f);
+						Global.sprites["menu_subtank"].drawToHUD(2, optionPos.x - 2, optionPos.y - 4, 0.5f);
 					}
 				}
 
@@ -241,26 +254,37 @@ public class UpgradeMenu : IMainMenu {
 					}
 				}
 			} else {
-				Global.sprites["menu_subtank"].drawToHUD(0, optionPos.x - 1, optionPos.y - 4);
+				Global.sprites["menu_subtank"].drawToHUD(0, optionPos.x - 2, optionPos.y - 4);
 			}
-
-			Point size2 = Helpers.measureTextStd(TCat.Default, buyOrUseStr, fontSize: 24);
 			if (!buyOrUse) {
 				if (!canUseSubtank && subtankTargets.Count == 0) buyOrUseStr = "Cannot use Sub Tank Now";
-				Helpers.drawTextStd(TCat.Option, buyOrUseStr, optionPos.x + 20, optionPos.y, fontSize: 24, color: canUseSubtankInMenu(canUseSubtank) ? Color.White : Helpers.Gray, selected: selectArrowPosY == i + 1);
+				Fonts.drawText(
+					FontType.Blue, buyOrUseStr, textX,
+					optionPos.y, selected: selectArrowPosY == i + 1
+				);
 			} else {
-				Helpers.drawTextStd(TCat.Option, buyOrUseStr, optionPos.x + 20, optionPos.y, fontSize: 24, color: canUseSubtank ? Color.White : Helpers.Gray, selected: selectArrowPosY == i + 1);
+				Fonts.drawText(
+					FontType.Blue, buyOrUseStr, textX, optionPos.y,
+					selected: selectArrowPosY == i + 1
+				);
 			}
-			if (buyOrUse) Helpers.drawTextStd($" ({subtankScrapCost} scrap)", optionPos.x + 20 + size2.x, optionPos.y, fontSize: 24, color: (mainPlayer.scrap < subtankScrapCost ? Color.Red : Color.Green));
+			if (buyOrUse) {
+				string costStr = $" ({subtankScrapCost} scrap)";
+				int posOffset = Fonts.measureText(FontType.Blue, buyOrUseStr);
+				Fonts.drawText(FontType.Green, costStr, textX + posOffset, optionPos.y);
+			}
 		}
 
 		if (subtankTargets.Count > 1 && selectArrowPosY > 0) {
-			Helpers.drawTextStd(TCat.BotHelp, "Left/Right: Change Heal Target", Global.halfScreenW, 202, Alignment.Center, fontSize: 16);
+			Fonts.drawText(
+				FontType.Grey, "Left/Right: Change Heal Target",
+				Global.halfScreenW, Global.screenH - 32, Alignment.Center
+			);
 		}
 
 		UpgradeArmorMenu.drawHyperArmorUpgrades(mainPlayer, 20);
 
 		Helpers.drawTextStd(TCat.BotHelp, "Up/Down: Select Item", Global.halfScreenW, 208, Alignment.Center, fontSize: 16);
-		Helpers.drawTextStd(TCat.BotHelp, "[X]: Buy/Use, [Z]: Back", Global.halfScreenW, 214, Alignment.Center, fontSize: 16);
+		Helpers.drawTextStd(TCat.BotHelp, "[OK]: Buy/Use, [BACK]: Back", Global.halfScreenW, 214, Alignment.Center, fontSize: 16);
 	}
 }

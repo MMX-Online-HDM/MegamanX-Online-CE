@@ -52,6 +52,6 @@ public class ConfirmLeaveMenu : IMainMenu {
 		Helpers.drawTextStd(TCat.Option, "No", optionPos1.x, optionPos1.y, selected: selectY == 0);
 		Helpers.drawTextStd(TCat.Option, "Yes", optionPos2.x, optionPos2.y, selected: selectY == 1);
 
-		Helpers.drawTextStd(TCat.BotHelp, "[X]: Choose, [Z]: Back", Global.halfScreenW, optionPos5.y + 20, Alignment.Center, fontSize: 24);
+		Helpers.drawTextStd(TCat.BotHelp, "[OK]: Choose, [BACK]: Back", Global.halfScreenW, optionPos5.y + 20, Alignment.Center, fontSize: 24);
 	}
 }

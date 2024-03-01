@@ -1457,7 +1457,7 @@ public class OptionsMenu : IMainMenu {
 		else if (charNum == 4) subtitle = "SIGMA SETTINGS";
 		Fonts.drawText(FontType.Yellow, subtitle, Global.halfScreenW, 20, Alignment.Center);
 		Fonts.drawTextEX(
-			FontType.Grey, "[LEFT]/[RIGHT]: Change, [Z]: Save and Back",
+			FontType.Grey, "[MLEFT]/[MRIGHT]: Change, [BACK]: Save and Back",
 			Global.halfScreenW, 198, Alignment.Center
 		);
 

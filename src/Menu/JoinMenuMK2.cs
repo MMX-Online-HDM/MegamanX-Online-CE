@@ -98,7 +98,7 @@ public class JoinMenuP2P : IMainMenu {
 		DrawWrappers.DrawTextureHUD(Global.textures["severbrowser"], 0, 0);
 
 		Fonts.drawTextEX(
-			FontType.Grey, "[X]: Join, [Z]: Back",
+			FontType.Grey, "[OK]: Join, [BACK]: Back",
 			Global.halfScreenW, Global.screenH - 32, Alignment.Center
 		);
 		Fonts.drawText(FontType.Orange, "Name", 30, 22);

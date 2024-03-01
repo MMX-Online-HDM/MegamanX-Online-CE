@@ -90,7 +90,7 @@ public class KickMenu : IMainMenu {
 		Helpers.drawTextStd("Kick reason: " + kickReasons[kickReasonIndex], optionPoses[0].x, optionPoses[0].y, fontSize: fontSize, color: Color.White);
 		Helpers.drawTextStd("Kick duration: " + kickDuration + " min", optionPoses[1].x, optionPoses[1].y, fontSize: fontSize);
 
-		Helpers.drawTextStd(Helpers.menuControlText("Left/Right: Change, [X]: Kick, [Z]: Back"), Global.screenW * 0.5f, 200, Alignment.Center, fontSize: 21);
+		Helpers.drawTextStd(Helpers.menuControlText("Left/Right: Change, [OK]: Kick, [BACK]: Back"), Global.screenW * 0.5f, 200, Alignment.Center, fontSize: 21);
 	}
 
 	public static bool hasDirectKickPower() {

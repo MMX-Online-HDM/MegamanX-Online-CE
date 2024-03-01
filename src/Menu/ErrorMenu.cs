@@ -42,7 +42,7 @@ public class ErrorMenu : IMainMenu {
 			);
 		}
 		Fonts.drawTextEX(
-			FontType.Grey, "Press [X] to continue",
+			FontType.Grey, "Press [OK] to continue",
 			Global.screenW / 2, top + (i * 20), alignment: Alignment.Center
 		);
 	}

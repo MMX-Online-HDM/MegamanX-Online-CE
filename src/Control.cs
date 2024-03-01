@@ -103,7 +103,7 @@ public class Control {
 	}
 
 	public static string getCharSpecificName(string baseStr, int charNum, int aimMode) {
-		if (charNum == -1) return baseStr;
+		if (charNum == -1 || charNum == -2) return baseStr;
 
 		baseStr += "_";
 		if (charNum == 0) baseStr += "x";

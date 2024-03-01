@@ -406,7 +406,7 @@ public class UpgradeArmorMenu : IMainMenu {
 		drawHyperArmorUpgrades(mainPlayer, 0);
 
 		Helpers.drawTextStd(Helpers.menuControlText("Left/Right: Change Armor Set"), Global.halfScreenW, 208, Alignment.Center, fontSize: 16);
-		Helpers.drawTextStd(Helpers.menuControlText("[X]: Upgrade, [C]: Unupgrade, [Z]: Back"), Global.halfScreenW, 214, Alignment.Center, fontSize: 16);
+		Helpers.drawTextStd(Helpers.menuControlText("[OK]: Upgrade, [ALT]: Unupgrade, [BACK]: Back"), Global.halfScreenW, 214, Alignment.Center, fontSize: 16);
 	}
 
 	public static bool updateHyperArmorUpgrades(Player mainPlayer) {
@@ -449,15 +449,15 @@ public class UpgradeArmorMenu : IMainMenu {
 
 		string specialText = "";
 		if (mainPlayer.canUpgradeUltimateX() && mainPlayer.isX && !mainPlayer.isDisguisedAxl) {
-			specialText = "[D]: Ultimate Armor" + (mainPlayer.character.boughtUltimateArmorOnce ? "" : " (10 scrap)");
+			specialText = "[SPC]: Ultimate Armor" + (mainPlayer.character.boughtUltimateArmorOnce ? "" : " (10 scrap)");
 		} else if (mainPlayer.canUpgradeGoldenX() && mainPlayer.isX && !mainPlayer.isDisguisedAxl) {
-			specialText = "[D]: Hyper Chip" + (mainPlayer.character.boughtGoldenArmorOnce ? "" : " (5 scrap)");
+			specialText = "[SPC]: Hyper Chip" + (mainPlayer.character.boughtGoldenArmorOnce ? "" : " (5 scrap)");
 		}
 
 		if (mainPlayer.hasUltimateArmor()) {
-			specialText += "\n[C]: Take Off Ultimate Armor";
+			specialText += "\n[ALT]: Take Off Ultimate Armor";
 		} else if (mainPlayer.hasGoldenArmor()) {
-			specialText += "\n[C]: Disable Hyper Chip";
+			specialText += "\n[ALT]: Disable Hyper Chip";
 		}
 
 		if (!string.IsNullOrEmpty(specialText)) {

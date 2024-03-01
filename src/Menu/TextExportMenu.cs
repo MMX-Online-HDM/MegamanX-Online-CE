@@ -99,7 +99,7 @@ public class TextExportMenu : IMainMenu {
 		);
 		if (canCopyToClipboard) {
 			Fonts.drawTextEX(
-				FontType.Grey, clipboardTime == 0 ? "[X]: copy to clipboard" : "Copied to clipboard.",
+				FontType.Grey, clipboardTime == 0 ? "[OK]: copy to clipboard" : "Copied to clipboard.",
 				Global.screenW / 2, bot - 20, alignment: Alignment.Center
 			);
 		}
@@ -109,11 +109,11 @@ public class TextExportMenu : IMainMenu {
 			: "Failed to write to file."
 		);
 		Fonts.drawTextEX(
-			FontType.Grey, fileTime == 0 ? "[C]: export to file" : fileMessage,
+			FontType.Grey, fileTime == 0 ? "[ALT]: export to file" : fileMessage,
 			Global.screenW / 2, bot - 10, alignment: Alignment.Center
 		);
 		Fonts.drawTextEX(
-			FontType.Grey, "[Z]: back", Global.screenW / 2,
+			FontType.Grey, "[BACK]: back", Global.screenW / 2,
 			bot, alignment: Alignment.Center
 		);
 	}

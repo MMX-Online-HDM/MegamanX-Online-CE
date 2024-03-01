@@ -40,8 +40,7 @@ public class ControlMenu : IMainMenu {
 			mappingClone = new Dictionary<string, int?>(Control.getKeyboardMapping(charNum, axlAimMode, true));
 		}
 
-		bindableControls = new List<string[]>()
-		{
+		bindableControls = new List<string[]>() {
 				new string[] { Control.Up, "Up" },
 				new string[] { Control.Down, "Down" },
 				new string[] { Control.Left, "Left" },
@@ -53,16 +52,12 @@ public class ControlMenu : IMainMenu {
 				new string[] { Control.WeaponLeft, "WeaponL" },
 				new string[] { Control.WeaponRight, "WeaponR" },
 				new string[] { Control.Special2, "Command"},
+				new string[] { Control.Taunt, "Taunt" }
 			};
 
 		// General menu controls not to be overridden on characters
-		if (charNum == -1) {
-			bindableControls.Add(new string[] { Control.Scoreboard, "Scoreboard" });
-			bindableControls.Add(new string[] { Control.AllChat, "All Chat" });
-			bindableControls.Add(new string[] { Control.TeamChat, "Team Chat" });
-			bindableControls.Add(new string[] { Control.Taunt, "Taunt" });
-		}
 		if (charNum == -2) {
+			bindableControls = new List<string[]>();
 			bindableControls.Add(new string[] { Control.MenuUp, "Up" });
 			bindableControls.Add(new string[] { Control.MenuDown, "Down" });
 			bindableControls.Add(new string[] { Control.MenuLeft, "Left" });
@@ -71,6 +66,9 @@ public class ControlMenu : IMainMenu {
 			bindableControls.Add(new string[] { Control.MenuConfirm, "Confirm" });
 			bindableControls.Add(new string[] { Control.MenuBack, "Back/Cancel" });
 			bindableControls.Add(new string[] { Control.MenuAlt, "Alt/Switch" });
+			bindableControls.Add(new string[] { Control.Scoreboard, "Scoreboard" });
+			bindableControls.Add(new string[] { Control.AllChat, "All Chat" });
+			bindableControls.Add(new string[] { Control.TeamChat, "Team Chat" });
 		}
 		/* if (charNum == 4) {
 			bindableControls.Add(new string[] { Control.SigmaCommand, "Command Button" });
@@ -168,8 +166,11 @@ public class ControlMenu : IMainMenu {
 				if (kvp.Key.StartsWith("command", StringComparison.OrdinalIgnoreCase)) continue;
 				if (inputName.StartsWith("command", StringComparison.OrdinalIgnoreCase)) continue;
 				// Jump and up are the only only other exceptions to the "can't bind multiple with one key" rule
-				if ((kvp.Key == Control.Jump && inputName == Control.Up) || kvp.Key == Control.Up && inputName == Control.Jump) continue;
-
+				if ((kvp.Key == Control.Jump && inputName == Control.Up) ||
+					kvp.Key == Control.Up && inputName == Control.Jump
+				) {
+					continue;
+				}
 				if (kvp.Value == (int)key) {
 					keysToClear.Add(kvp.Key);
 				}
@@ -193,29 +194,41 @@ public class ControlMenu : IMainMenu {
 
 		if (!inGame) {
 			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0);
-			DrawWrappers.DrawTextureHUD(Global.textures["cursor"], startX, topLeft.y + startYOff + (selectArrowPosY * ySpace) + cursorYOff);
+			DrawWrappers.DrawTextureHUD(
+				Global.textures["cursor"], startX,
+				topLeft.y + startYOff + (selectArrowPosY * 8) + cursorYOff
+			);
 		} else {
 			DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
-			Global.sprites["cursor"].drawToHUD(0, startX, topLeft.y + startYOff + (selectArrowPosY * ySpace) + cursorYOff + 5);
+			Global.sprites["cursor"].drawToHUD(
+				0, startX, topLeft.y + startYOff + (selectArrowPosY * 8) + cursorYOff + 5
+			);
 		}
 
-		string subtitle = "GENERAL CONTROLS";
-		if (charNum == 0) subtitle = "X CONTROLS";
-		if (charNum == 1) subtitle = "ZERO CONTROLS";
-		if (charNum == 2) subtitle = "VILE CONTROLS";
-		if (charNum == 3) {
-			if (axlAimMode == 0) subtitle = "AXL CONTROLS (DIRECTIONAL)";
-			if (axlAimMode == 1) subtitle = "AXL CONTROLS (ANGULAR)";
-			if (axlAimMode == 2) subtitle = "AXL CONTROLS (CURSOR)";
-		}
-		if (charNum == 4) subtitle = "SIGMA CONTROLS";
-
-		Helpers.drawTextStd(TCat.Title, subtitle, Global.halfScreenW, 15, Alignment.Center, fontSize: 32);
+		string subtitle = charNum switch {
+			-2 => "MENU CONTROLS",
+			0 => "X CONTROLS",
+			1 => "ZERO CONTROLS",
+			2 => "VILE CONTROLS",
+			3 when (axlAimMode == 0) => "AXL CONTROLS (CURSOR)",
+			3 when (axlAimMode == 1) => "AXL CONTROLS (ANGULAR)",
+			3 => "AXL CONTROLS (DIRECTIONAL)",
+			4 => "SIGMA CONTROLS",
+			_ => "GENERAL CONTROLS"
+		};
+		Fonts.drawText(FontType.Yellow, subtitle, Global.halfScreenW, 24, Alignment.Center);
 
 		if (isController) {
-			Helpers.drawTextStd("Setting controls for controller \"" + Control.getControllerName() + "\"", Global.halfScreenW, 32, alignment: Alignment.Center, fontSize: 16, style: Styles.Italic, color: Color.Yellow);
+			Fonts.drawText(
+				FontType.Golden, "Setting controls for controller \"" +
+				Control.getControllerName() + "\"",
+				Global.halfScreenW, 32, alignment: Alignment.Center
+			);
 		} else {
-			Helpers.drawTextStd("Setting controls for keyboard", Global.halfScreenW, 32, alignment: Alignment.Center, fontSize: 16, style: Styles.Italic, color: Color.Yellow);
+			Fonts.drawText(
+				FontType.Golden, "Setting controls for keyboard",
+				Global.halfScreenW, 32, alignment: Alignment.Center
+			);
 		}
 
 		for (int i = 0; i < bindableControls.Count; i++) {
@@ -224,14 +237,35 @@ public class ControlMenu : IMainMenu {
 			if (string.IsNullOrEmpty(boundKeyDisplay) && charNum > -1) {
 				boundKeyDisplay = "(Inherit)";
 			}
-			Helpers.drawTextStd(TCat.Option, bindableControl[1].ToUpperInvariant() + ": " + boundKeyDisplay, topLeft.x, topLeft.y + startYOff + ySpace * (i + 1), fontSize: fontSize, selected: selectArrowPosY == i, optionPadding: 15);
+			Fonts.drawText(
+				FontType.Blue, bindableControl[1] + ":",
+				topLeft.x, topLeft.y + startYOff + 8 * (i + 1),
+				selected: selectArrowPosY == i
+			);
+			Fonts.drawText(
+				FontType.Blue, boundKeyDisplay,
+				topLeft.x + 80, topLeft.y + startYOff + 8 * (i + 1),
+				selected: selectArrowPosY == i
+			);
 		}
 
 		if (!listenForKey) {
-			Helpers.drawTextStd(Helpers.menuControlText("[X] = Bind, [C] = Unbind, [Z] = Save/Back", false), Global.halfScreenW, 210, Alignment.Center, fontSize: 24);
+			Fonts.drawTextEX(
+				FontType.Grey, "[OK] = Bind, [ALT] = Unbind, [BACK] = Save/Back",
+				Global.halfScreenW, Global.screenH - 16, Alignment.Center
+			);
 		} else {
-			if (isController) Helpers.drawTextStd(TCat.BotHelp, "Press desired controller button to bind", Global.halfScreenW, 205, Alignment.Center, fontSize: 24);
-			else Helpers.drawTextStd(TCat.BotHelp, "Press desired key to bind", Global.halfScreenW, 205, Alignment.Center, fontSize: 24);
+			if (isController) {
+				Fonts.drawText(
+					FontType.Grey, "Press desired controller button to bind",
+					Global.halfScreenW, Global.screenH - 16, Alignment.Center
+				);
+			} else {
+				Fonts.drawText(
+					FontType.Grey, "Press desired key to bind",
+					Global.halfScreenW, Global.screenH - 16, Alignment.Center
+				);
+			}
 		}
 
 		if (!string.IsNullOrEmpty(error)) {
@@ -243,7 +277,7 @@ public class ControlMenu : IMainMenu {
 			Fonts.drawText(FontType.Red, "ERROR", Global.screenW / 2, top - 20, alignment: Alignment.Center);
 			Fonts.drawText(FontType.RedishOrange, error, Global.screenW / 2, top, alignment: Alignment.Center);
 			Fonts.drawTextEX(
-				FontType.Grey, Helpers.controlText("Press [X] to continue"),
+				FontType.Grey, Helpers.controlText("Press [OK] to continue"),
 				Global.screenW / 2, 20 + top, alignment: Alignment.Center
 			);
 		}

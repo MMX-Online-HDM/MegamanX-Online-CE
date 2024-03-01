@@ -48,6 +48,7 @@ public class Fonts {
 		int fontDefaultWidth = 7;
 		int fontSpacing  = 1;
 		int newLineSpacing  = 10;
+		int fontSpaceWidth = 8;
 		if (baseFontData.ContainsKey(fontStr)) {
 			fontTextureSize = baseFontData[fontStr][0];
 			fontGridSpacing = baseFontData[fontStr][1];
@@ -65,8 +66,8 @@ public class Fonts {
 			deferred = true;
 		}
 		// Draw every character.
-		for (int j = 0; j < textLines.Length; j++) {
-			string textLine = textLines[j];
+		for (int line = 0; line < textLines.Length; line++) {
+			string textLine = textLines[line];
 			var currentXOff = MathF.Round(x);
 
 			if (alignment == Alignment.Center) {
@@ -76,8 +77,8 @@ public class Fonts {
 				int textSize = measureText(fontStr, textLine);
 				currentXOff -= textSize;
 			}
-			for (int i = 0; i < textLine.Length; i++) {
-				char letter = textLine[i];
+			for (int pos = 0; pos < textLine.Length; pos++) {
+				char letter = textLine[pos];
 				int charInt = (int)letter;
 				if (charInt > 191) {
 					letter = '?';
@@ -100,14 +101,20 @@ public class Fonts {
 				int fontWidth = fontDefaultWidth;
 				if (fontSizes.ContainsKey(fontStr)) {
 					fontWidth = fontSizes[fontStr][charInt];
+					fontSpaceWidth = fontWidth;
 				}
-				float yPos = MathF.Round(y) + (j * newLineSpacing);
+				float yPos = MathF.Round(y) + (line * newLineSpacing);
 				textSprite.Position = new Vector2f(currentXOff, yPos);
-				if (Char.IsWhiteSpace(letter)) {
-					currentXOff += fontWidth;
+				// Text spacing.
+				if (Char.IsWhiteSpace(letter) ||
+					pos >= textLines[line].Length - 1 ||
+					Char.IsWhiteSpace(textLines[line][pos+1])
+				) {
+					currentXOff += fontSpaceWidth;
 				} else {
 					currentXOff += fontWidth + fontSpacing;
 				}
+				// Add to array.
 				DrawWrappers.addToVertexArray(batchDrawable, textSprite);
 			}
 		}
@@ -137,20 +144,33 @@ public class Fonts {
 		int size = 0;
 		int fontDefaultWidth = 7;
 		int fontSpacing  = 1;
+		int fontSpaceWidth = 8;
 		if (baseFontData.ContainsKey(fontStr)) {
 			fontDefaultWidth = baseFontData[fontStr][2];
 			fontSpacing = baseFontData[fontStr][3];
 		}
-		for (int i = 0; i < text.Length; i++) {
-			char letter = text[i];
-			int charInt = (int)letter;
-			int fontWidth = fontDefaultWidth;
-			if (fontSizes.ContainsKey(fontStr)) {
-				fontWidth = fontSizes[fontStr][charInt];
+		string[] textLines = text.Split('\n');
+		for (int line = 0; line < textLines.Length; line++) {
+			int tempSize = 0;
+			for (int pos = 0; pos < textLines[line].Length; pos++) {
+				char letter = textLines[line][pos];
+				int charInt = (int)letter;
+				int fontWidth = fontDefaultWidth;
+				if (fontSizes.ContainsKey(fontStr)) {
+					fontWidth = fontSizes[fontStr][charInt];
+					fontSpaceWidth = fontWidth;
+				}
+				if (Char.IsWhiteSpace(letter) ||
+					pos >= textLines[line].Length - 1 ||
+					Char.IsWhiteSpace(textLines[line][pos+1])
+				) {
+					tempSize += fontSpaceWidth;
+				} else {
+					tempSize += fontWidth + fontSpacing;
+				}
 			}
-			size += fontWidth;
-			if (!Char.IsWhiteSpace(letter) && i < text.Length - 1) {
-				size += fontSpacing;
+			if (tempSize > size) {
+				size = tempSize;
 			}
 		}
 		return size;
@@ -226,8 +246,8 @@ public class Fonts {
 			FontType.Red => "Red",
 			FontType.RedishOrange => "RedishOrange",
 			FontType.Yellow => "Yellow",
-			FontType.FBlue => "FBlue",
-			FontType.FOrange => "FOrange",
+			FontType.FBlue => "FixedBlue",
+			FontType.FOrange => "FixedOrange",
 			FontType.BlueMenu => "BlueMenu",
 			FontType.OrangeMenu => "OrangeMenu",
 			_ => "Blue"

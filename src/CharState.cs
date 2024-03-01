@@ -150,10 +150,22 @@ public class CharState {
 			}
 		}
 		if (character.player.isViralSigma()) {
-			return this is ViralSigmaBeamState || this is ViralSigmaIdle || this is ViralSigmaTaunt || this is ViralSigmaShoot || this is ViralSigmaTackle || this is ViralSigmaPossessStart || this is ViralSigmaPossess || this is Die;
+			return this is ViralSigmaBeamState ||
+				this is ViralSigmaIdle || this is
+				ViralSigmaTaunt ||
+				this is ViralSigmaShoot ||
+				this is ViralSigmaTackle ||
+				this is ViralSigmaPossessStart ||
+				this is ViralSigmaPossess ||
+				this is Die;
 		}
-		if (character.player.isKaiserSigma()) {
-			return this is KaiserSigmaIdleState || this is KaiserSigmaHoverState || this is KaiserSigmaFallState || this is KaiserSigmaTauntState || this is KaiserSigmaVirusState || this is KaiserSigmaBeamState || this is Die;
+		if (character is KaiserSigma) {
+			return (
+				this is KaiserSigmaBaseState ||
+				this is KaiserSigmaRevive ||
+				this is KaiserSigmaVirusState ||
+				this is Die
+			);
 		}
 		if (character.charState is WarpOut && this is not WarpIn) {
 			return false;
@@ -162,7 +174,15 @@ public class CharState {
 	}
 
 	public virtual bool canExit(Character character, CharState newState) {
-		if (character.charState is Die && newState is not VileRevive && newState is not WolfSigmaRevive && newState is not ViralSigmaRevive && newState is not KaiserSigmaRevive && newState is not XReviveStart) return false;
+		if (character.charState is Die &&
+			newState is not VileRevive &&
+			newState is not WolfSigmaRevive &&
+			newState is not ViralSigmaRevive &&
+			newState is not KaiserSigmaRevive &&
+			newState is not XReviveStart
+		) {
+			return false;
+		}
 		return true;
 	}
 
@@ -1636,7 +1656,7 @@ public class Die : CharState {
 		}
 		player.lastDeathWasVileMK2 = vile?.isVileMK2 == true;
 		player.lastDeathWasVileMK5 = vile?.isVileMK5 == true;
-		player.lastDeathWasSigmaHyper = sigma?.isHyperSigma == true;
+		player.lastDeathWasSigmaHyper = sigma?.isHyperSigma == true || character is KaiserSigma;
 		player.lastDeathWasXHyper = mmx?.isHyperX == true; ;
 		player.lastDeathPos = character.getCenterPos();
 		if (player.isAI) player.selectedRAIndex = Helpers.randomRange(0, 3);
@@ -1664,37 +1684,50 @@ public class Die : CharState {
 				var ede = new ExplodeDieEffect(player, character.pos, character.pos, "empty", 1, character.zIndex, false, 20, 3, false);
 				ede.host = anim;
 				Global.level.addEffect(ede);
-			} else if (player.isSigma3()) {
-				string deathSprite = "";
-				if (sigma.lastHyperSigmaSprite.StartsWith("sigma3_kaiser_virus")) {
-					deathSprite = sigma.lastHyperSigmaSprite;
-					Point explodeCenterPos = character.pos.addxy(0, -16);
-					var ede = new ExplodeDieEffect(player, explodeCenterPos, explodeCenterPos, "empty", 1, character.zIndex, false, 16, 3, false);
-					Global.level.addEffect(ede);
-				} else {
-					deathSprite = sigma.lastHyperSigmaSprite + "_body";
-					if (!Global.sprites.ContainsKey(deathSprite)) {
-						deathSprite = "sigma3_kaiser_idle";
-					}
-					Point explodeCenterPos = character.pos.addxy(0, -55);
-					var ede = new ExplodeDieEffect(player, explodeCenterPos, explodeCenterPos, "empty", 1, character.zIndex, false, 60, 3, false);
-					Global.level.addEffect(ede);
-
-					var headAnim = new Anim(character.pos, sigma.lastHyperSigmaSprite, 1, player.getNextActorNetId(), false, sendRpc: true);
-					headAnim.ttl = 3;
-					headAnim.blink = true;
-					headAnim.setFrameIndexSafe(sigma.lastHyperSigmaFrameIndex);
-					headAnim.xDir = sigma.lastHyperSigmaXDir;
-					headAnim.frameSpeed = 0;
-				}
-
-				var anim = new Anim(character.pos, deathSprite, 1, player.getNextActorNetId(), false, sendRpc: true, zIndex: ZIndex.Background + 1000);
-				anim.ttl = 3;
-				anim.blink = true;
-				anim.setFrameIndexSafe(sigma.lastHyperSigmaFrameIndex);
-				anim.xDir = sigma.lastHyperSigmaXDir;
-				anim.frameSpeed = 0;
 			}
+		}
+		if (character.ownedByLocalPlayer && character is KaiserSigma) {
+			string deathSprite = "";
+			if (sigma.lastHyperSigmaSprite.StartsWith("sigma3_kaiser_virus")) {
+				deathSprite = sigma.lastHyperSigmaSprite;
+				Point explodeCenterPos = character.pos.addxy(0, -16);
+				var ede = new ExplodeDieEffect(
+					player, explodeCenterPos, explodeCenterPos,
+					"empty", 1, character.zIndex, false, 16, 3, false
+				);
+				Global.level.addEffect(ede);
+			} else {
+				deathSprite = sigma.lastHyperSigmaSprite + "_body";
+				if (!Global.sprites.ContainsKey(deathSprite)) {
+					deathSprite = "sigma3_kaiser_idle";
+				}
+				Point explodeCenterPos = character.pos.addxy(0, -55);
+				var ede = new ExplodeDieEffect(
+					player, explodeCenterPos, explodeCenterPos, "empty",
+					1, character.zIndex, false, 60, 3, false
+				);
+				Global.level.addEffect(ede);
+
+				var headAnim = new Anim(
+					character.pos, sigma.lastHyperSigmaSprite, 1,
+					player.getNextActorNetId(), false, sendRpc: true
+				);
+				headAnim.ttl = 3;
+				headAnim.blink = true;
+				headAnim.setFrameIndexSafe(sigma.lastHyperSigmaFrameIndex);
+				headAnim.xDir = sigma.lastHyperSigmaXDir;
+				headAnim.frameSpeed = 0;
+			}
+
+			var anim = new Anim(
+				character.pos, deathSprite, 1, player.getNextActorNetId(),
+				false, sendRpc: true, zIndex: ZIndex.Background + 1000
+			);
+			anim.ttl = 3;
+			anim.blink = true;
+			anim.setFrameIndexSafe(sigma.lastHyperSigmaFrameIndex);
+			anim.xDir = sigma.lastHyperSigmaXDir;
+			anim.frameSpeed = 0;
 		}
 	}
 

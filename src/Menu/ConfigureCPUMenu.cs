@@ -138,6 +138,6 @@ public class ConfigureCPUMenu : IMainMenu {
 			i++;
 		}
 
-		Helpers.drawTextStd(TCat.BotHelp, "Left/Right: Change, [Z]: Back", Global.screenW * 0.5f, 210, Alignment.Center, fontSize: 24);
+		Helpers.drawTextStd(TCat.BotHelp, "Left/Right: Change, [BACK]: Back", Global.screenW * 0.5f, 210, Alignment.Center, fontSize: 24);
 	}
 }

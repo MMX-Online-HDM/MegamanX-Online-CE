@@ -541,21 +541,24 @@ public class Helpers {
 
 	public static string controlText(string text, bool isController = false) {
 		if (isController) isController = Control.isJoystick();
-
-		text = text.Replace("[X]", Control.getKeyOrButtonName(Control.MenuConfirm, isController));
-		text = text.Replace("[C]", Control.getKeyOrButtonName(Control.MenuAlt, isController));
-		text = text.Replace("[ATTACK]", Control.getKeyOrButtonName(Control.Shoot, isController));
-		text = text.Replace("[Z]", Control.getKeyOrButtonName(Control.MenuBack, isController));
-		text = text.Replace("[D]", Control.getKeyOrButtonName(Control.Special1, isController));
-		text = text.Replace("[ESC]", Control.getKeyOrButtonName(Control.MenuPause, isController));
+		// Menu keys.
+		text = text.Replace("[OK]", Control.getKeyOrButtonName(Control.MenuConfirm, isController));
+		text = text.Replace("[ALT]", Control.getKeyOrButtonName(Control.MenuAlt, isController));
+		text = text.Replace("[BACK]", Control.getKeyOrButtonName(Control.MenuBack, isController));
 		text = text.Replace("[TAB]", Control.getKeyOrButtonName(Control.Scoreboard, isController));
+		text = text.Replace("[ESC]", Control.getKeyOrButtonName(Control.MenuPause, isController));
+		text = text.Replace("[MLEFT]", Control.getKeyOrButtonName(Control.MenuLeft, isController));
+		text = text.Replace("[MRIGHT]", Control.getKeyOrButtonName(Control.MenuRight, isController));
+		text = text.Replace("[MUP]", Control.getKeyOrButtonName(Control.MenuUp, isController));
+		text = text.Replace("[MDOWN]", Control.getKeyOrButtonName(Control.MenuDown, isController));
+		// Normal keys.
 		text = text.Replace("[JUMP]", Control.getKeyOrButtonName(Control.Jump, isController));
+		text = text.Replace("[SHOOT]", Control.getKeyOrButtonName(Control.Shoot, isController));
+		text = text.Replace("[SPC]", Control.getKeyOrButtonName(Control.Special1, isController));
 		text = text.Replace("[DASH]", Control.getKeyOrButtonName(Control.Dash, isController));
 		text = text.Replace("[WeaponL]", Control.getKeyOrButtonName(Control.WeaponLeft, isController));
 		text = text.Replace("[WeaponR]", Control.getKeyOrButtonName(Control.WeaponRight, isController));
 		text = text.Replace("[CMD]", Control.getKeyOrButtonName(Control.Special2, isController));
-		text = text.Replace("[LEFT]", Control.getKeyOrButtonName(Control.MenuLeft, isController));
-		text = text.Replace("[RIGHT]", Control.getKeyOrButtonName(Control.MenuRight, isController));
 
 		return text;
 	}
