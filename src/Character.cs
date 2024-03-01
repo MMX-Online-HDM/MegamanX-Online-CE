@@ -1245,7 +1245,7 @@ public partial class Character : Actor, IDamagable {
 			(charState.airMove && vel.y > 0 || charState is WallSlide) &&
 			wallKickTimer <= 0 &&
 			player.input.isPressed(Control.Jump, player) &&
-			(charState.wallKickLeftWall != null || charState.wallKickRigthWall != null)
+			(charState.wallKickLeftWall != null || charState.wallKickRightWall != null)
 		) {
 			if (player.input.isHeld(Control.Dash, player) &&
 				(charState.useDashJumpSpeed || charState is WallSlide)
@@ -1257,7 +1257,7 @@ public partial class Character : Actor, IDamagable {
 			if (charState.wallKickLeftWall != null) {
 				wallKickDir += 1;
 			}
-			if (charState.wallKickRigthWall != null) {
+			if (charState.wallKickRightWall != null) {
 				wallKickDir -= 1;
 			}
 			if (wallKickDir == 0) {

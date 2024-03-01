@@ -20,7 +20,7 @@ public class CharState {
 	public Wall lastLeftWall;
 	public Wall lastRightWall;
 	public Collider wallKickLeftWall;
-	public Collider wallKickRigthWall;
+	public Collider wallKickRightWall;
 	public float stateTime;
 	public float frameTime;
 	public string enterSound;
@@ -225,11 +225,11 @@ public class CharState {
 		} else {
 			wallKickLeftWall = null;
 		}
-		var wallKickRigthData = character.getHitWall(6, 0);
-		if (wallKickRigthData?.otherCollider?.isClimbable == true && wallKickRigthData?.gameObject is Wall) {
-			wallKickRigthWall = wallKickRigthData.otherCollider;
+		var wallKickRightData = character.getHitWall(6, 0);
+		if (wallKickRightData?.otherCollider?.isClimbable == true && wallKickRightData?.gameObject is Wall) {
+			wallKickRightWall = wallKickRightData.otherCollider;
 		} else {
-			wallKickRigthData = null;
+			wallKickRightData = null;
 		}
 
 

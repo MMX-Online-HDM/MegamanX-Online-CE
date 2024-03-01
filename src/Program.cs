@@ -154,7 +154,7 @@ class Program {
 
 		List<string> loadText = new();
 		loadText.Add("NOM BIOS v" + Global.version + ", An Energy Sunstar Ally");
-		loadText.Add("Copyrigth ©2114, NOM Corporation");
+		loadText.Add("Copyright ©2114, NOM Corporation");
 		loadText.Add("");
 		loadText.Add("MMXOD " + Global.shortForkName + " Revision " + Global.version + " " + Global.versionName);
 		loadText.Add("");

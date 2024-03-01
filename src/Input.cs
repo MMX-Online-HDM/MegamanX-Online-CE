@@ -662,7 +662,7 @@ public class Input {
 		return isHeld(Control.WeaponLeft, player) || isHeld(Control.WeaponRight, player);
 	}
 
-	// Return if left or rigth is pressed. Not both.
+	// Return if left or right is pressed. Not both.
 	// We use XOR (^) for this.
 	public bool isLeftOrRightHeld(Player player) {
 		return (isHeld(Control.Left, player) ^ isHeld(Control.Right, player));
