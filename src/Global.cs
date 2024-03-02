@@ -17,7 +17,8 @@ namespace MMXOnline;
 
 public partial class Global {
 	public static decimal version = 20m;
-	public const string versionName = "Alpha 7";
+	public static string versionName = "Revision 20";
+	public static string subVersionName = "Alpha 8";
 
 	// THIS VALUE MUST ALWAYS MANUALLY BE SET AFTER UPDATING ASSETS BEFORE BUILDING A RELEASE BUILD.
 	// Obtain it by pressing F1 in main menu.
@@ -29,11 +30,15 @@ public partial class Global {
 	public const string checksumPrefix = "[Community Edition]";
 	// Use this to make sure the checksum varies.
 	// Better to use together with "checksumPrefix" and be diferent from it.
-	public const string checksumKey = checksumPrefix + versionName + " DEVTEST-11-02-2024";
+	public const string checksumKey = checksumPrefix + " DEVTEST-01-03-2024";
 	// For displaying the name of the mod in the version string.
 	public static string shortForkName = "CE";
 
 	public static string prodChecksum = checksumPrefix + " " + assetChecksum;
+
+	// Some terminology related stuff.
+	public static string nameCoin = "Metal";
+	public static string nameCoins = "Metals";
 
 	public static void promptDebugSettings() {
 		//testDocumentsInDebug = Helpers.showMessageBoxYesNo("Test documents in debug?", "Debug Settings");
@@ -44,7 +49,8 @@ public partial class Global {
 	 * A useful section of debug variables you can set to quickly jump into testing something on F5/Ctrl+F5
 	 * For example, _quickStart = true and quickStartMap = "training" immediately spawns you in training in launch.
 	 * Can set a lot of other things like character, opponent character, game mode, etc.
-	 * IF YOU ADD ANY DEBUG SETTINGS YOU MUST SET THEM TO OFF VALUE IN INIT(). Don't distribute a build with these improperly set!
+	 * IF YOU ADD ANY DEBUG SETTINGS YOU MUST SET THEM TO OFF VALUE IN INIT().
+	 * Don't distribute a build with these improperly set!
 	 */
 
 	// Most common by far
@@ -97,7 +103,9 @@ public partial class Global {
 
 	public static int quickStartOnlineBotCount = 1;
 
-	// Network options to simulate lag when developing locally. Note, both relay server and client use this so if both are built and run using these settings, values will be doubled
+	// Network options to simulate lag when developing locally.
+	// Note, both relay server and client use this so if both are built and
+	// run using these settings, values will be doubled
 	public static float simulatedLatency = 0.1f;
 	public static float simulatedPacketLoss = 0f;
 	public static float simulatedDuplicates = 0.00f;
@@ -138,7 +146,8 @@ public partial class Global {
 	public static bool skipCharWepSel = false;
 	public static bool showDiagnostics = false;
 	public static bool debugDNACores = false;
-	public static bool breakpoint = false;  // Generic global that can be used for quick conditional breakpoints in low-level physics methods
+	// Generic global that can be used for quick conditional breakpoints in low-level physics methods
+	public static bool breakpoint = false;
 	public static int? overrideFPS = 60;
 	public static bool disableShaderOverride = false;
 	public static bool? useOptimizedAssetsOverride = false;
@@ -219,7 +228,7 @@ public partial class Global {
 			Global.showDiagnostics = !Global.showDiagnostics;
 		}
 		if (Global.input.isPressed(Key.F6)) {
-			Global.level.mainPlayer.scrap = 100;
+			Global.level.mainPlayer.currency = 100;
 		}
 
 		if (Global.input.isPressed(Key.F7)) {
@@ -276,9 +285,9 @@ public partial class Global {
 	public static Dictionary<string, Texture> fontTextures = new Dictionary<string, Texture>();
 	public static Dictionary<string, Texture[,]> mapTextures = new Dictionary<string, Texture[,]>();
 	public static Dictionary<string, Sprite> sprites = new Dictionary<string, Sprite>();
-	public static Dictionary<string, SoundBufferWrapper> soundBuffers = new Dictionary<string, SoundBufferWrapper>();
-	public static Dictionary<string, SoundBufferWrapper> voiceBuffers = new Dictionary<string, SoundBufferWrapper>();
-	public static Dictionary<string, SoundBufferWrapper> charSoundBuffers = new Dictionary<string, SoundBufferWrapper>();
+	public static Dictionary<string, SoundBufferWrapper> soundBuffers = new();
+	public static Dictionary<string, SoundBufferWrapper> voiceBuffers = new();
+	public static Dictionary<string, SoundBufferWrapper> charSoundBuffers = new();
 	public static Dictionary<string, MusicWrapper> musics = new Dictionary<string, MusicWrapper>();
 	public static Dictionary<string, Shader> shaders = new Dictionary<string, Shader>();
 	public static Dictionary<string, ShaderWrapper> shaderWrappers = new Dictionary<string, ShaderWrapper>();
@@ -478,7 +487,8 @@ public partial class Global {
 	public static float lastFrameProcessTime;
 	public static List<float> lastFrameProcessTimes = new List<float>(120);
 	public static List<long> lastFramePacketIncreases = new List<long>(120);
-	public static List<long> last10SecondsPacketsReceived = new List<long>(); // [5 packets received (second 1), 3 packets received (second 2), 2 packets received (second 3), ...]
+	// [5 packets received (second 1), 3 packets received (second 2), 2 packets received (second 3), ...]
+	public static List<long> last10SecondsPacketsReceived = new List<long>();
 	public static long packetTotal1SecondAgo;
 
 	public const int fpsCap = 60;
@@ -565,7 +575,11 @@ public partial class Global {
 							.AddMachineName()
 							.AddUserName()
 							.AddOsVersion()
-						.UseFormatter(new HashDeviceIdFormatter(() => SHA256.Create(), new Base64UrlByteArrayEncoder()))
+						.UseFormatter(
+							new HashDeviceIdFormatter(
+								() => SHA256.Create(), new Base64UrlByteArrayEncoder()
+							)
+						)
 						.ToString();
 					} catch (Exception ex2) {
 						_deviceId = "";
@@ -604,11 +618,17 @@ public partial class Global {
 	public static void changeMusic(string newMusic) {
 		if (music != null) music.stop();
 		if (level?.mainPlayer != null) {
-			if (level.mainPlayer.charNum == 0 && musics.ContainsKey(newMusic + ".mmx")) newMusic = newMusic + ".mmx";
-			if (level.mainPlayer.charNum == 1 && musics.ContainsKey(newMusic + ".zero")) newMusic = newMusic + ".zero";
-			if (level.mainPlayer.charNum == 2 && musics.ContainsKey(newMusic + ".vile")) newMusic = newMusic + ".vile";
-			if (level.mainPlayer.charNum == 3 && musics.ContainsKey(newMusic + ".axl")) newMusic = newMusic + ".axl";
-			if (level.mainPlayer.charNum == 4 && musics.ContainsKey(newMusic + ".sigma")) newMusic = newMusic + ".sigma";
+			string musicExtension = level.mainPlayer.charNum switch {
+				0 => "mmx",
+				1 => "zero",
+				2 => "axl",
+				3 => "axl",
+				4 => "sigma",
+				_ => "nullchar"
+			};
+			if (musics.ContainsKey(newMusic + "." + musicExtension)) {
+				newMusic = newMusic + ".mmx";
+			}
 		}
 		if (musics.ContainsKey(newMusic)) {
 			music = musics[newMusic];
@@ -642,7 +662,9 @@ public partial class Global {
 						try {
 							region = JsonConvert.DeserializeObject<Region>(text);
 						} catch {
-							throw new Exception("region.json has improper format and could not be parsed. Must be valid JSON.");
+							throw new Exception(
+								"region.json has improper format and could not be parsed. Must be valid JSON."
+							);
 						}
 
 						// Validate

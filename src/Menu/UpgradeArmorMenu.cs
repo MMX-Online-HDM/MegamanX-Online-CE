@@ -68,7 +68,7 @@ public class UpgradeArmorMenu : IMainMenu {
 			if (selectArrowPosY == 0) {
 				if (mainPlayer.helmetArmorNum != xGame) {
 					if (!mainPlayer.isHeadArmorPurchased(xGame)) {
-						if (mainPlayer.scrap >= MegamanX.headArmorCost) {
+						if (mainPlayer.currency >= MegamanX.headArmorCost) {
 							purchaseHelmetArmor(mainPlayer, xGame);
 							Global.playSound("ching");
 							if (mainPlayer.helmetArmorNum == 0) {
@@ -88,7 +88,7 @@ public class UpgradeArmorMenu : IMainMenu {
 			if (selectArrowPosY == 1) {
 				if (mainPlayer.bodyArmorNum != xGame) {
 					if (!mainPlayer.isBodyArmorPurchased(xGame)) {
-						if (mainPlayer.scrap >= MegamanX.bodyArmorCost) {
+						if (mainPlayer.currency >= MegamanX.bodyArmorCost) {
 							purchaseBodyArmor(mainPlayer, xGame);
 							Global.playSound("ching");
 							if (mainPlayer.bodyArmorNum == 0) {
@@ -108,7 +108,7 @@ public class UpgradeArmorMenu : IMainMenu {
 			if (selectArrowPosY == 2) {
 				if (mainPlayer.armArmorNum != xGame) {
 					if (!mainPlayer.isArmArmorPurchased(xGame)) {
-						if (mainPlayer.scrap >= MegamanX.armArmorCost) {
+						if (mainPlayer.currency >= MegamanX.armArmorCost) {
 							purchaseArmArmor(mainPlayer, xGame);
 							Global.playSound("ching");
 							if (mainPlayer.armArmorNum == 0) {
@@ -128,7 +128,7 @@ public class UpgradeArmorMenu : IMainMenu {
 			if (selectArrowPosY == 3) {
 				if (mainPlayer.bootsArmorNum != xGame) {
 					if (!mainPlayer.isBootsArmorPurchased(xGame)) {
-						if (mainPlayer.scrap >= MegamanX.bootsArmorCost) {
+						if (mainPlayer.currency >= MegamanX.bootsArmorCost) {
 							purchaseBootsArmor(mainPlayer, xGame);
 							Global.playSound("ching");
 							if (mainPlayer.bootsArmorNum == 0) {
@@ -191,7 +191,7 @@ public class UpgradeArmorMenu : IMainMenu {
 
 	public static void purchaseHelmetArmor(Player player, int type) {
 		if (!player.isHeadArmorPurchased(type)) {
-			player.scrap -= MegamanX.headArmorCost;
+			player.currency -= MegamanX.headArmorCost;
 			player.setHeadArmorPurchased(type);
 		}
 	}
@@ -209,7 +209,7 @@ public class UpgradeArmorMenu : IMainMenu {
 
 	public static void purchaseBodyArmor(Player player, int type) {
 		if (!player.isBodyArmorPurchased(type)) {
-			player.scrap -= MegamanX.bodyArmorCost;
+			player.currency -= MegamanX.bodyArmorCost;
 			player.setBodyArmorPurchased(type);
 		}
 	}
@@ -226,7 +226,7 @@ public class UpgradeArmorMenu : IMainMenu {
 
 	public static void purchaseArmArmor(Player player, int type) {
 		if (type != 0 && !player.isArmArmorPurchased(type)) {
-			player.scrap -= MegamanX.armArmorCost;
+			player.currency -= MegamanX.armArmorCost;
 			player.setArmArmorPurchased(type);
 		}
 	}
@@ -237,7 +237,7 @@ public class UpgradeArmorMenu : IMainMenu {
 
 	public static void purchaseBootsArmor(Player player, int type) {
 		if (type != 0 && !player.isBootsArmorPurchased(type)) {
-			player.scrap -= MegamanX.bootsArmorCost;
+			player.currency -= MegamanX.bootsArmorCost;
 			player.setBootsArmorPurchased(type);
 		}
 	}
@@ -248,7 +248,10 @@ public class UpgradeArmorMenu : IMainMenu {
 		DrawWrappers.DrawRect(5, 5, Global.screenW - 5, Global.screenH - 5, true, Helpers.MenuBgColor, 0, ZIndex.HUD + 200, false);
 
 		Helpers.drawTextStd(TCat.Title, string.Format("Upgrade Armor(MMX{0})", xGame), Global.screenW * 0.5f, 8, Alignment.Center, fontSize: 48);
-		Helpers.drawTextStd("Scrap: " + mainPlayer.scrap, Global.screenW * 0.5f, 25, Alignment.Center, fontSize: 24);
+		Helpers.drawTextStd(
+			Global.nameCoins + ": " + mainPlayer.currency,
+			Global.screenW * 0.5f, 25, Alignment.Center
+		);
 
 		if (Global.frameCount % 60 < 30) {
 			if (xGame == 1) {
@@ -313,7 +316,7 @@ public class UpgradeArmorMenu : IMainMenu {
 		// Head section
 		Color headPartColor = mainPlayer.helmetArmorNum == xGame ? grayColor : Color.White;
 		Color headMessageColor = mainPlayer.helmetArmorNum == xGame ? grayColor :
-			(!mainPlayer.isHeadArmorPurchased(xGame) && mainPlayer.scrap < MegamanX.headArmorCost ? Color.Red :
+			(!mainPlayer.isHeadArmorPurchased(xGame) && mainPlayer.currency < MegamanX.headArmorCost ? Color.Red :
 			(!mainPlayer.isHeadArmorPurchased(xGame) ? Color.Green : Color.White));
 		Helpers.drawTextStd(TCat.Option, "Head Parts", optionPos1.x, optionPos1.y, fontSize: 24, color: headPartColor, selected: selectArrowPosY == 0 && !showChips);
 		Helpers.drawTextStd(getHeadArmorMessage(), optionPos1.x + 57, optionPos1.y, fontSize: 24, color: headMessageColor);
@@ -336,7 +339,7 @@ public class UpgradeArmorMenu : IMainMenu {
 		// Body section
 		Color bodyPartColor = mainPlayer.bodyArmorNum == xGame ? grayColor : Color.White;
 		Color bodyMessageColor = mainPlayer.bodyArmorNum == xGame ? grayColor :
-			(!mainPlayer.isBodyArmorPurchased(xGame) && mainPlayer.scrap < MegamanX.bodyArmorCost ? Color.Red :
+			(!mainPlayer.isBodyArmorPurchased(xGame) && mainPlayer.currency < MegamanX.bodyArmorCost ? Color.Red :
 			(!mainPlayer.isBodyArmorPurchased(xGame) ? Color.Green : Color.White));
 		Helpers.drawTextStd(TCat.Option, "Body Parts", optionPos2.x, optionPos2.y, fontSize: 24, color: bodyPartColor, selected: selectArrowPosY == 1 && !showChips);
 		Helpers.drawTextStd(getBodyArmorMessage(), optionPos2.x + 57, optionPos2.y, fontSize: 24, color: bodyMessageColor);
@@ -358,7 +361,7 @@ public class UpgradeArmorMenu : IMainMenu {
 		// Arm section
 		Color armPartColor = mainPlayer.armArmorNum == xGame ? grayColor : Color.White;
 		Color armMessageColor = mainPlayer.armArmorNum == xGame ? grayColor :
-			(!mainPlayer.isArmArmorPurchased(xGame) && mainPlayer.scrap < MegamanX.armArmorCost ? Color.Red :
+			(!mainPlayer.isArmArmorPurchased(xGame) && mainPlayer.currency < MegamanX.armArmorCost ? Color.Red :
 			(!mainPlayer.isArmArmorPurchased(xGame) ? Color.Green : Color.White));
 		Helpers.drawTextStd(TCat.Option, "Arm Parts", optionPos3.x, optionPos3.y, fontSize: 24, color: armPartColor, selected: selectArrowPosY == 2 && !showChips);
 		Helpers.drawTextStd(getArmArmorMessage(), optionPos3.x + 57, optionPos3.y, fontSize: 24, color: armMessageColor);
@@ -378,7 +381,7 @@ public class UpgradeArmorMenu : IMainMenu {
 		// Foot section
 		Color bootsPartColor = mainPlayer.bootsArmorNum == xGame ? grayColor : Color.White;
 		Color bootsMessageColor = mainPlayer.bootsArmorNum == xGame ? grayColor :
-			(!mainPlayer.isBootsArmorPurchased(xGame) && mainPlayer.scrap < MegamanX.bootsArmorCost ? Color.Red :
+			(!mainPlayer.isBootsArmorPurchased(xGame) && mainPlayer.currency < MegamanX.bootsArmorCost ? Color.Red :
 			(!mainPlayer.isBootsArmorPurchased(xGame) ? Color.Green : Color.White));
 		Helpers.drawTextStd(TCat.Option, "Foot Parts", optionPos4.x, optionPos4.y, fontSize: 24, color: bootsPartColor, selected: selectArrowPosY == 3 && !showChips);
 		Helpers.drawTextStd(getBootsArmorMessage(), optionPos4.x + 57, optionPos4.y, fontSize: 24, color: bootsMessageColor);
@@ -416,7 +419,7 @@ public class UpgradeArmorMenu : IMainMenu {
 		if (Global.input.isPressedMenu(Control.Special1)) {
 			if (mainPlayer.canUpgradeUltimateX()) {
 				if (!mainPlayer.character.boughtUltimateArmorOnce) {
-					mainPlayer.scrap -= Player.ultimateArmorCost;
+					mainPlayer.currency -= Player.ultimateArmorCost;
 					mainPlayer.character.boughtUltimateArmorOnce = true;
 				}
 				mainPlayer.setUltimateArmor(true);
@@ -424,7 +427,7 @@ public class UpgradeArmorMenu : IMainMenu {
 				return true;
 			} else if (mainPlayer.canUpgradeGoldenX()) {
 				if (!mainPlayer.character.boughtGoldenArmorOnce) {
-					mainPlayer.scrap -= Player.goldenArmorCost;
+					mainPlayer.currency -= Player.goldenArmorCost;
 					mainPlayer.character.boughtGoldenArmorOnce = true;
 				}
 				mainPlayer.setGoldenArmor(true);
@@ -449,9 +452,14 @@ public class UpgradeArmorMenu : IMainMenu {
 
 		string specialText = "";
 		if (mainPlayer.canUpgradeUltimateX() && mainPlayer.isX && !mainPlayer.isDisguisedAxl) {
-			specialText = "[SPC]: Ultimate Armor" + (mainPlayer.character.boughtUltimateArmorOnce ? "" : " (10 scrap)");
+			specialText = ("[SPC]: Ultimate Armor" +
+				(mainPlayer.character.boughtUltimateArmorOnce ? "" : $" (10 {Global.nameCoins})")
+			);
 		} else if (mainPlayer.canUpgradeGoldenX() && mainPlayer.isX && !mainPlayer.isDisguisedAxl) {
-			specialText = "[SPC]: Hyper Chip" + (mainPlayer.character.boughtGoldenArmorOnce ? "" : " (5 scrap)");
+			specialText = (
+				"[SPC]: Hyper Chip" +
+				(mainPlayer.character.boughtGoldenArmorOnce ? "" : $" (5 {Global.nameCoins})")
+			);
 		}
 
 		if (mainPlayer.hasUltimateArmor()) {
@@ -474,27 +482,27 @@ public class UpgradeArmorMenu : IMainMenu {
 		if (mainPlayer.isHeadArmorPurchased(xGame)) {
 			return mainPlayer.helmetArmorNum == xGame ? " (Active)" : " (Bought)";
 		}
-		return string.Format(" ({0} scrap)", MegamanX.headArmorCost);
+		return $" ({MegamanX.headArmorCost} {Global.nameCoins})";
 	}
 
 	public string getBodyArmorMessage() {
 		if (mainPlayer.isBodyArmorPurchased(xGame)) {
 			return mainPlayer.bodyArmorNum == xGame ? " (Active)" : " (Bought)";
 		}
-		return string.Format(" ({0} scrap)", MegamanX.bodyArmorCost);
+		return $" ({MegamanX.bodyArmorCost} {Global.nameCoins})";
 	}
 
 	public string getArmArmorMessage() {
 		if (mainPlayer.isArmArmorPurchased(xGame)) {
 			return mainPlayer.armArmorNum == xGame ? " (Active)" : " (Bought)";
 		}
-		return string.Format(" ({0} scrap)", MegamanX.armArmorCost);
+		return $" ({MegamanX.armArmorCost} {Global.nameCoins}))";
 	}
 
 	public string getBootsArmorMessage() {
 		if (mainPlayer.isBootsArmorPurchased(xGame)) {
 			return mainPlayer.bootsArmorNum == xGame ? " (Active)" : " (Bought)";
 		}
-		return string.Format(" ({0} scrap)", MegamanX.bootsArmorCost);
+		return $" ({MegamanX.bootsArmorCost} {Global.nameCoins}))";
 	}
 }

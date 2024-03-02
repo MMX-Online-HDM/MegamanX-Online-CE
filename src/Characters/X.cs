@@ -541,13 +541,13 @@ public partial class MegamanX : Character {
 			shoryukenCheck = player.input.checkShoryuken(player, xDir, Control.Shoot);
 		}
 		if (player.isX && hadokenCheck && canUseFgMove()) {
-			if (!player.hasAllItems()) player.scrap -= 3;
+			if (!player.hasAllItems()) player.currency -= 3;
 			player.fgMoveAmmo = 0;
 			changeState(new Hadouken(), true);
 			return true;
 		}
 		if (player.isX && shoryukenCheck && canUseFgMove()) {
-			if (!player.hasAllItems()) player.scrap -= 3;
+			if (!player.hasAllItems()) player.currency -= 3;
 			player.fgMoveAmmo = 0;
 			changeState(new Shoryuken(isUnderwater()), true);
 			return true;
@@ -775,7 +775,7 @@ public partial class MegamanX : Character {
 		hyperProgress = 0;
 		if (player.canUpgradeGoldenX()) {
 			if (!player.character.boughtGoldenArmorOnce) {
-				player.scrap -= Player.goldenArmorCost;
+				player.currency -= Player.goldenArmorCost;
 				player.character.boughtGoldenArmorOnce = true;
 			}
 			player.setGoldenArmor(true);
@@ -784,7 +784,7 @@ public partial class MegamanX : Character {
 		}
 		if (player.canUpgradeUltimateX()) {
 			if (!player.character.boughtUltimateArmorOnce) {
-				player.scrap -= Player.ultimateArmorCost;
+				player.currency -= Player.ultimateArmorCost;
 				player.character.boughtUltimateArmorOnce = true;
 			}
 			player.setUltimateArmor(true);
@@ -1143,7 +1143,7 @@ public partial class MegamanX : Character {
 	}
 
 	public bool canAffordFgMove() {
-		return player.scrap >= 3 || player.hasAllItems();
+		return player.currency >= 3 || player.hasAllItems();
 	}
 
 	public bool canUseFgMove() {

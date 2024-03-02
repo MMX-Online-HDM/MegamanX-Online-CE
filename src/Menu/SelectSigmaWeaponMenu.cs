@@ -281,10 +281,10 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 				new Color(0, 0, 0, 100), 1, ZIndex.HUD, false, outlineColor: outlineColor
 			);
 			string cost = cursors[3].index switch {
-				0 => "3 Metal",
-				1 => "3 Metal",
+				0 => $"3 {Global.nameCoins}",
+				1 => $"3 {Global.nameCoins}",
 				2 => "Free",
-				3 => "5 Metal",
+				3 => $"5 {Global.nameCoins}",
 				_ => "ERROR"
 			};
 			string title = cursors[3].index switch {

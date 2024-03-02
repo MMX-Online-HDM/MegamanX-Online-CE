@@ -504,12 +504,14 @@ public abstract class BaseSigma : Character {
 		//if (Global.level.is1v1()) player.health -= (player.maxHealth / 2);
 		if (player.isStriker()) return;
 		if (player.isRefundableMode() && mw.summonedOnce) return;
-		else player.scrap -= getMaverickCost();
+		else player.currency -= getMaverickCost();
 	}
 
 	private void cantAffordMaverickMessage() {
 		//if (Global.level.is1v1()) Global.level.gameMode.setHUDErrorMessage(player, "Maverick requires 16 HP");
-		Global.level.gameMode.setHUDErrorMessage(player, "Maverick requires " + getMaverickCost() + " scrap");
+		Global.level.gameMode.setHUDErrorMessage(
+			player, "Maverick requires " + getMaverickCost() + " " + Global.nameCoins
+		);
 	}
 
 	private bool canAffordMaverick(MaverickWeapon mw) {
@@ -517,7 +519,7 @@ public abstract class BaseSigma : Character {
 		if (player.isStriker()) return true;
 		if (player.isRefundableMode() && mw.summonedOnce) return true;
 
-		return player.scrap >= getMaverickCost();
+		return player.currency >= getMaverickCost();
 	}
 
 	public int getMaverickCost() {

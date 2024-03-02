@@ -37,16 +37,16 @@ public class SelectVileArmorMenu : IMainMenu {
 
 		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 			if (selectArrowPosY == 0) {
-				if (!mainPlayer.frozenCastle && mainPlayer.scrap >= Vile.frozenCastleCost) {
+				if (!mainPlayer.frozenCastle && mainPlayer.currency >= Vile.frozenCastleCost) {
 					mainPlayer.frozenCastle = true;
 					Global.playSound("ching");
-					mainPlayer.scrap -= Vile.frozenCastleCost;
+					mainPlayer.currency -= Vile.frozenCastleCost;
 				}
 			} else if (selectArrowPosY == 1) {
-				if (!mainPlayer.speedDevil && mainPlayer.scrap >= Vile.speedDevilCost) {
+				if (!mainPlayer.speedDevil && mainPlayer.currency >= Vile.speedDevilCost) {
 					mainPlayer.speedDevil = true;
 					Global.playSound("ching");
-					mainPlayer.scrap -= Vile.speedDevilCost;
+					mainPlayer.currency -= Vile.speedDevilCost;
 				}
 			}
 		} else if (Global.input.isPressedMenu(Control.MenuBack)) {
@@ -71,13 +71,17 @@ public class SelectVileArmorMenu : IMainMenu {
 		Global.sprites["cursor"].drawToHUD(0, optionPosX - 6, optionPosY[0] + selectArrowPosY * 40 + 3);
 
 		Fonts.drawText(FontType.Yellow, "Vile Armor", Global.screenW * 0.5f, 10, Alignment.Center);
-		Fonts.drawText(FontType.Golden, "Scrap: " + mainPlayer.scrap, Global.screenW * 0.5f, 20, Alignment.Center);
+		Fonts.drawText(
+			FontType.Golden,
+			Global.nameCoins + ": " + mainPlayer.currency,
+			Global.screenW * 0.5f, 20, Alignment.Center
+		);
 
 		Fonts.drawText(FontType.Blue, "Frozen Castle", optionPosX, optionPosY[0],
 			selected: selectArrowPosY == 0
 		);
 		Fonts.drawText(
-			FontType.Purple, string.Format(" ({0} scrap)", Vile.frozenCastleCost),
+			FontType.Purple, $" ({Vile.frozenCastleCost} {Global.nameCoins})",
 			optionPosX + 110, optionPosY[0]
 		);
 		Fonts.drawText(
@@ -91,7 +95,7 @@ public class SelectVileArmorMenu : IMainMenu {
 			selected: selectArrowPosY == 1
 		);
 		Fonts.drawText(
-			FontType.Purple, string.Format(" ({0} scrap)", Vile.speedDevilCost),
+			FontType.Purple, $" ({Vile.speedDevilCost} {Global.nameCoins})",
 			optionPosX + 110, optionPosY[2]
 		);
 		Fonts.drawText(

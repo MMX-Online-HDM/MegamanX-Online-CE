@@ -68,10 +68,10 @@ public class DevConsole {
 		}
 	}
 
-	public static void scrapCommand(string[] args) {
+	public static void currencyCommand(string[] args) {
 		if (args[0] == "max") args[0] = "9999";
-		int scrap = int.Parse(args[0]);
-		Global.level.mainPlayer.scrap = scrap;
+		int currency = int.Parse(args[0]);
+		Global.level.mainPlayer.currency = currency;
 	}
 
 	public static void setHealth(string[] args) {
@@ -227,7 +227,7 @@ public class DevConsole {
 			new Command("aikill", (args) => Global.level.otherPlayer?.forceKill()),
 			new Command("aiswitch", aiSwitch),
 			new Command("aimash", (args) => aiMash(args)),
-			new Command("scrap", scrapCommand),
+			new Command("scrap", currencyCommand),
 			new Command("die", (args) => Global.level.mainPlayer.forceKill()),
 			new Command("raflight", (args) => Global.level.rideArmorFlight = !Global.level.rideArmorFlight),
             // Online

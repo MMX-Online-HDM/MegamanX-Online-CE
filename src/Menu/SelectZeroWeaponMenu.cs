@@ -235,7 +235,7 @@ public class SelectZeroWeaponMenu : IMainMenu {
 				Fonts.drawText(FontType.Green, "Lasts 12 seconds.", 40, wsy + 15);
 			} else if (cursors[8].index == 1) {
 				Fonts.drawText(FontType.Green, "This hyper form grants powerful ranged attacks.", 40, wsy + 6);
-				Fonts.drawText(FontType.Green, "Lasts until scrap is depleted.", 40, wsy + 15);
+				Fonts.drawText(FontType.Green, $"Lasts until {Global.nameCoins} are depleted.", 40, wsy + 15);
 			} else if (cursors[8].index == 2) {
 				Fonts.drawText(FontType.Green, "This hyper form infects and disrupts foes on each hit.", 40, wsy + 6);
 				Fonts.drawText(FontType.Green, "Lasts until death.", 40, wsy + 15);

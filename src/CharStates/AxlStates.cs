@@ -36,7 +36,7 @@ public class HyperAxlStart : CharState {
 		axl = character as Axl;
 		if (!axl.hyperAxlUsed) {
 			axl.hyperAxlUsed = true;
-			axl.player.scrap -= 10;
+			axl.player.currency -= 10;
 		}
 		axl.useGravity = false;
 		axl.vel = new Point();

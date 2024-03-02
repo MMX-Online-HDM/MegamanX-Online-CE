@@ -465,14 +465,14 @@ public class Axl : Character {
 				// Handles Hyper activation.
 
 				if (player.input.isHeld(Control.Special2, player) &&
-					player.scrap >= 10 && (!(charState is HyperAxlStart)) &&
+					player.currency >= 10 && (!(charState is HyperAxlStart)) &&
 					(!hyperAxlUsed) && (!(charState is WarpIn))
 				) {
 					hyperProgress += Global.spf;
 				} else {
 					hyperProgress = 0;
 				}
-				if (hyperProgress >= 1 && player.scrap >= 10) {
+				if (hyperProgress >= 1 && player.currency >= 10) {
 					hyperProgress = 0;
 					if (player.axlHyperMode == 0) {
 						changeState(new HyperAxlStart(grounded), true);
@@ -688,12 +688,12 @@ public class Axl : Character {
 						if (shootPressed && shootTime == 0) {
 							if (flag != null) {
 								Global.level.gameMode.setHUDErrorMessage(player, "Cannot transform with flag");
-							} else if (player.scrap < 1) {
-								Global.level.gameMode.setHUDErrorMessage(player, "Transformation requires 1 scrap");
+							} else if (player.currency < 1) {
+								Global.level.gameMode.setHUDErrorMessage(player, "Transformation requires 1 Metal");
 							} else if (isWhiteAxl() || isStealthMode()) {
 								Global.level.gameMode.setHUDErrorMessage(player, "Cannot transform as Hyper Axl");
 							} else {
-								player.scrap--;
+								player.currency--;
 								realWeapon.axlShoot(player);
 							}
 						}
@@ -1568,16 +1568,16 @@ public class Axl : Character {
 		return player.isAxl && isInvisibleBS.getValue() == true;
 	}
 
-	float stealthScrapTime;
+	float stealthCurrencyTime;
 
 	public void updateStealthMode() {
-		stealthScrapTime += Global.spf;
+		stealthCurrencyTime += Global.spf;
 		stingChargeTime = 8;
-		if (stealthScrapTime > 1) {
-			stealthScrapTime = 0;
-			player.scrap--;
-			if (player.scrap <= 0) {
-				player.scrap = 0;
+		if (stealthCurrencyTime > 1) {
+			stealthCurrencyTime = 0;
+			player.currency--;
+			if (player.currency <= 0) {
+				player.currency = 0;
 				stingChargeTime = 0;
 			}
 		}

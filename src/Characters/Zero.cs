@@ -205,7 +205,7 @@ public class Zero : Character {
 		framesSinceLastAttack = Global.level.frameCount - lastAttackFrame;
 
 		if (chargeButtonHeld() && (
-			player.scrap > 0 || player.isZBusterZero() || player.weapon is AssassinBullet
+			player.currency > 0 || player.isZBusterZero() || player.weapon is AssassinBullet
 			) && flag == null && rideChaser == null && rideArmor == null
 		) {
 			if (!stockedXSaber && !isInvulnerableAttack()) {
@@ -231,7 +231,7 @@ public class Zero : Character {
 		Helpers.decrementTime(ref zeroLemonCooldown);
 
 		// Handles Standard Hypermode Activations.
-		if (player.scrap >= Player.zeroHyperCost &&
+		if (player.currency >= Player.zeroHyperCost &&
 			player.input.isHeld(Control.Special2, player) &&
 			charState is not HyperZeroStart && (
 				!isNightmareZero &&
@@ -246,13 +246,13 @@ public class Zero : Character {
 		} else {
 			hyperProgress = 0;
 		}
-		if (hyperProgress >= 1 && player.scrap >= Player.zeroHyperCost) {
+		if (hyperProgress >= 1 && player.currency >= Player.zeroHyperCost) {
 			hyperProgress = 0;
 			changeState(new HyperZeroStart(zeroHyperMode), true);
 		}
-		if (player.scrap < Player.zeroHyperCost && player.input.isHeld(Control.Special2, player)) {
+		if (player.currency < Player.zeroHyperCost && player.input.isHeld(Control.Special2, player)) {
 			Global.level.gameMode.setHUDErrorMessage(
-				player, Player.zeroHyperCost + " scrap needed to enter hypermode.",
+				player, Player.zeroHyperCost + " " + Global.nameCoins + " needed to enter hypermode.",
 				playSound: false, resetCooldown: true
 			);
 		}
@@ -301,7 +301,7 @@ public class Zero : Character {
 
 			// Handles ZBusterZero's Hyper activations.
 			if (player.input.isHeld(Control.Special2, player) && 
-				player.scrap >= Player.zBusterZeroHyperCost && !isBlackZero2() && 
+				player.currency >= Player.zBusterZeroHyperCost && !isBlackZero2() && 
 				charState is not HyperZeroStart && invulnTime == 0 && 
 				rideChaser == null && rideArmor == null && charState is not WarpIn) {
 				hyperProgress += Global.spf;
@@ -309,15 +309,16 @@ public class Zero : Character {
 				hyperProgress = 0;
 			}
 
-			if (hyperProgress >= 1 && player.scrap >= Player.zBusterZeroHyperCost && 
+			if (hyperProgress >= 1 && player.currency >= Player.zBusterZeroHyperCost && 
 				!isBlackZero2()) {
 				hyperProgress = 0;
 				changeState(new HyperZeroStart(0), true);
 			}
 
-			if (player.scrap < Player.zBusterZeroHyperCost && player.input.isHeld(Control.Special2, player)) {
+			if (player.currency < Player.zBusterZeroHyperCost && player.input.isHeld(Control.Special2, player)) {
 				Global.level.gameMode.setHUDErrorMessage(
-					player, Player.zBusterZeroHyperCost + " scrap needed to enter hypermode.",
+					player,
+					Player.zBusterZeroHyperCost + " " + Global.nameCoins + " needed to enter hypermode.",
 					playSound: false, resetCooldown: true
 				);
 			}
@@ -725,7 +726,7 @@ public class Zero : Character {
 
 	public List<BusterProj> zeroLemonsOnField = new List<BusterProj>();
 	private void zeroShoot(int chargeLevel) {
-		if (!player.isZBusterZero() && player.scrap <= 0) return;
+		if (!player.isZBusterZero() && player.currency <= 0) return;
 
 		if (player.isZBusterZero() && chargeLevel == 0) {
 			for (int i = zeroLemonsOnField.Count - 1; i >= 0; i--) {
@@ -819,11 +820,11 @@ public class Zero : Character {
 				}, 0.3f));
 			}
 			if (!player.isZBusterZero() || !player.isAI) {
-				player.scrap--;
+				player.currency--;
 			}
-			if (player.scrap < 0)
+			if (player.currency < 0)
 			{
-				player.scrap = 0;
+				player.currency = 0;
 			}
 		} else {
 			int type = player.isZBusterZero() ? 1 : 0;
@@ -840,7 +841,7 @@ public class Zero : Character {
 			} else if (chargeLevel == 1) {
 				if (!player.isZBusterZero())
 				{
-				if (type == 0) player.scrap -= 1;
+				if (type == 0) player.currency -= 1;
 				playSound("buster2", sendRpc: true);
 				zeroLemonCooldown = 0.375f;
 				new ZBuster2Proj(
@@ -854,7 +855,7 @@ public class Zero : Character {
 					zeroBusterWeapon, shootPos, xDir, type, player, player.getNextActorNetId(), rpc: true
 				);}
 			} else if (chargeLevel == 2) {
-				if (type == 0) player.scrap -= 1;
+				if (type == 0) player.currency -= 1;
 				zeroLemonCooldown = 0.375f;
 				if (!player.isZBusterZero()) {
 					playSound("buster3", sendRpc: true);
@@ -868,14 +869,14 @@ public class Zero : Character {
 					);
 				}
 			} else if (chargeLevel == 3 || chargeLevel >= 4) {
-				if (type == 0) player.scrap -= 1;
+				if (type == 0) player.currency -= 1;
 				if (chargeLevel == 3 && player.isZBusterZero()) {
 					changeState(new ZeroDoubleBuster(false, true), true);
 					//playSound("zbuster2", sendRpc: true);
 					//new ZBuster2Proj(player.zeroBusterWeapon, shootPos, xDir, type, player, player.getNextActorNetId(), rpc: true);
 					//stockedCharge = true;
 				} else if (chargeLevel >= 4 && canUseDoubleBusterCombo()) {
-					//if (!isBlackZero2()) player.scrap -= 1;
+					//if (!isBlackZero2()) player.currency -= 1;
 					changeState(new ZeroDoubleBuster(false, false), true);
 				} else {
 					playSound("buster4", sendRpc: true);
@@ -923,20 +924,20 @@ public class Zero : Character {
 		return awakenedZeroTime > 30;
 	}
 
-	float awakenedScrapTime;
+	float awakenedCurrencyTime;
 	float awakenedAuraAnimTime;
 	public int awakenedAuraFrame;
 	public void updateAwakenedZero() {
 		awakenedZeroTime += Global.spf;
-		awakenedScrapTime += Global.spf;
-		int scrapDeductTime = 2;
-		if (isAwakenedGenmuZero()) scrapDeductTime = 1;
+		awakenedCurrencyTime += Global.spf;
+		int currencyDeductTime = 2;
+		if (isAwakenedGenmuZero()) currencyDeductTime = 1;
 
-		if (awakenedScrapTime > scrapDeductTime) {
-			awakenedScrapTime = 0;
-			player.scrap--;
-			if (player.scrap <= 0) {
-				player.scrap = 0;
+		if (awakenedCurrencyTime > currencyDeductTime) {
+			awakenedCurrencyTime = 0;
+			player.currency--;
+			if (player.currency <= 0) {
+				player.currency = 0;
 				awakenedZeroTime = 0;
 			}
 		}

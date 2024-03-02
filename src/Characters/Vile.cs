@@ -5,7 +5,7 @@ namespace MMXOnline;
 
 public class Vile : Character {
 	public float vulcanLingerTime;
-	public const int callNewMechScrapCost = 5;
+	public const int callNewMechCost = 5;
 	float mechBusterCooldown;
 	public bool usedAmmoLastFrame;
 	public float vileLadderShootCooldown;
@@ -418,9 +418,16 @@ public class Vile : Character {
 				Global.level.gameMode.setHUDErrorMessage(player, "Can only summon a mech once per life");
 			} else if (canAffordRideArmor()) {
 				if (!(charState is Idle || charState is Run || charState is Crouch)) return;
-				if (player.selectedRAIndex == 4 && player.scrap < 10) {
-					if (isVileMK2) Global.level.gameMode.setHUDErrorMessage(player, "Goliath armor requires 10 scrap");
-					else Global.level.gameMode.setHUDErrorMessage(player, "Devil Bear armor requires 10 scrap");
+				if (player.selectedRAIndex == 4 && player.currency < 10) {
+					if (isVileMK2) {
+						Global.level.gameMode.setHUDErrorMessage(
+							player, $"Goliath armor requires 10 {Global.nameCoins}"
+						);
+					} else {
+						Global.level.gameMode.setHUDErrorMessage(
+							player, $"Devil Bear armor requires 10 {Global.nameCoins}"
+						);
+					}
 				} else {
 					alreadySummonedNewMech = true;
 					if (vileStartRideArmor != null) vileStartRideArmor.selfDestructTime = 1000;
@@ -439,12 +446,12 @@ public class Vile : Character {
 					changeState(new CallDownMech(vileStartRideArmor, true), true);
 				}
 			} else {
-				if (player.selectedRAIndex == 4 && player.scrap < 10) {
+				if (player.selectedRAIndex == 4 && player.currency < 10) {
 					if (isVileMK2) Global.level.gameMode.setHUDErrorMessage(
-						player, "Goliath armor requires 10 scrap"
+						player, $"Goliath armor requires 10 {Global.nameCoins}"
 					);
 					else Global.level.gameMode.setHUDErrorMessage(
-						player, "Devil Bear armor requires 10 scrap"
+						player, $"Devil Bear armor requires 10 {Global.nameCoins}"
 					);
 				} else {
 					cantAffordRideArmorMessage();
@@ -472,8 +479,13 @@ public class Vile : Character {
 	}
 
 	private void cantAffordRideArmorMessage() {
-		if (Global.level.is1v1()) Global.level.gameMode.setHUDErrorMessage(player, "Ride Armor requires 16 HP");
-		else Global.level.gameMode.setHUDErrorMessage(player, "Ride Armor requires " + callNewMechScrapCost + " scrap");
+		if (Global.level.is1v1()) {
+			Global.level.gameMode.setHUDErrorMessage(player, "Ride Armor requires 16 HP");
+		} else {
+			Global.level.gameMode.setHUDErrorMessage(
+				player, "Ride Armor requires " + callNewMechCost + " " + Global.nameCoins
+			);
+		}
 	}
 
 	public Point getVileShootVel(bool aimable) {

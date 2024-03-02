@@ -11,7 +11,7 @@ namespace MMXOnline;
 [ProtoContract]
 public class CustomMatchSettings {
 	[ProtoMember(1)] public bool hyperModeMatch;
-	[ProtoMember(2)] public int startScrap = 3;
+	[ProtoMember(2)] public int startCurrency = 3;
 	[ProtoMember(3)] public int startHeartTanks;
 	[ProtoMember(4)] public int startSubTanks;
 	[ProtoMember(5)] public int healthModifier = 1;
@@ -60,10 +60,15 @@ public class CustomMatchSettingsMenu : IMainMenu {
 		menuOptions.Add(
 			new MenuOption(startX, currentY += lineH,
 				() => {
-					Helpers.menuLeftRightInc(ref savedMatchSettings.customMatchSettings.startScrap, 0, 9999, true);
+					Helpers.menuLeftRightInc(ref savedMatchSettings.customMatchSettings.startCurrency, 0, 9999, true);
 				},
 				(Point pos, int index) => {
-					Helpers.drawTextStd(TCat.Option, "Start scrap: " + savedMatchSettings.customMatchSettings.startScrap.ToString(), pos.x, pos.y, fontSize: fontSize, selected: selectArrowPosY == 1);
+					Helpers.drawTextStd(
+						TCat.Option, 
+						"Start " + Global.nameCoins + ": "  +
+						savedMatchSettings.customMatchSettings.startCurrency.ToString(),
+						pos.x, pos.y, fontSize: fontSize, selected: selectArrowPosY == 1
+					);
 				})
 			);
 

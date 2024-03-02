@@ -35,12 +35,12 @@ public class MaverickWeapon : Weapon {
 	public int selCommandIndex = 2;
 	public int selCommandIndexX = 1;
 	public const int maxCommandIndex = 4;
-	public float scrapHUDAnimTime;
-	public const float scrapHUDMaxAnimTime = 0.75f;
-	public float scrapGainCooldown;
-	public float scrapGainMaxCooldown {
+	public float currencyHUDAnimTime;
+	public const float currencyHUDMaxAnimTime = 0.75f;
+	public float currencyGainCooldown;
+	public float currencyGainMaxCooldown {
 		get {
-			return 10 + player.scrap;
+			return 10 + player.currency;
 		}
 	}
 
@@ -56,20 +56,20 @@ public class MaverickWeapon : Weapon {
 		Helpers.decrementTime(ref cooldown);
 
 		if (player != null && !summonedOnce && !player.isStriker() && player.character != null) {
-			if (scrapGainCooldown < scrapGainMaxCooldown) {
-				scrapGainCooldown += Global.spf;
-				if (scrapGainCooldown >= scrapGainMaxCooldown) {
-					scrapGainCooldown = 0;
-					scrapHUDAnimTime = Global.spf;
-					player.scrap++;
+			if (currencyGainCooldown < currencyGainMaxCooldown) {
+				currencyGainCooldown += Global.spf;
+				if (currencyGainCooldown >= currencyGainMaxCooldown) {
+					currencyGainCooldown = 0;
+					currencyHUDAnimTime = Global.spf;
+					player.currency++;
 				}
 			}
 		}
 
-		if (scrapHUDAnimTime > 0) {
-			scrapHUDAnimTime += Global.spf;
-			if (scrapHUDAnimTime > scrapHUDMaxAnimTime) {
-				scrapHUDAnimTime = 0;
+		if (currencyHUDAnimTime > 0) {
+			currencyHUDAnimTime += Global.spf;
+			if (currencyHUDAnimTime > currencyHUDMaxAnimTime) {
+				currencyHUDAnimTime = 0;
 			}
 		}
 	}

@@ -11,7 +11,7 @@ public class UpgradeMenu : IMainMenu {
 	public static int selectArrowPosY;
 	public IMainMenu prevMenu;
 	public static bool onUpgradeMenu = true;
-	public int subtankScrapCost = 4;
+	public int subtankCost = 4;
 	public List<Weapon> subtankTargets = new List<Weapon>();
 	public static int subtankTargetIndex;
 	public int startX = 25;
@@ -114,8 +114,8 @@ public class UpgradeMenu : IMainMenu {
 
 		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 			if (selectArrowPosY == 0) {
-				if (mainPlayer.heartTanks < getMaxHeartTanks() && mainPlayer.scrap >= getHeartTankCost()) {
-					mainPlayer.scrap -= getHeartTankCost();
+				if (mainPlayer.heartTanks < getMaxHeartTanks() && mainPlayer.currency >= getHeartTankCost()) {
+					mainPlayer.currency -= getHeartTankCost();
 					mainPlayer.heartTanks++;
 					Global.playSound("hearthX1");
 					mainPlayer.maxHealth += mainPlayer.getHeartTankModifier();
@@ -133,8 +133,8 @@ public class UpgradeMenu : IMainMenu {
 					*/
 				}
 			} else if (selectArrowPosY >= 1) {
-				if (mainPlayer.subtanks.Count < selectArrowPosY && mainPlayer.scrap >= subtankScrapCost) {
-					mainPlayer.scrap -= subtankScrapCost;
+				if (mainPlayer.subtanks.Count < selectArrowPosY && mainPlayer.currency >= subtankCost) {
+					mainPlayer.currency -= subtankCost;
 					mainPlayer.subtanks.Add(new SubTank());
 					Global.playSound("upgrade");
 				} else if (mainPlayer.subtanks.InRange(selectArrowPosY - 1)) {
@@ -166,7 +166,11 @@ public class UpgradeMenu : IMainMenu {
 		Global.sprites["cursor"].drawToHUD(0, optionPositions[0].x - 8, optionPositions[selectArrowPosY].y + 4);
 
 		Fonts.drawText(FontType.Yellow, "Upgrade Menu", Global.screenW * 0.5f, 16, Alignment.Center);
-		Fonts.drawText(FontType.Golden, "Metal: " + mainPlayer.scrap, Global.screenW * 0.5f, 26, Alignment.Center);
+		Fonts.drawText(
+			FontType.Golden,
+			Global.nameCoins + ": " + mainPlayer.currency,
+			Global.screenW * 0.5f, 26, Alignment.Center
+		);
 		int maxHeartTanks = getMaxHeartTanks();
 		for (int i = 0; i < maxHeartTanks; i++) {
 			bool isBought = mainPlayer.heartTanks > i;
@@ -198,7 +202,7 @@ public class UpgradeMenu : IMainMenu {
 		);
 		Fonts.drawText(FontType.Blue, heartTanksStr, textX, optionPositions[0].y, selected: selectArrowPosY == 0);
 		if (!soldOut) {
-			string costStr = string.Format(" ({0} Metal)", getHeartTankCost());
+			string costStr = $" ({getHeartTankCost()} {Global.nameCoins})";
 			int posOffset = Fonts.measureText(FontType.Blue, heartTanksStr);
 			Fonts.drawText(FontType.Green, costStr, textX + posOffset, optionPositions[0].y);
 		}
@@ -269,7 +273,7 @@ public class UpgradeMenu : IMainMenu {
 				);
 			}
 			if (buyOrUse) {
-				string costStr = $" ({subtankScrapCost} scrap)";
+				string costStr = $" ({subtankCost} {Global.nameCoins})";
 				int posOffset = Fonts.measureText(FontType.Blue, buyOrUseStr);
 				Fonts.drawText(FontType.Green, costStr, textX + posOffset, optionPos.y);
 			}

@@ -38,8 +38,8 @@ public class Tips {
 			},
 			new string[]
 			{
-				"You earn scrap on each kill.",
-				"As X, use scrap to upgrade your armor in the in-game menu."
+				$"You earn {Global.nameCoin} on each kill.",
+				$"As X, use {Global.nameCoins} to upgrade your armor in the in-game menu."
 			},
 			new string[]
 			{
@@ -74,13 +74,13 @@ public class Tips {
 			},
 			new string[]
 			{
-				"As X, use QCF + shoot to launch a Haudouken!",
-				"It kills in 1 hit but requires all X1 armors + 3 scrap."
+				"As X, use QCF + Shoot to launch a Hadoken!",
+				$"It kills in 1 hit but requires all X1 armors + 3 {Global.nameCoins}."
 			},
 			new string[]
 			{
-				"As X, input Dragon Punch + shoot to do a Shoryuken!",
-				"It kills in 1 hit but requires all X2 armors + 3 scrap."
+				"As X, input Dragon Punch + Shoot to do a Shoryuken!",
+				$"It kills in 1 hit but requires all X2 armors + 3 {Global.nameCoins}."
 			},
 			new string[]
 			{
@@ -283,7 +283,7 @@ public class Tips {
 			new string[]
 			{
 				"The Zero Buster can be fired by holding and",
-				"releasing SHOOT for 1 scrap."
+				"releasing SHOOT for 1 Metal."
 			},
 			new string[]
 			{
@@ -482,7 +482,7 @@ public class Tips {
 			},
 			new string[]
 			{
-				"As Axl, activate the White Armor with 10 scrap",
+				$"As Axl, activate the White Armor with 10 {Global.nameCoins}",
 				"by charging up the Copy Shot.",
 			},
 			new string[]
@@ -495,13 +495,13 @@ public class Tips {
 			{
 				"As Axl, when disguised press SPECIAL button",
 				"on the Assassination weapon slot to fire a very",
-				"effective quick assassination shot for 2 scrap."
+				$"effective quick assassination shot for 2 {Global.nameCoins}."
 			},
 			new string[]
 			{
 				"As Axl, when disguised press SPECIAL button",
 				"on the Undisguise slot to be able to keep",
-				"the transformation, at a cost of 2 scrap."
+				$"the transformation, at a cost of 2 {Global.nameCoins}."
 			},
 			new string[]
 			{
@@ -682,7 +682,7 @@ public class Tips {
 			},
 			new string[]
 			{
-				"The further you are behind, the more scrap you earn.",
+				$"The further you are behind, the more {Global.nameCoins} you earn.",
 			},
 			new string[]
 			{

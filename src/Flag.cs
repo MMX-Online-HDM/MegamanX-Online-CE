@@ -270,8 +270,8 @@ public class FlagPedestal : Actor {
 			if (chr.ai != null) {
 				chr.ai.changeState(new FindPlayer(chr));
 			}
-			chr.player.scrap += 5;
-			RPC.actorToggle.sendRpc(chr.netId, RPCActorToggleType.AwardScrap);
+			chr.player.currency += 5;
+			RPC.actorToggle.sendRpc(chr.netId, RPCActorToggleType.AwardCurrency);
 
 			var msg = chr.player.name + " scored";
 			Global.level.gameMode.addKillFeedEntry(new KillFeedEntry(msg, chr.player.alliance, chr.player), true);

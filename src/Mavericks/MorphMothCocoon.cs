@@ -7,7 +7,7 @@ namespace MMXOnline;
 public class MorphMothCocoon : Maverick {
 	public static Weapon getWeapon() { return new Weapon(WeaponIds.MorphMCGeneric, 145); }
 
-	public float scrapRegenTime;
+	public float currencyRegenTime;
 	public Point latchPos;
 	public float latchLen;
 	public int scrapAbsorbed;
@@ -58,9 +58,9 @@ public class MorphMothCocoon : Maverick {
 
 		if (!ownedByLocalPlayer) return;
 
-		scrapRegenTime += Global.spf;
-		if (scrapRegenTime > 0.5f) {
-			scrapRegenTime = 0;
+		currencyRegenTime += Global.spf;
+		if (currencyRegenTime > 0.5f) {
+			currencyRegenTime = 0;
 			ammo += 1;
 			if (ammo > maxAmmo) ammo = maxAmmo;
 		}
@@ -354,7 +354,7 @@ public class MorphMCSpinState : MaverickState {
 				Point vel = new Point(Helpers.randomRange(-75, 75), Helpers.randomRange(-300, -250));
 				new MorphMCScrapProj(mmCocoon.weapon, maverick.getFirstPOIOrDefault(), MathF.Sign(vel.x), vel, 0.75f, false, null, player, player.getNextActorNetId(), rpc: true);
 				mmCocoon.ammo--;
-				mmCocoon.scrapRegenTime = 0;
+				mmCocoon.currencyRegenTime = 0;
 			}
 		}
 
@@ -554,7 +554,7 @@ public class MorphMCHangState : MaverickState {
 				Point vel = new Point(Helpers.randomRange(-75, 75), Helpers.randomRange(-300, -250));
 				new MorphMCScrapProj(maverick.weapon, maverick.getFirstPOIOrDefault(), MathF.Sign(vel.x), vel, 1.5f, false, null, player, player.getNextActorNetId(), rpc: true);
 				mmCocoon.ammo--;
-				mmCocoon.scrapRegenTime = 0;
+				mmCocoon.currencyRegenTime = 0;
 			}
 		} else if (input.isHeld(Control.Special1, player)) {
 			suckAngle += Global.spf * 100;
@@ -568,7 +568,7 @@ public class MorphMCHangState : MaverickState {
 				Point suckPos = maverick.getCenterPos().add(Point.createFromAngle(suckAngle).times(suckRadius));
 				Point vel = suckPos.directionToNorm(maverick.getCenterPos()).times(350);
 				new MorphMCScrapProj(maverick.weapon, suckPos, MathF.Sign(vel.x), vel, 0.5f, true, mmCocoon, player, player.getNextActorNetId(), rpc: true);
-				mmCocoon.scrapRegenTime = 0;
+				mmCocoon.currencyRegenTime = 0;
 			}
 		}
 

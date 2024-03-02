@@ -571,12 +571,12 @@ public class GameMode {
 		if (!Global.level.mainPlayer.isSpectator) {
 			renderHealthAndWeapons();
 
-			// Scrap
+			// Currency
 			if (!Global.level.is1v1()) {
 				Global.sprites["hud_scrap"].drawToHUD(0, 4, 138);
 				Fonts.drawText(
 					FontType.Grey,
-					"x" + Global.level.mainPlayer.scrap.ToString(), 17, 141, Alignment.Left
+					"x" + Global.level.mainPlayer.currency.ToString(), 17, 141, Alignment.Left
 				);
 			}
 			MegamanX mmx = mainPlayer.character as MegamanX;
@@ -1742,8 +1742,8 @@ public class GameMode {
 		}
 
 		if (mw != null) {
-			if (mw.scrapHUDAnimTime > 0) {
-				float animProgress = mw.scrapHUDAnimTime / MaverickWeapon.scrapHUDMaxAnimTime;
+			if (mw.currencyHUDAnimTime > 0) {
+				float animProgress = mw.currencyHUDAnimTime / MaverickWeapon.currencyHUDMaxAnimTime;
 				float yOff = animProgress * 20;
 				float alpha = Helpers.clamp01(1 - animProgress);
 				Global.sprites["hud_scrap"].drawToHUD(0, x - 6, y - yOff - 10, alpha);
@@ -2032,7 +2032,7 @@ public class GameMode {
 		for (int i = 0; i < maxIndex; i++) {
 			float x = startX;
 			float y = startY - (i * height);
-			if (i == 4 && (!isMK2Or5 || level.mainPlayer.scrap < 10)) {
+			if (i == 4 && (!isMK2Or5 || level.mainPlayer.currency < 10)) {
 				DrawWrappers.DrawRectWH(x - 8, y - 8, 16, 16, true, new Color(0, 0, 0, 128), 1, ZIndex.HUD, false);
 			}
 		}
@@ -2465,13 +2465,19 @@ public class GameMode {
 			} else if (level.mainPlayer.canReviveVile()) {
 				if (level.mainPlayer.lastDeathWasVileMK2) {
 					Helpers.drawTextStd(TCat.HUD, respawnStr, Global.screenW / 2, -10 + Global.screenH / 2, Alignment.Center);
-					string reviveText = Helpers.controlText("[SPC]: Revive as Vile V (5 scrap)");
+					string reviveText = Helpers.controlText(
+						$"[SPC]: Revive as Vile V (5 {Global.nameCoins})"
+					);
 					Helpers.drawTextStd(TCat.HUD, reviveText, Global.screenW / 2, 10 + Global.screenH / 2, Alignment.Center, fontSize: 24);
 				} else {
 					Helpers.drawTextStd(TCat.HUD, respawnStr, Global.screenW / 2, -10 + Global.screenH / 2, Alignment.Center);
-					string reviveText = Helpers.controlText("[SPC]: Revive as MK-II (5 scrap)");
+					string reviveText = Helpers.controlText(
+						$"[SPC]: Revive as MK-II (5 {Global.nameCoins})"
+					);
 					Helpers.drawTextStd(TCat.HUD, reviveText, Global.screenW / 2, 10 + Global.screenH / 2, Alignment.Center, fontSize: 24);
-					string reviveText2 = Helpers.controlText("[CMD]: Revive as MK-V (5 scrap)");
+					string reviveText2 = Helpers.controlText(
+						$"[CMD]: Revive as MK-V (5 {Global.nameCoins})"
+					);
 					Helpers.drawTextStd(TCat.HUD, reviveText2, Global.screenW / 2, 22 + Global.screenH / 2, Alignment.Center, fontSize: 24);
 				}
 			} else if (level.mainPlayer.canReviveSigma(out _)) {
@@ -2479,7 +2485,9 @@ public class GameMode {
 				string hyperType = "Wolf";
 				if (level.mainPlayer.isSigma2()) hyperType = "Viral";
 				if (level.mainPlayer.isSigma3()) hyperType = "Kaiser";
-				string reviveText = Helpers.controlText($"[D]: Revive as {hyperType} Sigma (" + Player.reviveSigmaScrapCost.ToString() + " scrap)");
+				string reviveText = Helpers.controlText(
+					$"[D]: Revive as {hyperType} Sigma ({Player.reviveSigmaCost.ToString()} {Global.nameCoins}"
+				);
 				Helpers.drawTextStd(TCat.HUD, reviveText, Global.screenW / 2, 10 + Global.screenH / 2, Alignment.Center, fontSize: 24);
 			} else {
 				Helpers.drawTextStd(TCat.HUD, respawnStr, Global.screenW / 2, Global.screenH / 2, Alignment.Center);
