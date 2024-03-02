@@ -576,7 +576,7 @@ public class GameMode {
 				Global.sprites["hud_scrap"].drawToHUD(0, 4, 138);
 				Fonts.drawText(
 					FontType.Grey,
-					"x" + Global.level.mainPlayer.currency.ToString(), 17, 141, Alignment.Left
+					"x" + Global.level.mainPlayer.currency.ToString(), 16, 140, Alignment.Left
 				);
 			}
 			MegamanX mmx = mainPlayer.character as MegamanX;

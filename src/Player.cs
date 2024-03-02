@@ -245,7 +245,8 @@ public partial class Player {
 	}
 
 	// Currency
-	public Dictionary<int, int> charCurrency = new Dictionary<int, int>();
+	public const int maxCharCurrencyId = 5;
+	public int[] charCurrency = new int[maxCharCurrencyId];
 	public int currency {
 		get {
 			return charCurrency[isDisguisedAxl ? 3 : charNum];
@@ -536,7 +537,7 @@ public partial class Player {
 			armArmorNum = xArmor1v1;
 		}
 
-		for (int i = 0; i <= 5; i++) {
+		for (int i = 0; i < charCurrency.Length; i++) {
 			charCurrency[i] = getStartCurrency();
 		}
 		foreach (var key in charHeartTanks.Keys) {
