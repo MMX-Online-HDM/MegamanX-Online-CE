@@ -110,10 +110,19 @@ public class MainMenu : IMainMenu {
 					Menu.change(hostmenu);
 					Options.main.soundVolume = Global.quickStartOnlineHostSound;
 					Options.main.musicVolume = Global.quickStartOnlineHostMusic;
-					var serverData = new Server(Global.version, Options.main.getRegion(), "testserver", Global.quickStartOnlineMap, Global.quickStartOnlineMap, Global.quickStartOnlineGameMode, 100, Global.quickStartOnlineBotCount, 2, 300, false, false,
-						Global.quickStartNetcodeModel, Global.quickStartNetcodePing, true, Global.quickStartMirrored, Global.quickStartTrainingLoadout, Global.checksum, null, null, SavedMatchSettings.mainOffline.extraCpuCharData, null,
-						Global.quickStartDisableHtSt, Global.quickStartDisableVehicles);
-					HostMenu.createServer(Global.quickStartOnlineHostCharNum, serverData, null, false, new MainMenu(), out _);
+					var serverData = new Server(
+						Global.version, Options.main.getRegion(),
+						"testserver", Global.quickStartOnlineMap,
+						Global.quickStartOnlineMap, Global.quickStartOnlineGameMode,
+						100, Global.quickStartOnlineBotCount, 2, 300, false, false,
+						Global.quickStartNetcodeModel, Global.quickStartNetcodePing,
+						true, Global.quickStartMirrored, Global.quickStartTrainingLoadout,
+						Global.checksum, null, null, SavedMatchSettings.mainOffline.extraCpuCharData, null,
+						Global.quickStartDisableHtSt, Global.quickStartDisableVehicles
+					);
+					HostMenu.createServer(
+						Global.quickStartOnlineHostCharNum, serverData, null, false, new MainMenu(), out _
+					);
 				} else {
 					Global.skipCharWepSel = true;
 					Options.main.soundVolume = Global.quickStartOnlineClientSound;

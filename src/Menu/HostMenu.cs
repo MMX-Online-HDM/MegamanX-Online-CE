@@ -31,6 +31,7 @@ public class HostMenuSettings {
 	public bool fixedCamera;
 	public bool disableHtSt;
 	public bool disableVehicles;
+	public byte teamNum = 2;
 }
 
 public class HostMenu : IMainMenu {
@@ -130,6 +131,10 @@ public class HostMenu : IMainMenu {
 	public bool disableVehicles {
 		get { return savedMatchSettings.hostMenuSettings.disableVehicles; }
 		set { savedMatchSettings.hostMenuSettings.disableVehicles = value; }
+	}
+	public byte teamNum {
+		get { return savedMatchSettings.hostMenuSettings.teamNum; }
+		set { savedMatchSettings.hostMenuSettings.teamNum = value; }
 	}
 
 	public static int prevMapSizeIndex;
@@ -474,7 +479,26 @@ public class HostMenu : IMainMenu {
 				)
 			);
 		}
-
+		// Team number.
+		if (GameMode.isStringTeamMode(selectedGameMode)) {
+			menuOptions.Add(
+				new MenuOption(startX, startY,
+					() => {
+						if (Global.input.isPressedOrHeldMenu(Control.MenuLeft) && teamNum > 2) {
+							teamNum--;
+						} else if (Global.input.isPressedOrHeldMenu(Control.MenuRight) && teamNum < 6) {
+							teamNum++;
+						}
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							FontType.Blue, "Teams: " + teamNum,
+							pos.x, pos.y, selected: index == selectArrowPosY
+						);
+					}
+				)
+			);
+		}
 		// CPU Count
 		menuOptions.Add(
 			new MenuOption(startX, startY,
@@ -854,6 +878,7 @@ public class HostMenu : IMainMenu {
 				savedMatchSettings.extraCpuCharData, getCustomMatchSettings(),
 				disableHtSt, disableVehicles
 			);
+			server.teamNum = teamNum;
 			server.uniqueID = oldServer.uniqueID;
 			server.isP2P = oldServer.isP2P;
 			if (server.isP2P) {
@@ -881,7 +906,10 @@ public class HostMenu : IMainMenu {
 				savedMatchSettings.extraCpuCharData, getCustomMatchSettings(),
 				disableHtSt, disableVehicles
 			);
-			createServer(SelectCharacterMenu.playerData.charNum, serverData, team, false, previous, out errorMessage);
+			serverData.teamNum = teamNum;
+			createServer(
+				SelectCharacterMenu.playerData.charNum, serverData, team, false, previous, out errorMessage
+			);
 		} else {
 			//Global.playSound("menuConfirm");
 			createOfflineMatch();
@@ -929,7 +957,10 @@ public class HostMenu : IMainMenu {
 	}
 
 	public void createOfflineMatch() {
-		var me = new ServerPlayer(Options.main.playerName, 0, true, SelectCharacterMenu.playerData.charNum, team, Global.deviceId, null, 0);
+		var me = new ServerPlayer(
+			Options.main.playerName, 0, true,
+			SelectCharacterMenu.playerData.charNum, team, Global.deviceId, null, 0
+		);
 		if (GameMode.isStringTeamMode(selectedGameMode)) me.alliance = team;
 
 		string gameMode = selectedGameMode;
@@ -946,6 +977,7 @@ public class HostMenu : IMainMenu {
 			selectedLevel.customMapUrl, savedMatchSettings.extraCpuCharData, getCustomMatchSettings(),
 			disableHtSt, disableVehicles
 		);
+		localServer.teamNum = teamNum;
 		localServer.players = new List<ServerPlayer>() { me };
 
 		Global.level = new Level(
@@ -986,6 +1018,7 @@ public class HostMenu : IMainMenu {
 			selectedLevel.customMapUrl, savedMatchSettings.extraCpuCharData,
 			getCustomMatchSettings(), disableHtSt, disableVehicles
 		);
+		localServer.teamNum = teamNum;
 		localServer.isP2P = true;
 		Global.localServer = localServer;
 		localServer.start();

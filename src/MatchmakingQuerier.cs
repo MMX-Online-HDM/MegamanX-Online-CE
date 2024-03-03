@@ -71,9 +71,19 @@ public class MatchmakingQuerier {
 	}
 
 	public CreateServerResponse createServer(Server serverData) {
-		var requestServer = new Server(Global.version, serverData.region, serverData.name, serverData.level, serverData.shortLevelName, serverData.gameMode, serverData.playTo, serverData.botCount, serverData.maxPlayers, serverData.timeLimit ?? 0, serverData.fixedCamera, serverData.hidden,
-			serverData.netcodeModel, serverData.netcodeModelPing, serverData.isLAN, serverData.mirrored, serverData.useLoadout, Global.checksum, LevelData.getChecksumFromName(serverData.level), LevelData.getCustomMapUrlFromName(serverData.level),
-			serverData.extraCpuCharData, serverData.customMatchSettings, serverData.disableHtSt, serverData.disableVehicles);
+		var requestServer = new Server(
+			Global.version, serverData.region, serverData.name,
+			serverData.level, serverData.shortLevelName, serverData.gameMode,
+			serverData.playTo, serverData.botCount, serverData.maxPlayers,
+			serverData.timeLimit ?? 0, serverData.fixedCamera, serverData.hidden,
+			serverData.netcodeModel, serverData.netcodeModelPing, serverData.isLAN,
+			serverData.mirrored, serverData.useLoadout, Global.checksum,
+			LevelData.getChecksumFromName(serverData.level),
+			LevelData.getCustomMapUrlFromName(serverData.level),
+			serverData.extraCpuCharData, serverData.customMatchSettings,
+			serverData.disableHtSt, serverData.disableVehicles
+		);
+		requestServer.teamNum = serverData.teamNum;
 
 		var response = send(serverData.region.ip, "CreateServer:" + JsonConvert.SerializeObject(requestServer), "CreateServer");
 		if (!string.IsNullOrEmpty(response)) {

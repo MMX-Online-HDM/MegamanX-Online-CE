@@ -212,7 +212,17 @@ public class RelayServer {
 				client.SendStringMessage("CreateServer:fail:Same user can't create more than 1 match", networkStream);
 				return;
 			}
-			server = new Server(Global.version, requestServer.region, requestServer.name, requestServer.level, requestServer.shortLevelName, requestServer.gameMode, requestServer.playTo, requestServer.botCount, requestServer.maxPlayers, requestServer.timeLimit.GetValueOrDefault(), requestServer.fixedCamera, requestServer.hidden, requestServer.netcodeModel, requestServer.netcodeModelPing, requestServer.isLAN, requestServer.mirrored, requestServer.useLoadout, requestServer.gameChecksum, requestServer.customMapChecksum, requestServer.customMapUrl, requestServer.extraCpuCharData, requestServer.customMatchSettings, requestServer.disableHtSt, requestServer.disableVehicles);
+			server = new Server(
+				Global.version, requestServer.region, requestServer.name,
+				requestServer.level, requestServer.shortLevelName, requestServer.gameMode,
+				requestServer.playTo, requestServer.botCount, requestServer.maxPlayers,
+				requestServer.timeLimit.GetValueOrDefault(), requestServer.fixedCamera,
+				requestServer.hidden, requestServer.netcodeModel, requestServer.netcodeModelPing,
+				requestServer.isLAN, requestServer.mirrored, requestServer.useLoadout, requestServer.gameChecksum,
+				requestServer.customMapChecksum, requestServer.customMapUrl, requestServer.extraCpuCharData,
+				requestServer.customMatchSettings, requestServer.disableHtSt, requestServer.disableVehicles
+			);
+			server.teamNum = requestServer.teamNum;
 			server.start();
 			Server.servers[server] = true;
 			client.SendStringMessage("CreateServer:" + JsonConvert.SerializeObject(server), networkStream);
