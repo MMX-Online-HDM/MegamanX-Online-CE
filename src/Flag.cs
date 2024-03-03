@@ -277,10 +277,8 @@ public class FlagPedestal : Actor {
 			Global.level.gameMode.addKillFeedEntry(new KillFeedEntry(msg, chr.player.alliance, chr.player), true);
 			var ctf = Global.level.gameMode as CTF;
 			if (Global.isHost) {
-				if (alliance == GameMode.blueAlliance) {
-					ctf.bluePoints++;
-				} else {
-					ctf.redPoints++;
+				if (alliance != GameMode.neutralAlliance) {
+					Global.level.gameMode.teamPoints[alliance]++;
 				}
 				Global.level.gameMode.syncTeamScores();
 			}

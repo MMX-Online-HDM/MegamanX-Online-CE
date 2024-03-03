@@ -987,11 +987,8 @@ public class RPCSyncTeamScores : RPC {
 	}
 
 	public override void invoke(params byte[] arguments) {
-		var redScore = arguments[0];
-		var blueScore = arguments[1];
 		if (Global.level?.gameMode != null) {
-			Global.level.gameMode.redPoints = redScore;
-			Global.level.gameMode.bluePoints = blueScore;
+			Global.level.gameMode.teamPoints = arguments;
 		}
 	}
 }
@@ -1476,8 +1473,7 @@ public class RPCPeriodicHostSync : RPC {
 		if (syncModel.matchOverResponse != null) {
 			Global.level.gameMode.matchOverRpc(syncModel.matchOverResponse);
 		}
-		Global.level.gameMode.bluePoints = syncModel.bluePoints;
-		Global.level.gameMode.redPoints = syncModel.redPoints;
+		Global.level.gameMode.teamPoints = syncModel.teamPoints;
 		Global.level.syncCrackedWalls(syncModel.crackedWallBytes);
 		Global.level.gameMode.virusStarted = syncModel.virusStarted;
 		Global.level.gameMode.safeZoneSpawnIndex = syncModel.safeZoneSpawnIndex;
@@ -1486,11 +1482,10 @@ public class RPCPeriodicHostSync : RPC {
 	public void sendRpc() {
 		var syncModel = new PeriodicHostSyncModel() {
 			matchOverResponse = Global.level.gameMode.matchOverResponse,
-			bluePoints = Global.level.gameMode.bluePoints,
-			redPoints = Global.level.gameMode.redPoints,
 			crackedWallBytes = Global.level.getCrackedWallBytes(),
 			virusStarted = Global.level.gameMode.virusStarted,
-			safeZoneSpawnIndex = Global.level.gameMode.safeZoneSpawnIndex
+			safeZoneSpawnIndex = Global.level.gameMode.safeZoneSpawnIndex,
+			teamPoints = Global.level.gameMode.teamPoints,
 		};
 
 		var bytes = Helpers.serialize(syncModel);

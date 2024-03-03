@@ -344,7 +344,7 @@ public class JoinMenu : IMainMenu {
 	public float col5Pos = 225;
 	public float col6Pos = 265;
 
-	public float headerPos = 40;
+	public float headerPos = 30;
 	public float rowHeight = 20;
 	public float rowHeight2 = 14;
 
@@ -356,23 +356,32 @@ public class JoinMenu : IMainMenu {
 		// DrawWrappers.DrawTextureHUD(Global.textures[joinMenuImage], 0, 0);
 		//DrawWrappers.DrawTextureHUD(Global.textures["joinborder"], 0, 30);
 
-		Helpers.drawTextStd(TCat.Title, "Join Match", Global.halfScreenW, 10, alignment: Alignment.Center, vAlignment: VAlignment.Center, fontSize: 48);
+		Fonts.drawText(FontType.Yellow, "Join Match", Global.halfScreenW, 20, alignment: Alignment.Center);
 
-		Helpers.drawTextStd("Name", col1Pos, headerPos, outline: false, fontSize: 24);
-		Helpers.drawTextStd("Map", col2Pos, headerPos, outline: false, fontSize: 24);
-		Helpers.drawTextStd("Mode", col3Pos, headerPos, outline: false, fontSize: 24);
-		Helpers.drawTextStd("Players", col4Pos, headerPos, outline: false, fontSize: 24);
-		Helpers.drawTextStd("Region", col5Pos, headerPos, outline: false, fontSize: 24);
-		Helpers.drawTextStd("Ping", col6Pos, headerPos, outline: false, fontSize: 24);
+		Fonts.drawText(FontType.Orange, "Name", col1Pos, headerPos);
+		Fonts.drawText(FontType.Orange, "Map", col2Pos, headerPos);
+		Fonts.drawText(FontType.Orange, "Mode", col3Pos, headerPos);
+		Fonts.drawText(FontType.Orange, "Players", col4Pos, headerPos);
+		Fonts.drawText(FontType.Orange, "Region", col5Pos, headerPos);
+		Fonts.drawText(FontType.Orange, "Ping", col6Pos, headerPos);
 
 		if (refreshing) {
-			Helpers.drawTextStd("Searching...", col1Pos, headerPos + rowHeight, outline: false);
+			Fonts.drawText(
+				FontType.Grey, "Searching...", col1Pos, headerPos + rowHeight);
 		} else if (networkError) {
-			Helpers.drawTextStd("Could not contact server.", col1Pos, headerPos + rowHeight, outline: false);
+			Fonts.drawText(
+				FontType.Grey, "Could not contact server.", col1Pos, headerPos + rowHeight
+			);
 		} else if (publicServers.Count == 0) {
-			Helpers.drawTextStd(isLAN ? "(No LAN matches found)" : "(No matches found)", col1Pos, headerPos + rowHeight, outline: false);
+			Fonts.drawText(
+				FontType.Grey, isLAN ? "(No LAN matches found)" : "(No matches found)",
+				col1Pos, headerPos + rowHeight
+			);
 			if (isLAN) {
-				Helpers.drawTextStd(" Try connecting by IP (press ESC)", col1Pos, headerPos + rowHeight * 2, outline: false, fontSize: 24);
+				Fonts.drawText(
+					FontType.Grey," Try connecting by IP (press ESC)",
+					col1Pos, headerPos + rowHeight * 2
+				);
 			}
 		} else {
 			var startServerRow = rowHeight + headerPos;
@@ -381,27 +390,57 @@ public class JoinMenu : IMainMenu {
 				Region region = null;
 				if (!isLAN) region = Global.regions.FirstOrDefault(r => r.ip == server.region.ip);
 				else region = Global.lanRegions.FirstOrDefault(r => r.ip == server.region.ip);
-				Helpers.drawTextStd(TCat.Option, server.name, col1Pos, startServerRow + (i * rowHeight2), outline: false, fontSize: 20, selected: selServerIndex == i);
-				Helpers.drawTextStd(TCat.Option, server.getMapShortName(), col2Pos, startServerRow + (i * rowHeight2), outline: false, fontSize: 20, selected: selServerIndex == i);
-				Helpers.drawTextStd(TCat.Option, GameMode.abbreviatedMode(server.gameMode), col3Pos, startServerRow + (i * rowHeight2), outline: false, fontSize: 20, selected: selServerIndex == i);
-				Helpers.drawTextStd(TCat.Option, getPlayerCountStr(server), col4Pos, startServerRow + (i * rowHeight2), outline: false, fontSize: 20, selected: selServerIndex == i);
-				Helpers.drawTextStd(TCat.Option, server.region.name, col5Pos, startServerRow + (i * rowHeight2), outline: false, fontSize: 20, selected: selServerIndex == i);
-				if (region != null) Helpers.drawTextStd(region.getDisplayPing(), col6Pos, startServerRow + (i * rowHeight2), outline: false, fontSize: 20, color: region.getPingColor());
+				Fonts.drawText(FontType.Blue, server.name, col1Pos, startServerRow + (i * rowHeight2), selected: selServerIndex == i);
+				Fonts.drawText(FontType.Blue, server.getMapShortName(), col2Pos, startServerRow + (i * rowHeight2), selected: selServerIndex == i);
+				Fonts.drawText(FontType.Blue, GameMode.abbreviatedMode(server.gameMode), col3Pos, startServerRow + (i * rowHeight2), selected: selServerIndex == i);
+				Fonts.drawText(FontType.Blue, getPlayerCountStr(server), col4Pos, startServerRow + (i * rowHeight2), selected: selServerIndex == i);
+				Fonts.drawText(FontType.Blue, server.region.name, col5Pos, startServerRow + (i * rowHeight2), selected: selServerIndex == i);
+				if (region != null) {
+					int ping = region.ping ?? -1;
+					string displayPint = ping.ToString();
+					FontType pingColor = FontType.Blue;
+					if (ping > 200) {
+						pingColor = FontType.Red;
+					}
+					if (ping < 0) {
+						displayPint = "N/A"; 
+						pingColor = FontType.Grey;
+					}
+					Fonts.drawText(
+						pingColor, region.getDisplayPing(),
+						col6Pos, startServerRow + (i * rowHeight2)
+					);
+				}
 			}
-			DrawWrappers.DrawTextureHUD(Global.textures["cursor"], 12, startServerRow - 2 + (selServerIndex * rowHeight2));
+			DrawWrappers.DrawTextureHUD(
+				Global.textures["cursor"], 12, startServerRow - 2 + (selServerIndex * rowHeight2)
+			);
 		}
 
 		if (failedRegions.Count > 0) {
-			var failedRegionsList = failedRegions.Select(r => r.name);
+			string[] failedRegionsList = failedRegions.Select(r => r.name).ToArray();
 			//failedRegionsList = new List<string>() { "EastUS", "WestUS", "Brazil" };
-			var failedRegionsText = string.Join(", ", failedRegionsList);
-			Helpers.drawTextStd("!Failed to get match list from regions: " + failedRegionsText + ".", col1Pos, 52, outline: false, fontSize: 14, style: Text.Styles.Italic, color: Color.Red);
+			string failedRegionsText = string.Join(", ", failedRegionsList);
+			if (failedRegionsText == "") {
+				failedRegionsText = "N/A";
+			}
+			Fonts.drawText(
+				FontType.Red,
+				"Failed to get match list from regions: " + failedRegionsText + ".",
+				col1Pos, 60
+			);
 		}
 
 		if (!refreshing) {
 			string escText = isLAN ? "[ESC]: Search by IP" : "[ESC]: Join private match";
-			Helpers.drawTextStd(TCat.BotHelp, "[OK]: Join, [ALT]: Refresh, [BACK]: Back", Global.halfScreenW, 208, Alignment.Center, fontSize: 24);
-			Helpers.drawTextStd(TCat.BotHelp, escText, Global.halfScreenW, 216, Alignment.Center, fontSize: 24);
+			Fonts.drawTextEX(
+				FontType.Grey, "[OK]: Join, [ALT]: Refresh, [BACK]: Back",
+				Global.halfScreenW, Global.screenH - 36, Alignment.Center
+			);
+			Fonts.drawTextEX(
+				FontType.Grey, escText,
+				Global.halfScreenW, Global.screenH - 26, Alignment.Center
+			);
 		}
 	}
 

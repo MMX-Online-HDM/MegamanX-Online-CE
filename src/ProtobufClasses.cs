@@ -75,11 +75,11 @@ public class PeriodicServerSyncModel {
 [ProtoContract]
 public class PeriodicHostSyncModel {
 	[ProtoMember(1)] public RPCMatchOverResponse matchOverResponse;
-	[ProtoMember(2)] public int bluePoints;
-	[ProtoMember(3)] public int redPoints;
-	[ProtoMember(4)] public HashSet<byte> crackedWallBytes = new HashSet<byte>();
-	[ProtoMember(5)] public byte virusStarted;
-	[ProtoMember(6)] public byte safeZoneSpawnIndex;
+	[ProtoMember(2)] public int redPoints;
+	[ProtoMember(3)] public HashSet<byte> crackedWallBytes = new HashSet<byte>();
+	[ProtoMember(4)] public byte virusStarted;
+	[ProtoMember(5)] public byte safeZoneSpawnIndex;
+	[ProtoMember(6)] public byte[] teamPoints;
 }
 
 [ProtoContract]

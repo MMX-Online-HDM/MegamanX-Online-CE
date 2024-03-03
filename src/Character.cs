@@ -2634,9 +2634,10 @@ public partial class Character : Actor, IDamagable {
 				killer.addKill();
 				if (Global.level.gameMode is TeamDeathMatch) {
 					if (Global.isHost) {
-						if (player.alliance == GameMode.redAlliance) Global.level.gameMode.bluePoints++;
-						if (player.alliance == GameMode.blueAlliance) Global.level.gameMode.redPoints++;
-						Global.level.gameMode.syncTeamScores();
+						if (killer.alliance != player.alliance) {
+							Global.level.gameMode.teamPoints[killer.alliance]++;
+							Global.level.gameMode.syncTeamScores();
+						}
 					}
 				}
 
