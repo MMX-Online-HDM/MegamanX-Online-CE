@@ -77,20 +77,30 @@ public class KickMenu : IMainMenu {
 	}
 
 	public void render() {
-		DrawWrappers.DrawRect(5, 5, Global.screenW - 5, Global.screenH - 5, true, Helpers.MenuBgColor, 0, ZIndex.HUD + 200, false);
+		DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
 		Global.sprites["cursor"].drawToHUD(0, 15, optionPoses[(int)selectArrowPosY].y + 5);
 
 		string voteKickPrefix = "";
 		if (!hasDirectKickPower()) voteKickPrefix = "Vote ";
 
-		Helpers.drawTextStd(voteKickPrefix + "Kick Player " + player.name, Global.halfScreenW, 15, fontSize: 24, alignment: Alignment.Center);
+		Fonts.drawText(
+			FontType.Yellow, voteKickPrefix + "Kick Player " + player.name,
+			Global.halfScreenW, 20, alignment: Alignment.Center
+		);
 
-		uint fontSize = 24;
+		Fonts.drawText(
+			FontType.Blue, "Kick reason: " + kickReasons[kickReasonIndex],
+			optionPoses[0].x, optionPoses[0].y
+		);
+		Fonts.drawText(
+			FontType.Blue,"Kick duration: " + kickDuration + " min",
+			optionPoses[1].x, optionPoses[1].y
+		);
 
-		Helpers.drawTextStd("Kick reason: " + kickReasons[kickReasonIndex], optionPoses[0].x, optionPoses[0].y, fontSize: fontSize, color: Color.White);
-		Helpers.drawTextStd("Kick duration: " + kickDuration + " min", optionPoses[1].x, optionPoses[1].y, fontSize: fontSize);
-
-		Helpers.drawTextStd(Helpers.menuControlText("Left/Right: Change, [OK]: Kick, [BACK]: Back"), Global.screenW * 0.5f, 200, Alignment.Center, fontSize: 21);
+		Fonts.drawTextEX(
+			FontType.Grey, "[MLEFT]/[MRIGHT]: Change, [OK]: Kick, [BACK]: Back",
+			Global.screenW * 0.5f, Global.screenH - 20, Alignment.Center
+		);
 	}
 
 	public static bool hasDirectKickPower() {

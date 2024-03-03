@@ -610,13 +610,19 @@ public class GameMode {
 		if (isOver) {
 			drawWinScreen();
 		} else {
-			int startY = Options.main.showFPS ? 201 : 208;
+			/*int startY = Options.main.showFPS ? 201 : 208;
 			if (!Menu.inMenu && !Global.hideMouse && Options.main.showInGameMenuHUD) {
 				if (!shouldDrawRadar()) {
-					Helpers.drawTextStd(TCat.HUD, Helpers.controlText("[ESC]: Menu"), Global.screenW - 5, startY, Alignment.Right, fontSize: 18);
-					Helpers.drawTextStd(TCat.HUD, Helpers.controlText("[TAB]: Score"), Global.screenW - 5, startY + 7, Alignment.Right, fontSize: 18);
+					Helpers.drawTextStd(
+						TCat.HUD, Helpers.controlText("[ESC]: Menu"),
+						Global.screenW - 5, startY, Alignment.Right
+					);
+					Helpers.drawTextStd(
+						TCat.HUD, Helpers.controlText("[TAB]: Score"),
+						Global.screenW - 5, startY + 7, Alignment.Right
+					);
 				}
-			}
+			}*/
 
 			drawRespawnHUD();
 		}
@@ -628,52 +634,104 @@ public class GameMode {
 		}
 
 		if (level.isAfkWarn()) {
-			Helpers.drawTextStd(TCat.HUD, "Warning: Time before AFK Kick: " + Global.level.afkWarnTimeAmount(), Global.halfScreenW - 2, 50, Alignment.Center, fontSize: 24);
+			Fonts.drawText(
+				FontType.RedishOrange, "Warning: Time before AFK Kick: " + Global.level.afkWarnTimeAmount(),
+				Global.halfScreenW, 50, Alignment.Center
+			);
 		} else if (Global.serverClient != null && Global.serverClient.isLagging() && hudErrorMsgTime == 0) {
-			Helpers.drawTextStd(TCat.HUD, Helpers.controlText("Connectivity issues detected."), Global.halfScreenW - 2, 50, Alignment.Center, fontSize: 24);
+			Fonts.drawText(
+				FontType.RedishOrange, Helpers.controlText("Connectivity issues detected."),
+				Global.halfScreenW, 50, Alignment.Center
+			);
 		} else if (mainPlayer?.character is BaseSigma sigma && sigma.possessTarget != null) {
-			Helpers.drawTextStd(TCat.HUD, Helpers.controlText(
+			Fonts.drawText(
+				FontType.BlueMenu, Helpers.controlText(
 				$"Hold [JUMP] to possess {sigma.possessTarget.player.name}"),
-				Global.halfScreenW - 2, 50, Alignment.Center, fontSize: 24
+				Global.halfScreenW, 50, Alignment.Center
 			);
 		} else if (hudErrorMsgTime > 0) {
-			Helpers.drawTextStd(TCat.HUD, hudErrorMsg, Global.halfScreenW - 2, 50, Alignment.Center, fontSize: 24);
+			Fonts.drawText(
+				FontType.BlueMenu, hudErrorMsg,
+				Global.halfScreenW, 50, Alignment.Center
+			);
 		} else if (mainPlayer?.isKaiserViralSigma() == true) {
 			string msg = "";
 			if (KaiserSigma.canKaiserSpawn(mainPlayer.character, out _)) msg += "[JUMP]: Relocate";
-			if (msg != "") Helpers.drawTextStd(TCat.HUD, Helpers.controlText(msg), Global.halfScreenW - 2, 50, Alignment.Center, fontSize: 24);
-		} else if (mainPlayer?.character?.charState is ViralSigmaPossess vsp && vsp.target != null) {
-			Helpers.drawTextStd(TCat.HUD, $"Controlling possessed player {vsp.target.player.name}", Global.halfScreenW - 2, 50, Alignment.Center, fontSize: 24);
-		} else if (mainPlayer?.isPossessed() == true && mainPlayer.possesser != null) {
-			Helpers.drawTextStd(TCat.HUD, $"{mainPlayer.possesser.name} is possessing you!", Global.halfScreenW - 2, 50, Alignment.Center, fontSize: 24);
+			if (msg != "") {
+				Fonts.drawText(
+					FontType.BlueMenu, Helpers.controlText(msg),
+					Global.halfScreenW, 50, Alignment.Center
+				);
+			} else if (mainPlayer?.character?.charState is ViralSigmaPossess vsp && vsp.target != null) {
+				Fonts.drawText(
+					FontType.BlueMenu, $"Controlling possessed player {vsp.target.player.name}",
+					Global.halfScreenW, 50, Alignment.Center
+				);
+			} else if (mainPlayer?.isPossessed() == true && mainPlayer.possesser != null) {
+				Fonts.drawText(
+					FontType.BlueMenu, $"{mainPlayer.possesser.name} is possessing you!",
+					Global.halfScreenW - 2, 50, Alignment.Center
+				);
+			}
 		}
 
 		if (currentVoteKick != null) {
 			currentVoteKick.render();
 		} else if (level.mainPlayer.isSpectator && !Menu.inMenu) {
 			if (level.specPlayer == null) {
-				Helpers.drawTextStd(TCat.HUD, "Now spectating: (No player to spectate)", Global.halfScreenW, 190, Alignment.Center, fontSize: 24);
+				Fonts.drawText(
+					FontType.BlueMenu, "Now spectating: (No player to spectate)",
+					 Global.halfScreenW, 190, Alignment.Center
+				);
 			} else {
-				string deadMsg = level.specPlayer.character == null ? " (dead)" : "";
-				Helpers.drawTextStd(TCat.HUD, "Now spectating: " + level.specPlayer.name + deadMsg, Global.halfScreenW, 180, Alignment.Center, fontSize: 24);
-				Helpers.drawTextStd(TCat.HUD, "Left/Right: Change Spectated Player", Global.halfScreenW, 190, Alignment.Center, fontSize: 24);
+				string deadMsg = level.specPlayer.character == null ? " (Dead)" : "";
+				Fonts.drawText(
+					FontType.BlueMenu, "Now spectating: " + level.specPlayer.name + deadMsg,
+					Global.halfScreenW, 180, Alignment.Center
+				);
+				Fonts.drawText(
+					FontType.BlueMenu, "Left/Right: Change Spectated Player",
+					Global.halfScreenW, 190, Alignment.Center
+				);
 			}
 		} else if (level.mainPlayer.aiTakeover) {
-			Helpers.drawTextStd(TCat.HUD, "AI Takeover active. Press F12 to stop.", Global.halfScreenW, 190, Alignment.Center, fontSize: 24);
-		} else if (level.mainPlayer.isDisguisedAxl) {
-			Helpers.drawTextStd(TCat.HUD, "Disguised as " + level.mainPlayer.disguise.targetName, Global.halfScreenW, 190, Alignment.Center, fontSize: 24);
-		} else if (level.mainPlayer.isPuppeteer() && level.mainPlayer.currentMaverick != null && level.mainPlayer.weapon is MaverickWeapon mw) {
+			Fonts.drawText(
+				FontType.OrangeMenu, "AI Takeover active. Press F12 to stop.",
+				Global.halfScreenW, 190, Alignment.Center
+			);
+		} else if (
+			level.mainPlayer.isDisguisedAxl &&
+			level.mainPlayer.character?.disguiseCoverBlown != true
+		) {
+			Fonts.drawText(
+				FontType.Grey, "Disguised as " + level.mainPlayer.disguise.targetName,
+				Global.halfScreenW, 190, Alignment.Center
+			);
+		} else if (
+			level.mainPlayer.isPuppeteer() && level.mainPlayer.currentMaverick != null &&
+			level.mainPlayer.weapon is MaverickWeapon mw
+		) {
 			if (level.mainPlayer.currentMaverick.isPuppeteerTooFar()) {
-				Helpers.drawTextStd(TCat.HUD, mw.displayName + " too far to control", Global.halfScreenW, 190, Alignment.Center, fontSize: 24);
+				Fonts.drawText(
+					FontType.Grey, mw.displayName + " too far to control",
+					Global.halfScreenW, 190, Alignment.Center);
 			} else {
-				Helpers.drawTextStd(TCat.HUD, "Controlling " + mw.displayName, Global.halfScreenW, 190, Alignment.Center, fontSize: 24);
+				Fonts.drawText(
+					FontType.Grey, "Controlling " + mw.displayName, Global.halfScreenW, 190,
+					Alignment.Center
+				);
 			}
 		}
 		/*
 		else if (level.mainPlayer.character?.isVileMK5Linked() == true)
 		{
-			string rideArmorName = level.mainPlayer.character.vileStartRideArmor?.getRaTypeFriendlyName() ?? "Ride Armor";
-			Helpers.drawTextStd(TCat.HUD, "Controlling " + rideArmorName, Global.halfScreenW, 190, Alignment.Center, fontSize: 24);
+			string rideArmorName = level.mainPlayer.
+				character.vileStartRideArmor?
+				.getRaTypeFriendlyName() ?? "Ride Armor";
+			Helpers.drawTextStd
+				TCat.HUD, "Controlling " + rideArmorName,
+				Global.halfScreenW, 190, Alignment.Center, fontSize: 24
+			);
 		}
 		*/
 
@@ -723,8 +781,12 @@ public class GameMode {
 
 			DrawWrappers.DrawRect(5, boxStartY, Global.screenW - 5, boxEndY, true, new Color(0, 0, 0, 224), 0, ZIndex.HUD, false);
 
-			Helpers.drawTextStd(TCat.HUD, xrs.dialogLine1, 55, boxStartY + boxHeight * 0.3f, alignment: Alignment.Left, fontSize: 22);
-			Helpers.drawTextStd(TCat.HUD, xrs.dialogLine2, 55, boxStartY + boxHeight * 0.55f, alignment: Alignment.Left, fontSize: 22);
+			Fonts.drawText(
+				FontType.Blue, xrs.dialogLine1, 55, boxStartY + boxHeight * 0.33f
+			);
+			Fonts.drawText(
+				FontType.Blue, xrs.dialogLine2, 55, boxStartY + boxHeight * 0.55f
+			);
 
 			if (xrs.dialogLine1.Length > 0) {
 				int index = 0;
@@ -1240,8 +1302,7 @@ public class GameMode {
 			}
 			if (player.isSigma2() && player.character.isHyperSigmaBS.getValue() && player.currentMaverick == null) {
 				renderAmmo(baseX, ref baseY, 61, 50, player.sigmaAmmo, grayAmmo: player.weapon.getAmmoUsage(0));
-			}
-			else if (player.isMainPlayer && player.currentMaverick == null) {
+			} else if (player.isMainPlayer && player.currentMaverick == null) {
 				int hudWeaponBaseIndex = 50;
 				int hudWeaponFullIndex = 39;
 				int floorOrCeil = MathInt.Ceiling(player.sigmaMaxAmmo * ammoDisplayMultiplier);
@@ -1385,23 +1446,45 @@ public class GameMode {
 				DrawWrappers.DrawRect(fromRight - msgLen - 2, fromTop - 2 + (i * yDist) - msgHeight / 2, fromRight + 2, fromTop - 1 + msgHeight / 2 + (i * yDist), true, new Color(0, 0, 0, 128), 1, ZIndex.HUD, isWorldPos: false, outlineColor: Color.White);
 			}
 
-			var isKillerRed = killFeed.killer != null && killFeed.killer.alliance == redAlliance && isTeamMode;
-			var isVictimRed = killFeed.victim != null && killFeed.victim.alliance == redAlliance && isTeamMode;
-			if (killFeed.victim == null) isVictimRed = killFeed.customMessageAlliance == blueAlliance ? false : true;
+			FontType killerColor = FontType.Blue;
+			if (killFeed.killer != null && killFeed.killer.alliance == redAlliance && isTeamMode) {
+				killerColor = FontType.Red;
+			}
+			FontType victimColor = FontType.Blue;
+			if (killFeed.victim != null && killFeed.victim.alliance == redAlliance && isTeamMode) {
+				victimColor = FontType.Red;
+			}
 
 			if (killFeed.killer != null) {
-				var nameLen = Helpers.measureTextStd(TCat.HUD, victimName, fontSize: 24).x;
-				Helpers.drawTextStd(TCat.HUDColored, victimName, fromRight, fromTop + (i * yDist) - 5, Alignment.Right, fontSize: 24, outlineColor: isVictimRed ? Helpers.DarkRed : Helpers.DarkBlue);
-				var victimNameWidth = Helpers.measureTextStd(TCat.Default, victimName, fontSize: 24).x;
-				Helpers.drawTextStd(TCat.HUDColored, killersMsg, fromRight - victimNameWidth, fromTop + (i * yDist) - 5, Alignment.Right, fontSize: 24, outlineColor: isKillerRed ? Helpers.DarkRed : Helpers.DarkBlue);
+				int nameLen = Fonts.measureText(killerColor, victimName);
+				Fonts.drawText(
+					killerColor, victimName, fromRight, fromTop + (i * yDist) - 5, Alignment.Right
+				);
+				Fonts.drawText(
+					victimColor, killersMsg, fromRight - nameLen, fromTop + (i * yDist) - 5, Alignment.Right
+				);
 				int weaponIndex = (int)killFeed.weaponIndex;
-				weaponIndex = weaponIndex < Global.sprites["hud_killfeed_weapon"].frames.Count ? weaponIndex : 0;
-				Global.sprites["hud_killfeed_weapon"].drawToHUD(weaponIndex, fromRight - nameLen - 13, fromTop + (i * yDist) - 2);
+				weaponIndex = (
+					weaponIndex < Global.sprites["hud_killfeed_weapon"].frames.Count ? weaponIndex : 0
+				);
+				Global.sprites["hud_killfeed_weapon"].drawToHUD(
+					weaponIndex, fromRight - nameLen - 14, fromTop + (i * yDist) - 2
+				);
 				if (killFeed.maverickKillFeedIndex != null) {
-					Global.sprites["hud_killfeed_weapon"].drawToHUD(killFeed.maverickKillFeedIndex.Value, fromRight - nameLen + 3, fromTop + (i * yDist) - 2);
+					Global.sprites["hud_killfeed_weapon"].drawToHUD(
+						killFeed.maverickKillFeedIndex.Value, fromRight - nameLen + 3, fromTop + (i * yDist) - 2
+					);
 				}
 			} else {
-				Helpers.drawTextStd(TCat.HUDColored, msg, fromRight, fromTop + (i * yDist) - 5, Alignment.Right, fontSize: 24, outlineColor: killFeed.customMessageAlliance == GameMode.blueAlliance ? Helpers.DarkBlue : Helpers.DarkRed);
+				FontType fontColor = killFeed.customMessageAlliance switch {
+					GameMode.blueAlliance => FontType.Blue,
+					GameMode.redAlliance => FontType.Red,
+					_ => FontType.Grey
+				};
+				Fonts.drawText(
+					fontColor, msg, fromRight, fromTop + (i * yDist) - 5,
+					Alignment.Right
+				);
 			}
 		}
 	}
@@ -1413,7 +1496,7 @@ public class GameMode {
 		});
 		string spectatorStr = string.Join(",", spectatorNames);
 		if (!string.IsNullOrEmpty(spectatorStr)) {
-			Helpers.drawTextStd(TCat.HUD, "Spectators: " + spectatorStr, 15, 200, fontSize: 20);
+			Fonts.drawText(FontType.BlueMenu, "Spectators: " + spectatorStr, 15, 200);
 		}
 	}
 
@@ -1431,9 +1514,11 @@ public class GameMode {
 			int topLeftY = 35;
 			int w = 120;
 			int lineHeight = 4;
-			uint fontSize = 12;
 
-			DrawWrappers.DrawRect(topLeftX - 5, topLeftY - 5, topLeftX + w, topLeftY + 6 + currentLineH, true, Helpers.MenuBgColor, 1, ZIndex.HUD - 10, isWorldPos: false);
+			DrawWrappers.DrawRect(
+				topLeftX - 5, topLeftY - 5, topLeftX + w,
+				topLeftY + 6 + currentLineH, true, Helpers.MenuBgColor, 1, ZIndex.HUD - 10, isWorldPos: false
+			);
 
 			currentLineH = -6;
 
@@ -1442,35 +1527,73 @@ public class GameMode {
 				if (downloadedBytes != null) {
 					string downloadMb = (downloadedBytes.Value / 1000000.0).ToString("0.00");
 					string downloadKb = (downloadedBytes.Value / 1000.0).ToString("0.00");
-					Helpers.drawTextStd("Bytes received: " + downloadMb + " mb" + " (" + downloadKb + " kb)", topLeftX, topLeftY + (currentLineH += lineHeight), alignment: Alignment.Left, fontSize: fontSize, outlineColor: Color.Black);
+					Fonts.drawText(
+						FontType.Grey,
+						"Bytes received: " + downloadMb + " mb" + " (" + downloadKb + " kb)",
+						topLeftX, topLeftY + (currentLineH += lineHeight)
+					);
 				}
 				if (uploadedBytes != null) {
 					string uploadMb = (uploadedBytes.Value / 1000000.0).ToString("0.00");
 					string uploadKb = (uploadedBytes.Value / 1000.0).ToString("0.00");
-					Helpers.drawTextStd("Bytes sent: " + uploadMb + " mb" + " (" + uploadKb + " kb)", topLeftX, topLeftY + (currentLineH += lineHeight), alignment: Alignment.Left, fontSize: fontSize, outlineColor: Color.Black);
+					Fonts.drawText(
+						FontType.Grey,
+						"Bytes sent: " + uploadMb + " mb" + " (" + uploadKb + " kb)",
+						topLeftX, topLeftY + (currentLineH += lineHeight)
+					);
 				}
 
 				double avgPacketIncrease = Global.lastFramePacketIncreases.Count == 0 ? 0 : Global.lastFramePacketIncreases.Average();
-				Helpers.drawTextStd("Packet rate: " + (avgPacketIncrease * 60f).ToString("0") + " bytes/second", topLeftX, topLeftY + (currentLineH += lineHeight), alignment: Alignment.Left, fontSize: fontSize, outlineColor: Color.Black);
-				Helpers.drawTextStd("Packet rate: " + avgPacketIncrease.ToString("0") + " bytes/frame", topLeftX, topLeftY + (currentLineH += lineHeight), alignment: Alignment.Left, fontSize: fontSize, outlineColor: Color.Black);
+				Fonts.drawText(
+					FontType.Grey,
+					"Packet rate: " + (avgPacketIncrease * 60f).ToString("0") + " bytes/second", topLeftX, topLeftY + (currentLineH += lineHeight)
+				);
+				Fonts.drawText(
+					FontType.Grey,
+					"Packet rate: " + avgPacketIncrease.ToString("0") + " bytes/frame", topLeftX, topLeftY + (currentLineH += lineHeight)
+				);
 			}
 
 			double avgPacketsReceived = Global.last10SecondsPacketsReceived.Count == 0 ? 0 : Global.last10SecondsPacketsReceived.Average();
-			Helpers.drawTextStd("Ping Packets / sec: " + avgPacketsReceived.ToString("0.0"), topLeftX, topLeftY + (currentLineH += lineHeight), alignment: Alignment.Left, fontSize: fontSize, outlineColor: Color.Black);
+			Fonts.drawText(
+				FontType.Grey,
+				"Ping Packets / sec: " + avgPacketsReceived.ToString("0.0"),
+				topLeftX, topLeftY + (currentLineH += lineHeight)
+			);
+			Fonts.drawText(
+				FontType.Grey,
+				"Start GameObject Count: " + level.startGoCount, topLeftX, topLeftY + (currentLineH += lineHeight)
+			);
+			Fonts.drawText(
+				FontType.Grey,
+				"Current GameObject Count: " + level.gameObjects.Count, topLeftX, topLeftY + (currentLineH += lineHeight)
+			);
 
-			Helpers.drawTextStd("Start GameObject Count: " + level.startGoCount, topLeftX, topLeftY + (currentLineH += lineHeight), alignment: Alignment.Left, fontSize: fontSize, outlineColor: Color.Black);
-			Helpers.drawTextStd("Current GameObject Count: " + level.gameObjects.Count, topLeftX, topLeftY + (currentLineH += lineHeight), alignment: Alignment.Left, fontSize: fontSize, outlineColor: Color.Black);
+			Fonts.drawText(
+				FontType.Grey,
+				"Start GridItem Count: " + level.startGridCount, topLeftX, topLeftY + (currentLineH += lineHeight)
+			);
+			Fonts.drawText(
+				FontType.Grey,
+				"Current GridItem Count: " + level.getGridCount(), topLeftX, topLeftY + (currentLineH += lineHeight)
+			);
 
-			Helpers.drawTextStd("Start GridItem Count: " + level.startGridCount, topLeftX, topLeftY + (currentLineH += lineHeight), alignment: Alignment.Left, fontSize: fontSize, outlineColor: Color.Black);
-			Helpers.drawTextStd("Current GridItem Count: " + level.getGridCount(), topLeftX, topLeftY + (currentLineH += lineHeight), alignment: Alignment.Left, fontSize: fontSize, outlineColor: Color.Black);
+			Fonts.drawText(
+				FontType.Grey,
+				"Sound Count: " + Global.sounds.Count, topLeftX, topLeftY + (currentLineH += lineHeight)
+			);
 
-			Helpers.drawTextStd("Sound Count: " + Global.sounds.Count, topLeftX, topLeftY + (currentLineH += lineHeight), alignment: Alignment.Left, fontSize: fontSize, outlineColor: Color.Black);
-
-			Helpers.drawTextStd("List Counts: " + Global.level.getListCounts(), topLeftX, topLeftY + (currentLineH += lineHeight), alignment: Alignment.Left, fontSize: fontSize, outlineColor: Color.Black);
+			Fonts.drawText(
+				FontType.Grey,
+				"List Counts: " + Global.level.getListCounts(), topLeftX, topLeftY + (currentLineH += lineHeight)
+			);
 
 			float avgFrameProcessTime = Global.lastFrameProcessTimes.Count == 0 ? 0 : Global.lastFrameProcessTimes.Average();
 
-			Helpers.drawTextStd("Avg frame process time: " + avgFrameProcessTime.ToString("0.00") + " ms", topLeftX, topLeftY + (currentLineH += lineHeight), alignment: Alignment.Left, fontSize: fontSize, outlineColor: Color.Black);
+			Fonts.drawText(
+				FontType.Grey,
+				"Avg frame process time: " + avgFrameProcessTime.ToString("0.00") + " ms", topLeftX, topLeftY + (currentLineH += lineHeight)
+			);
 			//float graphYHeight = 20;
 			//drawDiagnosticsGraph(Global.lastFrameProcessTimes, topLeftX, topLeftY + (currentLineH += lineHeight) + graphYHeight, 1);
 
@@ -1496,8 +1619,12 @@ public class GameMode {
 			int napalmNum = mainPlayer.loadout.vileLoadout.napalm;
 			if (napalmNum < 0) napalmNum = 0;
 			if (napalmNum > 2) napalmNum = 0;
-			Global.sprites["hud_hawk_bombs"].drawToHUD(napalmNum, x, y, alpha: mainPlayer.vileNapalmWeapon.shootTime == 0 ? 1 : 0.5f);
-			Helpers.drawTextStd(TCat.HUD, "x" + mainPlayer.character.rideArmor.hawkBombCount.ToString(), x + 10, y - 4, fontSize: 24, color: Color.White);
+			Global.sprites["hud_hawk_bombs"].drawToHUD(
+				napalmNum, x, y, alpha: mainPlayer.vileNapalmWeapon.shootTime == 0 ? 1 : 0.5f
+			);
+			Fonts.drawText(
+				FontType.Grey, "x" + mainPlayer.character.rideArmor.hawkBombCount.ToString(), x + 10, y - 4
+			);
 		}
 
 		if (level.mainPlayer.character?.rideArmor != null || level.mainPlayer.character?.rideChaser != null) {
@@ -1531,7 +1658,9 @@ public class GameMode {
 			Global.sprites["hud_axl_ammo"].drawToHUD(index, x, y);
 			int currentAmmo = MathInt.Ceiling(mainPlayer.weapons[0].ammo);
 			int totalAmmo = MathInt.Ceiling(mainPlayer.axlBulletTypeAmmo[mainPlayer.weapons[0].type]);
-			Helpers.drawTextStd(TCat.HUD, totalAmmo.ToString(), x + 10, y - 4, fontSize: 24, color: Color.White);
+			Fonts.drawText(
+				FontType.Grey, totalAmmo.ToString(), x + 10, y - 4
+			);
 		}
 
 		if (level.mainPlayer.isGridModeEnabled()) {
@@ -1767,7 +1896,9 @@ public class GameMode {
 	}
 
 	private void drawWeaponText(float x, float y, string text) {
-		Helpers.drawTextStd(TCat.Default, text, x + 1, y + 8, Alignment.Center, fontSize: 18);
+		Fonts.drawText(
+			FontType.Yellow, text, x + 1, y + 8, Alignment.Center
+		);
 	}
 
 	private void drawWeaponSlotSelected(float x, float y) {
@@ -2142,14 +2273,12 @@ public class GameMode {
 			var color = getCharFont(player);
 
 			if (Global.serverClient != null && player.serverPlayer.isHost) {
-				Helpers.drawTextStd(
-					TCat.HUD, "H", col1x - 8, 3 + topPlayerY + i * rowH,
-					Alignment.Left, style: Text.Styles.Italic, fontSize: 20, color: Color.Yellow
+				Fonts.drawText(
+					FontType.Yellow, "H", col1x - 8, 3 + topPlayerY + i * rowH
 				);
 			} else if (Global.serverClient != null && player.serverPlayer.isBot) {
-				Helpers.drawTextStd(
-					TCat.HUD, "B", col1x - 8, 3 + topPlayerY + i * rowH,
-					Alignment.Left, style: Text.Styles.Italic, fontSize: 20, color: Helpers.Gray
+				Fonts.drawText(
+					FontType.Grey, "B", col1x - 8, 3 + topPlayerY + i * rowH
 				);
 			}
 
@@ -2380,9 +2509,8 @@ public class GameMode {
 
 	public void drawDpsIfSet(int yPos) {
 		if (!string.IsNullOrEmpty(dpsString)) {
-			Helpers.drawTextStd(
-				TCat.HUD, dpsString, 5, yPos,
-				Alignment.Left, fontSize: (uint)32, color: getTimeColor()
+			Fonts.drawText(
+				FontType.BlueMenu, dpsString, 5, yPos
 			);
 		}
 	}
@@ -2431,14 +2559,22 @@ public class GameMode {
 		}
 
 		// Title
-		Helpers.drawTextStd(TCat.HUD, text.ToUpperInvariant(), Global.halfScreenW, titleY, Alignment.Center, fontSize: 64u, outlineThickness: 6, outlineColor: Helpers.getAllianceColor(), vAlignment: VAlignment.Center);
+		Fonts.drawText(
+			FontType.Grey, text.ToUpperInvariant(), Global.halfScreenW,
+			titleY, Alignment.Center
+		);
 
 		// Subtitle
-		Helpers.drawTextStd(TCat.HUD, subtitle, Global.halfScreenW, subtitleY, Alignment.Center, fontSize: 32, outlineThickness: 5, outlineColor: Helpers.getAllianceColor(), vAlignment: VAlignment.Center);
+		Fonts.drawText(
+			FontType.Grey, subtitle, Global.halfScreenW, subtitleY, Alignment.Center
+		);
 
 		if (overTime >= secondsBeforeLeave) {
 			if (Global.serverClient == null) {
-				Helpers.drawTextStd(TCat.HUD, Helpers.controlText("Press [ESC] to return to menu"), Global.halfScreenW, Global.halfScreenH + 50, Alignment.Center, fontSize: 28);
+				Fonts.drawText(
+					FontType.OrangeMenu, Helpers.controlText("Press [ESC] to return to menu"),
+					Global.halfScreenW, Global.halfScreenH + 50
+				);
 			}
 		}
 	}
@@ -2449,48 +2585,84 @@ public class GameMode {
 
 	public void drawRespawnHUD() {
 		if (level.mainPlayer.character != null && level.mainPlayer.readyTextOver && level.mainPlayer.canReviveX()) {
-			Helpers.drawTextStd(TCat.HUD, Helpers.controlText("[CMD]: Activate Raging Charge"), Global.screenW / 2, 10 + Global.screenH / 2, Alignment.Center, fontSize: 21);
+			Fonts.drawTextEX(
+				FontType.Blue, Helpers.controlText("[CMD]: Activate Raging Charge"),
+				Global.screenW / 2, 10 + Global.screenH / 2
+			);
 		}
 
 		if (level.mainPlayer.randomTip == null) return;
 		if (level.mainPlayer.isSpectator) return;
 
 		if (level.mainPlayer.character == null && level.mainPlayer.readyTextOver) {
-			string respawnStr = (level.mainPlayer.respawnTime > 0) ? "Respawn in " + Math.Round(level.mainPlayer.respawnTime).ToString() :
-				Helpers.controlText("Press [OK] to respawn");
+			string respawnStr = (
+				(level.mainPlayer.respawnTime > 0) ?
+				"Respawn in " + Math.Round(level.mainPlayer.respawnTime).ToString() :
+				Helpers.controlText("Press [OK] to respawn")
+			);
 
 			if (level.mainPlayer.eliminated()) {
-				Helpers.drawTextStd(TCat.HUD, "You were eliminated!", Global.screenW / 2, -15 + Global.screenH / 2, Alignment.Center);
-				Helpers.drawTextStd(TCat.HUD, "Spectating in " + Math.Round(level.mainPlayer.respawnTime).ToString(), Global.screenW / 2, Global.screenH / 2, Alignment.Center);
+				Fonts.drawText(
+					FontType.Red, "You were eliminated!",
+					Global.screenW / 2, -15 + Global.screenH / 2, Alignment.Center
+				);
+				Fonts.drawText(
+					FontType.BlueMenu, "Spectating in " + Math.Round(level.mainPlayer.respawnTime).ToString(),
+					Global.screenW / 2, Global.screenH / 2, Alignment.Center
+				);
 			} else if (level.mainPlayer.canReviveVile()) {
 				if (level.mainPlayer.lastDeathWasVileMK2) {
-					Helpers.drawTextStd(TCat.HUD, respawnStr, Global.screenW / 2, -10 + Global.screenH / 2, Alignment.Center);
+					Fonts.drawText(
+						FontType.BlueMenu, respawnStr,
+						Global.screenW / 2, -10 + Global.screenH / 2, Alignment.Center
+					);
 					string reviveText = Helpers.controlText(
 						$"[SPC]: Revive as Vile V (5 {Global.nameCoins})"
 					);
-					Helpers.drawTextStd(TCat.HUD, reviveText, Global.screenW / 2, 10 + Global.screenH / 2, Alignment.Center, fontSize: 24);
+					Fonts.drawText(
+						FontType.Green, reviveText,
+						Global.screenW / 2, 10 + Global.screenH / 2, Alignment.Center
+					);
 				} else {
-					Helpers.drawTextStd(TCat.HUD, respawnStr, Global.screenW / 2, -10 + Global.screenH / 2, Alignment.Center);
+					Fonts.drawText(
+						FontType.BlueMenu, respawnStr,
+						Global.screenW / 2, -10 + Global.screenH / 2, Alignment.Center
+					);
 					string reviveText = Helpers.controlText(
 						$"[SPC]: Revive as MK-II (5 {Global.nameCoins})"
 					);
-					Helpers.drawTextStd(TCat.HUD, reviveText, Global.screenW / 2, 10 + Global.screenH / 2, Alignment.Center, fontSize: 24);
+					Fonts.drawText(
+						FontType.DarkBlue, reviveText,
+						Global.screenW / 2, 10 + Global.screenH / 2, Alignment.Center
+					);
 					string reviveText2 = Helpers.controlText(
 						$"[CMD]: Revive as MK-V (5 {Global.nameCoins})"
 					);
-					Helpers.drawTextStd(TCat.HUD, reviveText2, Global.screenW / 2, 22 + Global.screenH / 2, Alignment.Center, fontSize: 24);
+					Fonts.drawText(
+						FontType.Green, reviveText2,
+						Global.screenW / 2, 22 + Global.screenH / 2, Alignment.Center
+					);
 				}
 			} else if (level.mainPlayer.canReviveSigma(out _)) {
-				Helpers.drawTextStd(TCat.HUD, respawnStr, Global.screenW / 2, -10 + Global.screenH / 2, Alignment.Center);
+				Fonts.drawText(
+					FontType.BlueMenu, respawnStr,
+					Global.screenW / 2, -10 + Global.screenH / 2, Alignment.Center
+				);
 				string hyperType = "Wolf";
 				if (level.mainPlayer.isSigma2()) hyperType = "Viral";
 				if (level.mainPlayer.isSigma3()) hyperType = "Kaiser";
 				string reviveText = Helpers.controlText(
 					$"[D]: Revive as {hyperType} Sigma ({Player.reviveSigmaCost.ToString()} {Global.nameCoins}"
 				);
-				Helpers.drawTextStd(TCat.HUD, reviveText, Global.screenW / 2, 10 + Global.screenH / 2, Alignment.Center, fontSize: 24);
+				Fonts.drawText(
+					FontType.Green, reviveText,
+					Global.screenW / 2, 10 + Global.screenH / 2, Alignment.Center
+				);
 			} else {
-				Helpers.drawTextStd(TCat.HUD, respawnStr, Global.screenW / 2, Global.screenH / 2, Alignment.Center);
+				Fonts.drawText(
+					FontType.BlueMenu, respawnStr,
+					Global.screenW / 2, Global.screenH / 2, Alignment.Center
+				);
 			}
 
 			if (!Menu.inMenu) {
@@ -2498,7 +2670,10 @@ public class GameMode {
 				for (int i = 0; i < level.mainPlayer.randomTip.Length; i++) {
 					var line = level.mainPlayer.randomTip[i];
 					if (i == 0) line = "Tip: " + line;
-					Helpers.drawTextStd(TCat.HUD, line, Global.screenW / 2, (Global.screenH / 2) + 45 + (12 * i), Alignment.Center, fontSize: 18);
+					Fonts.drawText(
+						FontType.BlueMenu, line,
+						Global.screenW / 2, (Global.screenH / 2) + 45 + (12 * i), Alignment.Center
+					);
 				}
 			}
 		}
@@ -2665,14 +2840,33 @@ public class GameMode {
 			posX /= Global.viewSize;
 			posY /= Global.viewSize;
 
-			DrawWrappers.DrawLine(posX, posY, posX + dirTo.x * al, posY + dirTo.y * al, Helpers.getAllianceColor(), 1, ZIndex.HUD, false);
-			DrawWrappers.DrawLine(posX + dirTo.x * alm4, posY + dirTo.y * alm4, posX + dirTo.x * alm3, posY + dirTo.y * alm3, Helpers.getAllianceColor(), 4, ZIndex.HUD, false);
-			DrawWrappers.DrawLine(posX + dirTo.x * alm3, posY + dirTo.y * alm3, posX + dirTo.x * alm2, posY + dirTo.y * alm2, Helpers.getAllianceColor(), 3, ZIndex.HUD, false);
-			DrawWrappers.DrawLine(posX + dirTo.x * alm2, posY + dirTo.y * alm2, posX + dirTo.x * alm1, posY + dirTo.y * alm1, Helpers.getAllianceColor(), 2, ZIndex.HUD, false);
+			DrawWrappers.DrawLine(
+				posX, posY,
+				posX + dirTo.x * al, posY + dirTo.y * al,
+				Helpers.getAllianceColor(), 1, ZIndex.HUD, false
+			);
+			DrawWrappers.DrawLine(
+				posX + dirTo.x * alm4, posY + dirTo.y * alm4,
+				posX + dirTo.x * alm3, posY + dirTo.y * alm3,
+				Helpers.getAllianceColor(), 4, ZIndex.HUD, false
+			);
+			DrawWrappers.DrawLine(
+				posX + dirTo.x * alm3, posY + dirTo.y * alm3,
+				posX + dirTo.x * alm2, posY + dirTo.y * alm2,
+				Helpers.getAllianceColor(), 3, ZIndex.HUD, false
+			);
+			DrawWrappers.DrawLine(
+				posX + dirTo.x * alm2, posY + dirTo.y * alm2,
+				posX + dirTo.x * alm1, posY + dirTo.y * alm1,
+				Helpers.getAllianceColor(), 2, ZIndex.HUD, false
+			);
 
 			float distInMeters = objPos.distanceTo(playerPos) * 0.044f;
 			bool isLeft = posX < Global.viewScreenW / 2;
-			Helpers.drawTextStd(TCat.HUD, label + MathF.Round(distInMeters).ToString() + "m", posX, posY, isLeft ? Alignment.Left : Alignment.Right, fontSize: (uint)MathF.Round(18f / Global.viewSize));
+			Fonts.drawText(
+				FontType.BlueMenu, label + MathF.Round(distInMeters).ToString() + "m",
+				posX, posY, isLeft ? Alignment.Left : Alignment.Right
+			);
 		}
 	}
 

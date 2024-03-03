@@ -577,7 +577,7 @@ public class OptionsMenu : IMainMenu {
 					"Preferred server region for hosting matches.\nChoose the one with lowest ping."
 				),
 				// Hide Menu Helper Text
-				new MenuOption(
+				/*new MenuOption(
 					30, startY,
 					() => {
 						if (Global.input.isPressedMenu(Control.MenuLeft)) {
@@ -597,7 +597,7 @@ public class OptionsMenu : IMainMenu {
 						);
 					},
 					"Show or hide additional menu help text in\nbottom right of the in-match HUD."
-				),
+				),*/
 				// System requirements check
 				new MenuOption(
 					30, startY,
@@ -1487,16 +1487,21 @@ public class OptionsMenu : IMainMenu {
 				5, 5, Global.screenW - 5, Global.screenH - 5,
 				true, new Color(0, 0, 0, 224), 0, ZIndex.HUD, false
 			);
-			Helpers.drawTextStd("Type in a multiplayer name", Global.screenW / 2, top, alignment: Alignment.Center);
-
-			float xPos = Global.screenW * 0.33f;
-			Helpers.drawTextStd(playerName, xPos, 20 + top, alignment: Alignment.Left);
+			Fonts.drawText(
+				FontType.Orange, "Type in a multiplayer name",
+				Global.screenW / 2, top, alignment: Alignment.Center
+			);
+			int xPos = MathInt.Round(Global.screenW * 0.33f);
+			Fonts.drawText(FontType.Green, playerName, xPos, 20 + top);
 			if (blinkTime >= 0.5f) {
-				float width = Helpers.measureTextStd(TCat.Default, playerName).x;
-				Helpers.drawTextStd("<", xPos + width + 3, 20 + top, alignment: Alignment.Left);
+				int width = Fonts.measureText(FontType.Green, playerName);
+				Fonts.drawText(FontType.Grey, "<", xPos + width + 3, 20 + top);
 			}
 
-			Helpers.drawTextStd("Press Enter to continue", Global.screenW / 2, 40 + top, alignment: Alignment.Center);
+			Fonts.drawText(
+				FontType.Grey, "Press Enter to continue",
+				Global.screenW / 2, 40 + top, alignment: Alignment.Center
+			);
 		}
 	}
 }

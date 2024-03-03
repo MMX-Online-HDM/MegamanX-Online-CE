@@ -35,23 +35,30 @@ public class ConfirmLeaveMenu : IMainMenu {
 	}
 
 	public void render() {
-		DrawWrappers.DrawRect(5, 5, Global.screenW - 5, Global.screenH - 5, true, Helpers.MenuBgColor, 0, ZIndex.HUD + 200, false);
+		DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
 
 		if (message.Contains("\n")) {
 			var lines = message.Split('\n');
 			int i = 0;
 			foreach (var line in lines) {
-				Helpers.drawTextStd(TCat.Title, line, Global.screenW * 0.5f, 20 + i * 10, Alignment.Center, fontSize: 30);
+				Fonts.drawText(
+					FontType.Yellow, line, Global.screenW * 0.5f, 20 + i * 10, Alignment.Center
+				);
 				i++;
 			}
 		} else {
-			Helpers.drawTextStd(TCat.Title, message, Global.screenW * 0.5f, 20, Alignment.Center, fontSize: fontSize);
+			Fonts.drawText(
+				FontType.Yellow, message, Global.screenW * 0.5f, 20, Alignment.Center
+			);
 		}
-		Global.sprites["cursor"].drawToHUD(0, 70, 76 + (selectY * 20));
+		Global.sprites["cursor"].drawToHUD(0, 70, 76 + (selectY * 20) - 3);
 
-		Helpers.drawTextStd(TCat.Option, "No", optionPos1.x, optionPos1.y, selected: selectY == 0);
-		Helpers.drawTextStd(TCat.Option, "Yes", optionPos2.x, optionPos2.y, selected: selectY == 1);
+		Fonts.drawText(FontType.Blue, "No", optionPos1.x, optionPos1.y, selected: selectY == 0);
+		Fonts.drawText(FontType.Blue, "Yes", optionPos2.x, optionPos2.y, selected: selectY == 1);
 
-		Helpers.drawTextStd(TCat.BotHelp, "[OK]: Choose, [BACK]: Back", Global.halfScreenW, optionPos5.y + 20, Alignment.Center, fontSize: 24);
+		Fonts.drawText(
+			FontType.Grey, "[OK]: Choose, [BACK]: Back",
+			Global.halfScreenW, Global.screenH - 20, Alignment.Center
+		);
 	}
 }

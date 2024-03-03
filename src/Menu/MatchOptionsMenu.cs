@@ -26,9 +26,9 @@ public class MatchOptionsMenu : IMainMenu {
 	}
 
 	public List<MenuOption> menuOptions;
-	public const int startX = 90;
-	public const int startY = 60;
-	public const int lineH = 10;
+	public int startX = 90;
+	public int startY = 50;
+	public int lineH = 10;
 
 	public float muteCooldown;
 
@@ -37,297 +37,298 @@ public class MatchOptionsMenu : IMainMenu {
 
 		int lineNum = 0;
 
-		menuOptions = new List<MenuOption>()
-		{
-                // Suicide
-                new MenuOption(startX, startY + (lineH * lineNum++),
-					() =>
-					{
-						if (Global.input.isPressedMenu(Control.MenuConfirm))
-						{
-							if (canSuicide())
-							{
-								Global.level.mainPlayer.forceKill();
-								Menu.exit();
-							}
-						}
-					},
-					(Point pos, int index) =>
-					{
-						Helpers.drawTextStd(TCat.Option, "Suicide", pos.x, pos.y, color: canSuicide() ? Color.White : Helpers.Gray, fontSize: 24, selected: selectY == index);
-					}),
-                // Change team
-                new MenuOption(startX, startY + (lineH * lineNum++),
-					() =>
-					{
-						if (Global.input.isPressedMenu(Control.MenuConfirm))
-						{
-							if (canChangeToTeam())
-							{
-								int team = enemyTeam();
-								Global.serverClient?.rpc(RPC.switchTeam, RPCSwitchTeam.getSendMessage(Global.level.mainPlayer.id, team));
-								Global.level.mainPlayer.newAlliance = team;
-								Global.level.mainPlayer.forceKill();
-								Menu.exit();
-							}
-						}
-					},
-					(Point pos, int index) =>
-					{
-						Helpers.drawTextStd(TCat.Option, "Change Team", pos.x, pos.y, color: canChangeToTeam() ? Color.White : Helpers.Gray, fontSize: 24, selected: selectY == index);
-					}),
-                // Spectate
-                new MenuOption(startX, startY + (lineH * lineNum++),
-					() =>
-					{
-						if (!canSpectate()) return;
+		menuOptions = new List<MenuOption>() {
+			// Spectate
+			new MenuOption(startX, startY + (lineH * lineNum++),
+			() => {
+				if (!canSpectate()) return;
 
-						var otherPlayers = Global.level.spectatablePlayers();
+				var otherPlayers = Global.level.spectatablePlayers();
 
-						if (Global.input.isPressedMenu(Control.MenuConfirm))
+				if (Global.input.isPressedMenu(Control.MenuConfirm))
+				{
+					Global.level.setMainPlayerSpectate();
+					Menu.exit();
+				}
+			},
+			(Point pos, int index) => {
+				var otherPlayers = Global.level.spectatablePlayers();
+				string spectate = Global.level.mainPlayer.isSpectator ? "Stop spectating" : "Spectate";
+				Fonts.drawText(
+					canSpectate() ? FontType.Blue : FontType.Grey,
+					spectate, pos.x, pos.y, selected: selectY == index
+				);
+			}),
+			// Suicide
+			new MenuOption(startX, startY + (lineH * lineNum++),
+			() => {
+				if (Global.input.isPressedMenu(Control.MenuConfirm)) {
+					if (canSuicide()) {
+						Global.level.mainPlayer.forceKill();
+						Menu.exit();
+					}
+				}
+				},
+				(Point pos, int index) => {
+					Fonts.drawText(
+						canSuicide() ? FontType.Red : FontType.Grey, "Suicide",
+						pos.x, pos.y, selected: selectY == index
+					);
+				}
+			),
+			// Change team
+			new MenuOption(startX, startY + (lineH * lineNum++),
+			() => {
+				if (Global.input.isPressedMenu(Control.MenuConfirm)) {
+					if (canChangeToTeam()) {
+						int team = enemyTeam();
+						Global.serverClient?.rpc(
+							RPC.switchTeam, RPCSwitchTeam.getSendMessage(Global.level.mainPlayer.id, team)
+						);
+						Global.level.mainPlayer.newAlliance = team;
+						Global.level.mainPlayer.forceKill();
+						Menu.exit();
+					}
+				}
+			},
+			(Point pos, int index) => {
+				Fonts.drawText(
+					canChangeToTeam() ? FontType.Blue : FontType.Grey,
+					"Change Team", pos.x, pos.y, selected: selectY == index
+			);
+			}),
+			// Add bot
+			new MenuOption(startX, startY + (lineH * lineNum++),
+			() => {
+				if (!canAddBot()) {
+					return;
+				}
+				if (Global.input.isPressedMenu(Control.MenuConfirm)) {
+					Menu.change(new AddBotMenu(this));
+				}
+			},
+			(Point pos, int index) => {
+				Fonts.drawText(
+					canAddBot() ? FontType.Blue : FontType.Grey,
+					"Add Bot", pos.x, pos.y, selected: selectY == index
+				);
+			}),
+			// Remove bot
+			new MenuOption(startX, startY + (lineH * lineNum++),
+			() => {
+				if (!canRemoveBot()) { return; }
+				if (botToRemove == null) { return; }
+
+				if (Global.input.isPressedMenu(Control.MenuLeft)) {
+					removeBotIndex--;
+					if (removeBotIndex < 0) removeBotIndex = bots.Count - 1;
+				}
+				else if (Global.input.isPressedMenu(Control.MenuRight)) {
+					removeBotIndex++;
+					if (removeBotIndex >= bots.Count) removeBotIndex = 0;
+				}
+				else if (Global.input.isPressedMenu(Control.MenuConfirm)) {
+					// Don't allow removing a bot if it would unbalance the teams
+					if (isPublicMatch() && Global.level.gameMode.isTeamMode) {
+						GameMode.getAllianceCounts(Global.level.nonSpecPlayers(), out int redCount, out int blueCount);
+						if ((botToRemove.alliance == GameMode.redAlliance && redCount < blueCount) ||
+							(botToRemove.alliance == GameMode.blueAlliance && blueCount < redCount)
+						) {
+							Menu.change(new ErrorMenu("This would unbalance the teams.", this, true));
+							return;
+						}
+					}
+
+					if (Global.serverClient != null) {
+						RPC.removeBot.sendRpc(botToRemove.id);
+					}
+					else {
+						Global.level.removePlayer(botToRemove);
+					}
+				}
+			},
+			(Point pos, int index) => {
+				Fonts.drawText(
+					canRemoveBot() ? FontType.Blue : FontType.Grey,
+					"Remove Bot: " + (botToRemove?.name ?? "(No bots)"),
+					pos.x, pos.y, selected: selectY == index
+			);
+			}),
+			// Chat history
+			new MenuOption(startX, startY + (lineH * lineNum++),
+			() => {
+				if (Global.input.isPressedMenu(Control.MenuConfirm)) {
+					Menu.change(new ChatHistoryMenu(this));
+				}
+			},
+			(Point pos, int index) => {
+				Fonts.drawText(
+					FontType.Blue,
+					 "Chat History", pos.x, pos.y, selected: selectY == index
+				);
+			}),
+			// Disable chat
+			new MenuOption(startX, startY + (lineH * lineNum++),
+			() => {
+				if (Global.input.isPressedMenu(Control.MenuConfirm)) {
+					Global.level.gameMode.chatMenu.chatEnabled = !Global.level.gameMode.chatMenu.chatEnabled;
+				}
+			},
+			(Point pos, int index) => {
+				Fonts.drawText(
+					FontType.Blue,
+					Global.level.gameMode.chatMenu.chatEnabled ? "Disable Chat" : "Enable Chat",
+					pos.x, pos.y, selected: selectY == index
+				);
+			}),
+			// Mute
+			new MenuOption(startX, startY + (lineH * lineNum++),
+			() => {
+				if (playerToMute == null) return;
+
+				if (Global.input.isPressedMenu(Control.MenuLeft)) {
+					playerMuteIndex--;
+					if (playerMuteIndex < 0) playerMuteIndex = players.Count - 1;
+				}
+				else if (Global.input.isPressedMenu(Control.MenuRight)) {
+					playerMuteIndex++;
+					if (playerMuteIndex >= players.Count) playerMuteIndex = 0;
+				}
+				if (Global.input.isPressedMenu(Control.MenuConfirm)) {
+					if (muteCooldown == 0)
+					{
+						muteCooldown += Global.spf;
+						string muteMsg = " muted ";
+						if (!playerToMute.isMuted) {
+							playerToMute.isMuted = true;
+						}
+						else {
+							playerToMute.isMuted = false;
+							muteMsg = " unmuted ";
+						}
+						Global.level.gameMode.chatMenu.addChatEntry(new ChatEntry(Global.level.mainPlayer.name + muteMsg + playerToMute.name + ".", null, null, true));
+					}
+				}
+			},
+			(Point pos, int index) => {
+				Fonts.drawText(
+					FontType.Blue,
+					"Mute: " + getPlayerMuteMsg(playerToMute),
+					pos.x, pos.y, selected: selectY == index
+				);
+			}),
+			// Report
+			new MenuOption(startX, startY + (lineH * lineNum++),
+			() => {
+				if (playerToReport == null) return;
+
+				if (Global.input.isPressedMenu(Control.MenuLeft)) {
+					playerReportIndex--;
+					if (playerReportIndex < 0) playerReportIndex = playersIncludingSelf.Count - 1;
+				}
+				else if (Global.input.isPressedMenu(Control.MenuRight)) {
+					playerReportIndex++;
+					if (playerReportIndex >= playersIncludingSelf.Count) playerReportIndex = 0;
+				}
+				if (Global.input.isPressedMenu(Control.MenuConfirm)) {
+					var oldMenu = this;
+					Menu.change(new ConfirmLeaveMenu(this, "Report player " + playerToReport.name + "?\nThis will generate a report_[name].txt\nfile in your game folder;\nsend it to your server admin.", () =>
+					{
+						Global.serverClient?.rpc(RPC.reportPlayerRequest, playerToReport.name);
+						Menu.change(oldMenu);
+					}));
+				}
+			},
+			(Point pos, int index) => {
+				Fonts.drawText(
+					FontType.Blue,
+					"Report: " + (playerToReport?.name ?? "(No players)"),
+					pos.x, pos.y, selected: selectY == index
+				);
+			}),
+			// Kick/Ban
+			new MenuOption(startX, startY + (lineH * lineNum++),
+			() => {
+				if (playerToKick == null) return;
+				if (!canKick()) return;
+
+				if (Global.input.isPressedMenu(Control.MenuLeft))
+				{
+					playerKickIndex--;
+					if (playerKickIndex < 0) playerKickIndex = players.Count - 1;
+				}
+				else if (Global.input.isPressedMenu(Control.MenuRight))
+				{
+					playerKickIndex++;
+					if (playerKickIndex >= players.Count) playerKickIndex = 0;
+				}
+				if (Global.input.isPressedMenu(Control.MenuConfirm))
+				{
+					Menu.change(new KickMenu(this, playerToKick));
+				}
+			},
+			(Point pos, int index) => {
+				string prefix = "";
+				if (!KickMenu.hasDirectKickPower()) prefix = "Vote ";
+				Fonts.drawText(
+					canKick() ? FontType.Blue : FontType.Grey,
+					prefix + "Kick: " + (playerToKick?.name ?? "(No players)"),
+					pos.x, pos.y, selected: selectY == index
+				);
+			}),
+			// Reset flags
+			new MenuOption(startX, startY + (lineH * lineNum++),
+			() => {
+				if (!canResetFlags()) return;
+
+				if (Global.input.isPressedMenu(Control.MenuConfirm))
+				{
+					string confirmMsg = "Vote Reset Flags: are you sure?";
+					Menu.change(new ConfirmLeaveMenu(this, confirmMsg, () =>
+					{
+						VoteKick.initiate(Global.level.mainPlayer, VoteType.ResetFlags, 0, "");
+						Menu.exit();
+					}));
+				}
+			},
+			(Point pos, int index) => {
+				string msg = "Vote Reset Flags";
+				Fonts.drawText(
+					canResetFlags() ? FontType.Blue : FontType.Grey,
+					msg, pos.x, pos.y, selected: selectY == index
+				);
+			}),
+			// End match
+			new MenuOption(startX, startY + (lineH * lineNum++),
+			() => {
+				if (!canEndMatch()) return;
+
+				if (Global.input.isPressedMenu(Control.MenuConfirm))
+				{
+					string confirmMsg = canEndMatchWithoutVote() ? "End Match: are you sure?" : "Vote End Match: are you sure?";
+					Menu.change(new ConfirmLeaveMenu(this, confirmMsg, () =>
+					{
+						if (canEndMatchWithoutVote())
 						{
-							Global.level.setMainPlayerSpectate();
+							Global.level.gameMode.noContest = true;
+						}
+						else
+						{
+							VoteKick.initiate(Global.level.mainPlayer, VoteType.EndMatch, 0, "");
 							Menu.exit();
 						}
-					},
-					(Point pos, int index) =>
-					{
-						var otherPlayers = Global.level.spectatablePlayers();
-						string spectate = Global.level.mainPlayer.isSpectator ? "Stop spectating" : "Spectate";
-						Helpers.drawTextStd(TCat.Option, spectate, pos.x, pos.y, color: canSpectate() ? Color.White : Helpers.Gray, fontSize: 24, selected: selectY == index);
-					}),
-                // Add bot
-                new MenuOption(startX, startY + (lineH * lineNum++),
-					() =>
-					{
-						if (!canAddBot()) return;
-						if (Global.input.isPressedMenu(Control.MenuConfirm))
-						{
-							Menu.change(new AddBotMenu(this));
-						}
-					},
-					(Point pos, int index) =>
-					{
-						Helpers.drawTextStd(TCat.Option, "Add Bot", pos.x, pos.y, color: canAddBot() ? Color.White : Helpers.Gray, fontSize: 24, selected: selectY == index);
-					}),
-                // Remove bot
-                new MenuOption(startX, startY + (lineH * lineNum++),
-					() =>
-					{
-						if (!canRemoveBot()) return;
-						if (botToRemove == null) return;
-
-						if (Global.input.isPressedMenu(Control.MenuLeft))
-						{
-							removeBotIndex--;
-							if (removeBotIndex < 0) removeBotIndex = bots.Count - 1;
-						}
-						else if (Global.input.isPressedMenu(Control.MenuRight))
-						{
-							removeBotIndex++;
-							if (removeBotIndex >= bots.Count) removeBotIndex = 0;
-						}
-						else if (Global.input.isPressedMenu(Control.MenuConfirm))
-						{
-                            // Don't allow removing a bot if it would unbalance the teams
-                            if (isPublicMatch() && Global.level.gameMode.isTeamMode)
-							{
-								GameMode.getAllianceCounts(Global.level.nonSpecPlayers(), out int redCount, out int blueCount);
-								if ((botToRemove.alliance == GameMode.redAlliance && redCount < blueCount) || (botToRemove.alliance == GameMode.blueAlliance && blueCount < redCount))
-								{
-									Menu.change(new ErrorMenu("This would unbalance the teams.", this, true));
-									return;
-								}
-							}
-
-							if (Global.serverClient != null)
-							{
-								RPC.removeBot.sendRpc(botToRemove.id);
-							}
-							else
-							{
-								Global.level.removePlayer(botToRemove);
-							}
-						}
-					},
-					(Point pos, int index) =>
-					{
-						Helpers.drawTextStd(TCat.Option, "Remove Bot: " + (botToRemove?.name ?? "(No bots)"), pos.x, pos.y, color: canRemoveBot() ? Color.White : Helpers.Gray, fontSize: 24, selected: selectY == index);
-					}),
-                // Chat history
-                new MenuOption(startX, startY + (lineH * lineNum++),
-					() =>
-					{
-						if (Global.input.isPressedMenu(Control.MenuConfirm))
-						{
-							Menu.change(new ChatHistoryMenu(this));
-						}
-					},
-					(Point pos, int index) =>
-					{
-						Helpers.drawTextStd(TCat.Option, "Chat History", pos.x, pos.y, color: Color.White, fontSize: 24, selected: selectY == index);
-					}),
-                // Disable chat
-                new MenuOption(startX, startY + (lineH * lineNum++),
-					() =>
-					{
-						if (Global.input.isPressedMenu(Control.MenuConfirm))
-						{
-							Global.level.gameMode.chatMenu.chatEnabled = !Global.level.gameMode.chatMenu.chatEnabled;
-						}
-					},
-					(Point pos, int index) =>
-					{
-						Helpers.drawTextStd(TCat.Option, Global.level.gameMode.chatMenu.chatEnabled ? "Disable Chat" : "Enable Chat", pos.x, pos.y, color: Color.White, fontSize: 24, selected: selectY == index);
-					}),
-                // Mute
-                new MenuOption(startX, startY + (lineH * lineNum++),
-					() =>
-					{
-						if (playerToMute == null) return;
-
-						if (Global.input.isPressedMenu(Control.MenuLeft))
-						{
-							playerMuteIndex--;
-							if (playerMuteIndex < 0) playerMuteIndex = players.Count - 1;
-						}
-						else if (Global.input.isPressedMenu(Control.MenuRight))
-						{
-							playerMuteIndex++;
-							if (playerMuteIndex >= players.Count) playerMuteIndex = 0;
-						}
-						if (Global.input.isPressedMenu(Control.MenuConfirm))
-						{
-							if (muteCooldown == 0)
-							{
-								muteCooldown += Global.spf;
-								string muteMsg = " muted ";
-								if (!playerToMute.isMuted)
-								{
-									playerToMute.isMuted = true;
-								}
-								else
-								{
-									playerToMute.isMuted = false;
-									muteMsg = " unmuted ";
-								}
-								Global.level.gameMode.chatMenu.addChatEntry(new ChatEntry(Global.level.mainPlayer.name + muteMsg + playerToMute.name + ".", null, null, true));
-							}
-						}
-					},
-					(Point pos, int index) =>
-					{
-						Helpers.drawTextStd(TCat.Option, "Mute: " + getPlayerMuteMsg(playerToMute), pos.x, pos.y, color: Color.White, fontSize: 24, selected: selectY == index);
-					}),
-                // Report
-                new MenuOption(startX, startY + (lineH * lineNum++),
-					() =>
-					{
-						if (playerToReport == null) return;
-
-						if (Global.input.isPressedMenu(Control.MenuLeft))
-						{
-							playerReportIndex--;
-							if (playerReportIndex < 0) playerReportIndex = playersIncludingSelf.Count - 1;
-						}
-						else if (Global.input.isPressedMenu(Control.MenuRight))
-						{
-							playerReportIndex++;
-							if (playerReportIndex >= playersIncludingSelf.Count) playerReportIndex = 0;
-						}
-						if (Global.input.isPressedMenu(Control.MenuConfirm))
-						{
-							var oldMenu = this;
-							Menu.change(new ConfirmLeaveMenu(this, "Report player " + playerToReport.name + "?\nThis will generate a report_[name].txt\nfile in your game folder;\nsend it to your server admin.", () =>
-							{
-								Global.serverClient?.rpc(RPC.reportPlayerRequest, playerToReport.name);
-								Menu.change(oldMenu);
-							}));
-						}
-					},
-					(Point pos, int index) =>
-					{
-						Helpers.drawTextStd(TCat.Option, "Report: " + (playerToReport?.name ?? "(No players)"), pos.x, pos.y, color: Color.White, fontSize: 24, selected: selectY == index);
-					}),
-                // Kick/Ban
-                new MenuOption(startX, startY + (lineH * lineNum++),
-					() =>
-					{
-						if (playerToKick == null) return;
-						if (!canKick()) return;
-
-						if (Global.input.isPressedMenu(Control.MenuLeft))
-						{
-							playerKickIndex--;
-							if (playerKickIndex < 0) playerKickIndex = players.Count - 1;
-						}
-						else if (Global.input.isPressedMenu(Control.MenuRight))
-						{
-							playerKickIndex++;
-							if (playerKickIndex >= players.Count) playerKickIndex = 0;
-						}
-						if (Global.input.isPressedMenu(Control.MenuConfirm))
-						{
-							Menu.change(new KickMenu(this, playerToKick));
-						}
-					},
-					(Point pos, int index) =>
-					{
-						string prefix = "";
-						if (!KickMenu.hasDirectKickPower()) prefix = "Vote ";
-						Helpers.drawTextStd(TCat.Option, prefix + "Kick: " + (playerToKick?.name ?? "(No players)"), pos.x, pos.y, color: canKick() ? Color.White : Helpers.Gray, fontSize: 24, selected: selectY == index);
-					}),
-                // Reset flags
-                new MenuOption(startX, startY + (lineH * lineNum++),
-					() =>
-					{
-						if (!canResetFlags()) return;
-
-						if (Global.input.isPressedMenu(Control.MenuConfirm))
-						{
-							string confirmMsg = "Vote Reset Flags: are you sure?";
-							Menu.change(new ConfirmLeaveMenu(this, confirmMsg, () =>
-							{
-								VoteKick.initiate(Global.level.mainPlayer, VoteType.ResetFlags, 0, "");
-								Menu.exit();
-							}));
-						}
-					},
-					(Point pos, int index) =>
-					{
-						string msg = "Vote Reset Flags";
-						Helpers.drawTextStd(TCat.Option, msg, pos.x, pos.y, color: canResetFlags() ? Color.White : Helpers.Gray, fontSize: 24, selected: selectY == index);
-					}),
-                // End match
-                new MenuOption(startX, startY + (lineH * lineNum++),
-					() =>
-					{
-						if (!canEndMatch()) return;
-
-						if (Global.input.isPressedMenu(Control.MenuConfirm))
-						{
-							string confirmMsg = canEndMatchWithoutVote() ? "End Match: are you sure?" : "Vote End Match: are you sure?";
-							Menu.change(new ConfirmLeaveMenu(this, confirmMsg, () =>
-							{
-								if (canEndMatchWithoutVote())
-								{
-									Global.level.gameMode.noContest = true;
-								}
-								else
-								{
-									VoteKick.initiate(Global.level.mainPlayer, VoteType.EndMatch, 0, "");
-									Menu.exit();
-								}
-								Menu.exit();
-							}));
-						}
-					},
-					(Point pos, int index) =>
-					{
-						string msg = canEndMatchWithoutVote() ? "End Match" : "Vote End Match";
-						Helpers.drawTextStd(TCat.Option, msg, pos.x, pos.y, color: canEndMatch() ? Color.White : Helpers.Gray, fontSize: 24, selected: selectY == index);
-					}),
-			};
+						Menu.exit();
+					}));
+				}
+			},
+			(Point pos, int index) => {
+				string msg = canEndMatchWithoutVote() ? "End Match" : "Vote End Match";
+				Fonts.drawText(
+					canEndMatch() ? FontType.Blue : FontType.Grey,
+					msg, pos.x, pos.y, selected: selectY == index
+				);
+			}),
+		};
 	}
 
 	private bool canResetFlags() {
@@ -374,8 +375,11 @@ public class MatchOptionsMenu : IMainMenu {
 	}
 
 	public void render() {
-		DrawWrappers.DrawRect(5, 5, Global.screenW - 5, Global.screenH - 5, true, Helpers.MenuBgColor, 0, ZIndex.HUD + 200, false);
-		Helpers.drawTextStd(TCat.Title, "Match Options", Global.screenW * 0.5f, 20, Alignment.Center, fontSize: 48);
+		DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
+		Fonts.drawText(
+			FontType.Yellow, "Match Options",
+			Global.screenW * 0.5f, 16, Alignment.Center
+		);
 
 		Global.sprites["cursor"].drawToHUD(0, startX - 10, startY + 3 + (selectY * lineH));
 
@@ -386,9 +390,15 @@ public class MatchOptionsMenu : IMainMenu {
 		}
 
 		if (selectY == 5 || selectY == 6 || selectY == 7 || selectY == 9) {
-			Helpers.drawTextStd(TCat.BotHelp, "Left/Right: Change", Global.halfScreenW, 210, Alignment.Center, fontSize: 24);
+			Fonts.drawTextEX(
+				FontType.Grey, "[MLEFT]/[MRIGHT]: Change",
+				Global.halfScreenW, Global.screenH - 28, Alignment.Center
+			);
 		}
-		Helpers.drawTextStd(TCat.BotHelp, "[OK]: Select, [BACK]: Back", Global.halfScreenW, 200, Alignment.Center, fontSize: 24);
+		Fonts.drawTextEX(
+			FontType.Grey, "[OK]: Select, [BACK]: Back",
+			Global.halfScreenW, Global.screenH - 18, Alignment.Center
+		);
 	}
 
 	public Player playerToMute {

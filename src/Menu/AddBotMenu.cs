@@ -84,8 +84,8 @@ public class AddBotMenu : IMainMenu {
 		}
 	}
 
-	public void render() {
-		DrawWrappers.DrawRect(5, 5, Global.screenW - 5, Global.screenH - 5, true, Helpers.MenuBgColor, 0, ZIndex.HUD + 200, false);
+	public void render() { 
+		DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
 		Global.sprites["cursor"].drawToHUD(0, 15, optionPoses[(int)selectArrowPosY].y + 5);
 
 		Fonts.drawText(FontType.Orange, "Add Bot", Global.halfScreenW, 15, alignment: Alignment.Center);

@@ -244,8 +244,7 @@ public class UpgradeArmorMenu : IMainMenu {
 
 	public void render() {
 		var gameMode = level.gameMode;
-
-		DrawWrappers.DrawRect(5, 5, Global.screenW - 5, Global.screenH - 5, true, Helpers.MenuBgColor, 0, ZIndex.HUD + 200, false);
+		DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
 
 		Helpers.drawTextStd(TCat.Title, string.Format("Upgrade Armor(MMX{0})", xGame), Global.screenW * 0.5f, 8, Alignment.Center, fontSize: 48);
 		Helpers.drawTextStd(

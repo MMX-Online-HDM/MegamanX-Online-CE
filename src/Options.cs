@@ -18,7 +18,7 @@ public class Options {
 	public int? regionIndex;
 	public bool logTelemetry = true;
 	public bool showFPS = false;
-	public bool showInGameMenuHUD = false;
+	//public bool showInGameMenuHUD = false;
 	public bool showSysReqPrompt = true;
 	public bool enableDeveloperConsole;
 	public bool disableChat;

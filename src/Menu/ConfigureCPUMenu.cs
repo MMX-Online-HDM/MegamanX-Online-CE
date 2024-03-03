@@ -71,7 +71,7 @@ public class ConfigureCPUMenu : IMainMenu {
 
 			// CPU Character
 			menuOptions.Add(
-				new MenuOption(startX + 30, currentY += lineH,
+				new MenuOption(60, currentY += lineH,
 					() => {
 						Helpers.menuLeftRightInc(ref cpuData.uiSelectedCharIndex, 0, charSelections.Count - 1);
 						cpuData.charNum = charSelections[cpuData.uiSelectedCharIndex].mappedCharNum;
@@ -81,11 +81,11 @@ public class ConfigureCPUMenu : IMainMenu {
 					(Point pos, int index) => {
 						Fonts.drawText(
 							FontType.Blue, "CPU" + (iCopy + 1).ToString(),
-							pos.x - 40, pos.y
+							pos.x - 32, pos.y
 						);
 						Fonts.drawText(
 							FontType.Blue, "Character: " + charSelections[cpuData.uiSelectedCharIndex].name,
-							pos.x + 10, pos.y, selected: index == selectArrowPosY
+							pos.x + 14, pos.y, selected: index == selectArrowPosY
 						);
 					})
 				);
@@ -124,13 +124,18 @@ public class ConfigureCPUMenu : IMainMenu {
 
 	public void render() {
 		if (!isInGame) {
-			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0);
+			DrawWrappers.DrawTextureHUD(Global.textures["severbrowser"], 0, 0);
 		} else {
-			DrawWrappers.DrawRect(5, 5, Global.screenW - 5, Global.screenH - 5, true, Helpers.MenuBgColor, 0, ZIndex.HUD + 200, false);
+			DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
 		}
 
-		Helpers.drawTextStd(TCat.Title, "Configure CPU players", Global.halfScreenW, 7, fontSize: 48, alignment: Alignment.Center);
-		DrawWrappers.DrawTextureHUD(Global.textures["cursor"], menuOptions[0].pos.x - 10, menuOptions[(int)selectArrowPosY].pos.y - 1);
+		Fonts.drawText(
+			FontType.Yellow, "Configure CPU players",
+			Global.halfScreenW, 20, alignment: Alignment.Center
+		);
+		DrawWrappers.DrawTextureHUD(
+			Global.textures["cursor"], menuOptions[0].pos.x + 6, menuOptions[(int)selectArrowPosY].pos.y - 2
+		);
 
 		int i = 0;
 		foreach (var menuOption in menuOptions) {
@@ -138,6 +143,9 @@ public class ConfigureCPUMenu : IMainMenu {
 			i++;
 		}
 
-		Helpers.drawTextStd(TCat.BotHelp, "Left/Right: Change, [BACK]: Back", Global.screenW * 0.5f, 210, Alignment.Center, fontSize: 24);
+		Fonts.drawTextEX(
+			FontType.Grey, "[MLEFT]/[MRIGHT]: Change, [BACK]: Back",
+			Global.screenW * 0.5f, Global.screenH - 28, Alignment.Center
+		);
 	}
 }

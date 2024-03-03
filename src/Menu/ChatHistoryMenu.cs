@@ -10,7 +10,7 @@ namespace MMXOnline;
 public class ChatHistoryMenu : IMainMenu {
 	IMainMenu prevMenu;
 	int yOffset = 0;
-	int lines = 12;
+	int lines = 14;
 	public ChatHistoryMenu(IMainMenu prevMenu) {
 		this.prevMenu = prevMenu;
 	}
@@ -34,25 +34,37 @@ public class ChatHistoryMenu : IMainMenu {
 	}
 
 	public void render() {
-		DrawWrappers.DrawRect(5, 5, Global.screenW - 5, Global.screenH - 5, true, Helpers.MenuBgColor, 0, ZIndex.HUD + 200, false);
-		Helpers.drawTextStd(TCat.Title, "Chat History", Global.screenW * 0.5f, 10, Alignment.Center, fontSize: 54);
+		DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
+		Fonts.drawText(
+			FontType.Yellow, "Chat History", Global.screenW * 0.5f, 16, Alignment.Center
+		);
 
 		var ch = Global.level.gameMode.chatMenu.chatHistory;
 		if (ch.Count > lines) {
 			if (yOffset == maxYOffset) {
-				Fonts.drawText(FontType.RedishOrange, "[No more]", 20, 30, Alignment.Left);
+				Fonts.drawText(FontType.Purple, "[Match Start]", 20, 32, Alignment.Left);
 			} else {
-				Fonts.drawText(FontType.RedishOrange, "...", 20, 30, Alignment.Left);
+				Fonts.drawText(FontType.Purple, "...", 20, 32, Alignment.Left);
+			}
+		}
+		if (ch.Count > lines) {
+			if (yOffset == 0) {
+				Fonts.drawText(FontType.Purple, "[End]", 20, 182, Alignment.Left);
+			} else {
+				Fonts.drawText(FontType.Purple, "...", 20, 182, Alignment.Left);
 			}
 		}
 
 		int y = 0;
 		for (int i = Math.Max(0, ch.Count - lines - yOffset); i < ch.Count - yOffset; i++) {
 			string line = ch[i].getDisplayMessage();
-			Fonts.drawText(FontType.Grey, line, 20, 40 + (y * 10));
+			Fonts.drawText(FontType.Blue, line, 20, 42 + (y * 10));
 			y++;
 		}
 
-		Fonts.drawTextEX(FontType.Grey, "[MUP]/[MDOWN]: Scroll, [BACK]: Back", Global.halfScreenW, 210, Alignment.Center);
+		Fonts.drawTextEX(
+			FontType.Grey, "[MUP]/[MDOWN]: Scroll, [BACK]: Back",
+			Global.halfScreenW, Global.screenH - 18, Alignment.Center
+		);
 	}
 }

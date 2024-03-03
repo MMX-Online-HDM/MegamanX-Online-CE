@@ -59,8 +59,7 @@ public class Elimination : GameMode {
 		int lives = playingTo - level.mainPlayer.deaths;
 		var topText = "Lives: " + lives.ToString();
 		var botText = "Alive: " + (playersStillAlive.Count).ToString();
-		Helpers.drawTextStd(TCat.HUD, topText, 5, 5, Alignment.Left, fontSize: (uint)32);
-		Helpers.drawTextStd(TCat.HUD, botText, 5, 15, Alignment.Left, fontSize: (uint)32);
+		Fonts.drawText(FontType.BlueMenu, topText, 5, 5, Alignment.Left);
 
 		if (virusStarted != 1) {
 			drawTimeIfSet(30);

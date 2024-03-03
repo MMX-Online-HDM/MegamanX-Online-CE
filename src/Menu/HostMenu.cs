@@ -1279,14 +1279,9 @@ public class HostMenu : IMainMenu {
 		string msg;
 		string extraMsg = "";
 		if (!string.IsNullOrEmpty(menuOptions[selectArrowPosY].configureMessage)) {
-			extraMsg = "[ALT]: " + menuOptions[selectArrowPosY].configureMessage + ", ";
+			extraMsg = ", [ALT]: " + menuOptions[selectArrowPosY].configureMessage;
 		}
-		if (!inGame) {
-			if (isOffline) msg = "[OK]: Next, [BACK]: Back";
-			else msg = "[OK]: Next, " + extraMsg + "[BACK]: Back";
-		} else {
-			msg = "[OK]: Next, [ESC]: Menu";
-		}
+		msg = "[OK]: Next, [BACK]: Back" + extraMsg;
 		Fonts.drawTextEX(
 			FontType.Grey, msg + "\nLeft/Right: Change setting",
 			Global.screenW * 0.5f, 178, Alignment.Center

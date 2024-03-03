@@ -182,14 +182,14 @@ public class UpgradeMenu : IMainMenu {
 		}
 
 		if (Global.frameCount % 60 < 30 && mainPlayer.realCharNum == 2) {
-			Helpers.drawTextStd(TCat.Option, ">", Global.screenW - 25, Global.halfScreenH, Alignment.Center, fontSize: 32);
-			Helpers.drawTextStd(TCat.Option, "Armor", Global.screenW - 25, Global.halfScreenH + 15, Alignment.Center, fontSize: 20);
+			Fonts.drawText(FontType.DarkPurple, ">", Global.screenW - 25, Global.halfScreenH, Alignment.Center);
+			Fonts.drawText(FontType.DarkPurple, "Armor", Global.screenW - 25, Global.halfScreenH + 15, Alignment.Center);
 		} else if (Global.frameCount % 60 < 30 && mainPlayer.canUpgradeXArmor()) {
-			Helpers.drawTextStd(TCat.Option, "<", 12, Global.halfScreenH, Alignment.Center, fontSize: 32);
-			Helpers.drawTextStd(TCat.Option, "X3", 12, Global.halfScreenH + 15, Alignment.Center, fontSize: 20);
+			Fonts.drawText(FontType.DarkPurple, "<", 12, Global.halfScreenH, Alignment.Center);
+			Fonts.drawText(FontType.DarkPurple, "X3", 12, Global.halfScreenH + 15, Alignment.Center);
 
-			Helpers.drawTextStd(TCat.Option, ">", Global.screenW - 19, Global.halfScreenH, Alignment.Center, fontSize: 32);
-			Helpers.drawTextStd(TCat.Option, "X1", Global.screenW - 19, Global.halfScreenH + 15, Alignment.Center, fontSize: 20);
+			Fonts.drawText(FontType.DarkPurple, ">", Global.screenW - 19, Global.halfScreenH, Alignment.Center);
+			Fonts.drawText(FontType.DarkPurple, "X1", Global.screenW - 19, Global.halfScreenH + 15, Alignment.Center);
 		}
 
 		bool soldOut = false;
@@ -252,8 +252,8 @@ public class UpgradeMenu : IMainMenu {
 					if (subtankTargets.Count > 1) {
 						Global.sprites["hud_weapon_icon"].drawToHUD(currentTarget.weaponSlotIndex, optionPos.x + targetXPos, optionPos.y + 4);
 						if (Global.frameCount % 60 < 30) {
-							Helpers.drawTextStd("<", optionPos.x + targetXPos - 12, optionPos.y - 2, Alignment.Center, fontSize: 32);
-							Helpers.drawTextStd(">", optionPos.x + targetXPos + 12, optionPos.y - 2, Alignment.Center, fontSize: 32);
+							Fonts.drawText(FontType.DarkPurple, "<", optionPos.x + targetXPos - 12, optionPos.y - 2, Alignment.Center);
+							Fonts.drawText(FontType.DarkPurple, ">", optionPos.x + targetXPos + 12, optionPos.y - 2, Alignment.Center);
 						}
 					}
 				}
@@ -288,7 +288,13 @@ public class UpgradeMenu : IMainMenu {
 
 		UpgradeArmorMenu.drawHyperArmorUpgrades(mainPlayer, 20);
 
-		Helpers.drawTextStd(TCat.BotHelp, "Up/Down: Select Item", Global.halfScreenW, 208, Alignment.Center, fontSize: 16);
-		Helpers.drawTextStd(TCat.BotHelp, "[OK]: Buy/Use, [BACK]: Back", Global.halfScreenW, 214, Alignment.Center, fontSize: 16);
+		Fonts.drawTextEX(
+			FontType.Grey, "[MUP]/[MDOWN]: Select Item",
+			Global.halfScreenW, Global.screenH - 28, Alignment.Center
+		);
+		Fonts.drawTextEX(
+			FontType.Grey, "[OK]: Buy/Use, [BACK]: Back",
+			Global.halfScreenW, Global.screenH - 18, Alignment.Center
+		);
 	}
 }
