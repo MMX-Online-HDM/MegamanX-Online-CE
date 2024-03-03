@@ -299,12 +299,15 @@ public class SelectCharacterMenu : IMainMenu {
 		);
 
 		string[] description = playerData.charNum switch {
-		 	0 => ["A versatile marksman whose arsenal can", "accommodate a variety of different play styles."],
-			1 => ["Powerful melee warrior", "with high damage combos."],
-			2 => ["Unpredictable threat that can self-revive", "and call down Ride Armors."],
-			3 => ["Precise and deadly close range assassin", "with aiming and rapid fire capabilities."],
-			4 => ["A fearsome military commander that can", "summon Mavericks on the battlefield."],
-			_ => ["ERROR"]
+		 	0 => new string[]{
+				"A versatile marksman whose arsenal can",
+				"accommodate a variety of different play styles."
+			},
+			1 => new string[]{"Powerful melee warrior", "with high damage combos."},
+			2 => new string[]{"Unpredictable threat that can self-revive", "and call down Ride Armors."},
+			3 => new string[]{"Precise and deadly close range assassin", "with aiming and rapid fire capabilities."},
+			4 => new string[]{"A fearsome military commander that can", "summon Mavericks on the battlefield."},
+			_ => new string[]{"ERROR"}
 		};
 		if (description.Length > 0) {
 			DrawWrappers.DrawRect(
