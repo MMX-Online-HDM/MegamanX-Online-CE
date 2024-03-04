@@ -15,6 +15,7 @@ public class MatchOptionsMenu : IMainMenu {
 	public int playerKickIndex;
 	public int playerReportIndex;
 	public int removeBotIndex;
+	public int selectedTeam = 0;
 	public List<Player> players {
 		get { return Global.level.players.Where(p => !p.isBot && p != Global.level.mainPlayer).OrderBy(p => p.name).ToList(); }
 	}
@@ -79,6 +80,18 @@ public class MatchOptionsMenu : IMainMenu {
 			// Change team
 			new MenuOption(startX, startY + (lineH * lineNum++),
 			() => {
+				if (Global.input.isPressedMenu(Control.MenuLeft)) {
+					selectedTeam--;
+					if (selectedTeam < 0) {
+						selectedTeam = Global.level.server.teamNum - 1;
+					}
+				}
+				if (Global.input.isPressedMenu(Control.MenuRight)) {
+					selectedTeam++;
+					if (selectedTeam >= Global.level.server.teamNum) {
+						selectedTeam = 0;
+					}
+				}
 				if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 					if (canChangeToTeam()) {
 						int team = enemyTeam();
@@ -92,9 +105,10 @@ public class MatchOptionsMenu : IMainMenu {
 				}
 			},
 			(Point pos, int index) => {
+				string teamName = Global.level.gameMode.teamNames[selectedTeam];
 				Fonts.drawText(
 					canChangeToTeam() ? FontType.Blue : FontType.Grey,
-					"Change Team", pos.x, pos.y, selected: selectY == index
+					$"Change Team to < {teamName} >", pos.x, pos.y, selected: selectY == index
 			);
 			}),
 			// Add bot
@@ -129,15 +143,20 @@ public class MatchOptionsMenu : IMainMenu {
 				}
 				else if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 					// Don't allow removing a bot if it would unbalance the teams
+					// TODO: Recode this to allow unlimited teams.
+					/*
 					if (isPublicMatch() && Global.level.gameMode.isTeamMode) {
-						GameMode.getAllianceCounts(Global.level.nonSpecPlayers(), out int redCount, out int blueCount);
+						GameMode.getAllianceCounts(
+							Global.level.nonSpecPlayers(),
+							out int redCount, out int blueCount
+						);
 						if ((botToRemove.alliance == GameMode.redAlliance && redCount < blueCount) ||
 							(botToRemove.alliance == GameMode.blueAlliance && blueCount < redCount)
 						) {
 							Menu.change(new ErrorMenu("This would unbalance the teams.", this, true));
 							return;
 						}
-					}
+					}*/
 
 					if (Global.serverClient != null) {
 						RPC.removeBot.sendRpc(botToRemove.id);
@@ -472,10 +491,11 @@ public class MatchOptionsMenu : IMainMenu {
 		if (Global.level.server != null && Global.level.server.hidden) return true;
 
 		if (Global.level.gameMode.isTeamMode) {
-			GameMode.getAllianceCounts(Global.level.nonSpecPlayers(), out int redCount, out int blueCount);
-			if (Global.level.mainPlayer.alliance == GameMode.redAlliance && redCount < blueCount) return false;
-			if (Global.level.mainPlayer.alliance == GameMode.blueAlliance && blueCount < redCount) return false;
-			return true;
+			int[] teamteamSizes = GameMode.getAllianceCounts(Global.level.nonSpecPlayers());
+			if (teamteamSizes.Max() - 1 >= teamteamSizes.Where(x => x != 0).Min()) {
+				return true;
+			}
+			return false;
 		} else {
 			return true;
 		}
@@ -496,7 +516,7 @@ public class MatchOptionsMenu : IMainMenu {
 		if (Global.level.mainPlayer.isSpectator) return false;
 		if (Global.level.isElimination()) return false;
 		if (Global.serverClient == null) return true;
-		if (Global.level.server != null && Global.level.server.hidden) return true;
+		//if (Global.level.server != null && Global.level.server.hidden) return true;
 		return false;
 	}
 

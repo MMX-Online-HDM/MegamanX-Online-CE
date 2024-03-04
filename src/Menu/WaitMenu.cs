@@ -104,27 +104,30 @@ public class WaitMenu : IMainMenu {
 
 			bool isLeft = Global.input.isPressedMenu(Control.MenuLeft);
 			bool isRight = Global.input.isPressedMenu(Control.MenuRight);
+			if (isLeft && isRight) {
+				isLeft = false;
+				isRight = false;
+			}
+			bool isAlt = Global.input.isPressedMenu(Control.MenuAlt);
 			if (isLeft || isRight) {
 				var player = server.players[selCursorY];
 
 				if (isTeamMode()) {
-					if (isLeft) {
-						if (player.isSpectator) {
-							player.isSpectator = false;
-							player.alliance = 1;
-						} else if (player.alliance == 1) {
-							player.alliance = 0;
-						} else if (player.alliance == 0) {
-							player.isSpectator = true;
+					if (isAlt) {
+						player.isSpectator = !player.isSpectator;
+					}
+					if (!player.isSpectator) {
+						if (isLeft) {
+							player.alliance--;
+							if (player.alliance < 0) {
+								player.alliance = server.teamNum - 1;
+							}
 						}
-					} else {
-						if (player.isSpectator) {
-							player.isSpectator = false;
-							player.alliance = 0;
-						} else if (player.alliance == 0) {
-							player.alliance = 1;
-						} else if (player.alliance == 1) {
-							player.isSpectator = true;
+						if (isRight) {
+							player.alliance--;
+							if (player.alliance >= server.teamNum) {
+								player.alliance = 0;
+							}
 						}
 					}
 					RPC.makeSpectator.sendRpc(player.id, player.isSpectator);
@@ -216,8 +219,10 @@ public class WaitMenu : IMainMenu {
 				col3Pos, startServerRow + (i * rowHeight2)
 			);
 			if (isTeamMode()) {
-				string team = player.alliance == GameMode.redAlliance ? "red" : "blue";
-				if (player.isSpectator) team = "spec";
+				string team = GameMode.getTeamName(player.alliance);
+				if (player.isSpectator) {
+					team = "Spec";
+				}
 				Fonts.drawText(FontType.Blue, team, col4Pos, startServerRow + (i * rowHeight2));
 			} else {
 				Fonts.drawText(

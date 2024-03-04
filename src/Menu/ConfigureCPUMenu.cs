@@ -95,12 +95,13 @@ public class ConfigureCPUMenu : IMainMenu {
 				menuOptions.Add(
 					new MenuOption(startX + 30, currentY += lineH,
 						() => {
-							Helpers.menuLeftRightInc(ref cpuData.alliance, -1, 1);
+							Helpers.menuLeftRightInc(ref cpuData.alliance, -1, Global.level.server.teamNum);
 						},
 						(Point pos, int index) => {
 							string allianceStr = "auto";
-							if (cpuData.alliance == GameMode.blueAlliance) allianceStr = "blue";
-							if (cpuData.alliance == GameMode.redAlliance) allianceStr = "red";
+							if (cpuData.alliance >= 0) {
+								allianceStr = GameMode.getTeamName(cpuData.alliance);
+							}
 							Fonts.drawText(
 								FontType.Blue, "Team: " + allianceStr, pos.x, pos.y,
 								selected: index == selectArrowPosY

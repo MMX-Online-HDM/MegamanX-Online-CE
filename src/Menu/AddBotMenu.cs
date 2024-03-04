@@ -58,9 +58,7 @@ public class AddBotMenu : IMainMenu {
 				if (charNum == -1) charNum = Helpers.randomRange(0, 4);
 				if (alliance == -1) {
 					if (Global.level.gameMode.isTeamMode) {
-						GameMode.getAllianceCounts(Global.level.players, out int redCount, out int blueCount);
-						if (blueCount > redCount) alliance = GameMode.redAlliance;
-						else alliance = GameMode.blueAlliance;
+						alliance = Server.getMatchInitAutobalanceTeam(Global.level.players);
 					}
 				}
 
@@ -84,7 +82,7 @@ public class AddBotMenu : IMainMenu {
 		}
 	}
 
-	public void render() { 
+	public void render() {
 		DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
 		Global.sprites["cursor"].drawToHUD(0, 15, optionPoses[(int)selectArrowPosY].y + 5);
 
@@ -106,7 +104,7 @@ public class AddBotMenu : IMainMenu {
 			optionPoses[0].x, optionPoses[0].y, selected: selectArrowPosY == 0
 		);
 		Fonts.drawText(
-			teamOptionEnabled() ? FontType.Green: FontType.DarkGreen, "Team: " + botTeamStr,
+			teamOptionEnabled() ? FontType.Green : FontType.DarkGreen, "Team: " + botTeamStr,
 			optionPoses[1].x, optionPoses[1].y,
 			selected: selectArrowPosY == 1
 		);
