@@ -468,7 +468,7 @@ public class GameMode {
 				if (winningAlliance == -1) {
 					winningAlliance = i;
 				} else {
-					winningAlliance = -2;
+					winningAlliance = -3;
 				}
 			}
 		}
@@ -496,19 +496,19 @@ public class GameMode {
 				}
 			}
 		}
-		if (winningAlliance == -2) {
+		if (winningAlliance == -3) {
 			matchOverResponse = new RPCMatchOverResponse() {
 				winningAlliances = new HashSet<int>() { },
 				winMessage = "Draw!",
 				loseMessage = "Draw!"
 			};
-		} else if (winningAlliance == -1) {
+		} else if (winningAlliance == -2) {
 			matchOverResponse = new RPCMatchOverResponse() {
 				winningAlliances = new HashSet<int>() { },
 				winMessage = "Stalemate!",
 				loseMessage = "Stalemate!"
 			};
-		} else {
+		} else if (winningAlliance >= 0) {
 			matchOverResponse = new RPCMatchOverResponse() {
 				winningAlliances = new HashSet<int>() { winningAlliance },
 				winMessage = "Victory!",
@@ -2370,20 +2370,26 @@ public class GameMode {
 			MMXOnline.TeamElimination => $"Alive: {bluePlayersStillAlive}",
 			_ => $"Red: {Global.level.gameMode.teamPoints[1]}"
 		};
-		drawTeamMiniScore(new Point(padding, top + 32), 0, FontType.Blue, blueText);
-		drawTeamMiniScore(new Point(padding + 236, top + 32), 1, FontType.Red, redText);
+		(int x, int y)[] positions = {
+			(padding, top + 32),
+			(padding + 236, top + 32),
+			(padding + 118, top + 32),
+			(padding, top + 100),
+			(padding + 236, top + 100),
+			(padding + 118, top + 100),
+		};
+		drawTeamMiniScore(positions[0], 0, FontType.Blue, blueText);
+		drawTeamMiniScore(positions[1], 1, FontType.Red, redText);
 		for (int i = 2; i < Global.level.server.teamNum; i++) {
 			drawTeamMiniScore(
-				new Point(padding + 118, top + 32), 1,
+				positions[i], i,
 				teamFonts[i], $"{teamNames[i]}: {Global.level.gameMode.teamPoints[i]}"
 			);
 		}
 		drawSpectators();
 	}
 
-	public void drawTeamMiniScore(Point pos, int alliance, FontType color, string title) {
-		int dPosY = MathInt.Round(pos.y);
-		int dPosX = MathInt.Round(pos.x);
+	public void drawTeamMiniScore((int x, int y) pos, int alliance, FontType color, string title) {
 		int playersStillAlive = 0;
 		bool isTE = false;
 		if (this is TeamElimination) {
@@ -2392,10 +2398,11 @@ public class GameMode {
 				p => !p.isSpectator && p.deaths < playingTo && p.alliance == alliance
 			).Count();
 		}
-		int[] rows = new int[] { dPosY, dPosY + 10, dPosY + 24 };
-		int[] cols = new int[] { dPosX, dPosX + 72, dPosX + 82, dPosX + 92 };
+		int[] rows = new int[] { pos.y, pos.y + 10, pos.y + 24 };
+		int[] cols = new int[] { pos.x, pos.x + 72, pos.x + 82, pos.x + 92 };
 		DrawWrappers.DrawRect(
-			dPosX - 1, dPosY + 19, dPosX + 116, dPosY + 20, true, new Color(255, 255, 255, 128), 0, ZIndex.HUD, false
+			pos.x - 1, pos.x + 19, pos.x + 116, pos.x + 20, true,
+			new Color(255, 255, 255, 128), 0, ZIndex.HUD, false
 		);
 
 		Fonts.drawText(color, title, cols[0], rows[0]);
@@ -2478,8 +2485,15 @@ public class GameMode {
 	}
 
 	public static string getTeamName(int alliance) {
-		if (alliance == redAlliance) return "Red";
-		else return "Blue";
+		return alliance switch {
+			0 => "Blue",
+			1 => "Red",
+			2 => "Green",
+			3 => "Purple",
+			4 => "Yellow",
+			5 => "Orange",
+			_ => "Error"
+		};
 	}
 
 	public Color getTimeColor() {

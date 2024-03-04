@@ -426,16 +426,36 @@ public class HostMenu : IMainMenu {
 				)
 			);
 		}
+		// Team number.
+		if (GameMode.isStringTeamMode(selectedGameMode)) {
+			menuOptions.Add(
+				new MenuOption(startX, startY,
+					() => {
+						if (Global.input.isPressedOrHeldMenu(Control.MenuLeft) && teamNum > 2) {
+							teamNum--;
+						} else if (Global.input.isPressedOrHeldMenu(Control.MenuRight) && teamNum < 6) {
+							teamNum++;
+						}
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							FontType.Blue, "Teams: " + teamNum,
+							pos.x, pos.y, selected: index == selectArrowPosY
+						);
+					}
+				)
+			);
+		}
 		// Team
 		if (changeTeamEnabled()) {
 			menuOptions.Add(
 				new MenuOption(startX, startY,
 					() => {
 						if (changeTeamEnabled()) {
-							if (Global.input.isPressedMenu(Control.MenuLeft)) {
-								team = GameMode.blueAlliance;
-							} else if (Global.input.isPressedMenu(Control.MenuRight)) {
-								team = GameMode.redAlliance;
+							if (Global.input.isPressedOrHeldMenu(Control.MenuLeft) && team > 0) {
+								team--;
+							} else if (Global.input.isPressedOrHeldMenu(Control.MenuRight) && team < teamNum) {
+								team++;
 							}
 						}
 					},
@@ -474,26 +494,6 @@ public class HostMenu : IMainMenu {
 							FontType.Blue,
 							playToStr + playTo, pos.x, pos.y,
 							selected: index == selectArrowPosY
-						);
-					}
-				)
-			);
-		}
-		// Team number.
-		if (GameMode.isStringTeamMode(selectedGameMode)) {
-			menuOptions.Add(
-				new MenuOption(startX, startY,
-					() => {
-						if (Global.input.isPressedOrHeldMenu(Control.MenuLeft) && teamNum > 2) {
-							teamNum--;
-						} else if (Global.input.isPressedOrHeldMenu(Control.MenuRight) && teamNum < 6) {
-							teamNum++;
-						}
-					},
-					(Point pos, int index) => {
-						Fonts.drawText(
-							FontType.Blue, "Teams: " + teamNum,
-							pos.x, pos.y, selected: index == selectArrowPosY
 						);
 					}
 				)
