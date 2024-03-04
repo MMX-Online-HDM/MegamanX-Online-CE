@@ -15,14 +15,15 @@ public class CustomMatchSettings {
 	[ProtoMember(3)] public int startHeartTanks;
 	[ProtoMember(4)] public int startSubTanks;
 	[ProtoMember(5)] public int healthModifier = 1;
-	[ProtoMember(6)] public int redHealthModifier = 1;
-	[ProtoMember(7)] public int damageModifier = 1;
-	[ProtoMember(8)] public int redDamageModifier = 1;
-	[ProtoMember(9)] public int sameCharNum = -1;
-	[ProtoMember(10)] public int redSameCharNum = -1;
-	[ProtoMember(11)] public int maxHeartTanks = 4;
-	[ProtoMember(12)] public int maxSubTanks = 2;
-	[ProtoMember(13)] public int heartTankHp = 1;
+	[ProtoMember(5)] public int damageModifier = 1;
+	[ProtoMember(6)] public int sameCharNum = -1;
+	[ProtoMember(7)] public int redSameCharNum = -1;
+	[ProtoMember(8)] public int maxHeartTanks = 4;
+	[ProtoMember(9)] public int maxSubTanks = 2;
+	[ProtoMember(10)] public int heartTankHp = 1;
+
+	//[ProtoMember(8)] public int redDamageModifier = 1;
+	//[ProtoMember(6)] public int redHealthModifier = 1;
 
 	public CustomMatchSettings() {
 	}
@@ -174,7 +175,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 				}
 			)
 		);
-
+		/*
 		menuOptions.Add(
 			new MenuOption(startX, currentY += lineH,
 				() => {
@@ -190,7 +191,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 				}
 			)
 		);
-
+		*/
 		menuOptions.Add(
 			new MenuOption(startX, currentY += lineH,
 				() => {
@@ -206,7 +207,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 				}
 			)
 		);
-
+		/*
 		menuOptions.Add(
 			new MenuOption(startX, currentY += lineH,
 				() => {
@@ -222,7 +223,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 				}
 			)
 		);
-
+		*/
 		menuOptions.Add(
 			new MenuOption(startX, currentY += lineH,
 				() => {

@@ -600,18 +600,18 @@ public partial class Player {
 		}
 		if (level.server.customMatchSettings != null) {
 			modifier = level.server.customMatchSettings.healthModifier;
-			if (level.gameMode.isTeamMode && alliance == GameMode.redAlliance) {
-				modifier = level.server.customMatchSettings.redHealthModifier;
-			}
+			//if (level.gameMode.isTeamMode && alliance == GameMode.redAlliance) {
+			//	modifier = level.server.customMatchSettings.redHealthModifier;
+			//}
 		}
 		return modifier;
 	}
 
 	public float getDamageModifier() {
 		if (Global.level.server.customMatchSettings != null) {
-			if (Global.level.gameMode.isTeamMode && alliance == GameMode.redAlliance) {
+			/*if (Global.level.gameMode.isTeamMode && alliance == GameMode.redAlliance) {
 				return Global.level.server.customMatchSettings.redDamageModifier;
-			}
+			}*/
 			return Global.level.server.customMatchSettings.damageModifier;
 		}
 		return 1;

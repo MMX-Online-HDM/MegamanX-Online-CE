@@ -150,7 +150,13 @@ public class GameMode {
 	}
 
 	public static bool isStringTeamMode(string selectedGameMode) {
-		if (selectedGameMode == CTF || selectedGameMode == TeamDeathmatch || selectedGameMode == ControlPoint || selectedGameMode == TeamElimination || selectedGameMode == KingOfTheHill) {
+		if (selectedGameMode == CTF ||
+			selectedGameMode == TeamDeathmatch ||
+			selectedGameMode == ControlPoint ||
+			selectedGameMode == TeamElimination ||
+			selectedGameMode == KingOfTheHill ||
+			selectedGameMode.StartsWith("tm_")
+		) {
 			return true;
 		}
 		return false;
@@ -2387,8 +2393,8 @@ public class GameMode {
 			(padding + 236, top + 32),
 			(padding + 118, top + 32),
 			(padding, top + 100),
-			(padding + 236, top + 100),
-			(padding + 118, top + 100),
+			(padding + 236, top + 116),
+			(padding + 118, top + 116),
 		};
 		drawTeamMiniScore(positions[0], 0, FontType.Blue, blueText);
 		drawTeamMiniScore(positions[1], 1, FontType.Red, redText);
@@ -2413,7 +2419,7 @@ public class GameMode {
 		int[] rows = new int[] { pos.y, pos.y + 10, pos.y + 24 };
 		int[] cols = new int[] { pos.x, pos.x + 72, pos.x + 82, pos.x + 92 };
 		DrawWrappers.DrawRect(
-			pos.x - 1, pos.x + 19, pos.x + 116, pos.x + 20, true,
+			pos.x - 1, pos.y + 19, pos.x + 116, pos.y + 20, true,
 			new Color(255, 255, 255, 128), 0, ZIndex.HUD, false
 		);
 
