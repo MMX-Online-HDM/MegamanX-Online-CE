@@ -183,14 +183,26 @@ public class GameMode {
 		return 1;
 	}
 
-	public static void getAllianceCounts(List<Player> players, out int redCount, out int blueCount) {
-		redCount = players.Count(p => p.alliance == redAlliance && !p.isSpectator);
-		blueCount = players.Count(p => p.alliance == blueAlliance && !p.isSpectator);
+	public static int[] getAllianceCounts(List<Player> players) {
+		int teamNum = Global.level.server.teamNum;
+		int[] teamSizes = new int[teamNum];
+		foreach (Player player in players) {
+			if (!player.isSpectator && player.alliance >= 0 && player.alliance < teamNum) {
+				teamSizes[player.alliance]++;
+			}
+		}
+		return teamSizes;
 	}
 
-	public static void getAllianceCounts(List<ServerPlayer> players, out int redCount, out int blueCount) {
-		redCount = players.Count(p => p.alliance == redAlliance && !p.isSpectator);
-		blueCount = players.Count(p => p.alliance == blueAlliance && !p.isSpectator);
+	public static int[] getAllianceCounts(List<ServerPlayer> players) {
+		int teamNum = Global.level.server.teamNum;
+		int[] teamSizes = new int[teamNum];
+		foreach (ServerPlayer serverPlayer in players) {
+			if (!serverPlayer.isSpectator && serverPlayer.alliance >= 0 && serverPlayer.alliance < teamNum) {
+				teamSizes[serverPlayer.alliance]++;
+			}
+		}
+		return teamSizes;
 	}
 
 	public GameMode(Level level, int? timeLimit) {

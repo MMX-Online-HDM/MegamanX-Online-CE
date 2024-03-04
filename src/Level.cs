@@ -522,7 +522,12 @@ public partial class Level {
 						netId = cp1NetId;
 						int captureTime = 30;
 						float offsetY = 0;
-						hill = new ControlPoint(GameMode.neutralAlliance, pos, 1, true, captureTime, 0, netId, isHost) { yOff = offsetY };
+						hill = new ControlPoint(
+							GameMode.neutralAlliance, pos, 1, true,
+							captureTime, 0, netId, isHost
+						) {
+							yOff = offsetY
+						};
 					}
 				}
 			} else if (objectName == "Node") {

@@ -83,7 +83,7 @@ public class Server {
 	public Dictionary<string, int> weaponKillStats = new Dictionary<string, int>();
 	[JsonIgnore]
 	public long uniqueID = 0;
-	
+
 	private bool shutdownVar;
 	private long iterations = 0;
 	private long lastUpdateTime = 0L;
@@ -230,21 +230,16 @@ public class Server {
 			if (serverPlayer.preferredAlliance != null) {
 				serverPlayer.alliance = serverPlayer.preferredAlliance.Value;
 			} else {
-				GameMode.getAllianceCounts(players, out int redCount, out int blueCount);
-				if (redCount < blueCount) serverPlayer.alliance = GameMode.redAlliance;
-				else if (blueCount < redCount) serverPlayer.alliance = GameMode.blueAlliance;
-				else {
-					if (Global.debug) {
-						serverPlayer.alliance = GameMode.blueAlliance;
-					} else {
-						if (redScore > blueScore) {
-							serverPlayer.alliance = GameMode.blueAlliance;
-						} else if (redScore < blueScore) {
-							serverPlayer.alliance = GameMode.redAlliance;
-						} else {
-							serverPlayer.alliance = (
-								Helpers.randomRange(0, 1) == 0 ? GameMode.blueAlliance : GameMode.redAlliance
-							);
+				int[] teamSizes = GameMode.getAllianceCounts(players);
+				int biggerTeam = teamSizes.Max();
+				int smallerTeam = teamSizes.Min();
+				if (biggerTeam == smallerTeam) {
+					serverPlayer.alliance = Helpers.randomRange(0, teamNum - 1);
+				} else {
+					for (int i = 0; i < teamNum; i++) {
+						if (teamSizes[i] == smallerTeam) {
+							serverPlayer.alliance = i;
+							break;
 						}
 					}
 				}
@@ -273,9 +268,11 @@ public class Server {
 		if (!hidden && GameMode.isStringTeamMode(gameMode) &&
 			gameMode != GameMode.TeamElimination && level != "training"
 		) {
-			GameMode.getAllianceCounts(players, out int redCount, out int blueCount);
-			bool tooManyReds = redCount > blueCount + 1;
-			bool tooManyBlues = blueCount > redCount + 1;
+			int[] teamSizes = GameMode.getAllianceCounts(players);
+			int biggerTeam = teamSizes.Max();
+			int smallerTeam = teamSizes.Min();
+			// Check if a team has +2 characters than other team to move 1.
+			bool areTeamsUnbalanced = (biggerTeam - 1 > smallerTeam);
 
 			if (playerToAutobalance != null) {
 				// Player left match
@@ -288,23 +285,43 @@ public class Server {
 					playerToAutobalance = null;
 				}
 				// Teams no longer unbalanced
-				else if (!tooManyReds && !tooManyBlues) {
+				else if (!areTeamsUnbalanced) {
 					playerToAutobalance.autobalanceAlliance = null;
 					playerToAutobalance = null;
 				}
-			} else {
-				if (tooManyReds) {
+			} else if (areTeamsUnbalanced) {
+				int lowerCharTeam = Array.IndexOf(teamSizes, smallerTeam);
+				// Avoid putting people in 1 player teams if we have more than 3.
+				if (teamNum >= 3 && smallerTeam == 0) {
+					if (biggerTeam <= 2) {
+						lowerCharTeam = -1;
+					} else {
+						int teamsWithPeople = 0;
+						int ogLowerTeam = lowerCharTeam;
+						smallerTeam = biggerTeam;
+						lowerCharTeam = -1;
+						for (int i = 0; i < teamSizes.Length; i++) {
+							if (teamSizes[i] > 0) {
+								teamsWithPeople++;
+							}
+							if (teamSizes[i] < smallerTeam) {
+								smallerTeam = teamSizes[i];
+								lowerCharTeam = i;
+							}
+						}
+						if (teamsWithPeople < 2) {
+							lowerCharTeam = ogLowerTeam;
+						}
+					}
+				}
+				if (lowerCharTeam >= 0) {
 					playerToAutobalance = (
-						selectPlayerToAutobalance(GameMode.redAlliance, prioritizedAutobalancePlayer)
-					);
-					if (!playerToAutobalance.isBot) playerToAutobalance.alreadyAutobalanced = true;
-					playerToAutobalance.autobalanceAlliance = GameMode.blueAlliance;
-				} else if (tooManyBlues) {
-					playerToAutobalance = (
-						selectPlayerToAutobalance(GameMode.blueAlliance, prioritizedAutobalancePlayer)
-					);
-					if (!playerToAutobalance.isBot) playerToAutobalance.alreadyAutobalanced = true;
-					playerToAutobalance.autobalanceAlliance = GameMode.redAlliance;
+							selectPlayerToAutobalance(lowerCharTeam, prioritizedAutobalancePlayer)
+						);
+					if (!playerToAutobalance.isBot) {
+						playerToAutobalance.alreadyAutobalanced = true;
+					}
+					playerToAutobalance.autobalanceAlliance = lowerCharTeam;
 				}
 			}
 		}
