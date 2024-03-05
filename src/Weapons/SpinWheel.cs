@@ -135,14 +135,16 @@ public class SpinWheelProjChargedStart : Projectile {
 	public override void update() {
 		base.update();
 		if (sprite.isAnimOver()) {
-			new SpinWheelProjCharged(weapon, pos, -1, -1, damager.owner, damager.owner.getNextActorNetId(), rpc: true);
-			new SpinWheelProjCharged(weapon, pos, -1, 0, damager.owner, damager.owner.getNextActorNetId(), rpc: true);
-			new SpinWheelProjCharged(weapon, pos, -1, 1, damager.owner, damager.owner.getNextActorNetId(), rpc: true);
-			new SpinWheelProjCharged(weapon, pos, 0, -1, damager.owner, damager.owner.getNextActorNetId(), rpc: true);
-			new SpinWheelProjCharged(weapon, pos, 0, 1, damager.owner, damager.owner.getNextActorNetId(), rpc: true);
-			new SpinWheelProjCharged(weapon, pos, 1, -1, damager.owner, damager.owner.getNextActorNetId(), rpc: true);
-			new SpinWheelProjCharged(weapon, pos, 1, 0, damager.owner, damager.owner.getNextActorNetId(), rpc: true);
-			new SpinWheelProjCharged(weapon, pos, 1, 1, damager.owner, damager.owner.getNextActorNetId(), rpc: true);
+			if (ownedByLocalPlayer) {
+				new SpinWheelProjCharged(weapon, pos, -1, -1, damager.owner, damager.owner.getNextActorNetId(), rpc: true);
+				new SpinWheelProjCharged(weapon, pos, -1, 0, damager.owner, damager.owner.getNextActorNetId(), rpc: true);
+				new SpinWheelProjCharged(weapon, pos, -1, 1, damager.owner, damager.owner.getNextActorNetId(), rpc: true);
+				new SpinWheelProjCharged(weapon, pos, 0, -1, damager.owner, damager.owner.getNextActorNetId(), rpc: true);
+				new SpinWheelProjCharged(weapon, pos, 0, 1, damager.owner, damager.owner.getNextActorNetId(), rpc: true);
+				new SpinWheelProjCharged(weapon, pos, 1, -1, damager.owner, damager.owner.getNextActorNetId(), rpc: true);
+				new SpinWheelProjCharged(weapon, pos, 1, 0, damager.owner, damager.owner.getNextActorNetId(), rpc: true);
+				new SpinWheelProjCharged(weapon, pos, 1, 1, damager.owner, damager.owner.getNextActorNetId(), rpc: true);
+			}
 			destroySelf();
 		}
 	}
