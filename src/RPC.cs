@@ -1694,7 +1694,9 @@ public class RPCCommandGrabPlayer : RPC {
 		} else if (hookScenario == CommandGrabScenario.BBuffaloGrab) {
 			maverickGrabCode(grabberMaverick, victimChar, new BBuffaloDragged(grabber as BlizzardBuffalo), isDefenderFavored);
 		} else if (hookScenario == CommandGrabScenario.Release) {
-			if (victimChar != null) {
+			// Lasto: The != mistake strikes again.
+			
+			if (victimChar == null) {
 				victimChar.charState?.releaseGrab();
 			}
 		}
