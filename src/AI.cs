@@ -344,7 +344,10 @@ public class AI {
 					.addxy(Helpers.randomRange(-axlAccuracy, axlAccuracy), Helpers.randomRange(-axlAccuracy, axlAccuracy));
 			}
 		}
+		//Should Attack?
 		if (aiState.shouldAttack && target != null) 
+		{ //do not if is invulnerable
+		if (!character.isInvulnerable())
 		{
 			if (shootTime == 0) 
 			{
@@ -352,11 +355,6 @@ public class AI {
 				bool isTargetBellowYou = target.pos.y < character.pos.y + 10;
 				bool isTargetSuperClose = target.pos.x - 3 >= character.pos.x;
 				bool isTargetClose = target.pos.x - 15 >= character.pos.x;
-
-				// Clear Zero AI input (so He doesn't get in a loop with huhahu)
-				if(character is Zero)
-				if (character.sprite.name == "zero_attack3" && character.frameIndex == 8)
-				player.clearAiInput();
 
 				// Always check that Kaiser Sigma is on Air
 				if (target is Character chr && chr.player.isKaiserNonViralSigma()) isTargetInAir = true;
@@ -379,7 +377,7 @@ public class AI {
 						{
 
 							////Zero Buster Start	
-								if (player.isZBusterZero()&& !(character.charState is LadderClimb))
+								if (player.isZBusterZero() && character.charState is not LadderClimb)
 								{
 									if (Helpers.randomRange(0, 60) < 10)
 									if(player.currency == Player.zeroHyperCost && character.charState is not HyperZeroStart)
@@ -437,7 +435,7 @@ public class AI {
 									if (Helpers.randomRange(0, 60) < 10)							
 									if(player.currency == Player.zeroHyperCost && character.charState is not HyperZeroStart)
 									character.changeState(new HyperZeroStart(0), true);
-									int ZSattack = Helpers.randomRange(0, 14);
+									int ZSattack = Helpers.randomRange(0, 13);
 									if (isTargetInAir) ZSattack = 10;								
 									switch (ZSattack)
 									{
@@ -450,7 +448,7 @@ public class AI {
 										player.press(Control.Special1); player.press(Control.Up);
 										break;
 										case 2: //Uppercut
-										if( isTargetSuperClose && character.grounded)
+										if(isTargetSuperClose && character.grounded)
 										player.press(Control.Shoot); player.press(Control.Up);
 										break;
 										case 3: //Crouch slash
@@ -470,15 +468,15 @@ public class AI {
 										player.press(Control.Special1);
 										break;
 										case 7: // if the character is on fall state, Downthrust attack
-										if ((character.charState is Fall or Jump) && !(character.charState is ZeroUppercut && character.frameIndex == 10))
+										if ((character.charState is Fall or Jump) && !(character.charState is ZeroUppercut))
 										character.changeState(new ZeroFallStab(new HyouretsuzanWeapon(player)));
 										break;
 										case 8: // if the character is on fall state, Downthrust attack
-										if ((character.charState is Fall or Jump) && !(character.charState is ZeroUppercut && character.frameIndex == 10))
+										if ((character.charState is Fall or Jump) && !(character.charState is ZeroUppercut))
 										character.changeState(new ZeroFallStab(new QuakeBlazerWeapon(player)));
 										break;
 										case 9: // if the character is on fall state, Downthrust attack
-										if ((character.charState is Fall or Jump) && !(character.charState is ZeroUppercut && character.frameIndex == 10))
+										if ((character.charState is Fall or Jump) && !(character.charState is ZeroUppercut))
 										character.changeState(new ZeroFallStab(new RakukojinWeapon(player)));
 										break;
 										case 10: 
@@ -525,9 +523,9 @@ public class AI {
 								if (Helpers.randomRange(0, 60) < 10)	
 								if(player.currency == Player.zeroHyperCost && character.charState is not HyperZeroStart)
 								character.changeState(new HyperZeroStart(0), true);
-								int attack = Helpers.randomRange(0, 9);	
-								if (isTargetInAir) attack = 6;
-								switch (attack)
+								int ZKattack = Helpers.randomRange(0, 9);	
+								if (isTargetInAir) ZKattack = 6;
+								switch (ZKattack)
 								{
 										//Randomizador
 										case 0: // press shoot
@@ -595,27 +593,22 @@ public class AI {
 						if (character is BaseSigma)
 						{
 								//Commander Sigma Start
-								if (character is CmdSigma cmdSigma)
+								if (character is CmdSigma cmdSigma && character.charState is not LadderClimb)
 								{
-									int attack = Helpers.randomRange(0, 3);
-									if (isTargetInAir)
-									{
-										attack = 1;
-									}
-									switch (attack)
+									int Sattack = Helpers.randomRange(0, 3);
+									if (isTargetInAir) Sattack = 1;
+									switch (Sattack)
 									{
 									case 0: // Beam Saber
-										player.press(Control.Shoot);
-										break;
+									player.press(Control.Shoot);
+									break;
 									case 1: // Machine Gun if the enemy is on the air
-									if (character.grounded && isTargetInAir){							
-										character?.changeState(new SigmaBallShoot(), forceChange: true);					
-									}
+									if (character.grounded && isTargetInAir)						
+									character?.changeState(new SigmaBallShoot(), forceChange: true);					
 									break;		
 									case 2: // Triangle Kick
-									if (character.charState is Dash && character.grounded){
-										player.press(Control.Special1);
-									}					
+									if (character.charState is Dash && character.grounded)
+									player.press(Control.Special1);					
 									break;
 									}
 								}
@@ -634,12 +627,12 @@ public class AI {
 									player.press(Control.Special1);
 									break;
 									case 2:
-									if (character.isFacing(target) && player.weapon is RocketPunch)
+									if (player.weapon is RocketPunch)
 									{
 									player.press("left");
 									player.press(Control.Special1);
 									}				
-									else if (character.isFacing(target) && player.weapon is RocketPunch)
+									else if (player.weapon is RocketPunch)
 									{
 									player.press("right");
 									player.press(Control.Special1);
@@ -671,6 +664,7 @@ public class AI {
 				shootTime = 0;
 			}
 		}
+		}
 
 		//The AI should dodge if a projectile is close to him
 		if (aiState.shouldDodge && target != null) 
@@ -686,9 +680,10 @@ public class AI {
 						//Putting Zero here
 						if (player.character is Zero zero) 
 						{
-							//Projectile is not Magnet Mine uncharged or rolling shield charged or Fire Wave or Tornado or Character state is swordblock
-							if (projProj is not MagnetMineProj || projProj is not RollingShieldProjCharged 
-							||  projProj is not FireWaveProj || projProj is not TornadoProj || character.charState is not SwordBlock)
+							//Projectile is not 
+							if (proj is not RollingShieldProjCharged || proj is not RollingShieldProj
+							 || proj is not FrostShieldProj || proj is not FrostShieldProjAir || proj is not FrostShieldProjCharged || proj is not FrostShieldProjGround || proj is not FrostShieldProjPlatform //HOW MANY OF U EXIST
+							 || proj is not MagnetMineProj)
 							{
 								//If a projectile is close to Zero
 								if (projProj.isFacing(character) && character.withinX(projProj, 100) && character.withinY(projProj, 30))
@@ -696,60 +691,46 @@ public class AI {
 								//If the player is Z-Saber or Knuckle and has giga attack ammo available do "I hate the ground" Or "Block/Parry"
 									if (player.isZSaber() || player.hasKnuckle())
 									{							
-										// Do i have giga attack ammo available?
+										//Do i have giga attack ammo available?
 										if (zero.zeroGigaAttackWeapon.ammo >= 8f && character.grounded)
 										{
 												//RAKUHOUHA!
 												player.press(Control.Special1);player.press(Control.Down);
 										}
-										// If he hasn't do "Block/Parry"
-										else if (Global.time > 0.3f)
+										//If he hasn't do "Block/Parry"
+										else if (proj is not GenericMeleeProj || (projProj.reflectable == true))
 										{
 											player.press(Control.WeaponLeft);		
 										}	
 									}
-									// If player is Buster Zero do Saber Swing
-									if (player.isZBusterZero())
-									{
-										if (Global.time > 0.3f)
-										{
-											player.press(Control.Special1);
-										}
-									}
+									//If player is Buster Zero do Saber Swing
+									if (player.isZBusterZero())									
+									player.press(Control.Special1);									
 								}
 							}
-							// A magnet mine?
-							else if (projProj is MagnetMineProj)
+							//A magnet mine?
+							else if (proj is MagnetMineProj)
 							{
 								//if the projectile is super close to Zero
 								if (projProj.isFacing(character) && character.withinX(projProj, 15) && character.withinY(projProj, 1))
 								{		
 									//If the character is on the ground (and is not knuckle or Buster Zero)
-									if (player.isZSaber() && character.grounded && !player.hasKnuckle() && !player.isZBusterZero())
+									if (player.isZSaber() && character.grounded && !(player.hasKnuckle() || player.isZBusterZero()))
 									{
-										if (Global.time > 0.1f)
-										{
 										//CrouchSlash
 										player.press(Control.Down); player.press(Control.Shoot);
-										}
 									}
-									// If the character is on air
-									else if (character.charState is Jump)
+									//If the character is on air
+									else if (!character.grounded)
 									{
-										if (Global.time > 0.3f)
-										{
 										//Air Dash
-										player.press(Control.Dash);
-										}
-									}
+										player.press(Control.Dash);	
+									}						
 									//If the character is on the air (and is not knuckle or Buster Zero)
-									else if (character.charState is Jump && !player.hasKnuckle() && !player.isZBusterZero())
+									else if (player.isZSaber() && character.charState is Jump && !(player.hasKnuckle() || player.isZBusterZero()))
 									{
-										if (Global.time > 0.3f)
-										{
 										//Kuuenzan
 										player.press(Control.Special1);
-										}
 									}
 								}
 							}							
@@ -766,7 +747,7 @@ public class AI {
 								//Commander Sigma
 								if (character is CmdSigma cmdSigma)
 								{
-									if (Global.time > 0.3f)
+									if (proj is not GenericMeleeProj)
 										{
 											//Do Block
 											player.press(Control.Down);
@@ -798,7 +779,7 @@ public class AI {
 									// If Neo Sigma has giga attack ammo less than 16
 									else if (player.sigmaAmmo < 16)
 									{
-										if (Global.time > 0.3f)
+										if (proj is not GenericMeleeProj)
 											{
 												//Do "Block"
 												player.press(Control.Down);

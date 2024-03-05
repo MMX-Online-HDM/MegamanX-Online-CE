@@ -772,7 +772,7 @@ public class Zero : Character {
 		Point shootPos = getShootPos();
 		int xDir = getShootXDir();
 
-		if (isAwakenedZero() && !player.isZBusterZero())
+		if (isAwakenedZero())
 		{
 			if (chargeLevel == 1)
 			{
@@ -819,7 +819,7 @@ public class Zero : Character {
 					playSound("ShingetsurinX5", forcePlay: false, sendRpc: true);
 				}, 0.3f));
 			}
-			if (!player.isZBusterZero() || !player.isAI) {
+			if (!player.isZBusterZero()) {
 				player.currency--;
 			}
 			if (player.currency < 0)
