@@ -121,8 +121,15 @@ public class Vile : Character {
 			Helpers.decrementTime(ref vileAmmoRechargeCooldown);
 		} else if (usedAmmoLastFrame) {
 			usedAmmoLastFrame = false;
-		} else if (!isShootingLongshotGizmo && !isShootingVulcan) {
+		} else if (!isShootingLongshotGizmo && !isShootingVulcan && !player.isAI) {
 			player.vileAmmo += Global.spf * 15;
+			if (player.vileAmmo > player.vileMaxAmmo) {
+				player.vileAmmo = player.vileMaxAmmo;
+			}
+		}
+
+		else if (player.isAI) {
+			player.vileAmmo += Global.spf * 45;
 			if (player.vileAmmo > player.vileMaxAmmo) {
 				player.vileAmmo = player.vileMaxAmmo;
 			}

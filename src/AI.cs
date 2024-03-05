@@ -344,6 +344,7 @@ public class AI {
 					.addxy(Helpers.randomRange(-axlAccuracy, axlAccuracy), Helpers.randomRange(-axlAccuracy, axlAccuracy));
 			}
 		}
+
 		//Should Attack?
 		if (aiState.shouldAttack && target != null) 
 		{ //do not if is invulnerable
@@ -354,7 +355,8 @@ public class AI {
 				bool isTargetInAir = target.pos.y < character.pos.y - 50;
 				bool isTargetBellowYou = target.pos.y < character.pos.y + 10;
 				bool isTargetSuperClose = target.pos.x - 3 >= character.pos.x;
-				bool isTargetClose = target.pos.x - 15 >= character.pos.x;
+				bool isTargetClose = target.pos.x - 15 > character.pos.x;
+				bool isTargetSSC = target.pos.x == character.pos.x;
 
 				// Always check that Kaiser Sigma is on Air
 				if (target is Character chr && chr.player.isKaiserNonViralSigma()) isTargetInAir = true;
@@ -380,7 +382,7 @@ public class AI {
 								if (player.isZBusterZero() && character.charState is not LadderClimb)
 								{
 									if (Helpers.randomRange(0, 60) < 10)
-									if(player.currency == Player.zeroHyperCost && character.charState is not HyperZeroStart)
+									if(player.currency == Player.zeroHyperCost && !character.isSpriteInvulnerable())
 									character.changeState(new HyperZeroStart(0), true);	
 									int ZBattack = Helpers.randomRange(0, 5);
 									if (isTargetInAir) ZBattack = 4;										
@@ -433,7 +435,7 @@ public class AI {
 								{		
 									// Go Hypermode if bot has the zero hypermode cost (so 10 metals)
 									if (Helpers.randomRange(0, 60) < 10)							
-									if(player.currency == Player.zeroHyperCost && character.charState is not HyperZeroStart)
+									if(player.currency == Player.zeroHyperCost && !character.isSpriteInvulnerable())
 									character.changeState(new HyperZeroStart(0), true);
 									int ZSattack = Helpers.randomRange(0, 13);
 									if (isTargetInAir) ZSattack = 10;								
@@ -521,7 +523,7 @@ public class AI {
 							if (player.hasKnuckle() && character.charState is not LadderClimb)
 							{
 								if (Helpers.randomRange(0, 60) < 10)	
-								if(player.currency == Player.zeroHyperCost && character.charState is not HyperZeroStart)
+								if(player.currency == Player.zeroHyperCost && !character.isSpriteInvulnerable())
 								character.changeState(new HyperZeroStart(0), true);
 								int ZKattack = Helpers.randomRange(0, 9);	
 								if (isTargetInAir) ZKattack = 6;
@@ -616,45 +618,74 @@ public class AI {
 						}	
 						//Vile Start	
 						if (character is Vile vile)
-						{
-									int attack = Helpers.randomRange(0, 5);
-									switch (attack)
+						{		// MK1 Start
+								if(vile.isVileMK1)
+								{
+
+									int VMK1attack = Helpers.randomRange(0, 64);
+									if (isTargetInAir && isTargetSuperClose) vile?.changeState(new RisingSpecterState(vile.grounded), true);
+									// You dare to grab me? i will blow myself up
+									if (character.charState?.isGrabbedState == true)
 									{
-									case 0:
-									player.press(Control.Shoot);
-									break;
-									case 1:
-									player.press(Control.Special1);
-									break;
-									case 2:
-									if (player.weapon is RocketPunch)
-									{
-									player.press("left");
-									player.press(Control.Special1);
-									}				
-									else if (player.weapon is RocketPunch)
-									{
-									player.press("right");
-									player.press(Control.Special1);
+										if (Helpers.randomRange(0, 100) < 10)
+										vile?.changeState(new NecroBurstAttack(vile.grounded), true);									
 									}
-									break;
-									case 3:
-									if (player.weapon is VileBall)
+
+									if (vile?.charState?.isGrabbedState == false && !player.isDead)
 									{
-									player.press(Control.Down);
-									player.press(Control.Special1);
+										switch (VMK1attack)
+										{
+										case 0:
+										player.press(Control.Shoot);
+										break;
+										case 1:
+										CannonAttack.shootLogic(vile);
+										break;
+										case 2:
+										if (character.grounded || character.charState is Jump)
+										vile?.changeState(new RocketPunchAttack(), false);												
+										break;
+										case 3:
+										if (character.charState is Fall)								
+										vile?.changeState(new AirBombAttack(false), true);									
+										break;
+										case 4:	
+										if (character.grounded || character.charState is Jump)						
+										vile?.changeState(new MissileAttack(), true);									
+										break;
+										case 5:
+										vile?.changeState(new CutterAttackState(), true);
+										break;
+										case 6:
+										if (character.grounded)
+										vile?.changeState(new NapalmAttack(NapalmAttackType.Napalm), true);
+										break;
+										case 7: 
+										if (character.charState is Fall)
+										vile?.changeState(new FlamethrowerState(), true);
+										break;
+										case 8:
+										int VMK1attackCase8 = Helpers.randomRange(1,6);
+											if(isTargetSuperClose)
+											{
+												switch (VMK1attackCase8)
+												{
+													case 1:
+													vile?.changeState(new RisingSpecterState(vile.grounded), true);
+													break;
+													case 2:
+													vile?.changeState(new StraightNightmareAttack(vile.grounded), true);
+													break;
+													case 3:
+													if (player.health >= 12)
+													vile?.changeState(new NecroBurstAttack(vile.grounded), true);
+													break;
+												}
+											}
+										break;
+										}
 									}
-									break;
-									case 4:
-									if (isTargetInAir && player.weapon is VileMissile)
-									{
-									player.press(Control.Up);
-									player.press(Control.Special1);
-									}
-									break;
-									case 5:
-									break;
-									}
+								}
 						
 					}
 				}
@@ -799,30 +830,15 @@ public class AI {
 
 		//The AI should randomly charge weapon?
 		//I truly wonder why GM19 made only X charge weapons
-		if (aiState.randomlyChargeWeapon && framesChargeHeld == 0 && player.character.canCharge())
-		{
-			//Putting Zero, X, Axl, Vile here
-			if (player.character is Zero zero || player.character is MegamanX megamanX || player.character is Axl axl || player.character is Vile vile)
-			{
-				if (Helpers.randomRange(0, 50) < 1) {
-					if (player.isZBusterZero())
-					{
-						maxChargeTime = 5f;
+		if (aiState.randomlyChargeWeapon && (player.isX || player.isZBusterZero()) && framesChargeHeld == 0 && player.character.canCharge()) {
+			if (Helpers.randomRange(0, 50) < 1) {
+				if (player.isZBusterZero()) {
+					maxChargeTime = 5f;
+				} else {
+					maxChargeTime = 4.25f;
 					}
-					else 
-					{
-						maxChargeTime = 4.25f;
-					}
-					framesChargeHeld = 1;
-					if(player.isX || player.isZBusterZero())
-					{
-					player.press(Control.Shoot);
-					}
-					if (player.isVile || player.isAxl)
-					{
-					player.press(Control.Special1);
-					}
-				}
+				framesChargeHeld = 1;
+				player.press(Control.Shoot);
 			}
 		}
 		//End of Randomly Charge Weapon
