@@ -69,7 +69,7 @@ public class ShotgunIceProj : Projectile {
 		fadeSprite = "buster1_fade";
 		this.type = type;
 		if (velOverride != null) {
-			vel = new Point(maxSpeed * velOverride.Value.x, maxSpeed * (velOverride.Value.y / 0.5f));
+			vel = new Point(maxSpeed * velOverride.Value.x, maxSpeed * (velOverride.Value.y * 0.5f));
 		}
 		reflectable = true;
 		//this.fadeSound = "explosion";
@@ -106,23 +106,23 @@ public class ShotgunIceProj : Projectile {
 			Character chr = null;
 			new ShotgunIceProj(
 				weapon, pos.clone(), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
-				(-1, -2), chr, rpc: true
+				((-1 * xDir), -2), chr, rpc: true
 			);
 			new ShotgunIceProj(
 				weapon, pos.clone(), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
-				(-1, -1), chr, rpc: true
+				((-1 * xDir), -1), chr, rpc: true
 			);
 			new ShotgunIceProj(
 				weapon, pos.clone(), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
-				(-1, 0), chr, rpc: true
+				((-1 * xDir), 0), chr, rpc: true
 			);
 			new ShotgunIceProj(
 				weapon, pos.clone(), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
-				(-1, 1), chr, rpc: true
+				((-1 * xDir), 1), chr, rpc: true
 			);
 			new ShotgunIceProj(
 				weapon, pos.clone(), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
-				(-1, 2), chr, rpc: true
+				((-1 * xDir), 2), chr, rpc: true
 			);
 		}
 	}
