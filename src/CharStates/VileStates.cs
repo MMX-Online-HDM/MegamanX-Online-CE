@@ -75,11 +75,18 @@ public class VileRevive : CharState {
 		} else {
 			character.removeRenderEffect(RenderEffectType.Flash);
 		}
-		if (character.frameIndex == 7 && !once) {
+		if (character.frameIndex == 7 && !once && !player.isAI) {
 			character.playSound("ching");
 			player.health = 1;
 			character.addHealth(player.maxHealth);
 			once = true;
+		}
+		if (character.frameIndex == 0 && !once && player.isAI) {
+			character.playSound("ching");
+			player.health = 1;
+			character.addHealth(player.maxHealth);
+			once = true;
+			player.currency -= 5;
 		}
 		if (character.ownedByLocalPlayer) {
 			if (character.isAnimOver()) {

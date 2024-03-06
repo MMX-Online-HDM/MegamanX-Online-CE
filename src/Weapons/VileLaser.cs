@@ -126,7 +126,7 @@ public class RisingSpecterProj : Projectile {
 		vel = new Point();
 		projId = (int)ProjIds.RisingSpecter;
 		shouldVortexSuck = false;
-
+		if (player.isAI) damager.damage = 3;
 		float destX = xDir * 150;
 		float destY = -100;
 		Point toDestPos = new Point(destX, destY);
@@ -348,6 +348,7 @@ public class StraightNightmareProj : Projectile {
 		projId = (int)ProjIds.StraightNightmare;
 		maxTime = 2;
 		sprite.visible = false;
+		if(player.isAI) damager.hitCooldown = 0.25f;
 		for (var i = 0; i < maxLen; i++) {
 			var midSprite = Global.sprites["straightnightmare_proj"].clone();
 			midSprite.visible = false;

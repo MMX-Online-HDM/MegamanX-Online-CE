@@ -345,6 +345,15 @@ public class AI {
 			}
 		}
 
+			// Vile: Go MK2 to MKV
+			if (character is Vile vile1)
+			{
+				if (vile1?.charState is Die && vile1.isVileMK1 && player.currency >= 5)			
+					vile1?.changeState(new VileRevive(isMK5: false), false);				
+				if (vile1?.charState is Die && vile1.isVileMK2 && player.currency >= 5)			
+					vile1?.changeState(new VileRevive(isMK5: true), false);	
+			}
+
 		//Should Attack?
 		if (aiState.shouldAttack && target != null) 
 		{ //do not if is invulnerable
@@ -618,76 +627,81 @@ public class AI {
 						}	
 						//Vile Start	
 						if (character is Vile vile)
-						{		// MK1 Start
-								if(vile.isVileMK1)
+						{	
+							// You dare to grab me? i will blow myself up
+							if (character.charState?.isGrabbedState == true)
+							{
+							if (Helpers.randomRange(0, 100) < 10) 
+							vile?.changeState(new NecroBurstAttack(vile.grounded), true);
+							}	
+
+							if (Helpers.randomRange(0, 100) < 30)
+							{
+							if (isTargetInAir && isTargetSuperClose && !(character.charState is VileRevive or HexaInvoluteState))
+									vile?.changeState(new RisingSpecterState(vile.grounded), true);
+							}
+
+							int Vattack = Helpers.randomRange(0, 64);
+							if (vile?.charState?.isGrabbedState == false && !player.isDead && !(character.charState is VileRevive)
+								&& !character.isSpriteInvulnerable() && !(character.charState is HexaInvoluteState) && character.charState.canAttack())
+							{
+								switch (Vattack)
 								{
-
-									int VMK1attack = Helpers.randomRange(0, 64);
-									if (isTargetInAir && isTargetSuperClose) vile?.changeState(new RisingSpecterState(vile.grounded), true);
-									// You dare to grab me? i will blow myself up
-									if (character.charState?.isGrabbedState == true)
+								case 0:
+								player.press(Control.Shoot);
+								break;
+								case 1:
+								CannonAttack.shootLogic(vile);
+								break;
+								case 2:
+								if (character.grounded || character.charState is Jump)
+								vile?.changeState(new RocketPunchAttack(), false);												
+								break;
+								case 3:
+								if (character.charState is Fall)								
+								vile?.changeState(new AirBombAttack(false), true);									
+								break;
+								case 4:	
+								if (character.grounded || character.charState is Jump)						
+								vile?.changeState(new MissileAttack(), true);									
+								break;
+								case 5:
+								vile?.changeState(new CutterAttackState(), true);
+								break;
+								case 6:
+								if (character.grounded)
+								vile?.changeState(new NapalmAttack(NapalmAttackType.Napalm), true);
+								break;
+								case 7: 
+								if (character.charState is Fall)
+								vile?.changeState(new FlamethrowerState(), true);
+								break;
+								case 8:
+								int VMK1attackCase8 = Helpers.randomRange(1,4);
+									if(isTargetSuperClose)
 									{
-										if (Helpers.randomRange(0, 100) < 10)
-										vile?.changeState(new NecroBurstAttack(vile.grounded), true);									
-									}
-
-									if (vile?.charState?.isGrabbedState == false && !player.isDead)
-									{
-										switch (VMK1attack)
+										switch (VMK1attackCase8)
 										{
-										case 0:
-										player.press(Control.Shoot);
-										break;
-										case 1:
-										CannonAttack.shootLogic(vile);
-										break;
-										case 2:
-										if (character.grounded || character.charState is Jump)
-										vile?.changeState(new RocketPunchAttack(), false);												
-										break;
-										case 3:
-										if (character.charState is Fall)								
-										vile?.changeState(new AirBombAttack(false), true);									
-										break;
-										case 4:	
-										if (character.grounded || character.charState is Jump)						
-										vile?.changeState(new MissileAttack(), true);									
-										break;
-										case 5:
-										vile?.changeState(new CutterAttackState(), true);
-										break;
-										case 6:
-										if (character.grounded)
-										vile?.changeState(new NapalmAttack(NapalmAttackType.Napalm), true);
-										break;
-										case 7: 
-										if (character.charState is Fall)
-										vile?.changeState(new FlamethrowerState(), true);
-										break;
-										case 8:
-										int VMK1attackCase8 = Helpers.randomRange(1,6);
-											if(isTargetSuperClose)
-											{
-												switch (VMK1attackCase8)
-												{
-													case 1:
-													vile?.changeState(new RisingSpecterState(vile.grounded), true);
-													break;
-													case 2:
-													vile?.changeState(new StraightNightmareAttack(vile.grounded), true);
-													break;
-													case 3:
-													if (player.health >= 12)
-													vile?.changeState(new NecroBurstAttack(vile.grounded), true);
-													break;
-												}
-											}
-										break;
+											case 1:
+											vile?.changeState(new RisingSpecterState(vile.grounded), true);
+											break;
+											case 2:
+											vile?.changeState(new StraightNightmareAttack(vile.grounded), true);
+											break;
+											case 3:
+											if (player.health >= 12)
+											vile?.changeState(new NecroBurstAttack(vile.grounded), true);
+											break;
+											case 4:
+											if (vile.isVileMK5)
+											vile?.changeState(new HexaInvoluteState(), true);
+											break;
 										}
 									}
+								break;
 								}
-						
-					}
+							}																				
+						}
 				}
 			}
 			shootTime += Global.spf;
