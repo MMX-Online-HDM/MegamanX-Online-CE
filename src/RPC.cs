@@ -196,7 +196,7 @@ public class RPC {
 		if (bytes.Length > 0) {
 			om.Write(bytes);
 		}
-		s_server.SendMessage(om, s_server.Connections, netDeliveryMethod, 0);
+		s_server.SendToAll(om, netDeliveryMethod, 0);
 	}
 }
 

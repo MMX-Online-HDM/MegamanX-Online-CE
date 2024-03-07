@@ -1549,7 +1549,7 @@ public class Stunned : CharState {
 			character.isVaccinated() ||
 			//character.charState is Frozen ||
 			character.charState is VileMK2Grabbed ||
-			(character as MegamanX).chargedRollingShieldProj == null ||
+			(character as MegamanX)?.chargedRollingShieldProj != null ||
 			character.charState.invincible
 		) {
 			return false;

@@ -181,7 +181,7 @@ class Program {
 
 		// Loading with GUI.
 		loadText.Add("Getting Masterserver URL...");
-		loadMultiThread(loadText, window, MasterServerData.updateMasterServerURL);
+		//loadMultiThread(loadText, window, MasterServerData.updateMasterServerURL);
 		if (MasterServerData.serverIp == "127.0.0.1") {
 			loadText[loadText.Count - 1] = "Using local conection.";
 		} else {
@@ -760,23 +760,43 @@ class Program {
 	static void loadSprites() {
 		string spritePath = "assets/sprites";
 
-		List<string> spriteFilePaths = Helpers.getFiles(Global.assetPath + spritePath, false, "json");
-		if (spriteFilePaths.Count > 65536) {
-			throw new Exception("Exceeded max sprite limit of 65536. Fix actor.cs netUpdate() to support more sprites.");
+		string[] spriteFilePaths = Helpers.getFiles(Global.assetPath + spritePath, false, "json").ToArray();
+		if (spriteFilePaths.Length > 65536) {
+			throw new Exception(
+				"Exceeded max sprite limit of 65536. Fix actor.cs netUpdate() to support more sprites."
+			);
 		}
 
-		var fileChecksumDict = new Dictionary<string, string>();
-		foreach (string spriteFilePath in spriteFilePaths) {
-			string name = Path.GetFileNameWithoutExtension(spriteFilePath);
-			string json = File.ReadAllText(spriteFilePath);
-
-			fileChecksumDict[name] = json;
-
-			Sprite sprite = new Sprite(json, name, null);
-			Global.sprites[sprite.name] = sprite;
+		int fileSplit = MathInt.Floor(spriteFilePaths.Count() / 8);
+		string[][] treadedFilePaths;
+		// Use multitread if loading 20 or more sprites.
+		if (spriteFilePaths.Length >= 20) {
+			treadedFilePaths = new string[][] {
+				spriteFilePaths[..fileSplit],
+				spriteFilePaths[(fileSplit+1)..(fileSplit*2)],
+				spriteFilePaths[(fileSplit*2+1)..(fileSplit*3)],
+				spriteFilePaths[(fileSplit*3+1)..(fileSplit*4)],
+				spriteFilePaths[(fileSplit*4+1)..(fileSplit*5)],
+				spriteFilePaths[(fileSplit*5+1)..(fileSplit*6)],
+				spriteFilePaths[(fileSplit*7+1)..]
+			};
+			List<Thread> threads = new();
+			foreach (string[] filePath2 in treadedFilePaths) {
+				Thread tempThread = new Thread(() => { loadSpritesSub(filePath2); });
+				threads.Add(tempThread);
+				tempThread.Start();
+			}
+			while (threads.Count > 0) {
+				for (int i = 0; i < threads.Count; i++) {
+					if (threads[i].ThreadState == System.Threading.ThreadState.Stopped) {
+						threads.Remove(threads[i]);
+						i = 0;
+					}
+				}
+			}
+		} else {
+			loadSpritesSub(spriteFilePaths);
 		}
-		addToFileChecksumBlob(fileChecksumDict);
-
 		// Override sprite mods
 		string overrideSpriteSource = "assets/sprites_visualmods";
 		if (Options.main.shouldUseOptimizedAssets()) overrideSpriteSource = "assets/sprites_optimized";
@@ -802,6 +822,25 @@ class Program {
 					Global.sprites[piece].name = piece;
 				}
 			}
+		}
+	}
+
+	static void loadSpritesSub(string[] spriteFilePaths) {
+		Dictionary<string, string> fileChecksumDict = new();
+		foreach (string spriteFilePath in spriteFilePaths) {
+			string name = Path.GetFileNameWithoutExtension(spriteFilePath);
+			string json = File.ReadAllText(spriteFilePath);
+			if (String.IsNullOrEmpty(name)) {
+				continue;
+			}
+			fileChecksumDict[name] = json;
+			Sprite sprite = new Sprite(json, name, null);
+			lock (Global.sprites) {
+				Global.sprites[sprite.name] = sprite;
+			}
+		}
+		lock (Global.fileChecksumBlob) {
+			addToFileChecksumBlob(fileChecksumDict);
 		}
 	}
 

@@ -50,7 +50,7 @@ public class Buster : Weapon {
 		if ((player.character as MegamanX)?.isHyperX == true) {
 			return true;
 		}
-		return lemonsOnField.Count < 2;
+		return lemonsOnField.Count < 3;
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
