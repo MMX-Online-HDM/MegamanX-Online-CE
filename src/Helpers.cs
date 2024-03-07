@@ -563,7 +563,9 @@ public class Helpers {
 	public static List<string> getFiles(string path, bool recursive, params string[] filters) {
 		var files = new List<string>();
 		if (Directory.Exists(path)) {
-			files = Directory.GetFiles(path, "*", recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).ToList();
+			files = Directory.GetFiles(
+				path, "*", recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly
+			).ToList();
 		}
 
 		return files.Where(f => {

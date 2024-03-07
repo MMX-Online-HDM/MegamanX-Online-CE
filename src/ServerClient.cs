@@ -97,21 +97,14 @@ public class ServerClient {
 		return null;
 	}
 
-	public static ServerClient CreateHolePunch(
-		long serverId, ServerPlayer inputServerPlayer,
-		out JoinServerResponse joinServerResponse, out string error
+	public static ServerClient CreateHolePunchAlt(
+		NetClient client, long serverId, IPEndPoint serverIP, ServerPlayer inputServerPlayer,
+		out JoinServerResponse joinServerResponse, out string log
 	) {
-		error = null;
-		NetPeerConfiguration config = new NetPeerConfiguration("XOD-P2P");
-		config.EnableMessageType(NetIncomingMessageType.ConnectionLatencyUpdated);
-		config.EnableMessageType(NetIncomingMessageType.NatIntroductionSuccess);
-		config.EnableMessageType(NetIncomingMessageType.UnconnectedData);
-		config.AutoFlushSendQueue = false;
-		config.ConnectionTimeout = Server.connectionTimeoutSeconds;
-		config.Port = Global.clientPort;
-		// Create client.
-		var client = new NetClient(config);
-		client.Start();
+		// Enable autoflush temporally.
+		client.Configuration.AutoFlushSendQueue = true;
+		client.FlushSendQueue();
+		log = null;
 		// UDP Hole Punching happens here.
 		NetOutgoingMessage regMsg = client.CreateMessage();
 		regMsg.Write((byte)MasterServerMsg.ConnectPeers);
@@ -119,39 +112,56 @@ public class ServerClient {
 		regMsg.Write(new IPEndPoint(NetUtility.GetMyAddress(out _), client.Port));
 		IPEndPoint masterServerLocation = NetUtility.Resolve(MasterServerData.serverIp, MasterServerData.serverPort);
 		client.SendUnconnectedMessage(regMsg, masterServerLocation);
-		NetOutgoingMessage hail = client.CreateMessage(JsonConvert.SerializeObject(inputServerPlayer));
+		client.FlushSendQueue();
+		log += "Sent HolePunch message...";
 		// Wait for hole punching to happen.
 		int count = 0;
 		bool connected = false;
 		NetIncomingMessage msg;
-		while (count < 20) {
+		Stopwatch clock = Stopwatch.StartNew();
+		while (clock.Elapsed.Seconds < 4 && !connected) {
 			while ((msg = client.ReadMessage()) != null && !connected) {
 				if (msg.MessageType == NetIncomingMessageType.NatIntroductionSuccess) {
 					connected = true;
-					string[] hostIpPort = msg.ReadString().Split(':');
-					client.Connect(hostIpPort[0], Int32.Parse(hostIpPort[1]), hail);
-					Console.WriteLine("Got Connection MSG!");
-					Console.WriteLine("IP: " + hostIpPort[0]);
-					Console.WriteLine("Port: " + hostIpPort[1]);
+					client.Connect(serverIP);
+					log += "Got Connection MSG!";
 					goto exitLoop;
+				} else {
+					log += "Got other message.\n";
+					log += "MSG type:" + msg.MessageType.ToString() + "\n";
 				}
 			}
-			count++;
-			Thread.Sleep(100);
-			client.FlushSendQueue();
 		}
 		exitLoop:
+		clock.Reset();
 		// Do this if hole punch fails.
 		if (!connected) {
-			error = "Failed to connect to P2P server.";
+			log += "Failed to holepunch, resorting to direct connection anyway.";
+			log += "Conections active: " + client.Connections.Count;
+			clock.Start();
+			client.Connect(serverIP);
+			client.FlushSendQueue();
+			while (clock.Elapsed.Seconds < 4 && !connected) {
+				if (client.ConnectionStatus == NetConnectionStatus.Connected) {
+					connected = true;
+				}
+			}
+		}
+		clock.Reset();
+		clock.Stop();
+		// Ok. We failed 2 times so we give up.
+		if (!connected) {
+			log += "Failed to connect.";
 			joinServerResponse = null;
+			client.Configuration.AutoFlushSendQueue = false;
 			return null;
 		}
+		log = null;
 		client.FlushSendQueue();
 		Thread.Sleep(100);
 		// If it works, continue.
-		Console.WriteLine("Starting Serverclient.");
-		Console.WriteLine("Conections active: " + client.Connections.Count);
+		log += "Starting Serverclient.";
+		log += "Conections active: " + client.Connections.Count;
 		var serverClient = new ServerClient(client, inputServerPlayer.isHost);
 		serverClient.serverId = serverId;
 		// Now try to connect to get server connect response after conection.
@@ -160,120 +170,35 @@ public class ServerClient {
 			serverClient.getMessages(out var messages, false);
 			foreach (var message in messages) {
 				if (message.StartsWith("joinservertargetedresponse:")) {
-					Console.WriteLine("Got connection response.");
+					log += "Got connection response.";
 					joinServerResponse = (
 						JsonConvert.DeserializeObject<JoinServerResponse>(
 							message.RemovePrefix("joinservertargetedresponse:")
 						)
 					);
 					serverClient.serverPlayer = joinServerResponse.getLastPlayer();
+					client.Configuration.AutoFlushSendQueue = false;
 					return serverClient;
 				} else if (message.StartsWith("hostdisconnect:")) {
 					var reason = message.Split(':')[1];
-					error = "Could not join: " + reason;
+					log = "Could not join: " + reason;
 					joinServerResponse = null;
 					serverClient.disconnect("Client couldn't get response");
+					client.Configuration.AutoFlushSendQueue = false;
 					return null;
 				} else if (message.StartsWith("joinserverresponse:")) {
-					Console.WriteLine("Got general response.");
+					log += "Got general response.";
 				} else {
-					Console.WriteLine("Message: " + message);
+					log += "Message: " + message;
 				}
 			}
 			count++;
 			Thread.Sleep(100);
 		}
-
-		error = "Failed to get connect response from P2P server.";
+		log += "Failed to get connect response from P2P server.";
 		joinServerResponse = null;
 		serverClient.disconnect("Client couldn't get response");
-		return null;
-	}
-
-	public static ServerClient CreateHolePunchAlt(
-		NetClient client, long serverId, ServerPlayer inputServerPlayer,
-		out JoinServerResponse joinServerResponse, out string error
-	) {
-		error = null;
-		// UDP Hole Punching happens here.
-		NetOutgoingMessage regMsg = client.CreateMessage();
-		regMsg.Write((byte)MasterServerMsg.ConnectPeers);
-		regMsg.Write(serverId);
-		regMsg.Write(new IPEndPoint(NetUtility.GetMyAddress(out _), client.Port));
-		IPEndPoint masterServerLocation = NetUtility.Resolve(MasterServerData.serverIp, MasterServerData.serverPort);
-		client.SendUnconnectedMessage(regMsg, masterServerLocation);
-		client.FlushSendQueue();
-		NetOutgoingMessage hail = client.CreateMessage(JsonConvert.SerializeObject(inputServerPlayer));
-		// Wait for hole punching to happen,
-		int count = 0;
-		bool connected = false;
-		NetIncomingMessage msg;
-		while (count < 20) {
-			while ((msg = client.ReadMessage()) != null && !connected) {
-				if (msg.MessageType == NetIncomingMessageType.NatIntroductionSuccess) {
-					connected = true;
-					string[] hostIpPort = msg.ReadString().Split(':');
-					client.Connect(hostIpPort[0], Int32.Parse(hostIpPort[1]), hail);
-					Console.WriteLine("Got Connection MSG!");
-					Console.WriteLine("IP: " + hostIpPort[0]);
-					Console.WriteLine("Port: " + hostIpPort[1]);
-					goto exitLoop;
-				} else {
-					Console.WriteLine("Got other message.");
-					Console.WriteLine("MSG type:" + msg.MessageType.ToString());
-				}
-			}
-			count++;
-			Thread.Sleep(100);
-			client.FlushSendQueue();
-		}
-		exitLoop:
-		// Do this if hole punch fails.
-		if (!connected) {
-			error = "Failed to get response from masterserver.";
-			joinServerResponse = null;
-			return null;
-		}
-		client.FlushSendQueue();
-		Thread.Sleep(100);
-		// If it works, continue.
-		Console.WriteLine("Starting Serverclient.");
-		Console.WriteLine("Conections active: " + client.Connections.Count);
-		var serverClient = new ServerClient(client, inputServerPlayer.isHost);
-		serverClient.serverId = serverId;
-		// Now try to connect to get server connect response after conection.
-		count = 0;
-		while (count < 20) {
-			serverClient.getMessages(out var messages, false);
-			foreach (var message in messages) {
-				if (message.StartsWith("joinservertargetedresponse:")) {
-					Console.WriteLine("Got connection response.");
-					joinServerResponse = (
-						JsonConvert.DeserializeObject<JoinServerResponse>(
-							message.RemovePrefix("joinservertargetedresponse:")
-						)
-					);
-					serverClient.serverPlayer = joinServerResponse.getLastPlayer();
-					return serverClient;
-				} else if (message.StartsWith("hostdisconnect:")) {
-					var reason = message.Split(':')[1];
-					error = "Could not join: " + reason;
-					joinServerResponse = null;
-					serverClient.disconnect("Client couldn't get response");
-					return null;
-				} else if (message.StartsWith("joinserverresponse:")) {
-					Console.WriteLine("Got general response.");
-				} else {
-					Console.WriteLine("Message: " + message);
-				}
-			}
-			count++;
-			Thread.Sleep(100);
-		}
-
-		error = "Failed to get connect response from P2P server.";
-		joinServerResponse = null;
-		serverClient.disconnect("Client couldn't get response");
+		client.Configuration.AutoFlushSendQueue = false;
 		return null;
 	}
 
