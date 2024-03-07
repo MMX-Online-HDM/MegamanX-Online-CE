@@ -62,7 +62,7 @@ public class UpgradeMenu : IMainMenu {
 	}
 
 	public void update() {
-		if (UpgradeArmorMenu.updateHyperArmorUpgrades(mainPlayer)) return;
+		//if (UpgradeArmorMenu.updateHyperArmorUpgrades(mainPlayer)) return;
 
 		subtankTargets.Clear();
 		if (mainPlayer.isSigma) {
@@ -182,14 +182,14 @@ public class UpgradeMenu : IMainMenu {
 		}
 
 		if (Global.frameCount % 60 < 30 && mainPlayer.realCharNum == 2) {
-			Fonts.drawText(FontType.DarkPurple, ">", Global.screenW - 25, Global.halfScreenH, Alignment.Center);
-			Fonts.drawText(FontType.DarkPurple, "Armor", Global.screenW - 25, Global.halfScreenH + 15, Alignment.Center);
+			Fonts.drawText(FontType.DarkPurple, ">", Global.screenW - 14, Global.halfScreenH, Alignment.Center);
+			//Fonts.drawText(FontType.DarkPurple, "Armor", Global.screenW - 25, Global.halfScreenH + 15, Alignment.Center);
 		} else if (Global.frameCount % 60 < 30 && mainPlayer.canUpgradeXArmor()) {
-			Fonts.drawText(FontType.DarkPurple, "<", 12, Global.halfScreenH, Alignment.Center);
-			Fonts.drawText(FontType.DarkPurple, "X3", 12, Global.halfScreenH + 15, Alignment.Center);
+			Fonts.drawText(FontType.DarkPurple, "<", 14, Global.halfScreenH, Alignment.Center);
+			//Fonts.drawText(FontType.DarkPurple, "X3", 12, Global.halfScreenH + 15, Alignment.Center);
 
-			Fonts.drawText(FontType.DarkPurple, ">", Global.screenW - 19, Global.halfScreenH, Alignment.Center);
-			Fonts.drawText(FontType.DarkPurple, "X1", Global.screenW - 19, Global.halfScreenH + 15, Alignment.Center);
+			Fonts.drawText(FontType.DarkPurple, ">", Global.screenW - 14, Global.halfScreenH, Alignment.Center);
+			//Fonts.drawText(FontType.DarkPurple, "X1", Global.screenW - 19, Global.halfScreenH + 15, Alignment.Center);
 		}
 
 		bool soldOut = false;
@@ -286,7 +286,7 @@ public class UpgradeMenu : IMainMenu {
 			);
 		}
 
-		UpgradeArmorMenu.drawHyperArmorUpgrades(mainPlayer, 20);
+		//UpgradeArmorMenu.drawHyperArmorUpgrades(mainPlayer, 20);
 
 		Fonts.drawTextEX(
 			FontType.Grey, "[MUP]/[MDOWN]: Select Item",

@@ -187,14 +187,22 @@ public class SelectVileWeaponMenu : IMainMenu {
 		descLine1 = wsy + 13;
 		descLine2 = wsy + 20;
 
-		Helpers.drawTextStd(TCat.Title, titleText, 40, wsy + 6, Alignment.Left, style: Text.Styles.Italic, fontSize: 18);
-		Helpers.drawTextStd(TCat.Title, inputText, Global.screenW - 40, wsy + 6, Alignment.Right, style: Text.Styles.Italic, fontSize: 18);
+		Fonts.drawText(
+			FontType.Grey, titleText, 40, wsy + 6
+		);
+		Fonts.drawText(
+			FontType.Grey, inputText, Global.screenW - 40, wsy + 6
+		);
 
 		if (wep.description?.Length > 0) {
-			Helpers.drawTextStd(wep.description[0], 40, wep.description.Length == 1 ? descLine1 + 3 : descLine1, Alignment.Left, style: Text.Styles.Italic, fontSize: 18);
+			Fonts.drawText(
+				FontType.Grey, wep.description[0], 40, wep.description.Length == 1 ? descLine1 + 3 : descLine1
+			);
 		}
 		if (wep.description?.Length > 1) {
-			Helpers.drawTextStd(wep.description[1], 40, descLine2, Alignment.Left, style: Text.Styles.Italic, fontSize: 18);
+			Fonts.drawText(
+				FontType.Grey, wep.description[1], 40, descLine2, Alignment.Left
+			);
 		}
 
 		//Helpers.drawTextStd(TCat.BotHelp, "Left/Right: Change Weapon", Global.screenW * 0.5f, 200 + botOffY, Alignment.Center, fontSize: 18);

@@ -171,11 +171,6 @@ public class MainMenu : IMainMenu {
 		}
 	}
 
-	public MMXFont getFont(int index) {
-		if (selectY == index) return MMXFont.Select;
-		return MMXFont.Menu;
-	}
-
 	public void render() {
 		float startX = 75;
 
@@ -189,7 +184,7 @@ public class MainMenu : IMainMenu {
 		else if (selectY == 6) selectionImage = "quit";
 
 		DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0);
-		DrawWrappers.DrawTitleTexture(Global.textures["mainmenutitle"]);
+		DrawWrappers.DrawTextureHUD(Global.textures["mainmenutitle"], 0, 0);
 		DrawWrappers.DrawTextureHUD(Global.textures["cursor"], startX - 10, startPos - 2 + (selectY * yDistance));
 		DrawWrappers.DrawTextureHUD(Global.textures[selectionImage], 208, 107);
 		DrawWrappers.DrawTextureHUD(Global.textures["mainmenubox"], 199, 98);

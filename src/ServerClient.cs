@@ -52,6 +52,7 @@ public class ServerClient {
 		config.EnableMessageType(NetIncomingMessageType.ConnectionLatencyUpdated);
 		config.AutoFlushSendQueue = false;
 		config.ConnectionTimeout = Server.connectionTimeoutSeconds;
+		config.Port = Global.clientPort;
 		/*
 		#if DEBUG
 		config.SimulatedMinimumLatency = Global.simulatedLatency;
@@ -107,6 +108,7 @@ public class ServerClient {
 		config.EnableMessageType(NetIncomingMessageType.UnconnectedData);
 		config.AutoFlushSendQueue = false;
 		config.ConnectionTimeout = Server.connectionTimeoutSeconds;
+		config.Port = Global.clientPort;
 		// Create client.
 		var client = new NetClient(config);
 		client.Start();

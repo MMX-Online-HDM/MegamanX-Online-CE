@@ -547,6 +547,7 @@ public partial class Global {
 	public static bool isHost { get { return level != null && level.isHost; } }
 	public static LeaveMatchSignal leaveMatchSignal;
 	public const int basePort = 14242;
+	public const int clientPort = 14240;
 	public static bool firstTimeVersionCheck = false;
 
 	public static string encryptionKey;

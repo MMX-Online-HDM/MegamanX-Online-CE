@@ -540,7 +540,7 @@ public class Server {
 		//s_server.MessageReceivedEvent.WaitOne();
 		NetIncomingMessage im;
 		while ((im = s_server.ReadMessage()) != null) {
-			var all = s_server.Connections; // get copy
+			List<NetConnection> all = s_server.Connections.ToList(); // get copy
 			all.Remove(im.SenderConnection);
 
 			if (im.MessageType == NetIncomingMessageType.StatusChanged) {
@@ -753,7 +753,7 @@ public class Server {
 				om = s_server.CreateMessage();
 				om.Write(sendStringRPCByte);
 				om.Write("clientdisconnect:" + JsonConvert.SerializeObject(disconnectedPlayer));
-				s_server.SendMessage(om, s_server.Connections, NetDeliveryMethod.ReliableOrdered, 0);
+				s_server.SendToAll(om, NetDeliveryMethod.ReliableOrdered, 0);
 			}
 		} else {
 			// No connections: shut down server, everyone left
@@ -795,7 +795,7 @@ public class Server {
 			NetOutgoingMessage om = s_server.CreateMessage();
 			om.Write((byte)RPC.templates.IndexOf(RPC.kickPlayerResponse));
 			om.Write(kickPlayerJson);
-			s_server.SendMessage(om, s_server.Connections, rpcTemplate.netDeliveryMethod, 0);
+			s_server.SendToAll(om, rpcTemplate.netDeliveryMethod, 0);
 
 		} else if (rpcTemplate is RPCUpdatePlayer) {
 			ushort argCount = BitConverter.ToUInt16(im.ReadBytes(2), 0);
