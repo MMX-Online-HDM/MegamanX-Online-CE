@@ -577,6 +577,7 @@ public class FStagGrabbed : GenericGrabbedState {
 
 	public override void update() {
 		base.update();
+		trySnapToGrabPoint(true);
 
 		string grabberSpriteName = grabber.sprite?.name ?? "";
 		if (grabberSpriteName.EndsWith("_dash_grab") == true) {

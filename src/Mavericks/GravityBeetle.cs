@@ -321,6 +321,8 @@ public class BeetleGrabbedState : GenericGrabbedState {
 			}
 			if (character.stopCeiling()) {
 				(grabber as GravityBeetle).meleeWeapon.applyDamage(character, false, grabber, (int)ProjIds.GBeetleLiftCrash);
+				character.playSound("crash", sendRpc: true);
+				character.shakeCamera(sendRpc: true);
 			}
 			return;
 		}

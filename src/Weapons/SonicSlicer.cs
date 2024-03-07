@@ -45,8 +45,10 @@ public class SonicSlicerStart : Projectile {
 	public override void update() {
 		base.update();
 		if (sprite.isAnimOver()) {
-			new SonicSlicerProj(weapon, pos, xDir, 0, damager.owner, damager.owner.getNextActorNetId(), rpc: true);
-			new SonicSlicerProj(weapon, pos, xDir, 1, damager.owner, damager.owner.getNextActorNetId(), rpc: true);
+			if (ownedByLocalPlayer) {
+				new SonicSlicerProj(weapon, pos, xDir, 0, damager.owner, damager.owner.getNextActorNetId(), rpc: true);
+				new SonicSlicerProj(weapon, pos, xDir, 1, damager.owner, damager.owner.getNextActorNetId(), rpc: true);
+			}
 			destroySelf();
 		}
 	}

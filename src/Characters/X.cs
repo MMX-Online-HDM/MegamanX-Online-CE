@@ -1019,12 +1019,23 @@ public partial class MegamanX : Character {
 		return base.canChangeWeapons();
 	}
 
-	public override float getJumpModifier() {
-		float jumpModifier = 1;
+	// Handles Bubble Splash Charged jump height
+
+ 	public override float getJumpPower() {
+		float jumpModifier = 0;
 		jumpModifier += (chargedBubbles.Count / 6.0f) * 50;
 
-		return jumpModifier * base.getJumpModifier();
+		return jumpModifier + base.getJumpPower();
 	}
+
+	// Jack's version of the fix above, documented.
+
+	/* public override float getJumpModifier() {
+		float jumpModifier = 1;
+		jumpModifier += (chargedBubbles.Count / 6.0f) * 5;
+
+		return jumpModifier * base.getJumpModifier();
+	} */
 
 	public override void changeState(CharState newState, bool forceChange = false) {
 		if (!forceChange && charState != null && newState != null &&

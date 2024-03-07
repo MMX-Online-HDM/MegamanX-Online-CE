@@ -87,4 +87,9 @@ public class VileMK2Grabbed : GenericGrabbedState {
 	public const float maxGrabTime = 4;
 	public VileMK2Grabbed(Character grabber) : base(grabber, maxGrabTime, "vilemk2_grab") {
 	}
+
+	public override void update() {
+		base.update();
+		trySnapToGrabPoint(true);
+	}
 }

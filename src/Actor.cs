@@ -1496,7 +1496,7 @@ public partial class Actor : GameObject {
 	}
 
 	public bool stopCeiling() {
-		if (vel.y < 0 && Global.level.checkCollisionActor(this, 0, -1) != null) {
+		if (vel.y < 0 && Global.level.checkCollisionActor(this, 0, -8) != null) {
 			vel.y = 0;
 			return true;
 		}

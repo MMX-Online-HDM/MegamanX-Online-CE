@@ -308,4 +308,9 @@ public class CrushCGrabbed : GenericGrabbedState {
 	public const float maxGrabTime = 4;
 	public CrushCGrabbed(CrushCrawfish grabber) : base(grabber, maxGrabTime, "grab_attack", maxNotGrabbedTime: 1f) {
 	}
+
+	public override void update() {
+		base.update();
+		trySnapToGrabPoint(true);
+	}
 }
