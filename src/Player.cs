@@ -1491,9 +1491,6 @@ public partial class Player {
 				) {
 					return false;
 				}
-				if ((character as MegamanX)?.shotgunIceChargeTime > 0f) {
-					return false;
-				}
 				if (character.charState is Frozen ||
 					character.charState is Stunned ||
 					character.charState is Crystalized

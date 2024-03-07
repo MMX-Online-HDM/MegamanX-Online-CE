@@ -734,11 +734,6 @@ public class MagnaCDrainGrabbed : GenericGrabbedState {
 		this.grabber = grabber;
 		grabTime = maxGrabTime;
 	}
-
-	public override void update() {
-		base.update();
-		trySnapToGrabPoint(true);
-	}
 }
 
 public class MagnaCCeilingStartState : MaverickState {
