@@ -66,14 +66,13 @@ public partial class Level {
 			return cells;
 		}
 
-		int minI = MathInt.Round(Math.Clamp(MathF.Floor((shape.minY / height) * grid.Count), 0, grid.Count - 1));
-		int minJ = MathInt.Round(Math.Clamp(MathF.Floor((shape.minX / width) * grid[0].Count), 0, grid[0].Count - 1));
-		int maxI = MathInt.Round(Math.Clamp(MathF.Floor((shape.maxY / height) * grid.Count), 0, grid.Count - 1));
-		int maxJ = MathInt.Round(Math.Clamp(MathF.Floor((shape.maxX / width) * grid[0].Count), 0, grid[0].Count - 1));
+		int minI = Math.Clamp(MathInt.Floor((shape.minY / height) * grid.Count), 0, grid.Count - 1);
+		int minJ = Math.Clamp(MathInt.Floor((shape.minX / width) * grid[0].Count), 0, grid[0].Count - 1);
+		int maxI = Math.Clamp(MathInt.Floor((shape.maxY / height) * grid.Count), 0, grid.Count - 1);
+		int maxJ = Math.Clamp(MathInt.Floor((shape.maxX / width) * grid[0].Count), 0, grid[0].Count - 1);
 
 		for (int i = minI; i <= maxI; i++) {
 			for (int j = minJ; j <= maxJ; j++) {
-				if (i < 0 || j < 0 || i >= grid.Count || j >= grid[0].Count) continue;
 				cells.Add(new Cell(i, j, grid[i][j]));
 			}
 		}
@@ -82,7 +81,7 @@ public partial class Level {
 
 	//Called a lot
 	public List<GameObject> getGameObjectsInSameCell(Shape shape) {
-		var cells = getGridCells(shape);
+		List<Cell> cells = getGridCells(shape);
 		var retGameobjects = new HashSet<GameObject>();
 		foreach (var cell in cells) {
 			if (cell.gameobjects == null) continue;
@@ -556,11 +555,20 @@ public partial class Level {
 		return best;
 	}
 
-	public List<Actor> getTargets(Point pos, int alliance, bool checkWalls, float? aMaxDist = null, bool isRequesterAI = false, bool includeAllies = false, Actor callingActor = null) {
+	public List<Actor> getTargets(
+		Point pos, int alliance, bool checkWalls,
+		float? aMaxDist = null, bool isRequesterAI = false,
+		bool includeAllies = false, Actor callingActor = null
+	) {
 		float maxDist = aMaxDist ?? Global.screenW * 0.75f;
 		var targets = new List<Actor>();
-		Shape shape = Rect.createFromWH(pos.x - Global.halfScreenW, pos.y - (Global.screenH * 0.75f), Global.screenW, Global.screenH).getShape();
-		//DrawWrappers.DrawRectWH(pos.x - Global.halfScreenW, pos.y - (Global.screenH * 0.75f), Global.screenW, Global.screenH, true, new Color(0, 0, 255, 128), 1, ZIndex.HUD);
+		Shape shape = Rect.createFromWH(
+			pos.x - Global.halfScreenW, pos.y - (Global.screenH * 0.75f),
+			Global.screenW, Global.screenH).getShape();
+		//DrawWrappers.DrawRectWH(
+			//pos.x - Global.halfScreenW, pos.y - (Global.screenH * 0.75f),
+			//Global.screenW, Global.screenH, true, new Color(0, 0, 255, 128), 1, ZIndex.HUD
+		//);
 		var hits = Global.level.checkCollisionsShape(shape, null);
 		foreach (var hit in hits) {
 			var damagable = hit.gameObject as IDamagable;
@@ -573,7 +581,9 @@ public partial class Level {
 			if (hit.gameObject is Character character) {
 				if (character.player.isDead) continue;
 				if (!includeAllies && character.player.alliance == alliance) continue;
-				if (character.player.alliance != alliance && character.player.isDisguisedAxl && gameMode.isTeamMode) {
+				if (character.player.alliance != alliance &&
+					character.player.isDisguisedAxl && gameMode.isTeamMode
+				) {
 					if (!isRequesterAI) continue;
 					else if (!character.disguiseCoverBlown) continue;
 				}
@@ -592,9 +602,19 @@ public partial class Level {
 		return targets;
 	}
 
-	public Actor getClosestTarget(Point pos, int alliance, bool checkWalls, float? aMaxDist = null, bool isRequesterAI = false, bool includeAllies = false, Actor callingActor = null) {
-		List<Type> filters = new List<Type>() { typeof(Character), typeof(Maverick), typeof(RaySplasher), typeof(Mechaniloid) };
-		var targets = getTargets(pos, alliance, checkWalls, aMaxDist, isRequesterAI, includeAllies, callingActor);
+	public Actor getClosestTarget(
+		Point pos, int alliance, bool checkWalls,
+		float? aMaxDist = null, bool isRequesterAI = false,
+		bool includeAllies = false, Actor callingActor = null
+	) {
+		List<Type> filters = new List<Type>() {
+			typeof(Character), typeof(Maverick),
+			typeof(RaySplasher), typeof(Mechaniloid)
+		};
+		var targets = getTargets(
+			pos, alliance, checkWalls, aMaxDist,
+			isRequesterAI, includeAllies, callingActor
+		);
 		for (int i = 0; i < targets.Count; i++) {
 			if (isOfClass(targets[i], filters)) {
 				return targets[i];

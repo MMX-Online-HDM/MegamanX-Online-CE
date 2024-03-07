@@ -580,7 +580,11 @@ public class GameMode {
 
 				if (!axl.isZoomingIn && !axl.isZoomingOut) {
 					int zoomChargePercent = MathInt.Round(axl.zoomCharge * 100);
-					DrawWrappers.DrawText(zoomChargePercent.ToString() + "%", cursorPos.x + 5, cursorPos.y + 5, Alignment.Left, true, 0.75f, Color.White, Color.Black, Text.Styles.Regular, 1, false, ZIndex.HUD);
+					Fonts.drawText(
+						FontType.Orange, zoomChargePercent.ToString() + "%",
+						cursorPos.x + 5, cursorPos.y + 5, Alignment.Left,
+						true, depth: ZIndex.HUD
+					);
 				}
 
 				Helpers.decrementTime(ref flashCooldown);
@@ -1479,9 +1483,14 @@ public class GameMode {
 			}
 
 			if (killFeed.killer == level.mainPlayer || killFeed.victim == level.mainPlayer || killFeed.assister == level.mainPlayer) {
-				var msgLen = Helpers.measureTextStd(TCat.HUD, msg, fontSize: 24).x;
-				var msgHeight = 10;
-				DrawWrappers.DrawRect(fromRight - msgLen - 2, fromTop - 2 + (i * yDist) - msgHeight / 2, fromRight + 2, fromTop - 1 + msgHeight / 2 + (i * yDist), true, new Color(0, 0, 0, 128), 1, ZIndex.HUD, isWorldPos: false, outlineColor: Color.White);
+				int msgLen = Fonts.measureText(FontType.FBlue, msg);
+				int msgHeight = 10;
+				DrawWrappers.DrawRect(
+					fromRight - msgLen - 2, fromTop - 2 + (i * yDist) - msgHeight / 2,
+					fromRight + 2, fromTop - 1 + msgHeight / 2 + (i * yDist),
+					true, new Color(0, 0, 0, 128), 1, ZIndex.HUD,
+					isWorldPos: false, outlineColor: Color.White
+				);
 			}
 
 			FontType killerColor = FontType.Blue;

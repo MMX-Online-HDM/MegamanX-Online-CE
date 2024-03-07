@@ -623,10 +623,9 @@ public abstract class BaseSigma : Character {
 				true, Color.Yellow, 0, ZIndex.HUD - 1
 			);
 
-			DrawWrappers.DrawText(
-				"Swapping...", pos.x, pos.y - 15 + currentLabelY, Alignment.Center,
-				true, 0.75f, Color.White, Helpers.getAllianceColor(),
-				Text.Styles.Regular, 1, true, ZIndex.HUD
+			Fonts.drawText(
+				FontType.DarkGreen, "Swapping...", pos.x, pos.y - 15 + currentLabelY, Alignment.Center,
+				true, depth: ZIndex.HUD
 			);
 			deductLabelY(labelCooldownOffY);
 		}
@@ -652,10 +651,9 @@ public abstract class BaseSigma : Character {
 				topLeft.x + 1, topLeft.y + 1, topLeft.x + 1 + width, botRight.y - 1,
 				true, Color.Yellow, 0, ZIndex.HUD - 1
 			);
-			DrawWrappers.DrawText(
-				"Possessing...", pos.x, pos.y - 15 + currentLabelY, Alignment.Center,
-				true, 0.75f, Color.White, Helpers.getAllianceColor(),
-				Text.Styles.Regular, 1, true, ZIndex.HUD
+			Fonts.drawText(
+				FontType.DarkGreen, "Possessing...", pos.x, pos.y - 15 + currentLabelY,
+				Alignment.Center, true, depth: ZIndex.HUD
 			);
 			deductLabelY(labelCooldownOffY);
 		}

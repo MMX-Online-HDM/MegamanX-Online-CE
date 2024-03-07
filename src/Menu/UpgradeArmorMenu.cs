@@ -12,9 +12,9 @@ public class UpgradeArmorMenu : IMainMenu {
 	public IMainMenu prevMenu;
 
 	public Point optionPos1 = new Point(25, 40);
-	public Point optionPos2 = new Point(25, 80);
-	public Point optionPos3 = new Point(25, 110);
-	public Point optionPos4 = new Point(25, 170);
+	public Point optionPos2 = new Point(25, 40 + 36);
+	public Point optionPos3 = new Point(25, 40 + 36 * 2);
+	public Point optionPos4 = new Point(25, 40 + 36 * 3);
 
 	public Level level { get { return Global.level; } }
 	public Player mainPlayer { get { return Global.level.mainPlayer; } }
@@ -245,40 +245,55 @@ public class UpgradeArmorMenu : IMainMenu {
 	public void render() {
 		var gameMode = level.gameMode;
 		DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
-
-		Helpers.drawTextStd(TCat.Title, string.Format("Upgrade Armor(MMX{0})", xGame), Global.screenW * 0.5f, 8, Alignment.Center, fontSize: 48);
-		Helpers.drawTextStd(
-			Global.nameCoins + ": " + mainPlayer.currency,
-			Global.screenW * 0.5f, 25, Alignment.Center
+		string armorName = xGame switch {
+			1  => "Light",
+			2 => "Giga",
+			3 => "Max",
+			_ => "ERROR"
+		};
+		Fonts.drawText(
+			FontType.Yellow, string.Format($"Upgrade {armorName} Armor", xGame),
+			Global.screenW * 0.5f, 20, Alignment.Center
 		);
+		Fonts.drawText(FontType.Golden, Global.nameCoins + ": " + mainPlayer.currency, 20, 20);
 
 		if (Global.frameCount % 60 < 30) {
-			if (xGame == 1) {
-				Helpers.drawTextStd(TCat.Option, ">", Global.screenW - 19, Global.halfScreenH, Alignment.Center, fontSize: 32);
-				Helpers.drawTextStd(TCat.Option, "X2", Global.screenW - 19, Global.halfScreenH + 15, Alignment.Center, fontSize: 20);
-
-				if (!Global.level.server.disableHtSt) {
-					Helpers.drawTextStd(TCat.Option, "<", 12, Global.halfScreenH, Alignment.Center, fontSize: 32);
-					Helpers.drawTextStd(TCat.Option, "Items", 12, Global.halfScreenH + 15, Alignment.Center, fontSize: 20);
-				}
-			} else if (xGame == 2) {
-				Helpers.drawTextStd(TCat.Option, ">", Global.screenW - 19, Global.halfScreenH, Alignment.Center, fontSize: 32);
-				Helpers.drawTextStd(TCat.Option, "X3", Global.screenW - 19, Global.halfScreenH + 15, Alignment.Center, fontSize: 20);
-
-				Helpers.drawTextStd(TCat.Option, "<", 12, Global.halfScreenH, Alignment.Center, fontSize: 32);
-				Helpers.drawTextStd(TCat.Option, "X1", 12, Global.halfScreenH + 15, Alignment.Center, fontSize: 20);
-			} else if (xGame == 3) {
-				Helpers.drawTextStd(TCat.Option, "<", 12, Global.halfScreenH, Alignment.Center, fontSize: 32);
-				Helpers.drawTextStd(TCat.Option, "X2", 12, Global.halfScreenH + 15, Alignment.Center, fontSize: 20);
-
-				if (!Global.level.server.disableHtSt) {
-					Helpers.drawTextStd(TCat.Option, ">", Global.screenW - 19, Global.halfScreenH, Alignment.Center, fontSize: 32);
-					Helpers.drawTextStd(TCat.Option, "Items", Global.screenW - 19, Global.halfScreenH + 15, Alignment.Center, fontSize: 20);
-				}
+			bool stEnabled = !Global.level.server.disableHtSt;
+			string leftText = xGame switch {
+				1 when stEnabled => "Items",
+				2 => "Light",
+				3 => "Giga",
+				_ => ""
+			};
+			string rightText = xGame switch {
+				1 => "Giga",
+				2 => "Max",
+				3 when stEnabled => "Items",
+				_ => ""
+			};
+			if (leftText != "") {
+				Fonts.drawText(
+					FontType.DarkPurple, "<",
+					14, Global.halfScreenH, Alignment.Center
+				);
+				Fonts.drawText(
+					FontType.DarkPurple, "",//leftText,
+					14, Global.halfScreenH + 15, Alignment.Center
+				);
+			}
+			if (rightText != "") {
+				Fonts.drawText(
+					FontType.DarkPurple, ">",
+					Global.screenW - 14, Global.halfScreenH, Alignment.Center
+				);
+				Fonts.drawText(
+					FontType.DarkPurple, "",//rightText,
+					Global.screenW - 14, Global.halfScreenH + 15, Alignment.Center
+				);
 			}
 		}
 
-		Global.sprites["menu_xdefault"].drawToHUD(0, 220, 120);
+		Global.sprites["menu_xdefault"].drawToHUD(0, 300, 110);
 
 		if (mainPlayer.hasUltimateArmor()) Global.sprites["menu_xultimate"].drawToHUD(0, 220, 120);
 		else if (mainPlayer.hasGoldenArmor()) Global.sprites["menu_xgolden"].drawToHUD(0, 220, 120);
@@ -308,95 +323,75 @@ public class UpgradeArmorMenu : IMainMenu {
 		float yOff = xGame == 3 && mainPlayer.hasAllX3Armor() ? 9 : -1;
 		Global.sprites["cursor"].drawToHUD(0, optionPos1.x - 8, optionPos.y + 4 + yOff);
 
-		var grayColor = new Color(128, 128, 128);
-
 		bool showChips = mainPlayer.hasAllX3Armor() && xGame == 3;
 
 		// Head section
-		Color headPartColor = mainPlayer.helmetArmorNum == xGame ? grayColor : Color.White;
-		Color headMessageColor = mainPlayer.helmetArmorNum == xGame ? grayColor :
-			(!mainPlayer.isHeadArmorPurchased(xGame) && mainPlayer.currency < MegamanX.headArmorCost ? Color.Red :
-			(!mainPlayer.isHeadArmorPurchased(xGame) ? Color.Green : Color.White));
-		Helpers.drawTextStd(TCat.Option, "Head Parts", optionPos1.x, optionPos1.y, fontSize: 24, color: headPartColor, selected: selectArrowPosY == 0 && !showChips);
-		Helpers.drawTextStd(getHeadArmorMessage(), optionPos1.x + 57, optionPos1.y, fontSize: 24, color: headMessageColor);
-		Helpers.drawTextStd(" -----------", optionPos1.x + 114, optionPos1.y, fontSize: 24, color: headPartColor);
+		Fonts.drawText(FontType.Yellow, "Head Parts", optionPos1.x, optionPos1.y, selected: selectArrowPosY == 0 && !showChips);
+		Fonts.drawText(FontType.Green, getHeadArmorMessage(), optionPos1.x + 60, optionPos1.y);
 		if (xGame == 1) {
-			Helpers.drawTextStd("Grants a headbutt attack on jump.", optionPos1.x + 5, optionPos1.y + 11, fontSize: 18, color: headPartColor);
+			Fonts.drawText(FontType.Blue, "Grants a headbutt attack on jump.", optionPos1.x + 5, optionPos1.y + 10);
 		}
 		if (xGame == 2) {
-			Helpers.drawTextStd("Scan and tag enemies with SPECIAL.", optionPos1.x + 5, optionPos1.y + 11, fontSize: 18, color: headPartColor);
+			Fonts.drawText(FontType.Blue, "Scan and tag enemies with SPECIAL.", optionPos1.x + 5, optionPos1.y + 10);
 		}
 		if (xGame == 3) {
 			if (mainPlayer.hasAllX3Armor()) {
-				Helpers.drawTextStd(TCat.Option, "ENHANCEMENT CHIP", optionPos1.x + 5, optionPos1.y + 11, fontSize: 18, color: mainPlayer.hasChip(2) ? grayColor : Color.White, selected: selectArrowPosY == 0);
-				Helpers.drawTextStd("Slowly regenerate health.", optionPos1.x + 5, optionPos1.y + 19, fontSize: 18, color: mainPlayer.hasChip(2) ? grayColor : Color.White);
+				Fonts.drawText(FontType.Golden, "ENHANCEMENT CHIP", optionPos1.x + 5, optionPos1.y + 10, selected: selectArrowPosY == 0);
+				Fonts.drawText(FontType.Blue, "Slowly regenerate health.", optionPos1.x + 5, optionPos1.y + 20);
 			} else {
-				Helpers.drawTextStd("Gain a radar to detect enemies.", optionPos1.x + 5, optionPos1.y + 11, fontSize: 18, color: mainPlayer.helmetArmorNum == xGame ? grayColor : Color.White);
+				Fonts.drawText(FontType.Blue, "Gain a radar to detect enemies.", optionPos1.x + 5, optionPos1.y + 10);
 			}
 		}
 
 		// Body section
-		Color bodyPartColor = mainPlayer.bodyArmorNum == xGame ? grayColor : Color.White;
-		Color bodyMessageColor = mainPlayer.bodyArmorNum == xGame ? grayColor :
-			(!mainPlayer.isBodyArmorPurchased(xGame) && mainPlayer.currency < MegamanX.bodyArmorCost ? Color.Red :
-			(!mainPlayer.isBodyArmorPurchased(xGame) ? Color.Green : Color.White));
-		Helpers.drawTextStd(TCat.Option, "Body Parts", optionPos2.x, optionPos2.y, fontSize: 24, color: bodyPartColor, selected: selectArrowPosY == 1 && !showChips);
-		Helpers.drawTextStd(getBodyArmorMessage(), optionPos2.x + 57, optionPos2.y, fontSize: 24, color: bodyMessageColor);
-		Helpers.drawTextStd(" -----------", optionPos2.x + 114, optionPos2.y, fontSize: 24, color: bodyPartColor);
-		if (xGame == 1) Helpers.drawTextStd(string.Format("Reduces damage and flinch received."), optionPos2.x + 5, optionPos2.y + 11, fontSize: 18, color: bodyPartColor);
+		Fonts.drawText(FontType.Yellow, "Body Parts", optionPos2.x, optionPos2.y, selected: selectArrowPosY == 1 && !showChips);
+		Fonts.drawText(FontType.Green, getBodyArmorMessage(), optionPos2.x + 60, optionPos2.y);
+		if (xGame == 1) {
+			Fonts.drawText(FontType.Blue, string.Format("Reduces damage and flinch received."), optionPos2.x + 5, optionPos2.y + 10);
+		}
 		if (xGame == 2) {
-			Helpers.drawTextStd("Grants the Giga Crush attack", optionPos2.x + 5, optionPos2.y + 11, fontSize: 18, color: bodyPartColor);
-			Helpers.drawTextStd("and reduces damage received.", optionPos2.x + 5, optionPos2.y + 19, fontSize: 18, color: bodyPartColor);
+			Fonts.drawText(FontType.Blue, "Grants the Giga Crush attack", optionPos2.x + 5, optionPos2.y + 10);
+			Fonts.drawText(FontType.Blue, "and reduces damage received.", optionPos2.x + 5, optionPos2.y + 20);
 		}
 		if (xGame == 3) {
 			if (mainPlayer.hasAllX3Armor()) {
-				Helpers.drawTextStd(TCat.Option, "ENHANCEMENT CHIP", optionPos2.x + 5, optionPos2.y + 11, fontSize: 18, color: mainPlayer.hasChip(1) ? grayColor : Color.White, selected: selectArrowPosY == 1);
-				Helpers.drawTextStd("Improves barrier defense.", optionPos2.x + 5, optionPos2.y + 19, fontSize: 18, color: mainPlayer.hasChip(1) ? grayColor : Color.White);
+				Fonts.drawText(FontType.Golden, "ENHANCEMENT CHIP", optionPos2.x + 5, optionPos2.y + 10, selected: selectArrowPosY == 1);
+				Fonts.drawText(FontType.Blue, "Improves barrier defense.", optionPos2.x + 5, optionPos2.y + 20);
 			} else {
-				Helpers.drawTextStd("Gain a barrier on taking damage.", optionPos2.x + 5, optionPos2.y + 11, fontSize: 18, color: mainPlayer.bodyArmorNum == xGame ? grayColor : Color.White);
+				Fonts.drawText(FontType.Blue, "Gain a barrier on taking damage.", optionPos2.x + 5, optionPos2.y + 10);
 			}
 		}
 
 		// Arm section
-		Color armPartColor = mainPlayer.armArmorNum == xGame ? grayColor : Color.White;
-		Color armMessageColor = mainPlayer.armArmorNum == xGame ? grayColor :
-			(!mainPlayer.isArmArmorPurchased(xGame) && mainPlayer.currency < MegamanX.armArmorCost ? Color.Red :
-			(!mainPlayer.isArmArmorPurchased(xGame) ? Color.Green : Color.White));
-		Helpers.drawTextStd(TCat.Option, "Arm Parts", optionPos3.x, optionPos3.y, fontSize: 24, color: armPartColor, selected: selectArrowPosY == 2 && !showChips);
-		Helpers.drawTextStd(getArmArmorMessage(), optionPos3.x + 57, optionPos3.y, fontSize: 24, color: armMessageColor);
-		Helpers.drawTextStd(" -------", optionPos3.x + 114, optionPos3.y, fontSize: 24, color: armPartColor);
-		if (xGame == 1) Helpers.drawTextStd("Charge shots 50% faster.", optionPos3.x + 5, optionPos3.y + 11, fontSize: 18, color: armPartColor);
-		if (xGame == 2) Helpers.drawTextStd("Store an extra charge shot.", optionPos3.x + 5, optionPos3.y + 11, fontSize: 18, color: armPartColor);
+		Fonts.drawText(FontType.Yellow, "Arm Parts", optionPos3.x, optionPos3.y, selected: selectArrowPosY == 2 && !showChips);
+		Fonts.drawText(FontType.Green, getArmArmorMessage(), optionPos3.x + 60, optionPos3.y);
+		if (xGame == 1) Fonts.drawText(FontType.Blue, "Charge shots 50% faster.", optionPos3.x + 5, optionPos3.y + 10);
+		if (xGame == 2) Fonts.drawText(FontType.Blue, "Store an extra charge shot.", optionPos3.x + 5, optionPos3.y + 10);
 		if (xGame == 3) {
 			if (mainPlayer.hasAllX3Armor()) {
-				Helpers.drawTextStd(TCat.Option, "ENHANCEMENT CHIP", optionPos3.x + 5, optionPos3.y + 11, fontSize: 18, color: mainPlayer.hasChip(3) ? grayColor : Color.White, selected: selectArrowPosY == 2);
-				Helpers.drawTextStd("Reduce ammo usage by half.", optionPos3.x + 5, optionPos3.y + 19, fontSize: 18, color: mainPlayer.hasChip(3) ? grayColor : Color.White);
+				Fonts.drawText(FontType.Golden, "ENHANCEMENT CHIP", optionPos3.x + 5, optionPos3.y + 10);
+				Fonts.drawText(FontType.Blue, "Reduce ammo usage by half.", optionPos3.x + 5, optionPos3.y + 20);
 			} else {
-				Helpers.drawTextStd("Grants the Hyper Charge", optionPos3.x + 5, optionPos3.y + 11, fontSize: 18, color: mainPlayer.armArmorNum == xGame ? grayColor : Color.White);
-				Helpers.drawTextStd("and Cross Shot abilities.", optionPos3.x + 5, optionPos3.y + 19, fontSize: 18, color: mainPlayer.armArmorNum == xGame ? grayColor : Color.White);
+				Fonts.drawText(FontType.Blue, "Grants the Hyper Charge", optionPos3.x + 5, optionPos3.y + 10);
+				Fonts.drawText(FontType.Blue, "and Cross Shot abilities.", optionPos3.x + 5, optionPos3.y + 20);
 			}
 		}
 
 		// Foot section
-		Color bootsPartColor = mainPlayer.bootsArmorNum == xGame ? grayColor : Color.White;
-		Color bootsMessageColor = mainPlayer.bootsArmorNum == xGame ? grayColor :
-			(!mainPlayer.isBootsArmorPurchased(xGame) && mainPlayer.currency < MegamanX.bootsArmorCost ? Color.Red :
-			(!mainPlayer.isBootsArmorPurchased(xGame) ? Color.Green : Color.White));
-		Helpers.drawTextStd(TCat.Option, "Foot Parts", optionPos4.x, optionPos4.y, fontSize: 24, color: bootsPartColor, selected: selectArrowPosY == 3 && !showChips);
-		Helpers.drawTextStd(getBootsArmorMessage(), optionPos4.x + 57, optionPos4.y, fontSize: 24, color: bootsMessageColor);
-		Helpers.drawTextStd(" --------", optionPos4.x + 114, optionPos4.y, fontSize: 24, color: bootsPartColor);
+		Fonts.drawText(FontType.Yellow, "Foot Parts", optionPos4.x, optionPos4.y, selected: selectArrowPosY == 3 && !showChips);
+		Fonts.drawText(FontType.Green, getBootsArmorMessage(), optionPos4.x + 60, optionPos4.y);
 		if (xGame == 1) {
-			Helpers.drawTextStd("Ground dash 15% faster.", optionPos4.x + 5, optionPos4.y + 11, fontSize: 18, color: bootsPartColor);
+			Fonts.drawText(FontType.Blue, "Ground dash 15% faster.", optionPos4.x + 5, optionPos4.y + 10);
 		}
 		if (xGame == 2) {
-			Helpers.drawTextStd("Air dash 15% faster.", optionPos4.x + 5, optionPos4.y + 11, fontSize: 18, color: bootsPartColor);
+			Fonts.drawText(FontType.Blue, "Air dash 15% faster.", optionPos4.x + 5, optionPos4.y + 10);
 		}
 		if (xGame == 3) {
 			if (mainPlayer.hasAllX3Armor()) {
-				Helpers.drawTextStd(TCat.Option, "ENHANCEMENT CHIP", optionPos4.x + 5, optionPos4.y + 11, fontSize: 18, color: mainPlayer.hasChip(0) ? grayColor : Color.White, selected: selectArrowPosY == 3);
-				Helpers.drawTextStd("Dash twice in the air.", optionPos4.x + 5, optionPos4.y + 19, fontSize: 18, color: mainPlayer.hasChip(0) ? grayColor : Color.White);
+				Fonts.drawText(FontType.Golden, "ENHANCEMENT CHIP", optionPos4.x + 5, optionPos4.y + 10, selected: selectArrowPosY == 3);
+				Fonts.drawText(FontType.Blue, "Dash twice in the air.", optionPos4.x + 5, optionPos4.y + 20);
 			} else {
-				Helpers.drawTextStd("Gain a midair upward dash.", optionPos4.x + 5, optionPos4.y + 11, fontSize: 18, color: mainPlayer.bootsArmorNum == xGame ? grayColor : Color.White);
+				Fonts.drawText(FontType.Blue, "Gain a midair upward dash.", optionPos4.x + 5, optionPos4.y + 10);
 			}
 		}
 
@@ -405,10 +400,16 @@ public class UpgradeArmorMenu : IMainMenu {
 		if (mainPlayer.hasChip(3)) Global.sprites["menu_chip"].drawToHUD(0, 220 - 38, optionPos3.y);
 		if (mainPlayer.hasChip(0)) Global.sprites["menu_chip"].drawToHUD(0, 220 - 28, optionPos4.y);
 
-		drawHyperArmorUpgrades(mainPlayer, 0);
+		//drawHyperArmorUpgrades(mainPlayer, 0);
 
-		Helpers.drawTextStd(Helpers.menuControlText("Left/Right: Change Armor Set"), Global.halfScreenW, 208, Alignment.Center, fontSize: 16);
-		Helpers.drawTextStd(Helpers.menuControlText("[OK]: Upgrade, [ALT]: Unupgrade, [BACK]: Back"), Global.halfScreenW, 214, Alignment.Center, fontSize: 16);
+		Fonts.drawTextEX(
+			FontType.Grey, "[MLEFT]/[MRIGHT]: Change Armor Set",
+			40, Global.screenH - 28
+		);
+		Fonts.drawTextEX(
+			FontType.Grey, "[OK]: Upgrade, [ALT]: Unupgrade, [BACK]: Back",
+			40, Global.screenH - 18
+		);
 	}
 
 	public static bool updateHyperArmorUpgrades(Player mainPlayer) {
@@ -471,8 +472,14 @@ public class UpgradeArmorMenu : IMainMenu {
 			specialText = specialText.TrimStart('\n');
 			float yOff = specialText.Contains('\n') ? -3 : 0;
 			float yPos = Global.halfScreenH + 25;
-			DrawWrappers.DrawRect(5, yPos + offY, Global.screenW - 5, yPos + 30 + offY, true, Helpers.MenuBgColor, 0, ZIndex.HUD + 200, false);
-			Helpers.drawTextStd(TCat.OptionNoSplit, Helpers.controlText(specialText).ToUpperInvariant(), Global.halfScreenW, yPos + 11 + yOff + offY, Alignment.Center, fontSize: 24, selected: true);
+			DrawWrappers.DrawRect(
+				5, yPos + offY, Global.screenW - 5, yPos + 30 + offY,
+				true, Helpers.MenuBgColor, 0, ZIndex.HUD + 200, false
+			);
+			Fonts.drawText(
+				FontType.Yellow, Helpers.controlText(specialText).ToUpperInvariant(),
+				Global.halfScreenW, yPos + 11 + yOff + offY, Alignment.Center
+			);
 		}
 
 	}
@@ -495,13 +502,13 @@ public class UpgradeArmorMenu : IMainMenu {
 		if (mainPlayer.isArmArmorPurchased(xGame)) {
 			return mainPlayer.armArmorNum == xGame ? " (Active)" : " (Bought)";
 		}
-		return $" ({MegamanX.armArmorCost} {Global.nameCoins}))";
+		return $" ({MegamanX.armArmorCost} {Global.nameCoins})";
 	}
 
 	public string getBootsArmorMessage() {
 		if (mainPlayer.isBootsArmorPurchased(xGame)) {
 			return mainPlayer.bootsArmorNum == xGame ? " (Active)" : " (Bought)";
 		}
-		return $" ({MegamanX.bootsArmorCost} {Global.nameCoins}))";
+		return $" ({MegamanX.bootsArmorCost} {Global.nameCoins})";
 	}
 }
