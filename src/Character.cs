@@ -173,7 +173,7 @@ public partial class Character : Actor, IDamagable {
 			if (isWarpIn) initialCharState = new WarpIn();
 			else initialCharState = new Idle();
 		} else {
-			initialCharState = new NetLimbo(); 
+			initialCharState = new NetLimbo();
 			useGravity = false;
 		}
 
@@ -393,7 +393,7 @@ public partial class Character : Actor, IDamagable {
 				palette = player.nightmareZeroShader;
 			}
 		} else if (player.isAxl) {
-			
+
 		} else if (player.isViralSigma()) {
 			int paletteNum = 6 - MathInt.Ceiling((player.health / player.maxHealth) * 6);
 			if (sprite.name.Contains("_enter")) paletteNum = 0;
@@ -650,8 +650,7 @@ public partial class Character : Actor, IDamagable {
 			if (charState is XHover) {
 				runSpeed = Physics.WalkSpeed;
 			}
-		}
-		else if (player.isVile && player.speedDevil) {
+		} else if (player.isVile && player.speedDevil) {
 			runSpeed *= 1.1f;
 		}
 		return runSpeed * getRunDebuffs();
@@ -674,8 +673,7 @@ public partial class Character : Actor, IDamagable {
 
 		if (charState is XHover) {
 			dashSpeed *= 1.25f;
-		}
-		else if (player.isVile && player.speedDevil) {
+		} else if (player.isVile && player.speedDevil) {
 			dashSpeed *= 1.1f;
 		}
 		return dashSpeed * getRunDebuffs();
@@ -1318,16 +1316,14 @@ public partial class Character : Actor, IDamagable {
 				);
 				changeState(new Jump());
 				return true;
-			}
-			else if (player.dashPressed(out string dashControl) && canDash() && charState is not Dash) {
+			} else if (player.dashPressed(out string dashControl) && canDash() && charState is not Dash) {
 				changeState(new Dash(dashControl), true);
 				return true;
-			}
-			else if (mk5RideArmorPlatform != null &&
-				player.input.isPressed(Control.Jump, player) &&
-				player.input.isHeld(Control.Up, player) &&
-				canEjectFromRideArmor()
-			) {
+			} else if (mk5RideArmorPlatform != null &&
+				  player.input.isPressed(Control.Jump, player) &&
+				  player.input.isHeld(Control.Up, player) &&
+				  canEjectFromRideArmor()
+			  ) {
 				getOffMK5Platform();
 				return true;
 			}
@@ -1722,8 +1718,8 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public float camOffsetX;
-	
-	
+
+
 	public virtual Actor getFollowActor() {
 		if (mk5RideArmorPlatform != null) {
 			return mk5RideArmorPlatform;
@@ -1957,8 +1953,8 @@ public partial class Character : Actor, IDamagable {
 		newState.onEnter(oldState);
 
 		//if (!newState.canShoot()) {
-			//this.shootTime = 0;
-			//this.shootAnimTime = 0;
+		//this.shootTime = 0;
+		//this.shootAnimTime = 0;
 		//}
 	}
 
@@ -1995,7 +1991,9 @@ public partial class Character : Actor, IDamagable {
 			if (sprite.name.EndsWith("kaiser_shoot2")) kaiserBodySprite = sprite.name + "_body";
 			if (sprite.name.EndsWith("kaiser_taunt")) kaiserBodySprite = sprite.name + "_body";
 			if (kaiserBodySprite != "") {
-				Global.sprites[kaiserBodySprite].draw(0, pos.x + x, pos.y + y, xDir, 1, null, 1, 1, 1, zIndex - 10);
+				Global.sprites[kaiserBodySprite].draw(
+					0, pos.x + x, pos.y + y, xDir, 1, null, 1, 1, 1, zIndex - 10
+				);
 			}
 		}
 
@@ -2023,14 +2021,18 @@ public partial class Character : Actor, IDamagable {
 		}
 
 		if (player.isX && sprite.name.Contains("frozen")) {
-			Global.sprites["frozen_block"].draw(0, pos.x + x - (xDir * 2), pos.y + y + 1, xDir, 1, null, 1, 1, 1, zIndex + 1);
+			Global.sprites["frozen_block"].draw(
+				0, pos.x + x - (xDir * 2), pos.y + y + 1, xDir, 1, null, 1, 1, 1, zIndex + 1
+			);
 		}
 
 		if (isCrystalized) {
 			float yOff = 0;
 			if (sprite.name.Contains("ra_idle")) yOff = 12;
 			if (player.isSigma) yOff = -7;
-			Global.sprites["crystalhunter_crystal"].draw(0, pos.x + x, pos.y + y + yOff, xDir, 1, null, 1, 1, 1, zIndex + 1);
+			Global.sprites["crystalhunter_crystal"].draw(
+				0, pos.x + x, pos.y + y + yOff, xDir, 1, null, 1, 1, 1, zIndex + 1
+			);
 		}
 		List<Player> nonSpecPlayers = Global.level.nonSpecPlayers();
 		bool drawCursorChar = player.isMainPlayer && (
@@ -2042,15 +2044,16 @@ public partial class Character : Actor, IDamagable {
 		if (Global.overrideDrawCursorChar) drawCursorChar = true;
 
 		if (!isWarpIn() && drawCursorChar && player.currentMaverick == null) {
-			Global.sprites["cursorchar"].draw(0, pos.x + x, pos.y + y + currentLabelY, 1, 1, null, 1, 1, 1, zIndex + 1);
+			Global.sprites["cursorchar"].draw(
+				0, pos.x + x, pos.y + y + currentLabelY, 1, 1, null, 1, 1, 1, zIndex + 1
+			);
 			deductLabelY(labelCursorOffY);
 		}
 
 		bool shouldDrawName = false;
 		bool shouldDrawHealthBar = false;
 		string overrideName = null;
-		Color? overrideColor = null;
-		Color? overrideTextColor = null;
+		FontType? overrideColor = null;
 
 		if (!hideHealthAndName()) {
 			if (Global.level.mainPlayer.isSpectator) {
@@ -2061,42 +2064,50 @@ public partial class Character : Actor, IDamagable {
 					shouldDrawName = true;
 				}
 			}
-			  // Special case: puppeteer control, draw sigma health
-			  else if (player.isMainPlayer && player.isSigma && player.isPuppeteer() && player.currentMaverick != null) {
-				shouldDrawHealthBar = true;
-			}
-			  // Special case: labeling the own player's disguised Axl
-			  else if (player.isMainPlayer && player.isDisguisedAxl && Global.level.gameMode.isTeamMode) {
+			// Special case: labeling the own player's disguised Axl
+			else if (player.isMainPlayer && player.isDisguisedAxl && Global.level.gameMode.isTeamMode) {
 				overrideName = player.disguise.targetName;
-				overrideColor = player.alliance == GameMode.blueAlliance ? Helpers.DarkRed : Helpers.DarkBlue;
 				shouldDrawName = true;
 			}
-			  // Special case: labeling an enemy player's disguised Axl
-			  else if (!player.isMainPlayer && player.isDisguisedAxl && Global.level.gameMode.isTeamMode && player.alliance != Global.level.mainPlayer.alliance) {
+			// Special case: labeling an enemy player's disguised Axl
+			else if (
+				!player.isMainPlayer && player.isDisguisedAxl &&
+				Global.level.gameMode.isTeamMode &&
+				player.alliance != Global.level.mainPlayer.alliance
+			) {
 				overrideName = player.disguise.targetName;
-				overrideColor = player.alliance == GameMode.blueAlliance ? Helpers.DarkRed : Helpers.DarkBlue;
+				overrideColor = Global.level.gameMode.teamFonts[Global.level.mainPlayer.alliance];
 				shouldDrawName = true;
 				shouldDrawHealthBar = true;
 			}
-			  // Special case: drawing enemy team name/health as disguised Axl
-			  else if (!player.isMainPlayer && Global.level.mainPlayer.isDisguisedAxl && Global.level.gameMode.isTeamMode && player.alliance != Global.level.mainPlayer.alliance && !isStealthy(Global.level.mainPlayer.alliance)) {
+			// Special case: drawing enemy team name/health as disguised Axl
+			else if (!player.isMainPlayer && Global.level.mainPlayer.isDisguisedAxl &&
+				Global.level.gameMode.isTeamMode &&
+				player.alliance != Global.level.mainPlayer.alliance &&
+				!isStealthy(Global.level.mainPlayer.alliance)
+			) {
+				overrideColor = FontType.Grey;
 				shouldDrawName = true;
 				shouldDrawHealthBar = true;
 			}
-			  // Basic case, drawing alliance of teammates in team modes
-			  else if (!player.isMainPlayer && player.alliance == Global.level.mainPlayer.alliance && Global.level.gameMode.isTeamMode) {
+			// Basic case, drawing alliance of teammates in team modes
+			else if (
+				!player.isMainPlayer && player.alliance == Global.level.mainPlayer.alliance &&
+				Global.level.gameMode.isTeamMode
+			) {
 				shouldDrawName = true;
 				shouldDrawHealthBar = true;
 			}
-			  // X with scan
-			  else if (!player.isMainPlayer && Global.level.mainPlayer.isX && Global.level.mainPlayer.hasHelmetArmor(2) && player.scanned && !isStealthy(Global.level.mainPlayer.alliance)) {
-				overrideTextColor = Color.Red;
-				overrideColor = Helpers.DarkBlue;
+			// X with scan
+			else if (!player.isMainPlayer && Global.level.mainPlayer.isX &&
+			  	Global.level.mainPlayer.hasHelmetArmor(2) && player.scanned &&
+				!isStealthy(Global.level.mainPlayer.alliance)
+			) {
 				shouldDrawName = true;
 				shouldDrawHealthBar = true;
 			}
-			  // Axl target
-			  else if (
+			// Axl target
+			else if (
 				!player.isMainPlayer &&
 				Global.level.mainPlayer.character is Axl axl &&
 				axl.axlCursorTarget == this &&
@@ -2110,7 +2121,7 @@ public partial class Character : Actor, IDamagable {
 			drawHealthBar();
 		}
 		if (shouldDrawName || Global.overrideDrawName) {
-			drawName(overrideName, overrideColor, overrideTextColor);
+			drawName(overrideName, overrideColor);
 		}
 
 		if (!hideNoShaderIcon()) {
@@ -2144,7 +2155,11 @@ public partial class Character : Actor, IDamagable {
 				DrawWrappers.DrawRect(topLeft.x, topLeft.y, botRight.x, botRight.y, true, Color.Black, 0, ZIndex.HUD - 1, outlineColor: Color.White);
 				DrawWrappers.DrawRect(topLeft.x + 1, topLeft.y + 1, topLeft.x + 1 + width, botRight.y - 1, true, Color.Yellow, 0, ZIndex.HUD - 1);
 
-				DrawWrappers.DrawText("Dropping...", pos.x + 5, pos.y - 15 + currentLabelY, Alignment.Center, true, 0.75f, Color.White, Helpers.getAllianceColor(), Text.Styles.Regular, 1, true, ZIndex.HUD);
+				Fonts.drawText(
+					FontType.Grey, "Dropping...",
+					pos.x + 5, pos.y - 15 + currentLabelY,
+					Alignment.Center, true, depth: ZIndex.HUD
+				);
 				deductLabelY(labelCooldownOffY);
 			}
 
@@ -2188,20 +2203,48 @@ public partial class Character : Actor, IDamagable {
 		if (Global.showAIDebug) {
 			float textPosX = pos.x;// (pos.x - Global.level.camX) / Global.viewSize;
 			float textPosY = pos.y - 50;// (pos.y - 50 - Global.level.camY) / Global.viewSize;
-			float fontSize = 0.75f;
 			Color outlineColor = player.alliance == GameMode.blueAlliance ? Helpers.DarkBlue : Helpers.DarkRed;
 
-			//DrawWrappers.DrawText("Possessing...", pos.x, pos.y - 15 + currentLabelY, Alignment.Center, true, 0.75f, Color.White, Helpers.getAllianceColor(), Text.Styles.Regular, 1, true, ZIndex.HUD);
+			//DrawWrappers.DrawText(
+			//	"Possessing...", pos.x, pos.y - 15 + currentLabelY,
+			//	Alignment.Center, true, 0.75f, Color.White, Helpers.getAllianceColor(),
+			//	Text.Styles.Regular, 1, true, ZIndex.HUD
+			//);
 
-			DrawWrappers.DrawText(player.name, textPosX, textPosY, Alignment.Center, true, fontSize, Color.White, outlineColor, Text.Styles.Regular, 1, true, ZIndex.HUD);
+			Fonts.drawText(
+				FontType.Grey, player.name, textPosX, textPosY,
+				Alignment.Center, true, depth: ZIndex.HUD
+			);
 			if (ai != null) {
-				//DrawWrappers.DrawText("state:" + ai.aiState.GetType().Name, textPosX, textPosY -= 10, Alignment.Center, fontSize: fontSize, outlineColor: outlineColor);
+				//DrawWrappers.DrawText(
+				//	"state:" + ai.aiState.GetType().Name, textPosX, textPosY -= 10,
+				//	Alignment.Center, fontSize: fontSize, outlineColor: outlineColor
+				//);
 				var charTarget = ai.target as Character;
-				DrawWrappers.DrawText("dest:" + ai.aiState.getDestNodeName(), textPosX, textPosY -= 10, Alignment.Center, true, fontSize, Color.White, outlineColor, Text.Styles.Regular, 1, true, ZIndex.HUD);
-				DrawWrappers.DrawText("next:" + ai.aiState.getNextNodeName(), textPosX, textPosY -= 10, Alignment.Center, true, fontSize, Color.White, outlineColor, Text.Styles.Regular, 1, true, ZIndex.HUD);
-				DrawWrappers.DrawText("prev:" + ai.aiState.getPrevNodeName(), textPosX, textPosY -= 10, Alignment.Center, true, fontSize, Color.White, outlineColor, Text.Styles.Regular, 1, true, ZIndex.HUD);
-				if (charTarget != null) DrawWrappers.DrawText("target:" + charTarget?.name, textPosX, textPosY -= 10, Alignment.Center, true, fontSize, Color.White, outlineColor, Text.Styles.Regular, 1, true, ZIndex.HUD);
-				if (ai.aiState is FindPlayer fp) DrawWrappers.DrawText("stuck:" + fp.stuckTime, textPosX, textPosY -= 10, Alignment.Center, true, fontSize, Color.White, outlineColor, Text.Styles.Regular, 1, true, ZIndex.HUD);
+				Fonts.drawText(
+					FontType.Grey, "dest:" + ai.aiState.getDestNodeName(),
+					textPosX, textPosY -= 10, Alignment.Center, true, depth: ZIndex.HUD
+				);
+				Fonts.drawText(
+					FontType.Grey, "next:" + ai.aiState.getNextNodeName(), textPosX, textPosY -= 10,
+					Alignment.Center, true, depth: ZIndex.HUD
+				);
+				Fonts.drawText(
+					FontType.Grey, "prev:" + ai.aiState.getPrevNodeName(), textPosX, textPosY -= 10,
+					Alignment.Center, true, depth: ZIndex.HUD
+				);
+				if (charTarget != null) {
+					Fonts.drawText(
+						FontType.Grey, "target:" + charTarget?.name, textPosX, textPosY -= 10,
+						Alignment.Center, true, depth: ZIndex.HUD
+					);
+					if (ai.aiState is FindPlayer fp) {
+						Fonts.drawText(
+							FontType.Grey, "stuck:" + fp.stuckTime, textPosX, textPosY -= 10,
+							Alignment.Center, true, depth: ZIndex.HUD
+						);
+					}
+				}
 			}
 		}
 
@@ -2430,24 +2473,27 @@ public partial class Character : Actor, IDamagable {
 		}
 	}
 
-	public void drawName(string overrideName = "", Color? overrideColor = null, Color? overrideTextColor = null) {
+	public void drawName(string overrideName = "", FontType? overrideColor = null) {
 		float healthPct = 0;
 		getHealthNameOffsets(out bool shieldDrawn, ref healthPct);
 
 		string playerName = player.name;
-		Color playerColor = Helpers.DarkBlue;
-		if (Global.level.gameMode.isTeamMode) {
-			playerColor = player.alliance == GameMode.blueAlliance ? Helpers.DarkBlue : Helpers.DarkRed;
+		FontType playerColor = FontType.Grey;
+		if (Global.level.gameMode.isTeamMode && player.alliance < Global.level.server.teamNum) {
+			playerColor = Global.level.gameMode.teamFonts[player.alliance];
 		}
 
 		if (!string.IsNullOrEmpty(overrideName)) playerName = overrideName;
-		if (overrideColor != null) playerColor = overrideColor.Value;
-
+		if (overrideColor != null) {
+			playerColor = overrideColor.Value;
+		}
 		float textPosX = pos.x;
 		float textPosY = pos.y + currentLabelY - 8;
 
-		DrawWrappers.DrawText(playerName, textPosX, textPosY, Alignment.Center, true, 0.75f,
-			overrideTextColor ?? Color.White, playerColor, style: overrideTextColor == null ? Text.Styles.Regular : Text.Styles.Italic, 1, true, ZIndex.HUD);
+		Fonts.drawText(
+			FontType.Grey, playerName, textPosX, textPosY,
+			Alignment.Center, true, depth: ZIndex.HUD
+		);
 
 		deductLabelY(labelNameOffY);
 	}
@@ -2674,7 +2720,7 @@ public partial class Character : Actor, IDamagable {
 				Global.level.gameMode.addKillFeedEntry(new KillFeedEntry(player.name + " was eliminated.", GameMode.blueAlliance), sendRpc: true);
 			}
 
-			if (killer?.ownedByLocalPlayer == true) 
+			if (killer?.ownedByLocalPlayer == true)
 				if (killer.character is Axl axl && killer.copyShotDamageEvents.Any(c => c.character == this)) {
 					axl.addDNACore(this);
 				}

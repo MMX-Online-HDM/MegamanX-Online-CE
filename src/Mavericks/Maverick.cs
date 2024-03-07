@@ -946,11 +946,11 @@ public class Maverick : Actor, IDamagable {
 		deductLabelY(labelHealthOffY);
 	}
 
-	public void drawName(string overrideName = "", Color? overrideColor = null, Color? overrideTextColor = null) {
+	public void drawName(string overrideName = "", FontType? overrideColor = null) {
 		string playerName = player.name;
-		Color playerColor = Helpers.DarkBlue;
-		if (Global.level.gameMode.isTeamMode) {
-			playerColor = player.alliance == GameMode.blueAlliance ? Helpers.DarkBlue : Helpers.DarkRed;
+		FontType playerColor = FontType.Grey;
+		if (Global.level.gameMode.isTeamMode && player.alliance < Global.level.server.teamNum) {
+			playerColor = Global.level.gameMode.teamFonts[player.alliance];
 		}
 
 		if (!string.IsNullOrEmpty(overrideName)) playerName = overrideName;
@@ -959,8 +959,10 @@ public class Maverick : Actor, IDamagable {
 		float textPosX = pos.x;
 		float textPosY = pos.y + currentLabelY - 8;
 
-		DrawWrappers.DrawText(playerName, textPosX, textPosY, Alignment.Center, true, 0.75f,
-			overrideTextColor ?? Color.White, playerColor, style: overrideTextColor == null ? Text.Styles.Regular : Text.Styles.Italic, 1, true, ZIndex.HUD);
+		Fonts.drawText(
+			playerColor, playerName, textPosX, textPosY,
+			Alignment.Center, true, depth: ZIndex.HUD
+		);
 
 		deductLabelY(labelNameOffY);
 	}

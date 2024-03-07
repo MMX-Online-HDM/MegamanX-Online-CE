@@ -1691,7 +1691,10 @@ public partial class Level {
 				float textPosX = navMeshNode.pos.x - Global.level.camX / Global.viewSize;
 				float textPosY = (navMeshNode.pos.y - 20 - Global.level.camY) / Global.viewSize;
 				DrawWrappers.DrawRect(navMeshNode.pos.x - 10, navMeshNode.pos.y - 10, navMeshNode.pos.x + 10, navMeshNode.pos.y + 10, true, new Color(0, 255, 0, 128), 1, ZIndex.HUD + 100, true);
-				DrawWrappers.DrawText(navMeshNode.name, navMeshNode.pos.x, navMeshNode.pos.y - 20, Alignment.Center, true, 0.75f, Color.White, Color.Black, Text.Styles.Regular, 1, true, ZIndex.HUD);
+				Fonts.drawText(
+					FontType.Grey, navMeshNode.name, navMeshNode.pos.x, navMeshNode.pos.y - 20,
+					Alignment.Center, true, depth: ZIndex.HUD
+				);
 				//Helpers.drawTextStd(navMeshNode.name, textPosX, textPosY, Alignment.Center, fontSize: 24);
 			}
 		}

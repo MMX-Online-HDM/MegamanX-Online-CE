@@ -25,6 +25,7 @@ public class JoinMenuP2P : IMainMenu {
 		config.EnableMessageType(NetIncomingMessageType.UnconnectedData);
 		config.AutoFlushSendQueue = false;
 		config.ConnectionTimeout = Server.connectionTimeoutSeconds;
+		config.Port = Global.clientPort;
 		// Create client.
 		var netClient = new NetClient(config);
 		this.netClient = netClient;
@@ -323,10 +324,21 @@ public static class MasterServerData {
 	#pragma warning disable SYSLIB0014
 	public static void updateMasterServerURL() {
 		if (Helpers.FileExists("./serverurl.txt")) {
+			bool foundAdress = false;
 			string contents = Helpers.ReadFromFile("./serverurl.txt");
 			string[] portUrl = contents.Split(":");
-			serverIp = System.Net.Dns.GetHostAddresses(portUrl[0])[0].ToString();
-			serverPort = Int32.Parse(portUrl[1]);
+			IPAddress[] addresses = System.Net.Dns.GetHostAddresses(portUrl[0]);
+			serverIp = "";
+			foreach(IPAddress address in addresses) {
+				if (address.AddressFamily != System.Net.Sockets.AddressFamily.InterNetworkV6) {
+					serverIp = address.ToString();
+					foundAdress = true;
+					break;
+				}
+			}
+			if (foundAdress) {
+				serverPort = Int32.Parse(portUrl[1]);
+			}
 			return;
 		}
 		try {
