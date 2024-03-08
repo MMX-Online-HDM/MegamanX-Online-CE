@@ -88,11 +88,12 @@ public partial class Player {
 
 	public bool canUpgradeXArmor() {
 		return (
-			character is MegamanX mmx &&
 			!isDisguisedAxl &&
+			character is MegamanX mmx &&
 			mmx.isHyperX != true &&
 			mmx.charState is not XRevive &&
-			mmx.charState is not XReviveStart
+			mmx.charState is not XReviveStart ||
+			limboChar is MegamanX
 		);
 	}
 
@@ -920,12 +921,16 @@ public partial class Player {
 			previousLoadout = loadout;
 			applyLoadoutChange();
 			hyperChargeSlot = Global.level.is1v1() ? 0 : Options.main.hyperChargeSlot;
-			currentMaverickCommand = Options.main.maverickStartFollow ? MaverickAIBehavior.Follow : MaverickAIBehavior.Defend;
+			currentMaverickCommand = (
+				Options.main.maverickStartFollow ? MaverickAIBehavior.Follow : MaverickAIBehavior.Defend
+			);
 		} else if (isAI && Global.level.isTraining()) {
 			previousLoadout = loadout;
 			applyLoadoutChange();
 			hyperChargeSlot = Global.level.is1v1() ? 0 : Options.main.hyperChargeSlot;
-			currentMaverickCommand = Options.main.maverickStartFollow ? MaverickAIBehavior.Follow : MaverickAIBehavior.Defend;
+			currentMaverickCommand = (
+				Options.main.maverickStartFollow ? MaverickAIBehavior.Follow : MaverickAIBehavior.Defend
+			);
 		}
 
 		configureWeapons();

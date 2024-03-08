@@ -824,8 +824,7 @@ public partial class Character : Actor, IDamagable {
 
 	public override void update() {
 		if (charState is not InRideChaser) {
-			camOffsetX = Helpers.lerp(camOffsetX, 0, Global.spf * 10);
-			camOffsetX = MathF.Round(camOffsetX);
+			camOffsetX = MathInt.Round(Helpers.lerp(camOffsetX, 0, 10));
 		}
 
 		Helpers.decrementTime(ref limboRACheckCooldown);
@@ -1717,7 +1716,7 @@ public partial class Character : Actor, IDamagable {
 		return pos.addxy(0, yOff);
 	}
 
-	public float camOffsetX;
+	public int camOffsetX;
 
 
 	public virtual Actor getFollowActor() {
@@ -1735,27 +1734,27 @@ public partial class Character : Actor, IDamagable {
 
 	public virtual Point getCamCenterPos(bool ignoreZoom = false) {
 		if (mk5RideArmorPlatform != null) {
-			return mk5RideArmorPlatform.pos.addxy(0, -70);
+			return mk5RideArmorPlatform.pos.round().addxy(0, -70);
 		}
 		if (player.isSigma) {
 			var maverick = player.currentMaverick;
 			if (maverick != null && player.isTagTeam()) {
 				if (maverick.state is MEnter me) {
-					return me.getDestPos().addxy(camOffsetX, -24);
+					return me.getDestPos().round().addxy(camOffsetX, -24);
 				}
 				if (maverick.state is MorphMCHangState hangState) {
 					return maverick.pos.addxy(camOffsetX, -24 + 17);
 				}
-				return maverick.pos.addxy(camOffsetX, -24);
+				return maverick.pos.round().addxy(camOffsetX, -24);
 			}
 
 			if (player.isViralSigma()) {
-				return pos.addxy(camOffsetX, 25);
+				return pos.round().addxy(camOffsetX, 25);
 			}
 
 			if (player.isKaiserSigma()) {
 				if (sprite.name.StartsWith("sigma3_kaiser_virus")) return pos.addxy(camOffsetX, -12);
-				return pos.addxy(camOffsetX, -55);
+				return pos.round().addxy(camOffsetX, -55);
 			}
 
 			if (player.weapon is WolfSigmaHandWeapon handWeapon && handWeapon.hand.isControlling) {
@@ -1778,7 +1777,7 @@ public partial class Character : Actor, IDamagable {
 						camCenter.y += Math.Max(remainder, 0) * sign;
 					}
 
-					return camCenter;
+					return camCenter.round();
 				}
 			}
 
@@ -1790,9 +1789,9 @@ public partial class Character : Actor, IDamagable {
 			if (ownedByLocalPlayer && rideArmor.rideArmorState is RADropIn) {
 				return (rideArmor.rideArmorState as RADropIn).spawnPos.addxy(0, -24);
 			}
-			return rideArmor.pos.addxy(camOffsetX, -24);
+			return rideArmor.pos.round().addxy(camOffsetX, -24);
 		}
-		return pos.addxy(camOffsetX, -30);
+		return pos.round().addxy(camOffsetX, -30);
 	}
 
 	public Point? getHeadPos() {

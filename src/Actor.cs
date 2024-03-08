@@ -1087,8 +1087,8 @@ public partial class Actor : GameObject {
 		}
 		//console.log(this.pos.x + "," + this.pos.y);
 
-		var drawX = pos.x;
-		var drawY = pos.y;
+		var drawX = MathF.Round(pos.x);
+		var drawY = MathF.Round(pos.y);
 
 		if (customAngleRendering) {
 			renderFromAngle(x, y);

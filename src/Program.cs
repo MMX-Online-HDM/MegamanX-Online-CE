@@ -181,7 +181,7 @@ class Program {
 
 		// Loading with GUI.
 		loadText.Add("Getting Masterserver URL...");
-		//loadMultiThread(loadText, window, MasterServerData.updateMasterServerURL);
+		loadMultiThread(loadText, window, MasterServerData.updateMasterServerURL);
 		if (MasterServerData.serverIp == "127.0.0.1") {
 			loadText[loadText.Count - 1] = "Using local conection.";
 		} else {
@@ -694,6 +694,24 @@ class Program {
 		}
 	}
 
+	static string getFileBlobMD5(Dictionary<string, string> fileNamesToContents) {
+		string entireBlob = "";
+		var keys = fileNamesToContents.Keys.ToList();
+		keys.Sort(Helpers.invariantStringCompare);
+
+		foreach (var key in keys) {
+			entireBlob += key.ToLowerInvariant() + " " + fileNamesToContents[key];
+		}
+		var md5 = System.Security.Cryptography.MD5.Create();
+		return BitConverter.ToString(
+			md5.ComputeHash(
+				System.Text.Encoding.UTF8.GetBytes(entireBlob)
+			)
+		).Replace(
+			"-", String.Empty
+		);
+	}
+
 	static void addToFileChecksumBlob(Dictionary<string, string> fileNamesToContents) {
 		string entireBlob = "";
 		var keys = fileNamesToContents.Keys.ToList();
@@ -731,7 +749,7 @@ class Program {
 				Global.levelDatas.Add(levelData.name, levelData);
 			}
 		}
-		addToFileChecksumBlob(fileChecksumDict);
+		Global.fileChecksumBlob += "-" + getFileBlobMD5(fileChecksumDict);
 
 		var customLevelPaths = Helpers.getFiles(Global.assetPath + "assets/maps_custom", true, "json");
 		foreach (string levelPath in customLevelPaths) {
@@ -767,7 +785,7 @@ class Program {
 			);
 		}
 
-		int fileSplit = MathInt.Floor(spriteFilePaths.Count() / 8);
+		int fileSplit = MathInt.Floor(spriteFilePaths.Count() / 6);
 		string[][] treadedFilePaths;
 		// Use multitread if loading 20 or more sprites.
 		if (spriteFilePaths.Length >= 20) {
@@ -777,12 +795,13 @@ class Program {
 				spriteFilePaths[(fileSplit*2+1)..(fileSplit*3)],
 				spriteFilePaths[(fileSplit*3+1)..(fileSplit*4)],
 				spriteFilePaths[(fileSplit*4+1)..(fileSplit*5)],
-				spriteFilePaths[(fileSplit*5+1)..(fileSplit*6)],
-				spriteFilePaths[(fileSplit*7+1)..]
+				spriteFilePaths[(fileSplit*5+1)..],
 			};
+			string[] fileChecksums = new string[6];
 			List<Thread> threads = new();
-			foreach (string[] filePath2 in treadedFilePaths) {
-				Thread tempThread = new Thread(() => { loadSpritesSub(filePath2); });
+			for (int i = 0; i < treadedFilePaths.Length; i++) {
+				int j = i;
+				Thread tempThread = new Thread(() => { fileChecksums[j] = loadSpritesSub(treadedFilePaths[j]); });
 				threads.Add(tempThread);
 				tempThread.Start();
 			}
@@ -794,8 +813,12 @@ class Program {
 					}
 				}
 			}
+			foreach (string fileChecksum in fileChecksums) {
+				Global.fileChecksumBlob += "-" + fileChecksum;
+			}
 		} else {
-			loadSpritesSub(spriteFilePaths);
+			string fileChecksum = loadSpritesSub(spriteFilePaths);
+			Global.fileChecksumBlob += "-" + fileChecksum;
 		}
 		// Override sprite mods
 		string overrideSpriteSource = "assets/sprites_visualmods";
@@ -825,7 +848,7 @@ class Program {
 		}
 	}
 
-	static void loadSpritesSub(string[] spriteFilePaths) {
+	static string loadSpritesSub(string[] spriteFilePaths) {
 		Dictionary<string, string> fileChecksumDict = new();
 		foreach (string spriteFilePath in spriteFilePaths) {
 			string name = Path.GetFileNameWithoutExtension(spriteFilePath);
@@ -839,9 +862,7 @@ class Program {
 				Global.sprites[sprite.name] = sprite;
 			}
 		}
-		lock (Global.fileChecksumBlob) {
-			addToFileChecksumBlob(fileChecksumDict);
-		}
+		return getFileBlobMD5(fileChecksumDict);
 	}
 
 	static void loadSounds() {
@@ -857,7 +878,7 @@ class Program {
 			fileChecksumDict[name] = "";
 			Global.soundBuffers.Add(name, new SoundBufferWrapper(name, file, SoundPool.Regular));
 		}
-		addToFileChecksumBlob(fileChecksumDict);
+		//addToFileChecksumBlob(fileChecksumDict);
 
 		// Voices
 		var voiceNames = Helpers.getFiles(Global.assetPath + "assets/voices", true, "ogg", "wav");

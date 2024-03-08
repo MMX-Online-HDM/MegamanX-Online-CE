@@ -414,6 +414,7 @@ public class Server {
 			*/
 			s_server = new NetServer(config);
 			s_server.Start();
+			s_server.UPnP.ForwardPort(config.Port, "XOD P2P", s_server.Port);
 			if (uniqueID == 0) {
 				uniqueID = s_server.UniqueIdentifier;
 			}
@@ -491,6 +492,7 @@ public class Server {
 		s_server.FlushSendQueue();
 		s_server.Shutdown(reason);
 		s_server.FlushSendQueue();
+		s_server.UPnP.DeleteForwardingRule(s_server.Port);
 		servers.Remove(this, out _);
 		shutdownVar = true;
 	}
