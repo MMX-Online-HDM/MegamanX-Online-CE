@@ -124,7 +124,7 @@ public class WaitMenu : IMainMenu {
 							}
 						}
 						if (isRight) {
-							player.alliance--;
+							player.alliance++;
 							if (player.alliance >= server.teamNum) {
 								player.alliance = 0;
 							}

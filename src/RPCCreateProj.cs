@@ -22,7 +22,8 @@ public partial class RPCCreateProj : RPC {
 		float angle = 0;
 		float byteAngle = 0;
 		if (dataInf[0]) {
-			xDir = (int)arguments[14] - 128;
+			xDir = arguments[14];
+			xDir -= 128;
 		} else {
 			byteAngle = arguments[14];
 			angle = byteAngle * 1.40625f;

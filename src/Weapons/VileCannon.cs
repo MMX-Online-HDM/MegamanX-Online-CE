@@ -231,6 +231,9 @@ public class CannonAttack : CharState {
 			shootPos, muzzleSprite, vile.getShootXDir(), player.getNextActorNetId(), true, true, host: vile
 		);
 		muzzle.angle = new Point(shootVel.x, vile.getShootXDir() * shootVel.y).angle;
+		if (vile.getShootXDir() == -1) {
+			shootVel = new Point(shootVel.x * vile.getShootXDir(), shootVel.y);
+		}
 
 		new VileCannonProj(
 			player.weapons.FirstOrDefault(w => w is VileCannon) as VileCannon,

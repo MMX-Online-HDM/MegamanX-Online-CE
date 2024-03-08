@@ -877,10 +877,14 @@ public partial class Character : Actor, IDamagable {
 			removeRenderEffect(RenderEffectType.BlueShadow);
 			removeRenderEffect(RenderEffectType.RedShadow);
 
-			if (alliance == GameMode.blueAlliance) {
-				addRenderEffect(RenderEffectType.BlueShadow);
-			} else {
-				addRenderEffect(RenderEffectType.RedShadow);
+			if (Global.level.server.teamNum == 2) {
+				if (alliance == GameMode.blueAlliance) {
+					addRenderEffect(RenderEffectType.BlueShadow);
+				} else {
+					addRenderEffect(RenderEffectType.RedShadow);
+				}
+			} else if (!player.isMainPlayer && alliance == Global.level.mainPlayer.alliance) {
+				addRenderEffect(RenderEffectType.GreenShadow);
 			}
 		}
 

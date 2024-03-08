@@ -798,7 +798,6 @@ public class Server {
 			om.Write((byte)RPC.templates.IndexOf(RPC.kickPlayerResponse));
 			om.Write(kickPlayerJson);
 			s_server.SendToAll(om, rpcTemplate.netDeliveryMethod, 0);
-
 		} else if (rpcTemplate is RPCUpdatePlayer) {
 			ushort argCount = BitConverter.ToUInt16(im.ReadBytes(2), 0);
 			var bytes = im.ReadBytes((int)argCount);

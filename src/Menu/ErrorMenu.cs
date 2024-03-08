@@ -26,7 +26,7 @@ public class ErrorMenu : IMainMenu {
 	}
 
 	public void render() {
-		float top = Global.screenH * 0.4f;
+		float top = 22;
 
 		if (inGame) {
 			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0);
@@ -34,16 +34,20 @@ public class ErrorMenu : IMainMenu {
 			DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
 		}
 
-		int i = 0;
-		for (; i < error.Length; i++) {
+		Fonts.drawText(
+			FontType.Red, error[0], Global.screenW / 2, top,
+			alignment: Alignment.Center
+		);
+		for (int i = 1; i < error.Length; i++) {
 			Fonts.drawText(
-				FontType.Red, error[i], Global.screenW / 2, top + (i * 20),
+				FontType.Blue, error[i],
+				Global.screenW / 2, top + (i * 20),
 				alignment: Alignment.Center
 			);
 		}
 		Fonts.drawTextEX(
 			FontType.Grey, "Press [OK] to continue",
-			Global.screenW / 2, top + (i * 20), alignment: Alignment.Center
+			Global.screenW / 2, Global.screenH - 32, alignment: Alignment.Center
 		);
 	}
 }

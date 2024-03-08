@@ -166,10 +166,14 @@ public class Mechaniloid : Actor, IDamagable {
 		if (player == Global.level.mainPlayer) {
 			addRenderEffect(RenderEffectType.GreenShadow);
 		} else if (Global.level.gameMode.isTeamMode) {
-			if (player.alliance == GameMode.blueAlliance) {
-				addRenderEffect(RenderEffectType.BlueShadow);
-			} else {
-				addRenderEffect(RenderEffectType.RedShadow);
+			if (Global.level.server.teamNum == 2) {
+				if (player.alliance == GameMode.blueAlliance) {
+					addRenderEffect(RenderEffectType.BlueShadow);
+				} else {
+					addRenderEffect(RenderEffectType.RedShadow);
+				}
+			} else if (player.alliance == Global.level.mainPlayer.alliance) {
+				addRenderEffect(RenderEffectType.GreenShadow);
 			}
 		}
 

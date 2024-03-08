@@ -338,8 +338,11 @@ public class RayGunAltProj : Projectile {
 
 public class SplashLaserProj : Projectile {
 	public float maxSpeed = 400;
-	public SplashLaserProj(Weapon weapon, Point pos, Player player, Point bulletDir, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, 1, 400, 1, player, "splashlaser_proj", 0, 0.3f, netProjId, player.ownedByLocalPlayer) {
+	public SplashLaserProj(
+		Weapon weapon, Point pos, Player player, Point bulletDir, ushort netProjId, bool sendRpc = false
+	) : base(
+		weapon, pos, 1, 400, 1, player, "splashlaser_proj", 0, 0.3f, netProjId, player.ownedByLocalPlayer
+	) {
 		fadeSprite = "splashlaser_fade";
 		projId = (int)ProjIds.SplashLaser;
 		maxTime = 0.4f;
@@ -351,7 +354,7 @@ public class SplashLaserProj : Projectile {
 		shouldShieldBlock = false;
 		updateAngle();
 		if (sendRpc) {
-			rpcCreateAngle(pos, player, netProjId, getRpcAngle());
+			rpcCreateByteAngle(pos, player, netProjId, bulletDir.byteAngle);
 		}
 		destroyOnHitWall = true;
 	}

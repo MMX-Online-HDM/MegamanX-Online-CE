@@ -51,7 +51,6 @@ public class GameMode {
 		FontType.Green,
 		FontType.Purple,
 		FontType.Yellow,
-		FontType.Yellow,
 		FontType.Orange
 	};
 
@@ -2401,7 +2400,7 @@ public class GameMode {
 			(padding, top + 32),
 			(padding + 236, top + 32),
 			(padding + 118, top + 32),
-			(padding, top + 100),
+			(padding, top + 116),
 			(padding + 236, top + 116),
 			(padding + 118, top + 116),
 		};
@@ -2876,7 +2875,7 @@ public class GameMode {
 			}
 		}
 		if (moreThanOneLeader) {
-			Fonts.drawText(teamFonts[teamSide], $"Leader: {leaderScore}", 5, 5);
+			Fonts.drawText(teamFonts[teamSide], $"Leader: {leaderScore}", 5, 15);
 		} else {
 			Fonts.drawText(FontType.Grey, $"Leader: {leaderScore}", 5, 5);
 		}

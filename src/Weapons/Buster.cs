@@ -71,10 +71,10 @@ public class Buster : Weapon {
 				_ when (
 					player.character.stockedCharge
 				) => "",
-				0 => "buster", //i have to rip the sound of this one
+				0 => "buster",
 				1 => "buster2X2",
 				2 => "buster3X2",
-				3 => "", //haha this causes bugs
+				3 => "",
 				_ => shootSound
 			};
 		} else if (player.hasArmArmor(ArmorId.Max)) {
@@ -103,7 +103,9 @@ public class Buster : Weapon {
 			new Anim(pos, "buster_unpo_muzzle", xDir, null, true);
 			shootSound = "buster2";
 		} else if (player.character.stockedCharge) {
-			player.character.changeState(new X2ChargeShot(1), true);
+			if (player.ownedByLocalPlayer) {
+				player.character.changeState(new X2ChargeShot(1), true);
+			}
 		} else if (chargeLevel == 0) {
 			lemonsOnField.Add(new BusterProj(this, pos, xDir, 0, player, netProjId));
 		} else if (chargeLevel == 1) {
@@ -111,13 +113,24 @@ public class Buster : Weapon {
 		} else if (chargeLevel == 2) {
 			new Buster3Proj(this, pos, xDir, 0, player, netProjId);
 		} else if (chargeLevel >= 3) {
-			if (hasUltArmor) {
+			if (hasUltArmor && !player.hasArmArmor(3)) {
 				if (player.hasArmArmor(2)) {
-					player.character.changeState(new X2ChargeShot(2), true);
+					if (player.ownedByLocalPlayer) {
+						player.character.changeState(new X2ChargeShot(2), true);
+					}
+					shootSound = "";
 				} else {
 					new Anim(pos.clone(), "buster4_muzzle_flash", xDir, null, true);
 					new BusterPlasmaProj(this, pos, xDir, player, netProjId);
 					shootSound = "plasmaShot";
+				}
+			} else if (player.hasArmArmor(3)) {
+				if (player.ownedByLocalPlayer) {
+					if (player.character.charState is not WallSlide) {
+						shootTime = 0;
+					}
+					player.character.changeState(new X3ChargeShot(null), true);
+					shootSound = "";
 				}
 			} else if (player.hasArmArmor(0) || player.hasArmArmor(1)) {
 				new Anim(pos.clone(), "buster4_muzzle_flash", xDir, null, true);
@@ -140,18 +153,12 @@ public class Buster : Weapon {
 						shootTime = 0;
 					}
 					player.character.changeState(new X2ChargeShot(0), true);
-				}
-			} else if (player.hasArmArmor(3)) {
-				if (player.ownedByLocalPlayer) {
-					if (player.character.charState is not WallSlide) {
-						shootTime = 0;
-					}
-					player.character.changeState(new X3ChargeShot(null), true);
+					shootSound = "";
 				}
 			}
 		}
 
-		if (player?.character?.ownedByLocalPlayer == true) {
+		if (player?.character?.ownedByLocalPlayer == true && shootSound != "") {
 			player.character.playSound(shootSound, sendRpc: true);
 		}
 	}
@@ -490,15 +497,26 @@ public class X3ChargeShot : CharState {
 		if (!fired && character.currentFrame.getBusterOffset() != null) {
 			fired = true;
 			if (state == 0) {
-				new Anim(
-					character.getShootPos(), "buster4_x3_muzzle", character.getShootXDir(),
-					player.getNextActorNetId(), true, sendRpc: true
-				);
-				new Buster3Proj(
-					player.weapon, character.getShootPos(), character.getShootXDir(),
-					3, player, player.getNextActorNetId(), rpc: true
-				);
-				//character.playSound("buster3X3", sendRpc: true);
+				Point shootPos = character.getShootPos();
+				int shootDir = character.getShootXDir();
+				if (!player.hasUltimateArmor()) {
+					new Anim(
+						shootPos, "buster4_x3_muzzle", shootDir,
+						player.getNextActorNetId(), true, sendRpc: true
+					);
+					new Buster3Proj(
+						player.weapon, shootPos, shootDir,
+						3, player, player.getNextActorNetId(), rpc: true
+					);
+					character.playSound("buster3X3", sendRpc: true);
+				} else {
+					new Anim(shootPos, "buster4_muzzle_flash", shootDir, null, true);
+					new BusterPlasmaProj(
+						player.weapon, shootPos, shootDir,
+						player, player.getNextActorNetId(), rpc: true
+					);
+					character.playSound("plasmaShot", sendRpc: true);
+				}
 			} else {
 				if (hyperBusterWeapon != null) {
 					hyperBusterWeapon.ammo -= hyperBusterWeapon.getChipFactoredAmmoUsage(player);
