@@ -1,13 +1,6 @@
-﻿using Newtonsoft.Json;
-using SFML.Graphics;
-using SFML.System;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+using SFML.Graphics;
 using static SFML.Window.Keyboard;
 
 namespace MMXOnline;
@@ -166,6 +159,7 @@ public class MainMenu : IMainMenu {
 				localServer.players = new List<ServerPlayer>() { me };
 
 				Global.level = new Level(localServer.getLevelData(), SelectCharacterMenu.playerData, localServer.extraCpuCharData, false);
+				Global.level.teamNum = localServer.teamNum;
 				Global.level.startLevel(localServer, false);
 			}
 		}
@@ -236,7 +230,7 @@ public class MainMenu : IMainMenu {
 				FontType.Blue, "Loading...", Global.screenW / 2, top, alignment: Alignment.Center
 			);
 		} else {
-			string versionText = "v" + "20" + " " + Global.shortForkName;
+			string versionText = "v" + Global.version + " " + Global.subVersionShortName + " " + Global.shortForkName;
 			/*
 			if (Helpers.compareVersions(Global.version, Global.serverVersion) == -1 &&
 				Global.serverVersion != decimal.MaxValue
@@ -250,7 +244,7 @@ public class MainMenu : IMainMenu {
 				offset += 10;
 			}
 			Fonts.drawText(FontType.DarkBlue, versionText, 2, offset);
-			
+
 		}
 	}
 }

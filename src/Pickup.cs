@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace MMXOnline;
+﻿namespace MMXOnline;
 
 public enum PickupType {
 	Health,

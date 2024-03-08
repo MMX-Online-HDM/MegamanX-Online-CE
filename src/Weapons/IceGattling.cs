@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace MMXOnline;
 
@@ -98,7 +94,7 @@ public class GaeaShieldProj : Projectile {
 		base(weapon, pos, 1, 0, 0, player, "gaea_shield_proj", 0, 1, netProjId, player.ownedByLocalPlayer) {
 		maxTime = 10;
 		axl = (player.character as Axl);
-		
+
 		if (axl?.isWhiteAxl() == true) {
 			maxTime = 10;
 		}
@@ -134,7 +130,7 @@ public class GaeaShieldProj : Projectile {
 	public override void postUpdate() {
 		base.postUpdate();
 		if (!ownedByLocalPlayer ||
-			destroyed || 
+			destroyed ||
 			axl == null
 		) {
 			return;

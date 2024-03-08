@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using SFML.Graphics;
-using SFML.System;
-using SFML.Audio;
-using SFML.Window;
-using static SFML.Window.Keyboard;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Globalization;
-using Lidgren.Network;
+using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
+using Lidgren.Network;
+using SFML.Audio;
+using SFML.Graphics;
+using SFML.System;
+using SFML.Window;
+using static SFML.Window.Keyboard;
 
 namespace MMXOnline;
 
@@ -447,8 +447,8 @@ class Program {
 	private static void onWindowResized(object sender, SizeEventArgs e) {
 		// Compares the aspect ratio of the window to the aspect ratio of the view,
 		// and sets the view's viewport accordingly in order to archieve a letterbox effect.
-		float windowRatio = (float)Global.window.Size.X / (float)Global.window.Size.Y;
-		float viewRatio = (float)Global.view.Size.X / (float)Global.view.Size.Y;
+		float windowRatio = Global.window.Size.X / (float)Global.window.Size.Y;
+		float viewRatio = Global.view.Size.X / Global.view.Size.Y;
 		float sizeX = 1;
 		float sizeY = 1;
 		float posX = 0;
@@ -791,11 +791,11 @@ class Program {
 		if (spriteFilePaths.Length >= 20) {
 			treadedFilePaths = new string[][] {
 				spriteFilePaths[..fileSplit],
-				spriteFilePaths[(fileSplit+1)..(fileSplit*2)],
-				spriteFilePaths[(fileSplit*2+1)..(fileSplit*3)],
-				spriteFilePaths[(fileSplit*3+1)..(fileSplit*4)],
-				spriteFilePaths[(fileSplit*4+1)..(fileSplit*5)],
-				spriteFilePaths[(fileSplit*5+1)..],
+				spriteFilePaths[(fileSplit)..(fileSplit*2)],
+				spriteFilePaths[(fileSplit*2)..(fileSplit*3)],
+				spriteFilePaths[(fileSplit*3)..(fileSplit*4)],
+				spriteFilePaths[(fileSplit*4)..(fileSplit*5)],
+				spriteFilePaths[(fileSplit*5)..],
 			};
 			string[] fileChecksums = new string[6];
 			List<Thread> threads = new();

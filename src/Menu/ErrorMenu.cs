@@ -1,6 +1,4 @@
-﻿using SFML.Graphics;
-
-namespace MMXOnline;
+﻿namespace MMXOnline;
 
 public class ErrorMenu : IMainMenu {
 	string[] error;

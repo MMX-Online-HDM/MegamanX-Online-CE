@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace MMXOnline;
 
@@ -1141,7 +1140,7 @@ public class FindPlayer : AIState {
 		stuckTime = 0;
 		if (Global.level.gameMode is Race) {
 			destNode = Global.level.goalNode;
-		} else if (Global.level.gameMode is CTF) {
+		} else if (Global.level.gameMode is CTF && player.alliance < 1) {
 			if (character.flag == null) {
 				Flag targetFlag = null;
 				if (player.alliance == GameMode.redAlliance) targetFlag = Global.level.blueFlag;

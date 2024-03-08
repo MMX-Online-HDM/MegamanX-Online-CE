@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MMXOnline;
 
@@ -165,7 +162,7 @@ public class VileCannonProj : Projectile {
 		this.byteAngle = byteAngle;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreateByteAngle(pos, player, netProjId, byteAngle);
 		}
 	}
 
@@ -186,7 +183,7 @@ public class VileCannonProj : Projectile {
 
 public class CannonAttack : CharState {
 	bool isGizmo;
-	
+
 	public CannonAttack(bool isGizmo, bool grounded) : base(getSprite(isGizmo, grounded), "", "", "") {
 		this.isGizmo = isGizmo;
 	}
@@ -216,7 +213,7 @@ public class CannonAttack : CharState {
 		if (vile.sprite.getCurrentFrame().POIs.IsNullOrEmpty()) {
 			return;
 		}
-        Point shootVel = vile.getVileShootVel(true);
+		Point shootVel = vile.getVileShootVel(true);
 
 		var player = vile.player;
 		vile.playSound("frontrunner", sendRpc: true);

@@ -1,10 +1,7 @@
-﻿using ProtoBuf;
-using SFML.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using static SFML.Window.Keyboard;
+using ProtoBuf;
+using SFML.Graphics;
 
 namespace MMXOnline;
 
@@ -299,15 +296,15 @@ public class SelectCharacterMenu : IMainMenu {
 		);
 
 		string[] description = playerData.charNum switch {
-		 	0 => new string[]{
+			0 => new string[]{
 				"A versatile marksman whose arsenal can",
 				"accommodate a variety of different play styles."
 			},
-			1 => new string[]{"Powerful melee warrior", "with high damage combos."},
-			2 => new string[]{"Unpredictable threat that can self-revive", "and call down Ride Armors."},
-			3 => new string[]{"Precise and deadly close range assassin", "with aiming and rapid fire capabilities."},
-			4 => new string[]{"A fearsome military commander that can", "summon Mavericks on the battlefield."},
-			_ => new string[]{"ERROR"}
+			1 => new string[] { "Powerful melee warrior", "with high damage combos." },
+			2 => new string[] { "Unpredictable threat that can self-revive", "and call down Ride Armors." },
+			3 => new string[] { "Precise and deadly close range assassin", "with aiming and rapid fire capabilities." },
+			4 => new string[] { "A fearsome military commander that can", "summon Mavericks on the battlefield." },
+			_ => new string[] { "ERROR" }
 		};
 		if (description.Length > 0) {
 			DrawWrappers.DrawRect(

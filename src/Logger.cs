@@ -89,7 +89,7 @@ public class Logger {
 			File.WriteAllText(Global.writePath + "crashlogs/" + dateName + ".txt", crashDump);
 		} catch { }
 	}
-	
+
 	public static void LogNonFatalError(string error) {
 		try {
 			if (!Directory.Exists(Global.writePath + "errorlogs")) {

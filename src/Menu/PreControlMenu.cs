@@ -1,9 +1,5 @@
-﻿using SFML.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MMXOnline;
 
@@ -116,7 +112,7 @@ public class PreControlMenu : IMainMenu {
 
 		Fonts.drawTextEX(
 			FontType.Grey, "[OK]: Choose, [BACK]: Back",
-			Global.halfScreenW,Global.screenH - 16, Alignment.Center
+			Global.halfScreenW, Global.screenH - 16, Alignment.Center
 		);
 	}
 

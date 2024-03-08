@@ -1,9 +1,7 @@
-﻿using Lidgren.Network;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
+using Lidgren.Network;
 
 namespace MMXOnline;
 
@@ -315,7 +313,7 @@ public class RPCUpdateActor : RPC {
 			yScale = arguments[i++] / 20f;
 		}
 		if (maskBools[3]) {
-			frameIndex = (int)arguments[i];
+			frameIndex = arguments[i];
 			i++;
 		}
 		if (maskBools[4]) {

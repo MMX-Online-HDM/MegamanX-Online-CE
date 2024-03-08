@@ -1,9 +1,7 @@
-﻿using SFML.Audio;
-using SFML.Window;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
-using System.Text;
+using SFML.Audio;
+using SFML.Window;
 
 namespace MMXOnline;
 

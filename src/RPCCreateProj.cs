@@ -1,5 +1,5 @@
-﻿using Lidgren.Network;
-using System;
+﻿using System;
+using Lidgren.Network;
 
 namespace MMXOnline;
 
@@ -12,18 +12,18 @@ public partial class RPCCreateProj : RPC {
 		// Data of the array.
 		bool[] dataInf = Helpers.byteToBoolArray(arguments[0]);
 		// Always present values.
-		ushort projId = BitConverter.ToUInt16(new byte[] { arguments[1], arguments[2] }, 0);
-		float xPos = BitConverter.ToSingle(new byte[] { arguments[3], arguments[4], arguments[5], arguments[6] }, 0);
-		float yPos = BitConverter.ToSingle(new byte[] { arguments[7], arguments[8], arguments[9], arguments[10] }, 0);
-		var playerId = arguments[11];
-		var netProjByte = BitConverter.ToUInt16(new byte[] { arguments[12], arguments[13] }, 0);
+		var playerId = arguments[1];
+		ushort projId = BitConverter.ToUInt16(arguments[2..4], 0);
+		float xPos = BitConverter.ToSingle(arguments[4..8], 0);
+		float yPos = BitConverter.ToSingle(arguments[8..12], 0);
+		var netProjByte = BitConverter.ToUInt16(arguments[12..14], 0);
 		// Angle or Dir
 		int xDir = 1;
 		float angle = 0;
 		float byteAngle = 0;
-		if (dataInf[0]) {
+		if (!dataInf[0]) {
 			xDir = arguments[14];
-			xDir -= 128;
+			xDir -= 1;
 		} else {
 			byteAngle = arguments[14];
 			angle = byteAngle * 1.40625f;
@@ -55,7 +55,7 @@ public partial class RPCCreateProj : RPC {
 				byteAngle = byteAngle,
 				extraData = extraData
 			};
-			proj = functs[(int)projId](args);
+			proj = functs[projId](args);
 			return;
 		}
 
@@ -108,15 +108,15 @@ public partial class RPCCreateProj : RPC {
 		} else if (projId == (int)ProjIds.ChillPIceBlow) {
 			proj = new ShotgunIceProjCharged(new ShotgunIce(), pos, xDir, player, 1, true, netProjByte);
 		} else if (projId == (int)ProjIds.Rakuhouha) {
-			float velX = (float)arguments[extraDataIndex+1] * 100;
-			float velY = (float)arguments[extraDataIndex+2] * 100;
+			float velX = (float)arguments[extraDataIndex + 1] * 100;
+			float velY = (float)arguments[extraDataIndex + 2] * 100;
 			proj = new RakuhouhaProj(
 				new RakuhouhaWeapon(player), pos, false,
 				velX, velY, player, netProjByte, arguments[extraDataIndex]
 			);
 		} else if (projId == (int)ProjIds.CFlasher) {
-			float velX = (float)arguments[extraDataIndex+1] * 100;
-			float velY = (float)arguments[extraDataIndex+2] * 100;
+			float velX = (float)arguments[extraDataIndex + 1] * 100;
+			float velY = (float)arguments[extraDataIndex + 2] * 100;
 			proj = new RakuhouhaProj(
 				new CFlasher(player), pos, true,
 				velX, velY, player, netProjByte, arguments[extraDataIndex]
@@ -131,7 +131,7 @@ public partial class RPCCreateProj : RPC {
 			proj = new VileBombProj(new VileBall(VileBallType.ExplosiveRound), pos, xDir, player, 0, netProjByte);
 		} else if (projId == (int)ProjIds.VileBombSplit) {
 			proj = new VileBombProj(new VileBall(VileBallType.ExplosiveRound), pos, xDir, player, 1, netProjByte);
-		}  else if (projId == (int)ProjIds.MechMissile) {
+		} else if (projId == (int)ProjIds.MechMissile) {
 			proj = new MechMissileProj(new MechMissileWeapon(player), pos, xDir, false, player, netProjByte);
 		} else if (projId == (int)ProjIds.MechTorpedo) {
 			proj = new TorpedoProj(new MechTorpedoWeapon(player), pos, xDir, player, 2, netProjByte);

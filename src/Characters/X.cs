@@ -1,9 +1,6 @@
-﻿using SFML.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MMXOnline;
 
@@ -23,7 +20,7 @@ public partial class MegamanX : Character {
 	public List<BubbleSplashProjCharged> chargedBubbles = new List<BubbleSplashProjCharged>();
 	public StrikeChainProj strikeChainProj;
 	public GravityWellProjCharged chargedGravityWell;
-	public SpinningBladeProjCharged chargedSpinningBlade; 
+	public SpinningBladeProjCharged chargedSpinningBlade;
 	public FrostShieldProjCharged chargedFrostShield;
 	public TunnelFangProjCharged chargedTunnelFang;
 	public GravityWellProj gravityWell;
@@ -194,13 +191,12 @@ public partial class MegamanX : Character {
 				shoot(false);
 				player.weaponSlot = oldSlot;
 				player.changeWeaponSlot(oldSlot);
-			}
-			else if (
-				Options.main.novaStrikeSpecial &&
-				player.input.isPressed(Control.Special1, player) &&
-				player.weapons.Any(w => w is NovaStrike) &&
-				!inputDir.isZero()
-			) {
+			} else if (
+				  Options.main.novaStrikeSpecial &&
+				  player.input.isPressed(Control.Special1, player) &&
+				  player.weapons.Any(w => w is NovaStrike) &&
+				  !inputDir.isZero()
+			  ) {
 				int oldSlot = player.weaponSlot;
 				int novaStrikeSlot = player.weapons.FindIndex(w => w is NovaStrike);
 				player.changeWeaponSlot(novaStrikeSlot);
@@ -993,7 +989,7 @@ public partial class MegamanX : Character {
 		if (flag != null) return false;
 		if (player.weapons.Count == 0) return false;
 		if (weapon is AbsorbWeapon) return false;
-		
+
 		return true;
 	}
 
@@ -1021,7 +1017,7 @@ public partial class MegamanX : Character {
 
 	// Handles Bubble Splash Charged jump height
 
- 	public override float getJumpPower() {
+	public override float getJumpPower() {
 		float jumpModifier = 0;
 		jumpModifier += (chargedBubbles.Count / 6.0f) * 50;
 
@@ -1128,7 +1124,7 @@ public partial class MegamanX : Character {
 		}
 	}
 
-	
+
 	public bool canHeadbutt() {
 		if (!player.isX) return false;
 		if (!player.hasHelmetArmor(1)) return false;

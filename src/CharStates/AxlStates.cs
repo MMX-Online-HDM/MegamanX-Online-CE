@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 
 namespace MMXOnline;
@@ -70,7 +69,7 @@ public class Hover : CharState {
 
 		accuracy = 0;
 		Point prevPos = character.pos;
-		
+
 		if (character.pos.x != prevPos.x) {
 			accuracy = 5;
 		}
@@ -118,8 +117,7 @@ public class Hover : CharState {
 		base.onExit(newState);
 		character.useGravity = true;
 		hoverExhaust.destroySelf();
-		if (sound != null && !sound.deleted)
-		{
+		if (sound != null && !sound.deleted) {
 			sound.sound?.Stop();
 		}
 		RPC.stopSound.sendRpc("Axlhover", character.netId);

@@ -1,10 +1,10 @@
-﻿using Lidgren.Network;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Threading;
+using Lidgren.Network;
+using Newtonsoft.Json;
 
 namespace MMXOnline;
 
@@ -37,7 +37,7 @@ public class ServerClient {
 		NetOutgoingMessage hail = client.CreateMessage("a");
 		try {
 			client.Connect(serverIp, Global.basePort, hail);
-		} catch {}
+		} catch { }
 
 		return client;
 	}
@@ -97,7 +97,7 @@ public class ServerClient {
 		return null;
 	}
 
-	public static ServerClient CreateHolePunchAlt(
+	public static ServerClient CreateHolePunch(
 		NetClient client, long serverId, IPEndPoint serverIP, ServerPlayer inputServerPlayer,
 		out JoinServerResponse joinServerResponse, out string log
 	) {
@@ -107,47 +107,47 @@ public class ServerClient {
 		log = null;
 		// UDP Hole Punching happens here.
 		NetOutgoingMessage regMsg = client.CreateMessage();
-		regMsg.Write((byte)MasterServerMsg.ConnectPeers);
+		regMsg.Write((byte)MasterServerMsg.ConnectPeersShort);
 		regMsg.Write(serverId);
 		regMsg.Write(new IPEndPoint(NetUtility.GetMyAddress(out _), client.Port));
 		IPEndPoint masterServerLocation = NetUtility.Resolve(MasterServerData.serverIp, MasterServerData.serverPort);
 		client.SendUnconnectedMessage(regMsg, masterServerLocation);
 		client.FlushSendQueue();
-		log += "\nSent HolePunch message...";
-		// Create hail message for later.
-		NetOutgoingMessage hail = client.CreateMessage(JsonConvert.SerializeObject(inputServerPlayer)); 
+		NetOutgoingMessage hail = client.CreateMessage(JsonConvert.SerializeObject(inputServerPlayer));
 		// Wait for hole punching to happen.
+		log += "\nSent HolePunch message...";
 		int count = 0;
 		bool connected = false;
 		NetIncomingMessage msg;
-		Stopwatch clock = Stopwatch.StartNew();
-		while (clock.Elapsed.Seconds < 4 && !connected) {
+		while (count < 20) {
 			while ((msg = client.ReadMessage()) != null && !connected) {
 				if (msg.MessageType == NetIncomingMessageType.NatIntroductionSuccess) {
 					connected = true;
-					client.Connect(serverIP, hail);
 					log += "\nGot Connection MSG!";
-					Stopwatch clock2 = Stopwatch.StartNew();
+					client.Connect(msg.SenderEndPoint, hail);
+					Thread.Sleep(100);
 					goto exitLoop;
 				} else {
 					log += "\nGot other message.";
 					log += "\nMSG type:" + msg.MessageType.ToString();
 				}
 			}
-		}
-		clock.Reset();
-		// Do this if hole punch fails.
-		if (!connected && client.ConnectionsCount == 0) {
-			log += "\nFailed to holepunch, resorting to direct connection anyway.";
-			clock.Start();
-			client.Connect(serverIP, hail);
+			count++;
 			client.FlushSendQueue();
-			while (clock.Elapsed.Seconds < 4 && !connected) {
-				if (client.ConnectionsCount != 0) {
-					log += "\nConections active: " + client.Connections.Count;
-					connected = true;
-				}
+			Thread.Sleep(100);
+		}
+		// Do this if hole punch fails.
+		log += "\nFailed to holepunch, resorting to direct connection anyway.";
+		client.Connect(serverIP, hail);
+		count = 0;
+		while (count < 20 && !connected) {
+			if (client.ConnectionsCount != 0) {
+				log += "\nConections active: " + client.Connections.Count;
+				connected = true;
 			}
+			count++;
+			client.FlushSendQueue();
+			Thread.Sleep(100);
 		}
 		// Ok. We failed 2 times so we give up.
 		if (client.ConnectionsCount != 0) {
@@ -156,10 +156,8 @@ public class ServerClient {
 			client.Configuration.AutoFlushSendQueue = false;
 			return null;
 		}
-		exitLoop:
-		clock.Reset();
-		client.FlushSendQueue();
-		// If it works, continue.
+exitLoop:
+// If it works, continue.
 		log += "\nStarting Serverclient.";
 		log += "\nConections active: " + client.Connections.Count;
 		var serverClient = new ServerClient(client, inputServerPlayer.isHost);
@@ -193,6 +191,7 @@ public class ServerClient {
 				}
 			}
 			count++;
+			client.FlushSendQueue();
 			Thread.Sleep(100);
 		}
 		log += "\nFailed to get connect response from P2P server.";
@@ -379,7 +378,7 @@ public class ServerClient {
 
 					if (!rpcTemplate.isString) {
 						ushort argCount = BitConverter.ToUInt16(im.ReadBytes(2), 0);
-						var bytes = im.ReadBytes((int)argCount);
+						var bytes = im.ReadBytes(argCount);
 						if (invokeRpcs) {
 							Helpers.tryWrap(() => { rpcTemplate.invoke(bytes); }, false);
 						}

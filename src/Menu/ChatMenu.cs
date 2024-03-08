@@ -1,9 +1,6 @@
-﻿using SFML.Graphics;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SFML.Graphics;
 using static SFML.Window.Keyboard;
 
 namespace MMXOnline;
@@ -107,7 +104,7 @@ public class ChatMenu : IMainMenu {
 		var chatEntry = new ChatEntry(
 			currentTypedChat,
 			Global.level.mainPlayer.name,
-			isTeamChat ? (int?)Global.level.mainPlayer.alliance : null,
+			isTeamChat ? Global.level.mainPlayer.alliance : null,
 			false,
 			isSpectator: Global.level.mainPlayer.isSpectator);
 

@@ -1,9 +1,7 @@
-﻿using SFML.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SFML.Graphics;
 
 namespace MMXOnline;
 
@@ -191,13 +189,13 @@ public class UpgradeMenu : IMainMenu {
 
 		if (Global.frameCount % 60 < 30 && mainPlayer.realCharNum == 2) {
 			Fonts.drawText(FontType.DarkPurple, ">", Global.screenW - 14, Global.halfScreenH, Alignment.Center);
-		//Fonts.drawText(FontType.DarkPurple, "Armor", Global.screenW - 25, Global.halfScreenH + 15, Alignment.Center);
+			//Fonts.drawText(FontType.DarkPurple, "Armor", Global.screenW - 25, Global.halfScreenH + 15, Alignment.Center);
 		} else if (Global.frameCount % 60 < 30 && mainPlayer.canUpgradeXArmor()) {
 			Fonts.drawText(FontType.DarkPurple, "<", 14, Global.halfScreenH, Alignment.Center);
-		//Fonts.drawText(FontType.DarkPurple, "X3", 12, Global.halfScreenH + 15, Alignment.Center);
+			//Fonts.drawText(FontType.DarkPurple, "X3", 12, Global.halfScreenH + 15, Alignment.Center);
 
 			Fonts.drawText(FontType.DarkPurple, ">", Global.screenW - 14, Global.halfScreenH, Alignment.Center);
-		//Fonts.drawText(FontType.DarkPurple, "X1", Global.screenW - 19, Global.halfScreenH + 15, Alignment.Center);
+			//Fonts.drawText(FontType.DarkPurple, "X1", Global.screenW - 19, Global.halfScreenH + 15, Alignment.Center);
 		}
 
 		bool soldOut = false;

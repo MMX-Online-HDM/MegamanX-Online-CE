@@ -1,10 +1,7 @@
-﻿using Newtonsoft.Json;
-using ProtoBuf;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Newtonsoft.Json;
+using ProtoBuf;
 
 namespace MMXOnline;
 
@@ -342,8 +339,7 @@ public class SigmaLoadout {
 		}
 
 		var randPool = Helpers.getRandomSubarray(weaponPool, 2);
-		return new SigmaLoadout()
-		{
+		return new SigmaLoadout() {
 			maverick1 = randPool[0] - (int)WeaponIds.ChillPenguin,
 			maverick2 = randPool[1] - (int)WeaponIds.ChillPenguin
 			// Gacel: So it was an option for third maverick before?

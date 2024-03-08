@@ -1,10 +1,4 @@
-﻿using SFML.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using static SFML.Window.Keyboard;
-
-namespace MMXOnline;
+﻿namespace MMXOnline;
 
 public class InGameMainMenu : IMainMenu {
 	public static int selectY = 0;

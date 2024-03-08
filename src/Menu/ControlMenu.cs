@@ -1,10 +1,6 @@
-﻿using SFML.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using static SFML.Graphics.Text;
-using static SFML.Window.Keyboard;
+using SFML.Graphics;
 
 namespace MMXOnline;
 
@@ -156,7 +152,7 @@ public class ControlMenu : IMainMenu {
 	public void bind(int key) {
 		string inputName = bindableControls[selectArrowPosY][0];
 
-		if (!mappingClone.ContainsKey(inputName) || mappingClone[inputName] != (int)key) {
+		if (!mappingClone.ContainsKey(inputName) || mappingClone[inputName] != key) {
 			var keysToClear = new List<string>();
 			foreach (var kvp in mappingClone) {
 				if (kvp.Key.StartsWith("menu", StringComparison.OrdinalIgnoreCase)) continue;
@@ -171,7 +167,7 @@ public class ControlMenu : IMainMenu {
 				) {
 					continue;
 				}
-				if (kvp.Value == (int)key) {
+				if (kvp.Value == key) {
 					keysToClear.Add(kvp.Key);
 				}
 			}
@@ -179,7 +175,7 @@ public class ControlMenu : IMainMenu {
 				mappingClone[keyToClear] = null;
 			}
 
-			mappingClone[inputName] = (int)key;
+			mappingClone[inputName] = key;
 		}
 
 		bindFrames = 3;

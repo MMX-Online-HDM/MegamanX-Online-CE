@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static SFML.Window.Keyboard;
 
 namespace MMXOnline;
@@ -284,7 +282,7 @@ public partial class Player {
 
 	public void weaponLeft() {
 		int ws = weaponSlot - 1;
-	label:
+label:
 		if (ws < 0) {
 			ws = weapons.Count - 1;
 			if (shouldBlockMechSlotScroll() && isVile && weapons.ElementAtOrDefault(ws) is MechMenuWeapon) {
@@ -301,7 +299,7 @@ public partial class Player {
 
 	public void weaponRight() {
 		int ws = weaponSlot + 1;
-	label:
+label:
 		int max = weapons.Count;
 		if (shouldBlockMechSlotScroll() && isVile && weapons.ElementAtOrDefault(max - 1) is MechMenuWeapon) {
 			max--;

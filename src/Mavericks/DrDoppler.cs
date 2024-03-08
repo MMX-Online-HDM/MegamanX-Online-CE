@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace MMXOnline;
+﻿namespace MMXOnline;
 
 public class DrDoppler : Maverick {
 	public static Weapon getWeapon() { return new Weapon(WeaponIds.DrDoppler, 159); }

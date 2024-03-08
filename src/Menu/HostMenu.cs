@@ -1,14 +1,10 @@
-﻿using Lidgren.Network;
-using SFML.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading;
-using static SFML.Window.Keyboard;
+using Lidgren.Network;
+using SFML.Graphics;
 
 namespace MMXOnline;
 
@@ -983,6 +979,7 @@ public class HostMenu : IMainMenu {
 		Global.level = new Level(
 			localServer.getLevelData(), SelectCharacterMenu.playerData, localServer.extraCpuCharData, false
 		);
+		Global.level.teamNum = teamNum;
 		Global.level.startLevel(localServer, false);
 	}
 

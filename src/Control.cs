@@ -1,9 +1,7 @@
-﻿using Newtonsoft.Json;
-using SFML.Window;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Text;
+using Newtonsoft.Json;
+using SFML.Window;
 using static SFML.Window.Keyboard;
 
 namespace MMXOnline;

@@ -1,11 +1,8 @@
-﻿using SFML.Audio;
-using SFML.Graphics;
-using SFML.Graphics.Glsl;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using SFML.Graphics;
 
 namespace MMXOnline;
 
@@ -333,7 +330,7 @@ public partial class Actor : GameObject {
 			if (value == null) {
 				return;
 			}
-			_byteAngle =  value % 256;
+			_byteAngle = value % 256;
 		}
 	}
 
@@ -1007,8 +1004,7 @@ public partial class Actor : GameObject {
 						targetNetPos = null;
 					}
 				}
-			}
-			else if (!stopSyncingNetPos) {
+			} else if (!stopSyncingNetPos) {
 				var netPos = pos;
 				bool posChanged = false;
 				if (netXPos != null) {
@@ -1053,7 +1049,7 @@ public partial class Actor : GameObject {
 	public bool isRollingShield() {
 		return this is RollingShieldProj;
 	}
-	
+
 	public virtual bool shouldRender(float x, float y) {
 		// Don't draw things without sprites.
 		if (sprite == null || currentFrame == null) {
@@ -1664,7 +1660,7 @@ public partial class Actor : GameObject {
 		// For object specific state-machine code.
 	}
 
-		public virtual void statePostUpdate() {
+	public virtual void statePostUpdate() {
 	}
 
 	public virtual float getGravity() {

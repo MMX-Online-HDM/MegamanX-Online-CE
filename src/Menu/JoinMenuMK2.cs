@@ -1,11 +1,9 @@
 using System;
-using System.Net;
 using System.Collections.Generic;
-using Lidgren.Network;
-using ProtoBuf;
-using Newtonsoft.Json;
-using System.Linq;
+using System.Net;
 using System.Threading;
+using Lidgren.Network;
+using Newtonsoft.Json;
 
 namespace MMXOnline;
 
@@ -253,7 +251,7 @@ public class JoinMenuP2P : IMainMenu {
 			playerName, -1, false, SelectCharacterMenu.playerData.charNum,
 			null, Global.deviceId, null, 0
 		);
-		Global.serverClient = ServerClient.CreateHolePunchAlt(
+		Global.serverClient = ServerClient.CreateHolePunch(
 			netClient, serverId, ipEndPoint, inputServerPlayer,
 			out JoinServerResponse joinServerResponse, out string error
 		);
@@ -272,6 +270,7 @@ public class JoinMenuP2P : IMainMenu {
 			Global.level = new Level(
 				server.getLevelData(), SelectCharacterMenu.playerData, server.extraCpuCharData, true
 			);
+			Global.level.teamNum = server.teamNum;
 			Global.level.startLevel(joinServerResponse.server, true);
 		} else {
 			Menu.change(new WaitMenu(new MainMenu(), server, false));
@@ -375,7 +374,7 @@ public enum MasterServerMsg {
 	RegisterInfo,
 	UpdatePlayerNum,
 	DeleteHost,
-	ConnectPeers,
+	ConnectPeersShort,
 }
 
 

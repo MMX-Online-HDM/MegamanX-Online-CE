@@ -1,12 +1,9 @@
-using SFML.Graphics;
-using SFML.System;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using static SFML.Graphics.Text;
+using SFML.Graphics;
+using SFML.System;
 
 namespace MMXOnline;
 
@@ -46,8 +43,8 @@ public class Fonts {
 		int fontTextureSize = 8;
 		int fontGridSpacing = 1;
 		int fontDefaultWidth = 7;
-		int fontSpacing  = 1;
-		int newLineSpacing  = 10;
+		int fontSpacing = 1;
+		int newLineSpacing = 10;
 		int fontSpaceWidth = 8;
 		if (baseFontData.ContainsKey(fontStr)) {
 			fontTextureSize = baseFontData[fontStr][0];
@@ -79,10 +76,10 @@ public class Fonts {
 			}
 			for (int pos = 0; pos < textLine.Length; pos++) {
 				char letter = textLine[pos];
-				int charInt = (int)letter;
+				int charInt = letter;
 				if (charInt > 191) {
 					letter = '?';
-					charInt = (int)letter;
+					charInt = letter;
 				}
 				int rx = charInt % 16;
 				int ry = MathInt.Floor(charInt / 16);
@@ -108,7 +105,7 @@ public class Fonts {
 				// Text spacing.
 				if (Char.IsWhiteSpace(letter) ||
 					pos >= textLines[line].Length - 1 ||
-					Char.IsWhiteSpace(textLines[line][pos+1])
+					Char.IsWhiteSpace(textLines[line][pos + 1])
 				) {
 					currentXOff += fontSpaceWidth;
 				} else {
@@ -143,7 +140,7 @@ public class Fonts {
 	public static int measureText(string fontStr, string text) {
 		int size = 0;
 		int fontDefaultWidth = 7;
-		int fontSpacing  = 1;
+		int fontSpacing = 1;
 		int fontSpaceWidth = 8;
 		if (baseFontData.ContainsKey(fontStr)) {
 			fontDefaultWidth = baseFontData[fontStr][2];
@@ -154,7 +151,7 @@ public class Fonts {
 			int tempSize = 0;
 			for (int pos = 0; pos < textLines[line].Length; pos++) {
 				char letter = textLines[line][pos];
-				int charInt = (int)letter;
+				int charInt = letter;
 				int fontWidth = fontDefaultWidth;
 				if (fontSizes.ContainsKey(fontStr)) {
 					fontWidth = fontSizes[fontStr][charInt];
@@ -162,7 +159,7 @@ public class Fonts {
 				}
 				if (Char.IsWhiteSpace(letter) ||
 					pos >= textLines[line].Length - 1 ||
-					Char.IsWhiteSpace(textLines[line][pos+1])
+					Char.IsWhiteSpace(textLines[line][pos + 1])
 				) {
 					tempSize += fontSpaceWidth;
 				} else {
@@ -186,7 +183,7 @@ public class Fonts {
 	public static void loadFontSizes() {
 		// Get all files with ".fontdef" extension.
 		string[] files = Directory.GetFiles(Global.assetPath + "assets/fonts/", "*.fontdef");
-		foreach(string fileLocation in files) {
+		foreach (string fileLocation in files) {
 			// Load text and replace all the new lines to make it easier to parse.
 			// While also splitting it based on ";"
 			string fileName = RemoveFromEnd(fileLocation.Split("/").Last(), ".fontdef");

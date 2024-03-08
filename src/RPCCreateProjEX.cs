@@ -1,5 +1,3 @@
-using Lidgren.Network;
-using System;
 using System.Collections.Generic;
 
 namespace MMXOnline;
@@ -20,20 +18,20 @@ public partial class RPCCreateProj : RPC {
 		{ (int)ProjIds.FrontRunner, VileCannonProj.rpcInvoke },
 		{ (int)ProjIds.FatBoy, VileCannonProj.rpcInvoke },
 		{ (int)ProjIds.LongshotGizmo, VileCannonProj.rpcInvoke },
-		
+
 	};
-	
+
 }
 
 public struct ProjParameters {
-		public int projId;
-		public Point pos;
-		public int xDir;
-		public Player player;
-		public ushort netId;
-		public byte[] extraData;
-		public float angle;
-		public float byteAngle;
-	}
+	public int projId;
+	public Point pos;
+	public int xDir;
+	public Player player;
+	public ushort netId;
+	public byte[] extraData;
+	public float angle;
+	public float byteAngle;
+}
 
-	public delegate Projectile ProjCreate(ProjParameters arg);
+public delegate Projectile ProjCreate(ProjParameters arg);

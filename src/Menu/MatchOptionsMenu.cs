@@ -1,9 +1,5 @@
-﻿using SFML.Graphics;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MMXOnline;
 
@@ -83,12 +79,12 @@ public class MatchOptionsMenu : IMainMenu {
 				if (Global.input.isPressedMenu(Control.MenuLeft)) {
 					selectedTeam--;
 					if (selectedTeam < 0) {
-						selectedTeam = Global.level.server.teamNum - 1;
+						selectedTeam = Global.level.teamNum - 1;
 					}
 				}
 				if (Global.input.isPressedMenu(Control.MenuRight)) {
 					selectedTeam++;
-					if (selectedTeam >= Global.level.server.teamNum) {
+					if (selectedTeam >= Global.level.teamNum) {
 						selectedTeam = 0;
 					}
 				}
@@ -491,7 +487,9 @@ public class MatchOptionsMenu : IMainMenu {
 		if (Global.level.server != null && Global.level.server.hidden) return true;
 
 		if (Global.level.gameMode.isTeamMode) {
-			int[] teamteamSizes = GameMode.getAllianceCounts(Global.level.nonSpecPlayers());
+			int[] teamteamSizes = GameMode.getAllianceCounts(
+				Global.level.nonSpecPlayers(), Global.level.teamNum
+			);
 			if (teamteamSizes.Max() - 1 >= teamteamSizes.Where(x => x != 0).Min()) {
 				return true;
 			}
@@ -516,7 +514,7 @@ public class MatchOptionsMenu : IMainMenu {
 		if (Global.level.mainPlayer.isSpectator) return false;
 		if (Global.level.isElimination()) return false;
 		if (Global.serverClient == null) return true;
-		//if (Global.level.server != null && Global.level.server.hidden) return true;
+		if (Global.level.server != null && Global.level.server.hidden) return true;
 		return false;
 	}
 

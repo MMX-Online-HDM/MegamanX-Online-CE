@@ -1,10 +1,5 @@
-﻿using ProtoBuf;
-using SFML.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using static SFML.Window.Keyboard;
+﻿using System.Collections.Generic;
+using ProtoBuf;
 
 namespace MMXOnline;
 
@@ -95,7 +90,7 @@ public class ConfigureCPUMenu : IMainMenu {
 				menuOptions.Add(
 					new MenuOption(startX + 30, currentY += lineH,
 						() => {
-							Helpers.menuLeftRightInc(ref cpuData.alliance, -1, Global.level.server.teamNum);
+							Helpers.menuLeftRightInc(ref cpuData.alliance, -1, Global.level.teamNum);
 						},
 						(Point pos, int index) => {
 							string allianceStr = "auto";
@@ -135,7 +130,7 @@ public class ConfigureCPUMenu : IMainMenu {
 			Global.halfScreenW, 20, alignment: Alignment.Center
 		);
 		DrawWrappers.DrawTextureHUD(
-			Global.textures["cursor"], menuOptions[0].pos.x + 6, menuOptions[(int)selectArrowPosY].pos.y - 2
+			Global.textures["cursor"], menuOptions[0].pos.x + 6, menuOptions[selectArrowPosY].pos.y - 2
 		);
 
 		int i = 0;

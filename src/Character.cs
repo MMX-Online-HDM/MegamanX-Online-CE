@@ -1,11 +1,8 @@
 ﻿
-using SFML.Graphics;
-using SFML.Window;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using static SFML.Window.Keyboard;
+using SFML.Graphics;
 
 namespace MMXOnline;
 
@@ -877,7 +874,7 @@ public partial class Character : Actor, IDamagable {
 			removeRenderEffect(RenderEffectType.BlueShadow);
 			removeRenderEffect(RenderEffectType.RedShadow);
 
-			if (Global.level.server.teamNum == 2) {
+			if (Global.level.teamNum == 2) {
 				if (alliance == GameMode.blueAlliance) {
 					addRenderEffect(RenderEffectType.BlueShadow);
 				} else {
@@ -2482,7 +2479,7 @@ public partial class Character : Actor, IDamagable {
 
 		string playerName = player.name;
 		FontType playerColor = FontType.Grey;
-		if (Global.level.gameMode.isTeamMode && player.alliance < Global.level.server.teamNum) {
+		if (Global.level.gameMode.isTeamMode && player.alliance < Global.level.teamNum) {
 			playerColor = Global.level.gameMode.teamFonts[player.alliance];
 		}
 
@@ -2740,7 +2737,7 @@ public partial class Character : Actor, IDamagable {
 				if (weaponIndex != null && killer != null) {
 					var bytes = new List<byte>()
 					{
-							(byte)1,
+							1,
 							(byte)killer.id,
 							assister == null ? (byte)killer.id : (byte)assister.id,
 							victimPlayerIdBytes[0],
@@ -2756,7 +2753,7 @@ public partial class Character : Actor, IDamagable {
 
 					Global.serverClient?.rpc(RPC.killPlayer, bytes.ToArray());
 				} else {
-					Global.serverClient?.rpc(RPC.killPlayer, (byte)0, (byte)0, (byte)0, victimPlayerIdBytes[0], victimPlayerIdBytes[1]);
+					Global.serverClient?.rpc(RPC.killPlayer, 0, 0, 0, victimPlayerIdBytes[0], victimPlayerIdBytes[1]);
 				}
 			}
 		}

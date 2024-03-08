@@ -1,9 +1,4 @@
-﻿using SFML.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 
 namespace MMXOnline;
 
@@ -46,7 +41,7 @@ public class PreOptionsMenu : IMainMenu {
 		if (!inGame) {
 			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0);
 			//DrawWrappers.DrawTextureMenu(
-				//Global.textures["cursor"], 20, topLeft.y + ySpace + (selectArrowPosY * ySpace)
+			//Global.textures["cursor"], 20, topLeft.y + ySpace + (selectArrowPosY * ySpace)
 			//);
 		} else {
 			DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);

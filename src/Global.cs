@@ -1,16 +1,15 @@
+using System;
+using System.Collections.Generic;
+using System.IO.Hashing;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading.Tasks;
 using DeviceId;
 using DeviceId.Encoders;
 using DeviceId.Formatters;
 using Newtonsoft.Json;
 using SFML.Graphics;
-using System;
-using System.Collections.Generic;
-using System.IO.Hashing;
-using System.Linq;
-using System.Net;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 using static SFML.Window.Keyboard;
 
 namespace MMXOnline;
@@ -18,7 +17,8 @@ namespace MMXOnline;
 public partial class Global {
 	public static decimal version = 20m;
 	public static string versionName = "Revision 20";
-	public static string subVersionName = "Alpha 9";
+	public static string subVersionName = "Alpha 10";
+	public static string subVersionShortName = "a10";
 
 	// THIS VALUE MUST ALWAYS MANUALLY BE SET AFTER UPDATING ASSETS BEFORE BUILDING A RELEASE BUILD.
 	// Obtain it by pressing F1 in main menu.
@@ -130,7 +130,7 @@ public partial class Global {
 	public static bool maverickWallClimb = false;
 
 	public static bool debug = false;
-	
+
 	public static bool consoleDebugLogging = false;
 
 	public static bool showHitboxes = false;
@@ -236,7 +236,7 @@ public partial class Global {
 		}
 
 		//if (Global.input.isPressed(Key.F8)) {
-			//DevConsole.changeTeam();
+		//DevConsole.changeTeam();
 		//}
 
 		if (Global.input.isPressed(Key.F9)) {
@@ -453,7 +453,7 @@ public partial class Global {
 		}
 	}
 	public static string MD5Checksum => (_checksum);
-	
+
 	public static string CRC32Checksum;
 
 	public static string getShortChecksum() {
@@ -559,9 +559,9 @@ public partial class Global {
 	private static string _deviceId;
 	public static string deviceId {
 		get {
-			#if RELAYSERVER
+#if RELAYSERVER
 			return "";
-			#endif
+#endif
 			if (_deviceId == null) {
 				try {
 					_deviceId = new DeviceIdBuilder()
@@ -676,12 +676,10 @@ public partial class Global {
 								region.ip = null;
 							}
 						}
-						if (string.IsNullOrEmpty(region.name) || string.IsNullOrEmpty(region.ip))
-						{
+						if (string.IsNullOrEmpty(region.name) || string.IsNullOrEmpty(region.ip)) {
 							//throw new Exception("region.json has missing fields.");
 							region = new Region();
-						}
-						else {
+						} else {
 							if (!region.ip.IsValidIpAddress()) {
 								throw new Exception("region.json has an invalid IP.");
 							}

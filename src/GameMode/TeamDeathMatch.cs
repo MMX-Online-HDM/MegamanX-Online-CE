@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MMXOnline;
+﻿namespace MMXOnline;
 
 public class TeamDeathMatch : GameMode {
 	public TeamDeathMatch(Level level, int playingTo, int? timeLimit) : base(level, timeLimit) {

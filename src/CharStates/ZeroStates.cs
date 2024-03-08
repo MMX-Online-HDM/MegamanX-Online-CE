@@ -1,4 +1,3 @@
-using System;
 using SFML.Graphics;
 
 namespace MMXOnline;
@@ -66,8 +65,8 @@ public class HyperZeroStart : CharState {
 				destroyOnEnd: false, sendRpc: true
 			);
 			drWilyAnim.fadeIn = true;
-			character.playSound("BlackZeroEntry", forcePlay: false, sendRpc: true);	
-		}else if (zero.zeroHyperMode == 1) {
+			character.playSound("BlackZeroEntry", forcePlay: false, sendRpc: true);
+		} else if (zero.zeroHyperMode == 1) {
 			drWilyAnim = new Anim(
 				character.pos.addxy(30 * character.xDir, -30), "drwily", -character.xDir,
 				player.getNextActorNetId(), false, sendRpc: true

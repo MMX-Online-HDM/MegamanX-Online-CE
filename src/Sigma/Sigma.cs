@@ -1,9 +1,6 @@
-﻿using SFML.Graphics;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SFML.Graphics;
 
 namespace MMXOnline;
 
@@ -147,9 +144,9 @@ public abstract class BaseSigma : Character {
 		}
 
 		// "Global" command prototype
-		if (player.weapon is SigmaMenuWeapon && 
-			player.currentMaverick == null && player.mavericks.Count > 0 && 
-			grounded && player.input.isHeld(Control.Down, player) && 
+		if (player.weapon is SigmaMenuWeapon &&
+			player.currentMaverick == null && player.mavericks.Count > 0 &&
+			grounded && player.input.isHeld(Control.Down, player) &&
 			(isPuppeteer || isSummoner) && charState is not IssueGlobalCommand) {
 			if (player.input.isCommandButtonPressed(player)) {
 				Global.level.gameMode.hudErrorMsgTime = 0;

@@ -1,9 +1,7 @@
-﻿using SFML.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SFML.Graphics;
 using static SFML.Window.Keyboard;
 
 namespace MMXOnline;
@@ -155,7 +153,7 @@ public class Maverick : Actor, IDamagable {
 		_input = new Input(true);
 
 		if (Global.level.gameMode.isTeamMode) {
-			if (Global.level.server.teamNum == 2) {
+			if (Global.level.teamNum == 2) {
 				if (player.alliance == GameMode.blueAlliance) {
 					addRenderEffect(RenderEffectType.BlueShadow);
 				} else {
@@ -953,7 +951,7 @@ public class Maverick : Actor, IDamagable {
 	public void drawName(string overrideName = "", FontType? overrideColor = null) {
 		string playerName = player.name;
 		FontType playerColor = FontType.Grey;
-		if (Global.level.gameMode.isTeamMode && player.alliance < Global.level.server.teamNum) {
+		if (Global.level.gameMode.isTeamMode && player.alliance < Global.level.teamNum) {
 			playerColor = Global.level.gameMode.teamFonts[player.alliance];
 		}
 

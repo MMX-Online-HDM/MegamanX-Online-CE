@@ -1,9 +1,5 @@
-﻿using Newtonsoft.Json;
-using SFML.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using static SFML.Window.Keyboard;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace MMXOnline;
 
@@ -78,7 +74,7 @@ public class KickMenu : IMainMenu {
 
 	public void render() {
 		DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
-		Global.sprites["cursor"].drawToHUD(0, 15, optionPoses[(int)selectArrowPosY].y + 5);
+		Global.sprites["cursor"].drawToHUD(0, 15, optionPoses[selectArrowPosY].y + 5);
 
 		string voteKickPrefix = "";
 		if (!hasDirectKickPower()) voteKickPrefix = "Vote ";
@@ -93,7 +89,7 @@ public class KickMenu : IMainMenu {
 			optionPoses[0].x, optionPoses[0].y
 		);
 		Fonts.drawText(
-			FontType.Blue,"Kick duration: " + kickDuration + " min",
+			FontType.Blue, "Kick duration: " + kickDuration + " min",
 			optionPoses[1].x, optionPoses[1].y
 		);
 

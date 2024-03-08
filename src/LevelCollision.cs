@@ -1,9 +1,6 @@
-﻿using SFML.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MMXOnline;
 
@@ -566,8 +563,8 @@ public partial class Level {
 			pos.x - Global.halfScreenW, pos.y - (Global.screenH * 0.75f),
 			Global.screenW, Global.screenH).getShape();
 		//DrawWrappers.DrawRectWH(
-			//pos.x - Global.halfScreenW, pos.y - (Global.screenH * 0.75f),
-			//Global.screenW, Global.screenH, true, new Color(0, 0, 255, 128), 1, ZIndex.HUD
+		//pos.x - Global.halfScreenW, pos.y - (Global.screenH * 0.75f),
+		//Global.screenW, Global.screenH, true, new Color(0, 0, 255, 128), 1, ZIndex.HUD
 		//);
 		var hits = Global.level.checkCollisionsShape(shape, null);
 		foreach (var hit in hits) {
