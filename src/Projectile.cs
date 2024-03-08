@@ -47,10 +47,17 @@ public class Projectile : Actor {
 		damager = new Damager(player, damage, flinch, hitCooldown);
 		this.xDir = xDir;
 		if (Global.level.gameMode.isTeamMode && !(this is NapalmPartProj) && !(this is FlameBurnerProj)) {
-			if (player.alliance == GameMode.blueAlliance) {
-				addRenderEffect(RenderEffectType.BlueShadow);
-			} else {
-				addRenderEffect(RenderEffectType.RedShadow);
+			if (Global.level.server.teamNum == 2) {
+				if (player.alliance == GameMode.blueAlliance) {
+					addRenderEffect(RenderEffectType.BlueShadow);
+				} else {
+					addRenderEffect(RenderEffectType.RedShadow);
+				}
+			} else if (damager != null &&
+				!damager.owner.isMainPlayer &&
+				damager.owner.alliance == Global.level.mainPlayer.alliance
+			) {
+				addRenderEffect(RenderEffectType.GreenShadow);
 			}
 		}
 		this.ownerPlayer = player;
@@ -592,9 +599,10 @@ public class Projectile : Actor {
 		byte[] yBytes = BitConverter.GetBytes(pos.y);
 		byte[] netProjIdByte = BitConverter.GetBytes(netProjId);
 		// Create bools of data.
-		byte dataInf = 0;
-		if (isAngle) { dataInf += (byte)(1 << 7); }
-		if (extraData != null && extraData.Length > 0) { dataInf += (byte)(1 << 6); }
+		byte dataInf =  Helpers.boolArrayToByte(new bool[] {
+			isAngle,
+			extraData != null && extraData.Length > 0
+		});
 		// Create byte list.
 		var bytes = new List<byte>() {
 			dataInf,

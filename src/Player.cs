@@ -88,12 +88,12 @@ public partial class Player {
 
 	public bool canUpgradeXArmor() {
 		return (
-			!isDisguisedAxl &&
-			character is MegamanX mmx &&
-			mmx.isHyperX != true &&
-			mmx.charState is not XRevive &&
-			mmx.charState is not XReviveStart ||
-			limboChar is MegamanX
+			realCharNum == 0 && (
+				character is not MegamanX mmx ||
+				mmx.isHyperX != true &&
+				mmx.charState is not XRevive &&
+				mmx.charState is not XReviveStart
+			)
 		);
 	}
 

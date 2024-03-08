@@ -25,7 +25,7 @@ public class JoinMenuP2P : IMainMenu {
 		config.EnableMessageType(NetIncomingMessageType.UnconnectedData);
 		config.AutoFlushSendQueue = false;
 		config.ConnectionTimeout = Server.connectionTimeoutSeconds;
-		config.Port = Global.clientPort;
+		//config.Port = Global.clientPort;
 		// Create client.
 		var netClient = new NetClient(config);
 		this.netClient = netClient;
@@ -258,8 +258,11 @@ public class JoinMenuP2P : IMainMenu {
 			out JoinServerResponse joinServerResponse, out string error
 		);
 		if (Global.serverClient == null) {
-			exit(new ErrorMenu(new string[] { "Connection error, log bellow.", error }, new MainMenu()));
-			Logger.LogNonFatalError(error);
+			exit(new ErrorMenu(
+				new string[] { "Connection error, log bellow.", error },
+				new MainMenu()
+			));
+			//Logger.LogNonFatalError(error);
 			return;
 		}
 		var players = joinServerResponse.server.players;

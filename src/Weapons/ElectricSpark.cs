@@ -102,8 +102,12 @@ public class ElectricSparkProj : Projectile {
 }
 
 public class ElectricSparkProjChargedStart : Projectile {
-	public ElectricSparkProjChargedStart(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId) :
-		base(weapon, pos, xDir, 0, 4, player, "electric_spark_charge_start", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public ElectricSparkProjChargedStart(
+		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId
+	) : base(
+		weapon, pos, xDir, 0, 4, player, "electric_spark_charge_start",
+		Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.ElectricSparkCharged;
 		destroyOnHit = false;
 		shouldShieldBlock = false;
@@ -114,16 +118,26 @@ public class ElectricSparkProjChargedStart : Projectile {
 		if (sprite.isAnimOver()) {
 			destroySelf();
 			if (ownedByLocalPlayer) {
-				new ElectricSparkProjCharged(weapon, pos.addxy(-1, 0), -1, damager.owner, damager.owner.getNextActorNetId(true), rpc: true);
-				new ElectricSparkProjCharged(weapon, pos.addxy(1, 0), 1, damager.owner, damager.owner.getNextActorNetId(true), rpc: true);
+				new ElectricSparkProjCharged(
+					weapon, pos.addxy(-1, 0), -1, damager.owner,
+					damager.owner.getNextActorNetId(true), rpc: true
+				);
+				new ElectricSparkProjCharged(
+					weapon, pos.addxy(1, 0), 1, damager.owner,
+					damager.owner.getNextActorNetId(true), rpc: true
+				);
 			}	
 		}
 	}
 }
 
 public class ElectricSparkProjCharged : Projectile {
-	public ElectricSparkProjCharged(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 450, 4, player, "electric_spark_charge", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public ElectricSparkProjCharged(
+		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 450, 4, player, "electric_spark_charge",
+		Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.ElectricSparkCharged;
 		maxTime = 0.3f;
 		destroyOnHit = false;

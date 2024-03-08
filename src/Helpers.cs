@@ -271,6 +271,16 @@ public class Helpers {
 		return MathF.Cos(radians);
 	}
 
+	public static float sinb(float degrees) {
+		var radians = degrees * MathF.PI / 128f;
+		return MathF.Sin(radians);
+	}
+
+	public static float cosb(float degrees) {
+		var radians = degrees * MathF.PI / 128f;
+		return MathF.Cos(radians);
+	}
+
 	public static float moveTo(float num, float dest, float inc, bool snap = false) {
 		float diff = dest - num;
 		inc *= MathF.Sign(diff);

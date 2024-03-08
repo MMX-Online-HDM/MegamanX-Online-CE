@@ -52,7 +52,7 @@ public class ServerClient {
 		config.EnableMessageType(NetIncomingMessageType.ConnectionLatencyUpdated);
 		config.AutoFlushSendQueue = false;
 		config.ConnectionTimeout = Server.connectionTimeoutSeconds;
-		config.Port = Global.clientPort;
+		//config.Port = Global.clientPort;
 		/*
 		#if DEBUG
 		config.SimulatedMinimumLatency = Global.simulatedLatency;
@@ -113,7 +113,9 @@ public class ServerClient {
 		IPEndPoint masterServerLocation = NetUtility.Resolve(MasterServerData.serverIp, MasterServerData.serverPort);
 		client.SendUnconnectedMessage(regMsg, masterServerLocation);
 		client.FlushSendQueue();
-		log += "Sent HolePunch message..."; 
+		log += "\nSent HolePunch message...";
+		// Create hail message for later.
+		NetOutgoingMessage hail = client.CreateMessage(JsonConvert.SerializeObject(inputServerPlayer)); 
 		// Wait for hole punching to happen.
 		int count = 0;
 		bool connected = false;
@@ -123,45 +125,43 @@ public class ServerClient {
 			while ((msg = client.ReadMessage()) != null && !connected) {
 				if (msg.MessageType == NetIncomingMessageType.NatIntroductionSuccess) {
 					connected = true;
-					client.Connect(serverIP);
-					log += "Got Connection MSG!";
+					client.Connect(serverIP, hail);
+					log += "\nGot Connection MSG!";
+					Stopwatch clock2 = Stopwatch.StartNew();
 					goto exitLoop;
 				} else {
-					log += "Got other message.\n";
-					log += "MSG type:" + msg.MessageType.ToString() + "\n";
+					log += "\nGot other message.";
+					log += "\nMSG type:" + msg.MessageType.ToString();
 				}
 			}
 		}
-		exitLoop:
 		clock.Reset();
 		// Do this if hole punch fails.
-		if (!connected) {
-			log += "Failed to holepunch, resorting to direct connection anyway.";
-			log += "Conections active: " + client.Connections.Count;
+		if (!connected && client.ConnectionsCount == 0) {
+			log += "\nFailed to holepunch, resorting to direct connection anyway.";
 			clock.Start();
-			client.Connect(serverIP);
+			client.Connect(serverIP, hail);
 			client.FlushSendQueue();
 			while (clock.Elapsed.Seconds < 4 && !connected) {
-				if (client.ConnectionStatus == NetConnectionStatus.Connected) {
+				if (client.ConnectionsCount != 0) {
+					log += "\nConections active: " + client.Connections.Count;
 					connected = true;
 				}
 			}
 		}
-		clock.Reset();
-		clock.Stop();
 		// Ok. We failed 2 times so we give up.
-		if (!connected) {
-			log += "Failed to connect.";
+		if (client.ConnectionsCount != 0) {
+			log += "\nFailed to connect.";
 			joinServerResponse = null;
 			client.Configuration.AutoFlushSendQueue = false;
 			return null;
 		}
-		log = null;
+		exitLoop:
+		clock.Reset();
 		client.FlushSendQueue();
-		Thread.Sleep(100);
 		// If it works, continue.
-		log += "Starting Serverclient.";
-		log += "Conections active: " + client.Connections.Count;
+		log += "\nStarting Serverclient.";
+		log += "\nConections active: " + client.Connections.Count;
 		var serverClient = new ServerClient(client, inputServerPlayer.isHost);
 		serverClient.serverId = serverId;
 		// Now try to connect to get server connect response after conection.
@@ -170,7 +170,7 @@ public class ServerClient {
 			serverClient.getMessages(out var messages, false);
 			foreach (var message in messages) {
 				if (message.StartsWith("joinservertargetedresponse:")) {
-					log += "Got connection response.";
+					log += "\nGot connection response.";
 					joinServerResponse = (
 						JsonConvert.DeserializeObject<JoinServerResponse>(
 							message.RemovePrefix("joinservertargetedresponse:")
@@ -181,21 +181,21 @@ public class ServerClient {
 					return serverClient;
 				} else if (message.StartsWith("hostdisconnect:")) {
 					var reason = message.Split(':')[1];
-					log = "Could not join: " + reason;
+					log = "\nCould not join: " + reason;
 					joinServerResponse = null;
 					serverClient.disconnect("Client couldn't get response");
 					client.Configuration.AutoFlushSendQueue = false;
 					return null;
 				} else if (message.StartsWith("joinserverresponse:")) {
-					log += "Got general response.";
+					log += "\nGot general response.";
 				} else {
-					log += "Message: " + message;
+					log += "\nMessage: " + message;
 				}
 			}
 			count++;
 			Thread.Sleep(100);
 		}
-		log += "Failed to get connect response from P2P server.";
+		log += "\nFailed to get connect response from P2P server.";
 		joinServerResponse = null;
 		serverClient.disconnect("Client couldn't get response");
 		client.Configuration.AutoFlushSendQueue = false;

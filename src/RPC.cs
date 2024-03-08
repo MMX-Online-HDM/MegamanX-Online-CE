@@ -532,15 +532,21 @@ public class RPCPlayerToggle : RPC {
 		} else if (toggleId == RPCToggleType.UnstockCharge) {
 			player.character.stockedCharge = false;
 		} else if (toggleId == RPCToggleType.StartRaySplasher) {
-			(player?.character as MegamanX).isShootingRaySplasher = true;
+			if (player.character is MegamanX mmx) {
+				mmx.isShootingRaySplasher = true;
+			}
 		} else if (toggleId == RPCToggleType.StopRaySplasher) {
 			if (player.character is MegamanX mmx) {
 				mmx.isShootingRaySplasher = false;
 			}
 		} else if (toggleId == RPCToggleType.StartBarrier) {
-			(player?.character as MegamanX).barrierTime = (player?.character as MegamanX).barrierDuration;
+			if (player.character is MegamanX mmx) {
+				mmx.barrierTime = mmx.barrierDuration;
+			}
 		} else if (toggleId == RPCToggleType.StopBarrier) {
-			(player?.character as MegamanX).barrierTime = 0;
+			if (player.character is MegamanX mmx) {
+				mmx.barrierTime = 0;
+			}
 		} else if (toggleId == RPCToggleType.StockSaber) {
 			player.character.stockedXSaber = true;
 		} else if (toggleId == RPCToggleType.UnstockSaber) {
