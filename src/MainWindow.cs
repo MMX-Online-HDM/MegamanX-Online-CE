@@ -109,13 +109,13 @@ public partial class Global {
 	public static FloatRect getFullScreenViewPort() {
 		float desktopWidth = VideoMode.DesktopMode.Width;
 		float desktopHeight = VideoMode.DesktopMode.Height;
-		float heightMultiple = (float)VideoMode.DesktopMode.Height / (float)screenH;
+		float heightMultiple = VideoMode.DesktopMode.Height / (float)screenH;
 
 		if (Options.main.integerFullscreen) {
-			heightMultiple = MathF.Floor((float)VideoMode.DesktopMode.Height / (float)screenH);
+			heightMultiple = MathF.Floor(VideoMode.DesktopMode.Height / (float)screenH);
 		}
-		float extraWidthPercent = (desktopWidth - (float)screenW * heightMultiple) / desktopWidth;
-		float extraHeightPercent = (desktopHeight - (float)screenH * heightMultiple) / desktopHeight;
+		float extraWidthPercent = (desktopWidth - screenW * heightMultiple) / desktopWidth;
+		float extraHeightPercent = (desktopHeight - screenH * heightMultiple) / desktopHeight;
 
 		return new FloatRect(extraWidthPercent / 2f, extraHeightPercent / 2f, 1f - extraWidthPercent, 1f - extraHeightPercent);
 	}

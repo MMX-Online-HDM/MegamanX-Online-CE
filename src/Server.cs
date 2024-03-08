@@ -93,7 +93,7 @@ public class Server {
 		return !string.IsNullOrEmpty(customMapChecksum);
 	}
 
-	public const byte sendStringRPCByte = (byte)0;
+	public const byte sendStringRPCByte = 0;
 	public const int maxOverflowSpectatorCount = 2;
 	public const int maxRejoinCount = 3;
 	public const float connectionTimeoutSeconds = 15;
@@ -125,7 +125,7 @@ public class Server {
 		this.playTo = playTo;
 		this.botCount = botCount;
 		this.maxPlayers = maxPlayerCap;//Helpers.clamp(maxPlayers, 12, maxPlayerCap);
-		this.timeLimit = (timeLimit == 0 ? null : (int?)timeLimit);
+		this.timeLimit = (timeLimit == 0 ? null : timeLimit);
 		this.fixedCamera = fixedCamera;
 		this.hidden = hidden;
 		this.netcodeModel = netcodeModel;
@@ -797,7 +797,7 @@ public class Server {
 			s_server.SendToAll(om, rpcTemplate.netDeliveryMethod, 0);
 		} else if (rpcTemplate is RPCUpdatePlayer) {
 			ushort argCount = BitConverter.ToUInt16(im.ReadBytes(2), 0);
-			var bytes = im.ReadBytes((int)argCount);
+			var bytes = im.ReadBytes(argCount);
 			int playerId = bytes[0];
 			int kills = BitConverter.ToUInt16(new byte[] { bytes[1], bytes[2] }, 0);
 			int deaths = BitConverter.ToUInt16(new byte[] { bytes[3], bytes[4] }, 0);
@@ -810,7 +810,7 @@ public class Server {
 		} else if (rpcTemplate is RPCAddBot) {
 			if (players.Count < 10) {
 				ushort argCount = BitConverter.ToUInt16(im.ReadBytes(2), 0);
-				var bytes = im.ReadBytes((int)argCount);
+				var bytes = im.ReadBytes(argCount);
 
 				int charNum = bytes[0];
 				int team = bytes[1];
@@ -829,13 +829,13 @@ public class Server {
 			}
 		} else if (rpcTemplate is RPCRemoveBot) {
 			ushort argCount = BitConverter.ToUInt16(im.ReadBytes(2), 0);
-			var bytes = im.ReadBytes((int)argCount);
+			var bytes = im.ReadBytes(argCount);
 			int playerId = bytes[0];
 			players.RemoveAll(p => p.id == playerId);
 			periodicPing(s_server);
 		} else if (rpcTemplate is RPCMakeSpectator) {
 			ushort argCount = BitConverter.ToUInt16(im.ReadBytes(2), 0);
-			var bytes = im.ReadBytes((int)argCount);
+			var bytes = im.ReadBytes(argCount);
 			int playerId = bytes[0];
 			int spectator = bytes[1];
 			bool isSpectator = (spectator == 0);
@@ -860,7 +860,7 @@ public class Server {
 			om.Write(rpcIndexByte);
 			om.Write(argCount);
 
-			var bytes = im.ReadBytes((int)argCount);
+			var bytes = im.ReadBytes(argCount);
 			foreach (var b in bytes) {
 				om.Write(b);
 			}

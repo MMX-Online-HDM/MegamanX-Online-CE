@@ -1275,7 +1275,7 @@ public class GameMode {
 			ammoDisplayMultiplier = 0.5f;
 		}
 		for (var i = 0; i < MathF.Ceiling(maxAmmo * ammoDisplayMultiplier); i++) {
-			if ((double)i < Math.Ceiling(ammo * ammoDisplayMultiplier)) {
+			if (i < Math.Ceiling(ammo * ammoDisplayMultiplier)) {
 				if (ammo < grayAmmo) Global.sprites["hud_weapon_full"].drawToHUD(grayAmmoIndex, baseX, baseY);
 				else Global.sprites["hud_weapon_full"].drawToHUD(barIndex, baseX, baseY);
 			} else {

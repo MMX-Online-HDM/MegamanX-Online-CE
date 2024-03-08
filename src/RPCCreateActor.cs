@@ -55,12 +55,12 @@ public class RPCCreateActor : RPC {
 	}
 
 	public override void invoke(params byte[] arguments) {
-		int createId = (int)arguments[0];
+		int createId = arguments[0];
 		float xPos = BitConverter.ToSingle(new byte[] { arguments[1], arguments[2], arguments[3], arguments[4] }, 0);
 		float yPos = BitConverter.ToSingle(new byte[] { arguments[5], arguments[6], arguments[7], arguments[8] }, 0);
 		var playerId = arguments[9];
 		var netProjByte = BitConverter.ToUInt16(new byte[] { arguments[10], arguments[11] }, 0);
-		int xDir = (int)arguments[12] - 128;
+		int xDir = arguments[12] - 128;
 
 		var player = Global.level.getPlayerById(playerId);
 		if (player == null) return;

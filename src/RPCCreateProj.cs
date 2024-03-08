@@ -55,7 +55,7 @@ public partial class RPCCreateProj : RPC {
 				byteAngle = byteAngle,
 				extraData = extraData
 			};
-			proj = functs[(int)projId](args);
+			proj = functs[projId](args);
 			return;
 		}
 

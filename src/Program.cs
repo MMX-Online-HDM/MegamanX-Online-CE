@@ -447,8 +447,8 @@ class Program {
 	private static void onWindowResized(object sender, SizeEventArgs e) {
 		// Compares the aspect ratio of the window to the aspect ratio of the view,
 		// and sets the view's viewport accordingly in order to archieve a letterbox effect.
-		float windowRatio = (float)Global.window.Size.X / (float)Global.window.Size.Y;
-		float viewRatio = (float)Global.view.Size.X / (float)Global.view.Size.Y;
+		float windowRatio = Global.window.Size.X / (float)Global.window.Size.Y;
+		float viewRatio = Global.view.Size.X / Global.view.Size.Y;
 		float sizeX = 1;
 		float sizeY = 1;
 		float posX = 0;

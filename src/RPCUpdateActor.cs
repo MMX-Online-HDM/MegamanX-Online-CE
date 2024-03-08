@@ -313,7 +313,7 @@ public class RPCUpdateActor : RPC {
 			yScale = arguments[i++] / 20f;
 		}
 		if (maskBools[3]) {
-			frameIndex = (int)arguments[i];
+			frameIndex = arguments[i];
 			i++;
 		}
 		if (maskBools[4]) {

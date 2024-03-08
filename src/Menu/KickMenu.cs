@@ -74,7 +74,7 @@ public class KickMenu : IMainMenu {
 
 	public void render() {
 		DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
-		Global.sprites["cursor"].drawToHUD(0, 15, optionPoses[(int)selectArrowPosY].y + 5);
+		Global.sprites["cursor"].drawToHUD(0, 15, optionPoses[selectArrowPosY].y + 5);
 
 		string voteKickPrefix = "";
 		if (!hasDirectKickPower()) voteKickPrefix = "Vote ";

@@ -135,14 +135,14 @@ public class Buster : Weapon {
 				int xOff = xDir * -5;
 				player.setNextActorNetId(netProjId);
 				// Create first line instantly.
-				createBuster4Line(pos.x + (float)xOff, pos.y, xDir, player, 0f);
+				createBuster4Line(pos.x + xOff, pos.y, xDir, player, 0f);
 				// Create 2nd with a delay.
 				Global.level.delayedActions.Add(new DelayedAction(delegate {
-					createBuster4Line(pos.x + (float)xOff, pos.y, xDir, player, 10f / 60f);
+					createBuster4Line(pos.x + xOff, pos.y, xDir, player, 10f / 60f);
 				}, 2.8f / 60f));
 				// Use smooth spawn on the 3rd.
 				Global.level.delayedActions.Add(new DelayedAction(delegate {
-					createBuster4Line(pos.x + (float)xOff, pos.y, xDir, player, 5f / 60f, true);
+					createBuster4Line(pos.x + xOff, pos.y, xDir, player, 5f / 60f, true);
 				}, 5.8f / 60f));
 			} else if (player.hasArmArmor(2)) {
 				if (player.ownedByLocalPlayer) {
@@ -181,7 +181,7 @@ public class BusterProj : Projectile {
 	public override void update() {
 		base.update();
 		if (System.MathF.Abs(vel.x) < 360) {
-			vel.x += Global.spf * (float)xDir * 900f;
+			vel.x += Global.spf * xDir * 900f;
 			if (System.MathF.Abs(vel.x) >= 360) {
 				vel.x = (float)xDir * 360;
 			}

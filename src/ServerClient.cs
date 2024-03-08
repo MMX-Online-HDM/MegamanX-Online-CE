@@ -378,7 +378,7 @@ exitLoop:
 
 					if (!rpcTemplate.isString) {
 						ushort argCount = BitConverter.ToUInt16(im.ReadBytes(2), 0);
-						var bytes = im.ReadBytes((int)argCount);
+						var bytes = im.ReadBytes(argCount);
 						if (invokeRpcs) {
 							Helpers.tryWrap(() => { rpcTemplate.invoke(bytes); }, false);
 						}

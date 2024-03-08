@@ -29,7 +29,7 @@ public class SigmaSlashState : CharState {
 
 		if (prevCharState is Dash) {
 			if (character.frameIndex < attackFrame) {
-				character.move(new Point(character.getDashSpeed() * (float)character.xDir, 0));
+				character.move(new Point(character.getDashSpeed() * character.xDir, 0));
 			}
 		}
 

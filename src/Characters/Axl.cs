@@ -1071,7 +1071,7 @@ public class Axl : Character {
 		foreach (var enemy in Global.level.players) {
 			if (enemy.character != null && enemy.character.canBeDamaged(player.alliance, player.id, null) && enemy.character.getHeadPos() != null) {
 				if (player.axlGenericCursorWorldPos.distanceTo(enemy.character.getHeadPos().Value) < headshotRadius) {
-					axlCursorTarget = enemy.character as IDamagable;
+					axlCursorTarget = enemy.character;
 					axlHeadshotTarget = enemy.character;
 				}
 			}

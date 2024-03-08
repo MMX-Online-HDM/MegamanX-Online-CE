@@ -226,8 +226,8 @@ public class Helpers {
 		var genericPaletteShader = cloneShaderSafe("genericPalette");
 		genericPaletteShader?.SetUniform("paletteTexture", texture);
 		genericPaletteShader?.SetUniform("palette", 1);
-		genericPaletteShader?.SetUniform("rows", (float)texture.Size.Y);
-		genericPaletteShader?.SetUniform("cols", (float)texture.Size.X);
+		genericPaletteShader?.SetUniform("rows", texture.Size.Y);
+		genericPaletteShader?.SetUniform("cols", texture.Size.X);
 		return genericPaletteShader;
 	}
 
@@ -236,8 +236,8 @@ public class Helpers {
 		var genericPaletteShader = cloneShaderSafe("nightmareZero");
 		genericPaletteShader?.SetUniform("paletteTexture", texture);
 		genericPaletteShader?.SetUniform("palette", 1);
-		genericPaletteShader?.SetUniform("rows", (float)texture.Size.Y);
-		genericPaletteShader?.SetUniform("cols", (float)texture.Size.X);
+		genericPaletteShader?.SetUniform("rows", texture.Size.Y);
+		genericPaletteShader?.SetUniform("cols", texture.Size.X);
 		return genericPaletteShader;
 	}
 
@@ -392,7 +392,7 @@ public class Helpers {
 	}
 
 	public static int byteToDir(byte dirByte) {
-		return (int)(dirByte - 128);
+		return dirByte - 128;
 	}
 
 	public static string menuControlText(string text, bool isController = false) {

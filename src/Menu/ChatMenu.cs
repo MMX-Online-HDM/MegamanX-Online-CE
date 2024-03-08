@@ -104,7 +104,7 @@ public class ChatMenu : IMainMenu {
 		var chatEntry = new ChatEntry(
 			currentTypedChat,
 			Global.level.mainPlayer.name,
-			isTeamChat ? (int?)Global.level.mainPlayer.alliance : null,
+			isTeamChat ? Global.level.mainPlayer.alliance : null,
 			false,
 			isSpectator: Global.level.mainPlayer.isSpectator);
 

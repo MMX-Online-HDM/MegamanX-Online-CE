@@ -79,7 +79,7 @@ public class ShotgunIceProj : Projectile {
 					(byte)(velOverride.Value.y + 128)
 				};
 			} else {
-				extraArgs = new byte[] { (byte)type, (byte)(128 + xDir), (byte)128 };
+				extraArgs = new byte[] { (byte)type, (byte)(128 + xDir), 128 };
 			}
 			rpcCreate(pos, player, netProjId, xDir, extraArgs);
 		}

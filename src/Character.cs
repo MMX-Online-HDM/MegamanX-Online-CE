@@ -2737,7 +2737,7 @@ public partial class Character : Actor, IDamagable {
 				if (weaponIndex != null && killer != null) {
 					var bytes = new List<byte>()
 					{
-							(byte)1,
+							1,
 							(byte)killer.id,
 							assister == null ? (byte)killer.id : (byte)assister.id,
 							victimPlayerIdBytes[0],
@@ -2753,7 +2753,7 @@ public partial class Character : Actor, IDamagable {
 
 					Global.serverClient?.rpc(RPC.killPlayer, bytes.ToArray());
 				} else {
-					Global.serverClient?.rpc(RPC.killPlayer, (byte)0, (byte)0, (byte)0, victimPlayerIdBytes[0], victimPlayerIdBytes[1]);
+					Global.serverClient?.rpc(RPC.killPlayer, 0, 0, 0, victimPlayerIdBytes[0], victimPlayerIdBytes[1]);
 				}
 			}
 		}

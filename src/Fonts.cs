@@ -76,10 +76,10 @@ public class Fonts {
 			}
 			for (int pos = 0; pos < textLine.Length; pos++) {
 				char letter = textLine[pos];
-				int charInt = (int)letter;
+				int charInt = letter;
 				if (charInt > 191) {
 					letter = '?';
-					charInt = (int)letter;
+					charInt = letter;
 				}
 				int rx = charInt % 16;
 				int ry = MathInt.Floor(charInt / 16);
@@ -151,7 +151,7 @@ public class Fonts {
 			int tempSize = 0;
 			for (int pos = 0; pos < textLines[line].Length; pos++) {
 				char letter = textLines[line][pos];
-				int charInt = (int)letter;
+				int charInt = letter;
 				int fontWidth = fontDefaultWidth;
 				if (fontSizes.ContainsKey(fontStr)) {
 					fontWidth = fontSizes[fontStr][charInt];

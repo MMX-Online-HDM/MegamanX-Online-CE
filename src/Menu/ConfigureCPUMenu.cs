@@ -130,7 +130,7 @@ public class ConfigureCPUMenu : IMainMenu {
 			Global.halfScreenW, 20, alignment: Alignment.Center
 		);
 		DrawWrappers.DrawTextureHUD(
-			Global.textures["cursor"], menuOptions[0].pos.x + 6, menuOptions[(int)selectArrowPosY].pos.y - 2
+			Global.textures["cursor"], menuOptions[0].pos.x + 6, menuOptions[selectArrowPosY].pos.y - 2
 		);
 
 		int i = 0;
