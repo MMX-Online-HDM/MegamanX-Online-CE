@@ -25,6 +25,7 @@ public class WaitMenu : IMainMenu {
 		previous = prevMenu;
 		Global.level = new Level(server.getLevelData(), SelectCharacterMenu.playerData, server.extraCpuCharData, false);
 		this.server = server;
+		Global.level.teamNum = server.teamNum;
 		if (isRecreate) {
 			recreateWaitTime = 9;
 		}

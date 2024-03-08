@@ -62,6 +62,8 @@ public class Server {
 	[ProtoMember(31)] public bool disableVehicles;
 	[ProtoMember(32)] public bool isP2P;
 	[ProtoMember(33)] public byte teamNum = 2;
+	[ProtoMember(5)] public int altPlayTo;
+	[ProtoMember(33)] public byte extraOptions;
 
 	[JsonIgnore]
 	public int redScore;
@@ -230,7 +232,7 @@ public class Server {
 			if (serverPlayer.preferredAlliance != null) {
 				serverPlayer.alliance = serverPlayer.preferredAlliance.Value;
 			} else {
-				serverPlayer.alliance = getMatchInitAutobalanceTeam(players);;
+				serverPlayer.alliance = getMatchInitAutobalanceTeam(players, teamNum);
 			}
 		} else {
 			serverPlayer.alliance = serverPlayer.id;
@@ -253,14 +255,14 @@ public class Server {
 			player.ping = (int)MathF.Round(player.connection.AverageRoundtripTime * 1000);
 		}
 
-		if (!hidden && GameMode.isStringTeamMode(gameMode) &&
+		if ((!hidden || isP2P) && GameMode.isStringTeamMode(gameMode) &&
 			gameMode != GameMode.TeamElimination && level != "training"
 		) {
-			int[] teamSizes = GameMode.getAllianceCounts(players);
+			int[] teamSizes = GameMode.getAllianceCounts(players, teamNum);
 			int biggerTeam = teamSizes.Max();
 			int smallerTeam = teamSizes.Min();
 			// Check if a team has +2 characters than other team to move 1.
-			bool areTeamsUnbalanced = (biggerTeam - 1 > smallerTeam);
+			bool areTeamsUnbalanced = (biggerTeam - 1 >= smallerTeam);
 
 			if (playerToAutobalance != null) {
 				// Player left match
@@ -283,10 +285,12 @@ public class Server {
 					playerToAutobalance = (
 						selectPlayerToAutobalance(lowerCharTeam, prioritizedAutobalancePlayer)
 					);
-					if (!playerToAutobalance.isBot) {
-						playerToAutobalance.alreadyAutobalanced = true;
+					if (playerToAutobalance != null) {
+						if (!playerToAutobalance.isBot) {
+							playerToAutobalance.alreadyAutobalanced = true;
+						}
+						playerToAutobalance.autobalanceAlliance = lowerCharTeam;
 					}
-					playerToAutobalance.autobalanceAlliance = lowerCharTeam;
 				}
 			}
 		}
@@ -303,26 +307,22 @@ public class Server {
 		int smallerTeam = teamSizes.Min();
 		int lowerCharTeam = Array.IndexOf(teamSizes, smallerTeam);
 		// Avoid putting people in 1 player teams if we have more than 3.
-		if (teamSizes.Length >= 3 && smallerTeam == 0) {
-			if (biggerTeam <= 2) {
-				lowerCharTeam = -1;
-			} else {
-				int teamsWithPeople = 0;
-				int ogLowerTeam = lowerCharTeam;
-				smallerTeam = biggerTeam;
-				lowerCharTeam = -1;
-				for (int i = 0; i < teamSizes.Length; i++) {
-					if (teamSizes[i] > 0) {
-						teamsWithPeople++;
-					}
+		if (teamSizes.Length >= 3 && smallerTeam < 2) {
+			int teamsWithPeople = 0;
+			int ogLowerTeam = lowerCharTeam;
+			smallerTeam = 2;
+			lowerCharTeam = -1;
+			for (int i = 0; i < teamSizes.Length; i++) {
+				if (teamSizes[i] > 0) {
+					teamsWithPeople++;
 					if (teamSizes[i] < smallerTeam) {
 						smallerTeam = teamSizes[i];
 						lowerCharTeam = i;
 					}
 				}
-				if (teamsWithPeople < 2) {
-					lowerCharTeam = ogLowerTeam;
-				}
+			}
+			if (teamsWithPeople < 2) {
+				lowerCharTeam = ogLowerTeam;
 			}
 		}
 		if (lowerCharTeam >= 0) {
@@ -331,8 +331,8 @@ public class Server {
 		return -1;
 	}
 
-	public static int getMatchInitAutobalanceTeam(List<Player> players) {
-		int[] teamSizes = GameMode.getAllianceCounts(players);
+	public static int getMatchInitAutobalanceTeam(List<Player> players, int teamNum) {
+		int[] teamSizes = GameMode.getAllianceCounts(players, teamNum);
 		int biggerTeam = teamSizes.Max();
 		int smallerTeam = teamSizes.Min();
 		if (biggerTeam == smallerTeam) {
@@ -348,8 +348,8 @@ public class Server {
 		return Array.IndexOf(teamSizes, smallerTeam);
 	}
 
-	public static int getMatchInitAutobalanceTeam(List<ServerPlayer> players) {
-		int[] teamSizes = GameMode.getAllianceCounts(players);
+	public static int getMatchInitAutobalanceTeam(List<ServerPlayer> players, int teamNum) {
+		int[] teamSizes = GameMode.getAllianceCounts(players, teamNum);
 		int biggerTeam = teamSizes.Max();
 		int smallerTeam = teamSizes.Min();
 		if (biggerTeam == smallerTeam) {
@@ -474,7 +474,7 @@ public class Server {
 			try {
 				runIteration();
 			} catch (Exception ex) {
-				Logger.logException(ex, true);
+				Logger.LogFatalException(ex);
 			}
 		}
 	}

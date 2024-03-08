@@ -47,7 +47,7 @@ public class Projectile : Actor {
 		damager = new Damager(player, damage, flinch, hitCooldown);
 		this.xDir = xDir;
 		if (Global.level.gameMode.isTeamMode && !(this is NapalmPartProj) && !(this is FlameBurnerProj)) {
-			if (Global.level.server.teamNum == 2) {
+			if (Global.level.teamNum == 2) {
 				if (player.alliance == GameMode.blueAlliance) {
 					addRenderEffect(RenderEffectType.BlueShadow);
 				} else {
@@ -603,15 +603,18 @@ public class Projectile : Actor {
 			isAngle,
 			extraData != null && extraData.Length > 0
 		});
+		if (!isAngle) {
+			xDirOrAngle = Math.Sign(xDirOrAngle);
+			xDirOrAngle += 1;
+		}
 		// Create byte list.
-		var bytes = new List<byte>() {
-			dataInf,
+		List<byte> bytes = new List<byte>() {
+			dataInf, (byte)player.id,
 			projIdBytes[0], projIdBytes[1],
 			xBytes[0], xBytes[1], xBytes[2], xBytes[3],
 			yBytes[0], yBytes[1], yBytes[2], yBytes[3],
-			(byte)player.id,
 			netProjIdByte[0], netProjIdByte[1],
-			isAngle ? (byte)angle : (byte)(xDir + 128)
+			(byte)xDirOrAngle
 		};
 		if (extraData != null && extraData.Length > 0) {
 			bytes.AddRange(extraData);
@@ -619,7 +622,10 @@ public class Projectile : Actor {
 		Global.serverClient?.rpc(RPC.createProj, bytes.ToArray());
 	}
 
-	public virtual void rpcCreate(Point pos, Player player, ushort netProjId, int xDir, params byte[] extraData) {
+	public virtual void rpcCreate(
+		Point pos, Player player, ushort netProjId,
+		int xDir, params byte[] extraData
+	) {
 		rpcCreateHelper(pos, player, netProjId, xDir, false, extraData);
 	}
 

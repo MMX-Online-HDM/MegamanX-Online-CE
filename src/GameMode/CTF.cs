@@ -7,8 +7,14 @@ using System.Threading.Tasks;
 namespace MMXOnline;
 
 public class CTF : GameMode {
-	public CTF(Level level, int playingTo, int? timeLimit) : base(level, timeLimit) {
+	int neutralKillLimit;
+
+	public CTF(
+		Level level, int playingTo,
+		int? timeLimit, int neutralKillLimit = 100
+	) : base(level, timeLimit, level.teamNum) {
 		this.playingTo = playingTo;
+		this.neutralKillLimit = neutralKillLimit;
 		isTeamMode = true;
 	}
 

@@ -58,7 +58,7 @@ public class AddBotMenu : IMainMenu {
 				if (charNum == -1) charNum = Helpers.randomRange(0, 4);
 				if (alliance == -1) {
 					if (Global.level.gameMode.isTeamMode) {
-						alliance = Server.getMatchInitAutobalanceTeam(Global.level.players);
+						alliance = Server.getMatchInitAutobalanceTeam(Global.level.players, Global.level.teamNum);
 					}
 				}
 

@@ -162,7 +162,7 @@ public class VileCannonProj : Projectile {
 		this.byteAngle = byteAngle;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreateByteAngle(pos, player, netProjId, byteAngle);
 		}
 	}
 

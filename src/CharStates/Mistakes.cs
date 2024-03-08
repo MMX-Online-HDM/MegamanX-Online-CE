@@ -12,7 +12,6 @@ public class XTeleportState : CharState {
 	Actor cloneG;
 	Rect teleportCollider = new Rect(0f, 0f, 18, 30);
 	int width = 18;
-	int height = 30;
 
 	public XTeleportState() : base("land") {
 	}

@@ -235,7 +235,7 @@ public class UPParryRangedProj : Projectile {
 	}
 
 	public static Projectile rpcInvoke(ProjParameters args) {
-		float hitCooldown = BitConverter.ToUInt16(args.extraData[2..5], 0);
+		float hitCooldown = BitConverter.ToUInt16(args.extraData[2..6], 0);
 		string sprite = Encoding.ASCII.GetString(args.extraData[6..]);
 
 		return new UPParryRangedProj(

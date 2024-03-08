@@ -877,7 +877,7 @@ public partial class Character : Actor, IDamagable {
 			removeRenderEffect(RenderEffectType.BlueShadow);
 			removeRenderEffect(RenderEffectType.RedShadow);
 
-			if (Global.level.server.teamNum == 2) {
+			if (Global.level.teamNum == 2) {
 				if (alliance == GameMode.blueAlliance) {
 					addRenderEffect(RenderEffectType.BlueShadow);
 				} else {
@@ -2482,7 +2482,7 @@ public partial class Character : Actor, IDamagable {
 
 		string playerName = player.name;
 		FontType playerColor = FontType.Grey;
-		if (Global.level.gameMode.isTeamMode && player.alliance < Global.level.server.teamNum) {
+		if (Global.level.gameMode.isTeamMode && player.alliance < Global.level.teamNum) {
 			playerColor = Global.level.gameMode.teamFonts[player.alliance];
 		}
 

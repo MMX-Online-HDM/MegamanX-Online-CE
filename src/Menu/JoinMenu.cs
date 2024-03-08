@@ -321,6 +321,7 @@ public class JoinMenu : IMainMenu {
 
 		if (Global.serverClient.serverPlayer.joinedLate) {
 			Global.level = new Level(server.getLevelData(), SelectCharacterMenu.playerData, server.extraCpuCharData, true);
+			Global.level.teamNum = joinServerResponse.server.teamNum;
 
 			Global.level.startLevel(joinServerResponse.server, true);
 			/*

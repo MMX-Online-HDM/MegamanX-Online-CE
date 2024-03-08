@@ -295,23 +295,23 @@ public class UpgradeArmorMenu : IMainMenu {
 
 		Global.sprites["menu_xdefault"].drawToHUD(0, 300, 110);
 
-		if (mainPlayer.hasUltimateArmor()) Global.sprites["menu_xultimate"].drawToHUD(0, 220, 120);
-		else if (mainPlayer.hasGoldenArmor()) Global.sprites["menu_xgolden"].drawToHUD(0, 220, 120);
+		if (mainPlayer.hasUltimateArmor()) Global.sprites["menu_xultimate"].drawToHUD(0, 300, 110);
+		else if (mainPlayer.hasGoldenArmor()) Global.sprites["menu_xgolden"].drawToHUD(0, 300, 110);
 		else {
-			if (mainPlayer.helmetArmorNum == 1) Global.sprites["menu_xhelmet"].drawToHUD(0, 220, 120);
-			if (mainPlayer.bodyArmorNum == 1) Global.sprites["menu_xbody"].drawToHUD(0, 220, 120);
-			if (mainPlayer.armArmorNum == 1) Global.sprites["menu_xarm"].drawToHUD(0, 220, 120);
-			if (mainPlayer.bootsArmorNum == 1) Global.sprites["menu_xboots"].drawToHUD(0, 220, 120);
+			if (mainPlayer.helmetArmorNum == 1) Global.sprites["menu_xhelmet"].drawToHUD(0, 300, 110);
+			if (mainPlayer.bodyArmorNum == 1) Global.sprites["menu_xbody"].drawToHUD(0, 300, 110);
+			if (mainPlayer.armArmorNum == 1) Global.sprites["menu_xarm"].drawToHUD(0, 300, 110);
+			if (mainPlayer.bootsArmorNum == 1) Global.sprites["menu_xboots"].drawToHUD(0, 300, 110);
 
-			if (mainPlayer.helmetArmorNum == 2) Global.sprites["menu_xhelmet2"].drawToHUD(0, 220, 120);
-			if (mainPlayer.bodyArmorNum == 2) Global.sprites["menu_xbody2"].drawToHUD(0, 220, 120);
-			if (mainPlayer.armArmorNum == 2) Global.sprites["menu_xarm2"].drawToHUD(0, 220, 120);
-			if (mainPlayer.bootsArmorNum == 2) Global.sprites["menu_xboots2"].drawToHUD(0, 220, 120);
+			if (mainPlayer.helmetArmorNum == 2) Global.sprites["menu_xhelmet2"].drawToHUD(0, 300, 110);
+			if (mainPlayer.bodyArmorNum == 2) Global.sprites["menu_xbody2"].drawToHUD(0, 300, 110);
+			if (mainPlayer.armArmorNum == 2) Global.sprites["menu_xarm2"].drawToHUD(0, 300, 110);
+			if (mainPlayer.bootsArmorNum == 2) Global.sprites["menu_xboots2"].drawToHUD(0, 300, 110);
 
-			if (mainPlayer.helmetArmorNum >= 3) Global.sprites["menu_xhelmet3"].drawToHUD(0, 220, 120);
-			if (mainPlayer.bodyArmorNum >= 3) Global.sprites["menu_xbody3"].drawToHUD(0, 220, 120);
-			if (mainPlayer.armArmorNum >= 3) Global.sprites["menu_xarm3"].drawToHUD(0, 220, 120);
-			if (mainPlayer.bootsArmorNum >= 3) Global.sprites["menu_xboots3"].drawToHUD(0, 220, 120);
+			if (mainPlayer.helmetArmorNum >= 3) Global.sprites["menu_xhelmet3"].drawToHUD(0, 300, 110);
+			if (mainPlayer.bodyArmorNum >= 3) Global.sprites["menu_xbody3"].drawToHUD(0, 300, 110);
+			if (mainPlayer.armArmorNum >= 3) Global.sprites["menu_xarm3"].drawToHUD(0, 300, 110);
+			if (mainPlayer.bootsArmorNum >= 3) Global.sprites["menu_xboots3"].drawToHUD(0, 300, 110);
 		}
 
 		Point optionPos = new Point();

@@ -37,6 +37,7 @@ public class GameMode {
 	public bool noContest;
 
 	public byte[] teamPoints = new byte[6];
+	public byte[] teamAltPoints = new byte[6];
 	public string[] teamNames = {
 		"Blue",
 		"Red",
@@ -188,8 +189,7 @@ public class GameMode {
 		return 1;
 	}
 
-	public static int[] getAllianceCounts(List<Player> players) {
-		int teamNum = Global.level.server.teamNum;
+	public static int[] getAllianceCounts(List<Player> players, int teamNum) {
 		int[] teamSizes = new int[teamNum];
 		foreach (Player player in players) {
 			if (!player.isSpectator && player.alliance >= 0 && player.alliance < teamNum) {
@@ -199,8 +199,7 @@ public class GameMode {
 		return teamSizes;
 	}
 
-	public static int[] getAllianceCounts(List<ServerPlayer> players) {
-		int teamNum = Global.level.server.teamNum;
+	public static int[] getAllianceCounts(List<ServerPlayer> players, int teamNum) {
 		int[] teamSizes = new int[teamNum];
 		foreach (ServerPlayer serverPlayer in players) {
 			if (!serverPlayer.isSpectator && serverPlayer.alliance >= 0 && serverPlayer.alliance < teamNum) {
@@ -210,7 +209,7 @@ public class GameMode {
 		return teamSizes;
 	}
 
-	public GameMode(Level level, int? timeLimit) {
+	public GameMode(Level level, int? timeLimit, int? teamNum) {
 		this.level = level;
 		if (timeLimit != null) {
 			remainingTime = timeLimit.Value * 60;
@@ -480,7 +479,7 @@ public class GameMode {
 
 	public void checkIfWinLogicTeams() {
 		int winningAlliance = -1;
-		for (int i = 0; i < Global.level.server.teamNum; i++) {
+		for (int i = 0; i < Global.level.teamNum; i++) {
 			if (Global.level.gameMode.teamPoints[i] >= playingTo) {
 				if (winningAlliance == -1) {
 					winningAlliance = i;
@@ -492,7 +491,7 @@ public class GameMode {
 		if (winningAlliance == -1 && remainingTime <= 0) {
 			int lastScore = 0;
 			bool closeMatch = false;
-			for (int i = 0; i < Global.level.server.teamNum; i++) {
+			for (int i = 0; i < Global.level.teamNum; i++) {
 				if (Global.level.gameMode.teamPoints[i] > lastScore) {
 					winningAlliance = i;
 					closeMatch = false;
@@ -2406,7 +2405,7 @@ public class GameMode {
 		};
 		drawTeamMiniScore(positions[0], 0, FontType.Blue, blueText);
 		drawTeamMiniScore(positions[1], 1, FontType.Red, redText);
-		for (int i = 2; i < Global.level.server.teamNum; i++) {
+		for (int i = 2; i < Global.level.teamNum; i++) {
 			drawTeamMiniScore(
 				positions[i], i,
 				teamFonts[i], $"{teamNames[i]}: {Global.level.gameMode.teamPoints[i]}"
@@ -2857,7 +2856,7 @@ public class GameMode {
 			drawAllTeamsHUD();
 			return;
 		}
-		int maxTeams = Global.level.server.teamNum;
+		int maxTeams = Global.level.teamNum;
 
 		string teamText = $"{teamNames[teamSide]}: {teamPoints[teamSide]}";
 		Fonts.drawText(teamFonts[teamSide], teamText, 5, 5);
@@ -2865,7 +2864,7 @@ public class GameMode {
 		int leaderTeam = 0;
 		int leaderScore = -1;
 		bool moreThanOneLeader = false;
-		for (int i = 0; i < Global.level.server.teamNum; i++) {
+		for (int i = 0; i < Global.level.teamNum; i++) {
 			if (teamPoints[0] >= leaderScore) {
 				leaderTeam = i;
 				if (leaderScore == teamPoints[i]) {
@@ -2874,19 +2873,19 @@ public class GameMode {
 				leaderScore = teamPoints[i];
 			}
 		}
-		if (moreThanOneLeader) {
-			Fonts.drawText(teamFonts[teamSide], $"Leader: {leaderScore}", 5, 15);
+		if (!moreThanOneLeader) {
+			Fonts.drawText(teamFonts[leaderTeam], $"Leader: {leaderScore}", 5, 15);
 		} else {
-			Fonts.drawText(FontType.Grey, $"Leader: {leaderScore}", 5, 5);
+			Fonts.drawText(FontType.Grey, $"Leader: {leaderScore}", 5, 15);
 		}
 		drawTimeIfSet(25);
 	}
 	
 	public void drawAllTeamsHUD() {
-		for (int i = 0; i < Global.level.server.teamNum; i++) {
+		for (int i = 0; i < Global.level.teamNum; i++) {
 			Fonts.drawText(teamFonts[i],  $"{teamNames[i]}: {teamPoints[i]}", 5, 5 + i* 10);
 		}
-		drawTimeIfSet(5 + 10 * (Global.level.server.teamNum + 1));
+		drawTimeIfSet(5 + 10 * (Global.level.teamNum + 1));
 	}
 
 	public void drawObjectiveNavpoint(string label, Point objPos) {

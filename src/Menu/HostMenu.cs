@@ -983,6 +983,7 @@ public class HostMenu : IMainMenu {
 		Global.level = new Level(
 			localServer.getLevelData(), SelectCharacterMenu.playerData, localServer.extraCpuCharData, false
 		);
+		Global.level.teamNum = teamNum;
 		Global.level.startLevel(localServer, false);
 	}
 

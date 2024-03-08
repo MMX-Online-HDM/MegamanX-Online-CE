@@ -12,18 +12,18 @@ public partial class RPCCreateProj : RPC {
 		// Data of the array.
 		bool[] dataInf = Helpers.byteToBoolArray(arguments[0]);
 		// Always present values.
-		ushort projId = BitConverter.ToUInt16(new byte[] { arguments[1], arguments[2] }, 0);
-		float xPos = BitConverter.ToSingle(new byte[] { arguments[3], arguments[4], arguments[5], arguments[6] }, 0);
-		float yPos = BitConverter.ToSingle(new byte[] { arguments[7], arguments[8], arguments[9], arguments[10] }, 0);
-		var playerId = arguments[11];
-		var netProjByte = BitConverter.ToUInt16(new byte[] { arguments[12], arguments[13] }, 0);
+		var playerId = arguments[1];
+		ushort projId = BitConverter.ToUInt16(arguments[2..4], 0);
+		float xPos = BitConverter.ToSingle(arguments[4..8], 0);
+		float yPos = BitConverter.ToSingle(arguments[8..12], 0);
+		var netProjByte = BitConverter.ToUInt16(arguments[12..14], 0);
 		// Angle or Dir
 		int xDir = 1;
 		float angle = 0;
 		float byteAngle = 0;
-		if (dataInf[0]) {
+		if (!dataInf[0]) {
 			xDir = arguments[14];
-			xDir -= 128;
+			xDir -= 1;
 		} else {
 			byteAngle = arguments[14];
 			angle = byteAngle * 1.40625f;

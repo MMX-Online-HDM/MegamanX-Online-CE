@@ -1778,8 +1778,13 @@ public class RPCStopSound : RPC {
 		if (actor == null) return;
 
 		if (actor.netSounds.ContainsKey(soundIndex)) {
-			var soundWrapper = actor.netSounds[soundIndex];
-			if (!soundWrapper.deleted) soundWrapper.sound?.Stop();
+			SoundWrapper soundWrapper = actor.netSounds[soundIndex];
+			if (soundWrapper == null) {
+				actor.netSounds.Remove(soundIndex);
+			}
+			else if (soundWrapper.deleted == false) {
+				soundWrapper.sound?.Stop();
+			}
 		}
 	}
 

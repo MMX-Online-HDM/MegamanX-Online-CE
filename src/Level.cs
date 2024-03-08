@@ -201,6 +201,7 @@ public partial class Level {
 	public float scaleH;
 	public float scaledW;
 	public float scaledH;
+	public int teamNum;
 
 	public Level(LevelData levelData, PlayerCharData playerData, ExtraCpuCharData extraCpuCharData, bool joinedLate) {
 		this.levelData = levelData;
@@ -255,7 +256,7 @@ public partial class Level {
 		} else if (server.gameMode == GameMode.TeamDeathmatch) {
 			gameMode = new TeamDeathMatch(this, server.playTo, server.timeLimit);
 		} else if (server.gameMode == GameMode.CTF) {
-			gameMode = new CTF(this, server.playTo, server.timeLimit);
+			gameMode = new CTF(this, server.playTo, server.timeLimit, server.altPlayTo);
 		} else if (server.gameMode == GameMode.ControlPoint) {
 			gameMode = new ControlPoints(this, server.timeLimit);
 		} else if (server.gameMode == GameMode.Elimination) {
@@ -757,7 +758,7 @@ public partial class Level {
 				if (!gameMode.isTeamMode) {
 					alliance = id;
 				} else {
-					alliance = Server.getMatchInitAutobalanceTeam(players);;
+					alliance = Server.getMatchInitAutobalanceTeam(players, teamNum);
 				}
 
 				if (equalCharDistribution) {
@@ -980,7 +981,9 @@ public partial class Level {
 	public void addPlayer(ServerPlayer serverPlayer, bool joinedLate) {
 		bool isPlayerIdMainPlayer;
 
-		if (Global.serverClient != null) isPlayerIdMainPlayer = (serverPlayer.id == Global.serverClient.serverPlayer.id);
+		if (Global.serverClient != null) isPlayerIdMainPlayer = (
+			serverPlayer.id == Global.serverClient.serverPlayer.id
+		);
 		else isPlayerIdMainPlayer = (serverPlayer.id == 0);
 
 		// Player already exists, do not re-add
@@ -993,7 +996,11 @@ public partial class Level {
 		bool ownedByLocalPlayer = serverPlayer.isBot ? Global.isHost : isPlayerIdMainPlayer;
 		bool isBot = Global.isHost ? serverPlayer.isBot : false;
 
-		var player = new Player(serverPlayer.name, serverPlayer.id, serverPlayer.charNum, playerData, isBot, ownedByLocalPlayer, serverPlayer.alliance, input, serverPlayer);
+		var player = new Player(
+			serverPlayer.name, serverPlayer.id,
+			serverPlayer.charNum, playerData, isBot,
+			ownedByLocalPlayer, serverPlayer.alliance, input, serverPlayer
+		);
 		if (joinedLate) {
 			player.warpedIn = true;
 			player.readyTime = 10;
@@ -2043,18 +2050,35 @@ public partial class Level {
 			return spawnPoints[player.getSpawnIndex(spawnPoints.Count)];
 		}
 
-		if (Global.quickStart && Global.quickStartSpawn != null) return spawnPoints[Global.quickStartSpawn.Value];
-		var availableSpawns = spawnPoints.Where((spawnPoint) => {
-			return (!gameMode.useTeamSpawns() && spawnPoint.alliance == -1) || (gameMode.useTeamSpawns() && spawnPoint.alliance == player.newAlliance);
-		}).ToList();
-
-		if (isFirstTime) {
-			return availableSpawns[player.getSpawnIndex(availableSpawns.Count)];
+		if (Global.quickStart && Global.quickStartSpawn != null) {
+			return spawnPoints[Global.quickStartSpawn.Value];
+		}
+		SpawnPoint[] availableSpawns;
+		if (!gameMode.useTeamSpawns() || player.newAlliance < 0 || player.newAlliance > 1) {
+			availableSpawns = spawnPoints.Where(
+				(spawnPoint) => {
+					return (
+						spawnPoint.alliance == -1
+					);
+				}
+			).ToArray();
+		} else {
+			availableSpawns = spawnPoints.Where(
+				(spawnPoint) => {
+					return (
+						spawnPoint.alliance == player.newAlliance
+					);
+				}
+			).ToArray();
 		}
 
-		var unoccupied = availableSpawns.Where((spawnPoint) => {
+		if (isFirstTime) {
+			return availableSpawns[player.getSpawnIndex(availableSpawns.Length)];
+		}
+
+		SpawnPoint[] unoccupied = availableSpawns.Where((spawnPoint) => {
 			return !spawnPoint.occupied();
-		}).ToList();
+		}).ToArray();
 
 		return unoccupied.GetRandomItem();
 	}

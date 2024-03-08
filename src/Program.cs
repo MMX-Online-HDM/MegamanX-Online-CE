@@ -791,11 +791,11 @@ class Program {
 		if (spriteFilePaths.Length >= 20) {
 			treadedFilePaths = new string[][] {
 				spriteFilePaths[..fileSplit],
-				spriteFilePaths[(fileSplit+1)..(fileSplit*2)],
-				spriteFilePaths[(fileSplit*2+1)..(fileSplit*3)],
-				spriteFilePaths[(fileSplit*3+1)..(fileSplit*4)],
-				spriteFilePaths[(fileSplit*4+1)..(fileSplit*5)],
-				spriteFilePaths[(fileSplit*5+1)..],
+				spriteFilePaths[(fileSplit)..(fileSplit*2)],
+				spriteFilePaths[(fileSplit*2)..(fileSplit*3)],
+				spriteFilePaths[(fileSplit*3)..(fileSplit*4)],
+				spriteFilePaths[(fileSplit*4)..(fileSplit*5)],
+				spriteFilePaths[(fileSplit*5)..],
 			};
 			string[] fileChecksums = new string[6];
 			List<Thread> threads = new();

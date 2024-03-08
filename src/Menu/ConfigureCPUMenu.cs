@@ -95,7 +95,7 @@ public class ConfigureCPUMenu : IMainMenu {
 				menuOptions.Add(
 					new MenuOption(startX + 30, currentY += lineH,
 						() => {
-							Helpers.menuLeftRightInc(ref cpuData.alliance, -1, Global.level.server.teamNum);
+							Helpers.menuLeftRightInc(ref cpuData.alliance, -1, Global.level.teamNum);
 						},
 						(Point pos, int index) => {
 							string allianceStr = "auto";

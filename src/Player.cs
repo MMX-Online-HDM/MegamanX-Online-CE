@@ -362,8 +362,14 @@ public partial class Player {
 			deaths = serverPlayer.deaths;
 		}
 
-		if (ownedByLocalPlayer && serverPlayer.autobalanceAlliance != null && newAlliance != serverPlayer.autobalanceAlliance.Value) {
-			Global.level.gameMode.chatMenu.addChatEntry(new ChatEntry(name + " was autobalanced to " + GameMode.getTeamName(serverPlayer.autobalanceAlliance.Value), null, null, true), true);
+		if (ownedByLocalPlayer && serverPlayer.autobalanceAlliance != null &&
+			newAlliance != serverPlayer.autobalanceAlliance.Value
+		) {
+			Global.level.gameMode.chatMenu.addChatEntry(
+				new ChatEntry(
+					name + " was autobalanced to " +
+					GameMode.getTeamName(serverPlayer.autobalanceAlliance.Value), null, null, true
+				), true);
 			forceKill();
 			currency += 5;
 			Global.serverClient?.rpc(RPC.switchTeam, RPCSwitchTeam.getSendMessage(id, serverPlayer.autobalanceAlliance.Value));
@@ -2335,7 +2341,9 @@ public partial class Player {
 		var nonSpecPlayers = Global.level.nonSpecPlayers();
 		nonSpecPlayers = nonSpecPlayers.OrderBy(p => p.id).ToList();
 		int index = nonSpecPlayers.IndexOf(this) % spawnPointCount;
-		if (index < 0) index = 0;
+		if (index < 0) {
+			index = 0;
+		}
 		return index;
 	}
 
