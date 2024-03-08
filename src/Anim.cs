@@ -17,6 +17,7 @@ public class Anim : Actor {
 	public bool blink;
 	public bool maverickFade;
 	public bool grow;
+	public string animJsonName;
 
 	public Anim(Point pos, string spriteName, int xDir, ushort? netId, bool destroyOnEnd, bool sendRpc = false, bool ownedByLocalPlayer = true, Actor host = null,
 		long? zIndex = null, Actor zIndexRelActor = null, bool fadeIn = false, bool hasRaColorShader = false) :
@@ -26,6 +27,7 @@ public class Anim : Actor {
 		this.xDir = xDir;
 		this.destroyOnEnd = destroyOnEnd;
 		Global.level.gameObjects.Add(this);
+		animJsonName = spriteName;
 
 		if (isMaverickDeathAnim(spriteName)) {
 			maverickFade = true;
@@ -125,9 +127,9 @@ public class Anim : Actor {
 	private bool isMaverickDeathAnim(string spriteName) {
 		string[] maverickDieSprites = new string[]
 		{
-				"chillp_die", "sparkm_die", "armoreda_die", "armoreda_na_die", "launcho_die", "boomerk_die", "boomerk_bald_die", "stingc_die", "storme_die", "flamem_die",
-				"wsponge_die", "wheelg_die", "bcrab_die", "fstag_die", "morphmc_die", "morphm_die", "magnac_die", "magnac_notail_die", "csnail_die", "overdriveo_die", "fakezero_die",
-				"bbuffalo_die", "tseahorse_die", "tunnelr_die", "voltc_die", "crushc_die", "neont_die", "gbeetle_die", "bhornet_die", "drdoppler_die",
+			"chillp_die", "sparkm_die", "armoreda_die", "armoreda_na_die", "launcho_die", "boomerk_die", "boomerk_bald_die", "stingc_die", "storme_die", "flamem_die",
+			"wsponge_die", "wheelg_die", "bcrab_die", "fstag_die", "morphmc_die", "morphm_die", "magnac_die", "magnac_notail_die", "csnail_die", "overdriveo_die", "fakezero_die",
+			"bbuffalo_die", "tseahorse_die", "tunnelr_die", "voltc_die", "crushc_die", "neont_die", "gbeetle_die", "bhornet_die", "drdoppler_die",
 		};
 		return maverickDieSprites.Any(s => s == spriteName);
 	}

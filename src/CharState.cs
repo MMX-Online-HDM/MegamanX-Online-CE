@@ -262,34 +262,8 @@ public class CharState {
 
 	public void landingCode() {
 		character.playSound("land", sendRpc: true);
-		string ts = "land";
-		if (character.sprite != null && character.sprite.name.EndsWith(shootSprite)) {
-			ts = "";
-		}
-		if (character.sprite.name.Contains("hyouretsuzan")) {
-			ts = "hyouretsuzan_land";
-			if (!character.sprite.name.Contains("_start") || character.frameIndex > 0) {
-				character.breakFreeze(player, character.pos.addxy(character.xDir * 5, 0), sendRpc: true);
-			}
-		}
-		if (character.sprite.name.Contains("rakukojin")) {
-			ts = "rakukojin_land";
-			if (!character.sprite.name.Contains("_start") || character.frameIndex > 0) {
-				character.playSound("swordthud", sendRpc: true);
-			}
-		}
-		if (character.sprite.name.Contains("quakeblazer") && character.charState is ZeroFallStab h) {
-			ts = "quakeblazer_land";
-			h.quakeBlazerExplode(true);
-		}
-		if (character.sprite.name.Contains("dropkick") && character.charState is DropKickState d) {
-			ts = "dropkick_land";
-		}
-		if (character is Zero zero) {
-			zero.quakeBlazerBounces = 0;
-		}
 		character.dashedInAir = 0;
-		changeToIdle(ts);
+		changeToIdle();
 		if (character.ai != null) {
 			character.ai.jumpTime = 0;
 		}

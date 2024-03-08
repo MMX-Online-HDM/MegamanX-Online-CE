@@ -113,7 +113,7 @@ public class TextExportMenu : IMainMenu {
 			Global.screenW / 2, bot - 10, alignment: Alignment.Center
 		);
 		Fonts.drawTextEX(
-			FontType.Grey, "[BACK]: back", Global.screenW / 2,
+			FontType.Grey, "[BACK]: Back", Global.screenW / 2,
 			bot, alignment: Alignment.Center
 		);
 	}

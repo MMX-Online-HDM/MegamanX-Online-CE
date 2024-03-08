@@ -113,7 +113,7 @@ public class ServerClient {
 		IPEndPoint masterServerLocation = NetUtility.Resolve(MasterServerData.serverIp, MasterServerData.serverPort);
 		client.SendUnconnectedMessage(regMsg, masterServerLocation);
 		client.FlushSendQueue();
-		log += "Sent HolePunch message...";
+		log += "Sent HolePunch message..."; 
 		// Wait for hole punching to happen.
 		int count = 0;
 		bool connected = false;

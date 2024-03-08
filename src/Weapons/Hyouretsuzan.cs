@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MMXOnline;
 
-public enum HyouretsuzanType {
+public enum ZeroFallStabType {
 	Hyouretsuzan,
 	Rakukojin,
 	QuakeBlazer,
@@ -21,16 +21,16 @@ public class HyouretsuzanWeapon : Weapon {
 		weaponBarBaseIndex = 24;
 		weaponBarIndex = weaponBarBaseIndex;
 		killFeedIndex = 12;
-		type = (int)HyouretsuzanType.Hyouretsuzan;
+		type = (int)ZeroFallStabType.Hyouretsuzan;
 		displayName = "Hyouretsuzan";
 		description = new string[] { "A dive attack that can freeze enemies." };
 	}
 
 	public static Weapon getWeaponFromIndex(Player player, int index) {
-		if (index == (int)HyouretsuzanType.Hyouretsuzan) return new HyouretsuzanWeapon(player);
-		else if (index == (int)HyouretsuzanType.Rakukojin) return new RakukojinWeapon(player);
-		else if (index == (int)HyouretsuzanType.QuakeBlazer) return new QuakeBlazerWeapon(player);
-		else if (index == (int)HyouretsuzanType.DropKick) return new DropKickWeapon(player);
+		if (index == (int)ZeroFallStabType.Hyouretsuzan) return new HyouretsuzanWeapon(player);
+		else if (index == (int)ZeroFallStabType.Rakukojin) return new RakukojinWeapon(player);
+		else if (index == (int)ZeroFallStabType.QuakeBlazer) return new QuakeBlazerWeapon(player);
+		else if (index == (int)ZeroFallStabType.DropKick) return new DropKickWeapon(player);
 		else throw new Exception("Invalid Zero hyouretsuzan weapon index!");
 	}
 }
@@ -42,7 +42,7 @@ public class RakukojinWeapon : Weapon {
 		rateOfFire = 0;
 		weaponBarBaseIndex = 38;
 		killFeedIndex = 37;
-		type = (int)HyouretsuzanType.Rakukojin;
+		type = (int)ZeroFallStabType.Rakukojin;
 		displayName = "Rakukojin";
 		description = new string[] { "Drop with a metal blade that deals more damage", "the faster Zero is falling." };
 	}
@@ -55,7 +55,7 @@ public class QuakeBlazerWeapon : Weapon {
 		rateOfFire = 0.3f;
 		weaponBarBaseIndex = 38;
 		killFeedIndex = 82;
-		type = (int)HyouretsuzanType.QuakeBlazer;
+		type = (int)ZeroFallStabType.QuakeBlazer;
 		displayName = "Danchien";
 		description = new string[] { "A dive attack that can burn enemies", "and knock them downwards." };
 	}
@@ -63,7 +63,7 @@ public class QuakeBlazerWeapon : Weapon {
 
 public class ZeroFallStab : CharState {
 	public Weapon weapon;
-	public HyouretsuzanType type { get { return (HyouretsuzanType)weapon.type; } }
+	public ZeroFallStabType type { get { return (ZeroFallStabType)weapon.type; } }
 	public bool canFreeze;
 	public Zero zero;
 
@@ -71,12 +71,11 @@ public class ZeroFallStab : CharState {
 		getSpriteName(weapon.type) + "_fall", "", "", getSpriteName(weapon.type) + "_start"
 	) {
 		this.weapon = weapon;
-		exitOnLanding = true;
 	}
 
 	public static string getSpriteName(int type) {
-		if (type == (int)HyouretsuzanType.Hyouretsuzan) return "hyouretsuzan";
-		else if (type == (int)HyouretsuzanType.Rakukojin) return "rakukojin";
+		if (type == (int)ZeroFallStabType.Hyouretsuzan) return "hyouretsuzan";
+		else if (type == (int)ZeroFallStabType.Rakukojin) return "rakukojin";
 		else return "quakeblazer";
 	}
 
@@ -90,7 +89,7 @@ public class ZeroFallStab : CharState {
 				character.changeSpriteFromName(sprite, false);
 			}
 		}
-		if (type == HyouretsuzanType.QuakeBlazer) {
+		if (type == ZeroFallStabType.QuakeBlazer) {
 			if (player.input.isHeld(Control.Left, player)) {
 				character.xDir = -1;
 				character.move(new Point(-100, 0));
@@ -99,10 +98,16 @@ public class ZeroFallStab : CharState {
 				character.move(new Point(100, 0));
 			}
 		}
+		if (character.grounded) {
+			character.changeState(new ZeroFallStabLand(weapon.type, getSpriteName(weapon.type) + "_land"), true);
+			if (weapon.type == (int)ZeroFallStabType.QuakeBlazer) {
+				quakeBlazerExplode(true);
+			}
+		}
 	}
 
 	public bool isUnderwaterQuakeBlazer() {
-		return character.isUnderwater() && type == HyouretsuzanType.QuakeBlazer;
+		return character.isUnderwater() && type == ZeroFallStabType.QuakeBlazer;
 	}
 
 	public void quakeBlazerExplode(bool hitGround) {
@@ -139,8 +144,37 @@ public class ZeroFallStab : CharState {
 		zero = character as Zero;
 	}
 
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
+	public override void onExit(CharState oldState) {
+		zero.quakeBlazerBounces = 0;
+	}
+}
+
+
+public class ZeroFallStabLand : CharState {
+	int type;
+	public ZeroFallStabLand(int type, string sprite) : base(sprite) {
+		exitOnAirborne = true;
+		this.type = type;
+	}
+
+	public override void update() {
+		base.update();
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.playSound("land", sendRpc: true);
+		switch (type) {
+			case (int)ZeroFallStabType.Hyouretsuzan:
+				character.breakFreeze(player, character.pos.addxy(character.xDir * 5, 0), sendRpc: true);
+				break;
+			case (int)ZeroFallStabType.Rakukojin:
+				character.playSound("swordthud", sendRpc: true);
+				break;
+		}
 	}
 }
 
@@ -214,7 +248,7 @@ public class DropKickWeapon : Weapon {
 		index = (int)WeaponIds.DropKick;
 		rateOfFire = 0;
 		killFeedIndex = 112;
-		type = (int)HyouretsuzanType.DropKick;
+		type = (int)ZeroFallStabType.DropKick;
 	}
 }
 

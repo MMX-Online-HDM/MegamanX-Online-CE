@@ -68,13 +68,17 @@ public class UpgradeMenu : IMainMenu {
 		if (mainPlayer.isSigma) {
 			if (mainPlayer.isTagTeam()) {
 				if (mainPlayer.currentMaverick != null) {
-					var currentMaverickWeapon = mainPlayer.weapons.FirstOrDefault(w => w is MaverickWeapon mw && mw.maverick == mainPlayer.currentMaverick);
+					var currentMaverickWeapon = mainPlayer.weapons.FirstOrDefault(
+						w => w is MaverickWeapon mw && mw.maverick == mainPlayer.currentMaverick
+					);
 					if (currentMaverickWeapon != null) {
 						subtankTargets.Add(currentMaverickWeapon);
 					}
 				}
 			} else if (!mainPlayer.isStriker()) {
-				subtankTargets = mainPlayer.weapons.FindAll(w => (w is MaverickWeapon mw && mw.maverick != null) || w is SigmaMenuWeapon).ToList();
+				subtankTargets = mainPlayer.weapons.FindAll(
+					w => (w is MaverickWeapon mw && mw.maverick != null) || w is SigmaMenuWeapon
+				).ToList();
 			}
 		}
 
@@ -141,13 +145,17 @@ public class UpgradeMenu : IMainMenu {
 					bool maverickUsed = false;
 					if (subtankTargets.Count > 0) {
 						var currentTarget = subtankTargets[subtankTargetIndex];
-						if (currentTarget is MaverickWeapon mw && canUseSubtankInMenu(mw.canUseSubtank(mainPlayer.subtanks[selectArrowPosY - 1]))) {
+						if (currentTarget is MaverickWeapon mw &&
+							canUseSubtankInMenu(mw.canUseSubtank(mainPlayer.subtanks[selectArrowPosY - 1]))
+						) {
 							mainPlayer.subtanks[selectArrowPosY - 1].use(mw.maverick);
 							maverickUsed = true;
 						}
 					}
 
-					if (!maverickUsed && canUseSubtankInMenu(mainPlayer.canUseSubtank(mainPlayer.subtanks[selectArrowPosY - 1]))) {
+					if (!maverickUsed && canUseSubtankInMenu(
+						mainPlayer.canUseSubtank(mainPlayer.subtanks[selectArrowPosY - 1]))
+					) {
 						mainPlayer.subtanks[selectArrowPosY - 1].use(mainPlayer.character);
 					}
 				}
@@ -183,13 +191,13 @@ public class UpgradeMenu : IMainMenu {
 
 		if (Global.frameCount % 60 < 30 && mainPlayer.realCharNum == 2) {
 			Fonts.drawText(FontType.DarkPurple, ">", Global.screenW - 14, Global.halfScreenH, Alignment.Center);
-			//Fonts.drawText(FontType.DarkPurple, "Armor", Global.screenW - 25, Global.halfScreenH + 15, Alignment.Center);
+		//Fonts.drawText(FontType.DarkPurple, "Armor", Global.screenW - 25, Global.halfScreenH + 15, Alignment.Center);
 		} else if (Global.frameCount % 60 < 30 && mainPlayer.canUpgradeXArmor()) {
 			Fonts.drawText(FontType.DarkPurple, "<", 14, Global.halfScreenH, Alignment.Center);
-			//Fonts.drawText(FontType.DarkPurple, "X3", 12, Global.halfScreenH + 15, Alignment.Center);
+		//Fonts.drawText(FontType.DarkPurple, "X3", 12, Global.halfScreenH + 15, Alignment.Center);
 
 			Fonts.drawText(FontType.DarkPurple, ">", Global.screenW - 14, Global.halfScreenH, Alignment.Center);
-			//Fonts.drawText(FontType.DarkPurple, "X1", Global.screenW - 19, Global.halfScreenH + 15, Alignment.Center);
+		//Fonts.drawText(FontType.DarkPurple, "X1", Global.screenW - 19, Global.halfScreenH + 15, Alignment.Center);
 		}
 
 		bool soldOut = false;

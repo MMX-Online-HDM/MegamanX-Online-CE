@@ -277,4 +277,8 @@ public struct Point {
 
 		return bestPoint;
 	}
+
+	public Point round() {
+		return new Point(MathF.Round(x), MathF.Round(y));
+	}
 }
