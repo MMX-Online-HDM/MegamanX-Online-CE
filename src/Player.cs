@@ -1,10 +1,8 @@
-﻿using Newtonsoft.Json;
-using ProtoBuf;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
+using Newtonsoft.Json;
+using ProtoBuf;
 using static SFML.Window.Keyboard;
 
 namespace MMXOnline;
@@ -1707,8 +1705,7 @@ public partial class Player {
 		} else if (isSigma2()) {
 			explodeDieEffect.changeSprite("sigma2_revive");
 			character.changeState(new ViralSigmaRevive(explodeDieEffect), true);
-		}
-		else if (character is Doppma) {
+		} else if (character is Doppma) {
 			character.destroySelf();
 			KaiserSigma kaiserSigma = new KaiserSigma(
 				this, spawnPoint.x, spawnPoint.y, character.xDir, true,

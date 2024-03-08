@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace MMXOnline;
 
@@ -80,7 +76,7 @@ public class TriadThunderProj : Projectile {
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new TriadThunderProj(
 			TriadThunder.netWeapon, arg.pos, arg.xDir, arg.extraData[0], arg.player, arg.netId
-		); 
+		);
 	}
 
 	public override void update() {
@@ -272,7 +268,7 @@ public class TriadThunderProjCharged : Projectile {
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new TriadThunderProjCharged(
 			TriadThunder.netWeapon, arg.pos, arg.xDir, arg.extraData[0], arg.player, arg.netId
-		); 
+		);
 	}
 }
 
@@ -294,7 +290,7 @@ public class TriadThunderQuake : Projectile {
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new TriadThunderQuake(
 			TriadThunder.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
-		); 
+		);
 	}
 }
 

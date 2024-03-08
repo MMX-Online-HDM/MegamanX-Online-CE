@@ -1,5 +1,3 @@
-using System;
-
 namespace MMXOnline;
 
 public class IssueGlobalCommand : CharState {
@@ -68,8 +66,7 @@ public class CallDownMaverick : CharState {
 		if (!isNew) {
 			if (maverick.state is not MExit) {
 				maverick.changeState(new MExit(character.pos, isRecall));
-			}
-			else {
+			} else {
 				maverick.changeState(new MEnter(character.pos));
 			}
 		}

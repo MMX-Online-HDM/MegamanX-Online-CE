@@ -1,9 +1,7 @@
-﻿using SFML.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SFML.Graphics;
 
 namespace MMXOnline;
 
@@ -1069,22 +1067,18 @@ public class RideArmorState {
 		if (player == null) return;
 
 		if (rideArmor.grounded) {
-			if (rideArmor.raNum == 3)
-			{
-			rideArmor.playSound("ridewalk2X3");
+			if (rideArmor.raNum == 3) {
+				rideArmor.playSound("ridewalk2X3");
 			}
-			if (rideArmor.raNum != 1 && rideArmor.raNum != 2 && rideArmor.raNum != 3 && rideArmor.raNum != 4)
-			{
-			rideArmor.playSound("ridewalk");
+			if (rideArmor.raNum != 1 && rideArmor.raNum != 2 && rideArmor.raNum != 3 && rideArmor.raNum != 4) {
+				rideArmor.playSound("ridewalk");
 			}
-			if (rideArmor.raNum == 1 || rideArmor.raNum == 2 || rideArmor.raNum == 3)
-			{
-			rideArmor.playSound("ridewalkX3");
+			if (rideArmor.raNum == 1 || rideArmor.raNum == 2 || rideArmor.raNum == 3) {
+				rideArmor.playSound("ridewalkX3");
 			}
-			if (rideArmor.raNum == 4)
-			{
-			rideArmor.playCrashSound();
-			rideArmor.shakeCamera(sendRpc: true);
+			if (rideArmor.raNum == 4) {
+				rideArmor.playCrashSound();
+				rideArmor.shakeCamera(sendRpc: true);
 			}
 			string ts = "ridearmor_land".Replace("ridearmor", rideArmor.getRaTypeName());
 			if (!rideArmor.isAttacking() || rideArmor.raNum == 2 || rideArmor.raNum == 3) {
@@ -1160,9 +1154,9 @@ public class RideArmorState {
 			return;
 		}
 
-		if (jumpPressed()) {			
-				rideArmor.vel.y = -rideArmor.getJumpPower();
-				rideArmor.changeState(new RAJump());			
+		if (jumpPressed()) {
+			rideArmor.vel.y = -rideArmor.getJumpPower();
+			rideArmor.changeState(new RAJump());
 			if (rideArmor.raNum >= 1 && rideArmor.raNum <= 4) {
 				rideArmor.playSound("ridejumpX3", sendRpc: true);
 			} else {
@@ -1242,10 +1236,10 @@ public class RADeactive : RideArmorState {
 		rideArmor.consecutiveJump = 0;
 	}
 
-    public override void onExit(RideArmorState newState) {
-        base.onExit(newState);
+	public override void onExit(RideArmorState newState) {
+		base.onExit(newState);
 		rideArmor.manualDisabled = false;
-    }
+	}
 }
 
 public class RAIdle : RideArmorState {
@@ -1672,14 +1666,12 @@ public class RADash : RideArmorState {
 
 	public override void onEnter(RideArmorState oldState) {
 		base.onEnter(oldState);
-		if (rideArmor.raNum != 1 && rideArmor.raNum != 2 && rideArmor.raNum != 3 && rideArmor.raNum != 4)
-			{
+		if (rideArmor.raNum != 1 && rideArmor.raNum != 2 && rideArmor.raNum != 3 && rideArmor.raNum != 4) {
 			rideArmor.playSound("ridedash");
-			}
-		if (rideArmor.raNum == 1 || rideArmor.raNum == 2 || rideArmor.raNum == 3 || rideArmor.raNum == 4 )
-			{
+		}
+		if (rideArmor.raNum == 1 || rideArmor.raNum == 2 || rideArmor.raNum == 3 || rideArmor.raNum == 4) {
 			rideArmor.playSound("ridedashX3");
-			}
+		}
 		rideArmor.isDashing = true;
 		new Anim(rideArmor.pos.addxy(rideArmor.xDir * -15, 0), "dash_sparks", rideArmor.xDir, null, true);
 	}
@@ -1851,14 +1843,12 @@ public class RAChainChargeDash : RideArmorState {
 
 	public override void onEnter(RideArmorState oldState) {
 		base.onEnter(oldState);
-		if (rideArmor.raNum != 1 && rideArmor.raNum != 2 && rideArmor.raNum != 3 && rideArmor.raNum != 4)
-			{
+		if (rideArmor.raNum != 1 && rideArmor.raNum != 2 && rideArmor.raNum != 3 && rideArmor.raNum != 4) {
 			rideArmor.playSound("ridedash");
-			}
-		if (rideArmor.raNum == 1 || rideArmor.raNum == 2 || rideArmor.raNum == 3 || rideArmor.raNum == 4 )
-			{
+		}
+		if (rideArmor.raNum == 1 || rideArmor.raNum == 2 || rideArmor.raNum == 3 || rideArmor.raNum == 4) {
 			rideArmor.playSound("ridedashX3");
-			}
+		}
 		rideArmor.isDashing = true;
 		new Anim(rideArmor.pos, "dash_sparks", rideArmor.xDir, null, true);
 	}

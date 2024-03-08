@@ -22,16 +22,16 @@ public class RPCCustom : RPC {
 		switch (type) {
 			case (byte)RpcCustomType.ChangeOwnership:
 				RPC.changeOwnership.invoke(finalArguments);
-			break;
+				break;
 			case (byte)RpcCustomType.Reflect:
 				RPC.reflect.invoke(finalArguments);
-			break;
+				break;
 			case (byte)RpcCustomType.Deflect:
 				RPC.deflect.invoke(finalArguments);
-			break;
+				break;
 			case (byte)RpcCustomType.UpdateMaxTime:
 				RPC.updateMaxTime.invoke(finalArguments);
-			break;
+				break;
 		}
 	}
 

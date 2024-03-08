@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MMXOnline;
 
@@ -98,7 +95,7 @@ public class VileFlamethrower : Weapon {
 public class FlamethrowerState : CharState {
 	public float shootTime;
 	public Point shootPOI = new Point(-1, -1);
-	
+
 	public FlamethrowerState(string transitionSprite = "") : base("flamethrower", "", "", transitionSprite) {
 	}
 

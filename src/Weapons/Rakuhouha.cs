@@ -1,9 +1,5 @@
-﻿using SFML.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using SFML.Graphics;
 
 namespace MMXOnline;
 
@@ -148,18 +144,13 @@ public class Rakuhouha : CharState {
 				character.playSound("rakuhouha", sendRpc: true);
 			} else if (isCFlasher && !isDarkHold) {
 				character.playSound("cflasher", sendRpc: true);
-			}
-			else if (!isCFlasher && isDarkHold)
-			{
+			} else if (!isCFlasher && isDarkHold) {
 				character.playSound("dark_hold", forcePlay: false, sendRpc: true);
-				if (Helpers.randomRange(0, 1) == 0)
-				{
+				if (Helpers.randomRange(0, 1) == 0) {
 					character.playSound("X6_ZeroN_Nigeru", forcePlay: false, sendRpc: true);
-				}
-				else
-				{
+				} else {
 					character.playSound("X6_ZeroN_Owari", forcePlay: false, sendRpc: true);
-				}		
+				}
 			}
 		}
 
@@ -367,7 +358,7 @@ public class RekkohaProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
-		netcodeOverride = NetcodeModel.FavorDefender; 
+		netcodeOverride = NetcodeModel.FavorDefender;
 	}
 
 	public override void update() {

@@ -1,9 +1,5 @@
-﻿using SFML.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using static SFML.Window.Keyboard;
+﻿using System.Collections.Generic;
+using SFML.Graphics;
 
 namespace MMXOnline;
 
@@ -229,7 +225,7 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 				}
 				Global.sprites["hud_weapon_icon"].drawToHUD(
 					drawIndex,
-					startX + 152 + i * 16  + 8,
+					startX + 152 + i * 16 + 8,
 					wsy + 18
 				);
 			}
@@ -245,7 +241,7 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 				}
 				Global.sprites["hud_weapon_icon"].drawToHUD(
 					drawIndex,
-					startX + 152 + i * 16  + 8,
+					startX + 152 + i * 16 + 8,
 					wsy + 34
 				);
 			}
@@ -301,7 +297,7 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 				3 => "Mavericks will swap out with Sigma.",
 				_ => ""
 			};
-			
+
 			Fonts.drawText(FontType.Purple, title, startX, wsy);
 			Fonts.drawText(FontType.Green, text, startX, wsy + 16);
 			Fonts.drawText(FontType.Orange, "Maverick cost: " + cost, startX, wsy + 40);
@@ -420,7 +416,7 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 				new MorphMothWeapon(null).weaponSlotIndex, new SilkShot().weaponSlotIndex,
 				new FakeZeroWeapon(null).weaponSlotIndex
 			},
-			13 => new int[] {new MagnaCentipedeWeapon(null).weaponSlotIndex, new MagnetMine().weaponSlotIndex },
+			13 => new int[] { new MagnaCentipedeWeapon(null).weaponSlotIndex, new MagnetMine().weaponSlotIndex },
 			14 => new int[] { new CrystalSnailWeapon(null).weaponSlotIndex, new CrystalHunter().weaponSlotIndex },
 			15 => new int[] { new OverdriveOstrichWeapon(null).weaponSlotIndex, new SonicSlicer().weaponSlotIndex },
 			16 => new int[] { new WireSpongeWeapon(null).weaponSlotIndex, new StrikeChain().weaponSlotIndex },

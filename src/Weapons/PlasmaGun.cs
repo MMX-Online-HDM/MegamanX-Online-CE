@@ -1,10 +1,6 @@
-﻿using SFML.Audio;
-using SFML.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SFML.Graphics;
 
 namespace MMXOnline;
 
@@ -103,7 +99,7 @@ public class PlasmaGunAltProj : Projectile {
 	public PlasmaGunAltProj(Weapon weapon, Point pos, Point cursorPos, int xDir, Player player, ushort netProjId, bool sendRpc = false) :
 		base(weapon, pos, xDir, 0, 1, player, "plasmagun_alt_proj", 1, 0.25f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.PlasmaGun2;
-		
+
 		destroyOnHit = false;
 		shouldVortexSuck = false;
 		shouldShieldBlock = false;

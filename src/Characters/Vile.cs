@@ -260,7 +260,7 @@ public class Vile : Character {
 			onMechSlotSelect(mmw);
 			return;
 		}
-		
+
 		/* else if (mmw != null) {
 			if (player.input.isPressed(Control.Up, player)) {
 				onMechSlotSelect(mmw);
@@ -621,8 +621,7 @@ public class Vile : Character {
 	public override void render(float x, float y) {
 		if (isSpeedDevilActiveBS.getValue()) {
 			addRenderEffect(RenderEffectType.SpeedDevilTrail);
-		}
-		else {
+		} else {
 			removeRenderEffect(RenderEffectType.SpeedDevilTrail);
 		}
 		if (currentFrame?.POIs?.Count > 0) {

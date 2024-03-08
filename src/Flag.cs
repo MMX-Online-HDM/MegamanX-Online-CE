@@ -1,7 +1,6 @@
-﻿using SFML.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using SFML.Graphics;
 
 namespace MMXOnline;
 

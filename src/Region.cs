@@ -1,12 +1,9 @@
-﻿using Lidgren.Network;
-using ProtoBuf;
-using SFML.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Lidgren.Network;
+using ProtoBuf;
+using SFML.Graphics;
 
 namespace MMXOnline;
 
@@ -15,7 +12,7 @@ public class Region {
 	[ProtoMember(1)] public string name;
 	[ProtoMember(2)] public string ip;
 	[ProtoMember(3)] public int? ping;
-	
+
 	public string url;
 
 	private NetClient pingClient;

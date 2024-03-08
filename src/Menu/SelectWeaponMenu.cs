@@ -1,9 +1,5 @@
-﻿using SFML.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using static SFML.Window.Keyboard;
+﻿using System.Collections.Generic;
+using SFML.Graphics;
 
 namespace MMXOnline;
 
@@ -309,7 +305,7 @@ public class SelectWeaponMenu : IMainMenu {
 			if (cursors[3].index == 1) {
 				Fonts.drawText(FontType.Green, "Z-Saber", Global.halfScreenW, 146, Alignment.Center);
 				Fonts.drawText(
-					FontType.Blue,"If no armor is equipped,\nSPECIAL will swing the Z-Saber.",
+					FontType.Blue, "If no armor is equipped,\nSPECIAL will swing the Z-Saber.",
 					Global.halfScreenW, wsy, Alignment.Center
 				);
 			}
@@ -322,7 +318,7 @@ public class SelectWeaponMenu : IMainMenu {
 			int weakAgainstMaverickIndex = getWeakAgainstMaverickFrameIndex(wi);
 
 			Fonts.drawText(
-				FontType.Purple,  "Slot " + (selCursorIndex + 1).ToString() + " weapon",
+				FontType.Purple, "Slot " + (selCursorIndex + 1).ToString() + " weapon",
 				Global.halfScreenW, 126, Alignment.Center
 			);
 			Fonts.drawText(
@@ -442,7 +438,7 @@ public class SelectWeaponMenu : IMainMenu {
 			(int)WeaponIds.GravityWell => new int[] { new BlastHornetWeapon(null).weaponSlotIndex },
 			(int)WeaponIds.FrostShield => new int[] { new ToxicSeahorseWeapon(null).weaponSlotIndex },
 			(int)WeaponIds.TunnelFang => new int[] { new VoltCatfishWeapon(null).weaponSlotIndex },
-			_ => new int[] {}
+			_ => new int[] { }
 		};
 	}
 }

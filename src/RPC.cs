@@ -1,9 +1,9 @@
-﻿using Lidgren.Network;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Lidgren.Network;
+using Newtonsoft.Json;
 
 namespace MMXOnline;
 
@@ -1781,8 +1781,7 @@ public class RPCStopSound : RPC {
 			SoundWrapper soundWrapper = actor.netSounds[soundIndex];
 			if (soundWrapper == null) {
 				actor.netSounds.Remove(soundIndex);
-			}
-			else if (soundWrapper.deleted == false) {
+			} else if (soundWrapper.deleted == false) {
 				soundWrapper.sound?.Stop();
 			}
 		}

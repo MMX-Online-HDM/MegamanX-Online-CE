@@ -58,8 +58,7 @@ public class XTeleportState : CharState {
 					if (hitWall2 == null) {
 						clone.changePos(new Point(clone.pos.x + moveAmount, clone.pos.y - 64));
 						clone.visible = true;
-					}
-					else if (clone.pos.y - wallY <= 36 && clone.pos.y - wallY > 0) {
+					} else if (clone.pos.y - wallY <= 36 && clone.pos.y - wallY > 0) {
 						clone.changePos(new Point(clone.pos.x + moveAmount, wallY - 1));
 						clone.visible = true;
 					}

@@ -1,14 +1,7 @@
-﻿using Newtonsoft.Json;
-using SFML.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.NetworkInformation;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using static SFML.Window.Keyboard;
 
 namespace MMXOnline;
 
@@ -380,7 +373,7 @@ public class JoinMenu : IMainMenu {
 			);
 			if (isLAN) {
 				Fonts.drawText(
-					FontType.Grey," Try connecting by IP (press ESC)",
+					FontType.Grey, " Try connecting by IP (press ESC)",
 					col1Pos, headerPos + rowHeight * 2
 				);
 			}
@@ -404,7 +397,7 @@ public class JoinMenu : IMainMenu {
 						pingColor = FontType.Red;
 					}
 					if (ping < 0) {
-						displayPint = "N/A"; 
+						displayPint = "N/A";
 						pingColor = FontType.Grey;
 					}
 					Fonts.drawText(

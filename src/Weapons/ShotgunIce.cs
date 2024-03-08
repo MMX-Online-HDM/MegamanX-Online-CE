@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MMXOnline;
 
@@ -143,7 +140,7 @@ public class ShotgunIceProj : Projectile {
 		return new ShotgunIceProj(
 			ShotgunIce.netWeapon, arg.pos, arg.xDir, arg.player,
 			arg.extraData[0], arg.netId, (arg.extraData[1] - 128, arg.extraData[2] - 128)
-		); 
+		);
 	}
 }
 

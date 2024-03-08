@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MMXOnline;
+﻿namespace MMXOnline;
 
 public enum VileMissileType {
 	None = -1,
@@ -16,7 +10,7 @@ public enum VileMissileType {
 public class VileMissile : Weapon {
 	public string projSprite;
 	public float vileAmmo;
-	
+
 	public VileMissile(VileMissileType vileMissileType) : base() {
 		index = (int)WeaponIds.ElectricShock;
 		weaponBarBaseIndex = 26;

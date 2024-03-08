@@ -1,10 +1,3 @@
-using SFML.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace MMXOnline;
 
 public class CmdSigma : BaseSigma {
@@ -112,7 +105,7 @@ public class CmdSigma : BaseSigma {
 	public override string getSprite(string spriteName) {
 		return "sigma_" + spriteName;
 	}
-	
+
 	// This can run on both owners and non-owners. So data used must be in sync
 	public override Projectile getProjFromHitbox(Collider collider, Point centerPoint) {
 		Projectile proj = sprite.name switch {
@@ -127,7 +120,7 @@ public class CmdSigma : BaseSigma {
 			_ => null
 		};
 		if (proj != null) {
-			return proj; 
+			return proj;
 		}
 		return base.getProjFromHitbox(collider, centerPoint);
 	}

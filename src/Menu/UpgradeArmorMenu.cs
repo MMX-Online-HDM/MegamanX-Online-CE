@@ -1,11 +1,4 @@
-﻿using SFML.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MMXOnline;
+﻿namespace MMXOnline;
 
 public class UpgradeArmorMenu : IMainMenu {
 	public int selectArrowPosY;
@@ -246,7 +239,7 @@ public class UpgradeArmorMenu : IMainMenu {
 		var gameMode = level.gameMode;
 		DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
 		string armorName = xGame switch {
-			1  => "Light",
+			1 => "Light",
 			2 => "Giga",
 			3 => "Max",
 			_ => "ERROR"

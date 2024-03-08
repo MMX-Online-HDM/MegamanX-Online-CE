@@ -1,8 +1,8 @@
-﻿using SFML.Graphics;
-using SFML.Window;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SFML.Graphics;
+using SFML.Window;
 
 namespace MMXOnline;
 
@@ -355,8 +355,7 @@ public class Axl : Character {
 		if (dodgeRollCooldown == 0 && player.canControl) {
 			if (charState is Crouch && player.input.isPressed(Control.Dash, player) && canDash()) {
 				changeState(new DodgeRoll());
-			}
-			else if (player.input.isPressed(Control.Dash, player) && player.input.checkDoubleTap(Control.Dash)) {
+			} else if (player.input.isPressed(Control.Dash, player) && player.input.checkDoubleTap(Control.Dash)) {
 				changeState(new DodgeRoll(), true);
 			}
 		}
@@ -1230,13 +1229,13 @@ public class Axl : Character {
 
 		if (player.isMainPlayer && !player.isDead && !drawStatusProgress() && !drawSubtankHealing()) {
 			if (Options.main.aimKeyToggle) {
-			if (player.input.isAimingBackwards(player)) {
-				Global.sprites["hud_axl_aim"].draw(0, pos.x, pos.y + currentLabelY, xDir, 1, null, 1, 1, 1, ZIndex.HUD);
-				deductLabelY(labelAxlAimModeIconOffY);
-			} else if (player.input.isPositionLocked(player)) {
-				Global.sprites["hud_axl_aim"].draw(1, pos.x, pos.y + currentLabelY, 1, 1, null, 1, 1, 1, ZIndex.HUD);
-				deductLabelY(labelAxlAimModeIconOffY);
-			}
+				if (player.input.isAimingBackwards(player)) {
+					Global.sprites["hud_axl_aim"].draw(0, pos.x, pos.y + currentLabelY, xDir, 1, null, 1, 1, 1, ZIndex.HUD);
+					deductLabelY(labelAxlAimModeIconOffY);
+				} else if (player.input.isPositionLocked(player)) {
+					Global.sprites["hud_axl_aim"].draw(1, pos.x, pos.y + currentLabelY, 1, 1, null, 1, 1, 1, ZIndex.HUD);
+					deductLabelY(labelAxlAimModeIconOffY);
+				}
 			} else if (Options.main.showRollCooldown && dodgeRollCooldown > 0) {
 				drawSpinner(Helpers.progress(dodgeRollCooldown, maxDodgeRollCooldown));
 			}

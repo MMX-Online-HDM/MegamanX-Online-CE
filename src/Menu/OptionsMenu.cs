@@ -1,7 +1,6 @@
-﻿using SFML.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using SFML.Graphics;
 using static SFML.Window.Keyboard;
 
 namespace MMXOnline;
@@ -215,7 +214,7 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Integer fullscreen:", 
+							optionFontText, "Integer fullscreen:",
 							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
@@ -383,8 +382,7 @@ public class OptionsMenu : IMainMenu {
 					"Enable or disable map sprites.\nDisabling map sprites results in faster performance."
 				),
 			};
-		}
-		else if (isGameplay) {
+		} else if (isGameplay) {
 			menuOptions = new List<MenuOption>() {
 				// Preferred character
 				new MenuOption(
@@ -1324,7 +1322,7 @@ public class OptionsMenu : IMainMenu {
 			if (Options.main.graphicsPreset < 3) {
 				return FontType.Grey;
 			}
-			return FontType.DarkBlue;;
+			return FontType.DarkBlue; ;
 		}
 		if (Options.main.graphicsPreset < 3) {
 			return FontType.Grey;

@@ -1,9 +1,7 @@
-﻿using SFML.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SFML.Graphics;
 
 namespace MMXOnline;
 
@@ -105,11 +103,11 @@ public class CrystalHunterCharged : Actor {
 		var normalizedCoords = new Point(screenCoords.x / Global.viewScreenW, 1 - screenCoords.y / Global.viewScreenH);
 
 		//if (isSnails) {
-			Helpers.decrementTime(ref soundTime);
-			if (soundTime == 0) {
-				playSound("csnailSlowLoop");
-				soundTime = 1.09f;
-			}
+		Helpers.decrementTime(ref soundTime);
+		if (soundTime == 0) {
+			playSound("csnailSlowLoop");
+			soundTime = 1.09f;
+		}
 		//} Why only snail gets the cool sound???
 
 		if (timeSlowShader != null) {

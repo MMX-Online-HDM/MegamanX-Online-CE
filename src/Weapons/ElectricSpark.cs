@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace MMXOnline;
 
@@ -126,7 +122,7 @@ public class ElectricSparkProjChargedStart : Projectile {
 					weapon, pos.addxy(1, 0), 1, damager.owner,
 					damager.owner.getNextActorNetId(true), rpc: true
 				);
-			}	
+			}
 		}
 	}
 }

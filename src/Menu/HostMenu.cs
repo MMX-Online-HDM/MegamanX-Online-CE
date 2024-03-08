@@ -1,14 +1,10 @@
-﻿using Lidgren.Network;
-using SFML.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading;
-using static SFML.Window.Keyboard;
+using Lidgren.Network;
+using SFML.Graphics;
 
 namespace MMXOnline;
 

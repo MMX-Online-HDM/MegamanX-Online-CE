@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MMXOnline;
+﻿namespace MMXOnline;
 
 public class NovaStrike : Weapon {
 	public const float ammoUsage = 16;
@@ -61,10 +55,11 @@ public class NovaStrikeState : CharState {
 					leftOrRight = 1;
 					sprite = "nova_strike";
 				}
-					if (Helpers.randomRange(0, 10) < 10) {
-						character.playSound("NovaStrikeX4", forcePlay: false, sendRpc: true);
-					}else{
-						character.playSound("NovaStrikeX6", forcePlay: false, sendRpc: true);}
+				if (Helpers.randomRange(0, 10) < 10) {
+					character.playSound("NovaStrikeX4", forcePlay: false, sendRpc: true);
+				} else {
+					character.playSound("NovaStrikeX6", forcePlay: false, sendRpc: true);
+				}
 				character.changeSpriteFromName(sprite, true);
 			}
 			return;

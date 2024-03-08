@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace MMXOnline;
 
@@ -43,7 +39,7 @@ public class FFADeathMatch : GameMode {
 		}
 	}
 
-	public override void drawTopHUD() { 
+	public override void drawTopHUD() {
 		string placeStr = "";
 		List<Player> playerList = GameMode.getOrderedPlayerList();
 		int place = playerList.IndexOf(level.mainPlayer) + 1;

@@ -1,18 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using SFML.Graphics;
 using SFML.System;
-using SFML.Audio;
 using SFML.Window;
-using Newtonsoft.Json;
-using static SFML.Window.Keyboard;
-using SFML.Graphics.Glsl;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Diagnostics;
-using System.Globalization;
 
 namespace MMXOnline;
 

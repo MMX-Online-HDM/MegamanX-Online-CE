@@ -1,7 +1,4 @@
-﻿using SFML.Graphics;
-using System.Collections.Generic;
-
-namespace MMXOnline;
+﻿namespace MMXOnline;
 
 public class FlameStag : Maverick {
 	public static Weapon getWeapon() { return new Weapon(WeaponIds.FStagGeneric, 144); }

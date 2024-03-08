@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace MMXOnline;
 
@@ -260,7 +258,7 @@ public class Damager {
 		bool playHurtSound = false;
 		if (character != null) {
 			MegamanX mmx = character as MegamanX;
-			
+
 			bool isStompWeapon = (
 				weaponKillFeedIndex == 19 ||
 				weaponKillFeedIndex == 58 ||

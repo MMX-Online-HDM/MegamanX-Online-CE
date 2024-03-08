@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MMXOnline;
 
@@ -139,7 +136,7 @@ public class BoomerangProj : Projectile {
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new BoomerangProj(
 			Boomerang.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId, arg.extraData[0] - 1
-		); 
+		);
 	}
 }
 

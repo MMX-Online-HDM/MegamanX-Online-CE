@@ -1,9 +1,9 @@
-﻿using Newtonsoft.Json;
-using SFML.Graphics;
-using SFML.System;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
+using SFML.Graphics;
+using SFML.System;
 
 namespace MMXOnline;
 
@@ -495,7 +495,7 @@ public class GameMode {
 				if (Global.level.gameMode.teamPoints[i] > lastScore) {
 					winningAlliance = i;
 					closeMatch = false;
-					if (Global.level.gameMode.teamPoints[i] -1 == lastScore) {
+					if (Global.level.gameMode.teamPoints[i] - 1 == lastScore) {
 						closeMatch = true;
 					}
 				} else if (Global.level.gameMode.teamPoints[i] == lastScore) {
@@ -2880,10 +2880,10 @@ public class GameMode {
 		}
 		drawTimeIfSet(25);
 	}
-	
+
 	public void drawAllTeamsHUD() {
 		for (int i = 0; i < Global.level.teamNum; i++) {
-			Fonts.drawText(teamFonts[i],  $"{teamNames[i]}: {teamPoints[i]}", 5, 5 + i* 10);
+			Fonts.drawText(teamFonts[i], $"{teamNames[i]}: {teamPoints[i]}", 5, 5 + i * 10);
 		}
 		drawTimeIfSet(5 + 10 * (Global.level.teamNum + 1));
 	}

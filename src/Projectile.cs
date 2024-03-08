@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace MMXOnline;
 
@@ -599,7 +598,7 @@ public class Projectile : Actor {
 		byte[] yBytes = BitConverter.GetBytes(pos.y);
 		byte[] netProjIdByte = BitConverter.GetBytes(netProjId);
 		// Create bools of data.
-		byte dataInf =  Helpers.boolArrayToByte(new bool[] {
+		byte dataInf = Helpers.boolArrayToByte(new bool[] {
 			isAngle,
 			extraData != null && extraData.Length > 0
 		});

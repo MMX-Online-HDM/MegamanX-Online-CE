@@ -1,9 +1,5 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
+using Newtonsoft.Json;
 using static SFML.Window.Keyboard;
 
 namespace MMXOnline;
@@ -140,7 +136,7 @@ public class VoteKick {
 				Global.halfScreenW, 180, Alignment.Center
 			);
 			Fonts.drawText(
-				FontType.RedishOrange, instructions, 
+				FontType.RedishOrange, instructions,
 				Global.halfScreenW, 190, Alignment.Center
 			);
 		} else if (type == VoteType.EndMatch) {

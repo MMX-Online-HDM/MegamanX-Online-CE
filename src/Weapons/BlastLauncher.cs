@@ -1,9 +1,6 @@
-﻿using SFML.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SFML.Graphics;
 
 namespace MMXOnline;
 
@@ -63,7 +60,7 @@ public class GrenadeProj : Projectile, IDamagable {
 	bool planted;
 	// We use player here due to airblast reflect potential.
 	// The explosion should still be the original owner's.
-	Player player; 
+	Player player;
 	public GrenadeProj(
 		Weapon weapon, Point pos, int xDir, Player player, Point bulletDir,
 		IDamagable target, Point cursorPos, int chargeLevel, ushort netProjId

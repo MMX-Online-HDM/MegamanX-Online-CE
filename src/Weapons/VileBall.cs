@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MMXOnline;
 
@@ -190,7 +187,7 @@ public class PeaceOutRollerProj : Projectile {
 public class AirBombAttack : CharState {
 	int bombNum;
 	bool isNapalm;
-	
+
 	public AirBombAttack(bool isNapalm, string transitionSprite = "") : base("air_bomb_attack", "", "", transitionSprite) {
 		this.isNapalm = isNapalm;
 	}

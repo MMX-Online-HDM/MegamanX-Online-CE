@@ -1,5 +1,3 @@
-using System;
-
 namespace MMXOnline;
 
 public class SigmaSlashWeapon : Weapon {

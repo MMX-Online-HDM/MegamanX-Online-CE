@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace MMXOnline;
 
@@ -265,37 +263,37 @@ public class Weapon {
 			player, 0, offsetTime,
 			player.getNextActorNetId(allowNonMainPlayer: true), smoothStart
 		);
-		Global.level.delayedActions.Add(new DelayedAction(delegate{
+		Global.level.delayedActions.Add(new DelayedAction(delegate {
 			new Buster4Proj(
 				this, new Point(x + xDir, y), xDir,
 				player, 1, offsetTime,
 				player.getNextActorNetId(allowNonMainPlayer: true), smoothStart
 			);
-		}, 1.8f/60f
+		}, 1.8f / 60f
 		));
-		Global.level.delayedActions.Add(new DelayedAction(delegate{ 
+		Global.level.delayedActions.Add(new DelayedAction(delegate {
 			new Buster4Proj(
 				this, new Point(x + xDir, y), xDir,
 				player, 2, offsetTime,
 				player.getNextActorNetId(allowNonMainPlayer: true), smoothStart
 			);
-		}, 3.8f/60f
+		}, 3.8f / 60f
 		));
-		Global.level.delayedActions.Add(new DelayedAction(delegate{ 
+		Global.level.delayedActions.Add(new DelayedAction(delegate {
 			new Buster4Proj(
 				this, new Point(x + xDir, y), xDir,
 				player, 2, offsetTime,
 				player.getNextActorNetId(allowNonMainPlayer: true), smoothStart
 			);
-		}, 5.8f/60f
+		}, 5.8f / 60f
 		));
-		Global.level.delayedActions.Add(new DelayedAction(delegate{ 
+		Global.level.delayedActions.Add(new DelayedAction(delegate {
 			new Buster4Proj(
 				this, new Point(x + xDir, y), xDir,
 				player, 3, offsetTime,
 				player.getNextActorNetId(allowNonMainPlayer: true), smoothStart
 			);
-		}, 7.8f/60f
+		}, 7.8f / 60f
 		));
 	}
 

@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MMXOnline;
 
@@ -72,7 +69,7 @@ public class TunnelFangProj : Projectile {
 			projId = (int)ProjIds.TunnelFang2;
 		}
 
-		if (rpc) { 
+		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir, new byte[] { (byte)type });
 		}
 	}

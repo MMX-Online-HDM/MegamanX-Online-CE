@@ -1,10 +1,3 @@
-using SFML.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace MMXOnline;
 
 public class NeoSigma : BaseSigma {
@@ -156,7 +149,7 @@ public class NeoSigma : BaseSigma {
 			_ => null
 		};
 		if (proj != null) {
-			return proj; 
+			return proj;
 		}
 		return base.getProjFromHitbox(collider, centerPoint);
 	}

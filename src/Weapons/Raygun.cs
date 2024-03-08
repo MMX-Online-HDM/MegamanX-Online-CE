@@ -1,9 +1,6 @@
-﻿using SFML.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SFML.Graphics;
 
 namespace MMXOnline;
 
@@ -168,7 +165,7 @@ public class RayGunAltProj : Projectile {
 	float chargeTime;
 	float chargeDecreaseCooldown;
 	Axl axl;
-	
+
 	public RayGunAltProj(Weapon weapon, Point pos, Point cursorPos, int xDir, Player player, ushort netProjId) :
 		base(weapon, pos, xDir, 0, 1, player, "axl_raygun_laser", 0, 0.33f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.RayGun2;

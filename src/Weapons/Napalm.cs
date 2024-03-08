@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MMXOnline;
 
@@ -201,7 +198,7 @@ public class NapalmAttack : CharState {
 	NapalmAttackType napalmAttackType;
 	float shootTime;
 	int shootCount;
-	
+
 	public NapalmAttack(NapalmAttackType napalmAttackType, string transitionSprite = "") :
 		base(getSprite(napalmAttackType), "", "", transitionSprite) {
 		this.napalmAttackType = napalmAttackType;

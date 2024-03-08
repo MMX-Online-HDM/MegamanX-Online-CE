@@ -1,11 +1,10 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using SFML.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using SFML.Graphics;
 
 namespace MMXOnline;
 
@@ -349,33 +348,24 @@ public class Sprite {
 			if (renderEffects.Contains(RenderEffectType.Hit)) {
 				shader = Global.shaderWrappers.GetValueOrDefault("hit");
 				if (shaders.Count > 1) shaders.RemoveAt(1);
-			}
-			else if (renderEffects.Contains(RenderEffectType.Flash)) {
+			} else if (renderEffects.Contains(RenderEffectType.Flash)) {
 				shader = Global.shaderWrappers.GetValueOrDefault("flash");
-			}
-			else if (renderEffects.Contains(RenderEffectType.InvisibleFlash) && alpha == 1) {
+			} else if (renderEffects.Contains(RenderEffectType.InvisibleFlash) && alpha == 1) {
 				shader = Global.shaderWrappers.GetValueOrDefault("invisible");
 				shader?.SetUniform("alpha", 0.5f - (MathF.Sin(Global.level.time * 5) * 0.25f));
-			}
-			else if (renderEffects.Contains(RenderEffectType.ChargeGreen)) {
+			} else if (renderEffects.Contains(RenderEffectType.ChargeGreen)) {
 				shader = Global.shaderWrappers.GetValueOrDefault("chargeGreen");
-			}
-			else if (renderEffects.Contains(RenderEffectType.ChargeOrange)) {
+			} else if (renderEffects.Contains(RenderEffectType.ChargeOrange)) {
 				shader = Global.shaderWrappers.GetValueOrDefault("chargeOrange");
-			}
-			else if (renderEffects.Contains(RenderEffectType.ChargePink)) {
+			} else if (renderEffects.Contains(RenderEffectType.ChargePink)) {
 				shader = Global.shaderWrappers.GetValueOrDefault("chargePink");
-			}
-			else if (renderEffects.Contains(RenderEffectType.ChargeYellow)) {
+			} else if (renderEffects.Contains(RenderEffectType.ChargeYellow)) {
 				shader = Global.shaderWrappers.GetValueOrDefault("chargeYellow");
-			}
-			else if (renderEffects.Contains(RenderEffectType.ChargeBlue)) {
+			} else if (renderEffects.Contains(RenderEffectType.ChargeBlue)) {
 				shader = Global.shaderWrappers.GetValueOrDefault("chargeBlue");
-			}
-			else if (renderEffects.Contains(RenderEffectType.StealthModeBlue)) {
+			} else if (renderEffects.Contains(RenderEffectType.StealthModeBlue)) {
 				shader = Global.shaderWrappers.GetValueOrDefault("stealthmode_blue");
-			}
-			else if (renderEffects.Contains(RenderEffectType.StealthModeRed)) {
+			} else if (renderEffects.Contains(RenderEffectType.StealthModeRed)) {
 				shader = Global.shaderWrappers.GetValueOrDefault("stealthmode_red");
 			}
 			if (shader != null) {
@@ -425,7 +415,7 @@ public class Sprite {
 						currentFrame.rect.w() + 2, currentFrame.rect.h() + 2,
 						x + frameOffsetX - (1 * xDirArg),
 						y + frameOffsetY - (1 * yDirArg),
-						zIndex-10,
+						zIndex - 10,
 						cx, cy, xDirArg, yDirArg, angle, alpha,
 						new List<ShaderWrapper>() { redShader }, true
 					);
@@ -581,7 +571,7 @@ public class Sprite {
 			if (armors[2] == 1) DrawWrappers.DrawTexture(xArmorHelmetBitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true);
 			if (armors[2] == 2) DrawWrappers.DrawTexture(
 				xArmorHelmetBitmap2,
-				currentFrame.rect.x1, currentFrame.rect.y1-1,
+				currentFrame.rect.x1, currentFrame.rect.y1 - 1,
 				currentFrame.rect.w(), currentFrame.rect.h() + 1,
 				x + frameOffsetX, y + frameOffsetY - 1, zIndex,
 				cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true

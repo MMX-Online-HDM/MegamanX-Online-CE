@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MMXOnline;
 
@@ -56,16 +53,16 @@ public class Buster : Weapon {
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
 		string shootSound = "buster";
 		if (player.hasArmArmor(ArmorId.Light) || player.hasArmArmor(ArmorId.None) || player.hasUltimateArmor())
-		shootSound = chargeLevel switch {
-			_ when (
-					player.character.stockedCharge
-			) => "",
-			0 => "buster",
-			1 => "buster2",
-			2 => "buster3",
-			3 => "buster4",
-			_ => ""
-		};
+			shootSound = chargeLevel switch {
+				_ when (
+						player.character.stockedCharge
+				) => "",
+				0 => "buster",
+				1 => "buster2",
+				2 => "buster3",
+				3 => "buster4",
+				_ => ""
+			};
 		if (player.hasArmArmor(ArmorId.Giga)) {
 			shootSound = chargeLevel switch {
 				_ when (
@@ -140,13 +137,13 @@ public class Buster : Weapon {
 				// Create first line instantly.
 				createBuster4Line(pos.x + (float)xOff, pos.y, xDir, player, 0f);
 				// Create 2nd with a delay.
-				Global.level.delayedActions.Add(new DelayedAction(delegate{
+				Global.level.delayedActions.Add(new DelayedAction(delegate {
 					createBuster4Line(pos.x + (float)xOff, pos.y, xDir, player, 10f / 60f);
-				}, 2.8f/60f));
+				}, 2.8f / 60f));
 				// Use smooth spawn on the 3rd.
-				Global.level.delayedActions.Add(new DelayedAction(delegate{
+				Global.level.delayedActions.Add(new DelayedAction(delegate {
 					createBuster4Line(pos.x + (float)xOff, pos.y, xDir, player, 5f / 60f, true);
-				}, 5.8f/60f));
+				}, 5.8f / 60f));
 			} else if (player.hasArmArmor(2)) {
 				if (player.ownedByLocalPlayer) {
 					if (player.character.charState is not WallSlide) {
@@ -356,7 +353,7 @@ public class Buster4Proj : Projectile {
 		base.update();
 		base.frameIndex = type;
 		float currentOffsetTime = offsetTime;
-		if (smoothStart && time < 5f/60f) {
+		if (smoothStart && time < 5f / 60f) {
 			currentOffsetTime *= (time / 5f) * 60f;
 		}
 		float y = initY + (MathF.Sin((time + currentOffsetTime) * (MathF.PI * 6)) * 15f);
@@ -418,8 +415,7 @@ public class X2ChargeShot : CharState {
 					defaultSprite = sprite;
 				}
 				character.changeSpriteFromName(sprite, true);
-			}
-			else {
+			} else {
 				character.changeToIdleOrFall();
 			}
 		} else {
@@ -524,19 +520,19 @@ public class X3ChargeShot : CharState {
 				character.playSound("buster3X3", sendRpc: true);
 				float xDir = character.getShootXDir();
 				new BusterX3Proj2(
-					player.weapon, character.getShootPos().addxy(6*xDir, -2), character.getShootXDir(), 0,
+					player.weapon, character.getShootPos().addxy(6 * xDir, -2), character.getShootXDir(), 0,
 					player, player.getNextActorNetId(), rpc: true
 				);
 				new BusterX3Proj2(
-					player.weapon, character.getShootPos().addxy(6*xDir, -2), character.getShootXDir(), 1,
+					player.weapon, character.getShootPos().addxy(6 * xDir, -2), character.getShootXDir(), 1,
 					player, player.getNextActorNetId(), rpc: true
 				);
 				new BusterX3Proj2(
-					player.weapon, character.getShootPos().addxy(6*xDir, -2), character.getShootXDir(), 2,
+					player.weapon, character.getShootPos().addxy(6 * xDir, -2), character.getShootXDir(), 2,
 					player, player.getNextActorNetId(), rpc: true
 				);
 				new BusterX3Proj2(
-					player.weapon, character.getShootPos().addxy(6*xDir, -2), character.getShootXDir(), 3,
+					player.weapon, character.getShootPos().addxy(6 * xDir, -2), character.getShootXDir(), 3,
 					player, player.getNextActorNetId(), rpc: true
 				);
 			}
@@ -565,7 +561,7 @@ public class X3ChargeShot : CharState {
 			} else {
 				character.changeToIdleOrFall();
 			}
-		}  else {
+		} else {
 			if (!pressFire && stateTime > Global.spf && player.input.isPressed(Control.Shoot, player)) {
 				pressFire = true;
 			}

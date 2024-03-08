@@ -1,5 +1,5 @@
-﻿using Lidgren.Network;
-using System;
+﻿using System;
+using Lidgren.Network;
 
 namespace MMXOnline;
 
@@ -108,15 +108,15 @@ public partial class RPCCreateProj : RPC {
 		} else if (projId == (int)ProjIds.ChillPIceBlow) {
 			proj = new ShotgunIceProjCharged(new ShotgunIce(), pos, xDir, player, 1, true, netProjByte);
 		} else if (projId == (int)ProjIds.Rakuhouha) {
-			float velX = (float)arguments[extraDataIndex+1] * 100;
-			float velY = (float)arguments[extraDataIndex+2] * 100;
+			float velX = (float)arguments[extraDataIndex + 1] * 100;
+			float velY = (float)arguments[extraDataIndex + 2] * 100;
 			proj = new RakuhouhaProj(
 				new RakuhouhaWeapon(player), pos, false,
 				velX, velY, player, netProjByte, arguments[extraDataIndex]
 			);
 		} else if (projId == (int)ProjIds.CFlasher) {
-			float velX = (float)arguments[extraDataIndex+1] * 100;
-			float velY = (float)arguments[extraDataIndex+2] * 100;
+			float velX = (float)arguments[extraDataIndex + 1] * 100;
+			float velY = (float)arguments[extraDataIndex + 2] * 100;
 			proj = new RakuhouhaProj(
 				new CFlasher(player), pos, true,
 				velX, velY, player, netProjByte, arguments[extraDataIndex]
@@ -131,7 +131,7 @@ public partial class RPCCreateProj : RPC {
 			proj = new VileBombProj(new VileBall(VileBallType.ExplosiveRound), pos, xDir, player, 0, netProjByte);
 		} else if (projId == (int)ProjIds.VileBombSplit) {
 			proj = new VileBombProj(new VileBall(VileBallType.ExplosiveRound), pos, xDir, player, 1, netProjByte);
-		}  else if (projId == (int)ProjIds.MechMissile) {
+		} else if (projId == (int)ProjIds.MechMissile) {
 			proj = new MechMissileProj(new MechMissileWeapon(player), pos, xDir, false, player, netProjByte);
 		} else if (projId == (int)ProjIds.MechTorpedo) {
 			proj = new TorpedoProj(new MechTorpedoWeapon(player), pos, xDir, player, 2, netProjByte);

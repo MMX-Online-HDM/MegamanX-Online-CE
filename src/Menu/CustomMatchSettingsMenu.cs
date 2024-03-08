@@ -1,10 +1,5 @@
-﻿using ProtoBuf;
-using SFML.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using ProtoBuf;
 
 namespace MMXOnline;
 
@@ -73,7 +68,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 				(Point pos, int index) => {
 					Fonts.drawText(
 						FontType.Blue,
-						"Start " + Global.nameCoins + ": "  +
+						"Start " + Global.nameCoins + ": " +
 						savedMatchSettings.customMatchSettings.startCurrency.ToString(),
 						pos.x, pos.y, selected: selectArrowPosY == 1
 					);

@@ -1,13 +1,9 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using SFML.Audio;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Newtonsoft.Json;
 using SFML.Graphics;
 using SFML.System;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace MMXOnline;
 
@@ -1253,10 +1249,10 @@ public partial class Level {
 				float fullDeltaY = MathF.Round(expectedCamPos.y) - camY;
 
 				if (followActor != null && followActor.grounded == false) {
-					if (fullDeltaY > -54 && fullDeltaY < 20 && 
-						camPlayer.character.charState is not WallKick && 
-						camPlayer.character.charState is not WallSlide && 
-						camPlayer.character.charState is not LadderClimb 
+					if (fullDeltaY > -54 && fullDeltaY < 20 &&
+						camPlayer.character.charState is not WallKick &&
+						camPlayer.character.charState is not WallSlide &&
+						camPlayer.character.charState is not LadderClimb
 					) {
 						if (!unlockfollow) {
 							moveDeltaY = 0;

@@ -1,10 +1,10 @@
-﻿using Lidgren.Network;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Threading;
+using Lidgren.Network;
+using Newtonsoft.Json;
 
 namespace MMXOnline;
 
@@ -37,7 +37,7 @@ public class ServerClient {
 		NetOutgoingMessage hail = client.CreateMessage("a");
 		try {
 			client.Connect(serverIp, Global.basePort, hail);
-		} catch {}
+		} catch { }
 
 		return client;
 	}
@@ -113,7 +113,7 @@ public class ServerClient {
 		IPEndPoint masterServerLocation = NetUtility.Resolve(MasterServerData.serverIp, MasterServerData.serverPort);
 		client.SendUnconnectedMessage(regMsg, masterServerLocation);
 		client.FlushSendQueue();
-		NetOutgoingMessage hail = client.CreateMessage(JsonConvert.SerializeObject(inputServerPlayer)); 
+		NetOutgoingMessage hail = client.CreateMessage(JsonConvert.SerializeObject(inputServerPlayer));
 		// Wait for hole punching to happen.
 		log += "\nSent HolePunch message...";
 		int count = 0;
@@ -156,8 +156,8 @@ public class ServerClient {
 			client.Configuration.AutoFlushSendQueue = false;
 			return null;
 		}
-		exitLoop:
-		// If it works, continue.
+exitLoop:
+// If it works, continue.
 		log += "\nStarting Serverclient.";
 		log += "\nConections active: " + client.Connections.Count;
 		var serverClient = new ServerClient(client, inputServerPlayer.isHost);

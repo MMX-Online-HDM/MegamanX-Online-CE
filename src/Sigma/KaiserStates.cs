@@ -79,7 +79,8 @@ public class KaiserSigmaBaseState : CharState {
 						posL.addxy(-8 * character.xDir, 0),
 						player, player.getNextActorNetId(),
 						rpc: true
-					);},
+					);
+					},
 					0f
 				));
 				Global.level.delayedActions.Add(
@@ -88,15 +89,17 @@ public class KaiserSigmaBaseState : CharState {
 						new KaiserMissileWeapon(),
 						posL, player, player.getNextActorNetId(),
 						rpc: true
-					);},
+					);
+					},
 					0.15f
 				));
 				Global.level.delayedActions.Add(new DelayedAction(() => {
-						new KaiserSigmaMissileProj(
-						new KaiserMissileWeapon(),
-						posR, player, player.getNextActorNetId(),
-						rpc: true
-					);},
+					new KaiserSigmaMissileProj(
+					new KaiserMissileWeapon(),
+					posR, player, player.getNextActorNetId(),
+					rpc: true
+				);
+				},
 					0.3f
 				));
 				Global.level.delayedActions.Add(
@@ -106,7 +109,8 @@ public class KaiserSigmaBaseState : CharState {
 						posR.addxy(8 * character.xDir, 0),
 						player, player.getNextActorNetId(),
 						rpc: true
-					);},
+					);
+					},
 					0.45f
 				));
 			}

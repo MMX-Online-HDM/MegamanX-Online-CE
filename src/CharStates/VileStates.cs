@@ -1,5 +1,5 @@
-using SFML.Graphics;
 using System;
+using SFML.Graphics;
 
 namespace MMXOnline;
 
@@ -55,7 +55,7 @@ public class VileRevive : CharState {
 	public float radius = 200;
 	Anim drDopplerAnim;
 	bool isMK5;
-	
+
 	public VileRevive(bool isMK5) : base(isMK5 ? "revive_to5" : "revive") {
 		invincible = true;
 		this.isMK5 = isMK5;
@@ -147,7 +147,7 @@ public class VileHover : CharState {
 	float flyVelAcc = 500;
 	float flyVelMaxSpeed = 200;
 	public float fallY;
-	
+
 	public VileHover(string transitionSprite = "") : base("hover", "hover_shoot", "", transitionSprite) {
 		exitOnLanding = true;
 		attackCtrl = true;
@@ -196,7 +196,7 @@ public class VileHover : CharState {
 			character.frameIndex = 0;
 			character.frameSpeed = 0;
 		}
-		if(base.player.input.isHeld("jump", base.player) && !once){
+		if (base.player.input.isHeld("jump", base.player) && !once) {
 			once = true;
 			sound = character.playSound("Vilehover", forcePlay: false, sendRpc: true);
 		}
@@ -280,8 +280,7 @@ public class VileHover : CharState {
 		character.useGravity = true;
 		character.sprite.restart();
 		character.stopMoving();
-		if (sound != null && !sound.deleted)
-		{
+		if (sound != null && !sound.deleted) {
 			sound.sound?.Stop();
 		}
 		RPC.stopSound.sendRpc("Vilehover", character.netId);

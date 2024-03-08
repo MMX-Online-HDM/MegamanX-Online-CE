@@ -1,13 +1,6 @@
-﻿using Newtonsoft.Json;
-using SFML.Graphics;
-using SFML.System;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+using SFML.Graphics;
 using static SFML.Window.Keyboard;
 
 namespace MMXOnline;
@@ -251,7 +244,7 @@ public class MainMenu : IMainMenu {
 				offset += 10;
 			}
 			Fonts.drawText(FontType.DarkBlue, versionText, 2, offset);
-			
+
 		}
 	}
 }

@@ -1,12 +1,8 @@
-﻿using Lidgren.Network;
+﻿using System;
+using System.Linq;
+using System.Threading;
 using Newtonsoft.Json;
 using SFML.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using static SFML.Window.Keyboard;
 
 namespace MMXOnline;
 
@@ -214,7 +210,7 @@ public class WaitMenu : IMainMenu {
 			}
 
 			Fonts.drawText(FontType.Blue, player.name, col1Pos, startServerRow + (i * rowHeight2));
-			Fonts.drawText(FontType.Blue,player.id.ToString(), col2Pos, startServerRow + (i * rowHeight2));
+			Fonts.drawText(FontType.Blue, player.id.ToString(), col2Pos, startServerRow + (i * rowHeight2));
 			Fonts.drawText(
 				FontType.Blue, player.isHost ? "yes" : "no",
 				col3Pos, startServerRow + (i * rowHeight2)
@@ -255,9 +251,8 @@ public class WaitMenu : IMainMenu {
 					FontType.Grey, "[Left/Right: change player team]",
 					Global.halfScreenW, 180, Alignment.Center
 				);
-			}
-			else if (
-				!isTeamMode() && Global.serverClient.isHost)
+			} else if (
+				  !isTeamMode() && Global.serverClient.isHost)
 				Fonts.drawTextEX(
 					FontType.Grey, "[Left/Right: change player spectator]",
 					Global.halfScreenW, 180, Alignment.Center

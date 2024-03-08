@@ -1,18 +1,12 @@
-﻿using ProtoBuf;
-using SFML.Graphics;
-using SFML.System;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Text.RegularExpressions;
-using static SFML.Graphics.Text;
+using ProtoBuf;
+using SFML.Graphics;
 
 namespace MMXOnline;
 
@@ -436,44 +430,44 @@ public class Helpers {
 	public static int getGridCoordKey(ushort x, ushort y) {
 		return x << 16 | y;
 	}
-	
-	# if WINDOWS
-		[DllImport("user32.dll", SetLastError = true, CharSet= CharSet.Auto)]
-		public static extern int MessageBox(IntPtr hWnd, String text, String caption, uint type);
-	#endif
+
+#if WINDOWS
+	[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+	public static extern int MessageBox(IntPtr hWnd, String text, String caption, uint type);
+#endif
 
 	public static void showMessageBox(string message, string caption) {
-		#if WINDOWS
-			if (Global.window != null) {
-				Global.window.SetMouseCursorVisible(true);
-			}
-			MessageBox(IntPtr.Zero, message, caption, 0);
-			if (Global.window != null && Options.main != null) {
-				Global.window.SetMouseCursorVisible(!Options.main.fullScreen);
-			}
-		#else
+#if WINDOWS
+		if (Global.window != null) {
+			Global.window.SetMouseCursorVisible(true);
+		}
+		MessageBox(IntPtr.Zero, message, caption, 0);
+		if (Global.window != null && Options.main != null) {
+			Global.window.SetMouseCursorVisible(!Options.main.fullScreen);
+		}
+#else
 			Console.WriteLine(caption + Environment.NewLine + message);
-		#endif
+#endif
 	}
 
 	public static bool showMessageBoxYesNo(string message, string caption) {
-		#if WINDOWS
-			if (Global.window != null) {
-				Global.window.SetMouseCursorVisible(true);
-			}
-			int dialogResult = MessageBox(IntPtr.Zero, message, caption, 4);
-			if (Global.window != null && Options.main != null) {
-				Global.window.SetMouseCursorVisible(!Options.main.fullScreen);
-			}
-			if (dialogResult == 6) {
-				return true;
-			} else {
-				return false;
-			}
-		#else
+#if WINDOWS
+		if (Global.window != null) {
+			Global.window.SetMouseCursorVisible(true);
+		}
+		int dialogResult = MessageBox(IntPtr.Zero, message, caption, 4);
+		if (Global.window != null && Options.main != null) {
+			Global.window.SetMouseCursorVisible(!Options.main.fullScreen);
+		}
+		if (dialogResult == 6) {
+			return true;
+		} else {
+			return false;
+		}
+#else
        		Console.WriteLine(caption + Environment.NewLine + message);
     		return true;
-		#endif
+#endif
 	}
 
 	public static void menuUpDown(ref int val, int minVal, int maxVal, bool wrap = true, bool playSound = true) {
@@ -691,16 +685,16 @@ public class Helpers {
 		byte byteVal = 0;
 		for (int i = 0; i < boolArray.Length; i++) {
 			if (boolArray[i]) {
-				byteVal += (byte)(1 << 7-i);
+				byteVal += (byte)(1 << 7 - i);
 			}
 		}
 		return byteVal;
 	}
 
 	public static bool[] byteToBoolArray(byte byteValue) {
-		bool[] boolArray = new bool[8]; 
+		bool[] boolArray = new bool[8];
 		for (int i = 0; i < 8; i++) {
-			boolArray[i] = (byteValue & (1 << 7-i)) != 0;
+			boolArray[i] = (byteValue & (1 << 7 - i)) != 0;
 		}
 		return boolArray;
 	}

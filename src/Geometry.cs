@@ -1,7 +1,5 @@
-﻿using SFML.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
+using SFML.Graphics;
 
 namespace MMXOnline;
 
@@ -23,9 +21,9 @@ public class Geometry : GameObject {
 
 	}
 
-	public virtual void statePreUpdate() {}
-	public virtual void stateUpdate() {}
-	public virtual void statePostUpdate() {}
+	public virtual void statePreUpdate() { }
+	public virtual void stateUpdate() { }
+	public virtual void statePostUpdate() { }
 
 	public virtual void netUpdate() {
 
