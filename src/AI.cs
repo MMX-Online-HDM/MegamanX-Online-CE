@@ -51,7 +51,7 @@ public class AI {
 		}
 	}
 
-	public RideChaser raceAiSetupRc;
+	public RideChaser? raceAiSetupRc;
 
 	public RideChaser getRaceAIChaser() {
 		var rideChasers = new List<RideChaser>();
@@ -130,8 +130,7 @@ public class AI {
 			}
 
 			var turnZones = Global.level.getTriggerList(character.abstractedActor(), 0, 0, null, typeof(TurnZone));
-			var turnZone = turnZones.FirstOrDefault()?.gameObject as TurnZone;
-			if (turnZone != null && turnZone.xDir != character.xDir) {
+			if (turnZones.FirstOrDefault()?.gameObject is TurnZone turnZone && turnZone.xDir != character.xDir) {
 				if (turnZone.xDir == -1) {
 					player.release(Control.Left);
 					player.press(Control.Left);
@@ -344,490 +343,433 @@ public class AI {
 			}
 		}
 
-			// Vile: Go MK2 to MKV
-			if (character is Vile vile1)
-			{
-				if (vile1?.charState is Die && vile1.isVileMK1 && player.currency >= 5)			
-					vile1?.changeState(new VileRevive(isMK5: false), false);				
-				if (vile1?.charState is Die && vile1.isVileMK2 && player.currency >= 5)			
-					vile1?.changeState(new VileRevive(isMK5: true), false);	
-			}
+		// Vile: Go MK2 to MKV
+		if (character is Vile vile1) {
+			if (vile1?.charState is Die && vile1.isVileMK1 && player.currency >= 5)
+				vile1?.changeState(new VileRevive(isMK5: false), false);
+			if (vile1?.charState is Die && vile1.isVileMK2 && player.currency >= 5)
+				vile1?.changeState(new VileRevive(isMK5: true), false);
+		}
 
 		//Should Attack?
-		if (aiState.shouldAttack && target != null) 
-		{ //do not if is invulnerable
-		if (!character.isInvulnerable())
-		{
-			if (shootTime == 0) 
-			{
-				bool isTargetInAir = target.pos.y < character.pos.y - 50;
-				bool isTargetBellowYou = target.pos.y < character.pos.y + 10;
-				bool isTargetSuperClose = target.pos.x - 3 >= character.pos.x;
-				bool isTargetClose = target.pos.x - 15 > character.pos.x;
-				bool isTargetSSC = target.pos.x == character.pos.x;
+		if (aiState.shouldAttack && target != null) { //do not if is invulnerable
+			if (!character.isInvulnerable()) {
+				if (shootTime == 0) {
+					bool isTargetInAir = target.pos.y < character.pos.y - 50;
+					bool isTargetBellowYou = target.pos.y < character.pos.y + 10;
+					bool isTargetSuperClose = target.pos.x - 3 >= character.pos.x;
+					bool isTargetClose = target.pos.x - 15 > character.pos.x;
+					bool isTargetSSC = target.pos.x == character.pos.x;
 
-				// Always check that Kaiser Sigma is on Air
-				if (target is Character chr && chr.player.isKaiserNonViralSigma()) isTargetInAir = true;
+					// Always check that Kaiser Sigma is on Air
+					if (target is Character chr && chr.player.isKaiserNonViralSigma()) isTargetInAir = true;
 
-				// is Facing the target?
-				if (character.isFacing(target)) 
-				{
-					//Makes the AI release the charge
-					if (framesChargeHeld > 0)
-					{
-						if (character.chargeTime >= maxChargeTime)
-						{
-							player.release(Control.Shoot);
-							framesChargeHeld = 0;
+					// is Facing the target?
+					if (character.isFacing(target)) {
+						//Makes the AI release the charge
+						if (framesChargeHeld > 0) {
+							if (character.chargeTime >= maxChargeTime) {
+								player.release(Control.Shoot);
+								framesChargeHeld = 0;
+							}
 						}
-					}
-				
+
 						//Zero Start
-						if (character is Zero zero)
-						{
+						if (character is Zero zero) {
 
 							////Zero Buster Start	
-								if (player.isZBusterZero() && character.charState is not LadderClimb)
-								{
-									if (Helpers.randomRange(0, 60) < 10)
-									if(player.currency == Player.zeroHyperCost && !character.isSpriteInvulnerable())
-									character.changeState(new HyperZeroStart(0), true);	
-									int ZBattack = Helpers.randomRange(0, 5);
-									if (isTargetInAir) ZBattack = 4;										
-									switch (ZBattack)
-									{
+							if (player.isZBusterZero() && character.charState is not LadderClimb) {
+								if (Helpers.randomRange(0, 60) < 10)
+									if (player.currency == Player.zeroHyperCost && !character.isSpriteInvulnerable())
+										character.changeState(new HyperZeroStart(0), true);
+								int ZBattack = Helpers.randomRange(0, 5);
+								if (isTargetInAir) ZBattack = 4;
+								switch (ZBattack) {
 									case 0: // Press Shoot to lemon
-									player.press(Control.Shoot);
-									break;
+										player.press(Control.Shoot);
+										break;
 									case 1: // Saber Swing
-									player.press(Control.Special1);
-									break;
+										player.press(Control.Special1);
+										break;
 									case 2: // Another action if the enemy is on Do Jump and do SaberSwing
-									if (isTargetInAir)
-									player.press(Control.Jump); player.press(Control.Special1);
-									break;
+										if (isTargetInAir)
+											player.press(Control.Jump); player.press(Control.Special1);
+										break;
 									case 3:
-									if(zero.stockedXSaber) 
-									player.press(Control.Shoot); player.release(Control.Shoot);
-									break;
+										if (zero.stockedXSaber)
+											player.press(Control.Shoot); player.release(Control.Shoot);
+										break;
 									case 4: //Do rising if enemy is on air and you are not on the ground counting if you are on Fall or Jump state
-									if (isTargetInAir && !character.grounded && character.charState is Fall or Jump)
-										character.changeState(
-										new ZeroUppercut(
-										new RisingWeapon(player),
-										character.isUnderwater()), forceChange: true);												
-									break; 
-									case 5:	//If is Black Zero Buster
-										if (zero.isBlackZero2())
-										{
-											switch (Helpers.randomRange(0,48))
-											{
-											case 1: // CFlasher Spam
-											character.changeState(new Rakuhouha(new CFlasher(player)), true);
-											break;
-											case 2: // Double Buster Spam!
-											character.changeState(new ZeroDoubleBuster(true, true), true);
-											break;
-											case 3: // Genmurei Spam!
-											character.changeState(new GenmuState(), true);
-											break;
+										if (isTargetInAir && !character.grounded && character.charState is Fall or Jump)
+											character.changeState(
+											new ZeroUppercut(
+											new RisingWeapon(player),
+											character.isUnderwater()), forceChange: true);
+										break;
+									case 5: //If is Black Zero Buster
+										if (zero.isBlackZero2()) {
+											switch (Helpers.randomRange(0, 48)) {
+												case 1: // CFlasher Spam
+													character.changeState(new Rakuhouha(new CFlasher(player)), true);
+													break;
+												case 2: // Double Buster Spam!
+													character.changeState(new ZeroDoubleBuster(true, true), true);
+													break;
+												case 3: // Genmurei Spam!
+													character.changeState(new GenmuState(), true);
+													break;
 											}
 										}
-									break;
-									}
+										break;
 								}
+							}
 							//Zero Buster End
 
 							//Zero Saber Start		
-								if (player.isZSaber() && character.charState is not LadderClimb)			
-								{		
-									// Go Hypermode if bot has the zero hypermode cost (so 10 metals)
-									if (Helpers.randomRange(0, 60) < 10)							
-									if(player.currency == Player.zeroHyperCost && !character.isSpriteInvulnerable())
-									character.changeState(new HyperZeroStart(0), true);
-									int ZSattack = Helpers.randomRange(0, 13);
-									if (isTargetInAir) ZSattack = 10;								
-									switch (ZSattack)
-									{
-										//Randomizador
-										case 0: // Attack
+							if (player.isZSaber() && character.charState is not LadderClimb) {
+								// Go Hypermode if bot has the zero hypermode cost (so 10 metals)
+								if (Helpers.randomRange(0, 60) < 10)
+									if (player.currency == Player.zeroHyperCost && !character.isSpriteInvulnerable())
+										character.changeState(new HyperZeroStart(0), true);
+								int ZSattack = Helpers.randomRange(0, 13);
+								if (isTargetInAir) ZSattack = 10;
+								switch (ZSattack) {
+									//Randomizador
+									case 0: // Attack
 										character.changeSprite(character.getSprite(character.charState.attackSprite), true);
 										break;
-										case 1: //Uppercut 
-										if(isTargetSuperClose && character.grounded)
-										player.press(Control.Special1); player.press(Control.Up);
+									case 1: //Uppercut 
+										if (isTargetSuperClose && character.grounded)
+											player.press(Control.Special1); player.press(Control.Up);
 										break;
-										case 2: //Uppercut
-										if(isTargetSuperClose && character.grounded)
-										player.press(Control.Shoot); player.press(Control.Up);
+									case 2: //Uppercut
+										if (isTargetSuperClose && character.grounded)
+											player.press(Control.Shoot); player.press(Control.Up);
 										break;
-										case 3: //Crouch slash
-										if(character.grounded)
-										player.press(Control.Down); player.press(Control.Shoot);
+									case 3: //Crouch slash
+										if (character.grounded)
+											player.press(Control.Down); player.press(Control.Shoot);
 										break;
-										case 4: // If Zero is dashing, press special and do shippuga
-										if(character.charState is Dash && isTargetClose)
-										player.press(Control.Special1);
+									case 4: // If Zero is dashing, press special and do shippuga
+										if (character.charState is Dash && isTargetClose)
+											player.press(Control.Special1);
 										break;
-										case 5: // If Zero is on the ground and has giga attack ammo of at least 8 to above do "Rakuhouha"
-										if(character.grounded && zero.zeroGigaAttackWeapon.ammo >= 8f)
-										player.press(Control.Down); player.press(Control.Special1);									
+									case 5: // If Zero is on the ground and has giga attack ammo of at least 8 to above do "Rakuhouha"
+										if (character.grounded && zero.zeroGigaAttackWeapon.ammo >= 8f)
+											player.press(Control.Down); player.press(Control.Special1);
 										break;
-										case 6: // Air special
+									case 6: // Air special
 										if (!character.grounded)
-										player.press(Control.Special1);
+											player.press(Control.Special1);
 										break;
-										case 7: // if the character is on fall state, Downthrust attack
-										if ((character.charState is Fall or Jump) && !(character.charState is ZeroUppercut))
-										character.changeState(new ZeroFallStab(new HyouretsuzanWeapon(player)));
+									case 7: // if the character is on fall state, Downthrust attack
+										if ((character.charState is Fall or Jump) && character.charState is not ZeroUppercut)
+											character.changeState(new ZeroFallStab(new HyouretsuzanWeapon(player)));
 										break;
-										case 8: // if the character is on fall state, Downthrust attack
-										if ((character.charState is Fall or Jump) && !(character.charState is ZeroUppercut))
-										character.changeState(new ZeroFallStab(new QuakeBlazerWeapon(player)));
+									case 8: // if the character is on fall state, Downthrust attack
+										if (character.charState is (Fall or Jump) and not ZeroUppercut)
+											character.changeState(new ZeroFallStab(new QuakeBlazerWeapon(player)));
 										break;
-										case 9: // if the character is on fall state, Downthrust attack
-										if ((character.charState is Fall or Jump) && !(character.charState is ZeroUppercut))
-										character.changeState(new ZeroFallStab(new RakukojinWeapon(player)));
+									case 9: // if the character is on fall state, Downthrust attack
+										if ((character.charState is Fall or Jump) && character.charState is not ZeroUppercut)
+											character.changeState(new ZeroFallStab(new RakukojinWeapon(player)));
 										break;
-										case 10: 
+									case 10:
 										if (isTargetInAir && !character.grounded && character.charState is Fall or Jump)
 											character.changeState(
 											new ZeroUppercut(
 											new EBladeWeapon(player),
-											character.isUnderwater()), forceChange: true);												
-										break; 
-										case 11: // Dash slash
+											character.isUnderwater()), forceChange: true);
+										break;
+									case 11: // Dash slash
 										if (character.charState is Dash && isTargetClose)
-										player.press(Control.Shoot);
+											player.press(Control.Shoot);
 										break;
-										case 12:
-										if(zero.stockedXSaber) 
-										player.press(Control.Shoot); player.release(Control.Shoot);
+									case 12:
+										if (zero.stockedXSaber)
+											player.press(Control.Shoot); player.release(Control.Shoot);
 										break;
-										case 13:	
-											if (zero.isHyperZero() || zero.isNightmareZeroBS.getValue())
-											{
-												switch (Helpers.randomRange(0,24))
-												{
+									case 13:
+										if (zero.isHyperZero() || zero.isNightmareZeroBS.getValue()) {
+											switch (Helpers.randomRange(0, 24)) {
 												case 1: // Unleash the 13.2 Shin messenkou spam!
-												character.changeState(new Rakuhouha(zero.zeroGigaAttackWeapon), true);
-												break;
+													character.changeState(new Rakuhouha(zero.zeroGigaAttackWeapon), true);
+													break;
 												case 2: // Double Buster Spam!
-												character.changeState(new ZeroDoubleBuster(false, true), true);
-												break;
+													character.changeState(new ZeroDoubleBuster(false, true), true);
+													break;
 												case 3: // Genmurei Spam!
-												character.changeState(new GenmuState(), true);
-												break;
-												}
+													character.changeState(new GenmuState(), true);
+													break;
 											}
+										}
 										break;
-									}
-											
-											
 								}
+
+
+							}
 							//Zero Saber End
 
 							//Zero Knuckle Start
-							if (player.hasKnuckle() && character.charState is not LadderClimb)
-							{
-								if (Helpers.randomRange(0, 60) < 10)	
-								if(player.currency == Player.zeroHyperCost && !character.isSpriteInvulnerable())
-								character.changeState(new HyperZeroStart(0), true);
-								int ZKattack = Helpers.randomRange(0, 9);	
+							if (player.hasKnuckle() && character.charState is not LadderClimb) {
+								if (Helpers.randomRange(0, 60) < 10)
+									if (player.currency == Player.zeroHyperCost && !character.isSpriteInvulnerable())
+										character.changeState(new HyperZeroStart(0), true);
+								int ZKattack = Helpers.randomRange(0, 9);
 								if (isTargetInAir) ZKattack = 6;
-								switch (ZKattack)
-								{
-										//Randomizador
-										case 0: // press shoot
-										if(character.grounded)
-										character.changeSprite(character.getSprite(character.charState.attackSprite), true);
+								switch (ZKattack) {
+									//Randomizador
+									case 0: // press shoot
+										if (character.grounded)
+											character.changeSprite(character.getSprite(character.charState.attackSprite), true);
 										break;
-										case 1: //Uppercut 
-										if(character.grounded)
-										player.press(Control.Shoot); player.press(Control.Up);
+									case 1: //Uppercut 
+										if (character.grounded)
+											player.press(Control.Shoot); player.press(Control.Up);
 										break;
-										case 2: // If Zero is dashing, press special and do shippuga
-										if(character.charState is Dash)
+									case 2: // If Zero is dashing, press special and do shippuga
+										if (character.charState is Dash)
+											player.press(Control.Special1);
+										break;
+									case 3: // If Zero is on the ground and has giga attack ammo of at least 8 to above do "Rakuhouha"
+										if (character.grounded && zero.zeroGigaAttackWeapon.ammo >= 8f)
+											player.press(Control.Down); player.press(Control.Special1);
+										break;
+									case 4: // 
 										player.press(Control.Special1);
 										break;
-										case 3: // If Zero is on the ground and has giga attack ammo of at least 8 to above do "Rakuhouha"
-										if(character.grounded && zero.zeroGigaAttackWeapon.ammo >= 8f)
-										player.press(Control.Down); player.press(Control.Special1);									
+									case 5: // if the character is on fall state, Downthrust attack
+										if (character.charState is Fall || character.charState is Jump)
+											player.press(Control.Down); player.press(Control.Shoot);
 										break;
-										case 4: // 
-										player.press(Control.Special1);
+									case 6:
+										if (isTargetInAir && !character.grounded && character.charState is Fall or Jump)
+											character.changeState(
+											new ZeroUppercut(
+											new ZeroShoryukenWeapon(player),
+											character.isUnderwater()), forceChange: true);
 										break;
-										case 5: // if the character is on fall state, Downthrust attack
-										if(character.charState is Fall || character.charState is Jump)
-										player.press(Control.Down); player.press(Control.Shoot); 
+									case 7:
+										if (character.charState is Jump or Fall)
+											player.press(Control.Shoot);
 										break;
-										case 6: 
-										if (isTargetInAir && !character.grounded && character.charState is Fall or Jump)											
-										character.changeState(
-										new ZeroUppercut(
-										new ZeroShoryukenWeapon(player),
-										character.isUnderwater()), forceChange: true);																							
-										break; 
-										case 7:
-										if(character.charState is Jump or Fall)
-										player.press(Control.Shoot);								
+									case 8:
+										if (zero.stockedXSaber)
+											player.press(Control.Shoot); player.release(Control.Shoot);
 										break;
-										case 8:
-										if(zero.stockedXSaber) 
-										player.press(Control.Shoot); player.release(Control.Shoot);
-										break;
-										case 9:
-											if (zero.isHyperZero() || zero.isNightmareZeroBS.getValue())
-											{
-												switch (Helpers.randomRange(0,32))
-												{
+									case 9:
+										if (zero.isHyperZero() || zero.isNightmareZeroBS.getValue()) {
+											switch (Helpers.randomRange(0, 32)) {
 												case 1: // Unleash the 13.2 Shin messenkou spam!
-												character.changeState(new Rakuhouha(zero.zeroGigaAttackWeapon), true);
-												break;
+													character.changeState(new Rakuhouha(zero.zeroGigaAttackWeapon), true);
+													break;
 												case 2: // Double Buster Spam!
-												character.changeState(new ZeroDoubleBuster(true, true), true);
-												break;
+													character.changeState(new ZeroDoubleBuster(true, true), true);
+													break;
 												case 3: // Genmurei Spam!
-												character.changeState(new GenmuState(), true);
-												break;
-												}
+													character.changeState(new GenmuState(), true);
+													break;
 											}
+										}
 										break;
-								}	
+								}
 							}
 							//Zero Knuckle end
 						}
 						//Zero End
 
 						//Sigma Start
-						if (character is BaseSigma)
-						{
-								//Commander Sigma Start
-								if (character is CmdSigma cmdSigma && character.charState is not LadderClimb)
-								{
-									int Sattack = Helpers.randomRange(0, 3);
-									if (isTargetInAir) Sattack = 1;
-									switch (Sattack)
-									{
+						if (character is BaseSigma) {
+							//Commander Sigma Start
+							if (character is CmdSigma cmdSigma && character.charState is not LadderClimb) {
+								int Sattack = Helpers.randomRange(0, 3);
+								if (isTargetInAir) Sattack = 1;
+								switch (Sattack) {
 									case 0: // Beam Saber
-									player.press(Control.Shoot);
-									break;
+										player.press(Control.Shoot);
+										break;
 									case 1: // Machine Gun if the enemy is on the air
-									if (character.grounded && isTargetInAir)						
-									character?.changeState(new SigmaBallShoot(), forceChange: true);					
-									break;		
+										if (character.grounded && isTargetInAir)
+											character?.changeState(new SigmaBallShoot(), forceChange: true);
+										break;
 									case 2: // Triangle Kick
-									if (character.charState is Dash && character.grounded)
-									player.press(Control.Special1);					
-									break;
-									}
+										if (character.charState is Dash && character.grounded)
+											player.press(Control.Special1);
+										break;
 								}
+							}
 							//Commander Sigma End
-						}	
+						}
 						//Vile Start	
-						if (character is Vile vile)
-						{	
+						if (character is Vile vile) {
 							// You dare to grab me? i will blow myself up
-							if (character.charState?.isGrabbedState == true)
-							{
-							if (Helpers.randomRange(0, 100) < 10) 
-							vile?.changeState(new NecroBurstAttack(vile.grounded), true);
-							}	
+							if (character.charState?.isGrabbedState == true) {
+								if (Helpers.randomRange(0, 100) < 10)
+									vile?.changeState(new NecroBurstAttack(vile.grounded), true);
+							}
 
-							if (Helpers.randomRange(0, 100) < 30)
-							{
-							if (isTargetInAir && isTargetSuperClose && !(character.charState is VileRevive or HexaInvoluteState))
+							if (Helpers.randomRange(0, 100) < 30) {
+								if (isTargetInAir && isTargetSuperClose && !(character.charState is VileRevive or HexaInvoluteState))
 									vile?.changeState(new RisingSpecterState(vile.grounded), true);
 							}
 
 							int Vattack = Helpers.randomRange(0, 64);
-							if (vile?.charState?.isGrabbedState == false && !player.isDead && !(character.charState is VileRevive)
-								&& !character.isSpriteInvulnerable() && !(character.charState is HexaInvoluteState) && character.charState.canAttack())
-							{
-								switch (Vattack)
-								{
-								case 0:
-								player.press(Control.Shoot);
-								break;
-								case 1:
-								CannonAttack.shootLogic(vile);
-								break;
-								case 2:
-								if (character.grounded || character.charState is Jump)
-								vile?.changeState(new RocketPunchAttack(), false);												
-								break;
-								case 3:
-								if (character.charState is Fall)								
-								vile?.changeState(new AirBombAttack(false), true);									
-								break;
-								case 4:	
-								if (character.grounded || character.charState is Jump)						
-								vile?.changeState(new MissileAttack(), true);									
-								break;
-								case 5:
-								vile?.changeState(new CutterAttackState(), true);
-								break;
-								case 6:
-								if (character.grounded)
-								vile?.changeState(new NapalmAttack(NapalmAttackType.Napalm), true);
-								break;
-								case 7: 
-								if (character.charState is Fall)
-								vile?.changeState(new FlamethrowerState(), true);
-								break;
-								case 8:
-								int VMK1attackCase8 = Helpers.randomRange(1,4);
-									if(isTargetSuperClose)
-									{
-										switch (VMK1attackCase8)
-										{
-											case 1:
-											vile?.changeState(new RisingSpecterState(vile.grounded), true);
-											break;
-											case 2:
-											vile?.changeState(new StraightNightmareAttack(vile.grounded), true);
-											break;
-											case 3:
-											if (player.health >= 12)
-											vile?.changeState(new NecroBurstAttack(vile.grounded), true);
-											break;
-											case 4:
-											if (vile.isVileMK5)
-											vile?.changeState(new HexaInvoluteState(), true);
-											break;
+							if (vile?.charState?.isGrabbedState == false && !player.isDead && character.charState is not VileRevive
+								&& !character.isSpriteInvulnerable() && character.charState is not HexaInvoluteState && character.charState.canAttack()) {
+								switch (Vattack) {
+									case 0:
+										player.press(Control.Shoot);
+										break;
+									case 1:
+										CannonAttack.shootLogic(vile);
+										break;
+									case 2:
+										if (character.grounded || character.charState is Jump)
+											vile?.changeState(new RocketPunchAttack(), false);
+										break;
+									case 3:
+										if (character.charState is Fall)
+											vile?.changeState(new AirBombAttack(false), true);
+										break;
+									case 4:
+										if (character.grounded || character.charState is Jump)
+											vile?.changeState(new MissileAttack(), true);
+										break;
+									case 5:
+										vile?.changeState(new CutterAttackState(), true);
+										break;
+									case 6:
+										if (character.grounded)
+											vile?.changeState(new NapalmAttack(NapalmAttackType.Napalm), true);
+										break;
+									case 7:
+										if (character.charState is Fall)
+											vile?.changeState(new FlamethrowerState(), true);
+										break;
+									case 8:
+										int VMK1attackCase8 = Helpers.randomRange(1, 4);
+										if (isTargetSuperClose) {
+											switch (VMK1attackCase8) {
+												case 1:
+													vile?.changeState(new RisingSpecterState(vile.grounded), true);
+													break;
+												case 2:
+													vile?.changeState(new StraightNightmareAttack(vile.grounded), true);
+													break;
+												case 3:
+													if (player.health >= 12)
+														vile?.changeState(new NecroBurstAttack(vile.grounded), true);
+													break;
+												case 4:
+													if (vile.isVileMK5)
+														vile?.changeState(new HexaInvoluteState(), true);
+													break;
+											}
 										}
-									}
-								break;
+										break;
 								}
-							}																				
+							}
 						}
+					}
+				}
+				shootTime += Global.spf;
+				if (shootTime > 0.01) {
+					shootTime = 0;
 				}
 			}
-			shootTime += Global.spf;
-			if (shootTime > 0.01) {
-				shootTime = 0;
-			}
-		}
 		}
 
 		//The AI should dodge if a projectile is close to him
-		if (aiState.shouldDodge && target != null) 
-		{
-			foreach (GameObject proj in Global.level.gameObjects)
-			{
-				if (proj is Projectile)
-				{
-					Projectile projProj = proj as Projectile;
-					if (projProj.damager.owner.alliance != player.alliance)
-					{
+		if (aiState.shouldDodge && target != null) {
+			foreach (GameObject gameObject in Global.level.gameObjects) {
+				if (gameObject is Projectile proj) {
+					if (proj.damager.owner.alliance != player.alliance) {
 						//Start of Zero
 						//Putting Zero here
-						if (player.character is Zero zero) 
-						{
+						if (player.character is Zero zero) {
 							//Projectile is not 
-							if (proj is not RollingShieldProjCharged || proj is not RollingShieldProj
-							 || proj is not FrostShieldProj || proj is not FrostShieldProjAir || proj is not FrostShieldProjCharged || proj is not FrostShieldProjGround || proj is not FrostShieldProjPlatform //HOW MANY OF U EXIST
-							 || proj is not MagnetMineProj)
-							{
+							if (gameObject is not RollingShieldProjCharged || gameObject is not RollingShieldProj
+							 || gameObject is not FrostShieldProj || gameObject is not FrostShieldProjAir || gameObject is not FrostShieldProjCharged || gameObject is not FrostShieldProjGround || gameObject is not FrostShieldProjPlatform //HOW MANY OF U EXIST
+							 || gameObject is not MagnetMineProj) {
 								//If a projectile is close to Zero
-								if (projProj.isFacing(character) && character.withinX(projProj, 100) && character.withinY(projProj, 30))
-								{
-								//If the player is Z-Saber or Knuckle and has giga attack ammo available do "I hate the ground" Or "Block/Parry"
-									if (player.isZSaber() || player.hasKnuckle())
-									{							
+								if (proj.isFacing(character) && character.withinX(proj, 100) && character.withinY(proj, 30)) {
+									//If the player is Z-Saber or Knuckle and has giga attack ammo available do "I hate the ground" Or "Block/Parry"
+									if (player.isZSaber() || player.hasKnuckle()) {
 										//Do i have giga attack ammo available?
-										if (zero.zeroGigaAttackWeapon.ammo >= 8f && character.grounded)
-										{
-												//RAKUHOUHA!
-												player.press(Control.Special1);player.press(Control.Down);
+										if (zero.zeroGigaAttackWeapon.ammo >= 8f && character.grounded) {
+											//RAKUHOUHA!
+											player.press(Control.Special1); player.press(Control.Down);
 										}
 										//If he hasn't do "Block/Parry"
-										else if (proj is not GenericMeleeProj || (projProj.reflectable == true))
-										{
-											player.press(Control.WeaponLeft);		
-										}	
+										else if (gameObject is not GenericMeleeProj || (proj.reflectable == true)) {
+											player.press(Control.WeaponLeft);
+										}
 									}
 									//If player is Buster Zero do Saber Swing
-									if (player.isZBusterZero())									
-									player.press(Control.Special1);									
+									if (player.isZBusterZero())
+										player.press(Control.Special1);
 								}
 							}
 							//A magnet mine?
-							else if (proj is MagnetMineProj)
-							{
+							else if (gameObject is MagnetMineProj) {
 								//if the projectile is super close to Zero
-								if (projProj.isFacing(character) && character.withinX(projProj, 15) && character.withinY(projProj, 1))
-								{		
+								if (proj.isFacing(character) && character.withinX(proj, 15) && character.withinY(proj, 1)) {
 									//If the character is on the ground (and is not knuckle or Buster Zero)
-									if (player.isZSaber() && character.grounded && !(player.hasKnuckle() || player.isZBusterZero()))
-									{
+									if (player.isZSaber() && character.grounded && !(player.hasKnuckle() || player.isZBusterZero())) {
 										//CrouchSlash
 										player.press(Control.Down); player.press(Control.Shoot);
 									}
 									//If the character is on air
-									else if (!character.grounded)
-									{
+									else if (!character.grounded) {
 										//Air Dash
-										player.press(Control.Dash);	
-									}						
+										player.press(Control.Dash);
+									}
 									//If the character is on the air (and is not knuckle or Buster Zero)
-									else if (player.isZSaber() && character.charState is Jump && !(player.hasKnuckle() || player.isZBusterZero()))
-									{
+									else if (player.isZSaber() && character.charState is Jump && !(player.hasKnuckle() || player.isZBusterZero())) {
 										//Kuuenzan
 										player.press(Control.Special1);
 									}
 								}
-							}							
+							}
 						}
 						//End of Zero
 
 						//Start Of Sigma
 						//Putting Sigma here
-						if (player.character is BaseSigma baseSigma)
-						{
+						if (player.character is BaseSigma baseSigma) {
 							//If a projectile is close to Sigma
-							if (projProj.isFacing(character) && character.withinX(projProj, 150) && character.withinY(projProj, 30))
-							{
+							if (proj.isFacing(character) && character.withinX(proj, 150) && character.withinY(proj, 30)) {
 								//Commander Sigma
-								if (character is CmdSigma cmdSigma)
-								{
-									if (proj is not GenericMeleeProj)
-										{
-											//Do Block
-											player.press(Control.Down);
-										}
+								if (character is CmdSigma cmdSigma) {
+									if (gameObject is not GenericMeleeProj) {
+										//Do Block
+										player.press(Control.Down);
+									}
 								}
 								//Neo Sigma
-								if (character is NeoSigma neoSigma)
-								{
+								if (character is NeoSigma neoSigma) {
 									// If Neo Sigma giga attack ammo is the same and higher than 16 but less than 24
-									if (player.sigmaAmmo >= 16 && player.sigmaAmmo <= 24)
-									{
-										if (Global.time > 0.3f)
-											{
-												//Do "Better C-Flasher" 
-												//Original name: 5 Bullet Shot (弾5発射 Dan 5 Hassha)
-												player.press(Control.Special1);
-											}
+									if (player.sigmaAmmo >= 16 && player.sigmaAmmo <= 24) {
+										if (Global.time > 0.3f) {
+											//Do "Better C-Flasher" 
+											//Original name: 5 Bullet Shot (弾5発射 Dan 5 Hassha)
+											player.press(Control.Special1);
+										}
 									}
 									// If Neo Sigma giga attack ammo is 32
-									else if (player.sigmaAmmo == 32)
-									{
-										if (Global.time > 0.3f)
-											{
-												//Do "I-Frames E-Spark move"
-												//Original name: Electromagnetic Wave (電磁波 Denjiha) - Nightshade Electric Spark
-												player.press(Control.Special1);
-											}
+									else if (player.sigmaAmmo == 32) {
+										if (Global.time > 0.3f) {
+											//Do "I-Frames E-Spark move"
+											//Original name: Electromagnetic Wave (電磁波 Denjiha) - Nightshade Electric Spark
+											player.press(Control.Special1);
+										}
 									}
 									// If Neo Sigma has giga attack ammo less than 16
-									else if (player.sigmaAmmo < 16)
-									{
-										if (proj is not GenericMeleeProj)
-											{
-												//Do "Block"
-												player.press(Control.Down);
-											}
+									else if (player.sigmaAmmo < 16) {
+										if (gameObject is not GenericMeleeProj) {
+											//Do "Block"
+											player.press(Control.Down);
+										}
 									}
 								}
 							}
@@ -835,7 +777,7 @@ public class AI {
 						//Doppma shouldn't get an AI to block something
 						//dude literally holds the best shield.
 						//End of Sigma
-					}	
+					}
 				}
 			}
 		}
@@ -849,7 +791,7 @@ public class AI {
 					maxChargeTime = 5f;
 				} else {
 					maxChargeTime = 4.25f;
-					}
+				}
 				framesChargeHeld = 1;
 				player.press(Control.Shoot);
 			}
@@ -863,7 +805,7 @@ public class AI {
 				return;
 			}
 		}
-		if (aiState.randomlyDash && !(character.charState is WallKick) && !inNodeTransition && stuckTime == 0) {
+		if (aiState.randomlyDash && character.charState is not WallKick && !inNodeTransition && stuckTime == 0) {
 			if (Helpers.randomRange(0, 150) < 5) {
 				dashTime = Helpers.randomRange(0.2f, 0.5f);
 			}
@@ -894,7 +836,7 @@ public class AI {
 				}
 			}
 		}
-		if (player.weapon != null && player.weapon.ammo <= 0 && !(player.weapon is Buster)) {
+		if (player.weapon != null && player.weapon.ammo <= 0 && player.weapon is not Buster) {
 			player.changeWeaponSlot(getRandomWeaponIndex());
 		}
 
@@ -910,7 +852,7 @@ public class AI {
 
 	public int getRandomWeaponIndex() {
 		if (player.weapons.Count == 0) return 0;
-		var weapons = player.weapons.FindAll(w => !(w is DoubleBullet) && !(w is DNACore)).ToList();
+		List<Weapon> weapons = player.weapons.FindAll(w => w is not DoubleBullet and not DNACore).ToList();
 		return weapons.IndexOf(weapons.GetRandomItem());
 	}
 
@@ -1050,9 +992,9 @@ public class MoveTowardsTarget : AIState {
 public class FindPlayer : AIState {
 	public NavMeshNode destNode;
 	public NavMeshNode nextNode;
-	public NavMeshNode prevNode;
+	public NavMeshNode? prevNode;
 	public NavMeshNeighbor neighbor;
-	public NodeTransition nodeTransition;
+	public NodeTransition? nodeTransition;
 	public List<NavMeshNode> nodePath;
 	public float stuckTime;
 	public float lastX;
@@ -1142,13 +1084,11 @@ public class FindPlayer : AIState {
 			destNode = Global.level.goalNode;
 		} else if (Global.level.gameMode is CTF && player.alliance < 1) {
 			if (character.flag == null) {
-				Flag targetFlag = null;
+				Flag? targetFlag = null;
 				if (player.alliance == GameMode.redAlliance) targetFlag = Global.level.blueFlag;
 				else if (player.alliance == GameMode.blueAlliance) targetFlag = Global.level.redFlag;
 				destNode = Global.level.getClosestNodeInSight(targetFlag.pos);
-				if (destNode == null) {
-					destNode = Global.level.getRandomNode();
-				}
+				destNode ??= Global.level.getRandomNode();
 			} else {
 				if (player.alliance == GameMode.blueAlliance) destNode = Global.level.blueFlagNode;
 				else if (player.alliance == GameMode.redAlliance) destNode = Global.level.redFlagNode;
