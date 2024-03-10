@@ -413,7 +413,7 @@ public class Projectile : Actor {
 			) {
 				if (deltaPos.x != 0 && Math.Sign(deltaPos.x) != otherProj.xDir) {
 					reflect(otherProj.owner, sendRpc: true);
-					playSound("SigmaSaberBlock", sendRpc: true);
+					playSound("ding", sendRpc: true);
 				}
 			}
 

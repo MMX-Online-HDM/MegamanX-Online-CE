@@ -136,15 +136,12 @@ public class VileCannonProj : Projectile {
 
 		if (weapon.type == (int)VileCannonType.FrontRunner) {
 			// Nothing.
-			// Nothing was the past. focus on the AI
-			if (player.isAI) damager.damage = 1;
 		} else if (weapon.type == (int)VileCannonType.FatBoy) {
 			xScale = xDir;
 			damager.damage = 4;
 			damager.flinch = Global.defFlinch;
 			projId = (int)ProjIds.FatBoy;
 			maxTime = 0.35f;
-			if (player.isAI) damager.damage = 2; damager.flinch = Global.halfFlinch;
 		} else if (weapon.type == (int)VileCannonType.LongshotGizmo) {
 			damager.damage = 1;
 			/*

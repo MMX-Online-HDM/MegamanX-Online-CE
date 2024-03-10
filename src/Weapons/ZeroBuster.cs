@@ -124,7 +124,6 @@ public class ZBuster3Proj : Projectile {
 			damager.flinch = Global.halfFlinch;
 			damager.damage = 3;
 		}
-		if (player.isAI && !(projId == (int)ProjIds.ZBuster3b)) damager.damage = 3;
 		ZBuster2Proj.hyorogaCode(this, player);
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
@@ -149,7 +148,6 @@ public class ZBuster4Proj : Projectile {
 			damager.damage = 3;
 			damager.flinch = Global.halfFlinch;
 		}
-		if (player.isAI && !(projId == (int)ProjIds.ZBuster4b)) damager.damage = 4;
 		ZBuster2Proj.hyorogaCode(this, player);
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);

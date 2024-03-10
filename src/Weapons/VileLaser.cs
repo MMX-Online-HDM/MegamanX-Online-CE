@@ -105,7 +105,10 @@ public class RisingSpecterState : CharState {
 		Point shootPos = vile.setCannonAim(new Point(1.5f, -1));
 
 		if (vile.tryUseVileAmmo(vile.player.vileLaserWeapon.getAmmoUsage(0))) {
-			new RisingSpecterProj(new VileLaser(VileLaserType.RisingSpecter), shootPos, vile.xDir, vile.player, vile.player.getNextActorNetId(), rpc: true);
+			new RisingSpecterProj(
+				new VileLaser(VileLaserType.RisingSpecter), shootPos, vile.xDir,
+				vile.player, vile.player.getNextActorNetId(), rpc: true
+			);
 			vile.playSound("risingSpecter", sendRpc: true);
 		}
 	}
@@ -123,15 +126,15 @@ public class RisingSpecterProj : Projectile {
 		vel = new Point();
 		projId = (int)ProjIds.RisingSpecter;
 		shouldVortexSuck = false;
-		if (player.isAI) damager.damage = 3;
 		float destX = xDir * 150;
 		float destY = -100;
 		Point toDestPos = new Point(destX, destY);
 		pos = poi.addxy(destX * 0.0225f, destY * 0.0225f);
 		destPos = pos.add(toDestPos);
 
-		muzzle = new Anim(poi, "risingspecter_muzzle", xDir, null, false, host: player.character);
-		muzzle.angle = xDir == 1 ? toDestPos.angle : toDestPos.angle + 180;
+		muzzle = new Anim(poi, "risingspecter_muzzle", xDir, null, false, host: player.character) {
+			angle = xDir == 1 ? toDestPos.angle : toDestPos.angle + 180
+		};
 
 		float ang = poi.directionTo(destPos).angle;
 		var points = new List<Point>();
@@ -189,8 +192,16 @@ public class RisingSpecterProj : Projectile {
 		float jutY = dirTo.y;
 
 		DrawWrappers.DrawLine(pos.x, pos.y, destPos.x, destPos.y, col1, (30 + sin * 15) * sinDamp, 0, true);
-		DrawWrappers.DrawLine(pos.x - jutX * 2, pos.y - jutY * 2, destPos.x + jutX * 2, destPos.y + jutY * 2, col2, (20 + sin * 10) * sinDamp, 0, true);
-		DrawWrappers.DrawLine(pos.x - jutX * 4, pos.y - jutY * 4, destPos.x + jutX * 4, destPos.y + jutY * 4, col3, (10 + sin * 5) * sinDamp, 0, true);
+		DrawWrappers.DrawLine(
+			pos.x - jutX * 2, pos.y - jutY * 2,
+			destPos.x + jutX * 2, destPos.y + jutY * 2,
+			col2, (20 + sin * 10) * sinDamp, 0, true
+		);
+		DrawWrappers.DrawLine(
+			pos.x - jutX * 4, pos.y - jutY * 4,
+			destPos.x + jutX * 4, destPos.y + jutY * 4,
+			col3, (10 + sin * 5) * sinDamp, 0, true
+		);
 	}
 }
 
@@ -217,7 +228,10 @@ public class NecroBurstAttack : CharState {
 		if (vile.tryUseVileAmmo(vile.player.vileLaserWeapon.getAmmoUsage(0))) {
 			Point shootPos = vile.setCannonAim(new Point(1, 0));
 			//character.vileAmmoRechargeCooldown = 3;
-			new NecroBurstProj(new VileLaser(VileLaserType.NecroBurst), shootPos, vile.xDir, vile.player, vile.player.getNextActorNetId(), rpc: true);
+			new NecroBurstProj(
+				new VileLaser(VileLaserType.NecroBurst), shootPos,
+				vile.xDir, vile.player, vile.player.getNextActorNetId(), rpc: true
+			);
 			vile.playSound("necroburst", sendRpc: true);
 		}
 	}
@@ -248,12 +262,10 @@ public class NecroBurstProj : Projectile {
 		base.update();
 		if (isRunByLocalPlayer()) {
 			foreach (var go in Global.level.getGameObjectArray()) {
-				var actor = go as Actor;
-				var damagable = go as IDamagable;
 				var chr = go as Character;
 				bool isHurtSelf = chr?.player == damager.owner;
-				if (actor == null) continue;
-				if (damagable == null) continue;
+				if (go is not Actor actor) continue;
+				if (go is not IDamagable damagable) continue;
 				if (!isHurtSelf && !damagable.canBeDamaged(damager.owner.alliance, damager.owner.id, null)) continue;
 
 				float dist = actor.getCenterPos().distanceTo(pos);
@@ -345,7 +357,6 @@ public class StraightNightmareProj : Projectile {
 		projId = (int)ProjIds.StraightNightmare;
 		maxTime = 2;
 		sprite.visible = false;
-		if(player.isAI) damager.hitCooldown = 0.25f;
 		for (var i = 0; i < maxLen; i++) {
 			var midSprite = Global.sprites["straightnightmare_proj"].clone();
 			midSprite.visible = false;
@@ -361,10 +372,12 @@ public class StraightNightmareProj : Projectile {
 
 	public override void render(float x, float y) {
 		int spriteMidLen = 12;
-		int i = 0;
-		for (i = 0; i < length; i++) {
+		for (int i = 0; i < length; i++) {
 			spriteMids[i].visible = true;
-			spriteMids[i].draw(frameIndex, pos.x + x + (i * xDir * spriteMidLen), pos.y + y, xDir, yDir, getRenderEffectSet(), 1, 1, 1, zIndex);
+			spriteMids[i].draw(
+				frameIndex, pos.x + x + (i * xDir * spriteMidLen), pos.y + y,
+				xDir, yDir, getRenderEffectSet(), 1, 1, 1, zIndex
+			);
 		}
 
 		if (Global.showHitboxes && collider != null) {
@@ -404,8 +417,7 @@ public class StraightNightmareProj : Projectile {
 	}
 
 	public override void onHitDamagable(IDamagable damagable) {
-		var character = damagable as Character;
-		if (character == null) return;
+		if (damagable is not Character character) return;
 		if (character.charState.invincible) return;
 		if (character.isImmuneToKnockback()) return;
 

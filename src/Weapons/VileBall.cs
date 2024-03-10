@@ -91,7 +91,6 @@ public class VileBombProj : Projectile {
 		if (type == 1) maxTime = 0.3f;
 		destroyOnHit = true;
 		this.type = type;
-		if(player.isAI) damager.damage = 1;
 		if (vel != null) this.vel = (Point)vel;
 		if (type == 0) {
 			fadeSprite = "explosion";
@@ -143,7 +142,6 @@ public class PeaceOutRollerProj : Projectile {
 		if (type == 1) maxTime = 0.4f;
 		destroyOnHit = false;
 		this.type = type;
-		if (player.isAI) damager.damage = 2;
 		if (vel != null) this.vel = (Point)vel;
 		if (type == 0) {
 			this.vel.y = 50;

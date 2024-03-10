@@ -220,7 +220,7 @@ public class NapalmAttack : CharState {
 
 				Projectile proj;
 				if (napalmAttackType == NapalmAttackType.Napalm) {
-					if (player.vileNapalmWeapon.type == (int)NapalmType.RumblingBang && !player.isAI) {
+					if (player.vileNapalmWeapon.type == (int)NapalmType.RumblingBang) {
 						proj = new NapalmGrenadeProj(player.vileNapalmWeapon, character.pos.add(poi), character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
 					} else if (player.vileNapalmWeapon.type == (int)NapalmType.FireGrenade) {
 						character.playSound("FireNappalmMK2", forcePlay: false, sendRpc: true);
@@ -321,7 +321,6 @@ public class MK2NapalmGrenadeProj : Projectile {
 		collider.wallOnly = true;
 		fadeSound = "explosion";
 		fadeSprite = "explosion";
-		if(player.isAI) damager.hitCooldown = 0.5f;
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
@@ -396,7 +395,6 @@ public class MK2NapalmFlame : Projectile {
 		destroyOnHit = true;
 		shouldShieldBlock = false;
 		gravityModifier = 0.25f;
-		if(player.isAI) damager.damage = 0;
 	}
 
 	public override void update() {
@@ -423,7 +421,6 @@ public class MK2NapalmWallProj : Projectile {
 		vel = new Point(0, -200);
 		destroyOnHit = false;
 		shouldShieldBlock = false;
-		if(player.isAI) damager.damage = 0;
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}

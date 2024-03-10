@@ -104,7 +104,6 @@ public class VileMissileProj : Projectile {
 
 		if (weapon.type == (int)VileMissileType.HumerusCrush) {
 			damager.damage = 3;
-			if(player.isAI) damager.damage = 1;
 			// damager.flinch = Global.halfFlinch;
 			this.vel.x = xDir * 350;
 			maxTime = 0.35f;
@@ -112,7 +111,6 @@ public class VileMissileProj : Projectile {
 		if (weapon.type == (int)VileMissileType.PopcornDemon) {
 			projId = (int)ProjIds.PopcornDemon;
 			damager.damage = 2;
-			if(player.isAI) damager.damage = 1; damager.hitCooldown = 0.3f;
 		}
 		if (type == 1) {
 			projId = (int)ProjIds.PopcornDemonSplit;
@@ -120,8 +118,7 @@ public class VileMissileProj : Projectile {
 			this.vel = vel.Value.times(speed);
 			angle = this.vel.angle;
 			damager.damage = 2;
-			damager.hitCooldown = 0; // why did gm19 made the split have 0 hit cooldown WTF??? 
-			if(player.isAI) damager.damage = 1; damager.hitCooldown = 0.3f;
+			damager.hitCooldown = 0;
 		}
 
 		if (rpc) {

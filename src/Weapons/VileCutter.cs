@@ -130,7 +130,6 @@ public class VileCutterProj : Projectile {
 		projId = (int)weapon.projId;
 		destroyOnHit = true;
 		vileCutterType = (VileCutterType)weapon.type;
-		if(player.isAI) damager.damage = 1;
 		if (vileCutterType == VileCutterType.ParasiteSword) {
 			destroyOnHit = false;
 			maxAngleDist = 45;
@@ -142,7 +141,6 @@ public class VileCutterProj : Projectile {
 			returnTime = 0;
 			damager.damage = 1;
 			damager.hitCooldown = 0.33f;
-			if(player.isAI) damager.hitCooldown = 0.5f;
 		}
 
 		this.vel.y = 50;
