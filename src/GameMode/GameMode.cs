@@ -209,7 +209,7 @@ public class GameMode {
 		return teamSizes;
 	}
 
-	public GameMode(Level level, int? timeLimit, int? teamNum) {
+	public GameMode(Level level, int? timeLimit) {
 		this.level = level;
 		if (timeLimit != null) {
 			remainingTime = timeLimit.Value * 60;
@@ -619,9 +619,8 @@ public class GameMode {
 					"x" + Global.level.mainPlayer.currency.ToString(), 16, 140, Alignment.Left
 				);
 			}
-			MegamanX mmx = mainPlayer.character as MegamanX;
 
-			if (mmx != null && mmx.unpoShotCount > 0) {
+			if (mainPlayer.character is MegamanX mmx && mmx.unpoShotCount > 0) {
 				int x = 10, y = 156;
 				int count = mmx.unpoShotCount;
 				if (count >= 1) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x, y);
@@ -1223,8 +1222,9 @@ public class GameMode {
 		baseY -= 16;
 		int barIndex = 0;
 
-		MegamanX mmx = mainPlayer.character as MegamanX;
-		if (mmx != null && (mmx.isHyperX == true || player.character?.charState is XRevive)) {
+		if (mainPlayer.character is MegamanX mmx &&
+			(mmx.isHyperX == true || player.character?.charState is XRevive)
+		) {
 			if (mmx.unpoDamageMaxCooldown >= 2) barIndex = 1;
 			else if (mmx.unpoDamageMaxCooldown >= 1) barIndex = 3;
 			else if (mmx.unpoDamageMaxCooldown >= 0.5f) barIndex = 4;

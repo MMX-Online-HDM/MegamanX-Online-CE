@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<!--LangVersion>12.0</LangVersion-->
 		<AssemblyName>MMXOD</AssemblyName>
@@ -6,18 +6,20 @@
 		<Version>19.12</Version>
 		<AssemblyVersion>19.12</AssemblyVersion>
 		<ApplicationIcon>app.ico</ApplicationIcon>
-		<TargetFramework>net6.0-windows</TargetFramework>
-
+		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>false</ImplicitUsings>
 		<SelfContained>false</SelfContained>
 		<!--OutDir>./bin/test/<OutDir-->
 		<!--RunWorkingDirectory>./bin/win7-x64/</RunWorkingDirectory-->
 		<OutputPath>./bin/</OutputPath>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<Nullable>enable</Nullable>
+		<DebugType>embedded</DebugType>
+		<WarningLevel>9999</WarningLevel>
+		<Platforms>AnyCPU;x64</Platforms>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<!-- Warning: New protobuff versions like 3.2 are not compatible with .Net 6-->
 		<PackageReference Include="protobuf-net" Version="3.2.30" />
 		<PackageReference Include="protobuf-net.Core" Version="3.2.30" />
 		<PackageReference Include="SFML.Graphics" Version="2.5.1" />

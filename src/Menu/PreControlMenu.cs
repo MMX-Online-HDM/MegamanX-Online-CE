@@ -32,7 +32,7 @@ public class PreControlMenu : IMainMenu {
 		} else if (Global.input.isPressedMenu(Control.MenuRight)) {
 			cursorToCharNum[selArrowPosY]++;
 			if (cursorToCharNum[selArrowPosY] > 5) {
-				cursorToCharNum[selArrowPosY] = 0;
+				cursorToCharNum[selArrowPosY] = -2;
 			}
 		}
 

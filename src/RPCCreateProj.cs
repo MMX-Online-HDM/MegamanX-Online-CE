@@ -42,7 +42,6 @@ public partial class RPCCreateProj : RPC {
 		if (player == null) return;
 
 		Point pos = new Point(xPos, yPos);
-		Projectile proj = null;
 
 		if (functs.ContainsKey(projId)) {
 			ProjParameters args = new() {
@@ -55,9 +54,10 @@ public partial class RPCCreateProj : RPC {
 				byteAngle = byteAngle,
 				extraData = extraData
 			};
-			proj = functs[projId](args);
+			functs[projId](args);
 			return;
 		}
+		Projectile proj;
 
 		if (projId == (int)ProjIds.ItemTracer) {
 			proj = new ItemTracerProj(new ItemTracer(), pos, xDir, player, null, netProjByte);
@@ -489,7 +489,7 @@ public partial class RPCCreateProj : RPC {
 		} else if (projId == (int)ProjIds.BBuffaloIceProjGround) {
 			proj = new BBuffaloIceProjGround(BlizzardBuffalo.getWeapon(), pos, 0, player, netProjByte);
 		} else if (projId == (int)ProjIds.BBuffaloBeam) {
-			ushort bbNetIdBytes = BitConverter.ToUInt16(new byte[] { arguments[extraDataIndex], arguments[extraDataIndex + 1] }, 0);
+			ushort bbNetIdBytes = BitConverter.ToUInt16(arguments[extraDataIndex..2], 0);
 			var bb = Global.level.getActorByNetId(bbNetIdBytes) as BlizzardBuffalo;
 			proj = new BBuffaloBeamProj(BlizzardBuffalo.getWeapon(), pos, xDir, bb, player, netProjByte);
 		} else if (projId == (int)ProjIds.BHornetBee) {
@@ -502,6 +502,8 @@ public partial class RPCCreateProj : RPC {
 			proj = new DarkHoldProj(new DarkHoldWeapon(), pos, xDir, player, netProjByte);
 		} else if (projId == (int)ProjIds.HexaInvolute) {
 			proj = new HexaInvoluteProj(new HexaInvoluteWeapon(), pos, xDir, player, netProjByte);
+		} else {
+			proj = null;
 		}
 
 		/*

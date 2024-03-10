@@ -6,7 +6,7 @@ public class CTF : GameMode {
 	public CTF(
 		Level level, int playingTo,
 		int? timeLimit, int neutralKillLimit = 100
-	) : base(level, timeLimit, level.teamNum) {
+	) : base(level, timeLimit) {
 		this.playingTo = playingTo;
 		this.neutralKillLimit = neutralKillLimit;
 		isTeamMode = true;
