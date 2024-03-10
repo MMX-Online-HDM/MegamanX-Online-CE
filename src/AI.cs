@@ -345,10 +345,10 @@ public class AI {
 
 		// Vile: Go MK2 to MKV
 		if (character is Vile vile1) {
-			if (vile1?.charState is Die && vile1.isVileMK1 && player.currency >= 5)
-				vile1?.changeState(new VileRevive(isMK5: false), false);
-			if (vile1?.charState is Die && vile1.isVileMK2 && player.currency >= 5)
-				vile1?.changeState(new VileRevive(isMK5: true), false);
+			if (player.canReviveVile() && vile1.isVileMK1)
+				player.reviveVile(false);
+			if (vile1.isVileMK2 && player.canReviveVile())
+				player.reviveVile(true);	
 		}
 
 		//Should Attack?
@@ -381,7 +381,7 @@ public class AI {
 							if (player.isZBusterZero() && character.charState is not LadderClimb) {
 								if (Helpers.randomRange(0, 60) < 10)
 									if (player.currency == Player.zeroHyperCost && !character.isSpriteInvulnerable())
-										character.changeState(new HyperZeroStart(0), true);
+										zero.changeState(new HyperZeroStart(zero.zeroHyperMode), true);
 								int ZBattack = Helpers.randomRange(0, 5);
 								if (isTargetInAir) ZBattack = 4;
 								switch (ZBattack) {
@@ -397,7 +397,7 @@ public class AI {
 										break;
 									case 3:
 										if (zero.stockedXSaber)
-											player.press(Control.Shoot); player.release(Control.Shoot);
+											zero.swingStockedSaber();
 										break;
 									case 4: //Do rising if enemy is on air and you are not on the ground counting if you are on Fall or Jump state
 										if (isTargetInAir && !character.grounded && character.charState is Fall or Jump)
@@ -430,9 +430,9 @@ public class AI {
 								// Go Hypermode if bot has the zero hypermode cost (so 10 metals)
 								if (Helpers.randomRange(0, 60) < 10)
 									if (player.currency == Player.zeroHyperCost && !character.isSpriteInvulnerable())
-										character.changeState(new HyperZeroStart(0), true);
+										zero.changeState(new HyperZeroStart(zero.zeroHyperMode), true);
 								int ZSattack = Helpers.randomRange(0, 13);
-								if (isTargetInAir) ZSattack = 10;
+								if (isTargetInAir) ZSattack = 9;
 								switch (ZSattack) {
 									//Randomizador
 									case 0: // Attack
@@ -447,7 +447,7 @@ public class AI {
 											player.press(Control.Shoot); player.press(Control.Up);
 										break;
 									case 3: //Crouch slash
-										if (character.grounded)
+										if (character.grounded && isTargetSuperClose)
 											player.press(Control.Down); player.press(Control.Shoot);
 										break;
 									case 4: // If Zero is dashing, press special and do shippuga
@@ -463,33 +463,29 @@ public class AI {
 											player.press(Control.Special1);
 										break;
 									case 7: // if the character is on fall state, Downthrust attack
-										if ((character.charState is Fall or Jump) && character.charState is not ZeroUppercut)
-											character.changeState(new ZeroFallStab(new HyouretsuzanWeapon(player)));
+										if (character.charState is Fall && character.charState is not ZeroUppercut)
+											character.changeState(new ZeroFallStab(zero.zeroDownThrustWeaponA));
 										break;
 									case 8: // if the character is on fall state, Downthrust attack
-										if (character.charState is (Fall or Jump) and not ZeroUppercut)
-											character.changeState(new ZeroFallStab(new QuakeBlazerWeapon(player)));
-										break;
-									case 9: // if the character is on fall state, Downthrust attack
-										if ((character.charState is Fall or Jump) && character.charState is not ZeroUppercut)
-											character.changeState(new ZeroFallStab(new RakukojinWeapon(player)));
-										break;
-									case 10:
+										if (character.charState is Fall && character.charState is not ZeroUppercut)
+											character.changeState(new ZeroFallStab(zero.zeroDownThrustWeaponS));
+										break;					
+									case 9:
 										if (isTargetInAir && !character.grounded && character.charState is Fall or Jump)
 											character.changeState(
 											new ZeroUppercut(
 											new EBladeWeapon(player),
 											character.isUnderwater()), forceChange: true);
 										break;
-									case 11: // Dash slash
+									case 10: // Dash slash
 										if (character.charState is Dash && isTargetClose)
 											player.press(Control.Shoot);
 										break;
-									case 12:
+									case 11:
 										if (zero.stockedXSaber)
-											player.press(Control.Shoot); player.release(Control.Shoot);
+											zero.swingStockedSaber();
 										break;
-									case 13:
+									case 12:
 										if (zero.isHyperZero() || zero.isNightmareZeroBS.getValue()) {
 											switch (Helpers.randomRange(0, 24)) {
 												case 1: // Unleash the 13.2 Shin messenkou spam!
@@ -500,6 +496,7 @@ public class AI {
 													break;
 												case 3: // Genmurei Spam!
 													character.changeState(new GenmuState(), true);
+													
 													break;
 											}
 										}
@@ -514,7 +511,7 @@ public class AI {
 							if (player.hasKnuckle() && character.charState is not LadderClimb) {
 								if (Helpers.randomRange(0, 60) < 10)
 									if (player.currency == Player.zeroHyperCost && !character.isSpriteInvulnerable())
-										character.changeState(new HyperZeroStart(0), true);
+										zero.changeState(new HyperZeroStart(zero.zeroHyperMode), true);
 								int ZKattack = Helpers.randomRange(0, 9);
 								if (isTargetInAir) ZKattack = 6;
 								switch (ZKattack) {
@@ -539,12 +536,12 @@ public class AI {
 										player.press(Control.Special1);
 										break;
 									case 5: // if the character is on fall state, Downthrust attack
-										if (character.charState is Fall || character.charState is Jump)
-											player.press(Control.Down); player.press(Control.Shoot);
+										if (character.charState is Fall)
+											zero.changeState(new DropKickState(),true);										
 										break;
 									case 6:
 										if (isTargetInAir && !character.grounded && character.charState is Fall or Jump)
-											character.changeState(
+											zero.changeState(
 											new ZeroUppercut(
 											new ZeroShoryukenWeapon(player),
 											character.isUnderwater()), forceChange: true);
@@ -555,7 +552,7 @@ public class AI {
 										break;
 									case 8:
 										if (zero.stockedXSaber)
-											player.press(Control.Shoot); player.release(Control.Shoot);
+											zero.swingStockedSaber();
 										break;
 									case 9:
 										if (zero.isHyperZero() || zero.isNightmareZeroBS.getValue()) {
@@ -603,17 +600,17 @@ public class AI {
 						//Vile Start	
 						if (character is Vile vile) {
 							// You dare to grab me? i will blow myself up
-							if (character.charState?.isGrabbedState == true) {
-								if (Helpers.randomRange(0, 100) < 10)
+							if (character.charState?.isGrabbedState == true && player.health >= 12) {
+								if (Helpers.randomRange(0, 100) < 1)
 									vile?.changeState(new NecroBurstAttack(vile.grounded), true);
 							}
 
-							if (Helpers.randomRange(0, 100) < 30) {
-								if (isTargetInAir && isTargetSuperClose && !(character.charState is VileRevive or HexaInvoluteState))
+							if (Helpers.randomRange(0, 100) < 10) {
+								if (isTargetInAir && isTargetSuperClose && !(character.charState is VileRevive or HexaInvoluteState) && player.vileAmmo >= 24)
 									vile?.changeState(new RisingSpecterState(vile.grounded), true);
 							}
 
-							int Vattack = Helpers.randomRange(0, 64);
+							int Vattack = Helpers.randomRange(0, 16);
 							if (vile?.charState?.isGrabbedState == false && !player.isDead && character.charState is not VileRevive
 								&& !character.isSpriteInvulnerable() && character.charState is not HexaInvoluteState && character.charState.canAttack()) {
 								switch (Vattack) {
@@ -621,52 +618,36 @@ public class AI {
 										player.press(Control.Shoot);
 										break;
 									case 1:
-										CannonAttack.shootLogic(vile);
+										player.weapon.vileShoot(WeaponIds.FrontRunner, vile);
 										break;
 									case 2:
-										if (character.grounded || character.charState is Jump)
-											vile?.changeState(new RocketPunchAttack(), false);
+										player.vileRocketPunchWeapon.vileShoot(WeaponIds.RocketPunch, vile);
 										break;
-									case 3:
-										if (character.charState is Fall)
-											vile?.changeState(new AirBombAttack(false), true);
+									case 3: 									
+										if (!character.grounded)
+											player.vileBallWeapon.vileShoot(WeaponIds.VileBomb, vile);
 										break;
 									case 4:
-										if (character.grounded || character.charState is Jump)
-											vile?.changeState(new MissileAttack(), true);
+										player.vileMissileWeapon.vileShoot(WeaponIds.ElectricShock, vile);
 										break;
 									case 5:
-										vile?.changeState(new CutterAttackState(), true);
+										player.vileCutterWeapon.vileShoot(WeaponIds.VileCutter, vile);
 										break;
 									case 6:
 										if (character.grounded)
-											vile?.changeState(new NapalmAttack(NapalmAttackType.Napalm), true);
+											player.vileNapalmWeapon.vileShoot(WeaponIds.Napalm, vile);
 										break;
 									case 7:
 										if (character.charState is Fall)
-											vile?.changeState(new FlamethrowerState(), true);
+											player.vileFlamethrowerWeapon.vileShoot(WeaponIds.VileFlamethrower, vile);
 										break;
 									case 8:
-										int VMK1attackCase8 = Helpers.randomRange(1, 4);
-										if (isTargetSuperClose) {
-											switch (VMK1attackCase8) {
-												case 1:
-													vile?.changeState(new RisingSpecterState(vile.grounded), true);
-													break;
-												case 2:
-													vile?.changeState(new StraightNightmareAttack(vile.grounded), true);
-													break;
-												case 3:
-													if (player.health >= 12)
-														vile?.changeState(new NecroBurstAttack(vile.grounded), true);
-													break;
-												case 4:
-													if (vile.isVileMK5)
-														vile?.changeState(new HexaInvoluteState(), true);
-													break;
-											}
-										}
-										break;
+										player.vileLaserWeapon.vileShoot(WeaponIds.VileLaser, vile);
+									break;
+									case 9:
+									if (vile.isVileMK5)
+										vile?.changeState(new HexaInvoluteState(), true);
+									break;
 								}
 							}
 						}
@@ -785,11 +766,15 @@ public class AI {
 
 		//The AI should randomly charge weapon?
 		//I truly wonder why GM19 made only X charge weapons
-		if (aiState.randomlyChargeWeapon && (player.isX || player.isZBusterZero()) && framesChargeHeld == 0 && player.character.canCharge()) {
+		if (aiState.randomlyChargeWeapon && (player.isX || player.isZBusterZero() || player.isZSaber()) && framesChargeHeld == 0 && player.character.canCharge()) {
 			if (Helpers.randomRange(0, 50) < 1) {
 				if (player.isZBusterZero()) {
 					maxChargeTime = 5f;
-				} else {
+				} 
+				if (player.isZSaber())
+				 if (Helpers.randomRange(0, 50) < 1)
+				 		maxChargeTime = 4.25f;
+				else {
 					maxChargeTime = 4.25f;
 				}
 				framesChargeHeld = 1;
@@ -839,6 +824,8 @@ public class AI {
 		if (player.weapon != null && player.weapon.ammo <= 0 && player.weapon is not Buster) {
 			player.changeWeaponSlot(getRandomWeaponIndex());
 		}
+		if ( player.vileAmmo <= 0 && player.weapon is not VileCannon)
+		{player.changeWeaponSlot(getRandomWeaponIndex());}
 
 		aiState.update();
 
