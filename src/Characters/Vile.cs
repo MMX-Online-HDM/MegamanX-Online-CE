@@ -128,6 +128,7 @@ public class Vile : Character {
 			}
 		}
 
+
 		if (player.vileAmmo >= player.vileMaxAmmo) {
 			weaponHealAmount = 0;
 		}

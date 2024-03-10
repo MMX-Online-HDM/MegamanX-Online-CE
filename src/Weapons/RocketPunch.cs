@@ -94,6 +94,7 @@ public class RocketPunchProj : Projectile {
 		if (player.character != null) setzIndex(player.character.zIndex - 100);
 		minTime = 0.2f;
 		maxReverseTime = 0.4f;
+		if(player.isAI) damager.damage = 1;
 		if (weapon.type == (int)RocketPunchType.GoGetterRight) {
 			maxReverseTime = 0.3f;
 		}
@@ -106,8 +107,10 @@ public class RocketPunchProj : Projectile {
 			maxTime = 0.25f;
 			destroyOnHit = true;
 			projId = (int)ProjIds.SpoiledBrat;
+			if(player.isAI) damager.damage = 1;
 		} else if (weapon.type == (int)RocketPunchType.InfinityGig) {
 			projId = (int)ProjIds.InfinityGig;
+			if(player.isAI) damager.damage = 1;
 		}
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);

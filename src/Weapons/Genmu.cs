@@ -22,6 +22,11 @@ public class GenmuProj : Projectile {
 		xScale = 0.75f;
 		yScale = 0.75f;
 		projId = (int)ProjIds.Gemnu;
+		if (player.isAI) damager.damage = (float)Math.Floor((decimal)player.maxHealth * 0.2m);	
+		
+		if(player?.character != null && player.character is Zero zero &&
+		(zero.isBlackZero2() || zero.isHyperZero() || zero.isNightmareZeroBS.getValue()))
+		genericShader = player.zeroPaletteShader;
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}

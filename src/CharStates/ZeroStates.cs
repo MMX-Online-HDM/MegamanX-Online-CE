@@ -23,7 +23,7 @@ public class HyperZeroStart : CharState {
 				if (player.isZBusterZero()) {
 					zero.blackZeroTime = 9999;
 					RPC.actorToggle.sendRpc(character.netId, RPCActorToggleType.ActivateBlackZero2);
-				} else if (zero.zeroHyperMode == 0) {
+				} else if (zero.zeroHyperMode == 0 && !player.isAI) {
 					zero.blackZeroTime = zero.maxHyperZeroTime + 1;
 					RPC.setHyperZeroTime.sendRpc(character.player.id, zero.blackZeroTime, 0);
 				} else if (zero.zeroHyperMode == 1) {
@@ -32,6 +32,9 @@ public class HyperZeroStart : CharState {
 				} else if (zero.zeroHyperMode == 2) {
 					zero.isNightmareZero = true;
 				}
+				// We do a little buff to BZ and AZ AI 
+				else if (zero.zeroHyperMode == 0 && player.isAI)
+				{zero.blackZeroTime = 36;RPC.setHyperZeroTime.sendRpc(character.player.id, zero.blackZeroTime, 0);} 		
 				character.playSound("ching");
 				character.fillHealthToMax();
 			}

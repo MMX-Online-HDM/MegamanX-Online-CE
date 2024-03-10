@@ -710,7 +710,7 @@ public class Zero : Character {
 				new EBladeWeapon(player), centerPoint, ProjIds.EBlade, player, 3, Global.defFlinch, 0.1f
 			),
 			"zero_rising" => new GenericMeleeProj(
-				new RisingWeapon(player), centerPoint, ProjIds.Rising, player, 1, 0, 0.15f
+				new RisingWeapon(player), centerPoint, ProjIds.Rising, player, 1, player.isAI ? 4 : 0, 0.15f
 			),
 			_ => null
 		};
@@ -766,8 +766,10 @@ public class Zero : Character {
 		Point shootPos = getShootPos();
 		int xDir = getShootXDir();
 
-		if (isAwakenedZero() && !player.isZBusterZero()) {
-			if (chargeLevel == 1) {
+		if (isAwakenedZero())
+		{
+			if (chargeLevel == 1)
+			{
 				new ShingetsurinProj(new Shingetsurin(player), getShootPos(), xDir, 0, player, player.getNextActorNetId(), rpc: true);
 				playSound("ShingetsurinX5", forcePlay: false, sendRpc: true);
 			}
@@ -803,7 +805,7 @@ public class Zero : Character {
 					playSound("ShingetsurinX5", forcePlay: false, sendRpc: true);
 				}, 0.3f));
 			}
-			if (!player.isZBusterZero() || !player.isAI) {
+			if (!player.isZBusterZero()) {
 				player.currency--;
 			}
 			if (player.currency < 0) {
@@ -822,23 +824,17 @@ public class Zero : Character {
 				);
 				zeroLemonsOnField.Add(lemon);
 			} else if (chargeLevel == 1) {
-				if (!player.isZBusterZero()) {
-					if (type == 0) player.currency -= 1;
-					playSound("buster2", sendRpc: true);
-					zeroLemonCooldown = 0.375f;
-					new ZBuster2Proj(
-						zeroBusterWeapon, shootPos, xDir, type, player, player.getNextActorNetId(), rpc: true
-					);
-				}
-				if (type == 1) {
-					playSound("buster2X3", sendRpc: true);
-					zeroLemonCooldown = 0.375f;
-					new ZBuster2Proj(
-						zeroBusterWeapon, shootPos, xDir, type, player, player.getNextActorNetId(), rpc: true
-					);
+				if (!player.isZBusterZero())
+				{
+				if (type == 0 && !player.isAI) player.currency -= 1;
+				playSound("buster2", sendRpc: true);
+				zeroLemonCooldown = 0.375f;
+				new ZBuster2Proj(
+					zeroBusterWeapon, shootPos, xDir, type, player, player.getNextActorNetId(), rpc: true
+				);
 				}
 			} else if (chargeLevel == 2) {
-				if (type == 0) player.currency -= 1;
+				if (type == 0 && !player.isAI) player.currency -= 1;
 				zeroLemonCooldown = 0.375f;
 				if (!player.isZBusterZero()) {
 					playSound("buster3", sendRpc: true);
@@ -852,7 +848,7 @@ public class Zero : Character {
 					);
 				}
 			} else if (chargeLevel == 3 || chargeLevel >= 4) {
-				if (type == 0) player.currency -= 1;
+				if (type == 0 && !player.isAI) player.currency -= 1;
 				if (chargeLevel == 3 && player.isZBusterZero()) {
 					changeState(new ZeroDoubleBuster(false, true), true);
 					//playSound("zbuster2", sendRpc: true);
@@ -876,7 +872,7 @@ public class Zero : Character {
 	}
 
 	public bool canUseDoubleBusterCombo() {
-		//if (isBlackZero()) return true;
+		if (isBlackZero() && player.isAI) return true;
 		if (player.isZBusterZero()) return true;
 		return false;
 	}
@@ -914,7 +910,7 @@ public class Zero : Character {
 		awakenedZeroTime += Global.spf;
 		awakenedCurrencyTime += Global.spf;
 		int currencyDeductTime = 2;
-		if (isAwakenedGenmuZero()) currencyDeductTime = 1;
+		if (isAwakenedGenmuZero() && !player.isAI) currencyDeductTime = 1;
 
 		if (awakenedCurrencyTime > currencyDeductTime) {
 			awakenedCurrencyTime = 0;
@@ -945,7 +941,8 @@ public class Zero : Character {
 	}
 	public override void increaseCharge() {
 		float factor = 1;
-		if (isBlackZero2()) factor = 1.5f;
+		if (isBlackZero2() && !player.isAI) factor = 1.5f;
+		if (player.isAI && (isHyperZero()) || isNightmareZeroBS.getValue() || isBlackZero2()) factor = 2f;
 		chargeTime += Global.spf * factor;
 	}
 
