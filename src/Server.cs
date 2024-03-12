@@ -58,9 +58,10 @@ public class Server {
 	[ProtoMember(30)] public bool disableHtSt;
 	[ProtoMember(31)] public bool disableVehicles;
 	[ProtoMember(32)] public bool isP2P;
-	[ProtoMember(33)] public byte teamNum = 2;
-	[ProtoMember(5)] public int altPlayTo;
 	[ProtoMember(33)] public byte extraOptions;
+	[ProtoMember(33)] public byte[] teamScore;
+	[ProtoMember(34)] public byte teamNum = 2;
+	[ProtoMember(35)] public int altPlayTo;
 
 	[JsonIgnore]
 	public int redScore;
@@ -894,7 +895,10 @@ public class Server {
 			if ((gameMode == GameMode.CTF || gameMode == GameMode.TeamDeathmatch) &&
 				rpcIndexByte == RPC.templates.IndexOf(RPC.syncTeamScores)
 			) {
-				Global.level.gameMode.teamPoints = bytes;
+				teamScore = bytes;
+				if (Global.level?.gameMode != null) {
+					Global.level.gameMode.teamPoints = bytes;
+				}
 			}
 		} else {
 			var message = im.ReadString();

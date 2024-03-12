@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -16,7 +16,7 @@ public enum AITrainingBehavior {
 public class AI {
 	public Character character;
 	public AIState aiState;
-	public Actor target;
+	public Actor? target;
 	public float shootTime;
 	public float dashTime = 0;
 	public float jumpTime = 0;
@@ -117,7 +117,7 @@ public class AI {
 			}
 
 			var brakeZones = Global.level.getTriggerList(character.abstractedActor(), 0, 0, null, typeof(BrakeZone));
-			if ((Global.level.gameMode as Race).getPlace(character.player) > 1) {
+			if ((Global.level.gameMode as Race)?.getPlace(character.player) > 1) {
 				dashTime = 100;
 			} else {
 				dashTime = 0;
@@ -228,7 +228,7 @@ public class AI {
 			}
 		}
 
-		if (!Global.level.gameObjects.Contains(target)) {
+		if (target != null && !Global.level.gameObjects.Contains(target)) {
 			target = null;
 		}
 
@@ -255,9 +255,11 @@ public class AI {
 			if (neighbor != null) {
 				jumpZones = jumpZones.FindAll(j => !neighbor.isJumpZoneExcluded(j.gameObject.name));
 			}
-			if (jumpZones.Count > 0) {
-				var jumpZone = jumpZones[0].gameObject as JumpZone;
-				var jumpZoneDir = jumpZone.forceDir != 0 ? jumpZone.forceDir : character.xDir;
+			if (jumpZones.Count > 0 && jumpZones[0].gameObject is JumpZone jumpZone) {
+				var jumpZoneDir = character.xDir;
+				if (jumpZone.forceDir != 0) {
+					jumpZoneDir = jumpZone.forceDir;
+				}
 				if (jumpZoneDir == 0) jumpZoneDir = -1;
 
 				if (jumpZone.targetNode == null || jumpZone.targetNode == aiState.getNextNodeName()) {
@@ -610,7 +612,7 @@ public class AI {
 									vile?.changeState(new RisingSpecterState(vile.grounded), true);
 							}
 
-							int Vattack = Helpers.randomRange(0, 16);
+							int Vattack = Helpers.randomRange(0, 64);
 							if (vile?.charState?.isGrabbedState == false && !player.isDead && character.charState is not VileRevive
 								&& !character.isSpriteInvulnerable() && character.charState is not HexaInvoluteState && character.charState.canAttack()) {
 								switch (Vattack) {
@@ -672,9 +674,12 @@ public class AI {
 							if (gameObject is not RollingShieldProjCharged || gameObject is not RollingShieldProj
 							 || gameObject is not FrostShieldProj || gameObject is not FrostShieldProjAir || gameObject is not FrostShieldProjCharged || gameObject is not FrostShieldProjGround || gameObject is not FrostShieldProjPlatform //HOW MANY OF U EXIST
 							 || gameObject is not MagnetMineProj) {
-								//If a projectile is close to Zero
-								if (proj.isFacing(character) && character.withinX(proj, 100) && character.withinY(proj, 30)) {
-									//If the player is Z-Saber or Knuckle and has giga attack ammo available do "I hate the ground" Or "Block/Parry"
+								// If a projectile is close to Zero
+								if (character != null && proj.isFacing(character) &&
+									character.withinX(proj, 100) && character.withinY(proj, 30)
+								) {
+									// If the player is Z-Saber or Knuckle
+									// and has giga attack ammo available do "I hate the ground" Or "Block/Parry"
 									if (player.isZSaber() || player.hasKnuckle()) {
 										//Do i have giga attack ammo available?
 										if (zero.zeroGigaAttackWeapon.ammo >= 8f && character.grounded) {
@@ -694,9 +699,13 @@ public class AI {
 							//A magnet mine?
 							else if (gameObject is MagnetMineProj) {
 								//if the projectile is super close to Zero
-								if (proj.isFacing(character) && character.withinX(proj, 15) && character.withinY(proj, 1)) {
+								if (character != null && proj.isFacing(character) &&
+									character.withinX(proj, 15) && character.withinY(proj, 1)
+								) {
 									//If the character is on the ground (and is not knuckle or Buster Zero)
-									if (player.isZSaber() && character.grounded && !(player.hasKnuckle() || player.isZBusterZero())) {
+									if (player.isZSaber() && character.grounded &&
+										!(player.hasKnuckle() || player.isZBusterZero())
+									) {
 										//CrouchSlash
 										player.press(Control.Down); player.press(Control.Shoot);
 									}
@@ -706,7 +715,9 @@ public class AI {
 										player.press(Control.Dash);
 									}
 									//If the character is on the air (and is not knuckle or Buster Zero)
-									else if (player.isZSaber() && character.charState is Jump && !(player.hasKnuckle() || player.isZBusterZero())) {
+									else if (player.isZSaber() && character.charState is Jump &&
+										!(player.hasKnuckle() || player.isZBusterZero())
+									) {
 										//Kuuenzan
 										player.press(Control.Special1);
 									}
@@ -719,7 +730,9 @@ public class AI {
 						//Putting Sigma here
 						if (player.character is BaseSigma baseSigma) {
 							//If a projectile is close to Sigma
-							if (proj.isFacing(character) && character.withinX(proj, 150) && character.withinY(proj, 30)) {
+							if (character != null && proj.isFacing(character) &&
+								character.withinX(proj, 150) && character.withinY(proj, 30)
+							) {
 								//Commander Sigma
 								if (character is CmdSigma cmdSigma) {
 									if (gameObject is not GenericMeleeProj) {
@@ -783,14 +796,14 @@ public class AI {
 		}
 		//End of Randomly Charge Weapon
 
-		if (aiState.randomlyChangeState) {
+		if (aiState.randomlyChangeState && character != null) {
 			if (Helpers.randomRange(0, 60) < 5) {
 				var randAmount = Helpers.randomRange(-100, 100);
 				changeState(new MoveToPos(character, character.pos.addxy(randAmount, 0)));
 				return;
 			}
 		}
-		if (aiState.randomlyDash && character.charState is not WallKick && !inNodeTransition && stuckTime == 0) {
+		if (aiState.randomlyDash && character?.charState is not WallKick && !inNodeTransition && stuckTime == 0) {
 			if (Helpers.randomRange(0, 150) < 5) {
 				dashTime = Helpers.randomRange(0.2f, 0.5f);
 			}
@@ -808,7 +821,7 @@ public class AI {
 		}
 		if (aiState.randomlyChangeWeapon &&
 			(player.isX || player.isAxl || player.isVile) &&
-			!player.lockWeapon && !character.isInvisibleBS.getValue() &&
+			!player.lockWeapon && character?.isInvisibleBS.getValue() != true &&
 			(character as MegamanX)?.chargedRollingShieldProj == null
 		) {
 			weaponTime += Global.spf;
@@ -903,22 +916,22 @@ public class AIState {
 	}
 
 	public string getPrevNodeName() {
-		if (this is FindPlayer) {
-			return (this as FindPlayer).prevNode?.name;
+		if (this is FindPlayer findPlayer) {
+			return findPlayer.prevNode?.name ?? "";
 		}
 		return "";
 	}
 
 	public string getNextNodeName() {
-		if (this is FindPlayer) {
-			return (this as FindPlayer).nextNode?.name;
+		if (this is FindPlayer findPlayer) {
+			return findPlayer.nextNode?.name ?? "";
 		}
 		return "";
 	}
 
 	public string getDestNodeName() {
-		if (this is FindPlayer) {
-			return (this as FindPlayer).destNode?.name;
+		if (this is FindPlayer findPlayer) {
+			return findPlayer.destNode?.name ?? "";
 		}
 		return "";
 	}
@@ -1071,10 +1084,12 @@ public class FindPlayer : AIState {
 			destNode = Global.level.goalNode;
 		} else if (Global.level.gameMode is CTF && player.alliance < 1) {
 			if (character.flag == null) {
-				Flag? targetFlag = null;
+				Flag targetFlag = Global.level.blueFlag;
 				if (player.alliance == GameMode.redAlliance) targetFlag = Global.level.blueFlag;
 				else if (player.alliance == GameMode.blueAlliance) targetFlag = Global.level.redFlag;
-				destNode = Global.level.getClosestNodeInSight(targetFlag.pos);
+				if (targetFlag != null) {
+					destNode = Global.level.getClosestNodeInSight(targetFlag.pos);
+				}
 				destNode ??= Global.level.getRandomNode();
 			} else {
 				if (player.alliance == GameMode.blueAlliance) destNode = Global.level.blueFlagNode;
