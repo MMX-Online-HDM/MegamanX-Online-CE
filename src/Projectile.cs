@@ -747,7 +747,7 @@ public class Projectile : Actor {
 
 	public void setupWallCrawl(Point initialMoveDir) {
 		useLegacyWallCrawl = Global.level.levelData.wallPathNodes.Count == 0;
-		if (ownedByLocalPlayer) {
+		if (ownedByLocalPlayer || canBeLocal) {
 			if (useLegacyWallCrawl) {
 				setupLegacyWallCrawl();
 			} else {
@@ -829,6 +829,9 @@ public class Projectile : Actor {
 	}
 
 	public void updateModernWallCrawl() {
+		if (currentNode == null) {
+			return;
+		}
 		var nextNode = currentNode.next;
 		Point destPoint = nextNode.point;
 		Point dirToDest = pos.directionToNorm(destPoint);

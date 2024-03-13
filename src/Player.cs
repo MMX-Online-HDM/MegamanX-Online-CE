@@ -40,6 +40,13 @@ public partial class Player {
 		if (pingOrStartPing == null) return "?";
 		return pingOrStartPing.Value.ToString();
 	}
+	public string getTeamDisplayPing() {
+		int? pingOrStartPing = getPingOrStartPing();
+		if (pingOrStartPing == null) {
+			return "?";
+		}
+		return MathInt.Floor(pingOrStartPing.Value / 10f).ToString();
+	}
 
 	public int? getPingOrStartPing() {
 		if (ping == null) {
@@ -302,13 +309,13 @@ public partial class Player {
 	public int kills;
 	public int assists;
 	public int deaths;
-	public string getDeathScore() {
+	public int getDeathScore() {
 		if (Global.level.gameMode is Elimination ||
 			Global.level.gameMode is TeamElimination
 		) {
-			return (Global.level.gameMode.playingTo - deaths).ToString();
+			return (Global.level.gameMode.playingTo - deaths);
 		}
-		return deaths.ToString();
+		return deaths;
 	}
 	public ushort curMaxNetId;
 	public bool warpedIn = false;

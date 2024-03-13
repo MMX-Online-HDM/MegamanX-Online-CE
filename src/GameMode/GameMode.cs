@@ -1009,7 +1009,7 @@ public class GameMode {
 
 		Global.sprites["hud_life"].drawToHUD(player.getHudLifeSpriteIndex(), lifeX, lifeY);
 		Fonts.drawText(FontType.BlueMenu, player.name, nameX, nameY, (isLeft ? Alignment.Left : Alignment.Right));
-		Fonts.drawText(FontType.BlueMenu, player.getDeathScore(), deathX, deathY, Alignment.Center);
+		Fonts.drawText(FontType.BlueMenu, player.getDeathScore().ToString(), deathX, deathY, Alignment.Center);
 	}
 
 	public void draw1v1TopHUD() {
@@ -2326,7 +2326,10 @@ public class GameMode {
 
 			Fonts.drawText(color, player.name, col1x, topPlayerY + (i) * rowH, Alignment.Left);
 			Fonts.drawText(FontType.Blue, player.kills.ToString(), col3x, topPlayerY + (i) * rowH, Alignment.Left);
-			Fonts.drawText(FontType.Blue, player.getDeathScore(), col4x, topPlayerY + (i) * rowH, Alignment.Left);
+			Fonts.drawText(
+				FontType.Blue, player.getDeathScore().ToString(),
+				col4x, topPlayerY + (i) * rowH, Alignment.Left
+			);
 
 			if (Global.serverClient != null) {
 				Fonts.drawText(FontType.Blue, player.getDisplayPing(), col5x, topPlayerY + (i) * rowH, Alignment.Left);
@@ -2396,12 +2399,12 @@ public class GameMode {
 			_ => $"Red: {Global.level.gameMode.teamPoints[1]}"
 		};
 		(int x, int y)[] positions = {
-			(padding, top + 32),
-			(padding + 236, top + 32),
-			(padding + 118, top + 32),
-			(padding, top + 116),
-			(padding + 236, top + 116),
-			(padding + 118, top + 116),
+			(padding - 6, top + 32),
+			(padding + 238, top + 32),
+			(padding + 116, top + 32),
+			(padding - 6, top + 116),
+			(padding + 238, top + 116),
+			(padding + 116, top + 116),
 		};
 		drawTeamMiniScore(positions[0], 0, FontType.Blue, blueText);
 		drawTeamMiniScore(positions[1], 1, FontType.Red, redText);
@@ -2424,14 +2427,14 @@ public class GameMode {
 			).Count();
 		}
 		int[] rows = new int[] { pos.y, pos.y + 10, pos.y + 24 };
-		int[] cols = new int[] { pos.x, pos.x + 72, pos.x + 82, pos.x + 92 };
+		int[] cols = new int[] { pos.x, pos.x + 72, pos.x + 88, pos.x + 104 };
 		DrawWrappers.DrawRect(
-			pos.x - 1, pos.y + 19, pos.x + 116, pos.y + 20, true,
+			pos.x - 1, pos.y + 19, pos.x + 120, pos.y + 20, true,
 			new Color(255, 255, 255, 128), 0, ZIndex.HUD, false
 		);
 
-		Fonts.drawText(color, title, cols[0], rows[0]);
-		Fonts.drawText(FontType.Orange, "Player", cols[0], rows[1]);
+		Fonts.drawText(color, title, cols[0] + 12, rows[0]);
+		Fonts.drawText(FontType.Orange, "Player", cols[0] + 12, rows[1]);
 		Fonts.drawText(FontType.Orange, "K", cols[1], rows[1]);
 		Fonts.drawText(FontType.Orange, isTE ? "L" : "D", cols[2], rows[1]);
 		if (Global.serverClient != null) {
@@ -2452,8 +2455,8 @@ public class GameMode {
 
 			Global.sprites[getCharIcon(player)].drawToHUD(player.realCharNum, cols[0] + 5, posY - 2);
 			Fonts.drawText(charColor, player.name, cols[0] + 12, posY);
-			Fonts.drawText(color, player.kills.ToString(), cols[1], posY);
-			Fonts.drawText(color, player.getDeathScore(), cols[2], posY);
+			Fonts.drawText(FontType.Blue, player.kills.ToString(), cols[1], posY);
+			Fonts.drawText(FontType.Red, player.getDeathScore().ToString(), cols[2], posY);
 
 			if (Global.serverClient != null) {
 				Fonts.drawText(FontType.Grey, player.getDisplayPing(), cols[3], posY);

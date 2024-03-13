@@ -401,7 +401,10 @@ public partial class RPCCreateProj : RPC {
 		} else if (projId == (int)ProjIds.MagnaCMagnetPull) {
 			proj = new MagnaCMagnetPullProj(MagnaCentipede.getWeapon(), pos, xDir, player, netProjByte);
 		} else if (projId == (int)ProjIds.CSnailCrystalHunter) {
-			proj = new CSnailCrystalHunterProj(CrystalSnail.getWeapon(), pos, xDir, Point.zero, player, netProjByte);
+			proj = new CSnailCrystalHunterProj(
+				CrystalSnail.getWeapon(), pos, xDir,
+				new Point(xDir, (extraData[0] - 128) / 2f), player, netProjByte
+			);
 		} else if (projId == (int)ProjIds.OverdriveOSonicSlicer) {
 			proj = new OverdriveOSonicSlicerProj(OverdriveOstrich.getWeapon(), pos, xDir, player, netProjByte);
 		} else if (projId == (int)ProjIds.OverdriveOSonicSlicerUp) {

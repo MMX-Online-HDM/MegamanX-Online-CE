@@ -31,12 +31,18 @@ public class SigmaShieldProj : Projectile {
 	float maxTravelDistance;
 	bool returnedToOrigin;
 
-	public SigmaShieldProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, 0, 3, player, "sigma3_proj_shield", Global.halfFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public SigmaShieldProj(
+		Weapon weapon, Point pos, int xDir,
+		Player player, ushort netProjId, bool sendRpc = false
+	) : base(
+		weapon, pos, xDir, 0, 3, player, "sigma3_proj_shield",
+		Global.halfFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.Sigma3Shield;
 		setIndestructableProperties();
 		isDeflectShield = true;
 		isShield = true;
+		canBeLocal = false;
 
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
@@ -132,7 +138,7 @@ public class SigmaShieldProj : Projectile {
 }
 
 public class SigmaThrowShieldState : CharState {
-	SigmaShieldProj proj;
+	SigmaShieldProj? proj;
 	public SigmaThrowShieldState() : base("throw", "", "", "") {
 	}
 
@@ -145,7 +151,10 @@ public class SigmaThrowShieldState : CharState {
 		}
 
 		if (proj == null && character.frameIndex >= 1) {
-			proj = new SigmaShieldProj(player.sigmaShieldWeapon, character.getFirstPOIOrDefault(), character.xDir, player, player.getNextActorNetId(), sendRpc: true);
+			proj = new SigmaShieldProj(
+				player.sigmaShieldWeapon, character.getFirstPOIOrDefault(),
+				character.xDir, player, player.getNextActorNetId(), sendRpc: true
+			);
 		}
 
 		if (proj != null && !once) {
