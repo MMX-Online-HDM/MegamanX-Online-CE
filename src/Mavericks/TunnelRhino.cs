@@ -117,14 +117,13 @@ public class TunnelRTornadoFang : Projectile {
 		}
 
 		if (sendRpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, player, netProjId, xDir, (byte)type);
 		}
 	}
 
 	public override void update() {
 		base.update();
 		Helpers.decrementTime(ref sparksCooldown);
-		if (!ownedByLocalPlayer) return;
 
 		if (state == 0) {
 			if (type == 0) {
@@ -150,7 +149,7 @@ public class TunnelRTornadoFang : Projectile {
 
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
-		if (ownedByLocalPlayer) vel.x = 4 * xDir;
+		vel.x = 4 * xDir;
 
 		if (damagable is not CrackedWall) {
 			time -= Global.spf;

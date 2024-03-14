@@ -855,7 +855,7 @@ public class Dash : CharState {
 			speedModifier = 1.15f;
 			distanceModifier = 1.15f;
 		}
-		if (player.character.sprite.name.EndsWith("unpo_grab_dash")) {
+		if (character.sprite.name.EndsWith("unpo_grab_dash")) {
 			speedModifier = 1.25f;
 			distanceModifier = 1.25f;
 		}

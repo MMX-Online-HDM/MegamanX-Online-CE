@@ -65,8 +65,7 @@ public class FlameMammoth : Maverick {
 	}
 
 	public override MaverickState getRandomAttackState() {
-		var attacks = new MaverickState[]
-		{
+		var attacks = new MaverickState[] {
 				getShootState(true),
 				new FlameMOilState(),
 				new MJumpStart(),
@@ -122,8 +121,13 @@ public class FlameMOilFireWeapon : Weapon {
 
 #region projectiles
 public class FlameMFireballProj : Projectile {
-	public FlameMFireballProj(Weapon weapon, Point pos, int xDir, bool isShort, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 250, 2, player, "flamem_proj_fireball", 0, 0.01f, netProjId, player.ownedByLocalPlayer) {
+	public FlameMFireballProj(
+		Weapon weapon, Point pos, int xDir, bool isShort,
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 250, 2, player, "flamem_proj_fireball",
+		0, 0.01f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.FlameMFireball;
 		fadeSprite = "flamem_anim_fireball_fade";
 		maxTime = 0.75f;
@@ -168,8 +172,12 @@ public class FlameMFireballProj : Projectile {
 }
 
 public class FlameMOilProj : Projectile {
-	public FlameMOilProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 175, 0, player, "flamem_proj_oilball", 0, 0.01f, netProjId, player.ownedByLocalPlayer) {
+	public FlameMOilProj(
+		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 175, 0, player, "flamem_proj_oilball",
+		0, 0.01f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.FlameMOil;
 		maxTime = 0.75f;
 		useGravity = true;
@@ -213,8 +221,13 @@ public class FlameMOilProj : Projectile {
 }
 
 public class FlameMOilSpillProj : Projectile {
-	public FlameMOilSpillProj(Weapon weapon, Point pos, int xDir, float angle, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 0, player, "flamem_proj_oilspill", 0, 0f, netProjId, player.ownedByLocalPlayer) {
+	public FlameMOilSpillProj(
+		Weapon weapon, Point pos, int xDir,
+		float angle, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 0, player, "flamem_proj_oilspill",
+		0, 0f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.FlameMOilSpill;
 		maxTime = 8f;
 		this.angle = angle;
@@ -227,9 +240,8 @@ public class FlameMOilSpillProj : Projectile {
 
 	public override void update() {
 		base.update();
-		if (!ownedByLocalPlayer) return;
-
 		moveWithMovingPlatform();
+		if (!ownedByLocalPlayer) return;
 
 		if (isUnderwater()) {
 			destroySelf();
@@ -239,8 +251,12 @@ public class FlameMOilSpillProj : Projectile {
 }
 
 public class FlameMBigFireProj : Projectile {
-	public FlameMBigFireProj(Weapon weapon, Point pos, int xDir, float angle, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 2, player, "flamem_proj_bigfire", Global.defFlinch, 0.15f, netProjId, player.ownedByLocalPlayer) {
+	public FlameMBigFireProj(
+		Weapon weapon, Point pos, int xDir, float angle, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 2, player, "flamem_proj_bigfire",
+		Global.defFlinch, 0.15f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.FlameMOilFire;
 		maxTime = 8;
 		this.angle = angle;
@@ -254,11 +270,10 @@ public class FlameMBigFireProj : Projectile {
 	}
 
 	public override void update() {
-		if (!ownedByLocalPlayer) return;
 		base.update();
-
 		moveWithMovingPlatform();
 
+		if (!ownedByLocalPlayer) return;
 		if (isUnderwater()) {
 			destroySelf();
 			return;

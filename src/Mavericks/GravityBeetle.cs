@@ -166,7 +166,7 @@ public class GBeetleBallProj : Projectile {
 			didHit = true;
 		}
 		if (didHit) {
-			playSound("gbeetleProjBounce", sendRpc: true);
+			playSound("gbeetleProjBounce", sendRpc: false);
 			increaseSize();
 			//hitWallCooldown += 0.1f;
 		}
@@ -364,6 +364,7 @@ public class GBeetleGravityWellProj : Projectile {
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 
 	public override void update() {

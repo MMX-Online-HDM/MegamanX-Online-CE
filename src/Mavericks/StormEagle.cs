@@ -208,6 +208,8 @@ public class StormEBirdProj : Projectile, IDamagable {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		// ToDo: Make local.
+		canBeLocal = false;
 	}
 
 	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {

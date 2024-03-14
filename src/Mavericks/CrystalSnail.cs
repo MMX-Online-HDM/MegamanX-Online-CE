@@ -236,28 +236,30 @@ public class CrystalSnailShell : Actor {
 }
 
 public class CSnailCrystalHunterProj : Projectile {
-	public CSnailCrystalHunterProj(Weapon weapon, Point pos, int xDir, Point velDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 0, player, "csnail_projectile", 0, 0, netProjId, player.ownedByLocalPlayer) {
+	public CSnailCrystalHunterProj(
+		Weapon weapon, Point pos, int xDir, Point velDir,
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 0, player, "csnail_projectile",
+		0, 0, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.CSnailCrystalHunter;
 		maxTime = 1.25f;
 		vel = velDir.normalize().times(200);
 		destroyOnHit = true;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, player, netProjId, xDir, (byte)(velDir.y * 2 + 128));
 		}
 	}
 
 	public override void update() {
 		base.update();
-		if (!ownedByLocalPlayer) return;
-
 		vel.y += Global.spf * 50;
 	}
 
 	public override void onHitWall(CollideData other) {
 		base.onHitWall(other);
-		if (!ownedByLocalPlayer) return;
 
 		if (other.isSideWallHit()) {
 			fadeSprite = "csnail_projectile_hitwall";
@@ -291,9 +293,21 @@ public class CSnailShootState : MaverickState {
 		if (!shotOnce && shootPos != null) {
 			shotOnce = true;
 			maverick.playSound("csnailShoot", sendRpc: true);
-			new CSnailCrystalHunterProj(maverick.weapon, shootPos.Value, maverick.xDir, new Point(maverick.xDir, -1), player, player.getNextActorNetId(), rpc: true);
-			new CSnailCrystalHunterProj(maverick.weapon, shootPos.Value, maverick.xDir, new Point(maverick.xDir, -0.5f), player, player.getNextActorNetId(), rpc: true);
-			new CSnailCrystalHunterProj(maverick.weapon, shootPos.Value, maverick.xDir, new Point(maverick.xDir, 0), player, player.getNextActorNetId(), rpc: true);
+			new CSnailCrystalHunterProj(
+				maverick.weapon, shootPos.Value, maverick.xDir,
+				new Point(maverick.xDir, -1),
+				player, player.getNextActorNetId(), rpc: true
+			);
+			new CSnailCrystalHunterProj(
+				maverick.weapon, shootPos.Value, maverick.xDir,
+				new Point(maverick.xDir, -0.5f),
+				player, player.getNextActorNetId(), rpc: true
+			);
+			new CSnailCrystalHunterProj(
+				maverick.weapon, shootPos.Value, maverick.xDir,
+				new Point(maverick.xDir, 0), player,
+				player.getNextActorNetId(), rpc: true
+			);
 		}
 
 		if (maverick.isAnimOver()) {

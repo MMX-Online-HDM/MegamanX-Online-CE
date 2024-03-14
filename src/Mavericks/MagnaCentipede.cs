@@ -192,6 +192,8 @@ public class MagnaCShurikenProj : Projectile {
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		// ToDo: Make local.
+		canBeLocal = false;
 	}
 
 	public override void update() {
@@ -246,6 +248,8 @@ public class MagnaCMagnetMineProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		// ToDo: Make local.
+		canBeLocal = false;
 	}
 }
 

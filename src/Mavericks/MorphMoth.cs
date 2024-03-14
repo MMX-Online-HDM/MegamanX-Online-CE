@@ -104,6 +104,7 @@ public class MorphMBeamProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 
 	public void setEndPos(Point endPos) {

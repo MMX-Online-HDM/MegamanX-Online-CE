@@ -148,6 +148,8 @@ public class BHornetBeeProj : Projectile, IDamagable {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		// ToDo: Make local.
+		canBeLocal = false;
 	}
 
 	public override void update() {
@@ -232,6 +234,7 @@ public class BHornetHomingBeeProj : Projectile, IDamagable {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 
 	public override void update() {
@@ -352,6 +355,8 @@ public class BHornetCursorProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		// ToDo: Make local.
+		canBeLocal = false;
 	}
 
 	public override void postUpdate() {

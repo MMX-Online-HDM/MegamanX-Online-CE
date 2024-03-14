@@ -1239,7 +1239,7 @@ public partial class Level {
 		if (camPlayer.character != null) {
 			if (!camPlayer.character.stopCamUpdate) {
 				Point camPos = camPlayer.character.getCamCenterPos();
-				Actor followActor = camPlayer.character?.getFollowActor();
+				Actor? followActor = camPlayer.character?.getFollowActor();
 				Point expectedCamPos = computeCamPos(camPos, new Point(playerX, playerY));
 
 				float moveDeltaX = camX - MathF.Round(playerX);
@@ -1250,9 +1250,8 @@ public partial class Level {
 
 				if (followActor != null && followActor.grounded == false) {
 					if (fullDeltaY > -54 && fullDeltaY < 20 &&
-						camPlayer.character.charState is not WallKick &&
-						camPlayer.character.charState is not WallSlide &&
-						camPlayer.character.charState is not LadderClimb
+						camPlayer.character?.charState is 
+							(not WallKick and not WallSlide and not LadderClimb) or InRideChaser
 					) {
 						if (!unlockfollow) {
 							moveDeltaY = 0;
@@ -1268,11 +1267,14 @@ public partial class Level {
 				float deltaX = fullDeltaX;
 				float deltaY = fullDeltaY;
 
-				if (MathF.Abs(deltaX) > 4) {
-					deltaX = 4 * MathF.Sign(fullDeltaX);
-				}
-				if (MathF.Abs(deltaY) > 4) {
-					deltaY = 4 * MathF.Sign(fullDeltaY);
+				if (camPlayer.character?.charState is not InRideChaser) {
+					int camSpeed = 4;
+					if (MathF.Abs(deltaX) > camSpeed) {
+						deltaX = camSpeed * MathF.Sign(fullDeltaX);
+					}
+					if (MathF.Abs(deltaY) > camSpeed) {
+						deltaY = camSpeed * MathF.Sign(fullDeltaY);
+					}
 				}
 
 				updateCamPos(deltaX, deltaY);

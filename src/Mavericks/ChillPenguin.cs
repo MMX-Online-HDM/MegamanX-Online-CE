@@ -271,16 +271,7 @@ public class ChillPIceStatueProj : Projectile, IDamagable {
 
 	public override void update() {
 		base.update();
-
 		updateProjectileCooldown();
-
-		if (!ownedByLocalPlayer) {
-			// This is to sync the damage in FTD
-			if (sprite.frameIndex == sprite.frames.Count - 1) {
-				damager.damage = 4;
-			}
-			return;
-		}
 
 		if (sprite.isAnimOver()) {
 			useGravity = true;

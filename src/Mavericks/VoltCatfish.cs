@@ -166,6 +166,7 @@ public class VoltCTriadThunderProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 
 	public void electrify() {

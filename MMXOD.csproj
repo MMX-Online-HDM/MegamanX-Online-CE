@@ -16,7 +16,6 @@
 		<Nullable>enable</Nullable>
 		<DebugType>embedded</DebugType>
 		<WarningLevel>9999</WarningLevel>
-		<Platforms>AnyCPU;x64</Platforms>
 	</PropertyGroup>
 
 	<ItemGroup>
