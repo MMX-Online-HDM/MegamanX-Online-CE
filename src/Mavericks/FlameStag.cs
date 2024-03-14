@@ -154,7 +154,7 @@ public class FlameStag : Maverick {
 }
 
 public class FStagFireballProj : Projectile {
-	Wall hitWall;
+	Wall? hitWall;
 	public bool launched;
 	public FStagFireballProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, xDir, 0, 2, player, "fstag_fireball_proj", 0, 0.01f, netProjId, player.ownedByLocalPlayer) {
@@ -176,7 +176,6 @@ public class FStagFireballProj : Projectile {
 
 	public override void onHitWall(CollideData other) {
 		base.onHitWall(other);
-		if (!ownedByLocalPlayer) return;
 
 		if (!launched) return;
 

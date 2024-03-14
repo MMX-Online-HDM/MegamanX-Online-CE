@@ -122,12 +122,12 @@ public class VelGFireProj : Projectile {
 
 	public override void update() {
 		base.update();
+		if (MathF.Abs(vel.y) < 600) vel.y -= Global.spf * 600;
 		if (!ownedByLocalPlayer) return;
 		if (isUnderwater()) {
 			destroySelf();
 			return;
 		}
-		if (MathF.Abs(vel.y) < 600) vel.y -= Global.spf * 600;
 	}
 }
 

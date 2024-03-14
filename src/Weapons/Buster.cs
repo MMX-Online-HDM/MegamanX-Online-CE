@@ -90,7 +90,14 @@ public class Buster : Weapon {
 			};
 		}
 		if (player.character.stockedX3Buster) {
-			chargeLevel = 3;
+			if (player.ownedByLocalPlayer) {
+				if (player.character.charState is not WallSlide) {
+					shootTime = 0;
+				}
+				player.character.changeState(new X3ChargeShot(null), true);
+				shootSound = "";
+			}
+			return;
 		}
 		bool hasUltArmor = player.character.hasUltimateArmorBS.getValue();
 		bool isHyperX = ((player.character as MegamanX)?.isHyperX == true);

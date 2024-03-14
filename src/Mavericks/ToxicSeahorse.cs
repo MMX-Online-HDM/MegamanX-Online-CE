@@ -115,7 +115,6 @@ public class TSeahorseAcidProj : Projectile, IDamagable {
 
 	public override void update() {
 		base.update();
-		if (!ownedByLocalPlayer) return;
 
 		if (sprite.name.EndsWith("_start")) {
 			if (isAnimOver()) {
@@ -157,7 +156,7 @@ public class TSeahorseAcidProj : Projectile, IDamagable {
 		if (didHit) {
 			//playSound("gbeetleProjBounce", sendRpc: true);
 			hitWallCooldown = 0.1f;
-			if (wasSideHit) {
+			if (wasSideHit && ownedByLocalPlayer) {
 				new AcidBurstProjSmall(weapon, other.getHitPointSafe().addxy(-5 * moveDirX, 0), 1, new Point(-moveDirX * 50, 0), ProjIds.TSeahorseAcid1, owner, owner.getNextActorNetId(), rpc: true);
 				new AcidBurstProjSmall(weapon, other.getHitPointSafe().addxy(-5 * moveDirX, 0), 1, new Point(-moveDirX * 100, 0), ProjIds.TSeahorseAcid1, owner, owner.getNextActorNetId(), rpc: true);
 			}
@@ -201,7 +200,6 @@ public class TSeahorseAcid2Proj : Projectile {
 
 	public override void update() {
 		base.update();
-		if (!ownedByLocalPlayer) return;
 
 		if (sprite.name == "acidburst_charged_start" && isAnimOver()) {
 			changeSprite("acidburst_charged", true);
@@ -234,7 +232,7 @@ public class TSeahorseAcid2Proj : Projectile {
 			if (vel.y < -300) vel.y = -300;
 			incPos(new Point(0, 5 * MathF.Sign(vel.y)));
 		}
-		playSound("acidBurst", sendRpc: true);
+		playSound("acidBurst");
 	}
 
 	bool acidSplashOnce;

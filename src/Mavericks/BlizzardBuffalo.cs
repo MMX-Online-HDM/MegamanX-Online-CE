@@ -136,6 +136,8 @@ public class BBuffaloIceProj : Projectile {
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		// ToDo: Make local.
+		canBeLocal = false;
 	}
 
 	public override void onStart() {
@@ -186,10 +188,7 @@ public class BBuffaloIceProjGround : Projectile, IDamagable {
 	public override void update() {
 		base.update();
 		updateProjectileCooldown();
-
-		if (ownedByLocalPlayer) {
-			moveWithMovingPlatform();
-		}
+		moveWithMovingPlatform();
 
 		updateHitboxes();
 	}
@@ -277,6 +276,8 @@ public class BBuffaloBeamProj : Projectile {
 			byte[] bbNetIdBytes = BitConverter.GetBytes(bb.netId ?? 0);
 			rpcCreate(pos, player, netProjId, xDir, bbNetIdBytes[0], bbNetIdBytes[1]);
 		}
+		// ToDo: Make local.
+		canBeLocal = false;
 	}
 
 	public override void update() {

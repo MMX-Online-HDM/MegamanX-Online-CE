@@ -144,7 +144,7 @@ public class Axl : Character {
 
 		List<CollideData> hits = Global.level.raycastAll(bulletPos, maxPos, new List<Type>() { typeof(Actor), typeof(Wall) });
 
-		CollideData hit = null;
+		CollideData? hit = null;
 
 		foreach (var p in Global.level.players) {
 			if (p.character == null || p.character.getHeadPos() == null) continue;
@@ -353,8 +353,11 @@ public class Axl : Character {
 		updateAxlAim();
 
 		if (dodgeRollCooldown == 0 && player.canControl) {
-			if (charState is Crouch && player.input.isPressed(Control.Dash, player) && canDash()) {
-				changeState(new DodgeRoll());
+			if (player.input.isPressed(Control.Down, player) &&
+				player.input.isPressed(Control.Dash, player) &&
+				canDash()
+			) {
+				changeState(new DodgeRoll(), true);
 			} else if (player.input.isPressed(Control.Dash, player) && player.input.checkDoubleTap(Control.Dash)) {
 				changeState(new DodgeRoll(), true);
 			}
@@ -682,7 +685,7 @@ public class Axl : Character {
 
 				// DNA Core
 				if (player.weapon is DNACore && charState.canShoot()) {
-					AxlWeapon realWeapon = player.weapons[player.weaponSlot] as AxlWeapon;
+					AxlWeapon? realWeapon = player.weapons[player.weaponSlot] as AxlWeapon;
 					if (realWeapon != null) {
 						if (shootPressed && shootTime == 0) {
 							if (flag != null) {
@@ -911,7 +914,7 @@ public class Axl : Character {
 	}
 
 	public Character getLockOnTarget() {
-		Character newTarget = null;
+		Character? newTarget = null;
 		foreach (var enemy in Global.level.players) {
 			if (enemy.character != null && enemy.character.canBeDamaged(player.alliance, player.id, null) && enemy.character.pos.distanceTo(pos) < 150 && !enemy.character.isStealthy(player.alliance)) {
 				float distPercent = 1 - (enemy.character.pos.distanceTo(pos) / 150);
@@ -1022,7 +1025,7 @@ public class Axl : Character {
 		// Aim assist
 		if (!Options.main.useMouseAim && Options.main.lockOnSound)// && !axisXMoved && !axisYMoved)
 		{
-			Character target = null;
+			Character? target = null;
 			float bestDist = float.MaxValue;
 			foreach (var enemy in Global.level.players) {
 				if (enemy.character != null && enemy.character.canBeDamaged(player.alliance, player.id, null) && !enemy.character.isStealthy(player.alliance)) {
@@ -1589,7 +1592,7 @@ public class Axl : Character {
 	// New data starts here.
 	public override List<ShaderWrapper> getShaders() {
 		var shaders = new List<ShaderWrapper>();
-		ShaderWrapper palette = null;
+		ShaderWrapper? palette = null;
 
 		int paletteNum = 0;
 		if (whiteAxlTime > 3) paletteNum = 1;

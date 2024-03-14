@@ -277,7 +277,7 @@ public partial class RPCCreateProj : RPC {
 		} else if (projId == (int)ProjIds.ArmoredAChargeRelease) {
 			proj = new ArmoredAChargeReleaseProj(new ArmoredAChargeReleaseWeapon(), pos, xDir, new Point(), 6, player, netProjByte);
 		} else if (projId == (int)ProjIds.LaunchOMissle) {
-			proj = new LaunchOMissile(new LaunchOMissileWeapon(), pos, xDir, player, new Point(), netProjByte);
+			proj = new LaunchOMissile(new LaunchOMissileWeapon(), pos, xDir, player, extraData[0], netProjByte);
 		} else if (projId == (int)ProjIds.LaunchOWhirlpool) {
 			proj = new LaunchOWhirlpoolProj(new LaunchOWhirlpoolWeapon(), pos, xDir, player, netProjByte);
 		} else if (projId == (int)ProjIds.LaunchOTorpedo) {
@@ -285,7 +285,7 @@ public partial class RPCCreateProj : RPC {
 		} else if (projId == (int)ProjIds.BoomerangKBoomerang) {
 			proj = new BoomerangKBoomerangProj(new BoomerangKBoomerangWeapon(), pos, xDir, null, 0, player, netProjByte);
 		} else if (projId == (int)ProjIds.StingCSting) {
-			proj = new StingCStingProj(new StingCStingWeapon(), pos, xDir, 0, player, netProjByte);
+			proj = new StingCStingProj(new StingCStingWeapon(), pos, xDir, extraData[0], player, netProjByte);
 		} else if (projId == (int)ProjIds.StingCSpike) {
 			proj = new StingCSpikeProj(new StingCSpikeWeapon(), pos, xDir, player, netProjByte);
 		} else if (projId == (int)ProjIds.StormEEgg) {
@@ -408,7 +408,7 @@ public partial class RPCCreateProj : RPC {
 		} else if (projId == (int)ProjIds.OverdriveOSonicSlicer) {
 			proj = new OverdriveOSonicSlicerProj(OverdriveOstrich.getWeapon(), pos, xDir, player, netProjByte);
 		} else if (projId == (int)ProjIds.OverdriveOSonicSlicerUp) {
-			proj = new OverdriveOSonicSlicerUpProj(OverdriveOstrich.getWeapon(), pos, xDir, player, netProjByte);
+			proj = new OverdriveOSonicSlicerUpProj(OverdriveOstrich.getWeapon(), pos, extraData[0], player, netProjByte);
 		} else if (projId == (int)ProjIds.FakeZeroBuster) {
 			proj = new FakeZeroBusterProj(FakeZero.getWeapon(), pos, xDir, player, netProjByte);
 		} else if (projId == (int)ProjIds.FakeZeroBuster2) {
@@ -446,11 +446,11 @@ public partial class RPCCreateProj : RPC {
 		} else if (projId == (int)ProjIds.TSeahorseAcid2) {
 			proj = new TSeahorseAcid2Proj(ToxicSeahorse.getWeapon(), pos, xDir, 0, player, netProjByte);
 		} else if (projId == (int)ProjIds.TunnelRTornadoFang) {
-			proj = new TunnelRTornadoFang(ToxicSeahorse.getWeapon(), pos, xDir, 0, player, netProjByte);
+			proj = new TunnelRTornadoFang(ToxicSeahorse.getWeapon(), pos, xDir, extraData[0], player, netProjByte);
 		} else if (projId == (int)ProjIds.TunnelRTornadoFang2) {
-			proj = new TunnelRTornadoFang(TunnelRhino.getWeapon(), pos, xDir, 1, player, netProjByte);
+			proj = new TunnelRTornadoFang(TunnelRhino.getWeapon(), pos, xDir, extraData[0], player, netProjByte);
 		} else if (projId == (int)ProjIds.TunnelRTornadoFangDiag) {
-			proj = new TunnelRTornadoFangDiag(TunnelRhino.getWeapon(), pos, xDir * -1, player, netProjByte);
+			proj = new TunnelRTornadoFangDiag(TunnelRhino.getWeapon(), pos, xDir, player, netProjByte);
 		} else if (projId == (int)ProjIds.VoltCBall) {
 			proj = new TriadThunderProjCharged(new TriadThunder(), pos, xDir, 2, player, netProjByte);
 		} else if (projId == (int)ProjIds.VoltCBarrier) {

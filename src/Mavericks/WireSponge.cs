@@ -189,6 +189,8 @@ public class WSpongeSideChainProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		// ToDo: Make local.
+		canBeLocal = false;
 	}
 
 	public override void postUpdate() {
@@ -550,6 +552,8 @@ public class WSpongeUpChainProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		// ToDo: Make local.
+		canBeLocal = false;
 	}
 
 	public override void update() {
@@ -764,6 +768,8 @@ public class WSpongeSeedProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		// ToDo: Make local.
+		canBeLocal = false;
 	}
 
 	public override void onHitWall(CollideData other) {
@@ -821,10 +827,7 @@ public class WSpongeSpike : Projectile, IDamagable {
 	public override void update() {
 		base.update();
 		updateProjectileCooldown();
-
-		if (ownedByLocalPlayer) {
-			moveWithMovingPlatform();
-		}
+		moveWithMovingPlatform();
 	}
 
 	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {

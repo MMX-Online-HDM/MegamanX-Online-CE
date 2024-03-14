@@ -135,6 +135,8 @@ public class CrushCArmProj : Projectile {
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		// ToDo: Make local.
+		canBeLocal = false;
 	}
 
 	public static string getSprite(Point moveDir) {

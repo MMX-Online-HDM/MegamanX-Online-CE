@@ -150,17 +150,26 @@ public class LaunchOHomingTorpedoWeapon : Weapon {
 #region projectiles
 public class LaunchOMissile : Projectile, IDamagable {
 	public float smokeTime = 0;
-	public LaunchOMissile(Weapon weapon, Point pos, int xDir, Player player, Point unitVel, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 100, 3, player, "launcho_proj_missile", 0, 0.15f, netProjId, player.ownedByLocalPlayer) {
+	public LaunchOMissile(
+		Weapon weapon, Point pos, int xDir, Player player,
+		int unitVel, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 100, 3, player, "launcho_proj_missile",
+		0, 0.15f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.LaunchOMissle;
 		maxTime = 0.75f;
 		fadeSprite = "explosion";
 		fadeSound = "explosion";
-		vel = unitVel.times(speed);
-		vel.x *= xDir;
+		vel.y = speed * (unitVel switch {
+			0 => -0.2f,
+			1 => -0.05f,
+			2 => 0.25f,
+			_ => 0
+		});
 		reflectableFBurner = true;
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, player, netProjId, xDir, (byte)unitVel);
 		}
 	}
 
@@ -179,10 +188,17 @@ public class LaunchOMissile : Projectile, IDamagable {
 		}
 	}
 
-	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) { return owner.alliance != damagerAlliance; }
-	public bool canBeHealed(int healerAlliance) { return false; }
-	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) { }
-	public bool isInvincible(Player attacker, int? projId) { return false; }
+	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
+		return owner.alliance != damagerAlliance;
+	}
+	public bool canBeHealed(int healerAlliance) {
+		return false;
+	}
+	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
+	}
+	public bool isInvincible(Player attacker, int? projId) {
+		return false;
+	}
 	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
 		if (damage > 0) {
 			destroySelf();
@@ -265,9 +281,9 @@ public class LaunchOShoot : MaverickState {
 		if (shootState == 0 && shootPos != null) {
 			shootState = 1;
 			maverick.playSound("torpedo", sendRpc: true);
-			if (maverick.ammo >= 1) new LaunchOMissile(lo.missileWeapon, shootPos.Value.addxy(0, -3), lo.xDir, player, new Point(1, -0.2f), player.getNextActorNetId(), rpc: true);
-			if (maverick.ammo >= 2) new LaunchOMissile(lo.missileWeapon, shootPos.Value.addxy(0, 0), lo.xDir, player, new Point(1, -0.05f), player.getNextActorNetId(), rpc: true);
-			if (maverick.ammo >= 3) new LaunchOMissile(lo.missileWeapon, shootPos.Value.addxy(0, 5), lo.xDir, player, new Point(1, 0.25f), player.getNextActorNetId(), rpc: true);
+			if (maverick.ammo >= 1) new LaunchOMissile(lo.missileWeapon, shootPos.Value.addxy(0, -3), lo.xDir, player, 0, player.getNextActorNetId(), rpc: true);
+			if (maverick.ammo >= 2) new LaunchOMissile(lo.missileWeapon, shootPos.Value.addxy(0, 0), lo.xDir, player, 1, player.getNextActorNetId(), rpc: true);
+			if (maverick.ammo >= 3) new LaunchOMissile(lo.missileWeapon, shootPos.Value.addxy(0, 5), lo.xDir, player, 2, player.getNextActorNetId(), rpc: true);
 			maverick.ammo -= 3;
 			if (maverick.ammo < 0) maverick.ammo = 0;
 		}
@@ -286,9 +302,9 @@ public class LaunchOShoot : MaverickState {
 				maverick.changeSpriteFromName(sprite, true);
 				maverick.playSound("torpedo", sendRpc: true);
 				shootPos = lo.getFirstPOI();
-				if (maverick.ammo >= 1) new LaunchOMissile(lo.missileWeapon, shootPos.Value.addxy(0, -3), lo.xDir, player, new Point(1, -0.2f), player.getNextActorNetId(), rpc: true);
-				if (maverick.ammo >= 2) new LaunchOMissile(lo.missileWeapon, shootPos.Value.addxy(0, 0), lo.xDir, player, new Point(1, -.05f), player.getNextActorNetId(), rpc: true);
-				if (maverick.ammo >= 3) new LaunchOMissile(lo.missileWeapon, shootPos.Value.addxy(0, 5), lo.xDir, player, new Point(1, 0.25f), player.getNextActorNetId(), rpc: true);
+				if (maverick.ammo >= 1) new LaunchOMissile(lo.missileWeapon, shootPos.Value.addxy(0, -3), lo.xDir, player, 0, player.getNextActorNetId(), rpc: true);
+				if (maverick.ammo >= 2) new LaunchOMissile(lo.missileWeapon, shootPos.Value.addxy(0, 0), lo.xDir, player, 1, player.getNextActorNetId(), rpc: true);
+				if (maverick.ammo >= 3) new LaunchOMissile(lo.missileWeapon, shootPos.Value.addxy(0, 5), lo.xDir, player, 2, player.getNextActorNetId(), rpc: true);
 				maverick.ammo -= 3;
 				if (maverick.ammo < 0) maverick.ammo = 0;
 			}

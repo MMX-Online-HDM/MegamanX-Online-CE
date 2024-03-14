@@ -157,7 +157,6 @@ public class OverdriveOSonicSlicerProj : Projectile {
 
 	public override void update() {
 		base.update();
-		if (!ownedByLocalPlayer) return;
 
 		if (sprite.isAnimOver() && !once) {
 			once = true;
@@ -212,13 +211,12 @@ public class OverdriveOSonicSlicerUpProj : Projectile {
 		useGravity = true;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, 1);
+			rpcCreate(pos, player, netProjId, xDir, (byte)num);
 		}
 	}
 
 	public override void update() {
 		base.update();
-		if (!ownedByLocalPlayer) return;
 
 		vel.y += Global.speedMul * getGravity();
 		if (!fall) {
