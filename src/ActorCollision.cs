@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using SFML.Graphics;
 
@@ -146,7 +147,7 @@ public partial class Actor {
 	// This is used for stage collision.
 	// If this is Null it defaults to the Global collider.
 	// Generally if a global collider does not exist this is disabled too.
-	public virtual Collider getTerrainCollider() {
+	public virtual Collider? getTerrainCollider() {
 		return null;
 	}
 
@@ -210,7 +211,7 @@ public partial class Actor {
 		return proj;
 	}
 
-	public virtual Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
+	public virtual Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		return null;
 	}
 

@@ -378,7 +378,8 @@ public class Vile : Character {
 		if (sprite.name.EndsWith("cannon_air") && isAnimOver()) {
 			changeSpriteFromName("fall", true);
 		}
-		if (canVileHover() &&
+		if (!grounded &&
+			canVileHover() &&
 			player.input.isPressed(Control.Jump, player) &&
 			charState is not VileHover
 		) {

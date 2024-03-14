@@ -700,7 +700,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	// For terrain collision.
-	public override Collider getTerrainCollider() {
+	public override Collider? getTerrainCollider() {
 		if (physicsCollider == null) {
 			return null;
 		}
@@ -3032,7 +3032,7 @@ public partial class Character : Actor, IDamagable {
 		return damagePercent;
 	}
 
-	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
+	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		return base.getProjFromHitbox(hitbox, centerPoint);
 	}
 
