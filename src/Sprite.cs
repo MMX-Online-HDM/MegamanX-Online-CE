@@ -265,7 +265,7 @@ public class Sprite {
 
 	public List<Trail> lastFiveTrailDraws = new List<Trail>();
 	public List<Trail> lastTwoBkTrailDraws = new List<Trail>();
-	public void draw(int frameIndex, float x, float y, int flipX, int flipY, HashSet<RenderEffectType> renderEffects, float alpha, float scaleX, float scaleY, long zIndex, List<ShaderWrapper> shaders = null, float angle = 0, Actor actor = null, bool useFrameOffsets = false) {
+	public void draw(int frameIndex, float x, float y, int flipX, int flipY, HashSet<RenderEffectType>? renderEffects, float alpha, float scaleX, float scaleY, long zIndex, List<ShaderWrapper>? shaders = null, float angle = 0, Actor? actor = null, bool useFrameOffsets = false) {
 		if (!visible) return;
 		if (actor != null) {
 			if (!actor.shouldDraw()) return;
