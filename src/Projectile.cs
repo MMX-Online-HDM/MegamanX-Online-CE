@@ -37,6 +37,7 @@ public class Projectile : Actor {
 	public ShaderWrapper nightmareZeroShader;
 	//public int? destroyFrames;
 	public Player ownerPlayer;
+	public Actor hitboxActor;
 
 	public Projectile(Weapon weapon, Point pos, int xDir, float speed, float damage, Player player, string sprite, int flinch, float hitCooldown, ushort? netId, bool ownedByLocalPlayer) : base(sprite, pos, netId, ownedByLocalPlayer, false) {
 		this.weapon = weapon;
