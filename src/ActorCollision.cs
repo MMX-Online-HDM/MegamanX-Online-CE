@@ -204,8 +204,9 @@ public partial class Actor {
 
 	public virtual Projectile getProjFromHitboxBase(Collider hitbox) {
 		Point centerPoint = hitbox.shape.getRect().center();
-		var proj = getProjFromHitbox(hitbox, centerPoint);
+		Projectile proj = getProjFromHitbox(hitbox, centerPoint);
 		if (proj != null) {
+			proj.hitboxActor = this;
 			proj.globalCollider = hitbox.clone();
 		}
 		return proj;

@@ -688,4 +688,8 @@ public enum ProjIds {
 	RideChaserCrash,
 	DarkHold,
 	KillZone,
+
+	// Close to the int16 max value.
+	// Do not add things bellow this.
+	SelfDmg = 32700,
 }

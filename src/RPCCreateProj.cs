@@ -88,11 +88,7 @@ public partial class RPCCreateProj : RPC {
 		} else if (projId == (int)ProjIds.ZBuster4b) {
 			proj = new ZBuster4Proj(new ZeroBuster(), pos, xDir, 1, player, netProjByte);
 		} else if (projId == (int)ProjIds.Sting || projId == (int)ProjIds.StingDiag) {
-			Point? vel = null;
-			if (extraData.Length >= 3) {
-				vel = new Point(extraData[1], extraData[2]);
-			}
-			proj = new StingProj(new Sting(), pos, xDir, player, extraData[0], netProjByte, vel);
+			proj = new StingProj(new Sting(), pos, xDir, player, extraData[0], netProjByte);
 		} else if (projId == (int)ProjIds.FireWaveCharged) {
 			proj = new FireWaveProjCharged(new FireWave(), pos, xDir, player, 0, netProjByte, 0);
 		} else if (projId == (int)ProjIds.ElectricSpark) {

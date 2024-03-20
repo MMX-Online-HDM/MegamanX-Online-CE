@@ -25,18 +25,14 @@ public class Sting : Weapon {
 
 public class StingProj : Projectile {
 	public int type = 0; //0 = initial proj, 1 = horiz, 2 = up, 3 = down
-	public Point origVel;
 	public StingProj(
-		Weapon weapon, Point pos, int xDir, Player player, int type, ushort netProjId, Point? vel = null, bool rpc = false
+		Weapon weapon, Point pos, int xDir, Player player, int type, ushort netProjId, bool rpc = false
 	) : base(
 		weapon, pos, xDir, 300, 2, player, "sting_start", 0, 0.25f, netProjId, player.ownedByLocalPlayer
 	) {
-		bool hasCustomVel = (vel != null);
 		projId = (int)ProjIds.Sting;
 		maxTime = 0.6f;
-		if (type == 0) {
-			origVel = this.vel.clone();
-		} else if (type == 1) {
+		if (type == 1) {
 			var sprite = "sting_flat";
 			changeSprite(sprite, false);
 			reflectable = true;
@@ -44,13 +40,15 @@ public class StingProj : Projectile {
 			var sprite = "sting_up";
 			if (type == 3) {
 				yDir = -1;
+				vel.y = -150;
+			} else {
+				vel.y = 150;
 			}
 			changeSprite(sprite, false);
 			reflectable = true;
 			damager.damage = 2;
 			projId = (int)ProjIds.StingDiag;
 		}
-		if (vel != null) this.vel = (Point)vel;
 		fadeSprite = "buster1_fade";
 		this.type = type;
 		/*
@@ -61,13 +59,7 @@ public class StingProj : Projectile {
 		*/
 
 		if (rpc) {
-			byte[] extraArgs;
-			if (hasCustomVel) {
-				extraArgs = new byte[] { (byte)type, (byte)vel.Value.x, (byte)vel.Value.y };
-			} else {
-				extraArgs = new byte[] { (byte)type };
-			}
-			rpcCreate(pos, player, netProjId, xDir, extraArgs);
+			rpcCreate(pos, player, netProjId, xDir, (byte)type);
 		}
 	}
 
@@ -81,15 +73,15 @@ public class StingProj : Projectile {
 				if (ownedByLocalPlayer) {
 					new StingProj(
 						weapon, pos.addxy(15 * xDir, 0), xDir, damager.owner,
-						1, Global.level.mainPlayer.getNextActorNetId(), origVel, rpc: true
+						1, Global.level.mainPlayer.getNextActorNetId(), rpc: true
 					);
 					new StingProj(
 						weapon, pos.addxy(15 * xDir, -8), xDir, damager.owner,
-						2, Global.level.mainPlayer.getNextActorNetId(), origVel.addxy(0, -150), rpc: true
+						2, Global.level.mainPlayer.getNextActorNetId(), rpc: true
 					);
 					new StingProj(
-						weapon, pos.addxy(15 * xDir, 8), xDir,
-						damager.owner, 3, Global.level.mainPlayer.getNextActorNetId(), origVel.addxy(0, 150), rpc: true
+						weapon, pos.addxy(15 * xDir, 8), xDir, damager.owner,
+						3, Global.level.mainPlayer.getNextActorNetId(), rpc: true
 					);
 				}
 				destroySelfNoEffect();

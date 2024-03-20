@@ -1,3 +1,5 @@
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using SFML.Graphics;
 
 namespace MMXOnline;
@@ -5,7 +7,9 @@ namespace MMXOnline;
 public class HyperZeroStart : CharState {
 	public float radius = 200;
 	public float time;
+	[AllowNull]
 	Anim drWilyAnim;
+	[AllowNull]
 	Zero zero;
 
 	public HyperZeroStart(int type) : base(type == 1 ? "hyper_start2" : "hyper_start", "", "", "") {
@@ -49,6 +53,9 @@ public class HyperZeroStart : CharState {
 
 		character.useGravity = false;
 		character.vel = new Point();
+		if (zero == null) {
+			throw new NullReferenceException();
+		}
 
 		if (zero.hyperZeroUsed) {
 			return;
@@ -130,18 +137,19 @@ public class KKnuckleParryStartState : CharState {
 	}
 
 	public void counterAttack(Player damagingPlayer, Actor damagingActor, float damage) {
-		Actor counterAttackTarget = null;
+		Actor? counterAttackTarget = null;
 		if (damagingActor is GenericMeleeProj gmp) {
 			counterAttackTarget = gmp.owningActor;
 		}
-
 		if (counterAttackTarget == null) {
 			counterAttackTarget = damagingPlayer?.character ?? damagingActor;
 		}
 
-		var proj = damagingActor as Projectile;
+		Projectile? proj = damagingActor as Projectile;
 		bool stunnableParry = proj != null && proj.canBeParried();
-		if (counterAttackTarget != null && character.pos.distanceTo(counterAttackTarget.pos) < 75 && counterAttackTarget is Character chr && stunnableParry) {
+		if (counterAttackTarget != null && character.pos.distanceTo(counterAttackTarget.pos) < 75 &&
+			counterAttackTarget is Character chr && stunnableParry
+		) {
 			if (!chr.ownedByLocalPlayer) {
 				RPC.actorToggle.sendRpc(chr.netId, RPCActorToggleType.ChangeToParriedState);
 			} else {
@@ -162,8 +170,7 @@ public class KKnuckleParryStartState : CharState {
 	}
 
 	public bool canParry(Actor damagingActor) {
-		var proj = damagingActor as Projectile;
-		if (proj == null) {
+		if (damagingActor is not Projectile) {
 			return false;
 		}
 		return character.frameIndex == 0;
@@ -171,9 +178,9 @@ public class KKnuckleParryStartState : CharState {
 }
 
 public class KKnuckleParryMeleeState : CharState {
-	Actor counterAttackTarget;
+	Actor? counterAttackTarget;
 	Point counterAttackPos;
-	public KKnuckleParryMeleeState(Actor counterAttackTarget) : base("parry", "", "", "") {
+	public KKnuckleParryMeleeState(Actor? counterAttackTarget) : base("parry", "", "", "") {
 		invincible = true;
 		this.counterAttackTarget = counterAttackTarget;
 	}
