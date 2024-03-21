@@ -339,7 +339,37 @@ label:
 					if (hasArmArmor(3)) weapons.Add(new HyperBuster());
 					if (hasBodyArmor(2)) weapons.Add(new GigaCrush());
 					if (hasUltimateArmor()) weapons.Add(new NovaStrike(this));
-				} else if (Global.level.is1v1()) {
+				}
+				else if (isAI) {
+						weapons.Add(new Buster());
+						weapons.Add(new Torpedo());
+						weapons.Add(new Sting());
+						weapons.Add(new RollingShield());
+						weapons.Add(new FireWave());
+						weapons.Add(new Tornado());
+						weapons.Add(new ElectricSpark());
+						weapons.Add(new Boomerang());
+						weapons.Add(new ShotgunIce());
+						weapons.Add(new CrystalHunter());
+						weapons.Add(new BubbleSplash());
+						weapons.Add(new SilkShot());
+						weapons.Add(new SpinWheel());
+						weapons.Add(new SonicSlicer());
+						weapons.Add(new StrikeChain());
+						weapons.Add(new MagnetMine());
+						weapons.Add(new SpeedBurner(this));
+						weapons.Add(new AcidBurst());
+						weapons.Add(new ParasiticBomb());
+						weapons.Add(new TriadThunder());
+						weapons.Add(new SpinningBlade());
+						weapons.Add(new RaySplasher());
+						weapons.Add(new GravityWell());
+						weapons.Add(new FrostShield());
+						weapons.Add(new TunnelFang());
+					if (hasArmArmor(3)) weapons.Add(new HyperBuster());
+					if (hasBodyArmor(2)) weapons.Add(new GigaCrush());
+					}
+				 else if (Global.level.is1v1()) {
 					if (xArmor1v1 == 1) {
 						weapons.Add(new Buster());
 						weapons.Add(new Torpedo());
@@ -434,7 +464,17 @@ label:
 					weapons.Add(new PlasmaGun(axlLoadout.plasmaGunAlt));
 					weapons.Add(new IceGattling(axlLoadout.iceGattlingAlt));
 					weapons.Add(new FlameBurner(axlLoadout.flameBurnerAlt));
-				} else {
+				}
+				else if (isAI) {
+					weapons.Add(new AxlBullet());
+					weapons.Add(new RayGun(axlLoadout.rayGunAlt));
+					weapons.Add(new BlastLauncher(axlLoadout.blastLauncherAlt));
+					weapons.Add(new BlackArrow(axlLoadout.blackArrowAlt));
+					weapons.Add(new SpiralMagnum(axlLoadout.spiralMagnumAlt));
+					weapons.Add(new BoundBlaster(axlLoadout.boundBlasterAlt));
+					weapons.Add(new PlasmaGun(axlLoadout.plasmaGunAlt));
+					weapons.Add(new IceGattling(axlLoadout.iceGattlingAlt)); }
+				 else {
 					weapons = loadout.axlLoadout.getWeaponsFromLoadout();
 					weapons.Insert(0, getAxlBullet(axlBulletType));
 				}
