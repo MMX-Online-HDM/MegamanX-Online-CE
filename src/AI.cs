@@ -396,7 +396,7 @@ public class AI {
 		}
 
 		// Sigma:
-		if (character is BaseSigma)
+		if (character is BaseSigma baseSigma1)
 		{
 			if(player.canReviveSigma(out var spawnPoint)) player.reviveSigma(spawnPoint);
 		}
@@ -620,24 +620,45 @@ public class AI {
 						//Zero End
 
 						//Sigma Start
-						if (character is BaseSigma) {
+						if (character is BaseSigma baseSigma) {
+							bool once = false;
+							if (baseSigma.player.weapon is MaverickWeapon mw && mw.maverick == null && once == false && baseSigma.canAffordMaverick(mw)){
+								baseSigma.buyMaverick(mw);
+								baseSigma.changeState(new CallDownMaverick(mw.maverick, true, false), true);
+								mw.summon(player, baseSigma.pos.addxy(0, -112), baseSigma.pos, baseSigma.xDir);
+								player.changeToSigmaSlot();
+								once = true;
+							}
 							//Commander Sigma Start
 							if (character is CmdSigma cmdSigma && character.charState is not LadderClimb) {
-								int Sattack = Helpers.randomRange(0, 3);
+								int Sattack = Helpers.randomRange(0, 4);
 								if (isTargetInAir) Sattack = 1;
-								if (cmdSigma?.charState?.isGrabbedState == false && !player.isDead && !cmdSigma.isSpriteInvulnerable() && !cmdSigma.isInvulnerable())
-								switch (Sattack) {
-									case 0: // Beam Saber
-										player.press(Control.Shoot);
+								if (cmdSigma?.charState?.isGrabbedState == false && !player.isDead && !cmdSigma.isSpriteInvulnerable() && !cmdSigma.isInvulnerable() && cmdSigma.charState.canAttack()
+								&& !(cmdSigma.charState is CallDownMaverick or SigmaSlashState)){
+									switch (Sattack) {
+										case 0: // Beam Saber
+											if (isTargetSuperClose){
+												cmdSigma.changeState(new SigmaSlashState(cmdSigma.charState), true);}
+											break;
+										case 1: // Machine Gun if the enemy is on the air
+											if (cmdSigma.grounded && isTargetInAir) {
+												cmdSigma?.changeState(new SigmaBallShoot(), forceChange: true);}
+											break;
+										case 2: // Triangle Kick
+											if (cmdSigma.charState is Dash && cmdSigma.grounded) {
+												cmdSigma.changeState(new SigmaWallDashState(cmdSigma.xDir, true), true);}
+											break;
+										case 3:
+										if (!once){
+										cmdSigma.player.changeWeaponSlot(1);
+										once = true;}
 										break;
-									case 1: // Machine Gun if the enemy is on the air
-										if (cmdSigma.grounded && isTargetInAir)
-											cmdSigma?.changeState(new SigmaBallShoot(), forceChange: true);
+										case 4:
+										if (!once){
+										cmdSigma.player.changeWeaponSlot(2);
+										once = true;}
 										break;
-									case 2: // Triangle Kick
-										if (cmdSigma.charState is Dash && cmdSigma.grounded)
-											player.press(Control.Special1);
-										break;
+									}
 								}
 							}
 							//Commander Sigma End

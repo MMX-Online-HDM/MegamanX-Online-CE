@@ -497,7 +497,7 @@ public abstract class BaseSigma : Character {
 		}
 	}
 
-	private void buyMaverick(MaverickWeapon mw) {
+	public void buyMaverick(MaverickWeapon mw) {
 		//if (Global.level.is1v1()) player.health -= (player.maxHealth / 2);
 		if (player.isStriker()) return;
 		if (player.isRefundableMode() && mw.summonedOnce) return;
@@ -511,7 +511,7 @@ public abstract class BaseSigma : Character {
 		);
 	}
 
-	private bool canAffordMaverick(MaverickWeapon mw) {
+	public bool canAffordMaverick(MaverickWeapon mw) {
 		//if (Global.level.is1v1()) return player.health > (player.maxHealth / 2);
 		if (player.isStriker()) return true;
 		if (player.isRefundableMode() && mw.summonedOnce) return true;
