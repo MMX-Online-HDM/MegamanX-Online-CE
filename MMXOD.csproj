@@ -13,7 +13,7 @@
 		<!--RunWorkingDirectory>./bin/win7-x64/</RunWorkingDirectory-->
 		<OutputPath>./bin/</OutputPath>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-		<Nullable>enable</Nullable>
+		<Nullable>warning</Nullable>
 		<DebugType>embedded</DebugType>
 		<WarningLevel>9999</WarningLevel>
 	</PropertyGroup>
