@@ -9,7 +9,7 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>false</ImplicitUsings>
 		<SelfContained>false</SelfContained>
-		<!--OutDir>./bin/test/<OutDir-->
+		<!--OutDir>./bin/anycpu/<OutDir-->
 		<!--RunWorkingDirectory>./bin/win7-x64/</RunWorkingDirectory-->
 		<OutputPath>./bin/</OutputPath>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
