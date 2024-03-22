@@ -70,7 +70,7 @@ public class XTeleportState : CharState {
 				clone.move(new Point(moveAmount, 0), useDeltaTime: false);
 			}
 			if (!canChangePos(clone)) {
-				int widthH = MathInt.Ceiling(width / 2);
+				int widthH = MathInt.Ceiling(width / 2.0);
 				List<CollideData> hits = Global.level.raycastAllSorted(
 					clone.getCenterPos().addxy(-widthH, 0),
 					clone.getCenterPos().addxy(-widthH, 200),
