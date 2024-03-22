@@ -501,8 +501,6 @@ public partial class RPCCreateProj : RPC {
 			proj = new DarkHoldProj(new DarkHoldWeapon(), pos, xDir, player, netProjByte);
 		} else if (projId == (int)ProjIds.HexaInvolute) {
 			proj = new HexaInvoluteProj(new HexaInvoluteWeapon(), pos, xDir, player, netProjByte);
-		} else {
-			proj = null;
 		}
 
 		/*

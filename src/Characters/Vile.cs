@@ -25,7 +25,7 @@ public class Vile : Character {
 	public float vileHoverTime;
 	public float vileMaxHoverTime = 6;
 
-	public const float frozenCastlePercent = 0.125f;
+	public const decimal frozenCastlePercent = 0.125m;
 	public const float speedDevilRunSpeed = 110;
 	public const int frozenCastleCost = 3;
 	public const int speedDevilCost = 3;
