@@ -736,7 +736,7 @@ public class Axl : Character {
 	}
 
 	public override bool normalCtrl() {
-		if (!player.isAI && player.input.isPressed(Control.Jump, player) &&
+		if (player.input.isPressed(Control.Jump, player) &&
 			canJump() && !grounded && !isDashing && canAirDash() && flag == null
 		) {
 			dashedInAir++;
@@ -1141,9 +1141,9 @@ public class Axl : Character {
 		}
 
 		// aimbot
-		if (!player.isAI) {
-			//var target = Global.level.getClosestTarget(pos, player.alliance, true);
-			//if (target != null) player.axlCursorPos = target.pos.addxy(-Global.level.camX, -Global.level.camY - (target.charState is InRideArmor ? 0 : 16));
+		if (player.isAI) {
+			var target = Global.level.getClosestTarget(pos, player.alliance, true);
+			if (target != null) player.axlCursorPos = target.pos.addxy(-Global.level.camX, -Global.level.camY - (target is InRideArmor ? 0 : 16));
 		}
 
 		getMouseTargets();
@@ -1264,7 +1264,6 @@ public class Axl : Character {
 
 	float axlCursorAngle;
 	public void drawAxlCursor() {
-		if (player.isAI) return;
 		if (!ownedByLocalPlayer) return;
 		if (Global.level.gameMode.isOver) return;
 		if (isZooming() && !isZoomOutPhase1Done) return;
