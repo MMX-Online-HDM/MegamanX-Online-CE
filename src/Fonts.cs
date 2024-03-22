@@ -82,7 +82,7 @@ public class Fonts {
 					charInt = letter;
 				}
 				int rx = charInt % 16;
-				int ry = MathInt.Floor(charInt / 16);
+				int ry = MathInt.Floor(charInt / 16.0);
 
 				var textSprite = new SFML.Graphics.Sprite(
 					bitmapFontTexture, new IntRect(

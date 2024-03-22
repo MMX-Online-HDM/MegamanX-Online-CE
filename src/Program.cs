@@ -785,7 +785,7 @@ class Program {
 			);
 		}
 
-		int fileSplit = MathInt.Floor(spriteFilePaths.Count() / 6);
+		int fileSplit = MathInt.Floor(spriteFilePaths.Count() / 6.0);
 		string[][] treadedFilePaths;
 		// Use multitread if loading 20 or more sprites.
 		if (spriteFilePaths.Length >= 20) {
