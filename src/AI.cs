@@ -754,7 +754,6 @@ public class AI {
 						}
 						//X Start
 						if (character is MegamanX megamanX) {
-
 							int Xattack = Helpers.randomRange(0, 12);
 							if (!megamanX.isHyperX && megamanX?.charState?.isGrabbedState == false && !player.isDead && megamanX.charState.canAttack() && megamanX.canShoot()
 							&& megamanX.canChangeWeapons()
@@ -1071,7 +1070,7 @@ public class AI {
 							}
 							int UPXAttack = Helpers.randomRange(0, 5);
 							//UP X section
-							if (megamanX.isHyperX) {
+							if (megamanX?.isHyperX == true) {
 								switch (UPXAttack) {
 									case 0:
 										megamanX.player.press(Control.Special1);
@@ -1411,7 +1410,7 @@ public class AIState {
 		}
 	}
 
-	public Actor target {
+	public Actor? target {
 		get {
 			return ai?.target;
 		}
@@ -1492,12 +1491,12 @@ public class MoveTowardsTarget : AIState {
 }
 
 public class FindPlayer : AIState {
-	public NavMeshNode destNode;
-	public NavMeshNode nextNode;
+	public NavMeshNode? destNode;
+	public NavMeshNode? nextNode;
 	public NavMeshNode? prevNode;
-	public NavMeshNeighbor neighbor;
+	public NavMeshNeighbor? neighbor;
 	public NodeTransition? nodeTransition;
-	public List<NavMeshNode> nodePath;
+	public List<NavMeshNode> nodePath = new();
 	public float stuckTime;
 	public float lastX;
 	public float runIntoWallTime;
@@ -1567,8 +1566,9 @@ public class FindPlayer : AIState {
 			prevNode = nextNode;
 			nextNode = nodePath.PopFirst();
 		}
-
-		neighbor = prevNode?.getNeighbor(nextNode);
+		if (nextNode != null) {
+			neighbor = prevNode?.getNeighbor(nextNode);
+		}
 		if (neighbor != null) {
 			var phases = neighbor.getNodeTransitionPhases(this);
 			if (phases.Count > 0) {
@@ -1618,7 +1618,9 @@ public class FindPlayer : AIState {
 		prevNode = null;
 
 		if (nextNode != null) {
-			nodePath = nextNode.getNodePath(destNode);
+			if (destNode != null) {
+				nodePath = nextNode.getNodePath(destNode);
+			}
 			nodePath.Remove(nextNode);
 		}
 	}

@@ -47,7 +47,7 @@ public partial class MegamanX : Character {
 	bool lastFrameSpecialHeld;
 	bool lastShotWasSpecialBuster;
 	public float upPunchCooldown;
-	public Projectile unpoAbsorbedProj;
+	public Projectile? unpoAbsorbedProj;
 
 	float hyperChargeAnimTime;
 	float hyperChargeAnimTime2 = 0.125f;
