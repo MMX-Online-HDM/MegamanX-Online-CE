@@ -63,7 +63,7 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 	public void update() {
 		if (!string.IsNullOrEmpty(error)) {
 			if (Global.input.isPressedMenu(Control.MenuConfirm)) {
-				error = null;
+				error = "";
 			}
 			return;
 		}

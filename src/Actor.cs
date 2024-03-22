@@ -672,7 +672,7 @@ public partial class Actor : GameObject {
 							move(new Point(hitWall.moveX, 0));
 						}
 					}
-					if (isPlatform) {
+					if (isPlatform && hitActor != null) {
 						move(hitActor.deltaPos, useDeltaTime: false);
 					}
 
@@ -1584,7 +1584,7 @@ public partial class Actor : GameObject {
 
 	public float getDistFromGround() {
 		var ground = Global.level.raycast(pos, pos.addxy(0, 1000), new List<Type>() { typeof(Wall) });
-		if (ground != null) {
+		if (ground?.hitData?.hitPoint != null) {
 			return MathF.Abs(pos.y - ground.hitData.hitPoint.Value.y);
 		}
 		return -1;

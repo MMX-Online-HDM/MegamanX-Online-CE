@@ -3,6 +3,7 @@
 		<!--LangVersion>12.0</LangVersion-->
 		<AssemblyName>MMXOD</AssemblyName>
 		<OutputType>WinExe</OutputType>
+		<Nullable>enable</Nullable>
 		<Version>19.12</Version>
 		<AssemblyVersion>19.12</AssemblyVersion>
 		<ApplicationIcon>app.ico</ApplicationIcon>
@@ -13,9 +14,7 @@
 		<!--RunWorkingDirectory>./bin/win7-x64/</RunWorkingDirectory-->
 		<OutputPath>./bin/</OutputPath>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-		<Nullable>warnings</Nullable>
 		<DebugType>embedded</DebugType>
-		<WarningLevel>9999</WarningLevel>
 	</PropertyGroup>
 
 	<ItemGroup>

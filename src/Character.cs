@@ -51,7 +51,7 @@ public partial class Character : Actor, IDamagable {
 	public float weaponHealTime = 0;
 	public float healthBarInnerWidth;
 	public float slideVel = 0;
-	public Flag flag;
+	public Flag? flag;
 	public float stingChargeTime;
 	public bool isCrystalized;
 	public bool insideCharacter;

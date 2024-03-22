@@ -117,7 +117,7 @@ public class SelectWeaponMenu : IMainMenu {
 	public void update() {
 		if (!string.IsNullOrEmpty(error)) {
 			if (Global.input.isPressedMenu(Control.MenuConfirm)) {
-				error = null;
+				error = "";
 			}
 			return;
 		}
@@ -174,7 +174,7 @@ public class SelectWeaponMenu : IMainMenu {
 				Options.main.xLoadout.weapon2 = selectedWeaponIndices[1];
 				Options.main.xLoadout.weapon3 = selectedWeaponIndices[2];
 				shouldSave = true;
-				if (inGame) {
+				if (inGame && Global.level != null) {
 					if (Options.main.killOnLoadoutChange) {
 						Global.level.mainPlayer.forceKill();
 					} else if (!Global.level.mainPlayer.isDead) {

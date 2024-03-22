@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class SpeedBurner : Weapon {
-	public SpeedBurner(Player player) : base() {
+	public SpeedBurner(Player? player) : base() {
 		damager = new Damager(player, 4, Global.defFlinch, 0.5f);
 		shootSounds = new List<string>() { "speedBurner", "speedBurner", "speedBurner", "speedBurnerCharged" };
 		rateOfFire = 1f;

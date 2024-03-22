@@ -262,7 +262,7 @@ public class FlagPedestal : Actor {
 		if (!ownedByLocalPlayer) return;
 		if (other.otherCollider?.flag == (int)HitboxFlag.Hitbox) return;
 
-		var chr = other.gameObject as Character;
+		Character? chr = other.gameObject as Character;
 		if (chr != null && chr.flag != null && chr.player.alliance == alliance) {
 			chr.flag.returnFlag();
 			chr.flag = null;
