@@ -473,7 +473,9 @@ label:
 					weapons.Add(new SpiralMagnum(axlLoadout.spiralMagnumAlt));
 					weapons.Add(new BoundBlaster(axlLoadout.boundBlasterAlt));
 					weapons.Add(new PlasmaGun(axlLoadout.plasmaGunAlt));
-					weapons.Add(new IceGattling(axlLoadout.iceGattlingAlt)); }
+				//	weapons.Add(new IceGattling(axlLoadout.iceGattlingAlt));
+					weapons.Add(new FlameBurner(axlLoadout.flameBurnerAlt));}
+
 				 else {
 					weapons = loadout.axlLoadout.getWeaponsFromLoadout();
 					weapons.Insert(0, getAxlBullet(axlBulletType));

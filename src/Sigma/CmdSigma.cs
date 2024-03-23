@@ -107,8 +107,8 @@ public class CmdSigma : BaseSigma {
 	}
 
 	// This can run on both owners and non-owners. So data used must be in sync
-	public override Projectile getProjFromHitbox(Collider collider, Point centerPoint) {
-		Projectile proj = sprite.name switch {
+	public override Projectile? getProjFromHitbox(Collider collider, Point centerPoint) {
+		Projectile? proj = sprite.name switch {
 			"sigma_ladder_attack" => new GenericMeleeProj(
 				player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSlash, player,
 				3, 0, 0.25f

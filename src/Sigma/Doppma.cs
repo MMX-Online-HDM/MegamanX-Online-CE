@@ -110,7 +110,7 @@ public class Doppma : BaseSigma {
 	}
 
 	// This can run on both owners and non-owners. So data used must be in sync.
-	public override Projectile getProjFromHitbox(Collider collider, Point centerPoint) {
+	public override Projectile? getProjFromHitbox(Collider collider, Point centerPoint) {
 		if (collider.name == "shield") {
 			return new GenericMeleeProj(
 				new Weapon(), centerPoint, ProjIds.Sigma3ShieldBlock, player,

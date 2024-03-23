@@ -436,7 +436,7 @@ public abstract class BaseSigma : Character {
 	}
 
 	// This can run on both owners and non-owners. So data used must be in sync
-	public override Projectile getProjFromHitbox(Collider collider, Point centerPoint) {
+	public override Projectile? getProjFromHitbox(Collider collider, Point centerPoint) {
 		if (sprite.name.Contains("sigma_block") && !collider.isHurtBox()) {
 			return new GenericMeleeProj(
 				player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player,

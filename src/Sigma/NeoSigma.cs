@@ -112,8 +112,8 @@ public class NeoSigma : BaseSigma {
 	}
 
 	// This can run on both owners and non-owners. So data used must be in sync.
-	public override Projectile getProjFromHitbox(Collider collider, Point centerPoint) {
-		Projectile proj = sprite.name switch {
+	public override Projectile? getProjFromHitbox(Collider collider, Point centerPoint) {
+		Projectile? proj = sprite.name switch {
 			"sigma2_attack" => new GenericMeleeProj(
 				player.sigmaClawWeapon, centerPoint, ProjIds.Sigma2Claw, player,
 				2, 0, 0.2f
