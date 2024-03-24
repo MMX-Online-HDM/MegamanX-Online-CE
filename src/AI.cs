@@ -1230,8 +1230,15 @@ public class AI {
 											 player.press(Control.Down);
 										}
 										//If he hasn't do "Block/Parry"
-										else if (gameObject is not GenericMeleeProj || (proj.reflectable == true) || gameObject is not SwordBlock) {
-											player.press(Control.WeaponLeft);
+										else if (gameObject is not SwordBlock) {
+											if(gameObject is not GenericMeleeProj && player.isZSaber() && !player.hasKnuckle()) {
+												zero.turnToInput(player.input, player);
+												zero.changeState(new SwordBlock());
+											}
+											if(!player.isZSaber() && player.hasKnuckle()) {
+												zero.turnToInput(player.input, player);
+												zero.changeState(new KKnuckleParryStartState());
+											}
 										}
 									}
 									//If player is Buster Zero do Saber Swing
