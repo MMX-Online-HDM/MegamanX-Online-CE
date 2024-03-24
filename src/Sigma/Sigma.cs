@@ -425,7 +425,7 @@ public abstract class BaseSigma : Character {
 	}
 
 	public virtual bool canGuard() {
-		if (isSoftLocked() || isDashing) {
+		if (isDashing) {
 			return false;
 		}
 		return true;
