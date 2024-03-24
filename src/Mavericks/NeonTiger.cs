@@ -81,7 +81,7 @@ public class NeonTiger : Maverick {
 
 	public MaverickState getShootState(bool isAI) {
 		var mshoot = new MShoot((Point pos, int xDir) => {
-			//playSound("neontRaySplasher", sendRpc: true);
+			playSound("neontRaySplasher", sendRpc: true);
 			new NeonTRaySplasherProj(weapon, pos, xDir, shootNum, false, player, player.getNextActorNetId(), sendRpc: true);
 			shootNum++;
 		}, null);
