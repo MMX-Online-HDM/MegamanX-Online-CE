@@ -108,7 +108,7 @@ public class StormEagle : Maverick {
 		}
 	}
 
-	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
+	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (sprite.name.Contains("dive")) {
 			return new GenericMeleeProj(diveWeapon, centerPoint, ProjIds.StormEDive, player);
 		}

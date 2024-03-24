@@ -121,7 +121,7 @@ public class BlastHornet : Maverick {
 		}
 	}
 
-	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
+	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (sprite.name.EndsWith("_stinger_attack")) {
 			return new GenericMeleeProj(weapon, centerPoint, ProjIds.BHornetSting, player, damage: 7, flinch: Global.defFlinch, hitCooldown: 0.5f, owningActor: this);
 		}

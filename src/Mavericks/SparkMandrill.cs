@@ -101,7 +101,7 @@ public class SparkMandrill : Maverick {
 		return attacks.GetRandomItem();
 	}
 
-	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
+	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (sprite.name.Contains("punch")) {
 			return new GenericMeleeProj(punchWeapon, centerPoint, ProjIds.SparkMPunch, player);
 		}

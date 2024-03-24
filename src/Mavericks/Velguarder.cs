@@ -75,7 +75,7 @@ public class Velguarder : Maverick {
 		return attacks.GetRandomItem();
 	}
 
-	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
+	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (sprite.name.Contains("pounce")) {
 			return new GenericMeleeProj(meleeWeapon, centerPoint, ProjIds.VelGMelee, player);
 		}

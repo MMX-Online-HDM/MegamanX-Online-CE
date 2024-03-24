@@ -154,8 +154,8 @@ public class MagnaCentipede : Maverick {
 		changeSpriteFromName(state.sprite, false);
 	}
 
-	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		Projectile proj = null;
+	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
+		Projectile? proj = null;
 		if (sprite.name.EndsWith("_drain") && ((reversedGravity && hitbox.name == "flipped") || (!reversedGravity && hitbox.name != "flipped"))) {
 			var meleeProj = new GenericMeleeProj(weapon, getFirstPOIOrDefault(), ProjIds.MagnaCTail, player, damage: 0, flinch: 0, hitCooldown: 0, owningActor: this);
 			var rect = new Rect(0, 0, 10, 10);

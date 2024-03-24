@@ -87,7 +87,7 @@ public class ToxicSeahorse : Maverick {
 		return mshoot;
 	}
 
-	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
+	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (sprite.name.Contains("teleport2")) {
 			return new GenericMeleeProj(weapon, centerPoint, ProjIds.TSeahorseEmerge, player, damage: 4, flinch: Global.defFlinch, hitCooldown: 0.5f);
 		} else if (sprite.name.Contains("teleport")) {
