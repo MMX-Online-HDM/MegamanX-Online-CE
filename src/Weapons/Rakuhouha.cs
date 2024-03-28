@@ -88,6 +88,7 @@ public class ShinMessenkou : Weapon {
 		type = (int)RakuhouhaType.ShinMessenkou;
 		weaponBarBaseIndex = 43;
 		weaponBarIndex = 37;
+		weaponSlotIndex = 64;
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
@@ -102,8 +103,13 @@ public class Rakuhouha : CharState {
 	bool fired2 = false;
 	bool fired3 = false;
 	const float shinMessenkouWidth = 40;
-	public DarkHoldProj darkHoldProj;
-	public Rakuhouha(Weapon weapon) : base(weapon.type == (int)RakuhouhaType.CFlasher || weapon.type == (int)RakuhouhaType.DarkHold ? "cflasher" : "rakuhouha", "", "", "") {
+	public DarkHoldProj? darkHoldProj;
+	public Rakuhouha(
+		Weapon weapon
+	) : base(
+		weapon.type == (int)RakuhouhaType.CFlasher ||
+		weapon.type == (int)RakuhouhaType.DarkHold ? "cflasher" : "rakuhouha"
+	) {
 		this.weapon = weapon;
 		invincible = true;
 	}
@@ -126,7 +132,9 @@ public class Rakuhouha : CharState {
 				new ShinMessenkouProj(weapon, new Point(x - shinMessenkouWidth, y), character.xDir, player, player.getNextActorNetId(), rpc: true);
 				new ShinMessenkouProj(weapon, new Point(x + shinMessenkouWidth, y), character.xDir, player, player.getNextActorNetId(), rpc: true);
 			} else if (isDarkHold) {
-				darkHoldProj = new DarkHoldProj(weapon, new Point(x, y), character.xDir, player, player.getNextActorNetId(), rpc: true);
+				darkHoldProj = new DarkHoldProj(
+					weapon, new Point(x, y - 5), character.xDir, player, player.getNextActorNetId(), rpc: true
+				);
 			} else {
 				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, -1, 0, player, player.getNextActorNetId(), 180, rpc: true);
 				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, -0.92f, -0.38f, player, player.getNextActorNetId(), 135, rpc: true);
@@ -274,7 +282,7 @@ public class Rekkoha : CharState {
 	bool fired5 = false;
 	bool sound;
 	int loop;
-	public RekkohaEffect effect;
+	public RekkohaEffect? effect;
 	public Weapon weapon;
 	public Rekkoha(Weapon weapon) : base("rekkoha", "", "", "") {
 		this.weapon = weapon;
@@ -347,7 +355,8 @@ public class RekkohaProj : Projectile {
 	public RekkohaProj(
 		Weapon weapon, Point pos, Player player, ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, 1, 0, 3, player, "rekkoha_proj", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, 1, 0, 3, player, "rekkoha_proj",
+		Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.Rekkoha;
 		vel.y = 400;
@@ -497,22 +506,22 @@ public class DarkHoldWeapon : Weapon {
 
 public class DarkHoldProj : Projectile {
 	public float radius = 10;
-	public float attackRadius { get { return radius + 15; } }
-	public ShaderWrapper screenShader;
-	public DarkHoldProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 6, player, "empty", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
-		maxTime = 0.5f;
+	public float attackRadius => (radius + 15);
+	public ShaderWrapper? screenShader;
+	public DarkHoldProj(
+		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 0, player, "empty", 0, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
+		maxTime = 1.25f;
 		vel = new Point();
 		projId = (int)ProjIds.DarkHold;
 		setIndestructableProperties();
-
 		Global.level.darkHoldProjs.Add(this);
-
 		if (Options.main.enablePostProcessing) {
 			screenShader = player.darkHoldScreenShader;
 			updateShader();
 		}
-
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
@@ -520,40 +529,56 @@ public class DarkHoldProj : Projectile {
 
 	public override void update() {
 		base.update();
-
 		updateShader();
 
-		if (isRunByLocalPlayer()) {
-			foreach (var go in Global.level.getGameObjectArray()) {
-				var actor = go as Actor;
-				var damagable = go as IDamagable;
-				if (actor == null) continue;
-				if (damagable == null) continue;
-				if (!damagable.canBeDamaged(damager.owner.alliance, damager.owner.id, null)) continue;
-				if (!inRange(actor)) continue;
-
-				damager.applyDamage(damagable, false, weapon, this, projId, overrideDamage: 0, overrideFlinch: 0);
+		if (time <= 0.5) {
+			foreach (var gameObject in Global.level.getGameObjectArray()) {
+				if (gameObject is Actor actor &&
+					actor.ownedByLocalPlayer &&
+					gameObject is IDamagable damagable &&
+					damagable.canBeDamaged(damager.owner.alliance, damager.owner.id, null) &&
+					inRange(actor)
+				) {
+					damager.applyDamage(damagable, false, weapon, this, projId);
+				}
 			}
 		}
-		radius += Global.spf * 400;
+		if (time <= 0.5) {
+			radius += Global.spf * 400;
+		}
+		if (time >= 1 && radius > 0) {
+			radius -= Global.spf * 800;
+			if (radius <= 0) {
+				radius = 0;
+			}
+		}
 	}
 
 	public bool inRange(Actor actor) {
-		float dist = actor.getCenterPos().distanceTo(pos);
-		if (dist > attackRadius) return false;
-		return true;
+		return (actor.getCenterPos().distanceTo(pos) <= attackRadius);
 	}
 
 	public void updateShader() {
 		if (screenShader != null) {
-			var screenCoords = new Point(pos.x - Global.level.camX, pos.y - Global.level.camY);
-			var normalizedCoords = new Point(screenCoords.x / Global.viewScreenW, 1 - screenCoords.y / Global.viewScreenH);
-			var normalizedRadius = radius / 261f;
-
+			var screenCoords = new Point(
+				pos.x - Global.level.camX,
+				pos.y - Global.level.camY
+			);
+			var normalizedCoords = new Point(
+				screenCoords.x / Global.viewScreenW,
+				1 - screenCoords.y / Global.viewScreenH
+			);
+			float ratio = (float)Global.screenW / (float)Global.screenH;
+			float normalizedRadius = (radius / (float)Global.screenH);
+	
+			screenShader.SetUniform("ratio", ratio);
 			screenShader.SetUniform("x", normalizedCoords.x);
 			screenShader.SetUniform("y", normalizedCoords.y);
-			if (Global.viewSize == 2) screenShader.SetUniform("r", normalizedRadius * 0.5f);
-			else screenShader.SetUniform("r", normalizedRadius);
+			if (Global.viewSize == 2) {
+				screenShader.SetUniform("r", normalizedRadius * 0.5f);
+			} else {
+				screenShader.SetUniform("r", normalizedRadius);
+			}
 		}
 	}
 
@@ -565,6 +590,7 @@ public class DarkHoldProj : Projectile {
 			DrawWrappers.DrawCircle(pos.x + x, pos.y + y, radius, true, col, 1, zIndex + 1, true);
 			DrawWrappers.DrawCircle(pos.x + x, pos.y + y, radius, false, col2, 3, zIndex + 1, true, col2);
 		}
+
 	}
 
 	public override void onDestroy() {
@@ -582,7 +608,7 @@ public class DarkHoldState : CharState {
 	public DarkHoldState(Character character) : base(character?.sprite?.name ?? "grabbed") {
 		immuneToWind = true;
 
-		this.frameIndex = character.frameIndex;
+		this.frameIndex = character?.frameIndex ?? 0;
 		if (character is Axl axl) {
 			this.shouldDrawAxlArm = axl.shouldDrawArm();
 			this.lastArmAngle = axl.netArmAngle;

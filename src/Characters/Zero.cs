@@ -1016,12 +1016,6 @@ public class Zero : Character {
 				deductLabelY(labelKillFeedIconOffY);
 			}
 		}
-
-		if (!drawStatusProgress() && !drawSubtankHealing()) {
-			if (Options.main.showGigaAttackCooldown && zeroGigaAttackWeapon.shootTime > 0) {
-				drawSpinner(Helpers.progress(zeroGigaAttackWeapon.shootTime, zeroGigaAttackWeapon.rateOfFire));
-			}
-		}
 		base.render(x, y);
 	}
 

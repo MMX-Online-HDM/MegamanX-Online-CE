@@ -1231,23 +1231,28 @@ public class Axl : Character {
 			}
 		}
 
-		if (player.isMainPlayer && !player.isDead && !drawStatusProgress() && !drawSubtankHealing()) {
+		if (player.isMainPlayer && !player.isDead) {
 			if (Options.main.aimKeyToggle) {
 				if (player.input.isAimingBackwards(player)) {
-					Global.sprites["hud_axl_aim"].draw(0, pos.x, pos.y + currentLabelY, xDir, 1, null, 1, 1, 1, ZIndex.HUD);
+					Global.sprites["hud_axl_aim"].draw(
+						0, pos.x, pos.y + currentLabelY, xDir, 1, null, 1, 1, 1, ZIndex.HUD
+					);
 					deductLabelY(labelAxlAimModeIconOffY);
 				} else if (player.input.isPositionLocked(player)) {
-					Global.sprites["hud_axl_aim"].draw(1, pos.x, pos.y + currentLabelY, 1, 1, null, 1, 1, 1, ZIndex.HUD);
+					Global.sprites["hud_axl_aim"].draw(
+						1, pos.x, pos.y + currentLabelY, 1, 1, null, 1, 1, 1, ZIndex.HUD
+					);
 					deductLabelY(labelAxlAimModeIconOffY);
 				}
-			} else if (Options.main.showRollCooldown && dodgeRollCooldown > 0) {
-				drawSpinner(Helpers.progress(dodgeRollCooldown, maxDodgeRollCooldown));
 			}
 		}
 
 		if (Global.showHitboxes) {
 			Point bulletPos = getAxlBulletPos();
-			DrawWrappers.DrawLine(bulletPos.x, bulletPos.y, player.axlGenericCursorWorldPos.x, player.axlGenericCursorWorldPos.y, Color.Magenta, 1, ZIndex.Default + 1);
+			DrawWrappers.DrawLine(
+				bulletPos.x, bulletPos.y, player.axlGenericCursorWorldPos.x,
+				player.axlGenericCursorWorldPos.y, Color.Magenta, 1, ZIndex.Default + 1
+			);
 		}
 
 		drawAxlCursor();

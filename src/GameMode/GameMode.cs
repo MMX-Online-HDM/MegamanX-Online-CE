@@ -608,19 +608,28 @@ public class GameMode {
 			return;
 		}
 
+		Player? drawPlayer = null;
 		if (!Global.level.mainPlayer.isSpectator) {
-			renderHealthAndWeapons();
+			drawPlayer = Global.level.mainPlayer;
+		} else {
+			drawPlayer = level.specPlayer;
+		}
 
+		if (drawPlayer != null) {
+			if (Global.level.mainPlayer == drawPlayer) {
+				renderHealthAndWeapons();
+			} else {
+				renderHealthAndWeapon(drawPlayer, HUDHealthPosition.Left);
+			}
 			// Currency
 			if (!Global.level.is1v1()) {
 				Global.sprites["hud_scrap"].drawToHUD(0, 4, 138);
 				Fonts.drawText(
 					FontType.Grey,
-					"x" + Global.level.mainPlayer.currency.ToString(), 16, 140, Alignment.Left
+					"x" + drawPlayer.currency.ToString(), 16, 140, Alignment.Left
 				);
 			}
-
-			if (mainPlayer.character is MegamanX mmx && mmx.unpoShotCount > 0) {
+			if (drawPlayer.character is MegamanX mmx && mmx.unpoShotCount > 0) {
 				int x = 10, y = 156;
 				int count = mmx.unpoShotCount;
 				if (count >= 1) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x, y);
@@ -628,10 +637,16 @@ public class GameMode {
 				if (count >= 3) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x, y + 11);
 				if (count >= 4) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x + 13, y + 11);
 			}
-
-			if (level.mainPlayer.weapons.Count > 1) {
+			if (drawPlayer.isZero && !drawPlayer.isZBusterZero()) {
+				drawZeroGigaCooldown(drawPlayer);
+			}
+			if (drawPlayer.character is Axl axl2 && axl2.dodgeRollCooldown > 0) {
+				float cooldown = 1 - Helpers.progress(axl2.dodgeRollCooldown, Axl.maxDodgeRollCooldown);
+				drawGigaWeaponCooldown(50, cooldown, y: 170);
+			}
+			if (drawPlayer.weapons.Count > 1) {
 				drawWeaponSwitchHUD();
-			} else if (level.mainPlayer.weapons.Count == 1 && level.mainPlayer.weapons[0] is MechMenuWeapon mmw) {
+			} else if (drawPlayer.weapons.Count == 1 && drawPlayer.weapons[0] is MechMenuWeapon mmw) {
 				drawWeaponSwitchHUD();
 			}
 		}
@@ -639,7 +654,6 @@ public class GameMode {
 		if (!Global.level.is1v1()) {
 			drawKillFeed();
 		}
-
 		if (Global.level.isTraining()) {
 			drawDpsIfSet(5);
 		} else {
@@ -1779,6 +1793,28 @@ public class GameMode {
 		if (level.mainPlayer.isSelectingCommand()) {
 			drawMaverickCommandIcons();
 		}
+	}
+
+	public void drawZeroGigaCooldown(Player player) {
+		// This runs once per character.
+		Weapon weapon = player.lastHudWeapon;
+		if (player.character != null) {
+			weapon = player.weapon;
+			if (player.character is Zero zero && !player.isZBusterZero()) {
+				weapon = zero.zeroGigaAttackWeapon;
+			}
+			player.lastHudWeapon = weapon;
+		}
+		if (weapon.shootTime <= 0) {
+			return;
+		}
+		float cooldown = Helpers.progress(weapon.shootTime, weapon.rateOfFire);
+		drawGigaWeaponCooldown(weapon.weaponSlotIndex, 1 - cooldown);
+	}
+
+	public void drawGigaWeaponCooldown(int slotIndex, float cooldown, int x = 11, int y = 159) {
+		Global.sprites["hud_weapon_icon"].drawToHUD(slotIndex, x, y);
+		drawWeaponSlotCooldown(x, y, cooldown);
 	}
 
 	public void drawWeaponSlot(Weapon weapon, float x, float y) {
