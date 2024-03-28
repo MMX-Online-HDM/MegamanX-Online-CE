@@ -81,7 +81,7 @@ public class NeonTiger : Maverick {
 
 	public MaverickState getShootState(bool isAI) {
 		var mshoot = new MShoot((Point pos, int xDir) => {
-			//playSound("neontRaySplasher", sendRpc: true);
+			playSound("neontRaySplasher", sendRpc: true);
 			new NeonTRaySplasherProj(weapon, pos, xDir, shootNum, false, player, player.getNextActorNetId(), sendRpc: true);
 			shootNum++;
 		}, null);
@@ -91,7 +91,7 @@ public class NeonTiger : Maverick {
 		return mshoot;
 	}
 
-	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
+	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (sprite.name == "neont_slash") {
 			return new GenericMeleeProj(weapon, centerPoint, ProjIds.NeonTClaw, player, damage: 2, flinch: 0, hitCooldown: 0.2f, owningActor: this);
 		} else if (sprite.name == "neont_slash2") {

@@ -76,7 +76,7 @@ public class TunnelRhino : Maverick {
 		return damagePercent;
 	}
 
-	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
+	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (sprite.name.EndsWith("_dash")) {
 			return new GenericMeleeProj(weapon, centerPoint, ProjIds.TunnelRDash, player, damage: 4, flinch: Global.defFlinch, hitCooldown: 0.5f, owningActor: this);
 		}

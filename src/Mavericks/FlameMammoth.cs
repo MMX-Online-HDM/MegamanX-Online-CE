@@ -73,7 +73,7 @@ public class FlameMammoth : Maverick {
 		return attacks.GetRandomItem();
 	}
 
-	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
+	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (sprite.name.Contains("fall")) {
 			float damage = 0;
 			if (deltaPos.y > 100 * Global.spf) damage = 2f;

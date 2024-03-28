@@ -551,7 +551,7 @@ public class Zero : Character {
 		if (changedState) {
 			return true;
 		}
-		if (player.isZSaber() && (
+		if (charState is not Dash && grounded && !isAttacking() && player.isZSaber() && (
 				player.input.isHeld(Control.WeaponLeft, player) ||
 				player.input.isHeld(Control.WeaponRight, player)
 			) && (
@@ -559,6 +559,7 @@ public class Zero : Character {
 				player.input.isHeld(Control.Down, player)
 			)
 		) {
+			turnToInput(player.input, player);
 			changeState(new SwordBlock());
 			return true;
 		} else if (!player.isZBusterZero() && !isDashing && (
@@ -569,7 +570,9 @@ public class Zero : Character {
 			  )
 		  ) {
 			if (!player.hasKnuckle()) {
-				changeState(new SwordBlock());
+				if (grounded && !isAttacking()){
+				turnToInput(player.input, player);
+				changeState(new SwordBlock());}
 				return true;
 			} else if (parryCooldown == 0) {
 				changeState(new KKnuckleParryStartState());

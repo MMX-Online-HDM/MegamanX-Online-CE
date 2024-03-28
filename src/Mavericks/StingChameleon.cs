@@ -169,7 +169,7 @@ public class StingChameleon : Maverick {
 		return attacks.GetRandomItem();
 	}
 
-	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
+	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (sprite.name.Contains("tongue")) {
 			return new GenericMeleeProj(tongueWeapon, centerPoint, ProjIds.StingCTongue, player);
 		}

@@ -165,7 +165,7 @@ public class MorphMothCocoon : Maverick {
 		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
 	}
 
-	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
+	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (sprite.name.Contains("spin")) {
 			return new GenericMeleeProj(weapon, centerPoint, ProjIds.MorphMCSpin, player, 1, 0, 0.5f);
 		} else if (sprite.name.Contains("hang")) {

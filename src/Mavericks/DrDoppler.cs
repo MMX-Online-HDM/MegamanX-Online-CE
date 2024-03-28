@@ -101,7 +101,7 @@ public class DrDoppler : Maverick {
 		return mshoot;
 	}
 
-	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
+	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (sprite.name == "drdoppler_dash") {
 			return new GenericMeleeProj(weapon, centerPoint, ProjIds.DrDopplerDash, player, damage: 4, flinch: Global.defFlinch, hitCooldown: 0.5f, owningActor: this);
 		} else if (sprite.name == "drdoppler_dash_water") {

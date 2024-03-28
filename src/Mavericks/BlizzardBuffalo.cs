@@ -98,7 +98,7 @@ public class BlizzardBuffalo : Maverick {
 		return damagePercent;
 	}
 
-	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
+	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (sprite.name.EndsWith("_dash")) {
 			return new GenericMeleeProj(weapon, centerPoint, ProjIds.BBuffaloDrag, player, damage: 0, flinch: 0, hitCooldown: 0.5f, owningActor: this);
 		}

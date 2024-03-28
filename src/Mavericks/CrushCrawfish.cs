@@ -69,7 +69,7 @@ public class CrushCrawfish : Maverick {
 		return mshoot;
 	}
 
-	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
+	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (sprite.name.EndsWith("_dash")) {
 			return new GenericMeleeProj(weapon, centerPoint, ProjIds.CrushCGrab, player, damage: 0, flinch: 0, hitCooldown: 0, owningActor: this);
 		}

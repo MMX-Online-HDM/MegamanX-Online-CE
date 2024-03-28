@@ -137,7 +137,7 @@ public class FakeZero : Maverick {
 
 	public MaverickState getShootState(bool isAI) {
 		var mshoot = new MShoot((Point pos, int xDir) => {
-			playSound("zbuster2", sendRpc: true);
+			playSound("buster2", sendRpc: true);
 			deductAmmo(2);
 			new FakeZeroBusterProj(weapon, pos, xDir, player, player.getNextActorNetId(), rpc: true);
 		}, null);

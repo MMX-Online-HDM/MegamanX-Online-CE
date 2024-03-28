@@ -54,7 +54,7 @@ public class XHover : CharState {
 		}
 
 		hoverTime += Global.spf;
-		if (hoverTime > 2 || character.player.input.isPressed(Control.Jump, character.player)) {
+		if (hoverTime > 2 || player.input.checkDoubleTap(Control.Dash)) {
 			character.changeState(new Fall(), true);
 		}
 	}
