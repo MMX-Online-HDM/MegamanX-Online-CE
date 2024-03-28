@@ -7,11 +7,11 @@
 		<Version>19.12</Version>
 		<AssemblyVersion>19.12</AssemblyVersion>
 		<ApplicationIcon>app.ico</ApplicationIcon>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net6.0-windows</TargetFramework>
 		<ImplicitUsings>false</ImplicitUsings>
 		<SelfContained>false</SelfContained>
 		<!--OutDir>./bin/anycpu/</OutDir-->
-		<!--RunWorkingDirectory>./bin/win7-x64/</RunWorkingDirectory-->
+		<RunWorkingDirectory>./bin/runenv/</RunWorkingDirectory>
 		<OutputPath>./bin/</OutputPath>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<DebugType>embedded</DebugType>
