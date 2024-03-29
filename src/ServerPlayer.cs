@@ -28,6 +28,8 @@ public class ServerPlayer {
 	[JsonIgnore]
 	public bool alreadyAutobalanced;
 
+	public ServerPlayer() {}
+
 	public ServerPlayer(
 		string name, int id, bool isHost, int charNum,
 		int? preferredAlliance, string deviceId, NetConnection? connection, int? startPing

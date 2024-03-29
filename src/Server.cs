@@ -27,7 +27,7 @@ public class Server {
 	[ProtoMember(4)] public int playTo;
 	[ProtoMember(5)] public int botCount;
 	[ProtoMember(6)] public int maxPlayers;
-	[ProtoMember(7)] public Region region;
+	[ProtoMember(7)] public Region? region;
 	[ProtoMember(8)] public int? timeLimit;
 	[ProtoMember(9)] public bool fixedCamera;
 	[ProtoMember(10)] public bool hidden;
@@ -105,15 +105,15 @@ public class Server {
 	public const int maxPlayerCap = 22;
 
 	public Server(
-		decimal gameVersion, Region region,
+		decimal gameVersion, Region? region,
 		string name, string level, string shortLevelName,
 		string gameMode, int playTo, int botCount, int maxPlayers,
-		int timeLimit, bool fixedCamera, bool hidden,
+		int? timeLimit, bool fixedCamera, bool hidden,
 		NetcodeModel netcodeModel, int netcodeModelPing, bool isLAN,
 		bool mirrored, bool useLoadout,
 		string gameChecksum, string customMapChecksum, string customMapUrl,
 		ExtraCpuCharData extra1v1CpuCharData, CustomMatchSettings customMatchSettings,
-		bool disableHtSt, bool disableVehicles
+		bool disableHtSt, bool disableVehicles, byte teamNum
 	) {
 		this.gameVersion = gameVersion;
 		this.region = region;
@@ -139,6 +139,8 @@ public class Server {
 		this.customMatchSettings = customMatchSettings;
 		this.disableHtSt = disableHtSt;
 		this.disableVehicles = disableVehicles;
+		this.teamNum = teamNum;
+		teamScore = new byte[teamNum];
 		players = new List<ServerPlayer>();
 		port = getNextAvailablePort();
 	}

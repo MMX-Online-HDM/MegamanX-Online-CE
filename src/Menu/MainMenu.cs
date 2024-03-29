@@ -111,7 +111,7 @@ public class MainMenu : IMainMenu {
 						Global.quickStartNetcodeModel, Global.quickStartNetcodePing,
 						true, Global.quickStartMirrored, Global.quickStartTrainingLoadout,
 						Global.checksum, null, null, SavedMatchSettings.mainOffline.extraCpuCharData, null,
-						Global.quickStartDisableHtSt, Global.quickStartDisableVehicles
+						Global.quickStartDisableHtSt, Global.quickStartDisableVehicles, 2
 					);
 					HostMenu.createServer(
 						Global.quickStartOnlineHostCharNum, serverData, null, false, new MainMenu(), out _
@@ -129,8 +129,15 @@ public class MainMenu : IMainMenu {
 				Global.skipCharWepSel = true;
 				var hostmenu = new HostMenu(this, null, false, false);
 				Menu.change(hostmenu);
-				var serverData = new Server(Global.version, Options.main.getRegion(), "testserver", Global.quickStartOnlineMap, Global.quickStartOnlineMap, Global.quickStartOnlineGameMode, 100, Global.quickStartOnlineBotCount, 2, 300, false, false,
-					Global.quickStartNetcodeModel, Global.quickStartNetcodePing, true, Global.quickStartMirrored, Global.quickStartTrainingLoadout, Global.checksum, null, null, SavedMatchSettings.mainOffline.extraCpuCharData, null, Global.quickStartDisableHtSt, Global.quickStartDisableVehicles);
+				var serverData = new Server(
+					Global.version, Options.main.getRegion(), "testserver",
+					Global.quickStartOnlineMap, Global.quickStartOnlineMap,
+					Global.quickStartOnlineGameMode, 100, Global.quickStartOnlineBotCount, 2, 300, false, false,
+					Global.quickStartNetcodeModel, Global.quickStartNetcodePing,
+					true, Global.quickStartMirrored, Global.quickStartTrainingLoadout,
+					Global.checksum, null, null, SavedMatchSettings.mainOffline.extraCpuCharData,
+					null, Global.quickStartDisableHtSt, Global.quickStartDisableVehicles, 2
+				);
 				HostMenu.createServer(Global.quickStartCharNum, serverData, null, false, new MainMenu(), out _);
 			} else if (Global.input.isPressed(Key.Num2)) {
 				Global.skipCharWepSel = true;
@@ -153,11 +160,16 @@ public class MainMenu : IMainMenu {
 				int botCount = selectedLevel.name == "training" ? Global.quickStartTrainingBotCount : Global.quickStartBotCount;
 				bool disableVehicles = selectedLevel.name == "training" ? Global.quickStartDisableVehiclesTraining : Global.quickStartDisableVehicles;
 
-				var localServer = new Server(Global.version, null, null, selectedLevel.name, selectedLevel.shortName, gameMode, Global.quickStartPlayTo, botCount, selectedLevel.maxPlayers, 0, false, false,
-					NetcodeModel.FavorAttacker, 200, true, Global.quickStartMirrored, Global.quickStartTrainingLoadout, Global.checksum, selectedLevel.checksum, selectedLevel.customMapUrl, SavedMatchSettings.mainOffline.extraCpuCharData, null,
-					Global.quickStartDisableHtSt, disableVehicles);
+				var localServer = new Server(
+					Global.version, null, null, selectedLevel.name, selectedLevel.shortName,
+					gameMode, Global.quickStartPlayTo, botCount, selectedLevel.maxPlayers, 0, false, false,
+					NetcodeModel.FavorAttacker, 200, true, Global.quickStartMirrored,
+					Global.quickStartTrainingLoadout, Global.checksum, selectedLevel.checksum,
+					selectedLevel.customMapUrl, SavedMatchSettings.mainOffline.extraCpuCharData, null,
+					Global.quickStartDisableHtSt, disableVehicles,
+					2
+				);
 				localServer.players = new List<ServerPlayer>() { me };
-
 				Global.level = new Level(localServer.getLevelData(), SelectCharacterMenu.playerData, localServer.extraCpuCharData, false);
 				Global.level.teamNum = localServer.teamNum;
 				Global.level.startLevel(localServer, false);

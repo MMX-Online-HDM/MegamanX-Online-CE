@@ -11,7 +11,7 @@
 		<ImplicitUsings>false</ImplicitUsings>
 		<SelfContained>false</SelfContained>
 		<!--OutDir>./bin/anycpu/</OutDir-->
-		<RunWorkingDirectory>./bin/runenv/</RunWorkingDirectory>
+		<RunWorkingDirectory>./bin/win7-x64/</RunWorkingDirectory>
 		<OutputPath>./bin/</OutputPath>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<DebugType>embedded</DebugType>

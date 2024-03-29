@@ -220,9 +220,9 @@ public class RelayServer {
 				requestServer.hidden, requestServer.netcodeModel, requestServer.netcodeModelPing,
 				requestServer.isLAN, requestServer.mirrored, requestServer.useLoadout, requestServer.gameChecksum,
 				requestServer.customMapChecksum, requestServer.customMapUrl, requestServer.extraCpuCharData,
-				requestServer.customMatchSettings, requestServer.disableHtSt, requestServer.disableVehicles
+				requestServer.customMatchSettings, requestServer.disableHtSt, requestServer.disableVehicles,
+				requestServer.teamNum
 			);
-			server.teamNum = requestServer.teamNum;
 			server.start();
 			Server.servers[server] = true;
 			client.SendStringMessage("CreateServer:" + JsonConvert.SerializeObject(server), networkStream);

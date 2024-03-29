@@ -76,9 +76,9 @@ public class MatchmakingQuerier {
 			LevelData.getChecksumFromName(serverData.level),
 			LevelData.getCustomMapUrlFromName(serverData.level),
 			serverData.extraCpuCharData, serverData.customMatchSettings,
-			serverData.disableHtSt, serverData.disableVehicles
+			serverData.disableHtSt, serverData.disableVehicles,
+			serverData.teamNum
 		);
-		requestServer.teamNum = serverData.teamNum;
 
 		var response = send(serverData.region.ip, "CreateServer:" + JsonConvert.SerializeObject(requestServer), "CreateServer");
 		if (!string.IsNullOrEmpty(response)) {
