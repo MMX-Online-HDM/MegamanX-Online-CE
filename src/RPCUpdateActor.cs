@@ -66,22 +66,20 @@ public partial class Actor {
 		byte[] spriteBytes = BitConverter.GetBytes((ushort)spriteIndex);
 		args.AddRange(spriteBytes);
 
-		// add character stuff
+		// Add character stuff
 		if (this is Character character) {
 			// This gets parsed in RPCUpdateActor
-			List<bool> charMask = new List<bool>();
-			for (int i = 0; i < 8; i++) charMask.Add(false);
+			bool[] charMask = new bool[8];
+			charMask[0] = character.acidTime > 0;
+			charMask[1] = character.burnTime > 0;
+			charMask[2] = character.chargeTime > 0;
+			charMask[3] = character.igFreezeProgress > 0;
+			charMask[4] = character.oilTime > 0;
+			charMask[5] = character.infectedTime > 0;
+			charMask[6] = character.vaccineTime > 0;
+			charMask[7] = false;
+			byte charMaskByte = Helpers.boolArrayToByte(charMask);
 
-			charMask[0] = character.player.isX;
-			charMask[1] = character.player.isVile;
-			charMask[2] = character.player.isAxl;
-			charMask[3] = character.acidTime > 0;
-			charMask[4] = character.burnTime > 0;
-			charMask[5] = character.chargeTime > 0;
-			charMask[6] = character.igFreezeProgress > 0;
-			charMask[7] = character.oilTime > 0 || character.infectedTime > 0 || character.vaccineTime > 0;
-
-			byte charMaskByte = Convert.ToByte(string.Join("", charMask.Select(b => b ? 1 : 0)), 2);
 			int weaponIndex = character.player.weapon.index;
 			if (weaponIndex == (int)WeaponIds.HyperBuster) {
 				weaponIndex = character.player.weapons[character.player.hyperChargeSlot].index;
@@ -96,11 +94,6 @@ public partial class Actor {
 			int ammo = character.player.weapon == null ? 0 : (int)character.player.weapon.ammo;
 			int charIndex = character.player.charNum;
 			int alliance = character.player.alliance;
-			if (character is Zero zero) {
-				ammo = MathInt.Ceiling(zero.zeroGigaAttackWeapon.ammo);
-			}
-			if (character.player.isVile) ammo = (int)character.player.vileAmmo;
-			if (character.player.isSigma) ammo = (int)character.player.sigmaAmmo;
 			if (character.rideArmor != null) ammo = MathInt.Ceiling(character.rideArmor.health);
 
 			args.Add(charMaskByte);
@@ -112,19 +105,20 @@ public partial class Actor {
 			args.Add((byte)alliance);
 			args.Add(character.updateAndGetNetCharState1());  // Packs bool states (BS's) into one byte
 			args.Add(character.updateAndGetNetCharState2());
+			args.Add((byte)character.player.currency);
 
-			if (charMask[0]) {
+			if (character is MegamanX mmx) {
 				byte[] armorBytes = BitConverter.GetBytes(character.player.armorFlag);
 				args.AddRange(armorBytes);
 			}
-
-			if (charMask[1]) {
-				Vile vile = character as Vile;
+			if (character is Zero zero) {
+				ammo = MathInt.Ceiling(zero.zeroGigaAttackWeapon.ammo);
+			}
+			if (character is Vile vile) {
+				ammo = (int)character.player.vileAmmo;
 				args.Add((byte)vile.cannonAimNum);
 			}
-
-			if (charMask[2]) {
-				Axl axl = character as Axl;
+			if (character is Axl axl) {
 				byte axlArmAngle = Helpers.angleToByte(axl.netArmAngle);
 				args.Add(axlArmAngle);
 				byte[] netAxlArmSpriteIndexBytes = BitConverter.GetBytes(
@@ -133,28 +127,31 @@ public partial class Actor {
 				args.AddRange(netAxlArmSpriteIndexBytes);
 				args.Add((byte)character.player.axlBulletType);
 			}
-
-			if (charMask[3]) {
+			if (character is BaseSigma sigma) {
+				ammo = (int)character.player.sigmaAmmo;
+			}
+			// Status effects.
+			if (charMask[0]) {
 				args.Add((byte)(int)(character.acidTime * 20));
 			}
-
-			if (charMask[4]) {
+			if (charMask[1]) {
 				args.Add((byte)(int)(character.burnTime * 20));
 			}
-
-			if (charMask[5]) {
+			if (charMask[2]) {
 				args.Add((byte)(int)(character.chargeTime * 20));
 			}
-
-			if (charMask[6]) {
+			if (charMask[3]) {
 				args.Add((byte)(int)(character.igFreezeProgress * 20));
 			}
-
 			// We don't have room for more individual status flags. So just cram all the rarest statuses in the 7th flag
 			// Gacel: What the actual hell GM19. We have room.
-			if (charMask[7]) {
+			if (charMask[5]) {
 				args.Add((byte)(int)(character.oilTime * 20));
+			}
+			if (charMask[6]) {
 				args.Add((byte)(int)(character.infectedTime * 20));
+			}
+			if (charMask[7]) {
 				args.Add((byte)(int)(character.vaccineTime * 20));
 			}
 
@@ -346,8 +343,7 @@ public class RPCUpdateActor : RPC {
 				if (actor is Character character) {
 					// char mask section
 					byte charMask = arguments[i++];
-					var charMaskBools = Convert.ToString(charMask, 2).Select(s => s.Equals('1')).ToList();
-					while (charMaskBools.Count < 8) charMaskBools.Insert(0, false);
+					bool[] charMaskBools = Helpers.byteToBoolArray(charMask);
 
 					// universal section
 					int weaponIndex = arguments[i++];
@@ -358,42 +354,39 @@ public class RPCUpdateActor : RPC {
 					int alliance = arguments[i++];
 					int netCharState1 = arguments[i++];
 					int netCharState2 = arguments[i++];
+					int currency = arguments[i++];
 
 					character.player.changeWeaponFromWi(weaponIndex);
 					character.player.health = health;
 					character.player.maxHealth = maxHealth;
-					if (character is Zero zero) {
-						zero.zeroGigaAttackWeapon.ammo = ammo;
-					} else if (character.player.isX) {
-						character.player.weapon.ammo = ammo;
-					} else if (character.player.isVile) {
-						character.player.vileAmmo = ammo;
-					} else if (character.player.isSigma) {
-						character.player.sigmaAmmo = ammo;
-					}
 					character.player.charNum = charIndex;
 					character.player.alliance = alliance;
 					character.netCharState1 = (byte)netCharState1;
 					character.netCharState2 = (byte)netCharState2;
+					character.player.currency = currency;
 
-					// X section
-					if (charMaskBools[0]) {
+					// X section.
+					if (character.player.isX && character is MegamanX) {
+						character.player.weapon.ammo = ammo;
 						byte armorByte = arguments[i++];
 						byte armorByte2 = arguments[i++];
 
-						character.player.armorFlag = BitConverter.ToUInt16(new byte[] { armorByte, armorByte2 });
+						character.player.armorFlag = BitConverter.ToUInt16(
+							new byte[] { armorByte, armorByte2 }
+						);
 					}
-
-					// Vile section
-					if (charMaskBools[1]) {
+					// Zero section.
+					if (character.player.isZero && character is Zero zero) {
+						zero.zeroGigaAttackWeapon.ammo = ammo;
+					}
+					// Vile section.
+					if (character.player.isVile && character is Vile vile) {
+						character.player.vileAmmo = ammo;
 						byte cannonByte = arguments[i++];
-						Vile vile = character as Vile;
 						vile.cannonAimNum = cannonByte;
 					}
-
-					// Axl section
-					if (charMaskBools[2]) {
-						Axl axl = character as Axl;
+					// Axl section.
+					if (character.player.isAxl && character is Axl axl) {
 						int axlArmAngle = arguments[i++];
 						axl.netArmAngle = axlArmAngle * 2;
 						byte netAxlArmSpriteIndexByte = arguments[i++];
@@ -404,49 +397,55 @@ public class RPCUpdateActor : RPC {
 						int axlBulletType = arguments[i++];
 						axl.player.axlBulletType = axlBulletType;
 					}
+					// Sigma section.
+					if (character.player.isSigma && character is BaseSigma sigma) {
+						character.player.sigmaAmmo = ammo;
+					}
 
 					// acid section
-					if (charMaskBools[3]) {
+					if (charMaskBools[0]) {
 						byte acidTime = arguments[i++];
 						character.acidTime = acidTime / 20f;
 					} else {
 						character.acidTime = 0;
 					}
-
 					// burn section
-					if (charMaskBools[4]) {
+					if (charMaskBools[1]) {
 						byte burnTime = arguments[i++];
 						character.burnTime = burnTime / 20f;
 					} else {
 						character.burnTime = 0;
 					}
-
 					// charge section
-					if (charMaskBools[5]) {
+					if (charMaskBools[2]) {
 						byte chargeTime = arguments[i++];
 						character.chargeTime = chargeTime / 20f;
 					} else {
 						character.chargeTime = 0;
 					}
-
-					if (charMaskBools[6]) {
+					if (charMaskBools[3]) {
 						byte igFreezeProgress = arguments[i++];
 						character.igFreezeProgress = igFreezeProgress / 20f;
 					} else {
 						character.igFreezeProgress = 0;
 					}
-
 					// all other statuses section
-					if (charMaskBools[7]) {
+					if (charMaskBools[4]) {
 						byte oilTime = arguments[i++];
 						character.oilTime = oilTime / 20f;
+					} else {
+						character.oilTime = 0;
+					}
+					if (charMaskBools[5]) {
 						byte infectedTime = arguments[i++];
 						character.infectedTime = infectedTime / 20f;
+					} else {
+						character.infectedTime = 0;
+					}
+					if (charMaskBools[6]) {
 						byte vaccineTime = arguments[i++];
 						character.vaccineTime = vaccineTime / 20f;
 					} else {
-						character.oilTime = 0;
-						character.infectedTime = 0;
 						character.vaccineTime = 0;
 					}
 
@@ -487,7 +486,9 @@ public class RPCUpdateActor : RPC {
 						byte isInvisible = arguments[i++];
 						sc.isInvisible = (isInvisible == 1);
 					} else if (actor is WireSponge ws) {
-						float chargeTime = BitConverter.ToSingle(new byte[] { arguments[i], arguments[i + 1], arguments[i + 2], arguments[i + 3] }, 0);
+						float chargeTime = BitConverter.ToSingle(
+							new byte[] { arguments[i], arguments[i + 1], arguments[i + 2], arguments[i + 3] }, 0
+						);
 						i += 4;
 						ws.chargeTime = chargeTime;
 					} else if (actor is WheelGator wg) {
@@ -612,7 +613,9 @@ public class RPCUpdateActor : RPC {
 					i += 4;
 					wellProj.maxRadius = maxRadius;
 				} else if (actor is VoltCSuckProj voltcSuckProj) {
-					ushort voltCatfishNetId = BitConverter.ToUInt16(new byte[] { arguments[i], arguments[i + 1] }, 0);
+					ushort voltCatfishNetId = BitConverter.ToUInt16(
+						new byte[] { arguments[i], arguments[i + 1] }, 0
+					);
 					i += 2;
 					voltcSuckProj.vc = Global.level.getActorByNetId(voltCatfishNetId) as VoltCatfish;
 				} else if (actor is BHornetCursorProj cursorProj) {

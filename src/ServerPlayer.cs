@@ -23,14 +23,15 @@ public class ServerPlayer {
 	[ProtoMember(15)] public int? startPing;
 
 	[JsonIgnore]
-	public NetConnection connection;
+	public NetConnection? connection;
 
 	[JsonIgnore]
 	public bool alreadyAutobalanced;
 
-	public ServerPlayer() { }
-
-	public ServerPlayer(string name, int id, bool isHost, int charNum, int? preferredAlliance, string deviceId, NetConnection connection, int? startPing) {
+	public ServerPlayer(
+		string name, int id, bool isHost, int charNum,
+		int? preferredAlliance, string deviceId, NetConnection? connection, int? startPing
+	) {
 		this.name = name;
 		this.id = id;
 		this.isHost = isHost;
@@ -52,7 +53,7 @@ public class JoinServerResponse {
 		this.server = server;
 	}
 	// Last player joined is always the requester
-	public ServerPlayer getLastPlayer() {
+	public ServerPlayer? getLastPlayer() {
 		var players = server.players;
 		for (int i = players.Count - 1; i >= 0; i--) {
 			if (!players[i].isBot) {

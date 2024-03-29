@@ -37,14 +37,16 @@ public class JoinMenuP2P : IMainMenu {
 	public void getServer() {
 		NetOutgoingMessage regMsg = netClient.CreateMessage();
 		regMsg.Write((byte)MasterServerMsg.HostList);
-		IPEndPoint masterServerLocation = NetUtility.Resolve(
+		IPEndPoint? masterServerLocation = NetUtility.Resolve(
 			MasterServerData.serverIp, MasterServerData.serverPort
 		);
-		netClient.SendUnconnectedMessage(regMsg, masterServerLocation);
+		if (masterServerLocation != null) {
+			netClient.SendUnconnectedMessage(regMsg, masterServerLocation);
+		}
 	}
 
 	public void update() {
-		NetIncomingMessage msg;
+		NetIncomingMessage? msg;
 		// Respond to connection messages.
 		while ((msg = netClient.ReadMessage()) != null) {
 			if (msg.MessageType == NetIncomingMessageType.UnconnectedData) {
@@ -120,7 +122,7 @@ public class JoinMenuP2P : IMainMenu {
 			Fonts.drawText(FontType.Blue, serverInfo[serverId].map, 102, 32 + offset);
 			Fonts.drawText(FontType.Blue,
 				serverInfo[serverId].playerCount + "/" + serverInfo[serverId].maxPlayer,
-				190, 32
+				190, 32 + offset
 			);
 			Fonts.drawText(FontType.Blue, serverInfo[serverId].mode, 238, 32 + offset);
 			Fonts.drawText(FontType.Blue, serverInfo[serverId].fork, 326, 32 + offset);
@@ -147,13 +149,19 @@ public class JoinMenuP2P : IMainMenu {
 		while (msg.ReadByte() == 1) {
 			long key = msg.ReadInt64();
 			serverList[key] = (msg.ReadIPEndPoint(), msg.ReadIPEndPoint());
+			string name = msg.ReadString();
+			byte maxPlayer = msg.ReadByte();
+			byte playerCount = msg.ReadByte();
+			string mode = msg.ReadString();
+			string map = msg.ReadString();
+			string fork = msg.ReadString();
 			serverInfo[key] = new SimpleServerInfo(
-				name: msg.ReadString(),
-				maxPlayer: msg.ReadByte(),
-				playerCount: msg.ReadByte(),
-				mode: msg.ReadString(),
-				map: msg.ReadString(),
-				fork: msg.ReadString()
+				name,
+				maxPlayer,
+				playerCount,
+				mode,
+				map,
+				fork
 			);
 			serverKeys.Add(key);
 		}
@@ -164,7 +172,10 @@ public class JoinMenuP2P : IMainMenu {
 		long severId = msg.ReadInt64();
 		string jsonString = msg.ReadString();
 		IPEndPoint ipEndPoint = msg.ReadIPEndPoint();
-		SimpleServerData serverDetails = JsonConvert.DeserializeObject<SimpleServerData>(jsonString);
+		SimpleServerData? serverDetails = JsonConvert.DeserializeObject<SimpleServerData>(jsonString);
+		if (serverDetails == null) {
+			throw new NullReferenceException("Error deserializing server details.");
+		}
 		return (severId, serverDetails, ipEndPoint);
 	}
 
@@ -172,10 +183,12 @@ public class JoinMenuP2P : IMainMenu {
 		NetOutgoingMessage regMsg = netClient.CreateMessage();
 		regMsg.Write((byte)MasterServerMsg.RequestDetails);
 		regMsg.Write(serverId);
-		IPEndPoint masterServerLocation = NetUtility.Resolve(
+		IPEndPoint? masterServerLocation = NetUtility.Resolve(
 			MasterServerData.serverIp, MasterServerData.serverPort
 		);
-		netClient.SendUnconnectedMessage(regMsg, masterServerLocation);
+		if (masterServerLocation != null) {
+			netClient.SendUnconnectedMessage(regMsg, masterServerLocation);
+		}
 	}
 
 	public void joinServer(long serverId, SimpleServerData serverdata, IPEndPoint ipEndPoint) {
@@ -286,10 +299,6 @@ public class SimpleServerData {
 	public string customMapChecksum;
 	public string customMapUrl;
 
-	public SimpleServerData() {
-
-	}
-
 	public SimpleServerData(
 		string name, string level, decimal gameVersion,
 		string gameChecksum, string customMapChecksum, string customMapUrl
@@ -311,10 +320,10 @@ public class SimpleServerInfo {
 	public string map;
 	public string fork;
 
-	public SimpleServerInfo(string name, byte playerCount, byte maxPlayer, string mode, string map, string fork) {
+	public SimpleServerInfo(string name, byte maxPlayer, byte playerCount, string mode, string map, string fork) {
 		this.name = name;
-		this.playerCount = playerCount;
 		this.maxPlayer = maxPlayer;
+		this.playerCount = playerCount;
 		this.mode = mode;
 		this.map = map;
 		this.fork = fork;
@@ -404,7 +413,7 @@ public class ConnectionWaitMenuP2P : IMainMenu {
 	}
 
 	public void joinServerLoop() {
-		NetIncomingMessage msg;
+		NetIncomingMessage? msg;
 		// Respond to connection messages.
 		for (int i = 0; i <= 50; i++) {
 			while ((msg = joinMenu.netClient.ReadMessage()) != null) {
