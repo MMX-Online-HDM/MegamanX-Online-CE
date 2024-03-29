@@ -740,6 +740,12 @@ public class Zero : Character {
 			if (grounded) zeroShootSprite = "zero_shoot";
 			else zeroShootSprite = "zero_fall_shoot";
 		}
+		// Zero MMXOD Vanilla intended balance: Z-Buster Cancel on Zerofallstabland
+		if (shootAnimTime == 0f && (		
+			charState is ZeroFallStabLand 
+		)) {
+			changeToIdleOrFall();
+		}
 		bool hasShootSprite = !string.IsNullOrEmpty(charState.shootSprite);
 		if (shootAnimTime == 0) {
 			if (hasShootSprite) {
