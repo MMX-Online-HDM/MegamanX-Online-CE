@@ -257,6 +257,9 @@ public partial class Player {
 	public int[] charCurrency = new int[maxCharCurrencyId];
 	public int currency {
 		get {
+			if (!ownedByLocalPlayer) {
+				return charCurrency[isDisguisedAxl ? 3 : charNum];
+			}
 			if (charCurrencyBackup[isDisguisedAxl ? 3 : charNum] / curMul
 				!=
 				charCurrency[isDisguisedAxl ? 3 : charNum]
