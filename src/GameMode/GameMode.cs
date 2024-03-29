@@ -645,9 +645,9 @@ public class GameMode {
 				drawGigaWeaponCooldown(50, cooldown, y: 170);
 			}
 			if (drawPlayer.weapons.Count > 1) {
-				drawWeaponSwitchHUD();
+				drawWeaponSwitchHUD(drawPlayer);
 			} else if (drawPlayer.weapons.Count == 1 && drawPlayer.weapons[0] is MechMenuWeapon mmw) {
-				drawWeaponSwitchHUD();
+				drawWeaponSwitchHUD(drawPlayer);
 			}
 		}
 
@@ -1665,28 +1665,31 @@ public class GameMode {
 		}
 	}
 
-	public void drawWeaponSwitchHUD() {
-		if (level.mainPlayer.isZero && !level.mainPlayer.isDisguisedAxl) return;
+	public void drawWeaponSwitchHUD(Player player) {
+		if (player.isZero && !player.isDisguisedAxl) return;
 
-		if (level.mainPlayer.isSelectingRA()) {
+		if (player.isSelectingRA()) {
 			drawRideArmorIcons();
 		}
 
-		if (mainPlayer.isVile && mainPlayer.character != null && mainPlayer.character.rideArmor != null && mainPlayer.character.rideArmor == mainPlayer.character.vileStartRideArmor
-			&& mainPlayer.character.rideArmor.raNum == 2) {
+		if (player.isVile && player.character != null &&
+			player.character.rideArmor != null &&
+			player.character.rideArmor == player.character.vileStartRideArmor
+			&& player.character.rideArmor.raNum == 2
+		) {
 			int x = 10, y = 155;
-			int napalmNum = mainPlayer.loadout.vileLoadout.napalm;
+			int napalmNum = player.loadout.vileLoadout.napalm;
 			if (napalmNum < 0) napalmNum = 0;
 			if (napalmNum > 2) napalmNum = 0;
 			Global.sprites["hud_hawk_bombs"].drawToHUD(
-				napalmNum, x, y, alpha: mainPlayer.vileNapalmWeapon.shootTime == 0 ? 1 : 0.5f
+				napalmNum, x, y, alpha: player.vileNapalmWeapon.shootTime == 0 ? 1 : 0.5f
 			);
 			Fonts.drawText(
-				FontType.Grey, "x" + mainPlayer.character.rideArmor.hawkBombCount.ToString(), x + 10, y - 4
+				FontType.Grey, "x" + player.character.rideArmor.hawkBombCount.ToString(), x + 10, y - 4
 			);
 		}
 
-		if (level.mainPlayer.character?.rideArmor != null || level.mainPlayer.character?.rideChaser != null) {
+		if (player.character?.rideArmor != null || player.character?.rideChaser != null) {
 			return;
 		}
 
@@ -1694,40 +1697,55 @@ public class GameMode {
 		var iconH = 8;
 		var width = 20;
 
-		var startX = getWeaponSlotStartX(ref iconW, ref iconH, ref width);
+		var startX = getWeaponSlotStartX(player, ref iconW, ref iconH, ref width);
 		var startY = Global.screenH - 12;
 
-		MegamanX mmx = mainPlayer.character as MegamanX;
-		if (mmx != null && mmx.hasFgMoveEquipped() && mmx.canAffordFgMove()) {
-			int x = 10, y = 159;
+		int gigaWeaponX = 11;
+
+		if (player.isX && Options.main.gigaCrushSpecial) {
+			Weapon? gigaCrush = player.weapons.FirstOrDefault((Weapon w) => w is GigaCrush);
+			if (gigaCrush != null) {
+				drawWeaponSlot(gigaCrush, gigaWeaponX, 159);
+				gigaWeaponX += 18;
+			}
+		}
+		if (player.isX && Options.main.novaStrikeSpecial) {
+			Weapon? novaStrike = player.weapons.FirstOrDefault((Weapon w) => w is NovaStrike);
+			if (novaStrike != null) {
+				drawWeaponSlot(novaStrike, gigaWeaponX, 159);
+				gigaWeaponX += 18;
+			}
+		}
+		if (player.character is MegamanX mmx && mmx.hasFgMoveEquipped() && mmx.canAffordFgMove()) {
+			int x = gigaWeaponX, y = 159;
 			Global.sprites["hud_weapon_icon"].drawToHUD(mmx.hasHadoukenEquipped() ? 112 : 113, x, y);
-			float cooldown = Helpers.progress(mainPlayer.fgMoveAmmo, 32f);
+			float cooldown = Helpers.progress(player.fgMoveAmmo, 32f);
 			drawWeaponSlotCooldown(x, y, cooldown);
 		}
 
-		if (mainPlayer.isAxl && mainPlayer.weapons[0].type > 0) {
+		if (player.isAxl && player.weapons[0].type > 0) {
 			int x = 10, y = 156;
 			int index = 0;
-			if (mainPlayer.weapons[0].type == (int)AxlBulletWeaponType.MetteurCrash) index = 0;
-			if (mainPlayer.weapons[0].type == (int)AxlBulletWeaponType.BeastKiller) index = 1;
-			if (mainPlayer.weapons[0].type == (int)AxlBulletWeaponType.MachineBullets) index = 2;
-			if (mainPlayer.weapons[0].type == (int)AxlBulletWeaponType.DoubleBullets) index = 3;
-			if (mainPlayer.weapons[0].type == (int)AxlBulletWeaponType.RevolverBarrel) index = 4;
-			if (mainPlayer.weapons[0].type == (int)AxlBulletWeaponType.AncientGun) index = 5;
+			if (player.weapons[0].type == (int)AxlBulletWeaponType.MetteurCrash) index = 0;
+			if (player.weapons[0].type == (int)AxlBulletWeaponType.BeastKiller) index = 1;
+			if (player.weapons[0].type == (int)AxlBulletWeaponType.MachineBullets) index = 2;
+			if (player.weapons[0].type == (int)AxlBulletWeaponType.DoubleBullets) index = 3;
+			if (player.weapons[0].type == (int)AxlBulletWeaponType.RevolverBarrel) index = 4;
+			if (player.weapons[0].type == (int)AxlBulletWeaponType.AncientGun) index = 5;
 			Global.sprites["hud_axl_ammo"].drawToHUD(index, x, y);
-			int currentAmmo = MathInt.Ceiling(mainPlayer.weapons[0].ammo);
-			int totalAmmo = MathInt.Ceiling(mainPlayer.axlBulletTypeAmmo[mainPlayer.weapons[0].type]);
+			int currentAmmo = MathInt.Ceiling(player.weapons[0].ammo);
+			int totalAmmo = MathInt.Ceiling(player.axlBulletTypeAmmo[player.weapons[0].type]);
 			Fonts.drawText(
 				FontType.Grey, totalAmmo.ToString(), x + 10, y - 4
 			);
 		}
 
-		if (level.mainPlayer.isGridModeEnabled()) {
-			if (level.mainPlayer.gridModeHeld == true) {
-				var gridPoints = level.mainPlayer.gridModePoints();
-				for (var i = 0; i < level.mainPlayer.weapons.Count && i < 9; i++) {
+		if (player.isGridModeEnabled()) {
+			if (player.gridModeHeld == true) {
+				var gridPoints = player.gridModePoints();
+				for (var i = 0; i < player.weapons.Count && i < 9; i++) {
 					Point pos = gridPoints[i];
-					var weapon = level.mainPlayer.weapons[i];
+					var weapon = player.weapons[i];
 					var x = Global.halfScreenW + (pos.x * 20);
 					var y = Global.screenH - 30 + pos.y * 20;
 
@@ -1737,60 +1755,80 @@ public class GameMode {
 
 			/*
 			// Draw giga crush/hyper buster
-			if (level.mainPlayer.weapons.Count == 10)
+			if (player.weapons.Count == 10)
 			{
 				int x = 10, y = 146;
-				Weapon weapon = level.mainPlayer.weapons[9];
+				Weapon weapon = player.weapons[9];
 
 				drawWeaponSlot(weapon, x, y);
 
 				//Global.sprites["hud_weapon_icon"].drawToHUD(weapon.weaponSlotIndex, x, y);
-				//DrawWrappers.DrawRectWH(x - 8, y - 8, 16, 16 - MathF.Floor(16 * (weapon.ammo / weapon.maxAmmo)), true, new Color(0, 0, 0, 128), 1, ZIndex.HUD, false);
+				//DrawWrappers.DrawRectWH(
+					//x - 8, y - 8, 16, 16 - MathF.Floor(16 * (weapon.ammo / weapon.maxAmmo)),
+					//true, new Color(0, 0, 0, 128), 1, ZIndex.HUD, false
+				//);
 			}
 			*/
-
 			return;
 		}
 
-		for (var i = 0; i < level.mainPlayer.weapons.Count; i++) {
-			var weapon = level.mainPlayer.weapons[i];
+		for (var i = 0; i < player.weapons.Count; i++) {
+			var weapon = player.weapons[i];
 			var x = startX + (i * width);
 			var y = startY;
-
 			if (weapon is HyperBuster hb) {
-				bool canShootHyperBuster = hb.canShootIncludeCooldown(level.mainPlayer);
+				bool canShootHyperBuster = hb.canShootIncludeCooldown(player);
 				Color lineColor = canShootHyperBuster ? Color.White : Helpers.Gray;
 
-				float slotPosX = startX + (level.mainPlayer.hyperChargeSlot * width);
+				float slotPosX = startX + (player.hyperChargeSlot * width);
 				int yOff = -1;
 
 				// Stretch black
-				DrawWrappers.DrawRect(slotPosX, y - 9 + yOff, x, y - 12 + yOff, true, Color.Black, 1, ZIndex.HUD, false);
-
+				DrawWrappers.DrawRect(
+					slotPosX, y - 9 + yOff, x, y - 12 + yOff,
+					true, Color.Black, 1, ZIndex.HUD, false
+				);
 				// Right
-				DrawWrappers.DrawRect(x - 1, y - 7, x + 2, y - 12 + yOff, true, Color.Black, 1, ZIndex.HUD, false);
-				DrawWrappers.DrawRect(x, y - 8, x + 1, y - 11 + yOff, true, lineColor, 1, ZIndex.HUD, false);
-
+				DrawWrappers.DrawRect(
+					x - 1, y - 7, x + 2, y - 12 + yOff,
+					true, Color.Black, 1, ZIndex.HUD, false
+				);
+				DrawWrappers.DrawRect(
+					x, y - 8, x + 1, y - 11 + yOff,
+					true, lineColor, 1, ZIndex.HUD, false
+				);
 				// Left
-				DrawWrappers.DrawRect(slotPosX - 1, y - 7, slotPosX + 2, y - 12 + yOff, true, Color.Black, 1, ZIndex.HUD, false);
-				DrawWrappers.DrawRect(slotPosX, y - 8, slotPosX + 1, y - 11 + yOff, true, lineColor, 1, ZIndex.HUD, false);
-
+				DrawWrappers.DrawRect(
+					slotPosX - 1, y - 7, slotPosX + 2, y - 12 + yOff,
+					true, Color.Black, 1, ZIndex.HUD, false
+				);
+				DrawWrappers.DrawRect(
+					slotPosX, y - 8, slotPosX + 1, y - 11 + yOff,
+					true, lineColor, 1, ZIndex.HUD, false
+				);
 				// Stretch white
-				DrawWrappers.DrawRect(slotPosX, y - 10 + yOff, x, y - 11 + yOff, true, lineColor, 1, ZIndex.HUD, false);
-
+				DrawWrappers.DrawRect(
+					slotPosX, y - 10 + yOff, x, y - 11 + yOff,
+					true, lineColor, 1, ZIndex.HUD, false
+				);
 				break;
 			}
 		}
 
-		for (var i = 0; i < level.mainPlayer.weapons.Count; i++) {
-			var weapon = level.mainPlayer.weapons[i];
+		for (var i = 0; i < player.weapons.Count; i++) {
+			var weapon = player.weapons[i];
 			var x = startX + (i * width);
 			var y = startY;
-
+			if (player.isX && Options.main.gigaCrushSpecial && weapon is GigaCrush) {
+				continue;
+			}
+			if (player.isX && Options.main.novaStrikeSpecial && weapon is NovaStrike) {
+				continue;
+			}
 			drawWeaponSlot(weapon, x, y);
 		}
 
-		if (level.mainPlayer.isSelectingCommand()) {
+		if (player == mainPlayer && mainPlayer.isSelectingCommand()) {
 			drawMaverickCommandIcons();
 		}
 	}
@@ -2160,18 +2198,22 @@ public class GameMode {
 		}
 	}
 
-	public float getWeaponSlotStartX(ref int iconW, ref int iconH, ref int width) {
-		int weaponsOver3 = level.mainPlayer.weapons.Count - 3;
-		int overboard = 9;
-		if (weaponsOver3 > overboard) {
-			width = weaponsOver3 > overboard ? 10 : 20;
-			iconW = 7;
-			iconH = 7;
+	public float getWeaponSlotStartX(Player player, ref int iconW, ref int iconH, ref int width) {
+		int weaponCountOff = player.weapons.Count - 1;
+		if (mainPlayer.isX && Options.main.gigaCrushSpecial) {
+			weaponCountOff = player.weapons.Count((Weapon w) => w is not GigaCrush) - 1;
+		}
+		int weaponOffset = 0;
+		float halfSize = width / 2f;
+		if (weaponCountOff + 1 >= 20) {
+			width -= weaponCountOff + 1 - 20;
+			halfSize = width / 2f;
+		}
+		if (weaponCountOff > 0) {
+			weaponOffset = MathInt.Floor(halfSize * weaponCountOff);
 		}
 
-		var startX = MathF.Round(Global.screenW * 0.43f) - (weaponsOver3 * width * 0.5f);
-
-		return startX;
+		return Global.halfScreenW - weaponOffset;
 	}
 
 	public void drawMaverickCommandIcons() {
@@ -2181,7 +2223,7 @@ public class GameMode {
 		var iconW = 8;
 		var iconH = 8;
 
-		float startX = getWeaponSlotStartX(ref iconW, ref iconH, ref width) + (mwIndex * 20);
+		float startX = getWeaponSlotStartX(mainPlayer, ref iconW, ref iconH, ref width) + (mwIndex * 20);
 		float startY = Global.screenH - 12;
 
 		for (int i = 0; i < MaverickWeapon.maxCommandIndex; i++) {

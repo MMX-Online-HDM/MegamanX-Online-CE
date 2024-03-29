@@ -252,13 +252,22 @@ public partial class Player {
 
 	// Currency
 	public const int maxCharCurrencyId = 5;
+	public static int curMul = Helpers.randomRange(2, 8);
+	public int[] charCurrencyBackup = new int[maxCharCurrencyId];
 	public int[] charCurrency = new int[maxCharCurrencyId];
 	public int currency {
 		get {
+			if (charCurrencyBackup[isDisguisedAxl ? 3 : charNum] / curMul
+				!=
+				charCurrency[isDisguisedAxl ? 3 : charNum]
+			) {
+				throw new Exception("Error, corrupted currency value");
+			}
 			return charCurrency[isDisguisedAxl ? 3 : charNum];
 		}
 		set {
 			charCurrency[isDisguisedAxl ? 3 : charNum] = value;
+			charCurrencyBackup[isDisguisedAxl ? 3 : charNum] = value * curMul;
 		}
 	}
 
@@ -551,6 +560,7 @@ public partial class Player {
 
 		for (int i = 0; i < charCurrency.Length; i++) {
 			charCurrency[i] = getStartCurrency();
+			charCurrencyBackup[i] = getStartCurrency() * curMul;
 		}
 		foreach (var key in charHeartTanks.Keys) {
 			int htCount = getStartHeartTanksForChar();

@@ -1039,8 +1039,10 @@ public class WSpongeChargeState : MaverickState {
 
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
-		(maverick as WireSponge).chargeTime = 0;
-		if (!chargeSound.deleted) {
+		if (maverick is WireSponge sponge) {
+			sponge.chargeTime = 0;
+		}
+		if (chargeSound != null && !chargeSound.deleted) {
 			chargeSound.sound.Stop();
 		}
 		RPC.stopSound.sendRpc("wspongeCharge", maverick.netId);

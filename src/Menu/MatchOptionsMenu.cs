@@ -478,7 +478,11 @@ public class MatchOptionsMenu : IMainMenu {
 	}
 
 	private bool canSpectate() {
-		if (Global.level.mainPlayer.isSpectator && Global.level.players.Count(p => !p.isSpectator) >= Global.level.server.maxPlayers) return false;
+		if (Global.level.mainPlayer.isSpectator &&
+			Global.level.players.Count(p => !p.isSpectator) >= Global.level.server.maxPlayers
+		) {
+			return false;
+		}
 		if (Global.level.is1v1()) return false;
 		if (!Global.level.isElimination() && Global.level.mainPlayer.isSpectator) return true;
 		if (Global.level.isElimination() && Global.level.mainPlayer.isSpectator) return false;
@@ -490,7 +494,7 @@ public class MatchOptionsMenu : IMainMenu {
 			int[] teamteamSizes = GameMode.getAllianceCounts(
 				Global.level.nonSpecPlayers(), Global.level.teamNum
 			);
-			if (teamteamSizes.Max() - 1 >= teamteamSizes.Where(x => x != 0).Min()) {
+			if (teamteamSizes.Max() >= teamteamSizes.Where(x => x != 0).Min()) {
 				return true;
 			}
 			return false;

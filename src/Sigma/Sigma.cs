@@ -199,8 +199,8 @@ public abstract class BaseSigma : Character {
 
 		if (player.currentMaverick == null && !isTagTeam) {
 			if (player.weapon is MaverickWeapon mw &&
-			(!isStriker || mw.cooldown == 0) && (shootPressed || spcPressed)
-		) {
+				(!isStriker || mw.cooldown == 0) && (shootPressed || spcPressed)
+			) {
 				if (mw.maverick == null) {
 					if (canAffordMaverick(mw)) {
 						if (!(charState is Idle || charState is Run || charState is Crouch)) return;
@@ -242,7 +242,7 @@ public abstract class BaseSigma : Character {
 					} else {
 						cantAffordMaverickMessage();
 					}
-				} else if (isSummoner) {
+				} else if (isSummoner && !mw.isMenuOpened) {
 					if (shootPressed && mw.shootTime == 0) {
 						mw.shootTime = MaverickWeapon.summonerCooldown;
 						changeState(new CallDownMaverick(mw.maverick, false, false), true);
@@ -391,7 +391,8 @@ public abstract class BaseSigma : Character {
 			return;
 		}
 		if (player.weapon is MaverickWeapon && (
-			player.input.isHeld(Control.Shoot, player) || player.input.isHeld(Control.Special1, player))
+			player.input.isHeld(Control.Shoot, player) ||
+			player.input.isHeld(Control.Special1, player))
 		) {
 			return;
 		}
@@ -407,6 +408,9 @@ public abstract class BaseSigma : Character {
 			return;
 		}
 		*/
+		if (player.weapon is MaverickWeapon mw2 && player.input.isPressed(Control.Special2, player)) {
+			mw2.isMenuOpened = true;
+		}
 	}
 
 	public override bool normalCtrl() {
