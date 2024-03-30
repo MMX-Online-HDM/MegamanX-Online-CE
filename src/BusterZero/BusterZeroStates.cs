@@ -2,6 +2,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using SFML.Graphics;
 
 namespace MMXOnline;
 
@@ -220,5 +221,69 @@ public class BusterZeroHadangeki : CharState {
 	public override void onExit(CharState oldState) {
 		base.onEnter(oldState);
 		zero.zSaberCooldown = 36f/60f;
+	}
+}
+
+
+public class HyperBusterZeroStart : CharState {
+	public float radius = 200;
+	public float time;
+	[AllowNull]
+	BusterZero zero;
+
+	public HyperBusterZeroStart() : base("hyper_start") {
+		invincible = true;
+	}
+
+	public override void update() {
+		base.update();
+		if (time == 0) {
+			if (radius >= 0) {
+				radius -= Global.spf * 200;
+			} else {
+				time = Global.spf;
+				radius = 0;
+				zero.isBlackZero = true;
+				character.playSound("ching");
+				character.fillHealthToMax();
+			}
+		} else {
+			time += Global.spf;
+			if (time >= 1) {
+				character.changeState(new Idle(), true);
+			}
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		zero = character as BusterZero;
+		if (zero == null) {
+			throw new NullReferenceException();
+		}
+		character.useGravity = false;
+		character.vel = new Point();
+		if (zero == null) {
+			throw new NullReferenceException();
+		}
+
+		character.player.currency -= 10;
+		character.playSound("BlackZeroEntry", forcePlay: false, sendRpc: true);
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+		if (character != null) {
+			character.invulnTime = 0.5f;
+		}
+	}
+
+	public override void render(float x, float y) {
+		base.render(x, y);
+		Point pos = character.getCenterPos();
+		DrawWrappers.DrawCircle(
+			pos.x + x, pos.y + y, radius, false, Color.White, 5, character.zIndex + 1, true, Color.White
+		);
 	}
 }
