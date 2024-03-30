@@ -20,6 +20,7 @@ public class BusterZeroMelee : CharState {
 	public override void update() {
 		base.update();
 		if (character.frameIndex >= 4 && !fired) {
+			fired = true;
 			character.playSound("ZeroSaberX3", sendRpc: true);
 		}
 		if (character.isAnimOver()) {
@@ -44,10 +45,9 @@ public class BusterZeroMelee : CharState {
 		if (zero == null) {
 			throw new NullReferenceException();
 		}
-		character.playSound("ZeroSaberX3", sendRpc: true);
 		if (!character.grounded || character.vel.y < 0) {
 			sprite = "projswing_air";
-			character.changeSprite(sprite, true);
+			character.changeSpriteFromName(sprite, true);
 		}
 	}
 
@@ -212,7 +212,8 @@ public class BusterZeroHadangeki : CharState {
 		}
 		if (!character.grounded || character.vel.y < 0) {
 			sprite = "projswing_air";
-			character.changeSprite(sprite, true);
+			defaultSprite = sprite;
+			character.changeSpriteFromName(sprite, true);
 		}
 	}
 

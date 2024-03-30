@@ -538,15 +538,12 @@ public partial class Character : Actor, IDamagable {
 		return true;
 	}
 
-	public bool canAirDash() {
-		return dashedInAir == 0 || (dashedInAir == 1 && player.isX && player.hasChip(0));
+	public virtual bool canAirDash() {
+		return dashedInAir == 0;
 	}
 
-	public bool canAirJump() {
-		if (this is not Zero zero) {
-			return false;
-		}
-		return dashedInAir == 0 || (dashedInAir == 1 && zero.isBlackZero2());
+	public virtual bool canAirJump() {
+		return false;
 	}
 
 	public virtual bool canWallClimb() {

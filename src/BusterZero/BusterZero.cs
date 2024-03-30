@@ -230,4 +230,12 @@ public class BusterZero : Character {
 		}
 		return dashSpeed * getRunDebuffs();
 	}
+
+	public override bool canAirDash() {
+		return dashedInAir == 0 || (dashedInAir == 1 && isBlackZero);
+	}
+
+	public override bool canAirJump() {
+		return dashedInAir == 0 || (dashedInAir == 1 && isBlackZero);
+	}
 }

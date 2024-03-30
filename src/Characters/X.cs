@@ -1216,6 +1216,10 @@ public partial class MegamanX : Character {
 		return player.input.isHeld(Control.Shoot, player);
 	}
 
+	public override bool canAirDash() {
+		return dashedInAir == 0 || (dashedInAir == 1 && player.hasChip(0));
+	}
+
 	public override string getSprite(string spriteName) {
 		return "mmx_" + spriteName;
 	}
