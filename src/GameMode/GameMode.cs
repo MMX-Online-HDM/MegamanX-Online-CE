@@ -1835,15 +1835,11 @@ public class GameMode {
 
 	public void drawZeroGigaCooldown(Player player) {
 		// This runs once per character.
-		Weapon weapon = player.lastHudWeapon;
-		if (player.character != null) {
-			weapon = player.weapon;
-			if (player.character is Zero zero && !player.isZBusterZero()) {
-				weapon = zero.zeroGigaAttackWeapon;
-			}
-			player.lastHudWeapon = weapon;
+		Weapon? weapon = null;
+		if (player.character is Zero zero) {
+			weapon = zero.zeroGigaAttackWeapon;
 		}
-		if (weapon.shootTime <= 0) {
+		if (weapon == null || weapon.shootTime <= 0) {
 			return;
 		}
 		float cooldown = Helpers.progress(weapon.shootTime, weapon.rateOfFire);
