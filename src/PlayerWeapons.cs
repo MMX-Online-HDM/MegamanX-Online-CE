@@ -340,6 +340,7 @@ label:
 					if (hasBodyArmor(2)) weapons.Add(new GigaCrush());
 					if (hasUltimateArmor()) weapons.Add(new NovaStrike(this));
 				}
+				/* Removed X AI having all weapons
 				else if (isAI) {
 						weapons.Add(new Buster());
 						weapons.Add(new Torpedo());
@@ -369,6 +370,7 @@ label:
 					if (hasArmArmor(3)) weapons.Add(new HyperBuster());
 					if (hasBodyArmor(2)) weapons.Add(new GigaCrush());
 					}
+				*/
 				 else if (Global.level.is1v1()) {
 					if (xArmor1v1 == 1) {
 						weapons.Add(new Buster());
@@ -465,6 +467,7 @@ label:
 					weapons.Add(new IceGattling(axlLoadout.iceGattlingAlt));
 					weapons.Add(new FlameBurner(axlLoadout.flameBurnerAlt));
 				}
+				/* Removed Axl AI having all weapons
 				else if (isAI) {
 					weapons.Add(new AxlBullet());
 					weapons.Add(new RayGun(axlLoadout.rayGunAlt));
@@ -475,7 +478,7 @@ label:
 					weapons.Add(new PlasmaGun(axlLoadout.plasmaGunAlt));
 				//	weapons.Add(new IceGattling(axlLoadout.iceGattlingAlt));
 					weapons.Add(new FlameBurner(axlLoadout.flameBurnerAlt));}
-
+				*/
 				 else {
 					weapons = loadout.axlLoadout.getWeaponsFromLoadout();
 					weapons.Insert(0, getAxlBullet(axlBulletType));
