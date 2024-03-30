@@ -55,10 +55,10 @@ public class GameMode {
 		FontType.Orange
 	};
 
-	public VoteKick currentVoteKick;
+	public VoteKick? currentVoteKick;
 	public float voteKickCooldown;
 
-	public string dpsString;
+	public string dpsString = "";
 	public Level level;
 	public float eliminationTime;
 	public float localElimTimeInc;  // Used to "client side predict" the elimination time increase.
@@ -68,9 +68,9 @@ public class GameMode {
 	bool loggedStatsOnce;
 	float goTime;
 
-	public Player mainPlayer { get { return level?.mainPlayer; } }
+	public Player mainPlayer { get { return level.mainPlayer; } }
 
-	public RPCMatchOverResponse matchOverResponse;
+	public RPCMatchOverResponse? matchOverResponse;
 	public bool isOver { get { return matchOverResponse != null; } }
 
 	public int lastTimeInt;
@@ -87,20 +87,20 @@ public class GameMode {
 	public List<string> killFeedHistory = new List<string>();
 
 	bool removedGates;
-	public HostMenu nextMatchHostMenu;
+	public HostMenu? nextMatchHostMenu;
 
 	float flashTime;
 	float flashCooldown;
 
 	public float hudErrorMsgTime;
-	string hudErrorMsg;
+	string hudErrorMsg = "";
 
-	public Player hudTopLeftPlayer;
-	public Player hudTopRightPlayer;
-	public Player hudLeftPlayer;
-	public Player hudRightPlayer;
-	public Player hudBotLeftPlayer;
-	public Player hudBotRightPlayer;
+	public Player? hudTopLeftPlayer;
+	public Player? hudTopRightPlayer;
+	public Player? hudLeftPlayer;
+	public Player? hudRightPlayer;
+	public Player? hudBotLeftPlayer;
+	public Player? hudBotRightPlayer;
 
 	bool hudPositionsAssigned;
 	int currentLineH;
@@ -124,7 +124,7 @@ public class GameMode {
 			if (virusStarted == 0) {
 				return new Rect(0, 0, level.width, level.height);
 			} else if (virusStarted == 1) {
-				float t = eliminationTime - startTimeLimit.Value;
+				float t = eliminationTime - (startTimeLimit ?? eliminationTime);
 				if (t < 0) t = 0;
 				float timePct = t / 60;
 				return new Rect(
@@ -134,7 +134,7 @@ public class GameMode {
 					level.height - (timePct * (level.height - (safeZonePoint.y + 112)))
 				);
 			} else if (virusStarted == 2) {
-				float t = eliminationTime - startTimeLimit.Value - 60;
+				float t = eliminationTime - (startTimeLimit ?? eliminationTime) - 60;
 				if (t < 0) t = 0;
 				float timePct = t / 300;
 				return new Rect(
@@ -247,7 +247,7 @@ public class GameMode {
 		Helpers.decrementTime(ref hudErrorMsgTime);
 
 		if (Global.isHost) {
-			if (level.isNon1v1Elimination() && remainingTime.Value <= 0) {
+			if (level.isNon1v1Elimination() && remainingTime != null && remainingTime.Value <= 0) {
 				if (virusStarted < 3) {
 					virusStarted++;
 					if (virusStarted == 1) remainingTime = 60;
@@ -261,8 +261,8 @@ public class GameMode {
 					localElimTimeInc += Global.spf;
 				}
 
-				float phase1Time = startTimeLimit.Value;
-				float phase2Time = startTimeLimit.Value + 60;
+				float phase1Time = (startTimeLimit ?? 0);
+				float phase2Time = (startTimeLimit ?? 0) + 60;
 
 				if (eliminationTime <= phase1Time) virusStarted = 0;
 				else if (eliminationTime >= phase1Time && eliminationTime < phase2Time) virusStarted = 1;
@@ -414,7 +414,11 @@ public class GameMode {
 					}
 				} else {
 					if (!Menu.inMenu && level.is1v1()) {
-						Menu.change(new SelectCharacterMenu(null, level.is1v1(), false, true, true, level.gameMode.isTeamMode, Global.isHost, () => { }));
+						Menu.change(
+							new SelectCharacterMenu(
+								null, level.is1v1(), false, true, true,
+								level.gameMode.isTeamMode, Global.isHost, () => { })
+							);
 					}
 				}
 			}
@@ -795,7 +799,7 @@ public class GameMode {
 		}
 
 		if (level.mainPlayer.isX && level.mainPlayer.hasHelmetArmor(2)) {
-			Player mostRecentlyScanned = null;
+			Player? mostRecentlyScanned = null;
 			foreach (var player in level.players) {
 				if (player.tagged && player.character != null) {
 					mostRecentlyScanned = player;
@@ -1004,7 +1008,7 @@ public class GameMode {
 		DrawWrappers.DrawRect(radarX + camStartX, radarY + camStartY, radarX + camEndX, radarY + camEndY, true, new Color(0, 0, 0, 0), borderThickness * 0.5f, ZIndex.HUD, isWorldPos: false, outlineColor: new Color(255, 255, 255));
 	}
 
-	public void draw1v1PlayerTopHUD(Player player, HUDHealthPosition position) {
+	public void draw1v1PlayerTopHUD(Player? player, HUDHealthPosition position) {
 		if (player == null) return;
 
 		Color outlineColor = isTeamMode ? Helpers.getAllianceColor(player) : Helpers.DarkBlue;
@@ -1134,7 +1138,7 @@ public class GameMode {
 		}
 	}
 
-	public void renderHealthAndWeapon(Player player, HUDHealthPosition position) {
+	public void renderHealthAndWeapon(Player? player, HUDHealthPosition position) {
 		if (player == null) return;
 		if (level.is1v1() && player.deaths >= playingTo) return;
 
@@ -1182,8 +1186,11 @@ public class GameMode {
 		}
 
 		int frameIndex = player.charNum;
-		if (player.charNum == 5) {
-			frameIndex = 0;
+		if (player.charNum == (int)CharIds.PunchyZero) {
+			frameIndex = 1;
+		}
+		if (player.charNum == (int)CharIds.BusterZero) {
+			frameIndex = 1;
 		}
 		if (player.isDisguisedAxl) frameIndex = 3;
 
@@ -1461,7 +1468,7 @@ public class GameMode {
 
 			string victimName = killFeed.victim?.name ?? "";
 			if (killFeed.maverickKillFeedIndex != null) {
-				victimName = " (" + killFeed.victim.name + ")";
+				victimName = " (" + victimName + ")";
 			}
 
 			var msg = "";
@@ -1522,7 +1529,7 @@ public class GameMode {
 				Fonts.drawText(
 					victimColor, killersMsg, fromRight - nameLen, fromTop + (i * yDist) - 5, Alignment.Right
 				);
-				int weaponIndex = (int)killFeed.weaponIndex;
+				int weaponIndex = killFeed.weaponIndex ?? 0;
 				weaponIndex = (
 					weaponIndex < Global.sprites["hud_killfeed_weapon"].frames.Count ? weaponIndex : 0
 				);
@@ -1909,7 +1916,7 @@ public class GameMode {
 			drawWeaponSlotCooldownBar(x, y, aw2.altShootTime / aw2.altFireCooldown, true);
 		}
 
-		MaverickWeapon mw = weapon as MaverickWeapon;
+		MaverickWeapon? mw = weapon as MaverickWeapon;
 		if (mw != null) {
 			float maxHealth = level.mainPlayer.getMaverickMaxHp();
 			if (level.mainPlayer.isSummoner()) {
@@ -2533,7 +2540,7 @@ public class GameMode {
 			Fonts.drawText(FontType.Red, player.getDeathScore().ToString(), cols[2], posY);
 
 			if (Global.serverClient != null) {
-				Fonts.drawText(FontType.Grey, player.getDisplayPing(), cols[3], posY);
+				Fonts.drawText(FontType.Grey, player.getTeamDisplayPing(), cols[3], posY);
 			}
 		}
 	}
@@ -2648,7 +2655,7 @@ public class GameMode {
 	}
 
 	public void drawVirusTime(int yPos) {
-		var timespan = new TimeSpan(0, 0, MathInt.Ceiling(remainingTime.Value));
+		var timespan = new TimeSpan(0, 0, MathInt.Ceiling(remainingTime ?? 0));
 		string timeStr = "Nightmare Virus: " + timespan.ToString(@"m\:ss");
 		Fonts.drawText(FontType.Purple, timeStr, 5, yPos, Alignment.Left);
 	}
@@ -2975,8 +2982,8 @@ public class GameMode {
 		var camRect = new Rect(level.camX, level.camY, level.camX + Global.viewScreenW, level.camY + Global.viewScreenH);
 
 		var intersectionPoints = camRect.getShape().getLineIntersectCollisions(line);
-		if (intersectionPoints.Count > 0) {
-			var intersectPoint = intersectionPoints[0].hitData.hitPoint.Value;
+		if (intersectionPoints.Count > 0 && intersectionPoints[0].hitData?.hitPoint != null) {
+			Point intersectPoint = intersectionPoints[0].hitData.hitPoint.GetValueOrDefault();
 			var dirTo = playerPos.directionTo(objPos).normalize();
 
 			//a = arrow, l = length, m = minus

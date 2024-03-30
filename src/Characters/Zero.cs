@@ -1140,4 +1140,8 @@ public class Zero : Character {
 	public override bool chargeButtonHeld() {
 		return player.input.isHeld(Control.Shoot, player);
 	}
+
+	public override bool canAirJump() {
+		return dashedInAir == 0;
+	}
 }
