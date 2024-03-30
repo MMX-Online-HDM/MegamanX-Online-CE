@@ -6,7 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace MMXOnline;
 
 public class BusterZeroMelee : CharState {
-		[AllowNull]
+	[AllowNull]
 	public BusterZero zero;
 
 	public BusterZeroMelee() : base("projswing") {
@@ -40,6 +40,7 @@ public class BusterZeroMelee : CharState {
 		if (zero == null) {
 			throw new NullReferenceException();
 		}
+		character.playSound("ZeroSaberX3", sendRpc: true);
 		if (!character.grounded || character.vel.y < 0) {
 			sprite = "projswing_air";
 			character.changeSprite(sprite, true);
@@ -177,7 +178,6 @@ public class BusterZeroHadangeki : CharState {
 		if (character.frameIndex >= 4 && !fired) {
 			zero.stockedSaber = false;
 			fired = true;
-			character.playSound("ZeroSaberX3", sendRpc: true);
 			new ZSaberProj(
 				new ZSaber(player), character.pos.addxy(30 * character.xDir, -20),
 				character.xDir, player, player.getNextActorNetId(), rpc: true
@@ -205,6 +205,7 @@ public class BusterZeroHadangeki : CharState {
 		if (zero == null) {
 			throw new NullReferenceException();
 		}
+		character.playSound("ZeroSaberX3", sendRpc: true);
 		if (!character.grounded || character.vel.y < 0) {
 			sprite = "projswing_air";
 			character.changeSprite(sprite, true);
