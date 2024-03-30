@@ -1210,10 +1210,12 @@ public partial class Character : Actor, IDamagable {
 			player.input.isPressed(Control.Jump, player) &&
 			(charState.wallKickLeftWall != null || charState.wallKickRightWall != null)
 		) {
+			dashedInAir = 0;
 			if (player.input.isHeld(Control.Dash, player) &&
 				(charState.useDashJumpSpeed || charState is WallSlide)
 			) {
 				isDashing = true;
+				dashedInAir++;
 			}
 			vel.y = -getJumpPower();
 			wallKickDir = 0;
