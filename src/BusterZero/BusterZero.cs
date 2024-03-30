@@ -84,7 +84,7 @@ public class BusterZero : Character {
 		}
 		if (hyperProgress >= 1 && player.currency >= Player.zeroHyperCost) {
 			hyperProgress = 0;
-			changeState(new HyperZeroStart(0), true);
+			changeState(new HyperBusterZeroStart(), true);
 			return true;
 		}
 		return base.normalCtrl();
@@ -237,5 +237,25 @@ public class BusterZero : Character {
 
 	public override bool canAirJump() {
 		return dashedInAir == 0 || (dashedInAir == 1 && isBlackZero);
+	}
+
+	public override List<ShaderWrapper> getShaders() {
+		List<ShaderWrapper> baseShaders = base.getShaders();
+		List<ShaderWrapper> shaders = new();
+		ShaderWrapper? palette = null;
+
+		if (isBlackZero) {
+			palette = player.zeroPaletteShader;
+			palette?.SetUniform("palette", 1);
+			palette?.SetUniform("paletteTexture", Global.textures["hyperBusterZeroPalette"]);
+		}
+		if (palette != null) {
+			shaders.Add(palette);
+		}
+		if (shaders.Count == 0) {
+			return baseShaders;
+		}
+		shaders.AddRange(baseShaders);
+		return shaders;
 	}
 }
