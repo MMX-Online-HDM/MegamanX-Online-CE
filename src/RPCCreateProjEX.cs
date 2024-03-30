@@ -18,6 +18,10 @@ public partial class RPCCreateProj : RPC {
 		{ (int)ProjIds.FrontRunner, VileCannonProj.rpcInvoke },
 		{ (int)ProjIds.FatBoy, VileCannonProj.rpcInvoke },
 		{ (int)ProjIds.LongshotGizmo, VileCannonProj.rpcInvoke },
+		// Buster Zero
+		{ (int)ProjIds.DZBuster, DZBusterProj.rpcInvoke },
+		{ (int)ProjIds.DZBuster2, DZBuster2Proj.rpcInvoke },
+		{ (int)ProjIds.DZBuster3, DZBuster3Proj.rpcInvoke },
 
 	};
 

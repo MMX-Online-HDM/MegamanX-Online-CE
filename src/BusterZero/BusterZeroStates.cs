@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Diagnostics.CodeAnalysis;
 using SFML.Graphics;
@@ -84,9 +82,9 @@ public class BusterZeroDoubleBuster : CharState {
 		if (!fired1 && character.frameIndex == 3) {
 			fired1 = true;
 			character.playSound("buster3X3", sendRpc: true);
-			new ZBuster4Proj(
-				zero.busterWeapon, character.getShootPos(), character.getShootXDir(),
-				1, player, player.getNextActorNetId(), rpc: true
+			new DZBuster3Proj(
+				character.getShootPos(), character.getShootXDir(),
+				player, player.getNextActorNetId(), rpc: true
 			);
 		}
 		if (!fired2 && character.frameIndex == 7) {
@@ -94,16 +92,16 @@ public class BusterZeroDoubleBuster : CharState {
 			if (!isPinkCharge) {
 				zero.stockedBusterLv = 0;
 				character.playSound("buster3X3", sendRpc: true);
-				new ZBuster4Proj(
-					zero.busterWeapon, character.getShootPos(),
-					character.getShootXDir(), 1, player, player.getNextActorNetId(), rpc: true
+				new DZBuster3Proj(
+					character.getShootPos(), character.getShootXDir(),
+					player, player.getNextActorNetId(), rpc: true
 				);
 			} else {
 				zero.stockedBusterLv = 0;
 				character.playSound("buster2X3", sendRpc: true);
-				new ZBuster2Proj(
-					zero.busterWeapon, character.getShootPos(), character.getShootXDir(),
-					1, player, player.getNextActorNetId(), rpc: true
+				new DZBuster2Proj(
+					character.getShootPos(), character.getShootXDir(),
+					player, player.getNextActorNetId(), rpc: true
 				);
 			}
 		}
@@ -184,9 +182,9 @@ public class BusterZeroHadangeki : CharState {
 			character.playSound("ZeroSaberX3", sendRpc: true);
 			zero.stockedSaber = false;
 			fired = true;
-			new ZSaberProj(
-				new ZSaber(player), character.pos.addxy(30 * character.xDir, -20),
-				character.xDir, player, player.getNextActorNetId(), rpc: true
+			new DZHadangekiProj(
+				character.pos.addxy(30 * character.xDir, -20), character.xDir,
+				zero.isBlackZero, player, player.getNextActorNetId(), rpc: true
 			);
 		}
 		if (character.isAnimOver()) {

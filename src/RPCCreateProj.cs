@@ -93,15 +93,6 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.ZBuster4:
 				proj = new ZBuster4Proj(new ZeroBuster(), pos, xDir, 0, player, netProjByte);
 				break;
-			case (int)ProjIds.ZBuster2b:
-				proj = new ZBuster2Proj(new ZeroBuster(), pos, xDir, 1, player, netProjByte);
-				break;
-			case (int)ProjIds.ZBuster3b:
-				proj = new ZBuster3Proj(new ZeroBuster(), pos, xDir, 1, player, netProjByte);
-				break;
-			case (int)ProjIds.ZBuster4b:
-				proj = new ZBuster4Proj(new ZeroBuster(), pos, xDir, 1, player, netProjByte);
-				break;
 			case (int)ProjIds.Sting:
 			case (int)ProjIds.StingDiag:
 				proj = new StingProj(new Sting(), pos, xDir, player, extraData[0], netProjByte);

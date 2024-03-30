@@ -4,6 +4,8 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class ZeroBuster : Weapon {
+	public static ZeroBuster netWeapon = new();
+
 	public ZeroBuster() : base() {
 		index = (int)WeaponIds.Buster;
 		killFeedIndex = 160;
@@ -15,6 +17,15 @@ public class ZeroBuster : Weapon {
 		displayName = "Z-Buster";
 		description = new string[] { "Shoot uncharged Z-Buster with ATTACK." };
 		type = (int)ZeroAttackLoadoutType.ZBuster;
+	}
+}
+
+public class ZBusterSaber : Weapon {
+	public static ZBusterSaber netWeapon = new();
+
+	public ZBusterSaber() : base() {
+		index = (int)WeaponIds.ZSaberProjSwing;
+		killFeedIndex = 9;
 	}
 }
 
@@ -88,7 +99,7 @@ public class ZBuster2Proj : Projectile {
 			projId = (int)ProjIds.ZBuster2;
 			changeSprite("buster2", true);
 		} else {
-			projId = (int)ProjIds.ZBuster2b;
+			projId = (int)ProjIds.DZBuster2;
 			damager.flinch = 0;
 		}
 		ZBuster2Proj.hyorogaCode(this, player);
@@ -122,7 +133,7 @@ public class ZBuster3Proj : Projectile {
 		if (type == 0) {
 			projId = (int)ProjIds.ZBuster3;
 		} else {
-			projId = (int)ProjIds.ZBuster3b;
+			projId = (int)ProjIds.DZBuster3;
 			damager.flinch = Global.halfFlinch;
 			damager.damage = 3;
 		}
@@ -147,7 +158,7 @@ public class ZBuster4Proj : Projectile {
 		if (type == 0) {
 			projId = (int)ProjIds.ZBuster4;
 		} else {
-			projId = (int)ProjIds.ZBuster4b;
+			projId = (int)ProjIds.DZBuster4;
 			damager.damage = 3;
 			damager.flinch = Global.halfFlinch;
 		}
