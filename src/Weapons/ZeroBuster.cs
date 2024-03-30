@@ -80,6 +80,7 @@ public class ZBuster2Proj : Projectile {
 	) : base(
 		weapon, pos, xDir, 350, 2, player, "zbuster2", Global.defFlinch, 0, netProjId, player.ownedByLocalPlayer
 	) {
+		fadeOnAutoDestroy = true;
 		fadeSprite = "buster2_fade";
 		reflectable = true;
 		maxTime = 0.5f;
@@ -114,6 +115,7 @@ public class ZBuster3Proj : Projectile {
 	) : base(
 		weapon, pos, xDir, 350, 4, player, "zbuster3", Global.defFlinch, 0, netProjId, player.ownedByLocalPlayer
 	) {
+		fadeOnAutoDestroy = true;
 		fadeSprite = "buster3_fade";
 		reflectable = true;
 		maxTime = 0.5f;
@@ -138,7 +140,8 @@ public class ZBuster4Proj : Projectile {
 	) : base(
 		weapon, pos, xDir, 350, 6, player, "zbuster4", Global.defFlinch, 0, netProjId, player.ownedByLocalPlayer
 	) {
-		fadeSprite = "buster4_fade";
+		fadeOnAutoDestroy = true;
+		fadeSprite = "buster3_fade";
 		reflectable = true;
 		maxTime = 0.5f;
 		if (type == 0) {
