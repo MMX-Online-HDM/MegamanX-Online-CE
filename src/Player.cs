@@ -150,11 +150,11 @@ public partial class Player {
 	public bool aiTakeover;
 	public MaverickAIBehavior currentMaverickCommand;
 
-	public bool isX { get { return charNum == 0; } }
-	public bool isZero { get { return charNum == 1; } }
-	public bool isVile { get { return charNum == 2; } }
-	public bool isAxl { get { return charNum == 3; } }
-	public bool isSigma { get { return charNum == 4; } }
+	public bool isX { get { return charNum == (int)CharIds.X; } }
+	public bool isZero { get { return charNum == (int)CharIds.Zero; } }
+	public bool isVile { get { return charNum == (int)CharIds.Vile; } }
+	public bool isAxl { get { return charNum == (int)CharIds.Axl; } }
+	public bool isSigma { get { return charNum == (int)CharIds.Sigma; } }
 
 	public float health;
 	public float maxHealth;
@@ -213,45 +213,39 @@ public partial class Player {
 	public bool isMuted;
 
 	// Subtanks
-	public Dictionary<int, List<SubTank>> charSubTanks = new Dictionary<int, List<SubTank>>()
-	{
-			{ 0, new List<SubTank>() },
-			{ 1, new List<SubTank>() },
-			{ 2, new List<SubTank>() },
-			{ 3, new List<SubTank>() },
-			{ 4, new List<SubTank>() },
-			{ 5, new List<SubTank>() },
-		};
-	public List<SubTank> subtanks {
-		get {
-			return charSubTanks[isDisguisedAxl ? 3 : charNum];
-		}
-		set {
-			charSubTanks[isDisguisedAxl ? 3 : charNum] = value;
-		}
-	}
-
+	public Dictionary<int, List<SubTank>> charSubTanks = new Dictionary<int, List<SubTank>>() {
+		{ (int)CharIds.X, new List<SubTank>() },
+		{ (int)CharIds.Zero, new List<SubTank>() },
+		{ (int)CharIds.Vile, new List<SubTank>() },
+		{ (int)CharIds.Axl, new List<SubTank>() },
+		{ (int)CharIds.Sigma, new List<SubTank>() },
+		{ (int)CharIds.PunchyZero, new List<SubTank>() },
+		{ (int)CharIds.BusterZero, new List<SubTank>() },
+		{ (int)CharIds.Rock, new List<SubTank>() },
+	};
 	// Heart tanks
-	public Dictionary<int, int> charHeartTanks = new Dictionary<int, int>()
-	{
-			{ 0, 0 },
-			{ 1, 0 },
-			{ 2, 0 },
-			{ 3, 0 },
-			{ 4, 0 },
-			{ 5, 0 },
-		};
+	public Dictionary<int, int> charHeartTanks = new Dictionary<int, int>(){
+		{ (int)CharIds.X, 0 },
+		{ (int)CharIds.Zero, 0 },
+		{ (int)CharIds.Vile, 0 },
+		{ (int)CharIds.Axl, 0 },
+		{ (int)CharIds.Sigma, 0 },
+		{ (int)CharIds.PunchyZero, 0 },
+		{ (int)CharIds.BusterZero, 0 },
+		{ (int)CharIds.Rock, 0 },
+	};
+	// Getter functions.
+	public List<SubTank> subtanks {
+		get { return charSubTanks[isDisguisedAxl ? 3 : charNum]; }
+		set { charSubTanks[isDisguisedAxl ? 3 : charNum] = value; }
+	}
 	public int heartTanks {
-		get {
-			return charHeartTanks[isDisguisedAxl ? 3 : charNum];
-		}
-		set {
-			charHeartTanks[isDisguisedAxl ? 3 : charNum] = value;
-		}
+		get { return charHeartTanks[isDisguisedAxl ? 3 : charNum]; }
+		set { charHeartTanks[isDisguisedAxl ? 3 : charNum] = value; }
 	}
 
 	// Currency
-	public const int maxCharCurrencyId = 5;
+	public const int maxCharCurrencyId = 10;
 	public static int curMul = Helpers.randomRange(2, 8);
 	public int[] charCurrencyBackup = new int[maxCharCurrencyId];
 	public int[] charCurrency = new int[maxCharCurrencyId];
@@ -976,27 +970,27 @@ public partial class Player {
 				}
 			}
 
-			if (charNum == 0) {
+			if (charNum == (int)CharIds.X) {
 				character = new MegamanX(
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer
 				);
-			} else if (charNum == 1) {
+			} else if (charNum == (int)CharIds.Zero) {
 				character = new Zero(
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer
 				);
-			} else if (charNum == 2) {
+			} else if (charNum == (int)CharIds.Vile) {
 				character = new Vile(
 					this, pos.x, pos.y, xDir, false, charNetId,
 					ownedByLocalPlayer, mk2VileOverride: mk2VileOverride
 				);
-			} else if (charNum == 3) {
+			} else if (charNum == (int)CharIds.Axl) {
 				character = new Axl(
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer
 				);
-			} else if (charNum == 4) {
+			} else if (charNum == (int)CharIds.Sigma) {
 				if (isSigma3()) {
 					character = new Doppma(
 						this, pos.x, pos.y, xDir,
@@ -1013,16 +1007,18 @@ public partial class Player {
 						false, charNetId, ownedByLocalPlayer
 					);
 				}
-			} else if (charNum == 5) {
+			} else if (charNum == (int)CharIds.Rock) {
 				character = new Rock(
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer
 				);
-			} else {
-				character = new Character(
-					this, pos.x, pos.y, xDir, false, charNetId,
-					ownedByLocalPlayer, mk2VileOverride: mk2VileOverride, mk5VileOverride: false
+			} else if (charNum == (int)CharIds.BusterZero) {
+				character = new BusterZero(
+					this, pos.x, pos.y, xDir,
+					false, charNetId, ownedByLocalPlayer
 				);
+			} else {
+				throw new Exception("Error: Non-valid char ID: " + charNum);
 			}
 			// Hyper mode overrides (POST)
 			if (Global.level.isHyper1v1() && ownedByLocalPlayer) {
@@ -1214,28 +1210,28 @@ public partial class Player {
 		bool isVileMK2 = charNum == 2 && dnaCore.hyperMode == DNACoreHyperMode.VileMK2;
 		bool isVileMK5 = charNum == 2 && dnaCore.hyperMode == DNACoreHyperMode.VileMK5;
 		Character retChar = null;
-		if (charNum == 0) {
+		if (charNum == (int)CharIds.X) {
 			retChar = new MegamanX(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, character.netId, true, isWarpIn: false
 			);
-		} else if (charNum == 1) {
+		} else if (charNum == (int)CharIds.Zero) {
 			retChar = new Zero(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, character.netId, true, isWarpIn: false
 			);
-		} else if (charNum == 2) {
+		} else if (charNum == (int)CharIds.Vile) {
 			retChar = new Vile(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, character.netId, true, isWarpIn: false,
 				mk2VileOverride: isVileMK2, mk5VileOverride: isVileMK5
 			);
-		} else if (charNum == 3) {
+		} else if (charNum == (int)CharIds.Axl) {
 			retChar = new Axl(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, character.netId, true, isWarpIn: false
 			);
-		} else if (charNum == 4) {
+		} else if (charNum == (int)CharIds.Sigma) {
 			if (dnaCore.loadout.sigmaLoadout.sigmaForm == 2) {
 				retChar = new Doppma(
 					this, character.pos.x, character.pos.y, character.xDir,
@@ -1252,18 +1248,18 @@ public partial class Player {
 					true, character.netId, true, isWarpIn: false
 				);
 			}
-
-		} else if (charNum == 5) {
+		} else if (charNum == (int)CharIds.Rock) {
 			retChar = new Rock(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, character.netId, true, isWarpIn: false
 			);
-		} else {
-			retChar = new Character(
+		} else if (charNum == (int)CharIds.BusterZero) {
+			retChar = new BusterZero(
 				this, character.pos.x, character.pos.y, character.xDir,
-				true, character.netId, true, isWarpIn: false,
-				mk2VileOverride: isVileMK2, mk5VileOverride: isVileMK5
+				true, character.netId, true, isWarpIn: false
 			);
+		} else {
+			throw new Exception("Error: Non-valid char ID: " + charNum);
 		}
 		if (retChar is Vile vile) {
 			if (isVileMK5) vile.vileForm = 2;
@@ -1563,9 +1559,7 @@ public partial class Player {
 		//if (isX && hasGoldenArmor()) return;
 		if (Global.level.is1v1()) return;
 
-		if (isZero || isVile) fillSubtank(2);
-		if (isAxl) fillSubtank(3);
-		if (isX || isSigma) fillSubtank(4);
+		if (isZero || isVile) { fillSubtank(2); } else if (isAxl) { fillSubtank(3); } else if (isX || isSigma) { fillSubtank(4); } else { fillSubtank(4); }
 
 		currency++;
 	}

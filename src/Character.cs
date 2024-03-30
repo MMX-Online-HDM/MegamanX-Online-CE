@@ -1510,7 +1510,7 @@ public partial class Character : Actor, IDamagable {
 		if (isCharging()) {
 			chargeSound.play();
 			int chargeType = 0;
-			if (player.isZBusterZero()) {
+			if (this is BusterZero) {
 				chargeType = 1;
 			} else if (player.isX && player.hasArmArmor(3)) {
 				if (player.hasGoldenArmor()) {
@@ -1894,10 +1894,20 @@ public partial class Character : Actor, IDamagable {
 
 	public int getChargeLevel() {
 		bool clampTo3 = true;
-		if (this is Zero zero) clampTo3 = !zero.canUseDoubleBusterCombo();
-		if (this is Vile vile) clampTo3 = !vile.isVileMK5;
-		if (this is MegamanX mmx) clampTo3 = !mmx.isHyperX;
-
+		switch (this) {
+			case MegamanX mmx:
+				clampTo3 = !mmx.isHyperX;
+				break;
+			case Zero zero:
+				clampTo3 = !zero.canUseDoubleBusterCombo();
+				break;
+			case Vile vile:
+				clampTo3 = !vile.isVileMK5;
+				break;
+			case BusterZero:
+				clampTo3 = false;
+				break;
+		}
 		if (chargeTime < charge1Time) {
 			return 0;
 		} else if (chargeTime >= charge1Time && chargeTime < charge2Time) {
@@ -2554,7 +2564,7 @@ public partial class Character : Actor, IDamagable {
 			}
 			// If is under 1 we just apply it as is.
 			else {
-				damage += decDamage; 
+				damage += decDamage;
 			}
 		}
 		// First we apply debt then savings.

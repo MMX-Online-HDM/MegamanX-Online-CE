@@ -24,6 +24,18 @@ public class PlayerCharData {
 	}
 }
 
+public enum CharIds {
+	X,
+	Zero,
+	Vile,
+	Axl,
+	Sigma,
+	PunchyZero,
+	BusterZero,
+	// Non vanilla chars start here.
+	Rock = 10,
+}
+
 public class CharSelection {
 	public string name;
 	public int mappedCharNum;
@@ -40,22 +52,22 @@ public class CharSelection {
 
 	public static List<CharSelection> selections {
 		get {
-			return new List<CharSelection>()
-			{
-					new CharSelection("X", 0, 1, 0, "menu_megaman", 0),
-					new CharSelection("Zero", 1, 1, 0, "menu_zero", 0),
-					new CharSelection("Vile", 2, 1, 0, "menu_vile", 0),
-					new CharSelection("Axl", 3, 1, 0, "menu_axl", 0),
-					new CharSelection("Sigma", 4, 1, 0, "menu_sigma", sigmaIndex),
-					//new CharSelection("Rockman", 5, 1, 0, "rock_idle", 0),
-				};
+			return new List<CharSelection>() {
+				new CharSelection("X", 0, 1, 0, "menu_megaman", 0),
+				new CharSelection("Zero", 1, 1, 0, "menu_zero", 0),
+				new CharSelection("Vile", 2, 1, 0, "menu_vile", 0),
+				new CharSelection("Axl", 3, 1, 0, "menu_axl", 0),
+				new CharSelection("Sigma", 4, 1, 0, "menu_sigma", sigmaIndex),
+				//new CharSelection("Kaiser Zero", 5, 1, 0, "menu_zero", 0),
+				new CharSelection("Buster Zero", 6, 1, 0, "menu_zero", 0),
+				//new CharSelection("Rockman", 10, 1, 0, "rock_idle", 0),
+			};
 		}
 	}
 
 	public static List<CharSelection> selections1v1 {
 		get {
-			return new List<CharSelection>()
-			{
+			return new List<CharSelection>() {
 					new CharSelection("X(X1)", 0, 1, 0, "menu_megaman", 1),
 					new CharSelection("X(X2)", 0, 2, 0, "menu_megaman", 2),
 					new CharSelection("X(X3)", 0, 3, 0, "menu_megaman", 3),
@@ -63,6 +75,8 @@ public class CharSelection {
 					new CharSelection("Vile", 2, 1, 0, "menu_vile", 0),
 					new CharSelection("Axl", 3, 1, 0, "menu_axl", 0),
 					new CharSelection("Sigma", 4, 1, 0, "menu_sigma", sigmaIndex),
+					new CharSelection("Kaiser Zero", 5, 1, 0, "menu_zero", 0),
+					new CharSelection("Buster Zero", 6, 1, 0, "menu_zero", 0),
 					new CharSelection("C.Penguin", 210, 1, 0, "chillp_idle", 0),
 					new CharSelection("S.Mandrill", 212, 1, 1, "sparkm_idle", 0),
 					new CharSelection("A.Armadillo", 213, 1, 2, "armoreda_idle", 0),
@@ -304,6 +318,7 @@ public class SelectCharacterMenu : IMainMenu {
 			2 => new string[] { "Unpredictable threat that can self-revive", "and call down Ride Armors." },
 			3 => new string[] { "Precise and deadly close range assassin", "with aiming and rapid fire capabilities." },
 			4 => new string[] { "A fearsome military commander that can", "summon Mavericks on the battlefield." },
+			6 => new string[] { "Fast ranged character", "with a simple but strong buster combo." },
 			_ => new string[] { "ERROR" }
 		};
 		if (description.Length > 0) {

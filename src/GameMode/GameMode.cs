@@ -1186,8 +1186,11 @@ public class GameMode {
 		}
 
 		int frameIndex = player.charNum;
-		if (player.charNum == 5) {
-			frameIndex = 0;
+		if (player.charNum == (int)CharIds.PunchyZero) {
+			frameIndex = 1;
+		}
+		if (player.charNum == (int)CharIds.BusterZero) {
+			frameIndex = 1;
 		}
 		if (player.isDisguisedAxl) frameIndex = 3;
 

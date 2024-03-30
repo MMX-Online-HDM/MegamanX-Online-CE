@@ -10,6 +10,8 @@ public class CharState {
 	public string shootSprite;
 	public string transitionSprite;
 	public string landSprite;
+	public string airSprite;
+	public bool wasGrounded = true;
 	public Point busterOffset;
 	public Character character;
 	public Collider lastLeftWallCollider;
@@ -133,6 +135,7 @@ public class CharState {
 			character.useGravity = false;
 			character.stopMoving();
 		}
+		wasGrounded = character.grounded;
 	}
 
 	public virtual bool canEnter(Character character) {
@@ -247,7 +250,19 @@ public class CharState {
 			lastRightWallCollider = rightActor.collider;
 		}
 
-		if (character.grounded && !string.IsNullOrEmpty(landSprite) && sprite != landSprite) {
+		airTrasition();
+		wasGrounded = character.grounded;
+	}
+
+	public virtual void airTrasition() {
+		if (airSprite != null && !character.grounded && wasGrounded && sprite != airSprite) {
+			sprite = airSprite;
+			int oldFrameIndex = character.sprite.frameIndex;
+			float oldFrameTime = character.sprite.frameTime;
+			character.changeSprite(sprite, false);
+			character.sprite.frameIndex = oldFrameIndex;
+			character.sprite.frameTime = oldFrameTime;
+		} else if (landSprite != null && character.grounded && !wasGrounded && sprite != landSprite) {
 			sprite = landSprite;
 			int oldFrameIndex = character.sprite.frameIndex;
 			float oldFrameTime = character.sprite.frameTime;

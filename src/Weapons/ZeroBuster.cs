@@ -299,11 +299,6 @@ public class ZSaberProjSwingState : CharState {
 
 	public override void update() {
 		base.update();
-		if (!character.grounded) {
-			if (player.input.isHeld(Control.Dash, player)) {
-				character.isDashing = true;
-			}
-		}
 
 		if (character.frameIndex >= 4 && !fired) {
 			fired = true;
