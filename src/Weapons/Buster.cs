@@ -381,11 +381,6 @@ public class X2ChargeShot : CharState {
 
 	public override void update() {
 		base.update();
-		if (!character.grounded) {
-			if (player.input.isHeld(Control.Dash, player)) {
-				character.isDashing = true;
-			}
-		}
 		if (!fired && character.currentFrame.getBusterOffset() != null) {
 			fired = true;
 			if (type == 0) {
@@ -486,15 +481,12 @@ public class X3ChargeShot : CharState {
 	public X3ChargeShot(HyperBuster hyperBusterWeapon) : base("x3_shot", "", "", "") {
 		this.hyperBusterWeapon = hyperBusterWeapon;
 		airMove = true;
+		useDashJumpSpeed = true;
 	}
 
 	public override void update() {
 		base.update();
-		if (!character.grounded) {
-			if (player.input.isHeld(Control.Dash, player)) {
-				character.isDashing = true;
-			}
-		} else {
+		if (character.grounded) {
 			character.turnToInput(player.input, player);
 		}
 		if (!fired && character.currentFrame.getBusterOffset() != null) {

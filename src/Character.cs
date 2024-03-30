@@ -1279,6 +1279,9 @@ public partial class Character : Actor, IDamagable {
 				isDashing = (
 					isDashing || player.dashPressed(out string dashControl) && canDash()
 				);
+				if (isDashing) {
+					dashedInAir++;
+				}
 				changeState(new Jump());
 				return true;
 			} else if (player.dashPressed(out string dashControl) && canDash() && charState is not Dash) {
@@ -1304,10 +1307,8 @@ public partial class Character : Actor, IDamagable {
 		// Air normal states.
 		else {
 			if (player.dashPressed(out string dashControl) && canAirDash() && canDash()) {
-				if (!isDashing) {
-					changeState(new AirDash(dashControl));
-					return true;
-				}
+				changeState(new AirDash(dashControl));
+				return true;
 			}
 			if (canAirJump()) {
 				if (player.input.isPressed(Control.Jump, player) && canJump()) {
@@ -1315,7 +1316,7 @@ public partial class Character : Actor, IDamagable {
 				}
 				if ((player.input.isPressed(Control.Jump, player) ||
 					Global.time - lastJumpPressedTime < 0.1f) &&
-					!isDashing && wallKickTimer <= 0 && flag == null &&
+					wallKickTimer <= 0 && flag == null &&
 					!sprite.name.Contains("kick_air")
 				) {
 					lastJumpPressedTime = 0;

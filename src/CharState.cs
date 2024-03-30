@@ -97,17 +97,13 @@ public class CharState {
 		if (newState is not Dash &&
 			newState is not Jump &&
 			newState is not Fall &&
-			!(newState.useDashJumpSpeed && (character.grounded || character.vel.y < 0))
+			!(newState.useDashJumpSpeed && (!character.grounded || character.vel.y < 0))
 		) {
-			if (character.isDashing && newState is AirDash) {
-				character.dashedInAir++;
-			}
-			if (character.isDashing && newState is UpDash) {
-				character.dashedInAir++;
-			}
 			character.isDashing = false;
 		}
-		if (newState is Hurt || newState is Die || newState is Frozen || newState is Crystalized || newState is Stunned) {
+		if (newState is Hurt || newState is Die ||
+			newState is Frozen || newState is Crystalized || newState is Stunned
+		) {
 			character.onFlinchOrStun(newState);
 		}
 		if (character.mk5RideArmorPlatform != null && (
@@ -811,7 +807,7 @@ public class Dash : CharState {
 		enterSound = "dash";
 		this.initialDashButton = initialDashButton;
 		accuracy = 10;
-		exitOnAirborne = true;
+		//exitOnAirborne = true;
 		attackCtrl = true;
 		normalCtrl = true;
 	}
@@ -918,6 +914,10 @@ public class Dash : CharState {
 				"dust", initialDashDir, player.getNextActorNetId(), true,
 				sendRpc: true
 			);
+		}
+		if (!character.grounded) {
+			character.dashedInAir++;
+			character.changeState(new Fall());
 		}
 	}
 }

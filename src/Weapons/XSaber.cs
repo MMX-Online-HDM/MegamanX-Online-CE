@@ -36,16 +36,11 @@ public class XSaberState : CharState {
 		this.grounded = grounded;
 		landSprite = "beam_saber";
 		airMove = true;
+		useDashJumpSpeed = true;
 	}
 
 	public override void update() {
 		base.update();
-		if (!character.grounded) {
-			if (player.input.isHeld(Control.Dash, player)) {
-				character.isDashing = true;
-			}
-		}
-
 		if (character.frameIndex >= 6 && !fired) {
 			fired = true;
 			character.playSound("ZeroSaberX3");
@@ -71,12 +66,6 @@ public class X6SaberState : CharState {
 
 	public override void update() {
 		base.update();
-		if (!character.grounded) {
-			if (player.input.isHeld(Control.Dash, player)) {
-				character.isDashing = true;
-			}
-		}
-
 		int frameSound = 5;
 		if (character.frameIndex >= frameSound && !fired) {
 			fired = true;
