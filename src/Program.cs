@@ -227,7 +227,67 @@ class Program {
 
 		// Force startup config to be fetched
 		Menu.change(new MainMenu());
-		Global.changeMusic("menu");
+		switch(Helpers.randomRange(0,18)){
+			// Title screens
+			case 1:
+			Global.changeMusic("MMX1-TitleScreen");
+				break;
+			case 2:
+			Global.changeMusic("MMX2-TitleScreen");
+				break;
+			case 3:
+			Global.changeMusic("MMX3-TitleScreen");
+				break;
+			// Stage Selects
+			case 4:
+				Global.changeMusic("MMX1-StageSelect");
+				break;
+			case 5:
+				Global.changeMusic("MMX1-StageSelect2");
+				break;
+			case 6:
+				Global.changeMusic("MMX2-SecondWave");
+				break;
+			case 7:
+				Global.changeMusic("MMX2-FinalDestination");
+				break;
+			case 8:
+				Global.changeMusic("MMX3-StageSelect");
+				break;
+			case 9:
+				Global.changeMusic("MMX3-DopplerStageRevealed");
+				break;
+			// Introduction
+			case 10:
+				Global.changeMusic("MMX3-Introduction");
+				break;
+			case 11:
+				Global.changeMusic("MMX2-PlotoftheCounterHunters");
+				break;
+			// Extra
+			case 12:
+				Global.changeMusic("MMX3-Ending");
+				break;
+			case 13:
+				Global.changeMusic("MMX2-TheWakeofDestruction");
+				break;
+			case 14:
+				Global.changeMusic("MMX1-Ending");
+				break;
+			case 15:
+				Global.changeMusic("MMX1-Credits");
+				break;
+			case 16:
+				Global.changeMusic("MMX2-ConspiracytoMurder");
+				break;
+			case 17:
+				Global.changeMusic("MMX3-CainsLab");
+				break;	
+			case 18:
+				Global.changeMusic("MMX1-SigmaFortress4");
+				break;		
+		}
+		
 		if (mode == 1) {
 			HostMenu menu = new HostMenu(new MainMenu(), null, false, false, true);
 			Menu.change(menu);

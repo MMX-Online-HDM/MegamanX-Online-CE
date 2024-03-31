@@ -607,6 +607,7 @@ public enum RPCActorToggleType {
 	KaiserShellFadeOut,
 	AddVaccineTime,
 	ActivateBlackZero2,
+	AddWolfSigmaIntroMusicSource,
 }
 
 public class RPCActorToggle : RPC {
@@ -647,21 +648,23 @@ public class RPCActorToggle : RPC {
 		} else if (toggleId == RPCActorToggleType.StartGravityWell && actor is GravityWellProjCharged gw) {
 			gw.started = true;
 		} else if (toggleId == RPCActorToggleType.AddWolfSigmaMusicSource) {
-			actor.addMusicSource("wolfsigma", actor.pos.addxy(0, -75), false);
+			actor.addMusicSource("MMX1-WolfSigma", actor.pos.addxy(0, -75), false);
+		} else if (toggleId == RPCActorToggleType.AddWolfSigmaIntroMusicSource) {
+			actor.addMusicSource("MMX1-WolfSigmaIntro", actor.pos.addxy(0, -75), false);
 		} else if (toggleId == RPCActorToggleType.AddDrLightMusicSource) {
-			actor.addMusicSource("drlight", actor.getCenterPos(), false);
+			actor.addMusicSource("MMX1-DrLight", actor.getCenterPos(), false);
 		} else if (toggleId == RPCActorToggleType.AddDrDopplerMusicSource) {
-			actor.addMusicSource("drdoppler", actor.getCenterPos(), false);
+			actor.addMusicSource("MMX3-Doppler", actor.getCenterPos(), false);
 		} else if (toggleId == RPCActorToggleType.AddGoliathMusicSource) {
-			actor.addMusicSource("goliath", actor.getCenterPos(), true);
+			actor.addMusicSource("MMX3-DopplerBattle", actor.getCenterPos(), true);
 		} else if (toggleId == RPCActorToggleType.AddViralSigmaMusicSource) {
-			actor.addMusicSource("viralsigma", actor.getCenterPos(), true);
+			actor.addMusicSource("MMX2-JudgementDay", actor.getCenterPos(), true);
 		} else if (toggleId == RPCActorToggleType.AddKaiserSigmaMusicSource) {
 			actor.destroyMusicSource();
-			actor.addMusicSource("kaisersigma", actor.getCenterPos(), true);
+			actor.addMusicSource("MMX3-KaiserSigma", actor.getCenterPos(), true);
 		} else if (toggleId == RPCActorToggleType.AddKaiserViralSigmaMusicSource) {
 			actor.destroyMusicSource();
-			actor.addMusicSource("kaisersigmavirus", actor.getCenterPos(), true);
+			actor.addMusicSource("MMX3-Doppler", actor.getCenterPos(), true);
 		} else if (toggleId == RPCActorToggleType.StartMechSelfDestruct && actor is RideArmor ra) {
 			ra.selfDestructTime = Global.spf;
 		} else if (toggleId == RPCActorToggleType.ShakeCamera) {

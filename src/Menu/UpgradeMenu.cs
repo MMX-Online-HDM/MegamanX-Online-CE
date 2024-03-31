@@ -38,7 +38,7 @@ public class UpgradeMenu : IMainMenu {
 	}
 
 	public int getHeartTankCost() {
-		if (Global.level.server?.customMatchSettings?.heartTankHp == 2) return 4;
+		// if (Global.level.server?.customMatchSettings?.heartTankHp == 2) return 4;
 		return 2;
 	}
 

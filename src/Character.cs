@@ -1132,7 +1132,12 @@ public partial class Character : Actor, IDamagable {
 					if (acidTime < 0) removeAcid();
 				}
 				if (player == Global.level.mainPlayer || playHealSound) {
+					if (!player.hasChip(2)) {
 					playSound("heal", forcePlay: true, sendRpc: true);
+					}
+					else {
+					playSound("MMX3-GoldenHelmetHP" , forcePlay: true, sendRpc: true);
+					}
 				}
 			}
 		} else {
@@ -2629,10 +2634,22 @@ public partial class Character : Actor, IDamagable {
 				var gigaCrush = player.weapons.FirstOrDefault(w => w is GigaCrush);
 				if (gigaCrush != null) {
 					gigaCrush.addAmmo(gigaAmmoToAdd, player);
+					if (gigaCrush.ammo < 32) {
+						playSound("MMX2-GigaCrushRecharge");	
+					}
+					if (gigaCrush.ammo == 32 && player.health < 8 && player.health > 4) {
+						playSound("MMX2-GigaCrushFull");	
+					}
 				}
 				var hyperBuster = player.weapons.FirstOrDefault(w => w is HyperBuster);
 				if (hyperBuster != null) {
 					hyperBuster.addAmmo(gigaAmmoToAdd, player);
+					if (hyperBuster.ammo < 32){
+						playSound("MMX3-HyperchargeRecharge");	
+					}
+					if (hyperBuster.ammo == 32 && player.health < 8 && player.health > 4) {
+						playSound("MMX3-HyperchargeFull");	
+					}
 				}
 				var novaStrike = player.weapons.FirstOrDefault(w => w is NovaStrike);
 				if (novaStrike != null) {

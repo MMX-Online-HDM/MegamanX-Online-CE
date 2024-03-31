@@ -355,7 +355,7 @@ public class KaiserSigmaVirusState : CharState {
 				kaiserSigma.changeToKaiserIdleOrFall();
 
 				character.destroyMusicSource();
-				character.addMusicSource("kaisersigma", character.getCenterPos(), true);
+				character.addMusicSource("MMX3-KaiserSigma", character.getCenterPos(), true);
 				RPC.actorToggle.sendRpc(character.netId, RPCActorToggleType.AddKaiserSigmaMusicSource);
 
 				character.xScale = 1;
@@ -398,7 +398,7 @@ public class KaiserSigmaVirusState : CharState {
 
 		RPC.actorToggle.sendRpc(character.netId, RPCActorToggleType.AddKaiserViralSigmaMusicSource);
 		character.destroyMusicSource();
-		character.addMusicSource("kaisersigmavirus", character.getCenterPos(), true);
+		character.addMusicSource("MMX3-Doppler", character.getCenterPos(), true);
 
 		kaiserSigma = character as KaiserSigma;
 	}
@@ -757,7 +757,7 @@ public class KaiserSigmaRevive : CharState {
 		if (state == 0) {
 			if (explodeDieEffect == null || explodeDieEffect.destroyed) {
 				state = 1;
-				character.addMusicSource("kaisersigma", character.pos, true);
+				character.addMusicSource("MMX3-KaiserSigma", character.pos, true);
 				RPC.actorToggle.sendRpc(character.netId, RPCActorToggleType.AddKaiserSigmaMusicSource);
 				character.visible = true;
 				character.changePos(spawnPoint);

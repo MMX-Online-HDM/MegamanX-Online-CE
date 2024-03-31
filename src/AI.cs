@@ -1634,9 +1634,9 @@ public class AI {
 				player.reviveSigma(spawnPoint);
 			}
 
-			if (jumpTime >= 0.4) {
-				player.release(Control.Jump);
-			}
+			//if (jumpTime >= 0.4) {
+			//	player.release(Control.Jump);
+			//}
 		}	
 	}
 } // End of AI

@@ -16,14 +16,14 @@ public partial class MegamanX : Character {
 	public const int armArmorCost = 3;
 	public const int bootsArmorCost = 2;
 
-	public RollingShieldProjCharged chargedRollingShieldProj;
-	public List<BubbleSplashProjCharged> chargedBubbles = new List<BubbleSplashProjCharged>();
-	public StrikeChainProj strikeChainProj;
-	public GravityWellProjCharged chargedGravityWell;
-	public SpinningBladeProjCharged chargedSpinningBlade;
-	public FrostShieldProjCharged chargedFrostShield;
-	public TunnelFangProjCharged chargedTunnelFang;
-	public GravityWellProj gravityWell;
+	public RollingShieldProjCharged? chargedRollingShieldProj;
+	public List<BubbleSplashProjCharged>? chargedBubbles = new List<BubbleSplashProjCharged>();
+	public StrikeChainProj? strikeChainProj;
+	public GravityWellProjCharged? chargedGravityWell;
+	public SpinningBladeProjCharged? chargedSpinningBlade;
+	public FrostShieldProjCharged? chargedFrostShield;
+	public TunnelFangProjCharged? chargedTunnelFang;
+	public GravityWellProj? gravityWell;
 	public int totalChipHealAmount;
 	public const int maxTotalChipHealAmount = 32;
 	public int unpoShotCount;
@@ -130,7 +130,11 @@ public partial class MegamanX : Character {
 				weaponHealTime = 0;
 				weaponHealAmount--;
 				player.weapon.ammo = Helpers.clampMax(player.weapon.ammo + 1, player.weapon.maxAmmo);
+				if (!player.hasArmArmor(3)) {			
 				playSound("heal", forcePlay: true);
+				} else {
+				playSound("healX3", forcePlay: true);
+				}
 			}
 		}
 
@@ -211,10 +215,9 @@ public partial class MegamanX : Character {
 		quickArmorUpgrade();
 
 		if (charState is not Die &&
-			player.input.isPressed(Control.Special1, player) &&
-			player.hasAllX3Armor() && !player.hasGoldenArmor()
-			&& player.hasUltimateArmor()
-		) {
+			player.input.isPressed(Control.Special2, player) &&
+			player.hasAllX3Armor() && !player.hasGoldenArmor()) 
+		{
 			if (player.input.isHeld(Control.Down, player)) {
 				player.setChipNum(0, false);
 				Global.level.gameMode.setHUDErrorMessage(
@@ -754,7 +757,7 @@ public partial class MegamanX : Character {
 
 	// Fast upgrading via command key.
 	public void quickArmorUpgrade() {
-		if (!player.input.isHeld(Control.Special2, player)) {
+		if (!player.input.isHeld(Control.Special1, player)) {
 			hyperProgress = 0;
 			return;
 		}
@@ -805,7 +808,7 @@ public partial class MegamanX : Character {
 
 	// BARRIER SECTION
 
-	public Anim barrierAnim;
+	public Anim? barrierAnim;
 	public float barrierTime;
 	public bool barrierFlinch;
 	public float barrierDuration { get { return barrierFlinch ? 1.5f : 0.75f; } }
@@ -940,8 +943,8 @@ public partial class MegamanX : Character {
 		return false;
 	}
 
-	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		Projectile proj = null;
+	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
+		Projectile? proj = null;
 
 		if (sprite.name.Contains("beam_saber") && sprite.name.Contains("2")) {
 			float overrideDamage = 3;

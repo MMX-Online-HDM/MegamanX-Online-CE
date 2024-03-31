@@ -83,7 +83,7 @@ public class WheelGator : Maverick {
 		return new List<ShaderWrapper>();
 	}
 
-	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
+	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (sprite.name.Contains("drill_loop")) {
 			return new GenericMeleeProj(weapon, centerPoint, ProjIds.WheelGSpin, player, damage: 1, flinch: Global.defFlinch, hitCooldown: 0.1f, owningActor: this);
 		}

@@ -301,7 +301,7 @@ public class Rekkoha : CharState {
 
 		if (stateTime >= 0.15f && !sound) {
 			sound = true;
-			character.playSound("rekkoha", sendRpc: true);
+			character.playSound("RekkohaX6", sendRpc: true);
 		}
 
 		if (stateTime > 0.4f && !fired1) {

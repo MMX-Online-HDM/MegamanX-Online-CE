@@ -142,11 +142,29 @@ public class Zero : Character {
 		if (!Global.level.is1v1()) {
 			if (isBlackZero()) {
 				if (musicSource == null) {
-					addMusicSource("blackzero", getCenterPos(), true);
+                    switch(Helpers.randomRange(0,1)) {
+                    case 0:
+                    addMusicSource("MMX1-Zero", getCenterPos(), true);
+                    break;
+                    case 1:
+                    addMusicSource("MMX3-Zero", getCenterPos(), true);
+                    break;
+                    }
+                }
+            }
+            else if (isAwakenedZero()) {
+				if (musicSource == null){
+					addMusicSource("MMX5-XvsZeroV2-megasfc", getCenterPos(), true);
 				}
+			} 
+			else if (isNightmareZero) {
+				if (musicSource == null){
+					addMusicSource("MMX5-XvsZeroV1-megasfc", getCenterPos(), true);
+				} 
 			} else {
 				destroyMusicSource();
 			}
+			
 		}
 		if (!ownedByLocalPlayer) {
 			return;

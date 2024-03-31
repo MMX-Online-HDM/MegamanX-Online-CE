@@ -236,6 +236,7 @@ public class WolfSigmaHead : Actor, IDamagable {
 				}
 			}
 		}
+
 	}
 
 	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
@@ -810,8 +811,9 @@ public class WolfSigmaRevive : CharState {
 				stateTime = 0;
 				state = 3;
 
-				character.addMusicSource("wolfsigma", character.pos.addxy(0, -75), false);
-				RPC.actorToggle.sendRpc(character.netId, RPCActorToggleType.AddWolfSigmaMusicSource);
+				character.addMusicSource("MMX1-WolfSigmaIntro", character.pos.addxy(0, -75), false);
+				RPC.actorToggle.sendRpc(character.netId, RPCActorToggleType.AddWolfSigmaIntroMusicSource);
+
 			}
 		} else if (state == 3) {
 			if (character.pos.y > destPos.y) {
@@ -846,6 +848,8 @@ public class WolfSigmaRevive : CharState {
 				player.weaponSlot = 1;
 
 				character.changeState(new WolfSigma(), true);
+				character.addMusicSource("MMX1-WolfSigma", character.pos.addxy(0, -75), false);
+				RPC.actorToggle.sendRpc(character.netId, RPCActorToggleType.AddWolfSigmaMusicSource);
 			}
 		}
 	}

@@ -142,6 +142,8 @@ public class MagnetMineProj : Projectile, IDamagable {
 
 public class MagnetMineProjCharged : Projectile {
 	public float size;
+
+	float soundTime;
 	float startY;
 	public MagnetMineProjCharged(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) : base(weapon, pos, xDir, 50, 1, player, "magnetmine_charged", Global.defFlinch, 0.2f, netProjId, player.ownedByLocalPlayer) {
 		maxTime = 4f;
@@ -152,7 +154,6 @@ public class MagnetMineProjCharged : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
-		playSound("magnetminechargedtravelX2", forcePlay: false, sendRpc: true);
 	}
 
 	public override void update() {
@@ -186,6 +187,11 @@ public class MagnetMineProjCharged : Projectile {
 				pos.y = startY - maxY;
 				vel.y = 0;
 			}
+			soundTime += Global.spf;
+			if (soundTime == 0.1f) {
+			playSound("magnetminechargedtravelX2", forcePlay: false, sendRpc: true);				
+			}
+			
 		}
 	}
 

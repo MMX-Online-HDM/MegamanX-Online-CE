@@ -72,6 +72,7 @@ public class ItemTracerProj : Projectile {
 						player.tagged = false;
 					}
 					scannedChar.player.tagged = true;
+					playSound("MMX2-itemTracerTarget", sendRpc: true);
 				}
 				scannedChar.player.scanned = true;
 			}

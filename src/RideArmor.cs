@@ -219,7 +219,7 @@ public class RideArmor : Actor, IDamagable {
 		}
 
 		if (raNum == 4 && character != null && musicSource == null) {
-			addMusicSource("goliath", getCenterPos(), true);
+			addMusicSource("MMX3-DopplerBattle", getCenterPos(), true);
 		}
 		if (character == null && musicSource != null) {
 			destroyMusicSource();
@@ -901,7 +901,7 @@ public class RideArmor : Actor, IDamagable {
 
 	public void playCrashSound() {
 		if (Global.time - lastCrashSoundTime > 0.33f) {
-			if (raNum == 3) playSound("frogLand");
+			if (raNum == 3) playSound("ridewalkX3");
 			else playSound("crash");
 		}
 		lastCrashSoundTime = Global.time;

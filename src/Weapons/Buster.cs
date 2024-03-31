@@ -503,7 +503,9 @@ public class X3ChargeShot : CharState {
 						player.weapon, shootPos, shootDir,
 						3, player, player.getNextActorNetId(), rpc: true
 					);
+					if(!(player.weapon is HyperBuster)){ 
 					character.playSound("buster3X3", sendRpc: true);
+					}
 				} else {
 					new Anim(shootPos, "buster4_muzzle_flash", shootDir, null, true);
 					new BusterPlasmaProj(
