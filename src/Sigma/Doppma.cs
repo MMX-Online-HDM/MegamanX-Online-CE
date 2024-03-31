@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace MMXOnline;
 
@@ -118,5 +119,23 @@ public class Doppma : BaseSigma {
 			);
 		}
 		return base.getProjFromHitbox(collider, centerPoint);
+	}
+	
+	public override List<ShaderWrapper> getShaders() {
+		List<ShaderWrapper> baseShaders = base.getShaders();
+		List<ShaderWrapper> shaders = new();
+		ShaderWrapper? palette = null;
+
+		if (Global.isOnFrameCycle(8)) {
+			palette = player.sigmaShieldShader;
+		}
+		if (palette != null) {
+			shaders.Add(palette);
+		}
+		if (shaders.Count == 0) {
+			return baseShaders;
+		}
+		shaders.AddRange(baseShaders);
+		return shaders;
 	}
 }

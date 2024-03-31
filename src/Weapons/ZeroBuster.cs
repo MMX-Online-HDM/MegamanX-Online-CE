@@ -4,6 +4,8 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class ZeroBuster : Weapon {
+	public static ZeroBuster netWeapon = new();
+
 	public ZeroBuster() : base() {
 		index = (int)WeaponIds.Buster;
 		killFeedIndex = 160;
@@ -15,6 +17,15 @@ public class ZeroBuster : Weapon {
 		displayName = "Z-Buster";
 		description = new string[] { "Shoot uncharged Z-Buster with ATTACK." };
 		type = (int)ZeroAttackLoadoutType.ZBuster;
+	}
+}
+
+public class ZBusterSaber : Weapon {
+	public static ZBusterSaber netWeapon = new();
+
+	public ZBusterSaber() : base() {
+		index = (int)WeaponIds.ZSaberProjSwing;
+		killFeedIndex = 9;
 	}
 }
 
@@ -80,6 +91,7 @@ public class ZBuster2Proj : Projectile {
 	) : base(
 		weapon, pos, xDir, 350, 2, player, "zbuster2", Global.defFlinch, 0, netProjId, player.ownedByLocalPlayer
 	) {
+		fadeOnAutoDestroy = true;
 		fadeSprite = "buster2_fade";
 		reflectable = true;
 		maxTime = 0.5f;
@@ -87,7 +99,7 @@ public class ZBuster2Proj : Projectile {
 			projId = (int)ProjIds.ZBuster2;
 			changeSprite("buster2", true);
 		} else {
-			projId = (int)ProjIds.ZBuster2b;
+			projId = (int)ProjIds.DZBuster2;
 			damager.flinch = 0;
 		}
 		ZBuster2Proj.hyorogaCode(this, player);
@@ -114,13 +126,14 @@ public class ZBuster3Proj : Projectile {
 	) : base(
 		weapon, pos, xDir, 350, 4, player, "zbuster3", Global.defFlinch, 0, netProjId, player.ownedByLocalPlayer
 	) {
+		fadeOnAutoDestroy = true;
 		fadeSprite = "buster3_fade";
 		reflectable = true;
 		maxTime = 0.5f;
 		if (type == 0) {
 			projId = (int)ProjIds.ZBuster3;
 		} else {
-			projId = (int)ProjIds.ZBuster3b;
+			projId = (int)ProjIds.DZBuster3;
 			damager.flinch = Global.halfFlinch;
 			damager.damage = 3;
 		}
@@ -138,13 +151,14 @@ public class ZBuster4Proj : Projectile {
 	) : base(
 		weapon, pos, xDir, 350, 6, player, "zbuster4", Global.defFlinch, 0, netProjId, player.ownedByLocalPlayer
 	) {
-		fadeSprite = "buster4_fade";
+		fadeOnAutoDestroy = true;
+		fadeSprite = "buster3_fade";
 		reflectable = true;
 		maxTime = 0.5f;
 		if (type == 0) {
 			projId = (int)ProjIds.ZBuster4;
 		} else {
-			projId = (int)ProjIds.ZBuster4b;
+			projId = (int)ProjIds.DZBuster4;
 			damager.damage = 3;
 			damager.flinch = Global.halfFlinch;
 		}
@@ -183,6 +197,7 @@ public class ZeroDoubleBuster : CharState {
 		superArmor = true;
 		this.isPinkCharge = isPinkCharge;
 		airMove = true;
+		useDashJumpSpeed = true;
 	}
 
 	public override void update() {
@@ -191,12 +206,6 @@ public class ZeroDoubleBuster : CharState {
 
 		if (player.input.isPressed(Control.Shoot, player)) {
 			shootPressedAgain = true;
-		}
-
-		if (!character.grounded) {
-			if (player.input.isHeld(Control.Dash, player)) {
-				character.isDashing = true;
-			}
 		}
 
 		int type = player.isZBusterZero() ? 1 : 0;
@@ -295,6 +304,7 @@ public class ZSaberProjSwingState : CharState {
 			superArmor = true;
 		}
 		airMove = true;
+		useDashJumpSpeed = true;
 	}
 
 	public override void update() {

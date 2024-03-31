@@ -590,14 +590,17 @@ public class Projectile : Actor {
 	}
 
 	private void rpcCreateHelper(
-		Point pos, Player player, ushort netProjId,
+		Point pos, Player player, ushort? netProjId,
 		int xDirOrAngle, bool isAngle,
 		params byte[] extraData
 	) {
+		if (netProjId == null) {
+			throw new Exception($"Attempt to create RPC of projectile type {this.GetType().ToString()} with null ID");
+		}
 		byte[] projIdBytes = BitConverter.GetBytes((ushort)projId);
 		byte[] xBytes = BitConverter.GetBytes(pos.x);
 		byte[] yBytes = BitConverter.GetBytes(pos.y);
-		byte[] netProjIdByte = BitConverter.GetBytes(netProjId);
+		byte[] netProjIdByte = BitConverter.GetBytes(netProjId.Value);
 		// Create bools of data.
 		byte dataInf = Helpers.boolArrayToByte(new bool[] {
 			isAngle,
@@ -623,14 +626,14 @@ public class Projectile : Actor {
 	}
 
 	public virtual void rpcCreate(
-		Point pos, Player player, ushort netProjId,
+		Point pos, Player player, ushort? netProjId,
 		int xDir, params byte[] extraData
 	) {
 		rpcCreateHelper(pos, player, netProjId, xDir, false, extraData);
 	}
 
 	public virtual void rpcCreateAngle(
-		Point pos, Player player, ushort netProjId,
+		Point pos, Player player, ushort? netProjId,
 		float angle, params byte[] extraData
 	) {
 		int byteAngle = MathInt.Round((angle / 1.40625f) % 256f);
@@ -638,7 +641,7 @@ public class Projectile : Actor {
 	}
 
 	public virtual void rpcCreateByteAngle(
-		Point pos, Player player, ushort netProjId,
+		Point pos, Player player, ushort? netProjId,
 		float angle, params byte[] extraData
 	) {
 		int byteAngle = MathInt.Round(angle % 256f);

@@ -1223,4 +1223,46 @@ public partial class MegamanX : Character {
 	public override string getSprite(string spriteName) {
 		return "mmx_" + spriteName;
 	}
+
+	public override List<ShaderWrapper> getShaders() {
+		List<ShaderWrapper> baseShaders = base.getShaders();
+		List<ShaderWrapper> shaders = new();
+		ShaderWrapper? palette = null;
+		int index = player.weapon.index;
+
+		if (index == (int)WeaponIds.GigaCrush ||
+			index == (int)WeaponIds.ItemTracer ||
+			index == (int)WeaponIds.AssassinBullet ||
+			index == (int)WeaponIds.Undisguise ||
+			index == (int)WeaponIds.UPParry
+		) { 
+			index = 0;
+		}
+		if (index == (int)WeaponIds.HyperBuster && ownedByLocalPlayer) {
+			index = player.weapons[player.hyperChargeSlot].index;
+		}
+		if (player.hasGoldenArmor()) {
+			index = 25;
+		}
+		if (hasUltimateArmorBS.getValue()) {
+			index = 0;
+		}
+		palette = player.xPaletteShader;
+
+		if (!isCStingInvisibleGraphics()) {
+			palette?.SetUniform("palette", index);
+			palette?.SetUniform("paletteTexture", Global.textures["paletteTexture"]);
+		} else {
+			palette?.SetUniform("palette", (this as MegamanX).cStingPaletteIndex % 9);
+			palette?.SetUniform("paletteTexture", Global.textures["cStingPalette"]);
+		}
+		if (palette != null) {
+			shaders.Add(palette);
+		}
+		if (shaders.Count == 0) {
+			return baseShaders;
+		}
+		shaders.AddRange(baseShaders);
+		return shaders;
+	}
 }

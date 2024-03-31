@@ -352,55 +352,16 @@ public partial class Character : Actor, IDamagable {
 
 	public override List<ShaderWrapper> getShaders() {
 		var shaders = new List<ShaderWrapper>();
-		ShaderWrapper palette = null;
+		ShaderWrapper? palette = null;
 
 		// TODO: Send this to the respective classes.
-		if (player.isX) {
-			int index = player.weapon.index;
-			if (index == (int)WeaponIds.GigaCrush || index == (int)WeaponIds.ItemTracer || index == (int)WeaponIds.AssassinBullet || index == (int)WeaponIds.Undisguise || index == (int)WeaponIds.UPParry) index = 0;
-			if (index == (int)WeaponIds.HyperBuster && ownedByLocalPlayer) {
-				index = player.weapons[player.hyperChargeSlot].index;
-			}
-			if (player.hasGoldenArmor()) index = 25;
-			if (hasUltimateArmorBS.getValue()) index = 0;
-			palette = player.xPaletteShader;
-
-			if (!isCStingInvisibleGraphics()) {
-				palette?.SetUniform("palette", index);
-				palette?.SetUniform("paletteTexture", Global.textures["paletteTexture"]);
-			} else {
-				palette?.SetUniform("palette", (this as MegamanX).cStingPaletteIndex % 9);
-				palette?.SetUniform("paletteTexture", Global.textures["cStingPalette"]);
-			}
-		} else if (this is Zero zero) {
-			int paletteNum = 0;
-			if (zero.blackZeroTime > 3) paletteNum = 1;
-			else if (zero.blackZeroTime > 0) {
-				int mod = MathInt.Ceiling(zero.blackZeroTime) * 2;
-				paletteNum = (Global.frameCount % (mod * 2)) < mod ? 0 : 1;
-			}
-			palette = player.zeroPaletteShader;
-			palette?.SetUniform("palette", paletteNum);
-			if (!player.isZBusterZero()) {
-				palette?.SetUniform("paletteTexture", Global.textures["hyperZeroPalette"]);
-			} else {
-				palette?.SetUniform("paletteTexture", Global.textures["hyperBusterZeroPalette"]);
-			}
-			if (isNightmareZeroBS.getValue()) {
-				palette = player.nightmareZeroShader;
-			}
-		} else if (player.isAxl) {
-
-		} else if (player.isViralSigma()) {
+		if (player.isViralSigma()) {
 			int paletteNum = 6 - MathInt.Ceiling((player.health / player.maxHealth) * 6);
 			if (sprite.name.Contains("_enter")) paletteNum = 0;
 			palette = player.viralSigmaShader;
 			palette?.SetUniform("palette", paletteNum);
 			palette?.SetUniform("paletteTexture", Global.textures["paletteViralSigma"]);
-		} else if (player.isSigma3()) {
-			if (Global.isOnFrameCycle(8)) palette = player.sigmaShieldShader;
 		}
-
 		if (palette != null) shaders.Add(palette);
 
 		if (player.isPossessed()) {
@@ -1249,10 +1210,12 @@ public partial class Character : Actor, IDamagable {
 			player.input.isPressed(Control.Jump, player) &&
 			(charState.wallKickLeftWall != null || charState.wallKickRightWall != null)
 		) {
+			dashedInAir = 0;
 			if (player.input.isHeld(Control.Dash, player) &&
 				(charState.useDashJumpSpeed || charState is WallSlide)
 			) {
 				isDashing = true;
+				dashedInAir++;
 			}
 			vel.y = -getJumpPower();
 			wallKickDir = 0;
@@ -1318,6 +1281,9 @@ public partial class Character : Actor, IDamagable {
 				isDashing = (
 					isDashing || player.dashPressed(out string dashControl) && canDash()
 				);
+				if (isDashing) {
+					dashedInAir++;
+				}
 				changeState(new Jump());
 				return true;
 			} else if (player.dashPressed(out string dashControl) && canDash() && charState is not Dash) {
@@ -1343,10 +1309,8 @@ public partial class Character : Actor, IDamagable {
 		// Air normal states.
 		else {
 			if (player.dashPressed(out string dashControl) && canAirDash() && canDash()) {
-				if (!isDashing) {
-					changeState(new AirDash(dashControl));
-					return true;
-				}
+				changeState(new AirDash(dashControl));
+				return true;
 			}
 			if (canAirJump()) {
 				if (player.input.isPressed(Control.Jump, player) && canJump()) {
@@ -1354,9 +1318,10 @@ public partial class Character : Actor, IDamagable {
 				}
 				if ((player.input.isPressed(Control.Jump, player) ||
 					Global.time - lastJumpPressedTime < 0.1f) &&
-					!isDashing && wallKickTimer <= 0 && flag == null &&
+					wallKickTimer <= 0 && flag == null &&
 					!sprite.name.Contains("kick_air")
 				) {
+					lastJumpPressedTime = 0;
 					dashedInAir++;
 					vel.y = -getJumpPower();
 					changeState(new Jump(), true);

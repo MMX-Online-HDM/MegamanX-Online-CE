@@ -10,9 +10,8 @@ public class BusterZero : Character {
 	public bool isBlackZero;
 	public int stockedBusterLv;
 	public bool stockedSaber;
-	public List<BusterProj> zeroLemonsOnField = new();
-	public ZeroBuster busterWeapon = new();
-	public ZSaberProjSwing meleeWeapon;
+	public List<DZBusterProj> zeroLemonsOnField = new();
+	public ZBusterSaber meleeWeapon = new();
 
 	public BusterZero(
 		Player player, float x, float y, int xDir,
@@ -20,7 +19,6 @@ public class BusterZero : Character {
 	) : base(
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn
 	) {
-		meleeWeapon = new ZSaberProjSwing(player);
 	}
 
 	public override void update() {
@@ -84,7 +82,7 @@ public class BusterZero : Character {
 		}
 		if (hyperProgress >= 1 && player.currency >= Player.zeroHyperCost) {
 			hyperProgress = 0;
-			changeState(new HyperZeroStart(0), true);
+			changeState(new HyperBusterZeroStart(), true);
 			return true;
 		}
 		return base.normalCtrl();
@@ -163,21 +161,21 @@ public class BusterZero : Character {
 
 		if (chargeLevel == 0) {
 			playSound("busterX3", sendRpc: true);
-			var lemon = new BusterProj(
-				busterWeapon, shootPos, xDir, 1, player, player.getNextActorNetId(), rpc: true
+			var lemon = new DZBusterProj(
+				shootPos, xDir, player, player.getNextActorNetId(), rpc: true
 			);
 			zeroLemonsOnField.Add(lemon);
 			lemonCooldown = 0.15f;
 		} else if (chargeLevel == 1) {
 			playSound("buster2X3", sendRpc: true);
-			new ZBuster2Proj(
-				busterWeapon, shootPos, xDir, 1, player, player.getNextActorNetId(), rpc: true
+			new DZBuster2Proj(
+				shootPos, xDir, player, player.getNextActorNetId(), rpc: true
 			);
 			lemonCooldown = 22f / 60f;
 		} else if (chargeLevel == 2) {
 			playSound("buster3X3", sendRpc: true);
-			new ZBuster4Proj(
-				busterWeapon, shootPos, xDir, 1, player, player.getNextActorNetId(), rpc: true
+			new DZBuster3Proj(
+				shootPos, xDir, player, player.getNextActorNetId(), rpc: true
 			);
 			lemonCooldown = 22f / 60f;
 		} else if (chargeLevel >= 3) {
@@ -197,7 +195,7 @@ public class BusterZero : Character {
 	public override Projectile? getProjFromHitbox(Collider collider, Point centerPoint) {
 		if (sprite.name == "zero_projswing") {
 			return new GenericMeleeProj(
-				meleeWeapon, centerPoint, ProjIds.ZSaberProjSwing, player,
+				meleeWeapon, centerPoint, ProjIds.DZMelee, player,
 				isBlackZero ? 4 : 3, Global.defFlinch, 0.5f, isReflectShield: true
 			);
 		}
@@ -237,5 +235,25 @@ public class BusterZero : Character {
 
 	public override bool canAirJump() {
 		return dashedInAir == 0 || (dashedInAir == 1 && isBlackZero);
+	}
+
+	public override List<ShaderWrapper> getShaders() {
+		List<ShaderWrapper> baseShaders = base.getShaders();
+		List<ShaderWrapper> shaders = new();
+		ShaderWrapper? palette = null;
+
+		if (isBlackZero) {
+			palette = player.zeroPaletteShader;
+			palette?.SetUniform("palette", 1);
+			palette?.SetUniform("paletteTexture", Global.textures["hyperBusterZeroPalette"]);
+		}
+		if (palette != null) {
+			shaders.Add(palette);
+		}
+		if (shaders.Count == 0) {
+			return baseShaders;
+		}
+		shaders.AddRange(baseShaders);
+		return shaders;
 	}
 }
