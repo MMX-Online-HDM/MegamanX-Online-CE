@@ -34,12 +34,11 @@ public class Shoryuken : CharState {
 		if (character.sprite.frameIndex >= 2 && !jumpedYet) {
 			jumpedYet = true;
 			character.dashedInAir++;
-			character.vel.y = -character.getJumpPower() * 1.5f;
+			character.vel.y = -character.getJumpPower() * 4.75f;
 			character.playSound("shoryukenV", sendRpc: true);
-
 		}
 		if (character.sprite.frameIndex == 2 && character.currentFrame.POIs.Count > 0) {
-			character.move(new Point(character.xDir * 150, 0));
+			character.move(new Point(character.xDir * 165, 0));
 			Point poi = character.currentFrame.POIs[0];
 			Point firePos = character.pos.addxy(poi.x * character.xDir, poi.y);
 			if (anim == null) {
