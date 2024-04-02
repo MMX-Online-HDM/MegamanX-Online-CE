@@ -25,9 +25,9 @@ public class Damager {
 			{ (int)ProjIds.VoltTornado, 1 },
 			{ (int)ProjIds.TornadoCharged, 1 },
             //{ (int)ProjIds.KKnuckle, 1 },
-            { (int)ProjIds.KKnuckle2, 1 },
-			{ (int)ProjIds.KKnuckleSpinKick, 1 },
-			{ (int)ProjIds.KKnuckleAirKick, 1 },
+            { (int)ProjIds.PZeroPunch2, 1 },
+			{ (int)ProjIds.PZeroSenpuukyaku, 1 },
+			{ (int)ProjIds.PZeroAirKick, 1 },
 			{ (int)ProjIds.MechPunch, 1 },
 			{ (int)ProjIds.MechKangarooPunch, 1 },
 			{ (int)ProjIds.MechGoliathPunch, 1 },
@@ -153,34 +153,45 @@ public class Damager {
 
 		// Run the RPC on all clients first, before it can modify the parameters, so clients can act accordingly
 		if (sendRpc && victim.netId != null && Global.serverClient?.isLagging() == false) {
-			var damageBytes = BitConverter.GetBytes(damage);
-			var hitCooldownBytes = BitConverter.GetBytes(hitCooldown);
-			var victimNetIdBytes = BitConverter.GetBytes((ushort)victim.netId);
-			var actorNetIdBytes = BitConverter.GetBytes(damagingActor?.netId ?? 0);
+			byte[] damageBytes = BitConverter.GetBytes(damage);
+			byte[] hitCooldownBytes = BitConverter.GetBytes(hitCooldown);
+			byte[] victimNetIdBytes = BitConverter.GetBytes((ushort)victim.netId);
+			byte[] actorNetIdBytes = BitConverter.GetBytes(damagingActor?.netId ?? 0);
 			var projIdBytes = BitConverter.GetBytes(projId);
-
+			bool isLinkedMelee = false;
+			
+			if (damagingActor is GenericMeleeProj gmp &&
+				(gmp.netId == null || gmp.netId == 0)
+			) {
+				isLinkedMelee = true; 
+				if (gmp.owningActor?.netId != null) {
+					actorNetIdBytes = BitConverter.GetBytes(gmp.owningActor?.netId ?? 0);
+				} else {
+					actorNetIdBytes = BitConverter.GetBytes(gmp.owner?.character?.netId ?? 0);
+				}
+			}
 			var byteParams = new List<byte> {
-					(byte)owner.id,
-					damageBytes[0],
-					damageBytes[1],
-					damageBytes[2],
-					damageBytes[3],
-					hitCooldownBytes[0],
-					hitCooldownBytes[1],
-					hitCooldownBytes[2],
-					hitCooldownBytes[3],
-					(byte)flinch,
-					victimNetIdBytes[0],
-					victimNetIdBytes[1],
-					weakness ? (byte)1 : (byte)0,
-					(byte)weaponIndex,
-					(byte)weaponKillFeedIndex,
-					actorNetIdBytes[0],
-					actorNetIdBytes[1],
-					projIdBytes[0],
-					projIdBytes[1],
-				};
-
+				(byte)owner.id,
+				damageBytes[0],
+				damageBytes[1],
+				damageBytes[2],
+				damageBytes[3],
+				hitCooldownBytes[0],
+				hitCooldownBytes[1],
+				hitCooldownBytes[2],
+				hitCooldownBytes[3],
+				(byte)flinch,
+				victimNetIdBytes[0],
+				victimNetIdBytes[1],
+				weakness ? (byte)1 : (byte)0,
+				(byte)weaponIndex,
+				(byte)weaponKillFeedIndex,
+				actorNetIdBytes[0],
+				actorNetIdBytes[1],
+				projIdBytes[0],
+				projIdBytes[1],
+				(byte)(isLinkedMelee ? 0 : 1),
+			};
 			RPC.applyDamage.sendRpc(byteParams.ToArray());
 		}
 
@@ -670,10 +681,12 @@ public class Damager {
 		) {
 			parryState.counterAttack(owner, damagingActor, Math.Max(finalDamage * 2, 4));
 			return true;
-		} else if (
-			finalDamage > 0 && character != null &&
-			character.ownedByLocalPlayer && charState is KKnuckleParryStartState parryState2
-			&& parryState2.canParry(damagingActor) && !isDot(projId)
+		}
+		if (finalDamage > 0 && character != null &&
+			character.ownedByLocalPlayer &&
+			charState is KKnuckleParryStartState parryState2
+			&& parryState2.canParry(damagingActor) &&
+			!isDot(projId)
 		) {
 			parryState2.counterAttack(owner, damagingActor, finalDamage);
 			return true;

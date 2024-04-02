@@ -726,6 +726,16 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public override void onCollision(CollideData other) {
+		if (charState is KKnuckleParryStartState punchParry &&
+			other.gameObject is Projectile proj &&
+			punchParry.canParry(proj) &&
+			proj.owner.alliance != player.alliance &&
+			proj.damager?.damage > 0 &&
+			!Damager.isDot(proj.projId)
+		) {
+			punchParry.counterAttack(proj.owner, proj, proj.damager.damage);
+			return;
+		}
 		base.onCollision(other);
 		if (other.myCollider?.flag == (int)HitboxFlag.Hitbox || other.myCollider?.flag == (int)HitboxFlag.None) return;
 
@@ -975,7 +985,7 @@ public partial class Character : Actor, IDamagable {
 
 		if (!ownedByLocalPlayer) {
 			if (isCharging()) {
-				chargeLogic();
+				chargeGfx();
 			} else {
 				stopCharge();
 			}
@@ -1262,6 +1272,9 @@ public partial class Character : Actor, IDamagable {
 		if (charState.attackCtrl) {
 			return attackCtrl();
 		}
+		if (charState.altAttackCtrls.Any(b => b)) {
+			return altAttackCtrl(charState.altAttackCtrls);
+		}
 		return false;
 	}
 
@@ -1383,6 +1396,10 @@ public partial class Character : Actor, IDamagable {
 		return false;
 	}
 
+	public virtual bool altAttackCtrl(bool[] ctrls) {
+		return false;
+	}
+
 	public void removeAcid() {
 		acidTime = 0;
 		acidHurtCooldown = 0;
@@ -1465,7 +1482,7 @@ public partial class Character : Actor, IDamagable {
 		return true;
 	}
 
-	public void chargeLogic() {
+	public virtual void chargeGfx() {
 		if (ownedByLocalPlayer) {
 			chargeEffect.stop();
 		}
@@ -3193,7 +3210,7 @@ public partial class Character : Actor, IDamagable {
 				}
 				stopCharge();
 			}
-			chargeLogic();
+			chargeGfx();
 		}
 
 		/*
@@ -3242,6 +3259,30 @@ public partial class Character : Actor, IDamagable {
 
 	public virtual bool chargeButtonHeld() {
 		return false;
+	}
+
+
+	public virtual void chargeLogic(Action<int> shootFunct) {
+		// Charge shoot logic.
+		// We test if we are holding charge and not inside a vehicle.
+		if (chargeButtonHeld() && flag == null && rideChaser == null && rideArmor == null) {
+			// If we are holding but we cannot charge we do not release.
+			if (canCharge()) {
+				increaseCharge();
+			}
+		}
+		// Release charge only if not holding and we can attack.
+		// This to prevent from losing charge.
+		else if (charState.attackCtrl) {
+			int chargeLevel = getChargeLevel();
+			if (isCharging()) {
+				if (chargeLevel >= 1) {
+					shootFunct(chargeLevel);
+				}
+			}
+			stopCharge();
+		}
+		chargeGfx();
 	}
 }
 

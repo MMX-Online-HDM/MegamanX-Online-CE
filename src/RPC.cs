@@ -310,19 +310,46 @@ public class RPCApplyDamage : RPC {
 
 	public override void invoke(params byte[] arguments) {
 		int ownerId = arguments[0];
-		float damage = BitConverter.ToSingle(new byte[] { arguments[1], arguments[2], arguments[3], arguments[4] }, 0);
-		float hitCooldown = BitConverter.ToSingle(new byte[] { arguments[5], arguments[6], arguments[7], arguments[8] }, 0);
+		float damage = BitConverter.ToSingle(
+			new byte[] { arguments[1], arguments[2], arguments[3], arguments[4] }, 0
+		);
+		float hitCooldown = BitConverter.ToSingle(
+			new byte[] { arguments[5], arguments[6], arguments[7], arguments[8] }, 0
+		);
 		int flinch = arguments[9];
-		ushort victimId = BitConverter.ToUInt16(new byte[] { arguments[10], arguments[11] }, 0);
+		ushort victimId = BitConverter.ToUInt16(
+			new byte[] { arguments[10], arguments[11] }, 0
+		);
 		bool weakness = arguments[12] == 1;
 		int weaponIndex = arguments[13];
 		int weaponKillFeedIndex = arguments[14];
-		ushort actorId = BitConverter.ToUInt16(new byte[] { arguments[15], arguments[16] }, 0);
-		ushort projId = BitConverter.ToUInt16(new byte[] { arguments[17], arguments[18] }, 0);
+		ushort actorId = BitConverter.ToUInt16(
+			new byte[] { arguments[15], arguments[16] }, 0
+		);
+		ushort projId = BitConverter.ToUInt16(
+			new byte[] { arguments[17], arguments[18] }, 0
+		);
+		bool isLinkedMelee = arguments[19] == 1;
 
 		var player = Global.level.getPlayerById(ownerId);
 		var victim = Global.level.getActorByNetId(victimId);
-		var actor = actorId == 0 ? null : Global.level.getActorByNetId(actorId);
+		Actor? actor = null;
+
+		if (isLinkedMelee) {
+			Actor mainActor = Global.level.getActorByNetId(actorId);
+			List<Projectile> projs = new();
+			foreach (Collider collider in mainActor.sprite.getCurrentFrame().hitboxes) {
+				Projectile proj = mainActor.getProjFromHitboxBase(collider);
+				if (proj != null) {
+					if (proj.projId == projId) {
+						actor = proj;
+						break;
+					}
+				}
+			}
+		} else {
+			actor = (actorId == 0 ? null : Global.level.getActorByNetId(actorId));
+		}
 
 		if (player != null && victim != null) {
 			Damager.applyDamage(

@@ -9,7 +9,9 @@ public partial class Actor {
 	public void sendActorNetData() {
 		byte[] networkIdBytes = Helpers.convertToBytes((ushort)netId);
 		if ((netId == 10 || netId == 11) && this is not Flag) {
-			//string msg = string.Format("NetId {0} was not flag. Was {1}", netId.Value.ToString(), this.GetType().ToString());
+			//string msg = string.Format(
+				//"NetId {0} was not flag. Was {1}", netId.Value.ToString(), this.GetType().ToString()
+			//);
 			//Logger.logException(new Exception(msg), false);
 			return;
 		}

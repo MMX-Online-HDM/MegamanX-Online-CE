@@ -222,7 +222,6 @@ public class BusterZeroHadangeki : CharState {
 	}
 }
 
-
 public class HyperBusterZeroStart : CharState {
 	public float radius = 200;
 	public float time;

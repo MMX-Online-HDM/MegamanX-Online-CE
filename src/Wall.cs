@@ -322,8 +322,8 @@ public class CrackedWall : Actor, IDamagable {
 		if (projId == (int)ProjIds.SparkMPunch) return 12;
 		if (projId == (int)ProjIds.TBreaker) return 12;
 		if (projId == (int)ProjIds.TBreakerProj) return 12;
-		if (projId == (int)ProjIds.KKnuckle || projId == (int)ProjIds.KKnuckle2) return null;
-		if (projId == (int)ProjIds.KKnuckleMegaPunch) return null;
+		if (projId == (int)ProjIds.PZeroPunch || projId == (int)ProjIds.PZeroPunch2) return null;
+		if (projId == (int)ProjIds.PZeroYoudantotsu) return null;
 		if (projId == (int)ProjIds.WheelGSpinWheel) return 3;
 		if (projId == (int)ProjIds.WheelGSpin) return 3;
 		if (projId == (int)ProjIds.TunnelRTornadoFang) return null;
