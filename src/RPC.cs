@@ -334,29 +334,42 @@ public class RPCApplyDamage : RPC {
 		var player = Global.level.getPlayerById(ownerId);
 		var victim = Global.level.getActorByNetId(victimId);
 		Actor? actor = null;
-
+		// For when the projectile was a melee without a NetID.
 		if (isLinkedMelee) {
 			Actor mainActor = Global.level.getActorByNetId(actorId);
 			List<Projectile> projs = new();
-			foreach (Collider collider in mainActor.sprite.getCurrentFrame().hitboxes) {
-				Projectile proj = mainActor.getProjFromHitboxBase(collider);
-				if (proj != null) {
-					if (proj.projId == projId) {
-						actor = proj;
-						break;
-					}
-				}
-			}
-			if (actor == null) {
+			if (mainActor != null) {
+				// We try to search anything with a matching ProjID.
 				foreach (Collider collider in mainActor.sprite.getCurrentFrame().hitboxes) {
 					Projectile proj = mainActor.getProjFromHitboxBase(collider);
 					if (proj != null) {
-						actor = proj;
-						break;
+						if (proj.projId == projId) {
+							actor = proj;
+							break;
+						}
 					}
 				}
+				// If that fails we search anything at all.
+				if (actor == null) {
+					foreach (Collider collider in mainActor.sprite.getCurrentFrame().hitboxes) {
+						Projectile proj = mainActor.getProjFromHitboxBase(collider);
+						if (proj != null) {
+							actor = proj;
+							break;
+						}
+					}
+				}
+				// If that fails... screw it we create one.
+				if (actor == null) {
+					actor = new GenericMeleeProj(
+						new Weapon(), mainActor.pos, (ProjIds)projId,
+						player, damage, flinch, hitCooldown
+					);
+				}
 			}
-		} else {
+		}
+		// For normal projectiles.
+		else {
 			actor = (actorId == 0 ? null : Global.level.getActorByNetId(actorId));
 		}
 
