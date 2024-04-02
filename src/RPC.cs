@@ -347,6 +347,15 @@ public class RPCApplyDamage : RPC {
 					}
 				}
 			}
+			if (actor == null) {
+				foreach (Collider collider in mainActor.sprite.getCurrentFrame().hitboxes) {
+					Projectile proj = mainActor.getProjFromHitboxBase(collider);
+					if (proj != null) {
+						actor = proj;
+						break;
+					}
+				}
+			}
 		} else {
 			actor = (actorId == 0 ? null : Global.level.getActorByNetId(actorId));
 		}
