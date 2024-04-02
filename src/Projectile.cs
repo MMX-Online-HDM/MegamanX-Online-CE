@@ -39,6 +39,8 @@ public class Projectile : Actor {
 	public Player ownerPlayer;
 	public Actor hitboxActor;
 
+	public bool isMelee;
+
 	public Projectile(Weapon weapon, Point pos, int xDir, float speed, float damage, Player player, string sprite, int flinch, float hitCooldown, ushort? netId, bool ownedByLocalPlayer) : base(sprite, pos, netId, ownedByLocalPlayer, false) {
 		this.weapon = weapon;
 		this.speed = speed;
@@ -110,7 +112,7 @@ public class Projectile : Actor {
 				return;
 			}
 		} else {
-			if (time > maxTime + 0.2 ||
+			if (time > maxTime + 0.1 ||
 				moveDistance > maxDistance ||
 				pos.x > Global.level.width + leeway ||
 				pos.x < -leeway ||
