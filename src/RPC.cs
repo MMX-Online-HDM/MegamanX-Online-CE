@@ -363,7 +363,7 @@ public class RPCApplyDamage : RPC {
 				if (actor == null) {
 					actor = new GenericMeleeProj(
 						new Weapon(), mainActor.pos, (ProjIds)projId,
-						player, damage, flinch, hitCooldown
+						player, damage, flinch, hitCooldown, mainActor
 					);
 				}
 			}
