@@ -24,7 +24,7 @@ public class AwakenedSaberProj : Projectile {
 		reflectable = true;
 		destroyOnHit = true;
 		this.maxTime = maxTime;
-		projId = (int)ProjIds.AwakenedZeroSaber;
+		//projId = (int)ProjIds.AwakenedZeroSaber;
 		Character character = player.character;
 		if (rpc) {
 			rpcCreate(
