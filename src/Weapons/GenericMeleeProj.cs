@@ -3,8 +3,13 @@
 public class GenericMeleeProj : Projectile {
 	public Actor owningActor;
 
-	public GenericMeleeProj(Weapon weapon, Point pos, ProjIds projId, Player player, float? damage = null, int? flinch = null, float? hitCooldown = null, Actor owningActor = null, bool isShield = false, bool isDeflectShield = false, bool isReflectShield = false) :
-		base(weapon, pos, 1, 0, 2, player, "empty", 0, 0.25f, null, player.ownedByLocalPlayer) {
+	public GenericMeleeProj(
+		Weapon weapon, Point pos, ProjIds projId, Player player,
+		float? damage = null, int? flinch = null, float? hitCooldown = null,
+		Actor owningActor = null, bool isShield = false, bool isDeflectShield = false, bool isReflectShield = false
+	) : base(
+		weapon, pos, 1, 0, 2, player, "empty", 0, 0.25f, null, player.ownedByLocalPlayer
+	) {
 		destroyOnHit = false;
 		shouldVortexSuck = false;
 		shouldShieldBlock = false;
@@ -12,12 +17,15 @@ public class GenericMeleeProj : Projectile {
 		damager.damage = damage ?? weapon.damager.damage;
 		damager.flinch = flinch ?? weapon.damager.flinch;
 		damager.hitCooldown = hitCooldown ?? weapon.damager.hitCooldown;
-		if (damager.hitCooldown == 0) damager.hitCooldown = 0.5f;
+		if (damager.hitCooldown == 0) {
+			damager.hitCooldown = 0.5f;
+		}
 		this.owningActor = owningActor;
 		this.xDir = owningActor?.xDir ?? player.character?.xDir ?? 1;
 		this.isShield = isShield;
 		this.isDeflectShield = isDeflectShield;
 		this.isReflectShield = isReflectShield;
+		isMelee = true;
 	}
 
 	public override void update() {

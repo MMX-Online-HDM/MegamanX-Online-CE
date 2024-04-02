@@ -180,7 +180,7 @@ public class Vile : Character {
 				}
 				stopCharge();
 			}
-			chargeLogic();
+			chargeGfx();
 		}
 
 		var raState = charState as InRideArmor;

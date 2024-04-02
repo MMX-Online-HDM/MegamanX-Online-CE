@@ -244,7 +244,7 @@ public class Zero : Character {
 			}
 			stopCharge();
 		}
-		chargeLogic();
+		chargeGfx();
 
 		Helpers.decrementTime(ref zeroLemonCooldown);
 
@@ -648,40 +648,6 @@ public class Zero : Character {
 			);
 		}
 		Projectile? proj = sprite.name switch {
-			"zero_punch" => new GenericMeleeProj(
-				kKnuckleWeapon, centerPoint, ProjIds.KKnuckle, player, 2, 0, 0.25f
-			),
-			"zero_punch2" => new GenericMeleeProj(
-				kKnuckleWeapon, centerPoint, ProjIds.KKnuckle2, player, 2, Global.halfFlinch, 0.25f
-			),
-			"zero_spinkick" => new GenericMeleeProj(
-				kKnuckleWeapon, centerPoint, ProjIds.KKnuckle2, player, 2, Global.halfFlinch, 0.5f
-			),
-			"zero_kick_air" => new GenericMeleeProj(
-				kKnuckleWeapon, centerPoint, ProjIds.KKnuckleAirKick, player, 3, 0, 0.25f
-			),
-			"zero_parry_start" => new GenericMeleeProj(
-				new KKnuckleParry(), centerPoint, ProjIds.KKnuckleParryStart, player, 0, Global.defFlinch, 0.25f
-			),
-			"zero_parry" => new GenericMeleeProj(
-				new KKnuckleParry(), centerPoint, ProjIds.KKnuckleParry, player, 4, Global.defFlinch, 0.25f
-			),
-			"zero_shoryuken" => new GenericMeleeProj(
-				zeroUppercutWeaponA, centerPoint, ProjIds.KKnuckleShoryuken, player, 4, Global.defFlinch, 0.25f
-			),
-			"zero_megapunch" => new GenericMeleeProj(
-				raijingekiWeapon, centerPoint, ProjIds.KKnuckleMegaPunch, player, 6, Global.defFlinch, 0.25f
-			),
-			"zero_dropkick" => new GenericMeleeProj(
-				zeroDownThrustWeaponA, centerPoint, ProjIds.KKnuckleDropKick, player, 4, Global.halfFlinch, 0.25f
-			),
-			_ => null
-		};
-		if (proj != null) {
-			return proj;
-		}
-
-		proj = sprite.name switch {
 			"zero_attack" => new GenericMeleeProj(
 				zSaberWeapon, centerPoint, ProjIds.ZSaber1, player, 2, 0, 0.25f, isReflectShield: true
 			),

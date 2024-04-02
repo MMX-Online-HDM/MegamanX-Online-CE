@@ -54,6 +54,7 @@ public class CharState {
 	// Control system.
 	// This dictates if it can attack or land.
 	public bool attackCtrl;
+	public bool[] altAttackCtrls = new bool[1];
 	public bool normalCtrl;
 	public bool airMove;
 	public bool canStopJump;

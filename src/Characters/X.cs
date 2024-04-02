@@ -421,7 +421,7 @@ public partial class MegamanX : Character {
 			player.changeWeaponControls();
 		}
 
-		chargeLogic();
+		chargeGfx();
 
 		if (charState is Hurt || charState is Die) {
 			shotgunIceChargeTime = 0;

@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace MMXOnline;
 
@@ -50,23 +48,12 @@ public class BusterZero : Character {
 				}
 			}
 		}
-		// Charge and release shoot logic.
-		if (chargeButtonHeld() && flag == null && rideChaser == null && rideArmor == null) {
-			if (stockedBusterLv == 0 && !stockedSaber && !isInvulnerableAttack()) {
-				increaseCharge();
-			}
-		}
-		// Release charge.
-		else if (charState.attackCtrl) {
-			int chargeLevel = getChargeLevel();
-			if (isCharging()) {
-				if (chargeLevel >= 1) {
-					shoot(chargeLevel);
-				}
-			}
-			stopCharge();
-		}
-		chargeLogic();
+		// Charge and release charge logic.
+		chargeLogic(shoot);
+	}
+
+	public override bool canCharge() {
+		return (stockedBusterLv == 0 && !stockedSaber && !isInvulnerableAttack());
 	}
 
 	public override bool normalCtrl() {
