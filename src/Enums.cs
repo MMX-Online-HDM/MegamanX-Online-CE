@@ -416,15 +416,6 @@ public enum ProjIds {
 	SuiretsusanProj,
 	TBreaker,
 	TBreakerProj,
-	KKnuckle,
-	KKnuckle2,
-	KKnuckleAirKick,
-	KKnuckleSpinKick,
-	KKnuckleShoryuken,
-	KKnuckleDropKick,
-	KKnuckleMegaPunch,
-	KKnuckleParryStart,
-	KKnuckleParry,
 
 	ElectricShock,
 	MK2StunShot,
@@ -685,7 +676,18 @@ public enum ProjIds {
 	RideChaserCrash,
 	DarkHold,
 
-	// Zero buster.
+	// PunchyZeroStuff
+	PZeroPunch,
+	PZeroPunch2,
+	PZeroAirKick,
+	PZeroSenpuukyaku,
+	PZeroShoryuken,
+	PZeroEnkoukyaku,
+	PZeroYoudantotsu,
+	PZeroParryStart,
+	PZeroParryAttack,
+
+	// Dark Zero buster.
 	DZBuster,
 	DZBuster2,
 	DZBuster3,
