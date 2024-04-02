@@ -45,7 +45,7 @@ public abstract class ZeroGroundPunches : CharState {
 			Projectile? saberHitbox = character.getProjFromHitbox(null, character.pos);
 			if (saberHitbox != null) {
 				saberHitbox.destroySelf();
-				new AwakenedSaberProj(
+				/*new AwakenedSaberProj(
 					projId, projMaxTime,
 					player.zSaberWeapon,
 					character.pos.addxy(30 * character.xDir, -20f),
@@ -53,7 +53,7 @@ public abstract class ZeroGroundPunches : CharState {
 					player,
 					player.getNextActorNetId(),
 					rpc: true
-				);
+				);*/
 			}
 		}
 		if (character.sprite.frameIndex >= comboFrame) {
