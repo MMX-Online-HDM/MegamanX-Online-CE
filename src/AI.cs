@@ -562,7 +562,8 @@ public class AI {
 				int ShotgunIce = player.weapons.FindIndex(w => w is ShotgunIce);	
 				int SonicSlicer = player.weapons.FindIndex(w => w is SonicSlicer);
 				int StrikeChain = player.weapons.FindIndex(w => w is StrikeChain);
-				int BubbleSplash = player.weapons.FindIndex(w => w is BubbleSplash);		
+				int BubbleSplash = player.weapons.FindIndex(w => w is BubbleSplash);	
+
 				int Xattack = Helpers.randomRange(0, 12);
 				if (!megamanX.isHyperX && megamanX?.charState?.isGrabbedState == false && !player.isDead && megamanX.charState.canAttack() && megamanX.canShoot()
 				&& megamanX.canChangeWeapons()
@@ -816,8 +817,10 @@ public class AI {
 							}
 							break;
 						case 5:
-							if (!player.hasArmor() && isTargetSSC)
-								megamanX.changeState(new X6SaberState(megamanX.grounded), true);
+							if (!player.hasArmor()) {
+								megamanX.player.press(Control.Special1);
+								megamanX.player.release(Control.Special1);
+							}
 							break;
 						case 6:
 							int novaStrikeSlot = player.weapons.FindIndex(w => w is NovaStrike);
@@ -899,8 +902,7 @@ public class AI {
 							}
 							break;
 						case 5:
-							if (isTargetClose)
-								megamanX.changeState(new X6SaberState(megamanX.grounded), true);
+							megamanX.changeState(new X6SaberState(megamanX.grounded), true);
 							break;
 					}
 				}
@@ -1302,9 +1304,13 @@ public class AI {
 	public void axlAIAttack(Character axl2) {
 		//Axl Start
 		if (character is Axl axl) {
-			if (player.currency >= 10 && !player.isDead && !axl.isSpriteInvulnerable() && !axl.isInvulnerable() && !axl.isWhiteAxl()
+			if (player.axlHyperMode == 0 && player.currency >= 10 && !player.isDead && !axl.isSpriteInvulnerable() && !axl.isInvulnerable() && !axl.isWhiteAxl()
 				&& !(axl.charState is Hurt or Die or Frozen or Crystalized or Stunned or WarpIn or HyperAxlStart or WallSlide or WallKick or DodgeRoll)){
 				axl.changeState(new HyperAxlStart(axl.grounded), true);
+				}
+			if (player.axlHyperMode == 1 && player.currency >= 10 && !player.isDead && !axl.isSpriteInvulnerable() && !axl.isInvulnerable() && !axl.isStealthMode()
+				&& !(axl.charState is Hurt or Die or Frozen or Crystalized or Stunned or WarpIn or HyperAxlStart or WallSlide or WallKick or DodgeRoll)){
+				axl.stingChargeTime = 12;
 				}
 
 			int AAttack = Helpers.randomRange(0, 1);

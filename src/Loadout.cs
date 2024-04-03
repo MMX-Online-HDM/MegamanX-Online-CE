@@ -289,6 +289,7 @@ public class AxlLoadout {
 			plasmaGunAlt = Helpers.randomRange(0, 1),
 			iceGattlingAlt = Helpers.randomRange(0, 1),
 			flameBurnerAlt = Helpers.randomRange(0, 1),
+			hyperMode = Helpers.randomRange(0,1),
 		};
 	}
 }
