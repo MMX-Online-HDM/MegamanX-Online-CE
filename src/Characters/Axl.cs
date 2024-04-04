@@ -353,8 +353,8 @@ public class Axl : Character {
 		player.changeWeaponControls();
 
 		updateAxlAim();
-
-		if (dodgeRollCooldown == 0 && player.canControl) {
+		//somehow you could do air dodge roll, added "grounded" to fix that "bug"
+		if (dodgeRollCooldown == 0 && player.canControl && grounded) {
 			if (charState is Crouch && player.input.isPressed(Control.Dash, player)) {
 				changeState(new DodgeRoll(), true);
 			} else if (player.input.isPressed(Control.Dash, player) && player.input.checkDoubleTap(Control.Dash)) {
