@@ -219,6 +219,25 @@ public class AI {
 				player.aiArmorUpgradeIndex++;
 			}
 		}
+		if (!player.isMainPlayer && player.isVile)
+		{
+			if (player.currency >= 3 && !player.frozenCastle) {
+				player.frozenCastle = true;
+				player.currency -= Vile.frozenCastleCost;
+			}
+			if (player.currency >= 3 && !player.speedDevil) {
+				player.speedDevil = true;
+				player.currency -= Vile.speedDevilCost;
+			}
+		}
+		if (!player.isMainPlayer) {
+			if(player.heartTanks < 8 && player.currency >= 2) {
+				player.currency -= 2;	
+				player.heartTanks++;
+				player.maxHealth += player.getHeartTankModifier();
+				player.character?.addHealth(player.getHeartTankModifier());
+			}
+		}
 
 		if (framesChargeHeld > 0) {
 			if (character.chargeTime < maxChargeTime) {
@@ -817,7 +836,7 @@ public class AI {
 							}
 							break;
 						case 5:
-							if (!player.hasArmor()) {
+							if (player.armorFlag == 0) {
 								megamanX.player.press(Control.Special1);
 								megamanX.player.release(Control.Special1);
 							}
@@ -1542,7 +1561,7 @@ public class AI {
 		// X:
 		if (character is MegamanX mmx) {
 
-			if (player.canUpgradeUltimateX() && player.health >= 16) {
+			if (player.canUpgradeUltimateX() && player.health >= player.maxHealth) {
 				if (!player.character.boughtUltimateArmorOnce) {
 					player.currency -= Player.ultimateArmorCost;
 					player.character.boughtUltimateArmorOnce = true;
@@ -1551,7 +1570,7 @@ public class AI {
 				return;
 			}
 
-			if (player.hasAllX3Armor() && player.canUpgradeGoldenX() && player.health >= 16) {
+			if (player.hasAllX3Armor() && player.canUpgradeGoldenX() && player.health >= player.maxHealth) {
 				if (!player.character.boughtGoldenArmorOnce) {
 					player.currency -= Player.goldenArmorCost;
 					player.character.boughtGoldenArmorOnce = true;
