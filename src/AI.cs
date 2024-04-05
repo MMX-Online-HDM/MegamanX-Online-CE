@@ -1551,10 +1551,39 @@ public class AI {
 	public void doVileAI(Character vile4) {
 		// Vile: Go MK2 to MKV
 		if (character is Vile vile1) {
-			if (player.canReviveVile() && vile1.isVileMK1)
+			if (player.canReviveVile() && vile1.isVileMK1) {			
 				player.reviveVile(false);
-			if (vile1.isVileMK2 && player.canReviveVile())
+			}
+			if (vile1.isVileMK2 && player.canReviveVile()) {
 				player.reviveVile(true);
+			}
+			/*		
+			if (vile1.vileStartRideArmor == null && vile1.grounded && !player.isMainPlayer) {
+				if (vile1.canAffordRideArmor()) {
+					if (!(vile1.charState is Idle || vile1.charState is Run || vile1.charState is Crouch)) return;
+					else {
+						vile1.alreadySummonedNewMech = false;
+						if (vile1.vileStartRideArmor != null) vile1.vileStartRideArmor.selfDestructTime = 1000;
+						vile1.buyRideArmor();
+						int raIndex = player.selectedRAIndex;
+						if (vile1.isVileMK1) {
+							raIndex = Helpers.randomRange(0,3);
+						}
+						if (vile1.isVileMK2 || vile1.isVileMK5) raIndex = 4;
+						vile1.vileStartRideArmor = new RideArmor(player, vile1.pos, raIndex, 0, player.getNextActorNetId(), true, sendRpc: true);
+						if (vile1.isVileMK5) {
+							vile1.vileStartRideArmor.ownedByMK5 = true;
+							vile1.vileStartRideArmor.zIndex = vile1.zIndex - 1;
+							player.weaponSlot = 0;
+							if (player.weapon is MechMenuWeapon) player.weaponSlot = 1;
+						}
+						vile1.changeState(new CallDownMech(vile1.vileStartRideArmor, true), true);
+						vile1.alreadySummonedNewMech = true;
+
+					}
+				}
+			}
+			*/
 		}
 	}
 	public void dommxAI(Character mmx4) {
