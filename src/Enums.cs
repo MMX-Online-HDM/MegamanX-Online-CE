@@ -680,10 +680,10 @@ public enum ProjIds {
 	PZeroPunch,
 	PZeroPunch2,
 	PZeroAirKick,
-	PZeroSenpuukyaku,
-	PZeroShoryuken,
-	PZeroEnkoukyaku,
-	PZeroYoudantotsu,
+	PZeroSenpuukyaku, // Spin kick
+	PZeroShoryuken, // Air Upercut
+	PZeroEnkoukyaku, // Drop Kick
+	PZeroYoudantotsu, // Strong Punch
 	PZeroParryStart,
 	PZeroParryAttack,
 

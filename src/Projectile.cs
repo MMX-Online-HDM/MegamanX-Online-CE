@@ -40,8 +40,15 @@ public class Projectile : Actor {
 	public Actor hitboxActor;
 
 	public bool isMelee;
+	public int meleeId = -1;
 
-	public Projectile(Weapon weapon, Point pos, int xDir, float speed, float damage, Player player, string sprite, int flinch, float hitCooldown, ushort? netId, bool ownedByLocalPlayer) : base(sprite, pos, netId, ownedByLocalPlayer, false) {
+	public Projectile(
+		Weapon weapon, Point pos, int xDir, float speed, float damage,
+		Player player, string sprite, int flinch, float hitCooldown, ushort? netId, bool ownedByLocalPlayer,
+		bool addToLevel = true
+	) : base(
+		sprite, pos, netId, ownedByLocalPlayer, !addToLevel
+	) {
 		this.weapon = weapon;
 		this.speed = speed;
 		vel = new Point(speed * xDir, 0);

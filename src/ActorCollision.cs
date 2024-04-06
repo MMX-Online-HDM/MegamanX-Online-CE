@@ -216,6 +216,14 @@ public partial class Actor {
 		return null;
 	}
 
+	public virtual int getHitboxMeleeId(Collider hitbox) {
+		return -1;
+	}
+
+	public virtual Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return null;
+	}
+
 	public virtual void updateProjFromHitbox(Projectile proj) {
 
 	}
