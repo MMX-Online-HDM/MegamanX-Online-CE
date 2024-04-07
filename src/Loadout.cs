@@ -289,6 +289,7 @@ public class AxlLoadout {
 			plasmaGunAlt = Helpers.randomRange(0, 1),
 			iceGattlingAlt = Helpers.randomRange(0, 1),
 			flameBurnerAlt = Helpers.randomRange(0, 1),
+			hyperMode = Helpers.randomRange(0,1),
 		};
 	}
 }
@@ -341,7 +342,8 @@ public class SigmaLoadout {
 		var randPool = Helpers.getRandomSubarray(weaponPool, 2);
 		return new SigmaLoadout() {
 			maverick1 = randPool[0] - (int)WeaponIds.ChillPenguin,
-			maverick2 = randPool[1] - (int)WeaponIds.ChillPenguin
+			maverick2 = randPool[1] - (int)WeaponIds.ChillPenguin,
+			sigmaForm = Helpers.randomRange(0, 2)
 			// Gacel: So it was an option for third maverick before?
 			//maverick3 = randPool[2],
 		};

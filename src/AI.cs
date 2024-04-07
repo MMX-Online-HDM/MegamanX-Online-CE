@@ -219,6 +219,25 @@ public class AI {
 				player.aiArmorUpgradeIndex++;
 			}
 		}
+		if (!player.isMainPlayer && player.isVile)
+		{
+			if (player.currency >= 3 && !player.frozenCastle) {
+				player.frozenCastle = true;
+				player.currency -= Vile.frozenCastleCost;
+			}
+			if (player.currency >= 3 && !player.speedDevil) {
+				player.speedDevil = true;
+				player.currency -= Vile.speedDevilCost;
+			}
+		}
+		if (!player.isMainPlayer) {
+			if(player.heartTanks < 8 && player.currency >= 2) {
+				player.currency -= 2;	
+				player.heartTanks++;
+				player.maxHealth += player.getHeartTankModifier();
+				player.character?.addHealth(player.getHeartTankModifier());
+			}
+		}
 
 		if (framesChargeHeld > 0) {
 			if (character.chargeTime < maxChargeTime) {
@@ -562,7 +581,8 @@ public class AI {
 				int ShotgunIce = player.weapons.FindIndex(w => w is ShotgunIce);	
 				int SonicSlicer = player.weapons.FindIndex(w => w is SonicSlicer);
 				int StrikeChain = player.weapons.FindIndex(w => w is StrikeChain);
-				int BubbleSplash = player.weapons.FindIndex(w => w is BubbleSplash);		
+				int BubbleSplash = player.weapons.FindIndex(w => w is BubbleSplash);	
+
 				int Xattack = Helpers.randomRange(0, 12);
 				if (!megamanX.isHyperX && megamanX?.charState?.isGrabbedState == false && !player.isDead && megamanX.charState.canAttack() && megamanX.canShoot()
 				&& megamanX.canChangeWeapons()
@@ -816,8 +836,10 @@ public class AI {
 							}
 							break;
 						case 5:
-							if (!player.hasArmor() && isTargetSSC)
-								megamanX.changeState(new X6SaberState(megamanX.grounded), true);
+							if (player.armorFlag == 0) {
+								megamanX.player.press(Control.Special1);
+								megamanX.player.release(Control.Special1);
+							}
 							break;
 						case 6:
 							int novaStrikeSlot = player.weapons.FindIndex(w => w is NovaStrike);
@@ -899,8 +921,7 @@ public class AI {
 							}
 							break;
 						case 5:
-							if (isTargetClose)
-								megamanX.changeState(new X6SaberState(megamanX.grounded), true);
+							megamanX.changeState(new X6SaberState(megamanX.grounded), true);
 							break;
 					}
 				}
@@ -1302,9 +1323,13 @@ public class AI {
 	public void axlAIAttack(Character axl2) {
 		//Axl Start
 		if (character is Axl axl) {
-			if (player.currency >= 10 && !player.isDead && !axl.isSpriteInvulnerable() && !axl.isInvulnerable() && !axl.isWhiteAxl()
+			if (player.axlHyperMode == 0 && player.currency >= 10 && !player.isDead && !axl.isSpriteInvulnerable() && !axl.isInvulnerable() && !axl.isWhiteAxl()
 				&& !(axl.charState is Hurt or Die or Frozen or Crystalized or Stunned or WarpIn or HyperAxlStart or WallSlide or WallKick or DodgeRoll)){
 				axl.changeState(new HyperAxlStart(axl.grounded), true);
+				}
+			if (player.axlHyperMode == 1 && player.currency >= 10 && !player.isDead && !axl.isSpriteInvulnerable() && !axl.isInvulnerable() && !axl.isStealthMode()
+				&& !(axl.charState is Hurt or Die or Frozen or Crystalized or Stunned or WarpIn or HyperAxlStart or WallSlide or WallKick or DodgeRoll)){
+				axl.stingChargeTime = 12;
 				}
 
 			int AAttack = Helpers.randomRange(0, 1);
@@ -1526,17 +1551,46 @@ public class AI {
 	public void doVileAI(Character vile4) {
 		// Vile: Go MK2 to MKV
 		if (character is Vile vile1) {
-			if (player.canReviveVile() && vile1.isVileMK1)
+			if (player.canReviveVile() && vile1.isVileMK1) {			
 				player.reviveVile(false);
-			if (vile1.isVileMK2 && player.canReviveVile())
+			}
+			if (vile1.isVileMK2 && player.canReviveVile()) {
 				player.reviveVile(true);
+			}
+			/*		
+			if (vile1.vileStartRideArmor == null && vile1.grounded && !player.isMainPlayer) {
+				if (vile1.canAffordRideArmor()) {
+					if (!(vile1.charState is Idle || vile1.charState is Run || vile1.charState is Crouch)) return;
+					else {
+						vile1.alreadySummonedNewMech = false;
+						if (vile1.vileStartRideArmor != null) vile1.vileStartRideArmor.selfDestructTime = 1000;
+						vile1.buyRideArmor();
+						int raIndex = player.selectedRAIndex;
+						if (vile1.isVileMK1) {
+							raIndex = Helpers.randomRange(0,3);
+						}
+						if (vile1.isVileMK2 || vile1.isVileMK5) raIndex = 4;
+						vile1.vileStartRideArmor = new RideArmor(player, vile1.pos, raIndex, 0, player.getNextActorNetId(), true, sendRpc: true);
+						if (vile1.isVileMK5) {
+							vile1.vileStartRideArmor.ownedByMK5 = true;
+							vile1.vileStartRideArmor.zIndex = vile1.zIndex - 1;
+							player.weaponSlot = 0;
+							if (player.weapon is MechMenuWeapon) player.weaponSlot = 1;
+						}
+						vile1.changeState(new CallDownMech(vile1.vileStartRideArmor, true), true);
+						vile1.alreadySummonedNewMech = true;
+
+					}
+				}
+			}
+			*/
 		}
 	}
 	public void dommxAI(Character mmx4) {
 		// X:
 		if (character is MegamanX mmx) {
 
-			if (player.canUpgradeUltimateX() && player.health >= 16) {
+			if (player.canUpgradeUltimateX() && player.health >= player.maxHealth) {
 				if (!player.character.boughtUltimateArmorOnce) {
 					player.currency -= Player.ultimateArmorCost;
 					player.character.boughtUltimateArmorOnce = true;
@@ -1545,7 +1599,7 @@ public class AI {
 				return;
 			}
 
-			if (player.hasAllX3Armor() && player.canUpgradeGoldenX() && player.health >= 16) {
+			if (player.hasAllX3Armor() && player.canUpgradeGoldenX() && player.health >= player.maxHealth) {
 				if (!player.character.boughtGoldenArmorOnce) {
 					player.currency -= Player.goldenArmorCost;
 					player.character.boughtGoldenArmorOnce = true;
