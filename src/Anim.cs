@@ -34,17 +34,6 @@ public class Anim : Actor {
 			playSound("maverickDie", sendRpc: true);
 		}
 		// TODO: Remove all the harcoded sprites shenanigans.
-		if (spriteName.StartsWith("drlight")) {
-			switch(Helpers.randomRange(0,1)) {
-				case 0:
-					addMusicSource("MMX1-DrLight", getCenterPos(), true);
-					break;	
-				case 1:
-					addMusicSource("MMX2-MentorsGift", getCenterPos(), true);
-					break;
-			}
-		}	
-
 		if (spriteName.StartsWith("cannon_muzzle")) {
 			byteAngle = 0;
 			//if (host != null)

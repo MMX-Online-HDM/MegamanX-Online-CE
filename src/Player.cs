@@ -1017,6 +1017,11 @@ public partial class Player {
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer
 				);
+			} else if (charNum == (int)CharIds.PunchyZero) {
+				character = new PunchyZero(
+					this, pos.x, pos.y, xDir,
+					false, charNetId, ownedByLocalPlayer
+				);
 			} else {
 				throw new Exception("Error: Non-valid char ID: " + charNum);
 			}
@@ -1255,6 +1260,11 @@ public partial class Player {
 			);
 		} else if (charNum == (int)CharIds.BusterZero) {
 			retChar = new BusterZero(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, character.netId, true, isWarpIn: false
+			);
+		} else if (charNum == (int)CharIds.PunchyZero) {
+			retChar = new PunchyZero(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, character.netId, true, isWarpIn: false
 			);

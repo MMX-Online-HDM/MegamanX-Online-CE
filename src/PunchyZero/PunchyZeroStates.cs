@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace MMXOnline;
@@ -23,14 +23,14 @@ public class ZeroGroundPunches : CharState {
 				sound = "punch1";
 				projMaxTime = 0.2f;
 				projId = (int)ProjIds.PZeroPunch;
-				soundFrame = 2;
+				soundFrame = 1;
 				comboFrame = 3;
 				break;
 			case 1:
 				sound = "punch2";
 				projMaxTime = 0.2f;
 				projId = (int)ProjIds.PZeroPunch2;
-				soundFrame = 2;
+				soundFrame = 1;
 				comboFrame = 4;
 				break;
 		}
