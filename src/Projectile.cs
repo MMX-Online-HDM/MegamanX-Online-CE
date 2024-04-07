@@ -41,6 +41,7 @@ public class Projectile : Actor {
 
 	public bool isMelee;
 	public int meleeId = -1;
+	public Actor owningActor;
 
 	public Projectile(
 		Weapon weapon, Point pos, int xDir, float speed, float damage,

@@ -1,8 +1,6 @@
 ﻿namespace MMXOnline;
 
 public class GenericMeleeProj : Projectile {
-	public Actor owningActor;
-
 	public GenericMeleeProj(
 		Weapon weapon, Point pos, ProjIds projId, Player player,
 		float? damage = null, int? flinch = null, float? hitCooldown = null,

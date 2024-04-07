@@ -202,9 +202,9 @@ public partial class Actor {
 		return new Dictionary<int, Func<Projectile>>();
 	}
 
-	public virtual Projectile getProjFromHitboxBase(Collider hitbox) {
+	public virtual Projectile? getProjFromHitboxBase(Collider hitbox) {
 		Point centerPoint = hitbox.shape.getRect().center();
-		Projectile proj = getProjFromHitbox(hitbox, centerPoint);
+		Projectile? proj = getProjFromHitbox(hitbox, centerPoint);
 		if (proj != null) {
 			proj.hitboxActor = this;
 			proj.globalCollider = hitbox.clone();
@@ -213,7 +213,16 @@ public partial class Actor {
 	}
 
 	public virtual Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		return null;
+		int meleeId = getHitboxMeleeId(hitbox);
+		if (meleeId == -1) {
+			return null;
+		}
+		Projectile? proj = getMeleeProjById(meleeId, centerPoint);
+		if (proj != null) {
+			proj.meleeId = meleeId;
+			proj.owningActor = this;
+		}
+		return proj;
 	}
 
 	public virtual int getHitboxMeleeId(Collider hitbox) {

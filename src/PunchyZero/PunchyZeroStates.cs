@@ -4,18 +4,18 @@ using System.Diagnostics.CodeAnalysis;
 namespace MMXOnline;
 
 
-public abstract class ZeroGroundPunches : CharState {
+public class ZeroGroundPunches : CharState {
 	[AllowNull]
 	PunchyZero zero;
-	private bool fired;
-
-	private string sound = "";
 	private int attackNum;
 
-	private int projFrame;
 	private float projMaxTime;
 	private int projId;
 	private int comboFrame = Int32.MaxValue;
+
+	private string sound = "";
+	private bool soundPlayed;
+	private int soundFrame = Int32.MaxValue;
 
 	public ZeroGroundPunches(int attackNum) : base(getSpr(attackNum)) {
 		switch (attackNum) {
@@ -23,15 +23,15 @@ public abstract class ZeroGroundPunches : CharState {
 				sound = "punch1";
 				projMaxTime = 0.2f;
 				projId = (int)ProjIds.PZeroPunch;
+				soundFrame = 2;
 				comboFrame = 3;
-				projFrame = 3;
 				break;
 			case 1:
 				sound = "punch2";
 				projMaxTime = 0.2f;
 				projId = (int)ProjIds.PZeroPunch2;
+				soundFrame = 2;
 				comboFrame = 4;
-				projFrame = 3;
 				break;
 		}
 		this.attackNum = attackNum;
@@ -39,22 +39,8 @@ public abstract class ZeroGroundPunches : CharState {
 
 	public override void update() {
 		base.update();
-		if (zero.isAwakened && character.frameIndex >= projFrame && !fired) {
-			fired = true;
-			character.playSound("saberShot", forcePlay: false, sendRpc: true);
-			Projectile? saberHitbox = character.getProjFromHitbox(null, character.pos);
-			if (saberHitbox != null) {
-				saberHitbox.destroySelf();
-				/*new AwakenedSaberProj(
-					projId, projMaxTime,
-					player.zSaberWeapon,
-					character.pos.addxy(30 * character.xDir, -20f),
-					character.xDir,
-					player,
-					player.getNextActorNetId(),
-					rpc: true
-				);*/
-			}
+		if (character.sprite.frameIndex >= soundFrame && !soundPlayed) {
+			character.playSound(sound, forcePlay: false, sendRpc: true);
 		}
 		if (character.sprite.frameIndex >= comboFrame) {
 			altAttackCtrls[0] = true;
@@ -67,7 +53,6 @@ public abstract class ZeroGroundPunches : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.turnToInput(player.input, player);
-		character.playSound(sound, forcePlay: false, sendRpc: true);
 		zero = character as PunchyZero;
 	}
 

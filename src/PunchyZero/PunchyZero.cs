@@ -48,6 +48,9 @@ public class PunchyZero : Character {
 	}
 
 	public bool groundAttacks() {
+		if (player.input.isPressed(Control.Shoot, player)) {
+			changeState(new ZeroGroundPunches(0), true);
+		}
 		return false;
 	}
 
@@ -102,24 +105,25 @@ public class PunchyZero : Character {
 		Projectile? proj = getMeleeProjById(meleeId, centerPoint);
 		if (proj != null) {
 			proj.meleeId = meleeId;
+			proj.owningActor = this;
 			return proj;
 		}
 		return null;
 	}
 
 	public override int getHitboxMeleeId(Collider hitbox) {
-		return sprite.name switch {
-			"zero_punch" => (int)MeleeIds.Punch,
-			"zero_punch2" => (int)MeleeIds.Punch2,
-			"zero_spinkick" =>(int)MeleeIds.Spin,
-			"zero_kick_air" => (int)MeleeIds.AirKick,
-			"zero_parry_start" => (int)MeleeIds.Parry,
-			"zero_parry" => (int)MeleeIds.ParryAttack,
-			"zero_shoryuken" => (int)MeleeIds.Uppercut,
-			"zero_megapunch" => (int)MeleeIds.StrongPunch,
-			"zero_dropkick" => (int)MeleeIds.DropKick,
-			_ => -1
-		};
+		return (int)(sprite.name switch {
+			"zero_punch" => MeleeIds.Punch,
+			"zero_punch2" => MeleeIds.Punch2,
+			"zero_spinkick" => MeleeIds.Spin,
+			"zero_kick_air" => MeleeIds.AirKick,
+			"zero_parry_start" => MeleeIds.Parry,
+			"zero_parry" => MeleeIds.ParryAttack,
+			"zero_shoryuken" => MeleeIds.Uppercut,
+			"zero_megapunch" => MeleeIds.StrongPunch,
+			"zero_dropkick" => MeleeIds.DropKick,
+			_ => MeleeIds.None
+		});
 	}
 
 	public Projectile? getMeleeProjById(int id, Point? pos = null, bool addToLevel = true) {
@@ -171,6 +175,7 @@ public class PunchyZero : Character {
 	}
 
 	public enum MeleeIds {
+		None = -1,
 		Punch,
 		Punch2,
 		Spin,
