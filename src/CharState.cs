@@ -1311,6 +1311,7 @@ public class LadderEnd : CharState {
 
 public class Taunt : CharState {
 	float tauntTime = 1;
+	Anim? zeroching;
 	public Taunt() : base("win") {
 	}
 
@@ -1323,6 +1324,7 @@ public class Taunt : CharState {
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
+		zeroching?.destroySelf();
 	}
 
 	public override void update() {
@@ -1334,6 +1336,23 @@ public class Taunt : CharState {
 			}
 		} else if (stateTime >= tauntTime) {
 			character.changeState(new Idle());
+		}
+
+		if (player.charNum == (int)CharIds.Zero && player.input.isHeld(Control.Up, player)) {
+			character.changeSprite("zero_win2", true);
+			if (character.isAnimOver()) {
+				character.changeState(new Idle());
+			}
+		}
+		if (character.sprite.name == "zero_win2" && character.frameIndex == 1 && !once) {
+			once = true;
+			character.playSound("ching", sendRpc: true);
+			zeroching = new Anim(
+				character.pos.addxy(character.xDir, -25f),
+				"zero_ching", -character.xDir,
+				player.getNextActorNetId(),
+				destroyOnEnd: true, sendRpc: true
+			);
 		}
 	}
 }
@@ -1646,6 +1665,7 @@ public class Die : CharState {
 		player.lastDeathWasSigmaHyper = sigma?.isHyperSigma == true || character is KaiserSigma;
 		player.lastDeathWasXHyper = mmx?.isHyperX == true; ;
 		player.lastDeathPos = character.getCenterPos();
+		//why is this here
 		if (player.isAI) player.selectedRAIndex = Helpers.randomRange(0, 3);
 		sigmaHasMavericks = player.isSigma && player.mavericks.Count > 0;
 

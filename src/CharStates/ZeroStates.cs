@@ -12,7 +12,9 @@ public class HyperZeroStart : CharState {
 	[AllowNull]
 	Zero zero;
 
-	public HyperZeroStart(int type) : base(type == 1 ? "hyper_start2" : "hyper_start", "", "", "") {
+	public HyperZeroStart(int type) : base(
+		type == 2 ? "hyper_start3" : 
+		type == 1 ? "hyper_start2" : "hyper_start", "", "", "") {
 		invincible = true;
 	}
 

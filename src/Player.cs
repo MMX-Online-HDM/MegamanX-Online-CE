@@ -393,6 +393,7 @@ public partial class Player {
 	public ShaderWrapper invisibleShader = Helpers.cloneShaderSafe("invisible");
 	public ShaderWrapper zeroPaletteShader = Helpers.cloneShaderSafe("hyperzero");
 	public ShaderWrapper nightmareZeroShader = Helpers.cloneNightmareZeroPaletteShader("paletteNightmareZero");
+	public ShaderWrapper zeroazPaletteShader = Helpers.cloneGenericPaletteShader("hyperAwakenedZeroPalette");
 	public ShaderWrapper axlPaletteShader = Helpers.cloneShaderSafe("hyperaxl");
 	public ShaderWrapper viralSigmaShader = Helpers.cloneShaderSafe("viralsigma");
 	public ShaderWrapper viralSigmaShader2 = Helpers.cloneShaderSafe("viralsigma");

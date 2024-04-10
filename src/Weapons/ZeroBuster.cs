@@ -310,7 +310,7 @@ public class ZSaberProjSwingState : CharState {
 	public override void update() {
 		base.update();
 
-		if (character.frameIndex >= 4 && !fired) {
+		if (character.frameIndex >= 7 && !fired) {
 			fired = true;
 			character.playSound("ZeroSaberX3", sendRpc: true);
 			if (shootProj) {
