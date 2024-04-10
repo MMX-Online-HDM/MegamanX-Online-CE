@@ -230,61 +230,61 @@ class Program {
 		switch(Helpers.randomRange(0,18)){
 			// Title screens
 			case 1:
-			Global.changeMusic("MMX1-TitleScreen");
+			Global.changeMusic("mmx1_titlescreen");
 				break;
 			case 2:
-			Global.changeMusic("MMX2-TitleScreen");
+			Global.changeMusic("mmx2_titlescreen");
 				break;
 			case 3:
-			Global.changeMusic("MMX3-TitleScreen");
+			Global.changeMusic("mmx3_titlescreen");
 				break;
 			// Stage Selects
 			case 4:
-				Global.changeMusic("MMX1-StageSelect");
+				Global.changeMusic("mmx1_stageselect");
 				break;
 			case 5:
-				Global.changeMusic("MMX1-StageSelect2");
+				Global.changeMusic("mmx1_stageselect2");
 				break;
 			case 6:
-				Global.changeMusic("MMX2-SecondWave");
+				Global.changeMusic("mmx2_secondwave");
 				break;
 			case 7:
-				Global.changeMusic("MMX2-FinalDestination");
+				Global.changeMusic("mmx2_finaldestination");
 				break;
 			case 8:
-				Global.changeMusic("MMX3-StageSelect");
+				Global.changeMusic("mmx3_stageselect");
 				break;
 			case 9:
-				Global.changeMusic("MMX3-DopplerStageRevealed");
+				Global.changeMusic("mmx3_dopplerstagerevealed");
 				break;
 			// Introduction
 			case 10:
-				Global.changeMusic("MMX3-Introduction");
+				Global.changeMusic("mmx3_introduction");
 				break;
 			case 11:
-				Global.changeMusic("MMX2-PlotoftheCounterHunters");
+				Global.changeMusic("mmx2_plotofthecounterhunters");
 				break;
 			// Extra
 			case 12:
-				Global.changeMusic("MMX3-Ending");
+				Global.changeMusic("mmx3_ending");
 				break;
 			case 13:
-				Global.changeMusic("MMX2-TheWakeofDestruction");
+				Global.changeMusic("mmx2_thewakeofdestruction");
 				break;
 			case 14:
-				Global.changeMusic("MMX1-Ending");
+				Global.changeMusic("mmx1_ending");
 				break;
 			case 15:
-				Global.changeMusic("MMX1-Credits");
+				Global.changeMusic("mmx1_credits");
 				break;
 			case 16:
-				Global.changeMusic("MMX2-ConspiracytoMurder");
+				Global.changeMusic("mmx2_conspiracytomurder");
 				break;
 			case 17:
-				Global.changeMusic("MMX3-CainsLab");
+				Global.changeMusic("mmx3_cainslab");
 				break;	
 			case 18:
-				Global.changeMusic("MMX1-SigmaFortress4");
+				Global.changeMusic("mmx1_sigmafortress4");
 				break;		
 		}
 		

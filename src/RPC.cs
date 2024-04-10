@@ -697,23 +697,23 @@ public class RPCActorToggle : RPC {
 		} else if (toggleId == RPCActorToggleType.StartGravityWell && actor is GravityWellProjCharged gw) {
 			gw.started = true;
 		} else if (toggleId == RPCActorToggleType.AddWolfSigmaMusicSource) {
-			actor.addMusicSource("MMX1-WolfSigma", actor.pos.addxy(0, -75), false);
+			actor.addMusicSource("mmx1_wolfsigma", actor.pos.addxy(0, -75), false);
 		} else if (toggleId == RPCActorToggleType.AddWolfSigmaIntroMusicSource) {
-			actor.addMusicSource("MMX1-WolfSigmaIntro", actor.pos.addxy(0, -75), false);
+			actor.addMusicSource("mmx1_wolfsigmaintro", actor.pos.addxy(0, -75), false);
 		} else if (toggleId == RPCActorToggleType.AddDrLightMusicSource) {
-			actor.addMusicSource("MMX1-DrLight", actor.getCenterPos(), false);
+			actor.addMusicSource("mmx1_drlight", actor.getCenterPos(), false);
 		} else if (toggleId == RPCActorToggleType.AddDrDopplerMusicSource) {
-			actor.addMusicSource("MMX3-Doppler", actor.getCenterPos(), false);
+			actor.addMusicSource("mmx3_doppler", actor.getCenterPos(), false);
 		} else if (toggleId == RPCActorToggleType.AddGoliathMusicSource) {
-			actor.addMusicSource("MMX3-DopplerBattle", actor.getCenterPos(), true);
+			actor.addMusicSource("mmx3_dopplerbattle", actor.getCenterPos(), true);
 		} else if (toggleId == RPCActorToggleType.AddViralSigmaMusicSource) {
-			actor.addMusicSource("MMX2-JudgementDay", actor.getCenterPos(), true);
+			actor.addMusicSource("mmx2_judgementday", actor.getCenterPos(), true);
 		} else if (toggleId == RPCActorToggleType.AddKaiserSigmaMusicSource) {
 			actor.destroyMusicSource();
-			actor.addMusicSource("MMX3-KaiserSigma", actor.getCenterPos(), true);
+			actor.addMusicSource("mmx3_kaisersigma", actor.getCenterPos(), true);
 		} else if (toggleId == RPCActorToggleType.AddKaiserViralSigmaMusicSource) {
 			actor.destroyMusicSource();
-			actor.addMusicSource("MMX3-Doppler", actor.getCenterPos(), true);
+			actor.addMusicSource("mmx3_doppler", actor.getCenterPos(), true);
 		} else if (toggleId == RPCActorToggleType.StartMechSelfDestruct && actor is RideArmor ra) {
 			ra.selfDestructTime = Global.spf;
 		} else if (toggleId == RPCActorToggleType.ShakeCamera) {

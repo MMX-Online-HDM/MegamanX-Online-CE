@@ -811,7 +811,7 @@ public class WolfSigmaRevive : CharState {
 				stateTime = 0;
 				state = 3;
 
-				character.addMusicSource("MMX1-WolfSigmaIntro", character.pos.addxy(0, -75), false);
+				character.addMusicSource("mmx1_wolfsigmaintro", character.pos.addxy(0, -75), false);
 				RPC.actorToggle.sendRpc(character.netId, RPCActorToggleType.AddWolfSigmaIntroMusicSource);
 
 			}
@@ -848,7 +848,7 @@ public class WolfSigmaRevive : CharState {
 				player.weaponSlot = 1;
 
 				character.changeState(new WolfSigma(), true);
-				character.addMusicSource("MMX1-WolfSigma", character.pos.addxy(0, -75), false);
+				character.addMusicSource("mmx1_wolfsigma", character.pos.addxy(0, -75), false);
 				RPC.actorToggle.sendRpc(character.netId, RPCActorToggleType.AddWolfSigmaMusicSource);
 			}
 		}

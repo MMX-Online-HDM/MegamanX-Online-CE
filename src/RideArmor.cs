@@ -219,7 +219,7 @@ public class RideArmor : Actor, IDamagable {
 		}
 
 		if (raNum == 4 && character != null && musicSource == null) {
-			addMusicSource("MMX3-DopplerBattle", getCenterPos(), true);
+			addMusicSource("mmx3_dopplerbattle", getCenterPos(), true);
 		}
 		if (character == null && musicSource != null) {
 			destroyMusicSource();

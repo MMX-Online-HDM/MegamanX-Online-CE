@@ -144,22 +144,22 @@ public class Zero : Character {
 				if (musicSource == null) {
                     switch(Helpers.randomRange(0,1)) {
                     case 0:
-                    addMusicSource("MMX1-Zero", getCenterPos(), true);
+                    addMusicSource("mmx1_zero", getCenterPos(), true);
                     break;
                     case 1:
-                    addMusicSource("MMX3-Zero", getCenterPos(), true);
+                    addMusicSource("mmx3_zero", getCenterPos(), true);
                     break;
                     }
                 }
             }
             else if (isAwakenedZero()) {
 				if (musicSource == null){
-					addMusicSource("MMX5-XvsZeroV2-megasfc", getCenterPos(), true);
+					addMusicSource("mmx5_xvszerov2_megasfc", getCenterPos(), true);
 				}
 			} 
 			else if (isNightmareZero) {
 				if (musicSource == null){
-					addMusicSource("MMX5-XvsZeroV1-megasfc", getCenterPos(), true);
+					addMusicSource("mmx5_xvszerov1_megasfc", getCenterPos(), true);
 				} 
 			} else {
 				destroyMusicSource();
@@ -1148,6 +1148,9 @@ public class Zero : Character {
 		}
 		if (isNightmareZeroBS.getValue()) {
 			palette = player.nightmareZeroShader;
+		}
+		if (isAwakenedZeroBS.getValue()) {
+			palette = player.zeroazPaletteShader;
 		}
 		if (palette != null) {
 			shaders.Add(palette);

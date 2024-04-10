@@ -37,10 +37,10 @@ public class Anim : Actor {
 		if (spriteName.StartsWith("drlight")) {
 			switch(Helpers.randomRange(0,1)) {
 				case 0:
-					addMusicSource("MMX1-DrLight", getCenterPos(), true);
+					addMusicSource("mmx1_drlight", getCenterPos(), true);
 					break;	
 				case 1:
-					addMusicSource("MMX2-MentorsGift", getCenterPos(), true);
+					addMusicSource("mmx2_mentorsgift", getCenterPos(), true);
 					break;
 			}
 		}	
