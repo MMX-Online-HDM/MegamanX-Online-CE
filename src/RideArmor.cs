@@ -19,7 +19,8 @@ public class RideArmor : Actor, IDamagable {
 	public Character grabbedCharacter;
 	public bool changedStateInFrame;
 	public bool isDashing;
-	public Player player { get { return character?.player; } } //WARNING: this gets the player of the character riding the armor. For the owner, use netOwner
+	//WARNING: this gets the player of the character riding the armor. For the owner, use netOwner
+	public Player? player { get { return character?.player; } }
 	public bool isExploding;
 	public float enterCooldown;
 	public float goliathTime;
@@ -121,7 +122,7 @@ public class RideArmor : Actor, IDamagable {
 		else if (raNum == 3) maxHealth = 24; // + Helpers.clampMax(netOwner.heartTanks * netOwner.getHeartTankModifier(), 8);
 		else maxHealth = 32;
 		if (raNum == 4) goliathHealth = 32;
-		maxHealth *= netOwner.getHealthModifier();
+		maxHealth = MathF.Ceiling(maxHealth * netOwner.getHealthModifier());
 	}
 
 	public void setRaNum(int raNum) {
@@ -236,7 +237,7 @@ public class RideArmor : Actor, IDamagable {
 					chr.canLandOnRideArmor()
 				) {
 					mk5Rider = chr;
-					chr.mk5RideArmorPlatform = this;
+					chr.rideArmorPlatform = this;
 					if (rideArmorState is RADeactive) {
 						changeState(new RAIdle("ridearmor_activating"), true);
 					}
@@ -246,7 +247,7 @@ public class RideArmor : Actor, IDamagable {
 			if (mk5Rider != null) {
 				mk5Rider.changePos(mk5Pos.addxy(0, 1));
 			}
-			if (mk5Rider?.mk5RideArmorPlatform == null) {
+			if (mk5Rider?.rideArmorPlatform == null) {
 				mk5Rider = null;
 			} else {
 				character = mk5Rider;
@@ -589,7 +590,7 @@ public class RideArmor : Actor, IDamagable {
 						} else if (!(ownedByLocalPlayer && chr.ownedByLocalPlayer)) {
 							return;
 						}
-					} else if (chr?.vileStartRideArmor != this || selfDestructTime > 0) {
+					} else if (chr?.startRideArmor != this || selfDestructTime > 0) {
 						return;
 					}
 				} else {
@@ -645,7 +646,7 @@ public class RideArmor : Actor, IDamagable {
 		chr.rideArmor = this;
 		chr.changeState(new InRideArmor(), true);
 		changeState(new RAIdle("ridearmor_activating"), true);
-		if (!healedOnEnter && raNum == 4 && character.ownedByLocalPlayer && character.vileStartRideArmor == this) {
+		if (!healedOnEnter && raNum == 4 && character.ownedByLocalPlayer && character.startRideArmor == this) {
 			healedOnEnter = true;
 			character.fillHealthToMax();
 		}
@@ -703,7 +704,7 @@ public class RideArmor : Actor, IDamagable {
 			health = 0;
 		}
 		if (health <= 0) {
-			if (character != null && !ownedByMK5 && character.vileStartRideArmor == this) {
+			if (character != null && !ownedByMK5 && character.startRideArmor == this) {
 				character.invulnTime = 1;
 			}
 
@@ -2204,9 +2205,7 @@ public class InRideArmor : CharState {
 			Global.serverClient?.rpc(RPC.playerToggle, (byte)player.id, (byte)RPCToggleType.StopCrystalize);
 		}
 		character.incPos(new Point(0, 30));
-		if (player.isAI) {
-			character.calldownMechCooldown = Character.maxCalldownMechCooldown;
-		}
+
 		base.onExit(newState);
 	}
 

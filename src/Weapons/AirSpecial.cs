@@ -64,7 +64,6 @@ public class FSplasherState : CharState {
 		character.useGravity = false;
 		character.vel = new Point(0, 0);
 		character.dashedInAir++;
-		character.lastAirDashWasSide = true;
 		fSplasherProj = new FSplasherProj(
 			zero.zeroAirSpecialWeapon, character.pos, character.xDir,
 			player, player.getNextActorNetId(), sendRpc: true

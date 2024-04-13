@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace MMXOnline;
@@ -24,7 +25,7 @@ public class BusterZero : Character {
 		if (stockedBusterLv > 0 || stockedSaber) {
 			var renderGfx = stockedBusterLv switch {
 				_ when stockedSaber => RenderEffectType.ChargeGreen,
-				1  => RenderEffectType.ChargePink,
+				1 => RenderEffectType.ChargePink,
 				2 => RenderEffectType.ChargeOrange,
 				_ => RenderEffectType.ChargeBlue
 			};
@@ -95,14 +96,29 @@ public class BusterZero : Character {
 			int framesSinceLastShootPressed = Global.frameCount - lastShootPressed;
 			if (shootPressed || framesSinceLastShootPressed < 6) {
 				if (stockedBusterLv == 1) {
+					if (charState is WallSlide) {
+						shoot(1);
+						stockedBusterLv = 0;
+						return true;
+					}
 					changeState(new BusterZeroDoubleBuster(true, true), true);
 					return true;
 				}
 				if (stockedBusterLv == 2) {
+					if (charState is WallSlide) {
+						shoot(2);
+						stockedBusterLv = 0;
+						lastShootPressed = 0;
+						return true;
+					}
 					changeState(new BusterZeroDoubleBuster(true, false), true);
 					return true;
 				}
 				if (stockedSaber) {
+					if (charState is WallSlide wsState) {
+						changeState(new BusterZeroHadangekiWall(wsState.wallDir, wsState.wallCollider), true);
+						return true;
+					}
 					changeState(new BusterZeroHadangeki(), true);
 					return true;
 				}
@@ -165,13 +181,26 @@ public class BusterZero : Character {
 				shootPos, xDir, player, player.getNextActorNetId(), rpc: true
 			);
 			lemonCooldown = 22f / 60f;
-		} else if (chargeLevel >= 3) {
-			shootAnimTime = 0;
-			changeState(new BusterZeroDoubleBuster(false, true), true);
+		} else if (chargeLevel == 3) {
+			if (charState is WallSlide) {
+				shoot(2);
+				stockedBusterLv = 1;
+				return;
+			} else {
+				shootAnimTime = 0;
+				changeState(new BusterZeroDoubleBuster(false, true), true);
+			}
 		}
-		if (chargeLevel >= 4) {
-			shootAnimTime = 0;
-			changeState(new BusterZeroDoubleBuster(false, false), true);
+		else if (chargeLevel >= 4) {
+			if (charState is WallSlide) {
+				shoot(2);
+				stockedBusterLv = 2;
+				stockedSaber = true;
+				return;
+			} else {
+				shootAnimTime = 0;
+				changeState(new BusterZeroDoubleBuster(false, false), true);
+			}
 		}
 		if (chargeLevel >= 1) {
 			stopCharge();

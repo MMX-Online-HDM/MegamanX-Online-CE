@@ -155,7 +155,7 @@ public class VileCutterProj : Projectile {
 	public override void onCollision(CollideData other) {
 		base.onCollision(other);
 		if (!ownedByLocalPlayer) return;
-		if (vileCutterType == VileCutterType.MaroonedTomahawk) return;
+		if (vileCutterType != VileCutterType.QuickHomesick) return;
 
 		if (other.gameObject is Pickup && pickup == null) {
 			pickup = other.gameObject as Pickup;
@@ -165,8 +165,7 @@ public class VileCutterProj : Projectile {
 			}
 		}
 
-		var character = other.gameObject as Character;
-		if (time > returnTime && character != null && character.player == damager.owner) {
+		if (time > returnTime && other.gameObject is Character character && character.player == damager.owner) {
 			if (pickup != null) {
 				pickup.changePos(character.getCenterPos());
 			}

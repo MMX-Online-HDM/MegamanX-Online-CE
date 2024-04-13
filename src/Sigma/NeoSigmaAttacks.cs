@@ -185,7 +185,7 @@ public class SigmaElectricBall2State : CharState {
 
 		if (!sound && character.frameIndex >= 13) {
 			sound = true;
-			character.playSound("NeoSigmaESpark", sendRpc: true);
+			character.playSound("neoSigmaESpark", sendRpc: true);
 		}
 
 		if (!fired && character.getFirstPOI() != null) {

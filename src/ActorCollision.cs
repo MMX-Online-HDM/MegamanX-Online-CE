@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using SFML.Graphics;
 
@@ -158,9 +157,12 @@ public partial class Actor {
 
 	// The spriteToCollider dict is a streamlined way to be able to change global colliders based on a sprite name.
 	// The key of this dictionary is the sprite name and the value is the collider.
-	// Use * in the key to match section of string against anything, allowing for streamlined application to multiple sprites at once
-	// If the sprite key is not found, the global collider will use the default global collider. If it's null, it is removed.
-	public Dictionary<string, Collider> spriteToCollider = new Dictionary<string, Collider>();
+	// Use * in the key to match section of string against anything,
+	// allowing for streamlined application to multiple sprites at once
+	// If the sprite key is not found, the global collider will use the default global collider.
+	// If it's null, it is removed.
+	public Dictionary<string, Collider?> spriteToCollider = new();
+
 	public void changeGlobalColliderOnSpriteChange(string newSpriteName) {
 		if (spriteToColliderMatch(newSpriteName, out Collider overrideGlobalCollider)) {
 			changeGlobalColliderWithoutGridChange(overrideGlobalCollider);

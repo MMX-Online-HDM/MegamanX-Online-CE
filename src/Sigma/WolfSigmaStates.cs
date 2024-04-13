@@ -472,7 +472,7 @@ public class WolfSigmaHand : Actor, IDamagable {
 			beamTime += Global.spf;
 			frameSpeed = 1;
 			if ((beamTime > beamDuration || beamLetGo) && !beamShot) {
-				playSound("WolfSigmaThunderX1", sendRpc: true);
+				playSound("wolfSigmaThunderX1", sendRpc: true);
 				beamShot = true;
 				new WolfSigmaBeam(new WolfSigmaBeamWeapon(), pos.addxy(0, -10), 1, -1, 0, owner, owner.getNextActorNetId(), rpc: true);
 				new WolfSigmaBeam(new WolfSigmaBeamWeapon(), pos.addxy(0, 10), 1, 1, 0, owner, owner.getNextActorNetId(), rpc: true);

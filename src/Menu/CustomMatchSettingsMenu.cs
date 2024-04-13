@@ -9,7 +9,7 @@ public class CustomMatchSettings {
 	[ProtoMember(2)] public int startCurrency = 3;
 	[ProtoMember(3)] public int startHeartTanks;
 	[ProtoMember(4)] public int startSubTanks;
-	[ProtoMember(5)] public int healthModifier = 1;
+	[ProtoMember(5)] public int healthModifier = 10;
 	[ProtoMember(5)] public int damageModifier = 1;
 	[ProtoMember(6)] public int sameCharNum = -1;
 	[ProtoMember(7)] public int redSameCharNum = -1;
@@ -158,13 +158,14 @@ public class CustomMatchSettingsMenu : IMainMenu {
 		menuOptions.Add(
 			new MenuOption(startX, currentY += lineH,
 				() => {
-					Helpers.menuLeftRightInc(ref savedMatchSettings.customMatchSettings.healthModifier, 1, 4);
+					Helpers.menuLeftRightInc(ref savedMatchSettings.customMatchSettings.healthModifier, 5, 20);
 				},
 				(Point pos, int index) => {
 					Fonts.drawText(
 						FontType.Blue,
 						"Health modifier: " +
-						(savedMatchSettings.customMatchSettings.healthModifier * 100).ToString() + "%",
+						(savedMatchSettings.customMatchSettings.healthModifier * 10).ToString() +
+						"%",
 						pos.x, pos.y, selected: selectArrowPosY == 7
 					);
 				}

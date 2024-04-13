@@ -189,9 +189,9 @@ public class MagnetMineProjCharged : Projectile {
 			}
 			soundTime += Global.spf;
 			if (soundTime == 0.1f) {
-			playSound("magnetminechargedtravelX2", forcePlay: false, sendRpc: true);				
+				playSound("magnetminechargedtravelX2", forcePlay: false, sendRpc: true);
 			}
-			
+
 		}
 	}
 

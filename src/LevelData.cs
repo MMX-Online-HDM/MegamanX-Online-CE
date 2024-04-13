@@ -6,7 +6,6 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using Newtonsoft.Json;
-using SFML.Audio;
 using SFML.Graphics;
 
 namespace MMXOnline;
@@ -223,11 +222,10 @@ public class LevelData {
 			supportedGameModesSet.Add(GameMode.Deathmatch);
 			supportedGameModesSet.Add(GameMode.TeamDeathmatch);
 		} else {
-			maxPlayers = 22;
+			maxPlayers = Server.maxPlayerCap;
 			supportedGameModesSet.Add(GameMode.Deathmatch);
 			supportedGameModesSet.Add(GameMode.TeamDeathmatch);
 		}
-
 		if (levelJson.supportsCTF == true) {
 			supportedGameModesSet.Add(GameMode.CTF);
 		}
@@ -513,126 +511,71 @@ public class LevelData {
 
 	public string getMusicKey(List<Player> players) {
 		if (name == "japetribute_1v1") {
-			return "MMX1-Demo";
+			return "japetribute_1v1";
 		}
-
 		if (isCustomMap) {
 			return name;
 		}
-		if (name == "training"){
-			return "DeterminedReploid-TrainingRom-Vodaz";
+		if (name == "dopplerlab_1v1") {
+			return "goliath";
 		}
-
-		//MMX3
-		if (name == "hunterbase2") return "MMX3-Credits";
-		if (name == "dopplerlab") return "MMX3-DopplerStage";
-		if (name == "safaripark") return "MMX3-NeonTiger";
-		if (name == "quarry") return "MMX3-TunnelRhino";
-		if (name == "shipyard") return "MMX3-CrushCrawfish";
-		if (name == "powercenter") return "MMX3-VoltCatfish";
-		if (name == "aircraftcarrier") return "MMX3-GravityBeetle";
-		if (name == "weaponsfactory") return "MMX3-BlastHornet";
-		if (name == "giantdam") return "MMX3-ToxicSeahorse";
-		if (name == "giantdam2") return "MMX3-ToxicSeahorse";
-		if (name == "hunterbase") return "MMX3-IntroStage";
-		if (name == "frozentown") return "MMX3-BlizzardBuffalo";
-		//MMX2
-		if (name == "xhunter2") return "MMX2-DeeperIntotheAbyss";
-		if (name == "xhunter1") return "MMX2-AbsoluteZero";
-		if (name == "centralcomputer") return "MMX2-RedAlert";
-		if (name == "crystalmine") return "MMX2-SinisterGleam";
-		if (name == "desertbase2") return "MMX2-HailtheConqueringHero";
-		if (name == "desertbase") return "MMX2-DustDevil";
-		if (name == "robotjunkyard") return "MMX2-Wasteland";
-		if (name == "volcaniczone") return "MMX2-VolcanosFury";
-		if (name == "deepseabase") return "MMX2-DangerousReef";
-		if (name == "dinosaurtank") return "MMX2-PanzerdesDrachens";
-		if (name == "weathercontrol") return "MMX2-WeatherWizard";
-		if (name == "maverickfactory") return "MMX2-TheMavericksLastStand";
-		//MMX1
-		if (name == "sigma3") return "MMX1-SigmaFortress3";
-		if (name == "sigma2") return "MMX1-SigmaFortress2";
-		if (name == "sigma1") return "MMX1-SigmaFortress1";
-		if (name == "airport") return "MMX1-StormEagle";
-		if (name == "forest3") return "MMX1-StingChameleon";
-		if (name == "forest2") return "MMX1-StingChameleon";
-		if (name == "forest") return "MMX1-StingChameleon";
-		if (name == "highway2") return "MMX1-Castings";
-		if (name == "highway") return "MMX1-OpeningStage";
-		if (name == "ocean") return "MMX1-LaunchOctopus";
-		if (name == "mountain") return "MMX1-ChillPenguin";
-		if (name == "tower") return "MMX1-BoomerKuwanger";
-		if (name == "powerplant") return "MMX1-SparkMandrill";
-		if (name == "powerplant2") return "MMX1-SparkMandrill";
-		if (name == "factory") return "MMX1-FlameMammoth";
-		if (name == "gallery") return "MMX1-ArmoredArmadillo";
-		//Small Maps
-		if (name == "factory_md") return "MMX1-FlameMammoth";
-		if (name == "airport_md") return "MMX1-StormEagle";
-		if (name == "maverickfactory_md") return "MMX2-TheMavericksLastStand";
-		if (name == "desertbase_md") return "MMX2-DustDevil";
-		if (name == "weathercontrol_md") return "MMX2-WeatherWizard";
-		if (name == "highway_md") return "MMX1-IntroStage";
-		if (name == "mountain_md") return "MMX1-ChillPenguin";
-		if (name == "ocean_md") return "MMX1-LaunchOctopus";
-		if (name == "forest_md") return "MMX1-StingChameleon";
-		if (name == "sigma1_md") return "MMX1-SigmaFortress1";
-		if (name == "sigma2_md") return "MMX1-SigmaFortress2";
-		//1V1 Maps
-		if (name == "centralcomputer_1v1") return "MMX2-RedAlert";
-		if (name == "sigma4_1v1") return "MMX1-SigmaBattle";
-		if (name == "dopplerlab_1v1") return "MMX3-DopplerBattle";
-		if (name == "sigma1_1v1") return "MMX1-SigmaFortress1";
-		if (name == "factory_1v1") return "MMX1-FlameMammoth";
-		if (name == "hunterbase_1v1") return "MMX3-IntroStage";
-		if (name == "airport_1v1") return "MMX1-StormEagle";
-		if (name == "forest_1v1") return "MMX1-StingChameleon";
-		if (name == "highway_1v1") return "MMX1-IntroStage";
-		if (name == "hunterbase_1v1") return "MMX3-IntroStage";
-		if (name == "mountain_1v1") return "MMX1-ChillPenguin";
-		if (name == "ocean_1v1") return "MMX1-LaunchOctopus";
-		if (name == "tower_1v1") return "MMX1-BoomerKuwanger";
-
 		if (name == "zerovirus_1v1") {
-			return "MMX5-XvsZeroV2-megasfc";
-		} else if (players.Count == 2 && is1v1() && ((players[0].isZero && players[1].isX) || (players[0].isX && players[1].isZero))) {
-			return "MMX5-XvsZeroV2-megasfc";
-		} else if (players.Count == 2 && is1v1() && (players[0].is1v1MaverickFakeZero() || players[1].is1v1MaverickFakeZero())) {
-			return "MMX2-ZerosRebirth";
-		} else if 
-		(players.Count == 2 && is1v1() && (players[0].isNon1v1MaverickSigma() || players[1].isNon1v1MaverickSigma())) 
-		{
-			if (players[0].isSigma1AndSigma() || players[1].isSigma1AndSigma()) return "MMX1-SigmaBattle";
-
-			else if (players[0].isSigma2AndSigma() || players[1].isSigma2AndSigma()) return "MMX2-GrimVigilante";
-
-			else return "MMX3-Sigma";
-		} else if (players.Count == 2 && is1v1() && (players[0].is1v1MaverickX1() || players[1].is1v1MaverickX1())) {
-			return "MMX1-BossBattle";
-		} else if (players.Count == 2 && is1v1() && (players[0].is1v1MaverickX2() || players[1].is1v1MaverickX2())) {
-			return "MMX2-TheBattleEnsues";
-		} else if (players.Count == 2 && is1v1() && (players[0].is1v1MaverickX3() || players[1].is1v1MaverickX3())) {
-			return "MMX3-MaverickBattle";
-		} else if (players.Count == 2 && name == "highway_1v1" && (players[0].isVile || players[1].isVile)) {
-			return "MMX1-Vile";
-		} else {
-			return Helpers.removeMapSuffix(name);
-		}	
+			return "x_vs_zero_x5";
+		}
+		if (name == "centralcomputer_1v1") {
+			return "boss2";
+		}
+		if (name == "forest2" || name == "forest3") {
+			return "forest";
+		}
+		if (name == "powerplant2") {
+			return "powerplant";
+		}
+		if (name == "giantdam2") {
+			return "giantdam";
+		}
+		if (name.Contains("sigma4")) {
+			return "bossroom";
+		}
+		return Helpers.removeMapSuffix(name);
 	}
 
 	public string getWinTheme() {
-		if (name.Contains("xhunter1") || name.Contains("deepseabase") || name.Contains("maverickfactory") ||
-			 name.Contains("robotjunkyard") || name.Contains("volcaniczone") || name.Contains("dinosaurtank") || name.Contains("centralcomputer")
-			|| name.Contains("crystalmine") || name.Contains("desertbase") || name.Contains("weathercontrol")) {
-			return "MMX2-MissionAccomplished";
+		if (name.Contains("xhunter1") ||
+			name.Contains("deepseabase") ||
+			name.Contains("maverickfactory") ||
+			name.Contains("robotjunkyard") ||
+			name.Contains("volcaniczone") ||
+			name.Contains("dinosaurtank") ||
+			name.Contains("centralcomputer") ||
+			name.Contains("crystalmine") ||
+			name.Contains("desertbase") ||
+			name.Contains("weathercontrol")
+		) {
+			return "win_x2";
 		}
-		if (name.Contains("hunterbase") || name.Contains("giantdam") || name.Contains("weaponsfactory") ||
-		 name.Contains("frozentown") || name.Contains("aircraftcarrier") || name.Contains("powercenter") || name.Contains("shipyard") || 
-		 name.Contains("quarry") || name.Contains("safaripark") || name.Contains("dopplerlab")) {
+		if (name.Contains("hunterbase") ||
+			name.Contains("giantdam") ||
+			name.Contains("weaponsfactory") ||
+			name.Contains("frozentown") ||
+			name.Contains("aircraftcarrier") ||
+			name.Contains("powercenter") ||
+			name.Contains("shipyard") ||
+			name.Contains("quarry") ||
+			name.Contains("safaripark") ||
+			name.Contains("dopplerlab")
+		) {
+			return "win_x3";
+		}
+		if (isCustomMap) {
+			return Helpers.randomRange(0, 2) switch {
+				1 => "win_x2",
+				2 => "win_x3",
+				_ => "win"
+			};
+		}
 
-			return "MMX3-Victory";
-		}
-		return "MMX1-BossDefeated";
+		return "win";
 	}
 
 	public Texture getMapThumbnail() {

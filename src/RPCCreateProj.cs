@@ -730,9 +730,9 @@ public partial class RPCCreateProj : RPC {
 				proj = new BBuffaloIceProjGround(BlizzardBuffalo.getWeapon(), pos, 0, player, netProjByte);
 				break;
 			case (int)ProjIds.BBuffaloBeam:
-					ushort bbNetIdBytes = BitConverter.ToUInt16(extraData[0..2], 0);
-					BlizzardBuffalo? bb = Global.level.getActorByNetId(bbNetIdBytes) as BlizzardBuffalo;
-					proj = new BBuffaloBeamProj(BlizzardBuffalo.getWeapon(), pos, xDir, bb, player, netProjByte);
+				ushort bbNetIdBytes = BitConverter.ToUInt16(extraData[0..2], 0);
+				BlizzardBuffalo? bb = Global.level.getActorByNetId(bbNetIdBytes) as BlizzardBuffalo;
+				proj = new BBuffaloBeamProj(BlizzardBuffalo.getWeapon(), pos, xDir, bb, player, netProjByte);
 				break;
 			case (int)ProjIds.BHornetBee:
 				proj = new BHornetBeeProj(

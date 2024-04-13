@@ -146,7 +146,6 @@ public class ZeroFallStab : CharState {
 	}
 }
 
-
 public class ZeroFallStabLand : CharState {
 	int type;
 	public ZeroFallStabLand(int type, string sprite) : base(sprite) {

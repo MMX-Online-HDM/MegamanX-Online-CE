@@ -316,8 +316,8 @@ public class Weapon {
 	}
 
 	public void shoot(Point pos, int xDir, Player player, int chargeLevel, ushort netProjId) {
-		if (player.character == null) return;
-		if (player.character.stockedCharge) {
+		if (player.character is not MegamanX mmx) return;
+		if (mmx.stockedCharge) {
 			chargeLevel = 3;
 		}
 

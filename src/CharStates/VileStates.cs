@@ -112,8 +112,8 @@ public class VileRevive : CharState {
 			drDopplerAnim.fadeIn = true;
 			drDopplerAnim.blink = true;
 		} else {
-			if (vile.vileStartRideArmor != null) {
-				vile.vileStartRideArmor.ownedByMK5 = true;
+			if (vile.startRideArmor != null) {
+				vile.startRideArmor.ownedByMK5 = true;
 			}
 		}
 	}
@@ -198,7 +198,7 @@ public class VileHover : CharState {
 		}
 		if (base.player.input.isHeld("jump", base.player) && !once) {
 			once = true;
-			sound = character.playSound("Vilehover", forcePlay: false, sendRpc: true);
+			sound = character.playSound("vileHover", forcePlay: false, sendRpc: true);
 		}
 	}
 
@@ -283,7 +283,7 @@ public class VileHover : CharState {
 		if (sound != null && !sound.deleted) {
 			sound.sound?.Stop();
 		}
-		RPC.stopSound.sendRpc("Vilehover", character.netId);
+		RPC.stopSound.sendRpc("vileHover", character.netId);
 
 	}
 }

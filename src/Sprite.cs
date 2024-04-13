@@ -45,6 +45,9 @@ public class Sprite {
 	public bool visible = true;
 	public bool reversed;
 
+	public float tempOffY = 0;
+	public float tempOffX = 0;
+
 	public Sprite(Texture texture) {
 		bitmap = texture;
 		frames = new List<Frame>();
@@ -257,8 +260,8 @@ public class Sprite {
 		cx = cx * currentFrame.rect.w();
 		cy = cy * currentFrame.rect.h();
 
-		cx += alignOffX - currentFrame.offset.x;
-		cy += alignOffY - currentFrame.offset.y;
+		cx += alignOffX - tempOffX - currentFrame.offset.x;
+		cy += alignOffY - tempOffY - currentFrame.offset.y;
 
 		DrawWrappers.DrawTextureHUD(bitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x - cx, y - cy, alpha);
 	}
@@ -326,8 +329,8 @@ public class Sprite {
 		cx = cx * currentFrame.rect.w();
 		cy = cy * currentFrame.rect.h();
 
-		cx += alignOffX;
-		cy += alignOffY;
+		cx += alignOffX - tempOffX;
+		cy += alignOffY - tempOffY;
 
 		if (scaleY == -1 && (actor is MagnaCentipede ms || name.Contains("magnac_teleport") || name.Contains("magnac_notail_teleport"))) {
 			cy -= MagnaCentipede.constHeight;
@@ -731,8 +734,8 @@ public class Sprite {
 
 		cx = cx * currentFrame.rect.w();
 		cy = cy * currentFrame.rect.h();
-		cx += alignOffX;
-		cy += alignOffY;
+		cx += alignOffX - tempOffX;
+		cy += alignOffY - tempOffY;
 		cx = MathF.Floor(cx);
 		cy = MathF.Floor(cy);
 

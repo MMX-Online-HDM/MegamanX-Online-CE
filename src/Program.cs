@@ -227,16 +227,16 @@ class Program {
 
 		// Force startup config to be fetched
 		Menu.change(new MainMenu());
-		switch(Helpers.randomRange(0,18)){
+		switch (Helpers.randomRange(0, 18)) {
 			// Title screens
 			case 1:
-			Global.changeMusic("MMX1-TitleScreen");
+				Global.changeMusic("MMX1-TitleScreen");
 				break;
 			case 2:
-			Global.changeMusic("MMX2-TitleScreen");
+				Global.changeMusic("MMX2-TitleScreen");
 				break;
 			case 3:
-			Global.changeMusic("MMX3-TitleScreen");
+				Global.changeMusic("MMX3-TitleScreen");
 				break;
 			// Stage Selects
 			case 4:
@@ -282,12 +282,12 @@ class Program {
 				break;
 			case 17:
 				Global.changeMusic("MMX3-CainsLab");
-				break;	
+				break;
 			case 18:
 				Global.changeMusic("MMX1-SigmaFortress4");
-				break;		
+				break;
 		}
-		
+
 		if (mode == 1) {
 			HostMenu menu = new HostMenu(new MainMenu(), null, false, false, true);
 			Menu.change(menu);

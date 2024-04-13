@@ -1,8 +1,9 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace MMXOnline;
 
 public class PunchyZero : Character {
+	// Hypermode stuff.
 	public float blackZeroTime;
 	public float awakenedZeroTime;
 	public bool isViral;
@@ -10,25 +11,65 @@ public class PunchyZero : Character {
 	public bool isBlack;
 	public byte hypermodeBlink;
 	public int hyperMode;
+
+	// Weapons.
 	public PunchyZeroMeleeWeapon meleeWeapon = new();
 	public KKnuckleParry parryWeapon = new();
+	public Weapon gigaAttack;
+	
+	// Inputs.
+	public float shootPressTime;
+	public float parryPressTime;
+	public float specialPressTime;
 
+	// Cooldowns.
+	public float dashAttackCooldown = 0;
+	public float diveKickCooldown = 0;
+	public float parryCooldown = 0;
+	public float uppercutCooldown = 0;
+
+	// Creation code.
 	public PunchyZero(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer, bool isWarpIn = true
 	) : base(
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn
 	) {
-
+		gigaAttack = new RakuhouhaWeapon(player);
 	}
 
 	public override void update() {
+		if (shootPressTime > 0) {
+			shootPressTime--;
+		}
+		if (specialPressTime > 0) {
+			specialPressTime--;
+		}
+		if (parryPressTime > 0) {
+			parryPressTime--;
+		}
+		if (player.input.isPressed(Control.Shoot, player)) {
+			shootPressTime = 10;
+		}
+		if (player.input.isPressed(Control.Special1, player)) {
+			specialPressTime = 10;
+		}
+		if (player.input.isPressed(Control.WeaponLeft, player) ||
+			player.input.isPressed(Control.WeaponRight, player)
+		) {
+			parryPressTime = 10;
+		}
+		Helpers.decrementFrames(ref parryCooldown);
+		Helpers.decrementFrames(ref dashAttackCooldown);
+		Helpers.decrementFrames(ref diveKickCooldown);
+		Helpers.decrementFrames(ref uppercutCooldown);
+		gigaAttack.update();
 		base.update();
 		// Charge and release charge logic.
 		//chargeLogic(shoot);
 	}
 
-	public override bool canCharge() {
+	public override bool canCharge() { 
 		return (!isInvulnerableAttack());
 	}
 
@@ -42,20 +83,82 @@ public class PunchyZero : Character {
 		}
 		return airAttacks();
 	}
-	
-	public override bool altAttackCtrl(bool[] ctrls) {
+
+
+	public override void changeState(CharState newState, bool forceChange = false) {
+		CharState? oldState = charState;
+		base.changeState(newState, forceChange);
+		if (!newState.attackCtrl || newState.attackCtrl != oldState?.attackCtrl) {
+			shootPressTime = 0;
+			specialPressTime = 0;
+		}
+	}
+
+	public override bool altCtrl(bool[] ctrls) {
+		if (charState is PZeroGenericMeleeState zgms) {
+			return zgms.altCtrlUpdate(ctrls);
+		}
 		return false;
 	}
 
 	public bool groundAttacks() {
-		if (player.input.isPressed(Control.Shoot, player)) {
-			changeState(new ZeroGroundPunches(0), true);
+		if (parryPressTime > 0 && parryCooldown == 0) {
+			changeState(new PZeroParry(), true);
+			return true;
+		}
+		int yDir = player.input.getYDir(player);
+		if (isDashing && dashAttackCooldown == 0 &&
+			player.input.isHeld(Control.Down, player) && shootPressTime > 0
+		) {
+			changeState(new PZeroSpinKick(), true);
+			return true;
+		}
+		if (shootPressTime > 0) {
+			if (yDir == -1) {
+				changeState(new PZeroShoryuken(), true);
+				return true;
+			}
+			if (isDashing) {
+				slideVel = xDir * getDashSpeed() * 0.8f;
+			}
+			changeState(new PZeroPunch1(), true);
+			return true;
+		}
+		if (specialPressTime > 0) {
+			return groundSpcAttacks();
 		}
 		return false;
 	}
 
 	public bool airAttacks() {
+		int yDir = player.input.getYDir(player);
+		if ((shootPressTime > 0 || specialPressTime > 0) && yDir == 1) {
+			changeState(new PZeroDropKickState(), true);
+			return true;
+		}
+		if (shootPressTime > 0) {
+			changeState(new PZeroKick(), true);
+		}
 		return false;
+	}
+
+	public bool groundSpcAttacks() {
+		int yDir = player.input.getYDir(player);
+		if (yDir == -1) {
+			changeState(new PZeroShoryuken(), true);
+			return true;
+		}
+		if (yDir == 1 && gigaAttack.shootTime == 0) {
+			gigaAttack.addAmmo(-16, player);
+			gigaAttack.shootTime = gigaAttack.rateOfFire;
+			changeState(new Rakuhouha(gigaAttack), true);
+			return true;
+		}
+		if (isDashing) {
+			slideVel = xDir * getDashSpeed() * 0.8f;
+		}
+		changeState(new PZeroYoudantotsu(), true);
+		return true;
 	}
 
 	public override bool canAirJump() {
@@ -74,7 +177,7 @@ public class PunchyZero : Character {
 		int paletteNum = 0;
 		if (isBlack) {
 			paletteNum = 1;
-		} 
+		}
 		if (paletteNum != 0) {
 			palette = player.zeroPaletteShader;
 			palette?.SetUniform("palette", paletteNum);
@@ -84,8 +187,8 @@ public class PunchyZero : Character {
 			palette = player.nightmareZeroShader;
 		}
 		if (palette != null && hypermodeBlink > 0) {
-			float blinkRate =  MathInt.Ceiling(hypermodeBlink / 30f);
-			palette =  ((Global.frameCount % (blinkRate * 2) >= blinkRate) ? null : palette);
+			float blinkRate = MathInt.Ceiling(hypermodeBlink / 30f);
+			palette = ((Global.frameCount % (blinkRate * 2) >= blinkRate) ? null : palette);
 		}
 		if (palette != null) {
 			shaders.Add(palette);
@@ -146,14 +249,6 @@ public class PunchyZero : Character {
 				meleeWeapon, projPos, ProjIds.PZeroAirKick, player, 3, 0, 0.25f,
 				addToLevel: addToLevel
 			),
-			(int)MeleeIds.Parry => new GenericMeleeProj(
-				parryWeapon, projPos, ProjIds.PZeroParryStart, player, 0, Global.defFlinch, 0.25f,
-				addToLevel: addToLevel
-			),
-			(int)MeleeIds.ParryAttack => new GenericMeleeProj(
-				parryWeapon, projPos, ProjIds.PZeroParryAttack, player, 4, Global.defFlinch, 0.25f,
-				addToLevel: addToLevel
-			),
 			(int)MeleeIds.Uppercut => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.PZeroShoryuken, player, 4, Global.defFlinch, 0.25f,
 				addToLevel: addToLevel
@@ -166,12 +261,19 @@ public class PunchyZero : Character {
 				meleeWeapon, projPos, ProjIds.PZeroEnkoukyaku, player, 4, Global.halfFlinch, 0.25f,
 				addToLevel: addToLevel
 			),
+			(int)MeleeIds.Parry => new GenericMeleeProj(
+				parryWeapon, projPos, ProjIds.PZeroParryStart, player, 0, 0, 0,
+				addToLevel: addToLevel
+			),
+			(int)MeleeIds.ParryAttack => (new GenericMeleeProj(
+				parryWeapon, projPos, ProjIds.PZeroParryAttack, player, 4, Global.defFlinch, 0.5f,
+				addToLevel: addToLevel
+			) {
+				netcodeOverride = NetcodeModel.FavorDefender
+			}),
 			_ => null
 		};
-		if (proj != null) {
-			return proj;
-		}
-		return null;
+		return proj;
 	}
 
 	public enum MeleeIds {
@@ -185,5 +287,19 @@ public class PunchyZero : Character {
 		DropKick,
 		Parry,
 		ParryAttack
+	}
+
+	// For parry purposes.
+	public override void onCollision(CollideData other) {
+		if (specialState == (int)SpecialStateIds.PZeroParry &&
+			other.gameObject is Projectile proj &&
+			charState is PZeroParry zeroParry &&
+			proj.damager.damage > 0 &&
+			zeroParry.canParry(proj, proj.projId)
+		) {
+			zeroParry.counterAttack(proj.owner, proj);
+			return;
+		}
+		base.onCollision(other);
 	}
 }

@@ -576,7 +576,7 @@ public class Server {
 				}
 			} else if (im.MessageType == NetIncomingMessageType.ConnectionApproval) {
 				if (im.SenderConnection != null) {
-				string ipAddress = im.SenderConnection.RemoteEndPoint?.Address.ToString() ?? "";
+					string ipAddress = im.SenderConnection.RemoteEndPoint?.Address.ToString() ?? "";
 					BanEntry? banEntry = Global.banList.FirstOrDefault(b => b.isBanned(ipAddress, "", 0));
 					if (banEntry == null) {
 						im.SenderConnection.Approve();

@@ -1250,7 +1250,7 @@ public partial class Level {
 
 				if (followActor != null && followActor.grounded == false) {
 					if (fullDeltaY > -54 && fullDeltaY < 20 &&
-						camPlayer.character?.charState is 
+						camPlayer.character?.charState is
 							(not WallKick and not WallSlide and not LadderClimb) or InRideChaser
 					) {
 						if (!unlockfollow) {
