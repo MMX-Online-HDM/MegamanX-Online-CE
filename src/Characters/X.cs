@@ -53,6 +53,17 @@ public partial class MegamanX : Character {
 	float hyperChargeAnimTime2 = 0.125f;
 	const float maxHyperChargeAnimTime = 0.25f;
 
+	public bool boughtUltimateArmorOnce;
+	public bool boughtGoldenArmorOnce;
+
+	public bool stockedCharge;
+	public bool stockedXSaber;
+
+	public bool stockedX3Buster;
+
+	public float xSaberCooldown;
+	public float stockedChargeFlashTime;
+
 	public MegamanX(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
@@ -85,6 +96,20 @@ public partial class MegamanX : Character {
 	public override void update() {
 		fgMotion = false;
 		base.update();
+
+		if (stockedCharge) {
+			addRenderEffect(RenderEffectType.ChargePink, 0.033333f, 0.1f);
+		}
+		if (stockedXSaber) {
+			addRenderEffect(RenderEffectType.ChargeGreen, 0.05f, 0.1f);
+		}
+		if (stockedX3Buster) {
+			if (player.weapon is not Buster) {
+				stockedX3Buster = false;
+			} else {
+				addRenderEffect(RenderEffectType.ChargeOrange, 0.05f, 0.1f);
+			}
+		}
 
 		Helpers.decrementTime(ref barrierCooldown);
 
@@ -130,10 +155,10 @@ public partial class MegamanX : Character {
 				weaponHealTime = 0;
 				weaponHealAmount--;
 				player.weapon.ammo = Helpers.clampMax(player.weapon.ammo + 1, player.weapon.maxAmmo);
-				if (!player.hasArmArmor(3)) {			
-				playSound("heal", forcePlay: true);
+				if (!player.hasArmArmor(3)) {
+					playSound("heal", forcePlay: true);
 				} else {
-				playSound("healX3", forcePlay: true);
+					playSound("healX3", forcePlay: true);
 				}
 			}
 		}
@@ -216,8 +241,7 @@ public partial class MegamanX : Character {
 
 		if (charState is not Die &&
 			player.input.isPressed(Control.Special2, player) &&
-			player.hasAllX3Armor() && !player.hasGoldenArmor()) 
-		{
+			player.hasAllX3Armor() && !player.hasGoldenArmor()) {
 			if (player.input.isHeld(Control.Down, player)) {
 				player.setChipNum(0, false);
 				Global.level.gameMode.setHUDErrorMessage(
@@ -578,6 +602,24 @@ public partial class MegamanX : Character {
 		}
 	}
 
+	public void stockCharge(bool stockOrUnstock) {
+		stockedCharge = stockOrUnstock;
+		if (ownedByLocalPlayer) {
+			RPC.playerToggle.sendRpc(
+				player.id, stockOrUnstock ? RPCToggleType.StockCharge : RPCToggleType.UnstockCharge
+			);
+		}
+	}
+
+	public void stockSaber(bool stockOrUnstock) {
+		stockedXSaber = stockOrUnstock;
+		if (ownedByLocalPlayer) {
+			RPC.playerToggle.sendRpc(
+				player.id, stockOrUnstock ? RPCToggleType.StockSaber : RPCToggleType.UnstockSaber
+			);
+		}
+	}
+
 	public void unpoChargeControls() {
 		if (chargeButtonHeld() && canCharge()) {
 			increaseCharge();
@@ -773,18 +815,18 @@ public partial class MegamanX : Character {
 		}
 		hyperProgress = 0;
 		if (player.canUpgradeGoldenX()) {
-			if (!player.character.boughtGoldenArmorOnce) {
+			if (!boughtGoldenArmorOnce) {
 				player.currency -= Player.goldenArmorCost;
-				player.character.boughtGoldenArmorOnce = true;
+				boughtGoldenArmorOnce = true;
 			}
 			player.setGoldenArmor(true);
 			Global.playSound("ching");
 			return;
 		}
 		if (player.canUpgradeUltimateX()) {
-			if (!player.character.boughtUltimateArmorOnce) {
+			if (!boughtUltimateArmorOnce) {
 				player.currency -= Player.ultimateArmorCost;
-				player.character.boughtUltimateArmorOnce = true;
+				boughtUltimateArmorOnce = true;
 			}
 			player.setUltimateArmor(true);
 			Global.playSound("chingX4");
@@ -1238,7 +1280,7 @@ public partial class MegamanX : Character {
 			index == (int)WeaponIds.AssassinBullet ||
 			index == (int)WeaponIds.Undisguise ||
 			index == (int)WeaponIds.UPParry
-		) { 
+		) {
 			index = 0;
 		}
 		if (index == (int)WeaponIds.HyperBuster && ownedByLocalPlayer) {
@@ -1256,7 +1298,7 @@ public partial class MegamanX : Character {
 			palette?.SetUniform("palette", index);
 			palette?.SetUniform("paletteTexture", Global.textures["paletteTexture"]);
 		} else {
-			palette?.SetUniform("palette", (this as MegamanX).cStingPaletteIndex % 9);
+			palette?.SetUniform("palette", this.cStingPaletteIndex % 9);
 			palette?.SetUniform("paletteTexture", Global.textures["cStingPalette"]);
 		}
 		if (palette != null) {

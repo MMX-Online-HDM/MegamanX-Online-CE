@@ -6,8 +6,7 @@ namespace MMXOnline;
 
 public class BusterZeroMelee : CharState {
 	bool fired;
-	[AllowNull]
-	public BusterZero zero;
+	public BusterZero zero = null!;
 
 	public BusterZeroMelee() : base("projswing") {
 		landSprite = "projswing";
@@ -40,10 +39,7 @@ public class BusterZeroMelee : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		zero = character as BusterZero;
-		if (zero == null) {
-			throw new NullReferenceException();
-		}
+		zero = character as BusterZero ?? throw new NullReferenceException();
 		if (!character.grounded || character.vel.y < 0) {
 			sprite = "projswing_air";
 			character.changeSpriteFromName(sprite, true);
@@ -52,7 +48,7 @@ public class BusterZeroMelee : CharState {
 
 	public override void onExit(CharState oldState) {
 		base.onEnter(oldState);
-		zero.zSaberCooldown = 36f/60f;
+		zero.zSaberCooldown = 36f / 60f;
 	}
 }
 
@@ -62,8 +58,7 @@ public class BusterZeroDoubleBuster : CharState {
 	public bool isSecond;
 	public bool shootPressedAgain;
 	public bool isPinkCharge;
-	[AllowNull]
-	BusterZero zero;
+	BusterZero zero = null!;
 
 	public BusterZeroDoubleBuster(bool isSecond, bool isPinkCharge) : base("doublebuster") {
 		this.isSecond = isSecond;
@@ -125,10 +120,7 @@ public class BusterZeroDoubleBuster : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		zero = character as BusterZero;
-		if (zero == null) {
-			throw new NullReferenceException();
-		}
+		zero = character as BusterZero ?? throw new NullReferenceException();
 		// Non-full charge.
 		if (isPinkCharge) {
 			zero.stockedBusterLv = 1;
@@ -166,8 +158,7 @@ public class BusterZeroDoubleBuster : CharState {
 
 public class BusterZeroHadangeki : CharState {
 	bool fired;
-	[AllowNull]
-	public BusterZero zero;
+	public BusterZero zero = null!;
 
 	public BusterZeroHadangeki() : base("projswing") {
 		landSprite = "projswing";
@@ -205,10 +196,7 @@ public class BusterZeroHadangeki : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		zero = character as BusterZero;
-		if (zero == null) {
-			throw new NullReferenceException();
-		}
+		zero = character as BusterZero ?? throw new NullReferenceException();
 		if (!character.grounded || character.vel.y < 0) {
 			sprite = "projswing_air";
 			defaultSprite = sprite;
@@ -218,15 +206,56 @@ public class BusterZeroHadangeki : CharState {
 
 	public override void onExit(CharState oldState) {
 		base.onEnter(oldState);
-		zero.zSaberCooldown = 36f/60f;
+		zero.zSaberCooldown = 36f / 60f;
+	}
+}
+
+public class BusterZeroHadangekiWall : CharState {
+	bool fired;
+	public BusterZero zero = null!;
+	public int wallDir;
+	public Collider wallCollider;
+
+	public BusterZeroHadangekiWall(int wallDir, Collider wallCollider) : base("wall_slide_attack") {
+		this.wallDir = wallDir;
+		this.wallCollider = wallCollider;
+		superArmor = true;
+		useGravity = false;
+	}
+
+	public override void update() {
+		base.update();
+		if (character.frameIndex >= 4 && !fired) {
+			character.playSound("ZeroSaberX3", sendRpc: true);
+			zero.stockedSaber = false;
+			fired = true;
+			new DZHadangekiProj(
+				character.pos.addxy(30 * -wallDir, -20), -wallDir,
+				zero.isBlackZero, player, player.getNextActorNetId(), rpc: true
+			);
+		}
+		if (character.isAnimOver()) {
+			character.changeState(new WallSlide(wallDir, wallCollider));
+			character.sprite.frameIndex = character.sprite.frames.Count - 1;
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		zero = character as BusterZero ?? throw new NullReferenceException();
+	}
+
+	public override void onExit(CharState oldState) {
+		base.onEnter(oldState);
+		useGravity = true;
+		zero.zSaberCooldown = 36f / 60f;
 	}
 }
 
 public class HyperBusterZeroStart : CharState {
 	public float radius = 200;
 	public float time;
-	[AllowNull]
-	BusterZero zero;
+	BusterZero zero = null!;
 	Anim? LightX3;
 
 	public HyperBusterZeroStart() : base("hyper_start") {
@@ -255,10 +284,7 @@ public class HyperBusterZeroStart : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		zero = character as BusterZero;
-		if (zero == null) {
-			throw new NullReferenceException();
-		}
+		zero = character as BusterZero ?? throw new NullReferenceException();
 		character.useGravity = false;
 		character.vel = new Point();
 		if (zero == null) {

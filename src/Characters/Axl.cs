@@ -129,7 +129,7 @@ public class Axl : Character {
 		if (isZoomingOut || isZoomingIn) return false;
 		if (axlCursorTarget == null && axlHeadshotTarget == null) return false;
 		var hitData = getFirstHitPos(player.adjustedZoomRange, ignoreDamagables: true);
-		if (axlCursorTarget != null && axlHeadshotTarget != null){
+		if (axlCursorTarget != null && axlHeadshotTarget != null) {
 			if (hitData.hitGos.Contains(axlCursorTarget) || hitData.hitGos.Contains(axlHeadshotTarget)) {
 				return true;
 			}
@@ -193,7 +193,7 @@ public class Axl : Character {
 						}
 
 						float xLeeway = c.headshotRadius * 5f;
-						float yLeeway = c.headshotRadius * 2.5f;
+						float yLeeway = c.headshotRadius;
 
 						float xDist = MathF.Abs(hitPoint.x - headPos.x);
 						float yDist = MathF.Abs(hitPoint.y - headPos.y);
@@ -1066,7 +1066,7 @@ public class Axl : Character {
 		var hit = Global.level.checkCollisionsShape(shape, new List<GameObject>() { this }).FirstOrDefault(c => c.gameObject is IDamagable);
 		if (hit != null) {
 			var target = hit.gameObject as IDamagable;
-			if(target != null){
+			if (target != null) {
 				if (target.canBeDamaged(player.alliance, player.id, null)) {
 					axlCursorTarget = target;
 				}

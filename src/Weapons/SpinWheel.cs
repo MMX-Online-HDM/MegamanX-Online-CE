@@ -88,7 +88,7 @@ public class SpinWheelProj : Projectile {
 		if (started > 0 && grounded && !destroyed) {
 			if (sparks == null) {
 				sparks = new Anim(pos, "spinwheel_sparks", xDir, null, false);
-				playSound("MMX2-SpinWheelGround", forcePlay: true, sendRpc: true);
+				playSound("spinWheelGround", forcePlay: true, sendRpc: true);
 
 			}
 			sparks.pos = pos.addxy(-xDir * 10, 10);

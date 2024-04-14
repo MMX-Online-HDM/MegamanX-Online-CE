@@ -120,8 +120,9 @@ public class UpgradeMenu : IMainMenu {
 					mainPlayer.currency -= getHeartTankCost();
 					mainPlayer.heartTanks++;
 					Global.playSound("hearthX1");
-					mainPlayer.maxHealth += mainPlayer.getHeartTankModifier();
-					mainPlayer.character?.addHealth(mainPlayer.getHeartTankModifier());
+					float currentMaxHp = mainPlayer.maxHealth;
+					mainPlayer.maxHealth = mainPlayer.getMaxHealth();
+					mainPlayer.character?.addHealth(mainPlayer.maxHealth - currentMaxHp);
 					/*
 					if (mainPlayer.isVile && mainPlayer.character?.vileStartRideArmor != null)
 					{

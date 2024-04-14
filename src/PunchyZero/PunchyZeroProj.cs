@@ -1,14 +1,11 @@
-using System;
-using System.Diagnostics.CodeAnalysis;
-
-namespace MMXOnline;
+﻿namespace MMXOnline;
 
 public class PunchyZeroMeleeWeapon : Weapon {
 	public static PunchyZeroMeleeWeapon netWeapon = new();
 }
 
-public class AwakenedSaberProj : Projectile {
-	public AwakenedSaberProj(
+public class PunchyZeroMeleeWave : Projectile {
+	public PunchyZeroMeleeWave(
 		Point pos, int xDir, Player player,
 		int saberId, float maxTime, float hitCooldown,
 		ushort netProjId, bool rpc = false
@@ -34,5 +31,26 @@ public class AwakenedSaberProj : Projectile {
 			);
 		}
 		projId = saberId;
+	}
+}
+
+
+public class PZeroHadangeki : Projectile {
+	public PZeroHadangeki(
+		Point pos, int xDir, Player player,
+		ushort netProjId, bool rpc = false
+	) : base(
+		PunchyZeroMeleeWeapon.netWeapon, pos, xDir,
+		300, 3, player, "zsaber_shot", 0, 0,
+		netProjId, player.ownedByLocalPlayer
+	) {
+		fadeSprite = "zsaber_shot_fade";
+		fadeOnAutoDestroy = true;
+		reflectable = true;
+		destroyOnHit = true;
+		maxTime = 0.5f;
+		if (rpc) {
+			rpcCreate(pos, player, netProjId, xDir);
+		}
 	}
 }

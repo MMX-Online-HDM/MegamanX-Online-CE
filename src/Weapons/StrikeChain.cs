@@ -401,7 +401,7 @@ public class StrikeChainHooked : CharState {
 		player.character.useGravity = false;
 		player.character.vel.y = 0;
 		if (player.character is Vile vile) {
-			vile.mk5RideArmorPlatform = null;
+			vile.rideArmorPlatform = null;
 		}
 	}
 

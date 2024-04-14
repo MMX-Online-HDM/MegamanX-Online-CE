@@ -18,7 +18,8 @@ public enum SpecialStateIds {
 	None,
 	AxlRoll,
 	HyorogaStart,
-	XTeleport
+	XTeleport,
+	PZeroParry
 }
 
 public static class ArmorParts {

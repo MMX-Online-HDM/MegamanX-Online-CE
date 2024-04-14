@@ -140,31 +140,28 @@ public class Zero : Character {
 		}
 		Helpers.decrementTime(ref blackZeroTime);
 		if (!Global.level.is1v1()) {
-			if (isBlackZero()) {
+			/*if (isBlackZero()) {
 				if (musicSource == null) {
-                    switch(Helpers.randomRange(0,1)) {
-                    case 0:
-                    addMusicSource("mmx1_zero", getCenterPos(), true);
-                    break;
-                    case 1:
-                    addMusicSource("mmx3_zero", getCenterPos(), true);
-                    break;
-                    }
-                }
-            }
-            else if (isAwakenedZero()) {
-				if (musicSource == null){
-					addMusicSource("mmx5_xvszerov2_megasfc", getCenterPos(), true);
+					switch (Helpers.randomRange(0, 1)) {
+						case 0:
+							addMusicSource("ThemeOfZero", getCenterPos(), true);
+							break;
+						case 1:
+							addMusicSource("MMX3-Zero", getCenterPos(), true);
+							break;
+					}
 				}
-			} 
-			else if (isNightmareZero) {
-				if (musicSource == null){
-					addMusicSource("mmx5_xvszerov1_megasfc", getCenterPos(), true);
-				} 
+			} else if (isAwakenedZero()) {
+				if (musicSource == null) {
+					addMusicSource("XvsZeroV2-megasfc", getCenterPos(), true);
+				}
+			} else if (isNightmareZero) {
+				if (musicSource == null) {
+					addMusicSource("XvsZeroV1-megasfc", getCenterPos(), true);
+				}
 			} else {
 				destroyMusicSource();
-			}
-			
+			}*/
 		}
 		if (!ownedByLocalPlayer) {
 			return;
@@ -182,7 +179,6 @@ public class Zero : Character {
 		if (dashAttackCooldown > 0) dashAttackCooldown = Helpers.clampMin0(dashAttackCooldown - Global.spf);
 		if (airAttackCooldown > 0) airAttackCooldown = Helpers.clampMin0(airAttackCooldown - Global.spf);
 		Helpers.decrementTime(ref saberCooldown);
-		Helpers.decrementTime(ref xSaberCooldown);
 		Helpers.decrementTime(ref genmuCooldown);
 		Helpers.decrementTime(ref zSaberShotCooldown);
 		Helpers.decrementTime(ref knuckleSoundCooldown);
@@ -223,10 +219,10 @@ public class Zero : Character {
 		framesSinceLastAttack = Global.level.frameCount - lastAttackFrame;
 
 		if (chargeButtonHeld() && (
-			player.currency > 0 || player.isZBusterZero() || player.weapon is AssassinBullet
+			player.currency > 0 || player.weapon is AssassinBullet
 			) && flag == null && rideChaser == null && rideArmor == null
 		) {
-			if (!stockedXSaber && !isInvulnerableAttack()) {
+			if (!isInvulnerableAttack()) {
 				increaseCharge();
 			}
 		} else {
@@ -275,74 +271,6 @@ public class Zero : Character {
 			);
 		}
 
-		if (player.isZBusterZero()) {
-			if (charState.canShoot() && !isCharging()) {
-				var shootPressed = player.input.isPressed(Control.Shoot, player);
-				if (shootPressed) {
-					lastShootPressed = Global.frameCount;
-				}
-
-				int framesSinceLastShootPressed = Global.frameCount - lastShootPressed;
-				int framesSinceLastShootReleased = Global.frameCount - lastShootReleased;
-				var shootHeld = player.input.isHeld(Control.Shoot, player);
-
-				if (shootPressed || (framesSinceLastShootPressed < Global.normalizeFrames(6) && framesSinceLastShootReleased > Global.normalizeFrames(30))) {
-					if (stockedXSaber) {
-						if (!doubleBusterDone) {
-							changeState(new ZeroDoubleBuster(true, false), true);
-						} else if (xSaberCooldown == 0) {
-							swingStockedSaber();
-						}
-						return;
-					}
-
-					if (zeroLemonCooldown == 0) {
-						zeroLemonCooldown = 0.15f;
-						zeroShoot(0);
-						return;
-					}
-				}
-			}
-
-			if (player.input.isPressed(Control.Special1, player)) {
-				if (charState.canAttack()) {
-					if (xSaberCooldown == 0) {
-						xSaberCooldown = 1;
-						if (stockedXSaber) {
-							swingStockedSaber();
-						} else {
-							changeState(new ZSaberProjSwingState(grounded, false), true);
-						}
-					}
-				}
-			}
-
-			// Handles ZBusterZero's Hyper activations.
-			if (player.input.isHeld(Control.Special2, player) &&
-				player.currency >= Player.zBusterZeroHyperCost && !isBlackZero2() &&
-				charState is not HyperZeroStart && invulnTime == 0 &&
-				rideChaser == null && rideArmor == null && charState is not WarpIn) {
-				hyperProgress += Global.spf;
-			} else {
-				hyperProgress = 0;
-			}
-
-			if (hyperProgress >= 1 && player.currency >= Player.zBusterZeroHyperCost &&
-				!isBlackZero2()) {
-				hyperProgress = 0;
-				changeState(new HyperZeroStart(0), true);
-			}
-
-			if (player.currency < Player.zBusterZeroHyperCost && player.input.isHeld(Control.Special2, player)) {
-				Global.level.gameMode.setHUDErrorMessage(
-					player,
-					Player.zBusterZeroHyperCost + " " + Global.nameCoins + " needed to enter hypermode.",
-					playSound: false, resetCooldown: true
-				);
-			}
-			return;
-		}
-
 		// Cutoff point for non-zero buster loadouts
 		bool lenientAttackPressed = (attackPressed || framesSinceLastAttack < 5);
 		bool spcPressed = player.input.isPressed(Control.Special1, player);
@@ -376,22 +304,15 @@ public class Zero : Character {
 			zeroAirSpecialWeapon.attack(this);
 		} else if (lenientAttackPressed && !player.hasKnuckle() && charState.canAttack() && !isAttacking() && notUpLogic && !player.input.isHeld(Control.Down, player) &&
 			  (charState is Idle || charState is Crouch || charState is Run || charState is Dash || charState is AirDash || charState is Jump || charState is Fall)) {
-			if (stockedXSaber) {
-				if (xSaberCooldown == 0) {
-					xSaberCooldown = 1;
-					stockSaber(false);
-					changeState(new ZSaberProjSwingState(grounded, true), true);
-				}
-				return;
-			} else if ((charState is Idle || charState is Crouch || charState is Run || charState is Dash) && isAwakenedGenmuZero()) {
-				if (genmuCooldown == 0 && xSaberCooldown < 0.5f) {
+			if ((charState is Idle || charState is Crouch || charState is Run || charState is Dash) && isAwakenedGenmuZero()) {
+				if (genmuCooldown == 0) {
 					genmuCooldown = 2;
 					changeState(new GenmuState(), true);
 				}
 				return;
 			} else if (isAwakenedZero()) {
-				if (xSaberCooldown == 0 && genmuCooldown < 1) {
-					xSaberCooldown = 1f;
+				if (saberCooldown == 0 && genmuCooldown < 1) {
+					saberCooldown = 1f;
 					changeState(new ZSaberProjSwingState(grounded, true), true);
 				}
 				return;
@@ -525,8 +446,7 @@ public class Zero : Character {
 				changeSprite(getSprite(attackSprite), true);
 
 				if (!player.hasKnuckle()) {
-					if (stockedXSaber || isAwakenedZero()) {
-						stockSaber(false);
+					if (isAwakenedZero()) {
 						playSound("saberShot", sendRpc: true);
 						if (zSaberShotCooldown == 0) {
 							zSaberShotCooldown = maxZSaberShotCooldown;
@@ -598,13 +518,6 @@ public class Zero : Character {
 			}
 		}
 		return false;
-	}
-
-	public void swingStockedSaber() {
-		xSaberCooldown = 1;
-		doubleBusterDone = false;
-		stockSaber(false);
-		changeState(new ZSaberProjSwingState(grounded, true), true);
 	}
 
 	// This can run on both owners and non-owners. So data used must be in sync
@@ -707,9 +620,9 @@ public class Zero : Character {
 
 	public List<BusterProj> zeroLemonsOnField = new List<BusterProj>();
 	private void zeroShoot(int chargeLevel) {
-		if (!player.isZBusterZero() && player.currency <= 0) return;
+		if (player.currency <= 0) return;
 
-		if (player.isZBusterZero() && chargeLevel == 0) {
+		if (chargeLevel == 0) {
 			for (int i = zeroLemonsOnField.Count - 1; i >= 0; i--) {
 				if (zeroLemonsOnField[i].destroyed) {
 					zeroLemonsOnField.RemoveAt(i);
@@ -760,106 +673,74 @@ public class Zero : Character {
 		Point shootPos = getShootPos();
 		int xDir = getShootXDir();
 
-		if (isAwakenedZero() && !player.isZBusterZero()) {
-			if (chargeLevel == 1) {
-				new ShingetsurinProj(new Shingetsurin(player), getShootPos(), xDir, 0, player, player.getNextActorNetId(), rpc: true);
-				playSound("ShingetsurinX5", forcePlay: false, sendRpc: true);
-			}
-			if (chargeLevel == 2) {
-				playSound("ShingetsurinX5", forcePlay: false, sendRpc: true);
-				new ShingetsurinProj(new Shingetsurin(player), getShootPos(), xDir, 0, player, player.getNextActorNetId(), rpc: true);
-				Global.level.delayedActions.Add(new DelayedAction(delegate {
-					new ShingetsurinProj(new Shingetsurin(player), getShootPos(), xDir, 0.15f, player, player.getNextActorNetId(), rpc: true);
-					playSound("ShingetsurinX5", forcePlay: false, sendRpc: true);
-				}, 0.15f));
-			}
-			if (chargeLevel == 3) {
-				playSound("ShingetsurinX5", forcePlay: false, sendRpc: true);
-				new ShingetsurinProj(new Shingetsurin(player), getShootPos(), xDir, 0, player, player.getNextActorNetId(), rpc: true);
-				Global.level.delayedActions.Add(new DelayedAction(delegate {
-					new ShingetsurinProj(new Shingetsurin(player), getShootPos(), xDir, 0.15f, player, player.getNextActorNetId(), rpc: true);
-					playSound("ShingetsurinX5", forcePlay: false, sendRpc: true);
-				}, 0.15f));
-				Global.level.delayedActions.Add(new DelayedAction(delegate {
-					new ShingetsurinProj(new Shingetsurin(player), getShootPos(), xDir, 0.3f, player, player.getNextActorNetId(), rpc: true);
-					playSound("ShingetsurinX5", forcePlay: false, sendRpc: true);
-				}, 0.3f));
-			}
-			if (chargeLevel == 4) {
-				playSound("ShingetsurinX5", forcePlay: false, sendRpc: true);
-				new ShingetsurinProj(new Shingetsurin(player), getShootPos(), xDir, 0, player, player.getNextActorNetId(), rpc: true);
-				Global.level.delayedActions.Add(new DelayedAction(delegate {
-					new ShingetsurinProj(new Shingetsurin(player), getShootPos(), xDir, 0.15f, player, player.getNextActorNetId(), rpc: true);
-					playSound("ShingetsurinX5", forcePlay: false, sendRpc: true);
-				}, 0.15f));
-				Global.level.delayedActions.Add(new DelayedAction(delegate {
-					new ShingetsurinProj(new Shingetsurin(player), getShootPos(), xDir, 0.3f, player, player.getNextActorNetId(), rpc: true);
-					playSound("ShingetsurinX5", forcePlay: false, sendRpc: true);
-				}, 0.3f));
-			}
-			if (!player.isZBusterZero() || !player.isAI) {
+		if (isAwakenedZero()) {
+			if (chargeLevel >= 1) {
 				player.currency--;
+				playSound("ShingetsurinX5", forcePlay: false, sendRpc: true);
+				new ShingetsurinProj(
+					new Shingetsurin(player), getShootPos(), xDir,
+					0, player, player.getNextActorNetId(), rpc: true
+				);
+			}
+			if (chargeLevel >= 2) {
+				Global.level.delayedActions.Add(new DelayedAction(delegate {
+					new ShingetsurinProj(
+						new Shingetsurin(player), getShootPos(), xDir,
+						0.15f, player, player.getNextActorNetId(), rpc: true
+					);
+					playSound("ShingetsurinX5", forcePlay: false, sendRpc: true);
+				}, 0.15f));
+			}
+			if (chargeLevel >= 3) {
+				Global.level.delayedActions.Add(new DelayedAction(delegate {
+					new ShingetsurinProj(
+						new Shingetsurin(player), getShootPos(), xDir,
+						0.3f, player, player.getNextActorNetId(), rpc: true
+					);
+					playSound("ShingetsurinX5", forcePlay: false, sendRpc: true);
+				}, 0.3f));
+			}
+			if (chargeLevel >= 4) {
+				Global.level.delayedActions.Add(new DelayedAction(delegate {
+					new ShingetsurinProj(
+						new Shingetsurin(player), getShootPos(), xDir, 0.45f,
+						player, player.getNextActorNetId(), rpc: true
+					);
+					playSound("ShingetsurinX5", forcePlay: false, sendRpc: true);
+				}, 0.45f));
 			}
 			if (player.currency < 0) {
 				player.currency = 0;
 			}
 		} else {
-			int type = player.isZBusterZero() ? 1 : 0;
-
-			if (stockedCharge) {
-				changeState(new ZeroDoubleBuster(true, true), true);
-			} else if (chargeLevel == 0) {
-				playSound("busterX3", sendRpc: true);
-				zeroLemonCooldown = 0.15f;
-				var lemon = new BusterProj(
-					zeroBusterWeapon, shootPos, xDir, 1, player, player.getNextActorNetId(), rpc: true
-				);
-				zeroLemonsOnField.Add(lemon);
-			} else if (chargeLevel == 1) {
-				if (!player.isZBusterZero()) {
-					if (type == 0) player.currency -= 1;
+			if (chargeLevel == 1) {
+				player.currency -= 1;
 					playSound("buster2", sendRpc: true);
 					zeroLemonCooldown = 0.375f;
 					new ZBuster2Proj(
-						zeroBusterWeapon, shootPos, xDir, type, player, player.getNextActorNetId(), rpc: true
+						zeroBusterWeapon, shootPos, xDir, 0, player, player.getNextActorNetId(), rpc: true
 					);
-				}
-				if (type == 1) {
-					playSound("buster2X3", sendRpc: true);
-					zeroLemonCooldown = 0.375f;
-					new ZBuster2Proj(
-						zeroBusterWeapon, shootPos, xDir, type, player, player.getNextActorNetId(), rpc: true
-					);
-				}
 			} else if (chargeLevel == 2) {
-				if (type == 0) player.currency -= 1;
+				player.currency -= 1;
 				zeroLemonCooldown = 0.375f;
-				if (!player.isZBusterZero()) {
-					playSound("buster3", sendRpc: true);
+				playSound("buster3", sendRpc: true);
 					new ZBuster3Proj(
-						zeroBusterWeapon, shootPos, xDir, type, player, player.getNextActorNetId(), rpc: true
-					);
-				} else {
-					playSound("buster3X3", sendRpc: true);
+						zeroBusterWeapon, shootPos, xDir, 0, player, player.getNextActorNetId(), rpc: true
+				);
+				playSound("buster3X3", sendRpc: true);
 					new ZBuster4Proj(
-						zeroBusterWeapon, shootPos, xDir, type, player, player.getNextActorNetId(), rpc: true
+						zeroBusterWeapon, shootPos, xDir, 0, player, player.getNextActorNetId(), rpc: true
 					);
-				}
+				
 			} else if (chargeLevel == 3 || chargeLevel >= 4) {
-				if (type == 0) player.currency -= 1;
-				if (chargeLevel == 3 && player.isZBusterZero()) {
-					changeState(new ZeroDoubleBuster(false, true), true);
-					//playSound("zbuster2", sendRpc: true);
-					//new ZBuster2Proj(player.zeroBusterWeapon, shootPos, xDir, type, player, player.getNextActorNetId(), rpc: true);
-					//stockedCharge = true;
-				} else if (chargeLevel >= 4 && canUseDoubleBusterCombo()) {
-					//if (!isBlackZero2()) player.currency -= 1;
+				player.currency -= 1;
+				if (chargeLevel >= 4 && canUseDoubleBusterCombo()) {
 					changeState(new ZeroDoubleBuster(false, false), true);
 				} else {
 					playSound("buster4", sendRpc: true);
 					zeroLemonCooldown = 0.375f;
 					new ZBuster4Proj(
-						zeroBusterWeapon, shootPos, xDir, type, player, player.getNextActorNetId(), rpc: true
+						zeroBusterWeapon, shootPos, xDir, 0, player, player.getNextActorNetId(), rpc: true
 					);
 				}
 			}
@@ -1018,22 +899,24 @@ public class Zero : Character {
 
 	public override Dictionary<int, Func<Projectile>> getGlobalProjs() {
 		if (player.isZero && isAwakenedZeroBS.getValue() && globalCollider != null) {
-			Dictionary<int, Func<Projectile>> retProjs = new();
-			retProjs[(int)ProjIds.AwakenedAura] = () => {
-				//playSound("Aura", forcePlay: true, sendRpc: true); 
-				Point centerPoint = globalCollider.shape.getRect().center();
-				float damage = 2;
-				int flinch = 0;
-				if (isAwakenedGenmuZeroBS.getValue()) {
-					damage = 4;
-					flinch = Global.defFlinch;
+			Dictionary<int, Func<Projectile>> retProjs = new() {
+				[(int)ProjIds.AwakenedAura] = () => {
+					//playSound("awakenedAura", forcePlay: true, sendRpc: true); 
+					Point centerPoint = globalCollider.shape.getRect().center();
+					float damage = 2;
+					int flinch = 0;
+					if (isAwakenedGenmuZeroBS.getValue()) {
+						damage = 4;
+						flinch = Global.defFlinch;
+					}
+					Projectile proj = new GenericMeleeProj(
+						awakenedAuraWeapon, centerPoint,
+						ProjIds.AwakenedAura, player, damage, flinch, 0.5f
+					) {
+						globalCollider = globalCollider.clone()
+					};
+					return proj;
 				}
-				Projectile proj = new GenericMeleeProj(
-					awakenedAuraWeapon, centerPoint,
-					ProjIds.AwakenedAura, player, damage, flinch, 0.5f
-				);
-				proj.globalCollider = globalCollider.clone();
-				return proj;
 			};
 		}
 		return base.getGlobalProjs();

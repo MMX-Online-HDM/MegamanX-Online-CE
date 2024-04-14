@@ -504,7 +504,7 @@ public class HostMenu : IMainMenu {
 						resetCpuDataTeams();
 					} else if (
 						Global.input.isPressedOrHeldMenu(Control.MenuRight) &&
-						botCount < Math.Max(selectedLevel.maxPlayers - 1, 3)
+						botCount < Math.Max(Server.maxPlayerCap - 1, 3)
 					) {
 						botCount++;
 						resetCpuDataTeams();
@@ -1252,7 +1252,7 @@ public class HostMenu : IMainMenu {
 	}
 
 	public void setBotCounts() {
-		if (isOffline) botCount = selectedLevel.maxPlayers - 1;
+		//if (isOffline) botCount = Server.maxPlayerCap - 1;
 	}
 
 	public bool changeTeamEnabled() {

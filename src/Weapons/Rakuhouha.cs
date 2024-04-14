@@ -578,9 +578,9 @@ public class DarkHoldProj : Projectile {
 				screenCoords.x / Global.viewScreenW,
 				1 - screenCoords.y / Global.viewScreenH
 			);
-			float ratio = (float)Global.screenW / (float)Global.screenH;
-			float normalizedRadius = (radius / (float)Global.screenH);
-	
+			float ratio = Global.screenW / (float)Global.screenH;
+			float normalizedRadius = (radius / Global.screenH);
+
 			screenShader.SetUniform("ratio", ratio);
 			screenShader.SetUniform("x", normalizedCoords.x);
 			screenShader.SetUniform("y", normalizedCoords.y);

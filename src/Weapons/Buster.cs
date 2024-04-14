@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MMXOnline;
 
@@ -52,10 +53,13 @@ public class Buster : Weapon {
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
 		string shootSound = "buster";
+		if (player.character is not MegamanX mmx) {
+			return;
+		}
 		if (player.hasArmArmor(ArmorId.Light) || player.hasArmArmor(ArmorId.None) || player.hasUltimateArmor())
 			shootSound = chargeLevel switch {
 				_ when (
-						player.character.stockedCharge
+						mmx.stockedCharge
 				) => "",
 				0 => "buster",
 				1 => "buster2",
@@ -66,7 +70,7 @@ public class Buster : Weapon {
 		if (player.hasArmArmor(ArmorId.Giga)) {
 			shootSound = chargeLevel switch {
 				_ when (
-					player.character.stockedCharge
+					mmx.stockedCharge
 				) => "",
 				0 => "buster",
 				1 => "buster2X2",
@@ -77,10 +81,10 @@ public class Buster : Weapon {
 		} else if (player.hasArmArmor(ArmorId.Max)) {
 			shootSound = chargeLevel switch {
 				_ when (
-					player.character.stockedCharge
+					mmx.stockedCharge
 				) => "",
 				_ when (
-					player.character.stockedX3Buster
+					mmx.stockedX3Buster
 				) => "",
 				0 => "busterX3",
 				1 => "buster2X3",
@@ -89,7 +93,7 @@ public class Buster : Weapon {
 				_ => shootSound
 			};
 		}
-		if (player.character.stockedX3Buster) {
+		if (mmx.stockedX3Buster) {
 			if (player.ownedByLocalPlayer) {
 				if (player.character.charState is not WallSlide) {
 					shootTime = 0;
@@ -106,7 +110,7 @@ public class Buster : Weapon {
 			new BusterUnpoProj(this, pos, xDir, player, netProjId);
 			new Anim(pos, "buster_unpo_muzzle", xDir, null, true);
 			shootSound = "buster2";
-		} else if (player.character.stockedCharge) {
+		} else if (mmx.stockedCharge) {
 			if (player.ownedByLocalPlayer) {
 				player.character.changeState(new X2ChargeShot(1), true);
 			}
@@ -372,6 +376,7 @@ public class X2ChargeShot : CharState {
 	bool fired;
 	int type;
 	bool pressFire;
+	MegamanX mmx = null!;
 
 	public X2ChargeShot(int type) : base("x2_shot", "", "", "") {
 		this.type = type;
@@ -407,7 +412,7 @@ public class X2ChargeShot : CharState {
 			if (type == 0 && pressFire) {
 				fired = false;
 				type = 1;
-				character.stockedCharge = false;
+				mmx.stockedCharge = false;
 				Global.serverClient?.rpc(RPC.playerToggle, (byte)player.id, (int)RPCToggleType.UnstockCharge);
 				sprite = "x2_shot2";
 				defaultSprite = sprite;
@@ -440,6 +445,8 @@ public class X2ChargeShot : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		mmx = character as MegamanX ?? throw new NullReferenceException();
+
 		bool air = !character.grounded || character.vel.y < 0;
 		if (type == 0) {
 			sprite = "x2_shot";
@@ -476,9 +483,10 @@ public class X3ChargeShot : CharState {
 	bool fired;
 	int state = 0;
 	bool pressFire;
+	MegamanX mmx = null!;
+	public HyperBuster? hyperBusterWeapon;
 
-	public HyperBuster hyperBusterWeapon;
-	public X3ChargeShot(HyperBuster hyperBusterWeapon) : base("x3_shot", "", "", "") {
+	public X3ChargeShot(HyperBuster? hyperBusterWeapon) : base("x3_shot", "", "", "") {
 		this.hyperBusterWeapon = hyperBusterWeapon;
 		airMove = true;
 		useDashJumpSpeed = true;
@@ -503,8 +511,8 @@ public class X3ChargeShot : CharState {
 						player.weapon, shootPos, shootDir,
 						3, player, player.getNextActorNetId(), rpc: true
 					);
-					if(!(player.weapon is HyperBuster)){ 
-					character.playSound("buster3X3", sendRpc: true);
+					if (!(player.weapon is HyperBuster)) {
+						character.playSound("buster3X3", sendRpc: true);
 					}
 				} else {
 					new Anim(shootPos, "buster4_muzzle_flash", shootDir, null, true);
@@ -547,7 +555,7 @@ public class X3ChargeShot : CharState {
 						return;
 					}
 				} else {
-					character.stockedX3Buster = false;
+					mmx.stockedX3Buster = false;
 				}
 				sprite = "x3_shot2";
 				landSprite = "x3_shot2";
@@ -582,9 +590,13 @@ public class X3ChargeShot : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		if (!character.stockedX3Buster) {
+		mmx = character as MegamanX ?? throw new NullReferenceException();
+		if (mmx == null) {
+			throw new NullReferenceException();
+		}
+		if (!mmx.stockedX3Buster) {
 			if (hyperBusterWeapon == null) {
-				character.stockedX3Buster = true;
+				mmx.stockedX3Buster = true;
 			}
 			sprite = "x3_shot";
 			defaultSprite = sprite;
@@ -594,7 +606,7 @@ public class X3ChargeShot : CharState {
 			}
 			character.changeSpriteFromName(sprite, true);
 		} else {
-			character.stockedX3Buster = false;
+			mmx.stockedX3Buster = false;
 			state = 1;
 			sprite = "x3_shot2";
 			defaultSprite = sprite;
@@ -608,9 +620,9 @@ public class X3ChargeShot : CharState {
 
 	public override void onExit(CharState newState) {
 		if (state == 0) {
-			character.stockedX3Buster = true;
+			mmx.stockedX3Buster = true;
 		} else {
-			character.stockedX3Buster = false;
+			mmx.stockedX3Buster = false;
 		}
 		character.shootAnimTime = 0;
 		base.onExit(newState);

@@ -28,7 +28,7 @@ public class ServerPlayer {
 	[JsonIgnore]
 	public bool alreadyAutobalanced;
 
-	public ServerPlayer() {}
+	public ServerPlayer() { }
 
 	public ServerPlayer(
 		string name, int id, bool isHost, int charNum,

@@ -227,7 +227,7 @@ class Program {
 
 		// Force startup config to be fetched
 		Menu.change(new MainMenu());
-		switch(Helpers.randomRange(0,18)){
+		switch (Helpers.randomRange(0, 18)) {
 			// Title screens
 			case 1:
 			Global.changeMusic("mmx1_titlescreen");
@@ -287,7 +287,7 @@ class Program {
 				Global.changeMusic("mmx1_sigmafortress4");
 				break;		
 		}
-		
+
 		if (mode == 1) {
 			HostMenu menu = new HostMenu(new MainMenu(), null, false, false, true);
 			Menu.change(menu);

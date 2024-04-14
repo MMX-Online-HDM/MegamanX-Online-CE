@@ -54,7 +54,7 @@ public class CharState {
 	// Control system.
 	// This dictates if it can attack or land.
 	public bool attackCtrl;
-	public bool[] altAttackCtrls = new bool[1];
+	public bool[] altCtrls = new bool[1];
 	public bool normalCtrl;
 	public bool airMove;
 	public bool canStopJump;
@@ -92,7 +92,7 @@ public class CharState {
 		// Stop the dash speed on transition to any frame except jump/fall (dash lingers in air) or dash itself
 		// TODO: Add a bool here to charstate.
 		if (newState == null) {
-			character.mk5RideArmorPlatform = null;
+			character.rideArmorPlatform = null;
 			return;
 		}
 		if (newState is not Dash &&
@@ -107,11 +107,11 @@ public class CharState {
 		) {
 			character.onFlinchOrStun(newState);
 		}
-		if (character.mk5RideArmorPlatform != null && (
+		if (character.rideArmorPlatform != null && (
 			newState is Hurt || newState is Die ||
 			newState is CallDownMech || newState?.isGrabbedState == true
 		)) {
-			character.mk5RideArmorPlatform = null;
+			character.rideArmorPlatform = null;
 		}
 		if (invincible) {
 			player.delaySubtank();
@@ -540,10 +540,20 @@ public class Idle : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		if (character is MegamanX mmx && (mmx.isHyperX || player.health < 4)) {
-			sprite = "weak";
-			character.changeSpriteFromName("weak", true);
+		if ((character is MegamanX { isHyperX: true } || player.health < 4)) {
+			if (Global.sprites.ContainsKey(character.getSprite("weak"))) {
+				sprite = "weak";
+				character.changeSpriteFromName("weak", true);
+			}
 		}
+		if ((character is PunchyZero)) {
+			if (player.health < 4) {
+				sprite = "pweak";
+			} else {
+				sprite = "pidle";
+			}
+			character.changeSpriteFromName(sprite, true);
+		} 
 		character.dashedInAir = 0;
 	}
 
@@ -930,7 +940,7 @@ public class AirDash : CharState {
 	public bool stop;
 
 	public AirDash(string initialDashButton) : base("dash", "dash_shoot") {
-		enterSound = "DashX2";
+		enterSound = "dashX2";
 		this.initialDashButton = initialDashButton;
 		accuracy = 10;
 		attackCtrl = true;
@@ -994,7 +1004,6 @@ public class AirDash : CharState {
 		character.vel = new Point(0, 0);
 		character.dashedInAir++;
 		character.globalCollider = character.getDashingCollider();
-		character.lastAirDashWasSide = true;
 		new Anim(character.getDashSparkEffectPos(initialDashDir), "dash_sparks", initialDashDir, null, true);
 	}
 
@@ -1018,7 +1027,6 @@ public class UpDash : CharState {
 		character.useGravity = false;
 		character.vel = new Point(0, -4);
 		character.dashedInAir++;
-		character.lastAirDashWasSide = false;
 		character.frameSpeed = 2;
 	}
 
@@ -1422,7 +1430,7 @@ public class Hurt : CharState {
 	public override bool canEnter(Character character) {
 		if (character.isCCImmune()) return false;
 		if (character.vaccineTime > 0) return false;
-		if (character.mk5RideArmorPlatform != null) return false;
+		if (character.rideArmorPlatform != null) return false;
 		return base.canEnter(character);
 	}
 
@@ -1813,9 +1821,9 @@ public class Die : CharState {
 	}
 
 	public void destroyRideArmor() {
-		if (character.vileStartRideArmor != null) {
-			character.vileStartRideArmor.selfDestructTime = Global.spf;
-			RPC.actorToggle.sendRpc(character.vileStartRideArmor.netId, RPCActorToggleType.StartMechSelfDestruct);
+		if (character.startRideArmor != null) {
+			character.startRideArmor.selfDestructTime = Global.spf;
+			RPC.actorToggle.sendRpc(character.startRideArmor.netId, RPCActorToggleType.StartMechSelfDestruct);
 		}
 	}
 }

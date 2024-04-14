@@ -36,6 +36,10 @@ public class Helpers {
 		num = clampMin0(num - Global.spf);
 	}
 
+	public static void decrementFrames(ref float num) {
+		num = clampMin0(num - Global.speedMul);
+	}
+
 	public static float clampMin0(float num) {
 		if (num < 0) return 0;
 		return num;

@@ -35,7 +35,7 @@ public class GravityWell : Weapon {
 		if (player.character is not MegamanX mmx) {
 			return false;
 		}
-		if (chargeLevel >= 3 || player?.character?.stockedCharge == true) {
+		if (chargeLevel >= 3 || mmx.stockedCharge == true) {
 			return base.canShoot(chargeLevel, player) && (
 				mmx.chargedGravityWell == null || mmx.chargedGravityWell.destroyed
 			);
@@ -310,7 +310,7 @@ public class GravityWellProjCharged : Projectile, IDamagable {
 				if (chr != null) {
 					chr.damageHistory.Add(new DamageEvent(owner, weapon.killFeedIndex, projId, true, Global.time));
 					if (chr is Vile vile) {
-						vile.mk5RideArmorPlatform = null;
+						vile.rideArmorPlatform = null;
 					}
 				}
 			}

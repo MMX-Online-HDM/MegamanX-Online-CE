@@ -408,7 +408,10 @@ public class KillZone : Geometry {
 			return;
 		}
 
-		if (damagable.projectileCooldown.ContainsKey("killzone") && damagable.projectileCooldown["killzone"] > 0) return;
+		if (damagable.projectileCooldown.ContainsKey("killzone") &&
+			damagable.projectileCooldown["killzone"] > 0) {
+			return;
+		}
 		if (damagable.canBeDamaged(-1, null, null) && !damagable.isInvincible(null, null)) {
 			damagable.projectileCooldown["killzone"] = hitCooldown;
 			damagable.applyDamage(null, null, damage, null);

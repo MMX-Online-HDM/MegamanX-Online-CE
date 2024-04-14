@@ -41,6 +41,7 @@ public class Projectile : Actor {
 
 	public bool isMelee;
 	public int meleeId = -1;
+	public Actor owningActor;
 
 	public Projectile(
 		Weapon weapon, Point pos, int xDir, float speed, float damage,
@@ -432,7 +433,7 @@ public class Projectile : Actor {
 			) {
 				if (deltaPos.x != 0 && Math.Sign(deltaPos.x) != otherProj.xDir) {
 					deflect(otherProj.owner, sendRpc: true);
-					playSound("SigmaSaberBlock", forcePlay: false, sendRpc: true);
+					playSound("sigmaSaberBlock", forcePlay: false, sendRpc: true);
 				}
 			}
 

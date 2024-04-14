@@ -109,7 +109,7 @@ public class Hover : CharState {
 		);
 		hoverExhaust.setzIndex(ZIndex.Character - 1);
 		if (character.ownedByLocalPlayer) {
-			sound = character.playSound("Axlhover", forcePlay: false, sendRpc: true);
+			sound = character.playSound("axlHover", forcePlay: false, sendRpc: true);
 		}
 	}
 
@@ -120,7 +120,7 @@ public class Hover : CharState {
 		if (sound != null && !sound.deleted) {
 			sound.sound?.Stop();
 		}
-		RPC.stopSound.sendRpc("Axlhover", character.netId);
+		RPC.stopSound.sendRpc("axlHover", character.netId);
 	}
 }
 

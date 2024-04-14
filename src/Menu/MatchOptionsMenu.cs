@@ -474,7 +474,7 @@ public class MatchOptionsMenu : IMainMenu {
 	}
 
 	private bool canAddBot() {
-		return Global.isHost && Global.level.players.Count < Global.level.levelData.maxPlayers && !Global.level.isElimination();
+		return Global.isHost && Global.level.players.Count < Server.maxPlayerCap && !Global.level.isElimination();
 	}
 
 	private bool canSpectate() {

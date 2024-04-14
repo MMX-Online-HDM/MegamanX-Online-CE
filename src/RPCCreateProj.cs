@@ -660,8 +660,6 @@ public partial class RPCCreateProj : RPC {
 				proj = new TSeahorseAcid2Proj(ToxicSeahorse.getWeapon(), pos, xDir, 0, player, netProjByte);
 				break;
 			case (int)ProjIds.TunnelRTornadoFang:
-				proj = new TunnelRTornadoFang(ToxicSeahorse.getWeapon(), pos, xDir, extraData[0], player, netProjByte);
-				break;
 			case (int)ProjIds.TunnelRTornadoFang2:
 				proj = new TunnelRTornadoFang(TunnelRhino.getWeapon(), pos, xDir, extraData[0], player, netProjByte);
 				break;
@@ -732,9 +730,9 @@ public partial class RPCCreateProj : RPC {
 				proj = new BBuffaloIceProjGround(BlizzardBuffalo.getWeapon(), pos, 0, player, netProjByte);
 				break;
 			case (int)ProjIds.BBuffaloBeam:
-					ushort bbNetIdBytes = BitConverter.ToUInt16(extraData[0..2], 0);
-					BlizzardBuffalo? bb = Global.level.getActorByNetId(bbNetIdBytes) as BlizzardBuffalo;
-					proj = new BBuffaloBeamProj(BlizzardBuffalo.getWeapon(), pos, xDir, bb, player, netProjByte);
+				ushort bbNetIdBytes = BitConverter.ToUInt16(extraData[0..2], 0);
+				BlizzardBuffalo? bb = Global.level.getActorByNetId(bbNetIdBytes) as BlizzardBuffalo;
+				proj = new BBuffaloBeamProj(BlizzardBuffalo.getWeapon(), pos, xDir, bb, player, netProjByte);
 				break;
 			case (int)ProjIds.BHornetBee:
 				proj = new BHornetBeeProj(

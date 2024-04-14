@@ -45,13 +45,13 @@ public partial class Player {
 
 	public Weapon lastHudWeapon = null;
 
-	public AxlWeapon axlWeapon {
+	public AxlWeapon? axlWeapon {
 		get {
 			return weapon as AxlWeapon;
 		}
 	}
 
-	public MaverickWeapon maverickWeapon {
+	public MaverickWeapon? maverickWeapon {
 		get { return weapon as MaverickWeapon; }
 	}
 
@@ -67,9 +67,8 @@ public partial class Player {
 		}
 	}
 
-	public MaverickWeapon currentMaverickWeapon {
+	public MaverickWeapon? currentMaverickWeapon {
 		get {
-			var mavericks = new List<Maverick>();
 			foreach (var weapon in weapons) {
 				if (weapon is MaverickWeapon mw && mw.maverick != null && mw.maverick == currentMaverick) {
 					return mw;
@@ -110,18 +109,21 @@ public partial class Player {
 	public VileFlamethrower vileFlamethrowerWeapon;
 	public VileLaser vileLaserWeapon;
 
-	public Maverick currentMaverick {
+	public Maverick? currentMaverick {
 		get {
-			var mw = weapons.FirstOrDefault(w => w is MaverickWeapon mw && mw.maverick?.aiBehavior == MaverickAIBehavior.Control) as MaverickWeapon;
-			return mw?.maverick;
+			var mw = weapons.FirstOrDefault(
+				w => w is MaverickWeapon mw && mw.maverick?.aiBehavior == MaverickAIBehavior.Control
+			);
+			return (mw as MaverickWeapon)?.maverick;
 		}
 	}
 
 	public bool shouldBlockMechSlotScroll() {
-		if (character != null && character.vileStartRideArmor != null && (character as Vile).isVileMK5 == true) {
+		if (character is Vile { isVileMK5: true, startRideArmor: not null }) {
 			return false;
 		}
 		return Options.main.blockMechSlotScroll;
+		
 	}
 
 	public bool gridModeHeld;
@@ -176,9 +178,27 @@ public partial class Player {
 		} else if (input.isPressed(Control.WeaponRight, this)) {
 			if (isDisguisedAxl && isZero && input.isHeld(Control.Down, this)) return;
 			weaponRight();
-		} else if (!Control.isNumberBound(realCharNum, Options.main.axlAimMode)) {
-			if (isVile && weapon is MechMenuWeapon mmw && character?.vileStartRideArmor == null && shouldBlockMechSlotScroll()) {
-				if (input.isPressed(Key.Num1, canControl)) { selectedRAIndex = 0; character.onMechSlotSelect(mmw); } else if (input.isPressed(Key.Num2, canControl)) { selectedRAIndex = 1; character.onMechSlotSelect(mmw); } else if (input.isPressed(Key.Num3, canControl)) { selectedRAIndex = 2; character.onMechSlotSelect(mmw); } else if (input.isPressed(Key.Num4, canControl)) { selectedRAIndex = 3; character.onMechSlotSelect(mmw); } else if (input.isPressed(Key.Num5, canControl)) { selectedRAIndex = 4; character.onMechSlotSelect(mmw); }
+		} else if (character != null && !Control.isNumberBound(realCharNum, Options.main.axlAimMode)) {
+			if (isVile && weapon is MechMenuWeapon mmw &&
+				character.startRideArmor == null &&
+				shouldBlockMechSlotScroll()
+			) {
+				if (input.isPressed(Key.Num1, canControl)) {
+					selectedRAIndex = 0;
+					character.onMechSlotSelect(mmw);
+				} else if (input.isPressed(Key.Num2, canControl)) {
+					selectedRAIndex = 1;
+					character.onMechSlotSelect(mmw);
+				} else if (input.isPressed(Key.Num3, canControl)) {
+					selectedRAIndex = 2;
+					character.onMechSlotSelect(mmw);
+				} else if (input.isPressed(Key.Num4, canControl)) {
+					selectedRAIndex = 3;
+					character.onMechSlotSelect(mmw);
+				} else if (input.isPressed(Key.Num5, canControl)) {
+					selectedRAIndex = 4;
+					character.onMechSlotSelect(mmw);
+				}
 			} else {
 				if (input.isPressed(Key.Num1, canControl) && weapons.Count >= 1) {
 					changeWeaponSlot(0);
@@ -201,7 +221,7 @@ public partial class Player {
 	}
 
 	public void changeWeaponFromWi(int weaponIndex) {
-		nonOwnerWeapon = weapons.FirstOrDefault(w => w.index == weaponIndex);
+		nonOwnerWeapon = weapons.FirstOrDefault(w => w.index == weaponIndex) ?? nonOwnerWeapon;
 	}
 
 	public void changeToSigmaSlot() {
@@ -269,11 +289,10 @@ public partial class Player {
 		}
 
 		if (character is Axl axl) {
-			if (oldWeapon is AxlWeapon aw) {
+			if (oldWeapon is AxlWeapon) {
 				axl.axlSwapTime = axl.switchTime;
 				axl.axlAltSwapTime = axl.altSwitchTime;
 			}
-
 			if (axl.isZooming()) {
 				axl.zoomOut();
 			}
@@ -319,7 +338,7 @@ label:
 		weapons.Clear();
 	}
 
-	public List<Weapon> preSigmaReviveWeapons;
+	public List<Weapon>? preSigmaReviveWeapons;
 	public void configureWeapons() {
 		var oldGigaCrush = weapons?.Find(w => w is GigaCrush);
 		var oldHyperbuster = weapons?.Find(w => w is HyperBuster);
@@ -339,39 +358,7 @@ label:
 					if (hasArmArmor(3)) weapons.Add(new HyperBuster());
 					if (hasBodyArmor(2)) weapons.Add(new GigaCrush());
 					if (hasUltimateArmor()) weapons.Add(new NovaStrike(this));
-				}
-				/* Removed X AI having all weapons
-				else if (isAI) {
-						weapons.Add(new Buster());
-						weapons.Add(new Torpedo());
-						weapons.Add(new Sting());
-						weapons.Add(new RollingShield());
-						weapons.Add(new FireWave());
-						weapons.Add(new Tornado());
-						weapons.Add(new ElectricSpark());
-						weapons.Add(new Boomerang());
-						weapons.Add(new ShotgunIce());
-						weapons.Add(new CrystalHunter());
-						weapons.Add(new BubbleSplash());
-						weapons.Add(new SilkShot());
-						weapons.Add(new SpinWheel());
-						weapons.Add(new SonicSlicer());
-						weapons.Add(new StrikeChain());
-						weapons.Add(new MagnetMine());
-						weapons.Add(new SpeedBurner(this));
-						weapons.Add(new AcidBurst());
-						weapons.Add(new ParasiticBomb());
-						weapons.Add(new TriadThunder());
-						weapons.Add(new SpinningBlade());
-						weapons.Add(new RaySplasher());
-						weapons.Add(new GravityWell());
-						weapons.Add(new FrostShield());
-						weapons.Add(new TunnelFang());
-					if (hasArmArmor(3)) weapons.Add(new HyperBuster());
-					if (hasBodyArmor(2)) weapons.Add(new GigaCrush());
-					}
-				*/
-				 else if (Global.level.is1v1()) {
+				} else if (Global.level.is1v1()) {
 					if (xArmor1v1 == 1) {
 						weapons.Add(new Buster());
 						weapons.Add(new Torpedo());
@@ -408,7 +395,7 @@ label:
 
 					foreach (var enemyPlayer in Global.level.players) {
 						if (enemyPlayer.maverick1v1 != null && enemyPlayer.alliance != alliance) {
-							Weapon weaponToDeplete = null;
+							Weapon? weaponToDeplete = null;
 							if (enemyPlayer.maverick1v1 == 0) weaponToDeplete = weapons.FirstOrDefault(w => w is FireWave);
 							if (enemyPlayer.maverick1v1 == 1) weaponToDeplete = weapons.FirstOrDefault(w => w is ShotgunIce);
 							if (enemyPlayer.maverick1v1 == 2) weaponToDeplete = weapons.FirstOrDefault(w => w is ElectricSpark);
@@ -466,20 +453,7 @@ label:
 					weapons.Add(new PlasmaGun(axlLoadout.plasmaGunAlt));
 					weapons.Add(new IceGattling(axlLoadout.iceGattlingAlt));
 					weapons.Add(new FlameBurner(axlLoadout.flameBurnerAlt));
-				}
-				/* Removed Axl AI having all weapons
-				else if (isAI) {
-					weapons.Add(new AxlBullet());
-					weapons.Add(new RayGun(axlLoadout.rayGunAlt));
-					weapons.Add(new BlastLauncher(axlLoadout.blastLauncherAlt));
-					weapons.Add(new BlackArrow(axlLoadout.blackArrowAlt));
-					weapons.Add(new SpiralMagnum(axlLoadout.spiralMagnumAlt));
-					weapons.Add(new BoundBlaster(axlLoadout.boundBlasterAlt));
-					weapons.Add(new PlasmaGun(axlLoadout.plasmaGunAlt));
-				//	weapons.Add(new IceGattling(axlLoadout.iceGattlingAlt));
-					weapons.Add(new FlameBurner(axlLoadout.flameBurnerAlt));}
-				*/
-				 else {
+				} else {
 					weapons = loadout.axlLoadout.getWeaponsFromLoadout();
 					weapons.Insert(0, getAxlBullet(axlBulletType));
 				}
@@ -508,12 +482,17 @@ label:
 				}
 
 				// Preserve HP on death so can summon for free until they die
-				if (oldWeapons != null && isRefundableMode() && previousLoadout?.sigmaLoadout?.commandMode == loadout.sigmaLoadout.commandMode) {
+				if (oldWeapons != null && isRefundableMode() &&
+					previousLoadout?.sigmaLoadout?.commandMode == loadout.sigmaLoadout.commandMode
+				) {
 					foreach (var weapon in weapons) {
 						if (weapon is not MaverickWeapon mw) continue;
-						MaverickWeapon matchingOldWeapon = oldWeapons.FirstOrDefault(w => w is MaverickWeapon && w.GetType() == weapon.GetType()) as MaverickWeapon;
-						if (matchingOldWeapon == null) continue;
-
+						MaverickWeapon? matchingOldWeapon = oldWeapons.FirstOrDefault(
+							w => w is MaverickWeapon && w.GetType() == weapon.GetType()
+						) as MaverickWeapon;
+						if (matchingOldWeapon == null) {
+							continue;
+						}
 						if (matchingOldWeapon.lastHealth > 0 && matchingOldWeapon.summonedOnce) {
 							mw.summonedOnce = true;
 							mw.lastHealth = matchingOldWeapon.lastHealth;

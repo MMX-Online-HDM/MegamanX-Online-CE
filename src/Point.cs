@@ -280,4 +280,23 @@ public struct Point {
 	public Point round() {
 		return new Point(MathF.Round(x), MathF.Round(y));
 	}
+
+	public static Point operator+ (Point l, Point r) {
+		return new Point(l.x + r.x, l.y + r.y);
+	}
+	public static Point operator- (Point l, Point r) {
+		return new Point(l.x - r.x, l.y - r.y);
+	}
+	public static Point operator* (Point l, Point r) {
+		return new Point(l.x * r.x, l.y * r.y);
+	}
+	public static Point operator/ (Point l, Point r) {
+		return new Point(l.x / r.x, l.y / r.y);
+	}
+	public static Point operator% (Point l, Point r) {
+		return new Point(l.x % r.x, l.y % r.y);
+	}
+	public static Point operator* (Point l, float r) {
+		return new Point(l.x * r, l.y * r);
+	}
 }

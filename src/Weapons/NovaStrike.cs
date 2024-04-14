@@ -56,9 +56,9 @@ public class NovaStrikeState : CharState {
 					sprite = "nova_strike";
 				}
 				if (Helpers.randomRange(0, 10) < 10) {
-					character.playSound("NovaStrikeX4", forcePlay: false, sendRpc: true);
+					character.playSound("novaStrikeX4", forcePlay: false, sendRpc: true);
 				} else {
-					character.playSound("NovaStrikeX6", forcePlay: false, sendRpc: true);
+					character.playSound("novaStrikeX6", forcePlay: false, sendRpc: true);
 				}
 				character.changeSpriteFromName(sprite, true);
 			}

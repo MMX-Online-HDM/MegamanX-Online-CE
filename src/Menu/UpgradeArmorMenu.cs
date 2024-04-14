@@ -19,7 +19,7 @@ public class UpgradeArmorMenu : IMainMenu {
 	}
 
 	public void update() {
-		if (updateHyperArmorUpgrades(mainPlayer)) return;
+		//if (updateHyperArmorUpgrades(mainPlayer)) return;
 
 		// Should not be able to reach here but preventing upgrades just in case
 		if (!mainPlayer.canUpgradeXArmor()) return;
@@ -404,7 +404,7 @@ public class UpgradeArmorMenu : IMainMenu {
 			40, Global.screenH - 18
 		);
 	}
-
+	/*
 	public static bool updateHyperArmorUpgrades(Player mainPlayer) {
 		if (mainPlayer.character == null) return false;
 		if (mainPlayer.character.charState is NovaStrikeState) return false;
@@ -438,7 +438,7 @@ public class UpgradeArmorMenu : IMainMenu {
 		}
 		return false;
 	}
-
+	
 	public static void drawHyperArmorUpgrades(Player mainPlayer, int offY) {
 		if (mainPlayer.character == null) return;
 		if (mainPlayer.character.charState is NovaStrikeState) return;
@@ -476,7 +476,7 @@ public class UpgradeArmorMenu : IMainMenu {
 		}
 
 	}
-
+	*/
 	public string getHeadArmorMessage() {
 		if (mainPlayer.isHeadArmorPurchased(xGame)) {
 			return mainPlayer.helmetArmorNum == xGame ? " (Active)" : " (Bought)";

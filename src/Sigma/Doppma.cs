@@ -120,7 +120,7 @@ public class Doppma : BaseSigma {
 		}
 		return base.getProjFromHitbox(collider, centerPoint);
 	}
-	
+
 	public override List<ShaderWrapper> getShaders() {
 		List<ShaderWrapper> baseShaders = base.getShaders();
 		List<ShaderWrapper> shaders = new();
