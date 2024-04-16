@@ -416,7 +416,7 @@ public class ViralSigmaBeamProj : Projectile {
 		Helpers.decrementTime(ref explosionTime);
 		if (soundTime == 0) {
 			playSound("viralSigmaBeam");
-			soundTime = 0.164f;
+			soundTime = 0.289f;
 		}
 		if (explosionTime == 0) {
 			playSound("explosion");

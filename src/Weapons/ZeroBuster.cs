@@ -312,7 +312,7 @@ public class ZSaberProjSwingState : CharState {
 
 		if (character.frameIndex >= 7 && !fired) {
 			fired = true;
-			character.playSound("ZeroSaberX3", sendRpc: true);
+			character.playSound("zerosaberx3", sendRpc: true);
 			if (shootProj) {
 				new ZSaberProj(
 					new ZSaber(player), character.pos.addxy(30 * character.xDir, -20),

@@ -447,7 +447,7 @@ public class Zero : Character {
 
 				if (!player.hasKnuckle()) {
 					if (isAwakenedZero()) {
-						playSound("saberShot", sendRpc: true);
+						playSound("azsaberX5", sendRpc: true);
 						if (zSaberShotCooldown == 0) {
 							zSaberShotCooldown = maxZSaberShotCooldown;
 							Global.level.delayedActions.Add(new DelayedAction(() => {
@@ -676,7 +676,7 @@ public class Zero : Character {
 		if (isAwakenedZero()) {
 			if (chargeLevel >= 1) {
 				player.currency--;
-				playSound("ShingetsurinX5", forcePlay: false, sendRpc: true);
+				playSound("shingetsurinx5", forcePlay: false, sendRpc: true);
 				new ShingetsurinProj(
 					new Shingetsurin(player), getShootPos(), xDir,
 					0, player, player.getNextActorNetId(), rpc: true
@@ -688,7 +688,7 @@ public class Zero : Character {
 						new Shingetsurin(player), getShootPos(), xDir,
 						0.15f, player, player.getNextActorNetId(), rpc: true
 					);
-					playSound("ShingetsurinX5", forcePlay: false, sendRpc: true);
+					playSound("shingetsurinx5", forcePlay: false, sendRpc: true);
 				}, 0.15f));
 			}
 			if (chargeLevel >= 3) {
@@ -697,7 +697,7 @@ public class Zero : Character {
 						new Shingetsurin(player), getShootPos(), xDir,
 						0.3f, player, player.getNextActorNetId(), rpc: true
 					);
-					playSound("ShingetsurinX5", forcePlay: false, sendRpc: true);
+					playSound("shingetsurinx5", forcePlay: false, sendRpc: true);
 				}, 0.3f));
 			}
 			if (chargeLevel >= 4) {
@@ -706,7 +706,7 @@ public class Zero : Character {
 						new Shingetsurin(player), getShootPos(), xDir, 0.45f,
 						player, player.getNextActorNetId(), rpc: true
 					);
-					playSound("ShingetsurinX5", forcePlay: false, sendRpc: true);
+					playSound("shingetsurinx5", forcePlay: false, sendRpc: true);
 				}, 0.45f));
 			}
 			if (player.currency < 0) {
@@ -901,7 +901,7 @@ public class Zero : Character {
 		if (player.isZero && isAwakenedZeroBS.getValue() && globalCollider != null) {
 			Dictionary<int, Func<Projectile>> retProjs = new() {
 				[(int)ProjIds.AwakenedAura] = () => {
-					//playSound("awakenedAura", forcePlay: true, sendRpc: true); 
+					playSound("awakenedaura", forcePlay: true, sendRpc: true); 
 					Point centerPoint = globalCollider.shape.getRect().center();
 					float damage = 2;
 					int flinch = 0;

@@ -499,7 +499,7 @@ public class WarpOut : CharState {
 
 		if (character.player == Global.level.mainPlayer && !warpSoundPlayed) {
 			warpSoundPlayed = true;
-			character.playSound("warpIn");
+			character.playSound("warpOut", forcePlay: true, sendRpc: true);
 		}
 
 		warpAnim.pos.y -= Global.spf * 1000;
@@ -554,6 +554,14 @@ public class Idle : CharState {
 			}
 			character.changeSpriteFromName(sprite, true);
 		} 
+		if (character is Zero) {
+			if (player.health <= 4) {
+				sprite = "weak";
+			} else {
+				sprite = "idle";
+			}
+			character.changeSpriteFromName(sprite, true);				
+		}
 		character.dashedInAir = 0;
 	}
 
@@ -1743,6 +1751,11 @@ public class Die : CharState {
 			anim.setFrameIndexSafe(sigma.lastHyperSigmaFrameIndex);
 			anim.xDir = sigma.lastHyperSigmaXDir;
 			anim.frameSpeed = 0;
+		}
+		if (character is Zero zero) {
+			if (zero.isNightmareZeroBS.getValue()) {
+				character.playSound("zndie", sendRpc: true);
+			}
 		}
 	}
 

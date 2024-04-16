@@ -350,7 +350,7 @@ public class Projectile : Actor {
 					else return;
 
 					owner.character.changeState(new ZeroClang(-owner.character.xDir), true);
-					owner.character.playSound("ding", sendRpc: true);
+					owner.character.playSound("m10ding", sendRpc: true);
 
 					if (other.hitData.hitPoint != null) {
 						new Anim(other.hitData.hitPoint.Value, "zsaber_shot_fade", 1, owner.getNextActorNetId(), true, sendRpc: true);
@@ -424,7 +424,7 @@ public class Projectile : Actor {
 			) {
 				if (deltaPos.x != 0 && Math.Sign(deltaPos.x) != otherProj.xDir) {
 					reflect(otherProj.owner, sendRpc: true);
-					playSound("ding", sendRpc: true);
+					playSound("m10ding", sendRpc: true);
 				}
 			}
 
@@ -445,7 +445,7 @@ public class Projectile : Actor {
 					bool isDestroyable = otherProj is IDamagable;
 					if (shouldShieldBlock && !isDestroyable) {
 						destroySelf(fadeSprite, fadeSound);
-						playSound("ding", sendRpc: true);
+						playSound("m10ding", sendRpc: true);
 						return;
 					}
 				}

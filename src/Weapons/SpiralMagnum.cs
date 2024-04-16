@@ -248,7 +248,7 @@ public class SpiralMagnumProj : Projectile {
 				if (proj != null && (proj.isShield || proj.isDeflectShield || proj.isReflectShield))
 				{
 					destroySelf();
-					playSound("ding");
+					playSound("m10ding");
 					return;
 				}
 			}
@@ -273,7 +273,7 @@ public class SpiralMagnumProj : Projectile {
 				vel.y *= -1;
 				weakness = false;
 				time = 0;
-				playSound("ding");
+				playSound("m10ding");
 				Global.serverClient?.rpc(RPC.playerToggle, (byte)damager.owner.id, (byte)RPCToggleType.PlayDingSound);
 				return;
 			}

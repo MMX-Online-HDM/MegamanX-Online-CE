@@ -19,7 +19,7 @@ public class BusterZeroMelee : CharState {
 		base.update();
 		if (character.frameIndex >= 4 && !fired) {
 			fired = true;
-			character.playSound("ZeroSaberX3", sendRpc: true);
+			character.playSound("zerosaberx3", sendRpc: true);
 		}
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
@@ -170,7 +170,7 @@ public class BusterZeroHadangeki : CharState {
 	public override void update() {
 		base.update();
 		if (character.frameIndex >= 7 && !fired) {
-			character.playSound("ZeroSaberX3", sendRpc: true);
+			character.playSound("zerosaberx3", sendRpc: true);
 			zero.stockedSaber = false;
 			fired = true;
 			new DZHadangekiProj(
@@ -226,7 +226,7 @@ public class BusterZeroHadangekiWall : CharState {
 	public override void update() {
 		base.update();
 		if (character.frameIndex >= 4 && !fired) {
-			character.playSound("ZeroSaberX3", sendRpc: true);
+			character.playSound("zerosaberx3", sendRpc: true);
 			zero.stockedSaber = false;
 			fired = true;
 			new DZHadangekiProj(
@@ -298,7 +298,7 @@ public class HyperBusterZeroStart : CharState {
 			);
 		LightX3.fadeIn = true;
 		character.player.currency -= 10;
-		character.playSound("BlackZeroEntry", forcePlay: false, sendRpc: true);
+		character.playSound("blackzeroentry", forcePlay: false, sendRpc: true);
 	}
 
 	public override void onExit(CharState newState) {

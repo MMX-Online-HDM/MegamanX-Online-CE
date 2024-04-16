@@ -361,7 +361,7 @@ public class GameMode {
 				}
 
 				if (remainingTime.Value < lastTimeInt) {
-					if (remainingTime.Value <= 10) Global.playSound("tick");
+					if (remainingTime.Value <= 10) Global.playSound("text");
 					if (elimTime > 0) Global.serverClient?.rpc(RPC.syncGameTime, timeBytes[0], timeBytes[1], elimTimeBytes[0], elimTimeBytes[1]);
 					else Global.serverClient?.rpc(RPC.syncGameTime, timeBytes[0], timeBytes[1]);
 				}

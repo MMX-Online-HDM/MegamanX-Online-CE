@@ -277,7 +277,7 @@ public class ArmoredAGuardChargeState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		maverick.playSound("armoredaCharge", sendRpc: true);
+		maverick.playSound("4earmoredaCharge", sendRpc: true);
 	}
 
 	public override void update() {

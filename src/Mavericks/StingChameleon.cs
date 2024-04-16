@@ -126,11 +126,11 @@ public class StingChameleon : Maverick {
 				deductAmmo(8);
 				isInvisible = true;
 				cloakTransitionTime = 1;
-				playSound("stingcCloak", sendRpc: true);
+				playSound("76stingcCloak", sendRpc: true);
 			}
 		} else {
 			uncloakTransitionTime = 1;
-			playSound("stingcCloak", sendRpc: true);
+			playSound("76stingcCloak", sendRpc: true);
 		}
 	}
 

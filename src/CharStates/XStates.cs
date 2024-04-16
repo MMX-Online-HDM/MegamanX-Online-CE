@@ -65,7 +65,7 @@ public class XHover : CharState {
 		character.vel = new Point();
 		startXDir = character.xDir;
 		if (stateTime <= 0.1f) {
-			sound = character.playSound("UAHover", forcePlay: false, sendRpc: true);
+			sound = character.playSound("uahover", forcePlay: false, sendRpc: true);
 		}
 	}
 
@@ -75,7 +75,7 @@ public class XHover : CharState {
 		if (sound != null && !sound.deleted) {
 			sound.sound?.Stop();
 		}
-		RPC.stopSound.sendRpc("UAHover", character.netId);
+		RPC.stopSound.sendRpc("uahover", character.netId);
 
 	}
 }

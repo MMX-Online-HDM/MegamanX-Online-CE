@@ -45,17 +45,28 @@ public class GenmuState : CharState {
 
 	public override void update() {
 		base.update();
-
+		
 		if (character.frameIndex >= 8 && !fired) {
 			fired = true;
-			character.playSound("GenmureiX5", sendRpc: true);
+			character.playSound("genmureix5", sendRpc: true);
 			new GenmuProj(new Genmu(), character.pos.addxy(30 * character.xDir, -25), character.xDir, 0, player, player.getNextActorNetId(), rpc: true);
 			new GenmuProj(new Genmu(), character.pos.addxy(30 * character.xDir, -25), character.xDir, 1, player, player.getNextActorNetId(), rpc: true);
 		}
-
+		if (character.frameIndex == 1) {
+			if (character is Zero zero) {
+				if (zero.isNightmareZeroBS.getValue()) {
+					character.playSound("znshine", sendRpc: true);					
+				}
+			}
+		}
 		if (character.isAnimOver()) {
 			if (character.grounded) character.changeState(new Idle(), true);
 			else character.changeState(new Fall(), true);
+			if (character is Zero zero) {
+				if (zero.isNightmareZeroBS.getValue()) {
+					character.playSound("znsokomadeda", sendRpc: true);					
+				}
+			}
 		}
 	}
 }

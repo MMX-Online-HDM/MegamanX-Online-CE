@@ -75,7 +75,7 @@ public class VileMissile : Weapon {
 			} else {
 				vile.setVileShootTime(this);
 				if (player.vileMissileWeapon.type == 2 || player.vileMissileWeapon.type == 1) {
-					vile.playSound("mk2rocket", sendRpc: true);
+					vile.playSound("mk2stunshot", sendRpc: true);
 					new VileMissileProj(player.vileMissileWeapon, vile.getFirstPOIOrDefault(), vile.getShootXDir(), 0, vile.player, vile.player.getNextActorNetId(), new Point(vile.xDir, 0), rpc: true);
 				} else {
 					MissileAttack.mk2ShootLogic(vile, true);
@@ -271,7 +271,7 @@ public class MissileAttack : CharState {
 		Point? headPosNullable = vile.getVileMK2StunShotPos();
 		if (headPosNullable == null) return;
 
-		vile.playSound("MK2Stunshot", sendRpc: true);
+		vile.playSound("mk2stunshot", sendRpc: true);
 		new Anim(headPosNullable.Value, "dust", 1, vile.player.getNextActorNetId(), true, true);
 
 		if (isStunShot) {
