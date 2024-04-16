@@ -78,7 +78,6 @@ public class ZeroLoadout {
 			hyperMode = Helpers.randomRange(0, 2),
 			groundSpecial = Helpers.randomRange(0, 2),
 			airSpecial = Helpers.randomRange(0, 2),
-			melee = Helpers.randomRange(0, 2),
 		};
 	}
 
