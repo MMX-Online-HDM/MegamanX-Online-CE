@@ -184,7 +184,11 @@ public class CharState {
 	}
 
 	public bool inTransition() {
-		return !string.IsNullOrEmpty(transitionSprite) && sprite == transitionSprite && character?.sprite?.name != null && character.sprite.name.Contains(transitionSprite);
+		return (!string.IsNullOrEmpty(transitionSprite) &&
+			sprite == transitionSprite &&
+			character?.sprite?.name != null &&
+			character.sprite.name.Contains(transitionSprite)
+		);
 	}
 
 	public virtual void render(float x, float y) {
@@ -542,17 +546,23 @@ public class Idle : CharState {
 		base.onEnter(oldState);
 		if ((character is MegamanX { isHyperX: true } || player.health < 4)) {
 			if (Global.sprites.ContainsKey(character.getSprite("weak"))) {
-				sprite = "weak";
-				character.changeSpriteFromName("weak", true);
+				defaultSprite = "weak";
+				if (!inTransition()) {
+					sprite = defaultSprite;
+					character.changeSpriteFromName("weak", true);
+				}
 			}
 		}
 		if ((character is PunchyZero)) {
 			if (player.health < 4) {
-				sprite = "pweak";
+				defaultSprite = "pweak";
 			} else {
-				sprite = "pidle";
+				defaultSprite = "pidle";
 			}
-			character.changeSpriteFromName(sprite, true);
+			if (!inTransition()) {
+				sprite = defaultSprite;
+				character.changeSpriteFromName(sprite, true);
+			}
 		} 
 		character.dashedInAir = 0;
 	}

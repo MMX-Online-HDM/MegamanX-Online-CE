@@ -124,4 +124,16 @@ public class CmdSigma : BaseSigma {
 		}
 		return base.getProjFromHitbox(collider, centerPoint);
 	}
+
+	public override void addAmmo(float amount) {
+		weaponHealAmount += amount;
+	}
+
+	public override void addPercentAmmo(float amount) {
+		weaponHealAmount += amount * 0.32f;
+	}
+
+	public override bool canAddAmmo() {
+		return (player.sigmaAmmo < 32);
+	}
 }

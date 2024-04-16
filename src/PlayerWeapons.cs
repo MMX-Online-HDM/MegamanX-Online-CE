@@ -629,6 +629,9 @@ label:
 	public void updateWeapons() {
 		foreach (var weapon in weapons) {
 			weapon.update();
+			if (character != null && health > 0) {
+				weapon.charLinkedUpdate(character, false);
+			}
 		}
 	}
 }

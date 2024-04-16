@@ -64,6 +64,7 @@ public class PunchyZero : Character {
 		Helpers.decrementFrames(ref diveKickCooldown);
 		Helpers.decrementFrames(ref uppercutCooldown);
 		gigaAttack.update();
+		gigaAttack.charLinkedUpdate(this, true);
 		base.update();
 		// Charge and release charge logic.
 		//chargeLogic(shoot);
@@ -301,5 +302,17 @@ public class PunchyZero : Character {
 			return;
 		}
 		base.onCollision(other);
+	}
+
+	public override void addAmmo(float amount) {
+		gigaAttack.addAmmoHeal(amount);
+	}
+
+	public override void addPercentAmmo(float amount) {
+		gigaAttack.addAmmoPercentHeal(amount);
+	}
+
+	public override bool canAddAmmo() {
+		return (gigaAttack.ammo < gigaAttack.maxAmmo);
 	}
 }

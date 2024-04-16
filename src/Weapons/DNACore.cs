@@ -36,7 +36,7 @@ public class DNACore : AxlWeapon {
 	public List<Weapon> weapons = new List<Weapon>();
 	public bool usedOnce = false;
 
-	public DNACore(Character character) : base(0) {
+	public DNACore(Character? character) : base(0) {
 		if (character != null) {
 			charNum = character.player.charNum;
 			loadout = character.player.loadout;

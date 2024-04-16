@@ -700,7 +700,7 @@ public partial class Character : Actor, IDamagable {
 		changedStateInFrame = false;
 		pushedByTornadoInFrame = false;
 		lastXDir = xDir;
-		if (grounded) {
+		if (grounded && !isDashing) {
 			dashedInAir = 0;
 		}
 	}
@@ -2797,25 +2797,20 @@ public partial class Character : Actor, IDamagable {
 		healAmount += player.maxHealth;
 	}
 
-	public void addAmmo(float amount) {
-		if (player.isX && player.weapon.ammo >= player.weapon.maxAmmo) {
-			foreach (var weapon in player.weapons) {
-				if (weapon == player.weapon) continue;
-				if (weapon.ammo == weapon.maxAmmo) continue;
-				weapon.ammo = Math.Clamp(weapon.ammo + amount, 0, weapon.maxAmmo);
-				break;
-			}
-			return;
-		}
+	public virtual void addAmmo(float amount) {
+		player.weapon?.addAmmoHeal(amount);
+	}
 
-		weaponHealAmount += amount;
+	public virtual void addPercentAmmo(float amount) {
+		player.weapon?.addAmmoPercentHeal(amount);
+	}
+
+	public virtual bool canAddAmmo() {
+		return false;
 	}
 
 	public virtual void increaseCharge() {
 		float factor = 1;
-		if (player.isX && player.hasArmArmor(1)) factor = 1.5f;
-		//if (player.isX && isHyperX) factor = 1.5f;
-		//if (player.isZero && isAttacking()) factor = 0f;
 		chargeTime += Global.spf * factor;
 	}
 

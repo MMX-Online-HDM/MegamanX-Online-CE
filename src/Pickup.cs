@@ -39,8 +39,7 @@ public class Pickup : Actor {
 		base.onCollision(other);
 		if (other.otherCollider.flag == (int)HitboxFlag.Hitbox) return;
 
-		if (other.gameObject is Character) {
-			var chr = other.gameObject as Character;
+		if (other.gameObject is Character chr) {
 			if (!chr.ownedByLocalPlayer) return;
 			if (chr.isHyperSigmaBS.getValue()) return;
 
@@ -49,16 +48,12 @@ public class Pickup : Actor {
 				chr.addHealth(healAmount);
 				destroySelf(doRpcEvenIfNotOwned: true);
 			} else if (pickupType == PickupType.Ammo) {
-				if (chr.player.isZBusterZero()) return;
-				if (!chr.player.isZero && !chr.player.isVile && !chr.player.isSigma && (chr.player.weapon == null || chr.player.weapon.ammo >= chr.player.weapon.maxAmmo)) return;
-				if (chr.player.isVile && chr.player.vileAmmo >= chr.player.vileMaxAmmo) return;
-				if (chr.isHyperSigmaBS.getValue()) return;
-				if (chr.player.isSigma && chr.player.sigmaAmmo >= chr.player.sigmaMaxAmmo) return;
-				chr.addAmmo(healAmount);
-				destroySelf(doRpcEvenIfNotOwned: true);
+				if (chr.canAddAmmo()) {
+					chr.addPercentAmmo(healAmount);
+					destroySelf(doRpcEvenIfNotOwned: true);
+				}
 			}
-		} else if (other.gameObject is RideArmor) {
-			var rideArmor = other.gameObject as RideArmor;
+		} else if (other.gameObject is RideArmor rideArmor) {
 			if (!rideArmor.ownedByLocalPlayer) return;
 
 			if (rideArmor.character != null) {
@@ -69,7 +64,7 @@ public class Pickup : Actor {
 						)) {
 							return;
 						} else {
-							rideArmor.character.addHealth(healAmount);
+							rideArmor.character?.addHealth(healAmount);
 						}
 					} else {
 						rideArmor.addHealth(healAmount);
@@ -80,15 +75,19 @@ public class Pickup : Actor {
 					//this.destroySelf();
 				}
 			}
-		} else if (other.gameObject is RideChaser) {
-			var rideChaser = other.gameObject as RideChaser;
+		} else if (other.gameObject is RideChaser rideChaser) {
 			if (!rideChaser.ownedByLocalPlayer) return;
 
 			if (rideChaser.character != null) {
 				if (pickupType == PickupType.Health) {
 					if (rideChaser.health >= rideChaser.maxHealth) {
-						if (rideChaser.character != null && rideChaser.character.player.health >= rideChaser.character.player.maxHealth) return;
-						else rideChaser.character.addHealth(healAmount);
+						if (rideChaser.character != null &&
+							rideChaser.character.player.health >= rideChaser.character.player.maxHealth
+						) {
+							return;
+						} else {
+							rideChaser.character?.addHealth(healAmount);
+						}
 					} else {
 						rideChaser.addHealth(healAmount);
 					}
@@ -96,7 +95,9 @@ public class Pickup : Actor {
 				}
 			}
 		} else if (other.gameObject is Maverick maverick && maverick.ownedByLocalPlayer) {
-			if (pickupType == PickupType.Health && (maverick.health < maverick.maxHealth || maverick.netOwner.hasSubtankCapacity())) {
+			if (pickupType == PickupType.Health &&
+				(maverick.health < maverick.maxHealth || maverick.netOwner.hasSubtankCapacity())
+			) {
 				maverick.addHealth(healAmount, true);
 				destroySelf(doRpcEvenIfNotOwned: true);
 			} else if (pickupType == PickupType.Ammo && maverick.ammo < maverick.maxAmmo) {
@@ -108,33 +109,53 @@ public class Pickup : Actor {
 }
 
 public class LargeHealthPickup : Pickup {
-	public LargeHealthPickup(Player owner, Point pos, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
-		base(owner, pos, "pickup_health_large", netId, ownedByLocalPlayer, NetActorCreateId.LargeHealth, sendRpc: sendRpc) {
+	public LargeHealthPickup(
+		Player owner, Point pos, ushort? netId,
+		bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(
+		owner, pos, "pickup_health_large", netId, ownedByLocalPlayer,
+		NetActorCreateId.LargeHealth, sendRpc: sendRpc
+	) {
 		healAmount = 8;
 		pickupType = PickupType.Health;
 	}
 }
 
 public class SmallHealthPickup : Pickup {
-	public SmallHealthPickup(Player owner, Point pos, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
-		base(owner, pos, "pickup_health_small", netId, ownedByLocalPlayer, NetActorCreateId.SmallHealth, sendRpc: sendRpc) {
+	public SmallHealthPickup(
+		Player owner, Point pos, ushort? netId,
+		bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(
+		owner, pos, "pickup_health_small", netId, ownedByLocalPlayer,
+		NetActorCreateId.SmallHealth, sendRpc: sendRpc
+	) {
 		healAmount = 4;
 		pickupType = PickupType.Health;
 	}
 }
 
 public class LargeAmmoPickup : Pickup {
-	public LargeAmmoPickup(Player owner, Point pos, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
-		base(owner, pos, "pickup_ammo_large", netId, ownedByLocalPlayer, NetActorCreateId.LargeAmmo, sendRpc: sendRpc) {
-		healAmount = 16;
+	public LargeAmmoPickup(
+		Player owner, Point pos, ushort? netId,
+		bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(
+		owner, pos, "pickup_ammo_large", netId, ownedByLocalPlayer,
+		NetActorCreateId.LargeAmmo, sendRpc: sendRpc
+	) {
+		healAmount = 50;
 		pickupType = PickupType.Ammo;
 	}
 }
 
 public class SmallAmmoPickup : Pickup {
-	public SmallAmmoPickup(Player owner, Point pos, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
-		base(owner, pos, "pickup_ammo_small", netId, ownedByLocalPlayer, NetActorCreateId.SmallAmmo, sendRpc: sendRpc) {
-		healAmount = 8;
+	public SmallAmmoPickup(
+		Player owner, Point pos, ushort? netId,
+		bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(
+		owner, pos, "pickup_ammo_small", netId, ownedByLocalPlayer,
+		NetActorCreateId.SmallAmmo, sendRpc: sendRpc
+	) {
+		healAmount = 25;
 		pickupType = PickupType.Ammo;
 	}
 }

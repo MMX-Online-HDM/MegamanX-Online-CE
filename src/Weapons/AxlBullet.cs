@@ -28,6 +28,7 @@ public class AxlBullet : AxlWeapon {
 			chargedFlashSprite = "axl_pistol_flash_charged";
 			altFireCooldown = 0.3f;
 			displayName = "Axl Bullets";
+			canHealAmmo = false;
 		} else if (type == AxlBulletWeaponType.MetteurCrash) {
 			index = (int)WeaponIds.MetteurCrash;
 			weaponBarBaseIndex = 48;
