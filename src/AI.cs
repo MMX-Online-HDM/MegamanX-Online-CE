@@ -1267,7 +1267,7 @@ public class AI {
 				if (isTargetInAir && isTargetSuperClose && !(character.charState is VileRevive or HexaInvoluteState) && player.vileAmmo >= 24)
 					character.changeState(new RisingSpecterState(vile.grounded), true);
 			}
-			int Vattack = Helpers.randomRange(0, 18);
+			int Vattack = Helpers.randomRange(0, 12);
 			if (vile?.charState?.isGrabbedState == false && !player.isDead && vile.charState.canAttack()
 				&& !(character.charState is VileRevive or HexaInvoluteState or NecroBurstAttack
 				or StraightNightmareAttack or RisingSpecterState or VileMK2GrabState)) {
