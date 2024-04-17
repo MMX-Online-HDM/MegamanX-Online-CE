@@ -772,7 +772,7 @@ public partial class MegamanX : Character {
 			chargeLevel = 3;
 		}
 
-		weapon.shoot(pos, xDir, player, chargeLevel, netProjId);
+		shoot(weapon, pos, xDir, player, chargeLevel, netProjId);
 
 		if (ownedByLocalPlayer && nonBusterHyperCharge) {
 			weapon.ammo = oldWeaponAmmo;
@@ -793,7 +793,62 @@ public partial class MegamanX : Character {
 				shootRpc = RPC.shootFast;
 			}
 
-			Global.serverClient?.rpc(shootRpc, playerIdByte, xBytes[0], xBytes[1], yBytes[0], yBytes[1], xDirByte, chargeLevelByte, netProjIdBytes[0], netProjIdBytes[1], weaponIndexByte);
+			Global.serverClient?.rpc(
+				shootRpc, playerIdByte,
+				xBytes[0], xBytes[1], yBytes[0], yBytes[1], xDirByte,
+				chargeLevelByte, netProjIdBytes[0], netProjIdBytes[1], weaponIndexByte
+			);
+		}
+	}
+
+	public void shoot(Weapon weapon, Point pos, int xDir, Player player, int chargeLevel, ushort netProjId) {
+		if (stockedCharge) {
+			chargeLevel = 3;
+		}
+
+		weapon.getProjectile(pos, xDir, player, chargeLevel, netProjId);
+
+		if (weapon.soundTime == 0) {
+			if (weapon.shootSounds != null && weapon.shootSounds.Count > 0) {
+				player.character.playSound(weapon.shootSounds[chargeLevel]);
+			}
+			if (weapon is FireWave) {
+				weapon.soundTime = 0.25f;
+			}
+		}
+
+		// Only deduct ammo if owned by local player
+		if (ownedByLocalPlayer) {
+			float ammoUsage;
+			if (player.character.isInvisibleBS.getValue() && chargeLevel < 3) {
+				ammoUsage = 4;
+			} else if (weapon is FireWave) {
+				if (chargeLevel < 3) {
+					float chargeTime = player.character.chargeTime;
+					if (chargeTime < 1) {
+						ammoUsage = Global.spf * 10;
+					} else {
+						ammoUsage = Global.spf * 20;
+					}
+				} else {
+					ammoUsage = 8;
+				}
+			} else if (weapon is Buster buster) {
+				ammoUsage = 0;
+			} else {
+				ammoUsage = weapon.getAmmoUsage(chargeLevel);
+			}
+			weapon.addAmmo(-ammoUsage, player);
+
+			/*
+			if (weapon.ammo <= 0 && isHyperX == true) {
+				player.weapons.Remove(this);
+				player.weaponSlot--;
+				if (player.weaponSlot < 0) {
+					player.weaponSlot = 0;
+				}
+			}
+			*/
 		}
 	}
 
@@ -1309,5 +1364,59 @@ public partial class MegamanX : Character {
 		}
 		shaders.AddRange(baseShaders);
 		return shaders;
+	}
+
+	public override bool canAddAmmo() {
+		if (player.weapon == null) { return false; }
+		bool hasEmptyAmmo = false;
+		foreach (Weapon weapon in player.weapons) {
+			if (weapon.canHealAmmo && weapon.ammo < weapon.maxAmmo) {
+				hasEmptyAmmo = true;
+				break;
+			}
+		}
+		return hasEmptyAmmo;
+	}
+
+	public override void addAmmo(float amount) {
+		getRefillTargetWeapon()?.addAmmoHeal(amount);
+	}
+
+	public override void addPercentAmmo(float amount) {
+		getRefillTargetWeapon()?.addAmmoPercentHeal(amount);
+	}
+
+	public Weapon? getRefillTargetWeapon() {
+		if (player.weapon.canHealAmmo && player.weapon.ammo < player.weapon.maxAmmo) {
+			return player.weapon;
+		}
+		foreach (Weapon weapon in player.weapons) {
+			if (weapon is GigaCrush or NovaStrike or HyperBuster &&
+			player.weapon.ammo < player.weapon.maxAmmo
+			) {
+				return weapon;
+			}
+		}
+		Weapon? targetWeapon = null;
+		float targetAmmo = Int32.MaxValue;
+		foreach (Weapon weapon in player.weapons) {
+			if (!weapon.canHealAmmo) {
+				continue;
+			}
+			if (weapon != player.weapon &&
+				weapon.ammo < weapon.maxAmmo &&
+				weapon.ammo < targetAmmo
+			) {
+				targetWeapon = weapon;
+				targetAmmo = targetWeapon.ammo;
+			}
+		}
+		return targetWeapon;
+	}
+
+	public override void increaseCharge() {
+		float factor = 1;
+		if (player.hasArmArmor(1)) { factor = 1.5f; }
+		chargeTime += Global.spf * factor;
 	}
 }

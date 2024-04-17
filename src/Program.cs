@@ -227,66 +227,7 @@ class Program {
 
 		// Force startup config to be fetched
 		Menu.change(new MainMenu());
-		switch (Helpers.randomRange(0, 18)) {
-			// Title screens
-			case 1:
-			Global.changeMusic("mmx1_titlescreen");
-				break;
-			case 2:
-			Global.changeMusic("mmx2_titlescreen");
-				break;
-			case 3:
-			Global.changeMusic("mmx3_titlescreen");
-				break;
-			// Stage Selects
-			case 4:
-				Global.changeMusic("mmx1_stageselect");
-				break;
-			case 5:
-				Global.changeMusic("mmx1_stageselect2");
-				break;
-			case 6:
-				Global.changeMusic("mmx2_secondwave");
-				break;
-			case 7:
-				Global.changeMusic("mmx2_finaldestination");
-				break;
-			case 8:
-				Global.changeMusic("mmx3_stageselect");
-				break;
-			case 9:
-				Global.changeMusic("mmx3_dopplerstagerevealed");
-				break;
-			// Introduction
-			case 10:
-				Global.changeMusic("mmx3_introduction");
-				break;
-			case 11:
-				Global.changeMusic("mmx2_plotofthecounterhunters");
-				break;
-			// Extra
-			case 12:
-				Global.changeMusic("mmx3_ending");
-				break;
-			case 13:
-				Global.changeMusic("mmx2_thewakeofdestruction");
-				break;
-			case 14:
-				Global.changeMusic("mmx1_ending");
-				break;
-			case 15:
-				Global.changeMusic("mmx1_credits");
-				break;
-			case 16:
-				Global.changeMusic("mmx2_conspiracytomurder");
-				break;
-			case 17:
-				Global.changeMusic("mmx3_cainslab");
-				break;	
-			case 18:
-				Global.changeMusic("mmx1_sigmafortress4");
-				break;		
-		}
+		Global.changeMusic("MMX1-TitleScreen");
 
 		if (mode == 1) {
 			HostMenu menu = new HostMenu(new MainMenu(), null, false, false, true);
@@ -1104,6 +1045,13 @@ class Program {
 		int videoUpdatesThisSecond = 0;
 		int framesUpdatesThisSecond = 0;
 		bool useFrameSkip = false;
+		// Debug stuff.
+		bool isFrameStep = false;
+		bool continueNextFrameStep = false;
+		bool f5Released = true;
+		bool f6Released = true;
+		// WARNING DISABLE THIS FOR NON-DEBUG BUILDS
+		bool frameStepEnabled = true;
 
 		// Main loop itself.
 		while (window.IsOpen) {
@@ -1116,6 +1064,24 @@ class Program {
 			if (deltaTime >= 1 || deltaTimeAlt >= 1) {
 				window.DispatchEvents();
 				lastAltUpdateTime = timeNow;
+				if (frameStepEnabled) {
+					if (Keyboard.IsKeyPressed(Key.F5)) {
+						if (f5Released) {
+							isFrameStep = !isFrameStep;
+							f5Released = false;
+						}
+					} else {
+						f5Released = true;
+					}
+					if (Keyboard.IsKeyPressed(Key.F6)) {
+						if (f6Released) {
+							continueNextFrameStep = true;
+							f6Released = false;
+						}
+					} else {
+						f6Released = true;
+					}
+				}
 			}
 			if (deltaTime >= 1) {
 			} else {
@@ -1128,6 +1094,11 @@ class Program {
 				lastSecondFPS = timeSecondsNow;
 				videoUpdatesThisSecond = 0;
 				framesUpdatesThisSecond = 0;
+			}
+			// For debug framestep.
+			if (isFrameStep && !continueNextFrameStep) {
+				lastUpdateTime = timeNow;
+				continue;
 			}
 			// Disable frameskip in the menu.
 			if (Global.level != null) {
@@ -1142,10 +1113,12 @@ class Program {
 			if (Global.level?.levelData?.bgColor != null) {
 				clearColor = Global.level.levelData.bgColor;
 			}
-			if (!useFrameSkip) {
+			if (!useFrameSkip || isFrameStep) {
 				update();
 				framesUpdatesThisSecond++;
 				deltaTime = 0;
+				deltaTimeSavings = 0;
+				continueNextFrameStep = false;
 			} else {
 				// Logic update happens here.
 				while (deltaTime >= 1) {
@@ -1214,21 +1187,20 @@ class Program {
 		// For Windows OS.
 		cpuName = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(
 			@"HARDWARE\DESCRIPTION\System\CentralProcessor\0\"
-		).GetValue(
+		)?.GetValue(
 			"ProcessorNameString"
-		) as String;
+		) as String ?? "Windows";
 #endif
 #if LINUX
-	cpuName = "Linux CPU";
-
+	cpuName = "Linux";
 #endif
 #if MACOS
-	cpuName = "MAC CPU";
+	cpuName = "Darwin";
 #endif
 		// Fix simbols.
-		cpuName.Replace("(R)", "®");
-		cpuName.Replace("(C)", "©");
-		cpuName.Replace("(TM)", "ª"); //Todo, implement proper trademark simbol.
+		cpuName = cpuName.Replace("(R)", "®");
+		cpuName = cpuName.Replace("(C)", "©");
+		cpuName = cpuName.Replace("(TM)", "®"); //Todo, implement proper trademark simbol.
 		return cpuName;
 	}
 

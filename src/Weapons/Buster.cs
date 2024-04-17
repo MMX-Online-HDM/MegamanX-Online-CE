@@ -14,6 +14,7 @@ public class Buster : Weapon {
 		weaponBarIndex = 59;
 		weaponSlotIndex = 121;
 		killFeedIndex = 180;
+		canHealAmmo = false;
 	}
 
 	public static bool isNormalBuster(Weapon weapon) {
@@ -169,6 +170,50 @@ public class Buster : Weapon {
 		if (player?.character?.ownedByLocalPlayer == true && shootSound != "") {
 			player.character.playSound(shootSound, sendRpc: true);
 		}
+	}
+	
+	
+	public void createBuster4Line(
+		float x, float y, int xDir, Player player,
+		float offsetTime, bool smoothStart = false
+	) {
+		new Buster4Proj(
+			this, new Point(x + xDir, y), xDir,
+			player, 0, offsetTime,
+			player.getNextActorNetId(allowNonMainPlayer: true), smoothStart
+		);
+		Global.level.delayedActions.Add(new DelayedAction(delegate {
+			new Buster4Proj(
+				this, new Point(x + xDir, y), xDir,
+				player, 1, offsetTime,
+				player.getNextActorNetId(allowNonMainPlayer: true), smoothStart
+			);
+		}, 1.8f / 60f
+		));
+		Global.level.delayedActions.Add(new DelayedAction(delegate {
+			new Buster4Proj(
+				this, new Point(x + xDir, y), xDir,
+				player, 2, offsetTime,
+				player.getNextActorNetId(allowNonMainPlayer: true), smoothStart
+			);
+		}, 3.8f / 60f
+		));
+		Global.level.delayedActions.Add(new DelayedAction(delegate {
+			new Buster4Proj(
+				this, new Point(x + xDir, y), xDir,
+				player, 2, offsetTime,
+				player.getNextActorNetId(allowNonMainPlayer: true), smoothStart
+			);
+		}, 5.8f / 60f
+		));
+		Global.level.delayedActions.Add(new DelayedAction(delegate {
+			new Buster4Proj(
+				this, new Point(x + xDir, y), xDir,
+				player, 3, offsetTime,
+				player.getNextActorNetId(allowNonMainPlayer: true), smoothStart
+			);
+		}, 7.8f / 60f
+		));
 	}
 }
 

@@ -131,6 +131,7 @@ public class Zero : Character {
 
 	public override void update() {
 		base.update();
+		zeroGigaAttackWeapon?.charLinkedUpdate(this, true);
 
 		if (awakenedZeroTime > 0) {
 			updateAwakenedZero();
@@ -1043,5 +1044,17 @@ public class Zero : Character {
 		}
 		shaders.AddRange(baseShaders);
 		return shaders;
+	}
+
+	public override void addAmmo(float amount) {
+		zeroGigaAttackWeapon?.addAmmoHeal(amount);
+	}
+
+	public override void addPercentAmmo(float amount) {
+		zeroGigaAttackWeapon?.addAmmoPercentHeal(amount);
+	}
+
+	public override bool canAddAmmo() {
+		return (zeroGigaAttackWeapon != null && zeroGigaAttackWeapon.ammo < zeroGigaAttackWeapon.maxAmmo);
 	}
 }

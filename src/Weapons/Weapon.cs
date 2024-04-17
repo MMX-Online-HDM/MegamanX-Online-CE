@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace MMXOnline;
 
@@ -13,10 +14,10 @@ public class Weapon {
 	public float shootTime;
 	public float altShootTime;
 	public float streamTime;
-	public string displayName;
-	public string[] description;
-	public Damager damager;
-	public int type;    // For "swappable category" weapons, like techniques, vile weapon sections, etc.
+	public string displayName = "";
+	public string[] description = {""};
+	public Damager? damager;
+	public int type; // For "swappable category" weapons, like techniques, vile weapon sections, etc.
 
 	public int streams;
 	public int maxStreams;
@@ -30,6 +31,25 @@ public class Weapon {
 	public int weaknessIndex;
 	public int vileWeight;
 
+	public float rechargeTime;
+	public float rechargeCooldown;
+	public float? timeSinceLastShoot;
+
+	// Ammo display vars.
+	public bool allowSmallBar = true;
+	public float ammoDisplayScale = 1;
+	public float ammoDisplayScaleSmall = 2;
+
+	// Ammo recharge vars.
+	public float weaponHealAmount = 0;
+	public float weaponHealTime = 0;
+	public float weaponHealCount = 0;
+	public float ammoGainMultiplier = 1;
+	public bool canHealAmmo = true;
+	
+	// For double buster shenanigans.
+	public bool forceDefaultXShot = false;
+
 	public Weapon() {
 		ammo = 32;
 		maxAmmo = 32;
@@ -37,14 +57,14 @@ public class Weapon {
 		shootSounds = new List<string>() { "", "", "", "" };
 	}
 
-	public Weapon(WeaponIds index, int killFeedIndex, Damager damager = null) {
+	public Weapon(WeaponIds index, int killFeedIndex, Damager? damager = null) {
 		this.index = (int)index;
 		this.killFeedIndex = killFeedIndex;
 		this.damager = damager;
 	}
 
 	public Weapon clone() {
-		return MemberwiseClone() as Weapon;
+		return MemberwiseClone() as Weapon ?? throw new Exception("Error while copying weapon object.");
 	}
 
 	public static List<Weapon> getAllSwitchableWeapons(AxlLoadout axlLoadout) {
@@ -65,7 +85,7 @@ public class Weapon {
 		return weaponList;
 	}
 
-	public static List<Weapon> getAllSigmaWeapons(Player player, int? sigmaForm = null) {
+	public static List<Weapon> getAllSigmaWeapons(Player? player, int? sigmaForm = null) {
 		var weapons = new List<Weapon>()
 		{
 				new SigmaMenuWeapon(),
@@ -157,34 +177,39 @@ public class Weapon {
 	// friendlyIndex is 0-8.
 	// Don't use this to generate weapons for use as they don't come with the right alt fire
 	public static AxlWeapon fiToAxlWep(int friendlyIndex) {
-		if (friendlyIndex == 0) return new AxlBullet();
-		if (friendlyIndex == 1) return new RayGun(0);
-		if (friendlyIndex == 2) return new BlastLauncher(0);
-		if (friendlyIndex == 3) return new BlackArrow(0);
-		if (friendlyIndex == 4) return new SpiralMagnum(0);
-		if (friendlyIndex == 5) return new BoundBlaster(0);
-		if (friendlyIndex == 6) return new PlasmaGun(0);
-		if (friendlyIndex == 7) return new IceGattling(0);
-		if (friendlyIndex == 8) return new FlameBurner(0);
-		return null;
+		return friendlyIndex switch {
+			1 => new RayGun(0),
+			2 => new BlastLauncher(0),
+			3 => new BlackArrow(0),
+			4 => new SpiralMagnum(0),
+			5 => new BoundBlaster(0),
+			6 => new PlasmaGun(0),
+			7 => new IceGattling(0),
+			8 => new FlameBurner(0),
+			_ => new AxlBullet()
+		};
 	}
 
 	public static int wiToFi(int weaponIndex) {
-		if (weaponIndex == (int)WeaponIds.AxlBullet) return 0;
-		if (weaponIndex == (int)WeaponIds.RayGun) return 1;
-		if (weaponIndex == (int)WeaponIds.BlastLauncher) return 2;
-		if (weaponIndex == (int)WeaponIds.BlackArrow) return 3;
-		if (weaponIndex == (int)WeaponIds.SpiralMagnum) return 4;
-		if (weaponIndex == (int)WeaponIds.BoundBlaster) return 5;
-		if (weaponIndex == (int)WeaponIds.PlasmaGun) return 6;
-		if (weaponIndex == (int)WeaponIds.IceGattling) return 7;
-		if (weaponIndex == (int)WeaponIds.FlameBurner) return 8;
-		return 0;
+		return weaponIndex switch {
+			(int)WeaponIds.AxlBullet => 0,
+			(int)WeaponIds.RayGun => 1,
+			(int)WeaponIds.BlastLauncher => 2,
+			(int)WeaponIds.BlackArrow => 3,
+			(int)WeaponIds.SpiralMagnum => 4,
+			(int)WeaponIds.BoundBlaster => 5,
+			(int)WeaponIds.PlasmaGun => 6,
+			(int)WeaponIds.IceGattling => 7,
+			(int)WeaponIds.FlameBurner => 8,
+			_ => 0
+		};
 	}
 
 	public static List<int> getWeaponPool(bool includeBuster) {
 		List<int> weaponPool;
-		weaponPool = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24 };
+		weaponPool = new List<int>() {
+			1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24
+		};
 		if (includeBuster) weaponPool.Insert(0, 0);
 		return weaponPool;
 	}
@@ -204,102 +229,17 @@ public class Weapon {
 			};
 	}
 
-	// Friendly reminder that this method MUST be deterministic across all clients, i.e. don't vary it on a field that could vary locally.
-	public virtual void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-	}
-
-	public virtual float getAmmoUsage(int chargeLevel) {
-		if (chargeLevel >= 3) return 8;
-		else return 1;
-	}
-
-	public float rechargeTime;
-	public float rechargeCooldown;
-	public virtual void rechargeAmmo(float maxRechargeTime) {
-		rechargeCooldown -= Global.spf;
-		if (rechargeCooldown < 0) {
-			rechargeCooldown = 0;
-		}
-		if (rechargeCooldown == 0) {
-			rechargeTime += Global.spf;
-			if (rechargeTime > maxRechargeTime) {
-				rechargeTime = 0;
-				ammo++;
-				if (ammo > maxAmmo) ammo = maxAmmo;
-			}
-		}
-	}
-
-	public int spriteIndex {
-		get {
-			return index;
-		}
-
-	}
-
-	public float? timeSinceLastShoot;
-	public virtual void update() {
-		if (soundTime > 0) {
-			soundTime = Helpers.clampMin(soundTime - Global.spf, 0);
-		}
-		Helpers.decrementTime(ref shootTime);
-		Helpers.decrementTime(ref altShootTime);
-		if (timeSinceLastShoot != null) timeSinceLastShoot += Global.spf;
-	}
-
-	public float getDamage(float currentDamage) {
-		if (currentDamage == 1) return 1;
-		if (ammo <= 0) {
-			if (currentDamage == 7) return 3;
-			if (currentDamage == 5) return 2;
-			if (currentDamage == 3) return 1;
-		}
-		return currentDamage;
-	}
-
-	public void createBuster4Line(float x, float y, int xDir, Player player, float offsetTime, bool smoothStart = false) {
-		new Buster4Proj(
-			this, new Point(x + xDir, y), xDir,
-			player, 0, offsetTime,
-			player.getNextActorNetId(allowNonMainPlayer: true), smoothStart
-		);
-		Global.level.delayedActions.Add(new DelayedAction(delegate {
-			new Buster4Proj(
-				this, new Point(x + xDir, y), xDir,
-				player, 1, offsetTime,
-				player.getNextActorNetId(allowNonMainPlayer: true), smoothStart
-			);
-		}, 1.8f / 60f
-		));
-		Global.level.delayedActions.Add(new DelayedAction(delegate {
-			new Buster4Proj(
-				this, new Point(x + xDir, y), xDir,
-				player, 2, offsetTime,
-				player.getNextActorNetId(allowNonMainPlayer: true), smoothStart
-			);
-		}, 3.8f / 60f
-		));
-		Global.level.delayedActions.Add(new DelayedAction(delegate {
-			new Buster4Proj(
-				this, new Point(x + xDir, y), xDir,
-				player, 2, offsetTime,
-				player.getNextActorNetId(allowNonMainPlayer: true), smoothStart
-			);
-		}, 5.8f / 60f
-		));
-		Global.level.delayedActions.Add(new DelayedAction(delegate {
-			new Buster4Proj(
-				this, new Point(x + xDir, y), xDir,
-				player, 3, offsetTime,
-				player.getNextActorNetId(allowNonMainPlayer: true), smoothStart
-			);
-		}, 7.8f / 60f
-		));
-	}
-
-	public bool isCooldownPercentDone(float percent) {
-		if (rateOfFire == 0) return true;
-		return (shootTime / rateOfFire) < (1 - percent);
+	// GM19:
+	// Friendly reminder that this method MUST be deterministic across all clients,
+	// i.e. don't vary it on a field that could vary locally.
+	// Gacel:
+	// Using this as a deterministic generator is a horrible idea.
+	// As a lot of X's projectiles have state changes and other thing that this legacy funtion
+	// cannot use at all. Better to NOT use this at all.
+	// ToDo: Eventually remove this.
+	public virtual void getProjectile(
+		Point pos, int xDir, Player player, float chargeLevel, ushort netProjId
+	) {
 	}
 
 	public virtual void vileShoot(WeaponIds weaponInput, Vile vile) {
@@ -315,55 +255,38 @@ public class Weapon {
 
 	}
 
-	public void shoot(Point pos, int xDir, Player player, int chargeLevel, ushort netProjId) {
-		if (player.character is not MegamanX mmx) return;
-		if (mmx.stockedCharge) {
-			chargeLevel = 3;
+	// Gacel:
+	// This is to be used locally to get projectiles.
+	// A replacement of the above. Remeber to send RPCs when using this one.
+	public virtual void shoot(Character character, int[] args) {
+	}
+	public virtual void shoot(Actor actor, int[] args) {
+	}
+
+	// ToDo: Remove default values from this.
+	public virtual float getAmmoUsage(int chargeLevel) {
+		if (chargeLevel >= 3) return 8;
+		else return 1;
+	}
+
+	public virtual void rechargeAmmo(float maxRechargeTime) {
+		rechargeCooldown -= Global.spf;
+		if (rechargeCooldown < 0) {
+			rechargeCooldown = 0;
 		}
-
-		getProjectile(pos, xDir, player, chargeLevel, netProjId);
-
-		if (soundTime == 0) {
-			if (shootSounds != null && shootSounds.Count > 0) {
-				player.character.playSound(shootSounds[chargeLevel]);
-			}
-			if (this is FireWave) {
-				soundTime = 0.25f;
+		if (rechargeCooldown == 0) {
+			rechargeTime += Global.spf;
+			if (rechargeTime > maxRechargeTime) {
+				rechargeTime = 0;
+				ammo++;
+				if (ammo > maxAmmo) ammo = maxAmmo;
 			}
 		}
+	}
 
-		// Only deduct ammo if owned by local player
-		if (player.character.ownedByLocalPlayer) {
-			float ammoUsage;
-			if (player.character.isInvisibleBS.getValue() && chargeLevel < 3) {
-				ammoUsage = 4;
-			} else if (this is FireWave) {
-				if (chargeLevel < 3) {
-					float chargeTime = player.character.chargeTime;
-					if (chargeTime < 1) {
-						ammoUsage = Global.spf * 10;
-					} else {
-						ammoUsage = Global.spf * 20;
-					}
-				} else {
-					ammoUsage = 8;
-				}
-			} else if (this is Buster buster) {
-				ammoUsage = 0;
-			} else {
-				ammoUsage = getAmmoUsage(chargeLevel);
-			}
-			addAmmo(-ammoUsage, player);
-
-			/*
-			if (ammo <= 0 && player.character?.isHyperX == true)
-			{
-				player.weapons.Remove(this);
-				player.weaponSlot--;
-				if (player.weaponSlot < 0) player.weaponSlot = 0;
-			}
-			*/
-		}
+	public bool isCooldownPercentDone(float percent) {
+		if (rateOfFire == 0) { return true; }
+		return (shootTime / rateOfFire) < (1 - percent);
 	}
 
 	public void addAmmo(float amount, Player player) {
@@ -380,11 +303,64 @@ public class Weapon {
 		return ammo > 0;
 	}
 
-	public virtual bool applyDamage(IDamagable victim, bool weakness, Actor actor, int projId, float? overrideDamage = null, int? overrideFlinch = null, bool sendRpc = true) {
-		return damager?.applyDamage(victim, weakness, this, actor, projId, overrideDamage, overrideFlinch, sendRpc) ?? false;
+	public virtual bool applyDamage(
+		IDamagable victim, bool weakness, Actor actor,
+		int projId, float? overrideDamage = null,
+		int? overrideFlinch = null, bool sendRpc = true
+	) {
+		return damager?.applyDamage(
+			victim, weakness, this, actor, projId,
+			overrideDamage, overrideFlinch, sendRpc
+		) ?? false;
 	}
 
 	public bool isCmWeapon() {
 		return type > 0 && (this is AxlBullet || this is DoubleBullet);
+	}
+	
+	public virtual void update() {
+		if (soundTime > 0) {
+			soundTime = Helpers.clampMin(soundTime - Global.spf, 0);
+		}
+		Helpers.decrementTime(ref shootTime);
+		Helpers.decrementTime(ref altShootTime);
+		if (timeSinceLastShoot != null) {
+			timeSinceLastShoot += Global.spf;
+		}
+	}
+
+	public void charLinkedUpdate(Character character, bool isAlwaysOn) {
+		if (ammo >= maxAmmo || weaponHealAmount <= 0) {
+			weaponHealAmount = 0f;
+			weaponHealTime = 0;
+			return;
+		}
+		weaponHealTime += 1;
+		if (weaponHealTime >= 4) {
+			weaponHealCount += ammoDisplayScale;
+			weaponHealTime = 0;
+			weaponHealAmount -= ammoDisplayScale;
+			ammo = Helpers.clampMax(ammo + ammoDisplayScale, maxAmmo);
+			if (weaponHealCount >= 1) {
+				weaponHealCount = 0;
+				if (isAlwaysOn || character.player.weapon == this) {
+					character.playSound("heal", forcePlay: true);
+				}
+			}
+		}
+	}
+
+	public void addAmmoHeal(float ammoAdd) {
+		if (ammoAdd < 0 || ammo >= maxAmmo) {
+			return;
+		}
+		weaponHealAmount += MathF.Ceiling(ammoAdd * ammoGainMultiplier);
+	}
+
+	public void addAmmoPercentHeal(float ammoAdd) {
+		if (ammoAdd < 0 || ammo >= maxAmmo) {
+			return;
+		}
+		weaponHealAmount += MathF.Ceiling(maxAmmo * ammoAdd * ammoGainMultiplier / 100f);
 	}
 }

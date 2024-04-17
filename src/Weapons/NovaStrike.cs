@@ -2,7 +2,7 @@
 
 public class NovaStrike : Weapon {
 	public const float ammoUsage = 16;
-	public NovaStrike(Player player) : base() {
+	public NovaStrike(Player? player) : base() {
 		damager = new Damager(player, 4, Global.defFlinch, 0.5f);
 		rateOfFire = 1.5f;
 		index = (int)WeaponIds.NovaStrike;
