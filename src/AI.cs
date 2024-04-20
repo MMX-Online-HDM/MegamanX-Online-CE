@@ -449,13 +449,9 @@ public class AI {
 
 		//The AI should randomly charge weapon?
 		//I truly wonder why GM19 made only X charge weapons	
-		if (aiState.randomlyChargeWeapon && (player.isX || player.isZBusterZero() || player.isZSaber() || player.isAxl)
+		if (aiState.randomlyChargeWeapon && (player.isX || player.isZSaber() || player.isAxl)
 		&& framesChargeHeld == 0 && player.character.canCharge()) {
-
 			if (Helpers.randomRange(0, 20) < 1) {
-				if (player.isZBusterZero()) {
-					maxChargeTime = 5f;
-				}
 				if (player.isZSaber()) {
 					if (Helpers.randomRange(0, 50) < 1) {
 						maxChargeTime = 4.25f;
