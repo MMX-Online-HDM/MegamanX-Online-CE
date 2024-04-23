@@ -542,7 +542,7 @@ public class X3ChargeShot : CharState {
 		if (character.grounded) {
 			character.turnToInput(player.input, player);
 		}
-		if (!fired && character.currentFrame.getBusterOffset() != null) {
+		if (!fired && character.currentFrame.getBusterOffset() != null && player.ownedByLocalPlayer) {
 			fired = true;
 			if (state == 0) {
 				Point shootPos = character.getShootPos();
