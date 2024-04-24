@@ -14,7 +14,8 @@ public class DrDoppler : Maverick {
 		weapon = getWeapon();
 		canClimbWall = true;
 		canClimb = true;
-
+		//spriteFrameToSounds["drdoppler_run/1"] = "run";
+		//spriteFrameToSounds["drdoppler_run/5"] = "run";
 		weakWeaponId = WeaponIds.AcidBurst;
 		weakMaverickWeaponId = WeaponIds.ToxicSeahorse;
 

@@ -20,6 +20,8 @@ public class FlameStag : Maverick {
 		antler = Global.sprites["fstag_antler"].clone();
 		antlerDown = Global.sprites["fstag_antler_down"].clone();
 		antlerSide = Global.sprites["fstag_antler_side"].clone();
+		//spriteFrameToSounds["fstag_run/2"] = "run";
+		//spriteFrameToSounds["fstag_run/6"] = "run";
 
 		//stateCooldowns.Add(typeof(FStagShoot), new MaverickStateCooldown(false, false, 0.25f));
 		stateCooldowns.Add(typeof(FStagDashChargeState), new MaverickStateCooldown(true, false, 0.75f));
@@ -601,6 +603,7 @@ public class FStagGrabbed : GenericGrabbedState {
 
 public class FStagWallDashState : MaverickState {
 	public FStagWallDashState() : base("wall_dash") {
+	enterSound = "jumpx2";
 	}
 
 	public override void update() {

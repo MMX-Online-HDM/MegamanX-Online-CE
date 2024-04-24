@@ -510,6 +510,10 @@ public class MEnter : MaverickState {
 		base.onEnter(oldState);
 		maverick.useGravity = false;
 		maverick.alpha = 0;
+		if (player.isPuppeteer() || player.isSummoner() || player.isStriker() && !once) {
+			maverick.playSound("warpIn", sendRpc: true);
+			once = true;
+		} 
 	}
 
 	public override void onExit(MaverickState newState) {
@@ -550,6 +554,10 @@ public class MExit : MaverickState {
 		maverick.vel.x = 0;
 		maverick.vel.y = -400 * maverick.getYMod();
 		destY = maverick.pos.y - (yPos * maverick.getYMod());
+		if (player.isPuppeteer() || player.isSummoner() || player.isStriker() && !once) {
+			maverick.playSound("warpOut", sendRpc: true);
+			once = true;
+		} 
 	}
 
 	public override void onExit(MaverickState newState) {
@@ -569,6 +577,10 @@ public class MTaunt : MaverickState {
 		if (maverick.isAnimOver() && !Global.level.gameMode.playerWon(player)) {
 			maverick.changeState(new MIdle());
 		}
+		if (maverick.sprite.name == "bcrab_taunt" && stateTime >= 14/60f && !once) {
+			once = true;
+			maverick.playSound("sigma2start", sendRpc: true);
+		}
 	}
 
 	public override void onEnter(MaverickState oldState) {
@@ -579,6 +591,16 @@ public class MTaunt : MaverickState {
 			maverick.playSound("velgHowl", sendRpc: true);
 		} else if (maverick is OverdriveOstrich) {
 			maverick.playSound("overdriveoTaunt", sendRpc: true);
+		} else if (maverick is FakeZero) {
+			maverick.playSound("ching", sendRpc: true);
+		} else if (maverick is CrystalSnail) {
+			maverick.playSound("csnailSpecial", sendRpc: true);
+		}
+		if (maverick is BlastHornet && player.input.isHeld(Control.Up, player)) {
+			maverick.changeSprite("bhornet_taunt2", true);
+			if (maverick.isAnimOver()) {
+				maverick.changeState(new MIdle());
+			}
 		}
 	}
 }
@@ -648,6 +670,10 @@ public class MRun : MaverickState {
 				}
 			}
 		}
+		if (maverick is FakeZero && !once && stateTime >= 14/60f) {
+				maverick.playSound("dashX2", sendRpc: true);
+				once = true;
+			}
 	}
 
 	public override void onEnter(MaverickState oldState) {
@@ -732,6 +758,7 @@ public class MJump : MaverickState {
 	public MaverickState followUpAiState;
 	public MJump(MaverickState followUpAiState = null) : base("jump", "") {
 		this.followUpAiState = followUpAiState;
+		enterSound = "jump";
 	}
 
 	public override void update() {
@@ -904,6 +931,7 @@ public class MLand : MaverickState {
 	bool jumpHeldOnce;
 	public MLand(float landingVelY) : base("land", "") {
 		this.landingVelY = landingVelY;
+		enterSound = "land";
 	}
 
 	public override void onEnter(MaverickState oldState) {
@@ -1130,6 +1158,7 @@ public class MWallSlide : MaverickState {
 	public MWallSlide(int wallDir, Wall wall) : base("wall_slide") {
 		this.wallDir = wallDir;
 		this.wall = wall;
+		enterSound = "land";
 	}
 
 	public override void update() {
@@ -1212,6 +1241,7 @@ public class MWallKick : MaverickState {
 	public MWallKick(int kickDir, string overrideSprite = null) : base(overrideSprite ?? "wall_kick") {
 		this.kickDir = kickDir;
 		kickSpeed = kickDir * 150;
+		enterSound = "jump";
 	}
 
 	public override void update() {
