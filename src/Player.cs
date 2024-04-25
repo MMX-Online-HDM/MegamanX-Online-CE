@@ -348,7 +348,7 @@ public partial class Player {
 	public bool speedDevil;
 	public bool oldSpeedDevil;
 
-	public Disguise disguise;
+	public Disguise? disguise;
 
 	public int newAlliance;     // Not sure what this is useful for, seems like a pointless clone of alliance that needs to be kept in sync
 

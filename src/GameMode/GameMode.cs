@@ -764,8 +764,8 @@ public class GameMode {
 			level.mainPlayer.character?.disguiseCoverBlown != true
 		) {
 			Fonts.drawText(
-				FontType.Grey, "Disguised as " + level.mainPlayer.disguise.targetName,
-				Global.halfScreenW, 190, Alignment.Center
+				FontType.RedishOrange, "Disguised as " + level.mainPlayer.disguise?.targetName,
+				Global.halfScreenW, 8, Alignment.Center
 			);
 		} else if (
 			level.mainPlayer.isPuppeteer() && level.mainPlayer.currentMaverick != null &&
@@ -1827,15 +1827,17 @@ public class GameMode {
 				break;
 			}
 		}
-
+		int offsetX = 0;
 		for (var i = 0; i < player.weapons.Count; i++) {
 			var weapon = player.weapons[i];
-			var x = startX + (i * width);
+			var x = startX + (i * width) + offsetX;
 			var y = startY;
 			if (player.isX && Options.main.gigaCrushSpecial && weapon is GigaCrush) {
+				offsetX -= width;
 				continue;
 			}
 			if (player.isX && Options.main.novaStrikeSpecial && weapon is NovaStrike) {
+				offsetX -= width;
 				continue;
 			}
 			drawWeaponSlot(weapon, x, y);
