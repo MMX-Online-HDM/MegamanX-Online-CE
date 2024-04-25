@@ -297,6 +297,7 @@ public partial class Global {
 	public static Dictionary<string, ushort> spriteIndexByName = new();
 	public static Dictionary<int, string> spriteNameByIndex = new();
 	public static int spriteCount = 0;
+	public static int realSpriteCount = 0;
 
 	// For indexing purposes.
 	public static Dictionary<string, ushort> soundIndexByName = new();

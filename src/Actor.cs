@@ -1277,8 +1277,8 @@ public partial class Actor : GameObject {
 			anim.xScale = xScale;
 			anim.yScale = yScale;
 		}
-		fadeSound = fadeSound.ToLowerInvariant();
 		if (fadeSound != null) {
+			fadeSound = fadeSound.ToLowerInvariant();
 			playSound(fadeSound);
 		}
 

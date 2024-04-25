@@ -194,7 +194,7 @@ class Program {
 
 		loadText.Add("Loading Sprite JSONS...");
 		loadMultiThread(loadText, window, loadSprites);
-		loadText[loadText.Count - 1] = "Sprite JSONS OK.";
+		loadText[loadText.Count - 1] = $"Loaded {Global.realSpriteCount} Sprite JSONs.";
 
 		loadText.Add("Loading Maps...");
 		loadMultiThread(loadText, window, loadLevels);
@@ -853,13 +853,15 @@ class Program {
 		arrayBuffer.Sort(Helpers.invariantStringCompare);
 
 		for (int i = 0; i < arrayBuffer.Count; i++) {
+			// For HUD purposes.
+			Global.realSpriteCount++;
 			// Skip custom map sprites.
 			if (!string.IsNullOrEmpty(Global.sprites[arrayBuffer[i]].customMapName)) {
 				continue;
 			}
 			Global.spriteIndexByName[arrayBuffer[i]] = (ushort)i;
 			Global.spriteNameByIndex[i] = arrayBuffer[i];
-			Global.soundCount++;
+			Global.spriteCount++;
 		}
 	}
 
