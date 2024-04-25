@@ -1020,11 +1020,15 @@ public partial class Actor : GameObject {
 				}
 			}
 
-			int spriteIndex = Global.spriteNames.IndexOf(sprite.name);
+			
+			int spriteIndex = -1;
+			if (Global.spriteIndexByName.ContainsKey(sprite.name)) {
+				spriteIndex = Global.spriteIndexByName[sprite.name];
+			}
 			if (netSpriteIndex != null && netSpriteIndex != spriteIndex) {
 				int index = (int)netSpriteIndex;
-				if (index >= 0 && index < Global.spriteNames.Count) {
-					string spriteName = Global.spriteNames[index];
+				if (index >= 0 && index < Global.spriteCount) {
+					string spriteName = Global.spriteNameByIndex[index];
 					changeSprite(spriteName, true);
 				}
 			}
@@ -1284,8 +1288,8 @@ public partial class Actor : GameObject {
 				float speed = vel.magnitude;
 				if (speed == 0) speed = deltaPos.magnitude / Global.spf;
 				RPC.destroyActor.sendRpc(
-					netId.Value, (ushort)Global.spriteNames.IndexOf(spriteName),
-					(ushort)Global.soundNames.IndexOf(fadeSound), pos, favorDefenderProjDestroy, speed
+					netId.Value, Global.spriteIndexByName[spriteName],
+					Global.soundIndexByName[fadeSound], pos, favorDefenderProjDestroy, speed
 				);
 			}
 		}

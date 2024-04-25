@@ -1064,7 +1064,7 @@ public partial class Level {
 			server?.hidden == true ||
 			Global.debug ||
 			gameMode.isOver ||
-			Global.isHost && ||
+			Global.isHost ||
 			Global.level.mainPlayer.isSpectator
 
 		) {

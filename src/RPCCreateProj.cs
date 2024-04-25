@@ -356,7 +356,7 @@ public partial class RPCCreateProj : RPC {
 					ushort spriteIndex = BitConverter.ToUInt16(
 						new byte[] { arguments[extraDataIndex], arguments[extraDataIndex + 1] }, 0
 					);
-					string spriteName = Global.spriteNames[spriteIndex];
+					string spriteName = Global.spriteNameByIndex[spriteIndex];
 					byte hasRaColorShaderByte = arguments[extraDataIndex + 2];
 					proj = new RAShrapnelProj(
 						new VileLaser(VileLaserType.NecroBurst),

@@ -466,11 +466,11 @@ public class RPCDestroyActor : RPC {
 
 		string destroySprite = null;
 		string destroySound = null;
-		if (spriteIndex < Global.spriteNames.Count) {
-			destroySprite = Global.spriteNames[spriteIndex];
+		if (spriteIndex < Global.spriteCount) {
+			destroySprite = Global.spriteNameByIndex[spriteIndex];
 		}
-		if (soundIndex < Global.soundNames.Count) {
-			destroySound = Global.soundNames[soundIndex];
+		if (soundIndex < Global.soundCount) {
+			destroySound = Global.soundNameByIndex[soundIndex];
 		}
 		float x = BitConverter.ToSingle(new byte[] { arguments[6], arguments[7], arguments[8], arguments[9] }, 0);
 		float y = BitConverter.ToSingle(new byte[] { arguments[10], arguments[11], arguments[12], arguments[13] }, 0);
@@ -817,10 +817,16 @@ public class RPCCreateAnim : RPC {
 		float yPos = BitConverter.ToSingle(new byte[] { arguments[8], arguments[9], arguments[10], arguments[11] }, 0);
 		int xDir = arguments[12] - 128;
 
-		if (!Global.spriteNames.InRange(spriteIndex)) return;
+		if (spriteIndex >= Global.spriteCount) {
+			return;
+		}
+		string netSprName = Global.spriteNameByIndex[spriteIndex];
 
-		if (Global.spriteNames[spriteIndex] == "parasitebomb_latch_start") {
-			new ParasiteAnim(new Point(xPos, yPos), Global.spriteNames[spriteIndex], netProjByte, sendRpc: false, ownedByLocalPlayer: false);
+		if (netSprName == "parasitebomb_latch_start") {
+			new ParasiteAnim(
+				new Point(xPos, yPos), netSprName,
+				netProjByte, sendRpc: false, ownedByLocalPlayer: false
+			);
 			return;
 		}
 
@@ -836,9 +842,12 @@ public class RPCCreateAnim : RPC {
 			}
 		}
 
-		new Anim(new Point(xPos, yPos), Global.spriteNames[spriteIndex], xDir, netProjByte, true, ownedByLocalPlayer: false,
-			zIndex: extendedAnimModel?.zIndex, zIndexRelActor: zIndexRelActor, fadeIn: extendedAnimModel?.fadeIn ?? false,
-			hasRaColorShader: extendedAnimModel?.hasRaColorShader ?? false);
+		new Anim(
+			new Point(xPos, yPos), netSprName, xDir, netProjByte, true, ownedByLocalPlayer: false,
+			zIndex: extendedAnimModel?.zIndex, zIndexRelActor: zIndexRelActor,
+			fadeIn: extendedAnimModel?.fadeIn ?? false,
+			hasRaColorShader: extendedAnimModel?.hasRaColorShader ?? false
+		);
 	}
 }
 
@@ -1834,8 +1843,8 @@ public class RPCPlaySound : RPC {
 		var actor = Global.level.getActorByNetId(netId);
 		if (actor == null) return;
 
-		if (Global.soundNames.InRange(soundIndex)) {
-			string sound = Global.soundNames[soundIndex];
+		if (soundIndex < Global.soundCount) {
+			string sound = Global.soundNameByIndex[soundIndex];
 			var soundWrapper = actor.playSound(sound);
 			actor.netSounds[soundIndex] = soundWrapper;
 		}
@@ -1845,8 +1854,10 @@ public class RPCPlaySound : RPC {
 		if (netId == null) return;
 		if (Global.serverClient == null) return;
 
-		int soundIndex = Global.soundNames.IndexOf(sound);
-		if (soundIndex == -1) return;
+		if (!Global.soundIndexByName.ContainsKey(sound)) {
+			return;
+		}
+		ushort soundIndex = Global.soundIndexByName[sound];
 		byte[] netIdBytes = BitConverter.GetBytes((ushort)netId);
 		byte[] soundIndexBytes = BitConverter.GetBytes((ushort)soundIndex);
 		Global.serverClient?.rpc(this, netIdBytes[0], netIdBytes[1], soundIndexBytes[0], soundIndexBytes[1]);
@@ -1879,8 +1890,10 @@ public class RPCStopSound : RPC {
 		if (netId == null || Global.serverClient == null) {
 			return;
 		}
-		int soundIndex = Global.soundNames.IndexOf(sound);
-		if (soundIndex == -1) return;
+		if (!Global.soundIndexByName.ContainsKey(sound)) {
+			return;
+		}
+		int soundIndex = Global.soundIndexByName[sound];
 		byte[] netIdBytes = BitConverter.GetBytes((ushort)netId);
 		byte[] soundIndexBytes = BitConverter.GetBytes((ushort)soundIndex);
 		Global.serverClient?.rpc(this, netIdBytes[0], netIdBytes[1], soundIndexBytes[0], soundIndexBytes[1]);

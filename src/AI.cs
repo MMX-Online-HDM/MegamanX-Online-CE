@@ -379,7 +379,7 @@ public class AI {
 		} else if (character is Axl axl4) {
 			doAxlAI(axl4);
 		} else if (character is PunchyZero pzero) {
-			doKnuckleAI(pzero);
+			//doKnuckleAI(pzero);
 		}
 
 		//Should AI Attack?
@@ -399,7 +399,7 @@ public class AI {
 				} else if (character is BusterZero zero) {
 					busterZeroAIAttack(zero);
 				} else if (character is PunchyZero pzero) {
-					KnuckleZeroAIAttack(pzero);
+					//KnuckleZeroAIAttack(pzero);
 				}
 
 				// is Facing the target?

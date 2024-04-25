@@ -425,7 +425,7 @@ public class Zero : Character {
 					if (charState is Crouch) {
 						return;
 					}
-					if (Global.spriteNames.Contains(getSprite(attackSprite))) {
+					if (Global.spriteIndexByName.ContainsKey(getSprite(attackSprite))) {
 						playSound(attackSound, sendRpc: true);
 					}
 					if (charState is Run) changeState(new Idle(), true);

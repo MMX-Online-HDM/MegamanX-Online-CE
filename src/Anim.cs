@@ -100,17 +100,16 @@ public class Anim : Actor {
 			byte[] xBytes = BitConverter.GetBytes(pos.x);
 			byte[] yBytes = BitConverter.GetBytes(pos.y);
 			byte[] netProjIdByte = BitConverter.GetBytes(netId.Value);
-			int spriteIndex = Global.spriteNames.IndexOf(spriteName);
+			int spriteIndex =  Global.spriteIndexByName.GetValueOrCreate(spriteName, ushort.MaxValue);
 			byte[] spriteIndexBytes = BitConverter.GetBytes((ushort)spriteIndex);
 
-			var bytes = new List<byte>
-			{
-					netProjIdByte[0], netProjIdByte[1],
-					spriteIndexBytes[0], spriteIndexBytes[1],
-					xBytes[0], xBytes[1], xBytes[2], xBytes[3],
-					yBytes[0], yBytes[1], yBytes[2], yBytes[3],
-					(byte)(xDir + 128)
-				};
+			var bytes = new List<byte> {
+				netProjIdByte[0], netProjIdByte[1],
+				spriteIndexBytes[0], spriteIndexBytes[1],
+				xBytes[0], xBytes[1], xBytes[2], xBytes[3],
+				yBytes[0], yBytes[1], yBytes[2], yBytes[3],
+				(byte)(xDir + 128)
+			};
 
 			if (zIndex != null || zIndexRelActor?.netId != null || fadeIn != false || hasRaColorShader != false) {
 				var extendedAnimModel = new RPCAnimModel();

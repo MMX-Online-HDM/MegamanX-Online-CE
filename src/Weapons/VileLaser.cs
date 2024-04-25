@@ -309,7 +309,9 @@ public class RAShrapnelProj : Projectile {
 		}
 
 		if (rpc) {
-			byte[] spriteIndexBytes = BitConverter.GetBytes((ushort)Global.spriteNames.IndexOf(spriteName));
+			byte[] spriteIndexBytes = BitConverter.GetBytes(
+				Global.spriteIndexByName.GetValueOrCreate(spriteName, ushort.MaxValue)
+			);
 			byte hasRaColorShaderByte = hasRaColorShader ? (byte)1 : (byte)0;
 			rpcCreate(pos, player, netProjId, xDir, spriteIndexBytes[0], spriteIndexBytes[1], hasRaColorShaderByte);
 		}

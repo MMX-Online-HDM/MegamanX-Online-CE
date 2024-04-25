@@ -1423,8 +1423,8 @@ public class Axl : Character {
 	}
 
 	public Sprite getAxlArmSprite() {
-		if (!ownedByLocalPlayer) {
-			return Global.sprites[Global.spriteNames[netAxlArmSpriteIndex]];
+		if (!ownedByLocalPlayer && Global.spriteNameByIndex.ContainsKey(netAxlArmSpriteIndex)) {
+			return Global.sprites[Global.spriteNameByIndex[netAxlArmSpriteIndex]];
 		}
 
 		return Global.sprites[getAxlArmSpriteName()];

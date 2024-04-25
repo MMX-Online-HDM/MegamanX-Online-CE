@@ -202,7 +202,7 @@ class Program {
 
 		loadText.Add("Loading SFX...");
 		loadMultiThread(loadText, window, loadSounds);
-		loadText[loadText.Count - 1] = "SFX Loaded.";
+		loadText[loadText.Count - 1] = $"Loaded {Global.soundCount} SFX files.";
 
 		loadText.Add("Loading Music...");
 		loadMultiThread(loadText, window, loadMusics);
@@ -847,6 +847,20 @@ class Program {
 				}
 			}
 		}
+
+		// Create sprite RPC index data for RPC purposes.
+		List<String> arrayBuffer = Global.sprites.Keys.ToList();
+		arrayBuffer.Sort(Helpers.invariantStringCompare);
+
+		for (int i = 0; i < arrayBuffer.Count; i++) {
+			// Skip custom map sprites.
+			if (!string.IsNullOrEmpty(Global.sprites[arrayBuffer[i]].customMapName)) {
+				continue;
+			}
+			Global.spriteIndexByName[arrayBuffer[i]] = (ushort)i;
+			Global.spriteNameByIndex[i] = arrayBuffer[i];
+			Global.soundCount++;
+		}
 	}
 
 	static string loadSpritesSub(string[] spriteFilePaths) {
@@ -901,6 +915,16 @@ class Program {
 			} else {
 				Global.charSoundBuffers.Add(name, new SoundBufferWrapper(name, file, SoundPool.CharOverride));
 			}
+		}
+
+		// Create sound-index list for RPC purposes.
+		List<String> arrayBuffer = Global.soundBuffers.Keys.ToList();
+		arrayBuffer.Sort(Helpers.invariantStringCompare);
+
+		for (int i = 0; i < arrayBuffer.Count; i++) {
+			Global.soundIndexByName[arrayBuffer[i]] = (ushort)i;
+			Global.soundNameByIndex[i] = arrayBuffer[i];
+			Global.soundCount++;
 		}
 	}
 

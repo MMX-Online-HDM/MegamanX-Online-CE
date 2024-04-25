@@ -293,32 +293,15 @@ public partial class Global {
 	public static Dictionary<string, ShaderWrapper> shaderWrappers = new Dictionary<string, ShaderWrapper>();
 	public static Dictionary<string, string> shaderCodes = new Dictionary<string, string>();
 
-	private static List<string> _spriteNames;
-	public static List<string> spriteNames {
-		get {
-			if (_spriteNames == null) {
-				_spriteNames = new List<string>();
-				foreach (var kvp in sprites) {
-					if (string.IsNullOrEmpty(kvp.Value.customMapName)) {
-						_spriteNames.Add(kvp.Key);
-					}
-				}
-				_spriteNames.Sort(Helpers.invariantStringCompare);
-			}
-			return _spriteNames;
-		}
-	}
+	// For indexing purposes.
+	public static Dictionary<string, ushort> spriteIndexByName = new();
+	public static Dictionary<int, string> spriteNameByIndex = new();
+	public static int spriteCount = 0;
 
-	private static List<string> _soundNames;
-	public static List<string> soundNames {
-		get {
-			if (_soundNames == null) {
-				_soundNames = soundBuffers.Keys.ToList();
-				_soundNames.Sort(Helpers.invariantStringCompare);
-			}
-			return _soundNames;
-		}
-	}
+	// For indexing purposes.
+	public static Dictionary<string, ushort> soundIndexByName = new();
+	public static Dictionary<int, string> soundNameByIndex = new();
+	public static int soundCount = 0;
 
 	// First: existing, second: new cloned sprite
 	public static Dictionary<string, string> spriteAliases = new Dictionary<string, string>()
