@@ -15,6 +15,8 @@ public class LoopingSound {
 	public bool destroyed;
 
 	public LoopingSound(string startClipStr, string loopClipStr, Actor actor) {
+		startClipStr = startClipStr.ToLowerInvariant();
+		loopClipStr = loopClipStr.ToLowerInvariant();
 		startClip = new Sound(Global.soundBuffers[startClipStr].soundBuffer);
 		loopClip = new Sound(Global.soundBuffers[loopClipStr].soundBuffer);
 		loopClip.Loop = true;
@@ -22,7 +24,12 @@ public class LoopingSound {
 		Global.level.loopingSounds.Add(this);
 	}
 
-	public LoopingSound(string startClipStr, string stopClipStr, string loopClipStr, Actor actor) : this(startClipStr, loopClipStr, actor) {
+	public LoopingSound(
+		string startClipStr, string stopClipStr, string loopClipStr, Actor actor
+	) : this(
+		startClipStr, loopClipStr, actor
+	) {
+		stopClipStr = stopClipStr.ToLowerInvariant();
 		this.stopClip = new Sound(Global.soundBuffers[stopClipStr].soundBuffer);
 	}
 

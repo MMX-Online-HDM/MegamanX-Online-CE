@@ -466,9 +466,12 @@ public class RPCDestroyActor : RPC {
 
 		string destroySprite = null;
 		string destroySound = null;
-		if (spriteIndex < Global.spriteNames.Count) destroySprite = Global.spriteNames[spriteIndex];
-		if (soundIndex < Global.soundNames.Count) destroySound = Global.soundNames[soundIndex];
-
+		if (spriteIndex < Global.spriteNames.Count) {
+			destroySprite = Global.spriteNames[spriteIndex];
+		}
+		if (soundIndex < Global.soundNames.Count) {
+			destroySound = Global.soundNames[soundIndex];
+		}
 		float x = BitConverter.ToSingle(new byte[] { arguments[6], arguments[7], arguments[8], arguments[9] }, 0);
 		float y = BitConverter.ToSingle(new byte[] { arguments[10], arguments[11], arguments[12], arguments[13] }, 0);
 		Point destroyPos = new Point(x, y);
@@ -1873,9 +1876,9 @@ public class RPCStopSound : RPC {
 	}
 
 	public void sendRpc(string sound, ushort? netId) {
-		if (netId == null) return;
-		if (Global.serverClient == null) return;
-
+		if (netId == null || Global.serverClient == null) {
+			return;
+		}
 		int soundIndex = Global.soundNames.IndexOf(sound);
 		if (soundIndex == -1) return;
 		byte[] netIdBytes = BitConverter.GetBytes((ushort)netId);

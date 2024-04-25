@@ -867,33 +867,35 @@ class Program {
 	}
 
 	static void loadSounds() {
-		var soundNames = Helpers.getFiles(Global.assetPath + "assets/sounds", true, "ogg", "wav");
+		var soundNames = Helpers.getFiles(Global.assetPath + "assets/sounds", true, "ogg", "wav", "mp3", "flac");
 		if (soundNames.Count > 65535) {
 			throw new Exception("Cannot have more than 65535 sounds.");
 		}
 
-		var fileChecksumDict = new Dictionary<string, string>();
+		//var fileChecksumDict = new Dictionary<string, string>();
 		for (int i = 0; i < soundNames.Count; i++) {
 			string file = soundNames[i];
-			string name = Path.GetFileNameWithoutExtension(file);
-			fileChecksumDict[name] = "";
+			string name = Path.GetFileNameWithoutExtension(file).ToLowerInvariant();
+			//fileChecksumDict[name] = "";
 			Global.soundBuffers.Add(name, new SoundBufferWrapper(name, file, SoundPool.Regular));
 		}
 		//addToFileChecksumBlob(fileChecksumDict);
 
 		// Voices
-		var voiceNames = Helpers.getFiles(Global.assetPath + "assets/voices", true, "ogg", "wav");
+		var voiceNames = Helpers.getFiles(Global.assetPath + "assets/voices", true, "ogg", "wav", "mp3", "flac");
 		for (int i = 0; i < voiceNames.Count; i++) {
 			string file = voiceNames[i];
-			string name = Path.GetFileNameWithoutExtension(file);
+			string name = Path.GetFileNameWithoutExtension(file).ToLowerInvariant();;
 			Global.voiceBuffers.Add(name, new SoundBufferWrapper(name, file, SoundPool.Voice));
 		}
 
 		// Char-Specific Overrides
-		var overrideNames = Helpers.getFiles(Global.assetPath + "assets/sounds_overrides", true, "ogg", "wav");
+		var overrideNames = Helpers.getFiles(
+			Global.assetPath + "assets/sounds_overrides", true, "ogg", "wav", "mp3", "flac"
+		);
 		for (int i = 0; i < overrideNames.Count; i++) {
 			string file = overrideNames[i];
-			string name = Path.GetFileNameWithoutExtension(file);
+			string name = Path.GetFileNameWithoutExtension(file).ToLowerInvariant();;
 			if (Global.soundBuffers.ContainsKey(name)) {
 				Global.soundBuffers[name] = new SoundBufferWrapper(name, file, SoundPool.Regular);
 			} else {

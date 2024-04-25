@@ -100,7 +100,7 @@ public class SpinningBladeProj : Projectile {
 
 	public override void onStart() {
 		base.onStart();
-		spinSound = new Sound(Global.soundBuffers["spinningBlade"].soundBuffer);
+		spinSound = new Sound(Global.soundBuffers["spinningblade"].soundBuffer);
 		spinSound.Volume = 50f;
 	}
 }

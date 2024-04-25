@@ -1273,6 +1273,7 @@ public partial class Actor : GameObject {
 			anim.xScale = xScale;
 			anim.yScale = yScale;
 		}
+		fadeSound = fadeSound.ToLowerInvariant();
 		if (fadeSound != null) {
 			playSound(fadeSound);
 		}
@@ -1282,7 +1283,10 @@ public partial class Actor : GameObject {
 			if ((ownedByLocalPlayer || doRpcEvenIfNotOwned) && netId != null && !disableRpc) {
 				float speed = vel.magnitude;
 				if (speed == 0) speed = deltaPos.magnitude / Global.spf;
-				RPC.destroyActor.sendRpc(netId.Value, (ushort)Global.spriteNames.IndexOf(spriteName), (ushort)Global.soundNames.IndexOf(fadeSound), pos, favorDefenderProjDestroy, speed);
+				RPC.destroyActor.sendRpc(
+					netId.Value, (ushort)Global.spriteNames.IndexOf(spriteName),
+					(ushort)Global.soundNames.IndexOf(fadeSound), pos, favorDefenderProjDestroy, speed
+				);
 			}
 		}
 
@@ -1344,6 +1348,7 @@ public partial class Actor : GameObject {
 	}
 
 	public SoundWrapper playSound(string soundKey, bool forcePlay = false, bool sendRpc = false) {
+		soundKey = soundKey.ToLowerInvariant();
 		if (!Global.soundBuffers.ContainsKey(soundKey)) return null;
 		return playSound(Global.soundBuffers[soundKey], forcePlay: forcePlay, sendRpc: sendRpc);
 	}

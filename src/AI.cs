@@ -400,7 +400,7 @@ public class AI {
 					busterZeroAIAttack(zero);
 				} else if (character is PunchyZero pzero) {
 					KnuckleZeroAIAttack(pzero);
-				}	
+				}
 
 				// is Facing the target?
 				if (character.isFacing(target)) {
@@ -419,7 +419,7 @@ public class AI {
 			// funny enough fighting Nightmare Zero with 0.01 is pretty much as MMX6 LV 4 Xtreme mode :skull:
 			shootTime += Global.spf;
 			if (shootTime > 0.08) {
-			shootTime = 0;
+				shootTime = 0;
 			}
 		}
 		//End of AI should attack
@@ -1086,7 +1086,7 @@ public class AI {
 		if (player.currency >= 10 && !zero.isBlackZero && !zero.isInvulnerable()
 			&& zero.charState is not HyperBusterZeroStart and not WarpIn) {
 			zero.changeState(new HyperBusterZeroStart(), true);
-		}		
+		}
 		bool isTargetInAir = target.pos.y <= character.pos.y - 50;
 		bool isTargetClose = MathF.Abs(target.pos.x - character.pos.x) <= 32;
 		bool canHitMaxCharge = (!isTargetInAir && zero.getChargeLevel() >= 4);
@@ -1352,9 +1352,9 @@ public class AI {
 		foreach (GameObject gameObject in Global.level.gameObjects) {
 			if (gameObject is Projectile proj) {
 				if (proj.damager.owner.alliance != player.alliance) {
-					if (gameObject is not FrostShieldProj or FrostShieldProjAir 
+					if (gameObject is not FrostShieldProj or FrostShieldProjAir
 						or FrostShieldProjCharged or FrostShieldProjGround or FrostShieldProjPlatform //HOW MANY OF U EXIST
-					    ) {
+						) {
 						if (player.character is BusterZero bzero1) {
 							if (character != null && proj.isFacing(character) &&
 								character.withinX(proj, 100) && character.withinY(proj, 30)) {
@@ -1371,14 +1371,14 @@ public class AI {
 			if (gameObject is Projectile proj) {
 				if (proj.damager.owner.alliance != player.alliance) {
 					if (player.character is PunchyZero pzero1 && !player.isMainPlayer) {
-						if (character != null && proj.isFacing(character) && character.withinX(proj, 100) && character.withinY(proj, 30)) {						
+						if (character != null && proj.isFacing(character) && character.withinX(proj, 100) && character.withinY(proj, 30)) {
 							if (pzero.gigaAttack.ammo >= 16 && pzero.grounded) {
 								player.press(Control.Special1);
 								player.press(Control.Down);
-							} else { 
+							} else {
 								pzero1.turnToInput(player.input, player);
-								pzero1.changeState(new PZeroParry(), true);				
- 							}
+								pzero1.changeState(new PZeroParry(), true);
+							}
 						}
 					}
 				}
@@ -1407,10 +1407,10 @@ public class AI {
 								} else if (gameObject is not SwordBlock and GenericMeleeProj && zero.grounded) {
 									//If he hasn't do "Block/Parry"						
 									zero.turnToInput(player.input, player);
-									zero.changeState(new SwordBlock());																		
+									zero.changeState(new SwordBlock());
 								}
 							}
-						}				
+						}
 					}
 				}
 			}
@@ -1490,7 +1490,7 @@ public class AI {
 							} else {
 								doJump(0.75f);
 							}
-							//Or just Jump					
+							//Or just Jump
 						}
 					}
 				}
@@ -1639,8 +1639,7 @@ public class AI {
 				}
 				if (!zero1.grounded && zero1.zeroAirSpecialWeapon.type == (int)AirSpecialType.Kuuenzan && !zero1.isAttacking() && zero1.charState.canAttack() && !(zero1.sprite.name == "zero_attack_air2")) {
 					player.press(Control.Special1); //Do Kuuenzan even if he is not attacking
-				}
-				else if (!zero1.grounded && zero1.isAttacking() && zero1.charState.canAttack() && zero1.sprite.name == "zero_attack_air2" && zero1.framePercent > 0.4 && !(zero1.sprite.name == "zero_attack_air")) {
+				} else if (!zero1.grounded && zero1.isAttacking() && zero1.charState.canAttack() && zero1.sprite.name == "zero_attack_air2" && zero1.framePercent > 0.4 && !(zero1.sprite.name == "zero_attack_air")) {
 					player.press(Control.Shoot);
 					player.release(Control.Special1);
 					// Do air slash
@@ -1679,9 +1678,9 @@ public class AI {
 		//		player.reviveSigma(spawnPoint);
 		//	}
 
-			//if (jumpTime >= 0.4) {
-			//	player.release(Control.Jump);
-			//}
+		//if (jumpTime >= 0.4) {
+		//	player.release(Control.Jump);
+		//}
 		//}	
 	}
 } // End of AI
