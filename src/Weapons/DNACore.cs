@@ -77,6 +77,22 @@ public class DNACore : AxlWeapon {
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 30 + charNum;
 		if (charNum == 4) weaponSlotIndex = 65;
+		if (charNum == (int)CharIds.BusterZero || charNum == (int)CharIds.PunchyZero) {
+			weaponBarBaseIndex = 31;
+		}
+		sprite = "axl_arm_pistol";
+	}
+
+	public DNACore() : base(0) {
+		charNum = 0;
+		name = "error";
+		loadout = null!;
+		rateOfFire = 1f;
+		index = (int)WeaponIds.DNACore;
+		weaponBarBaseIndex = 30 + charNum;
+		weaponBarIndex = weaponBarBaseIndex;
+		weaponSlotIndex = 30 + charNum;
+		if (charNum == 4) weaponSlotIndex = 65;
 		sprite = "axl_arm_pistol";
 	}
 

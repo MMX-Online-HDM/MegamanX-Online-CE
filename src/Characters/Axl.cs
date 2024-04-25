@@ -1419,7 +1419,7 @@ public class Axl : Character {
 			return "axl_arm_icegattling2";
 		}
 
-		return player.axlWeapon.sprite;
+		return player.axlWeapon?.sprite ?? "axl_arm_pistol";
 	}
 
 	public Sprite getAxlArmSprite() {

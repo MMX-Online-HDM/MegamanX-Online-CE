@@ -223,10 +223,8 @@ public partial class Actor : GameObject {
 	}
 
 	public virtual void changeSprite(string spriteName, bool resetFrame) {
-		string oldSpriteName = sprite.name;
-
+		string oldSpriteName = sprite?.name ?? "";
 		if (spriteName == null) return;
-
 		if (sprite != null) {
 			if (sprite.name == spriteName) return;
 		}

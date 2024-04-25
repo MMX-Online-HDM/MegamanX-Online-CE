@@ -68,17 +68,16 @@ public class Weapon {
 	}
 
 	public static List<Weapon> getAllSwitchableWeapons(AxlLoadout axlLoadout) {
-		var weaponList = new List<Weapon>()
-		{
-				new GigaCrush(),
-				new HyperBuster(),
-				new NovaStrike(null),
-				new DoubleBullet(),
-				new DNACore(null),
-				new VileMissile(VileMissileType.ElectricShock),
-				new VileCannon(VileCannonType.FrontRunner),
-				new Vulcan(VulcanType.CherryBlast),
-			};
+		var weaponList = new List<Weapon>() {
+			new GigaCrush(),
+			new HyperBuster(),
+			new NovaStrike(null),
+			new DoubleBullet(),
+			new DNACore(),
+			new VileMissile(VileMissileType.ElectricShock),
+			new VileCannon(VileCannonType.FrontRunner),
+			new Vulcan(VulcanType.CherryBlast),
+		};
 		weaponList.AddRange(getAllXWeapons());
 		weaponList.AddRange(getAllAxlWeapons(axlLoadout));
 		weaponList.AddRange(getAllSigmaWeapons(null));
