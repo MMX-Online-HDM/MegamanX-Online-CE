@@ -48,7 +48,7 @@ public class ShotgunIce : Weapon {
 public class ShotgunIceProj : Projectile {
 	public int type = 0;
 	public float sparkleTime = 0;
-	public Character hitChar;
+	public Character? hitChar;
 	public float maxSpeed = 400;
 
 	public ShotgunIceProj(
@@ -103,7 +103,7 @@ public class ShotgunIceProj : Projectile {
 		}
 		if (type == 0) {
 			destroySelf(disableRpc: true);
-			Character chr = null;
+			Character? chr = null;
 			new ShotgunIceProj(
 				weapon, pos.clone(), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
 				((-1 * xDir), -2), chr, rpc: true
@@ -167,12 +167,13 @@ public class ShotgunIceProjCharged : Projectile {
 }
 
 public class ShotgunIceProjSled : Projectile {
-	public Character character;
+	public Character? character;
 	bool setVelOnce = false;
 	float lastY;
 	int heightIncreaseDir = 0;
 	float nonRideTime = 0;
 	public bool ridden;
+
 	public ShotgunIceProjSled(
 		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId
 	) : base(

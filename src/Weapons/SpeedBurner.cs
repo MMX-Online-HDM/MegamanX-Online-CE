@@ -5,7 +5,9 @@ namespace MMXOnline;
 
 public class SpeedBurner : Weapon {
 	public SpeedBurner(Player? player) : base() {
-		damager = new Damager(player, 4, Global.defFlinch, 0.5f);
+		if (player != null) {
+			damager = new Damager(player, 4, Global.defFlinch, 0.5f);
+		}
 		shootSounds = new List<string>() { "speedBurner", "speedBurner", "speedBurner", "speedBurnerCharged" };
 		rateOfFire = 1f;
 		index = (int)WeaponIds.SpeedBurner;
@@ -60,7 +62,7 @@ public class SpeedBurnerProj : Projectile {
 		var hit = Global.level.raycast(pos, pos.addxy(0, 20), new List<Type>() { typeof(Wall) });
 		if (hit?.gameObject is Wall && groundSpawnTime == 0) {
 			Point spawnPos = pos.addxy(-(groundSpawns * 15) * xDir, 0);
-			spawnPos.y = hit.hitData.hitPoint.Value.y;
+			spawnPos.y = hit.hitData.hitPoint?.y ?? pos.y;
 			new SpeedBurnerProjGround(weapon, spawnPos, xDir, damager.owner, damager.owner.getNextActorNetId(), rpc: true);
 			groundSpawns++;
 
@@ -124,7 +126,8 @@ public class SpeedBurnerProjGround : Projectile {
 }
 
 public class SpeedBurnerCharState : CharState {
-	Anim proj;
+	Anim? proj;
+
 	public SpeedBurnerCharState() : base("speedburner", "", "", "") {
 		superArmor = true;
 		immuneToWind = true;

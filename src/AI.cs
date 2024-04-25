@@ -449,8 +449,10 @@ public class AI {
 
 		//The AI should randomly charge weapon?
 		//I truly wonder why GM19 made only X charge weapons	
-		if (aiState.randomlyChargeWeapon && (player.isX || player.isZSaber() || player.isAxl)
-		&& framesChargeHeld == 0 && player.character.canCharge()) {
+		if (aiState.randomlyChargeWeapon &&
+			(player.isX || player.isZSaber() || player.isAxl) &&
+			framesChargeHeld == 0 && player.character?.canCharge() == true
+		) {
 			if (Helpers.randomRange(0, 20) < 1) {
 				if (player.isZSaber()) {
 					if (Helpers.randomRange(0, 50) < 1) {
@@ -1480,8 +1482,11 @@ public class AI {
 							character.withinX(proj, 150) && character.withinY(proj, 30)) {
 							//Dodge Roll if your DodgeRollCooldown is on 0 and you are not in Dodgeroll State, also if you are on ground and can dash.
 							//and we count that you are not on hurt, die, frozen, crystalized, stunned, or grabbed state.. :skull:
-							if (axl.grounded && axl.canDash() && !(axl.charState is DodgeRoll) && axl.dodgeRollCooldown == 0 && (axl.player.axlWeapon.isTwoHanded(true) || axl.isZooming())
-								&& !(axl.charState is Hurt or Die or Frozen or Crystalized or Stunned or HyperAxlStart or WarpIn or Hover) && axl?.charState?.isGrabbedState == false) {
+							if (axl.grounded && axl.canDash() && axl.charState is not DodgeRoll && axl.dodgeRollCooldown == 0 &&
+								(axl.player.axlWeapon?.isTwoHanded(true) == true || axl.isZooming())
+								&& axl.charState.normalCtrl &&
+								axl?.charState?.isGrabbedState == false
+							) {
 								axl.changeState(new DodgeRoll());
 							}
 							//Use Airblast If Axl has flameburner as his weapon and has air blast as its alt, as the projectile is not Melee and is reflectable by airblast (why this exists?), which its ammo should be higher than 0

@@ -42,7 +42,7 @@ public partial class Actor : GameObject {
 	public float yPushVel = 0;
 
 	public Dictionary<int, SoundWrapper> netSounds = new Dictionary<int, SoundWrapper>();
-	public string startSound;
+	public string startSound = "";
 	public bool isStatic;
 	public bool startMethodCalled;
 	// Angle stuff.
@@ -61,8 +61,8 @@ public partial class Actor : GameObject {
 	public bool visible = true;
 	public bool timeSlow;
 	public bool destroyed;
-	public ShaderWrapper genericShader;
-	public virtual List<ShaderWrapper> getShaders() { return genericShader != null ? new List<ShaderWrapper> { genericShader } : null; }
+	public ShaderWrapper? genericShader;
+	public virtual List<ShaderWrapper>? getShaders() { return genericShader != null ? new List<ShaderWrapper> { genericShader } : null; }
 	public float alpha = 1;
 	public float xScale = 1;
 	public float yScale = 1;
@@ -223,7 +223,7 @@ public partial class Actor : GameObject {
 	}
 
 	public virtual void changeSprite(string spriteName, bool resetFrame) {
-		string oldSpriteName = sprite?.name;
+		string oldSpriteName = sprite.name;
 
 		if (spriteName == null) return;
 
@@ -233,8 +233,9 @@ public partial class Actor : GameObject {
 
 		if (!Global.sprites.ContainsKey(spriteName)) return;
 
-		if (sprite != null) Global.level.removeFromGridFast(this);
-
+		if (sprite != null) {
+			Global.level.removeFromGridFast(this);
+		}
 		int oldFrameIndex = sprite?.frameIndex ?? 0;
 		float oldFrameTime = sprite?.frameTime ?? 0;
 		float oldAnimTime = sprite?.animTime ?? 0;
@@ -1264,6 +1265,7 @@ public partial class Actor : GameObject {
 
 		//console.log("DESTROYING")
 		Global.level.removeGameObject(this);
+		ushort spriteNameIndex = ushort.MaxValue;
 		if (spriteName != null) {
 			var anim = new Anim(getCenterPos(), spriteName, xDir, null, true);
 			// TODO: Fix this. WTF GM19.
@@ -1276,10 +1278,13 @@ public partial class Actor : GameObject {
 
 			anim.xScale = xScale;
 			anim.yScale = yScale;
+			spriteNameIndex = Global.spriteIndexByName[spriteName];
 		}
+		ushort fadeSoundIndex = ushort.MaxValue;
 		if (fadeSound != null) {
 			fadeSound = fadeSound.ToLowerInvariant();
 			playSound(fadeSound);
+			fadeSoundIndex = Global.soundIndexByName[fadeSound];
 		}
 
 		// Character should not run destroy RPC. The destroyCharacter RPC handles that already
@@ -1288,8 +1293,8 @@ public partial class Actor : GameObject {
 				float speed = vel.magnitude;
 				if (speed == 0) speed = deltaPos.magnitude / Global.spf;
 				RPC.destroyActor.sendRpc(
-					netId.Value, Global.spriteIndexByName[spriteName],
-					Global.soundIndexByName[fadeSound], pos, favorDefenderProjDestroy, speed
+					netId.Value, spriteNameIndex,
+					fadeSoundIndex, pos, favorDefenderProjDestroy, speed
 				);
 			}
 		}

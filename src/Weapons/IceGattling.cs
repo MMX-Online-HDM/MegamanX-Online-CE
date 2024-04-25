@@ -29,7 +29,7 @@ public class IceGattling : AxlWeapon {
 			return;
 		}
 		Point bulletDir = Point.createFromAngle(angle);
-		Projectile bullet = null;
+		Projectile? bullet = null;
 		if (chargeLevel == 0) {
 			bullet = new IceGattlingProj(weapon, bulletPos, xDir, player, bulletDir, netId);
 			RPC.axlShoot.sendRpc(player.id, bullet.projId, netId, bulletPos, xDir, angle);

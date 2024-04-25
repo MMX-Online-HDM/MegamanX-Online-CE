@@ -1780,35 +1780,65 @@ public class RPCCommandGrabPlayer : RPC {
 					grabberChar.changeState(new XUPGrabState(victimChar));
 				}
 			}
-		} else if (hookScenario == CommandGrabScenario.WhirlpoolGrab) {
-			maverickGrabCode(grabberMaverick, victimChar, new WhirlpoolGrabbed(grabber as LaunchOctopus), isDefenderFavored);
-		} else if (hookScenario == CommandGrabScenario.DeadLiftGrab) {
-			maverickGrabCode(grabberMaverick, victimChar, new DeadLiftGrabbed(grabber as BoomerangKuwanger), isDefenderFavored);
-		} else if (hookScenario == CommandGrabScenario.WheelGGrab) {
-			maverickGrabCode(grabberMaverick, victimChar, new WheelGGrabbed(grabber as WheelGator), isDefenderFavored);
-		} else if (hookScenario == CommandGrabScenario.FStagGrab) {
-			maverickGrabCode(grabberMaverick, victimChar, new FStagGrabbed(grabber as FlameStag), isDefenderFavored, optionalGrabberState: new FStagUppercutState(victimChar));
-		} else if (hookScenario == CommandGrabScenario.MagnaCGrab) {
-			maverickGrabCode(grabberMaverick, victimChar, new MagnaCDrainGrabbed(grabber as MagnaCentipede), isDefenderFavored);
-		} else if (hookScenario == CommandGrabScenario.BeetleLiftGrab) {
-			maverickGrabCode(grabberMaverick, victimChar, new BeetleGrabbedState(grabber as GravityBeetle), isDefenderFavored);
-		} else if (hookScenario == CommandGrabScenario.CrushCGrab) {
-			maverickGrabCode(grabberMaverick, victimChar, new CrushCGrabbed(grabber as CrushCrawfish), isDefenderFavored, optionalGrabberState: new CrushCGrabState(victimChar));
-		} else if (hookScenario == CommandGrabScenario.BBuffaloGrab) {
-			maverickGrabCode(grabberMaverick, victimChar, new BBuffaloDragged(grabber as BlizzardBuffalo), isDefenderFavored);
 		} else if (hookScenario == CommandGrabScenario.Release) {
 			if (victimChar != null) {
 				victimChar.charState?.releaseGrab();
+			}
+		} else if (grabberMaverick != null && victimChar != null) {
+			if (hookScenario == CommandGrabScenario.WhirlpoolGrab && grabber is LaunchOctopus launchOctopus) {
+				maverickGrabCode(grabberMaverick, victimChar, new WhirlpoolGrabbed(launchOctopus), isDefenderFavored);
+			} else if (hookScenario == CommandGrabScenario.DeadLiftGrab && grabber is BoomerangKuwanger boomerangKuwanger) {
+				maverickGrabCode(
+					grabberMaverick, victimChar,
+					new DeadLiftGrabbed(boomerangKuwanger),
+					isDefenderFavored
+				);
+			} else if (hookScenario == CommandGrabScenario.WheelGGrab && grabber is WheelGator wheelGator) {
+				maverickGrabCode(
+					grabberMaverick, victimChar,
+					new WheelGGrabbed(wheelGator), isDefenderFavored
+				);
+			} else if (hookScenario == CommandGrabScenario.FStagGrab && grabber is FlameStag flameStag) {
+				maverickGrabCode(
+					grabberMaverick, victimChar,
+					new FStagGrabbed(flameStag), isDefenderFavored,
+					optionalGrabberState: new FStagUppercutState(victimChar)
+				);
+			} else if (hookScenario == CommandGrabScenario.MagnaCGrab && grabber is MagnaCentipede magnaCentipede) {
+				maverickGrabCode(
+					grabberMaverick, victimChar,
+					new MagnaCDrainGrabbed(magnaCentipede), isDefenderFavored
+				);
+			} else if (hookScenario == CommandGrabScenario.BeetleLiftGrab && grabber is GravityBeetle gravityBeetle) {
+				maverickGrabCode(
+					grabberMaverick, victimChar,
+					new BeetleGrabbedState(gravityBeetle), isDefenderFavored
+				);
+			} else if (hookScenario == CommandGrabScenario.CrushCGrab && grabber is CrushCrawfish crushCrawfish) {
+				maverickGrabCode(
+					grabberMaverick, victimChar,
+					new CrushCGrabbed(crushCrawfish), isDefenderFavored,
+					optionalGrabberState: new CrushCGrabState(victimChar)
+				);
+			} else if (hookScenario == CommandGrabScenario.BBuffaloGrab && grabber is BlizzardBuffalo blizzardBuffalo) {
+				maverickGrabCode(
+					grabberMaverick, victimChar,
+					new BBuffaloDragged(blizzardBuffalo), isDefenderFavored
+				);
 			}
 		}
 	}
 
 	public void sendRpc(ushort? grabberNetId, ushort? victimCharNetId, CommandGrabScenario hookScenario, bool isDefenderFavored) {
 		if (victimCharNetId == null) return;
+		if (grabberNetId == null) return;
 
 		var grabberNetIdBytes = BitConverter.GetBytes(grabberNetId.Value);
 		var victimNetIdBytes = BitConverter.GetBytes(victimCharNetId.Value);
-		Global.serverClient?.rpc(this, grabberNetIdBytes[0], grabberNetIdBytes[1], victimNetIdBytes[0], victimNetIdBytes[1], (byte)hookScenario, Helpers.boolToByte(isDefenderFavored));
+		Global.serverClient?.rpc(
+			this, grabberNetIdBytes[0], grabberNetIdBytes[1], victimNetIdBytes[0], victimNetIdBytes[1],
+			(byte)hookScenario, Helpers.boolToByte(isDefenderFavored)
+		);
 	}
 }
 
@@ -1949,7 +1979,7 @@ public class RPCSyncAxlBulletPos : RPC {
 		short yPos = BitConverter.ToInt16(new byte[] { arguments[3], arguments[4] }, 0);
 
 		var player = Global.level.getPlayerById(playerId);
-		Axl axl = player?.character as Axl;
+		Axl? axl = player?.character as Axl;
 		if (axl == null) { return; }
 
 		axl.nonOwnerAxlBulletPos = new Point(xPos, yPos);
@@ -1971,7 +2001,7 @@ public class RPCSyncAxlScopePos : RPC {
 		int playerId = arguments[0];
 
 		var player = Global.level.getPlayerById(playerId);
-		Axl axl = player?.character as Axl;
+		Axl? axl = player?.character as Axl;
 		if (axl == null) {
 			return;
 		}
@@ -2012,7 +2042,7 @@ public class RPCBoundBlasterStick : RPC {
 		short xPos = BitConverter.ToInt16(new byte[] { arguments[4], arguments[5] }, 0);
 		short yPos = BitConverter.ToInt16(new byte[] { arguments[6], arguments[7] }, 0);
 
-		BoundBlasterAltProj beaconActor = Global.level.getActorByNetId(beaconNetId) as BoundBlasterAltProj;
+		BoundBlasterAltProj? beaconActor = Global.level.getActorByNetId(beaconNetId) as BoundBlasterAltProj;
 		Actor stuckActor = Global.level.getActorByNetId(stuckActorNetId);
 
 		if (beaconActor == null || stuckActor == null) return;
@@ -2072,7 +2102,7 @@ public class RPCCreditPlayerKillMaverick : RPC {
 
 		Player killer = Global.level.getPlayerById(killerId);
 		Player assister = Global.level.getPlayerById(assisterId);
-		Maverick victim = Global.level.getActorByNetId(victimNetId) as Maverick;
+		Maverick? victim = Global.level.getActorByNetId(victimNetId) as Maverick;
 
 		victim?.creditMaverickKill(killer, assister, weaponIndex);
 	}
@@ -2194,7 +2224,7 @@ public class RPCCheckRAEnter : RPC {
 
 		Player player = Global.level.getPlayerById(playerId);
 		if (player == null) return;
-		RideArmor ra = Global.level.getActorByNetId(raNetId) as RideArmor;
+		RideArmor? ra = Global.level.getActorByNetId(raNetId) as RideArmor;
 		if (ra == null) return;
 
 		if (ra.isNeutral && ra.ownedByLocalPlayer && !ra.claimed && ra.character == null) {
@@ -2227,15 +2257,16 @@ public class RPCRAEnter : RPC {
 		int raNum = arguments[4];
 
 		if (player.ownedByLocalPlayer && player.character != null) {
-			var oldRa = Global.level.getActorByNetId(oldRaNetId) as RideArmor;
-			var pos = player.character.pos;
-			float oldRaHealth = oldRa.health;
+			RideArmor? oldRa = Global.level.getActorByNetId(oldRaNetId) as RideArmor;
+			Point pos = player.character.pos;
+			RideArmor ra = new RideArmor(player, pos, raNum, neutralId, player.getNextActorNetId(), true, sendRpc: true);
+
+			float oldRaHealth = ra.health;
 			if (oldRa != null) {
 				pos = oldRa.pos;
-
+				oldRaHealth = oldRa.health;
 				oldRa.destroySelf(doRpcEvenIfNotOwned: true);
 			}
-			var ra = new RideArmor(player, pos, raNum, neutralId, player.getNextActorNetId(), true, sendRpc: true);
 			ra.health = oldRaHealth;
 			ra.putCharInRideArmor(player.character);
 		}
@@ -2260,9 +2291,10 @@ public class RPCCheckRCEnter : RPC {
 
 		Player player = Global.level.getPlayerById(playerId);
 		if (player == null) return;
-		RideChaser rc = Global.level.getActorByNetId(rcNetId) as RideChaser;
-		if (rc == null) return;
-
+		RideChaser? rc = Global.level.getActorByNetId(rcNetId) as RideChaser;
+		if (rc == null) {
+			return;
+		}
 		if (rc.ownedByLocalPlayer && !rc.claimed && rc.character == null) {
 			rc.claimed = true;
 			RPC.rcEnter.sendRpc(player.id, rc.netId, neutralId);
@@ -2292,14 +2324,16 @@ public class RPCRCEnter : RPC {
 		int neutralId = arguments[3];
 
 		if (player.ownedByLocalPlayer && player.character != null) {
-			var oldRc = Global.level.getActorByNetId(oldRcNetId) as RideChaser;
-			var pos = player.character.pos;
-			float oldRcHealth = oldRc.health;
+			RideChaser? oldRc = Global.level.getActorByNetId(oldRcNetId) as RideChaser;
+			Point pos = player.character.pos;
+			RideChaser ra = new RideChaser(player, pos, neutralId, player.getNextActorNetId(), true, sendRpc: true);
+
+			float oldRcHealth = ra.health;
 			if (oldRc != null) {
 				pos = oldRc.pos;
+				oldRcHealth = oldRc.health;
 				oldRc.destroySelf(doRpcEvenIfNotOwned: true);
 			}
-			var ra = new RideChaser(player, pos, neutralId, player.getNextActorNetId(), true, sendRpc: true);
 			ra.health = oldRcHealth;
 			ra.putCharInRideChaser(player.character);
 		}
