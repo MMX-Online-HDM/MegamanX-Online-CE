@@ -450,7 +450,7 @@ public class Zero : Character {
 
 				if (!player.hasKnuckle()) {
 					if (isAwakenedZero()) {
-						playSound("azsaberX5", sendRpc: true);
+						playSound("zerosaberx3", sendRpc: true);
 						if (zSaberShotCooldown == 0) {
 							zSaberShotCooldown = maxZSaberShotCooldown;
 							Global.level.delayedActions.Add(new DelayedAction(() => {
@@ -904,7 +904,7 @@ public class Zero : Character {
 		if (player.isZero && isAwakenedZeroBS.getValue() && globalCollider != null) {
 			Dictionary<int, Func<Projectile>> retProjs = new() {
 				[(int)ProjIds.AwakenedAura] = () => {
-					playSound("awakenedaura", forcePlay: true, sendRpc: true); 
+					//playSound("awakenedaura", forcePlay: true, sendRpc: true); 
 					Point centerPoint = globalCollider.shape.getRect().center();
 					float damage = 2;
 					int flinch = 0;

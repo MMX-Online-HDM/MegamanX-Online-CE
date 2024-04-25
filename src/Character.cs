@@ -2643,20 +2643,17 @@ public partial class Character : Actor, IDamagable {
 				var gigaCrush = player.weapons.FirstOrDefault(w => w is GigaCrush);
 				if (gigaCrush != null) {
 					gigaCrush.addAmmo(gigaAmmoToAdd, player);
-					if (gigaCrush.ammo < 32) {
-						playSound("gigaCrushAmmoRecharge");
-					}
-					if (gigaCrush.ammo == 32 && player.health < 8 && player.health > 4) {
+					if (gigaCrush.ammo == gigaCrush.maxAmmo && player.isMainPlayer) {
 						playSound("gigaCrushAmmoFull");
 					}
 				}
 				var hyperBuster = player.weapons.FirstOrDefault(w => w is HyperBuster);
 				if (hyperBuster != null) {
 					hyperBuster.addAmmo(gigaAmmoToAdd, player);
-					if (hyperBuster.ammo < 32) {
+					if (hyperBuster.ammo < 8 && player.isMainPlayer) {
 						playSound("hyperchargeRecharge");
 					}
-					if (hyperBuster.ammo == 32 && player.health < 8 && player.health > 4) {
+					if (player.isMainPlayer && hyperBuster.ammo == hyperBuster.maxAmmo || (hyperBuster.ammo > 8 && hyperBuster.ammo < 12)) {
 						playSound("hyperchargeFull");
 					}
 				}

@@ -313,6 +313,7 @@ public class FakeZeroMeleeProj : Projectile {
 public class FakeZeroMeleeState : MaverickState {
 	FakeZeroMeleeProj proj;
 	public FakeZeroMeleeState() : base("run_attack", "") {
+		enterSound = "saber3";
 	}
 
 	public override void update() {

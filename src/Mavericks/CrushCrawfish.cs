@@ -207,6 +207,7 @@ public class CrushCDashState : MaverickState {
 	float dustTime;
 	float ftdWaitTime;
 	public CrushCDashState() : base("dash", "dash_start") {
+		enterSound = "dashX3";
 	}
 
 	public override void update() {

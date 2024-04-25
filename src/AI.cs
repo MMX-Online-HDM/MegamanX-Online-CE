@@ -378,6 +378,8 @@ public class AI {
 			doVileAI(vile4);
 		} else if (character is Axl axl4) {
 			doAxlAI(axl4);
+		} else if (character is PunchyZero pzero) {
+			doKnuckleAI(pzero);
 		}
 
 		//Should AI Attack?
@@ -394,7 +396,11 @@ public class AI {
 					vileAIAttack(vile2);
 				} else if (character is Axl axl2) {
 					axlAIAttack(axl2);
-				}
+				} else if (character is BusterZero zero) {
+					busterZeroAIAttack(zero);
+				} else if (character is PunchyZero pzero) {
+					KnuckleZeroAIAttack(pzero);
+				}	
 
 				// is Facing the target?
 				if (character.isFacing(target)) {
@@ -432,18 +438,20 @@ public class AI {
 			if (character is MegamanX mmx3) {
 				mmxAIDodge(mmx3);
 			}
+			if (character is PunchyZero pzero) {
+				knuckleZeroAIDodge(pzero);
+			}
+			if (character is BusterZero bzero) {
+				busterzeroAIDodge(bzero);
+			}
 		}
 		//End of The AI Dodging
 
 		//The AI should randomly charge weapon?
 		//I truly wonder why GM19 made only X charge weapons	
-		if (aiState.randomlyChargeWeapon && (player.isX || player.isZBusterZero() || player.isZSaber() || player.isAxl)
+		if (aiState.randomlyChargeWeapon && (player.isX || player.isZSaber() || player.isAxl)
 		&& framesChargeHeld == 0 && player.character.canCharge()) {
-
 			if (Helpers.randomRange(0, 20) < 1) {
-				if (player.isZBusterZero()) {
-					maxChargeTime = 5f;
-				}
 				if (player.isZSaber()) {
 					if (Helpers.randomRange(0, 50) < 1) {
 						maxChargeTime = 4.25f;
@@ -544,7 +552,6 @@ public class AI {
 
 	public float getMaxDist() {
 		var maxDist = Global.screenW / 2;
-		if (player.isZero || player.isSigma) return 100;
 		int? raNum = player.character?.rideArmor?.raNum;
 		if (raNum != null && raNum != 2) maxDist = 35;
 		return maxDist;
@@ -927,7 +934,6 @@ public class AI {
 		bool isTargetInAir = target?.pos.y < character.pos.y - 50;
 		bool isTargetSuperClose = target?.pos.x - 3 >= character.pos.x;
 		bool isTargetClose = target?.pos.x - 15 > character.pos.x;
-		//Zero Start
 
 		// Go hypermode 
 		if (player.currency >= Player.zeroHyperCost && zero.charState.normalCtrl) {
@@ -1071,12 +1077,16 @@ public class AI {
 		}//Zero End
 	}
 
-	
 	public void busterZeroAIAttack(BusterZero zero) {
 		if (target == null) {
 			zero.increaseCharge();
 			return;
 		}
+		// Go hypermode 
+		if (player.currency >= 10 && !zero.isBlackZero && !zero.isInvulnerable()
+			&& zero.charState is not HyperBusterZeroStart and not WarpIn) {
+			zero.changeState(new HyperBusterZeroStart(), true);
+		}		
 		bool isTargetInAir = target.pos.y <= character.pos.y - 50;
 		bool isTargetClose = MathF.Abs(target.pos.x - character.pos.x) <= 32;
 		bool canHitMaxCharge = (!isTargetInAir && zero.getChargeLevel() >= 4);
@@ -1085,26 +1095,28 @@ public class AI {
 		if (isTargetInAir && zero.vel.y >= 0) {
 			player.press(Control.Jump);
 		}
-		switch (ZBattack) {
-			// Release full charge if we have it.
-			case >= 0 when canHitMaxCharge:
-				player.press(Control.Shoot);
-				break;
-			// Saber swing when target is close.
-			case 0 when isTargetClose:
-				player.press(Control.Special1);
-				break;
-			// Another action if the enemy is on Do Jump and do SaberSwing.
-			case 1 when isTargetClose:
-				if (zero.vel.y >= 0) {
-					player.press(Control.Jump);
-				}
-				player.press(Control.Special1);
-				break;
-			// Press Shoot to lemon.
-			default:
-				player.press(Control.Shoot);
-				break;
+		if (!zero.isInvulnerable()) {
+			switch (ZBattack) {
+				// Release full charge if we have it.
+				case >= 0 when canHitMaxCharge:
+					player.press(Control.Shoot);
+					break;
+				// Saber swing when target is close.
+				case 0 when isTargetClose:
+					player.press(Control.Special1);
+					break;
+				// Another action if the enemy is on Do Jump and do SaberSwing.
+				case 1 when isTargetClose:
+					if (zero.vel.y >= 0) {
+						player.press(Control.Jump);
+					}
+					player.press(Control.Special1);
+					break;
+				// Press Shoot to lemon.
+				default:
+					player.press(Control.Shoot);
+					break;
+			}
 		}
 	}
 
@@ -1250,13 +1262,13 @@ public class AI {
 		//Vile Start	
 		if (character is Vile vile) {
 			// You dare to grab me? i will blow myself up
-			if (character.charState?.isGrabbedState == true && player.health >= 12) {
+			if (character.charState?.isGrabbedState == true && player.health >= 12 && !player.isMainPlayer) {
 				if (Helpers.randomRange(0, 100) < 1)
 					character.changeState(new NecroBurstAttack(vile.grounded), true);
 			}
 
 			if (Helpers.randomRange(0, 100) < 1) {
-				if (isTargetInAir && isTargetSuperClose && !(character.charState is VileRevive or HexaInvoluteState) && player.vileAmmo >= 24)
+				if (isTargetInAir && isTargetSuperClose && !(character.charState is VileRevive or HexaInvoluteState) && player.vileAmmo >= 24 && !player.isMainPlayer)
 					character.changeState(new RisingSpecterState(vile.grounded), true);
 			}
 			int Vattack = Helpers.randomRange(0, 12);
@@ -1336,78 +1348,70 @@ public class AI {
 			}
 		}
 	}
+	public void busterzeroAIDodge(BusterZero bzero) {
+		foreach (GameObject gameObject in Global.level.gameObjects) {
+			if (gameObject is Projectile proj) {
+				if (proj.damager.owner.alliance != player.alliance) {
+					if (gameObject is not FrostShieldProj or FrostShieldProjAir 
+						or FrostShieldProjCharged or FrostShieldProjGround or FrostShieldProjPlatform //HOW MANY OF U EXIST
+					    ) {
+						if (player.character is BusterZero bzero1) {
+							if (character != null && proj.isFacing(character) &&
+								character.withinX(proj, 100) && character.withinY(proj, 30)) {
+								bzero1.changeState(new BusterZeroHadangeki(), true);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	public void knuckleZeroAIDodge(PunchyZero pzero) {
+		foreach (GameObject gameObject in Global.level.gameObjects) {
+			if (gameObject is Projectile proj) {
+				if (proj.damager.owner.alliance != player.alliance) {
+					if (player.character is PunchyZero pzero1 && !player.isMainPlayer) {
+						if (character != null && proj.isFacing(character) && character.withinX(proj, 100) && character.withinY(proj, 30)) {						
+							if (pzero.gigaAttack.ammo >= 16 && pzero.grounded) {
+								player.press(Control.Special1);
+								player.press(Control.Down);
+							} else { 
+								pzero1.turnToInput(player.input, player);
+								pzero1.changeState(new PZeroParry(), true);				
+ 							}
+						}
+					}
+				}
+			}
+		}
+	}
 	public void zeroAIDodge(Character zero3) {
 		foreach (GameObject gameObject in Global.level.gameObjects) {
 			if (gameObject is Projectile proj) {
 				if (proj.damager.owner.alliance != player.alliance) {
-					//Start of Zero
-					//Putting Zero here
-					if (player.character is Zero zero) {
+					if (player.character is Zero zero && !player.isMainPlayer) {
 						//Projectile is not 
-						if (gameObject is not RollingShieldProjCharged || gameObject is not RollingShieldProj
-							|| gameObject is not FrostShieldProj || gameObject is not FrostShieldProjAir || gameObject is not FrostShieldProjCharged || gameObject is not FrostShieldProjGround || gameObject is not FrostShieldProjPlatform //HOW MANY OF U EXIST
-							|| gameObject is not MagnetMineProj) {
+						if (gameObject is not RollingShieldProjCharged or RollingShieldProj or MagnetMineProj or FrostShieldProj
+							or FrostShieldProjAir or FrostShieldProjCharged or FrostShieldProjGround or FrostShieldProjPlatform //HOW MANY OF U EXIST
+							) {
 							// If a projectile is close to Zero
 							if (character != null && proj.isFacing(character) &&
 								character.withinX(proj, 100) && character.withinY(proj, 30) && !player.isDead && zero.charState.canAttack() && zero.sprite.name != null &&
 								(zero.charState is not HyperZeroStart or LadderClimb or DarkHoldState or Hurt or Frozen or Crystalized or Die or WarpIn or WarpOut or WallSlide or WallKick or SwordBlock)
 							) {
-								// If the player is Z-Saber or Knuckle
-								// and has giga attack ammo available do "I hate the ground" Or "Block/Parry"
-								if (player.isZSaber() || player.hasKnuckle()) {
-									//Do i have giga attack ammo available?
-									if (zero.zeroGigaAttackWeapon.ammo >= 8f && zero.grounded) {
-										//RAKUHOUHA!
-										player.press(Control.Special1);
-										player.press(Control.Down);
-									}
-									//If he hasn't do "Block/Parry"
-									else if (gameObject is not SwordBlock) {
-										if (gameObject is not GenericMeleeProj && player.isZSaber() && !player.hasKnuckle()) {
-											zero.turnToInput(player.input, player);
-											zero.changeState(new SwordBlock());
-										}
-										if (!player.isZSaber() && player.hasKnuckle()) {
-											zero.turnToInput(player.input, player);
-											zero.changeState(new KKnuckleParryStartState());
-										}
-									}
-								}
-								//If player is Buster Zero do Saber Swing
-								if (player.isZBusterZero())
+								//Do i have giga attack ammo available?
+								if (zero.zeroGigaAttackWeapon.ammo >= 8f && zero.grounded) {
+									//RAKUHOUHA!
 									player.press(Control.Special1);
-							}
-						}
-						// this was causing crashes for 0 reason
-						//A magnet mine?
-						/*	else if (gameObject is MagnetMineProj) {
-								//if the projectile is super close to Zero
-								if (character != null && proj.isFacing(character) &&
-									character.withinX(proj, 15) && character.withinY(proj, 1)
-								) {
-									//If the character is on the ground (and is not knuckle or Buster Zero)
-									if (player.isZSaber() && zero.grounded &&
-										!(player.hasKnuckle() || player.isZBusterZero())
-									) {
-										//CrouchSlash
-										player.press(Control.Down); player.press(Control.Shoot);
-									}
-									//If the character is on air
-									else if (!zero.grounded) {
-										//Air Dash
-										player.press(Control.Dash);
-									}
-									//If the character is on the air (and is not knuckle or Buster Zero)
-									else if (player.isZSaber() && zero.charState is Jump &&
-										!(player.hasKnuckle() || player.isZBusterZero())
-									) {
-										//Kuuenzan
-										player.press(Control.Special1);
-									}
+									player.press(Control.Down);
+								} else if (gameObject is not SwordBlock and GenericMeleeProj && zero.grounded) {
+									//If he hasn't do "Block/Parry"						
+									zero.turnToInput(player.input, player);
+									zero.changeState(new SwordBlock());																		
 								}
 							}
-						*/
-					} //End of Zero
+						}				
+					}
 				}
 			}
 		}
@@ -1604,7 +1608,7 @@ public class AI {
 				player.character.increaseCharge();
 			}
 
-			if (mmx.isHyperX && mmx.canShoot()) {
+			if (mmx.isHyperX && mmx.canShoot() && !player.isMainPlayer) {
 				mmx.unpoShotCount = Math.Max(mmx.unpoShotCount, 4);
 				player.release(Control.Shoot);
 				player.press(Control.Shoot);
@@ -1636,7 +1640,7 @@ public class AI {
 				if (!zero1.grounded && zero1.zeroAirSpecialWeapon.type == (int)AirSpecialType.Kuuenzan && !zero1.isAttacking() && zero1.charState.canAttack() && !(zero1.sprite.name == "zero_attack_air2")) {
 					player.press(Control.Special1); //Do Kuuenzan even if he is not attacking
 				}
-				if (!zero1.grounded && zero1.isAttacking() && zero1.charState.canAttack() && zero1.sprite.name == "zero_attack_air2" && zero1.framePercent > 0.4 && !(zero1.sprite.name == "zero_attack_air")) {
+				else if (!zero1.grounded && zero1.isAttacking() && zero1.charState.canAttack() && zero1.sprite.name == "zero_attack_air2" && zero1.framePercent > 0.4 && !(zero1.sprite.name == "zero_attack_air")) {
 					player.press(Control.Shoot);
 					player.release(Control.Special1);
 					// Do air slash
