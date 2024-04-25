@@ -62,7 +62,7 @@ public class CharState {
 	public bool exitOnAirborne;
 	public bool useDashJumpSpeed;
 
-	public CharState(string sprite, string shootSprite = null, string attackSprite = null, string transitionSprite = null) {
+	public CharState(string sprite, string shootSprite = "", string attackSprite = "", string transitionSprite = "") {
 		this.sprite = string.IsNullOrEmpty(transitionSprite) ? sprite : transitionSprite;
 		this.transitionSprite = transitionSprite;
 		defaultSprite = sprite;

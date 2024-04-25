@@ -231,7 +231,7 @@ public class Anim : Actor {
 		}
 	}
 
-	public override List<ShaderWrapper> getShaders() {
+	public override List<ShaderWrapper>? getShaders() {
 		if (maverickFade && Global.shaderWrappers.ContainsKey("fadeBlack")) {
 			if (fadeBlackShader == null) {
 				fadeBlackShader = new ShaderWrapper("fadeBlack");

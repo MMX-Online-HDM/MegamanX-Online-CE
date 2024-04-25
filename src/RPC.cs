@@ -1473,6 +1473,7 @@ public class RPCVoteKickStart : RPC {
 
 	public override void invoke(string kickPlayerJson) {
 		var rpcKickPlayerObj = JsonConvert.DeserializeObject<RPCKickPlayerJson>(kickPlayerJson);
+		if (rpcKickPlayerObj == null) { return; }
 		var player = Global.level.getPlayerByName(rpcKickPlayerObj.playerName);
 		if (player == null) return;
 		VoteKick.sync(player, rpcKickPlayerObj.type, rpcKickPlayerObj.banTimeMinutes, rpcKickPlayerObj.banReason);
@@ -1710,7 +1711,7 @@ public class RPCCommandGrabPlayer : RPC {
 		netDeliveryMethod = NetDeliveryMethod.ReliableOrdered;
 	}
 
-	public void maverickGrabCode(Maverick grabber, Character victimChar, CharState grabbedState, bool isDefenderFavored, MaverickState optionalGrabberState = null) {
+	public void maverickGrabCode(Maverick grabber, Character victimChar, CharState grabbedState, bool isDefenderFavored, MaverickState? optionalGrabberState = null) {
 		if (grabber == null || victimChar == null) return;
 		if (!victimChar.canBeGrabbed()) return;
 
@@ -1740,9 +1741,9 @@ public class RPCCommandGrabPlayer : RPC {
 		var victim = Global.level.getActorByNetId(victimNetId);
 		if (victim == null) return;
 
-		Character grabberChar = grabber as Character;
-		Maverick grabberMaverick = grabber as Maverick;
-		Character victimChar = victim as Character;
+		Character? grabberChar = grabber as Character;
+		Maverick? grabberMaverick = grabber as Maverick;
+		Character? victimChar = victim as Character;
 
 		if (hookScenario == CommandGrabScenario.StrikeChain) {
 			if (victimChar == null) return;

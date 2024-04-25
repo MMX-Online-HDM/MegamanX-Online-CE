@@ -48,9 +48,9 @@ public class DNACore : AxlWeapon {
 		speedDevil = character.isSpeedDevilActiveBS.getValue();
 		ultimateArmor = character.hasUltimateArmorBS.getValue();
 		if (charNum == 0) weapons = loadout.xLoadout.getWeaponsFromLoadout(character.player);
-		if (charNum == 1 && character is Zero zero) {
-			rakuhouhaAmmo = zero.zeroGigaAttackWeapon.ammo;
-			if (character.isNightmareZeroBS.getValue()) rakuhouhaAmmo = zero.zeroDarkHoldWeapon.ammo;
+		if (charNum == 1 && character is Zero zero2) {
+			rakuhouhaAmmo = zero2.zeroGigaAttackWeapon.ammo;
+			if (character.isNightmareZeroBS.getValue()) rakuhouhaAmmo = zero2.zeroDarkHoldWeapon.ammo;
 		}
 		if (charNum == 2) weapons = loadout.vileLoadout.getWeaponsFromLoadout(false);
 		if (charNum == 3) {

@@ -94,7 +94,7 @@ public class DevConsole {
 			count = int.Parse(args[0]);
 		}
 		for (int i = 0; i < count; i++) {
-			var chr = Global.level.players.FirstOrDefault(p => p != Global.level.mainPlayer).character;
+			Character? chr = Global.level.players.FirstOrDefault(p => p != Global.level.mainPlayer)?.character;
 			if (chr != null) {
 				Global.level.mainPlayer.weapons.Add(new DNACore(chr));
 			}

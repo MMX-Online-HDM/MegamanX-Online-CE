@@ -8,8 +8,8 @@ namespace MMXOnline;
 public class XTeleportState : CharState {
 	public bool onceTeleportInSound;
 	bool isInvisible;
-	Actor clone;
-	Actor cloneG;
+	Actor? clone;
+	Actor? cloneG;
 	Rect teleportCollider = new Rect(0f, 0f, 18, 30);
 	int width = 18;
 
@@ -28,12 +28,12 @@ public class XTeleportState : CharState {
 			isInvisible = false;
 			character.specialState = (int)SpecialStateIds.None;
 			character.useGravity = true;
-			if (canChangePos(cloneG)) {
+			if (cloneG != null && canChangePos(cloneG)) {
 				Point prevCamPos = player.character.getCamCenterPos();
 				player.character.stopCamUpdate = true;
 				character.changePos(cloneG.pos);
 			}
-			clone.destroySelf();
+			clone?.destroySelf();
 			clone = null;
 		}
 		if (clone != null && !clone.destroyed) {

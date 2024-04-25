@@ -1709,9 +1709,9 @@ public class AIState {
 
 	public AI ai {
 		get {
-			if (player.character != null) {
+			if (player.character?.ai != null) {
 				return player.character.ai;
-			} else if (player.limboChar != null) {
+			} else if (player.limboChar?.ai != null) {
 				return player.limboChar.ai;
 			} else {
 				return new AI(character);
