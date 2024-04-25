@@ -38,19 +38,21 @@ public class ZSaberProjSwing : Weapon {
 }
 
 public class Shingetsurin : Weapon {
-	public Shingetsurin(Player player) : base() {
+	public static Shingetsurin netWeapon = new();
+
+	public Shingetsurin() : base() {
 		index = (int)WeaponIds.Shingetsurin;
 		killFeedIndex = 85;
-		damager = new Damager(player, 4, Global.defFlinch, 0.5f);
+		//damager = new Damager(player, 4, Global.defFlinch, 0.5f);
 	}
 }
 
-public class ShingetsurinProj : Projectile {
+public class ShingetsurinProj : Projectile {	
 	public Actor target;
 	public ShingetsurinProj(
-		Weapon weapon, Point pos, int xDir, float startTime, Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, float startTime, Player player, ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 150, 2, player, "shingetsurin_proj",
+		Shingetsurin.netWeapon, pos, xDir, 150, 2, player, "shingetsurin_proj",
 		Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
 		maxTime = 3f;

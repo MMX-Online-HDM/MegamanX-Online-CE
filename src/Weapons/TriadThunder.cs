@@ -28,11 +28,12 @@ public class TriadThunder : Weapon {
 			return;
 		}
 		if (chargeLevel < 3) {
-			player.setNextActorNetId(netProjId);
-			var triadThunder = new TriadThunderProj(
-				this, pos, xDir, player.input.isHeld(Control.Down, player) ? -1 : 1,
-				player, player.getNextActorNetId(true), true
-			);
+			if (player.ownedByLocalPlayer) {
+				new TriadThunderProj(
+					pos, xDir, player.input.isHeld(Control.Down, player) ? -1 : 1,
+					player, netProjId, true
+				);
+			}
 		} else {
 			if (player.character != null && player.character.ownedByLocalPlayer) {
 				player.character.changeState(new TriadThunderChargedState(player.character.grounded), true);
@@ -43,12 +44,12 @@ public class TriadThunder : Weapon {
 
 public class TriadThunderProj : Projectile {
 	int state;
-	Character character;
+	Character? character;
 	public List<TriadThunderBall> balls;
 	public TriadThunderProj(
-		Weapon weapon, Point pos, int xDir, int yDir, Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, int yDir, Player player, ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, 1, player, "triadthunder_proj",
+		TriadThunder.netWeapon, pos, xDir, 0, 1, player, "triadthunder_proj",
 		Global.fourFrameFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.TriadThunder;
@@ -61,11 +62,10 @@ public class TriadThunderProj : Projectile {
 		visible = false;
 
 		// Clockwise from top
-		player.setNextActorNetId(netProjId);
 		balls = new List<TriadThunderBall>() {
-			new TriadThunderBall(weapon, pos, xDir, player, player.getNextActorNetId(true)),
-			new TriadThunderBall(weapon, pos, xDir, player, player.getNextActorNetId(true)),
-			new TriadThunderBall(weapon, pos, xDir, player, player.getNextActorNetId(true)),
+			new TriadThunderBall(weapon, pos, xDir, player),
+			new TriadThunderBall(weapon, pos, xDir, player),
+			new TriadThunderBall(weapon, pos, xDir, player),
 		};
 
 		if (rpc) {
@@ -75,7 +75,7 @@ public class TriadThunderProj : Projectile {
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new TriadThunderProj(
-			TriadThunder.netWeapon, arg.pos, arg.xDir, arg.extraData[0], arg.player, arg.netId
+			arg.pos, arg.xDir, arg.extraData[0] - 2, arg.player, arg.netId
 		);
 	}
 
@@ -90,13 +90,13 @@ public class TriadThunderProj : Projectile {
 			}
 			return;
 		}*/
-
-		Point incAmount = pos.directionTo(character.getCenterPos());
-		incPos(incAmount);
-		foreach (var ball in balls) {
-			ball.incPos(incAmount);
+		if (character != null) {
+			Point incAmount = pos.directionTo(character.getCenterPos());
+			incPos(incAmount);
+			foreach (var ball in balls) {
+				ball.incPos(incAmount);
+			}
 		}
-
 		if (state == 0) {
 			if (yDir == 1) {
 				balls[0].move(new Point(0, -300));
@@ -142,23 +142,18 @@ public class TriadThunderProj : Projectile {
 public class TriadThunderBall : Projectile {
 	public float startDropTime;
 	public TriadThunderBall(
-		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
+		Weapon weapon, Point pos, int xDir, Player player
 	) : base(
 		weapon, pos, xDir, 0, 2, player, "triadthunder_ball",
-		Global.fourFrameFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+		Global.fourFrameFlinch, 0.5f, null, player.ownedByLocalPlayer
 	) {
-		canBeLocal = false;
 		projId = (int)ProjIds.TriadThunder;
 		destroyOnHit = false;
 		shouldShieldBlock = false;
-		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
-		}
 	}
 
 	public override void update() {
 		base.update();
-
 		if (startDropTime > 0) {
 			startDropTime += Global.spf;
 			if (startDropTime > 0.075f) {

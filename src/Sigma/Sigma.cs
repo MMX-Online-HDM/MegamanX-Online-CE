@@ -50,6 +50,7 @@ public abstract class BaseSigma : Character {
 		player, x, y, xDir, isVisible,
 		netId, ownedByLocalPlayer, isWarpIn, false, false
 	) {
+		charId = CharIds.Sigma;
 		// Special Sigma-only colider.
 		spriteToCollider["head*"] = getSigmaHeadCollider();
 

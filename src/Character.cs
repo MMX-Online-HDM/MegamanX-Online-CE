@@ -128,6 +128,8 @@ public partial class Character : Actor, IDamagable {
 	public float vaccineTime;
 	public float vaccineHurtCooldown;
 
+	public CharIds charId;
+
 	// Main character class starts here.
 	public Character(
 		Player player, float x, float y, int xDir,
@@ -2886,6 +2888,12 @@ public partial class Character : Actor, IDamagable {
 		parasiteDamager = null;
 		removeAcid();
 		removeBurn();
+		burnTime = 0;
+		acidTime = 0;
+		oilTime = 0;
+		player.possessedTime = 0;
+		igFreezeProgress = 0;
+		infectedTime = 0;
 	}
 
 	public bool canBeHealed(int healerAlliance) {

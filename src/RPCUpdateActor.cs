@@ -343,7 +343,7 @@ public class RPCUpdateActor : RPC {
 				actor.visible = visible;
 
 				if (actor is Character character) {
-					// char mask section
+					// Char mask section
 					byte charMask = arguments[i++];
 					bool[] charMaskBools = Helpers.byteToBoolArray(charMask);
 
@@ -368,7 +368,7 @@ public class RPCUpdateActor : RPC {
 					character.player.currency = currency;
 
 					// X section.
-					if (character.player.isX && character is MegamanX) {
+					if (character.player.isX && character is MegamanX mmx) {
 						character.player.weapon.ammo = ammo;
 						byte armorByte = arguments[i++];
 						byte armorByte2 = arguments[i++];

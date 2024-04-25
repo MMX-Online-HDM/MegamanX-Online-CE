@@ -39,7 +39,6 @@ public class StingProj : Projectile {
 		} else if (type == 2 || type == 3) {
 			var sprite = "sting_up";
 			if (type == 3) {
-				yDir = 1;
 				vel.y = -150;
 			} else {
 				vel.y = 150;

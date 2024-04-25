@@ -71,7 +71,7 @@ public partial class MegamanX : Character {
 	) : base(
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn
 	) {
-
+		charId = CharIds.X;
 	}
 
 	public bool canShootSpecialBuster() {

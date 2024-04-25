@@ -35,7 +35,8 @@ public class PunchyZero : Character {
 	) : base(
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn
 	) {
-		gigaAttack = new RakuhouhaWeapon(player);
+		charId = CharIds.PunchyZero;
+		gigaAttack = new RakuhouhaWeapon();
 	}
 
 	public override void update() {

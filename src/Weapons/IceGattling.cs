@@ -89,14 +89,15 @@ public class IceGattlingProj : Projectile {
 
 
 public class GaeaShieldProj : Projectile {
-	public Axl axl;
-	public GaeaShieldProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, 1, 0, 0, player, "gaea_shield_proj", 0, 1, netProjId, player.ownedByLocalPlayer) {
+	public Axl? axl;
+	public GaeaShieldProj(
+		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, 1, 0, 0, player, "gaea_shield_proj", 0, 1, netProjId, player.ownedByLocalPlayer
+	) {
 		maxTime = 10;
-		axl = (player.character as Axl);
-
-		if (axl?.isWhiteAxl() == true) {
-			maxTime = 10;
+		if (ownedByLocalPlayer) {
+			axl = (player.character as Axl);
 		}
 		fadeSound = "explosion";
 		fadeSprite = "explosion";
@@ -143,6 +144,8 @@ public class GaeaShieldProj : Projectile {
 
 	public override void onDestroy() {
 		base.onDestroy();
-		axl.gaeaShield = null;
+		if (axl != null) {
+			axl.gaeaShield = null;
+		}
 	}
 }

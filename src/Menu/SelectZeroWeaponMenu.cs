@@ -46,12 +46,11 @@ public class SelectZeroWeaponMenu : IMainMenu {
 			new QuakeBlazerWeapon(null)
 		};
 
-	public static List<Weapon> gigaAttackWeapons = new List<Weapon>()
-	{
-			new RakuhouhaWeapon(null),
-			new CFlasher(null),
-			new RekkohaWeapon(null)
-		};
+	public static List<Weapon> gigaAttackWeapons = new List<Weapon>() {
+		new RakuhouhaWeapon(),
+		new CFlasher(),
+		new RekkohaWeapon()
+	};
 
 	public static List<Tuple<string, List<Weapon>>> zeroWeaponCategories = new List<Tuple<string, List<Weapon>>>()
 	{

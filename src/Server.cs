@@ -973,9 +973,10 @@ public class Server {
 	}
 
 	public void logWeaponKills() {
-		if (!loggedOnce) loggedOnce = true;
-		else return;
-
+		if (loggedOnce) {
+			return;
+		}
+		loggedOnce = true;
 		foreach (var kvp in weaponKillStats) {
 			string weaponName = kvp.Key;
 			Logger.logEvent("weapon_kills", weaponName, kvp.Value, forceLog: true);

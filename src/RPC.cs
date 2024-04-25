@@ -992,7 +992,12 @@ public class RPCJoinLateResponse : RPC {
 			joinLateResponseModel = Helpers.deserialize<JoinLateResponseModel>(arguments);
 		} catch {
 			try {
-				//Logger.logEvent("error", "Bad joinLateResponseModel bytes. name: " + Options.main.playerName + ", match: " + Global.level?.server?.name + ", bytes: " + arguments.ToString());
+				Logger.logEvent(
+					"error",
+					"Bad joinLateResponseModel bytes. name: " +
+					Options.main.playerName + ", match: " + Global.level?.server?.name +
+					", bytes: " + arguments.ToString()
+				);
 				//Console.Write(message); 
 			} catch { }
 			throw;
@@ -1333,11 +1338,25 @@ public class RPCAxlShoot : RPC {
 
 public class RPCAxlDisguiseJson {
 	public int playerId;
+	public ushort dnaNetId;
 	public string targetName;
+	public int charNum;
+	public byte[] extraData;
+	public LoadoutData? loadout;
+
 	public RPCAxlDisguiseJson() { }
-	public RPCAxlDisguiseJson(int playerId, string targetName) {
+
+	public RPCAxlDisguiseJson(
+		int playerId, string targetName, int charNum,
+		LoadoutData? loadout = null,
+		ushort dnaNetId = 0, byte[]? extraData = null
+	) {
 		this.playerId = playerId;
 		this.targetName = targetName;
+		this.charNum = charNum;
+		this.dnaNetId = dnaNetId;
+		this.loadout = loadout;
+		this.extraData = extraData ?? new byte[1];
 	}
 }
 
@@ -1348,13 +1367,19 @@ public class RPCAxlDisguise : RPC {
 	}
 
 	public override void invoke(string json) {
-		var rpcAxlDisguiseJson = JsonConvert.DeserializeObject<RPCAxlDisguiseJson>(json);
-		var player = Global.level.getPlayerById(rpcAxlDisguiseJson.playerId);
-		if (player == null) return;
-		if (string.IsNullOrEmpty(rpcAxlDisguiseJson.targetName)) {
-			player.disguise = null;
+		var axlDisguiseData = (
+			JsonConvert.DeserializeObject<RPCAxlDisguiseJson>(json) ?? throw new NullReferenceException()
+		);
+		var player = Global.level.getPlayerById(axlDisguiseData.playerId);
+		if (player == null) {
+			return;
+		}
+		if (axlDisguiseData.charNum == -1) {
+			player.revertToAxl();
+		} else if (axlDisguiseData.charNum  == -2) {
+			player.revertToAxlDeath();
 		} else {
-			player.disguise = new Disguise(rpcAxlDisguiseJson.targetName);
+			player.transformAxlNet(axlDisguiseData);
 		}
 	}
 }
