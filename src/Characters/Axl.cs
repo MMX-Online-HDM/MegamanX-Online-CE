@@ -83,6 +83,7 @@ public class Axl : Character {
 		player, x, y, xDir, isVisible,
 		netId, ownedByLocalPlayer, isWarpIn, false, false
 	) {
+		charId = CharIds.Axl;
 		iceGattlingSound = new LoopingSound("iceGattlingLoopStart", "iceGattlingLoopStop", "iceGattlingLoop", this);
 
 		muzzleFlash = new Anim(new Point(), "axl_pistol_flash", xDir, null, false);
@@ -1545,7 +1546,6 @@ public class Axl : Character {
 	public void addDNACore(Character hitChar) {
 		if (!player.ownedByLocalPlayer) return;
 		if (!player.isAxl) return;
-		if (player.isAxl && player.isDisguisedAxl) return;
 		if (Global.level.is1v1()) return;
 
 		if (player.weapons.Count < 8 || Global.level.isTraining()) {
@@ -1554,7 +1554,11 @@ public class Axl : Character {
 			for (int i = 0; i < loopCount; i++) {
 				var dnaCoreWeapon = new DNACore(hitChar);
 				dnaCoreWeapon.index = (int)WeaponIds.DNACore - player.weapons.Count;
-				player.weapons.Add(dnaCoreWeapon);
+				if (player.isDisguisedAxl) {
+					player.oldWeapons?.Add(dnaCoreWeapon);
+				} else {
+					player.weapons.Add(dnaCoreWeapon);
+				}
 				player.savedDNACoreWeapons.Add(dnaCoreWeapon);
 			}
 		}

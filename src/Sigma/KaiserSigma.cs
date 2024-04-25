@@ -27,7 +27,7 @@ public partial class KaiserSigma : Character {
 	) : base(
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, false, false
 	) {
-		// Spawn code.
+		charId = CharIds.KaiserSigma;
 	}
 
 	public override void update() {

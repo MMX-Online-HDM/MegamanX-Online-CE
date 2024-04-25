@@ -6,7 +6,10 @@ namespace MMXOnline;
 
 // A logging class designed to log analytics and stats to some analytics server for analysis of game balance, trends, etc.
 public class Logger {
-	public static void logException(Exception ex, bool isServer, string additionalDetails = "", bool forceLog = false) {
+	public static void logException(
+		Exception ex, bool isServer,
+		string additionalDetails = "", bool forceLog = false
+	) {
 		// TODO: Add normal data logging.
 		if (!Global.debug) {
 			return;
@@ -38,11 +41,10 @@ public class Logger {
 		logEvent("error", (isServer ? server : client) + errorMsg, isServer: isServer, forceLog: forceLog);
 	}
 
-	public static void logEvent(string action, string label, long val = 0, bool isServer = false, bool forceLog = false) {
-		if (Global.debug) {
-			return;
-		}
-
+	public static void logEvent(
+		string action, string label, long val = 0,
+		bool isServer = false, bool forceLog = false
+	) {
 		// Does not log anything anywhere right now.
 		/// TODO: Can add logging code here with analytics system of your choice or a custom solution.
 	}

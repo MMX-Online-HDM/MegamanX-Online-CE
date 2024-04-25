@@ -32,7 +32,11 @@ public enum CharIds {
 	Sigma,
 	PunchyZero,
 	BusterZero,
-	// Non vanilla chars start here.
+	// Non-standart chars start here.
+	WolfSigma = 100,
+	ViralSigma,
+	KaiserSigma,
+	// Non-vanilla chars start here.
 	Rock = 10,
 }
 

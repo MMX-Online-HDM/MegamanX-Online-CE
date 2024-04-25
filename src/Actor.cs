@@ -1639,7 +1639,7 @@ public partial class Actor : GameObject {
 
 	public void setRaColorShader() {
 		if (sprite.name == "neutralra_pieces") {
-			genericShader = Helpers.cloneGenericPaletteShader("paletteChimera");
+			genericShader = Helpers.cloneGenericPaletteShader("paletteEG01");
 			genericShader?.SetUniform("palette", 1);
 		} else if (sprite.name == "kangaroo_pieces") {
 			genericShader = Helpers.cloneGenericPaletteShader("paletteKangaroo");

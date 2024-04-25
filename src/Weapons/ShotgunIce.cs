@@ -50,9 +50,10 @@ public class ShotgunIceProj : Projectile {
 	public float sparkleTime = 0;
 	public Character hitChar;
 	public float maxSpeed = 400;
+
 	public ShotgunIceProj(
 		Weapon weapon, Point pos, int xDir, Player player, int type, ushort netProjId,
-		(int x, int y)? velOverride = null, Character hitChar = null, bool rpc = false
+		(int x, int y)? velOverride = null, Character? hitChar = null, bool rpc = false
 	) : base(
 		weapon, pos, xDir, 400, 2, player, "shotgun_ice", 0, 0.01f, netProjId, player.ownedByLocalPlayer
 	) {
@@ -69,6 +70,7 @@ public class ShotgunIceProj : Projectile {
 			vel = new Point(maxSpeed * velOverride.Value.x, maxSpeed * (velOverride.Value.y * 0.5f));
 		}
 		reflectable = true;
+		useGravity = true;
 		//this.fadeSound = "explosion";
 		if (rpc) {
 			byte[] extraArgs;

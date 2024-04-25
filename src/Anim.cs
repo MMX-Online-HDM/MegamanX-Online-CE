@@ -10,17 +10,23 @@ public class Anim : Actor {
 	public float? ttl;
 	public float time;
 	public Point acc;
-	public Actor host;
+	public Actor? host;
 	public bool fadeIn;
 	public bool fadeOut;
 	public bool blink;
 	public bool maverickFade;
 	public bool grow;
 	public string animJsonName;
+	public ShaderWrapper? fadeBlackShader;
+	public ShaderWrapper? viralSigmaShader;
 
-	public Anim(Point pos, string spriteName, int xDir, ushort? netId, bool destroyOnEnd, bool sendRpc = false, bool ownedByLocalPlayer = true, Actor host = null,
-		long? zIndex = null, Actor zIndexRelActor = null, bool fadeIn = false, bool hasRaColorShader = false) :
-		base(spriteName, new Point(pos.x, pos.y), netId, ownedByLocalPlayer, true) {
+	public Anim(
+		Point pos, string spriteName, int xDir, ushort? netId,
+		bool destroyOnEnd, bool sendRpc = false, bool ownedByLocalPlayer = true, Actor? host = null,
+		long? zIndex = null, Actor? zIndexRelActor = null, bool fadeIn = false, bool hasRaColorShader = false
+	) : base(
+		spriteName, new Point(pos.x, pos.y), netId, ownedByLocalPlayer, true
+	) {
 		this.host = host;
 		useGravity = false;
 		this.xDir = xDir;
@@ -38,7 +44,7 @@ public class Anim : Actor {
 			byteAngle = 0;
 			//if (host != null)
 			{
-				setzIndex(ZIndex.HUD);
+				setzIndex(ZIndex.Foreground - 10);
 			}
 		}
 
@@ -119,13 +125,19 @@ public class Anim : Actor {
 		}
 	}
 
+	static string[] maverickDieSprites = new string[] {
+		"chillp_die", "sparkm_die", "armoreda_die",
+		"armoreda_na_die", "launcho_die", "boomerk_die",
+		"boomerk_bald_die", "stingc_die", "storme_die", "flamem_die",
+		"wsponge_die", "wheelg_die", "bcrab_die", "fstag_die",
+		"morphmc_die", "morphm_die", "magnac_die", "magnac_notail_die",
+		"csnail_die", "overdriveo_die", "fakezero_die",
+		"bbuffalo_die", "tseahorse_die", "tunnelr_die",
+		"voltc_die", "crushc_die", "neont_die", "gbeetle_die",
+		"bhornet_die", "drdoppler_die",
+	};
+
 	private bool isMaverickDeathAnim(string spriteName) {
-		string[] maverickDieSprites = new string[]
-		{
-			"chillp_die", "sparkm_die", "armoreda_die", "armoreda_na_die", "launcho_die", "boomerk_die", "boomerk_bald_die", "stingc_die", "storme_die", "flamem_die",
-			"wsponge_die", "wheelg_die", "bcrab_die", "fstag_die", "morphmc_die", "morphm_die", "magnac_die", "magnac_notail_die", "csnail_die", "overdriveo_die", "fakezero_die",
-			"bbuffalo_die", "tseahorse_die", "tunnelr_die", "voltc_die", "crushc_die", "neont_die", "gbeetle_die", "bhornet_die", "drdoppler_die",
-		};
 		return maverickDieSprites.Any(s => s == spriteName);
 	}
 
@@ -209,8 +221,7 @@ public class Anim : Actor {
 		base.postUpdate();
 		if (host != null) {
 			if (sprite.name == "plasmagun_effect") {
-				if (ownedByLocalPlayer) {
-					Axl axl = host as Axl;
+				if (ownedByLocalPlayer && host is Axl axl) {
 					Point bulletPos = axl.getAxlBulletPos();
 					byteAngle = axl.getShootAngle(true);
 					changePos(bulletPos);
@@ -221,8 +232,6 @@ public class Anim : Actor {
 		}
 	}
 
-	public ShaderWrapper fadeBlackShader;
-	public ShaderWrapper viralSigmaShader;
 	public override List<ShaderWrapper> getShaders() {
 		if (maverickFade && Global.shaderWrappers.ContainsKey("fadeBlack")) {
 			if (fadeBlackShader == null) {
@@ -238,9 +247,11 @@ public class Anim : Actor {
 			if (viralSigmaShader == null) {
 				viralSigmaShader = chara.player.viralSigmaShader2;
 			}
-			viralSigmaShader?.SetUniform("palette", 6);
-			viralSigmaShader?.SetUniform("paletteTexture", Global.textures["paletteViralSigma"]);
-			return new List<ShaderWrapper>() { viralSigmaShader };
+			if (viralSigmaShader != null) {
+				viralSigmaShader.SetUniform("palette", 6);
+				viralSigmaShader.SetUniform("paletteTexture", Global.textures["paletteViralSigma"]);
+				return new List<ShaderWrapper>() { viralSigmaShader };
+			}
 		}
 		return base.getShaders();
 	}

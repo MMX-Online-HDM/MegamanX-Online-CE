@@ -423,10 +423,17 @@ public class X2ChargeShot : CharState {
 	bool pressFire;
 	MegamanX mmx = null!;
 
-	public X2ChargeShot(int type) : base("x2_shot", "", "", "") {
+	public X2ChargeShot(int type) : base(type == 0 ? "x2_shot" : "x2_shot2") {
 		this.type = type;
 		useDashJumpSpeed = true;
 		airMove = true;
+		landSprite = "x2_shot";
+		airSprite = "x2_air_shot";
+
+		if (type == 1) {
+			landSprite = "x2_shot2";
+			airSprite = "x2_air_shot2";
+		}
 	}
 
 	public override void update() {
@@ -462,6 +469,7 @@ public class X2ChargeShot : CharState {
 				sprite = "x2_shot2";
 				defaultSprite = sprite;
 				landSprite = "x2_shot2";
+				airSprite = "x2_shot2";
 				if (!character.grounded || character.vel.y < 0) {
 					sprite = "x2_air_shot2";
 					defaultSprite = sprite;
@@ -478,11 +486,9 @@ public class X2ChargeShot : CharState {
 				character.vel.y = -character.getJumpPower();
 				if (type == 0) {
 					sprite = "x2_air_shot";
-					defaultSprite = sprite;
 				} else {
 					sprite = "x2_air_shot2";
-					defaultSprite = sprite;
-				}
+				}	
 				character.changeSpriteFromName(sprite, false);
 			}
 		}
@@ -491,25 +497,13 @@ public class X2ChargeShot : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		mmx = character as MegamanX ?? throw new NullReferenceException();
-
-		bool air = !character.grounded || character.vel.y < 0;
-		if (type == 0) {
-			sprite = "x2_shot";
-			defaultSprite = sprite;
-			landSprite = "x2_shot";
-			if (air) {
+		if (!character.grounded || character.vel.y > 0) {
+			if (type == 0) {
 				sprite = "x2_air_shot";
-				defaultSprite = sprite;
-			}
-		}
-		if (type == 1) {
-			sprite = "x2_shot2";
-			defaultSprite = sprite;
-			landSprite = "x2_shot2";
-			if (air) {
+			} else {
 				sprite = "x2_air_shot2";
-				defaultSprite = sprite;
 			}
+			character.changeSpriteFromName(sprite, true);
 		}
 		character.changeSpriteFromName(sprite, true);
 	}

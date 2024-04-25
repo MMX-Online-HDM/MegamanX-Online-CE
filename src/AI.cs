@@ -930,14 +930,11 @@ public class AI {
 		//Zero Start
 
 		// Go hypermode 
-		if (player.currency >= Player.zeroHyperCost && !zero.isSpriteInvulnerable() && !zero.isInvulnerable()
-		&& !(zero.charState is HyperZeroStart or LadderClimb) && !(zero.isHyperZero() || zero.isNightmareZeroBS.getValue())) {
+		if (player.currency >= Player.zeroHyperCost && zero.charState.normalCtrl) {
 			zero.changeState(new HyperZeroStart(zero.zeroHyperMode), true);
 		}
 
-		if ((zero.charState is not HyperZeroStart or LadderClimb or DarkHoldState or Hurt or Frozen or Crystalized or Die or WarpIn or WarpOut or WallSlide or WallKick or SwordBlock or ZeroFallStabLand)
-		&& zero.charState?.isGrabbedState == false && !player.isDead && zero.sprite.name != null && zero.charState.canAttack() && !zero.isSpriteInvulnerable() && !zero.isInvulnerable()) {
-
+		if (zero.charState.attackCtrl) {
 			// Hypermode attacks
 			if (zero.isHyperZero() || zero.isNightmareZeroBS.getValue()) {
 				switch (Helpers.randomRange(0, 96)) {
@@ -949,11 +946,6 @@ public class AI {
 						break;
 					case 3: // Genmurei Spam!
 						zero.changeState(new GenmuState(), true);
-						break;
-					case 4:
-						if (zero.isBlackZero2()) {
-							zero.changeState(new Rakuhouha(new CFlasher(zero.player)), true);
-						}
 						break;
 				}
 			}

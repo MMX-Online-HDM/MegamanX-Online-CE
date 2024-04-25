@@ -76,11 +76,13 @@ public class Zero : Character {
 		player, x, y, xDir, isVisible,
 		netId, ownedByLocalPlayer, isWarpIn, false, false
 	) {
+		charId = CharIds.Zero;
+
 		zSaberWeapon = new ZSaber(player);
 		kKnuckleWeapon = new KKnuckleWeapon(player);
 		shippuugaWeapon = new ShippuugaWeapon(player);
 		raijingeki2Weapon = new Raijingeki2Weapon(player);
-		zeroShinMessenkouWeapon = new ShinMessenkou(player);
+		zeroShinMessenkouWeapon = new ShinMessenkou();
 		zeroDarkHoldWeapon = new DarkHoldWeapon();
 		zeroBusterWeapon = new ZeroBuster();
 		zSaberProjSwingWeapon = new ZSaberProjSwing(player);
@@ -679,14 +681,14 @@ public class Zero : Character {
 				player.currency--;
 				playSound("shingetsurinx5", forcePlay: false, sendRpc: true);
 				new ShingetsurinProj(
-					new Shingetsurin(player), getShootPos(), xDir,
+					getShootPos(), xDir,
 					0, player, player.getNextActorNetId(), rpc: true
 				);
 			}
 			if (chargeLevel >= 2) {
 				Global.level.delayedActions.Add(new DelayedAction(delegate {
 					new ShingetsurinProj(
-						new Shingetsurin(player), getShootPos(), xDir,
+						getShootPos(), xDir,
 						0.15f, player, player.getNextActorNetId(), rpc: true
 					);
 					playSound("shingetsurinx5", forcePlay: false, sendRpc: true);
@@ -695,7 +697,7 @@ public class Zero : Character {
 			if (chargeLevel >= 3) {
 				Global.level.delayedActions.Add(new DelayedAction(delegate {
 					new ShingetsurinProj(
-						new Shingetsurin(player), getShootPos(), xDir,
+						getShootPos(), xDir,
 						0.3f, player, player.getNextActorNetId(), rpc: true
 					);
 					playSound("shingetsurinx5", forcePlay: false, sendRpc: true);
@@ -704,7 +706,7 @@ public class Zero : Character {
 			if (chargeLevel >= 4) {
 				Global.level.delayedActions.Add(new DelayedAction(delegate {
 					new ShingetsurinProj(
-						new Shingetsurin(player), getShootPos(), xDir, 0.45f,
+						getShootPos(), xDir, 0.45f,
 						player, player.getNextActorNetId(), rpc: true
 					);
 					playSound("shingetsurinx5", forcePlay: false, sendRpc: true);

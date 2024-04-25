@@ -12,8 +12,10 @@ public enum RakuhouhaType {
 }
 
 public class RakuhouhaWeapon : Weapon {
-	public RakuhouhaWeapon(Player player) : base() {
-		damager = new Damager(player, 4, Global.defFlinch, 0.5f);
+	public static RakuhouhaWeapon netWeapon = new();
+	
+	public RakuhouhaWeapon() : base() {
+		//damager = new Damager(player, 4, Global.defFlinch, 0.5f);
 		ammo = 0;
 		rateOfFire = 1;
 		index = (int)WeaponIds.Rakuhouha;
@@ -31,16 +33,20 @@ public class RakuhouhaWeapon : Weapon {
 	}
 
 	public static Weapon getWeaponFromIndex(Player player, int index) {
-		if (index == (int)RakuhouhaType.Rakuhouha) return new RakuhouhaWeapon(player);
-		else if (index == (int)RakuhouhaType.CFlasher) return new CFlasher(player);
-		else if (index == (int)RakuhouhaType.Rekkoha) return new RekkohaWeapon(player);
-		else throw new Exception("Invalid Zero hyouretsuzan weapon index!");
+		return index switch {
+			(int)RakuhouhaType.Rakuhouha => new RakuhouhaWeapon(),
+			(int)RakuhouhaType.CFlasher => new CFlasher(),
+			(int)RakuhouhaType.Rekkoha => new RekkohaWeapon(),
+			_ => throw new Exception("Invalid Zero hyouretsuzan weapon index!")
+		};
 	}
 }
 
 public class RekkohaWeapon : Weapon {
-	public RekkohaWeapon(Player player) : base() {
-		damager = new Damager(player, 4, Global.defFlinch, 0.5f);
+	public static RekkohaWeapon netWeapon = new();
+
+	public RekkohaWeapon() : base() {
+		//damager = new Damager(player, 4, Global.defFlinch, 0.5f);
 		ammo = 0;
 		rateOfFire = 2;
 		index = (int)WeaponIds.Rekkoha;
@@ -59,8 +65,10 @@ public class RekkohaWeapon : Weapon {
 }
 
 public class CFlasher : Weapon {
-	public CFlasher(Player player) : base() {
-		damager = new Damager(player, 2, 0, 0.5f);
+	public static CFlasher netWeapon = new();
+	
+	public CFlasher() : base() {
+		//damager = new Damager(player, 2, 0, 0.5f);
 		ammo = 0;
 		rateOfFire = 1f;
 		index = (int)WeaponIds.CFlasher;
@@ -79,8 +87,8 @@ public class CFlasher : Weapon {
 }
 
 public class ShinMessenkou : Weapon {
-	public ShinMessenkou(Player player) : base() {
-		damager = new Damager(player, 4, Global.defFlinch, 0.5f);
+	public ShinMessenkou() : base() {
+		//damager = new Damager(player, 4, Global.defFlinch, 0.5f);
 		ammo = 0;
 		rateOfFire = 1f;
 		index = (int)WeaponIds.ShinMessenkou;

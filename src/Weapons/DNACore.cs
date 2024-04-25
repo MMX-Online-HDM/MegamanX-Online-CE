@@ -82,14 +82,16 @@ public class DNACore : AxlWeapon {
 		sprite = "axl_arm_pistol";
 	}
 
-	public override void axlShoot(Player player, AxlBulletType axlBulletType = AxlBulletType.Normal, int? overrideChargeLevel = null) {
+	public override void axlShoot(
+		Player player, AxlBulletType axlBulletType = AxlBulletType.Normal,
+		int? overrideChargeLevel = null
+	) {
 		player.lastDNACore = this;
 		player.lastDNACoreIndex = player.weaponSlot;
 		player.savedDNACoreWeapons.Remove(this);
 		player.weapons.RemoveAt(player.weaponSlot);
-		player.character.cleanupBeforeTransform();
 		player.preTransformedAxl = player.character;
 		Global.level.gameObjects.Remove(player.preTransformedAxl);
-		player.transformAxl(this);
+		player.transformAxl(this, player.getNextATransNetId());
 	}
 }
