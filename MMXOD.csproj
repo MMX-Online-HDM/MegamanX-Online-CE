@@ -1,4 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+	<!--Common properties-->
 	<PropertyGroup>
 		<!--LangVersion>12.0</LangVersion-->
 		<AssemblyName>MMXOD</AssemblyName>
@@ -10,13 +11,19 @@
 		<TargetFramework>net6.0-windows</TargetFramework>
 		<ImplicitUsings>false</ImplicitUsings>
 		<SelfContained>false</SelfContained>
-		<!--OutDir>./bin/anycpu/</OutDir-->
-		<RunWorkingDirectory>./bin/win7-x64/</RunWorkingDirectory>
 		<OutputPath>./bin/</OutputPath>
+		<!--OutDir>./bin/anycpu/</OutDir-->
+		<RunWorkingDirectory>./bin/runenv/</RunWorkingDirectory>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<DebugType>embedded</DebugType>
 	</PropertyGroup>
 
+	<!--For making output go to anycpu if the RuntimeIdentifier is empty-->
+	<PropertyGroup Condition="'$(RuntimeIdentifier)' == ''">
+		<OutputPath>./bin/anycpu/</OutputPath>
+    </PropertyGroup>
+
+	<!--Dependencies-->
 	<ItemGroup>
 		<PackageReference Include="protobuf-net" Version="3.2.30" />
 		<PackageReference Include="protobuf-net.Core" Version="3.2.30" />
