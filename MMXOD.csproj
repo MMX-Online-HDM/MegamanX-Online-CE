@@ -21,7 +21,10 @@
 	<!--For making output go to anycpu if the RuntimeIdentifier is empty-->
 	<PropertyGroup Condition="'$(RuntimeIdentifier)' == ''">
 		<OutputPath>./bin/anycpu/</OutputPath>
-    </PropertyGroup>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Watch2)' == 'true'">
+		<OutputPath>./bin/anycpu2/</OutputPath>
+	</PropertyGroup>
 
 	<!--Dependencies-->
 	<ItemGroup>
