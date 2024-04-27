@@ -66,7 +66,7 @@ public class CrystalHunterProj : Projectile {
 public class CrystalHunterCharged : Actor {
 	public float time;
 	public Player owner;
-	public ShaderWrapper timeSlowShader;
+	public ShaderWrapper? timeSlowShader;
 	public const int radius = 120;
 	public float drawRadius = 120;
 	public float drawAlpha = 64;
@@ -86,7 +86,7 @@ public class CrystalHunterCharged : Actor {
 		Global.level.chargedCrystalHunters.Add(this);
 
 		if (isSnails) {
-			maxTime = overrideTime.Value;
+			maxTime = overrideTime!.Value;
 			netOwner = owner;
 			netActorCreateId = NetActorCreateId.CrystalHunterCharged;
 			if (sendRpc) {

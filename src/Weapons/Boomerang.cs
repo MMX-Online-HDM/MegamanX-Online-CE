@@ -48,7 +48,7 @@ public class Boomerang : Weapon {
 public class BoomerangProj : Projectile {
 	public float angleDist = 0;
 	public float turnDir = 1;
-	public Pickup pickup;
+	public Pickup? pickup;
 	public float maxSpeed = 250;
 	public BoomerangProj(
 		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, int turnDir, bool sendRpc = false
@@ -73,10 +73,13 @@ public class BoomerangProj : Projectile {
 
 		if (other.gameObject is Pickup && pickup == null) {
 			pickup = other.gameObject as Pickup;
-			if (!pickup.ownedByLocalPlayer) {
-				pickup.takeOwnership();
-				RPC.clearOwnership.sendRpc(pickup.netId);
+			if (pickup != null) {
+				if (!pickup.ownedByLocalPlayer) {
+					pickup.takeOwnership();
+					RPC.clearOwnership.sendRpc(pickup.netId);
+				}
 			}
+			
 		}
 
 		var character = other.gameObject as Character;
@@ -118,13 +121,13 @@ public class BoomerangProj : Projectile {
 				var angInc = (-xDir * turnDir) * Global.spf * 300;
 				angle += angInc;
 				angleDist += MathF.Abs(angInc);
-				vel.x = Helpers.cosd((float)angle) * maxSpeed;
+				vel.x = Helpers.cosd((float)angle!) * maxSpeed;
 				vel.y = Helpers.sind((float)angle) * maxSpeed;
 			} else if (damager.owner.character != null) {
 				var dTo = pos.directionTo(damager.owner.character.getCenterPos()).normalize();
 				var destAngle = MathF.Atan2(dTo.y, dTo.x) * 180 / MathF.PI;
 				destAngle = Helpers.to360(destAngle);
-				angle = Helpers.lerpAngle((float)angle, destAngle, Global.spf * 10);
+				angle = Helpers.lerpAngle((float)angle!, destAngle, Global.spf * 10);
 				vel.x = Helpers.cosd((float)angle) * maxSpeed;
 				vel.y = Helpers.sind((float)angle) * maxSpeed;
 			} else {
@@ -143,16 +146,16 @@ public class BoomerangProj : Projectile {
 public class BoomerangProjCharged : Projectile {
 	public float angleDist = 0;
 	public float turnDir = 1;
-	public Pickup pickup;
+	public Pickup? pickup;
 	public float maxSpeed = 400;
 	public int type = 0;
 	public Point blurPosOffset;
-	public BoomerangProjCharged twin;
+	public BoomerangProjCharged? twin;
 
 	public Point lerpOffset;
 	public float lerpTime;
 
-	public BoomerangProjCharged(Weapon weapon, Point pos, Point? lerpToPos, int xDir, Player player, float angle, int type, ushort netProjId, BoomerangProjCharged twin) :
+	public BoomerangProjCharged(Weapon weapon, Point pos, Point? lerpToPos, int xDir, Player player, float angle, int type, ushort netProjId, BoomerangProjCharged? twin) :
 		base(weapon, pos, xDir, 0, 2, player, type == 0 ? "boomerang_charge" : "boomerang_charge2", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.BoomerangCharged;
 		maxTime = 1.2f;
@@ -179,7 +182,7 @@ public class BoomerangProjCharged : Projectile {
 			incPos(lerpOffset.times(Global.spf * 15));
 			lerpTime += Global.spf * 15;
 		}
-		vel.x = Helpers.cosd((float)angle) * maxSpeed;
+		vel.x = Helpers.cosd((float)angle!) * maxSpeed;
 		vel.y = Helpers.sind((float)angle) * maxSpeed;
 		if (type == 0) {
 			if (time > 0.1 && time < 0.72) {

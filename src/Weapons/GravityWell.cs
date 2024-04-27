@@ -50,7 +50,7 @@ public class GravityWellProj : Projectile, IDamagable {
 	float wellFrameTime = 0;
 	float activeTime;
 	float maxActiveTime;
-	public Anim wellAnim;
+	public Anim? wellAnim;
 	float health = 2;
 	float velX;
 
@@ -129,7 +129,7 @@ public class GravityWellProj : Projectile, IDamagable {
 				if (wellFrameIndex > 3) {
 					wellFrameIndex = 0;
 					state = 2;
-					wellAnim.changeSprite("gravitywell_well", true);
+					wellAnim?.changeSprite("gravitywell_well", true);
 				}
 			}
 		}
@@ -139,12 +139,14 @@ public class GravityWellProj : Projectile, IDamagable {
 
 			int xDir = Helpers.randomRange(0, 1) == 0 ? 1 : -1;
 			int yDir = Helpers.randomRange(0, 1) == 0 ? 1 : -1;
-			wellAnim.xDir = xDir;
-			wellAnim.yDir = yDir;
+			if (wellAnim != null) {
+				wellAnim.xDir = xDir;
+				wellAnim.yDir = yDir;
+			}
 
 			if (activeTime > maxActiveTime || (activeTime > 0.01f && commandShoot())) {
 				state = 3;
-				wellAnim.changeSprite("gravitywell_well_end", true);
+				wellAnim?.changeSprite("gravitywell_well_end", true);
 			}
 			wellFrameTime += Global.spf;
 			if (wellFrameTime > 0.06f) {
@@ -344,7 +346,7 @@ public class GravityWellProjCharged : Projectile, IDamagable {
 
 public class GravityWellChargedState : CharState {
 	bool fired = false;
-	MegamanX mmx;
+	MegamanX? mmx;
 
 	public GravityWellChargedState() : base("point_up", "", "", "") {
 		superArmor = true;
@@ -356,11 +358,13 @@ public class GravityWellChargedState : CharState {
 		if (character.frameIndex >= 3 && !fired) {
 			fired = true;
 			stateTime = 0;
-			mmx.chargedGravityWell = new GravityWellProjCharged(
-				player.weapon, character.getShootPos(), 1,
-				player.input.isHeld(Control.Down, player) ? -1 : 1,
-				player, player.getNextActorNetId(), rpc: true
-			);
+			if (mmx != null) {
+				mmx.chargedGravityWell = new GravityWellProjCharged(
+					player.weapon, character.getShootPos(), 1,
+					player.input.isHeld(Control.Down, player) ? -1 : 1,
+					player, player.getNextActorNetId(), rpc: true
+				);
+			}	
 		}
 
 		if (stateTime > 0.65f) {

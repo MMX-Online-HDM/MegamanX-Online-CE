@@ -40,7 +40,7 @@ public class StrikeChainProj : Projectile {
 	public float distRetracted;
 	public bool reversed;
 	public Point toWallVel;
-	public Actor hookedActor;
+	public Actor? hookedActor;
 	public List<Sprite> spriteMids = new List<Sprite>();
 	public int maxDist = 120;
 	public int origXDir;
@@ -49,8 +49,8 @@ public class StrikeChainProj : Projectile {
 	public float hookWaitTime;
 	public int upOrDown;
 	public Point chainVel;
-	public Actor anchorActor;
-	public MegamanX megamanX;
+	public Actor? anchorActor;
+	public MegamanX? megamanX;
 
 	public StrikeChainProj(
 		Weapon weapon, Point pos, int xDir, int type,
@@ -92,8 +92,10 @@ public class StrikeChainProj : Projectile {
 			if (xDir == -1) angle = -135;
 		}
 
-		chainVel.x = Helpers.cosd(angle.Value) * speed;
-		chainVel.y = Helpers.sind(angle.Value) * speed;
+		if (angle != null) {
+			chainVel.x = Helpers.cosd(angle.Value) * speed;
+			chainVel.y = Helpers.sind(angle.Value) * speed;
+		}
 
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir, (byte)type, (byte)(upOrDown + 128));
@@ -115,7 +117,9 @@ public class StrikeChainProj : Projectile {
 		base.postUpdate();
 		if (player.character != null) {
 			var shootPos = player.character.getShootPos();
-			changePos(new Point(shootPos.x + (distMoved - distRetracted) * Helpers.cosd(angle.Value), shootPos.y + (distMoved - distRetracted) * Helpers.sind(angle.Value)));
+			if (angle != null) {
+				changePos(new Point(shootPos.x + (distMoved - distRetracted) * Helpers.cosd(angle.Value), shootPos.y + (distMoved - distRetracted) * Helpers.sind(angle.Value)));
+			}
 		}
 	}
 
@@ -226,7 +230,10 @@ public class StrikeChainProj : Projectile {
 				xOff = (i + iOff) * xDir * -5.657f;
 				yOff = (i + iOff) * upOrDown * -5.657f;
 			}
-			spriteMids[i].draw(5 - chainFrame, pos.x + x + xOff, pos.y + y + yOff, xDir, yDir, getRenderEffectSet(), 1, 1, 1, ZIndex.Character - 1, angle: angle.Value);
+			if (angle != null) {
+				spriteMids[i].draw(5 - chainFrame, pos.x + x + xOff, pos.y + y + yOff, xDir, yDir, getRenderEffectSet(), 1, 1, 1, ZIndex.Character - 1, angle: angle.Value);
+			}
+			
 		}
 		base.render(x, y);
 	}
@@ -294,7 +301,7 @@ public class StrikeChainProj : Projectile {
 		}
 	}
 
-	public void hookActor(Actor actor) {
+	public void hookActor(Actor? actor) {
 		int reverse = 1;
 		if (state == 1) {
 			if (time <= 0.2f) reverse = -1;
@@ -307,7 +314,7 @@ public class StrikeChainProj : Projectile {
 		hookedActor = actor;
 	}
 
-	public override DamagerMessage onDamage(IDamagable damagable, Player attacker) {
+	public override DamagerMessage? onDamage(IDamagable damagable, Player attacker) {
 		if (isDefenderFavored()) {
 			if (damagable is Character chr) {
 				if (Global.serverClient != null) {
@@ -413,7 +420,7 @@ public class StrikeChainHooked : CharState {
 	public override void update() {
 		base.update();
 
-		Character scpChar = scp.damager?.owner?.character;
+		Character? scpChar = scp.damager?.owner?.character;
 		if (scp is StrikeChainProj && scpChar != null && !isWireSponge) {
 			if (scpChar.getShootXDir() == 1 && character.pos.x < scpChar.pos.x + 15) {
 				stateTime = 5;

@@ -1,7 +1,7 @@
 namespace MMXOnline;
 
 public class XHover : CharState {
-	public SoundWrapper sound;
+	public SoundWrapper? sound;
 	float hoverTime;
 	int startXDir;
 	public XHover() : base("hover", "hover_shoot", "", "") {

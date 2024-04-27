@@ -19,7 +19,7 @@ public class ItemTracer : Weapon {
 
 		mmx.scannerCooldown = 1;
 		ammo -= 3;
-		Character target = null;
+		Character? target = null;
 		mmx.playSound("itemTracer", sendRpc: true);
 		CollideData hit = Global.level.raycast(pos, pos.addxy(150 * xDir, 0), new List<Type>() { typeof(Actor) });
 		if (hit?.gameObject is Character chr && chr.player.alliance != player.alliance && !chr.player.scanned) {
@@ -31,7 +31,7 @@ public class ItemTracer : Weapon {
 
 public class ItemTracerProj : Projectile {
 	public Character target;
-	public Character scannedChar;
+	public Character? scannedChar;
 	public ItemTracerProj(Weapon weapon, Point pos, int xDir, Player player, Character target, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, xDir, 300, 0, player, "itemscan_proj", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
 		maxTime = 1f;

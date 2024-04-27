@@ -88,21 +88,18 @@ public class RaySplasherProj : Projectile {
 
 public class RaySplasherTurret : Actor, IDamagable {
 	int state = 0;
-	Actor target;
+	Actor? target;
 	float health = 4;
 	float maxHealth = 4;
 	const float range = 130;
 	float drainTime;
-
 	float raySplasherShootTime;
 	int raySplasherMod;
-
 	float velY;
 	static ShaderWrapper replaceColorShaderAlly = Helpers.cloneShaderSafe("replacecolor");
 	static ShaderWrapper replaceColorShaderBlue = Helpers.cloneShaderSafe("replacecolor");
 	static ShaderWrapper replaceColorShaderRed = Helpers.cloneShaderSafe("replacecolor");
-
-	ShaderWrapper replaceColorShader;
+	ShaderWrapper? replaceColorShader;
 
 	public RaySplasherTurret(Point pos, Player player, int xDir, ushort netId, bool ownedByLocalPlayer, bool rpc = false) :
 		base("raysplasher_turret_start", pos, netId, ownedByLocalPlayer, false) {
@@ -139,7 +136,7 @@ public class RaySplasherTurret : Actor, IDamagable {
 		}
 	}
 
-	public override List<ShaderWrapper> getShaders() {
+	public override List<ShaderWrapper>? getShaders() {
 		if (replaceColorShader != null) {
 			return new List<ShaderWrapper>() { replaceColorShader };
 		}
@@ -181,7 +178,9 @@ public class RaySplasherTurret : Actor, IDamagable {
 				playSound("raySplasher");
 			}
 		} else if (state == 2) {
-			Actor oldTarget = target;
+			if (target != null) {
+				Actor oldTarget = target;
+			}
 			target = Global.level.getClosestTarget(pos, netOwner.alliance, true);
 			if (target == null || pos.distanceTo(target.getCenterPos()) >= range) {
 				state = 1;

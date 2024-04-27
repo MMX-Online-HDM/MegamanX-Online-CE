@@ -35,7 +35,7 @@ public class Torpedo : Weapon {
 }
 
 public class TorpedoProj : Projectile, IDamagable {
-	public Actor target;
+	public Actor? target;
 	public float smokeTime = 0;
 	public float maxSpeed = 150;
 	int type;
@@ -100,16 +100,19 @@ public class TorpedoProj : Projectile, IDamagable {
 		checkLandFrogTorpedo();
 
 		if (ownedByLocalPlayer && homing) {
-			if (!Global.level.gameObjects.Contains(target)) {
-				target = null;
+			if (target != null) {
+				if (!Global.level.gameObjects.Contains(target)) {
+					target = null;
+				}
 			}
+
 
 			if (target != null) {
 				if (time < 3f) {
 					var dTo = pos.directionTo(target.getCenterPos()).normalize();
 					var destAngle = MathF.Atan2(dTo.y, dTo.x) * 180 / MathF.PI;
 					destAngle = Helpers.to360(destAngle);
-					angle = Helpers.lerpAngle((float)angle, destAngle, Global.spf * 3);
+					if (angle != null) angle = Helpers.lerpAngle((float)angle, destAngle, Global.spf * 3);
 				} else {
 
 				}
@@ -126,8 +129,10 @@ public class TorpedoProj : Projectile, IDamagable {
 			  this.vel = this.vel.normalize().times(this.maxSpeed);
 			}
 			*/
-			vel.x = Helpers.cosd((float)angle) * maxSpeed;
-			vel.y = Helpers.sind((float)angle) * maxSpeed;
+			if (angle != null) {
+				vel.x = Helpers.cosd((float)angle) * maxSpeed;
+				vel.y = Helpers.sind((float)angle) * maxSpeed;
+			}
 		}
 
 		smokeTime += Global.spf;

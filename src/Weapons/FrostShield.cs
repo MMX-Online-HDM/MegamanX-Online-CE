@@ -28,9 +28,11 @@ public class FrostShield : Weapon {
 				var cfs = new FrostShieldProjPlatform(this, pos, xDir, player, netProjId);
 			} else {
 				var cfs = new FrostShieldProjCharged(this, pos, xDir, player, netProjId);
-				if (player.character.ownedByLocalPlayer && player.character is MegamanX mmx) {
-					mmx.chargedFrostShield = cfs;
-				}
+				if (player.character != null) {
+					if (player.character.ownedByLocalPlayer && player.character is MegamanX mmx) {
+						mmx.chargedFrostShield = cfs;
+					}
+				}	
 			}
 		}
 	}
