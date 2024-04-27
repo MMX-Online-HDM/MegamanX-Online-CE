@@ -1147,6 +1147,10 @@ class Program {
 				deltaTimeSavings = 0;
 				continueNextFrameStep = false;
 			} else {
+				// Frameskip limiter.
+				if (deltaTime >= 10) {
+					deltaTime = 10;
+				}
 				// Logic update happens here.
 				while (deltaTime >= 1) {
 					// This is to only send RPC is when not frameskipping.
