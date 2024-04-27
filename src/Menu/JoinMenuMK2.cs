@@ -433,5 +433,6 @@ public class ConnectionWaitMenuP2P : IMainMenu {
 			}
 			Thread.Sleep(100);
 		}
+		Program.setLastUpdateTimeAsNow();
 	}
 }
