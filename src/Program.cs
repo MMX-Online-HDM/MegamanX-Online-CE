@@ -386,10 +386,10 @@ class Program {
 			if (Global.level.gameMode.shouldDrawRadar()) {
 				yPos = 219;
 			}
-			//Fonts.drawText(
-			//	FontType.BlueMenu, "VFPS:" + vfps.ToString(), Global.screenW - 5, yPos - 10,
-			//	Alignment.Right
-			//);
+			Fonts.drawText(
+				FontType.BlueMenu, "VFPS:" + vfps.ToString(), Global.screenW - 5, yPos - 10,
+				Alignment.Right
+			);
 			Fonts.drawText(
 				FontType.BlueMenu, "FPS:" + fps.ToString(), Global.screenW - 5, yPos,
 				Alignment.Right
@@ -1111,8 +1111,7 @@ class Program {
 					}
 				}
 			}
-			if (deltaTime >= 1) {
-			} else {
+			if (!(deltaTime >= 1)) {
 				continue;
 			}
 			long timeSecondsNow = (long)Math.Floor(timeSpam.TotalSeconds);
@@ -1150,9 +1149,6 @@ class Program {
 			} else {
 				// Logic update happens here.
 				while (deltaTime >= 1) {
-					if (deltaTime >= 10) {
-						deltaTime = 10;
-					}
 					// This is to only send RPC is when not frameskipping.
 					if (deltaTime >= 2) {
 						Global.isSkippingFrames = true;

@@ -2642,24 +2642,37 @@ public partial class Character : Actor, IDamagable {
 			if (this is MegamanX) {
 				var gigaCrush = player.weapons.FirstOrDefault(w => w is GigaCrush);
 				if (gigaCrush != null) {
+					float currentAmmo = gigaCrush.ammo;
 					gigaCrush.addAmmo(gigaAmmoToAdd, player);
-					if (gigaCrush.ammo == gigaCrush.maxAmmo && player.isMainPlayer) {
-						playSound("gigaCrushAmmoFull");
+					if (player.isMainPlayer) {
+						Weapon.gigaAttackSoundLogic(
+							this, currentAmmo, gigaCrush.ammo,
+							gigaCrush.getAmmoUsage(0), gigaCrush.maxAmmo
+						);
 					}
 				}
 				var hyperBuster = player.weapons.FirstOrDefault(w => w is HyperBuster);
 				if (hyperBuster != null) {
+					float currentAmmo = hyperBuster.ammo;
 					hyperBuster.addAmmo(gigaAmmoToAdd, player);
-					if (hyperBuster.ammo < 8 && player.isMainPlayer) {
-						playSound("hyperchargeRecharge");
-					}
-					if (player.isMainPlayer && hyperBuster.ammo == hyperBuster.maxAmmo || (hyperBuster.ammo > 8 && hyperBuster.ammo < 12)) {
-						playSound("hyperchargeFull");
+					if (player.isMainPlayer) {
+						Weapon.gigaAttackSoundLogic(
+							this, currentAmmo, hyperBuster.ammo,
+							hyperBuster.getAmmoUsage(0), hyperBuster.maxAmmo,
+							"hyperchargeRecharge", "hyperchargeFull"
+						);
 					}
 				}
 				var novaStrike = player.weapons.FirstOrDefault(w => w is NovaStrike);
 				if (novaStrike != null) {
+					float currentAmmo = novaStrike.ammo;
 					novaStrike.addAmmo(gigaAmmoToAdd, player);
+					if (player.isMainPlayer) {
+						Weapon.gigaAttackSoundLogic(
+							this, currentAmmo, novaStrike.ammo,
+							novaStrike.getAmmoUsage(0), novaStrike.maxAmmo
+						);
+					}
 				}
 				//fgMoveAmmo += gigaAmmoToAdd;
 				//if (fgMoveAmmo > 32) fgMoveAmmo = 32;

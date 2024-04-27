@@ -362,4 +362,19 @@ public class Weapon {
 		}
 		weaponHealAmount += MathF.Ceiling(maxAmmo * ammoAdd * ammoGainMultiplier / 100f);
 	}
+
+	public static void gigaAttackSoundLogic(
+		Actor actor, float oldAmmo, float newAmmo, float steps, float maxAmmo,
+		string normalSound = "gigaCrushRecharge", string maxSound = "gigaCrushAmmoFull"
+	) {
+		if (oldAmmo >= newAmmo) {
+			return;
+		}
+		float nextCharge = MathF.Ceiling(oldAmmo / steps) * steps;
+		if (newAmmo >= maxAmmo) {
+			actor.playSound(maxSound);
+		} else {
+			actor.playSound(normalSound);
+		}
+	}
 }
