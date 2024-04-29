@@ -111,6 +111,7 @@ public class LeaveMatchSignal {
 			}
 			Thread.Sleep(100);
 		}
+		Program.setLastUpdateTimeAsNow();
 	}
 
 	public void reCreateMS() {

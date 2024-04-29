@@ -1054,7 +1054,14 @@ class Program {
 
 		return true;
 	}
+	public static decimal deltaTimeSavings = 0;
+	public static decimal lastUpdateTime = 0;
 
+	public static void setLastUpdateTimeAsNow() {
+		deltaTimeSavings = 0;
+		TimeSpan timeSpam = (DateTimeOffset.UtcNow - Global.UnixEpoch);
+		lastUpdateTime = timeSpam.Ticks;
+	}
 
 	// Main loop.
 	// GM19 used some deltatime system.
@@ -1064,8 +1071,6 @@ class Program {
 		// Variables for stuff.
 		decimal deltaTime = 0;
 		decimal deltaTimeAlt = 0;
-		decimal deltaTimeSavings = 0;
-		decimal lastUpdateTime = 0;
 		decimal lastAltUpdateTime = 0;
 		decimal fpsLimit = (TimeSpan.TicksPerSecond / 60m);
 		decimal fpsLimitAlt = (TimeSpan.TicksPerSecond / 240m);
@@ -1147,6 +1152,10 @@ class Program {
 				deltaTimeSavings = 0;
 				continueNextFrameStep = false;
 			} else {
+				// Frameskip limiter.
+				if (deltaTime >= 10) {
+					deltaTime = 10;
+				}
 				// Logic update happens here.
 				while (deltaTime >= 1) {
 					// This is to only send RPC is when not frameskipping.

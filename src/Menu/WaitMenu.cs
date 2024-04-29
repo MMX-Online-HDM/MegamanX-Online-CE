@@ -144,6 +144,7 @@ public class WaitMenu : IMainMenu {
 				Global.serverClient = null;
 				Thread.Sleep(200);
 				Menu.change(new JoinMenu(false));
+				Program.setLastUpdateTimeAsNow();
 			}
 		}
 
