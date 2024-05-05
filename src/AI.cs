@@ -1122,8 +1122,8 @@ public class AI {
 			if (character is CmdSigma cmdSigma && character.charState is not LadderClimb) {
 				int Sattack = Helpers.randomRange(0, 4);
 				if (isTargetInAir) Sattack = 1;
-				if (cmdSigma?.charState?.isGrabbedState == false && !player.isDead
-					&& !cmdSigma.isInvulnerable() && cmdSigma.charState.canAttack()
+				if (cmdSigma.charState.attackCtrl && cmdSigma?.charState?.isGrabbedState == false && !player.isDead 
+					&& !cmdSigma.isInvulnerable() && cmdSigma.charState.canAttack() && character.saberCooldown == 0
 					&& !(cmdSigma.charState is CallDownMaverick or SigmaSlashState)) {
 					switch (Sattack) {
 						case 0: // Beam Saber
@@ -1162,7 +1162,7 @@ public class AI {
 			if (character is NeoSigma neoSigma && character.charState is not LadderClimb) {
 				int Neoattack = Helpers.randomRange(0, 5);
 				if (isTargetInAir) Neoattack = 2;
-				if (neoSigma?.charState?.isGrabbedState == false && !player.isDead && !neoSigma.isInvulnerable()
+				if (neoSigma?.charState?.isGrabbedState == false && !player.isDead && !neoSigma.isInvulnerable() && character.saberCooldown == 0
 					&& !(neoSigma.charState is CallDownMaverick or SigmaElectricBall2State or SigmaElectricBallState)) {
 					switch (Neoattack) {
 						case 0:
@@ -1635,7 +1635,7 @@ public class AI {
 					zero1.changeState(new ZeroUppercut(new RisingWeapon(zero1.player), zero1.isUnderwater()), forceChange: true);
 				}
 				// Do Hyouretsuzan if is at 50% of the animation of rising
-				else if (zero1.sprite.name == "zero_rising" && zero1.framePercent > 0.65f) {
+				else if (zero1.sprite.name == "zero_rising" && zero1.framePercent > 0.6f) {
 					zero1.changeState(new ZeroFallStab(new HyouretsuzanWeapon(player)), forceChange: true);
 				}
 				if (!zero1.grounded && zero1.zeroAirSpecialWeapon.type == (int)AirSpecialType.Kuuenzan && !zero1.isAttacking() && zero1.charState.canAttack() && !(zero1.sprite.name == "zero_attack_air2")) {
