@@ -1282,7 +1282,7 @@ public class AI {
 					case 8 when player.vileAmmo >= 24:
 						player.vileLaserWeapon.vileShoot(WeaponIds.VileLaser, vile);
 						break;
-					case 9 when vile.isVileMK5:
+					case 9 when vile.isVileMK5 && player.vileAmmo >= 20:
 						vile?.changeState(new HexaInvoluteState(), true);
 						break;
 				}
