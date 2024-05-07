@@ -1273,7 +1273,7 @@ public class AI {
 					case 5:
 						player.vileCutterWeapon.vileShoot(WeaponIds.VileCutter, vile);
 						break;
-					case 6 when !vile.grounded  && player.vileNapalmWeapon.type == (int)NapalmType.FireGrenade || player.vileNapalmWeapon.type == (int)NapalmType.SplashHit :				
+					case 6 when vile.grounded && player.vileNapalmWeapon.type == (int)NapalmType.FireGrenade || player.vileNapalmWeapon.type == (int)NapalmType.SplashHit :				
 						player.vileNapalmWeapon.vileShoot(WeaponIds.Napalm, vile);
 						break;
 					case 7 when vile.charState is Fall:
