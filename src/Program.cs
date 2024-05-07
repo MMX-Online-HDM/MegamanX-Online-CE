@@ -84,10 +84,8 @@ class Program {
 		Global.writePath = Global.assetPath;
 #endif
 		Global.Init();
-		if (Global.debug) {
-			if (Enum.GetNames(typeof(WeaponIds)).Length > 256) {
-				throw new Exception("Too many weapon ids, max 256");
-			}
+		if (Enum.GetNames(typeof(WeaponIds)).Length > 256) {
+			throw new Exception("Too many weapon ids, max 256");
 		}
 
 		if (Global.debug) {
@@ -887,22 +885,21 @@ class Program {
 		if (soundNames.Count > 65535) {
 			throw new Exception("Cannot have more than 65535 sounds.");
 		}
-
-		//var fileChecksumDict = new Dictionary<string, string>();
 		for (int i = 0; i < soundNames.Count; i++) {
 			string file = soundNames[i];
 			string name = Path.GetFileNameWithoutExtension(file).ToLowerInvariant();
-			//fileChecksumDict[name] = "";
-			Global.soundBuffers.Add(name, new SoundBufferWrapper(name, file, SoundPool.Regular));
+			if (Global.soundBuffers.ContainsKey(name)) {
+
+			}
+			Global.soundBuffers[name] = new SoundBufferWrapper(name, file, SoundPool.Regular);
 		}
-		//addToFileChecksumBlob(fileChecksumDict);
 
 		// Voices
 		var voiceNames = Helpers.getFiles(Global.assetPath + "assets/voices", true, "ogg", "wav", "mp3", "flac");
 		for (int i = 0; i < voiceNames.Count; i++) {
 			string file = voiceNames[i];
 			string name = Path.GetFileNameWithoutExtension(file).ToLowerInvariant();;
-			Global.voiceBuffers.Add(name, new SoundBufferWrapper(name, file, SoundPool.Voice));
+			Global.voiceBuffers[name] = new SoundBufferWrapper(name, file, SoundPool.Voice);
 		}
 
 		// Char-Specific Overrides
@@ -915,7 +912,7 @@ class Program {
 			if (Global.soundBuffers.ContainsKey(name)) {
 				Global.soundBuffers[name] = new SoundBufferWrapper(name, file, SoundPool.Regular);
 			} else {
-				Global.charSoundBuffers.Add(name, new SoundBufferWrapper(name, file, SoundPool.CharOverride));
+				Global.charSoundBuffers[name] = new SoundBufferWrapper(name, file, SoundPool.CharOverride);
 			}
 		}
 
@@ -1237,13 +1234,20 @@ class Program {
 		return cpuName;
 	}
 
-	public static void loadMultiThread(List<String> loadText, RenderWindow window, ThreadStart loadFunct) {
-		Thread loadTread = new Thread(loadFunct);
+	public static void loadMultiThread(List<String> loadText, RenderWindow window, Action loadFunct) {
+		Task loadTread = new Task(loadFunct);
+		loadTread.ContinueWith(loadExceptionHandler, TaskContinuationOptions.OnlyOnFaulted);
 		loadTread.Start();
 		loadLoop(loadText, window, loadTread);
 	}
 
-	public static void loadLoop(List<String> loadText, RenderWindow window, Thread loadTread) {
+	public static void loadExceptionHandler(Task task) {
+        var exception = task.Exception;
+        Console.WriteLine(exception);
+    }
+
+
+	public static void loadLoop(List<String> loadText, RenderWindow window, Task loadTread) {
 		// Variables for stuff.
 		decimal deltaTime = 0;
 		decimal lastUpdateTime = 0;
@@ -1277,7 +1281,7 @@ class Program {
 			lastUpdateTime = timeNow;
 			window.DispatchEvents();
 			window.Display();
-			exit = (loadTread.ThreadState == System.Threading.ThreadState.Stopped);
+			exit = (loadTread.Status >= TaskStatus.RanToCompletion);
 		}
 	}
 }

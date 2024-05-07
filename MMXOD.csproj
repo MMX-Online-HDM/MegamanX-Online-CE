@@ -16,6 +16,7 @@
 		<RunWorkingDirectory>./bin/runenv/</RunWorkingDirectory>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<DebugType>embedded</DebugType>
+		<Deterministic>true</Deterministic>
 	</PropertyGroup>
 
 	<!--For making output go to anycpu if the RuntimeIdentifier is empty-->
