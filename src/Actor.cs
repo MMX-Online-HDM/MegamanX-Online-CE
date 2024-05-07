@@ -1360,21 +1360,26 @@ public partial class Actor : GameObject {
 		return playSound(Global.soundBuffers[soundKey], forcePlay: forcePlay, sendRpc: sendRpc);
 	}
 
-	public SoundWrapper createSoundWrapper(SoundBufferWrapper soundBuffer, int? charNum) {
-		if (charNum != null) {
-			string charName;
-			if (charNum.Value == 0) charName = "mmx";
-			else if (charNum.Value == 1) charName = "zero";
-			else if (charNum.Value == 2) charName = "vile";
-			else if (charNum.Value == 3) charName = "axl";
-			else charName = "sigma";
+	public SoundWrapper createSoundWrapper(SoundBufferWrapper soundBuffer) {
+		if (this is Character chara) {
+			string charName = chara switch {
+				MegamanX => "mmx",
+				Zero => "zero",
+				PunchyZero => "pzero",
+				BusterZero => "dzero",
+				Vile => "vile",
+				Axl => "axl",
+				CmdSigma => "sigma",
+				NeoSigma => "neosigma",
+				Doppma => "doppma",
+				_ => "error"
+			};
 
 			var overrideSoundBuffer = Global.charSoundBuffers.GetValueOrDefault(soundBuffer.soundKey + "." + charName);
 			if (overrideSoundBuffer != null) {
 				return new SoundWrapper(overrideSoundBuffer, this);
 			}
 		}
-
 		return new SoundWrapper(soundBuffer, this);
 	}
 
@@ -1400,11 +1405,13 @@ public partial class Actor : GameObject {
 			charNum = this is Character chr ? chr.player.charNum : 4;
 		}
 
-		SoundWrapper sound = createSoundWrapper(soundBuffer, charNum);
+		SoundWrapper sound = createSoundWrapper(soundBuffer);
 		sound.play();
 
 		if (charNum != null && soundBuffer.soundPool != SoundPool.Voice) {
-			var matchingVoice = Helpers.getRandomMatchingVoice(Global.voiceBuffers, soundBuffer.soundKey, charNum.Value);
+			var matchingVoice = Helpers.getRandomMatchingVoice(
+				Global.voiceBuffers, soundBuffer.soundKey, charNum.Value
+			);
 			if (matchingVoice != null) {
 				playSound(matchingVoice);
 			}
