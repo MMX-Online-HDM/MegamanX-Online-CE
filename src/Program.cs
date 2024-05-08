@@ -889,7 +889,7 @@ class Program {
 			string file = soundNames[i];
 			string name = Path.GetFileNameWithoutExtension(file).ToLowerInvariant();
 			if (Global.soundBuffers.ContainsKey(name)) {
-
+				throw new Exception("Duplicated sound: " + name)
 			}
 			Global.soundBuffers[name] = new SoundBufferWrapper(name, file, SoundPool.Regular);
 		}
@@ -1242,8 +1242,9 @@ class Program {
 	}
 
 	public static void loadExceptionHandler(Task task) {
-        var exception = task.Exception;
-        Console.WriteLine(exception);
+        if (task.Exception != null) {
+			Logger.LogFatalException(task.Exception);
+		}
     }
 
 
