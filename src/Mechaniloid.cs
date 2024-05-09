@@ -160,7 +160,7 @@ public class Mechaniloid : Actor, IDamagable {
 			netActorCreateId = NetActorCreateId.MechaniloidHopper;
 		}
 
-		if (Global.level.gameMode.isTeamMode ^ Global.level.mainPlayer != player) {
+		if (Global.level.gameMode.isTeamMode && Global.level.mainPlayer != player) {
 			RenderEffectType? allianceEffect = player.alliance switch {
 				0 => RenderEffectType.BlueShadow,
 				1 => RenderEffectType.RedShadow,

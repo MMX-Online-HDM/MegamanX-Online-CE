@@ -821,7 +821,7 @@ public partial class Character : Actor, IDamagable {
 			dropFlagUnlocked = false;
 		}
 
-		if (Global.level.gameMode.isTeamMode ^ Global.level.mainPlayer != player) {
+		if (Global.level.gameMode.isTeamMode && Global.level.mainPlayer != player) {
 			int alliance = player.alliance;
 			// If this is an enemy disguised Axl, change the alliance
 			if (player.alliance != Global.level.mainPlayer.alliance && player.isDisguisedAxl) {
@@ -837,7 +837,7 @@ public partial class Character : Actor, IDamagable {
 				_ => null
 			};
 			if (allianceEffect != null) {
-				addRenderEffect(allianceEffect.Value, time: 1/60f);
+				addRenderEffect(allianceEffect.Value);
 			}
 		}
 

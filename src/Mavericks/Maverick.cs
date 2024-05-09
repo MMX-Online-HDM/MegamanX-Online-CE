@@ -152,7 +152,7 @@ public class Maverick : Actor, IDamagable {
 		changeState(overrideState ?? new MEnter(destPos));
 		_input = new Input(true);
 
-		if (Global.level.gameMode.isTeamMode ^ Global.level.mainPlayer != player) {
+		if (Global.level.gameMode.isTeamMode && Global.level.mainPlayer != player) {
 			RenderEffectType? allianceEffect = player.alliance switch {
 				0 => RenderEffectType.BlueShadow,
 				1 => RenderEffectType.RedShadow,
