@@ -892,7 +892,10 @@ public partial class Player {
 					);
 					if (spawnPoints.Count != 0) {
 						Character randomChar = spawnPoints[Helpers.randomRange(0, spawnPoints.Count - 1)].character;
-						spawnCharAtPoint(randomChar.pos, randomChar.xDir, charNetId, sendRpc);
+						Point warpInPos = Global.level.getGroundPosNoKillzone(
+							randomChar.pos, Global.screenH
+						) ?? randomChar.pos;
+						spawnCharAtPoint(warpInPos, randomChar.xDir, charNetId, sendRpc);
 					} else {
 						var spawnPoint = Global.level.getSpawnPoint(this, !warpedInOnce);
 						int spawnPointIndex = Global.level.spawnPoints.IndexOf(spawnPoint);
