@@ -342,7 +342,8 @@ public class SigmaLoadout {
 		return new SigmaLoadout() {
 			maverick1 = randPool[0] - (int)WeaponIds.ChillPenguin,
 			maverick2 = randPool[1] - (int)WeaponIds.ChillPenguin,
-			sigmaForm = Helpers.randomRange(0, 2)
+			sigmaForm = Helpers.randomRange(0, 2),
+			commandMode = 2,
 			// Gacel: So it was an option for third maverick before?
 			//maverick3 = randPool[2],
 		};
