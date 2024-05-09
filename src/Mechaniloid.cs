@@ -160,17 +160,18 @@ public class Mechaniloid : Actor, IDamagable {
 			netActorCreateId = NetActorCreateId.MechaniloidHopper;
 		}
 
-		if (player == Global.level.mainPlayer) {
-			addRenderEffect(RenderEffectType.GreenShadow);
-		} else if (Global.level.gameMode.isTeamMode) {
-			if (Global.level.teamNum == 2) {
-				if (player.alliance == GameMode.blueAlliance) {
-					addRenderEffect(RenderEffectType.BlueShadow);
-				} else {
-					addRenderEffect(RenderEffectType.RedShadow);
-				}
-			} else if (player.alliance == Global.level.mainPlayer.alliance) {
-				addRenderEffect(RenderEffectType.GreenShadow);
+		if (Global.level.gameMode.isTeamMode ^ Global.level.mainPlayer != player) {
+			RenderEffectType? allianceEffect = player.alliance switch {
+				0 => RenderEffectType.BlueShadow,
+				1 => RenderEffectType.RedShadow,
+				2 => RenderEffectType.GreenShadow,
+				3 => RenderEffectType.PurpleShadow,
+				4 => RenderEffectType.YellowShadow,
+				5 => RenderEffectType.OrangeShadow,
+				_ => null
+			};
+			if (allianceEffect != null) {
+				addRenderEffect(allianceEffect.Value);
 			}
 		}
 

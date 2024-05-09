@@ -821,24 +821,23 @@ public partial class Character : Actor, IDamagable {
 			dropFlagUnlocked = false;
 		}
 
-		if (Global.level.gameMode.isTeamMode) {
+		if (Global.level.gameMode.isTeamMode ^ Global.level.mainPlayer != player) {
 			int alliance = player.alliance;
 			// If this is an enemy disguised Axl, change the alliance
 			if (player.alliance != Global.level.mainPlayer.alliance && player.isDisguisedAxl) {
 				alliance = Global.level.mainPlayer.alliance;
 			}
-
-			removeRenderEffect(RenderEffectType.BlueShadow);
-			removeRenderEffect(RenderEffectType.RedShadow);
-
-			if (Global.level.teamNum == 2) {
-				if (alliance == GameMode.blueAlliance) {
-					addRenderEffect(RenderEffectType.BlueShadow);
-				} else {
-					addRenderEffect(RenderEffectType.RedShadow);
-				}
-			} else if (!player.isMainPlayer && alliance == Global.level.mainPlayer.alliance) {
-				addRenderEffect(RenderEffectType.GreenShadow);
+			RenderEffectType? allianceEffect = alliance switch {
+				0 => RenderEffectType.BlueShadow,
+				1 => RenderEffectType.RedShadow,
+				2 => RenderEffectType.GreenShadow,
+				3 => RenderEffectType.PurpleShadow,
+				4 => RenderEffectType.YellowShadow,
+				5 => RenderEffectType.OrangeShadow,
+				_ => null
+			};
+			if (allianceEffect != null) {
+				addRenderEffect(allianceEffect.Value, time: 1/60f);
 			}
 		}
 

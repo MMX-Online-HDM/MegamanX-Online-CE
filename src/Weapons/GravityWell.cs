@@ -68,11 +68,11 @@ public class GravityWellProj : Projectile, IDamagable {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
 
-		if (player.isMainPlayer) {
+		//if (player.isMainPlayer) {
 			//removeRenderEffect(RenderEffectType.BlueShadow);
 			//removeRenderEffect(RenderEffectType.RedShadow);
 			//addRenderEffect(RenderEffectType.GreenShadow);
-		}
+		//}
 
 		if (!ownedByLocalPlayer) {
 			vel = new Point();

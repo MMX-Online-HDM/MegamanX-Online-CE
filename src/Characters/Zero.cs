@@ -523,46 +523,24 @@ public class Zero : Character {
 		return false;
 	}
 
+	public enum MeleeIds {
+		None = -1,
+		TripleSlash1,
+		TripleSlash2,
+		TripleSlash3,
+		AirSlash,
+		CrouchSlash,
+		
+	}
+
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			_ => MeleeIds.None
+		});
+	}
+
 	// This can run on both owners and non-owners. So data used must be in sync
 	public override Projectile? getProjFromHitbox(Collider collider, Point centerPoint) {
-		if (sprite.name == "zero_attack3") {
-			float timeSinceStart = zero3SwingComboEndTime - zero3SwingComboStartTime;
-			float overrideDamage = 4;
-			int overrideFlinch = Global.defFlinch;
-			if (timeSinceStart < 0.4f) {
-				overrideDamage = 2;
-				overrideFlinch = Global.halfFlinch;
-			} else if (timeSinceStart < 0.5f) {
-				overrideDamage = 3;
-				overrideFlinch = Global.defFlinch;
-			}
-			return new GenericMeleeProj(
-				zSaberWeapon, centerPoint, ProjIds.ZSaber3, player,
-				overrideDamage, overrideFlinch, 0.25f, isReflectShield: true
-			);
-		} else if (sprite.name.Contains("hyouretsuzan")) {
-			return new GenericMeleeProj(
-				new HyouretsuzanWeapon(player), centerPoint, ProjIds.Hyouretsuzan2, player, 4, 12, 0.5f
-			);
-		} else if (sprite.name.Contains("rakukojin")) {
-			float damage = 3 + Helpers.clamp(MathF.Floor(deltaPos.y * 0.8f), 0, 10);
-			return new GenericMeleeProj(
-				new RakukojinWeapon(player), centerPoint, ProjIds.Rakukojin, player, damage, 12, 0.5f
-			);
-		} else if (sprite.name.Contains("quakeblazer")) {
-			return new GenericMeleeProj(
-				new QuakeBlazerWeapon(player), centerPoint, ProjIds.QuakeBlazer, player, 2, 0, 0.5f
-			);
-		} else if (sprite.name.Contains("zero_projswing")) {
-			return new GenericMeleeProj(
-				zSaberProjSwingWeapon, centerPoint, ProjIds.ZSaberProjSwing, player,
-				isBlackZero2() ? 4 : 3, Global.defFlinch, 0.5f, isReflectShield: true
-			);
-		} else if (sprite.name.Contains("zero_block") && !collider.isHurtBox()) {
-			return new GenericMeleeProj(
-				zSaberWeapon, centerPoint, ProjIds.SwordBlock, player, 0, 0, 0, isDeflectShield: true
-			);
-		}
 		Projectile? proj = sprite.name switch {
 			"zero_attack" => new GenericMeleeProj(
 				zSaberWeapon, centerPoint, ProjIds.ZSaber1, player, 2, 0, 0.25f, isReflectShield: true
@@ -570,9 +548,21 @@ public class Zero : Character {
 			"zero_attack2" => new GenericMeleeProj(
 				zSaberWeapon, centerPoint, ProjIds.ZSaber2, player, 2, 0, 0.25f, isReflectShield: true
 			),
-			"zero_attack3" => new GenericMeleeProj(
-					zSaberWeapon, centerPoint, ProjIds.ZSaber2, player, 2, 0, 0.25f, isReflectShield: true
-			),
+			"zero_attack3" => new Func<Projectile>(() => {
+				float timeSinceStart = zero3SwingComboEndTime - zero3SwingComboStartTime;
+				float overrideDamage = 4;
+				int overrideFlinch = Global.defFlinch;
+				if (timeSinceStart < 0.4f) {
+					overrideDamage = 2;
+					overrideFlinch = Global.halfFlinch;
+				} else if (timeSinceStart < 0.5f) {
+					overrideDamage = 3;
+				}
+				return new GenericMeleeProj(
+					zSaberWeapon, centerPoint, ProjIds.ZSaber3, player,
+					overrideDamage, overrideFlinch, 0.25f, isReflectShield: true
+				);
+			})(),
 			"zero_hyoroga_attack" => new GenericMeleeProj(
 				zeroAirSpecialWeapon, centerPoint, ProjIds.HyorogaSwing, player, 4, 0, 0.25f
 			),
@@ -615,6 +605,26 @@ public class Zero : Character {
 			"zero_rising" => new GenericMeleeProj(
 				new RisingWeapon(player), centerPoint, ProjIds.Rising, player, 1, 0, 0.15f
 			),
+			"zero_block" when collider.isHurtBox() => new GenericMeleeProj(
+				zSaberWeapon, centerPoint, ProjIds.SwordBlock, player, 0, 0, 0, isDeflectShield: true
+			),
+			"zero_projswing" or "zero_projswing_air" => new GenericMeleeProj(
+				zSaberProjSwingWeapon, centerPoint, ProjIds.ZSaberProjSwing, player,
+				3, Global.defFlinch, 0.5f, isReflectShield: true
+			),
+			"zero_hyouretsuzan_start" or "zero_hyouretsuzan_fall" => new GenericMeleeProj(
+				new HyouretsuzanWeapon(player), centerPoint, ProjIds.Hyouretsuzan2, player, 4, 12, 0.5f
+			),
+			"zero_quakeblazer_start" or "zero_quakeblazer_fall" => new GenericMeleeProj(
+				new QuakeBlazerWeapon(player), centerPoint, ProjIds.QuakeBlazer, player, 2, 0, 0.5f
+			),
+			"zero_rakukojin_start" or "zero_rakukojin_fall" => new Func<Projectile>(() => {
+				float damage = 3 + Helpers.clamp(MathF.Floor(deltaPos.y * 0.8f), 0, 10);
+				return new GenericMeleeProj(
+					new RakukojinWeapon(player), centerPoint,
+					ProjIds.Rakukojin, player, damage, 12, 0.5f
+				);
+			})(),
 			_ => null
 		};
 

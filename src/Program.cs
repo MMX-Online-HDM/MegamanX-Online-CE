@@ -889,7 +889,7 @@ class Program {
 			string file = soundNames[i];
 			string name = Path.GetFileNameWithoutExtension(file).ToLowerInvariant();
 			if (Global.soundBuffers.ContainsKey(name)) {
-				throw new Exception("Duplicated sound: " + name)
+				throw new Exception("Duplicated sound: " + name);
 			}
 			Global.soundBuffers[name] = new SoundBufferWrapper(name, file, SoundPool.Regular);
 		}
@@ -1213,20 +1213,20 @@ class Program {
 
 	public static string getCpuName() {
 		string cpuName = "Unknown";
-#if WINDOWS
-		// For Windows OS.
-		cpuName = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(
-			@"HARDWARE\DESCRIPTION\System\CentralProcessor\0\"
-		)?.GetValue(
-			"ProcessorNameString"
-		) as String ?? "Windows";
-#endif
-#if LINUX
-	cpuName = "Linux";
-#endif
-#if MACOS
-	cpuName = "Darwin";
-#endif
+		#if WINDOWS
+			// For Windows OS.
+			cpuName = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(
+				@"HARDWARE\DESCRIPTION\System\CentralProcessor\0\"
+			)?.GetValue(
+				"ProcessorNameString"
+			) as String ?? "Windows";
+		#endif
+		#if LINUX
+			cpuName = "Linux";
+		#endif
+		#if MACOS
+			cpuName = "Darwin";
+		#endif
 		// Fix simbols.
 		cpuName = cpuName.Replace("(R)", "®");
 		cpuName = cpuName.Replace("(C)", "©");

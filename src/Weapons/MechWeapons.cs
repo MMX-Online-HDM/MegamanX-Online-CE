@@ -279,9 +279,6 @@ public class MechChainProj : Projectile {
 		shouldShieldBlock = false;
 		shouldVortexSuck = false;
 
-		removeRenderEffect(RenderEffectType.RedShadow);
-		removeRenderEffect(RenderEffectType.BlueShadow);
-
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}

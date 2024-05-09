@@ -97,7 +97,7 @@ public class MagnetMineProj : Projectile, IDamagable {
 			landed = true;
 			updateDamager(4);
 
-			if (player.isMainPlayer) {
+			if (player.isMainPlayer && !Global.level.gameMode.isTeamMode) {
 				removeRenderEffect(RenderEffectType.BlueShadow);
 				removeRenderEffect(RenderEffectType.RedShadow);
 				addRenderEffect(RenderEffectType.GreenShadow);

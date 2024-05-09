@@ -56,18 +56,20 @@ public class Projectile : Actor {
 		useGravity = false;
 		damager = new Damager(player, damage, flinch, hitCooldown);
 		this.xDir = xDir;
-		if (Global.level.gameMode.isTeamMode && !(this is NapalmPartProj) && !(this is FlameBurnerProj)) {
-			if (Global.level.teamNum == 2) {
-				if (player.alliance == GameMode.blueAlliance) {
-					addRenderEffect(RenderEffectType.BlueShadow);
-				} else {
-					addRenderEffect(RenderEffectType.RedShadow);
-				}
-			} else if (damager != null &&
-				!damager.owner.isMainPlayer &&
-				damager.owner.alliance == Global.level.mainPlayer.alliance
-			) {
-				addRenderEffect(RenderEffectType.GreenShadow);
+		if ((Global.level.gameMode.isTeamMode ^ Global.level.mainPlayer != player) &&
+			this is not NapalmPartProj or FlameBurnerProj
+		) {
+			RenderEffectType? allianceEffect = player.alliance switch {
+				0 => RenderEffectType.BlueShadow,
+				1 => RenderEffectType.RedShadow,
+				2 => RenderEffectType.GreenShadow,
+				3 => RenderEffectType.PurpleShadow,
+				4 => RenderEffectType.YellowShadow,
+				5 => RenderEffectType.OrangeShadow,
+				_ => null
+			};
+			if (allianceEffect != null) {
+				addRenderEffect(allianceEffect.Value);
 			}
 		}
 		this.ownerPlayer = player;
