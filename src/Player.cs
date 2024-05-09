@@ -886,10 +886,19 @@ public partial class Player {
 			bool sendRpc = ownedByLocalPlayer;
 			var charNetId = getCharActorNetId();
 			if (shouldRespawn()) {
-				var spawnPoint = Global.level.getSpawnPoint(this, !warpedInOnce);
-				if (spawnPoint == null) return;
-				int spawnPointIndex = Global.level.spawnPoints.IndexOf(spawnPoint);
-				spawnCharAtSpawnIndex(spawnPointIndex, charNetId, sendRpc);
+				if (Global.level.gameMode is TeamDeathMatch && Global.level.teamNum > 2) {
+					List<Player> spawnPoints = Global.level.players.FindAll(
+						p => p.teamAlliance == teamAlliance && p.health > 0 && p.character != null
+					);
+					Character randomChar = spawnPoints[Helpers.randomRange(0, spawnPoints.Count - 1)].character;
+					spawnCharAtPoint(randomChar.pos, randomChar.xDir, charNetId, sendRpc);
+				}
+				else {
+					var spawnPoint = Global.level.getSpawnPoint(this, !warpedInOnce);
+					if (spawnPoint == null) return;
+					int spawnPointIndex = Global.level.spawnPoints.IndexOf(spawnPoint);
+					spawnCharAtSpawnIndex(spawnPointIndex, charNetId, sendRpc);
+				}
 			}
 		}
 
