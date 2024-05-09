@@ -890,8 +890,14 @@ public partial class Player {
 					List<Player> spawnPoints = Global.level.players.FindAll(
 						p => p.teamAlliance == teamAlliance && p.health > 0 && p.character != null
 					);
-					Character randomChar = spawnPoints[Helpers.randomRange(0, spawnPoints.Count - 1)].character;
-					spawnCharAtPoint(randomChar.pos, randomChar.xDir, charNetId, sendRpc);
+					if (spawnPoints.Count != 0) {
+						Character randomChar = spawnPoints[Helpers.randomRange(0, spawnPoints.Count - 1)].character;
+						spawnCharAtPoint(randomChar.pos, randomChar.xDir, charNetId, sendRpc);
+					} else {
+						var spawnPoint = Global.level.getSpawnPoint(this, !warpedInOnce);
+						int spawnPointIndex = Global.level.spawnPoints.IndexOf(spawnPoint);
+						spawnCharAtSpawnIndex(spawnPointIndex, charNetId, sendRpc);
+					}
 				}
 				else {
 					var spawnPoint = Global.level.getSpawnPoint(this, !warpedInOnce);

@@ -133,12 +133,12 @@ public class Rakuhouha : CharState {
 		// isDarkHold = true;
 		if (character.frameIndex == 5 && !once && !isDarkHold) {
 			once = true;
-			rakuanim = new Anim(
+			/*rakuanim = new Anim(
 				character.pos.addxy(character.xDir, 0),
 				"zero_rakuanim", character.xDir,
 				player.getNextActorNetId(),
 				destroyOnEnd: true, sendRpc: true
-			);
+			);*/
 		}
 		float x = character.pos.x;
 		float y = character.pos.y;
