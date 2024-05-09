@@ -18,12 +18,14 @@ public class FireWave : Weapon {
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-		if (player.character != null && player.character.isUnderwater()) return;
-		if (chargeLevel < 3) {
-			var proj = new FireWaveProj(this, pos, xDir, player, netProjId);
-			proj.vel.inc(player.character.vel.times(-0.5f));
-		} else {
-			var proj = new FireWaveProjChargedStart(this, pos, xDir, player, netProjId);
+		if (player.character != null) {
+			if (player.character.isUnderwater()) return;
+			if (chargeLevel < 3) {
+				var proj = new FireWaveProj(this, pos, xDir, player, netProjId);
+				proj.vel.inc(player.character.vel.times(-0.5f));
+			} else {
+				var proj = new FireWaveProjChargedStart(this, pos, xDir, player, netProjId);
+			}
 		}
 	}
 }
@@ -74,7 +76,7 @@ public class FireWaveProjChargedStart : Projectile {
 	}
 
 	public void putOutFire() {
-		base.destroySelf(null, null, false, true);
+		base.destroySelf("", "", false, true);
 	}
 }
 
@@ -83,7 +85,7 @@ public class FireWaveProjCharged : Projectile {
 	public Sprite spriteTop;
 	public float riseY = 0;
 	public float parentTime = 0;
-	public FireWaveProjCharged child;
+	public FireWaveProjCharged? child;
 	public bool reversedOnce;
 	public int timesReversed;
 	float soundCooldown;
@@ -169,6 +171,6 @@ public class FireWaveProjCharged : Projectile {
 	}
 
 	public void putOutFire() {
-		base.destroySelf(null, null, false, true);
+		base.destroySelf("", "", false, true);
 	}
 }

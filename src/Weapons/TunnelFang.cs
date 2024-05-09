@@ -134,7 +134,7 @@ public class TunnelFangProj : Projectile {
 }
 
 public class TunnelFangProjCharged : Projectile {
-	public MegamanX character;
+	public MegamanX? character;
 	float sparksCooldown;
 	public TunnelFangProjCharged(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, xDir, 300, 1, player, "tunnelfang_charged", Global.defFlinch, 0.125f, netProjId, player.ownedByLocalPlayer) {
@@ -177,8 +177,11 @@ public class TunnelFangProjCharged : Projectile {
 		if (!ownedByLocalPlayer) return;
 		if (destroyed) return;
 
-		changePos(character.getShootPos());
-		xDir = character.getShootXDir();
+		if (character != null) {
+			changePos(character.getShootPos());
+			xDir = character.getShootXDir();
+		}
+		
 	}
 
 	public override void onHitDamagable(IDamagable damagable) {

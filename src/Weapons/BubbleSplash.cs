@@ -67,12 +67,11 @@ public class BubbleSplash : Weapon {
 		} else if (chargeLevel >= 3 && player.character is MegamanX mmx) {
 			player.setNextActorNetId(netProjId);
 			mmx.popAllBubbles();
-			mmx.chargedBubbles.Add(new BubbleSplashProjCharged(this, pos, xDir, player, 0, player.getNextActorNetId(true)));
-			mmx.chargedBubbles.Add(new BubbleSplashProjCharged(this, pos, xDir, player, 0.2f, player.getNextActorNetId(true)));
-			mmx.chargedBubbles.Add(new BubbleSplashProjCharged(this, pos, xDir, player, 0.4f, player.getNextActorNetId(true)));
-			mmx.chargedBubbles.Add(new BubbleSplashProjCharged(this, pos, xDir, player, 0.6f, player.getNextActorNetId(true)));
-			mmx.chargedBubbles.Add(new BubbleSplashProjCharged(this, pos, xDir, player, 0.8f, player.getNextActorNetId(true)));
-			mmx.chargedBubbles.Add(new BubbleSplashProjCharged(this, pos, xDir, player, 1f, player.getNextActorNetId(true)));
+			float time = 0;
+			for (int i = 0; i < 6; i++) {
+				mmx?.chargedBubbles?.Add(new BubbleSplashProjCharged(this, pos, xDir, player, time, player.getNextActorNetId(true)));
+				time += 0.2f;
+			}
 		}
 	}
 }
@@ -115,7 +114,7 @@ public class BubbleSplashProj : Projectile {
 }
 
 public class BubbleSplashProjCharged : Projectile {
-	public MegamanX character;
+	public MegamanX? character;
 	public float yPos;
 	public float initTime;
 	public BubbleSplashProjCharged(Weapon weapon, Point pos, int xDir, Player player, float time, ushort netProjId, bool rpc = false) :
@@ -154,7 +153,7 @@ public class BubbleSplashProjCharged : Projectile {
 
 	public override void onDestroy() {
 		if (character != null) {
-			character.chargedBubbles.Remove(this);
+			character?.chargedBubbles?.Remove(this);
 		}
 	}
 }

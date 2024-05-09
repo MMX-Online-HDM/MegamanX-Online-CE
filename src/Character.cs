@@ -278,7 +278,7 @@ public partial class Character : Actor, IDamagable {
 	public float burnHurtCooldown;
 	public Damager burnDamager;
 	public Weapon burnWeapon;
-	public void addBurnTime(Player attacker, Weapon weapon, float time) {
+	public void addBurnTime(Player? attacker, Weapon weapon, float time) {
 		if (!ownedByLocalPlayer) return;
 		if ((this as MegamanX)?.chargedRollingShieldProj != null) return;
 		if (isInvulnerable()) return;
@@ -2948,7 +2948,7 @@ public partial class Character : Actor, IDamagable {
 	public float parasiteTime;
 	public float parasiteMashTime;
 	public Damager parasiteDamager;
-	public BeeSwarm beeSwarm;
+	public BeeSwarm? beeSwarm;
 
 	public void addParasite(Player attacker) {
 		if (!ownedByLocalPlayer) return;

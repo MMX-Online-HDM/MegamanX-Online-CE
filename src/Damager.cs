@@ -328,7 +328,7 @@ public class Damager {
 			if (projId == (int)ProjIds.FireWave) character.addBurnTime(owner, new FireWave(), 0.5f);
 			else if (projId == (int)ProjIds.FireWaveCharged) character.addBurnTime(owner, new FireWave(), 2f);
 			else if (projId == (int)ProjIds.SpeedBurner) character.addBurnTime(owner, new SpeedBurner(null), 1);
-			else if (projId == (int)ProjIds.SpeedBurnerCharged) { if (character != owner.character) character.addBurnTime(owner, new SpeedBurner(null), 1); } else if (projId == (int)ProjIds.Napalm2 || projId == (int)ProjIds.Napalm2Wall) character.addBurnTime(owner, new Napalm(NapalmType.FireGrenade), 1);
+			else if (projId == (int)ProjIds.SpeedBurnerCharged) { if (character != owner?.character) character.addBurnTime(owner, new SpeedBurner(null), 1); } else if (projId == (int)ProjIds.Napalm2 || projId == (int)ProjIds.Napalm2Wall) character.addBurnTime(owner, new Napalm(NapalmType.FireGrenade), 1);
 			else if (projId == (int)ProjIds.Napalm2Flame) character.addBurnTime(owner, new Napalm(NapalmType.FireGrenade), 0.5f);
 			else if (projId == (int)ProjIds.Ryuenjin) character.addBurnTime(owner, new RyuenjinWeapon(owner), 2);
 			else if (projId == (int)ProjIds.FlameBurner) character.addBurnTime(owner, new FlameBurner(0), 0.5f);
@@ -514,10 +514,10 @@ public class Damager {
 				rideArmor.xFlinchPushVel = pushDirection * tempPush;
 			}
 			if (damage > 1 || flinch > 0) {
-				victim.playSound("hurt");
+				victim?.playSound("hurt");
 				rideArmor.playHurtAnim();
 			} else {
-				victim.playSound("hit");
+				victim?.playSound("hit");
 			}
 		}
 		// Maverick section
@@ -645,9 +645,9 @@ public class Damager {
 			if (damage > 0) {
 				if (flinch > 0 && !isOnFlinchCooldown) {
 					if (weakness) {
-						victim.playSound("weakness");
+						victim?.playSound("weakness");
 					} else {
-						victim.playSound("hurt");
+						victim?.playSound("hurt");
 					}
 					if (newState == null) {
 						int hurtDir = -maverick.xDir;
@@ -659,7 +659,7 @@ public class Damager {
 						}
 					}
 				} else {
-					victim.playSound("hit");
+					victim?.playSound("hit");
 				}
 			}
 		}
@@ -671,7 +671,7 @@ public class Damager {
 		}
 
 		if (damage > 0 && character?.isDarkHoldBS.getValue() != true) {
-			victim.addRenderEffect(RenderEffectType.Hit, 0.05f, 0.1f);
+			victim?.addRenderEffect(RenderEffectType.Hit, 0.05f, 0.1f);
 		}
 
 		float finalDamage = damage * owner.getDamageModifier();
@@ -905,7 +905,7 @@ public class Damager {
 		return false;
 	}
 
-	public static DamagerMessage onCrystalDamage(IDamagable damagable, Player attacker, int crystalTime) {
+	public static DamagerMessage? onCrystalDamage(IDamagable damagable, Player attacker, int crystalTime) {
 		var character = damagable as Character;
 		if (character != null && character.ownedByLocalPlayer && character.canCrystalize()) {
 			character.vel.y = 0;
@@ -914,7 +914,7 @@ public class Damager {
 		return null;
 	}
 
-	public static DamagerMessage onAcidDamage(IDamagable damagable, Player attacker, float acidTime) {
+	public static DamagerMessage? onAcidDamage(IDamagable damagable, Player attacker, float acidTime) {
 		(damagable as Character)?.addAcidTime(attacker, acidTime);
 		return null;
 	}
@@ -947,7 +947,7 @@ public class Damager {
 			   projId == (int)ProjIds.NapalmSplashHit;
 	}
 
-	public static DamagerMessage onParasiticBombDamage(IDamagable damagable, Player attacker) {
+	public static DamagerMessage? onParasiticBombDamage(IDamagable damagable, Player attacker) {
 		var chr = damagable as Character;
 		if (chr != null && chr.ownedByLocalPlayer && !chr.hasParasite) {
 			chr.addParasite(attacker);
@@ -957,7 +957,7 @@ public class Damager {
 		return null;
 	}
 
-	public static DamagerMessage onStunShotDamage(IDamagable damagable, Player attacker) {
+	public static DamagerMessage? onStunShotDamage(IDamagable damagable, Player attacker) {
 		var character = damagable as Character;
 		if (character != null && character.ownedByLocalPlayer && !character.isInvulnerable() &&
 			!(character.charState is Hurt) && !(character.charState is Die) &&

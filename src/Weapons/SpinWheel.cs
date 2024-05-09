@@ -32,7 +32,7 @@ public class SpinWheel : Weapon {
 public class SpinWheelProj : Projectile {
 	int started;
 	float startedTime;
-	public Anim sparks;
+	public Anim? sparks;
 	float soundTime;
 	float startMaxTime = 2.5f;
 	float lastHitTime;
@@ -56,8 +56,11 @@ public class SpinWheelProj : Projectile {
 			started = 1;
 			changeSprite("spinwheel_proj", true);
 			useGravity = true;
-			collider.isTrigger = false;
-			collider.wallOnly = true;
+			if (collider != null) {
+				collider.isTrigger = false;
+				collider.wallOnly = true;
+			}
+			
 		}
 		if (started == 1) {
 			startedTime += Global.spf;
@@ -72,7 +75,9 @@ public class SpinWheelProj : Projectile {
 			Helpers.decrementTime(ref lastHitTime);
 			if (Global.level.checkCollisionActor(this, 0, -1) == null) {
 				var collideData = Global.level.checkCollisionActor(this, xDir, 0, vel);
-				if (collideData != null && collideData.hitData != null && !((Point)collideData.hitData.normal).isAngled()) {
+				if (collideData != null && collideData.hitData != null &&
+					collideData.hitData.normal != null && !((Point)collideData.hitData.normal).isAngled()
+				) {
 					xDir *= -1;
 					if (sparks != null) sparks.xDir *= -1;
 					maxTime = startMaxTime;

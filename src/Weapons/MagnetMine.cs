@@ -201,11 +201,14 @@ public class MagnetMineProjCharged : Projectile {
 		var go = other.gameObject;
 		if (go is Projectile) {
 			var proj = go as Projectile;
-			if (!proj.shouldVortexSuck) return;
-			if (proj is MagnetMineProj magnetMine && !magnetMine.canBeSucked(damager.owner.alliance)) return;
-
-			size += proj.damager.damage;
-			proj.destroySelfNoEffect(doRpcEvenIfNotOwned: true);
+			if (proj != null) {
+				if (!proj.shouldVortexSuck) return;
+				if (proj is MagnetMineProj magnetMine && !magnetMine.canBeSucked(damager.owner.alliance)) return;
+				size += proj.damager.damage;
+				proj.destroySelfNoEffect(doRpcEvenIfNotOwned: true);
+			}
+			
+			
 			if (size > 10) {
 				changeSprite("magnetmine_charged3", true);
 				damager.damage = 4;

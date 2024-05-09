@@ -285,7 +285,7 @@ public partial class Player {
 		if (Global.serverClient != null) {
 			string msg = name + " now spectating.";
 			if (newSpectateValue == false) msg = name + " stopped spectating.";
-			Global.level.gameMode.chatMenu.addChatEntry(new ChatEntry(msg, null, null, true), sendRpc: true);
+			Global.level.gameMode.chatMenu.addChatEntry(new ChatEntry(msg, "", null, true), sendRpc: true);
 			RPC.makeSpectator.sendRpc(id, newSpectateValue);
 		} else {
 			isSpectator = newSpectateValue;
@@ -380,7 +380,7 @@ public partial class Player {
 			Global.level.gameMode.chatMenu.addChatEntry(
 				new ChatEntry(
 					name + " was autobalanced to " +
-					GameMode.getTeamName(serverPlayer.autobalanceAlliance.Value), null, null, true
+					GameMode.getTeamName(serverPlayer.autobalanceAlliance.Value), "", null, true
 				), true);
 			forceKill();
 			currency += 5;

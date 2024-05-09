@@ -73,7 +73,7 @@ public class ZeroUppercut : CharState {
 	public bool isHeld = true;
 	public float holdTime;
 	public RyuenjinType type { get { return (RyuenjinType)weapon.type; } }
-	public Zero zero;
+	public Zero? zero;
 
 	public ZeroUppercut(Weapon weapon, bool isUnderwater) : base(getSprite(weapon.type, isUnderwater), "", "") {
 		this.weapon = weapon;
@@ -141,13 +141,17 @@ public class ZeroUppercut : CharState {
 
 		if (canDownSpecial()) {
 			if (player.input.isPressed(Control.Shoot, player) && player.input.isHeld(Control.Down, player)) {
-				if (!player.hasKnuckle()) character.changeState(new ZeroFallStab(zero.zeroDownThrustWeaponA), true);
-				else character.changeState(new DropKickState(), true);
-				return;
+				if (zero != null) {
+					if (!player.hasKnuckle())  character.changeState(new ZeroFallStab(zero.zeroDownThrustWeaponA), true);
+					else character.changeState(new DropKickState(), true);
+					return;
+				}
 			} else if (player.input.isPressed(Control.Special1, player) && player.input.isHeld(Control.Down, player)) {
-				if (!player.hasKnuckle()) character.changeState(new ZeroFallStab(zero.zeroDownThrustWeaponS), true);
-				else character.changeState(new DropKickState(), true);
-				return;
+				if (zero != null) {
+					if (!player.hasKnuckle()) character.changeState(new ZeroFallStab(zero.zeroDownThrustWeaponS), true);
+					else character.changeState(new DropKickState(), true);
+					return;
+				}
 			}
 		}
 

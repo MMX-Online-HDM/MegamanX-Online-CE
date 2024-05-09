@@ -69,8 +69,8 @@ public class RollingShieldProj : Projectile {
 }
 
 public class RollingShieldProjCharged : Projectile {
-	public MegamanX mmx;
-	public LoopingSound rollingShieldSound;
+	public MegamanX? mmx;
+	public LoopingSound? rollingShieldSound;
 	public float ammoDecCooldown = 0;
 	public RollingShieldProjCharged(
 		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId
@@ -84,7 +84,9 @@ public class RollingShieldProjCharged : Projectile {
 		useGravity = false;
 		mmx = (player.character as MegamanX);
 		rollingShieldSound = new LoopingSound("rollingShieldCharge", "rollingShieldChargeLoop", this);
-		mmx.chargedRollingShieldProj = this;
+		if (mmx is not null) {
+			mmx.chargedRollingShieldProj = this;
+		}
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 		shouldVortexSuck = false;
@@ -102,7 +104,7 @@ public class RollingShieldProjCharged : Projectile {
 		}
 		// In case it gets reflected (somehow) it implodes.
 		// This to prevent it from killing X when reflected.
-		if (mmx.player != owner) {
+		if (mmx?.player != owner) {
 			destroySelf();
 			return;
 		}
@@ -127,7 +129,9 @@ public class RollingShieldProjCharged : Projectile {
 	}
 
 	public override void onHitDamagable(IDamagable damagable) {
-		base.onHitDamagable(mmx);
+		if (mmx is not null) {
+			base.onHitDamagable(mmx);
+		}
 		decAmmo(1);
 	}
 
@@ -140,7 +144,9 @@ public class RollingShieldProjCharged : Projectile {
 
 	public override void onDestroy() {
 		if (damager.owner.character != null) {
-			mmx.chargedRollingShieldProj = null;
+			if (mmx is not null) {
+				mmx.chargedRollingShieldProj = null;
+			}
 		}
 		if (rollingShieldSound != null) {
 			rollingShieldSound.destroy();

@@ -15,9 +15,9 @@ public class Shoryuken : CharState {
 	bool jumpedYet;
 	float timeInWall;
 	bool isUnderwater;
-	Anim anim;
+	Anim? anim;
 	float projTime;
-	MegamanX mmx;
+	MegamanX? mmx;
 
 	public Shoryuken(bool isUnderwater) : base("shoryuken", "", "") {
 		this.isUnderwater = isUnderwater;
@@ -87,6 +87,6 @@ public class Shoryuken : CharState {
 			anim = null;
 		}
 		base.onExit(newState);
-		mmx.shoryukenCooldownTime = mmx.maxShoryukenCooldownTime;
+		if (mmx != null) mmx.shoryukenCooldownTime = mmx.maxShoryukenCooldownTime;
 	}
 }

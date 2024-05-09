@@ -83,7 +83,7 @@ public class GigaCrushProj : Projectile {
 }
 
 public class GigaCrushCharState : CharState {
-	GigaCrushProj proj;
+	GigaCrushProj? proj;
 	bool fired;
 	Point moveDir = new(0, -20);
 
