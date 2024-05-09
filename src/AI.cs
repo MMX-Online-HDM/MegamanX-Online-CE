@@ -411,7 +411,7 @@ public class AI {
 							framesChargeHeld = 0;
 						}
 					}
-				} 
+				}
 			}
 			// this makes the AI harder, the lower the number, the more acts the AI will do
 			// at 0.01 is just absurd, the zero AI gets at kaizo levels.
@@ -945,7 +945,7 @@ public class AI {
 		doZeroAI(zero);
 		//WildDance(zero);
 		if (zero.charState.attackCtrl && !player.isDead && zero.sprite.name != null && zero.charState.canAttack() && !zero.isSpriteInvulnerable() && !zero.isInvulnerable()) {
-		int ZSattack = Helpers.randomRange(0, 10);
+			int ZSattack = Helpers.randomRange(0, 10);
 			if (!(zero.sprite.name == "zero_attack" || zero.sprite.name == "zero_attack3" || zero.sprite.name == "zero_attack2")) {
 				switch (ZSattack) {
 					//Randomizador
@@ -966,7 +966,7 @@ public class AI {
 						zero.changeSprite("zero_attack_crouch", true);
 						break;
 					case 4 when zero.charState is Dash && isTargetClose: // If Zero is dashing, press special and do shippuga
-						zero.changeSprite("zero_attack_dash2", true);		
+						zero.changeSprite("zero_attack_dash2", true);
 						break;
 					case 5 when zero.grounded && zero.zeroGigaAttackWeapon.ammo >= 8f: // If Zero is on the ground and has giga attack ammo of at least 8 to above do "Rakuhouha"	
 						player.press(Control.Down);
@@ -983,20 +983,20 @@ public class AI {
 						break;
 					case 9 when zero.charState is Dash && isTargetClose: // Dash slash
 						zero.changeSprite("zero_attack_dash", true);
-					break;
+						break;
 					case 10 when zero.grounded && isTargetClose: // Special attack
 						zero.raijingekiWeapon.attack(zero);
-					break;
+						break;
 				}
 			}
 
 			// Hypermode attacks
 			if (zero.isHyperZero() || zero.isNightmareZeroBS.getValue() && !player.isMainPlayer) {
 				switch (Helpers.randomRange(0, 96)) {
-					case 1: 
+					case 1:
 						zero.changeState(new Rakuhouha(zero.zeroGigaAttackWeapon), true);
 						break;
-					case 2: 
+					case 2:
 						zero.changeState(new ZeroDoubleBuster(true, true), true);
 						break;
 					case 3:
@@ -1007,9 +1007,9 @@ public class AI {
 
 			if (!player.isMainPlayer && isTargetInAir && !zero.grounded && zero.charState is Fall or Jump) {
 				zero.changeState(new ZeroUppercut(new EBladeWeapon(player), zero.isUnderwater()), forceChange: true);
-			}	
+			}
 
-		} 
+		}
 	}
 	public void doKnuckleAI(PunchyZero pzero) {
 		player.release(Control.Shoot);
@@ -1023,7 +1023,7 @@ public class AI {
 		bool isTargetInAir = target.pos.y < character.pos.y - 50;
 		bool isTargetClose = MathF.Abs(target.pos.x - character.pos.x) <= 32;
 		bool canHitMaxCharge = (!isTargetInAir && pzero.getChargeLevel() >= 4);
-		if (isTargetInAir && !pzero.grounded && pzero.charState is Fall or Jump) { 
+		if (isTargetInAir && !pzero.grounded && pzero.charState is Fall or Jump) {
 			pzero.changeState(new PZeroShoryuken(), true);
 		}
 		int ZKattack = Helpers.randomRange(0, 6);
@@ -1031,9 +1031,9 @@ public class AI {
 			switch (ZKattack) {
 				//Randomizador
 				case 0 when pzero.grounded: //Punch
-				//zero.changeSprite(zero.getSprite(zero.charState.attackSprite.Replace("attack", "punch")), true);
-				player.press(Control.Shoot);
-				break;
+											//zero.changeSprite(zero.getSprite(zero.charState.attackSprite.Replace("attack", "punch")), true);
+					player.press(Control.Shoot);
+					break;
 				case 1 when pzero.grounded: //Uppercut 
 					pzero.changeState(new PZeroShoryuken(), true);
 					break;
@@ -1098,7 +1098,7 @@ public class AI {
 			}
 		}
 	}
-	
+
 	public void sigmaAIAttack(Character sigma2) {
 		bool isTargetInAir = target?.pos.y < character.pos.y - 50;
 		bool isTargetBellowYou = target?.pos.y < character.pos.y + 10;
@@ -1122,7 +1122,7 @@ public class AI {
 			if (character is CmdSigma cmdSigma && character.charState is not LadderClimb) {
 				int Sattack = Helpers.randomRange(0, 4);
 				if (isTargetInAir) Sattack = 1;
-				if (cmdSigma.charState.attackCtrl && cmdSigma?.charState?.isGrabbedState == false && !player.isDead 
+				if (cmdSigma.charState.attackCtrl && cmdSigma?.charState?.isGrabbedState == false && !player.isDead
 					&& !cmdSigma.isInvulnerable() && cmdSigma.charState.canAttack() && character.saberCooldown == 0
 					&& !(cmdSigma.charState is CallDownMaverick or SigmaSlashState)) {
 					switch (Sattack) {
@@ -1273,7 +1273,7 @@ public class AI {
 					case 5:
 						player.vileCutterWeapon.vileShoot(WeaponIds.VileCutter, vile);
 						break;
-					case 6 when vile.grounded && player.vileNapalmWeapon.type == (int)NapalmType.FireGrenade || player.vileNapalmWeapon.type == (int)NapalmType.SplashHit :				
+					case 6 when vile.grounded && player.vileNapalmWeapon.type == (int)NapalmType.FireGrenade || player.vileNapalmWeapon.type == (int)NapalmType.SplashHit:
 						player.vileNapalmWeapon.vileShoot(WeaponIds.Napalm, vile);
 						break;
 					case 7 when vile.charState is Fall:
@@ -1594,27 +1594,26 @@ public class AI {
 					player.clearAiInput();
 				}
 			}
-		} 
+		}
 	}
 	public void WildDanceMove(Character zero) {
 		if (character is Zero zero7) {
-		int i = 0;
-			for (i = 0; i < 2; i++) {	
+			int i = 0;
+			for (i = 0; i < 2; i++) {
 				zero7.stopMoving();
-				if(zero7.sprite.name == "zero_attack" && zero7.framePercent > 0.8) 
+				if (zero7.sprite.name == "zero_attack" && zero7.framePercent > 0.8)
 					zero7.changeSprite("zero_attack2", true);
-				if(zero7.sprite.name == "zero_attack2" && zero7.framePercent > 0.8) 
-					zero7.changeSprite("zero_attack3", true);	
-				else if(zero7.sprite.name == "zero_attack3" && zero7.framePercent > 0.8) 
-					zero7.changeSprite("zero_attack", true);	
+				if (zero7.sprite.name == "zero_attack2" && zero7.framePercent > 0.8)
+					zero7.changeSprite("zero_attack3", true);
+				else if (zero7.sprite.name == "zero_attack3" && zero7.framePercent > 0.8)
+					zero7.changeSprite("zero_attack", true);
 			}
 			if (zero7.sprite.name == "zero_attack3" && zero7.framePercent > 0.7 && i == 2) {
-				zero7.changeState(new Rakuhouha(new RakuhouhaWeapon()), true);			
-			}
-			else if(zero7.sprite.name == "zero_rakuhouha" && zero7.framePercent > 0.9) {
+				zero7.changeState(new Rakuhouha(new RakuhouhaWeapon()), true);
+			} else if (zero7.sprite.name == "zero_rakuhouha" && zero7.framePercent > 0.9) {
 				zero7.changeState(new ZeroUppercut(new EBladeWeapon(player), zero7.isUnderwater()), forceChange: true);
 			}
-		}	
+		}
 	}
 	public void doZeroAI(Character zero4) {
 		// Zero:
@@ -1976,7 +1975,7 @@ public class AimAtPlayer : AIState {
 		//		ai.doJump();
 		//	}
 		//} else {
-			//this.changeState(new JumpToWall());
+		//this.changeState(new JumpToWall());
 		//}
 	}
 }
