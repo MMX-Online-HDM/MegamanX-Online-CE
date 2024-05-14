@@ -15,6 +15,8 @@ public class Buster : Weapon {
 		weaponSlotIndex = 121;
 		killFeedIndex = 180;
 		canHealAmmo = false;
+		drawAmmo = false;
+		drawCooldown = false;
 	}
 
 	public static bool isNormalBuster(Weapon weapon) {

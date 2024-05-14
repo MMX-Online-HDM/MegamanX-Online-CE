@@ -50,6 +50,10 @@ public class Weapon {
 	// For double buster shenanigans.
 	public bool forceDefaultXShot = false;
 
+	// HUD related stuff.
+	public bool drawCooldown = true;
+	public bool drawAmmo = true;
+
 	public Weapon() {
 		ammo = 32;
 		maxAmmo = 32;

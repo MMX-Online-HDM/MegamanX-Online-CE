@@ -1708,7 +1708,7 @@ public class GameMode {
 
 		var iconW = 8;
 		var iconH = 8;
-		var width = 20;
+		var width = 15;
 
 		var startX = getWeaponSlotStartX(player, ref iconW, ref iconH, ref width);
 		var startY = Global.screenH - 12;
@@ -1840,7 +1840,15 @@ public class GameMode {
 				offsetX -= width;
 				continue;
 			}
-			drawWeaponSlot(weapon, x, y);
+			if (level.mainPlayer.weapon == weapon && !level.mainPlayer.isSelectingCommand()) {
+				DrawWrappers.DrawRectWH(
+					x - 7, y - 8, 14, 15, false,
+					Color.Black, 1, ZIndex.HUD, false
+				);
+				drawWeaponSlot(weapon, x, y-1, true);
+			} else {
+				drawWeaponSlot(weapon, x, y);
+			}
 		}
 
 		if (player == mainPlayer && mainPlayer.isSelectingCommand()) {
@@ -1862,8 +1870,8 @@ public class GameMode {
 		drawWeaponSlotCooldown(x, y, cooldown);
 	}
 
-	public void drawWeaponSlot(Weapon weapon, float x, float y) {
-		if (weapon is MechMenuWeapon && level.mainPlayer.character?.startRideArmor != null) {
+	public void drawWeaponSlot(Weapon weapon, float x, float y, bool selected = false) {
+		if (weapon is MechMenuWeapon && !mainPlayer.isSpectator && level.mainPlayer.character?.startRideArmor != null) {
 			int index = 37 + level.mainPlayer.character.startRideArmor.raNum;
 			if (index == 42) index = 119;
 			Global.sprites["hud_weapon_icon"].drawToHUD(index, x, y);
@@ -1872,8 +1880,16 @@ public class GameMode {
 		} else if (weapon is not AbsorbWeapon) {
 			Global.sprites["hud_weapon_icon"].drawToHUD(weapon.weaponSlotIndex, x, y);
 		}
-
-		if (weapon.ammo < weapon.maxAmmo && weapon is not UndisguiseWeapon && weapon is not MechMenuWeapon) {
+		if (selected) {
+			if (!weapon.canShoot(0, mainPlayer)) {
+				drawWeaponStateOverlay(x, y, 2);
+			} else if (weapon.shootTime > 0 && weapon.rateOfFire > 10f/60f && weapon.drawCooldown) {
+				drawWeaponStateOverlay(x, y, 1);
+			} else if (selected) {
+				drawWeaponStateOverlay(x, y, 0);
+			}
+		}
+		if (weapon.ammo < weapon.maxAmmo && weapon.drawAmmo) {
 			drawWeaponSlotAmmo(x, y, weapon.ammo / weapon.maxAmmo);
 		}
 
@@ -1914,7 +1930,8 @@ public class GameMode {
 			drawWeaponSlotCooldown(x, y, hb.shootTime / hb.getRateOfFire(level.mainPlayer));
 		} else if (weapon is NovaStrike ns) {
 			drawWeaponSlotCooldown(x, y, ns.shootTime / ns.rateOfFire);
-		} else if (weapon is SigmaMenuWeapon) {
+		}
+		if (weapon is SigmaMenuWeapon) {
 			drawWeaponSlotCooldown(x, y, weapon.shootTime / 4);
 		}
 
@@ -1973,9 +1990,9 @@ public class GameMode {
 			}
 		}
 
-		if (level.mainPlayer.weapon == weapon && !level.mainPlayer.isSelectingCommand()) {
+		/*if (level.mainPlayer.weapon == weapon && !level.mainPlayer.isSelectingCommand()) {
 			drawWeaponSlotSelected(x, y);
-		}
+		}*/
 
 		if (weapon is AxlWeapon && Options.main.axlLoadout.altFireArray[Weapon.wiToFi(weapon.index)] == 1) {
 			Helpers.drawWeaponSlotSymbol(x - 8, y - 8, "B");
@@ -2022,6 +2039,20 @@ public class GameMode {
 			Global.sprites["hud_weapon_icon"].draw(weapon.weaponSlotIndex, Global.level.camX + x, Global.level.camY + y, 1, 1, null, 1, 1, 1, ZIndex.HUD);
 			Global.sprites[aw.absorbedProj.sprite.name].draw(0, Global.level.camX + x, Global.level.camY + y, 1, 1, null, 1, scaleX, scaleY, ZIndex.HUD);
 		}
+	}
+
+	private void drawWeaponStateOverlay(float x, float y, int type) {
+		Color cooldownColour = type switch {
+			1 => new Color(255, 212, 128, 128),
+			2 => new Color(255, 128, 128, 128),
+			_ => new Color(128, 255, 128, 128),
+		};
+		DrawWrappers.DrawRectWH(
+			x - 6f, y - 6f,
+			12f, 12f, filled: false,
+			cooldownColour, 1,
+			1000000L, isWorldPos: false
+		);
 	}
 
 	private void drawWeaponText(float x, float y, string text) {

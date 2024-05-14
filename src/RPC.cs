@@ -635,7 +635,7 @@ public class RPCPlayerToggle : RPC {
 			}
 		} else if (toggleId == RPCToggleType.ReviveSigma) {
 			if (player.character is BaseSigma) {
-				player.reviveSigma(player.character.pos);
+				player.reviveSigmaNonOwner(player.character.pos);
 			}
 		}
 	}

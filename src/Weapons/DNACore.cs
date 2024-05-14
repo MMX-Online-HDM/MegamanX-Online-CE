@@ -9,6 +9,8 @@ public class UndisguiseWeapon : AxlWeapon {
 		index = (int)WeaponIds.Undisguise;
 		weaponSlotIndex = 50;
 		sprite = "axl_arm_pistol";
+		drawAmmo = false;
+		drawCooldown = false;
 	}
 }
 

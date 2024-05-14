@@ -2863,11 +2863,13 @@ public partial class Character : Actor, IDamagable {
 		if (player.isSigma || isToughGuyHyperMode()) {
 			if (miniFlinchTime > 0) return;
 			else {
-				flinchFrames = 0;
+				flinchFrames = 6;
 				miniFlinchTime = 0.1f;
 			}
 		}
-		if (!(charState is Die) && !(charState is InRideArmor) && !(charState is InRideChaser)) {
+		if (charState is not Die and not InRideArmor and not InRideChaser &&
+			(charState is not Hurt hurtState || MathF.Floor(hurtState.stateTime * 60f) >= flinchFrames)
+		) {
 			changeState(new Hurt(dir, flinchFrames, miniFlinchTime, spiked), true);
 		}
 	}

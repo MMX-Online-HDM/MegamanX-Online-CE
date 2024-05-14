@@ -1935,8 +1935,12 @@ public partial class Player {
 		respawnTime = 0;
 		character = limboChar;
 		limboChar = null;
+		if (character?.destroyed == false) {
+			character.destroySelf();
+		}
 		clearSigmaWeapons();
 		maxHealth = MathF.Ceiling(32 * getHealthModifier());
+		/*
 		if (isSigma1()) {
 			if (Global.level.is1v1()) {
 				character.changePos(new Point(Global.level.width / 2, character.pos.y));
@@ -1946,7 +1950,7 @@ public partial class Player {
 			explodeDieEffect.changeSprite("sigma2_revive");
 			character.changeState(new ViralSigmaRevive(explodeDieEffect), true);
 		} else if (character is Doppma) {
-			character.destroySelf();
+		*/
 			KaiserSigma kaiserSigma = new KaiserSigma(
 				this, spawnPoint.x, spawnPoint.y, character.xDir, true,
 				character.netId, character.ownedByLocalPlayer
@@ -1961,21 +1965,21 @@ public partial class Player {
 				spawnPoint = closestSpawn?.pos ?? new Point(Global.level.width / 2, character.pos.y);
 			}
 			character.changeState(new KaiserSigmaRevive(explodeDieEffect, spawnPoint), true);
-		}
+		//}
 		RPC.playerToggle.sendRpc(id, RPCToggleType.ReviveSigma);
 	}
 
 	public void reviveSigmaNonOwner(Point spawnPoint) {
 		clearSigmaWeapons();
 		maxHealth = MathF.Ceiling(32 * getHealthModifier());
-		if (character is Doppma) {
+		//if (character is Doppma) {
 			character.destroySelf();
 			KaiserSigma kaiserSigma = new KaiserSigma(
 				this, spawnPoint.x, spawnPoint.y, character.xDir, true,
 				character.netId, character.ownedByLocalPlayer
 			);
 			character = kaiserSigma;
-		}
+		//}
 		character.changeSprite("sigma3_kaiser_enter", true);
 	}
 

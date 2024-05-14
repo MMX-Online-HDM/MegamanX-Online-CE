@@ -15,6 +15,8 @@ public class MechMenuWeapon : Weapon {
 		index = (int)WeaponIds.MechMenuWeapon;
 		weaponSlotIndex = 46;
 		this.type = (int)type;
+		drawAmmo = false;
+		drawCooldown = false;
 
 		if (type == VileMechMenuType.None) {
 			displayName = "None";
