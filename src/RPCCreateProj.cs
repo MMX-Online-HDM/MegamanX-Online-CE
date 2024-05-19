@@ -118,24 +118,19 @@ public partial class RPCCreateProj : RPC {
 				proj = new ShotgunIceProjCharged(new ShotgunIce(), pos, xDir, player, 1, true, netProjByte);
 				break;
 			case (int)ProjIds.Rakuhouha: {
-					float velX = (float)extraData[1] / 100f;
-					float velY = (float)extraData[2] / 100f;
-					proj = new RakuhouhaProj(
-						RakuhouhaWeapon.netWeapon, pos, false,
-						velX, velY, player, netProjByte, extraData[0]
-					);
-					break;
-				}
+				proj = new RakuhouhaProj(
+					RakuhouhaWeapon.netWeapon, pos, false,
+					extraData[0], player, netProjByte 
+				);
+				break;
+			}
 			case (int)ProjIds.CFlasher: {
-					float velX = (float)extraData[1] / 100f;
-					float velY = (float)extraData[2] / 100f;
-					proj = new RakuhouhaProj(
-						CFlasher.netWeapon, pos, true,
-						velX, velY, player, netProjByte, extraData[0]
-					);
-					break;
-				}
-
+				proj = new RakuhouhaProj(
+					RakuhouhaWeapon.netWeapon, pos, true,
+					extraData[0], player, netProjByte 
+				);
+				break;
+			}
 			case (int)ProjIds.Hadouken:
 				proj = new HadoukenProj(new HadoukenWeapon(player), pos, xDir, player, netProjByte);
 				break;
@@ -344,7 +339,7 @@ public partial class RPCCreateProj : RPC {
 				);
 				break;
 			case (int)ProjIds.Gemnu:
-				proj = new GenmuProj(new Genmu(), pos, xDir, 0, player, netProjByte);
+				proj = new GenmuProj(pos, xDir, extraData[0], player, netProjByte);
 				break;
 			case (int)ProjIds.PeaceOutRoller:
 				proj = new PeaceOutRollerProj(new VileBall(VileBallType.PeaceOutRoller), pos, xDir, player, 0, netProjByte);

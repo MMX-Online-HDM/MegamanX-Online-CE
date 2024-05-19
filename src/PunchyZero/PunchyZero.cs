@@ -152,7 +152,6 @@ public class PunchyZero : Character {
 		}
 		if (yDir == 1 && gigaAttack.shootTime == 0) {
 			gigaAttack.addAmmo(-16, player);
-			gigaAttack.shootTime = gigaAttack.rateOfFire;
 			changeState(new Rakuhouha(gigaAttack), true);
 			return true;
 		}

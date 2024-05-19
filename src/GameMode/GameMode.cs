@@ -642,7 +642,16 @@ public class GameMode {
 				if (count >= 4) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x + 13, y + 11);
 			}
 			if (drawPlayer.character is Zero zero && !drawPlayer.isZBusterZero()) {
-				drawZeroGigaCooldown(zero.zeroGigaAttackWeapon);
+				int posY = 159;
+				if (zero.isNightmareZero) {
+					Global.sprites["hud_killfeed_weapon"].drawToHUD(170, 7, 155);
+					Fonts.drawText(
+						FontType.Grey,
+						"x" + zero.freeBusterShots, 16, 152, Alignment.Left
+					);
+					posY += 12;
+				}
+				drawZeroGigaCooldown(zero.zeroGigaAttackWeapon, y: posY);
 			}
 			if (drawPlayer.character is PunchyZero punchyZero && !drawPlayer.isZBusterZero()) {
 				drawZeroGigaCooldown(punchyZero.gigaAttack);
@@ -1856,13 +1865,13 @@ public class GameMode {
 		}
 	}
 
-	public void drawZeroGigaCooldown(Weapon weapon) {
+	public void drawZeroGigaCooldown(Weapon weapon, int x = 11, int y = 159) {
 		// This runs once per character.
 		if (weapon == null || weapon.shootTime <= 0) {
 			return;
 		}
 		float cooldown = Helpers.progress(weapon.shootTime, weapon.rateOfFire);
-		drawGigaWeaponCooldown(weapon.weaponSlotIndex, 1 - cooldown);
+		drawGigaWeaponCooldown(weapon.weaponSlotIndex, 1 - cooldown, x, y);
 	}
 
 	public void drawGigaWeaponCooldown(int slotIndex, float cooldown, int x = 11, int y = 159) {

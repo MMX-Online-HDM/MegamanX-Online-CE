@@ -1119,11 +1119,15 @@ public partial class Actor : GameObject {
 		}
 	}
 
-	public void addDamageTextHelper(Player attacker, float damage, float maxHealth, bool sendRpc) {
+	public void addDamageTextHelper(
+		Player attacker, float damage, float maxHealth, bool sendRpc
+	) {
 		if (attacker == null) return;
 
 		float reportDamage = Helpers.clampMax(damage, maxHealth);
-		if (attacker.isMainPlayer) {
+		if (damage == Damager.ohkoDamage && damage >= maxHealth) {
+			addDamageText("Instakill!", (int)FontType.RedishOrange);
+		} else if (attacker.isMainPlayer) {
 			addDamageText(reportDamage);
 		} else if (ownedByLocalPlayer && sendRpc) {
 			RPC.addDamageText.sendRpc(attacker.id, netId, reportDamage);
@@ -1139,18 +1143,18 @@ public partial class Actor : GameObject {
 			}
 		}
 		string text = damage.ToString();
-		bool isHeal = false;
+		FontType color = FontType.Red;
 		if (damage < 0) {
 			text = (damage * -1).ToString();
-			isHeal = true;
+			color = FontType.Green;
 		}
 		if (damage != 0 && damage < 1 && damage > -1) {
 			text = text[1..];
 		}
-		damageTexts.Add(new DamageText(text, 0, pos, new Point(xOff, yOff), isHeal));
+		damageTexts.Add(new DamageText(text, 0, pos, new Point(xOff, yOff), (int)color));
 	}
 
-	public void addDamageText(string text, bool isHeal) {
+	public void addDamageText(string text, int color) {
 		int xOff = 0;
 		int yOff = 0;
 		for (int i = damageTexts.Count - 1; i >= 0; i--) {
@@ -1158,7 +1162,7 @@ public partial class Actor : GameObject {
 				yOff -= (6 - (int)damageTexts[i].time);
 			}
 		}
-		damageTexts.Add(new DamageText(text, 0, pos, new Point(xOff, yOff), isHeal));
+		damageTexts.Add(new DamageText(text, 0, pos, new Point(xOff, yOff), color));
 	}
 
 	public void renderDamageText(float yOff) {
@@ -1178,10 +1182,7 @@ public partial class Actor : GameObject {
 				textPosX += MathInt.Floor(dt.offset.x);
 			}
 			float textPosY = dt.pos.y - yOff + dt.offset.y;
-			FontType color = FontType.Red;
-			if (dt.isHeal) {
-				color = FontType.Green;
-			}
+			FontType color = (FontType)dt.color;
 			Fonts.drawText(
 				color, dt.text, textPosX, textPosY,
 				Alignment.Center, isWorldPos: true, depth: ZIndex.HUD

@@ -51,7 +51,7 @@ public class PZeroPunch1 : PZeroGenericMeleeState {
 	}
 
 	public override bool altCtrlUpdate(bool[] ctrls) {
-		if (zero.shootPressTime > 0) {
+		if (zero.shootPressTime > 0 || player.isAI) {
 			zero.changeState(new PZeroPunch2(), true);
 			return true;
 		}

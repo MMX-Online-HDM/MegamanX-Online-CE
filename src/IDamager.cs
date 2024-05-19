@@ -17,13 +17,14 @@ public class DamageText {
 	public Point pos;
 	public Point offset;
 	public Point vel;
-	public bool isHeal;
-	public DamageText(string text, float time, Point pos, Point offset, bool isHeal) {
+	public int color;
+
+	public DamageText(string text, float time, Point pos, Point offset, int color) {
 		this.text = text;
 		this.time = time;
 		this.pos = pos;
 		this.offset = offset;
-		this.isHeal = isHeal;
+		this.color = color;
 		this.vel = new Point(0, 0);
 	}
 }

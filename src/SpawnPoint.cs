@@ -18,8 +18,8 @@ public class SpawnPoint {
 	public bool occupied() {
 		//if(this.name !== "Spawn Point2") return true; //Beginning of level
 		if (Global.level.is1v1() || Global.level.isTraining()) return false;
-		var nearbyChars = getActorsInRadius(pos, 30);
-		if (nearbyChars.Count > 0) return true;
+		//var nearbyChars = getActorsInRadius(pos, 30);
+		//if (nearbyChars.Count > 0) return true;
 		return false;
 	}
 

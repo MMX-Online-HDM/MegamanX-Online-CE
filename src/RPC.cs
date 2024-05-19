@@ -707,7 +707,8 @@ public class RPCActorToggle : RPC {
 			new Anim(actor.pos, "sonicslicer_sparks", actor.xDir, null, true);
 		} else if (toggleId == RPCActorToggleType.StartGravityWell && actor is GravityWellProjCharged gw) {
 			gw.started = true;
-		} else if (toggleId == RPCActorToggleType.AddWolfSigmaMusicSource) {
+		}
+		else if (toggleId == RPCActorToggleType.AddWolfSigmaMusicSource) {
 			actor.addMusicSource("mmx1_wolfsigma", actor.pos.addxy(0, -75), false);
 		} else if (toggleId == RPCActorToggleType.AddWolfSigmaIntroMusicSource) {
 			actor.addMusicSource("mmx1_wolfsigmaintro", actor.pos.addxy(0, -75), false);
@@ -725,7 +726,8 @@ public class RPCActorToggle : RPC {
 		} else if (toggleId == RPCActorToggleType.AddKaiserViralSigmaMusicSource) {
 			actor.destroyMusicSource();
 			actor.addMusicSource("mmx3_doppler", actor.getCenterPos(), true);
-		} else if (toggleId == RPCActorToggleType.StartMechSelfDestruct && actor is RideArmor ra) {
+		}
+		else if (toggleId == RPCActorToggleType.StartMechSelfDestruct && actor is RideArmor ra) {
 			ra.selfDestructTime = Global.spf;
 		} else if (toggleId == RPCActorToggleType.ShakeCamera) {
 			actor.shakeCamera();

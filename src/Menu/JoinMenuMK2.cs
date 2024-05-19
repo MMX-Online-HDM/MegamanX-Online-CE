@@ -356,20 +356,16 @@ public static class MasterServerData {
 		if (portUrl.Length != 2) {
 			return;
 		}
-		bool foundAdress = false;
 		IPAddress[] addresses = System.Net.Dns.GetHostAddresses(
 			portUrl[0], System.Net.Sockets.AddressFamily.InterNetwork
 		);
-		foreach (IPAddress address in addresses) {
-			serverIp = address.ToString();
-			foundAdress = true;
-			break;
+		if (addresses.Length == 0) {
+			return;
 		}
-		if (foundAdress) {
+		if (addresses[0].ToString() != "") {
+			serverIp = addresses[0].ToString();
 			serverPort = Int32.Parse(portUrl[1]);
 		}
-		serverIp = System.Net.Dns.GetHostAddresses(portUrl[0])[0].ToString();
-		serverPort = Int32.Parse(portUrl[1]);
 	}
 }
 #pragma warning restore SYSLIB0014

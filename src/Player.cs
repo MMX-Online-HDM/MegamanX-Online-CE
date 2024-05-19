@@ -392,9 +392,9 @@ public partial class Player {
 	// Shaders
 	public ShaderWrapper xPaletteShader = Helpers.cloneShaderSafe("palette");
 	public ShaderWrapper invisibleShader = Helpers.cloneShaderSafe("invisible");
-	public ShaderWrapper zeroPaletteShader = Helpers.cloneShaderSafe("hyperzero");
+	public ShaderWrapper zeroPaletteShader = Helpers.cloneGenericPaletteShader("hyperZeroPalette");
 	public ShaderWrapper nightmareZeroShader = Helpers.cloneNightmareZeroPaletteShader("paletteNightmareZero");
-	public ShaderWrapper zeroazPaletteShader = Helpers.cloneGenericPaletteShader("hyperAwakenedZeroPalette");
+	public ShaderWrapper zeroAzPaletteShader = Helpers.cloneGenericPaletteShader("hyperAwakenedZeroPalette");
 	public ShaderWrapper axlPaletteShader = Helpers.cloneShaderSafe("hyperaxl");
 	public ShaderWrapper viralSigmaShader = Helpers.cloneShaderSafe("viralsigma");
 	public ShaderWrapper viralSigmaShader2 = Helpers.cloneShaderSafe("viralsigma");
@@ -1065,7 +1065,7 @@ public partial class Player {
 						zero.blackZeroTime = 100000;
 						zero.hyperZeroUsed = true;
 					} else {
-						zero.awakenedZeroTime = Global.spf;
+						zero.awakenedZeroTime = 0;
 						zero.hyperZeroUsed = true;
 						currency = 9999;
 					}
@@ -1495,7 +1495,7 @@ public partial class Player {
 			if (dnaCore.hyperMode == DNACoreHyperMode.BlackZero) {
 				zero.blackZeroTime = zero.maxHyperZeroTime;
 			} else if (dnaCore.hyperMode == DNACoreHyperMode.AwakenedZero) {
-				zero.awakenedZeroTime = Global.spf;
+				zero.awakenedZeroTime = 0;
 			} else if (dnaCore.hyperMode == DNACoreHyperMode.NightmareZero) {
 				zero.isNightmareZero = true;
 			}
@@ -1772,17 +1772,26 @@ public partial class Player {
 	}
 
 	public void awardCurrency() {
-		if (axlBulletType == (int)AxlBulletWeaponType.AncientGun && isAxl) return;
-		if (character?.isCCImmuneHyperMode() == true) return;
-		if (character is Zero zero && (zero.isNightmareZero)) return;
-		//if (character != null && character.isBlackZero2()) return;
-		if (character != null && character.rideArmor != null && character.charState is InRideArmor && character.rideArmor.raNum == 4) return;
-		if (isX && hasUltimateArmor()) return;
-		//if (isX && hasAnyChip() && !hasGoldenArmor()) return;
-		//if (isX && hasGoldenArmor()) return;
+		// Cannot gain scrap or ST.
 		if (Global.level.is1v1()) return;
+		if (axlBulletType == (int)AxlBulletWeaponType.AncientGun && isAxl) return;
 
-		if (isZero || isVile) { fillSubtank(2); } else if (isAxl) { fillSubtank(3); } else if (isX || isSigma) { fillSubtank(4); } else { fillSubtank(4); }
+		// First we fill ST.
+		if (isVile) {
+			fillSubtank(2);
+		} else if (isAxl) {
+			fillSubtank(3);
+		} else {
+			fillSubtank(4);
+		}
+		if (character is Zero zero && zero.isNightmareZero) {
+			zero.freeBusterShots++;
+			return;
+		}
+		// Check for stuff that cannot gain scraps.
+		if (character?.isCCImmuneHyperMode() == true) return;
+		if (character?.rideArmor?.raNum == 4 && character.charState is InRideArmor) return;
+		if (isX && hasUltimateArmor()) return;
 
 		currency++;
 	}
@@ -2297,7 +2306,7 @@ public partial class Player {
 		int? control = Control.controllerNameToMapping[keyboard].GetValueOrDefault(inputMapping);
 		if (control == null) return;
 		Key key = (Key)control;
-		input.keyPressed[key] = !input.keyHeld.ContainsKey(key) || !input.keyHeld[key];
+		input.keyPressed[key] = !input.keyHeld.GetValueOrDefault(key);
 		input.keyHeld[key] = true;
 	}
 

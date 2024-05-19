@@ -130,7 +130,6 @@ public class Rakuhouha : CharState {
 		bool isRakuhouha = type == RakuhouhaType.Rakuhouha;
 		bool isShinMessenkou = type == RakuhouhaType.ShinMessenkou;
 		bool isDarkHold = type == RakuhouhaType.DarkHold;
-		// isDarkHold = true;
 		if (character.frameIndex == 5 && !once && !isDarkHold) {
 			once = true;
 			/*rakuanim = new Anim(
@@ -144,54 +143,68 @@ public class Rakuhouha : CharState {
 		float y = character.pos.y;
 		if (character.frameIndex > 7 && !fired) {
 			fired = true;
-
 			if (isShinMessenkou) {
 				character.playSound("zeroshinmessenkoubullet", forcePlay: false, sendRpc: true);
-				new ShinMessenkouProj(weapon, new Point(x - shinMessenkouWidth, y), character.xDir, player, player.getNextActorNetId(), rpc: true);
-				new ShinMessenkouProj(weapon, new Point(x + shinMessenkouWidth, y), character.xDir, player, player.getNextActorNetId(), rpc: true);
+				new ShinMessenkouProj(
+					weapon, new Point(x - shinMessenkouWidth, y),
+					character.xDir, player, player.getNextActorNetId(), rpc: true
+				);
+				new ShinMessenkouProj(
+					weapon, new Point(x + shinMessenkouWidth, y), character.xDir,
+					player, player.getNextActorNetId(), rpc: true
+				);
 			} else if (isDarkHold) {
 				darkHoldProj = new DarkHoldProj(
 					weapon, new Point(x, y - 20), character.xDir, player, player.getNextActorNetId(), rpc: true
 				);
 			} else {
-				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, -1, 0, player, player.getNextActorNetId(), 180, rpc: true);
-				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, -0.92f, -0.38f, player, player.getNextActorNetId(), 135, rpc: true);
-				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, -0.7f, -0.7f, player, player.getNextActorNetId(), 135, rpc: true);
-				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, -0.38f, -0.92f, player, player.getNextActorNetId(), 135, rpc: true);
-				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, 0, -1, player, player.getNextActorNetId(), 90, rpc: true);
-				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, 0.92f, -0.38f, player, player.getNextActorNetId(), 45, rpc: true);
-				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, 0.71f, -0.71f, player, player.getNextActorNetId(), 45, rpc: true);
-				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, 0.38f, -0.92f, player, player.getNextActorNetId(), 45, rpc: true);
-				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, 1, 0, player, player.getNextActorNetId(), 0, rpc: true);
+				for (int i = 256; i >= 128; i -= 16) {
+					new RakuhouhaProj(
+						weapon, new Point(x, y), isCFlasher, i,
+						player, player.getNextActorNetId(), rpc: true
+					);
+				}
 			}
-
 			if (!isCFlasher && !isDarkHold) {
 				character.shakeCamera(sendRpc: true);
-				character.playSound("rakuhouha", sendRpc: true);
+				character.playSound("voltcStrongBolt", sendRpc: true);
+				character.playSound("morphmCrash", sendRpc: true);
+				//character.playSound("buster2X3", sendRpc: true);
 			} else if (isCFlasher && !isDarkHold) {
+				character.shakeCamera(sendRpc: true);
 				character.playSound("cflasher", sendRpc: true);
 			} else if (!isCFlasher && isDarkHold) {
 				character.playSound("darkhold", forcePlay: false, sendRpc: true);
-				if (Helpers.randomRange(0, 1) == 0) {
+				/*if (Helpers.randomRange(0, 1) == 0) {
 					character.playSound("znnigerunayo", forcePlay: false, sendRpc: true);
 				} else {
 					character.playSound("znowarida", forcePlay: false, sendRpc: true);
-				}
+				}*/
 			}
 		}
-
 		if (!fired2 && isShinMessenkou && character.frameIndex > 11) {
 			fired2 = true;
 			character.playSound("zeroshinmessenkoubullet", forcePlay: false, sendRpc: true);
-			new ShinMessenkouProj(weapon, new Point(x - shinMessenkouWidth * 2, y), character.xDir, player, player.getNextActorNetId(), rpc: true);
-			new ShinMessenkouProj(weapon, new Point(x + shinMessenkouWidth * 2, y), character.xDir, player, player.getNextActorNetId(), rpc: true);
+			new ShinMessenkouProj(
+				weapon, new Point(x - shinMessenkouWidth * 2, y),
+				character.xDir, player, player.getNextActorNetId(), rpc: true
+			);
+			new ShinMessenkouProj(
+				weapon, new Point(x + shinMessenkouWidth * 2, y),
+				character.xDir, player, player.getNextActorNetId(), rpc: true
+			);
 		}
-
 		if (!fired3 && isShinMessenkou && character.frameIndex > 14) {
 			fired3 = true;
 			character.playSound("zeroshinmessenkoubullet", forcePlay: false, sendRpc: true);
-			new ShinMessenkouProj(weapon, new Point(x - shinMessenkouWidth * 3, y), character.xDir, player, player.getNextActorNetId(), rpc: true);
-			new ShinMessenkouProj(weapon, new Point(x + shinMessenkouWidth * 3, y), character.xDir, player, player.getNextActorNetId(), rpc: true);
+			new ShinMessenkouProj(
+				weapon, new Point(x - shinMessenkouWidth * 3, y),
+				character.xDir, player, player.getNextActorNetId(), rpc: true
+			);
+			new ShinMessenkouProj(
+				weapon, new Point(x + shinMessenkouWidth * 3, y),
+				character.xDir, player, player.getNextActorNetId(), rpc: true
+			);
 		}
 
 		if (character.isAnimOver()) {
@@ -212,27 +225,28 @@ public class Rakuhouha : CharState {
 public class RakuhouhaProj : Projectile {
 	bool isCFlasher;
 	public RakuhouhaProj(
-		Weapon weapon, Point pos, bool isCFlasher, float xVel,
-		float yVel, Player player, ushort netProjId, int angle, bool rpc = false
+		Weapon weapon, Point pos, bool isCFlasher, float byteAngle,
+		Player player, ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, xVel >= 0 ? 1 : -1, 300, 4, player, isCFlasher ? "cflasher" : "rakuhouha",
+		weapon, pos, 1, 300, 4, player, isCFlasher ? "cflasher" : "rakuhouha",
 		Global.defFlinch, 1f, netProjId, player.ownedByLocalPlayer
 	) {
 		this.isCFlasher = isCFlasher;
+		byteAngle = byteAngle % 256;
 
-		if (angle == 45) {
+		/*if (angle == 128+16) {
 			var sprite = isCFlasher ? "cflasher_diag" : "rakuhouha_diag";
 			changeSprite(sprite, false);
-		} else if (angle == 90) {
+		} else if (angle == 128+32) {
 			var sprite = isCFlasher ? "cflasher_up" : "rakuhouha_up";
 			changeSprite(sprite, false);
-		} else if (angle == 135) {
+		} else if (angle == 128) {
 			xDir = -1;
 			var sprite = isCFlasher ? "cflasher_diag" : "rakuhouha_diag";
 			changeSprite(sprite, false);
 		} else if (angle == 180) {
 			xDir = -1;
-		}
+		}*/
 
 		if (!isCFlasher) {
 			fadeSprite = "rakuhouha_fade";
@@ -245,17 +259,18 @@ public class RakuhouhaProj : Projectile {
 
 		reflectable = true;
 		projId = (int)ProjIds.Rakuhouha;
-		if (isCFlasher) projId = (int)ProjIds.CFlasher;
-		vel.x = xVel * 300;
-		vel.y = yVel * 300;
+		if (isCFlasher) {
+			projId = (int)ProjIds.CFlasher;
+		}
+		vel.x = 300 * Helpers.cosb(byteAngle);
+		vel.y = 300 * Helpers.sinb(byteAngle);
+		this.byteAngle = byteAngle;
 
 		if (rpc) {
 			rpcCreate(
 				pos, player, netProjId, xDir,
 				new Byte[]{
-					(byte)angle,
-					(byte)MathInt.Round(xVel * 100),
-					(byte)MathInt.Round(yVel * 100)
+					(byte)byteAngle,
 				}
 			);
 		}
@@ -319,6 +334,8 @@ public class Rekkoha : CharState {
 
 		if (character.frameIndex == 5 && !sound) {
 			sound = true;
+			character.shakeCamera(sendRpc: true);
+			character.playSound("crash", sendRpc: true);
 			character.playSound("rekkohax6", sendRpc: true);
 		}
 
@@ -470,15 +487,39 @@ public class RekkohaEffect : Effect {
 		offsetX += pos.x;
 		offsetY += pos.y;
 
-		float alpha = 0.5f;
+		float baseAlpha = 0.4f;
+		float alpha = baseAlpha;
 		if (effectTime < 0.25f) {
-			alpha = 0.5f * (effectTime * 4);
+			alpha = baseAlpha * (effectTime * 4);
 		}
 		if (effectTime > 1.75f) {
-			alpha = 0.5f - 0.5f * ((effectTime - 1.75f) * 4);
+			alpha = baseAlpha - baseAlpha * ((effectTime - 1.75f) * 4);
 		}
 		alpha *= 1.5f;
 
+		for (int i = 0; i < 50 * scale; i++) {
+			float offY = (effectTime * 448) * (i % 2 == 0 ? 1 : -1);
+			while (offY > 596) offY -= 596;
+			while (offY < -596) offY += 596;
+
+			int index = i + (int)(effectTime * 20);
+
+			Global.sprites["rekkoha_effect_strip"].draw(
+				index % 3,
+				offsetX + i * 8, offsetY + offY - 596,
+				1, 1, null, alpha, 1, 1, ZIndex.Backwall + 5
+			);
+			Global.sprites["rekkoha_effect_strip"].draw(
+				index % 3,
+				offsetX + i * 8, offsetY + offY,
+				1, 1, null, alpha, 1, 1, ZIndex.Backwall + 5
+			);
+			Global.sprites["rekkoha_effect_strip"].draw(
+				index % 3,
+				offsetX + i * 8, offsetY + offY + 596,
+				1, 1, null, alpha, 1, 1, ZIndex.Backwall + 5
+			);
+		}
 		for (int i = 0; i < 50 * scale; i++) {
 			float offY = (effectTime * 448) * (i % 2 == 0 ? 1 : -1);
 			while (offY > 596) offY -= 596;

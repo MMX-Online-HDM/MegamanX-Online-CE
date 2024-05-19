@@ -279,9 +279,9 @@ public class HostMenu : IMainMenu {
 			}
 		}
 
-		if (isOffline && botCount == 0) {
+		/*if (isOffline && botCount == 0) {
 			botCount = is1v1 ? 1 : 7;
-		}
+		}*/
 	}
 
 	public void setMenuOptions() {

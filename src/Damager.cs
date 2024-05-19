@@ -423,11 +423,13 @@ public class Damager {
 			}
 
 			if (owner?.character is Zero zero && zero.isBlackZero() && projId != (int)ProjIds.Burn) {
-				if (flinch >= Global.halfFlinch) {
-					flinch = Global.defFlinch;
-				} else {
+				if (flinch <= 0) {
 					flinch = Global.halfFlinch;
 					flinchCooldown = 1;
+				} else if (flinch < Global.halfFlinch) {
+					flinch = Global.halfFlinch;
+				} else if (flinch < Global.defFlinch) {
+					flinch = Global.defFlinch;
 				}
 				damage = MathF.Ceiling(damage * 1.5f);
 			}

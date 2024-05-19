@@ -25,9 +25,9 @@ public class Zero : Character {
 	public float maxZSaberShotCooldown = 0.33f;
 	public float knuckleSoundCooldown;
 
-	public float maxHyperZeroTime = 12;
+	public float maxHyperZeroTime = 15;
 	public float blackZeroTime;
-	public float awakenedZeroTime;
+	public float awakenedZeroTime = -1;
 	public bool hyperZeroUsed;
 	public bool isNightmareZero;
 	//public ShaderWrapper zeroPaletteShader;
@@ -67,6 +67,7 @@ public class Zero : Character {
 		}
 	}
 	public int zeroHyperMode;
+	public int freeBusterShots;
 
 	public Zero(
 		Player player, float x, float y, int xDir,
@@ -135,7 +136,7 @@ public class Zero : Character {
 		base.update();
 		zeroGigaAttackWeapon?.charLinkedUpdate(this, true);
 
-		if (awakenedZeroTime > 0) {
+		if (awakenedZeroTime >= 0) {
 			updateAwakenedZero();
 		}
 		if (isAwakenedZeroBS.getValue()) {
@@ -191,9 +192,11 @@ public class Zero : Character {
 			shootAnimTime -= Global.spf;
 			if (shootAnimTime <= 0) {
 				shootAnimTime = 0;
-				changeSpriteFromName(charState.defaultSprite, false);
-				if (charState is WallSlide) {
-					frameIndex = sprite.frames.Count - 1;
+				if (sprite.name.EndsWith("shoot")) {
+					changeSpriteFromName(charState.defaultSprite, false);
+					if (charState is WallSlide) {
+						frameIndex = sprite.frames.Count - 1;
+					}
 				}
 			}
 		}
@@ -222,8 +225,11 @@ public class Zero : Character {
 		framesSinceLastAttack = Global.level.frameCount - lastAttackFrame;
 
 		if (chargeButtonHeld() && (
-			player.currency > 0 || player.weapon is AssassinBullet
-			) && flag == null && rideChaser == null && rideArmor == null
+				player.currency > 0 && !isNightmareZero ||
+				freeBusterShots > 0 && isNightmareZero ||
+				player.weapon is AssassinBullet
+			) &&
+			flag == null && rideChaser == null && rideArmor == null
 		) {
 			if (!isInvulnerableAttack()) {
 				increaseCharge();
@@ -263,7 +269,7 @@ public class Zero : Character {
 		} else {
 			hyperProgress = 0;
 		}
-		if (hyperProgress >= 1 && player.currency >= Player.zeroHyperCost) {
+		if (hyperProgress >= 1 && player.currency >= Player.zeroHyperCost && charState is not HyperZeroStart) {
 			hyperProgress = 0;
 			changeState(new HyperZeroStart(zeroHyperMode), true);
 		}
@@ -633,7 +639,10 @@ public class Zero : Character {
 
 	public List<BusterProj> zeroLemonsOnField = new List<BusterProj>();
 	private void zeroShoot(int chargeLevel) {
-		if (player.currency <= 0) return;
+		if (player.currency <= 0 && !isNightmareZero || freeBusterShots <= 0 && isNightmareZero) {
+			return;
+		}
+		int currencyUse = 0;
 
 		if (chargeLevel == 0) {
 			for (int i = zeroLemonsOnField.Count - 1; i >= 0; i--) {
@@ -722,19 +731,17 @@ public class Zero : Character {
 					playSound("shingetsurinx5", forcePlay: false, sendRpc: true);
 				}, 0.45f));
 			}
-			if (player.currency < 0) {
-				player.currency = 0;
-			}
+			currencyUse = 1;
 		} else {
 			if (chargeLevel == 1) {
-				player.currency -= 1;
+				currencyUse = 1;
 					playSound("buster2", sendRpc: true);
 					zeroLemonCooldown = 0.375f;
 					new ZBuster2Proj(
 						zeroBusterWeapon, shootPos, xDir, 0, player, player.getNextActorNetId(), rpc: true
 					);
 			} else if (chargeLevel == 2) {
-				player.currency -= 1;
+				currencyUse = 1;
 				zeroLemonCooldown = 0.375f;
 				playSound("buster3", sendRpc: true);
 					new ZBuster3Proj(
@@ -744,9 +751,8 @@ public class Zero : Character {
 					new ZBuster4Proj(
 						zeroBusterWeapon, shootPos, xDir, 0, player, player.getNextActorNetId(), rpc: true
 					);
-				
 			} else if (chargeLevel == 3 || chargeLevel >= 4) {
-				player.currency -= 1;
+				currencyUse = 1;
 				if (chargeLevel >= 4 && canUseDoubleBusterCombo()) {
 					changeState(new ZeroDoubleBuster(false, false), true);
 				} else {
@@ -761,6 +767,13 @@ public class Zero : Character {
 
 		chargeTime = 0;
 		//saberCooldown = 0.5f;
+		if (currencyUse > 0) {
+			if (freeBusterShots > 0) {
+				freeBusterShots--;
+			} else if (player.currency > 0) {
+				player.currency--;
+			}
+		}
 	}
 
 	public bool canUseDoubleBusterCombo() {
@@ -788,28 +801,29 @@ public class Zero : Character {
 
 	// These methods below can't be used by non-owners of the character since the times aren't sync'd. Use the BS states instead
 	public bool isAwakenedZero() {
-		return awakenedZeroTime > 0;
+		return awakenedZeroTime >= 0;
 	}
 
 	public bool isAwakenedGenmuZero() {
-		return awakenedZeroTime > 30;
+		return awakenedZeroTime >= 30 * 60;
 	}
 
-	float awakenedCurrencyTime;
+	public float awakenedCurrencyTime;
 	float awakenedAuraAnimTime;
 	public int awakenedAuraFrame;
 	public void updateAwakenedZero() {
-		awakenedZeroTime += Global.spf;
-		awakenedCurrencyTime += Global.spf;
-		int currencyDeductTime = 2;
-		if (isAwakenedGenmuZero()) currencyDeductTime = 1;
-
+		awakenedZeroTime += Global.speedMul;
+		awakenedCurrencyTime += Global.speedMul;
+		int currencyDeductTime = 60;
+		if (isAwakenedGenmuZero()) {
+			currencyDeductTime = 30;
+		}
 		if (awakenedCurrencyTime > currencyDeductTime) {
 			awakenedCurrencyTime = 0;
 			player.currency--;
 			if (player.currency <= 0) {
 				player.currency = 0;
-				awakenedZeroTime = 0;
+				awakenedZeroTime = -1;
 			}
 		}
 
@@ -914,7 +928,7 @@ public class Zero : Character {
 		if (player.isZero && isAwakenedZeroBS.getValue() && globalCollider != null) {
 			Dictionary<int, Func<Projectile>> retProjs = new() {
 				[(int)ProjIds.AwakenedAura] = () => {
-					//playSound("awakenedaura", forcePlay: true, sendRpc: true); 
+					playSound("awakenedaura", forcePlay: true, sendRpc: true); 
 					Point centerPoint = globalCollider.shape.getRect().center();
 					float damage = 2;
 					int flinch = 0;
@@ -931,6 +945,7 @@ public class Zero : Character {
 					return proj;
 				}
 			};
+			return retProjs;
 		}
 		return base.getGlobalProjs();
 	}
@@ -1025,6 +1040,13 @@ public class Zero : Character {
 		return dashedInAir == 0;
 	}
 
+	public override bool canCrouch() {
+		if (isAttacking()) {
+			return false;
+		}
+		return base.canCrouch();
+	}
+
 	public override List<ShaderWrapper> getShaders() {
 		List<ShaderWrapper> baseShaders = base.getShaders();
 		List<ShaderWrapper> shaders = new();
@@ -1046,7 +1068,7 @@ public class Zero : Character {
 			palette = player.nightmareZeroShader;
 		}
 		if (isAwakenedZeroBS.getValue()) {
-			palette = player.zeroazPaletteShader;
+			palette = player.zeroAzPaletteShader;
 		}
 		if (palette != null) {
 			shaders.Add(palette);

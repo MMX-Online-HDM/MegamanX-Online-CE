@@ -100,6 +100,9 @@ public class Options {
 	public bool maverickStartFollow = true;
 	public bool puppeteerCancel;
 
+	// Punchy Zero
+	public PZeroLoadout pzeroLoadout = new PZeroLoadout();
+
 	private static Options _main;
 
 	public static Options main {

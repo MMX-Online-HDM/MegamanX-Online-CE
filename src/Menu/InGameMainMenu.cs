@@ -27,7 +27,9 @@ public class InGameMainMenu : IMainMenu {
 		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 			if (selectY == 0) {
 				if (isSelWepDisabled()) return;
-				if (Global.level.mainPlayer.realCharNum == 4) {
+				if (Global.level.mainPlayer.realCharNum == (int)CharIds.PunchyZero) {
+					Menu.change(new SelectPunchyZeroWeaponMenu(this, true));
+				} if (Global.level.mainPlayer.realCharNum == 4) {
 					Menu.change(new SelectSigmaWeaponMenu(this, true));
 				} else if (Global.level.mainPlayer.realCharNum == 3) {
 					Menu.change(new SelectAxlWeaponMenu(this, true));
@@ -75,7 +77,7 @@ public class InGameMainMenu : IMainMenu {
 	}
 
 	public bool isSelWepDisabled() {
-		return Global.level.is1v1();
+		return Global.level.is1v1() || mainPlayer.realCharNum == (int)CharIds.BusterZero;
 	}
 
 	public bool isSelArmorDisabled() {

@@ -1421,13 +1421,7 @@ public class OptionsMenu : IMainMenu {
 	}
 
 	public string getWindowedResolution() {
-		if (Options.main.windowScale == 1) return "298x224";
-		else if (Options.main.windowScale == 2) return "596x448";
-		else if (Options.main.windowScale == 3) return "894x672";
-		else if (Options.main.windowScale == 4) return "1192x896";
-		else if (Options.main.windowScale == 5) return "1490x1120";
-		else if (Options.main.windowScale == 6) return "1788x1344";
-		else throw new Exception("Invalid window scale.");
+		return $"{Global.screenW * Options.main.windowScale}x{Global.screenH * Options.main.windowScale}";
 	}
 
 	public string helpText = "";

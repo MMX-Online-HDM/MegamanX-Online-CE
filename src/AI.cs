@@ -31,6 +31,9 @@ public class AI {
 
 	public Player player { get { return character.player; } }
 
+	public int targetUpdateFrame;
+	public static int targetUpdateCounter;
+
 	public AI(Character character) {
 		this.character = character;
 		aiState = new AimAtPlayer(this.character);
@@ -41,6 +44,11 @@ public class AI {
 		axlAccuracy = Helpers.randomRange(10, 30);
 		mashType = Helpers.randomRange(0, 2);
 		if (Global.level.isTraining()) mashType = 0;
+		targetUpdateFrame = targetUpdateCounter;
+		targetUpdateCounter++;
+		if (targetUpdateCounter >= Server.maxPlayerCap / 2) {
+			targetUpdateCounter = 0;
+		}
 	}
 
 	public void doJump(float jumpTime = 0.75f) {
@@ -161,12 +169,12 @@ public class AI {
 		}
 	}
 	//End of Ride Chaser AI
+
 	public virtual void update() {
 		if (Global.level.isRace() && Global.level.supportsRideChasers && Global.level.levelData.raceOnly) {
 			raceChaserAI();
 			return;
 		}
-
 		if (Global.debug || Global.level.isTraining()) {
 			if (trainingBehavior == AITrainingBehavior.Idle) {
 				player.release(Control.Shoot);
@@ -197,11 +205,10 @@ public class AI {
 				return;
 			}
 		}
-
-		if (Global.level.gameMode.isOver) return;
-
-		var gameMode = Global.level.gameMode;
-		if (!player.isMainPlayer && player.isX &&
+		if (Global.level.gameMode.isOver) {
+			return;
+		}
+		if (!player.isMainPlayer && character is MegamanX &&
 			player.aiArmorUpgradeIndex < player.aiArmorUpgradeOrder.Count && !Global.level.is1v1()
 		) {
 			var upgradeNumber = player.aiArmorUpgradeOrder[player.aiArmorUpgradeIndex];
@@ -219,7 +226,7 @@ public class AI {
 				player.aiArmorUpgradeIndex++;
 			}
 		}
-		if (!player.isMainPlayer && player.isVile) {
+		if (!player.isMainPlayer && character is Vile) {
 			if (player.currency >= 3 && !player.frozenCastle) {
 				player.frozenCastle = true;
 				player.currency -= Vile.frozenCastleCost;
@@ -238,8 +245,7 @@ public class AI {
 				player.character?.addHealth(player.maxHealth - currentMaxHp);
 			}
 		}
-
-		if (framesChargeHeld > 0) {
+		if (framesChargeHeld > 0 && character is MegamanX) {
 			if (character.chargeTime < maxChargeTime) {
 				//console.log("HOLD");
 				player.press(Control.Shoot);
@@ -249,13 +255,18 @@ public class AI {
 				//this.player.release(control.Shoot.key);
 			}
 		}
-
-		if (target != null && !Global.level.gameObjects.Contains(target)) {
+		if (target != null && target.destroyed) {
 			target = null;
 		}
-
-		target = Global.level.getClosestTarget(character.pos, player.alliance, true, isRequesterAI: true);
-
+		if (!Global.isSkippingFrames && Global.level.nonSkippedframeCount % 60 == targetUpdateFrame) {
+			if (target != null && !Global.level.gameObjects.Contains(target)) {
+				target = null;
+			}
+			target = Global.level.getClosestTarget(
+				character.pos, player.alliance, true, isRequesterAI: true,
+				aMaxDist: 250
+			);
+		}
 		if (character is KaiserSigma || character is BaseSigma sigma && sigma.isHyperSigma) {
 			int attack = Helpers.randomRange(0, 1);
 			if (attack == 0) {
@@ -314,10 +325,11 @@ public class AI {
 			target = null;
 		} else if (Global.level.gameMode is CTF) {
 			/*
-			foreach (var player in Global.level.players)
-			{
-				if (player.character != null && player.alliance != character.player.alliance && player.character.flag != null)
-				{
+			foreach (var player in Global.level.players) {
+				if (player.character != null &&
+					player.alliance != character.player.alliance &&
+					player.character.flag != null
+				) {
 					target = player.character;
 					break;
 				}
@@ -363,7 +375,11 @@ public class AI {
 			if (player.isAxl) {
 				player.axlCursorPos = target.pos
 					.addxy(-Global.level.camX, -Global.level.camY)
-					.addxy(Helpers.randomRange(-axlAccuracy, axlAccuracy), Helpers.randomRange(-axlAccuracy, axlAccuracy));
+					.addxy(Helpers.randomRange(
+						-axlAccuracy, axlAccuracy
+					), Helpers.randomRange(
+						-axlAccuracy, axlAccuracy
+					));
 			}
 		}
 
@@ -371,7 +387,7 @@ public class AI {
 		if (character is MegamanX mmx4) {
 			dommxAI(mmx4);
 		} else if (character is Zero zero) {
-			//doZeroAI(zero);
+			doZeroAI(zero);
 		} else if (character is BaseSigma sigma4) {
 			doSigmaAI(sigma4);
 		} else if (character is Vile vile4) {
@@ -380,16 +396,17 @@ public class AI {
 			doAxlAI(axl4);
 		} else if (character is PunchyZero pzero) {
 			doKnuckleAI(pzero);
+		} else if (character is BusterZero bzero) {
+			doBusterZeroAI(bzero);
 		}
 
 		//Should AI Attack?
 		if (aiState.shouldAttack && target != null) {
 			if (shootTime == 0) {
-
 				if (character is MegamanX mmx2) {
 					mmxAIAttack(mmx2);
 				} else if (character is Zero zero2) {
-					zeroAIAttack(zero2);
+					//zeroAIAttack(zero2);
 				} else if (character is BaseSigma sigma2) {
 					sigmaAIAttack(sigma2);
 				} else if (character is Vile vile2) {
@@ -400,6 +417,7 @@ public class AI {
 					busterZeroAIAttack(zero);
 				} else if (character is PunchyZero pzero) {
 					KnuckleZeroAIAttack(pzero);
+					return;
 				}
 
 				// is Facing the target?
@@ -417,7 +435,7 @@ public class AI {
 			// at 0.01 is just absurd, the zero AI gets at kaizo levels.
 			// can possibly cause bugs if you put that value
 			// funny enough fighting Nightmare Zero with 0.01 is pretty much as MMX6 LV 4 Xtreme mode :skull:
-			shootTime += Global.spf;
+		shootTime += Global.spf;
 			if (shootTime > 0.08) {
 				shootTime = 0;
 			}
@@ -425,6 +443,7 @@ public class AI {
 		//End of AI should attack
 
 		//The AI should dodge if a projectile is close to him
+		/*
 		if (aiState.shouldDodge && target != null) {
 			if (character is Zero zero3) {
 				zeroAIDodge(zero3);
@@ -445,20 +464,15 @@ public class AI {
 				busterzeroAIDodge(bzero);
 			}
 		}
+		*/
 		//End of The AI Dodging
 
 		//The AI should randomly charge weapon?
 		//I truly wonder why GM19 made only X charge weapons	
-		if (aiState.randomlyChargeWeapon &&
-			(player.isX || player.isZSaber() || player.isAxl) &&
+		if (aiState.randomlyChargeWeapon && character is MegamanX or Axl &&
 			framesChargeHeld == 0 && player.character?.canCharge() == true
 		) {
 			if (Helpers.randomRange(0, 20) < 1) {
-				if (player.isZSaber()) {
-					if (Helpers.randomRange(0, 50) < 1) {
-						maxChargeTime = 4.25f;
-					}
-				}
 				if (player.isAxl) {
 					if (player.weapon is AxlBullet || player.weapon is DoubleBullet) {
 						character?.increaseCharge();
@@ -467,7 +481,6 @@ public class AI {
 					maxChargeTime = 4.25f;
 				}
 				framesChargeHeld = 1;
-				player.press(Control.Shoot);
 			}
 		}
 		//End of Randomly Charge Weapon
@@ -480,15 +493,16 @@ public class AI {
 			}
 		}
 
-		if (aiState.randomlyDash && character?.charState is not WallKick && !inNodeTransition && stuckTime == 0) {
-			if (Helpers.randomRange(0, 100) < 1) {
-				dashTime = Helpers.randomRange(0.3f, 0.5f);
-			}
-			if (dashTime > 0) {
-				player.press(Control.Dash);
-				dashTime -= Global.spf;
-				if (dashTime < 0) dashTime = 0;
-			}
+		if (aiState.randomlyDash && character != null &&
+			character.charState is not WallKick &&
+			character.grounded &&
+			!inNodeTransition && stuckTime == 0 &&
+			character.charState.normalCtrl &&
+			character.charState is not Dash or AirDash or UpDash
+		) {
+			character.changeState(
+				new Dash(Control.Dash)
+			);
 		}
 
 		if (aiState.randomlyJump && !inNodeTransition && stuckTime == 0) {
@@ -597,7 +611,6 @@ public class AI {
 						// If X AI is facing Zero or Sigma
 						if (target is Zero or CmdSigma or NeoSigma or Doppma) {
 							switch (Helpers.randomRange(0, 10)) {
-
 								// SpeedBurner	
 								case 0:
 									if (isTargetClose)
@@ -1012,12 +1025,17 @@ public class AI {
 		}
 	}
 	public void doKnuckleAI(PunchyZero pzero) {
-		player.release(Control.Shoot);
-		player.release(Control.Special1);
+		if (!pzero.attackCtrl() && pzero.getChargeLevel() > 0) {
+			pzero.increaseCharge();
+		}
+	}
+	public void doBusterZeroAI(BusterZero bzero) {
+		if (!bzero.attackCtrl()) {
+			bzero.increaseCharge();
+		}
 	}
 	public void KnuckleZeroAIAttack(PunchyZero pzero) {
-		if (target == null) {
-			pzero.increaseCharge();
+		if (target == null || !pzero.charState.attackCtrl) {
 			return;
 		}
 		bool isTargetInAir = target.pos.y < character.pos.y - 50;
@@ -1027,33 +1045,37 @@ public class AI {
 			pzero.changeState(new PZeroShoryuken(), true);
 		}
 		int ZKattack = Helpers.randomRange(0, 6);
-		if (pzero.charState.canAttack()) {
-			switch (ZKattack) {
-				//Randomizador
-				case 0 when pzero.grounded: //Punch
-											//zero.changeSprite(zero.getSprite(zero.charState.attackSprite.Replace("attack", "punch")), true);
-					player.press(Control.Shoot);
-					break;
-				case 1 when pzero.grounded: //Uppercut 
-					pzero.changeState(new PZeroShoryuken(), true);
-					break;
-				case 2 when pzero.charState is Dash: // If Zero is dashing, Spin Kick
-					pzero.changeState(new PZeroKick(), true);
-					break;
-				case 3 when pzero.grounded && pzero.gigaAttack.ammo >= 16: // If Zero is on the ground and has giga attack ammo of at least 8 to above do "Rakuhouha"
-					pzero.changeState(new Rakuhouha(pzero.gigaAttack), true);
-					pzero.gigaAttack.addAmmo(-16, player);
-					break;
-				case 4 when pzero.grounded: // Megapunch 
-					pzero.changeState(new PZeroYoudantotsu(), true);
-					break;
-				case 5 when pzero.charState is Fall: // if the character is on fall state, Drop Kick
-					pzero.changeState(new PZeroDropKickState(), true);
-					break;
-				case 6 when pzero.charState is Jump or Fall: // if the character is on Jump or Fall, Air Kick
-					pzero.changeState(new PZeroKick(), true);
-					break;
-			}
+		//Randomizer.
+		switch (ZKattack) {
+			// Punch.
+			case 0 when pzero.grounded: 
+				pzero.changeState(new PZeroPunch1(), true);
+				break;
+			// Uppercut.
+			case 1 when pzero.grounded:
+				pzero.changeState(new PZeroShoryuken(), true);
+				break;
+			// If Zero is dashing, Spin Kick.
+			case 2 when pzero.charState is Dash:
+				pzero.changeState(new PZeroKick(), true);
+				break;
+			// If Zero is on the ground and has giga attack ammo of at least 8 to above do "Rakuhouha"
+			case 3 when pzero.grounded && pzero.gigaAttack.ammo >= 16:
+				pzero.changeState(new Rakuhouha(pzero.gigaAttack), true);
+				pzero.gigaAttack.addAmmo(-16, player);
+				break;
+			// Megapunch.
+			case 4 when pzero.grounded:
+				pzero.changeState(new PZeroYoudantotsu(), true);
+				break;
+			// If the character is on fall state, Drop Kick.
+			case 5 when pzero.charState is Fall: 
+				pzero.changeState(new PZeroDropKickState(), true);
+				break;
+			// if the character is on Jump or Fall, Air Kick.
+			case 6 when pzero.charState is Jump or Fall:
+				pzero.changeState(new PZeroKick(), true);
+				break;
 		}
 	}
 	public void busterZeroAIAttack(BusterZero zero) {
@@ -1615,35 +1637,40 @@ public class AI {
 			}
 		}
 	}
-	public void doZeroAI(Character zero4) {
-		// Zero:
-		if (character is Zero zero1) {
-			if (player.isZSaber() && !zero1.isAwakenedZeroBS.getValue() && !(zero1.charState is HyperZeroStart or DarkHoldState or Hurt) && zero1.sprite.name != null) {
-				// huhahu section
-				if (zero1.grounded && zero1.sprite.name == "zero_attack" || zero1.sprite.name == "zero_attack_dash" && zero1.framePercent > 0.5) {
-					zero1.changeSprite("zero_attack2", true);
-					zero1.turnToInput(player.input, player);
-					zero1.playSound("saber2", sendRpc: true);
-				} else if (zero1.grounded && zero1.sprite.name == "zero_attack2" && zero1.framePercent > 0.65) {
-					zero1.changeSprite("zero_attack3", true);
-					zero1.turnToInput(player.input, player);
-					zero1.playSound("saber3", sendRpc: true);
-				}
-				  // Do Rising if is at 50% of the animation of third slash
-				  else if (zero1.grounded && zero1.sprite.name == "zero_attack3" && zero1.framePercent > 0.65) {
-					zero1.changeState(new ZeroUppercut(new RisingWeapon(zero1.player), zero1.isUnderwater()), forceChange: true);
-				}
-				// Do Hyouretsuzan if is at 50% of the animation of rising
-				else if (zero1.sprite.name == "zero_rising" && zero1.framePercent > 0.6f) {
-					zero1.changeState(new ZeroFallStab(new HyouretsuzanWeapon(player)), forceChange: true);
-				}
-				if (!zero1.grounded && zero1.zeroAirSpecialWeapon.type == (int)AirSpecialType.Kuuenzan && !zero1.isAttacking() && zero1.charState.canAttack() && !(zero1.sprite.name == "zero_attack_air2")) {
-					player.press(Control.Special1); //Do Kuuenzan even if he is not attacking
-				} else if (!zero1.grounded && zero1.isAttacking() && zero1.charState.canAttack() && zero1.sprite.name == "zero_attack_air2" && zero1.framePercent > 0.65 && !(zero1.sprite.name == "zero_attack_air")) {
-					player.press(Control.Shoot);
-					player.release(Control.Special1);
-					// Do air slash
-				}
+	public void doZeroAI(Zero zero) {
+		if (!zero.isAwakenedZeroBS.getValue() && !(zero.charState is HyperZeroStart or DarkHoldState or Hurt) &&
+			zero.sprite.name != null
+		) {
+			// Huhahu section
+			if (zero.grounded && zero.sprite.name == "zero_attack" || zero.sprite.name == "zero_attack_dash" && zero.framePercent > 0.5) {
+				zero.changeSprite("zero_attack2", true);
+				zero.turnToInput(player.input, player);
+				zero.playSound("saber2", sendRpc: true);
+			} else if (zero.grounded && zero.sprite.name == "zero_attack2" && zero.framePercent > 0.65) {
+				zero.changeSprite("zero_attack3", true);
+				zero.turnToInput(player.input, player);
+				zero.playSound("saber3", sendRpc: true);
+			}
+			// Do Rising if is at 50% of the animation of third slash
+			else if (zero.grounded && zero.sprite.name == "zero_attack3" && zero.framePercent > 0.65) {
+				zero.changeState(new ZeroUppercut(new RisingWeapon(zero.player), zero.isUnderwater()), forceChange: true);
+			}
+			// Do Hyouretsuzan if is at 50% of the animation of rising
+			else if (zero.sprite.name == "zero_rising" && zero.framePercent > 0.6f) {
+				zero.changeState(new ZeroFallStab(new HyouretsuzanWeapon(player)), forceChange: true);
+			}
+			// Do Kuuenzan even if he is not attacking
+			else if (!zero.grounded && zero.zeroAirSpecialWeapon.type == (int)AirSpecialType.Kuuenzan &&
+				!zero.isAttacking() && zero.charState.canAttack() && !(zero.sprite.name == "zero_attack_air2")
+			) {
+				player.press(Control.Special1); 
+			}
+			// Do air slash
+			else if (!zero.grounded && zero.isAttacking() &&
+				zero.charState.canAttack() && zero.sprite.name == "zero_attack_air2" &&
+				zero.framePercent > 0.65 && !(zero.sprite.name == "zero_attack_air")) {
+				player.press(Control.Shoot);
+				player.release(Control.Special1);
 			}
 		}
 	}

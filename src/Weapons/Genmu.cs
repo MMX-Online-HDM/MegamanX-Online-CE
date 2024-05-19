@@ -3,6 +3,8 @@
 namespace MMXOnline;
 
 public class Genmu : Weapon {
+	public static Genmu netWeapon = new();
+
 	public Genmu() : base() {
 		index = (int)WeaponIds.Gemnu;
 		killFeedIndex = 84;
@@ -13,8 +15,12 @@ public class GenmuProj : Projectile {
 	public int type = 0;
 	public float initY = 0;
 
-	public GenmuProj(Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 300, 12, player, "genmu_proj", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public GenmuProj(
+		Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		Genmu.netWeapon, pos, xDir, 300, 12, player, "genmu_proj",
+		Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		this.type = type;
 		initY = pos.y;
 		maxTime = 0.5f;
@@ -24,7 +30,7 @@ public class GenmuProj : Projectile {
 		projId = (int)ProjIds.Gemnu;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, player, netProjId, xDir, type);
 		}
 	}
 
@@ -49,13 +55,19 @@ public class GenmuState : CharState {
 		if (character.frameIndex >= 8 && !fired) {
 			fired = true;
 			character.playSound("genmureix5", sendRpc: true);
-			new GenmuProj(new Genmu(), character.pos.addxy(30 * character.xDir, -25), character.xDir, 0, player, player.getNextActorNetId(), rpc: true);
-			new GenmuProj(new Genmu(), character.pos.addxy(30 * character.xDir, -25), character.xDir, 1, player, player.getNextActorNetId(), rpc: true);
+			new GenmuProj(
+				character.pos.addxy(30 * character.xDir, -25),
+				character.xDir, 0, player, player.getNextActorNetId(), rpc: true
+			);
+			new GenmuProj(
+				character.pos.addxy(30 * character.xDir, -25),
+				character.xDir, 1, player, player.getNextActorNetId(), rpc: true
+			);
 		}
 		if (character.frameIndex == 1) {
 			if (character is Zero zero) {
 				if (zero.isNightmareZeroBS.getValue()) {
-					character.playSound("znshine", sendRpc: true);					
+					character.playSound("znshine", sendRpc: true);
 				}
 			}
 		}

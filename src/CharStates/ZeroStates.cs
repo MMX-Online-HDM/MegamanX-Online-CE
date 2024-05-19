@@ -13,7 +13,7 @@ public class HyperZeroStart : CharState {
 	Zero zero;
 
 	public HyperZeroStart(int type) : base(
-		type == 2 ? "hyper_start3" : 
+		type == 2 ? "hyper_start" : 
 		type == 1 ? "hyper_start2" : "hyper_start", "", "", "") {
 		invincible = true;
 	}
@@ -26,16 +26,15 @@ public class HyperZeroStart : CharState {
 			} else if (character is Zero zero) {
 				time = Global.spf;
 				radius = 0;
-				if (player.isZBusterZero()) {
-					zero.blackZeroTime = 9999;
-					RPC.actorToggle.sendRpc(character.netId, RPCActorToggleType.ActivateBlackZero2);
-				} else if (zero.zeroHyperMode == 0) {
+				if (zero.zeroHyperMode == 0) {
 					zero.blackZeroTime = zero.maxHyperZeroTime + 1;
 					RPC.setHyperZeroTime.sendRpc(character.player.id, zero.blackZeroTime, 0);
 				} else if (zero.zeroHyperMode == 1) {
-					zero.awakenedZeroTime = Global.spf;
+					zero.zeroShinMessenkouWeapon.ammo = zero.zeroGigaAttackWeapon.ammo;
+					zero.awakenedZeroTime = 0;
 					RPC.setHyperZeroTime.sendRpc(character.player.id, zero.awakenedZeroTime, 2);
 				} else if (zero.zeroHyperMode == 2) {
+					zero.zeroDarkHoldWeapon.ammo = zero.zeroGigaAttackWeapon.ammo;
 					zero.isNightmareZero = true;
 				}
 				character.playSound("ching");
@@ -62,8 +61,7 @@ public class HyperZeroStart : CharState {
 		if (zero.hyperZeroUsed) {
 			return;
 		}
-		if (base.player.isZBusterZero() || zero.zeroHyperMode == 0) {
-			character.player.currency -= 10;
+		if (zero.zeroHyperMode == 0) {
 			drWilyAnim = new Anim(
 				character.pos.addxy(50 * character.xDir, 0f),
 				"LightX3", -character.xDir,
@@ -72,6 +70,7 @@ public class HyperZeroStart : CharState {
 			);
 			drWilyAnim.fadeIn = true;
 			character.playSound("blackzeroentry", forcePlay: false, sendRpc: true);
+			character.player.currency -= 10;
 		} else if (zero.zeroHyperMode == 1) {
 			drWilyAnim = new Anim(
 				character.pos.addxy(30 * character.xDir, -30), "drwily", -character.xDir,
@@ -79,17 +78,19 @@ public class HyperZeroStart : CharState {
 			);
 			drWilyAnim.fadeIn = true;
 			drWilyAnim.blink = true;
-			character.player.awakenedCurrencyEnd = (character.player.currency - 10);
+			character.player.awakenedCurrencyEnd = (character.player.currency - 5);
 			character.playSound("awakenedzeroentry", forcePlay: false, sendRpc: true);
 		} else if (zero.zeroHyperMode == 2) {
-			drWilyAnim = new Anim(
+			/*drWilyAnim = new Anim(
 				character.pos.addxy(30 * character.xDir, -30), "gate", -character.xDir,
 				player.getNextActorNetId(), false, sendRpc: true
 			);
 			drWilyAnim.fadeIn = true;
-			drWilyAnim.blink = true;
-			character.player.currency -= 10;
+			drWilyAnim.blink = true;*/
 			character.playSound("nightmarezeroentry", forcePlay: false, sendRpc: true);
+			zero.freeBusterShots = 10;
+			character.player.currency -= 10;
+			zero.zeroDarkHoldWeapon.ammo = zero.zeroGigaAttackWeapon.ammo;
 		}
 		zero.hyperZeroUsed = true;
 	}
@@ -98,11 +99,18 @@ public class HyperZeroStart : CharState {
 		base.onExit(newState);
 		character.useGravity = true;
 		drWilyAnim?.destroySelf();
-		if (character != null) {
-			character.invulnTime = 0.5f;
-		}
-		if (character is Zero zero) {
-			zero.hyperZeroUsed = false;
+		character.invulnTime = 0.5f;
+		zero.hyperZeroUsed = false;
+
+		if (zero.zeroHyperMode == 0) {
+			zero.blackZeroTime = zero.maxHyperZeroTime + 0.5f;
+			RPC.setHyperZeroTime.sendRpc(zero.player.id, zero.blackZeroTime, 0);
+		} else if (zero.zeroHyperMode == 1) {
+			zero.awakenedCurrencyTime = -30;
+			RPC.setHyperZeroTime.sendRpc(zero.player.id, zero.awakenedZeroTime, 2);
+		} else if (zero.zeroHyperMode == 2) {
+			zero.isNightmareZero = true;
+			zero.freeBusterShots = 10;
 		}
 	}
 
