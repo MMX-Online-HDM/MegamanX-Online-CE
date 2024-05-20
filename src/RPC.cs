@@ -709,23 +709,23 @@ public class RPCActorToggle : RPC {
 			gw.started = true;
 		}
 		else if (toggleId == RPCActorToggleType.AddWolfSigmaMusicSource) {
-			actor.addMusicSource("mmx1_wolfsigma", actor.pos.addxy(0, -75), false);
+			actor.addMusicSource("wolfSigma", actor.pos.addxy(0, -75), false);
 		} else if (toggleId == RPCActorToggleType.AddWolfSigmaIntroMusicSource) {
-			actor.addMusicSource("mmx1_wolfsigmaintro", actor.pos.addxy(0, -75), false);
+			actor.addMusicSource("wolfSigmaIntro", actor.pos.addxy(0, -75), false, loop: false);
 		} else if (toggleId == RPCActorToggleType.AddDrLightMusicSource) {
-			actor.addMusicSource("mmx1_drlight", actor.getCenterPos(), false);
+			actor.addMusicSource("drLigth_X1", actor.getCenterPos(), false, loop: false);
 		} else if (toggleId == RPCActorToggleType.AddDrDopplerMusicSource) {
-			actor.addMusicSource("mmx3_doppler", actor.getCenterPos(), false);
+			actor.addMusicSource("demo_X3", actor.getCenterPos(), false, loop: false);
 		} else if (toggleId == RPCActorToggleType.AddGoliathMusicSource) {
-			actor.addMusicSource("mmx3_dopplerbattle", actor.getCenterPos(), true);
+			actor.addMusicSource("vile_X3", actor.getCenterPos(), true);
 		} else if (toggleId == RPCActorToggleType.AddViralSigmaMusicSource) {
-			actor.addMusicSource("mmx2_judgementday", actor.getCenterPos(), true);
+			actor.addMusicSource("virusSigma", actor.getCenterPos(), true);
 		} else if (toggleId == RPCActorToggleType.AddKaiserSigmaMusicSource) {
 			actor.destroyMusicSource();
-			actor.addMusicSource("mmx3_kaisersigma", actor.getCenterPos(), true);
+			actor.addMusicSource("kaiserSigma", actor.getCenterPos(), true);
 		} else if (toggleId == RPCActorToggleType.AddKaiserViralSigmaMusicSource) {
 			actor.destroyMusicSource();
-			actor.addMusicSource("mmx3_doppler", actor.getCenterPos(), true);
+			actor.addMusicSource("demo_X3", actor.getCenterPos(), true);
 		}
 		else if (toggleId == RPCActorToggleType.StartMechSelfDestruct && actor is RideArmor ra) {
 			ra.selfDestructTime = Global.spf;

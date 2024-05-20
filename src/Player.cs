@@ -635,15 +635,15 @@ public partial class Player {
 	public float getMaxHealth() {
 		// 1v1 is the only mode without possible heart tanks/sub tanks
 		if (Global.level.is1v1()) {
-			return MathF.Ceiling(32 * getHealthModifier());
+			return MathF.Ceiling(28 * getHealthModifier());
 		}
 		int bonus = 0;
 		if (isSigma && isPuppeteer()) bonus = 4;
 		float hpModifier = getHealthModifier();
 		if (hpModifier < 1) {
-			return MathF.Ceiling((16 + bonus) * hpModifier) + heartTanks * getHeartTankModifier();
+			return MathF.Ceiling((20 + bonus) * hpModifier) + heartTanks * getHeartTankModifier();
 		}
-		return MathF.Ceiling((16 + bonus + (heartTanks * getHeartTankModifier())) * hpModifier);
+		return MathF.Ceiling((20 + bonus + (heartTanks * getHeartTankModifier())) * hpModifier);
 	}
 
 	public void creditHealing(float healAmount) {

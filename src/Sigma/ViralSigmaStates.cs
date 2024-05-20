@@ -449,7 +449,7 @@ public class ViralSigmaRevive : CharState {
 			if (explodeDieEffect == null || explodeDieEffect.destroyed) {
 				state = 1;
 				character.frameSpeed = 1;
-				character.addMusicSource("mmx2_judgementday", character.pos, true);
+				character.addMusicSource("virusSigma", character.pos, true);
 				RPC.actorToggle.sendRpc(character.netId, RPCActorToggleType.AddViralSigmaMusicSource);
 				character.visible = true;
 			}

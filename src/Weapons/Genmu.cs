@@ -30,7 +30,7 @@ public class GenmuProj : Projectile {
 		projId = (int)ProjIds.Gemnu;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir, type);
+			rpcCreate(pos, player, netProjId, xDir, (byte)type);
 		}
 	}
 

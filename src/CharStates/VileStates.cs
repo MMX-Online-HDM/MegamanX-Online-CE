@@ -106,7 +106,7 @@ public class VileRevive : CharState {
 		base.onEnter(oldState);
 		//character.setzIndex(ZIndex.Foreground);
 		character.playSound("revive");
-		character.addMusicSource("mmx3_doppler", character.getCenterPos(), false);
+		character.addMusicSource("demo_X3", character.getCenterPos(), false, loop: false);
 		if (!isMK5) {
 			drDopplerAnim = new Anim(character.pos.addxy(30 * character.xDir, -15), "drdoppler", -character.xDir, null, false);
 			drDopplerAnim.fadeIn = true;

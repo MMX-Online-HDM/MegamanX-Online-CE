@@ -122,13 +122,48 @@ public partial class Character : Actor, IDamagable {
 	public int wallKickDir;
 	public float maxWallKickTime = 12;
 
+	// Char Ids.
+	public CharIds charId;
+
+	// Random stuff.
+	public List<Tuple<string, int>> lastDTInputs = new List<Tuple<string, int>>();
+	public string holdingDTDash = "";
+	const int doubleDashFrames = 20;
+	public float dropFlagProgress;
+	public float dropFlagCooldown;
+	public bool dropFlagUnlocked;
+	long originalZIndex;
+	bool viralOnce;
+
+	// Status effects.
+	// Acid
+	public Damager? acidDamager;
+	public float acidTime;
+	public float acidHurtCooldown;
+	// Infected
+	public Damager? infectedDamager;
 	public float infectedTime;
-	public Damager infectedDamager;
+	// Oil
+	public Damager? oilDamager;
+	public float oilTime;
+	// Burn
+	public Damager? burnDamager;
+	public Weapon? burnWeapon;
+	public float burnTime;
+	public float burnEffectTime;
+	public float burnHurtCooldown;
+	// Ice
+	public float slowdownTime;
+	// Parasite.
+	public Damager? parasiteDamager;
+	public ParasiteAnim? parasiteAnim;
+	public bool hasParasite { get { return parasiteTime > 0; } }
+	public float parasiteTime;
+	public float parasiteMashTime;
 	
+
 	public float vaccineTime;
 	public float vaccineHurtCooldown;
-
-	public CharIds charId;
 
 	// Main character class starts here.
 	public Character(
@@ -136,7 +171,7 @@ public partial class Character : Actor, IDamagable {
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
 		bool isWarpIn = true, bool mk2VileOverride = false, bool mk5VileOverride = false
 	) : base(
-		null, new Point(x, y), netId, ownedByLocalPlayer, dontAddToLevel: true
+		"mmx_idle", new Point(x, y), netId, ownedByLocalPlayer, dontAddToLevel: true
 	) {
 		this.player = player;
 		this.xDir = xDir;
@@ -230,9 +265,6 @@ public partial class Character : Actor, IDamagable {
 		changeState(new DarkHoldState(this), true);
 	}
 
-	public float acidTime;
-	public float acidHurtCooldown;
-	public Damager acidDamager;
 	public void addAcidTime(Player attacker, float time) {
 		if (!ownedByLocalPlayer) return;
 		if ((this as MegamanX)?.chargedRollingShieldProj != null) return;
@@ -249,8 +281,6 @@ public partial class Character : Actor, IDamagable {
 		if (acidTime > 8) acidTime = 8;
 	}
 
-	public float oilTime;
-	public Damager oilDamager;
 	public void addOilTime(Player attacker, float time) {
 		if (!ownedByLocalPlayer) return;
 		if ((this as MegamanX)?.chargedRollingShieldProj != null) return;
@@ -273,11 +303,6 @@ public partial class Character : Actor, IDamagable {
 		}
 	}
 
-	public float burnTime;
-	public float burnEffectTime;
-	public float burnHurtCooldown;
-	public Damager burnDamager;
-	public Weapon burnWeapon;
 	public void addBurnTime(Player? attacker, Weapon weapon, float time) {
 		if (!ownedByLocalPlayer) return;
 		if ((this as MegamanX)?.chargedRollingShieldProj != null) return;
@@ -343,9 +368,9 @@ public partial class Character : Actor, IDamagable {
 		}
 		if (palette != null) shaders.Add(palette);
 
-		if (player.isPossessed()) {
-			player.possessedShader?.SetUniform("palette", 1);
-			player.possessedShader?.SetUniform("paletteTexture", Global.textures["palettePossessed"]);
+		if (player.isPossessed() && player.possessedShader != null) {
+			player.possessedShader.SetUniform("palette", 1);
+			player.possessedShader.SetUniform("paletteTexture", Global.textures["palettePossessed"]);
 			shaders.Add(player.possessedShader);
 		}
 
@@ -366,37 +391,37 @@ public partial class Character : Actor, IDamagable {
 		}
 
 		if (acidTime > 0 && player.acidShader != null) {
-			player.acidShader?.SetUniform("acidFactor", 0.25f + (acidTime / 8f) * 0.75f);
+			player.acidShader.SetUniform("acidFactor", 0.25f + (acidTime / 8f) * 0.75f);
 			shaders.Add(player.acidShader);
 		}
 		if (oilTime > 0 && player.oilShader != null) {
-			player.oilShader?.SetUniform("oilFactor", 0.25f + (oilTime / 8f) * 0.75f);
+			player.oilShader.SetUniform("oilFactor", 0.25f + (oilTime / 8f) * 0.75f);
 			shaders.Add(player.oilShader);
 		}
 		if (vaccineTime > 0 && player.vaccineShader != null) {
-			player.vaccineShader?.SetUniform("vaccineFactor", vaccineTime / 8f);
+			player.vaccineShader.SetUniform("vaccineFactor", vaccineTime / 8f);
 			//vaccineShader?.SetUniform("vaccineFactor", 1f);
 			shaders.Add(player.vaccineShader);
 		}
 		if (igFreezeProgress > 0 && !sprite.name.Contains("frozen") && player.igShader != null) {
-			player.igShader?.SetUniform("igFreezeProgress", igFreezeProgress / 4);
+			player.igShader.SetUniform("igFreezeProgress", igFreezeProgress / 4);
 			shaders.Add(player.igShader);
 		}
 		if (infectedTime > 0 && player.infectedShader != null) {
-			player.infectedShader?.SetUniform("infectedFactor", infectedTime / 8f);
+			player.infectedShader.SetUniform("infectedFactor", infectedTime / 8f);
 			shaders.Add(player.infectedShader);
-		} else if (player.isVile && isFrozenCastleActiveBS.getValue()) {
+		} else if (player.isVile && isFrozenCastleActiveBS.getValue() && player.frozenCastleShader != null) {
 			shaders.Add(player.frozenCastleShader);
 		}
 
-		if (!isCStingInvisibleGraphics()) {
+		if (!isCStingInvisibleGraphics() && player.invisibleShader != null) {
 			if (renderEffects.ContainsKey(RenderEffectType.Invisible) && alpha == 1) {
-				player.invisibleShader?.SetUniform("alpha", 0.33f);
+				player.invisibleShader.SetUniform("alpha", 0.33f);
 				shaders.Add(player.invisibleShader);
 			}
 			// alpha float doesn't work if one or more shaders exist. So need to use the invisible shader instead
 			else if (alpha < 1 && shaders.Count > 0) {
-				player.invisibleShader?.SetUniform("alpha", alpha);
+				player.invisibleShader.SetUniform("alpha", alpha);
 				shaders.Add(player.invisibleShader);
 			}
 		}
@@ -766,16 +791,6 @@ public partial class Character : Actor, IDamagable {
 		}
 	}
 
-	public List<Tuple<string, int>> lastDTInputs = new List<Tuple<string, int>>();
-	public string holdingDTDash;
-	const int doubleDashFrames = 20;
-	public float slowdownTime;
-	public float dropFlagProgress;
-	public float dropFlagCooldown;
-	public bool dropFlagUnlocked;
-	long originalZIndex;
-	bool viralOnce;
-
 	public override void update() {
 		if (charState is not InRideChaser) {
 			camOffsetX = MathInt.Round(Helpers.lerp(camOffsetX, 0, 10));
@@ -990,7 +1005,7 @@ public partial class Character : Actor, IDamagable {
 			flag.changePos(getCenterPos());
 		}
 
-		if (!Global.level.hasGameObject(startRideArmor)) {
+		if (startRideArmor != null &&!Global.level.hasGameObject(startRideArmor)) {
 			startRideArmor = null;
 		}
 
@@ -1057,10 +1072,6 @@ public partial class Character : Actor, IDamagable {
 		}
 
 		updateParasite();
-
-		if (beeSwarm != null) {
-			beeSwarm.update();
-		}
 
 		if (stingChargeTime > 0) {
 			if (player.isX) {
@@ -1400,14 +1411,18 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public Point getCharRideArmorPos() {
-		if (rideArmor.currentFrame.POIs.Count == 0) return new Point();
+		if (rideArmor == null || rideArmor.currentFrame.POIs.Count == 0) {
+			return new Point();
+		}
 		var charPos = rideArmor.currentFrame.POIs[0];
 		charPos.x *= xDir;
 		return charPos;
 	}
 
 	public Point getMK5RideArmorPos() {
-		if (rideArmorPlatform.currentFrame.POIs.Count == 0) return new Point();
+		if (rideArmorPlatform == null || rideArmorPlatform.currentFrame.POIs.Count == 0) {
+			return new Point();
+		}
 		var charPos = rideArmorPlatform.currentFrame.POIs[0];
 		charPos.x *= xDir;
 		return charPos;
@@ -1427,8 +1442,10 @@ public partial class Character : Actor, IDamagable {
 		base.changeSprite(spriteName, resetFrame);
 	}
 
-	public bool isHeadbuttSprite(string sprite) {
-		if (sprite == null) return false;
+	public bool isHeadbuttSprite(string? sprite) {
+		if (sprite == null) {
+			return false;
+		}
 		return sprite.EndsWith("jump") || sprite.EndsWith("up_dash") || sprite.EndsWith("wall_kick");
 	}
 
@@ -1516,14 +1533,18 @@ public partial class Character : Actor, IDamagable {
 		if (isWarpIn()) return true;
 		if (!factorHyperMode && isInvulnBS.getValue()) return true;
 		if (factorHyperMode && isInvulnBS.getValue() && !isCCImmuneHyperMode()) return true;
-		if (!ignoreRideArmorHide && charState is InRideArmor && (charState as InRideArmor).isHiding) return true;
+		if (!ignoreRideArmorHide && charState is InRideArmor && (charState as InRideArmor)?.isHiding == true) {
+			return true;
+		}
 		if (!ignoreRideArmorHide && !string.IsNullOrEmpty(sprite?.name) && sprite.name.Contains("ra_hide")) return true;
 		if (specialState == (int)SpecialStateIds.AxlRoll ||
 			specialState == (int)SpecialStateIds.XTeleport
 		) {
 			return true;
 		}
-		if (sprite.name.Contains("viral_exit")) return true;
+		if (sprite != null && sprite.name.Contains("viral_exit")) {
+			return true;
+		}
 		if (charState is WarpOut) return true;
 		if (charState is WolfSigmaRevive || charState is ViralSigmaRevive || charState is KaiserSigmaRevive) return true;
 		return false;
@@ -2489,8 +2510,8 @@ public partial class Character : Actor, IDamagable {
 		decimal originalDamage = damage;
 		decimal originalHP = (decimal)player.health;
 		decimal decimalHP = (decimal)player.health;
-		Axl axl = this as Axl;
-		MegamanX mmx = this as MegamanX;
+		Axl? axl = this as Axl;
+		MegamanX? mmx = this as MegamanX;
 
 		if (attacker == player && axl?.isWhiteAxl() == true) {
 			damage = 0;
@@ -2839,9 +2860,7 @@ public partial class Character : Actor, IDamagable {
 		dropFlagProgress = 0;
 		this.flag = flag;
 		stingChargeTime = 0;
-		if (beeSwarm != null) {
-			beeSwarm.destroy();
-		}
+
 		if (this is MegamanX mmx) {
 			if (mmx.chargedRollingShieldProj != null) {
 				mmx.chargedRollingShieldProj.destroySelf();
@@ -2849,6 +2868,9 @@ public partial class Character : Actor, IDamagable {
 			mmx.popAllBubbles();
 			mmx.stockedCharge = false;
 			mmx.stockedX3Buster = false;
+			if (mmx.beeSwarm != null) {
+				mmx.beeSwarm.destroy();
+			}
 		}
 		if (player.isDisguisedAxl && player.ownedByLocalPlayer) {
 			player.revertToAxl();
@@ -2875,7 +2897,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public override void destroySelf(
-		string spriteName = null, string fadeSound = null,
+		string spriteName = "", string fadeSound = "",
 		bool disableRpc = false, bool doRpcEvenIfNotOwned = false,
 		bool favorDefenderProjDestroy = false
 	) {
@@ -2944,14 +2966,6 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	// PARASITE SECTION
-
-	public ParasiteAnim parasiteAnim;
-	public bool hasParasite { get { return parasiteTime > 0; } }
-	public float parasiteTime;
-	public float parasiteMashTime;
-	public Damager parasiteDamager;
-	public BeeSwarm? beeSwarm;
-
 	public void addParasite(Player attacker) {
 		if (!ownedByLocalPlayer) return;
 
@@ -2969,7 +2983,7 @@ public partial class Character : Actor, IDamagable {
 			foreach (var otherPlayer in Global.level.players) {
 				if (otherPlayer.character == null) continue;
 				if (otherPlayer == player) continue;
-				if (otherPlayer == parasiteDamager.owner) continue;
+				if (otherPlayer == parasiteDamager?.owner) continue;
 				if (otherPlayer.character.isInvulnerable()) continue;
 				if (Global.level.gameMode.isTeamMode && otherPlayer.alliance != player.alliance) continue;
 				if (otherPlayer.character.getCenterPos().distanceTo(getCenterPos()) > ParasiticBomb.carryRange) continue;
@@ -3085,6 +3099,9 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public bool canEjectFromRideArmor() {
+		if (rideArmor == null) {
+			return true;
+		}
 		var shape = globalCollider.shape;
 		if (shape.minY < 0 && shape.maxY < 0) {
 			shape = shape.clone(0, MathF.Abs(shape.maxY) + 1);
@@ -3151,7 +3168,7 @@ public partial class Character : Actor, IDamagable {
 				);
 			}
 		} else {
-			rideArmor.changeState(new RACalldown(pos, false), true);
+			rideArmor?.changeState(new RACalldown(pos, false), true);
 		}
 	}
 

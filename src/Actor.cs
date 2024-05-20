@@ -1246,7 +1246,7 @@ public partial class Actor : GameObject {
 
 	//Optionally take in a sprite to draw when destroyed
 	public virtual void destroySelf(
-		string spriteName = null, string fadeSound = null,
+		string spriteName = "", string fadeSound = "",
 		bool disableRpc = false, bool doRpcEvenIfNotOwned = false,
 		bool favorDefenderProjDestroy = false
 	) {
@@ -1265,7 +1265,7 @@ public partial class Actor : GameObject {
 		//console.log("DESTROYING")
 		Global.level.removeGameObject(this);
 		ushort spriteNameIndex = ushort.MaxValue;
-		if (spriteName != null) {
+		if (!String.IsNullOrEmpty(spriteName)) {
 			var anim = new Anim(getCenterPos(), spriteName, xDir, null, true);
 			// TODO: Fix this. WTF GM19.
 			if (spriteName != "explosion") {
@@ -1280,7 +1280,7 @@ public partial class Actor : GameObject {
 			spriteNameIndex = Global.spriteIndexByName[spriteName];
 		}
 		ushort fadeSoundIndex = ushort.MaxValue;
-		if (fadeSound != null) {
+		if (!String.IsNullOrEmpty(null)) {
 			fadeSound = fadeSound.ToLowerInvariant();
 			playSound(fadeSound);
 			fadeSoundIndex = Global.soundIndexByName[fadeSound];
@@ -1583,7 +1583,7 @@ public partial class Actor : GameObject {
 		return pos.add(deltaPos.times(pingSeconds / Global.spf));
 	}
 
-	public void addMusicSource(string musicName, Point worldPos, bool moveWithActor) {
+	public void addMusicSource(string musicName, Point worldPos, bool moveWithActor, bool loop = true) {
 		var ms = Global.musics[musicName].clone();
 		ms.musicSourcePos = worldPos;
 		ms.musicSourceActor = this;

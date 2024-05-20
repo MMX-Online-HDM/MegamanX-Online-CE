@@ -15,7 +15,7 @@ public class RideArmor : Actor, IDamagable {
 
 	public RideArmorState rideArmorState;
 	public Character mk5Rider;
-	public Character character;
+	public Character? character;
 	public Character grabbedCharacter;
 	public bool changedStateInFrame;
 	public bool isDashing;
@@ -220,7 +220,7 @@ public class RideArmor : Actor, IDamagable {
 		}
 
 		if (raNum == 4 && character != null && musicSource == null) {
-			addMusicSource("mmx3_dopplerbattle", getCenterPos(), true);
+			addMusicSource("vile_X3", getCenterPos(), true);
 		}
 		if (character == null && musicSource != null) {
 			destroyMusicSource();
@@ -664,7 +664,7 @@ public class RideArmor : Actor, IDamagable {
 		}
 	}
 
-	public void addDamageText(string text) {
+	public void addDamageText(string text, FontType color) {
 		int xOff = 0;
 		int yOff = 0;
 
@@ -673,7 +673,7 @@ public class RideArmor : Actor, IDamagable {
 				yOff -= (6 - (int)damageTexts[i].time);
 			}
 		}
-		damageTexts.Add(new DamageText(text, 0, pos, new Point(xOff, yOff), false));
+		damageTexts.Add(new DamageText(text, 0, pos, new Point(xOff, yOff), (int)color));
 	}
 
 	public void playHurtAnim() {

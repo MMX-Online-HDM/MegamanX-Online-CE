@@ -85,7 +85,7 @@ public class CharState {
 		}
 	}
 
-	public virtual void onExit(CharState newState) {
+	public virtual void onExit(CharState? newState) {
 		if (!useGravity) {
 			character.useGravity = true;
 		}
@@ -1866,7 +1866,7 @@ public class GenericGrabbedState : CharState {
 	public GenericGrabbedState(
 		Actor grabber, float maxGrabTime, string grabSpriteSuffix,
 		bool reverseZIndex = false, bool freeOnHitWall = true,
-		bool lerp = true, string additionalGrabSprite = null, float maxNotGrabbedTime = 0.5f
+		bool lerp = true, string additionalGrabSprite = "", float maxNotGrabbedTime = 0.5f
 	) : base(
 		"grabbed"
 	) {

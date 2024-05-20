@@ -44,14 +44,14 @@ public partial class Character {
 	// NET CHAR STATE 1 SECTION
 	public byte netCharState1;
 
-	public NetCharBoolState isFrozenCastleActiveBS;
-	public NetCharBoolState isStrikeChainHookedBS;
-	public NetCharBoolState shouldDrawArmBS;
-	public NetCharBoolState isAwakenedZeroBS;
-	public NetCharBoolState isAwakenedGenmuZeroBS;
-	public NetCharBoolState isInvisibleBS;
-	public NetCharBoolState isHyperXBS;
-	public NetCharBoolState isHyperSigmaBS;
+	public NetCharBoolState isFrozenCastleActiveBS = null!;
+	public NetCharBoolState isStrikeChainHookedBS = null!;
+	public NetCharBoolState shouldDrawArmBS = null!;
+	public NetCharBoolState isAwakenedZeroBS = null!;
+	public NetCharBoolState isAwakenedGenmuZeroBS = null!;
+	public NetCharBoolState isInvisibleBS = null!;
+	public NetCharBoolState isHyperXBS = null!;
+	public NetCharBoolState isHyperSigmaBS = null!;
 
 	public void initNetCharState1() {
 		isFrozenCastleActiveBS = new NetCharBoolState(this, 0, NetCharBoolStateNum.One, (character) => {
@@ -97,14 +97,14 @@ public partial class Character {
 	// NET CHAR STATE 2 SECTION
 	public byte netCharState2;
 
-	public NetCharBoolState isHyperChargeActiveBS;
-	public NetCharBoolState isSpeedDevilActiveBS;
-	public NetCharBoolState isInvulnBS;
-	public NetCharBoolState hasUltimateArmorBS;
-	public NetCharBoolState isDefenderFavoredBS;
-	public NetCharBoolState hasSubtankCapacityBS;
-	public NetCharBoolState isNightmareZeroBS;
-	public NetCharBoolState isDarkHoldBS;
+	public NetCharBoolState isHyperChargeActiveBS = null!;
+	public NetCharBoolState isSpeedDevilActiveBS = null!;
+	public NetCharBoolState isInvulnBS = null!;
+	public NetCharBoolState hasUltimateArmorBS = null!;
+	public NetCharBoolState isDefenderFavoredBS = null!;
+	public NetCharBoolState hasSubtankCapacityBS = null!;
+	public NetCharBoolState isNightmareZeroBS = null!;
+	public NetCharBoolState isDarkHoldBS = null!;
 
 	public void initNetCharState2() {
 		isHyperChargeActiveBS = new NetCharBoolState(this, 0, NetCharBoolStateNum.Two, (character) => { return character.player.showHyperBusterCharge(); });
