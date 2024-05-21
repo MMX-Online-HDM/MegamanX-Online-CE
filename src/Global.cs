@@ -598,9 +598,9 @@ public partial class Global {
 		if (!playIfExists && sounds.Any(s => s.soundBuffer.soundKey == soundKey)) {
 			return;
 		}
-		SoundWrapper sound = new SoundWrapper(soundBuffers[soundKey], null);
-		Global.sounds.Add(sound);
-		sound.sound.Play();
+		SoundWrapper soundWrapper = new SoundWrapper(soundBuffers[soundKey], null);
+		Global.sounds.Add(soundWrapper);
+		soundWrapper.sound.Play();
 	}
 
 	public static void changeMusic(string newMusic) {
