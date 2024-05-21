@@ -171,7 +171,7 @@ public partial class Character : Actor, IDamagable {
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
 		bool isWarpIn = true, bool mk2VileOverride = false, bool mk5VileOverride = false
 	) : base(
-		"mmx_idle", new Point(x, y), netId, ownedByLocalPlayer, dontAddToLevel: true
+		null!, new Point(x, y), netId, ownedByLocalPlayer, dontAddToLevel: true
 	) {
 		this.player = player;
 		this.xDir = xDir;
