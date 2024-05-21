@@ -358,8 +358,7 @@ class Program {
 						Global.sounds.RemoveAt(i);
 					}
 				}
-
-				Global.music.update();
+				Global.music?.update();
 			}
 
 			Global.input.clearInput();
