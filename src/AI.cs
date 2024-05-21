@@ -264,7 +264,7 @@ public class AI {
 			}
 			target = Global.level.getClosestTarget(
 				character.pos, player.alliance, true, isRequesterAI: true,
-				aMaxDist: 250
+				aMaxDist: 400
 			);
 		}
 		if (character is KaiserSigma || character is BaseSigma sigma && sigma.isHyperSigma) {
