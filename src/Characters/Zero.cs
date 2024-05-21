@@ -143,29 +143,21 @@ public class Zero : Character {
 			updateAwakenedAura();
 		}
 		Helpers.decrementTime(ref blackZeroTime);
-		if (!Global.level.is1v1()) {
-			/*if (isBlackZero()) {
+		// Hypermode music.
+		if (!Global.level.isHyper1v1()) {
+			if (isBlackZero()) {
+				addMusicSource("Zero_X1", getCenterPos(), true);
+			} else if (isAwakenedZero() && ownedByLocalPlayer) {
 				if (musicSource == null) {
-					switch (Helpers.randomRange(0, 1)) {
-						case 0:
-							addMusicSource("ThemeOfZero", getCenterPos(), true);
-							break;
-						case 1:
-							addMusicSource("MMX3-Zero", getCenterPos(), true);
-							break;
-					}
+					addMusicSource("XvsZeroV2_megasfc", getCenterPos(), true);
 				}
-			} else if (isAwakenedZero()) {
+			} else if (isNightmareZero && ownedByLocalPlayer) {
 				if (musicSource == null) {
-					addMusicSource("XvsZeroV2-megasfc", getCenterPos(), true);
-				}
-			} else if (isNightmareZero) {
-				if (musicSource == null) {
-					addMusicSource("XvsZeroV1-megasfc", getCenterPos(), true);
+					addMusicSource("XvsZeroV1_megasfc", getCenterPos(), true);
 				}
 			} else {
 				destroyMusicSource();
-			}*/
+			}
 		}
 		if (!ownedByLocalPlayer) {
 			return;

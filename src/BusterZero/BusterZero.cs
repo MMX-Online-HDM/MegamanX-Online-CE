@@ -35,6 +35,16 @@ public class BusterZero : Character {
 		if (!ownedByLocalPlayer) {
 			return;
 		}
+		// Hypermode music.
+		if (!Global.level.isHyper1v1()) {
+			if (isBlackZero) {
+				if (musicSource == null) {
+					addMusicSource("Zero_X3", getCenterPos(), true);
+				}
+			} else {
+				destroyMusicSource();
+			}
+		}
 		// Cooldowns.
 		Helpers.decrementTime(ref zSaberCooldown);
 		Helpers.decrementTime(ref lemonCooldown);

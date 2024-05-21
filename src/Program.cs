@@ -352,7 +352,7 @@ class Program {
 				}
 				for (int i = Global.sounds.Count - 1; i >= 0; i--) {
 					Global.sounds[i].update();
-					if (!Global.sounds[i].deleted && Global.sounds[i].sound.Status == SoundStatus.Stopped) {
+					if (Global.sounds[i].deleted || Global.sounds[i].sound.Status == SoundStatus.Stopped) {
 						Global.sounds[i].sound.Dispose();
 						Global.sounds[i].deleted = true;
 						Global.sounds.RemoveAt(i);

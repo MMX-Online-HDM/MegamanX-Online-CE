@@ -2566,7 +2566,6 @@ public partial class Character : Actor, IDamagable {
 			damageSavings -= 1;
 			damage -= 1;
 		}
-
 		// Damage increase/reduction section
 		if (!isArmorPiercing) {
 			if (charState is SwordBlock) {
@@ -2600,11 +2599,6 @@ public partial class Character : Actor, IDamagable {
 			if (this is Vile vile && vile.hasFrozenCastleBarrier()) {
 				damageSavings += originalDamage * Vile.frozenCastlePercent;
 			}
-		}
-		// Special conditions for decimal damage.
-		if (damage % 1 != 0) {
-			decimal damageDec = damage % 1m;
-
 		}
 		// This is to defend from overkill damage.
 		// Or at least attempt to.
