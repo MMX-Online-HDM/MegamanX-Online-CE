@@ -38,6 +38,11 @@ public class XUPParryStartState : CharState {
 	public void counterAttack(Player damagingPlayer, Actor damagingActor, float damage) {
 		Actor counterAttackTarget = null;
 		Projectile absorbedProj = null;
+		
+		if (player.weapon is Buster { isUnpoBuster: true }) {
+			player.weapon.ammo = player.weapon.maxAmmo;
+		}
+		
 		if (damagingActor is GenericMeleeProj gmp) {
 			counterAttackTarget = gmp.owningActor;
 		} else if (damagingActor is Projectile proj) {
@@ -59,7 +64,7 @@ public class XUPParryStartState : CharState {
 					shootProj = true;
 					absorbThenShoot = true;
 				}
-				mmx.refillUnpoBuster();
+				//mmx.refillUnpoBuster();
 				character.changeState(new XUPParryProjState(absorbedProj, shootProj, absorbThenShoot), true);
 			}
 
@@ -205,6 +210,7 @@ public class AbsorbWeapon : Weapon {
 		weaponSlotIndex = 118;
 		killFeedIndex = 168;
 		this.absorbedProj = otherProj;
+		drawAmmo = false;
 	}
 }
 
@@ -600,13 +606,13 @@ public class XReviveStart : CharState {
 			drLightAnim.frameSpeed = 0;
 			drLightAnim.frameIndex = 0;
 		}
-
+		/*
 		if (stateTime > 2) mmx.unpoShotCount = Math.Max(mmx.unpoShotCount, 1);
 		if (stateTime > 3.75f) mmx.unpoShotCount = Math.Max(mmx.unpoShotCount, 2);
 		if (stateTime > 5.75f) mmx.unpoShotCount = Math.Max(mmx.unpoShotCount, 3);
-
+		*/
 		if (stateTime > 7.75f) {
-			mmx.unpoShotCount = Math.Max(mmx.unpoShotCount, 4);
+			//mmx.unpoShotCount = Math.Max(mmx.unpoShotCount, 4);
 			character.changeState(new XRevive(), true);
 		}
 	}
@@ -655,7 +661,7 @@ public class XRevive : CharState {
 			}
 			var busterWeapon = player.weapons.FirstOrDefault(w => w is Buster) as Buster;
 			if (busterWeapon != null) {
-				busterWeapon.setUnpoBuster();
+				busterWeapon.setUnpoBuster(mmx);
 			}
 			player.weaponSlot = 0;
 

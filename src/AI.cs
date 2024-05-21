@@ -1602,7 +1602,7 @@ public class AI {
 			}
 
 			if (mmx.isHyperX && mmx.canShoot() && !player.isMainPlayer) {
-				mmx.unpoShotCount = Math.Max(mmx.unpoShotCount, 4);
+				//mmx.unpoShotCount = Math.Max(mmx.unpoShotCount, 4);
 				player.release(Control.Shoot);
 				player.press(Control.Shoot);
 			}

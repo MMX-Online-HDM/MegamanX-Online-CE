@@ -83,6 +83,7 @@ public class DNACore : AxlWeapon {
 			weaponBarBaseIndex = 31;
 		}
 		sprite = "axl_arm_pistol";
+		drawAmmo = false;
 	}
 
 	public DNACore() : base(0) {

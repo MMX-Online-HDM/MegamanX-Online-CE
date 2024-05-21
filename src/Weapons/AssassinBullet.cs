@@ -14,6 +14,7 @@ public class AssassinBullet : AxlWeapon {
 		weaponBarIndex = 28;
 		weaponSlotIndex = 47;
 		killFeedIndex = 61;
+		drawAmmo = false;
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
