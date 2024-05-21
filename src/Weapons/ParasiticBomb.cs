@@ -23,8 +23,8 @@ public class ParasiticBomb : Weapon {
 			player.character.playSound("buster");
 			new ParasiticBombProj(this, pos, xDir, player, netProjId);
 		} else {
-			if (player.character.ownedByLocalPlayer && player.character.beeSwarm == null) {
-				player.character.beeSwarm = new BeeSwarm(player.character);
+			if (player.character.ownedByLocalPlayer && player.character is MegamanX mmx && mmx.beeSwarm == null) {
+				mmx.beeSwarm = new BeeSwarm(mmx);
 			}
 		}
 	}
@@ -129,26 +129,26 @@ public class ParasiteCarry : CharState {
 }
 
 public class BeeSwarm {
-	public Character character;
+	public MegamanX mmx;
 	public List<BeeCursorAnim> beeCursors = new List<BeeCursorAnim>();
 	int currentIndex;
 	float currentTime = 0f;
 	const float beeCooldown = 1f;
 
-	public BeeSwarm(Character character) {
-		this.character = character;
+	public BeeSwarm(MegamanX mmx) {
+		this.mmx = mmx;
 
 		beeCursors = new List<BeeCursorAnim>()
 		{
-				new BeeCursorAnim(getCursorStartPos(0), character),
-				new BeeCursorAnim(getCursorStartPos(1), character),
-				new BeeCursorAnim(getCursorStartPos(2), character),
-				new BeeCursorAnim(getCursorStartPos(3), character),
+				new BeeCursorAnim(getCursorStartPos(0), mmx),
+				new BeeCursorAnim(getCursorStartPos(1), mmx),
+				new BeeCursorAnim(getCursorStartPos(2), mmx),
+				new BeeCursorAnim(getCursorStartPos(3), mmx),
 			};
 	}
 
 	public Point getCursorStartPos(int index) {
-		Point cPos = character.getCenterPos();
+		Point cPos = mmx.getCenterPos();
 		if (index == 0) return cPos.addxy(-15, -17);
 		else if (index == 1) return cPos.addxy(15, -17);
 		else if (index == 2) return cPos.addxy(-15, 17);
@@ -156,8 +156,8 @@ public class BeeSwarm {
 	}
 
 	public Actor? getAvailableTarget() {
-		Point centerPos = character.getCenterPos();
-		var targets = Global.level.getTargets(centerPos, character.player.alliance, true, ParasiticBomb.beeRange);
+		Point centerPos = mmx.getCenterPos();
+		var targets = Global.level.getTargets(centerPos, mmx.player.alliance, true, ParasiticBomb.beeRange);
 
 		foreach (var target in targets) {
 			if (beeCursors.Any(b => b.target == target)) {
@@ -186,7 +186,7 @@ public class BeeSwarm {
 				beeCursors[i].pos = getCursorStartPos(i);
 			}
 			if (beeCursors[i].state == 4) {
-				beeCursors[i] = new BeeCursorAnim(getCursorStartPos(i), character);
+				beeCursors[i] = new BeeCursorAnim(getCursorStartPos(i), mmx);
 			}
 		}
 
@@ -205,9 +205,9 @@ public class BeeSwarm {
 	}
 
 	public bool shouldDestroy() {
-		if (!character.player.input.isHeld(Control.Shoot, character.player)) return true;
-		if (character.player.weapon is not ParasiticBomb) return true;
-		var pb = character.player.weapon as ParasiticBomb;
+		if (!mmx.player.input.isHeld(Control.Shoot, mmx.player)) return true;
+		if (mmx.player.weapon is not ParasiticBomb) return true;
+		var pb = mmx.player.weapon as ParasiticBomb;
 		if (pb?.ammo <= 0) return true;
 		return false;
 	}
@@ -217,7 +217,7 @@ public class BeeSwarm {
 			beeCursor.destroySelf();
 		}
 		beeCursors.Clear();
-		character.beeSwarm = null;
+		mmx.beeSwarm = null;
 	}
 }
 
