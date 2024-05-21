@@ -125,6 +125,14 @@ public partial class MegamanX : Character {
 			headbuttAirTime += Global.spf;
 		}
 
+		if (isHyperXBS.getValue()) {
+			if (musicSource == null) {
+				addMusicSource("introStageBreisX4_JX", getCenterPos(), true);
+			}
+		} else {
+			destroyMusicSource();
+		}
+
 		if (!ownedByLocalPlayer) {
 			Helpers.decrementTime(ref barrierTime);
 			return;

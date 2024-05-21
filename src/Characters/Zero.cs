@@ -153,7 +153,7 @@ public class Zero : Character {
 				}
 			} else if (isNightmareZero && ownedByLocalPlayer) {
 				if (musicSource == null) {
-					addMusicSource("XvsZeroV1_megasfc", getCenterPos(), true);
+					addMusicSource("introStageZeroX5_megasfc", getCenterPos(), true);
 				}
 			} else {
 				destroyMusicSource();
