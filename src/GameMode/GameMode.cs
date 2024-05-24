@@ -1589,16 +1589,19 @@ public class GameMode {
 			}
 
 			int topLeftX = 10;
-			int topLeftY = 35;
-			int w = 120;
-			int lineHeight = 4;
+			int topLeftY = 30;
+			int w = 180;
+			int lineHeight = 10;
 
 			DrawWrappers.DrawRect(
-				topLeftX - 5, topLeftY - 5, topLeftX + w,
-				topLeftY + 6 + currentLineH, true, Helpers.MenuBgColor, 1, ZIndex.HUD - 10, isWorldPos: false
+				topLeftX - 2,
+				topLeftY + lineHeight - 2,
+				topLeftX + w,
+				topLeftY + currentLineH + lineHeight - 1,
+				true, Helpers.MenuBgColor, 1, ZIndex.HUD - 10, isWorldPos: false
 			);
 
-			currentLineH = -6;
+			currentLineH = 0;
 
 			bool showNetStats = Global.debug;
 			if (showNetStats) {
@@ -1661,7 +1664,7 @@ public class GameMode {
 				"Sound Count: " + Global.sounds.Count, topLeftX, topLeftY + (currentLineH += lineHeight)
 			);
 
-			Fonts.drawText(
+			/*Fonts.drawText(
 				FontType.Grey,
 				"List Counts: " + Global.level.getListCounts(), topLeftX, topLeftY + (currentLineH += lineHeight)
 			);
@@ -1672,6 +1675,7 @@ public class GameMode {
 				FontType.Grey,
 				"Avg frame process time: " + avgFrameProcessTime.ToString("0.00") + " ms", topLeftX, topLeftY + (currentLineH += lineHeight)
 			);
+			*/
 			//float graphYHeight = 20;
 			//drawDiagnosticsGraph(Global.lastFrameProcessTimes, topLeftX, topLeftY + (currentLineH += lineHeight) + graphYHeight, 1);
 
