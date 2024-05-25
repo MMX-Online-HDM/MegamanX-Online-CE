@@ -264,7 +264,7 @@ public class AI {
 			}
 			target = Global.level.getClosestTarget(
 				character.pos, player.alliance, true, isRequesterAI: true,
-				aMaxDist: 250
+				aMaxDist: 400
 			);
 		}
 		if (character is KaiserSigma || character is BaseSigma sigma && sigma.isHyperSigma) {
@@ -1603,7 +1603,7 @@ public class AI {
 			}
 
 			if (mmx.isHyperX && mmx.canShoot() && !player.isMainPlayer) {
-				mmx.unpoShotCount = Math.Max(mmx.unpoShotCount, 4);
+				//mmx.unpoShotCount = Math.Max(mmx.unpoShotCount, 4);
 				player.release(Control.Shoot);
 				player.press(Control.Shoot);
 			}

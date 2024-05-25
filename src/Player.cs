@@ -393,8 +393,8 @@ public partial class Player {
 	public ShaderWrapper xPaletteShader = Helpers.cloneShaderSafe("palette");
 	public ShaderWrapper invisibleShader = Helpers.cloneShaderSafe("invisible");
 	public ShaderWrapper zeroPaletteShader = Helpers.cloneGenericPaletteShader("hyperZeroPalette");
-	public ShaderWrapper nightmareZeroShader = Helpers.cloneNightmareZeroPaletteShader("paletteNightmareZero");
-	public ShaderWrapper zeroAzPaletteShader = Helpers.cloneGenericPaletteShader("hyperAwakenedZeroPalette");
+	public ShaderWrapper nightmareZeroShader = Helpers.cloneGenericPaletteShader("paletteViralZero");
+	public ShaderWrapper zeroAzPaletteShader = Helpers.cloneGenericPaletteShader("paletteAwakenedZero");
 	public ShaderWrapper axlPaletteShader = Helpers.cloneShaderSafe("hyperaxl");
 	public ShaderWrapper viralSigmaShader = Helpers.cloneShaderSafe("viralsigma");
 	public ShaderWrapper viralSigmaShader2 = Helpers.cloneShaderSafe("viralsigma");
@@ -1996,7 +1996,7 @@ public partial class Player {
 		currency -= reviveXCost;
 		hyperXRespawn = true;
 		respawnTime = 0;
-		character.changeState(new XReviveStart(), true);
+		character.changeState(new XRevive(), true);
 	}
 
 	public void reviveXNonOwner() {
@@ -2564,7 +2564,8 @@ public partial class Player {
 		if (character.charState is WarpOut) return false;
 		if (character.charState.invincible) return false;
 		if (character.isCStingInvisible()) return false;
-		if (character.isHyperSigmaBS.getValue()) return false;
+		// TODO: Add Wolf Check here.
+		//if (character.isHyperSigmaBS.getValue()) return false;
 
 		return true;
 	}

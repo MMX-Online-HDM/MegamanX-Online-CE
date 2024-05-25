@@ -26,7 +26,14 @@ public partial class MegamanX : Character {
 	public GravityWellProj? gravityWell;
 	public int totalChipHealAmount;
 	public const int maxTotalChipHealAmount = 32;
-	public int unpoShotCount;
+	public int unpoShotCount {
+		get {
+			if (player.weapon is not Buster { isUnpoBuster: true }) {
+				return 0;
+			}
+			return MathInt.Floor(player.weapon.ammo / player.weapon.getAmmoUsage(0));
+		}
+	}
 
 	public float hadoukenCooldownTime;
 	public float maxHadoukenCooldownTime = 1f;
@@ -92,7 +99,7 @@ public partial class MegamanX : Character {
 	}
 
 	public void refillUnpoBuster() {
-		if (player.weapons.Count > 0) player.weapons[0].ammo = 32;
+		if (player.weapons.Count > 0) player.weapons[0].ammo = player.weapons[0].maxAmmo;
 	}
 
 	public override void update() {
@@ -293,11 +300,6 @@ public partial class MegamanX : Character {
 				  (charState is Dash || charState is AirDash)) {
 				charState.isGrabbing = true;
 				changeSpriteFromName("unpo_grab_dash", true);
-			} else if (player.input.isPressed(Control.Special1, player) &&
-				  (charState is Idle || charState is Run || charState is Fall || charState is Jump)) {
-				upPunchCooldown = 0.5f;
-				changeState(new XUPPunchState(grounded), true);
-				return;
 			} else if
 			  (
 				  player.input.isWeaponLeftOrRightPressed(player) && parryCooldown == 0 &&
@@ -314,11 +316,11 @@ public partial class MegamanX : Character {
 		}
 
 		if (charState.attackCtrl &&
-			isSpecialSaber() && canShoot() &&
+			(isSpecialSaber() || isHyperX) && canShoot() &&
 			canChangeWeapons() && player.armorFlag == 0 &&
 			player.input.isPressed(Control.Special1, player) &&
 			!isAttacking() && !isInvisible() &&
-			!charState.isGrabbing && !isHyperX
+			!charState.isGrabbing
 		) {
 			if (xSaberCooldown == 0) {
 				xSaberCooldown = 1f;
@@ -328,12 +330,19 @@ public partial class MegamanX : Character {
 		}
 
 		if (isHyperX) {
-			if (unpoTime > 12) unpoDamageMaxCooldown = 1;
-			if (unpoTime > 24) unpoDamageMaxCooldown = 0.75f;
-			if (unpoTime > 36) unpoDamageMaxCooldown = 0.5f;
-			if (unpoTime > 48) unpoDamageMaxCooldown = 0.25f;
+			//if (unpoTime > 12) unpoDamageMaxCooldown = 1;
+			//if (unpoTime > 24) unpoDamageMaxCooldown = 0.75f;
+			//if (unpoTime > 36) unpoDamageMaxCooldown = 0.5f;
+			//if (unpoTime > 48) unpoDamageMaxCooldown = 0.25f;
 
-			if (charState is not XUPGrabState && charState is not XUPParryMeleeState && charState is not XUPParryProjState) {
+			if (charState is not XUPGrabState
+				and not XUPParryMeleeState
+				and not XUPParryProjState
+				and not Hurt and not Frozen
+				and not VileMK2Grabbed
+				and not GenericGrabbedState
+				and not Stunned
+			) {
 				unpoTime += Global.spf;
 				UPDamageCooldown += Global.spf;
 				if (UPDamageCooldown > unpoDamageMaxCooldown) {
@@ -637,11 +646,17 @@ public partial class MegamanX : Character {
 
 	public void unpoChargeControls() {
 		if (chargeButtonHeld() && canCharge()) {
-			increaseCharge();
-			if (getChargeLevel() == 1) unpoShotCount = Math.Max(unpoShotCount, 1);
-			if (getChargeLevel() == 2) unpoShotCount = Math.Max(unpoShotCount, 2);
-			if (getChargeLevel() == 3) unpoShotCount = Math.Max(unpoShotCount, 3);
-			if (getChargeLevel() == 4) unpoShotCount = Math.Max(unpoShotCount, 4);
+			//increaseCharge();
+			player.weapon.addAmmo(player.weapon.getAmmoUsage(0) * 0.625f * Global.spf, player);
+			chargeTime = unpoShotCount switch {
+				0 => charge1Time,
+				1 => charge2Time,
+				3 => charge3Time,
+				_ => charge3Time
+			};
+			if (sprite.name.EndsWith("shoot")) {
+				chargeTime = 0;
+			}
 		} else {
 			if (isCharging()) {
 				stopCharge();
@@ -756,10 +771,10 @@ public partial class MegamanX : Character {
 			streamCooldown = 0.25f;
 		}
 
-		if (isHyperX) {
+		/*if (isHyperX) {
 			unpoShotCount--;
 			if (unpoShotCount < 0) unpoShotCount = 0;
-		}
+		}*/
 	}
 
 	public void shootRpc(Point pos, int weaponIndex, int xDir, int chargeLevel, ushort netProjId, bool sendRpc) {
@@ -848,8 +863,6 @@ public partial class MegamanX : Character {
 				} else {
 					ammoUsage = 8;
 				}
-			} else if (weapon is Buster buster) {
-				ammoUsage = 0;
 			} else {
 				ammoUsage = weapon.getAmmoUsage(chargeLevel);
 			}

@@ -157,12 +157,13 @@ public class Damager {
 			byte[] victimNetIdBytes = BitConverter.GetBytes((ushort)victim.netId);
 			byte[] actorNetIdBytes = BitConverter.GetBytes(damagingActor?.netId ?? 0);
 			var projIdBytes = BitConverter.GetBytes(projId);
-			bool isLinkedMelee = false;
+			byte linkedMeleeId = byte.MaxValue;
 
 			if (damagingActor is GenericMeleeProj gmp &&
-				(gmp.netId == null || gmp.netId == 0)
+				(gmp.netId == null || gmp.netId == 0) &&
+				gmp.meleeId != -1
 			) {
-				isLinkedMelee = true;
+				linkedMeleeId = (byte)gmp.meleeId;
 				if (gmp.owningActor?.netId != null) {
 					actorNetIdBytes = BitConverter.GetBytes(gmp.owningActor?.netId ?? 0);
 				} else {
@@ -189,7 +190,7 @@ public class Damager {
 				actorNetIdBytes[1],
 				projIdBytes[0],
 				projIdBytes[1],
-				(byte)(isLinkedMelee ? 0 : 1),
+				linkedMeleeId,
 			};
 			RPC.applyDamage.sendRpc(byteParams.ToArray());
 		}

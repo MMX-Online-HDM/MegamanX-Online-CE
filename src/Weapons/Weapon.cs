@@ -53,6 +53,7 @@ public class Weapon {
 	// HUD related stuff.
 	public bool drawCooldown = true;
 	public bool drawAmmo = true;
+	public bool drawRoundedDown = false;
 
 	public Weapon() {
 		ammo = 32;
@@ -358,6 +359,7 @@ public class Weapon {
 			return;
 		}
 		weaponHealAmount += MathF.Ceiling(ammoAdd * ammoGainMultiplier);
+		weaponHealAmount = Helpers.clampMax(weaponHealAmount, maxAmmo);
 	}
 
 	public void addAmmoPercentHeal(float ammoAdd) {
@@ -365,6 +367,7 @@ public class Weapon {
 			return;
 		}
 		weaponHealAmount += MathF.Ceiling(maxAmmo * ammoAdd * ammoGainMultiplier / 100f);
+		weaponHealAmount = Helpers.clampMax(weaponHealAmount, maxAmmo);
 	}
 
 	public static void gigaAttackSoundLogic(

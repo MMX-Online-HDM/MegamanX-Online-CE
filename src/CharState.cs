@@ -171,15 +171,6 @@ public class CharState {
 	}
 
 	public virtual bool canExit(Character character, CharState newState) {
-		if (character.charState is Die &&
-			newState is not VileRevive &&
-			newState is not WolfSigmaRevive &&
-			newState is not ViralSigmaRevive &&
-			newState is not KaiserSigmaRevive &&
-			newState is not XReviveStart
-		) {
-			return false;
-		}
 		return true;
 	}
 
@@ -1848,6 +1839,20 @@ public class Die : CharState {
 			character.startRideArmor.selfDestructTime = Global.spf;
 			RPC.actorToggle.sendRpc(character.startRideArmor.netId, RPCActorToggleType.StartMechSelfDestruct);
 		}
+	}
+
+	public override bool canExit(Character character, CharState newState) {
+		if (character.charState is Die &&
+			newState is not VileRevive and
+			not WolfSigmaRevive and
+			not ViralSigmaRevive and
+			not KaiserSigmaRevive and
+			not XReviveStart and
+			not XRevive
+		) {
+			return false;
+		}
+		return base.canExit(character, newState);
 	}
 }
 

@@ -7,25 +7,6 @@ namespace MMXOnline;
 public class Buster : Weapon {
 	public List<BusterProj> lemonsOnField = new List<BusterProj>();
 	public bool isUnpoBuster;
-	public void setUnpoBuster() {
-		isUnpoBuster = true;
-		rateOfFire = 0.75f;
-		weaponBarBaseIndex = 70;
-		weaponBarIndex = 59;
-		weaponSlotIndex = 121;
-		killFeedIndex = 180;
-		canHealAmmo = false;
-		drawAmmo = false;
-		drawCooldown = false;
-	}
-
-	public static bool isNormalBuster(Weapon weapon) {
-		return weapon is Buster buster && !buster.isUnpoBuster;
-	}
-
-	public static bool isWeaponUnpoBuster(Weapon weapon) {
-		return weapon is Buster buster && buster.isUnpoBuster;
-	}
 
 	public Buster() : base() {
 		index = (int)WeaponIds.Buster;
@@ -35,6 +16,43 @@ public class Buster : Weapon {
 		weaponSlotIndex = 0;
 		shootSounds = new List<string>() { "", "", "", "" };
 		rateOfFire = 0.15f;
+		canHealAmmo = false;
+		drawAmmo = false;
+		drawCooldown = false;
+	}
+
+	public void setUnpoBuster(MegamanX mmx) {
+		isUnpoBuster = true;
+		rateOfFire = 0.75f;
+		weaponBarBaseIndex = 70;
+		weaponBarIndex = 59;
+		weaponSlotIndex = 121;
+		killFeedIndex = 180;
+
+		// Ammo variables
+		maxAmmo = 12;
+		ammo = maxAmmo;
+		allowSmallBar = false;
+		ammoGainMultiplier = 2;
+		canHealAmmo = true;
+		drawRoundedDown = true;
+		
+		// HUD.
+		drawAmmo = true;
+		drawCooldown = true;
+		
+		// Remove charge.
+		mmx.stockedCharge = false;
+		mmx.stockedX3Buster = false;
+		mmx.stockedXSaber = false;
+	}
+
+	public static bool isNormalBuster(Weapon weapon) {
+		return weapon is Buster buster && !buster.isUnpoBuster;
+	}
+
+	public static bool isWeaponUnpoBuster(Weapon weapon) {
+		return weapon is Buster buster && buster.isUnpoBuster;
 	}
 
 	public override bool canShoot(int chargeLevel, Player player) {
@@ -52,6 +70,13 @@ public class Buster : Weapon {
 			return true;
 		}
 		return lemonsOnField.Count < 3;
+	}
+
+	public override float getAmmoUsage(int chargeLevel) {
+		if (isUnpoBuster) {
+			return 3;
+		}
+		return 0;
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
@@ -173,7 +198,6 @@ public class Buster : Weapon {
 			player.character.playSound(shootSound, sendRpc: true);
 		}
 	}
-	
 	
 	public void createBuster4Line(
 		float x, float y, int xDir, Player player,
