@@ -64,7 +64,7 @@ public class GenmuState : CharState {
 				character.xDir, 1, player, player.getNextActorNetId(), rpc: true
 			);
 		}
-		if (character.frameIndex == 1) {
+	/*	if (character.frameIndex == 1) {
 			if (character is Zero zero) {
 				if (zero.isNightmareZeroBS.getValue()) {
 					character.playSound("znshine", sendRpc: true);
@@ -79,6 +79,6 @@ public class GenmuState : CharState {
 					character.playSound("znsokomadeda", sendRpc: true);					
 				}
 			}
-		}
+		}*/
 	}
 }

@@ -387,7 +387,7 @@ public class AI {
 		if (character is MegamanX mmx4) {
 			dommxAI(mmx4);
 		} else if (character is Zero zero) {
-			doZeroAI(zero);
+			//doZeroAI(zero);
 		} else if (character is BaseSigma sigma4) {
 			doSigmaAI(sigma4);
 		} else if (character is Vile vile4) {
@@ -406,7 +406,7 @@ public class AI {
 				if (character is MegamanX mmx2) {
 					mmxAIAttack(mmx2);
 				} else if (character is Zero zero2) {
-					//zeroAIAttack(zero2);
+					zeroAIAttack(zero2);
 				} else if (character is BaseSigma sigma2) {
 					sigmaAIAttack(sigma2);
 				} else if (character is Vile vile2) {
@@ -570,7 +570,7 @@ public class AI {
 		var maxDist = Global.screenW / 2;
 		int? raNum = player.character?.rideArmor?.raNum;
 		if (raNum != null && raNum != 2) maxDist = 35;
-		if (player.isZero || player.isSigma) return 60;
+		if (player.isZero || player.isSigma || character is PunchyZero) return 50;
 		return maxDist;
 	}
 	public void mmxAIAttack(Character mmx2) {
@@ -952,10 +952,10 @@ public class AI {
 		bool isTargetClose = target?.pos.x - 15 > character.pos.x;
 		// Go hypermode 
 		if (player.currency >= Player.zeroHyperCost && !zero.isSpriteInvulnerable() && !zero.isInvulnerable() &&
-		 !(zero.charState is HyperZeroStart or LadderClimb) && !(zero.isHyperZero() || zero.isNightmareZeroBS.getValue())) {
+		   !(zero.charState is HyperZeroStart or LadderClimb) && !(zero.isHyperZero() || zero.isNightmareZeroBS.getValue())) {
 			zero.changeState(new HyperZeroStart(zero.zeroHyperMode), true);
 		}
-		doZeroAI(zero);
+		doZeroAIAttack(zero);
 		//WildDance(zero);
 		if (zero.charState.attackCtrl && !player.isDead && zero.sprite.name != null && zero.charState.canAttack() && !zero.isSpriteInvulnerable() && !zero.isInvulnerable()) {
 			int ZSattack = Helpers.randomRange(0, 10);
@@ -1346,9 +1346,9 @@ public class AI {
 						or FrostShieldProjCharged or FrostShieldProjGround or FrostShieldProjPlatform //HOW MANY OF U EXIST
 						) {
 						if (player.character is BusterZero bzero1) {
-							if (character != null && proj.isFacing(character) &&
+							if (character != null && !bzero1.isInvulnerable() && proj.isFacing(character) &&
 								character.withinX(proj, 100) && character.withinY(proj, 30)) {
-								bzero1.changeState(new BusterZeroHadangeki(), true);
+								player.press(Control.Special1);
 							}
 						}
 					}
@@ -1360,7 +1360,8 @@ public class AI {
 		foreach (GameObject gameObject in Global.level.gameObjects) {
 			if (gameObject is Projectile proj) {
 				if (proj.damager.owner.alliance != player.alliance) {
-					if (player.character is PunchyZero pzero1 && !player.isMainPlayer) {
+					if (player.character is PunchyZero pzero1 && !player.isMainPlayer &&
+						!pzero1.isInvulnerable() && pzero.parryCooldown == 0 && pzero.charState.canAttack()) {
 						if (character != null && proj.isFacing(character) && character.withinX(proj, 100) && character.withinY(proj, 30)) {
 							if (pzero.gigaAttack.ammo >= 16 && pzero.grounded) {
 								player.press(Control.Special1);
@@ -1637,7 +1638,7 @@ public class AI {
 			}
 		}
 	}
-	public void doZeroAI(Zero zero) {
+	public void doZeroAIAttack(Zero zero) {
 		if (!zero.isAwakenedZeroBS.getValue() && !(zero.charState is HyperZeroStart or DarkHoldState or Hurt) &&
 			zero.sprite.name != null
 		) {
