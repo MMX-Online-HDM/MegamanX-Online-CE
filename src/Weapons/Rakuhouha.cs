@@ -167,12 +167,12 @@ public class Rakuhouha : CharState {
 			}
 			if (!isCFlasher && !isDarkHold) {
 				character.shakeCamera(sendRpc: true);
-				//character.playSound("crashX3", sendRpc: true);
 				character.playSound("rakuhouha", sendRpc: true);
-				character.playSound("messenkou", sendRpc: true);
+				character.playSound("morphmCrash", sendRpc: true);
 			} else if (isCFlasher && !isDarkHold) { 
 				character.shakeCamera(sendRpc: true);
 				character.playSound("messenkou", sendRpc: true);
+				character.playSound("morphmCrash", sendRpc: true);
 			} else if (!isCFlasher && isDarkHold) {
 				character.playSound("darkhold", forcePlay: false, sendRpc: true);
 				/*if (Helpers.randomRange(0, 1) == 0) {

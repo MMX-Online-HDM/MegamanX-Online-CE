@@ -54,8 +54,8 @@ public class PunchyZero : Character {
 		PZeroLoadout pzeroLoadout = player.loadout.pzeroLoadout;
 		
 		gigaAttack = pzeroLoadout.gigaAttack switch {
-			2 => new CFlasher(),
-			1 => new RekkohaWeapon(),
+			1 => new CFlasher(),
+			2 => new RekkohaWeapon(),
 			_ => new RakuhouhaWeapon(),
 		};
 		hyperMode = pzeroLoadout.hyperMode;
