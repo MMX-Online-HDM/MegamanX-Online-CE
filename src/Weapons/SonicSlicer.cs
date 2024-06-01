@@ -73,7 +73,7 @@ public class SonicSlicerProj : Projectile {
 		}
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, player, netProjId, xDir, (byte)type);
 		}
 	}
 
@@ -88,7 +88,7 @@ public class SonicSlicerProj : Projectile {
 			xDir *= -1;
 			vel.x *= -1;
 			new Anim(pos, "sonicslicer_sparks", xDir, null, true);
-			RPC.actorToggle.sendRpc(netId, RPCActorToggleType.SonicSlicerBounce);
+			//RPC.actorToggle.sendRpc(netId, RPCActorToggleType.SonicSlicerBounce);
 		}
 
 		int velYSign = MathF.Sign(vel.y);
@@ -98,7 +98,7 @@ public class SonicSlicerProj : Projectile {
 				playSound("dingX2");
 				vel.y *= -1;
 				new Anim(pos, "sonicslicer_sparks", xDir, null, true);
-				RPC.actorToggle.sendRpc(netId, RPCActorToggleType.SonicSlicerBounce);
+				//RPC.actorToggle.sendRpc(netId, RPCActorToggleType.SonicSlicerBounce);
 			}
 		}
 	}
@@ -107,7 +107,7 @@ public class SonicSlicerProj : Projectile {
 		base.render(x, y);
 		float ox = -vel.x * Global.spf * 3;
 		float oy = -vel.y * Global.spf * 3;
-		twin.draw(frameIndex, pos.x + x + ox, pos.y + y + oy, 1, 1, null, 1, 1, 1, zIndex);
+		twin.draw(frameIndex, pos.x + x + ox, pos.y + y + oy, 1, 1, null, 0.5f, 1, 1, zIndex);
 	}
 }
 

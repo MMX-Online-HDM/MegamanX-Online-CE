@@ -295,8 +295,16 @@ public class Projectile : Actor {
 		return false;
 	}
 
-	public override void destroySelf(string spriteName = null, string fadeSound = null, bool disableRpc = false, bool doRpcEvenIfNotOwned = false, bool favorDefenderProjDestroy = false) {
-		base.destroySelf(fadeSprite, this.fadeSound, disableRpc, doRpcEvenIfNotOwned, favorDefenderProjDestroy: favorDefenderProjDestroy);
+	public override void destroySelf(
+		string spriteName = null, string fadeSound = null,
+		bool disableRpc = false, bool doRpcEvenIfNotOwned = false,
+		bool favorDefenderProjDestroy = false
+	) {
+		base.destroySelf(
+			fadeSprite, this.fadeSound,
+			disableRpc, doRpcEvenIfNotOwned,
+			favorDefenderProjDestroy: favorDefenderProjDestroy
+		);
 	}
 
 	public void destroySelfNoEffect(bool disableRpc = false, bool doRpcEvenIfNotOwned = false) {

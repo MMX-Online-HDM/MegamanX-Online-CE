@@ -29,7 +29,7 @@ public class InGameMainMenu : IMainMenu {
 				if (isSelWepDisabled()) return;
 				if (Global.level.mainPlayer.realCharNum == (int)CharIds.PunchyZero) {
 					Menu.change(new SelectPunchyZeroWeaponMenu(this, true));
-				} if (Global.level.mainPlayer.realCharNum == 4) {
+				} else if (Global.level.mainPlayer.realCharNum == 4) {
 					Menu.change(new SelectSigmaWeaponMenu(this, true));
 				} else if (Global.level.mainPlayer.realCharNum == 3) {
 					Menu.change(new SelectAxlWeaponMenu(this, true));

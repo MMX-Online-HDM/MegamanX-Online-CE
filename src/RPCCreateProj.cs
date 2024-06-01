@@ -70,10 +70,10 @@ public partial class RPCCreateProj : RPC {
 				proj = new XSaberProj(new XSaber(player), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.Buster3:
-				proj = new Buster3Proj(new Buster(), pos, xDir, arguments[extraDataIndex], player, netProjByte);
+				proj = new Buster3Proj(new Buster(), pos, xDir, extraData[0], player, netProjByte);
 				break;
 			case (int)ProjIds.BusterX3Proj2:
-				proj = new BusterX3Proj2(new Buster(), pos, xDir, 0, player, netProjByte);
+				proj = new BusterX3Proj2(new Buster(), pos, xDir, extraData[0], player, netProjByte);
 				break;
 			case (int)ProjIds.BusterX3Plasma:
 				proj = new BusterPlasmaProj(new Buster(), pos, xDir, player, netProjByte);
@@ -120,14 +120,14 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.Rakuhouha: {
 				proj = new RakuhouhaProj(
 					RakuhouhaWeapon.netWeapon, pos, false,
-					extraData[0], player, netProjByte 
+					byteAngle, player, netProjByte 
 				);
 				break;
 			}
 			case (int)ProjIds.CFlasher: {
 				proj = new RakuhouhaProj(
 					RakuhouhaWeapon.netWeapon, pos, true,
-					extraData[0], player, netProjByte 
+					byteAngle, player, netProjByte 
 				);
 				break;
 			}
@@ -204,13 +204,15 @@ public partial class RPCCreateProj : RPC {
 				proj = new VulcanProj(new Vulcan(VulcanType.BuckshotDance), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.SilkShotShrapnel:
-				proj = new SilkShotProjShrapnel(new SilkShot(), pos, xDir, player, 0, new Point(), netProjByte);
+				proj = new SilkShotProjShrapnel(
+					SilkShot.netWeapon, pos, xDir, player, extraData[1], extraData[0], netProjByte
+				);
 				break;
 			case (int)ProjIds.SpinWheelCharged:
 				proj = new SpinWheelProjCharged(new SpinWheel(), pos, xDir, 0, player, netProjByte);
 				break;
 			case (int)ProjIds.SonicSlicer:
-				proj = new SonicSlicerProj(new SonicSlicer(), pos, xDir, 0, player, netProjByte);
+				proj = new SonicSlicerProj(new SonicSlicer(), pos, xDir, extraData[0], player, netProjByte);
 				break;
 			case (int)ProjIds.StrikeChain:
 				proj = new StrikeChainProj(

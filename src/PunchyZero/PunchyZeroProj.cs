@@ -52,5 +52,8 @@ public class PZeroHadangeki : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		if (player.character is PunchyZero pzero && pzero.isAwakened) {
+			genericShader = player.zeroAzPaletteShader;
+		}
 	}
 }

@@ -55,11 +55,23 @@ public class SpeedBurnerProj : Projectile {
 				changeSprite("speedburner_proj", true);
 			}
 		}
-		if (!ownedByLocalPlayer) return;
 		Helpers.decrementTime(ref groundSpawnTime);
 		Helpers.decrementTime(ref airSpawnTime);
 
 		var hit = Global.level.raycast(pos, pos.addxy(0, 20), new List<Type>() { typeof(Wall) });
+		
+		if (airSpawnTime == 0) {
+			var anim = new Anim(
+				pos.addxy(Helpers.randomRange(-10, 10),
+				Helpers.randomRange(-10, 10)), "speedburner_dust", xDir, null, true
+			);
+			anim.vel.x = 50 * xDir;
+			anim.vel.y = 10;
+			airSpawnTime = 0.05f;
+		}
+		if (!ownedByLocalPlayer) {
+			return;
+		}
 		if (hit?.gameObject is Wall && groundSpawnTime == 0) {
 			Point spawnPos = pos.addxy(-(groundSpawns * 15) * xDir, 0);
 			spawnPos.y = hit.hitData.hitPoint?.y ?? pos.y;
@@ -67,12 +79,6 @@ public class SpeedBurnerProj : Projectile {
 			groundSpawns++;
 
 			groundSpawnTime = 0.075f;
-		}
-		if (airSpawnTime == 0) {
-			var anim = new Anim(pos.addxy(Helpers.randomRange(-10, 10), Helpers.randomRange(-10, 10)), "speedburner_dust", xDir, null, true);
-			anim.vel.x = 50 * xDir;
-			anim.vel.y = 10;
-			airSpawnTime = 0.05f;
 		}
 	}
 }

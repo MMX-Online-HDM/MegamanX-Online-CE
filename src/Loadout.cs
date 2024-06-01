@@ -358,6 +358,7 @@ public class LoadoutData {
 	[ProtoMember(4)] public VileLoadout vileLoadout = new VileLoadout();
 	[ProtoMember(5)] public AxlLoadout axlLoadout = new AxlLoadout();
 	[ProtoMember(6)] public SigmaLoadout sigmaLoadout = new SigmaLoadout();
+	[ProtoMember(7)] public PZeroLoadout pzeroLoadout = new();
 
 	public static LoadoutData createRandom(int playerId) {
 		return new LoadoutData() {
@@ -378,6 +379,7 @@ public class LoadoutData {
 			vileLoadout = Helpers.cloneProtobuf(Options.main.vileLoadout),
 			axlLoadout = Helpers.cloneProtobuf(Options.main.axlLoadout),
 			sigmaLoadout = Helpers.cloneProtobuf(Options.main.sigmaLoadout),
+			pzeroLoadout = Helpers.cloneProtobuf(Options.main.pzeroLoadout),
 		};
 	}
 }

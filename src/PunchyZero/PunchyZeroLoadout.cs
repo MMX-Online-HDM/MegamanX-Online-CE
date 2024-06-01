@@ -40,6 +40,8 @@ public class SelectPunchyZeroWeaponMenu : IMainMenu {
 	public SelectPunchyZeroWeaponMenu(IMainMenu prevMenu, bool inGame) {
 		this.prevMenu = prevMenu;
 		this.inGame = inGame;
+		hyperMode = Options.main.pzeroLoadout.hyperMode;
+		gigaAttack = Options.main.pzeroLoadout.gigaAttack;
 	}
 
 	public void update() {

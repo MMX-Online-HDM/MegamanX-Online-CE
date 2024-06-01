@@ -37,17 +37,25 @@ public class SpinWheelProj : Projectile {
 	float startMaxTime = 2.5f;
 	float lastHitTime;
 	const float hitCooldown = 0.2f;
+	float maxTimeProj = 2.5f;
+
 	public SpinWheelProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, xDir, 0, 1, player, "spinwheel_start", 0, hitCooldown, netProjId, player.ownedByLocalPlayer) {
 		destroyOnHit = false;
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		projId = (int)ProjIds.SpinWheel;
+		maxTimeProj = startMaxTime;
+		maxTime = startMaxTime;
 	}
 
 	public override void update() {
 		base.update();
-		projId = (int)ProjIds.SpinWheel;
+		if (ownedByLocalPlayer && time >= maxTimeProj) {
+			destroySelf();
+			return;
+		}
 		if (collider != null) {
 			collider.isTrigger = false;
 			collider.wallOnly = true;
@@ -60,13 +68,12 @@ public class SpinWheelProj : Projectile {
 				collider.isTrigger = false;
 				collider.wallOnly = true;
 			}
-			
 		}
 		if (started == 1) {
 			startedTime += Global.spf;
 			if (startedTime > 1) {
 				started = 2;
-				maxTime = startMaxTime;
+				maxTimeProj = startMaxTime;
 			}
 		}
 		if (started == 2) {
@@ -80,8 +87,10 @@ public class SpinWheelProj : Projectile {
 				) {
 					xDir *= -1;
 					if (sparks != null) sparks.xDir *= -1;
-					maxTime = startMaxTime;
-					startMaxTime -= 0.2f;
+					maxTimeProj = startMaxTime;
+					if (ownedByLocalPlayer) {
+						startMaxTime -= 0.2f;
+					}
 				}
 			}
 			soundTime += Global.spf;
@@ -93,13 +102,14 @@ public class SpinWheelProj : Projectile {
 		if (started > 0 && grounded && !destroyed) {
 			if (sparks == null) {
 				sparks = new Anim(pos, "spinwheel_sparks", xDir, null, false);
-				playSound("spinWheelGround", forcePlay: true, sendRpc: true);
-
+				playSound("spinWheelGround", forcePlay: true);
 			}
 			sparks.pos = pos.addxy(-xDir * 10, 10);
 			sparks.visible = true;
 		} else {
-			if (sparks != null) sparks.visible = false;
+			if (sparks != null) {
+				sparks.visible = false;
+			}
 		}
 	}
 

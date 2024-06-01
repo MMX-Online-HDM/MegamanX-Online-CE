@@ -18,6 +18,17 @@ public class ZSaber : Weapon {
 		displayName = "Z-Saber";
 		description = new string[] { "Zero's trusty beam saber." };
 	}
+
+	public ZSaber() : base() {
+		index = (int)WeaponIds.ZSaber;
+		weaponBarBaseIndex = 21;
+		weaponBarIndex = weaponBarBaseIndex;
+		weaponSlotIndex = 48;
+		killFeedIndex = 9;
+		type = (int)ZeroAttackLoadoutType.ZSaber;
+		displayName = "Z-Saber";
+		description = new string[] { "Zero's trusty beam saber." };
+	}
 }
 
 public class ShippuugaWeapon : Weapon {

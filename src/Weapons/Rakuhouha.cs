@@ -167,12 +167,12 @@ public class Rakuhouha : CharState {
 			}
 			if (!isCFlasher && !isDarkHold) {
 				character.shakeCamera(sendRpc: true);
-				character.playSound("voltcStrongBolt", sendRpc: true);
-				character.playSound("morphmCrash", sendRpc: true);
-				//character.playSound("buster2X3", sendRpc: true);
-			} else if (isCFlasher && !isDarkHold) {
+				//character.playSound("crashX3", sendRpc: true);
+				character.playSound("rakuhouha", sendRpc: true);
+				character.playSound("messenkou", sendRpc: true);
+			} else if (isCFlasher && !isDarkHold) { 
 				character.shakeCamera(sendRpc: true);
-				character.playSound("cflasher", sendRpc: true);
+				character.playSound("messenkou", sendRpc: true);
 			} else if (!isCFlasher && isDarkHold) {
 				character.playSound("darkhold", forcePlay: false, sendRpc: true);
 				/*if (Helpers.randomRange(0, 1) == 0) {
@@ -267,12 +267,7 @@ public class RakuhouhaProj : Projectile {
 		this.byteAngle = byteAngle;
 
 		if (rpc) {
-			rpcCreate(
-				pos, player, netProjId, xDir,
-				new Byte[]{
-					(byte)byteAngle,
-				}
-			);
+			rpcCreateByteAngle(pos, player, netProjId, byteAngle);
 		}
 	}
 
@@ -335,8 +330,8 @@ public class Rekkoha : CharState {
 		if (character.frameIndex == 5 && !sound) {
 			sound = true;
 			character.shakeCamera(sendRpc: true);
-			character.playSound("crash", sendRpc: true);
-			character.playSound("rekkohax6", sendRpc: true);
+			character.playSound("crashX2", sendRpc: true);
+			character.playSound("rekkoha", sendRpc: true);
 		}
 
 		if (stateTime > 26/60f && !fired1) {
