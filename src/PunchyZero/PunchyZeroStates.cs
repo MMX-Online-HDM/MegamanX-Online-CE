@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using SFML.Graphics;
 
 namespace MMXOnline;
 
@@ -430,5 +431,174 @@ public class PZeroShoryuken : CharState {
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
+	}
+}
+
+
+public class HyperPunchyZeroStart : CharState {
+	public float radius = 200;
+	public float time;
+	PunchyZero zero = null!;
+
+	public HyperPunchyZeroStart() : base("hyper_start") {
+		invincible = true;
+	}
+
+	public override void update() {
+		base.update();
+		if (time == 0) {
+			if (radius >= 0) {
+				radius -= Global.spf * 200;
+			} else {
+				time = Global.spf;
+				radius = 0;
+				activateHypermode();
+				character.playSound("ching");
+				character.fillHealthToMax();
+			}
+		} else {
+			time += Global.spf;
+			if (time >= 1) {
+				character.changeToIdleOrFall();
+			}
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		zero = character as PunchyZero ?? throw new NullReferenceException();
+		character.useGravity = false;
+		character.vel = new Point();
+		if (zero == null) {
+			throw new NullReferenceException();
+		}
+		character.player.currency -= 10;
+		//character.playSound("blackzeroentry", forcePlay: false, sendRpc: true);
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+		if (character != null) {
+			character.invulnTime = 0.5f;
+		}
+	}
+
+	public void activateHypermode() {
+		if (zero.hyperMode == 1) {
+			zero.isAwakened = true;
+			float storedAmmo = zero.gigaAttack.ammo;
+			zero.gigaAttack = new ShinMessenkou();
+			zero.gigaAttack.ammo = storedAmmo;
+		} else if (zero.hyperMode == 2) {
+			zero.isViral = true;
+			float storedAmmo = zero.gigaAttack.ammo;
+			zero.gigaAttack = new DarkHoldWeapon();
+			zero.gigaAttack.ammo = storedAmmo;
+			zero.freeBusterShots = 10;
+		} else {
+			zero.isBlack = true;
+		} 
+	}
+
+	public override void render(float x, float y) {
+		base.render(x, y);
+		Point pos = character.getCenterPos();
+		DrawWrappers.DrawCircle(
+			pos.x + x, pos.y + y, radius, false, Color.White, 5, character.zIndex + 1, true, Color.White
+		);
+	}
+}
+
+
+public class PunchyZeroHadangeki : CharState {
+	bool fired;
+
+	public PunchyZeroHadangeki() : base("projswing") {
+		landSprite = "projswing";
+		airSprite = "projswing_air";
+		useDashJumpSpeed = true;
+		airMove = true;
+		superArmor = true;
+	}
+
+	public override void update() {
+		base.update();
+		if (character.grounded) {
+			character.isDashing = false;
+		}
+		if (character.frameIndex >= 7 && !fired) {
+			character.playSound("zerosaberx3", sendRpc: true);
+			fired = true;
+			new PZeroHadangeki(
+				character.pos.addxy(30 * character.xDir, -20), character.xDir,
+				player, player.getNextActorNetId(), rpc: true
+			);
+		}
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		} else {
+			if ((character.grounded || character.canAirJump()) &&
+				player.input.isPressed(Control.Jump, player)
+			) {
+				if (!character.grounded) {
+					character.dashedInAir++;
+				}
+				character.vel.y = -character.getJumpPower();
+				sprite = "projswing_air";
+				character.changeSpriteFromName(sprite, false);
+			}
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (!character.grounded || character.vel.y < 0) {
+			sprite = "projswing_air";
+			defaultSprite = sprite;
+			character.changeSpriteFromName(sprite, true);
+		}
+	}
+
+	public override void onExit(CharState oldState) {
+		base.onEnter(oldState);
+	}
+}
+
+public class PunchyZeroHadangekiWall : CharState {
+	bool fired;
+	public int wallDir;
+	public Collider wallCollider;
+
+	public PunchyZeroHadangekiWall(int wallDir, Collider wallCollider) : base("wall_slide_attack") {
+		this.wallDir = wallDir;
+		this.wallCollider = wallCollider;
+		superArmor = true;
+		useGravity = false;
+	}
+
+	public override void update() {
+		base.update();
+		if (character.frameIndex >= 4 && !fired) {
+			character.playSound("zerosaberx3", sendRpc: true);
+			fired = true;
+			new PZeroHadangeki(
+				character.pos.addxy(30 * -wallDir, -20), -wallDir,
+				player, player.getNextActorNetId(), rpc: true
+			);
+		}
+		if (character.isAnimOver()) {
+			character.changeState(new WallSlide(wallDir, wallCollider));
+			character.sprite.frameIndex = character.sprite.frames.Count - 1;
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	}
+
+	public override void onExit(CharState oldState) {
+		base.onEnter(oldState);
+		useGravity = true;
 	}
 }

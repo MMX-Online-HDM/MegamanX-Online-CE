@@ -48,6 +48,10 @@ public class AcidBurstProj : Projectile {
 		vel = new Point(xDir * 100, -200);
 		fadeSound = "acidBurst";
 		checkUnderwater();
+
+		// TODO: Fix this
+		canBeLocal = false;
+
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
@@ -81,13 +85,20 @@ public class AcidBurstProj : Projectile {
 }
 
 public class AcidBurstProjSmall : Projectile {
-	public AcidBurstProjSmall(Weapon weapon, Point pos, int xDir, Point vel, ProjIds projId, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 300, 0, player, "acidburst_proj_small", 0, 0f, netProjId, player.ownedByLocalPlayer) {
+	public AcidBurstProjSmall(
+		Weapon weapon, Point pos, int xDir, Point vel,
+		ProjIds projId, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 300, 0, player,
+		"acidburst_proj_small", 0, 0f, netProjId, player.ownedByLocalPlayer
+	) {
 		useGravity = true;
 		maxTime = 1.5f;
 		this.projId = (int)projId;
 		fadeSprite = "acidburst_fade";
 		this.vel = vel;
+		// TODO: Fix this
+		canBeLocal = false;
 
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
@@ -134,6 +145,9 @@ public class AcidBurstProjCharged : Projectile {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
 		checkBigAcidUnderwater();
+
+		// TODO: Fix this
+		canBeLocal = false;
 	}
 
 	public override void update() {

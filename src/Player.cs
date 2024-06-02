@@ -1788,6 +1788,10 @@ public partial class Player {
 			zero.freeBusterShots++;
 			return;
 		}
+		if (character is PunchyZero pzero && pzero.isViral) {
+			pzero.freeBusterShots++;
+			return;
+		}
 		// Check for stuff that cannot gain scraps.
 		if (character?.isCCImmuneHyperMode() == true) return;
 		if (character?.rideArmor?.raNum == 4 && character.charState is InRideArmor) return;

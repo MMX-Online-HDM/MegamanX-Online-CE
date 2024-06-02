@@ -642,19 +642,62 @@ public class GameMode {
 				if (count >= 4) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x + 13, y + 11);
 			}
 			if (drawPlayer.character is Zero zero && !drawPlayer.isZBusterZero()) {
-				int posY = 159;
+				int yStart = 159;
 				if (zero.isNightmareZero) {
 					Global.sprites["hud_killfeed_weapon"].drawToHUD(170, 7, 155);
 					Fonts.drawText(
 						FontType.Grey,
 						"x" + zero.freeBusterShots, 16, 152, Alignment.Left
 					);
-					posY += 12;
+					yStart += 12;
 				}
-				drawZeroGigaCooldown(zero.zeroGigaAttackWeapon, y: posY);
+				int xStart = 11;
+				if (zero.zeroGigaAttackWeapon.shootTime > 0) {
+					drawZeroGigaCooldown(zero.zeroGigaAttackWeapon, y: yStart);
+					xStart += 15;
+				}
+				if (zero.saberCooldown > 0 && zero.isAwakenedGenmuZero() || zero.genmuCooldown > 0) {
+					float cooldown = 1 - Helpers.progress(zero.genmuCooldown, 2);
+					if (zero.saberCooldown > zero.genmuCooldown) {
+						cooldown = 1 - Helpers.progress(zero.saberCooldown, 1);
+					}
+					drawGigaWeaponCooldown(102, cooldown, xStart, yStart);
+					xStart += 15;
+				}
+				if (zero.saberCooldown > 0 || zero.genmuCooldown > 1) {
+					float cooldown = 1 - Helpers.progress(zero.saberCooldown, 1);
+					if (zero.genmuCooldown - 1 > zero.saberCooldown) {
+						cooldown = 1 - Helpers.progress(zero.genmuCooldown - 1, 1);
+					}
+					drawGigaWeaponCooldown(zero.isAwakenedGenmuZero() ? 48 : 102, cooldown, xStart, yStart);
+					xStart += 15;
+				}
 			}
 			if (drawPlayer.character is PunchyZero punchyZero && !drawPlayer.isZBusterZero()) {
-				drawZeroGigaCooldown(punchyZero.gigaAttack);
+				int xStart = 11;
+				int yStart = 159;
+				if (punchyZero.isViral) {
+					Global.sprites["hud_killfeed_weapon"].drawToHUD(170, 7, 155);
+					Fonts.drawText(
+						FontType.Grey,
+						"x" + punchyZero.freeBusterShots, 16, 152, Alignment.Left
+					);
+					yStart += 12;
+				}
+				if (punchyZero.gigaAttack.shootTime > 0) {
+					drawZeroGigaCooldown(punchyZero.gigaAttack, xStart, yStart);
+					xStart += 15;
+				}
+				if (punchyZero.swingCooldown > 0) {
+					float cooldown = 1 - Helpers.progress(punchyZero.swingCooldown, 60);
+					drawGigaWeaponCooldown(102, cooldown, xStart, yStart);
+					xStart += 15;
+				}
+				if (punchyZero.parryCooldown > 0) {
+					float cooldown = 1 - Helpers.progress(punchyZero.parryCooldown, 30);
+					drawGigaWeaponCooldown(120, cooldown, xStart, yStart);
+					xStart += 15;
+				}
 			}
 			if (drawPlayer.character is Axl axl2 && axl2.dodgeRollCooldown > 0) {
 				float cooldown = 1 - Helpers.progress(axl2.dodgeRollCooldown, Axl.maxDodgeRollCooldown);

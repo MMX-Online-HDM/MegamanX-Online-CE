@@ -299,24 +299,28 @@ public class Zero : Character {
 		);
 
 		bool notUpLogic = !player.input.isHeld(Control.Up, player) || !isMidairRising;
-		if (zeroAirSpecialWeapon.type != (int)AirSpecialType.Kuuenzan && spcPressed && !player.input.isHeld(Control.Down, player) && !isAttacking() && !player.hasKnuckle() &&
+		if (zeroAirSpecialWeapon.type != (int)AirSpecialType.Kuuenzan && spcPressed &&
+			!player.input.isHeld(Control.Down, player) && !isAttacking() && !player.hasKnuckle() &&
 			(charState is Jump || charState is Fall || charState is WallKick) && !isInvulnerableAttack() &&
 			(zeroUppercutWeaponS.type != (int)RyuenjinType.Rising || !player.input.isHeld(Control.Up, player))) {
 			zeroAirSpecialWeapon.attack(this);
-		} else if (lenientAttackPressed && !player.hasKnuckle() && charState.canAttack() && !isAttacking() && notUpLogic && !player.input.isHeld(Control.Down, player) &&
-			  (charState is Idle || charState is Crouch || charState is Run || charState is Dash || charState is AirDash || charState is Jump || charState is Fall)) {
-			if ((charState is Idle || charState is Crouch || charState is Run || charState is Dash) && isAwakenedGenmuZero()) {
+		} else if (
+			player.input.isPressed(Control.WeaponRight, player) &&
+			charState.canAttack() && !isAttacking() && charState.attackCtrl &&
+			isAwakenedZero()
+		) {
+			if (grounded && vel.y >= 0 && isAwakenedGenmuZero()) {
 				if (genmuCooldown == 0) {
 					genmuCooldown = 2;
 					changeState(new GenmuState(), true);
+					return;
 				}
-				return;
-			} else if (isAwakenedZero()) {
+			} else {
 				if (saberCooldown == 0 && genmuCooldown < 1) {
 					saberCooldown = 1f;
 					changeState(new ZSaberProjSwingState(grounded, true), true);
+					return;
 				}
-				return;
 			}
 		}
 
@@ -447,17 +451,7 @@ public class Zero : Character {
 				changeSprite(getSprite(attackSprite), true);
 
 				if (!player.hasKnuckle()) {
-					if (isAwakenedZero()) {
-						playSound("zerosaberx3", sendRpc: true);
-						if (zSaberShotCooldown == 0) {
-							zSaberShotCooldown = maxZSaberShotCooldown;
-							Global.level.delayedActions.Add(new DelayedAction(() => {
-								new ZSaberProj(new ZSaber(player), pos.addxy(30 * getShootXDir(), -20), getShootXDir(), player, player.getNextActorNetId(), rpc: true);
-							}, 0.1f));
-						}
-					} else {
-						playSound("saber1", sendRpc: true);
-					}
+					playSound("saber1", sendRpc: true);
 				}
 			} else if (charState is Idle && sprite.name == "zero_attack" && framePercent > 0.4f) {
 				playSound("saber2", sendRpc: true);
@@ -473,7 +467,6 @@ public class Zero : Character {
 				turnToInput(player.input, player);
 			}
 		}
-
 		if (isAttacking()) {
 			if (isAnimOver() && charState is not ZSaberProjSwingState) {
 				changeSprite(getSprite(charState.defaultSprite), true);
@@ -489,9 +482,9 @@ public class Zero : Character {
 		if (changedState) {
 			return true;
 		}
-		if (charState is not Dash && grounded && !isAttacking() && player.isZSaber() && (
+		if (charState.attackCtrl && charState is not Dash && grounded && !isAttacking() && player.isZSaber() && (
 				player.input.isHeld(Control.WeaponLeft, player) ||
-				player.input.isHeld(Control.WeaponRight, player)
+				(player.input.isHeld(Control.WeaponRight, player) && !isAwakenedZero())
 			) && (
 				!player.isDisguisedAxl ||
 				player.input.isHeld(Control.Down, player)
@@ -500,9 +493,10 @@ public class Zero : Character {
 			turnToInput(player.input, player);
 			changeState(new SwordBlock());
 			return true;
-		} else if (!player.isZBusterZero() && !isDashing && (
-				  player.input.isPressed(Control.WeaponLeft, player) ||
-				  player.input.isPressed(Control.WeaponRight, player)
+		} else if (
+			charState.attackCtrl && !player.isZBusterZero() && !isDashing && (
+				player.input.isPressed(Control.WeaponLeft, player) ||
+				(player.input.isHeld(Control.WeaponRight, player) && !isAwakenedZero())
 			  ) && (
 				  !player.isDisguisedAxl || player.input.isHeld(Control.Down, player)
 			  )
@@ -689,7 +683,6 @@ public class Zero : Character {
 
 		if (isAwakenedZero()) {
 			if (chargeLevel >= 1) {
-				player.currency--;
 				playSound("shingetsurinx5", forcePlay: false, sendRpc: true);
 				new ShingetsurinProj(
 					getShootPos(), xDir,
@@ -736,13 +729,9 @@ public class Zero : Character {
 				currencyUse = 1;
 				zeroLemonCooldown = 0.375f;
 				playSound("buster3", sendRpc: true);
-					new ZBuster3Proj(
+				new ZBuster3Proj(
 						zeroBusterWeapon, shootPos, xDir, 0, player, player.getNextActorNetId(), rpc: true
 				);
-				playSound("buster3X3", sendRpc: true);
-					new ZBuster4Proj(
-						zeroBusterWeapon, shootPos, xDir, 0, player, player.getNextActorNetId(), rpc: true
-					);
 			} else if (chargeLevel == 3 || chargeLevel >= 4) {
 				currencyUse = 1;
 				if (chargeLevel >= 4 && canUseDoubleBusterCombo()) {

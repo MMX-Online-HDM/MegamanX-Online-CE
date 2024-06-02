@@ -1280,7 +1280,7 @@ public partial class Actor : GameObject {
 			spriteNameIndex = Global.spriteIndexByName[spriteName];
 		}
 		ushort fadeSoundIndex = ushort.MaxValue;
-		if (!String.IsNullOrEmpty(null)) {
+		if (!String.IsNullOrEmpty(fadeSound)) {
 			fadeSound = fadeSound.ToLowerInvariant();
 			playSound(fadeSound);
 			fadeSoundIndex = Global.soundIndexByName[fadeSound];

@@ -29,7 +29,7 @@ public class SelectPunchyZeroWeaponMenu : IMainMenu {
 	public int hyperMode;
 
 	public int[][] weaponIcons = {
-		new int[] {51, 63, 64},
+		new int[] {51, 64, 63},
 		new int[] {118, 118, 122}
 	};
 	public int[][] weaponIconsL2 = {
@@ -40,6 +40,8 @@ public class SelectPunchyZeroWeaponMenu : IMainMenu {
 	public SelectPunchyZeroWeaponMenu(IMainMenu prevMenu, bool inGame) {
 		this.prevMenu = prevMenu;
 		this.inGame = inGame;
+		hyperMode = Options.main.pzeroLoadout.hyperMode;
+		gigaAttack = Options.main.pzeroLoadout.gigaAttack;
 	}
 
 	public void update() {

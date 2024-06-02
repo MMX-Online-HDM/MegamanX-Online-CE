@@ -301,8 +301,11 @@ public class Buster3Proj : Projectile {
 	public List<Sprite> spriteMids = new List<Sprite>();
 	float partTime;
 
-	public Buster3Proj(Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 350, 3, player, "buster3", Global.defFlinch, 0f, netProjId, player.ownedByLocalPlayer) {
+	public Buster3Proj(
+		Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 350, 3, player, "buster3", Global.defFlinch, 0f, netProjId, player.ownedByLocalPlayer
+	) {
 		this.type = type;
 		maxTime = 0.5f;
 		fadeSprite = "buster3_fade";
