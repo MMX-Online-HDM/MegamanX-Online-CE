@@ -561,7 +561,7 @@ public class PunchyZeroHadangeki : CharState {
 	}
 
 	public override void onExit(CharState oldState) {
-		base.onEnter(oldState);
+		base.onExit(oldState);
 	}
 }
 
@@ -598,7 +598,7 @@ public class PunchyZeroHadangekiWall : CharState {
 	}
 
 	public override void onExit(CharState oldState) {
-		base.onEnter(oldState);
+		base.onExit(oldState);
 		useGravity = true;
 	}
 }

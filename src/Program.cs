@@ -929,49 +929,101 @@ class Program {
 
 	static void loadMusics() {
 		string path = Global.assetPath + "assets/music";
-		List<string> files = Helpers.getFiles(path, true, "ogg");
-		files = files.Concat(Helpers.getFiles(Global.assetPath + "assets/maps_custom", true, "ogg")).ToList();
+		List<string> files = Helpers.getFiles(path, true, "wav", "ogg", "flac");
+		files = files.Concat(
+			Helpers.getFiles(Global.assetPath + "assets/maps_custom", true, "wav", "ogg", "flac")
+		).ToList();
 
 		for (int i = 0; i < files.Count; i++) {
-			string name = Path.GetFileNameWithoutExtension(files[i]);
+			bool isIniMusic = File.Exists(
+				Path.GetDirectoryName(files[i]) + "/" +
+				Path.GetFileNameWithoutExtension(files[i]) + ".ini"
+			);
+			bool isLocal = !files[i].Contains("assets/maps_custom");
 
-			var pieces = name.Split('.');
-			string baseName = pieces[0];
-			if (files[i].Contains("assets/maps_custom")) {
-				var filePieces = files[i].Split('/').ToList();
-				filePieces.Pop();
-				string customMapName = filePieces.Pop();
-				if (baseName == "music") {
-					baseName = customMapName;
-				} else {
-					baseName = customMapName + ":" + baseName;
-				}
+			if (isIniMusic) {
+				loadMusicData(files[i]);
+			} if (isLocal) {
+				loadMusicWithoutData(files[i]);
+			} else {
+				loadMusicDataLegacy(files[i]);
 			}
-
-			int pieceIndex = 1;
-			double startPos = 0;
-			double endPos = 0;
-			if (pieceIndex < pieces.Length &&
-				double.TryParse(
-					pieces[pieceIndex].Replace(',', '.'), NumberStyles.Any,
-					CultureInfo.InvariantCulture, out startPos
-				)
-			) {
-				pieceIndex++;
-			}
-			if (pieceIndex < pieces.Length &&
-				double.TryParse(
-					pieces[pieceIndex].Replace(',', '.'), NumberStyles.Any,
-					CultureInfo.InvariantCulture, out endPos
-				)
-			) {
-				pieceIndex++;
-			}
-			string charOverride = pieceIndex < pieces.Length ? ("." + pieces[pieceIndex]) : "";
-			MusicWrapper musicWrapper = new MusicWrapper(files[i], startPos, endPos, loop: (endPos != 0));
-
-			Global.musics[baseName + charOverride] = musicWrapper;
 		}
+	}
+	
+	static void loadMusicData(string file) {
+		string name = Path.GetFileNameWithoutExtension(file);
+		string iniLocation = (
+			Path.GetDirectoryName(file) + "/" +
+			Path.GetFileNameWithoutExtension(file) + ".ini"
+		);
+		Dictionary<string, object> iniData = IniParser.Parse(iniLocation);
+
+		double startPos = 0;
+		double endPos = 0;
+		if (iniData.ContainsKey("loopData") && iniData["loopData"] is Dictionary<string, object> loopData) {
+			if (loopData.ContainsKey("loopStart") && loopData["loopStart"] is Decimal loopStart) {
+				startPos = (double)loopStart;
+			}
+			if (loopData.ContainsKey("loopEnd") && loopData["loopEnd"] is Decimal loopEnd) {
+				endPos = (double)loopEnd;
+			}
+		}
+		MusicWrapper musicWrapper = new MusicWrapper(file, startPos, endPos, true);
+		if (endPos == 0) {
+			musicWrapper.endPos =  musicWrapper.music.Duration.AsSeconds();
+		}
+		Global.musics[name] = musicWrapper;
+	}
+
+	static void loadMusicWithoutData(string file) {
+		string name = Path.GetFileNameWithoutExtension(file);
+
+		MusicWrapper musicWrapper = new MusicWrapper(file, 0, 0, true);
+		musicWrapper.endPos =  musicWrapper.music.Duration.AsSeconds();
+
+		Global.musics[name] = musicWrapper;
+	}
+
+	static void loadMusicDataLegacy(string file) {
+		string name = Path.GetFileNameWithoutExtension(file);
+
+		var pieces = name.Split('.');
+		string baseName = pieces[0];
+		if (file.Contains("assets/maps_custom")) {
+			var filePieces = file.Split('/').ToList();
+			filePieces.Pop();
+			string customMapName = filePieces.Pop();
+			if (baseName == "music") {
+				baseName = customMapName;
+			} else {
+				baseName = customMapName + ":" + baseName;
+			}
+		}
+
+		int pieceIndex = 1;
+		double startPos = 0;
+		double endPos = 0;
+		if (pieceIndex < pieces.Length &&
+			double.TryParse(
+				pieces[pieceIndex].Replace(',', '.'), NumberStyles.Any,
+				CultureInfo.InvariantCulture, out startPos
+			)
+		) {
+			pieceIndex++;
+		}
+		if (pieceIndex < pieces.Length &&
+			double.TryParse(
+				pieces[pieceIndex].Replace(',', '.'), NumberStyles.Any,
+				CultureInfo.InvariantCulture, out endPos
+			)
+		) {
+			pieceIndex++;
+		}
+		string charOverride = pieceIndex < pieces.Length ? ("." + pieces[pieceIndex]) : "";
+		MusicWrapper musicWrapper = new MusicWrapper(file, startPos, endPos, loop: (endPos != 0));
+
+		Global.musics[baseName + charOverride] = musicWrapper;
 	}
 
 	static void loadShaders() {
