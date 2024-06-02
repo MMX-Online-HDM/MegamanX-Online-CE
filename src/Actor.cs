@@ -1589,6 +1589,7 @@ public partial class Actor : GameObject {
 		ms.musicSourceActor = this;
 		ms.volume = 0;
 		ms.moveWithActor = moveWithActor;
+		ms.loop = loop;
 		ms.play();
 		Global.level.musicSources.Add(ms);
 		musicSource = ms;
