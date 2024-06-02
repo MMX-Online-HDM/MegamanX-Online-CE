@@ -428,10 +428,6 @@ public class PZeroShoryuken : CharState {
 		}
 		zero = character as PunchyZero ?? throw new NullReferenceException();
 	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-	}
 }
 
 
@@ -591,10 +587,6 @@ public class PunchyZeroHadangekiWall : CharState {
 			character.changeState(new WallSlide(wallDir, wallCollider));
 			character.sprite.frameIndex = character.sprite.frames.Count - 1;
 		}
-	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
 	}
 
 	public override void onExit(CharState oldState) {

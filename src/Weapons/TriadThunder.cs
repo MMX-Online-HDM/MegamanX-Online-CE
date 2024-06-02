@@ -336,8 +336,4 @@ public class TriadThunderChargedState : CharState {
 		base.onEnter(oldState);
 		if (character.vel.y < 0) character.vel.y = 0;
 	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-	}
 }

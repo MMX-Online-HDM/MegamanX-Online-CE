@@ -237,10 +237,6 @@ public class NecroBurstAttack : CharState {
 			vile.playSound("necroburst", sendRpc: true);
 		}
 	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-	}
 }
 
 public class NecroBurstProj : Projectile {

@@ -63,10 +63,6 @@ public class VileMK2GrabState : CharState {
 		}
 	}
 
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-	}
-
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		character.grabCooldown = 1;

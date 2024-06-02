@@ -71,14 +71,6 @@ public class Raijingeki : CharState {
 			character.changeState(new Idle());
 		}
 	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-	}
 }
 
 
@@ -202,10 +194,6 @@ public class TBreakerState : CharState {
 		zero = character as Zero;
 	}
 
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-	}
-
 	public override void update() {
 		base.update();
 
@@ -283,14 +271,6 @@ public class MegaPunchState : CharState {
 	bool isAlt;
 	public MegaPunchState(bool isAlt) : base("megapunch", "") {
 		this.isAlt = isAlt;
-	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
 	}
 
 	public override void update() {

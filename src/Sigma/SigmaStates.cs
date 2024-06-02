@@ -12,14 +12,6 @@ public class IssueGlobalCommand : CharState {
 			character.changeState(new Idle(), true);
 		}
 	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-	}
 }
 
 public class CallDownMaverick : CharState {
@@ -70,10 +62,6 @@ public class CallDownMaverick : CharState {
 				maverick.changeState(new MEnter(character.pos));
 			}
 		}
-	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
 	}
 }
 
