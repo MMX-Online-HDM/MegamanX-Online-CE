@@ -128,8 +128,7 @@ public class SonicSlicerProjCharged : Projectile {
 		if (num == 4) dest = pos.addxy(60, -100);
 
 		vel.x = 0;
-		vel.y = -500;
-		useGravity = true;
+		useGravity = false;
 
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, 1);
@@ -138,14 +137,14 @@ public class SonicSlicerProjCharged : Projectile {
 
 	public override void update() {
 		base.update();
-		vel.y += Global.speedMul * getGravity();
 		if (!fall) {
 			float x = Helpers.lerp(pos.x, dest.x, Global.spf * 10);
 			changePos(new Point(x, pos.y));
-			if (vel.y > 0) {
-				fall = true;
-				yDir = -1;
-			}
+			vel.y += -40;
 		}
+		if (vel.y <= -375) fall = true;
+		if (vel.y > 100) yDir = -1;
+		if (fall) vel.y += 30;
+		
 	}
 }
