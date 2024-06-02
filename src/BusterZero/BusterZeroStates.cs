@@ -169,7 +169,7 @@ public class BusterZeroHadangeki : CharState {
 
 	public override void update() {
 		base.update();
-		if (character.frameIndex >= 7 && !fired) {
+		if (character.frameIndex >= 4 && !fired) {
 			character.playSound("zerosaberx3", sendRpc: true);
 			zero.stockedSaber = false;
 			fired = true;

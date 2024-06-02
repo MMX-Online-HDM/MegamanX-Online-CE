@@ -145,8 +145,10 @@ public class Zero : Character {
 		Helpers.decrementTime(ref blackZeroTime);
 		// Hypermode music.
 		if (!Global.level.isHyper1v1()) {
-			if (isBlackZero()) {
-				addMusicSource("Zero_X1", getCenterPos(), true);
+			if (isBlackZero() && ownedByLocalPlayer) {
+				if (musicSource == null) {
+					addMusicSource("zero_X1", getCenterPos(), true);
+				}
 			} else if (isAwakenedZero() && ownedByLocalPlayer) {
 				if (musicSource == null) {
 					addMusicSource("XvsZeroV2_megasfc", getCenterPos(), true);

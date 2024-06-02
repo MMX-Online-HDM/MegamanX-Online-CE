@@ -165,21 +165,19 @@ public class Rakuhouha : CharState {
 					);
 				}
 			}
-			if (!isCFlasher && !isDarkHold) {
+			if (isRakuhouha) {
 				character.shakeCamera(sendRpc: true);
 				character.playSound("rakuhouha", sendRpc: true);
-				character.playSound("morphmCrash", sendRpc: true);
-			} else if (isCFlasher && !isDarkHold) { 
+				character.playSound("crash", sendRpc: true);
+			} else if (isCFlasher) { 
 				character.shakeCamera(sendRpc: true);
 				character.playSound("messenkou", sendRpc: true);
-				character.playSound("morphmCrash", sendRpc: true);
-			} else if (!isCFlasher && isDarkHold) {
+				character.playSound("crashX3", sendRpc: true);
+			} else if (isDarkHold) {
 				character.playSound("darkhold", forcePlay: false, sendRpc: true);
-				/*if (Helpers.randomRange(0, 1) == 0) {
-					character.playSound("znnigerunayo", forcePlay: false, sendRpc: true);
-				} else {
-					character.playSound("znowarida", forcePlay: false, sendRpc: true);
-				}*/
+			} else if (isShinMessenkou) {
+				character.playSound("crash", forcePlay: false, sendRpc: true);
+				character.shakeCamera(sendRpc: true);
 			}
 		}
 		if (!fired2 && isShinMessenkou && character.frameIndex > 11) {
