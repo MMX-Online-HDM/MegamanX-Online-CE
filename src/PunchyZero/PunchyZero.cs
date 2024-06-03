@@ -357,7 +357,7 @@ public class PunchyZero : Character {
 			changeState(new PZeroShoryuken(), true);
 			return true;
 		}
-		if (yDir == 1 && gigaAttack.shootTime == 0) {
+		if (yDir == 1 && gigaAttack.shootTime == 0 && gigaAttack.ammo > gigaAttack.getAmmoUsage(0)) {
 			if (gigaAttack is RekkohaWeapon) {
 				gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
 				changeState(new Rekkoha(gigaAttack), true);
