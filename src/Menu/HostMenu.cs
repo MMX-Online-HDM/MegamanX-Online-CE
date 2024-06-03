@@ -223,7 +223,6 @@ public class HostMenu : IMainMenu {
 		foreach (var kvp in Global.levelDatas) {
 			var levelData = kvp.Value;
 			if (levelData.isMirrored || levelData.name.EndsWith("_inverted")) continue;
-			if (levelData.name == "nodetest") continue;
 
 			if (!levelData.isCustomMap) {
 				if (levelData.is1v1() || levelData.isTraining()) smallMaps.Add(levelData);
