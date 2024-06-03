@@ -165,12 +165,4 @@ public class VulcanCharState : CharState {
 		if (player.input.isHeld(Control.Left, player)) character.xDir = -1;
 		if (player.input.isHeld(Control.Right, player)) character.xDir = 1;
 	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-	}
 }

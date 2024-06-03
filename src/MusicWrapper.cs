@@ -6,7 +6,7 @@ using SFML.Window;
 namespace MMXOnline;
 
 public class MusicWrapper {
-	private Music music;
+	public Music music;
 	public string musicPath;
 	public float startPos;
 	public float endPos;

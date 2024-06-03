@@ -602,10 +602,6 @@ public class Run : CharState {
 		normalCtrl = true;
 	}
 
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-	}
-
 	public override void update() {
 		base.update();
 		var move = new Point(0, 0);
@@ -641,10 +637,6 @@ public class Crouch : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.globalCollider = character.getCrouchingCollider();
-	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
 	}
 
 	public override void update() {
@@ -716,10 +708,6 @@ public class ZeroClang : CharState {
 		hurtSpeed = dir * 100;
 	}
 
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-	}
-
 	public override void update() {
 		base.update();
 		if (hurtSpeed != 0) {
@@ -758,14 +746,6 @@ public class Jump : CharState {
 			}
 			return;
 		}
-	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
 	}
 }
 
@@ -1191,14 +1171,6 @@ public class WallKick : CharState {
 		if (character.vel.y > 0) {
 			character.changeState(new Fall());
 		}
-	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
 	}
 }
 

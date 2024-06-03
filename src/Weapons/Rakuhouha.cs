@@ -210,10 +210,6 @@ public class Rakuhouha : CharState {
 		}
 	}
 
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-	}
-
 	public override void onExit(CharState newState) {
 		weapon.shootTime = weapon.rateOfFire;
 		base.onExit(newState);

@@ -167,10 +167,6 @@ public class SigmaThrowShieldState : CharState {
 		}
 	}
 
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-	}
-
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		proj?.destroySelf();

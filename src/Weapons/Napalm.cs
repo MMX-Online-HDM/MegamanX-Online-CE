@@ -302,14 +302,6 @@ public class NapalmAttack : CharState {
 			character.changeState(new Crouch(""), true);
 		}
 	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-	}
 }
 
 public class MK2NapalmGrenadeProj : Projectile {

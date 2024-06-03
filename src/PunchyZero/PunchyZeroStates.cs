@@ -428,10 +428,6 @@ public class PZeroShoryuken : CharState {
 		}
 		zero = character as PunchyZero ?? throw new NullReferenceException();
 	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-	}
 }
 
 
@@ -561,7 +557,7 @@ public class PunchyZeroHadangeki : CharState {
 	}
 
 	public override void onExit(CharState oldState) {
-		base.onEnter(oldState);
+		base.onExit(oldState);
 	}
 }
 
@@ -593,12 +589,8 @@ public class PunchyZeroHadangekiWall : CharState {
 		}
 	}
 
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-	}
-
 	public override void onExit(CharState oldState) {
-		base.onEnter(oldState);
+		base.onExit(oldState);
 		useGravity = true;
 	}
 }
