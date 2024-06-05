@@ -563,7 +563,7 @@ public class LevelData {
 		// Others.
 		{ "japetribute", "variableX" },
 		{ "nodetest", "credits_X1" },
-		{ "training", "" },
+		{ "training", "training_vodaz" },
 	};
 
 	public string getMusicKey(List<Player> players) {
