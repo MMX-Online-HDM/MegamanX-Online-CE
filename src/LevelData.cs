@@ -509,33 +509,72 @@ public class LevelData {
 		return name.EndsWith("_md");
 	}
 
+	// TODO: Add this info to the level format themsleves
+	public static Dictionary<string, string> stageSongs = new Dictionary<string, string>() {
+		// X1 stuff.
+		{ "airport", "stormEagle" },
+		{ "bossroom", "boss_X1" },
+		{ "factory", "flameMammoth" },
+		{ "gallery", "armoredArmadillo" },
+		{ "forest", "stingChameleon" },
+		{ "forest2", "stingChameleon" },
+		{ "highway", "centralHighway" },
+		{ "highway2", "castRoll_X1" },
+		{ "mountain", "chillPenguin" },
+		{ "ocean", "launchOctopus" },
+		{ "powerplant", "sparkMandrill" },
+		{ "sigma1", "sigmaFortress" },
+		{ "sigma2", "sigmaFortress2" },
+		{ "sigma3", "sigmaFortress3" },
+		{ "tower", "boomerangKuwanger" },
+		// X2 stuff.
+		{ "centralcomputer", "magnetCentipede" },
+		{ "crystalmine", "crystalSnail" },
+		{ "deepseabase", "bubbleCrab" },
+		{ "desertbase", "overdriveOstrich" },
+		{ "desertbase2", "overdriveOstrich" },
+		{ "dinosaurtank", "wheelGator" },
+		{ "maverickfactory", "maverickFactory" },
+		{ "robotjunkyard", "morphMoth" },
+		{ "volcaniczone", "flameStag" },
+		{ "weathercontrol", "wireSponge" },
+		{ "xhunter1", "counterHunter2" },
+		{ "xhunter2", "counterHunter1" },
+		// X3 stuff.
+		{ "aircraftcarrier", "gravityBeetle" },
+		{ "dopplerlab", "dopplerLab" },
+		{ "frozentown", "blizzardBuffalo" },
+		{ "giantdam", "toxicSeahorse" },
+		{ "giantdam2", "toxicSeahorse" },
+		{ "hunterbase", "hunterBase" },
+		{ "hunterbase2", "credits_X3" },
+		{ "powercenter", "voltCatfish" },
+		{ "quarry", "tunnelRhino" },
+		{ "safaripark", "neonTiger" },
+		{ "shipyard", "crushCrawfish" },
+		{ "weaponsfactory", "blastHornet" },
+
+		// Alt music.
+		{ "dopplerlab_1v1", "goliath" },
+		{ "zerovirus_1v1", "XvsZeroV1_megasfc" },
+		{ "centralcomputer_1v1", "boss_X2" },
+		{ "sigma4_1v1", "boss_X1" },
+
+		// Others.
+		{ "japetribute", "variableX" },
+		{ "nodetest", "credits_X1" },
+		{ "training", "training_vodaz" },
+	};
+
 	public string getMusicKey(List<Player> players) {
-		if (name == "japetribute_1v1") {
-			return "japetribute_1v1";
-		}
 		if (isCustomMap) {
 			return name;
 		}
-		if (name == "dopplerlab_1v1") {
-			return "goliath";
+		if (stageSongs.ContainsKey(name)) {
+			return stageSongs[name];
 		}
-		if (name == "zerovirus_1v1") {
-			return "x_vs_zero_x5";
-		}
-		if (name == "centralcomputer_1v1") {
-			return "boss2";
-		}
-		if (name == "forest2" || name == "forest3") {
-			return "forest";
-		}
-		if (name == "powerplant2") {
-			return "powerplant";
-		}
-		if (name == "giantdam2") {
-			return "giantdam";
-		}
-		if (name.Contains("sigma4")) {
-			return "bossroom";
+		if (stageSongs.ContainsKey(Helpers.removeMapSuffix(name))) {
+			return stageSongs[Helpers.removeMapSuffix(name)];
 		}
 		return Helpers.removeMapSuffix(name);
 	}

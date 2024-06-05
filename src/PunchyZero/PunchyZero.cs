@@ -13,6 +13,7 @@ public class PunchyZero : Character {
 	public bool secondPhaseHyper;
 	public byte hypermodeBlink;
 	public int hyperMode;
+	public float hyperModeTimer;
 	public int awakenedAuraFrame;
 	public float awakenedAuraAnimTime;
 
@@ -78,6 +79,15 @@ public class PunchyZero : Character {
 
 		base.update();
 
+		// Hypermode timer.
+		if (hyperModeTimer > 0) {
+			hyperModeTimer -= Global.speedMul;
+			if (hyperModeTimer <= 0) {
+				hyperModeTimer = 0;
+				isAwakened = false;
+				isBlack = false;
+			}
+		}
 		// For the shooting animation.
 		if (shootAnimTime > 0) {
 			shootAnimTime -= Global.spf;
@@ -357,7 +367,7 @@ public class PunchyZero : Character {
 			changeState(new PZeroShoryuken(), true);
 			return true;
 		}
-		if (yDir == 1 && gigaAttack.shootTime == 0) {
+		if (yDir == 1 && gigaAttack.shootTime == 0 && gigaAttack.ammo > gigaAttack.getAmmoUsage(0)) {
 			if (gigaAttack is RekkohaWeapon) {
 				gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
 				changeState(new Rekkoha(gigaAttack), true);

@@ -478,6 +478,9 @@ public class HyperPunchyZeroStart : CharState {
 		if (character != null) {
 			character.invulnTime = 0.5f;
 		}
+		if (zero.isAwakened || zero.isBlack) {
+			zero.hyperModeTimer = 20 * 60;
+		}
 	}
 
 	public void activateHypermode() {
