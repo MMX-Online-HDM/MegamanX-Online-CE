@@ -526,7 +526,7 @@ public class PunchyZeroHadangeki : CharState {
 		if (character.grounded) {
 			character.isDashing = false;
 		}
-		if (character.frameIndex >= 7 && !fired) {
+		if (character.frameIndex >= 4 && !fired) {
 			character.playSound("zerosaberx3", sendRpc: true);
 			fired = true;
 			new PZeroHadangeki(

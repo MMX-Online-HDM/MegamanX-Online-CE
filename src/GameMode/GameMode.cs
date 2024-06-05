@@ -650,6 +650,7 @@ public class GameMode {
 						"x" + zero.freeBusterShots, 16, 152, Alignment.Left
 					);
 					yStart += 12;
+					Global.sprites["virusalert"].drawToHUD(0, 36, 214);
 				}
 				int xStart = 11;
 				if (zero.zeroGigaAttackWeapon.shootTime > 0) {
