@@ -208,7 +208,7 @@ public class DevConsole {
 			new Command("invuln", (args) => Global.level.mainPlayer.character.invulnTime = 60),
 			new Command("ult", (args) => Global.level.mainPlayer.setUltimateArmor(true)),
 			new Command("health", (args) => setHealth(args)),
-			new Command("freeze", (args) => Global.level.mainPlayer.character.freeze(2)),
+			new Command("freeze", (args) => Global.level.mainPlayer.character.freeze()),
 			new Command("hurt", (args) => Global.level.mainPlayer.character.setHurt(-1, Global.defFlinch, false)),
 			new Command("trhealth", (args) => Global.spawnTrainingHealth = !Global.spawnTrainingHealth),
 			new Command("checksum", (args) => printChecksum()),
