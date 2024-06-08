@@ -249,7 +249,7 @@ public class Axl : Character {
 	}
 
 	public bool canChangeDir() {
-		return !(charState is InRideArmor) && !(charState is Die) && !(charState is Frozen) && !(charState is Stunned);
+		return !(charState is InRideArmor) && !(charState is Die) && !(charState is GenericStun);
 	}
 
 	float assassinSmokeTime;
@@ -1403,7 +1403,7 @@ public class Axl : Character {
 			}
 		} else if (charState is LadderEnd) ladderClimb = true;
 
-		return !(charState is HyperAxlStart || isWarpIn() || charState is Hurt || charState is Die || charState is Frozen || charState is InRideArmor || charState is DodgeRoll || charState is Crystalized || charState is VileMK2Grabbed || charState is KnockedDown
+		return !(charState is HyperAxlStart || isWarpIn() || charState is Hurt || charState is Die || charState is GenericStun || charState is InRideArmor || charState is DodgeRoll || charState is VileMK2Grabbed || charState is KnockedDown
 			|| sprite.name.Contains("win") || sprite.name.Contains("lose") || ladderClimb || charState is DeadLiftGrabbed || charState is UPGrabbed || charState is WhirlpoolGrabbed || charState is InRideChaser);
 	}
 

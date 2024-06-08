@@ -38,7 +38,6 @@ public class FireWaveProj : Projectile {
 	}
 	public override void onHitDamagable(IDamagable damagable) {
 		var character = damagable as Character;
-		character?.unfreezeIfFrozen();
 	}
 }
 
@@ -72,7 +71,6 @@ public class FireWaveProjChargedStart : Projectile {
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
 		var character = damagable as Character;
-		character?.unfreezeIfFrozen();
 	}
 
 	public void putOutFire() {
@@ -162,7 +160,6 @@ public class FireWaveProjCharged : Projectile {
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
 		var character = damagable as Character;
-		character?.unfreezeIfFrozen();
 	}
 
 	public override void onDestroy() {

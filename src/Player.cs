@@ -1742,10 +1742,7 @@ public partial class Player {
 				if ((character as MegamanX)?.shotgunIceChargeTime > 0f) {
 					return false;
 				}
-				if (character.charState is Frozen ||
-					character.charState is Stunned ||
-					character.charState is Crystalized
-				) {
+				if (character.charState is GenericStun) {
 					return false;
 				}
 				if (character?.charState is SniperAimAxl) {

@@ -214,7 +214,6 @@ public class FlamethrowerProj : Projectile {
 		base.onHitDamagable(damagable);
 		if (weapon.type == (int)VileFlamethrowerType.WildHorseKick) {
 			var character = damagable as Character;
-			character?.unfreezeIfFrozen();
 		}
 	}
 }

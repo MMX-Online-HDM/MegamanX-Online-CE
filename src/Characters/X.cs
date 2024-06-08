@@ -338,10 +338,10 @@ public partial class MegamanX : Character {
 			if (charState is not XUPGrabState
 				and not XUPParryMeleeState
 				and not XUPParryProjState
-				and not Hurt and not Frozen
+				and not Hurt
+				and not GenericStun
 				and not VileMK2Grabbed
 				and not GenericGrabbedState
-				and not Stunned
 			) {
 				unpoTime += Global.spf;
 				UPDamageCooldown += Global.spf;

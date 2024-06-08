@@ -603,9 +603,9 @@ public class AI {
 			int BubbleSplash = player.weapons.FindIndex(w => w is BubbleSplash);
 
 			int Xattack = Helpers.randomRange(0, 12);
-			if (!megamanX.isHyperX && megamanX?.charState?.isGrabbedState == false && !player.isDead && megamanX.charState.canAttack() && megamanX.canShoot()
-			&& megamanX.canChangeWeapons()
-			&& !(character.charState is Hurt or Die or Frozen or Crystalized or Stunned or WarpIn or LadderClimb or Hadouken or Shoryuken or XUPGrabState)) {
+			if (!player.isDead && megamanX.charState.canAttack() && megamanX.canShoot() && megamanX.canChangeWeapons()
+				&& character.charState.normalCtrl && character.charState is not LadderClimb
+			) {
 				switch (Xattack) {
 					case 0:
 						// If X AI is facing Zero or Sigma
@@ -1315,18 +1315,18 @@ public class AI {
 		//Axl Start
 		if (character is Axl axl) {
 			if (player.axlHyperMode == 0 && player.currency >= 10 && !player.isDead && !axl.isSpriteInvulnerable() && !axl.isInvulnerable() && !axl.isWhiteAxl()
-				&& !(axl.charState is Hurt or Die or Frozen or Crystalized or Stunned or WarpIn or HyperAxlStart or WallSlide or WallKick or DodgeRoll)) {
+				&& !(axl.charState is Hurt or Die or GenericStun or WarpIn or HyperAxlStart or WallSlide or WallKick or DodgeRoll)) {
 				axl.changeState(new HyperAxlStart(axl.grounded), true);
 			}
 			if (player.axlHyperMode == 1 && player.currency >= 10 && !player.isDead && !axl.isSpriteInvulnerable() && !axl.isInvulnerable() && !axl.isStealthMode()
-				&& !(axl.charState is Hurt or Die or Frozen or Crystalized or Stunned or WarpIn or HyperAxlStart or WallSlide or WallKick or DodgeRoll)) {
+				&& !(axl.charState is Hurt or Die or GenericStun or WarpIn or HyperAxlStart or WallSlide or WallKick or DodgeRoll)) {
 				axl.stingChargeTime = 12;
 			}
 
 			int AAttack = Helpers.randomRange(0, 1);
 			if (axl.charState.canShoot() && !axl.isSpriteInvulnerable() && player.weapon.ammo > 0 && player.axlWeapon != null && axl.canShoot()
 				&& axl?.charState?.isGrabbedState == false && !player.isDead && axl.canChangeWeapons() && character.canChangeWeapons()
-				&& !(axl.charState is Hurt or Die or Frozen or Crystalized or Stunned or WarpIn or HyperAxlStart or WallSlide or WallKick or LadderClimb or DodgeRoll)) {
+				&& !(axl.charState is Hurt or Die or GenericStun or WarpIn or HyperAxlStart or WallSlide or WallKick or LadderClimb or DodgeRoll)) {
 				switch (AAttack) {
 					case 0:
 						player.press(Control.Shoot);
@@ -1388,7 +1388,7 @@ public class AI {
 							// If a projectile is close to Zero
 							if (character != null && proj.isFacing(character) &&
 								character.withinX(proj, 100) && character.withinY(proj, 30) && !player.isDead && zero.charState.canAttack() && zero.sprite.name != null &&
-								(zero.charState is not HyperZeroStart or LadderClimb or DarkHoldState or Hurt or Frozen or Crystalized or Die or WarpIn or WarpOut or WallSlide or WallKick or SwordBlock)
+								(zero.charState is not HyperZeroStart or LadderClimb or DarkHoldState or Hurt or GenericStun or Die or WarpIn or WarpOut or WallSlide or WallKick or SwordBlock)
 							) {
 								//Do i have giga attack ammo available?
 								if (zero.zeroGigaAttackWeapon.ammo >= 8f && zero.grounded) {

@@ -233,21 +233,44 @@ public class Damager {
 				if (damagerMessage?.damage != null) damage = damagerMessage.damage.Value;
 			}
 
-			if (projId == (int)ProjIds.CrystalHunter) damagerMessage = onCrystalDamage(damagable, owner, 2);
-			else if (projId == (int)ProjIds.CSnailCrystalHunter) damagerMessage = onCrystalDamage(damagable, owner, 2);
-			else if (projId == (int)ProjIds.AcidBurst) damagerMessage = onAcidDamage(damagable, owner, 2);
-			else if (projId == (int)ProjIds.AcidBurstSmall) damagerMessage = onAcidDamage(damagable, owner, 1);
-			else if (projId == (int)ProjIds.AcidBurstCharged) damagerMessage = onAcidDamage(damagable, owner, 3);
-			else if (projId == (int)ProjIds.TSeahorseAcid1) damagerMessage = onAcidDamage(damagable, owner, 2);
-			else if (projId == (int)ProjIds.TSeahorseAcid2) damagerMessage = onAcidDamage(damagable, owner, 2);
-			//else if (projId == (int)ProjIds.TSeahorsePuddle) damagerMessage = onAcidDamage(damagable, owner, 1);
-			//else if (projId == (int)ProjIds.TSeahorseEmerge) damagerMessage = onAcidDamage(damagable, owner, 2);
-			else if (projId == (int)ProjIds.ParasiticBomb) damagerMessage = onParasiticBombDamage(damagable, owner);
-			else if (projId == (int)ProjIds.ElectricShock ||
-				projId == (int)ProjIds.MK2StunShot ||
-				projId == (int)ProjIds.MorphMPowder
-			) {
-				damagerMessage = onStunShotDamage(damagable, owner);
+			switch (projId) {
+				case (int)ProjIds.CrystalHunter:
+					character?.crystalize();
+					break;
+				case (int)ProjIds.CSnailCrystalHunter:
+					character?.crystalize();
+					break;
+				case (int)ProjIds.AcidBurst:
+					damagerMessage = onAcidDamage(damagable, owner, 2);
+					break;
+				case (int)ProjIds.AcidBurstSmall:
+					damagerMessage = onAcidDamage(damagable, owner, 1);
+					break;
+				case (int)ProjIds.AcidBurstCharged:
+					damagerMessage = onAcidDamage(damagable, owner, 3);
+					break;
+				case (int)ProjIds.TSeahorseAcid1:
+					damagerMessage = onAcidDamage(damagable, owner, 2);
+					break;
+				case (int)ProjIds.TSeahorseAcid2:
+					damagerMessage = onAcidDamage(damagable, owner, 2);
+					break;
+				/*
+				case (int)ProjIds.TSeahorsePuddle:
+					damagerMessage = onAcidDamage(damagable, owner, 1);
+					break;
+				case (int)ProjIds.TSeahorseEmerge:
+					damagerMessage = onAcidDamage(damagable, owner, 2);
+					break;
+				*/
+				case (int)ProjIds.ParasiticBomb:
+					damagerMessage = onParasiticBombDamage(damagable, owner);
+					break;
+				case (int)ProjIds.ElectricShock:
+				case (int)ProjIds.MK2StunShot:
+				case (int)ProjIds.MorphMPowder:
+					character?.paralize();
+					break;
 			}
 			if (damagerMessage?.flinch != null) flinch = damagerMessage.flinch.Value;
 			if (damagerMessage?.damage != null) damage = damagerMessage.damage.Value;
@@ -349,35 +372,35 @@ public class Damager {
 
 			// Other effects
 			if (projId == (int)ProjIds.IceGattling) {
-				character.addIgFreezeProgress(1, 2);
+				character.addIgFreezeProgress(1);
 			} else if (projId == (int)ProjIds.IceGattlingHeadshot) {
-				character.addIgFreezeProgress(2, 2);
+				character.addIgFreezeProgress(2);
 			} else if (projId == (int)ProjIds.IceGattlingHyper) {
-				character.addIgFreezeProgress(2, 2);
+				character.addIgFreezeProgress(2);
 			} else if (projId == (int)ProjIds.Hyouretsuzan) {
-				character.addIgFreezeProgress(3, 2);
+				character.addIgFreezeProgress(3);
 			} else if (projId == (int)ProjIds.Hyouretsuzan2) {
-				character.freeze(2);
+				character.freeze();
 				flinch = 0;
 			} else if (projId == (int)ProjIds.VelGIce) {
-				character.addIgFreezeProgress(2, 2);
+				character.addIgFreezeProgress(2, 2 * 60);
 			} else if (projId == (int)ProjIds.BBuffaloBeam) {
-				character.freeze(2);
+				character.freeze();
 			} else if (projId == (int)ProjIds.PlasmaGun) {
 				if (mmx != null) {
 					mmx.barrierCooldown = 3;
 					mmx.barrierTime = 0;
 				}
 			} else if (projId == (int)ProjIds.ShotgunIceCharged) {
-				character.addIgFreezeProgress(4, 5);
+				character.addIgFreezeProgress(4, 5 * 60);
 			} else if (projId == (int)ProjIds.ChillPIceBlow) {
-				character.addIgFreezeProgress(4, 2);
+				character.addIgFreezeProgress(4);
 			} else if (projId == (int)ProjIds.HyorogaProj) {
-				character.addIgFreezeProgress(1.5f, 2);
+				character.addIgFreezeProgress(1.5f);
 			} else if (projId == (int)ProjIds.HyorogaSwing) {
-				character.addIgFreezeProgress(4, 2);
+				character.addIgFreezeProgress(4);
 			} else if (projId == (int)ProjIds.SeaDragonRage) {
-				character.addIgFreezeProgress(1, 2);
+				character.addIgFreezeProgress(1);
 			} else if (projId == (int)ProjIds.SplashLaser) {
 				if (damagingActor != null) {
 					character.splashLaserKnockback(damagingActor.deltaPos);
@@ -900,15 +923,6 @@ public class Damager {
 		return false;
 	}
 
-	public static DamagerMessage? onCrystalDamage(IDamagable damagable, Player attacker, int crystalTime) {
-		var character = damagable as Character;
-		if (character != null && character.ownedByLocalPlayer && character.canCrystalize()) {
-			character.vel.y = 0;
-			character.changeState(new Crystalized(crystalTime), true);
-		}
-		return null;
-	}
-
 	public static DamagerMessage? onAcidDamage(IDamagable damagable, Player attacker, float acidTime) {
 		(damagable as Character)?.addAcidTime(attacker, acidTime);
 		return null;
@@ -952,18 +966,6 @@ public class Damager {
 		return null;
 	}
 
-	public static DamagerMessage? onStunShotDamage(IDamagable damagable, Player attacker) {
-		var character = damagable as Character;
-		if (character != null && character.ownedByLocalPlayer && !character.isInvulnerable() &&
-			!(character.charState is Hurt) && !(character.charState is Die) &&
-			character.player.alliance != attacker.alliance
-		) {
-			if (!(character.charState is Stunned)) {
-				character.changeState(new Stunned(), true);
-			}
-		}
-		return null;
-	}
 
 	public static bool canDamageFrostShield(int projId) {
 		if (CrackedWall.canDamageCrackedWall(projId, null) != 0) {
