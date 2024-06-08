@@ -56,15 +56,6 @@ public class RisingWeapon : Weapon {
 	}
 }
 
-public class ZeroShoryukenWeapon : Weapon {
-	public ZeroShoryukenWeapon(Player player) : base() {
-		damager = new Damager(player, 4, Global.defFlinch, 0.5f);
-		index = (int)WeaponIds.ZeroShoryuken;
-		type = (int)RyuenjinType.Shoryuken;
-		killFeedIndex = 113;
-	}
-}
-
 public class ZeroUppercut : CharState {
 	bool jumpedYet;
 	float timeInWall;
@@ -142,14 +133,12 @@ public class ZeroUppercut : CharState {
 		if (canDownSpecial()) {
 			if (player.input.isPressed(Control.Shoot, player) && player.input.isHeld(Control.Down, player)) {
 				if (zero != null) {
-					if (!player.hasKnuckle())  character.changeState(new ZeroFallStab(zero.zeroDownThrustWeaponA), true);
-					else character.changeState(new DropKickState(), true);
+					character.changeState(new ZeroFallStab(zero.zeroDownThrustWeaponA), true);
 					return;
 				}
 			} else if (player.input.isPressed(Control.Special1, player) && player.input.isHeld(Control.Down, player)) {
 				if (zero != null) {
-					if (!player.hasKnuckle()) character.changeState(new ZeroFallStab(zero.zeroDownThrustWeaponS), true);
-					else character.changeState(new DropKickState(), true);
+					character.changeState(new ZeroFallStab(zero.zeroDownThrustWeaponS), true);
 					return;
 				}
 			}

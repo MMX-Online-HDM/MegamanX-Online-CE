@@ -62,7 +62,7 @@ public class ZeroFallStab : CharState {
 	public Weapon weapon;
 	public ZeroFallStabType type { get { return (ZeroFallStabType)weapon.type; } }
 	public bool canFreeze;
-	public Zero zero;
+	public Zero zero = null!;
 
 	public ZeroFallStab(Weapon weapon) : base(
 		getSpriteName(weapon.type) + "_fall", "", "", getSpriteName(weapon.type) + "_start"
@@ -138,7 +138,7 @@ public class ZeroFallStab : CharState {
 		if (ground == null) {
 			canFreeze = true;
 		}
-		zero = character as Zero;
+		zero = character as Zero ?? throw new NullReferenceException();
 	}
 
 	public override void onExit(CharState oldState) {
@@ -248,51 +248,21 @@ public class DropKickWeapon : Weapon {
 	}
 }
 
-
-public class DropKickState : CharState {
-	float stuckTime;
-	public DropKickState() : base("dropkick", "", "") {
-		exitOnLanding = true;
-		airMove = true;
+public class ZeroShoryukenWeapon : Weapon {
+	public ZeroShoryukenWeapon(Player player) : base() {
+		damager = new Damager(player, 4, Global.defFlinch, 0.5f);
+		index = (int)WeaponIds.ZeroShoryuken;
+		type = (int)RyuenjinType.Shoryuken;
+		killFeedIndex = 113;
 	}
+}
 
-	public override void update() {
-		if (character.frameIndex >= 3) {
-			character.vel.x = character.xDir * 300;
-			character.vel.y = 450;
-			if (!once) {
-				once = true;
-				character.playSound("punch2", sendRpc: true);
-			}
-		}
 
-		base.update();
-
-		var hit = Global.level.checkCollisionActor(character, character.vel.x * Global.spf, character.vel.y * Global.spf);
-		if (hit?.isSideWallHit() == true) {
-			character.changeState(new Fall(), true);
-			return;
-		} else if (hit != null) {
-			stuckTime += Global.spf;
-			if (stuckTime > 0.1f) {
-				character.changeState(new Fall(), true);
-				return;
-			}
-		}
-	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		character.stopMoving();
-		character.useGravity = false;
-	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-		character.useGravity = true;
-		character.stopMoving();
-		Zero zero = character as Zero;
-		zero.zeroDownThrustWeaponA.shootTime = 1;
-		zero.zeroDownThrustWeaponS.shootTime = 1;
+public class MegaPunchWeapon : Weapon {
+	public MegaPunchWeapon(Player player) : base() {
+		damager = new Damager(player, 3, Global.defFlinch, 0.06f);
+		index = (int)WeaponIds.MegaPunchWeapon;
+		killFeedIndex = 106;
+		type = (int)GroundSpecialType.MegaPunch;
 	}
 }

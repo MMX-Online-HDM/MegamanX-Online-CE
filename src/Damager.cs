@@ -408,9 +408,17 @@ public class Damager {
 
 			#endregion
 
+			float flinchCooldown = 0;
+			if (projectileFlinchCooldowns.ContainsKey(projId)) {
+				flinchCooldown = projectileFlinchCooldowns[projId];
+			}
+
 			if (mmx != null) {
 				if (mmx.checkMaverickWeakness((ProjIds)projId)) {
 					weakness = true;
+					if (flinch == 0 && flinchCooldown == 0) {
+						flinchCooldown = 1;
+					}
 					flinch = Global.defFlinch;
 					if (damage == 0) {
 						damage = 1;
@@ -418,12 +426,18 @@ public class Damager {
 				}
 			}
 
-			float flinchCooldown = 0;
-			if (projectileFlinchCooldowns.ContainsKey(projId)) {
-				flinchCooldown = projectileFlinchCooldowns[projId];
+			if (owner?.character is Zero zero && zero.isBlackZero() && !isDot(projId)) {
+				if (flinch <= 0) {
+					flinch = Global.halfFlinch;
+					flinchCooldown = 1;
+				} else if (flinch < Global.halfFlinch) {
+					flinch = Global.halfFlinch;
+				} else if (flinch < Global.defFlinch) {
+					flinch = Global.defFlinch;
+				}
+				damage = MathF.Ceiling(damage * 1.5f);
 			}
-
-			if (owner?.character is Zero zero && zero.isBlackZero() && projId != (int)ProjIds.Burn) {
+			if (owner?.character is PunchyZero pzero && pzero.isBlack && !isDot(projId)) {
 				if (flinch <= 0) {
 					flinch = Global.halfFlinch;
 					flinchCooldown = 1;
@@ -460,20 +474,9 @@ public class Damager {
 
 			if (damage > 0) {
 				bool isShotgunIceAndFrozen = character.sprite.name.Contains("frozen") && weaponKillFeedIndex == 8;
-				if ((flinch > 0 || weakness) && !isShotgunIceAndFrozen) {
-					float miniFlinchTime = 0;
-					bool isMiniFlinch = getIsMiniFlinch(projId);
+				if ((flinch > 0) && !isShotgunIceAndFrozen) {
+					victim?.playSound("hurt");
 
-					if (isMiniFlinch) {
-						miniFlinchTime = 0.1f;
-						victim?.playSound("hit");
-					} else {
-						victim?.playSound("hurt");
-					}
-
-					if (flinch == 0) {
-						flinch = Global.defFlinch;
-					}
 					int hurtDir = -character.xDir;
 					if (damagingActor != null && hitFromBehind(character, damagingActor, owner, projId)) {
 						hurtDir = 1;
@@ -481,18 +484,26 @@ public class Damager {
 					if (projId == (int)ProjIds.GravityWellCharged) {
 						hurtDir = 0;
 					}
-					character.setHurt(hurtDir, flinch, miniFlinchTime, spiked);
+					character.setHurt(hurtDir, flinch, spiked);
 
-					if (weaponKillFeedIndex == 18) {
+					//if (weaponKillFeedIndex == 18) {
 						//character.punchFlinchCooldown = Global.spf;
-					}
+					//}
 				} else {
 					if (playHurtSound || weaponKillFeedIndex == 18 ||
-						(projId == (int)ProjIds.BlackArrow && damage > 1) ||
-						((projId == (int)ProjIds.SpiralMagnum || projId == (int)ProjIds.SpiralMagnumScoped) && damage > 2) ||
-						((projId == (int)ProjIds.AssassinBullet || projId == (int)ProjIds.AssassinBulletQuick) && damage > 8)) {
-						victim?.playSound("hurt");
-					} else victim?.playSound("hit");
+						(
+							projId == (int)ProjIds.BlackArrow && damage > 1
+						) || ((
+							projId == (int)ProjIds.SpiralMagnum ||
+							projId == (int)ProjIds.SpiralMagnumScoped) && damage > 2
+						) || ((
+							projId == (int)ProjIds.AssassinBullet ||
+							projId == (int)ProjIds.AssassinBulletQuick) && damage > 8)
+						) {
+							victim?.playSound("hurt");
+					} else {
+						victim?.playSound("hit");
+					}
 				}
 			}
 		}
@@ -707,25 +718,6 @@ public class Damager {
 		damagable?.applyDamage(owner, weaponKillFeedIndex, finalDamage, projId);
 
 		return true;
-	}
-
-	private static bool getIsMiniFlinch(int projId) {
-		return
-			projId == (int)ProjIds.ElectricSpark ||
-			projId == (int)ProjIds.TriadThunderBall ||
-			projId == (int)ProjIds.TriadThunderBeam ||
-			projId == (int)ProjIds.TriadThunder ||
-			projId == (int)ProjIds.PeaceOutRoller ||
-			projId == (int)ProjIds.RayGun ||
-			projId == (int)ProjIds.RayGun2 ||
-			projId == (int)ProjIds.PlasmaGun2 ||
-			projId == (int)ProjIds.PlasmaGun2Hyper ||
-			projId == (int)ProjIds.VoltTornado ||
-			projId == (int)ProjIds.VoltTornadoHyper ||
-			projId == (int)ProjIds.Sigma2Ball ||
-			projId == (int)ProjIds.VoltCTriadThunder ||
-			projId == (int)ProjIds.DrDopplerBall ||
-			projId == (int)ProjIds.CopyShot;
 	}
 
 	public static bool isArmorPiercingOrElectric(int? projId) {

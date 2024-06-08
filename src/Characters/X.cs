@@ -262,7 +262,7 @@ public partial class MegamanX : Character {
 		quickArmorUpgrade();
 
 		if (charState is not Die &&
-			player.input.isPressed(Control.Special2, player) &&
+			player.input.isPressed(Control.Special1, player) &&
 			player.hasAllX3Armor() && !player.hasGoldenArmor()) {
 			if (player.input.isHeld(Control.Down, player)) {
 				player.setChipNum(0, false);
@@ -882,7 +882,7 @@ public partial class MegamanX : Character {
 
 	// Fast upgrading via command key.
 	public void quickArmorUpgrade() {
-		if (!player.input.isHeld(Control.Special1, player)) {
+		if (!player.input.isHeld(Control.Special2, player)) {
 			hyperProgress = 0;
 			return;
 		}

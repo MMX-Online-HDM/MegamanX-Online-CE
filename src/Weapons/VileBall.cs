@@ -135,8 +135,11 @@ public class VileBombProj : Projectile {
 public class PeaceOutRollerProj : Projectile {
 	int type;
 	bool split;
-	public PeaceOutRollerProj(Weapon weapon, Point pos, int xDir, Player player, int type, ushort netProjId, Point? vel = null, bool rpc = false) :
-		base(weapon, pos, xDir, 75, 3, player, "ball_por_proj", 1, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public PeaceOutRollerProj(
+		Weapon weapon, Point pos, int xDir, Player player, int type, ushort netProjId, Point? vel = null, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 75, 3, player, "ball_por_proj", Global.miniFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.PeaceOutRoller;
 		maxTime = 0.5f;
 		if (type == 1) maxTime = 0.4f;
@@ -149,7 +152,6 @@ public class PeaceOutRollerProj : Projectile {
 			gravityModifier = 0.5f;
 		} else {
 		}
-
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}

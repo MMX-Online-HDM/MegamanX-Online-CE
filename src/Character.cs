@@ -2875,22 +2875,18 @@ public partial class Character : Actor, IDamagable {
 		}
 	}
 
-	public void setHurt(int dir, int flinchFrames, float miniFlinchTime, bool spiked) {
+	public void setHurt(int dir, int flinchFrames, bool spiked) {
 		if (!ownedByLocalPlayer) {
 			return;
 		}
 		// Tough Guy.
 		if (player.isSigma || isToughGuyHyperMode()) {
-			if (miniFlinchTime > 0) return;
-			else {
-				flinchFrames = 6;
-				miniFlinchTime = 0.1f;
-			}
+			flinchFrames = 6;
 		}
 		if (charState is not Die and not InRideArmor and not InRideChaser &&
 			(charState is not Hurt hurtState || MathF.Floor(hurtState.stateTime * 60f) >= flinchFrames)
 		) {
-			changeState(new Hurt(dir, flinchFrames, miniFlinchTime, spiked), true);
+			changeState(new Hurt(dir, flinchFrames, spiked), true);
 		}
 	}
 

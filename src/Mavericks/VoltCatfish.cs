@@ -153,8 +153,13 @@ public class VoltCatfish : Maverick {
 public class VoltCTriadThunderProj : Projectile {
 	public bool electrified;
 	public VoltCatfish vc;
-	public VoltCTriadThunderProj(Weapon weapon, Point pos, int xDir, int type, Point velDir, VoltCatfish vc, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 2, player, type == 0 ? "voltc_proj_triadt_deactivated" : "voltc_proj_ball", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public VoltCTriadThunderProj(
+		Weapon weapon, Point pos, int xDir, int type, Point velDir,
+		VoltCatfish vc, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 2, player, type == 0 ? "voltc_proj_triadt_deactivated" : "voltc_proj_ball",
+		0, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.VoltCTriadThunder;
 		destroyOnHit = false;
 		shouldShieldBlock = false;

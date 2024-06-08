@@ -72,7 +72,6 @@ public class SelectZeroWeaponMenu : IMainMenu {
 
 		cursors = new List<WeaponCursor>();
 
-		cursors.Add(new WeaponCursor(zeroWeaponCategories[0].Item2.FindIndex(w => w.type == Options.main.zeroLoadout.melee)));
 		cursors.Add(new WeaponCursor(zeroWeaponCategories[1].Item2.FindIndex(w => w.type == Options.main.zeroLoadout.groundSpecial)));
 		cursors.Add(new WeaponCursor(zeroWeaponCategories[2].Item2.FindIndex(w => w.type == Options.main.zeroLoadout.airSpecial)));
 		cursors.Add(new WeaponCursor(zeroWeaponCategories[3].Item2.FindIndex(w => w.type == Options.main.zeroLoadout.uppercutS)));
@@ -110,9 +109,17 @@ public class SelectZeroWeaponMenu : IMainMenu {
 				return;
 			}
 
-			int[] oldArray = { Options.main.zeroLoadout.uppercutS, Options.main.zeroLoadout.uppercutA, Options.main.zeroLoadout.downThrustS, Options.main.zeroLoadout.downThrustA, Options.main.zeroLoadout.gigaAttack, Options.main.zeroLoadout.hyperMode, Options.main.zeroLoadout.melee, Options.main.zeroLoadout.groundSpecial, Options.main.zeroLoadout.airSpecial };
+			int[] oldArray = {
+				Options.main.zeroLoadout.uppercutS,
+				Options.main.zeroLoadout.uppercutA,
+				Options.main.zeroLoadout.downThrustS,
+				Options.main.zeroLoadout.downThrustA,
+				Options.main.zeroLoadout.gigaAttack,
+				Options.main.zeroLoadout.hyperMode,
+				Options.main.zeroLoadout.groundSpecial,
+				Options.main.zeroLoadout.airSpecial
+			};
 
-			Options.main.zeroLoadout.melee = zeroWeaponCategories[0].Item2[cursors[0].index].type;
 			Options.main.zeroLoadout.groundSpecial = zeroWeaponCategories[1].Item2[cursors[1].index].type;
 			Options.main.zeroLoadout.airSpecial = zeroWeaponCategories[2].Item2[cursors[2].index].type;
 			Options.main.zeroLoadout.uppercutS = zeroWeaponCategories[3].Item2[cursors[3].index].type;
@@ -121,7 +128,16 @@ public class SelectZeroWeaponMenu : IMainMenu {
 			Options.main.zeroLoadout.downThrustA = zeroWeaponCategories[6].Item2[cursors[6].index].type;
 			Options.main.zeroLoadout.gigaAttack = zeroWeaponCategories[7].Item2[cursors[7].index].type;
 			Options.main.zeroLoadout.hyperMode = cursors[8].index;
-			int[] newArray = { Options.main.zeroLoadout.uppercutS, Options.main.zeroLoadout.uppercutA, Options.main.zeroLoadout.downThrustS, Options.main.zeroLoadout.downThrustA, Options.main.zeroLoadout.gigaAttack, Options.main.zeroLoadout.hyperMode, Options.main.zeroLoadout.melee, Options.main.zeroLoadout.groundSpecial, Options.main.zeroLoadout.airSpecial };
+			int[] newArray = {
+				Options.main.zeroLoadout.uppercutS,
+				Options.main.zeroLoadout.uppercutA,
+				Options.main.zeroLoadout.downThrustS,
+				Options.main.zeroLoadout.downThrustA,
+				Options.main.zeroLoadout.gigaAttack,
+				Options.main.zeroLoadout.hyperMode,
+				Options.main.zeroLoadout.groundSpecial,
+				Options.main.zeroLoadout.airSpecial
+			};
 
 			if (!Enumerable.SequenceEqual(oldArray, newArray)) {
 				Options.main.saveToFile();

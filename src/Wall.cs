@@ -419,7 +419,7 @@ public class KillZone : Geometry {
 				chr.playSound(flinch ? "hurt" : "hit", sendRpc: true);
 				chr.addRenderEffect(RenderEffectType.Hit, 0.05f, 0.1f);
 				if (flinch && chr.ownedByLocalPlayer) {
-					chr.changeState(new Hurt(-chr.xDir, flinch ? Global.defFlinch : 0, 0));
+					chr.changeState(new Hurt(-chr.xDir, flinch ? Global.defFlinch : 0));
 				}
 			} else {
 				damagable.actor().playSound("hit", sendRpc: true);

@@ -641,7 +641,7 @@ public class GameMode {
 				if (count >= 3) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x, y + 11);
 				if (count >= 4) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x + 13, y + 11);
 			}
-			if (drawPlayer.character is Zero zero && !drawPlayer.isZBusterZero()) {
+			if (drawPlayer.character is Zero zero) {
 				int yStart = 159;
 				if (zero.isNightmareZero) {
 					Global.sprites["hud_killfeed_weapon"].drawToHUD(170, 7, 155);
@@ -674,7 +674,7 @@ public class GameMode {
 					xStart += 15;
 				}
 			}
-			if (drawPlayer.character is PunchyZero punchyZero && !drawPlayer.isZBusterZero()) {
+			if (drawPlayer.character is PunchyZero punchyZero) {
 				int xStart = 11;
 				int yStart = 159;
 				if (punchyZero.isViral) {
@@ -1462,7 +1462,7 @@ public class GameMode {
 		Weapon weapon = player.lastHudWeapon;
 		if (player.character != null) {
 			weapon = player.weapon;
-			if (player.character is Zero zero && !player.isZBusterZero()) {
+			if (player.character is Zero zero) {
 				weapon = zero.zeroGigaAttackWeapon;
 			}
 			if (player.character is PunchyZero punchyZero) {
@@ -2259,14 +2259,14 @@ public class GameMode {
 		for (int i = 0; i < dnaCore.weapons.Count && i < 6; i++) {
 			weapons.Add(dnaCore.weapons[i]);
 		}
-		if (dnaCore.charNum == 1 && dnaCore.loadout.zeroLoadout.melee != 2) {
+		if (dnaCore.charNum == (int)CharIds.Zero) {
 			if (dnaCore.hyperMode == DNACoreHyperMode.NightmareZero) {
 				weapons.Add(new DarkHoldWeapon() { ammo = dnaCore.rakuhouhaAmmo });
 			} else {
-				weapons.Add(RakuhouhaWeapon.getWeaponFromIndex(null, dnaCore.loadout.zeroLoadout.gigaAttack));
+				weapons.Add(RakuhouhaWeapon.getWeaponFromIndex(null, dnaCore.loadout?.zeroLoadout.gigaAttack ?? 0));
 			}
 		}
-		if (dnaCore.charNum == 4) {
+		if (dnaCore.charNum == (int)CharIds.Sigma) {
 			if (sigmaForm == 0) weapons.Add(new Weapon() {
 				weaponSlotIndex = 111,
 				ammo = dnaCore.rakuhouhaAmmo,

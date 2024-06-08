@@ -85,7 +85,7 @@ public class CharState {
 		}
 	}
 
-	public virtual void onExit(CharState? newState) {
+	public virtual void onExit(CharState newState) {
 		if (!useGravity) {
 			character.useGravity = true;
 		}
@@ -1390,22 +1390,17 @@ public class Hurt : CharState {
 	public int hurtDir;
 	public float hurtSpeed;
 	public float flinchTime;
-	public float miniFlinchTime;
 	public bool spiked;
-	public Hurt(int dir, int flinchFrames, float miniFlinchTime, bool spiked = false) : base("hurt") {
-		this.miniFlinchTime = miniFlinchTime;
-		if (miniFlinchTime == 0) {
-			hurtDir = dir;
-			hurtSpeed = dir * 100;
-			flinchTime = flinchFrames * (1 / 60f);
-		} else {
-			flinchTime = miniFlinchTime;
-		}
+	public Hurt(int dir, int flinchFrames, bool spiked = false) : base("hurt") {
+		this.flinchTime = flinchFrames;
+		hurtDir = dir;
+		hurtSpeed = dir * 100;
+		flinchTime = flinchFrames * (1 / 60f);
 		this.spiked = spiked;
 	}
 
 	public bool isMiniFlinch() {
-		return miniFlinchTime > 0;
+		return flinchTime >= 6;
 	}
 
 	public override bool canEnter(Character character) {
@@ -1417,8 +1412,8 @@ public class Hurt : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		if (miniFlinchTime == 0) {
-			if (!spiked) character.vel.y = -100;
+		if (!spiked && flinchTime > 2) {
+			character.vel.y = -0.125f * flinchTime + 0.25f;
 		}
 		if (player.isX && player.hasBodyArmor(1)) {
 			flinchTime *= 0.75f;
@@ -1434,7 +1429,7 @@ public class Hurt : CharState {
 			character.move(new Point(hurtSpeed, 0));
 		}
 
-		if (miniFlinchTime > 0) {
+		if (isMiniFlinch()) {
 			character.frameSpeed = 0;
 			if (Global.frameCount % 2 == 0) {
 				if (player.charNum == 0) character.frameIndex = 3;
@@ -1449,11 +1444,14 @@ public class Hurt : CharState {
 			}
 		}
 
-		if (player.character.canCharge() && player.input.isHeld(Control.Shoot, player)) {
+		if (player.character is MegamanX or Zero &&
+			player.character.canCharge() &&
+			player.character.chargeButtonHeld()
+		) {
 			player.character.increaseCharge();
 		}
 
-		if (stateTime >= flinchTime) {
+		if (frameTime >= flinchTime) {
 			character.changeState(new Idle());
 		}
 	}
