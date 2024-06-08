@@ -478,8 +478,8 @@ public class Damager {
 					victim?.playSound("hurt");
 
 					int hurtDir = -character.xDir;
-					if (damagingActor != null && hitFromBehind(character, damagingActor, owner, projId)) {
-						hurtDir = 1;
+					if (damagingActor != null && !hitFromFront(character, damagingActor, owner, projId)) {
+						hurtDir *= -1;
 					}
 					if (projId == (int)ProjIds.GravityWellCharged) {
 						hurtDir = 0;
