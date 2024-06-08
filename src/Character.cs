@@ -2205,7 +2205,7 @@ public partial class Character : Actor, IDamagable {
 		}
 
 		bool drewSubtankHealing = drawSubtankHealing();
-		if (player.isMainPlayer && !player.isDead) {
+		if (!player.isDead) {
 			bool drewStatusProgress = drawStatusProgress();
 
 			if (!drewStatusProgress && !drewSubtankHealing && dropFlagProgress > 0) {
@@ -2391,19 +2391,41 @@ public partial class Character : Actor, IDamagable {
 		int statusIndex = 0;
 		float statusProgress = 0;
 		float totalMashTime = 1;
+		float healthBarInnerWidth = 30;
 
-		if (frozenTime > 0) {
-			statusIndex = 0;
-			totalMashTime = frozenMaxTime;
-			statusProgress = frozenTime / totalMashTime;
-		} else if (crystalizedTime > 0) {
-			statusIndex = 1;
-			totalMashTime = crystalizedMaxTime;
-			statusProgress = crystalizedTime / totalMashTime;
-		} else if (paralyzedTime > 0) {
-			statusIndex = 2;
-			totalMashTime = paralyzedMaxTime;
-			statusProgress = paralyzedTime / totalMashTime;
+		if (charState is GenericStun gst) {
+			bool hasDrawn = false;
+			List<int> iconsToDraw = new();
+			if (crystalizedTime > 0) {
+				drawStatusBar(crystalizedTime, gst.getTimerFalloff(), crystalizedMaxTime, new Color(247, 206, 247));
+				deductLabelY(5);
+				iconsToDraw.Add(1);
+				hasDrawn = true;
+			}
+			if (frozenTime > 0) {
+				drawStatusBar(frozenTime, gst.getTimerFalloff(), frozenMaxTime, Color.Cyan);
+				deductLabelY(5);
+				iconsToDraw.Add(0);
+				hasDrawn = true;
+			}
+			if (paralyzedTime > 0) {
+				drawStatusBar(paralyzedTime, gst.getTimerFalloff(), paralyzedMaxTime, Color.Yellow);
+				deductLabelY(5);
+				iconsToDraw.Add(2);
+				hasDrawn = true;
+			}
+			if (hasDrawn) {
+				for(int i = 0; i < iconsToDraw.Count; i++) {
+					Global.sprites["hud_status_icon"].draw(
+						iconsToDraw[i],
+						pos.x - (iconsToDraw.Count - 1) * 8 + i * 12,
+						pos.y - 7 + currentLabelY,
+						1, 1, null, 1, 1, 1, ZIndex.HUD
+					);
+				}
+				deductLabelY(15);
+				return true;
+			}
 		} else if (charState is VileMK2Grabbed grabbed) {
 			statusIndex = 3;
 			totalMashTime = VileMK2Grabbed.maxGrabTime;
@@ -2453,8 +2475,6 @@ public partial class Character : Actor, IDamagable {
 			return false;
 		}
 
-		float healthBarInnerWidth = 30;
-
 		float width = Helpers.clampMax(MathF.Ceiling(healthBarInnerWidth * statusProgress), healthBarInnerWidth);
 		float mashWidth = healthBarInnerWidth * (player.lastMashAmount / totalMashTime);
 
@@ -2464,13 +2484,44 @@ public partial class Character : Actor, IDamagable {
 		Point botRight = new Point(pos.x + 16, pos.y + currentLabelY);
 		Global.sprites["hud_status_icon"].draw(statusIndex, pos.x, topLeft.y - 7, 1, 1, null, 1, 1, 1, ZIndex.HUD);
 
-		DrawWrappers.DrawRect(topLeft.x, topLeft.y, botRight.x, botRight.y, true, Color.Black, 0, ZIndex.HUD - 1, outlineColor: Color.White);
-		DrawWrappers.DrawRect(topLeft.x + 1, topLeft.y + 1, topLeft.x + 1 + width, botRight.y - 1, true, Color.Yellow, 0, ZIndex.HUD - 1);
-		DrawWrappers.DrawRect(topLeft.x + 1 + width, topLeft.y + 1, Math.Min(topLeft.x + 1 + width + mashWidth, botRight.x - 1), botRight.y - 1, true, Color.Red, 0, ZIndex.HUD - 1);
-
+		DrawWrappers.DrawRect(
+			topLeft.x, topLeft.y, botRight.x, botRight.y, true,
+			Color.Black, 0, ZIndex.HUD - 1, outlineColor: Color.White
+		);
+		DrawWrappers.DrawRect(
+			topLeft.x + 1, topLeft.y + 1, topLeft.x + 1 + width,
+			botRight.y - 1, true, Color.Yellow, 0, ZIndex.HUD - 1
+		);
+		DrawWrappers.DrawRect(
+			topLeft.x + 1 + width, topLeft.y + 1,
+			Math.Min(topLeft.x + 1 + width + mashWidth, botRight.x - 1),
+			botRight.y - 1, true, Color.Red, 0, ZIndex.HUD - 1
+		);
 		deductLabelY(labelStatusOffY);
 
 		return true;
+	}
+
+	public void drawStatusBar(float time, float mash, float maxTime, Color color) {
+		float healthBarInnerWidth = 30;
+		float width = Helpers.clampMax(MathF.Ceiling(healthBarInnerWidth * (time / maxTime)), healthBarInnerWidth);
+		float mashWidth = mash / maxTime;
+
+		Point topLeft = new Point(pos.x - 16, pos.y - 5 + currentLabelY);
+		Point botRight = new Point(pos.x + 16, pos.y + currentLabelY);
+		DrawWrappers.DrawRect(
+			topLeft.x, topLeft.y, botRight.x, botRight.y,
+			true, Color.Black, 0, ZIndex.HUD - 1, outlineColor: Color.White
+		);
+		DrawWrappers.DrawRect(
+			topLeft.x + 1, topLeft.y + 1, topLeft.x + 1 + width,
+			botRight.y - 1, true, color, 0, ZIndex.HUD - 1
+		);
+		DrawWrappers.DrawRect(
+			topLeft.x + 1 + width, topLeft.y + 1,
+			Math.Min(topLeft.x + 1 + width + mashWidth, botRight.x - 1), botRight.y - 1,
+			true, Color.Red, 0, ZIndex.HUD - 1
+		);
 	}
 
 	public bool hideHealthAndName() {

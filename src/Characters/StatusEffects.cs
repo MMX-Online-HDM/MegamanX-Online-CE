@@ -247,9 +247,16 @@ public class GenericStun : CharState {
 	}
 
 	
-	public float reduceStunFrames(ref float arg) {
+	public void reduceStunFrames(ref float arg) {
+		arg -= getTimerFalloff();
+		if (arg <= 0) {
+			arg = 0;
+		}
+	}
+	
+	public float getTimerFalloff() {
 		float healthPercent = 0.25f * (player.health / player.maxHealth);
-		return (Global.spf * (2 - healthPercent));
+		return (Global.speedMul * (2 - healthPercent));
 	}
 }
 
