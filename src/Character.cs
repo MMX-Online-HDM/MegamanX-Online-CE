@@ -2418,7 +2418,7 @@ public partial class Character : Actor, IDamagable {
 				for(int i = 0; i < iconsToDraw.Count; i++) {
 					Global.sprites["hud_status_icon"].draw(
 						iconsToDraw[i],
-						pos.x - (iconsToDraw.Count - 1) * 8 + i * 12,
+						pos.x - (iconsToDraw.Count - 1) * 6 + i * 12,
 						pos.y - 7 + currentLabelY,
 						1, 1, null, 1, 1, 1, ZIndex.HUD
 					);
