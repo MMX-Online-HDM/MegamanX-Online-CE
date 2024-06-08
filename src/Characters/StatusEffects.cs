@@ -189,6 +189,9 @@ public class GenericStun : CharState {
 		if (character.frozenTime > 0) {
 			return "frozen";
 		}
+		if (character.isCrystalized) {
+			return "idle";
+		}
 		if (character.paralyzedTime > 0 && character.grounded) {
 			return "lose";
 		}

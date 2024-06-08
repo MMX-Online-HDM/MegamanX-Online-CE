@@ -2403,13 +2403,13 @@ public partial class Character : Actor, IDamagable {
 				hasDrawn = true;
 			}
 			if (frozenTime > 0) {
-				drawStatusBar(frozenTime, gst.getTimerFalloff(), frozenMaxTime, Color.Cyan);
+				drawStatusBar(frozenTime, gst.getTimerFalloff(), frozenMaxTime, new Color(123, 206, 255));
 				deductLabelY(5);
 				iconsToDraw.Add(0);
 				hasDrawn = true;
 			}
 			if (paralyzedTime > 0) {
-				drawStatusBar(paralyzedTime, gst.getTimerFalloff(), paralyzedMaxTime, Color.Yellow);
+				drawStatusBar(paralyzedTime, gst.getTimerFalloff(), paralyzedMaxTime, new Color(255, 231, 123));
 				deductLabelY(5);
 				iconsToDraw.Add(2);
 				hasDrawn = true;
