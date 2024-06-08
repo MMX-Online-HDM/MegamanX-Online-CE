@@ -126,8 +126,12 @@ public class DrDoppler : Maverick {
 }
 
 public class DrDopplerBallProj : Projectile {
-	public DrDopplerBallProj(Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, 250, 3, player, type == 0 ? "drdoppler_proj_ball" : "drdoppler_proj_ball2", Global.miniFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public DrDopplerBallProj(
+		Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool sendRpc = false
+	) : base(
+		weapon, pos, xDir, 250, 3, player, type == 0 ? "drdoppler_proj_ball" : "drdoppler_proj_ball2",
+		Global.miniFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		if (type == 0) {
 			projId = (int)ProjIds.DrDopplerBall;
 		} else {

@@ -209,7 +209,7 @@ public class DevConsole {
 			new Command("ult", (args) => Global.level.mainPlayer.setUltimateArmor(true)),
 			new Command("health", (args) => setHealth(args)),
 			new Command("freeze", (args) => Global.level.mainPlayer.character.freeze(2)),
-			new Command("hurt", (args) => Global.level.mainPlayer.character.setHurt(-1, Global.defFlinch, 0, false)),
+			new Command("hurt", (args) => Global.level.mainPlayer.character.setHurt(-1, Global.defFlinch, false)),
 			new Command("trhealth", (args) => Global.spawnTrainingHealth = !Global.spawnTrainingHealth),
 			new Command("checksum", (args) => printChecksum()),
 			new Command("dna", (args) => addDnaCore(args)),

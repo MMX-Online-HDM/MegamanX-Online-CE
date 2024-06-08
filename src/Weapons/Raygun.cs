@@ -166,8 +166,11 @@ public class RayGunAltProj : Projectile {
 	float chargeDecreaseCooldown;
 	Axl axl;
 
-	public RayGunAltProj(Weapon weapon, Point pos, Point cursorPos, int xDir, Player player, ushort netProjId) :
-		base(weapon, pos, xDir, 0, 1, player, "axl_raygun_laser", 0, 0.33f, netProjId, player.ownedByLocalPlayer) {
+	public RayGunAltProj(
+		Weapon weapon, Point pos, Point cursorPos, int xDir, Player player, ushort netProjId
+	) : base(
+		weapon, pos, xDir, 0, 1, player, "axl_raygun_laser", 0, 0.33f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.RayGun2;
 		destroyOnHit = false;
 		shouldShieldBlock = false;

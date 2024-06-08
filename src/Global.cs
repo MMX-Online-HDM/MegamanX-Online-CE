@@ -587,7 +587,6 @@ public partial class Global {
 	public static readonly int defFlinch = 26;
 	public static readonly int halfFlinch = 13;
 	public static readonly int miniFlinch = 6;
-	public static readonly int fourFrameFlinch = 4;
 
 	public static DateTimeOffset UnixEpoch = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
 

@@ -91,21 +91,12 @@ public class Zero : Character {
 
 		var zeroLoadout = player.loadout.zeroLoadout;
 
-		if (!player.hasKnuckle()) {
-			raijingekiWeapon = RaijingekiWeapon.getWeaponFromIndex(player, zeroLoadout.groundSpecial);
-			zeroAirSpecialWeapon = KuuenzanWeapon.getWeaponFromIndex(player, zeroLoadout.airSpecial);
-			zeroUppercutWeaponA = RyuenjinWeapon.getWeaponFromIndex(player, zeroLoadout.uppercutA);
-			zeroUppercutWeaponS = RyuenjinWeapon.getWeaponFromIndex(player, zeroLoadout.uppercutS);
-			zeroDownThrustWeaponA = HyouretsuzanWeapon.getWeaponFromIndex(player, zeroLoadout.downThrustA);
-			zeroDownThrustWeaponS = HyouretsuzanWeapon.getWeaponFromIndex(player, zeroLoadout.downThrustS);
-		} else {
-			raijingekiWeapon = new MegaPunchWeapon(player);
-			zeroAirSpecialWeapon = KuuenzanWeapon.getWeaponFromIndex(player, zeroLoadout.airSpecial);
-			zeroUppercutWeaponA = new ZeroShoryukenWeapon(player);
-			zeroUppercutWeaponS = new ZeroShoryukenWeapon(player);
-			zeroDownThrustWeaponA = new DropKickWeapon(player);
-			zeroDownThrustWeaponS = new DropKickWeapon(player);
-		}
+		raijingekiWeapon = RaijingekiWeapon.getWeaponFromIndex(player, zeroLoadout.groundSpecial);
+		zeroAirSpecialWeapon = KuuenzanWeapon.getWeaponFromIndex(player, zeroLoadout.airSpecial);
+		zeroUppercutWeaponA = RyuenjinWeapon.getWeaponFromIndex(player, zeroLoadout.uppercutA);
+		zeroUppercutWeaponS = RyuenjinWeapon.getWeaponFromIndex(player, zeroLoadout.uppercutS);
+		zeroDownThrustWeaponA = HyouretsuzanWeapon.getWeaponFromIndex(player, zeroLoadout.downThrustA);
+		zeroDownThrustWeaponS = HyouretsuzanWeapon.getWeaponFromIndex(player, zeroLoadout.downThrustS);
 
 		_zeroGigaAttackWeapon = RakuhouhaWeapon.getWeaponFromIndex(player, zeroLoadout.gigaAttack);
 		zeroHyperMode = zeroLoadout.hyperMode;
@@ -134,7 +125,7 @@ public class Zero : Character {
 
 	public override void update() {
 		base.update();
-		zeroGigaAttackWeapon?.charLinkedUpdate(this, true);
+		zeroGigaAttackWeapon.charLinkedUpdate(this, true);
 
 		if (awakenedZeroTime >= 0) {
 			updateAwakenedZero();
@@ -253,13 +244,10 @@ public class Zero : Character {
 			charState is not HyperZeroStart and not WarpIn && (
 				!isNightmareZero &&
 				!isAwakenedZero() &&
-				!isBlackZero() &&
-				!isBlackZero2()
+				!isBlackZero()
 			)
 		) {
-			if (!player.isZBusterZero()) {
-				hyperProgress += Global.spf;
-			}
+			hyperProgress += Global.spf;
 		} else {
 			hyperProgress = 0;
 		}
@@ -302,7 +290,7 @@ public class Zero : Character {
 
 		bool notUpLogic = !player.input.isHeld(Control.Up, player) || !isMidairRising;
 		if (zeroAirSpecialWeapon.type != (int)AirSpecialType.Kuuenzan && spcPressed &&
-			!player.input.isHeld(Control.Down, player) && !isAttacking() && !player.hasKnuckle() &&
+			!player.input.isHeld(Control.Down, player) && !isAttacking() &&
 			(charState is Jump || charState is Fall || charState is WallKick) && !isInvulnerableAttack() &&
 			(zeroUppercutWeaponS.type != (int)RyuenjinType.Rising || !player.input.isHeld(Control.Up, player))) {
 			zeroAirSpecialWeapon.attack(this);
@@ -327,16 +315,13 @@ public class Zero : Character {
 		}
 
 		if (charState.canAttack() &&
-			charState is Idle && !player.hasKnuckle() &&
+			charState is Idle &&
 			((sprite.name == "zero_attack" && framePercent > 0.7f) ||
 			(sprite.name == "zero_attack2" && framePercent > 0.55f)) &&
 			spcPressed &&
 			!player.input.isHeld(Control.Up, player) &&
 			!player.input.isHeld(Control.Down, player)
 		) {
-			raijingekiWeapon.attack2(this);
-		} else if (charState.canAttack() && charState is Idle && player.hasKnuckle() && ((sprite.name == "zero_punch" && framePercent > 0.6f) || (sprite.name == "zero_punch2" && framePercent > 0.6f)) && spcPressed &&
-				!player.input.isHeld(Control.Up, player) && !player.input.isHeld(Control.Down, player)) {
 			raijingekiWeapon.attack2(this);
 		} else if (charState.canAttack() && (spcPressed || lenientAttackPressed) && !isAttacking()) {
 			if (charState is Idle || charState is Run || charState is Crouch) {
@@ -379,10 +364,9 @@ public class Zero : Character {
 				} else if (player.input.isHeld(Control.Down, player)) {
 					spcActivated = true;
 					if (hyouretsuzanCooldown <= 0) {
-						if (!player.hasKnuckle()) changeState(new ZeroFallStab(lenientAttackPressed ? zeroDownThrustWeaponA : zeroDownThrustWeaponS), true);
-						else changeState(new DropKickState(), true);
+						changeState(new ZeroFallStab(lenientAttackPressed ? zeroDownThrustWeaponA : zeroDownThrustWeaponS), true);
 					}
-				} else if ((Options.main.swapAirAttacks || airAttackCooldown == 0) && !lenientAttackPressed && !player.hasKnuckle()) {
+				} else if ((Options.main.swapAirAttacks || airAttackCooldown == 0) && !lenientAttackPressed) {
 					if (zeroAirSpecialWeapon.type == (int)AirSpecialType.Kuuenzan || !spcPressed) {
 						playSound("saber1", sendRpc: true);
 						changeState(new Fall(), true);
@@ -392,18 +376,12 @@ public class Zero : Character {
 				}
 
 			} else if (charState is Dash && !lenientAttackPressed) {
-				if (!player.hasKnuckle()) {
-					if (dashAttackCooldown > 0) return;
-					dashAttackCooldown = maxDashAttackCooldown;
-					slideVel = xDir * getDashSpeed();
-					changeState(new Idle(), true);
-					playSound("saber1", sendRpc: true);
-					changeSprite("zero_attack_dash2", true);
-				} else {
-					if (dashAttackCooldown > 0) return;
-					changeState(new ZeroSpinKickState(), true);
-					return;
-				}
+				if (dashAttackCooldown > 0) return;
+				dashAttackCooldown = maxDashAttackCooldown;
+				slideVel = xDir * getDashSpeed();
+				changeState(new Idle(), true);
+				playSound("saber1", sendRpc: true);
+				changeSprite("zero_attack_dash2", true);
 			}
 		}
 
@@ -417,44 +395,22 @@ public class Zero : Character {
 					}
 				}
 				var attackSprite = charState.attackSprite;
-				if (player.hasKnuckle()) {
-					attackSprite = attackSprite.Replace("attack", "punch");
-					string attackSound = "punch1";
-					if (charState is Jump || charState is Fall || charState is WallKick) attackSprite = "kick_air";
-					if (charState is Dash) {
-						if (dashAttackCooldown > 0) return;
-						changeState(new ZeroSpinKickState(), true);
-						return;
-					}
-					if (charState is Crouch) {
-						return;
-					}
-					if (Global.spriteIndexByName.ContainsKey(getSprite(attackSprite))) {
-						playSound(attackSound, sendRpc: true);
-					}
-					if (charState is Run) changeState(new Idle(), true);
-					else if (charState is Jump) changeState(new Fall(), true);
-				} else {
-					if (charState is Run) changeState(new Idle(), true);
-					else if (charState is Jump) changeState(new Fall(), true);
-					else if (charState is Dash) {
-						if (dashAttackCooldown > 0) return;
-						dashAttackCooldown = maxDashAttackCooldown;
-						slideVel = xDir * getDashSpeed();
-						changeState(new Idle(), true);
-					}
-					if (charState is Fall) {
-						if (Options.main.swapAirAttacks) {
-							if (airAttackCooldown > 0) return;
-							airAttackCooldown = maxAirAttackCooldown;
-						}
+				if (charState is Run) changeState(new Idle(), true);
+				else if (charState is Jump) changeState(new Fall(), true);
+				else if (charState is Dash) {
+					if (dashAttackCooldown > 0) return;
+					dashAttackCooldown = maxDashAttackCooldown;
+					slideVel = xDir * getDashSpeed();
+					changeState(new Idle(), true);
+				}
+				if (charState is Fall) {
+					if (Options.main.swapAirAttacks) {
+						if (airAttackCooldown > 0) return;
+						airAttackCooldown = maxAirAttackCooldown;
 					}
 				}
 				changeSprite(getSprite(attackSprite), true);
-
-				if (!player.hasKnuckle()) {
-					playSound("saber1", sendRpc: true);
-				}
+				playSound("saber1", sendRpc: true);
 			} else if (charState is Idle && sprite.name == "zero_attack" && framePercent > 0.4f) {
 				playSound("saber2", sendRpc: true);
 				changeSprite("zero_attack2", true);
@@ -484,7 +440,7 @@ public class Zero : Character {
 		if (changedState) {
 			return true;
 		}
-		if (charState.attackCtrl && charState is not Dash && grounded && !isAttacking() && player.isZSaber() && (
+		if (charState.attackCtrl && charState is not Dash && grounded && !isAttacking() && (
 				player.input.isHeld(Control.WeaponLeft, player) ||
 				(player.input.isHeld(Control.WeaponRight, player) && !isAwakenedZero())
 			) && (
@@ -496,23 +452,18 @@ public class Zero : Character {
 			changeState(new SwordBlock());
 			return true;
 		} else if (
-			charState.attackCtrl && !player.isZBusterZero() && !isDashing && (
+			charState.attackCtrl && !isDashing && (
 				player.input.isPressed(Control.WeaponLeft, player) ||
 				(player.input.isHeld(Control.WeaponRight, player) && !isAwakenedZero())
 			  ) && (
 				  !player.isDisguisedAxl || player.input.isHeld(Control.Down, player)
 			  )
-		  ) {
-			if (!player.hasKnuckle()) {
-				if (grounded && !isAttacking()) {
-					turnToInput(player.input, player);
-					changeState(new SwordBlock());
-				}
-				return true;
-			} else if (parryCooldown == 0) {
-				changeState(new KKnuckleParryStartState());
-				return true;
+			) {
+			if (grounded && !isAttacking()) {
+				turnToInput(player.input, player);
+				changeState(new SwordBlock());
 			}
+			return true;
 		}
 		return false;
 	}
@@ -760,8 +711,6 @@ public class Zero : Character {
 	}
 
 	public bool canUseDoubleBusterCombo() {
-		//if (isBlackZero()) return true;
-		if (player.isZBusterZero()) return true;
 		return false;
 	}
 
@@ -775,11 +724,7 @@ public class Zero : Character {
 
 	// isBlackZero below can be used by non-owners as these times are sync'd
 	public bool isBlackZero() {
-		return blackZeroTime > 0 && !player.isZBusterZero();
-	}
-
-	public bool isBlackZero2() {
-		return blackZeroTime > 0 && player.isZBusterZero();
+		return blackZeroTime > 0;
 	}
 
 	// These methods below can't be used by non-owners of the character since the times aren't sync'd. Use the BS states instead
@@ -827,11 +772,6 @@ public class Zero : Character {
 
 	public override bool isToughGuyHyperMode() {
 		return isBlackZero();
-	}
-	public override void increaseCharge() {
-		float factor = 1;
-		if (isBlackZero2()) factor = 1.5f;
-		chargeTime += Global.spf * factor;
 	}
 
 	public override void changeSprite(string spriteName, bool resetFrame) {
@@ -935,7 +875,7 @@ public class Zero : Character {
 
 	public override float getRunSpeed() {
 		float runSpeed = 90;
-		if (isBlackZero() || isBlackZero2()) {
+		if (isBlackZero()) {
 			runSpeed *= 1.15f;
 		}
 		return runSpeed * getRunDebuffs();
@@ -947,7 +887,7 @@ public class Zero : Character {
 		}
 		float dashSpeed = 210;
 
-		if (isBlackZero() || isBlackZero2()) {
+		if (isBlackZero()) {
 			dashSpeed *= 1.15f;
 		}
 		return dashSpeed * getRunDebuffs();

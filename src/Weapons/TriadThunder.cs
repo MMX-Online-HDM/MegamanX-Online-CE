@@ -50,7 +50,7 @@ public class TriadThunderProj : Projectile {
 		Point pos, int xDir, int yDir, Player player, ushort netProjId, bool rpc = false
 	) : base(
 		TriadThunder.netWeapon, pos, xDir, 0, 1, player, "triadthunder_proj",
-		Global.fourFrameFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+		Global.miniFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.TriadThunder;
 		character = player.character;
@@ -145,7 +145,7 @@ public class TriadThunderBall : Projectile {
 		Weapon weapon, Point pos, int xDir, Player player
 	) : base(
 		weapon, pos, xDir, 0, 2, player, "triadthunder_ball",
-		Global.fourFrameFlinch, 0.5f, null, player.ownedByLocalPlayer
+		Global.miniFlinch, 0.5f, null, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.TriadThunder;
 		destroyOnHit = false;
@@ -204,8 +204,12 @@ public class TriadThunderBeam : Actor {
 
 public class TriadThunderBeamPiece : Projectile {
 	int type;
-	public TriadThunderBeamPiece(Weapon weapon, Point pos, int xDir, int yDir, Player player, int type, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 2, player, type == 0 ? "triadthunder_beam_up" : "triadthunder_beam_diag", 4, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public TriadThunderBeamPiece(
+		Weapon weapon, Point pos, int xDir, int yDir, Player player, int type, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 2, player, type == 0 ? "triadthunder_beam_up" : "triadthunder_beam_diag",
+		Global.miniFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		this.type = type;
 		this.yDir = yDir;
 		maxTime = 0.125f;

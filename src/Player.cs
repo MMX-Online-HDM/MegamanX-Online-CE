@@ -2460,18 +2460,6 @@ public partial class Player {
 		return weapon is HyperBuster hb && hb.canShootIncludeCooldown(this);
 	}
 
-	public bool isZSaber() {
-		return loadout?.zeroLoadout?.melee == 0;
-	}
-
-	public bool hasKnuckle() {
-		return loadout?.zeroLoadout?.melee == 1;
-	}
-
-	public bool isZBusterZero() {
-		return isZero && loadout.zeroLoadout.melee == 2;
-	}
-
 	// Sigma helper functions
 
 	public bool isSigma1AndSigma() {

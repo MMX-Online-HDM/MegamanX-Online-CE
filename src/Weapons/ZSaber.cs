@@ -50,10 +50,6 @@ public class ZSaberProj : Projectile {
 		reflectable = true;
 		projId = (int)ProjIds.ZSaberProj;
 		if (player.character is Zero zero) {
-			if (zero.isBlackZero2() == true) {
-				damager.damage = 4;
-				genericShader = player.zeroPaletteShader;
-			}
 			if (zero.isBlackZero() == true) {
 				genericShader = player.zeroPaletteShader;
 			}
