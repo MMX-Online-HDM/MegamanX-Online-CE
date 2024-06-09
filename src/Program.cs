@@ -943,7 +943,7 @@ class Program {
 
 			if (isIniMusic) {
 				loadMusicData(files[i]);
-			} if (isLocal) {
+			} else if (isLocal) {
 				loadMusicWithoutData(files[i]);
 			} else {
 				loadMusicDataLegacy(files[i]);
