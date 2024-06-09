@@ -13,8 +13,12 @@ public class BubbleCrab : Maverick {
 
 	float clawSoundTime;
 
-	public BubbleCrab(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
-		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
+	public BubbleCrab(
+		Player player, Point pos, Point destPos, int xDir,
+		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(
+		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+	) {
 		//stateCooldowns.Add(typeof(BCrabShieldStartState), new MaverickStateCooldown(false, true, 0.75f));
 
 		weapon = getWeapon();
@@ -35,6 +39,8 @@ public class BubbleCrab : Maverick {
 		maxAmmo = 32;
 		grayAmmoLevel = 8;
 		barIndexes = (62, 51);
+
+		armorClass = ArmorClass.Light;
 	}
 
 	public override void update() {
@@ -159,8 +165,13 @@ public class BCrabBubbleSplashProj : Projectile {
 	bool once;
 	int num;
 	int type;
-	public BCrabBubbleSplashProj(Weapon weapon, Point pos, int xDir, int num, int type, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 0, player, "bcrab_bubble_ring_start", 0, 0.15f, netProjId, player.ownedByLocalPlayer) {
+	public BCrabBubbleSplashProj(
+		Weapon weapon, Point pos, int xDir, int num,
+		int type, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 0, player, "bcrab_bubble_ring_start",
+		0, 0.15f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.BCrabBubbleSplash;
 		this.num = num;
 		this.type = type;
@@ -220,7 +231,10 @@ public class BCrabShootState : MaverickState {
 			num = (num == 1 ? 0 : 1);
 			maverick.playSound("bcrabShoot", sendRpc: true);
 			int type = input.isHeld(Control.Up, player) ? 1 : 0;
-			new BCrabBubbleSplashProj(maverick.weapon, shootPos.Value, maverick.xDir, num, type, player, player.getNextActorNetId(), rpc: true);
+			new BCrabBubbleSplashProj(
+				maverick.weapon, shootPos.Value, maverick.xDir,
+				num, type, player, player.getNextActorNetId(), rpc: true
+			);
 		}
 
 		if (!secondAnim) {
@@ -295,9 +309,16 @@ public class BCrabClawJumpState : MaverickState {
 
 public class BCrabShieldProj : Projectile, IDamagable {
 	public float health = 8;
+	public float maxHealth = 8;
+
 	public bool once;
-	public BCrabShieldProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 0, player, "bcrab_shield", 0, 1, netProjId, player.ownedByLocalPlayer) {
+	public BCrabShieldProj(
+		Weapon weapon, Point pos, int xDir,
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 0, player, "bcrab_shield",
+		0, 1, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.BCrabBubbleShield;
 		syncScale = true;
 		yScale = 0;
@@ -333,17 +354,33 @@ public class BCrabShieldProj : Projectile, IDamagable {
 	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
 		if (!ownedByLocalPlayer) return;
 
-		if (projId == (int)ProjIds.SpinWheel || projId == (int)ProjIds.SpinWheelCharged || projId == (int)ProjIds.WheelGSpinWheel) damage = health;
+		if (projId == (int)ProjIds.SpinWheel ||
+			projId == (int)ProjIds.SpinWheelCharged ||
+			projId == (int)ProjIds.WheelGSpinWheel
+		) {
+			damage *= 2;
+		}
 		health -= damage;
 		if (health <= 0) {
 			destroySelf();
 		}
 	}
-
-	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) { return damagerAlliance != owner.alliance; }
-	public bool canBeHealed(int healerAlliance) { return false; }
-	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) { }
-	public bool isInvincible(Player attacker, int? projId) { return false; }
+	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
+		return damagerAlliance != owner.alliance;
+	}
+	public bool canBeHealed(int healerAlliance) {
+		return (health < maxHealth);
+	}
+	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
+		commonHealLogic(healer, healAmount, health, maxHealth, drawHealText);
+		health += healAmount;
+		if (health > maxHealth) {
+			health = maxHealth;
+		}
+	}
+	public bool isInvincible(Player attacker, int? projId) {
+		return false;
+	}
 }
 
 public class BCrabShieldStartState : MaverickState {
@@ -360,7 +397,9 @@ public class BCrabShieldStartState : MaverickState {
 				once = true;
 				maverick.deductAmmo(8);
 				maverick.playSound("bcrabShield", sendRpc: true);
-				var shield = new BCrabShieldProj(maverick.weapon, shootPos.Value, maverick.xDir, player, player.getNextActorNetId(), rpc: true);
+				var shield = new BCrabShieldProj(
+					maverick.weapon, shootPos.Value, maverick.xDir, player, player.getNextActorNetId(), rpc: true
+				);
 				(maverick as BubbleCrab).shield = shield;
 			}
 		}
@@ -372,9 +411,16 @@ public class BCrabShieldStartState : MaverickState {
 }
 
 public class BCrabSummonBubbleProj : Projectile, IDamagable {
-	float health = 2;
-	public BCrabSummonBubbleProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 0, player, "bcrab_summon_bubble", 0, 1, netProjId, player.ownedByLocalPlayer) {
+	public float health = 2;
+	public float maxHealth = 2;
+
+	public BCrabSummonBubbleProj(
+		Weapon weapon, Point pos, int xDir,
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 0, player, "bcrab_summon_bubble",
+		0, 1, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.BCrabCrablingBubble;
 		setIndestructableProperties();
 		syncScale = true;
@@ -382,7 +428,6 @@ public class BCrabSummonBubbleProj : Projectile, IDamagable {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
-		// ToDo: Make local.
 		canBeLocal = false;
 	}
 
@@ -396,26 +441,53 @@ public class BCrabSummonBubbleProj : Projectile, IDamagable {
 	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
 		if (!ownedByLocalPlayer) return;
 
-		if (projId == (int)ProjIds.SpinWheel || projId == (int)ProjIds.SpinWheelCharged || projId == (int)ProjIds.WheelGSpinWheel) damage = health;
+		if (projId == (int)ProjIds.SpinWheel ||
+			projId == (int)ProjIds.SpinWheelCharged ||
+			projId == (int)ProjIds.WheelGSpinWheel
+		) {
+			damage *= 2;
+		}
 		health -= damage;
 		if (health <= 0) {
 			destroySelf();
 		}
 	}
 
-	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) { return damagerAlliance != owner.alliance; }
-	public bool canBeHealed(int healerAlliance) { return false; }
-	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) { }
-	public bool isInvincible(Player attacker, int? projId) { return false; }
+	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
+		return false;
+	}
+	public bool canBeHealed(int healerAlliance) {
+		return false;
+	}
+	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
+		commonHealLogic(healer, healAmount, health, maxHealth, drawHealText);
+		health += healAmount;
+		if (health > maxHealth) {
+			health = maxHealth;
+		}
+	}
+	public bool isInvincible(Player attacker, int? projId) {
+		return false;
+	}
 }
 
 public class BCrabSummonCrabProj : Projectile, IDamagable {
-	float health = 2;
+	public float health = 4;
+	public float maxHealth = 4;
+	public float bubbleSummonCooldown = 120;
+
 	int? moveDirOnce = null;
+
 	BCrabSummonBubbleProj shield;
 	BubbleCrab maverick;
-	public BCrabSummonCrabProj(Weapon weapon, Point pos, Point vel, BubbleCrab maverick, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, 1, 0, 2, player, "bcrab_summon_crab", Global.halfFlinch, 1, netProjId, player.ownedByLocalPlayer) {
+
+	public BCrabSummonCrabProj(
+		Weapon weapon, Point pos, Point vel, BubbleCrab maverick,
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, 1, 0, 2, player, "bcrab_summon_crab",
+		Global.halfFlinch, 1, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.BCrabCrabling;
 		this.vel = vel;
 		this.maverick = maverick;
@@ -429,7 +501,6 @@ public class BCrabSummonCrabProj : Projectile, IDamagable {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
-		// ToDo: Make local.
 		canBeLocal = false;
 	}
 
@@ -444,11 +515,19 @@ public class BCrabSummonCrabProj : Projectile, IDamagable {
 		if (!ownedByLocalPlayer) return;
 
 		if (shield != null) {
-			if (shield.destroyed) shield = null;
-			else shield.changePos(pos);
+			if (shield.destroyed) {
+				shield = null;
+			} else {
+				shield.changePos(pos);
+			}
 		} else {
-			patrol();
+			bubbleSummonCooldown -= Global.speedMul;
+			if (bubbleSummonCooldown <= 0) {
+				bubbleSummonCooldown = 0;
+				shield = new BCrabSummonBubbleProj(maverick.weapon, pos, xDir, owner, owner.getNextActorNetId(), rpc: true);
+			}
 		}
+		patrol();
 	}
 
 	public void patrol() {
@@ -499,24 +578,44 @@ public class BCrabSummonCrabProj : Projectile, IDamagable {
 	public override void onDestroy() {
 		base.onDestroy();
 		if (!ownedByLocalPlayer) return;
+
 		maverick.crabs.Remove(this);
 		shield?.destroySelf();
 	}
 
 	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
 		if (!ownedByLocalPlayer) return;
-
-		if (projId == (int)ProjIds.SpinWheel || projId == (int)ProjIds.SpinWheelCharged || projId == (int)ProjIds.WheelGSpinWheel) damage = health;
+		if (shield != null) {
+			shield.applyDamage(owner, weaponIndex, damage, projId);
+			return;
+		}
+		if (projId == (int)ProjIds.SpinWheel ||
+			projId == (int)ProjIds.SpinWheelCharged ||
+			projId == (int)ProjIds.WheelGSpinWheel
+		) {
+			damage *= 2;
+		}
 		health -= damage;
 		if (health <= 0) {
 			destroySelf();
 		}
 	}
-
-	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) { return damagerAlliance != owner.alliance; }
-	public bool canBeHealed(int healerAlliance) { return false; }
-	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) { }
-	public bool isInvincible(Player attacker, int? projId) { return false; }
+	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
+		return damagerAlliance != owner.alliance;
+	}
+	public bool canBeHealed(int healerAlliance) {
+		return (health < maxHealth);
+	}
+	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
+		commonHealLogic(healer, healAmount, health, maxHealth, drawHealText);
+		health += healAmount;
+		if (health > maxHealth) {
+			health = maxHealth;
+		}
+	}
+	public bool isInvincible(Player attacker, int? projId) {
+		return false;
+	}
 }
 
 public class BCrabSummonState : MaverickState {
@@ -531,9 +630,21 @@ public class BCrabSummonState : MaverickState {
 		if (!once && shootPos != null) {
 			once = true;
 			var bc = maverick as BubbleCrab;
-			if (bc.crabs.Count < 3) bc.crabs.Add(new BCrabSummonCrabProj(maverick.weapon, shootPos.Value, new Point(-50, -300), bc, player, player.getNextActorNetId(), rpc: true));
-			if (bc.crabs.Count < 3) bc.crabs.Add(new BCrabSummonCrabProj(maverick.weapon, shootPos.Value, new Point(0, -300), bc, player, player.getNextActorNetId(), rpc: true));
-			if (bc.crabs.Count < 3) bc.crabs.Add(new BCrabSummonCrabProj(maverick.weapon, shootPos.Value, new Point(50, -300), bc, player, player.getNextActorNetId(), rpc: true));
+			if (bc.crabs.Count < 3) bc.crabs.Add(
+				new BCrabSummonCrabProj(
+					maverick.weapon, shootPos.Value, new Point(-50, -300),
+					bc, player, player.getNextActorNetId(), rpc: true)
+				);
+			if (bc.crabs.Count < 3) bc.crabs.Add(
+				new BCrabSummonCrabProj(
+					maverick.weapon, shootPos.Value, new Point(0, -300),
+					bc, player, player.getNextActorNetId(), rpc: true)
+				);
+			if (bc.crabs.Count < 3) bc.crabs.Add(
+				new BCrabSummonCrabProj(
+					maverick.weapon, shootPos.Value, new Point(50, -300),
+					bc, player, player.getNextActorNetId(), rpc: true)
+				);
 		}
 
 		if (maverick.isAnimOver()) {

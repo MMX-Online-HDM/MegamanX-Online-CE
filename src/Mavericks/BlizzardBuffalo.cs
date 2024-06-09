@@ -6,16 +6,20 @@ namespace MMXOnline;
 
 public class BlizzardBuffalo : Maverick {
 	public static Weapon getWeapon() { return new Weapon(WeaponIds.BBuffaloGeneric, 151); }
-	public static Weapon getMeleeWeapon(Player player) { return new Weapon(WeaponIds.BBuffaloGeneric, 151, new Damager(player, 4, Global.defFlinch, 1)); }
+	public static Weapon getMeleeWeapon(Player player) {
+		return new Weapon(WeaponIds.BBuffaloGeneric, 151, new Damager(player, 4, Global.defFlinch, 1));
+	}
 
 	public Weapon meleeWeapon;
-	public BlizzardBuffalo(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
-		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
+	public BlizzardBuffalo(
+		Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(
+		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+	) {
 		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
 		stateCooldowns.Add(typeof(BBuffaloDashState), new MaverickStateCooldown(false, true, 1.25f));
 		stateCooldowns.Add(typeof(BBuffaloShootBeamState), new MaverickStateCooldown(false, false, 2));
 
-		isHeavy = true;
 		spriteFrameToSounds["bbuffalo_run/2"] = "walkStomp";
 		spriteFrameToSounds["bbuffalo_run/6"] = "walkStomp";
 
@@ -31,6 +35,9 @@ public class BlizzardBuffalo : Maverick {
 		if (sendRpc) {
 			createActorRpc(player.id);
 		}
+
+		armorClass = ArmorClass.Heavy;
+		canStomp = true;
 	}
 
 	public override void update() {
@@ -82,7 +89,10 @@ public class BlizzardBuffalo : Maverick {
 			int shootFramesHeld = (state as MShoot)?.shootFramesHeld ?? 0;
 			float speedModifier = Helpers.clamp((shootFramesHeld + 3) / 10f, 0.5f, 1.5f);
 
-			new BBuffaloIceProj(weapon, pos, xDir, unitDir.normalize(), speedModifier, player, player.getNextActorNetId(), sendRpc: true);
+			new BBuffaloIceProj(
+				weapon, pos, xDir, unitDir.normalize(),
+				speedModifier, player, player.getNextActorNetId(), sendRpc: true
+			);
 		}, null);
 		if (isAI) {
 			mshoot.consecutiveData = new MaverickStateConsecutiveData(0, 4, 0.75f);
@@ -100,12 +110,18 @@ public class BlizzardBuffalo : Maverick {
 
 	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (sprite.name.EndsWith("_dash")) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.BBuffaloDrag, player, damage: 0, flinch: 0, hitCooldown: 0.5f, owningActor: this);
+			return new GenericMeleeProj(
+				weapon, centerPoint, ProjIds.BBuffaloDrag,
+				player, damage: 0, flinch: 0, hitCooldown: 0.5f, owningActor: this
+			);
 		}
 		if (sprite.name.Contains("fall")) {
 			float damagePercent = getStompDamage();
 			if (damagePercent > 0) {
-				return new GenericMeleeProj(weapon, centerPoint, ProjIds.BBuffaloStomp, player, damage: 4 * damagePercent, flinch: Global.defFlinch, hitCooldown: 0.5f);
+				return new GenericMeleeProj(
+					weapon, centerPoint, ProjIds.BBuffaloStomp,
+					player, damage: 4 * damagePercent, flinch: Global.defFlinch, hitCooldown: 0.5f
+				);
 			}
 		}
 		return null;
@@ -122,8 +138,13 @@ public class BlizzardBuffalo : Maverick {
 }
 
 public class BBuffaloIceProj : Projectile {
-	public BBuffaloIceProj(Weapon weapon, Point pos, int xDir, Point unitDir, float speedModifier, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, 150, 3, player, "bbuffalo_proj_iceball", Global.defFlinch, 0.01f, netProjId, player.ownedByLocalPlayer) {
+	public BBuffaloIceProj(
+		Weapon weapon, Point pos, int xDir, Point unitDir,
+		float speedModifier, Player player, ushort netProjId, bool sendRpc = false
+	) : base(
+		weapon, pos, xDir, 150, 3, player, "bbuffalo_proj_iceball",
+		Global.defFlinch, 0.01f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.BBuffaloIceProj;
 		maxTime = 1.5f;
 		useGravity = true;
@@ -157,7 +178,10 @@ public class BBuffaloIceProj : Projectile {
 
 		var hitNormal = other.getNormalSafe();
 		destroySelf();
-		new BBuffaloIceProjGround(weapon, other.getHitPointSafe(), hitNormal.angle, owner, owner.getNextActorNetId(), sendRpc: true);
+		new BBuffaloIceProjGround(
+			weapon, other.getHitPointSafe(), hitNormal.angle,
+			owner, owner.getNextActorNetId(), sendRpc: true
+		);
 	}
 
 	public override void onHitDamagable(IDamagable damagable) {
@@ -172,8 +196,12 @@ public class BBuffaloIceProj : Projectile {
 
 public class BBuffaloIceProjGround : Projectile, IDamagable {
 	float health = 6;
-	public BBuffaloIceProjGround(Weapon weapon, Point pos, float angle, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, 1, 0, 3, player, "bbuffalo_proj_ice", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public BBuffaloIceProjGround(
+		Weapon weapon, Point pos, float angle, Player player, ushort netProjId, bool sendRpc = false
+	) : base(
+		weapon, pos, 1, 0, 3, player, "bbuffalo_proj_ice",
+		Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		maxTime = 5;
 		projId = (int)ProjIds.BBuffaloIceProjGround;
 		destroyOnHit = true;
@@ -264,8 +292,13 @@ public class BBuffaloBeamProj : Projectile {
 	public bool released;
 	public float moveDistance2;
 	public float maxDistance2;
-	public BBuffaloBeamProj(Weapon weapon, Point pos, int xDir, BlizzardBuffalo bb, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, 150, 0, player, "bbuffalo_proj_beam_head", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public BBuffaloBeamProj(
+		Weapon weapon, Point pos, int xDir, BlizzardBuffalo bb,
+		Player player, ushort netProjId, bool sendRpc = false
+	) : base(
+		weapon, pos, xDir, 150, 0, player, "bbuffalo_proj_beam_head",
+		0, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.BBuffaloBeam;
 		setStartPos(pos.addxy(-xDir * 10, 0));
 		maxDistance2 = 200;
@@ -466,8 +499,12 @@ public class BBuffaloDashState : MaverickState {
 }
 
 public class BBuffaloCrashProj : Projectile {
-	public BBuffaloCrashProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 4, player, "bbuffalo_proj_crash", Global.defFlinch, 1, netProjId, player.ownedByLocalPlayer) {
+	public BBuffaloCrashProj(
+		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 4, player, "bbuffalo_proj_crash",
+		Global.defFlinch, 1, netProjId, player.ownedByLocalPlayer
+	) {
 		setIndestructableProperties();
 		maxTime = 0.15f;
 
@@ -479,7 +516,11 @@ public class BBuffaloCrashProj : Projectile {
 
 public class BBuffaloDragged : GenericGrabbedState {
 	public const float maxGrabTime = 4;
-	public BBuffaloDragged(BlizzardBuffalo grabber) :
-		base(grabber, maxGrabTime, "_dash", reverseZIndex: true, freeOnHitWall: false, lerp: true, additionalGrabSprite: "_dash_grab") {
+	public BBuffaloDragged(
+		BlizzardBuffalo grabber
+	) : base(
+		grabber, maxGrabTime, "_dash", reverseZIndex: true,
+		freeOnHitWall: false, lerp: true, additionalGrabSprite: "_dash_grab"
+	) {
 	}
 }

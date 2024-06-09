@@ -7,8 +7,11 @@ public class TunnelRhino : Maverick {
 	public static Weapon getMeleeWeapon(Player player) { return new Weapon(WeaponIds.TunnelRGeneric, 153); }
 
 	public Weapon meleeWeapon;
-	public TunnelRhino(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
-		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
+	public TunnelRhino(
+		Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(
+		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+	) {
 		stateCooldowns.Add(typeof(TunnelRShootState), new MaverickStateCooldown(true, false, 0.75f));
 		stateCooldowns.Add(typeof(TunnelRShoot2State), new MaverickStateCooldown(true, false, 0.75f));
 		stateCooldowns.Add(typeof(TunnelRDashState), new MaverickStateCooldown(false, false, 1f));
@@ -19,8 +22,6 @@ public class TunnelRhino : Maverick {
 		spriteFrameToSounds["tunnelr_run/3"] = "walkStomp";
 		spriteFrameToSounds["tunnelr_run/11"] = "walkStomp";
 
-		isHeavy = true;
-
 		awardWeaponId = WeaponIds.TunnelFang;
 		weakWeaponId = WeaponIds.AcidBurst;
 		weakMaverickWeaponId = WeaponIds.ToxicSeahorse;
@@ -30,6 +31,9 @@ public class TunnelRhino : Maverick {
 		if (sendRpc) {
 			createActorRpc(player.id);
 		}
+
+		armorClass = ArmorClass.Heavy;
+		canStomp = true;
 	}
 
 	public override void update() {
@@ -78,12 +82,18 @@ public class TunnelRhino : Maverick {
 
 	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (sprite.name.EndsWith("_dash")) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.TunnelRDash, player, damage: 4, flinch: Global.defFlinch, hitCooldown: 0.5f, owningActor: this);
+			return new GenericMeleeProj(
+				weapon, centerPoint, ProjIds.TunnelRDash, player,
+				damage: 4, flinch: Global.defFlinch, hitCooldown: 0.5f, owningActor: this
+			);
 		}
 		if (sprite.name.Contains("fall")) {
 			float damagePercent = getStompDamage();
 			if (damagePercent > 0) {
-				return new GenericMeleeProj(weapon, centerPoint, ProjIds.TunnelRStomp, player, damage: 4 * damagePercent, flinch: Global.defFlinch, hitCooldown: 0.5f);
+				return new GenericMeleeProj(
+					weapon, centerPoint, ProjIds.TunnelRStomp, player,
+					damage: 4 * damagePercent, flinch: Global.defFlinch, hitCooldown: 0.5f
+				);
 			}
 		}
 		return null;
@@ -104,8 +114,11 @@ public class TunnelRTornadoFang : Projectile {
 	float stateTime = 0;
 	int type;
 	float sparksCooldown;
-	public TunnelRTornadoFang(Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, 100, 1, player, "tunnelr_proj_drillbig", 0, 0.25f, netProjId, player.ownedByLocalPlayer) {
+	public TunnelRTornadoFang(
+		Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool sendRpc = false
+	) : base(
+		weapon, pos, xDir, 100, 1, player, "tunnelr_proj_drillbig", 0, 0.25f, netProjId, player.ownedByLocalPlayer
+	) {
 		maxTime = 1.5f;
 		projId = (int)ProjIds.TunnelRTornadoFang;
 		destroyOnHit = false;
@@ -202,8 +215,11 @@ public class TunnelRShootState : MaverickState {
 }
 
 public class TunnelRTornadoFangDiag : Projectile {
-	public TunnelRTornadoFangDiag(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, 0, 3, player, "tunnelr_proj_drill", Global.halfFlinch, 0.25f, netProjId, player.ownedByLocalPlayer) {
+	public TunnelRTornadoFangDiag(
+		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool sendRpc = false
+	) : base(
+		weapon, pos, xDir, 0, 3, player, "tunnelr_proj_drill", Global.halfFlinch, 0.25f, netProjId, player.ownedByLocalPlayer
+	) {
 		maxTime = 1.5f;
 		projId = (int)ProjIds.TunnelRTornadoFang;
 		destroyOnHit = false;
@@ -230,20 +246,28 @@ public class TunnelRShoot2State : MaverickState {
 		Point? shootPos = maverick.getFirstPOI("drillbig");
 		if (!shotOnce && shootPos != null) {
 			shotOnce = true;
-			new TunnelRTornadoFang(maverick.weapon, shootPos.Value, maverick.xDir, 0, player, player.getNextActorNetId(), sendRpc: true);
+			new TunnelRTornadoFang(
+				maverick.weapon, shootPos.Value, maverick.xDir, 0,
+				player, player.getNextActorNetId(), sendRpc: true
+			);
 			maverick.playSound("tunnelrShoot", sendRpc: true);
 		}
 
 		Point? shootPos2 = maverick.getFirstPOI("drillfront");
 		if (!shotOnce2 && shootPos2 != null) {
 			shotOnce2 = true;
-			new TunnelRTornadoFangDiag(maverick.weapon, shootPos2.Value, maverick.xDir * -1, player, player.getNextActorNetId(), sendRpc: true);
+			new TunnelRTornadoFangDiag(
+				maverick.weapon, shootPos2.Value, maverick.xDir * -1,
+				player, player.getNextActorNetId(), sendRpc: true);
 		}
 
 		Point? shootPos3 = maverick.getFirstPOI("drillback");
 		if (!shotOnce3 && shootPos3 != null) {
 			shotOnce3 = true;
-			new TunnelRTornadoFangDiag(maverick.weapon, shootPos3.Value, maverick.xDir, player, player.getNextActorNetId(), sendRpc: true);
+			new TunnelRTornadoFangDiag(
+				maverick.weapon, shootPos3.Value, maverick.xDir,
+				player, player.getNextActorNetId(), sendRpc: true
+			);
 		}
 	}
 }
@@ -260,7 +284,10 @@ public class TunnelRDashState : MaverickState {
 		dustTime += Global.spf;
 		if (dustTime > 0.05f) {
 			dustTime = 0;
-			new Anim(maverick.pos.addxy(-maverick.xDir * 10, 0), "dust", 1, player.getNextActorNetId(), true, sendRpc: true) {
+			new Anim(
+				maverick.pos.addxy(-maverick.xDir * 10, 0), "dust", 1,
+				player.getNextActorNetId(), true, sendRpc: true
+			) {
 				vel = new Point(0, -50)
 			};
 		}

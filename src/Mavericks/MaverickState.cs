@@ -38,7 +38,7 @@ public class MaverickState {
 	public string defaultSprite;
 	public string transitionSprite;
 	public float stateTime;
-	public int stateFrame;
+	public float stateFrame;
 	public float framesJumpNotHeld = 0;
 	public float flySoundTime;
 
@@ -81,7 +81,6 @@ public class MaverickState {
 		}
 
 		stateTime += Global.spf;
-		stateFrame++;
 
 		var lastLeftWallData = maverick.getHitWall(-Global.spf * 60, 0);
 		lastLeftWallCollider = lastLeftWallData != null ? lastLeftWallData.otherCollider : null;
@@ -199,7 +198,7 @@ public class MaverickState {
 	}
 
 	public void landingCode() {
-		if (maverick.isHeavy) {
+		if (maverick.canStomp) {
 			maverick.shakeCamera(sendRpc: true);
 			maverick.playSound("crash", sendRpc: true);
 		}
@@ -988,13 +987,32 @@ public class MLand : MaverickState {
 }
 
 public class MHurt : MaverickState {
+	public float flinchYPos;
+	public bool isCombo;
 	public int hurtDir;
-	public float flinchTime;
 	public float hurtSpeed;
-	public MHurt(int dir, int flinchFrames) : base("hurt") {
+	public float flinchTime;
+
+	public MHurt(int dir, int flinchFrames, float? oldComboPos = null) : base("hurt") {
+		this.flinchTime = flinchFrames;
 		hurtDir = dir;
-		hurtSpeed = dir * 200;
-		flinchTime = flinchFrames * (1 / 60f);
+		hurtSpeed = dir * 1.6f;
+		flinchTime = flinchFrames;
+		if (oldComboPos != null) {
+			isCombo = true;
+			flinchYPos = oldComboPos.Value;
+		}
+	}
+
+	public override void update() {
+		base.update();
+		if (hurtSpeed != 0) {
+			hurtSpeed = Helpers.toZero(hurtSpeed, 1.6f / flinchTime  * Global.speedMul, hurtDir);
+			maverick.move(new Point(hurtSpeed * 60f, 0));
+		}
+		if (stateFrame >= flinchTime) {
+			maverick.changeToIdleOrFall();
+		}
 	}
 
 	public override void onEnter(MaverickState oldState) {
@@ -1002,45 +1020,54 @@ public class MHurt : MaverickState {
 		if (oldState is MFly) {
 			wasFlying = true;
 			maverick.useGravity = false;
-		} else if (oldState.wasFlying &&
-			  (oldState is StormEDiveState || oldState is StormEAirShootState || oldState is StormEEggState ||
-			  oldState is MorphMSweepState || oldState is MorphMShootAir ||
-			  oldState is BHornetShootState || oldState is BHornetShoot2State || oldState is BHornetStingState)) {
+		} else if (
+			oldState.wasFlying && oldState is StormEDiveState or StormEAirShootState or StormEEggState or
+			MorphMSweepState or MorphMShootAir or BHornetShootState or BHornetShoot2State or BHornetStingState
+		) {
 			wasFlying = true;
 			maverick.useGravity = false;
 		}
-
+		else if (oldState is MHurt flinchState) {
+			isCombo = true;
+			flinchYPos = flinchState.flinchYPos;
+			wasFlying = flinchState.wasFlying;
+			if (wasFlying) {
+				maverick.useGravity = false;
+			}
+		}
 		if (shouldKnockUp()) {
-			maverick.vel.y = -100;
+			if (isCombo) {
+				maverick.vel.y = (-0.125f * (flinchTime - 1)) * 60f;
+				if (isCombo && maverick.pos.y < flinchYPos) {
+					// Magic equation. Changing gravity from 0.25 probably super-break this.
+					// That said, we do not change base gravity.
+					maverick.vel.y *= (0.002f * flinchTime - 0.076f) * (flinchYPos - maverick.pos.y) + 1;
+				}
+			} else {
+				flinchYPos = maverick.pos.y;
+			}
+		}
+		if (maverick.sprite.name.EndsWith("hurt")) {
+			maverick.changeSpriteFromName("die", true);
 		}
 	}
 
 	public override void onExit(MaverickState newState) {
-		base.onExit(newState);
 		maverick.useGravity = true;
+		base.onExit(newState);
 	}
 
 	public bool noMove() {
-		return maverick is LaunchOctopus || maverick is StormEagle || maverick is FlameMammoth || maverick is BlizzardBuffalo || maverick is GravityBeetle || maverick is TunnelRhino || maverick is WheelGator;
+		return (
+			maverick is LaunchOctopus lc && lc.isUnderwater() ||
+			maverick.armorClass == Maverick.ArmorClass.Heavy ||
+			maverick is StormEagle && wasFlying
+		);
 	}
 
 	public bool shouldKnockUp() {
-		return maverick is StingChameleon || maverick is Velguarder || maverick is WireSponge || maverick is ChillPenguin;
-	}
-
-	public override void update() {
-		base.update();
-		if (player == null) return;
-
-		if (hurtSpeed != 0 && !noMove()) {
-			hurtSpeed = Helpers.toZero(hurtSpeed, 600 * Global.spf, hurtDir);
-			//hurtSpeed = Helpers.lerp(hurtSpeed, 0, Global.spf * 10);
-			maverick.move(new Point(hurtSpeed, 0));
-		}
-
-		if (stateTime >= flinchTime) {
-			maverick.changeToIdleFallOrFly();
-		}
+		return (!wasFlying && maverick.armorClass != Maverick.ArmorClass.Heavy);
+		//return maverick is StingChameleon or Velguarder or WireSponge or ChillPenguin;
 	}
 }
 

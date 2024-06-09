@@ -14,8 +14,12 @@ public class MorphMothCocoon : Maverick {
 	public bool isBurned { get { return sprite.name.Contains("_burn"); } }
 	public float smokeTime;
 
-	public MorphMothCocoon(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
-		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
+	public MorphMothCocoon(
+		Player player, Point pos, Point destPos, int xDir,
+		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(
+		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+	) {
 		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
 		stateCooldowns.Add(typeof(MorphMCThreadState), new MaverickStateCooldown(false, true, 0.75f));
 
@@ -39,6 +43,8 @@ public class MorphMothCocoon : Maverick {
 		ammo = 0;
 		maxAmmo = 32;
 		barIndexes = (52, 41);
+
+		armorClass = ArmorClass.Light;
 	}
 
 	public float selfDestructTime;
@@ -110,8 +116,18 @@ public class MorphMothCocoon : Maverick {
 
 					playSound("morphmHatch", sendRpc: true);
 
-					new Anim(getCenterPos().addxy(0, 0), "morphmc_part_left", 1, player.getNextActorNetId(), false, sendRpc: true) { vel = new Point(-100, 100), ttl = 1f, xScale = xScale, yScale = yScale };
-					new Anim(getCenterPos().addxy(0, 0), "morphmc_part_right", 1, player.getNextActorNetId(), false, sendRpc: true) { vel = new Point(100, 100), ttl = 1f, xScale = xScale, yScale = yScale };
+					new Anim(
+						getCenterPos().addxy(0, 0), "morphmc_part_left",
+						1, player.getNextActorNetId(), false, sendRpc: true
+						) {
+							vel = new Point(-100, 100), ttl = 1f, xScale = xScale, yScale = yScale
+						};
+					new Anim(
+						getCenterPos().addxy(0, 0), "morphmc_part_right",
+						1, player.getNextActorNetId(), false, sendRpc: true
+					) {
+						vel = new Point(100, 100), ttl = 1f, xScale = xScale, yScale = yScale
+					};
 					destroySelf();
 
 					return;
@@ -196,7 +212,9 @@ public class MorphMothCocoon : Maverick {
 	float crashCooldown;
 	public override void onCollision(CollideData other) {
 		base.onCollision(other);
-		if (other.gameObject is Wall && sprite.name.Contains("spin") && deltaPos.magnitude > 200 * Global.spf && deltaPos.angleWith(other.getNormalSafe()) > 135) {
+		if (other.gameObject is Wall && sprite.name.Contains("spin") &&
+			deltaPos.magnitude > 200 * Global.spf && deltaPos.angleWith(other.getNormalSafe()) > 135
+		) {
 			crash();
 		}
 	}
@@ -245,8 +263,11 @@ public class MorphMothCocoon : Maverick {
 		}
 	}
 
-	public Actor getHealTarget() {
-		var targets = Global.level.getTargets(pos, player.alliance, true, aMaxDist: 20, isRequesterAI: true, includeAllies: true, callingActor: this);
+	public Actor? getHealTarget() {
+		var targets = Global.level.getTargets(
+			pos, player.alliance, true, aMaxDist: 20,
+			isRequesterAI: true, includeAllies: true, callingActor: this
+		);
 		return targets.FirstOrDefault((t) => {
 			if (t is Character chr) {
 				return chr.player.alliance != player.alliance || chr.player.health < chr.player.maxHealth;
@@ -268,8 +289,14 @@ public class MorphMothCocoon : Maverick {
 public class MorphMCScrapProj : Projectile {
 	bool isSuck;
 	MorphMothCocoon mmCocoon;
-	public MorphMCScrapProj(Weapon weapon, Point pos, int xDir, Point vel, float maxTime, bool isSuck, MorphMothCocoon mmCocoon, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 1, player, "morphmc_scrap_proj", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public MorphMCScrapProj(
+		Weapon weapon, Point pos, int xDir, Point vel,
+		float maxTime, bool isSuck, MorphMothCocoon mmCocoon,
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 1, player, "morphmc_scrap_proj",
+		0, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.MorphMCScrap;
 		this.maxTime = maxTime;
 		this.vel = vel;
@@ -303,7 +330,9 @@ public class MorphMCScrapProj : Projectile {
 		base.onCollision(other);
 		if (!ownedByLocalPlayer) return;
 
-		if (isSuck && mmCocoon != null && ownedByLocalPlayer && mmCocoon.ownedByLocalPlayer && other.gameObject == mmCocoon) {
+		if (isSuck && mmCocoon != null && ownedByLocalPlayer &&
+			mmCocoon.ownedByLocalPlayer && other.gameObject == mmCocoon
+		) {
 			mmCocoon.absorbScrap();
 			mmCocoon.addAmmo(1);
 			destroySelf();
@@ -354,7 +383,10 @@ public class MorphMCSpinState : MaverickState {
 			if (shootTime == 0) {
 				shootTime = 0.15f;
 				Point vel = new Point(Helpers.randomRange(-75, 75), Helpers.randomRange(-300, -250));
-				new MorphMCScrapProj(mmCocoon.weapon, maverick.getFirstPOIOrDefault(), MathF.Sign(vel.x), vel, 0.75f, false, null, player, player.getNextActorNetId(), rpc: true);
+				new MorphMCScrapProj(
+					mmCocoon.weapon, maverick.getFirstPOIOrDefault(),
+					MathF.Sign(vel.x), vel, 0.75f, false, null, player, player.getNextActorNetId(), rpc: true
+				);
 				mmCocoon.ammo--;
 				mmCocoon.currencyRegenTime = 0;
 			}
@@ -407,8 +439,11 @@ public class MorphMCThreadProj : Projectile {
 	bool reversed;
 	float reverseDist;
 	float range = 200;
-	public MorphMCThreadProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 2, player, "morphmc_silk_spike", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public MorphMCThreadProj(
+		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 2, player, "morphmc_silk_spike", 0, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.MorphMCThread;
 		vel = new Point(0, -200);
 		origin = pos;
@@ -457,7 +492,10 @@ public class MorphMCThreadProj : Projectile {
 		float dist = origin.y - pos.y;
 		int h = 8;
 		for (int i = 0; i < dist / h; i++) {
-			Global.sprites["morphmc_silk_animated"].draw(frameIndex, origin.x, origin.y - (i * h), 1, 1, null, 1, 1, 1, ZIndex.Character);
+			Global.sprites["morphmc_silk_animated"].draw(
+				frameIndex, origin.x, origin.y - (i * h),
+				1, 1, null, 1, 1, 1, ZIndex.Character
+			);
 		}
 	}
 }
@@ -490,7 +528,10 @@ public class MorphMCThreadState : MaverickState {
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 		maverick.stopMoving();
-		proj = new MorphMCThreadProj(maverick.weapon, maverick.getFirstPOIOrDefault(), 1, player, player.getNextActorNetId(), rpc: true);
+		proj = new MorphMCThreadProj(
+			maverick.weapon, maverick.getFirstPOIOrDefault(),
+			1, player, player.getNextActorNetId(), rpc: true
+		);
 	}
 
 	public override void onExit(MaverickState newState) {
@@ -555,7 +596,10 @@ public class MorphMCHangState : MaverickState {
 			if (shootTime == 0) {
 				shootTime = 0.15f;
 				Point vel = new Point(Helpers.randomRange(-75, 75), Helpers.randomRange(-300, -250));
-				new MorphMCScrapProj(maverick.weapon, maverick.getFirstPOIOrDefault(), MathF.Sign(vel.x), vel, 1.5f, false, null, player, player.getNextActorNetId(), rpc: true);
+				new MorphMCScrapProj(
+					maverick.weapon, maverick.getFirstPOIOrDefault(),
+					MathF.Sign(vel.x), vel, 1.5f, false, null, player, player.getNextActorNetId(), rpc: true
+				);
 				mmCocoon.ammo--;
 				mmCocoon.currencyRegenTime = 0;
 			}
@@ -570,7 +614,10 @@ public class MorphMCHangState : MaverickState {
 				shootTime = 0.1f;
 				Point suckPos = maverick.getCenterPos().add(Point.createFromAngle(suckAngle).times(suckRadius));
 				Point vel = suckPos.directionToNorm(maverick.getCenterPos()).times(350);
-				new MorphMCScrapProj(maverick.weapon, suckPos, MathF.Sign(vel.x), vel, 0.5f, true, mmCocoon, player, player.getNextActorNetId(), rpc: true);
+				new MorphMCScrapProj(
+					maverick.weapon, suckPos, MathF.Sign(vel.x),
+					vel, 0.5f, true, mmCocoon, player, player.getNextActorNetId(), rpc: true
+				);
 				mmCocoon.currencyRegenTime = 0;
 			}
 		}

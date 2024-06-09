@@ -45,6 +45,16 @@ public class MusicWrapper {
 		this.endPos = (float)(endPos);
 	}
 
+	public MusicWrapper(string musicPath, float startPos, float endPos, bool loop = true) {
+		this.musicPath = musicPath;
+		this.loop = loop;
+		music = new Music(musicPath);
+		music.Loop = loop;
+		name = Path.GetFileNameWithoutExtension(musicPath);
+		this.startPos = startPos;
+		this.endPos = endPos;
+	}
+
 	public MusicWrapper clone() {
 		return new MusicWrapper(musicPath, startPos, endPos, loop);
 	}
@@ -59,6 +69,7 @@ public class MusicWrapper {
 
 	public void update() {
 		if (music == null) return;
+		float offset = music.PlayingOffset.AsSeconds();
 		if (music.Loop && music.PlayingOffset.AsSeconds() > endPos) {
 			music.PlayingOffset = SFML.System.Time.FromSeconds(startPos);
 		}
@@ -73,11 +84,17 @@ public class MusicWrapper {
 		}
 	}
 
-	public void setNearEnd() {
+	public void setNearEndCheat() {
 		if (music == null) return;
 		music.PlayingOffset = SFML.System.Time.FromSeconds(endPos - 1);
 		debugLoop = true;
 	}
+
+	public void setNearEnd() {
+		if (music == null) return;
+		music.PlayingOffset = SFML.System.Time.FromSeconds(endPos - 1);
+	}
+
 
 	public void updateVolume() {
 		if (music == null) return;
