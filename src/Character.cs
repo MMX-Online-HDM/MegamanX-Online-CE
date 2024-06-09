@@ -2995,10 +2995,18 @@ public partial class Character : Actor, IDamagable {
 			genericStunState.activateFlinch(flinchFrames, dir);
 			return;
 		}
-		if (charState is not Die and not InRideArmor and not InRideChaser &&
-			(charState is not Hurt hurtState || MathF.Floor(hurtState.stateTime * 60f) >= flinchFrames)
-		) {
+		if (charState is Hurt hurtState) {
+			if (hurtState.frameTime <= flinchFrames) {
+				// You can probably add a check here that sets "hurtState.yStartPos" to null if you.
+				// Want to add a flinch attack that pushes up on chain-flinch.
+				changeState(new Hurt(dir, flinchFrames, false, hurtState.yStartPos), true);
+				return;
+			}
+			return;
+		}
+		if (charState is not Die and not InRideArmor and not InRideChaser) {
 			changeState(new Hurt(dir, flinchFrames, spiked), true);
+			return;
 		}
 	}
 

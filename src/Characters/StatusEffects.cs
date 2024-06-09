@@ -4,17 +4,23 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class Hurt : CharState {
+	public float yStartPos;
+	public bool isCombo;
 	public int hurtDir;
 	public float hurtSpeed;
 	public float flinchTime;
 	public bool spiked;
 
-	public Hurt(int dir, int flinchFrames, bool spiked = false) : base("hurt") {
+	public Hurt(int dir, int flinchFrames, bool spiked = false, float? oldComboPos = null) : base("hurt") {
 		this.flinchTime = flinchFrames;
 		hurtDir = dir;
 		hurtSpeed = dir * 1.6f;
 		flinchTime = flinchFrames;
 		this.spiked = spiked;
+		if (oldComboPos != null) {
+			isCombo = true;
+			yStartPos = oldComboPos.Value;
+		}
 	}
 
 	public bool isMiniFlinch() {
@@ -37,6 +43,15 @@ public class Hurt : CharState {
 		}
 		if (!spiked) {
 			character.vel.y = (-0.125f * (flinchTime - 1)) * 60f;
+			if (isCombo && character.pos.y < yStartPos) {
+				if (yStartPos - character.pos.y < 0) {
+					character.addDamageText("error", 0);
+				}
+				character.vel.y *= (0.002f * flinchTime - 0.076f) * (yStartPos - character.pos.y) + 1;
+			}
+		}
+		if (!isCombo) {
+			yStartPos = character.pos.y;
 		}
 	}
 
@@ -88,6 +103,7 @@ public class GenericStun : CharState {
 	public float flinchFrames = Global.defFlinch;
 	public int hurtDir;
 	public float hurtSpeed;
+	public float flinchYPos;
 
 	public float flinchTime;
 	public float flinchMaxTime;
