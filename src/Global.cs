@@ -584,6 +584,7 @@ public partial class Global {
 	public const int maxServers = 5;
 	public static int tickRate = 1;
 
+	public static readonly int superFlinch = 36;
 	public static readonly int defFlinch = 26;
 	public static readonly int halfFlinch = 13;
 	public static readonly int miniFlinch = 6;

@@ -54,10 +54,6 @@ public class Hurt : CharState {
 		}
 	}
 
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-	}
-
 	public override void update() {
 		base.update();
 		if (hurtSpeed != 0) {

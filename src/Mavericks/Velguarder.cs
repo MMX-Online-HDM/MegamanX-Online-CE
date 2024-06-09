@@ -5,8 +5,12 @@ namespace MMXOnline;
 public class Velguarder : Maverick {
 	public VelGMeleeWeapon meleeWeapon;
 
-	public Velguarder(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
-		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
+	public Velguarder(
+		Player player, Point pos, Point destPos, int xDir,
+		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(
+		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+	) {
 		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
 		meleeWeapon = new VelGMeleeWeapon(player);
 		canClimbWall = true;
@@ -22,6 +26,8 @@ public class Velguarder : Maverick {
 		if (sendRpc) {
 			createActorRpc(player.id);
 		}
+
+		armorClass = ArmorClass.Light;
 	}
 
 	public override void update() {
@@ -109,8 +115,13 @@ public class VelGMeleeWeapon : Weapon {
 
 #region projectiles
 public class VelGFireProj : Projectile {
-	public VelGFireProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 125, 1, player, "velg_proj_fire", 0, 0.01f, netProjId, player.ownedByLocalPlayer) {
+	public VelGFireProj(
+		Weapon weapon, Point pos, int xDir,
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 125, 1, player, "velg_proj_fire",
+		0, 0.01f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.VelGFire;
 		maxTime = 1f;
 		vel.y = 200;
@@ -132,8 +143,13 @@ public class VelGFireProj : Projectile {
 }
 
 public class VelGIceProj : Projectile {
-	public VelGIceProj(Weapon weapon, Point pos, int xDir, Point vel, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 2, player, "velg_proj_ice", 0, 0.01f, netProjId, player.ownedByLocalPlayer) {
+	public VelGIceProj(
+		Weapon weapon, Point pos, int xDir, Point vel,
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 2, player, "velg_proj_ice",
+		0, 0.01f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.VelGIce;
 		maxTime = 0.75f;
 		useGravity = true;
@@ -198,7 +214,10 @@ public class VelGShootIceState : MaverickState {
 				//float xSpeed = (index % 2 == 0 ? 150 : 200);
 				var inputDir = input.getInputDir(player);
 				float xSpeed = inputDir.x == maverick.xDir ? 200 : 150;
-				new VelGIceProj(new VelGIceWeapon(), poi, maverick.xDir, new Point(xSpeed * maverick.xDir, -200), player, player.getNextActorNetId(), rpc: true);
+				new VelGIceProj(
+					new VelGIceWeapon(), poi, maverick.xDir,
+					new Point(xSpeed * maverick.xDir, -200), player, player.getNextActorNetId(), rpc: true
+				);
 			}
 		} else {
 			shot = false;
@@ -264,8 +283,12 @@ public class VelGPounceState : MaverickState {
 
 public class VelGDeathAnim : Anim {
 	Player player;
-	public VelGDeathAnim(Point pos, int xDir, Player player, ushort? netId = null, bool sendRpc = false, bool ownedByLocalPlayer = true) :
-		base(pos, "velg_anim_die", xDir, netId, false, sendRpc, ownedByLocalPlayer) {
+	public VelGDeathAnim(
+		Point pos, int xDir, Player player, ushort? netId = null,
+		bool sendRpc = false, bool ownedByLocalPlayer = true
+	) : base(
+		pos, "velg_anim_die", xDir, netId, false, sendRpc, ownedByLocalPlayer
+	) {
 		vel = new Point(-xDir * 150, -150);
 		ttl = 0.5f;
 		useGravity = true;
@@ -286,9 +309,14 @@ public class VelGDeathAnim : Anim {
 
 	public override void onDestroy() {
 		base.onDestroy();
-		var dieEffect = new ExplodeDieEffect(player, getCenterPos(), getCenterPos(), "empty", 1, zIndex, false, 25, 0.75f, false);
+		var dieEffect = new ExplodeDieEffect(
+			player, getCenterPos(), getCenterPos(), "empty", 1, zIndex, false, 25, 0.75f, false
+		);
 		Global.level.addEffect(dieEffect);
-		Anim.createGibEffect("velg_pieces", getCenterPos(), player, GibPattern.SemiCircle, randVelStart: 150, randVelEnd: 200, sendRpc: true);
+		Anim.createGibEffect(
+			"velg_pieces", getCenterPos(), player,
+			GibPattern.SemiCircle, randVelStart: 150, randVelEnd: 200, sendRpc: true
+		);
 	}
 }
 

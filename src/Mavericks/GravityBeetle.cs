@@ -9,16 +9,17 @@ public class GravityBeetle : Maverick {
 	public Weapon meleeWeapon;
 	public GBeetleGravityWellProj well;
 
-	public GravityBeetle(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
-		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
+	public GravityBeetle(
+		Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(
+		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+	) {
 		stateCooldowns.Add(typeof(GBeetleShoot), new MaverickStateCooldown(false, false, 1f));
 		stateCooldowns.Add(typeof(GBeetleGravityWellState), new MaverickStateCooldown(false, false, 1));
 		stateCooldowns.Add(typeof(GBeetleDashState), new MaverickStateCooldown(false, false, 1.5f));
 
 		weapon = getWeapon();
 		meleeWeapon = getMeleeWeapon(player);
-
-		isHeavy = true;
 
 		awardWeaponId = WeaponIds.GravityWell;
 		weakWeaponId = WeaponIds.RaySplasher;
@@ -29,6 +30,9 @@ public class GravityBeetle : Maverick {
 		if (sendRpc) {
 			createActorRpc(player.id);
 		}
+
+		armorClass = ArmorClass.Heavy;
+		canStomp = true;
 	}
 
 	public override void update() {

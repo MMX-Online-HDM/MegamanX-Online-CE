@@ -3,12 +3,14 @@
 public class FlameMammoth : Maverick {
 	public FlameMStompWeapon stompWeapon;
 
-	public FlameMammoth(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
-		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
+	public FlameMammoth(
+		Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(
+		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+	) {
 		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.5f));
 		stompWeapon = new FlameMStompWeapon(player);
 		stateCooldowns.Add(typeof(FlameMOilState), new MaverickStateCooldown(false, true, 0.5f));
-		isHeavy = true;
 
 		awardWeaponId = WeaponIds.FireWave;
 		weakWeaponId = WeaponIds.Tornado;
@@ -21,6 +23,9 @@ public class FlameMammoth : Maverick {
 		if (sendRpc) {
 			createActorRpc(player.id);
 		}
+
+		armorClass = ArmorClass.Heavy;
+		canStomp = true;
 	}
 
 	public override void update() {
@@ -47,7 +52,10 @@ public class FlameMammoth : Maverick {
 	public MaverickState getShootState(bool isAI) {
 		var shootState = new MShoot((Point pos, int xDir) => {
 			playSound("flamemShoot", sendRpc: true);
-			new FlameMFireballProj(new FlameMFireballWeapon(), pos, xDir, player.input.isHeld(Control.Down, player), player, player.getNextActorNetId(), rpc: true);
+			new FlameMFireballProj(
+				new FlameMFireballWeapon(), pos, xDir,
+				player.input.isHeld(Control.Down, player), player, player.getNextActorNetId(), rpc: true
+			);
 		}, null);
 		if (isAI) {
 			shootState.consecutiveData = new MaverickStateConsecutiveData(0, 4, 0.5f);
@@ -163,7 +171,10 @@ public class FlameMFireballProj : Projectile {
 		if (!ownedByLocalPlayer) return;
 		if (other.gameObject is FlameMOilSpillProj oilSpill && oilSpill.ownedByLocalPlayer) {
 			playSound("flamemOilBurn", sendRpc: true);
-			new FlameMBigFireProj(new FlameMOilFireWeapon(), oilSpill.pos, oilSpill.xDir, oilSpill.angle ?? 0, owner, owner.getNextActorNetId(), rpc: true);
+			new FlameMBigFireProj(
+				new FlameMOilFireWeapon(), oilSpill.pos, oilSpill.xDir,
+				oilSpill.angle ?? 0, owner, owner.getNextActorNetId(), rpc: true
+			);
 			// oilSpill.time = 0;
 			oilSpill.destroySelf(doRpcEvenIfNotOwned: true);
 			destroySelf();
@@ -193,7 +204,10 @@ public class FlameMOilProj : Projectile {
 		base.onHitWall(other);
 		if (!ownedByLocalPlayer) return;
 		if (!destroyed) {
-			new FlameMOilSpillProj(new FlameMOilWeapon(), other.getHitPointSafe(), 1, other.getNormalSafe().angle + 90, owner, owner.getNextActorNetId(), rpc: true);
+			new FlameMOilSpillProj(
+				new FlameMOilWeapon(), other.getHitPointSafe(), 1,
+				other.getNormalSafe().angle + 90, owner, owner.getNextActorNetId(), rpc: true
+			);
 			playSound("flamemOil", sendRpc: true);
 			destroySelf();
 		}
@@ -291,7 +305,11 @@ public class FlameMBigFireProj : Projectile {
 		if (!ownedByLocalPlayer) return;
 		if (other.gameObject is FlameMOilSpillProj oilSpill && oilSpill.ownedByLocalPlayer && frameIndex >= 4) {
 			playSound("flamemOilBurn", sendRpc: true);
-			new FlameMBigFireProj(new FlameMOilFireWeapon(), oilSpill.pos, oilSpill.xDir, oilSpill.angle ?? 0, owner, owner.getNextActorNetId(), rpc: true);
+			new FlameMBigFireProj(
+				new FlameMOilFireWeapon(), oilSpill.pos, oilSpill.xDir,
+				oilSpill.angle ?? 0,
+				owner, owner.getNextActorNetId(), rpc: true
+			);
 			// oilSpill.time = 0;
 			oilSpill.destroySelf();
 		}
@@ -300,8 +318,11 @@ public class FlameMBigFireProj : Projectile {
 
 
 public class FlameMStompShockwave : Projectile {
-	public FlameMStompShockwave(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 0, player, "flamem_proj_shockwave", 0, 1f, netProjId, player.ownedByLocalPlayer) {
+	public FlameMStompShockwave(
+		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 0, player, "flamem_proj_shockwave", 0, 1f, netProjId, player.ownedByLocalPlayer
+	) {
 		maxTime = 0.75f;
 		projId = (int)ProjIds.FlameMStompShockwave;
 		destroyOnHit = false;

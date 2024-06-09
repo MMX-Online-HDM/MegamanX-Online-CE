@@ -542,7 +542,7 @@ public class Projectile : Actor {
 			bool isMaverickHealProj = projId == (int)ProjIds.MorphMCScrap || projId == (int)ProjIds.MorphMPowder;
 			if (ownedByLocalPlayer && (damagable != damager.owner.character || isMaverickHealProj) && !damager.owner.mavericks.Contains(damagable as Maverick) && damagable.canBeHealed(damager.owner.alliance) && healAmount > 0) {
 				if (Global.serverClient == null || damagableActor.ownedByLocalPlayer) {
-					damagable.heal(owner, healAmount, allowStacking: false, drawHealText: true);
+					damagable.heal(owner, healAmount, allowStacking: true, drawHealText: true);
 				} else {
 					RPC.heal.sendRpc(owner, damagableActor.netId.Value, healAmount);
 				}

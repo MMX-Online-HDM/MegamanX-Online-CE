@@ -8,9 +8,11 @@ public class SparkMandrill : Maverick {
 	public SparkMSparkWeapon sparkWeapon;
 	public SparkMStompWeapon stompWeapon;
 
-	public SparkMandrill(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
-		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
-		isHeavy = true;
+	public SparkMandrill(
+		Player player, Point pos, Point destPos, int xDir,
+		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(player, pos, destPos, xDir, netId, ownedByLocalPlayer
+) {
 		punchWeapon = new SparkMPunchWeapon(player);
 		sparkWeapon = new SparkMSparkWeapon(player);
 		stompWeapon = new SparkMStompWeapon(player);
@@ -39,6 +41,9 @@ public class SparkMandrill : Maverick {
 		grayAmmoLevel = 31;
 		ammoRoundDown = true;
 		barIndexes = (55, 44);
+
+		armorClass = ArmorClass.Heavy;
+		canStomp = true;
 	}
 
 	public override void update() {
