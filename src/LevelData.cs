@@ -542,7 +542,7 @@ public class LevelData {
 		{ "xhunter2", "counterHunter1" },
 		// X3 stuff.
 		{ "aircraftcarrier", "gravityBeetle" },
-		{ "dopplerlab", "dopplerLab" },
+		{ "dopplerlab", "dopplerStage" },
 		{ "frozentown", "blizzardBuffalo" },
 		{ "giantdam", "toxicSeahorse" },
 		{ "giantdam2", "toxicSeahorse" },
@@ -555,8 +555,8 @@ public class LevelData {
 		{ "weaponsfactory", "blastHornet" },
 
 		// Alt music.
-		{ "dopplerlab_1v1", "goliath" },
-		{ "zerovirus_1v1", "XvsZeroV1_megasfc" },
+		{ "dopplerlab_1v1", "fortressBoss_X3" },
+		{ "zerovirus_1v1", "XvsZeroV2_megasfc" },
 		{ "centralcomputer_1v1", "boss_X2" },
 		{ "sigma4_1v1", "boss_X1" },
 
