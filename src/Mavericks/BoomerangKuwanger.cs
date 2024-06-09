@@ -280,10 +280,15 @@ public class BoomerKTeleportState : MaverickState {
 		if (isInvisible && stateTime > 0.4f) {
 			isInvisible = false;
 			if (canChangePos()) {
-				var prevCamPos = player.character.getCamCenterPos();
+				Point? prevCamPos = null;
+				if (player.character != null) {
+					prevCamPos = player.character.getCamCenterPos();
+				}
 				player.character.stopCamUpdate = true;
 				maverick.changePos(clone.pos);
-				if (player.isTagTeam()) Global.level.snapCamPos(player.character.getCamCenterPos(), prevCamPos);
+				if (prevCamPos != null && player.isTagTeam()) {
+					Global.level.snapCamPos(player.character.getCamCenterPos(), prevCamPos);
+				}
 			}
 			clone.destroySelf();
 			clone = null;

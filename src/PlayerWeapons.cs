@@ -621,7 +621,13 @@ label:
 		foreach (var weapon in weapons) {
 			weapon.update();
 			if (character != null && health > 0) {
-				weapon.charLinkedUpdate(character, false);
+				bool alwaysOn = false;
+				if (weapon is GigaCrush && Options.main.gigaCrushSpecial ||
+					weapon is NovaStrike && Options.main.novaStrikeSpecial
+				) {
+					alwaysOn = true;
+				}
+				weapon.charLinkedUpdate(character, alwaysOn);
 			}
 		}
 	}
