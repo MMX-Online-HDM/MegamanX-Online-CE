@@ -959,14 +959,14 @@ class Program {
 		);
 		Dictionary<string, object> iniData = IniParser.Parse(iniLocation);
 
-		double startPos = 0;
-		double endPos = 0;
+		float startPos = 0;
+		float endPos = 0;
 		if (iniData.ContainsKey("loopData") && iniData["loopData"] is Dictionary<string, object> loopData) {
 			if (loopData.ContainsKey("loopStart") && loopData["loopStart"] is Decimal loopStart) {
-				startPos = (double)loopStart;
+				startPos = float.Parse(loopStart.ToString());
 			}
 			if (loopData.ContainsKey("loopEnd") && loopData["loopEnd"] is Decimal loopEnd) {
-				endPos = (double)loopEnd;
+				endPos = float.Parse(loopEnd.ToString());
 			}
 		}
 		MusicWrapper musicWrapper = new MusicWrapper(file, startPos, endPos, true);

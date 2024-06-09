@@ -267,9 +267,9 @@ public partial class Global {
 		if (Global.input.isPressed(Key.F11)) {
 			var ms = Global.level.musicSources.FirstOrDefault();
 			if (ms != null) {
-				ms.setNearEnd();
+				ms.setNearEndCheat();
 			} else {
-				Global.music.setNearEnd();
+				Global.music.setNearEndCheat();
 			}
 		}
 	}

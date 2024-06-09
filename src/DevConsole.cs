@@ -79,7 +79,7 @@ public class DevConsole {
 	}
 
 	public static void setMusicNearEnd() {
-		Global.music?.setNearEnd();
+		Global.music?.setNearEndCheat();
 	}
 
 	public static void printChecksum() {
