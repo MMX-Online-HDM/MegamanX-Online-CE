@@ -591,7 +591,7 @@ public class LevelData {
 			name.Contains("desertbase") ||
 			name.Contains("weathercontrol")
 		) {
-			return "win_x2";
+			return "stageClear_X2";
 		}
 		if (name.Contains("hunterbase") ||
 			name.Contains("giantdam") ||
@@ -604,17 +604,17 @@ public class LevelData {
 			name.Contains("safaripark") ||
 			name.Contains("dopplerlab")
 		) {
-			return "win_x3";
+			return "stageClear_X3";
 		}
 		if (isCustomMap) {
 			return Helpers.randomRange(0, 2) switch {
-				1 => "win_x2",
-				2 => "win_x3",
-				_ => "win"
+				1 => "stageClear_X2",
+				2 => "stageClear_X3",
+				_ => "stageClear_X1"
 			};
 		}
 
-		return "win";
+		return "stageClear_X1";
 	}
 
 	public Texture getMapThumbnail() {
