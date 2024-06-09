@@ -47,6 +47,8 @@ public class Hurt : CharState {
 				if (yStartPos - character.pos.y < 0) {
 					character.addDamageText("error", 0);
 				}
+				// Magic equation. Changing gravity from 0.25 probably super-break this.
+				// That said, we do not change base gravity.
 				character.vel.y *= (0.002f * flinchTime - 0.076f) * (yStartPos - character.pos.y) + 1;
 			}
 		}
