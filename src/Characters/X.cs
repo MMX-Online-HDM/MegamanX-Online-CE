@@ -839,7 +839,7 @@ public partial class MegamanX : Character {
 		weapon.getProjectile(pos, xDir, player, chargeLevel, netProjId);
 
 		if (weapon.soundTime == 0) {
-			if (weapon.shootSounds != null && weapon.shootSounds.Count > 0) {
+			if (weapon.shootSounds != null && weapon.shootSounds.Length > 0) {
 				player.character.playSound(weapon.shootSounds[chargeLevel]);
 			}
 			if (weapon is FireWave) {
