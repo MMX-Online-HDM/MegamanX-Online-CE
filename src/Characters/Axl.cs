@@ -1778,4 +1778,16 @@ public class Axl : Character {
 		}
 		return targetWeapon;
 	}
+
+	public override bool canAddAmmo() {
+		if (player.weapon == null) { return false; }
+		bool hasEmptyAmmo = false;
+		foreach (Weapon weapon in player.weapons) {
+			if (weapon.canHealAmmo && weapon.ammo < weapon.maxAmmo) {
+				hasEmptyAmmo = true;
+				break;
+			}
+		}
+		return hasEmptyAmmo;
+	}
 }

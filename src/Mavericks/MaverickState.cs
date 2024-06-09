@@ -801,6 +801,7 @@ public class MFly : MaverickState {
 	public override void update() {
 		base.update();
 		if (player == null) return;
+		Helpers.decrementFrames(ref maverick.flyBar);
 
 		if (Global.level.checkCollisionActor(maverick, 0, -maverick.getYMod()) != null && maverick.vel.y * maverick.getYMod() < 0) {
 			maverick.vel.y = 0;
@@ -841,7 +842,6 @@ public class MFly : MaverickState {
 			}
 		}
 
-		maverick.flyBar = -1 * Global.speedMul;
 		if (maverick.flyBar <= 0 || maverick.gravityWellModifier > 1) {
 			flyVel.y = 100;
 		}
@@ -867,8 +867,7 @@ public class MFly : MaverickState {
 			maverick.xDir = 1;
 		}
 
-		Helpers.decrementTime(ref maverick.ammo);
-		if (maverick.ammo > 0 && maverick.gravityWellModifier <= 1) {
+		if (maverick.flyBar > 0 && maverick.gravityWellModifier <= 1) {
 			if (input.isHeld(Control.Up, player)) {
 				if (maverick.pos.y > -5) {
 					move.y = -maverick.getRunSpeed() * maverick.getDashSpeed();
