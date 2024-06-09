@@ -12,7 +12,7 @@ public class ZeroBuster : Weapon {
 		weaponBarBaseIndex = 0;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 0;
-		shootSounds = new List<string>() { "buster", "buster2", "buster3", "buster4" };
+		shootSounds = new string[] { "buster", "buster2", "buster3", "buster4" };
 		rateOfFire = 0.15f;
 		displayName = "Z-Buster";
 		description = new string[] { "Shoot uncharged Z-Buster with ATTACK." };

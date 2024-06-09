@@ -13,7 +13,7 @@ public class ShotgunIce : Weapon {
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 8;
 		weaknessIndex = 4;
-		shootSounds = new List<string>() { "shotgunIce", "shotgunIce", "shotgunIce", "icyWind" };
+		shootSounds = new string[] { "shotgunIce", "shotgunIce", "shotgunIce", "icyWind" };
 		rateOfFire = 0.5f;
 	}
 

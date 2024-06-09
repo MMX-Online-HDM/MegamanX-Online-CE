@@ -14,7 +14,7 @@ public enum AxlBulletWeaponType {
 
 public class AxlBullet : AxlWeapon {
 	public AxlBullet(AxlBulletWeaponType type = AxlBulletWeaponType.AxlBullets) : base(0) {
-		shootSounds = new List<string>() { "axlBullet", "axlBullet", "axlBullet", "axlBulletCharged" };
+		shootSounds = new string[] { "axlBullet", "axlBullet", "axlBullet", "axlBulletCharged" };
 
 		this.type = (int)type;
 		if (type == AxlBulletWeaponType.AxlBullets) {
@@ -40,7 +40,7 @@ public class AxlBullet : AxlWeapon {
 			chargedFlashSprite = "axl_pistol_flash_charged";
 			altFireCooldown = 0.3f;
 			displayName = "Mettaur Crash";
-			shootSounds = new List<string>() { "mettaurCrash", "axlBullet", "axlBullet", "axlBulletCharged" };
+			shootSounds = new string[] { "mettaurCrash", "axlBullet", "axlBullet", "axlBulletCharged" };
 		} else if (type == AxlBulletWeaponType.BeastKiller) {
 			index = (int)WeaponIds.BeastHunter;
 			weaponBarBaseIndex = 46;
@@ -53,7 +53,7 @@ public class AxlBullet : AxlWeapon {
 			altFireCooldown = 0.3f;
 			rateOfFire = 0.75f;
 			displayName = "Beast Killer";
-			shootSounds = new List<string>() { "beastKiller", "axlBullet", "axlBullet", "axlBulletCharged" };
+			shootSounds = new string[] { "beastKiller", "axlBullet", "axlBullet", "axlBulletCharged" };
 		} else if (type == AxlBulletWeaponType.MachineBullets) {
 			index = (int)WeaponIds.MachineBullets;
 			weaponBarBaseIndex = 45;
@@ -66,7 +66,7 @@ public class AxlBullet : AxlWeapon {
 			altFireCooldown = 0.3f;
 			rateOfFire = 0.15f;
 			displayName = "Machine Bullets";
-			shootSounds = new List<string>() { "machineBullets", "axlBullet", "axlBullet", "axlBulletCharged" };
+			shootSounds = new string[] { "machineBullets", "axlBullet", "axlBullet", "axlBulletCharged" };
 		} else if (type == AxlBulletWeaponType.RevolverBarrel) {
 			index = (int)WeaponIds.RevolverBarrel;
 			weaponBarBaseIndex = 47;
@@ -78,7 +78,7 @@ public class AxlBullet : AxlWeapon {
 			chargedFlashSprite = "axl_pistol_flash_charged";
 			altFireCooldown = 0.3f;
 			displayName = "Revolver Barrel";
-			shootSounds = new List<string>() { "revolverBarrel", "axlBullet", "axlBullet", "axlBulletCharged" };
+			shootSounds = new string[] { "revolverBarrel", "axlBullet", "axlBullet", "axlBulletCharged" };
 		} else if (type == AxlBulletWeaponType.AncientGun) {
 			index = (int)WeaponIds.AncientGun;
 			weaponBarBaseIndex = 49;
@@ -91,7 +91,7 @@ public class AxlBullet : AxlWeapon {
 			altFireCooldown = 0.225f;
 			rateOfFire = 0.1f;
 			displayName = "Ancient Gun";
-			shootSounds = new List<string>() { "ancientGun3", "axlBullet", "axlBullet", "axlBulletCharged" };
+			shootSounds = new string[] { "ancientGun3", "axlBullet", "axlBullet", "axlBulletCharged" };
 		}
 	}
 
@@ -143,7 +143,7 @@ public class DoubleBullet : AxlWeapon {
 		sprite = "axl_arm_pistol";
 		flashSprite = "axl_pistol_flash";
 		chargedFlashSprite = "axl_pistol_flash_charged";
-		shootSounds = new List<string>() { "axlBullet", "axlBullet", "axlBullet", "axlBulletCharged" };
+		shootSounds = new string[] { "axlBullet", "axlBullet", "axlBullet", "axlBulletCharged" };
 		index = (int)WeaponIds.DoubleBullet;
 		weaponBarBaseIndex = 31;
 		weaponBarIndex = 28;

@@ -10,7 +10,7 @@ public class Sting : Weapon {
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 2;
 		weaknessIndex = 7;
-		shootSounds = new List<string>() { "csting", "csting", "csting", "stingCharge" };
+		shootSounds = new string[] { "csting", "csting", "csting", "stingCharge" };
 		rateOfFire = 0.75f;
 	}
 

@@ -6,7 +6,7 @@ namespace MMXOnline;
 
 public class BlastLauncher : AxlWeapon {
 	public BlastLauncher(int altFire) : base(altFire) {
-		shootSounds = new List<string>() { "grenadeShoot", "grenadeShoot", "grenadeShoot", "rocketShoot" };
+		shootSounds = new string[] { "grenadeShoot", "grenadeShoot", "grenadeShoot", "rocketShoot" };
 		index = (int)WeaponIds.BlastLauncher;
 		weaponBarBaseIndex = 29;
 		weaponBarIndex = weaponBarBaseIndex;

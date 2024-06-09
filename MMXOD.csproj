@@ -4,7 +4,7 @@
 		<!--LangVersion>12.0</LangVersion-->
 		<AssemblyName>MMXOD</AssemblyName>
 		<OutputType>WinExe</OutputType>
-		<Nullable>enable</Nullable>
+		
 		<Version>20</Version>
 		<AssemblyVersion>20.0</AssemblyVersion>
 		<ApplicationIcon>app.ico</ApplicationIcon>

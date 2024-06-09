@@ -14,7 +14,7 @@ public class Buster : Weapon {
 		weaponBarBaseIndex = 0;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 0;
-		shootSounds = new List<string>() { "", "", "", "" };
+		shootSounds = new string[] { "", "", "", "" };
 		rateOfFire = 0.15f;
 		canHealAmmo = false;
 		drawAmmo = false;

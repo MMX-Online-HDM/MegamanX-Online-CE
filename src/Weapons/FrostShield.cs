@@ -5,7 +5,7 @@ namespace MMXOnline;
 
 public class FrostShield : Weapon {
 	public FrostShield() : base() {
-		shootSounds = new List<string>() { "frostShield", "frostShield", "frostShield", "frostShieldCharged" };
+		shootSounds = new string[] { "frostShield", "frostShield", "frostShield", "frostShieldCharged" };
 		rateOfFire = 1f;
 		index = (int)WeaponIds.FrostShield;
 		weaponBarBaseIndex = 23;
