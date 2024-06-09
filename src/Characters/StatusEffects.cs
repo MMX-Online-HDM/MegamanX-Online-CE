@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class Hurt : CharState {
-	public float yStartPos;
+	public float flinchYPos;
 	public bool isCombo;
 	public int hurtDir;
 	public float hurtSpeed;
@@ -19,7 +19,7 @@ public class Hurt : CharState {
 		this.spiked = spiked;
 		if (oldComboPos != null) {
 			isCombo = true;
-			yStartPos = oldComboPos.Value;
+			flinchYPos = oldComboPos.Value;
 		}
 	}
 
@@ -43,17 +43,14 @@ public class Hurt : CharState {
 		}
 		if (!spiked) {
 			character.vel.y = (-0.125f * (flinchTime - 1)) * 60f;
-			if (isCombo && character.pos.y < yStartPos) {
-				if (yStartPos - character.pos.y < 0) {
-					character.addDamageText("error", 0);
-				}
+			if (isCombo && character.pos.y < flinchYPos) {
 				// Magic equation. Changing gravity from 0.25 probably super-break this.
 				// That said, we do not change base gravity.
-				character.vel.y *= (0.002f * flinchTime - 0.076f) * (yStartPos - character.pos.y) + 1;
+				character.vel.y *= (0.002f * flinchTime - 0.076f) * (flinchYPos - character.pos.y) + 1;
 			}
 		}
 		if (!isCombo) {
-			yStartPos = character.pos.y;
+			flinchYPos = character.pos.y;
 		}
 	}
 
@@ -102,7 +99,6 @@ public class GenericStun : CharState {
 	public bool changeAnim = true;
 	public bool canPlayFrozenSound = true;
 	public bool canPlayStaticSound = true;
-	public float flinchFrames = Global.defFlinch;
 	public int hurtDir;
 	public float hurtSpeed;
 	public float flinchYPos;
@@ -115,7 +111,7 @@ public class GenericStun : CharState {
 	}
 
 	public override void update() {
-		reduceStunFrames(ref flinchTime);
+		Helpers.decrementFrames(ref flinchTime);
 
 		crystalizeLogic();
 		paralizeAnimLogic();
@@ -165,6 +161,7 @@ public class GenericStun : CharState {
 		character.crystalizeInvulnTime = 2;
 
 		if (!character.isCrystalized && character.crystalizedTime > 0) {
+			changeAnim = true;
 			character.crystalizeStart();
 			Global.serverClient?.rpc(RPC.playerToggle, (byte)character.player.id, (byte)RPCToggleType.StartCrystalize);
 		}
@@ -226,12 +223,17 @@ public class GenericStun : CharState {
 		if (flinchTime > flinchFrames) {
 			return;
 		}
-		this.flinchFrames = flinchFrames;
-		if (flinchTime <= 0) {
-			hurtSpeed = 1.6f * xDir;
-			if (flinchFrames >= 2) {
-				character.vel.y = (-0.125f * (flinchFrames - 1)) * 60f;
+		bool isCombo = (flinchFrames != 0);
+
+		hurtSpeed = 1.6f * xDir;
+		if (flinchFrames >= 2) {
+			character.vel.y = (-0.125f * (flinchFrames - 1)) * 60f;
+			if (isCombo && character.pos.y < flinchYPos) {
+				character.vel.y *= (0.002f * flinchTime - 0.076f) * (flinchYPos - character.pos.y) + 1;
 			}
+		}
+		if (!isCombo) {
+			flinchYPos = character.pos.y;
 		}
 		flinchTime = flinchFrames;
 		flinchMaxTime = flinchFrames;
@@ -245,6 +247,7 @@ public class GenericStun : CharState {
 			hurtDir = hurtState.hurtDir;
 			hurtSpeed = hurtState.hurtSpeed;
 			flinchTime = hurtState.flinchTime - hurtState.frameTime;
+			flinchYPos = hurtState.flinchYPos;
 			if (flinchTime < 0) {
 				flinchTime = 0;
 			}
@@ -256,7 +259,7 @@ public class GenericStun : CharState {
 			paralyzeAnim.destroySelf();
 			paralyzeAnim = null;
 		}
-		if (character.crystalizedTime != 0) {
+		if (character.crystalizedTime != 0 || character.isCrystalized) {
 			character.crystalizeEnd();
 			Global.serverClient?.rpc(RPC.playerToggle, (byte)character.player.id, (byte)RPCToggleType.StopCrystalize);
 		}
