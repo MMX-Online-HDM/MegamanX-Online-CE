@@ -1594,7 +1594,7 @@ public class AI {
 				return;
 			}
 
-			if (player.canReviveX()) {
+			if (player.canReviveX() && !player.isMainPlayer) {
 				player.reviveX();
 
 			}
