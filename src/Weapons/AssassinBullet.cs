@@ -8,7 +8,7 @@ public class AssassinBullet : AxlWeapon {
 		sprite = "axl_arm_pistol";
 		flashSprite = "axl_pistol_flash_charged";
 		chargedFlashSprite = "axl_pistol_flash_charged";
-		shootSounds = new List<string>() { "assassinate", "assassinate", "assassinate", "assassinate" };
+		shootSounds = new string[] { "assassinate", "assassinate", "assassinate", "assassinate" };
 		index = (int)WeaponIds.AssassinBullet;
 		weaponBarBaseIndex = 28;
 		weaponBarIndex = 28;

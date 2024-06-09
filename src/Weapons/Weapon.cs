@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class Weapon {
-	public List<string> shootSounds = new List<string>();
+	public string[] shootSounds = { "" };
 	public float ammo;
 	public float maxAmmo;
 	public float rateOfFire;
@@ -59,7 +59,7 @@ public class Weapon {
 		ammo = 32;
 		maxAmmo = 32;
 		rateOfFire = 0.15f;
-		shootSounds = new List<string>() { "", "", "", "" };
+		shootSounds = new string[] { "", "", "", "" };
 	}
 
 	public Weapon(WeaponIds index, int killFeedIndex, Damager? damager = null) {

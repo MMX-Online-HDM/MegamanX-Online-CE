@@ -11,7 +11,7 @@ public class Torpedo : Weapon {
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 1;
 		weaknessIndex = 3;
-		shootSounds = new List<string>() { "torpedo", "torpedo", "torpedo", "buster3" };
+		shootSounds = new string[] { "torpedo", "torpedo", "torpedo", "buster3" };
 		rateOfFire = 0.625f;
 	}
 

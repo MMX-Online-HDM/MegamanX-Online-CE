@@ -6,7 +6,7 @@ namespace MMXOnline;
 
 public class StrikeChain : Weapon {
 	public StrikeChain() : base() {
-		shootSounds = new List<string>() { "strikeChain", "strikeChain", "strikeChain", "strikeChainCharged" };
+		shootSounds = new string[] { "strikeChain", "strikeChain", "strikeChain", "strikeChainCharged" };
 		rateOfFire = 0.75f;
 		index = (int)WeaponIds.StrikeChain;
 		weaponBarBaseIndex = 14;

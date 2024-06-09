@@ -5,7 +5,7 @@ namespace MMXOnline;
 
 public class ItemTracer : Weapon {
 	public ItemTracer() : base() {
-		shootSounds = new List<string>() { "", "", "", "" };
+		shootSounds = new string[] { "", "", "", "" };
 		rateOfFire = 1f;
 		index = (int)WeaponIds.ItemTracer;
 		weaponBarBaseIndex = 26;

@@ -10,7 +10,7 @@ public class ElectricSpark : Weapon {
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 6;
 		weaknessIndex = 8;
-		shootSounds = new List<string>() { "electricSpark", "electricSpark", "electricSpark", "electricSpark" };
+		shootSounds = new string[] { "electricSpark", "electricSpark", "electricSpark", "electricSpark" };
 		rateOfFire = 0.5f;
 	}
 

@@ -5,7 +5,7 @@ namespace MMXOnline;
 
 public class SpinWheel : Weapon {
 	public SpinWheel() : base() {
-		shootSounds = new List<string>() { "spinWheel", "spinWheel", "spinWheel", "spinWheelCharged" };
+		shootSounds = new string[] { "spinWheel", "spinWheel", "spinWheel", "spinWheelCharged" };
 		rateOfFire = 1f;
 		index = (int)WeaponIds.SpinWheel;
 		weaponBarBaseIndex = 12;

@@ -7,7 +7,7 @@ namespace MMXOnline;
 
 public class CrystalHunter : Weapon {
 	public CrystalHunter() : base() {
-		shootSounds = new List<string>() { "crystalHunter", "crystalHunter", "crystalHunter", "crystalHunterCharged" };
+		shootSounds = new string[] { "crystalHunter", "crystalHunter", "crystalHunter", "crystalHunterCharged" };
 		rateOfFire = 1.25f;
 		index = (int)WeaponIds.CrystalHunter;
 		weaponBarBaseIndex = 9;

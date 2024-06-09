@@ -12,7 +12,7 @@ public class HyperBuster : Weapon {
 		weaponBarBaseIndex = 32;
 		weaponBarIndex = 31;
 		weaponSlotIndex = 36;
-		shootSounds = new List<string>() { "buster3X3", "buster3X3", "buster3X3", "buster3X3" };
+		shootSounds = new string[] { "buster3X3", "buster3X3", "buster3X3", "buster3X3" };
 		rateOfFire = 2f;
 		switchCooldown = 0.25f;
 		ammo = 0;
@@ -31,7 +31,9 @@ public class HyperBuster : Weapon {
 	}
 
 	public static float getRateofFireMod(Player player) {
-		if (player.weapons[player.hyperChargeSlot] is Buster && !player.hasUltimateArmor()) {
+		if (player != null && player.hyperChargeSlot < player.weapons.Count &&
+			player.weapons[player.hyperChargeSlot] is Buster && !player.hasUltimateArmor()
+		) {
 			return 0.75f;
 		}
 		return 1;

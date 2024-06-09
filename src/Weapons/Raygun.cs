@@ -11,7 +11,7 @@ public class RayGun : AxlWeapon {
 		sprite = "axl_arm_raygun";
 		flashSprite = "axl_raygun_flash";
 		chargedFlashSprite = "axl_raygun_flash";
-		shootSounds = new List<string>() { "raygun", "raygun", "raygun", "splashLaser" };
+		shootSounds = new string[] { "raygun", "raygun", "raygun", "splashLaser" };
 		index = (int)WeaponIds.RayGun;
 		weaponBarBaseIndex = 30;
 		weaponBarIndex = 28;

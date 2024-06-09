@@ -5,7 +5,7 @@ namespace MMXOnline;
 
 public class AcidBurst : Weapon {
 	public AcidBurst() : base() {
-		shootSounds = new List<string>() { "acidBurst", "acidBurst", "acidBurst", "acidBurst" };
+		shootSounds = new string[] { "acidBurst", "acidBurst", "acidBurst", "acidBurst" };
 		rateOfFire = 0.5f;
 		index = (int)WeaponIds.AcidBurst;
 		weaponBarBaseIndex = 17;

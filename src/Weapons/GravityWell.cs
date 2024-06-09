@@ -4,7 +4,7 @@ namespace MMXOnline;
 
 public class GravityWell : Weapon {
 	public GravityWell() : base() {
-		shootSounds = new List<string>() { "buster", "buster", "buster", "warpIn" };
+		shootSounds = new string[] { "buster", "buster", "buster", "warpIn" };
 		rateOfFire = 0.5f;
 		index = (int)WeaponIds.GravityWell;
 		weaponBarBaseIndex = 22;
