@@ -1150,7 +1150,8 @@ class Program {
 			if (deltaTime >= 1 || deltaTimeAlt >= 1) {
 				window.DispatchEvents();
 				lastAltUpdateTime = timeNow;
-				if (frameStepEnabled) {
+				// Framestep works always, but offline only.
+				if (frameStepEnabled && Global.serverClient == null) {
 					if (Keyboard.IsKeyPressed(Key.F5)) {
 						if (f5Released) {
 							isFrameStep = !isFrameStep;
