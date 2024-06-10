@@ -276,7 +276,7 @@ public class GenericStun : CharState {
 	
 	public float getTimerFalloff() {
 		int mashCount = player.input.mashCount;
-		float healthPercent = -4 * ((player.health / player.health));
+		float healthPercent = 1 - 4 * ((player.health / player.health));
 		float mashAmount = (healthPercent * mashCount * 0.25f);
 		if (Global.frameCount - player.lastMashAmountSetFrame > 10) {
 			player.lastMashAmount = 0;
