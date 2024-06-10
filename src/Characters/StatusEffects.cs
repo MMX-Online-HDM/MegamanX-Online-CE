@@ -268,15 +268,29 @@ public class GenericStun : CharState {
 
 	
 	public void reduceStunFrames(ref float arg) {
-		arg -= getTimerFalloff();
+		arg -= getTimerFalloff() / Global.secondsFrameDuration;
 		if (arg <= 0) {
 			arg = 0;
 		}
 	}
 	
 	public float getTimerFalloff() {
-		float healthPercent = (2f/3f) * (player.health / player.maxHealth);
-		return (Global.speedMul * (2 + healthPercent));
+		int mashCount = player.input.mashCount;
+		float healthPercent = 1 - 4 * ((player.health / player.health));
+		float mashAmount = (healthPercent * mashCount * 0.25f);
+		if (Global.frameCount - player.lastMashAmountSetFrame > 10) {
+			player.lastMashAmount = 0;
+		}
+		float prevLastMashAmount = player.lastMashAmount;
+		player.lastMashAmount += mashAmount;
+		if (mashAmount > 0 && prevLastMashAmount == 0) {
+			player.lastMashAmountSetFrame = Global.frameCount;
+		}
+		// To prevent a underflow bug.
+		if (mashAmount < -Global.spf / 2) {
+			mashAmount = -Global.spf / 2;
+		}
+		return (Global.spf + mashAmount);
 	}
 }
 

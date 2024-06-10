@@ -481,7 +481,7 @@ public partial class Global {
 	public static float currentFPS = 60;
 	public static float logicFPS = 60;
 	public static float speedMul = 1;
-	private static float secondsFrameDuration = 1f / 60f;
+	public static readonly float secondsFrameDuration = 1f / 60f;
 	public static float spf {
 		get {
 			if (speedMul != 1) {
