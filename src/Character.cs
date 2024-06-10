@@ -265,12 +265,12 @@ public partial class Character : Actor, IDamagable {
 		if (infectedTime > 8) infectedTime = 8;
 	}
 
-	public void addDarkHoldTime(Player attacker, float time) {
+	public void addDarkHoldTime(float darkHoldTime, Player attacker) {
 		if (!ownedByLocalPlayer) return;
 		if (isInvulnerable()) return;
 		if (isVaccinated()) return;
 
-		changeState(new DarkHoldState(this), true);
+		changeState(new DarkHoldState(this, darkHoldTime), true);
 	}
 
 	public void addAcidTime(Player attacker, float time) {
@@ -2384,7 +2384,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public bool drawStatusProgress() {
-		if (!Options.main.showMashProgress) {
+		if (!Options.main.showMashProgress || Global.level.mainPlayer.character != this) {
 			return false;
 		}
 
@@ -2624,6 +2624,11 @@ public partial class Character : Actor, IDamagable {
 		decimal decimalHP = (decimal)player.health;
 		Axl? axl = this as Axl;
 		MegamanX? mmx = this as MegamanX;
+
+		// For Dark Hold break.
+		if (damage > 0 && charState is DarkHoldState dhs && dhs.frameTime > 10 && !Damager.isDot(projId)) {
+			changeToIdleOrFall();
+		}
 
 		if (attacker == player && axl?.isWhiteAxl() == true) {
 			damage = 0;

@@ -1460,6 +1460,11 @@ public partial class Level {
 		var actor = go as Actor;
 		if (actor == null) return false;
 
+		if (actor.timeStopTime > 10) {
+			slowAmount = 0.0625f;
+			return true;
+		}
+
 		bool isSlown = false;
 
 		if (actor is Character chr2) {

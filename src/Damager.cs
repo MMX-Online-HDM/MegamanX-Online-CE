@@ -420,7 +420,7 @@ public class Damager {
 				character.addOilTime(owner, 8);
 				character.playSound("flamemOil");
 			} else if (projId == (int)ProjIds.DarkHold) {
-				character.addDarkHoldTime(owner, 4);
+				character.addDarkHoldTime(4, owner);
 			} else if (projId == (int)ProjIds.MagnaCTail) {
 				character.addInfectedTime(owner, 4f);
 			}

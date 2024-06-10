@@ -161,6 +161,8 @@ public partial class Actor : GameObject {
 	public float bigBubbleTime;
 	public float waterTime;
 
+	public float timeStopTime;
+
 	public Actor(string spriteName, Point pos, ushort? netId, bool ownedByLocalPlayer, bool dontAddToLevel) {
 		this.pos = pos;
 		prevPos = pos;
@@ -482,10 +484,16 @@ public partial class Actor : GameObject {
 		}
 
 		if (!locallyControlled) {
-			//frameSpeed = 0;
+			frameSpeed = 0;
+			timeStopTime = 0;
 			sprite.time += Global.spf;
 		}
-
+		if (timeStopTime > 0) {
+			timeStopTime--;
+			if (timeStopTime <= 0) {
+				timeStopTime = 0;
+			}
+		};
 		if (locallyControlled && sprite != null) {
 			int oldFrameIndex = sprite.frameIndex;
 			sprite?.update();
@@ -1085,6 +1093,7 @@ public partial class Actor : GameObject {
 		if (!shouldRender(x, y)) {
 			return;
 		}
+
 		//console.log(this.pos.x + "," + this.pos.y);
 
 		var drawX = MathF.Round(pos.x);
