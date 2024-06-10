@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using SFML.Graphics;
 
 namespace MMXOnline;
@@ -538,7 +539,7 @@ public class RekkohaEffect : Effect {
 public class DarkHoldWeapon : Weapon {
 	public DarkHoldWeapon() : base() {
 		ammo = 0;
-		rateOfFire = 1f;
+		rateOfFire = 3f;
 		index = (int)WeaponIds.DarkHold;
 		type = (int)RakuhouhaType.DarkHold;
 		killFeedIndex = 175;
@@ -556,12 +557,14 @@ public class DarkHoldProj : Projectile {
 	public float radius = 10;
 	public float attackRadius => (radius + 15);
 	public ShaderWrapper? screenShader;
+	float timeInFrames;
+
 	public DarkHoldProj(
 		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
 	) : base(
 		weapon, pos, xDir, 0, 0, player, "empty", 0, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
-		maxTime = 1.25f;
+		maxTime = 3f;
 		vel = new Point();
 		projId = (int)ProjIds.DarkHold;
 		setIndestructableProperties();
@@ -578,24 +581,50 @@ public class DarkHoldProj : Projectile {
 	public override void update() {
 		base.update();
 		updateShader();
+		timeInFrames++;
 
-		if (time <= 0.5) {
+		if (timeInFrames < 150) {
 			foreach (var gameObject in Global.level.getGameObjectArray()) {
-				if (gameObject is Actor actor &&
-					actor.ownedByLocalPlayer &&
-					gameObject is IDamagable damagable &&
-					damagable.canBeDamaged(damager.owner.alliance, damager.owner.id, null) &&
-					inRange(actor)
-				) {
-					damager.applyDamage(damagable, false, weapon, this, projId);
+				if (gameObject != this && gameObject is Actor actor && actor.locallyControlled && inRange(actor)) {
+					// For characters.
+					if (actor is Character chara && chara.darkHoldInvulnTime <= 0) {
+						if (timeInFrames > 30) {
+							continue;
+						}
+						if (chara.canBeDamaged(damager.owner.alliance, damager.owner.id, null)) {
+							chara.addDarkHoldTime(150 - timeInFrames, damager.owner);
+							chara.darkHoldInvulnTime = (150 - timeInFrames) * 60f;
+						}
+						continue;
+					}
+					// For maverick and rides
+					if (actor is RideArmor or Maverick or Mechaniloid) {
+						if (actor.timeStopTime <= 0) {
+							continue;
+						}
+						IDamagable? damagable = actor as IDamagable;
+						if (damagable?.canBeDamaged(damager.owner.alliance, damager.owner.id, null) == true) {
+							continue;
+						}
+						actor.timeStopTime = 160 - timeInFrames;
+					}
+					// For projectiles
+					if (actor is Projectile && actor.timeStopTime <= 0) {
+						if (actor is BCrabSummonBubbleProj or BCrabSummonCrabProj &&
+							(actor as IDamagable)?.canBeDamaged(damager.owner.alliance, damager.owner.id, null) != true
+						) {
+							continue;
+						}
+						actor.timeStopTime = 160 - timeInFrames;
+					}
 				}
 			}
 		}
-		if (time <= 0.5) {
-			radius += Global.spf * 400;
+		if (timeInFrames <= 30) {
+			radius += (1f/60f) * 400;
 		}
-		if (time >= 1 && radius > 0) {
-			radius -= Global.spf * 800;
+		if (timeInFrames >= 150 && radius > 0) {
+			radius -= (1f/60f) * 800;
 			if (radius <= 0) {
 				radius = 0;
 			}
@@ -649,12 +678,14 @@ public class DarkHoldProj : Projectile {
 
 public class DarkHoldState : CharState {
 	public float stunTime = totalStunTime;
-	public const float totalStunTime = 5;
+	public const float totalStunTime = 2.5f * 60;
 	int frameIndex;
 	public bool shouldDrawAxlArm = true;
 	public float lastArmAngle = 0;
-	public DarkHoldState(Character character) : base(character?.sprite?.name ?? "grabbed") {
+
+	public DarkHoldState(Character character, float time) : base(character?.sprite?.name ?? "grabbed") {
 		immuneToWind = true;
+		stunTime = time;
 
 		this.frameIndex = character?.frameIndex ?? 0;
 		if (character is Axl axl) {
@@ -666,19 +697,24 @@ public class DarkHoldState : CharState {
 	public override void update() {
 		base.update();
 		character.stopMoving();
-		stunTime -= player.mashValue();
 		if (stunTime <= 0) {
 			stunTime = 0;
 			character.changeToIdleOrFall();
 		}
+		// Does not stack with other time stops.
+		stunTime -= 1;
 	}
 
 	public override bool canEnter(Character character) {
-		if (!base.canEnter(character)) return false;
-		if (character.darkHoldInvulnTime > 0) return false;
-		if (character.isInvulnerable()) return false;
-		if (character.isVaccinated()) return false;
-		return !character.isCCImmune() && !character.charState.invincible;
+		if (character.darkHoldInvulnTime > 0 ||
+			character.isInvulnerable() ||
+			character.isVaccinated() ||
+			character.isCCImmune() ||
+			character.charState.invincible
+		) {
+			return false;
+		}
+		return base.canEnter(character);
 	}
 
 	public override void onEnter(CharState oldState) {
