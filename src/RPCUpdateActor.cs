@@ -114,7 +114,10 @@ public partial class Actor {
 				args.AddRange(armorBytes);
 			}
 			if (character is Zero zero) {
-				ammo = MathInt.Ceiling(zero.zeroGigaAttackWeapon.ammo);
+				ammo = MathInt.Ceiling(zero.gigaAttack.ammo);
+			}
+			if (character is PunchyZero pzero) {
+				ammo = MathInt.Ceiling(pzero.gigaAttack.ammo);
 			}
 			if (character is Vile vile) {
 				ammo = (int)character.player.vileAmmo;
@@ -379,7 +382,7 @@ public class RPCUpdateActor : RPC {
 					}
 					// Zero section.
 					if (character.player.isZero && character is Zero zero) {
-						zero.zeroGigaAttackWeapon.ammo = ammo;
+						zero.gigaAttack.ammo = ammo;
 					}
 					// Vile section.
 					if (character.player.isVile && character is Vile vile) {

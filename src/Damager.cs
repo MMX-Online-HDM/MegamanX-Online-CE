@@ -7,7 +7,7 @@ public class Damager {
 	public Player owner;
 	public float damage;
 	public float hitCooldown;
-	public int flinch;  // number of frames to flinch
+	public int flinch; // Number of frames to flinch
 	public float knockback;
 
 	public const float envKillDamage = 2000;
@@ -354,12 +354,18 @@ public class Damager {
 			else if (projId == (int)ProjIds.SpeedBurner) character.addBurnTime(owner, new SpeedBurner(null), 1);
 			else if (projId == (int)ProjIds.SpeedBurnerCharged) { if (character != owner?.character) character.addBurnTime(owner, new SpeedBurner(null), 1); } else if (projId == (int)ProjIds.Napalm2 || projId == (int)ProjIds.Napalm2Wall) character.addBurnTime(owner, new Napalm(NapalmType.FireGrenade), 1);
 			else if (projId == (int)ProjIds.Napalm2Flame) character.addBurnTime(owner, new Napalm(NapalmType.FireGrenade), 0.5f);
-			else if (projId == (int)ProjIds.Ryuenjin) character.addBurnTime(owner, new RyuenjinWeapon(owner), 2);
+			else if (projId == (int)ProjIds.Ryuenjin) {
+				character.addBurnTime(owner, RyuenjinWeapon.staticWeapon, 2);
+			}
 			else if (projId == (int)ProjIds.FlameBurner) character.addBurnTime(owner, new FlameBurner(0), 0.5f);
 			else if (projId == (int)ProjIds.FlameBurnerHyper) character.addBurnTime(owner, new FlameBurner(0), 1);
 			else if (projId == (int)ProjIds.CircleBlazeExplosion) character.addBurnTime(owner, new FlameBurner(0), 2);
-			else if (projId == (int)ProjIds.QuakeBlazer) character.addBurnTime(owner, new QuakeBlazerWeapon(null), 0.5f);
-			else if (projId == (int)ProjIds.QuakeBlazerFlame) character.addBurnTime(owner, new QuakeBlazerWeapon(null), 0.5f);
+			else if (projId == (int)ProjIds.QuakeBlazer) {
+				character.addBurnTime(owner, DanchienWeapon.staticWeapon, 0.5f);
+			}
+			else if (projId == (int)ProjIds.QuakeBlazerFlame) {
+				character.addBurnTime(owner, DanchienWeapon.staticWeapon, 0.5f);
+			}
 			else if (projId == (int)ProjIds.FlameMFireball) character.addBurnTime(owner, new FlameMFireballWeapon(), 1);
 			else if (projId == (int)ProjIds.FlameMOilFire) character.addBurnTime(owner, new FlameMOilFireWeapon(), 8);
 			else if (projId == (int)ProjIds.VelGFire) character.addBurnTime(owner, new VelGFireWeapon(), 0.5f);
@@ -425,7 +431,10 @@ public class Damager {
 				character.addInfectedTime(owner, 4f);
 			}
 
-			if (owner?.character?.isNightmareZeroBS.getValue() == true) {
+			if ((owner?.character as Zero)?.isViral == true) {
+				character.addInfectedTime(owner, damage);
+			}
+			if ((owner?.character as PunchyZero)?.isViral == true) {
 				character.addInfectedTime(owner, damage);
 			}
 
@@ -449,18 +458,10 @@ public class Damager {
 				}
 			}
 
-			if (owner?.character is Zero zero && zero.isBlackZero() && !isDot(projId)) {
-				if (flinch <= 0) {
-					flinch = Global.halfFlinch;
-					flinchCooldown = 1;
-				} else if (flinch < Global.halfFlinch) {
-					flinch = Global.halfFlinch;
-				} else if (flinch < Global.defFlinch) {
-					flinch = Global.defFlinch;
-				}
-				damage = MathF.Ceiling(damage * 1.5f);
-			}
-			if (owner?.character is PunchyZero pzero && pzero.isBlack && !isDot(projId)) {
+			if (!isDot(projId) && (
+				owner?.character is Zero zero && zero.isBlack ||
+				owner?.character is PunchyZero pzero && pzero.isBlack
+			)) {
 				if (flinch <= 0) {
 					flinch = Global.halfFlinch;
 					flinchCooldown = 1;
@@ -682,7 +683,7 @@ public class Damager {
 						maverick.playSound("m10ding");
 						if (owner.ownedByLocalPlayer &&
 							owner.character is Zero zero &&
-							!zero.isHyperZero()
+							!zero.hypermodeActive()
 						) {
 							if (projId == (int)ProjIds.ZSaber || projId == (int)ProjIds.ZSaber1 ||
 								projId == (int)ProjIds.ZSaber2 || projId == (int)ProjIds.ZSaber3
@@ -734,7 +735,7 @@ public class Damager {
 		}
 		if (finalDamage > 0 && character != null &&
 			character.ownedByLocalPlayer &&
-			charState is KKnuckleParryStartState parryState2
+			charState is SaberParryStartState parryState2
 			&& parryState2.canParry(damagingActor) &&
 			!isDot(projId)
 		) {
@@ -793,7 +794,7 @@ public class Damager {
 			projId == (int)ProjIds.TriadThunderCharged ||
 			projId == (int)ProjIds.Raijingeki ||
 			projId == (int)ProjIds.Raijingeki2 ||
-			projId == (int)ProjIds.EBlade ||
+			projId == (int)ProjIds.Denjin ||
 			projId == (int)ProjIds.PeaceOutRoller ||
 			projId == (int)ProjIds.PlasmaGun ||
 			projId == (int)ProjIds.PlasmaGun2 ||

@@ -4,7 +4,7 @@ using SFML.Graphics;
 
 namespace MMXOnline;
 
-public enum RakuhouhaType {
+public enum ZeroGigaType {
 	Rakuhouha,
 	CFlasher,
 	Rekkoha,
@@ -24,7 +24,7 @@ public class RakuhouhaWeapon : Weapon {
 		weaponBarIndex = 33;
 		killFeedIndex = 16;
 		weaponSlotIndex = 51;
-		type = (int)RakuhouhaType.Rakuhouha;
+		type = (int)ZeroGigaType.Rakuhouha;
 		displayName = "Rakuhouha";
 		description = new string[] { "Channels stored energy in one blast.", "Energy cost: 16" };
 	}
@@ -33,11 +33,11 @@ public class RakuhouhaWeapon : Weapon {
 		return 16;
 	}
 
-	public static Weapon getWeaponFromIndex(Player player, int index) {
+	public static Weapon getWeaponFromIndex(int index) {
 		return index switch {
-			(int)RakuhouhaType.Rakuhouha => new RakuhouhaWeapon(),
-			(int)RakuhouhaType.CFlasher => new CFlasher(),
-			(int)RakuhouhaType.Rekkoha => new RekkohaWeapon(),
+			(int)ZeroGigaType.Rakuhouha => new RakuhouhaWeapon(),
+			(int)ZeroGigaType.CFlasher => new CFlasher(),
+			(int)ZeroGigaType.Rekkoha => new RekkohaWeapon(),
 			_ => throw new Exception("Invalid Zero hyouretsuzan weapon index!")
 		};
 	}
@@ -55,7 +55,7 @@ public class RekkohaWeapon : Weapon {
 		weaponBarIndex = 34;
 		killFeedIndex = 38;
 		weaponSlotIndex = 63;
-		type = (int)RakuhouhaType.Rekkoha;
+		type = (int)ZeroGigaType.Rekkoha;
 		displayName = "Rekkoha";
 		description = new string[] { "Summon down pillars of light energy.", "Energy cost: 32" };
 	}
@@ -77,7 +77,7 @@ public class CFlasher : Weapon {
 		weaponBarIndex = 35;
 		killFeedIndex = 81;
 		weaponSlotIndex = 64;
-		type = (int)RakuhouhaType.CFlasher;
+		type = (int)ZeroGigaType.CFlasher;
 		displayName = "Messenkou";
 		description = new string[] { "A less damaging blast that can pierce enemies.", "Energy cost: 8" };
 	}
@@ -94,7 +94,7 @@ public class ShinMessenkou : Weapon {
 		rateOfFire = 1f;
 		index = (int)WeaponIds.ShinMessenkou;
 		killFeedIndex = 86;
-		type = (int)RakuhouhaType.ShinMessenkou;
+		type = (int)ZeroGigaType.ShinMessenkou;
 		weaponBarBaseIndex = 43;
 		weaponBarIndex = 37;
 		weaponSlotIndex = 64;
@@ -108,7 +108,7 @@ public class ShinMessenkou : Weapon {
 public class Rakuhouha : CharState {
 	public Weapon weapon;
 	Anim? rakuanim;
-	RakuhouhaType type { get { return (RakuhouhaType)weapon.type; } }
+	ZeroGigaType type { get { return (ZeroGigaType)weapon.type; } }
 	bool fired = false;
 	bool fired2 = false;
 	bool fired3 = false;
@@ -117,9 +117,9 @@ public class Rakuhouha : CharState {
 	public Rakuhouha(
 		Weapon weapon
 	) : base(
-		(weapon.type == (int)RakuhouhaType.DarkHold) ? "darkhold" : 
-		weapon.type == (int)RakuhouhaType.CFlasher ||
-		weapon.type == (int)RakuhouhaType.DarkHold ? "cflasher" : "rakuhouha"
+		(weapon.type == (int)ZeroGigaType.DarkHold) ? "darkhold" : 
+		weapon.type == (int)ZeroGigaType.CFlasher ||
+		weapon.type == (int)ZeroGigaType.DarkHold ? "cflasher" : "rakuhouha"
 	) {
 		this.weapon = weapon;
 		invincible = true;
@@ -127,10 +127,10 @@ public class Rakuhouha : CharState {
 
 	public override void update() {
 		base.update();
-		bool isCFlasher = type == RakuhouhaType.CFlasher;
-		bool isRakuhouha = type == RakuhouhaType.Rakuhouha;
-		bool isShinMessenkou = type == RakuhouhaType.ShinMessenkou;
-		bool isDarkHold = type == RakuhouhaType.DarkHold;
+		bool isCFlasher = type == ZeroGigaType.CFlasher;
+		bool isRakuhouha = type == ZeroGigaType.Rakuhouha;
+		bool isShinMessenkou = type == ZeroGigaType.ShinMessenkou;
+		bool isDarkHold = type == ZeroGigaType.DarkHold;
 		if (character.frameIndex == 5 && !once && !isDarkHold) {
 			once = true;
 			/*rakuanim = new Anim(
@@ -541,7 +541,7 @@ public class DarkHoldWeapon : Weapon {
 		ammo = 0;
 		rateOfFire = 3f;
 		index = (int)WeaponIds.DarkHold;
-		type = (int)RakuhouhaType.DarkHold;
+		type = (int)ZeroGigaType.DarkHold;
 		killFeedIndex = 175;
 		weaponBarBaseIndex = 69;
 		weaponBarIndex = 58;

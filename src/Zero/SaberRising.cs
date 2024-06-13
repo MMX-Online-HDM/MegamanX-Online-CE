@@ -2,55 +2,60 @@
 
 namespace MMXOnline;
 
-public enum RyuenjinType {
+public enum RisingType {
 	Ryuenjin,
-	EBlade,
-	Rising,
-	Shoryuken,
+	Denjin,
+	RisingFang
 }
 
 public class RyuenjinWeapon : Weapon {
-	public RyuenjinWeapon(Player player) : base() {
-		damager = new Damager(player, 4, 0, 0.2f);
+	public static RyuenjinWeapon staticWeapon = new();
+
+	public RyuenjinWeapon() : base() {
+		//damager = new Damager(player, 4, 0, 0.2f);
 		index = (int)WeaponIds.Ryuenjin;
 		rateOfFire = 0.25f;
 		weaponBarBaseIndex = 23;
 		weaponBarIndex = weaponBarBaseIndex;
 		killFeedIndex = 11;
-		type = (int)RyuenjinType.Ryuenjin;
+		type = (int)RisingType.Ryuenjin;
 		displayName = "Ryuenjin";
 		description = new string[] { "A fiery uppercut that burns enemies." };
 	}
 
-	public static Weapon getWeaponFromIndex(Player player, int index) {
-		if (index == (int)RyuenjinType.Ryuenjin) return new RyuenjinWeapon(player);
-		else if (index == (int)RyuenjinType.EBlade) return new EBladeWeapon(player);
-		else if (index == (int)RyuenjinType.Rising) return new RisingWeapon(player);
+	public static Weapon getWeaponFromIndex(int index) {
+		if (index == (int)RisingType.Ryuenjin) return new RyuenjinWeapon();
+		else if (index == (int)RisingType.Denjin) return new DenjinWeapon();
+		else if (index == (int)RisingType.RisingFang) return new RisingFangWeapon();
 		else throw new Exception("Invalid Zero ryuenjin weapon index!");
 	}
 }
 
-public class EBladeWeapon : Weapon {
-	public EBladeWeapon(Player player) : base() {
-		damager = new Damager(player, 3, Global.defFlinch, 0.1f);
+public class DenjinWeapon : Weapon {
+	public static DenjinWeapon staticWeapon = new();
+
+	public DenjinWeapon() : base() {
+		//damager = new Damager(player, 3, Global.defFlinch, 0.1f);
 		index = (int)WeaponIds.EBlade;
 		rateOfFire = 0.25f;
 		weaponBarBaseIndex = 41;
 		killFeedIndex = 36;
-		type = (int)RyuenjinType.EBlade;
+		type = (int)RisingType.Denjin;
 		displayName = "Denjin";
 		description = new string[] { "An electrical uppercut that flinches enemies", "and can hit multiple times." };
 	}
 }
 
-public class RisingWeapon : Weapon {
-	public RisingWeapon(Player player) : base() {
-		damager = new Damager(player, 2, 0, 0.5f);
+public class RisingFangWeapon : Weapon {
+	public static RisingFangWeapon staticWeapon = new();
+
+	public RisingFangWeapon() : base() {
+		//damager = new Damager(player, 2, 0, 0.5f);
 		index = (int)WeaponIds.Rising;
 		rateOfFire = 0.1f;
 		weaponBarBaseIndex = 41;
 		killFeedIndex = 83;
-		type = (int)RyuenjinType.Rising;
+		type = (int)RisingType.RisingFang;
 		displayName = "Rising";
 		description = new string[] { "A fast, element-neutral uppercut.", "Can be used in the air to gain height." };
 	}
@@ -60,40 +65,56 @@ public class ZeroUppercut : CharState {
 	bool jumpedYet;
 	float timeInWall;
 	bool isUnderwater;
-	public Weapon weapon;
 	public bool isHeld = true;
 	public float holdTime;
-	public RyuenjinType type { get { return (RyuenjinType)weapon.type; } }
-	public Zero? zero;
+	public RisingType type;
+	public Zero? zero = null!;
+	int jumpFrame;
 
-	public ZeroUppercut(Weapon weapon, bool isUnderwater) : base(getSprite(weapon.type, isUnderwater), "", "") {
-		this.weapon = weapon;
-		this.isUnderwater = type == RyuenjinType.Ryuenjin && isUnderwater;
+	public ZeroUppercut(RisingType type, bool isUnderwater) : base(getSprite(type, isUnderwater), "", "") {
+		this.type = type;
+		this.isUnderwater = type == RisingType.Ryuenjin && isUnderwater;
+		setStartupFrame(type);
 	}
 
-	public static string getSprite(int type, bool isUnderwater) {
-		if (type == (int)RyuenjinType.Ryuenjin) {
-			return (isUnderwater ? "ryuenjin_underwater" : "ryuenjin");
-		}
-		if (type == (int)RyuenjinType.EBlade) return "eblade";
-		if (type == (int)RyuenjinType.Shoryuken) return "shoryuken";
-		return "rising";
+	public ZeroUppercut(int type, bool isUnderwater) : base(getSprite((RisingType)type, isUnderwater), "", "") {
+		this.type = (RisingType)type;
+		this.isUnderwater = this.type == RisingType.Ryuenjin && isUnderwater;
+		setStartupFrame(this.type);
+	}
+
+	public void setStartupFrame(RisingType type) {
+		jumpFrame = type switch {
+			RisingType.Ryuenjin => 4,
+			RisingType.Denjin => 5,
+			_ => 4
+		};
+	}
+
+	public static string getSprite(RisingType type, bool isUnderwater) {
+		return type switch {
+			RisingType.Ryuenjin when isUnderwater => "ryuenjin_underwater",
+			RisingType.Ryuenjin => "ryuenjin",
+			RisingType.Denjin => "eblade",
+			_ => "rising"
+		};
 	}
 
 	public override void update() {
 		base.update();
 
-		if (character.sprite.frameIndex >= 3 && !jumpedYet) {
+		if (character.sprite.frameIndex >= jumpFrame && !jumpedYet) {
 			jumpedYet = true;
 			character.dashedInAir++;
 			float ySpeedMod = 1.2f;
-			if (type == RyuenjinType.Shoryuken) ySpeedMod = 1.5f;
 			character.vel.y = -character.getJumpPower() * ySpeedMod;
 			if (!isUnderwater) {
-				if (type == RyuenjinType.Ryuenjin) character.playSound("ryuenjin", sendRpc: true);
-				if (type == RyuenjinType.EBlade) character.playSound("raijingeki", sendRpc: true);
-				if (type == RyuenjinType.Rising) character.playSound("saber1", sendRpc: true);
-				if (type == RyuenjinType.Shoryuken) character.playSound("punch2", sendRpc: true);
+				string saberSound = type switch {
+					RisingType.Ryuenjin => "ryuenjin",
+					RisingType.Denjin => "raijingeki",
+					_ => "saber1"
+				};
+				character.playSound(saberSound, sendRpc: true);
 			}
 		}
 
@@ -101,7 +122,7 @@ public class ZeroUppercut : CharState {
 			isHeld = false;
 		}
 
-		if (character.sprite.frameIndex == 6 && type == RyuenjinType.Rising) {
+		if (character.sprite.frameIndex == 6 && type == RisingType.RisingFang) {
 			if (isHeld && holdTime < 0.2f) {
 				holdTime += Global.spf;
 				character.frameSpeed = 0;
@@ -114,11 +135,10 @@ public class ZeroUppercut : CharState {
 
 		if (character.sprite.frameIndex >= 3 && character.sprite.frameIndex < 6) {
 			float speed = 100;
-			if (type == RyuenjinType.EBlade) speed = 120;
-			character.move(new Point(character.xDir * speed, 0));
-			if (type == RyuenjinType.Shoryuken && jumpedYet) {
-				character.vel.y += Global.speedMul * character.getGravity() * 0.5f;
+			if (type == RisingType.Denjin) {
+				speed = 120;
 			}
+			character.move(new Point(character.xDir * speed, 0));
 		}
 
 		var wallAbove = Global.level.checkCollisionActor(character, 0, -10);
@@ -133,12 +153,12 @@ public class ZeroUppercut : CharState {
 		if (canDownSpecial()) {
 			if (player.input.isPressed(Control.Shoot, player) && player.input.isHeld(Control.Down, player)) {
 				if (zero != null) {
-					character.changeState(new ZeroFallStab(zero.zeroDownThrustWeaponA), true);
+					character.changeState(new ZeroDownthrust(zero.fallStabA.type), true);
 					return;
 				}
 			} else if (player.input.isPressed(Control.Special1, player) && player.input.isHeld(Control.Down, player)) {
 				if (zero != null) {
-					character.changeState(new ZeroFallStab(zero.zeroDownThrustWeaponS), true);
+					character.changeState(new ZeroDownthrust(zero.fallStabS.type), true);
 					return;
 				}
 			}
@@ -153,9 +173,10 @@ public class ZeroUppercut : CharState {
 		if (character is not Zero zero) {
 			return false;
 		}
-		if (zero.airAttackCooldown == 0) return false;
 		int fc = character.sprite.frames.Count;
-		if (type == RyuenjinType.Rising) return character.sprite.frameIndex >= fc - 1;
+		if (type == RisingType.RisingFang) {
+			return character.sprite.frameIndex >= fc - 1;
+		}
 		return character.sprite.frameIndex >= fc - 3;
 	}
 
@@ -164,11 +185,10 @@ public class ZeroUppercut : CharState {
 		if (!character.grounded) {
 			character.sprite.frameIndex = 3;
 		}
-		zero = character as Zero;
+		zero = character as Zero ?? throw new NullReferenceException();
 	}
 
 	public override void onExit(CharState newState) {
-		weapon.shootTime = weapon.rateOfFire;
 		base.onExit(newState);
 	}
 }

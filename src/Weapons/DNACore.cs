@@ -50,9 +50,15 @@ public class DNACore : AxlWeapon {
 		speedDevil = character.isSpeedDevilActiveBS.getValue();
 		ultimateArmor = character.hasUltimateArmorBS.getValue();
 		if (charNum == 0) weapons = loadout.xLoadout.getWeaponsFromLoadout(character.player);
-		if (charNum == 1 && character is Zero zero2) {
-			rakuhouhaAmmo = zero2.zeroGigaAttackWeapon.ammo;
-			if (character.isNightmareZeroBS.getValue()) rakuhouhaAmmo = zero2.zeroDarkHoldWeapon.ammo;
+		if (charNum == 1 && character is Zero zero) {
+			rakuhouhaAmmo = zero.gigaAttack.ammo;
+			if (zero.hypermodeActive()) {
+				hyperMode = zero.hyperMode switch {
+					1 => DNACoreHyperMode.AwakenedZero,
+					2 => DNACoreHyperMode.NightmareZero,
+					_ => DNACoreHyperMode.BlackZero
+				};
+			}
 		}
 		if (charNum == 2) weapons = loadout.vileLoadout.getWeaponsFromLoadout(false);
 		if (charNum == 3) {
@@ -68,10 +74,7 @@ public class DNACore : AxlWeapon {
 		// For any hyper modes added here, be sure to de-apply them if "preserve undisguise" is used in: axl.updateDisguisedAxl()
 		if (character.sprite.name.Contains("vilemk2")) hyperMode = DNACoreHyperMode.VileMK2;
 		else if (character.sprite.name.Contains("vilemk5")) hyperMode = DNACoreHyperMode.VileMK5;
-		else if (character is Zero zero && zero.isBlackZero()) hyperMode = DNACoreHyperMode.BlackZero;
 		else if (character is Axl axl && axl.isWhiteAxl()) hyperMode = DNACoreHyperMode.WhiteAxl;
-		else if (character.isAwakenedZeroBS.getValue()) hyperMode = DNACoreHyperMode.AwakenedZero;
-		else if (character.isNightmareZeroBS.getValue()) hyperMode = DNACoreHyperMode.NightmareZero;
 
 		rateOfFire = 1f;
 		index = (int)WeaponIds.DNACore;

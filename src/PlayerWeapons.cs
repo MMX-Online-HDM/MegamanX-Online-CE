@@ -525,15 +525,15 @@ label:
 		headbuttWeapon = new Headbutt(this);
 
 		if (character is Zero zero) {
-			zero.raijingekiWeapon = RaijingekiWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.groundSpecial);
-			zero.zeroAirSpecialWeapon = KuuenzanWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.airSpecial);
-			zero.zeroUppercutWeaponA = RyuenjinWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.uppercutA);
-			zero.zeroUppercutWeaponS = RyuenjinWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.uppercutS);
-			zero.zeroDownThrustWeaponA = HyouretsuzanWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.downThrustA);
-			zero.zeroDownThrustWeaponS = HyouretsuzanWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.downThrustS);
+			zero.groundSpecial = RaijingekiWeapon.getWeaponFromIndex(loadout.zeroLoadout.groundSpecial);
+			zero.airSpecial = KuuenzanWeapon.getWeaponFromIndex(loadout.zeroLoadout.airSpecial);
+			zero.uppercutA = RyuenjinWeapon.getWeaponFromIndex(loadout.zeroLoadout.uppercutA);
+			zero.uppercutS = RyuenjinWeapon.getWeaponFromIndex(loadout.zeroLoadout.uppercutS);
+			zero.fallStabA = HyouretsuzanWeapon.getWeaponFromIndex(loadout.zeroLoadout.downThrustA);
+			zero.fallStabS = HyouretsuzanWeapon.getWeaponFromIndex(loadout.zeroLoadout.downThrustS);
 
-			zero.zeroGigaAttackWeapon = RakuhouhaWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.gigaAttack);
-			zero.zeroHyperMode = loadout.zeroLoadout.hyperMode;
+			zero.gigaAttack = RakuhouhaWeapon.getWeaponFromIndex(loadout.zeroLoadout.gigaAttack);
+			zero.hyperMode = loadout.zeroLoadout.hyperMode;
 		}
 
 		hadoukenWeapon = new HadoukenWeapon(this);
