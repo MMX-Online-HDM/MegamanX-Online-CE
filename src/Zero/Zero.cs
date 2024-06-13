@@ -709,7 +709,7 @@ public class Zero : Character {
 				DenjinWeapon.staticWeapon, projPos, ProjIds.Denjin, player, 3, Global.defFlinch, 0.1f
 			),
 			(int)MeleeIds.RisingFang => new GenericMeleeProj(
-				RisingFangWeapon.staticWeapon, projPos, ProjIds.RisingFang, player, 1, 0, 0.15f
+				RisingFangWeapon.staticWeapon, projPos, ProjIds.RisingFang, player, 2, 0, 0.5f
 			),
 			// Down specials
 			(int)MeleeIds.Hyouretsuzan => new GenericMeleeProj(
