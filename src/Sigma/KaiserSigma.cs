@@ -207,4 +207,13 @@ public partial class KaiserSigma : Character {
 		}
 		return null;
 	}
+
+	public override void updateProjFromHitbox(Projectile proj) {
+		if (proj.projId == (int)ProjIds.Sigma3KaiserStomp) {
+			float damagePercent = getKaiserStompDamage();
+			if (damagePercent > 0) {
+				proj.damager.damage = 12 * damagePercent;
+			}
+		}
+	}
 }

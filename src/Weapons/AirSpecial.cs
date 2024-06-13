@@ -9,8 +9,10 @@ public enum AirSpecialType {
 }
 
 public class KuuenzanWeapon : Weapon {
-	public KuuenzanWeapon(Player player) : base() {
-		damager = new Damager(player, 3, 0, 0.5f);
+	public static KuuenzanWeapon staticWeapon = new();
+
+	public KuuenzanWeapon() : base() {
+		//damager = new Damager(player, 3, 0, 0.5f);
 		index = (int)WeaponIds.Kuuenzan;
 		weaponBarBaseIndex = 21;
 		weaponBarIndex = weaponBarBaseIndex;
@@ -21,17 +23,21 @@ public class KuuenzanWeapon : Weapon {
 		description = new string[] { "Standard spin attack in the air." };
 	}
 
-	public static Weapon getWeaponFromIndex(Player player, int index) {
-		if (index == (int)AirSpecialType.Kuuenzan) return new KuuenzanWeapon(player);
-		else if (index == (int)AirSpecialType.FSplasher) return new FSplasherWeapon(player);
-		else if (index == (int)AirSpecialType.Hyoroga) return new HyorogaWeapon(player);
-		else throw new Exception("Invalid Zero air special weapon index!");
+	public static Weapon getWeaponFromIndex(int index) {
+		return index switch {
+			(int)AirSpecialType.Kuuenzan => new KuuenzanWeapon(),
+			(int)AirSpecialType.FSplasher => new FSplasherWeapon(),
+			(int)AirSpecialType.Hyoroga => new HyorogaWeapon(),
+			_ => throw new Exception("Invalid Zero air special weapon index!")
+		};
 	}
 }
 
 public class FSplasherWeapon : Weapon {
-	public FSplasherWeapon(Player player) : base() {
-		damager = new Damager(player, 3, Global.defFlinch, 0.06f);
+	public static FSplasherWeapon staticWeapon = new();
+
+	public FSplasherWeapon() : base() {
+		//damager = new Damager(player, 3, Global.defFlinch, 0.06f);
 		index = (int)WeaponIds.FSplasher;
 		killFeedIndex = 109;
 		type = (int)AirSpecialType.FSplasher;
@@ -65,7 +71,7 @@ public class FSplasherState : CharState {
 		character.vel = new Point(0, 0);
 		character.dashedInAir++;
 		fSplasherProj = new FSplasherProj(
-			zero.zeroAirSpecialWeapon, character.pos, character.xDir,
+			character.pos, character.xDir,
 			player, player.getNextActorNetId(), sendRpc: true
 		);
 	}
@@ -76,7 +82,7 @@ public class FSplasherState : CharState {
 			fSplasherProj.destroySelf();
 			fSplasherProj = null;
 		}
-		zero.zeroAirSpecialWeapon.shootTime = 1;
+		zero.airSpecial.shootTime = 1;
 		base.onExit(newState);
 	}
 
@@ -122,8 +128,13 @@ public class FSplasherState : CharState {
 }
 
 public class FSplasherProj : Projectile {
-	public FSplasherProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, 0, 2, player, "fsplasher_proj", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public FSplasherProj(
+		Point pos, int xDir,
+		Player player, ushort netProjId, bool sendRpc = false
+	) : base(
+		FSplasherWeapon.staticWeapon, pos, xDir, 0, 2, player, "fsplasher_proj",
+		0, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.FSplasher;
 		destroyOnHit = false;
 		shouldVortexSuck = false;
@@ -137,8 +148,10 @@ public class FSplasherProj : Projectile {
 }
 
 public class HyorogaWeapon : Weapon {
-	public HyorogaWeapon(Player player) : base() {
-		damager = new Damager(player, 3, Global.defFlinch, 0.06f);
+	public static HyorogaWeapon staticWeapon = new();
+
+	public HyorogaWeapon() : base() {
+		//damager = new Damager(player, 3, Global.defFlinch, 0.06f);
 		index = (int)WeaponIds.Hyoroga;
 		killFeedIndex = 108;
 		type = (int)AirSpecialType.Hyoroga;
@@ -150,7 +163,9 @@ public class HyorogaWeapon : Weapon {
 		//if (character.charState is Fall) return;
 		for (int i = 1; i <= 4; i++) {
 			CollideData collideData = Global.level.checkCollisionActor(character, 0, -10 * i, autoVel: true);
-			if (collideData != null && collideData.gameObject is Wall wall && !wall.isMoving && !wall.topWall && collideData.isCeilingHit()) {
+			if (collideData != null && collideData.gameObject is Wall wall
+				&& !wall.isMoving && !wall.topWall && collideData.isCeilingHit()
+			) {
 				character.changeState(new HyorogaStartState(), true);
 				return;
 			}
@@ -183,9 +198,6 @@ public class HyorogaStartState : CharState {
 		character.vel = new Point(0, 0);
 		character.gravityModifier = -1;
 		character.dashedInAir = 0;
-		if (character is Zero zero) {
-			zero.quakeBlazerBounces = 0;
-		}
 		character.specialState = (int)SpecialStateIds.HyorogaStart;
 	}
 
@@ -228,15 +240,15 @@ public class HyorogaState : CharState {
 			if (pois != null && pois.Count > 0 && shootCooldown == 0) {
 				var poi = character.getFirstPOIOrDefault();
 				new HyorogaProj(
-					zero.zeroAirSpecialWeapon, poi, new Point(0, 1),
+					poi, 0,
 					player, player.getNextActorNetId(), sendRpc: true
 				);
 				new HyorogaProj(
-					zero.zeroAirSpecialWeapon, poi, new Point(0.375f, 1),
+					poi, 1,
 					player, player.getNextActorNetId(), sendRpc: true
 				);
 				new HyorogaProj(
-					zero.zeroAirSpecialWeapon, poi, new Point(-0.375f, 1),
+					poi, -1,
 					player, player.getNextActorNetId(), sendRpc: true
 				);
 				//shootCooldown = 1f;
@@ -252,16 +264,21 @@ public class HyorogaState : CharState {
 }
 
 public class HyorogaProj : Projectile {
-	public HyorogaProj(Weapon weapon, Point pos, Point vel, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, 1, 0, 3, player, "hyoroga_proj", Global.halfFlinch, 0.15f, netProjId, player.ownedByLocalPlayer) {
+	public HyorogaProj(
+		Point pos, int velDir, Player player,
+		ushort netProjId, bool sendRpc = false
+	) : base(
+		HyorogaWeapon.staticWeapon, pos, 1, 0, 3, player, "hyoroga_proj",
+		Global.halfFlinch, 0.15f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.HyorogaProj;
 		destroyOnHit = true;
-		this.vel = vel.times(250);
+		this.vel.x = velDir * 250 * 0.375f;
+		this.vel.y = 250;
 		maxTime = 0.4f;
-		canBeLocal = false; // TODO: Implement local.
 
 		if (sendRpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, player, netProjId, xDir, (byte)(velDir + 128));
 		}
 	}
 

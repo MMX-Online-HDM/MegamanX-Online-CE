@@ -267,7 +267,7 @@ public class GenericStun : CharState {
 	}
 
 	public void reduceStunFrames(ref float arg) {
-		arg -= getTimerFalloff();
+		arg -= player.mashValue() * 60f;
 		if (arg <= 0) {
 			arg = 0;
 		}

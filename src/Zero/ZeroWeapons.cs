@@ -7,19 +7,10 @@ public enum ZeroAttackLoadoutType {
 }
 
 public class ZSaber : Weapon {
-	public ZSaber(Player player) : base() {
-		damager = new Damager(player, 3, 0, 0.5f);
-		index = (int)WeaponIds.ZSaber;
-		weaponBarBaseIndex = 21;
-		weaponBarIndex = weaponBarBaseIndex;
-		weaponSlotIndex = 48;
-		killFeedIndex = 9;
-		type = (int)ZeroAttackLoadoutType.ZSaber;
-		displayName = "Z-Saber";
-		description = new string[] { "Zero's trusty beam saber." };
-	}
+	public static ZSaber staticWeapon = new();
 
 	public ZSaber() : base() {
+		//damager = new Damager(player, 3, 0, 0.5f);
 		index = (int)WeaponIds.ZSaber;
 		weaponBarBaseIndex = 21;
 		weaponBarIndex = weaponBarBaseIndex;
@@ -32,48 +23,19 @@ public class ZSaber : Weapon {
 }
 
 public class ShippuugaWeapon : Weapon {
-	public ShippuugaWeapon(Player player) : base() {
-		damager = new Damager(player, 2, Global.defFlinch, 0.5f);
+	public static ShippuugaWeapon staticWeapon = new();
+
+	public ShippuugaWeapon() : base() {
+		//damager = new Damager(player, 2, Global.defFlinch, 0.5f);
 		index = (int)WeaponIds.Shippuuga;
 		weaponBarBaseIndex = 21;
 		killFeedIndex = 39;
 	}
 }
 
-public class ZSaberProj : Projectile {
-	public ZSaberProj(
-		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
-	) : base(
-		weapon, pos, xDir, 300, 3, player, "zsaber_shot", 0, 0.5f, netProjId, player.ownedByLocalPlayer
-	) {
-		fadeSprite = "zsaber_shot_fade";
-		reflectable = true;
-		projId = (int)ProjIds.ZSaberProj;
-		if (player.character is Zero zero) {
-			if (zero.isBlackZero() == true) {
-				genericShader = player.zeroPaletteShader;
-			}
-			if (zero.isAwakenedZeroBS.getValue() == true) {
-				genericShader = player.zeroAzPaletteShader;
-			}
-		}
-		
-		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
-		}
-	}
-
-	public override void update() {
-		base.update();
-		if (time > 0.5) {
-			destroySelf(fadeSprite);
-		}
-	}
-}
-
 public class KKnuckleWeapon : Weapon {
-	public KKnuckleWeapon(Player player) : base() {
-		damager = new Damager(player, 3, Global.defFlinch, 0.25f);
+	public KKnuckleWeapon() : base() {
+		//damager = new Damager(player, 3, Global.defFlinch, 0.25f);
 		index = (int)WeaponIds.KKnuckle;
 		weaponBarBaseIndex = 21;
 		weaponBarIndex = weaponBarBaseIndex;
@@ -85,6 +47,23 @@ public class KKnuckleWeapon : Weapon {
 	}
 }
 
+public class Shingetsurin : Weapon {
+	public static Shingetsurin netWeapon = new();
+
+	public Shingetsurin() : base() {
+		index = (int)WeaponIds.Shingetsurin;
+		killFeedIndex = 85;
+		//damager = new Damager(player, 4, Global.defFlinch, 0.5f);
+	}
+}
+
+public class ZSaberProjSwing : Weapon {
+	public ZSaberProjSwing() : base() {
+		index = (int)WeaponIds.ZSaberProjSwing;
+		killFeedIndex = 9;
+		//damager = new Damager(player, 3, Global.defFlinch, 0.5f);
+	}
+}
 
 public class ZeroSpinKickState : CharState {
 	public float dashTime = 0;

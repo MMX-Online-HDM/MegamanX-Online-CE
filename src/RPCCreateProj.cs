@@ -64,7 +64,7 @@ public partial class RPCCreateProj : RPC {
 				proj = new ItemTracerProj(new ItemTracer(), pos, xDir, player, null, netProjByte);
 				break;
 			case (int)ProjIds.ZSaberProj:
-				proj = new ZSaberProj(new ZSaber(player), pos, xDir, player, netProjByte);
+				proj = new ZSaberProj(pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.XSaberProj:
 				proj = new XSaberProj(new XSaber(player), pos, xDir, player, netProjByte);
@@ -85,13 +85,13 @@ public partial class RPCCreateProj : RPC {
 				proj = new BusterProj(new ZeroBuster(), pos, xDir, 1, player, netProjByte);
 				break;
 			case (int)ProjIds.ZBuster2:
-				proj = new ZBuster2Proj(new ZeroBuster(), pos, xDir, 0, player, netProjByte);
+				proj = new ZBuster2Proj(pos, xDir, 0, player, netProjByte);
 				break;
 			case (int)ProjIds.ZBuster3:
-				proj = new ZBuster3Proj(new ZeroBuster(), pos, xDir, 0, player, netProjByte);
+				proj = new ZBuster3Proj(pos, xDir, 0, player, netProjByte);
 				break;
 			case (int)ProjIds.ZBuster4:
-				proj = new ZBuster4Proj(new ZeroBuster(), pos, xDir, 0, player, netProjByte);
+				proj = new ZBuster4Proj(pos, xDir, 0, player, netProjByte);
 				break;
 			case (int)ProjIds.Sting:
 			case (int)ProjIds.StingDiag:
@@ -308,10 +308,10 @@ public partial class RPCCreateProj : RPC {
 				proj = new CircleBlazeExplosionProj(new FlameBurner(0), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.QuakeBlazer:
-				proj = new QuakeBlazerExplosionProj(new QuakeBlazerWeapon(null), pos, xDir, player, netProjByte);
+				proj = new DanchienExplosionProj(pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.QuakeBlazerFlame:
-				proj = new QuakeBlazerFlamePart(new QuakeBlazerWeapon(null), pos, xDir, new Point(), player, netProjByte);
+				proj = new QuakeBlazerFlamePart(pos, xDir, (int)extraData[0] - 1, player, netProjByte);
 				break;
 			case (int)ProjIds.MechFrogStompShockwave:
 				proj = new MechFrogStompShockwave(new MechFrogStompWeapon(null), pos, xDir, player, netProjByte);
@@ -449,16 +449,13 @@ public partial class RPCCreateProj : RPC {
 				proj = new WolfSigmaFlame(new WolfSigmaHeadWeapon(), pos, new Point(), player, netProjByte);
 				break;
 			case (int)ProjIds.FSplasher:
-				proj = new FSplasherProj(new FSplasherWeapon(player), pos, xDir, player, netProjByte);
+				proj = new FSplasherProj(pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.HyorogaProj:
-				proj = new HyorogaProj(new HyorogaWeapon(player), pos, new Point(0, 0), player, netProjByte);
-				break;
-			case (int)ProjIds.SuiretsusanProj:
-				proj = new SuiretsusenProj(new SuiretsusenWeapon(player), pos, xDir, player, netProjByte);
+				proj = new HyorogaProj(pos, (int)extraData[0] - 128, player, netProjByte);
 				break;
 			case (int)ProjIds.TBreakerProj:
-				proj = new TBreakerProj(new TBreakerWeapon(player), pos, xDir, player, netProjByte);
+				proj = new TBreakerProj(pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.QuickHomesick:
 				proj = new VileCutterProj(new VileCutter(VileCutterType.QuickHomesick), pos, xDir, player, netProjByte);

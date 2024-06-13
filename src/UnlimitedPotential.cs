@@ -98,7 +98,7 @@ public class XUPParryStartState : CharState {
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
-		character.parryCooldown = character.maxParryCooldown;
+		mmx.parryCooldown = mmx.maxParryCooldown;
 	}
 }
 
@@ -199,7 +199,9 @@ public class XUPParryMeleeState : CharState {
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
-		character.parryCooldown = character.maxParryCooldown;
+		if (character is MegamanX mmx) {
+			mmx.parryCooldown = mmx.maxParryCooldown;
+		}
 	}
 }
 
@@ -312,7 +314,9 @@ public class XUPParryProjState : CharState {
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		absorbAnim?.destroySelf();
-		character.parryCooldown = character.maxParryCooldown;
+		if (character is MegamanX mmx) {
+			mmx.parryCooldown = mmx.maxParryCooldown;
+		}
 	}
 }
 
@@ -697,9 +701,7 @@ public class XRevive : CharState {
 		character.useGravity = true;
 		mmx.isHyperX = true;
 		Global.level.addGameObjectToGrid(character);
-		if (character != null) {
-			character.invulnTime = character.maxParryCooldown;
-		}
+		mmx.invulnTime = mmx.maxParryCooldown;
 	}
 }
 

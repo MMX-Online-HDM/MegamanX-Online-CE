@@ -70,8 +70,11 @@ public partial class MegamanX : Character {
 
 	public float xSaberCooldown;
 	public float stockedChargeFlashTime;
-	
+
 	public BeeSwarm? beeSwarm;
+
+	public float parryCooldown;
+	public float maxParryCooldown = 0.5f;
 
 	public MegamanX(
 		Player player, float x, float y, int xDir,
@@ -144,6 +147,7 @@ public partial class MegamanX : Character {
 			Helpers.decrementTime(ref barrierTime);
 			return;
 		}
+		Helpers.decrementTime(ref parryCooldown);
 
 		if (beeSwarm != null) {
 			beeSwarm.update();

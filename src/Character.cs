@@ -52,8 +52,6 @@ public partial class Character : Actor, IDamagable {
 	public bool isCrystalized;
 	public bool insideCharacter;
 	public float invulnTime = 0;
-	public float parryCooldown;
-	public float maxParryCooldown = 0.5f;
 
 	public List<Trail> lastFiveTrailDraws = new List<Trail>();
 	public LoopingSound chargeSound;
@@ -523,7 +521,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool canWallClimb() {
-		if (charState is ZSaberProjSwingState || charState is ZeroDoubleBuster) return false;
+		if (!charState.normalCtrl) return false;
 		if (rideArmorPlatform != null) return false;
 		if (isSoftLocked()) return false;
 		if (charState is VileHover) {
@@ -533,7 +531,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool canUseLadder() {
-		if (charState is ZSaberProjSwingState || charState is ZeroDoubleBuster) return false;
+		if (!charState.normalCtrl) return false;
 		if (rideArmorPlatform != null) return false;
 		if (isSoftLocked()) return false;
 		if (charState is VileHover) {
@@ -543,7 +541,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public bool canStartClimbLadder() {
-		if (charState is ZSaberProjSwingState || charState is ZeroDoubleBuster) return false;
+		if (!charState.normalCtrl) return false;
 		return true;
 	}
 
@@ -744,7 +742,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public override void onCollision(CollideData other) {
-		if (charState is KKnuckleParryStartState punchParry &&
+		if (charState is SaberParryStartState punchParry &&
 			other.gameObject is Projectile proj &&
 			punchParry.canParry(proj) &&
 			proj.owner.alliance != player.alliance &&
@@ -809,7 +807,6 @@ public partial class Character : Actor, IDamagable {
 
 		Helpers.decrementTime(ref limboRACheckCooldown);
 		Helpers.decrementTime(ref dropFlagCooldown);
-		Helpers.decrementTime(ref parryCooldown);
 
 		if (ownedByLocalPlayer && player.possessedTime > 0) {
 			player.possesseeUpdate();
@@ -1568,7 +1565,11 @@ public partial class Character : Actor, IDamagable {
 	public bool isCCImmuneHyperMode() {
 		// The former two hyper modes rely on a float time value sync.
 		// The latter two hyper modes are boolean states so use the BoolState ("BS") system.
-		return isAwakenedGenmuZeroBS.getValue() || (isInvisibleBS.getValue() && player.isAxl) || isHyperSigmaBS.getValue() || isHyperXBS.getValue();
+		return (
+			(isInvisibleBS.getValue() && player.isAxl) ||
+			isHyperSigmaBS.getValue() ||
+			isHyperXBS.getValue()
+		);
 	}
 
 	public virtual bool isToughGuyHyperMode() {
@@ -1927,7 +1928,7 @@ public partial class Character : Actor, IDamagable {
 				clampTo3 = !mmx.isHyperX;
 				break;
 			case Zero zero:
-				clampTo3 = !zero.canUseDoubleBusterCombo();
+				clampTo3 = !zero.isBlack;
 				break;
 			case Vile vile:
 				clampTo3 = !vile.isVileMK5;
@@ -2001,13 +2002,12 @@ public partial class Character : Actor, IDamagable {
 			}
 		}
 		if (charState?.canExit(this, newState) == false) {
-			return;
+			return; 
 		}
 		if (!newState.canEnter(this)) {
 			return;
 		}
 		changedStateInFrame = true;
-
 		if (shootAnimTime > 0 && newState.canShoot() == true) {
 			changeSprite(getSprite(newState.shootSprite), true);
 		} else {
@@ -2618,10 +2618,10 @@ public partial class Character : Actor, IDamagable {
 
 	public void applyDamage(Player attacker, int? weaponIndex, float fDamage, int? projId) {
 		if (!ownedByLocalPlayer) return;
-		decimal damage = (decimal)fDamage;
+		decimal damage = decimal.Parse(fDamage.ToString());
 		decimal originalDamage = damage;
-		decimal originalHP = (decimal)player.health;
-		decimal decimalHP = (decimal)player.health;
+		decimal originalHP = decimal.Parse(player.health.ToString());
+		decimal decimalHP = originalHP;
 		Axl? axl = this as Axl;
 		MegamanX? mmx = this as MegamanX;
 
@@ -2686,15 +2686,10 @@ public partial class Character : Actor, IDamagable {
 		// Damage increase/reduction section
 		if (!isArmorPiercing) {
 			if (charState is SwordBlock) {
-				if (player.isSigma) {
-					if (player.isPuppeteer()) {
-						damageSavings += (originalDamage * 0.25m);
-					} else {
-						damageSavings += (originalDamage * 0.5m);
-					}
-				} else {
-					damageSavings += (originalDamage * 0.25m);
-				}
+				damageSavings += (originalDamage * 0.25m);
+			}
+			if (charState is SigmaBlock) {
+				damageSavings += (originalDamage * 0.5m);
 			}
 			if (acidTime > 0) {
 				decimal extraDamage = 0.25m + (0.25m * ((decimal)acidTime / 8.0m));
@@ -2723,18 +2718,28 @@ public partial class Character : Actor, IDamagable {
 			decimalHP - damage <= 0 &&
 			(decimalHP + damageSavings) - damage > 0
 		) {
+			// Apply in the normal way.
 			while (damageSavings >= 1) {
 				damageSavings -= 1;
 				damage -= 1;
 			}
+			// Decimal protection scenario.
+			if (damage > 0 && damageSavings > 0 && damageSavings + (1m/8m) >= damage) {
+				damage = 0;
+				damageSavings = damageSavings - damage;
+				if (damageSavings <= 0) {
+					damageSavings = 0;
+				}
+			} 
 		}
 
 		// If somehow the damage is negative.
 		// Heals are not really applied here.
 		if (damage < 0) { damage = 0; }
 
-		player.health -= (float)damage;
-		decimalHP = (decimal)player.health;
+		decimalHP = decimalHP - damage;
+		// We use this to attempt to reduce float errors.
+		player.health = float.Parse(decimalHP.ToString());
 
 		if (player.showTrainingDps && player.health > 0 && originalDamage > 0) {
 			if (player.trainingDpsStartTime == 0) {
@@ -2765,7 +2770,7 @@ public partial class Character : Actor, IDamagable {
 			}
 			float gigaAmmoToAdd = (float)(1 + (gigaDamage * 2 * modifier));
 			if (this is Zero zero) {
-				zero.zeroGigaAttackWeapon.addAmmo(gigaAmmoToAdd, player);
+				zero.gigaAttack.addAmmo(gigaAmmoToAdd, player);
 			}
 			if (this is PunchyZero punchyZero) {
 				punchyZero.gigaAttack.addAmmo(gigaAmmoToAdd, player);
@@ -3181,20 +3186,6 @@ public partial class Character : Actor, IDamagable {
 			};
 		}
 		return retProjs;
-	}
-
-	public override void updateProjFromHitbox(Projectile proj) {
-		if (proj.projId == (int)ProjIds.Sigma3KaiserStomp) {
-			float damagePercent = getKaiserStompDamage();
-			if (damagePercent > 0) {
-				proj.damager.damage = 12 * damagePercent;
-			}
-		} else if (proj.projId == (int)ProjIds.AwakenedAura) {
-			if (isAwakenedGenmuZeroBS.getValue()) {
-				proj.damager.damage = 4;
-				proj.damager.flinch = Global.defFlinch;
-			}
-		}
 	}
 
 	public float getKaiserStompDamage() {

@@ -10,8 +10,10 @@ public enum GroundSpecialType {
 }
 
 public class RaijingekiWeapon : Weapon {
-	public RaijingekiWeapon(Player player) : base() {
-		damager = new Damager(player, 2, Global.defFlinch, 0.06f);
+	public static RaijingekiWeapon staticWeapon = new();
+
+	public RaijingekiWeapon() : base() {
+		//damager = new Damager(player, 2, Global.defFlinch, 0.06f);
 		index = (int)WeaponIds.Raijingeki;
 		weaponBarBaseIndex = 22;
 		weaponBarIndex = weaponBarBaseIndex;
@@ -21,12 +23,13 @@ public class RaijingekiWeapon : Weapon {
 		description = new string[] { "Powerful lightning attack." };
 	}
 
-	public static Weapon getWeaponFromIndex(Player player, int index) {
-		if (index == (int)GroundSpecialType.Raijingeki) return new RaijingekiWeapon(player);
-		else if (index == (int)GroundSpecialType.Suiretsusen) return new SuiretsusenWeapon(player);
-		else if (index == (int)GroundSpecialType.TBreaker) return new TBreakerWeapon(player);
-		else if (index == (int)GroundSpecialType.MegaPunch) return new MegaPunchWeapon(player);
-		else throw new Exception("Invalid Zero air special weapon index!");
+	public static Weapon getWeaponFromIndex(int index) {
+		return index switch {
+			(int)GroundSpecialType.Raijingeki => new RaijingekiWeapon(),
+			(int)GroundSpecialType.Suiretsusen => new SuiretsusenWeapon(),
+			(int)GroundSpecialType.TBreaker => new TBreakerWeapon(),
+			_ => throw new Exception("Invalid Zero air special weapon index!")
+		};
 	}
 
 	public override void attack(Character character) {
@@ -39,8 +42,10 @@ public class RaijingekiWeapon : Weapon {
 }
 
 public class Raijingeki2Weapon : Weapon {
-	public Raijingeki2Weapon(Player player) : base() {
-		damager = new Damager(player, 2, Global.defFlinch, 0.06f);
+	public static Raijingeki2Weapon staticWeapon = new();
+
+	public Raijingeki2Weapon() : base() {
+		//damager = new Damager(player, 2, Global.defFlinch, 0.06f);
 		index = (int)WeaponIds.Raijingeki2;
 		weaponBarBaseIndex = 40;
 		killFeedIndex = 35;
@@ -75,13 +80,15 @@ public class Raijingeki : CharState {
 
 
 public class SuiretsusenWeapon : Weapon {
-	public SuiretsusenWeapon(Player player) : base() {
-		damager = new Damager(player, 3, Global.defFlinch, 0.06f);
+	public static SuiretsusenWeapon staticWeapon = new();
+
+	public SuiretsusenWeapon() : base() {
+		//damager = new Damager(player, 3, Global.defFlinch, 0.06f);
 		index = (int)WeaponIds.Suiretsusen;
 		killFeedIndex = 110;
 		type = (int)GroundSpecialType.Suiretsusen;
 		displayName = "Suiretsusen";
-		description = new string[] { "Water element spear with good reach." };
+		description = new string[] { "Water element glaive with good reach." };
 	}
 
 	public override void attack(Character character) {
@@ -119,44 +126,17 @@ public class SuiretsusanState : CharState {
 			if (character.sprite.frameIndex % 2 == 0) character.sprite.frameSpeed = 2;
 			else character.sprite.frameSpeed = 1;
 		}
-
-		var pois = character.sprite.getCurrentFrame().POIs;
-		if (pois != null && pois.Count > 0 && !once) {
-			once = true;
-			new SuiretsusenProj(zero.raijingekiWeapon, character.getFirstPOIOrDefault(), character.xDir, player, player.getNextActorNetId(), sendRpc: true);
-			character.playSound("spear", sendRpc: true);
-		}
-
 		if (character.isAnimOver()) {
-			character.changeState(new Idle(), true);
-		}
-	}
-}
-
-public class SuiretsusenProj : Projectile {
-	public SuiretsusenProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, 200, 6, player, "spear_proj", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
-		projId = (int)ProjIds.SuiretsusanProj;
-		destroyOnHit = false;
-		shouldVortexSuck = false;
-		shouldShieldBlock = false;
-
-		if (sendRpc) {
-			rpcCreate(pos, player, netProjId, xDir);
-		}
-	}
-
-	public override void update() {
-		base.update();
-		if (isAnimOver()) {
-			destroySelf();
+			character.changeToIdleOrFall();
 		}
 	}
 }
 
 public class TBreakerWeapon : Weapon {
-	public TBreakerWeapon(Player player) : base() {
-		damager = new Damager(player, 3, Global.defFlinch, 0.06f);
+	public static TBreakerWeapon staticWeapon = new();
+
+	public TBreakerWeapon() : base() {
+		//damager = new Damager(player, 3, Global.defFlinch, 0.06f);
 		index = (int)WeaponIds.TBreaker;
 		killFeedIndex = 107;
 		type = (int)GroundSpecialType.TBreaker;
@@ -211,7 +191,7 @@ public class TBreakerState : CharState {
 			var hit = Global.level.checkCollisionShape(shape, null);
 			if (hit != null && hit.gameObject is Wall) {
 				new TBreakerProj(
-					zero.raijingekiWeapon, poi, character.xDir,
+					poi, character.xDir,
 					player, player.getNextActorNetId(), sendRpc: true
 				);
 			}
@@ -224,8 +204,13 @@ public class TBreakerState : CharState {
 }
 
 public class TBreakerProj : Projectile {
-	public TBreakerProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, 0, 0, player, "tbreaker_shockwave", 0, 0.15f, netProjId, player.ownedByLocalPlayer) {
+	public TBreakerProj(
+		Point pos, int xDir,
+		Player player, ushort netProjId, bool sendRpc = false
+	) : base(
+		TBreakerWeapon.staticWeapon, pos, xDir, 0, 0, player, "tbreaker_shockwave",
+		0, 0.15f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.TBreakerProj;
 		destroyOnHit = false;
 		shouldVortexSuck = false;

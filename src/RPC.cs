@@ -598,7 +598,7 @@ public class RPCPlayerToggle : RPC {
 			}
 		} else if (toggleId == RPCToggleType.SetBlackZero) {
 			if (player.character is Zero zero) {
-				zero.blackZeroTime = zero.maxHyperZeroTime;
+				zero.blackZeroTime = Zero.maxBlackZeroTime;
 			}
 		} else if (toggleId == RPCToggleType.SetWhiteAxl) {
 			if (player.character is Axl axl) {

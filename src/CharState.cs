@@ -133,6 +133,9 @@ public class CharState {
 			character.stopMoving();
 		}
 		wasGrounded = character.grounded;
+		if (this is not Jump && oldState?.canStopJump == false) {
+			canStopJump = false;
+		}
 	}
 
 	public virtual bool canEnter(Character character) {
@@ -1071,9 +1074,6 @@ public class WallSlide : CharState {
 		base.onEnter(oldState);
 		mmx = character as MegamanX;
 		character.dashedInAir = 0;
-		if (character is Zero zero) {
-			zero.quakeBlazerBounces = 0;
-		}
 		if (player.isAI) {
 			character.ai.jumpTime = 0;
 		}

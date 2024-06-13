@@ -299,4 +299,10 @@ public struct Point {
 	public static Point operator* (Point l, float r) {
 		return new Point(l.x * r, l.y * r);
 	}
+	public static bool operator== (Point l, Point r) {
+		return l.x == r.x && l.y == r.y;
+	}
+	public static bool operator!= (Point l, Point r) {
+		return l.x != r.x || l.y != r.y;
+	}
 }
