@@ -401,15 +401,17 @@ public class Zero : Character {
 		int yDir = player.input.getYDir(player);
 		// Giga attacks.
 		if (yDir == 1 && specialPressed) {
-			if (gigaAttack.shootTime > 0 && gigaAttack.ammo < gigaAttack.getAmmoUsage(0)) {
+			if (gigaAttack.shootTime > 0 || gigaAttack.ammo < gigaAttack.getAmmoUsage(0)) {
 				return false;
 			}
 			if (gigaAttack is RekkohaWeapon) {
 				gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
 				changeState(new Rekkoha(gigaAttack), true);
+				return true;
 			} else {
 				gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
 				changeState(new Rakuhouha(gigaAttack), true);
+				return true;
 			}
 			if (!shootPressed) {
 				return true;

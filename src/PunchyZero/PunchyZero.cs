@@ -382,7 +382,7 @@ public class PunchyZero : Character {
 			return true;
 		}
 		if (yDir == 1) {
-			if (gigaAttack.shootTime > 0 && gigaAttack.ammo < gigaAttack.getAmmoUsage(0)) {
+			if (gigaAttack.shootTime > 0 || gigaAttack.ammo < gigaAttack.getAmmoUsage(0)) {
 				return false;
 			}
 			if (gigaAttack is RekkohaWeapon) {
