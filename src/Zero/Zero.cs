@@ -466,6 +466,7 @@ public class Zero : Character {
 			(uppercutA.type == (int)RisingType.RisingFang && shootPressed) ||
 			(uppercutS.type == (int)RisingType.RisingFang && specialPressed)
 		) {
+			changeState(new ZeroUppercut(RisingType.RisingFang, isUnderwater()), true);
 			dashedInAir++;
 			return false;
 		}
