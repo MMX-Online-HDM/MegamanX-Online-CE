@@ -171,6 +171,9 @@ public partial class Character : Actor, IDamagable {
 	public float vaccineTime;
 	public float vaccineHurtCooldown;
 
+	// Ctrl data
+	public int altCtrlsLength = 1;
+
 	// Main character class starts here.
 	public Character(
 		Player player, float x, float y, int xDir,
@@ -563,10 +566,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool canShoot() {
-		if (isInvulnerableAttack()) {
-			return false;
-		}
-		return true;
+		return charState.attackCtrl;
 	}
 
 	public virtual bool canChangeWeapons() {
@@ -1986,6 +1986,7 @@ public partial class Character : Actor, IDamagable {
 		}
 		// Set the character as soon as posible.
 		newState.character = this;
+		newState.altCtrls = new bool[altCtrlsLength];
 		// For Ride Armor stuns.
 		if (charState is InRideArmor inRideArmor) {
 			if (newState is GenericStun) {
@@ -3424,7 +3425,7 @@ public partial class Character : Actor, IDamagable {
 		}
 		// Release charge only if not holding and we can attack.
 		// This to prevent from losing charge.
-		else if (charState.attackCtrl) {
+		else if (canShoot()) {
 			int chargeLevel = getChargeLevel();
 			if (isCharging()) {
 				if (chargeLevel >= 1) {

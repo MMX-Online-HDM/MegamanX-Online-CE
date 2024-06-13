@@ -72,6 +72,11 @@ public class SigmaSlashProj : Projectile {
 		setIndestructableProperties();
 		maxTime = 0.1f;
 		projId = (int)ProjIds.SigmaSlash;
+		isMelee = true;
+		if (player?.character != null) {
+			owningActor = player.character;
+		}
+
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}

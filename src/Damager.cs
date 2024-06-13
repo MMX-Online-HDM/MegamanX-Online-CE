@@ -870,6 +870,9 @@ public class Damager {
 		Func<Actor, float, bool> checkDelta,
 		Func<Actor, Point, bool> checkPos
 	) {
+		if (damager == null) {
+			return false;
+		}
 		if (projId >= 0 && (
 			damager is not Projectile ||
 			projId == (int)ProjIds.Burn ||
@@ -881,10 +884,7 @@ public class Damager {
 		)) {
 			return false;
 		}
-		if (damager is Projectile &&
-			damager is not GenericMeleeProj &&
-			projId != (int)ProjIds.SigmaSlash
-		) {
+		if ((damager as Projectile)?.isMelee != true) {
 			if (damager.deltaPos.x != 0) {
 				if (checkDelta(actor, damager.deltaPos.x)) {
 					return true;
@@ -896,8 +896,8 @@ public class Damager {
 		// Calculate based on other values if speed is 0.
 		Point? damagePos = null;
 
-		if (damager is GenericMeleeProj gmp && gmp.owningActor != null) {
-			damagePos = gmp.owningActor.pos;
+		if (damager is Projectile proj && proj.owningActor != null) {
+			damagePos = proj.owningActor.pos;
 		} else if (projOwner?.character != null && (
 			  projId == (int)ProjIds.PlasmaGun ||
 			  projId == (int)ProjIds.PlasmaGun2 ||

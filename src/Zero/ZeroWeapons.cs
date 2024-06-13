@@ -1,4 +1,6 @@
-﻿namespace MMXOnline;
+﻿using System;
+
+namespace MMXOnline;
 
 public enum ZeroAttackLoadoutType {
 	ZSaber,
@@ -65,55 +67,105 @@ public class ZSaberProjSwing : Weapon {
 	}
 }
 
-public class ZeroSpinKickState : CharState {
-	public float dashTime = 0;
-	public float soundTime = 0;
 
-	public ZeroSpinKickState() : base("spinkick") {
-		exitOnAirborne = true;
-		airMove = true;
-		attackCtrl = false;
-		normalCtrl = true;
+public class RaijingekiWeapon : Weapon {
+	public static RaijingekiWeapon staticWeapon = new();
+
+	public RaijingekiWeapon() : base() {
+		//damager = new Damager(player, 2, Global.defFlinch, 0.06f);
+		index = (int)WeaponIds.Raijingeki;
+		weaponBarBaseIndex = 22;
+		weaponBarIndex = weaponBarBaseIndex;
+		killFeedIndex = 10;
+		type = (int)GroundSpecialType.Raijingeki;
+		displayName = "Raijingeki";
+		description = new string[] { "Powerful lightning attack." };
 	}
 
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		character.isDashing = true;
+	public static Weapon getWeaponFromIndex(int index) {
+		return index switch {
+			(int)GroundSpecialType.Raijingeki => new RaijingekiWeapon(),
+			(int)GroundSpecialType.Suiretsusen => new SuiretsusenWeapon(),
+			(int)GroundSpecialType.TBreaker => new TBreakerWeapon(),
+			_ => throw new Exception("Invalid Zero air special weapon index!")
+		};
 	}
 
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-		if (character is Zero zero) {
-			zero.dashAttackCooldown = 0.5f;
-		}
+	public override void attack(Character character) {
+		character.changeState(new Raijingeki(false), true);
 	}
 
-	public override void update() {
-		base.update();
-		soundTime -= Global.spf;
-		if (soundTime <= 0) {
-			soundTime = 0.15f;
-			character.playSound("spinkick", sendRpc: true);
-		}
-
-		if (
-			(player.input.isPressed(Control.Left, player) && character.xDir == 1) ||
-			(player.input.isPressed(Control.Right, player) && character.xDir == -1) ||
-			player.input.isPressed(Control.Dash, player)
-		) {
-			changeToIdle();
-			return;
-		}
-
-		dashTime += Global.spf;
-		float modifier = 1;
-		if (dashTime > 0.6 * modifier) {
-			changeToIdle();
-			return;
-		}
-		var move = new Point(0, 0);
-		move.x = character.getDashSpeed() * modifier * character.xDir;
-		character.move(move);
+	public override void attack2(Character character) {
+		character.changeState(new Raijingeki(true), true);
 	}
 }
 
+public class Raijingeki2Weapon : Weapon {
+	public static Raijingeki2Weapon staticWeapon = new();
+
+	public Raijingeki2Weapon() : base() {
+		//damager = new Damager(player, 2, Global.defFlinch, 0.06f);
+		index = (int)WeaponIds.Raijingeki2;
+		weaponBarBaseIndex = 40;
+		killFeedIndex = 35;
+	}
+}
+
+public class TBreakerWeapon : Weapon {
+	public static TBreakerWeapon staticWeapon = new();
+
+	public TBreakerWeapon() : base() {
+		//damager = new Damager(player, 3, Global.defFlinch, 0.06f);
+		index = (int)WeaponIds.TBreaker;
+		killFeedIndex = 107;
+		type = (int)GroundSpecialType.TBreaker;
+		displayName = "T-Breaker";
+		description = new string[] { "A mighty hammer that can shatter barriers." };
+	}
+
+	public override void attack(Character character) {
+		character.changeState(new TBreakerState(false), true);
+	}
+
+	public override void attack2(Character character) {
+		character.changeState(new TBreakerState(true), true);
+	}
+}
+
+public class SuiretsusenWeapon : Weapon {
+	public static SuiretsusenWeapon staticWeapon = new();
+
+	public SuiretsusenWeapon() : base() {
+		//damager = new Damager(player, 3, Global.defFlinch, 0.06f);
+		index = (int)WeaponIds.Suiretsusen;
+		killFeedIndex = 110;
+		type = (int)GroundSpecialType.Suiretsusen;
+		displayName = "Suiretsusen";
+		description = new string[] { "Water element glaive with good reach." };
+	}
+
+	public override void attack(Character character) {
+		character.changeState(new SuiretsusanState(false), true);
+	}
+
+	public override void attack2(Character character) {
+		character.changeState(new SuiretsusanState(true), true);
+	}
+}
+
+public class AwakenedAura : Weapon {
+	public AwakenedAura() : base() {
+		index = (int)WeaponIds.AwakenedAura;
+		killFeedIndex = 87;
+		//damager = new Damager(player, 2, 0, 0.5f);
+	}
+}
+
+public class Genmu : Weapon {
+	public static Genmu netWeapon = new();
+
+	public Genmu() : base() {
+		index = (int)WeaponIds.Gemnu;
+		killFeedIndex = 84;
+	}
+}

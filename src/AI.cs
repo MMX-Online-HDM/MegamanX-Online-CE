@@ -1029,7 +1029,7 @@ public class AI {
 			if (!player.isMainPlayer && isTargetInAir && !zero.grounded && zero.charState is Fall or Jump) {
 				zero.changeState(
 					new ZeroUppercut(
-						zero.fallStabA.type, zero.isUnderwater()
+						zero.downThrustA.type, zero.isUnderwater()
 					), forceChange: true
 				);
 			}
@@ -1647,7 +1647,7 @@ public class AI {
 				zero7.changeState(new Rakuhouha(new RakuhouhaWeapon()), true);
 			} else if (zero7.sprite.name == "zero_rakuhouha" && zero7.framePercent > 0.9) {
 				zero7.changeState(
-					new ZeroUppercut(zero7.fallStabA.type, zero7.isUnderwater()),
+					new ZeroUppercut(zero7.downThrustA.type, zero7.isUnderwater()),
 					forceChange: true
 				);
 			}
@@ -1670,14 +1670,14 @@ public class AI {
 			// Do Rising if is at 50% of the animation of third slash
 			else if (zero.grounded && zero.sprite.name == "zero_attack3" && zero.framePercent > 0.65) {
 				zero.changeState(
-					new ZeroUppercut(zero.fallStabA.type, zero.isUnderwater()),
+					new ZeroUppercut(zero.downThrustA.type, zero.isUnderwater()),
 					forceChange: true
 				);
 			}
 			// Do Hyouretsuzan if is at 50% of the animation of rising
 			else if (zero.sprite.name == "zero_rising" && zero.framePercent > 0.6f) {
 				zero.changeState(
-					new ZeroDownthrust(zero.fallStabA.type),
+					new ZeroDownthrust(zero.downThrustA.type),
 					forceChange: true
 				);
 			}
