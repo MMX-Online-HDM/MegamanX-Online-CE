@@ -1201,8 +1201,8 @@ public partial class Character : Actor, IDamagable {
 		if (charState.exitOnAirborne && !grounded) {
 			changeState(new Fall());
 		}
-		if (canWallClimb() && !grounded &&
-			(charState.airMove && vel.y > 0 || charState is WallSlide) &&
+		if (((canWallClimb() && !grounded &&
+			charState.airMove && vel.y > 0) || charState is WallSlide) &&
 			wallKickTimer <= 0 &&
 			player.input.isPressed(Control.Jump, player) &&
 			(charState.wallKickLeftWall != null || charState.wallKickRightWall != null)
@@ -2012,6 +2012,14 @@ public partial class Character : Actor, IDamagable {
 		if (shootAnimTime > 0 && newState.canShoot() == true) {
 			changeSprite(getSprite(newState.shootSprite), true);
 		} else {
+			if (sprite != null && sprite.name == newState.sprite && this is not MegamanX) {
+				sprite.frameIndex = 0;
+				sprite.frameTime = 0;
+				sprite.time = 0;
+				sprite.frameSpeed = 1;
+				sprite.loopCount = 0;
+				sprite.visible = true;
+			}
 			changeSprite(getSprite(newState.sprite), true);
 		}
 		CharState? oldState = charState;

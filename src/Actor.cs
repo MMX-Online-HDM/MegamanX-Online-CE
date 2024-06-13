@@ -229,15 +229,7 @@ public partial class Actor : GameObject {
 		string oldSpriteName = sprite?.name ?? "";
 		if (spriteName == null) return;
 		if (sprite != null) {
-			if (sprite.name == spriteName) {
-				if (resetFrame) {
-					sprite.frameIndex = 0;
-					sprite.frameTime = 0;
-					sprite.time = 0;
-					sprite.frameSpeed = 1;
-					sprite.loopCount = 0;
-					sprite.visible = true;
-				}
+			if (sprite.name == spriteName) {	
 				return;
 			}
 		}
