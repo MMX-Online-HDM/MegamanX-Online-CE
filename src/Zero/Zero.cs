@@ -49,6 +49,7 @@ public class Zero : Character {
 	public float dashAttackCooldown;
 	public float swingCooldown;
 	public float genmuCooldown;
+	public int airRisingUses;
 
 	// Hypermode stuff.
 	public float donutTimer;
@@ -80,6 +81,15 @@ public class Zero : Character {
 
 		hyperMode = zeroLoadout.hyperMode;
 		altCtrlsLength = 2;
+	}
+
+
+
+	public override void preUpdate() {
+		base.preUpdate();
+		if (grounded) {
+			airRisingUses = 0;
+		}
 	}
 
 	public override void update() {
@@ -462,7 +472,7 @@ public class Zero : Character {
 
 	public bool airAttacks() {
 		int yDir = player.input.getYDir(player);
-		if (yDir == -1 && canAirDash() &&
+		if (yDir == -1 && canAirDash() && airRisingUses == 0 &&
 			(uppercutA.type == (int)RisingType.RisingFang && shootPressed) ||
 			(uppercutS.type == (int)RisingType.RisingFang && specialPressed)
 		) {
