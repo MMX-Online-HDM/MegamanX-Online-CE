@@ -153,12 +153,12 @@ public class ZeroUppercut : CharState {
 		if (canDownSpecial()) {
 			if (player.input.isPressed(Control.Shoot, player) && player.input.isHeld(Control.Down, player)) {
 				if (zero != null) {
-					character.changeState(new ZeroDownthrust(zero.fallStabA.type), true);
+					character.changeState(new ZeroDownthrust(zero.downThrustA.type), true);
 					return;
 				}
 			} else if (player.input.isPressed(Control.Special1, player) && player.input.isHeld(Control.Down, player)) {
 				if (zero != null) {
-					character.changeState(new ZeroDownthrust(zero.fallStabS.type), true);
+					character.changeState(new ZeroDownthrust(zero.downThrustS.type), true);
 					return;
 				}
 			}

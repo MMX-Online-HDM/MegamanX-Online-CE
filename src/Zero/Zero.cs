@@ -34,8 +34,8 @@ public class Zero : Character {
 	public Weapon airSpecial;
 	public Weapon uppercutA;
 	public Weapon uppercutS;
-	public Weapon fallStabA;
-	public Weapon fallStabS;
+	public Weapon downThrustA;
+	public Weapon downThrustS;
 
 	// Inputs.
 	public int shootPressTime;
@@ -44,7 +44,6 @@ public class Zero : Character {
 	public bool shootPressed => (shootPressTime > 0);
 	public bool specialPressed => (specialPressTime > 0);
 	public bool swingPressed => (swingPressTime > 0);
-
 
 	// Cooldowns.
 	public float dashAttackCooldown;
@@ -75,11 +74,12 @@ public class Zero : Character {
 		airSpecial = KuuenzanWeapon.getWeaponFromIndex(zeroLoadout.airSpecial);
 		uppercutA = RyuenjinWeapon.getWeaponFromIndex(zeroLoadout.uppercutA);
 		uppercutS = RyuenjinWeapon.getWeaponFromIndex(zeroLoadout.uppercutS);
-		fallStabA = HyouretsuzanWeapon.getWeaponFromIndex(zeroLoadout.downThrustA);
-		fallStabS = HyouretsuzanWeapon.getWeaponFromIndex(zeroLoadout.downThrustS);
+		downThrustA = HyouretsuzanWeapon.getWeaponFromIndex(zeroLoadout.downThrustA);
+		downThrustS = HyouretsuzanWeapon.getWeaponFromIndex(zeroLoadout.downThrustS);
 		gigaAttack = RakuhouhaWeapon.getWeaponFromIndex(zeroLoadout.gigaAttack);
 
 		hyperMode = zeroLoadout.hyperMode;
+		altCtrlsLength = 2;
 	}
 
 	public override void update() {
@@ -88,6 +88,7 @@ public class Zero : Character {
 		Helpers.decrementFrames(ref swingCooldown);
 		Helpers.decrementFrames(ref genmuCooldown);
 		Helpers.decrementFrames(ref dashAttackCooldown);
+		airSpecial.update();
 		gigaAttack.update();
 		gigaAttack.charLinkedUpdate(this, true);
 
@@ -157,8 +158,18 @@ public class Zero : Character {
 	}
 
 	// Shoot logic and stuff.
+	public override bool canShoot() {
+		return (!charState.invincible &&
+			(charState.attackCtrl || (charState.altCtrls.Length >= 2 && charState.altCtrls[1]))
+		);
+	}
+	
 	public override bool canCharge() {
-		return (player.currency > 0 || freeBusterShots > 0) && donutsPending == 0;
+		return (
+			(charState.attackCtrl || getChargeLevel() > 0) &&
+			(player.currency > 0 || freeBusterShots > 0) &&
+			donutsPending == 0
+		);
 	}
 
 	public override bool chargeButtonHeld() {
@@ -359,7 +370,6 @@ public class Zero : Character {
 		if (donutsPending != 0) {
 			return false;
 		}
-
 		if (isAwakened && swingPressTime > 0 && swingCooldown == 0) {
 			swingCooldown = 60;
 			if (charState is WallSlide wallSlide) {
@@ -385,7 +395,6 @@ public class Zero : Character {
 		} else {
 			return airAttacks();
 		}
-		return base.attackCtrl();
 	}
 
 	public bool groundAttacks() {
@@ -402,7 +411,9 @@ public class Zero : Character {
 				gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
 				changeState(new Rakuhouha(gigaAttack), true);
 			}
-			return true;
+			if (!shootPressed) {
+				return true;
+			}
 		}
 		// Uppercuts.
 		if (yDir == -1 && (shootPressed || specialPressed)) {
@@ -415,10 +426,30 @@ public class Zero : Character {
 			changeState(new ZeroUppercut(weaponType, isUnderwater()), true);
 			return true;
 		}
+		// Dash attacks.
+		if (isDashing && (shootPressed || specialPressed)) {
+			// Do nothing if we dashed already.
+			if (dashAttackCooldown > 0) {
+				return false;
+			}
+			dashAttackCooldown = 1;
+			slideVel = xDir * getDashSpeed();
+			if (specialPressTime > shootPressTime) {
+				changeState(new ZeroShippuugaState(), true);
+				return true;
+			}
+			changeState(new ZeroDashSlashState(), true);
+			return true;
+		}
+		// Use special if pressed first.
+		if (specialPressed && specialPressTime > shootPressTime) {
+			groundSpecial.attack(this);
+		}
 		// Regular slashes.
 		if (shootPressed) {
 			// Crounch variant.
 			if (yDir == 1) {
+				changeState(new ZeroCrouchSlashState(), true);
 				return true;
 			}
 			changeState(new ZeroSlash1State(), true);
@@ -438,17 +469,22 @@ public class Zero : Character {
 		}
 		if (yDir == 1 && (shootPressed || specialPressed)) {
 			// Weapon type to use.
-			int weaponType = fallStabA.type;
+			int weaponType = downThrustA.type;
 			// If special was pressed first.
 			if (specialPressTime > shootPressTime) {
-				weaponType = fallStabS.type;
+				weaponType = downThrustS.type;
 			}
 			changeState(new ZeroDownthrust(weaponType), true);
 			return true;
 		}
 		// Air attack.
 		if (specialPressed) {
-			changeState(new ZeroRollingSlashtate(), true);
+			if (airSpecial.type == 0 && charState is not ZeroRollingSlashtate) {
+				changeState(new ZeroRollingSlashtate(), true);
+			}
+			if (airSpecial.type != 0) {
+				airSpecial.attack(this);
+			}
 			return true;
 		}
 		// Air attack.
@@ -472,7 +508,7 @@ public class Zero : Character {
 	public override void changeState(CharState newState, bool forceChange = false) {
 		CharState? oldState = charState;
 		base.changeState(newState, forceChange);
-		if (!newState.attackCtrl || newState.attackCtrl != oldState?.attackCtrl) {
+		if (!newState.attackCtrl || newState.attackCtrl != oldState.attackCtrl) {
 			shootPressTime = 0;
 			specialPressTime = 0;
 		}
@@ -587,7 +623,7 @@ public class Zero : Character {
 			"zero_attack_crouch" => MeleeIds.CrouchSlash,
 			// Dash
 			"zero_attack_dash" => MeleeIds.DashSlash,
-			"zero_attack_dash2" => MeleeIds.RollingSlash,
+			"zero_attack_dash2" => MeleeIds.Shippuuga,
 			// Air
 			"zero_attack_air" => MeleeIds.AirSlash,
 			"zero_attack_air2" => MeleeIds.RollingSlash,
@@ -596,7 +632,7 @@ public class Zero : Character {
 			"zero_raijingeki" => MeleeIds.Raijingeki,
 			"zero_raijingeki2" => MeleeIds.RaijingekiWeak,
 			"zero_tbreaker" => MeleeIds.Dairettsui,
-			"zero_lance" => MeleeIds.Suiretsusen,
+			"zero_spear" => MeleeIds.Suiretsusen,
 			// Up Specials
 			"zero_ryuenjin" => MeleeIds.Ryuenjin,
 			"zero_eblade" => MeleeIds.Denjin,
@@ -628,21 +664,22 @@ public class Zero : Character {
 				3, Global.defFlinch, 0.25f, isReflectShield: true
 			),
 			(int)MeleeIds.CrouchSlash => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.ZSabercrouch, player, 3, 0, 0.25f, isReflectShield: true
+				meleeWeapon, projPos, ProjIds.ZSaberCrouch, player, 3, 0, 0.25f, isReflectShield: true
 			),
 			// Dash
 			(int)MeleeIds.DashSlash => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.ZSaberdash, player, 2, 0, 0.25f, isReflectShield: true
+				meleeWeapon, projPos, ProjIds.ZSaberDash, player, 2, 0, 0.25f, isReflectShield: true
 			),
 			(int)MeleeIds.Shippuuga => new GenericMeleeProj(
 				ShippuugaWeapon.staticWeapon, projPos, ProjIds.Shippuuga, player, 2, Global.halfFlinch, 0.25f
 			),
 			// Air
 			(int)MeleeIds.AirSlash => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.ZSaberair, player, 2, 0, 0.25f, isReflectShield: true
+				meleeWeapon, projPos, ProjIds.ZSaberAir, player, 2, 0, 0.25f, isReflectShield: true
 			),
 			(int)MeleeIds.RollingSlash =>  new GenericMeleeProj(
-				KuuenzanWeapon.staticWeapon, projPos, ProjIds.ZSaberair, player, 1, 0, 0.125f, isDeflectShield: true
+				KuuenzanWeapon.staticWeapon, projPos, ProjIds.ZSaberRollingSlash, player,
+				1, 0, 0.125f, isDeflectShield: true
 			),
 			(int)MeleeIds.Hyoroga => new GenericMeleeProj(
 				HyorogaWeapon.staticWeapon, projPos, ProjIds.HyorogaSwing, player, 4, 0, 0.25f
@@ -658,7 +695,7 @@ public class Zero : Character {
 				TBreakerWeapon.staticWeapon, projPos, ProjIds.TBreaker, player, 6, Global.defFlinch, 0.5f
 			),
 			(int)MeleeIds.Suiretsusen => new GenericMeleeProj(
-				SuiretsusenWeapon.staticWeapon, projPos, ProjIds.SuiretsusanProj, player, 6, Global.defFlinch, 0.5f
+				SuiretsusenWeapon.staticWeapon, projPos, ProjIds.SuiretsusanProj, player, 6, Global.defFlinch, 0.75f
 			),
 			// Up Specials
 			(int)MeleeIds.Ryuenjin => new GenericMeleeProj(
@@ -683,7 +720,7 @@ public class Zero : Character {
 			),
 			// Others
 			(int)MeleeIds.LadderSlash => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.ZSaberladder, player, 3, 0, 0.25f, isReflectShield: true
+				meleeWeapon, projPos, ProjIds.ZSaberLadder, player, 3, 0, 0.25f, isReflectShield: true
 			),
 			(int)MeleeIds.WallSlash => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.ZSaberslide, player, 3, 0, 0.25f, isReflectShield: true

@@ -173,6 +173,7 @@ public class ZeroDownthrustLand : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		altCtrls[1] = true;
 		character.playSound("land", sendRpc: true);
 		switch (type) {
 			case ZeroDownthrustType.Hyouretsuzan:

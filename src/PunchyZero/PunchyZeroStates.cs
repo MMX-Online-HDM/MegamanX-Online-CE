@@ -238,17 +238,21 @@ public class PZeroParry : CharState {
 
 	public void counterAttack(Player damagingPlayer, Actor? damagingActor) {
 		zero.parryCooldown = 0;
-		if (damagingActor is Projectile proj && proj.damager != null) {
-			zero.gigaAttack.addAmmo(proj.damager.damage, player);
-		}
 		Actor? counterAttackTarget = null;
-		if (damagingActor is GenericMeleeProj gmp) {
-			counterAttackTarget = gmp.owningActor;
+		bool isMelee = false;
+		if (damagingActor is Projectile proj) {
+			if (proj.damager != null) {
+				zero.gigaAttack.addAmmo(proj.damager.damage, player);
+			}
+			if (proj.isMelee && proj.owningActor != null) {
+				counterAttackTarget = proj.owningActor;
+				isMelee = true;
+			}
 		}
 		if (counterAttackTarget == null) {
 			counterAttackTarget = damagingPlayer?.character ?? damagingActor;
 		}
-		if (counterAttackTarget is Character chara && damagingActor is Projectile { isMelee: true }) {
+		if (counterAttackTarget is Character chara && isMelee) {
 			if (!chara.ownedByLocalPlayer) {
 				RPC.actorToggle.sendRpc(chara.netId, RPCActorToggleType.ChangeToParriedState);
 			} else {
@@ -260,7 +264,7 @@ public class PZeroParry : CharState {
 		} else {
 			character.playSound("zeroParry2", forcePlay: false, sendRpc: true);
 		}
-		character.changeState(new PZeroParryCounter(counterAttackTarget), true);
+		character.changeState(new PZeroParryCounter(counterAttackTarget, isMelee), true);
 	}
 
 	public override void onEnter(CharState oldState) {
@@ -282,6 +286,7 @@ public class PZeroParry : CharState {
 
 public class PZeroParryCounter : CharState {
 	private Actor? counterAttackTarget;
+	bool isMelee;
 
 	private Point counterAttackPos;
 	private Point enemyAttackPos;
@@ -293,9 +298,10 @@ public class PZeroParryCounter : CharState {
 	private float counterSpeed = 0.1f;
 	private float acumulatedPos = 0;
 
-	public PZeroParryCounter(Actor? counterAttackTarget) : base("parry", "", "", "") {
+	public PZeroParryCounter(Actor? counterAttackTarget, bool isMelee) : base("parry", "", "", "") {
 		invincible = true;
 		this.counterAttackTarget = counterAttackTarget;
+		this.isMelee = isMelee;
 	}
 
 	public override void update() {
@@ -328,7 +334,7 @@ public class PZeroParryCounter : CharState {
 			counterAttackPos = counterAttackTarget.pos.addxy(character.xDir * -20, 0f);
 			float dist2 = currentPos.distanceTo(enemyAttackPos);
 
-			if (dist <= 150 || dist2 <= 150) {
+			if (isMelee || dist <= 150 || dist2 <= 150) {
 				canCounterDash = true;
 			}
 			calcOnce = true;

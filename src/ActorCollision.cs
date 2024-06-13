@@ -111,6 +111,9 @@ public partial class Actor {
 			Color hitboxColor = new Color(173, 216, 230, 128);
 			if (allCollider.isAttack()) {
 				hitboxColor = new Color(byte.MaxValue, 0, 0, 128);
+				if (destroyed) {
+					hitboxColor = new Color(128, 0, 255, 128);
+				}
 			} else {
 				hasNonAttackColider = true;
 			}

@@ -130,8 +130,8 @@ public class GenericMeleeProj : Projectile {
 	}
 
 	public bool isZSaber() {
-		return projId == (int)ProjIds.ZSaber1 || projId == (int)ProjIds.ZSaber3 || projId == (int)ProjIds.ZSaberair || projId == (int)ProjIds.ZSabercrouch || projId == (int)ProjIds.ZSaberdash
-			|| projId == (int)ProjIds.ZSaberladder || projId == (int)ProjIds.ZSaberslide || projId == (int)ProjIds.ZSaberProjSwing;
+		return projId == (int)ProjIds.ZSaber1 || projId == (int)ProjIds.ZSaber3 || projId == (int)ProjIds.ZSaberAir || projId == (int)ProjIds.ZSaberCrouch || projId == (int)ProjIds.ZSaberDash
+			|| projId == (int)ProjIds.ZSaberLadder || projId == (int)ProjIds.ZSaberslide || projId == (int)ProjIds.ZSaberProjSwing;
 	}
 
 	public override void onDestroy() {

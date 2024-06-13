@@ -176,3 +176,36 @@ public class ShingetsurinProj : Projectile {
 		}
 	}
 }
+
+public class GenmuProj : Projectile {
+	public int type = 0;
+	public float initY = 0;
+
+	public GenmuProj(
+		Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		Genmu.netWeapon, pos, xDir, 300, 12, player, "genmu_proj",
+		Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
+		this.type = type;
+		initY = pos.y;
+		maxTime = 0.5f;
+		destroyOnHit = false;
+		xScale = 0.75f;
+		yScale = 0.75f;
+		projId = (int)ProjIds.Gemnu;
+
+		if (rpc) {
+			rpcCreate(pos, player, netProjId, xDir, (byte)type);
+		}
+	}
+
+	public override void update() {
+		base.update();
+
+		float y = 0;
+		if (type == 0) y = initY + MathF.Sin(time * 8) * 50;
+		else y = initY + MathF.Sin(-time * 8) * 50;
+		changePos(new Point(pos.x, y));
+	}
+}

@@ -10,6 +10,7 @@ public abstract class ZeroGenericMeleeState : CharState {
 	public string sound = "";
 	public bool soundPlayed;
 	public int soundFrame = Int32.MaxValue;
+	public bool exitOnOver = true;
 
 	public ZeroGenericMeleeState(string spr) : base(spr) {
 	}
@@ -23,7 +24,7 @@ public abstract class ZeroGenericMeleeState : CharState {
 		if (character.sprite.frameIndex >= comboFrame) {
 			altCtrls[0] = true;
 		}
-		if (character.isAnimOver()) {
+		if (exitOnOver && character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		}
 	}
@@ -53,6 +54,13 @@ public class ZeroSlash1State : ZeroGenericMeleeState {
 
 
 	public override bool altCtrlUpdate(bool[] ctrls) {
+		if (zero.specialPressed &&
+			zero.specialPressTime > zero.shootPressTime &&
+			character.sprite.frameIndex >= 8 
+		) {
+			zero.groundSpecial.attack2(zero);
+			return true;
+		}
 		if (zero.shootPressed || player.isAI) {
 			zero.shootPressTime = 0;
 			zero.changeState(new ZeroSlash2State(), true);
@@ -70,6 +78,13 @@ public class ZeroSlash2State : ZeroGenericMeleeState {
 	}
 
 	public override bool altCtrlUpdate(bool[] ctrls) {
+		if (zero.specialPressed &&
+			zero.specialPressTime > zero.shootPressTime &&
+			character.sprite.frameIndex >= 6 
+		) {
+			zero.groundSpecial.attack2(zero);
+			return true;
+		}
 		if (zero.shootPressed || player.isAI) {
 			zero.shootPressTime = 0;
 			zero.changeState(new ZeroSlash3State(), true);
@@ -88,10 +103,6 @@ public class ZeroSlash3State : ZeroGenericMeleeState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		zero.zeroTripleSlashEndTime = Global.time;
-	}
-
-	public override bool altCtrlUpdate(bool[] ctrls) {
-		return false;
 	}
 }
 
@@ -116,14 +127,45 @@ public class ZeroAirSlashState : ZeroGenericMeleeState {
 }
 
 public class ZeroRollingSlashtate : ZeroGenericMeleeState {
+	bool once;
+
 	public ZeroRollingSlashtate() : base("attack_air2") {
 		sound = "saber1";
 		soundFrame = 1;
+		comboFrame = 7;
 
 		airMove = true;
 		exitOnLanding = true;
 		useDashJumpSpeed = true;
 		canStopJump = true;
+	}
+
+	public override void update() {
+		base.update();
+		if (!once && zero.sprite.loopCount >= 1) {
+			character.changeToIdleOrFall();
+		}
+	}
+}
+
+public class ZeroCrouchSlashState : ZeroGenericMeleeState {
+	public ZeroCrouchSlashState() : base("attack_crouch") {
+		sound = "saber1";
+		soundFrame = 1;
+	}
+}
+
+public class ZeroDashSlashState : ZeroGenericMeleeState {
+	public ZeroDashSlashState() : base("attack_dash") {
+		sound = "saber1";
+		soundFrame = 1;
+	}
+}
+
+public class ZeroShippuugaState : ZeroGenericMeleeState {
+	public ZeroShippuugaState() : base("attack_dash2") {
+		sound = "saber1";
+		soundFrame = 1;
 	}
 }
 
@@ -315,5 +357,31 @@ public class AwakenedZeroHadangekiWall : CharState {
 	public override void onExit(CharState oldState) {
 		base.onExit(oldState);
 		useGravity = true;
+	}
+}
+
+public class GenmuState : CharState {
+	bool fired;
+	public GenmuState() : base("genmu") { }
+
+	public override void update() {
+		base.update();
+
+		if (character.frameIndex >= 8 && !fired) {
+			fired = true;
+			character.playSound("genmureix5", sendRpc: true);
+			new GenmuProj(
+				character.pos.addxy(30 * character.xDir, -25),
+				character.xDir, 0, player, player.getNextActorNetId(), rpc: true
+			);
+			new GenmuProj(
+				character.pos.addxy(30 * character.xDir, -25),
+				character.xDir, 1, player, player.getNextActorNetId(), rpc: true
+			);
+		}
+		if (character.isAnimOver()) {
+			if (character.grounded) character.changeState(new Idle(), true);
+			else character.changeState(new Fall(), true);
+		}
 	}
 }
