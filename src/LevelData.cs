@@ -542,7 +542,7 @@ public class LevelData {
 		{ "xhunter2", "counterHunter1" },
 		// X3 stuff.
 		{ "aircraftcarrier", "gravityBeetle" },
-		{ "dopplerlab", "dopplerLab" },
+		{ "dopplerlab", "dopplerStage" },
 		{ "frozentown", "blizzardBuffalo" },
 		{ "giantdam", "toxicSeahorse" },
 		{ "giantdam2", "toxicSeahorse" },
@@ -555,8 +555,8 @@ public class LevelData {
 		{ "weaponsfactory", "blastHornet" },
 
 		// Alt music.
-		{ "dopplerlab_1v1", "goliath" },
-		{ "zerovirus_1v1", "XvsZeroV1_megasfc" },
+		{ "dopplerlab_1v1", "fortressBoss_X3" },
+		{ "zerovirus_1v1", "XvsZeroV2_megasfc" },
 		{ "centralcomputer_1v1", "boss_X2" },
 		{ "sigma4_1v1", "boss_X1" },
 
@@ -591,7 +591,7 @@ public class LevelData {
 			name.Contains("desertbase") ||
 			name.Contains("weathercontrol")
 		) {
-			return "win_x2";
+			return "stageClear_X2";
 		}
 		if (name.Contains("hunterbase") ||
 			name.Contains("giantdam") ||
@@ -604,17 +604,17 @@ public class LevelData {
 			name.Contains("safaripark") ||
 			name.Contains("dopplerlab")
 		) {
-			return "win_x3";
+			return "stageClear_X3";
 		}
 		if (isCustomMap) {
 			return Helpers.randomRange(0, 2) switch {
-				1 => "win_x2",
-				2 => "win_x3",
-				_ => "win"
+				1 => "stageClear_X2",
+				2 => "stageClear_X3",
+				_ => "stageClear_X1"
 			};
 		}
 
-		return "win";
+		return "stageClear_X1";
 	}
 
 	public Texture getMapThumbnail() {

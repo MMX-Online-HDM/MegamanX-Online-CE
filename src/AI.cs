@@ -1548,7 +1548,7 @@ public class AI {
 	}
 	public void doVileAI(Character vile4) {
 		// Vile: Go MK2 to MKV
-		if (character is Vile vile1) {
+		if (character is Vile vile1 && !player.isMainPlayer) {
 			if (player.canReviveVile() && vile1.isVileMK1) {
 				player.reviveVile(false);
 			}
@@ -1606,7 +1606,7 @@ public class AI {
 				return;
 			}
 
-			if (player.canReviveX()) {
+			if (player.canReviveX() && !player.isMainPlayer) {
 				player.reviveX();
 
 			}
