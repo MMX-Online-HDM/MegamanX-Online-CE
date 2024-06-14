@@ -1201,8 +1201,8 @@ public partial class Character : Actor, IDamagable {
 		if (charState.exitOnAirborne && !grounded) {
 			changeState(new Fall());
 		}
-		if (((canWallClimb() && !grounded &&
-			charState.airMove && vel.y > 0) || charState is WallSlide) &&
+		if ((canWallClimb() || charState.airMove || charState is WallSlide) &&
+			!grounded && vel.y >= 0 &&
 			wallKickTimer <= 0 &&
 			player.input.isPressed(Control.Jump, player) &&
 			(charState.wallKickLeftWall != null || charState.wallKickRightWall != null)
@@ -1234,7 +1234,9 @@ public partial class Character : Actor, IDamagable {
 				xDir = -wallKickDir;
 			}
 			wallKickTimer = maxWallKickTime;
-			changeState(new WallKick(), true);
+			if (charState.normalCtrl || charState is WallSlide) {
+				changeState(new WallKick(), true);
+			}
 			var wallSparkPoint = pos.addxy(12 * xDir, 0);
 			var rect = new Rect(wallSparkPoint.addxy(-2, -2), wallSparkPoint.addxy(2, 2));
 			if (Global.level.checkCollisionShape(rect.getShape(), null) != null) {
