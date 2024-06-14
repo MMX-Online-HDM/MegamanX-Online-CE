@@ -63,7 +63,7 @@ public class PlasmaGun : AxlWeapon {
 }
 
 public class PlasmaGunProj : Projectile {
-	Axl axl;
+	Axl? axl;
 	float dist;
 	public PlasmaGunProj(
 		Weapon weapon, Point pos, int xDir, Player player,
@@ -83,6 +83,11 @@ public class PlasmaGunProj : Projectile {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
 		canBeLocal = false;
+
+		isMelee = true;
+		if (player?.character != null) {
+			owningActor = player.character;
+		}
 	}
 
 	public override void update() {
@@ -125,6 +130,11 @@ public class PlasmaGunAltProj : Projectile {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
 		canBeLocal = false;
+
+		isMelee = true;
+		if (player?.character != null) {
+			owningActor = player.character;
+		}
 	}
 
 	public override void postUpdate() {

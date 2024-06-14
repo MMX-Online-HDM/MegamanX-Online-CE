@@ -393,6 +393,11 @@ public class RekkohaProj : Projectile {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
 		netcodeOverride = NetcodeModel.FavorDefender;
+
+		isOwnerLinked = true;
+		if (player.character != null) {
+			owningActor = player.character;
+		}
 	}
 
 	public override void update() {

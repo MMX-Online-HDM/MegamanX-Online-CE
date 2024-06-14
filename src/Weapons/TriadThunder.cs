@@ -71,6 +71,11 @@ public class TriadThunderProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir, new byte[] { (byte)(yDir + 2) });
 		}
+
+		isMelee = true;
+		if (player.character != null) {
+			owningActor = player.character;
+		}
 	}
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
@@ -150,6 +155,11 @@ public class TriadThunderBall : Projectile {
 		projId = (int)ProjIds.TriadThunder;
 		destroyOnHit = false;
 		shouldShieldBlock = false;
+
+		isMelee = true;
+		if (player.character != null) {
+			owningActor = player.character;
+		}
 	}
 
 	public override void update() {
@@ -283,6 +293,11 @@ public class TriadThunderQuake : Projectile {
 
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
+		}
+
+		isMelee = true;
+		if (player.character != null) {
+			owningActor = player.character;
 		}
 	}
 

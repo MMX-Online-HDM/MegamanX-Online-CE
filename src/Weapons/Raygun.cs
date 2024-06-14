@@ -191,6 +191,11 @@ public class RayGunAltProj : Projectile {
 			axl.nonOwnerAxlBulletPos = pos;
 		}
 		canBeLocal = false;
+
+		isMelee = true;
+		if (player?.character != null) {
+			owningActor = player.character;
+		}
 	}
 
 	public int getChargeLevel() {

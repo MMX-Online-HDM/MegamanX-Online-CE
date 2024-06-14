@@ -95,7 +95,7 @@ public class GenericStun : CharState {
 	public bool changeAnim = true;
 	public bool canPlayFrozenSound = true;
 	public bool canPlayStaticSound = true;
-	public int hurtDir;
+	public int hurtDir = 1;
 	public float hurtSpeed;
 	public float flinchYPos;
 
@@ -124,7 +124,10 @@ public class GenericStun : CharState {
 
 		if (character.frozenTime == 0 && character.crystalizedTime == 0 && character.paralyzedTime == 0) {
 			if (flinchTime > 0) {
-				character.setHurt(-character.xDir, MathInt.Ceiling(flinchTime), true);
+				character.changeState(
+					new Hurt(hurtDir, MathInt.Ceiling(flinchTime), false, flinchYPos
+					), true
+				);
 				return;
 			}
 			character.changeToIdleOrFall();
@@ -150,7 +153,7 @@ public class GenericStun : CharState {
 	}
 
 	public void crystalizeLogic() {
-		if (character.crystalizedTime == 0) {
+		if (character.crystalizedTime == 0 && !character.isCrystalized) {
 			return;
 		}
 		reduceStunFrames(ref character.crystalizedTime);
@@ -213,23 +216,20 @@ public class GenericStun : CharState {
 		hurtDir = xDir;
 		if (player.isX && player.hasBodyArmor(1)) {
 			flinchFrames = MathInt.Floor(flinchFrames * 0.75f);
-			sprite = "hurt2";
-			character.changeSpriteFromName("hurt2", true);
 		}
 		if (flinchTime > flinchFrames) {
 			return;
 		}
-		bool isCombo = (flinchFrames != 0);
-
+		bool isCombo = (flinchTime != 0);
 		hurtSpeed = 1.6f * xDir;
+		if (!isCombo) {
+			flinchYPos = character.pos.y;
+		}
 		if (flinchFrames >= 2) {
 			character.vel.y = (-0.125f * (flinchFrames - 1)) * 60f;
 			if (isCombo && character.pos.y < flinchYPos) {
 				character.vel.y *= (0.002f * flinchTime - 0.076f) * (flinchYPos - character.pos.y) + 1;
 			}
-		}
-		if (!isCombo) {
-			flinchYPos = character.pos.y;
 		}
 		flinchTime = flinchFrames;
 		flinchMaxTime = flinchFrames;
@@ -238,6 +238,7 @@ public class GenericStun : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.stopMovingWeak();
+		hurtDir = -character.xDir;
 		// To continue the flinch if was flinched before the stun.
 		if (oldState is Hurt hurtState) {
 			hurtDir = hurtState.hurtDir;

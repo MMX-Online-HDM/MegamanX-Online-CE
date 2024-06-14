@@ -133,7 +133,7 @@ public class CharState {
 			character.stopMoving();
 		}
 		wasGrounded = character.grounded;
-		if (this is not Jump && oldState?.canStopJump == false) {
+		if (this is not Jump and not WallKick && oldState?.canStopJump == false) {
 			canStopJump = false;
 		}
 	}

@@ -73,7 +73,7 @@ public class SigmaSlashProj : Projectile {
 		maxTime = 0.1f;
 		projId = (int)ProjIds.SigmaSlash;
 		isMelee = true;
-		if (player?.character != null) {
+		if (player.character != null) {
 			owningActor = player.character;
 		}
 

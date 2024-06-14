@@ -500,9 +500,8 @@ public class Damager {
 				bool isShotgunIceAndFrozen = character.sprite.name.Contains("frozen") && weaponKillFeedIndex == 8;
 				if ((flinch > 0) && !isShotgunIceAndFrozen) {
 					victim?.playSound("hurt");
-
 					int hurtDir = -character.xDir;
-					if (damagingActor != null && !hitFromFront(character, damagingActor, owner, projId)) {
+					if (damagingActor != null && hitFromBehind(character, damagingActor, owner, projId)) {
 						hurtDir *= -1;
 					}
 					if (projId == (int)ProjIds.GravityWellCharged) {
@@ -874,7 +873,6 @@ public class Damager {
 			return false;
 		}
 		if (projId >= 0 && (
-			damager is not Projectile ||
 			projId == (int)ProjIds.Burn ||
 			projId == (int)ProjIds.SelfDmg ||
 			projId == (int)ProjIds.Napalm ||
@@ -884,7 +882,7 @@ public class Damager {
 		)) {
 			return false;
 		}
-		if ((damager as Projectile)?.isMelee != true) {
+		if (damager is not Projectile { isMelee: false }) {
 			if (damager.deltaPos.x != 0) {
 				if (checkDelta(actor, damager.deltaPos.x)) {
 					return true;
@@ -894,39 +892,23 @@ public class Damager {
 			}
 		}
 		// Calculate based on other values if speed is 0.
-		Point? damagePos = null;
+		Point damagePos = damager.pos;
 
-		if (damager is Projectile proj && proj.owningActor != null) {
-			damagePos = proj.owningActor.pos;
-		} else if (projOwner?.character != null && (
-			  projId == (int)ProjIds.PlasmaGun ||
-			  projId == (int)ProjIds.PlasmaGun2 ||
-			  projId == (int)ProjIds.PlasmaGun2Hyper ||
-			  projId == (int)ProjIds.FlameBurner ||
-			  projId == (int)ProjIds.FlameBurnerHyper ||
-			  projId == (int)ProjIds.RayGun2 ||
-			  projId == (int)ProjIds.TriadThunder ||
-			  projId == (int)ProjIds.TriadThunderBall ||
-			  projId == (int)ProjIds.TriadThunderQuake ||
-			  projId == (int)ProjIds.Rekkoha ||
-			  projId == (int)ProjIds.ShotgunIceCharged ||
-			  projId == (int)ProjIds.BubbleSplashCharged ||
-			  projId == (int)ProjIds.SigmaSlash
-		  )) {
-			damagePos = projOwner.character.pos;
-		} else if (damager is Projectile prj && prj.hitboxActor != null && !prj.hitboxActor.destroyed) {
-			damagePos = prj.hitboxActor.pos;
-		} else if (damager is GenericMeleeProj && projOwner?.character != null) {
-			damagePos = projOwner.character.pos;
-		} else if (damager is not GenericMeleeProj and not null) {
-			damagePos = damager.pos;
+		if (damager is Projectile proj) {
+			if (proj.isMelee || proj.isOwnerLinked) {
+				if (proj.owningActor != null) {
+					damagePos = proj.owningActor.pos;
+				} else if (projOwner?.character != null) {
+					damagePos = projOwner.character.pos;
+				}
+			}
+			if (damagePos == null && proj.hitboxActor?.destroyed == false) {
+				damagePos = proj.hitboxActor.pos;
+			}
 		}
 
 		// Call function if pos is not null.
-		if (damagePos != null && checkPos(actor, damagePos.Value)) {
-			return true;
-		}
-		return false;
+		return checkPos(actor, damagePos);
 	}
 
 	private static bool isVictimImmuneToQuake(Actor victim) {

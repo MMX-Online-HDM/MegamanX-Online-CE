@@ -41,6 +41,7 @@ public class Projectile : Actor {
 
 	public bool isMelee;
 	public int meleeId = -1;
+	public bool isOwnerLinked;
 	public Actor owningActor;
 
 	public Projectile(
