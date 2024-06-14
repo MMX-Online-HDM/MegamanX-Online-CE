@@ -1461,7 +1461,7 @@ public partial class Level {
 		if (actor == null) return false;
 
 		if (actor.timeStopTime > 10) {
-			slowAmount = 0.0625f;
+			slowAmount = 0.125f;
 			return true;
 		}
 
