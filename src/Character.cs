@@ -2012,7 +2012,10 @@ public partial class Character : Actor, IDamagable {
 		if (shootAnimTime > 0 && newState.canShoot() == true) {
 			changeSprite(getSprite(newState.shootSprite), true);
 		} else {
-			if (sprite != null && sprite.name == newState.sprite && this is not MegamanX) {
+			string spriteName = sprite.name;
+			changeSprite(getSprite(newState.sprite), true);
+
+			if (sprite != null && spriteName == sprite.name && this is not MegamanX) {
 				sprite.frameIndex = 0;
 				sprite.frameTime = 0;
 				sprite.time = 0;
@@ -2020,7 +2023,6 @@ public partial class Character : Actor, IDamagable {
 				sprite.loopCount = 0;
 				sprite.visible = true;
 			}
-			changeSprite(getSprite(newState.sprite), true);
 		}
 		CharState? oldState = charState;
 		oldState?.onExit(newState);

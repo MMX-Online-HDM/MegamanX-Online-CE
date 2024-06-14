@@ -6,7 +6,7 @@ namespace MMXOnline;
 public class Zero : Character {
 	// Hypermode stuff.
 	public float blackZeroTime;
-	public static readonly float maxBlackZeroTime = 20;
+	public static readonly float maxBlackZeroTime = 20 * 60;
 	public float awakenedZeroTime;
 	public bool isViral;
 	public int awakenedPhase;
@@ -104,6 +104,9 @@ public class Zero : Character {
 
 		if (isAwakened) {
 			updateAwakenedAura();
+		}
+		if (isBlack && blackZeroTime > 0) {
+			Helpers.decrementFrames(ref blackZeroTime);
 		}
 
 		// Hypermode music.
@@ -411,17 +414,16 @@ public class Zero : Character {
 		int yDir = player.input.getYDir(player);
 		// Giga attacks.
 		if (yDir == 1 && specialPressed) {
-			if (gigaAttack.shootTime > 0 || gigaAttack.ammo < gigaAttack.getAmmoUsage(0)) {
-				return false;
-			}
-			if (gigaAttack is RekkohaWeapon) {
-				gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-				changeState(new Rekkoha(gigaAttack), true);
-				return true;
-			} else {
-				gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-				changeState(new Rakuhouha(gigaAttack), true);
-				return true;
+			if (gigaAttack.shootTime <= 0 && gigaAttack.ammo >= gigaAttack.getAmmoUsage(0)) {
+				if (gigaAttack is RekkohaWeapon) {
+					gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
+					changeState(new Rekkoha(gigaAttack), true);
+					return true;
+				} else {
+					gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
+					changeState(new Rakuhouha(gigaAttack), true);
+					return true;
+				}
 			}
 			if (!shootPressed) {
 				return true;
@@ -729,7 +731,7 @@ public class Zero : Character {
 				DanchienWeapon.staticWeapon, projPos, ProjIds.QuakeBlazer, player, 2, 0, 0.5f
 			),
 			(int)MeleeIds.Rakukojin => new GenericMeleeProj(
-				RakukojinWeapon.staticWeapon, projPos, ProjIds.QuakeBlazer, player, 2, 0, 0.5f
+				RakukojinWeapon.staticWeapon, projPos, ProjIds.Rakukojin, player, 2, 0, 0.5f
 			),
 			// Others
 			(int)MeleeIds.LadderSlash => new GenericMeleeProj(

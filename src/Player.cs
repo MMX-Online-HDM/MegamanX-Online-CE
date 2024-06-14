@@ -1056,16 +1056,15 @@ public partial class Player {
 				throw new Exception("Error: Non-valid char ID: " + charNum);
 			}
 			// Hyper mode overrides (POST)
-			if (Global.level.isHyper1v1() && ownedByLocalPlayer) {
+			if (Global.level.isHyperMatch() && ownedByLocalPlayer) {
 				if (isX) {
 					setUltimateArmor(true);
 				}
 				if (character is Zero zero) {
 					if (loadout.zeroLoadout.hyperMode == 0) {
-						zero.blackZeroTime = 100000;
+						zero.blackZeroTime = Zero.maxBlackZeroTime;
 					} else {
-						zero.awakenedZeroTime = 0;
-						currency = 9999;
+						zero.awakenedPhase = 1;
 					}
 				}
 				if (character is Axl axl) {
