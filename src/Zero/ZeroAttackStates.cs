@@ -113,6 +113,7 @@ public class ZeroAirSlashState : ZeroGenericMeleeState {
 		comboFrame = 7;
 
 		airMove = true;
+		canJump = true;
 		exitOnLanding = true;
 		useDashJumpSpeed = true;
 		canStopJump = true;
@@ -135,6 +136,7 @@ public class ZeroRollingSlashtate : ZeroGenericMeleeState {
 		comboFrame = 7;
 
 		airMove = true;
+		canJump = true;
 		exitOnLanding = true;
 		useDashJumpSpeed = true;
 		canStopJump = true;

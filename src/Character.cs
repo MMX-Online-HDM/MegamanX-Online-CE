@@ -1253,6 +1253,20 @@ public partial class Character : Actor, IDamagable {
 		if (charState.airMove && !grounded) {
 			airMove();
 		}
+		if (charState.canJump && (grounded || canAirJump())) {
+			if (player.input.isPressed(Control.Jump, player)) {
+				if (!grounded) {
+					dashedInAir++;
+				} else {
+					grounded = false;
+				}
+				vel.y = -getJumpPower();
+				playSound("jump", sendRpc: true);
+				if (charState.airSprite != null && charState.airSprite != "") {
+					changeSprite(charState.airSprite, false);
+				}
+			}
+		}
 		if (charState.normalCtrl) {
 			normalCtrl();
 		}
@@ -2012,7 +2026,7 @@ public partial class Character : Actor, IDamagable {
 		if (shootAnimTime > 0 && newState.canShoot() == true) {
 			changeSprite(getSprite(newState.shootSprite), true);
 		} else {
-			string spriteName = sprite.name;
+			string spriteName = sprite?.name ?? "";
 			changeSprite(getSprite(newState.sprite), true);
 
 			if (sprite != null && spriteName == sprite.name && this is not MegamanX) {
