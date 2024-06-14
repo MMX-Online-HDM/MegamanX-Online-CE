@@ -1236,6 +1236,8 @@ public partial class Character : Actor, IDamagable {
 			wallKickTimer = maxWallKickTime;
 			if (charState.normalCtrl || charState is WallSlide) {
 				changeState(new WallKick(), true);
+			} else {
+				playSound("jump", sendRpc: true);
 			}
 			var wallSparkPoint = pos.addxy(12 * xDir, 0);
 			var rect = new Rect(wallSparkPoint.addxy(-2, -2), wallSparkPoint.addxy(2, 2));
