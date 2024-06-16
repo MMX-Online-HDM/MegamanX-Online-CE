@@ -1072,7 +1072,7 @@ public partial class Character : Actor, IDamagable {
 		}
 
 		if (player.isVile && !player.isAI && !player.isDisguisedAxl && player.getVileWeightActive() > VileLoadout.maxWeight && charState is not WarpIn && charState is not Die) {
-			applyDamage(null, null, Damager.envKillDamage, null);
+			applyDamage(Damager.envKillDamage, player, this, null, null);
 			return;
 		}
 
@@ -1103,7 +1103,7 @@ public partial class Character : Actor, IDamagable {
 				if (charState is not Die) {
 					incPos(new Point(0, 25));
 				}
-				applyDamage(null, null, Damager.envKillDamage, null);
+				applyDamage(Damager.envKillDamage, player, this, null, null);
 			}
 		}
 
@@ -2645,7 +2645,7 @@ public partial class Character : Actor, IDamagable {
 		deductLabelY(labelNameOffY);
 	}
 
-	public void applyDamage(Player attacker, int? weaponIndex, float fDamage, int? projId) {
+	public void applyDamage(float fDamage, Player? attacker, Actor? actor, int? weaponIndex, int? projId) {
 		if (!ownedByLocalPlayer) return;
 		decimal damage = decimal.Parse(fDamage.ToString());
 		decimal originalDamage = damage;

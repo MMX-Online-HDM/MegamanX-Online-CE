@@ -176,7 +176,7 @@ public class TorpedoProj : Projectile, IDamagable {
 		sprite.draw(frameIndex, pos.x + x, pos.y + y, xDir, yDir, getRenderEffectSet(), 1, 1, 1, zIndex, actor: this);
 	}
 
-	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
+	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
 		if (damage > 0) {
 			destroySelf();
 		}

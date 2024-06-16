@@ -351,7 +351,7 @@ public class BCrabShieldProj : Projectile, IDamagable {
 		}
 	}
 
-	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
+	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
 		if (!ownedByLocalPlayer) return;
 
 		if (projId == (int)ProjIds.SpinWheel ||
@@ -438,7 +438,7 @@ public class BCrabSummonBubbleProj : Projectile, IDamagable {
 		updateBubbleBounce();
 	}
 
-	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
+	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
 		if (!ownedByLocalPlayer) return;
 
 		if (projId == (int)ProjIds.SpinWheel ||
@@ -583,10 +583,10 @@ public class BCrabSummonCrabProj : Projectile, IDamagable {
 		shield?.destroySelf();
 	}
 
-	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
+	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
 		if (!ownedByLocalPlayer) return;
 		if (shield != null) {
-			shield.applyDamage(owner, weaponIndex, damage, projId);
+			shield.applyDamage(damage, owner, actor, weaponIndex, projId);
 			return;
 		}
 		if (projId == (int)ProjIds.SpinWheel ||

@@ -199,7 +199,7 @@ public class LaunchOMissile : Projectile, IDamagable {
 	public bool isInvincible(Player attacker, int? projId) {
 		return false;
 	}
-	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
+	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
 		if (damage > 0) {
 			destroySelf();
 		}

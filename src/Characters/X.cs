@@ -351,7 +351,7 @@ public partial class MegamanX : Character {
 				UPDamageCooldown += Global.spf;
 				if (UPDamageCooldown > unpoDamageMaxCooldown) {
 					UPDamageCooldown = 0;
-					applyDamage(null, null, 1, null);
+					applyDamage(1, player, this, null, null);
 				}
 			}
 		}

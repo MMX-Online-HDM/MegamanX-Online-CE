@@ -750,7 +750,7 @@ public class Damager {
 			zeroParryState.counterAttack(owner, damagingActor);
 			return true;
 		}
-		damagable?.applyDamage(owner, weaponKillFeedIndex, finalDamage, projId);
+		damagable?.applyDamage(finalDamage, owner, damagingActor, weaponKillFeedIndex, projId);
 
 		return true;
 	}

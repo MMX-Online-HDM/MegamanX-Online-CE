@@ -336,7 +336,7 @@ public class RideArmor : Actor, IDamagable {
 
 		if (pos.y > Global.level.killY) {
 			incPos(new Point(0, 50));
-			applyDamage(null, null, Damager.envKillDamage, null);
+			applyDamage(Damager.envKillDamage, null, null, null, null);
 		}
 
 		if (grabbedCharacter != null && !string.IsNullOrEmpty(rideArmorState.carrySprite) && !isAttacking()) {
@@ -682,7 +682,7 @@ public class RideArmor : Actor, IDamagable {
 		}
 	}
 
-	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
+	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
 		if (!ownedByLocalPlayer) return;
 
 		if (damage > 0 && owner != null) {

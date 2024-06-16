@@ -91,7 +91,7 @@ public class BirdMechaniloidProj : Projectile, IDamagable {
 		destroySelf();
 	}
 
-	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
+	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
 		health -= damage;
 		if (health <= 0) {
 			health = 0;
@@ -377,7 +377,7 @@ public class Mechaniloid : Actor, IDamagable {
 		return MathF.Abs(pos.x - target.pos.x) < attackRange && MathF.Abs(pos.y - target.pos.y) < 30;
 	}
 
-	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
+	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
 		health -= damage;
 		if (health <= 0) {
 			health = 0;

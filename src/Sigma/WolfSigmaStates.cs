@@ -239,7 +239,7 @@ public class WolfSigmaHead : Actor, IDamagable {
 
 	}
 
-	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
+	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
 	}
 
 	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
@@ -583,7 +583,7 @@ public class WolfSigmaHand : Actor, IDamagable {
 			};
 	}
 
-	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
+	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
 	}
 
 	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {

@@ -1228,7 +1228,7 @@ public partial class Level {
 							if (damagable.projectileCooldown["sigmavirus"] == 0) {
 								actor.playSound("hit");
 								actor.addRenderEffect(RenderEffectType.Hit, 0.05f, 0.1f);
-								damagable.applyDamage(null, null, 2, null);
+								damagable.applyDamage(2, null, null, null, null);
 								damagable.projectileCooldown["sigmavirus"] = 1;
 							}
 						}

@@ -334,7 +334,7 @@ public class CrackedWall : Actor, IDamagable {
 		return 0;
 	}
 
-	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
+	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
 		if (!Global.isHost) {
 			RPC.actorToggle.sendRpcDamageCw(id, (byte)(int)damage);
 			return;
@@ -404,7 +404,7 @@ public class KillZone : Geometry {
 	public void applyDamage(IDamagable damagable) {
 		if (!damagable.actor().ownedByLocalPlayer) return;
 		if (damage == Damager.envKillDamage) {
-			damagable.applyDamage(null, null, damage, null);
+			damagable.applyDamage(damage, null, null, null, null);
 			return;
 		}
 
@@ -414,7 +414,7 @@ public class KillZone : Geometry {
 		}
 		if (damagable.canBeDamaged(-1, null, null) && !damagable.isInvincible(null, null)) {
 			damagable.projectileCooldown["killzone"] = hitCooldown;
-			damagable.applyDamage(null, null, damage, null);
+			damagable.applyDamage(damage, null, null, null, null);
 			if (damagable is Character chr) {
 				chr.playSound(flinch ? "hurt" : "hit", sendRpc: true);
 				chr.addRenderEffect(RenderEffectType.Hit, 0.05f, 0.1f);

@@ -670,7 +670,7 @@ public class RPCActorToggle : RPC {
 				byte damage = arguments[1];
 				CrackedWall crackedWall = Global.level.getCrackedWallById(crackedWallId);
 				if (crackedWall != null) {
-					crackedWall.applyDamage(null, null, damage, null);
+					crackedWall.applyDamage(damage, null, null, null, null);
 				}
 			}
 			return;

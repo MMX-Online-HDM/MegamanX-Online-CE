@@ -2085,7 +2085,7 @@ public partial class Player {
 	}
 
 	public void maverick1v1Kill() {
-		character?.applyDamage(null, null, 1000, null);
+		character?.applyDamage(1000, null, null, null, null);
 		character?.destroySelf();
 		character = null;
 		respawnTime = getRespawnTime() * (suicided ? 2 : 1);
@@ -2097,17 +2097,17 @@ public partial class Player {
 	public void forceKill() {
 		if (maverick1v1 != null && Global.level.is1v1()) {
 			//character?.applyDamage(null, null, 1000, null);
-			currentMaverick?.applyDamage(null, null, 1000, null);
+			currentMaverick?.applyDamage(1000, this, character, null, null);
 			return;
 		}
 
 		if (currentMaverick != null && isTagTeam()) {
 			destroyCharacter();
 		} else {
-			character?.applyDamage(null, null, 1000, null);
+			character?.applyDamage(1000, this, character, null, null);
 		}
 		foreach (var maverick in mavericks) {
-			maverick.applyDamage(null, null, 1000, null);
+			maverick.applyDamage(1000, this, character, null, null);
 		}
 	}
 
