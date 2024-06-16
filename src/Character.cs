@@ -524,7 +524,6 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool canWallClimb() {
-		if (!charState.normalCtrl) return false;
 		if (rideArmorPlatform != null) return false;
 		if (isSoftLocked()) return false;
 		if (charState is VileHover) {
@@ -1201,7 +1200,8 @@ public partial class Character : Actor, IDamagable {
 		if (charState.exitOnAirborne && !grounded) {
 			changeState(new Fall());
 		}
-		if ((canWallClimb() || charState.airMove || charState is WallSlide) &&
+		if (canWallClimb() &&
+			(charState.normalCtrl || charState.airMove || charState is WallSlide) &&
 			!grounded && vel.y >= 0 &&
 			wallKickTimer <= 0 &&
 			player.input.isPressed(Control.Jump, player) &&
@@ -2645,7 +2645,7 @@ public partial class Character : Actor, IDamagable {
 		deductLabelY(labelNameOffY);
 	}
 
-	public void applyDamage(float fDamage, Player? attacker, Actor? actor, int? weaponIndex, int? projId) {
+	public virtual void applyDamage(float fDamage, Player? attacker, Actor? actor, int? weaponIndex, int? projId) {
 		if (!ownedByLocalPlayer) return;
 		decimal damage = decimal.Parse(fDamage.ToString());
 		decimal originalDamage = damage;
