@@ -52,7 +52,7 @@ public class VileMK2GrabState : CharState {
 			damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.VileMK2Grab);
 		}
 
-		if (frameTime >= 2 && player.input.isPressed(Control.Special1, player)) {
+		if (stateFrames >= 2 && player.input.isPressed(Control.Special1, player)) {
 			character.changeState(new Idle(), true);
 			return;
 		}

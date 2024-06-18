@@ -21,7 +21,7 @@ public class CharState {
 	public Collider wallKickLeftWall;
 	public Collider wallKickRightWall;
 	public float stateTime;
-	public float frameTime;
+	public float stateFrames;
 	public string enterSound;
 	public float framesJumpNotHeld = 0;
 	public bool once;
@@ -610,7 +610,7 @@ public class Run : CharState {
 		base.update();
 		var move = new Point(0, 0);
 		float runSpeed = character.getRunSpeed();
-		if (frameTime <= 4) {
+		if (stateFrames <= 4) {
 			runSpeed = 60 * character.getRunDebuffs();
 		}
 		if (player.input.isHeld(Control.Left, player)) {

@@ -83,7 +83,7 @@ public class Hurt : CharState {
 			player.character.increaseCharge();
 		}
 
-		if (frameTime >= flinchTime) {
+		if (stateFrames >= flinchTime) {
 			character.changeToLandingOrFall(false);
 		}
 	}
@@ -243,7 +243,7 @@ public class GenericStun : CharState {
 		if (oldState is Hurt hurtState) {
 			hurtDir = hurtState.hurtDir;
 			hurtSpeed = hurtState.hurtSpeed;
-			flinchTime = hurtState.flinchTime - hurtState.frameTime;
+			flinchTime = hurtState.flinchTime - hurtState.stateFrames;
 			flinchYPos = hurtState.flinchYPos;
 			if (flinchTime < 0) {
 				flinchTime = 0;

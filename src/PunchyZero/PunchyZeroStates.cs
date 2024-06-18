@@ -460,7 +460,7 @@ public class HyperPunchyZeroStart : CharState {
 					}
 					if (virusAnim[i].destroyed) {
 						character.playSound("shingetsurinx5", true);
-						if (frameTime > 55) {
+						if (stateFrames > 55) {
 							virusAnim[i] = null!;
 							continue;
 						}
@@ -479,7 +479,7 @@ public class HyperPunchyZeroStart : CharState {
 						virusAnim[i] = createVirusAnim();
 					}
 				}
-				if (animCount == 0 && frameTime > 55 && virusEffectParts != null) {
+				if (animCount == 0 && stateFrames > 55 && virusEffectParts != null) {
 					virusEffectParts.destroySelf();
 				}
 			}
