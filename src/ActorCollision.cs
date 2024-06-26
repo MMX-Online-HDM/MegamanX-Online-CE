@@ -7,9 +7,11 @@ namespace MMXOnline;
 
 // Everything strongly related to actor collision should go here
 public partial class Actor {
-	private Collider _globalCollider;
+	private Collider _globalCollider = null!;
 
-	// One of the possible colliders of an actor. This is typically used for a collider shared across multiple sprites an actor can be. Typically used for chars, mavericks, rides, etc.
+	// One of the possible colliders of an actor.
+	// This is typically used for a collider shared across multiple sprites an actor can be.
+	// Typically used for chars, mavericks, rides, etc.
 	public Collider globalCollider {
 		get {
 			return _globalCollider;

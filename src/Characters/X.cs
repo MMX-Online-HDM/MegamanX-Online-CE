@@ -17,7 +17,7 @@ public partial class MegamanX : Character {
 	public const int bootsArmorCost = 2;
 
 	public RollingShieldProjCharged? chargedRollingShieldProj;
-	public List<BubbleSplashProjCharged>? chargedBubbles = new List<BubbleSplashProjCharged>();
+	public List<BubbleSplashProjCharged> chargedBubbles = new List<BubbleSplashProjCharged>();
 	public StrikeChainProj? strikeChainProj;
 	public GravityWellProjCharged? chargedGravityWell;
 	public SpinningBladeProjCharged? chargedSpinningBlade;

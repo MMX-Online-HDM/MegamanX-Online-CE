@@ -368,7 +368,7 @@ public partial class Level {
 		return null;
 	}
 
-	public List<CollideData> checkCollisionsShape(Shape shape, List<GameObject> exclusions) {
+	public List<CollideData> checkCollisionsShape(Shape shape, List<GameObject>? exclusions) {
 		var hitDatas = new List<CollideData>();
 		var gameObjects = getGameObjectsInSameCell(shape);
 		foreach (var go in gameObjects) {
