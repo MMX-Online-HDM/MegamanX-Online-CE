@@ -1723,7 +1723,7 @@ public partial class Actor : GameObject {
 		if (includeAllies) {
 			alliance = this switch {
 				Character selfChar => selfChar.player.alliance,
-				Projectile selfProj => selfProj.damager?.owner.alliance ?? -1,
+				Projectile selfProj => selfProj.damager.owner.alliance,
 				Maverick selfMvrk => selfMvrk.player.alliance,
 				_ => -1
 			};
@@ -1734,7 +1734,7 @@ public partial class Actor : GameObject {
 			}
 			if (!includeAllies && alliance != -1) {
 				if (actor is Character character && character.player.alliance == alliance ||
-					actor is Projectile proj && (proj.damager?.owner.alliance ?? -1) == alliance ||
+					actor is Projectile proj && proj.damager?.owner.alliance == alliance ||
 					actor is Maverick maverick && maverick.player.alliance == alliance ||
 					actor is DarkHoldProj
 				) {
