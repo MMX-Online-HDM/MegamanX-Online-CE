@@ -1719,12 +1719,13 @@ public partial class Actor : GameObject {
 			halfDist, halfDist
 		).getShape();
 		var hits = Global.level.checkCollisionsShape(shape, null);
+		int alliance = -1;
 
 		foreach (CollideData hit in hits) {
 			if (hit.gameObject is not Actor actor || actor == this) {
 				continue;
 			}
-			if (!includeAllies) {
+			if (!includeAllies && alliance != -1) {
 				if (actor is Character character && character.player.alliance == alliance ||
 					actor is Projectile proj && proj.damager.owner.alliance == alliance ||
 					actor is Maverick maverick && maverick.player.alliance == alliance ||
