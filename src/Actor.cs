@@ -1728,7 +1728,6 @@ public partial class Actor : GameObject {
 				_ => -1
 			};
 		}
-
 		foreach (CollideData hit in hits) {
 			if (hit.gameObject is not Actor actor || actor == this) {
 				continue;
