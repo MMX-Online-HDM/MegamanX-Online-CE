@@ -1449,6 +1449,6 @@ public partial class MegamanX : Character {
 	public override void increaseCharge() {
 		float factor = 1;
 		if (player.hasArmArmor(1)) { factor = 1.5f; }
-		chargeTime += Global.spf * factor;
+		chargeTime += Global.speedMul * factor;
 	}
 }

@@ -1705,4 +1705,36 @@ public partial class Actor : GameObject {
 	public virtual float getGravity() {
 		return Global.level.gravity * gravityModifier * gravityWellModifier;
 	}
+
+	public Actor[] getCloseActors(
+		int distance, bool isRequesterAI = false,
+		bool checkWalls = false, bool includeAllies = false
+	) {
+		List<Actor> closeActors = new();
+		int halfDist = MathInt.Floor(distance / 2f);
+
+		Point checkPos = new Point(MathF.Round(pos.x), MathF.Round(pos.y));
+		Shape shape = Rect.createFromWH(
+			pos.x - halfDist, pos.y - halfDist,
+			halfDist, halfDist
+		).getShape();
+		var hits = Global.level.checkCollisionsShape(shape, null);
+
+		foreach (CollideData hit in hits) {
+			if (hit.gameObject is not Actor actor || actor == this) {
+				continue;
+			}
+			if (!includeAllies) {
+				if (actor is Character character && character.player.alliance == alliance ||
+					actor is Projectile proj && proj.damager.owner.alliance == alliance ||
+					actor is Maverick maverick && maverick.player.alliance == alliance ||
+					actor is DarkHoldProj
+				) {
+					continue;
+				}
+			}
+			closeActors.Add(actor);
+		}
+		return closeActors.ToArray();
+	}
 }

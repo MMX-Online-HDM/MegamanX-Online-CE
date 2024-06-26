@@ -143,7 +143,7 @@ public partial class Actor {
 				args.Add((byte)(int)(character.burnTime * 20));
 			}
 			if (charMask[2]) {
-				args.Add((byte)(int)(character.chargeTime * 20));
+				args.Add((byte)MathInt.Ceiling(character.chargeTime / 3));
 			}
 			if (charMask[3]) {
 				args.Add((byte)(int)(character.igFreezeProgress * 20));
@@ -424,7 +424,7 @@ public class RPCUpdateActor : RPC {
 					// charge section
 					if (charMaskBools[2]) {
 						byte chargeTime = arguments[i++];
-						character.chargeTime = chargeTime / 20f;
+						character.chargeTime = chargeTime * 3;
 					} else {
 						character.chargeTime = 0;
 					}

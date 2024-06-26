@@ -239,7 +239,7 @@ public class BusterZero : Character {
 	public override void increaseCharge() {
 		float factor = 1;
 		if (isBlackZero) factor = 1.5f;
-		chargeTime += Global.spf * factor;
+		chargeTime += Global.speedMul * factor;
 	}
 
 	public override float getRunSpeed() {
