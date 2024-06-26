@@ -163,7 +163,9 @@ public partial class Actor : GameObject {
 
 	public float timeStopTime;
 
-	public Actor(string spriteName, Point pos, ushort? netId, bool ownedByLocalPlayer, bool dontAddToLevel) {
+	public Actor(
+		string spriteName, Point pos, ushort? netId, bool ownedByLocalPlayer, bool dontAddToLevel
+	) {
 		this.pos = pos;
 		prevPos = pos;
 
@@ -187,6 +189,13 @@ public partial class Actor : GameObject {
 		grounded = false;
 		zIndex = ++Global.level.autoIncActorZIndex;
 		changeSprite(spriteName, true);
+		if (sprite == null) {
+			string typeName = GetType().ToString().Replace("MMXOnline", "");
+			throw new Exception(
+				"Error null sprite at object" + typeName +
+				"with spritename variable \"" + spriteName + "\""
+			);
+		}
 		lastNetUpdate = Global.time;
 
 		if (!dontAddToLevel) {
