@@ -1720,6 +1720,14 @@ public partial class Actor : GameObject {
 		).getShape();
 		var hits = Global.level.checkCollisionsShape(shape, null);
 		int alliance = -1;
+		if (includeAllies) {
+			alliance = this switch {
+				Character selfChar => selfChar.player.alliance,
+				Projectile selfProj => selfProj.damager?.owner.alliance ?? -1,
+				Maverick selfMvrk => selfMvrk.player.alliance,
+				_ => -1
+			};
+		}
 
 		foreach (CollideData hit in hits) {
 			if (hit.gameObject is not Actor actor || actor == this) {
@@ -1727,7 +1735,7 @@ public partial class Actor : GameObject {
 			}
 			if (!includeAllies && alliance != -1) {
 				if (actor is Character character && character.player.alliance == alliance ||
-					actor is Projectile proj && proj.damager.owner.alliance == alliance ||
+					actor is Projectile proj && (proj.damager?.owner.alliance ?? -1) == alliance ||
 					actor is Maverick maverick && maverick.player.alliance == alliance ||
 					actor is DarkHoldProj
 				) {
