@@ -65,7 +65,7 @@ public class RPCCreateActor : RPC {
 		var player = Global.level.getPlayerById(playerId);
 		if (player == null) return;
 
-		Actor actor = Global.level.getActorByNetId(netProjByte);
+		Actor? actor = Global.level.getActorByNetId(netProjByte);
 		if (actor != null && (int)actor.netActorCreateId == createId) return;
 		if (Global.level.recentlyDestroyedNetActors.ContainsKey(netProjByte)) return;
 		Point pos = new Point(xPos, yPos);

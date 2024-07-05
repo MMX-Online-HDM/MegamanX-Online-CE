@@ -684,21 +684,17 @@ public partial class Player {
 
 	// The first net id this player could possibly own. This includes the "reserved" ones
 	public ushort getStartNetId() {
-		return (ushort)(Level.maxReservedNetId + (ushort)(id * netIdsPerPlayer));
+		return (ushort)(Level.firstNormalNetId + (ushort)(id * netIdsPerPlayer));
 	}
 
 	// The character net id is always the first net id of the player
 	public ushort getCharActorNetId() {
-		if (isLocalAI) {
-			return Global.level.mainPlayer.getStartNetId();
-		}
-
 		return getStartNetId();
 	}
 
 	public static int? getPlayerIdFromCharNetId(ushort charNetId) {
 		int netIdInt = charNetId;
-		int maxIdInt = Level.maxReservedNetId;
+		int maxIdInt = Level.firstNormalNetId;
 		int diff = (netIdInt - maxIdInt);
 		if (diff < 0) return null;
 		if (diff % netIdsPerPlayer != 0) {
@@ -716,9 +712,6 @@ public partial class Player {
 	}
 
 	public ushort getNextATransNetId() {
-		if (isLocalAI) {
-			return Global.level.mainPlayer.getStartNetId();
-		}
 		var retId = curATransNetId;
 		curATransNetId++;
 		if (curATransNetId >= getStartNetId() + 10) {
@@ -729,18 +722,26 @@ public partial class Player {
 
 	// Usually, only the main player is allowed to get the next actor net id. The exception is if you call setNextActorNetId() first. The assert checks for that in debug.
 	public ushort getNextActorNetId(bool allowNonMainPlayer = false) {
-		if (isLocalAI) {
-			return Global.level.mainPlayer.getStartNetId();
-		}
-
-		var retId = curMaxNetId;
+		// Increase by 1 normall.
+		int retId = curMaxNetId;
 		curMaxNetId++;
-
+		// Use this to avoid duplicates.
+		if (ownedByLocalPlayer) {
+			while (
+				Global.level.actorsById.GetValueOrDefault(curMaxNetId) != null &&
+				curMaxNetId <= getStartNetId() + netIdsPerPlayer
+			) {
+				// Overwrite if destroyed.
+				if (Global.level.actorsById[curMaxNetId].destroyed) {
+					break;
+				}
+				curMaxNetId++;
+			}
+		}
 		if (curMaxNetId >= getStartNetId() + netIdsPerPlayer) {
 			curMaxNetId = getFirstAvailableNetId();
 		}
-
-		return retId;
+		return (ushort)retId;
 	}
 
 	public void setNextActorNetId(ushort curMaxNetId) {

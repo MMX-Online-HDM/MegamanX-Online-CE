@@ -811,7 +811,7 @@ public class Dash : CharState {
 		enterSound = "dash";
 		this.initialDashButton = initialDashButton;
 		accuracy = 10;
-		//exitOnAirborne = true;
+		exitOnAirborne = true;
 		attackCtrl = true;
 		normalCtrl = true;
 	}

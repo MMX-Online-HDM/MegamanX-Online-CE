@@ -271,7 +271,10 @@ class Program {
 
 	private static void update() {
 		if (Global.levelStarted()) {
-			Helpers.tryWrap(Global.level.update, false);
+			Global.level.update();
+			if (!Global.isSkippingFrames) {
+				Global.level.clearOldActors();
+			}
 		}
 		Menu.update();
 		if (Global.leaveMatchSignal != null) {

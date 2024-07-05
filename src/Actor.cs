@@ -61,6 +61,7 @@ public partial class Actor : GameObject {
 	public bool visible = true;
 	public bool timeSlow;
 	public bool destroyed;
+	public float destroyedOnFrame;
 	public ShaderWrapper? genericShader;
 	public virtual List<ShaderWrapper>? getShaders() { return genericShader != null ? new List<ShaderWrapper> { genericShader } : null; }
 	public float alpha = 1;
@@ -138,14 +139,17 @@ public partial class Actor : GameObject {
 	) {
 		this.pos = pos;
 		prevPos = pos;
-
-		if (Global.debug && Global.serverClient != null && netId != null && Global.level.getActorByNetId(netId.Value) != null) {
+		/*
+		if (Global.debug && Global.serverClient != null && netId != null
+			&& Global.level.getActorByNetId(netId.Value) != null
+		) {
 			string netIdDump = Global.level.getNetIdDump();
 			Helpers.WriteToFile("netIdDump.txt", netIdDump);
-			//Global.logToConsole("The netId " + netId.ToString() + " (sprite " + spriteName + " ) was already used", showConsole: true);
-			throw new Exception("The netId " + netId.ToString() + " (sprite " + spriteName + " ) was already used.");
+			throw new Exception(
+				"The netId " + netId.ToString() + " (sprite " + spriteName + " ) was already used."
+			);
 		}
-
+		*/
 		this.netId = netId;
 		this.ownedByLocalPlayer = ownedByLocalPlayer;
 		vel = new Point(0, 0);
@@ -167,6 +171,10 @@ public partial class Actor : GameObject {
 			);
 		}
 		lastNetUpdate = Global.time;
+
+		if (netId is not null and >= Level.firstNormalNetId) {
+			Global.level.actorsById[netId.Value] = this;
+		}
 
 		if (!dontAddToLevel) {
 			Global.level.addGameObject(this);
@@ -1278,7 +1286,7 @@ public partial class Actor : GameObject {
 		}
 	}
 
-	//Optionally take in a sprite to draw when destroyed
+	// Optionally take in a sprite to draw when destroyed
 	public virtual void destroySelf(
 		string spriteName = "", string fadeSound = "",
 		bool disableRpc = false, bool doRpcEvenIfNotOwned = false,
@@ -1291,6 +1299,15 @@ public partial class Actor : GameObject {
 
 		if (!destroyed) {
 			destroyed = true;
+			destroyedOnFrame = Global.frameCount;
+			if (netId is not null and >= Level.firstNormalNetId &&
+				Global.level.actorsById.ContainsKey(netId.Value)
+			) {
+				if (Global.level.actorsById[netId.Value] == this) {
+					Global.level.actorsById.Remove(netId.Value);
+					Global.level.destroyedActorsById[netId.Value] = this;
+				}
+			}
 			onDestroy();
 		} else {
 			return;

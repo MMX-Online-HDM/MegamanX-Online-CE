@@ -11,6 +11,8 @@ public partial class Level {
 	#region dynamic lists
 	// Any list that can grow over time should be put here for memory leak investigation
 	public HashSet<GameObject> gameObjects = new HashSet<GameObject>();
+	public Dictionary<ushort, Actor> actorsById = new();
+	public Dictionary<ushort, Actor> destroyedActorsById = new();
 	public List<Actor> mapSprites = new List<Actor>();
 	public List<List<HashSet<GameObject>>> grid = new List<List<HashSet<GameObject>>>();
 	public HashSet<HashSet<GameObject>> occupiedGridSets = new HashSet<HashSet<GameObject>>();
@@ -101,7 +103,8 @@ public partial class Level {
 	public int startGridCount;
 	public int flaggerCount;
 
-	public const ushort maxReservedNetId = 50;
+	public const ushort maxReservedNetId = firstNormalNetId - 1;
+	public const ushort firstNormalNetId = 50;
 	public const ushort maxReservedCharNetId = 50;
 	public const ushort redFlagNetId = 10;
 	public const ushort blueFlagNetId = 11;
@@ -945,12 +948,21 @@ public partial class Level {
 		}
 	}
 
-	public Actor getActorByNetId(ushort netId) {
+	public Actor? getActorByNetId(ushort netId, bool getDestroyed = false) {
+		/*
 		foreach (var go in gameObjects) {
 			var actor = go as Actor;
 			if (actor?.netId == netId) {
 				return actor;
 			}
+		}
+		return null;
+		*/
+		if (Global.level.actorsById.ContainsKey(netId)) {
+			return Global.level.actorsById[netId];
+		}
+		if (getDestroyed && Global.level.destroyedActorsById.ContainsKey(netId)) {
+			return Global.level.destroyedActorsById[netId];
 		}
 		return null;
 	}
@@ -2253,6 +2265,14 @@ public partial class Level {
 		var players = Global.level?.server?.players;
 		if (players == null || players.Count == 0) return 0;
 		return players.Max(p => p.kills);
+	}
+
+	public void clearOldActors() {
+		foreach ((ushort actorId, Actor actor) in destroyedActorsById) {
+			if (frameCount - actor.destroyedOnFrame is > 360 or < 0) {
+				destroyedActorsById.Remove(actorId);
+			}
+		}
 	}
 }
 
