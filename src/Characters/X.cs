@@ -844,7 +844,13 @@ public partial class MegamanX : Character {
 
 		if (weapon.soundTime == 0) {
 			if (weapon.shootSounds != null && weapon.shootSounds.Length > 0) {
-				player.character.playSound(weapon.shootSounds[chargeLevel]);
+				int shootSoundIndex = chargeLevel;
+				if (shootSoundIndex >= weapon.shootSounds.Length) {
+					shootSoundIndex = weapon.shootSounds.Length - 1;
+				}
+				if (weapon.shootSounds[chargeLevel] != "") {
+					player.character.playSound(weapon.shootSounds[chargeLevel]);
+				}
 			}
 			if (weapon is FireWave) {
 				weapon.soundTime = 0.25f;
