@@ -59,7 +59,6 @@ public class Weapon {
 		ammo = 32;
 		maxAmmo = 32;
 		rateOfFire = 0.15f;
-		shootSounds = new string[] { "", "", "", "" };
 	}
 
 	public Weapon(WeaponIds index, int killFeedIndex, Damager? damager = null) {
