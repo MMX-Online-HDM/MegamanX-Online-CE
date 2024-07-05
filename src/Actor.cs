@@ -162,13 +162,15 @@ public partial class Actor : GameObject {
 		yDir = 1;
 		grounded = false;
 		zIndex = ++Global.level.autoIncActorZIndex;
-		changeSprite(spriteName, true);
-		if (sprite == null) {
-			string typeName = GetType().ToString().Replace("MMXOnline", "");
-			throw new Exception(
-				"Error null sprite at object" + typeName +
-				"with spritename variable \"" + spriteName + "\""
-			);
+		if (spriteName is not null and not "") {
+			changeSprite(spriteName, true);
+			if (sprite == null) {
+				string typeName = GetType().ToString().Replace("MMXOnline", "");
+				throw new Exception(
+					"Error null sprite at object" + typeName +
+					"with spritename variable \"" + spriteName + "\""
+				);
+			}
 		}
 		lastNetUpdate = Global.time;
 
