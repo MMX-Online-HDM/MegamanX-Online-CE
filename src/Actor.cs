@@ -1411,7 +1411,7 @@ public partial class Actor : GameObject {
 	public SoundWrapper? playSound(string soundKey, bool forcePlay = false, bool sendRpc = false) {
 		soundKey = soundKey.ToLowerInvariant();
 		if (!Global.soundBuffers.ContainsKey(soundKey)) {
-			throw new Exception("Attempted playing missing sound with name \"{soundKey}\"");
+			throw new Exception($"Attempted playing missing sound with name \"{soundKey}\"");
 		}
 		return playSound(Global.soundBuffers[soundKey], forcePlay: forcePlay, sendRpc: sendRpc);
 	}
