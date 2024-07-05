@@ -2987,8 +2987,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual void increaseCharge() {
-		float factor = 1;
-		chargeTime += Global.speedMul * factor;
+		chargeTime += Global.speedMul;
 	}
 
 	public void dropFlag() {
