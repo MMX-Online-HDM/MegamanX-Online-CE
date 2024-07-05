@@ -24,10 +24,10 @@ public partial class Character : Actor, IDamagable {
 	public bool changedStateInFrame;
 	public bool pushedByTornadoInFrame;
 	public float chargeTime;
-	public float charge1Time = 0.5f;
-	public float charge2Time = 1.75f;
-	public float charge3Time = 3f;
-	public float charge4Time = 4.25f;
+	public float charge1Time = 30;
+	public float charge2Time = 105;
+	public float charge3Time = 180;
+	public float charge4Time = 255;
 	public float hyperProgress;
 
 	public Point? sigmaHeadGroundCamCenterPos;
@@ -2988,7 +2988,7 @@ public partial class Character : Actor, IDamagable {
 
 	public virtual void increaseCharge() {
 		float factor = 1;
-		chargeTime += Global.spf * factor;
+		chargeTime += Global.speedMul * factor;
 	}
 
 	public void dropFlag() {

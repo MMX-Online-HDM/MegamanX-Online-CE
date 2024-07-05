@@ -236,6 +236,7 @@ public class BusterZero : Character {
 	public override bool chargeButtonHeld() {
 		return player.input.isHeld(Control.Shoot, player);
 	}
+
 	public override void increaseCharge() {
 		float factor = 1;
 		if (isBlackZero) factor = 1.5f;
