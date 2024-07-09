@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace MMXOnline;
@@ -8,7 +9,7 @@ public class RideChaser : Actor, IDamagable {
 	public float maxHealth = 24;
 	public float healAmount = 0;
 	public float healTime = 0;
-	public Character character;
+	public Character? character;
 	public float selfDestructTime;
 	public float maxSelfDestructTime = 10;
 	public Anim hawkElec;
@@ -626,6 +627,32 @@ public class RideChaser : Actor, IDamagable {
 		if (ownedByLocalPlayer) {
 			RPC.creditPlayerKillVehicle.sendRpc(killer, assister, this, weaponIndex);
 		}
+	}
+
+	public override List<byte> getCustomActorNetData() {
+		List<byte> customData = new();
+
+		customData.Add((byte)drawState);
+		// 1 means riding it, 0 means not.
+		customData.Add((byte)(character != null ? 1 : 0)); 
+		customData.Add((byte)(neutralId));
+		customData.Add((byte)MathF.Ceiling(rc.health));
+
+		return customData;
+	}
+
+	public override void updateCustomActorNetData(byte[] data) {
+		drawState = data[0];
+		int isOwnerRiding = data[1];
+		
+		if (isOwnerRiding == 0) {
+			character = null;
+		} else if (isOwnerRiding == 1) {
+			character = netOwner?.character;
+		}
+
+		neutralId = data[2];
+		health = data[3];
 	}
 }
 

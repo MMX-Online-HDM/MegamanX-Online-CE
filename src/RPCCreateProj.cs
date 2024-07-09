@@ -671,9 +671,6 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.VoltCSparkle:
 				proj = new VoltCSparkleProj(VoltCatfish.getWeapon(), pos, xDir, player, netProjByte);
 				break;
-			case (int)ProjIds.VoltCSuck:
-				proj = new VoltCSuckProj(VoltCatfish.getWeapon(), pos, xDir, null, player, netProjByte);
-				break;
 			case (int)ProjIds.VoltCTriadThunder:
 				proj = new VoltCTriadThunderProj(
 					VoltCatfish.getWeapon(), pos, xDir, 0,

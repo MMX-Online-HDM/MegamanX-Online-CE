@@ -250,8 +250,8 @@ public partial class Actor : GameObject {
 	public virtual void changeSprite(string spriteName, bool resetFrame) {
 		string oldSpriteName = sprite?.name ?? "";
 		if (spriteName == null) return;
-		if (sprite != null) {
-			if (sprite.name == spriteName) {	
+		if (sprite != null && (this is Character || !resetFrame)) {
+			if (sprite.name == spriteName) {
 				return;
 			}
 		}

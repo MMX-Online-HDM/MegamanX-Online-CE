@@ -133,7 +133,7 @@ public class BlastHornet : Maverick {
 public class BHornetBeeProj : Projectile, IDamagable {
 	public Point lastMoveAmount;
 	const float maxSpeed = 150;
-	public Actor latchTarget;
+	public Actor? latchTarget;
 	float latchLerpTime;
 	public BHornetBeeProj(Weapon weapon, Point pos, int xDir, Point unitDir, Player player, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, xDir, 0, 2, player, "bhornet_proj_wasp_small", 0, 1f, netProjId, player.ownedByLocalPlayer) {
@@ -210,6 +210,21 @@ public class BHornetBeeProj : Projectile, IDamagable {
 	public bool isInvincible(Player attacker, int? projId) { return false; }
 	public bool canBeHealed(int healerAlliance) { return false; }
 	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) { }
+
+	public override List<byte> getCustomActorNetData() {
+		List<byte> customData = new();
+		customData.AddRange(BitConverter.GetBytes(latchTarget?.netId ?? ushort.MaxValue));
+
+		return customData;
+	}
+
+	public override void updateCustomActorNetData(byte[] data) {
+		ushort targetNetId = BitConverter.ToUInt16(data, 0);
+		if (targetNetId == ushort.MaxValue) {
+			return;
+		}
+		latchTarget = Global.level.getActorByNetId(targetNetId);
+	}
 }
 
 public class BHornetHomingBeeProj : Projectile, IDamagable {
@@ -341,9 +356,13 @@ public class BHornetShootCursorState : MaverickState {
 
 public class BHornetCursorProj : Projectile {
 	public BlastHornet bh;
-	public Actor target;
-	public BHornetCursorProj(Weapon weapon, Point pos, int xDir, Point unitDir, BlastHornet bh, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 0, player, "bhornet_particle_aim_small", 0, 0, netProjId, player.ownedByLocalPlayer) {
+	public Actor? target;
+	public BHornetCursorProj(
+		Weapon weapon, Point pos, int xDir, Point unitDir, BlastHornet bh,
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 0, player, "bhornet_particle_aim_small", 0, 0, netProjId, player.ownedByLocalPlayer
+	) {
 		this.weapon = weapon;
 		this.bh = bh;
 		if (ownedByLocalPlayer) {
@@ -402,6 +421,21 @@ public class BHornetCursorProj : Projectile {
 		} else {
 			base.render(x, y);
 		}
+	}
+
+	public override List<byte> getCustomActorNetData() {
+		List<byte> customData = new();
+		customData.AddRange(BitConverter.GetBytes(target?.netId ?? ushort.MaxValue));
+
+		return customData;
+	}
+
+	public override void updateCustomActorNetData(byte[] data) {
+		ushort targetNetId = BitConverter.ToUInt16(data, 0);
+		if (targetNetId == ushort.MaxValue) {
+			return;
+		}
+		target = Global.level.getActorByNetId(targetNetId);
 	}
 }
 

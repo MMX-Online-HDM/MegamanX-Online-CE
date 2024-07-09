@@ -565,6 +565,19 @@ public class KaiserSigmaBeamProj : Projectile {
 		Color color = new Color(132, 132, 231);
 		DrawWrappers.DrawPolygon(getPoints(), color, true, ZIndex.Character);
 	}
+
+	public override List<byte> getCustomActorNetData() {
+		List<byte> customData = new();
+		customData.AddRange(BitConverter.GetBytes(beamAngle));
+		customData.AddRange(BitConverter.GetBytes(beamWidth));
+
+		return customData;
+	}
+
+	public override void updateCustomActorNetData(byte[] data) {
+		beamAngle = BitConverter.ToSingle(data[0..4], 0);
+		beamWidth = BitConverter.ToSingle(data[4..8], 0);
+	}
 }
 
 public class KaiserMissileWeapon : Weapon {

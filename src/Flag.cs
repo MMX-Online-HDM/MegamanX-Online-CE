@@ -232,6 +232,40 @@ public class Flag : Actor {
 			ang += (360f / count);
 		}
 	}
+
+	public override List<byte> getCustomActorNetData() {
+		List<byte> customData = new();
+
+		customData.AddRange(BitConverter.GetBytes(chr?.netId ?? ushort.MaxValue));
+		customData.Add((byte)(hasUpdraft() ? 1 : 0));
+		customData.Add((byte)(pickedUpOnce ? 1 : 0));
+		customData.Add((byte)MathF.Floor(timeDropped * 8));
+
+		return customData;
+	}
+
+	public override void updateCustomActorNetData(byte[] data) {
+		ushort chrNetId = BitConverter.ToUInt16(data[0..2]);
+		nonOwnerHasUpdraft = data[2] == 1;
+		pickedUpOnce = data[3] == 1;
+		timeDropped = data[4] / 8f;
+
+		Character? chara = null;
+		if (chrNetId != ushort.MaxValue) {
+			chara = Global.level.getActorByNetId(chrNetId) as Character;
+		}
+		if (chrNetId == ushort.MaxValue || chara == null) {
+			if (chara != null && chara.flag == null) {
+				chara.onFlagPickup(this);
+			}
+		} else {
+			foreach (Player player in Global.level.players) {
+				if (player?.character != null && player.character.flag == this) {
+					player.character.flag = null;
+				}
+			}
+		}
+	}
 }
 
 public class UpdraftParticle {

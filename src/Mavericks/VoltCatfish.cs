@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace MMXOnline;
 
 public class VoltCatfish : Maverick {
 	public static Weapon getWeapon() { return new Weapon(WeaponIds.VoltCatfish, 154); }
+	public static Weapon mainWeapon = new Weapon(WeaponIds.VoltCatfish, 154);
 	public static Weapon getMeleeWeapon(Player player) { return new Weapon(WeaponIds.VoltCatfish, 154); }
 
 	public Weapon meleeWeapon;
@@ -255,16 +257,29 @@ public class VoltCTriadThunderState : MaverickState {
 public class VoltCSuckProj : Projectile {
 	Player player;
 	public VoltCatfish vc;
-	public VoltCSuckProj(Weapon weapon, Point pos, int xDir, VoltCatfish vc, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, 0, 0, player, "voltc_proj_suck", 0, 0f, netProjId, player.ownedByLocalPlayer) {
+
+	public VoltCSuckProj(
+		Weapon weapon, Point pos, int xDir, VoltCatfish vc, Player player, ushort netProjId, bool sendRpc = false
+	) : base(
+		weapon, pos, xDir, 0, 0, player, "voltc_proj_suck", 0, 0f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.VoltCSuck;
 		setIndestructableProperties();
 		this.player = player;
 		this.vc = vc;
 
 		if (sendRpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, player, netProjId, xDir, BitConverter.GetBytes(vc.netId.Value));
 		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		ushort catfishId = BitConverter.ToUInt16(args.extraData, 0);
+		VoltCatfish catfish = Global.level.getActorByNetId(catfishId) as VoltCatfish;
+
+		return new VoltCSuckProj(
+			VoltCatfish.mainWeapon, args.pos, args.xDir, catfish, args.player, args.netId
+		);
 	}
 
 	public override void update() {

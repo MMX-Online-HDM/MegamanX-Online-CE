@@ -248,4 +248,15 @@ public class HexaInvoluteProj : Projectile {
 			sound = null;
 		}
 	}
+
+	public override List<byte> getCustomActorNetData() {
+		List<byte> customData = new();
+		customData.AddRange(BitConverter.GetBytes(ang));
+
+		return customData;
+	}
+
+	public override void updateCustomActorNetData(byte[] data) {
+		ang = BitConverter.ToSingle(data, 0);
+	}
 }

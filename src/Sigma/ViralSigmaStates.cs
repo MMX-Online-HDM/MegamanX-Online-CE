@@ -431,6 +431,15 @@ public class ViralSigmaBeamProj : Projectile {
 		Color color = new Color((byte)r, 0, 0, 128);
 		DrawWrappers.DrawRect(pos.x - 9, pos.y, pos.x + 8, bottomY, true, color, 1, ZIndex.Character);
 	}
+
+	public override List<byte> getCustomActorNetData() {
+		List<byte> customData = new();
+		customData.AddRange(BitConverter.GetBytes(bottomY));
+		return customData;
+	}
+	public override void updateCustomActorNetData(byte[] data) {
+		bottomY = BitConverter.ToSingle(data, 0);
+	}
 }
 
 public class ViralSigmaRevive : CharState {

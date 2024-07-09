@@ -154,6 +154,21 @@ public class MorphMBeamProj : Projectile {
 			DrawWrappers.DrawPolygon(points, colors[frameIndex], true, ZIndex.AboveFont);
 		}
 	}
+
+	public override List<byte> getCustomActorNetData() {
+		List<byte> customData = new();
+
+		customData.AddRange(BitConverter.GetBytes(endPos.x));
+		customData.AddRange(BitConverter.GetBytes(endPos.y));
+
+		return customData;
+	}
+	public override void updateCustomActorNetData(byte[] data) {
+		float endX = BitConverter.ToSingle(data[0..4], 0);
+		float endY = BitConverter.ToSingle(data[4..8], 0);
+
+		setEndPos(new Point(endX, endY));
+	}
 }
 
 public class MorphMShoot : MaverickState {

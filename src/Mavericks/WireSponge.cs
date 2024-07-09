@@ -380,6 +380,21 @@ public class WSpongeSideChainProj : Projectile {
 	public bool isLatched() {
 		return state == 2;
 	}
+
+	public override List<byte> getCustomActorNetData() {
+		List<byte> customData = new();
+
+		customData.AddRange(BitConverter.GetBytes(netOrigin.x));
+		customData.AddRange(BitConverter.GetBytes(netOrigin.y));
+
+		return customData;
+	}
+	public override void updateCustomActorNetData(byte[] data) {
+		float originX = BitConverter.ToSingle(data[0..4], 0);
+		float originY = BitConverter.ToSingle(data[4..8], 0);
+
+		netOrigin = new Point(originX, originY);
+	}
 }
 
 public class WSpongeSideChainState : MaverickState {
@@ -602,6 +617,20 @@ public class WSpongeUpChainProj : Projectile {
 		for (int i = 0; i < pieceCount; i++) {
 			Global.sprites["wsponge_vine_base_up"].draw(0, pos.x, origin.y - (len * i), xDir, 1, null, 1, 1, 1, ZIndex.Background + 100);
 		}
+	}
+
+	public override List<byte> getCustomActorNetData() {
+		List<byte> customData = new();
+
+		customData.AddRange(BitConverter.GetBytes(netOrigin.x));
+		customData.AddRange(BitConverter.GetBytes(netOrigin.y));
+
+		return customData;
+	}
+	public override void updateCustomActorNetData(byte[] data) {
+		float originX = BitConverter.ToSingle(data[0..4], 0);
+		float originY = BitConverter.ToSingle(data[4..8], 0);
+		netOrigin = new Point(originX, originY);
 	}
 }
 

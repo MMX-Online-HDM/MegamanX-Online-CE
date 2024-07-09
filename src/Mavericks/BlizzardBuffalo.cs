@@ -378,6 +378,21 @@ public class BBuffaloBeamProj : Projectile {
 		base.render(x, y);
 		Global.sprites["bbuffalo_proj_beam_head"].draw(0, startPos.x, startPos.y, -xDir, 1, null, 1, 1, 1, zIndex);
 	}
+
+	public override List<byte> getCustomActorNetData() {
+		List<byte> customData = new();
+
+		customData.AddRange(BitConverter.GetBytes(startPos.x));
+		customData.AddRange(BitConverter.GetBytes(startPos.y));
+
+		return customData;
+	}
+	public override void updateCustomActorNetData(byte[] data) {
+		float startX = BitConverter.ToSingle(data[0..4], 0);
+		float startY = BitConverter.ToSingle(data[4..8], 0);
+
+		setStartPos(new Point(startX, startY));
+	}
 }
 
 public class BBuffaloShootBeamState : MaverickState {

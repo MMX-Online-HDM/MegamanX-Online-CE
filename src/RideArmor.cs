@@ -45,6 +45,8 @@ public class RideArmor : Actor, IDamagable {
 	public static ShaderWrapper paletteHawk = Helpers.cloneGenericPaletteShader("paletteHawk");
 	public static ShaderWrapper paletteFrog = Helpers.cloneGenericPaletteShader("paletteFrog");
 
+	bool netColorShadersSet;
+
 	public RideArmor(
 		Player owner, Point pos, int raNum, int neutralId, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
 	) : base(
@@ -996,6 +998,35 @@ public class RideArmor : Actor, IDamagable {
 
 		if (ownedByLocalPlayer) {
 			RPC.creditPlayerKillVehicle.sendRpc(killer, assister, this, weaponIndex);
+		}
+	}
+
+	public override List<byte> getCustomActorNetData() {
+		List<byte> customData = new();
+		customData.Add((byte)raNum);
+		// 1 means riding it, 0 means not.
+		customData.Add((byte)(character != null ? 1 : 0)); 
+		customData.Add((byte)neutralId);
+		customData.Add((byte)MathF.Ceiling(health));
+
+		return customData;
+	}
+
+	public override void updateCustomActorNetData(byte[] data) {
+		raNum = data[0];
+
+		int isOwnerRiding = data[1];
+		if (isOwnerRiding == 0) {
+			character = null;
+		} else if (isOwnerRiding == 1) {
+			character = netOwner?.character;
+		}
+
+		neutralId = data[2];
+		health = data[3];
+
+		if (!netColorShadersSet) {
+			setColorShaders();
 		}
 	}
 }

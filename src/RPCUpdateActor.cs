@@ -6,7 +6,12 @@ using Lidgren.Network;
 namespace MMXOnline;
 
 public partial class Actor {
-	public void sendActorNetData() {
+	public virtual List<byte>? getCustomActorNetData() {
+		return null;
+	}
+	public virtual void updateCustomActorNetData(byte[] data) { }
+
+	public virtual void sendActorNetData() {
 		byte[] networkIdBytes = Helpers.convertToBytes((ushort)netId);
 		if ((netId == 10 || netId == 11) && this is not Flag) {
 			//string msg = string.Format(
@@ -68,8 +73,12 @@ public partial class Actor {
 		byte[] spriteBytes = BitConverter.GetBytes((ushort)spriteIndex);
 		args.AddRange(spriteBytes);
 
+		List<byte>? customData = getCustomActorNetData();
+		if (customData != null) {
+			args.AddRange(customData);
+		}
 		// Add character stuff
-		if (this is Character character) {
+		else if (this is Character character) {
 			// This gets parsed in RPCUpdateActor
 			bool[] charMask = new bool[8];
 			charMask[0] = character.acidTime > 0;
@@ -188,69 +197,6 @@ public partial class Actor {
 			} else if (this is MagnaCentipede ms) {
 				args.Add((byte)(ms.reversedGravity ? 1 : 0));
 			}
-		} else if (this is RideArmor ra) {
-			args.Add((byte)ra.raNum);
-			args.Add((byte)(ra.character != null ? 1 : 0)); // 1 means riding it, 0 means not
-			args.Add((byte)(ra.neutralId));
-			args.Add((byte)MathF.Ceiling(ra.health));
-		} else if (this is RideChaser rc) {
-			args.Add((byte)rc.drawState);
-			args.Add((byte)(rc.character != null ? 1 : 0)); // 1 means riding it, 0 means not
-			args.Add((byte)(rc.neutralId));
-			args.Add((byte)MathF.Ceiling(rc.health));
-		} else if (this is Flag flag) {
-			var chrNetIdBytes = BitConverter.GetBytes(flag.chr?.netId ?? 0);
-			args.AddRange(chrNetIdBytes);
-			args.Add(flag.hasUpdraft() ? (byte)1 : (byte)0);
-			args.Add(flag.pickedUpOnce ? (byte)1 : (byte)0);
-			args.Add((byte)(int)flag.timeDropped);
-		} else if (this is WSpongeSideChainProj sideChain) {
-			byte[] xBytes = BitConverter.GetBytes(sideChain.netOrigin.x);
-			args.AddRange(xBytes);
-			byte[] yBytes = BitConverter.GetBytes(sideChain.netOrigin.y);
-			args.AddRange(yBytes);
-		} else if (this is WSpongeUpChainProj upChain) {
-			byte[] xBytes = BitConverter.GetBytes(upChain.netOrigin.x);
-			args.AddRange(xBytes);
-			byte[] yBytes = BitConverter.GetBytes(upChain.netOrigin.y);
-			args.AddRange(yBytes);
-		} else if (this is BBuffaloBeamProj bbBeamProj) {
-			byte[] xBytes = BitConverter.GetBytes(bbBeamProj.startPos.x);
-			args.AddRange(xBytes);
-			byte[] yBytes = BitConverter.GetBytes(bbBeamProj.startPos.y);
-			args.AddRange(yBytes);
-		} else if (this is MorphMBeamProj beamProj) {
-			byte[] xBytes = BitConverter.GetBytes(beamProj.endPos.x);
-			args.AddRange(xBytes);
-			byte[] yBytes = BitConverter.GetBytes(beamProj.endPos.y);
-			args.AddRange(yBytes);
-		} else if (this is ViralSigmaBeamProj vsBeamProj) {
-			byte[] botY = BitConverter.GetBytes(vsBeamProj.bottomY);
-			args.AddRange(botY);
-		} else if (this is KaiserSigmaBeamProj ksBeamProj) {
-			byte[] beamAngle = BitConverter.GetBytes(ksBeamProj.beamAngle);
-			byte[] beamWidth = BitConverter.GetBytes(ksBeamProj.beamWidth);
-			args.AddRange(beamAngle);
-			args.AddRange(beamWidth);
-		} else if (this is GBeetleGravityWellProj wellProj) {
-			args.Add((byte)wellProj.state);
-			byte[] radiusFactor = BitConverter.GetBytes(wellProj.radiusFactor);
-			args.AddRange(radiusFactor);
-			byte[] maxRadius = BitConverter.GetBytes(wellProj.maxRadius);
-			args.AddRange(maxRadius);
-
-		} else if (this is VoltCSuckProj voltcSuckProj) {
-			byte[] voltCatfishNetId = BitConverter.GetBytes(voltcSuckProj.vc?.netId ?? 0);
-			args.AddRange(voltCatfishNetId);
-		} else if (this is BHornetCursorProj cursorProj) {
-			byte[] targetNetId = BitConverter.GetBytes(cursorProj.target?.netId ?? 0);
-			args.AddRange(targetNetId);
-		} else if (this is BHornetBeeProj beeProj) {
-			byte[] targetNetId = BitConverter.GetBytes(beeProj.latchTarget?.netId ?? 0);
-			args.AddRange(targetNetId);
-		} else if (this is HexaInvoluteProj hiProj) {
-			byte[] hiAng = BitConverter.GetBytes(hiProj.ang);
-			args.AddRange(hiAng);
 		}
 		/*
 		else if (this is ShotgunIceProjSled sips)
@@ -341,6 +287,11 @@ public class RPCUpdateActor : RPC {
 			return;
 		}
 
+		// We send custom data here.
+		if (i+1 >= arguments.Length) {
+			actor.updateCustomActorNetData(arguments[i..]);
+		}
+
 		try {
 			if (actor != null && !actor.ownedByLocalPlayer) {
 				// In case we are updating a local object.
@@ -358,7 +309,7 @@ public class RPCUpdateActor : RPC {
 				if (yScale != null) actor.yScale = yScale.Value;
 
 				actor.visible = visible;
-
+			
 				if (actor is Character character) {
 					// Char mask section
 					byte charMask = arguments[i++];
@@ -530,125 +481,6 @@ public class RPCUpdateActor : RPC {
 							ms.reverseGravity();
 						}
 					}
-				} else if (actor is RideArmor ra) {
-					int raNum = arguments[i++];
-					ra.setRaNum(raNum);
-
-					int isOwnerRiding = arguments[i++];
-					if (isOwnerRiding == 0) {
-						ra.character = null;
-					} else if (isOwnerRiding == 1) {
-						ra.character = ra.netOwner?.character;
-					}
-
-					int neutralId = arguments[i++];
-					ra.neutralId = neutralId;
-
-					int health = arguments[i++];
-					ra.health = health;
-
-					ra.setColorShaders();
-				} else if (actor is RideChaser rc) {
-					int drawState = arguments[i++];
-					rc.drawState = drawState;
-
-					int isOwnerRiding = arguments[i++];
-					if (isOwnerRiding == 0) {
-						rc.character = null;
-					} else if (isOwnerRiding == 1) {
-						rc.character = rc.netOwner?.character;
-					}
-
-					int neutralId = arguments[i++];
-					rc.neutralId = neutralId;
-
-					int health = arguments[i++];
-					rc.health = health;
-				} else if (actor is Flag flag) {
-					byte chrNetIdByte1 = arguments[i++];
-					byte chrNetIdByte2 = arguments[i++];
-					byte hasUpdraftByte = arguments[i++];
-					byte pickedUpOnce = arguments[i++];
-					int timeDropped = arguments[i++];
-
-					ushort chrNetId = BitConverter.ToUInt16(new byte[] { chrNetIdByte1, chrNetIdByte2 });
-					if (chrNetId != 0) {
-						var chr = Global.level.getActorByNetId(chrNetId) as Character;
-						if (chr != null && chr.flag == null) {
-							chr.onFlagPickup(flag);
-						}
-					} else {
-						foreach (var player in Global.level.players) {
-							if (player?.character != null && player.character.flag == flag) {
-								player.character.flag = null;
-							}
-						}
-					}
-					flag.nonOwnerHasUpdraft = hasUpdraftByte == 1;
-					flag.pickedUpOnce = pickedUpOnce == 1;
-					flag.timeDropped = timeDropped;
-				} else if (actor is WSpongeSideChainProj sideChain) {
-					float originX = BitConverter.ToSingle(new byte[] { arguments[i], arguments[i + 1], arguments[i + 2], arguments[i + 3] }, 0);
-					i += 4;
-					float originY = BitConverter.ToSingle(new byte[] { arguments[i], arguments[i + 1], arguments[i + 2], arguments[i + 3] }, 0);
-					i += 4;
-					sideChain.netOrigin = new Point(originX, originY);
-				} else if (actor is WSpongeUpChainProj upChain) {
-					float originX = BitConverter.ToSingle(new byte[] { arguments[i], arguments[i + 1], arguments[i + 2], arguments[i + 3] }, 0);
-					i += 4;
-					float originY = BitConverter.ToSingle(new byte[] { arguments[i], arguments[i + 1], arguments[i + 2], arguments[i + 3] }, 0);
-					i += 4;
-					upChain.netOrigin = new Point(originX, originY);
-				} else if (actor is BBuffaloBeamProj bbBeamProj) {
-					float x = BitConverter.ToSingle(new byte[] { arguments[i], arguments[i + 1], arguments[i + 2], arguments[i + 3] }, 0);
-					i += 4;
-					float y = BitConverter.ToSingle(new byte[] { arguments[i], arguments[i + 1], arguments[i + 2], arguments[i + 3] }, 0);
-					i += 4;
-					bbBeamProj.setStartPos(new Point(x, y));
-				} else if (actor is MorphMBeamProj beamProj) {
-					float x = BitConverter.ToSingle(new byte[] { arguments[i], arguments[i + 1], arguments[i + 2], arguments[i + 3] }, 0);
-					i += 4;
-					float y = BitConverter.ToSingle(new byte[] { arguments[i], arguments[i + 1], arguments[i + 2], arguments[i + 3] }, 0);
-					i += 4;
-					beamProj.setEndPos(new Point(x, y));
-				} else if (actor is ViralSigmaBeamProj vsBeamProj) {
-					float botY = BitConverter.ToSingle(new byte[] { arguments[i], arguments[i + 1], arguments[i + 2], arguments[i + 3] }, 0);
-					i += 4;
-					vsBeamProj.bottomY = botY;
-				} else if (actor is KaiserSigmaBeamProj ksBeamProj) {
-					float beamAngle = BitConverter.ToSingle(new byte[] { arguments[i], arguments[i + 1], arguments[i + 2], arguments[i + 3] }, 0);
-					i += 4;
-					float beamWidth = BitConverter.ToSingle(new byte[] { arguments[i], arguments[i + 1], arguments[i + 2], arguments[i + 3] }, 0);
-					i += 4;
-					ksBeamProj.beamAngle = beamAngle;
-					ksBeamProj.beamWidth = beamWidth;
-				} else if (actor is GBeetleGravityWellProj wellProj) {
-					int state = arguments[i++];
-					wellProj.state = state;
-					float radiusFactor = BitConverter.ToSingle(new byte[] { arguments[i], arguments[i + 1], arguments[i + 2], arguments[i + 3] }, 0);
-					i += 4;
-					wellProj.radiusFactor = radiusFactor;
-					float maxRadius = BitConverter.ToSingle(new byte[] { arguments[i], arguments[i + 1], arguments[i + 2], arguments[i + 3] }, 0);
-					i += 4;
-					wellProj.maxRadius = maxRadius;
-				} else if (actor is VoltCSuckProj voltcSuckProj) {
-					ushort voltCatfishNetId = BitConverter.ToUInt16(
-						new byte[] { arguments[i], arguments[i + 1] }, 0
-					);
-					i += 2;
-					voltcSuckProj.vc = Global.level.getActorByNetId(voltCatfishNetId) as VoltCatfish;
-				} else if (actor is BHornetCursorProj cursorProj) {
-					ushort targetNetId = BitConverter.ToUInt16(new byte[] { arguments[i], arguments[i + 1] }, 0);
-					i += 2;
-					cursorProj.target = Global.level.getActorByNetId(targetNetId);
-				} else if (actor is BHornetBeeProj beeProj) {
-					ushort targetNetId = BitConverter.ToUInt16(new byte[] { arguments[i], arguments[i + 1] }, 0);
-					i += 2;
-					beeProj.latchTarget = Global.level.getActorByNetId(targetNetId);
-				} else if (actor is HexaInvoluteProj hiProj) {
-					float hiAng = BitConverter.ToSingle(new byte[] { arguments[i], arguments[i + 1], arguments[i + 2], arguments[i + 3] }, 0);
-					hiProj.ang = hiAng;
-				}
 				/*
 				else if (actor is ShotgunIceProjSled sips)
 				{
