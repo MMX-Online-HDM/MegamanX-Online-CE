@@ -41,7 +41,6 @@ public class Pickup : Actor {
 
 		if (other.gameObject is Character chr) {
 			if (!chr.ownedByLocalPlayer) return;
-			if (chr.isHyperSigmaBS.getValue()) return;
 
 			if (pickupType == PickupType.Health) {
 				if (chr.player.health >= chr.player.maxHealth && !chr.player.hasSubtankCapacity()) return;

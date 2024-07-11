@@ -513,7 +513,7 @@ public class AI {
 
 		if (aiState.randomlyChangeWeapon &&
 			(player.isX || player.isAxl || player.isVile) &&
-			!player.lockWeapon && character?.isInvisibleBS.getValue() != true &&
+			!player.lockWeapon && player.character?.isStealthy(-1) != null &&
 			(character as MegamanX)?.chargedRollingShieldProj == null
 		) {
 			weaponTime += Global.spf;
