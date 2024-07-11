@@ -3476,8 +3476,8 @@ public partial class Character : Actor, IDamagable {
 		customData.Add(Helpers.boolArrayToByte([
 			player.isDefenderFavored,
 			invulnTime > 0,
-			charState is DarkHoldState,
-			charState is StrikeChainHooked
+			isDarkHoldState,
+			isStrikeChainState
 		]));
 
 		// Bool mask. Pos 5.

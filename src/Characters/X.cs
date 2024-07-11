@@ -158,6 +158,7 @@ public partial class MegamanX : Character {
 			return;
 		}
 		Helpers.decrementTime(ref parryCooldown);
+		isHyperChargeActive = shouldShowHyperBusterCharge();
 
 		if (beeSwarm != null) {
 			beeSwarm.update();
@@ -1486,6 +1487,10 @@ public partial class MegamanX : Character {
 
 	public override bool isCCImmuneHyperMode() {
 		return isHyperX;
+	}
+
+	public bool shouldShowHyperBusterCharge() {
+		return flag != null && player.weapon is HyperBuster hb && hb.canShootIncludeCooldown(player);
 	}
 
 	public override bool isInvulnerable(bool ignoreRideArmorHide = false, bool factorHyperMode = false) {

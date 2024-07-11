@@ -410,11 +410,13 @@ public class StrikeChainHooked : CharState {
 		if (player.character is Vile vile) {
 			vile.rideArmorPlatform = null;
 		}
+		character.isStrikeChainState = true;
 	}
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		player.character.useGravity = true;
+		character.isStrikeChainState = false;
 	}
 
 	public override void update() {

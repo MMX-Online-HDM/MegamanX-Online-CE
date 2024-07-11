@@ -309,6 +309,9 @@ public class Axl : Character {
 
 		if (isStealthMode()) {
 			updateStealthMode();
+			stealthActive = true;
+		} else {
+			stealthActive = false;
 		}
 
 		if (isZooming() && deltaPos.magnitude > 1) {
@@ -1831,7 +1834,7 @@ public class Axl : Character {
 		customData.Add(Helpers.degreeToByte(player.axlBulletType));
 
 		customData.Add(Helpers.boolArrayToByte([
-			shouldDrawArmNet,
+			shouldDrawArm(),
 			stealthActive
 		]));
 

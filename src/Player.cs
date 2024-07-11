@@ -2448,11 +2448,6 @@ public partial class Player {
 		return (Global.spf + mashAmount);
 	}
 
-	public bool showHyperBusterCharge() {
-		if (character?.flag != null) return false;
-		return weapon is HyperBuster hb && hb.canShootIncludeCooldown(this);
-	}
-
 	// Sigma helper functions
 
 	public bool isSigma1AndSigma() {

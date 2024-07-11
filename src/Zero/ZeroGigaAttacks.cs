@@ -728,6 +728,7 @@ public class DarkHoldState : CharState {
 		character.frameSpeed = 0;
 		character.frameIndex = frameIndex;
 		character.stopMoving();
+		character.isDarkHoldState = true;
 	}
 
 	public override void onExit(CharState newState) {
@@ -735,5 +736,6 @@ public class DarkHoldState : CharState {
 		character.useGravity = true;
 		character.frameSpeed = 1;
 		character.darkHoldInvulnTime = 1;
+		character.isDarkHoldState = false;
 	}
 }
