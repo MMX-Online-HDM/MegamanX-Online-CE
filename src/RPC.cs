@@ -1220,7 +1220,7 @@ public class RPCAxlShoot : RPC {
 		float x = BitConverter.ToSingle(new byte[] { arguments[5], arguments[6], arguments[7], arguments[8] }, 0);
 		float y = BitConverter.ToSingle(new byte[] { arguments[9], arguments[10], arguments[11], arguments[12] }, 0);
 		int xDir = Helpers.byteToDir(arguments[13]);
-		float angle = Helpers.byteToAngle(arguments[14]);
+		float angle = Helpers.byteToDegree(arguments[14]);
 		int axlBulletWeaponType = arguments.InRange(15) ? arguments[16] : 0;
 
 		var player = Global.level.getPlayerById(playerId);
@@ -1333,7 +1333,7 @@ public class RPCAxlShoot : RPC {
 			this, (byte)playerId, projIdBytes[0], projIdBytes[1], netIdBytes[0], netIdBytes[1],
 			xBytes[0], xBytes[1], xBytes[2], xBytes[3],
 			yBytes[0], yBytes[1], yBytes[2], yBytes[3],
-			Helpers.dirToByte(xDir), Helpers.angleToByte(angle)
+			Helpers.dirToByte(xDir), Helpers.degreeToByte(angle)
 		);
 	}
 }

@@ -10,6 +10,7 @@ public partial class MegamanX : Character {
 	public int shotgunIceChargeMod = 0;
 	public bool fgMotion;
 	public bool isHyperX;
+	public bool hasUltimateArmor;
 
 	public const int headArmorCost = 2;
 	public const int bodyArmorCost = 3;
@@ -76,6 +77,9 @@ public partial class MegamanX : Character {
 	public float parryCooldown;
 	public float maxParryCooldown = 0.5f;
 
+	public bool stingActive;
+	public bool isHyperChargeActive;
+
 	public MegamanX(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
@@ -92,13 +96,13 @@ public partial class MegamanX : Character {
 		}
 		return isSpecialBuster() &&
 			!Buster.isNormalBuster(player.weapon) &&
-			!isInvisibleBS.getValue() &&
+			!stingActive &&
 			player.armorFlag == 0 &&
 			streamCooldown == 0;
 	}
 
 	public bool canShootSpecialBusterOnBuster() {
-		return isSpecialBuster() && !isInvisibleBS.getValue() && player.armorFlag == 0;
+		return isSpecialBuster() && !stingActive && player.armorFlag == 0;
 	}
 
 	public void refillUnpoBuster() {
@@ -125,6 +129,12 @@ public partial class MegamanX : Character {
 
 		Helpers.decrementTime(ref barrierCooldown);
 
+		if (stingActive) {
+			addRenderEffect(RenderEffectType.Invisible);
+		} else {
+			removeRenderEffect(RenderEffectType.Invisible);
+		}
+
 		if (cStingPaletteTime > 5) {
 			cStingPaletteTime = 0;
 			cStingPaletteIndex++;
@@ -135,7 +145,7 @@ public partial class MegamanX : Character {
 			headbuttAirTime += Global.spf;
 		}
 
-		if (isHyperXBS.getValue()) {
+		if (isHyperX) {
 			if (musicSource == null) {
 				addMusicSource("introStageBreisX4_JX", getCenterPos(), true);
 			}
@@ -761,7 +771,7 @@ public partial class MegamanX : Character {
 		if (chargeLevel >= 3 && player.hasArmArmor(2)) {
 			stockedCharge = true;
 			if (player.weapon is Buster) {
-				shootTime = hasUltimateArmorBS.getValue() ? 0.5f : 0.25f;
+				shootTime = hasUltimateArmor ? 0.5f : 0.25f;
 			} else shootTime = 0.5f;
 			Global.serverClient?.rpc(RPC.playerToggle, (byte)player.id, (int)RPCToggleType.StockCharge);
 		} else if (stockedCharge) {
@@ -860,7 +870,7 @@ public partial class MegamanX : Character {
 		// Only deduct ammo if owned by local player
 		if (ownedByLocalPlayer) {
 			float ammoUsage;
-			if (player.character.isInvisibleBS.getValue() && chargeLevel < 3) {
+			if ((player.character as MegamanX)?.stingActive == true && chargeLevel < 3) {
 				ammoUsage = 4;
 			} else if (weapon is FireWave) {
 				if (chargeLevel < 3) {
@@ -936,9 +946,7 @@ public partial class MegamanX : Character {
 	}
 
 	public bool isHyperXOrReviving() {
-		if (sprite.name.Contains("revive")) return true;
-		if (isHyperXBS.getValue()) return true;
-		return false;
+		return (isHyperX || sprite.name.EndsWith("revive"));
 	}
 
 	// BARRIER SECTION
@@ -1123,7 +1131,7 @@ public partial class MegamanX : Character {
 		if (beeSwarm != null) return false;
 		Weapon weapon = player.weapon;
 		if (weapon is RollingShield && chargedRollingShieldProj != null) return false;
-		if (isInvisibleBS.getValue()) return false;
+		if (stingActive) return false;
 		if (flag != null) return false;
 		if (player.weapons.Count == 0) return false;
 		if (weapon is AbsorbWeapon) return false;
@@ -1229,7 +1237,7 @@ public partial class MegamanX : Character {
 				shootPos.x + x + (3 * xDir), shootPos.y + y, 1, 1, null, 1, 1, 1, zIndex
 			);
 		}
-		if (isHyperChargeActiveBS.getValue() && visible) {
+		if (isHyperChargeActive && visible) {
 			drawHyperCharge(x, y);
 		}
 		base.render(x, y);
@@ -1266,7 +1274,7 @@ public partial class MegamanX : Character {
 	public bool canHeadbutt() {
 		if (!player.isX) return false;
 		if (!player.hasHelmetArmor(1)) return false;
-		if (isInvisibleBS.getValue()) return false;
+		if (stingActive) return false;
 		if (isInvulnerableAttack()) return false;
 		if (headbuttAirTime < 0.04f) return false;
 		if (sprite.name.Contains("jump") && deltaPos.y < -100 * Global.spf) return true;
@@ -1292,11 +1300,11 @@ public partial class MegamanX : Character {
 	}
 
 	public bool canUseFgMove() {
-		return !isInvulnerableAttack() && chargedRollingShieldProj == null && !isInvisibleBS.getValue() && canAffordFgMove() && hadoukenCooldownTime == 0 && player.weapon is Buster && player.fgMoveAmmo >= 32;
+		return !isInvulnerableAttack() && chargedRollingShieldProj == null && !stingActive && canAffordFgMove() && hadoukenCooldownTime == 0 && player.weapon is Buster && player.fgMoveAmmo >= 32;
 	}
 
 	public bool shouldDrawFgCooldown() {
-		return !isInvulnerableAttack() && chargedRollingShieldProj == null && !isInvisibleBS.getValue() && canAffordFgMove() && hadoukenCooldownTime == 0;
+		return !isInvulnerableAttack() && chargedRollingShieldProj == null && !stingActive && canAffordFgMove() && hadoukenCooldownTime == 0;
 	}
 
 	public override Dictionary<int, Func<Projectile>> getGlobalProjs() {
@@ -1382,7 +1390,7 @@ public partial class MegamanX : Character {
 		if (player.hasGoldenArmor()) {
 			index = 25;
 		}
-		if (hasUltimateArmorBS.getValue()) {
+		if (hasUltimateArmor) {
 			index = 0;
 		}
 		palette = player.xPaletteShader;
@@ -1456,5 +1464,76 @@ public partial class MegamanX : Character {
 		float factor = 1;
 		if (player.hasArmArmor(1)) { factor = 1.5f; }
 		chargeTime += Global.speedMul * factor;
+	}
+
+
+	public override bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
+		bool damaged = base.canBeDamaged(damagerAlliance, damagerPlayerId, projId);
+
+		// Bommerang can go thru invisibility check
+		if (player.alliance != damagerAlliance && projId != null && Damager.isBoomerang(projId)) {
+			return damaged;
+		}
+		if (stingActive) {
+			return false;
+		}
+		return damaged;
+	}
+
+	public override bool isStealthy(int alliance) {
+		return (player.alliance != alliance && stingActive);
+	}
+
+	public override bool isCCImmuneHyperMode() {
+		return isHyperX;
+	}
+
+	public override bool isInvulnerable(bool ignoreRideArmorHide = false, bool factorHyperMode = false) {
+		bool invul = base.isInvulnerable(ignoreRideArmorHide, factorHyperMode);
+		if (stingActive) {
+			return true;
+		}
+		return invul;
+	}
+
+	public override List<byte> getCustomActorNetData() {
+		List<byte> customData = base.getCustomActorNetData();
+
+		int weaponIndex = player.weapon.index;
+		if (weaponIndex == (int)WeaponIds.HyperBuster) {
+			weaponIndex = player.weapons[player.hyperChargeSlot].index;
+		}
+		customData.Add((byte)weaponIndex);
+		customData.Add((byte)MathF.Ceiling(player.weapon?.ammo ?? 0));
+
+		customData.AddRange(BitConverter.GetBytes(player.armorFlag));
+
+		customData.Add(Helpers.boolArrayToByte([
+			stingActive,
+			isHyperX,
+			isHyperChargeActive,
+			hasUltimateArmor
+		]));
+
+		return customData;
+	}
+
+	public override void updateCustomActorNetData(byte[] data) {
+		// Update base arguments.
+		base.updateCustomActorNetData(data);
+		data = data[data[0]..];
+
+		// Per-player data.
+		player.changeWeaponFromWi(data[0]);
+		if (player.weapon != null) {
+			player.weapon.ammo = data[1];
+		}
+		player.armorFlag = BitConverter.ToUInt16(data[2..4]);
+
+		bool[] boolData = Helpers.byteToBoolArray(data[4]);
+		stingActive = boolData[0];
+		isHyperX = boolData[1];
+		isHyperChargeActive = boolData[2];
+		hasUltimateArmor = boolData[3];
 	}
 }

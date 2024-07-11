@@ -584,7 +584,7 @@ public partial class Level {
 					if (!isRequesterAI) continue;
 					else if (!character.disguiseCoverBlown) continue;
 				}
-				if (character.isInvisibleBS.getValue()) continue;
+				if (character.isStealthy(alliance)) continue;
 			}
 
 			if (!includeAllies && !damagable.canBeDamaged(alliance, null, null)) continue;

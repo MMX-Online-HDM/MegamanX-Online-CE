@@ -379,16 +379,12 @@ public class Helpers {
 		return (byte)(int)(value);
 	}
 
-	public static byte angleToByte(float netArmAngle) {
-		float newAngle = netArmAngle;
-		if (newAngle < 0) newAngle += 360;
-		if (newAngle > 360) newAngle -= 360;
-		newAngle /= 2;
-		return (byte)((int)newAngle);
+	public static byte degreeToByte(float netArmAngle) {
+		return (byte)(MathInt.Round(netArmAngle / 1.40625f) % 256);
 	}
 
-	public static float byteToAngle(byte angleByte) {
-		return (float)angleByte * 2;
+	public static float byteToDegree(byte angleByte) {
+		return angleByte * 1.40625f % 360;
 	}
 
 	public static byte dirToByte(int dir) {

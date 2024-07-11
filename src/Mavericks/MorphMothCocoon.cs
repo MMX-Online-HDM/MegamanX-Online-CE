@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using SFML.Graphics;
 
@@ -283,6 +284,24 @@ public class MorphMothCocoon : Maverick {
 			*/
 			return false;
 		});
+	}
+
+	public override List<byte> getCustomActorNetData() {
+		List<byte> customData = base.getCustomActorNetData();
+		customData.AddRange(BitConverter.GetBytes(latchPos.x));
+		customData.AddRange(BitConverter.GetBytes(latchPos.y));
+		customData.Add((byte)scrapAbsorbed);
+
+		return customData;
+	}
+
+	public override void updateCustomActorNetData(byte[] data) {
+		base.updateCustomActorNetData(data);
+		data = data[Maverick.CustomNetDataLength..];
+
+		latchPos.x = BitConverter.ToSingle(data[0..4]);
+		latchPos.y = BitConverter.ToSingle(data[4..8]);
+		scrapAbsorbed = data[8];
 	}
 }
 

@@ -1076,4 +1076,22 @@ public class Maverick : Actor, IDamagable {
 			else if (state is not MFall) changeState(new MFall(transitionSprite));
 		}
 	}
+
+	public const int CustomNetDataLength = 3;
+
+	public override List<byte> getCustomActorNetData() {
+		List<byte> customData = new();
+
+		customData.Add((byte)MathF.Ceiling(alpha * 100));
+		customData.Add((byte)MathF.Ceiling(health));
+		customData.Add((byte)MathF.Ceiling(invulnTime * 20));
+
+		return customData;
+	}
+
+	public override void updateCustomActorNetData(byte[] data) {
+		alpha = data[0] / 100f;
+		health = data[1];
+		invulnTime = data[2] / 20f;
+	}
 }

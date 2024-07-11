@@ -624,9 +624,11 @@ public class RideArmor : Actor, IDamagable {
 			} else if (raNum == 5) {
 				proj = new GenericMeleeProj(new MechDevilBearPunchWeapon(player), centerPoint, ProjIds.MechDevilBearPunch, player);
 			}
-		} else if (sprite.name.Contains("charge")) {
+		}
+		else if (sprite.name.Contains("charge")) {
 			proj = new GenericMeleeProj(new MechChainChargeWeapon(player), centerPoint, ProjIds.MechChain, player);
-		} else if (hitbox.name == "stomp" && deltaPos.y > 150 * Global.spf && character != null && !character.isInvulnBS.getValue()) {
+		}
+		else if (hitbox.name == "stomp" && deltaPos.y > 150 * Global.spf && character != null) {
 			bool canDamage = deltaPos.y > 150 * Global.spf;
 			float? overrideDamage = sprite.name.EndsWith("groundpound") ? 4 : null;
 			if (!canDamage) overrideDamage = 0;
@@ -1294,7 +1296,7 @@ public class RAIdle : RideArmorState {
 
 		Helpers.decrementTime(ref attackCooldown);
 
-		if (rideArmor.raNum == 1 && player.input.isHeld(Control.Shoot, player) && !rideArmor.isAttacking() && !character.isInvulnBS.getValue()) {
+		if (rideArmor.raNum == 1 && player.input.isHeld(Control.Shoot, player) && !rideArmor.isAttacking()) {
 			shootHeldTime += Global.spf;
 			if (shootHeldTime > 0.5f) {
 				shootHeldTime = 0;

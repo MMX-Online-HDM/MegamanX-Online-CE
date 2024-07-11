@@ -175,6 +175,20 @@ public class MagnaCentipede : Maverick {
 	public void setTeleportCooldown() {
 		teleportCooldown = 0.15f;
 	}
+
+	public override List<byte> getCustomActorNetData() {
+		List<byte> customData = base.getCustomActorNetData();
+		customData.Add((byte)(reversedGravity ? 1 : 0));
+
+		return customData;
+	}
+
+	public override void updateCustomActorNetData(byte[] data) {
+		base.updateCustomActorNetData(data);
+		data = data[Maverick.CustomNetDataLength..];
+
+		reversedGravity = (data[0] == 1);
+	}
 }
 
 public class MagnaCShurikenProj : Projectile {

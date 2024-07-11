@@ -353,7 +353,7 @@ public abstract class BaseSigma : Character {
 			}
 		}
 
-		if (isHyperSigmaBS.getValue() && player.isSigma2() && charState is not Die) {
+		if (this is ViralSigma && charState is not Die) {
 			lastHyperSigmaSprite = sprite?.name;
 			lastHyperSigmaFrameIndex = frameIndex;
 			lastViralSigmaAngle = angle ?? 0;

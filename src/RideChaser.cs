@@ -636,7 +636,7 @@ public class RideChaser : Actor, IDamagable {
 		// 1 means riding it, 0 means not.
 		customData.Add((byte)(character != null ? 1 : 0)); 
 		customData.Add((byte)(neutralId));
-		customData.Add((byte)MathF.Ceiling(rc.health));
+		customData.Add((byte)MathF.Ceiling(health));
 
 		return customData;
 	}
@@ -644,7 +644,7 @@ public class RideChaser : Actor, IDamagable {
 	public override void updateCustomActorNetData(byte[] data) {
 		drawState = data[0];
 		int isOwnerRiding = data[1];
-		
+
 		if (isOwnerRiding == 0) {
 			character = null;
 		} else if (isOwnerRiding == 1) {

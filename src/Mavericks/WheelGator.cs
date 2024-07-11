@@ -133,6 +133,20 @@ public class WheelGator : Maverick {
 		};
 		return attacks.GetRandomItem();
 	}
+
+	public override List<byte> getCustomActorNetData() {
+		List<byte> customData = base.getCustomActorNetData();
+		customData.Add((byte)MathF.Ceiling(damageEaten));
+
+		return customData;
+	}
+
+	public override void updateCustomActorNetData(byte[] data) {
+		base.updateCustomActorNetData(data);
+		data = data[Maverick.CustomNetDataLength..];
+
+		damageEaten = data[0];
+	}
 }
 
 public class WheelGSpinWheelProj : Projectile {

@@ -855,4 +855,20 @@ public class Zero : Character {
 		}
 		base.render(x, y);
 	}
+
+	public override List<byte> getCustomActorNetData() {
+		List<byte> customData = base.getCustomActorNetData();
+		customData.Add((byte)MathF.Floor(gigaAttack.ammo));
+
+		return customData;
+	}
+
+	public override void updateCustomActorNetData(byte[] data) {
+		// Update base arguments.
+		base.updateCustomActorNetData(data);
+		data = data[data[0]..];
+
+		// Per-player data.
+		gigaAttack.ammo = data[0];
+	}
 }

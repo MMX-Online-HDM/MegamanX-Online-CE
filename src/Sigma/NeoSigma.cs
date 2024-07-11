@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+
 namespace MMXOnline;
 
 public class NeoSigma : BaseSigma {
@@ -164,5 +167,21 @@ public class NeoSigma : BaseSigma {
 
 	public override bool canAddAmmo() {
 		return (player.sigmaAmmo < 32);
+	}
+
+	public override List<byte> getCustomActorNetData() {
+		List<byte> customData = base.getCustomActorNetData();
+		customData.Add((byte)MathF.Floor(player.sigmaAmmo));
+
+		return customData;
+	}
+
+	public override void updateCustomActorNetData(byte[] data) {
+		// Update base arguments.
+		base.updateCustomActorNetData(data);
+		data = data[data[0]..];
+
+		// Per-player data.
+		player.sigmaAmmo = data[0];
 	}
 }

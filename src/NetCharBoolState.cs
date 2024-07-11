@@ -1,4 +1,5 @@
-﻿using System;
+﻿/*
+using System;
 
 namespace MMXOnline;
 
@@ -116,3 +117,4 @@ public partial class Character {
 		return netCharState2;
 	}
 }
+*/

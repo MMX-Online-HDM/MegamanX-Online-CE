@@ -106,6 +106,20 @@ public class WireSponge : Maverick {
 	public override MaverickState getRandomAttackState() {
 		return aiAttackStates().GetRandomItem();
 	}
+
+	public override List<byte> getCustomActorNetData() {
+		List<byte> customData = base.getCustomActorNetData();
+		customData.AddRange(BitConverter.GetBytes(chargeTime));
+
+		return customData;
+	}
+
+	public override void updateCustomActorNetData(byte[] data) {
+		base.updateCustomActorNetData(data);
+		data = data[Maverick.CustomNetDataLength..];
+
+		chargeTime = BitConverter.ToSingle(data);
+	}
 }
 
 public class WSpongeChainSpinProj : Projectile {

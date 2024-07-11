@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace MMXOnline;
@@ -624,7 +625,7 @@ public class Vile : Character {
 	}
 
 	public override void render(float x, float y) {
-		if (isSpeedDevilActiveBS.getValue()) {
+		if (player.speedDevil) {
 			addRenderEffect(RenderEffectType.SpeedDevilTrail);
 		} else {
 			removeRenderEffect(RenderEffectType.SpeedDevilTrail);
@@ -676,5 +677,37 @@ public class Vile : Character {
 	public override Collider getRaCollider() {
 		var rect = new Rect(0, 0, 18, 22);
 		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
+	}
+
+	public override List<ShaderWrapper> getShaders() {
+		List<ShaderWrapper> shaders = base.getShaders();
+
+		if (player.frozenCastle && player.frozenCastleShader != null) {
+			shaders.Add(player.frozenCastleShader);
+		}
+
+		return shaders;
+	}
+
+	public override List<byte> getCustomActorNetData() {
+		List<byte> customData = base.getCustomActorNetData();
+
+		customData.Add(Helpers.boolArrayToByte([
+			player.frozenCastle,
+			player.speedDevil
+		]));
+
+		return customData;
+	}
+
+	public override void updateCustomActorNetData(byte[] data) {
+		// Update base arguments.
+		base.updateCustomActorNetData(data);
+		data = data[data[0]..];
+
+		// Per-character data.
+		bool[] boolData = Helpers.byteToBoolArray(data[0]);
+		player.frozenCastle = boolData[0];
+		player.speedDevil = boolData[1];
 	}
 }

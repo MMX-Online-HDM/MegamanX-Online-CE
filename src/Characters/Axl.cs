@@ -75,6 +75,9 @@ public class Axl : Character {
 
 	public PlasmaGunAltProj? plasmaGunAltProj;
 
+	public bool shouldDrawArmNet;
+	public bool stealthActive;
+
 	public Axl(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
@@ -266,6 +269,12 @@ public class Axl : Character {
 					player.weapons[0] = new AxlBullet();
 				}
 			}
+		}
+
+		if (stealthActive) {
+			addRenderEffect(RenderEffectType.StealthModeBlue);
+		} else {
+			removeRenderEffect(RenderEffectType.StealthModeBlue);
 		}
 
 		// Cutoff point for things not controlled by the local player.
@@ -1165,7 +1174,7 @@ public class Axl : Character {
 		base.render(x, y);
 
 		if (!ownedByLocalPlayer) {
-			if (shouldDrawArmBS.getValue()) {
+			if (shouldDrawArmNet) {
 				drawArm(netArmAngle);
 			}
 
@@ -1579,10 +1588,6 @@ public class Axl : Character {
 		return player.isAxl && isInvisible();
 	}
 
-	public bool isStealthModeSynced() {
-		return player.isAxl && isInvisibleBS.getValue() == true;
-	}
-
 	float stealthCurrencyTime;
 
 	public void updateStealthMode() {
@@ -1789,5 +1794,71 @@ public class Axl : Character {
 			}
 		}
 		return hasEmptyAmmo;
+	}
+
+	public override bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
+		bool damaged = base.canBeDamaged(damagerAlliance, damagerPlayerId, projId);
+		if (stealthActive) {
+			return false;
+		}
+		return damaged;
+	}
+
+	public override bool isStealthy(int alliance) {
+		return (player.alliance != alliance && (stealthActive || player.isDisguisedAxl && !disguiseCoverBlown));
+	}
+
+	public override bool isCCImmuneHyperMode() {
+		return isStealthMode();
+	}
+
+
+	public override bool isInvulnerable(bool ignoreRideArmorHide = false, bool factorHyperMode = false) {
+		bool invul = base.isInvulnerable(ignoreRideArmorHide, factorHyperMode);
+		if (stealthActive) {
+			return true;
+		}
+		return invul;
+	}
+
+	public override List<byte> getCustomActorNetData() {
+		List<byte> customData = base.getCustomActorNetData();
+
+		customData.Add((byte)(player.weapon?.index ?? 0));
+		customData.Add((byte)MathF.Ceiling(player.weapon?.ammo ?? 0));
+
+		customData.Add(Helpers.degreeToByte(netArmAngle));
+		customData.Add(Helpers.degreeToByte(player.axlBulletType));
+
+		customData.Add(Helpers.boolArrayToByte([
+			shouldDrawArmNet,
+			stealthActive
+		]));
+
+		customData.AddRange(BitConverter.GetBytes(
+			Global.spriteIndexByName.GetValueOrCreate(getAxlArmSpriteName(), ushort.MaxValue)
+		));
+
+		return customData;
+	}
+
+	public override void updateCustomActorNetData(byte[] data) {
+		// Update base arguments.
+		base.updateCustomActorNetData(data);
+		data = data[data[0]..];
+
+		// Per-character data.
+		player.changeWeaponFromWi(data[0]);
+		if (player.weapon != null) {
+			player.weapon.ammo = data[1];
+		}
+		netArmAngle = Helpers.byteToDegree(data[2]);
+		player.axlBulletType = data[3];
+
+		bool[] boolData = Helpers.byteToBoolArray(data[4]);
+		shouldDrawArmNet = boolData[0];
+		stealthActive = boolData[1];
+
+		netAxlArmSpriteIndex = BitConverter.ToUInt16(data[5..7]);
 	}
 }

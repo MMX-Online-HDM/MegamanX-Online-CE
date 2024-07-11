@@ -112,7 +112,7 @@ public class NeutralEnemy : Actor, IDamagable {
 		return invincibleFlag;
 	}
 
-	// Net update override.
+	// Sends net data to update.
 	public override List<byte> getCustomActorNetData() {
 		List<byte> customData = new();
 		customData.Add((byte)health);
@@ -121,8 +121,9 @@ public class NeutralEnemy : Actor, IDamagable {
 		return customData;
 	}
 
-	
+	// Updates data recieved.
 	public override void updateCustomActorNetData(byte[] data) {
-		
+		health = (data[0]);
+		invincibleFlag = (data[1] == 1);
 	}
 }

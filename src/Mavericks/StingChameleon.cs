@@ -190,6 +190,20 @@ public class StingChameleon : Maverick {
 		return shaders;
 	}
 	*/
+
+	public override List<byte> getCustomActorNetData() {
+		List<byte> customData = base.getCustomActorNetData();
+		customData.Add((byte)(isInvisible ? 1 : 0));
+
+		return customData;
+	}
+
+	public override void updateCustomActorNetData(byte[] data) {
+		base.updateCustomActorNetData(data);
+		data = data[Maverick.CustomNetDataLength..];
+
+		isInvisible = (data[0] == 1);
+	}
 }
 
 #region weapons
