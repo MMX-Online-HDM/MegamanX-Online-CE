@@ -82,7 +82,7 @@ public class DZBuster3Proj : Projectile {
 		fadeSprite = "buster3_fade";
 		reflectable = true;
 		maxTime = 0.5f;
-		projId = (int)ProjIds.DZBuster4;
+		projId = (int)ProjIds.DZBuster3;
 		if (rpc) {
 			rpcCreate(pos, player, netId, xDir);
 		}
