@@ -371,7 +371,7 @@ public class Weapon {
 
 	public static void gigaAttackSoundLogic(
 		Actor actor, float oldAmmo, float newAmmo, float steps, float maxAmmo,
-		string normalSound = "gigaCrushRecharge", string maxSound = "gigaCrushAmmoFull"
+		string normalSound = "gigaCrushAmmoRecharge", string maxSound = "gigaCrushAmmoFull"
 	) {
 		if (oldAmmo >= newAmmo) {
 			return;
