@@ -192,7 +192,7 @@ public class RPCUpdateActor : RPC {
 
 		if (actor != null) {
 			// We send custom data here.
-			if (i >= arguments.Length - 1) {
+			if (i < arguments.Length) {
 				actor.updateCustomActorNetData(arguments[i..]);
 			}
 		}
