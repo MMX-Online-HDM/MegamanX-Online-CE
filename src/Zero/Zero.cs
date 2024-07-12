@@ -93,6 +93,7 @@ public class Zero : Character {
 	}
 
 	public override void update() {
+		base.update();
 		inputUpdate();
 		Helpers.decrementFrames(ref donutTimer);
 		Helpers.decrementFrames(ref swingCooldown);
