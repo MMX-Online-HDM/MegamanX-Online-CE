@@ -145,7 +145,7 @@ public class StrikeChainProj : Projectile {
 
 		// Hooked character? Wait for them to become hooked before pulling back. Wait a max of 200 ms
 		var hookedChar = hookedActor as Character;
-		if (hookedChar != null && !hookedChar.ownedByLocalPlayer && !hookedChar.isStrikeChainHookedBS.getValue()) {
+		if (hookedChar != null && !hookedChar.ownedByLocalPlayer && !hookedChar.isStrikeChainState) {
 			hookWaitTime += Global.spf;
 			if (hookWaitTime < 0.2f) return;
 		}

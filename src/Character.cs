@@ -3529,8 +3529,6 @@ public partial class Character : Actor, IDamagable {
 		// Add the final value of the bool mask.
 		customData[boolMaskPos] = Helpers.boolArrayToByte(boolMask);
 
-
-
 		// Add the total arguments size.
 		customData[0] = (byte)customData.Count;
 
