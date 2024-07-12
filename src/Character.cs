@@ -292,7 +292,7 @@ public partial class Character : Actor, IDamagable {
 		}
 		// Reset timer if it's 0.
 		if (acidTime == 0) {
-			acidHurtCooldown = 1;
+			acidHurtCooldown = 0;
 		}
 		// Apply time if we do not go over 8.
 		if (acidTime + time >= 8) {
@@ -346,7 +346,7 @@ public partial class Character : Actor, IDamagable {
 		}
 		// Reset timer if it's 0.
 		if (burnTime == 0) {
-			burnHurtCooldown = 1;
+			burnHurtCooldown = 0;
 		}
 		// Apply time if we do not go over 8.
 		if (burnTime + time >= 8) {
@@ -362,7 +362,7 @@ public partial class Character : Actor, IDamagable {
 			// Apply burn damage instantly.
 			burnTime += oilTime;
 			oilTime = 0;
-			burnHurtCooldown = 1;
+			burnHurtCooldown = 0;
 			// Double check again in case oil increased over 8.
 			if (burnTime >= 8) {
 				burnTime = 8;
