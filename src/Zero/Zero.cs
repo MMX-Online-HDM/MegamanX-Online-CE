@@ -87,7 +87,7 @@ public class Zero : Character {
 
 	public override void preUpdate() {
 		base.preUpdate();
-		if (grounded) {
+		if (grounded && charState is not ZeroUppercut) {
 			airRisingUses = 0;
 		}
 	}
@@ -480,8 +480,9 @@ public class Zero : Character {
 			(uppercutS.type == (int)RisingType.RisingFang && specialPressed)
 		) {
 			changeState(new ZeroUppercut(RisingType.RisingFang, isUnderwater()), true);
+			airRisingUses++;
 			dashedInAir++;
-			return false;
+			return true;
 		}
 		if (yDir == 1 && (shootPressed || specialPressed)) {
 			// Weapon type to use.
