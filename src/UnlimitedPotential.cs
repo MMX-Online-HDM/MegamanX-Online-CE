@@ -366,11 +366,11 @@ public class XUPGrab : Weapon {
 }
 
 public class XUPGrabState : CharState {
-	public Character victim;
+	public Character? victim;
 	float leechTime = 1;
 	public bool victimWasGrabbedSpriteOnce;
 	float timeWaiting;
-	public XUPGrabState(Character victim) : base("unpo_grab", "", "", "") {
+	public XUPGrabState(Character? victim) : base("unpo_grab", "", "", "") {
 		this.victim = victim;
 		grabTime = UPGrabbed.maxGrabTime;
 	}
@@ -450,9 +450,9 @@ public class XUPGrabState : CharState {
 
 public class UPGrabbed : CharState {
 	public const float maxGrabTime = 4;
-	public Character grabber;
+	public Character? grabber;
 	public long savedZIndex;
-	public UPGrabbed(Character grabber) : base("grabbed") {
+	public UPGrabbed(Character? grabber) : base("grabbed") {
 		this.grabber = grabber;
 	}
 

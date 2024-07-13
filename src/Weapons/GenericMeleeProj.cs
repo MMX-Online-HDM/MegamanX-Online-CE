@@ -4,7 +4,7 @@ public class GenericMeleeProj : Projectile {
 	public GenericMeleeProj(
 		Weapon weapon, Point pos, ProjIds projId, Player player,
 		float? damage = null, int? flinch = null, float? hitCooldown = null,
-		Actor owningActor = null, bool isShield = false, bool isDeflectShield = false, bool isReflectShield = false,
+		Actor? owningActor = null, bool isShield = false, bool isDeflectShield = false, bool isReflectShield = false,
 		bool addToLevel = true
 	) : base(
 		weapon, pos, 1, 0, 2, player, "empty", 0, 0.25f, null, player.ownedByLocalPlayer, addToLevel: addToLevel
@@ -31,7 +31,7 @@ public class GenericMeleeProj : Projectile {
 		base.update();
 	}
 
-	public void charGrabCode(CommandGrabScenario scenario, Character grabber, IDamagable damagable, CharState grabState, CharState grabbedState) {
+	public void charGrabCode(CommandGrabScenario scenario, Character? grabber, IDamagable? damagable, CharState grabState, CharState grabbedState) {
 		if (grabber != null && damagable is Character grabbedChar && grabbedChar.canBeGrabbed()) {
 			if (!owner.isDefenderFavored) {
 				if (ownedByLocalPlayer && !Helpers.isOfClass(grabber.charState, grabState.GetType())) {
@@ -84,54 +84,96 @@ public class GenericMeleeProj : Projectile {
 		}
 
 		// Command grab section
-		Character grabberChar = owner.character;
-		Character grabbedChar = damagable as Character;
-		if (projId == (int)ProjIds.UPGrab) {
-			charGrabCode(CommandGrabScenario.UPGrab, grabberChar, damagable, new XUPGrabState(grabbedChar), new UPGrabbed(grabberChar));
-		} else if (projId == (int)ProjIds.VileMK2Grab) {
-			charGrabCode(CommandGrabScenario.MK2Grab, grabberChar, damagable, new VileMK2GrabState(grabbedChar), new VileMK2Grabbed(grabberChar));
-		} else if (projId == (int)ProjIds.LaunchODrain && owningActor is LaunchOctopus lo) {
-			maverickGrabCode(CommandGrabScenario.WhirlpoolGrab, lo, damagable, new WhirlpoolGrabbed(lo));
-		} else if (projId == (int)ProjIds.FStagUppercut && owningActor is FlameStag fs) {
-			maverickGrabCode(CommandGrabScenario.FStagGrab, fs, damagable, new FStagGrabbed(fs));
-		} else if (projId == (int)ProjIds.WheelGGrab && owningActor is WheelGator wg) {
-			maverickGrabCode(CommandGrabScenario.WheelGGrab, wg, damagable, new WheelGGrabbed(wg));
-		} else if (projId == (int)ProjIds.MagnaCTail && owningActor is MagnaCentipede ms) {
-			maverickGrabCode(CommandGrabScenario.MagnaCGrab, ms, damagable, new MagnaCDrainGrabbed(ms));
-		} else if (projId == (int)ProjIds.BoomerangKDeadLift && owningActor is BoomerangKuwanger bk) {
-			maverickGrabCode(CommandGrabScenario.DeadLiftGrab, bk, damagable, new DeadLiftGrabbed(bk));
-		} else if (projId == (int)ProjIds.GBeetleLift && owningActor is GravityBeetle gb) {
-			maverickGrabCode(CommandGrabScenario.BeetleLiftGrab, gb, damagable, new BeetleGrabbedState(gb));
-		} else if (projId == (int)ProjIds.CrushCGrab && owningActor is CrushCrawfish cc) {
-			maverickGrabCode(CommandGrabScenario.CrushCGrab, cc, damagable, new CrushCGrabbed(cc));
-		} else if (projId == (int)ProjIds.BBuffaloDrag && owningActor is BlizzardBuffalo bb) {
-			maverickGrabCode(CommandGrabScenario.BBuffaloGrab, bb, damagable, new BBuffaloDragged(bb));
+		Character? grabberChar = owner.character;
+		Character? grabbedChar = damagable as Character;
+		switch (projId) {
+			case (int)ProjIds.UPGrab:
+				charGrabCode(CommandGrabScenario.UPGrab, grabberChar, damagable, new XUPGrabState(grabbedChar), new UPGrabbed(grabberChar));
+				break;
+			case (int)ProjIds.VileMK2Grab:
+				charGrabCode(CommandGrabScenario.MK2Grab, grabberChar, damagable, new VileMK2GrabState(grabbedChar), new VileMK2Grabbed(grabberChar));
+				break;
+			case (int)ProjIds.LaunchODrain when owningActor is LaunchOctopus lo:
+				maverickGrabCode(CommandGrabScenario.WhirlpoolGrab, lo, damagable, new WhirlpoolGrabbed(lo));
+				break;
+			case (int)ProjIds.FStagUppercut when owningActor is FlameStag fs:
+				maverickGrabCode(CommandGrabScenario.FStagGrab, fs, damagable, new FStagGrabbed(fs));
+				break;
+			case (int)ProjIds.WheelGGrab when owningActor is WheelGator wg:
+				maverickGrabCode(CommandGrabScenario.WheelGGrab, wg, damagable, new WheelGGrabbed(wg));
+				break;
+			case (int)ProjIds.MagnaCTail when owningActor is MagnaCentipede ms:
+				maverickGrabCode(CommandGrabScenario.MagnaCGrab, ms, damagable, new MagnaCDrainGrabbed(ms));
+				break;
+			case (int)ProjIds.BoomerangKDeadLift when owningActor is BoomerangKuwanger bk:
+				maverickGrabCode(CommandGrabScenario.DeadLiftGrab, bk, damagable, new DeadLiftGrabbed(bk));
+				break;
+			case (int)ProjIds.GBeetleLift when owningActor is GravityBeetle gb:
+				maverickGrabCode(CommandGrabScenario.BeetleLiftGrab, gb, damagable, new BeetleGrabbedState(gb));
+				break;
+			case (int)ProjIds.CrushCGrab when owningActor is CrushCrawfish cc:
+				maverickGrabCode(CommandGrabScenario.CrushCGrab, cc, damagable, new CrushCGrabbed(cc));
+				break;
+			case (int)ProjIds.BBuffaloDrag when owningActor is BlizzardBuffalo bb:
+				maverickGrabCode(CommandGrabScenario.BBuffaloGrab, bb, damagable, new BBuffaloDragged(bb));
+				break;
 		}
 	}
 
-	public override DamagerMessage onDamage(IDamagable damagable, Player attacker) {
-		if (isZSaber() || projId == (int)ProjIds.X6Saber || projId == (int)ProjIds.XSaber) {
-			Point hitPoint = (damagable as Actor).getCenterPos();
-			Collider hitbox = getGlobalCollider();
-			Collider collider = (damagable as Actor).collider;
-
+	public override DamagerMessage? onDamage(IDamagable? damagable, Player? attacker) {	
+			Point? hitPoint = (damagable as Actor)?.getCenterPos() ?? new Point(0,0);
+			Collider? hitbox = getGlobalCollider();
+			Collider? collider = (damagable as Actor)?.collider;
 			if (hitbox?.shape != null && collider?.shape != null) {
 				var hitboxCenter = hitbox.shape.getRect().center();
 				var hitCenter = collider.shape.getRect().center();
 				hitPoint = new Point((hitboxCenter.x + hitCenter.x) * 0.5f, (hitboxCenter.y + hitCenter.y) * 0.5f);
 			}
-
-			string swordSparkSprite = projId == (int)ProjIds.ZSaber2 ? "sword_sparks_horizontal" : "sword_sparks_angled";
-
-			new Anim(hitPoint, swordSparkSprite, 1, Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
-		}
-
+			string SaberShotFade = "zsaber_shot_fade";
+			string SaberSlashFade = "zsaber_slash_fade";
+			string SparkVerticalFade = "sword_sparks_vertical";
+			//string SparkElectricFade = "tunnelfang_sparks";
+			//string PunchSpark = "sword_sparks_horizontal";
+			if (isZSaber() || projId == (int)ProjIds.X6Saber || projId == (int)ProjIds.XSaber) {
+				new Anim(hitPoint.Value, SaberShotFade, xDir,
+				 Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
+			}
+			switch (projId) {
+				case (int)ProjIds.ZSaber1:
+				case (int)ProjIds.ZSaberRollingSlash:
+				case (int)ProjIds.ZSaberAir: 
+				
+					new Anim(hitPoint.Value, SaberSlashFade, xDir,
+					 Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
+					break;
+				case (int)ProjIds.ZSaber2: 
+					new Anim(hitPoint.Value, SaberSlashFade, xDir*-1,
+					 Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
+					break;
+				case (int)ProjIds.Rakukojin: 
+					new Anim(hitPoint.Value, SparkVerticalFade, xDir,
+					 Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
+					break;
+			/*	case (int)ProjIds.Raijingeki: We need better hit effect sprites
+				case (int)ProjIds.Raijingeki2: 
+					new Anim(hitPoint.Value, SparkElectricFade, xDir,
+					 Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
+					break;
+				case (int)ProjIds.PZeroPunch: 
+				case (int)ProjIds.PZeroPunch2: 
+					new Anim(hitPoint.Value, PunchSpark, xDir,
+					 Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
+					break; */
+			}
 		return null;
 	}
 
 	public bool isZSaber() {
-		return projId == (int)ProjIds.ZSaber1 || projId == (int)ProjIds.ZSaber3 || projId == (int)ProjIds.ZSaberAir || projId == (int)ProjIds.ZSaberCrouch || projId == (int)ProjIds.ZSaberDash
-			|| projId == (int)ProjIds.ZSaberLadder || projId == (int)ProjIds.ZSaberslide || projId == (int)ProjIds.ZSaberProjSwing;
+		return 
+		/* projId == (int)ProjIds.ZSaber1 || */ projId == (int)ProjIds.ZSaber3 || /* projId == (int)ProjIds.ZSaber2 || */
+		projId == (int)ProjIds.ZSaberCrouch || projId == (int)ProjIds.ZSaberDash ||	projId == (int)ProjIds.DZMelee ||
+		projId == (int)ProjIds.ZSaberLadder || projId == (int)ProjIds.ZSaberslide || projId == (int)ProjIds.Shippuuga || 
+		/*projId == (int)ProjIds.ZSaberAir || */ projId == (int)ProjIds.RisingFang /*|| projId == (int)ProjIds.ZSaberRollingSlash*/;
 	}
 
 	public override void onDestroy() {

@@ -599,7 +599,7 @@ public partial class Level {
 		return targets;
 	}
 
-	public Actor getClosestTarget(
+	public Actor? getClosestTarget(
 		Point pos, int alliance, bool checkWalls,
 		float? aMaxDist = null, bool isRequesterAI = false,
 		bool includeAllies = false, Actor callingActor = null

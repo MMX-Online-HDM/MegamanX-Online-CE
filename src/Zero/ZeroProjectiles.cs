@@ -194,6 +194,17 @@ public class GenmuProj : Projectile {
 		xScale = 0.75f;
 		yScale = 0.75f;
 		projId = (int)ProjIds.Gemnu;
+		if (player.character is Zero zero) {
+			if (zero.isBlack == true) {
+				genericShader = player.zeroPaletteShader;
+			}
+			if (zero.isAwakened == true) {
+				genericShader = player.zeroAzPaletteShader;
+			}
+			if (zero.isViral == true) {
+				genericShader = player.nightmareZeroShader;
+			}
+		}
 
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir, (byte)type);
