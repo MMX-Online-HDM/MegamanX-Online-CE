@@ -2915,7 +2915,7 @@ public class GameMode {
 		if (level.mainPlayer != null && playerWon(level.mainPlayer)) {
 			Global.changeMusic(Global.level.levelData.getWinTheme());
 		} else if (level.mainPlayer != null && !playerWon(level.mainPlayer)) {
-			Global.changeMusic("lose");
+			Global.changeMusic(Global.level.levelData.getLooseTheme());
 		}
 		if (Menu.inMenu) {
 			Menu.exit();
