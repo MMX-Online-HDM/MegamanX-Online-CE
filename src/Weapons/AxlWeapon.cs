@@ -107,11 +107,13 @@ public class AxlWeapon : Weapon {
 			axl.muzzleFlash.changeSprite(fs, true);
 			axl.muzzleFlash.sprite.restart();
 		}
-
-		if (axlBulletType == AxlBulletType.AltFire) {
-			axl.playSound(!isCharged ? "axlBullet" : shootSounds[3]);
-		} else {
-			axl.playSound(!isCharged ? shootSounds[0] : shootSounds[3]);
+		// Shoot sound.
+		string soundToPlay = !isCharged ? shootSounds[0] : shootSounds[3];
+		if (axlBulletType == AxlBulletType.AltFire && !isCharged) {
+			soundToPlay = "axlBullet";
+		}
+		if (soundToPlay != "") {
+			axl.playSound(soundToPlay);
 		}
 
 		float rateOfFireMode = (axl.isWhiteAxl() ? whiteAxlFireRateMod() : 1);
