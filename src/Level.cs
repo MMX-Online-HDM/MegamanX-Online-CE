@@ -76,7 +76,7 @@ public partial class Level {
 	public Texture[,] backgroundSprites;
 	public Texture[,] backwallSprites;
 	public Texture[,] foregroundSprites;
-	public const int gridSize = 32;
+	public const int gridSize = 48;
 	public bool started = false;
 	public bool joinedLate;
 	public int width;
@@ -335,7 +335,7 @@ public partial class Level {
 			parallaxSprites.Add(new List<ParallaxSprite>());
 		}
 
-		setupGrid(48);
+		setupGrid(gridSize);
 		foreach (var instance in levelData.levelJson.instances) {
 			// 0 = both, 1 = non mirrored only, 2 = mirrored only
 			if (instance.mirrorEnabled == 1 && levelData.isMirrored) {
