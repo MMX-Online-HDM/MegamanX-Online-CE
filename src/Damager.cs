@@ -397,7 +397,7 @@ public class Damager {
 			} else if (projId == (int)ProjIds.DrDopplerDash) {
 				character.addBurnTime(owner, new Weapon(WeaponIds.DrDopplerGeneric, 156), 1f);
 			} else if (projId == (int)ProjIds.Sigma3Fire) {
-				character.addBurnTime(owner, new Sigma3FireWeapon(), 0.5f);
+				character.addBurnTime(owner, new Sigma3FireWeapon(), 1f);
 			}
 			// Other effects
 			if (projId == (int)ProjIds.IceGattling) {

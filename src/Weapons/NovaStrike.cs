@@ -13,6 +13,8 @@ public class NovaStrike : Weapon {
 		weaponSlotIndex = 95;
 		killFeedIndex = 104;
 		ammo = 32;
+		drawGrayOnLowAmmo = true;
+		drawRoundedDown = true;
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {

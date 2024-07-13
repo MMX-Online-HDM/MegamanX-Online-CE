@@ -293,11 +293,11 @@ public class Sigma3Shoot : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		if (character.grounded) {
+		if (character.grounded && character.vel.y >= 0) {
 			sprite = "shot";
 			defaultSprite = sprite;
 			shootSprite = sprite;
-			character.changeSprite(sprite, true);
+			character.changeSpriteFromName(sprite, true);
 		}
 	}
 

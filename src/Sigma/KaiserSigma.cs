@@ -49,13 +49,13 @@ public partial class KaiserSigma : Character {
 			kaiserExhaustL.changePos(getFirstPOIOrDefault("exhaustL"));
 			kaiserExhaustR.changePos(getFirstPOIOrDefault("exhaustR"));
 			if (ksState.exhaustMoveDir != 0) {
-				kaiserExhaustL.changeSpriteIfDifferent("sigma3_kaiser_exhaust2", true);
-				kaiserExhaustR.changeSpriteIfDifferent("sigma3_kaiser_exhaust2", true);
+				kaiserExhaustL.changeSpriteIfDifferent("kaisersigma_exhaust2", true);
+				kaiserExhaustR.changeSpriteIfDifferent("kaisersigma_exhaust2", true);
 				kaiserExhaustL.xDir = -ksState.exhaustMoveDir;
 				kaiserExhaustR.xDir = -ksState.exhaustMoveDir;
 			} else {
-				kaiserExhaustL.changeSpriteIfDifferent("sigma3_kaiser_exhaust", true);
-				kaiserExhaustR.changeSpriteIfDifferent("sigma3_kaiser_exhaust", true);
+				kaiserExhaustL.changeSpriteIfDifferent("kaisersigma_exhaust", true);
+				kaiserExhaustR.changeSpriteIfDifferent("kaisersigma_exhaust", true);
 			}
 		} else {
 			kaiserExhaustL.visible = false;
@@ -69,7 +69,7 @@ public partial class KaiserSigma : Character {
 
 	public override Collider getGlobalCollider() {
 		if (player.isKaiserViralSigma()) {
-			if (sprite.name == "sigma3_kaiser_virus_return") {
+			if (sprite.name == "kaisersigma_virus_return") {
 				return null;
 			}
 			var rect2 = new Rect(0, 0, 20, 32);
@@ -175,7 +175,7 @@ public partial class KaiserSigma : Character {
 	}
 
 	public override Point getCenterPos() {
-		if (sprite.name.StartsWith("sigma3_kaiser_virus")) {
+		if (sprite.name.StartsWith("kaisersigma_virus")) {
 			return pos.addxy(0, -16);
 		} else {
 			return pos.addxy(0, -60);
@@ -190,16 +190,16 @@ public partial class KaiserSigma : Character {
 	}
 
 	public override string getSprite(string spriteName) {
-		return "sigma3_kaiser_" + spriteName;
+		return "kaisersigma_" + spriteName;
 	}
 
 	public override Projectile getProjFromHitbox(Collider collider, Point centerPoint) {
-		if (sprite.name.Contains("sigma3_kaiser_fall") && collider.isAttack()) {
+		if (sprite.name == "kaisersigma_fall" && collider.isAttack()) {
 			return new GenericMeleeProj(
 				new KaiserStompWeapon(player), centerPoint, ProjIds.Sigma3KaiserStomp, player,
 				damage: 12 * getKaiserStompDamage(), flinch: Global.defFlinch, hitCooldown: 1f
 			);
-		} else if (sprite.name.StartsWith("sigma3_kaiser_") && collider.name == "body") {
+		} else if (collider.name == "body") {
 			return new GenericMeleeProj(
 				new Weapon(), centerPoint, ProjIds.Sigma3KaiserSuit, player,
 				damage: 0, flinch: 0, hitCooldown: 1, isShield: true
@@ -215,5 +215,9 @@ public partial class KaiserSigma : Character {
 				proj.damager.damage = 12 * damagePercent;
 			}
 		}
+	}
+
+	public override bool canPickupFlag() {
+		return false;
 	}
 }

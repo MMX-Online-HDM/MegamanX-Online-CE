@@ -815,7 +815,7 @@ public partial class Actor : GameObject {
 				if (trigger.gameObject is GenericMeleeProj && trigger.otherCollider.flag == (int)HitboxFlag.None &&
 					(trigger.otherCollider.originalSprite == "sigma_block" || trigger.otherCollider.originalSprite == "zero_block")) {
 					return 0;
-				} else if (trigger.otherCollider.originalSprite?.StartsWith("sigma3_kaiser") == true && trigger.otherCollider.name == "head") {
+				} else if (trigger.otherCollider.originalSprite?.StartsWith("kaisersigma") == true && trigger.otherCollider.name == "head") {
 					return 0;
 				} else if (trigger.gameObject is GenericMeleeProj && trigger.otherCollider.flag == (int)HitboxFlag.None && trigger.otherCollider.originalSprite == "drdoppler_absorb") {
 					return 0;

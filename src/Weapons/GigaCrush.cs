@@ -9,6 +9,8 @@ public class GigaCrush : Weapon {
 		shootSounds = new string[] { "gigaCrushX2", "gigaCrushX2", "gigaCrushX2", "gigaCrushX2" };
 		rateOfFire = 1;
 		ammo = 0;
+		drawGrayOnLowAmmo = true;
+		drawRoundedDown = true;
 		index = (int)WeaponIds.GigaCrush;
 		weaponBarBaseIndex = 25;
 		weaponBarIndex = weaponBarBaseIndex;

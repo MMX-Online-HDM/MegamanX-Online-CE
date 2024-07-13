@@ -16,6 +16,8 @@ public class HyperBuster : Weapon {
 		rateOfFire = 2f;
 		switchCooldown = 0.25f;
 		ammo = 0;
+		drawGrayOnLowAmmo = true;
+		drawRoundedDown = true;
 	}
 
 	public override void update() {

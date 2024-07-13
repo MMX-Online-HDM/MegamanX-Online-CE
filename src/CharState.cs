@@ -1406,7 +1406,7 @@ public class Die : CharState {
 		}
 		if (character.ownedByLocalPlayer && character is KaiserSigma) {
 			string deathSprite = "";
-			if (sigma.lastHyperSigmaSprite.StartsWith("sigma3_kaiser_virus")) {
+			if (sigma.lastHyperSigmaSprite.StartsWith("kaisersigma_virus")) {
 				deathSprite = sigma.lastHyperSigmaSprite;
 				Point explodeCenterPos = character.pos.addxy(0, -16);
 				var ede = new ExplodeDieEffect(
@@ -1417,7 +1417,7 @@ public class Die : CharState {
 			} else {
 				deathSprite = sigma.lastHyperSigmaSprite + "_body";
 				if (!Global.sprites.ContainsKey(deathSprite)) {
-					deathSprite = "sigma3_kaiser_idle";
+					deathSprite = "kaisersigma_idle";
 				}
 				Point explodeCenterPos = character.pos.addxy(0, -55);
 				var ede = new ExplodeDieEffect(

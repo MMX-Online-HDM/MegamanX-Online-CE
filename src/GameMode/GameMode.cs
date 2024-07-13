@@ -1480,11 +1480,7 @@ public class GameMode {
 				}
 				if (i < floorOrCeiling) {
 					int spriteIndex = weapon.weaponBarIndex;
-					if ((weapon is RakuhouhaWeapon && weapon.ammo < 16) ||
-						(weapon is RekkohaWeapon && weapon.ammo < 32) ||
-						(weapon is CFlasher && weapon.ammo < 8) ||
-						(weapon is ShinMessenkou && weapon.ammo < 16) ||
-						(weapon is DarkHoldWeapon && weapon.ammo < 16) ||
+					if (weapon.drawGrayOnLowAmmo && weapon.ammo < weapon.getAmmoUsage(0) ||
 						(weapon is GigaCrush && !weapon.canShoot(0, player)) ||
 						(weapon is NovaStrike && !weapon.canShoot(0, player)) ||
 						(weapon is HyperBuster hb && !hb.canShootIncludeCooldown(level.mainPlayer))) {

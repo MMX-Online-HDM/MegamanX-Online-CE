@@ -414,8 +414,8 @@ public partial class Global {
 
 			{ "drdoppler_jump", "drdoppler_exit" },
 
-			{ "sigma3_kaiser_idle_body", "sigma3_kaiser_taunt_body" },
-			{ "sigma3_kaiser_empty", "sigma3_kaiser_empty_fadeout" }
+			{ "kaisersigma_idle_body", "kaisersigma_taunt_body" },
+			{ "kaisersigma_empty", "kaisersigma_empty_fadeout" }
 		};
 
 	private static MatchmakingQuerier _matchmakingQuerier;
