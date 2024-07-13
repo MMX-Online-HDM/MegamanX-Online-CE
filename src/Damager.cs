@@ -354,33 +354,51 @@ public class Damager {
 			#region effects
 
 			// Burn effects. If adding one here add it to canDamageFrostShield() method too
-			if (projId == (int)ProjIds.FireWave) character.addBurnTime(owner, new FireWave(), 0.5f);
-			else if (projId == (int)ProjIds.FireWaveCharged) character.addBurnTime(owner, new FireWave(), 2f);
-			else if (projId == (int)ProjIds.SpeedBurner) character.addBurnTime(owner, new SpeedBurner(null), 1);
-			else if (projId == (int)ProjIds.SpeedBurnerCharged) { if (character != owner?.character) character.addBurnTime(owner, new SpeedBurner(null), 1); } else if (projId == (int)ProjIds.Napalm2 || projId == (int)ProjIds.Napalm2Wall) character.addBurnTime(owner, new Napalm(NapalmType.FireGrenade), 1);
-			else if (projId == (int)ProjIds.Napalm2Flame) character.addBurnTime(owner, new Napalm(NapalmType.FireGrenade), 0.5f);
-			else if (projId == (int)ProjIds.Ryuenjin) {
+			if (projId == (int)ProjIds.FireWave) {
+				character.addBurnTime(owner, new FireWave(), 0.5f);
+			} else if (projId == (int)ProjIds.FireWaveCharged) {
+				character.addBurnTime(owner, new FireWave(), 2f);
+			} else if (projId == (int)ProjIds.SpeedBurner) {
+				character.addBurnTime(owner, new SpeedBurner(null), 1);
+			} else if (projId == (int)ProjIds.SpeedBurnerCharged) {
+				if (character != owner?.character) {
+					character.addBurnTime(owner, new SpeedBurner(null), 1);
+				}
+			} else if (projId == (int)ProjIds.Napalm2 || projId == (int)ProjIds.Napalm2Wall) {
+				character.addBurnTime(owner, new Napalm(NapalmType.FireGrenade), 1);
+			} else if (projId == (int)ProjIds.Napalm2Flame) {
+				character.addBurnTime(owner, new Napalm(NapalmType.FireGrenade), 0.5f);
+			} else if (projId == (int)ProjIds.Ryuenjin) {
 				character.addBurnTime(owner, RyuenjinWeapon.staticWeapon, 2);
-			}
-			else if (projId == (int)ProjIds.FlameBurner) character.addBurnTime(owner, new FlameBurner(0), 0.5f);
-			else if (projId == (int)ProjIds.FlameBurnerHyper) character.addBurnTime(owner, new FlameBurner(0), 1);
-			else if (projId == (int)ProjIds.CircleBlazeExplosion) character.addBurnTime(owner, new FlameBurner(0), 2);
-			else if (projId == (int)ProjIds.QuakeBlazer) {
+			} else if (projId == (int)ProjIds.FlameBurner) {
+				character.addBurnTime(owner, new FlameBurner(0), 0.5f);
+			} else if (projId == (int)ProjIds.FlameBurnerHyper) {
+				character.addBurnTime(owner, new FlameBurner(0), 1);
+			} else if (projId == (int)ProjIds.CircleBlazeExplosion) {
+				character.addBurnTime(owner, new FlameBurner(0), 2);
+			} else if (projId == (int)ProjIds.QuakeBlazer) {
 				character.addBurnTime(owner, DanchienWeapon.staticWeapon, 0.5f);
-			}
-			else if (projId == (int)ProjIds.QuakeBlazerFlame) {
+			} else if (projId == (int)ProjIds.QuakeBlazerFlame) {
 				character.addBurnTime(owner, DanchienWeapon.staticWeapon, 0.5f);
+			} else if (projId == (int)ProjIds.FlameMFireball) {
+				character.addBurnTime(owner, new FlameMFireballWeapon(), 1);
+			} else if (projId == (int)ProjIds.FlameMOilFire) {
+				character.addBurnTime(owner, new FlameMOilFireWeapon(), 8);
+			} else if (projId == (int)ProjIds.VelGFire) {
+				character.addBurnTime(owner, new VelGFireWeapon(), 0.5f);
+			} else if (projId == (int)ProjIds.SigmaWolfHeadFlameProj) {
+				character.addBurnTime(owner, new WolfSigmaHeadWeapon(), 3);
+			} else if (projId == (int)ProjIds.WildHorseKick) {
+				character.addBurnTime(owner, new VileFlamethrower(VileFlamethrowerType.WildHorseKick), 0.5f);
+			} else if (projId == (int)ProjIds.FStagFireball) {
+				character.addBurnTime(owner, FlameStag.getWeapon(), 1f);
+			} else if (projId == (int)ProjIds.FStagDash) {
+				character.addBurnTime(owner, FlameStag.getUppercutWeapon(null), 2f);
+			} else if (projId == (int)ProjIds.DrDopplerDash) {
+				character.addBurnTime(owner, new Weapon(WeaponIds.DrDopplerGeneric, 156), 1f);
+			} else if (projId == (int)ProjIds.Sigma3Fire) {
+				character.addBurnTime(owner, new Sigma3FireWeapon(), 0.5f);
 			}
-			else if (projId == (int)ProjIds.FlameMFireball) character.addBurnTime(owner, new FlameMFireballWeapon(), 1);
-			else if (projId == (int)ProjIds.FlameMOilFire) character.addBurnTime(owner, new FlameMOilFireWeapon(), 8);
-			else if (projId == (int)ProjIds.VelGFire) character.addBurnTime(owner, new VelGFireWeapon(), 0.5f);
-			else if (projId == (int)ProjIds.SigmaWolfHeadFlameProj) character.addBurnTime(owner, new WolfSigmaHeadWeapon(), 3);
-			else if (projId == (int)ProjIds.WildHorseKick) character.addBurnTime(owner, new VileFlamethrower(VileFlamethrowerType.WildHorseKick), 0.5f);
-			else if (projId == (int)ProjIds.FStagFireball) character.addBurnTime(owner, FlameStag.getWeapon(), 1f);
-			else if (projId == (int)ProjIds.FStagDash) character.addBurnTime(owner, FlameStag.getUppercutWeapon(null), 2f);
-			else if (projId == (int)ProjIds.DrDopplerDash) character.addBurnTime(owner, new Weapon(WeaponIds.DrDopplerGeneric, 156), 1f);
-			else if (projId == (int)ProjIds.Sigma3Fire) character.addBurnTime(owner, new Sigma3FireWeapon(), 0.5f);
-
 			// Other effects
 			if (projId == (int)ProjIds.IceGattling) {
 				character.addIgFreezeProgress(1);
