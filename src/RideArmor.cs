@@ -607,22 +607,31 @@ public class RideArmor : Actor, IDamagable {
 		}
 	}
 
-	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
+	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (hitbox == null || player == null || sprite?.name == null) {
 			return null;
 		}
-
-		Projectile proj = null;
+		// whats the center point value?
+		Projectile? proj = null;
 
 		if (sprite.name.Contains("attack")) {
-			if (raNum == 0) {
-				proj = new GenericMeleeProj(new MechPunchWeapon(player), centerPoint, ProjIds.MechPunch, player);
-			} else if (raNum == 1) {
-				proj = new GenericMeleeProj(new MechKangarooPunchWeapon(player), centerPoint, ProjIds.MechKangarooPunch, player);
-			} else if (raNum == 4) {
-				proj = new GenericMeleeProj(new MechGoliathPunchWeapon(player), centerPoint, ProjIds.MechGoliathPunch, player);
-			} else if (raNum == 5) {
-				proj = new GenericMeleeProj(new MechDevilBearPunchWeapon(player), centerPoint, ProjIds.MechDevilBearPunch, player);
+			switch (raNum) {
+				case 0:
+					proj = new GenericMeleeProj(new MechPunchWeapon(player),
+					 centerPoint, ProjIds.MechPunch, player);
+					break;
+				case 1:
+					proj = new GenericMeleeProj(new MechKangarooPunchWeapon(player),
+					 centerPoint, ProjIds.MechKangarooPunch, player);
+					break;
+				case 4:
+					proj = new GenericMeleeProj(new MechGoliathPunchWeapon(player),
+					 centerPoint, ProjIds.MechGoliathPunch, player);
+					break;
+				case 5:
+					proj = new GenericMeleeProj(new MechDevilBearPunchWeapon(player),
+					 centerPoint, ProjIds.MechDevilBearPunch, player);
+					break;
 			}
 		}
 		else if (sprite.name.Contains("charge")) {
@@ -633,12 +642,32 @@ public class RideArmor : Actor, IDamagable {
 			float? overrideDamage = sprite.name.EndsWith("groundpound") ? 4 : null;
 			if (!canDamage) overrideDamage = 0;
 			ProjIds overrideProjId = sprite.name.EndsWith("groundpound") ? ProjIds.MechFrogGroundPound : ProjIds.MechStomp;
-			if (raNum == 0) proj = new GenericMeleeProj(new MechStompWeapon(player), centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null);
-			if (raNum == 1) proj = new GenericMeleeProj(new MechKangarooStompWeapon(player), centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null);
-			if (raNum == 2) proj = new GenericMeleeProj(new MechHawkStompWeapon(player), centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null);
-			if (raNum == 3) proj = new GenericMeleeProj(new MechFrogStompWeapon(player), centerPoint, overrideProjId, player, damage: overrideDamage);
-			if (raNum == 4) proj = new GenericMeleeProj(new MechGoliathStompWeapon(player), centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null);
-			if (raNum == 5) proj = new GenericMeleeProj(new MechDevilBearStompWeapon(player), centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null);
+			switch (raNum) {
+				case 0:
+					proj = new GenericMeleeProj(new MechStompWeapon(player),
+					 centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null);
+					break;
+				case 1:
+					proj = new GenericMeleeProj(new MechKangarooStompWeapon(player),
+					 centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null);
+					break;
+				case 2:
+					proj = new GenericMeleeProj(new MechHawkStompWeapon(player),
+					 centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null);
+					break;
+				case 3:
+					proj = new GenericMeleeProj(new MechFrogStompWeapon(player),
+					 centerPoint, overrideProjId, player, damage: overrideDamage);
+					break;
+				case 4:
+					proj = new GenericMeleeProj(new MechGoliathStompWeapon(player),
+					 centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null);
+					break;
+				case 5:
+					proj = new GenericMeleeProj(new MechDevilBearStompWeapon(player),
+					 centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null);
+					break;
+			}
 		}
 
 		return proj;

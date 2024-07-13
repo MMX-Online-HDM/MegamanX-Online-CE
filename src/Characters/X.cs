@@ -1033,55 +1033,56 @@ public partial class MegamanX : Character {
 	}
 
 	public bool checkMaverickWeakness(ProjIds projId) {
-		if (player.weapon is Torpedo) {
-			return projId == ProjIds.ArmoredARoll;
-		} else if (player.weapon is Sting) {
-			return projId == ProjIds.BoomerangKBoomerang;
-		} else if (player.weapon is RollingShield) {
-			return projId == ProjIds.SparkMSpark;
-		} else if (player.weapon is FireWave) {
-			return projId == ProjIds.StormETornado;
-		} else if (player.weapon is Tornado) {
-			return projId == ProjIds.StingCSting;
-		} else if (player.weapon is ElectricSpark) {
-			return projId == ProjIds.ChillPIcePenguin || projId == ProjIds.ChillPIceShot;
-		} else if (player.weapon is Boomerang) {
-			return projId == ProjIds.LaunchOMissle || projId == ProjIds.LaunchOTorpedo;
-		} else if (player.weapon is ShotgunIce) {
-			return projId == ProjIds.FlameMFireball || projId == ProjIds.FlameMOilFire;
-		} else if (player.weapon is CrystalHunter) {
-			return projId == ProjIds.MagnaCMagnetMine;
-		} else if (player.weapon is BubbleSplash) {
-			return projId == ProjIds.WheelGSpinWheel;
-		} else if (player.weapon is SilkShot) {
-			return projId == ProjIds.FStagFireball || projId == ProjIds.FStagDash ||
-				projId == ProjIds.FStagDashCharge || projId == ProjIds.FStagDashTrail;
-		} else if (player.weapon is SpinWheel) {
-			return projId == ProjIds.WSpongeChain || projId == ProjIds.WSpongeUpChain;
-		} else if (player.weapon is SonicSlicer) {
-			return projId == ProjIds.CSnailCrystalHunter;
-		} else if (player.weapon is StrikeChain) {
-			return projId == ProjIds.OverdriveOSonicSlicer || projId == ProjIds.OverdriveOSonicSlicerUp;
-		} else if (player.weapon is MagnetMine) {
-			return projId == ProjIds.MorphMCScrap || projId == ProjIds.MorphMBeam;
-		} else if (player.weapon is SpeedBurner) {
-			return projId == ProjIds.BCrabBubbleSplash;
-		} else if (player.weapon is AcidBurst) {
-			return projId == ProjIds.BBuffaloIceProj || projId == ProjIds.BBuffaloIceProjGround;
-		} else if (player.weapon is ParasiticBomb) {
-			return projId == ProjIds.GBeetleGravityWell || projId == ProjIds.GBeetleBall;
-		} else if (player.weapon is TriadThunder) {
-			return projId == ProjIds.TunnelRTornadoFang || projId == ProjIds.TunnelRTornadoFang2 || projId == ProjIds.TunnelRTornadoFangDiag;
-		} else if (player.weapon is SpinningBlade) {
-			return projId == ProjIds.VoltCBall || projId == ProjIds.VoltCTriadThunder || projId == ProjIds.VoltCUpBeam || projId == ProjIds.VoltCUpBeam2;
-		} else if (player.weapon is RaySplasher) {
-			return projId == ProjIds.CrushCArmProj;
-		} else if (player.weapon is GravityWell) {
-			return projId == ProjIds.NeonTRaySplasher;
-		} else if (player.weapon is FrostShield) {
-			return projId == ProjIds.BHornetBee || projId == ProjIds.BHornetHomingBee;
-		} else if (player.weapon is TunnelFang) {
-			return projId == ProjIds.TSeahorseAcid1 || projId == ProjIds.TSeahorseAcid2;
+		switch (player.weapon) {
+			case Torpedo:
+				return projId == ProjIds.ArmoredARoll;
+			case Sting:
+				return projId == ProjIds.BoomerangKBoomerang;
+			case RollingShield:
+				return projId == ProjIds.SparkMSpark;
+			case FireWave:
+				return projId == ProjIds.StormETornado;
+			case Tornado:
+				return projId == ProjIds.StingCSting;
+			case ElectricSpark:
+				return projId == ProjIds.ChillPIcePenguin || projId == ProjIds.ChillPIceShot;
+			case Boomerang:
+				return projId == ProjIds.LaunchOMissle || projId == ProjIds.LaunchOTorpedo;
+			case ShotgunIce:
+				return projId == ProjIds.FlameMFireball || projId == ProjIds.FlameMOilFire;
+			case CrystalHunter:
+				return projId == ProjIds.MagnaCMagnetMine;
+			case BubbleSplash:
+				return projId == ProjIds.WheelGSpinWheel;
+			case SilkShot:
+				return projId == ProjIds.FStagFireball || projId == ProjIds.FStagDash ||
+					   projId == ProjIds.FStagDashCharge || projId == ProjIds.FStagDashTrail;
+			case SpinWheel:
+				return projId == ProjIds.WSpongeChain || projId == ProjIds.WSpongeUpChain;
+			case SonicSlicer:
+				return projId == ProjIds.CSnailCrystalHunter;
+			case StrikeChain:
+				return projId == ProjIds.OverdriveOSonicSlicer || projId == ProjIds.OverdriveOSonicSlicerUp;
+			case MagnetMine:
+				return projId == ProjIds.MorphMCScrap || projId == ProjIds.MorphMBeam;
+			case SpeedBurner:
+				return projId == ProjIds.BCrabBubbleSplash;
+			case AcidBurst:
+				return projId == ProjIds.BBuffaloIceProj || projId == ProjIds.BBuffaloIceProjGround;
+			case ParasiticBomb:
+				return projId == ProjIds.GBeetleGravityWell || projId == ProjIds.GBeetleBall;
+			case TriadThunder:
+				return projId == ProjIds.TunnelRTornadoFang || projId == ProjIds.TunnelRTornadoFang2 || projId == ProjIds.TunnelRTornadoFangDiag;
+			case SpinningBlade:
+				return projId == ProjIds.VoltCBall || projId == ProjIds.VoltCTriadThunder || projId == ProjIds.VoltCUpBeam || projId == ProjIds.VoltCUpBeam2;
+			case RaySplasher:
+				return projId == ProjIds.CrushCArmProj;
+			case GravityWell:
+				return projId == ProjIds.NeonTRaySplasher;
+			case FrostShield:
+				return projId == ProjIds.BHornetBee || projId == ProjIds.BHornetHomingBee;
+			case TunnelFang:
+				return projId == ProjIds.TSeahorseAcid1 || projId == ProjIds.TSeahorseAcid2;
 		}
 
 		return false;
