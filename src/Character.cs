@@ -295,7 +295,7 @@ public partial class Character : Actor, IDamagable {
 			acidHurtCooldown = 0;
 		}
 		// Apply time if we do not go over 8.
-		if (acidTime + time >= 8) {
+		if (acidTime + time <= 8) {
 			acidTime += time;
 		}
 	}
@@ -349,7 +349,7 @@ public partial class Character : Actor, IDamagable {
 			burnHurtCooldown = 0;
 		}
 		// Apply time if we do not go over 8.
-		if (burnTime + time >= 8) {
+		if (burnTime + time <= 8) {
 			burnTime += time;
 		}
 		// Oil explosion.
