@@ -138,7 +138,7 @@ public class DodgeRoll : CharState {
 		base.onEnter(oldState);
 		axl = character as Axl;
 		character.isDashing = true;
-		character.burnTime -= 2;
+		character.burnTime -= 1;
 		if (character.burnTime < 0) {
 			character.burnTime = 0;
 		}

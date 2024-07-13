@@ -93,7 +93,6 @@ public class Zero : Character {
 	}
 
 	public override void update() {
-		base.update();
 		inputUpdate();
 		Helpers.decrementFrames(ref donutTimer);
 		Helpers.decrementFrames(ref swingCooldown);
@@ -102,6 +101,7 @@ public class Zero : Character {
 		airSpecial.update();
 		gigaAttack.update();
 		gigaAttack.charLinkedUpdate(this, true);
+		base.update();
 
 		if (isAwakened) {
 			updateAwakenedAura();
@@ -131,8 +131,6 @@ public class Zero : Character {
 		if (!ownedByLocalPlayer) {
 			return;
 		}
-
-		base.update();
 		// Hypermode timer.
 		if (hyperModeTimer > 0) {
 			hyperModeTimer -= Global.speedMul;
