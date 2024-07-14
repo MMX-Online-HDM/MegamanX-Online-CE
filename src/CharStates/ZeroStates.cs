@@ -102,7 +102,7 @@ public class HyperZeroStart : CharState {
 			character.invulnTime = 0.5f;
 		}
 		if (zero.isAwakened || zero.isBlack) {
-			zero.hyperModeTimer = 20 * 60;
+			zero.hyperModeTimer = Zero.maxBlackZeroTime + 30;
 		}
 		virusEffectParts?.destroySelf();
 		bool playedHitSound = false;

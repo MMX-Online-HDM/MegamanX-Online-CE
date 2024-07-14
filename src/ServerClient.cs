@@ -367,9 +367,13 @@ exitLoop:
 
 					break;
 				case NetIncomingMessageType.Data:
-
-					var rpcIndexByte = im.ReadByte();
-					var rpcTemplate = RPC.templates[rpcIndexByte];
+					byte rpcIndexByte = im.ReadByte();
+					RPC rpcTemplate;
+					if (rpcIndexByte >= RPC.templates.Length) {
+						rpcTemplate = RPC.unknown;
+					} else {
+						rpcTemplate = RPC.templates[rpcIndexByte];
+					}
 
 					if (rpcTemplate is RPCPeriodicServerPing) {
 						packetLossStopwatch.Restart();

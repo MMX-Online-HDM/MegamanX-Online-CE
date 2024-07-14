@@ -20,7 +20,7 @@ public class HyperAxlStart : CharState {
 
 		if (character.loopCount > 8) {
 			axl.whiteAxlTime = axl.maxHyperAxlTime;
-			RPC.setHyperZeroTime.sendRpc(character.player.id, axl.whiteAxlTime, 1);
+			RPC.setHyperAxlTime.sendRpc(character.player.id, axl.whiteAxlTime, 1);
 			axl.playSound("ching");
 			if (player.input.isHeld(Control.Jump, player)) {
 				axl.changeState(new Hover(), true);

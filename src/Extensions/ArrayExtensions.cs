@@ -15,4 +15,8 @@ public static class ArrayExtensions {
 	public static int FindIndex<T>(this T[] array, Predicate<T> match) {
 		return Array.FindIndex(array, match);
 	}
+
+	public static int IndexOf(this Array array, object? value) {
+		return Array.IndexOf(array, value);
+	}
 }
