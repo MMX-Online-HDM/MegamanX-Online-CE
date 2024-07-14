@@ -1702,8 +1702,27 @@ public partial class Level {
 
 		if (Global.showGridHitboxes) {
 			int gridItemCount = 0;
-			for (int i = 0; i < grid.Count; i++) {
-				for (int j = 0; j < grid[i].Count; j++) {
+			int offset = 0;
+			int startGridX = MathInt.Floor(camX / cellWidth);
+			int endGridX = MathInt.Ceiling((camX + Global.screenW) / cellWidth);
+			int startGridY = MathInt.Floor(camY / cellWidth);
+			int endGridY = MathInt.Ceiling((camY + Global.screenH) / cellWidth);
+			
+			bool drawPos = (cellWidth >= 32);
+			int firstRowSize = 10;
+			string separator = "-";
+			if (cellWidth < 48) {
+				separator = "\n";
+				firstRowSize = 20;
+			}
+		
+			startGridX = MathInt.Clamp(startGridX, 0, grid[0].Count);
+			endGridX = MathInt.Clamp(endGridX, 0, grid[0].Count);
+			startGridY = MathInt.Clamp(startGridY, 0, grid.Count);
+			endGridY = MathInt.Clamp(endGridY, 0, grid.Count);
+
+			for (int i = startGridY; i < endGridY; i++) {
+				for (int j = startGridX; j < endGridX; j++) {
 					if (grid[i][j].Count > 0) {
 						gridItemCount += grid[i][j].Count;
 						DrawWrappers.DrawRect(
@@ -1711,27 +1730,31 @@ public partial class Level {
 							i * cellWidth,
 							cellWidth + (j * cellWidth) - 1,
 							cellWidth + (i * cellWidth) - 1,
-							true, new Color(128, 128, 128, 64), 1,
+							true, new Color(200, 255, 200, 64), 1,
 							ZIndex.HUD - 15, true, new Color(128, 255, 128, 128)
 						);
-						Fonts.drawText(
-							FontType.Purple,
-							i.ToString() + "-" + j.ToString(),
-							(j * cellWidth),
-							(i * cellWidth),
-							isWorldPos: true,
-							depth: ZIndex.HUD - 10,
-							alpha: 192
-						);
+						if (cellWidth >= 32) {
+							Fonts.drawText(
+								FontType.Purple,
+								i.ToString() + separator + j.ToString(),
+								(j * cellWidth) + 1,
+								(i * cellWidth) + 1,
+								isWorldPos: true,
+								depth: ZIndex.HUD - 10,
+								alpha: 192
+							);
+							offset += firstRowSize;
+						}
 						Fonts.drawText(
 							FontType.DarkPurple,
 							grid[i][j].Count.ToString(),
 							(j * cellWidth),
-							10 + (i * cellWidth),
+							offset + (i * cellWidth) + 1,
 							isWorldPos: true,
 							depth: ZIndex.HUD - 10,
 							alpha: 192
 						);
+						offset = 0;
 					}
 				}
 			}
