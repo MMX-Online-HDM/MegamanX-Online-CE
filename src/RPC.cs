@@ -92,13 +92,14 @@ public class RPC {
 	// For mods and stuff.
 	// It allow to not override stuff when developing mods.
 	public static RPCCustom custom;
+	public static RPCUnknown unknown = new();
 	public static RpcChangeOwnership changeOwnership = new();
 	public static RpcReflect reflect = new();
 	public static RpcDeflect deflect = new();
 	public static RpcUpdateMaxTime updateMaxTime = new();
+	public static RpcReviveSigma reviveSigma = new();
 
-	public static List<RPC> templates = new List<RPC>()
-	{
+	public static RPC[] templates = new RPC[] {
 			(sendString = new RPCSendString()),
 			(startLevel = new RPCStartLevel()),
 			(spawnCharacter = new RPCSpawnCharacter()),
@@ -538,8 +539,7 @@ public enum RPCToggleType {
 	ReviveVileTo5,
 	ReviveX,
 	StartRev,
-	StopRev,
-	ReviveSigma
+	StopRev
 }
 
 public class RPCPlayerToggle : RPC {
@@ -617,10 +617,6 @@ public class RPCPlayerToggle : RPC {
 		} else if (toggleId == RPCToggleType.StopRev) {
 			if (player.character is Axl axl) {
 				axl.isNonOwnerRev = false;
-			}
-		} else if (toggleId == RPCToggleType.ReviveSigma) {
-			if (player.character is BaseSigma) {
-				player.reviveSigmaNonOwner(player.character.pos);
 			}
 		}
 	}

@@ -15,6 +15,9 @@ public class RPCCustom : RPC {
 	// Normally you want to use the first byte to determine the RPC type.
 	// The call another custom RPC from it.
 	public override void invoke(params byte[] arguments) {
+		if (Global.serverClient == null) {
+			return;
+		}
 		byte type = arguments[0];
 		byte[] finalArguments = arguments[1..];
 
@@ -32,6 +35,9 @@ public class RPCCustom : RPC {
 			case (byte)RpcCustomType.UpdateMaxTime:
 				RPC.updateMaxTime.invoke(finalArguments);
 				break;
+			case (byte)RpcCustomType.ReviveSigma:
+				RPC.updateMaxTime.invoke(finalArguments);
+				break;
 		}
 	}
 
@@ -47,12 +53,21 @@ public class RPCCustom : RPC {
 	}
 }
 
+// Does nothing by default.
+// Used when a unknow index is sent.
+public class RPCUnknown : RPC {
+	public RPCUnknown() {
+		netDeliveryMethod = NetDeliveryMethod.ReliableOrdered;
+	}
+}
+
 // For the RPCCustom "type" argument.
 public enum RpcCustomType {
 	ChangeOwnership,
 	Reflect,
 	Deflect,
-	UpdateMaxTime
+	UpdateMaxTime,
+	ReviveSigma
 }
 
 public class RpcChangeOwnership : RPC {
@@ -177,5 +192,34 @@ public class RpcUpdateMaxTime : RPC {
 			timeBytes[1]
 		};
 		RPC.custom.sendRpc((byte)RpcCustomType.UpdateMaxTime, sendValues);
+	}
+}
+
+public class RpcReviveSigma : RPC {
+	public RpcReviveSigma() {
+		netDeliveryMethod = NetDeliveryMethod.ReliableOrdered;
+	}
+
+	public override void invoke(byte[] arguments) {
+		ushort netId = BitConverter.ToUInt16(arguments[1..3]);
+		Player player = Global.level.getPlayerById(arguments[0]);
+		player.reviveSigmaNonOwner(arguments[3], new Point(arguments[4], arguments[5]), netId);
+	}
+
+	public void sendRpc( 
+		int form, Point spawnPoint, int playerId, ushort netId) {
+		if (Global.serverClient == null) {
+			return;
+		}
+		byte[] netIdBytes = BitConverter.GetBytes(netId);
+		byte[] sendValues = new byte[] {
+			(byte)playerId,
+			netIdBytes[0],
+			netIdBytes[1],
+			(byte)form,
+			(byte)MathInt.Round(spawnPoint.x),
+			(byte)MathInt.Round(spawnPoint.y),
+		};
+		RPC.custom.sendRpc((byte)RpcCustomType.ReviveSigma, sendValues);
 	}
 }

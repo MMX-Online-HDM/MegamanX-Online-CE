@@ -875,8 +875,12 @@ public partial class Player {
 				}
 			}
 
-			if (canReviveSigma(out var spawnPoint) && (input.isPressed(Control.Special1, this) || Global.level.isHyper1v1() || Global.shouldAiAutoRevive)) {
-				reviveSigma(spawnPoint);
+			if (canReviveSigma(out var spawnPoint) &&
+				(input.isPressed(Control.Special1, this) ||
+				Global.level.isHyper1v1() ||
+				Global.shouldAiAutoRevive)
+			) {
+				reviveSigma(2, spawnPoint);
 			}
 		} else if (isX) {
 			if (canReviveX() && (input.isPressed(Control.Special2, this) || Global.shouldAiAutoRevive)) {
@@ -1935,31 +1939,30 @@ public partial class Player {
 		character.changeState(new VileRevive(toMK5), true);
 	}
 
-	public void reviveSigma(Point spawnPoint) {
+	public void reviveSigma(int form, Point spawnPoint) {
 		currency -= reviveSigmaCost;
 		hyperSigmaRespawn = true;
 		respawnTime = 0;
 		character = limboChar;
 		limboChar = null;
-		if (character?.destroyed == false) {
+		if (character.destroyed == false) {
 			character.destroySelf();
 		}
 		clearSigmaWeapons();
 		maxHealth = MathF.Ceiling(32 * getHealthModifier());
-		/*
-		if (isSigma1()) {
+		ushort newNetId = getNextATransNetId();
+		if (form == 0) {
 			if (Global.level.is1v1()) {
 				character.changePos(new Point(Global.level.width / 2, character.pos.y));
 			}
 			character.changeState(new WolfSigmaRevive(explodeDieEffect), true);
-		} else if (isSigma2()) {
+		} else if (form == 1) {
 			explodeDieEffect.changeSprite("sigma2_revive");
 			character.changeState(new ViralSigmaRevive(explodeDieEffect), true);
-		} else if (character is Doppma) {
-		*/
+		} else {
 			KaiserSigma kaiserSigma = new KaiserSigma(
 				this, spawnPoint.x, spawnPoint.y, character.xDir, true,
-				character.netId, character.ownedByLocalPlayer
+				newNetId, character.ownedByLocalPlayer
 			);
 			character = kaiserSigma;
 			character.changeSprite("kaisersigma_enter", true);
@@ -1971,11 +1974,11 @@ public partial class Player {
 				spawnPoint = closestSpawn?.pos ?? new Point(Global.level.width / 2, character.pos.y);
 			}
 			character.changeState(new KaiserSigmaRevive(explodeDieEffect, spawnPoint), true);
-		//}
-		RPC.playerToggle.sendRpc(id, RPCToggleType.ReviveSigma);
+		}
+		RPC.reviveSigma.sendRpc(form, spawnPoint, id, newNetId);
 	}
 
-	public void reviveSigmaNonOwner(Point spawnPoint) {
+	public void reviveSigmaNonOwner(int form, Point spawnPoint, ushort sigmaNetId) {
 		clearSigmaWeapons();
 		maxHealth = MathF.Ceiling(32 * getHealthModifier());
 		//if (character is Doppma) {
