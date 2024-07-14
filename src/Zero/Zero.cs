@@ -473,12 +473,11 @@ public class Zero : Character {
 
 	public bool airAttacks() {
 		int yDir = player.input.getYDir(player);
-		if (yDir == -1 && canAirDash() && airRisingUses == 0 &&
+		if (yDir == -1 && canAirDash() && airRisingUses == 0 && (
 			(uppercutA.type == (int)RisingType.RisingFang && shootPressed) ||
 			(uppercutS.type == (int)RisingType.RisingFang && specialPressed)
-		) {
+		)) {
 			changeState(new ZeroUppercut(RisingType.RisingFang, isUnderwater()), true);
-			airRisingUses++;
 			dashedInAir++;
 			return true;
 		}
