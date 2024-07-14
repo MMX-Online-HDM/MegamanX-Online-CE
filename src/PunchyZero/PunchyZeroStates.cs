@@ -535,7 +535,7 @@ public class HyperPunchyZeroStart : CharState {
 			character.invulnTime = 0.5f;
 		}
 		if (zero.isAwakened || zero.isBlack) {
-			zero.hyperModeTimer = 20 * 60;
+			zero.hyperModeTimer = PunchyZero.maxBlackZeroTime + 30;
 		}
 		virusEffectParts?.destroySelf();
 		bool playedHitSound = false;
@@ -573,7 +573,7 @@ public class HyperPunchyZeroStart : CharState {
 
 	public void activateHypermode() {
 		if (zero.hyperMode == 1) {
-			zero.isAwakened = true;
+			zero.awakenedPhase = 1;
 			float storedAmmo = zero.gigaAttack.ammo;
 			zero.gigaAttack = new ShinMessenkou();
 			zero.gigaAttack.ammo = storedAmmo;

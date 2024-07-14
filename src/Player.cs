@@ -1069,9 +1069,11 @@ public partial class Player {
 				}
 				if (character is Zero zero) {
 					if (loadout.zeroLoadout.hyperMode == 0) {
-						zero.blackZeroTime = Zero.maxBlackZeroTime;
-					} else {
+						zero.isBlack = true;
+					} else if (loadout.zeroLoadout.hyperMode == 1) {
 						zero.awakenedPhase = 1;
+					} else {
+						zero.isViral = true;
 					}
 				}
 				if (character is Axl axl) {
@@ -1497,11 +1499,14 @@ public partial class Player {
 			zero.gigaAttack.ammo = dnaCore.rakuhouhaAmmo;
 
 			if (dnaCore.hyperMode == DNACoreHyperMode.BlackZero) {
-				zero.blackZeroTime = Zero.maxBlackZeroTime;
+				zero.isBlack = true;
+				zero.hyperMode = 0;
 			} else if (dnaCore.hyperMode == DNACoreHyperMode.AwakenedZero) {
 				zero.awakenedPhase = 1;
+				zero.hyperMode = 1;
 			} else if (dnaCore.hyperMode == DNACoreHyperMode.NightmareZero) {
 				zero.isViral = true;
+				zero.hyperMode = 2;
 			}
 		} else if (charNum == (int)CharIds.Axl && character is Axl axl) {
 			if (dnaCore.hyperMode == DNACoreHyperMode.WhiteAxl) {
