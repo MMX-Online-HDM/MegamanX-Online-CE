@@ -1962,7 +1962,7 @@ public partial class Player {
 				character.netId, character.ownedByLocalPlayer
 			);
 			character = kaiserSigma;
-			character.changeSprite("sigma3_kaiser_enter", true);
+			character.changeSprite("kaisersigma_enter", true);
 			explodeDieEffect.changeSprite("sigma3_revive");
 			if (Global.level.is1v1() && spawnPoint.isZero()) {
 				var closestSpawn = Global.level.spawnPoints.OrderBy(
@@ -1986,7 +1986,7 @@ public partial class Player {
 			);
 			character = kaiserSigma;
 		//}
-		character.changeSprite("sigma3_kaiser_enter", true);
+		character.changeSprite("kaisersigma_enter", true);
 	}
 
 	public void reviveX() {
@@ -2491,7 +2491,7 @@ public partial class Player {
 	}
 
 	public bool isKaiserViralSigma() {
-		return character != null && character.sprite.name.StartsWith("sigma3_kaiser_virus");
+		return character != null && character.sprite.name.StartsWith("kaisersigma_virus");
 	}
 
 	public bool isKaiserNonViralSigma() {

@@ -69,7 +69,7 @@ public class Anim : Actor {
 			}
 		}
 
-		if (spriteName == "sigma3_kaiser_empty" || spriteName == "sigma3_kaiser_exhaust") {
+		if (spriteName == "kaisersigma_empty" || spriteName == "kaisersigma_exhaust") {
 			this.zIndex = ZIndex.Background + 1000;
 		} else if (spriteName == "hover_exhaust") {
 			this.zIndex = ZIndex.Character - 100;
@@ -79,7 +79,7 @@ public class Anim : Actor {
 			alpha = 0.5f;
 		} else if (spriteName == "drdoppler_coat") {
 			fadeOut = true;
-		} else if (spriteName == "sigma3_kaiser_empty_fadeout") {
+		} else if (spriteName == "kaisersigma_empty_fadeout") {
 			setFadeOut(0.25f);
 		}
 
@@ -189,7 +189,7 @@ public class Anim : Actor {
 			yScale = 1 + 2 * Helpers.clamp01(time / sprite.getAnimLength());
 		}
 
-		if (sprite.name == "sigma3_kaiser_virus_return") {
+		if (sprite.name == "kaisersigma_virus_return") {
 			xScale -= Global.spf * 2.5f;
 			yScale = xScale;
 			if (xScale < 0) {

@@ -54,6 +54,7 @@ public class Weapon {
 	public bool drawCooldown = true;
 	public bool drawAmmo = true;
 	public bool drawRoundedDown = false;
+	public bool drawGrayOnLowAmmo = false;
 
 	public Weapon() {
 		ammo = 32;
@@ -380,7 +381,9 @@ public class Weapon {
 		if (newAmmo >= maxAmmo) {
 			actor.playSound(maxSound);
 		} else {
-			actor.playSound(normalSound);
+			if (oldAmmo < nextCharge && newAmmo >= nextCharge) {
+				actor.playSound(normalSound);
+			}
 		}
 	}
 }

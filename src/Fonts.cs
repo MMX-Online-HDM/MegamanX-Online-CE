@@ -23,7 +23,7 @@ public class Fonts {
 	public static void drawText(
 		FontType fontType, string textStr, float x, float y,
 		Alignment alignment = Alignment.Left, bool isWorldPos = false, bool selected = false,
-		FontType? selectedFont = null, long depth = 0, byte? alpha = null, bool isLoading = false
+		FontType? selectedFont = null, long depth = ZIndex.HUD, byte? alpha = null, bool isLoading = false
 	) {
 		// To prevent crashes.
 		if (string.IsNullOrEmpty(textStr)) { return; }
@@ -59,8 +59,6 @@ public class Fonts {
 		if (isWorldPos) {
 			x = (x - Global.level.camX) / Global.viewSize;
 			y = (y - Global.level.camY) / Global.viewSize;
-			isWorldPos = false;
-			deferred = true;
 		}
 		// Draw every character.
 		for (int line = 0; line < textLines.Length; line++) {

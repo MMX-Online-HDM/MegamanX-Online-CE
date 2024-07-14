@@ -76,7 +76,7 @@ public partial class Level {
 	public Texture[,] backgroundSprites;
 	public Texture[,] backwallSprites;
 	public Texture[,] foregroundSprites;
-	public const int gridSize = 50;
+	public const int gridSize = 48;
 	public bool started = false;
 	public bool joinedLate;
 	public int width;
@@ -1702,21 +1702,59 @@ public partial class Level {
 
 		if (Global.showGridHitboxes) {
 			int gridItemCount = 0;
-			for (int i = 0; i < grid.Count; i++) {
-				for (int j = 0; j < grid[i].Count; j++) {
+			int offset = 0;
+			int startGridX = MathInt.Floor(camX / cellWidth);
+			int endGridX = MathInt.Ceiling((camX + Global.screenW) / cellWidth);
+			int startGridY = MathInt.Floor(camY / cellWidth);
+			int endGridY = MathInt.Ceiling((camY + Global.screenH) / cellWidth);
+			
+			bool drawPos = (cellWidth >= 32);
+			int firstRowSize = 10;
+			string separator = "-";
+			if (cellWidth < 48) {
+				separator = "\n";
+				firstRowSize = 20;
+			}
+		
+			startGridX = MathInt.Clamp(startGridX, 0, grid[0].Count);
+			endGridX = MathInt.Clamp(endGridX, 0, grid[0].Count);
+			startGridY = MathInt.Clamp(startGridY, 0, grid.Count);
+			endGridY = MathInt.Clamp(endGridY, 0, grid.Count);
+
+			for (int i = startGridY; i < endGridY; i++) {
+				for (int j = startGridX; j < endGridX; j++) {
 					if (grid[i][j].Count > 0) {
 						gridItemCount += grid[i][j].Count;
-						DrawWrappers.DrawRect(j * gridSize, i * gridSize, gridSize + (j * gridSize), gridSize + (i * gridSize), true, new Color(0, 255, 0, 128), 1, ZIndex.HUD + 100, true, Color.Magenta);
-						Fonts.drawText(
-							FontType.DarkBlue, "i:" + i.ToString() + ",j:" + j.ToString(),
-							(j * gridSize) - Global.level.camX / Global.viewSize,
-							10 + (i * gridSize) - Global.level.camY / Global.viewSize
+						DrawWrappers.DrawRect(
+							j * cellWidth,
+							i * cellWidth,
+							cellWidth + (j * cellWidth) - 1,
+							cellWidth + (i * cellWidth) - 1,
+							true, new Color(200, 255, 200, 64), 1,
+							ZIndex.HUD - 15, true, new Color(128, 255, 128, 128)
 						);
+						if (cellWidth >= 32) {
+							Fonts.drawText(
+								FontType.Purple,
+								i.ToString() + separator + j.ToString(),
+								(j * cellWidth) + 1,
+								(i * cellWidth) + 1,
+								isWorldPos: true,
+								depth: ZIndex.HUD - 10,
+								alpha: 192
+							);
+							offset += firstRowSize;
+						}
 						Fonts.drawText(
-							FontType.DarkPurple, "count:" + grid[i][j].Count.ToString(),
-							(j * gridSize) - Global.level.camX / Global.viewSize,
-							(i * gridSize) - Global.level.camY / Global.viewSize
+							FontType.DarkPurple,
+							grid[i][j].Count.ToString(),
+							(j * cellWidth),
+							offset + (i * cellWidth) + 1,
+							isWorldPos: true,
+							depth: ZIndex.HUD - 10,
+							alpha: 192
 						);
+						offset = 0;
 					}
 				}
 			}

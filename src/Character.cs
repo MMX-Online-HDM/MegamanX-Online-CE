@@ -607,16 +607,13 @@ public partial class Character : Actor, IDamagable {
 		return true;
 	}
 
-	public bool canPickupFlag() {
+	public virtual bool canPickupFlag() {
 		if (player.isPossessed()) return false;
 		if (dropFlagCooldown > 0) return false;
 		if (isInvulnerable()) return false;
 		if (player.isDisguisedAxl) return false;
 		if (isCCImmuneHyperMode()) return false;
 		if (charState is Die || charState is VileRevive || charState is XReviveStart || charState is XRevive) return false;
-		if (charState is WolfSigmaRevive || charState is WolfSigmaHeadState || sprite.name.StartsWith("sigma_head")) return false;
-		if (charState is ViralSigmaRevive || charState is ViralSigmaIdle || sprite.name.StartsWith("sigma2_viral")) return false;
-		if (charState is KaiserSigmaRevive || Helpers.isOfClass(charState, typeof(KaiserSigmaBaseState)) || sprite.name.StartsWith("sigma3_kaiser")) return false;
 		if (player.currentMaverick != null && player.isTagTeam()) return false;
 		if (isWarpOut()) return false;
 		return true;
@@ -1770,7 +1767,7 @@ public partial class Character : Actor, IDamagable {
 			}
 
 			if (player.isKaiserSigma()) {
-				if (sprite.name.StartsWith("sigma3_kaiser_virus")) return pos.addxy(camOffsetX, -12);
+				if (sprite.name.StartsWith("kaisersigma_virus")) return pos.addxy(camOffsetX, -12);
 				return pos.round().addxy(camOffsetX, -55);
 			}
 
@@ -2803,17 +2800,32 @@ public partial class Character : Actor, IDamagable {
 			addDamageTextHelper(attacker, (float)damage, player.maxHealth, true);
 		}
 		if (player.health > 0 && (originalDamage > 0 || damage > 0) && ownedByLocalPlayer) {
-			decimal modifier = (decimal)player.maxHealth > 0 ? (16 / (decimal)player.maxHealth) : 1;
-			decimal gigaDamage = (decimal)damage;
+			decimal modifier = (32 / (decimal)player.maxHealth);
+			decimal gigaDamage = damage;
 			if (originalDamage > damage) {
 				gigaDamage = originalDamage;
 			}
-			float gigaAmmoToAdd = (float)(1 + (gigaDamage * 2 * modifier));
+			float gigaAmmoToAdd = (float)(gigaDamage * modifier);
+	
 			if (this is Zero zero) {
+				float currentAmmo = zero.gigaAttack.ammo;
 				zero.gigaAttack.addAmmo(gigaAmmoToAdd, player);
+				if (player.isMainPlayer) {
+					Weapon.gigaAttackSoundLogic(
+						this, currentAmmo, zero.gigaAttack.ammo,
+						zero.gigaAttack.getAmmoUsage(0), zero.gigaAttack.maxAmmo
+					);
+				}
 			}
 			if (this is PunchyZero punchyZero) {
+				float currentAmmo = punchyZero.gigaAttack.ammo;
 				punchyZero.gigaAttack.addAmmo(gigaAmmoToAdd, player);
+				if (player.isMainPlayer) {
+					Weapon.gigaAttackSoundLogic(
+						this, currentAmmo, punchyZero.gigaAttack.ammo,
+						punchyZero.gigaAttack.getAmmoUsage(0), punchyZero.gigaAttack.maxAmmo
+					);
+				}
 			}
 			if (this is MegamanX) {
 				var gigaCrush = player.weapons.FirstOrDefault(w => w is GigaCrush);
