@@ -259,13 +259,20 @@ public class AI {
 			target = null;
 		}
 		if (!Global.isSkippingFrames && Global.level.nonSkippedframeCount % 60 == targetUpdateFrame) {
-			if (target != null && !Global.level.gameObjects.Contains(target)) {
+			if (target != null && (
+					target.destroyed ||
+					character.pos.distanceTo(target.pos) > 400 ||
+					!Global.level.gameObjects.Contains(target)
+				)
+			) {
 				target = null;
 			}
-			target = Global.level.getClosestTarget(
-				character.pos, player.alliance, true, isRequesterAI: true,
-				aMaxDist: 400
-			);
+			if (target == null) {
+				target = Global.level.getClosestTarget(
+					character.pos, player.alliance, true, isRequesterAI: true,
+					aMaxDist: 400
+				);
+			}
 		}
 		if (character is KaiserSigma || character is BaseSigma sigma && sigma.isHyperSigma) {
 			int attack = Helpers.randomRange(0, 1);
