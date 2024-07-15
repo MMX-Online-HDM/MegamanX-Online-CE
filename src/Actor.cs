@@ -36,8 +36,9 @@ public partial class Actor : GameObject {
 	public int loopCount => sprite.loopCount;
 
 	public void setFrameIndexSafe(int newFrameIndex) {
-		if (sprite == null) return;
-		if (sprite.frames.InRange(newFrameIndex)) sprite.frameIndex = newFrameIndex;
+		if (sprite.frames.InRange(newFrameIndex)) {
+			sprite.frameIndex = newFrameIndex;
+		}
 	}
 
 	public bool useFrameProjs;

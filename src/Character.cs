@@ -1492,10 +1492,7 @@ public partial class Character : Actor, IDamagable {
 		}
 	}
 
-	public bool isHeadbuttSprite(string? sprite) {
-		if (sprite == null) {
-			return false;
-		}
+	public bool isHeadbuttSprite(string sprite) {
 		return sprite.EndsWith("jump") || sprite.EndsWith("up_dash") || sprite.EndsWith("wall_kick");
 	}
 
