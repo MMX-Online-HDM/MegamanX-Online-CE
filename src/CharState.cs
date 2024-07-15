@@ -1362,6 +1362,7 @@ public class Die : CharState {
 		character.stingChargeTime = 0;
 		if (character is MegamanX mmx) {
 			mmx.removeBarrier();
+			player.lastDeathWasXHyper = mmx.isHyperX;
 		}
 		if (character.ownedByLocalPlayer && character.player.isDisguisedAxl) {
 			character.player.revertToAxlDeath();
@@ -1370,7 +1371,6 @@ public class Die : CharState {
 		player.lastDeathWasVileMK2 = vile?.isVileMK2 == true;
 		player.lastDeathWasVileMK5 = vile?.isVileMK5 == true;
 		player.lastDeathWasSigmaHyper = character is WolfSigma or ViralSigma or KaiserSigma;
-		player.lastDeathWasXHyper = mmx?.isHyperX == true; ;
 		player.lastDeathPos = character.getCenterPos();
 		//why is this here
 		if (player.isAI) player.selectedRAIndex = Helpers.randomRange(0, 3);
