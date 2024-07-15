@@ -190,7 +190,11 @@ public partial class Character : Actor, IDamagable {
 
 		isDashing = false;
 		splashable = true;
+		// Intialize state as soon as posible.
+		charState = new NetLimbo();
+		charState.character = this;
 
+		// Starting state.
 		CharState initialCharState;
 
 		if (ownedByLocalPlayer) {
@@ -719,7 +723,7 @@ public partial class Character : Actor, IDamagable {
 		);
 	}
 
-	public override Collider getGlobalCollider() {
+	public override Collider? getGlobalCollider() {
 		var rect = new Rect(0, 0, 18, 34);
 		if (sprite.name.Contains("_ra_")) {
 			rect.y2 = 20;
@@ -1957,7 +1961,7 @@ public partial class Character : Actor, IDamagable {
 			return;
 		}
 		if (!forceChange &&
-			(charState?.GetType() == newState.GetType() || changedStateInFrame)
+			(charState.GetType() == newState.GetType() || changedStateInFrame)
 		) {
 			return;
 		}
@@ -1979,7 +1983,7 @@ public partial class Character : Actor, IDamagable {
 				return;
 			}
 		}
-		if (charState?.canExit(this, newState) == false) {
+		if (charState.canExit(this, newState) == false) {
 			return; 
 		}
 		if (!newState.canEnter(this)) {
@@ -1989,10 +1993,10 @@ public partial class Character : Actor, IDamagable {
 		if (shootAnimTime > 0 && newState.canShoot() == true) {
 			changeSprite(getSprite(newState.shootSprite), true);
 		} else {
-			string spriteName = sprite?.name ?? "";
+			string spriteName = sprite.name ?? "";
 			changeSprite(getSprite(newState.sprite), true);
 
-			if (sprite != null && spriteName == sprite.name && this is not MegamanX) {
+			if (spriteName == sprite.name && this is not MegamanX) {
 				sprite.frameIndex = 0;
 				sprite.frameTime = 0;
 				sprite.time = 0;
@@ -2001,8 +2005,8 @@ public partial class Character : Actor, IDamagable {
 				sprite.visible = true;
 			}
 		}
-		CharState? oldState = charState;
-		oldState?.onExit(newState);
+		CharState oldState = charState;
+		oldState.onExit(newState);
 
 		charState = newState;
 		newState.onEnter(oldState);
@@ -2037,21 +2041,7 @@ public partial class Character : Actor, IDamagable {
 		}
 		currentLabelY = -getLabelOffY();
 
-		if (player.isSigma && visible) {
-			string kaiserBodySprite = "";
-			if (sprite.name.EndsWith("kaiser_idle")) kaiserBodySprite = sprite.name + "_body";
-			if (sprite.name.EndsWith("kaiser_hover")) kaiserBodySprite = sprite.name + "_body";
-			if (sprite.name.EndsWith("kaiser_fall")) kaiserBodySprite = sprite.name + "_body";
-			if (sprite.name.EndsWith("kaiser_shoot")) kaiserBodySprite = sprite.name + "_body";
-			if (sprite.name.EndsWith("kaiser_shoot2")) kaiserBodySprite = sprite.name + "_body";
-			if (sprite.name.EndsWith("kaiser_taunt")) kaiserBodySprite = sprite.name + "_body";
-			if (kaiserBodySprite != "") {
-				Global.sprites[kaiserBodySprite].draw(
-					0, pos.x + x, pos.y + y, xDir, 1, null, 1, 1, 1, zIndex - 10
-				);
-			}
-		}
-
+		
 		if (rideArmor == null && rideChaser == null && rideArmorPlatform == null) {
 			base.render(x, y);
 		} else if (rideArmorPlatform != null) {

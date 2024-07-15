@@ -41,7 +41,7 @@ public class CmdSigma : BaseSigma {
 				if (charState is WallSlide && sprite != null) {
 					frameIndex = sprite.frames.Count - 1;
 				}
-			} else if (grounded && sprite?.name != "sigma_attack") {
+			} else if (grounded && sprite.name != "sigma_attack") {
 				changeSprite("sigma_attack", false);
 			}
 		}

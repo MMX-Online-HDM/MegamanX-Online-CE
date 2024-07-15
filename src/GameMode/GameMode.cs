@@ -2870,13 +2870,11 @@ public class GameMode {
 					FontType.BlueMenu, respawnStr,
 					Global.screenW / 2, -10 + Global.screenH / 2, Alignment.Center
 				);
-				string hyperType = "Wolf";
-				if (level.mainPlayer.isSigma2()) hyperType = "Viral";
-				if (level.mainPlayer.isSigma3()) hyperType = "Kaiser";
-				string reviveText = Helpers.controlText(
-					$"[D]: Revive as {hyperType} Sigma ({Player.reviveSigmaCost.ToString()} {Global.nameCoins}"
+				string hyperType = "Kaiser";
+				string reviveText = (
+					$"[CMD]: Revive as {hyperType} Sigma ({Player.reviveSigmaCost.ToString()} {Global.nameCoins})"
 				);
-				Fonts.drawText(
+				Fonts.drawTextEX(
 					FontType.Green, reviveText,
 					Global.screenW / 2, 10 + Global.screenH / 2, Alignment.Center
 				);

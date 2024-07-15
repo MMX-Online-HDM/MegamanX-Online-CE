@@ -132,8 +132,8 @@ public class Zero : Character {
 		// Hypermode timer.
 		if (hyperModeTimer > 0) {
 			hyperModeTimer -= Global.speedMul;
-			if (hyperModeTimer >= 120) {
-				hypermodeBlink = (byte)MathInt.Ceiling(hyperModeTimer - 120);
+			if (hyperModeTimer <= 180) {
+				hypermodeBlink = (byte)MathInt.Ceiling(hyperModeTimer - 180);
 			}
 			if (hyperModeTimer <= 0) {
 				hypermodeBlink = 0;
@@ -860,6 +860,14 @@ public class Zero : Character {
 		} else {
 			removeRenderEffect(RenderEffectType.Trail);
 		}
+		float auraAlpha = 1;
+		if (isAwakened && visible && hypermodeBlink > 0) {
+			float blinkRate = MathInt.Ceiling(hypermodeBlink / 2f);
+			bool blinkActive = Global.frameCount % (blinkRate * 2) >= blinkRate;
+			if (!blinkActive) {
+				auraAlpha = 0.5f;
+			}
+		}
 		if (isAwakened && visible) {
 			float xOff = 0;
 			int auraXDir = 1;
@@ -881,7 +889,7 @@ public class Zero : Character {
 				awakenedAuraFrame,
 				pos.x + x + (xOff * auraXDir),
 				pos.y + y + yOff, auraXDir,
-				1, null, 1, 1, 1,
+				1, null, auraAlpha, 1, 1,
 				zIndex - 1, shaders: shaders
 			);
 		}

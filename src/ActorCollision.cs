@@ -156,7 +156,7 @@ public partial class Actor {
 	}
 
 	// The default global collider. This can be thought of the one that is used most often, in the most sprites.
-	public virtual Collider getGlobalCollider() {
+	public virtual Collider? getGlobalCollider() {
 		return null;
 	}
 
