@@ -1688,10 +1688,8 @@ public partial class Character : Actor, IDamagable {
 
 	public Point getDashDustEffectPos(int xDir) {
 		float dashXPos = -24;
-		if (player.isVile) dashXPos = -30;
-		if (player.isSigma1AndSigma()) dashXPos = -35;
-		if (player.isSigma2AndSigma()) dashXPos = -35;
-		if (player.isSigma3AndSigma()) dashXPos = -35;
+		if (this is Vile) dashXPos = -30;
+		if (this is BaseSigma) dashXPos = -35;
 		return pos.addxy(dashXPos * xDir + (5 * xDir), -4);
 	}
 
