@@ -205,7 +205,7 @@ public class NeonTClawState : MaverickState {
 			return;
 		}
 
-		if (!isSecond && input.isHeld(Control.Shoot, player) && maverick.frameIndex > 2 && maverick.frameTime > 0.08f) {
+		if (!isSecond && input.isHeld(Control.Shoot, player) && maverick.frameIndex > 2 && maverick.frameTime >= 5) {
 			maverick.sprite.restart();
 			maverick.changeState(new NeonTClawState(false), true);
 			return;

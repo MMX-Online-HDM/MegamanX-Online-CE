@@ -541,7 +541,7 @@ public class X2ChargeShot : CharState {
 		if (newState is not AirDash && newState is not WallSlide) {
 			character.shootAnimTime = 0;
 		} else {
-			character.shootAnimTime = 0.334f - character.animTime;
+			character.shootAnimTime = 0.334f - character.animSeconds;
 		}
 		base.onExit(newState);
 	}

@@ -17,8 +17,11 @@ public class Sprite {
 	public string alignment;
 	public float alignOffX;
 	public float alignOffY;
-	public string spritesheetPath;  // Legacy system had the full path. New system only saves the file name in the json since the entire path isn't needed or used anywhere
-	public string wrapMode; //Can be "once", "loop" or "pingpong"
+	// Legacy system had the full path.
+	// New system only saves the file name in the json since the entire path isn't needed or used anywhere.
+	public string spritesheetPath;
+	//Can be "once", "loop" or "pingpong"
+	public string wrapMode;
 	public bool freeForPool = false;
 	public Texture bitmap;
 	public Texture xArmorBootsBitmap;
@@ -39,8 +42,18 @@ public class Sprite {
 	public float time;
 	public int frameIndex = 0;
 	public float frameSpeed = 1;
-	public float frameTime = 0;
-	public float animTime = 0;
+
+	public float frameSeconds {
+		get => frameTime * Global.secondsFrameDuration;
+		set => frameTime = value / Global.secondsFrameDuration;
+	}
+	public float animSeconds {
+		get => animTime * Global.secondsFrameDuration;
+		set => animTime = value / Global.secondsFrameDuration;
+	}
+	public float frameTime;
+	public float animTime;
+
 	public int loopCount = 0;
 	public bool visible = true;
 	public bool reversed;
@@ -128,13 +141,14 @@ public class Sprite {
 			float y1 = (float)Convert.ToDouble(frameJson["rect"]["topLeftPoint"]["y"]);
 			float x2 = (float)Convert.ToDouble(frameJson["rect"]["botRightPoint"]["x"]);
 			float y2 = (float)Convert.ToDouble(frameJson["rect"]["botRightPoint"]["y"]);
-			float duration = (float)Convert.ToDouble(frameJson["duration"]);
 			float offsetX = (float)Convert.ToDouble(frameJson["offset"]["x"]);
 			float offsetY = (float)Convert.ToDouble(frameJson["offset"]["y"]);
+			float durationSeconds = (float)Convert.ToDouble(frameJson["duration"]);
+			float durationFrames = MathF.Round(durationSeconds * 60);
 
 			Frame frame = new Frame(
 				new Rect(x1, y1, x2, y2),
-				duration,
+				durationFrames,
 				new Point(offsetX, offsetY)
 			);
 
@@ -184,8 +198,8 @@ public class Sprite {
 	}
 
 	public bool update() {
-		frameTime += Global.spf * frameSpeed;
-		animTime += Global.spf * frameSpeed;
+		frameTime += Global.speedMul * frameSpeed;
+		animTime += Global.speedMul * frameSpeed;
 		time += Global.spf;
 		var currentFrame = getCurrentFrame();
 		if (currentFrame != null && frameTime >= currentFrame.duration) {
@@ -447,7 +461,7 @@ public class Sprite {
 				}
 			}
 
-			if ((name == "boomerk_dash" || name == "boomerk_bald_dash") && (animTime > 0.01f || frameIndex > 0)) {
+			if (name is "boomerk_dash" or "boomerk_bald_dash" && (animTime > 0 || frameIndex > 0)) {
 				if (Global.isOnFrameCycle(4)) {
 					var trail = lastTwoBkTrailDraws.ElementAtOrDefault(5);
 					if (trail != null) {

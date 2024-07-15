@@ -227,7 +227,7 @@ public class Mechaniloid : Actor, IDamagable {
 		// Turning
 		else if (state == 1) {
 			if (frameIndex == 0) {
-				move(new Point(xDir * speed * (sprite.animTime / 0.16f), 0));
+				move(new Point(xDir * speed * (sprite.animSeconds / 0.16f), 0));
 			}
 			if (sprite.isAnimOver()) {
 				changeSprite(baseSprite, true);
