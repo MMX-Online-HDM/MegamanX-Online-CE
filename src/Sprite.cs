@@ -648,7 +648,7 @@ public class Sprite {
 	}
 
 	public Sprite clone() {
-		var clonedSprite = (Sprite)MemberwiseClone();
+		Sprite clonedSprite = (Sprite)MemberwiseClone();
 		clonedSprite.lastFiveTrailDraws = new List<Trail>();
 		clonedSprite.hitboxes = new List<Collider>();
 		foreach (Collider collider in hitboxes) {

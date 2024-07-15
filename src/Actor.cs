@@ -173,6 +173,7 @@ public partial class Actor : GameObject {
 		} else {
 			// Default to empty if no sprite was provided.
 			sprite = Global.sprites["empty"].clone();
+			sprite.name = "null";
 		}
 		// Initalize other stuff.
 		this.pos = pos;
@@ -392,11 +393,7 @@ public partial class Actor : GameObject {
 		this.zIndex = val;
 	}
 
-	public Frame currentFrame {
-		get {
-			return sprite.getCurrentFrame();
-		}
-	}
+	public Frame currentFrame => sprite.getCurrentFrame();
 
 	public float framePercent {
 		get {
@@ -422,7 +419,7 @@ public partial class Actor : GameObject {
 		if (!useFrameProjs) {
 			return;
 		}
-		if (sprite == null) {
+		if (sprite.name == "null") {
 			return;
 		}
 		// Frame-based hitbox projectile section
@@ -1125,8 +1122,8 @@ public partial class Actor : GameObject {
 	}
 
 	public virtual bool shouldRender(float x, float y) {
-		// Don't draw things without sprites.
-		if (sprite == null || currentFrame == null) {
+		// Don't draw things without sprites or with the "null" sprite.
+		if (sprite.name == "null" || currentFrame == null) {
 			return false;
 		}
 		// Don't draw actors out of the screen for optimization
