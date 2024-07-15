@@ -162,8 +162,10 @@ public partial class Actor : GameObject {
 		yDir = 1;
 		grounded = false;
 		zIndex = ++Global.level.autoIncActorZIndex;
+		// Intialize sprite as soon as posible.
 		if (spriteName is not null and not "") {
 			changeSprite(spriteName, true);
+			// Crash if spriteName was provided but does not exist.
 			if (sprite == null) {
 				string typeName = GetType().ToString().Replace("MMXOnline", "");
 				throw new Exception(
@@ -171,6 +173,9 @@ public partial class Actor : GameObject {
 					"with spritename variable \"" + spriteName + "\""
 				);
 			}
+		} else {
+			// Default to empty if no sprite was provided.
+			sprite = Global.sprites["empty"].clone();
 		}
 		lastNetUpdate = Global.time;
 

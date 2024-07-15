@@ -2,6 +2,15 @@ using System;
 
 namespace MMXOnline;
 
-public class ViralSigma {
+public class ViralSigma : Character {
+	public string lastHyperSigmaSprite = "";
 
+	public ViralSigma(
+		Player player, float x, float y, int xDir, bool isVisible,
+		ushort? netId, bool ownedByLocalPlayer, bool isWarpIn = false
+	) : base(
+		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, false, false
+	) { 
+		charId = CharIds.WolfSigma;
+	}
 }

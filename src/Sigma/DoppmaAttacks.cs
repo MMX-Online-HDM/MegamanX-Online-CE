@@ -163,7 +163,7 @@ public class SigmaThrowShieldState : CharState {
 
 		if (character.frameIndex >= 2 && !once) {
 			once = true;
-			proj.launch(player);
+			proj?.launch(player);
 		}
 	}
 
@@ -271,10 +271,10 @@ public class Sigma3Shoot : CharState {
 			player.sigmaFireWeapon.shootTime = 0.15f;
 			int upDownDir = MathF.Sign(player.input.getInputDir(player).y);
 			float ang = character.getShootXDir() == 1 ? 0 : 180;
-			if (shootSprite.EndsWith("jump_shoot_downdiag")) {
+			if (character.sprite.name.EndsWith("jump_shoot_downdiag")) {
 				ang = character.getShootXDir() == 1 ? 45 : 135;
 			}
-			if (shootSprite.EndsWith("jump_shoot_down")) {
+			if (character.sprite.name.EndsWith("jump_shoot_down")) {
 				ang = 90;
 			}
 			if (ang != 0 && ang != 180) {
@@ -294,7 +294,7 @@ public class Sigma3Shoot : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		if (character.grounded && character.vel.y >= 0) {
-			sprite = "shot";
+			sprite = "shoot";
 			defaultSprite = sprite;
 			shootSprite = sprite;
 			character.changeSpriteFromName(sprite, true);

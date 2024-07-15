@@ -6,8 +6,8 @@ namespace MMXOnline;
 public partial class KaiserSigma : Character {
 	public bool kaiserWinTauntOnce;
 	public float kaiserMissileShootTime;
-	public Anim kaiserExhaustL;
-	public Anim kaiserExhaustR;
+	public Anim kaiserExhaustL = null!;
+	public Anim kaiserExhaustR = null!;
 	public float kaiserHoverCooldown;
 	public float kaiserLeftMineShootTime;
 	public float kaiserRightMineShootTime;
@@ -17,42 +17,61 @@ public partial class KaiserSigma : Character {
 	public float kaiserHoverTime;
 	public float kaiserMaxHoverTime = 4;
 
-	public string lastHyperSigmaSprite;
+	public string lastHyperSigmaSprite = "";
 	public int lastHyperSigmaFrameIndex;
-	public int lastHyperSigmaXDir;
+	public int lastHyperSigmaXDir = 1;
+
+	public bool showExhaust;
+	public int exaustDir;
 
 	public KaiserSigma(
 		Player player, float x, float y, int xDir, bool isVisible,
 		ushort? netId, bool ownedByLocalPlayer, bool isWarpIn = false
 	) : base(
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, false, false
-	) {
+	) { 
 		charId = CharIds.KaiserSigma;
+		kaiserExhaustL = new Anim(
+			pos, "kaisersigma_exhaust", xDir,
+			null, false, sendRpc: true
+		) {
+			visible = false
+		};
+		kaiserExhaustR = new Anim(
+			pos, "kaisersigma_exhaust", xDir,
+			null, false, sendRpc: true
+		) {
+			visible = false
+		};
 	}
 
 	public override void update() {
 		base.update();
 
 		if (charState is not Die) {
-			lastHyperSigmaSprite = sprite?.name;
+			lastHyperSigmaSprite = sprite.name;
 			lastHyperSigmaFrameIndex = frameIndex;
 			lastHyperSigmaXDir = xDir;
 		}
 
-		if (!ownedByLocalPlayer) {
-			return;
+		if (ownedByLocalPlayer) {
+			var ksState = charState as KaiserSigmaBaseState;
+			showExhaust = (ksState?.showExhaust == true);
+			if (ksState != null) {
+				exaustDir = ksState.exhaustMoveDir;
+			};
 		}
 
-		if (charState is KaiserSigmaBaseState ksState && ksState.showExhaust) {
+		if (showExhaust) {
 			kaiserExhaustL.visible = true;
 			kaiserExhaustR.visible = true;
 			kaiserExhaustL.changePos(getFirstPOIOrDefault("exhaustL"));
 			kaiserExhaustR.changePos(getFirstPOIOrDefault("exhaustR"));
-			if (ksState.exhaustMoveDir != 0) {
+			if (exaustDir != 0) {
 				kaiserExhaustL.changeSpriteIfDifferent("kaisersigma_exhaust2", true);
 				kaiserExhaustR.changeSpriteIfDifferent("kaisersigma_exhaust2", true);
-				kaiserExhaustL.xDir = -ksState.exhaustMoveDir;
-				kaiserExhaustR.xDir = -ksState.exhaustMoveDir;
+				kaiserExhaustL.xDir = -exaustDir;
+				kaiserExhaustR.xDir = -exaustDir;
 			} else {
 				kaiserExhaustL.changeSpriteIfDifferent("kaisersigma_exhaust", true);
 				kaiserExhaustR.changeSpriteIfDifferent("kaisersigma_exhaust", true);
@@ -67,7 +86,7 @@ public partial class KaiserSigma : Character {
 		return false;
 	}
 
-	public override Collider getGlobalCollider() {
+	public override Collider? getGlobalCollider() {
 		if (player.isKaiserViralSigma()) {
 			if (sprite.name == "kaisersigma_virus_return") {
 				return null;
@@ -108,7 +127,7 @@ public partial class KaiserSigma : Character {
 
 		// DrawWrappers.DrawRect(rect.x1, rect.y1, rect.x2, rect.y2, true, new Color(255, 0, 0, 64), 1, ZIndex.HUD);
 
-		List<CollideData> hits = null;
+		List<CollideData>? hits = null;
 		hits = Global.level.checkCollisionsShape(rect.getShape(), null);
 		if (hits.Any(h => h.gameObject is Wall)) {
 			var hitPoints = new List<Point>();
@@ -152,7 +171,7 @@ public partial class KaiserSigma : Character {
 	}
 
 	public override void destroySelf(
-		string spriteName = null, string fadeSound = null,
+		string spriteName = "", string fadeSound = "",
 		bool rpc = false, bool doRpcEvenIfNotOwned = false,
 		bool favorDefenderProjDestroy = false
 	) {
@@ -164,8 +183,15 @@ public partial class KaiserSigma : Character {
 
 	public override void render(float x, float y) {
 		base.render(x, y);
+		string kaiserBodySprite = "";
+		kaiserBodySprite = sprite.name + "_body";
+		if (Global.sprites.ContainsKey(kaiserBodySprite)) {
+			Global.sprites[kaiserBodySprite].draw(
+				0, pos.x + x, pos.y + y, xDir, 1, null, 1, 1, 1, zIndex - 10
+			);
+		}
 
-		if (player.isMainPlayer && player.isKaiserNonViralSigma() && kaiserHoverTime > 0) {
+		if (player.isMainPlayer && kaiserHoverTime > 0) {
 			float healthPct = Helpers.clamp01((kaiserMaxHoverTime - kaiserHoverTime) / kaiserMaxHoverTime);
 			float sy = -70;
 			float sx = 0;
@@ -193,7 +219,7 @@ public partial class KaiserSigma : Character {
 		return "kaisersigma_" + spriteName;
 	}
 
-	public override Projectile getProjFromHitbox(Collider collider, Point centerPoint) {
+	public override Projectile? getProjFromHitbox(Collider collider, Point centerPoint) {
 		if (sprite.name == "kaisersigma_fall" && collider.isAttack()) {
 			return new GenericMeleeProj(
 				new KaiserStompWeapon(player), centerPoint, ProjIds.Sigma3KaiserStomp, player,
@@ -219,5 +245,33 @@ public partial class KaiserSigma : Character {
 
 	public override bool canPickupFlag() {
 		return false;
+	}
+
+	public override List<byte> getCustomActorNetData() {
+		List<byte> customData = base.getCustomActorNetData();
+		customData.Add(Helpers.boolArrayToByte([
+			showExhaust,
+			exaustDir != 0,
+			exaustDir == 1
+		]));
+
+		return customData;
+	}
+
+	public override void updateCustomActorNetData(byte[] data) {
+		// Update base arguments.
+		base.updateCustomActorNetData(data);
+		data = data[data[0]..];
+
+		// Per-player data.
+		bool[] flags = Helpers.byteToBoolArray(data[0]);
+
+		showExhaust = flags[0];
+
+		if (flags[1]) {
+			exaustDir = flags[2] ? 1 : -1;
+		} else {
+			exaustDir = 0;
+		}
 	}
 }

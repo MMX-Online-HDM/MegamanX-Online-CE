@@ -134,7 +134,7 @@ public class CharState {
 			character.stopMoving();
 		}
 		wasGrounded = character.grounded;
-		if (this is not Jump and not WallKick && oldState?.canStopJump == false) {
+		if (this is not Jump and not WallKick && oldState.canStopJump == false) {
 			canStopJump = false;
 		}
 	}
@@ -1349,22 +1349,18 @@ public class Taunt : CharState {
 
 public class Die : CharState {
 	bool sigmaHasMavericks;
-	BaseSigma sigma;
-	MegamanX mmx;
 
 	public Die() : base("die") {
 	}
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		sigma = character as BaseSigma;
-		mmx = character as MegamanX;
 		character.useGravity = false;
 		character.stopMoving();
 		character.stopCharge();
 		new Anim(character.pos.addxy(0, -12), "die_sparks", 1, null, true);
 		character.stingChargeTime = 0;
-		if (mmx != null) {
+		if (character is MegamanX mmx) {
 			mmx.removeBarrier();
 		}
 		if (character.ownedByLocalPlayer && character.player.isDisguisedAxl) {
@@ -1373,41 +1369,51 @@ public class Die : CharState {
 		}
 		player.lastDeathWasVileMK2 = vile?.isVileMK2 == true;
 		player.lastDeathWasVileMK5 = vile?.isVileMK5 == true;
-		player.lastDeathWasSigmaHyper = sigma?.isHyperSigma == true || character is KaiserSigma;
+		player.lastDeathWasSigmaHyper = character is WolfSigma or ViralSigma or KaiserSigma;
 		player.lastDeathWasXHyper = mmx?.isHyperX == true; ;
 		player.lastDeathPos = character.getCenterPos();
 		//why is this here
 		if (player.isAI) player.selectedRAIndex = Helpers.randomRange(0, 3);
 		sigmaHasMavericks = player.isSigma && player.mavericks.Count > 0;
 
-		if (sigma != null && character.ownedByLocalPlayer && sigma.isHyperSigma == true) {
+		if (character.ownedByLocalPlayer && character is WolfSigma wolfSigma) {
 			player.destroyCharacter();
 			Global.serverClient?.rpc(RPC.destroyCharacter, (byte)player.id);
-			if (player.isSigma1()) {
-				var anim = new Anim(character.pos, "sigma_wolf_head_drop", 1, player.getNextActorNetId(), false, sendRpc: true);
-				anim.useGravity = true;
-				anim.ttl = 3;
-				anim.blink = true;
-				anim.collider.wallOnly = true;
-				var ede = new ExplodeDieEffect(player, character.pos, character.pos, "empty", 1, character.zIndex, false, 20, 3, false);
-				ede.host = anim;
-				Global.level.addEffect(ede);
-			} else if (player.isSigma2()) {
-				var anim = new Anim(character.pos, sigma.lastHyperSigmaSprite, 1, player.getNextActorNetId(), false, sendRpc: true);
-				anim.ttl = 3;
-				anim.blink = true;
-				anim.frameIndex = sigma.lastHyperSigmaFrameIndex;
-				anim.frameSpeed = 0;
-				anim.angle = sigma.lastViralSigmaAngle;
-				var ede = new ExplodeDieEffect(player, character.pos, character.pos, "empty", 1, character.zIndex, false, 20, 3, false);
-				ede.host = anim;
-				Global.level.addEffect(ede);
-			}
+			var anim = new Anim(
+				character.pos, "sigma_wolf_head_drop", 1, player.getNextActorNetId(), false, sendRpc: true
+			);
+			anim.useGravity = true;
+			anim.ttl = 3;
+			anim.blink = true;
+			anim.collider.wallOnly = true;
+			var ede = new ExplodeDieEffect(
+				player, character.pos, character.pos, "empty", 1, character.zIndex, false, 20, 3, false
+			);
+			ede.host = anim;
+			Global.level.addEffect(ede);
 		}
-		if (character.ownedByLocalPlayer && character is KaiserSigma) {
+		else if (character.ownedByLocalPlayer && character is ViralSigma viralSigma) {
+			player.destroyCharacter();
+			Global.serverClient?.rpc(RPC.destroyCharacter, (byte)player.id);
+			var anim = new Anim(
+				character.pos, viralSigma.lastHyperSigmaSprite, 1, player.getNextActorNetId(), false, sendRpc: true
+			);
+			anim.ttl = 3;
+			anim.blink = true;
+			anim.frameIndex = viralSigma.lastHyperSigmaFrameIndex;
+			anim.frameSpeed = 0;
+			anim.angle = viralSigma.lastViralSigmaAngle;
+			var ede = new ExplodeDieEffect(
+				player, character.pos, character.pos, "empty", 1, character.zIndex, false, 20, 3, false
+			);
+			ede.host = anim;
+			Global.level.addEffect(ede);
+		} else if (character.ownedByLocalPlayer && character is KaiserSigma kaiserSigma) {
+			player.destroyCharacter();
+			Global.serverClient?.rpc(RPC.destroyCharacter, (byte)player.id);
 			string deathSprite = "";
-			if (sigma.lastHyperSigmaSprite.StartsWith("kaisersigma_virus")) {
-				deathSprite = sigma.lastHyperSigmaSprite;
+			if (kaiserSigma.lastHyperSigmaSprite.StartsWith("kaisersigma_virus")) {
+				deathSprite = kaiserSigma.lastHyperSigmaSprite;
 				Point explodeCenterPos = character.pos.addxy(0, -16);
 				var ede = new ExplodeDieEffect(
 					player, explodeCenterPos, explodeCenterPos,
@@ -1415,7 +1421,7 @@ public class Die : CharState {
 				);
 				Global.level.addEffect(ede);
 			} else {
-				deathSprite = sigma.lastHyperSigmaSprite + "_body";
+				deathSprite = kaiserSigma.lastHyperSigmaSprite + "_body";
 				if (!Global.sprites.ContainsKey(deathSprite)) {
 					deathSprite = "kaisersigma_idle";
 				}
@@ -1427,13 +1433,13 @@ public class Die : CharState {
 				Global.level.addEffect(ede);
 
 				var headAnim = new Anim(
-					character.pos, sigma.lastHyperSigmaSprite, 1,
+					character.pos, kaiserSigma.lastHyperSigmaSprite, 1,
 					player.getNextActorNetId(), false, sendRpc: true
 				);
 				headAnim.ttl = 3;
 				headAnim.blink = true;
-				headAnim.setFrameIndexSafe(sigma.lastHyperSigmaFrameIndex);
-				headAnim.xDir = sigma.lastHyperSigmaXDir;
+				headAnim.setFrameIndexSafe(kaiserSigma.lastHyperSigmaFrameIndex);
+				headAnim.xDir = kaiserSigma.lastHyperSigmaXDir;
 				headAnim.frameSpeed = 0;
 			}
 
@@ -1443,8 +1449,8 @@ public class Die : CharState {
 			);
 			anim.ttl = 3;
 			anim.blink = true;
-			anim.setFrameIndexSafe(sigma.lastHyperSigmaFrameIndex);
-			anim.xDir = sigma.lastHyperSigmaXDir;
+			anim.setFrameIndexSafe(kaiserSigma.lastHyperSigmaFrameIndex);
+			anim.xDir = kaiserSigma.lastHyperSigmaXDir;
 			anim.frameSpeed = 0;
 		}
 		/*if (character is Zero zero) {

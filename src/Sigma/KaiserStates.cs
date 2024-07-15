@@ -827,24 +827,5 @@ public class KaiserSigmaRevive : CharState {
 		character.alpha = 0;
 		player.sigmaAmmo = player.sigmaMaxAmmo;
 		KaiserSigma kaiserSigma = character as KaiserSigma;
-		if (!player.ownedByLocalPlayer) {
-			return;
-		}
-		if (kaiserSigma.kaiserExhaustL == null) {
-			kaiserSigma.kaiserExhaustL = new Anim(
-				character.pos, "kaisersigma_exhaust", character.xDir,
-				player.getNextActorNetId(), false, sendRpc: true
-			) {
-				visible = false
-			};
-		}
-		if (kaiserSigma.kaiserExhaustR == null) {
-			kaiserSigma.kaiserExhaustR = new Anim(
-				character.pos, "kaisersigma_exhaust", character.xDir,
-				player.getNextActorNetId(), false, sendRpc: true
-			) {
-				visible = false
-			};
-		}
 	}
 }

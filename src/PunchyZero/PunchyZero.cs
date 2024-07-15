@@ -105,7 +105,7 @@ public class PunchyZero : Character {
 		// Hypermode timer.
 		if (hyperModeTimer > 0) {
 			hyperModeTimer -= Global.speedMul;
-			if (hyperModeTimer >= 120) {
+			if (hyperModeTimer <= 120) {
 				hypermodeBlink = (byte)MathInt.Ceiling(hyperModeTimer - 120);
 			}
 			if (hyperModeTimer <= 0) {

@@ -876,7 +876,7 @@ public partial class Player {
 			}
 
 			if (canReviveSigma(out var spawnPoint) &&
-				(input.isPressed(Control.Special1, this) ||
+				(input.isPressed(Control.Special2, this) ||
 				Global.level.isHyper1v1() ||
 				Global.shouldAiAutoRevive)
 			) {
@@ -1852,7 +1852,7 @@ public partial class Player {
 		bool basicCheck = !Global.level.isElimination() && limboChar != null && lastDeathCanRevive && isSigma && newCharNum == 4 && currency >= reviveSigmaCost && !lastDeathWasSigmaHyper;
 		if (!basicCheck) return false;
 
-		if (isSigma1()) {
+		if (false) {
 			Point deathPos = limboChar.pos;
 
 			// Get ground snapping pos
@@ -1884,9 +1884,9 @@ public partial class Player {
 					return false;
 				}
 			}
-		} else if (isSigma2()) {
+		} else if (false) {
 			return true;
-		} else if (isSigma3()) {
+		} else if (true) {
 			return limboChar != null && KaiserSigma.canKaiserSpawn(limboChar, out spawnPoint);
 		}
 
@@ -1971,7 +1971,7 @@ public partial class Player {
 			);
 			character = kaiserSigma;
 			character.changeSprite("kaisersigma_enter", true);
-			explodeDieEffect.changeSprite("sigma3_revive");
+			//explodeDieEffect.changeSprite("sigma3_revive");
 			if (Global.level.is1v1() && spawnPoint.isZero()) {
 				var closestSpawn = Global.level.spawnPoints.OrderBy(
 					s => s.pos.distanceTo(character.pos)
@@ -1986,7 +1986,7 @@ public partial class Player {
 	public void reviveSigmaNonOwner(int form, Point spawnPoint, ushort sigmaNetId) {
 		clearSigmaWeapons();
 		maxHealth = MathF.Ceiling(32 * getHealthModifier());
-		//if (character is Doppma) {
+		//if (form >= 2) {
 			character.destroySelf();
 			KaiserSigma kaiserSigma = new KaiserSigma(
 				this, spawnPoint.x, spawnPoint.y, character.xDir, true,
