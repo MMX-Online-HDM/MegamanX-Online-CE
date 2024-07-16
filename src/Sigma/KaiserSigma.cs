@@ -152,20 +152,6 @@ public partial class KaiserSigma : Character {
 			return false;
 		}
 
-		/*
-		foreach (var player in Global.level.players) {
-			Character otherChar = player?.character;
-			if (otherChar != null &&
-				otherChar != character && otherChar.isHyperSigmaBS.getValue() == true &&
-				otherChar.player.isSigma1Or3() &&
-				character.pos.distanceTo(otherChar.pos) < Global.screenW
-			) {
-				spawnPos = Point.zero;
-				return false;
-			}
-		}
-		*/
-
 		spawnPos = groundPos;
 		return true;
 	}

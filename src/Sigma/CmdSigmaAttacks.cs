@@ -207,11 +207,6 @@ public class SigmaWallDashState : CharState {
 		useDashJumpSpeed = true;
 	}
 
-	public override bool canEnter(Character character) {
-		if (!base.canEnter(character)) return false;
-		return character?.player?.isSigma1() == true;
-	}
-
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		sigma = character as CmdSigma;

@@ -574,7 +574,7 @@ public class Vile : Character {
 		if (isVileMK5 && player.weapon is MechMenuWeapon && startRideArmor != null) {
 			return true;
 		}
-		if (sprite.name.EndsWith("_idle_shoot") && sprite.frameTime < 0.1f) {
+		if (sprite.name.EndsWith("_idle_shoot") && sprite.frameTime < 6) {
 			return true;
 		}
 		return base.isSoftLocked();
