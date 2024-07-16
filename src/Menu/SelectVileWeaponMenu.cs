@@ -11,17 +11,61 @@ public class SelectVileWeaponMenu : IMainMenu {
 	public bool inGame;
 	public string error = "";
 
-	public static List<Tuple<string, List<Weapon>>> vileWeaponCategories = new List<Tuple<string, List<Weapon>>>()
-	{
-			Tuple.Create("Cannon", new List<Weapon>() { new VileCannon(VileCannonType.None), new VileCannon(VileCannonType.FrontRunner), new VileCannon(VileCannonType.LongshotGizmo), new VileCannon(VileCannonType.FatBoy) }),
-			Tuple.Create("Vulcan", new List<Weapon>() { new Vulcan(VulcanType.None), new Vulcan(VulcanType.CherryBlast), new Vulcan(VulcanType.DistanceNeedler), new Vulcan(VulcanType.BuckshotDance) }),
-			Tuple.Create("Missile", new List<Weapon>() { new VileMissile(VileMissileType.None), new VileMissile(VileMissileType.ElectricShock), new VileMissile(VileMissileType.HumerusCrush), new VileMissile(VileMissileType.PopcornDemon) }),
-			Tuple.Create("R.Punch", new List<Weapon>() { new RocketPunch(RocketPunchType.None), new RocketPunch(RocketPunchType.GoGetterRight), new RocketPunch(RocketPunchType.SpoiledBrat), new RocketPunch(RocketPunchType.InfinityGig) }),
-			Tuple.Create("Napalm", new List<Weapon>() { new Napalm(NapalmType.NoneBall), new Napalm(NapalmType.RumblingBang), new Napalm(NapalmType.FireGrenade), new Napalm(NapalmType.SplashHit), new Napalm(NapalmType.NoneFlamethrower) }),
-			Tuple.Create("Ball", new List<Weapon>() { new VileBall(VileBallType.NoneNapalm), new VileBall(VileBallType.ExplosiveRound), new VileBall(VileBallType.SpreadShot), new VileBall(VileBallType.PeaceOutRoller), new VileBall(VileBallType.NoneFlamethrower) }),
-			Tuple.Create("Cutter", new List<Weapon>() { new VileCutter(VileCutterType.None), new VileCutter(VileCutterType.QuickHomesick), new VileCutter(VileCutterType.ParasiteSword), new VileCutter(VileCutterType.MaroonedTomahawk) }),
-			Tuple.Create("Flamethrower", new List<Weapon>() { new VileFlamethrower(VileFlamethrowerType.NoneNapalm), new VileFlamethrower(VileFlamethrowerType.WildHorseKick), new VileFlamethrower(VileFlamethrowerType.DragonsWrath), new VileFlamethrower(VileFlamethrowerType.SeaDragonRage), new VileFlamethrower(VileFlamethrowerType.NoneBall) }),
-			Tuple.Create("Laser", new List<Weapon>() { new VileLaser(VileLaserType.None), new VileLaser(VileLaserType.RisingSpecter), new VileLaser(VileLaserType.NecroBurst), new VileLaser(VileLaserType.StraightNightmare) }),
+	public static (string name, Weapon[] weapons)[] vileWeaponCategories = {
+			("Cannon", [
+				new VileCannon(VileCannonType.None),
+				new VileCannon(VileCannonType.FrontRunner),
+				new VileCannon(VileCannonType.LongshotGizmo),
+				new VileCannon(VileCannonType.FatBoy)
+			]),
+			("Vulcan", [
+				new Vulcan(VulcanType.None),
+				new Vulcan(VulcanType.CherryBlast),
+				new Vulcan(VulcanType.DistanceNeedler),
+				new Vulcan(VulcanType.BuckshotDance)
+			]),
+			("Missile", [
+				new VileMissile(VileMissileType.None),
+				new VileMissile(VileMissileType.ElectricShock),
+				new VileMissile(VileMissileType.HumerusCrush),
+				new VileMissile(VileMissileType.PopcornDemon)
+			]),
+			("R.Punch", [
+				new RocketPunch(RocketPunchType.None),
+				new RocketPunch(RocketPunchType.GoGetterRight),
+				new RocketPunch(RocketPunchType.SpoiledBrat),
+				new RocketPunch(RocketPunchType.InfinityGig)
+			]),
+			("Napalm", [
+				new Napalm(NapalmType.NoneBall),
+				new Napalm(NapalmType.RumblingBang),
+				new Napalm(NapalmType.FireGrenade),
+				new Napalm(NapalmType.SplashHit),
+				new Napalm(NapalmType.NoneFlamethrower)
+			]),
+			("Ball", [
+				new VileBall(VileBallType.NoneNapalm),
+				new VileBall(VileBallType.ExplosiveRound),
+				new VileBall(VileBallType.SpreadShot),
+				new VileBall(VileBallType.PeaceOutRoller),
+				new VileBall(VileBallType.NoneFlamethrower)
+			]),
+			("Cutter", [
+				new VileCutter(VileCutterType.None),
+				new VileCutter(VileCutterType.QuickHomesick),
+				new VileCutter(VileCutterType.ParasiteSword),
+				new VileCutter(VileCutterType.MaroonedTomahawk)
+			]),
+			("Flamethrower", [
+				WildHorseKick.netWeapon,
+				SeaDragonRage.netWeapon,
+				DragonsWrath.netWeapon
+			]),
+			("Laser", [
+				new VileLaser(VileLaserType.RisingSpecter),
+				new VileLaser(VileLaserType.NecroBurst),
+				new VileLaser(VileLaserType.StraightNightmare)
+			]),
 		};
 
 	public IMainMenu prevMenu;
@@ -32,15 +76,15 @@ public class SelectVileWeaponMenu : IMainMenu {
 
 		cursors = new List<WeaponCursor>();
 
-		cursors.Add(new WeaponCursor(vileWeaponCategories[0].Item2.FindIndex(w => w.type == Options.main.vileLoadout.cannon)));
-		cursors.Add(new WeaponCursor(vileWeaponCategories[1].Item2.FindIndex(w => w.type == Options.main.vileLoadout.vulcan)));
-		cursors.Add(new WeaponCursor(vileWeaponCategories[2].Item2.FindIndex(w => w.type == Options.main.vileLoadout.missile)));
-		cursors.Add(new WeaponCursor(vileWeaponCategories[3].Item2.FindIndex(w => w.type == Options.main.vileLoadout.rocketPunch)));
-		cursors.Add(new WeaponCursor(vileWeaponCategories[4].Item2.FindIndex(w => w.type == Options.main.vileLoadout.napalm)));
-		cursors.Add(new WeaponCursor(vileWeaponCategories[5].Item2.FindIndex(w => w.type == Options.main.vileLoadout.ball)));
-		cursors.Add(new WeaponCursor(vileWeaponCategories[6].Item2.FindIndex(w => w.type == Options.main.vileLoadout.cutter)));
-		cursors.Add(new WeaponCursor(vileWeaponCategories[7].Item2.FindIndex(w => w.type == Options.main.vileLoadout.flamethrower)));
-		cursors.Add(new WeaponCursor(vileWeaponCategories[8].Item2.FindIndex(w => w.type == Options.main.vileLoadout.laser)));
+		cursors.Add(new WeaponCursor(vileWeaponCategories[0].weapons.FindIndex(w => w.type == Options.main.vileLoadout.cannon)));
+		cursors.Add(new WeaponCursor(vileWeaponCategories[1].weapons.FindIndex(w => w.type == Options.main.vileLoadout.vulcan)));
+		cursors.Add(new WeaponCursor(vileWeaponCategories[2].weapons.FindIndex(w => w.type == Options.main.vileLoadout.missile)));
+		cursors.Add(new WeaponCursor(vileWeaponCategories[3].weapons.FindIndex(w => w.type == Options.main.vileLoadout.rocketPunch)));
+		cursors.Add(new WeaponCursor(vileWeaponCategories[4].weapons.FindIndex(w => w.type == Options.main.vileLoadout.napalm)));
+		cursors.Add(new WeaponCursor(vileWeaponCategories[5].weapons.FindIndex(w => w.type == Options.main.vileLoadout.ball)));
+		cursors.Add(new WeaponCursor(vileWeaponCategories[6].weapons.FindIndex(w => w.type == Options.main.vileLoadout.cutter)));
+		cursors.Add(new WeaponCursor(vileWeaponCategories[7].weapons.FindIndex(w => w.type == Options.main.vileLoadout.flamethrower)));
+		cursors.Add(new WeaponCursor(vileWeaponCategories[8].weapons.FindIndex(w => w.type == Options.main.vileLoadout.laser)));
 	}
 
 	public void update() {
@@ -51,7 +95,7 @@ public class SelectVileWeaponMenu : IMainMenu {
 			return;
 		}
 
-		int maxCatCount = vileWeaponCategories[selCursorIndex].Item2.Count;
+		int maxCatCount = vileWeaponCategories[selCursorIndex].weapons.Length;
 
 		int minIndex = 0;
 		if (selCursorIndex == 0 || selCursorIndex == 1 || selCursorIndex == 2 || selCursorIndex == 3 || selCursorIndex == 8) {
@@ -60,7 +104,7 @@ public class SelectVileWeaponMenu : IMainMenu {
 
 		Helpers.menuLeftRightInc(ref cursors[selCursorIndex].index, minIndex, maxCatCount - 1, wrap: true, playSound: true);
 
-		Helpers.menuUpDown(ref selCursorIndex, 0, vileWeaponCategories.Count - 1);
+		Helpers.menuUpDown(ref selCursorIndex, 0, vileWeaponCategories.Length - 1);
 
 		bool backPressed = Global.input.isPressedMenu(Control.MenuBack);
 		bool selectPressed = Global.input.isPressedMenu(Control.MenuConfirm) || (backPressed && !inGame);
@@ -70,21 +114,21 @@ public class SelectVileWeaponMenu : IMainMenu {
 				return;
 			}
 
-			if (vileWeaponCategories[0].Item2[cursors[0].index].type == -1 && vileWeaponCategories[1].Item2[cursors[1].index].type == -1) {
+			if (vileWeaponCategories[0].weapons[cursors[0].index].type == -1 && vileWeaponCategories[1].weapons[cursors[1].index].type == -1) {
 				error = "Must equip either a Vulcan or Cannon.";
 				return;
 			}
 
 			int[] oldArray = { Options.main.vileLoadout.cannon, Options.main.vileLoadout.vulcan, Options.main.vileLoadout.missile, Options.main.vileLoadout.rocketPunch, Options.main.vileLoadout.napalm, Options.main.vileLoadout.ball, Options.main.vileLoadout.cutter, Options.main.vileLoadout.flamethrower, Options.main.vileLoadout.laser };
-			Options.main.vileLoadout.cannon = vileWeaponCategories[0].Item2[cursors[0].index].type;
-			Options.main.vileLoadout.vulcan = vileWeaponCategories[1].Item2[cursors[1].index].type;
-			Options.main.vileLoadout.missile = vileWeaponCategories[2].Item2[cursors[2].index].type;
-			Options.main.vileLoadout.rocketPunch = vileWeaponCategories[3].Item2[cursors[3].index].type;
-			Options.main.vileLoadout.napalm = vileWeaponCategories[4].Item2[cursors[4].index].type;
-			Options.main.vileLoadout.ball = vileWeaponCategories[5].Item2[cursors[5].index].type;
-			Options.main.vileLoadout.cutter = vileWeaponCategories[6].Item2[cursors[6].index].type;
-			Options.main.vileLoadout.flamethrower = vileWeaponCategories[7].Item2[cursors[7].index].type;
-			Options.main.vileLoadout.laser = vileWeaponCategories[8].Item2[cursors[8].index].type;
+			Options.main.vileLoadout.cannon = vileWeaponCategories[0].weapons[cursors[0].index].type;
+			Options.main.vileLoadout.vulcan = vileWeaponCategories[1].weapons[cursors[1].index].type;
+			Options.main.vileLoadout.missile = vileWeaponCategories[2].weapons[cursors[2].index].type;
+			Options.main.vileLoadout.rocketPunch = vileWeaponCategories[3].weapons[cursors[3].index].type;
+			Options.main.vileLoadout.napalm = vileWeaponCategories[4].weapons[cursors[4].index].type;
+			Options.main.vileLoadout.ball = vileWeaponCategories[5].weapons[cursors[5].index].type;
+			Options.main.vileLoadout.cutter = vileWeaponCategories[6].weapons[cursors[6].index].type;
+			Options.main.vileLoadout.flamethrower = vileWeaponCategories[7].weapons[cursors[7].index].type;
+			Options.main.vileLoadout.laser = vileWeaponCategories[8].weapons[cursors[8].index].type;
 			int[] newArray = { Options.main.vileLoadout.cannon, Options.main.vileLoadout.vulcan, Options.main.vileLoadout.missile, Options.main.vileLoadout.rocketPunch, Options.main.vileLoadout.napalm, Options.main.vileLoadout.ball, Options.main.vileLoadout.cutter, Options.main.vileLoadout.flamethrower, Options.main.vileLoadout.laser };
 
 			if (!Enumerable.SequenceEqual(oldArray, newArray)) {
@@ -107,8 +151,8 @@ public class SelectVileWeaponMenu : IMainMenu {
 
 	public int getWeightSum() {
 		int total = Global.level?.mainPlayer?.getVileWeight(0) ?? 0;
-		for (int i = 0; i < vileWeaponCategories.Count; i++) {
-			total += vileWeaponCategories[i].Item2[cursors[i].index].vileWeight;
+		for (int i = 0; i < vileWeaponCategories.Length; i++) {
+			total += vileWeaponCategories[i].weapons[cursors[i].index].vileWeight;
 		}
 		return total;
 	}
@@ -141,13 +185,13 @@ public class SelectVileWeaponMenu : IMainMenu {
 		float wepTextX = 132;
 
 		Global.sprites["cursor"].drawToHUD(0, startX, startY + (selCursorIndex * wepH) - 2);
-		for (int i = 0; i < vileWeaponCategories.Count; i++) {
+		for (int i = 0; i < vileWeaponCategories.Length; i++) {
 			float yPos = startY - 6 + (i * wepH);
 			Fonts.drawText(
-				FontType.Blue, vileWeaponCategories[i].Item1 + ": ",
+				FontType.Blue, vileWeaponCategories[i].name + ": ",
 				startX + 10, yPos, selected: selCursorIndex == i
 			);
-			var weapon = vileWeaponCategories[i].Item2[cursors[i].index];
+			var weapon = vileWeaponCategories[i].weapons[cursors[i].index];
 			if (weapon.killFeedIndex != 0) {
 				Global.sprites["hud_killfeed_weapon"].drawToHUD(weapon.killFeedIndex, wepPosX, yPos + 3);
 				Fonts.drawText(FontType.Blue, weapon.displayName, wepTextX, yPos, selected: selCursorIndex == i);
@@ -162,7 +206,7 @@ public class SelectVileWeaponMenu : IMainMenu {
 			);
 		}
 
-		var wep = vileWeaponCategories[selCursorIndex].Item2[cursors[selCursorIndex].index];
+		var wep = vileWeaponCategories[selCursorIndex].weapons[cursors[selCursorIndex].index];
 
 		int wsy = 167;
 		DrawWrappers.DrawRect(25, wsy + 2, Global.screenW - 30, wsy + 28, true, new Color(0, 0, 0, 100), 0.5f, ZIndex.HUD, false, outlineColor: outlineColor);

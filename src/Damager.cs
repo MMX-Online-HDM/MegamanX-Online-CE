@@ -389,7 +389,7 @@ public class Damager {
 			} else if (projId == (int)ProjIds.SigmaWolfHeadFlameProj) {
 				character.addBurnTime(owner, new WolfSigmaHeadWeapon(), 3);
 			} else if (projId == (int)ProjIds.WildHorseKick) {
-				character.addBurnTime(owner, new VileFlamethrower(VileFlamethrowerType.WildHorseKick), 0.5f);
+				character.addBurnTime(owner, WildHorseKick.netWeapon, 0.5f);
 			} else if (projId == (int)ProjIds.FStagFireball) {
 				character.addBurnTime(owner, FlameStag.getWeapon(), 1f);
 			} else if (projId == (int)ProjIds.FStagDash) {

@@ -106,7 +106,7 @@ public partial class Player {
 	public Napalm vileNapalmWeapon;
 	public VileBall vileBallWeapon;
 	public VileCutter vileCutterWeapon;
-	public VileFlamethrower vileFlamethrowerWeapon;
+	public VileFlamethrower? vileFlamethrowerWeapon;
 	public VileLaser vileLaserWeapon;
 
 	public Maverick? currentMaverick {
@@ -546,7 +546,12 @@ label:
 		vileNapalmWeapon = new Napalm((NapalmType)loadout.vileLoadout.napalm);
 		vileBallWeapon = new VileBall((VileBallType)loadout.vileLoadout.ball);
 		vileCutterWeapon = new VileCutter((VileCutterType)loadout.vileLoadout.cutter);
-		vileFlamethrowerWeapon = new VileFlamethrower((VileFlamethrowerType)loadout.vileLoadout.flamethrower);
+		vileFlamethrowerWeapon = loadout.vileLoadout.flamethrower switch {
+			(int)VileFlamethrowerType.WildHorseKick => new WildHorseKick(),
+			(int)VileFlamethrowerType.SeaDragonRage => new SeaDragonRage(),
+			(int)VileFlamethrowerType.DragonsWrath => new DragonsWrath(),
+			_ => null,
+		};
 		vileLaserWeapon = new VileLaser((VileLaserType)loadout.vileLoadout.laser);
 
 		axlHyperMode = loadout.axlLoadout.hyperMode;
