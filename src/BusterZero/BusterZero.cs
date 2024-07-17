@@ -70,7 +70,7 @@ public class BusterZero : Character {
 
 	public override bool normalCtrl() {
 		// Handles Standard Hypermode Activations.
-		if (player.currency >= Player.zeroHyperCost &&
+		if (player.currency >= Player.zBusterZeroHyperCost &&
 			!isBlackZero &&
 			player.input.isHeld(Control.Special2, player) &&
 			charState is not HyperZeroStart and not WarpIn
@@ -79,7 +79,7 @@ public class BusterZero : Character {
 		} else {
 			hyperProgress = 0;
 		}
-		if (hyperProgress >= 1 && player.currency >= Player.zeroHyperCost) {
+		if (hyperProgress >= 1 && player.currency >= Player.zBusterZeroHyperCost) {
 			hyperProgress = 0;
 			changeState(new HyperBusterZeroStart(), true);
 			return true;

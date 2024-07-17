@@ -1559,7 +1559,7 @@ public class Axl : Character {
 		if (!player.isAxl) return;
 		if (Global.level.is1v1()) return;
 
-		if (player.weapons.Count < 8 || Global.level.isTraining()) {
+		if (player.weapons.Count((Weapon weapon) => weapon is DNACore) < 4) {
 			int loopCount = 1;
 			if (Global.debug && Global.debugDNACores && Global.level.isTraining()) loopCount = 4;
 			for (int i = 0; i < loopCount; i++) {
