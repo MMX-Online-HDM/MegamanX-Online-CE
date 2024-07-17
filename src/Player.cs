@@ -113,28 +113,13 @@ public partial class Player {
 		return overrideLoadoutWeight.Value;
 	}
 
-	public int getVileWeightActive() {
-		int weight =
-			vileCannonWeapon.vileWeight +
-			vileVulcanWeapon.vileWeight +
-			vileMissileWeapon.vileWeight +
-			vileRocketPunchWeapon.vileWeight +
-			vileNapalmWeapon.vileWeight +
-			vileBallWeapon.vileWeight +
-			vileCutterWeapon.vileWeight +
-			vileFlamethrowerWeapon.vileWeight +
-			vileLaserWeapon.vileWeight;
-
-		return weight;
-	}
-
 	public Point? lastDeathPos;
 	public bool lastDeathWasVileMK2;
 	public bool lastDeathWasVileMK5;
 	public bool lastDeathWasSigmaHyper;
 	public bool lastDeathWasXHyper;
 	public const int zeroHyperCost = 10;
-	public const int zBusterZeroHyperCost = 10;
+	public const int zBusterZeroHyperCost = 8;
 	public const int AxlHyperCost = 10;
 	public const int reviveVileCost = 5;
 	public const int reviveSigmaCost = 10;

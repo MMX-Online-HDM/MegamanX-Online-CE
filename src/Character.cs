@@ -1092,12 +1092,6 @@ public partial class Character : Actor, IDamagable {
 
 			return;
 		}
-
-		if (player.isVile && !player.isAI && !player.isDisguisedAxl && player.getVileWeightActive() > VileLoadout.maxWeight && charState is not WarpIn && charState is not Die) {
-			applyDamage(Damager.envKillDamage, player, this, null, null);
-			return;
-		}
-
 		updateParasite();
 
 		if (stingChargeTime > 0) {

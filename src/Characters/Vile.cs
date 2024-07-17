@@ -36,7 +36,15 @@ public class Vile : Character {
 	
 	public float calldownMechCooldown;
 
+	public VileCannon cannonWeapon;
 	public Vulcan vulcanWeapon;
+	public VileMissile missileWeapon;
+	public RocketPunch rocketPunchWeapon;
+	public Napalm napalmWeapon;
+	public VileBall grenadeWeapon;
+	public VileCutter cutterWeapon;
+	public VileFlamethrower flamethrowerWeapon;
+	public VileLaser laserWeapon;
 	public MechMenuWeapon rideMenuWeapon;
 
 	public Vile(
@@ -158,15 +166,14 @@ public class Vile : Character {
 			}
 		}
 
-		player.vileStunShotWeapon.update();
-		player.vileMissileWeapon.update();
-		player.vileRocketPunchWeapon.update();
-		player.vileNapalmWeapon.update();
-		player.vileBallWeapon.update();
-		player.vileCutterWeapon.update();
-		player.vileLaserWeapon.update();
-		player.vileFlamethrowerWeapon.update();
 		vulcanWeapon.update();
+		missileWeapon.update();
+		rocketPunchWeapon.update();
+		napalmWeapon.update();
+		grenadeWeapon.update();
+		cutterWeapon.update();
+		laserWeapon.update();
+		flamethrowerWeapon.update();
 
 		if (calldownMechCooldown > 0) {
 			calldownMechCooldown -= Global.spf;
@@ -177,15 +184,18 @@ public class Vile : Character {
 		Helpers.decrementTime(ref mechBusterCooldown);
 		Helpers.decrementTime(ref gizmoCooldown);
 
-		if (player.weapon is not AssassinBullet && (player.vileLaserWeapon.type > -1 || isVileMK5)) {
-			if (player.input.isHeld(Control.Special1, player) && charState is not Die && invulnTime == 0 && flag == null && player.vileAmmo >= player.vileLaserWeapon.getAmmoUsage(0)) {
+		if (player.weapon is not AssassinBullet && (laserWeapon.type > -1 || isVileMK5)) {
+			if (player.input.isHeld(Control.Special1, player) &&
+				charState is not Die && invulnTime == 0 && flag == null &&
+				player.vileAmmo >= laserWeapon.getAmmoUsage(0)
+			) {
 				increaseCharge();
 			} else {
 				if (isCharging() && getChargeLevel() >= 3) {
 					if (getChargeLevel() >= 4 && isVileMK5) {
 						changeState(new HexaInvoluteState(), true);
 					} else {
-						player.vileLaserWeapon.vileShoot(WeaponIds.VileLaser, this);
+						laserWeapon.vileShoot(WeaponIds.VileLaser, this);
 					}
 				}
 				stopCharge();
@@ -206,14 +216,8 @@ public class Vile : Character {
 				}
 
 				if (stunShotPressed && !player.input.isHeld(Control.Down, player) && invulnTime == 0) {
-					if (player.vileMissileWeapon.type == 1 || player.vileMissileWeapon.type == 2) {
-						if (tryUseVileAmmo(player.vileMissileWeapon.vileAmmo)) {
-							player.vileMissileWeapon.vileShoot(WeaponIds.ElectricShock, this);
-						}
-					} else if (player.vileStunShotWeapon.type == -1 || player.vileStunShotWeapon.type == 0) {
-						if (tryUseVileAmmo(player.vileMissileWeapon.vileAmmo)) {
-							player.vileStunShotWeapon.vileShoot(WeaponIds.ElectricShock, this);
-						}
+					if (tryUseVileAmmo(missileWeapon.vileAmmo)) {
+						missileWeapon.vileShoot(WeaponIds.ElectricShock, this);
 					}
 				}
 
@@ -334,42 +338,30 @@ public class Vile : Character {
 			player.weapon.vileShoot(WeaponIds.FrontRunner, this);
 		} else if (player.input.isPressed(Control.Special1, player)) {
 			if (charState is Crouch) {
-				if (player.vileNapalmWeapon.type == (int)NapalmType.NoneBall) {
-					player.vileBallWeapon.vileShoot(WeaponIds.Napalm, this);
-				} else if (player.vileNapalmWeapon.type == (int)NapalmType.NoneFlamethrower) {
-					player.vileFlamethrowerWeapon.vileShoot(WeaponIds.Napalm, this);
-				} else {
-					player.vileNapalmWeapon.vileShoot(WeaponIds.Napalm, this);
-				}
+				napalmWeapon.vileShoot(WeaponIds.Napalm, this);
 			} else if (charState is Jump || charState is Fall || charState is VileHover) {
 				if (!player.input.isHeld(Control.Down, player)) {
-					if (player.vileBallWeapon.type == (int)VileBallType.NoneNapalm) {
-						player.vileNapalmWeapon.vileShoot(WeaponIds.VileBomb, this);
-					} else if (player.vileBallWeapon.type == (int)VileBallType.NoneFlamethrower) {
-						player.vileFlamethrowerWeapon.vileShoot(WeaponIds.VileBomb, this);
-					} else {
-						player.vileBallWeapon.vileShoot(WeaponIds.VileBomb, this);
-					}
+					napalmWeapon.vileShoot(WeaponIds.VileBomb, this);
 				} else {
-					player.vileFlamethrowerWeapon.vileShoot(WeaponIds.VileFlamethrower, this);
+					flamethrowerWeapon.vileShoot(WeaponIds.VileFlamethrower, this);
 				}
 			} else if (charState is Idle || charState is Dash || charState is Run || charState is RocketPunchAttack) {
 				if ((player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) && !player.input.isHeld(Control.Up, player)) {
-					if (player.vileRocketPunchWeapon.type > -1) {
-						player.vileRocketPunchWeapon.vileShoot(WeaponIds.RocketPunch, this);
+					if (rocketPunchWeapon.type > -1) {
+						rocketPunchWeapon.vileShoot(WeaponIds.RocketPunch, this);
 					}
 				} else if (charState is not RocketPunchAttack) {
-					if (!player.input.isHeld(Control.Up, player) || player.vileCutterWeapon.type == -1) {
-						if (player.vileMissileWeapon.type > -1) {
-							player.vileMissileWeapon.vileShoot(WeaponIds.ElectricShock, this);
+					if (!player.input.isHeld(Control.Up, player) || cutterWeapon.type == -1) {
+						if (missileWeapon.type > -1) {
+							missileWeapon.vileShoot(WeaponIds.ElectricShock, this);
 						}
 					} else {
-						player.vileCutterWeapon.vileShoot(WeaponIds.VileCutter, this);
+						cutterWeapon.vileShoot(WeaponIds.VileCutter, this);
 					}
 				}
 			}
 		} else if (player.input.isHeld(Control.Shoot, player)) {
-			if (player.vileCutterWeapon.shootTime < player.vileCutterWeapon.rateOfFire * 0.75f) {
+			if (cutterWeapon.shootTime < cutterWeapon.rateOfFire * 0.75f) {
 				player.weapon.vileShoot(0, this);
 			}
 		} else if (player.input.isHeld(Control.WeaponRight, player)) {

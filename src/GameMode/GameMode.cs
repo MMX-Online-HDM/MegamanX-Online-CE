@@ -1734,20 +1734,20 @@ public class GameMode {
 			drawRideArmorIcons();
 		}
 
-		if (player.isVile && player.character != null &&
-			player.character.rideArmor != null &&
-			player.character.rideArmor == player.character.startRideArmor
-			&& player.character.rideArmor.raNum == 2
+		if (player.character is Vile vilePilot &&
+			vilePilot.rideArmor != null &&
+			vilePilot.rideArmor == vilePilot.startRideArmor
+			&& vilePilot.rideArmor.raNum == 2
 		) {
 			int x = 10, y = 155;
 			int napalmNum = player.loadout.vileLoadout.napalm;
 			if (napalmNum < 0) napalmNum = 0;
 			if (napalmNum > 2) napalmNum = 0;
 			Global.sprites["hud_hawk_bombs"].drawToHUD(
-				napalmNum, x, y, alpha: player.vileNapalmWeapon.shootTime == 0 ? 1 : 0.5f
+				napalmNum, x, y, alpha: vilePilot.napalmWeapon.shootTime == 0 ? 1 : 0.5f
 			);
 			Fonts.drawText(
-				FontType.Grey, "x" + player.character.rideArmor.hawkBombCount.ToString(), x + 10, y - 4
+				FontType.Grey, "x" + vilePilot.rideArmor.hawkBombCount.ToString(), x + 10, y - 4
 			);
 		}
 
