@@ -468,20 +468,20 @@ public partial class RPCCreateProj : RPC {
 				break;
 			case (int)ProjIds.WildHorseKick:
 				proj = new FlamethrowerProj(
-					new VileFlamethrower(VileFlamethrowerType.WildHorseKick),
-					pos, xDir, false, player, netProjByte
+					WildHorseKick.netWeapon,
+					pos, xDir, extraData[0] == 1, player, netProjByte
 				);
 				break;
 			case (int)ProjIds.SeaDragonRage:
 				proj = new FlamethrowerProj(
-					new VileFlamethrower(VileFlamethrowerType.SeaDragonRage),
-					pos, xDir, false, player, netProjByte
+					SeaDragonRage.netWeapon,
+					pos, xDir, extraData[0] == 1, player, netProjByte
 				);
 				break;
 			case (int)ProjIds.DragonsWrath:
 				proj = new FlamethrowerProj(
-					new VileFlamethrower(VileFlamethrowerType.DragonsWrath),
-					pos, xDir, false, player, netProjByte
+					DragonsWrath.netWeapon,
+					pos, xDir, extraData[0] == 1, player, netProjByte
 				);
 				break;
 			case (int)ProjIds.RisingSpecter:

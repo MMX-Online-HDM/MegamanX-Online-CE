@@ -348,13 +348,7 @@ public class Vile : Character {
 						player.vileBallWeapon.vileShoot(WeaponIds.VileBomb, this);
 					}
 				} else {
-					if (player.vileFlamethrowerWeapon.type == (int)VileFlamethrowerType.NoneNapalm) {
-						player.vileNapalmWeapon.vileShoot(WeaponIds.VileFlamethrower, this);
-					} else if (player.vileFlamethrowerWeapon.type == (int)VileFlamethrowerType.NoneBall) {
-						player.vileBallWeapon.vileShoot(WeaponIds.VileFlamethrower, this);
-					} else {
-						player.vileFlamethrowerWeapon.vileShoot(WeaponIds.VileFlamethrower, this);
-					}
+					player.vileFlamethrowerWeapon.vileShoot(WeaponIds.VileFlamethrower, this);
 				}
 			} else if (charState is Idle || charState is Dash || charState is Run || charState is RocketPunchAttack) {
 				if ((player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) && !player.input.isHeld(Control.Up, player)) {

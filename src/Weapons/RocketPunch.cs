@@ -115,7 +115,7 @@ public class RocketPunchProj : Projectile {
 
 	public override void update() {
 		base.update();
-		if (ownedByLocalPlayer && owner.character?.destroyed == false) {
+		if (ownedByLocalPlayer && !ownerExists) {
 			destroySelf("explosion", "explosion");
 			return;
 		}
