@@ -36,6 +36,9 @@ public class Vile : Character {
 	
 	public float calldownMechCooldown;
 
+	public Vulcan vulcanWeapon;
+	public MechMenuWeapon rideMenuWeapon;
+
 	public Vile(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
@@ -57,6 +60,8 @@ public class Vile : Character {
 				vileForm = 1;
 			}
 		}
+		vulcanWeapon = new Vulcan((VulcanType)player.loadout.vileLoadout.vulcan);
+		rideMenuWeapon = new MechMenuWeapon(VileMechMenuType.All);
 	}
 
 	public Sprite getCannonSprite(out Point poiPos, out int zIndexDir) {
@@ -161,6 +166,7 @@ public class Vile : Character {
 		player.vileCutterWeapon.update();
 		player.vileLaserWeapon.update();
 		player.vileFlamethrowerWeapon.update();
+		vulcanWeapon.update();
 
 		if (calldownMechCooldown > 0) {
 			calldownMechCooldown -= Global.spf;
@@ -227,16 +233,14 @@ public class Vile : Character {
 			return;
 		}
 
-		player.changeWeaponControls();
-		if (player.weapons.Count == 1 && player.weapon is MechMenuWeapon mmw2 && mmw2.isMenuOpened) {
-			if (player.input.isPressed(Control.WeaponLeft, player) || player.input.isPressed(Control.WeaponRight, player)) {
-				mmw2.isMenuOpened = false;
+		if (rideMenuWeapon.isMenuOpened) {
+			if (player.input.isPressed(Control.Special1, player) || player.input.isPressed(Control.WeaponLeft, player)) {
+				rideMenuWeapon.isMenuOpened = false;
 			}
 		}
 
 		bool wL = player.input.isHeld(Control.WeaponLeft, player);
-		bool wR = player.input.isHeld(Control.WeaponRight, player);
-		if (isVileMK5 && startRideArmor != null && Options.main.mk5PuppeteerHoldOrToggle && player.weapon is MechMenuWeapon && !wL && !wR) {
+		if (isVileMK5 && startRideArmor != null && Options.main.mk5PuppeteerHoldOrToggle && player.weapon is MechMenuWeapon && !wL) {
 			if (lastFrameWeaponRightHeld) {
 				player.weaponSlot--;
 				if (player.weaponSlot < 0) {
@@ -250,19 +254,18 @@ public class Vile : Character {
 			}
 		}
 		lastFrameWeaponLeftHeld = wL;
-		lastFrameWeaponRightHeld = wR;
-
-		var mmw = player.weapon as MechMenuWeapon;
 
 		// Vile V Ride control.
-
 		if (!isVileMK5 || startRideArmor == null) {
-			if (player.input.isPressed(Control.Shoot, player) && mmw != null && calldownMechCooldown == 0) {
-				onMechSlotSelect(mmw);
+			if (player.input.isPressed(Control.Special2, player) &&
+				rideMenuWeapon != null && calldownMechCooldown == 0 &&
+				(!alreadySummonedNewMech || startRideArmor != null)
+			) {
+				onMechSlotSelect(rideMenuWeapon);
 				return;
 			}
 		} else if (player.input.isPressed(Control.Special2, player) && !player.input.isHeld(Control.Down, player)) {
-			onMechSlotSelect(mmw);
+			onMechSlotSelect(rideMenuWeapon);
 			return;
 		}
 
@@ -369,6 +372,8 @@ public class Vile : Character {
 			if (player.vileCutterWeapon.shootTime < player.vileCutterWeapon.rateOfFire * 0.75f) {
 				player.weapon.vileShoot(0, this);
 			}
+		} else if (player.input.isHeld(Control.WeaponRight, player)) {
+			vulcanWeapon.vileShoot(0, this);
 		}
 	}
 

@@ -707,6 +707,8 @@ public class GameMode {
 				drawWeaponSwitchHUD(drawPlayer);
 			} else if (drawPlayer.weapons.Count == 1 && drawPlayer.weapons[0] is MechMenuWeapon mmw) {
 				drawWeaponSwitchHUD(drawPlayer);
+			} else if (drawPlayer.character is Vile vileR && vileR.rideMenuWeapon.isMenuOpened) {
+				drawRideArmorIcons();
 			}
 		}
 
@@ -2351,9 +2353,13 @@ public class GameMode {
 	public void drawRideArmorIcons() {
 		int raIndex = mainPlayer.weapons.FindIndex(w => w is MechMenuWeapon);
 
+
 		float startX = 168;
 		if (raIndex == 0) startX = 148;
 		if (raIndex == 1) startX = 158;
+		if (raIndex == -1) {
+			startX = 11;
+		}
 
 		float startY = Global.screenH - 12;
 		float height = 15;
