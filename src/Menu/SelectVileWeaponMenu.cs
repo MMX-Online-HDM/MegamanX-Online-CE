@@ -43,7 +43,7 @@ public class SelectVileWeaponMenu : IMainMenu {
 				new Napalm(NapalmType.SplashHit),
 				new Napalm(NapalmType.NoneFlamethrower)
 			]),
-			("Ball", [
+			("Grenade", [
 				new VileBall(VileBallType.NoneNapalm),
 				new VileBall(VileBallType.ExplosiveRound),
 				new VileBall(VileBallType.SpreadShot),

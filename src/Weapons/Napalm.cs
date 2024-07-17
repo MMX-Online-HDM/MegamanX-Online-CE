@@ -22,7 +22,7 @@ public class Napalm : Weapon {
 
 		if (napalmType == NapalmType.NoneBall) {
 			displayName = "None(BALL)";
-			description = new string[] { "Do not equip a Napalm.", "BALL will be used instead." };
+			description = new string[] { "Do not equip a Napalm.", "GRENADE will be used instead." };
 			killFeedIndex = 126;
 		} else if (napalmType == NapalmType.NoneFlamethrower) {
 			displayName = "None(FLAMETHROWER)";

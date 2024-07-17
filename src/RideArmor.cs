@@ -947,13 +947,6 @@ public class RideArmor : Actor, IDamagable {
 		}
 
 		if (character != null && !(character.charState is Die)) {
-			if (character.player.weapon is MechMenuWeapon) {
-				player.changeWeaponSlot(0);
-			}
-			if (character.alreadySummonedNewMech) {
-				player.weapons.RemoveAll(w => w is MechMenuWeapon);
-			}
-
 			if (!ownedByMK5) {
 				character.changeState(new Fall(), true);
 				character.player.vileBallWeapon.shootTime = 1;

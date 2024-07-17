@@ -296,7 +296,7 @@ public partial class Player {
 
 	public int selectedRAIndex = Global.quickStartMechNum ?? 0;
 	public bool isSelectingRA() {
-		if (weapon is MechMenuWeapon mmw && mmw.isMenuOpened) {
+		if (character is Vile vile && vile.rideMenuWeapon.isMenuOpened) {
 			return true;
 		}
 		return false;
@@ -1918,9 +1918,7 @@ public partial class Player {
 			explodeDieEffect = null;
 		}
 		limboChar = null;
-		if (!weapons.Any(w => w is MechMenuWeapon)) {
-			weapons.Add(new MechMenuWeapon(VileMechMenuType.All));
-		}
+		vile.rideMenuWeapon = new MechMenuWeapon(VileMechMenuType.All);
 		character.changeState(new VileRevive(vileFormToRespawnAs == 2), true);
 		RPC.playerToggle.sendRpc(id, vileFormToRespawnAs == 2 ? RPCToggleType.ReviveVileTo5 : RPCToggleType.ReviveVileTo2);
 	}
