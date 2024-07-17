@@ -259,7 +259,7 @@ public class Vile : Character {
 		if (!isVileMK5 || startRideArmor == null) {
 			if (player.input.isPressed(Control.Special2, player) &&
 				rideMenuWeapon != null && calldownMechCooldown == 0 &&
-				!alreadySummonedNewMech
+				(!alreadySummonedNewMech || startRideArmor != null)
 			) {
 				onMechSlotSelect(rideMenuWeapon);
 				return;
