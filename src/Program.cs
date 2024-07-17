@@ -225,8 +225,71 @@ class Program {
 
 		// Force startup config to be fetched
 		Menu.change(new MainMenu());
-		Global.changeMusic("MMX1-TitleScreen");
-
+		//Global.changeMusic(Global.level.levelData.getTitleTheme());
+		switch(Helpers.randomRange(1,19)) {
+			// Title screens
+			case 1:
+				Global.changeMusic("title_X1");
+				break;
+			case 2:
+				Global.changeMusic("title_X2");
+				break;
+			case 3:
+				Global.changeMusic("title_X3");
+				break;
+			// Stage Selects
+			case 4:
+				Global.changeMusic("stageSelect_X1");
+				break;
+			case 5:
+				Global.changeMusic("stageSelect2_X1");
+				break;
+			case 6:
+				Global.changeMusic("stageSelect_X2");
+				break;
+			case 7:
+				Global.changeMusic("stageSelect2_X2");
+				break;
+			case 8:
+				Global.changeMusic("stageSelect_X3");
+				break;
+			case 9:
+				Global.changeMusic("stageSelect2_X3");
+				break;
+			// Introduction
+			case 10:
+				Global.changeMusic("opening_X3");
+				break;
+			case 11:
+				Global.changeMusic("opening_X2");
+				break;
+			// Extra
+			case 12:
+				Global.changeMusic("ending_X3");
+				break;
+			case 13:
+				Global.changeMusic("ending_X2");
+				break;
+			case 14:
+				Global.changeMusic("ending_X1");
+				break;
+			case 15:
+				Global.changeMusic("credits_X1");
+				break;
+			case 16:
+				Global.changeMusic("demo_X2");
+				break;
+			case 17:
+				Global.changeMusic("demo_X3");
+				break;	
+			case 18:
+				Global.changeMusic("laboratory_X3");
+				break;	
+			case 19:
+				Global.changeMusic("sigmaFortress4");
+				break;			
+		}
+		
 		if (mode == 1) {
 			HostMenu menu = new HostMenu(new MainMenu(), null, false, false, true);
 			Menu.change(menu);

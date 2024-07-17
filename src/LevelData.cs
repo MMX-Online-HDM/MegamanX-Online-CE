@@ -538,11 +538,11 @@ public class LevelData {
 		{ "robotjunkyard", "morphMoth" },
 		{ "volcaniczone", "flameStag" },
 		{ "weathercontrol", "wireSponge" },
-		{ "xhunter1", "counterHunter2" },
-		{ "xhunter2", "counterHunter1" },
+		{ "xhunter1", "counterHunter1" },
+		{ "xhunter2", "counterHunter2" },
 		// X3 stuff.
 		{ "aircraftcarrier", "gravityBeetle" },
-		{ "dopplerlab", "dopplerStage" },
+		{ "dopplerlab", "dopplerLab" },
 		{ "frozentown", "blizzardBuffalo" },
 		{ "giantdam", "toxicSeahorse" },
 		{ "giantdam2", "toxicSeahorse" },
@@ -634,5 +634,42 @@ public class LevelData {
 			return false;
 		}
 		return supportsMirrored && !mirroredOnly;
+	}
+	public string getLooseTheme() {
+		if (name.Contains("xhunter1") ||
+			name.Contains("deepseabase") ||
+			name.Contains("maverickfactory") ||
+			name.Contains("robotjunkyard") ||
+			name.Contains("volcaniczone") ||
+			name.Contains("dinosaurtank") ||
+			name.Contains("centralcomputer") ||
+			name.Contains("crystalmine") ||
+			name.Contains("desertbase") ||
+			name.Contains("weathercontrol")
+		) {
+			return "password_X2";
+		}
+		if (name.Contains("hunterbase") ||
+			name.Contains("giantdam") ||
+			name.Contains("weaponsfactory") ||
+			name.Contains("frozentown") ||
+			name.Contains("aircraftcarrier") ||
+			name.Contains("powercenter") ||
+			name.Contains("shipyard") ||
+			name.Contains("quarry") ||
+			name.Contains("safaripark") ||
+			name.Contains("dopplerlab")
+		) {
+			return "password_X3";
+		}
+		if (isCustomMap) {
+			return Helpers.randomRange(0, 2) switch {
+				1 => "password_X2",
+				2 => "password_X3",
+				_ => "password_X1"
+			};
+		}
+
+		return "password_X1";
 	}
 }

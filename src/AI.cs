@@ -33,6 +33,8 @@ public class AI {
 
 	public int targetUpdateFrame;
 	public static int targetUpdateCounter;
+	public int projId;
+	public bool isWildDance;
 
 	public AI(Character character) {
 		this.character = character;
@@ -208,6 +210,7 @@ public class AI {
 		if (Global.level.gameMode.isOver) {
 			return;
 		}
+		// Buy Section
 		if (!player.isMainPlayer && character is MegamanX &&
 			player.aiArmorUpgradeIndex < player.aiArmorUpgradeOrder.Count && !Global.level.is1v1()
 		) {
@@ -274,7 +277,7 @@ public class AI {
 				);
 			}
 		}
-		if (character is KaiserSigma || character is BaseSigma sigma && sigma.isHyperSigma) {
+		/*if (character is KaiserSigma || character is BaseSigma sigma && sigma.isHyperSigma) {
 			int attack = Helpers.randomRange(0, 1);
 			if (attack == 0) {
 				player.release(Control.Special1);
@@ -287,7 +290,7 @@ public class AI {
 				player.changeWeaponSlot(Helpers.randomRange(0, 2));
 			}
 			return;
-		}
+		}*/
 
 		if (aiState is not InJumpZone) {
 			var jumpZones = Global.level.getTriggerList(character.abstractedActor(), 0, 0, null, typeof(JumpZone));
@@ -379,7 +382,7 @@ public class AI {
 					player.press(Control.Right);
 				}
 			}
-			if (player.isAxl) {
+			/*if (player.isAxl) {
 				player.axlCursorPos = target.pos
 					.addxy(-Global.level.camX, -Global.level.camY)
 					.addxy(Helpers.randomRange(
@@ -387,7 +390,7 @@ public class AI {
 					), Helpers.randomRange(
 						-axlAccuracy, axlAccuracy
 					));
-			}
+			}*/
 		}
 
 		//Always do as AI
@@ -438,10 +441,8 @@ public class AI {
 					}
 				}
 			}
-			// this makes the AI harder, the lower the number, the more acts the AI will do
-			// at 0.01 is just absurd, the zero AI gets at kaizo levels.
-			// can possibly cause bugs if you put that value
-			// funny enough fighting Nightmare Zero with 0.01 is pretty much as MMX6 LV 4 Xtreme mode :skull:
+			// The amount of actions the AI will do, the lower the number, the higher the actions
+			// At 0.01 is Kaizo Level
 			shootTime += Global.spf;
 			if (shootTime > 0.08) {
 				shootTime = 0;
@@ -475,9 +476,9 @@ public class AI {
 		//End of The AI Dodging
 
 		//The AI should randomly charge weapon?
-		//I truly wonder why GM19 made only X charge weapons	
-		if (aiState.randomlyChargeWeapon && character is MegamanX or Axl &&
-			framesChargeHeld == 0 && player.character?.canCharge() == true
+		if (aiState.randomlyChargeWeapon 
+			&& character is MegamanX or Axl or BusterZero
+			&& framesChargeHeld == 0 && player.character?.canCharge() == true
 		) {
 			if (Helpers.randomRange(0, 20) < 1) {
 				if (player.isAxl) {
@@ -491,15 +492,15 @@ public class AI {
 			}
 		}
 		//End of Randomly Charge Weapon
-
+		//The AI randomly change state?
 		if (aiState.randomlyChangeState && character != null) {
 			if (Helpers.randomRange(0, 100) < 1) {
 				var randAmount = Helpers.randomRange(-100, 100);
 				changeState(new MoveToPos(character, character.pos.addxy(randAmount, 0)));
 				return;
 			}
-		}
-
+		} 
+		//Randomly Dash
 		if (aiState.randomlyDash && character != null &&
 			character.charState is not WallKick &&
 			character.grounded &&
@@ -507,17 +508,25 @@ public class AI {
 			character.charState.normalCtrl &&
 			character.charState is not Dash or AirDash or UpDash
 		) {
-			character.changeState(
+				if (Helpers.randomRange(0, 75) < 5) {
+				dashTime = Helpers.randomRange(0.3f, 0.5f);
+			}
+			if (dashTime > 0) {
+				character.changeState(
 				new Dash(Control.Dash)
 			);
-		}
+				dashTime -= Global.spf;
+				if (dashTime < 0) dashTime = 0;
+			}
 
+		}	
+		//Randomly Jump
 		if (aiState.randomlyJump && !inNodeTransition && stuckTime == 0) {
 			if (Helpers.randomRange(0, 650) < 3) {
 				jumpTime = Helpers.randomRange(0.25f, 0.75f);
 			}
 		}
-
+		//Randomly Change Weapon
 		if (aiState.randomlyChangeWeapon &&
 			(player.isX || player.isAxl || player.isVile) &&
 			!player.lockWeapon && player.character?.isStealthy(-1) != null &&
@@ -580,6 +589,8 @@ public class AI {
 		if (player.isZero || player.isSigma || character is PunchyZero) return 50;
 		return maxDist;
 	}
+
+	//Start of X 
 	public void mmxAIAttack(Character mmx2) {
 		bool isTargetInAir = target?.pos.y < character.pos.y - 50;
 		bool isTargetBellowYou = target?.pos.y < character.pos.y + 10;
@@ -952,76 +963,155 @@ public class AI {
 			}
 		}
 	}
+	public void dommxAI(Character mmx4) {
+		// X:
+		if (character is MegamanX mmx) {
 
+			if (player.canUpgradeUltimateX() && player.health >= player.maxHealth) {
+				if (!mmx.boughtUltimateArmorOnce) {
+					player.currency -= Player.ultimateArmorCost;
+					mmx.boughtUltimateArmorOnce = true;
+				}
+				player.setUltimateArmor(true);
+				return;
+			}
+
+			if (player.hasAllX3Armor() && player.canUpgradeGoldenX() && player.health >= player.maxHealth) {
+				if (!mmx.boughtGoldenArmorOnce) {
+					player.currency -= Player.goldenArmorCost;
+					mmx.boughtGoldenArmorOnce = true;
+				}
+				player.setGoldenArmor(true);
+				return;
+			}
+
+			if (player.canReviveX() && !player.isMainPlayer) {
+				player.reviveX();
+
+			}
+			if (mmx.canCharge()) {
+				player.character.increaseCharge();
+			}
+
+			if (mmx.isHyperX && mmx.canShoot() && !player.isMainPlayer) {
+				//mmx.unpoShotCount = Math.Max(mmx.unpoShotCount, 4);
+				player.release(Control.Shoot);
+				player.press(Control.Shoot);
+			}
+		}
+	}
+	public void mmxAIDodge(Character mmx3) {
+		int RollingShield = player.weapons.FindIndex(w => w is RollingShield);
+		foreach (GameObject gameObject in Global.level.gameObjects) {
+			if (gameObject is Projectile proj) {
+				if (proj.damager.owner.alliance != player.alliance) {
+					//Start of X
+					//Putting X 
+					if (player.character is MegamanX X) {
+						if (character != null && proj.isFacing(character) &&
+						character.withinX(proj, 60) && character.withinY(proj, 30)) {
+
+							if (player.hasArmor() || !player.hasArmor() && !X.isHyperX) {
+								if (X.player.weapon.ammo > 0) {
+									player.changeWeaponSlot(RollingShield);
+									player.press(Control.Shoot);
+									player.release(Control.Shoot);
+								}
+							}
+
+							int novaStrikeSlot = player.weapons.FindIndex(w => w is NovaStrike);
+							if (player.hasUltimateArmor()) {
+								X.player.changeWeaponSlot(novaStrikeSlot);
+								if (X.player.weapon.ammo >= 16) {
+									X.player.press(Control.Shoot);
+								} else { X.player.changeWeaponSlot(getRandomWeaponIndex()); }
+							}
+
+							if (X.isHyperX) {
+								if (X.unpoAbsorbedProj != null) {
+									X.changeState(new XUPParryProjState(X.unpoAbsorbedProj, true, false), true);
+									player.press(Control.WeaponLeft); player.release(Control.WeaponLeft);
+									X.unpoAbsorbedProj = null;
+									return;
+								} else {
+									X.changeState(new XUPParryStartState(), true); player.press(Control.WeaponLeft); player.release(Control.WeaponLeft);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	//End of X
+	//Start of Saber Zero
 	public void zeroAIAttack(Zero zero) {
-		bool isTargetInAir = target?.pos.y < character.pos.y - 50;
-		bool isTargetSuperClose = target?.pos.x - 3 >= character.pos.x;
 		bool isTargetClose = target?.pos.x - 15 > character.pos.x;
+		bool isTargetInAir = target?.pos.y < character.pos.y - 50;
 		// Go hypermode 
 		if (player.currency >= Player.zeroHyperCost && !zero.isSpriteInvulnerable() && !zero.isInvulnerable() &&
 		   zero.charState is not (HyperZeroStart or LadderClimb) && !zero.hypermodeActive()
 		) {
 			zero.changeState(new HyperZeroStart(), true);
 		}
-		doZeroAIAttack(zero);
-		//WildDance(zero);
-		if (zero.charState.attackCtrl && !player.isDead && zero.sprite.name != null && zero.charState.canAttack() && !zero.isSpriteInvulnerable() && !zero.isInvulnerable()) {
-			int ZSattack = Helpers.randomRange(0, 10);
+		ComboAttacks(zero);
+		WildDance(zero);
+		if (zero.charState.attackCtrl && !player.isDead && zero.sprite.name != null 
+			&& zero.charState.canAttack() && !zero.isSpriteInvulnerable() && !zero.isInvulnerable()
+			) {
+			int ZSattack = Helpers.randomRange(0, 11);
 			if (!(zero.sprite.name == "zero_attack" || zero.sprite.name == "zero_attack3" || zero.sprite.name == "zero_attack2")) {
 				switch (ZSattack) {
 					//Randomizador
-					case 0 when zero.grounded: // Attack
-						if (!zero.isAwakened) {
-							zero.changeSprite("zero_attack", true);
-						} else {
-							player.press(Control.Shoot);
+					case 0 when zero.grounded:
+						zero.changeState(new ZeroSlash1State(), true);					
+						break;
+					case 1 when zero.grounded:
+						zero.changeState(new ZeroUppercut(zero.uppercutA.type, zero.isUnderwater()), true);
+						break;
+					case 2 when zero.grounded:
+						zero.changeState(new ZeroUppercut(zero.uppercutS.type, zero.isUnderwater()), true);
+						break;				
+					case 3 when zero.grounded && zero.canCrouch():
+						zero.changeState(new ZeroCrouchSlashState(), true);
+						break;
+					case 4 when zero.charState is Dash:
+						zero.changeState(new ZeroShippuugaState(), true);
+						zero.slideVel = zero.xDir * zero.getDashSpeed() * 2f;
+						break;		
+					case 5 when zero.grounded:
+						if (zero.gigaAttack is RekkohaWeapon && zero.gigaAttack.ammo == 32f) {
+							zero.gigaAttack.addAmmo(-zero.gigaAttack.getAmmoUsage(0), player);
+							zero.changeState(new Rekkoha(zero.gigaAttack), true);
+						} else if (zero.gigaAttack.ammo >= 8) {
+							zero.gigaAttack.addAmmo(-zero.gigaAttack.getAmmoUsage(0), player);
+							zero.changeState(new Rakuhouha(zero.gigaAttack), true);
 						}
 						break;
-					case 1 when isTargetSuperClose && zero.grounded: //Uppercut 	
-						zero.changeState(
-							new ZeroUppercut(zero.uppercutA.type, zero.isUnderwater()), forceChange: true
-						);
+					case 6 when zero.charState is Fall or Jump: 
+					zero.changeState(new ZeroRollingSlashtate(), true);
 						break;
-					case 2 when isTargetSuperClose && zero.grounded:
-						zero.changeState(new ZeroUppercut(
-							zero.uppercutS.type, zero.isUnderwater()), forceChange: true
-						);
+					case 7 when zero.charState is Fall or Jump:
+					zero.changeState(new ZeroAirSlashState(), true);
+						break;	
+					case 8 when zero.charState is Fall:
+						zero.changeState(new ZeroDownthrust(zero.downThrustA.type));
 						break;
-					//Crouch slash
-					case 3 when isTargetSuperClose && zero.grounded && zero.canCrouch():
-						zero.changeSprite("zero_attack_crouch", true);
+					case 9 when zero.charState is Fall:
+						zero.changeState(new ZeroDownthrust(zero.downThrustS.type));
 						break;
-					// If Zero is dashing, press special and do shippuga
-					case 4 when zero.charState is Dash && isTargetClose:
-						zero.changeSprite("zero_attack_dash2", true);
+					case 10 when zero.charState is Dash: 
+						zero.changeState(new ZeroDashSlashState(), true);
+						zero.slideVel = zero.xDir * zero.getDashSpeed() * 2f;
 						break;
-					// If Zero is on the ground and has giga attack ammo of at least 8 to above do "Rakuhouha"
-					case 5 when zero.grounded && zero.gigaAttack.ammo >= 8f:
-						player.press(Control.Down);
-						player.press(Control.Special1);
-						break;
-					case 6 when zero.charState is Fall or Jump: // Air speciar		
-						zero.changeSprite(Options.main.getSpecialAirAttack(), true);
-						break;
-					// if the character is on fall state, Downthrust attack
-					case 7 when zero.charState is Fall && zero.charState is not ZeroUppercut:
-						zero.changeState(new ZeroDownthrust(zero.uppercutA.type));
-						break;
-					// if the character is on fall state, Downthrust attack
-					case 8 when zero.charState is Fall && zero.charState is not ZeroUppercut:
-						zero.changeState(new ZeroDownthrust(zero.uppercutS.type));
-						break;
-					case 9 when zero.charState is Dash && isTargetClose: // Dash slash
-						zero.changeSprite("zero_attack_dash", true);
-						break;
-					case 10 when zero.grounded && isTargetClose: // Special attack
+					case 11 when zero.grounded:
 						zero.groundSpecial.attack(zero);
 						break;
 				}
 			}
 			// Hypermode attacks
-			if (zero.hypermodeActive()) {
-				switch (Helpers.randomRange(0, 96)) {
+			if (zero.hypermodeActive() && !player.isMainPlayer) {
+				switch (Helpers.randomRange(0, 84)) {
 					case 1:
 						zero.changeState(new Rakuhouha(zero.gigaAttack), true);
 						break;
@@ -1031,32 +1121,104 @@ public class AI {
 					case 3:
 						zero.changeState(new GenmuState(), true);
 						break;
+					case 4:
+						zero.changeState(new AwakenedZeroHadangeki(), true);
+						break;
 				}
 			}
-			if (!player.isMainPlayer && isTargetInAir && !zero.grounded && zero.charState is Fall or Jump) {
-				zero.changeState(
-					new ZeroUppercut(
-						zero.downThrustA.type, zero.isUnderwater()
-					), forceChange: true
-				);
+		}
+		if (!player.isMainPlayer && isTargetInAir && zero.charState is Fall or Jump) {
+			zero.changeState(new ZeroUppercut(RisingType.Denjin, true), true);
+		}
+	}
+	public void ComboAttacks(Zero zero) {
+		if (!(zero.charState is HyperZeroStart or DarkHoldState or Hurt) &&
+			zero.sprite.name != null && !player.isMainPlayer
+		) {
+			// Do Rising if is at 50% of the animation of third slash
+			if (zero.grounded && zero.sprite.name == "zero_attack3" && zero.sprite.frameIndex >= 5 && !isWildDance) {
+				zero.changeState(new ZeroUppercut(RisingType.RisingFang, true), true);
 			}
-
+			// Do Hyouretsuzan if is at 50% of the animation of rising
+			else if (zero.sprite.name == "zero_rising" && zero.sprite.frameIndex >= 5 && !isWildDance) {
+				zero.changeState(new ZeroDownthrust(ZeroDownthrustType.Hyouretsuzan), true);
+			}
+			// Do Kuuenzan even if he is not attacking
+			if (!zero.grounded && zero.airSpecial.type == (int)AirSpecialType.Kuuenzan &&
+				!zero.isAttacking() && zero.charState.canAttack() && 
+				!(zero.sprite.name == "zero_attack_air2")
+			) {
+				zero.changeState(new ZeroRollingSlashtate(), true);
+			}
 		}
 	}
-	public void doKnuckleAI(PunchyZero pzero) {
-		if (!pzero.attackCtrl() && pzero.getChargeLevel() > 0) {
-			pzero.increaseCharge();
+	public void WildDance(Character zero) {
+		if (character is Zero zero6) {
+			if (player.health <= 4 && target != null && !player.isMainPlayer) {
+				if (character.isFacing(target) && zero6.sprite.name != null && zero6.grounded) {
+					WildDanceMove(zero);
+					player.clearAiInput();
+				}
+			}
 		}
 	}
-	public void doBusterZeroAI(BusterZero bzero) {
-		if (!bzero.attackCtrl()) {
-			bzero.increaseCharge();
+	public void WildDanceMove(Character zero) {
+		if (character is Zero zero7) {
+			isWildDance = true;
+			for (int i = 0; i <= 1; i++) {
+				zero7.stopMoving();
+				if (zero7.sprite.name == "zero_attack" && zero.sprite.frameIndex >= 6)
+					zero7.changeState(new ZeroSlash2State(), true);					
+				if (zero7.sprite.name == "zero_attack2" && zero.sprite.frameIndex >= 3)
+					zero7.changeState(new ZeroSlash3State(), true);					
+				else if (zero7.sprite.name == "zero_attack3" && zero.sprite.frameIndex >= 6)
+					zero7.changeState(new ZeroSlash1State(), true);					
+			}
+			if (zero7.sprite.name == "zero_attack3" && zero.sprite.frameIndex >= 5) {
+				zero7.changeState(new Rakuhouha(new RakuhouhaWeapon()), true);
+			} else if (zero7.sprite.name == "zero_rakuhouha" && zero.sprite.frameIndex >= 11) {
+				zero7.changeState(new ZeroUppercut(RisingType.RisingFang, false), true);
+				zero.playSound("hyperchargeFull");
+			}
 		}
 	}
+	public void zeroAIDodge(Character zero3, GameObject go) {
+		var proj = go as Projectile;
+				if (proj != null && proj.damager.owner.alliance != player.alliance) {
+					if (player.character is Zero zero && !player.isMainPlayer) {
+						//Projectile is not 
+						if (!(projId == (int)ProjIds.RollingShieldCharged || projId == (int)ProjIds.RollingShield
+							|| projId == (int)ProjIds.MagnetMine || projId == (int)ProjIds.FrostShield
+							|| projId == (int)ProjIds.FrostShieldAir || projId == (int)ProjIds.FrostShieldChargedPlatform)	
+							) {
+							// If a projectile is close to Zero
+							if (character != null && proj.isFacing(character) &&
+								character.withinX(proj, 100) && character.withinY(proj, 30) && 
+								!player.isDead && zero.charState.canAttack() && zero.sprite.name != null &&
+								(zero.charState is not HyperZeroStart or LadderClimb or DarkHoldState or Hurt
+								 or GenericStun or Die or WarpIn or WarpOut or WallSlide or WallKick or SwordBlock)
+							) {
+								//Do i have giga attack ammo available?
+								if (zero.gigaAttack.ammo >= 8f && zero.grounded) {
+									//RAKUHOUHA!
+									player.press(Control.Special1);
+									player.press(Control.Down);
+								} else if (!(projId == (int)ProjIds.SwordBlock) && zero.grounded) {
+									//If he hasn't do "Block"						
+									zero.turnToInput(player.input, player);
+									zero.changeState(new SwordBlock());
+								}
+							}
+						}
+					}
+				}	
+	}
+	//End of Saber Zero
+	//Start of Punchy Zero
 	public void KnuckleZeroAIAttack(PunchyZero pzero) {
 		if (target == null || !pzero.charState.attackCtrl) {
 			return;
-		}
+		}		
 		bool isTargetInAir = target.pos.y < character.pos.y - 50;
 		bool isTargetClose = MathF.Abs(target.pos.x - character.pos.x) <= 32;
 		bool canHitMaxCharge = (!isTargetInAir && pzero.getChargeLevel() >= 4);
@@ -1097,6 +1259,33 @@ public class AI {
 				break;
 		}
 	}
+	public void doKnuckleAI(PunchyZero pzero) {
+		//if (!pzero.attackCtrl() && pzero.getChargeLevel() > 0) {
+		//	pzero.increaseCharge();
+		//}
+	}
+	public void knuckleZeroAIDodge(PunchyZero pzero) {
+		foreach (GameObject gameObject in Global.level.gameObjects) {
+			if (gameObject is Projectile proj) {
+				if (proj.damager.owner.alliance != player.alliance) {
+					if (player.character is PunchyZero pzero1 && !player.isMainPlayer &&
+						!pzero1.isInvulnerable() && pzero.parryCooldown == 0 && pzero.charState.canAttack()) {
+						if (character != null && proj.isFacing(character) && character.withinX(proj, 100) && character.withinY(proj, 30)) {
+							if (pzero.gigaAttack.ammo >= 16 && pzero.grounded) {
+								player.press(Control.Special1);
+								player.press(Control.Down);
+							} else {
+								pzero1.turnToInput(player.input, player);
+								pzero1.changeState(new PZeroParry(), true);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	//End of Punchy Zero
+	//Start of Buster Zero
 	public void busterZeroAIAttack(BusterZero zero) {
 		if (target == null) {
 			zero.increaseCharge();
@@ -1139,7 +1328,31 @@ public class AI {
 			}
 		}
 	}
-
+	public void doBusterZeroAI(BusterZero bzero) {
+		//if (!bzero.attackCtrl()) {
+		//	bzero.increaseCharge();
+		//}
+	}
+	public void busterzeroAIDodge(BusterZero bzero) {
+		foreach (GameObject gameObject in Global.level.gameObjects) {
+			if (gameObject is Projectile proj) {
+				if (proj.damager.owner.alliance != player.alliance) {
+					if (gameObject is not FrostShieldProj or FrostShieldProjAir
+						or FrostShieldProjCharged or FrostShieldProjGround or FrostShieldProjPlatform //HOW MANY OF U EXIST
+						) {
+						if (player.character is BusterZero bzero1) {
+							if (character != null && !bzero1.isInvulnerable() && proj.isFacing(character) &&
+								character.withinX(proj, 100) && character.withinY(proj, 30)) {
+								player.press(Control.Special1);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	//End of Buster Zero
+	//Start of Sigma
 	public void sigmaAIAttack(Character sigma2) {
 		bool isTargetInAir = target?.pos.y < character.pos.y - 50;
 		bool isTargetBellowYou = target?.pos.y < character.pos.y + 10;
@@ -1168,7 +1381,7 @@ public class AI {
 					&& !(cmdSigma.charState is CallDownMaverick or SigmaSlashState)) {
 					switch (Sattack) {
 						case 0: // Beam Saber
-							if (isTargetSuperClose) {
+							if (isTargetSuperClose && !player.isMainPlayer) {
 								cmdSigma.changeState(new SigmaSlashState(cmdSigma.charState), true);
 							}
 							break;
@@ -1250,7 +1463,7 @@ public class AI {
 							DoppmaSigma.changeState(new Sigma3Shoot(player.input.getInputDir(player)), true);
 							break;
 						case 1:
-							if (DoppmaSigma.grounded) {
+							if (DoppmaSigma.grounded && !player.isMainPlayer) {
 								DoppmaSigma.changeState(new SigmaThrowShieldState(), true);
 							}
 							break;
@@ -1275,156 +1488,19 @@ public class AI {
 			//Doppma Sigma End
 		}
 	}
+	public void doSigmaAI(Character sigma4) {
+		// Sigma:
+		// deactivated until fixed
+		//if (character is BaseSigma baseSigma1) {
+		//	
+		//	if (player.canReviveSigma(out var spawnPoint)){
+		//		player.reviveSigma(spawnPoint);
+		//	}
 
-	public void vileAIAttack(Character vile2) {
-		bool isTargetInAir = target?.pos.y < character.pos.y - 50;
-		bool isTargetSuperClose = target?.pos.x - 3 >= character.pos.x;
-		//Vile Start	
-		if (character is Vile vile) {
-			// You dare to grab me? i will blow myself up
-			if (character.charState?.isGrabbedState == true && player.health >= 12 && !player.isMainPlayer) {
-				if (Helpers.randomRange(0, 100) < 1)
-					character.changeState(new NecroBurstAttack(vile.grounded), true);
-			}
-
-			if (Helpers.randomRange(0, 100) < 1) {
-				if (isTargetInAir && isTargetSuperClose && !(character.charState is VileRevive or HexaInvoluteState) && player.vileAmmo >= 24 && !player.isMainPlayer)
-					character.changeState(new RisingSpecterState(vile.grounded), true);
-			}
-			int Vattack = Helpers.randomRange(0, 12);
-			if (vile?.charState?.isGrabbedState == false && !player.isDead && vile.charState.canAttack()
-				&& !(character.charState is VileRevive or HexaInvoluteState or NecroBurstAttack
-				or StraightNightmareAttack or RisingSpecterState or VileMK2GrabState)) {
-				switch (Vattack) {
-					case 0:
-						player.press(Control.Shoot);
-						break;
-					case 1:
-						player.weapon.vileShoot(WeaponIds.FrontRunner, vile);
-						break;
-					case 2:
-						player.vileRocketPunchWeapon.vileShoot(WeaponIds.RocketPunch, vile);
-						break;
-					case 3 when !vile.grounded:
-						player.vileBallWeapon.vileShoot(WeaponIds.VileBomb, vile);
-						break;
-					case 4:
-						player.vileMissileWeapon.vileShoot(WeaponIds.ElectricShock, vile);
-						break;
-					case 5:
-						player.vileCutterWeapon.vileShoot(WeaponIds.VileCutter, vile);
-						break;
-					case 6 when vile.grounded && player.vileNapalmWeapon.type == (int)NapalmType.FireGrenade || player.vileNapalmWeapon.type == (int)NapalmType.SplashHit:
-						player.vileNapalmWeapon.vileShoot(WeaponIds.Napalm, vile);
-						break;
-					case 7 when vile.charState is Fall:
-						player.vileFlamethrowerWeapon.vileShoot(WeaponIds.VileFlamethrower, vile);
-						break;
-					case 8 when player.vileAmmo >= 24:
-						player.vileLaserWeapon.vileShoot(WeaponIds.VileLaser, vile);
-						break;
-					case 9 when vile.isVileMK5 && player.vileAmmo >= 20:
-						vile?.changeState(new HexaInvoluteState(), true);
-						break;
-				}
-			}
-		}
-	}
-	public void axlAIAttack(Character axl2) {
-		//Axl Start
-		if (character is Axl axl) {
-			if (player.axlHyperMode == 0 && player.currency >= 10 && !player.isDead && !axl.isSpriteInvulnerable() && !axl.isInvulnerable() && !axl.isWhiteAxl()
-				&& !(axl.charState is Hurt or Die or GenericStun or WarpIn or HyperAxlStart or WallSlide or WallKick or DodgeRoll)) {
-				axl.changeState(new HyperAxlStart(axl.grounded), true);
-			}
-			if (player.axlHyperMode == 1 && player.currency >= 10 && !player.isDead && !axl.isSpriteInvulnerable() && !axl.isInvulnerable() && !axl.isStealthMode()
-				&& !(axl.charState is Hurt or Die or GenericStun or WarpIn or HyperAxlStart or WallSlide or WallKick or DodgeRoll)) {
-				axl.stingChargeTime = 12;
-			}
-
-			int AAttack = Helpers.randomRange(0, 1);
-			if (axl.charState.canShoot() && !axl.isSpriteInvulnerable() && player.weapon.ammo > 0 && player.axlWeapon != null && axl.canShoot()
-				&& axl?.charState?.isGrabbedState == false && !player.isDead && axl.canChangeWeapons() && character.canChangeWeapons()
-				&& !(axl.charState is Hurt or Die or GenericStun or WarpIn or HyperAxlStart or WallSlide or WallKick or LadderClimb or DodgeRoll)) {
-				switch (AAttack) {
-					case 0:
-						player.press(Control.Shoot);
-						break;
-					case 1 when axl.player.weapon is not IceGattling or PlasmaGun:
-						player.press(Control.Special1);
-						break;
-				}
-			}
-		}
-	}
-	public void busterzeroAIDodge(BusterZero bzero) {
-		foreach (GameObject gameObject in Global.level.gameObjects) {
-			if (gameObject is Projectile proj) {
-				if (proj.damager.owner.alliance != player.alliance) {
-					if (gameObject is not FrostShieldProj or FrostShieldProjAir
-						or FrostShieldProjCharged or FrostShieldProjGround or FrostShieldProjPlatform //HOW MANY OF U EXIST
-						) {
-						if (player.character is BusterZero bzero1) {
-							if (character != null && !bzero1.isInvulnerable() && proj.isFacing(character) &&
-								character.withinX(proj, 100) && character.withinY(proj, 30)) {
-								player.press(Control.Special1);
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	public void knuckleZeroAIDodge(PunchyZero pzero) {
-		foreach (GameObject gameObject in Global.level.gameObjects) {
-			if (gameObject is Projectile proj) {
-				if (proj.damager.owner.alliance != player.alliance) {
-					if (player.character is PunchyZero pzero1 && !player.isMainPlayer &&
-						!pzero1.isInvulnerable() && pzero.parryCooldown == 0 && pzero.charState.canAttack()) {
-						if (character != null && proj.isFacing(character) && character.withinX(proj, 100) && character.withinY(proj, 30)) {
-							if (pzero.gigaAttack.ammo >= 16 && pzero.grounded) {
-								player.press(Control.Special1);
-								player.press(Control.Down);
-							} else {
-								pzero1.turnToInput(player.input, player);
-								pzero1.changeState(new PZeroParry(), true);
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	public void zeroAIDodge(Character zero3) {
-		foreach (GameObject gameObject in Global.level.gameObjects) {
-			if (gameObject is Projectile proj) {
-				if (proj.damager.owner.alliance != player.alliance) {
-					if (player.character is Zero zero && !player.isMainPlayer) {
-						//Projectile is not 
-						if (gameObject is not RollingShieldProjCharged or RollingShieldProj or MagnetMineProj or FrostShieldProj
-							or FrostShieldProjAir or FrostShieldProjCharged or FrostShieldProjGround or FrostShieldProjPlatform //HOW MANY OF U EXIST
-							) {
-							// If a projectile is close to Zero
-							if (character != null && proj.isFacing(character) &&
-								character.withinX(proj, 100) && character.withinY(proj, 30) && !player.isDead && zero.charState.canAttack() && zero.sprite.name != null &&
-								(zero.charState is not HyperZeroStart or LadderClimb or DarkHoldState or Hurt or GenericStun or Die or WarpIn or WarpOut or WallSlide or WallKick or SwordBlock)
-							) {
-								//Do i have giga attack ammo available?
-								if (zero.gigaAttack.ammo >= 8f && zero.grounded) {
-									//RAKUHOUHA!
-									player.press(Control.Special1);
-									player.press(Control.Down);
-								} else if (gameObject is not SwordBlock and GenericMeleeProj && zero.grounded) {
-									//If he hasn't do "Block/Parry"						
-									zero.turnToInput(player.input, player);
-									zero.changeState(new SwordBlock());
-								}
-							}
-						}
-					}
-				}
-			}
-		}
+		//if (jumpTime >= 0.4) {
+		//	player.release(Control.Jump);
+		//}
+		//}	
 	}
 	public void sigmaAIDodge(Character sigma3) {
 		foreach (GameObject gameObject in Global.level.gameObjects) {
@@ -1479,76 +1555,58 @@ public class AI {
 			}
 		}
 	}
-	public void axlAIDodge(Character axl3) {
-		foreach (GameObject gameObject in Global.level.gameObjects) {
-			if (gameObject is Projectile proj) {
-				if (proj.damager.owner.alliance != player.alliance) {
-					//Start of Axl
-					//Putting Axl
-					if (player.character is Axl axl) {
-						if (character != null && proj.isFacing(character) &&
-							character.withinX(proj, 150) && character.withinY(proj, 30)) {
-							//Dodge Roll if your DodgeRollCooldown is on 0 and you are not in Dodgeroll State, also if you are on ground and can dash.
-							//and we count that you are not on hurt, die, frozen, crystalized, stunned, or grabbed state.. :skull:
-							if (axl.grounded && axl.canDash() && axl.charState is not DodgeRoll && axl.dodgeRollCooldown == 0 &&
-								(axl.player.axlWeapon?.isTwoHanded(true) == true || axl.isZooming())
-								&& axl.charState.normalCtrl &&
-								axl?.charState?.isGrabbedState == false
-							) {
-								axl.changeState(new DodgeRoll());
-							}
-							//Use Airblast If Axl has flameburner as his weapon and has air blast as its alt, as the projectile is not Melee and is reflectable by airblast (why this exists?), which its ammo should be higher than 0
-							else if (axl?.player.weapon is FlameBurner && axl.player.axlLoadout.flameBurnerAlt == 1 && (gameObject is not GenericMeleeProj || (proj.reflectableFBurner == true)) && axl.player.weapon.ammo > 0) {
-								player.press(Control.Special1);
-							} else {
-								doJump(0.75f);
-							}
-							//Or just Jump
-						}
-					}
-				}
+	//End of Sigma
+	//Start of Vile
+	public void vileAIAttack(Character vile2) {
+		bool isTargetInAir = target?.pos.y < character.pos.y - 50;
+		bool isTargetSuperClose = target?.pos.x - 3 >= character.pos.x;
+		//Vile Start	
+		if (character is Vile vile) {
+			// You dare to grab me? i will blow myself up
+			if (character.charState?.isGrabbedState == true && player.health >= 12 && !player.isMainPlayer) {
+				if (Helpers.randomRange(0, 100) < 1)
+					character.changeState(new NecroBurstAttack(vile.grounded), true);
 			}
-		}
-	}
-	public void mmxAIDodge(Character mmx3) {
-		int RollingShield = player.weapons.FindIndex(w => w is RollingShield);
-		foreach (GameObject gameObject in Global.level.gameObjects) {
-			if (gameObject is Projectile proj) {
-				if (proj.damager.owner.alliance != player.alliance) {
-					//Start of X
-					//Putting X 
-					if (player.character is MegamanX X) {
-						if (character != null && proj.isFacing(character) &&
-						character.withinX(proj, 60) && character.withinY(proj, 30)) {
 
-							if (player.hasArmor() || !player.hasArmor() && !X.isHyperX) {
-								if (X.player.weapon.ammo > 0) {
-									player.changeWeaponSlot(RollingShield);
-									player.press(Control.Shoot);
-									player.release(Control.Shoot);
-								}
-							}
-
-							int novaStrikeSlot = player.weapons.FindIndex(w => w is NovaStrike);
-							if (player.hasUltimateArmor()) {
-								X.player.changeWeaponSlot(novaStrikeSlot);
-								if (X.player.weapon.ammo >= 16) {
-									X.player.press(Control.Shoot);
-								} else { X.player.changeWeaponSlot(getRandomWeaponIndex()); }
-							}
-
-							if (X.isHyperX) {
-								if (X.unpoAbsorbedProj != null) {
-									X.changeState(new XUPParryProjState(X.unpoAbsorbedProj, true, false), true);
-									player.press(Control.WeaponLeft); player.release(Control.WeaponLeft);
-									X.unpoAbsorbedProj = null;
-									return;
-								} else {
-									X.changeState(new XUPParryStartState(), true); player.press(Control.WeaponLeft); player.release(Control.WeaponLeft);
-								}
-							}
-						}
-					}
+			if (Helpers.randomRange(0, 100) < 1) {
+				if (isTargetInAir && isTargetSuperClose && !(character.charState is VileRevive or HexaInvoluteState) && player.vileAmmo >= 24 && !player.isMainPlayer)
+					character.changeState(new RisingSpecterState(vile.grounded), true);
+			}
+			int Vattack = Helpers.randomRange(0, 12);
+			if (vile?.charState?.isGrabbedState == false && !player.isDead && vile.charState.canAttack()
+				&& !(character.charState is VileRevive or HexaInvoluteState or NecroBurstAttack
+				or StraightNightmareAttack or RisingSpecterState or VileMK2GrabState)) {
+				switch (Vattack) {
+					case 0:
+						player.press(Control.Shoot);
+						break;
+					case 1:
+						player.weapon.vileShoot(WeaponIds.FrontRunner, vile);
+						break;
+					case 2:
+						player.vileRocketPunchWeapon.vileShoot(WeaponIds.RocketPunch, vile);
+						break;
+					case 3 when !vile.grounded:
+						player.vileBallWeapon.vileShoot(WeaponIds.VileBomb, vile);
+						break;
+					case 4:
+						player.vileMissileWeapon.vileShoot(WeaponIds.ElectricShock, vile);
+						break;
+					case 5:
+						player.vileCutterWeapon.vileShoot(WeaponIds.VileCutter, vile);
+						break;
+					case 6 when vile.grounded && player.vileNapalmWeapon.type == (int)NapalmType.FireGrenade || player.vileNapalmWeapon.type == (int)NapalmType.SplashHit:
+						player.vileNapalmWeapon.vileShoot(WeaponIds.Napalm, vile);
+						break;
+					case 7 when vile.charState is Fall:
+						player.vileFlamethrowerWeapon.vileShoot(WeaponIds.VileFlamethrower, vile);
+						break;
+					case 8 when player.vileAmmo >= 24 && !player.isMainPlayer:
+						player.vileLaserWeapon.vileShoot(WeaponIds.VileLaser, vile);
+						break;
+					case 9 when vile.isVileMK5 && player.vileAmmo >= 20 && !player.isMainPlayer:
+						vile?.changeState(new HexaInvoluteState(), true);
+						break;
 				}
 			}
 		}
@@ -1591,154 +1649,82 @@ public class AI {
 			*/
 		}
 	}
-	public void dommxAI(Character mmx4) {
-		// X:
-		if (character is MegamanX mmx) {
+	//End of Vile
+	//Start of Axl
+	public void axlAIAttack(Character axl2) {
+		//Axl Start
+		if (character is Axl axl) {
+			if (player.axlHyperMode == 0 && player.currency >= 10 && !player.isDead && !axl.isSpriteInvulnerable() && !axl.isInvulnerable() && !axl.isWhiteAxl()
+				&& !(axl.charState is Hurt or Die or GenericStun or WarpIn or HyperAxlStart or WallSlide or WallKick or DodgeRoll)) {
+				axl.changeState(new HyperAxlStart(axl.grounded), true);
+			}
+			if (player.axlHyperMode == 1 && player.currency >= 10 && !player.isDead && !axl.isSpriteInvulnerable() && !axl.isInvulnerable() && !axl.isStealthMode()
+				&& !(axl.charState is Hurt or Die or GenericStun or WarpIn or HyperAxlStart or WallSlide or WallKick or DodgeRoll)) {
+				axl.stingChargeTime = 12;
+			}
 
-			if (player.canUpgradeUltimateX() && player.health >= player.maxHealth) {
-				if (!mmx.boughtUltimateArmorOnce) {
-					player.currency -= Player.ultimateArmorCost;
-					mmx.boughtUltimateArmorOnce = true;
+			int AAttack = Helpers.randomRange(0, 1);
+			if (axl.charState.canShoot() && !axl.isSpriteInvulnerable() && player.weapon.ammo > 0 && player.axlWeapon != null && axl.canShoot()
+				&& axl?.charState?.isGrabbedState == false && !player.isDead && axl.canChangeWeapons() && character.canChangeWeapons()
+				&& !(axl.charState is Hurt or Die or GenericStun or WarpIn or HyperAxlStart or WallSlide or WallKick or LadderClimb or DodgeRoll)) {
+				switch (AAttack) {
+					case 0:
+						player.press(Control.Shoot);
+						break;
+					case 1 when axl.player.weapon is not IceGattling or PlasmaGun:
+						player.press(Control.Special1);
+						break;
 				}
-				player.setUltimateArmor(true);
-				return;
-			}
-
-			if (player.hasAllX3Armor() && player.canUpgradeGoldenX() && player.health >= player.maxHealth) {
-				if (!mmx.boughtGoldenArmorOnce) {
-					player.currency -= Player.goldenArmorCost;
-					mmx.boughtGoldenArmorOnce = true;
-				}
-				player.setGoldenArmor(true);
-				return;
-			}
-
-			if (player.canReviveX() && !player.isMainPlayer) {
-				player.reviveX();
-
-			}
-			if (mmx.canCharge()) {
-				player.character.increaseCharge();
-			}
-
-			if (mmx.isHyperX && mmx.canShoot() && !player.isMainPlayer) {
-				//mmx.unpoShotCount = Math.Max(mmx.unpoShotCount, 4);
-				player.release(Control.Shoot);
-				player.press(Control.Shoot);
-			}
-		}
-	}
-	public void WildDance(Character zero) {
-		if (character is Zero zero6) {
-			if (player.health <= 4 && target != null) {
-				if (character.isFacing(target) && zero6.sprite.name != null && zero6.grounded) {
-					WildDanceMove(zero);
-					player.clearAiInput();
-				}
-			}
-		}
-	}
-	public void WildDanceMove(Character zero) {
-		if (character is Zero zero7) {
-			int i = 0;
-			for (i = 0; i < 2; i++) {
-				zero7.stopMoving();
-				if (zero7.sprite.name == "zero_attack" && zero7.framePercent > 0.8)
-					zero7.changeSprite("zero_attack2", true);
-				if (zero7.sprite.name == "zero_attack2" && zero7.framePercent > 0.8)
-					zero7.changeSprite("zero_attack3", true);
-				else if (zero7.sprite.name == "zero_attack3" && zero7.framePercent > 0.8)
-					zero7.changeSprite("zero_attack", true);
-			}
-			if (zero7.sprite.name == "zero_attack3" && zero7.framePercent > 0.7 && i == 2) {
-				zero7.changeState(new Rakuhouha(new RakuhouhaWeapon()), true);
-			} else if (zero7.sprite.name == "zero_rakuhouha" && zero7.framePercent > 0.9) {
-				zero7.changeState(
-					new ZeroUppercut(zero7.downThrustA.type, zero7.isUnderwater()),
-					forceChange: true
-				);
-			}
-		}
-	}
-	public void doZeroAIAttack(Zero zero) {
-		if (!zero.isAwakened && !(zero.charState is HyperZeroStart or DarkHoldState or Hurt) &&
-			zero.sprite.name != null
-		) {
-			// Huhahu section
-			if (zero.grounded && zero.sprite.name == "zero_attack" || zero.sprite.name == "zero_attack_dash" && zero.framePercent > 0.5) {
-				zero.changeSprite("zero_attack2", true);
-				zero.turnToInput(player.input, player);
-				zero.playSound("saber2", sendRpc: true);
-			} else if (zero.grounded && zero.sprite.name == "zero_attack2" && zero.framePercent > 0.65) {
-				zero.changeSprite("zero_attack3", true);
-				zero.turnToInput(player.input, player);
-				zero.playSound("saber3", sendRpc: true);
-			}
-			// Do Rising if is at 50% of the animation of third slash
-			else if (zero.grounded && zero.sprite.name == "zero_attack3" && zero.framePercent > 0.65) {
-				zero.changeState(
-					new ZeroUppercut(zero.downThrustA.type, zero.isUnderwater()),
-					forceChange: true
-				);
-			}
-			// Do Hyouretsuzan if is at 50% of the animation of rising
-			else if (zero.sprite.name == "zero_rising" && zero.framePercent > 0.6f) {
-				zero.changeState(
-					new ZeroDownthrust(zero.downThrustA.type),
-					forceChange: true
-				);
-			}
-			// Do Kuuenzan even if he is not attacking
-			else if (!zero.grounded && zero.airSpecial.type == (int)AirSpecialType.Kuuenzan &&
-				!zero.isAttacking() && zero.charState.canAttack() && !(zero.sprite.name == "zero_attack_air2")
-			) {
-				player.press(Control.Special1);
-			}
-			// Do air slash
-			else if (!zero.grounded && zero.isAttacking() &&
-				zero.charState.canAttack() && zero.sprite.name == "zero_attack_air2" &&
-				zero.framePercent > 0.65 && !(zero.sprite.name == "zero_attack_air")) {
-				player.press(Control.Shoot);
-				player.release(Control.Special1);
 			}
 		}
 	}
 	public void doAxlAI(Character axl4) {
 		// Axl: 
 		if (character is Axl axl5) {
-
 			if (player.weapon is not IceGattling) {
 				player.release(Control.Shoot);
 			}
-
 			if (player.weapon is not IceGattling or PlasmaGun or RayGun) {
 				player.release(Control.Special1);
 			}
-
-			if (axl5.player.weapon is AxlBullet) {
-
-			}
-
 			if (Helpers.randomRange(0, 10) < 1) {
 				player.release(Control.Jump);
 			}
-
 		}
 	}
-	public void doSigmaAI(Character sigma4) {
-		// Sigma:
-		// deactivated until fixed
-		//if (character is BaseSigma baseSigma1) {
-		//	
-		//	if (player.canReviveSigma(out var spawnPoint)){
-		//		player.reviveSigma(spawnPoint);
-		//	}
-
-		//if (jumpTime >= 0.4) {
-		//	player.release(Control.Jump);
-		//}
-		//}	
+	public void axlAIDodge(Character axl3) {
+		foreach (GameObject gameObject in Global.level.gameObjects) {
+			if (gameObject is Projectile proj) {
+				if (proj.damager.owner.alliance != player.alliance) {
+					//Start of Axl
+					//Putting Axl
+					if (player.character is Axl axl) {
+						if (character != null && proj.isFacing(character) &&
+							character.withinX(proj, 150) && character.withinY(proj, 30)) {
+							//Dodge Roll if your DodgeRollCooldown is on 0 and you are not in Dodgeroll State, also if you are on ground and can dash.
+							//and we count that you are not on hurt, die, frozen, crystalized, stunned, or grabbed state.. :skull:
+							if (axl.grounded && axl.canDash() && axl.charState is not DodgeRoll && axl.dodgeRollCooldown == 0 &&
+								(axl.player.axlWeapon?.isTwoHanded(true) == true || axl.isZooming())
+								&& axl.charState.normalCtrl &&
+								axl?.charState?.isGrabbedState == false
+							) {
+								axl.changeState(new DodgeRoll());
+							}
+							//Use Airblast If Axl has flameburner as his weapon and has air blast as its alt, as the projectile is not Melee and is reflectable by airblast (why this exists?), which its ammo should be higher than 0
+							else if (axl?.player.weapon is FlameBurner && axl.player.axlLoadout.flameBurnerAlt == 1 && (gameObject is not GenericMeleeProj || (proj.reflectableFBurner == true)) && axl.player.weapon.ammo > 0) {
+								player.press(Control.Special1);
+							} else {
+								doJump(0.75f);
+							}
+							//Or just Jump
+						}
+					}
+				}
+			}
+		}
 	}
+	//End of Axl
+
 } // End of AI
 
 public class AIState {

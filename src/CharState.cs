@@ -911,7 +911,7 @@ public class Dash : CharState {
 			}
 		}
 		dashTime += Global.spf;
-		if (stateTime > 0.1) {
+		if (stateTime > 0.1 && !character.isUnderwater()) {
 			stateTime = 0;
 			new Anim(
 				character.getDashDustEffectPos(initialDashDir),

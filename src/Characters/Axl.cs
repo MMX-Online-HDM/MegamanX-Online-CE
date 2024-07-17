@@ -470,7 +470,6 @@ public class Axl : Character {
 							player.axlWeapon?.axlShoot(player, AxlBulletType.AltFire);
 						} else {
 							player.axlWeapon?.axlShoot(player, AxlBulletType.WhiteAxlCopyShot2);
-							player.axlWeapon?.axlShoot(player, AxlBulletType.WhiteAxlCopyShot2);
 						}
 					}
 				}
