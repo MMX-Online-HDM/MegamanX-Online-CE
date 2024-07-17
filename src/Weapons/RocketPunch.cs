@@ -224,7 +224,7 @@ public class RocketPunchAttack : CharState {
 			shoot();
 		}
 		if (proj != null) {
-			if (player.vileRocketPunchWeapon.type == (int)RocketPunchType.SpoiledBrat) {
+			if (vile.rocketPunchWeapon.type == (int)RocketPunchType.SpoiledBrat) {
 				if (player.input.isPressed(Control.Special1, player)) {
 					specialPressTime = 0.25f;
 				}
@@ -252,7 +252,7 @@ public class RocketPunchAttack : CharState {
 		character.frameTime = 0;
 		var poi = character.sprite.getCurrentFrame().POIs[0];
 		poi.x *= character.xDir;
-		proj = new RocketPunchProj(player.vileRocketPunchWeapon, character.pos.add(poi), character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
+		proj = new RocketPunchProj(vile.rocketPunchWeapon, character.pos.add(poi), character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
 	}
 
 	public void reset() {

@@ -424,6 +424,31 @@ public partial class Player {
 	public float sigmaMaxAmmo = 32;
 	public int? maverick1v1;
 	public bool maverick1v1Spawned;
+
+	public float possessedTime;
+	public const float maxPossessedTime = 12;
+	public Player possesser;
+
+	public List<MagnetMineProj> magnetMines = new List<MagnetMineProj>();
+	public List<RaySplasherTurret> turrets = new List<RaySplasherTurret>();
+	public List<GrenadeProj> grenades = new List<GrenadeProj>();
+	public List<ChillPIceStatueProj> iceStatues = new List<ChillPIceStatueProj>();
+	public List<WSpongeSpike> seeds = new List<WSpongeSpike>();
+	public List<Actor> mechaniloids = new List<Actor>();
+
+	ExplodeDieEffect explodeDieEffect;
+	public Character limboChar;
+	public bool suicided;
+
+	ushort savedArmorFlag;
+	public bool[] headArmorsPurchased = new bool[] { false, false, false };
+	public bool[] bodyArmorsPurchased = new bool[] { false, false, false };
+	public bool[] armArmorsPurchased = new bool[] { false, false, false };
+	public bool[] bootsArmorsPurchased = new bool[] { false, false, false };
+
+	public float lastMashAmount;
+	public int lastMashAmountSetFrame;
+
 	public bool isNon1v1MaverickSigma() {
 		return isSigma && maverick1v1 == null;
 	}
@@ -1091,9 +1116,6 @@ public partial class Player {
 		warpedIn = true;
 	}
 
-	public float possessedTime;
-	public const float maxPossessedTime = 12;
-	public Player possesser;
 	public void startPossess(Player possesser, bool sendRpc = false) {
 		possessedTime = maxPossessedTime;
 		this.possesser = possesser;
@@ -1650,21 +1672,18 @@ public partial class Player {
 		}
 	}
 
-	public List<MagnetMineProj> magnetMines = new List<MagnetMineProj>();
 	public void removeOwnedMines() {
 		for (int i = magnetMines.Count - 1; i >= 0; i--) {
 			magnetMines[i].destroySelf();
 		}
 	}
 
-	public List<RaySplasherTurret> turrets = new List<RaySplasherTurret>();
 	public void removeOwnedTurrets() {
 		for (int i = turrets.Count - 1; i >= 0; i--) {
 			turrets[i].destroySelf();
 		}
 	}
 
-	public List<GrenadeProj> grenades = new List<GrenadeProj>();
 	public void removeOwnedGrenades() {
 		for (int i = grenades.Count - 1; i >= 0; i--) {
 			grenades[i].destroySelf();
@@ -1672,7 +1691,6 @@ public partial class Player {
 		grenades.Clear();
 	}
 
-	public List<ChillPIceStatueProj> iceStatues = new List<ChillPIceStatueProj>();
 	public void removeOwnedIceStatues() {
 		for (int i = iceStatues.Count - 1; i >= 0; i--) {
 			iceStatues[i].destroySelf();
@@ -1680,7 +1698,6 @@ public partial class Player {
 		iceStatues.Clear();
 	}
 
-	public List<WSpongeSpike> seeds = new List<WSpongeSpike>();
 	public void removeOwnedSeeds() {
 		for (int i = seeds.Count - 1; i >= 0; i--) {
 			seeds[i].destroySelf();
@@ -1688,7 +1705,6 @@ public partial class Player {
 		seeds.Clear();
 	}
 
-	public List<Actor> mechaniloids = new List<Actor>();
 	public void removeOwnedMechaniloids() {
 		for (int i = mechaniloids.Count - 1; i >= 0; i--) {
 			mechaniloids[i].destroySelf();
@@ -1809,9 +1825,6 @@ public partial class Player {
 		}
 		return 5;
 	}
-
-	ExplodeDieEffect explodeDieEffect;
-	public Character limboChar;
 
 	public bool canReviveVile() {
 		if (Global.level.isElimination() ||
@@ -2027,7 +2040,6 @@ public partial class Player {
 		onCharacterDeath();
 	}
 
-	public bool suicided;
 	public void destroyCharacter() {
 		respawnTime = getRespawnTime();// * (suicided ? 2 : 1);
 		randomTip = Tips.getRandomTip(charNum);
@@ -2195,7 +2207,6 @@ public partial class Player {
 		setArmorNum(armorIndex, remove ? 3 : 15);
 	}
 
-	ushort savedArmorFlag;
 	public void setGoldenArmor(bool addOrRemove) {
 		if (addOrRemove) {
 			savedArmorFlag = armorFlag;
@@ -2249,11 +2260,6 @@ public partial class Player {
 	public bool hasBodyArmor(int xGame) { return bodyArmorNum == xGame; }
 	public bool hasHelmetArmor(int xGame) { return helmetArmorNum == xGame; }
 	public bool hasArmArmor(int xGame) { return armArmorNum == xGame; }
-
-	public bool[] headArmorsPurchased = new bool[] { false, false, false };
-	public bool[] bodyArmorsPurchased = new bool[] { false, false, false };
-	public bool[] armArmorsPurchased = new bool[] { false, false, false };
-	public bool[] bootsArmorsPurchased = new bool[] { false, false, false };
 
 	public bool isHeadArmorPurchased(int xGame) { return headArmorsPurchased[xGame - 1]; }
 	public bool isBodyArmorPurchased(int xGame) { return bodyArmorsPurchased[xGame - 1]; }
@@ -2409,9 +2415,6 @@ public partial class Player {
 			RPC.updatePlayer.sendRpc(id, kills, deaths);
 		}
 	}
-
-	public float lastMashAmount;
-	public int lastMashAmountSetFrame;
 
 	public float mashValue() {
 		int mashCount = input.mashCount;
