@@ -27,9 +27,9 @@ public class ServerPlayer {
 
 	[JsonIgnore]
 	public bool alreadyAutobalanced;
-
+	#nullable disable
 	public ServerPlayer() { }
-
+	#nullable enable
 	public ServerPlayer(
 		string name, int id, bool isHost, int charNum,
 		int? preferredAlliance, string deviceId, NetConnection? connection, int? startPing

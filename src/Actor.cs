@@ -885,6 +885,9 @@ public partial class Actor : GameObject {
 			cy = 1;
 		}
 
+		if (collider == null) {
+			return pos.y;
+		}
 		return pos.y - (collider.shape.getRect().h() * cy);
 	}
 
@@ -926,7 +929,10 @@ public partial class Actor : GameObject {
 		return true;
 	}
 
-	public void getKillerAndAssister(Player ownPlayer, ref Player killer, ref Player assister, ref int? weaponIndex, ref int? assisterProjId, ref int? assisterWeaponId) {
+	public void getKillerAndAssister(
+		Player ownPlayer, ref Player? killer, ref Player? assister, ref int? weaponIndex,
+		ref int? assisterProjId, ref int? assisterWeaponId
+	) {
 		if (damageHistory.Count > 0) {
 			for (int i = damageHistory.Count - 1; i >= 0; i--) {
 				var lastAttacker = damageHistory[i];
@@ -1189,7 +1195,7 @@ public partial class Actor : GameObject {
 	}
 
 	public void addDamageTextHelper(
-		Player attacker, float damage, float maxHealth, bool sendRpc
+		Player? attacker, float damage, float maxHealth, bool sendRpc
 	) {
 		if (attacker == null) return;
 

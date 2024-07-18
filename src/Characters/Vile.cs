@@ -5,6 +5,7 @@ using System.Linq;
 namespace MMXOnline;
 
 public class Vile : Character {
+	public bool vulcanActive;
 	public float vulcanLingerTime;
 	public const int callNewMechCost = 5;
 	float mechBusterCooldown;
@@ -68,11 +69,25 @@ public class Vile : Character {
 				vileForm = 1;
 			}
 		}
-		vulcanWeapon = new Vulcan((VulcanType)player.loadout.vileLoadout.vulcan);
+		VileLoadout vileLoadout = player.loadout.vileLoadout;
+
+		vulcanWeapon = new Vulcan((VulcanType)vileLoadout.vulcan);
+		cannonWeapon = new VileCannon((VileCannonType)vileLoadout.cannon);
+		missileWeapon = new VileMissile((VileMissileType)vileLoadout.missile);
+		rocketPunchWeapon = new RocketPunch((RocketPunchType)vileLoadout.vulcan);
+		napalmWeapon = new Napalm((NapalmType)vileLoadout.napalm);
+		grenadeWeapon = new VileBall((VileBallType)vileLoadout.ball);
+		cutterWeapon = new VileCutter((VileCutterType)vileLoadout.cutter);
+		flamethrowerWeapon = vileLoadout.flamethrower switch {
+			1 => new SeaDragonRage(),
+			2 => new DragonsWrath(),
+			_ => new WildHorseKick()
+		};
+		laserWeapon = new VileLaser((VileLaserType)vileLoadout.laser);
 		rideMenuWeapon = new MechMenuWeapon(VileMechMenuType.All);
 	}
 
-	public Sprite getCannonSprite(out Point poiPos, out int zIndexDir) {
+	public Sprite? getCannonSprite(out Point poiPos, out int zIndexDir) {
 		poiPos = getCenterPos();
 		zIndexDir = 0;
 
@@ -323,9 +338,9 @@ public class Vile : Character {
 		if (!player.canControl) return;
 
 		// GMTODO: Consider a better way here instead of a hard-coded deny list
-		if (charState is Die || charState is Hurt || charState is VileRevive || charState is VileMK2Grabbed || charState is DeadLiftGrabbed || charState is WhirlpoolGrabbed || charState is UPGrabbed || charState is Taunt ||
-			charState is DarkHoldState || charState is HexaInvoluteState || charState is CallDownMech || charState is NapalmAttack) return;
-
+		if (charState.attackCtrl || charState is VileMK2GrabState) {
+			return;
+		}
 		if (charState is Dash || charState is AirDash) {
 			if (isVileMK2 && (player.input.isPressed(Control.Special1, player))) {
 				charState.isGrabbing = true;
@@ -539,7 +554,7 @@ public class Vile : Character {
 		return headPos.Value.addxy(-xDir * 5, 3);
 	}
 
-	public void setVileShootTime(Weapon weapon, float modifier = 1f, Weapon targetCooldownWeapon = null) {
+	public void setVileShootTime(Weapon weapon, float modifier = 1f, Weapon? targetCooldownWeapon = null) {
 		targetCooldownWeapon = targetCooldownWeapon ?? weapon;
 		if (isVileMK2) {
 			float innerModifier = 1f;
@@ -550,8 +565,8 @@ public class Vile : Character {
 		}
 	}
 
-	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		Projectile proj = null;
+	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
+		Projectile? proj = null;
 		if (sprite.name.Contains("dash_grab")) {
 			proj = new GenericMeleeProj(new VileMK2Grab(), centerPoint, ProjIds.VileMK2Grab, player, 0, 0, 0);
 		}
@@ -622,7 +637,7 @@ public class Vile : Character {
 			removeRenderEffect(RenderEffectType.SpeedDevilTrail);
 		}
 		if (currentFrame?.POIs?.Count > 0) {
-			Sprite cannonSprite = getCannonSprite(out Point poiPos, out int zIndexDir);
+			Sprite? cannonSprite = getCannonSprite(out Point poiPos, out int zIndexDir);
 			cannonSprite?.draw(
 				cannonAimNum, poiPos.x, poiPos.y, getShootXDirSynced(),
 				1, getRenderEffectSet(), alpha, 1, 1, zIndex + zIndexDir,

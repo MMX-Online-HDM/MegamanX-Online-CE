@@ -7,6 +7,8 @@ using ProtoBuf;
 
 namespace MMXOnline;
 
+# nullable disable
+
 [ProtoContract]
 public class BanEntry {
 	[ProtoMember(1)] public string ipAddress;
@@ -133,3 +135,5 @@ public class ReportedPlayer {
 		return "report_" + validFilename + ".txt";
 	}
 }
+
+# nullable enable

@@ -4,6 +4,7 @@ using SFML.Graphics;
 namespace MMXOnline;
 
 public class CallDownMech : CharState {
+	Vile vile = null!;
 	RideArmor rideArmor;
 	bool isNew;
 
@@ -44,6 +45,7 @@ public class CallDownMech : CharState {
 		base.onEnter(oldState);
 		rideArmor.changeState(new RACalldown(character.pos, isNew), true);
 		rideArmor.xDir = character.xDir;
+		vile = character as Vile ?? throw new NullReferenceException();
 	}
 }
 
@@ -51,6 +53,7 @@ public class VileRevive : CharState {
 	public float radius = 200;
 	Anim drDopplerAnim;
 	bool isMK5;
+	Vile vile;
 
 	public VileRevive(bool isMK5) : base(isMK5 ? "revive_to5" : "revive") {
 		invincible = true;
@@ -100,6 +103,7 @@ public class VileRevive : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		vile = character as Vile ?? throw new NullReferenceException();
 		//character.setzIndex(ZIndex.Foreground);
 		character.playSound("revive");
 		character.addMusicSource("demo_X3", character.getCenterPos(), false, loop: false);
@@ -143,6 +147,7 @@ public class VileHover : CharState {
 	float flyVelAcc = 500;
 	float flyVelMaxSpeed = 200;
 	public float fallY;
+	Vile vile = null!;
 
 	public VileHover(string transitionSprite = "") : base("hover", "hover_shoot", "", transitionSprite) {
 		exitOnLanding = true;
@@ -242,6 +247,7 @@ public class VileHover : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		vile = character as Vile ?? throw new NullReferenceException();
 		character.useGravity = false;
 		if (player.speedDevil) {
 			flyVelMaxSpeed *= 1.1f;

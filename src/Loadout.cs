@@ -115,7 +115,6 @@ public class VileLoadout {
 	[ProtoMember(7)] public int laser;
 	[ProtoMember(8)] public int cutter;
 	[ProtoMember(9)] public int flamethrower;
-	[ProtoMember(10)] public int hyperMode;
 
 	public const int maxWeight = 1000;
 
@@ -141,18 +140,15 @@ public class VileLoadout {
 	}
 
 	public void validate() {
-		if (!inRange(cannon, 0, 2)) cannon = 0;
-		if (!inRange(vulcan, 0, 2)) vulcan = 0;
-		if (!inRange(missile, 0, 2)) missile = 0;
-		if (!inRange(rocketPunch, 0, 2)) rocketPunch = 0;
-		if (!inRange(napalm, -1, 3)) napalm = 0;
-		if (!inRange(ball, -1, 3)) ball = 0;
-		if (!inRange(laser, 0, 2)) laser = 0;
-		if (cutter < -1 || cutter > 2) cutter = 0;
-		if (!inRange(flamethrower, -1, 3)) flamethrower = 0;
-		if (hyperMode < 0 || hyperMode > 2) hyperMode = 0;
-
-		//if (cannon == -1 && vulcan == -1) cannon = 0;
+		if (!inRange(cannon, 0, 2)) { cannon = 0; }
+		if (!inRange(vulcan, 0, 2)) { vulcan = 0; }
+		if (!inRange(missile, 0, 2)) { missile = 0; }
+		if (!inRange(rocketPunch, 0, 2)) { rocketPunch = 0; }
+		if (!inRange(napalm, -1, 3)) { napalm = 0; }
+		if (!inRange(ball, -1, 3)) { ball = 0; }
+		if (!inRange(laser, 0, 2)) { laser = 0; }
+		if (!inRange(cutter, -1, 2)) { cutter = 0; }
+		if (!inRange(flamethrower, -1, 3)) { flamethrower = 0; }
 
 		if (getTotalWeight() > maxWeight) {
 			cannon = 0;
@@ -161,23 +157,23 @@ public class VileLoadout {
 			rocketPunch = 0;
 			napalm = 0;
 			ball = 0;
-			laser = -1;
-			cutter = -1;
-			flamethrower = -1;
+			laser = 0;
+			cutter = 0;
+			flamethrower = 0;
 		}
 	}
 
 	public int getTotalWeight() {
 		int totalWeight =
-			SelectVileWeaponMenu.vileWeaponCategories[0].Item2.FirstOrDefault(w => w.type == cannon).vileWeight +
-			SelectVileWeaponMenu.vileWeaponCategories[1].Item2.FirstOrDefault(w => w.type == vulcan).vileWeight +
-			SelectVileWeaponMenu.vileWeaponCategories[2].Item2.FirstOrDefault(w => w.type == missile).vileWeight +
-			SelectVileWeaponMenu.vileWeaponCategories[3].Item2.FirstOrDefault(w => w.type == rocketPunch).vileWeight +
-			SelectVileWeaponMenu.vileWeaponCategories[4].Item2.FirstOrDefault(w => w.type == napalm).vileWeight +
-			SelectVileWeaponMenu.vileWeaponCategories[5].Item2.FirstOrDefault(w => w.type == ball).vileWeight +
-			SelectVileWeaponMenu.vileWeaponCategories[6].Item2.FirstOrDefault(w => w.type == cutter).vileWeight +
-			SelectVileWeaponMenu.vileWeaponCategories[7].Item2.FirstOrDefault(w => w.type == flamethrower).vileWeight +
-			SelectVileWeaponMenu.vileWeaponCategories[8].Item2.FirstOrDefault(w => w.type == laser).vileWeight;
+			SelectVileWeaponMenu.vileWeaponCategories[0].weapons.FirstOrDefault(w => w.type == cannon).vileWeight +
+			SelectVileWeaponMenu.vileWeaponCategories[1].weapons.FirstOrDefault(w => w.type == vulcan).vileWeight +
+			SelectVileWeaponMenu.vileWeaponCategories[2].weapons.FirstOrDefault(w => w.type == missile).vileWeight +
+			SelectVileWeaponMenu.vileWeaponCategories[3].weapons.FirstOrDefault(w => w.type == rocketPunch).vileWeight +
+			SelectVileWeaponMenu.vileWeaponCategories[4].weapons.FirstOrDefault(w => w.type == napalm).vileWeight +
+			SelectVileWeaponMenu.vileWeaponCategories[5].weapons.FirstOrDefault(w => w.type == ball).vileWeight +
+			SelectVileWeaponMenu.vileWeaponCategories[6].weapons.FirstOrDefault(w => w.type == cutter).vileWeight +
+			SelectVileWeaponMenu.vileWeaponCategories[7].weapons.FirstOrDefault(w => w.type == flamethrower).vileWeight +
+			SelectVileWeaponMenu.vileWeaponCategories[8].weapons.FirstOrDefault(w => w.type == laser).vileWeight;
 		return totalWeight;
 	}
 

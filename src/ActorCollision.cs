@@ -23,7 +23,7 @@ public partial class Actor {
 		}
 	}
 
-	public void changeGlobalColliderWithoutGridChange(Collider newGlobalCollider) {
+	public void changeGlobalColliderWithoutGridChange(Collider? newGlobalCollider) {
 		_globalCollider = newGlobalCollider;
 	}
 
@@ -68,9 +68,9 @@ public partial class Actor {
 		get {
 			Collider stdColl = getAllColliders().FirstOrDefault();
 			if (stdColl == null) {
-				return stdColl;
+				return null;
 			}
-			Collider lvColl = getTerrainCollider();
+			Collider? lvColl = getTerrainCollider();
 			if (lvColl != null) {
 				return lvColl;
 			}
@@ -78,9 +78,9 @@ public partial class Actor {
 		}
 	}
 
-	public Collider standartCollider => getAllColliders().FirstOrDefault();
+	public Collider? standartCollider => getAllColliders().FirstOrDefault();
 
-	public Collider physicsCollider {
+	public Collider? physicsCollider {
 		get {
 			return getAllColliders().FirstOrDefault(c => !c.isTrigger);
 		}
@@ -122,7 +122,7 @@ public partial class Actor {
 			DrawWrappers.DrawPolygon(allCollider.shape.points, hitboxColor, fill: true, zIndex + 1);
 		}
 		if (hasNonAttackColider) {
-			Collider terrainCollider = getTerrainCollider();
+			Collider? terrainCollider = getTerrainCollider();
 			if (terrainCollider == null) {
 				return;
 			}
@@ -176,15 +176,17 @@ public partial class Actor {
 		}
 	}
 
-	public bool spriteToColliderMatch(string spriteName, out Collider overrideGlobalCollider) {
+	public bool spriteToColliderMatch(string spriteName, out Collider? overrideGlobalCollider) {
 		int underscorePos = spriteName.IndexOf('_');
 		if (underscorePos >= 0) {
 			spriteName = spriteName.Substring(underscorePos + 1);
 		}
 
-		foreach (var kvp in spriteToCollider) {
-			string spriteKey = kvp.Key;
-			Collider colliderValue = kvp.Value;
+		foreach ((string name, Collider? colliderValue) in spriteToCollider) {
+			if (colliderValue == null) {
+				continue;
+			}
+			string spriteKey = name;
 			if (spriteKey.Contains("*")) {
 				spriteKey = spriteKey.Replace("*", "");
 				if (spriteName.StartsWith(spriteKey)) {
@@ -256,7 +258,7 @@ public partial class Actor {
 		Global.level.addGameObjectToGrid(this);
 	}
 
-	public CollideData sweepTest(Point offset) {
+	public CollideData? sweepTest(Point offset) {
 		Point inc = offset.clone();
 		var collideData = Global.level.checkCollisionActor(this, inc.x, inc.y);
 		if (collideData != null) {
@@ -363,19 +365,19 @@ public partial class Actor {
 		var currentCollideDatas = Global.level.checkCollisionsActor(this, 0, 0, null);
 
 		foreach (var collideData in currentCollideDatas) {
-			if (this is Character && collideData.gameObject is Character) {
-				(this as Character).insideCharacter = true;
-				(collideData.gameObject as Character).insideCharacter = true;
+			if (this is Character chara && collideData.gameObject is Character otherChara) {
+				chara.insideCharacter = true;
+				otherChara.insideCharacter = true;
 				continue;
 			}
 
 			Point? freeVec = null;
-			if (this is RideChaser rc) {
+			if (this is RideChaser rc && physicsCollider != null) {
 				// Hack to make ride chasers not get stuck on inclines
 				freeVec = physicsCollider.shape.getMinTransVectorDir(collideData.otherCollider.shape, new Point(0, -1));
 			}
 
-			if (freeVec == null || freeVec.Value.magnitude > 20) {
+			if ((freeVec == null || freeVec.Value.magnitude > 20) && physicsCollider != null) {
 				freeVec = physicsCollider.shape.getMinTransVector(collideData.otherCollider.shape);
 			}
 

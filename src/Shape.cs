@@ -10,7 +10,7 @@ public struct Shape {
 	public float maxX;
 	public float maxY;
 
-	public Shape(List<Point> points, List<Point> normals = null) {
+	public Shape(List<Point> points, List<Point>? normals = null) {
 		minX = float.MaxValue;
 		minY = float.MaxValue;
 		maxX = float.MinValue;
@@ -101,7 +101,7 @@ public struct Shape {
 	}
 
 	//IMPORTANT NOTE- When determining normals, it is always off "other".
-	public HitData intersectsShape(Shape other, Point? vel = null) {
+	public HitData? intersectsShape(Shape other, Point? vel = null) {
 		Global.collisionCalls++;
 		var pointOutside = false;
 		foreach (var point in points) {
@@ -216,7 +216,7 @@ public struct Shape {
 			if (min == null || dp < min) min = dp;
 			if (max == null || dp > max) max = dp;
 		}
-		return new float[] { (float)min, (float)max };
+		return new float[] { min ?? 0, max ?? 0 };
 	}
 
 	public Point? checkNormal(Shape other, Point normal) {

@@ -76,7 +76,7 @@ public class Server {
 	[JsonIgnore]
 	public ServerPlayer? playerToAutobalance;
 	[JsonIgnore]
-	public NetServer s_server;
+	public NetServer s_server = null!;
 	[JsonIgnore]
 	public bool killServer;
 	[JsonIgnore]
@@ -603,7 +603,11 @@ public class Server {
 		if (im.SenderConnection == null || connectMessage == "") {
 			return;
 		}
-		var playerContract = JsonConvert.DeserializeObject<ServerPlayer>(connectMessage);
+		ServerPlayer? playerContract = JsonConvert.DeserializeObject<ServerPlayer>(connectMessage);
+
+		if (playerContract == null) {
+			return;
+		}
 
 		bool shouldSpec = false;
 		if (!started) {
@@ -702,8 +706,9 @@ public class Server {
 
 	public void onDisconnect(NetIncomingMessage im, string reason) {
 		var disconnectedPlayer = players.FirstOrDefault(p => p.connection == im.SenderConnection && !p.isBot);
-		players.Remove(disconnectedPlayer);
-
+		if (disconnectedPlayer != null) {
+			players.Remove(disconnectedPlayer);
+		}
 		bool hostDisconnectBeforeStart = (disconnectedPlayer != null && disconnectedPlayer.isHost && !started);
 		if (players.Count == 0 ||
 			reason == "Recreate" ||
@@ -936,7 +941,7 @@ public class Server {
 		}
 
 		if (rpcTemplate.toHostOnly) {
-			if (host.connection != null) {
+			if (host?.connection != null) {
 				s_server.SendMessage(om, host.connection, rpcTemplate.netDeliveryMethod, 0);
 			}
 		} else if (all.Count > 0) {

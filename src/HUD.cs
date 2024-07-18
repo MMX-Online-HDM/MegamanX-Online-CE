@@ -24,7 +24,7 @@ public class BatchDrawable : Transformable, Drawable {
 
 // Draw wrappers and font code.
 public partial class DrawWrappers {
-	public static View hudView;
+	public static View hudView = null!;
 	public static List<Action> deferredTextDraws = new List<Action>();
 	public static void initHUD() {
 		hudView = new View(

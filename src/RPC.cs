@@ -218,14 +218,14 @@ public class RPCStartLevel : RPC {
 		var rpcStartLevelJson = JsonConvert.DeserializeObject<RPCStartLevelJson>(message);
 
 		// Sometimes server won't have player in it preventing mainPlayer from being set, in this case need to be a late joiner
-		if (!rpcStartLevelJson.server.players.Any(p => p.id == Global.serverClient.serverPlayer.id)) {
-			Global.serverClient.disconnect("Host recreated before client could reconnect");
+		if (rpcStartLevelJson?.server.players.Any(p => p.id == Global.serverClient?.serverPlayer.id) != true) {
+			Global.serverClient?.disconnect("Host recreated before client could reconnect");
 			Global.serverClient = null;
 			Menu.change(new ErrorMenu(new string[] { "Could not reconnect in time.", "Please rejoin the server manually." }, new JoinMenu(false)));
 			return;
 		}
 
-		Global.level.startLevel(rpcStartLevelJson.server, false);
+		Global.level?.startLevel(rpcStartLevelJson.server, false);
 	}
 }
 

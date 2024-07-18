@@ -9,7 +9,7 @@ public interface GameObject {
 	void update();
 	void postUpdate();
 	void render(float x, float y);
-	Collider collider { get; }
+	Collider? collider { get; }
 	List<Collider> getAllColliders();
 	Shape? getAllCollidersShape();
 	void onCollision(CollideData other);

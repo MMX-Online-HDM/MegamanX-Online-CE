@@ -180,10 +180,10 @@ public class CrystalSnail : Maverick {
 public class CrystalSnailShell : Actor {
 	const float leeway = 500;
 	int bounces;
-	CrystalSnail cs;
+	CrystalSnail? cs;
 
 	public CrystalSnailShell(
-		Point pos, int xDir, CrystalSnail cs, Player owner,
+		Point pos, int xDir, CrystalSnail? cs, Player owner,
 		ushort? netId, bool sendRpc = false, bool ownedByLocalPlayer = true
 	) : base(
 		"csnail_shell_empty", pos, netId, ownedByLocalPlayer, false

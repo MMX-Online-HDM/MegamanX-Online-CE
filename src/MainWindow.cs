@@ -7,27 +7,27 @@ using SFML.Window;
 namespace MMXOnline;
 
 public partial class Global {
-	public static RenderWindow window;
+	public static RenderWindow window = null!;
 	public static bool fullscreen;
 
-	public static RenderTexture renderTexture;
-	public static RenderTexture screenRenderTexture;
-	public static RenderTexture srtBuffer1;
-	public static RenderTexture srtBuffer2;
-	public static RenderTexture radarRenderTexture;
+	public static RenderTexture renderTexture = null!;
+	public static RenderTexture screenRenderTexture = null!;
+	public static RenderTexture srtBuffer1 = null!;
+	public static RenderTexture srtBuffer2 = null!;
+	public static RenderTexture radarRenderTexture = null!;
 
 	// Normal (small) camera
-	public static RenderTexture screenRenderTextureS;
-	public static RenderTexture srtBuffer1S;
-	public static RenderTexture srtBuffer2S;
+	public static RenderTexture screenRenderTextureS = null!;
+	public static RenderTexture srtBuffer1S = null!;
+	public static RenderTexture srtBuffer2S = null!;
 
 	// Large camera
-	public static RenderTexture screenRenderTextureL;
-	public static RenderTexture srtBuffer1L;
-	public static RenderTexture srtBuffer2L;
+	public static RenderTexture screenRenderTextureL = null!;
+	public static RenderTexture srtBuffer1L = null!;
+	public static RenderTexture srtBuffer2L = null!;
 
-	public static View view;
-	public static View backgroundView;
+	public static View view = null!;
+	public static View backgroundView = null!;
 
 	public static uint screenW = 384;
 	public static uint screenH = 216;

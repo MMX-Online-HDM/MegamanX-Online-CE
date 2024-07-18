@@ -106,7 +106,7 @@ public class RisingSpecterState : CharState {
 	public void shoot(Vile vile) {
 		Point shootPos = vile.setCannonAim(new Point(1.5f, -1));
 
-		if (vile.tryUseVileAmmo(vile.player.vileLaserWeapon.getAmmoUsage(0))) {
+		if (vile.tryUseVileAmmo(vile.laserWeapon.getAmmoUsage(0))) {
 			new RisingSpecterProj(
 				new VileLaser(VileLaserType.RisingSpecter), shootPos, vile.xDir,
 				vile.player, vile.player.getNextActorNetId(), rpc: true
@@ -209,6 +209,7 @@ public class RisingSpecterProj : Projectile {
 
 public class NecroBurstAttack : CharState {
 	bool shot = false;
+	Vile vile = null!;
 
 	public NecroBurstAttack(bool grounded) : base(grounded ? "idle_shoot" : "cannon_air", "", "", "") {
 	}
@@ -227,7 +228,7 @@ public class NecroBurstAttack : CharState {
 	}
 
 	public static void shoot(Vile vile) {
-		if (vile.tryUseVileAmmo(vile.player.vileLaserWeapon.getAmmoUsage(0))) {
+		if (vile.tryUseVileAmmo(vile.laserWeapon.getAmmoUsage(0))) {
 			Point shootPos = vile.setCannonAim(new Point(1, 0));
 			//character.vileAmmoRechargeCooldown = 3;
 			new NecroBurstProj(
@@ -236,6 +237,11 @@ public class NecroBurstAttack : CharState {
 			);
 			vile.playSound("necroburst", sendRpc: true);
 		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		vile = character as Vile ?? throw new NullReferenceException();
 	}
 }
 
@@ -338,7 +344,7 @@ public class StraightNightmareAttack : CharState {
 	}
 
 	public static void shoot(Vile vile) {
-		if (vile.tryUseVileAmmo(vile.player.vileLaserWeapon.getAmmoUsage(0))) {
+		if (vile.tryUseVileAmmo(vile.laserWeapon.getAmmoUsage(0))) {
 			Point shootPos = vile.setCannonAim(new Point(1, 0));
 			new StraightNightmareProj(new VileLaser(VileLaserType.StraightNightmare), shootPos.addxy(-8 * vile.xDir, 0), vile.xDir, vile.player, vile.player.getNextActorNetId(), sendRpc: true);
 		}

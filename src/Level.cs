@@ -120,7 +120,7 @@ public partial class Level {
 
 	public List<Player> players = new List<Player>();
 	public Player mainPlayer;
-	public Player otherPlayer {
+	public Player? otherPlayer {
 		get {
 			return players.FirstOrDefault(p => !p.isMainPlayer);
 		}
@@ -152,7 +152,7 @@ public partial class Level {
 			return mainPlayer;
 		}
 	}
-	public Player getNextSpecPlayer(int inc) {
+	public Player? getNextSpecPlayer(int inc) {
 		var otherPlayers = spectatablePlayers();
 		if (otherPlayers.Count == 0) return null;
 

@@ -72,7 +72,7 @@ public class CollideData {
 	public bool isTrigger;
 	public HitData hitData;
 
-	public CollideData(Collider myCollider, Collider otherCollider, Point? vel, bool isTrigger, GameObject gameObject, HitData hitData) {
+	public CollideData(Collider? myCollider, Collider? otherCollider, Point? vel, bool isTrigger, GameObject? gameObject, HitData hitData) {
 		this.myCollider = myCollider;
 		this.otherCollider = otherCollider;
 		this.vel = vel;
@@ -156,7 +156,7 @@ public class HitData {
 		}
 	}
 
-	public HitData(Point? normal, List<Point> hitPoints, List<Line> hitLines = null) {
+	public HitData(Point? normal, List<Point>? hitPoints, List<Line> hitLines = null) {
 		this.normal = normal;
 		this.hitPoints = hitPoints ?? new List<Point>();
 		this.hitLines = hitLines ?? new List<Line>();
