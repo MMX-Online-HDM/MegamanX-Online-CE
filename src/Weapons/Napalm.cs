@@ -214,43 +214,43 @@ public class NapalmAttack : CharState {
 		if (napalmAttackType == NapalmAttackType.Napalm) {
 			if (!shot && character.sprite.frameIndex == 2) {
 				shot = true;
-				vile.setVileShootTime(player.vileNapalmWeapon);
+				vile.setVileShootTime(vile.napalmWeapon);
 				var poi = character.sprite.getCurrentFrame().POIs[0];
 				poi.x *= character.xDir;
 
 				Projectile proj;
 				if (napalmAttackType == NapalmAttackType.Napalm) {
-					if (player.vileNapalmWeapon.type == (int)NapalmType.RumblingBang) {
-						proj = new NapalmGrenadeProj(player.vileNapalmWeapon, character.pos.add(poi), character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
-					} else if (player.vileNapalmWeapon.type == (int)NapalmType.FireGrenade) {
+					if (vile.napalmWeapon.type == (int)NapalmType.RumblingBang) {
+						proj = new NapalmGrenadeProj(vile.napalmWeapon, character.pos.add(poi), character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
+					} else if (vile.napalmWeapon.type == (int)NapalmType.FireGrenade) {
 						character.playSound("FireNappalmMK2", forcePlay: false, sendRpc: true);
-						proj = new MK2NapalmGrenadeProj(player.vileNapalmWeapon, character.pos.add(poi), character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
-					} else if (player.vileNapalmWeapon.type == (int)NapalmType.SplashHit) {
-						proj = new SplashHitGrenadeProj(player.vileNapalmWeapon, character.pos.add(poi), character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
+						proj = new MK2NapalmGrenadeProj(vile.napalmWeapon, character.pos.add(poi), character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
+					} else if (vile.napalmWeapon.type == (int)NapalmType.SplashHit) {
+						proj = new SplashHitGrenadeProj(vile.napalmWeapon, character.pos.add(poi), character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
 					}
 				}
 			}
 		} else if (napalmAttackType == NapalmAttackType.Ball) {
-			if (player.vileBallWeapon.type == (int)VileBallType.ExplosiveRound) {
+			if (vile.grenadeWeapon.type == (int)VileBallType.ExplosiveRound) {
 				if (shootCount < 3 && character.sprite.frameIndex == 2) {
-					if (!vile.tryUseVileAmmo(player.vileBallWeapon.vileAmmoUsage)) {
+					if (!vile.tryUseVileAmmo(vile.grenadeWeapon.vileAmmoUsage)) {
 						character.changeState(new Crouch(""), true);
 						return;
 					}
 					shootCount++;
-					vile.setVileShootTime(player.vileBallWeapon);
+					vile.setVileShootTime(vile.grenadeWeapon);
 					var poi = character.sprite.getCurrentFrame().POIs[0];
 					poi.x *= character.xDir;
-					Projectile proj = new VileBombProj(player.vileBallWeapon, character.pos.add(poi), character.xDir, player, 0, character.player.getNextActorNetId(), rpc: true);
+					Projectile proj = new VileBombProj(vile.grenadeWeapon, character.pos.add(poi), character.xDir, player, 0, character.player.getNextActorNetId(), rpc: true);
 					proj.vel = new Point(character.xDir * 150, -200);
 					proj.maxTime = 0.6f;
 					character.sprite.frameIndex = 0;
 				}
-			} else if (player.vileBallWeapon.type == (int)VileBallType.SpreadShot) {
+			} else if (vile.grenadeWeapon.type == (int)VileBallType.SpreadShot) {
 				shootTime += Global.spf;
 				var poi = character.getFirstPOI();
 				if (shootTime > 0.06f && poi != null && shootCount <= 4) {
-					if (!vile.tryUseVileAmmo(player.vileBallWeapon.vileAmmoUsage)) {
+					if (!vile.tryUseVileAmmo(vile.grenadeWeapon.vileAmmoUsage)) {
 						character.changeState(new Crouch(""), true);
 						return;
 					}
@@ -261,20 +261,20 @@ public class NapalmAttack : CharState {
 					if (shootCount == 2) shootDir = Point.createFromAngle(0).times(150);
 					if (shootCount == 3) shootDir = Point.createFromAngle(22.5f).times(150);
 					if (shootCount == 4) shootDir = Point.createFromAngle(45f).times(150);
-					new StunShotProj(player.vileBallWeapon, poi.Value, character.xDir, 1, character.player, character.player.getNextActorNetId(), new Point(shootDir.x * character.xDir, shootDir.y), rpc: true);
+					new StunShotProj(vile.grenadeWeapon, poi.Value, character.xDir, 1, character.player, character.player.getNextActorNetId(), new Point(shootDir.x * character.xDir, shootDir.y), rpc: true);
 					shootCount++;
 				}
-			} else if (player.vileBallWeapon.type == (int)VileBallType.PeaceOutRoller) {
+			} else if (vile.grenadeWeapon.type == (int)VileBallType.PeaceOutRoller) {
 				if (!shot && character.sprite.frameIndex == 2) {
-					if (!vile.tryUseVileAmmo(player.vileBallWeapon.vileAmmoUsage)) {
+					if (!vile.tryUseVileAmmo(vile.grenadeWeapon.vileAmmoUsage)) {
 						character.changeState(new Crouch(""), true);
 						return;
 					}
 					shot = true;
-					vile.setVileShootTime(player.vileBallWeapon);
+					vile.setVileShootTime(vile.grenadeWeapon);
 					var poi = character.sprite.getCurrentFrame().POIs[0];
 					poi.x *= character.xDir;
-					Projectile proj = new PeaceOutRollerProj(player.vileBallWeapon, character.pos.add(poi), character.xDir, player, 0, character.player.getNextActorNetId(), rpc: true);
+					Projectile proj = new PeaceOutRollerProj(vile.grenadeWeapon, character.pos.add(poi), character.xDir, player, 0, character.player.getNextActorNetId(), rpc: true);
 					proj.vel = new Point(character.xDir * 150, -200);
 					proj.gravityModifier = 1;
 				}
@@ -289,7 +289,7 @@ public class NapalmAttack : CharState {
 				}
 				shootTime = 0;
 				character.playSound("flamethrower");
-				new FlamethrowerProj(player.vileFlamethrowerWeapon, poi.Value, character.xDir, true, player, player.getNextActorNetId(), sendRpc: true);
+				new FlamethrowerProj(vile.flamethrowerWeapon, poi.Value, character.xDir, true, player, player.getNextActorNetId(), sendRpc: true);
 			}
 
 			if (character.loopCount > 4) {

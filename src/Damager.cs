@@ -409,7 +409,7 @@ public class Damager {
 					character.addBurnTime(owner, new WolfSigmaHeadWeapon(), 3);
 					break;
 				case (int)ProjIds.WildHorseKick:
-					character.addBurnTime(owner, new VileFlamethrower(VileFlamethrowerType.WildHorseKick), 0.5f);
+					character.addBurnTime(owner, WildHorseKick.netWeapon, 0.5f);
 					break;
 				case (int)ProjIds.FStagFireball:
 					character.addBurnTime(owner, FlameStag.getWeapon(), 1f);

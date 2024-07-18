@@ -993,7 +993,7 @@ public class AI {
 				player.character.increaseCharge();
 			}
 
-			if (mmx.isHyperX && mmx.canShoot() && !player.isMainPlayer) {
+			if (mmx.isHyperX && mmx.canShoot()) {
 				//mmx.unpoShotCount = Math.Max(mmx.unpoShotCount, 4);
 				player.release(Control.Shoot);
 				player.press(Control.Shoot);
@@ -1126,7 +1126,7 @@ public class AI {
 				}
 			}
 		}
-		if (!player.isMainPlayer && isTargetInAir && zero.charState is Fall or Jump) {
+		if (isTargetInAir && zero.charState is Fall or Jump) {
 			zero.changeState(new ZeroUppercut(RisingType.Denjin, true), true);
 		}
 	}
@@ -1265,7 +1265,7 @@ public class AI {
 	}
 	public void WildDance(Character zero) {
 		if (character is Zero zero6) {
-			if (player.health <= 4 && target != null && !player.isMainPlayer) {
+			if (player.health <= 4 && target != null) {
 				if (character.isFacing(target) && zero6.sprite.name != null && zero6.grounded) {
 					WildDanceMove(zero);
 					player.clearAiInput();
@@ -1312,7 +1312,7 @@ public class AI {
 	public void zeroAIDodge(Character zero3, GameObject go) {
 		var proj = go as Projectile;
 				if (proj != null && proj.damager.owner.alliance != player.alliance) {
-					if (player.character is Zero zero && !player.isMainPlayer) {
+					if (player.character is Zero zero) {
 						//Projectile is not 
 						if (!(projId == (int)ProjIds.RollingShieldCharged || projId == (int)ProjIds.RollingShield
 							|| projId == (int)ProjIds.MagnetMine || projId == (int)ProjIds.FrostShield
@@ -1395,7 +1395,7 @@ public class AI {
 		foreach (GameObject gameObject in Global.level.gameObjects) {
 			if (gameObject is Projectile proj) {
 				if (proj.damager.owner.alliance != player.alliance) {
-					if (player.character is PunchyZero pzero1 && !player.isMainPlayer &&
+					if (player.character is PunchyZero pzero1 &&
 						!pzero1.isInvulnerable() && pzero.parryCooldown == 0 && pzero.charState.canAttack()) {
 						if (character != null && proj.isFacing(character) && character.withinX(proj, 100) && character.withinY(proj, 30)) {
 							if (pzero.gigaAttack.ammo >= 16 && pzero.grounded) {
@@ -1508,7 +1508,7 @@ public class AI {
 					&& !(cmdSigma.charState is CallDownMaverick or SigmaSlashState)) {
 					switch (Sattack) {
 						case 0: // Beam Saber
-							if (isTargetSuperClose && !player.isMainPlayer) {
+							if (isTargetSuperClose) {
 								cmdSigma.changeState(new SigmaSlashState(cmdSigma.charState), true);
 							}
 							break;
@@ -1590,7 +1590,7 @@ public class AI {
 							DoppmaSigma.changeState(new Sigma3Shoot(player.input.getInputDir(player)), true);
 							break;
 						case 1:
-							if (DoppmaSigma.grounded && !player.isMainPlayer) {
+							if (DoppmaSigma.grounded) {
 								DoppmaSigma.changeState(new SigmaThrowShieldState(), true);
 							}
 							break;
@@ -1690,13 +1690,13 @@ public class AI {
 		//Vile Start	
 		if (character is Vile vile) {
 			// You dare to grab me? i will blow myself up
-			if (character.charState?.isGrabbedState == true && player.health >= 12 && !player.isMainPlayer) {
+			if (character.charState?.isGrabbedState == true && player.health >= 12) {
 				if (Helpers.randomRange(0, 100) < 1)
 					character.changeState(new NecroBurstAttack(vile.grounded), true);
 			}
 
 			if (Helpers.randomRange(0, 100) < 1) {
-				if (isTargetInAir && isTargetSuperClose && !(character.charState is VileRevive or HexaInvoluteState) && player.vileAmmo >= 24 && !player.isMainPlayer)
+				if (isTargetInAir && isTargetSuperClose && !(character.charState is VileRevive or HexaInvoluteState) && player.vileAmmo >= 24)
 					character.changeState(new RisingSpecterState(vile.grounded), true);
 			}
 			int Vattack = Helpers.randomRange(0, 12);
@@ -1711,27 +1711,27 @@ public class AI {
 						player.weapon.vileShoot(WeaponIds.FrontRunner, vile);
 						break;
 					case 2:
-						player.vileRocketPunchWeapon.vileShoot(WeaponIds.RocketPunch, vile);
+						vile.rocketPunchWeapon.vileShoot(WeaponIds.RocketPunch, vile);
 						break;
 					case 3 when !vile.grounded:
-						player.vileBallWeapon.vileShoot(WeaponIds.VileBomb, vile);
+						vile.grenadeWeapon.vileShoot(WeaponIds.VileBomb, vile);
 						break;
 					case 4:
-						player.vileMissileWeapon.vileShoot(WeaponIds.ElectricShock, vile);
+						vile.missileWeapon.vileShoot(WeaponIds.ElectricShock, vile);
 						break;
 					case 5:
-						player.vileCutterWeapon.vileShoot(WeaponIds.VileCutter, vile);
+						vile.cutterWeapon.vileShoot(WeaponIds.VileCutter, vile);
 						break;
-					case 6 when vile.grounded && player.vileNapalmWeapon.type == (int)NapalmType.FireGrenade || player.vileNapalmWeapon.type == (int)NapalmType.SplashHit:
-						player.vileNapalmWeapon.vileShoot(WeaponIds.Napalm, vile);
+					case 6 when vile.grounded:
+						vile.napalmWeapon.vileShoot(WeaponIds.Napalm, vile);
 						break;
 					case 7 when vile.charState is Fall:
-						player.vileFlamethrowerWeapon.vileShoot(WeaponIds.VileFlamethrower, vile);
+						vile.flamethrowerWeapon.vileShoot(WeaponIds.VileFlamethrower, vile);
 						break;
-					case 8 when player.vileAmmo >= 24 && !player.isMainPlayer:
-						player.vileLaserWeapon.vileShoot(WeaponIds.VileLaser, vile);
+					case 8 when player.vileAmmo >= 24:
+						vile.laserWeapon.vileShoot(WeaponIds.VileLaser, vile);
 						break;
-					case 9 when vile.isVileMK5 && player.vileAmmo >= 20 && !player.isMainPlayer:
+					case 9 when vile.isVileMK5 && player.vileAmmo >= 20:
 						vile?.changeState(new HexaInvoluteState(), true);
 						break;
 				}

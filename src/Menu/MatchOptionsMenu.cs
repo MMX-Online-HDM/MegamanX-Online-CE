@@ -519,7 +519,7 @@ public class MatchOptionsMenu : IMainMenu {
 		if (Global.level.isElimination()) return false;
 		if (Global.serverClient == null) return true;
 		if (Global.level.server != null && Global.level.server.hidden) return true;
-		return false;
+		return true;
 	}
 
 	private bool isPublicMatch() {

@@ -277,7 +277,7 @@ public class HyperBusterZeroStart : CharState {
 		} else {
 			time += Global.spf;
 			if (time >= 1) {
-				character.changeState(new Idle(), true);
+				character.changeToLandingOrFall();
 			}
 		}
 	}
@@ -297,7 +297,7 @@ public class HyperBusterZeroStart : CharState {
 				destroyOnEnd: false, sendRpc: true
 			);
 		LightX3.fadeIn = true;
-		character.player.currency -= 10;
+		character.player.currency -= Player.zBusterZeroHyperCost;
 		character.playSound("blackzeroentry", forcePlay: false, sendRpc: true);
 	}
 
