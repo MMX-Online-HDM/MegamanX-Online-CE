@@ -198,6 +198,7 @@ public class NapalmAttack : CharState {
 	NapalmAttackType napalmAttackType;
 	float shootTime;
 	int shootCount;
+	Vile vile = null!;
 
 	public NapalmAttack(NapalmAttackType napalmAttackType, string transitionSprite = "") :
 		base(getSprite(napalmAttackType), "", "", transitionSprite) {
@@ -301,6 +302,11 @@ public class NapalmAttack : CharState {
 		if (character.isAnimOver()) {
 			character.changeState(new Crouch(""), true);
 		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		vile = character as Vile ?? throw new NullReferenceException();
 	}
 }
 

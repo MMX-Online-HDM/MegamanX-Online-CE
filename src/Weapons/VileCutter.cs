@@ -97,7 +97,7 @@ public class CutterAttackState : CharState {
 		Point muzzlePos = vile.pos.add(poi);
 		vile.playSound("frontrunner", sendRpc: true);
 
-		proj = new VileCutterProj(player.vileCutterWeapon, muzzlePos, vile.getShootXDir(), player, player.getNextActorNetId(), shootVel, rpc: true);
+		proj = new VileCutterProj(vile.cutterWeapon, muzzlePos, vile.getShootXDir(), player, player.getNextActorNetId(), shootVel, rpc: true);
 	}
 
 	public override void onEnter(CharState oldState) {

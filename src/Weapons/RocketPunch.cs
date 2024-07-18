@@ -208,6 +208,8 @@ public class RocketPunchAttack : CharState {
 	bool shot = false;
 	RocketPunchProj? proj;
 	float specialPressTime;
+	Vile vile = null!;
+
 	public RocketPunchAttack(string transitionSprite = "") : base("rocket_punch", "", "", transitionSprite) {
 	}
 
@@ -259,5 +261,10 @@ public class RocketPunchAttack : CharState {
 		character.frameIndex = 0;
 		stateTime = 0;
 		shot = false;
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		vile = character as Vile ?? throw new NullReferenceException();
 	}
 }
