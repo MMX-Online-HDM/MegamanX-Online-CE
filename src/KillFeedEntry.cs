@@ -3,16 +3,16 @@
 namespace MMXOnline;
 
 public class KillFeedEntry {
-	public Player killer;
-	public Player assister;
-	public Player victim;
+	public Player? killer;
+	public Player? assister;
+	public Player? victim;
 	public int? weaponIndex;
-	public string customMessage;
+	public string? customMessage;
 	public int customMessageAlliance = GameMode.blueAlliance;
 	public float time = 0;
 	public int? maverickKillFeedIndex;
 
-	public KillFeedEntry(Player killer, Player assister, Player victim, int? weaponIndex, int? maverickKillFeedIndex = null) {
+	public KillFeedEntry(Player? killer, Player? assister, Player victim, int? weaponIndex, int? maverickKillFeedIndex = null) {
 		this.killer = killer;
 		this.assister = assister;
 		this.victim = victim;
@@ -20,7 +20,7 @@ public class KillFeedEntry {
 		this.maverickKillFeedIndex = maverickKillFeedIndex;
 	}
 
-	public KillFeedEntry(string message, int alliance, Player player = null) {
+	public KillFeedEntry(string message, int alliance, Player? player = null) {
 		customMessage = message;
 		customMessageAlliance = alliance;
 		victim = player;

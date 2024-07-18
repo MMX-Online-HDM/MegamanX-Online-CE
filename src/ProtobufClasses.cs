@@ -3,6 +3,8 @@ using ProtoBuf;
 
 namespace MMXOnline;
 
+# nullable disable
+
 [ProtoContract]
 public class RPCMatchOverResponse {
 	[ProtoMember(1)] public HashSet<int> winningAlliances;
@@ -70,7 +72,7 @@ public class PeriodicServerSyncModel {
 
 [ProtoContract]
 public class PeriodicHostSyncModel {
-	[ProtoMember(1)] public RPCMatchOverResponse? matchOverResponse;
+	[ProtoMember(1)] public RPCMatchOverResponse matchOverResponse;
 	[ProtoMember(2)] public int redPoints;
 	[ProtoMember(3)] public HashSet<byte> crackedWallBytes = new HashSet<byte>();
 	[ProtoMember(4)] public byte virusStarted;
@@ -122,3 +124,5 @@ public class PlayerPB {
 		charXDir = player.charXDir;
 	}
 }
+
+# nullable enable

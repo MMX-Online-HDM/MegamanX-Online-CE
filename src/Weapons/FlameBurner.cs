@@ -33,20 +33,19 @@ public class FlameBurner : AxlWeapon {
 	public override void axlGetProjectile(Weapon weapon, Point bulletPos, int xDir, Player player, float angle, IDamagable target, Character headshotTarget, Point cursorPos, int chargeLevel, ushort netId) {
 		if (!player.ownedByLocalPlayer) return;
 		Point bulletDir = Point.createFromAngle(angle);
-		Projectile bullet = null;
 		if (chargeLevel < 3) {
-			if (player?.character?.isUnderwater() == false) {
-				bullet = new FlameBurnerProj(weapon, bulletPos, xDir, player, bulletDir, netId, sendRpc: true);
-				bullet = new FlameBurnerProj(weapon, bulletPos.add(bulletDir.times(5)), xDir, player, Point.createFromAngle(angle + Helpers.randomRange(-10, 10)), player.getNextActorNetId(), sendRpc: true);
-				bullet = new FlameBurnerProj(weapon, bulletPos.add(bulletDir.times(10)), xDir, player, Point.createFromAngle(angle + Helpers.randomRange(-10, 10)), player.getNextActorNetId(), sendRpc: true);
+			if (player.character?.isUnderwater() == false) {
+				new FlameBurnerProj(weapon, bulletPos, xDir, player, bulletDir, netId, sendRpc: true);
+				new FlameBurnerProj(weapon, bulletPos.add(bulletDir.times(5)), xDir, player, Point.createFromAngle(angle + Helpers.randomRange(-10, 10)), player.getNextActorNetId(), sendRpc: true);
+				new FlameBurnerProj(weapon, bulletPos.add(bulletDir.times(10)), xDir, player, Point.createFromAngle(angle + Helpers.randomRange(-10, 10)), player.getNextActorNetId(), sendRpc: true);
 			}
 			RPC.playSound.sendRpc(shootSounds[0], player.character?.netId);
 		} else {
 			if (altFire == 0) {
-				bullet = new CircleBlazeProj(weapon, bulletPos, xDir, player, bulletDir, netId, sendRpc: true);
+				new CircleBlazeProj(weapon, bulletPos, xDir, player, bulletDir, netId, sendRpc: true);
 				RPC.playSound.sendRpc(shootSounds[3], player.character?.netId);
 			} else {
-				bullet = new FlameBurnerAltProj(weapon, bulletPos, xDir, player, bulletDir, netId, sendRpc: true);
+				new FlameBurnerAltProj(weapon, bulletPos, xDir, player, bulletDir, netId, sendRpc: true);
 				RPC.playSound.sendRpc(shootSounds[3], player.character?.netId);
 			}
 		}

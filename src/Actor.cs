@@ -885,6 +885,9 @@ public partial class Actor : GameObject {
 			cy = 1;
 		}
 
+		if (collider == null) {
+			return pos.y;
+		}
 		return pos.y - (collider.shape.getRect().h() * cy);
 	}
 
@@ -1189,7 +1192,7 @@ public partial class Actor : GameObject {
 	}
 
 	public void addDamageTextHelper(
-		Player attacker, float damage, float maxHealth, bool sendRpc
+		Player? attacker, float damage, float maxHealth, bool sendRpc
 	) {
 		if (attacker == null) return;
 

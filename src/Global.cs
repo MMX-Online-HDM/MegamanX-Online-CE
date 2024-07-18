@@ -527,11 +527,11 @@ public partial class Global {
 
 	public static int defaultThresholdPing = 200;
 	public static Level level;
-	public static ServerClient serverClient;
-	public static Server localServer;
+	public static ServerClient? serverClient;
+	public static Server? localServer;
 	public static bool isOffline { get { return serverClient == null; } }
 	public static bool isHost { get { return level != null && level.isHost; } }
-	public static LeaveMatchSignal leaveMatchSignal;
+	public static LeaveMatchSignal? leaveMatchSignal;
 	public const int basePort = 14242;
 	public const int clientPort = 14240;
 	public static bool firstTimeVersionCheck = false;

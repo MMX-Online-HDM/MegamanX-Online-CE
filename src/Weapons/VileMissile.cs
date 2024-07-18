@@ -1,4 +1,6 @@
-﻿namespace MMXOnline;
+﻿using System;
+
+namespace MMXOnline;
 
 public enum VileMissileType {
 	None = -1,
@@ -8,7 +10,7 @@ public enum VileMissileType {
 }
 
 public class VileMissile : Weapon {
-	public string projSprite;
+	public string projSprite = "";
 	public float vileAmmo;
 
 	public VileMissile(VileMissileType vileMissileType) : base() {
@@ -283,6 +285,6 @@ public class MissileAttack : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		shootLogic(character as Vile);
+		shootLogic(character as Vile ?? throw new NullReferenceException());
 	}
 }

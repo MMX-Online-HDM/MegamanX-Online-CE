@@ -4,6 +4,8 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class FireWave : Weapon {
+	public static FireWave netWeapon = new();
+	
 	public FireWave() : base() {
 		index = (int)WeaponIds.FireWave;
 		killFeedIndex = 4;

@@ -120,7 +120,7 @@ public partial class Level {
 
 	public List<Player> players = new List<Player>();
 	public Player mainPlayer;
-	public Player otherPlayer {
+	public Player? otherPlayer {
 		get {
 			return players.FirstOrDefault(p => !p.isMainPlayer);
 		}
