@@ -5,6 +5,7 @@ using System.Linq;
 namespace MMXOnline;
 
 public class Vile : Character {
+	public bool vulcanActive;
 	public float vulcanLingerTime;
 	public const int callNewMechCost = 5;
 	float mechBusterCooldown;
@@ -323,9 +324,9 @@ public class Vile : Character {
 		if (!player.canControl) return;
 
 		// GMTODO: Consider a better way here instead of a hard-coded deny list
-		if (charState is Die || charState is Hurt || charState is VileRevive || charState is VileMK2Grabbed || charState is DeadLiftGrabbed || charState is WhirlpoolGrabbed || charState is UPGrabbed || charState is Taunt ||
-			charState is DarkHoldState || charState is HexaInvoluteState || charState is CallDownMech || charState is NapalmAttack) return;
-
+		if (charState.attackCtrl || charState is VileMK2Grab) {
+			return;
+		}
 		if (charState is Dash || charState is AirDash) {
 			if (isVileMK2 && (player.input.isPressed(Control.Special1, player))) {
 				charState.isGrabbing = true;
