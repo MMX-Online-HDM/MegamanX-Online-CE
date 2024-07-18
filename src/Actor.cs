@@ -929,7 +929,10 @@ public partial class Actor : GameObject {
 		return true;
 	}
 
-	public void getKillerAndAssister(Player ownPlayer, ref Player killer, ref Player assister, ref int? weaponIndex, ref int? assisterProjId, ref int? assisterWeaponId) {
+	public void getKillerAndAssister(
+		Player ownPlayer, ref Player? killer, ref Player? assister, ref int? weaponIndex,
+		ref int? assisterProjId, ref int? assisterWeaponId
+	) {
 		if (damageHistory.Count > 0) {
 			for (int i = damageHistory.Count - 1; i >= 0; i--) {
 				var lastAttacker = damageHistory[i];

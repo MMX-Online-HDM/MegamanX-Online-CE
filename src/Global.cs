@@ -86,7 +86,7 @@ public partial class Global {
 	public static int? quickStartMechNum = 0;
 	public static bool? quickStartVileMK2 = false;
 	public static bool? quickStartVileMK5 = false;
-	public static string overrideSpawnPoint = null;//"Spawn Point3";
+	public static string? overrideSpawnPoint = null;//"Spawn Point3";
 
 	// Online quickstart
 	public static bool quickStartOnline = false;
@@ -223,7 +223,7 @@ public partial class Global {
 			//Global.showAIDebug = !Global.showAIDebug;
 		}
 		if (Global.input.isPressed(Key.F4)) {
-			Global.level?.mainPlayer?.forceKill();
+			Global.level.mainPlayer?.forceKill();
 			//Global.level?.mainPlayer?.character?.setHurt(1, Global.defFlinch);
 		}
 		if (Global.input.isPressed(Key.F5)) {

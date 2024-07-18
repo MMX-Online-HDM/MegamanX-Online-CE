@@ -30,7 +30,9 @@ public class KillFeedEntry {
 	}
 
 	public void sendRpc() {
-		var json = JsonConvert.SerializeObject(new RPCKillFeedEntryResponse(customMessage, customMessageAlliance, victim?.id));
+		var json = JsonConvert.SerializeObject(new RPCKillFeedEntryResponse(
+			customMessage, customMessageAlliance, victim?.id
+		));
 		Global.serverClient?.rpc(RPC.sendKillFeedEntry, json);
 	}
 

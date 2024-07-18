@@ -152,7 +152,7 @@ public partial class Level {
 			return mainPlayer;
 		}
 	}
-	public Player getNextSpecPlayer(int inc) {
+	public Player? getNextSpecPlayer(int inc) {
 		var otherPlayers = spectatablePlayers();
 		if (otherPlayers.Count == 0) return null;
 
