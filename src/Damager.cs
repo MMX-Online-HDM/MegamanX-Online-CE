@@ -471,7 +471,7 @@ public class Damager {
 					break;
 				//Other effects
 				case (int)ProjIds.PlasmaGun:
-					if (mmx != null) {
+					if (mmx != null && mmx.player.hasBodyArmor(3)) {
 						//The main shot fires an EMP burst that causes a full flinch and 
 						//destroys Rolling Shields as well as temporarily disabling X3 barriers
 						//He literally made an INFINITE DEACTIVATION
