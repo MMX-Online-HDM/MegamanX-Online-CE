@@ -374,8 +374,8 @@ public class Projectile : Actor {
 			}
 		}
 
-		var gmp = this as GenericMeleeProj;
-		var isSaber = gmp != null && gmp.isZSaber();
+		
+		var isSaber = GenericMeleeProj.isZSaberClang(projId);
 		if (isSaber && owner.character?.isCCImmune() != true) {
 			// Case 1: hitting a clangable projectile.
 			if (ownedByLocalPlayer && owner.character != null &&
@@ -387,9 +387,10 @@ public class Projectile : Actor {
 
 					owner.character.changeState(new ZeroClang(-owner.character.xDir), true);
 					owner.character.playSound("m10ding", sendRpc: true);
+					owner.character.addDamageText("Clang!", 3);
 
 					if (other.hitData.hitPoint != null) {
-						new Anim(other.hitData.hitPoint.Value, "zsaber_shot_fade", 1, owner.getNextActorNetId(), true, sendRpc: true);
+						new Anim(other.hitData.hitPoint.Value, "buster4_x3_muzzle", 1, owner.getNextActorNetId(), true, sendRpc: true);
 					}
 
 					destroySelf();
@@ -462,7 +463,7 @@ public class Projectile : Actor {
 			) {
 				if (deltaPos.x != 0 && Math.Sign(deltaPos.x) != otherProj.xDir) {
 					reflect(otherProj.owner, sendRpc: true);
-					playSound("m10ding", sendRpc: true);
+					playSound("sigmaSaberBlock", sendRpc: true);
 				}
 			}
 

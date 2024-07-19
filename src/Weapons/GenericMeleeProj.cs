@@ -121,59 +121,69 @@ public class GenericMeleeProj : Projectile {
 	}
 
 	public override DamagerMessage? onDamage(IDamagable? damagable, Player? attacker) {	
-			Point? hitPoint = (damagable as Actor)?.getCenterPos() ?? new Point(0,0);
-			Collider? hitbox = getGlobalCollider();
-			Collider? collider = (damagable as Actor)?.collider;
-			if (hitbox?.shape != null && collider?.shape != null) {
-				var hitboxCenter = hitbox.shape.getRect().center();
-				var hitCenter = collider.shape.getRect().center();
-				hitPoint = new Point((hitboxCenter.x + hitCenter.x) * 0.5f, (hitboxCenter.y + hitCenter.y) * 0.5f);
-			}
-			string SaberShotFade = "zsaber_shot_fade";
-			string SaberSlashFade = "zsaber_slash_fade";
-			string SparkVerticalFade = "sword_sparks_vertical";
-			//string SparkElectricFade = "tunnelfang_sparks";
-			//string PunchSpark = "sword_sparks_horizontal";
-			if (isZSaber() || projId == (int)ProjIds.X6Saber || projId == (int)ProjIds.XSaber) {
-				new Anim(hitPoint.Value, SaberShotFade, xDir,
-				 Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
-			}
-			switch (projId) {
-				case (int)ProjIds.ZSaber1:
-				case (int)ProjIds.ZSaberRollingSlash:
-				case (int)ProjIds.ZSaberAir: 
-				
-					new Anim(hitPoint.Value, SaberSlashFade, xDir,
-					 Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
-					break;
-				case (int)ProjIds.ZSaber2: 
-					new Anim(hitPoint.Value, SaberSlashFade, xDir*-1,
-					 Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
-					break;
-				case (int)ProjIds.Rakukojin: 
-					new Anim(hitPoint.Value, SparkVerticalFade, xDir,
-					 Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
-					break;
-			/*	case (int)ProjIds.Raijingeki: We need better hit effect sprites
-				case (int)ProjIds.Raijingeki2: 
-					new Anim(hitPoint.Value, SparkElectricFade, xDir,
-					 Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
-					break;
-				case (int)ProjIds.PZeroPunch: 
-				case (int)ProjIds.PZeroPunch2: 
-					new Anim(hitPoint.Value, PunchSpark, xDir,
-					 Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
-					break; */
-			}
+		Point? hitPoint = (damagable as Actor)?.getCenterPos() ?? new Point(0,0);
+		Collider? hitbox = getGlobalCollider();
+		Collider? collider = (damagable as Actor)?.collider;
+		if (hitbox?.shape != null && collider?.shape != null) {
+			var hitboxCenter = hitbox.shape.getRect().center();
+			var hitCenter = collider.shape.getRect().center();
+			hitPoint = new Point((hitboxCenter.x + hitCenter.x) * 0.5f, (hitboxCenter.y + hitCenter.y) * 0.5f);
+		}
+		string SaberShotFade = "zsaber_shot_fade";
+		string SaberSlashFade = "zsaber_slash_fade";
+		string SparkVerticalFade = "sword_sparks_vertical";
+		//string SparkElectricFade = "tunnelfang_sparks";
+		//string PunchSpark = "sword_sparks_horizontal";
+		if (isZSaberEffect() || projId == (int)ProjIds.X6Saber || projId == (int)ProjIds.XSaber) {
+			new Anim(hitPoint.Value, SaberShotFade, xDir,
+				Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
+		}
+		switch (projId) {
+			case (int)ProjIds.ZSaber1:
+			case (int)ProjIds.ZSaberRollingSlash:
+			case (int)ProjIds.ZSaberAir: 
+			
+				new Anim(hitPoint.Value, SaberSlashFade, xDir,
+					Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
+				break;
+			case (int)ProjIds.ZSaber2: 
+				new Anim(hitPoint.Value, SaberSlashFade, xDir*-1,
+					Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
+				break;
+			case (int)ProjIds.Rakukojin: 
+				new Anim(hitPoint.Value, SparkVerticalFade, xDir,
+					Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
+				break;
+		/*	case (int)ProjIds.Raijingeki: We need better hit effect sprites
+			case (int)ProjIds.Raijingeki2: 
+				new Anim(hitPoint.Value, SparkElectricFade, xDir,
+					Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
+				break;
+			case (int)ProjIds.PZeroPunch: 
+			case (int)ProjIds.PZeroPunch2: 
+				new Anim(hitPoint.Value, PunchSpark, xDir,
+					Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
+				break; */
+		}
 		return null;
 	}
 
-	public bool isZSaber() {
+	public bool isZSaberEffect() {
 		return 
 		/* projId == (int)ProjIds.ZSaber1 || */ projId == (int)ProjIds.ZSaber3 || /* projId == (int)ProjIds.ZSaber2 || */
 		projId == (int)ProjIds.ZSaberCrouch || projId == (int)ProjIds.ZSaberDash ||	projId == (int)ProjIds.DZMelee ||
 		projId == (int)ProjIds.ZSaberLadder || projId == (int)ProjIds.ZSaberslide || projId == (int)ProjIds.Shippuuga || 
 		/*projId == (int)ProjIds.ZSaberAir || */ projId == (int)ProjIds.RisingFang /*|| projId == (int)ProjIds.ZSaberRollingSlash*/;
+	}
+	public static bool isZSaberClang(int projId) {
+ 		// Turns out that, isZSaber bool (now, isZSaberEffect) is used on clanging, and i modified it to match with the fancy looks
+		// This one will be used for clanging purpose, also, original bool literally missed ZSaber2 and many others..
+		// how do you.. clang on Ladder? or.. Wall slash???.
+		return projId == (int)ProjIds.ZSaber1 || projId == (int)ProjIds.ZSaber2 || projId == (int)ProjIds.ZSaber3 ||
+		 	   projId == (int)ProjIds.ZSaberAir || projId == (int)ProjIds.ZSaberCrouch || projId == (int)ProjIds.ZSaberDash || 
+			   projId == (int)ProjIds.ZSaberLadder || projId == (int)ProjIds.ZSaberslide || projId == (int)ProjIds.ZSaberProjSwing ||
+			   projId == (int)ProjIds.ZSaberRollingSlash || projId == (int)ProjIds.DZMelee; 
+			   //i wonder if Shippuga could count as Z-Saber or Rising too, but this last wouldn't make sense as is an uppercut
 	}
 
 	public override void onDestroy() {

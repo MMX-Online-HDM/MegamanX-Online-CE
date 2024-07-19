@@ -967,14 +967,14 @@ public class AI {
 		// X:
 		if (character is MegamanX mmx) {
 
-			if (player.canUpgradeUltimateX() && player.health >= player.maxHealth) {
+			/*if (player.canUpgradeUltimateX() && player.health >= player.maxHealth) {
 				if (!mmx.boughtUltimateArmorOnce) {
 					player.currency -= Player.ultimateArmorCost;
 					mmx.boughtUltimateArmorOnce = true;
 				}
 				player.setUltimateArmor(true);
 				return;
-			}
+			} Deactivated until fixed */ 
 
 			if (player.hasAllX3Armor() && player.canUpgradeGoldenX() && player.health >= player.maxHealth) {
 				if (!mmx.boughtGoldenArmorOnce) {
