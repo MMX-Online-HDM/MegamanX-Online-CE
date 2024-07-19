@@ -17,122 +17,145 @@ public class AxlBullet : AxlWeapon {
 		shootSounds = new string[] { "axlBullet", "axlBullet", "axlBullet", "axlBulletCharged" };
 
 		this.type = (int)type;
-		if (type == AxlBulletWeaponType.AxlBullets) {
-			index = (int)WeaponIds.AxlBullet;
-			weaponBarBaseIndex = 28;
-			weaponBarIndex = 28;
-			weaponSlotIndex = 28;
-			killFeedIndex = 28;
-			sprite = "axl_arm_pistol";
-			flashSprite = "axl_pistol_flash";
-			chargedFlashSprite = "axl_pistol_flash_charged";
-			altFireCooldown = 0.3f;
-			displayName = "Axl Bullets";
-			canHealAmmo = false;
-		} else if (type == AxlBulletWeaponType.MetteurCrash) {
-			index = (int)WeaponIds.MetteurCrash;
-			weaponBarBaseIndex = 48;
-			weaponBarIndex = 28;
-			weaponSlotIndex = 99;
-			killFeedIndex = 127;
-			sprite = "axl_arm_metteurcrash";
-			flashSprite = "axl_pistol_flash";
-			chargedFlashSprite = "axl_pistol_flash_charged";
-			altFireCooldown = 0.3f;
-			displayName = "Mettaur Crash";
-			shootSounds = new string[] { "mettaurCrash", "axlBullet", "axlBullet", "axlBulletCharged" };
-		} else if (type == AxlBulletWeaponType.BeastKiller) {
-			index = (int)WeaponIds.BeastHunter;
-			weaponBarBaseIndex = 46;
-			weaponBarIndex = 28;
-			weaponSlotIndex = 97;
-			killFeedIndex = 128;
-			sprite = "axl_arm_beastkiller";
-			flashSprite = "axl_pistol_flash";
-			chargedFlashSprite = "axl_pistol_flash_charged";
-			altFireCooldown = 0.3f;
-			rateOfFire = 0.75f;
-			displayName = "Beast Killer";
-			shootSounds = new string[] { "beastKiller", "axlBullet", "axlBullet", "axlBulletCharged" };
-		} else if (type == AxlBulletWeaponType.MachineBullets) {
-			index = (int)WeaponIds.MachineBullets;
-			weaponBarBaseIndex = 45;
-			weaponBarIndex = 28;
-			weaponSlotIndex = 96;
-			killFeedIndex = 129;
-			sprite = "axl_arm_machinebullets";
-			flashSprite = "axl_pistol_flash";
-			chargedFlashSprite = "axl_pistol_flash_charged";
-			altFireCooldown = 0.3f;
-			rateOfFire = 0.15f;
-			displayName = "Machine Bullets";
-			shootSounds = new string[] { "machineBullets", "axlBullet", "axlBullet", "axlBulletCharged" };
-		} else if (type == AxlBulletWeaponType.RevolverBarrel) {
-			index = (int)WeaponIds.RevolverBarrel;
-			weaponBarBaseIndex = 47;
-			weaponBarIndex = 28;
-			weaponSlotIndex = 98;
-			killFeedIndex = 130;
-			sprite = "axl_arm_revolverbarrel";
-			flashSprite = "axl_pistol_flash";
-			chargedFlashSprite = "axl_pistol_flash_charged";
-			altFireCooldown = 0.3f;
-			displayName = "Revolver Barrel";
-			shootSounds = new string[] { "revolverBarrel", "axlBullet", "axlBullet", "axlBulletCharged" };
-		} else if (type == AxlBulletWeaponType.AncientGun) {
-			index = (int)WeaponIds.AncientGun;
-			weaponBarBaseIndex = 49;
-			weaponBarIndex = 28;
-			weaponSlotIndex = 100;
-			killFeedIndex = 131;
-			sprite = "axl_arm_ancientgun";
-			flashSprite = "axl_pistol_flash";
-			chargedFlashSprite = "axl_pistol_flash_charged";
-			altFireCooldown = 0.225f;
-			rateOfFire = 0.1f;
-			displayName = "Ancient Gun";
-			shootSounds = new string[] { "ancientGun3", "axlBullet", "axlBullet", "axlBulletCharged" };
+		switch (type) {
+			case AxlBulletWeaponType.AxlBullets:
+				index = (int)WeaponIds.AxlBullet;
+				weaponBarBaseIndex = 28;
+				weaponBarIndex = 28;
+				weaponSlotIndex = 28;
+				killFeedIndex = 28;
+				sprite = "axl_arm_pistol";
+				flashSprite = "axl_pistol_flash";
+				chargedFlashSprite = "axl_pistol_flash_charged";
+				altFireCooldown = 0.3f;
+				displayName = "Axl Bullets";
+				canHealAmmo = true;
+				break;
+			case AxlBulletWeaponType.MetteurCrash:
+				index = (int)WeaponIds.MetteurCrash;
+				weaponBarBaseIndex = 48;
+				weaponBarIndex = 28;
+				weaponSlotIndex = 99;
+				killFeedIndex = 127;
+				sprite = "axl_arm_metteurcrash";
+				flashSprite = "axl_pistol_flash";
+				chargedFlashSprite = "axl_pistol_flash_charged";
+				altFireCooldown = 0.3f;
+				displayName = "Mettaur Crash";
+				shootSounds = new string[] { "mettaurCrash", "axlBullet", "axlBullet", "axlBulletCharged" };
+				break;
+			case AxlBulletWeaponType.BeastKiller:
+				index = (int)WeaponIds.BeastHunter;
+				weaponBarBaseIndex = 46;
+				weaponBarIndex = 28;
+				weaponSlotIndex = 97;
+				killFeedIndex = 128;
+				sprite = "axl_arm_beastkiller";
+				flashSprite = "axl_pistol_flash";
+				chargedFlashSprite = "axl_pistol_flash_charged";
+				altFireCooldown = 0.3f;
+				rateOfFire = 0.75f;
+				displayName = "Beast Killer";
+				shootSounds = new string[] { "beastKiller", "axlBullet", "axlBullet", "axlBulletCharged" };
+				break;
+			case AxlBulletWeaponType.MachineBullets:
+				index = (int)WeaponIds.MachineBullets;
+				weaponBarBaseIndex = 45;
+				weaponBarIndex = 28;
+				weaponSlotIndex = 96;
+				killFeedIndex = 129;
+				sprite = "axl_arm_machinebullets";
+				flashSprite = "axl_pistol_flash";
+				chargedFlashSprite = "axl_pistol_flash_charged";
+				altFireCooldown = 0.3f;
+				rateOfFire = 0.15f;
+				displayName = "Machine Bullets";
+				shootSounds = new string[] { "machineBullets", "axlBullet", "axlBullet", "axlBulletCharged" };
+				break;
+			case AxlBulletWeaponType.RevolverBarrel:
+				index = (int)WeaponIds.RevolverBarrel;
+				weaponBarBaseIndex = 47;
+				weaponBarIndex = 28;
+				weaponSlotIndex = 98;
+				killFeedIndex = 130;
+				sprite = "axl_arm_revolverbarrel";
+				flashSprite = "axl_pistol_flash";
+				chargedFlashSprite = "axl_pistol_flash_charged";
+				altFireCooldown = 0.3f;
+				displayName = "Revolver Barrel";
+				shootSounds = new string[] { "revolverBarrel", "axlBullet", "axlBullet", "axlBulletCharged" };
+				break;
+			case AxlBulletWeaponType.AncientGun:
+				index = (int)WeaponIds.AncientGun;
+				weaponBarBaseIndex = 49;
+				weaponBarIndex = 28;
+				weaponSlotIndex = 100;
+				killFeedIndex = 131;
+				sprite = "axl_arm_ancientgun";
+				flashSprite = "axl_pistol_flash";
+				chargedFlashSprite = "axl_pistol_flash_charged";
+				altFireCooldown = 0.225f;
+				rateOfFire = 0.1f;
+				displayName = "Ancient Gun";
+				shootSounds = new string[] { "ancientGun3", "axlBullet", "axlBullet", "axlBulletCharged" };
+				break;
 		}
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
 		if (type == (int)AxlBulletWeaponType.MachineBullets) return 2;
 		if (type == (int)AxlBulletWeaponType.BeastKiller) return 3;
-		if (chargeLevel == 1) return 4;
-		else if (chargeLevel == 2) return 6;
-		else if (chargeLevel >= 3) return 8;
-		else return 1;
+		switch (chargeLevel) {
+			case 1:
+				return 4;
+			case 2:
+				return 6;
+			case >= 3:
+				return 8;
+			default:
+				return 1;
+		}
 		//return 0;
 	}
 
-	public override void axlGetProjectile(Weapon weapon, Point bulletPos, int xDir, Player player, float angle, IDamagable target, Character headshotTarget, Point cursorPos, int chargeLevel, ushort netId) {
-		Point bulletDir = Point.createFromAngle(angle);
-		Projectile bullet = null;
+	public override void axlGetProjectile(
+		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
+		IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
+	) {
+		Point? bulletDir = Point.createFromAngle(angle);
+		Projectile? bullet = null;
 		if (chargeLevel == 0) {
-			if (type == (int)AxlBulletWeaponType.AxlBullets) {
-				bullet = new AxlBulletProj(weapon, bulletPos, player, bulletDir, netId);
-			} else if (type == (int)AxlBulletWeaponType.MetteurCrash) {
-				bullet = new MettaurCrashProj(weapon, bulletPos, player, bulletDir, netId, sendRpc: true);
-			} else if (type == (int)AxlBulletWeaponType.BeastKiller) {
-				bullet = new BeastKillerProj(weapon, bulletPos, player, Point.createFromAngle(angle - 45), player.getNextActorNetId(), sendRpc: true);
-				bullet = new BeastKillerProj(weapon, bulletPos, player, Point.createFromAngle(angle - 22.5f), player.getNextActorNetId(), sendRpc: true);
-				bullet = new BeastKillerProj(weapon, bulletPos, player, bulletDir, player.getNextActorNetId(), sendRpc: true);
-				bullet = new BeastKillerProj(weapon, bulletPos, player, Point.createFromAngle(angle + 22.5f), player.getNextActorNetId(), sendRpc: true);
-				bullet = new BeastKillerProj(weapon, bulletPos, player, Point.createFromAngle(angle + 45), player.getNextActorNetId(), sendRpc: true);
-			} else if (type == (int)AxlBulletWeaponType.MachineBullets) {
-				bullet = new MachineBulletProj(weapon, bulletPos, player, Point.createFromAngle(angle + Helpers.randomRange(-25, 25)), player.getNextActorNetId(), sendRpc: true);
-				bullet = new MachineBulletProj(weapon, bulletPos, player, Point.createFromAngle(angle + Helpers.randomRange(-25, 25)), player.getNextActorNetId(), sendRpc: true);
-			} else if (type == (int)AxlBulletWeaponType.RevolverBarrel) {
-				bullet = new RevolverBarrelProj(weapon, bulletPos, player, bulletDir, netId, sendRpc: true);
-			} else if (type == (int)AxlBulletWeaponType.AncientGun) {
-				bullet = new AncientGunProj(weapon, bulletPos, player, bulletDir, player.getNextActorNetId(), sendRpc: true);
-				bullet = new AncientGunProj(weapon, bulletPos, player, Point.createFromAngle(angle + Helpers.randomRange(-25, 25)), player.getNextActorNetId(), sendRpc: true);
+			switch (type) {
+				case (int)AxlBulletWeaponType.AxlBullets:
+					bullet = new AxlBulletProj(weapon, bulletPos, player, bulletDir.Value, netId);
+					break;
+				case (int)AxlBulletWeaponType.MetteurCrash:
+					bullet = new MettaurCrashProj(weapon, bulletPos, player, bulletDir.Value, netId, sendRpc: true);
+					break;
+				case (int)AxlBulletWeaponType.BeastKiller:
+					bullet = new BeastKillerProj(weapon, bulletPos, player, Point.createFromAngle(angle - 45), player.getNextActorNetId(), sendRpc: true);
+					bullet = new BeastKillerProj(weapon, bulletPos, player, Point.createFromAngle(angle - 22.5f), player.getNextActorNetId(), sendRpc: true);
+					bullet = new BeastKillerProj(weapon, bulletPos, player, bulletDir.Value, player.getNextActorNetId(), sendRpc: true);
+					bullet = new BeastKillerProj(weapon, bulletPos, player, Point.createFromAngle(angle + 22.5f), player.getNextActorNetId(), sendRpc: true);
+					bullet = new BeastKillerProj(weapon, bulletPos, player, Point.createFromAngle(angle + 45), player.getNextActorNetId(), sendRpc: true);
+					break;
+				case (int)AxlBulletWeaponType.MachineBullets:
+					bullet = new MachineBulletProj(weapon, bulletPos, player, Point.createFromAngle(angle + Helpers.randomRange(-25, 25)), player.getNextActorNetId(), sendRpc: true);
+					bullet = new MachineBulletProj(weapon, bulletPos, player, Point.createFromAngle(angle + Helpers.randomRange(-25, 25)), player.getNextActorNetId(), sendRpc: true);
+					break;
+				case (int)AxlBulletWeaponType.RevolverBarrel:
+					bullet = new RevolverBarrelProj(weapon, bulletPos, player, bulletDir.Value, netId, sendRpc: true);
+					break;
+				case (int)AxlBulletWeaponType.AncientGun:
+					bullet = new AncientGunProj(weapon, bulletPos, player, bulletDir.Value, player.getNextActorNetId(), sendRpc: true);
+					bullet = new AncientGunProj(weapon, bulletPos, player, Point.createFromAngle(angle + Helpers.randomRange(-25, 25)), player.getNextActorNetId(), sendRpc: true);
+					break;
 			}
 		} else {
-			bullet = new CopyShotProj(weapon, bulletPos, chargeLevel, player, bulletDir, netId);
+			bullet = new CopyShotProj(weapon, bulletPos, chargeLevel, player, bulletDir.Value, netId);
 		}
 
-		if (player.ownedByLocalPlayer) {
+		if (player.ownedByLocalPlayer && bullet != null) {
 			RPC.axlShoot.sendRpc(player.id, bullet.projId, netId, bulletPos, xDir, angle);
 		}
 	}
@@ -156,15 +179,24 @@ public class DoubleBullet : AxlWeapon {
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
-		if (chargeLevel == 1) return 4;
-		else if (chargeLevel == 2) return 6;
-		else if (chargeLevel >= 3) return 8;
-		else return 1;
+		switch (chargeLevel) {
+			case 1:
+				return 4;
+			case 2:
+				return 6;
+			case >= 3:
+				return 8;
+			default:
+				return 1;
+		}
 	}
 
-	public override void axlGetProjectile(Weapon weapon, Point bulletPos, int xDir, Player player, float angle, IDamagable target, Character headshotTarget, Point cursorPos, int chargeLevel, ushort netId) {
+	public override void axlGetProjectile(
+		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
+		IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
+	) {
 		Point bulletDir = Point.createFromAngle(angle);
-		Projectile bullet = null;
+		Projectile? bullet = null;
 		if (chargeLevel == 0) {
 			bullet = new AxlBulletProj(weapon, bulletPos, player, bulletDir, netId);
 
@@ -292,7 +324,7 @@ public class RevolverBarrelProj : Projectile {
 	}
 
 	public override void update() {
-		if (ownedByLocalPlayer && getHeadshotVictim(owner, out IDamagable victim, out Point? hitPoint)) {
+		if (ownedByLocalPlayer && getHeadshotVictim(owner, out IDamagable? victim, out Point? hitPoint)) {
 			if (hitPoint != null) changePos(hitPoint.Value);
 			damager.applyDamage(victim, false, weapon, this, projId, overrideDamage: damager.damage * 3f);
 			damager.damage = 0;
@@ -329,7 +361,7 @@ public class AncientGunProj : Projectile {
 			new Anim(pos, "ancient_gun_sparkles", 1, null, true);
 		}
 
-		if (ownedByLocalPlayer && getHeadshotVictim(owner, out IDamagable victim, out Point? hitPoint)) {
+		if (ownedByLocalPlayer && getHeadshotVictim(owner, out IDamagable? victim, out Point? hitPoint)) {
 			//if (hitPoint != null) changePos(hitPoint.Value);
 			damager.applyDamage(victim, false, weapon, this, projId, overrideDamage: damager.damage * 1.5f);
 			//damager.damage = 0;
