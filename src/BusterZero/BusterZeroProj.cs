@@ -115,7 +115,7 @@ public class DZHadangekiProj : Projectile {
 		Point pos, int xDir, bool isBZ, Player player, ushort? netId, bool rpc = false
 	) : base(
 		ZeroBuster.netWeapon, pos, xDir,
-		350, 3, player, "zsaber_shot", Global.halfFlinch, 0,
+		350, 3, player, "zsaber_shot", 0, 0,
 		netId, player.ownedByLocalPlayer
 	) {
 		fadeOnAutoDestroy = true;

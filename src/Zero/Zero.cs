@@ -762,7 +762,7 @@ public class Zero : Character {
 				DanchienWeapon.staticWeapon, projPos, ProjIds.QuakeBlazer, player, 2, 0, 0.5f
 			),
 			(int)MeleeIds.Rakukojin => new GenericMeleeProj(
-				RakukojinWeapon.staticWeapon, projPos, ProjIds.Rakukojin, player, 2, 0, 0.5f
+				RakukojinWeapon.staticWeapon, projPos, ProjIds.Rakukojin, player, 2, 12, 0.5f
 			),
 			// Others
 			(int)MeleeIds.LadderSlash => new GenericMeleeProj(
