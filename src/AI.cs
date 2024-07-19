@@ -1126,7 +1126,7 @@ public class AI {
 				}
 			}
 		}
-		if (isTargetInAir && zero.charState is Fall or Jump) {
+		if (isTargetInAir && zero.charState is Fall or Jump && !player.isMainPlayer) {
 			zero.changeState(new ZeroUppercut(RisingType.Denjin, true), true);
 		}
 	}
@@ -1265,7 +1265,7 @@ public class AI {
 	}
 	public void WildDance(Character zero) {
 		if (character is Zero zero6) {
-			if (player.health <= 4 && target != null) {
+			if (player.health <= 4 && target != null && !player.isMainPlayer) {
 				if (character.isFacing(target) && zero6.sprite.name != null && zero6.grounded) {
 					WildDanceMove(zero);
 					player.clearAiInput();
@@ -1504,12 +1504,13 @@ public class AI {
 				int Sattack = Helpers.randomRange(0, 4);
 				if (isTargetInAir) Sattack = 1;
 				if (cmdSigma.charState.attackCtrl && cmdSigma?.charState?.isGrabbedState == false && !player.isDead
-					&& !cmdSigma.isInvulnerable() && cmdSigma.charState.canAttack() && character.saberCooldown == 0
+					&& !cmdSigma.isInvulnerable() && cmdSigma.charState.canAttack() 
 					&& !(cmdSigma.charState is CallDownMaverick or SigmaSlashState)) {
 					switch (Sattack) {
-						case 0: // Beam Saber
+						case 0 when cmdSigma.saberCooldown == 0: // Beam Saber
 							if (isTargetSuperClose) {
 								cmdSigma.changeState(new SigmaSlashState(cmdSigma.charState), true);
+								cmdSigma.saberCooldown = cmdSigma.sigmaSaberMaxCooldown;
 							}
 							break;
 						case 1: // Machine Gun if the enemy is on the air
@@ -1543,20 +1544,24 @@ public class AI {
 			if (character is NeoSigma neoSigma && character.charState is not LadderClimb) {
 				int Neoattack = Helpers.randomRange(0, 5);
 				if (isTargetInAir) Neoattack = 2;
-				if (neoSigma?.charState?.isGrabbedState == false && !player.isDead && !neoSigma.isInvulnerable() && character.saberCooldown == 0
+				if (neoSigma?.charState?.isGrabbedState == false && !player.isDead && !neoSigma.isInvulnerable()
+				    && neoSigma.charState.canAttack()
 					&& !(neoSigma.charState is CallDownMaverick or SigmaElectricBall2State or SigmaElectricBallState)) {
 					switch (Neoattack) {
-						case 0:
+						case 0 when neoSigma.saberCooldown == 0:
 							neoSigma.changeState(new SigmaClawState(neoSigma.charState, neoSigma.grounded), true);
+							neoSigma.saberCooldown = neoSigma.sigmaSaberMaxCooldown;
 							break;
-						case 1:
+						case 1 when neoSigma.sigmaDownSlashCooldown == 0:
 							if (neoSigma.grounded && isTargetInAir) {
 								neoSigma.changeState(new SigmaUpDownSlashState(true), true);
+								neoSigma.sigmaDownSlashCooldown = 1f;
 							}
 							break;
-						case 2:
+						case 2 when neoSigma.sigmaUpSlashCooldown == 0:
 							if (!neoSigma.grounded && isTargetBellowYou) {
 								neoSigma.changeState(new SigmaUpDownSlashState(false), true);
+								neoSigma.sigmaUpSlashCooldown = 0.75f;
 							}
 							break;
 						case 3:
@@ -1574,6 +1579,15 @@ public class AI {
 						case 5:
 							neoSigma.player.changeWeaponSlot(0);
 							break;
+						case 6:
+							if (neoSigma.player.sigmaAmmo < 32) {
+								neoSigma.player.sigmaAmmo -= 16;
+								neoSigma.changeState(new SigmaElectricBallState(), true);
+								} else {
+								neoSigma.player.sigmaAmmo = 0;
+								neoSigma.changeState(new SigmaElectricBall2State(), true);
+								}
+							break;
 					}
 				}
 			}
@@ -1583,15 +1597,18 @@ public class AI {
 			if (character is Doppma DoppmaSigma && character.charState is not LadderClimb) {
 				int DoppmaSigmaAttack = Helpers.randomRange(0, 4);
 				if (isTargetInAir) DoppmaSigmaAttack = 1;
-				if (DoppmaSigma?.charState?.isGrabbedState == false && !player.isDead && !DoppmaSigma.isInvulnerable()
-					&& !(DoppmaSigma.charState is CallDownMaverick or SigmaThrowShieldState or Sigma3Shoot)) {
+				if (DoppmaSigma?.charState?.isGrabbedState == false && !player.isDead &&
+				   !DoppmaSigma.isInvulnerable() && DoppmaSigma.charState.canAttack()
+				   && !(DoppmaSigma.charState is CallDownMaverick or SigmaThrowShieldState or Sigma3Shoot)) {
 					switch (DoppmaSigmaAttack) {
-						case 0:
+						case 0 when DoppmaSigma.sigma3FireballCooldown == 0:
 							DoppmaSigma.changeState(new Sigma3Shoot(player.input.getInputDir(player)), true);
+							DoppmaSigma.sigma3FireballCooldown = DoppmaSigma.maxSigma3FireballCooldown;
 							break;
-						case 1:
+						case 1 when DoppmaSigma.sigma3ShieldCooldown == 0:
 							if (DoppmaSigma.grounded) {
 								DoppmaSigma.changeState(new SigmaThrowShieldState(), true);
+								DoppmaSigma.sigma3ShieldCooldown = DoppmaSigma.maxSigma3ShieldCooldown;
 							}
 							break;
 						case 2:
@@ -1689,16 +1706,6 @@ public class AI {
 		bool isTargetSuperClose = target?.pos.x - 3 >= character.pos.x;
 		//Vile Start	
 		if (character is Vile vile) {
-			// You dare to grab me? i will blow myself up
-			if (character.charState?.isGrabbedState == true && player.health >= 12) {
-				if (Helpers.randomRange(0, 100) < 1)
-					character.changeState(new NecroBurstAttack(vile.grounded), true);
-			}
-
-			if (Helpers.randomRange(0, 100) < 1) {
-				if (isTargetInAir && isTargetSuperClose && !(character.charState is VileRevive or HexaInvoluteState) && player.vileAmmo >= 24)
-					character.changeState(new RisingSpecterState(vile.grounded), true);
-			}
 			int Vattack = Helpers.randomRange(0, 12);
 			if (vile?.charState?.isGrabbedState == false && !player.isDead && vile.charState.canAttack()
 				&& !(character.charState is VileRevive or HexaInvoluteState or NecroBurstAttack
@@ -1731,7 +1738,7 @@ public class AI {
 					case 8 when player.vileAmmo >= 24:
 						vile.laserWeapon.vileShoot(WeaponIds.VileLaser, vile);
 						break;
-					case 9 when vile.isVileMK5 && player.vileAmmo >= 20:
+					case 9 when vile.isVileMK5 && player.vileAmmo >= 20 && !player.isMainPlayer:
 						vile?.changeState(new HexaInvoluteState(), true);
 						break;
 				}
@@ -1740,6 +1747,7 @@ public class AI {
 	}
 	public void doVileAI(Character vile4) {
 		// Vile: Go MK2 to MKV
+		// Do not remove isMainPlayer
 		if (character is Vile vile1 && !player.isMainPlayer) {
 			if (player.canReviveVile() && vile1.isVileMK1) {
 				player.reviveVile(false);
