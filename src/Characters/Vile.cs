@@ -338,7 +338,8 @@ public class Vile : Character {
 		if (!player.canControl) return;
 
 		// GMTODO: Consider a better way here instead of a hard-coded deny list
-		if (charState.attackCtrl || charState is VileMK2GrabState) {
+		// Gacel: Done, now it uses attackCtrl
+		if (!charState.attackCtrl || charState is VileMK2GrabState) {
 			return;
 		}
 		if (charState is Dash || charState is AirDash) {
