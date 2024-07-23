@@ -48,7 +48,7 @@ public class BusterZeroMelee : CharState {
 
 	public override void onExit(CharState oldState) {
 		base.onExit(oldState);
-		zero.zSaberCooldown = 36f / 60f;
+		zero.zSaberCooldown = 36;
 	}
 }
 
@@ -206,7 +206,7 @@ public class BusterZeroHadangeki : CharState {
 
 	public override void onExit(CharState oldState) {
 		base.onExit(oldState);
-		zero.zSaberCooldown = 36f / 60f;
+		zero.zSaberCooldown = 36;
 	}
 }
 
@@ -248,7 +248,7 @@ public class BusterZeroHadangekiWall : CharState {
 	public override void onExit(CharState oldState) {
 		base.onExit(oldState);
 		useGravity = true;
-		zero.zSaberCooldown = 36f / 60f;
+		zero.zSaberCooldown = 36;
 	}
 }
 

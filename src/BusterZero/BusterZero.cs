@@ -46,8 +46,8 @@ public class BusterZero : Character {
 			}
 		}
 		// Cooldowns.
-		Helpers.decrementTime(ref zSaberCooldown);
-		Helpers.decrementTime(ref lemonCooldown);
+		Helpers.decrementFrames(ref zSaberCooldown);
+		Helpers.decrementFrames(ref lemonCooldown);
 
 		// For the shooting animation.
 		if (shootAnimTime > 0) {
@@ -109,6 +109,7 @@ public class BusterZero : Character {
 				if (stockedBusterLv == 1) {
 					if (charState is WallSlide) {
 						shoot(1);
+						lemonCooldown = 22;
 						stockedBusterLv = 0;
 						return true;
 					}
@@ -118,6 +119,7 @@ public class BusterZero : Character {
 				if (stockedBusterLv == 2) {
 					if (charState is WallSlide) {
 						shoot(2);
+						lemonCooldown = 22;
 						stockedBusterLv = 0;
 						lastShootPressed = 0;
 						return true;
@@ -179,23 +181,24 @@ public class BusterZero : Character {
 				shootPos, xDir, player, player.getNextActorNetId(), rpc: true
 			);
 			zeroLemonsOnField.Add(lemon);
-			lemonCooldown = 0.15f;
+			lemonCooldown = 9;
 		} else if (chargeLevel == 1) {
 			playSound("buster2X3", sendRpc: true);
 			new DZBuster2Proj(
 				shootPos, xDir, player, player.getNextActorNetId(), rpc: true
 			);
-			lemonCooldown = 22f / 60f;
+			lemonCooldown = 22;
 		} else if (chargeLevel == 2) {
 			playSound("buster3X3", sendRpc: true);
 			new DZBuster3Proj(
 				shootPos, xDir, player, player.getNextActorNetId(), rpc: true
 			);
-			lemonCooldown = 22f / 60f;
+			lemonCooldown = 22;
 		} else if (chargeLevel == 3) {
 			if (charState is WallSlide) {
 				shoot(2);
 				stockedBusterLv = 1;
+				lemonCooldown = 22;
 				return;
 			} else {
 				shootAnimTime = 0;
@@ -207,6 +210,7 @@ public class BusterZero : Character {
 				shoot(2);
 				stockedBusterLv = 2;
 				stockedSaber = true;
+				lemonCooldown = 22;
 				return;
 			} else {
 				shootAnimTime = 0;
