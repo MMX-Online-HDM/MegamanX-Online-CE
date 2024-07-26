@@ -101,7 +101,11 @@ public class Zero : Character {
 		}
 		// Hypermode music.
 		if (!Global.level.isHyper1v1()) {
-			if (isAwakened && ownedByLocalPlayer) {
+			if (isBlack) {
+				if (musicSource == null) {
+					addMusicSource("zero_X1", getCenterPos(), true);
+				}
+			} else if (isAwakened) {
 				if (musicSource == null) {
 					addMusicSource("XvsZeroV2_megasfc", getCenterPos(), true);
 				}
@@ -425,7 +429,7 @@ public class Zero : Character {
 			}
 			if (grounded && vel.y >= 0 && isGenmuZero) {
 				if (genmuCooldown == 0) {
-					genmuCooldown = 2;
+					genmuCooldown = 120;
 					changeState(new GenmuState(), true);
 					return true;
 				}
@@ -477,7 +481,7 @@ public class Zero : Character {
 			if (dashAttackCooldown > 0) {
 				return false;
 			}
-			dashAttackCooldown = 1;
+			dashAttackCooldown = 60;
 			slideVel = xDir * getDashSpeed();
 			if (specialPressTime > shootPressTime) {
 				changeState(new ZeroShippuugaState(), true);
@@ -596,6 +600,10 @@ public class Zero : Character {
 
 	public override bool canAddAmmo() {
 		return (gigaAttack.ammo < gigaAttack.maxAmmo);
+	}
+
+	public override bool isToughGuyHyperMode() {
+		return isBlack || isGenmuZero;
 	}
 
 	// Melee projectiles.

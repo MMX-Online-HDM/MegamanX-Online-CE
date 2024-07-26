@@ -453,7 +453,7 @@ public partial class MegamanX : Character {
 				shootPressed ||
 				(framesSinceLastShootPressed < Global.normalizeFrames(6) &&
 				framesSinceLastShootReleased > Global.normalizeFrames(30)) ||
-				(shootHeld && player.weapon.isStream && chargeTime < charge1Time)
+				(shootHeld && player.weapon.isStream && chargeTime < charge2Time)
 			);
 			if (!fgMotion && offCooldown && shootCondition) {
 				shoot(false);

@@ -37,7 +37,7 @@ public class BusterZero : Character {
 		}
 		// Hypermode music.
 		if (!Global.level.isHyper1v1()) {
-			if (isBlackZero) {
+			if (isBlackZero && ownedByLocalPlayer) {
 				if (musicSource == null) {
 					addMusicSource("zero_X3", getCenterPos(), true);
 				}

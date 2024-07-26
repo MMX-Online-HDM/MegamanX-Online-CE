@@ -600,36 +600,41 @@ public partial class Player {
 	}
 
 	public int getHeartTankModifier() {
-		return Helpers.clamp(Global.level.server?.customMatchSettings?.heartTankHp ?? 1, 1, 2);
+		return Global.level.server?.customMatchSettings?.heartTankHp ?? 1;
 	}
 
 	public float getMaverickMaxHp() {
 		if (!Global.level.is1v1() && isTagTeam()) {
-			//return 16 + (heartTanks * getHeartTankModifier());
-			return MathF.Ceiling(24 * getHealthModifier());
+			return getModifiedHealth(20) + (heartTanks * getHeartTankModifier());
 		}
-
-		return MathF.Ceiling(24 * getHealthModifier());
+		return MathF.Ceiling(getModifiedHealth(24));
 	}
 
 	public bool hasAllItems() {
 		return subtanks.Count >= 4 && heartTanks >= 8;
 	}
 
-	public float getHealthModifier() {
-		var level = Global.level;
-		float modifier = 1;
-		if (level.is1v1()) {
-			if (Global.level.server.playTo == 1) modifier = 2;
-			if (Global.level.server.playTo == 2) modifier = 1.5f;
+	public static float getBaseHealth() {
+		if (Global.level.server.customMatchSettings != null) {
+			return Global.level.server.customMatchSettings.healthModifier;
 		}
-		if (level.server.customMatchSettings != null) {
-			modifier = (float)(level.server.customMatchSettings.healthModifier * 0.1m);
-			//if (level.gameMode.isTeamMode && alliance == GameMode.redAlliance) {
-			//	modifier = level.server.customMatchSettings.redHealthModifier;
-			//}
+		return 16;
+	}
+
+	public static float getModifiedHealth(float health) {
+		if (Global.level.server.customMatchSettings != null) {
+			float retHp = getBaseHealth();
+			float extraHP = health - 16;
+
+			float hpMulitiplier = MathF.Ceiling(getBaseHealth() / 16);
+			retHp += MathF.Ceiling(extraHP * hpMulitiplier);
+
+			if (retHp < 1) {
+				retHp = 1;
+			}
+			return retHp;
 		}
-		return modifier;
+		return health;
 	}
 
 	public float getDamageModifier() {
@@ -645,15 +650,15 @@ public partial class Player {
 	public float getMaxHealth() {
 		// 1v1 is the only mode without possible heart tanks/sub tanks
 		if (Global.level.is1v1()) {
-			return MathF.Ceiling(28 * getHealthModifier());
+			return getModifiedHealth(28);
 		}
 		int bonus = 0;
-		if (isSigma && isPuppeteer()) bonus = 4;
-		float hpModifier = getHealthModifier();
-		if (hpModifier < 1) {
-			return MathF.Ceiling((20 + bonus) * hpModifier) + heartTanks * getHeartTankModifier();
+		if (isSigma && isPuppeteer()) {
+			bonus = 4;
 		}
-		return MathF.Ceiling((20 + bonus + (heartTanks * getHeartTankModifier())) * hpModifier);
+		return MathF.Ceiling(
+			getModifiedHealth(16 + bonus) + (heartTanks * getHeartTankModifier())
+		);
 	}
 
 	public void creditHealing(float healAmount) {
@@ -1365,12 +1370,7 @@ public partial class Player {
 			);
 			Global.serverClient?.rpc(RPC.axlDisguise, json);
 		}
-		float hpModifier = getHealthModifier();
-		if (hpModifier < 1) {
-			maxHealth = dnaCore.maxHealth + heartTanks * getHeartTankModifier();
-		} else {
-			maxHealth = dnaCore.maxHealth + MathF.Ceiling(heartTanks * getHeartTankModifier() * getHealthModifier());
-		}
+		maxHealth = dnaCore.maxHealth + MathF.Ceiling(heartTanks * getHeartTankModifier());
 
 		oldAxlLoadout = loadout;
 		loadout = dnaCore.loadout;
@@ -1945,7 +1945,7 @@ public partial class Player {
 			character.destroySelf();
 		}
 		clearSigmaWeapons();
-		maxHealth = MathF.Ceiling(32 * getHealthModifier());
+		maxHealth = getModifiedHealth(32);
 		ushort newNetId = getNextATransNetId();
 		if (form == 0) {
 			if (Global.level.is1v1()) {
@@ -1976,7 +1976,7 @@ public partial class Player {
 
 	public void reviveSigmaNonOwner(int form, Point spawnPoint, ushort sigmaNetId) {
 		clearSigmaWeapons();
-		maxHealth = MathF.Ceiling(32 * getHealthModifier());
+		maxHealth = getModifiedHealth(32);
 		//if (form >= 2) {
 			character.destroySelf();
 			KaiserSigma kaiserSigma = new KaiserSigma(

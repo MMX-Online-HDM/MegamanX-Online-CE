@@ -73,7 +73,11 @@ public class PunchyZero : Character {
 			updateAwakenedAura();
 		}
 		if (!Global.level.isHyper1v1()) {
-			if (isAwakened && ownedByLocalPlayer) {
+			if (isBlack) {
+				if (musicSource == null) {
+					addMusicSource("zero_X1", getCenterPos(), true);
+				}
+			} else if (isAwakened) {
 				if (musicSource == null) {
 					addMusicSource("XvsZeroV2_megasfc", getCenterPos(), true);
 				}
@@ -456,6 +460,10 @@ public class PunchyZero : Character {
 
 	public override string getSprite(string spriteName) {
 		return "zero_" + spriteName;
+	}
+
+	public override bool isToughGuyHyperMode() {
+		return isBlack || isGenmuZero;
 	}
 
 	public override List<ShaderWrapper> getShaders() {

@@ -850,8 +850,6 @@ public class HostMenu : IMainMenu {
 	}
 
 	public CustomMatchSettings getCustomMatchSettings() {
-		if (Global.quickStart) return null;
-		if (!isHiddenOrLan() && !isOffline && !isP2P) return null;
 		if (useCustomMatchSettings) {
 			return savedMatchSettings.customMatchSettings;
 		}

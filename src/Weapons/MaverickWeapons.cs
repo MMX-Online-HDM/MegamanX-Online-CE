@@ -143,7 +143,11 @@ public class MaverickWeapon : Weapon {
 		if (maverick == null) {
 			throw new Exception("Error summoning maverick on maverick weapon " + this.GetType().ToString());
 		}
-		maverick.setHealth(lastHealth);
+		if (summonedOnce) {
+			maverick.setHealth(lastHealth);
+		} else {
+			lastHealth = maverick.maxHealth;
+		}
 		smd?.applySavedMaverickData(maverick, player.isPuppeteer());
 		if (player.isStriker()) {
 			if (maverick is not MorphMothCocoon) {
@@ -155,9 +159,6 @@ public class MaverickWeapon : Weapon {
 	}
 
 	public bool canUseSubtank(SubTank subtank) {
-		if (player?.isTagTeam() != false) {
-			return false;
-		}
 		return maverick != null && maverick.health < maverick.maxHealth;
 	}
 }

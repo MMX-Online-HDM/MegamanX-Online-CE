@@ -11,7 +11,7 @@ public class SavedMatchSettings {
 
 	public SavedMatchSettings() {
 		hostMenuSettings = new HostMenuSettings();
-		customMatchSettings = new CustomMatchSettings();
+		customMatchSettings = CustomMatchSettings.getDefaults();
 		extraCpuCharData = new ExtraCpuCharData();
 	}
 

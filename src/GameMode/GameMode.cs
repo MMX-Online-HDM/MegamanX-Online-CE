@@ -656,20 +656,20 @@ public class GameMode {
 					drawZeroGigaCooldown(zero.gigaAttack, y: yStart);
 					xStart += 15;
 				}
-				if (zero.saberCooldown > 0 && zero.awakenedPhase >= 2 || zero.genmuCooldown > 0) {
-					float cooldown = 1 - Helpers.progress(zero.genmuCooldown, 2);
-					if (zero.saberCooldown > zero.genmuCooldown) {
-						cooldown = 1 - Helpers.progress(zero.saberCooldown, 1);
+				if (zero.swingCooldown > 0 && zero.isGenmuZero || zero.genmuCooldown > 0) {
+					float cooldown = 1 - Helpers.progress(zero.genmuCooldown, 120);
+					if (zero.swingCooldown > zero.genmuCooldown) {
+						cooldown = 1 - Helpers.progress(zero.swingCooldown, 60);
 					}
 					drawGigaWeaponCooldown(102, cooldown, xStart, yStart);
 					xStart += 15;
 				}
-				if (zero.saberCooldown > 0 || zero.genmuCooldown > 1) {
-					float cooldown = 1 - Helpers.progress(zero.saberCooldown, 1);
-					if (zero.genmuCooldown - 1 > zero.saberCooldown) {
-						cooldown = 1 - Helpers.progress(zero.genmuCooldown - 1, 1);
+				if (zero.swingCooldown > 0 || zero.genmuCooldown > 60) {
+					float cooldown = 1 - Helpers.progress(zero.swingCooldown, 60);
+					if (zero.genmuCooldown - 1 > zero.swingCooldown) {
+						cooldown = 1 - Helpers.progress(zero.genmuCooldown - 60, 1);
 					}
-					drawGigaWeaponCooldown(zero.awakenedPhase >= 2 ? 48 : 102, cooldown, xStart, yStart);
+					drawGigaWeaponCooldown(zero.isGenmuZero ? 48 : 102, cooldown, xStart, yStart);
 					xStart += 15;
 				}
 			}

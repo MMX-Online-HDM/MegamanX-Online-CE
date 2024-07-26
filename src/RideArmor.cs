@@ -128,7 +128,7 @@ public class RideArmor : Actor, IDamagable {
 		else if (raNum == 3) maxHealth = 24; // + Helpers.clampMax(netOwner.heartTanks * netOwner.getHeartTankModifier(), 8);
 		else maxHealth = 32;
 		if (raNum == 4) goliathHealth = 32;
-		maxHealth = MathF.Ceiling(maxHealth * netOwner.getHealthModifier());
+		maxHealth = Player.getModifiedHealth(maxHealth);
 	}
 
 	public void setRaNum(int raNum) {

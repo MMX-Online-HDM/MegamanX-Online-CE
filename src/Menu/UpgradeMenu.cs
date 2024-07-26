@@ -38,7 +38,9 @@ public class UpgradeMenu : IMainMenu {
 	}
 
 	public int getHeartTankCost() {
-		// if (Global.level.server?.customMatchSettings?.heartTankHp == 2) return 4;
+		if (Global.level.server?.customMatchSettings != null) {
+			return Global.level.server.customMatchSettings.heartTankCost;
+		}
 		return 2;
 	}
 
@@ -179,11 +181,17 @@ public class UpgradeMenu : IMainMenu {
 			Global.screenW * 0.5f, 26, Alignment.Center
 		);
 		int maxHeartTanks = getMaxHeartTanks();
+		int distance = 20;
+		if (maxHeartTanks > 16) {
+			distance = distance - MathInt.Floor((maxHeartTanks / 2f) * 0.6f);
+		}
+		int startPos = (int)Global.halfScreenW - (maxHeartTanks / 2) * distance;
+
 		for (int i = 0; i < maxHeartTanks; i++) {
 			bool isBought = mainPlayer.heartTanks > i;
 			Global.sprites["menu_hearttank"].drawToHUD(
 				isBought ? 0 : 2,
-				70 + (i * 20) + ((8 - maxHeartTanks) * 20),
+				startPos + (i * distance),
 				37
 			);
 		}
