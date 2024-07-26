@@ -218,7 +218,7 @@ public partial class Character : Actor, IDamagable {
 		spriteToCollider["die"] = null;
 		spriteToCollider["block"] = getBlockCollider();
 
-		changeState(initialCharState);
+		changeState(initialCharState, true);
 		visible = isVisible;
 
 		chargeTime = 0;
