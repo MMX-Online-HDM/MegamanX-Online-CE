@@ -46,12 +46,15 @@ public class RayGun : AxlWeapon {
 		}
 	}
 
-	public override void axlGetProjectile(Weapon weapon, Point bulletPos, int xDir, Player player, float angle, IDamagable target, Character headshotTarget, Point cursorPos, int chargeLevel, ushort netId) {
+	public override void axlGetProjectile(
+	    Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
+	 	IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
+	) {
 		if (player.character is not Axl axl) {
 			return;
 		}
 		Point bulletDir = Point.createFromAngle(angle);
-		Projectile bullet = null;
+		Projectile? bullet = null;
 		if (chargeLevel < 3) {
 			bullet = new RayGunProj(weapon, bulletPos, xDir, player, bulletDir, netId);
 		} else {
@@ -159,12 +162,12 @@ public class RayGunProj : Projectile {
 }
 
 public class RayGunAltProj : Projectile {
-	Player player;
+	Player? player;
 	const float range = 150;
 	float soundCooldown;
 	float chargeTime;
 	float chargeDecreaseCooldown;
-	Axl axl;
+	Axl? axl;
 
 	public RayGunAltProj(
 		Weapon weapon, Point pos, Point cursorPos, int xDir, Player player, ushort netProjId
@@ -214,7 +217,7 @@ public class RayGunAltProj : Projectile {
 
 	public override void postUpdate() {
 		base.postUpdate();
-		Character chr = player?.character;
+		Character? chr = player?.character;
 
 		if (ownedByLocalPlayer) {
 			if (chr == null || chr.destroyed == true) {
@@ -246,11 +249,11 @@ public class RayGunAltProj : Projectile {
 		Point destPos = axl.getAxlHitscanPoint(range);
 		var hits = Global.level.raycastAll(bulletPos, destPos, new List<Type>() { typeof(Actor), typeof(Wall) }, isChargeBeam: true);
 
-		CollideData closestHit = null;
+		CollideData? closestHit = null;
 		float bestDist = float.MaxValue;
 		foreach (var hit in hits) {
 			if (hit.gameObject is IDamagable damagable) {
-				if (damagable.canBeDamaged(owner.alliance, player.id, null)) {
+				if (damagable.canBeDamaged(owner.alliance, player?.id, null)) {
 					float dist = bulletPos.distanceTo(hit.hitData.hitPoint.Value);
 					if (dist < bestDist) {
 						bestDist = dist;
@@ -298,7 +301,7 @@ public class RayGunAltProj : Projectile {
 
 		changePos(destPos);
 
-		if (Global.level.isSendMessageFrame()) {
+		if (Global.level.isSendMessageFrame() && player != null) {
 			RPC.syncAxlBulletPos.sendRpc(player.id, bulletPos);
 		}
 	}

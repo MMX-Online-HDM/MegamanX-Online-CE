@@ -34,7 +34,10 @@ public class BlastLauncher : AxlWeapon {
 		return 1f;
 	}
 
-	public override void axlGetProjectile(Weapon weapon, Point bulletPos, int xDir, Player player, float angle, IDamagable target, Character headshotTarget, Point cursorPos, int chargeLevel, ushort netId) {
+	public override void axlGetProjectile(
+		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
+		IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
+	) {
 		Point bulletDir = Point.createFromAngle(angle);
 		Projectile grenade;
 		if (chargeLevel < 3) {
@@ -60,7 +63,7 @@ public class GrenadeProj : Projectile, IDamagable {
 	bool planted;
 	// We use player here due to airblast reflect potential.
 	// The explosion should still be the original owner's.
-	Player player;
+	Player? player;
 	public GrenadeProj(
 		Weapon weapon, Point pos, int xDir, Player player, Point bulletDir,
 		IDamagable target, Point cursorPos, int chargeLevel, ushort netProjId
@@ -162,7 +165,7 @@ public class GrenadeProj : Projectile, IDamagable {
 
 	public override void onDestroy() {
 		if (!ownedByLocalPlayer) return;
-		if (type == 0) {
+		if (type == 0 && player != null) {
 			new GrenadeExplosionProj(
 				weapon, pos, xDir, player, type, target, Math.Sign(vel.x), player.getNextActorNetId()
 			);
@@ -190,6 +193,7 @@ public class GrenadeProj : Projectile, IDamagable {
 
 	public void detonate() {
 		playSound("detonate", sendRpc: true);
+		if (player != null)
 		new GrenadeExplosionProj(
 			weapon, pos, xDir, player, type, target, Math.Sign(vel.x), player.getNextActorNetId()
 		);
@@ -262,8 +266,8 @@ public class GrenadeExplosionProj : Projectile {
 		}
 	}
 
-	public override DamagerMessage onDamage(IDamagable damagable, Player attacker) {
-		Character character = damagable as Character;
+	public override DamagerMessage? onDamage(IDamagable damagable, Player attacker) {
+		Character? character = damagable as Character;
 
 		if (character != null) {
 			bool directHit = this.directHit == character;
@@ -345,6 +349,7 @@ public class GreenSpinnerProj : Projectile {
 		if (!ownedByLocalPlayer) return;
 		if (time >= maxTime) return;
 		var netId = owner.getNextActorNetId();
+		if (angle != null)
 		new GreenSpinnerExplosionProj(weapon, pos, xDir, owner, angle.Value, target, Math.Sign(vel.x), netId);
 	}
 }
@@ -378,8 +383,8 @@ public class GreenSpinnerExplosionProj : Projectile {
 		}
 	}
 
-	public override DamagerMessage onDamage(IDamagable damagable, Player attacker) {
-		Character character = damagable as Character;
+	public override DamagerMessage? onDamage(IDamagable damagable, Player attacker) {
+		Character? character = damagable as Character;
 
 		if (character != null) {
 			bool directHit = this.directHit == character;

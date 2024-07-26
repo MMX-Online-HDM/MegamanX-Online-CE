@@ -35,18 +35,21 @@ public class PlasmaGun : AxlWeapon {
 		return 2;
 	}
 
-	public override void axlGetProjectile(Weapon weapon, Point bulletPos, int xDir, Player player, float angle, IDamagable target, Character headshotTarget, Point cursorPos, int chargeLevel, ushort netId) {
+	public override void axlGetProjectile(
+		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
+	 	IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
+	) {
 		if (!player.ownedByLocalPlayer) return;
 		if (player?.character is not Axl axl) return;
 
-		Point bulletDir = Point.createFromAngle(angle);
-		Projectile bullet = null;
+		Point? bulletDir = Point.createFromAngle(angle);
+		Projectile? bullet = null;
 		if (chargeLevel < 3) {
 			new Anim(bulletPos, "plasmagun_effect", 1, player.getNextActorNetId(), true, sendRpc: true) {
 				angle = angle,
 				host = player.character
 			};
-			bullet = new PlasmaGunProj(weapon, bulletPos, xDir, player, bulletDir, netId, sendRpc: true);
+			bullet = new PlasmaGunProj(weapon, bulletPos, xDir, player, bulletDir.Value, netId, sendRpc: true);
 			RPC.playSound.sendRpc(shootSounds[0], player.character?.netId);
 		} else {
 			if (altFire == 0) {
@@ -105,7 +108,7 @@ public class PlasmaGunAltProj : Projectile {
 	const float range = 100;
 	float soundCooldown;
 	bool hasTarget;
-	SoundWrapper sound;
+	SoundWrapper? sound;
 	public PlasmaGunAltProj(
 		Weapon weapon, Point pos, Point cursorPos, int xDir, Player player, ushort netProjId, bool sendRpc = false
 	) : base(
@@ -142,13 +145,13 @@ public class PlasmaGunAltProj : Projectile {
 
 		Helpers.decrementTime(ref soundCooldown);
 		if (soundCooldown == 0) {
-			sound = player.character?.playSound("plasmaGunAlt");
+			sound = player?.character?.playSound("plasmaGunAlt");
 			soundCooldown = 2.259f;
 		}
 
 		if (!ownedByLocalPlayer) return;
 
-		Axl axl = player?.character as Axl;
+		Axl? axl = player?.character as Axl;
 		if (axl == null || axl.destroyed == true) {
 			destroySelf();
 			return;
@@ -157,7 +160,7 @@ public class PlasmaGunAltProj : Projectile {
 		Point bulletDir = axl.getAxlBulletDir();
 		Point bulletPos = axl.getAxlBulletPos();
 		float closestAngle = float.MaxValue;
-		Character closestEnemy = null;
+		Character? closestEnemy = null;
 		foreach (var player in Global.level.players) {
 			Character enemy = player.character;
 			if (enemy == null) continue;
@@ -178,10 +181,10 @@ public class PlasmaGunAltProj : Projectile {
 			Point destPos = axl.getAxlHitscanPoint(range);
 			var hits = Global.level.raycastAll(bulletPos, destPos, new List<Type>() { typeof(Actor), typeof(Wall) });
 
-			CollideData closestHit = null;
+			CollideData? closestHit = null;
 			float bestDist = float.MaxValue;
 			foreach (var hit in hits) {
-				if (hit.gameObject is Wall) {
+				if (hit.gameObject is Wall && hit.hitData.hitPoint != null) {
 					float dist = bulletPos.distanceTo(hit.hitData.hitPoint.Value);
 					if (dist < bestDist) {
 						bestDist = dist;
@@ -190,7 +193,7 @@ public class PlasmaGunAltProj : Projectile {
 				}
 			}
 
-			if (closestHit != null) {
+			if (closestHit != null  && closestHit.hitData.hitPoint != null) {
 				hasTarget = true;
 				destPos = closestHit.hitData.hitPoint.Value;
 			} else {
@@ -202,14 +205,14 @@ public class PlasmaGunAltProj : Projectile {
 			changePos(closestEnemy.getCenterPos());
 		}
 
-		if (Global.level.isSendMessageFrame()) {
+		if (Global.level.isSendMessageFrame() && player != null) {
 			RPC.syncAxlBulletPos.sendRpc(player.id, bulletPos);
 		}
 	}
 
 	public override void onDestroy() {
 		base.onDestroy();
-		if (Global.sounds.Contains(sound)) {
+		if (sound != null && Global.sounds.Contains(sound)) {
 			sound.sound.Stop();
 			sound.sound.Dispose();
 			Global.sounds.Remove(sound);

@@ -33,11 +33,11 @@ public class BoundBlaster : AxlWeapon {
 
 	public override void axlGetProjectile(
 		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
-		IDamagable target, Character headshotTarget, Point cursorPos, int chargeLevel, ushort netId
+		IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
 	) {
 		if (!player.ownedByLocalPlayer) return;
 		Point bulletDir = Point.createFromAngle(angle);
-		Projectile bullet = null;
+		Projectile? bullet = null;
 		var hit = Global.level.checkCollisionPoint(bulletPos, new List<GameObject>() { });
 
 		if (hit?.gameObject is Wall wall && player.character != null) {
@@ -249,7 +249,7 @@ public class BoundBlasterParticle : Anim {
 
 public class BoundBlasterAltProj : Projectile {
 	public int state = 0;
-	public Actor stuckActor;
+	public Actor? stuckActor;
 	public bool isActorStuck;
 	const float circleRadius = 14;
 	float circleTime;
@@ -317,7 +317,7 @@ public class BoundBlasterAltProj : Projectile {
 		stick(damagable as Actor);
 	}
 
-	public void stick(Actor stuckActor) {
+	public void stick(Actor? stuckActor) {
 		if (!ownedByLocalPlayer) return;
 		if (state == 0) {
 			damager.damage = 0;

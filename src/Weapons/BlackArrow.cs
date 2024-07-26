@@ -31,11 +31,14 @@ public class BlackArrow : AxlWeapon {
 		return 2f;
 	}
 
-	public override void axlGetProjectile(Weapon weapon, Point bulletPos, int xDir, Player player, float angle, IDamagable target, Character headshotTarget, Point cursorPos, int chargeLevel, ushort netId) {
+	public override void axlGetProjectile(
+		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
+		IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
+	) {
 		if (!player.ownedByLocalPlayer) return;
 
 		Point bulletDir = Point.createFromAngle(angle);
-		Projectile bullet = null;
+		Projectile? bullet = null;
 		if (chargeLevel < 3) {
 			bullet = new BlackArrowProj(weapon, bulletPos, player, bulletDir, 0, netId, rpc: true);
 		} else {
@@ -56,7 +59,7 @@ public class BlackArrow : AxlWeapon {
 
 public class BlackArrowProj : Projectile {
 	int type;
-	public Actor target;
+	public Actor? target;
 	public List<Point> lastPoses = new List<Point>();
 
 	public BlackArrowProj(Weapon weapon, Point pos, Player player, Point bulletDir, int type, ushort netProjId, bool rpc = false) :
@@ -96,7 +99,7 @@ public class BlackArrowProj : Projectile {
 					var destAngle = MathF.Atan2(dTo.y, dTo.x) * 180 / MathF.PI;
 					destAngle = Helpers.to360(destAngle);
 					float distFactor = pos.distanceTo(target.getCenterPos()) / 100;
-					angle = Helpers.moveAngle((float)angle, destAngle, Global.spf * 200 * distFactor);
+					angle = Helpers.moveAngle((float)angle.Value, destAngle, Global.spf * 200 * distFactor);
 
 					vel.x = Helpers.cosd((float)angle) * speed;
 					vel.y = Helpers.sind((float)angle) * speed;
@@ -108,7 +111,7 @@ public class BlackArrowProj : Projectile {
 				updateAngle();
 			}
 
-			if (getHeadshotVictim(owner, out IDamagable victim, out Point? hitPoint)) {
+			if (getHeadshotVictim(owner, out IDamagable? victim, out Point? hitPoint)) {
 				damager.applyDamage(victim, false, weapon, this, projId, overrideDamage: damager.damage * Damager.headshotModifier);
 				damager.damage = 0;
 				playSound("hurt");
@@ -155,7 +158,7 @@ public class BlackArrowProj : Projectile {
 }
 
 public class WindCutterProj : Projectile {
-	Actor target;
+	Actor? target;
 	public float angleDist = 0;
 	public float turnDir = 1;
 	public bool targetHit;
@@ -220,14 +223,14 @@ public class WindCutterProj : Projectile {
 				var angInc = turnDir * Global.spf * 500;
 				angle += angInc;
 				angleDist += MathF.Abs(angInc);
-				vel.x = Helpers.cosd((float)angle) * speed;
-				vel.y = Helpers.sind((float)angle) * speed;
+				vel.x = Helpers.cosd((float)angle.Value) * speed;
+				vel.y = Helpers.sind((float)angle.Value) * speed;
 			} else if (owner.character != null) {
 				Point destPos = owner.character.getCenterPos();
 				var dTo = pos.directionTo(destPos).normalize();
 				var destAngle = MathF.Atan2(dTo.y, dTo.x) * 180 / MathF.PI;
 				destAngle = Helpers.to360(destAngle);
-				angle = Helpers.lerpAngle((float)angle, destAngle, Global.spf * 10);
+				angle = Helpers.lerpAngle((float)angle.Value, destAngle, Global.spf * 10);
 				vel.x = Helpers.cosd((float)angle) * speed;
 				vel.y = Helpers.sind((float)angle) * speed;
 				if (pos.distanceTo(destPos) < 15) {

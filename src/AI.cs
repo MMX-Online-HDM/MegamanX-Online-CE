@@ -967,14 +967,14 @@ public class AI {
 		// X:
 		if (character is MegamanX mmx) {
 
-			if (player.canUpgradeUltimateX() && player.health >= player.maxHealth) {
+			/*if (player.canUpgradeUltimateX() && player.health >= player.maxHealth) {
 				if (!mmx.boughtUltimateArmorOnce) {
 					player.currency -= Player.ultimateArmorCost;
 					mmx.boughtUltimateArmorOnce = true;
 				}
 				player.setUltimateArmor(true);
 				return;
-			}
+			} Deactivated until fixed */ 
 
 			if (player.hasAllX3Armor() && player.canUpgradeGoldenX() && player.health >= player.maxHealth) {
 				if (!mmx.boughtGoldenArmorOnce) {
@@ -1056,7 +1056,7 @@ public class AI {
 		}
 		ComboAttacks(zero);
 		WildDance(zero);
-		if (zero.charState.attackCtrl && !player.isDead && zero.sprite.name != null 
+		if (zero.charState.attackCtrl && !player.isDead && zero.sprite.name != null && !isWildDance
 			&& zero.charState.canAttack() && !zero.isSpriteInvulnerable() && !zero.isInvulnerable()
 			) {
 			int ZSattack = Helpers.randomRange(0, 11);
@@ -1080,14 +1080,16 @@ public class AI {
 						zero.slideVel = zero.xDir * zero.getDashSpeed() * 2f;
 						break;		
 					case 5 when zero.grounded:
-						if (zero.gigaAttack is RekkohaWeapon && zero.gigaAttack.ammo == 32f) {
-							zero.gigaAttack.addAmmo(-zero.gigaAttack.getAmmoUsage(0), player);
-							zero.changeState(new Rekkoha(zero.gigaAttack), true);
-						} else if (zero.gigaAttack.ammo >= 8) {
-							zero.gigaAttack.addAmmo(-zero.gigaAttack.getAmmoUsage(0), player);
-							zero.changeState(new Rakuhouha(zero.gigaAttack), true);
+						if (zero.gigaAttack.shootTime <= 0 && zero.gigaAttack.ammo >= zero.gigaAttack.getAmmoUsage(0)) {
+							if (zero.gigaAttack is RekkohaWeapon) {
+								zero.gigaAttack.addAmmo(-zero.gigaAttack.getAmmoUsage(0), player);
+								zero.changeState(new Rekkoha(zero.gigaAttack), true);
+							} else {
+								zero.gigaAttack.addAmmo(-zero.gigaAttack.getAmmoUsage(0), player);
+								zero.changeState(new Rakuhouha(zero.gigaAttack), true);
+							}
 						}
-						break;
+						break;		
 					case 6 when zero.charState is Fall or Jump: 
 					zero.changeState(new ZeroRollingSlashtate(), true);
 						break;
@@ -1095,10 +1097,10 @@ public class AI {
 					zero.changeState(new ZeroAirSlashState(), true);
 						break;	
 					case 8 when zero.charState is Fall:
-						zero.changeState(new ZeroDownthrust(zero.downThrustA.type));
+						zero.changeState(new ZeroDownthrust(zero.downThrustA.type), true);
 						break;
 					case 9 when zero.charState is Fall:
-						zero.changeState(new ZeroDownthrust(zero.downThrustS.type));
+						zero.changeState(new ZeroDownthrust(zero.downThrustS.type), true);
 						break;
 					case 10 when zero.charState is Dash: 
 						zero.changeState(new ZeroDashSlashState(), true);
@@ -1110,75 +1112,200 @@ public class AI {
 				}
 			}
 			// Hypermode attacks
-			if (zero.hypermodeActive()) {
-				switch (Helpers.randomRange(0, 84)) {
-					case 1:
+			if (zero.hypermodeActive() && !player.isMainPlayer) {
+				switch (Helpers.randomRange(0, 54)) {
+					case 0 when !zero.isViral:
 						zero.changeState(new Rakuhouha(zero.gigaAttack), true);
 						break;
-					case 2:
-						zero.changeState(new ZeroDoubleBuster(true, true), true);
-						break;
-					case 3:
+					case 1 when zero.isAwakened: // i would like to every hyper do Genmu, but okay
 						zero.changeState(new GenmuState(), true);
 						break;
-					case 4:
+					case 2 when zero.isAwakened:
 						zero.changeState(new AwakenedZeroHadangeki(), true);
 						break;
 				}
 			}
 		}
-		if (isTargetInAir && zero.charState is Fall or Jump) {
+		if (isTargetInAir && zero.charState is Fall or Jump && !player.isMainPlayer) {
 			zero.changeState(new ZeroUppercut(RisingType.Denjin, true), true);
 		}
 	}
 	public void ComboAttacks(Zero zero) {
 		if (!(zero.charState is HyperZeroStart or DarkHoldState or Hurt) &&
-			zero.sprite.name != null
-		) {
-			// Do Rising if is at 50% of the animation of third slash
-			if (zero.grounded && zero.sprite.name == "zero_attack3" && zero.sprite.frameIndex >= 5 && !isWildDance) {
-				zero.changeState(new ZeroUppercut(RisingType.RisingFang, true), true);
+			zero.sprite.name != null && !player.isMainPlayer && !isWildDance
+		) { //least insane else if chain be like:		
+			if (zero.sprite.name == "zero_attack3") { //if zero is on third slash 
+				switch (Helpers.randomRange(1,2)) { // A random of two scenarios
+					case 1 when zero.sprite.frameIndex >= 10: //if is on 10th frame
+						switch (Helpers.randomRange(1, 5)) {
+							case 1:
+								zero.groundSpecial.attack(zero);
+								break;
+							case 2:
+								zero.changeState(new ZeroCrouchSlashState(), true);
+								break;
+							case 3:
+								if (zero.gigaAttack.shootTime <= 0 && zero.gigaAttack.ammo >= zero.gigaAttack.getAmmoUsage(0)) {
+									if (zero.gigaAttack is RekkohaWeapon) {
+										zero.gigaAttack.addAmmo(-zero.gigaAttack.getAmmoUsage(0), player);
+										zero.changeState(new Rekkoha(zero.gigaAttack), true);
+									} else {
+										zero.gigaAttack.addAmmo(-zero.gigaAttack.getAmmoUsage(0), player);
+										zero.changeState(new Rakuhouha(zero.gigaAttack), true);
+									}
+								} 
+								break;
+							case 4:
+								zero.changeState(new ZeroShippuugaState(), true);
+								zero.slideVel = zero.xDir * zero.getDashSpeed() * 2f;
+								break;
+							case 5:
+								zero.changeState(new ZeroDashSlashState(), true);
+								zero.slideVel = zero.xDir * zero.getDashSpeed() * 2f;
+								break;
+						} 
+					break;						
+					case 2 when zero.sprite.frameIndex >= 7: // if is on 7th frame
+						switch (Helpers.randomRange(1, 3)) {
+							case 1:
+								zero.changeState(new ZeroUppercut(RisingType.Denjin, true), true);
+								break;
+							case 2 when !zero.isUnderwater():
+								zero.changeState(new ZeroUppercut(RisingType.Ryuenjin, false), true);
+								break;
+							case 3:
+								zero.changeState(new ZeroUppercut(RisingType.RisingFang, true), true);
+								break;
+						} 
+					break;
+				}
+			} 
+			if (zero.sprite.name == "zero_ryuenjin" && zero.sprite.frameIndex >= 9 ||
+				zero.sprite.name == "zero_eblade" && zero.sprite.frameIndex >= 11 ||
+				zero.sprite.name == "zero_rising" && zero.sprite.frameIndex >= 5) {						
+				switch (Helpers.randomRange(1,5)) { 
+				//on the uppercuts in certain frames with a random of five cases
+					case 1:
+						zero.changeState(new ZeroDownthrust(ZeroDownthrustType.Hyouretsuzan), true);
+						break;
+					case 2:
+						zero.changeState(new ZeroDownthrust(ZeroDownthrustType.Rakukojin), true);
+						break;
+					case 3:
+						zero.changeState(new ZeroDownthrust(ZeroDownthrustType.QuakeBlazer), true); 
+						break;
+					case 4:
+						zero.changeState(new ZeroRollingSlashtate(), true);
+						break;
+					case 5:
+						zero.changeState(new ZeroAirSlashState(), true);
+						break;
+				}
+			} 
+			if (zero.sprite.name == "zero_raijingeki" && zero.sprite.frameIndex >= 26 || 
+				zero.sprite.name == "zero_tbreaker" && zero.sprite.frameIndex >= 9 ||
+				zero.sprite.name == "zero_spear" && zero.sprite.frameIndex >= 12) {
+				//on the ground specials in certain frames with a random of three cases
+				switch (Helpers.randomRange(1,3)) {
+					case 1:
+						zero.changeState(new ZeroDashSlashState(), true);
+						zero.slideVel = zero.xDir * zero.getDashSpeed() * 2f;
+						break;
+					case 2:
+						zero.changeState(new ZeroShippuugaState(), true);
+						zero.slideVel = zero.xDir * zero.getDashSpeed() * 2f;
+						break;
+					case 3:
+						zero.changeState(new FSplasherState(), true);
+						break;
+				}
 			}
-			// Do Hyouretsuzan if is at 50% of the animation of rising
-			else if (zero.sprite.name == "zero_rising" && zero.sprite.frameIndex >= 5 && !isWildDance) {
-				zero.changeState(new ZeroDownthrust(ZeroDownthrustType.Hyouretsuzan), true);
+			if (zero.charState is Rakuhouha && zero.sprite.frameIndex >= 16 ||
+				zero.charState is Rekkoha && zero.sprite.frameIndex >= 14) {
+				//on the giga attacks in certain frames with a random of three cases
+				switch (Helpers.randomRange(1,3)) {
+					case 1:
+						zero.changeState(new ZeroDashSlashState(), true);
+						zero.slideVel = zero.xDir * zero.getDashSpeed() * 2f;
+						break;
+					case 2:
+						zero.changeState(new ZeroShippuugaState(), true);
+						zero.slideVel = zero.xDir * zero.getDashSpeed() * 2f;
+						break;
+					case 3:
+						zero.changeState(new FSplasherState(), true);
+						break;
+				}
 			}
-			// Do Kuuenzan even if he is not attacking
-			if (!zero.grounded && zero.airSpecial.type == (int)AirSpecialType.Kuuenzan &&
-				!zero.isAttacking() && zero.charState.canAttack() && 
-				!(zero.sprite.name == "zero_attack_air2")
-			) {
-				zero.changeState(new ZeroRollingSlashtate(), true);
+			if(zero.sprite.name == "zero_attack_dash2" && zero.sprite.frameIndex >= 7) {
+				//on shippuga in certain frame with a random of three cases
+				switch(Helpers.randomRange(1,3)) {
+					case 1:
+						zero.changeState(new ZeroSlash1State(), true);
+						break;
+					case 2:
+						switch (Helpers.randomRange(1, 3)) {
+							case 1:
+								zero.changeState(new ZeroUppercut(RisingType.Denjin, true), true);
+								break;
+							case 2 when !zero.isUnderwater():
+								zero.changeState(new ZeroUppercut(RisingType.Ryuenjin, false), true);
+								break;
+							case 3:
+								zero.changeState(new ZeroUppercut(RisingType.RisingFang, true), true);
+								break;
+						} 
+						break;
+					case 3:
+						zero.changeState(new ZeroCrouchSlashState(), true);
+						break;
+				}
 			}
 		}
 	}
 	public void WildDance(Character zero) {
 		if (character is Zero zero6) {
-			if (player.health <= 4 && target != null) {
+			if (player.health <= 4 && target != null && !player.isMainPlayer) {
 				if (character.isFacing(target) && zero6.sprite.name != null && zero6.grounded) {
 					WildDanceMove(zero);
 					player.clearAiInput();
+					isWildDance = true;
 				}
+			}
+			if (player.health > 4) {
+				isWildDance = false;
 			}
 		}
 	}
 	public void WildDanceMove(Character zero) {
 		if (character is Zero zero7) {
-			isWildDance = true;
-			for (int i = 0; i <= 1; i++) {
-				zero7.stopMoving();
-				if (zero7.sprite.name == "zero_attack" && zero.sprite.frameIndex >= 6)
-					zero7.changeState(new ZeroSlash2State(), true);					
-				if (zero7.sprite.name == "zero_attack2" && zero.sprite.frameIndex >= 3)
-					zero7.changeState(new ZeroSlash3State(), true);					
-				else if (zero7.sprite.name == "zero_attack3" && zero.sprite.frameIndex >= 6)
-					zero7.changeState(new ZeroSlash1State(), true);					
+			if (!zero7.isAttacking() && zero7.charState.canAttack() && zero7.charState.attackCtrl) {
+				zero7.changeState(new ZeroShippuugaState(), true);
+				zero7.slideVel = zero.xDir * zero7.getDashSpeed() * 2f;
 			}
-			if (zero7.sprite.name == "zero_attack3" && zero.sprite.frameIndex >= 5) {
-				zero7.changeState(new Rakuhouha(new RakuhouhaWeapon()), true);
-			} else if (zero7.sprite.name == "zero_rakuhouha" && zero.sprite.frameIndex >= 11) {
-				zero7.changeState(new ZeroUppercut(RisingType.RisingFang, false), true);
-				zero.playSound("hyperchargeFull");
+			if (zero.isAttacking()) {
+				if (zero7.sprite.name == "zero_attack_dash2" && zero7.sprite.frameIndex >= 7) {
+					zero7.changeState(new ZeroSlash1State(), true);
+					zero7.stopMoving();				
+				}
+				if (zero7.sprite.name == "zero_attack3" && zero7.sprite.frameIndex >= 6) {
+					zero7.changeState(new ZeroDashSlashState(), true);
+					zero7.slideVel = zero.xDir * zero7.getDashSpeed() * 2f;	
+				}
+				if (zero7.sprite.name == "zero_attack_dash" && zero7.sprite.frameIndex >= 3) {
+					zero7.playSound("gigaCrushAmmoFull");
+					switch (Helpers.randomRange(1, 3)) {
+						case 1:
+							zero7.changeState(new ZeroUppercut(RisingType.Denjin, true), true);
+							break;
+						case 2 when !zero7.isUnderwater():
+							zero7.changeState(new ZeroUppercut(RisingType.Ryuenjin, false), true);
+							break;
+						case 3:
+							zero7.changeState(new ZeroUppercut(RisingType.RisingFang, true), true);
+							break;
+					}					
+				}
 			}
 		}
 	}
@@ -1377,12 +1504,13 @@ public class AI {
 				int Sattack = Helpers.randomRange(0, 4);
 				if (isTargetInAir) Sattack = 1;
 				if (cmdSigma.charState.attackCtrl && cmdSigma?.charState?.isGrabbedState == false && !player.isDead
-					&& !cmdSigma.isInvulnerable() && cmdSigma.charState.canAttack() && character.saberCooldown == 0
+					&& !cmdSigma.isInvulnerable() && cmdSigma.charState.canAttack() 
 					&& !(cmdSigma.charState is CallDownMaverick or SigmaSlashState)) {
 					switch (Sattack) {
-						case 0: // Beam Saber
+						case 0 when cmdSigma.saberCooldown == 0: // Beam Saber
 							if (isTargetSuperClose) {
 								cmdSigma.changeState(new SigmaSlashState(cmdSigma.charState), true);
+								cmdSigma.saberCooldown = cmdSigma.sigmaSaberMaxCooldown;
 							}
 							break;
 						case 1: // Machine Gun if the enemy is on the air
@@ -1416,20 +1544,24 @@ public class AI {
 			if (character is NeoSigma neoSigma && character.charState is not LadderClimb) {
 				int Neoattack = Helpers.randomRange(0, 5);
 				if (isTargetInAir) Neoattack = 2;
-				if (neoSigma?.charState?.isGrabbedState == false && !player.isDead && !neoSigma.isInvulnerable() && character.saberCooldown == 0
+				if (neoSigma?.charState?.isGrabbedState == false && !player.isDead && !neoSigma.isInvulnerable()
+				    && neoSigma.charState.canAttack()
 					&& !(neoSigma.charState is CallDownMaverick or SigmaElectricBall2State or SigmaElectricBallState)) {
 					switch (Neoattack) {
-						case 0:
+						case 0 when neoSigma.saberCooldown == 0:
 							neoSigma.changeState(new SigmaClawState(neoSigma.charState, neoSigma.grounded), true);
+							neoSigma.saberCooldown = neoSigma.sigmaSaberMaxCooldown;
 							break;
-						case 1:
+						case 1 when neoSigma.sigmaDownSlashCooldown == 0:
 							if (neoSigma.grounded && isTargetInAir) {
 								neoSigma.changeState(new SigmaUpDownSlashState(true), true);
+								neoSigma.sigmaDownSlashCooldown = 1f;
 							}
 							break;
-						case 2:
+						case 2 when neoSigma.sigmaUpSlashCooldown == 0:
 							if (!neoSigma.grounded && isTargetBellowYou) {
 								neoSigma.changeState(new SigmaUpDownSlashState(false), true);
+								neoSigma.sigmaUpSlashCooldown = 0.75f;
 							}
 							break;
 						case 3:
@@ -1447,6 +1579,15 @@ public class AI {
 						case 5:
 							neoSigma.player.changeWeaponSlot(0);
 							break;
+						case 6:
+							if (neoSigma.player.sigmaAmmo < 32) {
+								neoSigma.player.sigmaAmmo -= 16;
+								neoSigma.changeState(new SigmaElectricBallState(), true);
+								} else {
+								neoSigma.player.sigmaAmmo = 0;
+								neoSigma.changeState(new SigmaElectricBall2State(), true);
+								}
+							break;
 					}
 				}
 			}
@@ -1456,15 +1597,18 @@ public class AI {
 			if (character is Doppma DoppmaSigma && character.charState is not LadderClimb) {
 				int DoppmaSigmaAttack = Helpers.randomRange(0, 4);
 				if (isTargetInAir) DoppmaSigmaAttack = 1;
-				if (DoppmaSigma?.charState?.isGrabbedState == false && !player.isDead && !DoppmaSigma.isInvulnerable()
-					&& !(DoppmaSigma.charState is CallDownMaverick or SigmaThrowShieldState or Sigma3Shoot)) {
+				if (DoppmaSigma?.charState?.isGrabbedState == false && !player.isDead &&
+				   !DoppmaSigma.isInvulnerable() && DoppmaSigma.charState.canAttack()
+				   && !(DoppmaSigma.charState is CallDownMaverick or SigmaThrowShieldState or Sigma3Shoot)) {
 					switch (DoppmaSigmaAttack) {
-						case 0:
+						case 0 when DoppmaSigma.sigma3FireballCooldown == 0:
 							DoppmaSigma.changeState(new Sigma3Shoot(player.input.getInputDir(player)), true);
+							DoppmaSigma.sigma3FireballCooldown = DoppmaSigma.maxSigma3FireballCooldown;
 							break;
-						case 1:
+						case 1 when DoppmaSigma.sigma3ShieldCooldown == 0:
 							if (DoppmaSigma.grounded) {
 								DoppmaSigma.changeState(new SigmaThrowShieldState(), true);
+								DoppmaSigma.sigma3ShieldCooldown = DoppmaSigma.maxSigma3ShieldCooldown;
 							}
 							break;
 						case 2:
@@ -1562,16 +1706,6 @@ public class AI {
 		bool isTargetSuperClose = target?.pos.x - 3 >= character.pos.x;
 		//Vile Start	
 		if (character is Vile vile) {
-			// You dare to grab me? i will blow myself up
-			if (character.charState?.isGrabbedState == true && player.health >= 12) {
-				if (Helpers.randomRange(0, 100) < 1)
-					character.changeState(new NecroBurstAttack(vile.grounded), true);
-			}
-
-			if (Helpers.randomRange(0, 100) < 1) {
-				if (isTargetInAir && isTargetSuperClose && !(character.charState is VileRevive or HexaInvoluteState) && player.vileAmmo >= 24)
-					character.changeState(new RisingSpecterState(vile.grounded), true);
-			}
 			int Vattack = Helpers.randomRange(0, 12);
 			if (vile?.charState?.isGrabbedState == false && !player.isDead && vile.charState.canAttack()
 				&& !(character.charState is VileRevive or HexaInvoluteState or NecroBurstAttack
@@ -1604,7 +1738,7 @@ public class AI {
 					case 8 when player.vileAmmo >= 24:
 						vile.laserWeapon.vileShoot(WeaponIds.VileLaser, vile);
 						break;
-					case 9 when vile.isVileMK5 && player.vileAmmo >= 20:
+					case 9 when vile.isVileMK5 && player.vileAmmo >= 20 && !player.isMainPlayer:
 						vile?.changeState(new HexaInvoluteState(), true);
 						break;
 				}
@@ -1613,6 +1747,7 @@ public class AI {
 	}
 	public void doVileAI(Character vile4) {
 		// Vile: Go MK2 to MKV
+		// Do not remove isMainPlayer
 		if (character is Vile vile1 && !player.isMainPlayer) {
 			if (player.canReviveVile() && vile1.isVileMK1) {
 				player.reviveVile(false);

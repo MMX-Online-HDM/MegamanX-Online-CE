@@ -33,17 +33,17 @@ public class SpiralMagnum : AxlWeapon {
 
 	public override void axlGetProjectile(
 		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
-		IDamagable target, Character headshotTarget, Point cursorPos, int chargeLevel, ushort netId
+		IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
 	) {
 		if (!player.ownedByLocalPlayer) return;
 		if (player.character == null) return;
 		if (player.character is not Axl axl) return;
-		Point bulletDir = Point.createFromAngle(angle);
-		Projectile bullet = null;
-		Point origPos = bulletPos;
+		Point? bulletDir = Point.createFromAngle(angle);
+		Projectile? bullet = null;
+		Point? origPos = bulletPos;
 
 		if (chargeLevel == 3 && altFire == 0) {
-			axl.sniperMissileProj = new SniperMissileProj(weapon, bulletPos, player, bulletDir, netId, rpc: true);
+			axl.sniperMissileProj = new SniperMissileProj(weapon, bulletPos, player, bulletDir.Value, netId, rpc: true);
 			RPC.playSound.sendRpc(shootSounds[3], axl.netId);
 			return;
 		}
@@ -52,19 +52,19 @@ public class SpiralMagnum : AxlWeapon {
 		var spiralMagnumShell = new SpiralMagnumShell(shellPos, -axl.xDir, player.getNextActorNetId(), sendRpc: true);
 
 		if (axl.isZooming() == false) {
-			bullet = new SpiralMagnumProj(weapon, bulletPos, 0, 0, player, bulletDir, target, headshotTarget, netId);
+			bullet = new SpiralMagnumProj(weapon, bulletPos, 0, 0, player, bulletDir.Value, target, headshotTarget, netId);
 		} else {
 			float jumpDist = 0;
 			if (headshotTarget != null || target != null) {
 				bulletPos = player.axlGenericCursorWorldPos;
 				jumpDist = bulletPos.distanceTo(bulletPos);
 			}
-			bullet = new SpiralMagnumProj(weapon, bulletPos, jumpDist, 1, player, bulletDir, target, headshotTarget, netId);
-			AssassinBulletTrailAnim trail = new AssassinBulletTrailAnim(origPos, bullet);
+			bullet = new SpiralMagnumProj(weapon, bulletPos, jumpDist, 1, player, bulletDir.Value, target, headshotTarget, netId);			
+			AssassinBulletTrailAnim trail = new AssassinBulletTrailAnim(origPos.Value, bullet);
 			axl.zoomCharge = 0;
 		}
 
-		RPC.axlShoot.sendRpc(player.id, bullet.projId, netId, origPos, xDir, angle);
+		RPC.axlShoot.sendRpc(player.id, bullet.projId, netId, origPos.Value, xDir, angle);
 	}
 }
 
@@ -95,7 +95,7 @@ public class SpiralMagnumShell : Anim {
 				stopped = true;
 			}
 		}
-		if (!stopped) {
+		if (!stopped && angle != null) {
 			angle += angularVel * Global.spf;
 			angle = Helpers.to360(angle.Value);
 		} else {
@@ -164,7 +164,7 @@ public class SpiralMagnumProj : Projectile {
 		this.player = player;
 		this.headshotChar = headshotChar;
 
-		Axl axl = (player.character as Axl);
+		Axl? axl = player.character as Axl;
 
 		if (type == 0) damager.damage = 1.5f;
 		isHyper = axl?.isWhiteAxl() == true;
@@ -212,9 +212,11 @@ public class SpiralMagnumProj : Projectile {
 
 		if (isScoped && damager.damage > 0 && (target != null || headshotChar != null)) {
 			var hitTarget = headshotChar ?? target;
-			weakness = (hitTarget.actor() as Character)?.isAlwaysHeadshot() == true || (headshotChar != null);
-			float overrideDamage = weakness ? (damager.damage * Damager.headshotModifier) : damager.damage;
-			damager.applyDamage(hitTarget, false, weapon, this, projId, overrideDamage: overrideDamage);
+			if (hitTarget != null) {
+				weakness = (hitTarget.actor() as Character)?.isAlwaysHeadshot() == true || (headshotChar != null);
+				float overrideDamage = weakness ? (damager.damage * Damager.headshotModifier) : damager.damage;
+				damager.applyDamage(hitTarget, false, weapon, this, projId, overrideDamage: overrideDamage);
+			}
 
 			if (weakness) {
 				playSound("hurt", sendRpc: true);
@@ -229,7 +231,7 @@ public class SpiralMagnumProj : Projectile {
 		float velYDist = vel.y * Global.spf;
 
 		weakness = false;
-		IDamagable victim = null;
+		IDamagable? victim = null;
 		Point? hitPoint = null;
 
 		float distPerFrame = speed * Global.spf;
@@ -258,8 +260,11 @@ public class SpiralMagnumProj : Projectile {
 		if (victim != null) {
 			var hitChar = victim as Character;
 
-			bool canBlock = reflectable && !weakness && hitChar != null && hitChar.player.isZero && (hitChar.sprite.name == "zero_block" || (hitChar.sprite.name.Contains("zero_attack") && hitChar.sprite.getCurrentFrame().hitboxes.Count > 0));
-			if (canBlock && hitChar.sprite.name != "zero_attack_air2") {
+			bool canBlock = reflectable && !weakness && hitChar != null && hitChar.player.isZero &&
+			 (hitChar.sprite.name == "zero_block" || (hitChar.sprite.name.Contains("zero_attack") && 
+			 hitChar.sprite.getCurrentFrame().hitboxes.Count > 0));
+
+			if (hitChar != null && canBlock && hitChar.sprite.name != "zero_attack_air2") {
 				canBlock = canBlock && hitChar.xDir == -MathF.Sign(vel.x);
 				if (player.character.pos.distanceTo(hitChar.pos) < 50) {
 					canBlock = false;
@@ -359,7 +364,7 @@ public class SpiralMagnumProj : Projectile {
 }
 
 public class SniperMissileProj : Projectile, IDamagable {
-	public Character target;
+	public Character? target;
 	public float health = 6;
 	public float maxHealth = 6;
 	public float blinkTime;
@@ -367,12 +372,12 @@ public class SniperMissileProj : Projectile, IDamagable {
 	float? holdStartAngle;
 	const float maxTimeConst = 5f;
 	float turnSpeed = 1;
-	Axl axl;
+	Axl? axl;
 
 	public SniperMissileProj(Weapon weapon, Point pos, Player player, Point bulletDir, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, 1, 150, 0, player, "snipermissile_proj", 0, 0f, netProjId, player.ownedByLocalPlayer) {
 		maxTime = maxTimeConst;
-		axl = (player.character as Axl);
+		axl = player.character as Axl;
 
 		if (axl?.isWhiteAxl() == true) {
 			maxTime = 1000;
@@ -397,8 +402,10 @@ public class SniperMissileProj : Projectile, IDamagable {
 	}
 
 	public void updateVel() {
-		vel.x = Helpers.cosd(angle.Value) * speed;
-		vel.y = Helpers.sind(angle.Value) * speed;
+		if (angle != null) {
+			vel.x = Helpers.cosd(angle.Value) * speed;
+			vel.y = Helpers.sind(angle.Value) * speed;
+		}
 	}
 
 	public override void update() {
@@ -424,13 +431,15 @@ public class SniperMissileProj : Projectile, IDamagable {
 					//vel = Point.lerp(vel, pos.directionToNorm(owner.axlCursorWorldPos).times(speed), Global.spf * 2.5f);
 
 					float destAngle = pos.directionToNorm(owner.axlCursorWorldPos).angle;
-					if (MathF.Abs(angle.Value - destAngle) > 3) {
-						angle = Helpers.moveAngle(angle.Value, destAngle, Global.spf * 200 * turnSpeed);
+					if (angle != null) {
+						if (MathF.Abs(angle.Value - destAngle) > 3) {
+							angle = Helpers.moveAngle(angle.Value, destAngle, Global.spf * 200 * turnSpeed);
+						}
 					}
 				}
 				updateVel();
 			} else {
-				if (owner.input.isHeld(Control.Up, owner)) {
+				if (owner.input.isHeld(Control.Up, owner) && angle != null) {
 					int sign = -1;
 					if (holdStartAngle == null) holdStartAngle = angle;
 					if (holdStartAngle < 90 || holdStartAngle > 270) {
@@ -439,7 +448,7 @@ public class SniperMissileProj : Projectile, IDamagable {
 					angle -= sign * Global.spf * 150 * turnSpeed;
 					angle = Helpers.to360(angle.Value);
 					updateVel();
-				} else if (owner.input.isHeld(Control.Down, owner)) {
+				} else if (owner.input.isHeld(Control.Down, owner) && angle != null) {
 					int sign = -1;
 					if (holdStartAngle == null) holdStartAngle = angle;
 					if (holdStartAngle < 90 || holdStartAngle > 270) {
@@ -508,9 +517,9 @@ public class SniperMissileProj : Projectile, IDamagable {
 }
 
 public class SniperMissileExplosionProj : Projectile {
-	public IDamagable directHit;
+	public IDamagable? directHit;
 	public int directHitXDir;
-	Axl axl;
+	Axl? axl;
 
 	public SniperMissileExplosionProj(Weapon weapon, Point pos, int xDir, float damage, Player player, ushort netProjId) :
 		base(weapon, pos, xDir, 0, damage, player, "axl_grenade_explosion2", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
@@ -519,7 +528,7 @@ public class SniperMissileExplosionProj : Projectile {
 		projId = (int)ProjIds.SniperMissileBlast;
 		playSound("grenadeExplode");
 		shouldShieldBlock = false;
-		axl = (player.character as Axl);
+		axl = player.character as Axl;
 
 		if (ownedByLocalPlayer) {
 			rpcCreate(pos, owner, netProjId, xDir);
@@ -542,8 +551,8 @@ public class SniperMissileExplosionProj : Projectile {
 		}
 	}
 
-	public override DamagerMessage onDamage(IDamagable damagable, Player attacker) {
-		Character character = damagable as Character;
+	public override DamagerMessage? onDamage(IDamagable damagable, Player attacker) {
+		Character? character = damagable as Character;
 
 		if (character != null) {
 			bool directHit = this.directHit == character;
