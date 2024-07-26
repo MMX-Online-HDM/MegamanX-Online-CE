@@ -206,10 +206,8 @@ public class Damager {
 
 		if (damagable.isInvincible(owner, projId) && damage > 0) {
 			victim.playSound("m10ding");
-			if (Helpers.randomRange(0, 20) != 20) {
-			victim.addDamageText("0", 1);
-			} else {
-			victim.addDamageText("Bloqueo! Por 48 horas!", 1);
+			if (Helpers.randomRange(0, 50) == 10) {
+				victim.addDamageText("Bloqueo! Por 48 horas!", 1);
 			}
 			return true;
 		}
@@ -350,12 +348,8 @@ public class Damager {
 				damage *= 1.5f;
 				playHurtSound = true;
 			}
-			// there is no change log that says Plasma Gun can ignore super armor btw
-			if (character.ownedByLocalPlayer && character.charState.superArmor && projId != (int)ProjIds.PlasmaGun) {
+			if (character.ownedByLocalPlayer && character.charState.superArmor) {
 				flinch = 0;
-			}
-			if (character.ownedByLocalPlayer && character.charState.superArmor && projId == (int)ProjIds.PlasmaGun) {
-				victim?.playSound("weakness");
 			}
 			if ((owner?.character as Zero)?.isViral == true) {
 				character.addInfectedTime(owner, damage);
