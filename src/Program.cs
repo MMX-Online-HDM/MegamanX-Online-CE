@@ -188,7 +188,7 @@ class Program {
 
 		loadText.Add("Loading Sprites...");
 		loadMultiThread(loadText, window, loadImages);
-		loadText[loadText.Count - 1] = "Loaded Sprites.";
+		loadText[loadText.Count - 1] = $"Loaded {Global.textures.Count} Sprites.";
 
 		loadText.Add("Loading Sprite JSONS...");
 		loadMultiThread(loadText, window, loadSprites);
@@ -196,7 +196,7 @@ class Program {
 
 		loadText.Add("Loading Maps...");
 		loadMultiThread(loadText, window, loadLevels);
-		loadText[loadText.Count - 1] = "Maps Loaded.";
+		loadText[loadText.Count - 1] = $"Loaded {Global.levelDatas.Count} Maps.";
 
 		loadText.Add("Loading SFX...");
 		loadMultiThread(loadText, window, loadSounds);
@@ -204,7 +204,7 @@ class Program {
 
 		loadText.Add("Loading Music...");
 		loadMultiThread(loadText, window, loadMusics);
-		loadText[loadText.Count - 1] = "Music Loaded.";
+		loadText[loadText.Count - 1] = $"Loaded {Global.musics.Count} Songs.";
 
 		loadText.Add("Calculating checksum...");
 		loadMultiThread(loadText, window, Global.computeChecksum);
@@ -795,7 +795,12 @@ class Program {
 		var invertedMaps = new HashSet<string>();
 		foreach (string levelPath in levelPaths) {
 			string levelText = File.ReadAllText(levelPath);
-			var levelData = new LevelData(levelText, false);
+			string levelIniText = "";
+			string levelIniLocation = Path.GetDirectoryName(levelPath) + "/mapData.ini";
+			if (File.Exists(levelIniLocation)) {
+				levelIniText = File.ReadAllText(levelIniLocation);
+			}
+			var levelData = new LevelData(levelText, levelIniText, false);
 
 			var pathPieces = levelPath.Split('/').ToList();
 			string fileName = pathPieces.Pop();
@@ -821,7 +826,12 @@ class Program {
 			if (levelPath.Contains("/sprites/")) continue;
 
 			string levelText = File.ReadAllText(levelPath);
-			var levelData = new LevelData(levelText, true);
+			string levelIniText = "";
+			string levelIniLocation = Path.GetDirectoryName(levelPath) + "/mapData.ini";
+			if (File.Exists(levelIniLocation)) {
+				levelIniText = File.ReadAllText(levelIniLocation);
+			}
+			var levelData = new LevelData(levelText, levelIniText, true);
 			if (levelData.name.EndsWith("_mirrored")) {
 				Global.levelDatas.Add(levelData.name, levelData);
 				levelData.isMirrored = true;

@@ -10,7 +10,7 @@ namespace MMXOnline;
 
 public class HostMenuSettings {
 	public int gameModeIndex;
-	public int mapSizeIndex = 2;
+	public int mapSizeIndex = 0;
 	public string mapName;
 	[JsonIgnore] public int? mapIndex;
 	public int botCount = 0;
@@ -137,18 +137,27 @@ public class HostMenu : IMainMenu {
 	public bool playToDirty;
 	public bool timeLimitDirty;
 
-	public string[] mapSizes = new string[] { "1v1", "Small", "Medium" };
+	public string[] mapSizes = new string[] { "Training", "1v1", "Small", "Medium", "Large", "Collosal" };
 	public string selectedMapSize {
 		get {
-			if (!mapSizes.InRange(mapSizeIndex)) mapSizeIndex = 0;
+			if (!mapSizes.InRange(mapSizeIndex)) {
+				mapSizeIndex = 0;
+			}
 			return mapSizes[mapSizeIndex];
 		}
 	}
 
 	public LevelData selectedLevel {
 		get {
-			if (mapIndex < 0) mapIndex = currentMapSizePool.Count - 1;
-			if (mapIndex >= currentMapSizePool.Count) mapIndex = 0;
+			if (currentMapSizePool.Count == 0) {
+				return trainingMaps[0];
+			}
+			if (mapIndex < 0) {
+				mapIndex = currentMapSizePool.Count - 1;
+			}
+			if (mapIndex >= currentMapSizePool.Count) {
+				mapIndex = 0;
+			}
 			return currentMapSizePool[mapIndex];
 		}
 	}
@@ -162,13 +171,19 @@ public class HostMenu : IMainMenu {
 		}
 	}
 
+	List<LevelData> trainingMaps = new List<LevelData>();
+	List<LevelData> foxOnlyMaps = new List<LevelData>();
 	List<LevelData> smallMaps = new List<LevelData>();
 	List<LevelData> mediumMaps = new List<LevelData>();
 	List<LevelData> largeMaps = new List<LevelData>();
+	List<LevelData> collosalMaps = new List<LevelData>();
 
+	List<LevelData> trainingCustomMaps = new List<LevelData>();
+	List<LevelData> foxOnlyCustomMaps = new List<LevelData>();
 	List<LevelData> smallCustomMaps = new List<LevelData>();
 	List<LevelData> mediumCustomMaps = new List<LevelData>();
 	List<LevelData> largeCustomMaps = new List<LevelData>();
+	List<LevelData> collosalCustomMaps = new List<LevelData>();
 
 	public LevelData selectedLevelMirrored {
 		get {
@@ -179,10 +194,24 @@ public class HostMenu : IMainMenu {
 
 	public List<LevelData> currentMapSizePool {
 		get {
-			if (mapSizeIndex == 0) return isCustomMapPool ? smallCustomMaps : smallMaps;
-			if (mapSizeIndex == 1) return isCustomMapPool ? mediumCustomMaps : mediumMaps;
-			if (mapSizeIndex == 2) return isCustomMapPool ? largeCustomMaps : largeMaps;
-			return null;
+			if (isCustomMapPool) {
+				return mapSizeIndex switch {
+					0 => trainingCustomMaps,
+					1 => foxOnlyCustomMaps,
+					2 => smallCustomMaps,
+					3 => mediumCustomMaps,
+					4 => largeCustomMaps,
+					_ => collosalCustomMaps
+				};
+			}
+			return mapSizeIndex switch {
+				0 => trainingMaps,
+				1 => foxOnlyMaps,
+				2 => smallMaps,
+				3 => mediumMaps,
+				4 => largeMaps,
+				_ => collosalMaps
+			};
 		}
 	}
 
@@ -225,17 +254,55 @@ public class HostMenu : IMainMenu {
 			if (levelData.isMirrored || levelData.name.EndsWith("_inverted")) continue;
 
 			if (!levelData.isCustomMap) {
-				if (levelData.is1v1() || levelData.isTraining()) smallMaps.Add(levelData);
-				else if (levelData.isMedium()) mediumMaps.Add(levelData);
-				else if (!levelData.isTraining()) largeMaps.Add(levelData);
-
+				if (levelData.isTraining()) {
+					trainingMaps.Add(levelData);
+				}
+				else if (levelData.isCollosal()) {
+					collosalMaps.Add(levelData);
+				}
+				else if (levelData.isSmall()) {
+					smallMaps.Add(levelData);
+				}
+				else if (levelData.is1v1()) {
+					foxOnlyMaps.Add(levelData);
+				}
+				else if (levelData.isMedium()) {
+					mediumMaps.Add(levelData);
+				}
+				else {
+					largeMaps.Add(levelData);
+				}
+				trainingMaps.Sort(mapSortFunc);
+				foxOnlyMaps.Sort(mapSortFunc);
 				smallMaps.Sort(mapSortFunc);
 				mediumMaps.Sort(mapSortFunc);
 				largeMaps.Sort(mapSortFunc);
+				collosalMaps.Sort(mapSortFunc);
 			} else {
-				if (levelData.is1v1() || levelData.isTraining()) smallCustomMaps.Add(levelData);
-				else if (levelData.isMedium()) mediumCustomMaps.Add(levelData);
-				else if (!levelData.isTraining()) largeCustomMaps.Add(levelData);
+				if (levelData.isTraining()) {
+					trainingCustomMaps.Add(levelData);
+				}
+				else if (levelData.is1v1()) {
+					foxOnlyCustomMaps.Add(levelData);
+				}
+				else if (levelData.isSmall()) {
+					smallCustomMaps.Add(levelData);
+				}
+				else if (levelData.isMedium()) {
+					mediumCustomMaps.Add(levelData);
+				}
+				else if (levelData.isCollosal()) {
+					collosalCustomMaps.Add(levelData);
+				}
+				else {
+					largeCustomMaps.Add(levelData);
+				}
+				trainingCustomMaps.Sort(mapSortFunc);
+				foxOnlyCustomMaps.Sort(mapSortFunc);
+				smallCustomMaps.Sort(mapSortFunc);
+				mediumCustomMaps.Sort(mapSortFunc);
+				largeCustomMaps.Sort(mapSortFunc);
+				collosalCustomMaps.Sort(mapSortFunc);
 			}
 		}
 
@@ -266,15 +333,29 @@ public class HostMenu : IMainMenu {
 			isMapSelected = false;
 			LevelData currentLevelData = Global.level.server.getLevelData();
 
-			if (smallMaps.IndexOf(currentLevelData) >= 0) {
+			if (trainingMaps.IndexOf(currentLevelData) >= 0) {
 				mapSizeIndex = 0;
-				mapIndex = smallMaps.IndexOf(currentLevelData);
-			} else if (mediumMaps.IndexOf(currentLevelData) >= 0) {
+				mapIndex = trainingMaps.IndexOf(currentLevelData);
+			}
+			else if (foxOnlyMaps.IndexOf(currentLevelData) >= 0) {
 				mapSizeIndex = 1;
-				mapIndex = mediumMaps.IndexOf(currentLevelData);
-			} else if (largeMaps.IndexOf(currentLevelData) >= 0) {
+				mapIndex = foxOnlyMaps.IndexOf(currentLevelData);
+			}
+			else if (smallMaps.IndexOf(currentLevelData) >= 0) {
 				mapSizeIndex = 2;
+				mapIndex = smallMaps.IndexOf(currentLevelData);
+			}
+			else if (mediumMaps.IndexOf(currentLevelData) >= 0) {
+				mapSizeIndex = 3;
+				mapIndex = mediumMaps.IndexOf(currentLevelData);
+			}
+			else if (largeMaps.IndexOf(currentLevelData) >= 0) {
+				mapSizeIndex = 4;
 				mapIndex = largeMaps.IndexOf(currentLevelData);
+			}
+			else if (collosalMaps.IndexOf(currentLevelData) >= 0) {
+				mapSizeIndex = 5;
+				mapIndex = collosalMaps.IndexOf(currentLevelData);
 			}
 		}
 
@@ -355,6 +436,9 @@ public class HostMenu : IMainMenu {
 		menuOptions.Add(
 			new MenuOption(startX, startY,
 				() => {
+					if (currentMapSizePool.Count == 0) {
+						return;
+					}
 					if (Global.input.isPressedMenu(Control.MenuLeft)) {
 						mapIndex--;
 						if (mapIndex < 0) mapIndex = currentMapSizePool.Count - 1;
@@ -746,16 +830,20 @@ public class HostMenu : IMainMenu {
 	}
 
 	public string[] mapSortOrder = new string[] {
+		// Medium maps.
 		"factory_md", "airport_md", "maverickfactory_md", "desertbase_md", "weathercontrol_md",
+		// Small maps.
+		 "training",
 		"centralcomputer_1v1", "zerovirus_1v1", "sigma4_1v1", "dopplerlab_1v1", "sigma1_1v1",
 		"airport_1v1", "factory_1v1", "hunterbase_1v1", "forest_1v1", "highway", "highway2",
 		"bossroom", "powerplant", "factory", "gallery", "tower", "mountain", "ocean", "forest",
-		"forest2", "airport", "sigma", "sigma2", "japetribute_1v1", "training",
+		"forest2", "airport", "sigma", "sigma2", "japetribute_1v1",
+		// Large maps.
 		"maverickfactory", "weathercontrol", "dinosaurtank", "deepseabase", "volcaniczone",
 		"robotjunkyard", "desertbase", "desertbase2", "crystalmine", "centralcomputer",
 		"xhunter1", "xhunter2", "hunterbase", "highway2", "giantdam", "giantdam2",
 		"weaponsfactory", "frozentown", "aircraftcarrier", "powercenter", "shipyard",
-		"quarry", "safaripark", "dopplerlab", "hunterbase2",
+		"quarry", "safaripark", "dopplerlab", "hunterbase2", "nodetest",
 	};
 	public int mapSortFunc(LevelData a, LevelData b) {
 		int aIndex = -1;
@@ -1101,18 +1189,12 @@ public class HostMenu : IMainMenu {
 		timeLimitDirty = false;
 		mapIndex = 0;
 		gameModeIndex = 0;
-		if (prevMapSizeIndex != 0 && newMapSizeIndex == 0) {
-			netcodeModel = (int)NetcodeModel.FavorDefender;
-			playTo = 1;
-		}
-		if (prevMapSizeIndex == 0 && newMapSizeIndex != 0) {
-			netcodeModel = (int)NetcodeModel.FavorAttacker;
+		if (prevMapSizeIndex == 1 && newMapSizeIndex != 1) {
 			removeMaverickCpuDatas();
 		}
 		if (!isOffline && is1v1) {
 			botCount = 0;
 		}
-
 		onMapChange();
 	}
 

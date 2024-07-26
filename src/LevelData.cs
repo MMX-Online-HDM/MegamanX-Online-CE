@@ -104,12 +104,27 @@ public class LevelData {
 	public string backgroundShaderImage;
 	public bool supportsVehicles;
 	public bool raceOnly;
+	public int customSize = -1;
 
 	public LevelData() {
 	}
 
-	public LevelData(string levelJsonStr, bool isCustomMap) {
+	public LevelData(string levelJsonStr, string levelIniStr, bool isCustomMap) {
 		levelJson = JsonConvert.DeserializeObject<dynamic>(levelJsonStr);
+		if (levelIniStr != "") {
+			dynamic levelIni = IniParser.ParseText(levelIniStr);
+			if (levelIni["MapData"]["size"] is String customSizeStr) {
+				customSize = customSizeStr.ToLowerInvariant() switch {
+					"training" => 0,
+					"1v1" => 1,
+					"small" => 2,
+					"medium" => 3,
+					"large" => 4,
+					"xl" or "collosal" => 5,
+					_=> -1 
+				};
+			}
+		}
 		name = levelJson.name;
 		path = levelJson.path;
 		width = levelJson.width;
@@ -216,11 +231,6 @@ public class LevelData {
 			maxPlayers = 4;
 			supportedGameModesSet.Add(GameMode.Elimination);
 			supportedGameModesSet.Add(GameMode.TeamElimination);
-		} else if (isMedium()) {
-			//maxPlayers = 4;
-			maxPlayers = 12;
-			supportedGameModesSet.Add(GameMode.Deathmatch);
-			supportedGameModesSet.Add(GameMode.TeamDeathmatch);
 		} else {
 			maxPlayers = Server.maxPlayerCap;
 			supportedGameModesSet.Add(GameMode.Deathmatch);
@@ -497,16 +507,45 @@ public class LevelData {
 		return string.Join('/', pieces);
 	}
 
-	public bool is1v1() {
-		return name.EndsWith("1v1");
+	public bool isTraining() {
+		if (customSize != -1) {
+			return customSize == 0;
+		}
+		return name == "training" || name.EndsWith("_training");
 	}
 
-	public bool isTraining() {
-		return name == "training";
+	public bool is1v1() {
+		if (customSize != -1) {
+			return customSize == 1;
+		}
+		return name.EndsWith("_1v1");
+	}
+
+	public bool isSmall() {
+		if (customSize != -1) {
+			return customSize == 2;
+		}
+		if (name is "nodetest" or "airport_1v1" or "sigma1_1v1") {
+			return true;
+		}
+		return name.EndsWith("_small");
 	}
 
 	public bool isMedium() {
+		if (customSize != -1) {
+			return customSize == 3;
+		}
 		return name.EndsWith("_md");
+	}
+
+	public bool isCollosal() {
+		if (customSize != -1) {
+			return customSize == 5;
+		}
+		if (name is "sigma1" or "shipyard" or "giantdam" or "gallery") {
+			return true;
+		}
+		return name.EndsWith("_collosal") || name.EndsWith("_xl");
 	}
 
 	// TODO: Add this info to the level format themsleves

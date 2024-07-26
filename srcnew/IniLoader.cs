@@ -17,7 +17,7 @@ public class IniParser {
 		LineBreak,
 	}
 
-	public static Dictionary<string, object> Parse(string fileLocation) {
+	public static dynamic Parse(string fileLocation) {
 		string fileText = File.ReadAllText(fileLocation, Encoding.UTF8);
 		(Token token, string value)[] data = TokenizeIni(fileText);
 
@@ -25,9 +25,16 @@ public class IniParser {
 		return parsedIni;
 	}
 
-	static Dictionary<string, object> ParseTokens((Token token, string value)[] data) {
-		Dictionary<string, object> parsedIni = new();
-		List<Dictionary<string, object>> levels = new() { parsedIni };
+	public static dynamic ParseText(string fileText) {
+		(Token token, string value)[] data = TokenizeIni(fileText);
+
+		var parsedIni = ParseTokens(data);
+		return parsedIni;
+	}
+
+	static dynamic ParseTokens((Token token, string value)[] data) {
+		dynamic parsedIni = new Dictionary<string, dynamic>();
+		List<Dictionary<string, dynamic>> levels = new() { parsedIni };
 
 		for (int i = 0; i < data.Length; i++) {
 			var currentLevel = levels.Last();
@@ -37,7 +44,7 @@ public class IniParser {
 					if (levels.Count > 1) {
 						levels.RemoveAt(levels.Count - 1);
 					}
-					Dictionary<string, object> newLevel = new();
+					Dictionary<string, dynamic> newLevel = new();
 					levels.Last()[data[i].value] = newLevel;
 					levels.Add(newLevel);
 				} else {
