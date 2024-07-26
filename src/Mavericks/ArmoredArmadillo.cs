@@ -15,8 +15,8 @@ public class ArmoredArmadillo : Maverick {
 		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.6f));
 		//stateCooldowns.Add(typeof(ArmoredARollEnterState), new MaverickStateCooldown(false, false, 4));
 
-		spriteToCollider.Add("roll", getRollCollider());
-		spriteToCollider.Add("na_roll", getRollCollider());
+		spriteToCollider["roll"] = getRollCollider();
+		spriteToCollider["na_roll"] = getRollCollider();
 
 		weapon = new Weapon(WeaponIds.ArmoredAGeneric, 95);
 

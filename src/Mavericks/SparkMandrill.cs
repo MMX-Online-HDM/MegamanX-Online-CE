@@ -20,7 +20,7 @@ public class SparkMandrill : Maverick {
 		stateCooldowns.Add(typeof(SparkMPunchState), new MaverickStateCooldown(true, true, 1f));
 		stateCooldowns.Add(typeof(SparkMDashPunchState), new MaverickStateCooldown(true, false, 0.75f));
 		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(true, true, 2f));
-		spriteToCollider.Add("dash_punch", getDashCollider());
+		spriteToCollider["dash_punch"] = getDashCollider();
 
 		weapon = new Weapon(WeaponIds.SparkMGeneric, 94);
 

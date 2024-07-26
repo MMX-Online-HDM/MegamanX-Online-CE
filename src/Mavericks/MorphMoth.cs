@@ -14,7 +14,7 @@ public class MorphMoth : Maverick {
 		stateCooldowns.Add(typeof(MorphMShootAir), new MaverickStateCooldown(true, false, 0.5f));
 
 		weapon = getWeapon();
-		spriteToCollider.Add("sweep", getDashCollider());
+		spriteToCollider["sweep"] = getDashCollider();
 
 		canFly = true;
 

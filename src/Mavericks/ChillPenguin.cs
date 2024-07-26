@@ -22,7 +22,7 @@ public class ChillPenguin : Maverick {
 		stateCooldowns.Add(typeof(ChillPSlideState), new MaverickStateCooldown(true, false, 0.5f));
 		stateCooldowns.Add(typeof(ChillPBlizzardState), new MaverickStateCooldown(false, false, 3f));
 		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
-		spriteToCollider.Add("slide", getDashCollider());
+		spriteToCollider["slide"] = getDashCollider();
 
 		weapon = new Weapon(WeaponIds.ChillPGeneric, 93);
 
