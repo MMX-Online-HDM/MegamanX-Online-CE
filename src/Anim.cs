@@ -222,7 +222,7 @@ public class Anim : Actor {
 			if (sprite.name == "plasmagun_effect") {
 				if (ownedByLocalPlayer && host is Axl axl) {
 					Point bulletPos = axl.getAxlBulletPos();
-					byteAngle = axl.getShootAngle(true);
+					angle = axl.getShootAngle(true);
 					changePos(bulletPos);
 				}
 			} else {
