@@ -219,8 +219,6 @@ public partial class Character : Actor, IDamagable {
 		spriteToCollider["block"] = getBlockCollider();
 
 		changeState(initialCharState);
-		charState = initialCharState;
-
 		visible = isVisible;
 
 		chargeTime = 0;
@@ -1651,7 +1649,10 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public bool canBeGrabbed() {
-		return grabInvulnTime == 0 && !isCCImmune() && charState is not DarkHoldState;
+		return (
+			grabInvulnTime == 0 && !charState.invincible &&
+			!isInvulnerable() && !isCCImmune() && isDarkHoldState
+		);
 	}
 
 	public bool isDeathOrReviveSprite() {
@@ -1950,18 +1951,17 @@ public partial class Character : Actor, IDamagable {
 		changeState(new Idle("land"), true);
 	}
 
-	public virtual void changeState(CharState newState, bool forceChange = false) {
-		if (newState == null) {
-			return;
-		}
-		if (!forceChange &&
-			(charState.GetType() == newState.GetType() || changedStateInFrame)
-		) {
-			return;
-		}
+	public virtual bool changeState(CharState newState, bool forceChange = false) {
 		// Set the character as soon as posible.
 		newState.character = this;
 		newState.altCtrls = new bool[altCtrlsLength];
+
+		// Check if we can change.
+		if (!forceChange &&
+			(charState.GetType() == newState.GetType() || changedStateInFrame)
+		) {
+			return false;
+		}
 		// For Ride Armor stuns.
 		if (charState is InRideArmor inRideArmor) {
 			if (newState is GenericStun) {
@@ -1974,14 +1974,14 @@ public partial class Character : Actor, IDamagable {
 				if (paralyzedTime > 0) {
 					inRideArmor.stun(paralyzedTime / 60f);
 				}
-				return;
+				return false;
 			}
 		}
-		if (charState.canExit(this, newState) == false) {
-			return; 
+		if (!charState.canExit(this, newState)) {
+			return false; 
 		}
 		if (!newState.canEnter(this)) {
-			return;
+			return false;
 		}
 		changedStateInFrame = true;
 		if (shootAnimTime > 0 && newState.canShoot() == true) {
@@ -2009,6 +2009,7 @@ public partial class Character : Actor, IDamagable {
 		//	this.shootTime = 0;
 		//	this.shootAnimTime = 0;
 		//}
+		return true;
 	}
 
 	// Get dist from y pos to pos at which to draw the first label

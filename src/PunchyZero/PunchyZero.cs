@@ -361,13 +361,19 @@ public class PunchyZero : Character {
 	}
 
 
-	public override void changeState(CharState newState, bool forceChange = false) {
-		CharState? oldState = charState;
-		base.changeState(newState, forceChange);
-		if (!newState.attackCtrl || newState.attackCtrl != oldState?.attackCtrl) {
+	public override bool changeState(CharState newState, bool forceChange = false) {
+		// Save old state.
+		CharState oldState = charState;
+		// Base function call.
+		bool hasChanged = base.changeState(newState, forceChange);
+		if (!hasChanged) {
+			return false;
+		}
+		if (!newState.attackCtrl || newState.attackCtrl != oldState.attackCtrl) {
 			shootPressTime = 0;
 			specialPressTime = 0;
 		}
+		return true;
 	}
 
 	public override bool altCtrl(bool[] ctrls) {

@@ -551,13 +551,19 @@ public class Zero : Character {
 	// This is to prevent accidental combo activation between attacks.
 
 	// This is to prevent accidental combo activation between attacks.
-	public override void changeState(CharState newState, bool forceChange = false) {
-		CharState? oldState = charState;
-		base.changeState(newState, forceChange);
+	public override bool changeState(CharState newState, bool forceChange = false) {
+		// Save old state.
+		CharState oldState = charState;
+		// Base function call.
+		bool hasChanged = base.changeState(newState, forceChange);
+		if (!hasChanged) {
+			return false;
+		}
 		if (!newState.attackCtrl || newState.attackCtrl != oldState.attackCtrl) {
 			shootPressTime = 0;
 			specialPressTime = 0;
 		}
+		return true;
 	}
 
 	// Movement and stuff.

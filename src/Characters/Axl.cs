@@ -1697,19 +1697,16 @@ public class Axl : Character {
 		return base.getCamCenterPos(ignoreZoom);
 	}
 
-	public override void changeState(CharState newState, bool forceChange = false) {
-		if (!forceChange && charState != null && newState != null &&
-			charState.GetType() == newState.GetType() ||
-			 !forceChange && changedStateInFrame
-		) {
-			return;
+	public override bool changeState(CharState newState, bool forceChange = false) {
+		bool hasChanged = base.changeState(newState, forceChange);
+		if (!hasChanged) {
+			return false;
 		}
-		base.changeState(newState, forceChange);
-
 		if (gaeaShield != null && shouldDrawArm() == false) {
 			gaeaShield.destroySelf();
 			gaeaShield = null;
 		}
+		return true;
 	}
 
 	public override void destroySelf(

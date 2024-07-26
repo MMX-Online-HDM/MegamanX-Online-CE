@@ -1181,18 +1181,15 @@ public partial class MegamanX : Character {
 		return jumpModifier * base.getJumpModifier();
 	} */
 
-	public override void changeState(CharState newState, bool forceChange = false) {
-		if (!forceChange && charState != null &&
-			charState.GetType() == newState.GetType() ||
-			 !forceChange && changedStateInFrame
-		) {
-			return;
+	public override bool changeState(CharState newState, bool forceChange = false) {
+		bool hasChanged = base.changeState(newState, forceChange);
+		if (!hasChanged) {
+			return false;
 		}
-		base.changeState(newState, forceChange);
-
 		if (hasBusterProj() && string.IsNullOrEmpty(newState.shootSprite) && newState is not Hurt) {
 			destroyBusterProjs();
 		}
+		return true;
 	}
 
 	public void drawHyperCharge(float x, float y) {
