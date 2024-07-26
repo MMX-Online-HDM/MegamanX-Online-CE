@@ -174,13 +174,13 @@ public class Vile : Character {
 			}
 		}
 
-		if (vulcanLingerTime <= 0.1f && player.weapon.shootTime == 0f) {
+		if (vulcanLingerTime <= 0.1f && vulcanWeapon.shootTime == 0f) {
 			vulcanLingerTime += Global.spf;
 			if (vulcanLingerTime > 0.1f && sprite.name.EndsWith("shoot")) {
 				changeSpriteFromName(charState.sprite, resetFrame: false);
 			}
 		}
-
+		cannonWeapon.update();
 		vulcanWeapon.update();
 		missileWeapon.update();
 		rocketPunchWeapon.update();
@@ -259,19 +259,6 @@ public class Vile : Character {
 		}
 
 		bool wL = player.input.isHeld(Control.WeaponLeft, player);
-		if (isVileMK5 && startRideArmor != null && Options.main.mk5PuppeteerHoldOrToggle && player.weapon is MechMenuWeapon && !wL) {
-			if (lastFrameWeaponRightHeld) {
-				player.weaponSlot--;
-				if (player.weaponSlot < 0) {
-					player.weaponSlot = player.weapons.Count - 1;
-				}
-			} else {
-				player.weaponSlot++;
-				if (player.weaponSlot >= player.weapons.Count) {
-					player.weaponSlot = 0;
-				}
-			}
-		}
 		lastFrameWeaponLeftHeld = wL;
 
 		// Vile V Ride control.
@@ -350,9 +337,7 @@ public class Vile : Character {
 			}
 		}
 
-		if (isShootingLongshotGizmo && player.weapon is VileCannon) {
-			player.weapon.vileShoot(WeaponIds.FrontRunner, this);
-		} else if (player.input.isPressed(Control.Special1, player)) {
+		if (player.input.isPressed(Control.Special1, player)) {
 			if (charState is Crouch) {
 				napalmWeapon.vileShoot(WeaponIds.Napalm, this);
 			} else if (charState is Jump || charState is Fall || charState is VileHover) {
@@ -378,7 +363,7 @@ public class Vile : Character {
 			}
 		} else if (player.input.isHeld(Control.Shoot, player)) {
 			if (cutterWeapon.shootTime < cutterWeapon.rateOfFire * 0.75f) {
-				player.weapon.vileShoot(0, this);
+				cannonWeapon.vileShoot(0, this);
 			}
 		} else if (player.input.isHeld(Control.WeaponRight, player)) {
 			vulcanWeapon.vileShoot(0, this);
@@ -454,7 +439,6 @@ public class Vile : Character {
 						startRideArmor.ownedByMK5 = true;
 						startRideArmor.zIndex = zIndex - 1;
 						player.weaponSlot = 0;
-						if (player.weapon is MechMenuWeapon) player.weaponSlot = 1;
 					}
 					changeState(new CallDownMech(startRideArmor, true), true);
 				}
@@ -578,7 +562,7 @@ public class Vile : Character {
 		if (isShootingLongshotGizmo) {
 			return true;
 		}
-		if (isVileMK5 && player.weapon is MechMenuWeapon && startRideArmor != null) {
+		if (isVileMK5 && startRideArmor != null && player.input.isHeld(Control.WeaponLeft, player)) {
 			return true;
 		}
 		if (sprite.name.EndsWith("_idle_shoot") && sprite.frameTime < 6) {

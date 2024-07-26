@@ -197,9 +197,14 @@ public class CannonAttack : CharState {
 		base.update();
 
 		if (vile.isShootingLongshotGizmo) {
+			if (vile.cannonWeapon.shootTime == 0) {
+				vile.cannonWeapon.vileShoot(0, vile);
+			}
+			if (player.vileAmmo <= 0) {
+				vile.isShootingLongshotGizmo = false;
+			}
 			return;
 		}
-
 		//groundCodeWithMove();
 
 		if (character.sprite.isAnimOver()) {

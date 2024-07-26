@@ -328,8 +328,6 @@ public partial class Player {
 	// Note: Every time you add an armor, add an "old" version and update DNA Core code appropriately
 	public ushort armorFlag;
 	public ushort oldArmorFlag;
-	public bool ultimateArmor;
-	public bool oldUltimateArmor;
 	public bool frozenCastle;
 	public bool oldFrozenCastle;
 	public bool speedDevil;
@@ -1289,15 +1287,16 @@ public partial class Player {
 		// Save old flags.
 		oldArmorFlag = armorFlag;
 		oldSpeedDevil = speedDevil;
-		oldFrozenCastle = frozenCastle;
-		oldUltimateArmor = ultimateArmor;
+		oldFrozenCastle = frozenCastle;;
 
 		// Armor flags for X.
 		if (data.charNum == (int)CharIds.X) {
 			armorFlag = BitConverter.ToUInt16(
 				new byte[] { data.extraData[0], data.extraData[1] }
 			);
-			oldUltimateArmor = (data.extraData[2] == 1);
+			if (retChar is MegamanX retX) {
+				retX.hasUltimateArmor = (data.extraData[2] == 1);
+			}
 		}
 		// Store old weapons.
 		oldWeapons = weapons;
@@ -1328,12 +1327,10 @@ public partial class Player {
 		oldArmorFlag = armorFlag;
 		oldFrozenCastle = frozenCastle;
 		oldSpeedDevil = speedDevil;
-		oldUltimateArmor = ultimateArmor;
 
 		armorFlag = dnaCore.armorFlag;
 		frozenCastle = dnaCore.frozenCastle;
 		speedDevil = dnaCore.speedDevil;
-		ultimateArmor = dnaCore.ultimateArmor;
 
 		bool isVileMK2 = charNum == 2 && dnaCore.hyperMode == DNACoreHyperMode.VileMK2;
 		bool isVileMK5 = charNum == 2 && dnaCore.hyperMode == DNACoreHyperMode.VileMK5;
@@ -1346,7 +1343,7 @@ public partial class Player {
 				extraData = new byte[] {
 					armorBytes[0],
 					armorBytes[1],
-					ultimateArmor ? (byte)1 : (byte)0
+					dnaCore.ultimateArmor ? (byte)1 : (byte)0
 				};
 			} else if (dnaCore.charNum == (int)CharIds.Vile) {
 				extraData = new byte[1];
@@ -1563,7 +1560,6 @@ public partial class Player {
 		armorFlag = oldArmorFlag;
 		speedDevil = oldSpeedDevil;
 		frozenCastle = oldFrozenCastle;
-		ultimateArmor = oldUltimateArmor;
 
 		lastDNACore = null;
 		lastDNACoreIndex = 4;
@@ -1612,7 +1608,6 @@ public partial class Player {
 		armorFlag = oldArmorFlag;
 		speedDevil = oldSpeedDevil;
 		frozenCastle = oldFrozenCastle;
-		ultimateArmor = oldUltimateArmor;
 
 		lastDNACore = null;
 		lastDNACoreIndex = 4;
@@ -2221,17 +2216,19 @@ public partial class Player {
 	}
 
 	public void setUltimateArmor(bool addOrRemove) {
-		if (addOrRemove) {
-			ultimateArmor = true;
-			addNovaStrike();
-		} else {
-			ultimateArmor = false;
-			removeNovaStrike();
+		if (character is MegamanX mmx) {
+			if (addOrRemove) {
+				mmx.hasUltimateArmor = true;
+				addNovaStrike();
+			} else {
+				mmx.hasUltimateArmor = false;
+				removeNovaStrike();
+			}
 		}
 	}
 
 	public bool hasUltimateArmor() {
-		return ultimateArmor;
+		return character is MegamanX { hasUltimateArmor: true };
 	}
 
 	public int bootsArmorNum {
