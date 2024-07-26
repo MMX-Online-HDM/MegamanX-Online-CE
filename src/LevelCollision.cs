@@ -409,10 +409,15 @@ public partial class Level {
 	) {
 		List<CollideData> collideDatas = new List<CollideData>();
 		// Use custom terrain collider by default.
-		Collider terrainCollider = actor.getTerrainCollider();
+		Collider? terrainCollider = actor.getTerrainCollider();
 		// If terrain collider is not used or is null we use the default colliders.
 		if (terrainCollider == null) {
 			terrainCollider = actor.standartCollider;
+		}
+		if (actor.spriteToCollider.ContainsKey(actor.sprite.name) &&
+			actor.spriteToCollider[actor.sprite.name] == null
+		) {
+			return collideDatas;
 		}
 		// If there is no collider we return.
 		if (actor.standartCollider == null) {

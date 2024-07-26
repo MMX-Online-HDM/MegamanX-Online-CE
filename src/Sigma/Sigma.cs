@@ -553,7 +553,11 @@ public abstract class BaseSigma : Character {
 	}
 
 	public override Collider getTerrainCollider() {
-		if (physicsCollider == null || isHyperSigma) {
+		Collider? overrideGlobalCollider = null;
+		if (spriteToColliderMatch(sprite.name, out overrideGlobalCollider)) {
+			return overrideGlobalCollider;
+		}
+		if (physicsCollider == null) {
 			return null;
 		}
 		float hSize = 40;

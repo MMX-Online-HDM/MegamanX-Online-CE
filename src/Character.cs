@@ -702,6 +702,10 @@ public partial class Character : Actor, IDamagable {
 
 	// For terrain collision.
 	public override Collider? getTerrainCollider() {
+		Collider? overrideGlobalCollider = null;
+		if (spriteToColliderMatch(sprite.name, out overrideGlobalCollider)) {
+			return overrideGlobalCollider;
+		}
 		if (physicsCollider == null) {
 			return null;
 		}

@@ -2044,7 +2044,7 @@ public class GameMode {
 		}*/
 
 		if (weapon is AxlWeapon && Options.main.axlLoadout.altFireArray[Weapon.wiToFi(weapon.index)] == 1) {
-			Helpers.drawWeaponSlotSymbol(x - 8, y - 8, "B");
+			//Helpers.drawWeaponSlotSymbol(x - 8, y - 8, "²");
 		}
 
 		if (weapon is SigmaMenuWeapon) {

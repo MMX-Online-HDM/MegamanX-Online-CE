@@ -98,7 +98,7 @@ public class SelectVileWeaponMenu : IMainMenu {
 		int maxCatCount = vileWeaponCategories[selCursorIndex].weapons.Length;
 
 		int minIndex = 0;
-		if (selCursorIndex == 0 || selCursorIndex == 1 || selCursorIndex == 2 || selCursorIndex == 3 || selCursorIndex == 8) {
+		if (selCursorIndex == 0 || selCursorIndex == 1 || selCursorIndex == 2 || selCursorIndex == 3) {
 			minIndex = 1;
 		}
 

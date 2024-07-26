@@ -7,12 +7,12 @@ namespace MMXOnline;
 
 // Everything strongly related to actor collision should go here
 public partial class Actor {
-	private Collider _globalCollider = null!;
+	private Collider? _globalCollider;
 
 	// One of the possible colliders of an actor.
 	// This is typically used for a collider shared across multiple sprites an actor can be.
 	// Typically used for chars, mavericks, rides, etc.
-	public Collider globalCollider {
+	public Collider? globalCollider {
 		get {
 			return _globalCollider;
 		}
@@ -66,7 +66,7 @@ public partial class Actor {
 
 	public Collider collider {
 		get {
-			Collider stdColl = getAllColliders().FirstOrDefault();
+			Collider? stdColl = getAllColliders().FirstOrDefault();
 			if (stdColl == null) {
 				return null;
 			}
@@ -183,9 +183,6 @@ public partial class Actor {
 		}
 
 		foreach ((string name, Collider? colliderValue) in spriteToCollider) {
-			if (colliderValue == null) {
-				continue;
-			}
 			string spriteKey = name;
 			if (spriteKey.Contains("*")) {
 				spriteKey = spriteKey.Replace("*", "");
