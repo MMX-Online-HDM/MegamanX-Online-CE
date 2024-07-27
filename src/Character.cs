@@ -1294,7 +1294,7 @@ public partial class Character : Actor, IDamagable {
 		if (charState.normalCtrl) {
 			normalCtrl();
 		}
-		if (charState.attackCtrl) {
+		if (charState.attackCtrl && invulnTime <= 0) {
 			return attackCtrl();
 		}
 		if (charState.altCtrls.Any(b => b)) {

@@ -28,8 +28,7 @@ public class ElectricSparkProj : Projectile {
 	public bool split = false;
 	public ElectricSparkProj(
 		Weapon weapon, Point pos, int xDir,
-		Player player, int type, ushort netProjId,
-		Point? vel = null, bool rpc = false
+		Player player, int type, ushort netProjId, bool rpc = false
 	) : base(
 		weapon, pos, xDir, 150, 2, player, "electric_spark",
 		Global.miniFlinch, 0, netProjId, player.ownedByLocalPlayer
@@ -37,56 +36,46 @@ public class ElectricSparkProj : Projectile {
 		projId = (int)ProjIds.ElectricSpark;
 		maxTime = 1.2f;
 
-		if (vel != null) {
+		if (type == 1) {
 			maxTime = 0.4f;
+			vel.x = 0;
+			vel.y = 450;
 		}
+		else if (type == 2) {
+			maxTime = 0.4f;
+			vel.x = 0;
+			vel.y = -450;
+		} 
 
 		fadeSprite = "electric_spark_fade";
 		//this.fadeSound = "explosion";
 		this.type = type;
-		if (vel != null) this.vel = (Point)vel;
 		reflectable = true;
 		shouldShieldBlock = false;
 
 		if (rpc) {
 			byte[] extraArgs;
-			if (vel != null) {
-				extraArgs = new byte[] { (byte)type, (byte)vel.Value.x, (byte)vel.Value.y };
-			} else {
-				extraArgs = new byte[] { (byte)type };
-			}
+			extraArgs = new byte[] { (byte)type };
 			rpcCreate(pos, player, netProjId, xDir, extraArgs);
 		}
 	}
 
 	public override void onHitWall(CollideData other) {
-		if (!other.gameObject.collider.isClimbable) return;
 		if (split) return;
 		if (type == 0) {
-			var normal = other?.hitData?.normal;
-			if (normal != null) {
-				if (normal.Value.x == 0) {
-					normal = new Point(-1, 0);
-				}
-				normal = ((Point)normal).leftNormal();
-			} else {
-				normal = new Point(0, 1);
-				return;
-			}
-			Point normal2 = (Point)normal;
-			normal2.multiply(getSpeed() * 3);
 			destroySelf(fadeSprite);
 			split = true;
 			if (!ownedByLocalPlayer) {
 				return;
 			}
+
 			new ElectricSparkProj(
 				weapon, pos.clone(), xDir, damager.owner, 1,
-				Global.level.mainPlayer.getNextActorNetId(), normal2, rpc: true
+				Global.level.mainPlayer.getNextActorNetId(), true
 			);
 			new ElectricSparkProj(
-				weapon, pos.clone(), xDir, damager.owner, 1,
-				Global.level.mainPlayer.getNextActorNetId(), normal2.times(-1), rpc: true
+				weapon, pos.clone(), xDir, damager.owner, 2,
+				Global.level.mainPlayer.getNextActorNetId(), rpc: true
 			);
 		}
 	}
