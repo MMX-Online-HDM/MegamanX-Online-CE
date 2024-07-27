@@ -248,12 +248,14 @@ public partial class KaiserSigma : Character {
 		// Update base arguments.
 		base.updateCustomActorNetData(data);
 		data = data[data[0]..];
+		if (data.Length == 0) {
+			return;
+		}
 
 		// Per-player data.
 		bool[] flags = Helpers.byteToBoolArray(data[0]);
 
 		showExhaust = flags[0];
-
 		if (flags[1]) {
 			exaustDir = flags[2] ? 1 : -1;
 		} else {

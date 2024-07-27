@@ -21,6 +21,7 @@ public class ServerPlayer {
 	[ProtoMember(13)] public bool isSpectator;
 	[ProtoMember(14)] public int? autobalanceAlliance;
 	[ProtoMember(15)] public int? startPing;
+	[ProtoMember(16)] public int charNumSub;
 
 	[JsonIgnore]
 	public NetConnection? connection;

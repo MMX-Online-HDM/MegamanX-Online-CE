@@ -178,12 +178,12 @@ class Program {
 		}
 
 		// Loading with GUI.
-		loadText.Add("Getting Masterserver URL...");
+		loadText.Add("Getting Master Server URL...");
 		loadMultiThread(loadText, window, MasterServerData.updateMasterServerURL);
 		if (MasterServerData.serverIp == "127.0.0.1") {
 			loadText[loadText.Count - 1] = "Using local conection.";
 		} else {
-			loadText[loadText.Count - 1] = "Masterserver OK.";
+			loadText[loadText.Count - 1] = "Master Server OK.";
 		}
 
 		loadText.Add("Loading Sprites...");

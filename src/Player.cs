@@ -318,6 +318,7 @@ public partial class Player {
 	public bool readyTextOver = false;
 	public ServerPlayer serverPlayer;
 	public LoadoutData loadout;
+	public bool loadoutSet;
 	public LoadoutData previousLoadout;
 	public LoadoutData oldAxlLoadout;
 	public AxlLoadout axlLoadout { get { return loadout.axlLoadout; } }
@@ -590,8 +591,12 @@ public partial class Player {
 
 		if (ownedByLocalPlayer && !isAI) {
 			loadout = LoadoutData.createFromOptions(id);
+			loadoutSet = true;
 		} else {
 			loadout = LoadoutData.createRandom(id);
+			if (ownedByLocalPlayer) {
+				loadoutSet = true;
+			}
 		}
 
 		configureWeapons();
@@ -727,6 +732,9 @@ public partial class Player {
 	}
 
 	public ushort getNextATransNetId() {
+		if (curATransNetId < getStartNetId() + 1) {
+			curATransNetId = (ushort)(getStartNetId() + 1);
+		}
 		var retId = curATransNetId;
 		curATransNetId++;
 		if (curATransNetId >= getStartNetId() + 10) {
@@ -1041,7 +1049,12 @@ public partial class Player {
 					false, charNetId, ownedByLocalPlayer
 				);
 			} else if (charNum == (int)CharIds.Sigma) {
-				if (isSigma3()) {
+				if (!ownedByLocalPlayer && !loadoutSet) {
+					character = new BaseSigma(
+						this, pos.x, pos.y, xDir,
+						false, charNetId, ownedByLocalPlayer
+					);
+				} else if (isSigma3()) {
 					character = new Doppma(
 						this, pos.x, pos.y, xDir,
 						false, charNetId, ownedByLocalPlayer
@@ -1958,7 +1971,7 @@ public partial class Player {
 		} else {
 			KaiserSigma kaiserSigma = new KaiserSigma(
 				this, spawnPoint.x, spawnPoint.y, character.xDir, true,
-				newNetId, character.ownedByLocalPlayer
+				newNetId, true
 			);
 			character = kaiserSigma;
 			character.changeSprite("kaisersigma_enter", true);
@@ -1977,15 +1990,16 @@ public partial class Player {
 	public void reviveSigmaNonOwner(int form, Point spawnPoint, ushort sigmaNetId) {
 		clearSigmaWeapons();
 		maxHealth = getModifiedHealth(32);
-		//if (form >= 2) {
+		if (form >= 2) {
 			character.destroySelf();
 			KaiserSigma kaiserSigma = new KaiserSigma(
 				this, spawnPoint.x, spawnPoint.y, character.xDir, true,
-				character.netId, character.ownedByLocalPlayer
+				sigmaNetId, false
 			);
 			character = kaiserSigma;
-		//}
-		character.changeSprite("kaisersigma_enter", true);
+
+			character.changeSprite("kaisersigma_enter", true);
+		}
 	}
 
 	public void reviveX() {

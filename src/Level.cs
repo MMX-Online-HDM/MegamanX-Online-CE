@@ -1294,7 +1294,9 @@ public partial class Level {
 				float deltaX = fullDeltaX;
 				float deltaY = fullDeltaY;
 
-				if (camPlayer.character?.charState is not InRideChaser) {
+				if (camPlayer.character?.charState is not InRideChaser &&
+					(camPlayer.character as Axl)?.isZooming() != true
+				) {
 					int camSpeed = 4;
 					if (MathF.Abs(deltaX) > camSpeed) {
 						deltaX = camSpeed * MathF.Sign(fullDeltaX);

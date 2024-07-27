@@ -221,7 +221,7 @@ public class TunnelRTornadoFangDiag : Projectile {
 		weapon, pos, xDir, 0, 3, player, "tunnelr_proj_drill", Global.halfFlinch, 0.25f, netProjId, player.ownedByLocalPlayer
 	) {
 		maxTime = 1.5f;
-		projId = (int)ProjIds.TunnelRTornadoFang;
+		projId = (int)ProjIds.TunnelRTornadoFangDiag;
 		destroyOnHit = false;
 		vel = new Point(xDir * 150, -150);
 

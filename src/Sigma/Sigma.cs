@@ -4,7 +4,7 @@ using SFML.Graphics;
 
 namespace MMXOnline;
 
-public abstract class BaseSigma : Character {
+public class BaseSigma : Character {
 	public const float sigmaHeight = 50;
 	public float sigmaSaberMaxCooldown = 1f;
 	public float noBlockTime = 0;
