@@ -466,7 +466,10 @@ public class KaiserSigmaBeamState : KaiserSigmaBaseState {
 
 			if (chargeTime > 1f) {
 				state = 1;
-				proj = new KaiserSigmaBeamProj(new KaiserBeamWeapon(), shootPos, character.xDir, !isDown, player, player.getNextActorNetId(), rpc: true);
+				proj = new KaiserSigmaBeamProj(
+					new KaiserBeamWeapon(), shootPos, character.xDir,
+					!isDown, player, player.getNextActorNetId(), rpc: true
+				);
 				beamSound = character.playSound("kaiserSigmaBeam", sendRpc: true);
 			}
 		} else if (state == 1) {
@@ -503,20 +506,21 @@ public class KaiserSigmaBeamProj : Projectile {
 	public float beamWidth;
 	const float beamLen = 150;
 	const float maxBeamTime = 2;
-	public KaiserSigmaBeamProj(Weapon weapon, Point pos, int xDir, bool isUp, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, 1, 0, 1, player, "empty", 0, 0.15f, netProjId, player.ownedByLocalPlayer) {
+	public KaiserSigmaBeamProj(
+		Weapon weapon, Point pos, int xDir, bool isUp, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, 1, 0, 1, player, "empty", Global.miniFlinch, 0.15f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.Sigma3KaiserBeam;
 		setIndestructableProperties();
 
-		if (ownedByLocalPlayer) {
-			if (xDir == 1 && !isUp) beamAngle = 45;
-			if (xDir == -1 && !isUp) beamAngle = 135;
-			if (xDir == -1 && isUp) beamAngle = 225;
-			if (xDir == 1 && isUp) beamAngle = 315;
-		}
+		if (xDir == 1 && !isUp) beamAngle = 45;
+		if (xDir == -1 && !isUp) beamAngle = 135;
+		if (xDir == -1 && isUp) beamAngle = 225;
+		if (xDir == 1 && isUp) beamAngle = 315;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, player, netProjId, xDir, (byte)(isUp ? 1 : 0));
 		}
 	}
 
@@ -528,8 +532,6 @@ public class KaiserSigmaBeamProj : Projectile {
 		} else {
 			changeGlobalCollider(getPoints());
 		}
-
-		if (!ownedByLocalPlayer) return;
 
 		if (time < 1) {
 			beamWidth += Global.spf * 20;
@@ -551,12 +553,11 @@ public class KaiserSigmaBeamProj : Projectile {
 		Point pos1 = new Point(beamLen * Helpers.cosd(ang1), beamLen * Helpers.sind(ang1));
 		Point pos2 = new Point(beamLen * Helpers.cosd(ang2), beamLen * Helpers.sind(ang2));
 
-		var points = new List<Point>
-		{
-				pos,
-				pos.add(pos1),
-				pos.add(pos2),
-			};
+		var points = new List<Point> {
+			pos,
+			pos.add(pos1),
+			pos.add(pos2),
+		};
 		return points;
 	}
 
@@ -564,19 +565,6 @@ public class KaiserSigmaBeamProj : Projectile {
 		base.render(x, y);
 		Color color = new Color(132, 132, 231);
 		DrawWrappers.DrawPolygon(getPoints(), color, true, ZIndex.Character);
-	}
-
-	public override List<byte> getCustomActorNetData() {
-		List<byte> customData = new();
-		customData.AddRange(BitConverter.GetBytes(beamAngle));
-		customData.AddRange(BitConverter.GetBytes(beamWidth));
-
-		return customData;
-	}
-
-	public override void updateCustomActorNetData(byte[] data) {
-		beamAngle = BitConverter.ToSingle(data[0..4], 0);
-		beamWidth = BitConverter.ToSingle(data[4..8], 0);
 	}
 }
 
