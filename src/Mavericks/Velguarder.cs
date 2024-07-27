@@ -134,9 +134,8 @@ public class VelGFireProj : Projectile {
 	public override void update() {
 		base.update();
 		if (MathF.Abs(vel.y) < 600) vel.y -= Global.spf * 600;
-		if (!ownedByLocalPlayer) return;
 		if (isUnderwater()) {
-			destroySelf();
+			destroySelf(disableRpc: true);
 			return;
 		}
 	}
@@ -154,6 +153,7 @@ public class VelGIceProj : Projectile {
 		maxTime = 0.75f;
 		useGravity = true;
 		this.vel = vel;
+		canBeLocal = false;
 
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);

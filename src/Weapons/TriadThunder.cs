@@ -33,6 +33,7 @@ public class TriadThunder : Weapon {
 					pos, xDir, player.input.isHeld(Control.Down, player) ? -1 : 1,
 					player, netProjId, true
 				);
+				player.setNextActorNetId((ushort)(netProjId + 4));
 			}
 		} else {
 			if (player.character != null && player.character.ownedByLocalPlayer) {
@@ -58,14 +59,15 @@ public class TriadThunderProj : Projectile {
 		shouldShieldBlock = false;
 		shouldVortexSuck = false;
 		this.yDir = yDir;
+		maxTime = 1.5f;
 
 		visible = false;
 
 		// Clockwise from top
 		balls = new List<TriadThunderBall>() {
-			new TriadThunderBall(weapon, pos, xDir, player),
-			new TriadThunderBall(weapon, pos, xDir, player),
-			new TriadThunderBall(weapon, pos, xDir, player),
+			new TriadThunderBall(weapon, pos, xDir, player, netId: (ushort)(netProjId + 1)),
+			new TriadThunderBall(weapon, pos, xDir, player, netId: (ushort)(netProjId + 2)),
+			new TriadThunderBall(weapon, pos, xDir, player, netId: (ushort)(netProjId + 3)),
 		};
 
 		if (rpc) {
@@ -86,15 +88,7 @@ public class TriadThunderProj : Projectile {
 
 	public override void update() {
 		base.update();
-		/*if (!ownedByLocalPlayer) {
-			if (time > 0.125f) {
-				foreach (var ball in balls) {
-					ball.visible = false;
-				}
-				visible = true;
-			}
-			return;
-		}*/
+
 		if (character != null) {
 			Point incAmount = pos.directionTo(character.getCenterPos());
 			incPos(incAmount);
@@ -129,14 +123,16 @@ public class TriadThunderProj : Projectile {
 					ball.startDropTime = Global.spf;
 					ball.changeSprite("triadthunder_ball_drop", true);
 				}
-				if (yDir == 1) {
-					new TriadThunderBeam(balls[0].pos.addxy(0, 15), 0, 1, 1, owner, ownedByLocalPlayer);
-					new TriadThunderBeam(balls[1].pos.addxy(-5, 0), 1, 1, 1, owner, ownedByLocalPlayer);
-					new TriadThunderBeam(balls[2].pos.addxy(5, 0), 1, -1, 1, owner, ownedByLocalPlayer);
-				} else {
-					new TriadThunderBeam(balls[0].pos.addxy(0, -15), 0, 1, -1, owner, ownedByLocalPlayer);
-					new TriadThunderBeam(balls[1].pos.addxy(-5, 0), 1, 1, -1, owner, ownedByLocalPlayer);
-					new TriadThunderBeam(balls[2].pos.addxy(5, 0), 1, -1, -1, owner, ownedByLocalPlayer);
+				if (ownedByLocalPlayer) {
+					if (yDir == 1) {
+						new TriadThunderBeam(balls[0].pos.addxy(0, 15), 0, 1, 1, owner, ownedByLocalPlayer);
+						new TriadThunderBeam(balls[1].pos.addxy(-5, 0), 1, 1, 1, owner, ownedByLocalPlayer);
+						new TriadThunderBeam(balls[2].pos.addxy(5, 0), 1, -1, 1, owner, ownedByLocalPlayer);
+					} else {
+						new TriadThunderBeam(balls[0].pos.addxy(0, -15), 0, 1, -1, owner, ownedByLocalPlayer);
+						new TriadThunderBeam(balls[1].pos.addxy(-5, 0), 1, 1, -1, owner, ownedByLocalPlayer);
+						new TriadThunderBeam(balls[2].pos.addxy(5, 0), 1, -1, -1, owner, ownedByLocalPlayer);
+					}
 				}
 				destroySelf();
 			}
@@ -147,14 +143,15 @@ public class TriadThunderProj : Projectile {
 public class TriadThunderBall : Projectile {
 	public float startDropTime;
 	public TriadThunderBall(
-		Weapon weapon, Point pos, int xDir, Player player
+		Weapon weapon, Point pos, int xDir, Player player, ushort netId
 	) : base(
 		weapon, pos, xDir, 0, 2, player, "triadthunder_ball",
-		Global.miniFlinch, 0.5f, null, player.ownedByLocalPlayer
+		Global.miniFlinch, 0.5f, netId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.TriadThunder;
 		destroyOnHit = false;
 		shouldShieldBlock = false;
+		maxTime = 2.25f;
 
 		isMelee = true;
 		if (player.character != null) {
@@ -168,7 +165,7 @@ public class TriadThunderBall : Projectile {
 			startDropTime += Global.spf;
 			if (startDropTime > 0.075f) {
 				useGravity = true;
-				maxTime = 1;
+				destroySelf();
 			}
 		}
 	}

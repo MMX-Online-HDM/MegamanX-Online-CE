@@ -3467,6 +3467,12 @@ public partial class Character : Actor, IDamagable {
 		chargeGfx();
 	}
 
+	public virtual void aiUpdate(Actor? target) { }
+
+	public virtual void aiAttack(Actor target) { }
+
+	public virtual void aiDodge(Actor? target) { }
+
 	public override List<byte> getCustomActorNetData() {
 		List<byte> customData = new();
 

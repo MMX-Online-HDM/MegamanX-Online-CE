@@ -1271,7 +1271,6 @@ public partial class MegamanX : Character {
 
 
 	public bool canHeadbutt() {
-		if (!player.isX) return false;
 		if (!player.hasHelmetArmor(1)) return false;
 		if (stingActive) return false;
 		if (isInvulnerableAttack()) return false;

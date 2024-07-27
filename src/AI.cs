@@ -64,15 +64,15 @@ public class AI {
 	public RideChaser? raceAiSetupRc;
 
 	public RideChaser? getRaceAIChaser() {
-		var rideChasers = new List<RideChaser>();
-		foreach (var go in Global.level.gameObjects) {
+		List<RideChaser> rideChasers = new();
+		foreach (GameObject go in Global.level.gameObjects) {
 			if (go is RideChaser rc && !rc.destroyed && rc.character == null) {
 				rideChasers.Add(rc);
 			}
 		}
 		rideChasers = rideChasers.OrderBy(rc => rc.pos.distanceTo(character.pos)).ToList();
-		var rideChaser = rideChasers.FirstOrDefault();
-		return rideChaser;
+
+		return rideChasers.FirstOrDefault();
 	}
 
 	//Ride Chaser AI
@@ -1000,9 +1000,10 @@ public class AI {
 			}
 		}
 	}
-	public void mmxAIDodge(Character mmx3) {
+
+	public void mmxAIDodge(Character mmx) {
 		int RollingShield = player.weapons.FindIndex(w => w is RollingShield);
-		foreach (GameObject gameObject in Global.level.gameObjects) {
+		foreach (GameObject gameObject in mmx.getCloseActors(64, true, false, false)) {
 			if (gameObject is Projectile proj) {
 				if (proj.damager.owner.alliance != player.alliance) {
 					//Start of X
@@ -1392,7 +1393,7 @@ public class AI {
 		//}
 	}
 	public void knuckleZeroAIDodge(PunchyZero pzero) {
-		foreach (GameObject gameObject in Global.level.gameObjects) {
+		foreach (GameObject gameObject in pzero.getCloseActors(64, true, false, false)) {
 			if (gameObject is Projectile proj) {
 				if (proj.damager.owner.alliance != player.alliance) {
 					if (player.character is PunchyZero pzero1 &&
@@ -1461,7 +1462,7 @@ public class AI {
 		//}
 	}
 	public void busterzeroAIDodge(BusterZero bzero) {
-		foreach (GameObject gameObject in Global.level.gameObjects) {
+		foreach (GameObject gameObject in bzero.getCloseActors(64, true, false, false)) {
 			if (gameObject is Projectile proj) {
 				if (proj.damager.owner.alliance != player.alliance) {
 					if (gameObject is not FrostShieldProj or FrostShieldProjAir
@@ -1647,7 +1648,7 @@ public class AI {
 		//}	
 	}
 	public void sigmaAIDodge(Character sigma3) {
-		foreach (GameObject gameObject in Global.level.gameObjects) {
+		foreach (GameObject gameObject in sigma3.getCloseActors(64, true, false, false)) {
 			if (gameObject is Projectile proj) {
 				if (proj.damager.owner.alliance != player.alliance) {
 					//Start Of Sigma
@@ -1828,7 +1829,7 @@ public class AI {
 		}
 	}
 	public void axlAIDodge(Character axl3) {
-		foreach (GameObject gameObject in Global.level.gameObjects) {
+		foreach (GameObject gameObject in axl3.getCloseActors(64, true, false, false)) {
 			if (gameObject is Projectile proj) {
 				if (proj.damager.owner.alliance != player.alliance) {
 					//Start of Axl

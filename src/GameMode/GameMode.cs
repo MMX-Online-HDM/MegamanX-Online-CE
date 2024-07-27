@@ -1256,7 +1256,7 @@ public class GameMode {
 		float baseY = hudHealthPosition.y;
 
 		float twoLayerHealth = 0;
-		if (isMech && player.character?.rideArmor != null) {
+		if (isMech && player.character?.rideArmor != null && player.character.rideArmor.raNum != 5) {
 			spriteName = "hud_health_base_mech";
 			health = player.character.rideArmor.health;
 			maxHealth = player.character.rideArmor.maxHealth;

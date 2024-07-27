@@ -356,7 +356,7 @@ public class ArmoredAZappedState : MaverickState {
 }
 
 public class ArmoredARollEnterState : MaverickState {
-	public ArmoredARollEnterState() : base("roll_enter", "") {
+	public ArmoredARollEnterState() : base("roll_enter") {
 	}
 
 	public override void onEnter(MaverickState oldState) {
@@ -374,7 +374,7 @@ public class ArmoredARollEnterState : MaverickState {
 		if (maverick.vel.y > 0) {
 			maverick.frameSpeed = 1;
 		}
-		if (maverick.grounded) {
+		if (maverick.grounded && stateFrame >= 2) {
 			maverick.changeState(new ArmoredARollState());
 		}
 	}

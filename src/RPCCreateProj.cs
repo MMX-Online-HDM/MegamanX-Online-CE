@@ -363,7 +363,7 @@ public partial class RPCCreateProj : RPC {
 				}
 
 			case (int)ProjIds.ChillPIceShot:
-				proj = new ChillPIceProj(new ChillPIceShotWeapon(), pos, xDir, player, 0, netProjByte);
+				proj = new ChillPIceProj(new ChillPIceShotWeapon(), pos, xDir, player, extraData[0], netProjByte);
 				break;
 			case (int)ProjIds.ChillPIcePenguin:
 				proj = new ChillPIceStatueProj(new ChillPIceStatueWeapon(), pos, xDir, player, netProjByte);

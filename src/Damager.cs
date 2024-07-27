@@ -545,7 +545,9 @@ public class Damager {
 				}
 			}
 
-			if (!isDot(projId) && (
+			if (!character.charState.superArmor &&
+				!character.isInvulnerable(true, true) &&
+				!isDot(projId) && (
 				owner?.character is Zero zero && zero.isBlack ||
 				owner?.character is PunchyZero pzero && pzero.isBlack
 			)) {
