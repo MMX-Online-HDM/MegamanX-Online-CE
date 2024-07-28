@@ -74,7 +74,7 @@ public class ArmoredArmadillo : Maverick {
 		}
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle || state is MRun) {
+			if (state is MIdle or MRun or MLand) {
 				if (shootPressed()) {
 					changeState(getShootState(false));
 				} else if (specialPressed() && !noArmor) {
@@ -89,7 +89,7 @@ public class ArmoredArmadillo : Maverick {
 				}
 			}
 		} else {
-			if (state is MIdle || state is MRun || state is MShoot) {
+			if (state is MIdle or MRun or MLand or MShoot) {
 				bool shouldGuard = false;
 				Rect rect = collider.shape.getRect();
 				if (xDir == -1) {

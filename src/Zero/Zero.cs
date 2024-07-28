@@ -509,7 +509,7 @@ public class Zero : Character {
 
 	public bool airAttacks() {
 		int yDir = player.input.getYDir(player);
-		if (yDir == -1 && canAirDash() && airRisingUses == 0 && (
+		if (yDir == -1 && canAirDash() && airRisingUses == 0 && flag == null && (
 			(uppercutA.type == (int)RisingType.RisingFang && shootPressed) ||
 			(uppercutS.type == (int)RisingType.RisingFang && specialPressed)
 		)) {

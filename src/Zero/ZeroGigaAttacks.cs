@@ -584,7 +584,7 @@ public class DarkHoldProj : Projectile {
 	) : base(
 		weapon, pos, xDir, 0, 0, player, "empty", 0, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
-		maxTime = 3f;
+		maxTime = 1.25f;
 		vel = new Point();
 		projId = (int)ProjIds.DarkHold;
 		setIndestructableProperties();
@@ -601,14 +601,13 @@ public class DarkHoldProj : Projectile {
 	public override void update() {
 		base.update();
 		updateShader();
-		timeInFrames++;
 
-		if (timeInFrames < 150) {
+		if (timeInFrames  <= 30) {
 			foreach (var gameObject in Global.level.getGameObjectArray()) {
 				if (gameObject != this && gameObject is Actor actor && actor.locallyControlled && inRange(actor)) {
 					// For characters.
 					if (actor is Character chara && chara.darkHoldInvulnTime <= 0) {
-						if (timeInFrames > 30) {
+						if (timeInFrames >= 30) {
 							continue;
 						}
 						if (chara.canBeDamaged(damager.owner.alliance, damager.owner.id, null)) {
@@ -628,27 +627,19 @@ public class DarkHoldProj : Projectile {
 						}
 						actor.timeStopTime = 160 - timeInFrames;
 					}
-					// For projectiles
-					if (actor is Projectile && actor.timeStopTime <= 0) {
-						if (actor is BCrabSummonBubbleProj or BCrabSummonCrabProj &&
-							(actor as IDamagable)?.canBeDamaged(damager.owner.alliance, damager.owner.id, null) != true
-						) {
-							continue;
-						}
-						actor.timeStopTime = 160 - timeInFrames;
-					}
 				}
 			}
 		}
 		if (timeInFrames <= 30) {
-			radius += (1f/60f) * 400;
+			radius += 6.5f;
 		}
-		if (timeInFrames >= 150 && radius > 0) {
-			radius -= (1f/60f) * 800;
+		if (timeInFrames >= 60 && radius > 0) {
+			radius -= 13;
 			if (radius <= 0) {
 				radius = 0;
 			}
 		}
+		timeInFrames++;
 	}
 
 	public bool inRange(Actor actor) {
@@ -687,7 +678,6 @@ public class DarkHoldProj : Projectile {
 			DrawWrappers.DrawCircle(pos.x + x, pos.y + y, radius, true, col, 1, zIndex + 1, true);
 			DrawWrappers.DrawCircle(pos.x + x, pos.y + y, radius, false, col2, 3, zIndex + 1, true, col2);
 		}
-
 	}
 
 	public override void onDestroy() {

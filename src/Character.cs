@@ -1277,7 +1277,7 @@ public partial class Character : Actor, IDamagable {
 		if (charState.airMove && !grounded) {
 			airMove();
 		}
-		if (charState.canJump && (grounded || canAirJump())) {
+		if (charState.canJump && (grounded || canAirJump() && character.flag == null)) {
 			if (player.input.isPressed(Control.Jump, player)) {
 				if (!grounded) {
 					dashedInAir++;
@@ -1346,11 +1346,11 @@ public partial class Character : Actor, IDamagable {
 		}
 		// Air normal states.
 		else {
-			if (player.dashPressed(out string dashControl) && canAirDash() && canDash()) {
+			if (player.dashPressed(out string dashControl) && canAirDash() && canDash() && flag == null) {
 				changeState(new AirDash(dashControl));
 				return true;
 			}
-			if (canAirJump()) {
+			if (canAirJump() && flag == null) {
 				if (player.input.isPressed(Control.Jump, player) && canJump()) {
 					lastJumpPressedTime = Global.time;
 				}
@@ -1655,7 +1655,7 @@ public partial class Character : Actor, IDamagable {
 	public bool canBeGrabbed() {
 		return (
 			grabInvulnTime == 0 && !charState.invincible &&
-			!isInvulnerable() && !isCCImmune() && isDarkHoldState
+			!isInvulnerable() && !isCCImmune() && !isDarkHoldState
 		);
 	}
 
@@ -3232,11 +3232,12 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public void releaseGrab(Actor grabber, bool sendRpc = false) {
-		charState?.releaseGrab();
+		charState.releaseGrab();
 		if (!ownedByLocalPlayer) {
 			RPC.commandGrabPlayer.sendRpc(
 				grabber.netId, netId, CommandGrabScenario.Release, grabber.isDefenderFavored()
 			);
+			changeState(new NetLimbo());
 		}
 	}
 

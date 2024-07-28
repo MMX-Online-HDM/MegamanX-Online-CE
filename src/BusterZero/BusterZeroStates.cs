@@ -24,7 +24,7 @@ public class BusterZeroMelee : CharState {
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		} else {
-			if ((character.grounded || character.canAirJump()) &&
+			if ((character.grounded || character.canAirJump() && character.flag == null) &&
 				player.input.isPressed(Control.Jump, player)
 			) {
 				if (!character.grounded) {
@@ -105,7 +105,7 @@ public class BusterZeroDoubleBuster : CharState {
 		} else if (!isSecond && character.frameIndex >= 4 && !shootPressedAgain) {
 			character.changeToIdleOrFall();
 		} else {
-			if ((character.grounded || character.canAirJump()) &&
+			if ((character.grounded || character.canAirJump() && character.flag == null) &&
 				player.input.isPressed(Control.Jump, player)
 			) {
 				if (!character.grounded) {
@@ -181,7 +181,7 @@ public class BusterZeroHadangeki : CharState {
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		} else {
-			if ((character.grounded || character.canAirJump()) &&
+			if ((character.grounded || character.canAirJump() && character.flag == null) &&
 				player.input.isPressed(Control.Jump, player)
 			) {
 				if (!character.grounded) {

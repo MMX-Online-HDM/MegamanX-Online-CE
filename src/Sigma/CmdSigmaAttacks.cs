@@ -167,7 +167,7 @@ public class SigmaBallShoot : CharState {
 			shot = true;
 			Point poi = character.getFirstPOI() ?? character.getCenterPos();
 
-			player.sigmaAmmo -= 7;
+			player.sigmaAmmo -= 4;
 			if (player.sigmaAmmo < 0) player.sigmaAmmo = 0;
 			sigma.sigmaAmmoRechargeCooldown = sigma.sigmaHeadBeamTimeBeforeRecharge;
 			character.playSound("energyBall", sendRpc: true);

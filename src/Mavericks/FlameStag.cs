@@ -58,7 +58,7 @@ public class FlameStag : Maverick {
 		if (!ownedByLocalPlayer) return;
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle || state is MRun) {
+			if (state is MIdle or MRun or MLand) {
 				if (input.isPressed(Control.Shoot, player)) {
 					changeState(new FStagShoot(false));
 				} else if (input.isPressed(Control.Special1, player)) {
@@ -575,6 +575,7 @@ public class FStagGrabbed : GenericGrabbedState {
 
 	public override void update() {
 		base.update();
+		if (!character.ownedByLocalPlayer) { return; }
 
 		string grabberSpriteName = grabber.sprite?.name ?? "";
 		if (grabberSpriteName.EndsWith("_dash_grab") == true) {

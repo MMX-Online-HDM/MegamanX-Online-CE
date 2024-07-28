@@ -44,7 +44,7 @@ public class WheelGator : Maverick {
 		if (!ownedByLocalPlayer) return;
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle || state is MRun) {
+			if (state is MIdle or MRun or MLand) {
 				if (input.isPressed(Control.Shoot, player)) {
 					if (input.isHeld(Control.Up, player)) {
 						changeState(new WheelGUpBiteState());
@@ -218,7 +218,7 @@ public class WheelGSpinWheelProj : Projectile {
 public class WheelGShootState : MaverickState {
 	int state;
 	bool shotOnce;
-	public WheelGShootState() : base("wheelthrow_start", "") {
+	public WheelGShootState() : base("wheelthrow_start") {
 	}
 
 	public override void update() {
@@ -251,21 +251,19 @@ public class WheelGShootState : MaverickState {
 			}
 
 			if (maverick.isAnimOver()) {
-				maverick.changeSpriteFromName("wheelthrow_loop2", true);
-				shotOnce = false;
-				state = 2;
+				state = 3;
 			}
 		}
 
 		if (maverick.isAnimOver()) {
-			maverick.changeState(new MIdle());
+			maverick.changeToIdleOrFall();;
 		}
 	}
 }
 
 public class WheelGBiteState : MaverickState {
 	int state;
-	public WheelGBiteState() : base("eat_start", "") {
+	public WheelGBiteState() : base("eat_start") {
 	}
 
 	public override void update() {
@@ -304,7 +302,7 @@ public class WheelGBiteState : MaverickState {
 
 public class WheelGEatState : MaverickState {
 	float soundTime;
-	public WheelGEatState() : base("eat_loop", "") {
+	public WheelGEatState() : base("eat_loop") {
 	}
 
 	public override void update() {
@@ -343,7 +341,7 @@ public class WheelGSpitProj : Projectile {
 public class WheelGSpitState : MaverickState {
 	bool shotOnce;
 	float damageEaten;
-	public WheelGSpitState(float damageEaten) : base("eat_spit", "") {
+	public WheelGSpitState(float damageEaten) : base("eat_spit") {
 		this.damageEaten = damageEaten;
 	}
 

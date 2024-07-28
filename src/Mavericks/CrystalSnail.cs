@@ -74,7 +74,7 @@ public class CrystalSnail : Maverick {
 		}
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if ((state is MIdle || state is MRun)) {
+			if ((state is MIdle or MRun or MLand)) {
 				if (input.isPressed(Control.Shoot, player)) {
 					changeState(new CSnailShootState());
 				} else if (input.isPressed(Control.Dash, player)) {
