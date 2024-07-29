@@ -342,7 +342,7 @@ public class Vile : Character {
 				napalmWeapon.vileShoot(WeaponIds.Napalm, this);
 			} else if (charState is Jump || charState is Fall || charState is VileHover) {
 				if (!player.input.isHeld(Control.Down, player)) {
-					napalmWeapon.vileShoot(WeaponIds.VileBomb, this);
+					grenadeWeapon.vileShoot(WeaponIds.VileBomb, this);
 				} else {
 					flamethrowerWeapon.vileShoot(WeaponIds.VileFlamethrower, this);
 				}

@@ -416,7 +416,7 @@ public class Maverick : Actor, IDamagable {
 			target = mmc.getHealTarget();
 		}
 
-		bool isAIState = (state is MIdle || state is MRun);
+		bool isAIState = (state is MIdle or MRun or MLand);
 		if (canFly) isAIState = isAIState || state is MFly;
 
 		if (target != null && (isAIState || state is MShoot)) {

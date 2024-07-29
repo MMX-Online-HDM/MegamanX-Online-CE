@@ -12,13 +12,9 @@ public class BaseSigma : Character {
 	public const float maxLeapSlashCooldown = 2;
 	public float tagTeamSwapProgress;
 	public int tagTeamSwapCase;
-	public float sigmaAmmoRechargeCooldown = 0.5f;
-	public float sigmaAmmoRechargeTime;
 	public float maxSigma3FireballCooldown = 0.39f;
 	public float sigma3ShieldCooldown;
 	public float maxSigma3ShieldCooldown = 1.125f;
-	public float sigmaHeadBeamRechargePeriod = 0.05f;
-	public float sigmaHeadBeamTimeBeforeRecharge = 0.33f;
 
 	public float viralSigmaTackleCooldown;
 	public float viralSigmaTackleMaxCooldown = 1;

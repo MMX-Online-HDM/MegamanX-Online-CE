@@ -556,7 +556,7 @@ public partial class MegamanX : Character {
 
 	public override bool normalCtrl() {
 		if (!grounded) {
-			if (player.dashPressed(out string dashControl) && canAirDash() && canDash()) {
+			if (player.dashPressed(out string dashControl) && canAirDash() && canDash() && flag == null) {
 				CharState dashState;
 				if (player.input.isHeld(Control.Up, player) && player.hasBootsArmor(3)) {
 					dashState = new UpDash(Control.Dash);

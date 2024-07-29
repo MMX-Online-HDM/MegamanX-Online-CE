@@ -60,7 +60,7 @@ public class ChillPenguin : Maverick {
 					}
 				}
 			}
-			if (state is MIdle || state is MRun) {
+			if (state is MIdle or MRun or MLand) {
 				if (shootPressed()) {
 					changeState(getShootState(false));
 				} else if (specialPressed()) {

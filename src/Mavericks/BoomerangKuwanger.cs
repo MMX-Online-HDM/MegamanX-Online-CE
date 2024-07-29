@@ -54,7 +54,7 @@ public class BoomerangKuwanger : Maverick {
 		}
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle || state is MRun || state is BoomerKDashState) {
+			if (state is MIdle or MRun or MLand or BoomerKDashState) {
 				if (state is not BoomerKDashState) {
 					if (input.isHeld(Control.Left, player)) {
 						xDir = -1;
@@ -82,7 +82,7 @@ public class BoomerangKuwanger : Maverick {
 				}
 			}
 		} else {
-			if (!bald && (state is MIdle || state is MRun || state is BoomerKDashState)) {
+			if (!bald && (state is MIdle or MRun or MLand or BoomerKDashState)) {
 				foreach (var enemyPlayer in Global.level.players) {
 					if (enemyPlayer.character == null || enemyPlayer == player) continue;
 					var chr = enemyPlayer.character;
@@ -459,6 +459,7 @@ public class DeadLiftGrabbed : GenericGrabbedState {
 
 	public override void update() {
 		base.update();
+		if (!character.ownedByLocalPlayer) { return; }
 
 		if (launched) {
 			launchTime += Global.spf;

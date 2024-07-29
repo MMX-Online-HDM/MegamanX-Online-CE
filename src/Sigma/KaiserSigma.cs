@@ -262,4 +262,8 @@ public partial class KaiserSigma : Character {
 			exaustDir = 0;
 		}
 	}
+
+	public override Collider? getTerrainCollider() {
+		return null;
+	}
 }

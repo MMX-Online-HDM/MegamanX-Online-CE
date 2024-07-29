@@ -32,11 +32,15 @@ public class NeonTiger : Maverick {
 		base.update();
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle || state is MRun) {
+			if (state is MIdle or MRun or MLand) {
 				if (input.isHeld(Control.Special1, player)) {
 					changeState(getShootState(false));
 				} else if (input.isPressed(Control.Dash, player)) {
-					changeState(new NeonTDashState());
+					if (player.isTagTeam()) {
+						changeState(new NeonTDashState());
+					} else {
+						changeState(new NeonTDashClawState());
+					}
 				} else if (input.isHeld(Control.Shoot, player)) {
 					changeState(new NeonTClawState(false));
 				}

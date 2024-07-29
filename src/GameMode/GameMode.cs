@@ -1415,7 +1415,7 @@ public class GameMode {
 			}
 			if (player.character is ViralSigma) {
 				renderAmmo(baseX, ref baseY, 61, 50, player.sigmaAmmo, grayAmmo: player.weapon.getAmmoUsage(0));
-			} else if (player.isMainPlayer && player.currentMaverick == null) {
+			} else if (player.isMainPlayer && player.currentMaverick == null && !player.isSigma3()) {
 				int hudWeaponBaseIndex = 50;
 				int hudWeaponFullIndex = 39;
 				int floorOrCeil = MathInt.Ceiling(player.sigmaMaxAmmo * ammoDisplayMultiplier);

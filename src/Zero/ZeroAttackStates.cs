@@ -230,7 +230,7 @@ public class ZeroDoubleBuster : CharState {
 		} else if (!isSecond && character.frameIndex >= 4 && !shootPressedAgain) {
 			character.changeToIdleOrFall();
 		} else {
-			if ((character.grounded || character.canAirJump()) &&
+			if ((character.grounded || character.canAirJump() && character.flag == null) &&
 				player.input.isPressed(Control.Jump, player)
 			) {
 				if (!character.grounded) {
@@ -301,7 +301,7 @@ public class AwakenedZeroHadangeki : CharState {
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		} else {
-			if ((character.grounded || character.canAirJump()) &&
+			if ((character.grounded || character.canAirJump() && character.flag == null) &&
 				player.input.isPressed(Control.Jump, player)
 			) {
 				if (!character.grounded) {

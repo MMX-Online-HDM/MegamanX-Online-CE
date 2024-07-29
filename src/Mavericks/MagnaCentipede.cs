@@ -69,7 +69,7 @@ public class MagnaCentipede : Maverick {
 		}
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle || state is MRun) {
+			if (state is MIdle or MRun or MLand) {
 				if (shootHeldTime > 0.2f && magnetMineParent == null && !noTail) {
 					shootHeldTime = 0;
 					changeState(new MagnaCMagnetMineState());
@@ -99,7 +99,7 @@ public class MagnaCentipede : Maverick {
 			}
 		}
 
-		if (state is MIdle || state is MRun) {
+		if (state is MIdle or MRun or MLand) {
 			shootHeldLastFrame = input.isHeld(Control.Shoot, player);
 			if (shootHeldLastFrame) {
 				shootHeldTime += Global.spf;

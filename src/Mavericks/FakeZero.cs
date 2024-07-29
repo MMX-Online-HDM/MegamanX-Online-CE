@@ -90,7 +90,7 @@ public class FakeZero : Maverick {
 		}
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle || state is MRun) {
+			if (state is MIdle or MRun or MLand) {
 				if (input.isHeld(Control.Shoot, player) && state is MRun) {
 					changeState(new FakeZeroMeleeState());
 				} else if (input.isHeld(Control.Shoot, player) && ammo >= 2) {

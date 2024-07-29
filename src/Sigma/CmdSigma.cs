@@ -5,6 +5,10 @@ namespace MMXOnline;
 
 public class CmdSigma : BaseSigma {
 	public float leapSlashCooldown;
+	public float sigmaAmmoRechargeCooldown = 0;
+	public float sigmaAmmoRechargeTime;
+	public float sigmaHeadBeamRechargePeriod = 5;
+	public float sigmaHeadBeamTimeBeforeRecharge = 20;
 
 	public CmdSigma(
 		Player player, float x, float y, int xDir,
@@ -25,14 +29,16 @@ public class CmdSigma : BaseSigma {
 		}
 		// Cooldowns.
 		Helpers.decrementTime(ref leapSlashCooldown);
-		Helpers.decrementTime(ref sigmaAmmoRechargeCooldown);
+		Helpers.decrementFrames(ref sigmaAmmoRechargeCooldown);
 		// Ammo reload.
 		if (sigmaAmmoRechargeCooldown == 0) {
-			Helpers.decrementTime(ref sigmaAmmoRechargeTime);
+			Helpers.decrementFrames(ref sigmaAmmoRechargeTime);
 			if (sigmaAmmoRechargeTime == 0) {
 				player.sigmaAmmo = Helpers.clampMax(player.sigmaAmmo + 1, player.sigmaMaxAmmo);
 				sigmaAmmoRechargeTime = sigmaHeadBeamRechargePeriod;
 			}
+		} else {
+			sigmaAmmoRechargeTime = 0;
 		}
 		// For ladder and slide attacks.
 		if (isAttacking() && charState is WallSlide or LadderClimb && !isSigmaShooting()) {
@@ -137,7 +143,7 @@ public class CmdSigma : BaseSigma {
 	}
 
 	public override bool canAddAmmo() {
-		return (player.sigmaAmmo < 32);
+		return (player.sigmaAmmo < player.sigmaMaxAmmo);
 	}
 
 	public override List<byte> getCustomActorNetData() {

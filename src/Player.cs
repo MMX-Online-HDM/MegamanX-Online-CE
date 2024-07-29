@@ -1012,8 +1012,13 @@ public partial class Player {
 		configureWeapons();
 		maxHealth = getMaxHealth();
 		if (isSigma) {
-			if (isSigma1()) sigmaAmmo = sigmaMaxAmmo;
-			else if (isSigma2()) sigmaAmmo = 0;
+			if (isSigma1()) {
+				sigmaMaxAmmo = 20;
+				sigmaAmmo = sigmaMaxAmmo;
+			} else if (isSigma2()) {
+				sigmaMaxAmmo = 28;
+				sigmaAmmo = 0;
+			}
 		}
 		health = maxHealth;
 		assassinHitPos = null;

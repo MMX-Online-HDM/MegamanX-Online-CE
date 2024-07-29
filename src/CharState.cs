@@ -1587,6 +1587,7 @@ public class GenericGrabbedState : CharState {
 
 	public override void update() {
 		base.update();
+		if (!character.ownedByLocalPlayer) { return; }
 		if (customUpdate) return;
 
 		if (grabber.sprite.name.EndsWith(grabSpriteSuffix) == true || (
@@ -1657,7 +1658,7 @@ public class GenericGrabbedState : CharState {
 }
 
 public class NetLimbo : CharState {
-	public NetLimbo() : base("idle", "", "", "") {
+	public NetLimbo() : base("not_a_real_sprite") {
 
 	}
 }

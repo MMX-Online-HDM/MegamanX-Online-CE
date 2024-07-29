@@ -626,7 +626,7 @@ public class PunchyZeroHadangeki : CharState {
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		} else {
-			if ((character.grounded || character.canAirJump()) &&
+			if ((character.grounded || character.canAirJump() && character.flag == null) &&
 				player.input.isPressed(Control.Jump, player)
 			) {
 				if (!character.grounded) {
