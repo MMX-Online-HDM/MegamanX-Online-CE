@@ -256,7 +256,10 @@ public class MainMenu : IMainMenu {
 				offset += 10;
 			}
 			Fonts.drawText(FontType.DarkBlue, versionText, 2, offset);
-
+			offset += 10;
+			if (Global.radminIP != "") {
+				Fonts.drawText(FontType.DarkGreen, "Radmin", 2, offset);
+			}
 		}
 	}
 }

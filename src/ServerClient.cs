@@ -98,7 +98,7 @@ public class ServerClient {
 	}
 
 	public static ServerClient CreateHolePunch(
-		NetClient client, long serverId, IPEndPoint serverIP, ServerPlayer inputServerPlayer,
+		NetClient client, long serverId, IPEndPoint serverIP, IPEndPoint? radminIP, ServerPlayer inputServerPlayer,
 		out JoinServerResponse joinServerResponse, out string log
 	) {
 		// Enable autoflush temporally.
@@ -115,7 +115,7 @@ public class ServerClient {
 		client.FlushSendQueue();
 		NetOutgoingMessage hail = client.CreateMessage(JsonConvert.SerializeObject(inputServerPlayer));
 		// Wait for hole punching to happen.
-		log += "\nSent HolePunch message...";
+		log += "\nSent connection message...";
 		int count = 0;
 		bool connected = false;
 		NetIncomingMessage msg;
@@ -137,7 +137,7 @@ public class ServerClient {
 			Thread.Sleep(100);
 		}
 		// Do this if hole punch fails.
-		log += "\nFailed to holepunch, resorting to direct connection anyway.";
+		log += "\nFailed to holepunch, trying direct connection anyway...";
 		client.Connect(serverIP, hail);
 		count = 0;
 		while (count < 20 && !connected) {
@@ -147,7 +147,24 @@ public class ServerClient {
 			}
 			count++;
 			client.FlushSendQueue();
-			Thread.Sleep(100);
+			Thread.Sleep(60);
+		}
+		// Try Radmin at last.
+		if (Global.radminIP != null && radminIP != null && Global.radminIP != "") {
+			log += "\nFailed direct connection, using radmin...";
+			client.Connect(radminIP, hail);
+			count = 0;
+			while (count < 20 && !connected) {
+				if (client.ConnectionsCount != 0) {
+					log += "\nConections active: " + client.Connections.Count;
+					connected = true;
+				}
+				count++;
+				client.FlushSendQueue();
+				Thread.Sleep(60);
+			}
+		} else {
+			log += "\nRadmin not avaliable, skipping.";
 		}
 		// Ok. We failed 2 times so we give up.
 		if (client.ConnectionsCount != 0) {
@@ -156,8 +173,8 @@ public class ServerClient {
 			client.Configuration.AutoFlushSendQueue = false;
 			return null;
 		}
-exitLoop:
-// If it works, continue.
+		exitLoop:
+		// If it works, continue.
 		log += "\nStarting Serverclient.";
 		log += "\nConections active: " + client.Connections.Count;
 		var serverClient = new ServerClient(client, inputServerPlayer.isHost);

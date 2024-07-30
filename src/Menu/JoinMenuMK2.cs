@@ -58,9 +58,9 @@ public class JoinMenuP2P : IMainMenu {
 						break;
 					// Recieve server details to connect.
 					case 101:
-						(long, SimpleServerData, IPEndPoint) serverData = receiveServerDetails(msg);
+						(long, SimpleServerData, IPEndPoint, IPEndPoint?) serverData = receiveServerDetails(msg);
 						if (serverData.Item2 != null) {
-							joinServer(serverData.Item1, serverData.Item2, serverData.Item3);
+							joinServer(serverData.Item1, serverData.Item2, serverData.Item3, serverData.Item4);
 							return;
 						}
 						break;
@@ -168,15 +168,20 @@ public class JoinMenuP2P : IMainMenu {
 		serverIndexes = serverKeys.ToArray();
 	}
 
-	public (long, SimpleServerData, IPEndPoint) receiveServerDetails(NetIncomingMessage msg) {
+	public (long, SimpleServerData, IPEndPoint, IPEndPoint?) receiveServerDetails(NetIncomingMessage msg) {
 		long severId = msg.ReadInt64();
 		string jsonString = msg.ReadString();
 		IPEndPoint ipEndPoint = msg.ReadIPEndPoint();
+		IPEndPoint radminEndpoint = null;
+		if (msg.Position < msg.LengthBits - 2) {
+			radminEndpoint = msg.ReadIPEndPoint();
+		}
+
 		SimpleServerData? serverDetails = JsonConvert.DeserializeObject<SimpleServerData>(jsonString);
 		if (serverDetails == null) {
 			throw new NullReferenceException("Error deserializing server details.");
 		}
-		return (severId, serverDetails, ipEndPoint);
+		return (severId, serverDetails, ipEndPoint, radminEndpoint);
 	}
 
 	public void requestServerDetails(long serverId) {
@@ -191,7 +196,7 @@ public class JoinMenuP2P : IMainMenu {
 		}
 	}
 
-	public void joinServer(long serverId, SimpleServerData serverdata, IPEndPoint ipEndPoint) {
+	public void joinServer(long serverId, SimpleServerData serverdata, IPEndPoint ipEndPoint, IPEndPoint? radminIP) {
 		if (Helpers.compareVersions(Global.version, serverdata.gameVersion) == -1) {
 			exit(
 				new ErrorMenu(
@@ -265,7 +270,7 @@ public class JoinMenuP2P : IMainMenu {
 			null, Global.deviceId, null, 0
 		);
 		Global.serverClient = ServerClient.CreateHolePunch(
-			netClient, serverId, ipEndPoint, inputServerPlayer,
+			netClient, serverId, ipEndPoint, radminIP, inputServerPlayer,
 			out JoinServerResponse joinServerResponse, out string error
 		);
 		if (Global.serverClient == null) {
@@ -416,9 +421,9 @@ public class ConnectionWaitMenuP2P : IMainMenu {
 				if (msg.MessageType == NetIncomingMessageType.UnconnectedData &&
 					msg.ReadByte() == 101
 				) {
-					(long, SimpleServerData, IPEndPoint) serverData = joinMenu.receiveServerDetails(msg);
+					(long, SimpleServerData, IPEndPoint, IPEndPoint?) serverData = joinMenu.receiveServerDetails(msg);
 					if (serverData.Item2 != null) {
-						joinMenu.joinServer(serverData.Item1, serverData.Item2, serverData.Item3);
+						joinMenu.joinServer(serverData.Item1, serverData.Item2, serverData.Item3, serverData.Item4);
 						return;
 					}
 				}

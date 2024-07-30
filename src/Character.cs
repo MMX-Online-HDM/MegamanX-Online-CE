@@ -1277,7 +1277,7 @@ public partial class Character : Actor, IDamagable {
 		if (charState.airMove && !grounded) {
 			airMove();
 		}
-		if (charState.canJump && (grounded || canAirJump() && character.flag == null)) {
+		if (charState.canJump && (grounded || canAirJump() && flag == null)) {
 			if (player.input.isPressed(Control.Jump, player)) {
 				if (!grounded) {
 					dashedInAir++;

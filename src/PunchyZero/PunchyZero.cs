@@ -525,8 +525,7 @@ public class PunchyZero : Character {
 		});
 	}
 
-	public Projectile? getMeleeProjById(int id, Point? pos = null, bool addToLevel = true) {
-		Point projPos = pos ?? new Point(0, 0);
+	public override Projectile? getMeleeProjById(int id, Point projPos, bool addToLevel = true) {
 		Projectile? proj = id switch {
 			(int)MeleeIds.Punch => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.PZeroPunch, player,

@@ -222,15 +222,28 @@ public class BusterZero : Character {
 		}
 	}
 
-	// This can run on both owners and non-owners. So data used must be in sync
-	public override Projectile? getProjFromHitbox(Collider collider, Point centerPoint) {
-		if (sprite.name == "zero_projswing") {
-			return new GenericMeleeProj(
-				meleeWeapon, centerPoint, ProjIds.DZMelee, player,
-				isBlackZero ? 4 : 3, Global.defFlinch, 0.5f, isReflectShield: true
-			);
-		}
-		return null;
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"zero_projswing" or "zero_projswing_air" => MeleeIds.SaberSwing,
+			_ => MeleeIds.None
+		});
+	}
+
+	public override Projectile? getMeleeProjById(int id, Point projPos, bool addToLevel = true) {
+		Projectile? proj = id switch {
+			(int)MeleeIds.SaberSwing => new GenericMeleeProj(
+				meleeWeapon, projPos, ProjIds.DZMelee, player,
+				isBlackZero ? 4 : 3, Global.defFlinch, 0.5f, isReflectShield: true, addToLevel: addToLevel
+			),
+			_ => null
+		};
+		return proj;
+	}
+
+	public enum MeleeIds {
+		None = -1,
+		SaberSwing,
 	}
 
 	public override string getSprite(string spriteName) {

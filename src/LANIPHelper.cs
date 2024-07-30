@@ -20,13 +20,13 @@ public class LANIPHelper {
 	}
 
 	public static string GetLocalIPAddress() {
-		var host = Dns.GetHostEntry(Dns.GetHostName());
-		foreach (var ip in host.AddressList) {
-			if (ip.AddressFamily == AddressFamily.InterNetwork) {
-				return ip.ToString();
-			}
+		string? localIP;
+		using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, 0)) {
+			socket.Connect("8.8.8.8", 65530);
+			IPEndPoint? endPoint = socket.LocalEndPoint as IPEndPoint;
+			localIP = endPoint?.Address.ToString();
 		}
-		throw new Exception("Failed to get local LAN IP address.");
+		return localIP ?? "127.0.0.1";
 	}
 
 	public bool isLANIP(string ip) {
