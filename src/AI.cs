@@ -1119,7 +1119,7 @@ public class AI {
 						zero.changeState(new Rakuhouha(zero.gigaAttack), true);
 						break;
 					case 1 when zero.isAwakened: // i would like to every hyper do Genmu, but okay
-						zero.changeState(new GenmuState(), true);
+						zero.changeState(new GenmureiState(), true);
 						break;
 					case 2 when zero.isAwakened:
 						zero.changeState(new AwakenedZeroHadangeki(), true);
@@ -1379,7 +1379,7 @@ public class AI {
 				break;
 			// If the character is on fall state, Drop Kick.
 			case 5 when pzero.charState is Fall:
-				pzero.changeState(new PZeroDropKickState(), true);
+				pzero.changeState(new PZeroDiveKickState(), true);
 				break;
 			// if the character is on Jump or Fall, Air Kick.
 			case 6 when pzero.charState is Jump or Fall:

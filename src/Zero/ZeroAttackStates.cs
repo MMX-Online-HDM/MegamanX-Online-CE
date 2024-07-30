@@ -362,9 +362,9 @@ public class AwakenedZeroHadangekiWall : CharState {
 	}
 }
 
-public class GenmuState : CharState {
+public class GenmureiState : CharState {
 	bool fired;
-	public GenmuState() : base("genmu") { }
+	public GenmureiState() : base("genmu") { }
 
 	public override void update() {
 		base.update();

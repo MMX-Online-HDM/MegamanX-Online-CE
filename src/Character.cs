@@ -1327,12 +1327,14 @@ public partial class Character : Actor, IDamagable {
 			} else if (player.dashPressed(out string dashControl) && canDash() && charState is not Dash) {
 				changeState(new Dash(dashControl), true);
 				return true;
-			} else if (rideArmorPlatform != null &&
-				  player.input.isPressed(Control.Jump, player) &&
-				  player.input.isHeld(Control.Up, player) &&
-				  canEjectFromRideArmor()
+			} else if (
+				rideArmorPlatform != null &&
+				player.input.isPressed(Control.Jump, player) &&
+				player.input.isHeld(Control.Up, player) &&
+				canEjectFromRideArmor()
 			  ) {
 				getOffMK5Platform();
+				changeState(new Jump());
 				return true;
 			}
 			if (player.isCrouchHeld() && canCrouch() && charState is not Crouch) {

@@ -656,18 +656,18 @@ public class GameMode {
 					drawZeroGigaCooldown(zero.gigaAttack, y: yStart);
 					xStart += 15;
 				}
-				if (zero.swingCooldown > 0 && zero.isGenmuZero || zero.genmuCooldown > 0) {
-					float cooldown = 1 - Helpers.progress(zero.genmuCooldown, 120);
-					if (zero.swingCooldown > zero.genmuCooldown) {
-						cooldown = 1 - Helpers.progress(zero.swingCooldown, 60);
+				if (zero.hadangekiCooldown > 0 && zero.isGenmuZero || zero.genmureiCooldown > 0) {
+					float cooldown = 1 - Helpers.progress(zero.genmureiCooldown, 120);
+					if (zero.hadangekiCooldown > zero.genmureiCooldown) {
+						cooldown = 1 - Helpers.progress(zero.hadangekiCooldown, 60);
 					}
 					drawGigaWeaponCooldown(102, cooldown, xStart, yStart);
 					xStart += 15;
 				}
-				if (zero.swingCooldown > 0 || zero.genmuCooldown > 60) {
-					float cooldown = 1 - Helpers.progress(zero.swingCooldown, 60);
-					if (zero.genmuCooldown - 1 > zero.swingCooldown) {
-						cooldown = 1 - Helpers.progress(zero.genmuCooldown - 60, 1);
+				if (zero.hadangekiCooldown > 0 || zero.genmureiCooldown > 60) {
+					float cooldown = 1 - Helpers.progress(zero.hadangekiCooldown, 60);
+					if (zero.genmureiCooldown - 1 > zero.hadangekiCooldown) {
+						cooldown = 1 - Helpers.progress(zero.genmureiCooldown - 60, 1);
 					}
 					drawGigaWeaponCooldown(zero.isGenmuZero ? 48 : 102, cooldown, xStart, yStart);
 					xStart += 15;
@@ -688,8 +688,8 @@ public class GameMode {
 					drawZeroGigaCooldown(punchyZero.gigaAttack, xStart, yStart);
 					xStart += 15;
 				}
-				if (punchyZero.swingCooldown > 0) {
-					float cooldown = 1 - Helpers.progress(punchyZero.swingCooldown, 60);
+				if (punchyZero.hadangekiCooldown > 0) {
+					float cooldown = 1 - Helpers.progress(punchyZero.hadangekiCooldown, 60);
 					drawGigaWeaponCooldown(102, cooldown, xStart, yStart);
 					xStart += 15;
 				}

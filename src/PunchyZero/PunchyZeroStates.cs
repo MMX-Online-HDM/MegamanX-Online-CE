@@ -150,11 +150,12 @@ public class PZeroSpinKick : CharState {
 	}
 }
 
-public class PZeroDropKickState : CharState {
+public class PZeroDiveKickState : CharState {
 	float stuckTime;
+	float diveTime;
 	PunchyZero zero = null!;
 
-	public PZeroDropKickState() : base("dropkick") {
+	public PZeroDiveKickState() : base("dropkick") {
 	}
 
 	public override void update() {
@@ -165,7 +166,9 @@ public class PZeroDropKickState : CharState {
 			once = true;
 		}
 		base.update();
-
+		if (!once) {
+			return;
+		}
 		CollideData hit = Global.level.checkCollisionActor(
 			character, character.vel.x * Global.spf, character.vel.y * Global.spf
 		);
@@ -175,13 +178,15 @@ public class PZeroDropKickState : CharState {
 		} else if (hit != null) {
 			stuckTime += Global.speedMul;
 			if (stuckTime >= 6) {
-				character.changeState(new Fall(), true);
+				character.changeToLandingOrFall();
 				return;
 			}
 		}
-		if (character.grounded) {
-			character.landingCode();
+		if (character.grounded || diveTime >= 6 && character.deltaPos.y == 0) {
+			character.changeToLandingOrFall();
+			return;
 		}
+		diveTime += Global.spf;
 	}
 
 	public override void onEnter(CharState oldState) {
@@ -411,7 +416,7 @@ public class PZeroShoryuken : CharState {
 			(zero.shootPressTime > 0 || zero.specialPressTime > 0) &&
 			player.input.getYDir(player) == 1
 		) {
-			character.changeState(new PZeroDropKickState(), true);
+			character.changeState(new PZeroDiveKickState(), true);
 			return;
 		}
 

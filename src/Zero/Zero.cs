@@ -26,7 +26,6 @@ public class Zero : Character {
 	// Weapons.
 	public ZSaber meleeWeapon = new();
 	public PZeroParryWeapon parryWeapon = new();
-	public Weapon gigaAttack;
 	public AwakenedAura awakenedAuraWeapon = new();
 	public ZSaberProjSwing saberSwingWeapon = new();
 	public ZeroBuster busterWeapon = new();
@@ -38,6 +37,8 @@ public class Zero : Character {
 	public Weapon uppercutS;
 	public Weapon downThrustA;
 	public Weapon downThrustS;
+	public Weapon gigaAttack;
+	public int gigaAttackSelected;
 
 	// Inputs.
 	public int shootPressTime;
@@ -49,8 +50,8 @@ public class Zero : Character {
 
 	// Cooldowns.
 	public float dashAttackCooldown;
-	public float swingCooldown;
-	public float genmuCooldown;
+	public float hadangekiCooldown;
+	public float genmureiCooldown;
 	public int airRisingUses;
 
 	// Hypermode stuff.
@@ -79,7 +80,13 @@ public class Zero : Character {
 		uppercutS = RyuenjinWeapon.getWeaponFromIndex(zeroLoadout.uppercutS);
 		downThrustA = HyouretsuzanWeapon.getWeaponFromIndex(zeroLoadout.downThrustA);
 		downThrustS = HyouretsuzanWeapon.getWeaponFromIndex(zeroLoadout.downThrustS);
-		gigaAttack = RakuhouhaWeapon.getWeaponFromIndex(zeroLoadout.gigaAttack);
+
+		gigaAttackSelected = zeroLoadout.gigaAttack;
+		gigaAttack = zeroLoadout.gigaAttack switch {
+			1 => new CFlasher(),
+			2 => new RekkohaWeapon(),
+			_ => new RakuhouhaWeapon(),
+		};
 
 		hyperMode = zeroLoadout.hyperMode;
 		altCtrlsLength = 2;
@@ -125,8 +132,8 @@ public class Zero : Character {
 		// Local update starts here.
 		inputUpdate();
 		Helpers.decrementFrames(ref donutTimer);
-		Helpers.decrementFrames(ref swingCooldown);
-		Helpers.decrementFrames(ref genmuCooldown);
+		Helpers.decrementFrames(ref hadangekiCooldown);
+		Helpers.decrementFrames(ref genmureiCooldown);
 		Helpers.decrementFrames(ref dashAttackCooldown);
 		airSpecial.update();
 		gigaAttack.update();
@@ -142,12 +149,20 @@ public class Zero : Character {
 			if (hyperModeTimer <= 0) {
 				hypermodeBlink = 0;
 				hyperModeTimer = 0;
-				if (hyperOvertimeActive && isAwakened && player.currency >= 2) {
+				if (hyperOvertimeActive && isAwakened && player.currency >= 4) {
 					awakenedPhase = 2;
 					heal(player, player.maxHealth * 2, true);
+					gigaAttack.addAmmoPercentHeal(100);
 				} else {
 					awakenedPhase = 0;
 					isBlack = false;
+					float oldAmmo = gigaAttack.ammo;
+					gigaAttack = gigaAttackSelected switch {
+						1 => new CFlasher(),
+						2 => new RekkohaWeapon(),
+						_ => new RakuhouhaWeapon(),
+					};
+					gigaAttack.ammo = oldAmmo;
 				}
 				hyperOvertimeActive = false;
 			}
@@ -356,7 +371,11 @@ public class Zero : Character {
 	// Non-attacks like guard and hypermode activation.
 	public override bool normalCtrl() {
 		// Hypermode activation.
-		if (player.currency >= Player.zeroHyperCost &&
+		int cost = Player.zeroHyperCost;
+		if (isAwakened) {
+			cost = 4;
+		}
+		if (player.currency >= cost &&
 			player.input.isHeld(Control.Special2, player) &&
 			charState is not HyperZeroStart and not WarpIn && (
 				!isViral && !isAwakened && !isBlack ||
@@ -418,8 +437,8 @@ public class Zero : Character {
 		if (donutsPending != 0) {
 			return false;
 		}
-		if (isAwakened && swingPressTime > 0 && swingCooldown == 0) {
-			swingCooldown = 60;
+		if (isAwakened && swingPressTime > 0 && hadangekiCooldown == 0) {
+			hadangekiCooldown = 60;
 			if (charState is WallSlide wallSlide) {
 				changeState(new AwakenedZeroHadangekiWall(wallSlide.wallDir, wallSlide.wallCollider), true);
 				return true;
@@ -428,9 +447,9 @@ public class Zero : Character {
 				slideVel = xDir * getDashSpeed() * 0.9f;
 			}
 			if (grounded && vel.y >= 0 && isGenmuZero) {
-				if (genmuCooldown == 0) {
-					genmuCooldown = 120;
-					changeState(new GenmuState(), true);
+				if (genmureiCooldown == 0) {
+					genmureiCooldown = 120;
+					changeState(new GenmureiState(), true);
 					return true;
 				}
 			} else {

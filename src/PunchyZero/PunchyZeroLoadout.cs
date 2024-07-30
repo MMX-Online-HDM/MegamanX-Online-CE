@@ -159,13 +159,13 @@ public class SelectPunchyZeroWeaponMenu : IMainMenu {
 				0 => "Increases speed by 15%, increases damage by 50%" +
 					"\nand increases the flinch of all attacks.",
 				1 => "Gives a damaging contact aura and upgrades attacks." +
-					"\nAfter 30 seconds enters Genmu state",
+					"\nHold [CMD] so after 20 seconds enters Genmu Zero",
 				2 => "Applies virus to enemies on hit\nand grants the Dark Hold giga attack.",
 				_ => "ERROR"
 			};
 			weaponSubDescription = hyperMode switch {
-				0 => "Duration: 15 seconds",
-				1 => "Duration: Scrap-based",
+				0 => "Duration: 20 seconds",
+				1 => "Duration: 20s, time-based with Genmu",
 				2 => "Duration: Unlimited",
 				_ => "ERROR"
 			};
@@ -192,7 +192,7 @@ public class SelectPunchyZeroWeaponMenu : IMainMenu {
 			FontType.Orange, weaponTitle,
 			Global.halfScreenW, titleY2, Alignment.Center
 		);
-		Fonts.drawText(
+		Fonts.drawTextEX(
 			FontType.Green, weaponDescription,
 			Global.halfScreenW, row1Y, Alignment.Center
 		);

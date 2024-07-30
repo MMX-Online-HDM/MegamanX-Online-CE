@@ -237,6 +237,7 @@ public class RideArmor : Actor, IDamagable {
 			var hitsAbove = Global.level.getTriggerList(this, 0, -2);
 			foreach (var hit in hitsAbove) {
 				if (ownedByMK5 &&
+					enterCooldown == 0 &&
 					hit.gameObject is Character chr &&
 					chr.player == netOwner &&
 					chr.pos.y <= mk5Pos.y + 10 &&
