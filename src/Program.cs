@@ -4,6 +4,9 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -178,13 +181,21 @@ class Program {
 		}
 
 		// Loading with GUI.
+		string urlText = "Using local conection.";
+		bool isOnlineUrl = false;
+
 		loadText.Add("Getting Master Server URL...");
 		loadMultiThread(loadText, window, MasterServerData.updateMasterServerURL);
-		if (MasterServerData.serverIp == "127.0.0.1") {
-			loadText[loadText.Count - 1] = "Using local conection.";
-		} else {
-			loadText[loadText.Count - 1] = "Master Server OK.";
+		if (MasterServerData.serverIp != "127.0.0.1") {
+			urlText = "All IPs OK.";
+			isOnlineUrl = true;
 		}
+		loadText[loadText.Count - 1] = "Getting local IPs...";
+		loadMultiThread(loadText, window, getRadminIP);
+		if (Global.radminIP != "" && isOnlineUrl) {
+			urlText += " Radmin detected.";
+		}
+		loadText[loadText.Count - 1] = urlText;
 
 		loadText.Add("Loading Sprites...");
 		loadMultiThread(loadText, window, loadImages);
@@ -226,68 +237,58 @@ class Program {
 		// Force startup config to be fetched
 		Menu.change(new MainMenu());
 		//Global.changeMusic(Global.level.levelData.getTitleTheme());
-		switch(Helpers.randomRange(1,19)) {
-			// Title screens
-			case 1:
-				Global.changeMusic("title_X1");
-				break;
-			case 2:
-				Global.changeMusic("title_X2");
-				break;
-			case 3:
-				Global.changeMusic("title_X3");
-				break;
+		switch(Helpers.randomRange(1, 15)) {
 			// Stage Selects
-			case 4:
+			case 1:
 				Global.changeMusic("stageSelect_X1");
 				break;
-			case 5:
+			case 2:
 				Global.changeMusic("stageSelect2_X1");
 				break;
-			case 6:
+			case 3:
 				Global.changeMusic("stageSelect_X2");
 				break;
-			case 7:
+			case 4:
 				Global.changeMusic("stageSelect2_X2");
 				break;
-			case 8:
+			case 5:
 				Global.changeMusic("stageSelect_X3");
 				break;
-			case 9:
+			case 6:
 				Global.changeMusic("stageSelect2_X3");
 				break;
 			// Introduction
-			case 10:
+			case 7:
 				Global.changeMusic("opening_X3");
 				break;
-			case 11:
+			case 8:
 				Global.changeMusic("opening_X2");
 				break;
 			// Extra
-			case 12:
+			case 9:
 				Global.changeMusic("ending_X3");
 				break;
-			case 13:
+			case 10:
 				Global.changeMusic("ending_X2");
 				break;
-			case 14:
+			case 11:
 				Global.changeMusic("ending_X1");
 				break;
-			case 15:
+			case 12:
 				Global.changeMusic("credits_X1");
 				break;
-			case 16:
+			case 13:
 				Global.changeMusic("demo_X2");
 				break;
-			case 17:
+			case 14:
 				Global.changeMusic("demo_X3");
-				break;	
-			case 18:
-				Global.changeMusic("laboratory_X3");
-				break;	
-			case 19:
-				Global.changeMusic("sigmaFortress4");
-				break;			
+				break;
+			case 15:
+				Global.changeMusic("laboratory_X2");
+				break;
+			default:
+				Global.changeMusic("stageSelect_X1");
+				break;
 		}
 		
 		if (mode == 1) {
@@ -1179,6 +1180,27 @@ class Program {
 
 		return true;
 	}
+
+	public static void getRadminIP() {
+		var local = NetworkInterface.GetAllNetworkInterfaces();
+		foreach (NetworkInterface net in local) {
+			if (net.NetworkInterfaceType != NetworkInterfaceType.Ethernet) {
+				continue;
+			}
+			if (!net.Description.ToLowerInvariant().Contains("radmin")) {
+				continue;
+			}
+			foreach (var uniAdress in net.GetIPProperties().UnicastAddresses) {
+				IPAddress ipAddress = IPAddress.Parse(uniAdress.Address.ToString());
+				if (ipAddress.AddressFamily == AddressFamily.InterNetwork) {
+					Global.radminIP = ipAddress.ToString();
+					return;
+				}
+			}
+		}
+	}
+
+	// Main loop stuff.
 	public static decimal deltaTimeSavings = 0;
 	public static decimal lastUpdateTime = 0;
 

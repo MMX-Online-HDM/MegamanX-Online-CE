@@ -424,7 +424,7 @@ public class Server {
 			}
 			if (isP2P && uniqueID != 0) {
 				// If we are a P2P server we cannot use a public IP as the masterserver handles that.
-				ip = "";
+				ip = LANIPHelper.GetLocalIPAddress();
 				// Send our info to masterserver to say that we are open now.
 				IPEndPoint? masterServerLocation = NetUtility.Resolve(
 					MasterServerData.serverIp, MasterServerData.serverPort
@@ -433,7 +433,10 @@ public class Server {
 				NetOutgoingMessage basicInfoMsg = s_server.CreateMessage();
 				basicInfoMsg.Write((byte)MasterServerMsg.RegisterHost);
 				basicInfoMsg.Write(uniqueID);
-				basicInfoMsg.Write(new IPEndPoint(NetUtility.GetMyAddress(out _), s_server.Port));
+				basicInfoMsg.Write(IPEndPoint.Parse(ip + ":" + s_server.Port));
+				if (Global.radminIP != "") {
+					basicInfoMsg.Write(IPEndPoint.Parse(Global.radminIP + ":" + s_server.Port));
+				}
 
 				// Second. The match list info.
 				NetOutgoingMessage listInfoMsg = s_server.CreateMessage();

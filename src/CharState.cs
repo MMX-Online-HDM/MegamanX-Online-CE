@@ -1091,7 +1091,7 @@ public class WallSlide : CharState {
 			return;
 		}
 		*/
-		if (player.isSigma && player.input.isPressed(Control.Special1, player) && character.flag == null) {
+		if (character is CmdSigma && player.input.isPressed(Control.Special1, player) && character.flag == null) {
 			int yDir = player.input.isHeld(Control.Down, player) ? 1 : -1;
 			character.changeState(new SigmaWallDashState(yDir, false), true);
 			return;

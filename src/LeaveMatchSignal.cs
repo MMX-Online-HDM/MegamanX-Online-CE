@@ -98,9 +98,9 @@ public class LeaveMatchSignal {
 				if (msg.MessageType == NetIncomingMessageType.UnconnectedData &&
 					msg.ReadByte() == 101
 				) {
-					(long, SimpleServerData, IPEndPoint) serverData = joinMenu.receiveServerDetails(msg);
+					(long, SimpleServerData, IPEndPoint, IPEndPoint?) serverData = joinMenu.receiveServerDetails(msg);
 					if (serverData.Item2 != null) {
-						joinMenu.joinServer(serverData.Item1, serverData.Item2, serverData.Item3);
+						joinMenu.joinServer(serverData.Item1, serverData.Item2, serverData.Item3, serverData.Item4);
 						return;
 					}
 				}
