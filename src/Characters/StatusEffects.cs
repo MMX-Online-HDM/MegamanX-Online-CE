@@ -119,7 +119,11 @@ public class GenericStun : CharState {
 		}
 
 		if (changeAnim) {
+			string stunAnim = getStunAnim();
 			character.changeSpriteFromName(getStunAnim(), true);
+			if (stunAnim == "idle") {
+				character.sprite.frameSpeed = 0;
+			}
 		}
 
 		if (character.frozenTime == 0 && character.crystalizedTime == 0 && character.paralyzedTime == 0) {

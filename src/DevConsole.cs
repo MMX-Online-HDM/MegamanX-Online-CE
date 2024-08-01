@@ -116,6 +116,29 @@ public class DevConsole {
 		Global.showGridHitboxes = !Global.showGridHitboxes;
 	}
 
+	public static void printClientPort(string[] args) {
+		if (Global.serverClient != null) {
+			log(Global.serverClient.client.Port.ToString());
+		} else {
+			log("No server client detected");
+		}
+	}
+
+	public static void printServerPort(string[] args) {
+		if (Global.localServer != null) {
+			log(Global.localServer.s_server.Port.ToString());
+		} else {
+			log("No server host detected");
+		}
+	}
+
+	public static void printRadminIP(string[] args) {
+		if (Global.localServer != null && Global.radminIP != "") {
+			log(Global.radminIP + ":" + Global.localServer.s_server.Port);
+		} else {
+			log("No server host detected");
+		}
+	}
 
 	public static void becomeMoth() {
 		var mmc = Global.level?.mainPlayer?.currentMaverick as MorphMothCocoon;
@@ -198,64 +221,78 @@ public class DevConsole {
 		Global.level.otherPlayer.character.changeState(new GigaCrushCharState(), true);
 	}
 
-	public static List<Command> commands = new List<Command>()
-	{
-            // Offline only, undocumented
-            new Command("log", (args) => toggleShowLogOnly()),
-			new Command("moth", (args) => becomeMoth()),
-			new Command("airevive", (args) => aiRevive()),
-			new Command("aigiga", (args) => aiGiga()),
-			new Command("rc", (args) => spawnRideChaser()),
-			new Command("aidebug", (args) => aiDebug(false)),
-			new Command("aispec", (args) => aiDebug(true)),
-            // Offline only
-            new Command("hitbox", (args) => showOrHideHitboxes(args)),
-            new Command("grid", (args) => showOrHideGrid(args)),
-			new Command("dumpnetids", (args) => Helpers.WriteToFile("netIdDump.txt", Global.level.getNetIdDump())),
-			new Command("dumpkillfeed", (args) => Helpers.WriteToFile("killFeedDump.txt", string.Join(Environment.NewLine, Global.level.gameMode.killFeedHistory))),
-			new Command("invuln", (args) => Global.level.mainPlayer.character.invulnTime = 60),
-			new Command("ult", (args) => Global.level.mainPlayer.setUltimateArmor(true)),
-			new Command("health", (args) => setHealth(args)),
-			new Command("freeze", (args) => Global.level.mainPlayer.character.freeze()),
-			new Command("hurt", (args) => Global.level.mainPlayer.character.setHurt(-1, Global.defFlinch, false)),
-			new Command("trhealth", (args) => Global.spawnTrainingHealth = !Global.spawnTrainingHealth),
-			new Command("checksum", (args) => printChecksum()),
-			new Command("dna", (args) => addDnaCore(args)),
-			new Command("timeleft", (args) => Global.level.gameMode.remainingTime = 5),
-			new Command("subtank", (args) => fillSubtank(args)),
-			new Command("subtest", (args) => { fillSubtank(args); setHealth(new string[] { "1" }); }),
-			new Command("aiattack", (args) => AI.trainingBehavior = AITrainingBehavior.Attack),
-			new Command("aijump", (args) => AI.trainingBehavior = AITrainingBehavior.Jump),
-			new Command("aiguard", (args) => AI.trainingBehavior = AITrainingBehavior.Guard),
-			new Command("aicrouch", (args) => AI.trainingBehavior = AITrainingBehavior.Crouch),
-			new Command("aistop", (args) => AI.trainingBehavior = AITrainingBehavior.Idle),
-			new Command("aikill", (args) => Global.level.otherPlayer?.forceKill()),
-			new Command("aiswitch", aiSwitch),
-			new Command("aimash", (args) => aiMash(args)),
-			new Command("scrap", currencyCommand),
-			new Command("die", (args) => Global.level.mainPlayer.forceKill()),
-			new Command("raflight", (args) => Global.level.rideArmorFlight = !Global.level.rideArmorFlight),
-            // Online
-            new Command("diagnostics", (args) => Global.showDiagnostics = !Global.showDiagnostics, offlineOnly: false),
-			new Command("clear", (args) => consoleLog.Clear(), offlineOnly: false),
-			new Command("musicend", (args) => setMusicNearEnd()),
-            // GMTODO: remove
-			// Gacel: Not. This could be usefull for bug reports with flags.
-            new Command("dumpflagdata", (args) => Helpers.WriteToFile("flagDataDump.txt", Global.level.getFlagDataDump()), offlineOnly: false),
-			/*
-			#if DEBUG
-            new Command("autofire", (args) => Global.autoFire = !Global.autoFire),
-			new Command("breakpoint", (args) => Global.breakpoint = !Global.breakpoint),
-			new Command("r", (args) => Global.level.mainPlayer.kills = Global.level.gameMode.playingTo - 1, offlineOnly: false),
-			new Command("1morekill", (args) => Global.level.mainPlayer.kills = Global.level.gameMode.playingTo - 1),
-			new Command("win", (args) => win()),
-			new Command("lose", (args) => lose()),
-			new Command("changeteam", (args) => changeTeam()),
-			new Command("ftd", (args) => toggleFTD()),
-			new Command("invuln", (args) => toggleInvulnFrames(10)),
-			#endif
-			*/
-        };
+	public static List<Command> commands = new List<Command>() {
+		// Offline only, undocumented
+		new Command("log", (args) => toggleShowLogOnly(), false),
+		new Command("moth", (args) => becomeMoth()),
+		new Command("airevive", (args) => aiRevive()),
+		new Command("aigiga", (args) => aiGiga()),
+		new Command("rc", (args) => spawnRideChaser()),
+		new Command("aidebug", (args) => aiDebug(false)),
+		new Command("aispec", (args) => aiDebug(true)),
+		// Offline only
+		new Command("hitbox", (args) => showOrHideHitboxes(args), false),
+		new Command("clientport", (args) => printClientPort(args), false),
+		new Command("serverport", (args) => printServerPort(args), false),
+		new Command("radminip", (args) => printRadminIP(args), false),
+		new Command("grid", (args) => showOrHideGrid(args), false),
+		new Command("dumpnetids", (args) => Helpers.WriteToFile("netIdDump.txt", Global.level.getNetIdDump())),
+		new Command(
+			"dumpkillfeed",
+			(args) => Helpers.WriteToFile(
+				"killFeedDump.txt", string.Join(Environment.NewLine, Global.level.gameMode.killFeedHistory)
+			),
+			false
+		),
+		new Command("invuln", (args) => Global.level.mainPlayer.character.invulnTime = 60),
+		new Command("ult", (args) => Global.level.mainPlayer.setUltimateArmor(true)),
+		new Command("health", (args) => setHealth(args)),
+		new Command("freeze", (args) => Global.level.mainPlayer.character.freeze()),
+		new Command("hurt", (args) => Global.level.mainPlayer.character.setHurt(-1, Global.defFlinch, false)),
+		new Command("trhealth", (args) => Global.spawnTrainingHealth = !Global.spawnTrainingHealth),
+		new Command("checksum", (args) => printChecksum(), false),
+		new Command("dna", (args) => addDnaCore(args)),
+		new Command("timeleft", (args) => Global.level.gameMode.remainingTime = 5),
+		new Command("subtank", (args) => fillSubtank(args)),
+		new Command("subtest", (args) => { fillSubtank(args); setHealth(new string[] { "1" }); }),
+		new Command("aiattack", (args) => AI.trainingBehavior = AITrainingBehavior.Attack),
+		new Command("aijump", (args) => AI.trainingBehavior = AITrainingBehavior.Jump),
+		new Command("aiguard", (args) => AI.trainingBehavior = AITrainingBehavior.Guard),
+		new Command("aicrouch", (args) => AI.trainingBehavior = AITrainingBehavior.Crouch),
+		new Command("aistop", (args) => AI.trainingBehavior = AITrainingBehavior.Idle),
+		new Command("aikill", (args) => Global.level.otherPlayer?.forceKill()),
+		new Command("aiswitch", aiSwitch),
+		new Command("aimash", (args) => aiMash(args)),
+		new Command("scrap", currencyCommand),
+		new Command("die", (args) => Global.level.mainPlayer.forceKill()),
+		new Command("raflight", (args) => Global.level.rideArmorFlight = !Global.level.rideArmorFlight),
+		// Online
+		new Command("diagnostics", (args) => Global.showDiagnostics = !Global.showDiagnostics, false),
+		new Command("clear", (args) => consoleLog.Clear(), false),
+		new Command("musicend", (args) => setMusicNearEnd()),
+		// GMTODO: remove
+		// Gacel: Not. This could be usefull for bug reports with flags.
+		new Command(
+			"dumpflagdata",
+			(args) => Helpers.WriteToFile("flagDataDump.txt", Global.level.getFlagDataDump()),
+			offlineOnly: false
+		),
+		/*
+		#if DEBUG
+		new Command("autofire", (args) => Global.autoFire = !Global.autoFire),
+		new Command("breakpoint", (args) => Global.breakpoint = !Global.breakpoint),
+		new Command("r", (args) => (
+			Global.level.mainPlayer.kills = Global.level.gameMode.playingTo - 1),
+		),
+		new Command("1morekill", (args) => Global.level.mainPlayer.kills = Global.level.gameMode.playingTo - 1),
+		new Command("win", (args) => win()),
+		new Command("lose", (args) => lose()),
+		new Command("changeteam", (args) => changeTeam()),
+		new Command("ftd", (args) => toggleFTD()),
+		new Command("invuln", (args) => toggleInvulnFrames(10)),
+		#endif
+		*/
+	};
 
 	public static void runCommand(string commandStr) {
 		List<string> pieces = commandStr.Split(' ').ToList();
@@ -265,7 +302,7 @@ public class DevConsole {
 			args = pieces.GetRange(1, pieces.Count - 1);
 		} catch { }
 
-		var commandObj = commands.FirstOrDefault(c => c.name == command);
+		var commandObj = commands.FirstOrDefault(c => c.name == command.ToLowerInvariant());
 		if (commandObj != null) {
 			if (!commandObj.offlineOnly || Global.serverClient == null || Global.debug) {
 				try {
