@@ -528,7 +528,7 @@ public class AI {
 		}
 		//Randomly Change Weapon
 		if (aiState.randomlyChangeWeapon &&
-			(player.isX || player.isAxl || player.isVile) &&
+			(player.isX || player.isAxl) &&
 			!player.lockWeapon && player.character?.isStealthy(-1) != null &&
 			(character as MegamanX)?.chargedRollingShieldProj == null
 		) {
