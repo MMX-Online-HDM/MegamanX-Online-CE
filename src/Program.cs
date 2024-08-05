@@ -182,17 +182,17 @@ class Program {
 
 		// Loading with GUI.
 		string urlText = "Using local conection.";
-		bool isOnlineUrl = false;
+		bool hasServerOnlineUrl = false;
 
 		loadText.Add("Getting Master Server URL...");
 		loadMultiThread(loadText, window, MasterServerData.updateMasterServerURL);
 		if (MasterServerData.serverIp != "127.0.0.1") {
 			urlText = "All IPs OK.";
-			isOnlineUrl = true;
+			hasServerOnlineUrl = true;
 		}
 		loadText[loadText.Count - 1] = "Getting local IPs...";
 		loadMultiThread(loadText, window, getRadminIP);
-		if (Global.radminIP != "" && isOnlineUrl) {
+		if (Global.radminIP != "" && hasServerOnlineUrl) {
 			urlText += " Radmin detected.";
 		}
 		loadText[loadText.Count - 1] = urlText;
@@ -296,9 +296,22 @@ class Program {
 			Menu.change(menu);
 			menu.completeAction();
 		} else if (mode == 2) {
-			// TODO: Fix this.
+			// TODO: Fix this.y
 			// Somehow we need to get the data before we connect.
 			Menu.change(new JoinMenuP2P(true));
+			var me = new ServerPlayer(
+				Options.main.playerName, 0, false,
+				SelectCharacterMenu.playerData.charNum, null, Global.deviceId, null, 0
+			);
+			Global.serverClient = ServerClient.CreateDirect(
+				args[0], int.Parse(args[1]), me,
+				out JoinServerResponse joinServerResponse, out string error
+			);
+			if (joinServerResponse != null && error == null) {
+				Menu.change(new WaitMenu(new MainMenu(), joinServerResponse.server, false));
+			} else {
+				Menu.change(new ErrorMenu(error, new MainMenu()));
+			}
 		}
 
 		while (window.IsOpen) {
