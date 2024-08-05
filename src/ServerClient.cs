@@ -165,7 +165,9 @@ public class ServerClient {
 
 			NetPeerConfiguration oldConfig = client.Configuration;
 			client.Shutdown("Error");
+			Thread.Sleep(50);
 			client = new NetClient(oldConfig);
+			client.Start();
 			client.Connect(radminIP, hail);
 
 			count = 0;
