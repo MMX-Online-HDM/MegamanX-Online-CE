@@ -428,7 +428,6 @@ public class AI {
 					busterZeroAIAttack(zero);
 				} else if (character is PunchyZero pzero) {
 					KnuckleZeroAIAttack(pzero);
-					return;
 				}
 
 				// is Facing the target?
@@ -443,9 +442,9 @@ public class AI {
 				}
 			}
 			// The amount of actions the AI will do, the lower the number, the higher the actions
-			// At 0.01 is Kaizo Level
+			// Before the AI did an actions in 5 frames (0.08 seconds), now it will do an action in 24 frames
 			shootTime += Global.spf;
-			if (shootTime > 0.08) {
+			if (shootTime > 24f/60f) {
 				shootTime = 0;
 			}
 		}
@@ -453,7 +452,7 @@ public class AI {
 
 		//The AI should dodge if a projectile is close to him
 		
-		if (aiState.shouldDodge && target != null) {
+		if (aiState.shouldDodge && target != null && shootTime == 0) {
 			if (character is Zero zero3) {
 				zeroAIDodge(zero3);
 			}
@@ -477,7 +476,7 @@ public class AI {
 		//End of The AI Dodging
 
 		//The AI should randomly charge weapon?
-		if (aiState.randomlyChargeWeapon 
+		if (aiState.randomlyChargeWeapon
 			&& character is MegamanX or Axl or BusterZero
 			&& framesChargeHeld == 0 && player.character?.canCharge() == true
 		) {
@@ -504,7 +503,7 @@ public class AI {
 		//Randomly Dash
 		if (aiState.randomlyDash && character != null &&
 			character.charState is not WallKick &&
-			character.grounded &&
+			character.grounded && shootTime == 0 &&
 			!inNodeTransition && stuckTime == 0 &&
 			character.charState.normalCtrl &&
 			character.charState is not Dash or AirDash or UpDash
@@ -522,7 +521,7 @@ public class AI {
 
 		}	
 		//Randomly Jump
-		if (aiState.randomlyJump && !inNodeTransition && stuckTime == 0) {
+		if (aiState.randomlyJump && !inNodeTransition && stuckTime == 0 && shootTime == 0 ) {
 			if (Helpers.randomRange(0, 650) < 3) {
 				jumpTime = Helpers.randomRange(0.25f, 0.75f);
 			}
@@ -548,9 +547,9 @@ public class AI {
 			player.changeWeaponSlot(getRandomWeaponIndex());
 		}
 
-		if (player.vileAmmo <= 0 && player.weapon is not VileCannon) {
-			player.changeWeaponSlot(getRandomWeaponIndex());
-		}
+		//if (player.vileAmmo <= 0 && player.weapon is not VileCannon) {
+		//	player.changeWeaponSlot(getRandomWeaponIndex());
+		//}
 
 		aiState.update();
 
@@ -1041,7 +1040,7 @@ public class AI {
 		bool isTargetInAir = target?.pos.y < character.pos.y - 50;
 		// Go hypermode 
 		if (player.currency >= Player.zeroHyperCost && !zero.isSpriteInvulnerable() && !zero.isInvulnerable() &&
-		   zero.charState is not (HyperZeroStart or LadderClimb) && !zero.hypermodeActive()
+		   zero.charState is not (HyperZeroStart or LadderClimb) && !zero.hypermodeActive() && !player.isMainPlayer
 		) {
 			zero.changeState(new HyperZeroStart(), true);
 		}
