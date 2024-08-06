@@ -584,11 +584,16 @@ public partial class Actor : GameObject {
 					}
 					grav *= modifier;
 				}
-				vel.y += grav * Global.speedMul;
-				if (vel.y > terminalVelDown) {
-					vel.y = terminalVelDown;
-				} else if (vel.y < -terminalVelUp) {
-					vel.y = -terminalVelUp;
+				if (grav > 0 && vel.y < terminalVelDown) {
+					vel.y += grav * Global.speedMul;
+					if (vel.y > terminalVelDown) {
+						vel.y = terminalVelDown;
+					}
+				} else if (grav < 0) {
+					vel.y += grav * Global.speedMul;
+					if (vel.y < -terminalVelUp) {
+						vel.y = -terminalVelUp;
+					}
 				}
 			}
 
