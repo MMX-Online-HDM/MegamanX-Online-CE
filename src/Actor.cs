@@ -749,7 +749,7 @@ public partial class Actor : GameObject {
 					}
 
 					//If already grounded, snap to ground further
-					CollideData collideDataCloseCheck = Global.level.checkCollisionActor(this, 0, 0.05f * yMod);
+					CollideData? collideDataCloseCheck = Global.level.checkCollisionActor(this, 0, 0.05f * yMod);
 					if (collideDataCloseCheck == null) {
 						var yVel = new Point(0, yDist);
 						var mtv = Global.level.getMtvDir(
@@ -930,7 +930,7 @@ public partial class Actor : GameObject {
 	}
 
 	public void getKillerAndAssister(
-		Player ownPlayer, ref Player? killer, ref Player? assister, ref int? weaponIndex,
+		Player? ownPlayer, ref Player? killer, ref Player? assister, ref int? weaponIndex,
 		ref int? assisterProjId, ref int? assisterWeaponId
 	) {
 		if (damageHistory.Count > 0) {

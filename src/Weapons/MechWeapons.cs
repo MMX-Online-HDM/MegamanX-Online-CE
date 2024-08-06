@@ -203,7 +203,7 @@ public class MechMissileWeapon : Weapon {
 }
 
 public class MechMissileProj : Projectile, IDamagable {
-	public Character target;
+	public Character? target;
 	public float smokeTime = 0;
 	public bool isDown;
 	public MechMissileProj(Weapon weapon, Point pos, int xDir, bool isDown, Player player, ushort netProjId, bool rpc = false) :
