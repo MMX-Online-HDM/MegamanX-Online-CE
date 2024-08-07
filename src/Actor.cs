@@ -672,7 +672,9 @@ public partial class Actor : GameObject {
 		if (underwater) terminalVelDown = Physics.MaxUnderwaterFallSpeed;
 
 		if (useGravity && !grounded) {
-			if (underwater) grav *= 0.5f;
+			if (underwater) {
+				grav *= 0.5f;
+			}
 			if (this is MegamanX mmx) {
 				int bubbleCount = mmx.chargedBubbles.Count;
 				float modifier = 1;
