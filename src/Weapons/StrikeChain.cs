@@ -107,7 +107,7 @@ public class StrikeChainProj : Projectile {
 			if (type == 1 && xDir == 1) sprite = "strikechain_charged_chain";
 			if (type == 1 && xDir == -1) sprite = "strikechain_charged_chain_left";
 
-			var midSprite = Global.sprites[sprite].clone();
+			var midSprite = new Sprite(sprite);
 			spriteMids.Add(midSprite);
 		}
 		canBeLocal = false;

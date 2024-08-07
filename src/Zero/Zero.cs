@@ -22,6 +22,8 @@ public class Zero : Character {
 	public int awakenedAuraFrame;
 	public float awakenedAuraAnimTime;
 	public byte hypermodeBlink;
+	public Sprite auraSprite = new Sprite("zero_awakened_aura");
+	public Sprite auraSprite2 = new Sprite("zero_awakened_aura2");
 
 	// Weapons.
 	public ZSaber meleeWeapon = new();
@@ -189,7 +191,7 @@ public class Zero : Character {
 				shootAnimTime = 0;
 				changeSpriteFromName(charState.defaultSprite, false);
 				if (charState is WallSlide) {
-					frameIndex = sprite.frames.Count - 1;
+					frameIndex = sprite.totalFrameNum - 1;
 				}
 			}
 		}
@@ -929,9 +931,9 @@ public class Zero : Character {
 			float xOff = 0;
 			int auraXDir = 1;
 			float yOff = 5;
-			string auraSprite = "zero_awakened_aura";
+			Sprite auraSprite = this.auraSprite;
 			if (sprite.name.Contains("dash")) {
-				auraSprite = "zero_awakened_aura2";
+				auraSprite = auraSprite2;
 				auraXDir = xDir;
 				yOff = 8;
 			}
@@ -942,7 +944,7 @@ public class Zero : Character {
 			) {
 				shaders.Add(Global.shaderWrappers["awakened"]);
 			}
-			Global.sprites[auraSprite].draw(
+			auraSprite.draw(
 				awakenedAuraFrame,
 				pos.x + x + (xOff * auraXDir),
 				pos.y + y + yOff, auraXDir,

@@ -212,6 +212,15 @@ public struct Point {
 		return sum.multiply(1.0f / points.Count);
 	}
 
+	public static Point average(Point[] points) {
+		if (points.Length == 0) return new Point();
+		Point sum = new Point();
+		foreach (var point in points) {
+			sum.inc(point);
+		}
+		return sum.multiply(1.0f / points.Length);
+	}
+
 	public static float minX(List<Point> points) {
 		float minX = float.MaxValue;
 		foreach (var point in points) {

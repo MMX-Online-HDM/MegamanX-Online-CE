@@ -309,7 +309,7 @@ public class LevelData {
 			string json = File.ReadAllText(customSpriteJsonPath);
 			fileChecksumDict[spriteName] = json;
 
-			Sprite sprite = new Sprite(json, spriteName, name);
+			AnimData sprite = new AnimData(json, spriteName, name);
 			Global.sprites[spriteName] = sprite;
 		}
 

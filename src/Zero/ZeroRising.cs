@@ -173,7 +173,7 @@ public class ZeroUppercut : CharState {
 		if (character is not Zero zero) {
 			return false;
 		}
-		int fc = character.sprite.frames.Count;
+		int fc = character.sprite.totalFrameNum;
 		if (type == RisingType.RisingFang) {
 			return character.sprite.frameIndex >= fc - 1;
 		}

@@ -212,7 +212,7 @@ public class ShotgunIceProjSled : Projectile {
 
 		if (!ownedByLocalPlayer) return;
 
-		if (sprite.frameIndex == sprite.frames.Count - 1) {
+		if (sprite.frameIndex == sprite.totalFrameNum - 1) {
 			damager.flinch = Global.defFlinch;
 			useGravity = true;
 		}

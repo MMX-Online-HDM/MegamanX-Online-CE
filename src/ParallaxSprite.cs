@@ -9,7 +9,7 @@ public class ParallaxSprite {
 	public float frameTime;
 
 	public ParallaxSprite(string spriteName, Point pos, int xDir, int yDir) {
-		this.sprite = Global.sprites[spriteName].clone();
+		this.sprite = new Sprite(spriteName);
 		this.pos = pos;
 		this.xDir = xDir;
 		this.yDir = yDir;
@@ -18,7 +18,7 @@ public class ParallaxSprite {
 	public void render(float x, float y) {
 		sprite.update();
 
-		var currentFrame = sprite.frames[frameIndex];
+		var currentFrame = sprite.animData.frames[frameIndex];
 		var offsetX = xDir * currentFrame.offset.x;
 		var offsetY = yDir * currentFrame.offset.y;
 

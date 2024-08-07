@@ -29,11 +29,11 @@ public partial class Actor {
 		for (int i = 0; i < 8; i++) mask.Add(false);
 
 		// These masks are for whether to send the following fields or not.
-		mask[0] = !isStatic;                    // pos x
-		mask[1] = !isStatic;                    // pos y
-		mask[2] = syncScale;                    // scale data
-		mask[3] = (sprite.frames.Count > 1);    // frame index data
-		mask[4] = byteAngle != null;                // angle
+		mask[0] = !isStatic;                            // pos x
+		mask[1] = !isStatic;                            // pos y
+		mask[2] = syncScale;                            // scale data
+		mask[3] = (sprite.totalFrameNum != 0); // frame index data
+		mask[4] = byteAngle != null;                    // angle
 
 		// The rest are just always sent and contain actual bool data
 		mask[5] = visible;                      // visibility

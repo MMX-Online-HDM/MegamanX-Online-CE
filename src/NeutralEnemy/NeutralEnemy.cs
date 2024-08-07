@@ -21,7 +21,7 @@ public class NeutralEnemy : Actor, IDamagable {
 		null!, pos, netId, isLocal, !addToLevel
 	) {
 		// Forcefull change sprite to something before we crash.
-		sprite = Global.sprites["empty"].clone();
+		sprite = new Sprite("empty");
 		// We do this to manually call the state change.
 		// As oldState cannot be null because we do not want null crashes.
 		state = new NeutralEnemyState("empty");

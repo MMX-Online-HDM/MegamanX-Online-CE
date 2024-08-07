@@ -80,6 +80,9 @@ public partial class MegamanX : Character {
 	public bool stingActive;
 	public bool isHyperChargeActive;
 
+	public Sprite hyperChargePartSprite =  new Sprite("hypercharge_part_1");
+	public Sprite hyperChargePart2Sprite =  new Sprite("hypercharge_part_1");
+
 	public MegamanX(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
@@ -206,7 +209,7 @@ public partial class MegamanX : Character {
 				shootAnimTime = 0;
 				changeSpriteFromName(charState.sprite, false);
 				if (charState is WallSlide) {
-					frameIndex = sprite.frames.Count - 1;
+					frameIndex = sprite.totalFrameNum - 1;
 				}
 			}
 		}
@@ -1199,10 +1202,10 @@ public partial class MegamanX : Character {
 		float sx = pos.x + x;
 		float sy = pos.y + y - 18;
 
-		var sprite1 = Global.sprites["hypercharge_part_1"];
+		var sprite1 = hyperChargePartSprite;
 		float distFromCenter = 12;
 		float posOffset = hyperChargeAnimTime * 50;
-		int hyperChargeAnimFrame = MathInt.Floor((hyperChargeAnimTime / maxHyperChargeAnimTime) * sprite1.frames.Count);
+		int hyperChargeAnimFrame = MathInt.Floor((hyperChargeAnimTime / maxHyperChargeAnimTime) * sprite1.totalFrameNum);
 		sprite1.draw(hyperChargeAnimFrame, sx + distFromCenter + posOffset, sy, 1, 1, null, 1, 1, 1, zIndex + 1);
 		sprite1.draw(hyperChargeAnimFrame, sx - distFromCenter - posOffset, sy, 1, 1, null, 1, 1, 1, zIndex + 1);
 		sprite1.draw(hyperChargeAnimFrame, sx, sy + distFromCenter + posOffset, 1, 1, null, 1, 1, 1, zIndex + 1);
@@ -1210,11 +1213,11 @@ public partial class MegamanX : Character {
 
 		hyperChargeAnimTime2 += Global.spf;
 		if (hyperChargeAnimTime2 >= maxHyperChargeAnimTime) hyperChargeAnimTime2 = 0;
-		var sprite2 = Global.sprites["hypercharge_part_2"];
+		var sprite2 = hyperChargePart2Sprite;
 		float distFromCenter2 = 12;
 		float posOffset2 = hyperChargeAnimTime2 * 50;
 		int hyperChargeAnimFrame2 = MathInt.Floor(
-			(hyperChargeAnimTime2 / maxHyperChargeAnimTime) * sprite2.frames.Count
+			(hyperChargeAnimTime2 / maxHyperChargeAnimTime) * sprite2.totalFrameNum
 		);
 		float xOff = Helpers.cosd(45) * (distFromCenter2 + posOffset2);
 		float yOff = Helpers.sind(45) * (distFromCenter2 + posOffset2);
@@ -1230,7 +1233,7 @@ public partial class MegamanX : Character {
 		}
 		if (isShootingRaySplasher) {
 			var shootPos = getShootPos();
-			var muzzleFrameCount = Global.sprites["raysplasher_muzzle"].frames.Count;
+			var muzzleFrameCount = Global.sprites["raysplasher_muzzle"].frames.Length;
 			Global.sprites["raysplasher_muzzle"].draw(
 				Global.frameCount % muzzleFrameCount,
 				shootPos.x + x + (3 * xDir), shootPos.y + y, 1, 1, null, 1, 1, 1, zIndex

@@ -19,7 +19,7 @@ public class BlastHornet : Maverick {
 		stateCooldowns.Add(typeof(BHornetStingState), new MaverickStateCooldown(false, false, 0.5f));
 
 		weapon = new Weapon(WeaponIds.BHornetGeneric, 158);
-		wings = Global.sprites["bhornet_wings"].clone();
+		wings = new Sprite("bhornet_wings");
 		canFly = true;
 
 		awardWeaponId = WeaponIds.ParasiticBomb;
@@ -102,8 +102,8 @@ public class BlastHornet : Maverick {
 
 	public Point? getWingPOI(out string tag) {
 		tag = "";
-		if (sprite?.getCurrentFrame()?.POIs?.Count > 0) {
-			for (int i = 0; i < sprite.getCurrentFrame().POITags.Count; i++) {
+		if (sprite.getCurrentFrame().POIs.Length > 0) {
+			for (int i = 0; i < sprite.getCurrentFrame().POITags.Length; i++) {
 				tag = sprite.getCurrentFrame().POITags[i];
 				if (tag == "wings") {
 					return getFirstPOIOffsetOnly(i);

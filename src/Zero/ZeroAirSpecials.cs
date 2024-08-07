@@ -237,7 +237,7 @@ public class HyorogaState : CharState {
 
 		var pois = character.sprite.getCurrentFrame().POIs;
 		if (character.sprite.name == "zero_hyoroga_attack") {
-			if (pois != null && pois.Count > 0 && shootCooldown == 0) {
+			if (pois != null && pois.Length > 0 && shootCooldown == 0) {
 				var poi = character.getFirstPOIOrDefault();
 				new HyorogaProj(
 					poi, 0,

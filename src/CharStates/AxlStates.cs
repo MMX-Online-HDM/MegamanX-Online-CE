@@ -94,7 +94,7 @@ public class Hover : CharState {
 	}
 
 	public Point exhaustPos() {
-		if (character.currentFrame.POIs.Count == 0) return character.pos;
+		if (character.currentFrame.POIs.Length == 0) return character.pos;
 		Point exhaustPOI = character.currentFrame.POIs.Last();
 		return character.pos.addxy(exhaustPOI.x * axl.getAxlXDir(), exhaustPOI.y);
 	}

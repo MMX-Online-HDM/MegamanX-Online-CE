@@ -91,15 +91,11 @@ public partial class Actor {
 		if (globalCollider != null) {
 			colliders.Add(globalCollider);
 		}
-		if (sprite != null) {
-			foreach (var collider in sprite.hitboxes) {
-				colliders.Add(collider);
-			}
+		foreach (var collider in sprite.hitboxes) {
+			colliders.Add(collider);
 		}
-		if (currentFrame != null) {
-			foreach (var collider in currentFrame.hitboxes) {
-				colliders.Add(collider);
-			}
+		foreach (var collider in sprite.frameHitboxes[frameIndex]) {
+			colliders.Add(collider);
 		}
 		return colliders;
 	}

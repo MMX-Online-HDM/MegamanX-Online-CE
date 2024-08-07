@@ -113,7 +113,7 @@ public class HexaInvoluteProj : Projectile {
 		base(weapon, pos, xDir, 0, 1, player, "empty", Global.defFlinch, 0.15f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.HexaInvolute;
 		setIndestructableProperties();
-		sprite.hitboxes = new List<Collider>();
+		sprite.hitboxes = new Collider[6];
 
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
@@ -160,8 +160,9 @@ public class HexaInvoluteProj : Projectile {
 
 			drawLine(origin, dest);
 			var hitbox = getHitbox(origin, dest);
-			if (sprite.hitboxes.InRange(i)) sprite.hitboxes[i] = hitbox;
-			else sprite.hitboxes.Add(hitbox);
+			if (sprite.hitboxes.InRange(i)) {
+				sprite.hitboxes[i] = hitbox;
+			}
 			if (partCooldown == 0) {
 				if (!Options.main.lowQualityParticles()) {
 					parts.Add(new HexaInvolutePart(dest));

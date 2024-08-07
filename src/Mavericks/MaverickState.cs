@@ -1250,7 +1250,7 @@ public class MWallSlide : MaverickState {
 		base.onEnter(oldState);
 		maverick.stopMoving();
 		if (leftOff) {
-			maverick.frameIndex = maverick.sprite.frames.Count - 1;
+			maverick.frameIndex = maverick.sprite.totalFrameNum - 1;
 			maverick.useGravity = false;
 		}
 	}

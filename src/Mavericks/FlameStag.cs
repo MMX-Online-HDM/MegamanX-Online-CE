@@ -17,9 +17,9 @@ public class FlameStag : Maverick {
 		canClimbWall = true;
 		width = 20;
 
-		antler = Global.sprites["fstag_antler"].clone();
-		antlerDown = Global.sprites["fstag_antler_down"].clone();
-		antlerSide = Global.sprites["fstag_antler_side"].clone();
+		antler = new Sprite("fstag_antler");
+		antlerDown = new Sprite("fstag_antler_down");
+		antlerSide = new Sprite("fstag_antler_side");
 		//spriteFrameToSounds["fstag_run/2"] = "run";
 		//spriteFrameToSounds["fstag_run/6"] = "run";
 
@@ -109,8 +109,8 @@ public class FlameStag : Maverick {
 
 	public Point? getAntlerPOI(out string tag) {
 		tag = "";
-		if (sprite?.getCurrentFrame()?.POIs?.Count > 0) {
-			for (int i = 0; i < sprite.getCurrentFrame().POITags.Count; i++) {
+		if (sprite.getCurrentFrame().POIs.Length > 0) {
+			for (int i = 0; i < sprite.getCurrentFrame().POITags.Length; i++) {
 				tag = sprite.getCurrentFrame().POITags[i];
 				if (tag == "antler" || tag == "antler_side" || tag == "antler_down") {
 					return getFirstPOIOffsetOnly(i);
@@ -129,7 +129,7 @@ public class FlameStag : Maverick {
 	}
 
 	public Point? getAttackPOI() {
-		if (sprite?.getCurrentFrame()?.POIs?.Count > 0) {
+		if (sprite.getCurrentFrame().POIs.Length > 0) {
 			int poiIndex = sprite.getCurrentFrame().POITags.FindIndex(tag => tag != "antler" && tag != "antler_side" && tag != "antler_down");
 			if (poiIndex >= 0) return getFirstPOIOrDefault(poiIndex);
 		}

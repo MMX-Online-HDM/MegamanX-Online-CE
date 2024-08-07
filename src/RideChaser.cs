@@ -169,7 +169,7 @@ public class RideChaser : Actor, IDamagable {
 
 		bool hitSideWall = false;
 		if (inclineTime == 0) {
-			if (sprite.hitboxes.Count > 0) {
+			if (sprite.hitboxes.Length > 0) {
 				var hit = Global.level.checkCollisionShape(sprite.hitboxes[0].shape, null);
 				if (hit?.isSideWallHit() == true && Math.Sign(hit.getNormalSafe().x) != Math.Sign(moveAmount.x)) {
 					hitSideWall = true;
@@ -411,8 +411,8 @@ public class RideChaser : Actor, IDamagable {
 		}
 	}
 
-	Sprite rideChaserSparkSprite = Global.sprites["ridechaser_sparks"].clone();
-	Sprite rideChaserBoostSprite = Global.sprites["ridechaser_boost"].clone();
+	Sprite rideChaserSparkSprite = new Sprite("ridechaser_sparks");
+	Sprite rideChaserBoostSprite = new Sprite("ridechaser_boost");
 	public int drawState = 0;  // 0 = no particle, 1 = sparks, 2 = boost
 	public override void render(float x, float y) {
 		base.render(x, y);

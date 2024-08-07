@@ -91,9 +91,9 @@ public class FireWaveProjCharged : Projectile {
 	float soundCooldown;
 	public FireWaveProjCharged(Weapon weapon, Point pos, int xDir, Player player, float parentTime, ushort netProjId, int timesReversed, bool rpc = false) : base(weapon, pos, xDir, 0, 1, player, "fire_wave_charge", 0, 0.33f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.FireWaveCharged;
-		spriteMid = Global.sprites["fire_wave_charge"].clone();
+		spriteMid = new Sprite("fire_wave_charge");
 		spriteMid.visible = false;
-		spriteTop = Global.sprites["fire_wave_charge"].clone();
+		spriteTop = new Sprite("fire_wave_charge");
 		spriteTop.visible = false;
 		useGravity = true;
 		collider.wallOnly = true;
@@ -112,8 +112,8 @@ public class FireWaveProjCharged : Projectile {
 
 	public override void render(float x, float y) {
 		sprite.draw(frameIndex, pos.x + x, pos.y + y - riseY, xDir, yDir, getRenderEffectSet(), 1, 1, 1, zIndex);
-		spriteMid.draw((int)MathF.Round(frameIndex + (sprite.frames.Count / 3)) % sprite.frames.Count, pos.x + x, pos.y + y - 6 - riseY, xDir, yDir, getRenderEffectSet(), 1, 1, 1, zIndex);
-		spriteTop.draw((int)MathF.Round(frameIndex + (sprite.frames.Count / 2)) % sprite.frames.Count, pos.x + x, pos.y + y - 12 - riseY, xDir, yDir, getRenderEffectSet(), 1, 1, 1, zIndex);
+		spriteMid.draw((int)MathF.Round(frameIndex + (sprite.totalFrameNum / 3)) % sprite.totalFrameNum, pos.x + x, pos.y + y - 6 - riseY, xDir, yDir, getRenderEffectSet(), 1, 1, 1, zIndex);
+		spriteTop.draw((int)MathF.Round(frameIndex + (sprite.totalFrameNum / 2)) % sprite.totalFrameNum, pos.x + x, pos.y + y - 12 - riseY, xDir, yDir, getRenderEffectSet(), 1, 1, 1, zIndex);
 	}
 
 	public override void update() {

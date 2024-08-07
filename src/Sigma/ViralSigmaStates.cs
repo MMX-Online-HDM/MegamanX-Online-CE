@@ -87,8 +87,8 @@ public class ViralSigmaTaunt : CharState {
 	public override void update() {
 		base.update();
 		if (character.loopCount > 2) {
-			if (character.frameIndex >= character.sprite.frames.Count - 1) {
-				character.frameIndex = character.sprite.frames.Count - 1;
+			if (character.frameIndex >= character.sprite.totalFrameNum - 1) {
+				character.frameIndex = character.sprite.totalFrameNum - 1;
 				character.frameSpeed = 0;
 				lastFrameTime += Global.spf;
 				if (lastFrameTime > 0 && !isWin) {
@@ -469,7 +469,7 @@ public class ViralSigmaRevive : CharState {
 				state = 2;
 				stateTime = 0;
 				character.frameSpeed = 0;
-				character.frameIndex = character.sprite.frames.Count - 1;
+				character.frameIndex = character.sprite.totalFrameNum - 1;
 				return;
 			}
 
@@ -477,14 +477,14 @@ public class ViralSigmaRevive : CharState {
 			else character.xScale = 1;
 			character.yScale = character.xScale;
 			if (character.loopCount > 1) {
-				if (character.frameIndex > character.sprite.frames.Count * 0.5f) {
+				if (character.frameIndex > character.sprite.totalFrameNum * 0.5f) {
 					character.frameSpeed = Helpers.lerp(character.frameSpeed, 0, Global.spf * 2);
 				}
-				if (character.frameIndex >= character.sprite.frames.Count - 1) {
+				if (character.frameIndex >= character.sprite.totalFrameNum - 1) {
 					state = 2;
 					stateTime = 0;
 					character.frameSpeed = 0;
-					character.frameIndex = character.sprite.frames.Count - 1;
+					character.frameIndex = character.sprite.totalFrameNum - 1;
 				}
 			}
 		} else if (state == 2) {

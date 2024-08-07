@@ -289,7 +289,7 @@ public partial class Global {
 	public static Dictionary<string, Texture> textures = new Dictionary<string, Texture>();
 	public static Dictionary<string, Texture> fontTextures = new Dictionary<string, Texture>();
 	public static Dictionary<string, Texture[,]> mapTextures = new Dictionary<string, Texture[,]>();
-	public static Dictionary<string, Sprite> sprites = new Dictionary<string, Sprite>();
+	public static Dictionary<string, AnimData> sprites = new();
 	public static Dictionary<string, SoundBufferWrapper> soundBuffers = new();
 	public static Dictionary<string, SoundBufferWrapper> voiceBuffers = new();
 	public static Dictionary<string, SoundBufferWrapper> charSoundBuffers = new();

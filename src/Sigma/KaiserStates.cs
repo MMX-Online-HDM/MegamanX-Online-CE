@@ -777,7 +777,7 @@ public class KaiserSigmaRevive : CharState {
 			}
 		} else if (state == 2) {
 			if (Global.debug && player.input.isPressed(Control.Special1, player)) {
-				character.frameIndex = character.sprite.frames.Count - 1;
+				character.frameIndex = character.sprite.totalFrameNum - 1;
 			}
 
 			if (character.isAnimOver()) {

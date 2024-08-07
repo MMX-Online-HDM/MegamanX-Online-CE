@@ -95,7 +95,7 @@ public class Vile : Character {
 		if (isVileMK2) vilePrefix = "vilemk2_";
 		if (isVileMK5) vilePrefix = "vilemk5_";
 		string cannonSprite = vilePrefix + "cannon";
-		for (int i = 0; i < currentFrame.POIs.Count; i++) {
+		for (int i = 0; i < currentFrame.POIs.Length; i++) {
 			var poi = currentFrame.POIs[i];
 			var tag = currentFrame.POITags[i] ?? "";
 			zIndexDir = tag.EndsWith("b") ? -1 : 1;
@@ -107,7 +107,7 @@ public class Vile : Character {
 			if (tag.StartsWith("cannon5") && cannonAimNum == 4) frameIndexToDraw = 4;
 			if (frameIndexToDraw != null) {
 				poiPos = new Point(pos.x + (poi.x * getShootXDirSynced()), pos.y + poi.y);
-				return Global.sprites[cannonSprite];
+				return new Sprite(cannonSprite);
 			}
 		}
 		return null;
@@ -124,7 +124,7 @@ public class Vile : Character {
 		else cannonAimNum = 4;
 
 		var cannonSprite = getCannonSprite(out Point poiPos, out _);
-		Point? nullablePos = cannonSprite?.frames?.ElementAtOrDefault(cannonAimNum)?.POIs?.FirstOrDefault();
+		Point? nullablePos = cannonSprite?.animData.frames?.ElementAtOrDefault(cannonAimNum)?.POIs?.FirstOrDefault();
 		if (nullablePos == null) {
 		}
 		Point cannonSpritePOI = nullablePos ?? Point.zero;
@@ -621,7 +621,7 @@ public class Vile : Character {
 		} else {
 			removeRenderEffect(RenderEffectType.SpeedDevilTrail);
 		}
-		if (currentFrame?.POIs?.Count > 0) {
+		if (currentFrame.POIs.Length > 0) {
 			Sprite? cannonSprite = getCannonSprite(out Point poiPos, out int zIndexDir);
 			cannonSprite?.draw(
 				cannonAimNum, poiPos.x, poiPos.y, getShootXDirSynced(),

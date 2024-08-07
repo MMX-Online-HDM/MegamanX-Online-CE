@@ -128,7 +128,7 @@ public class BubbleSplashProjCharged : Projectile {
 		character = (player.character as MegamanX);
 		initTime = time;
 		this.time = time;
-		sprite.wrapMode = "loop";
+		sprite.doesLoop = true;
 		projId = (int)ProjIds.BubbleSplashCharged;
 
 		if (rpc) {

@@ -278,10 +278,10 @@ public class TSeahorseTeleportState : MaverickState {
 		base.update();
 
 		if (state == 0) {
-			if (maverick.frameIndex == maverick.sprite.frames.Count - 1) {
+			if (maverick.frameIndex == maverick.sprite.totalFrameNum - 1) {
 				state = 1;
 				stateTime = 0;
-				maverick.frameIndex = maverick.sprite.frames.Count - 1;
+				maverick.frameIndex = maverick.sprite.totalFrameNum - 1;
 				maverick.frameSpeed = 0;
 			}
 		} else if (state == 1) {

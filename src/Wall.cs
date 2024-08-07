@@ -80,8 +80,8 @@ public class MovingPlatform : Wall {
 		name = "MovingPlatform";
 		isMoving = true;
 
-		sprite = Global.sprites[spriteName].clone();
-		idleSprite = !string.IsNullOrEmpty(idleSpriteName) ? Global.sprites[idleSpriteName].clone() : null;
+		sprite = new Sprite(spriteName);
+		idleSprite = !string.IsNullOrEmpty(idleSpriteName) ? new Sprite(idleSpriteName) : null;
 
 		var rect = sprite.hitboxes[0].shape.getRect();
 		origin = origin.addxy(-rect.w() / 2f, -rect.h() / 2f);
@@ -365,13 +365,13 @@ public class CrackedWall : Actor, IDamagable {
 		if (destroySilently) return;
 
 		// Animation section
-		foreach (var poi in sprite.frames[0].POIs) {
+		foreach (var poi in sprite.animData.frames[0].POIs) {
 			new Anim(pos.addxy(poi.x, poi.y), "explosion", 1, null, true);
 		}
 		playSound("explosion");
 
 		if (!string.IsNullOrEmpty(gibSprite)) {
-			Point centerPos = pos.add(Point.average(sprite.frames[0].POIs));
+			Point centerPos = pos.add(Point.average(sprite.animData.frames[0].POIs));
 			Anim.createGibEffect(gibSprite, centerPos, Global.level.mainPlayer, gibPattern: GibPattern.SemiCircle, randVelStart: 200, randVelEnd: 300);
 		}
 	}

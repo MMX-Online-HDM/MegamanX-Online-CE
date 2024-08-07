@@ -407,7 +407,7 @@ public class RideArmor : Actor, IDamagable {
 			bool isBombDrop = sprite.name.EndsWith("down2");
 			if (raNum == 2) {
 				missileCooldown = 0.75f;
-				for (int i = 0; i < currentFrame.POIs.Count; i++) {
+				for (int i = 0; i < currentFrame.POIs.Length; i++) {
 					Point poi = currentFrame.POIs[i];
 					string poiTag = currentFrame.POITags[i];
 					if (poiTag == "b") {
@@ -438,7 +438,7 @@ public class RideArmor : Actor, IDamagable {
 				}
 			} else if (raNum == 3 && rideArmorState is not RAGroundPound && rideArmorState is not RAGroundPoundStart) {
 				missileCooldown = 1f;
-				for (int i = 0; i < currentFrame.POIs.Count; i++) {
+				for (int i = 0; i < currentFrame.POIs.Length; i++) {
 					Point poi = currentFrame.POIs[i];
 					string poiTag = currentFrame.POITags[i];
 					if (poiTag == "b") {
@@ -780,7 +780,7 @@ public class RideArmor : Actor, IDamagable {
 		Global.level.addEffect(new ExplodeDieEffect(netOwner, centerPos, pos, raName + "_idle", 1, zIndex, false, 15, 0.5f, false));
 		string piecesSpriteName = raName + "_pieces";
 		if (raNum == 4) piecesSpriteName = "goliath_pieces";
-		int frameCount = Global.sprites[piecesSpriteName].frames.Count;
+		int frameCount = Global.sprites[piecesSpriteName].frames.Length;
 		var shrapnelVels = getShrapnelVels(frameCount);
 		bool hasRaColorShader = colorShader != null;
 		for (int i = 0; i < frameCount; i++) {
@@ -907,7 +907,7 @@ public class RideArmor : Actor, IDamagable {
 
 	public Point? getCarryPos() {
 		var cf = sprite.getCurrentFrame();
-		if (cf == null || cf.POIs.Count < 2) return null;
+		if (cf == null || cf.POIs.Length < 2) return null;
 		var offset = cf.POIs[1];
 		offset.x *= xDir;
 		return pos.add(offset);

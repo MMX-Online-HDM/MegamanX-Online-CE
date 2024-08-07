@@ -4,6 +4,9 @@ using System.Linq;
 namespace MMXOnline;
 
 public class ControlPoints : GameMode {
+	Sprite controlPointSprite = new Sprite("hud_cp");
+	Sprite controlPointBarSprite = new Sprite("hud_cp_bar");
+
 	public ControlPoints(Level level, int? timeLimit) : base(level, timeLimit) {
 		isTeamMode = true;
 		playingTo = 100;
@@ -43,11 +46,11 @@ public class ControlPoints : GameMode {
 			}
 
 			int allianceFactor = (controlPoint.alliance == GameMode.redAlliance ? 0 : 2);
-			Global.sprites["hud_cp"].drawToHUD((controlPoint.num - 1) + allianceFactor, 5, 5 + hudcpY);
+			controlPointSprite.drawToHUD((controlPoint.num - 1) + allianceFactor, 5, 5 + hudcpY);
 			float perc = controlPoint.captureTime / controlPoint.maxCaptureTime;
 			int barsFull = MathInt.Round(perc * 16f);
 			for (int i = 0; i < barsFull; i++) {
-				Global.sprites["hud_cp_bar"].drawToHUD(1, 5 + 17 + (i * 2), 5 + 3 + hudcpY);
+				controlPointBarSprite.drawToHUD(1, 5 + 17 + (i * 2), 5 + 3 + hudcpY);
 			}
 
 			Fonts.drawText(textColor, redText, 38, 9 + hudcpY, Alignment.Center);

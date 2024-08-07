@@ -366,7 +366,7 @@ public class StraightNightmareProj : Projectile {
 		maxTime = 2;
 		sprite.visible = false;
 		for (var i = 0; i < maxLen; i++) {
-			var midSprite = Global.sprites["straightnightmare_proj"].clone();
+			var midSprite = new Sprite("straightnightmare_proj");
 			midSprite.visible = false;
 			spriteMids.Add(midSprite);
 		}

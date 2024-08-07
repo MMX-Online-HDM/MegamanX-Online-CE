@@ -1460,7 +1460,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public Point getCharRideArmorPos() {
-		if (rideArmor == null || rideArmor.currentFrame.POIs.Count == 0) {
+		if (rideArmor == null || rideArmor.currentFrame.POIs.Length == 0) {
 			return new Point();
 		}
 		var charPos = rideArmor.currentFrame.POIs[0];
@@ -1469,7 +1469,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public Point getMK5RideArmorPos() {
-		if (rideArmorPlatform == null || rideArmorPlatform.currentFrame.POIs.Count == 0) {
+		if (rideArmorPlatform == null || rideArmorPlatform.currentFrame.POIs.Length == 0) {
 			return new Point();
 		}
 		var charPos = rideArmorPlatform.currentFrame.POIs[0];
@@ -1723,7 +1723,7 @@ public partial class Character : Actor, IDamagable {
 		if (sprite.name.Contains("_ra_")) {
 			float hideY = 0;
 			if (sprite.name.Contains("_ra_hide")) {
-				hideY = 22 * ((float)sprite.frameIndex / sprite.frames.Count);
+				hideY = 22 * ((float)sprite.frameIndex / sprite.totalFrameNum);
 			}
 			yOff = -6 + hideY;
 		} else if (player.isZero) yOff = -20;

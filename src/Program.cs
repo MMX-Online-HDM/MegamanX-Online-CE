@@ -918,9 +918,9 @@ class Program {
 			string name = Path.GetFileNameWithoutExtension(overrideSpritePath);
 			string json = File.ReadAllText(overrideSpritePath);
 
-			Sprite sprite = new Sprite(json, name, null);
+			AnimData sprite = new AnimData(json, name, null);
 			if (Global.sprites.ContainsKey(sprite.name)) {
-				Global.sprites[sprite.name].overrideSprite(sprite);
+				Global.sprites[sprite.name].overrideAnim(sprite);
 			}
 		}
 
@@ -951,6 +951,25 @@ class Program {
 			Global.spriteNameByIndex[i] = arrayBuffer[i];
 			Global.spriteCount++;
 		}
+
+		// Set up special sprites.
+		// Mods that does not use this should remove this thing.
+		Sprite.xArmorBootsBitmap = Global.textures["XBoots"];
+		Sprite.xArmorBodyBitmap = Global.textures["XBody"];
+		Sprite.xArmorHelmetBitmap = Global.textures["XHelmet"];
+		Sprite.xArmorArmBitmap = Global.textures["XArm"];
+
+		Sprite.xArmorBootsBitmap2 = Global.textures["XBoots2"];
+		Sprite.xArmorBodyBitmap2 = Global.textures["XBody2"];
+		Sprite.xArmorHelmetBitmap2 = Global.textures["XHelmet2"];
+		Sprite.xArmorArmBitmap2 = Global.textures["XArm2"];
+
+		Sprite.xArmorBootsBitmap3 = Global.textures["XBoots3"];
+		Sprite.xArmorBodyBitmap3 = Global.textures["XBody3"];
+		Sprite.xArmorHelmetBitmap3 = Global.textures["XHelmet3"];
+		Sprite.xArmorArmBitmap3 = Global.textures["XArm3"];
+
+		Sprite.axlArmBitmap = Global.textures["axlArm"];
 	}
 
 	static string loadSpritesSub(string[] spriteFilePaths) {
@@ -962,7 +981,7 @@ class Program {
 				continue;
 			}
 			fileChecksumDict[name] = json;
-			Sprite sprite = new Sprite(json, name, null);
+			AnimData sprite = new AnimData(json, name, "");
 			lock (Global.sprites) {
 				Global.sprites[sprite.name] = sprite;
 			}

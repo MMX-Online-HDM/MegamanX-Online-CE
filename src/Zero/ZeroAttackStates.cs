@@ -352,7 +352,7 @@ public class AwakenedZeroHadangekiWall : CharState {
 		}
 		if (character.isAnimOver()) {
 			character.changeState(new WallSlide(wallDir, wallCollider));
-			character.sprite.frameIndex = character.sprite.frames.Count - 1;
+			character.sprite.frameIndex = character.sprite.totalFrameNum - 1;
 		}
 	}
 

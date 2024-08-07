@@ -52,7 +52,7 @@ public class SilkShotProj : Projectile {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
 		frameSpeed = 0;
-		frameIndex = Helpers.randomRange(0, sprite.frames.Count - 1);
+		frameIndex = Helpers.randomRange(0, sprite.totalFrameNum - 1);
 
 	}
 

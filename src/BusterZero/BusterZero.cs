@@ -56,7 +56,7 @@ public class BusterZero : Character {
 				shootAnimTime = 0;
 				changeSpriteFromName(charState.defaultSprite, false);
 				if (charState is WallSlide) {
-					frameIndex = sprite.frames.Count - 1;
+					frameIndex = sprite.totalFrameNum - 1;
 				}
 			}
 		}

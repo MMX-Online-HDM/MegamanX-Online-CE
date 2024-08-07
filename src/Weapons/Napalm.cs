@@ -145,7 +145,7 @@ public class NapalmPartProj : Projectile {
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 		gravityModifier = 0.25f;
-		frameIndex = Helpers.randomRange(0, sprite.frames.Count - 1);
+		frameIndex = Helpers.randomRange(0, sprite.totalFrameNum - 1);
 		if (isTimeOffset) {
 			timeOffset = napalmPeriod * 0.5f;
 		}

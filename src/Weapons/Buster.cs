@@ -333,7 +333,7 @@ public class Buster3Proj : Projectile {
 			changeSprite("buster4_x2", true);
 			fadeSprite = "buster4_x2_fade";
 			for (int i = 0; i < 6; i++) {
-				var midSprite = Global.sprites["buster4_x2_orbit"].clone();
+				var midSprite = new Sprite("buster4_x2_orbit");
 				spriteMids.Add(midSprite);
 			}
 			projId = (int)ProjIds.Buster4;

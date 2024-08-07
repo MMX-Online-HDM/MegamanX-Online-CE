@@ -369,7 +369,7 @@ public class WheelGSpitState : MaverickState {
 
 		if (maverick.isAnimOver()) {
 			if (damageEaten > 0) {
-				maverick.frameIndex = maverick.sprite.frames.Count - 2;
+				maverick.frameIndex = maverick.sprite.totalFrameNum - 2;
 				shotOnce = false;
 			} else {
 				maverick.changeToIdleOrFall();

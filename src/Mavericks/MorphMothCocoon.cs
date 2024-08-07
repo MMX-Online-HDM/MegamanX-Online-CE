@@ -324,7 +324,7 @@ public class MorphMCScrapProj : Projectile {
 		this.mmCocoon = mmCocoon;
 		destroyOnHit = true;
 
-		frameIndex = Helpers.randomRange(0, sprite.frames.Count - 1);
+		frameIndex = Helpers.randomRange(0, sprite.totalFrameNum - 1);
 		frameSpeed = 0;
 		useGravity = !isSuck;
 		healAmount = 1;

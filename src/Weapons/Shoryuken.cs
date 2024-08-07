@@ -37,7 +37,7 @@ public class Shoryuken : CharState {
 			character.vel.y = -character.getJumpPower() * 4.75f;
 			character.playSound("shoryukenV", sendRpc: true);
 		}
-		if (character.sprite.frameIndex == 2 && character.currentFrame.POIs.Count > 0) {
+		if (character.sprite.frameIndex == 2 && character.currentFrame.POIs.Length > 0) {
 			character.move(new Point(character.xDir * 165, 0));
 			Point poi = character.currentFrame.POIs[0];
 			Point firePos = character.pos.addxy(poi.x * character.xDir, poi.y);

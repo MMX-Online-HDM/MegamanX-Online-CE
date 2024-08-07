@@ -50,7 +50,7 @@ public class SuiretsusanState : CharState {
 		}
 
 		var pois = character.sprite.getCurrentFrame().POIs;
-		if (pois != null && pois.Count > 0 && !once) {
+		if (pois != null && pois.Length > 0 && !once) {
 			once = true;
 			new SuiretsusenProj(
 				character.getFirstPOIOrDefault(),
@@ -116,7 +116,7 @@ public class TBreakerState : CharState {
 		}
 
 		var pois = character.sprite.getCurrentFrame().POIs;
-		if (pois != null && pois.Count > 0 && !once) {
+		if (pois != null && pois.Length > 0 && !once) {
 			once = true;
 			Point poi = character.getFirstPOIOrDefault();
 			var rect = new Rect(poi.x - 10, poi.y - 5, poi.x + 10, poi.y + 5);
