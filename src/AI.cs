@@ -249,7 +249,6 @@ public class AI {
 				player.character?.addHealth(player.maxHealth - currentMaxHp);
 			}
 		}
-		return;
 		if (framesChargeHeld > 0 && character is MegamanX) {
 			if (character.chargeTime < maxChargeTime) {
 				//console.log("HOLD");
@@ -453,7 +452,7 @@ public class AI {
 
 		//The AI should dodge if a projectile is close to him
 		
-		if (false && aiState.shouldDodge && target != null && shootTime == 0) {
+		if (aiState.shouldDodge && target != null && shootTime == 0) {
 			if (character is Zero zero3) {
 				zeroAIDodge(zero3);
 			}
