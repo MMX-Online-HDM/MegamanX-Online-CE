@@ -395,8 +395,8 @@ public partial class Level {
 	// Checks for collisions and returns the first one collided.
 	// A collision requires at least one of the colliders not to be a trigger.
 	// The vel parameter ensures we return normals that make sense, that are against the direction of vel.
-	public CollideData checkCollisionActor(
-		Actor actor, float incX, float incY, Point? vel = null, bool autoVel = false, bool checkPlatforms = false
+	public CollideData? checkCollisionActor(
+		Actor? actor, float incX, float incY, Point? vel = null, bool autoVel = false, bool checkPlatforms = false
 	) {
 		return checkCollisionsActor(
 			actor, incX, incY, vel, autoVel, returnOne: true, checkPlatforms: checkPlatforms
