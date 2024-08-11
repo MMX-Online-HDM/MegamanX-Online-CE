@@ -47,7 +47,7 @@ public partial class MegamanX : Character {
 	public float rechargeHealthTime;
 	public float scannerCooldown;
 	float UPDamageCooldown;
-	public float unpoDamageMaxCooldown = 125f/60f;
+	public float unpoDamageMaxCooldown = 2;
 	float unpoTime;
 
 	public int cStingPaletteIndex;
