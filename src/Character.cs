@@ -1620,6 +1620,7 @@ public partial class Character : Actor, IDamagable {
 	// and should be set only by code that is checking to see if such things can be done.
 	public virtual bool isInvulnerable(bool ignoreRideArmorHide = false, bool factorHyperMode = false) {
 		if (isWarpIn()) return true;
+		if (invulnTime > 0) return true;
 		if (!ignoreRideArmorHide && charState is InRideArmor && (charState as InRideArmor)?.isHiding == true) {
 			return true;
 		}
