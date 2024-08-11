@@ -322,6 +322,7 @@ public class Vile : Character {
 		} */
 
 		if (isInvulnerableAttack()) return;
+		if (invulnTime > 0) return;
 		if (!player.canControl) return;
 
 		// GMTODO: Consider a better way here instead of a hard-coded deny list

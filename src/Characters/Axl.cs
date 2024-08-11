@@ -1679,6 +1679,7 @@ public class Axl : Character {
 
 	public override bool canShoot() {
 		if (sniperMissileProj != null) { return false; }
+		if (invulnTime > 0) return false;
 		return base.canShoot();
 	}
 

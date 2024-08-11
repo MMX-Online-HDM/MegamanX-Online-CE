@@ -47,7 +47,7 @@ public partial class MegamanX : Character {
 	public float rechargeHealthTime;
 	public float scannerCooldown;
 	float UPDamageCooldown;
-	public float unpoDamageMaxCooldown = 2;
+	public float unpoDamageMaxCooldown = 125f/60f;
 	float unpoTime;
 
 	public int cStingPaletteIndex;
@@ -1150,6 +1150,7 @@ public partial class MegamanX : Character {
 		if (isShootingRaySplasher) return false;
 		if (chargedFrostShield != null) return false;
 		if (chargedTunnelFang != null) return false;
+		if (invulnTime > 0) return false;
 
 		return base.canShoot();
 	}
@@ -1490,7 +1491,7 @@ public partial class MegamanX : Character {
 	}
 
 	public bool shouldShowHyperBusterCharge() {
-		return flag != null && player.weapon is HyperBuster hb && hb.canShootIncludeCooldown(player);
+		return player.weapon is HyperBuster hb && hb.canShootIncludeCooldown(player) || flag != null;
 	}
 
 	public override bool isInvulnerable(bool ignoreRideArmorHide = false, bool factorHyperMode = false) {
