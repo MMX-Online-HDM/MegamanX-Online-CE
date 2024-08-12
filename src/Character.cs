@@ -1534,8 +1534,7 @@ public partial class Character : Actor, IDamagable {
 			charState.stunResistant ||
 			(charState is Die or VileMK2Grabbed) ||
 			(this as MegamanX)?.chargedRollingShieldProj != null ||
-		 	stunInvulnTime > 0 || grabInvulnTime > 0
-			// GM19 Intended balance: You cannot be stunned after getting MK2 Grabbed
+		 	stunInvulnTime > 0
 		) {
 			return;
 		}
