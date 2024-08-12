@@ -195,16 +195,16 @@ public class AI {
 				return;
 			}
 			if (trainingBehavior == AITrainingBehavior.Guard) {
-				player.press(Control.WeaponLeft);
+				if (character is BaseSigma) {
+					player.press(Control.Down);
+				}
+				else if (character is Zero) {
+					player.press(Control.WeaponLeft);
+				}
 				return;
 			}
 			if (trainingBehavior == AITrainingBehavior.Crouch) {
-				if (player.isSigma) {
-					character?.changeState(new SigmaBlock(), true);
-					player.press(Control.Down);
-				} else {
-					player.press(Control.Down);
-				}
+				player.press(Control.Down);
 				return;
 			}
 		}

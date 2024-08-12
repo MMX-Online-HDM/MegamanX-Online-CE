@@ -1501,7 +1501,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public void freeze(int timeToFreeze = 120) {
-		if (!ownedByLocalPlayer || !canFreeze()) {
+		if (!ownedByLocalPlayer) {
 			return;
 		}
 		frozenMaxTime = timeToFreeze;
@@ -1517,7 +1517,7 @@ public partial class Character : Actor, IDamagable {
 			(this as MegamanX)?.chargedRollingShieldProj == null &&
 			!charState.stunResistant &&
 			!charState.invincible &&
-			invulnTime < 0 &&
+			invulnTime == 0 &&
 			freezeInvulnTime <= 0 &&
 			!isInvulnerable() &&
 			!isVaccinated() &&
