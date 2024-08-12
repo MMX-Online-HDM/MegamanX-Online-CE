@@ -3132,7 +3132,7 @@ public partial class Character : Actor, IDamagable {
 	// PARASITE SECTION
 	public void addParasite(Player attacker) {
 		if (!ownedByLocalPlayer) return;
-
+		if (this is Character character && (character.charState.invincible || character.isInvulnerable())) return;
 		Damager damager = new Damager(attacker, 4, Global.defFlinch, 0);
 		parasiteTime = Global.spf;
 		parasiteDamager = damager;
