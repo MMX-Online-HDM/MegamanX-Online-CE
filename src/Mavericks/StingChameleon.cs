@@ -61,7 +61,7 @@ public class StingChameleon : Maverick {
 				drainAmmo(4);
 				if (ammo <= 0) {
 					uncloakTransitionTime = 1;
-					playSound("stingcCloak", sendRpc: true);
+					playSound("76stingcCloak", sendRpc: true);
 				}
 			} else {
 				rechargeAmmo(1);

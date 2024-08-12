@@ -671,6 +671,7 @@ public class SwordBlock : CharState {
 		exitOnAirborne = true;
 		attackCtrl = true;
 		normalCtrl = true;
+		stunResistant = true;
 	}
 
 	public override void update() {
