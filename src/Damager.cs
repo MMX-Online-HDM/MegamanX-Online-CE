@@ -439,20 +439,20 @@ public class Damager {
 					character.addIgFreezeProgress(3);
 					break;
 				case (int)ProjIds.Hyouretsuzan2:
-					character.addIgFreezeProgress(4, 2 * 60);
+					character.addIgFreezeProgress(4, 240);
 					flinch = 0;
 					break;
 				case (int)ProjIds.VelGIce:
 					character.addIgFreezeProgress(2, 2 * 60);
 					break;
 				case (int)ProjIds.BBuffaloBeam:
-					character.addIgFreezeProgress(4, 2 * 60);
+					character.addIgFreezeProgress(4, 240);
 					break;
 				case (int)ProjIds.ShotgunIceCharged:
 					character.addIgFreezeProgress(4, 5 * 60);
 					break;
 				case (int)ProjIds.ChillPIceBlow:
-					character.addIgFreezeProgress(4, 2 * 60);
+					character.addIgFreezeProgress(4, 240);
 					break;
 				case (int)ProjIds.HyorogaProj:
 					character.addIgFreezeProgress(1.5f);

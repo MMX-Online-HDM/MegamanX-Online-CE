@@ -1513,14 +1513,15 @@ public partial class Character : Actor, IDamagable {
 
 	public bool canFreeze() {
 		return (
-			isInvulnerable() ||
-			isVaccinated() ||
-			isCCImmune() ||
-			charState.invincible ||
-			//!charState.stunResistant || works fine like this
-			!(charState is Die or SigmaBlock or SwordBlock) ||
-			(this as MegamanX)?.chargedRollingShieldProj != null ||
-		 	freezeInvulnTime > 0
+			charState is not Die &&
+			(this as MegamanX)?.chargedRollingShieldProj == null &&
+			!charState.stunResistant &&
+			!charState.invincible &&
+			invulnTime < 0 &&
+			freezeInvulnTime <= 0 &&
+			!isInvulnerable() &&
+			!isVaccinated() &&
+			!isCCImmune()
 		);
 	}
 
