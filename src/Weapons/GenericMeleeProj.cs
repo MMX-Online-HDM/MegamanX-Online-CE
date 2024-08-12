@@ -31,7 +31,10 @@ public class GenericMeleeProj : Projectile {
 		base.update();
 	}
 
-	public void charGrabCode(CommandGrabScenario scenario, Character? grabber, IDamagable? damagable, CharState grabState, CharState grabbedState) {
+	public void charGrabCode(
+		CommandGrabScenario scenario, Character? grabber,
+		IDamagable? damagable, CharState grabState, CharState grabbedState
+	) {
 		if (grabber != null && damagable is Character grabbedChar && grabbedChar.canBeGrabbed()) {
 			if (!owner.isDefenderFavored) {
 				if (ownedByLocalPlayer && !Helpers.isOfClass(grabber.charState, grabState.GetType())) {
@@ -43,7 +46,9 @@ public class GenericMeleeProj : Projectile {
 					}
 				}
 			} else {
-				if (grabbedChar.ownedByLocalPlayer && !Helpers.isOfClass(grabbedChar.charState, grabbedState.GetType())) {
+				if (grabbedChar.ownedByLocalPlayer &&
+					!Helpers.isOfClass(grabbedChar.charState, grabbedState.GetType())
+				) {
 					grabbedChar.changeState(grabbedState);
 					if (Helpers.isOfClass(grabbedChar.charState, grabbedState.GetType())) {
 						RPC.commandGrabPlayer.sendRpc(grabber.netId, grabbedChar.netId, scenario, true);

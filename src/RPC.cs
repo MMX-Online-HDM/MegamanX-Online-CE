@@ -1693,7 +1693,9 @@ public class RPCCommandGrabPlayer : RPC {
 		if (!victimChar.canBeGrabbed()) return;
 
 		if (!isDefenderFavored) {
-			if (victimChar.ownedByLocalPlayer && !Helpers.isOfClass(victimChar.charState, grabbedState.GetType())) {
+			if (victimChar.ownedByLocalPlayer &&
+				!Helpers.isOfClass(victimChar.charState, grabbedState.GetType())
+			) {
 				victimChar.changeState(grabbedState, true);
 			}
 		} else {
