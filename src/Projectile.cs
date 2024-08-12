@@ -387,7 +387,9 @@ public class Projectile : Actor {
 
 					owner.character.changeState(new ZeroClang(-owner.character.xDir), true);
 					owner.character.playSound("m10ding", sendRpc: true);
-					owner.character.addDamageText("Clang!", 3);
+					if (Helpers.randomRange(0, 10) == 5) {
+						otherProj.owner.character.addDamageText("Clang!", 3);
+					}
 
 					if (other.hitData.hitPoint != null) {
 						new Anim(other.hitData.hitPoint.Value, "buster4_x3_muzzle", 1, owner.getNextActorNetId(), true, sendRpc: true);
