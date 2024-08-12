@@ -2661,10 +2661,11 @@ public partial class Character : Actor, IDamagable {
 		if (damage > 0 && charState is DarkHoldState dhs && dhs.stateFrames > 10 && !Damager.isDot(projId)) {
 			changeToIdleOrFall();
 		}
-
+		//this made Axl immortal to pits, suicide button, etc
+		/*
 		if (attacker == player && axl?.isWhiteAxl() == true) {
 			damage = 0;
-		}
+		} */
 		if (Global.level.isRace() &&
 			damage != (decimal)Damager.envKillDamage &&
 			damage != (decimal)Damager.switchKillDamage &&
