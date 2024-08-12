@@ -189,7 +189,8 @@ public class GenericStun : CharState {
 		if (paralyzeAnim == null && character.paralyzedTime > 0) {
 			paralyzeAnim = new Anim(
 				character.getCenterPos(), "vile_stun_static",
-				1, character.player.getNextActorNetId(), false, sendRpc: true
+				1, character.player.getNextActorNetId(), false,
+				host: character, sendRpc: true
 			);
 			paralyzeAnim.setzIndex(character.zIndex + 100);
 		}

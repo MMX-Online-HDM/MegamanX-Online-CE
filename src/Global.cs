@@ -38,6 +38,9 @@ public partial class Global {
 
 	public static string prodChecksum = checksumPrefix + " " + assetChecksum;
 
+	// Gemplay variables.
+	public static readonly bool canFlinchCombo = false;
+
 	// Some terminology related stuff.
 	public static string nameCoin = "Metal";
 	public static string nameCoins = "Metals";

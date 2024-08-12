@@ -531,7 +531,6 @@ public class Damager {
 			if (projectileFlinchCooldowns.ContainsKey(projId)) {
 				flinchCooldown = projectileFlinchCooldowns[projId];
 			}
-
 			if (mmx != null) {
 				if (mmx.checkMaverickWeakness((ProjIds)projId)) {
 					weakness = true;
@@ -560,6 +559,19 @@ public class Damager {
 					flinch = Global.defFlinch;
 				}
 				damage = MathF.Ceiling(damage * 1.5f);
+			}
+			// Disallow flinch stack for non-BZ.
+			else if (!Global.canFlinchCombo) {
+				if (character != null && character.charState is Hurt hurtState &&
+					hurtState.stateFrames < hurtState.flinchTime - 4
+				) {
+					flinchCooldown = 0;
+				}
+				if (maverick != null && maverick.state is MHurt mHurtState &&
+					mHurtState.stateFrame < mHurtState.flinchTime - 4
+				) {
+					flinchCooldown = 0;
+				}
 			}
 
 			if (flinchCooldown > 0) {
