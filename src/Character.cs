@@ -380,6 +380,7 @@ public partial class Character : Actor, IDamagable {
 		if (isCCImmune()) return;
 		if (isInvulnerable()) return;
 		if (isVaccinated()) return;
+		if (charState.invincible) return;
 
 		igFreezeProgress += amount;
 		igFreezeRecoveryCooldown = 0;
@@ -1512,27 +1513,28 @@ public partial class Character : Actor, IDamagable {
 
 	public bool canFreeze() {
 		return (
-			charState is not Die &&
-			(this as MegamanX)?.chargedRollingShieldProj == null &&
-			!charState.stunResistant &&
-			!charState.invincible &&
-			freezeInvulnTime <= 0 &&
-			!isInvulnerable() &&
-			!isVaccinated() &&
-			!isCCImmune()
+			isInvulnerable() ||
+			isVaccinated() ||
+			isCCImmune() ||
+			charState.invincible ||
+			//!charState.stunResistant || works fine like this
+			!(charState is Die or SigmaBlock or SwordBlock) ||
+			(this as MegamanX)?.chargedRollingShieldProj != null ||
+		 	freezeInvulnTime > 0
 		);
 	}
 
 	public void paralize(float timeToParalize = 120) {
 		if (!ownedByLocalPlayer ||
-			charState is Die ||
-			(this as MegamanX)?.chargedRollingShieldProj != null ||
-			charState.stunResistant ||
-			stunInvulnTime > 0 ||
-			isInvulnerable() &&
+			isInvulnerable() ||
 			isVaccinated() ||
-			isCCImmune() || 
-			charState.invincible
+			isCCImmune() ||
+			charState.invincible ||
+			charState.stunResistant ||
+			(charState is Die or VileMK2Grabbed) ||
+			(this as MegamanX)?.chargedRollingShieldProj != null ||
+		 	stunInvulnTime > 0 || grabInvulnTime > 0
+			// GM19 Intended balance: You cannot be stunned after getting MK2 Grabbed
 		) {
 			return;
 		}
@@ -1545,15 +1547,15 @@ public partial class Character : Actor, IDamagable {
 
 	public void crystalize(float timeToCrystalize = 120) {
 		if (!ownedByLocalPlayer ||
-			charState is Die ||
-			(this as MegamanX)?.chargedRollingShieldProj != null ||
-			charState.stunResistant ||
-			isCrystalized ||
-			crystalizeInvulnTime > 0 ||
 			isInvulnerable() ||
 			isVaccinated() ||
-			isCCImmune() || 
-			charState.invincible
+			isCCImmune() ||
+			charState.invincible ||
+			charState.stunResistant ||
+			isCrystalized ||
+			(charState is Die) ||
+			(this as MegamanX)?.chargedRollingShieldProj != null ||
+			crystalizeInvulnTime > 0
 		) {
 			return;
 		}
