@@ -21,6 +21,10 @@ public class BubbleSplash : Weapon {
 		maxStreams = 7;
 		streamCooldown = 1;
 		switchCooldown = 0.25f;
+		damage = "1/1";
+		ammousage = 0.5;
+		//effect = "Shoot a Stream up to 7 bubbles. C:Jump Boost.";
+		effect = "Charged: Grants Jump Boost.";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {

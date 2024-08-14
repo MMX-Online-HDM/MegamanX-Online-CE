@@ -17,6 +17,9 @@ public class RaySplasher : Weapon {
 		weaponSlotIndex = 21;
 		killFeedIndex = 44;
 		weaknessIndex = (int)WeaponIds.SpinningBlade;
+		damage = "1/1";
+		effect = "Charged: Grants Super Armor.";
+		hitcooldown = "0.075";
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {

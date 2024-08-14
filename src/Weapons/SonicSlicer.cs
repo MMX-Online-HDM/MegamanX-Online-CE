@@ -13,6 +13,10 @@ public class SonicSlicer : Weapon {
 		weaponSlotIndex = 13;
 		killFeedIndex = 24;
 		weaknessIndex = 9;
+		damage = "2/4";
+		effect = "Bounces on Wall. Breaks W.Sponge Shield.";
+		hitcooldown = "0/0.25";
+		Flinch = "0/26";
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {

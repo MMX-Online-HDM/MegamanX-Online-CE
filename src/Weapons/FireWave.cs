@@ -17,6 +17,10 @@ public class FireWave : Weapon {
 		rateOfFire = 0.06f;
 		isStream = true;
 		switchCooldown = 0.25f;
+		damage = "1/1";
+		ammousage = 0.5;
+		effect = "Inflicts burn to enemies. DOT: 0.5/2 seconds.";
+		hitcooldown = "0.2/0.33";
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {

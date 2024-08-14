@@ -15,6 +15,11 @@ public class SpinningBlade : Weapon {
 		weaponSlotIndex = 20;
 		killFeedIndex = 43;
 		weaknessIndex = (int)WeaponIds.TriadThunder;
+		damage = "2/2";
+		effect = "Goes back after some time on screen.";
+		hitcooldown = "0/0.5";
+		Flinch = "0/26";
+		FlinchCD = "0/1";
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {

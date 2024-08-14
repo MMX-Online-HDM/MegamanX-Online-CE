@@ -12,6 +12,9 @@ public class Sting : Weapon {
 		weaknessIndex = 7;
 		shootSounds = new string[] { "csting", "csting", "csting", "stingCharge" };
 		rateOfFire = 0.75f;
+		damage = "2";
+		effect = "Full Charge grants invulnerability.";
+		hitcooldown = "0/0";
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {

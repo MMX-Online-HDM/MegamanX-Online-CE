@@ -13,6 +13,9 @@ public class FrostShield : Weapon {
 		weaponSlotIndex = 23;
 		killFeedIndex = 46;
 		weaknessIndex = (int)WeaponIds.ParasiticBomb;
+		damage = "2+2/3+3";
+		hitcooldown = "0-0.5/1";
+		Flinch = "0/26-26";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {

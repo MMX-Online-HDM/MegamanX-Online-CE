@@ -14,6 +14,11 @@ public class Tornado : Weapon {
 		shootSounds = new string[] { "tornado", "tornado", "tornado", "buster3" };
 		rateOfFire = 2f;
 		switchCooldown = 0.5f;
+		damage = "1/4";
+		effect = "Weak push. Extinguishes Fire. Ignores Shields.";
+		hitcooldown = "0.25/0.33";
+		Flinch = "0/26";
+		FlinchCD = "0/1";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {

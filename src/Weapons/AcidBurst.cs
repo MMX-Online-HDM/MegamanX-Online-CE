@@ -13,6 +13,8 @@ public class AcidBurst : Weapon {
 		weaponSlotIndex = 17;
 		killFeedIndex = 40;
 		weaknessIndex = (int)WeaponIds.FrostShield;
+		damage = "1/1";
+		effect = "DOT: 2+1/3+1. Reduces Enemy Defense.";
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {

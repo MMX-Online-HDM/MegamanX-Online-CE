@@ -16,6 +16,10 @@ public class CrystalHunter : Weapon {
 		killFeedIndex = 20;
 		weaknessIndex = 15;
 		switchCooldown = 0.5f;
+		damage = "0-3/0";
+		effect = "Crystalize enemies. C: Slows down the area.";
+		hitcooldown = "0-1/0";
+		Flinch = "0-26/0";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {

@@ -316,36 +316,65 @@ public class SelectWeaponMenu : IMainMenu {
 			int weakAgainstIndex = weapon.weaknessIndex;
 			int[] strongAgainstMaverickIndices = getStrongAgainstMaverickFrameIndex(wi);
 			int weakAgainstMaverickIndex = getWeakAgainstMaverickFrameIndex(wi);
+			string damage = weapon.damage;
+			string rateOfFire = weapon.rateOfFire.ToString();
+			string ammousage = weapon.ammousage.ToString();
+			string effect = weapon.effect;
+			string hitcooldown = weapon.hitcooldown;
+			string Flinch = weapon.Flinch;
+			string FlinchCD = weapon.FlinchCD;
+
 
 			Fonts.drawText(
-				FontType.Purple, "Slot " + (selCursorIndex + 1).ToString() + " weapon",
-				Global.halfScreenW, 126, Alignment.Center
+				FontType.Purple, "Slot " + (selCursorIndex + 1).ToString() + " Weapon :",
+				Global.halfScreenW, 126, Alignment.Right
 			);
 			Fonts.drawText(
 				FontType.Orange, weaponNames[selectedWeaponIndices[selCursorIndex]],
-				Global.halfScreenW, 146, Alignment.Center
+				Global.halfScreenW + 10, 126, Alignment.Left
 			);
 			//Global.sprites["hud_weapon_icon"].drawToHUD(weapon.weaponSlotIndex, Global.halfScreenW + 75, 148);
-			Fonts.drawText(FontType.Green, "Strong against: ", 200, wsy + 2, Alignment.Right);
+			Fonts.drawText(FontType.Green, "Counters: ", 86, wsy - 17, Alignment.Right);
 			if (strongAgainstIndex > 0) {
-				Global.sprites["hud_weapon_icon"].drawToHUD(strongAgainstIndex, 210, wsy + 5);
+				Global.sprites["hud_weapon_icon"].drawToHUD(strongAgainstIndex, 89, wsy - 13);
 			} else {
-				Fonts.drawText(FontType.Grey, "Nothing", 202, wsy + 2);
+				Fonts.drawText(FontType.Grey, "None", 86, wsy - 17);
 			}
 			if (strongAgainstMaverickIndices.Length > 0 && strongAgainstMaverickIndices[0] > 0) {
-				Global.sprites["hud_weapon_icon"].drawToHUD(strongAgainstMaverickIndices[0], 228, wsy + 5);
+				Global.sprites["hud_weapon_icon"].drawToHUD(strongAgainstMaverickIndices[0], 107, wsy - 13);
 			}
 			if (strongAgainstMaverickIndices.Length > 1 && strongAgainstMaverickIndices[1] > 0) {
-				Global.sprites["hud_weapon_icon"].drawToHUD(strongAgainstMaverickIndices[1], 246, wsy + 5);
+				Global.sprites["hud_weapon_icon"].drawToHUD(strongAgainstMaverickIndices[1], 118, wsy - 13);
 			}
-			Fonts.drawText(FontType.Green, "Weak against: ", 200, wsy + 17, Alignment.Right);
+			Fonts.drawText(FontType.Green, "Weakness: ", 86, wsy, Alignment.Right);
 			if (weakAgainstIndex > 0) {
-				Global.sprites["hud_weapon_icon"].drawToHUD(weakAgainstIndex, 210, wsy + 20);
+				Global.sprites["hud_weapon_icon"].drawToHUD(weakAgainstIndex, 89, wsy + 4);
 			} else {
-				Fonts.drawText(FontType.Grey, "Nothing", 202, wsy + 17);
+				Fonts.drawText(FontType.Grey, "None", 86, wsy);
 			}
 			if (weakAgainstMaverickIndex > 0) {
-				Global.sprites["hud_weapon_icon"].drawToHUD(weakAgainstMaverickIndex, 228, wsy + 20);
+				Global.sprites["hud_weapon_icon"].drawToHUD(weakAgainstMaverickIndex, 107, wsy + 4);
+			}
+			Fonts.drawText(FontType.Red, "Damage:", 128, wsy - 17);
+			Fonts.drawText(FontType.Red, "Ammo Usage:", 128, wsy - 5);
+			Fonts.drawText(FontType.Red, "Fire Rate:", 127, wsy + 7);
+			Fonts.drawText(FontType.RedishOrange, "Hit CD:", 232, wsy - 17);
+			Fonts.drawText(FontType.RedishOrange, "Flinch CD:", 231, wsy + 7);
+			Fonts.drawText(FontType.RedishOrange, "Flinch:", 231, wsy - 5);
+			Fonts.drawText(FontType.DarkPurple, "Effects:", 25, wsy + 20);
+			Fonts.drawText(FontType.Red, damage, 172, wsy - 17);
+			Fonts.drawText(FontType.Red, rateOfFire, 190, wsy + 7);
+			Fonts.drawText(FontType.Red, ammousage, 200, wsy - 5);
+			Fonts.drawText(FontType.RedishOrange, hitcooldown, 279, wsy -17);
+			Fonts.drawText(FontType.RedishOrange, Flinch, 274, wsy + -5);
+			Fonts.drawText(FontType.RedishOrange, FlinchCD, 297, wsy +7);
+			Fonts.drawText(FontType.DarkPurple, effect, 74, wsy + 20);
+			if (weapon is FrostShield) {
+				if (Global.frameCount % 600 < 120) {
+					effect = "Missile,Mine,Shield,'Unbreakable' you name it."; } 
+				else { effect = "Blocks, Leaves Spikes. C:Tackle or Shoot it.";}	
+				Fonts.drawText(FontType.DarkPurple, 
+				effect, 74, wsy + 20);
 			}
 		}
 

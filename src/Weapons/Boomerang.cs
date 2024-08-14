@@ -15,6 +15,10 @@ public class Boomerang : Weapon {
 		weaknessIndex = 1;
 		shootSounds = new string[] { "boomerang", "boomerang", "boomerang", "buster3" };
 		rateOfFire = 0.5f;
+		damage = "2/2";
+		effect = "Charged: Doesn't destroy on hit.";
+		hitcooldown = "0/0.5";
+		Flinch = "0/26";
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {

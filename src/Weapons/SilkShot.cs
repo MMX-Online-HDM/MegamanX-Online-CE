@@ -15,6 +15,9 @@ public class SilkShot : Weapon {
 		weaponSlotIndex = 11;
 		killFeedIndex = 20 + (index - 9);
 		weaknessIndex = 16;
+		damage = "2+1/4+1";
+		effect = "Capable to heal allies, rewards scraps too.";
+		Flinch = "0/26";
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {

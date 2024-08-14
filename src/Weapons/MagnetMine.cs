@@ -15,6 +15,11 @@ public class MagnetMine : Weapon {
 		weaponSlotIndex = 15;
 		killFeedIndex = 20 + (index - 9);
 		weaknessIndex = 11;
+		effect = "C: Can absorb projectiles and grow it's size.";
+		hitcooldown = "0/0.2";
+		damage = "2,4/1,2,4";
+		Flinch = "0/26";
+		FlinchCD = "0/1";
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {

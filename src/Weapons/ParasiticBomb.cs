@@ -16,6 +16,11 @@ public class ParasiticBomb : Weapon {
 		weaponSlotIndex = 18;
 		killFeedIndex = 41;
 		weaknessIndex = (int)WeaponIds.GravityWell;
+		damage = "4/4";
+		effect = "Inflicts Wince. Can carry enemies. Homing bees.";
+		hitcooldown = "0/0.5";
+		Flinch = "26-CarryT/26";
+		FlinchCD = "iwish";
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {

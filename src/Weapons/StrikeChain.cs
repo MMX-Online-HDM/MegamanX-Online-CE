@@ -15,6 +15,11 @@ public class StrikeChain : Weapon {
 		killFeedIndex = 20 + (index - 9);
 		weaknessIndex = 13;
 		switchCooldown = 0;
+		damage = "2/4";
+		effect = "Hooks enemies and items. Be Spider-Man.";
+		hitcooldown = "0.5";
+		Flinch = "Hooked Time";
+		FlinchCD = "0";
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {

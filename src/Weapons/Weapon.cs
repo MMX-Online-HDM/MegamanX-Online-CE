@@ -55,11 +55,24 @@ public class Weapon {
 	public bool drawAmmo = true;
 	public bool drawRoundedDown = false;
 	public bool drawGrayOnLowAmmo = false;
+	public string damage = "";
+	public string hitcooldown= "";
+	public double ammousage;
+	public string effect = "";
+	public string Flinch = "";
+	public string FlinchCD = "";
+	public int wsy = 162;
 
 	public Weapon() {
 		ammo = 32;
 		maxAmmo = 32;
 		rateOfFire = 0.15f;
+		effect = "";
+		damage = "0/0";
+		hitcooldown = "0/0";
+		Flinch = "0/0";
+		FlinchCD = "0/0";
+		ammousage = getAmmoUsage(0);
 	}
 
 	public Weapon(WeaponIds index, int killFeedIndex, Damager? damager = null) {

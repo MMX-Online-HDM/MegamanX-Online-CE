@@ -13,6 +13,10 @@ public class SpinWheel : Weapon {
 		weaponSlotIndex = 12;
 		killFeedIndex = 20 + (index - 9);
 		weaknessIndex = 14;
+		damage = "1/1";
+		effect = "Inflicts Wince. Doesn't destroy on hit.";
+		hitcooldown = "0.2/0";
+		Flinch = "0/26";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {

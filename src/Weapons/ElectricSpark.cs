@@ -12,6 +12,11 @@ public class ElectricSpark : Weapon {
 		weaknessIndex = 8;
 		shootSounds = new string[] { "electricSpark", "electricSpark", "electricSpark", "electricSpark" };
 		rateOfFire = 0.5f;
+		damage = "2/4";
+		effect =  "Can Split. Charged: Doesn't destroy on hit.";
+		hitcooldown = "0/0.5";
+		Flinch = "6/26";
+		FlinchCD = "1/0";
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {

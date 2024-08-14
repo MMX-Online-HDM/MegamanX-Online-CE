@@ -12,6 +12,9 @@ public class RollingShield : Weapon {
 		weaknessIndex = 6;
 		shootSounds = new string[] { "rollingShield", "rollingShield", "rollingShield", "" };
 		rateOfFire = 0.75f;
+		damage = "2/1";
+		effect = "Mobile Shield That Deletes Projectiles.";
+		hitcooldown = "0/0.33";	
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {

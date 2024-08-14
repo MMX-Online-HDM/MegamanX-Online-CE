@@ -5,7 +5,7 @@ namespace MMXOnline;
 
 public class TunnelFang : Weapon {
 	public TunnelFang() : base() {
-		shootSounds = new string[] { "buster", "buster", "buster", "tunnelFang" };
+		shootSounds = new string[] { "busterX3", "busterX3", "busterX3", "tunnelFang" };
 		rateOfFire = 1;
 		index = (int)WeaponIds.TunnelFang;
 		weaponBarBaseIndex = 24;
@@ -13,6 +13,11 @@ public class TunnelFang : Weapon {
 		weaponSlotIndex = 24;
 		killFeedIndex = 47;
 		weaknessIndex = (int)WeaponIds.AcidBurst;
+		damage = "1/1";
+		effect = "Inflicts Wince. Doesn't destroy on hit.";
+		hitcooldown = "0.25/0.125";
+		Flinch = "0/26";
+		FlinchCD = "0/1";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
