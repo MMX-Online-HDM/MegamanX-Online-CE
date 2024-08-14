@@ -1,9 +1,11 @@
-﻿namespace MMXOnline;
+﻿using System;
+
+namespace MMXOnline;
 
 public class DrDoppler : Maverick {
 	public static Weapon getWeapon() { return new Weapon(WeaponIds.DrDoppler, 159); }
 
-	public Weapon meleeWeapon;
+	public Weapon? meleeWeapon;
 	public int ballType;
 	public DrDoppler(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
 		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
@@ -14,8 +16,8 @@ public class DrDoppler : Maverick {
 		weapon = getWeapon();
 		canClimbWall = true;
 		canClimb = true;
-		//spriteFrameToSounds["drdoppler_run/1"] = "run";
-		//spriteFrameToSounds["drdoppler_run/5"] = "run";
+		spriteFrameToSounds["drdoppler_run/1"] = "run";
+		spriteFrameToSounds["drdoppler_run/5"] = "run";
 		weakWeaponId = WeaponIds.AcidBurst;
 		weakMaverickWeaponId = WeaponIds.ToxicSeahorse;
 
@@ -94,6 +96,9 @@ public class DrDoppler : Maverick {
 
 	public MaverickState getShootState(bool isAI) {
 		var mshoot = new MShoot((Point pos, int xDir) => {
+			if (ballType == 0) {
+			playSound("electricSpark", sendRpc: true);
+			} else { playSound("busterX3", sendRpc: true); }
 			new DrDopplerBallProj(weapon, pos, xDir, ballType, player, player.getNextActorNetId(), sendRpc: true);
 		}, null);
 		if (isAI) {
@@ -154,6 +159,7 @@ public class DrDopplerBallProj : Projectile {
 public class DrDopplerDashStartState : MaverickState {
 	public DrDopplerDashStartState() : base("dash_charge", "") {
 		stopMovingOnEnter = true;
+		enterSound = "ryuenjin";
 	}
 
 	public override void update() {
@@ -165,13 +171,21 @@ public class DrDopplerDashStartState : MaverickState {
 }
 
 public class DrDopplerDashState : MaverickState {
-	Anim barrier;
+	Anim? barrier;
+	float soundTime;
 	public DrDopplerDashState() : base("dash", "dash_start") {
 		stopMovingOnEnter = true;
 	}
 
 	public override void update() {
 		base.update();
+		if (maverick.sprite.name == "drdoppler_dash") {
+			soundTime += Global.spf;
+			if (soundTime > 6f/60f) {
+				soundTime = 0;
+				maverick.playSound("flamethrower", sendRpc: true);
+			}
+		}
 		if (inTransition()) {
 			if (!once) {
 				once = true;
@@ -225,14 +239,23 @@ public class DrDopplerDashState : MaverickState {
 }
 
 public class DrDopplerAbsorbState : MaverickState {
+	float soundTime = 119f/60f;
+	public SoundWrapper? sound;
 	public DrDopplerAbsorbState() : base("absorb", "") {
 		exitOnAnimEnd = true;
 		superArmor = true;
+		enterSound = "bcrabShield";
 	}
 
 	public override void update() {
 		base.update();
-
+		if (maverick.frameIndex >= 9) {
+			soundTime += Global.spf;
+			if (soundTime >= 120f/60f) {
+				soundTime = 0;
+				sound = maverick.playSound("greenaurax3", sendRpc: true);
+			}
+		}
 		if (maverick.ammo <= 0) {
 			maverick.changeToIdleOrFall();
 			return;
@@ -242,18 +265,27 @@ public class DrDopplerAbsorbState : MaverickState {
 			maverick.frameIndex = 9;
 		}
 	}
+	public override void onExit(MaverickState newState) {
+		base.onExit(newState);
+		if (sound != null && !sound.deleted) {
+			sound.sound?.Stop();
+		}
+		RPC.stopSound?.sendRpc("greenaurax3", maverick.netId);
+
+	}
 }
 
 public class DrDopplerUncoatState : MaverickState {
 	public DrDopplerUncoatState() : base("uncoat", "") {
 		exitOnAnimEnd = true;
+		enterSound = "transform";
 	}
 
 	public override void update() {
 		base.update();
 		if (!once && maverick.frameIndex >= 1) {
 			once = true;
-			new Anim(maverick.getFirstPOIOrDefault(), "drdoppler_coat", maverick.xDir, player.getNextActorNetId(), false, sendRpc: true) { vel = new Point(maverick.xDir * 50, 0) };
+			new Anim(maverick.getFirstPOIOrDefault(), "drdoppler_coat", maverick.xDir, player.getNextActorNetId(), true, sendRpc: true) { vel = new Point(maverick.xDir * 50, 0) };
 		}
 	}
 }

@@ -20,8 +20,8 @@ public class FlameStag : Maverick {
 		antler = new Sprite("fstag_antler");
 		antlerDown = new Sprite("fstag_antler_down");
 		antlerSide = new Sprite("fstag_antler_side");
-		//spriteFrameToSounds["fstag_run/2"] = "run";
-		//spriteFrameToSounds["fstag_run/6"] = "run";
+		spriteFrameToSounds["fstag_run/2"] = "run";
+		spriteFrameToSounds["fstag_run/6"] = "run";
 
 		//stateCooldowns.Add(typeof(FStagShoot), new MaverickStateCooldown(false, false, 0.25f));
 		stateCooldowns.Add(typeof(FStagDashChargeState), new MaverickStateCooldown(true, false, 0.75f));
