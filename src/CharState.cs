@@ -859,7 +859,7 @@ public class Dash : CharState {
 		if (!player.isAI && !player.input.isHeld(initialDashButton, player) && !stop) {
 			dashTime = 50;
 		}
-		float speedModifier = 1;
+		float speedModifier = 1.15f; //CHANGED
 		float distanceModifier = 1;
 		float inputXDir = player.input.getInputDir(player).x;
 		if (player.isX && player.hasBootsArmor(1)) {
