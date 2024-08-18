@@ -1560,7 +1560,7 @@ public partial class Player {
 		var oldPos = character.pos;
 		var oldDir = character.xDir;
 		character.destroySelf();
-		Global.level.gameObjects.Add(preTransformedAxl);
+		Global.level.addGameObject(preTransformedAxl);
 		character = preTransformedAxl;
 		character.addTransformAnim();
 		preTransformedAxl = null;

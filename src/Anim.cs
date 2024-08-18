@@ -31,7 +31,7 @@ public class Anim : Actor {
 		useGravity = false;
 		this.xDir = xDir;
 		this.destroyOnEnd = destroyOnEnd;
-		Global.level.gameObjects.Add(this);
+		Global.level.addGameObject(this);
 		animJsonName = spriteName;
 
 		if (isMaverickDeathAnim(spriteName)) {
