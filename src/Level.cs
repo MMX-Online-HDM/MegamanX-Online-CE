@@ -14,8 +14,13 @@ public partial class Level {
 	public Dictionary<ushort, Actor> actorsById = new();
 	public Dictionary<ushort, Actor> destroyedActorsById = new();
 	public List<Actor> mapSprites = new List<Actor>();
-	public List<List<HashSet<GameObject>>> grid = new List<List<HashSet<GameObject>>>();
+
 	public HashSet<HashSet<GameObject>> occupiedGridSets = new HashSet<HashSet<GameObject>>();
+	public HashSet<GameObject>[,] grid;
+	public HashSet<GameObject>[,] terrainGrid;
+
+
+	// List of terrain objects. Used for fast collision.
 
 	// These are returned by getListCounts()
 	public HashSet<Effect> effects = new HashSet<Effect>();
@@ -361,7 +366,7 @@ public partial class Level {
 			Point pos = new Point((float)(instance.pos?.x ?? 0), (float)(instance.pos?.y ?? 0));
 
 			if (objectName == "Collision Shape") {
-				var wall = new Wall(instanceName, points);
+				Wall wall = new Wall(instanceName, points);
 
 				float moveX = instance?.properties?.moveX ?? 0;
 				wall.moveX = moveX;
@@ -377,13 +382,17 @@ public partial class Level {
 				bool isPitWall = false;
 				if (instance?.properties?.pitWall != null && instance.properties.pitWall == true) {
 					isPitWall = true;
-					wall.collider._shape.points[2] = new Point(wall.collider._shape.points[2].x, Global.level.height + 45);
-					wall.collider._shape.points[3] = new Point(wall.collider._shape.points[3].x, Global.level.height + 45);
+					wall.collider._shape.points[2] = (
+						new Point(wall.collider._shape.points[2].x, Global.level.height + 45)
+					);
+					wall.collider._shape.points[3] = (
+						new Point(wall.collider._shape.points[3].x, Global.level.height + 45)
+					);
 					var rect = wall.collider.shape.getRect();
 					var newRect = new Rect(rect.x1, rect.y2, rect.x2, rect.y2 + 1000);
 					var pitWall = new Wall(wall.name + "Pit", newRect.getPoints());
 					pitWall.collider.isClimbable = false;
-					addGameObject(pitWall);
+					addGameObject(pitWall); 
 				}
 
 				if (instance?.properties?.unclimbable != null && instance.properties.unclimbable == true) {
@@ -1718,29 +1727,29 @@ public partial class Level {
 				firstRowSize = 20;
 			}
 		
-			startGridX = MathInt.Clamp(startGridX, 0, grid[0].Count);
-			endGridX = MathInt.Clamp(endGridX, 0, grid[0].Count);
-			startGridY = MathInt.Clamp(startGridY, 0, grid.Count);
-			endGridY = MathInt.Clamp(endGridY, 0, grid.Count);
+			startGridX = MathInt.Clamp(startGridX, 0, grid.GetLength(0));
+			endGridX = MathInt.Clamp(endGridX, 0, grid.GetLength(0));
+			startGridY = MathInt.Clamp(startGridY, 0, grid.GetLength(1));
+			endGridY = MathInt.Clamp(endGridY, 0, grid.GetLength(1));
 
-			for (int i = startGridY; i < endGridY; i++) {
-				for (int j = startGridX; j < endGridX; j++) {
-					if (grid[i][j].Count > 0) {
-						gridItemCount += grid[i][j].Count;
+			for (int y = startGridY; y < endGridY; y++) {
+				for (int x = startGridX; x < endGridX; x++) {
+					if (grid[x, y].Count > 0) {
+						gridItemCount += grid[x, y].Count;
 						DrawWrappers.DrawRect(
-							j * cellWidth,
-							i * cellWidth,
-							cellWidth + (j * cellWidth) - 1,
-							cellWidth + (i * cellWidth) - 1,
+							x * cellWidth,
+							y * cellWidth,
+							cellWidth + (x * cellWidth) - 1,
+							cellWidth + (y * cellWidth) - 1,
 							true, new Color(200, 255, 200, 64), 1,
 							ZIndex.HUD - 15, true, new Color(128, 255, 128, 128)
 						);
 						if (cellWidth >= 32) {
 							Fonts.drawText(
 								FontType.Purple,
-								i.ToString() + separator + j.ToString(),
-								(j * cellWidth) + 1,
-								(i * cellWidth) + 1,
+								x.ToString() + separator + y.ToString(),
+								(x * cellWidth) + 1,
+								(y * cellWidth) + 1,
 								isWorldPos: true,
 								depth: ZIndex.HUD - 10,
 								alpha: 192
@@ -1749,9 +1758,9 @@ public partial class Level {
 						}
 						Fonts.drawText(
 							FontType.DarkPurple,
-							grid[i][j].Count.ToString(),
-							(j * cellWidth),
-							offset + (i * cellWidth) + 1,
+							grid[x, y].Count.ToString(),
+							(x * cellWidth),
+							offset + (y * cellWidth) + 1,
 							isWorldPos: true,
 							depth: ZIndex.HUD - 10,
 							alpha: 192

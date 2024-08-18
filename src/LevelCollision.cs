@@ -5,12 +5,12 @@ using System.Linq;
 namespace MMXOnline;
 
 public struct Cell {
-	public int i;
-	public int j;
+	public int x;
+	public int y;
 	public HashSet<GameObject> gameobjects;
-	public Cell(int i, int j, HashSet<GameObject> gameobjects) {
-		this.i = i;
-		this.j = j;
+	public Cell(int x, int y, HashSet<GameObject> gameobjects) {
+		this.x = y;
+		this.x = y;
 		this.gameobjects = gameobjects;
 	}
 }
@@ -18,16 +18,18 @@ public struct Cell {
 public partial class Level {
 	public void setupGrid(float cellWidth) {
 		this.cellWidth = cellWidth;
-		var width = this.width;
-		var height = this.height;
-		var hCellCount = Math.Ceiling(width / cellWidth);
-		var vCellCount = Math.Ceiling(height / cellWidth);
+		int width = this.width;
+		int height = this.height;
+		int xCellCount = MathInt.Ceiling((decimal)width / (decimal)cellWidth);
+		int yCellCount = MathInt.Ceiling((decimal)height / (decimal)cellWidth);
 		//console.log("Creating grid with width " + hCellCount + " and height " + vCellCount);
-		for (var i = 0; i < vCellCount; i++) {
-			var curRow = new List<HashSet<GameObject>>();
-			grid.Add(curRow);
-			for (var j = 0; j < hCellCount; j++) {
-				curRow.Add(new HashSet<GameObject>());
+		grid = new HashSet<GameObject>[xCellCount, yCellCount];
+		terrainGrid = new HashSet<GameObject>[xCellCount, yCellCount];
+
+		for (var x = 0; x < xCellCount; x++) {
+			for (var y = 0; y < yCellCount; y++) {
+				grid[x, y] = new HashSet<GameObject>();
+				terrainGrid[x, y] = new HashSet<GameObject>();
 			}
 		}
 	}
@@ -53,16 +55,16 @@ public partial class Level {
 			float mag = cellWidth / 2;
 			HashSet<int> usedCoords = new HashSet<int>();
 			while (dist <= maxDist) {
-				int i = MathInt.Floor(curY / cellWidth);
-				int j = MathInt.Floor(curX / cellWidth);
+				int y = MathInt.Floor(curY / cellWidth);
+				int x = MathInt.Floor(curX / cellWidth);
 				curX += dir.x * mag;
 				curY += dir.y * mag;
 				dist += mag;
-				if (i < 0 || j < 0 || i >= grid.Count || j >= grid[0].Count) continue;
-				int gridCoordKey = Helpers.getGridCoordKey((ushort)i, (ushort)j);
+				if (y < 0 || x < 0 || y >= grid.GetLength(1) || x >= grid.GetLength(0)) continue;
+				int gridCoordKey = Helpers.getGridCoordKey((ushort)x, (ushort)y);
 				if (usedCoords.Contains(gridCoordKey)) continue;
 				usedCoords.Add(gridCoordKey);
-				cells.Add(new Cell(i, j, grid[i][j]));
+				cells.Add(new Cell(x, y, grid[x, y]));
 			}
 			return cells;
 		}
@@ -72,14 +74,14 @@ public partial class Level {
 		int maxY = MathInt.Floor(shape.maxY / cellWidth);
 		int maxX = MathInt.Floor(shape.maxX / cellWidth);
 
-		minY = Math.Clamp(minY, 0, grid.Count - 1);
-		maxY = Math.Clamp(maxY, 0, grid.Count - 1);
-		minX = Math.Clamp(minX, 0, grid[0].Count - 1);
-		maxX = Math.Clamp(maxX, 0, grid[0].Count - 1);
+		minX = Math.Clamp(minX, 0, grid.GetLength(0) - 1);
+		maxX = Math.Clamp(maxX, 0, grid.GetLength(0) - 1);
+		minY = Math.Clamp(minY, 0, grid.GetLength(1) - 1);
+		maxY = Math.Clamp(maxY, 0, grid.GetLength(1) - 1);
 
-		for (int i = minY; i <= maxY; i++) {
-			for (int j = minX; j <= maxX; j++) {
-				cells.Add(new Cell(i, j, grid[i][j]));
+		for (int y = minY; y <= maxY; y++) {
+			for (int x = minX; x <= maxX; x++) {
+				cells.Add(new Cell(x, y, grid[x, y]));
 			}
 		}
 		return cells;
@@ -143,9 +145,12 @@ public partial class Level {
 			}
 		}
 		foreach (Cell cell in getGridCells(allCollidersShape.Value)) {
-			if (grid.InRange(cell.i) && grid[cell.i].InRange(cell.j) && !grid[cell.i][cell.j].Contains(go)) {
-				grid[cell.i][cell.j].Add(go);
-				occupiedGridSets.Add(grid[cell.i][cell.j]);
+			if (cell.x > 0 && cell.x < grid.GetLength(0) &&
+				cell.y > 0 && cell.y < grid.GetLength(1) &&
+				!grid[cell.x, cell.y].Contains(go)
+			) {
+				grid[cell.x, cell.y].Add(go);
+				occupiedGridSets.Add(grid[cell.x, cell.y]);
 			}
 		}
 	}
@@ -174,10 +179,10 @@ public partial class Level {
 
 	public int getGridCount() {
 		int gridItemCount = 0;
-		for (int i = 0; i < grid.Count; i++) {
-			for (int j = 0; j < grid[i].Count; j++) {
-				if (grid[i][j].Count > 0) {
-					gridItemCount += grid[i][j].Count;
+		for (int x = 0; x < grid.GetLength(0); x++) {
+			for (int y = 0; y < grid.GetLength(1); y++) {
+				if (grid[x, y].Count > 0) {
+					gridItemCount += grid[x, y].Count;
 				}
 			}
 		}
@@ -193,8 +198,8 @@ public partial class Level {
 		var vCellCount = Math.Ceiling(height / cellWidth);
 		for (var i = 0; i < vCellCount; i++) {
 			for (var j = 0; j < hCellCount; j++) {
-				count += grid[i][j].Count;
-				var set = grid[i][j];
+				count += grid[j, i].Count;
+				var set = grid[j, i];
 				foreach (var go in set) {
 					if (!gameObjects.Contains(go)) {
 						//this.grid[i][j].delete(go);
