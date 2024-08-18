@@ -2308,7 +2308,14 @@ public partial class Character : Actor, IDamagable {
 			if (headPos != null) {
 				//DrawWrappers.DrawCircle(headPos.Value.x, headPos.Value.y, headshotRadius, true, new Color(255, 0, 255, 128), 1, ZIndex.HUD);
 				var headRect = getHeadRect();
-				DrawWrappers.DrawRect(headRect.x1, headRect.y1, headRect.x2, headRect.y2, true, new Color(255, 0, 0, 128), 1, ZIndex.HUD);
+				DrawWrappers.DrawRect(
+					headRect.x1 + 1,
+					headRect.y1 + 1,
+					headRect.x2 - 1,
+					headRect.y2 - 1,
+					true, new Color(255, 0, 0, 50), 1, ZIndex.HUD, true,
+					new Color(255, 0, 0, 128)
+				);
 			}
 		}
 	}
