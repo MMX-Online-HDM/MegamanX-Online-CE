@@ -61,7 +61,7 @@ public partial class Level {
 	public float camX;
 	public float camY;
 	public float zoomScale;
-	public int frameCount;
+	public long frameCount;
 	public int nonSkippedframeCount;
 	public float twoFrameCycle;
 	public string debugString;
@@ -2311,7 +2311,8 @@ public partial class Level {
 
 	public void clearOldActors() {
 		foreach ((ushort actorId, Actor actor) in destroyedActorsById) {
-			if (frameCount - actor.destroyedOnFrame is > 360 or < 0) {
+			long framesDestroyed = frameCount - actor.destroyedOnFrame;
+			if (framesDestroyed >= 1200) {
 				destroyedActorsById.Remove(actorId);
 			}
 		}

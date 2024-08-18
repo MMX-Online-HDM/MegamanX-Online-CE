@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using SFML.Graphics;
+using static SFML.Window.Keyboard;
 
 namespace MMXOnline;
 
@@ -99,8 +100,8 @@ public partial class Character : Actor, IDamagable {
 	// Some things previously in other char files used by multiple characters.
 	public int lastShootPressed;
 	public int lastShootReleased;
-	public int lastAttackFrame = -100;
-	public int framesSinceLastAttack = 1000;
+	public long lastAttackFrame = -100;
+	public long framesSinceLastAttack = 1000;
 	public float grabCooldown;
 
 	public RideArmor? startRideArmor;
@@ -839,6 +840,10 @@ public partial class Character : Actor, IDamagable {
 	public override void update() {
 		if (charState is not InRideChaser) {
 			camOffsetX = MathInt.Round(Helpers.lerp(camOffsetX, 0, 10));
+		}
+
+		if (this == Global.level.mainPlayer.character && Global.input.isPressed(Key.F2)) {
+ 		   new TestEnemy(pos.addxy(0, -20), 2004, true);
 		}
 
 		Helpers.decrementTime(ref limboRACheckCooldown);

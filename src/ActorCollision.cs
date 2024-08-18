@@ -106,25 +106,52 @@ public partial class Actor {
 		}
 		bool hasNonAttackColider = false;
 		foreach (Collider allCollider in getAllColliders()) {
-			Color hitboxColor = new Color(173, 216, 230, 128);
-			if (allCollider.isAttack()) {
-				hitboxColor = new Color(byte.MaxValue, 0, 0, 128);
-				if (destroyed) {
-					hitboxColor = new Color(128, 0, 255, 128);
+			
+			if (allCollider._shape.points.Count == 4) {
+				Color hitboxColor = new Color(50, 100, 255, 50);
+				Color outlineColor = new Color(0, 0, 255, 200);
+				if (allCollider.isAttack()) {
+					hitboxColor = new Color(255, 0, 0, 100);
+					outlineColor = new Color(255, 0, 0, 200);
+				} else {
+					hasNonAttackColider = true;
 				}
+				Rect rect = allCollider.shape.getRect();
+				rect.x1 += 1;
+				rect.y1 += 1;
+				rect.x2 -= 1;
+				rect.y2 -= 1;
+				DrawWrappers.DrawRect(
+					rect.x1, rect.y1, rect.x2, rect.y2,
+					true, hitboxColor, 1, zIndex + 1, true,
+					outlineColor
+				);
 			} else {
-				hasNonAttackColider = true;
+				Color hitboxColor = new Color(173, 216, 230, 200);
+				if (allCollider.isAttack()) {
+					hitboxColor = new Color(byte.MaxValue, 0, 0, 100);
+					if (destroyed) {
+						hitboxColor = new Color(128, 0, 255, 100);
+					}
+				} else {
+					hasNonAttackColider = true;
+				}
+				DrawWrappers.DrawPolygon(allCollider.shape.points, hitboxColor, fill: true, zIndex + 1);
 			}
-			DrawWrappers.DrawPolygon(allCollider.shape.points, hitboxColor, fill: true, zIndex + 1);
 		}
 		if (hasNonAttackColider) {
 			Collider? terrainCollider = getTerrainCollider();
 			if (terrainCollider == null) {
 				return;
 			}
+			Rect rect = terrainCollider.shape.getRect();
+			rect.x1 += 1;
+			rect.y1 += 1;
+			rect.x2 -= 1;
+			rect.y2 -= 1;
 			DrawWrappers.DrawPolygon(
-				terrainCollider.shape.points,
-				new Color(178, 0, 216, 200),
+				rect.getPoints(),
+				new Color(0, 255, 0, 150),
 				fill: false, zIndex + 1, true
 			);
 		}

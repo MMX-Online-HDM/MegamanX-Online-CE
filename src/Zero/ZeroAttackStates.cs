@@ -128,8 +128,6 @@ public class ZeroAirSlashState : ZeroGenericMeleeState {
 }
 
 public class ZeroRollingSlashtate : ZeroGenericMeleeState {
-	bool once;
-
 	public ZeroRollingSlashtate() : base("attack_air2") {
 		sound = "saber1";
 		soundFrame = 1;
@@ -144,8 +142,9 @@ public class ZeroRollingSlashtate : ZeroGenericMeleeState {
 
 	public override void update() {
 		base.update();
-		if (!once && zero.sprite.loopCount >= 1) {
+		if (zero.sprite.loopCount >= 1) {
 			character.changeToIdleOrFall();
+			return;
 		}
 	}
 }

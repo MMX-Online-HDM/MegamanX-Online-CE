@@ -30,11 +30,51 @@ public class Geometry : GameObject {
 	}
 
 	public virtual void render(float x, float y) {
-		if (Global.showHitboxes && this is not BackwallZone) {
-			DrawWrappers.DrawPolygon(collider.shape.clone(x, y).points, new Color(0, 0, 255, 128), true, ZIndex.HUD + 100, true);
+		if (Global.showHitboxes && this is Wall) {
+			List<Point> points = collider.shape.clone(x, y).points;
+			if (points.Count == 4) {
+				points[0] = points[0].addxy(1, 1);
+				points[1] = points[1].addxy(-1, 1);
+				points[2] = points[2].addxy(-1, -1);
+				points[3] = points[3].addxy(1, -1);
+
+				DrawWrappers.DrawPolygon(
+					points, new Color(178, 0, 216, 100),
+					true, ZIndex.HUD + 100, true,
+					new Color(178, 0, 216, 200)
+				);
+			} else {
+				DrawWrappers.DrawPolygon(
+					points, new Color(50, 50, 255, 125),
+					true, ZIndex.HUD + 100, true
+				);
+			}
 		}
-		if (Global.showAIDebug && this is JumpZone) {
-			DrawWrappers.DrawPolygon(collider.shape.clone(x, y).points, new Color(0, 0, 255, 128), true, ZIndex.HUD + 100, true);
+		else if (Global.showAIDebug && this is JumpZone) {
+			DrawWrappers.DrawPolygon(
+				collider.shape.clone(x, y).points, new Color(0, 0, 255, 50),
+				true, ZIndex.HUD + 100, true
+			);
+		}
+		else if (Global.showHitboxes && this is not BackwallZone and not JumpZone) {
+			List<Point> points = collider.shape.clone(x, y).points;
+			if (points.Count == 4) {
+				points[0] = points[0].addxy(1, 1);
+				points[1] = points[1].addxy(-1, 1);
+				points[2] = points[2].addxy(-1, -1);
+				points[3] = points[3].addxy(1, -1);
+
+				DrawWrappers.DrawPolygon(
+					points, new Color(255, 150, 0, 50),
+					true, ZIndex.HUD + 100, true,
+					new Color(255, 100, 0, 200)
+				);
+			} else {
+				DrawWrappers.DrawPolygon(
+					points, new Color(255, 100, 0, 125),
+					true, ZIndex.HUD + 100, true
+				);
+			}
 		}
 	}
 

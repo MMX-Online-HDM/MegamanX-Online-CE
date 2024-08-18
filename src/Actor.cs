@@ -83,7 +83,7 @@ public partial class Actor : GameObject {
 	public bool visible = true;
 	public bool timeSlow;
 	public bool destroyed;
-	public float destroyedOnFrame;
+	public long destroyedOnFrame;
 	public ShaderWrapper? genericShader;
 	public virtual List<ShaderWrapper>? getShaders() { return genericShader != null ? new List<ShaderWrapper> { genericShader } : null; }
 	public float alpha = 1;
@@ -913,13 +913,13 @@ public partial class Actor : GameObject {
 				return false;
 			}
 			if (character.invulnTime > 0) {
-				int mod10 = Global.level.frameCount % 4;
+				long mod10 = Global.level.frameCount % 4;
 				if (mod10 < 2) return false;
 			}
 		}
 		if (this is Maverick maverick) {
 			if (maverick.invulnTime > 0) {
-				int mod10 = Global.level.frameCount % 4;
+				long mod10 = Global.level.frameCount % 4;
 				if (mod10 < 2) return false;
 			}
 		}

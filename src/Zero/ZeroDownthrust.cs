@@ -206,7 +206,6 @@ public class DanchienExplosionProj : Projectile {
 		base.onStart();
 		if (!ownedByLocalPlayer) return;
 
-		float velMag = 75;
 		new QuakeBlazerFlamePart(
 			pos.addxy(0, -10).addRand(5, 5), xDir, -1,
 			owner, owner.getNextActorNetId(), rpc: true

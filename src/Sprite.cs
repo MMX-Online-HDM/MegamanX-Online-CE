@@ -128,6 +128,9 @@ public class Sprite {
 		cx += animData.alignOffX - tempOffX - currentFrame.offset.x;
 		cy += animData.alignOffY - tempOffY - currentFrame.offset.y;
 
+		cx = MathF.Floor(cx);
+		cy = MathF.Floor(cy);
+
 		DrawWrappers.DrawTextureHUD(
 			animData.bitmap,
 			currentFrame.rect.x1, currentFrame.rect.y1,
@@ -201,6 +204,9 @@ public class Sprite {
 
 		cx += animData.alignOffX - tempOffX;
 		cy += animData.alignOffY - tempOffY;
+
+		cx = MathF.Floor(cx);
+		cy = MathF.Floor(cy);
 
 		if (scaleY == -1 && (
 				actor is MagnaCentipede ms ||
@@ -839,6 +845,9 @@ public class AnimData {
 		cx += alignOffX;
 		cy += alignOffY;
 
+		cx = MathF.Floor(cx);
+		cy = MathF.Floor(cy);
+
 		float frameOffsetX = 0;
 		float frameOffsetY = 0;
 
@@ -974,6 +983,9 @@ public class AnimData {
 
 		cx += alignOffX - currentFrame.offset.x;
 		cy += alignOffY - currentFrame.offset.y;
+
+		cx = MathF.Floor(cx);
+		cy = MathF.Floor(cy);
 
 		DrawWrappers.DrawTextureHUD(
 			bitmap,

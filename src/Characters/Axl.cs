@@ -1156,7 +1156,12 @@ public class Axl : Character {
 		// aimbot
 		if (player.isAI) {
 			var target = Global.level.getClosestTarget(pos, player.alliance, true);
-			if (target != null) player.axlCursorPos = target.pos.addxy(-Global.level.camX, -Global.level.camY - (target is InRideArmor ? 0 : 16));
+			if (target != null) {
+				player.axlCursorPos = target.pos.addxy(
+					-Global.level.camX,
+					-Global.level.camY - ((target as Character)?.charState is InRideArmor ? 0 : 16)
+				);
+			};
 		}
 
 		getMouseTargets();

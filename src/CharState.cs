@@ -383,7 +383,7 @@ public class WarpIn : CharState {
 		if (warpAnim == null) {
 			character.visible = true;
 			character.frameSpeed = 1;
-			if (this is CmdSigma && character.sprite.frameIndex >= 2 && !decloaked) {
+			if (character is CmdSigma && character.sprite.frameIndex >= 2 && !decloaked) {
 				decloaked = true;
 				var cloakAnim = new Anim(character.getFirstPOI() ?? character.getCenterPos(), "sigma_cloak", character.xDir, player.getNextActorNetId(), true);
 				cloakAnim.vel = new Point(-25 * character.xDir, -10);
