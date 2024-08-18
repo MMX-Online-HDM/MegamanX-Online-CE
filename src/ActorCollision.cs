@@ -328,7 +328,10 @@ public partial class Actor {
 		}
 	}
 
-	public void move(Point amount, bool useDeltaTime = true, bool pushIncline = true, bool useIce = true, MoveClampMode clampMode = MoveClampMode.None) {
+	public void move(
+		Point amount, bool useDeltaTime = true, bool pushIncline = true,
+		bool useIce = true, MoveClampMode clampMode = MoveClampMode.None
+	) {
 		var times = useDeltaTime ? Global.spf : 1;
 
 		if (grounded && groundedIce && useIce && (
@@ -352,7 +355,8 @@ public partial class Actor {
 		if (physicsCollider == null) {
 			incPos(moveAmount);
 		}
-		//Regular collider: need to detect collision incrementally and stop moving past a collider if that's the case
+		// Regular collider: need to detect collision incrementally
+		// and stop moving past a collider if that's the case
 		else {
 			freeFromCollision();
 

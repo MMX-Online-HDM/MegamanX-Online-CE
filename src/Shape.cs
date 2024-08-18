@@ -103,6 +103,15 @@ public struct Shape {
 	//IMPORTANT NOTE- When determining normals, it is always off "other".
 	public HitData? intersectsShape(Shape other, Point? vel = null) {
 		Global.collisionCalls++;
+
+		if (minY > other.maxX ||
+			maxX < other.minX ||
+			minY > other.maxY ||
+			maxY < other.minY			
+		) {
+			return null;
+		}
+
 		var pointOutside = false;
 		foreach (var point in points) {
 			if (!other.containsPoint(point)) {

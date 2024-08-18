@@ -783,10 +783,14 @@ public partial class Actor : GameObject {
 
 		if (this is Character) {
 			move(vel.addxy(xFlinchPushVel + xIceVel + xPushVel + xSwingVel, 0), true, true, false);
-			move(new Point(0, yPushVel), true, false, false);
+			if (yPushVel != 0) {
+				move(new Point(0, yPushVel), true, false, false);
+			}
 		} else if (!isStatic) {
 			move(vel.addxy(xFlinchPushVel + xIceVel + xPushVel + xSwingVel, 0), true, true, false);
-			move(new Point(0, yPushVel), true, false, false);
+			if (yPushVel != 0) {
+				move(new Point(0, yPushVel), true, false, false);
+			}
 		}
 
 		float yMod = reversedGravity ? -1 : 1;
