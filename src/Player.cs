@@ -1236,55 +1236,55 @@ public partial class Player {
 		if (data.charNum == (int)CharIds.X) {
 			retChar = new MegamanX(
 				this, character.pos.x, character.pos.y, character.xDir,
-				true, data.dnaNetId, true, isWarpIn: false
+				true, data.dnaNetId, false, isWarpIn: false
 			);
 		} else if (data.charNum == (int)CharIds.Zero) {
 			retChar = new Zero(
 				this, character.pos.x, character.pos.y, character.xDir,
-				true, data.dnaNetId, true, isWarpIn: false
+				true, data.dnaNetId, false, isWarpIn: false
 			);
 		} else if (data.charNum == (int)CharIds.Vile) {
 			retChar = new Vile(
 				this, character.pos.x, character.pos.y, character.xDir,
-				true, data.dnaNetId, true, isWarpIn: false,
+				true, data.dnaNetId, false, isWarpIn: false,
 				mk2VileOverride: data.extraData[0] == 1, mk5VileOverride: data.extraData[0] == 2
 			);
 		} else if (data.charNum == (int)CharIds.Axl) {
 			retChar = new Axl(
 				this, character.pos.x, character.pos.y, character.xDir,
-				true, data.dnaNetId, true, isWarpIn: false
+				true, data.dnaNetId, false, isWarpIn: false
 			);
 		} else if (data.charNum == (int)CharIds.Sigma) {
 			if (data.extraData[0] == 2) {
 				retChar = new Doppma(
 					this, character.pos.x, character.pos.y, character.xDir,
-					true, data.dnaNetId, true, isWarpIn: false
+					true, data.dnaNetId, false, isWarpIn: false
 				);
 			} else if (data.extraData[0] == 1) {
 				retChar = new NeoSigma(
 					this, character.pos.x, character.pos.y, character.xDir,
-					true, data.dnaNetId, true, isWarpIn: false
+					true, data.dnaNetId, false, isWarpIn: false
 				);
 			} else {
 				retChar = new CmdSigma(
 					this, character.pos.x, character.pos.y, character.xDir,
-					true, data.dnaNetId, true, isWarpIn: false
+					true, data.dnaNetId, false, isWarpIn: false
 				);
 			}
 		} else if (data.charNum == (int)CharIds.Rock) {
 			retChar = new Rock(
 				this, character.pos.x, character.pos.y, character.xDir,
-				true, data.dnaNetId, true, isWarpIn: false
+				true, data.dnaNetId, false, isWarpIn: false
 			);
 		} else if (data.charNum == (int)CharIds.BusterZero) {
 			retChar = new BusterZero(
 				this, character.pos.x, character.pos.y, character.xDir,
-				true, data.dnaNetId, true, isWarpIn: false
+				true, data.dnaNetId, false, isWarpIn: false
 			);
 		} else if (data.charNum == (int)CharIds.PunchyZero) {
 			retChar = new PunchyZero(
 				this, character.pos.x, character.pos.y, character.xDir,
-				true, data.dnaNetId, true, isWarpIn: false
+				true, data.dnaNetId, false, isWarpIn: false
 			);
 		} else {
 			throw new Exception("Error: Non-valid char ID: " + data.charNum);
