@@ -114,7 +114,7 @@ public class DNACore : AxlWeapon {
 		player.savedDNACoreWeapons.Remove(this);
 		player.weapons.RemoveAt(player.weaponSlot);
 		player.preTransformedAxl = player.character;
-		Global.level.gameObjects.Remove(player.preTransformedAxl);
+		Global.level.removeGameObject(player.preTransformedAxl);
 		player.transformAxl(this, player.getNextATransNetId());
 	}
 }

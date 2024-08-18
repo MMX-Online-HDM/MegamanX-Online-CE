@@ -1305,7 +1305,7 @@ public partial class Player {
 		// Change character.
 		character.cleanupBeforeTransform();
 		preTransformedAxl = character;
-		Global.level.gameObjects.Remove(preTransformedAxl);
+		Global.level.removeGameObject(preTransformedAxl);
 		character = retChar;
 
 		// Save old flags.
