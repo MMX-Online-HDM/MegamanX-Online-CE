@@ -135,23 +135,3 @@ public class NeutralEnemy : Actor, IDamagable {
 		invincibleFlag = (data[1] == 1);
 	}
 }
-
-
-
-public class TestEnemy : NeutralEnemy {
-	public TestEnemy(
-		Point pos, ushort netId, bool isLocal, bool addToLevel = true
-	) : base(
-		pos, netId, isLocal, addToLevel
-	) {
-		changeSprite(getSprite("idle"), true);
-	}
-
-	// Sprite change override.
-	public virtual string getSprite(string spriteName) {
-		if (spriteName is null or "") {
-			return "";
-		}
-		return "fakezero" + spriteName;
-	}
-}
