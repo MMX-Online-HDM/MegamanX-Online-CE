@@ -842,10 +842,6 @@ public partial class Character : Actor, IDamagable {
 			camOffsetX = MathInt.Round(Helpers.lerp(camOffsetX, 0, 10));
 		}
 
-		if (this == Global.level.mainPlayer.character && Global.input.isPressed(Key.F2)) {
- 		   new TestEnemy(pos.addxy(0, -20), 2004, true);
-		}
-
 		Helpers.decrementTime(ref limboRACheckCooldown);
 		Helpers.decrementTime(ref dropFlagCooldown);
 

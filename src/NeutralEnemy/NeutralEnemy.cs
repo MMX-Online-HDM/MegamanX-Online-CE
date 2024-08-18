@@ -9,8 +9,8 @@ public class NeutralEnemy : Actor, IDamagable {
 	public decimal maxHealth = 8;
 	public bool invincibleFlag;
 	public int enemyId;
-	public float wSize = 18;
-	public float hSize = 30;
+	public float wSize = 12;
+	public float hSize = 12;
 	public Action<Point>[] killDrops = new Action<Point>[0];
 
 	public NeutralEnemyState state;
@@ -72,18 +72,19 @@ public class NeutralEnemy : Actor, IDamagable {
 	// For normal collision.
 	public override Collider? getGlobalCollider() {
 		return new Collider(
-			new Rect(12f, 12f, wSize, hSize).getPoints(),
+			new Rect(0, 0, wSize, hSize).getPoints(),
 			false, this, false, false,
 			HitboxFlag.Hurtbox, Point.zero
 		);
 	}
+
 	// For terrain collision.
 	public override Collider? getTerrainCollider() {
 		if (physicsCollider == null) {
 			return null;
 		}
 		return new Collider(
-			new Rect(12f, 12f, wSize, hSize).getPoints(),
+			new Rect(0, 0, wSize, hSize).getPoints(),
 			false, this, false, false,
 			HitboxFlag.Hurtbox, Point.zero
 		);
