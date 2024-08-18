@@ -337,163 +337,161 @@ label:
 			oldWeapons = preSigmaReviveWeapons;
 			preSigmaReviveWeapons = null;
 		}
-
 		weapons = new List<Weapon>();
 
-		if (ownedByLocalPlayer) {
-			if (isX) {
-				if (Global.level.isTraining() && !Global.level.server.useLoadout) {
-					weapons = Weapon.getAllXWeapons().Select(w => w.clone()).ToList();
-					if (hasArmArmor(3)) weapons.Add(new HyperBuster());
-					if (hasBodyArmor(2)) weapons.Add(new GigaCrush());
-					if (hasUltimateArmor()) weapons.Add(new NovaStrike(this));
-				} else if (Global.level.is1v1()) {
-					if (xArmor1v1 == 1) {
-						weapons.Add(new Buster());
-						weapons.Add(new Torpedo());
-						weapons.Add(new Sting());
-						weapons.Add(new RollingShield());
-						weapons.Add(new FireWave());
-						weapons.Add(new Tornado());
-						weapons.Add(new ElectricSpark());
-						weapons.Add(new Boomerang());
-						weapons.Add(new ShotgunIce());
-					} else if (xArmor1v1 == 2) {
-						weapons.Add(new Buster());
-						weapons.Add(new CrystalHunter());
-						weapons.Add(new BubbleSplash());
-						weapons.Add(new SilkShot());
-						weapons.Add(new SpinWheel());
-						weapons.Add(new SonicSlicer());
-						weapons.Add(new StrikeChain());
-						weapons.Add(new MagnetMine());
-						weapons.Add(new SpeedBurner(this));
-						weapons.Add(new GigaCrush());
-					} else if (xArmor1v1 == 3) {
-						weapons.Add(new Buster());
-						weapons.Add(new AcidBurst());
-						weapons.Add(new ParasiticBomb());
-						weapons.Add(new TriadThunder());
-						weapons.Add(new SpinningBlade());
-						weapons.Add(new RaySplasher());
-						weapons.Add(new GravityWell());
-						weapons.Add(new FrostShield());
-						weapons.Add(new TunnelFang());
-						weapons.Add(new HyperBuster());
-					}
+		if (!ownedByLocalPlayer) {
+			configureStaticWeapons();
+			return;
+		}
 
-					foreach (var enemyPlayer in Global.level.players) {
-						if (enemyPlayer.maverick1v1 != null && enemyPlayer.alliance != alliance) {
-							Weapon? weaponToDeplete = null;
-							if (enemyPlayer.maverick1v1 == 0) weaponToDeplete = weapons.FirstOrDefault(w => w is FireWave);
-							if (enemyPlayer.maverick1v1 == 1) weaponToDeplete = weapons.FirstOrDefault(w => w is ShotgunIce);
-							if (enemyPlayer.maverick1v1 == 2) weaponToDeplete = weapons.FirstOrDefault(w => w is ElectricSpark);
-							if (enemyPlayer.maverick1v1 == 3) weaponToDeplete = weapons.FirstOrDefault(w => w is RollingShield);
-							if (enemyPlayer.maverick1v1 == 4) weaponToDeplete = weapons.FirstOrDefault(w => w is Torpedo);
-							if (enemyPlayer.maverick1v1 == 5) weaponToDeplete = weapons.FirstOrDefault(w => w is Boomerang);
-							if (enemyPlayer.maverick1v1 == 6) weaponToDeplete = weapons.FirstOrDefault(w => w is Sting);
-							if (enemyPlayer.maverick1v1 == 7) weaponToDeplete = weapons.FirstOrDefault(w => w is Tornado);
-							if (enemyPlayer.maverick1v1 == 8) weaponToDeplete = weapons.FirstOrDefault(w => w is ShotgunIce);
-
-							if (enemyPlayer.maverick1v1 == 9) weaponToDeplete = weapons.FirstOrDefault(w => w is SonicSlicer);
-							if (enemyPlayer.maverick1v1 == 10) weaponToDeplete = weapons.FirstOrDefault(w => w is StrikeChain);
-							if (enemyPlayer.maverick1v1 == 11) weaponToDeplete = weapons.FirstOrDefault(w => w is SpinWheel);
-							if (enemyPlayer.maverick1v1 == 12) weaponToDeplete = weapons.FirstOrDefault(w => w is BubbleSplash);
-							if (enemyPlayer.maverick1v1 == 13) weaponToDeplete = weapons.FirstOrDefault(w => w is SpeedBurner);
-							if (enemyPlayer.maverick1v1 == 14) weaponToDeplete = weapons.FirstOrDefault(w => w is SilkShot);
-							if (enemyPlayer.maverick1v1 == 15) weaponToDeplete = weapons.FirstOrDefault(w => w is MagnetMine);
-							if (enemyPlayer.maverick1v1 == 16) weaponToDeplete = weapons.FirstOrDefault(w => w is CrystalHunter);
-							if (enemyPlayer.maverick1v1 == 17) weaponToDeplete = weapons.FirstOrDefault(w => w is SpeedBurner);
-
-							if (enemyPlayer.maverick1v1 == 18) weaponToDeplete = weapons.FirstOrDefault(w => w is ParasiticBomb);
-							if (enemyPlayer.maverick1v1 == 19) weaponToDeplete = weapons.FirstOrDefault(w => w is FrostShield);
-							if (enemyPlayer.maverick1v1 == 20) weaponToDeplete = weapons.FirstOrDefault(w => w is AcidBurst);
-							if (enemyPlayer.maverick1v1 == 21) weaponToDeplete = weapons.FirstOrDefault(w => w is TunnelFang);
-							if (enemyPlayer.maverick1v1 == 22) weaponToDeplete = weapons.FirstOrDefault(w => w is TriadThunder);
-							if (enemyPlayer.maverick1v1 == 23) weaponToDeplete = weapons.FirstOrDefault(w => w is SpinningBlade);
-							if (enemyPlayer.maverick1v1 == 24) weaponToDeplete = weapons.FirstOrDefault(w => w is RaySplasher);
-							if (enemyPlayer.maverick1v1 == 25) weaponToDeplete = weapons.FirstOrDefault(w => w is GravityWell);
-							if (enemyPlayer.maverick1v1 == 26) weaponToDeplete = weapons.FirstOrDefault(w => w is AcidBurst);
-
-							if (weaponToDeplete != null) weaponToDeplete.ammo = 4;
-						}
-					}
-				} else {
-					weapons = loadout.xLoadout.getWeaponsFromLoadout(this);
-					/*
-					foreach (Weapon weapon in weapons)
-					{
-						if (weapon is GigaCrush && oldGigaCrush != null) weapon.ammo = oldGigaCrush.ammo;
-						if (weapon is HyperBuster && oldHyperbuster != null) weapon.ammo = oldHyperbuster.ammo;
-					}
-					*/
-				}
-			} else if (isAxl) {
-				if (Global.level.isTraining() && !Global.level.server.useLoadout) {
-					weapons = Weapon.getAllAxlWeapons(axlLoadout).Select(w => w.clone()).ToList();
-					weapons[0] = getAxlBullet(axlBulletType);
-				} else if (Global.level.is1v1()) {
-					weapons.Add(new AxlBullet());
-					weapons.Add(new RayGun(axlLoadout.rayGunAlt));
-					weapons.Add(new BlastLauncher(axlLoadout.blastLauncherAlt));
-					weapons.Add(new BlackArrow(axlLoadout.blackArrowAlt));
-					weapons.Add(new SpiralMagnum(axlLoadout.spiralMagnumAlt));
-					weapons.Add(new BoundBlaster(axlLoadout.boundBlasterAlt));
-					weapons.Add(new PlasmaGun(axlLoadout.plasmaGunAlt));
-					weapons.Add(new IceGattling(axlLoadout.iceGattlingAlt));
-					weapons.Add(new FlameBurner(axlLoadout.flameBurnerAlt));
-				} else {
-					weapons = loadout.axlLoadout.getWeaponsFromLoadout();
-					weapons.Insert(0, getAxlBullet(axlBulletType));
+		if (isX) {
+			if (Global.level.isTraining() && !Global.level.server.useLoadout) {
+				weapons = Weapon.getAllXWeapons().Select(w => w.clone()).ToList();
+				if (hasArmArmor(3)) weapons.Add(new HyperBuster());
+				if (hasBodyArmor(2)) weapons.Add(new GigaCrush());
+				if (hasUltimateArmor()) weapons.Add(new NovaStrike(this));
+			} else if (Global.level.is1v1()) {
+				if (xArmor1v1 == 1) {
+					weapons.Add(new Buster());
+					weapons.Add(new Torpedo());
+					weapons.Add(new Sting());
+					weapons.Add(new RollingShield());
+					weapons.Add(new FireWave());
+					weapons.Add(new Tornado());
+					weapons.Add(new ElectricSpark());
+					weapons.Add(new Boomerang());
+					weapons.Add(new ShotgunIce());
+				} else if (xArmor1v1 == 2) {
+					weapons.Add(new Buster());
+					weapons.Add(new CrystalHunter());
+					weapons.Add(new BubbleSplash());
+					weapons.Add(new SilkShot());
+					weapons.Add(new SpinWheel());
+					weapons.Add(new SonicSlicer());
+					weapons.Add(new StrikeChain());
+					weapons.Add(new MagnetMine());
+					weapons.Add(new SpeedBurner(this));
+					weapons.Add(new GigaCrush());
+				} else if (xArmor1v1 == 3) {
+					weapons.Add(new Buster());
+					weapons.Add(new AcidBurst());
+					weapons.Add(new ParasiticBomb());
+					weapons.Add(new TriadThunder());
+					weapons.Add(new SpinningBlade());
+					weapons.Add(new RaySplasher());
+					weapons.Add(new GravityWell());
+					weapons.Add(new FrostShield());
+					weapons.Add(new TunnelFang());
+					weapons.Add(new HyperBuster());
 				}
 
-				foreach (var dnaCore in savedDNACoreWeapons) {
-					weapons.Add(dnaCore);
-				}
+				foreach (var enemyPlayer in Global.level.players) {
+					if (enemyPlayer.maverick1v1 != null && enemyPlayer.alliance != alliance) {
+						Weapon? weaponToDeplete = null;
+						if (enemyPlayer.maverick1v1 == 0) weaponToDeplete = weapons.FirstOrDefault(w => w is FireWave);
+						if (enemyPlayer.maverick1v1 == 1) weaponToDeplete = weapons.FirstOrDefault(w => w is ShotgunIce);
+						if (enemyPlayer.maverick1v1 == 2) weaponToDeplete = weapons.FirstOrDefault(w => w is ElectricSpark);
+						if (enemyPlayer.maverick1v1 == 3) weaponToDeplete = weapons.FirstOrDefault(w => w is RollingShield);
+						if (enemyPlayer.maverick1v1 == 4) weaponToDeplete = weapons.FirstOrDefault(w => w is Torpedo);
+						if (enemyPlayer.maverick1v1 == 5) weaponToDeplete = weapons.FirstOrDefault(w => w is Boomerang);
+						if (enemyPlayer.maverick1v1 == 6) weaponToDeplete = weapons.FirstOrDefault(w => w is Sting);
+						if (enemyPlayer.maverick1v1 == 7) weaponToDeplete = weapons.FirstOrDefault(w => w is Tornado);
+						if (enemyPlayer.maverick1v1 == 8) weaponToDeplete = weapons.FirstOrDefault(w => w is ShotgunIce);
 
-				if (weapons[0].type > 0) {
-					weapons[0].ammo = axlBulletTypeLastAmmo[weapons[0].type];
-				}
-			} else if (isVile) {
-				weapons = loadout.vileLoadout.getWeaponsFromLoadout(true);
-			} else if (isSigma) {
-				if (Global.level.isTraining() && !Global.level.server.useLoadout) {
-					weapons = Weapon.getAllSigmaWeapons(this).Select(w => w.clone()).ToList();
-				} else if (Global.level.is1v1()) {
-					if (maverick1v1 != null) {
-						weapons = new List<Weapon>() { Weapon.getAllSigmaWeapons(this).Select(w => w.clone()).ToList()[maverick1v1.Value + 1] };
-					} else if (!Global.level.isHyper1v1()) {
-						int sigmaForm = Options.main.sigmaLoadout.sigmaForm;
-						weapons = Weapon.getAllSigmaWeapons(this, sigmaForm).Select(w => w.clone()).ToList();
-					}
-				} else {
-					weapons = loadout.sigmaLoadout.getWeaponsFromLoadout(this, Options.main.sigmaWeaponSlot);
-				}
+						if (enemyPlayer.maverick1v1 == 9) weaponToDeplete = weapons.FirstOrDefault(w => w is SonicSlicer);
+						if (enemyPlayer.maverick1v1 == 10) weaponToDeplete = weapons.FirstOrDefault(w => w is StrikeChain);
+						if (enemyPlayer.maverick1v1 == 11) weaponToDeplete = weapons.FirstOrDefault(w => w is SpinWheel);
+						if (enemyPlayer.maverick1v1 == 12) weaponToDeplete = weapons.FirstOrDefault(w => w is BubbleSplash);
+						if (enemyPlayer.maverick1v1 == 13) weaponToDeplete = weapons.FirstOrDefault(w => w is SpeedBurner);
+						if (enemyPlayer.maverick1v1 == 14) weaponToDeplete = weapons.FirstOrDefault(w => w is SilkShot);
+						if (enemyPlayer.maverick1v1 == 15) weaponToDeplete = weapons.FirstOrDefault(w => w is MagnetMine);
+						if (enemyPlayer.maverick1v1 == 16) weaponToDeplete = weapons.FirstOrDefault(w => w is CrystalHunter);
+						if (enemyPlayer.maverick1v1 == 17) weaponToDeplete = weapons.FirstOrDefault(w => w is SpeedBurner);
 
-				// Preserve HP on death so can summon for free until they die
-				if (oldWeapons != null && isRefundableMode() &&
-					previousLoadout?.sigmaLoadout?.commandMode == loadout.sigmaLoadout.commandMode
-				) {
-					foreach (var weapon in weapons) {
-						if (weapon is not MaverickWeapon mw) continue;
-						MaverickWeapon? matchingOldWeapon = oldWeapons.FirstOrDefault(
-							w => w is MaverickWeapon && w.GetType() == weapon.GetType()
-						) as MaverickWeapon;
-						if (matchingOldWeapon == null) {
-							continue;
-						}
-						if (matchingOldWeapon.lastHealth > 0 && matchingOldWeapon.summonedOnce) {
-							mw.summonedOnce = true;
-							mw.lastHealth = matchingOldWeapon.lastHealth;
-							mw.isMoth = matchingOldWeapon.isMoth;
-						}
+						if (enemyPlayer.maverick1v1 == 18) weaponToDeplete = weapons.FirstOrDefault(w => w is ParasiticBomb);
+						if (enemyPlayer.maverick1v1 == 19) weaponToDeplete = weapons.FirstOrDefault(w => w is FrostShield);
+						if (enemyPlayer.maverick1v1 == 20) weaponToDeplete = weapons.FirstOrDefault(w => w is AcidBurst);
+						if (enemyPlayer.maverick1v1 == 21) weaponToDeplete = weapons.FirstOrDefault(w => w is TunnelFang);
+						if (enemyPlayer.maverick1v1 == 22) weaponToDeplete = weapons.FirstOrDefault(w => w is TriadThunder);
+						if (enemyPlayer.maverick1v1 == 23) weaponToDeplete = weapons.FirstOrDefault(w => w is SpinningBlade);
+						if (enemyPlayer.maverick1v1 == 24) weaponToDeplete = weapons.FirstOrDefault(w => w is RaySplasher);
+						if (enemyPlayer.maverick1v1 == 25) weaponToDeplete = weapons.FirstOrDefault(w => w is GravityWell);
+						if (enemyPlayer.maverick1v1 == 26) weaponToDeplete = weapons.FirstOrDefault(w => w is AcidBurst);
 
+						if (weaponToDeplete != null) weaponToDeplete.ammo = 4;
 					}
 				}
+			} else {
+				weapons = loadout.xLoadout.getWeaponsFromLoadout(this);
+				/*
+				foreach (Weapon weapon in weapons)
+				{
+					if (weapon is GigaCrush && oldGigaCrush != null) weapon.ammo = oldGigaCrush.ammo;
+					if (weapon is HyperBuster && oldHyperbuster != null) weapon.ammo = oldHyperbuster.ammo;
+				}
+				*/
 			}
-		} else {
-			foreach (var weapon in Weapon.getAllSwitchableWeapons(loadout.axlLoadout)) {
-				weapons.Add(weapon);
+		} else if (isAxl) {
+			if (Global.level.isTraining() && !Global.level.server.useLoadout) {
+				weapons = Weapon.getAllAxlWeapons(axlLoadout).Select(w => w.clone()).ToList();
+				weapons[0] = getAxlBullet(axlBulletType);
+			} else if (Global.level.is1v1()) {
+				weapons.Add(new AxlBullet());
+				weapons.Add(new RayGun(axlLoadout.rayGunAlt));
+				weapons.Add(new BlastLauncher(axlLoadout.blastLauncherAlt));
+				weapons.Add(new BlackArrow(axlLoadout.blackArrowAlt));
+				weapons.Add(new SpiralMagnum(axlLoadout.spiralMagnumAlt));
+				weapons.Add(new BoundBlaster(axlLoadout.boundBlasterAlt));
+				weapons.Add(new PlasmaGun(axlLoadout.plasmaGunAlt));
+				weapons.Add(new IceGattling(axlLoadout.iceGattlingAlt));
+				weapons.Add(new FlameBurner(axlLoadout.flameBurnerAlt));
+			} else {
+				weapons = loadout.axlLoadout.getWeaponsFromLoadout();
+				weapons.Insert(0, getAxlBullet(axlBulletType));
+			}
+
+			foreach (var dnaCore in savedDNACoreWeapons) {
+				weapons.Add(dnaCore);
+			}
+
+			if (weapons[0].type > 0) {
+				weapons[0].ammo = axlBulletTypeLastAmmo[weapons[0].type];
+			}
+		} else if (isVile) {
+			weapons = loadout.vileLoadout.getWeaponsFromLoadout(true);
+		} else if (isSigma) {
+			if (Global.level.isTraining() && !Global.level.server.useLoadout) {
+				weapons = Weapon.getAllSigmaWeapons(this).Select(w => w.clone()).ToList();
+			} else if (Global.level.is1v1()) {
+				if (maverick1v1 != null) {
+					weapons = new List<Weapon>() { Weapon.getAllSigmaWeapons(this).Select(w => w.clone()).ToList()[maverick1v1.Value + 1] };
+				} else if (!Global.level.isHyper1v1()) {
+					int sigmaForm = Options.main.sigmaLoadout.sigmaForm;
+					weapons = Weapon.getAllSigmaWeapons(this, sigmaForm).Select(w => w.clone()).ToList();
+				}
+			} else {
+				weapons = loadout.sigmaLoadout.getWeaponsFromLoadout(this, Options.main.sigmaWeaponSlot);
+			}
+
+			// Preserve HP on death so can summon for free until they die
+			if (oldWeapons != null && isRefundableMode() &&
+				previousLoadout?.sigmaLoadout?.commandMode == loadout.sigmaLoadout.commandMode
+			) {
+				foreach (var weapon in weapons) {
+					if (weapon is not MaverickWeapon mw) continue;
+					MaverickWeapon? matchingOldWeapon = oldWeapons.FirstOrDefault(
+						w => w is MaverickWeapon && w.GetType() == weapon.GetType()
+					) as MaverickWeapon;
+					if (matchingOldWeapon == null) {
+						continue;
+					}
+					if (matchingOldWeapon.lastHealth > 0 && matchingOldWeapon.summonedOnce) {
+						mw.summonedOnce = true;
+						mw.lastHealth = matchingOldWeapon.lastHealth;
+						mw.isMoth = matchingOldWeapon.isMoth;
+					}
+
+				}
 			}
 		}
 
