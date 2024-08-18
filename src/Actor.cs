@@ -1782,7 +1782,7 @@ public partial class Actor : GameObject {
 		int distance, bool isRequesterAI = false,
 		bool checkWalls = false, bool includeAllies = false
 	) {
-		List<Actor> closeActors = new();
+		HashSet<Actor> closeActors = new();
 		int halfDist = MathInt.Floor(distance / 2f);
 
 		Point checkPos = new Point(MathF.Round(pos.x), MathF.Round(pos.y));
@@ -1792,7 +1792,7 @@ public partial class Actor : GameObject {
 		).getShape();
 		var hits = Global.level.checkCollisionsShape(shape, null);
 		int alliance = -1;
-		if (includeAllies) {
+		if (!includeAllies) {
 			alliance = this switch {
 				Character selfChar => selfChar.player.alliance,
 				Projectile selfProj => selfProj.damager.owner.alliance,
@@ -1813,7 +1813,9 @@ public partial class Actor : GameObject {
 					continue;
 				}
 			}
-			closeActors.Add(actor);
+			if (!closeActors.Contains(actor)) {
+				closeActors.Add(actor);
+			}
 		}
 		return closeActors.ToArray();
 	}

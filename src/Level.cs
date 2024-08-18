@@ -393,6 +393,7 @@ public partial class Level {
 					var pitWall = new Wall(wall.name + "Pit", newRect.getPoints());
 					pitWall.collider.isClimbable = false;
 					addGameObject(pitWall); 
+					addTerrain(pitWall);
 				}
 
 				if (instance?.properties?.unclimbable != null && instance.properties.unclimbable == true) {
@@ -408,22 +409,22 @@ public partial class Level {
 					var unclimbableWall = new Wall(wall.name + "Unclimbable", newRect.getPoints());
 					unclimbableWall.collider.isClimbable = false;
 					addGameObject(unclimbableWall);
+					addTerrain(unclimbableWall);
 				}
 
 				addGameObject(wall);
+				addTerrain(wall);
 			} else if (objectName == "Water Zone") {
-				if (!Global.level.isTraining() || Global.underwaterTraining) {
-					var waterRect = new Rect(points[0], points[2]);
-					waterRects.Add(waterRect);
-				}
+				var waterRect = new Rect(points[0], points[2]);
+				waterRects.Add(waterRect);
 			} else if (objectName == "Ladder") {
-				if (!Global.level.isTraining() || Global.debug) {
-					addGameObject(new Ladder(instanceName, points));
-				}
+				Ladder ladder = new Ladder(instanceName, points);
+				addGameObject(ladder);
+				addTerrain(ladder);
 			} else if (objectName == "Backwall Zone") {
-				if (!Global.disableBackwalls) {
-					addGameObject(new BackwallZone(instanceName, points, (bool?)instance.properties.isExclusion ?? false));
-				}
+				addGameObject(
+					new BackwallZone(instanceName, points, (bool?)instance.properties.isExclusion ?? false)
+				);
 			} else if (objectName == "Gate") {
 				if (isRace()) {
 					var gate = new Gate(instanceName, points);
@@ -433,7 +434,7 @@ public partial class Level {
 					} else {
 						gate.collider.isClimbable = true;
 					}
-
+					addTerrain(gate);
 					addGameObject(gate);
 					gates.Add(gate);
 				}
@@ -459,14 +460,23 @@ public partial class Level {
 
 				var killZone = new KillZone(instanceName, points, killInvuln, damage, flinch, hitCooldown);
 				addGameObject(killZone);
+				addTerrain(killZone);
 			} else if (objectName == "Move Zone") {
 				if (levelData.name != "giantdam" || enableGiantDamPropellers()) {
-					var moveZone = new MoveZone(instanceName, points, (float)instance.properties.moveX, (float)instance.properties.moveY);
+					var moveZone = new MoveZone(
+						instanceName, points,
+						(float)instance.properties.moveX, (float)instance.properties.moveY
+					);
 					addGameObject(moveZone);
+					addTerrain(moveZone);
 				}
 			} else if (objectName == "Jump Zone") {
 				float jumpTime = instance.properties.jumpTime ?? 1;
-				var jumpZone = new JumpZone(instanceName, points, (string)instance.properties.targetNode, Helpers.convertDynamicToDir(instance.properties.forceDir), jumpTime);
+				var jumpZone = new JumpZone(
+					instanceName, points,
+					(string)instance.properties.targetNode,
+					Helpers.convertDynamicToDir(instance.properties.forceDir), jumpTime
+				);
 				addGameObject(jumpZone);
 			} else if (objectName == "Turn Zone") {
 				bool jumpAfterTurn = instance.properties.jumpAfterTurn ?? false;
@@ -501,7 +511,9 @@ public partial class Level {
 					redSpawnXDir = nullableFlipX.Value == true ? -1 : 1;
 				}
 
-				spawnPoints.Add(new SpawnPoint(instanceName, pos.addxy(xOff, 0), redSpawnXDir, GameMode.redAlliance));
+				spawnPoints.Add(new SpawnPoint(
+					instanceName, pos.addxy(xOff, 0), redSpawnXDir, GameMode.redAlliance)
+				);
 			} else if (objectName == "Blue Spawn") {
 				var properties = instance.properties;
 				spawnPoints.Add(new SpawnPoint(instanceName, pos, xDir, GameMode.blueAlliance));
@@ -688,19 +700,27 @@ public partial class Level {
 				var platform = new MovingPlatform(spriteName, idleSpriteName, pos, moveData, moveSpeed, timeOffset, nodeName, killZoneName, crackedWallName, zIndex, flipXOnMoveLeft, flipYOnMoveUp);
 				movingPlatforms.Add(platform);
 				addGameObject(platform);
+				addTerrain(platform);
 			} else if (objectName.StartsWith("Music Source")) {
 				string musicName = instance.properties.musicName ?? "";
-				if (!Global.musics.ContainsKey(musicName)) {
-					//throw new Exception("Music Source with music name " + musicName + " not found.\nIf music is in custom map folder, format as CUSTOM_MAP_NAME:MUSIC_NAME");
-				} else {
-					var actor = new Actor("empty", pos, null, true, false);
-					actor.useGravity = false;
-					actor.name = instanceName;
-					actor.addMusicSource(musicName, pos, true);
-					addGameObject(actor);
+				if (musicName != "") {
+					if (!Global.musics.ContainsKey(musicName)) {
+						throw new Exception(
+							"Music Source with music name " + musicName + " not found.\n" +
+							"If music is in custom map folder, format as CUSTOM_MAP_NAME:MUSIC_NAME"
+						);
+					} else {
+						var actor = new Actor("empty", pos, null, true, false);
+						actor.useGravity = false;
+						actor.name = instanceName;
+						actor.addMusicSource(musicName, pos, true);
+						addGameObject(actor);
+					}
 				}
 			} else {
-				var actor = new Actor(instance.spriteName, pos, Global.level.mainPlayer.getNextActorNetId(), isHost, false);
+				var actor = new Actor(
+					instance.spriteName, pos, Global.level.mainPlayer.getNextActorNetId(), isHost, false
+				);
 				actor.name = instanceName;
 				addGameObject(actor);
 			}

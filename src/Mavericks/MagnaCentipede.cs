@@ -611,7 +611,7 @@ public class MagnaCMagnetPullProj : Projectile {
 
 	public override void update() {
 		base.update();
-		foreach (var go in Global.level.getGameObjectArray()) {
+		foreach (GameObject go in getCloseActors(MathInt.Ceiling(radius + 50))) {
 			var chr = go as Character;
 			if (chr == null || !chr.ownedByLocalPlayer || chr.isImmuneToKnockback()) continue;
 			var damagable = go as IDamagable;

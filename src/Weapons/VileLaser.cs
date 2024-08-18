@@ -265,7 +265,7 @@ public class NecroBurstProj : Projectile {
 	public override void update() {
 		base.update();
 		if (isRunByLocalPlayer()) {
-			foreach (var go in Global.level.getGameObjectArray()) {
+			foreach (var go in getCloseActors(MathInt.Ceiling(radius + 50))) {
 				var chr = go as Character;
 				bool isHurtSelf = chr?.player == damager.owner;
 				if (go is not Actor actor) continue;

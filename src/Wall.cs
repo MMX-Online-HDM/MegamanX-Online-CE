@@ -200,9 +200,11 @@ public class MovingPlatform : Wall {
 
 	public void changePos(Point newOrigin) {
 		var oldPos = collider.shape.points[0];
-		Global.level.removeGameObject(this);
+		Global.level.removeTerrainFromGrid(this);
+		Global.level.removeFromGridFast(this);
 		updateCollider(newOrigin);
-		Global.level.addGameObject(this);
+		Global.level.addGameObjectToGrid(this);
+		Global.level.addTerrainToGrid(this);
 		var newPos = collider.shape.points[0];
 		deltaMove = new Point(newPos.x - oldPos.x, newPos.y - oldPos.y);
 	}
@@ -265,6 +267,7 @@ public class CrackedWall : Actor, IDamagable {
 
 		wall.isCracked = true;
 		Global.level.addGameObject(wall);
+		Global.level.addTerrain(wall);
 
 		this.destroyInstanceName = destroyInstanceName;
 	}
@@ -275,17 +278,21 @@ public class CrackedWall : Actor, IDamagable {
 	}
 
 	public void move(Point deltaPos) {
+		Global.level.removeTerrainFromGrid(this);
 		incPos(deltaPos);
+		Global.level.addTerrainToGrid(this);
+
+		Global.level.removeTerrainFromGrid(wall);
 		Global.level.removeFromGridFast(wall);
-		var rect = collider.shape.getRect().getPoints();
-		wall.collider._shape.points = new List<Point>()
-		{
-				rect[0].addxy(1, 1),
-				rect[1].addxy(-1, 1),
-				rect[2].addxy(-1, -1),
-				rect[3].addxy(1, -1),
-			};
+		List<Point> rect = collider.shape.getRect().getPoints();
+		wall.collider._shape.points = new List<Point>() {
+			rect[0].addxy(1, 1),
+			rect[1].addxy(-1, 1),
+			rect[2].addxy(-1, -1),
+			rect[3].addxy(1, -1),
+		};
 		Global.level.addGameObjectToGrid(wall);
+		Global.level.addTerrainToGrid(this);
 	}
 
 	// Only if 0 is returned, it can't damage it. Even if null, it still can
@@ -351,6 +358,7 @@ public class CrackedWall : Actor, IDamagable {
 	public override void onDestroy() {
 		base.onDestroy();
 		Global.level.removeGameObject(wall);
+		Global.level.removeTerrain(wall);
 		if (!string.IsNullOrEmpty(destroyInstanceName)) {
 			if (destroyInstanceName.StartsWith("No Scroll")) {
 				Global.level.noScrolls.RemoveAll(ns => ns.name == destroyInstanceName);
@@ -358,6 +366,7 @@ public class CrackedWall : Actor, IDamagable {
 				var toRemove = Global.level.gameObjects.FirstOrDefault(go => go.name == destroyInstanceName);
 				if (toRemove != null) {
 					Global.level.removeGameObject(toRemove);
+					Global.level.removeTerrain(toRemove);
 				}
 			}
 		}
@@ -429,12 +438,14 @@ public class KillZone : Geometry {
 	}
 
 	public void move(Point deltaPos) {
+		Global.level.removeTerrainFromGrid(this);
 		Global.level.removeFromGridFast(this);
 		for (int i = 0; i < collider._shape.points.Count; i++) {
 			Point point = collider._shape.points[i];
 			collider._shape.points[i] = point.add(deltaPos);
 		}
 		Global.level.addGameObjectToGrid(this);
+		Global.level.addTerrainToGrid(this);
 	}
 }
 

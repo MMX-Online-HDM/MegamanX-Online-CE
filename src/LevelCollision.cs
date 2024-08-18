@@ -226,6 +226,7 @@ public partial class Level {
 		gameObjects.Remove(go);
 	}
 
+
 	public List<GameObject> getGameObjectArray() {
 		return new List<GameObject>(gameObjects);
 	}
@@ -641,5 +642,47 @@ public partial class Level {
 			return true;
 		}
 		return false;
+	}
+
+	public void addTerrain(GameObject go) {
+		gameObjects.Add(go);
+		addTerrainToGrid(go);
+	}
+
+	public void removeTerrain(GameObject go) {
+		gameObjects.Remove(go);
+		removeTerrainFromGrid(go);
+	}
+
+	public void addTerrainToGrid(GameObject go) {
+		if (!gameObjects.Contains(go)) {
+			return;
+		}
+		Shape? allCollidersShape = go.getAllCollidersShape();
+		if (!allCollidersShape.HasValue) {
+			return;
+		}
+		foreach (Cell cell in getGridCells(allCollidersShape.Value)) {
+			if (cell.x > 0 && cell.x < grid.GetLength(0) &&
+				cell.y > 0 && cell.y < grid.GetLength(1) &&
+				!terrainGrid[cell.x, cell.y].Contains(go)
+			) {
+				terrainGrid[cell.x, cell.y].Add(go);
+			}
+		}
+	}
+
+	public void removeTerrainFromGrid(GameObject go) {
+		Shape? allCollidersShape = go.getAllCollidersShape();
+		if (allCollidersShape == null) return;
+		List<Cell> cells = getGridCells(allCollidersShape.Value);
+		foreach (Cell cell in cells) {
+			if (cell.x > 0 && cell.x < grid.GetLength(0) &&
+				cell.y > 0 && cell.y < grid.GetLength(1) &&
+				terrainGrid[cell.x, cell.y].Contains(go)
+			) {
+				terrainGrid[cell.x, cell.y].Add(go);
+			}
+		}
 	}
 }

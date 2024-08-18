@@ -603,7 +603,7 @@ public class DarkHoldProj : Projectile {
 		updateShader();
 
 		if (timeInFrames  <= 30) {
-			foreach (var gameObject in Global.level.getGameObjectArray()) {
+			foreach (GameObject gameObject in getCloseActors(MathInt.Ceiling(radius + 50))) {
 				if (gameObject != this && gameObject is Actor actor && actor.locallyControlled && inRange(actor)) {
 					// For characters.
 					if (actor is Character chara && chara.darkHoldInvulnTime <= 0) {
