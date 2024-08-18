@@ -959,6 +959,7 @@ public partial class Player {
 		if (eliminated()) return false;
 		if (isAI) return true;
 		if (Global.level.is1v1()) return true;
+		if (!readyTextOver) return false;
 		if (!spawnedOnce) {
 			spawnedOnce = true;
 			return true;
