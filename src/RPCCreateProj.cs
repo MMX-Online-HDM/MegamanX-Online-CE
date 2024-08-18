@@ -632,10 +632,10 @@ public partial class RPCCreateProj : RPC {
 				);
 				break;
 			case (int)ProjIds.Sigma3Shield:
-				proj = new SigmaShieldProj(player.sigmaShieldWeapon, pos, xDir, player, netProjByte);
+				proj = new SigmaShieldProj(pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.Sigma3Fire:
-				proj = new Sigma3FireProj(player.sigmaFireWeapon, pos, 0, 0, player, netProjByte);
+				proj = new Sigma3FireProj(pos, 0, 0, player, netProjByte);
 				break;
 			case (int)ProjIds.Sigma3KaiserMine:
 				proj = new KaiserSigmaMineProj(new KaiserMineWeapon(), pos, xDir, 0, player, netProjByte);

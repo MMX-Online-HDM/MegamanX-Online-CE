@@ -849,6 +849,10 @@ public partial class Character : Actor, IDamagable {
 			player.possesseeUpdate();
 		}
 
+		if (Global.input.isPressed(Key.F2)) {
+    		new GunVolt(pos.addxy(0, 0), 42, true);
+		}
+
 		if (flag != null) {
 			if (MathF.Abs(xPushVel) > 75) xPushVel = 75 * MathF.Sign(xPushVel);
 			if (MathF.Abs(xSwingVel) > 75) xSwingVel = 75 * MathF.Sign(xSwingVel);

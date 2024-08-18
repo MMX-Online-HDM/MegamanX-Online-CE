@@ -3,6 +3,8 @@
 namespace MMXOnline;
 
 public class SigmaClawWeapon : Weapon {
+	public static SigmaClawWeapon netWeapon = new();
+
 	public SigmaClawWeapon() : base() {
 		index = (int)WeaponIds.Sigma2Claw;
 		killFeedIndex = 132;

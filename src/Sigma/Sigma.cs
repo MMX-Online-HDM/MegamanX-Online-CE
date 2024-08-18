@@ -440,7 +440,7 @@ public class BaseSigma : Character {
 	public override Projectile? getProjFromHitbox(Collider collider, Point centerPoint) {
 		if (sprite.name.Contains("sigma_block") && !collider.isHurtBox()) {
 			return new GenericMeleeProj(
-				player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player,
+				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.SigmaSwordBlock, player,
 				0, 0, 0, isDeflectShield: true
 			);
 		}

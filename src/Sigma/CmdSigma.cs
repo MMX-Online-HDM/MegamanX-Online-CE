@@ -119,11 +119,11 @@ public class CmdSigma : BaseSigma {
 	public override Projectile? getProjFromHitbox(Collider collider, Point centerPoint) {
 		Projectile? proj = sprite.name switch {
 			"sigma_ladder_attack" => new GenericMeleeProj(
-				player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSlash, player,
+				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.SigmaSlash, player,
 				3, 0, 0.25f
 			),
 			"sigma_wall_slide_attack" => new GenericMeleeProj(
-				player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSlash, player,
+				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.SigmaSlash, player,
 				3, 0, 0.25f
 			),
 			_ => null

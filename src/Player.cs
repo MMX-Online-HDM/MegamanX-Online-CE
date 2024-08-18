@@ -1330,7 +1330,6 @@ public partial class Player {
 		LoadoutData oldLoadout = loadout;
 		loadout = data.loadout;
 		configureWeapons();
-		configureStaticWeapons();
 		loadout = oldLoadout;
 	}
 
@@ -1395,7 +1394,6 @@ public partial class Player {
 
 		oldWeapons = weapons;
 		weapons = new List<Weapon>(dnaCore.weapons);
-		configureStaticWeapons();
 
 		if (charNum == (int)CharIds.Zero) {
 			weapons.Add(new ZSaber());
@@ -1572,7 +1570,6 @@ public partial class Player {
 		health = Math.Min(health, maxHealth);
 		loadout = oldAxlLoadout;
 		weapons = oldWeapons;
-		configureStaticWeapons();
 		weaponSlot = 0;
 
 		armorFlag = oldArmorFlag;
@@ -1620,7 +1617,6 @@ public partial class Player {
 		health = 0;
 		loadout = oldAxlLoadout;
 		configureWeapons();
-		configureStaticWeapons();
 		weaponSlot = 0;
 
 		armorFlag = oldArmorFlag;

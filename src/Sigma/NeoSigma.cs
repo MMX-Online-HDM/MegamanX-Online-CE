@@ -118,31 +118,31 @@ public class NeoSigma : BaseSigma {
 	public override Projectile? getProjFromHitbox(Collider collider, Point centerPoint) {
 		Projectile? proj = sprite.name switch {
 			"sigma2_attack" => new GenericMeleeProj(
-				player.sigmaClawWeapon, centerPoint, ProjIds.Sigma2Claw, player,
+				SigmaClawWeapon.netWeapon, centerPoint, ProjIds.Sigma2Claw, player,
 				2, 0, 0.2f
 			),
 			"sigma2_attack2" => new GenericMeleeProj(
-				player.sigmaClawWeapon, centerPoint, ProjIds.Sigma2Claw2, player,
+				SigmaClawWeapon.netWeapon, centerPoint, ProjIds.Sigma2Claw2, player,
 				2, Global.halfFlinch, 0.5f
 			),
 			"sigma2_attack_air" => new GenericMeleeProj(
-				player.sigmaClawWeapon, centerPoint, ProjIds.Sigma2Claw, player,
+				SigmaClawWeapon.netWeapon, centerPoint, ProjIds.Sigma2Claw, player,
 				3, 0, 0.375f
 			),
 			"sigma2_attack_dash" => new GenericMeleeProj(
-				player.sigmaClawWeapon, centerPoint, ProjIds.Sigma2Claw, player,
+				SigmaClawWeapon.netWeapon, centerPoint, ProjIds.Sigma2Claw, player,
 				3, 0, 0.375f
 			),
 			"sigma2_upslash" or "sigma2_downslash" => new GenericMeleeProj(
-				player.sigmaClawWeapon, centerPoint, ProjIds.Sigma2UpDownClaw, player,
+				SigmaClawWeapon.netWeapon, centerPoint, ProjIds.Sigma2UpDownClaw, player,
 				3, Global.defFlinch, 0.5f
 			),
 			"sigma2_ladder_attack" => new GenericMeleeProj(
-				player.sigmaSlashWeapon, centerPoint, ProjIds.Sigma2Claw, player,
+				SigmaClawWeapon.netWeapon, centerPoint, ProjIds.Sigma2Claw, player,
 				3, 0, 0.25f
 			),
 			"sigma2_wall_slide_attack" => new GenericMeleeProj(
-				player.sigmaSlashWeapon, centerPoint, ProjIds.Sigma2Claw, player,
+				SigmaClawWeapon.netWeapon, centerPoint, ProjIds.Sigma2Claw, player,
 				3, 0, 0.25f
 			),
 			"sigma2_shoot2" => new GenericMeleeProj(

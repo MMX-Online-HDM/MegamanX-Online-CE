@@ -5,6 +5,7 @@ namespace MMXOnline;
 
 public class Doppma : BaseSigma {
 	public float sigma3FireballCooldown;
+	public Weapon fireWeapon = new Sigma3FireWeapon();
 
 	public Doppma(
 		Player player, float x, float y, int xDir,
@@ -22,7 +23,7 @@ public class Doppma : BaseSigma {
 		if (!ownedByLocalPlayer) {
 			return;
 		}
-		player.sigmaFireWeapon.update();
+		fireWeapon.update();
 		Helpers.decrementTime(ref sigma3FireballCooldown);
 		Helpers.decrementTime(ref sigma3ShieldCooldown);
 		// For ladder and slide shoot.
@@ -34,8 +35,8 @@ public class Doppma : BaseSigma {
 				changeSpriteFromName(charState.sprite, true);
 			} else {
 				var shootPOI = getFirstPOI();
-				if (shootPOI != null && player.sigmaFireWeapon.shootTime == 0) {
-					player.sigmaFireWeapon.shootTime = 0.15f;
+				if (shootPOI != null && fireWeapon.shootTime == 0) {
+					fireWeapon.shootTime = 0.15f;
 					int upDownDir = MathF.Sign(player.input.getInputDir(player).y);
 					float ang = getShootXDir() == 1 ? 0 : 180;
 					if (charState.shootSprite.EndsWith("jump_shoot_downdiag")) {
@@ -49,8 +50,8 @@ public class Doppma : BaseSigma {
 					}
 					playSound("sigma3shoot", sendRpc: true);
 					new Sigma3FireProj(
-						player.sigmaFireWeapon, shootPOI.Value,
-						ang, upDownDir, player, player.getNextActorNetId(), sendRpc: true
+						shootPOI.Value, ang, upDownDir,
+						player, player.getNextActorNetId(), sendRpc: true
 					);
 				}
 			}
@@ -86,7 +87,7 @@ public class Doppma : BaseSigma {
 				}
 			}
 
-			if (player.sigmaFireWeapon.shootTime == 0 && sigma3FireballCooldown == 0) {
+			if (fireWeapon.shootTime == 0 && sigma3FireballCooldown == 0) {
 				if (charState is WallSlide or LadderClimb) {
 					changeSpriteFromName(charState.shootSprite, true);
 				} else {

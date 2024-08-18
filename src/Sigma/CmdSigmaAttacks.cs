@@ -1,6 +1,8 @@
 namespace MMXOnline;
 
 public class SigmaSlashWeapon : Weapon {
+	public static SigmaSlashWeapon netWeapon = new();
+
 	public SigmaSlashWeapon() : base() {
 		index = (int)WeaponIds.SigmaSlash;
 		killFeedIndex = 9;
@@ -45,7 +47,7 @@ public class SigmaSlashState : CharState {
 			float damage = character.grounded ? 4 : 3;
 			int flinch = character.grounded ? Global.defFlinch : 13;
 			new SigmaSlashProj(
-				player.sigmaSlashWeapon, character.pos.addxy(off.x * character.xDir, off.y),
+				SigmaSlashWeapon.netWeapon, character.pos.addxy(off.x * character.xDir, off.y),
 				character.xDir, player, player.getNextActorNetId(), damage: damage, flinch: flinch, rpc: true
 			);
 		}
@@ -91,6 +93,8 @@ public class SigmaSlashProj : Projectile {
 }
 
 public class SigmaBallWeapon : Weapon {
+	public static SigmaBallWeapon netWeapon = new();
+
 	public SigmaBallWeapon() : base() {
 		index = (int)WeaponIds.SigmaBall;
 		killFeedIndex = 103;
@@ -172,7 +176,7 @@ public class SigmaBallShoot : CharState {
 			sigma.sigmaAmmoRechargeCooldown = sigma.sigmaHeadBeamTimeBeforeRecharge;
 			character.playSound("energyBall", sendRpc: true);
 			new SigmaBallProj(
-				player.sigmaBallWeapon, poi, character.xDir, player,
+				SigmaBallWeapon.netWeapon, poi, character.xDir, player,
 				player.getNextActorNetId(), vel.normalize(), rpc: true
 			);
 			new Anim(
@@ -270,7 +274,7 @@ public class SigmaWallDashState : CharState {
 
 			Point off = new Point(30, -20);
 			new SigmaSlashProj(
-				player.sigmaSlashWeapon, character.pos.addxy(off.x * character.xDir, off.y),
+				SigmaSlashWeapon.netWeapon, character.pos.addxy(off.x * character.xDir, off.y),
 				character.xDir, player, player.getNextActorNetId(), damage: 4, rpc: true
 			);
 		}

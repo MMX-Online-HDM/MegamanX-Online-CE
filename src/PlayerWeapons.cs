@@ -25,15 +25,9 @@ public partial class Player {
 		}
 	}
 
-	public bool isShootingSpecialBuster;
-	public Buster busterWeapon = new Buster() { rateOfFire = 0.15f };
-
 	public Weapon weapon {
 		get {
 			if (ownedByLocalPlayer) {
-				if (isShootingSpecialBuster) {
-					return weapons.FirstOrDefault(w => w is Buster) ?? busterWeapon;
-				}
 				if (weapons.InRange(weaponSlot)) {
 					return weapons[weaponSlot];
 				}
@@ -77,26 +71,6 @@ public partial class Player {
 			return null;
 		}
 	}
-
-	public VileCannon cannonWeapon {
-		get {
-			return (weapons.FirstOrDefault(w => w is VileCannon) as VileCannon) ?? new VileCannon(VileCannonType.FrontRunner);
-		}
-	}
-
-	// TODO:
-	// Migrate this to Zero character.
-	public int axlHyperMode;
-
-	public HadoukenWeapon hadoukenWeapon;
-	public ShoryukenWeapon shoryukenWeapon;
-	public Headbutt headbuttWeapon;
-
-	public SigmaSlashWeapon sigmaSlashWeapon;
-	public SigmaClawWeapon sigmaClawWeapon;
-	public SigmaBallWeapon sigmaBallWeapon;
-	public SigmaShieldWeapon sigmaShieldWeapon;
-	public Sigma3FireWeapon sigmaFireWeapon;
 
 	public Maverick? currentMaverick {
 		get {
@@ -329,6 +303,10 @@ label:
 
 	public List<Weapon>? preSigmaReviveWeapons;
 	public void configureWeapons() {
+		if (!ownedByLocalPlayer) {
+			return;
+		}
+
 		var oldGigaCrush = weapons?.Find(w => w is GigaCrush);
 		var oldHyperbuster = weapons?.Find(w => w is HyperBuster);
 		var oldWeapons = weapons;
@@ -339,10 +317,6 @@ label:
 		}
 		weapons = new List<Weapon>();
 
-		if (!ownedByLocalPlayer) {
-			configureStaticWeapons();
-			return;
-		}
 
 		if (isX) {
 			if (Global.level.isTraining() && !Global.level.server.useLoadout) {
@@ -497,8 +471,6 @@ label:
 
 		weaponSlot = 0;
 		if (isSigma && weapons.Count == 3) weaponSlot = Options.main.sigmaWeaponSlot;
-
-		configureStaticWeapons();
 	}
 
 	private Weapon getAxlBullet(int axlBulletType) {
@@ -506,32 +478,6 @@ label:
 			return new DoubleBullet();
 		}
 		return new AxlBullet((AxlBulletWeaponType)axlBulletType);
-	}
-
-	public void configureStaticWeapons() {
-		headbuttWeapon = new Headbutt(this);
-
-		if (character is Zero zero) {
-			zero.groundSpecial = RaijingekiWeapon.getWeaponFromIndex(loadout.zeroLoadout.groundSpecial);
-			zero.airSpecial = KuuenzanWeapon.getWeaponFromIndex(loadout.zeroLoadout.airSpecial);
-			zero.uppercutA = RyuenjinWeapon.getWeaponFromIndex(loadout.zeroLoadout.uppercutA);
-			zero.uppercutS = RyuenjinWeapon.getWeaponFromIndex(loadout.zeroLoadout.uppercutS);
-			zero.downThrustA = HyouretsuzanWeapon.getWeaponFromIndex(loadout.zeroLoadout.downThrustA);
-			zero.downThrustS = HyouretsuzanWeapon.getWeaponFromIndex(loadout.zeroLoadout.downThrustS);
-
-			zero.gigaAttack = RakuhouhaWeapon.getWeaponFromIndex(loadout.zeroLoadout.gigaAttack);
-			zero.hyperMode = loadout.zeroLoadout.hyperMode;
-		}
-
-		hadoukenWeapon = new HadoukenWeapon(this);
-		shoryukenWeapon = new ShoryukenWeapon(this);
-		axlHyperMode = loadout.axlLoadout.hyperMode;
-
-		sigmaBallWeapon = new SigmaBallWeapon();
-		sigmaSlashWeapon = new SigmaSlashWeapon();
-		sigmaClawWeapon = new SigmaClawWeapon();
-		sigmaShieldWeapon = new SigmaShieldWeapon();
-		sigmaFireWeapon = new Sigma3FireWeapon();
 	}
 
 	public Weapon getAxlBulletWeapon() {

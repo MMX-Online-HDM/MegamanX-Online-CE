@@ -136,3 +136,25 @@ public class NeutralEnemy : Actor, IDamagable {
 		invincibleFlag = (data[1] == 1);
 	}
 }
+
+public class GunVolt: NeutralEnemy {
+    public GunVolt(
+		Point pos, ushort netId, bool isLocal, bool addToLevel = true
+	) : base(
+		pos, netId, isLocal, addToLevel
+	){
+        wSize = 42;
+        hSize = 58;
+        health = 16;
+        maxHealth = 16;
+        changeSprite(getSprite("idle"), true);
+    }
+
+	// Sprite change override.
+	public override string getSprite(string spriteName) {
+		if (spriteName is null or "") {
+			return "";
+		}
+		return "fakezero_" + spriteName;
+	}
+}

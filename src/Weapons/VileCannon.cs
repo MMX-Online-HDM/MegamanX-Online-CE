@@ -222,8 +222,8 @@ public class CannonAttack : CharState {
 		vile.playSound("frontrunner", sendRpc: true);
 
 		string muzzleSprite = "cannon_muzzle";
-		if (player.cannonWeapon.type == (int)VileCannonType.FatBoy) muzzleSprite += "_fb";
-		if (player.cannonWeapon.type == (int)VileCannonType.LongshotGizmo) muzzleSprite += "_lg";
+		if (vile.cannonWeapon.type == (int)VileCannonType.FatBoy) muzzleSprite += "_fb";
+		if (vile.cannonWeapon.type == (int)VileCannonType.LongshotGizmo) muzzleSprite += "_lg";
 
 		Point shootPos = vile.setCannonAim(new Point(shootVel.x, shootVel.y));
 		if (vile.sprite.name.EndsWith("_grab")) {

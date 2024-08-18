@@ -3,6 +3,8 @@
 namespace MMXOnline;
 
 public class SigmaShieldWeapon : Weapon {
+	public static SigmaShieldWeapon netWeapon = new();
+
 	public SigmaShieldWeapon() : base() {
 		index = (int)WeaponIds.Sigma3Shield;
 		killFeedIndex = 162;
@@ -10,6 +12,8 @@ public class SigmaShieldWeapon : Weapon {
 }
 
 public class Sigma3FireWeapon : Weapon {
+	public static Sigma3FireWeapon netWeapon = new();
+
 	public Sigma3FireWeapon() : base() {
 		index = (int)WeaponIds.Sigma3Fire;
 		killFeedIndex = 161;
@@ -32,10 +36,10 @@ public class SigmaShieldProj : Projectile {
 	bool returnedToOrigin;
 
 	public SigmaShieldProj(
-		Weapon weapon, Point pos, int xDir,
+		Point pos, int xDir,
 		Player player, ushort netProjId, bool sendRpc = false
 	) : base(
-		weapon, pos, xDir, 0, 3, player, "sigma3_proj_shield",
+		SigmaShieldWeapon.netWeapon, pos, xDir, 0, 3, player, "sigma3_proj_shield",
 		Global.halfFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.Sigma3Shield;
@@ -152,7 +156,7 @@ public class SigmaThrowShieldState : CharState {
 
 		if (proj == null && character.frameIndex >= 1) {
 			proj = new SigmaShieldProj(
-				player.sigmaShieldWeapon, character.getFirstPOIOrDefault(),
+				character.getFirstPOIOrDefault(),
 				character.xDir, player, player.getNextActorNetId(), sendRpc: true
 			);
 		}
@@ -179,8 +183,13 @@ public class Sigma3FireProj : Projectile {
 	int spriteXDir = 1;
 	string spriteName;
 	float smokeTime;
-	public Sigma3FireProj(Weapon weapon, Point pos, float angle, int upDownDir, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, 1, 0, 2, player, "sigma3_proj_fire", 0, 0.01f, netProjId, player.ownedByLocalPlayer) {
+	public Sigma3FireProj(
+		Point pos, float angle,
+		int upDownDir, Player player, ushort netProjId, bool sendRpc = false
+	) : base(
+		Sigma3FireWeapon.netWeapon, pos, 1, 0, 2, player,
+		"sigma3_proj_fire", 0, 0.01f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.Sigma3Fire;
 		maxTime = 0.75f;
 		this.angle = angle;
@@ -254,6 +263,7 @@ public class Sigma3FireProj : Projectile {
 
 public class Sigma3Shoot : CharState {
 	bool hasShot;
+	public Doppma doppma;
 
 	public Sigma3Shoot(Point inputDir) : base(getShootSprite(inputDir)) {
 		airMove = true;
@@ -268,7 +278,7 @@ public class Sigma3Shoot : CharState {
 		Point? shootPOI = character.getFirstPOI();
 		if (!hasShot && shootPOI != null) {
 			hasShot = true;
-			player.sigmaFireWeapon.shootTime = 0.15f;
+			doppma.fireWeapon.shootTime = 0.15f;
 			int upDownDir = MathF.Sign(player.input.getInputDir(player).y);
 			float ang = character.getShootXDir() == 1 ? 0 : 180;
 			if (character.sprite.name.EndsWith("jump_shoot_downdiag")) {
@@ -282,8 +292,8 @@ public class Sigma3Shoot : CharState {
 			}
 			character.playSound("sigma3shoot", sendRpc: true);
 			new Sigma3FireProj(
-				player.sigmaFireWeapon, shootPOI.Value,
-				ang, upDownDir, player, player.getNextActorNetId(), sendRpc: true
+				shootPOI.Value, ang, upDownDir, player,
+				player.getNextActorNetId(), sendRpc: true
 			);
 		}
 		if (character.isAnimOver()) {
@@ -299,6 +309,7 @@ public class Sigma3Shoot : CharState {
 			shootSprite = sprite;
 			character.changeSpriteFromName(sprite, true);
 		}
+		doppma = character as Doppma ?? throw new NullReferenceException();
 	}
 
 	public static string getShootSprite(Point inputDir) {
