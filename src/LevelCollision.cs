@@ -91,11 +91,13 @@ public partial class Level {
 		var retGameobjects = new HashSet<GameObject>();
 		foreach (var cell in cells) {
 			if (cell.gameobjects == null) continue;
-			foreach (var cell2 in cell.gameobjects) {
-				if (gameObjects.Contains(cell2)) {
-					retGameobjects.Add(cell2);
+			foreach (GameObject go in cell.gameobjects) {
+				if (gameObjects.Contains(go) ) {
+					if (!retGameobjects.Contains(go)) {
+						retGameobjects.Add(go);
+					}
 				} else {
-					gameObjects.Remove(cell2);
+					gameObjects.Remove(go);
 					//console.log(cell2);
 					//throw "A gameobject was found in a cell but no longer exists in the map";
 				}
