@@ -69,13 +69,21 @@ public class NeutralEnemy : Actor, IDamagable {
 		newState.onEnter(oldState);
 	}
 
+	// For normal collision.
+	public override Collider? getGlobalCollider() {
+		return new Collider(
+			new Rect(12f, 12f, wSize, hSize).getPoints(),
+			false, this, false, false,
+			HitboxFlag.Hurtbox, Point.zero
+		);
+	}
 	// For terrain collision.
 	public override Collider? getTerrainCollider() {
 		if (physicsCollider == null) {
 			return null;
 		}
 		return new Collider(
-			new Rect(0f, 0f, wSize, hSize).getPoints(),
+			new Rect(12f, 12f, wSize, hSize).getPoints(),
 			false, this, false, false,
 			HitboxFlag.Hurtbox, Point.zero
 		);
@@ -125,5 +133,25 @@ public class NeutralEnemy : Actor, IDamagable {
 	public override void updateCustomActorNetData(byte[] data) {
 		health = (data[0]);
 		invincibleFlag = (data[1] == 1);
+	}
+}
+
+
+
+public class TestEnemy : NeutralEnemy {
+	public TestEnemy(
+		Point pos, ushort netId, bool isLocal, bool addToLevel = true
+	) : base(
+		pos, netId, isLocal, addToLevel
+	) {
+		changeSprite(getSprite("idle"), true);
+	}
+
+	// Sprite change override.
+	public virtual string getSprite(string spriteName) {
+		if (spriteName is null or "") {
+			return "";
+		}
+		return "fakezero" + spriteName;
 	}
 }
