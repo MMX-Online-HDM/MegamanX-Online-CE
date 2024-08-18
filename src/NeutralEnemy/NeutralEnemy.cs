@@ -16,7 +16,7 @@ public class NeutralEnemy : Actor, IDamagable {
 	public NeutralEnemyState state;
 
 	public NeutralEnemy(
-		Point pos, ushort netId, bool isLocal, bool addToLevel = true
+		Point pos, ushort netId, bool isLocal, int alliance = 150, bool addToLevel = true
 	) : base(
 		null!, pos, netId, isLocal, !addToLevel
 	) {
