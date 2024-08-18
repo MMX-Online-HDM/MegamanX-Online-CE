@@ -6,8 +6,8 @@ using static SFML.Window.Keyboard;
 namespace MMXOnline;
 
 public partial class Player {
-	public List<Weapon> weapons;
-	public List<Weapon> oldWeapons;
+	public List<Weapon> weapons = new();
+	public List<Weapon> oldWeapons = new();
 
 	public Weapon nonOwnerWeapon;
 
