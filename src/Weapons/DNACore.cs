@@ -106,6 +106,9 @@ public class DNACore : AxlWeapon {
 		Player player, AxlBulletType axlBulletType = AxlBulletType.Normal,
 		int? overrideChargeLevel = null
 	) {
+		if (!player.ownedByLocalPlayer) {
+			return;
+		}
 		player.lastDNACore = this;
 		player.lastDNACoreIndex = player.weaponSlot;
 		player.savedDNACoreWeapons.Remove(this);
