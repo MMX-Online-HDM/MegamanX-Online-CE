@@ -3443,11 +3443,8 @@ public partial class Character : Actor, IDamagable {
 	public bool disguiseCoverBlown;
 
 	public void addTransformAnim() {
-		transformAnim = new Anim(pos, "axl_transform", xDir, null, true);
-		playSound("transform");
-		if (ownedByLocalPlayer) {
-			Global.serverClient?.rpc(RPC.playerToggle, (byte)player.id, (byte)RPCToggleType.AddTransformEffect);
-		}
+		transformAnim = new Anim(pos, "axl_transform", xDir, player.getNextActorNetId(), true);
+		playSound("transform", sendRpc: true);
 	}
 
 	public virtual void onFlinchOrStun(CharState state) {
