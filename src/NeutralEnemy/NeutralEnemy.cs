@@ -31,6 +31,8 @@ public class NeutralEnemy : Actor, IDamagable {
 		if (ownedByLocalPlayer) {
 			changeState(new NeIdle());
 		}
+
+		this.alliance = alliance;
 	}
 
 	// For state update.
