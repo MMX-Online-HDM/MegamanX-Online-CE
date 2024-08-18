@@ -104,7 +104,7 @@ public struct Shape {
 	public HitData? intersectsShape(Shape other, Point? vel = null) {
 		Global.collisionCalls++;
 
-		if (minY > other.maxX ||
+		if (minX > other.maxX ||
 			maxX < other.minX ||
 			minY > other.maxY ||
 			maxY < other.minY			
