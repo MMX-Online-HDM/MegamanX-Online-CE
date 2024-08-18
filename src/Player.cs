@@ -1388,8 +1388,6 @@ public partial class Player {
 			);
 			Global.serverClient?.rpc(RPC.axlDisguise, json);
 		}
-		maxHealth = dnaCore.maxHealth + MathF.Ceiling(heartTanks * getHeartTankModifier());
-
 		oldAxlLoadout = loadout;
 		loadout = dnaCore.loadout;
 
