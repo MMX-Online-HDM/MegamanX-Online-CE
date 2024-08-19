@@ -283,8 +283,8 @@ public class BoomerKTeleportState : MaverickState {
 				Point? prevCamPos = null;
 				if (player.character != null) {
 					prevCamPos = player.character.getCamCenterPos();
+					player.character.stopCamUpdate = true;
 				}
-				player.character.stopCamUpdate = true;
 				maverick.changePos(clone.pos);
 				if (prevCamPos != null && player.isTagTeam()) {
 					Global.level.snapCamPos(player.character.getCamCenterPos(), prevCamPos);
