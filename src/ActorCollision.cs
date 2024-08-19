@@ -386,8 +386,8 @@ public partial class Actor {
 
 	public void freeFromCollision() {
 		//Already were colliding in first place: free with path of least resistance
-		var currentCollideDatas = Global.level.checkCollisionsActor(this, 0, 0, null);
-
+		var currentCollideDatas = Global.level.checkTerrainCollision(this, 0, 0, null);
+ 
 		foreach (var collideData in currentCollideDatas) {
 			if (this is Character chara && collideData.gameObject is Character otherChara) {
 				chara.insideCharacter = true;
