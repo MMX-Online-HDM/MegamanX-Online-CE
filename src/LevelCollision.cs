@@ -450,7 +450,9 @@ public partial class Level {
 		return collideDatas;
 	}
 
-	public List<CollideData> getTriggerList(Actor actor, float incX, float incY, Point? vel = null, params Type[] classTypes) {
+	public List<CollideData> getTriggerList(
+		Actor actor, float incX, float incY, Point? vel = null, params Type[] classTypes
+	) {
 		var triggers = new List<CollideData>();
 		var myColliders = actor.getAllColliders();
 		if (myColliders.Count == 0) return triggers;
@@ -703,17 +705,17 @@ public partial class Level {
 		if (autoVel && vel == null) {
 			vel = new Point(incX, incY);
 		}
-		var actorShape = actor.collider.shape.clone(incX, incY);
-		var gameObjects = getTerrainInSameCell(actorShape);
-		foreach (var go in gameObjects) {
+		Shape actorShape = actor.collider.shape.clone(incX, incY);
+		GameObject[] gameObjects = getTerrainInSameCell(actorShape);
+		foreach (GameObject go in gameObjects) {
 			if (go == actor) continue;
 			if (go.collider == null) continue;
-			var isTrigger = shouldTrigger(actor, go, actor.collider, go.collider, new Point(incX, incY));
+			bool isTrigger = shouldTrigger(actor, go, actor.collider, go.collider, new Point(incX, incY));
 			if (go is Actor goActor && goActor.isPlatform && checkPlatforms) {
 				isTrigger = false;
 			}
 			if (isTrigger) continue;
-			var hitData = actorShape.intersectsShape(go.collider.shape, vel);
+			HitData hitData = actorShape.intersectsShape(go.collider.shape, vel);
 			if (hitData != null) {
 				collideDatas.Add(new CollideData(actor.collider, go.collider, vel, isTrigger, go, hitData));
 				if (returnOne) {
@@ -725,7 +727,7 @@ public partial class Level {
 		return collideDatas;
 	}
 
-	public List<GameObject> getTerrainInSameCell(Shape shape) {
+	public GameObject[] getTerrainInSameCell(Shape shape) {
 		List<Cell> cells = getTerrainCells(shape);
 		HashSet<GameObject> retGameobjects = new();
 		foreach (Cell cell in cells) {
@@ -736,11 +738,7 @@ public partial class Level {
 				}
 			}
 		}
-		List<GameObject> arr = new();
-		foreach (var go in retGameobjects) {
-			arr.Add(go);
-		}
-		return arr;
+		return retGameobjects.ToArray();
 	}
 
 	//Optimize this function, it will be called a lot
