@@ -2702,7 +2702,7 @@ public partial class Character : Actor, IDamagable {
 		// For fractional damage shenanigans.
 		if (damage % 1 != 0) {
 			decimal decDamage = damage % 1;
-			damage = Math.Floor(decDamage);
+			damage = Math.Floor(damage);
 			// Fully nullyfy decimal using damage savings if posible.
 			if (damageSavings >= decDamage) {
 				damageSavings -= decDamage;
