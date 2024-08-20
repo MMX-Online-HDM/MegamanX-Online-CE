@@ -1731,7 +1731,7 @@ public partial class Level {
 			}
 		}
 
-		if (true) {
+		if (Global.showGridHitboxes) {
 			int gridItemCount = 0;
 			int offset = 0;
 			int startGridX = MathInt.Floor(camX / cellWidth);
@@ -1754,7 +1754,7 @@ public partial class Level {
 
 			for (int y = startGridY; y < endGridY; y++) {
 				for (int x = startGridX; x < endGridX; x++) {
-					if (true) {
+					if (grid[x, y].Count > 0) {
 						gridItemCount += grid[x, y].Count;
 						DrawWrappers.DrawRect(
 							x * cellWidth,
