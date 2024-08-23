@@ -12,7 +12,7 @@ public class BusterZeroMelee : CharState {
 		landSprite = "projswing";
 		airSprite = "projswing_air";
 		airMove = true;
-		superArmor = true;
+		//superArmor = true;
 		canJump = true;
 		canStopJump = true;
 	}
