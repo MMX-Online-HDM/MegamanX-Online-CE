@@ -1851,14 +1851,26 @@ public partial class Player {
 
 	public bool canReviveSigma(out Point spawnPoint) {
 		spawnPoint = Point.zero;
-		if (Global.level.isHyper1v1() && !lastDeathWasSigmaHyper && limboChar != null && isSigma && newCharNum == 4) {
+
+		if (Global.level.isHyper1v1() &&
+			!lastDeathWasSigmaHyper &&
+			limboChar != null && isSigma
+			&& newCharNum == 4
+		) {
 			return true;
 		}
+		if (limboChar == null ||
+			!lastDeathCanRevive ||
+			!isSigma ||
+			newCharNum != 4 ||
+			currency < reviveSigmaCost ||
+			lastDeathWasSigmaHyper
+		) {
+			return false;
+		}
+		int sigmaHypermode = 2;
 
-		bool basicCheck = !Global.level.isElimination() && limboChar != null && lastDeathCanRevive && isSigma && newCharNum == 4 && currency >= reviveSigmaCost && !lastDeathWasSigmaHyper;
-		if (!basicCheck) return false;
-
-		if (false) {
+		if (sigmaHypermode == 0) {
 			Point deathPos = limboChar.pos;
 
 			// Get ground snapping pos
@@ -1876,7 +1888,10 @@ public partial class Player {
 			// Check if ample space to revive in
 			int w = 10;
 			int h = 120;
-			rect = new Rect(new Point(deathPos.x - w / 2, deathPos.y - h), new Point(deathPos.x + w / 2, deathPos.y - 25));
+			rect = new Rect(
+				new Point(deathPos.x - w / 2, deathPos.y - h),
+				new Point(deathPos.x + w / 2, deathPos.y - 25)
+			);
 			hits = Global.level.checkCollisionsShape(rect.getShape(), null);
 			if (hits.Any(h => h.gameObject is Wall)) {
 				return false;
@@ -1886,16 +1901,15 @@ public partial class Player {
 				return false;
 			}
 			foreach (var player in Global.level.players) {
-				if (player.character is WolfSigma && player.character.pos.distanceTo(deathPos) < Global.screenW) {
+				if (player.character is WolfSigma &&
+					player.character.pos.distanceTo(deathPos) < Global.screenW
+				) {
 					return false;
 				}
 			}
-		} else if (false) {
-			return true;
-		} else if (true) {
+		} else if (sigmaHypermode == 2) {
 			return limboChar != null && KaiserSigma.canKaiserSpawn(limboChar, out spawnPoint);
 		}
-
 		return true;
 	}
 

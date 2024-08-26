@@ -692,6 +692,13 @@ public class PunchyZero : Character {
 		return runSpeed * getRunDebuffs();
 	}
 
+	public override float getLabelOffY() {
+		if (sprite.name.Contains("_ra_")) {
+			return 25;
+		}
+		return 45;
+	}
+
 	public override void render(float x, float y) {
 		if (isViral && visible) {
 			addRenderEffect(RenderEffectType.Trail);

@@ -167,6 +167,13 @@ public partial class KaiserSigma : Character {
 		kaiserExhaustR?.destroySelf();
 	}
 
+	public override float getLabelOffY() {
+		if (player.isKaiserViralSigma()) {
+			return 60;
+		}
+		return 125;
+	}
+
 	public override void render(float x, float y) {
 		base.render(x, y);
 		string kaiserBodySprite = "";

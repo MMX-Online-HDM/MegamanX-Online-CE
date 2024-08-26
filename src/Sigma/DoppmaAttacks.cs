@@ -278,7 +278,7 @@ public class Sigma3Shoot : CharState {
 		Point? shootPOI = character.getFirstPOI();
 		if (!hasShot && shootPOI != null) {
 			hasShot = true;
-			doppma.fireWeapon.shootTime = 0.15f;
+			doppma.fireballWeapon.shootTime = 0.15f;
 			int upDownDir = MathF.Sign(player.input.getInputDir(player).y);
 			float ang = character.getShootXDir() == 1 ? 0 : 180;
 			if (character.sprite.name.EndsWith("jump_shoot_downdiag")) {

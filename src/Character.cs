@@ -407,17 +407,6 @@ public partial class Character : Actor, IDamagable {
 
 	public override List<ShaderWrapper> getShaders() {
 		List<ShaderWrapper> shaders = new();
-		ShaderWrapper? palette = null;
-
-		// TODO: Send this to the respective classes.
-		if (player.isViralSigma()) {
-			int paletteNum = 6 - MathInt.Ceiling((player.health / player.maxHealth) * 6);
-			if (sprite.name.Contains("_enter")) paletteNum = 0;
-			palette = player.viralSigmaShader;
-			palette?.SetUniform("palette", paletteNum);
-			palette?.SetUniform("paletteTexture", Global.textures["paletteViralSigma"]);
-		}
-		if (palette != null) shaders.Add(palette);
 
 		if (player.isPossessed() && player.possessedShader != null) {
 			player.possessedShader.SetUniform("palette", 1);
@@ -1701,11 +1690,6 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public override Point getCenterPos() {
-		if (player.isSigma) {
-			if (player.isWolfSigma()) return pos.addxy(0, -7);
-			else if (player.isViralSigma()) return pos.addxy(0, 0);
-			return pos.addxy(0, -32);
-		}
 		return pos.addxy(0, -18);
 	}
 
@@ -2023,21 +2007,11 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	// Get dist from y pos to pos at which to draw the first label
-	public float getLabelOffY() {
-		float offY = 42;
-		if (player.isZero) offY = 45;
-		if (player.isVile) offY = 50;
-		if (player.isSigma) offY = 62;
-		if (sprite.name.Contains("_ra_")) offY = 25;
-		if (player.isMainPlayer && player.isTagTeam() && player.currentMaverick != null) {
-			offY = player.currentMaverick.getLabelOffY();
+	public virtual float getLabelOffY() {
+		if (sprite.name.Contains("_ra_")) {
+			return 25;
 		}
-		if (player.isWolfSigma()) offY = 25;
-		if (player.isViralSigma()) offY = 43;
-		if (player.isKaiserSigma()) offY = 125;
-		if (player.isKaiserViralSigma()) offY = 60;
-
-		return offY;
+		return 42;
 	}
 
 	public override void render(float x, float y) {

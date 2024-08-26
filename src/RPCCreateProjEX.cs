@@ -7,6 +7,7 @@ public partial class RPCCreateProj : RPC {
 		// X Stuff.
 		{ (int)ProjIds.Boomerang, BoomerangProj.rpcInvoke },
 		{ (int)ProjIds.ShotgunIce, ShotgunIceProj.rpcInvoke },
+		{ (int)ProjIds.BubbleSplash, BubbleSplashProj.rpcInvoke },
 		{ (int)ProjIds.TriadThunder, TriadThunderProj.rpcInvoke },
 		{ (int)ProjIds.TriadThunderQuake, TriadThunderQuake.rpcInvoke },
 		{ (int)ProjIds.TriadThunderCharged, TriadThunderProjCharged.rpcInvoke },

@@ -4,6 +4,8 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class BubbleSplash : Weapon {
+	public static BubbleSplash netWeapon = new();
+
 	public List<BubbleSplashProj> bubblesOnField = new List<BubbleSplashProj>();
 	public List<float> bubbleAfterlifeTimes = new List<float>();
 	public float hyperChargeDelay;
@@ -66,8 +68,14 @@ public class BubbleSplash : Weapon {
 	// Friendly reminder that this method MUST be deterministic across all clients, i.e. don't vary it on a field that could vary locally.
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
 		if (chargeLevel < 3) {
-			var proj = new BubbleSplashProj(this, pos, xDir, player, netProjId);
-			bubblesOnField.Add(proj);
+			if (player.ownedByLocalPlayer) {
+				int type = 0;
+				if (player.input.isHeld(Control.Up, player)) {
+					type = 1;
+				}
+				var proj = new BubbleSplashProj(type, pos, xDir, player, netProjId, rpc: true);
+				bubblesOnField.Add(proj);
+			}
 		} else if (chargeLevel >= 3 && player.character is MegamanX mmx) {
 			player.setNextActorNetId(netProjId);
 			mmx.popAllBubbles();
@@ -81,14 +89,36 @@ public class BubbleSplash : Weapon {
 }
 
 public class BubbleSplashProj : Projectile {
-	public BubbleSplashProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 75, 1, player, "bubblesplash_proj_start", 0, 0f, netProjId, player.ownedByLocalPlayer) {
+	int size;
+
+	public BubbleSplashProj(
+		int type, Point pos, int xDir, Player player, ushort netProjId,
+		int? size = null, int? randX = null, int? randY = null,
+		bool rpc = false
+	) : base(
+		BubbleSplash.netWeapon, pos, xDir,
+		75, 1, player, "bubblesplash_proj_start", 0, 0f,
+		netProjId, player.ownedByLocalPlayer
+	) {
+		// RNG shenanigans.
+		if (randX == null) {
+			randX = Helpers.randomRange(75, 125);
+		}
+		if (randY == null) {
+			randY = Helpers.randomRange(75, 125);
+		}
+		if (size == null) {
+			size = Helpers.randomRange(0, spriteVariants.Length - 1);
+		}
+		// Create variables.
+		this.size = size.Value;
 		maxTime = 0.75f;
 		useGravity = false;
-		vel.y = -20 * Helpers.randomRange(0.75f, 1.25f);
-		vel.x *= Helpers.randomRange(0.75f, 1.25f);
 
-		if (!player.input.isHeld(Control.Up, player)) {
+		vel.x *= randX.Value / 100f;
+		vel.y = -20 * (randY.Value / 100f);
+
+		if (type == 0) {
 			vel.y *= 0.5f;
 			vel.x *= 1.75f;
 		} else {
@@ -101,19 +131,33 @@ public class BubbleSplashProj : Projectile {
 		projId = (int)ProjIds.BubbleSplash;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(
+				pos, player, netProjId, xDir,
+				(byte)type, (byte)size, (byte)randX, (byte)randY
+			);
 		}
 	}
 
 	public override void update() {
 		base.update();
+		vel.y -= 1.65f;
+
 		if (sprite.name == "bubblesplash_proj_start" && isAnimOver()) {
-			int randColor = Helpers.randomRange(0, 2);
-			if (randColor == 0) changeSprite("bubblesplash_proj", true);
-			if (randColor == 1) changeSprite("bubblesplash_proj2", true);
-			if (randColor == 2) changeSprite("bubblesplash_proj3", true);
+			changeSprite(spriteVariants[size], true);
 		}
-		vel.y -= Global.spf * 100;
+	}
+
+	public static string[] spriteVariants = {
+		"bubblesplash_proj",
+		"bubblesplash_proj2",
+		"bubblesplash_proj3",
+	};
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new BubbleSplashProj(
+			arg.extraData[0], arg.pos, arg.xDir, arg.player, arg.netId,
+			arg.extraData[1], arg.extraData[2], arg.extraData[3]
+		);
 	}
 }
 
