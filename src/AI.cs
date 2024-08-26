@@ -1619,14 +1619,14 @@ public class AI {
 				   !DoppmaSigma.isInvulnerable() && DoppmaSigma.charState.canAttack()
 				   && !(DoppmaSigma.charState is CallDownMaverick or SigmaThrowShieldState or Sigma3Shoot)) {
 					switch (DoppmaSigmaAttack) {
-						case 0 when DoppmaSigma.sigma3FireballCooldown == 0:
+						case 0 when DoppmaSigma.fireballCooldown == 0:
 							DoppmaSigma.changeState(new Sigma3Shoot(player.input.getInputDir(player)), true);
-							DoppmaSigma.sigma3FireballCooldown = DoppmaSigma.maxSigma3FireballCooldown;
+							DoppmaSigma.fireballCooldown = DoppmaSigma.maxFireballCooldown;
 							break;
-						case 1 when DoppmaSigma.sigma3ShieldCooldown == 0:
+						case 1 when DoppmaSigma.shieldCooldown == 0:
 							if (DoppmaSigma.grounded) {
 								DoppmaSigma.changeState(new SigmaThrowShieldState(), true);
-								DoppmaSigma.sigma3ShieldCooldown = DoppmaSigma.maxSigma3ShieldCooldown;
+								DoppmaSigma.shieldCooldown = DoppmaSigma.maxShieldCooldown;
 							}
 							break;
 						case 2:

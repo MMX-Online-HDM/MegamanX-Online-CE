@@ -8,35 +8,9 @@ public class BaseSigma : Character {
 	public const float sigmaHeight = 50;
 	public float sigmaSaberMaxCooldown = 1f;
 	public float noBlockTime = 0;
-	public bool isHyperSigma;
 	public const float maxLeapSlashCooldown = 2;
 	public float tagTeamSwapProgress;
 	public int tagTeamSwapCase;
-	public float maxSigma3FireballCooldown = 0.39f;
-	public float sigma3ShieldCooldown;
-	public float maxSigma3ShieldCooldown = 1.125f;
-
-	public float viralSigmaTackleCooldown;
-	public float viralSigmaTackleMaxCooldown = 1;
-	public string lastHyperSigmaSprite;
-	public int lastHyperSigmaFrameIndex;
-	public int lastHyperSigmaXDir;
-	public float lastViralSigmaAngle;
-	public float viralSigmaAngle;
-	//public ShaderWrapper viralSigmaShader;
-	//public ShaderWrapper sigmaShieldShader;
-
-	// TODO: Move this to a diferent class.
-	public float viralSigmaBeamLength;
-	public int lastViralSigmaXDir = 1;
-	public Character possessTarget;
-	public float possessEnemyTime;
-	public float maxPossessEnemyTime;
-	public int numPossesses;
-
-	public WolfSigmaHead head;
-	public WolfSigmaHand leftHand;
-	public WolfSigmaHand rightHand;
 
 	public BaseSigma(
 		Player player, float x, float y, int xDir,
@@ -64,36 +38,6 @@ public class BaseSigma : Character {
 			intialCharState = new Idle();
 		}
 		changeState(intialCharState);
-	}
-
-	public void getViralSigmaPossessTarget() {
-		var collideDatas = Global.level.getTriggerList(this, 0, 0);
-		foreach (var collideData in collideDatas) {
-			if (collideData?.gameObject is Character chr &&
-				chr.canBeDamaged(player.alliance, player.id, (int)ProjIds.Sigma2ViralPossess) &&
-				chr.player.canBePossessed()) {
-				possessTarget = chr;
-				maxPossessEnemyTime = 2 + (Helpers.clampMax(numPossesses, 4) * 0.5f);
-				//2 - Helpers.progress(chr.player.health, chr.player.maxHealth);
-				return;
-			}
-		}
-	}
-
-	public bool canPossess(Character target) {
-		if (target == null || target.destroyed) return false;
-		if (!target.player.canBePossessed()) return false;
-		var collideDatas = Global.level.getTriggerList(this, 0, 0);
-		foreach (var collideData in collideDatas) {
-			if (collideData.gameObject is Character chr &&
-				chr.canBeDamaged(player.alliance, player.id, (int)ProjIds.Sigma2ViralPossess)
-			) {
-				if (target == chr) {
-					return true;
-				}
-			}
-		}
-		return false;
 	}
 
 	public bool isSigmaShooting() {
@@ -320,11 +264,7 @@ public class BaseSigma : Character {
 		}
 		Helpers.decrementTime(ref saberCooldown);
 		Helpers.decrementTime(ref noBlockTime);
-		Helpers.decrementTime(ref viralSigmaTackleCooldown);
-		if (viralSigmaBeamLength < 1 && charState is not ViralSigmaBeamState) {
-			viralSigmaBeamLength += Global.spf * 0.1f;
-			if (viralSigmaBeamLength > 1) viralSigmaBeamLength = 1;
-		}
+		
 		if (player.sigmaAmmo >= player.sigmaMaxAmmo) {
 			weaponHealAmount = 0;
 		}
@@ -346,35 +286,6 @@ public class BaseSigma : Character {
 				mw.summon(player, pos.addxy(0, -112), pos, xDir);
 				mw.maverick.health = mw.lastHealth;
 				becomeMaverick(mw.maverick);
-			}
-		}
-
-		if (this is ViralSigma && charState is not Die) {
-			lastHyperSigmaSprite = sprite?.name;
-			lastHyperSigmaFrameIndex = frameIndex;
-			lastViralSigmaAngle = angle ?? 0;
-
-			var inputDir = player.input.getInputDir(player);
-			if (inputDir.x != 0) lastViralSigmaXDir = MathF.Sign(inputDir.x);
-
-			possessTarget = null;
-			if (charState is ViralSigmaIdle) {
-				getViralSigmaPossessTarget();
-			}
-
-			if (charState is not ViralSigmaRevive) {
-				angle = Helpers.moveAngle(angle ?? 0, viralSigmaAngle, Global.spf * 500, snap: true);
-			}
-			if (player.weapons.Count >= 3) {
-				if (isWading()) {
-					if (player.weapons[2] is MechaniloidWeapon meW && meW.mechaniloidType != MechaniloidType.Fish) {
-						player.weapons[2] = new MechaniloidWeapon(player, MechaniloidType.Fish);
-					}
-				} else {
-					if (player.weapons[2] is MechaniloidWeapon meW && meW.mechaniloidType != MechaniloidType.Bird) {
-						player.weapons[2] = new MechaniloidWeapon(player, MechaniloidType.Bird);
-					}
-				}
 			}
 		}
 		if (invulnTime > 0) {
@@ -535,11 +446,6 @@ public class BaseSigma : Character {
 		return base.canClimbLadder();
 	}
 
-	public override bool isSoundCentered() {
-		if (isHyperSigma) return false;
-		return base.isSoundCentered();
-	}
-
 	public override Collider getGlobalCollider() {
 		Rect rect = new Rect(0, 0, 18, BaseSigma.sigmaHeight);
 		if (sprite.name.Contains("_ra_")) {
@@ -599,6 +505,20 @@ public class BaseSigma : Character {
 		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
 	}
 
+	public override Point getCenterPos() {
+		return pos.addxy(0, -32);
+	}
+
+	public override float getLabelOffY() {
+		if (player.isMainPlayer && player.isTagTeam() && player.currentMaverick != null) {
+			return player.currentMaverick.getLabelOffY();
+		}
+		if (sprite.name.Contains("_ra_")) {
+			return 25;
+		}
+		return 62;
+	}
+
 	public override void render(float x, float y) {
 		base.render(x, y);
 
@@ -628,43 +548,6 @@ public class BaseSigma : Character {
 			);
 			deductLabelY(labelCooldownOffY);
 		}
-
-		if (player.isViralSigma() && charState is ViralSigmaPossessStart) {
-			float healthBarInnerWidth = 30;
-
-			float progress = (possessEnemyTime / maxPossessEnemyTime);
-			float width = progress * healthBarInnerWidth;
-
-			getHealthNameOffsets(out bool shieldDrawn, ref progress);
-
-			Point topLeft = new Point(pos.x - 16, pos.y - 5 + currentLabelY);
-			Point botRight = new Point(pos.x + 16, pos.y + currentLabelY);
-
-			DrawWrappers.DrawRect(
-				topLeft.x, topLeft.y, botRight.x, botRight.y,
-				true, Color.Black, 0, ZIndex.HUD - 1, outlineColor: Color.White
-			);
-			DrawWrappers.DrawRect(
-				topLeft.x + 1, topLeft.y + 1, topLeft.x + 1 + width, botRight.y - 1,
-				true, Color.Yellow, 0, ZIndex.HUD - 1
-			);
-			Fonts.drawText(
-				FontType.DarkGreen, "Possessing...", pos.x, pos.y - 15 + currentLabelY,
-				Alignment.Center, true, depth: ZIndex.HUD
-			);
-			deductLabelY(labelCooldownOffY);
-		}
-	}
-
-	public override void destroySelf(
-		string spriteName = null, string fadeSound = null, bool disableRpc = false,
-		bool doRpcEvenIfNotOwned = false, bool favorDefenderProjDestroy = false
-	) {
-		head?.explode();
-		leftHand?.destroySelf();
-		rightHand?.destroySelf();
-
-		base.destroySelf(spriteName, fadeSound, disableRpc, doRpcEvenIfNotOwned, favorDefenderProjDestroy);
 	}
 
 	public override bool isAttacking() {

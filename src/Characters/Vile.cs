@@ -616,6 +616,13 @@ public class Vile : Character {
 		base.changeToIdleOrFall();
 	}
 
+	public override float getLabelOffY() {
+		if (sprite.name.Contains("_ra_")) {
+			return 25;
+		}
+		return 50;
+	}
+
 	public override void render(float x, float y) {
 		if (player.speedDevil) {
 			addRenderEffect(RenderEffectType.SpeedDevilTrail);

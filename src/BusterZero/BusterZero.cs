@@ -287,6 +287,13 @@ public class BusterZero : Character {
 		return dashedInAir == 0 || (dashedInAir == 1 && isBlackZero);
 	}
 
+	public override float getLabelOffY() {
+		if (sprite.name.Contains("_ra_")) {
+			return 25;
+		}
+		return 45;
+	}
+
 	public override List<ShaderWrapper> getShaders() {
 		List<ShaderWrapper> baseShaders = base.getShaders();
 		List<ShaderWrapper> shaders = new();
