@@ -99,7 +99,7 @@ public class RisingSpecterState : CharState {
 		}
 
 		if (stateTime > 0.5f) {
-			character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 		}
 	}
 
@@ -223,7 +223,7 @@ public class NecroBurstAttack : CharState {
 		}
 
 		if (character.sprite.isAnimOver()) {
-			character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 		}
 	}
 
@@ -339,7 +339,7 @@ public class StraightNightmareAttack : CharState {
 		}
 
 		if (character.sprite.isAnimOver()) {
-			character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 		}
 	}
 

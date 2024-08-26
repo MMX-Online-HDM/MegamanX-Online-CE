@@ -84,7 +84,7 @@ public class CutterAttackState : CharState {
 		}
 
 		if (character.sprite.isAnimOver()) {
-			character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 		}
 	}
 

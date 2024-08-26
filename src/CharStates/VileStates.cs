@@ -17,7 +17,7 @@ public class CallDownMech : CharState {
 	public override void update() {
 		base.update();
 		if (rideArmor == null || rideArmor.destroyed || stateTime > 4) {
-			character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 			return;
 		}
 
@@ -27,7 +27,7 @@ public class CallDownMech : CharState {
 			{
 				if (stateTime > 0.75f)
 				{
-					character.changeState(new Idle(), true);
+					character.changeToIdleOrFall();
 				}
 				return;
 			}
@@ -36,7 +36,7 @@ public class CallDownMech : CharState {
 			if (vile.isVileMK5 != true && MathF.Abs(character.pos.x - rideArmor.pos.x) < 10) {
 				rideArmor.putCharInRideArmor(character);
 			} else {
-				character.changeState(new Idle(), true);
+				character.changeToIdleOrFall();
 			}
 		}
 	}

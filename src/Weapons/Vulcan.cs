@@ -152,13 +152,16 @@ public class VulcanCharState : CharState {
 		base.update();
 
 		if (isCrouch && !player.input.isHeld(Control.Down, player)) {
-			character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 			return;
 		}
 
 		if (!player.input.isHeld(Control.Shoot, player) || !(player.weapon is Vulcan)) {
-			if (isCrouch) character.changeState(new Crouch(transitionSprite = ""), true);
-			else character.changeState(new Idle(), true);
+			if (isCrouch) {
+				character.changeToCrouchOrFall();
+			} else {
+				character.changeToIdleOrFall();
+			}
 			return;
 		}
 

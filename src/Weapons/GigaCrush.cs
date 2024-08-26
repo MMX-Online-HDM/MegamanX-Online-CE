@@ -157,8 +157,8 @@ public class GigaCrushCharState : CharState {
 				player, player.getNextActorNetId(), rpc: true
 			);
 		}
-		if (character.sprite.isAnimOver()) {
-			character.changeState(new Idle(), true);
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
 		}
 
 		if (stateTime <= 1.6) {

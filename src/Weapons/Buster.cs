@@ -623,8 +623,7 @@ public class X3ChargeShot : CharState {
 			if (state == 0 && pressFire) {
 				if (hyperBusterWeapon != null) {
 					if (hyperBusterWeapon.ammo < hyperBusterWeapon.getChipFactoredAmmoUsage(player)) {
-						if (character.grounded) character.changeState(new Idle(), true);
-						else character.changeState(new Fall(), true);
+						character.changeToIdleOrFall();
 						return;
 					}
 				} else {

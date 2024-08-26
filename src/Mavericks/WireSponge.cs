@@ -281,7 +281,7 @@ public class WSpongeSideChainProj : Projectile {
 		var hookedChar = hookedActor as Character;
 
 		if (hookedChar != null && hookedChar.charState is StrikeChainHooked) {
-			hookedChar.changeState(new Idle());
+			hookedChar.changeToIdleOrFall();
 		}
 		if (hookedActor is Anim) {
 			hookedActor.useGravity = true;

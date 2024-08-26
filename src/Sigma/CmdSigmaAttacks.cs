@@ -53,8 +53,7 @@ public class SigmaSlashState : CharState {
 		}
 
 		if (character.isAnimOver()) {
-			if (character.grounded) character.changeState(new Idle(), true);
-			else character.changeState(new Fall(), true);
+			character.changeToIdleOrFall();
 		}
 	}
 }
@@ -133,7 +132,7 @@ public class SigmaBallShoot : CharState {
 		base.update();
 
 		if (character.sprite.loopCount > 0 && !player.input.isHeld(Control.Special1, player)) {
-			character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 			return;
 		}
 
@@ -186,7 +185,7 @@ public class SigmaBallShoot : CharState {
 		}
 
 		if (character.sprite.loopCount > 5 || player.sigmaAmmo <= 0) {
-			character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 		}
 	}
 
@@ -243,11 +242,11 @@ public class SigmaWallDashState : CharState {
 			if (collideData2?.gameObject is Wall wall2 && wall2.collider.isClimbable) {
 				character.changeState(new WallSlide(character.xDir, wall2.collider), true);
 			} else {
-				if (vel.y > 0) character.changeState(new Idle(), true);
-				else {
-					//vel.y *= -1;
+				if (vel.y > 0) {
+					character.changeToIdleOrFall();
+				} else {
 					character.isDashing = true;
-					character.changeState(new Fall(), true);
+					character.changeToIdleOrFall();
 				}
 			}
 		}

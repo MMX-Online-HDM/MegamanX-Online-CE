@@ -56,7 +56,7 @@ public class Hadouken : CharState {
 		}
 
 		if (character.isAnimOver()) {
-			character.changeState(new Idle());
+			character.changeToIdleOrFall();
 		}
 	}
 

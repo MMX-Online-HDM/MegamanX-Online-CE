@@ -381,8 +381,7 @@ public class GenmureiState : CharState {
 			);
 		}
 		if (character.isAnimOver()) {
-			if (character.grounded) character.changeState(new Idle(), true);
-			else character.changeState(new Fall(), true);
+			character.changeToIdleOrFall();
 		}
 	}
 }

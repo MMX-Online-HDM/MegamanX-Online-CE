@@ -160,11 +160,11 @@ public class SpeedBurnerCharState : CharState {
 		if (collideData != null && collideData.isSideWallHit() && character.ownedByLocalPlayer) {
 			character.applyDamage(2, player, character, (int)WeaponIds.SpeedBurner, (int)ProjIds.SpeedBurnerRecoil);
 			//character.changeState(new Hurt(-character.xDir, Global.defFlinch, 0), true);
-			character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 			character.playSound("hurt", sendRpc: true);
 			return;
 		} else if (stateTime > 0.6f) {
-			character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 			return;
 		}
 
