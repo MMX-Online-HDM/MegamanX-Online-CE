@@ -48,7 +48,7 @@ public class SigmaClawState : CharState {
 		}
 		if (shootHeldContinuously && character.grounded && character.frameIndex >= 4)
 		{
-			character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 			return;
 		}
 		*/
@@ -68,8 +68,7 @@ public class SigmaClawState : CharState {
 		}
 
 		if (character.isAnimOver()) {
-			if (character.grounded) character.changeState(new Idle(), true);
-			else character.changeState(new Fall(), true);
+			character.changeToIdleOrFall();
 		}
 	}
 
@@ -143,7 +142,7 @@ public class SigmaElectricBallState : CharState {
 		}
 
 		if (character.isAnimOver()) {
-			character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 		}
 	}
 }
@@ -199,7 +198,7 @@ public class SigmaElectricBall2State : CharState {
 		}
 
 		if (character.isAnimOver()) {
-			character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 		}
 	}
 }

@@ -48,8 +48,7 @@ public class XSaberState : CharState {
 		}
 
 		if (character.isAnimOver()) {
-			if (character.grounded) character.changeState(new Idle(), true);
-			else character.changeState(new Fall(), true);
+			character.changeToIdleOrFall();
 		}
 	}
 }
@@ -78,8 +77,7 @@ public class X6SaberState : CharState {
 		}
 
 		if (character.isAnimOver()) {
-			if (character.grounded) character.changeState(new Idle(), true);
-			else character.changeState(new Fall(), true);
+			character.changeToIdleOrFall();
 		}
 	}
 }

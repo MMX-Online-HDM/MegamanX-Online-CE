@@ -25,7 +25,7 @@ public class HyperAxlStart : CharState {
 			if (player.input.isHeld(Control.Jump, player)) {
 				axl.changeState(new Hover(), true);
 			} else {
-				character.changeState(new Idle(), true);
+				character.changeToIdleOrFall();
 			}
 		}
 	}
@@ -159,7 +159,7 @@ public class DodgeRoll : CharState {
 		base.update();
 
 		if (character.isAnimOver()) {
-			character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 			return;
 		}
 

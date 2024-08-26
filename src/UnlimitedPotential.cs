@@ -381,7 +381,7 @@ public class XUPGrabState : CharState {
 		leechTime += Global.spf;
 
 		if (victimWasGrabbedSpriteOnce && !victim.sprite.name.EndsWith("_grabbed")) {
-			character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 			return;
 		}
 
@@ -424,12 +424,12 @@ public class XUPGrabState : CharState {
 		}
 
 		if (player.input.isPressed(Control.Special1, player)) {
-			character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 			return;
 		}
 
 		if (grabTime <= 0) {
-			character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 			return;
 		}
 	}
@@ -676,8 +676,8 @@ public class XRevive : CharState {
 
 		if (character.isAnimOver()) {
 			mmx.isHyperX = true;
-			if (character.grounded) character.changeState(new Idle(), true);
-			else character.changeState(new Fall(), true);
+			character.changeToIdleOrFall();
+			return;
 		}
 
 		if (sprite == "revive_shake" && character.loopCount > 6) {

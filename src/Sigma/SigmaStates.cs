@@ -9,7 +9,7 @@ public class IssueGlobalCommand : CharState {
 		base.update();
 
 		if (character.isAnimOver()) {
-			character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 		}
 	}
 }
@@ -49,7 +49,7 @@ public class CallDownMaverick : CharState {
 		}
 
 		if (character.isAnimOver()) {
-			character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 		}
 	}
 
@@ -87,7 +87,7 @@ public class SigmaBlock : CharState {
 			else if (rightGuard) character.xDir = 1;
 		}
 		if (!isHoldingGuard) {
-			character.changeState(new Idle());
+			character.changeToIdleOrFall();
 			return;
 		}
 		if (Global.level.gameMode.isOver) {

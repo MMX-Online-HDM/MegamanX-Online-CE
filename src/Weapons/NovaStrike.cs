@@ -71,30 +71,30 @@ public class NovaStrikeState : CharState {
 		}
 
 		if (!character.tryMove(new Point(character.xDir * 350 * leftOrRight, 350 * upOrDown), out _)) {
-			player.character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 			return;
 		}
 
 		if (character.flag != null) {
-			player.character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 			return;
 		}
 		if (stateTime > 0.6f) {
-			player.character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 			return;
 		}
 	}
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		player.character.useGravity = false;
-		player.character.vel.y = 0;
-		player.character.stopCharge();
+		character.useGravity = false;
+		character.vel.y = 0;
+		character.stopCharge();
 	}
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
-		player.character.yDir = 1;
-		player.character.useGravity = true;
+		character.yDir = 1;
+		character.useGravity = true;
 	}
 }

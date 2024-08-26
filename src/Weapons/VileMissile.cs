@@ -248,7 +248,7 @@ public class MissileAttack : CharState {
 		groundCodeWithMove();
 
 		if (character.sprite.isAnimOver()) {
-			character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 		}
 	}
 

@@ -133,7 +133,7 @@ public class Assassinate : CharState {
 			(new AssassinBullet()).axlShoot(player, AxlBulletType.Assassin);
 		}
 		if (time > 0.5f) {
-			character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 		}
 	}
 

@@ -1921,9 +1921,9 @@ public partial class Character : Actor, IDamagable {
 		return -1;
 	}
 
-	public virtual void changeToIdleOrFall() {
+	public virtual void changeToIdleOrFall(string transitionSprite = "") {
 		if (grounded) {
-			changeState(new Idle(), true);
+			changeState(new Idle(transitionSprite), true);
 		} else {
 			changeState(new Fall(), true);
 		}
@@ -1932,6 +1932,14 @@ public partial class Character : Actor, IDamagable {
 	public virtual void changeToLandingOrFall(bool useSound = true) {
 		if (grounded) {
 			landingCode(useSound);
+		} else {
+			changeState(new Fall(), true);
+		}
+	}
+
+	public virtual void changeToCrouchOrFall() {
+		if (grounded) {
+			changeState(new Crouch(), true);
 		} else {
 			changeState(new Fall(), true);
 		}

@@ -372,7 +372,7 @@ public class GravityWellChargedState : CharState {
 		}
 
 		if (stateTime > 0.65f) {
-			character.changeState(new Idle());
+			character.changeToIdleOrFall();
 		}
 	}
 

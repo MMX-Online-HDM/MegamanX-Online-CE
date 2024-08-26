@@ -235,12 +235,12 @@ public class RocketPunchAttack : CharState {
 					character.frameIndex = 1;
 					character.frameTime = 0;
 				} else if (character.isAnimOver()) {
-					character.changeState(new Idle(), true);
+					character.changeToIdleOrFall();
 					return;
 				}
 			} else {
 				if (proj.returned || proj.destroyed) {
-					character.changeState(new Idle(), true);
+					character.changeToIdleOrFall();
 					return;
 				}
 			}

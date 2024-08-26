@@ -127,7 +127,7 @@ public class XTeleportState : CharState {
 			character.visible = Global.isOnFrameCycle(5);
 		}
 		if (stateFrames >= 30) {
-			character.changeState(new Idle());
+			character.changeToIdleOrFall();
 		}
 	}
 	public override void onEnter(CharState oldState) {

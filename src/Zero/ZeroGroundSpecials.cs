@@ -30,7 +30,7 @@ public class Raijingeki : CharState {
 		}
 
 		if (character.isAnimOver()) {
-			character.changeState(new Idle());
+			character.changeToIdleOrFall();
 		}
 	}
 }
@@ -131,7 +131,7 @@ public class TBreakerState : CharState {
 		}
 
 		if (character.isAnimOver()) {
-			character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 		}
 	}
 }
