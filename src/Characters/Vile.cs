@@ -608,7 +608,7 @@ public class Vile : Character {
 		return "vile_" + spriteName;
 	}
 
-	public override void changeToIdleOrFall(string transitionSprite = "") { {
+	public override void changeToIdleOrFall(string transitionSprite = "") {
 		if (!grounded && charState.wasVileHovering && canVileHover()) {
 			changeState(new VileHover(), true);
 			return;
