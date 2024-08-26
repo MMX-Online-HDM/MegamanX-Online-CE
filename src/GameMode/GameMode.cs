@@ -757,10 +757,10 @@ public class GameMode {
 				FontType.RedishOrange, Helpers.controlText("Connectivity issues detected."),
 				Global.halfScreenW, 50, Alignment.Center
 			);
-		} else if (mainPlayer?.character is BaseSigma sigma && sigma.possessTarget != null) {
+		} else if (mainPlayer?.character is ViralSigma viralSigma && viralSigma.possessTarget != null) {
 			Fonts.drawText(
 				FontType.BlueMenu, Helpers.controlText(
-				$"Hold [JUMP] to possess {sigma.possessTarget.player.name}"),
+				$"Hold [JUMP] to possess {viralSigma.possessTarget.player.name}"),
 				Global.halfScreenW, 50, Alignment.Center
 			);
 		} else if (hudErrorMsgTime > 0) {
