@@ -286,10 +286,8 @@ public partial class Actor : GameObject {
 		}
 
 		if (!Global.sprites.ContainsKey(spriteName)) return;
+		Global.level.removeFromGrid(this);
 
-		if (sprite != null) {
-			Global.level.removeFromGridFast(this);
-		}
 		int oldFrameIndex = sprite?.frameIndex ?? 0;
 		float oldFrameTime = sprite?.frameSeconds ?? 0;
 		float oldAnimTime = sprite?.animSeconds ?? 0;

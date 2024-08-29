@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using Newtonsoft.Json;
 using SFML.Graphics;
 using SFML.System;
@@ -15,10 +16,10 @@ public partial class Level {
 	public Dictionary<ushort, Actor> destroyedActorsById = new();
 	public List<Actor> mapSprites = new List<Actor>();
 
-	public HashSet<HashSet<GameObject>> occupiedGridSets = new HashSet<HashSet<GameObject>>();
 	public HashSet<GameObject>[,] grid;
 	public HashSet<GameObject>[,] terrainGrid;
-
+	public Dictionary<int, int[]> populatedGrids;
+	public Dictionary<int, int[]> populatedTerrainGrids;
 
 	// List of terrain objects. Used for fast collision.
 
@@ -881,7 +882,7 @@ public partial class Level {
 	}
 
 	public CrackedWall getCrackedWallById(byte crackedWallId) {
-		foreach (var go in gameObjects) {
+		foreach (GameObject go in gameObjects) {
 			if (go is CrackedWall cw && cw.id == crackedWallId) {
 				return cw;
 			}

@@ -169,6 +169,10 @@ public class PZeroDiveKickState : CharState {
 		if (!once) {
 			return;
 		}
+		if (character.vel.y < 100) {
+			character.changeToLandingOrFall();
+			return;
+		}
 		CollideData hit = Global.level.checkCollisionActor(
 			character, character.vel.x * Global.spf, character.vel.y * Global.spf
 		);
