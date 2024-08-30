@@ -200,11 +200,11 @@ public class MovingPlatform : Wall {
 
 	public void changePos(Point newOrigin) {
 		var oldPos = collider.shape.points[0];
-		Global.level.removeTerrainFromGrid(this);
-		Global.level.removeFromGridFast(this);
+		Global.level.removeFromTerrainGrid(this);
+		Global.level.removeFromGrid(this);
 		updateCollider(newOrigin);
 		Global.level.addGameObjectToGrid(this);
-		Global.level.addTerrainToGrid(this);
+		Global.level.addToTerrainGrid(this);
 		var newPos = collider.shape.points[0];
 		deltaMove = new Point(newPos.x - oldPos.x, newPos.y - oldPos.y);
 	}
@@ -278,12 +278,12 @@ public class CrackedWall : Actor, IDamagable {
 	}
 
 	public void move(Point deltaPos) {
-		Global.level.removeTerrainFromGrid(this);
+		Global.level.removeFromTerrainGrid(this);
 		incPos(deltaPos);
-		Global.level.addTerrainToGrid(this);
+		Global.level.addToTerrainGrid(this);
 
-		Global.level.removeTerrainFromGrid(wall);
-		Global.level.removeFromGridFast(wall);
+		Global.level.removeFromTerrainGrid(wall);
+		Global.level.removeFromGrid(wall);
 		List<Point> rect = collider.shape.getRect().getPoints();
 		wall.collider._shape.points = new List<Point>() {
 			rect[0].addxy(1, 1),
@@ -292,7 +292,7 @@ public class CrackedWall : Actor, IDamagable {
 			rect[3].addxy(1, -1),
 		};
 		Global.level.addGameObjectToGrid(wall);
-		Global.level.addTerrainToGrid(this);
+		Global.level.addToTerrainGrid(this);
 	}
 
 	// Only if 0 is returned, it can't damage it. Even if null, it still can
@@ -438,14 +438,14 @@ public class KillZone : Geometry {
 	}
 
 	public void move(Point deltaPos) {
-		Global.level.removeTerrainFromGrid(this);
-		Global.level.removeFromGridFast(this);
+		Global.level.removeFromTerrainGrid(this);
+		Global.level.removeFromGrid(this);
 		for (int i = 0; i < collider._shape.points.Count; i++) {
 			Point point = collider._shape.points[i];
 			collider._shape.points[i] = point.add(deltaPos);
 		}
 		Global.level.addGameObjectToGrid(this);
-		Global.level.addTerrainToGrid(this);
+		Global.level.addToTerrainGrid(this);
 	}
 }
 

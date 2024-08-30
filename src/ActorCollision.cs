@@ -17,7 +17,7 @@ public partial class Actor {
 			return _globalCollider;
 		}
 		set {
-			Global.level.removeFromGridFast(this);
+			Global.level.removeFromGrid(this);
 			_globalCollider = value;
 			Global.level.addGameObjectToGrid(this);
 		}
@@ -28,7 +28,7 @@ public partial class Actor {
 	}
 
 	public void changeGlobalCollider(List<Point> newPoints) {
-		Global.level.removeFromGridFast(this);
+		Global.level.removeFromGrid(this);
 		_globalCollider._shape.points = newPoints;
 		Global.level.addGameObjectToGrid(this);
 	}
@@ -267,13 +267,13 @@ public partial class Actor {
 	}
 
 	public void incPos(Point amount) {
-		Global.level.removeFromGridFast(this);
+		Global.level.removeFromGrid(this);
 		pos.inc(amount);
 		Global.level.addGameObjectToGrid(this);
 	}
 
 	public void changePos(Point newPos) {
-		Global.level.removeFromGridFast(this);
+		Global.level.removeFromGrid(this);
 		pos = newPos;
 		Global.level.addGameObjectToGrid(this);
 	}

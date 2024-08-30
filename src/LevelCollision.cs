@@ -87,6 +87,20 @@ public partial class Level {
 		return cells;
 	}
 
+	public int[] getGridCellsPos(Shape shape) {
+		int minX = MathInt.Floor(shape.minX / cellWidth);
+		int maxX = MathInt.Floor(shape.maxX / cellWidth);
+		int minY = MathInt.Floor(shape.minY / cellWidth);
+		int maxY = MathInt.Floor(shape.maxY / cellWidth);
+
+		minX = Math.Clamp(minX, 0, grid.GetLength(0) - 1);
+		maxX = Math.Clamp(maxX, 0, grid.GetLength(0) - 1);
+		minY = Math.Clamp(minY, 0, grid.GetLength(1) - 1);
+		maxY = Math.Clamp(maxY, 0, grid.GetLength(1) - 1);
+
+		return [minX, minY, maxX, maxY];
+	}
+
 	// Called a lot
 	public List<GameObject> getGameObjectsInSameCell(Shape shape) {
 		List<Cell> cells = getGridCells(shape);
@@ -106,33 +120,27 @@ public partial class Level {
 		return arr;
 	}
 
-	// Should be called when the object is destroyed for thorough cleanup.
-	public void removeFromGrid(GameObject go) {
-		foreach (var gridSet in occupiedGridSets) {
-			if (gridSet.Contains(go)) {
-				gridSet.Remove(go);
-			}
-			if (gridSet.Count == 0) {
-				occupiedGridSets.Remove(gridSet);
-			}
-		}
-	}
-
 	// Should be called on hitbox changes.
-	public void removeFromGridFast(GameObject go) {
-		Shape? allCollidersShape = go.getAllCollidersShape();
-		if (allCollidersShape == null) return;
-		var cells = getGridCells(allCollidersShape.Value);
-		foreach (var cell in cells) {
-			if (cell.gameobjects.Contains(go)) {
-				cell.gameobjects.Remove(go);
+	public void removeFromGrid(GameObject go) {
+		int hash = go.GetHashCode();
+		if (!populatedGrids.ContainsKey(hash)) {
+			return;
+		}
+		int[] dataPos = populatedGrids[hash];
+		for (int x = dataPos[0]; x <= dataPos[2]; x++) {
+			for (int y = dataPos[1]; y <= dataPos[3]; y++) {
+				grid[x, y].Remove(go);
 			}
 		}
+		populatedGrids.Remove(hash);
 	}
 
 	public void addGameObjectToGrid(GameObject go) {
 		if (!gameObjects.Contains(go)) {
 			return;
+		}
+		if (populatedGrids.ContainsKey(go.GetHashCode())) {
+			removeFromTerrainGrid(go);
 		}
 		Shape? allCollidersShape = go.getAllCollidersShape();
 		if (!allCollidersShape.HasValue) {
@@ -147,9 +155,9 @@ public partial class Level {
 		foreach (Cell cell in getGridCells(allCollidersShape.Value)) {
 			if (!grid[cell.x, cell.y].Contains(go)) {
 				grid[cell.x, cell.y].Add(go);
-				occupiedGridSets.Add(grid[cell.x, cell.y]);
 			}
 		}
+		populatedGrids[go.GetHashCode()] = getGridCellsPos(allCollidersShape.Value);
 	}
 
 	public Point getGroundPos(Point pos, float depth = 60) {
@@ -648,17 +656,20 @@ public partial class Level {
 
 	public void addTerrain(GameObject go) {
 		gameObjects.Add(go);
-		addTerrainToGrid(go);
+		addToTerrainGrid(go);
 	}
 
 	public void removeTerrain(GameObject go) {
 		gameObjects.Remove(go);
-		removeTerrainFromGrid(go);
+		removeFromTerrainGrid(go);
 	}
 
-	public void addTerrainToGrid(GameObject go) {
+	public void addToTerrainGrid(GameObject go) {
 		if (!gameObjects.Contains(go)) {
 			return;
+		}
+		if (populatedTerrainGrids.ContainsKey(go.GetHashCode())) {
+			removeFromTerrainGrid(go);
 		}
 		Shape? allCollidersShape = go.getAllCollidersShape();
 		if (!allCollidersShape.HasValue) {
@@ -669,17 +680,21 @@ public partial class Level {
 				terrainGrid[cell.x, cell.y].Add(go);
 			}
 		}
+		populatedTerrainGrids[go.GetHashCode()] = getGridCellsPos(allCollidersShape.Value);
 	}
 
-	public void removeTerrainFromGrid(GameObject go) {
-		Shape? allCollidersShape = go.getAllCollidersShape();
-		if (allCollidersShape == null) return;
-		List<Cell> cells = getTerrainCells(allCollidersShape.Value);
-		foreach (Cell cell in cells) {
-			if (terrainGrid[cell.x, cell.y].Contains(go)) {
-				terrainGrid[cell.x, cell.y].Remove(go);
+	public void removeFromTerrainGrid(GameObject go) {
+		int hash = go.GetHashCode();
+		if (!populatedGrids.ContainsKey(hash)) {
+			return;
+		}
+		int[] dataPos = populatedTerrainGrids[hash];
+		for (int x = dataPos[0]; x <= dataPos[2]; x++) {
+			for (int y = dataPos[1]; y <= dataPos[3]; y++) {
+				terrainGrid[x, y].Remove(go);
 			}
 		}
+		populatedTerrainGrids.Remove(hash);
 	}
 
 	public List<CollideData> checkTerrainCollision(
