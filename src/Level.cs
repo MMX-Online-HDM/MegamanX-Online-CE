@@ -18,8 +18,8 @@ public partial class Level {
 
 	public HashSet<GameObject>[,] grid;
 	public HashSet<GameObject>[,] terrainGrid;
-	public Dictionary<int, int[]> populatedGrids;
-	public Dictionary<int, int[]> populatedTerrainGrids;
+	public Dictionary<int, int[]> populatedGrids = new();
+	public Dictionary<int, int[]> populatedTerrainGrids = new();
 
 	// List of terrain objects. Used for fast collision.
 
@@ -412,7 +412,6 @@ public partial class Level {
 					addGameObject(unclimbableWall);
 					addTerrain(unclimbableWall);
 				}
-
 				addGameObject(wall);
 				addTerrain(wall);
 			} else if (objectName == "Water Zone") {
