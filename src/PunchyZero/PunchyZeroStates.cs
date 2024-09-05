@@ -173,7 +173,7 @@ public class PZeroDiveKickState : CharState {
 			character.changeToLandingOrFall();
 			return;
 		}
-		CollideData hit = Global.level.checkCollisionActor(
+		CollideData? hit = Global.level.checkCollisionActor(
 			character, character.vel.x * Global.spf, character.vel.y * Global.spf
 		);
 		if (hit?.isSideWallHit() == true) {
@@ -246,7 +246,6 @@ public class PZeroParry : CharState {
 	}
 
 	public void counterAttack(Player damagingPlayer, Actor? damagingActor) {
-		zero.parryCooldown = 0;
 		Actor? counterAttackTarget = null;
 		bool isMelee = false;
 		if (damagingActor is Projectile proj) {
@@ -285,7 +284,7 @@ public class PZeroParry : CharState {
 	public override void onExit(CharState newState) {
 		character.specialState = (int)SpecialStateIds.None;
 		base.onExit(newState);
-		zero.parryCooldown = 30;
+		zero.parryCooldown = 60;
 	}
 
 	public bool canParry(Actor? actor, int projId) {
