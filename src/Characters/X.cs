@@ -286,7 +286,7 @@ public partial class MegamanX : Character {
 
 		if (charState is not Die &&
 			player.input.isPressed(Control.Special1, player) &&
-			player.hasAllX3Armor() && !player.hasGoldenArmor()) {
+			player.hasAllX3Armor() && !player.hasGoldenArmor() && !player.hasUltimateArmor()) {
 			if (player.input.isHeld(Control.Down, player)) {
 				player.setChipNum(0, false);
 				Global.level.gameMode.setHUDErrorMessage(

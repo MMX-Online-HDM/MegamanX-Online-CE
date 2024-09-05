@@ -1,13 +1,16 @@
 ﻿namespace MMXOnline;
+using SFML.Graphics;
 
 public class UpgradeArmorMenu : IMainMenu {
 	public int selectArrowPosY;
 	public IMainMenu prevMenu;
+	public UpgradeArmorMenuGolden GoldenMenu;
+	public UpgradeArmorMenuUAX UAXMenu;
 
 	public Point optionPos1 = new Point(25, 40);
-	public Point optionPos2 = new Point(25, 40 + 36);
-	public Point optionPos3 = new Point(25, 40 + 36 * 2);
-	public Point optionPos4 = new Point(25, 40 + 36 * 3);
+	public Point optionPos2 = new Point(25, 40 + 40);
+	public Point optionPos3 = new Point(25, 40 + 40 * 2);
+	public Point optionPos4 = new Point(25, 40 + 38 * 3);
 
 	public Level level { get { return Global.level; } }
 	public Player mainPlayer { get { return Global.level.mainPlayer; } }
@@ -22,7 +25,6 @@ public class UpgradeArmorMenu : IMainMenu {
 		//if (updateHyperArmorUpgrades(mainPlayer)) return;
 
 		// Should not be able to reach here but preventing upgrades just in case
-		if (!mainPlayer.canUpgradeXArmor()) return;
 
 		Helpers.menuUpDown(ref selectArrowPosY, 0, 3);
 
@@ -52,11 +54,16 @@ public class UpgradeArmorMenu : IMainMenu {
 			Menu.change(prevMenu);
 			return;
 		}
-
-		if (mainPlayer.hasGoldenArmor() || mainPlayer.hasUltimateArmor()) {
-			return;
+		// Enable this to disable 14.0 UAX Menu
+		//if (mainPlayer.hasGoldenArmor() || mainPlayer.hasUltimateArmor()) {
+		//	return;
+		//}
+		if (mainPlayer.hasGoldenArmor()) {
+			Menu.change(new UpgradeArmorMenuGolden(GoldenMenu));
 		}
-
+		if (mainPlayer.hasUltimateArmor() || (mainPlayer.hasUltimateArmor() && mainPlayer.hasGoldenArmor())) {
+			Menu.change(new UpgradeArmorMenuUAX(UAXMenu));
+		}
 		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 			if (selectArrowPosY == 0) {
 				if (mainPlayer.helmetArmorNum != xGame) {
@@ -239,16 +246,16 @@ public class UpgradeArmorMenu : IMainMenu {
 		var gameMode = level.gameMode;
 		DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
 		string armorName = xGame switch {
-			1 => "Light",
-			2 => "Giga",
-			3 => "Max",
+			1 => "Armor of Light",
+			2 => "Second Armor",
+			3 => "Max Armor",
 			_ => "ERROR"
 		};
 		Fonts.drawText(
-			FontType.Yellow, string.Format($"Upgrade {armorName} Armor", xGame),
+			FontType.Yellow, string.Format($"Upgrade {armorName}", xGame),
 			Global.screenW * 0.5f, 20, Alignment.Center
 		);
-		Fonts.drawText(FontType.Golden, Global.nameCoins + ": " + mainPlayer.currency, 20, 20);
+		Fonts.drawText(FontType.OrangeMenu, Global.nameCoins + ": " + mainPlayer.currency, 20, 20);
 
 		if (Global.frameCount % 60 < 30) {
 			bool stEnabled = !Global.level.server.disableHtSt;
@@ -286,122 +293,109 @@ public class UpgradeArmorMenu : IMainMenu {
 			}
 		}
 
-		Global.sprites["menu_xdefault"].drawToHUD(0, 300, 110);
-
-		if (mainPlayer.hasUltimateArmor()) Global.sprites["menu_xultimate"].drawToHUD(0, 300, 110);
-		else if (mainPlayer.hasGoldenArmor()) Global.sprites["menu_xgolden"].drawToHUD(0, 300, 110);
-		else {
-			if (mainPlayer.helmetArmorNum == 1) Global.sprites["menu_xhelmet"].drawToHUD(0, 300, 110);
-			if (mainPlayer.bodyArmorNum == 1) Global.sprites["menu_xbody"].drawToHUD(0, 300, 110);
-			if (mainPlayer.armArmorNum == 1) Global.sprites["menu_xarm"].drawToHUD(0, 300, 110);
-			if (mainPlayer.bootsArmorNum == 1) Global.sprites["menu_xboots"].drawToHUD(0, 300, 110);
-
-			if (mainPlayer.helmetArmorNum == 2) Global.sprites["menu_xhelmet2"].drawToHUD(0, 300, 110);
-			if (mainPlayer.bodyArmorNum == 2) Global.sprites["menu_xbody2"].drawToHUD(0, 300, 110);
-			if (mainPlayer.armArmorNum == 2) Global.sprites["menu_xarm2"].drawToHUD(0, 300, 110);
-			if (mainPlayer.bootsArmorNum == 2) Global.sprites["menu_xboots2"].drawToHUD(0, 300, 110);
-
-			if (mainPlayer.helmetArmorNum >= 3) Global.sprites["menu_xhelmet3"].drawToHUD(0, 300, 110);
-			if (mainPlayer.bodyArmorNum >= 3) Global.sprites["menu_xbody3"].drawToHUD(0, 300, 110);
-			if (mainPlayer.armArmorNum >= 3) Global.sprites["menu_xarm3"].drawToHUD(0, 300, 110);
-			if (mainPlayer.bootsArmorNum >= 3) Global.sprites["menu_xboots3"].drawToHUD(0, 300, 110);
-		}
-
 		Point optionPos = new Point();
 		if (selectArrowPosY == 0) optionPos = optionPos1;
 		if (selectArrowPosY == 1) optionPos = optionPos2;
 		if (selectArrowPosY == 2) optionPos = optionPos3;
 		if (selectArrowPosY == 3) optionPos = optionPos4;
-
 		float yOff = xGame == 3 && mainPlayer.hasAllX3Armor() ? 9 : -1;
 		Global.sprites["cursor"].drawToHUD(0, optionPos1.x - 8, optionPos.y + 4 + yOff);
-
 		bool showChips = mainPlayer.hasAllX3Armor() && xGame == 3;
 
-		// Head section
+		switch (xGame) {
+			case 1: case 2: case 3: Global.sprites["menu_xdefault"].drawToHUD(0, 300, 110); break;
+		} 
+		switch (mainPlayer.helmetArmorNum) {
+			case 1: Global.sprites["menu_xhelmet"].drawToHUD(0, 300, 110); break;
+			case 2: Global.sprites["menu_xhelmet2"].drawToHUD(0, 300, 110); break;
+			case 3: Global.sprites["menu_xhelmet3"].drawToHUD(0, 300, 110); break;
+		}
+		switch (mainPlayer.bodyArmorNum) {
+			case 1: Global.sprites["menu_xbody"].drawToHUD(0, 300, 110); break;
+			case 2: Global.sprites["menu_xbody2"].drawToHUD(0, 300, 110); break;
+			case 3: Global.sprites["menu_xbody3"].drawToHUD(0, 300, 110); break;
+		}
+		switch (mainPlayer.armArmorNum) {
+			case 1: Global.sprites["menu_xarm"].drawToHUD(0, 300, 110); break;
+			case 2: Global.sprites["menu_xarm2"].drawToHUD(0, 300, 110); break;
+			case 3: Global.sprites["menu_xarm3"].drawToHUD(0, 300, 110); break;
+		}
+		switch (mainPlayer.bootsArmorNum) {
+			case 1: Global.sprites["menu_xboots"].drawToHUD(0, 300, 110); break;
+			case 2: Global.sprites["menu_xboots2"].drawToHUD(0, 300, 110); break;
+			case 3: Global.sprites["menu_xboots3"].drawToHUD(0, 300, 110); break;
+		}
 		Fonts.drawText(FontType.Yellow, "Head Parts", optionPos1.x, optionPos1.y, selected: selectArrowPosY == 0 && !showChips);
 		Fonts.drawText(FontType.Green, getHeadArmorMessage(), optionPos1.x + 60, optionPos1.y);
-		if (xGame == 1) {
-			Fonts.drawText(FontType.Blue, "Grants a headbutt attack on jump.", optionPos1.x + 5, optionPos1.y + 10);
-		}
-		if (xGame == 2) {
-			Fonts.drawText(FontType.Blue, "Scan and tag enemies with SPECIAL.", optionPos1.x + 5, optionPos1.y + 10);
-		}
-		if (xGame == 3) {
-			if (mainPlayer.hasAllX3Armor()) {
-				Fonts.drawText(FontType.Golden, "ENHANCEMENT CHIP", optionPos1.x + 5, optionPos1.y + 10, selected: selectArrowPosY == 0);
-				Fonts.drawText(FontType.Blue, "Slowly regenerate health.", optionPos1.x + 5, optionPos1.y + 20);
-			} else {
-				Fonts.drawText(FontType.Blue, "Gain a radar to detect enemies.", optionPos1.x + 5, optionPos1.y + 10);
-			}
-		}
-
-		// Body section
 		Fonts.drawText(FontType.Yellow, "Body Parts", optionPos2.x, optionPos2.y, selected: selectArrowPosY == 1 && !showChips);
 		Fonts.drawText(FontType.Green, getBodyArmorMessage(), optionPos2.x + 60, optionPos2.y);
-		if (xGame == 1) {
-			Fonts.drawText(FontType.Blue, string.Format("Reduces damage and flinch received."), optionPos2.x + 5, optionPos2.y + 10);
-		}
-		if (xGame == 2) {
-			Fonts.drawText(FontType.Blue, "Grants the Giga Crush attack", optionPos2.x + 5, optionPos2.y + 10);
-			Fonts.drawText(FontType.Blue, "and reduces damage received.", optionPos2.x + 5, optionPos2.y + 20);
-		}
-		if (xGame == 3) {
-			if (mainPlayer.hasAllX3Armor()) {
-				Fonts.drawText(FontType.Golden, "ENHANCEMENT CHIP", optionPos2.x + 5, optionPos2.y + 10, selected: selectArrowPosY == 1);
-				Fonts.drawText(FontType.Blue, "Improves barrier defense.", optionPos2.x + 5, optionPos2.y + 20);
-			} else {
-				Fonts.drawText(FontType.Blue, "Gain a barrier on taking damage.", optionPos2.x + 5, optionPos2.y + 10);
-			}
-		}
-
-		// Arm section
 		Fonts.drawText(FontType.Yellow, "Arm Parts", optionPos3.x, optionPos3.y, selected: selectArrowPosY == 2 && !showChips);
 		Fonts.drawText(FontType.Green, getArmArmorMessage(), optionPos3.x + 60, optionPos3.y);
-		if (xGame == 1) Fonts.drawText(FontType.Blue, "Charge shots 50% faster.", optionPos3.x + 5, optionPos3.y + 10);
-		if (xGame == 2) Fonts.drawText(FontType.Blue, "Store an extra charge shot.", optionPos3.x + 5, optionPos3.y + 10);
-		if (xGame == 3) {
-			if (mainPlayer.hasAllX3Armor()) {
-				Fonts.drawText(FontType.Golden, "ENHANCEMENT CHIP", optionPos3.x + 5, optionPos3.y + 10);
-				Fonts.drawText(FontType.Blue, "Reduce ammo usage by half.", optionPos3.x + 5, optionPos3.y + 20);
-			} else {
-				Fonts.drawText(FontType.Blue, "Grants the Hyper Charge", optionPos3.x + 5, optionPos3.y + 10);
-				Fonts.drawText(FontType.Blue, "and Cross Shot abilities.", optionPos3.x + 5, optionPos3.y + 20);
-			}
-		}
-
-		// Foot section
 		Fonts.drawText(FontType.Yellow, "Foot Parts", optionPos4.x, optionPos4.y, selected: selectArrowPosY == 3 && !showChips);
 		Fonts.drawText(FontType.Green, getBootsArmorMessage(), optionPos4.x + 60, optionPos4.y);
-		if (xGame == 1) {
-			Fonts.drawText(FontType.Blue, "Ground dash 15% faster.", optionPos4.x + 5, optionPos4.y + 10);
-		}
-		if (xGame == 2) {
-			Fonts.drawText(FontType.Blue, "Air dash 15% faster.", optionPos4.x + 5, optionPos4.y + 10);
-		}
-		if (xGame == 3) {
-			if (mainPlayer.hasAllX3Armor()) {
-				Fonts.drawText(FontType.Golden, "ENHANCEMENT CHIP", optionPos4.x + 5, optionPos4.y + 10, selected: selectArrowPosY == 3);
-				Fonts.drawText(FontType.Blue, "Dash twice in the air.", optionPos4.x + 5, optionPos4.y + 20);
-			} else {
-				Fonts.drawText(FontType.Blue, "Gain a midair upward dash.", optionPos4.x + 5, optionPos4.y + 10);
-			}
-		}
-
-		if (mainPlayer.hasChip(2)) Global.sprites["menu_chip"].drawToHUD(0, 220 - 4, optionPos1.y);
-		if (mainPlayer.hasChip(1)) Global.sprites["menu_chip"].drawToHUD(0, 220 - 4, optionPos2.y);
-		if (mainPlayer.hasChip(3)) Global.sprites["menu_chip"].drawToHUD(0, 220 - 38, optionPos3.y);
-		if (mainPlayer.hasChip(0)) Global.sprites["menu_chip"].drawToHUD(0, 220 - 28, optionPos4.y);
-
+		switch (xGame) {
+			case 1: //Light
+				Fonts.drawText(FontType.Blue, "Grants a headbutt attack on Jump.", optionPos1.x + 5, optionPos1.y + 10);
+				Fonts.drawText(FontType.Blue, "Can be combined with Upward Dash.", optionPos1.x + 5, optionPos1.y + 20);
+				Fonts.drawText(FontType.Blue, "Reduces Damage by 12.5%", optionPos2.x + 5, optionPos2.y + 10);
+				Fonts.drawText(FontType.Blue, "Reduces Flinch by 25.0%", optionPos2.x + 5, optionPos2.y + 20);
+				Fonts.drawText(FontType.Blue, "Powers up your Spiral Crush Buster", optionPos3.x + 5, optionPos3.y + 10);
+				Fonts.drawText(FontType.Blue, "by charging shots 50% Faster.", optionPos3.x + 5, optionPos3.y + 20);
+				Fonts.drawText(FontType.Blue, "Ground Dash 15% Faster.", optionPos4.x + 5, optionPos4.y + 10);
+				break;
+			case 2: //Second
+				Fonts.drawText(FontType.Blue, "Trace enemy hp and positioning", optionPos1.x + 5, optionPos1.y + 10);
+				Fonts.drawText(FontType.Blue, "by pressing SPECIAL button.", optionPos1.x + 5, optionPos1.y + 20);
+				Fonts.drawText(FontType.Blue, "Grants the Giga Crush attack", optionPos2.x + 5, optionPos2.y + 10);
+				Fonts.drawText(FontType.Blue, "Reduces Damage by 12.5%", optionPos2.x + 5, optionPos2.y + 20);
+				Fonts.drawText(FontType.Blue, "Grants the Double X-Buster.", optionPos3.x + 5, optionPos3.y + 10);
+				Fonts.drawText(FontType.Blue, "Store an extra charge shot.", optionPos3.x + 5, optionPos3.y + 20);
+				Fonts.drawText(FontType.Blue, "Air dash 15% Faster.", optionPos4.x + 5, optionPos4.y + 10);
+				break;
+			case 3:	//Max
+				if (!mainPlayer.hasAllX3Armor()) {
+					Fonts.drawText(FontType.Blue, "Communicates with the", optionPos1.x + 5, optionPos1.y + 10);
+					Fonts.drawText(FontType.DarkPurple,"State of the Art Orbital Satellite.", optionPos1.x + 5, optionPos1.y + 20);
+					Fonts.drawText(FontType.Blue, "To uncover enemy position.", optionPos1.x + 5, optionPos1.y + 30);
+					Fonts.drawText(FontType.Blue, "Gain a Defensive Forcefield", optionPos2.x + 5, optionPos2.y + 10);
+					Fonts.drawText(FontType.Blue, "on taking Damage.", optionPos2.x + 5, optionPos2.y + 20);
+					Fonts.drawText(FontType.Blue, "Forcefield Defense: 25%", optionPos2.x + 5, optionPos2.y + 30);
+					Fonts.drawText(FontType.Blue, "Grants the Hyper Charge.", optionPos3.x + 5, optionPos3.y + 10);
+					Fonts.drawText(FontType.Blue, "Grants the Cross Charge shot.", optionPos3.x + 5, optionPos3.y + 20);
+					Fonts.drawText(FontType.Blue, "Grants an Upwards Dash", optionPos4.x + 5, optionPos4.y + 10);
+				} else {
+					Fonts.drawText(FontType.Pink, "ENHANCEMENT CHIP", optionPos1.x + 5, optionPos1.y + 10, selected: selectArrowPosY == 0);
+					Fonts.drawText(FontType.Blue, "Slowly regenerate Health", optionPos1.x + 5, optionPos1.y + 20);
+					Fonts.drawText(FontType.Blue, "after not taking Damage.", optionPos1.x + 5, optionPos1.y + 30);
+					Fonts.drawText(FontType.Pink, "ENHANCEMENT CHIP", optionPos2.x + 5, optionPos2.y + 10, selected: selectArrowPosY == 1);
+					Fonts.drawText(FontType.Blue, "Forcefield Defense: 50%", optionPos2.x + 5, optionPos2.y + 20);
+					Fonts.drawText(FontType.Pink, "ENHANCEMENT CHIP", optionPos4.x + 5, optionPos3.y + 10, selected: selectArrowPosY == 2);
+					Fonts.drawText(FontType.Blue, "Reduce ammo usage by half.", optionPos3.x + 5, optionPos3.y + 20);
+					Fonts.drawText(FontType.Pink, "ENHANCEMENT CHIP", optionPos4.x + 5, optionPos4.y + 10, selected: selectArrowPosY == 3);
+					Fonts.drawText(FontType.Blue, "Dash Twice in the air", optionPos4.x + 5, optionPos4.y + 20);
+				}
+				if (mainPlayer.hasChip(2)) Global.sprites["menu_chip"].drawToHUD(0, 296, optionPos1.y-16);
+				if (mainPlayer.hasChip(1)) Global.sprites["menu_chip"].drawToHUD(0, 296, optionPos2.y+4);
+				if (mainPlayer.hasChip(3)) Global.sprites["menu_chip"].drawToHUD(0, 262, optionPos3.y-8);
+				if (mainPlayer.hasChip(0)) Global.sprites["menu_chip"].drawToHUD(0, 278, optionPos4.y+6);
+				if (mainPlayer.hasChip(0)) Global.sprites["menu_chip"].drawToHUD(0, 315, optionPos4.y+6);
+				/*
+				if (mainPlayer.hasChip(2)) Global.sprites["menu_x3armors"].drawToHUD(5, 313, 27);
+				if (mainPlayer.hasChip(1)) Global.sprites["menu_x3armors"].drawToHUD(4, 315, 65);
+				if (mainPlayer.hasChip(3)) Global.sprites["menu_x3armors"].drawToHUD(6, 331, 74);
+				if (mainPlayer.hasChip(0)) Global.sprites["menu_x3armors"].drawToHUD(7, 295, 142);
+				*/
+				break;
+		} 
 		//drawHyperArmorUpgrades(mainPlayer, 0);
 
 		Fonts.drawTextEX(
 			FontType.Grey, "[MLEFT]/[MRIGHT]: Change Armor Set",
-			40, Global.screenH - 28
+			26, Global.screenH - 28
 		);
 		Fonts.drawTextEX(
 			FontType.Grey, "[OK]: Upgrade, [ALT]: Unupgrade, [BACK]: Back",
-			40, Global.screenH - 18
+			26, Global.screenH - 18
 		);
 	}
 	/*
@@ -503,5 +497,133 @@ public class UpgradeArmorMenu : IMainMenu {
 			return mainPlayer.bootsArmorNum == xGame ? " (Active)" : " (Bought)";
 		}
 		return $" ({MegamanX.bootsArmorCost} {Global.nameCoins})";
+	}
+}
+public class UpgradeArmorMenuUAX : IMainMenu {
+	public IMainMenu prevMenu;
+	public Player mainPlayer { get { return Global.level.mainPlayer; } }
+
+	public static int xGame = 1;
+
+	public UpgradeArmorMenuUAX(IMainMenu prevMenu) {
+		this.prevMenu = prevMenu;
+	}
+	public void update() {
+		if (!mainPlayer.canUpgradeXArmor()) return;
+
+		if (Global.input.isPressedMenu(Control.MenuLeft)) {
+			xGame--;
+			if (xGame < 1) {
+				xGame = 1;
+				if (!Global.level.server.disableHtSt) {
+					UpgradeMenu.onUpgradeMenu = true;
+					Menu.change(new UpgradeMenu(prevMenu));
+					return;
+				}
+			}
+		} else if (Global.input.isPressedMenu(Control.MenuRight)) {
+			xGame++;
+			if (xGame > 3) {
+				xGame = 3;
+				if (!Global.level.server.disableHtSt) {
+					UpgradeMenu.onUpgradeMenu = true;
+					Menu.change(new UpgradeMenu(prevMenu));
+					return;
+				}
+			}
+		}
+		if (Global.input.isPressedMenu(Control.MenuBack)) {
+			Menu.change(prevMenu);
+			return;
+		}
+	}
+	public void render() {
+
+		DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
+		Fonts.drawText(FontType.Purple, "Ultimate Armor Active",Global.screenW * 0.5f, 20, Alignment.Center);
+		Global.sprites["menu_xultimatex2"].drawToHUD(0, Global.halfScreenW, 80);
+		Fonts.drawText(FontType.RedishOrange, "Uncompleted Powerful Armor",Global.halfScreenW-80, 140);
+		//Fonts.drawText(FontType.Red, "Grants Parts of All armors and Chips in the entire armor", Global.halfScreenW-170, optionPos3.y + 30);
+		Fonts.drawText(FontType.DarkPurple, "Enhances the Base Armor", Global.halfScreenW-70, 155);
+		Fonts.drawText(FontType.DarkPurple, "Grants Nova Strike, Hover and The Plasma Shot", Global.halfScreenW-136, 170);
+		Fonts.drawTextEX(
+			FontType.Grey, "[MLEFT]/[MRIGHT]: Change Menu",
+			Global.halfScreenW-70, 190
+		);
+		Fonts.drawTextEX(
+			FontType.Grey, "[BACK]: Back",
+			Global.halfScreenW-20, 200
+		);
+		if (mainPlayer.hasChip(2)) Global.sprites["menu_chip"].drawToHUD(0, Global.halfScreenW-6, 52, alpha: 0.85f);
+		if (mainPlayer.hasChip(1)) Global.sprites["menu_chip"].drawToHUD(0, Global.halfScreenW+2, 70, alpha: 0.85f);
+		if (mainPlayer.hasChip(3)) Global.sprites["menu_chip"].drawToHUD(0, Global.halfScreenW-20, 45, alpha: 0.85f);
+		if (mainPlayer.hasChip(0)) Global.sprites["menu_chip"].drawToHUD(0, Global.halfScreenW-22, 96, alpha: 0.85f);
+		if (mainPlayer.hasChip(0)) Global.sprites["menu_chip"].drawToHUD(0, Global.halfScreenW+22, 105, alpha: 0.85f);
+	}
+}
+public class UpgradeArmorMenuGolden : IMainMenu {
+	public IMainMenu prevMenu;
+	public Player mainPlayer { get { return Global.level.mainPlayer; } }
+	public static int xGame = 1;
+	public UpgradeArmorMenuGolden(IMainMenu prevMenu) {
+		this.prevMenu = prevMenu;
+	}
+	public void update() {
+		if (!mainPlayer.canUpgradeXArmor()) return;
+		if (Global.input.isPressedMenu(Control.MenuLeft)) {
+			xGame--;
+			if (xGame < 1) {
+				xGame = 1;
+				if (!Global.level.server.disableHtSt) {
+					UpgradeMenu.onUpgradeMenu = true;
+					Menu.change(new UpgradeMenu(prevMenu));
+					return;
+				}
+			}
+		} else if (Global.input.isPressedMenu(Control.MenuRight)) {
+			xGame++;
+			if (xGame > 3) {
+				xGame = 3;
+				if (!Global.level.server.disableHtSt) {
+					UpgradeMenu.onUpgradeMenu = true;
+					Menu.change(new UpgradeMenu(prevMenu));
+					return;
+				}
+			}
+		}
+		if (Global.input.isPressedMenu(Control.MenuBack)) {
+			Menu.change(prevMenu);
+			return;
+		}
+	}
+	public void render() {
+
+		DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
+		Fonts.drawText(FontType.Pink, "Hyper Chip Active",Global.screenW * 0.5f, 20, Alignment.Center);
+		Global.sprites["menu_x3"].drawToHUD(2, 295, 110);
+		if (Global.frameCount % 6 < 4) 
+			 Global.sprites["LightX3"].drawToHUD(10, 50, 130);
+		else Global.sprites["LightX3"].drawToHUD(11, 50, 130);
+		DrawWrappers.DrawRect(
+				210, 100 , 80 , 40,
+				true, Helpers.MenuBgColor, 0, ZIndex.Default, false
+		);
+		Fonts.drawText(FontType.DarkBlue, "(RIGHT)",92, 46);
+		Fonts.drawText(FontType.DarkBlue, "Your battles should",90, 60);
+		Fonts.drawText(FontType.DarkBlue, "be easier now.",90, 70);
+		Fonts.drawText(FontType.DarkBlue, "Do your Best, X.",90, 80);
+		if (Global.frameCount % 60 < 30)
+		Global.sprites["cursorchar"].drawToHUD(0, 94, 94);
+		Fonts.drawText(FontType.RedishOrange, "Enhances The Max Armor.", 30, 150);
+		Fonts.drawText(FontType.RedishOrange, "Grants the Z-Saber", 30, 160);
+		Fonts.drawText(FontType.RedishOrange, "and All the Chips.", 30, 170);
+		Fonts.drawTextEX(
+			FontType.Grey, "[MLEFT]/[MRIGHT]: Change Menu",
+			30, 190
+		);
+		Fonts.drawTextEX(
+			FontType.Grey, "[BACK]: Back",
+			30, 200
+		);
 	}
 }

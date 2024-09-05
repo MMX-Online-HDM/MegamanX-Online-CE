@@ -444,7 +444,7 @@ public class AI {
 			// The amount of actions the AI will do, the lower the number, the higher the actions
 			// Before the AI did an actions in 5 frames (0.08 seconds), now it will do an action in 24 frames
 			shootTime += Global.spf;
-			if (shootTime > 24f/60f) {
+			if (shootTime > 18f/60f) {
 				shootTime = 0;
 			}
 		}
@@ -503,7 +503,7 @@ public class AI {
 		//Randomly Dash
 		if (aiState.randomlyDash && character != null &&
 			character.charState is not WallKick &&
-			character.grounded && shootTime == 0 &&
+			character.grounded &&
 			!inNodeTransition && stuckTime == 0 &&
 			character.charState.normalCtrl &&
 			character.charState is not Dash or AirDash or UpDash

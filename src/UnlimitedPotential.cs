@@ -35,9 +35,9 @@ public class XUPParryStartState : CharState {
 		}
 	}
 
-	public void counterAttack(Player damagingPlayer, Actor damagingActor, float damage) {
-		Actor counterAttackTarget = null;
-		Projectile absorbedProj = null;
+	public void counterAttack(Player? damagingPlayer, Actor? damagingActor, float damage) {
+		Actor? counterAttackTarget = null;
+		Projectile? absorbedProj = null;
 		
 		if (player.weapon is Buster { isUnpoBuster: true }) {
 			player.weapon.ammo = player.weapon.maxAmmo;
@@ -255,8 +255,8 @@ public class UPParryRangedProj : Projectile {
 }
 
 public class XUPParryProjState : CharState {
-	Projectile otherProj;
-	Anim absorbAnim;
+	Projectile? otherProj;
+	Anim? absorbAnim;
 	bool shootProj;
 	bool absorbThenShoot;
 	public XUPParryProjState(Projectile otherProj, bool shootProj, bool absorbThenShoot) : base("unpo_parry_attack", "", "", "") {
@@ -648,6 +648,7 @@ public class XRevive : CharState {
 
 	public XRevive() : base("revive_shake") {
 		invincible = true;
+		immuneToWind = true;
 	}
 
 	public override void update() {
