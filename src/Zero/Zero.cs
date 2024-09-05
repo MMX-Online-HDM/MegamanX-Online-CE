@@ -606,6 +606,16 @@ public class Zero : Character {
 		return runSpeed * getRunDebuffs();
 	}
 
+	public override float getDashSpeed() {
+		if (flag != null || !isDashing) {
+			return getRunSpeed();
+		}
+		float dashSpeed = 210;
+		if (isBlack) {
+			dashSpeed *= 1.15f;
+		}
+		return dashSpeed * getRunDebuffs();
+	}
 	public override string getSprite(string spriteName) {
 		return "zero_" + spriteName;
 	}
