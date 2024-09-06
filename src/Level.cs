@@ -934,11 +934,18 @@ public partial class Level {
 			player.loadout = hostPlayer.loadoutData;
 			player.disguise = hostPlayer.disguise;
 
-			if (hostPlayer.charNetId != null && player.character == null) {
-				player.spawnCharAtPoint(new Point(hostPlayer.charXPos, hostPlayer.charYPos), hostPlayer.charXDir, (ushort)hostPlayer.charNetId, false);
+			if (hostPlayer.charNetId != null && player.character == null && player.loadoutSet) {
+				player.spawnCharAtPoint(
+					player.newCharNum, player.getCharSpawnData(player.newCharNum),
+					new Point(hostPlayer.charXPos, hostPlayer.charYPos),
+					hostPlayer.charXDir, (ushort)hostPlayer.charNetId, false
+				);
 				player.changeWeaponFromWi(hostPlayer.weaponIndex);
 				if (hostPlayer.charRollingShieldNetId != null) {
-					new RollingShieldProjCharged(player.weapon, player.character.pos, player.character.xDir, player, hostPlayer.charRollingShieldNetId.Value);
+					new RollingShieldProjCharged(
+						player.weapon, player.character.pos,
+						player.character.xDir, player, hostPlayer.charRollingShieldNetId.Value
+					);
 				}
 			}
 		}
@@ -1448,10 +1455,13 @@ public partial class Level {
 				var player = getPlayerById(kvp.Key);
 				if (player == null || player.character != null) {
 					keysToRemove.Add(kvp.Key);
-				} else if (kvp.Value.time >= 2.5f) {
+				} else if (kvp.Value.time >= 4f) {
 					keysToRemove.Add(kvp.Key);
-					if (player.character == null) {
-						player?.spawnCharAtPoint(kvp.Value.spawnPos, kvp.Value.xDir, kvp.Value.netId, false);
+					if (player.character == null && player.loadoutSet) {
+						player?.spawnCharAtPoint(
+							player.newCharNum, player.getCharSpawnData(player.newCharNum),
+							kvp.Value.spawnPos, kvp.Value.xDir, kvp.Value.netId, false
+						);
 					}
 				}
 			}

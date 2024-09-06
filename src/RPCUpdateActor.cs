@@ -156,7 +156,7 @@ public class RPCUpdateActor : RPC {
 			int? playerId = Player.getPlayerIdFromCharNetId(netId);
 			if (playerId != null) {
 				var player = Global.level.getPlayerById(playerId.Value);
-				if (player != null) {
+				if (player != null && netId == player.getStartNetId()) {
 					Global.level.addFailedSpawn(
 						playerId.Value, new Point(xPos ?? 0, yPos ?? 0), xDir ?? 1, netId
 					);

@@ -423,11 +423,11 @@ label:
 				weapons = loadout.axlLoadout.getWeaponsFromLoadout();
 				weapons.Insert(0, getAxlBullet(axlBulletType));
 			}
-
-			foreach (var dnaCore in savedDNACoreWeapons) {
-				weapons.Add(dnaCore);
+			if (ownedByLocalPlayer) {
+				foreach (var dnaCore in savedDNACoreWeapons) {
+					weapons.Add(dnaCore);
+				}
 			}
-
 			if (weapons[0].type > 0) {
 				weapons[0].ammo = axlBulletTypeLastAmmo[weapons[0].type];
 			}
@@ -446,7 +446,6 @@ label:
 			} else {
 				weapons = loadout.sigmaLoadout.getWeaponsFromLoadout(this, Options.main.sigmaWeaponSlot);
 			}
-
 			// Preserve HP on death so can summon for free until they die
 			if (oldWeapons != null && isRefundableMode() &&
 				previousLoadout?.sigmaLoadout?.commandMode == loadout.sigmaLoadout.commandMode
@@ -468,9 +467,10 @@ label:
 				}
 			}
 		}
-
 		weaponSlot = 0;
-		if (isSigma && weapons.Count == 3) weaponSlot = Options.main.sigmaWeaponSlot;
+		if (ownedByLocalPlayer && isSigma && weapons.Count == 3) {
+			weaponSlot = Options.main.sigmaWeaponSlot;
+		}
 	}
 
 	private Weapon getAxlBullet(int axlBulletType) {
