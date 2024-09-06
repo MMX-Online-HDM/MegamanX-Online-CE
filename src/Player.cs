@@ -598,7 +598,6 @@ public partial class Player {
 				loadoutSet = true;
 			}
 		}
-
 		configureWeapons();
 
 		is1v1Combatant = !isSpectator;
@@ -923,7 +922,10 @@ public partial class Player {
 						Point warpInPos = Global.level.getGroundPosNoKillzone(
 							randomChar.pos, Global.screenH
 						) ?? randomChar.pos;
-						spawnCharAtPoint(warpInPos, randomChar.xDir, charNetId, sendRpc);
+						spawnCharAtPoint(
+							newCharNum, getCharSpawnData(newCharNum),
+							warpInPos, randomChar.xDir, charNetId, sendRpc
+						);
 					} else {
 						var spawnPoint = Global.level.getSpawnPoint(this, !warpedInOnce);
 						int spawnPointIndex = Global.level.spawnPoints.IndexOf(spawnPoint);
@@ -980,12 +982,42 @@ public partial class Player {
 
 		var spawnPoint = Global.level.spawnPoints[spawnPointIndex];
 
-		spawnCharAtPoint(new Point(spawnPoint.pos.x, spawnPoint.getGroundY()), spawnPoint.xDir, charNetId, sendRpc);
+		spawnCharAtPoint(
+			newCharNum, getCharSpawnData(newCharNum),
+			new Point(spawnPoint.pos.x, spawnPoint.getGroundY()), spawnPoint.xDir, charNetId, sendRpc
+		);
 	}
 
-	public void spawnCharAtPoint(Point pos, int xDir, ushort charNetId, bool sendRpc) {
+	
+	public byte[] getCharSpawnData(int charNum) {
+		if (charNum == (int)CharIds.X) {
+			return [
+				(byte)loadout.xLoadout.weapon1,
+				(byte)loadout.xLoadout.weapon2,
+				(byte)loadout.xLoadout.weapon3,
+				(byte)loadout.xLoadout.melee
+			];
+		}
+		if (charNum == (int)CharIds.Axl) {
+			return [
+				(byte)loadout.axlLoadout.weapon2,
+				(byte)loadout.axlLoadout.weapon3,
+			];
+		}
+		if (charNum == (int)CharIds.Sigma) {
+			return [
+				(byte)loadout.sigmaLoadout.sigmaForm
+			];
+		}
+		return [];
+	}
+
+	public void spawnCharAtPoint(
+		int spawnCharNum, byte[] extraData,
+		Point pos, int xDir, ushort charNetId, bool sendRpc
+	) {
 		if (sendRpc) {
-			RPC.spawnCharacter.sendRpc(pos, xDir, id, charNetId);
+			RPC.spawnCharacter.sendRpc(charNum, extraData, pos, xDir, id, charNetId);
 		}
 
 		if (Global.level.gameMode.isTeamMode) {
@@ -993,7 +1025,7 @@ public partial class Player {
 		}
 
 		// ONRESPAWN, SPAWN, RESPAWN, ON RESPAWN, ON SPAWN LOGIC, SPAWNLOGIC
-		charNum = newCharNum;
+		charNum = spawnCharNum;
 		if (isMainPlayer) {
 			previousLoadout = loadout;
 			applyLoadoutChange();
@@ -1009,10 +1041,8 @@ public partial class Player {
 				Options.main.maverickStartFollow ? MaverickAIBehavior.Follow : MaverickAIBehavior.Defend
 			);
 		}
-
-		configureWeapons();
-		maxHealth = getMaxHealth();
 		if (isSigma) {
+			loadout.sigmaLoadout.sigmaForm = extraData[0];
 			if (isSigma1()) {
 				sigmaMaxAmmo = 20;
 				sigmaAmmo = sigmaMaxAmmo;
@@ -1021,6 +1051,18 @@ public partial class Player {
 				sigmaAmmo = 0;
 			}
 		}
+		if (isX) {
+			loadout.xLoadout.weapon1 = extraData[0];
+			loadout.xLoadout.weapon1 = extraData[1];
+			loadout.xLoadout.weapon1 = extraData[2];
+			loadout.xLoadout.melee = extraData[3];
+		}
+		if (isAxl) {
+			loadout.axlLoadout.weapon2 = extraData[0];
+			loadout.xLoadout.weapon3 = extraData[1];
+		}
+		configureWeapons();
+		maxHealth = getMaxHealth();
 		health = maxHealth;
 		assassinHitPos = null;
 
@@ -1055,12 +1097,7 @@ public partial class Player {
 					false, charNetId, ownedByLocalPlayer
 				);
 			} else if (charNum == (int)CharIds.Sigma) {
-				if (!ownedByLocalPlayer && !loadoutSet) {
-					character = new BaseSigma(
-						this, pos.x, pos.y, xDir,
-						false, charNetId, ownedByLocalPlayer
-					);
-				} else if (isSigma3()) {
+				if (isSigma3()) {
 					character = new Doppma(
 						this, pos.x, pos.y, xDir,
 						false, charNetId, ownedByLocalPlayer

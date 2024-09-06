@@ -241,8 +241,16 @@ public class BackloggedSpawns {
 	public Point spawnPoint;
 	public int xDir;
 	public ushort charNetId;
+	public int charNum;
 	public float time;
-	public BackloggedSpawns(int playerId, Point spawnPoint, int xDir, ushort charNetId) {
+	public byte[] extraData;
+
+	public BackloggedSpawns(
+		int charNum, byte[] extraData, int playerId, 
+		Point spawnPoint, int xDir, ushort charNetId
+	) {
+		this.charNum = charNum;
+		this.extraData = extraData;
 		this.playerId = playerId;
 		this.spawnPoint = spawnPoint;
 		this.xDir = xDir;
@@ -253,7 +261,10 @@ public class BackloggedSpawns {
 		var player = Global.level.getPlayerById(playerId);
 		// Player could not exist yet if late joiner.
 		if (player != null) {
-			player.spawnCharAtPoint(spawnPoint, xDir, charNetId, false);
+			player.spawnCharAtPoint(
+				charNum, extraData,
+				spawnPoint, xDir, charNetId, false
+			);
 			return true;
 		}
 		return false;
@@ -271,24 +282,43 @@ public class RPCSpawnCharacter : RPC {
 		int xDir = arguments[8] - 128;
 		int playerId = arguments[9];
 		ushort charNetId = BitConverter.ToUInt16(new byte[] { arguments[10], arguments[11] }, 0);
-
+		int charNum = arguments[12];
+		byte[] extraData;
+		if (arguments.Length > 13) {
+			extraData = arguments[13..];
+		} else {
+			extraData = [];
+		}
 		var player = Global.level.getPlayerById(playerId);
 		// Player could not exist yet if late joiner.
 		if (player != null) {
-			player.spawnCharAtPoint(new Point(x, y), xDir, charNetId, false);
+			player.spawnCharAtPoint(
+				charNum, extraData,
+				new Point(x, y), xDir, charNetId, false
+			);
 		} else {
-			Global.level.backloggedSpawns.Add(new BackloggedSpawns(playerId, new Point(x, y), xDir, charNetId));
+			Global.level.backloggedSpawns.Add(
+				new BackloggedSpawns(
+					charNum, extraData,
+					playerId, new Point(x, y), xDir, charNetId
+				)
+			);
 		}
 	}
 
-	public void sendRpc(Point spawnPos, int xDir, int playerId, ushort charNetId) {
+	public void sendRpc(int charNum, byte[] extraData, Point spawnPos, int xDir, int playerId, ushort charNetId) {
 		if (Global.serverClient == null) return;
+		List<byte> sendBytes = new();
 
-		byte[] xBytes = BitConverter.GetBytes(spawnPos.x);
-		byte[] yBytes = BitConverter.GetBytes(spawnPos.y);
-		byte[] netIdBytes = BitConverter.GetBytes(charNetId);
+		sendBytes.AddRange(BitConverter.GetBytes(spawnPos.x));
+		sendBytes.AddRange(BitConverter.GetBytes(spawnPos.y));
+		sendBytes.Add((byte)(xDir + 128));
+		sendBytes.Add((byte)playerId);
+		sendBytes.AddRange(BitConverter.GetBytes(charNetId));
+		sendBytes.Add((byte)charNum);
+		sendBytes.AddRange(extraData);
 
-		Global.serverClient.rpc(this, xBytes[0], xBytes[1], xBytes[2], xBytes[3], yBytes[0], yBytes[1], yBytes[2], yBytes[3], (byte)(xDir + 128), (byte)playerId, netIdBytes[0], netIdBytes[1]);
+		Global.serverClient.rpc(this, sendBytes.ToArray());
 	}
 }
 
