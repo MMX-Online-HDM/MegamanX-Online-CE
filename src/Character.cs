@@ -2308,7 +2308,7 @@ public partial class Character : Actor, IDamagable {
 		float ang = -90;
 		float radius = 4f;
 		float thickness = 1.5f;
-		int count = Options.main.lowQualityParticles() ? 8 : 40;
+		int count = Options.main.lowQualityParticles() ? 16 : 40;
 
 		for (int i = 0; i < count; i++) {
 			float angCopy = ang;

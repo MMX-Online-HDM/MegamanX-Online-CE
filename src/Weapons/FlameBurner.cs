@@ -84,7 +84,7 @@ public class FlameBurnerProj : Projectile {
 		base.update();
 		float progress = (time / maxTime);
 		if (!Options.main.lowQualityParticles()) {
-			alpha = 1f - (progress / 1.25f);
+			alpha = 1f - (progress / 1.5f);
 			xScale = 1f + progress * 1.5f;
 			yScale = 1f + progress * 1.5f;
 		}

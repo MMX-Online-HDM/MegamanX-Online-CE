@@ -171,7 +171,7 @@ public partial class RPCCreateProj : RPC {
 				proj = new NapalmGrenadeProj(new Weapon(), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.Napalm:
-				proj = new NapalmPartProj(new Weapon(), pos, xDir, player, netProjByte, arguments[extraDataIndex] != 0, 0);
+				proj = new NapalmPartProj(new Weapon(), pos, xDir, player, netProjByte, extraData[0]);
 				break;
 			case (int)ProjIds.NapalmGrenade2:
 				proj = new MK2NapalmGrenadeProj(new Napalm(NapalmType.FireGrenade), pos, xDir, player, netProjByte);

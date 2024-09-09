@@ -1066,108 +1066,110 @@ public partial class Player {
 		health = maxHealth;
 		assassinHitPos = null;
 
-		if (character == null) {
-			bool mk2VileOverride = false;
-			// Hyper mode overrides (PRE)
-			if (Global.level.isHyper1v1() && ownedByLocalPlayer) {
-				if (isVile) {
-					mk2VileOverride = true;
-					currency = 9999;
-				}
+		if (character != null) {
+			return;
+		}
+		bool mk2VileOverride = false;
+		// Hyper mode overrides (PRE)
+		if (Global.level.isHyper1v1() && ownedByLocalPlayer) {
+			if (isVile) {
+				mk2VileOverride = true;
+				currency = 9999;
 			}
+		}
 
-			if (charNum == (int)CharIds.X) {
-				character = new MegamanX(
+		if (charNum == (int)CharIds.X) {
+			character = new MegamanX(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+		} else if (charNum == (int)CharIds.Zero) {
+			character = new Zero(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+		} else if (charNum == (int)CharIds.Vile) {
+			character = new Vile(
+				this, pos.x, pos.y, xDir, false, charNetId,
+				ownedByLocalPlayer, mk2VileOverride: mk2VileOverride
+			);
+		} else if (charNum == (int)CharIds.Axl) {
+			character = new Axl(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+		} else if (charNum == (int)CharIds.Sigma) {
+			if (isSigma3()) {
+				character = new Doppma(
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer
 				);
-			} else if (charNum == (int)CharIds.Zero) {
-				character = new Zero(
-					this, pos.x, pos.y, xDir,
-					false, charNetId, ownedByLocalPlayer
-				);
-			} else if (charNum == (int)CharIds.Vile) {
-				character = new Vile(
-					this, pos.x, pos.y, xDir, false, charNetId,
-					ownedByLocalPlayer, mk2VileOverride: mk2VileOverride
-				);
-			} else if (charNum == (int)CharIds.Axl) {
-				character = new Axl(
-					this, pos.x, pos.y, xDir,
-					false, charNetId, ownedByLocalPlayer
-				);
-			} else if (charNum == (int)CharIds.Sigma) {
-				if (isSigma3()) {
-					character = new Doppma(
-						this, pos.x, pos.y, xDir,
-						false, charNetId, ownedByLocalPlayer
-					);
-				} else if (isSigma2()) {
-					character = new NeoSigma(
-						this, pos.x, pos.y, xDir,
-						false, charNetId, ownedByLocalPlayer
-					);
-				} else {
-					character = new CmdSigma(
-						this, pos.x, pos.y, xDir,
-						false, charNetId, ownedByLocalPlayer
-					);
-				}
-			} else if (charNum == (int)CharIds.Rock) {
-				character = new Rock(
-					this, pos.x, pos.y, xDir,
-					false, charNetId, ownedByLocalPlayer
-				);
-			} else if (charNum == (int)CharIds.BusterZero) {
-				character = new BusterZero(
-					this, pos.x, pos.y, xDir,
-					false, charNetId, ownedByLocalPlayer
-				);
-			} else if (charNum == (int)CharIds.PunchyZero) {
-				character = new PunchyZero(
+			} else if (isSigma2()) {
+				character = new NeoSigma(
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer
 				);
 			} else {
-				throw new Exception("Error: Non-valid char ID: " + charNum);
+				character = new CmdSigma(
+					this, pos.x, pos.y, xDir,
+					false, charNetId, ownedByLocalPlayer
+				);
 			}
-			// Hyper mode overrides (POST)
-			if (Global.level.isHyperMatch() && ownedByLocalPlayer) {
-				if (isX) {
-					setUltimateArmor(true);
-				}
-				if (character is Zero zero) {
-					if (loadout.zeroLoadout.hyperMode == 0) {
-						zero.isBlack = true;
-					} else if (loadout.zeroLoadout.hyperMode == 1) {
-						zero.awakenedPhase = 1;
-					} else {
-						zero.isViral = true;
-					}
-				}
-				if (character is Axl axl) {
-					if (loadout.axlLoadout.hyperMode == 0) {
-						axl.whiteAxlTime = 100000;
-						axl.hyperAxlUsed = true;
-						var db = new DoubleBullet();
-						weapons[0] = db;
-					} else {
-						axl.stingChargeTime = 8;
-						axl.hyperAxlUsed = true;
-						currency = 9999;
-					}
-				}
-			}
-
-			lastCharacter = character;
+		} else if (charNum == (int)CharIds.Rock) {
+			character = new Rock(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+		} else if (charNum == (int)CharIds.BusterZero) {
+			character = new BusterZero(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+		} else if (charNum == (int)CharIds.PunchyZero) {
+			character = new PunchyZero(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+		} else {
+			throw new Exception("Error: Non-valid char ID: " + charNum);
 		}
+		// Hyper mode overrides (POST)
+		if (Global.level.isHyperMatch() && ownedByLocalPlayer) {
+			if (isX) {
+				setUltimateArmor(true);
+			}
+			if (character is Zero zero) {
+				if (loadout.zeroLoadout.hyperMode == 0) {
+					zero.isBlack = true;
+				} else if (loadout.zeroLoadout.hyperMode == 1) {
+					zero.awakenedPhase = 1;
+				} else {
+					zero.isViral = true;
+				}
+			}
+			if (character is Axl axl) {
+				if (loadout.axlLoadout.hyperMode == 0) {
+					axl.whiteAxlTime = 100000;
+					axl.hyperAxlUsed = true;
+					var db = new DoubleBullet();
+					weapons[0] = db;
+				} else {
+					axl.stingChargeTime = 8;
+					axl.hyperAxlUsed = true;
+					currency = 9999;
+				}
+			}
+		}
+
+		lastCharacter = character;¿
 
 		if (isAI) {
 			character.addAI();
 		}
 
-		if (character.rideArmor != null) character.rideArmor.xDir = xDir;
-
+		if (character.rideArmor != null) {
+			character.rideArmor.xDir = xDir;
+		}
 		if (isCamPlayer) {
 			Global.level.snapCamPos(character.getCamCenterPos(), null);
 			//console.log(Global.level.camX + "," + Global.level.camY);
