@@ -41,6 +41,7 @@ public partial class Actor : GameObject {
 		}
 	}
 
+	public float localSpeedMul { get; set; } = 1;
 	public bool useFrameProjs;
 	public Dictionary<string, List<Projectile>> spriteFrameToProjs = new Dictionary<string, List<Projectile>>();
 	public List<Projectile> globalProjs = new List<Projectile>();
@@ -627,28 +628,6 @@ public partial class Actor : GameObject {
 			Helpers.decrementTime(ref gravityWellTime);
 			if (gravityWellTime <= 0) {
 				gravityWellModifier = 1;
-			}
-		}
-
-		if (this is not CrackedWall) {
-			// Process trigger events. Must loop thru all collisions in this case.
-			List<CollideData> triggerList = Global.level.getTriggerList(this, 0, 0);
-
-			// Prioritize certain colliders over others, running them first
-			triggerList = triggerList.OrderBy(trigger => {
-				if (trigger.gameObject is GenericMeleeProj && trigger.otherCollider.flag == (int)HitboxFlag.None &&
-					(trigger.otherCollider.originalSprite == "sigma_block" || trigger.otherCollider.originalSprite == "zero_block")) {
-					return 0;
-				} else if (trigger.otherCollider.originalSprite?.StartsWith("kaisersigma") == true && trigger.otherCollider.name == "head") {
-					return 0;
-				} else if (trigger.gameObject is GenericMeleeProj && trigger.otherCollider.flag == (int)HitboxFlag.None && trigger.otherCollider.originalSprite == "drdoppler_absorb") {
-					return 0;
-				}
-				return 1;
-			}).ToList();
-
-			foreach (var trigger in triggerList) {
-				registerCollision(trigger);
 			}
 		}
 

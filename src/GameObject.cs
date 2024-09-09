@@ -4,6 +4,7 @@ namespace MMXOnline;
 
 public interface GameObject {
 	string name { get; set; }
+	float localSpeedMul { get; set; }
 	void onStart();
 	void preUpdate();
 	void update();
@@ -17,5 +18,6 @@ public interface GameObject {
 	void statePreUpdate();
 	void stateUpdate();
 	void statePostUpdate();
+	void registerCollision(CollideData collideData);
 }
 

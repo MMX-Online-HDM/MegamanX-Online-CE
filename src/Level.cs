@@ -18,8 +18,10 @@ public partial class Level {
 
 	public HashSet<GameObject>[,] grid;
 	public HashSet<GameObject>[,] terrainGrid;
-	public Dictionary<int, int[]> populatedGrids = new();
-	public Dictionary<int, int[]> populatedTerrainGrids = new();
+	public HashSet<int[]> populatedGrids = new();
+	public Dictionary<int, int[]> gridsPopulatedByGo = new();
+	public Dictionary<int, int[]> terrainGridsPopulatedByGo = new();
+	public HashSet<int> collidedGObjs;
 
 	// List of terrain objects. Used for fast collision.
 
@@ -1247,6 +1249,7 @@ public partial class Level {
 			foreach (GameObject go in gos) {
 				if (isTimeSlowed(go, out float slowAmount)) {
 					Global.speedMul = slowAmount;
+					go.localSpeedMul = slowAmount;
 				}
 				go.preUpdate();
 				go.statePreUpdate();
@@ -1258,6 +1261,7 @@ public partial class Level {
 			foreach (var go in gos) {
 				if (isTimeSlowed(go, out float slowAmount)) {
 					Global.speedMul = slowAmount;
+					go.localSpeedMul = slowAmount;
 				}
 				go.update();
 				go.stateUpdate();
@@ -1286,9 +1290,58 @@ public partial class Level {
 				}
 				Global.speedMul = 1;
 			}
-			foreach (var go in gos) {
+			// Collision shenanigans.
+			collidedGObjs = new(); 
+			foreach (var gridData in populatedGrids) {
+				// Initalize data.
+				HashSet<GameObject> currentGrid = grid[gridData[0], gridData[1]];
+				// Awfull GM19 order code.
+				GameObject[] gameObjects = currentGrid.ToArray();
+				// Iterate trough populated grids.
+				for (int i = 0; i < gameObjects.Length - 1; i++) {
+					for (int j = i; j < gameObjects.Length; j++) {
+						// Skip terrain coliding with eachother.
+						if (gameObjects[i] is Geometry or CrackedWall && gameObjects[j] is Geometry or CrackedWall) {
+							continue;
+						}
+						// Get order independent hash.
+						int hash = gameObjects[i].GetHashCode() ^ gameObjects[j].GetHashCode();
+						// Skip checked objexts.
+						if (collidedGObjs.Contains(hash)) {
+							continue;
+						}
+						// Add to hash as we check.
+						collidedGObjs.Add(hash);
+						// Do preliminary collision checks and skip if we do not instersect.
+						if (!checkLossyCollision(gameObjects[i], gameObjects[j])) {
+							continue;
+						}
+						(List<CollideData> iDatas, List<CollideData> jDatas) = getTriggerExact(
+							gameObjects[i], gameObjects[j]
+						);
+						if (iDatas.Count > 0) {
+							Global.speedMul = gameObjects[i].localSpeedMul;
+							iDatas = organizeTriggers(iDatas);
+							foreach (CollideData collideDataI in iDatas) {
+								gameObjects[i].registerCollision(collideDataI);
+							}
+							Global.speedMul = 1;
+						}
+						if (jDatas.Count > 0) {
+							Global.speedMul = gameObjects[j].localSpeedMul;
+							jDatas = organizeTriggers(jDatas);
+							foreach (CollideData collideDataJ in jDatas) {
+								gameObjects[j].registerCollision(collideDataJ);
+							}
+							Global.speedMul = 1;
+						}
+					}
+				}
+			}
+			foreach (GameObject go in gos) {
 				if (isTimeSlowed(go, out float slowAmount)) {
 					Global.speedMul = slowAmount;
+					go.localSpeedMul = slowAmount;
 				}
 				go.postUpdate();
 				go.statePostUpdate();
