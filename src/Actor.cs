@@ -227,7 +227,7 @@ public partial class Actor : GameObject {
 			colliderHeight = 50;
 		}
 
-		foreach (var waterRect in Global.level.waterRects) {
+		foreach (Rect waterRect in Global.level.waterRects) {
 			if (pos.x > waterRect.x1 && pos.x < waterRect.x2 &&
 				pos.y - colliderHeight > waterRect.y1 && pos.y < waterRect.y2
 			) {

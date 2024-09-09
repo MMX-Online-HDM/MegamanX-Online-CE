@@ -1161,7 +1161,7 @@ public partial class Player {
 			}
 		}
 
-		lastCharacter = character;¿
+		lastCharacter = character;
 
 		if (isAI) {
 			character.addAI();
