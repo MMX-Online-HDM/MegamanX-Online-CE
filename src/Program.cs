@@ -1348,11 +1348,11 @@ class Program {
 				deltaTime = 0;
 			}
 			deltaTimeSavings = deltaTime;
-			videoUpdatesThisSecond++;
 			Global.isSkippingFrames = false;
 			Global.input.clearInput();
 			lastUpdateTime = timeNow;
 			if (Global.renderAction == null) {
+			videoUpdatesThisSecond++;
 				window.Clear(clearColor);
 				render();
 			}

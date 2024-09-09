@@ -8,11 +8,18 @@ namespace MMXOnline;
 public class DrawableWrapper {
 	public List<ShaderWrapper> shaders;
 	public Drawable drawable;
+	public Color color;
+	public int[]? size;
 
-	public DrawableWrapper(List<ShaderWrapper> shaders, Drawable drawable) {
+	public DrawableWrapper(
+		List<ShaderWrapper> shaders, Drawable drawable,
+		Color? color = null, int[]? size = null
+	) {
 		shaders?.RemoveAll(s => s == null);
 		this.shaders = shaders;
 		this.drawable = drawable;
+		this.color = color ?? Color.White;
+		this.size = size;
 	}
 }
 
@@ -27,39 +34,73 @@ public class DrawLayer : Transformable, Drawable {
 		for (int i = 0; i < oneOffs.Count; i++) {
 			var oneOff = oneOffs[i];
 			Global.window.SetView(Global.view);
-			if (oneOff.shaders != null && oneOff.shaders.Count == 1) {
+			// No shaders.
+			if (oneOff.shaders == null || oneOff.shaders.Count == 0) {
+				target.Draw(oneOff.drawable);
+			}
+			// One shader.
+			else if (oneOff.shaders.Count == 1 && oneOff.color == Color.White) {
 				RenderStates renderStates = new RenderStates(states);
 				renderStates.Shader = oneOff.shaders[0].getShader();
 				target.Draw(oneOff.drawable, renderStates);
-			} else if (oneOff.shaders != null && oneOff.shaders.Count > 1) {
+			}
+			// Multi-shader.
+			else {
 				var sprite = oneOff.drawable as SFML.Graphics.Sprite;
-				if (sprite == null) continue;
-
-				Global.renderTexture.Clear(new Color(0, 0, 0, 0));
-				Global.renderTexture.Display();
+				if (sprite == null) {
+					continue;
+				}
 				RenderStates renderStates = new RenderStates(states);
-				var originalPosition = sprite.Position;
-				var originalOrigin = sprite.Origin;
-				var originalRotation = sprite.Rotation;
-				var originalScale = sprite.Scale;
+				Vector2f originalPosition = sprite.Position;
+				Vector2f originalOrigin = sprite.Origin;
+				float originalRotation = sprite.Rotation;
+				Vector2f originalScale = sprite.Scale;
+				Color originalColor = sprite.Color;
 				sprite.Position = new Vector2f(0, 0);
 				sprite.Origin = new Vector2f(0, 0);
 				sprite.Scale = new Vector2f(1, 1);
 				sprite.Rotation = 0;
+				sprite.Color = Color.White;
+				// Get textures.
+				int encodeKey = (oneOff.size[0] * 397) ^ oneOff.size[1];
+				RenderTexture front;
+				RenderTexture back;
+				(front, back) = Global.renderTextures[encodeKey];
+				// Create a clear texture first.
+				back.Clear(new Color(0, 0, 0, 0));
+				back.Display();
 				renderStates.Shader = oneOff.shaders[0].getShader();
-				Global.renderTexture.Draw(sprite, renderStates);
-
-				var sprite3 = new SFML.Graphics.Sprite(Global.renderTexture.Texture);
-				sprite3.Position = originalPosition;
-				sprite3.Origin = originalOrigin;
-				sprite3.Scale = originalScale;
-				sprite3.Rotation = originalRotation;
+				back.Draw(sprite, renderStates);
+				// Iterate shaders.
+				for (int num = 1; num < oneOff.shaders.Count; num++) {
+					// Clear image.
+					renderStates = new RenderStates(states);
+					front.Clear(new Color(0, 0, 0, 0));
+					front.Display();
+					// Apply shader and draw.
+					renderStates.Shader = oneOff.shaders[num].getShader();
+					front.Draw(
+						new SFML.Graphics.Sprite(back.Texture), renderStates
+					);
+					// Swap.
+					(
+						front,
+						back
+					) = (
+						back,
+						front
+					);
+				}
+				// Final result.
+				var finalSprite = new SFML.Graphics.Sprite(back.Texture);
+				finalSprite.Position = originalPosition;
+				finalSprite.Origin = originalOrigin;
+				finalSprite.Scale = originalScale;
+				finalSprite.Rotation = originalRotation;
+				finalSprite.Color = originalColor;
 
 				renderStates = new RenderStates(states);
-				renderStates.Shader = oneOff.shaders[1].getShader();
-				target.Draw(sprite3, renderStates);
-			} else {
-				target.Draw(oneOff.drawable);
+				target.Draw(finalSprite, renderStates);
 			}
 		}
 	}
@@ -249,7 +290,7 @@ public partial class DrawWrappers {
 
 		if (isWorldPos) {
 			DrawLayer drawLayer = getDrawLayer(depth);
-			drawLayer.oneOffs.Add(new DrawableWrapper(shaders, sprite));
+			drawLayer.oneOffs.Add(new DrawableWrapper(shaders, sprite, sprite.Color, [(int)sw, (int)sh]));
 		} else {
 			drawToHUD(sprite);
 		}

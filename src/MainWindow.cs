@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using SFML.Graphics;
 using SFML.System;
@@ -10,7 +11,7 @@ public partial class Global {
 	public static RenderWindow window = null!;
 	public static bool fullscreen;
 
-	public static RenderTexture renderTexture = null!;
+	public static Dictionary<int, (RenderTexture, RenderTexture)> renderTextures = new();
 	public static RenderTexture screenRenderTexture = null!;
 	public static RenderTexture srtBuffer1 = null!;
 	public static RenderTexture srtBuffer2 = null!;
@@ -58,8 +59,6 @@ public partial class Global {
 		fullscreen = options.fullScreen;
 
 		changeWindowSize(options.windowScale);
-
-		renderTexture = new RenderTexture(screenW, screenH);
 
 		screenRenderTextureS = new RenderTexture(screenW, screenH);
 		srtBuffer1S = new RenderTexture(screenW, screenH);

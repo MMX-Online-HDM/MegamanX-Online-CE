@@ -740,6 +740,18 @@ public class AnimData {
 				durationFrames,
 				new Point(offsetX, offsetY)
 			);
+
+			// Rendertexture creation.
+			int sprWidth = MathInt.Ceiling(x2 - x1);
+			int sprHeight = MathInt.Ceiling(y2 - y1);
+			int encodeKey = (sprWidth * 397) ^ sprHeight;
+			if (!Global.renderTextures.ContainsKey(encodeKey)) {
+				Global.renderTextures[encodeKey] = (
+					new RenderTexture((uint)sprWidth, (uint)sprHeight),
+					new RenderTexture((uint)sprWidth, (uint)sprHeight)
+				);
+			}
+
 			if (frameJson["POIs"] != null) {
 				List<Point> framePOIs = new();
 				List<String> framePoiTags = new();
