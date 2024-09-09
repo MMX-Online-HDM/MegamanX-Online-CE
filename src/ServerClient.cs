@@ -420,16 +420,12 @@ public class ServerClient {
 						ushort argCount = BitConverter.ToUInt16(im.ReadBytes(2), 0);
 						var bytes = im.ReadBytes(argCount);
 						if (invokeRpcs) {
-							Helpers.tryWrap(() => { rpcTemplate.invoke(bytes); }, false);
+							rpcTemplate.invoke(bytes);
 						}
 					} else {
 						var message = im.ReadString();
 						if (invokeRpcs) {
-							if (rpcTemplate is RPCJoinLateResponse) {
-								rpcTemplate.invoke(message);
-							} else {
-								Helpers.tryWrap(() => { rpcTemplate.invoke(message); }, false);
-							}
+							rpcTemplate.invoke(message);
 						}
 						stringMessages.Add(message);
 					}

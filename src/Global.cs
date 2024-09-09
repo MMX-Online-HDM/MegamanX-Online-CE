@@ -482,6 +482,7 @@ public partial class Global {
 	// [5 packets received (second 1), 3 packets received (second 2), 2 packets received (second 3), ...]
 	public static List<long> last10SecondsPacketsReceived = new List<long>();
 	public static long packetTotal1SecondAgo;
+	public static Action renderAction;
 
 	public const int fpsCap = 60;
 	public static float currentFPS = 60;

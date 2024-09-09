@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Threading;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using SFML.Graphics;
 using SFML.System;
@@ -1620,6 +1622,7 @@ public partial class Level {
 	int powerplant2State = 0;   //0 = light, 1 = fade to black, 2 = black, 3 = fade to light
 	public float blackJoinTime;
 	public int camNotSetFrames;
+
 	public void render() {
 		if (Global.level.mainPlayer == null) return;
 
@@ -1639,14 +1642,9 @@ public partial class Level {
 			return;
 		}
 
-		RenderTexture srt = null;
-		if (Options.main.enablePostProcessing) {
-			srt = Global.screenRenderTexture;
-			Color? bgColor = Global.level?.levelData?.bgColor;
-			if (bgColor == null) bgColor = new Color(0, 0, 0, 0);
-			srt.Clear(bgColor.Value);
-			srt.Display();
-		}
+		RenderTexture srt = Global.screenRenderTexture;
+		srt.Clear(Global.level?.levelData?.bgColor ?? new Color(0, 0, 0, 0));
+		srt.Display();
 
 		for (int i = 0; i < parallaxes.Count; i++) {
 			Parallax parallax = parallaxes[i];
@@ -1697,7 +1695,17 @@ public partial class Level {
 		foreach (var effect in effects) {
 			effect.render(0, 0);
 		}
+		Dictionary<long, DrawLayer> drawObjCopy = new(DrawWrappers.walDrawObjects);
+		Global.renderAction = (() => {
+			renderResultAsync(srt, drawObjCopy);
+		});
+		DrawWrappers.walDrawObjects.Clear();
+	}
 
+	public void renderResultAsync(
+		RenderTexture srt,
+		Dictionary<long, DrawLayer> walDrawObjects
+	) {
 		foreach (var debugDrawCall in debugDrawCalls) {
 			debugDrawCall.Invoke();
 		}
@@ -1705,10 +1713,10 @@ public partial class Level {
 			debugDrawCalls.RemoveAt(0);
 		}
 
-		List<long> keys = DrawWrappers.walDrawObjects.Keys.ToList();
+		List<long> keys = walDrawObjects.Keys.ToList();
 		keys.Sort();
 
-		drawKeyRange(keys, long.MinValue, ZIndex.Backwall, srt);
+		drawKeyRange(keys, long.MinValue, ZIndex.Backwall, srt, walDrawObjects);
 
 		// If a backwall wasn't set, the background becomes the backwall.
 		if (backwallSprites != null) {
@@ -1717,20 +1725,18 @@ public partial class Level {
 			DrawWrappers.DrawMapTiles(backgroundSprites, 0, 0, srt, backgroundShader);
 		}
 
-		drawKeyRange(keys, ZIndex.Backwall, ZIndex.Background, srt);
+		drawKeyRange(keys, ZIndex.Backwall, ZIndex.Background, srt, walDrawObjects);
 
 		// If a backwall wasn't set, the background becomes the backwall.
 		if (backwallSprites != null) {
 			DrawWrappers.DrawMapTiles(backgroundSprites, 0, 0, srt, backgroundShader);
 		}
 
-		drawKeyRange(keys, ZIndex.Background, ZIndex.Foreground, srt);
+		drawKeyRange(keys, ZIndex.Background, ZIndex.Foreground, srt, walDrawObjects);;
 
 		DrawWrappers.DrawMapTiles(foregroundSprites, 0, 0, srt, backgroundShader);
 
-		drawKeyRange(keys, ZIndex.Foreground, long.MaxValue, srt);
-
-		DrawWrappers.walDrawObjects.Clear();
+		drawKeyRange(keys, ZIndex.Foreground, long.MaxValue, srt, walDrawObjects);
 
 		// Draw the screen render texture with any post processing applied
 		if (srt != null) {
@@ -1805,7 +1811,7 @@ public partial class Level {
 			int endGridX = MathInt.Ceiling((camX + Global.screenW) / cellWidth);
 			int startGridY = MathInt.Floor(camY / cellWidth);
 			int endGridY = MathInt.Ceiling((camY + Global.screenH) / cellWidth);
-			
+
 			bool drawPos = (cellWidth >= 32);
 			int firstRowSize = 10;
 			string separator = "-";
@@ -1813,7 +1819,7 @@ public partial class Level {
 				separator = "\n";
 				firstRowSize = 20;
 			}
-		
+
 			startGridX = MathInt.Clamp(startGridX, 0, grid.GetLength(0));
 			endGridX = MathInt.Clamp(endGridX, 0, grid.GetLength(0));
 			startGridY = MathInt.Clamp(startGridY, 0, grid.GetLength(1));
@@ -1880,12 +1886,36 @@ public partial class Level {
 				DrawWrappers.DrawLine(wallPathNode.point.x, wallPathNode.point.y, wallPathNode.next.point.x, wallPathNode.next.point.y, Color.Red, 1, ZIndex.HUD + 500);
 			}
 		}
+
+		Menu.render();
+
+		if (Options.main.showFPS && Global.level != null && Global.level.started) {
+			int vfps = MathInt.Round(Global.currentFPS);
+			int fps = MathInt.Round(Global.logicFPS);
+			float yPos = 200;
+			if (Global.level.gameMode.shouldDrawRadar()) {
+				yPos = 219;
+			}
+			Fonts.drawText(
+				FontType.BlueMenu, "VFPS:" + vfps.ToString(), Global.screenW - 5, yPos - 10,
+				Alignment.Right
+			);
+			Fonts.drawText(
+				FontType.BlueMenu, "FPS:" + fps.ToString(), Global.screenW - 5, yPos,
+				Alignment.Right
+			);
+		}
+
+		DevConsole.drawConsole();
 	}
 
-	public void drawKeyRange(List<long> keys, long minVal, long maxVal, RenderTexture srt) {
+	public void drawKeyRange(
+		List<long> keys, long minVal, long maxVal, RenderTexture srt,
+		Dictionary<long, DrawLayer> walDrawObjects
+	) {
 		foreach (long key in keys) {
 			if (key >= minVal && key < maxVal) {
-				var drawLayer = DrawWrappers.walDrawObjects[key];
+				var drawLayer = walDrawObjects[key];
 				if (srt != null) {
 					srt.Draw(drawLayer);
 				} else {

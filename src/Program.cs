@@ -20,14 +20,14 @@ using static SFML.Window.Keyboard;
 namespace MMXOnline;
 
 class Program {
-#if WINDOWS
-	[STAThread]
-#endif
+	//#if WINDOWS
+	//[STAThread]
+	//#endif
 	static void Main(string[] args) {
 		if (args.Length > 0 && args[0] == "-relay") {
-#if WINDOWS
+		#if WINDOWS
 			AllocConsole();
-#endif
+		#endif
 			RelayServer.ServerMain(args);
 		} else {
 			int mode = 0;
@@ -313,9 +313,20 @@ class Program {
 				Menu.change(new ErrorMenu(error, new MainMenu()));
 			}
 		}
-
+		Task mainLoopTask = new Task(() => {
+			while (window.IsOpen) {
+				mainLoop(window);
+			}
+		});
+		mainLoopTask.ContinueWith(Program.loadExceptionHandler, TaskContinuationOptions.OnlyOnFaulted);
+		mainLoopTask.Start();
 		while (window.IsOpen) {
-			mainLoop(window);
+			if (Global.renderAction != null) {
+				Global.renderAction();
+				Global.window.DispatchEvents();
+				Global.window.Display();
+				Global.renderAction = null;
+			}
 		}
 	}
 
@@ -447,30 +458,11 @@ class Program {
 
 	private static void render() {
 		if (Global.levelStarted()) {
-			Helpers.tryWrap(Global.level.render, false);
-		}
-
-		if (Global.levelStarted()) {
-			Helpers.tryWrap(Menu.render, false);
+			Global.level.render();
 		} else {
-			Menu.render();
-		}
-
-		if (Options.main.showFPS && Global.level != null && Global.level.started) {
-			int vfps = MathInt.Round(Global.currentFPS);
-			int fps = MathInt.Round(Global.logicFPS);
-			float yPos = 200;
-			if (Global.level.gameMode.shouldDrawRadar()) {
-				yPos = 219;
-			}
-			Fonts.drawText(
-				FontType.BlueMenu, "VFPS:" + vfps.ToString(), Global.screenW - 5, yPos - 10,
-				Alignment.Right
-			);
-			Fonts.drawText(
-				FontType.BlueMenu, "FPS:" + fps.ToString(), Global.screenW - 5, yPos,
-				Alignment.Right
-			);
+			Global.renderAction = (() => {
+				Menu.render();
+			});
 		}
 		// TODO: Make this work for errors.
 		//if (Global.debug) {
@@ -485,8 +477,6 @@ class Program {
 			Fonts.drawText(FontType.Red, Global.debugString3, 20, 40);
 			*/
 		//}
-
-		DevConsole.drawConsole();
 	}
 
 	/// <summary>
@@ -1358,9 +1348,10 @@ class Program {
 			Global.isSkippingFrames = false;
 			Global.input.clearInput();
 			lastUpdateTime = timeNow;
-			window.Clear(clearColor);
-			render();
-			window.Display();
+			if (Global.renderAction == null) {
+				window.Clear(clearColor);
+				render();
+			}
 			/*
 			long prevPackets = 0;
 			if (Global.showDiagnostics) {

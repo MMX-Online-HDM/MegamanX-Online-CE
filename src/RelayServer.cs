@@ -340,7 +340,7 @@ public class RelayServer {
 		netServer = new NetServer(config);
 		netServer.Start();
 		while (true) {
-			Helpers.tryWrap(udpIteration, isServer: true);
+			udpIteration();
 		}
 	}
 
