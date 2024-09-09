@@ -244,6 +244,17 @@ public partial class Level {
 	public int equalCharDistributerBlue;
 
 	public void startLevel(Server server, bool joinedLate) {
+		// Load stuff on the main thread to prevent RenderTexture errors.
+		Global.loadAction = () => {
+			startLevelAction(server, joinedLate);
+		};
+		// Wait for load to end.
+		while (Global.loadAction != null) {
+			Thread.Sleep(10);
+		}
+	}
+
+	public void startLevelAction(Server server, bool joinedLate) {
 		started = true;
 
 		if (Global.isOffline) {
@@ -1646,38 +1657,6 @@ public partial class Level {
 		srt.Clear(Global.level?.levelData?.bgColor ?? new Color(0, 0, 0, 0));
 		srt.Display();
 
-		for (int i = 0; i < parallaxes.Count; i++) {
-			Parallax parallax = parallaxes[i];
-			var parallaxTextures = levelData.getParallaxTextures(parallaxes[i].path);
-			if (parallaxTextures == null) continue;
-
-			Point parallaxOffset = parallaxOffsets[i];
-
-			float px = parallax.startX + (parallax.speedX * camX);
-			float py = parallax.startY + (parallax.speedY * camY);
-
-			DrawWrappers.DrawMapTiles(parallaxTextures, parallaxOffset.x + px, parallaxOffset.y + py, srt, parallaxShader);
-			Point size = Helpers.getTextureArraySize(parallaxTextures);
-
-			int signX = MathF.Sign(parallax.scrollSpeedX);
-			int signY = MathF.Sign(parallax.scrollSpeedY);
-
-			if (parallax.scrollSpeedX != 0) {
-				DrawWrappers.DrawMapTiles(parallaxTextures, parallaxOffset.x + px - (size.x * signX), parallaxOffset.y + py, srt, parallaxShader);
-			}
-
-			if (parallax.scrollSpeedY != 0) {
-				DrawWrappers.DrawMapTiles(parallaxTextures, parallaxOffset.x + px, parallaxOffset.y + py - (size.y * signY), srt, parallaxShader);
-				DrawWrappers.DrawMapTiles(parallaxTextures, parallaxOffset.x + px - (size.x * signX), parallaxOffset.y + py - (size.y * signY), srt, parallaxShader);
-			}
-
-			foreach (ParallaxSprite parallaxSprite in parallaxSprites[i]) {
-				float ppx = (parallax.speedX * camX);
-				float ppy = (parallax.speedY * camY);
-				parallaxSprite.render(ppx, ppy);
-			}
-		}
-
 		if (levelData.name == "powerplant2") {
 			drawPowerplant2();
 		}
@@ -1695,61 +1674,96 @@ public partial class Level {
 		foreach (var effect in effects) {
 			effect.render(0, 0);
 		}
-		Dictionary<long, DrawLayer> drawObjCopy = new(DrawWrappers.walDrawObjects);
+		Dictionary<long, DrawLayer> drawObjCopy = DrawWrappers.walDrawObjects;
+		DrawWrappers.walDrawObjects = new();
 		Global.renderAction = (() => {
-			renderResultAsync(srt, drawObjCopy);
+			renderResultAsync(this, srt, drawObjCopy);
 		});
-		DrawWrappers.walDrawObjects.Clear();
 	}
 
-	public void renderResultAsync(
-		RenderTexture srt,
+	public static void renderResultAsync(
+		Level level, RenderTexture srt,
 		Dictionary<long, DrawLayer> walDrawObjects
 	) {
-		foreach (var debugDrawCall in debugDrawCalls) {
-			debugDrawCall.Invoke();
-		}
-		if (debugDrawCalls.Count > 100) {
-			debugDrawCalls.RemoveAt(0);
-		}
+		for (int i = 0; i < level.parallaxes.Count; i++) {
+			Parallax parallax = level.parallaxes[i];
+			var parallaxTextures = level.levelData.getParallaxTextures(level.parallaxes[i].path);
+			if (parallaxTextures == null) continue;
 
+			Point parallaxOffset = level.parallaxOffsets[i];
+
+			float px = parallax.startX + (parallax.speedX * level.camX);
+			float py = parallax.startY + (parallax.speedY * level.camY);
+
+			DrawWrappers.DrawMapTiles(
+				parallaxTextures, parallaxOffset.x + px, parallaxOffset.y + py, srt, level.parallaxShader
+			);
+			Point size = Helpers.getTextureArraySize(parallaxTextures);
+
+			int signX = MathF.Sign(parallax.scrollSpeedX);
+			int signY = MathF.Sign(parallax.scrollSpeedY);
+
+			if (parallax.scrollSpeedX != 0) {
+				DrawWrappers.DrawMapTiles(
+					parallaxTextures, parallaxOffset.x + px - (size.x * signX),
+					parallaxOffset.y + py, srt, level.parallaxShader
+				);
+			}
+
+			if (parallax.scrollSpeedY != 0) {
+				DrawWrappers.DrawMapTiles(
+					parallaxTextures, parallaxOffset.x + px,
+					parallaxOffset.y + py - (size.y * signY), srt, level.parallaxShader
+				);
+				DrawWrappers.DrawMapTiles(
+					parallaxTextures, parallaxOffset.x + px - (size.x * signX),
+					parallaxOffset.y + py - (size.y * signY), srt, level.parallaxShader
+				);
+			}
+
+			foreach (ParallaxSprite parallaxSprite in level.parallaxSprites[i]) {
+				float ppx = (parallax.speedX * level.camX);
+				float ppy = (parallax.speedY * level.camY);
+				parallaxSprite.render(ppx, ppy);
+			}
+		}
 		List<long> keys = walDrawObjects.Keys.ToList();
 		keys.Sort();
 
-		drawKeyRange(keys, long.MinValue, ZIndex.Backwall, srt, walDrawObjects);
+		level.drawKeyRange(keys, long.MinValue, ZIndex.Backwall, srt, walDrawObjects);
 
 		// If a backwall wasn't set, the background becomes the backwall.
-		if (backwallSprites != null) {
-			DrawWrappers.DrawMapTiles(backwallSprites, 0, 0, srt, backgroundShader);
+		if (level.backwallSprites != null) {
+			DrawWrappers.DrawMapTiles(level.backwallSprites, 0, 0, srt, level.backgroundShader);
 		} else {
-			DrawWrappers.DrawMapTiles(backgroundSprites, 0, 0, srt, backgroundShader);
+			DrawWrappers.DrawMapTiles(level.backgroundSprites, 0, 0, srt, level.backgroundShader);
 		}
 
-		drawKeyRange(keys, ZIndex.Backwall, ZIndex.Background, srt, walDrawObjects);
+		level.drawKeyRange(keys, ZIndex.Backwall, ZIndex.Background, srt, walDrawObjects);
 
 		// If a backwall wasn't set, the background becomes the backwall.
-		if (backwallSprites != null) {
-			DrawWrappers.DrawMapTiles(backgroundSprites, 0, 0, srt, backgroundShader);
+		if (level.backwallSprites != null) {
+			DrawWrappers.DrawMapTiles(level.backgroundSprites, 0, 0, srt, level.backgroundShader);
 		}
 
-		drawKeyRange(keys, ZIndex.Background, ZIndex.Foreground, srt, walDrawObjects);;
+		level.drawKeyRange(keys, ZIndex.Background, ZIndex.Foreground, srt, walDrawObjects);;
 
-		DrawWrappers.DrawMapTiles(foregroundSprites, 0, 0, srt, backgroundShader);
+		DrawWrappers.DrawMapTiles(level.foregroundSprites, 0, 0, srt, level.backgroundShader);
 
-		drawKeyRange(keys, ZIndex.Foreground, long.MaxValue, srt, walDrawObjects);
+		level.drawKeyRange(keys, ZIndex.Foreground, long.MaxValue, srt, walDrawObjects);
 
 		// Draw the screen render texture with any post processing applied
 		if (srt != null) {
 			var screenSprite = new SFML.Graphics.Sprite(srt.Texture);
-			screenSprite.Position = new Vector2f(camX, camY);
+			screenSprite.Position = new Vector2f(level.camX, level.camY);
 
 			var ppShaders = new List<ShaderWrapper>();
-			foreach (var cch in chargedCrystalHunters) {
+			foreach (var cch in level.chargedCrystalHunters) {
 				if (cch.timeSlowShader != null) {
 					ppShaders.Add(cch.timeSlowShader);
 				}
 			}
-			foreach (var dhp in darkHoldProjs) {
+			foreach (var dhp in level.darkHoldProjs) {
 				if (dhp.screenShader != null) {
 					ppShaders.Add(dhp.screenShader);
 				}
@@ -1777,7 +1791,7 @@ public partial class Level {
 				}
 
 				var sprite2 = new SFML.Graphics.Sprite(currentRT.Texture);
-				sprite2.Position = new Vector2f(camX, camY);
+				sprite2.Position = new Vector2f(level.camX, level.camY);
 
 				Global.window.Draw(sprite2);
 			} else {
@@ -1791,19 +1805,94 @@ public partial class Level {
 		DrawWrappers.deferredTextDraws.Clear();
 
 		// At this point all drawing should be HUD/menu elements only
-		gameMode.render();
+		level.gameMode.render();
 
-		if (mainPlayer.readyTime > 0) {
-			if (mainPlayer.readyTime < 0.4) {
-				int frameIndex = (int)Math.Round((mainPlayer.readyTime / 0.4) * 9);
+		if (level.mainPlayer.readyTime > 0) {
+			if (level.mainPlayer.readyTime < 0.4) {
+				int frameIndex = (int)Math.Round((level.mainPlayer.readyTime / 0.4) * 9);
 				Global.sprites["ready"].drawToHUD(frameIndex, (Global.screenW / 2) - 21, Global.screenH / 2);
-			} else if (mainPlayer.readyTime < 1.75) {
-				if ((int)Math.Round(mainPlayer.readyTime * 7.5) % 2 == 0) {
+			} else if (level.mainPlayer.readyTime < 1.75) {
+				if ((int)Math.Round(level.mainPlayer.readyTime * 7.5) % 2 == 0) {
 					Global.sprites["ready"].drawToHUD(9, (Global.screenW / 2) - 21, Global.screenH / 2);
 				}
 			}
 		}
+		level.drawDebug();
 
+		Menu.render();
+
+		if (Options.main.showFPS && Global.level != null && Global.level.started) {
+			int vfps = MathInt.Round(Global.currentFPS);
+			int fps = MathInt.Round(Global.logicFPS);
+			float yPos = 200;
+			if (Global.level.gameMode.shouldDrawRadar()) {
+				yPos = 219;
+			}
+			Fonts.drawText(
+				FontType.BlueMenu, "VFPS:" + vfps.ToString(), Global.screenW - 5, yPos - 10,
+				Alignment.Right
+			);
+			Fonts.drawText(
+				FontType.BlueMenu, "FPS:" + fps.ToString(), Global.screenW - 5, yPos,
+				Alignment.Right
+			);
+		}
+
+		DevConsole.drawConsole();
+	}
+
+	public void drawKeyRange(
+		List<long> keys, long minVal, long maxVal, RenderTexture srt,
+		Dictionary<long, DrawLayer> walDrawObjects
+	) {
+		foreach (long key in keys) {
+			if (key >= minVal && key < maxVal) {
+				var drawLayer = walDrawObjects[key];
+				if (srt != null) {
+					srt.Draw(drawLayer);
+				} else {
+					Global.window.Draw(drawLayer);
+				}
+			}
+		}
+
+	}
+
+	int virusColorState = 0;
+	float virusColorTime;
+	Color virusColor1 = new Color(99, 20, 99, 128);
+	Color virusColor2 = new Color(66, 20, 99, 128);
+	private void drawSigmaVirus() {
+		var rect = gameMode.safeZoneRect;
+
+		if (virusColorState == 0) {
+			virusColorTime += Global.spf;
+			if (virusColorTime >= 1) {
+				virusColorState = 1;
+			}
+		} else if (virusColorState == 1) {
+			virusColorTime -= Global.spf;
+			if (virusColorTime <= 0) {
+				virusColorState = 0;
+			}
+		}
+
+		//virusColorTime = (MathF.Sin(Global.time * 2) * 0.5f) + 0.5f;
+
+		Color color = new Color(
+			(byte)Helpers.lerp(virusColor1.R, virusColor2.R, virusColorTime),
+			(byte)Helpers.lerp(virusColor1.G, virusColor2.G, virusColorTime),
+			(byte)Helpers.lerp(virusColor1.B, virusColor2.B, virusColorTime),
+			128
+		);
+
+		DrawWrappers.DrawRect(0, 0, rect.x1, height, true, color, 1, ZIndex.HUD, isWorldPos: true);
+		DrawWrappers.DrawRect(rect.x2, 0, width, height, true, color, 1, ZIndex.HUD, isWorldPos: true);
+		DrawWrappers.DrawRect(rect.x1, 0, rect.x2, rect.y1, true, color, 1, ZIndex.HUD, isWorldPos: true);
+		DrawWrappers.DrawRect(rect.x1, rect.y2, rect.x2, height, true, color, 1, ZIndex.HUD, isWorldPos: true);
+	}
+
+	public void drawDebug() {
 		if (Global.showGridHitboxes) {
 			int gridItemCount = 0;
 			int offset = 0;
@@ -1886,78 +1975,6 @@ public partial class Level {
 				DrawWrappers.DrawLine(wallPathNode.point.x, wallPathNode.point.y, wallPathNode.next.point.x, wallPathNode.next.point.y, Color.Red, 1, ZIndex.HUD + 500);
 			}
 		}
-
-		Menu.render();
-
-		if (Options.main.showFPS && Global.level != null && Global.level.started) {
-			int vfps = MathInt.Round(Global.currentFPS);
-			int fps = MathInt.Round(Global.logicFPS);
-			float yPos = 200;
-			if (Global.level.gameMode.shouldDrawRadar()) {
-				yPos = 219;
-			}
-			Fonts.drawText(
-				FontType.BlueMenu, "VFPS:" + vfps.ToString(), Global.screenW - 5, yPos - 10,
-				Alignment.Right
-			);
-			Fonts.drawText(
-				FontType.BlueMenu, "FPS:" + fps.ToString(), Global.screenW - 5, yPos,
-				Alignment.Right
-			);
-		}
-
-		DevConsole.drawConsole();
-	}
-
-	public void drawKeyRange(
-		List<long> keys, long minVal, long maxVal, RenderTexture srt,
-		Dictionary<long, DrawLayer> walDrawObjects
-	) {
-		foreach (long key in keys) {
-			if (key >= minVal && key < maxVal) {
-				var drawLayer = walDrawObjects[key];
-				if (srt != null) {
-					srt.Draw(drawLayer);
-				} else {
-					Global.window.Draw(drawLayer);
-				}
-			}
-		}
-
-	}
-
-	int virusColorState = 0;
-	float virusColorTime;
-	Color virusColor1 = new Color(99, 20, 99, 128);
-	Color virusColor2 = new Color(66, 20, 99, 128);
-	private void drawSigmaVirus() {
-		var rect = gameMode.safeZoneRect;
-
-		if (virusColorState == 0) {
-			virusColorTime += Global.spf;
-			if (virusColorTime >= 1) {
-				virusColorState = 1;
-			}
-		} else if (virusColorState == 1) {
-			virusColorTime -= Global.spf;
-			if (virusColorTime <= 0) {
-				virusColorState = 0;
-			}
-		}
-
-		//virusColorTime = (MathF.Sin(Global.time * 2) * 0.5f) + 0.5f;
-
-		Color color = new Color(
-			(byte)Helpers.lerp(virusColor1.R, virusColor2.R, virusColorTime),
-			(byte)Helpers.lerp(virusColor1.G, virusColor2.G, virusColorTime),
-			(byte)Helpers.lerp(virusColor1.B, virusColor2.B, virusColorTime),
-			128
-		);
-
-		DrawWrappers.DrawRect(0, 0, rect.x1, height, true, color, 1, ZIndex.HUD, isWorldPos: true);
-		DrawWrappers.DrawRect(rect.x2, 0, width, height, true, color, 1, ZIndex.HUD, isWorldPos: true);
-		DrawWrappers.DrawRect(rect.x1, 0, rect.x2, rect.y1, true, color, 1, ZIndex.HUD, isWorldPos: true);
-		DrawWrappers.DrawRect(rect.x1, rect.y2, rect.x2, height, true, color, 1, ZIndex.HUD, isWorldPos: true);
 	}
 
 	private void drawPowerplant2() {
@@ -2345,6 +2362,7 @@ public partial class Level {
 
 		Global.level.levelData.unloadLevelImages();
 		Global.level = null;
+		Global.renderAction = null;
 		Global.serverClient = null;
 
 		Global.viewSize = 1;

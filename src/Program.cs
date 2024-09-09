@@ -313,7 +313,7 @@ class Program {
 				Menu.change(new ErrorMenu(error, new MainMenu()));
 			}
 		}
-		Task mainLoopTask = new Task(() => {
+		Task? mainLoopTask = new Task(() => {
 			while (window.IsOpen) {
 				mainLoop(window);
 			}
@@ -326,6 +326,10 @@ class Program {
 				Global.window.DispatchEvents();
 				Global.window.Display();
 				Global.renderAction = null;
+			}
+			if (Global.loadAction != null) {
+				Global.loadAction();
+				Global.loadAction = null;
 			}
 		}
 	}
@@ -1268,7 +1272,7 @@ class Program {
 			deltaTime = deltaTimeSavings + ((timeNow - lastUpdateTime) / fpsLimit);
 			deltaTimeAlt = ((timeNow - lastAltUpdateTime) / fpsLimitAlt);
 			if (deltaTime >= 1 || deltaTimeAlt >= 1) {
-				window.DispatchEvents();
+				//window.DispatchEvents();
 				lastAltUpdateTime = timeNow;
 				// Framestep works always, but offline only.
 				if (frameStepEnabled && Global.serverClient == null) {
