@@ -21,7 +21,7 @@ public partial class Level {
 	public HashSet<int[]> populatedGrids = new();
 	public Dictionary<int, int[]> gridsPopulatedByGo = new();
 	public Dictionary<int, int[]> terrainGridsPopulatedByGo = new();
-	public HashSet<int> collidedGObjs;
+	public HashSet<int> collidedGObjs = new();
 
 	// List of terrain objects. Used for fast collision.
 
