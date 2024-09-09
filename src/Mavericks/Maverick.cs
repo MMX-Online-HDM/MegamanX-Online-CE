@@ -422,7 +422,7 @@ public class Maverick : Actor, IDamagable {
 				getCenterPos(), player.alliance, true, isRequesterAI: true,
 				aMaxDist: 300
 			);
-		} 
+		}
 
 		bool isAIState = (state is MIdle or MRun or MLand);
 		if (canFly) isAIState = isAIState || state is MFly;

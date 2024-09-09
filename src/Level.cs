@@ -1291,8 +1291,8 @@ public partial class Level {
 				Global.speedMul = 1;
 			}
 			// Collision shenanigans.
-			collidedGObjs = new(); 
-			foreach (var gridData in populatedGrids) {
+			collidedGObjs = new();
+			foreach (var gridData in populatedGrids.ToArray()) {
 				// Initalize data.
 				HashSet<GameObject> currentGrid = grid[gridData[0], gridData[1]];
 				// Awfull GM19 order code.
@@ -1308,6 +1308,10 @@ public partial class Level {
 						int hash = gameObjects[i].GetHashCode() ^ gameObjects[j].GetHashCode();
 						// Skip checked objexts.
 						if (collidedGObjs.Contains(hash)) {
+							continue;
+						}
+						// Skip destroyed stuff.
+						if (gameObjects[i] is Actor { destroyed: true } || gameObjects[j] is Actor { destroyed: true }) {
 							continue;
 						}
 						// Add to hash as we check.
