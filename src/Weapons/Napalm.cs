@@ -119,8 +119,7 @@ public class NapalmGrenadeProj : Projectile {
 		exploded = true;
 		if (ownedByLocalPlayer) {
 			for (int i = -3; i <= 3; i++) {
-				new NapalmPartProj(weapon, pos.addxy(0, 0), 1, owner, owner.getNextActorNetId(), false, i * 10, rpc: true);
-				new NapalmPartProj(weapon, pos.addxy(0, 0), 1, owner, owner.getNextActorNetId(), true, i * 10, rpc: true);
+				new NapalmPartProj(weapon, pos, 1, owner, owner.getNextActorNetId(), i * 10, rpc: true);
 			}
 		}
 		destroySelf();
@@ -131,14 +130,19 @@ public class NapalmPartProj : Projectile {
 	int times;
 	float xDist;
 	float maxXDist;
-	float napalmTime;
 	float timeOffset;
 	float napalmPeriod = 0.5f;
-	public NapalmPartProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool isTimeOffset, float xDist, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 1, player, "napalm_part", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	float napalmPeriod2 = 0.25f;
+
+	public NapalmPartProj(
+		Weapon weapon, Point pos, int xDir,
+		Player player, ushort netProjId, int xDist, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 1, player, "napalm_part", 0, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.Napalm;
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir, isTimeOffset ? (byte)1 : (byte)0);
+			rpcCreate(pos, player, netProjId, xDir, (byte)xDist);
 		}
 		useGravity = true;
 		collider.wallOnly = true;
@@ -146,11 +150,9 @@ public class NapalmPartProj : Projectile {
 		shouldShieldBlock = false;
 		gravityModifier = 0.25f;
 		frameIndex = Helpers.randomRange(0, sprite.totalFrameNum - 1);
-		if (isTimeOffset) {
-			timeOffset = napalmPeriod * 0.5f;
-		}
 		maxXDist = xDist;
 		visible = false;
+		maxTime = 4;
 	}
 
 	public override void update() {
@@ -160,30 +162,41 @@ public class NapalmPartProj : Projectile {
 			destroySelf(disableRpc: true);
 			return;
 		}
-
-		if (time < timeOffset) return;
-		else visible = true;
-
-		napalmTime += Global.spf;
-
-		if (!Options.main.lowQualityParticles()) {
-			alpha = 2 * (napalmPeriod - napalmTime);
-			xScale = 1 + (napalmTime * 2);
-			yScale = 1 + (napalmTime * 2);
-		}
-
 		if (xDist < MathF.Abs(maxXDist)) {
 			xDist += MathF.Abs(maxXDist * 0.25f);
 			move(new Point(maxXDist * 0.25f, 0), useDeltaTime: false);
 		}
+	}
 
-		if (napalmTime > napalmPeriod) {
-			napalmTime = 0;
-			times++;
-			if (times >= 8) {
-				destroySelf(disableRpc: false);
-			}
+	public override void render(float x, float y) {
+		if (!shouldRender(x, y)) {
+			return;
 		}
+		float drawX = MathF.Round(pos.x);
+		float drawY = MathF.Round(pos.y);
+		float napalmTime = time % napalmPeriod;
+		float napalmTime2 = time % napalmPeriod2;
+
+		sprite.draw(
+			frameIndex, drawX, drawY, xDir, yDir,
+			getRenderEffectSet(),
+			2 * (napalmPeriod - napalmTime),
+			1 + (napalmTime * 2),
+			1 + (napalmTime * 2),
+			zIndex,
+			getShaders(), 0,
+			actor: this, useFrameOffsets: true
+		);
+		sprite.draw(
+			frameIndex, drawX, drawY, xDir, yDir,
+			getRenderEffectSet(),
+			2 * (napalmPeriod2 - napalmTime2),
+			1 + (napalmTime2 * 2),
+			1 + (napalmTime2 * 2),
+			zIndex,
+			getShaders(), 0,
+			actor: this, useFrameOffsets: true
+		);
 	}
 }
 
