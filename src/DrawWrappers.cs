@@ -63,6 +63,13 @@ public class DrawLayer : Transformable, Drawable {
 				sprite.Color = Color.White;
 				// Get textures.
 				int encodeKey = (oneOff.size[0] * 397) ^ oneOff.size[1];
+				// If something goes off.
+				if (!Global.renderTextures.ContainsKey(encodeKey)) {
+					Global.renderTextures[encodeKey] = (
+						new RenderTexture((uint)oneOff.size[0], (uint)oneOff.size[1]),
+						new RenderTexture((uint)oneOff.size[0], (uint)oneOff.size[1])
+					);
+				}
 				RenderTexture front;
 				RenderTexture back;
 				(front, back) = Global.renderTextures[encodeKey];

@@ -731,13 +731,13 @@ public partial class Player {
 	}
 
 	public ushort getNextATransNetId() {
-		if (curATransNetId < getStartNetId() + 1) {
-			curATransNetId = (ushort)(getStartNetId() + 1);
+		if (curATransNetId < getStartNetId()) {
+			curATransNetId = (ushort)(getStartNetId());
 		}
 		ushort retId = curATransNetId;
 		curATransNetId++;
 		if (curATransNetId >= getStartNetId() + 10) {
-			curATransNetId = (ushort)(getStartNetId() + 1);
+			curATransNetId = (ushort)(getStartNetId());
 		}
 		return retId;
 	}
@@ -909,10 +909,11 @@ public partial class Player {
 		}
 
 		// Never spawn a character if it already exists
-		if (character == null) {
+		if (character == null && ownedByLocalPlayer) {
 			bool sendRpc = ownedByLocalPlayer;
-			var charNetId = getCharActorNetId();
 			if (shouldRespawn()) {
+				ushort charNetId = getNextATransNetId();
+
 				if (Global.level.gameMode is TeamDeathMatch && Global.level.teamNum > 2) {
 					List<Player> spawnPoints = Global.level.players.FindAll(
 						p => p.teamAlliance == teamAlliance && p.health > 0 && p.character != null
@@ -990,6 +991,10 @@ public partial class Player {
 
 	
 	public byte[] getCharSpawnData(int charNum) {
+		if (ownedByLocalPlayer) {
+			applyLoadoutChange();
+			syncLoadout();
+		}
 		if (charNum == (int)CharIds.X) {
 			return [
 				(byte)loadout.xLoadout.weapon1,
@@ -1017,11 +1022,15 @@ public partial class Player {
 		Point pos, int xDir, ushort charNetId, bool sendRpc
 	) {
 		if (sendRpc) {
-			RPC.spawnCharacter.sendRpc(charNum, extraData, pos, xDir, id, charNetId);
+			RPC.spawnCharacter.sendRpc(spawnCharNum, extraData, pos, xDir, id, charNetId);
 		}
 
 		if (Global.level.gameMode.isTeamMode) {
 			alliance = newAlliance;
+		}
+
+		if (character != null) {
+			return;
 		}
 
 		// ONRESPAWN, SPAWN, RESPAWN, ON RESPAWN, ON SPAWN LOGIC, SPAWNLOGIC
@@ -1041,7 +1050,7 @@ public partial class Player {
 				Options.main.maverickStartFollow ? MaverickAIBehavior.Follow : MaverickAIBehavior.Defend
 			);
 		}
-		if (isSigma) {
+		if (charNum == (int)CharIds.Sigma) {
 			loadout.sigmaLoadout.sigmaForm = extraData[0];
 			if (isSigma1()) {
 				sigmaMaxAmmo = 20;
@@ -1051,13 +1060,13 @@ public partial class Player {
 				sigmaAmmo = 0;
 			}
 		}
-		if (isX) {
+		if (charNum == (int)CharIds.X) {
 			loadout.xLoadout.weapon1 = extraData[0];
-			loadout.xLoadout.weapon1 = extraData[1];
-			loadout.xLoadout.weapon1 = extraData[2];
+			loadout.xLoadout.weapon2 = extraData[1];
+			loadout.xLoadout.weapon3 = extraData[2];
 			loadout.xLoadout.melee = extraData[3];
 		}
-		if (isAxl) {
+		if (charNum == (int)CharIds.Axl) {
 			loadout.axlLoadout.weapon2 = extraData[0];
 			loadout.xLoadout.weapon3 = extraData[1];
 		}
@@ -1066,9 +1075,6 @@ public partial class Player {
 		health = maxHealth;
 		assassinHitPos = null;
 
-		if (character != null) {
-			return;
-		}
 		bool mk2VileOverride = false;
 		// Hyper mode overrides (PRE)
 		if (Global.level.isHyper1v1() && ownedByLocalPlayer) {

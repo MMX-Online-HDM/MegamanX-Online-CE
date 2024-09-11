@@ -398,6 +398,7 @@ public class WarpIn : CharState {
 			}
 
 			if (character.isAnimOver()) {
+				character.grounded = true;
 				character.changeToIdleOrFall();
 			}
 			return;

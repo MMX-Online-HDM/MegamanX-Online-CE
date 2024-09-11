@@ -119,7 +119,6 @@ public class ShinMessenkou : Weapon {
 
 public class Rakuhouha : CharState {
 	public Weapon weapon;
-	Anim? rakuanim;
 	ZeroGigaType type { get { return (ZeroGigaType)weapon.type; } }
 	bool fired = false;
 	bool fired2 = false;
