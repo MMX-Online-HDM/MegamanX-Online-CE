@@ -244,14 +244,7 @@ public partial class Level {
 	public int equalCharDistributerBlue;
 
 	public void startLevel(Server server, bool joinedLate) {
-		// Load stuff on the main thread to prevent RenderTexture errors.
-		Global.loadAction = () => {
-			startLevelAction(server, joinedLate);
-		};
-		// Wait for load to end.
-		while (Global.loadAction != null) {
-			Thread.Sleep(10);
-		}
+		startLevelAction(server, joinedLate);
 	}
 
 	public void startLevelAction(Server server, bool joinedLate) {
@@ -928,8 +921,9 @@ public partial class Level {
 	}
 
 	public void joinedLateSyncPlayers(List<PlayerPB> hostPlayers) {
-		if (hostPlayers == null) return;
-
+		if (hostPlayers == null) {
+			return;
+		}
 		foreach (var hostPlayer in hostPlayers) {
 			if (hostPlayer.serverPlayer.id == mainPlayer.id) continue;
 			var player = players.Find(p => p.id == hostPlayer.serverPlayer.id);
@@ -949,7 +943,7 @@ public partial class Level {
 			player.loadout = hostPlayer.loadoutData;
 			player.disguise = hostPlayer.disguise;
 
-			if (hostPlayer.charNetId != null && player.character == null && player.loadoutSet) {
+			if (hostPlayer.charNetId != null && hostPlayer.charNetId != 0 && player.character == null) {
 				player.spawnCharAtPoint(
 					player.newCharNum, player.getCharSpawnData(player.newCharNum),
 					new Point(hostPlayer.charXPos, hostPlayer.charYPos),
@@ -1676,12 +1670,11 @@ public partial class Level {
 		}
 		Dictionary<long, DrawLayer> drawObjCopy = DrawWrappers.walDrawObjects;
 		DrawWrappers.walDrawObjects = new();
-		Global.renderAction = (() => {
-			renderResultAsync(this, srt, drawObjCopy);
-		});
+
+		renderResult(this, srt, drawObjCopy);
 	}
 
-	public static void renderResultAsync(
+	public static void renderResult(
 		Level level, RenderTexture srt,
 		Dictionary<long, DrawLayer> walDrawObjects
 	) {
@@ -2362,7 +2355,6 @@ public partial class Level {
 
 		Global.level.levelData.unloadLevelImages();
 		Global.level = null;
-		Global.renderAction = null;
 		Global.serverClient = null;
 
 		Global.viewSize = 1;

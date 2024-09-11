@@ -20,9 +20,9 @@ using static SFML.Window.Keyboard;
 namespace MMXOnline;
 
 class Program {
-	//#if WINDOWS
-	//[STAThread]
-	//#endif
+	#if WINDOWS
+	[STAThread]
+	#endif
 	static void Main(string[] args) {
 		if (args.Length > 0 && args[0] == "-relay") {
 		#if WINDOWS
@@ -313,24 +313,8 @@ class Program {
 				Menu.change(new ErrorMenu(error, new MainMenu()));
 			}
 		}
-		Task? mainLoopTask = new Task(() => {
-			while (window.IsOpen) {
-				mainLoop(window);
-			}
-		});
-		mainLoopTask.ContinueWith(Program.loadExceptionHandler, TaskContinuationOptions.OnlyOnFaulted);
-		mainLoopTask.Start();
 		while (window.IsOpen) {
-			if (Global.renderAction != null) {
-				Global.renderAction();
-				Global.window.DispatchEvents();
-				Global.window.Display();
-				Global.renderAction = null;
-			}
-			if (Global.loadAction != null) {
-				Global.loadAction();
-				Global.loadAction = null;
-			}
+			mainLoop(window);
 		}
 	}
 
@@ -464,9 +448,7 @@ class Program {
 		if (Global.levelStarted()) {
 			Global.level.render();
 		} else {
-			Global.renderAction = (() => {
-				Menu.render();
-			});
+			Menu.render();
 		}
 		// TODO: Make this work for errors.
 		//if (Global.debug) {
@@ -1272,7 +1254,7 @@ class Program {
 			deltaTime = deltaTimeSavings + ((timeNow - lastUpdateTime) / fpsLimit);
 			deltaTimeAlt = ((timeNow - lastAltUpdateTime) / fpsLimitAlt);
 			if (deltaTime >= 1 || deltaTimeAlt >= 1) {
-				//window.DispatchEvents();
+				window.DispatchEvents();
 				lastAltUpdateTime = timeNow;
 				// Framestep works always, but offline only.
 				if (frameStepEnabled && Global.serverClient == null) {
@@ -1351,11 +1333,10 @@ class Program {
 			Global.isSkippingFrames = false;
 			Global.input.clearInput();
 			lastUpdateTime = timeNow;
-			if (Global.renderAction == null) {
 			videoUpdatesThisSecond++;
-				window.Clear(clearColor);
-				render();
-			}
+			window.Clear(clearColor);
+			render();
+			window.Display();
 			/*
 			long prevPackets = 0;
 			if (Global.showDiagnostics) {
@@ -1447,6 +1428,7 @@ class Program {
 				continue;
 			}
 			window.Clear(clearColor);
+
 			for (int i = 0; i < loadText.Count; i++) {
 				Fonts.drawText(FontType.Grey, loadText[i], 8, 8 + (10 * i), isLoading: true);
 			}

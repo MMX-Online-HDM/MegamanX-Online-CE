@@ -256,9 +256,6 @@ public partial class Level {
 			//if (actorChar.sprite.name.Contains("frozen") || goChar.sprite.name.Contains("frozen")) return false;
 			return true;
 		}
-		if (actor is Maverick && gameObject is Maverick) {
-			return false;
-		}
 
 		/*if (actor is Character chr3 && (chr3.player.isViralSigma() || chr3.player.isKaiserViralSigma()) && gameObject is Ladder) {
 			return true;
