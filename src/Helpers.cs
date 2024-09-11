@@ -130,21 +130,6 @@ public class Helpers {
 		return (float)rndNum;
 	}
 
-	public static void tryWrap(Action action, bool isServer) {
-		/*
-		try {
-			action.Invoke();
-		}
-		catch (AccessViolationException) { throw; }
-		catch (StackOverflowException) { throw; }
-		catch (OutOfMemoryException) { throw; }
-		catch (Exception e) {
-			Logger.logException(e, isServer);
-		}
-		*/
-		action.Invoke();
-	}
-
 	public static List<T> getRandomSubarray<T>(List<T> list, int count) {
 		if (count >= list.Count)
 			count = list.Count - 1;

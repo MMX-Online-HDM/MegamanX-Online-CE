@@ -17,8 +17,8 @@ namespace MMXOnline;
 public partial class Global {
 	public static decimal version = 20m;
 	public static string versionName = "Revision 20";
-	public static string subVersionName = "Alpha 12 RC 7";
-	public static string subVersionShortName = "A12 RC7";
+	public static string subVersionName = "Alpha 13 [RELEASE CANDIDATE 1]";
+	public static string subVersionShortName = "A13 RC1";
 
 	// THIS VALUE MUST ALWAYS MANUALLY BE SET AFTER UPDATING ASSETS BEFORE BUILDING A RELEASE BUILD.
 	// Obtain it by pressing F1 in main menu.
@@ -30,7 +30,7 @@ public partial class Global {
 	public const string checksumPrefix = "[Community Edition]";
 	// Use this to make sure the checksum varies.
 	// Better to use together with "checksumPrefix" and be diferent from it.
-	public const string checksumPrefix2 = "CE-A12-RC7-03-08-2024";
+	public const string checksumPrefix2 = "CE-A12-RC1";
 	// Final checksum key.
 	public const string checksumKey = checksumPrefix + " " + checksumPrefix2;
 	// For displaying the name of the mod in the version string.
@@ -482,6 +482,8 @@ public partial class Global {
 	// [5 packets received (second 1), 3 packets received (second 2), 2 packets received (second 3), ...]
 	public static List<long> last10SecondsPacketsReceived = new List<long>();
 	public static long packetTotal1SecondAgo;
+	public static Action? renderAction;
+	public static Action? loadAction;
 
 	public const int fpsCap = 60;
 	public static float currentFPS = 60;

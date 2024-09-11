@@ -113,15 +113,6 @@ public class CollideData {
 	public bool isMovingPlatformHit() {
 		return gameObject is Wall wall && wall.isMoving;
 	}
-
-	public void drawNormal() {
-		var origin = getHitPointSafe();
-		var normal = getNormalSafe();
-		Global.level.debugDrawCalls.Add(() => {
-			DrawWrappers.DrawDebugDot(origin.x, origin.y, Color.Red);
-			DrawWrappers.DrawLine(origin.x, origin.y, origin.x + normal.x * 10, origin.y + normal.y * 10, Color.Red, 1, ZIndex.HUD);
-		});
-	}
 }
 
 public class HitData {

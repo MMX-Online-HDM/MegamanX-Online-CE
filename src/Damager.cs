@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace MMXOnline;
@@ -1008,9 +1008,6 @@ public class Damager {
 				} else if (projOwner?.character != null) {
 					damagePos = projOwner.character.pos;
 				}
-			}
-			if (damagePos == null && proj.hitboxActor?.destroyed == false) {
-				damagePos = proj.hitboxActor.pos;
 			}
 		}
 

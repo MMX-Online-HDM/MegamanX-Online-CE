@@ -415,10 +415,13 @@ public class Maverick : Actor, IDamagable {
 				target = Global.level.getClosestTarget(getCenterPos(), player.alliance, true, isRequesterAI: true);
 				doppler.ballType = 0;
 			}
-		} else if (!isSummonerCocoon && !isStrikerCocoon) {
-			target = Global.level.getClosestTarget(getCenterPos(), player.alliance, true, isRequesterAI: true);
-		} else {
+		} else if (isSummonerCocoon || isStrikerCocoon) {
 			target = mmc.getHealTarget();
+		} else if (!player.isPuppeteer() && !player.isTagTeam()) {
+			target = Global.level.getClosestTarget(
+				getCenterPos(), player.alliance, true, isRequesterAI: true,
+				aMaxDist: 300
+			);
 		}
 
 		bool isAIState = (state is MIdle or MRun or MLand);
