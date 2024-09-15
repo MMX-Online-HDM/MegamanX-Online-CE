@@ -161,8 +161,8 @@ public partial class Actor {
 	public HashSet<Tuple<Collider, Collider>> collidedInFrame = new HashSet<Tuple<Collider, Collider>>();
 	public void registerCollision(CollideData collideData) {
 		var tuple = new Tuple<Collider, Collider>(collideData.myCollider, collideData.otherCollider);
+		
 		if (!collidedInFrame.Contains(tuple)) {
-			Global.level.collidedGObjs.Contains(GetHashCode() ^ collideData.gameObject.GetHashCode());
 			collidedInFrame.Add(tuple);
 			onCollision(collideData);
 		}

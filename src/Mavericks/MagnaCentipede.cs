@@ -565,7 +565,7 @@ public class MagnaCTeleportState : MaverickState {
 	public bool canChangePos() {
 		float yDir = inverted ? -5 : 5;
 		if (Global.level.checkCollisionActor(clone, 0, yDir) == null) return false;
-		var hits = Global.level.getTriggerList(clone, 0, yDir, null, new Type[] { typeof(KillZone) });
+		var hits = Global.level.getTerrainTriggerList(clone, new Point(0, yDir), typeof(KillZone));
 		if (hits.Count > 0) return false;
 		return true;
 	}

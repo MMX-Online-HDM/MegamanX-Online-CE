@@ -21,8 +21,9 @@ public partial class Level {
 	public HashSet<GameObject>[,] grid;
 	public HashSet<GameObject>[,] terrainGrid;
 	public HashSet<int[]> populatedGrids = new();
-	public Dictionary<int, int[]> gridsPopulatedByGo = new();
-	public Dictionary<int, int[]> terrainGridsPopulatedByGo = new();
+	public HashSet<int[]> populatedTerrainGrids = new();
+	public Dictionary<int, Rect> gridsPopulatedByGo = new();
+	public Dictionary<int, Rect> terrainGridsPopulatedByGo = new();
 	public HashSet<int> collidedGObjs = new();
 
 	// List of terrain objects. Used for fast collision.
@@ -1313,7 +1314,7 @@ public partial class Level {
 						}
 						// Get order independent hash.
 						int hash = gameObjects[i].GetHashCode() ^ gameObjects[j].GetHashCode();
-						// Skip checked objexts.
+						// Skip checked objects.
 						if (collidedGObjs.Contains(hash)) {
 							continue;
 						}

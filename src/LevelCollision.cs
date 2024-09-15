@@ -87,7 +87,7 @@ public partial class Level {
 		return cells;
 	}
 
-	public int[] getGridCellsPos(Shape shape) {
+	public Rect getGridCellsPos(Shape shape) {
 		int minX = MathInt.Floor(shape.minX / cellWidth);
 		int maxX = MathInt.Floor(shape.maxX / cellWidth);
 		int minY = MathInt.Floor(shape.minY / cellWidth);
@@ -98,7 +98,7 @@ public partial class Level {
 		minY = Math.Clamp(minY, 0, grid.GetLength(1) - 1);
 		maxY = Math.Clamp(maxY, 0, grid.GetLength(1) - 1);
 
-		return [minX, minY, maxX, maxY];
+		return new Rect(minX, minY, maxX, maxY);
 	}
 
 	// Called a lot
@@ -126,9 +126,9 @@ public partial class Level {
 		if (!gridsPopulatedByGo.ContainsKey(hash)) {
 			return;
 		}
-		int[] dataPos = gridsPopulatedByGo[hash];
-		for (int x = dataPos[0]; x <= dataPos[2]; x++) {
-			for (int y = dataPos[1]; y <= dataPos[3]; y++) {
+		Rect dataPos = gridsPopulatedByGo[hash];
+		for (int x = (int)dataPos.x1; x <= dataPos.x2; x++) {
+			for (int y = (int)dataPos.y1; y <= dataPos.y2; y++) {
 				grid[x, y].Remove(go);
 				if (grid[x, y].Count == 0) {
 					populatedGrids.Remove([x, y]);
@@ -353,7 +353,9 @@ public partial class Level {
 			foreach (var collideData in collideDatas) {
 				actor.registerCollision(collideData);
 				int hash = GetHashCode() ^ collideData.gameObject.GetHashCode();
-
+				if (!Global.level.collidedGObjs.Contains(hash)) {
+					Global.level.collidedGObjs.Add(hash);
+				};
 				Point? mtv = pushDir == null ?
 					actorShape.getMinTransVector(collideData.otherCollider.shape) :
 					actorShape.getMinTransVectorDir(collideData.otherCollider.shape, (Point)pushDir);
@@ -512,6 +514,42 @@ public partial class Level {
 				}
 			}
 		}
+		return triggers;
+	}
+
+
+	public List<CollideData> getTerrainTriggerList(
+		Actor actor, Point posIncrease, params Type[] classTypes
+	) {
+		List<CollideData> triggers = new();
+		Collider? collider = actor.getTerrainCollider();
+		if (collider == null) {
+			return triggers;
+		}
+		Shape shape =  collider.shape.clone(posIncrease.x, posIncrease.y);
+		var gameObjects = getTerrainInSameCell(shape);
+
+		foreach (GameObject go in gameObjects) {
+			if (go == actor) {
+				continue;
+			}
+			if (classTypes.Length > 0 && !classTypes.Contains(go.GetType())) {
+				continue;
+			}
+			var otherColliders = go.getAllColliders();
+			if (otherColliders.Count == 0) {
+				continue;
+			}
+			foreach (Collider otherCollider in otherColliders) {
+				var isTrigger = shouldTrigger(actor, go, collider, otherCollider, posIncrease);
+				if (!isTrigger) { continue; }
+				var hitData = shape.intersectsShape(otherCollider.shape, posIncrease);
+				if (hitData != null) {
+					triggers.Add(new CollideData(collider, otherCollider, posIncrease, isTrigger, go, hitData));
+				}
+			}
+		}
+
 		return triggers;
 	}
 
@@ -695,10 +733,13 @@ public partial class Level {
 		if (!terrainGridsPopulatedByGo.ContainsKey(hash)) {
 			return;
 		}
-		int[] dataPos = terrainGridsPopulatedByGo[hash];
-		for (int x = dataPos[0]; x <= dataPos[2]; x++) {
-			for (int y = dataPos[1]; y <= dataPos[3]; y++) {
+		Rect dataPos = terrainGridsPopulatedByGo[hash];
+		for (int x = (int)dataPos.x1; x <= dataPos.x2; x++) {
+			for (int y = (int)dataPos.y1; y <= (int)dataPos.y2; y++) {
 				terrainGrid[x, y].Remove(go);
+				if (terrainGrid[x, y].Count == 0) {
+					populatedTerrainGrids.Remove([x, y]);
+				}
 			}
 		}
 		terrainGridsPopulatedByGo.Remove(hash);

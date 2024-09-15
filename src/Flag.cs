@@ -92,7 +92,7 @@ public class Flag : Actor {
 		if (pos.y > Math.Min(Global.level.killY, Global.level.height)) {
 			return Global.level.killY - 175;
 		}
-		var hitKillZones = Global.level.getTriggerList(this, 0, 0, null, new Type[] { typeof(KillZone) });
+		var hitKillZones = Global.level.getTerrainTriggerList(this, new Point(0, 0), typeof(KillZone));
 		if (hitKillZones.Count > 0 && hitKillZones[0].otherCollider != null && hitKillZones[0].gameObject is KillZone kz && kz.killInvuln) {
 			return hitKillZones[0].otherCollider.shape.minY - 175;
 		}

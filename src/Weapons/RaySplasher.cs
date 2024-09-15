@@ -161,7 +161,7 @@ public class RaySplasherTurret : Actor, IDamagable {
 		}
 
 		if (state == 0) {
-			var hits = Global.level.getTriggerList(this, 0, velY * Global.spf, null, typeof(Wall));
+			var hits = Global.level.getTerrainTriggerList(this, new Point(0, velY * Global.spf), typeof(Wall));
 			if (hits.Count == 0) {
 				move(new Point(0, velY));
 			}

@@ -281,7 +281,7 @@ public class MaverickState {
 		rect.y1 += 15;
 		rect.y2 -= 15;
 		var shape = rect.getShape();
-		var ladders = Global.level.getTriggerList(maverick, 0, 0, null, typeof(Ladder));
+		var ladders = Global.level.getTerrainTriggerList(maverick, new Point(0, 0), typeof(Ladder));
 		var backwallZones = maverick is StingChameleon ? Global.level.getTriggerList(shape, typeof(BackwallZone)) : new List<CollideData>();
 		if (ladders.Count > 0 || (backwallZones.Count > 0 && !backwallZones.Any(bw => (bw.gameObject as BackwallZone).isExclusion))) {
 			if (ladders.Count > 0) hitLadder = true;

@@ -366,7 +366,7 @@ public class BoomerKTeleportState : MaverickState {
 
 	public bool canChangePos() {
 		if (Global.level.checkCollisionActor(clone, 0, 5) == null) return false;
-		var hits = Global.level.getTriggerList(clone, 0, 5, null, new Type[] { typeof(KillZone) });
+		var hits = Global.level.getTerrainTriggerList(clone, new Point(0, 5), typeof(KillZone));
 		if (hits.Count > 0) return false;
 		return true;
 	}
