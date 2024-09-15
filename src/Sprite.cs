@@ -101,6 +101,7 @@ public class Sprite {
 		frameIndex = 0;
 		frameTime = 0;
 		animTime = 0;
+		loopCount = 0;
 	}
 
 	public Point getAlignOffset(int frameIndex, int flipX, int flipY) {
