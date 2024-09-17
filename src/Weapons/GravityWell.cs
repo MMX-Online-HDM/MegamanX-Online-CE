@@ -109,7 +109,7 @@ public class GravityWellProj : Projectile, IDamagable {
 		if (destroyed) return;
 
 		if (state == 0) {
-			var hits = Global.level.getTriggerList(this, velX * Global.spf, 0, null, typeof(Wall));
+			var hits = Global.level.getTerrainTriggerList(this, new Point(velX * Global.spf, 0), typeof(Wall));
 			if (hits.Count == 0) {
 				move(new Point(velX, 0));
 			}

@@ -154,7 +154,7 @@ public class XTeleportState : CharState {
 		if (Global.level.checkCollisionActor(actor, 0, 2) == null) {
 			return false;
 		}
-		List<CollideData> hits = Global.level.getTriggerList(actor, 0, 2, null, new Type[] { typeof(KillZone) });
+		List<CollideData> hits = Global.level.getTerrainTriggerList(actor, new Point(0, 2), typeof(KillZone));
 		if (hits.Count > 0) {
 			return false;
 		}

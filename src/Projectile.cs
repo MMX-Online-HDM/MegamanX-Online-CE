@@ -895,7 +895,7 @@ public class Projectile : Actor {
 	#region legacy wall crawl code, still needed for maps without wall paths
 
 	public void setupLegacyWallCrawl() {
-		var wallCollideDatas = Global.level.getTriggerList(this, 0, 0, null, typeof(Wall));
+		var wallCollideDatas = Global.level.getTerrainTriggerList(this, new Point(0, 0), typeof(Wall));
 		if (wallCollideDatas.Count == 0) {
 			initWall(null, null, false);
 		} else {

@@ -278,7 +278,7 @@ public class CharState {
 
 	public void checkLadder(bool isGround) {
 		if (player.input.isHeld(Control.Up, player)) {
-			List<CollideData> ladders = Global.level.getTriggerList(character, 0, 0, null, typeof(Ladder));
+			List<CollideData> ladders = Global.level.getTerrainTriggerList(character, new Point(0, 0), typeof(Ladder));
 			if (ladders != null && ladders.Count > 0 && ladders[0].gameObject is Ladder ladder) {
 				var midX = ladders[0].otherCollider.shape.getRect().center().x;
 				if (Math.Abs(character.pos.x - midX) < 12) {
@@ -294,7 +294,7 @@ public class CharState {
 		}
 		if (isGround && player.input.isPressed(Control.Down, player)) {
 			character.checkLadderDown = true;
-			var ladders = Global.level.getTriggerList(character, 0, 1, null, typeof(Ladder));
+			var ladders = Global.level.getTerrainTriggerList(character, new Point(0, 1), typeof(Ladder));
 			if (ladders.Count > 0 && ladders[0].gameObject is Ladder ladder) {
 				var rect = ladders[0].otherCollider.shape.getRect();
 				var snapX = (rect.x1 + rect.x2) / 2;
