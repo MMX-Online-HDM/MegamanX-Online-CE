@@ -442,7 +442,7 @@ public partial class Level {
 	// Checks for collisions and returns the first one collided.
 	// A collision requires at least one of the colliders not to be a trigger.
 	// The vel parameter ensures we return normals that make sense, that are against the direction of vel.
-	public CollideData? checkCollisionActor(
+	public CollideData? checkCollisionActorOnce(
 		Actor? actor, float incX, float incY, Point? vel = null, bool autoVel = false, bool checkPlatforms = false
 	) {
 		return checkCollisionsActor(
@@ -779,6 +779,13 @@ public partial class Level {
 			}
 		}
 		terrainGridsPopulatedByGo.Remove(hash);
+	}
+
+	public CollideData? checkTerrainCollisionOnce(
+		Actor actor, float incX, float incY, Point? vel = null, bool autoVel = false,
+		bool checkPlatforms = false
+	) {
+		return checkTerrainCollision(actor, incX, incY, vel, autoVel, checkPlatforms).FirstOrDefault();
 	}
 
 	public List<CollideData> checkTerrainCollision(

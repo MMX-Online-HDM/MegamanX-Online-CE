@@ -86,7 +86,7 @@ public class SonicSlicerProj : Projectile {
 		if (type == 0) vel.y -= Global.spf * 100;
 		else vel.y -= Global.spf * 50;
 
-		var collideData = Global.level.checkCollisionActor(this, xDir, 0, vel);
+		var collideData = Global.level.checkTerrainCollisionOnce(this, xDir, 0, vel);
 		if (collideData != null && collideData.hitData != null) {
 			playSound("dingX2");
 			xDir *= -1;
@@ -97,7 +97,7 @@ public class SonicSlicerProj : Projectile {
 
 		int velYSign = MathF.Sign(vel.y);
 		if (velYSign != 0) {
-			collideData = Global.level.checkCollisionActor(this, 0, velYSign, vel);
+			collideData = Global.level.checkTerrainCollisionOnce(this, 0, velYSign, vel);
 			if (collideData != null && collideData.hitData != null) {
 				playSound("dingX2");
 				vel.y *= -1;

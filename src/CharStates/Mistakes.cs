@@ -40,12 +40,12 @@ public class XTeleportState : CharState {
 			int xDir = player.input.getXDir(player);
 			float moveAmount = xDir * 6 * Global.speedMul;
 
-			CollideData hitWall = Global.level.checkCollisionActor(clone, moveAmount, -2);
+			CollideData hitWall = Global.level.checkTerrainCollisionOnce(clone, moveAmount, -2);
 			if (hitWall != null && hitWall.getNormalSafe().y == 0) {
 				float rectW = hitWall.otherCollider.shape.getRect().w();
 				if (rectW < 75) {
 					float wallClipAmount = moveAmount + xDir * (rectW + width);
-					CollideData hitWall2 = Global.level.checkCollisionActor(clone, wallClipAmount, -2);
+					CollideData hitWall2 = Global.level.checkTerrainCollisionOnce(clone, wallClipAmount, -2);
 					if (hitWall2 == null && clone.pos.x + wallClipAmount > 0 &&
 						clone.pos.x + wallClipAmount < Global.level.width
 					) {
@@ -53,7 +53,7 @@ public class XTeleportState : CharState {
 						clone.visible = true;
 					}
 				} else if (xDir != 0) {
-					CollideData hitWall2 = Global.level.checkCollisionActor(clone, moveAmount, -16);
+					CollideData hitWall2 = Global.level.checkTerrainCollisionOnce(clone, moveAmount, -16);
 					float wallY = MathInt.Floor(hitWall.otherCollider.shape.minY);
 					if (hitWall2 == null) {
 						clone.changePos(new Point(clone.pos.x + moveAmount, clone.pos.y - 64));
@@ -151,7 +151,7 @@ public class XTeleportState : CharState {
 		character.specialState = (int)SpecialStateIds.None;
 	}
 	public bool canChangePos(Actor actor) {
-		if (Global.level.checkCollisionActor(actor, 0, 2) == null) {
+		if (Global.level.checkTerrainCollisionOnce(actor, 0, 2) == null) {
 			return false;
 		}
 		List<CollideData> hits = Global.level.getTerrainTriggerList(actor, new Point(0, 2), typeof(KillZone));

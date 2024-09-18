@@ -89,7 +89,7 @@ public class MagnaCentipede : Maverick {
 					}
 
 					for (int i = 1; i <= 4; i++) {
-						CollideData collideData = Global.level.checkCollisionActor(this, 0, -10 * i * getYMod(), autoVel: true);
+						CollideData collideData = Global.level.checkTerrainCollisionOnce(this, 0, -10 * i * getYMod(), autoVel: true);
 						if (collideData != null && collideData.gameObject is Wall wall && !wall.isMoving && !wall.topWall && collideData.isCeilingHit()) {
 							changeState(new MagnaCCeilingStartState());
 							return;
@@ -564,7 +564,7 @@ public class MagnaCTeleportState : MaverickState {
 
 	public bool canChangePos() {
 		float yDir = inverted ? -5 : 5;
-		if (Global.level.checkCollisionActor(clone, 0, yDir) == null) return false;
+		if (Global.level.checkTerrainCollisionOnce(clone, 0, yDir) == null) return false;
 		var hits = Global.level.getTerrainTriggerList(clone, new Point(0, yDir), typeof(KillZone));
 		if (hits.Count > 0) return false;
 		return true;

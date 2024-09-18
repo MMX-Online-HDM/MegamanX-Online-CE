@@ -142,7 +142,7 @@ public class FireWaveProjCharged : Projectile {
 			}
 
 			if (ownedByLocalPlayer) {
-				var wall = Global.level.checkCollisionActor(this, 16 * xDir, -4);
+				var wall = Global.level.checkTerrainCollisionOnce(this, 16 * xDir, -4);
 				var sign = 1;
 				if (wall != null && wall.gameObject is Wall && wall.hitData.normal != null && !wall.hitData.normal.Value.isAngled()) {
 					sign = -1;

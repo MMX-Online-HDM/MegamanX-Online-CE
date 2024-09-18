@@ -699,7 +699,7 @@ public partial class Actor : GameObject {
 		if (Math.Abs(xPushVel) > 5) {
 			xPushVel = Helpers.lerp(xPushVel, 0, Global.spf * 5);
 
-			var wall = Global.level.checkCollisionActor(this, xPushVel * Global.spf, 0);
+			var wall = Global.level.checkTerrainCollisionOnce(this, xPushVel * Global.spf, 0);
 			if (wall != null && wall.gameObject is Wall) {
 				xPushVel = 0;
 			}
@@ -738,7 +738,7 @@ public partial class Actor : GameObject {
 				}
 			}
 
-			var wall = Global.level.checkCollisionActor(this, xSwingVel * Global.spf, 0);
+			var wall = Global.level.checkTerrainCollisionOnce(this, xSwingVel * Global.spf, 0);
 			if (wall != null && wall.gameObject is Wall) xSwingVel = 0;
 			if (grounded) xSwingVel = 0;
 			if (Math.Abs(xSwingVel) < 5) xSwingVel = 0;
@@ -801,7 +801,7 @@ public partial class Actor : GameObject {
 			}
 			yDist *= yMod;
 
-			CollideData? collideData = Global.level.checkTerrainCollision(this, 0, yDist, checkPlatforms: true).FirstOrDefault();
+			CollideData? collideData = Global.level.checkTerrainCollisionOnce(this, 0, yDist, checkPlatforms: true);
 
 			var hitActor = collideData?.gameObject as Actor;
 			bool isPlatform = false;
@@ -829,7 +829,7 @@ public partial class Actor : GameObject {
 
 			if (tooLowOnPlatform) {
 				tooLowOnPlatform = false;
-				collideData = Global.level.checkCollisionActor(this, 0, yDist);
+				collideData = Global.level.checkTerrainCollisionOnce(this, 0, yDist);
 			}
 
 			if (collideData != null && vel.y * yMod >= 0) {
@@ -857,7 +857,7 @@ public partial class Actor : GameObject {
 				}
 
 				//If already grounded, snap to ground further
-				CollideData collideDataCloseCheck = Global.level.checkCollisionActor(this, 0, 0.05f * yMod);
+				CollideData collideDataCloseCheck = Global.level.checkTerrainCollisionOnce(this, 0, 0.05f * yMod);
 				if (collideDataCloseCheck == null) {
 					var yVel = new Point(0, yDist);
 					var mtv = Global.level.getMtvDir(
@@ -1600,7 +1600,7 @@ public partial class Actor : GameObject {
 	}
 
 	public bool stopCeiling() {
-		if (vel.y < 0 && Global.level.checkCollisionActor(this, 0, -1) != null) {
+		if (vel.y < 0 && Global.level.checkTerrainCollisionOnce(this, 0, -1) != null) {
 			vel.y = 0;
 			return true;
 		}
@@ -1742,7 +1742,7 @@ public partial class Actor : GameObject {
 	}
 
 	public CollideData? getHitWall(float x, float y) {
-		var hits = Global.level.checkCollisionsActor(this, x, y, checkPlatforms: true);
+		var hits = Global.level.checkTerrainCollision(this, x, y, checkPlatforms: true);
 		var bestWall = hits.FirstOrDefault(h => h.gameObject is Wall wall && !wall.collider.isClimbable);
 		if (bestWall != null) return bestWall;
 		return hits.FirstOrDefault();

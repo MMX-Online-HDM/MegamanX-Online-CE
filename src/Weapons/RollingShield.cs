@@ -48,8 +48,8 @@ public class RollingShieldProj : Projectile {
 		}
 
 		move(new Point(xDir * 200, 0));
-		if (Global.level.checkCollisionActor(this, 0, -1) == null) {
-			var collideData = Global.level.checkCollisionActor(this, xDir, 0, vel);
+		if (Global.level.checkTerrainCollisionOnce(this, 0, -1) == null) {
+			var collideData = Global.level.checkTerrainCollisionOnce(this, xDir, 0, vel);
 			if (collideData?.hitData?.normal != null && !(collideData.hitData.normal.Value.isAngled())) {
 				xDir *= -1;
 			}

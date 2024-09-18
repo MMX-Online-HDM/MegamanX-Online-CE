@@ -291,7 +291,7 @@ public class TSeahorseTeleportState : MaverickState {
 			maverick.turnToInput(input, player);
 			if (dir.x != 0) {
 				var move = new Point(100 * dir.x, 0);
-				var hitGroundMove = Global.level.checkCollisionActor(maverick, dir.x * 20, 20);
+				var hitGroundMove = Global.level.checkTerrainCollisionOnce(maverick, dir.x * 20, 20);
 				if (hitGroundMove == null) {
 				} else {
 					maverick.move(move);

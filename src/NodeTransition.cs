@@ -146,14 +146,14 @@ public class JumpToPlatformNTP : NodeTransitionPhase {
 		if (state == 0) {
 			ai.doJump(1);
 			if (platformJumpDir >= 1) {
-				var rightWall = Global.level.checkCollisionActor(character, platformJumpDirDist, 0);
+				var rightWall = Global.level.checkTerrainCollisionOnce(character, platformJumpDirDist, 0);
 				if (rightWall != null && rightWall.gameObject is Wall) {
 					if (ai.jumpTime > 0.5f) {
 						state = 1;
 					}
 				}
 			} else if (platformJumpDir <= -1) {
-				var leftWall = Global.level.checkCollisionActor(character, -platformJumpDirDist, 0);
+				var leftWall = Global.level.checkTerrainCollisionOnce(character, -platformJumpDirDist, 0);
 				if (leftWall != null && leftWall.gameObject is Wall) {
 					if (ai.jumpTime > 0.5f) {
 						state = 1;

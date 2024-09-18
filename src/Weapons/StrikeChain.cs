@@ -191,7 +191,7 @@ public class StrikeChainProj : Projectile {
 		else if (state == 2) {
 			player.character.move(toWallVel);
 			distRetracted += MathF.Abs(toWallVel.magnitude * Global.spf);
-			var collision = Global.level.checkCollisionActor(player.character, toWallVel.x * Global.spf, toWallVel.y * Global.spf, toWallVel);
+			var collision = Global.level.checkTerrainCollisionOnce(player.character, toWallVel.x * Global.spf, toWallVel.y * Global.spf, toWallVel);
 			if (distRetracted >= distMoved || collision?.gameObject is Wall) {
 				destroySelf();
 				float momentum = 0.25f * (distRetracted / maxDist);
@@ -352,7 +352,6 @@ public class StrikeChainPullToWall : CharState {
 	public override void update() {
 		base.update();
 		if (scp == null || scp.destroyed) {
-			var collision = Global.level.checkCollisionActor(player.character, 0, 1);
 			character.changeToLandingOrFall();
 			return;
 		}

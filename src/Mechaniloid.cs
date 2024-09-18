@@ -278,8 +278,8 @@ public class Mechaniloid : Actor, IDamagable {
 	public float rightPatrolX;
 	public void patrol() {
 		var move = new Point(xDir * speed, 0);
-		var hitGround = Global.level.checkCollisionActor(this, xDir * 30, 20);
-		var hitWall = Global.level.checkCollisionActor(this, move.x * Global.spf * 2, -5);
+		var hitGround = Global.level.checkTerrainCollisionOnce(this, xDir * 30, 20);
+		var hitWall = Global.level.checkTerrainCollisionOnce(this, move.x * Global.spf * 2, -5);
 		bool blocked = ((grounded && hitGround == null) || hitWall?.isSideWallHit() == true);
 		this.move(move);
 

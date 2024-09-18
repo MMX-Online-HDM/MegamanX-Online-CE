@@ -1162,7 +1162,7 @@ public partial class Character : Actor, IDamagable {
 
 		// For G. Well damage.
 		// This is calculated after the base update to prevent acidental double damage.
-		if (vel.y < 0 && Global.level.checkCollisionActor(this, 0, -1) != null) {
+		if (vel.y < 0 && Global.level.checkTerrainCollisionOnce(this, 0, -1) != null) {
 			if (gravityWellModifier < 0 && vel.y < -300) {
 				Damager.applyDamage(
 					lastGravityWellDamager,

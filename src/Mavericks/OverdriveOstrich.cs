@@ -267,7 +267,7 @@ public class OverdriveOJumpKickState : MaverickState {
 			return;
 		}
 
-		if (Global.level.checkCollisionActor(maverick, 0, -1) != null && maverick.vel.y < 0) {
+		if (Global.level.checkTerrainCollisionOnce(maverick, 0, -1) != null && maverick.vel.y < 0) {
 			maverick.vel.y = 0;
 		}
 

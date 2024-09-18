@@ -281,7 +281,7 @@ public partial class Actor {
 
 	public CollideData? sweepTest(Point offset) {
 		Point inc = offset.clone();
-		var collideData = Global.level.checkCollisionActor(this, inc.x, inc.y);
+		var collideData = Global.level.checkTerrainCollisionOnce(this, inc.x, inc.y);
 		if (collideData != null) {
 			return collideData;
 		}
@@ -299,7 +299,7 @@ public partial class Actor {
 	}
 
 	public bool tryMoveExact(Point amount, out CollideData hit) {
-		hit = Global.level.checkCollisionActor(this, amount.x, amount.y);
+		hit = Global.level.checkTerrainCollisionOnce(this, amount.x, amount.y);
 		if (hit != null) {
 			return false;
 		}
@@ -308,7 +308,7 @@ public partial class Actor {
 	}
 
 	public bool tryMove(Point amount, out CollideData hit) {
-		hit = Global.level.checkCollisionActor(this, amount.x * Global.spf * 2, amount.y * Global.spf * 2);
+		hit = Global.level.checkTerrainCollisionOnce(this, amount.x * Global.spf * 2, amount.y * Global.spf * 2);
 		if (hit != null) {
 			return false;
 		}
@@ -428,12 +428,12 @@ public partial class Actor {
 	}
 
 	public void stopOnCeilingHit() {
-		if (vel.y < 0 && Global.level.checkCollisionActor(this, 0, -1) != null) {
+		if (vel.y < 0 && Global.level.checkTerrainCollisionOnce(this, 0, -1) != null) {
 			vel.y = 0;
 		}
 	}
 
 	public CollideData checkCollision(float incX, float incY) {
-		return Global.level.checkCollisionActor(this, incX, incY, autoVel: true);
+		return Global.level.checkTerrainCollisionOnce(this, incX, incY, autoVel: true);
 	}
 }

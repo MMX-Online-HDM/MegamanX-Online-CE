@@ -141,7 +141,7 @@ public class ZeroUppercut : CharState {
 			character.move(new Point(character.xDir * speed, 0));
 		}
 
-		var wallAbove = Global.level.checkCollisionActor(character, 0, -10);
+		var wallAbove = Global.level.checkTerrainCollisionOnce(character, 0, -10);
 		if (wallAbove != null && wallAbove.gameObject is Wall) {
 			timeInWall += Global.spf;
 			if (timeInWall > 0.1f) {

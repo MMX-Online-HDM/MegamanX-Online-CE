@@ -236,9 +236,9 @@ public class SigmaWallDashState : CharState {
 	public override void update() {
 		base.update();
 
-		var collideData = Global.level.checkCollisionActor(character, vel.x * Global.spf, vel.y * Global.spf);
+		var collideData = Global.level.checkTerrainCollisionOnce(character, vel.x * Global.spf, vel.y * Global.spf);
 		if (collideData?.gameObject is Wall wall) {
-			var collideData2 = Global.level.checkCollisionActor(character, vel.x * Global.spf, 0);
+			var collideData2 = Global.level.checkTerrainCollisionOnce(character, vel.x * Global.spf, 0);
 			if (collideData2?.gameObject is Wall wall2 && wall2.collider.isClimbable) {
 				character.changeState(new WallSlide(character.xDir, wall2.collider), true);
 			} else {

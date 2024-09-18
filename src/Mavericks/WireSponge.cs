@@ -270,7 +270,7 @@ public class WSpongeSideChainProj : Projectile {
 			wireSponge.stopMoving();
 			wireSponge.move(toWallVel);
 			distRetracted += MathF.Abs(toWallVel.magnitude * Global.spf);
-			var collision = Global.level.checkCollisionActor(wireSponge, toWallVel.x * Global.spf, toWallVel.y * Global.spf, toWallVel);
+			var collision = Global.level.checkTerrainCollisionOnce(wireSponge, toWallVel.x * Global.spf, toWallVel.y * Global.spf, toWallVel);
 			if (distRetracted >= distMoved + 20 || collision?.gameObject is Wall) {
 				destroySelf();
 			}
@@ -447,7 +447,7 @@ public class WSpongeSideChainState : MaverickState {
 				maverick.move(new Point(inputDir.x * 150, 0));
 			}
 
-			if (Global.level.checkCollisionActor(maverick, 0, -1) != null && maverick.vel.y < 0) {
+			if (Global.level.checkTerrainCollisionOnce(maverick, 0, -1) != null && maverick.vel.y < 0) {
 				maverick.vel.y = 0;
 			}
 		}
@@ -589,7 +589,7 @@ public class WSpongeUpChainProj : Projectile {
 		base.update();
 		if (!ownedByLocalPlayer) return;
 
-		var hit = Global.level.checkCollisionActor(this, 0, -1);
+		var hit = Global.level.checkTerrainCollisionOnce(this, 0, -1);
 		if (hit?.gameObject is Wall wall && !wall.topWall && !wall.isMoving && !reversed) {
 			latched = true;
 			vel.y = 0;
@@ -711,7 +711,7 @@ public class WSpongeUpChainLatchState : MaverickState {
 		if (dist < distToTravel) {
 			maverick.move(new Point(0, -200));
 			dist += 200 * Global.spf;
-			var hit = Global.level.checkCollisionActor(maverick, 0, -25);
+			var hit = Global.level.checkTerrainCollisionOnce(maverick, 0, -25);
 			if (hit != null) {
 				dist = distToTravel;
 			}

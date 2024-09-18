@@ -70,7 +70,7 @@ public class ChillPenguin : Maverick {
 				}
 			} else if (state is MJump || state is MFall) {
 				if (input.isHeld(Control.Special1, player)) {
-					var hit = Global.level.checkCollisionActor(this, 0, -ChillPBlizzardState.switchSpriteHeight - 5);
+					var hit = Global.level.checkTerrainCollisionOnce(this, 0, -ChillPBlizzardState.switchSpriteHeight - 5);
 					if (vel.y < 0 && hit?.gameObject is Wall wall && !wall.topWall) {
 						changeState(new ChillPBlizzardState(false));
 					}
@@ -574,7 +574,7 @@ public class ChillPSlideState : MaverickState {
 			maverick.vel.y = -maverick.getJumpPower() * 0.75f;
 		}
 		if (!maverick.grounded && maverick.vel.y < 0 &&
-			Global.level.checkCollisionActor(maverick, 0, maverick.vel.y * Global.spf * 2) != null
+			Global.level.checkTerrainCollisionOnce(maverick, 0, maverick.vel.y * Global.spf * 2) != null
 		) {
 			maverick.vel.y = 0;
 		}

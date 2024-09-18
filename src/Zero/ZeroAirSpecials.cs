@@ -104,7 +104,7 @@ public class FSplasherState : CharState {
 			fSplasherProj.incPos(character.deltaPos);
 		}
 
-		CollideData collideData = Global.level.checkCollisionActor(character, character.xDir, upSpeed);
+		CollideData collideData = Global.level.checkTerrainCollisionOnce(character, character.xDir, upSpeed);
 		if (collideData != null) {
 			character.changeState(new Fall(), true);
 			return;
@@ -162,7 +162,7 @@ public class HyorogaWeapon : Weapon {
 	public override void attack(Character character) {
 		//if (character.charState is Fall) return;
 		for (int i = 1; i <= 4; i++) {
-			CollideData collideData = Global.level.checkCollisionActor(character, 0, -10 * i, autoVel: true);
+			CollideData collideData = Global.level.checkTerrainCollisionOnce(character, 0, -10 * i, autoVel: true);
 			if (collideData != null && collideData.gameObject is Wall wall
 				&& !wall.isMoving && !wall.topWall && collideData.isCeilingHit()
 			) {
