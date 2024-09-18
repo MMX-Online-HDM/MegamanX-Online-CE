@@ -8,6 +8,8 @@ namespace MMXOnline;
 
 public partial class Actor : GameObject {
 	public Sprite sprite; //Current sprite
+	public bool useTerrainGrid { get; set; } = true;
+	public bool useActorGrid { get; set; } = true;
 
 	public int frameIndex {
 		get => sprite.frameIndex;
@@ -325,7 +327,7 @@ public partial class Actor : GameObject {
 			animTime = 0;
 		}
 
-		Global.level.addGameObjectToGrid(this);
+		Global.level.addToGrid(this);
 
 		if ((this is Character || this is Maverick) && spriteName != oldSpriteName) {
 			if (spriteName.EndsWith("_warp_in") && !Global.level.mainPlayer.readyTextOver) {

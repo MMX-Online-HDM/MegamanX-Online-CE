@@ -19,7 +19,7 @@ public partial class Actor {
 		set {
 			Global.level.removeFromGrid(this);
 			_globalCollider = value;
-			Global.level.addGameObjectToGrid(this);
+			Global.level.addToGrid(this);
 		}
 	}
 
@@ -30,7 +30,7 @@ public partial class Actor {
 	public void changeGlobalCollider(List<Point> newPoints) {
 		Global.level.removeFromGrid(this);
 		_globalCollider._shape.points = newPoints;
-		Global.level.addGameObjectToGrid(this);
+		Global.level.addToGrid(this);
 	}
 
 	// Gets the bounding box of all the hitboxes this actor has. Used for properly updating the grid.
@@ -270,13 +270,13 @@ public partial class Actor {
 	public void incPos(Point amount) {
 		Global.level.removeFromGrid(this);
 		pos.inc(amount);
-		Global.level.addGameObjectToGrid(this);
+		Global.level.addToGrid(this);
 	}
 
 	public void changePos(Point newPos) {
 		Global.level.removeFromGrid(this);
 		pos = newPos;
-		Global.level.addGameObjectToGrid(this);
+		Global.level.addToGrid(this);
 	}
 
 	public CollideData? sweepTest(Point offset) {

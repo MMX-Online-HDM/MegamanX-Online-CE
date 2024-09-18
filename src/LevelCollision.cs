@@ -121,7 +121,7 @@ public partial class Level {
 	}
 
 	// Should be called on hitbox changes.
-	public void removeFromGrid(GameObject go) {
+	private void removeFromActorGrid(GameObject go) {
 		int hash = go.GetHashCode();
 		if (!gridsPopulatedByGo.ContainsKey(hash)) {
 			return;
@@ -138,12 +138,12 @@ public partial class Level {
 		gridsPopulatedByGo.Remove(hash);
 	}
 
-	public void addGameObjectToGrid(GameObject go) {
+	private void addToActorGrid(GameObject go) {
 		if (!gameObjects.Contains(go)) {
 			return;
 		}
 		if (gridsPopulatedByGo.ContainsKey(go.GetHashCode())) {
-			removeFromGrid(go);
+			removeFromActorGrid(go);
 		}
 		Shape? allCollidersShape = go.getAllCollidersShape();
 		if (!allCollidersShape.HasValue) {
@@ -229,12 +229,40 @@ public partial class Level {
 
 	public void addGameObject(GameObject go) {
 		gameObjects.Add(go);
-		addGameObjectToGrid(go);
+		if (go.useActorGrid) {
+			addToGrid(go);
+		}
+		if (go.useTerrainGrid) {
+			addTerrainToGrid(go);
+		}
 	}
 
 	public void removeGameObject(GameObject go) {
-		removeFromGrid(go);
 		gameObjects.Remove(go);
+		if (go.useActorGrid) {
+			removeFromGrid(go);
+		}
+		if (go.useTerrainGrid) {
+			removeFromTerrainGrid(go);
+		}
+	}
+
+	public void modifyObjectGridGroups(GameObject obj, bool isActor, bool isTerrain) {
+		if (isActor) {
+			addToGrid(obj);
+			obj.useActorGrid = true;
+		} else {
+			removeFromGrid(obj);
+			obj.useActorGrid = false;
+		}
+		if (isTerrain) {
+			addTerrainToGrid(obj);
+			obj.useTerrainGrid = true;
+
+		} else {
+			removeFromTerrainGrid(obj);
+			obj.useTerrainGrid = false;
+		}
 	}
 
 
@@ -699,17 +727,25 @@ public partial class Level {
 		return false;
 	}
 
-	public void addTerrain(GameObject go) {
-		gameObjects.Add(go);
-		addToTerrainGrid(go);
+	public void addToGrid(GameObject obj) {
+		if (obj.useActorGrid) {
+			addToActorGrid(obj);
+		}
+		if (obj.useTerrainGrid) {
+			addTerrainToGrid(obj);
+		}
 	}
 
-	public void removeTerrain(GameObject go) {
-		gameObjects.Remove(go);
-		removeFromTerrainGrid(go);
+	public void removeFromGrid(GameObject obj) {
+		if (obj.useActorGrid) {
+			addToActorGrid(obj);
+		}
+		if (obj.useTerrainGrid) {
+			addTerrainToGrid(obj);
+		}
 	}
 
-	public void addToTerrainGrid(GameObject go) {
+	private void addTerrainToGrid(GameObject go) {
 		if (!gameObjects.Contains(go)) {
 			return;
 		}
@@ -728,7 +764,7 @@ public partial class Level {
 		terrainGridsPopulatedByGo[go.GetHashCode()] = getGridCellsPos(allCollidersShape.Value);
 	}
 
-	public void removeFromTerrainGrid(GameObject go) {
+	private void removeFromTerrainGrid(GameObject go) {
 		int hash = go.GetHashCode();
 		if (!terrainGridsPopulatedByGo.ContainsKey(hash)) {
 			return;
