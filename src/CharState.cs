@@ -336,6 +336,7 @@ public class CharState {
 public class WarpIn : CharState {
 	public bool warpSoundPlayed;
 	public float destY;
+	public float destX;
 	public float startY;
 	public Anim warpAnim;
 	bool warpAnimOnce;
@@ -381,6 +382,8 @@ public class WarpIn : CharState {
 
 			if (character.isAnimOver()) {
 				character.grounded = true;
+				character.pos.y = destY;
+				character.pos.x = destX;
 				character.changeToIdleOrFall();
 			}
 			return;
@@ -432,6 +435,7 @@ public class WarpIn : CharState {
 		character.visible = false;
 		character.frameSpeed = 0;
 		destY = character.pos.y;
+		destX = character.pos.x;
 		startY = character.pos.y;
 
 		if (player.warpedInOnce || Global.debug) {
