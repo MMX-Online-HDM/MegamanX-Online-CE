@@ -1295,6 +1295,7 @@ public partial class Level {
 			foreach (var gridData in populatedGrids.ToArray()) {
 				// Initalize data.
 				HashSet<GameObject> currentGrid = grid[gridData[0], gridData[1]];
+				HashSet<GameObject> currentTerrainGrid = terrainGrid[gridData[0], gridData[1]];
 				// Awfull GM19 order code.
 				GameObject[] gameObjects = currentGrid.ToArray();
 				// Iterate trough populated grids.

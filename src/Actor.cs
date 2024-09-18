@@ -801,7 +801,7 @@ public partial class Actor : GameObject {
 			}
 			yDist *= yMod;
 
-			CollideData? collideData = Global.level.checkCollisionActor(this, 0, yDist, checkPlatforms: true);
+			CollideData? collideData = Global.level.checkTerrainCollision(this, 0, yDist, checkPlatforms: true).FirstOrDefault();
 
 			var hitActor = collideData?.gameObject as Actor;
 			bool isPlatform = false;
