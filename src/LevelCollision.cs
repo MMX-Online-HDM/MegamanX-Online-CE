@@ -578,7 +578,7 @@ public partial class Level {
 	public List<CollideData> raycastAll(Point pos1, Point pos2, List<Type> classNames, bool isChargeBeam = false) {
 		var hits = new List<CollideData>();
 		var shape = new Shape(new List<Point>() { pos1, pos2 });
-		var gameObjects = getGameObjectsInSameCell(shape);
+		var gameObjects = getTerrainInSameCell(shape);
 		foreach (var go in gameObjects) {
 			if (go.collider == null) continue;
 			if (!isOfClass(go, classNames)) continue;
