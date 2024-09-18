@@ -164,7 +164,7 @@ public partial class Actor : GameObject {
 	) {
 		// Intialize sprites as soon as posible to prevent crashes.
 		if (spriteName is not null and not "") {
-			changeSprite(spriteName, true);
+			initalizeSprite(spriteName);
 			// Crash if spriteName was provided but does not exist.
 			if (sprite == null) {
 				string typeName = GetType().ToString().Replace("MMXOnline.", "");
@@ -275,7 +275,7 @@ public partial class Actor : GameObject {
 	}
 
 	public void changeSpriteIfDifferent(string spriteName, bool resetFrame) {
-		if (sprite?.name == spriteName) return;
+		if (sprite.name == spriteName) return;
 		changeSprite(spriteName, resetFrame);
 	}
 
@@ -338,6 +338,22 @@ public partial class Actor : GameObject {
 				playOverrideVoice(spriteName);
 			}
 		}
+	}
+
+	private void initalizeSprite(string spriteName) {
+		if (!Global.sprites.ContainsKey(spriteName)) return;
+		sprite = new Sprite(spriteName);
+		changeGlobalColliderOnSpriteChange(spriteName);
+
+		foreach (var hitbox in sprite.hitboxes) {
+			hitbox.actor = this;
+		}
+		foreach (var frame in sprite.frameHitboxes) {
+			foreach (var hitbox in frame) {
+				hitbox.actor = this;
+			}
+		}
+		Global.level.addToGrid(this);
 	}
 
 	public void playOverrideVoice(string spriteName) {
