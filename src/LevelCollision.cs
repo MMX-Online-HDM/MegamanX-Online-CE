@@ -229,21 +229,11 @@ public partial class Level {
 
 	public void addGameObject(GameObject go) {
 		gameObjects.Add(go);
-		if (go.useActorGrid) {
-			addToGrid(go);
-		}
-		if (go.useTerrainGrid) {
-			addTerrainToGrid(go);
-		}
+		addToGrid(go);
 	}
 
 	public void removeGameObject(GameObject go) {
-		if (go.useActorGrid) {
-			removeFromGrid(go);
-		}
-		if (go.useTerrainGrid) {
-			removeFromTerrainGrid(go);
-		}
+		removeFromGrid(go);
 		gameObjects.Remove(go);
 	}
 
@@ -738,7 +728,7 @@ public partial class Level {
 
 	public void removeFromGrid(GameObject obj) {
 		if (obj.useActorGrid) {
-			removeFromGrid(obj);
+			removeFromActorGrid(obj);
 		}
 		if (obj.useTerrainGrid) {
 			removeFromTerrainGrid(obj);
