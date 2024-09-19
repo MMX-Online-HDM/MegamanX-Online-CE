@@ -173,7 +173,7 @@ public class VileHover : CharState {
 
 		if (character.charState is not VileHover) return;
 
-		if (Global.level.checkCollisionActor(character, 0, -character.getYMod()) != null && character.vel.y * character.getYMod() < 0) {
+		if (Global.level.checkTerrainCollisionOnce(character, 0, -character.getYMod()) != null && character.vel.y * character.getYMod() < 0) {
 			character.vel.y = 0;
 		}
 

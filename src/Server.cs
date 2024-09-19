@@ -571,7 +571,13 @@ public class Server {
 				}
 			} else if (im.MessageType == NetIncomingMessageType.Data) {
 				byte rpcIndexByte = im.ReadByte();
-				RPC rpcTemplate = RPC.templates[rpcIndexByte];
+				RPC rpcTemplate;
+				if (rpcIndexByte >= RPC.templates.Length) {
+					rpcTemplate = RPC.templates[rpcIndexByte];
+				} else {
+					rpcTemplate = new RPCUnknown();
+					rpcTemplate.index = rpcIndexByte;
+				}
 				if (rpcTemplate.isServerMessage) {
 					processServerMessage(im, rpcTemplate);
 				} else {
@@ -883,7 +889,7 @@ public class Server {
 			om.Write(rpcIndexByte);
 			om.Write(argCount);
 
-			var bytes = im.ReadBytes(argCount);
+			byte[] bytes = im.ReadBytes(argCount);
 			foreach (var b in bytes) {
 				om.Write(b);
 			}

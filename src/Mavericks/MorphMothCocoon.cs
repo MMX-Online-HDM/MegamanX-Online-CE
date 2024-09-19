@@ -374,7 +374,7 @@ public class MorphMCSpinState : MaverickState {
 		Point airMove = new Point(0, 0);
 		genericJumpCode();
 		if (!maverick.grounded) {
-			if (Global.level.checkCollisionActor(maverick, 0, -1) != null && maverick.vel.y < 0) {
+			if (Global.level.checkTerrainCollisionOnce(maverick, 0, -1) != null && maverick.vel.y < 0) {
 				maverick.vel.y = 0;
 			}
 
@@ -648,7 +648,7 @@ public class MorphMCHangState : MaverickState {
 			mmCocoon.latchLen = Helpers.clamp(mmCocoon.latchLen, 10, 200);
 
 			float angle = mmCocoon.latchPos.directionToNorm(maverick.pos).angle;
-			if (Global.level.checkCollisionActor(mmCocoon, Helpers.cosd(angle) * 5, Helpers.sind(angle) * 5) != null) {
+			if (Global.level.checkTerrainCollisionOnce(mmCocoon, Helpers.cosd(angle) * 5, Helpers.sind(angle) * 5) != null) {
 				mmCocoon.latchLen = oldLatchLen;
 			}
 		}
@@ -684,7 +684,7 @@ public class MorphMCHangState : MaverickState {
 		}
 
 		Point moveAmount = maverick.pos.directionTo(destPos);
-		var hit = Global.level.checkCollisionActor(maverick, moveAmount.x, moveAmount.y);
+		var hit = Global.level.checkTerrainCollisionOnce(maverick, moveAmount.x, moveAmount.y);
 		if (hit == null) {
 			maverick.incPos(moveAmount);
 		} else {

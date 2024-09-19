@@ -1191,7 +1191,7 @@ public class RideArmorState {
 			}
 		}
 
-		if (Global.level.checkCollisionActor(rideArmor, 0, -1) != null && rideArmor?.vel.y < 0) {
+		if (Global.level.checkTerrainCollisionOnce(rideArmor, 0, -1) != null && rideArmor?.vel.y < 0) {
 			rideArmor.vel.y = 0;
 		}
 
@@ -1788,7 +1788,7 @@ public class RADash : RideArmorState {
 				if (rideArmor.sprite.name.Contains("attack") && rideArmor.frameIndex == 2) {
 					rideArmor.frameTime = 0;
 				}
-				var hitWall = Global.level.checkCollisionActor(rideArmor, move.x * Global.spf * 2, 0, null);
+				var hitWall = Global.level.checkTerrainCollisionOnce(rideArmor, move.x * Global.spf * 2, 0, null);
 				if (hitWall?.isSideWallHit() == true) {
 					rideArmor.playSound("crashX3", forcePlay: false, sendRpc: true);
 					rideArmor.shakeCamera(sendRpc: true);

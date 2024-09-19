@@ -230,7 +230,7 @@ public class SigmaUpDownSlashState : CharState {
 
 		float maxStateTime = isUp ? 0.35f : 0.5f;
 		if (stateTime > maxStateTime ||
-			Global.level.checkCollisionActor(character, moveAmount.x, moveAmount.y, moveAmount) != null
+			Global.level.checkTerrainCollisionOnce(character, moveAmount.x, moveAmount.y, moveAmount) != null
 		) {
 			character.changeState(
 				character.grounded ? new SigmaCooldownState("downslash_land") : new Fall(), true

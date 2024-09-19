@@ -534,8 +534,8 @@ public class BCrabSummonCrabProj : Projectile, IDamagable {
 		var closestTarget = Global.level.getClosestTarget(pos, owner.alliance, false, 150, true);
 		if (closestTarget != null) {
 			if (moveDirOnce == null) moveDirOnce = MathF.Sign(closestTarget.pos.x - pos.x);
-			var hitGround = Global.level.checkCollisionActor(this, moveDirOnce.Value * 30, 20);
-			var hitWall = Global.level.checkCollisionActor(this, moveDirOnce.Value * Global.spf * 2, -5);
+			var hitGround = Global.level.checkTerrainCollisionOnce(this, moveDirOnce.Value * 30, 20);
+			var hitWall = Global.level.checkTerrainCollisionOnce(this, moveDirOnce.Value * Global.spf * 2, -5);
 			bool blocked = (grounded && hitGround == null) || hitWall?.isSideWallHit() == true;
 			if (!blocked) {
 				move(new Point(moveDirOnce.Value * 100, 0));

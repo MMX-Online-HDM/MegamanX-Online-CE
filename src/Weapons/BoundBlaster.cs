@@ -410,8 +410,8 @@ public class MovingWheelProj : Projectile {
 		if (started == 1) {
 			vel.x = xDir * speed;
 			angle += xDir * speed * 3 * Global.spf;
-			if (Global.level.checkCollisionActor(this, 0, -1) == null) {
-				var collideData = Global.level.checkCollisionActor(this, xDir, 0, vel);
+			if (Global.level.checkTerrainCollisionOnce(this, 0, -1) == null) {
+				var collideData = Global.level.checkTerrainCollisionOnce(this, xDir, 0, vel);
 				if (collideData != null && collideData.hitData != null && !((Point)collideData.hitData.normal).isAngled()) {
 					xDir *= -1;
 					maxTime = startMaxTime;

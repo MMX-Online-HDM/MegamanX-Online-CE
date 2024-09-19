@@ -406,7 +406,7 @@ public class ServerClient {
 					byte rpcIndexByte = im.ReadByte();
 					RPC rpcTemplate;
 					if (rpcIndexByte >= RPC.templates.Length) {
-						rpcTemplate = RPC.unknown;
+						rpcTemplate = new RPCUnknown();
 					} else {
 						rpcTemplate = RPC.templates[rpcIndexByte];
 					}

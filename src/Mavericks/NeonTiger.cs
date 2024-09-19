@@ -283,13 +283,13 @@ public class NeonTDashState : MaverickState {
 
 		var move = new Point(250 * maverick.xDir, 0);
 
-		var hitGround = Global.level.checkCollisionActor(maverick, move.x * Global.spf * 5, 20);
+		var hitGround = Global.level.checkTerrainCollisionOnce(maverick, move.x * Global.spf * 5, 20);
 		if (hitGround == null) {
 			maverick.changeState(new MIdle());
 			return;
 		}
 
-		var hitWall = Global.level.checkCollisionActor(maverick, move.x * Global.spf * 2, -5);
+		var hitWall = Global.level.checkTerrainCollisionOnce(maverick, move.x * Global.spf * 2, -5);
 		if (hitWall?.isSideWallHit() == true) {
 			maverick.changeState(new MIdle());
 			return;
@@ -328,7 +328,7 @@ public class NeonTPounceState : MaverickState {
 			wallClimbCode();
 		}
 
-		if (Global.level.checkCollisionActor(maverick, 0, -1) != null && maverick.vel.y < 0) {
+		if (Global.level.checkTerrainCollisionOnce(maverick, 0, -1) != null && maverick.vel.y < 0) {
 			maverick.vel.y = 0;
 		}
 

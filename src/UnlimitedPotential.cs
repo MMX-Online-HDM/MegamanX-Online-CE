@@ -701,7 +701,7 @@ public class XRevive : CharState {
 		base.onExit(newState);
 		character.useGravity = true;
 		mmx.isHyperX = true;
-		Global.level.addGameObjectToGrid(character);
+		Global.level.addToGrid(character);
 		mmx.invulnTime = mmx.maxParryCooldown;
 	}
 }

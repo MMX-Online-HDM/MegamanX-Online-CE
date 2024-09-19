@@ -200,11 +200,9 @@ public class MovingPlatform : Wall {
 
 	public void changePos(Point newOrigin) {
 		var oldPos = collider.shape.points[0];
-		Global.level.removeFromTerrainGrid(this);
 		Global.level.removeFromGrid(this);
 		updateCollider(newOrigin);
-		Global.level.addGameObjectToGrid(this);
-		Global.level.addToTerrainGrid(this);
+		Global.level.addToGrid(this);
 		var newPos = collider.shape.points[0];
 		deltaMove = new Point(newPos.x - oldPos.x, newPos.y - oldPos.y);
 	}
@@ -267,7 +265,6 @@ public class CrackedWall : Actor, IDamagable {
 
 		wall.isCracked = true;
 		Global.level.addGameObject(wall);
-		Global.level.addTerrain(wall);
 
 		this.destroyInstanceName = destroyInstanceName;
 	}
@@ -278,11 +275,10 @@ public class CrackedWall : Actor, IDamagable {
 	}
 
 	public void move(Point deltaPos) {
-		Global.level.removeFromTerrainGrid(this);
+		Global.level.removeFromGrid(this);
 		incPos(deltaPos);
-		Global.level.addToTerrainGrid(this);
+		Global.level.addToGrid(this);
 
-		Global.level.removeFromTerrainGrid(wall);
 		Global.level.removeFromGrid(wall);
 		List<Point> rect = collider.shape.getRect().getPoints();
 		wall.collider._shape.points = new List<Point>() {
@@ -291,8 +287,7 @@ public class CrackedWall : Actor, IDamagable {
 			rect[2].addxy(-1, -1),
 			rect[3].addxy(1, -1),
 		};
-		Global.level.addGameObjectToGrid(wall);
-		Global.level.addToTerrainGrid(this);
+		Global.level.addToGrid(wall);
 	}
 
 	// Only if 0 is returned, it can't damage it. Even if null, it still can
@@ -358,7 +353,6 @@ public class CrackedWall : Actor, IDamagable {
 	public override void onDestroy() {
 		base.onDestroy();
 		Global.level.removeGameObject(wall);
-		Global.level.removeTerrain(wall);
 		if (!string.IsNullOrEmpty(destroyInstanceName)) {
 			if (destroyInstanceName.StartsWith("No Scroll")) {
 				Global.level.noScrolls.RemoveAll(ns => ns.name == destroyInstanceName);
@@ -366,7 +360,6 @@ public class CrackedWall : Actor, IDamagable {
 				var toRemove = Global.level.gameObjects.FirstOrDefault(go => go.name == destroyInstanceName);
 				if (toRemove != null) {
 					Global.level.removeGameObject(toRemove);
-					Global.level.removeTerrain(toRemove);
 				}
 			}
 		}
@@ -438,14 +431,12 @@ public class KillZone : Geometry {
 	}
 
 	public void move(Point deltaPos) {
-		Global.level.removeFromTerrainGrid(this);
 		Global.level.removeFromGrid(this);
 		for (int i = 0; i < collider._shape.points.Count; i++) {
 			Point point = collider._shape.points[i];
 			collider._shape.points[i] = point.add(deltaPos);
 		}
-		Global.level.addGameObjectToGrid(this);
-		Global.level.addToTerrainGrid(this);
+		Global.level.addToGrid(this);
 	}
 }
 

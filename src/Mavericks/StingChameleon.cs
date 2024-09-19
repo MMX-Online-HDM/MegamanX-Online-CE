@@ -447,7 +447,7 @@ public class StingCHangState : MaverickState {
 
 	public override bool canEnter(Maverick maverick) {
 		Point incPos = getTargetPos(maverick).subtract(maverick.pos);
-		if (Global.level.checkCollisionActor(maverick, incPos.x, incPos.y) != null) {
+		if (Global.level.checkTerrainCollisionOnce(maverick, incPos.x, incPos.y) != null) {
 			return false;
 		}
 		return base.canEnter(maverick);

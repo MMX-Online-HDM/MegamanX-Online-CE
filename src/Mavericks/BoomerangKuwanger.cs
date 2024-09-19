@@ -298,12 +298,12 @@ public class BoomerKTeleportState : MaverickState {
 			var dir = input.getInputDir(player);
 			float moveAmount = dir.x * 300 * Global.spf;
 
-			var hitWall = Global.level.checkCollisionActor(clone, moveAmount, -2);
+			var hitWall = Global.level.checkTerrainCollisionOnce(clone, moveAmount, -2);
 			if (hitWall != null && hitWall.getNormalSafe().y == 0) {
 				float rectW = hitWall.otherCollider.shape.getRect().w();
 				if (rectW < 75) {
 					float wallClipAmount = moveAmount + dir.x * (rectW + maverick.width);
-					var hitWall2 = Global.level.checkCollisionActor(clone, wallClipAmount, -2);
+					var hitWall2 = Global.level.checkTerrainCollisionOnce(clone, wallClipAmount, -2);
 					if (hitWall2 == null && clone.pos.x + wallClipAmount > 0 && clone.pos.x + wallClipAmount < Global.level.width) {
 						clone.incPos(new Point(wallClipAmount, 0));
 						clone.visible = true;
@@ -365,7 +365,7 @@ public class BoomerKTeleportState : MaverickState {
 	}
 
 	public bool canChangePos() {
-		if (Global.level.checkCollisionActor(clone, 0, 5) == null) return false;
+		if (Global.level.checkTerrainCollisionOnce(clone, 0, 5) == null) return false;
 		var hits = Global.level.getTerrainTriggerList(clone, new Point(0, 5), typeof(KillZone));
 		if (hits.Count > 0) return false;
 		return true;

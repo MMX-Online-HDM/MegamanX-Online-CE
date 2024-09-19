@@ -226,7 +226,7 @@ public class MaverickState {
 			return;
 		}
 
-		if (Global.level.checkCollisionActor(maverick, 0, -maverick.getYMod()) != null && maverick.vel.y * maverick.getYMod() < 0) {
+		if (Global.level.checkTerrainCollisionOnce(maverick, 0, -maverick.getYMod()) != null && maverick.vel.y * maverick.getYMod() < 0) {
 			maverick.vel.y = 0;
 		}
 
@@ -352,7 +352,7 @@ public class MaverickState {
 				var rect = ladders[0].otherCollider.shape.getRect();
 				var snapX = (rect.x1 + rect.x2) / 2;
 				float xDist = snapX - maverick.pos.x;
-				if (MathF.Abs(xDist) < 10 && Global.level.checkCollisionActor(maverick, xDist, 30) == null) {
+				if (MathF.Abs(xDist) < 10 && Global.level.checkTerrainCollisionOnce(maverick, xDist, 30) == null) {
 					maverick.move(new Point(xDist, 1), false);
 				}
 			}
@@ -364,7 +364,7 @@ public class MaverickState {
 				var rect = ladders[0].otherCollider.shape.getRect();
 				var snapX = (rect.x1 + rect.x2) / 2;
 				float xDist = snapX - maverick.pos.x;
-				if (MathF.Abs(xDist) < 10 && Global.level.checkCollisionActor(maverick, xDist, 30) == null) {
+				if (MathF.Abs(xDist) < 10 && Global.level.checkTerrainCollisionOnce(maverick, xDist, 30) == null) {
 					maverick.changeState(new StingCClimb());
 					maverick.move(new Point(0, 30), false);
 					player.character.stopCamUpdate = true;
@@ -394,14 +394,14 @@ public class MaverickState {
 	}
 
 	public CollideData checkCollision(float x, float y, bool autoVel = false) {
-		return Global.level.checkCollisionActor(maverick, x, y, autoVel: autoVel);
+		return Global.level.checkTerrainCollisionOnce(maverick, x, y, autoVel: autoVel);
 	}
 
 	// Use this for code that slides the maverick across the ground and needs to check if a side wall was hit.
 	// Be sure to pass in y = -2 (or -2 offset).
 	// This will handle inclines properly, for example sliding from an incline to another inline, or to flat ground.
 	public CollideData checkCollisionSlide(float x, float y) {
-		var hitWall = Global.level.checkCollisionActor(maverick, x, y, autoVel: true);
+		var hitWall = Global.level.checkTerrainCollisionOnce(maverick, x, y, autoVel: true);
 		if (maverick.deltaPos.isCloseToZero(1) && stateFrame > 1) {
 			return hitWall;
 		}
@@ -458,7 +458,7 @@ public class MIdle : MaverickState {
 				bool changeToRun = true;
 				if (maverick is OverdriveOstrich) {
 					Global.breakpoint = true;
-					var hit = Global.level.checkCollisionActor(maverick, maverick.xDir, -2, vel: new Point(maverick.xDir, 0));
+					var hit = Global.level.checkTerrainCollisionOnce(maverick, maverick.xDir, -2, vel: new Point(maverick.xDir, 0));
 					Global.breakpoint = false;
 					if (hit?.isSideWallHit() == true) {
 						changeToRun = false;
@@ -802,7 +802,7 @@ public class MFly : MaverickState {
 		if (player == null) return;
 		Helpers.decrementFrames(ref maverick.flyBar);
 
-		if (Global.level.checkCollisionActor(maverick, 0, -maverick.getYMod()) != null && maverick.vel.y * maverick.getYMod() < 0) {
+		if (Global.level.checkTerrainCollisionOnce(maverick, 0, -maverick.getYMod()) != null && maverick.vel.y * maverick.getYMod() < 0) {
 			maverick.vel.y = 0;
 		}
 
@@ -1221,7 +1221,7 @@ public class MWallSlide : MaverickState {
 
 		if (stateTime > 0.15) {
 			var dirHeld = wallDir == -1 ? input.isHeld(Control.Left, player) : input.isHeld(Control.Right, player);
-			if (!dirHeld || Global.level.checkCollisionActor(maverick, wallDir, 0) == null) {
+			if (!dirHeld || Global.level.checkTerrainCollisionOnce(maverick, wallDir, 0) == null) {
 				maverick.changeState(new MFall());
 			}
 			if (maverick is not NeonTiger) {

@@ -212,7 +212,7 @@ public class DrDopplerDashState : MaverickState {
 
 		var move = new Point(250 * maverick.xDir, 0);
 
-		var hitWall = Global.level.checkCollisionActor(maverick, move.x * Global.spf * 2, -5);
+		var hitWall = Global.level.checkTerrainCollisionOnce(maverick, move.x * Global.spf * 2, -5);
 		if (hitWall?.isSideWallHit() == true) {
 			maverick.changeToIdleOrFall();
 			return;

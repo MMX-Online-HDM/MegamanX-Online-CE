@@ -418,13 +418,13 @@ public class ArmoredARollState : MaverickState {
 
 		Point moveAmount = rollDir.times(rollSpeed * Global.spf);
 		float moveY = moveAmount.y + (maverick.vel.y * Global.spf);
-		CollideData hit = Global.level.checkCollisionActor(maverick, moveAmount.x, moveY - 2, autoVel: true);
+		CollideData hit = Global.level.checkTerrainCollisionOnce(maverick, moveAmount.x, moveY - 2, autoVel: true);
 		Point? newRollDir = null;
 		bool stopBouncing = false;
 		if (hit != null) {
 			Point normal = hit.getNormalSafe();
 
-			var ceilingHit = Global.level.checkCollisionActor(maverick, 0, moveY, autoVel: true);
+			var ceilingHit = Global.level.checkTerrainCollisionOnce(maverick, 0, moveY, autoVel: true);
 			if (ceilingHit != null) {
 				normal = new Point(0, 1);
 			}

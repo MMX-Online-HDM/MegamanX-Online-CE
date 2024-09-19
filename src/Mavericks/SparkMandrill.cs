@@ -65,7 +65,7 @@ public class SparkMandrill : Maverick {
 				}
 			} else if (state is MJump || state is MFall) {
 				if (input.isHeld(Control.Up, player)) {
-					var hit = Global.level.checkCollisionActor(this, 0, -15);
+					var hit = Global.level.checkTerrainCollisionOnce(this, 0, -15);
 					if (vel.y < 0 && hit?.gameObject is Wall wall && !wall.topWall) {
 						changeState(new SparkMClimbState(hit.getHitPointSafe()));
 					}
@@ -179,13 +179,13 @@ public class SparkMDashPunchState : MaverickState {
 
 		var move = new Point(250 * maverick.xDir, 0);
 
-		var hitGround = Global.level.checkCollisionActor(maverick, move.x * Global.spf * 5, 20);
+		var hitGround = Global.level.checkTerrainCollisionOnce(maverick, move.x * Global.spf * 5, 20);
 		if (hitGround == null) {
 			maverick.changeState(new MIdle());
 			return;
 		}
 
-		var hitWall = Global.level.checkCollisionActor(maverick, move.x * Global.spf * 2, -5);
+		var hitWall = Global.level.checkTerrainCollisionOnce(maverick, move.x * Global.spf * 2, -5);
 		if (hitWall?.isSideWallHit() == true) {
 			maverick.playSound("crash", sendRpc: true);
 			maverick.shakeCamera(sendRpc: true);

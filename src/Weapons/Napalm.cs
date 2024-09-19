@@ -413,7 +413,7 @@ public class MK2NapalmProj : Projectile {
 			}
 		}
 
-		var hit = Global.level.checkCollisionActor(this, vel.x * Global.spf, 0, null);
+		var hit = Global.level.checkTerrainCollisionOnce(this, vel.x * Global.spf, 0, null);
 		if (hit?.gameObject is Wall && hit?.hitData?.normal != null && !(hit.hitData.normal.Value.isAngled())) {
 			if (ownedByLocalPlayer) {
 				new MK2NapalmWallProj(weapon, pos, xDir, owner, owner.getNextActorNetId(), rpc: true);

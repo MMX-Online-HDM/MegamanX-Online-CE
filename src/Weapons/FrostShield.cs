@@ -118,7 +118,7 @@ public class FrostShieldProjAir : Projectile {
 
 	public override void update() {
 		base.update();
-		var wall = Global.level.checkCollisionActor(this, vel.x * Global.spf, vel.y * Global.spf, vel);
+		var wall = Global.level.checkTerrainCollisionOnce(this, vel.x * Global.spf, vel.y * Global.spf, vel);
 		if (wall != null && wall.gameObject is Wall) {
 			vel.x *= -1;
 		}

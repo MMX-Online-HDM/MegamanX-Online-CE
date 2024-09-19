@@ -1162,7 +1162,7 @@ public partial class Character : Actor, IDamagable {
 
 		// For G. Well damage.
 		// This is calculated after the base update to prevent acidental double damage.
-		if (vel.y < 0 && Global.level.checkCollisionActor(this, 0, -1) != null) {
+		if (vel.y < 0 && Global.level.checkTerrainCollisionOnce(this, 0, -1) != null) {
 			if (gravityWellModifier < 0 && vel.y < -300) {
 				Damager.applyDamage(
 					lastGravityWellDamager,
@@ -2285,7 +2285,7 @@ public partial class Character : Actor, IDamagable {
 			}
 		}
 
-		if (Global.showHitboxes) {
+		/*if (Global.showHitboxes) {
 			Point? headPos = getHeadPos();
 			if (headPos != null) {
 				//DrawWrappers.DrawCircle(headPos.Value.x, headPos.Value.y, headshotRadius, true, new Color(255, 0, 255, 128), 1, ZIndex.HUD);
@@ -2299,7 +2299,7 @@ public partial class Character : Actor, IDamagable {
 					new Color(255, 0, 0, 128)
 				);
 			}
-		}
+		}*/
 	}
 
 	public void drawSpinner(float progress) {

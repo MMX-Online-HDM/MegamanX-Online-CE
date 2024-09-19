@@ -403,7 +403,6 @@ public partial class Level {
 					var pitWall = new Wall(wall.name + "Pit", newRect.getPoints());
 					pitWall.collider.isClimbable = false;
 					addGameObject(pitWall); 
-					addTerrain(pitWall);
 				}
 
 				if (instance?.properties?.unclimbable != null && instance.properties.unclimbable == true) {
@@ -419,17 +418,14 @@ public partial class Level {
 					var unclimbableWall = new Wall(wall.name + "Unclimbable", newRect.getPoints());
 					unclimbableWall.collider.isClimbable = false;
 					addGameObject(unclimbableWall);
-					addTerrain(unclimbableWall);
 				}
 				addGameObject(wall);
-				addTerrain(wall);
 			} else if (objectName == "Water Zone") {
 				var waterRect = new Rect(points[0], points[2]);
 				waterRects.Add(waterRect);
 			} else if (objectName == "Ladder") {
 				Ladder ladder = new Ladder(instanceName, points);
 				addGameObject(ladder);
-				addTerrain(ladder);
 			} else if (objectName == "Backwall Zone") {
 				addGameObject(
 					new BackwallZone(instanceName, points, (bool?)instance.properties.isExclusion ?? false)
@@ -443,7 +439,6 @@ public partial class Level {
 					} else {
 						gate.collider.isClimbable = true;
 					}
-					addTerrain(gate);
 					addGameObject(gate);
 					gates.Add(gate);
 				}
@@ -469,7 +464,6 @@ public partial class Level {
 
 				var killZone = new KillZone(instanceName, points, killInvuln, damage, flinch, hitCooldown);
 				addGameObject(killZone);
-				addTerrain(killZone);
 			} else if (objectName == "Move Zone") {
 				if (levelData.name != "giantdam" || enableGiantDamPropellers()) {
 					var moveZone = new MoveZone(
@@ -477,7 +471,6 @@ public partial class Level {
 						(float)instance.properties.moveX, (float)instance.properties.moveY
 					);
 					addGameObject(moveZone);
-					addTerrain(moveZone);
 				}
 			} else if (objectName == "Jump Zone") {
 				float jumpTime = instance.properties.jumpTime ?? 1;
@@ -709,7 +702,6 @@ public partial class Level {
 				var platform = new MovingPlatform(spriteName, idleSpriteName, pos, moveData, moveSpeed, timeOffset, nodeName, killZoneName, crackedWallName, zIndex, flipXOnMoveLeft, flipYOnMoveUp);
 				movingPlatforms.Add(platform);
 				addGameObject(platform);
-				addTerrain(platform);
 			} else if (objectName.StartsWith("Music Source")) {
 				string musicName = instance.properties.musicName ?? "";
 				if (musicName != "") {
@@ -1303,6 +1295,7 @@ public partial class Level {
 			foreach (var gridData in populatedGrids.ToArray()) {
 				// Initalize data.
 				HashSet<GameObject> currentGrid = grid[gridData[0], gridData[1]];
+				HashSet<GameObject> currentTerrainGrid = terrainGrid[gridData[0], gridData[1]];
 				// Awfull GM19 order code.
 				GameObject[] gameObjects = currentGrid.ToArray();
 				// Iterate trough populated grids.

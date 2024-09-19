@@ -121,7 +121,7 @@ public partial class Level {
 	}
 
 	// Should be called on hitbox changes.
-	public void removeFromGrid(GameObject go) {
+	private void removeFromActorGrid(GameObject go) {
 		int hash = go.GetHashCode();
 		if (!gridsPopulatedByGo.ContainsKey(hash)) {
 			return;
@@ -138,12 +138,12 @@ public partial class Level {
 		gridsPopulatedByGo.Remove(hash);
 	}
 
-	public void addGameObjectToGrid(GameObject go) {
+	private void addToActorGrid(GameObject go) {
 		if (!gameObjects.Contains(go)) {
 			return;
 		}
 		if (gridsPopulatedByGo.ContainsKey(go.GetHashCode())) {
-			removeFromGrid(go);
+			removeFromActorGrid(go);
 		}
 		Shape? allCollidersShape = go.getAllCollidersShape();
 		if (!allCollidersShape.HasValue) {
@@ -229,12 +229,30 @@ public partial class Level {
 
 	public void addGameObject(GameObject go) {
 		gameObjects.Add(go);
-		addGameObjectToGrid(go);
+		addToGrid(go);
 	}
 
 	public void removeGameObject(GameObject go) {
 		removeFromGrid(go);
 		gameObjects.Remove(go);
+	}
+
+	public void modifyObjectGridGroups(GameObject obj, bool isActor, bool isTerrain) {
+		if (isActor) {
+			addToGrid(obj);
+			obj.useActorGrid = true;
+		} else {
+			removeFromGrid(obj);
+			obj.useActorGrid = false;
+		}
+		if (isTerrain) {
+			addTerrainToGrid(obj);
+			obj.useTerrainGrid = true;
+
+		} else {
+			removeFromTerrainGrid(obj);
+			obj.useTerrainGrid = false;
+		}
 	}
 
 
@@ -414,7 +432,7 @@ public partial class Level {
 	// Checks for collisions and returns the first one collided.
 	// A collision requires at least one of the colliders not to be a trigger.
 	// The vel parameter ensures we return normals that make sense, that are against the direction of vel.
-	public CollideData? checkCollisionActor(
+	public CollideData? checkCollisionActorOnce(
 		Actor? actor, float incX, float incY, Point? vel = null, bool autoVel = false, bool checkPlatforms = false
 	) {
 		return checkCollisionsActor(
@@ -560,7 +578,7 @@ public partial class Level {
 	public List<CollideData> raycastAll(Point pos1, Point pos2, List<Type> classNames, bool isChargeBeam = false) {
 		var hits = new List<CollideData>();
 		var shape = new Shape(new List<Point>() { pos1, pos2 });
-		var gameObjects = getGameObjectsInSameCell(shape);
+		var gameObjects = getTerrainInSameCell(shape);
 		foreach (var go in gameObjects) {
 			if (go.collider == null) continue;
 			if (!isOfClass(go, classNames)) continue;
@@ -699,17 +717,25 @@ public partial class Level {
 		return false;
 	}
 
-	public void addTerrain(GameObject go) {
-		gameObjects.Add(go);
-		addToTerrainGrid(go);
+	public void addToGrid(GameObject obj) {
+		if (obj.useActorGrid) {
+			addToActorGrid(obj);
+		}
+		if (obj.useTerrainGrid) {
+			addTerrainToGrid(obj);
+		}
 	}
 
-	public void removeTerrain(GameObject go) {
-		gameObjects.Remove(go);
-		removeFromTerrainGrid(go);
+	public void removeFromGrid(GameObject obj) {
+		if (obj.useActorGrid) {
+			removeFromActorGrid(obj);
+		}
+		if (obj.useTerrainGrid) {
+			removeFromTerrainGrid(obj);
+		}
 	}
 
-	public void addToTerrainGrid(GameObject go) {
+	private void addTerrainToGrid(GameObject go) {
 		if (!gameObjects.Contains(go)) {
 			return;
 		}
@@ -728,7 +754,7 @@ public partial class Level {
 		terrainGridsPopulatedByGo[go.GetHashCode()] = getGridCellsPos(allCollidersShape.Value);
 	}
 
-	public void removeFromTerrainGrid(GameObject go) {
+	private void removeFromTerrainGrid(GameObject go) {
 		int hash = go.GetHashCode();
 		if (!terrainGridsPopulatedByGo.ContainsKey(hash)) {
 			return;
@@ -743,6 +769,13 @@ public partial class Level {
 			}
 		}
 		terrainGridsPopulatedByGo.Remove(hash);
+	}
+
+	public CollideData? checkTerrainCollisionOnce(
+		Actor actor, float incX, float incY, Point? vel = null, bool autoVel = false,
+		bool checkPlatforms = false
+	) {
+		return checkTerrainCollision(actor, incX, incY, vel, autoVel, checkPlatforms).FirstOrDefault();
 	}
 
 	public List<CollideData> checkTerrainCollision(

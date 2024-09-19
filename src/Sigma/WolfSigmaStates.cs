@@ -863,7 +863,7 @@ public class WolfSigmaRevive : CharState {
 		character.frameSpeed = 0;
 		character.immuneToKnockback = true;
 
-		Global.level.addGameObjectToGrid(character);
+		Global.level.addToGrid(character);
 
 		/*
 		Point? groundPos = Global.level.getGroundPosWithNull(character.pos, 30);
