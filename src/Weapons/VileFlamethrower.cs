@@ -128,6 +128,7 @@ public class FlamethrowerState : CharState {
 
 	public FlamethrowerState() : base("flamethrower") {
 		useGravity = false;
+		useDashJumpSpeed = true;
 	}
 
 	public override void update() {
