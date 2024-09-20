@@ -894,7 +894,7 @@ public class Server {
 			if (rpcTemplate is RPCUnknown) {
 				bytes = new byte[argCount];
 				if (!im.TryReadBytes(bytes)) {
-					return;;
+					return;
 				}
 			}
 			// For know ones we just can and should crash.
