@@ -246,6 +246,7 @@ public class NapalmAttack : CharState {
 	public NapalmAttack(NapalmAttackType napalmAttackType, string transitionSprite = "") :
 		base(getSprite(napalmAttackType), "", "", transitionSprite) {
 		this.napalmAttackType = napalmAttackType;
+		useDashJumpSpeed = true;
 	}
 
 	public static string getSprite(NapalmAttackType napalmAttackType) {

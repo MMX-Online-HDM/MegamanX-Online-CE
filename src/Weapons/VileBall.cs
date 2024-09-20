@@ -191,6 +191,7 @@ public class AirBombAttack : CharState {
 
 	public AirBombAttack(bool isNapalm, string transitionSprite = "") : base("air_bomb_attack", "", "", transitionSprite) {
 		this.isNapalm = isNapalm;
+		useDashJumpSpeed = true;
 	}
 
 	public override void update() {
