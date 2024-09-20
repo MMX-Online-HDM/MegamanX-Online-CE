@@ -890,13 +890,15 @@ public class Server {
 			om.Write(argCount);
 			byte[] bytes;
 
-			// Safetly for Unknown RPCs... for know ones we just can and should crash.
+			// Safetly for Unknown RPCs.
 			if (rpcTemplate is RPCUnknown) {
 				bytes = new byte[argCount];
 				if (!im.TryReadBytes(bytes)) {
 					return;;
 				}
-			} else {
+			}
+			// For know ones we just can and should crash.
+			else {
 				bytes = im.ReadBytes(argCount);
 			}
 			foreach (byte b in bytes) {
