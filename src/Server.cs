@@ -573,10 +573,10 @@ public class Server {
 				byte rpcIndexByte = im.ReadByte();
 				RPC rpcTemplate;
 				if (rpcIndexByte >= RPC.templates.Length) {
-					rpcTemplate = RPC.templates[rpcIndexByte];
-				} else {
 					rpcTemplate = new RPCUnknown();
 					rpcTemplate.index = rpcIndexByte;
+				} else {
+					rpcTemplate = RPC.templates[rpcIndexByte];
 				}
 				if (rpcTemplate.isServerMessage) {
 					processServerMessage(im, rpcTemplate);
