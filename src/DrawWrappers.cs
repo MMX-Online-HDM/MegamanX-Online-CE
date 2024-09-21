@@ -211,7 +211,7 @@ public class DrawableCompositeSprite : IDrawableWrapper {
 		finalSprite.Rotation = rotation;
 		finalSprite.Color = color;
 		// Draw the composite sprite normally.
-		return DrawableSprite.GetBaseDrawable(finalSprite, shaders, color, size, target, states);
+		return DrawableSprite.GetBaseDrawable(finalSprite, shaders, color, size, target, renderStates);
 	}
 }
 
@@ -446,7 +446,12 @@ public partial class DrawWrappers {
 		var drawables = new DrawableSprite[texture.Length];
 		for (int i = 0; i < texture.Length; i++) {
 			var sprite = new SFML.Graphics.Sprite(texture[i], new IntRect((int)sx, (int)sy, (int)sw, (int)sh));
-			drawables[i] = new DrawableSprite(shaders, sprite, sprite.Color, size);
+			sprite.Position = new Vector2f(0, 0);
+			sprite.Origin = new Vector2f(0, 0);
+			sprite.Scale = new Vector2f(1, 1);
+			sprite.Rotation = 0;
+			sprite.Color = Color.White;
+			drawables[i] = new DrawableSprite([], sprite, sprite.Color, size);
 		}
 
 		DrawLayer drawLayer = getDrawLayer(depth);

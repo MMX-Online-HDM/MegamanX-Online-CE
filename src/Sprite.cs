@@ -448,16 +448,16 @@ public class Sprite {
 
 			List<Texture> drawTextures = [bitmap];
 			if (armors[2] > 0) {
-				drawTextures.Add(xArmorHelmetBitmap[armors[2]]);
+				drawTextures.Add(xArmorHelmetBitmap[armors[2] - 1]);
 			}
 			if (armors[0] > 0) {
-				drawTextures.Add(xArmorBootsBitmap[armors[0]]);
+				drawTextures.Add(xArmorBootsBitmap[armors[0] - 1]);
 			}
 			if (armors[1] > 0) {
-				drawTextures.Add(xArmorBodyBitmap[armors[1]]);
+				drawTextures.Add(xArmorBodyBitmap[armors[1] - 1]);
 			}
 			if (armors[3] > 0) {
-				drawTextures.Add(xArmorArmBitmap[armors[3]]);
+				drawTextures.Add(xArmorArmBitmap[armors[3] - 1]);
 			}
 			if (drawTextures.Count > 1) {
 				DrawWrappers.DrawCompositeTexture(
