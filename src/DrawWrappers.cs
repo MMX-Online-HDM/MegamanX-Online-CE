@@ -157,13 +157,22 @@ public class DrawableCompositeSprite : IDrawableWrapper {
 	public DrawableCompositeSprite(
 		DrawableSprite[] subSprites,
 		List<ShaderWrapper> shaders,
-		Color color, int[] size
+		int[] size,
+		Vector2f pos,
+		float rotation,
+		Vector2f scale,
+		Vector2f origin,
+		Color color
 	) {
 		shaders.RemoveAll(s => s == null);
 		this.shaders = shaders.ToArray();
 		this.subSprites = subSprites;
-		this.color = color;
 		this.size = size;
+		this.pos = pos;
+		this.rotation = rotation;
+		this.scale = scale;
+		this.origin = origin;
+		this.color = color;
 	}
 
 	public (Drawable, RenderStates) GetDrawable(RenderTarget target, RenderStates states) {
@@ -190,9 +199,9 @@ public class DrawableCompositeSprite : IDrawableWrapper {
 		// Create a clear texture first.
 		renderTexture.Clear(new Color(0, 0, 0, 0));
 		// Start to draw sprites one on top of another without clearing.
-		for (int i = 0; i < spriteParts.Length - 1; i++) {
+		for (int i = 0; i < spriteParts.Length; i++) {
 			renderTexture.Display();
-			renderTexture.Draw(spriteParts[0], renderStates);
+			renderTexture.Draw(spriteParts[i], renderStates);
 		}
 		// Final result.
 		var finalSprite = new SFML.Graphics.Sprite(renderTexture.Texture);
@@ -410,6 +419,46 @@ public partial class DrawWrappers {
 		} else {
 			drawToHUD(sprite);
 		}
+	}
+
+	public static void DrawCompositeTexture(
+		Texture[] texture, float sx,
+		float sy, float sw, float sh,
+		float dx, float dy, long depth,
+		float cx = 0, float cy = 0,
+		float xScale = 1, float yScale = 1,
+		float angle = 0, float alpha = 1,
+		List<ShaderWrapper> shaders = null!, bool isWorldPos = true
+	) {
+		if (shaders == null) {
+			shaders = new();
+		}
+		if (isWorldPos && Options.main.enablePostProcessing) {
+			dx -= Global.level.camX;
+			dy -= Global.level.camY;
+		}
+		dx = MathF.Round(dx);
+		dy = MathF.Round(dy);
+		cx = MathF.Floor(cx);
+		cy = MathF.Floor(cy);
+		int[] size = [(int)sw, (int)sh];
+
+		var drawables = new DrawableSprite[texture.Length];
+		for (int i = 0; i < texture.Length; i++) {
+			var sprite = new SFML.Graphics.Sprite(texture[i], new IntRect((int)sx, (int)sy, (int)sw, (int)sh));
+			drawables[i] = new DrawableSprite(shaders, sprite, sprite.Color, size);
+		}
+
+		DrawLayer drawLayer = getDrawLayer(depth);
+		drawLayer.oneOffs.Add(new DrawableCompositeSprite(
+			drawables, shaders,
+			size,
+			new Vector2f(dx, dy),
+			angle,
+			new Vector2f(xScale, yScale),
+			new Vector2f(cx, cy),
+			new Color(255, 255, 255, (byte)(int)(alpha * 255))
+		));
 	}
 
 	public static void DrawMapTiles(Texture[,] textureMDA, float x, float y, RenderTexture screenRenderTexture = null, ShaderWrapper shaderWrapper = null) {

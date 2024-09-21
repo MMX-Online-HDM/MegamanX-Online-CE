@@ -14,18 +14,10 @@ public class Sprite {
 	public Collider[] hitboxes;
 	public Collider[][] frameHitboxes;
 
-	public static Texture xArmorBootsBitmap = null!;
-	public static Texture xArmorBodyBitmap = null!;
-	public static Texture xArmorHelmetBitmap = null!;
-	public static Texture xArmorArmBitmap = null!;
-	public static Texture xArmorBootsBitmap2 = null!;
-	public static Texture xArmorBodyBitmap2 = null!;
-	public static Texture xArmorHelmetBitmap2 = null!;
-	public static Texture xArmorArmBitmap2 = null!;
-	public static Texture xArmorBootsBitmap3 = null!;
-	public static Texture xArmorBodyBitmap3 = null!;
-	public static Texture xArmorHelmetBitmap3 = null!;
-	public static Texture xArmorArmBitmap3 = null!;
+	public static Texture[] xArmorBootsBitmap = new Texture[3];
+	public static Texture[] xArmorBodyBitmap = new Texture[3];
+	public static Texture[] xArmorHelmetBitmap = new Texture[3];
+	public static Texture[] xArmorArmBitmap = new Texture[3];
 	public static Texture axlArmBitmap = null!;
 
 	public float time;
@@ -428,18 +420,6 @@ public class Sprite {
 			bitmap = Global.textures["XUP"];
 		}
 
-		DrawWrappers.DrawTexture(bitmap, currentFrame.rect.x1, currentFrame.rect.y1 - extraYOff, currentFrame.rect.w(), currentFrame.rect.h() + extraYOff, x + frameOffsetX, y + frameOffsetY - extraYOff, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true);
-
-		if (isUPX) {
-			var upShaders = new List<ShaderWrapper>(shaders);
-			if (Global.isOnFrameCycle(5)) {
-				if (Global.shaderWrappers.ContainsKey("hit")) {
-					upShaders.Add(Global.shaderWrappers["hit"]);
-				}
-			}
-			DrawWrappers.DrawTexture(Global.textures["XUPGlow"], currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, upShaders, true);
-		}
-
 		if (armors != null && animData.isXSprite) {
 			bool isShootSprite = needsX3BusterCorrection();
 
@@ -466,33 +446,44 @@ public class Sprite {
 				}
 			}
 
-			if (armors[2] == 1) DrawWrappers.DrawTexture(xArmorHelmetBitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true);
-			if (armors[2] == 2) DrawWrappers.DrawTexture(
-				xArmorHelmetBitmap2,
-				currentFrame.rect.x1, currentFrame.rect.y1 - 1,
-				currentFrame.rect.w(), currentFrame.rect.h() + 1,
-				x + frameOffsetX, y + frameOffsetY - 1, zIndex,
-				cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true
-			);
-			if (armors[2] == 3) DrawWrappers.DrawTexture(xArmorHelmetBitmap3, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true);
+			List<Texture> drawTextures = [bitmap];
+			if (armors[2] > 0) {
+				drawTextures.Add(xArmorHelmetBitmap[armors[2]]);
+			}
+			if (armors[0] > 0) {
+				drawTextures.Add(xArmorBootsBitmap[armors[0]]);
+			}
+			if (armors[1] > 0) {
+				drawTextures.Add(xArmorBodyBitmap[armors[1]]);
+			}
+			if (armors[3] > 0) {
+				drawTextures.Add(xArmorArmBitmap[armors[3]]);
+			}
+			if (drawTextures.Count > 1) {
+				DrawWrappers.DrawCompositeTexture(
+					drawTextures.ToArray(),
+					currentFrame.rect.x1 - flippedExtraW,
+					currentFrame.rect.y1, currentFrame.rect.w() + extraW,
+					currentFrame.rect.h(),
+					x + frameOffsetX + xOff,
+					y + frameOffsetY,
+					zIndex, cx, cy, xDirArg, yDirArg,
+					angle, alpha, shaders, true
+				);
+				return;
+			}
+		}
 
-			if (armors[0] == 1) DrawWrappers.DrawTexture(xArmorBootsBitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true);
-			if (armors[0] == 2) DrawWrappers.DrawTexture(xArmorBootsBitmap2, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true);
-			if (armors[0] == 3) DrawWrappers.DrawTexture(xArmorBootsBitmap3, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true);
+		DrawWrappers.DrawTexture(bitmap, currentFrame.rect.x1, currentFrame.rect.y1 - extraYOff, currentFrame.rect.w(), currentFrame.rect.h() + extraYOff, x + frameOffsetX, y + frameOffsetY - extraYOff, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true);
 
-			if (armors[1] == 1) DrawWrappers.DrawTexture(xArmorBodyBitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true);
-			if (armors[1] == 3) DrawWrappers.DrawTexture(xArmorBodyBitmap3, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true);
-			if (armors[1] == 2) DrawWrappers.DrawTexture(
-				xArmorBodyBitmap2,
-				currentFrame.rect.x1, currentFrame.rect.y1,
-				currentFrame.rect.w(), currentFrame.rect.h(),
-				x + frameOffsetX, y + frameOffsetY,
-				zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true
-			);
-
-			if (armors[3] == 1) DrawWrappers.DrawTexture(xArmorArmBitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true);
-			if (armors[3] == 2) DrawWrappers.DrawTexture(xArmorArmBitmap2, currentFrame.rect.x1 - flippedExtraW, currentFrame.rect.y1, currentFrame.rect.w() + extraW, currentFrame.rect.h(), x + frameOffsetX + xOff, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true);
-			if (armors[3] == 3) DrawWrappers.DrawTexture(xArmorArmBitmap3, currentFrame.rect.x1 - flippedExtraW, currentFrame.rect.y1, currentFrame.rect.w() + extraW, currentFrame.rect.h(), x + frameOffsetX + xOff, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, x3ArmShaders, true);
+		if (isUPX) {
+			var upShaders = new List<ShaderWrapper>(shaders);
+			if (Global.isOnFrameCycle(5)) {
+				if (Global.shaderWrappers.ContainsKey("hit")) {
+					upShaders.Add(Global.shaderWrappers["hit"]);
+				}
+			}
+			DrawWrappers.DrawTexture(Global.textures["XUPGlow"], currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, upShaders, true);
 		}
 
 		if (animData.isAxlSprite && drawAxlArms) {

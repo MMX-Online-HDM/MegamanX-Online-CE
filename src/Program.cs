@@ -930,20 +930,20 @@ class Program {
 
 		// Set up special sprites.
 		// Mods that does not use this should remove this thing.
-		Sprite.xArmorBootsBitmap = Global.textures["XBoots"];
-		Sprite.xArmorBodyBitmap = Global.textures["XBody"];
-		Sprite.xArmorHelmetBitmap = Global.textures["XHelmet"];
-		Sprite.xArmorArmBitmap = Global.textures["XArm"];
+		Sprite.xArmorBootsBitmap[0] = Global.textures["XBoots"];
+		Sprite.xArmorBodyBitmap[0] = Global.textures["XBody"];
+		Sprite.xArmorHelmetBitmap[0] = Global.textures["XHelmet"];
+		Sprite.xArmorArmBitmap[0] = Global.textures["XArm"];
 
-		Sprite.xArmorBootsBitmap2 = Global.textures["XBoots2"];
-		Sprite.xArmorBodyBitmap2 = Global.textures["XBody2"];
-		Sprite.xArmorHelmetBitmap2 = Global.textures["XHelmet2"];
-		Sprite.xArmorArmBitmap2 = Global.textures["XArm2"];
+		Sprite.xArmorBootsBitmap[1] = Global.textures["XBoots2"];
+		Sprite.xArmorBodyBitmap[1] = Global.textures["XBody2"];
+		Sprite.xArmorHelmetBitmap[1] = Global.textures["XHelmet2"];
+		Sprite.xArmorArmBitmap[1] = Global.textures["XArm2"];
 
-		Sprite.xArmorBootsBitmap3 = Global.textures["XBoots3"];
-		Sprite.xArmorBodyBitmap3 = Global.textures["XBody3"];
-		Sprite.xArmorHelmetBitmap3 = Global.textures["XHelmet3"];
-		Sprite.xArmorArmBitmap3 = Global.textures["XArm3"];
+		Sprite.xArmorBootsBitmap[2] = Global.textures["XBoots3"];
+		Sprite.xArmorBodyBitmap[2] = Global.textures["XBody3"];
+		Sprite.xArmorHelmetBitmap[2] = Global.textures["XHelmet3"];
+		Sprite.xArmorArmBitmap[2] = Global.textures["XArm3"];
 
 		Sprite.axlArmBitmap = Global.textures["axlArm"];
 	}
