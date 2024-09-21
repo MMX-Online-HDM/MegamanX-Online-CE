@@ -23,7 +23,7 @@ public class Buster : Weapon {
 		hitcooldown = "0/0/0/1";
 		damage = "1/2/3/4";
 		Flinch = "0/0/13/26";
-		FlinchCD = "0/0/0/0";
+		FlinchCD = "0";
 	}
 
 	public void setUnpoBuster(MegamanX mmx) {
