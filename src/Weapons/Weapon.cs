@@ -68,10 +68,10 @@ public class Weapon {
 		maxAmmo = 32;
 		rateOfFire = 0.15f;
 		effect = "";
-		damage = "0/0";
-		hitcooldown = "0/0";
-		Flinch = "0/0";
-		FlinchCD = "0/0";
+		damage = "0";
+		hitcooldown = "0";
+		Flinch = "0";
+		FlinchCD = "0";
 		ammousage = getAmmoUsage(0);
 	}
 
