@@ -1290,7 +1290,7 @@ public partial class Level {
 			List<GameObject> currentTerrainGrid = new(terrainGrid[gridData[0], gridData[1]]);
 			// Awfull GM19 order code.
 			// Iterate trough populated grids.
-			for (int i = 0; i < currentGrid.Count - 1; i++) {
+			for (int i = 0; i < currentGrid.Count; i++) {
 				// Skip terrain.
 				if (currentGrid[i] is Geometry or CrackedWall) {
 					continue;
