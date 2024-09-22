@@ -18,8 +18,8 @@ public partial class Level {
 	public Dictionary<ushort, Actor> destroyedActorsById = new();
 	public List<Actor> mapSprites = new List<Actor>();
 
-	public HashSet<GameObject>[,] grid;
-	public HashSet<GameObject>[,] terrainGrid;
+	public List<GameObject>[,] grid;
+	public List<GameObject>[,] terrainGrid;
 	public HashSet<int[]> populatedGrids = new();
 	public HashSet<int[]> populatedTerrainGrids = new();
 	public Dictionary<int, Rect> gridsPopulatedByGo = new();
@@ -1295,49 +1295,88 @@ public partial class Level {
 			HashSet<int[]> arrayGrid = new(populatedGrids);
 			foreach (int[] gridData in arrayGrid) {
 				// Initalize data.
-				HashSet<GameObject> currentGrid = grid[gridData[0], gridData[1]];
-				HashSet<GameObject> currentTerrainGrid = terrainGrid[gridData[0], gridData[1]];
+				List<GameObject> currentGrid = new (grid[gridData[0], gridData[1]]);
+				List<GameObject> currentTerrainGrid = new (terrainGrid[gridData[0], gridData[1]]);
 				// Awfull GM19 order code.
-				GameObject[] gameObjects = currentGrid.ToArray();
 				// Iterate trough populated grids.
-				for (int i = 0; i < gameObjects.Length - 1; i++) {
-					for (int j = i; j < gameObjects.Length; j++) {
+				for (int i = 0; i < currentGrid.Count - 1; i++) {
+					// Skip terrain.
+					if (currentGrid[i] is Geometry or CrackedWall) {
+						continue;
+					}
+					// Skip destroyed stuff.
+					if (currentGrid[i] is Actor { destroyed: true }) {
+						continue;
+					}
+					for (int j = i; j < currentGrid.Count; j++) {
 						// Skip terrain coliding with eachother.
-						if (gameObjects[i] is Geometry or CrackedWall && gameObjects[j] is Geometry or CrackedWall) {
+						if (currentGrid[j] is Geometry or CrackedWall) {
 							continue;
 						}
 						// Get order independent hash.
-						int hash = gameObjects[i].GetHashCode() ^ gameObjects[j].GetHashCode();
+						int hash = currentGrid[i].GetHashCode() ^ currentGrid[j].GetHashCode();
 						// Skip checked objects.
 						if (collidedGObjs.Contains(hash)) {
 							continue;
 						}
 						// Skip destroyed stuff.
-						if (gameObjects[i] is Actor { destroyed: true } || gameObjects[j] is Actor { destroyed: true }) {
+						if (currentGrid[j] is Actor { destroyed: true }) {
 							continue;
 						}
 						// Add to hash as we check.
 						collidedGObjs.Add(hash);
 						// Do preliminary collision checks and skip if we do not instersect.
-						if (!checkLossyCollision(gameObjects[i], gameObjects[j])) {
+						if (!checkLossyCollision(currentGrid[i], currentGrid[j])) {
 							continue;
 						}
 						(List<CollideData> iDatas, List<CollideData> jDatas) = getTriggerExact(
-							gameObjects[i], gameObjects[j]
+							currentGrid[i], currentGrid[j]
 						);
 						if (iDatas.Count > 0) {
-							Global.speedMul = gameObjects[i].localSpeedMul;
+							Global.speedMul = currentGrid[i].localSpeedMul;
 							iDatas = organizeTriggers(iDatas);
 							foreach (CollideData collideDataI in iDatas) {
-								gameObjects[i].registerCollision(collideDataI);
+								currentGrid[i].registerCollision(collideDataI);
 							}
 							Global.speedMul = 1;
 						}
 						if (jDatas.Count > 0) {
-							Global.speedMul = gameObjects[j].localSpeedMul;
+							Global.speedMul = currentGrid[j].localSpeedMul;
 							jDatas = organizeTriggers(jDatas);
 							foreach (CollideData collideDataJ in jDatas) {
-								gameObjects[j].registerCollision(collideDataJ);
+								currentGrid[j].registerCollision(collideDataJ);
+							}
+							Global.speedMul = 1;
+						}
+					}
+					foreach (GameObject wallObj in currentTerrainGrid) {
+						// Get order independent hash.
+						int hash = currentGrid[i].GetHashCode() ^ wallObj.GetHashCode();
+						// Skip checked objects.
+						if (collidedGObjs.Contains(hash)) {
+							continue;
+						}
+						// Add to hash as we check.
+						collidedGObjs.Add(hash);
+						// Do preliminary collision checks and skip if we do not instersect.
+						if (!checkLossyCollision(currentGrid[i], wallObj)) {
+							continue;
+						}
+						(List<CollideData> iDatas, List<CollideData> jDatas) = getTriggerExact(
+							currentGrid[i], wallObj
+						);
+						if (iDatas.Count > 0) {
+							Global.speedMul = currentGrid[i].localSpeedMul;
+							iDatas = organizeTriggers(iDatas);
+							foreach (CollideData collideDataI in iDatas) {
+								currentGrid[i].registerCollision(collideDataI);
+							}
+							Global.speedMul = 1;
+						}
+						if (jDatas.Count > 0) {
+							Global.speedMul = wallObj.localSpeedMul;
+							foreach (CollideData collideDataJ in jDatas) {
+								wallObj.registerCollision(collideDataJ);
 							}
 							Global.speedMul = 1;
 						}

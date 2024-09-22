@@ -8,7 +8,7 @@ namespace MMXOnline;
 
 public partial class Actor : GameObject {
 	public Sprite sprite; //Current sprite
-	public bool useTerrainGrid { get; set; } = true;
+	public bool useTerrainGrid { get; set; } = false;
 	public bool useActorGrid { get; set; } = true;
 
 	public int frameIndex {

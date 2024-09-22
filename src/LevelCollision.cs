@@ -7,8 +7,8 @@ namespace MMXOnline;
 public struct Cell {
 	public int x;
 	public int y;
-	public HashSet<GameObject> gameobjects;
-	public Cell(int x, int y, HashSet<GameObject> gameobjects) {
+	public List<GameObject> gameobjects;
+	public Cell(int x, int y, List<GameObject> gameobjects) {
 		this.x = x;
 		this.y = y;
 		this.gameobjects = gameobjects;
@@ -23,13 +23,13 @@ public partial class Level {
 		int xCellCount = MathInt.Ceiling((decimal)width / (decimal)cellWidth);
 		int yCellCount = MathInt.Ceiling((decimal)height / (decimal)cellWidth);
 		//console.log("Creating grid with width " + hCellCount + " and height " + vCellCount);
-		grid = new HashSet<GameObject>[xCellCount, yCellCount];
-		terrainGrid = new HashSet<GameObject>[xCellCount, yCellCount];
+		grid = new List<GameObject>[xCellCount, yCellCount];
+		terrainGrid = new List<GameObject>[xCellCount, yCellCount];
 
 		for (var x = 0; x < xCellCount; x++) {
 			for (var y = 0; y < yCellCount; y++) {
-				grid[x, y] = new HashSet<GameObject>();
-				terrainGrid[x, y] = new HashSet<GameObject>();
+				grid[x, y] = new List<GameObject>();
+				terrainGrid[x, y] = new List<GameObject>();
 			}
 		}
 	}
@@ -239,16 +239,15 @@ public partial class Level {
 
 	public void modifyObjectGridGroups(GameObject obj, bool isActor, bool isTerrain) {
 		if (isActor) {
-			addToGrid(obj);
+			addToActorGrid(obj);
 			obj.useActorGrid = true;
 		} else {
-			removeFromGrid(obj);
+			removeFromActorGrid(obj);
 			obj.useActorGrid = false;
 		}
 		if (isTerrain) {
 			addTerrainToGrid(obj);
 			obj.useTerrainGrid = true;
-
 		} else {
 			removeFromTerrainGrid(obj);
 			obj.useTerrainGrid = false;
