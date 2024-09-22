@@ -112,6 +112,7 @@ public partial class Level {
 
 	public int startGoCount;
 	public int startGridCount;
+	public int startTGridCount;
 	public int flaggerCount;
 
 	public const ushort maxReservedNetId = firstNormalNetId - 1;
@@ -850,6 +851,7 @@ public partial class Level {
 
 		startGoCount = gameObjects.Count;
 		startGridCount = getGridCount();
+		startTGridCount = getTGridCount();
 
 		//var p = Global.level.mainPlayer;
 		//new Mechaniloid(new Point(128, 128), p, 1, new MechaniloidWeapon(p, MechaniloidType.Hopper), MechaniloidType.Hopper, p.getNextActorNetId(), true);
