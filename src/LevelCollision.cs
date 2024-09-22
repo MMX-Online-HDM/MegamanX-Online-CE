@@ -239,10 +239,10 @@ public partial class Level {
 
 	public void modifyObjectGridGroups(GameObject obj, bool isActor, bool isTerrain) {
 		if (isActor) {
-			addToGrid(obj);
+			addToActorGrid(obj);
 			obj.useActorGrid = true;
 		} else {
-			removeFromGrid(obj);
+			removeFromActorGrid(obj);
 			obj.useActorGrid = false;
 		}
 		if (isTerrain) {
