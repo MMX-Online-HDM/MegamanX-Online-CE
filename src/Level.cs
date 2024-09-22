@@ -1980,6 +1980,66 @@ public partial class Level {
 			}
 			Global.debugString2 = "Grid item count: " + gridItemCount.ToString();
 		}
+		else if (Global.showTerrainGridHitboxes) {
+			int gridItemCount = 0;
+			int offset = 0;
+			int startGridX = MathInt.Floor(camX / cellWidth);
+			int endGridX = MathInt.Ceiling((camX + Global.screenW) / cellWidth);
+			int startGridY = MathInt.Floor(camY / cellWidth);
+			int endGridY = MathInt.Ceiling((camY + Global.screenH) / cellWidth);
+
+			bool drawPos = (cellWidth >= 32);
+			int firstRowSize = 10;
+			string separator = "-";
+			if (cellWidth < 48) {
+				separator = "\n";
+				firstRowSize = 20;
+			}
+
+			startGridX = MathInt.Clamp(startGridX, 0, grid.GetLength(0));
+			endGridX = MathInt.Clamp(endGridX, 0, grid.GetLength(0));
+			startGridY = MathInt.Clamp(startGridY, 0, grid.GetLength(1));
+			endGridY = MathInt.Clamp(endGridY, 0, grid.GetLength(1));
+
+			for (int y = startGridY; y < endGridY; y++) {
+				for (int x = startGridX; x < endGridX; x++) {
+					if (terrainGrid[x, y].Count > 0) {
+						gridItemCount += terrainGrid[x, y].Count;
+						DrawWrappers.DrawRect(
+							x * cellWidth,
+							y * cellWidth,
+							cellWidth + (x * cellWidth) - 1,
+							cellWidth + (y * cellWidth) - 1,
+							true, new Color(200, 255, 200, 64), 1,
+							ZIndex.HUD - 15, true, new Color(128, 255, 128, 128)
+						);
+						if (cellWidth >= 32) {
+							Fonts.drawText(
+								FontType.Purple,
+								x.ToString() + separator + y.ToString(),
+								(x * cellWidth) + 1,
+								(y * cellWidth) + 1,
+								isWorldPos: true,
+								depth: ZIndex.HUD - 10,
+								alpha: 192
+							);
+							offset += firstRowSize;
+						}
+						Fonts.drawText(
+							FontType.DarkPurple,
+							terrainGrid[x, y].Count.ToString(),
+							(x * cellWidth),
+							offset + (y * cellWidth) + 1,
+							isWorldPos: true,
+							depth: ZIndex.HUD - 10,
+							alpha: 192
+						);
+						offset = 0;
+					}
+				}
+			}
+			Global.debugString2 = "Grid item count: " + gridItemCount.ToString();
+		}
 
 		if (Global.showAIDebug) {
 			foreach (var navMeshNode in navMeshNodes) {
