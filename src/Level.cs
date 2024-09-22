@@ -1164,7 +1164,6 @@ public partial class Level {
 		time += Global.spf;
 
 		updateLevelShaders();
-
 		checkAfk();
 
 		Global.input.updateAimToggle(mainPlayer);
@@ -1175,7 +1174,7 @@ public partial class Level {
 			syncValue = Helpers.lerp(syncValue, hostSyncValue.Value, Global.spf * 5f);
 		}
 
-		foreach (var platform in movingPlatforms) {
+		foreach (MovingPlatform platform in movingPlatforms) {
 			platform.update(syncValue);
 		}
 
@@ -1185,7 +1184,7 @@ public partial class Level {
 			if (speedX != 0 || speedY != 0) {
 				parallaxOffsets[i] = parallaxOffsets[i].add(new Point(Global.spf * speedX, Global.spf * speedY));
 
-				var parallaxTextures = levelData.getParallaxTextures(parallaxes[i].path);
+				Texture[,] parallaxTextures = levelData.getParallaxTextures(parallaxes[i].path);
 				if (parallaxTextures == null) continue;
 
 				Point size = Helpers.getTextureArraySize(parallaxTextures);
@@ -1204,8 +1203,8 @@ public partial class Level {
 			else if (Global.frameCount % 40 == 20) new Anim(new Point(1728, 690 + 10), "bubbles", 1, null, false) { vel = new Point(-100, 0), ttl = 4 };
 		}
 
-		foreach (var key in recentClipCount.Keys.ToList()) {
-			var val = recentClipCount[key];
+		foreach (string key in recentClipCount.Keys.ToList()) {
+			List<float> val = recentClipCount[key];
 			for (var i = val.Count - 1; i >= 0; i--) {
 				val[i] += Global.spf;
 				if (val[i] >= 0.05) {
@@ -1214,20 +1213,6 @@ public partial class Level {
 			}
 			recentClipCount[key] = val;
 		}
-
-		//this.gameMode.checkIfWin();
-
-		// Sort players by score
-		/*players.Sort((a, b) => {
-			if (a.kills > b.kills) return -1;
-			else if (a.kills == b.kills) {
-				if (a.deaths < b.deaths) return -1;
-				else if (a.deaths == b.deaths) return 0;
-				else return 1;
-			} else {
-				return 1;
-			}
-		});*/
 
 		for (int i = delayedActions.Count - 1; i >= 0; i--) {
 			delayedActions[i].time -= Global.spf;
@@ -1245,158 +1230,160 @@ public partial class Level {
 			playerY = camPlayer.character.getCamCenterPos().y;
 		}
 
-		bool isNon1v1Elimination = Global.level.isNon1v1Elimination();
-		var gos = gameObjects.ToList();
-		try {
-			foreach (GameObject go in gos) {
-				if (isTimeSlowed(go, out float slowAmount)) {
-					Global.speedMul = slowAmount;
-					go.localSpeedMul = slowAmount;
-				}
-				go.preUpdate();
-				go.statePreUpdate();
-				Global.speedMul = 1;
+		List<GameObject> gos = gameObjects.ToList();
+		foreach (GameObject go in gos) {
+			if (isTimeSlowed(go, out float slowAmount)) {
+				Global.speedMul = slowAmount;
+				go.localSpeedMul = slowAmount;
 			}
-			foreach (var ms in mapSprites) {
-				ms.sprite?.update();
+			go.preUpdate();
+			go.statePreUpdate();
+			Global.speedMul = 1;
+		}
+
+		foreach (Actor ms in mapSprites) {
+			ms.sprite?.update();
+		}
+
+		foreach (var go in gos) {
+			if (isTimeSlowed(go, out float slowAmount)) {
+				Global.speedMul = slowAmount;
+				go.localSpeedMul = slowAmount;
 			}
-			foreach (var go in gos) {
-				if (isTimeSlowed(go, out float slowAmount)) {
-					Global.speedMul = slowAmount;
-					go.localSpeedMul = slowAmount;
-				}
-				go.update();
-				go.stateUpdate();
-				if (isNon1v1Elimination && gameMode.virusStarted > 0 && go is Actor actor && actor.ownedByLocalPlayer && go is IDamagable damagable) {
-					Rect szRect = gameMode.safeZoneRect;
-					if (actor.collider != null) {
-						Rect colRect = actor.collider.shape.getRect();
-						float w4 = colRect.w() / 4;
-						float h4 = colRect.h() / 4;
-						colRect.x1 += w4;
-						colRect.y1 += h4;
-						colRect.x2 -= w4;
-						colRect.y2 -= h4;
-						if (!szRect.overlaps(colRect)) {
-							if (!damagable.projectileCooldown.ContainsKey("sigmavirus")) {
-								damagable.projectileCooldown["sigmavirus"] = 0;
-							}
-							if (damagable.projectileCooldown["sigmavirus"] == 0) {
-								actor.playSound("hit");
-								actor.addRenderEffect(RenderEffectType.Hit, 0.05f, 0.1f);
-								damagable.applyDamage(2, null, null, null, null);
-								damagable.projectileCooldown["sigmavirus"] = 1;
-							}
+			go.update();
+			go.stateUpdate();
+			if (isNon1v1Elimination() &&
+				gameMode.virusStarted > 0 && go is Actor actor &&
+				actor.ownedByLocalPlayer && go is IDamagable damagable
+			) {
+				var szRect = gameMode.safeZoneRect;
+				if (actor.collider != null) {
+					var colRect = actor.collider.shape.getRect();
+					var w4 = colRect.w() / 4;
+					var h4 = colRect.h() / 4;
+					colRect.x1 += w4;
+					colRect.y1 += h4;
+					colRect.x2 -= w4;
+					colRect.y2 -= h4;
+					if (!szRect.overlaps(colRect)) {
+						if (!damagable.projectileCooldown.ContainsKey("sigmavirus")) {
+							damagable.projectileCooldown["sigmavirus"] = 0;
+						}
+						if (damagable.projectileCooldown["sigmavirus"] == 0) {
+							actor.playSound("hit");
+							actor.addRenderEffect(RenderEffectType.Hit, 0.05f, 0.1f);
+							damagable.applyDamage(2, null, null, null, null);
+							damagable.projectileCooldown["sigmavirus"] = 1;
 						}
 					}
 				}
-				Global.speedMul = 1;
 			}
-			// Collision shenanigans.
-			collidedGObjs = new();
-			HashSet<int[]> arrayGrid = new(populatedGrids);
-			foreach (int[] gridData in arrayGrid) {
-				// Initalize data.
-				List<GameObject> currentGrid = new (grid[gridData[0], gridData[1]]);
-				List<GameObject> currentTerrainGrid = new (terrainGrid[gridData[0], gridData[1]]);
-				// Awfull GM19 order code.
-				// Iterate trough populated grids.
-				for (int i = 0; i < currentGrid.Count - 1; i++) {
-					// Skip terrain.
-					if (currentGrid[i] is Geometry or CrackedWall) {
+			Global.speedMul = 1;
+		}
+
+		// Collision shenanigans.
+		collidedGObjs = new();
+		HashSet<int[]> arrayGrid = new(populatedGrids);
+		foreach (int[] gridData in arrayGrid) {
+			// Initalize data.
+			List<GameObject> currentGrid = new(grid[gridData[0], gridData[1]]);
+			List<GameObject> currentTerrainGrid = new(terrainGrid[gridData[0], gridData[1]]);
+			// Awfull GM19 order code.
+			// Iterate trough populated grids.
+			for (int i = 0; i < currentGrid.Count - 1; i++) {
+				// Skip terrain.
+				if (currentGrid[i] is Geometry or CrackedWall) {
+					continue;
+				}
+				// Skip destroyed stuff.
+				if (currentGrid[i] is Actor { destroyed: true }) {
+					continue;
+				}
+				for (int j = i; j < currentGrid.Count; j++) {
+					// Skip terrain coliding with eachother.
+					if (currentGrid[j] is Geometry or CrackedWall) {
+						continue;
+					}
+					// Get order independent hash.
+					int hash = currentGrid[i].GetHashCode() ^ currentGrid[j].GetHashCode();
+					// Skip checked objects.
+					if (collidedGObjs.Contains(hash)) {
 						continue;
 					}
 					// Skip destroyed stuff.
-					if (currentGrid[i] is Actor { destroyed: true }) {
+					if (currentGrid[j] is Actor { destroyed: true }) {
 						continue;
 					}
-					for (int j = i; j < currentGrid.Count; j++) {
-						// Skip terrain coliding with eachother.
-						if (currentGrid[j] is Geometry or CrackedWall) {
-							continue;
-						}
-						// Get order independent hash.
-						int hash = currentGrid[i].GetHashCode() ^ currentGrid[j].GetHashCode();
-						// Skip checked objects.
-						if (collidedGObjs.Contains(hash)) {
-							continue;
-						}
-						// Skip destroyed stuff.
-						if (currentGrid[j] is Actor { destroyed: true }) {
-							continue;
-						}
-						// Add to hash as we check.
-						collidedGObjs.Add(hash);
-						// Do preliminary collision checks and skip if we do not instersect.
-						if (!checkLossyCollision(currentGrid[i], currentGrid[j])) {
-							continue;
-						}
-						(List<CollideData> iDatas, List<CollideData> jDatas) = getTriggerExact(
-							currentGrid[i], currentGrid[j]
-						);
-						if (iDatas.Count > 0) {
-							Global.speedMul = currentGrid[i].localSpeedMul;
-							iDatas = organizeTriggers(iDatas);
-							foreach (CollideData collideDataI in iDatas) {
-								currentGrid[i].registerCollision(collideDataI);
-							}
-							Global.speedMul = 1;
-						}
-						if (jDatas.Count > 0) {
-							Global.speedMul = currentGrid[j].localSpeedMul;
-							jDatas = organizeTriggers(jDatas);
-							foreach (CollideData collideDataJ in jDatas) {
-								currentGrid[j].registerCollision(collideDataJ);
-							}
-							Global.speedMul = 1;
-						}
+					// Add to hash as we check.
+					collidedGObjs.Add(hash);
+					// Do preliminary collision checks and skip if we do not instersect.
+					if (!checkLossyCollision(currentGrid[i], currentGrid[j])) {
+						continue;
 					}
-					foreach (GameObject wallObj in currentTerrainGrid) {
-						// Get order independent hash.
-						int hash = currentGrid[i].GetHashCode() ^ wallObj.GetHashCode();
-						// Skip checked objects.
-						if (collidedGObjs.Contains(hash)) {
-							continue;
+					(List<CollideData> iDatas, List<CollideData> jDatas) = getTriggerExact(
+						currentGrid[i], currentGrid[j]
+					);
+					if (iDatas.Count > 0) {
+						Global.speedMul = currentGrid[i].localSpeedMul;
+						iDatas = organizeTriggers(iDatas);
+						foreach (CollideData collideDataI in iDatas) {
+							currentGrid[i].registerCollision(collideDataI);
 						}
-						// Add to hash as we check.
-						collidedGObjs.Add(hash);
-						// Do preliminary collision checks and skip if we do not instersect.
-						if (!checkLossyCollision(currentGrid[i], wallObj)) {
-							continue;
+						Global.speedMul = 1;
+					}
+					if (jDatas.Count > 0) {
+						Global.speedMul = currentGrid[j].localSpeedMul;
+						jDatas = organizeTriggers(jDatas);
+						foreach (CollideData collideDataJ in jDatas) {
+							currentGrid[j].registerCollision(collideDataJ);
 						}
-						(List<CollideData> iDatas, List<CollideData> jDatas) = getTriggerExact(
-							currentGrid[i], wallObj
-						);
-						if (iDatas.Count > 0) {
-							Global.speedMul = currentGrid[i].localSpeedMul;
-							iDatas = organizeTriggers(iDatas);
-							foreach (CollideData collideDataI in iDatas) {
-								currentGrid[i].registerCollision(collideDataI);
-							}
-							Global.speedMul = 1;
+						Global.speedMul = 1;
+					}
+				}
+				foreach (GameObject wallObj in currentTerrainGrid) {
+					// Get order independent hash.
+					int hash = currentGrid[i].GetHashCode() ^ wallObj.GetHashCode();
+					// Skip checked objects.
+					if (collidedGObjs.Contains(hash)) {
+						continue;
+					}
+					// Add to hash as we check.
+					collidedGObjs.Add(hash);
+					// Do preliminary collision checks and skip if we do not instersect.
+					if (!checkLossyCollision(currentGrid[i], wallObj)) {
+						continue;
+					}
+					(List<CollideData> iDatas, List<CollideData> jDatas) = getTriggerExact(
+						currentGrid[i], wallObj
+					);
+					if (iDatas.Count > 0) {
+						Global.speedMul = currentGrid[i].localSpeedMul;
+						foreach (CollideData collideDataI in iDatas) {
+							currentGrid[i].registerCollision(collideDataI);
 						}
-						if (jDatas.Count > 0) {
-							Global.speedMul = wallObj.localSpeedMul;
-							foreach (CollideData collideDataJ in jDatas) {
-								wallObj.registerCollision(collideDataJ);
-							}
-							Global.speedMul = 1;
+						Global.speedMul = 1;
+					}
+					if (jDatas.Count > 0) {
+						Global.speedMul = wallObj.localSpeedMul;
+						foreach (CollideData collideDataJ in jDatas) {
+							wallObj.registerCollision(collideDataJ);
 						}
+						Global.speedMul = 1;
 					}
 				}
 			}
-			foreach (GameObject go in gos) {
-				if (isTimeSlowed(go, out float slowAmount)) {
-					Global.speedMul = slowAmount;
-					go.localSpeedMul = slowAmount;
-				}
-				go.postUpdate();
-				go.statePostUpdate();
-				Global.speedMul = 1;
-				go.netUpdate();
-			}
-		} finally {
 			Global.speedMul = 1;
+		}
+
+		foreach (GameObject go in gos) {
+			if (isTimeSlowed(go, out float slowAmount)) {
+				Global.speedMul = slowAmount;
+				go.localSpeedMul = slowAmount;
+			}
+			go.postUpdate();
+			go.statePostUpdate();
+			Global.speedMul = 1;
+			go.netUpdate();
 		}
 
 		if (camPlayer.character != null) {
@@ -1578,7 +1565,6 @@ public partial class Level {
 		}
 
 		//this.getTotalCountInGrid();
-
 		updateMusicSources();
 	}
 
@@ -2542,9 +2528,10 @@ public partial class Level {
 	}
 
 	public void clearOldActors() {
-		foreach ((ushort actorId, Actor actor) in destroyedActorsById) {
+		Dictionary<ushort, Actor> destroyedActorsByIdClone = new(destroyedActorsById);
+		foreach ((ushort actorId, Actor actor) in destroyedActorsByIdClone) {
 			long framesDestroyed = frameCount - actor.destroyedOnFrame;
-			if (framesDestroyed >= 1200) {
+			if (framesDestroyed >= 240) {
 				destroyedActorsById.Remove(actorId);
 			}
 		}
