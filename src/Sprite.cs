@@ -424,6 +424,7 @@ public class Sprite {
 			bool isShootSprite = needsX3BusterCorrection();
 
 			float xOff = 0;
+			float extraY = 0;
 			float extraW = 0;
 			float flippedExtraW = 0;
 
@@ -435,6 +436,9 @@ public class Sprite {
 				} else {
 					extraW = 5;
 				}
+			}
+			if (armors[2] == 2) {
+				extraY = 1;
 			}
 
 			var x3ArmShaders = new List<ShaderWrapper>(shaders);
@@ -463,8 +467,9 @@ public class Sprite {
 				DrawWrappers.DrawCompositeTexture(
 					drawTextures.ToArray(),
 					currentFrame.rect.x1 - flippedExtraW,
-					currentFrame.rect.y1, currentFrame.rect.w() + extraW,
-					currentFrame.rect.h(),
+					currentFrame.rect.y1 - extraY,
+					currentFrame.rect.w() + extraW,
+					currentFrame.rect.h() + extraY * 2,
 					x + frameOffsetX + xOff,
 					y + frameOffsetY,
 					zIndex, cx, cy, xDirArg, yDirArg,
