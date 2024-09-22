@@ -171,7 +171,7 @@ public class NapalmPartProj : Projectile {
 	public override void update() {
 		base.update();
 
-		if (isUnderwater()) {
+		if (useGravity && isUnderwater()) {
 			destroySelf(disableRpc: true);
 			return;
 		}
@@ -185,6 +185,7 @@ public class NapalmPartProj : Projectile {
 		}
 		else if (grounded && useGravity) {
 			useGravity = false;
+			isStatic = true;
 		}
 	}
 
