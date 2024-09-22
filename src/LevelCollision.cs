@@ -202,8 +202,8 @@ public partial class Level {
 
 	public int getTGridCount() {
 		int gridItemCount = 0;
-		for (int x = 0; x < grid.GetLength(0); x++) {
-			for (int y = 0; y < grid.GetLength(1); y++) {
+		for (int x = 0; x < terrainGrid.GetLength(0); x++) {
+			for (int y = 0; y < terrainGrid.GetLength(1); y++) {
 				if (grid[x, y].Count > 0) {
 					gridItemCount += terrainGrid[x, y].Count;
 				}
