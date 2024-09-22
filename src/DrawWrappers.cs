@@ -66,7 +66,7 @@ public class DrawableSprite : IDrawableWrapper {
 	) {
 		Global.window.SetView(Global.view);
 		// No shaders.
-		if (shaders.Length == 0) {
+		if (shaders.Length == 0 || Options.main.disableShaders) {
 			return (drawable, states);
 		}
 		// Multi-shader.
