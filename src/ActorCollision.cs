@@ -264,12 +264,18 @@ public partial class Actor {
 	}
 
 	public void incPos(Point amount) {
+		if (amount == Point.zero) {
+			return;
+		}
 		Global.level.removeFromGrid(this);
 		pos.inc(amount);
 		Global.level.addToGrid(this);
 	}
 
 	public void changePos(Point newPos) {
+		if (newPos == pos) {
+			return;
+		}
 		Global.level.removeFromGrid(this);
 		pos = newPos;
 		Global.level.addToGrid(this);
@@ -329,6 +335,9 @@ public partial class Actor {
 		Point amount, bool useDeltaTime = true, bool pushIncline = true,
 		bool useIce = true, MoveClampMode clampMode = MoveClampMode.None
 	) {
+		if (amount == Point.zero) {
+			return;
+		}
 		var times = useDeltaTime ? Global.spf : 1;
 
 		if (grounded && groundedIce && useIce && (
