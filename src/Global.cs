@@ -140,6 +140,7 @@ public partial class Global {
 
 	public static bool showHitboxes = false;
 	public static bool showGridHitboxes = false;
+	public static bool showTerrainGridHitboxes = false;
 	public static bool showAIDebug = false;
 	public static bool debugDrop = false;
 	public static bool debugCharMovement = false;

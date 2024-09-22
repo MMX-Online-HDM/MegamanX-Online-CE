@@ -236,6 +236,7 @@ public class DevConsole {
 		new Command("serverport", (args) => printServerPort(args), false),
 		new Command("radminip", (args) => printRadminIP(args), false),
 		new Command("grid", (args) => showOrHideGrid(args), false),
+		new Command("tgrid", (args) => Global.showTerrainGridHitboxes = !Global.showTerrainGridHitboxes, false),
 		new Command("dumpnetids", (args) => Helpers.WriteToFile("netIdDump.txt", Global.level.getNetIdDump())),
 		new Command(
 			"dumpkillfeed",
@@ -268,6 +269,7 @@ public class DevConsole {
 		new Command("raflight", (args) => Global.level.rideArmorFlight = !Global.level.rideArmorFlight),
 		// Online
 		new Command("diagnostics", (args) => Global.showDiagnostics = !Global.showDiagnostics, false),
+		new Command("diag", (args) => Global.showDiagnostics = !Global.showDiagnostics, false),
 		new Command("clear", (args) => consoleLog.Clear(), false),
 		new Command("musicend", (args) => setMusicNearEnd()),
 		// GMTODO: remove
