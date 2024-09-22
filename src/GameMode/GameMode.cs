@@ -1691,11 +1691,15 @@ public class GameMode {
 
 			Fonts.drawText(
 				FontType.Grey,
-				"Start GridItem Count: " + level.startGridCount, topLeftX, topLeftY + (currentLineH += lineHeight)
+				"GridItem Count: " +
+				level.startGridCount + "-" + level.getGridCount(),
+				topLeftX, topLeftY + (currentLineH += lineHeight)
 			);
 			Fonts.drawText(
 				FontType.Grey,
-				"Current GridItem Count: " + level.getGridCount(), topLeftX, topLeftY + (currentLineH += lineHeight)
+				"TGridItem Count: " +
+				level.startTGridCount + "-" + level.getTGridCount(),
+				topLeftX, topLeftY + (currentLineH += lineHeight)
 			);
 
 			Fonts.drawText(

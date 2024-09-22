@@ -348,8 +348,8 @@ class Program {
 	private static void update() {
 		if (Global.levelStarted()) {
 			Global.level.update();
-			if (!Global.isSkippingFrames) {
-				Global.level.clearOldActors();
+			if (Global.serverClient != null && Global.level.nonSkippedframeCount % 300 == 0) {
+				new Task(Global.level.clearOldActors).Start();
 			}
 		}
 		Menu.update();
@@ -1294,7 +1294,7 @@ class Program {
 			}
 			// Disable frameskip in the menu.
 			if (Global.level != null) {
-				useFrameSkip = true;
+				useFrameSkip = false;
 			} else {
 				useFrameSkip = false;
 			}

@@ -1333,7 +1333,8 @@ public partial class Actor : GameObject {
 		if (!destroyed) {
 			destroyed = true;
 			destroyedOnFrame = Global.frameCount;
-			if (netId is not null &&
+			if (Global.serverClient != null &&
+				netId is not null &&
 				Global.level.actorsById.ContainsKey(netId.Value)
 			) {
 				if (Global.level.actorsById[netId.Value] == this) {
@@ -1471,6 +1472,7 @@ public partial class Actor : GameObject {
 	}
 
 	public SoundWrapper? playSound(SoundBufferWrapper soundBuffer, bool forcePlay = false, bool sendRpc = false) {
+		return null;
 		var recentClipCount = Global.level.recentClipCount;
 		if (recentClipCount.ContainsKey(soundBuffer.soundKey) &&
 			recentClipCount[soundBuffer.soundKey].Count > 1

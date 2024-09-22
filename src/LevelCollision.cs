@@ -200,6 +200,18 @@ public partial class Level {
 		return gridItemCount;
 	}
 
+	public int getTGridCount() {
+		int gridItemCount = 0;
+		for (int x = 0; x < terrainGrid.GetLength(0); x++) {
+			for (int y = 0; y < terrainGrid.GetLength(1); y++) {
+				if (grid[x, y].Count > 0) {
+					gridItemCount += terrainGrid[x, y].Count;
+				}
+			}
+		}
+		return gridItemCount;
+	}
+
 	public void getTotalCountInGrid() {
 		var count = 0;
 		var orphanedCount = 0;
@@ -916,11 +928,11 @@ public partial class Level {
 		}
 		foreach (Collider collider1 in collidersOne) {
 			foreach (Collider collider2 in collidersTwo) {
-				bool isTrigger1 = false;
+				bool isTrigger1 = true;
 				if (firstActor != null) {
 					isTrigger1 = shouldTrigger(firstActor, secondObj, collider1, collider2, new Point(0, 0));
 				}
-				bool isTrigger2 = false;
+				bool isTrigger2 = true;
 				if (secondActor != null) {
 					isTrigger2 = shouldTrigger(secondActor, secondObj, collider1, collider2, new Point(0, 0));
 				}
