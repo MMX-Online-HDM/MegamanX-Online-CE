@@ -70,10 +70,6 @@ public partial class Actor {
 			if (stdColl == null) {
 				return null;
 			}
-			Collider? lvColl = getTerrainCollider();
-			if (lvColl != null) {
-				return lvColl;
-			}
 			return stdColl;
 		}
 	}
@@ -395,17 +391,14 @@ public partial class Actor {
 				otherChara.insideCharacter = true;
 				continue;
 			}
-
 			Point? freeVec = null;
 			if (this is RideChaser rc && physicsCollider != null) {
 				// Hack to make ride chasers not get stuck on inclines
 				freeVec = physicsCollider.shape.getMinTransVectorDir(collideData.otherCollider.shape, new Point(0, -1));
 			}
-
 			if ((freeVec == null || freeVec.Value.magnitude > 20) && physicsCollider != null) {
 				freeVec = physicsCollider.shape.getMinTransVector(collideData.otherCollider.shape);
 			}
-
 			if (freeVec == null) {
 				return;
 			}

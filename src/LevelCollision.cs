@@ -578,7 +578,7 @@ public partial class Level {
 	public List<CollideData> raycastAll(Point pos1, Point pos2, List<Type> classNames, bool isChargeBeam = false) {
 		var hits = new List<CollideData>();
 		var shape = new Shape(new List<Point>() { pos1, pos2 });
-		var gameObjects = getTerrainInSameCell(shape);
+		List<GameObject> gameObjects = getTerrainInSameCell(shape);
 		foreach (var go in gameObjects) {
 			if (go.collider == null) continue;
 			if (!isOfClass(go, classNames)) continue;
@@ -775,7 +775,7 @@ public partial class Level {
 		Actor actor, float incX, float incY, Point? vel = null, bool autoVel = false,
 		bool checkPlatforms = false
 	) {
-		return checkTerrainCollision(actor, incX, incY, vel, autoVel, checkPlatforms).FirstOrDefault();
+		return checkTerrainCollision(actor, incX, incY, vel, autoVel, true, checkPlatforms).FirstOrDefault();
 	}
 
 	public List<CollideData> checkTerrainCollision(
@@ -789,11 +789,6 @@ public partial class Level {
 		if (terrainCollider == null) {
 			terrainCollider = actor.standartCollider;
 		}
-		if (actor.spriteToCollider.ContainsKey(actor.sprite.name) &&
-			actor.spriteToCollider[actor.sprite.name] == null
-		) {
-			return collideDatas;
-		}
 		// If there is no collider we return.
 		if (actor.standartCollider == null) {
 			return collideDatas;
@@ -802,7 +797,7 @@ public partial class Level {
 			vel = new Point(incX, incY);
 		}
 		Shape actorShape = actor.collider.shape.clone(incX, incY);
-		GameObject[] gameObjects = getTerrainInSameCell(actorShape);
+		List<GameObject> gameObjects = getTerrainInSameCell(actorShape);
 		foreach (GameObject go in gameObjects) {
 			if (go == actor) continue;
 			if (go.collider == null) continue;
@@ -811,7 +806,7 @@ public partial class Level {
 				isTrigger = false;
 			}
 			if (isTrigger) continue;
-			HitData hitData = actorShape.intersectsShape(go.collider.shape, vel);
+			HitData? hitData = actorShape.intersectsShape(go.collider.shape, vel);
 			if (hitData != null) {
 				collideDatas.Add(new CollideData(actor.collider, go.collider, vel, isTrigger, go, hitData));
 				if (returnOne) {
@@ -823,18 +818,20 @@ public partial class Level {
 		return collideDatas;
 	}
 
-	public GameObject[] getTerrainInSameCell(Shape shape) {
+	public List<GameObject> getTerrainInSameCell(Shape shape) {
 		List<Cell> cells = getTerrainCells(shape);
-		HashSet<GameObject> retGameobjects = new();
+		List<GameObject> retGameobjects = new();
+		HashSet<GameObject> gameobjectsChecked = new();
 		foreach (Cell cell in cells) {
 			if (cell.gameobjects == null) continue;
 			foreach (GameObject go in cell.gameobjects) {
-				if (!retGameobjects.Contains(go)) {
+				if (!gameobjectsChecked.Contains(go)) {
+					gameobjectsChecked.Add(go);
 					retGameobjects.Add(go);
 				}
 			}
 		}
-		return retGameobjects.ToArray();
+		return retGameobjects;
 	}
 
 	//Optimize this function, it will be called a lot

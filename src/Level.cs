@@ -1292,7 +1292,8 @@ public partial class Level {
 			}
 			// Collision shenanigans.
 			collidedGObjs = new();
-			foreach (var gridData in populatedGrids.ToArray()) {
+			HashSet<int[]> arrayGrid = new(populatedGrids);
+			foreach (int[] gridData in arrayGrid) {
 				// Initalize data.
 				HashSet<GameObject> currentGrid = grid[gridData[0], gridData[1]];
 				HashSet<GameObject> currentTerrainGrid = terrainGrid[gridData[0], gridData[1]];

@@ -1742,10 +1742,7 @@ public partial class Actor : GameObject {
 	}
 
 	public CollideData? getHitWall(float x, float y) {
-		var hits = Global.level.checkTerrainCollision(this, x, y, checkPlatforms: true);
-		var bestWall = hits.FirstOrDefault(h => h.gameObject is Wall wall && !wall.collider.isClimbable);
-		if (bestWall != null) return bestWall;
-		return hits.FirstOrDefault();
+		return Global.level.checkTerrainCollisionOnce(this, x, y, checkPlatforms: true);
 	}
 
 	public void setRaColorShader() {
