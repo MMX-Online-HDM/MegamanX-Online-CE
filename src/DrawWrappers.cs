@@ -69,12 +69,6 @@ public class DrawableSprite : IDrawableWrapper {
 		if (shaders.Length == 0) {
 			return (drawable, states);
 		}
-		// One shader.
-		else if (shaders.Length == 1 && color == Color.White) {
-			RenderStates renderStates = new RenderStates(states);
-			renderStates.Shader = shaders[0].getShader();
-			return (drawable, renderStates);
-		}
 		// Multi-shader.
 		else {
 			var sprite = drawable as SFML.Graphics.Sprite;
@@ -107,11 +101,10 @@ public class DrawableSprite : IDrawableWrapper {
 			// Create a clear texture first.
 			back.Clear(new Color(0, 0, 0, 0));
 			back.Display();
-			renderStates.Shader = shaders[0].getShader();
 			back.Draw(sprite, renderStates);
 			back.Display();
 			// Iterate shaders.
-			for (int num = 1; num < shaders.Length; num++) {
+			for (int num = 0; num < shaders.Length; num++) {
 				// Clear image.
 				renderStates = new RenderStates(states);
 				front.Clear(new Color(0, 0, 0, 0));

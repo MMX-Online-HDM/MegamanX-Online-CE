@@ -260,63 +260,117 @@ public class Sprite {
 
 		Texture bitmap = animData.bitmap;
 
-		if (renderEffects != null && !renderEffects.Contains(RenderEffectType.Invisible)) {
-			if (renderEffects.Contains(RenderEffectType.BlueShadow) && alpha >= 1) {
-				var blueShader = Helpers.cloneShaderSafe("outline_blue");
-				if (blueShader != null) {
-					blueShader.SetUniform(
-						"textureSize",
-						new SFML.Graphics.Glsl.Vec2(bitmap.Size.X, bitmap.Size.Y)
-					);
-					DrawWrappers.DrawTexture(
-						bitmap,
-						currentFrame.rect.x1 - 1, currentFrame.rect.y1 - 1,
-						currentFrame.rect.w() + 2, currentFrame.rect.h() + 2,
-						x + frameOffsetX - (1 * xDirArg),
-						y + frameOffsetY - (1 * yDirArg),
-						zIndex,
-						cx, cy, xDirArg, yDirArg, angle, alpha,
-						new List<ShaderWrapper>() { blueShader }, true
-					);
+		bool isCompositeSprite = false;
+		List<Texture> compositeBitmaps = new();
+		float extraY = 0;
+		float extraYOff = 0;
+		float extraW = 0;
+		float flippedExtraW = 0;
+		float extraXOff = 0;
+
+		if (isUltX) {
+			bitmap = Global.textures["XUltimate"];
+			extraYOff = 3;
+			extraY = 3;
+			armors = null;
+		}
+
+		if (isUPX) {
+			bitmap = Global.textures["XUP"];
+		}
+
+		if (!isUltX && armors != null && animData.isXSprite) {
+			bool isShootSprite = needsX3BusterCorrection();
+
+			if (isShootSprite) {
+				if (name.Contains("mmx_wall_slide_shoot")) {
+					flippedExtraW = 5;
+					extraW = flippedExtraW;
+					extraXOff = -flippedExtraW * flipX;
+				} else {
+					extraW = 5;
 				}
-			} else if (renderEffects.Contains(RenderEffectType.RedShadow) && alpha >= 1) {
-				var redShader = Helpers.cloneShaderSafe("outline_red");
-				if (redShader != null) {
-					redShader.SetUniform(
-						"textureSize",
-						new SFML.Graphics.Glsl.Vec2(bitmap.Size.X, bitmap.Size.Y)
-					);
-					DrawWrappers.DrawTexture(
-						bitmap,
-						currentFrame.rect.x1 - 1, currentFrame.rect.y1 - 1,
-						currentFrame.rect.w() + 2, currentFrame.rect.h() + 2,
-						x + frameOffsetX - (1 * xDirArg),
-						y + frameOffsetY - (1 * yDirArg),
-						zIndex - 10,
-						cx, cy, xDirArg, yDirArg, angle, alpha,
-						new List<ShaderWrapper>() { redShader }, true
-					);
-				}
-			} else if (renderEffects.Contains(RenderEffectType.GreenShadow) && alpha >= 1) {
-				var greenShader = Helpers.cloneShaderSafe("outline_green");
-				if (greenShader != null) {
-					greenShader.SetUniform(
-						"textureSize",
-						new SFML.Graphics.Glsl.Vec2(bitmap.Size.X, bitmap.Size.Y)
-					);
-					DrawWrappers.DrawTexture(
-						bitmap,
-						currentFrame.rect.x1 - 1, currentFrame.rect.y1 - 1,
-						currentFrame.rect.w() + 2, currentFrame.rect.h() + 2,
-						x + frameOffsetX - (1 * xDirArg),
-						y + frameOffsetY - (1 * yDirArg),
-						zIndex,
-						cx, cy, xDirArg, yDirArg, angle, alpha,
-						new List<ShaderWrapper>() { greenShader }, true
-					);
+			}
+			if (armors[2] == 2) {
+				extraYOff = 0;
+				extraY = 2;
+			}
+
+			var x3ArmShaders = new List<ShaderWrapper>(shaders);
+			if (hyperBusterReady) {
+				if (Global.isOnFrameCycle(5)) {
+					if (Global.shaderWrappers.ContainsKey("hit")) {
+						x3ArmShaders.Add(Global.shaderWrappers["hit"]);
+					}
 				}
 			}
 
+			compositeBitmaps.Add(bitmap);
+			if (armors[2] > 0) {
+				compositeBitmaps.Add(xArmorHelmetBitmap[armors[2] - 1]);
+			}
+			if (armors[0] > 0) {
+				compositeBitmaps.Add(xArmorBootsBitmap[armors[0] - 1]);
+			}
+			if (armors[1] > 0) {
+				compositeBitmaps.Add(xArmorBodyBitmap[armors[1] - 1]);
+			}
+			if (armors[3] > 0) {
+				compositeBitmaps.Add(xArmorArmBitmap[armors[3] - 1]);
+			}
+			if (compositeBitmaps.Count > 1) {
+				isCompositeSprite = true;
+			}
+		}
+
+		if (renderEffects != null && !renderEffects.Contains(RenderEffectType.Invisible)) {
+			if (alpha >= 1 && (
+				renderEffects.Contains(RenderEffectType.BlueShadow) ||
+				renderEffects.Contains(RenderEffectType.RedShadow) ||
+				renderEffects.Contains(RenderEffectType.GreenShadow)
+			)) {
+				ShaderWrapper? outlineShader = null;
+				if (renderEffects.Contains(RenderEffectType.BlueShadow)) {
+					outlineShader = Helpers.cloneShaderSafe("outline_blue");
+				} else if (renderEffects.Contains(RenderEffectType.RedShadow)) {
+					outlineShader = Helpers.cloneShaderSafe("outline_red");
+				} else if (renderEffects.Contains(RenderEffectType.GreenShadow)) {
+					outlineShader = Helpers.cloneShaderSafe("outline_green");
+				}
+				if (outlineShader != null) {
+					if (!isCompositeSprite) {
+						outlineShader.SetUniform(
+							"textureSize",
+							new SFML.Graphics.Glsl.Vec2(currentFrame.rect.w() + 2, currentFrame.rect.h() + 2)
+						);
+						DrawWrappers.DrawTexture(
+							bitmap,
+							currentFrame.rect.x1 - 1, currentFrame.rect.y1 - 1,
+							currentFrame.rect.w() + 2, currentFrame.rect.h() + 2,
+							x + frameOffsetX - (1 * xDirArg),
+							y + frameOffsetY - (1 * yDirArg),
+							zIndex,
+							cx, cy, xDirArg, yDirArg, angle, alpha,
+							[ outlineShader ], true
+						);
+					} else {
+						outlineShader.SetUniform(
+							"textureSize",
+							new SFML.Graphics.Glsl.Vec2(currentFrame.rect.w() + 4, currentFrame.rect.h() + 4)
+						);
+						DrawWrappers.DrawCompositeTexture(
+							compositeBitmaps.ToArray(),
+							currentFrame.rect.x1 - 2, currentFrame.rect.y1 - 2,
+							currentFrame.rect.w() + 4, currentFrame.rect.h() + 4,
+							x + frameOffsetX - (2 * xDirArg),
+							y + frameOffsetY - (2 * yDirArg),
+							zIndex,
+							cx, cy, xDirArg, yDirArg, angle, alpha,
+							[ outlineShader ], true
+						);
+					}
+				}
+			}
 			if (name is "boomerk_dash" or "boomerk_bald_dash" && (animTime > 0 || frameIndex > 0)) {
 				if (Global.isOnFrameCycle(4)) {
 					var trail = lastTwoBkTrailDraws.ElementAtOrDefault(5);
@@ -381,7 +435,6 @@ public class Sprite {
 					time = 0.25f
 				});
 			}
-
 			if (renderEffects.Contains(RenderEffectType.SpeedDevilTrail) && character != null && Global.shaderWrappers.ContainsKey("speedDevilTrail")) {
 				for (int i = character.lastFiveTrailDraws.Count - 1; i >= 0; i--) {
 					Trail trail = character.lastFiveTrailDraws[i];
@@ -409,78 +462,28 @@ public class Sprite {
 			}
 		}
 
-		float extraYOff = 0;
-		if (isUltX) {
-			bitmap = Global.textures["XUltimate"];
-			extraYOff = 3;
-			armors = null;
+		if (!isCompositeSprite) {
+			DrawWrappers.DrawTexture(
+				bitmap,
+				currentFrame.rect.x1,
+				currentFrame.rect.y1 - extraYOff,
+				currentFrame.rect.w(),
+				currentFrame.rect.h() + extraY,
+				x + frameOffsetX, y + frameOffsetY - extraYOff,
+				zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true);
+		} else {
+			DrawWrappers.DrawCompositeTexture(
+				compositeBitmaps.ToArray(),
+				currentFrame.rect.x1 - flippedExtraW,
+				currentFrame.rect.y1 - extraYOff,
+				currentFrame.rect.w() + extraW,
+				currentFrame.rect.h() + extraY,
+				x + frameOffsetX + extraXOff,
+				y + frameOffsetY,
+				zIndex, cx, cy, xDirArg, yDirArg,
+				angle, alpha, shaders, true
+			);
 		}
-
-		if (isUPX) {
-			bitmap = Global.textures["XUP"];
-		}
-
-		if (armors != null && animData.isXSprite) {
-			bool isShootSprite = needsX3BusterCorrection();
-
-			float xOff = 0;
-			float extraY = 0;
-			float extraW = 0;
-			float flippedExtraW = 0;
-
-			if (isShootSprite) {
-				if (name.Contains("mmx_wall_slide_shoot")) {
-					flippedExtraW = 5;
-					extraW = flippedExtraW;
-					xOff = -flippedExtraW * flipX;
-				} else {
-					extraW = 5;
-				}
-			}
-			if (armors[2] == 2) {
-				extraY = 1;
-			}
-
-			var x3ArmShaders = new List<ShaderWrapper>(shaders);
-			if (hyperBusterReady) {
-				if (Global.isOnFrameCycle(5)) {
-					if (Global.shaderWrappers.ContainsKey("hit")) {
-						x3ArmShaders.Add(Global.shaderWrappers["hit"]);
-					}
-				}
-			}
-
-			List<Texture> drawTextures = [bitmap];
-			if (armors[2] > 0) {
-				drawTextures.Add(xArmorHelmetBitmap[armors[2] - 1]);
-			}
-			if (armors[0] > 0) {
-				drawTextures.Add(xArmorBootsBitmap[armors[0] - 1]);
-			}
-			if (armors[1] > 0) {
-				drawTextures.Add(xArmorBodyBitmap[armors[1] - 1]);
-			}
-			if (armors[3] > 0) {
-				drawTextures.Add(xArmorArmBitmap[armors[3] - 1]);
-			}
-			if (drawTextures.Count > 1) {
-				DrawWrappers.DrawCompositeTexture(
-					drawTextures.ToArray(),
-					currentFrame.rect.x1 - flippedExtraW,
-					currentFrame.rect.y1 - extraY,
-					currentFrame.rect.w() + extraW,
-					currentFrame.rect.h() + extraY * 2,
-					x + frameOffsetX + xOff,
-					y + frameOffsetY,
-					zIndex, cx, cy, xDirArg, yDirArg,
-					angle, alpha, shaders, true
-				);
-				return;
-			}
-		}
-
-		DrawWrappers.DrawTexture(bitmap, currentFrame.rect.x1, currentFrame.rect.y1 - extraYOff, currentFrame.rect.w(), currentFrame.rect.h() + extraYOff, x + frameOffsetX, y + frameOffsetY - extraYOff, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true);
-
 		if (isUPX) {
 			var upShaders = new List<ShaderWrapper>(shaders);
 			if (Global.isOnFrameCycle(5)) {
