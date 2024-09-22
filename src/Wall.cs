@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using SFML.Graphics;
@@ -275,6 +275,9 @@ public class CrackedWall : Actor, IDamagable {
 	}
 
 	public void move(Point deltaPos) {
+		if (deltaPos == Point.zero) {
+			return;
+		}
 		Global.level.removeFromGrid(this);
 		incPos(deltaPos);
 		Global.level.addToGrid(this);
@@ -431,6 +434,9 @@ public class KillZone : Geometry {
 	}
 
 	public void move(Point deltaPos) {
+		if (deltaPos == Point.zero) {
+			return;
+		}
 		Global.level.removeFromGrid(this);
 		for (int i = 0; i < collider._shape.points.Count; i++) {
 			Point point = collider._shape.points[i];
