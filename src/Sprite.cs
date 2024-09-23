@@ -354,95 +354,96 @@ public class Sprite {
 					);
 				}
 			}
-		}
-		if (name is "boomerk_dash" or "boomerk_bald_dash" && (animTime > 0 || frameIndex > 0)) {
-			if (Global.isOnFrameCycle(4)) {
-				var trail = lastTwoBkTrailDraws.ElementAtOrDefault(5);
-				if (trail != null) {
-					trail.action.Invoke(trail.time);
-					trail.time -= Global.spf;
+		
+			if (name is "boomerk_dash" or "boomerk_bald_dash" && (animTime > 0 || frameIndex > 0)) {
+				if (Global.isOnFrameCycle(4)) {
+					var trail = lastTwoBkTrailDraws.ElementAtOrDefault(5);
+					if (trail != null) {
+						trail.action.Invoke(trail.time);
+						trail.time -= Global.spf;
+					}
+				} else {
+					var trail = lastTwoBkTrailDraws.ElementAtOrDefault(9);
+					if (trail != null) {
+						trail.action.Invoke(trail.time);
+						trail.time -= Global.spf;
+					}
 				}
+
+				var shaderList = new List<ShaderWrapper>();
+				if (Global.shaderWrappers.ContainsKey("boomerkTrail")) {
+					ShaderWrapper boomerkTrail = Global.shaderWrappers["boomerkTrail"];
+					boomerkTrail.SetUniform("paletteTexture", Global.textures["boomerkTrailPalette"]);
+					shaderList.Add(boomerkTrail);
+				}
+
+				if (lastTwoBkTrailDraws.Count > 10) {
+					lastTwoBkTrailDraws.PopFirst();
+				}
+				lastTwoBkTrailDraws.Add(new Trail() {
+					action = (float time) => {
+						DrawWrappers.DrawTexture(
+							bitmap,
+							animData.frames[1].rect.x1,
+							animData.frames[1].rect.y1,
+							animData.frames[1].rect.w(),
+							animData.frames[1].rect.h(),
+							x + frameOffsetX, y + frameOffsetY,
+							zIndex, cx, cy,
+							xDirArg, yDirArg,
+							angle, alpha,
+							shaderList, true
+						);
+					},
+					time = 0.25f
+				});
 			} else {
-				var trail = lastTwoBkTrailDraws.ElementAtOrDefault(9);
-				if (trail != null) {
+				lastTwoBkTrailDraws.Clear();
+			}
+
+			if (renderEffects.Contains(RenderEffectType.Trail)) {
+				for (int i = lastFiveTrailDraws.Count - 1; i >= 0; i--) {
+					var trail = lastFiveTrailDraws[i];
 					trail.action.Invoke(trail.time);
 					trail.time -= Global.spf;
 				}
+
+				var shaderList = new List<ShaderWrapper>();
+				if (Global.shaderWrappers.ContainsKey("trail")) shaderList.Add(Global.shaderWrappers["trail"]);
+
+				if (lastFiveTrailDraws.Count > 5) lastFiveTrailDraws.PopFirst();
+				lastFiveTrailDraws.Add(new Trail() {
+					action = (float time) => {
+						DrawWrappers.DrawTexture(bitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaderList, true);
+					},
+					time = 0.25f
+				});
 			}
-
-			var shaderList = new List<ShaderWrapper>();
-			if (Global.shaderWrappers.ContainsKey("boomerkTrail")) {
-				ShaderWrapper boomerkTrail = Global.shaderWrappers["boomerkTrail"];
-				boomerkTrail.SetUniform("paletteTexture", Global.textures["boomerkTrailPalette"]);
-				shaderList.Add(boomerkTrail);
-			}
-
-			if (lastTwoBkTrailDraws.Count > 10) {
-				lastTwoBkTrailDraws.PopFirst();
-			}
-			lastTwoBkTrailDraws.Add(new Trail() {
-				action = (float time) => {
-					DrawWrappers.DrawTexture(
-						bitmap,
-						animData.frames[1].rect.x1,
-						animData.frames[1].rect.y1,
-						animData.frames[1].rect.w(),
-						animData.frames[1].rect.h(),
-						x + frameOffsetX, y + frameOffsetY,
-						zIndex, cx, cy,
-						xDirArg, yDirArg,
-						angle, alpha,
-						shaderList, true
-					);
-				},
-				time = 0.25f
-			});
-		} else {
-			lastTwoBkTrailDraws.Clear();
-		}
-
-		if (renderEffects.Contains(RenderEffectType.Trail)) {
-			for (int i = lastFiveTrailDraws.Count - 1; i >= 0; i--) {
-				var trail = lastFiveTrailDraws[i];
-				trail.action.Invoke(trail.time);
-				trail.time -= Global.spf;
-			}
-
-			var shaderList = new List<ShaderWrapper>();
-			if (Global.shaderWrappers.ContainsKey("trail")) shaderList.Add(Global.shaderWrappers["trail"]);
-
-			if (lastFiveTrailDraws.Count > 5) lastFiveTrailDraws.PopFirst();
-			lastFiveTrailDraws.Add(new Trail() {
-				action = (float time) => {
-					DrawWrappers.DrawTexture(bitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaderList, true);
-				},
-				time = 0.25f
-			});
-		}
-		if (renderEffects.Contains(RenderEffectType.SpeedDevilTrail) && character != null && Global.shaderWrappers.ContainsKey("speedDevilTrail")) {
-			for (int i = character.lastFiveTrailDraws.Count - 1; i >= 0; i--) {
-				Trail trail = character.lastFiveTrailDraws[i];
-				if (character.isDashing) {
-					trail.action.Invoke(trail.time);
+			if (renderEffects.Contains(RenderEffectType.SpeedDevilTrail) && character != null && Global.shaderWrappers.ContainsKey("speedDevilTrail")) {
+				for (int i = character.lastFiveTrailDraws.Count - 1; i >= 0; i--) {
+					Trail trail = character.lastFiveTrailDraws[i];
+					if (character.isDashing) {
+						trail.action.Invoke(trail.time);
+					}
+					trail.time -= Global.spf;
+					if (trail.time <= 0) character.lastFiveTrailDraws.RemoveAt(i);
 				}
-				trail.time -= Global.spf;
-				if (trail.time <= 0) character.lastFiveTrailDraws.RemoveAt(i);
+
+				var shaderList = new List<ShaderWrapper>();
+
+				var speedDevilShader = character.player.speedDevilShader;
+				shaderList.Add(speedDevilShader);
+
+				if (character.lastFiveTrailDraws.Count > 1) character.lastFiveTrailDraws.PopFirst();
+
+				character.lastFiveTrailDraws.Add(new Trail() {
+					action = (float time) => {
+						speedDevilShader?.SetUniform("alpha", time * 2);
+						DrawWrappers.DrawTexture(bitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaderList, true);
+					},
+					time = 0.125f
+				});
 			}
-
-			var shaderList = new List<ShaderWrapper>();
-
-			var speedDevilShader = character.player.speedDevilShader;
-			shaderList.Add(speedDevilShader);
-
-			if (character.lastFiveTrailDraws.Count > 1) character.lastFiveTrailDraws.PopFirst();
-
-			character.lastFiveTrailDraws.Add(new Trail() {
-				action = (float time) => {
-					speedDevilShader?.SetUniform("alpha", time * 2);
-					DrawWrappers.DrawTexture(bitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaderList, true);
-				},
-				time = 0.125f
-			});
 		}
 		DrawWrappers.DrawTexture(
 			bitmap,
