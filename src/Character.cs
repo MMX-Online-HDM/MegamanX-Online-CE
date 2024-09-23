@@ -226,7 +226,7 @@ public partial class Character : Actor, IDamagable {
 		chargeFlashTime = 0;
 		useFrameProjs = true;
 
-		//chargeSound = new LoopingSound("charge_start", "charge_loop", this);
+		chargeSound = new LoopingSound("charge_start", "charge_loop", this);
 
 		if (this.player != Global.level.mainPlayer) {
 			zIndex = ++Global.level.autoIncCharZIndex;
@@ -1562,7 +1562,7 @@ public partial class Character : Actor, IDamagable {
 			chargeEffect.stop();
 		}
 		if (isCharging()) {
-			//chargeSound.play();
+			chargeSound.play();
 			int chargeType = 0;
 			if (this is BusterZero) {
 				chargeType = 1;
@@ -1871,9 +1871,9 @@ public partial class Character : Actor, IDamagable {
 		chargeEffect.reset();
 		chargeTime = 0;
 		chargeFlashTime = 0;
-		//chargeSound.stop();
-		//chargeSound.reset();
-		//chargeEffect.stop();
+		chargeSound.stop();
+		chargeSound.reset();
+		chargeEffect.stop();
 	}
 
 	public virtual string getSprite(string spriteName) {

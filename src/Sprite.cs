@@ -45,7 +45,7 @@ public class Sprite {
 
 	public float tempOffY = 0;
 	public float tempOffX = 0;
-	
+
 	public int totalFrameNum => (animData.frames.Length);
 
 	public Sprite(string spritename) {
@@ -55,11 +55,11 @@ public class Sprite {
 		loopStartFrame = animData.loopStartFrame;
 
 		hitboxes = new Collider[animData.hitboxes.Length];
-		for (int i = 0; i < hitboxes.Length; i++){
+		for (int i = 0; i < hitboxes.Length; i++) {
 			hitboxes[i] = animData.hitboxes[i].clone();
 		}
 		frameHitboxes = new Collider[animData.frames.Length][];
-		for (int i = 0; i < animData.frames.Length; i++){
+		for (int i = 0; i < animData.frames.Length; i++) {
 			int length = animData.frames[i].hitboxes.Length;
 			frameHitboxes[i] = new Collider[length];
 			for (int j = 0; j < length; j++) {
@@ -338,152 +338,122 @@ public class Sprite {
 					outlineShader = Helpers.cloneShaderSafe("outline_green");
 				}
 				if (outlineShader != null) {
-					if (!isCompositeSprite) {
-						outlineShader.SetUniform(
-							"textureSize",
-							new SFML.Graphics.Glsl.Vec2(currentFrame.rect.w() + 2, currentFrame.rect.h() + 2)
-						);
-						DrawWrappers.DrawTexture(
-							bitmap,
-							currentFrame.rect.x1 - 1, currentFrame.rect.y1 - 1,
-							currentFrame.rect.w() + 2, currentFrame.rect.h() + 2,
-							x + frameOffsetX - (1 * xDirArg),
-							y + frameOffsetY - (1 * yDirArg),
-							zIndex,
-							cx, cy, xDirArg, yDirArg, angle, alpha,
-							[ outlineShader ], true
-						);
-					} else {
-						outlineShader.SetUniform(
-							"textureSize",
-							new SFML.Graphics.Glsl.Vec2(currentFrame.rect.w() + 4, currentFrame.rect.h() + 4)
-						);
-						DrawWrappers.DrawCompositeTexture(
-							compositeBitmaps.ToArray(),
-							currentFrame.rect.x1 - 2, currentFrame.rect.y1 - 2,
-							currentFrame.rect.w() + 4, currentFrame.rect.h() + 4,
-							x + frameOffsetX - (2 * xDirArg),
-							y + frameOffsetY - (2 * yDirArg),
-							zIndex,
-							cx, cy, xDirArg, yDirArg, angle, alpha,
-							[ outlineShader ], true
-						);
-					}
+					outlineShader.SetUniform(
+						"textureSize",
+						new SFML.Graphics.Glsl.Vec2(currentFrame.rect.w() + 2, currentFrame.rect.h() + 2)
+					);
+					DrawWrappers.DrawTexture(
+						bitmap,
+						currentFrame.rect.x1 - 1, currentFrame.rect.y1 - 1,
+						currentFrame.rect.w() + 2, currentFrame.rect.h() + 2,
+						x + frameOffsetX - (1 * xDirArg),
+						y + frameOffsetY - (1 * yDirArg),
+						zIndex,
+						cx, cy, xDirArg, yDirArg, angle, alpha,
+						[outlineShader], true
+					);
 				}
 			}
-			if (name is "boomerk_dash" or "boomerk_bald_dash" && (animTime > 0 || frameIndex > 0)) {
-				if (Global.isOnFrameCycle(4)) {
-					var trail = lastTwoBkTrailDraws.ElementAtOrDefault(5);
-					if (trail != null) {
-						trail.action.Invoke(trail.time);
-						trail.time -= Global.spf;
-					}
-				} else {
-					var trail = lastTwoBkTrailDraws.ElementAtOrDefault(9);
-					if (trail != null) {
-						trail.action.Invoke(trail.time);
-						trail.time -= Global.spf;
-					}
-				}
-
-				var shaderList = new List<ShaderWrapper>();
-				if (Global.shaderWrappers.ContainsKey("boomerkTrail")) {
-					ShaderWrapper boomerkTrail = Global.shaderWrappers["boomerkTrail"];
-					boomerkTrail.SetUniform("paletteTexture", Global.textures["boomerkTrailPalette"]);
-					shaderList.Add(boomerkTrail);
-				}
-
-				if (lastTwoBkTrailDraws.Count > 10) {
-					lastTwoBkTrailDraws.PopFirst();
-				}
-				lastTwoBkTrailDraws.Add(new Trail() {
-					action = (float time) => {
-						DrawWrappers.DrawTexture(
-							bitmap,
-							animData.frames[1].rect.x1,
-							animData.frames[1].rect.y1,
-							animData.frames[1].rect.w(),
-							animData.frames[1].rect.h(),
-							x + frameOffsetX, y + frameOffsetY,
-							zIndex, cx, cy,
-							xDirArg, yDirArg,
-							angle, alpha,
-							shaderList, true
-						);
-					},
-					time = 0.25f
-				});
-			} else {
-				lastTwoBkTrailDraws.Clear();
-			}
-
-			if (renderEffects.Contains(RenderEffectType.Trail)) {
-				for (int i = lastFiveTrailDraws.Count - 1; i >= 0; i--) {
-					var trail = lastFiveTrailDraws[i];
+		}
+		if (name is "boomerk_dash" or "boomerk_bald_dash" && (animTime > 0 || frameIndex > 0)) {
+			if (Global.isOnFrameCycle(4)) {
+				var trail = lastTwoBkTrailDraws.ElementAtOrDefault(5);
+				if (trail != null) {
 					trail.action.Invoke(trail.time);
 					trail.time -= Global.spf;
 				}
-
-				var shaderList = new List<ShaderWrapper>();
-				if (Global.shaderWrappers.ContainsKey("trail")) shaderList.Add(Global.shaderWrappers["trail"]);
-
-				if (lastFiveTrailDraws.Count > 5) lastFiveTrailDraws.PopFirst();
-				lastFiveTrailDraws.Add(new Trail() {
-					action = (float time) => {
-						DrawWrappers.DrawTexture(bitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaderList, true);
-					},
-					time = 0.25f
-				});
-			}
-			if (renderEffects.Contains(RenderEffectType.SpeedDevilTrail) && character != null && Global.shaderWrappers.ContainsKey("speedDevilTrail")) {
-				for (int i = character.lastFiveTrailDraws.Count - 1; i >= 0; i--) {
-					Trail trail = character.lastFiveTrailDraws[i];
-					if (character.isDashing) {
-						trail.action.Invoke(trail.time);
-					}
+			} else {
+				var trail = lastTwoBkTrailDraws.ElementAtOrDefault(9);
+				if (trail != null) {
+					trail.action.Invoke(trail.time);
 					trail.time -= Global.spf;
-					if (trail.time <= 0) character.lastFiveTrailDraws.RemoveAt(i);
 				}
-
-				var shaderList = new List<ShaderWrapper>();
-
-				var speedDevilShader = character.player.speedDevilShader;
-				shaderList.Add(speedDevilShader);
-
-				if (character.lastFiveTrailDraws.Count > 1) character.lastFiveTrailDraws.PopFirst();
-
-				character.lastFiveTrailDraws.Add(new Trail() {
-					action = (float time) => {
-						speedDevilShader?.SetUniform("alpha", time * 2);
-						DrawWrappers.DrawTexture(bitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaderList, true);
-					},
-					time = 0.125f
-				});
 			}
+
+			var shaderList = new List<ShaderWrapper>();
+			if (Global.shaderWrappers.ContainsKey("boomerkTrail")) {
+				ShaderWrapper boomerkTrail = Global.shaderWrappers["boomerkTrail"];
+				boomerkTrail.SetUniform("paletteTexture", Global.textures["boomerkTrailPalette"]);
+				shaderList.Add(boomerkTrail);
+			}
+
+			if (lastTwoBkTrailDraws.Count > 10) {
+				lastTwoBkTrailDraws.PopFirst();
+			}
+			lastTwoBkTrailDraws.Add(new Trail() {
+				action = (float time) => {
+					DrawWrappers.DrawTexture(
+						bitmap,
+						animData.frames[1].rect.x1,
+						animData.frames[1].rect.y1,
+						animData.frames[1].rect.w(),
+						animData.frames[1].rect.h(),
+						x + frameOffsetX, y + frameOffsetY,
+						zIndex, cx, cy,
+						xDirArg, yDirArg,
+						angle, alpha,
+						shaderList, true
+					);
+				},
+				time = 0.25f
+			});
+		} else {
+			lastTwoBkTrailDraws.Clear();
 		}
 
-		if (!isCompositeSprite) {
-			DrawWrappers.DrawTexture(
-				bitmap,
-				currentFrame.rect.x1,
-				currentFrame.rect.y1 - extraYOff,
+		if (renderEffects.Contains(RenderEffectType.Trail)) {
+			for (int i = lastFiveTrailDraws.Count - 1; i >= 0; i--) {
+				var trail = lastFiveTrailDraws[i];
+				trail.action.Invoke(trail.time);
+				trail.time -= Global.spf;
+			}
+
+			var shaderList = new List<ShaderWrapper>();
+			if (Global.shaderWrappers.ContainsKey("trail")) shaderList.Add(Global.shaderWrappers["trail"]);
+
+			if (lastFiveTrailDraws.Count > 5) lastFiveTrailDraws.PopFirst();
+			lastFiveTrailDraws.Add(new Trail() {
+				action = (float time) => {
+					DrawWrappers.DrawTexture(bitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaderList, true);
+				},
+				time = 0.25f
+			});
+		}
+		if (renderEffects.Contains(RenderEffectType.SpeedDevilTrail) && character != null && Global.shaderWrappers.ContainsKey("speedDevilTrail")) {
+			for (int i = character.lastFiveTrailDraws.Count - 1; i >= 0; i--) {
+				Trail trail = character.lastFiveTrailDraws[i];
+				if (character.isDashing) {
+					trail.action.Invoke(trail.time);
+				}
+				trail.time -= Global.spf;
+				if (trail.time <= 0) character.lastFiveTrailDraws.RemoveAt(i);
+			}
+
+			var shaderList = new List<ShaderWrapper>();
+
+			var speedDevilShader = character.player.speedDevilShader;
+			shaderList.Add(speedDevilShader);
+
+			if (character.lastFiveTrailDraws.Count > 1) character.lastFiveTrailDraws.PopFirst();
+
+			character.lastFiveTrailDraws.Add(new Trail() {
+				action = (float time) => {
+					speedDevilShader?.SetUniform("alpha", time * 2);
+					DrawWrappers.DrawTexture(bitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaderList, true);
+				},
+				time = 0.125f
+			});
+		}
+		DrawWrappers.DrawTexture(
+			bitmap,
+			currentFrame.rect.x1,
+			currentFrame.rect.y1 - extraYOff,
 				currentFrame.rect.w(),
 				currentFrame.rect.h() + extraY,
 				x + frameOffsetX, y + frameOffsetY - extraYOff,
-				zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true);
-		} else {
-			DrawWrappers.DrawCompositeTexture(
-				compositeBitmaps.ToArray(),
-				currentFrame.rect.x1 - flippedExtraW,
-				currentFrame.rect.y1 - extraYOff,
-				currentFrame.rect.w() + extraW,
-				currentFrame.rect.h() + extraY,
-				x + frameOffsetX + extraXOff,
-				y + frameOffsetY,
-				zIndex, cx, cy, xDirArg, yDirArg,
-				angle, alpha, shaders, true
+				zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true
 			);
-		}
+
 		if (isUPX) {
 			var upShaders = new List<ShaderWrapper>(shaders);
 			if (Global.isOnFrameCycle(5)) {
@@ -514,7 +484,7 @@ public class Sprite {
 		if (frameIndex < 0) {
 			return animData.frames[0];
 		}
-		if	(frameIndex >= animData.frames.Length) {
+		if (frameIndex >= animData.frames.Length) {
 			return animData.frames[animData.frames.Length - 1];
 		}
 		return animData.frames[frameIndex];
@@ -529,7 +499,7 @@ public class Sprite {
 		if (frameIndex < 0) {
 			return 0;
 		}
-		if	(frameIndex >= animData.frames.Length) {
+		if (frameIndex >= animData.frames.Length) {
 			return animData.frames.Length - 1;
 		}
 		return frameIndex;
@@ -648,7 +618,7 @@ public class AnimData {
 	public float alignOffY;
 	public bool loop;
 	public Texture bitmap;
-	
+
 	public bool isXSprite;
 	public bool isAxlSprite;
 
@@ -658,16 +628,16 @@ public class AnimData {
 		this.name = name;
 		this.customMapName = customMapName;
 		string alignmentText = Convert.ToString(spriteJson.alignment);
-		
+
 		(baseAlignmentX, baseAlignmentY) = alignmentText switch {
-			"topmid"   => (0.5f, 0f),
-			"topright" => (1f,   0f),
-			"midleft"  => (0f,   0.5f),
-			"center"   => (0.5f, 0.5f),
-			"midright" => (1f,   0.5f),
-			"botleft"  => (0f,   1f),
-			"botmid"   => (0.5f, 1f),
-			"botright" => (1f,   1f),
+			"topmid" => (0.5f, 0f),
+			"topright" => (1f, 0f),
+			"midleft" => (0f, 0.5f),
+			"center" => (0.5f, 0.5f),
+			"midright" => (1f, 0.5f),
+			"botleft" => (0f, 1f),
+			"botmid" => (0.5f, 1f),
+			"botright" => (1f, 1f),
 			_ => (0, 0),
 		};
 
@@ -822,11 +792,11 @@ public class AnimData {
 	public AnimData clone() {
 		AnimData clonedSprite = (AnimData)MemberwiseClone();
 		clonedSprite.hitboxes = new Collider[hitboxes.Length];
-		for (int i = 0; i < hitboxes.Length; i++){
+		for (int i = 0; i < hitboxes.Length; i++) {
 			clonedSprite.hitboxes[i] = hitboxes[i].clone();
 		}
 		clonedSprite.frames = new Frame[frames.Length];
-		for (int i = 0; i < frames.Length; i++){
+		for (int i = 0; i < frames.Length; i++) {
 			clonedSprite.frames[i] = frames[i].clone();
 		}
 		return clonedSprite;

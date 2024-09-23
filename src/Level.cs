@@ -1343,6 +1343,10 @@ public partial class Level {
 				foreach (GameObject wallObj in currentTerrainGrid) {
 					// Get order independent hash.
 					int hash = currentGrid[i].GetHashCode() ^ wallObj.GetHashCode();
+
+					if (currentGrid[i] is not Actor actor || wallObj is not Geometry geometry) {
+						continue;
+					}
 					// Skip checked objects.
 					if (collidedGObjs.Contains(hash)) {
 						continue;
@@ -1353,21 +1357,17 @@ public partial class Level {
 					if (!checkLossyCollision(currentGrid[i], wallObj)) {
 						continue;
 					}
-					(List<CollideData> iDatas, List<CollideData> jDatas) = getTriggerExact(
-						currentGrid[i], wallObj
+					(CollideData? iData, CollideData? jData) = getTriggerTerrain(
+						actor, geometry
 					);
-					if (iDatas.Count > 0) {
+					if (iData != null) {
 						Global.speedMul = currentGrid[i].localSpeedMul;
-						foreach (CollideData collideDataI in iDatas) {
-							currentGrid[i].registerCollision(collideDataI);
-						}
+						currentGrid[i].registerCollision(iData);
 						Global.speedMul = 1;
 					}
-					if (jDatas.Count > 0) {
+					if (jData != null) {
 						Global.speedMul = wallObj.localSpeedMul;
-						foreach (CollideData collideDataJ in jDatas) {
-							wallObj.registerCollision(collideDataJ);
-						}
+						wallObj.registerCollision(jData);
 						Global.speedMul = 1;
 					}
 				}

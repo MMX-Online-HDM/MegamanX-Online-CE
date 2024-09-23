@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -129,7 +129,7 @@ public class Fonts {
 				DrawWrappers.walDrawObjects[depth] = new DrawLayer();
 			}
 			drawLayer = DrawWrappers.walDrawObjects[depth];
-			drawLayer.oneOffs.Add(new DrawableFont(batchDrawable, color.Value));
+			drawLayer.oneOffs.Add(new DrawableWrapper(null, batchDrawable, color.Value));
 		} else {
 			if (!deferred) {
 				DrawWrappers.drawToHUD(batchDrawable);

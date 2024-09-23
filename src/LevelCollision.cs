@@ -950,6 +950,26 @@ public partial class Level {
 		return (triggers1, triggers2);;
 	}
 
+	public (CollideData?, CollideData?) getTriggerTerrain(Actor actor, Geometry geometry) {
+		CollideData? triggerActor = null;
+		CollideData? triggerTerrain = null;
+		Collider? actorCollider = actor.getTerrainCollider() ?? actor.physicsCollider;
+		if (actorCollider == null) {
+			return (triggerActor, triggerTerrain);
+		}
+		Collider geometryCollider = geometry.collider;
+		if (geometryCollider == null) {
+			return (triggerActor, triggerTerrain);
+		}
+		bool isTrigger = shouldTrigger(actor, geometry, actorCollider, geometryCollider, new Point(0, 0));
+		HitData? hitData = actorCollider.shape.intersectsShape(geometryCollider.shape);
+		if (hitData != null) {
+			triggerActor = new CollideData(actorCollider, geometryCollider, null, isTrigger, geometry, hitData);
+			triggerTerrain = new CollideData(geometryCollider, actorCollider, null, isTrigger, actor, hitData);
+		}
+		return (triggerActor, triggerTerrain);
+	}
+
 	public List<CollideData> organizeTriggers(List<CollideData> triggerList) {
 		// Prioritize certain colliders over others, running them first
 			return triggerList.OrderBy(trigger => {
