@@ -1472,7 +1472,6 @@ public partial class Actor : GameObject {
 	}
 
 	public SoundWrapper? playSound(SoundBufferWrapper soundBuffer, bool forcePlay = false, bool sendRpc = false) {
-		return null;
 		var recentClipCount = Global.level.recentClipCount;
 		if (recentClipCount.ContainsKey(soundBuffer.soundKey) &&
 			recentClipCount[soundBuffer.soundKey].Count > 1

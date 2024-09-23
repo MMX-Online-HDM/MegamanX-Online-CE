@@ -603,7 +603,6 @@ public partial class Global {
 	}
 
 	public static void playSound(string soundKey, bool playIfExists = true) {
-		return;
 		soundKey = soundKey.ToLowerInvariant();
 		if (!playIfExists && sounds.Any(s => s.soundBuffer.soundKey == soundKey)) {
 			return;
