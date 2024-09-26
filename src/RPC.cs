@@ -126,6 +126,7 @@ public class RPC {
 		matchOver,
 		endMatchRequest,
 		// General stuff.
+		applyDamage,
 		updateActor,
 		destroyActor,
 		actorToggle,
