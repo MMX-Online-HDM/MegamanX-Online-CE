@@ -127,6 +127,7 @@ public class RPC {
 		endMatchRequest,
 		// General stuff.
 		applyDamage,
+		heal,
 		updateActor,
 		destroyActor,
 		actorToggle,
@@ -146,7 +147,6 @@ public class RPC {
 		broadcastLoadout,
 		switchCharacter,
 		reflectProj,
-		heal,
 		commandGrabPlayer,
 		addDamageText,
 		changeDamage,
