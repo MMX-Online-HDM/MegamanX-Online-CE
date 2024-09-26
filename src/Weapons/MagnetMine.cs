@@ -14,7 +14,7 @@ public class MagnetMine : Weapon {
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 15;
 		killFeedIndex = 20 + (index - 9);
-		weaknessIndex = 11;
+		weaknessIndex = (int)WeaponIds.SilkShot;
 		effect = "C: Can absorb projectiles and grow it's size.";
 		hitcooldown = "0/0.2";
 		damage = "2,4/1,2,4";

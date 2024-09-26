@@ -9,7 +9,7 @@ public class ElectricSpark : Weapon {
 		weaponBarBaseIndex = 6;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 6;
-		weaknessIndex = 8;
+		weaknessIndex = (int)WeaponIds.ShotgunIce;
 		shootSounds = new string[] { "electricSpark", "electricSpark", "electricSpark", "electricSpark" };
 		rateOfFire = 0.5f;
 		damage = "2/4";

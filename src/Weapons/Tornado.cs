@@ -10,7 +10,7 @@ public class Tornado : Weapon {
 		weaponBarBaseIndex = 5;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 5;
-		weaknessIndex = 2;
+		weaknessIndex = (int)WeaponIds.Sting;
 		shootSounds = new string[] { "tornado", "tornado", "tornado", "buster3" };
 		rateOfFire = 2f;
 		switchCooldown = 0.5f;

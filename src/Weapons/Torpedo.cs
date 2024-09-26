@@ -10,7 +10,7 @@ public class Torpedo : Weapon {
 		weaponBarBaseIndex = 1;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 1;
-		weaknessIndex = 3;
+		weaknessIndex = (int)WeaponIds.RollingShield;
 		shootSounds = new string[] { "torpedo", "torpedo", "torpedo", "buster3" };
 		rateOfFire = 0.625f;
 		damage = "2/1";

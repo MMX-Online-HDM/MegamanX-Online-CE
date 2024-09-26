@@ -15,7 +15,7 @@ public class SpeedBurner : Weapon {
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 16;
 		killFeedIndex = 27;
-		weaknessIndex = 10;
+		weaknessIndex = (int)WeaponIds.BubbleSplash;
 		damage = "2/4";
 		effect = "Fire DOT: 1. Charged Grants Super Armor.";
 		hitcooldown = "0-0.25/0";

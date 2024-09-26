@@ -12,7 +12,7 @@ public class ShotgunIce : Weapon {
 		weaponBarBaseIndex = 8;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 8;
-		weaknessIndex = 4;
+		weaknessIndex = (int)WeaponIds.FireWave;
 		shootSounds = new string[] { "shotgunIce", "shotgunIce", "shotgunIce", "icyWind" };
 		rateOfFire = 0.5f;
 		damage = "2/1-2";

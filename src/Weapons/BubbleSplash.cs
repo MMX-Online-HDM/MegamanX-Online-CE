@@ -19,7 +19,7 @@ public class BubbleSplash : Weapon {
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 10;
 		killFeedIndex = 21;
-		weaknessIndex = 12;
+		weaknessIndex = (int)WeaponIds.SpinWheel;
 		maxStreams = 7;
 		streamCooldown = 1;
 		switchCooldown = 0.25f;

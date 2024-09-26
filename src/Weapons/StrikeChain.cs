@@ -13,7 +13,7 @@ public class StrikeChain : Weapon {
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 14;
 		killFeedIndex = 20 + (index - 9);
-		weaknessIndex = 13;
+		weaknessIndex = (int)WeaponIds.SonicSlicer;
 		switchCooldown = 0;
 		damage = "2/4";
 		effect = "Hooks enemies and items. Be Spider-Man.";

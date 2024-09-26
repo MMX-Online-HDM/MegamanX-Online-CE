@@ -12,7 +12,7 @@ public class Boomerang : Weapon {
 		weaponBarBaseIndex = 7;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 7;
-		weaknessIndex = 1;
+		weaknessIndex = (int)WeaponIds.Torpedo;
 		shootSounds = new string[] { "boomerang", "boomerang", "boomerang", "buster3" };
 		rateOfFire = 0.5f;
 		damage = "2/2";

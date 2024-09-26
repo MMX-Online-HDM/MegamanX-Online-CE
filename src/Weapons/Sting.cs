@@ -9,7 +9,7 @@ public class Sting : Weapon {
 		weaponBarBaseIndex = 2;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 2;
-		weaknessIndex = 7;
+		weaknessIndex = (int)WeaponIds.Boomerang;
 		shootSounds = new string[] { "csting", "csting", "csting", "stingCharge" };
 		rateOfFire = 0.75f;
 		damage = "2";

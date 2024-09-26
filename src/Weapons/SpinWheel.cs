@@ -12,7 +12,7 @@ public class SpinWheel : Weapon {
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 12;
 		killFeedIndex = 20 + (index - 9);
-		weaknessIndex = 14;
+		weaknessIndex = (int)WeaponIds.StrikeChain;
 		damage = "1/1";
 		effect = "Inflicts Wince. Doesn't destroy on hit.";
 		hitcooldown = "0.2/0";
