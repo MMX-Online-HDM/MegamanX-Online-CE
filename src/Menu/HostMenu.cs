@@ -136,6 +136,8 @@ public class HostMenu : IMainMenu {
 	public static int prevMapSizeIndex;
 	public bool playToDirty;
 	public bool timeLimitDirty;
+	public float Time = 1, Time2;
+	public bool Confirm = false, Confirm2 = false;
 
 	public string[] mapSizes = new string[] { "Training", "1v1", "Small", "Medium", "Large", "Collosal" };
 	public string selectedMapSize {
@@ -870,8 +872,8 @@ public class HostMenu : IMainMenu {
 	public string getRandomServerName() {
 		return "match" + Helpers.randomRange(1, 999).ToString();
 	}
-
 	public void update() {
+		TimeUpdate();
 		if (Global.leaveMatchSignal != null) return;
 
 		if (inGame) {
@@ -920,10 +922,18 @@ public class HostMenu : IMainMenu {
 
 		if (string.IsNullOrEmpty(errorMessage)) {
 			menuOptions[selectArrowPosY].update();
-
+			/*
 			if (Global.input.isPressedMenu(Control.MenuBack) && !inGame) {
 				Global.serverClient = null;
 				Menu.change(previous);
+			} */
+			if (Time2 >= 1 && !inGame) {
+				Menu.change(previous);
+				Global.serverClient = null;
+				previous.Time = 0;
+				previous.Time2 = 1;
+				previous.Confirm = false;
+				previous.Confirm2 = false;
 			}
 			/*
 			else if (Global.input.isPressedMenu(Control.MenuEnter) && inGame)
@@ -1408,5 +1418,17 @@ public class HostMenu : IMainMenu {
 				Global.screenW * 0.5f, 20 + top, alignment: Alignment.Center
 			);
 		}
+		DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, Time);
+		DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, Time2);		
+
+	}
+	public void TimeUpdate() {
+		if (Confirm == false) Time -= Global.spf * 2;
+		if (Time <= 0) {
+			Confirm = true;
+			Time = 0;
+		}
+		if (Global.input.isPressedMenu(Control.MenuBack)) Confirm2 = true;
+		if (Confirm2 == true) Time2 += Global.spf * 2;
 	}
 }

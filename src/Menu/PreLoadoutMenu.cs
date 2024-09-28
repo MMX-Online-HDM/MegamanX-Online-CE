@@ -12,19 +12,29 @@ public class PreLoadoutMenu : IMainMenu {
 		130,
 		150
 	};
-	public IMainMenu prevMenu;
+	public MainMenu prevMenu;
 	public string message;
 	public Action yesAction;
 	public bool inGame;
 	public bool isAxl;
 	public float startX = 150;
-
-	public PreLoadoutMenu(IMainMenu prevMenu) {
+	public float Time = 1, Time2;
+	public bool Confirm = false, Confirm2 = false;
+	public PreLoadoutMenu(MainMenu prevMenu) {
 		this.prevMenu = prevMenu;
 		selectY = Options.main.preferredCharacter;
 	}
-
+	public void TimeUpdate() {
+		if (Confirm == false) Time -= Global.spf * 2;
+		if (Time <= 0) {
+			Confirm = true;
+			Time = 0;
+		}
+		if (Global.input.isPressedMenu(Control.MenuBack)) Confirm2 = true;
+		if (Confirm2 == true) Time2 += Global.spf * 2;
+	}
 	public void update() {
+		TimeUpdate();
 		Helpers.menuUpDown(ref selectY, 0, 5);
 
 		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
@@ -46,8 +56,13 @@ public class PreLoadoutMenu : IMainMenu {
 			if (selectY == (int)CharIds.PunchyZero) {
 				Menu.change(new SelectPunchyZeroWeaponMenu(this, false));
 			}
-		} else if (Global.input.isPressedMenu(Control.MenuBack)) {
+		} 
+		if (Time2 >= 1) {
 			Menu.change(prevMenu);
+			prevMenu.Time = 0;
+			prevMenu.Time2 = 1;
+			prevMenu.Confirm = false;
+			prevMenu.Confirm2 = false;
 		}
 	}
 
@@ -71,5 +86,7 @@ public class PreLoadoutMenu : IMainMenu {
 		Fonts.drawText(FontType.DarkBlue, "KZero Loadout", startX, optionPos[5], selected: selectY == 5);
 
 		Fonts.drawTextEX(FontType.Grey, "[OK]: Choose, [BACK]: Back", Global.halfScreenW, 200, Alignment.Center);
+		DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0,0, Time);
+		DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0,0, Time2);
 	}
 }

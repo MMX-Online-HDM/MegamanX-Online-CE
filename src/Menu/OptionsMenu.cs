@@ -393,7 +393,7 @@ public class OptionsMenu : IMainMenu {
 					(Point pos, int index) => {
 						string preferredChar = Character.charDisplayNames[Options.main.preferredCharacter];
 						Fonts.drawText(
-							optionFontText, "Referred character:",
+							optionFontText, "Preferred character:",
  							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(

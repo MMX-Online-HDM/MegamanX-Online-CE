@@ -7,24 +7,26 @@ namespace MMXOnline;
 public class PreJoinOrHostMenu : IMainMenu {
 	public int selectY;
 	public Point[] optionPos;
-	public const int lineH = 15;
+	public const int lineH = 17;
 	public MainMenu prevMenu;
 	public bool isJoin;
 	public const float startX = 120;
 	public int state;
 	public float state1Time;
-
+	public float Time = 1, Time2;
+	public bool Confirm = false, Confirm2 = false;
 	public PreJoinOrHostMenu(MainMenu prevMenu, bool isJoin) {
 		this.prevMenu = prevMenu;
 		this.isJoin = isJoin;
 		optionPos = new Point[] {
-			new Point(40, 70),
-			new Point(40, 70 + lineH),
-			new Point(40, 70 + (lineH * 2))
+			new Point(40, 107), //70
+			new Point(40, 107 + lineH),
+			new Point(40, 107 + (lineH * 2))
 		};
 	}
 
 	public void update() {
+		TimeUpdate();
 		if (state == 0) {
 			Helpers.menuUpDown(ref selectY, 0, 2);
 			if (Global.input.isPressedMenu(Control.MenuConfirm)) {
@@ -41,11 +43,15 @@ public class PreJoinOrHostMenu : IMainMenu {
 					if (isJoin) nextMenu = new JoinMenuP2P(true);
 					// TODO: Make a menu for new host.
 					else nextMenu = new HostMenu(prevMenu, null, false, false, true);
-
 					Menu.change(nextMenu);
 				}
-			} else if (Global.input.isPressedMenu(Control.MenuBack)) {
+			}
+			if (Time2 >= 1) {
 				Menu.change(prevMenu);
+				prevMenu.Time = 0;
+				prevMenu.Time2 = 1;
+				prevMenu.Confirm = false;
+				prevMenu.Confirm2 = false;
 			}
 		} else if (state == 1) {
 			if (Global.regions.Count == 0) {
@@ -75,7 +81,15 @@ public class PreJoinOrHostMenu : IMainMenu {
 			}
 		}
 	}
-
+	public void TimeUpdate() {
+		if (Confirm == false) Time -= Global.spf * 2;
+		if (Time <= 0) {
+			Confirm = true;
+			Time = 0;
+		}
+		if (Global.input.isPressedMenu(Control.MenuBack)) Confirm2 = true;
+		if (Confirm2 == true) Time2 += Global.spf * 2;
+	}
 	private string[] getOutdatedClientMessage(decimal version, decimal serverVersion) {
 		if (serverVersion == decimal.MaxValue) {
 			return new string[] { "Could not connect to server.", "The region may be down.", "Try changing your region in Settings." };
@@ -158,26 +172,45 @@ public class PreJoinOrHostMenu : IMainMenu {
 	}
 
 	public void render() {
+		float WD = Global.screenW * 0.5f;
 		DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0);
 		//DrawWrappers.DrawTextureMenu(Global.textures["cursor"], 20, topLeft.y + ySpace + (selectArrowPosY * ySpace));
-		Global.sprites["cursor"].drawToHUD(0, startX - 10, 73 + (selectY * lineH));
-
+		//Global.sprites["cursor"].drawToHUD(0, startX - 10, 73 + (selectY * lineH));
 		Fonts.drawText(
-			FontType.Golden, "SELECT OPTION", Global.screenW * 0.5f, 20, Alignment.Center
+			FontType.Golden, "SELECT OPTION",WD, 20, Alignment.Center
 		);
 
 		if (state == 0) {
-			Fonts.drawText(FontType.DarkBlue, "RELAY", startX, optionPos[2].y, selected: selectY == 2);
+			Fonts.drawText(FontType.DarkBlue, "RELAY", WD+1, optionPos[2].y, Alignment.Center,
+			 selected: selectY == 2, alpha: 40);
 		} else {
 			Fonts.drawText(FontType.DarkBlue, "LOADING...", startX, optionPos[2].y, selected: selectY == 2);
 		}
 
+		Fonts.drawText(FontType.DarkBlue, "LAN", WD, optionPos[1].y,
+		Alignment.Center, selected: selectY == 1, alpha: 40);
+
+		if (Global.frameCount % 60 < 30) {
+		Fonts.drawText(FontType.DarkBlue, "[     ]", WD, optionPos[0].y,
+		Alignment.Center,selected: selectY == 0);
+		}
+		Fonts.drawText(FontType.DarkBlue, "  P2P  ", WD, optionPos[0].y,
+		Alignment.Center, selected: selectY == 0);
+		Fonts.drawTextEX(FontType.Grey, "[OK]: Choose, [BACK]: Back", WD, 206, Alignment.Center);
+
+		DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0,0, Time);
+		DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0,0, Time2);
+	}
+	public void Guide() {
 		int msgPos = 140;
+		float WD = Global.screenW * 0.5f;
+
 		DrawWrappers.DrawLine(
 			10, msgPos - 5, Global.screenW - 10, msgPos - 5, Color.White, 1, ZIndex.HUD, isWorldPos: false
 		);
+		
 		Fonts.drawText(
-			FontType.DarkOrange, "NOTICE", Global.halfScreenW,
+			FontType.DarkOrange, "NOTICE", WD,
 			msgPos, Alignment.Center
 		);
 		Fonts.drawText(
@@ -191,11 +224,5 @@ public class PreJoinOrHostMenu : IMainMenu {
 		DrawWrappers.DrawLine(
 			10, msgPos + 32, Global.screenW - 10, msgPos + 32, Color.White, 1, ZIndex.HUD, isWorldPos: false
 		);
-
-		Fonts.drawText(FontType.DarkBlue, "LAN", startX, optionPos[1].y, selected: selectY == 1);
-
-		Fonts.drawText(FontType.DarkBlue, "P2P", startX, optionPos[0].y, selected: selectY == 0);
-
-		Fonts.drawTextEX(FontType.Grey, "[OK]: Choose, [BACK]: Back", Global.halfScreenW, 206, Alignment.Center);
 	}
 }

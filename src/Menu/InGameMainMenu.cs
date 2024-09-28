@@ -64,7 +64,7 @@ public class InGameMainMenu : IMainMenu {
 			} else if (selectY == 4) {
 				Menu.change(new PreControlMenu(this, true));
 			} else if (selectY == 5) {
-				Menu.change(new PreOptionsMenu(this, true));
+				Menu.change(new PreOptionsMenu(null, true));
 			} else if (selectY == 6) {
 				Menu.change(new ConfirmLeaveMenu(this, "Are you sure you want to leave?", () => {
 					Global._quickStart = false;
