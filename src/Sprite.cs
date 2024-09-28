@@ -482,10 +482,10 @@ public class Sprite {
 				x + frameOffsetX, y + frameOffsetY,
 				zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true
 			);
-
+//urrentFrame.rect.w() + 5,
 			if (armors[3] == 1) DrawWrappers.DrawTexture(xArmorArmBitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true);
 			if (armors[3] == 2) DrawWrappers.DrawTexture(xArmorArmBitmap2, currentFrame.rect.x1 - flippedExtraW, currentFrame.rect.y1, currentFrame.rect.w() + extraW, currentFrame.rect.h(), x + frameOffsetX + xOff, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true);
-			if (armors[3] == 3) DrawWrappers.DrawTexture(xArmorArmBitmap3, currentFrame.rect.x1 - flippedExtraW, currentFrame.rect.y1, currentFrame.rect.w() + extraW, currentFrame.rect.h(), x + frameOffsetX + xOff, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, x3ArmShaders, true);
+			if (armors[3] == 3) DrawWrappers.DrawTexture(xArmorArmBitmap3, currentFrame.rect.x1 - flippedExtraW, currentFrame.rect.y1, currentFrame.rect.w() + 5 + extraW, currentFrame.rect.h(), x + frameOffsetX + xOff, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, x3ArmShaders, true);
 		}
 
 		if (animData.isAxlSprite && drawAxlArms) {
@@ -684,7 +684,7 @@ public class AnimData {
 		List<Frame> frames = new();
 		List<Collider> hitboxes = new();
 
-		if (textureName == "XDefault") {
+		if (textureName == "0_X") {
 			isXSprite = true;
 		}
 		if (textureName == "axl") {

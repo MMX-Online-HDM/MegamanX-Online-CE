@@ -1288,7 +1288,7 @@ public partial class Level {
 						unlockfollow = true;
 					}
 				} else {
-					unlockfollow = false;
+					unlockfollow = true;
 				}
 
 				float deltaX = fullDeltaX;
@@ -1297,7 +1297,7 @@ public partial class Level {
 				if (camPlayer.character?.charState is not InRideChaser &&
 					(camPlayer.character as Axl)?.isZooming() != true
 				) {
-					int camSpeed = 4;
+					int camSpeed = 14;
 					if (MathF.Abs(deltaX) > camSpeed) {
 						deltaX = camSpeed * MathF.Sign(fullDeltaX);
 					}
@@ -1690,7 +1690,7 @@ public partial class Level {
 
 		// At this point all drawing should be HUD/menu elements only
 		gameMode.render();
-
+//checkpoint ready
 		if (mainPlayer.readyTime > 0) {
 			if (mainPlayer.readyTime < 0.4) {
 				int frameIndex = (int)Math.Round((mainPlayer.readyTime / 0.4) * 9);

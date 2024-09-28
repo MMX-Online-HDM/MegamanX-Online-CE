@@ -735,7 +735,7 @@ public class Jump : CharState {
 		airMove = true;
 		canStopJump = true;
 		attackCtrl = true;
-		normalCtrl = true;
+		normalCtrl = true; //checkpoint
 	}
 
 	public override void update() {
@@ -859,8 +859,8 @@ public class Dash : CharState {
 		if (!player.isAI && !player.input.isHeld(initialDashButton, player) && !stop) {
 			dashTime = 50;
 		}
-		float speedModifier = 1.15f; //CHANGED
-		float distanceModifier = 1;
+		float speedModifier = 1.25f; //chekpoint
+		float distanceModifier = 1.05f;
 		float inputXDir = player.input.getInputDir(player).x;
 		if (player.isX && player.hasBootsArmor(1)) {
 			speedModifier = 1.15f;
@@ -891,7 +891,7 @@ public class Dash : CharState {
 				return;
 			}
 		}
-		if (dashTime > Global.spf * 3 || stop) {
+		if (dashTime > Global.spf * 2f || stop) {  //checkpoint pero arregle un bug que nunca existio. y se lo agradecemos no vuelva nunca
 			var move = new Point(0, 0);
 			move.x = character.getDashSpeed() * initialDashDir * speedModifier;
 			character.move(move);
@@ -943,8 +943,8 @@ public class AirDash : CharState {
 		if (!player.input.isHeld(initialDashButton, player) && !stop) {
 			dashTime = 50;
 		}
-		float speedModifier = 1;
-		float distanceModifier = 1;
+		float speedModifier = 1.17f; //checkpoint
+		float distanceModifier = 0.7f;
 		if (player.isX && player.hasBootsArmor(2)) {
 			speedModifier = 1.15f;
 			distanceModifier = 1.15f;
@@ -966,7 +966,7 @@ public class AirDash : CharState {
 				character.changeState(new Fall());
 			}
 		}
-		if (dashTime > Global.spf * 3 || stop) {
+		if (dashTime > Global.spf * 2 || stop) {
 			var move = new Point(0, 0);
 			move.x = character.getDashSpeed() * initialDashDir * speedModifier;
 			character.move(move);

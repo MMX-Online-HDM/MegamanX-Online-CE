@@ -1653,7 +1653,7 @@ public class Axl : Character {
 
 		return base.canChangeWeapons();
 	}
-
+/*
 	public override float getRunSpeed() {
 		float runSpeed = 90;
 		if (player.isAxl && shootTime > 0) {
@@ -1676,7 +1676,7 @@ public class Axl : Character {
 		}
 		return dashSpeed * getRunDebuffs();
 	}
-
+*/
 	public override bool canShoot() {
 		if (sniperMissileProj != null) { return false; }
 		if (invulnTime > 0) return false;

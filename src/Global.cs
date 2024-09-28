@@ -34,7 +34,7 @@ public partial class Global {
 	// Final checksum key.
 	public const string checksumKey = checksumPrefix + " " + checksumPrefix2;
 	// For displaying the name of the mod in the version string.
-	public static string shortForkName = "supercum";
+	public static string shortForkName = "ghostgeicut";
 
 	public static string prodChecksum = checksumPrefix + " " + assetChecksum;
 
@@ -59,11 +59,11 @@ public partial class Global {
 	 */
 
 	// Most common by far
-	public static int quickStartCharNum = 2;
+	public static int quickStartCharNum = 0;
 	public static int quickStartBotCharNum = 0;
 
 	public static bool _quickStart = true;
-	public static string quickStartMap = "training";
+	public static string quickStartMap = "X4Volcano";
 	public static bool quickStartMirrored = false;
 
 	// Training

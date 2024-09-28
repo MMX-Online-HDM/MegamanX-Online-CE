@@ -175,19 +175,8 @@ public class Buster : Weapon {
 				}
 			} else if (player.hasArmArmor(0) || player.hasArmArmor(1)) {
 				new Anim(pos.clone(), "buster4_muzzle_flash", xDir, null, true);
-				//Create the buster effect
-				int xOff = xDir * -5;
-				player.setNextActorNetId(netProjId);
-				// Create first line instantly.
-				createBuster4Line(pos.x + xOff, pos.y, xDir, player, 0f);
-				// Create 2nd with a delay.
-				Global.level.delayedActions.Add(new DelayedAction(delegate {
-					createBuster4Line(pos.x + xOff, pos.y, xDir, player, 10f / 60f);
-				}, 2.8f / 60f));
-				// Use smooth spawn on the 3rd.
-				Global.level.delayedActions.Add(new DelayedAction(delegate {
-					createBuster4Line(pos.x + xOff, pos.y, xDir, player, 5f / 60f, true);
-				}, 5.8f / 60f));
+					new BusterPlasmaProj(this, pos, xDir, player, netProjId);
+					shootSound = "plasmaShot";
 			} else if (player.hasArmArmor(2)) {
 				if (player.ownedByLocalPlayer) {
 					if (player.character.charState is not WallSlide) {
@@ -751,12 +740,10 @@ public class BusterX3Proj2 : Projectile {
 public class BusterPlasmaProj : Projectile {
 	public HashSet<IDamagable> hitDamagables = new HashSet<IDamagable>();
 	public BusterPlasmaProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 400, 4, player, "buster_plasma", Global.defFlinch, 0.25f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 400, 4, player, "buster_plasma", 0, 0.25f, netProjId, player.ownedByLocalPlayer) {
 		maxTime = 0.5f;
 		projId = (int)ProjIds.BusterX3Plasma;
 		destroyOnHit = false;
-		xScale = 0.75f;
-		yScale = 0.75f;
 
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
@@ -765,10 +752,10 @@ public class BusterPlasmaProj : Projectile {
 
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
-		if (ownedByLocalPlayer && hitDamagables.Count < 1) {
+		if (ownedByLocalPlayer && hitDamagables.Count < 3) {
 			if (!hitDamagables.Contains(damagable)) {
 				hitDamagables.Add(damagable);
-				float xThreshold = 10;
+				float xThreshold = 5;
 				Point targetPos = damagable.actor().getCenterPos();
 				float distToTarget = MathF.Abs(pos.x - targetPos.x);
 				Point spawnPoint = pos;
@@ -781,7 +768,7 @@ public class BusterPlasmaProj : Projectile {
 
 public class BusterPlasmaHitProj : Projectile {
 	public BusterPlasmaHitProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 1, player, "buster_plasma_hit", 0, 0.25f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 0, 1, player, "buster_plasma_hit", 1, 0.1f, netProjId, player.ownedByLocalPlayer) {
 		maxTime = 2f;
 		projId = (int)ProjIds.BusterX3PlasmaHit;
 		destroyOnHit = false;
