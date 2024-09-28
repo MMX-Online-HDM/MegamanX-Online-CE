@@ -145,7 +145,6 @@ public class SelectZeroWeaponMenu : IMainMenu {
 		return zeroWeaponCategories[3].Item2[cursors[2].index].type == zeroWeaponCategories[3].Item2[cursors[3].index].type ||
 			zeroWeaponCategories[4].Item2[cursors[4].index].type == zeroWeaponCategories[5].Item2[cursors[5].index].type;
 	}
-
 	public void render() {
 		if (!inGame) {
 			DrawWrappers.DrawTextureHUD(Global.textures["loadoutbackground"], 0, 0);
@@ -176,13 +175,9 @@ public class SelectZeroWeaponMenu : IMainMenu {
 				yPos, selected: selCursorIndex == i
 			);
 			var weapon = zeroWeaponCategories[i].Item2[cursors[i].index];
-			Fonts.drawText(
-				FontType.Purple, weapon.displayName, wepTextX, yPos,
-				selected: selCursorIndex == i
-			);
+			Fonts.drawText(FontType.Purple, weapon.displayName, wepTextX, yPos,selected: selCursorIndex == i);
 			Global.sprites["hud_killfeed_weapon"].drawToHUD(weapon.killFeedIndex, wepPosX, yPos + 3, alpha);
 		}
-
 		color = Color.White;
 		alpha = 1f;
 
@@ -213,29 +208,45 @@ public class SelectZeroWeaponMenu : IMainMenu {
 
 		int wsy = 167;
 		DrawWrappers.DrawRect(
-			25, wsy + 2, Global.screenW - 30, wsy + 28, true, new Color(0, 0, 0, 100), 1,
+			22, wsy-12, Global.screenW - 22, wsy + 28, true, new Color(0, 0, 0, 100), 1,
 			ZIndex.HUD, false, outlineColor: outlineColor
 		);
-
 		if (selCursorIndex < 7) {
 			var wep = zeroWeaponCategories[selCursorIndex].Item2[cursors[selCursorIndex].index];
 			int posY = 6;
 			foreach (string description in wep.description) {
 				Fonts.drawText(
-					FontType.Green, wep.description[0], 30, wsy + 6, Alignment.Left
+					FontType.RedishOrange, wep.description[0], 28, wsy-8, Alignment.Left
 				);
 				posY += 9;
 			}
+			Fonts.drawText(FontType.DarkPurple, "Effect: ", 27, 173);
+			Fonts.drawText(FontType.Red, "Damage: ", 27.5f, 186);
+			Fonts.drawText(FontType.Red, "Flinch: ", 126, 186);
+			Fonts.drawText(FontType.Red, "Hit CD: ", 219, 186);
+			var wep1 = zeroWeaponCategories[selCursorIndex].Item2[cursors[selCursorIndex].index];
+			Fonts.drawText(FontType.DarkPurple, wep1.effect, 72, 173);
+			Fonts.drawText(FontType.Red, wep1.damage, 73, 186);
+			Fonts.drawText(FontType.Red, wep1.Flinch, 170, 186);
+			Fonts.drawText(FontType.Red, wep1.hitcooldown, 268, 186);
 		} else {
 			if (cursors[7].index == 0) {
-				Fonts.drawText(FontType.Green, "This hyper form increases speed and damage.", 40, wsy + 6);
-				Fonts.drawText(FontType.Green, "Lasts 12 seconds.", 40, wsy + 15);
+				Fonts.drawText(FontType.Green, "This HyperMode increases speed, damage and flinch.",
+				 Global.halfScreenW, wsy-6,Alignment.Center);
+				Fonts.drawText(FontType.DarkPurple, "Lasts 20 seconds.",
+				 Global.halfScreenW, wsy + 12, Alignment.Center);
 			} else if (cursors[7].index == 1) {
-				Fonts.drawText(FontType.Green, "This hyper form grants powerful ranged attacks.", 40, wsy + 6);
-				Fonts.drawText(FontType.Green, $"Lasts until {Global.nameCoins} are depleted.", 40, wsy + 15);
+				Fonts.drawText(FontType.Green, "This HyperMode grants powerful ranged attacks.",
+				 Global.halfScreenW, wsy-6,Alignment.Center);
+				Fonts.drawText(FontType.DarkPurple, $"Lasts until  			  are depleted.",
+				 Global.halfScreenW, wsy+12,Alignment.Center);
+				Fonts.drawText(FontType.DarkPurple, $"{Global.nameCoins}",
+				 Global.halfScreenW-5, wsy+12,Alignment.Center);
 			} else if (cursors[7].index == 2) {
-				Fonts.drawText(FontType.Green, "This hyper form infects and disrupts foes on each hit.", 40, wsy + 6);
-				Fonts.drawText(FontType.Green, "Lasts until death.", 40, wsy + 15);
+				Fonts.drawText(FontType.Green, "This HyperMode infects and disrupts foes on each hit.",
+				  Global.halfScreenW, wsy-6,Alignment.Center);
+				Fonts.drawText(FontType.DarkPurple, "Lasts until death.",
+				  Global.halfScreenW, wsy+12,Alignment.Center);
 			}
 		}
 		/*

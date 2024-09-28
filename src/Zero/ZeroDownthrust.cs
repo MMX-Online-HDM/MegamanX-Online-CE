@@ -21,6 +21,10 @@ public class HyouretsuzanWeapon : Weapon {
 		type = (int)ZeroDownthrustType.Hyouretsuzan;
 		displayName = "Hyouretsuzan";
 		description = new string[] { "A dive attack that can freeze enemies." };
+		damage = "4";
+		hitcooldown = "0.5";
+		Flinch = "12";
+		effect = "Freeze Time: 2 seconds.";
 	}
 
 	public static Weapon getWeaponFromIndex(int index) {
@@ -43,7 +47,11 @@ public class RakukojinWeapon : Weapon {
 		killFeedIndex = 37;
 		type = (int)ZeroDownthrustType.Rakukojin;
 		displayName = "Rakukojin";
-		description = new string[] { "Drop with a metal blade that deals more damage", "the faster Zero is falling." };
+		description = new string[] { "Drop with a metal blade that deals high damage."};
+		damage = "3";
+		hitcooldown = "0.5";
+		Flinch = "12";
+		effect = "Bonus Damage via Fall Time.";
 	}
 }
 
@@ -58,7 +66,11 @@ public class DanchienWeapon : Weapon {
 		killFeedIndex = 82;
 		type = (int)ZeroDownthrustType.QuakeBlazer;
 		displayName = "Danchien";
-		description = new string[] { "A dive attack that can burn enemies", "and knock them downwards." };
+		description = new string[] { "A dive attack that can burn enemies."};
+		damage = "2";
+		hitcooldown = "0.5";
+		Flinch = "0";
+		effect = "Burn DOT: 1 Second.Bounce on enemy by jumping.";
 	}
 }
 

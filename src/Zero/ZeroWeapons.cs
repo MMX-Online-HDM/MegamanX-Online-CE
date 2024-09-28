@@ -32,6 +32,9 @@ public class ShippuugaWeapon : Weapon {
 		index = (int)WeaponIds.Shippuuga;
 		weaponBarBaseIndex = 21;
 		killFeedIndex = 39;
+		damage = "2";
+		Flinch = "13";
+		effect = "None.";		
 	}
 }
 
@@ -55,6 +58,10 @@ public class Shingetsurin : Weapon {
 	public Shingetsurin() : base() {
 		index = (int)WeaponIds.Shingetsurin;
 		killFeedIndex = 85;
+		damage = "2";
+		Flinch = "26";
+		hitcooldown = "0.5";
+		effect = "Homing Projectile, Time on screen: 3 seconds.";
 		//damager = new Damager(player, 4, Global.defFlinch, 0.5f);
 	}
 }
@@ -63,6 +70,10 @@ public class ZSaberProjSwing : Weapon {
 	public ZSaberProjSwing() : base() {
 		index = (int)WeaponIds.ZSaberProjSwing;
 		killFeedIndex = 9;
+		damage = "3";
+		hitcooldown = "0.5";
+		Flinch = "26";
+		effect = "None.";
 		//damager = new Damager(player, 3, Global.defFlinch, 0.5f);
 	}
 }
@@ -80,6 +91,10 @@ public class RaijingekiWeapon : Weapon {
 		type = (int)GroundSpecialType.Raijingeki;
 		displayName = "Raijingeki";
 		description = new string[] { "Powerful lightning attack." };
+		damage = "2";
+		hitcooldown = "0.06";
+		Flinch = "26";
+		effect = "Ignores Defense.";
 	}
 
 	public static Weapon getWeaponFromIndex(int index) {
@@ -108,6 +123,10 @@ public class Raijingeki2Weapon : Weapon {
 		index = (int)WeaponIds.Raijingeki2;
 		weaponBarBaseIndex = 40;
 		killFeedIndex = 35;
+		damage = "2";
+		hitcooldown = "0.06";
+		Flinch = "26";
+		effect = "Ignores Armor Defense.";
 	}
 }
 
@@ -121,6 +140,10 @@ public class TBreakerWeapon : Weapon {
 		type = (int)GroundSpecialType.TBreaker;
 		displayName = "T-Breaker";
 		description = new string[] { "A mighty hammer that can shatter barriers." };
+		damage = "6";
+		hitcooldown = "0.5";
+		Flinch = "26";
+		effect = "Knocks Down the grounded enemy.";
 	}
 
 	public override void attack(Character character) {
@@ -142,6 +165,9 @@ public class SuiretsusenWeapon : Weapon {
 		type = (int)GroundSpecialType.Suiretsusen;
 		displayName = "Suiretsusen";
 		description = new string[] { "Water element glaive with good reach." };
+		damage = "6";
+		hitcooldown = "0.75";
+		effect = "None.";
 	}
 
 	public override void attack(Character character) {
@@ -158,6 +184,9 @@ public class AwakenedAura : Weapon {
 		index = (int)WeaponIds.AwakenedAura;
 		killFeedIndex = 87;
 		//damager = new Damager(player, 2, 0, 0.5f);
+		damage = "2/4";
+		hitcooldown = "0.5";
+		effect = "Passive AAura that damages the enemy.";
 	}
 }
 

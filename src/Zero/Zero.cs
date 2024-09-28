@@ -806,7 +806,6 @@ public class Zero : Character {
 				RyuenjinWeapon.staticWeapon, projPos, ProjIds.Ryuenjin, player, 4, 0, 0.2f,
 				addToLevel: addToLevel
 			),
-			// Deals +2 burn damage to total is 5.
 			(int)MeleeIds.Denjin => new GenericMeleeProj(
 				DenjinWeapon.staticWeapon, projPos, ProjIds.Denjin, player, 3, Global.defFlinch, 0.1f,
 				addToLevel: addToLevel

@@ -21,6 +21,10 @@ public class RyuenjinWeapon : Weapon {
 		type = (int)RisingType.Ryuenjin;
 		displayName = "Ryuenjin";
 		description = new string[] { "A fiery uppercut that burns enemies." };
+		damage = "4";
+		hitcooldown = "0.2";
+		Flinch = "0";
+		effect = "Burn DOT: 2 Seconds.";
 	}
 
 	public static Weapon getWeaponFromIndex(int index) {
@@ -43,6 +47,10 @@ public class DenjinWeapon : Weapon {
 		type = (int)RisingType.Denjin;
 		displayName = "Denjin";
 		description = new string[] { "An electrical uppercut that flinches enemies", "and can hit multiple times." };
+		damage = "3";
+		hitcooldown = "0.1";
+		Flinch = "26";
+		effect = "None.";
 	}
 }
 
@@ -58,6 +66,10 @@ public class RisingFangWeapon : Weapon {
 		type = (int)RisingType.RisingFang;
 		displayName = "Rising";
 		description = new string[] { "A fast, element-neutral uppercut.", "Can be used in the air to gain height." };
+		damage = "2";
+		hitcooldown = "0.5";
+		Flinch = "0";
+		effect = "Can be used in the air to gain height.";
 	}
 }
 

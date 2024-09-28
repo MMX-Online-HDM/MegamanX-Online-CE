@@ -21,6 +21,10 @@ public class KuuenzanWeapon : Weapon {
 		type = (int)AirSpecialType.Kuuenzan;
 		displayName = "Kuuenzan";
 		description = new string[] { "Standard spin attack in the air." };
+		damage = "1";
+		hitcooldown = "0.125";
+		Flinch = "0";
+		effect = "None.";
 	}
 
 	public static Weapon getWeaponFromIndex(int index) {
@@ -42,7 +46,11 @@ public class FSplasherWeapon : Weapon {
 		killFeedIndex = 109;
 		type = (int)AirSpecialType.FSplasher;
 		displayName = "Hisuishou";
-		description = new string[] { "An aerial dash attack forward.", "Also provides a good speed boost." };
+		description = new string[] { "A Mobile Aereal slightly faster Dash." };
+		damage = "2";
+		hitcooldown = "0.5";
+		Flinch = "0";
+		effect = "None.";
 	}
 
 	public override void attack(Character character) {
@@ -157,6 +165,10 @@ public class HyorogaWeapon : Weapon {
 		type = (int)AirSpecialType.Hyoroga;
 		displayName = "Hyoroga";
 		description = new string[] { "Cling to ceilings and rain down icicles with ATTACK." };
+		damage = "4-3";
+		hitcooldown = "0.25-0.15";
+		Flinch = "0-13";
+		effect = "Can Freeze enemies on contact.";
 	}
 
 	public override void attack(Character character) {

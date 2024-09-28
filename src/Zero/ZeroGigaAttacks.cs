@@ -27,9 +27,13 @@ public class RakuhouhaWeapon : Weapon {
 		weaponSlotIndex = 51;
 		type = (int)ZeroGigaType.Rakuhouha;
 		displayName = "Rakuhouha";
-		description = new string[] { "Channels stored energy in one blast.", "Energy cost: 16" };
+		description = new string[] { "Channels stored energy in one blast. Energy cost: 14." };
 		drawGrayOnLowAmmo = true;
 		drawRoundedDown = true;
+		damage = "4";
+		hitcooldown = "1";
+		Flinch = "26";
+		effect = "42 Frames of Invincibility.";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
@@ -61,9 +65,13 @@ public class RekkohaWeapon : Weapon {
 		weaponSlotIndex = 63;
 		type = (int)ZeroGigaType.Rekkoha;
 		displayName = "Rekkoha";
-		description = new string[] { "Summon down pillars of light energy.", "Energy cost: 32" };
+		description = new string[] { "Summon down pillars of light energy. Energy cost: 28." };
 		drawGrayOnLowAmmo = true;
 		drawRoundedDown = true;
+		damage = "3";
+		hitcooldown = "0.5";
+		Flinch = "26";
+		effect = "79 Frames of Invincibility.";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
@@ -86,9 +94,13 @@ public class CFlasher : Weapon {
 		weaponSlotIndex = 64;
 		type = (int)ZeroGigaType.CFlasher;
 		displayName = "Messenkou";
-		description = new string[] { "A less damaging blast that can pierce enemies.", "Energy cost: 8" };
+		description = new string[] { "A weak blast that can pierce enemies. Energy cost: 7." };
 		drawGrayOnLowAmmo = true;
 		drawRoundedDown = true;
+		damage = "2";
+		hitcooldown = "0.5";
+		Flinch = "0";
+		effect = "42 Frames of Invincibility. Ignores Defense.";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
@@ -110,6 +122,10 @@ public class ShinMessenkou : Weapon {
 		weaponSlotIndex = 64;
 		drawGrayOnLowAmmo = true;
 		drawRoundedDown = true;
+		damage = "4";
+		hitcooldown = "1";
+		Flinch = "26";
+		effect = "42 Frames of Invincibility";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
