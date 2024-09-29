@@ -4,7 +4,7 @@
 		<LangVersion>preview</LangVersion>
 		<AssemblyName>MMXOD</AssemblyName>
 		<OutputType>WinExe</OutputType>
-		<Nullable>enable</Nullable>
+		<Nullable>disable</Nullable>
 		<Version>20</Version>
 		<AssemblyVersion>20.0</AssemblyVersion>
 		<ApplicationIcon>app.ico</ApplicationIcon>
@@ -19,6 +19,7 @@
 		<Deterministic>true</Deterministic>
 		<NeutralLanguage>en</NeutralLanguage>
 		<FileVersion>20.0</FileVersion>
+		<NoWarn>$(NoWarn);CS8632</NoWarn>
 	</PropertyGroup>
 
 	<!--For making output go to anycpu if the RuntimeIdentifier is empty-->

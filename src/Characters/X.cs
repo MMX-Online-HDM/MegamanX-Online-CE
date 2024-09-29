@@ -1234,6 +1234,7 @@ public partial class MegamanX : Character {
 	}
 
 	public override void render(float x, float y) {
+		addRenderEffect(RenderEffectType.TrailX);
 		if (!shouldRender(x, y)) {
 			return;
 		}
