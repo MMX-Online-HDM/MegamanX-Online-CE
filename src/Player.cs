@@ -394,6 +394,10 @@ public partial class Player {
 	public ShaderWrapper vaccineShader = Helpers.cloneShaderSafe("vaccine");
 	public ShaderWrapper darkHoldShader = Helpers.cloneShaderSafe("darkhold");
 	public ShaderWrapper speedDevilShader = Helpers.cloneShaderSafe("speedDevilTrail");
+	public ShaderWrapper trailXShader = Helpers.cloneShaderSafe("trailX");
+	public ShaderWrapper trailZeroShader = Helpers.cloneShaderSafe("trailZero");
+	public ShaderWrapper trailAxlShader = Helpers.cloneShaderSafe("trailAxl");
+	public ShaderWrapper trailSigmaShader = Helpers.cloneShaderSafe("trailSigma");
 
 	// Maverick shaders.
 	// Duplicated mavericks are not a thing so this should not be a problem.
