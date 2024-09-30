@@ -423,7 +423,7 @@ public class Damager {
 					character.addBurnTime(owner, new Weapon(WeaponIds.DrDopplerGeneric, 156), 1f);
 					break;
 				case (int)ProjIds.Sigma3Fire:
-					character.addBurnTime(owner, new Sigma3FireWeapon(), 0.5f);
+					character.addBurnTime(owner, new Sigma3FireWeapon(), 1f);
 					break;
 				//Freeze effects	
 				case (int)ProjIds.IceGattling:
@@ -596,39 +596,42 @@ public class Damager {
 					}
 				}
 			}
-
+			//Damage above 0
 			if (damage > 0) {
-				bool isShotgunIceAndFrozen = character.sprite.name.Contains("frozen") && weaponKillFeedIndex == 8;
-				if ((flinch > 0) && !isShotgunIceAndFrozen) {
-					victim?.playSound("hurt");
-					int hurtDir = -character.xDir;
-					if (damagingActor != null && hitFromBehind(character, damagingActor, owner, projId)) {
-						hurtDir *= -1;
-					}
-					if (projId == (int)ProjIds.GravityWellCharged) {
-						hurtDir = 0;
-					}
-					character.setHurt(hurtDir, flinch, spiked);
+				//bool if the character is frozen
+				bool isShotgunIceAndFrozen = character?.sprite.name.Contains("frozen") == true && weaponKillFeedIndex == 8;
+				int hurtDir = -character.xDir; //Hurt Direction
+				if (damagingActor != null && hitFromBehind(character, damagingActor, owner, projId)) hurtDir *= -1;	
+				if (projId == (int)ProjIds.GravityWellCharged) hurtDir = 0;	
 
-					//if (weaponKillFeedIndex == 18) {
-						//character.punchFlinchCooldown = Global.spf;
-					//}
-				} else {
-					if (playHurtSound || weaponKillFeedIndex == 18 ||
-						(
-							projId == (int)ProjIds.BlackArrow && damage > 1
-						) || ((
-							projId == (int)ProjIds.SpiralMagnum ||
-							projId == (int)ProjIds.SpiralMagnumScoped) && damage > 2
-						) || ((
-							projId == (int)ProjIds.AssassinBullet ||
-							projId == (int)ProjIds.AssassinBulletQuick) && damage > 8)
-						) {
-							victim?.playSound("hurt");
-					} else {
-						victim?.playSound("hit");
+				// Flinch above 0 and is not weakness
+				if (flinch > 0 && !weakness) {
+					victim?.playSound("hurt");
+					character.setHurt(hurtDir, flinch, spiked);
+				} else if (weakness && !isShotgunIceAndFrozen) {
+					// Weakness is true and character is not frozen
+					if (!(character.charState is Hurt)) {
+						victim?.playSound("weakness");
+						//Only play if the victim is not in hurt state 
+						//Avoiding annoying sound spam
 					}
-				}
+					// bool if the proj does mini flinch (Vanilla behavior)
+					// (Yes, "mini flinch" weakness does nothing)
+					bool isMiniFlinch = getIsMiniFlinch(projId);
+					if (mmx?.WeaknessT == 0) {
+						//if the weakness time is 0, put a cooldown of 0.75
+						mmx.WeaknessT = 0.75f;
+						if (character.charState.superArmor) {
+							flinch = 0;
+							//if the enemy is on super armor, negate the flinch
+						} else flinch = Global.halfFlinch; //Weakness always does Half Flinch
+						if (character.ownedByLocalPlayer) { //(idk if this thing is correctly set)
+							//set hurt state  hurtDir, if is mini flinch, do 6 frames of flinch, else do half flinch
+							character.setHurt(hurtDir, isMiniFlinch ? 6 : flinch, spiked);			
+						}
+					}
+				} else victim?.playSound("hit");
+
 			}
 		}
 		// Ride armor section
@@ -830,7 +833,7 @@ public class Damager {
 			victim?.addRenderEffect(RenderEffectType.Hit, 0.05f, 0.1f);
 		}
 
-		float finalDamage = damage * owner.getDamageModifier();
+        float finalDamage = damage * (weakness ? 1.5f : 1) * owner.getDamageModifier();
 
 		if (finalDamage > 0 && character != null &&
 			character.ownedByLocalPlayer && charState is XUPParryStartState parryState &&
@@ -868,50 +871,76 @@ public class Damager {
 
 	public static bool isArmorPiercing(int? projId) {
 		if (projId == null) return false;
-		return
-			projId == (int)ProjIds.SpiralMagnum ||
-			projId == (int)ProjIds.AssassinBullet ||
-			projId == (int)ProjIds.AssassinBulletQuick ||
-			projId == (int)ProjIds.VileMK2Grab ||
-			projId == (int)ProjIds.UPGrab ||
-			projId == (int)ProjIds.LaunchODrain ||
-			projId == (int)ProjIds.DistanceNeedler ||
-			projId == (int)ProjIds.Raijingeki ||
-			projId == (int)ProjIds.Raijingeki2 ||
-			projId == (int)ProjIds.CFlasher ||
-			projId == (int)ProjIds.AcidBurstPoison ||
-			projId == (int)ProjIds.MetteurCrash;
+			return projId switch {
+				(int)ProjIds.SpiralMagnum  => true,
+				(int)ProjIds.AssassinBullet  => true,
+				(int)ProjIds.AssassinBulletQuick  => true,
+				(int)ProjIds.VileMK2Grab  => true,
+				(int)ProjIds.UPGrab  => true,
+				(int)ProjIds.LaunchODrain  => true,
+				(int)ProjIds.DistanceNeedler  => true,
+				(int)ProjIds.Raijingeki  => true,
+				(int)ProjIds.Raijingeki2  => true,
+				(int)ProjIds.CFlasher  => true,
+				(int)ProjIds.AcidBurstPoison  => true,
+				(int)ProjIds.MetteurCrash => true,
+				_=> false
+			};
 	}
 
 	public static bool isDot(int? projId) {
 		if (projId == null) return false;
-		return
-			projId == (int)ProjIds.AcidBurstPoison ||
-			projId == (int)ProjIds.Burn;
+		return projId switch {
+			(int)ProjIds.AcidBurstPoison => true,
+			(int)ProjIds.Burn => true,
+			_ => false
+		};
+	}
+	public static bool getIsMiniFlinch(int projId) {
+		return projId switch {
+			(int)ProjIds.ElectricSpark => true,
+			(int)ProjIds.TriadThunderBall => true,
+			(int)ProjIds.TriadThunderBeam  => true,
+			(int)ProjIds.TriadThunder  => true,
+			(int)ProjIds.PeaceOutRoller => true,
+			(int)ProjIds.RayGun  => true,
+			(int)ProjIds.RayGun2 => true,
+			(int)ProjIds.PlasmaGun2  => true,
+			(int)ProjIds.PlasmaGun2Hyper  => true,
+			(int)ProjIds.VoltTornado => true,
+			(int)ProjIds.VoltTornadoHyper  => true,
+			(int)ProjIds.Sigma2Ball  => true,
+			(int)ProjIds.VoltCTriadThunder => true,
+			(int)ProjIds.DrDopplerBall  => true,
+			(int)ProjIds.CopyShot => true,
+			_ => false
+		};
 	}
 
 	public static bool isElectric(int? projId) {
-		return
-			projId == (int)ProjIds.ElectricSpark ||
-			projId == (int)ProjIds.ElectricSparkCharged ||
-			projId == (int)ProjIds.TriadThunder ||
-			projId == (int)ProjIds.TriadThunderBall ||
-			projId == (int)ProjIds.TriadThunderBeam ||
-			projId == (int)ProjIds.TriadThunderCharged ||
-			projId == (int)ProjIds.Raijingeki ||
-			projId == (int)ProjIds.Raijingeki2 ||
-			projId == (int)ProjIds.Denjin ||
-			projId == (int)ProjIds.PeaceOutRoller ||
-			projId == (int)ProjIds.PlasmaGun ||
-			projId == (int)ProjIds.PlasmaGun2 ||
-			projId == (int)ProjIds.PlasmaGun2Hyper ||
-			projId == (int)ProjIds.VoltTornado ||
-			projId == (int)ProjIds.VoltTornadoHyper ||
-			projId == (int)ProjIds.SparkMSpark ||
-			projId == (int)ProjIds.SigmaHandElecBeam ||
-			projId == (int)ProjIds.Sigma2Ball ||
-			projId == (int)ProjIds.Sigma2Ball2 ||
-			projId == (int)ProjIds.WSpongeLightning;
+		return projId switch {
+			(int)ProjIds.ElectricSpark  => true,
+			(int)ProjIds.ElectricSparkCharged  => true,
+			(int)ProjIds.TriadThunder => true,
+			(int)ProjIds.TriadThunderBall  => true,
+			(int)ProjIds.TriadThunderBeam  => true,
+			(int)ProjIds.TriadThunderCharged => true,
+			(int)ProjIds.Raijingeki  => true,
+			(int)ProjIds.Raijingeki2  => true,
+			(int)ProjIds.Denjin  => true,
+			(int)ProjIds.PeaceOutRoller  => true,
+			(int)ProjIds.PlasmaGun  => true,
+			(int)ProjIds.PlasmaGun2  => true,
+			(int)ProjIds.PlasmaGun2Hyper  => true,
+			(int)ProjIds.VoltTornado => true,
+			(int)ProjIds.VoltTornadoHyper => true,
+			(int)ProjIds.SparkMSpark => true,
+			(int)ProjIds.SigmaHandElecBeam => true,
+			(int)ProjIds.Sigma2Ball => true,
+			(int)ProjIds.Sigma2Ball2 => true,
+			(int)ProjIds.WSpongeLightning => true,
+			_ => false
+		};
 	}
 
 	private static int getFlinchKeyFromProjId(int projId) {
@@ -1091,6 +1120,10 @@ public class Damager {
 			(int)ProjIds.VelGFire => true,
 			(int)ProjIds.SigmaWolfHeadFlameProj => true,
 			(int)ProjIds.WildHorseKick => true,
+			(int)ProjIds.Sigma3Fire => true,
+			(int)ProjIds.FStagDashCharge => true,
+			(int)ProjIds.FStagDash => true,
+			(int)ProjIds.FStagFireball => true,
 			_ => false
 		};
 	}
