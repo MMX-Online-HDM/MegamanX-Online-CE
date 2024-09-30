@@ -6,7 +6,8 @@ public class PreOptionsMenu : IMainMenu {
 	public int selectY;
 	public int[] optionPos = new int[9];
 	public int lineH = 14;
-	public MainMenu prevMenu;
+	public MainMenu? prevMenu1;
+	public IMainMenu prevMenu;
 	public string message;
 	public Action yesAction;
 	public bool inGame;
@@ -14,7 +15,7 @@ public class PreOptionsMenu : IMainMenu {
 	public float startX = 32;
 	public float Time = 1, Time2;
 	public bool Confirm = false, Confirm2 = false;
-	public PreOptionsMenu(MainMenu prevMenu, bool inGame) {
+	public PreOptionsMenu(IMainMenu prevMenu, bool inGame) {
 		this.prevMenu = prevMenu;
 		this.inGame = inGame;
 		for (int i = 0; i < optionPos.Length; i++) {
@@ -48,10 +49,12 @@ public class PreOptionsMenu : IMainMenu {
 		}
 		if (Time2 >= 1) {
 			Menu.change(prevMenu);
-			prevMenu.Time = 0;
-			prevMenu.Time2 = 1;
-			prevMenu.Confirm = false;
-			prevMenu.Confirm2 = false;
+			if (prevMenu1 != null) {		
+				prevMenu1.Time = 0;
+				prevMenu1.Time2 = 1;
+				prevMenu1.Confirm = false;
+				prevMenu1.Confirm2 = false;
+			}
 		}
 	}
 
