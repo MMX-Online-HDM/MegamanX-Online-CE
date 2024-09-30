@@ -24,13 +24,15 @@ public class PreOptionsMenu : IMainMenu {
 	}
 
 	public void TimeUpdate() {
-		if (Confirm == false) Time -= Global.spf * 2;
-		if (Time <= 0) {
-			Confirm = true;
-			Time = 0;
+		if (!inGame) {
+			if (Confirm == false) Time -= Global.spf * 2;
+			if (Time <= 0) {
+				Confirm = true;
+				Time = 0;
+			}
+			if (Global.input.isPressedMenu(Control.MenuBack)) Confirm2 = true;
+			if (Confirm2 == true) Time2 += Global.spf * 2;
 		}
-		if (Global.input.isPressedMenu(Control.MenuBack)) Confirm2 = true;
-		if (Confirm2 == true) Time2 += Global.spf * 2;
 	}
 	public void update() {
 		TimeUpdate();
@@ -47,7 +49,7 @@ public class PreOptionsMenu : IMainMenu {
 		if  (Global.input.isPressedMenu(Control.MenuConfirm)) {
 			if (selectY == 8) {Menu.change(new PreControlMenu(this, false));}
 		}
-		if (Time2 >= 1) {
+		if (Time2 >= 1 && !inGame) {
 			Menu.change(prevMenu);
 			if (prevMenu1 != null) {		
 				prevMenu1.Time = 0;
@@ -55,6 +57,9 @@ public class PreOptionsMenu : IMainMenu {
 				prevMenu1.Confirm = false;
 				prevMenu1.Confirm2 = false;
 			}
+		}
+		else if (Global.input.isPressedMenu(Control.MenuBack) && inGame) {
+			Menu.change(prevMenu);
 		}
 	}
 
@@ -88,7 +93,9 @@ public class PreOptionsMenu : IMainMenu {
 		Fonts.drawText(menuFont, "Controls", startX, optionPos[8], selected: selectY == 8);
 
 		Fonts.drawTextEX(FontType.Grey, "[OK]: Choose, [BACK]: Back", Global.halfScreenW, 198, Alignment.Center);
-		DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0,0, Time);
-		DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0,0, Time2);
+		if (!inGame) {
+			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0,0, Time);
+			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0,0, Time2);
+		}
 	}
 }
