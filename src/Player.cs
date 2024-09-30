@@ -1848,8 +1848,10 @@ public partial class Player {
 		if (character?.isCCImmuneHyperMode() == true) return;
 		if (character?.rideArmor?.raNum == 4 && character.charState is InRideArmor) return;
 		if (isX && hasUltimateArmor()) return;
-
-		currency++;
+		
+		if (Global.level?.server?.customMatchSettings != null) {
+			currency += Global.level.server.customMatchSettings.currencyGain;
+		} else currency++;
 	}
 
 	public int getStartCurrency() {
@@ -1866,11 +1868,15 @@ public partial class Player {
 		if (Global.level.isTraining() || Global.level.isRace()) {
 			return 2;
 		}
-		if (Global.level.gameMode is ControlPoints && alliance == GameMode.redAlliance) {
-			return 8;
-		}
-		if (Global.level.gameMode is KingOfTheHill) {
-			return 7;
+		if (Global.level?.server?.customMatchSettings != null) {
+			return Global.level.server.customMatchSettings.respawnTime;
+		} else {
+			if (Global.level?.gameMode is ControlPoints && alliance == GameMode.redAlliance) {
+				return 8;
+			}
+			if (Global.level?.gameMode is KingOfTheHill) {
+				return 7;
+			}
 		}
 		return 5;
 	}

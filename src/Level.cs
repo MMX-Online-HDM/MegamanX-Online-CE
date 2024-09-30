@@ -911,7 +911,7 @@ public partial class Level {
 		if (instance.properties.nonCtfOnly == true && Global.level.server.gameMode.Contains(GameMode.CTF)) return true;
 		if (instance.properties.nonKothOnly == true && Global.level.server.gameMode.Contains(GameMode.KingOfTheHill)) return true;
 		if (instance.properties.dmOnly == true && !Global.level.server.gameMode.Contains(GameMode.Deathmatch)) return true;
-
+		if (Global.level.server?.customMatchSettings?.pickupItems == false) return true;
 		return false;
 	}
 
