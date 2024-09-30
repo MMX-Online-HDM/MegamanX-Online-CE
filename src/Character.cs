@@ -262,6 +262,7 @@ public partial class Character : Actor, IDamagable {
 		if (!ownedByLocalPlayer) return;
 		if (isInvulnerable()) return;
 		if (isVaccinated()) return;
+		if (charState.invincible) return;
 
 		Damager damager = new Damager(attacker, 0, 0, 0);
 		if (infectedTime == 0 || infectedDamager == null) {
@@ -275,6 +276,7 @@ public partial class Character : Actor, IDamagable {
 		if (!ownedByLocalPlayer) return;
 		if (isInvulnerable()) return;
 		if (isVaccinated()) return;
+		if (charState.invincible) return;
 
 		changeState(new DarkHoldState(this, darkHoldTime), true);
 	}
@@ -283,7 +285,7 @@ public partial class Character : Actor, IDamagable {
 		if (!ownedByLocalPlayer ||
 			(this as MegamanX)?.chargedRollingShieldProj != null ||
 			isInvulnerable() ||
-			isVaccinated()
+			isVaccinated() || charState.invincible
 		) {
 			return;
 		}
@@ -308,7 +310,7 @@ public partial class Character : Actor, IDamagable {
 		if (!ownedByLocalPlayer ||
 			(this as MegamanX)?.chargedRollingShieldProj != null ||
 			isInvulnerable() ||
-			isVaccinated()
+			isVaccinated() || charState.invincible
 		) {
 			return;
 		}
@@ -335,7 +337,7 @@ public partial class Character : Actor, IDamagable {
 		if (!ownedByLocalPlayer ||
 			(this as MegamanX)?.chargedRollingShieldProj != null ||
 			isInvulnerable() ||
-			isVaccinated()
+			isVaccinated() || charState.invincible
 		) {
 			return;
 		}
@@ -590,6 +592,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool canShoot() {
+		// should we? if (Global.serverClient?.isLagging() == true) return false;
 		return charState.attackCtrl;
 	}
 
@@ -610,6 +613,8 @@ public partial class Character : Actor, IDamagable {
 		if (charState is Die || charState is VileRevive || charState is XReviveStart || charState is XRevive) return false;
 		if (player.currentMaverick != null && player.isTagTeam()) return false;
 		if (isWarpOut()) return false;
+		if (Global.serverClient?.isLagging() == true) return false;
+		if (charState is KaiserSigmaRevive || charState is WolfSigmaRevive || charState is ViralSigmaRevive) return false;
 		return true;
 	}
 
@@ -1564,13 +1569,13 @@ public partial class Character : Actor, IDamagable {
 		if (isCharging()) {
 			chargeSound.play();
 			int chargeType = 0;
-			if (this is BusterZero) {
+			/*if (this is BusterZero) {
 				chargeType = 1;
 			} else if (player.isX && player.hasArmArmor(3)) {
 				if (player.hasGoldenArmor()) {
 					chargeType = 2;
 				}
-			}
+			} */
 			if (!sprite.name.Contains("ra_hide")) {
 				int level = getChargeLevel();
 				var renderGfx = RenderEffectType.ChargeBlue;
@@ -1898,7 +1903,7 @@ public partial class Character : Actor, IDamagable {
 				clampTo3 = !mmx.isHyperX;
 				break;
 			case Zero zero:
-				clampTo3 = !zero.isBlack;
+				clampTo3 = true;
 				break;
 			case Vile vile:
 				clampTo3 = !vile.isVileMK5;
@@ -3124,7 +3129,7 @@ public partial class Character : Actor, IDamagable {
 	// PARASITE SECTION
 	public void addParasite(Player attacker) {
 		if (!ownedByLocalPlayer) return;
-		if (this is Character character && (character.charState.invincible || character.isInvulnerable())) return;
+		if (charState.invincible || isInvulnerable()) return;
 		Damager damager = new Damager(attacker, 4, Global.defFlinch, 0);
 		parasiteTime = Global.spf;
 		parasiteDamager = damager;
