@@ -21,6 +21,7 @@ public class ChargeEffect {
 	public List<Point> origPoints;
 	public List<ChargeParticle> chargeParts;
 	public bool active = false;
+	string? chargePart;
 
 	public ChargeEffect() {
 		chargeParts = new List<ChargeParticle>();
@@ -75,9 +76,10 @@ public class ChargeEffect {
 				part.pos.x = Helpers.moveTo(part.pos.x, 0, Global.spf * 70);
 				part.pos.y = Helpers.moveTo(part.pos.y, 0, Global.spf * 70);
 			}
-			var chargePart = "charge_part_" + chargeLevel.ToString();
-			if (chargeType != 1 && chargeLevel >= 4) {
-				chargePart = "hypercharge_part_1";
+			if (chargeType == 3 && chargeLevel >= 3) {
+				chargePart = "charge_part_4";
+			} else {
+				chargePart = "charge_part_" + chargeLevel.ToString();
 			}
 			part.changeSprite(chargePart, true);
 			part.time += Global.spf * 20;
