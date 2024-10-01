@@ -177,7 +177,7 @@ public class PunchyZero : Character {
 	}
 
 	public override bool canCharge() {
-		return (player.currency > 0 || freeBusterShots > 0) && donutsPending == 0;
+		return (player.currency > 0 || freeBusterShots > 0) && donutsPending == 0 && !isInvulnerableAttack();
 	}
 
 	public override bool chargeButtonHeld() {
@@ -488,6 +488,10 @@ public class PunchyZero : Character {
 
 	public override bool isToughGuyHyperMode() {
 		return isBlack || isGenmuZero;
+	}
+	public override bool canShoot() {
+		if (isInvulnerableAttack()) return false;
+		return base.canShoot();
 	}
 
 	public override List<ShaderWrapper> getShaders() {
