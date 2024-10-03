@@ -143,7 +143,6 @@ public class Vile : Character {
 			if (vileHoverTime < 0) vileHoverTime = 0;
 		}
 
-		//bool isShootingVulcan = sprite.name.EndsWith("shoot") && player.weapon is Vulcan;
 		bool isShootingVulcan = vulcanLingerTime <= 0.1;
 		if (isShootingVulcan) {
 			vileAmmoRechargeCooldown = 0.15f;
@@ -199,45 +198,105 @@ public class Vile : Character {
 		Helpers.decrementTime(ref mechBusterCooldown);
 		Helpers.decrementTime(ref gizmoCooldown);
 
-		if (player.weapon is not AssassinBullet && (laserWeapon.type > -1 || isVileMK5)) {
-			if (player.input.isHeld(Control.Special1, player) &&
-				charState is not Die && invulnTime == 0 && flag == null &&
-				player.vileAmmo >= laserWeapon.getAmmoUsage(0)
-			) {
-				increaseCharge();
-			} else {
-				if (isCharging() && getChargeLevel() >= 3) {
-					if (getChargeLevel() >= 4 && isVileMK5) {
-						changeState(new HexaInvoluteState(), true);
-					} else {
-						laserWeapon.vileShoot(WeaponIds.VileLaser, this);
-					}
-				}
-				stopCharge();
-			}
-			chargeGfx();
+
+		if (charState is InRideChaser) {
+			return;
 		}
-
+		RideArmorAttacks();
+		RideLinkMK5();
+		// GMTODO: Consider a better way here instead of a hard-coded deny list
+		// Gacel: Done, now it uses attackCtrl
+		if (!charState.attackCtrl || charState is VileMK2GrabState) {
+			return;
+		}
+		chargeLogic(shoot);
+	}
+	public override bool attackCtrl() {
+		bool specialPressed = player.input.isPressed(Control.Special1, player);
+		bool shootHeld = player.input.isHeld(Control.Shoot, player);
+		bool WeaponRightHeld = player.input.isHeld(Control.WeaponRight, player);
+		if (specialPressed) {
+			dashGrabSpecial();
+			airDownAttacks();
+			return normalAttacks();
+		}
+		if (shootHeld) {
+			if (cutterWeapon.shootTime < cutterWeapon.rateOfFire * 0.75f) 
+				cannonWeapon.vileShoot(0, this);
+		}
+		if (WeaponRightHeld) {
+			vulcanWeapon.vileShoot(0, this);
+		}
+		return base.attackCtrl();
+	}
+	public bool normalAttacks() {
+		bool LeftorRightHeld = player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player);
+		bool UpHeld = player.input.isHeld(Control.Up, player);
+		if (charState is Crouch) {
+			napalmWeapon.vileShoot(WeaponIds.Napalm, this);
+			return true;
+		}
+		if (LeftorRightHeld && !UpHeld && grounded) {
+			if (rocketPunchWeapon.type > -1) {
+				rocketPunchWeapon.vileShoot(WeaponIds.RocketPunch, this);
+			}
+			return true;
+		}
+		if (!UpHeld || cutterWeapon.type == -1) {
+			if (missileWeapon.type > -1) 
+				missileWeapon.vileShoot(WeaponIds.ElectricShock, this);					
+			return true;			
+		}
+		if (UpHeld) {
+			cutterWeapon.vileShoot(WeaponIds.VileCutter, this);
+			return true;
+		}
+		return false;
+	}
+	public bool airDownAttacks() {
+		bool HeldDown = player.input.isHeld(Control.Down, player);
+		bool dashorairdash = charState is Dash || charState is AirDash;
+		if (!grounded && !dashorairdash) {
+			if (!HeldDown) 
+				grenadeWeapon.vileShoot(WeaponIds.VileBomb, this);
+			 else 
+				flamethrowerWeapon.vileShoot(WeaponIds.VileFlamethrower, this);
+			return true;
+		}
+		return false;
+	}
+	public bool dashGrabSpecial() {
+		if (charState is Dash || charState is AirDash) {
+			if (isVileMK2) {
+				charState.isGrabbing = true;
+				charState.superArmor = true; //peakbalance
+				changeSpriteFromName("dash_grab", true);
+			}
+			return true;
+		}
+		return false;
+	} 
+	public bool RideArmorAttacks() {
 		var raState = charState as InRideArmor;
+		bool Goliath = rideArmor?.raNum == 4;
+		bool stunShotPressed = player.input.isPressed(Control.Special1, player);
+		bool HeldDown = player.input.isHeld(Control.Down, player);
+		bool goliathShotPressed = player.input.isPressed(Control.WeaponLeft, player) || player.input.isPressed(Control.WeaponRight, player);
+		bool raStates = rideArmor?.rideArmorState is RAIdle || rideArmor?.rideArmorState is RAJump || rideArmor?.rideArmorState is RAFall || rideArmor?.rideArmorState is RADash;
 		if (rideArmor != null && raState != null && !raState.isHiding) {
-			if (rideArmor.rideArmorState is RAIdle || rideArmor.rideArmorState is RAJump || rideArmor.rideArmorState is RAFall || rideArmor.rideArmorState is RADash) {
-				bool stunShotPressed = player.input.isPressed(Control.Special1, player);
-				bool goliathShotPressed = player.input.isPressed(Control.WeaponLeft, player) || player.input.isPressed(Control.WeaponRight, player);
-
-				if (rideArmor.raNum == 4 && Options.main.swapGoliathInputs) {
+			if (raStates) {
+				if (Goliath && Options.main.swapGoliathInputs) {
 					bool oldStunShotPressed = stunShotPressed;
 					stunShotPressed = goliathShotPressed;
 					goliathShotPressed = oldStunShotPressed;
 				}
-
-				if (stunShotPressed && !player.input.isHeld(Control.Down, player) && invulnTime == 0) {
+				if (stunShotPressed && !HeldDown) {
 					if (tryUseVileAmmo(missileWeapon.vileAmmo)) {
 						missileWeapon.vileShoot(WeaponIds.ElectricShock, this);
 					}
 				}
-
 				if (goliathShotPressed) {
-					if (rideArmor.raNum == 4 && !rideArmor.isAttacking() && mechBusterCooldown == 0) {
+					if (Goliath && !rideArmor.isAttacking() && mechBusterCooldown == 0) {
 						rideArmor.changeState(new RAGoliathShoot(rideArmor.grounded), true);
 						mechBusterCooldown = 1;
 					}
@@ -245,56 +304,62 @@ public class Vile : Character {
 			}
 			player.gridModeHeld = false;
 			player.gridModePos = new Point();
-			return;
+			return true;
 		}
-
-		if (charState is InRideChaser) {
-			return;
+		return false;
+	}
+	public override bool normalCtrl() {
+		if (sprite.name.EndsWith("cannon_air") && isAnimOver()) {
+			changeSpriteFromName("fall", true);
 		}
-
-		if (rideMenuWeapon.isMenuOpened) {
-			if (player.input.isPressed(Control.Special1, player) || player.input.isPressed(Control.WeaponLeft, player)) {
-				rideMenuWeapon.isMenuOpened = false;
+		if (!grounded &&
+			canVileHover() &&
+			player.input.isPressed(Control.Jump, player) &&
+			charState is not VileHover
+		) {
+			changeState(new VileHover(), true);
+			return true;
+		}
+		return base.normalCtrl();
+	}
+	public void shoot(int chargeLevel) {
+		if (chargeLevel >= 3) {
+			laserWeapon.vileShoot(WeaponIds.VileLaser, this);
+		}
+		if (chargeLevel == 4 && isVileMK5) {
+			changeState(new HexaInvoluteState(), true);
+		} 
+	}
+	public override bool chargeButtonHeld() {
+		return player.input.isHeld(Control.Special1, player);
+	}
+	public override bool canCharge() {
+		return !isInvulnerableAttack() && charState is not Die && invulnTime == 0;
+	}
+	public override bool canShoot() {
+		if (isInvulnerableAttack()) return false;
+		if (invulnTime > 0) return false;
+		if (!player.canControl) return false;
+		return base.canShoot();
+	}
+	public override void chargeLogic(Action<int> shootFunct) {
+		if (chargeButtonHeld() && flag == null && player.vileAmmo >= laserWeapon.getAmmoUsage(0)) {
+			if (canCharge()) {
+				increaseCharge();
 			}
 		}
-
-		bool wL = player.input.isHeld(Control.WeaponLeft, player);
-		lastFrameWeaponLeftHeld = wL;
-
-		// Vile V Ride control.
-		if (!isVileMK5 || startRideArmor == null) {
-			if (player.input.isPressed(Control.Special2, player) &&
-				rideMenuWeapon != null && calldownMechCooldown == 0 &&
-				(!alreadySummonedNewMech || startRideArmor != null)
-			) {
-				onMechSlotSelect(rideMenuWeapon);
-				return;
-			}
-		} else if (player.input.isPressed(Control.Special2, player) && !player.input.isHeld(Control.Down, player)) {
-			onMechSlotSelect(rideMenuWeapon);
-			return;
-		}
-
-		/* else if (mmw != null) {
-			if (player.input.isPressed(Control.Up, player)) {
-				onMechSlotSelect(mmw);
-				player.changeWeaponSlot(player.prevWeaponSlot);
-				return;
-			}
-		} */
-
-		if (isVileMK5 && startRideArmor != null) {
-			if (canLinkMK5()) {
-				if (startRideArmor.character == null) {
-					startRideArmor.linkMK5(this);
+		else if (canShoot()) {
+			int chargeLevel = getChargeLevel();
+			if (isCharging()) {
+				if (chargeLevel >= 1) {
+					shootFunct(chargeLevel);
 				}
-			} else {
-				if (startRideArmor.character != null) {
-					startRideArmor.unlinkMK5();
-				}
 			}
+			stopCharge();
 		}
-
+		chargeGfx();
+	}
+	public void RideLinkMK5() {
 		if (isVileMK5 && startRideArmor != null &&
 			player.input.isPressed(Control.Special2, player) &&
 			player.input.isHeld(Control.Down, player)
@@ -311,81 +376,38 @@ public class Vile : Character {
 				);
 			}
 		}
-
-		/* if (isVileMK5 && vileStartRideArmor != null && mmw != null && grounded && vileStartRideArmor.grounded && player.input.isPressed(Control.Down, player)) {
-			if (vileStartRideArmor.rideArmorState is not RADeactive) {
-				vileStartRideArmor.changeState(new RADeactive(), true);
-				player.changeWeaponSlot(player.prevWeaponSlot);
-				Global.level.gameMode.setHUDErrorMessage(player, "Deactivated Ride Armor.", playSound: false, resetCooldown: true);
+		// Vile V Ride control.
+		if (!isVileMK5 || startRideArmor == null) {
+			if (player.input.isPressed(Control.Special2, player) &&
+				rideMenuWeapon != null && calldownMechCooldown == 0 &&
+				(!alreadySummonedNewMech || startRideArmor != null)
+			) {
+				onMechSlotSelect(rideMenuWeapon);
 				return;
 			}
-		} */
-
-		if (isInvulnerableAttack()) return;
-		if (invulnTime > 0) return;
-		if (!player.canControl) return;
-
-		// GMTODO: Consider a better way here instead of a hard-coded deny list
-		// Gacel: Done, now it uses attackCtrl
-		if (!charState.attackCtrl || charState is VileMK2GrabState) {
+		//Ride Menu
+		} else if (player.input.isPressed(Control.Special2, player) && !player.input.isHeld(Control.Down, player)) {
+			onMechSlotSelect(rideMenuWeapon);
 			return;
 		}
-		if (charState is Dash || charState is AirDash) {
-			if (isVileMK2 && (player.input.isPressed(Control.Special1, player))) {
-				charState.isGrabbing = true;
-				charState.superArmor = true;
-				changeSpriteFromName("dash_grab", true);
+		if (rideMenuWeapon?.isMenuOpened == true) {
+			if (player.input.isPressed(Control.Special1, player) || player.input.isPressed(Control.WeaponLeft, player)) {
+				rideMenuWeapon.isMenuOpened = false;
 			}
 		}
 
-		if (player.input.isPressed(Control.Special1, player)) {
-			if (charState is Crouch) {
-				napalmWeapon.vileShoot(WeaponIds.Napalm, this);
-			} else if (charState is Jump || charState is Fall || charState is VileHover) {
-				if (!player.input.isHeld(Control.Down, player)) {
-					grenadeWeapon.vileShoot(WeaponIds.VileBomb, this);
-				} else {
-					flamethrowerWeapon.vileShoot(WeaponIds.VileFlamethrower, this);
+		if (isVileMK5 && startRideArmor != null) {
+			if (canLinkMK5()) {
+				if (startRideArmor.character == null) {
+					startRideArmor.linkMK5(this);
 				}
-			} else if (charState is Idle || charState is Dash || charState is Run || charState is RocketPunchAttack) {
-				if ((player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) && !player.input.isHeld(Control.Up, player)) {
-					if (rocketPunchWeapon.type > -1) {
-						rocketPunchWeapon.vileShoot(WeaponIds.RocketPunch, this);
-					}
-				} else if (charState is not RocketPunchAttack) {
-					if (!player.input.isHeld(Control.Up, player) || cutterWeapon.type == -1) {
-						if (missileWeapon.type > -1) {
-							missileWeapon.vileShoot(WeaponIds.ElectricShock, this);
-						}
-					} else {
-						cutterWeapon.vileShoot(WeaponIds.VileCutter, this);
-					}
+			} else {
+				if (startRideArmor.character != null) {
+					startRideArmor.unlinkMK5();
 				}
 			}
-		} else if (player.input.isHeld(Control.Shoot, player)) {
-			if (cutterWeapon.shootTime < cutterWeapon.rateOfFire * 0.75f) {
-				cannonWeapon.vileShoot(0, this);
-			}
-		} else if (player.input.isHeld(Control.WeaponRight, player)) {
-			vulcanWeapon.vileShoot(0, this);
 		}
 	}
-
-	public override bool normalCtrl() {
-		if (sprite.name.EndsWith("cannon_air") && isAnimOver()) {
-			changeSpriteFromName("fall", true);
-		}
-		if (!grounded &&
-			canVileHover() &&
-			player.input.isPressed(Control.Jump, player) &&
-			charState is not VileHover
-		) {
-			changeState(new VileHover(), true);
-			return true;
-		}
-		return base.normalCtrl();
-	}
-
 	public bool canLinkMK5() {
 		if (startRideArmor == null) return false;
 		if (startRideArmor.rideArmorState is RADeactive && startRideArmor.manualDisabled) return false;
