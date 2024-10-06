@@ -46,22 +46,23 @@ public class CharSelection {
 	public int mappedCharMaverick;
 	public string sprite;
 	public int frameIndex;
-	public Point offset = new Point(0, 0);
+	public Point offset = new Point(0, 45);
 
 	public static int sigmaIndex => Options.main?.sigmaLoadout?.sigmaForm ?? 0;
 
 	public static CharSelection[] selections => [
-		new CharSelection("X", 0, 1, 0, "menu_megaman", 0),
-		new CharSelection("Zero", 1, 1, 0, "menu_zero", 0),
-		new CharSelection("Kaiser Knuckle", 5, 1, 0, "zero_megapunch", 5) {
-			offset = new Point(0, 22)
+		new CharSelection("X", 0, 1, 0, "menu_mmx", 0),
+		new CharSelection("Zero", 1, 1, 0, "menu_szero", 0),
+		new CharSelection("Kaiser Knuckle", 5, 1, 0, "menu_kzero", 5) {
 		},
-		new CharSelection("Buster Zero", 6, 1, 0, "zero_shoot", 0) {
-			offset = new Point(-4, 22)
+		new CharSelection("Buster Zero", 6, 1, 0, "menu_bzero", 0) {
+			offset = new Point(2, 45)
 		},
-		new CharSelection("Vile", 2, 1, 0, "menu_vile", 0),
-		new CharSelection("Axl", 3, 1, 0, "menu_axl", 0),
-		new CharSelection("Sigma", 4, 1, 0, "menu_sigma", sigmaIndex),
+		new CharSelection("Vile", 2, 1, 0, "menu_vvile", 0),
+		new CharSelection("Axl", 3, 1, 0, "menu_aaxl", 0){
+			offset = new Point(1, 45)
+		},
+		new CharSelection("Sigma", 4, 1, 0, "menu_ssigma", sigmaIndex),
 		//new CharSelection("Rock", 10, 1, 0, "rock_idle", 0),
 	];
 
@@ -282,7 +283,7 @@ public class SelectCharacterMenu : IMainMenu {
 		// Draw character + box
 		var charPosX1 = Global.halfScreenW;
 		var charPosY1 = 85;
-		Global.sprites["playerbox"].drawToHUD(0, charPosX1, charPosY1);
+		Global.sprites["playerbox"].drawToHUD(0, charPosX1, charPosY1+2);
 		string sprite = charSelection.sprite;
 		int frameIndex = charSelection.frameIndex;
 		float yOff = sprite.EndsWith("_idle") ? (Global.sprites[sprite].frames[0].rect.h() * 0.5f) : 0;
@@ -296,16 +297,16 @@ public class SelectCharacterMenu : IMainMenu {
 
 		if (Global.frameCount % 60 < 30) {
 			Fonts.drawText(
-				FontType.Orange, "<", Global.halfScreenW - 60, Global.halfScreenH + 22,
+				FontType.Orange, "<", Global.halfScreenW - 60, Global.halfScreenH + 36,
 				Alignment.Center
 			);
 			Fonts.drawText(
-				FontType.Orange, ">", Global.halfScreenW + 60, Global.halfScreenH + 22,
+				FontType.Orange, ">", Global.halfScreenW + 60, Global.halfScreenH + 36,
 				Alignment.Center
 			);
 		}
 		Fonts.drawText(
-			FontType.Orange, charSelection.name, Global.halfScreenW, Global.halfScreenH + 22,
+			FontType.Orange, charSelection.name, Global.halfScreenW, Global.halfScreenH + 36,
 			alignment: Alignment.Center
 		);
 
@@ -336,20 +337,20 @@ public class SelectCharacterMenu : IMainMenu {
 		};
 		if (description.Length > 0) {
 			DrawWrappers.DrawRect(
-				25, startY + 98, Global.screenW - 25, startY + 127,
+				25, startY + 110, Global.screenW - 25, startY + 132,
 				true, new Color(0, 0, 0, 100), 1, ZIndex.HUD, false, outlineColor: Color.White
 			);
 			for (int i = 0; i < description.Length; i++) {
 				Fonts.drawText(
 					FontType.Green, description[i],
-					Global.halfScreenW, startY + 94 + (10 * (i + 1)), alignment: Alignment.Center
+					Global.halfScreenW, startY + 102 + (10 * (i + 1)), alignment: Alignment.Center
 				);
 			}
 		}
 		if (!isInGame) {
 			Fonts.drawTextEX(
 				FontType.Grey, "[OK]: Continue, [BACK]: Back\n[MLEFT]/[MRIGHT]: Change character",
-				Global.screenW * 0.5f, 178, Alignment.Center
+				Global.screenW * 0.5f, 182, Alignment.Center
 			);
 		} else {
 			if (!Global.isHost) {
