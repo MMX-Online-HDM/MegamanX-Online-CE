@@ -556,13 +556,19 @@ public class Projectile : Actor {
 				}
 
 				if (shouldDealDamage(damagable)) {
-					if (!isDefenderFavored()) {
-						if (ownedByLocalPlayer) {
+					if (Global.level.server.favorHost && Global.level.server.isP2P) {
+						if (Global.serverClient?.isHost == true) {
 							damager.applyDamage(damagable, weakness, weapon, this, projId);
 						}
 					} else {
-						if (damagable.actor().ownedByLocalPlayer) {
-							damager.applyDamage(damagable, weakness, weapon, this, projId);
+						if (!isDefenderFavored()) {
+							if (ownedByLocalPlayer) {
+								damager.applyDamage(damagable, weakness, weapon, this, projId);
+							}
+						} else {
+							if (damagable.actor().ownedByLocalPlayer) {
+								damager.applyDamage(damagable, weakness, weapon, this, projId);
+							}
 						}
 					}
 				}
