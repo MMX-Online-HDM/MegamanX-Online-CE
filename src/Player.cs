@@ -143,7 +143,24 @@ public partial class Player {
 	public bool isAxl { get { return charNum == (int)CharIds.Axl; } }
 	public bool isSigma { get { return charNum == (int)CharIds.Sigma; } }
 
-	public float health;
+	public float healthBackup;
+	public float _health;
+	public float health {
+		get {
+			if (!ownedByLocalPlayer) {
+				return _health;
+			}
+			if (healthBackup != health * curMul) {
+				throw new OverflowException();
+			}
+			return _health;
+		}
+		set {
+			_health = value;
+			healthBackup = value * curMul;
+		}
+	}
+
 	public float maxHealth;
 	public bool isDead {
 		get {
@@ -226,9 +243,25 @@ public partial class Player {
 		get { return charSubTanks[isDisguisedAxl ? 3 : charNum]; }
 		set { charSubTanks[isDisguisedAxl ? 3 : charNum] = value; }
 	}
+
+	public Dictionary<int, int> charHeartTanksBackup = new Dictionary<int, int>();
 	public int heartTanks {
-		get { return charHeartTanks[isDisguisedAxl ? 3 : charNum]; }
-		set { charHeartTanks[isDisguisedAxl ? 3 : charNum] = value; }
+		get {
+			if (!ownedByLocalPlayer) {
+				return charHeartTanks[isDisguisedAxl ? 3 : charNum];
+			}
+			if (charHeartTanksBackup.GetValueOrDefault(isDisguisedAxl ? 3 : charNum)
+				!=
+				charHeartTanks[isDisguisedAxl ? 3 : charNum] * curMul
+			) {
+				throw new OverflowException();
+			}
+			return charHeartTanks[isDisguisedAxl ? 3 : charNum];
+		}
+		set {
+			charHeartTanks[isDisguisedAxl ? 3 : charNum] = value;
+			charHeartTanksBackup[isDisguisedAxl ? 3 : charNum] = value * curMul;
+		}
 	}
 
 	// Currency
@@ -245,7 +278,7 @@ public partial class Player {
 				!=
 				charCurrency[isDisguisedAxl ? 3 : charNum]
 			) {
-				throw new Exception("Error, corrupted currency value");
+				throw new OverflowException();
 			}
 			return charCurrency[isDisguisedAxl ? 3 : charNum];
 		}
