@@ -216,13 +216,13 @@ public class Zero : Character {
 
 	// Shoot logic and stuff.
 	public override bool canShoot() {
-		return (!charState.invincible &&
+		return (!charState.invincible && !isInvulnerable
 			(charState.attackCtrl || (charState.altCtrls.Length >= 2 && charState.altCtrls[1]))
 		);
 	}
 	
 	public override bool canCharge() {
-		return (
+		return ( !isInvulnerable
 			(charState.attackCtrl || getChargeLevel() > 0) &&
 			(player.currency > 0 || freeBusterShots > 0) &&
 			donutsPending == 0

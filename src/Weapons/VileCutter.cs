@@ -60,7 +60,11 @@ public class VileCutter : Weapon {
 		if (shootTime == 0) {
 			if (vile.tryUseVileAmmo(vileAmmoUsage)) {
 				vile.setVileShootTime(this);
-				vile.changeState(new CutterAttackState(), true);
+				if (!vile.grounded) {
+					vile.changeState(new CutterAttackState(grounded: false), true);
+				} else {
+					vile.changeState(new CutterAttackState(grounded: true), true);
+				}
 			}
 		}
 	}
@@ -69,9 +73,12 @@ public class VileCutter : Weapon {
 public class CutterAttackState : CharState {
 	VileCutterProj proj;
 
-	public CutterAttackState() : base("idle_shoot", "", "", "") {
+	public CutterAttackState(bool grounded) : base(getSprite(grounded), "", "", "") {
 		exitOnAirborne = true;
 		normalCtrl = true;
+	}
+	public static string getSprite(bool grounded) {
+		return grounded ? "idle_shoot" : "cannon_air";
 	}
 
 	public override void update() {

@@ -1820,9 +1820,9 @@ public class Axl : Character {
 
 	public override bool isInvulnerable(bool ignoreRideArmorHide = false, bool factorHyperMode = false) {
 		bool invul = base.isInvulnerable(ignoreRideArmorHide, factorHyperMode);
-		if (stealthActive) {
+		/*if (stealthActive) {
 			return true;
-		}
+		}*/
 		return invul;
 	}
 
