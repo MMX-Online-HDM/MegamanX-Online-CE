@@ -55,9 +55,9 @@ public class UpgradeArmorMenu : IMainMenu {
 			return;
 		}
 		// Enable this to disable 14.0 UAX Menu
-		//if (mainPlayer.hasGoldenArmor() || mainPlayer.hasUltimateArmor()) {
-		//	return;
-		//}
+		if (mainPlayer.hasGoldenArmor() || mainPlayer.hasUltimateArmor()) {
+			return;
+		}
 		if (mainPlayer.hasGoldenArmor()) {
 			Menu.change(new UpgradeArmorMenuGolden(GoldenMenu));
 		}
