@@ -706,15 +706,29 @@ public class AnimData {
 			float durationSeconds = (float)Convert.ToDouble(frameJson["duration"]);
 			float durationFrames = MathF.Round(durationSeconds * 60);
 
+			if (x1 > x2) {
+				(x1, x2) = (x2, x1);
+			}
+			if (y1 > y2) {
+				(y1, y2) = (y2, y1);
+			}
+			// Rendertexture creation.
+			int sprWidth = MathInt.Ceiling(x2 - x1);
+			int sprHeight = MathInt.Ceiling(y2 - y1);
+			if (sprWidth > 1024) {
+				sprWidth = 1024;
+				x2 = x1 + 1024;
+			}
+			if (sprHeight > 1024) {
+				sprHeight = 1024;
+				y2 = y1 + 1024;
+			}
 			Frame frame = new Frame(
 				new Rect(x1, y1, x2, y2),
 				durationFrames,
 				new Point(offsetX, offsetY)
 			);
 
-			// Rendertexture creation.
-			int sprWidth = MathInt.Ceiling(x2 - x1);
-			int sprHeight = MathInt.Ceiling(y2 - y1);
 			int encodeKey = (sprWidth * 397) ^ sprHeight;
 			if (!Global.renderTextures.ContainsKey(encodeKey)) {
 				Global.renderTextures[encodeKey] = (
