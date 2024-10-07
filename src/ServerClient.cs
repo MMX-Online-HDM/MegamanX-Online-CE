@@ -250,6 +250,7 @@ public class ServerClient {
 		config.ConnectionTimeout = Server.connectionTimeoutSeconds;
 		// Create client.
 		var client = new NetClient(config);
+		client.Configuration.AutoFlushSendQueue = true;
 		client.Start();
 		NetOutgoingMessage hail = client.CreateMessage(JsonConvert.SerializeObject(inputServerPlayer));
 		client.Connect(serverIp, port, hail);
@@ -257,13 +258,15 @@ public class ServerClient {
 		Thread.Sleep(100);
 		Console.WriteLine("Starting Serverclient.");
 		int count = 0;
-		while (count < 20 && client.ConnectionsCount == 0) {
+		while (count < 40 && client.ConnectionsCount == 0) {
 			Thread.Sleep(100);
 			client.FlushSendQueue();
+			count++;
 		}
 		if (client.ConnectionsCount == 0) {
 			error = "Failed initial connection.";
 			joinServerResponse = null;
+			client.Configuration.AutoFlushSendQueue = false;
 			return null;
 		}
 		var serverClient = new ServerClient(client, inputServerPlayer.isHost);
@@ -280,12 +283,14 @@ public class ServerClient {
 						)
 					);
 					serverClient.serverPlayer = joinServerResponse.getLastPlayer();
+					client.Configuration.AutoFlushSendQueue = false;
 					return serverClient;
 				} else if (message.StartsWith("hostdisconnect:")) {
 					var reason = message.Split(':')[1];
 					error = "Could not join: " + reason;
 					joinServerResponse = null;
 					serverClient.disconnect("Client couldn't get response");
+					client.Configuration.AutoFlushSendQueue = false;
 					return null;
 				} else if (message.StartsWith("joinserverresponse:")) {
 					Console.WriteLine("Got general response.");
@@ -300,6 +305,7 @@ public class ServerClient {
 		error = "Failed to get connect response from server.";
 		joinServerResponse = null;
 		serverClient.disconnect("Client couldn't get response");
+		client.Configuration.AutoFlushSendQueue = false;
 		return null;
 	}
 
