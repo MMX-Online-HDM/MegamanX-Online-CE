@@ -1018,6 +1018,7 @@ public class GameMode {
 		sprite.Scale = new Vector2f(0.25f, 0.25f);
 		Global.window.SetView(DrawWrappers.hudView);
 		Global.window.Draw(sprite);
+		sprite.Dispose();
 
 		if (level.mainPlayer.isSigma) {
 			foreach (Maverick maverick in level.mainPlayer.mavericks) {

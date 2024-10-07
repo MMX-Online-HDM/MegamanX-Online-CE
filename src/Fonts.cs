@@ -115,6 +115,7 @@ public class Fonts {
 				}
 				// Add to array.
 				DrawWrappers.addToVertexArray(batchDrawable, textSprite);
+				textSprite.Dispose();
 			}
 		}
 		// For the loading screen.
