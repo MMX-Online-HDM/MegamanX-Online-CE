@@ -150,7 +150,7 @@ public partial class Player {
 			if (!ownedByLocalPlayer) {
 				return _health;
 			}
-			if (healthBackup != health * curMul) {
+			if (healthBackup != _health * curMul) {
 				throw new OverflowException();
 			}
 			return _health;
