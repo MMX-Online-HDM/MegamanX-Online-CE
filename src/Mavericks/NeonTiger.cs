@@ -36,11 +36,7 @@ public class NeonTiger : Maverick {
 				if (input.isHeld(Control.Special1, player)) {
 					changeState(getShootState(false));
 				} else if (input.isPressed(Control.Dash, player)) {
-					if (player.isTagTeam()) {
 						changeState(new NeonTDashState());
-					} else {
-						changeState(new NeonTDashClawState());
-					}
 				} else if (input.isHeld(Control.Shoot, player)) {
 					changeState(new NeonTClawState(false));
 				}
