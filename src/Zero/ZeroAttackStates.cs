@@ -168,6 +168,10 @@ public class ZeroShippuugaState : ZeroGenericMeleeState {
 		sound = "saber1";
 		soundFrame = 1;
 	}
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		altCtrls[1] = true;
+	}
 }
 
 public class ZeroDoubleBuster : CharState {

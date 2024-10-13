@@ -216,7 +216,7 @@ public class Zero : Character {
 
 	// Shoot logic and stuff.
 	public override bool canShoot() {
-		return (!charState.invincible && !isInvulnerable
+		return (!charState.invincible && !isInvulnerable() &&
 			(charState.attackCtrl || (charState.altCtrls.Length >= 2 && charState.altCtrls[1]))
 		);
 	}
