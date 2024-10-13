@@ -37,6 +37,7 @@ public enum CharIds {
 	KaiserSigma,
 	// Non-vanilla chars start here.
 	Rock = 10,
+	Iris = 11,
 }
 
 public class CharSelection {
@@ -64,6 +65,9 @@ public class CharSelection {
 		},
 		new CharSelection("Sigma", 4, 1, 0, "menu_ssigma", sigmaIndex),
 		//new CharSelection("Rock", 10, 1, 0, "rock_idle", 0),
+		new CharSelection("Iris", 11, 1, 0, "iris_idle", 0){
+			offset = new Point(0, 26)
+		},
 	];
 
 	public static CharSelection[] selections1v1 => [
@@ -332,6 +336,9 @@ public class SelectCharacterMenu : IMainMenu {
 			},
 			(int)CharIds.PunchyZero => new string[] {
 				"Close range melee brawler", "that can counter the enemy attacks."
+			},
+			(int)CharIds.Iris => new string[] {
+				"Zero (early) sprited over Iris."
 			},
 			_ => new string[] { "ERROR" }
 		};

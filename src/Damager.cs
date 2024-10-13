@@ -59,7 +59,8 @@ public class Damager {
 		{ (int)ProjIds.VoltCTriadThunder, 1f },
 		{ (int)ProjIds.Rekkoha, 1f },
 		{ (int)ProjIds.HexaInvolute, 1f },
-		{ (int)ProjIds.ZSaber3, 1f }
+		{ (int)ProjIds.ZSaber3, 1f },
+		{ (int)ProjIds.IrisSaber3, 2f }
 	};
 
 	public Damager(Player owner, float damage, int flinch, float hitCooldown, float knockback = 0) {
@@ -101,6 +102,13 @@ public class Damager {
 				} else {
 					newFlinch = 36;
 				}
+			}
+			if (chr is Iris iris && iris.isHyperIris && newFlinch > 0) {
+				if (newFlinch < 12) {
+					newFlinch = 0;
+				} else if (newFlinch < 26) {
+					newFlinch = 13;
+				} 
 			}
 		}
 
@@ -425,6 +433,9 @@ public class Damager {
 				case (int)ProjIds.Sigma3Fire:
 					character.addBurnTime(owner, new Sigma3FireWeapon(), 1f);
 					break;
+				case (int)ProjIds.IrisRyuenjin:
+					character.addBurnTime(owner, ZSaberIris.staticWeapon, 1);
+					break;
 				//Freeze effects	
 				case (int)ProjIds.IceGattling:
 					character.addIgFreezeProgress(1);
@@ -441,6 +452,9 @@ public class Damager {
 				case (int)ProjIds.Hyouretsuzan2:
 					character.addIgFreezeProgress(4);
 					flinch = 0;
+					break;
+				case (int)ProjIds.IrisHyouretsuzan:
+					character.addIgFreezeProgress(4);
 					break;
 				case (int)ProjIds.VelGIce:
 					character.addIgFreezeProgress(2, 2 * 60);
@@ -559,6 +573,24 @@ public class Damager {
 					flinch = Global.defFlinch;
 				}
 				damage = MathF.Ceiling(damage * 1.5f);
+			}
+			if (!character.charState.superArmor && projId != (int)ProjIds.IrisSwordBlock  && 
+				!character.isInvulnerable(true, true) && (
+				owner?.character is Iris iris && iris.isHyperIris				
+			)) {
+				if (flinch <= 0) {
+					flinch = 6;
+					flinchCooldown = 2.5f;
+				} else if (flinch < Global.halfFlinch) {
+					flinch = Global.halfFlinch;
+				} else if (flinch < Global.defFlinch) {
+					flinch = Global.defFlinch;
+				}
+				else if (flinch < Global.superFlinch && projId != (int)ProjIds.IrisDenjin && projId != (int)ProjIds.IrisRaijingeki) {
+					flinch = Global.superFlinch;				
+				}
+				if (projId != (int)ProjIds.Irisbuster && projId != (int)ProjIds.IrisSaberRollingSlash)
+				damage = damage + 1;
 			}
 			// Disallow flinch stack for non-BZ.
 			else if (!Global.canFlinchCombo) {
@@ -795,7 +827,7 @@ public class Damager {
 							!zero.hypermodeActive()
 						) {		 //What in the..
 							if ( /*projId == (int)ProjIds.ZSaber */ 
-								GenericMeleeProj.isZSaberClang(projId)
+								GenericMeleeProj.isZSaberClang(projId) || GenericMeleeProj.isSaberIrisClang(projId)
 							) {
 								owner.character.changeState(new ZeroClang(-owner.character.xDir));
 							}
@@ -884,6 +916,8 @@ public class Damager {
 				(int)ProjIds.CFlasher  => true,
 				(int)ProjIds.AcidBurstPoison  => true,
 				(int)ProjIds.MetteurCrash => true,
+				(int)ProjIds.IrisRaijingeki => true,
+				(int)ProjIds.IrisDenjin	 => true,
 				_=> false
 			};
 	}
@@ -939,6 +973,8 @@ public class Damager {
 			(int)ProjIds.Sigma2Ball => true,
 			(int)ProjIds.Sigma2Ball2 => true,
 			(int)ProjIds.WSpongeLightning => true,
+			(int)ProjIds.IrisRaijingeki => true,
+			(int)ProjIds.IrisDenjin	 => true,
 			_ => false
 		};
 	}

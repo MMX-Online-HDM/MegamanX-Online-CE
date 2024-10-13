@@ -279,6 +279,10 @@ public enum WeaponIds {
 	Sigma3KaiserStomp,
 	RideChaserGun,
 	RideChaserHit,
+	IrisZSaber,
+	IrisRakuhouha,
+	IrisRekkoha,
+	IrisBuster,
 	DNACore = 250
 }
 
@@ -696,6 +700,31 @@ public enum ProjIds {
 	DZBuster4,
 	DZMelee,
 	DZHadangeki,
+	//Iris (Zero Early) 
+	IrisSaber,
+	IrisSaber1,
+	IrisSaber2,
+	IrisSaber3,
+	IrisSaberCrouch,
+	IrisSaberDash,
+	IrisShippuuga,
+	IrisSaberAir,
+	IrisSaberRollingSlash,
+	IrisRaijingeki,
+	IrisRyuenjin,
+	IrisDenjin,
+	IrisHyouretsuzan,
+	IrisRakukojin,
+	IrisSaberLadder,
+	IrisSaberslide,
+	IrisSwordBlock,
+	IrisSaberProjSwing,
+	Irisbuster,
+	Irisbuster2,
+	Irisbuster3,
+	IrisHadangekiProj,
+	IrisRakuhouha,
+	IrisRekkoha,
 
 	// Special damage types.
 	SelfDmg = 30000,

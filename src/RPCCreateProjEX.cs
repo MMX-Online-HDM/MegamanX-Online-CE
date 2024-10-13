@@ -24,7 +24,15 @@ public partial class RPCCreateProj : RPC {
 		{ (int)ProjIds.DZBuster2, DZBuster2Proj.rpcInvoke },
 		{ (int)ProjIds.DZBuster3, DZBuster3Proj.rpcInvoke },
 		// Mavericks
-		{ (int)ProjIds.VoltCSuck, VoltCSuckProj.rpcInvoke }
+		{ (int)ProjIds.VoltCSuck, VoltCSuckProj.rpcInvoke },
+		//Iris
+		{ (int)ProjIds.Irisbuster, IrisBusterProj.rpcInvoke },
+		{ (int)ProjIds.Irisbuster2, IrisBuster2Proj.rpcInvoke },
+		{ (int)ProjIds.Irisbuster3, IrisBuster3Proj.rpcInvoke },
+		{ (int)ProjIds.IrisHadangekiProj, IrisHadangekiProj.rpcInvoke },
+		{ (int)ProjIds.IrisRakuhouha, IrisRakuhouhaProj.rpcInvoke },
+		{ (int)ProjIds.IrisRekkoha, IrisRekkohaProj.rpcInvoke },
+
 	};
 
 }

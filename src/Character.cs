@@ -1911,6 +1911,9 @@ public partial class Character : Actor, IDamagable {
 			case BusterZero:
 				clampTo3 = false;
 				break;
+			case Iris iris:
+				clampTo3 = !iris.isHyperIris;
+				break;
 		}
 		if (chargeTime < charge1Time) {
 			return 0;
@@ -2817,6 +2820,16 @@ public partial class Character : Actor, IDamagable {
 					Weapon.gigaAttackSoundLogic(
 						this, currentAmmo, punchyZero.gigaAttack.ammo,
 						punchyZero.gigaAttack.getAmmoUsage(0), punchyZero.gigaAttack.maxAmmo
+					);
+				}
+			}
+			if (this is Iris iris) {
+				float currentAmmo = iris.IrisRakuhouhaWeapon.ammo;
+				iris.IrisRakuhouhaWeapon.addAmmo(gigaAmmoToAdd, player);
+				if (player.isMainPlayer) {
+					Weapon.gigaAttackSoundLogic(
+						this, currentAmmo, iris.IrisRakuhouhaWeapon.ammo,
+						iris.IrisRakuhouhaWeapon.getAmmoUsage(0), iris.IrisRakuhouhaWeapon.maxAmmo
 					);
 				}
 			}

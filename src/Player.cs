@@ -142,6 +142,7 @@ public partial class Player {
 	public bool isVile { get { return charNum == (int)CharIds.Vile; } }
 	public bool isAxl { get { return charNum == (int)CharIds.Axl; } }
 	public bool isSigma { get { return charNum == (int)CharIds.Sigma; } }
+	public bool isIris { get { return charNum == (int)CharIds.Iris; } }
 
 	public float healthBackup;
 	public float _health;
@@ -226,6 +227,7 @@ public partial class Player {
 		{ (int)CharIds.PunchyZero, new List<SubTank>() },
 		{ (int)CharIds.BusterZero, new List<SubTank>() },
 		{ (int)CharIds.Rock, new List<SubTank>() },
+		{ (int)CharIds.Iris, new List<SubTank>() },
 	};
 	// Heart tanks
 	public Dictionary<int, int> charHeartTanks = new Dictionary<int, int>(){
@@ -237,6 +239,7 @@ public partial class Player {
 		{ (int)CharIds.PunchyZero, 0 },
 		{ (int)CharIds.BusterZero, 0 },
 		{ (int)CharIds.Rock, 0 },
+		{ (int)CharIds.Iris, 0 },
 	};
 	// Getter functions.
 	public List<SubTank> subtanks {
@@ -265,7 +268,7 @@ public partial class Player {
 	}
 
 	// Currency
-	public const int maxCharCurrencyId = 10;
+	public const int maxCharCurrencyId = 12;
 	public static int curMul = Helpers.randomRange(2, 8);
 	public int[] charCurrencyBackup = new int[maxCharCurrencyId];
 	public int[] charCurrency = new int[maxCharCurrencyId];
@@ -411,6 +414,7 @@ public partial class Player {
 	// Shaders
 	public ShaderWrapper xPaletteShader = Helpers.cloneShaderSafe("palette");
 	public ShaderWrapper invisibleShader = Helpers.cloneShaderSafe("invisible");
+	public ShaderWrapper irisPaletteShader = Helpers.cloneGenericPaletteShader("hyperirisp");
 	public ShaderWrapper zeroPaletteShader = Helpers.cloneGenericPaletteShader("hyperZeroPalette");
 	public ShaderWrapper nightmareZeroShader = Helpers.cloneGenericPaletteShader("paletteViralZero");
 	public ShaderWrapper zeroAzPaletteShader = Helpers.cloneGenericPaletteShader("paletteAwakenedZero");
@@ -1156,6 +1160,11 @@ public partial class Player {
 			}
 		} else if (charNum == (int)CharIds.Rock) {
 			character = new Rock(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+		} else if (charNum == (int)CharIds.Iris) {
+			character = new Iris(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
