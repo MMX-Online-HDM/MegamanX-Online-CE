@@ -991,7 +991,7 @@ public class UpDash : CharState {
 
 	public UpDash(string initialDashButton) : base("up_dash", "up_dash_shoot") {
 		this.initialDashButton = initialDashButton;
-		normalCtrl = true;
+		attackCtrl = true;
 	}
 
 	public override void onEnter(CharState oldState) {
