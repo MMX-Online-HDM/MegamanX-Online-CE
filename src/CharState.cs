@@ -991,7 +991,6 @@ public class UpDash : CharState {
 
 	public UpDash(string initialDashButton) : base("up_dash", "up_dash_shoot") {
 		this.initialDashButton = initialDashButton;
-		attackCtrl = true;
 		normalCtrl = true;
 	}
 
