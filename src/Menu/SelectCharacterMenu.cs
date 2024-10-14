@@ -65,9 +65,6 @@ public class CharSelection {
 		},
 		new CharSelection("Sigma", 4, 1, 0, "menu_ssigma", sigmaIndex),
 		//new CharSelection("Rock", 10, 1, 0, "rock_idle", 0),
-		new CharSelection("Iris", 11, 1, 0, "iris_idle", 0){
-			offset = new Point(0, 26)
-		},
 	];
 
 	public static CharSelection[] selections1v1 => [
