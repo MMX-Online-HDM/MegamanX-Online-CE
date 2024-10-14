@@ -65,7 +65,7 @@ public class GravityWellProj : Projectile, IDamagable {
 		projId = (int)ProjIds.GravityWell;
 		shouldShieldBlock = false;
 		destroyOnHit = false;
-		velX = 300 * xDir;
+		velX = 285 * xDir;
 		setzIndex(zIndex + 100);
 		Global.level.unchargedGravityWells.Add(this);
 		if (rpc) {
@@ -91,11 +91,14 @@ public class GravityWellProj : Projectile, IDamagable {
 	public void startState1() {
 		velX = 0;
 		state = 1;
-		changeSprite("gravitywell_proj", true);
-		frameIndex = 0;
-		frameSpeed = 0;
+		changeSprite("gravitywell_start1", false);
+		if (commandShoot()) {
+			changeSprite("gravitywell_proj", false);
+		}
+		if (time >= 24f/60f || commandShoot()) {
+			wellAnim = new Anim(pos, "gravitywell_well_start", xDir, owner.getNextActorNetId(), false, true, true);
+		}
 		playSound("gravityWell", sendRpc: true);
-		wellAnim = new Anim(pos, "gravitywell_well_start", xDir, owner.getNextActorNetId(), false, true, true);
 	}
 
 	public bool commandShoot() {
@@ -107,7 +110,6 @@ public class GravityWellProj : Projectile, IDamagable {
 		updateProjectileCooldown();
 		if (!ownedByLocalPlayer) return;
 		if (destroyed) return;
-
 		if (state == 0) {
 			var hits = Global.level.getTerrainTriggerList(this, new Point(velX * Global.spf, 0), typeof(Wall));
 			if (hits.Count == 0) {
@@ -122,7 +124,7 @@ public class GravityWellProj : Projectile, IDamagable {
 				if (velX > 0) velX = 0;
 			}
 
-			if (isAnimOver() || commandShoot()) {
+			if (sprite.time >= 0.525 || commandShoot()) {
 				startState1();
 			}
 		} else if (state == 1) {
@@ -140,7 +142,9 @@ public class GravityWellProj : Projectile, IDamagable {
 		  // Active
 		  else if (state == 2) {
 			activeTime += Global.spf;
-
+			if (time >= 12/60f) {
+				changeSprite("gravitywell_proj", false);
+			}
 			int xDir = Helpers.randomRange(0, 1) == 0 ? 1 : -1;
 			int yDir = Helpers.randomRange(0, 1) == 0 ? 1 : -1;
 			if (wellAnim != null) {
@@ -186,6 +190,7 @@ public class GravityWellProj : Projectile, IDamagable {
 				{
 					var targetPos = owner.character.getCenterPos();
 					moveToPos(targetPos, 300);
+					changeSprite("gravitywell_start", false);
 					if (pos.distanceTo(targetPos) < 10) {
 						state = 5;
 					}
