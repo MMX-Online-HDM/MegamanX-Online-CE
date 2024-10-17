@@ -1300,6 +1300,10 @@ public partial class Level {
 					continue;
 				}
 				for (int j = i; j < currentGrid.Count; j++) {
+					// Exit if we get destroyed.
+					if (currentGrid[i] is Actor { destroyed: true }) {
+						break;
+					}
 					// Skip terrain coliding with eachother.
 					if (currentGrid[j] is Geometry or CrackedWall) {
 						continue;
@@ -1339,6 +1343,10 @@ public partial class Level {
 						}
 						Global.speedMul = 1;
 					}
+				}
+				// Continue if we get destroyed.
+				if (currentGrid[i] is Actor { destroyed: true }) {
+					continue;
 				}
 				foreach (GameObject wallObj in currentTerrainGrid) {
 					// Get order independent hash.
