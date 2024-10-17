@@ -20,8 +20,8 @@ public partial class Level {
 
 	public List<GameObject>[,] grid;
 	public List<GameObject>[,] terrainGrid;
-	public HashSet<int[]> populatedGrids = new();
-	public HashSet<int[]> populatedTerrainGrids = new();
+	public HashSet<(int x, int y)> populatedGrids = new();
+	//public HashSet<(int x, int y)> populatedTerrainGrids = new();
 	public Dictionary<int, Rect> gridsPopulatedByGo = new();
 	public Dictionary<int, Rect> terrainGridsPopulatedByGo = new();
 	public HashSet<int> collidedGObjs = new();
@@ -1282,12 +1282,12 @@ public partial class Level {
 		}
 
 		// Collision shenanigans.
-		collidedGObjs = new();
-		HashSet<int[]> arrayGrid = new(populatedGrids);
-		foreach (int[] gridData in arrayGrid) {
+		collidedGObjs.Clear();
+		(int x, int y)[] arrayGrid = populatedGrids.ToArray();
+		foreach ((int x, int y)gridData in arrayGrid) {
 			// Initalize data.
-			List<GameObject> currentGrid = new(grid[gridData[0], gridData[1]]);
-			List<GameObject> currentTerrainGrid = new(terrainGrid[gridData[0], gridData[1]]);
+			List<GameObject> currentGrid = new(grid[gridData.x, gridData.y]);
+			List<GameObject> currentTerrainGrid = new(terrainGrid[gridData.x, gridData.y]);
 			// Awfull GM19 order code.
 			// Iterate trough populated grids.
 			for (int i = 0; i < currentGrid.Count; i++) {
@@ -1310,12 +1310,12 @@ public partial class Level {
 					if (collidedGObjs.Contains(hash)) {
 						continue;
 					}
+					// Add to hash as we check.
+					collidedGObjs.Add(hash);
 					// Skip destroyed stuff.
 					if (currentGrid[j] is Actor { destroyed: true }) {
 						continue;
 					}
-					// Add to hash as we check.
-					collidedGObjs.Add(hash);
 					// Do preliminary collision checks and skip if we do not instersect.
 					if (!checkLossyCollision(currentGrid[i], currentGrid[j])) {
 						continue;
@@ -1347,12 +1347,12 @@ public partial class Level {
 					if (currentGrid[i] is not Actor actor || wallObj is not Geometry geometry) {
 						continue;
 					}
+					// Add to hash as we check.
+					collidedGObjs.Add(hash);
 					// Skip checked objects.
 					if (collidedGObjs.Contains(hash)) {
 						continue;
 					}
-					// Add to hash as we check.
-					collidedGObjs.Add(hash);
 					// Do preliminary collision checks and skip if we do not instersect.
 					if (!checkLossyCollision(currentGrid[i], wallObj)) {
 						continue;

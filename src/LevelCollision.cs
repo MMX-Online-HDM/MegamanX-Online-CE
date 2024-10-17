@@ -131,7 +131,7 @@ public partial class Level {
 			for (int y = (int)dataPos.y1; y <= dataPos.y2; y++) {
 				grid[x, y].Remove(go);
 				if (grid[x, y].Count == 0) {
-					populatedGrids.Remove([x, y]);
+					populatedGrids.Remove((x, y));
 				}
 			}
 		}
@@ -150,7 +150,7 @@ public partial class Level {
 			return;
 		}
 		if (go is Actor actor) {
-			Collider terrainCollider = actor.getTerrainCollider();
+			Collider? terrainCollider = actor.getTerrainCollider();
 			if (terrainCollider != null) {
 				allCollidersShape = terrainCollider.shape;
 			}
@@ -158,7 +158,7 @@ public partial class Level {
 		foreach (Cell cell in getGridCells(allCollidersShape.Value)) {
 			if (!grid[cell.x, cell.y].Contains(go)) {
 				if (grid[cell.x, cell.y].Count == 0) {
-					populatedGrids.Add([cell.x, cell.y]);
+					populatedGrids.Add((cell.x, cell.y));
 				}
 				grid[cell.x, cell.y].Add(go);
 			}
@@ -774,9 +774,9 @@ public partial class Level {
 		for (int x = (int)dataPos.x1; x <= dataPos.x2; x++) {
 			for (int y = (int)dataPos.y1; y <= (int)dataPos.y2; y++) {
 				terrainGrid[x, y].Remove(go);
-				if (terrainGrid[x, y].Count == 0) {
-					populatedTerrainGrids.Remove([x, y]);
-				}
+				/*if (terrainGrid[x, y].Count == 0) {
+					populatedTerrainGrids.Remove((x, y));
+				}*/
 			}
 		}
 		terrainGridsPopulatedByGo.Remove(hash);

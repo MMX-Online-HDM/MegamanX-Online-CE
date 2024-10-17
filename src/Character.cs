@@ -3503,7 +3503,8 @@ public partial class Character : Actor, IDamagable {
 			player.isDefenderFavored,
 			invulnTime > 0,
 			isDarkHoldState,
-			isStrikeChainState
+			isStrikeChainState,
+			charState.immuneToWind
 		]));
 
 		// Bool mask. Pos 5.
@@ -3575,6 +3576,7 @@ public partial class Character : Actor, IDamagable {
 		invulnTime = (boolData[1] ? 1 : 0);
 		isDarkHoldState = boolData[2];
 		isStrikeChainState = boolData[3];
+		charState.immuneToWind = boolData[4];
 
 		// Optional statuses.
 		bool[] boolMask = Helpers.byteToBoolArray(data[6]);
