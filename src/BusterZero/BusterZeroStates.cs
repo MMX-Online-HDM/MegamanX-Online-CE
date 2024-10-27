@@ -42,6 +42,39 @@ public class BusterZeroMelee : CharState {
 	}
 }
 
+
+public class BusterZeroMeleeWall : CharState {
+	public BusterZero zero = null!;
+	public int wallDir;
+	public Collider wallCollider;
+
+	public BusterZeroMeleeWall(int wallDir, Collider wallCollider) : base("wall_slide_attack") {
+		this.wallDir = wallDir;
+		this.wallCollider = wallCollider;
+		superArmor = true;
+		useGravity = false;
+	}
+
+	public override void update() {
+		base.update();
+		if (character.isAnimOver()) {
+			character.changeState(new WallSlide(wallDir, wallCollider));
+			character.sprite.frameIndex = character.sprite.totalFrameNum - 1;
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		zero = character as BusterZero ?? throw new NullReferenceException();
+	}
+
+	public override void onExit(CharState oldState) {
+		base.onExit(oldState);
+		useGravity = true;
+		zero.zSaberCooldown = 36;
+	}
+}
+
 public class BusterZeroDoubleBuster : CharState {
 	public bool fired1;
 	public bool fired2;
