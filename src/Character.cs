@@ -3063,7 +3063,7 @@ public partial class Character : Actor, IDamagable {
 			return;
 		}
 		if (charState is Hurt hurtState) {
-			if (hurtState.stateFrames <= flinchFrames) {
+			if (flinchFrames >= hurtState.flinchLeft) {
 				// You can probably add a check here that sets "hurtState.yStartPos" to null if you.
 				// Want to add a flinch attack that pushes up on chain-flinch.
 				changeState(new Hurt(dir, flinchFrames, false, hurtState.flinchYPos), true);

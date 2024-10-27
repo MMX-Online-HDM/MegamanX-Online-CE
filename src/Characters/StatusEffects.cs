@@ -11,6 +11,8 @@ public class Hurt : CharState {
 	public float flinchTime;
 	public bool spiked;
 
+	public float flinchLeft => (flinchTime - stateFrames);
+
 	public Hurt(int dir, int flinchFrames, bool spiked = false, float? oldComboPos = null) : base("hurt") {
 		this.flinchTime = flinchFrames;
 		hurtDir = dir;
@@ -224,6 +226,9 @@ public class GenericStun : CharState {
 		}
 		if (flinchTime > flinchFrames) {
 			return;
+		}
+		if (character.paralyzedTime >= 3) {
+			character.paralyzedTime = 2;
 		}
 		bool isCombo = (flinchTime != 0);
 		hurtSpeed = 1.6f * xDir;
