@@ -638,11 +638,6 @@ public class Iris : Character {
 		List<ShaderWrapper> baseShaders = base.getShaders();
 		List<ShaderWrapper> shaders = new();
 		ShaderWrapper? palette = null;
-		if (isHyperIris) {
-			palette = player.irisPaletteShader;
-			palette?.SetUniform("palette", 1);
-			palette?.SetUniform("paletteTexture", Global.textures["hyperirisp"]);
-		}
 		if (palette != null) {
 			shaders.Add(palette);
 		}
