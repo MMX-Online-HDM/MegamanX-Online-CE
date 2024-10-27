@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
 using SFML.Graphics;
 using SFML.System;
@@ -55,6 +55,9 @@ public class DrawLayer : Transformable, Drawable {
 				var sprite = oneOff.drawable as SFML.Graphics.Sprite;
 				if (sprite == null) {
 					continue;
+				}
+				if (oneOff.size[0] <= 0 || oneOff.size[0] <= 0) {
+					return;
 				}
 				RenderStates renderStates = new RenderStates(states);
 				Vector2f originalPosition = sprite.Position;

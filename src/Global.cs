@@ -45,6 +45,8 @@ public partial class Global {
 	public static string nameCoin = "Metal";
 	public static string nameCoins = "Metals";
 
+	public static bool isLoading;
+
 	public static void promptDebugSettings() {
 		//testDocumentsInDebug = Helpers.showMessageBoxYesNo("Test documents in debug?", "Debug Settings");
 		//useOptimizedAssetsOverride = Helpers.showMessageBoxYesNo("Test optimized assets?", "Debug Settings");
