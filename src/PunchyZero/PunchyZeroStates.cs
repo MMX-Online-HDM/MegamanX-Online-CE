@@ -683,7 +683,7 @@ public class PunchyZeroHadangekiWall : CharState {
 			);
 		}
 		if (character.isAnimOver()) {
-			character.changeState(new WallSlide(wallDir, wallCollider));
+			character.changeState(new WallSlide(wallDir, wallCollider) { enterSound = "" });
 			character.sprite.frameIndex = character.sprite.totalFrameNum - 1;
 		}
 	}

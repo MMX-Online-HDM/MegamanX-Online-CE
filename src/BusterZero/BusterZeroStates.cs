@@ -18,7 +18,7 @@ public class BusterZeroMelee : CharState {
 
 	public override void update() {
 		base.update();
-		if (character.frameIndex >= 4 && !fired) {
+		if (character.frameIndex >= 3 && !fired) {
 			fired = true;
 			character.playSound("zerosaberx3", sendRpc: true);
 		}
@@ -44,6 +44,7 @@ public class BusterZeroMelee : CharState {
 
 
 public class BusterZeroMeleeWall : CharState {
+	bool fired;
 	public BusterZero zero = null!;
 	public int wallDir;
 	public Collider wallCollider;
@@ -57,8 +58,12 @@ public class BusterZeroMeleeWall : CharState {
 
 	public override void update() {
 		base.update();
+		if (character.frameIndex >= 2 && !fired) {
+			fired = true;
+			character.playSound("zerosaberx3", sendRpc: true);
+		}
 		if (character.isAnimOver()) {
-			character.changeState(new WallSlide(wallDir, wallCollider));
+			character.changeState(new WallSlide(wallDir, wallCollider) { enterSound = "" });
 			character.sprite.frameIndex = character.sprite.totalFrameNum - 1;
 		}
 	}
@@ -240,7 +245,7 @@ public class BusterZeroHadangekiWall : CharState {
 			);
 		}
 		if (character.isAnimOver()) {
-			character.changeState(new WallSlide(wallDir, wallCollider));
+			character.changeState(new WallSlide(wallDir, wallCollider) { enterSound = "" });
 			character.sprite.frameIndex = character.sprite.totalFrameNum - 1;
 		}
 	}
