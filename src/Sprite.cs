@@ -734,23 +734,21 @@ public class AnimData {
 			);
 
 			int encodeKey = (sprWidth * 397) ^ sprHeight;
-			if (!Global.renderTextures.ContainsKey(encodeKey)) {
-				if (!Global.isLoading) {
-					Global.renderTextures[encodeKey] = (
-						new RenderTexture((uint)sprWidth, (uint)sprHeight),
-						new RenderTexture((uint)sprWidth, (uint)sprHeight)
-					);
-				} else {
-					// Wait for loadtask to free.
-					while (Global.loadTask != null) { }
-					// Create new task,
-					Global.loadTask = () => {
-						Global.renderTextures[encodeKey] = (
-							new RenderTexture((uint)sprWidth, (uint)sprHeight),
-							new RenderTexture((uint)sprWidth, (uint)sprHeight)
-						);
-					};
+			if (Global.isLoading) {
+				if (!Global.renderTextureQueueKeys.Contains(encodeKey)) {
+					lock (Global.renderTextureQueueKeys) {
+						Global.renderTextureQueueKeys.Add(encodeKey);
+					}
+					lock (Global.renderTextureQueue) {
+						Global.renderTextureQueue.Add(((uint)sprWidth, (uint)sprHeight));
+					}
 				}
+			}
+			else if (!Global.renderTextures.ContainsKey(encodeKey)) {
+				Global.renderTextures[encodeKey] = (
+					new RenderTexture((uint)sprWidth, (uint)sprHeight),
+					new RenderTexture((uint)sprWidth, (uint)sprHeight)
+				);
 			}
 			if (frameJson["POIs"] != null) {
 				List<Point> framePOIs = new();
