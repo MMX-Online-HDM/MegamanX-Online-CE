@@ -39,7 +39,7 @@ public class Hurt : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		if (player.isX && player.hasBodyArmor(1)) {
-			flinchTime *= 0.75f;
+			flinchTime = MathF.Floor(flinchTime * 0.75f);
 			sprite = "hurt2";
 			character.changeSpriteFromName("hurt2", true);
 		}
