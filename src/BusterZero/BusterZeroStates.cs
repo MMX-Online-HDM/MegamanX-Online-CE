@@ -12,7 +12,6 @@ public class BusterZeroMelee : CharState {
 		landSprite = "projswing";
 		airSprite = "projswing_air";
 		airMove = true;
-		//superArmor = true;
 		canJump = true;
 		canStopJump = true;
 	}
@@ -56,6 +55,8 @@ public class BusterZeroDoubleBuster : CharState {
 		this.isPinkCharge = isPinkCharge;
 		airMove = true;
 		superArmor = true;
+		canStopJump = true;
+		canJump = true;
 		landSprite = "doublebuster";
 		airSprite = "doublebuster_air";
 	}
@@ -95,17 +96,6 @@ public class BusterZeroDoubleBuster : CharState {
 			character.changeToIdleOrFall();
 		} else if (!isSecond && character.frameIndex >= 4 && !shootPressedAgain) {
 			character.changeToIdleOrFall();
-		} else {
-			if ((character.grounded || character.canAirJump() && character.flag == null) &&
-				player.input.isPressed(Control.Jump, player)
-			) {
-				if (!character.grounded) {
-					character.dashedInAir++;
-				}
-				character.vel.y = -character.getJumpPower();
-				sprite = "doublebuster_air";
-				character.changeSpriteFromName(sprite, false);
-			}
 		}
 	}
 
@@ -156,6 +146,8 @@ public class BusterZeroHadangeki : CharState {
 		airSprite = "projswing_air";
 		airMove = true;
 		superArmor = true;
+		canStopJump = true;
+		canJump = true;
 	}
 
 	public override void update() {
@@ -171,17 +163,6 @@ public class BusterZeroHadangeki : CharState {
 		}
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
-		} else {
-			if ((character.grounded || character.canAirJump() && character.flag == null) &&
-				player.input.isPressed(Control.Jump, player)
-			) {
-				if (!character.grounded) {
-					character.dashedInAir++;
-				}
-				character.vel.y = -character.getJumpPower();
-				sprite = "projswing_air";
-				character.changeSpriteFromName(sprite, false);
-			}
 		}
 	}
 

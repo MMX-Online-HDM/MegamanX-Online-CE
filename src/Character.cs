@@ -1282,8 +1282,8 @@ public partial class Character : Actor, IDamagable {
 				}
 				vel.y = -getJumpPower();
 				playSound("jump", sendRpc: true);
-				if (charState.airSprite != null && charState.airSprite != "") {
-					changeSprite(charState.airSprite, false);
+				if (charState.airSprite != "") {
+					changeSpriteFromName(charState.airSprite, false);
 				}
 			}
 		}
