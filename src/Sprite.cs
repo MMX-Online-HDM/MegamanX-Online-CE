@@ -723,6 +723,10 @@ public class AnimData {
 				sprHeight = 1024;
 				y2 = y1 + 1024;
 			}
+
+			if (sprWidth <= 0 || sprHeight <= 0) {
+				throw new Exception("Error loading sprite " + name);
+			}
 			Frame frame = new Frame(
 				new Rect(x1, y1, x2, y2),
 				durationFrames,
@@ -731,12 +735,23 @@ public class AnimData {
 
 			int encodeKey = (sprWidth * 397) ^ sprHeight;
 			if (!Global.renderTextures.ContainsKey(encodeKey)) {
-				Global.renderTextures[encodeKey] = (
-					new RenderTexture((uint)sprWidth, (uint)sprHeight),
-					new RenderTexture((uint)sprWidth, (uint)sprHeight)
-				);
+				if (!Global.isLoading) {
+					Global.renderTextures[encodeKey] = (
+						new RenderTexture((uint)sprWidth, (uint)sprHeight),
+						new RenderTexture((uint)sprWidth, (uint)sprHeight)
+					);
+				} else {
+					// Wait for loadtask to free.
+					while (Global.loadTask != null) { }
+					// Create new task,
+					Global.loadTask = () => {
+						Global.renderTextures[encodeKey] = (
+							new RenderTexture((uint)sprWidth, (uint)sprHeight),
+							new RenderTexture((uint)sprWidth, (uint)sprHeight)
+						);
+					};
+				}
 			}
-
 			if (frameJson["POIs"] != null) {
 				List<Point> framePOIs = new();
 				List<String> framePoiTags = new();

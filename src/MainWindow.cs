@@ -46,6 +46,7 @@ public partial class Global {
 	public static uint windowH;
 
 	public static int viewSize = 1;
+	internal static Action? loadTask;
 
 	public static void changeWindowSize(uint windowScale) {
 		windowW = screenW * windowScale;

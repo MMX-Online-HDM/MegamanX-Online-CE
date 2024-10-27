@@ -953,7 +953,7 @@ public partial class Level {
 	public (CollideData?, CollideData?) getTriggerTerrain(Actor actor, Geometry geometry) {
 		CollideData? triggerActor = null;
 		CollideData? triggerTerrain = null;
-		Collider? actorCollider = actor.getTerrainCollider() ?? actor.physicsCollider;
+		Collider? actorCollider = actor.getTerrainCollider() ?? actor.physicsCollider ?? actor.collider;
 		if (actorCollider == null) {
 			return (triggerActor, triggerTerrain);
 		}

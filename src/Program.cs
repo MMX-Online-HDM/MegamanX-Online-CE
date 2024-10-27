@@ -1394,10 +1394,13 @@ class Program {
 	}
 
 	public static void loadMultiThread(List<String> loadText, RenderWindow window, Action loadFunct) {
+		Global.isLoading = true;
 		Task loadTread = new Task(loadFunct);
 		loadTread.ContinueWith(loadExceptionHandler, TaskContinuationOptions.OnlyOnFaulted);
 		loadTread.Start();
 		loadLoop(loadText, window, loadTread);
+
+		Global.isLoading = false;
 	}
 
 	public static void loadExceptionHandler(Task task) {
@@ -1442,6 +1445,11 @@ class Program {
 			lastUpdateTime = timeNow;
 			window.DispatchEvents();
 			window.Display();
+			if (Global.loadTask != null) {
+				Global.loadTask();
+				Global.loadTask = null;
+			}
+
 			exit = (loadTread.Status >= TaskStatus.RanToCompletion);
 		}
 	}
