@@ -411,7 +411,7 @@ public partial class Level {
 	}
 
 	public CollideData checkCollisionShape(Shape shape, List<GameObject>? exclusions) {
-		var gameObjects = getGameObjectsInSameCell(shape);
+		var gameObjects = getTerrainInSameCell(shape);
 		foreach (var go in gameObjects) {
 			if (go.collider == null) continue;
 			if (go is not Actor && go.collider.isTrigger) continue;

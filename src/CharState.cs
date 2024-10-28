@@ -192,13 +192,13 @@ public class CharState {
 		}
 		lastRightWall = lastRightWallData?.gameObject as Wall;
 
-		var wallKickLeftData = character.getHitWall(-6, 0);
+		var wallKickLeftData = character.getHitWall(-8, 0);
 		if (wallKickLeftData?.otherCollider?.isClimbable == true && wallKickLeftData?.gameObject is Wall) {
 			wallKickLeftWall = wallKickLeftData.otherCollider;
 		} else {
 			wallKickLeftWall = null;
 		}
-		var wallKickRightData = character.getHitWall(6, 0);
+		var wallKickRightData = character.getHitWall(8, 0);
 		if (wallKickRightData?.otherCollider?.isClimbable == true && wallKickRightData?.gameObject is Wall) {
 			wallKickRightWall = wallKickRightData.otherCollider;
 		} else {
@@ -1099,7 +1099,7 @@ public class WallSlide : CharState {
 		}
 		*/
 
-		if (stateTime >= 0.15) {
+		if (stateFrames >= 9) {
 			if (mmx == null || mmx.strikeChainProj == null) {
 				var hit = character.getHitWall(wallDir, 0);
 				var hitWall = hit?.gameObject as Wall;
@@ -1116,22 +1116,65 @@ public class WallSlide : CharState {
 			character.move(new Point(0, 100));
 		}
 
-		dustTime += Global.spf;
-		if (stateTime > 0.2 && dustTime > 0.1) {
+		dustTime += Global.speedMul;
+		if (stateFrames > 12 && dustTime > 6) {
 			dustTime = 0;
-
-			var animPoint = character.pos.addxy(12 * character.xDir, 0);
-			var rect = new Rect(animPoint.addxy(-3, -3), animPoint.addxy(3, 3));
-			if (Global.level.checkCollisionShape(rect.getShape(), null) != null) {
-				new Anim(animPoint, "dust", character.xDir, player.getNextActorNetId(), true, sendRpc: true);
-			}
+			generateDust(character);
 		}
-
 	}
 
 	public override void onExit(CharState newState) {
 		character.useGravity = true;
 		base.onExit(newState);
+	}
+
+	public static void generateDust(Character character) {
+		Point animPoint = character.pos.addxy(12 * character.xDir, 0);
+		Rect rect = new Rect(animPoint.addxy(-3, -3), animPoint.addxy(3, 3));
+		if (Global.level.checkCollisionShape(rect.getShape(), null) != null) {
+			new Anim(animPoint, "dust", character.xDir, character.player.getNextActorNetId(), true, sendRpc: true);
+		}
+	}
+}
+
+public class WallSlideAttack : CharState {
+	public int wallDir;
+	public float dustTime;
+	public Collider wallCollider;
+	public bool exitOnAnimEnd;
+	public bool canCancel;
+
+	public WallSlideAttack(string anim, int wallDir, Collider wallCollider) : base(anim) {
+		this.wallDir = wallDir;
+		this.wallCollider = wallCollider;
+		useGravity = false;
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.dashedInAir = 0;
+	}
+
+	public override void update() {
+		base.update();
+		if (canCancel && (character.grounded || player.input.getXDir(player) != wallDir)) {
+			character.changeToIdleOrFall();
+			return;
+		}
+		if (!character.grounded) {
+			character.move(new Point(0, 100));
+			dustTime += Global.speedMul;
+		}
+		if (stateFrames > 12 && dustTime > 6) {
+			dustTime = 0;
+			WallSlide.generateDust(character);
+		}
+		if (exitOnAnimEnd && character.isAnimOver()) {
+			WallSlide wallSlideState = new WallSlide(wallDir, wallCollider) { enterSound = "", stateFrames = 14 };
+			character.changeState(wallSlideState);
+			character.sprite.frameIndex = character.sprite.totalFrameNum - 1;
+			return;
+		}
 	}
 }
 

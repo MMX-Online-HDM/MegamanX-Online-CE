@@ -1217,15 +1217,17 @@ public partial class Character : Actor, IDamagable {
 			changeState(new Fall());
 		}
 		if (canWallClimb() &&
-			(charState.normalCtrl || charState.airMove || charState is WallSlide) &&
 			!grounded && vel.y >= 0 &&
-			wallKickTimer <= 0 &&
+			wallKickTimer <= 0 && (
+				charState.normalCtrl || charState.airMove ||
+				charState is WallSlide || charState is WallSlideAttack { canCancel: true }
+			) &&
 			player.input.isPressed(Control.Jump, player) &&
 			(charState.wallKickLeftWall != null || charState.wallKickRightWall != null)
 		) {
 			dashedInAir = 0;
 			if (player.input.isHeld(Control.Dash, player) &&
-				(charState.useDashJumpSpeed || charState is WallSlide)
+				(charState.useDashJumpSpeed || charState is WallSlide or WallSlideAttack)
 			) {
 				isDashing = true;
 				dashedInAir++;
@@ -1246,12 +1248,12 @@ public partial class Character : Actor, IDamagable {
 					wallKickDir -= 1;
 				}
 			}
-			if (wallKickDir != 0) {
-				xDir = -wallKickDir;
-			}
 			wallKickTimer = maxWallKickTime;
-			if (charState.normalCtrl || charState is WallSlide) {
+			if (charState.normalCtrl || charState is WallSlide or WallSlideAttack) {
 				changeState(new WallKick(), true);
+				if (wallKickDir != 0) {
+					xDir = -wallKickDir;
+				}
 			} else {
 				playSound("jump", sendRpc: true);
 			}
