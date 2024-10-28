@@ -497,6 +497,15 @@ public class Vile : Character {
 		}
 		return false;
 	}
+	public override void addAmmo(float amount) {
+		weaponHealAmount += amount;
+	}
+	public override void addPercentAmmo(float amount) {
+		weaponHealAmount += amount * 0.32f;
+	}
+	public override bool canAddAmmo() {
+		return player.vileAmmo < player.vileMaxAmmo;
+	}
 
 	private void cantAffordRideArmorMessage() {
 		if (Global.level.is1v1()) {
