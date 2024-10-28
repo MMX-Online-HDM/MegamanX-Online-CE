@@ -232,7 +232,6 @@ public partial class Actor {
 		Point centerPoint = hitbox.shape.getRect().center();
 		Projectile? proj = getProjFromHitbox(hitbox, centerPoint);
 		if (proj != null) {
-			proj.hitboxActor = this;
 			proj.globalCollider = hitbox.clone();
 		}
 		return proj;
