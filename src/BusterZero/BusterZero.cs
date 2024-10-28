@@ -248,7 +248,7 @@ public class BusterZero : Character {
 	// This can run on both owners and non-owners. So data used must be in sync.
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
-			"zero_projswing" or "zero_projswing_air" => MeleeIds.SaberSwing,
+			"zero_projswing" or "zero_projswing_air" or "zero_wall_slide_attack" => MeleeIds.SaberSwing,
 			_ => MeleeIds.None
 		});
 	}
