@@ -4,9 +4,13 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class SonicSlicer : Weapon {
+
+	public static SonicSlicer netWeapon = new();
+
 	public SonicSlicer() : base() {
 		shootSounds = new string[] { "sonicSlicer", "sonicSlicer", "sonicSlicer", "sonicSlicerCharged" };
-		rateOfFire = 1f;
+		//rateOfFire = 1f;
+		fireRateFrames = 60;
 		index = (int)WeaponIds.SonicSlicer;
 		weaponBarBaseIndex = 13;
 		weaponBarIndex = weaponBarBaseIndex;
@@ -19,28 +23,45 @@ public class SonicSlicer : Weapon {
 		Flinch = "0/26";
 	}
 
-	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
+	public override void shoot(Character character, int[] args) {
+		int chargeLevel = args[0];
+		Point pos = character.getShootPos();
+		int xDir = character.getShootXDir();
+		Player player = character.player;
+
 		if (chargeLevel < 3) {
-			new SonicSlicerStart(this, pos, xDir, player, netProjId);
+			new SonicSlicerStart(this, pos, xDir, player, player.getNextActorNetId(), true);
 		} else {
 			new Anim(pos, "sonicslicer_charge_start", xDir, null, true);
-			player.setNextActorNetId(netProjId);
-			new SonicSlicerProjCharged(this, pos, 0, player, player.getNextActorNetId(true));
-			new SonicSlicerProjCharged(this, pos, 1, player, player.getNextActorNetId(true));
-			new SonicSlicerProjCharged(this, pos, 2, player, player.getNextActorNetId(true));
-			new SonicSlicerProjCharged(this, pos, 3, player, player.getNextActorNetId(true));
-			new SonicSlicerProjCharged(this, pos, 4, player, player.getNextActorNetId(true));
+			player.setNextActorNetId(player.getNextActorNetId());
+			new SonicSlicerProjCharged(this, pos, 0, player, player.getNextActorNetId(true), true);
+			new SonicSlicerProjCharged(this, pos, 1, player, player.getNextActorNetId(true), true);
+			new SonicSlicerProjCharged(this, pos, 2, player, player.getNextActorNetId(true), true);
+			new SonicSlicerProjCharged(this, pos, 3, player, player.getNextActorNetId(true), true);
+			new SonicSlicerProjCharged(this, pos, 4, player, player.getNextActorNetId(true), true);
 		}
 	}
 }
 
 public class SonicSlicerStart : Projectile {
-	public SonicSlicerStart(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 1, player, "sonicslicer_start", 0, 0, netProjId, player.ownedByLocalPlayer) {
-		projId = (int)ProjIds.SonicSlicerChargedStart;
+	public SonicSlicerStart(
+		Weapon weapon, Point pos, int xDir, 
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 1, player, "sonicslicer_start", 
+		0, 0, netProjId, player.ownedByLocalPlayer
+	) {
+		projId = (int)ProjIds.SonicSlicerStart;
+
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new SonicSlicerStart(
+			SonicSlicer.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
+		);
 	}
 
 	public override void update() {
@@ -58,8 +79,13 @@ public class SonicSlicerStart : Projectile {
 public class SonicSlicerProj : Projectile {
 	public Sprite twin;
 	int type;
-	public SonicSlicerProj(Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 200, 2, player, "sonicslicer_proj", 0, 0, netProjId, player.ownedByLocalPlayer) {
+	public SonicSlicerProj(
+		Weapon weapon, Point pos, int xDir, int type, 
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 200, 2, player, "sonicslicer_proj", 
+		0, 0, netProjId, player.ownedByLocalPlayer
+	) {
 		maxTime = 0.75f;
 		this.type = type;
 		collider.wallOnly = true;
@@ -79,6 +105,13 @@ public class SonicSlicerProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir, (byte)type);
 		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new SonicSlicerProj(
+			SonicSlicer.netWeapon, arg.pos, arg.xDir, 
+			arg.extraData[0], arg.player, arg.netId
+		);
 	}
 
 	public override void update() {
@@ -118,8 +151,13 @@ public class SonicSlicerProj : Projectile {
 public class SonicSlicerProjCharged : Projectile {
 	public Point dest;
 	public bool fall;
-	public SonicSlicerProjCharged(Weapon weapon, Point pos, int num, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, 1, 300, 4, player, "sonicslicer_charged", Global.defFlinch, 0.25f, netProjId, player.ownedByLocalPlayer) {
+	public SonicSlicerProjCharged(
+		Weapon weapon, Point pos, int num, 
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, 1, 300, 4, player, "sonicslicer_charged", 
+		Global.defFlinch, 0.25f, netProjId, player.ownedByLocalPlayer
+	) {
 		fadeSprite = "sonicslicer_charged_fade";
 		maxTime = 1;
 		projId = (int)ProjIds.SonicSlicerCharged;
@@ -135,8 +173,14 @@ public class SonicSlicerProjCharged : Projectile {
 		useGravity = false;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, 1);
+			rpcCreate(pos, player, netProjId, 1, (byte)num);
 		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new SonicSlicerProjCharged(
+			SonicSlicer.netWeapon, arg.pos, arg.extraData[0], arg.player, arg.netId
+		);
 	}
 
 	public override void update() {

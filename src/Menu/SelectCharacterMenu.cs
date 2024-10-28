@@ -35,6 +35,7 @@ public enum CharIds {
 	WolfSigma = 100,
 	ViralSigma,
 	KaiserSigma,
+	RagingChargeX,
 	// Non-vanilla chars start here.
 	Rock = 10,
 }

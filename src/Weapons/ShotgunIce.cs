@@ -14,36 +14,29 @@ public class ShotgunIce : Weapon {
 		weaponSlotIndex = 8;
 		weaknessIndex = (int)WeaponIds.FireWave;
 		shootSounds = new string[] { "shotgunIce", "shotgunIce", "shotgunIce", "icyWind" };
-		rateOfFire = 0.5f;
+		//rateOfFire = 0.5f;
+		fireRateFrames = 30;
 		damage = "2/1-2";
 		effect = "Insta Freeze enemies. Ice sled up to 12 DMG.";
 		hitcooldown = "0.01/0.5";
 		Flinch = "0";
 	}
 
-	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
+	public override void shoot(Character character, int[] args) {
+		int chargeLevel = args[0];
+		Point pos = character.getShootPos();
+		int xDir = character.getShootXDir();
+		Player player = character.player;
+
 		if (chargeLevel < 3) {
-			new ShotgunIceProj(this, pos, xDir, player, 0, netProjId);
-		} else if (player?.character is MegamanX mmx) {
+			new ShotgunIceProj(this, pos, xDir, player, 0, player.getNextActorNetId(), rpc: true);
+		} else if (character is MegamanX mmx) {
 			pos = pos.addxy(xDir * 25, 0);
 			pos.y = mmx.pos.y;
 
 			mmx.shotgunIceChargeTime = 1.5f;
 
-			/*
-			var rect = new Rect(pos.x - 20, pos.y - 16, pos.x + 20, pos.y);
-			var collisions = Global.level.checkCollisionsShape(rect.getShape(), new List<GameObject>());
-			foreach (var collision in collisions)
-			{
-				var damagable = collision.gameObject as IDamagable;
-				if (damagable != null && damagable.canBeDamaged(player.alliance))
-				{
-					return;
-				}
-			}
-			*/
-
-			new ShotgunIceProjSled(this, pos, xDir, player, netProjId);
+			new ShotgunIceProjSled(this, pos, xDir, player, player.getNextActorNetId(), true);
 		}
 	}
 }
@@ -150,8 +143,13 @@ public class ShotgunIceProj : Projectile {
 }
 
 public class ShotgunIceProjCharged : Projectile {
-	public ShotgunIceProjCharged(Weapon weapon, Point pos, int xDir, Player player, int type, bool isChillP, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 150, 1, player, type == 0 ? "shotgun_ice_charge_wind2" : "shotgun_ice_charge_wind", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public ShotgunIceProjCharged(
+		Weapon weapon, Point pos, int xDir, Player player, int type, 
+		bool isChillP, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 150, 1, player, type == 0 ? "shotgun_ice_charge_wind2" : "shotgun_ice_charge_wind", 
+		0, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = isChillP ? (int)ProjIds.ChillPIceBlow : (int)ProjIds.ShotgunIceCharged;
 
 		shouldShieldBlock = false;
@@ -164,6 +162,13 @@ public class ShotgunIceProjCharged : Projectile {
 		if (player.character != null) {
 			owningActor = player.character;
 		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new ShotgunIceProjCharged(
+			ShotgunIce.netWeapon, arg.pos, arg.xDir, 
+			arg.player, 0, false, arg.netId
+		);
 	}
 
 	public override void update() {
@@ -183,9 +188,11 @@ public class ShotgunIceProjSled : Projectile {
 	public bool ridden;
 
 	public ShotgunIceProjSled(
-		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId
+		Weapon weapon, Point pos, int xDir, 
+		Player player, ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, 2, player, "shotgun_ice_charge", 0, 1, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 0, 2, player, "shotgun_ice_charge", 
+		0, 1, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.ShotgunIceSled;
 		fadeSound = "iceBreak";
@@ -193,6 +200,8 @@ public class ShotgunIceProjSled : Projectile {
 		isPlatform = true;
 		//this.collider.wallOnly = true;
 		canBeLocal = true;
+
+		if (rpc) rpcCreate(pos, player, netProjId, xDir);
 	}
 
 	public void increaseVel() {
@@ -209,6 +218,13 @@ public class ShotgunIceProjSled : Projectile {
 				}
 			}
 		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new ShotgunIceProjSled(
+			ShotgunIce.netWeapon, arg.pos, arg.xDir, 
+			arg.player, arg.netId
+		);
 	}
 
 	public override void update() {

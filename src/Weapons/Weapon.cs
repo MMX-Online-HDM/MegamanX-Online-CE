@@ -8,7 +8,9 @@ public class Weapon {
 	public float ammo;
 	public float maxAmmo;
 	public float rateOfFire;
+	public float fireRateFrames;
 	public float? switchCooldown;
+	public float? switchCooldownFrames;
 	public float soundTime = 0;
 	public bool isStream = false;
 	public float shootTime;
@@ -66,6 +68,7 @@ public class Weapon {
 		ammo = 32;
 		maxAmmo = 32;
 		rateOfFire = 0.15f;
+		fireRateFrames = 9;
 		effect = "";
 		damage = "0";
 		hitcooldown = "0";
@@ -335,13 +338,11 @@ public class Weapon {
 	}
 	
 	public virtual void update() {
-		if (soundTime > 0) {
-			soundTime = Helpers.clampMin(soundTime - Global.spf, 0);
-		}
+		Helpers.decrementFrames(ref soundTime);
 		Helpers.decrementTime(ref shootTime);
 		Helpers.decrementTime(ref altShootTime);
 		if (timeSinceLastShoot != null) {
-			timeSinceLastShoot += Global.spf;
+			timeSinceLastShoot += Global.speedMul;
 		}
 	}
 

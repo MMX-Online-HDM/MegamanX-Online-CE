@@ -691,7 +691,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public void hook(Projectile strikeChainProj) {
-		bool isChargedStrikeChain = strikeChainProj is StrikeChainProj scp && scp.isCharged;
+		bool isChargedStrikeChain = strikeChainProj is StrikeChainProjCharged;
 		bool flinch = (isChargedStrikeChain || strikeChainProj is WSpongeSideChainProj);
 		changeState(new StrikeChainHooked(strikeChainProj, flinch), true);
 	}
@@ -3433,6 +3433,8 @@ public partial class Character : Actor, IDamagable {
 	public virtual void onFlinchOrStun(CharState state) {
 
 	}
+
+	public virtual void onWeaponChange(Weapon oldWeapon, Weapon newWeapon) {}
 
 	public virtual void onExitState(CharState oldState, CharState newState) {
 

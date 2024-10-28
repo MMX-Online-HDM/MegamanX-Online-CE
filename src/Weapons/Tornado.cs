@@ -4,6 +4,8 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class Tornado : Weapon {
+
+	public static Tornado netWeapon = new();
 	public Tornado() : base() {
 		index = (int)WeaponIds.Tornado;
 		killFeedIndex = 5;
@@ -12,8 +14,10 @@ public class Tornado : Weapon {
 		weaponSlotIndex = 5;
 		weaknessIndex = (int)WeaponIds.Sting;
 		shootSounds = new string[] { "tornado", "tornado", "tornado", "buster3" };
-		rateOfFire = 2f;
-		switchCooldown = 0.5f;
+		//rateOfFire = 2f;
+		fireRateFrames = 120;
+		//switchCooldown = 0.5f;
+		switchCooldownFrames = 30;
 		damage = "1/4";
 		effect = "Weak push. Extinguishes Fire. Ignores Shields.";
 		hitcooldown = "0.25/0.33";
@@ -26,11 +30,16 @@ public class Tornado : Weapon {
 		return 8;
 	}
 
-	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
+	public override void shoot(Character character, int[] args) {
+		int chargeLevel = args[0];
+		Point pos = character.getShootPos();
+		int xDir = character.getShootXDir();
+		Player player = character.player;
+
 		if (chargeLevel < 3) {
-			new TornadoProj(this, pos, xDir, false, player, netProjId);
+			new TornadoProj(this, pos, xDir, false, player, player.getNextActorNetId(), true);
 		} else {
-			new TornadoProjCharged(this, pos, xDir, player, netProjId);
+			new TornadoProjCharged(this, pos, xDir, player, player.getNextActorNetId(), true);
 		}
 	}
 }
@@ -45,8 +54,13 @@ public class TornadoProj : Projectile {
 	public float tornadoTime;
 	public float blowModifier = 0.25f;
 
-	public TornadoProj(Weapon weapon, Point pos, int xDir, bool isStormE, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, 400, 1, player, "tornado_mid", 0, 0.25f, netProjId, player.ownedByLocalPlayer) {
+	public TornadoProj(
+		Weapon weapon, Point pos, int xDir, bool isStormE,
+		Player player, ushort netProjId, bool sendRpc = false
+	) : base(
+		weapon, pos, xDir, 400, 1, player, "tornado_mid", 
+		0, 0.25f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = isStormE ? (int)ProjIds.StormETornado : (int)ProjIds.Tornado;
 		if (isStormE) {
 			blowModifier = 1;
@@ -68,6 +82,13 @@ public class TornadoProj : Projectile {
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new TornadoProj(
+			Tornado.netWeapon, arg.pos, arg.xDir, 
+			false, arg.player, arg.netId
+		);
 	}
 
 	public override void render(float x, float y) {
@@ -141,7 +162,13 @@ public class TornadoProjCharged : Projectile {
 	public float growTime = 0;
 	public float maxLengthTime = 0;
 
-	public TornadoProjCharged(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId) : base(weapon, pos, xDir, 0, 2, player, "tornado_charge", Global.defFlinch, 0.33f, netProjId, player.ownedByLocalPlayer) {
+	public TornadoProjCharged(
+		Weapon weapon, Point pos, int xDir, 
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 2, player, "tornado_charge", 
+		Global.defFlinch, 0.33f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.TornadoCharged;
 		sprite.visible = false;
 		spriteStart = new Sprite("tornado_charge");
@@ -153,6 +180,15 @@ public class TornadoProjCharged : Projectile {
 		//this.ground();
 		destroyOnHit = false;
 		shouldShieldBlock = false;
+
+		if (rpc) rpcCreate(pos, player, netProjId, xDir);
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new TornadoProjCharged(
+			Tornado.netWeapon, arg.pos, arg.xDir, 
+			arg.player, arg.netId
+		);
 	}
 
 	public override void render(float x, float y) {

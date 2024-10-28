@@ -7,7 +7,8 @@ namespace MMXOnline;
 public class GigaCrush : Weapon {
 	public GigaCrush() : base() {
 		shootSounds = new string[] { "gigaCrushX2", "gigaCrushX2", "gigaCrushX2", "gigaCrushX2" };
-		rateOfFire = 1;
+		//rateOfFire = 1;
+		fireRateFrames = 60;
 		ammo = 0;
 		drawGrayOnLowAmmo = true;
 		drawRoundedDown = true;
@@ -17,12 +18,12 @@ public class GigaCrush : Weapon {
 		weaponSlotIndex = 25;
 		killFeedIndex = 13;
 	}
-
-	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-		if (player.character.ownedByLocalPlayer) {
-			player.character.changeState(new GigaCrushCharState(), true);
+	
+	public override void shoot(Character character, int[] args) {
+		if (character.ownedByLocalPlayer) {
+			character.changeState(new GigaCrushCharState(), true);
 		}
-		new GigaCrushEffect(player.character);
+		new GigaCrushEffect(character);
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {

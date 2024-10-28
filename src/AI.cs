@@ -910,7 +910,7 @@ public class AI {
 					case 9:
 						if (Helpers.randomRange(0, 30) < 5) {
 							megamanX.player.changeWeaponSlot(0);
-							megamanX.shoot(true);
+							megamanX.shoot(megamanX.getChargeLevel());
 						}
 						break;
 					case 10:
@@ -1306,8 +1306,8 @@ public class AI {
 			&& proj.damager.owner.alliance != player.alliance && zero.charState.attackCtrl) { 					
 				//Projectile is not 
 				if (!(proj.projId == (int)ProjIds.RollingShieldCharged || proj.projId == (int)ProjIds.RollingShield
-					|| proj.projId == (int)ProjIds.MagnetMine || proj.projId == (int)ProjIds.FrostShield
-					|| proj.projId == (int)ProjIds.FrostShieldAir || proj.projId == (int)ProjIds.FrostShieldChargedPlatform)	
+					|| proj.projId == (int)ProjIds.MagnetMine || proj.projId == (int)ProjIds.FrostShield || proj.projId == (int)ProjIds.FrostShieldCharged 
+					|| proj.projId == (int)ProjIds.FrostShieldAir || proj.projId == (int)ProjIds.FrostShieldChargedPlatform || proj.projId == (int)ProjIds.FrostShieldPlatform)	
 				){					
 					if (zero.gigaAttack.shootTime <= 0 && zero.grounded) {
 						switch (zero.gigaAttack) {
@@ -1484,7 +1484,7 @@ public class AI {
 			&& proj.damager.owner.alliance != player.alliance && bzero1.charState.attackCtrl) { 					
 				//Projectile is not 
 				if (!(proj.projId == (int)ProjIds.RollingShield || proj.projId == (int)ProjIds.FrostShield || proj.projId == (int)ProjIds.SwordBlock
-					|| proj.projId == (int)ProjIds.FrostShieldAir || proj.projId == (int)ProjIds.FrostShieldChargedPlatform)	
+					|| proj.projId == (int)ProjIds.FrostShieldAir || proj.projId == (int)ProjIds.FrostShieldChargedPlatform || proj.projId == (int)ProjIds.FrostShieldPlatform)	
 				){									
 					if (bzero1.zSaberCooldown == 0) {
 						bzero1.turnToInput(player.input, player);

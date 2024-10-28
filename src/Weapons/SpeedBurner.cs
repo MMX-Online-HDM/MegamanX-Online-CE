@@ -4,12 +4,16 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class SpeedBurner : Weapon {
+
+	public static SpeedBurner netWeapon = new(null); 
+
 	public SpeedBurner(Player? player) : base() {
 		if (player != null) {
 			damager = new Damager(player, 4, Global.defFlinch, 0.5f);
 		}
 		shootSounds = new string[] { "speedBurner", "speedBurner", "speedBurner", "speedBurnerCharged" };
-		rateOfFire = 1f;
+		//rateOfFire = 1f;
+		fireRateFrames = 60;
 		index = (int)WeaponIds.SpeedBurner;
 		weaponBarBaseIndex = 16;
 		weaponBarIndex = weaponBarBaseIndex;
@@ -23,18 +27,23 @@ public class SpeedBurner : Weapon {
 		FlinchCD = "0/0.5";
 	}
 
-	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
+	public override void shoot(Character character, int[] args) {
+		int chargeLevel = args[0];
+		Point pos = character.getShootPos();
+		int xDir = character.getShootXDir();
+		Player player = character.player;
+
 		if (chargeLevel < 3) {
-			if (!player.character.isUnderwater()) {
-				new SpeedBurnerProj(this, pos, xDir, player, netProjId);
+			if (!character.isUnderwater()) {
+				new SpeedBurnerProj(this, pos, xDir, player, player.getNextActorNetId(), true);
 			} else {
-				player.setNextActorNetId(netProjId);
-				new SpeedBurnerProjWater(this, pos, xDir, 0, player, player.getNextActorNetId(true));
-				new SpeedBurnerProjWater(this, pos, xDir, 1, player, player.getNextActorNetId(true));
+				player.setNextActorNetId(player.getNextActorNetId());
+				new SpeedBurnerProjWater(this, pos, xDir, 0, player, player.getNextActorNetId(true), true);
+				new SpeedBurnerProjWater(this, pos, xDir, 1, player, player.getNextActorNetId(true), true);
 			}
 		} else {
-			if (player.character.ownedByLocalPlayer) {
-				player.character.changeState(new SpeedBurnerCharState(), true);
+			if (character.ownedByLocalPlayer) {
+				character.changeState(new SpeedBurnerCharState(), true);
 			}
 		}
 	}
@@ -44,13 +53,24 @@ public class SpeedBurnerProj : Projectile {
 	float groundSpawnTime;
 	float airSpawnTime;
 	int groundSpawns;
-	public SpeedBurnerProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 275, 2, player, "speedburner_start", 0, 0, netProjId, player.ownedByLocalPlayer) {
+	public SpeedBurnerProj(
+		Weapon weapon, Point pos, int xDir, 
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 275, 2, player, "speedburner_start", 
+		0, 0, netProjId, player.ownedByLocalPlayer
+	) {
 		maxTime = 0.6f;
 		projId = (int)ProjIds.SpeedBurner;
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new SpeedBurnerProj(
+			SpeedBurner.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
+		);
 	}
 
 	public override void update() {
@@ -94,8 +114,13 @@ public class SpeedBurnerProjWater : Projectile {
 	float initY;
 	float offsetTime;
 	float smokeTime;
-	public SpeedBurnerProjWater(Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 275, 1, player, "speedburner_underwater", 0, 0, netProjId, player.ownedByLocalPlayer) {
+	public SpeedBurnerProjWater(
+		Weapon weapon, Point pos, int xDir, int type, 
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 275, 1, player, "speedburner_underwater", 
+		0, 0, netProjId, player.ownedByLocalPlayer
+	) {
 		maxTime = 0.6f;
 		projId = (int)ProjIds.SpeedBurnerWater;
 		initY = pos.y;
@@ -103,8 +128,15 @@ public class SpeedBurnerProjWater : Projectile {
 			offsetTime = MathF.PI / 2;
 		}
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, player, netProjId, xDir, (byte)type);
 		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new SpeedBurnerProjWater(
+			SpeedBurner.netWeapon, arg.pos, arg.xDir,
+			arg.extraData[0], arg.player, arg.netId
+		);
 	}
 
 	public override void update() {

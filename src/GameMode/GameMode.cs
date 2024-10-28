@@ -1785,7 +1785,7 @@ public class GameMode {
 		if (player.character is MegamanX mmx && mmx.hasFgMoveEquipped() && mmx.canAffordFgMove()) {
 			int x = gigaWeaponX, y = 159;
 			Global.sprites["hud_weapon_icon"].drawToHUD(mmx.hasHadoukenEquipped() ? 112 : 113, x, y);
-			float cooldown = Helpers.progress(player.fgMoveAmmo, 32f);
+			float cooldown = Helpers.progress(player.fgMoveAmmo, 1920f);
 			drawWeaponSlotCooldown(x, y, cooldown);
 		}
 
@@ -1974,16 +1974,25 @@ public class GameMode {
 			drawTransformPreviewInfo(dnaCore, x, y);
 		}
 
-		if (weapon is HyperBuster &&
-			!mainPlayer.isSpectator &&
-			mainPlayer.weapons[level.mainPlayer.hyperChargeSlot].ammo == 0
-		) {
-			drawWeaponSlotAmmo(x, y, 0);
-		} else if (weapon is HyperBuster hb) {
-			drawWeaponSlotCooldown(x, y, hb.shootTime / hb.getRateOfFire(level.mainPlayer));
-		} else if (weapon is NovaStrike ns) {
-			drawWeaponSlotCooldown(x, y, ns.shootTime / ns.rateOfFire);
+
+		if (mainPlayer.isX && mainPlayer.character != null && mainPlayer.character.charState is not XRevive) {
+			MegamanX mmx = null!;
+			if (mainPlayer.character != null && !mainPlayer.character.destroyed) {
+				mmx = mainPlayer.character as MegamanX ?? throw new NullReferenceException();
+			}
+
+			if (weapon is HyperBuster &&
+				!mainPlayer.isSpectator &&
+				mainPlayer.weapons[level.mainPlayer.hyperChargeSlot].ammo == 0
+			) {
+				drawWeaponSlotAmmo(x, y, 0);
+			} else if (weapon is HyperBuster hb) {
+				drawWeaponSlotCooldown(x, y, mmx.hyperchargeCooldown / hb.getRateOfFire(level.mainPlayer));
+			} else if (weapon is NovaStrike ns) {
+				drawWeaponSlotCooldown(x, y, mmx.novaStrikeCooldown / ns.fireRateFrames);
+			}
 		}
+		 
 		if (weapon is SigmaMenuWeapon) {
 			drawWeaponSlotCooldown(x, y, weapon.shootTime / 4);
 		}

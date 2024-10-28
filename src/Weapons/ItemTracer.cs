@@ -4,6 +4,9 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class ItemTracer : Weapon {
+
+	public static ItemTracer netWeapon = new();
+
 	public ItemTracer() : base() {
 		shootSounds = new string[] { "", "", "", "" };
 		rateOfFire = 1f;
@@ -17,8 +20,7 @@ public class ItemTracer : Weapon {
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
 		if (player?.character is not MegamanX mmx || !player.character.ownedByLocalPlayer) return;
 
-		mmx.scannerCooldown = 1;
-		ammo -= 3;
+		mmx.scannerCooldown = 60;
 		Character? target = null;
 		mmx.playSound("itemTracer", sendRpc: true);
 		CollideData hit = Global.level.raycast(pos, pos.addxy(150 * xDir, 0), new List<Type>() { typeof(Actor) });
@@ -32,18 +34,32 @@ public class ItemTracer : Weapon {
 public class ItemTracerProj : Projectile {
 	public Character target;
 	public Character? scannedChar;
-	public ItemTracerProj(Weapon weapon, Point pos, int xDir, Player player, Character target, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 300, 0, player, "itemscan_proj", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public ItemTracerProj(
+		Weapon weapon, Point pos, int xDir, Player player, 
+		Character target, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 300, 0, player, "itemscan_proj", 
+		0, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		maxTime = 1f;
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 		frameSpeed = 0;
 		projId = (int)ProjIds.ItemTracer;
 		this.target = target;
+
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+
 		canBeLocal = false;
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new ItemTracerProj(
+			ItemTracer.netWeapon, arg.pos, arg.xDir,
+			arg.player, null!, arg.netId
+		);
 	}
 
 	public override void update() {

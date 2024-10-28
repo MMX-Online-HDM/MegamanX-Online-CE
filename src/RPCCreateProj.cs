@@ -209,7 +209,7 @@ public partial class RPCCreateProj : RPC {
 				);
 				break;
 			case (int)ProjIds.SpinWheelCharged:
-				proj = new SpinWheelProjCharged(new SpinWheel(), pos, xDir, 0, player, netProjByte);
+				proj = new SpinWheelProjCharged(new SpinWheel(), pos, xDir, player, extraData[0], netProjByte);
 				break;
 			case (int)ProjIds.SonicSlicer:
 				proj = new SonicSlicerProj(new SonicSlicer(), pos, xDir, extraData[0], player, netProjByte);

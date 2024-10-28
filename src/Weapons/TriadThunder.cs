@@ -7,7 +7,8 @@ public class TriadThunder : Weapon {
 
 	public TriadThunder() : base() {
 		shootSounds = new string[] { "triadThunder", "triadThunder", "triadThunder", "" };
-		rateOfFire = 2.25f;
+		//rateOfFire = 2.25f;
+		fireRateFrames = 135;
 		index = (int)WeaponIds.TriadThunder;
 		weaponBarBaseIndex = 19;
 		weaponBarIndex = weaponBarBaseIndex;
@@ -28,7 +29,12 @@ public class TriadThunder : Weapon {
 		return 3;
 	}
 
-	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
+	public override void shoot(Character character, int[] args) {
+		int chargeLevel = args[0];
+		Point pos = character.getShootPos();
+		int xDir = character.getShootXDir();
+		Player player = character.player;
+
 		if (!player.ownedByLocalPlayer) {
 			return;
 		}
@@ -36,13 +42,13 @@ public class TriadThunder : Weapon {
 			if (player.ownedByLocalPlayer) {
 				new TriadThunderProj(
 					pos, xDir, player.input.isHeld(Control.Down, player) ? -1 : 1,
-					player, netProjId, true
+					player, player.getNextActorNetId(), true
 				);
-				player.setNextActorNetId((ushort)(netProjId + 4));
+				player.setNextActorNetId((ushort)(player.getNextActorNetId() + 4));
 			}
 		} else {
-			if (player.character != null && player.character.ownedByLocalPlayer) {
-				player.character.changeState(new TriadThunderChargedState(player.character.grounded), true);
+			if (character != null && character.ownedByLocalPlayer) {
+				character.changeState(new TriadThunderChargedState(character.grounded), true);
 			}
 		}
 	}

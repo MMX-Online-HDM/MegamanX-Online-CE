@@ -3,6 +3,8 @@
 namespace MMXOnline;
 
 public class Sting : Weapon {
+
+	public static Sting netWeapon = new();
 	public Sting() : base() {
 		index = (int)WeaponIds.Sting;
 		killFeedIndex = 2;
@@ -11,27 +13,35 @@ public class Sting : Weapon {
 		weaponSlotIndex = 2;
 		weaknessIndex = (int)WeaponIds.Boomerang;
 		shootSounds = new string[] { "csting", "csting", "csting", "stingCharge" };
-		rateOfFire = 0.75f;
+		//rateOfFire = 0.75f;
+		fireRateFrames = 45;
 		damage = "2";
 		effect = "Full Charge grants invulnerability.";
 		hitcooldown = "0";
 	}
 
-	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
+	public override void shoot(Character character, int[] args) {
+		int chargeLevel = args[0];
+		Point pos = character.getShootPos();
+		int xDir = character.getShootXDir();
+		Player player = character.player;
+
 		if (chargeLevel < 3) {
-			new StingProj(this, pos, xDir, player, 0, netProjId);
+			new StingProj(this, pos, xDir, player, 0, player.getNextActorNetId(), true);
 		} else {
-			player.character.stingChargeTime = 8;
+			character.stingChargeTime = 8;
 		}
 	}
 }
 
 public class StingProj : Projectile {
-	public int type = 0; //0 = initial proj, 1 = horiz, 2 = up, 3 = down
+	public int type = 0; //0 = initial proj, 1 = horiz, 2 = down, 3 = up
 	public StingProj(
-		Weapon weapon, Point pos, int xDir, Player player, int type, ushort netProjId, bool rpc = false
+		Weapon weapon, Point pos, int xDir, Player player, 
+		int type, ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 300, 2, player, "sting_start", 0, 0.25f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 300, 2, player, "sting_start", 
+		0, 0.25f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.Sting;
 		maxTime = 0.6f;
@@ -66,6 +76,13 @@ public class StingProj : Projectile {
 		}
 	}
 
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new StingProj(
+			Sting.netWeapon, arg.pos, arg.xDir, 
+			arg.player, arg.extraData[0], arg.netId
+		);
+	}
+
 	public override void update() {
 		base.update();
 		if (type == 0 && time > 0.05) {
@@ -79,11 +96,11 @@ public class StingProj : Projectile {
 						1, Global.level.mainPlayer.getNextActorNetId(), rpc: true
 					);
 					new StingProj(
-						weapon, pos.addxy(15 * xDir, -8), xDir, damager.owner,
+						weapon, pos.addxy(15 * xDir, 8), xDir, damager.owner,
 						2, Global.level.mainPlayer.getNextActorNetId(), rpc: true
 					);
 					new StingProj(
-						weapon, pos.addxy(15 * xDir, 8), xDir, damager.owner,
+						weapon, pos.addxy(15 * xDir, -8), xDir, damager.owner,
 						3, Global.level.mainPlayer.getNextActorNetId(), rpc: true
 					);
 				}
