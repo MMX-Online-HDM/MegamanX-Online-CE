@@ -222,55 +222,98 @@ public class HyorogaStartState : CharState {
 }
 
 public class HyorogaState : CharState {
-	float shootCooldown;
-	Zero zero;
-
-	public HyorogaState() : base("hyoroga", "hyoroga_shoot", "hyoroga_attack") {
+	Zero? zero;
+	public HyorogaState() : base("hyoroga") {
+		normalCtrl = true;
 	}
-
+	public override void update() {
+		base.update();
+		if (player.input.isPressed(Control.Special1, player)) {
+			character.changeState(new HyorogaStateA(), true);
+		}	
+		if (player.input.isPressed(Control.Shoot, player) && character.getChargeLevel() >= 1) {
+			character.changeState(new HyorogaStateB(), true);	
+		}
+		if (player.input.isPressed(Control.Jump, player)) {
+			character.changeState(new Fall(), true);
+		}
+		character.turnToInput(player.input, player);
+	}	
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.vel = new Point(0, 0);
 		character.useGravity = false;
 		character.gravityModifier = 0;
-
 		zero = character as Zero;
 	}
-
 	public override void onExit(CharState newState) {
 		character.useGravity = true;
 		character.gravityModifier = 1;
 		base.onExit(newState);
 	}
-
+}
+public class HyorogaStateA : CharState {
+	public HyorogaStateA() : base("hyoroga_attack") {
+	}
 	public override void update() {
+		character.vel = new Point(0, 0);
+		character.useGravity = false;
+		character.gravityModifier = 0;
 		base.update();
-		Helpers.decrementTime(ref shootCooldown);
-
-		var pois = character.sprite.getCurrentFrame().POIs;
-		if (character.sprite.name == "zero_hyoroga_attack") {
-			if (pois != null && pois.Length > 0 && shootCooldown == 0) {
-				var poi = character.getFirstPOIOrDefault();
-				new HyorogaProj(
-					poi, 0,
-					player, player.getNextActorNetId(), sendRpc: true
-				);
-				new HyorogaProj(
-					poi, 1,
-					player, player.getNextActorNetId(), sendRpc: true
-				);
-				new HyorogaProj(
-					poi, -1,
-					player, player.getNextActorNetId(), sendRpc: true
-				);
-				//shootCooldown = 1f;
-			}
-		} else {
-			character.turnToInput(player.input, player);
+		var pois = character.sprite.getCurrentFrame().POIs;	
+		if (pois != null && pois.Length > 0) {
+			var poi = character.getFirstPOIOrDefault();
+			new HyorogaProj(
+				poi, 0,
+				player, player.getNextActorNetId(), sendRpc: true
+			);
+			new HyorogaProj(
+				poi, 1,
+				player, player.getNextActorNetId(), sendRpc: true
+			);
+			new HyorogaProj(
+				poi, -1,
+				player, player.getNextActorNetId(), sendRpc: true
+			);
 		}
-
-		if (player.input.isPressed(Control.Jump, player)) {
-			character.changeState(new Fall(), true);
+		if (character.isAnimOver()) {
+			character.changeState(new HyorogaState(), true);			
+		}
+	}
+}
+public class HyorogaStateB : CharState {
+	public bool fired;
+	public HyorogaStateB() : base("hyoroga_shoot") {
+	}
+	public override void update() {
+		character.vel = new Point(0, 0);
+		character.useGravity = false;
+		character.gravityModifier = 0;
+		base.update();
+		if (!fired && character.frameIndex == 3) {
+			fired = true;
+			switch (character.getChargeLevel()) {
+				case 1:
+					character.playSound("buster2X3", sendRpc: true);
+					new ZBuster2Proj(character.getShootPos(), character.xDir, 0, 
+					player, player.getNextActorNetId(), rpc: true);
+					break;
+				case 2:
+					character.playSound("buster3X3", sendRpc: true);
+					new ZBuster3Proj(character.getShootPos(), character.xDir, 0, 
+					player, player.getNextActorNetId(), rpc: true);
+					break;
+				case >=3:
+					character.playSound("buster4", sendRpc: true);
+					new ZBuster4Proj(character.getShootPos(), character.xDir, 0, 
+					player, player.getNextActorNetId(), rpc: true);
+					break;
+			}
+			player.currency--;
+			character.stopCharge();		
+		}
+		if (character.isAnimOver()) {
+			character.changeState(new HyorogaState(), true);			
 		}
 	}
 }
