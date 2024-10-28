@@ -295,13 +295,13 @@ public class Damager {
 				damage = 4;
 				weakness = false;
 				flinch = 0;
-				victim?.playSound("hurt");
+				victim?.playSound("weakness");
 			}
 			if (projId == (int)ProjIds.StrikeChain && weakness) {
 				damage *= 2;
 				weakness = false;
 				flinch = 0;
-				victim?.playSound("hurt");
+				victim?.playSound("weakness");
 			}
 			if (projId == (int)ProjIds.Tornado && weakness) {
 				damage = 1;
@@ -646,6 +646,8 @@ public class Damager {
 						victim?.playSound("weakness");
 						//Only play if the victim is not in hurt state 
 						//Avoiding annoying sound spam
+					} else {
+						victim?.playSound("hurt");
 					}
 					// bool if the proj does mini flinch (Vanilla behavior)
 					// (Yes, "mini flinch" weakness does nothing)

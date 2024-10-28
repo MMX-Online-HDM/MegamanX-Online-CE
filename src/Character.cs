@@ -1217,15 +1217,17 @@ public partial class Character : Actor, IDamagable {
 			changeState(new Fall());
 		}
 		if (canWallClimb() &&
-			(charState.normalCtrl || charState.airMove || charState is WallSlide) &&
 			!grounded && vel.y >= 0 &&
-			wallKickTimer <= 0 &&
+			wallKickTimer <= 0 && (
+				charState.normalCtrl || charState.airMove ||
+				charState is WallSlide || charState is WallSlideAttack { canCancel: true }
+			) &&
 			player.input.isPressed(Control.Jump, player) &&
 			(charState.wallKickLeftWall != null || charState.wallKickRightWall != null)
 		) {
 			dashedInAir = 0;
 			if (player.input.isHeld(Control.Dash, player) &&
-				(charState.useDashJumpSpeed || charState is WallSlide)
+				(charState.useDashJumpSpeed || charState is WallSlide or WallSlideAttack)
 			) {
 				isDashing = true;
 				dashedInAir++;
@@ -1246,12 +1248,12 @@ public partial class Character : Actor, IDamagable {
 					wallKickDir -= 1;
 				}
 			}
-			if (wallKickDir != 0) {
-				xDir = -wallKickDir;
-			}
 			wallKickTimer = maxWallKickTime;
-			if (charState.normalCtrl || charState is WallSlide) {
+			if (charState.normalCtrl || charState is WallSlide or WallSlideAttack) {
 				changeState(new WallKick(), true);
+				if (wallKickDir != 0) {
+					xDir = -wallKickDir;
+				}
 			} else {
 				playSound("jump", sendRpc: true);
 			}
@@ -1282,8 +1284,8 @@ public partial class Character : Actor, IDamagable {
 				}
 				vel.y = -getJumpPower();
 				playSound("jump", sendRpc: true);
-				if (charState.airSprite != null && charState.airSprite != "") {
-					changeSprite(charState.airSprite, false);
+				if (charState.airSprite != "") {
+					changeSpriteFromName(charState.airSprite, false);
 				}
 			}
 		}
@@ -3063,7 +3065,7 @@ public partial class Character : Actor, IDamagable {
 			return;
 		}
 		if (charState is Hurt hurtState) {
-			if (hurtState.stateFrames <= flinchFrames) {
+			if (flinchFrames >= hurtState.flinchLeft) {
 				// You can probably add a check here that sets "hurtState.yStartPos" to null if you.
 				// Want to add a flinch attack that pushes up on chain-flinch.
 				changeState(new Hurt(dir, flinchFrames, false, hurtState.flinchYPos), true);

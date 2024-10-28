@@ -560,7 +560,11 @@ public class Zero : Character {
 		}
 		// Air attack.
 		if (shootPressed) {
-			changeState(new ZeroAirSlashState(), true);
+			if (charState is WallSlide wallSlide) {
+				changeState(new ZeroMeleeWall(wallSlide.wallDir, wallSlide.wallCollider), true);
+			} else {
+				changeState(new ZeroAirSlashState(), true);
+			}
 			return true;
 		}
 		return false;

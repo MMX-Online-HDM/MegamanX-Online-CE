@@ -11,6 +11,8 @@ public class Hurt : CharState {
 	public float flinchTime;
 	public bool spiked;
 
+	public float flinchLeft => (flinchTime - stateFrames);
+
 	public Hurt(int dir, int flinchFrames, bool spiked = false, float? oldComboPos = null) : base("hurt") {
 		this.flinchTime = flinchFrames;
 		hurtDir = dir;
@@ -37,7 +39,7 @@ public class Hurt : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		if (player.isX && player.hasBodyArmor(1)) {
-			flinchTime *= 0.75f;
+			flinchTime = MathF.Floor(flinchTime * 0.75f);
 			sprite = "hurt2";
 			character.changeSpriteFromName("hurt2", true);
 		}
@@ -224,6 +226,9 @@ public class GenericStun : CharState {
 		}
 		if (flinchTime > flinchFrames) {
 			return;
+		}
+		if (character.paralyzedTime >= 3) {
+			character.paralyzedTime = 2;
 		}
 		bool isCombo = (flinchTime != 0);
 		hurtSpeed = 1.6f * xDir;

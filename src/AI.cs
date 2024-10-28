@@ -1485,7 +1485,7 @@ public class AI {
 				//Projectile is not 
 				if (!(proj.projId == (int)ProjIds.RollingShield || proj.projId == (int)ProjIds.FrostShield || proj.projId == (int)ProjIds.SwordBlock
 					|| proj.projId == (int)ProjIds.FrostShieldAir || proj.projId == (int)ProjIds.FrostShieldChargedPlatform)	
-				){									
+				){
 					if (bzero1.zSaberCooldown == 0) {
 						bzero1.turnToInput(player.input, player);
 						bzero1.changeState(new BusterZeroMelee(), true);

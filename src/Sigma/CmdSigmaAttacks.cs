@@ -240,7 +240,7 @@ public class SigmaWallDashState : CharState {
 		if (collideData?.gameObject is Wall wall) {
 			var collideData2 = Global.level.checkTerrainCollisionOnce(character, vel.x * Global.spf, 0);
 			if (collideData2?.gameObject is Wall wall2 && wall2.collider.isClimbable) {
-				character.changeState(new WallSlide(character.xDir, wall2.collider), true);
+				character.changeState(new WallSlide(character.xDir, wall2.collider) { enterSound = "" }, true);
 			} else {
 				if (vel.y > 0) {
 					character.changeToIdleOrFall();

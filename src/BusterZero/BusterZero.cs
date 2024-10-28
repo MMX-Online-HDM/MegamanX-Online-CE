@@ -115,7 +115,11 @@ public class BusterZero : Character {
 					changeState(new BusterZeroHadangeki(), true);
 					return true;
 				}
-				changeState(new BusterZeroMelee(), true);
+				if (charState is WallSlide wallSlide) {
+					changeState(new BusterZeroMeleeWall(wallSlide.wallDir, wallSlide.wallCollider), true);
+				} else {
+					changeState(new BusterZeroMelee(), true);
+				}
 				return true;
 			}
 		}

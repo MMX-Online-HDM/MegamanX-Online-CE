@@ -174,6 +174,30 @@ public class ZeroShippuugaState : ZeroGenericMeleeState {
 	}
 }
 
+
+public class ZeroMeleeWall : WallSlideAttack {
+	bool fired;
+
+	public ZeroMeleeWall(
+		int wallDir, Collider wallCollider
+	) : base(
+		"wall_slide_attack", wallDir, wallCollider
+	) {
+		this.wallDir = wallDir;
+		this.wallCollider = wallCollider;
+		exitOnAnimEnd = true;
+		canCancel = true;
+	}
+
+	public override void update() {
+		base.update();
+		if (character.frameIndex >= 2 && !fired) {
+			fired = true;
+			character.playSound("zerosaberx3", sendRpc: true);
+		}
+	}
+}
+
 public class ZeroDoubleBuster : CharState {
 	bool fired1;
 	bool fired2;
@@ -354,7 +378,7 @@ public class AwakenedZeroHadangekiWall : CharState {
 			);
 		}
 		if (character.isAnimOver()) {
-			character.changeState(new WallSlide(wallDir, wallCollider));
+			character.changeState(new WallSlide(wallDir, wallCollider) { enterSound = "" });
 			character.sprite.frameIndex = character.sprite.totalFrameNum - 1;
 		}
 	}
