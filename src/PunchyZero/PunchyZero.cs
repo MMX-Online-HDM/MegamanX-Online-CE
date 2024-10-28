@@ -548,7 +548,7 @@ public class PunchyZero : Character {
 			"zero_shoryuken" => MeleeIds.Uppercut,
 			"zero_megapunch" => MeleeIds.StrongPunch,
 			"zero_dropkick" => MeleeIds.DropKick,
-			"zero_projswing" or "zero_projswing_air" => MeleeIds.SaberSwing,
+			"zero_projswing" or "zero_projswing_air" or "zero_wall_slide_attack" => MeleeIds.SaberSwing,
 			_ => MeleeIds.None
 		});
 	}
