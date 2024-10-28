@@ -393,7 +393,7 @@ public class PZeroShoryuken : CharState {
 		if (character.sprite.frameIndex >= 3 && !jumpedYet) {
 			jumpedYet = true;
 			character.dashedInAir++;
-			character.vel.y = -character.getJumpPower() * 1.2f;
+			character.vel.y = -character.getJumpPower() * 1.45f;
 			character.playSound("punch2", sendRpc: true);
 		}
 
