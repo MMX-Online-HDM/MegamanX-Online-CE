@@ -1,4 +1,6 @@
-﻿namespace MMXOnline;
+﻿using System;
+
+namespace MMXOnline;
 
 public class NovaStrike : Weapon {
 	public const float ammoUsage = 16;
@@ -7,7 +9,8 @@ public class NovaStrike : Weapon {
 			damager = new Damager(player, 4, Global.defFlinch, 0.5f);
 		}
 		shootSounds = new string[] { "", "", "", "" };
-		rateOfFire = 1.5f;
+		//rateOfFire = 1.5f;
+		fireRateFrames = 90;
 		index = (int)WeaponIds.NovaStrike;
 		weaponBarBaseIndex = 42;
 		weaponBarIndex = 36;
@@ -18,10 +21,13 @@ public class NovaStrike : Weapon {
 		drawRoundedDown = true;
 	}
 
-	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-		if (player.character.ownedByLocalPlayer) {
-			player.character.changeState(new NovaStrikeState(), true);
+	public override void shoot(Character character, int[] args) {
+		if (character.ownedByLocalPlayer) {
+			Point inputDir = character.player.input.getInputDir(character.player);
+			character.changeState(new NovaStrikeState(inputDir), true);
 		}
+		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
+		mmx.novaStrikeCooldown = fireRateFrames;
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
@@ -37,64 +43,59 @@ public class NovaStrike : Weapon {
 }
 
 public class NovaStrikeState : CharState {
-	int leftOrRight;
 	int upOrDown;
-	public NovaStrikeState() : base("nova_strike_start", "", "", "") {
-		superArmor = true;
+	int leftOrRight;
+	public NovaStrikeState(Point inputDir) : base(getNovaDir(inputDir), "", "", "nova_strike_start") {
 		immuneToWind = true;
 		invincible = true;
+		normalCtrl = false;
+		attackCtrl = false;
+		useGravity = false;
+
+		if (inputDir.y != 0) upOrDown = (int)inputDir.y;
+		else leftOrRight = 1;
 	}
 
 	public override void update() {
 		base.update();
 
-		if (sprite == "nova_strike_start") {
-			if (character.isAnimOver()) {
-				if (player.input.isHeld(Control.Up, player)) {
-					upOrDown = -1;
-					sprite = "nova_strike_up";
-				} else if (player.input.isHeld(Control.Down, player)) {
-					upOrDown = 1;
-					sprite = "nova_strike_down";
-				} else {
-					leftOrRight = 1;
-					sprite = "nova_strike";
-				}
-				if (Helpers.randomRange(0, 10) < 10) {
-					character.playSound("novaStrikeX4", forcePlay: false, sendRpc: true);
-				} else {
-					character.playSound("novaStrikeX6", forcePlay: false, sendRpc: true);
-				}
-				character.changeSpriteFromName(sprite, true);
+		if (!once && character.isAnimOver()) {
+			once = true;
+
+			if (Helpers.randomRange(0, 10) < 10) {
+				character.playSound("novaStrikeX4", forcePlay: false, sendRpc: true);
+			} else {
+				character.playSound("novaStrikeX6", forcePlay: false, sendRpc: true);
 			}
-			return;
 		}
 
-		if (!character.tryMove(new Point(character.xDir * 350 * leftOrRight, 350 * upOrDown), out _)) {
-			character.changeToIdleOrFall();
-			return;
-		}
-
-		if (character.flag != null) {
-			character.changeToIdleOrFall();
-			return;
-		}
-		if (stateTime > 0.6f) {
-			character.changeToIdleOrFall();
-			return;
+		if (!inTransition()) {
+			if (!character.tryMove(new Point(character.xDir * 350 * leftOrRight, 350 * upOrDown), out _) ||
+				character.flag != null || stateTime > 0.6f
+			) {
+				character.changeToIdleOrFall();
+				return;
+			}
 		}
 	}
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.useGravity = false;
-		character.vel.y = 0;
+		character.stopMoving();
 		character.stopCharge();
 	}
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		character.yDir = 1;
-		character.useGravity = true;
+	}
+
+	static string getNovaDir(Point input) {
+		if (input.y != 0) {
+			if (input.y == -1) return "nova_strike_up";
+			return "nova_strike_down";
+		}
+
+		return "nova_strike";
 	}
 }

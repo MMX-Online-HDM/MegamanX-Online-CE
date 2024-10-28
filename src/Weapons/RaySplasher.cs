@@ -10,7 +10,8 @@ public class RaySplasher : Weapon {
 
 	public RaySplasher() : base() {
 		shootSounds = new string[] { "raySplasher", "raySplasher", "raySplasher", "warpIn" };
-		rateOfFire = 1f;
+		//rateOfFire = 1f;
+		fireRateFrames = 60;
 		index = (int)WeaponIds.RaySplasher;
 		weaponBarBaseIndex = 21;
 		weaponBarIndex = weaponBarBaseIndex;
@@ -22,14 +23,16 @@ public class RaySplasher : Weapon {
 		hitcooldown = "0.075";
 	}
 
-	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
+	public override void shoot(Character character, int[] args) {
+		int chargeLevel = args[0];
+
 		if (chargeLevel < 3) {
-			if (player.character is MegamanX mmx) {
+			if (character is MegamanX mmx) {
 				mmx.setShootRaySplasher(true);
 			}
 		} else {
-			if (player.character.ownedByLocalPlayer) {
-				player.character.changeState(new RaySplasherChargedState(), true);
+			if (character.ownedByLocalPlayer) {
+				character.changeState(new RaySplasherChargedState(), true);
 			}
 		}
 	}
@@ -38,17 +41,14 @@ public class RaySplasher : Weapon {
 public class RaySplasherProj : Projectile {
 	public RaySplasherProj(
 		Weapon weapon, Point pos, int xDir, int spriteType, int dirType,
-		bool isTurret, Player player, ushort netProjId, bool rpc = false
+		Player player, ushort netProjId, bool rpc = false
 	) : base(
 		weapon, pos, xDir, 600, 1, player, "raysplasher_proj",
 		0, 0.075f, netProjId, player.ownedByLocalPlayer
 	) {
 		maxTime = 0.25f;
 		projId = (int)ProjIds.RaySplasher;
-		if (isTurret) {
-			projId = (int)ProjIds.RaySplasherChargedProj;
-			damager.hitCooldown = 0;
-		}
+		
 		reflectable = true;
 		frameIndex = spriteType;
 		frameSpeed = 0;
@@ -66,7 +66,7 @@ public class RaySplasherProj : Projectile {
 		if (rpc) {
 			rpcCreate(
 				pos, player, netProjId, xDir,
-				new byte[] { (byte)spriteType, (byte)dirType, isTurret ? (byte)1 : (byte)0 }
+				new byte[] { (byte)spriteType, (byte)dirType}
 			);
 		}
 	}
@@ -74,8 +74,7 @@ public class RaySplasherProj : Projectile {
 	public static Projectile rpcInvoke(ProjParameters args) {
 		return new RaySplasherProj(
 			RaySplasher.netWeapon, args.pos, args.xDir,
-			args.extraData[0], args.extraData[1], (args.extraData[2] == 1),
-			args.player, args.netId
+			args.extraData[0], args.extraData[1], args.player, args.netId
 		);
 	}
 
@@ -192,11 +191,14 @@ public class RaySplasherTurret : Actor, IDamagable {
 			} else {
 				raySplasherShootTime += Global.spf;
 				if (raySplasherShootTime > 0.1f) {
-					var proj = new RaySplasherProj(new RaySplasher(), pos, (pos.x > target.getCenterPos().x ? -1 : 1), raySplasherMod % 3, 0, true, netOwner, netOwner.getNextActorNetId(), rpc: true);
-
 					float ang = pos.directionToNorm(target.getCenterPos()).angle;
 					ang += Helpers.randomRange(-22.5f, 22.5f);
-					proj.vel = Point.createFromAngle(ang).times(600);
+
+					new RaySplasherTurretProj(
+						new RaySplasher(), pos, (pos.x > target.getCenterPos().x ? -1 : 1), 
+						raySplasherMod % 3, ang, netOwner, netOwner.getNextActorNetId(), rpc: true);
+
+					
 
 					//float randAngle = Helpers.randomRange(0, 360);
 					//proj.vel = new Point(600 * Helpers.cosd(randAngle), 600 * Helpers.sind(randAngle));
@@ -209,7 +211,7 @@ public class RaySplasherTurret : Actor, IDamagable {
 	}
 
 	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
-		if (projId == (int)ProjIds.SpinningBlade) {
+		if (projId == (int)ProjIds.SpinningBlade || projId == (int)ProjIds.SpinningBladeCharged) {
 			damage *= 2;
 		}
 
@@ -275,6 +277,38 @@ public class RaySplasherTurret : Actor, IDamagable {
 		}
 
 		renderDamageText(10);
+	}
+}
+
+
+public class RaySplasherTurretProj : Projectile {
+	public RaySplasherTurretProj(
+		Weapon weapon, Point pos, int xDir, int spriteType, float ang,
+		Player player, ushort? netProjId, bool rpc = false
+	) : base (
+		weapon, pos, xDir, 600, 1, player, "raysplasher_proj",
+		0, 0, netProjId, player.ownedByLocalPlayer
+	) {
+		maxTime = 0.25f;
+		projId = (int)ProjIds.RaySplasherChargedProj;
+		frameIndex = spriteType;
+		frameSpeed = 0;
+		fadeSprite = "raysplasher_fade";
+		vel = Point.createFromByteAngle(ang).times(speed);
+
+		if (rpc) {
+			rpcCreate(
+				pos, player, netProjId, xDir,
+				new byte[] { (byte)spriteType, (byte)ang }
+			);
+		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new RaySplasherTurretProj(
+			RaySplasher.netWeapon, args.pos, args.xDir,
+			args.extraData[0], args.extraData[1], args.player, args.netId
+		);
 	}
 }
 

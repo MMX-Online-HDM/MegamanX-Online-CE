@@ -3,6 +3,9 @@
 namespace MMXOnline;
 
 public class RollingShield : Weapon {
+
+	public static RollingShield netWeapon = new();
+
 	public RollingShield() : base() {
 		index = (int)WeaponIds.RollingShield;
 		killFeedIndex = 3;
@@ -11,27 +14,36 @@ public class RollingShield : Weapon {
 		weaponSlotIndex = 3;
 		weaknessIndex = 6;
 		shootSounds = new string[] { "rollingShield", "rollingShield", "rollingShield", "" };
-		rateOfFire = 0.75f;
+		//rateOfFire = 0.75f;
+		fireRateFrames = 45;
 		damage = "2/1";
 		effect = "Mobile Shield That Deletes Projectiles.";
 		hitcooldown = "0/0.33";	
 	}
 
-	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
+	public override void shoot(Character character, int[] args) {
+		int chargeLevel = args[0];
+		Point pos = character.getShootPos();
+		int xDir = character.getShootXDir();
+		Player player = character.player;
+
 		if (chargeLevel < 3) {
-			if (player.character is MegamanX mmx) {
-				new RollingShieldProj(this, pos, xDir, player, netProjId);
-			}
+			new RollingShieldProj(this, pos, xDir, player, player.getNextActorNetId(), true);	
 		} else {
-			new RollingShieldProjCharged(this, pos, xDir, player, netProjId);
+			new RollingShieldProjCharged(this, pos, xDir, player, player.getNextActorNetId(), true);
 		}
 	}
 }
 
 
 public class RollingShieldProj : Projectile {
-	public RollingShieldProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId) :
-		base(weapon, pos, xDir, 200, 2, player, "rolling_shield", 0, 0, netProjId, player.ownedByLocalPlayer) {
+	public RollingShieldProj(
+		Weapon weapon, Point pos, int xDir, 
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 200, 2, player, "rolling_shield", 
+		0, 0, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.RollingShield;
 		fadeSprite = "explosion";
 		fadeSound = "explosion";
@@ -39,6 +51,15 @@ public class RollingShieldProj : Projectile {
 		collider.wallOnly = true;
 		vel.x = 0;
 		canBeLocal = false;
+
+		if (rpc) rpcCreate(pos, player, netProjId, xDir);
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new RollingShieldProj(
+			RollingShield.netWeapon, arg.pos, arg.xDir, 
+			arg.player, arg.netId
+		);
 	}
 
 	public override void update() {
@@ -76,7 +97,8 @@ public class RollingShieldProjCharged : Projectile {
 	public LoopingSound? rollingShieldSound;
 	public float ammoDecCooldown = 0;
 	public RollingShieldProjCharged(
-		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId
+		Weapon weapon, Point pos, int xDir, 
+		Player player, ushort netProjId, bool rpc = false
 	) : base(
 		weapon, pos, xDir, 0, 1, player, "rolling_shield_charge_flash",
 		0, 0.33f, netProjId, player.ownedByLocalPlayer
@@ -95,6 +117,15 @@ public class RollingShieldProjCharged : Projectile {
 		shouldVortexSuck = false;
 		neverReflect = true;
 		canBeLocal = false;
+
+		if (rpc) rpcCreate(pos, player, netProjId, xDir);
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new RollingShieldProjCharged(
+			RollingShield.netWeapon, arg.pos, arg.xDir, 
+			arg.player, arg.netId
+		);
 	}
 
 	public override void update() {

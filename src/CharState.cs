@@ -1099,8 +1099,8 @@ public class WallSlide : CharState {
 		}
 		*/
 
-		if (stateFrames >= 9) {
-			if (mmx == null || mmx.strikeChainProj == null) {
+		if (stateTime >= 0.15) {
+			if (mmx == null || mmx.strikeChainProj == null || mmx.strikeChainChargedProj == null) {
 				var hit = character.getHitWall(wallDir, 0);
 				var hitWall = hit?.gameObject as Wall;
 

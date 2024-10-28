@@ -6,9 +6,13 @@ using SFML.Graphics;
 namespace MMXOnline;
 
 public class SpinningBlade : Weapon {
+
+	public static SpinningBlade netWeapon = new();
+
 	public SpinningBlade() : base() {
 		shootSounds = new string[] { "", "", "", "spinningBladeCharged" };
-		rateOfFire = 1.25f;
+		//rateOfFire = 1.25f;
+		fireRateFrames = 75;
 		index = (int)WeaponIds.SpinningBlade;
 		weaponBarBaseIndex = 20;
 		weaponBarIndex = weaponBarBaseIndex;
@@ -22,13 +26,18 @@ public class SpinningBlade : Weapon {
 		FlinchCD = "0/1";
 	}
 
-	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
+	public override void shoot(Character character, int[] args) {
+		int chargeLevel = args[0];
+		Point pos = character.getShootPos();
+		int xDir = character.getShootXDir();
+		Player player = character.player;
+
 		if (chargeLevel < 3) {
-			player.setNextActorNetId(netProjId);
-			new SpinningBladeProj(this, pos, xDir, 0, player, player.getNextActorNetId(true));
-			new SpinningBladeProj(this, pos, xDir, 1, player, player.getNextActorNetId(true));
-		} else if (player?.character is MegamanX mmx) {
-			var csb = new SpinningBladeProjCharged(this, pos, xDir, player, netProjId);
+			player.setNextActorNetId(player.getNextActorNetId());
+			new SpinningBladeProj(this, pos, xDir, 0, player, player.getNextActorNetId(true), true);
+			new SpinningBladeProj(this, pos, xDir, 1, player, player.getNextActorNetId(true), true);
+		} else if (character is MegamanX mmx) {
+			var csb = new SpinningBladeProjCharged(this, pos, xDir, player, player.getNextActorNetId(), true);
 			if (mmx.ownedByLocalPlayer) {
 				mmx.chargedSpinningBlade = csb;
 			}
@@ -45,8 +54,13 @@ public class SpinningBladeProj : Projectile {
 	Sound? spinSound;
 	bool once;
 
-	public SpinningBladeProj(Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 250, 2, player, "spinningblade_proj", 0, 0, netProjId, player.ownedByLocalPlayer) {
+	public SpinningBladeProj(
+		Weapon weapon, Point pos, int xDir, int type, 
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 250, 2, player, "spinningblade_proj", 
+		0, 0, netProjId, player.ownedByLocalPlayer
+	) {
 		maxTime = 2f;
 		projId = (int)ProjIds.SpinningBlade;
 		fadeSprite = "explosion";
@@ -69,8 +83,15 @@ public class SpinningBladeProj : Projectile {
 			yScale = -1;
 		}
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, player, netProjId, xDir, (byte)type);
 		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new SpinningBladeProj(
+			SpinningBlade.netWeapon, arg.pos, arg.xDir,
+			arg.extraData[0], arg.player, arg.netId
+		);
 	}
 
 	public override void update() {
@@ -117,8 +138,13 @@ public class SpinningBladeProjCharged : Projectile {
 	public float spinAngle;
 	bool retracted;
 	bool soundPlayed;
-	public SpinningBladeProjCharged(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 250, 2, player, "spinningblade_charged", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public SpinningBladeProjCharged(
+		Weapon weapon, Point pos, int xDir, 
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 250, 2, player, "spinningblade_charged", 
+		Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.SpinningBladeCharged;
 		shouldShieldBlock = false;
 		destroyOnHit = false;
@@ -128,6 +154,12 @@ public class SpinningBladeProjCharged : Projectile {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
 		canBeLocal = false;
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new SpinningBladeProjCharged(
+			SpinningBlade.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
+		);
 	}
 
 	public override void update() {

@@ -4,9 +4,13 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class SpinWheel : Weapon {
+
+	public static SpinWheel netWeapon = new();
+
 	public SpinWheel() : base() {
 		shootSounds = new string[] { "spinWheel", "spinWheel", "spinWheel", "spinWheelCharged" };
-		rateOfFire = 1f;
+		//rateOfFire = 1f;
+		fireRateFrames = 60;
 		index = (int)WeaponIds.SpinWheel;
 		weaponBarBaseIndex = 12;
 		weaponBarIndex = weaponBarBaseIndex;
@@ -24,11 +28,16 @@ public class SpinWheel : Weapon {
 		return 8;
 	}
 
-	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
+	public override void shoot(Character character, int[] args) {
+		int chargeLevel = args[0];
+		Point pos = character.getShootPos();
+		int xDir = character.getShootXDir();
+		Player player = character.player;
+
 		if (chargeLevel < 3) {
-			new SpinWheelProj(this, pos, xDir, player, netProjId);
+			new SpinWheelProj(this, pos, xDir, player, player.getNextActorNetId(), true);
 		} else {
-			new SpinWheelProjChargedStart(this, pos, xDir, player, netProjId);
+			new SpinWheelProjChargedStart(this, pos, xDir, player, player.getNextActorNetId(), true);
 		}
 	}
 }
@@ -43,15 +52,27 @@ public class SpinWheelProj : Projectile {
 	const float hitCooldown = 0.2f;
 	float maxTimeProj = 2.5f;
 
-	public SpinWheelProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 1, player, "spinwheel_start", 0, hitCooldown, netProjId, player.ownedByLocalPlayer) {
+	public SpinWheelProj(
+		Weapon weapon, Point pos, int xDir, 
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 1, player, "spinwheel_start", 
+		0, hitCooldown, netProjId, player.ownedByLocalPlayer
+	) {
 		destroyOnHit = false;
-		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
-		}
 		projId = (int)ProjIds.SpinWheel;
 		maxTimeProj = startMaxTime;
 		maxTime = startMaxTime;
+
+		if (rpc) {
+			rpcCreate(pos, player, netProjId, xDir);
+		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new SpinWheelProj(
+			SpinWheel.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
+		);
 	}
 
 	public override void update() {
@@ -142,26 +163,36 @@ public class SpinWheelProj : Projectile {
 }
 
 public class SpinWheelProjChargedStart : Projectile {
-	public SpinWheelProjChargedStart(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 4, player, "spinwheel_charged_start", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public SpinWheelProjChargedStart(
+		Weapon weapon, Point pos, int xDir, 
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 4, player, "spinwheel_charged_start", 
+		Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.SpinWheelChargedStart;
+
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
 	}
 
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new SpinWheelProjChargedStart(
+			SpinWheel.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
+		);
+	}
+
 	public override void update() {
 		base.update();
-		if (sprite.isAnimOver()) {
+		if (isAnimOver()) {
 			if (ownedByLocalPlayer) {
-				new SpinWheelProjCharged(weapon, pos, -1, -1, damager.owner, damager.owner.getNextActorNetId(), rpc: true);
-				new SpinWheelProjCharged(weapon, pos, -1, 0, damager.owner, damager.owner.getNextActorNetId(), rpc: true);
-				new SpinWheelProjCharged(weapon, pos, -1, 1, damager.owner, damager.owner.getNextActorNetId(), rpc: true);
-				new SpinWheelProjCharged(weapon, pos, 0, -1, damager.owner, damager.owner.getNextActorNetId(), rpc: true);
-				new SpinWheelProjCharged(weapon, pos, 0, 1, damager.owner, damager.owner.getNextActorNetId(), rpc: true);
-				new SpinWheelProjCharged(weapon, pos, 1, -1, damager.owner, damager.owner.getNextActorNetId(), rpc: true);
-				new SpinWheelProjCharged(weapon, pos, 1, 0, damager.owner, damager.owner.getNextActorNetId(), rpc: true);
-				new SpinWheelProjCharged(weapon, pos, 1, 1, damager.owner, damager.owner.getNextActorNetId(), rpc: true);
+				for (int i = 0; i < 8; i++) {
+					new SpinWheelProjCharged(
+						weapon, pos, 1, damager.owner, i,
+						damager.owner.getNextActorNetId(), rpc: true
+					);
+				}
 			}
 			destroySelf();
 		}
@@ -169,30 +200,36 @@ public class SpinWheelProjChargedStart : Projectile {
 }
 
 public class SpinWheelProjCharged : Projectile {
-	public SpinWheelProjCharged(Weapon weapon, Point pos, int xDir, int yDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 200, 1, player, "spinwheel_charged", Global.defFlinch, 0, netProjId, player.ownedByLocalPlayer) {
+
+	public SpinWheelProjCharged(
+		Weapon weapon, Point pos, int xDir, Player player, 
+		int type, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, 1, 200, 1, player, "spinwheel_charged", 
+		Global.defFlinch, 0, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.SpinWheelCharged;
 		maxTime = 0.75f;
+		vel = Point.createFromByteAngle(type * 32).times(speed);
 
-		this.xDir = xDir == 0 ? 1 : xDir;
-		this.yDir = yDir == 0 ? 1 : yDir;
-
-		if (xDir == 0) changeSprite("spinwheel_charged_up", true);
-		else if (yDir != 0) {
-			changeSprite("spinwheel_charged_diag", true);
+		if (vel.x < 0) {
+			xDir *= -1;
+			xScale *= -1;
 		}
+		if (vel.y > 0) yScale *= -1;
 
-		if (xDir != 0 && yDir != 0) speed *= 0.71f;
-
-		vel.x = speed * MathF.Sign(xDir);
-		vel.y = speed * MathF.Sign(-yDir);
+		if (type % 2 != 0) changeSprite("spinwheel_charged_diag", true);
+		else if (type is 2 or 6) changeSprite("spinwheel_charged_up", true);
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, player, netProjId, xDir, new byte[] {(byte)type});
 		}
 	}
 
-	public override void update() {
-		base.update();
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new SpinWheelProjCharged(
+			SpinWheel.netWeapon, arg.pos, arg.xDir, 
+			arg.player, arg.extraData[0], arg.netId
+		);
 	}
 }

@@ -1,6 +1,9 @@
 ﻿namespace MMXOnline;
 
 public class HadoukenWeapon : Weapon {
+
+	public static HadoukenWeapon netWeapon = new(null!);
+
 	public HadoukenWeapon(Player player) : base() {
 		damager = new Damager(player, Damager.ohkoDamage, Global.defFlinch, 0.5f);
 		ammo = 0;
@@ -12,8 +15,14 @@ public class HadoukenWeapon : Weapon {
 }
 
 public class HadoukenProj : Projectile {
-	public HadoukenProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 250, Damager.ohkoDamage, player, "hadouken", Global.defFlinch, 0.15f, netProjId, player.ownedByLocalPlayer) {
+	public HadoukenProj(
+		Weapon weapon, Point pos, int xDir, 
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 250, Damager.ohkoDamage, player, "hadouken", 
+		Global.defFlinch, 0.15f, netProjId, player.ownedByLocalPlayer
+	) {
+		maxTime = 0.4f;
 		fadeSprite = "hadouken_fade";
 		reflectable = true;
 		destroyOnHit = true;
@@ -24,11 +33,11 @@ public class HadoukenProj : Projectile {
 		}
 	}
 
-	public override void update() {
-		base.update();
-		if (time > 0.4) {
-			destroySelf(fadeSprite);
-		}
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new HadoukenProj(
+			HadoukenWeapon.netWeapon, arg.pos, 
+			arg.xDir, arg.player, arg.netId
+		);
 	}
 }
 

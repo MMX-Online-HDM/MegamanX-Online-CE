@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace MMXOnline;
 
 public class ElectricSpark : Weapon {
+
+	public static ElectricSpark netWeapon = new();
 	public ElectricSpark() : base() {
 		index = (int)WeaponIds.ElectricSpark;
 		killFeedIndex = 6;
@@ -11,7 +14,8 @@ public class ElectricSpark : Weapon {
 		weaponSlotIndex = 6;
 		weaknessIndex = (int)WeaponIds.ShotgunIce;
 		shootSounds = new string[] { "electricSpark", "electricSpark", "electricSpark", "electricSpark" };
-		rateOfFire = 0.5f;
+		//rateOfFire = 0.5f;
+		fireRateFrames = 30;
 		damage = "2/4";
 		effect =  "Can Split. Charged: Doesn't destroy on hit.";
 		hitcooldown = "0/0.5";
@@ -19,11 +23,16 @@ public class ElectricSpark : Weapon {
 		FlinchCD = "1/0";
 	}
 
-	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
+	public override void shoot(Character character, int[] args) {
+		int chargeLevel = args[0];
+		Point pos = character.getShootPos();
+		int xDir = character.getShootXDir();
+		Player player = character.player;
+
 		if (chargeLevel < 3) {
-			new ElectricSparkProj(this, pos, xDir, player, 0, netProjId);
+			new ElectricSparkProj(this, pos, xDir, player, 0, player.getNextActorNetId(), true);
 		} else {
-			new ElectricSparkProjChargedStart(this, pos, xDir, player, netProjId);
+			new ElectricSparkProjChargedStart(this, pos, xDir, player, player.getNextActorNetId(), true);
 		}
 	}
 }
@@ -53,7 +62,6 @@ public class ElectricSparkProj : Projectile {
 		} 
 
 		fadeSprite = "electric_spark_fade";
-		//this.fadeSound = "explosion";
 		this.type = type;
 		reflectable = true;
 		shouldShieldBlock = false;
@@ -63,6 +71,13 @@ public class ElectricSparkProj : Projectile {
 			extraArgs = new byte[] { (byte)type };
 			rpcCreate(pos, player, netProjId, xDir, extraArgs);
 		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new ElectricSparkProj(
+			ElectricSpark.netWeapon, arg.pos, arg.xDir, 
+			arg.player, arg.extraData[0], arg.netId
+		);
 	}
 
 	public override void onHitWall(CollideData other) {
@@ -93,14 +108,24 @@ public class ElectricSparkProj : Projectile {
 
 public class ElectricSparkProjChargedStart : Projectile {
 	public ElectricSparkProjChargedStart(
-		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId
+		Weapon weapon, Point pos, int xDir, 
+		Player player, ushort netProjId, bool rpc = false
 	) : base(
 		weapon, pos, xDir, 0, 4, player, "electric_spark_charge_start",
 		Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
-		projId = (int)ProjIds.ElectricSparkCharged;
+		projId = (int)ProjIds.ElectricSparkChargedStart;
 		destroyOnHit = false;
 		shouldShieldBlock = false;
+
+		if (rpc) rpcCreate(pos, player, netProjId, xDir);
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new ElectricSparkProjChargedStart(
+			ElectricSpark.netWeapon, arg.pos, arg.xDir, 
+			arg.player, arg.netId
+		);
 	}
 
 	public override void update() {
@@ -123,7 +148,8 @@ public class ElectricSparkProjChargedStart : Projectile {
 
 public class ElectricSparkProjCharged : Projectile {
 	public ElectricSparkProjCharged(
-		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
+		Weapon weapon, Point pos, int xDir, 
+		Player player, ushort netProjId, bool rpc = false
 	) : base(
 		weapon, pos, xDir, 450, 4, player, "electric_spark_charge",
 		Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
@@ -132,8 +158,16 @@ public class ElectricSparkProjCharged : Projectile {
 		maxTime = 0.3f;
 		destroyOnHit = false;
 		shouldShieldBlock = false;
+
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new ElectricSparkProjCharged(
+			ElectricSpark.netWeapon, arg.pos, arg.xDir, 
+			arg.player, arg.netId
+		);
 	}
 }

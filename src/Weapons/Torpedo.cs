@@ -4,6 +4,9 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class Torpedo : Weapon {
+
+	public static Torpedo netWeapon = new();
+
 	public Torpedo() : base() {
 		index = (int)WeaponIds.Torpedo;
 		killFeedIndex = 1;
@@ -12,7 +15,8 @@ public class Torpedo : Weapon {
 		weaponSlotIndex = 1;
 		weaknessIndex = (int)WeaponIds.RollingShield;
 		shootSounds = new string[] { "torpedo", "torpedo", "torpedo", "buster3" };
-		rateOfFire = 0.625f;
+		//rateOfFire = 0.625f;
+		fireRateFrames = 38;
 		damage = "2/1";
 		effect = "A Homing Torpedo.. yeah.";
 		hitcooldown = "0/0";
@@ -24,16 +28,22 @@ public class Torpedo : Weapon {
 		return base.getAmmoUsage(chargeLevel);
 	}
 
-	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
+	public override void shoot(Character character, int[] args) {
+		int chargeLevel = args[0];
+		Point pos = character.getShootPos();
+		int xDir = character.getShootXDir();
+		Player player = character.player;
+
+
 		if (chargeLevel < 3) {
-			new TorpedoProj(this, pos, xDir, player, 0, netProjId);
+			new TorpedoProj(this, pos, xDir, player, 0, player.getNextActorNetId(true), rpc: true);
 		} else {
-			player.setNextActorNetId(netProjId);
-			new TorpedoProj(this, pos.addxy(0, 2), xDir, player, 1, player.getNextActorNetId(true), 30);
-			new TorpedoProj(this, pos.addxy(0, 1), xDir, player, 1, player.getNextActorNetId(true), 15);
-			new TorpedoProj(this, pos.addxy(0, 0), xDir, player, 1, player.getNextActorNetId(true), 0);
-			new TorpedoProj(this, pos.addxy(0, -1), xDir, player, 1, player.getNextActorNetId(true), -15);
-			new TorpedoProj(this, pos.addxy(0, -2), xDir, player, 1, player.getNextActorNetId(true), -30);
+			player.getNextActorNetId(true);
+			new TorpedoProj(this, pos.addxy(0, 2), xDir, player, 1, player.getNextActorNetId(true), 30, true);
+			new TorpedoProj(this, pos.addxy(0, 1), xDir, player, 1, player.getNextActorNetId(true), 15, true);
+			new TorpedoProj(this, pos.addxy(0, 0), xDir, player, 1, player.getNextActorNetId(true), 0, true);
+			new TorpedoProj(this, pos.addxy(0, -1), xDir, player, 1, player.getNextActorNetId(true), -15, true);
+			new TorpedoProj(this, pos.addxy(0, -2), xDir, player, 1, player.getNextActorNetId(true), -30, true);
 		}
 	}
 }
@@ -43,8 +53,15 @@ public class TorpedoProj : Projectile, IDamagable {
 	public float smokeTime = 0;
 	public float maxSpeed = 150;
 	int type;
-	public TorpedoProj(Weapon weapon, Point pos, int xDir, Player player, int type, ushort netProjId, float? angle = null, bool rpc = false) :
-		base(weapon, pos, xDir, 150, 2, player, (type == 0 ? "torpedo" : type == 1 ? "torpedo_charge" : "frog_torpedo"), 0, 0f, netProjId, player.ownedByLocalPlayer) {
+	public TorpedoProj(
+		Weapon weapon, Point pos, int xDir, Player player, 
+		int type, ushort netProjId, float? angle = null, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 150, 2, player, 
+		(type == 0 ? "torpedo" : type == 1 ? "torpedo_charge" : "frog_torpedo"), 
+		0, 0f, netProjId, player.ownedByLocalPlayer
+	) {
+
 		if (type == 0) projId = (int)ProjIds.Torpedo;
 		else if (type == 1) projId = (int)ProjIds.TorpedoCharged;
 		else if (type == 2) projId = (int)ProjIds.MechTorpedo;
@@ -73,9 +90,16 @@ public class TorpedoProj : Projectile, IDamagable {
 		}
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, player, netProjId, xDir, (byte)type);
 		}
 		canBeLocal = false;
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new TorpedoProj(
+			Torpedo.netWeapon, arg.pos, arg.xDir, 
+			arg.player, arg.extraData[0], arg.netId
+		);
 	}
 
 	bool homing = true;

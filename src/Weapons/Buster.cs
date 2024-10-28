@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace MMXOnline;
 
 public class Buster : Weapon {
+	public static Buster netWeapon = new();
 	public List<BusterProj> lemonsOnField = new List<BusterProj>();
 	public bool isUnpoBuster;
 
@@ -27,7 +28,7 @@ public class Buster : Weapon {
 	}
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
 		string shootSound = "buster";
-		if (player.character is not MegamanX mmx) {
+		if (character is not MegamanX mmx) {
 			return;
 		}
 		if (player.hasArmArmor(ArmorId.Light) || player.hasArmArmor(ArmorId.None) || player.hasUltimateArmor())
@@ -70,8 +71,8 @@ public class Buster : Weapon {
 		bool hasUltArmor = ((player.character as MegamanX)?.hasUltimateArmor == true);
 		bool isHyperX = ((player.character as MegamanX)?.isHyperX == true);
 
-		if (isHyperX && chargeLevel > 0) {
-			new BusterUnpoProj(this, pos, xDir, player, netProjId);
+		if (isHyperX) {
+			new BusterUnpoProj(this, pos, xDir, player, player.getNextActorNetId(), true);
 			new Anim(pos, "buster_unpo_muzzle", xDir, null, true);
 			shootSound = "stockBuster";
 		} else if (mmx.stockedX3Buster) {
@@ -213,13 +214,13 @@ public class Buster : Weapon {
 		new Buster4Proj(
 			this, new Point(x + xDir, y), xDir,
 			player, 0, offsetTime,
-			player.getNextActorNetId(allowNonMainPlayer: true), smoothStart
+			player.getNextActorNetId(allowNonMainPlayer: true), smoothStart, true
 		);
 		Global.level.delayedActions.Add(new DelayedAction(delegate {
 			new Buster4Proj(
 				this, new Point(x + xDir, y), xDir,
 				player, 1, offsetTime,
-				player.getNextActorNetId(allowNonMainPlayer: true), smoothStart
+				player.getNextActorNetId(allowNonMainPlayer: true), smoothStart, true
 			);
 		}, 1.8f / 60f
 		));
@@ -227,7 +228,7 @@ public class Buster : Weapon {
 			new Buster4Proj(
 				this, new Point(x + xDir, y), xDir,
 				player, 2, offsetTime,
-				player.getNextActorNetId(allowNonMainPlayer: true), smoothStart
+				player.getNextActorNetId(allowNonMainPlayer: true), smoothStart, true
 			);
 		}, 3.8f / 60f
 		));
@@ -235,7 +236,7 @@ public class Buster : Weapon {
 			new Buster4Proj(
 				this, new Point(x + xDir, y), xDir,
 				player, 2, offsetTime,
-				player.getNextActorNetId(allowNonMainPlayer: true), smoothStart
+				player.getNextActorNetId(allowNonMainPlayer: true), smoothStart, true
 			);
 		}, 5.8f / 60f
 		));
@@ -243,7 +244,7 @@ public class Buster : Weapon {
 			new Buster4Proj(
 				this, new Point(x + xDir, y), xDir,
 				player, 3, offsetTime,
-				player.getNextActorNetId(allowNonMainPlayer: true), smoothStart
+				player.getNextActorNetId(allowNonMainPlayer: true), smoothStart, true
 			);
 		}, 7.8f / 60f
 		));

@@ -4,12 +4,15 @@ using System.Linq;
 namespace MMXOnline;
 
 public class ParasiticBomb : Weapon {
+
+	public static ParasiticBomb netWeapon = new();
 	public static float carryRange = 120;
 	public static float beeRange = 120;
 
 	public ParasiticBomb() : base() {
 		shootSounds = new string[] { "", "", "", "" };
-		rateOfFire = 1f;
+		//rateOfFire = 1f;
+		fireRateFrames = 60;
 		index = (int)WeaponIds.ParasiticBomb;
 		weaponBarBaseIndex = 18;
 		weaponBarIndex = weaponBarBaseIndex;
@@ -23,12 +26,23 @@ public class ParasiticBomb : Weapon {
 		FlinchCD = "iwish";
 	}
 
-	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
+	public override bool canShoot(int chargeLevel, Player player) {
+		if (!base.canShoot(chargeLevel, player) || player.character is not MegamanX mmx) return false;
+
+		return mmx.beeSwarm == null;
+	}
+
+	public override void shoot(Character character, int[] args) {
+		int chargeLevel = args[0];
+		Point pos = character.getShootPos();
+		int xDir = character.getShootXDir();
+		Player player = character.player;
+
 		if (chargeLevel < 3) {
-			player.character.playSound("busterX3");
-			new ParasiticBombProj(this, pos, xDir, player, netProjId);
+			character.playSound("busterX3");
+			new ParasiticBombProj(this, pos, xDir, player, player.getNextActorNetId(), true);
 		} else {
-			if (player.character.ownedByLocalPlayer && player.character is MegamanX mmx && mmx.beeSwarm == null) {
+			if (character.ownedByLocalPlayer && character is MegamanX mmx && mmx.beeSwarm == null) {
 				mmx.beeSwarm = new BeeSwarm(mmx);
 			}
 		}
@@ -42,8 +56,13 @@ public class ParasiticBomb : Weapon {
 
 public class ParasiticBombProj : Projectile {
 	public Character? host;
-	public ParasiticBombProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 200, 0, player, "parasitebomb", 0, 0, netProjId, player.ownedByLocalPlayer) {
+	public ParasiticBombProj(
+		Weapon weapon, Point pos, int xDir,
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 200, 0, player, "parasitebomb", 
+		0, 0, netProjId, player.ownedByLocalPlayer
+	) {
 		this.weapon = weapon;
 		maxTime = 0.6f;
 		projId = (int)ProjIds.ParasiticBomb;
@@ -52,6 +71,12 @@ public class ParasiticBombProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new ParasiticBombProj(
+			ParasiticBomb.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
+		);
 	}
 
 	public override void render(float x, float y) {
@@ -66,7 +91,9 @@ public class ParasiteCarry : CharState {
 	Character otherChar;
 	float moveAmount;
 	float maxMoveAmount;
-	public ParasiteCarry(Character otherChar, bool flinch) : base(flinch ? "hurt" : "fall", flinch ? "" : "fall_shoot", flinch ? "" : "fall_attack") {
+	public ParasiteCarry(Character otherChar, bool flinch) : 
+	base(flinch ? "hurt" : "fall", flinch ? "" : "fall_shoot", flinch ? "" : "fall_attack"
+	) {
 		this.flinch = flinch;
 		this.otherChar = otherChar;
 	}
@@ -212,7 +239,7 @@ public class BeeSwarm {
 	}
 
 	public bool shouldDestroy() {
-		if (!mmx.player.input.isHeld(Control.Shoot, mmx.player)) return true;
+		//if (!mmx.player.input.isHeld(Control.Shoot, mmx.player)) return true;
 		if (mmx.player.weapon is not ParasiticBomb) return true;
 		var pb = mmx.player.weapon as ParasiticBomb;
 		if (pb?.ammo <= 0) return true;
@@ -231,10 +258,12 @@ public class BeeSwarm {
 public class BeeCursorAnim : Anim {
 	public int state = 0;
 	MegamanX? character;
+	Player player;
 	public Actor? target;
 	public BeeCursorAnim(Point pos, Character character)
 		: base(pos, "parasite_cursor_start", 1, character.player.getNextActorNetId(), false, true, character.ownedByLocalPlayer) {
 		this.character = character as MegamanX;
+		player = character.player;
 	}
 
 	public override void update() {
@@ -269,8 +298,10 @@ public class BeeCursorAnim : Anim {
 				destroySelf();
 				if (!target!.destroyed) {
 					if (character != null) {
-						character.chargeTime = character.charge3Time;
-						character.shoot(true);
+						//character.chargeTime = character.charge3Time;
+						//character.shoot(character.getChargeLevel());
+						character.setShootAnim();
+						player.weapon.addAmmo(-player.weapon.getAmmoUsage(3), player);
 						character.chargeTime = 0;
 						new ParasiticBombProjCharged(new ParasiticBomb(), character.getShootPos(), character.pos.x - target.getCenterPos().x < 0 ? 1 : -1, character.player, character.player.getNextActorNetId(), target, rpc: true);
 					}	
@@ -290,8 +321,13 @@ public class ParasiticBombProjCharged : Projectile, IDamagable {
 	public Actor host;
 	public Point lastMoveAmount;
 	const float maxSpeed = 150;
-	public ParasiticBombProjCharged(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, Actor host, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 4, player, "parasitebomb_bee", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public ParasiticBombProjCharged(
+		Weapon weapon, Point pos, int xDir, Player player, 
+		ushort netProjId, Actor host, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 4, player, "parasitebomb_bee", 
+		Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		this.weapon = weapon;
 		this.host = host;
 		fadeSprite = "explosion";
@@ -304,6 +340,13 @@ public class ParasiticBombProjCharged : Projectile, IDamagable {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
 		canBeLocal = false;
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new ParasiticBombProjCharged(
+			ParasiticBomb.netWeapon, arg.pos, arg.xDir,
+			arg.player, arg.netId, null!
+		);
 	}
 
 	public override void update() {

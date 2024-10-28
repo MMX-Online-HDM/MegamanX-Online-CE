@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace MMXOnline;
 
@@ -12,9 +13,11 @@ public class HyperBuster : Weapon {
 		weaponBarBaseIndex = 32;
 		weaponBarIndex = 31;
 		weaponSlotIndex = 36;
-		shootSounds = new string[] { "buster3X3", "buster3X3", "buster3X3", "buster3X3" };
-		rateOfFire = 2f;
-		switchCooldown = 0.25f;
+		//shootSounds = new string[] { "buster3X3", "buster3X3", "buster3X3", "buster3X3" };
+		//rateOfFire = 2f;
+		fireRateFrames = 120;
+		//switchCooldown = 0.25f;
+		switchCooldownFrames = 15;
 		ammo = 0;
 		drawGrayOnLowAmmo = true;
 		drawRoundedDown = true;
@@ -42,18 +45,50 @@ public class HyperBuster : Weapon {
 	}
 
 	public float getRateOfFire(Player player) {
-		return rateOfFire * getRateofFireMod(player);
+		return fireRateFrames * getRateofFireMod(player);
 	}
 
 	public override bool canShoot(int chargeLevel, Player player) {
-		return ammo >= getChipFactoredAmmoUsage(player) && player.weapons[player.hyperChargeSlot].ammo > 0 && shootTime == 0 && player.character?.flag == null;
+		return 
+			ammo >= getChipFactoredAmmoUsage(player) && 
+			player.weapons[player.hyperChargeSlot].ammo > 0 && 
+			base.canShoot(chargeLevel, player) && player.character?.flag == null;
 	}
 
 	public bool canShootIncludeCooldown(Player player) {
-		return ammo >= getChipFactoredAmmoUsage(player) && player.weapons.InRange(player.hyperChargeSlot) && player.weapons[player.hyperChargeSlot].ammo > 0;
+		return 
+			ammo >= getChipFactoredAmmoUsage(player) &&
+			player.weapons.InRange(player.hyperChargeSlot) && 
+			player.weapons[player.hyperChargeSlot].ammo > 0;
 	}
 
-	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-		player.character.changeState(new X3ChargeShot(this), true);
+	bool changeToWeaponSlot(Weapon wep) {
+		return wep is
+			Sting or
+			RollingShield or
+			BubbleSplash or
+			ParasiticBomb or
+			TunnelFang;
+	} 
+
+	public override void shoot(Character character, int[] args) {
+		Player player = character.player;
+		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
+		Weapon wep = player.weapons[player.hyperChargeSlot];
+
+		if (wep is Buster) {
+			character.changeState(new X3ChargeShot(this), true);
+			character.playSound("buster3X3");
+		} else {
+			if (changeToWeaponSlot(wep)) player.changeWeaponSlot(player.hyperChargeSlot);
+			wep.shoot(character, new int[] {3});
+			wep.addAmmo(-wep.getAmmoUsage(3), player);
+			mmx.shootCooldown = MathF.Max(wep.fireRateFrames, switchCooldownFrames.GetValueOrDefault());
+			if (!string.IsNullOrEmpty(wep.shootSounds[3])) {
+				character.playSound(wep.shootSounds[3]);
+			}
+			
+			if (wep is BubbleSplash bs) bs.hyperChargeDelay = 15;
+		}
 	}
 }

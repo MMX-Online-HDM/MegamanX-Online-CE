@@ -974,7 +974,7 @@ public partial class Level {
 		foreach (var magnetMine in magnetMines) {
 			var player = getPlayerById(magnetMine.playerId);
 			if (player == null) continue;
-			new MagnetMineProj(new MagnetMine(), new Point(magnetMine.x, magnetMine.y), 1, 1, player, magnetMine.netId);
+			new MagnetMineProj(new MagnetMine(), new Point(magnetMine.x, magnetMine.y), 1, player, magnetMine.netId);
 		}
 	}
 

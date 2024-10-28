@@ -4,11 +4,14 @@ using System.Linq;
 namespace MMXOnline;
 
 public class MagnetMine : Weapon {
+
+	public static MagnetMine netWeapon = new(); 
 	public const int maxMinesPerPlayer = 10;
 
 	public MagnetMine() : base() {
 		shootSounds = new string[] { "magnetMine", "magnetMine", "magnetMine", "magnetMineCharged" };
-		rateOfFire = 0.75f;
+		//rateOfFire = 0.75f;
+		fireRateFrames = 45;
 		index = (int)WeaponIds.MagnetMine;
 		weaponBarBaseIndex = 15;
 		weaponBarIndex = weaponBarBaseIndex;
@@ -22,18 +25,20 @@ public class MagnetMine : Weapon {
 		FlinchCD = "0/1";
 	}
 
-	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
+	public override void shoot(Character character, int[] args) {
+		int chargeLevel = args[0];
+		Point pos = character.getShootPos();
+		int xDir = character.getShootXDir();
+		Player player = character.player;
+
 		if (chargeLevel < 3) {
-			int yDir = 0;
-			if (player.input.isHeld(Control.Down, player)) yDir = 1;
-			else if (player.input.isHeld(Control.Up, player)) yDir = -1;
-			var magnetMineProj = new MagnetMineProj(this, pos, xDir, yDir, player, netProjId);
+			var magnetMineProj = new MagnetMineProj(this, pos, xDir, player, player.getNextActorNetId(), true);
 			player.magnetMines.Add(magnetMineProj);
 			if (player.magnetMines.Count > maxMinesPerPlayer) {
 				player.magnetMines[0].destroySelf();
 			}
 		} else {
-			new MagnetMineProjCharged(this, pos, xDir, player, netProjId);
+			new MagnetMineProjCharged(this, pos, xDir, player, player.getNextActorNetId(), true);
 		}
 	}
 }
@@ -45,7 +50,7 @@ public class MagnetMineProj : Projectile, IDamagable {
 	float maxSpeed = 150;
 
 	public MagnetMineProj(
-		Weapon weapon, Point pos, int xDir, int yDir,
+		Weapon weapon, Point pos, int xDir,
 		Player player, ushort netProjId, bool rpc = false
 	) : base(
 		weapon, pos, xDir, 75, 2, player, "magnetmine_proj",
@@ -58,12 +63,17 @@ public class MagnetMineProj : Projectile, IDamagable {
 		reflectable = false;
 		projId = (int)ProjIds.MagnetMine;
 		this.player = player;
-		//vel.y = yDir * speed;
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
 		canBeLocal = false;
 		destroyOnHit = true;
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new MagnetMineProj(
+			MagnetMine.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
+		);
 	}
 
 	public override void update() {
@@ -169,6 +179,12 @@ public class MagnetMineProjCharged : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new MagnetMineProjCharged(
+			MagnetMine.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
+		);
 	}
 
 	public override void update() {

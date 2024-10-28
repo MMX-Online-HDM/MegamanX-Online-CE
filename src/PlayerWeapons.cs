@@ -215,10 +215,6 @@ public partial class Player {
 			selectedRAIndex = 0;
 		}
 
-		if (isX) {
-			character.stingChargeTime = 0;
-		}
-
 		Weapon oldWeapon = weapon;
 		if (oldWeapon is MechMenuWeapon mmw) {
 			mmw.isMenuOpened = false;
@@ -233,7 +229,9 @@ public partial class Player {
 			mw.isMenuOpened = false;
 		}
 
-		if (isX) {
+		character.onWeaponChange(oldWeapon, newWeapon);
+
+		/* if (isX) {
 			if (character.getChargeLevel() >= 2) {
 				newWeapon.shootTime = 0;
 			} else {
@@ -247,9 +245,9 @@ public partial class Player {
 				if (newWeapon is NovaStrike ns) {
 					ns.shootTime = 0;
 				}
-				*/
+				
 			}
-		}
+		} */
 
 		if (character is Axl axl) {
 			if (oldWeapon is AxlWeapon) {

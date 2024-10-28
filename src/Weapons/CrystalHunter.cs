@@ -6,16 +6,20 @@ using SFML.Graphics;
 namespace MMXOnline;
 
 public class CrystalHunter : Weapon {
+
+	public static CrystalHunter netWeapon = new();
 	public CrystalHunter() : base() {
 		shootSounds = new string[] { "crystalHunter", "crystalHunter", "crystalHunter", "crystalHunterCharged" };
-		rateOfFire = 1.25f;
+		//rateOfFire = 1.25f;
+		fireRateFrames = 75;
 		index = (int)WeaponIds.CrystalHunter;
 		weaponBarBaseIndex = 9;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 9;
 		killFeedIndex = 20;
 		weaknessIndex = (int)WeaponIds.MagnetMine;
-		switchCooldown = 0.5f;
+		//switchCooldown = 0.5f;
+		switchCooldownFrames = 30;
 		damage = "0-3/0";
 		effect = "Crystalize enemies. C: Slows down the area.";
 		hitcooldown = "0-1/0";
@@ -27,9 +31,14 @@ public class CrystalHunter : Weapon {
 		return 8;
 	}
 
-	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
+	public override void shoot(Character character, int[] args) {
+		int chargeLevel = args[0];
+		Point pos = character.getShootPos();
+		int xDir = character.getShootXDir();
+		Player player = character.player;
+
 		if (chargeLevel < 3) {
-			new CrystalHunterProj(this, pos, xDir, player, 0, netProjId);
+			new CrystalHunterProj(this, pos, xDir, player, player.getNextActorNetId(), rpc: true);
 		} else {
 			int amount = Global.level.chargedCrystalHunters.Count(c => c.owner == player);
 			if (amount >= 1) {
@@ -43,13 +52,19 @@ public class CrystalHunter : Weapon {
 				}
 			}
 
-			new CrystalHunterCharged(pos, player, netProjId, player.ownedByLocalPlayer);
+			new CrystalHunterCharged(pos, player, player.getNextActorNetId(), player.ownedByLocalPlayer, sendRpc: true);
 		}
 	}
 }
 
 public class CrystalHunterProj : Projectile {
-	public CrystalHunterProj(Weapon weapon, Point pos, int xDir, Player player, int type, ushort netProjId, Point? vel = null, bool rpc = false) : base(weapon, pos, xDir, 250, 0, player, "crystalhunter_proj", 0, 0, netProjId, player.ownedByLocalPlayer) {
+	public CrystalHunterProj(
+		Weapon weapon, Point pos, int xDir, 
+		Player player, ushort netProjId,  bool rpc = false
+	) : base(
+		weapon, pos, xDir, 250, 0, player, "crystalhunter_proj", 
+		0, 0, netProjId, player.ownedByLocalPlayer
+	) {
 		maxTime = 0.6f;
 		useGravity = true;
 		destroyOnHit = true;
@@ -62,8 +77,11 @@ public class CrystalHunterProj : Projectile {
 		}
 	}
 
-	public override void update() {
-		base.update();
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new CrystalHunterProj(
+			CrystalHunter.netWeapon, arg.pos, 
+			arg.xDir, arg.player, arg.netId
+		);
 	}
 }
 
@@ -77,8 +95,12 @@ public class CrystalHunterCharged : Actor {
 	public bool isSnails;
 	float maxTime = 4;
 	float soundTime;
-	public CrystalHunterCharged(Point pos, Player owner, ushort? netId, bool ownedByLocalPlayer, float? overrideTime = null, bool sendRpc = false) :
-		base("empty", pos, netId, ownedByLocalPlayer, false) {
+	public CrystalHunterCharged(
+		Point pos, Player owner, ushort? netId, bool ownedByLocalPlayer, 
+		float? overrideTime = null, bool sendRpc = false
+	) : base(
+		"empty", pos, netId, ownedByLocalPlayer, false
+	) {
 		useGravity = false;
 		this.owner = owner;
 		isSnails = overrideTime != null;
@@ -91,12 +113,14 @@ public class CrystalHunterCharged : Actor {
 
 		if (isSnails) {
 			maxTime = overrideTime!.Value;
-			netOwner = owner;
-			netActorCreateId = NetActorCreateId.CrystalHunterCharged;
-			if (sendRpc) {
-				createActorRpc(owner.id);
-			}
 		}
+
+		netOwner = owner;
+		netActorCreateId = NetActorCreateId.CrystalHunterCharged;
+		if (sendRpc) {
+			createActorRpc(owner.id);
+		}
+
 		canBeLocal = true;
 	}
 
@@ -107,10 +131,10 @@ public class CrystalHunterCharged : Actor {
 		var normalizedCoords = new Point(screenCoords.x / Global.viewScreenW, 1 - screenCoords.y / Global.viewScreenH);
 
 		//if (isSnails) {
-		Helpers.decrementTime(ref soundTime);
+		Helpers.decrementFrames(ref soundTime);
 		if (soundTime == 0) {
 			playSound("csnailSlowLoop");
-			soundTime = 1.09f;
+			soundTime = 65;
 		}
 		//} Why only snail gets the cool sound???
 

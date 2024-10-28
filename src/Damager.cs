@@ -297,7 +297,7 @@ public class Damager {
 				flinch = 0;
 				victim?.playSound("weakness");
 			}
-			if (projId == (int)ProjIds.StrikeChain && weakness) {
+			if ((projId == (int)ProjIds.StrikeChain || projId == (int)ProjIds.StrikeChainCharged) && weakness) {
 				damage *= 2;
 				weakness = false;
 				flinch = 0;
@@ -652,9 +652,9 @@ public class Damager {
 					// bool if the proj does mini flinch (Vanilla behavior)
 					// (Yes, "mini flinch" weakness does nothing)
 					bool isMiniFlinch = getIsMiniFlinch(projId);
-					if (mmx?.WeaknessT == 0) {
+					if (mmx?.WeaknessT <= 0) {
 						//if the weakness time is 0, put a cooldown of 0.75
-						mmx.WeaknessT = 0.75f;
+						mmx.WeaknessT = 45f;
 						if (character.charState.superArmor) {
 							flinch = 0;
 							//if the enemy is on super armor, negate the flinch
@@ -1181,7 +1181,7 @@ public class Damager {
 		return projId switch {
 			(int)ProjIds.SonicSlicer => true,
 			(int)ProjIds.SonicSlicerCharged => true,
-			(int)ProjIds.SonicSlicerChargedStart => true,
+			(int)ProjIds.SonicSlicerStart => true,
 			(int)ProjIds.OverdriveOSonicSlicer => true,
 			(int)ProjIds.OverdriveOSonicSlicerUp => true,
 			_ => false

@@ -12,7 +12,8 @@ public class BubbleSplash : Weapon {
 
 	public BubbleSplash() : base() {
 		shootSounds = new string[] { "bubbleSplash", "bubbleSplash", "bubbleSplash", "bubbleSplashCharged" };
-		rateOfFire = 0.1f;
+		//rateOfFire = 0.1f;
+		fireRateFrames = 6;
 		isStream = true;
 		index = (int)WeaponIds.BubbleSplash;
 		weaponBarBaseIndex = 10;
@@ -22,7 +23,8 @@ public class BubbleSplash : Weapon {
 		weaknessIndex = (int)WeaponIds.SpinWheel;
 		maxStreams = 7;
 		streamCooldown = 1;
-		switchCooldown = 0.25f;
+		//switchCooldown = 0.25f;
+		switchCooldownFrames = 15;
 		damage = "1/1";
 		ammousage = 0.5;
 		//effect = "Shoot a Stream up to 7 bubbles. C:Jump Boost.";
@@ -46,7 +48,7 @@ public class BubbleSplash : Weapon {
 
 	public override void update() {
 		base.update();
-		Helpers.decrementTime(ref hyperChargeDelay);
+		Helpers.decrementFrames(ref hyperChargeDelay);
 
 		for (int i = bubblesOnField.Count - 1; i >= 0; i--) {
 			if (bubblesOnField[i].destroyed) {
@@ -66,23 +68,30 @@ public class BubbleSplash : Weapon {
 	}
 
 	// Friendly reminder that this method MUST be deterministic across all clients, i.e. don't vary it on a field that could vary locally.
-	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
+	public override void shoot(Character character, int[] args) {
+		int chargeLevel = args[0];
+		Point pos = character.getShootPos();
+		int xDir = character.getShootXDir();
+		Player player = character.player;
+
 		if (chargeLevel < 3) {
 			if (player.ownedByLocalPlayer) {
 				int type = 0;
 				if (player.input.isHeld(Control.Up, player)) {
 					type = 1;
 				}
-				var proj = new BubbleSplashProj(type, pos, xDir, player, netProjId, rpc: true);
+				var proj = new BubbleSplashProj(type, pos, xDir, player, player.getNextActorNetId(), rpc: true);
 				bubblesOnField.Add(proj);
 			}
-		} else if (chargeLevel >= 3 && player.character is MegamanX mmx) {
-			player.setNextActorNetId(netProjId);
+		} else if (chargeLevel >= 3 && character is MegamanX mmx) {
+			//player.setNextActorNetId(player.getNextActorNetId());
 			mmx.popAllBubbles();
-			float time = 0;
 			for (int i = 0; i < 6; i++) {
-				mmx?.chargedBubbles?.Add(new BubbleSplashProjCharged(this, pos, xDir, player, time, player.getNextActorNetId(true)));
-				time += 0.2f;
+				var bubble = new BubbleSplashProjCharged(
+					this, pos, xDir, player, i, 
+					player.getNextActorNetId(true), true);
+
+				mmx?.chargedBubbles?.Add(bubble);	
 			}
 		}
 	}
@@ -164,9 +173,13 @@ public class BubbleSplashProj : Projectile {
 public class BubbleSplashProjCharged : Projectile {
 	public MegamanX? character;
 	public float yPos;
-	public float initTime;
-	public BubbleSplashProjCharged(Weapon weapon, Point pos, int xDir, Player player, float time, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 75, 1, player, "bubblesplash_proj1", 0, 0, netProjId, player.ownedByLocalPlayer) {
+	public BubbleSplashProjCharged(
+		Weapon weapon, Point pos, int xDir, Player player, 
+		int type, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 75, 1, player, "bubblesplash_proj1", 
+		0, 0, netProjId, player.ownedByLocalPlayer
+	) {
 		useGravity = false;
 		fadeSprite = "bubblesplash_pop";
 
@@ -174,24 +187,32 @@ public class BubbleSplashProjCharged : Projectile {
 		if (randColor == 0) changeSprite("bubblesplash_proj2", true);
 		if (randColor == 1) changeSprite("bubblesplash_proj3", true);
 		character = (player.character as MegamanX);
-		initTime = time;
-		this.time = time;
+		this.time = type * 0.2f;
 		sprite.doesLoop = true;
 		projId = (int)ProjIds.BubbleSplashCharged;
-
-		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
-		}
 
 		isOwnerLinked = true;
 		if (player.character != null) {
 			owningActor = player.character;
+		} 
+
+		if (rpc) {
+			rpcCreate(pos, player, netProjId, xDir, new byte[] { (byte)type });
 		}
+
+		canBeLocal = false;
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new BubbleSplashProjCharged(
+			BubbleSplash.netWeapon, arg.pos, arg.xDir, 
+			arg.player, arg.extraData[0], arg.netId
+		);
 	}
 
 	public override void update() {
 		base.update();
-		if (character == null || !Global.level.gameObjects.Contains(character) || (character.player.weapon is not BubbleSplash)) {
+		if (character == null || !Global.level.gameObjects.Contains(character)  || (character.player.weapon is not BubbleSplash)) {
 			destroySelf();
 			return;
 		}

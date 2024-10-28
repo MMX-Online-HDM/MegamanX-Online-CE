@@ -1,6 +1,8 @@
 ﻿namespace MMXOnline;
 
 public class XSaber : Weapon {
+
+	public static XSaber netWeapon = new(null!);
 	public XSaber(Player player) : base() {
 		damager = new Damager(player, 4, Global.defFlinch, 0.25f);
 		index = (int)WeaponIds.XSaber;
@@ -11,21 +13,26 @@ public class XSaber : Weapon {
 }
 
 public class XSaberProj : Projectile {
-	public XSaberProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 300, 4, player, "zsaber_shot", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
-		//this.fadeSprite = "zsaber_shot_fade";
+	public XSaberProj(
+		Weapon weapon, Point pos, int xDir,
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 300, 4, player, "zsaber_shot", 
+		0, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		reflectable = true;
 		projId = (int)ProjIds.XSaberProj;
+		maxTime = 0.5f;
+
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
 	}
 
-	public override void update() {
-		base.update();
-		if (time > 0.5) {
-			destroySelf(fadeSprite);
-		}
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new XSaberProj(
+			XSaber.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
+		);
 	}
 }
 
@@ -44,7 +51,10 @@ public class XSaberState : CharState {
 		if (character.frameIndex >= 6 && !fired) {
 			fired = true;
 			character.playSound("zerosaberx3");
-			new XSaberProj(new XSaber(player), character.pos.addxy(20 * character.xDir, -20), character.xDir, player, player.getNextActorNetId(), rpc: true);
+			new XSaberProj(
+				new XSaber(player), character.pos.addxy(20 * character.xDir, -20), 
+				character.xDir, player, player.getNextActorNetId(), rpc: true
+			);
 		}
 
 		if (character.isAnimOver()) {

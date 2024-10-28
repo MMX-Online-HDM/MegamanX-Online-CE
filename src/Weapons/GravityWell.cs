@@ -3,9 +3,13 @@
 namespace MMXOnline;
 
 public class GravityWell : Weapon {
+
+	public static GravityWell netWeapon = new();
+
 	public GravityWell() : base() {
 		shootSounds = new string[] { "busterX3", "busterX3", "busterX3", "warpIn" };
-		rateOfFire = 0.5f;
+		//rateOfFire = 0.5f;
+		fireRateFrames = 30;
 		index = (int)WeaponIds.GravityWell;
 		weaponBarBaseIndex = 22;
 		weaponBarIndex = weaponBarBaseIndex;
@@ -23,15 +27,20 @@ public class GravityWell : Weapon {
 		return 8;
 	}
 
-	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
+	public override void shoot(Character character, int[] args) {
+		int chargeLevel = args[0];
+		Point pos = character.getShootPos();
+		int xDir = character.getShootXDir();
+		Player player = character.player;
+
 		if (chargeLevel < 3) {
-			var proj = new GravityWellProj(this, pos, xDir, player, netProjId);
-			if (player.character.ownedByLocalPlayer && player.character is MegamanX mmx) {
+			var proj = new GravityWellProj(this, pos, xDir, player, player.getNextActorNetId(), true);
+			if (character.ownedByLocalPlayer && character is MegamanX mmx) {
 				mmx.gravityWell = proj;
 			}
 		} else {
-			if (!player.character.ownedByLocalPlayer) return;
-			player.character.changeState(new GravityWellChargedState(), true);
+			if (!character.ownedByLocalPlayer) return;
+			character.changeState(new GravityWellChargedState(), true);
 		}
 	}
 
@@ -58,8 +67,13 @@ public class GravityWellProj : Projectile, IDamagable {
 	float health = 2;
 	float velX;
 
-	public GravityWellProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 2, player, "gravitywell_start", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public GravityWellProj(
+		Weapon weapon, Point pos, int xDir, 
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 2, player, "gravitywell_start", 
+		0, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		maxActiveTime = 2;
 		maxTime = maxActiveTime + 5;
 		projId = (int)ProjIds.GravityWell;
@@ -82,6 +96,12 @@ public class GravityWellProj : Projectile, IDamagable {
 			vel = new Point();
 		}
 		canBeLocal = false;
+	}
+	
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new GravityWellProj(
+			GravityWell.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
+		);
 	}
 
 	public bool active() {
@@ -240,8 +260,13 @@ public class GravityWellProjCharged : Projectile, IDamagable {
 	float health = 4;
 	public bool started;
 	float velY = -300;
-	public GravityWellProjCharged(Weapon weapon, Point pos, int xDir, int yDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 0, player, "gravitywell_charged", 0, 0, netProjId, player.ownedByLocalPlayer) {
+	public GravityWellProjCharged(
+		Weapon weapon, Point pos, int xDir, int yDir, 
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 0, player, "gravitywell_charged", 
+		0, 0, netProjId, player.ownedByLocalPlayer
+	) {
 		maxTime = 4;
 		projId = (int)ProjIds.GravityWellCharged;
 		shouldShieldBlock = false;
@@ -249,9 +274,16 @@ public class GravityWellProjCharged : Projectile, IDamagable {
 		shouldVortexSuck = false;
 		this.yDir = yDir;
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, player, netProjId, xDir, (byte)yDir);
 		}
 		canBeLocal = false;
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new GravityWellProjCharged(
+			GravityWell.netWeapon, arg.pos, arg.xDir, 
+			arg.extraData[0], arg.player, arg.netId
+		);
 	}
 
 	public override void update() {
