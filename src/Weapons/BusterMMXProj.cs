@@ -5,9 +5,14 @@ using System.Diagnostics.CodeAnalysis;
 namespace MMXOnline;
 public class BusterProj : Projectile {
 	public BusterProj(
-		Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false
-	) : base(
-		weapon, pos, xDir, 240, 1, player, "buster1", 0, 0, netProjId, player.ownedByLocalPlayer
+		Weapon weapon, Point pos, int xDir, 
+		int type, Player player, ushort netProjId, 
+		bool rpc = false
+	) : base
+	(
+		weapon, pos, xDir, 240, 1, 
+		player, "buster1", 0, 0, netProjId, 
+		player.ownedByLocalPlayer
 	) {
 		fadeSprite = "buster1_fade";
 		reflectable = true;
@@ -16,8 +21,16 @@ public class BusterProj : Projectile {
 		else if (type == 1) projId = (int)ProjIds.ZBuster;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			byte[] extraArgs = new byte[] { (byte)type};
+			rpcCreate(pos, player, netProjId, xDir, extraArgs);
 		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new BusterProj(
+			Buster.netWeapon, arg.pos, arg.xDir, 
+			arg.extraData[0], arg.player, arg.netId
+		);
 	}
 
 	public override void update() {
@@ -32,28 +45,58 @@ public class BusterProj : Projectile {
 }
 
 public class Buster2Proj : Projectile {
-	public Buster2Proj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId) : base(weapon, pos, xDir, 350, 2, player, "buster2", 0, 0, netProjId, player.ownedByLocalPlayer) {
+	public Buster2Proj(
+		Weapon weapon, Point pos, int xDir, 
+		Player player, ushort netProjId,
+		bool rpc = false
+	) : base(
+		weapon, pos, xDir, 350, 2, 
+		player, "buster2", 0, 0, netProjId, 
+		player.ownedByLocalPlayer
+	) {
 		fadeSprite = "buster2_fade";
 		reflectable = true;
 		maxTime = 0.5f;
 		projId = (int)ProjIds.Buster2;
-		fadeOnAutoDestroy = true;
-		/*
-		var busterWeapon = weapon as Buster;
-		if (busterWeapon != null) {
-			damager.damage = busterWeapon.getDamage(damager.damage);
+
+		if (rpc) {
+			rpcCreate(pos, player, netProjId, xDir);
 		}
-		*/
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new Buster2Proj(
+			Buster.netWeapon, arg.pos, arg.xDir, 
+			arg.player, arg.netId
+		);
 	}
 }
 
 public class BusterUnpoProj : Projectile {
-	public BusterUnpoProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId) :
-		base(weapon, pos, xDir, 350, 3, player, "buster_unpo", Global.defFlinch, 0.01f, netProjId, player.ownedByLocalPlayer) {
+	public BusterUnpoProj(
+		Weapon weapon, Point pos, int xDir, 
+		Player player, ushort netProjId,
+		bool rpc = false	
+	) : base(
+		weapon, pos, xDir, 350, 3,
+		 player, "buster_unpo", Global.defFlinch, 0.01f, 
+		 netProjId, player.ownedByLocalPlayer
+	) {
 		fadeSprite = "buster3_fade";
 		reflectable = true;
 		maxTime = 0.5f;
 		projId = (int)ProjIds.BusterUnpo;
+
+		if (rpc) {
+			rpcCreate(pos, player, netProjId, xDir);
+		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new BusterUnpoProj(
+			Buster.netWeapon, arg.pos, arg.xDir, 
+			arg.player, arg.netId
+		);
 	}
 }
 
@@ -63,9 +106,13 @@ public class Buster3Proj : Projectile {
 	float partTime;
 
 	public Buster3Proj(
-		Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false
+		Weapon weapon, Point pos, int xDir, 
+		int type, Player player, ushort netProjId,
+		bool rpc = false
 	) : base(
-		weapon, pos, xDir, 350, 3, player, "buster3", Global.defFlinch, 0f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 350, 3, 
+		player, "buster3", Global.defFlinch, 0f, 
+		netProjId, player.ownedByLocalPlayer
 	) {
 		this.type = type;
 		maxTime = 0.5f;
@@ -74,7 +121,8 @@ public class Buster3Proj : Projectile {
 		reflectable = true;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir, (byte)type);
+			byte[] extraArgs = new byte[] { (byte)type};
+			rpcCreate(pos, player, netProjId, xDir, extraArgs);
 		}
 
 		// Regular yellow charge
@@ -110,11 +158,14 @@ public class Buster3Proj : Projectile {
 			projId = (int)ProjIds.Buster4;
 			reflectable = false;
 		}
-		/*var busterWeapon = weapon as Buster;
-		if (busterWeapon != null) {
-			damager.damage = busterWeapon.getDamage(damager.damage);
-		}*/
 		fadeOnAutoDestroy = true;
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new Buster3Proj(
+			Buster.netWeapon, arg.pos, arg.xDir, 
+			arg.extraData[0], arg.player, arg.netId
+		);
 	}
 
 	public override void update() {
@@ -176,23 +227,30 @@ public class Buster4Proj : Projectile {
 	public Buster4Proj(
 		Weapon weapon, Point pos, int xDir, Player player,
 		int type, float offsetTime, ushort netProjId,
-		bool smoothStart = false
+		bool smoothStart = false, bool rpc = false
 	) : base(
 		weapon, pos, xDir, 396, 4, player, "buster4",
 		Global.defFlinch, 1f, netProjId, player.ownedByLocalPlayer
 	) {
 		fadeSprite = "buster4_fade";
 		this.type = type;
-		//this.vel.x = 0;
 		initY = this.pos.y;
 		this.offsetTime = offsetTime;
 		this.smoothStart = smoothStart;
 		maxTime = 0.6f;
 		projId = (int)ProjIds.Buster4;
-		/*var busterWeapon = weapon as Buster;
-		if (busterWeapon != null) {
-			damager.damage = busterWeapon.getDamage(damager.damage);
-		}*/
+
+		if (rpc) {
+			byte[] extraArgs = new byte[] { (byte)type, (byte)offsetTime};
+			rpcCreate(pos, player, netProjId, xDir, extraArgs);
+		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new Buster4Proj(
+			Buster.netWeapon, arg.pos, arg.xDir, arg.player,
+			arg.extraData[0], arg.extraData[1], arg.netId
+		);
 	}
 
 	public override void update() {
@@ -234,6 +292,13 @@ public class BusterX3Proj2 : Projectile {
 		}
 	}
 
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new BusterX3Proj2(
+			Buster.netWeapon, arg.pos, arg.xDir, 
+			arg.extraData[0], arg.player, arg.netId
+		);
+	}
+
 	public override void update() {
 		base.update();
 		float maxSpeed = 600;
@@ -254,8 +319,13 @@ public class BusterX3Proj2 : Projectile {
 
 public class BusterPlasmaProj : Projectile {
 	public HashSet<IDamagable> hitDamagables = new HashSet<IDamagable>();
-	public BusterPlasmaProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 400, 4, player, "buster_plasma", Global.defFlinch, 0.25f, netProjId, player.ownedByLocalPlayer) {
+	public BusterPlasmaProj(
+		Weapon weapon, Point pos, int xDir, 
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 400, 4, player, "buster_plasma",
+		Global.defFlinch, 0.25f, netProjId, player.ownedByLocalPlayer
+	) {
 		maxTime = 0.5f;
 		projId = (int)ProjIds.BusterX3Plasma;
 		destroyOnHit = false;
@@ -265,6 +335,13 @@ public class BusterPlasmaProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new BusterPlasmaProj(
+			Buster.netWeapon, arg.pos, arg.xDir, 
+			arg.player, arg.netId
+		);
 	}
 
 	public override void onHitDamagable(IDamagable damagable) {
@@ -284,8 +361,13 @@ public class BusterPlasmaProj : Projectile {
 }
 
 public class BusterPlasmaHitProj : Projectile {
-	public BusterPlasmaHitProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 1, player, "buster_plasma_hit", 0, 0.25f, netProjId, player.ownedByLocalPlayer) {
+	public BusterPlasmaHitProj(
+		Weapon weapon, Point pos, int xDir, 
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 1, player, "buster_plasma_hit", 
+		0, 0.25f, netProjId, player.ownedByLocalPlayer
+	) {
 		maxTime = 2f;
 		projId = (int)ProjIds.BusterX3PlasmaHit;
 		destroyOnHit = false;
@@ -294,5 +376,12 @@ public class BusterPlasmaHitProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new BusterPlasmaHitProj(
+			Buster.netWeapon, arg.pos, arg.xDir, 
+			arg.player, arg.netId
+		);
 	}
 }

@@ -300,7 +300,7 @@ public class BeeCursorAnim : Anim {
 					if (character != null) {
 						//character.chargeTime = character.charge3Time;
 						//character.shoot(character.getChargeLevel());
-						character.setShootAnim();
+						if (character.charState.attackCtrl) character.setShootAnim();
 						player.weapon.addAmmo(-player.weapon.getAmmoUsage(3), player);
 						character.chargeTime = 0;
 						new ParasiticBombProjCharged(new ParasiticBomb(), character.getShootPos(), character.pos.x - target.getCenterPos().x < 0 ? 1 : -1, character.player, character.player.getNextActorNetId(), target, rpc: true);
