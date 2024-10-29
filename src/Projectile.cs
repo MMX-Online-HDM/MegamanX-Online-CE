@@ -36,7 +36,6 @@ public class Projectile : Actor {
 	bool damagedOnce;
 	//public int? destroyFrames;
 	public Player ownerPlayer;
-	public Actor? hitboxActor;
 
 	public bool isMelee;
 	public int meleeId = -1;
@@ -356,7 +355,7 @@ public class Projectile : Actor {
 	}
 
 	public bool canBeParried() {
-		return (this is GenericMeleeProj || this is SigmaSlashProj);
+		return isMelee;
 	}
 
 	public override void onCollision(CollideData other) {

@@ -46,7 +46,7 @@ public class XUPParryStartState : CharState {
 		if (damagingActor is GenericMeleeProj gmp) {
 			counterAttackTarget = gmp.owningActor;
 		} else if (damagingActor is Projectile proj) {
-			if (!proj.canBeParried() && proj.shouldVortexSuck) {
+			if (!proj.isMelee && proj.shouldVortexSuck) {
 				absorbedProj = proj;
 				absorbedProj.destroySelfNoEffect(doRpcEvenIfNotOwned: true);
 			}
