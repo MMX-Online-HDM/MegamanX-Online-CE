@@ -522,10 +522,10 @@ public class Axl : Character {
 			// Axl bullet
 			if (!isCharging() && player.axlWeapon != null) {
 				if (player.weapon is AxlBullet && charState.canShoot() && !player.weapon.noAmmo()) {
-					if (shootHeld && shootTime == 0 && player.weapon.altShootTime == 0) {
+					if (shootHeld && shootTime == 0 && player.weapon.altShotCooldown == 0) {
 						recoilTime = 0.2f;
 						player.axlWeapon.axlShoot(player);
-					} else if ((altShootPressed || altShootRecentlyPressed) && shootTime == 0 && player.weapon.altShootTime == 0 && player.weapon.ammo >= 4) {
+					} else if ((altShootPressed || altShootRecentlyPressed) && shootTime == 0 && player.weapon.altShotCooldown == 0 && player.weapon.ammo >= 4) {
 						recoilTime = 0.2f;
 						player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
 					}
@@ -536,13 +536,13 @@ public class Axl : Character {
 					if (shootHeld && shootTime == 0) {
 						recoilTime = 0.2f;
 						player.axlWeapon.axlShoot(player);
-						if (bothHeld) player.axlWeapon.shootTime *= 2f;
+						if (bothHeld) player.axlWeapon.shootCooldown *= 2f;
 					}
-					if (bothHeld && player.weapon.altShootTime == 0) {
+					if (bothHeld && player.weapon.altShotCooldown == 0) {
 						recoilTime = 0.2f;
 						player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
-						if (bothHeld) player.axlWeapon.altShootTime *= 2f;
-					} else if ((altShootPressed || altShootRecentlyPressed) && shootTime == 0 && player.weapon.altShootTime == 0 && player.weapon.ammo >= 4) {
+						if (bothHeld) player.axlWeapon.altShotCooldown *= 2f;
+					} else if ((altShootPressed || altShootRecentlyPressed) && shootTime == 0 && player.weapon.altShotCooldown == 0 && player.weapon.ammo >= 4) {
 						recoilTime = 0.2f;
 						player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
 					}
@@ -555,7 +555,7 @@ public class Axl : Character {
 					}
 
 					if (player.axlLoadout.blastLauncherAlt == 0) {
-						if (altShootPressed && shootTime == 0 && player.weapon.altShootTime == 0 && player.weapon.ammo >= 1) {
+						if (altShootPressed && shootTime == 0 && player.weapon.altShotCooldown == 0 && player.weapon.ammo >= 1) {
 							recoilTime = 0.2f;
 							player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
 						}
@@ -592,7 +592,7 @@ public class Axl : Character {
 					if (shootHeld && shootTime == 0) {
 						recoilTime = 0.2f;
 						player.axlWeapon.axlShoot(player);
-					} else if (altShootHeld && shootTime == 0 && player.weapon.altShootTime == 0) {
+					} else if (altShootHeld && shootTime == 0 && player.weapon.altShotCooldown == 0) {
 						recoilTime = 0.2f;
 						player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
 					}
@@ -606,7 +606,7 @@ public class Axl : Character {
 						}
 					} else {
 						if (player.axlLoadout.spiralMagnumAlt == 0) {
-							if (altShootPressed && player.axlWeapon.ammo > 0 && shootTime == 0 && player.weapon.altShootTime == 0) {
+							if (altShootPressed && player.axlWeapon.ammo > 0 && shootTime == 0 && player.weapon.altShotCooldown == 0) {
 								recoilTime = 0.2f;
 								player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
 							}
@@ -626,7 +626,7 @@ public class Axl : Character {
 					if (shootHeld && shootTime == 0) {
 						recoilTime = 0.2f;
 						player.axlWeapon.axlShoot(player);
-					} else if (altShootHeld && shootTime == 0 && player.weapon.altShootTime == 0) {
+					} else if (altShootHeld && shootTime == 0 && player.weapon.altShotCooldown == 0) {
 						recoilTime = 0.2f;
 						player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
 					}
@@ -635,17 +635,17 @@ public class Axl : Character {
 				if (player.weapon is PlasmaGun && charState.canShoot() && !player.weapon.noAmmo()) {
 					if (shootHeld && shootTime == 0) {
 						recoilTime = 0.2f;
-						player.axlWeapon.altShootTime = player.axlWeapon.altFireCooldown;
+						player.axlWeapon.altShotCooldown = player.axlWeapon.altFireCooldown;
 						player.axlWeapon.axlShoot(player);
 					} else if (altShootHeld) {
 						if (player.axlLoadout.plasmaGunAlt == 0) {
-							if (player.axlWeapon.altShootTime == 0 && grounded) {
+							if (player.axlWeapon.altShotCooldown == 0 && grounded) {
 								recoilTime = 0.2f;
 								voltTornadoTime = 0.2f;
 								player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
 							}
 						} else {
-							if (player.axlWeapon.altShootTime == 0) {
+							if (player.axlWeapon.altShotCooldown == 0) {
 								recoilTime = 0.2f;
 								player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
 							}
@@ -682,14 +682,14 @@ public class Axl : Character {
 					}
 
 					if (player.axlLoadout.flameBurnerAlt == 0) {
-						if (altShootHeld && shootTime == 0 && player.weapon.altShootTime == 0) {
+						if (altShootHeld && shootTime == 0 && player.weapon.altShotCooldown == 0) {
 							recoilTime = 0.2f;
 							player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
-							player.axlWeapon.shootTime = 0.5f;
+							player.axlWeapon.shootCooldown = 30;
 						}
 					} else {
 						if (altShootHeld) {
-							if (shootTime == 0 && player.weapon.altShootTime == 0) {
+							if (shootTime == 0 && player.weapon.altShotCooldown == 0) {
 								recoilTime = 0.2f;
 								player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
 							}

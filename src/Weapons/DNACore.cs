@@ -94,7 +94,7 @@ public class DNACore : AxlWeapon {
 		} else if (character is Axl axl && axl.isWhiteAxl()) {
 			hyperMode = DNACoreHyperMode.WhiteAxl;
 		}
-		rateOfFire = 1f;
+		fireRate = 60;
 		index = (int)WeaponIds.DNACore;
 		weaponBarBaseIndex = 30 + charNum;
 		weaponBarIndex = weaponBarBaseIndex;
@@ -113,7 +113,7 @@ public class DNACore : AxlWeapon {
 		charNum = 0;
 		name = "error";
 		loadout = null!;
-		rateOfFire = 1f;
+		fireRate = 60;
 		index = (int)WeaponIds.DNACore;
 		weaponBarBaseIndex = 30 + charNum;
 		weaponBarIndex = weaponBarBaseIndex;

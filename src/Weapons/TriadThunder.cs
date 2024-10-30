@@ -7,8 +7,7 @@ public class TriadThunder : Weapon {
 
 	public TriadThunder() : base() {
 		shootSounds = new string[] { "triadThunder", "triadThunder", "triadThunder", "" };
-		//rateOfFire = 2.25f;
-		fireRateFrames = 135;
+		fireRate = 135;
 		index = (int)WeaponIds.TriadThunder;
 		weaponBarBaseIndex = 19;
 		weaponBarIndex = weaponBarBaseIndex;

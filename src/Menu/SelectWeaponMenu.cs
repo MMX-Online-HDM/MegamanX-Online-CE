@@ -317,7 +317,7 @@ public class SelectWeaponMenu : IMainMenu {
 			int[] strongAgainstMaverickIndices = getStrongAgainstMaverickFrameIndex(wi);
 			int weakAgainstMaverickIndex = getWeakAgainstMaverickFrameIndex(wi);
 			string damage = weapon.damage;
-			string rateOfFire = weapon.rateOfFire.ToString();
+			string rateOfFire = weapon.fireRate.ToString();
 			string ammousage = weapon.ammousage.ToString();
 			string effect = weapon.effect;
 			string hitcooldown = weapon.hitcooldown;

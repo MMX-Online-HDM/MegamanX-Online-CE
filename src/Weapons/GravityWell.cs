@@ -8,8 +8,7 @@ public class GravityWell : Weapon {
 
 	public GravityWell() : base() {
 		shootSounds = new string[] { "busterX3", "busterX3", "busterX3", "warpIn" };
-		//rateOfFire = 0.5f;
-		fireRateFrames = 30;
+		fireRate = 30;
 		index = (int)WeaponIds.GravityWell;
 		weaponBarBaseIndex = 22;
 		weaponBarIndex = weaponBarBaseIndex;

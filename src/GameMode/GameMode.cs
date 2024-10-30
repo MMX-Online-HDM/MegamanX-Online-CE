@@ -652,7 +652,7 @@ public class GameMode {
 					yStart += 12;
 				}
 				int xStart = 11;
-				if (zero.gigaAttack.shootTime > 0) {
+				if (zero.gigaAttack.shootCooldown > 0) {
 					drawZeroGigaCooldown(zero.gigaAttack, y: yStart);
 					xStart += 15;
 				}
@@ -673,21 +673,6 @@ public class GameMode {
 					xStart += 15;
 				}
 			}
-			if (drawPlayer.character is Iris iris) {
-				if (iris.RakuhouhaCooldown > 0) {
-					Global.sprites["iris_hud"].drawToHUD(7, 10, 160);
-					Fonts.drawText(
-						FontType.DarkPurple,
-						iris.RakuhouhaCooldown.ToString("N0"), 20, 157, Alignment.Left
-					);				}
-				if (iris.isHyperIris) {
-					Global.sprites["hud_weapon_icon"].drawToHUD(122, 10, 180);
-					Fonts.drawText(
-						FontType.DarkPurple,
-						iris.hyperModeTimer.ToString("N0"), 20, 177	, Alignment.Left
-					);
-				}
-			}
 			if (drawPlayer.character is PunchyZero punchyZero) {
 				int xStart = 11;
 				int yStart = 159;
@@ -699,7 +684,7 @@ public class GameMode {
 					);
 					yStart += 12;
 				}
-				if (punchyZero.gigaAttack.shootTime > 0) {
+				if (punchyZero.gigaAttack.shootCooldown > 0) {
 					drawZeroGigaCooldown(punchyZero.gigaAttack, xStart, yStart);
 					xStart += 15;
 				}
@@ -1316,7 +1301,6 @@ public class GameMode {
 		baseY += 25;
 		var healthBaseSprite = spriteName;
 		Global.sprites[healthBaseSprite].drawToHUD(frameIndex, baseX, baseY);
-		if (player.isIris) Global.sprites["iris_hud"].drawToHUD(3, baseX, baseY);
 		baseY -= 16;
 		int barIndex = 0;
 
@@ -1438,6 +1422,7 @@ public class GameMode {
 			} else if (player.isMainPlayer && player.currentMaverick == null && !player.isSigma3()) {
 				int hudWeaponBaseIndex = 50;
 				int hudWeaponFullIndex = 39;
+				ammoDisplayMultiplier = 1;
 				int floorOrCeil = MathInt.Ceiling(player.sigmaMaxAmmo * ammoDisplayMultiplier);
 				if (player.isSigma2()) {
 					hudWeaponBaseIndex = 51;
@@ -1486,9 +1471,6 @@ public class GameMode {
 			}
 			if (player.character is PunchyZero punchyZero) {
 				weapon = punchyZero.gigaAttack;
-			}
-			if (player.character is Iris iris) {
-				weapon = iris.IrisRakuhouhaWeapon;
 			}
 			player.lastHudWeapon = weapon;
 		}
@@ -1774,7 +1756,7 @@ public class GameMode {
 			if (napalmNum < 0) napalmNum = 0;
 			if (napalmNum > 2) napalmNum = 0;
 			Global.sprites["hud_hawk_bombs"].drawToHUD(
-				napalmNum, x, y, alpha: vilePilot.napalmWeapon.shootTime == 0 ? 1 : 0.5f
+				napalmNum, x, y, alpha: vilePilot.napalmWeapon.shootCooldown == 0 ? 1 : 0.5f
 			);
 			Fonts.drawText(
 				FontType.Grey, "x" + vilePilot.rideArmor.hawkBombCount.ToString(), x + 10, y - 4
@@ -1937,10 +1919,10 @@ public class GameMode {
 
 	public void drawZeroGigaCooldown(Weapon weapon, int x = 11, int y = 159) {
 		// This runs once per character.
-		if (weapon == null || weapon.shootTime <= 0) {
+		if (weapon == null || weapon.shootCooldown <= 0) {
 			return;
 		}
-		float cooldown = Helpers.progress(weapon.shootTime, weapon.rateOfFire);
+		float cooldown = Helpers.progress(weapon.shootCooldown, weapon.fireRate);
 		drawGigaWeaponCooldown(weapon.weaponSlotIndex, 1 - cooldown, x, y);
 	}
 
@@ -1962,7 +1944,7 @@ public class GameMode {
 		if (selected) {
 			if (!weapon.canShoot(0, mainPlayer)) {
 				drawWeaponStateOverlay(x, y, 2);
-			} else if (weapon.shootTime > 0 && weapon.rateOfFire > 10f/60f && weapon.drawCooldown) {
+			} else if (weapon.shootCooldown > 0 && weapon.fireRate > 10 && weapon.drawCooldown) {
 				drawWeaponStateOverlay(x, y, 1);
 			} else if (selected) {
 				drawWeaponStateOverlay(x, y, 0);
@@ -2015,17 +1997,17 @@ public class GameMode {
 			} else if (weapon is HyperBuster hb) {
 				drawWeaponSlotCooldown(x, y, mmx.hyperchargeCooldown / hb.getRateOfFire(level.mainPlayer));
 			} else if (weapon is NovaStrike ns) {
-				drawWeaponSlotCooldown(x, y, mmx.novaStrikeCooldown / ns.fireRateFrames);
+				drawWeaponSlotCooldown(x, y, mmx.novaStrikeCooldown / ns.fireRate);
 			}
 		}
 		 
 		if (weapon is SigmaMenuWeapon) {
-			drawWeaponSlotCooldown(x, y, weapon.shootTime / 4);
+			drawWeaponSlotCooldown(x, y, weapon.shootCooldown / 4);
 		}
 
 		if (Global.debug && Global.quickStart && weapon is AxlWeapon aw2 && weapon is not DNACore) {
-			drawWeaponSlotCooldownBar(x, y, aw2.shootTime / aw2.rateOfFire);
-			drawWeaponSlotCooldownBar(x, y, aw2.altShootTime / aw2.altFireCooldown, true);
+			drawWeaponSlotCooldownBar(x, y, aw2.shootCooldown / aw2.fireRate);
+			drawWeaponSlotCooldownBar(x, y, aw2.altShotCooldown / aw2.altFireCooldown, true);
 		}
 
 		MaverickWeapon? mw = weapon as MaverickWeapon;
@@ -2036,7 +2018,7 @@ public class GameMode {
 				float mMaxHealth = mw.maverick?.maxHealth ?? maxHealth;
 				if (!mw.summonedOnce) mHealth = 0;
 				drawWeaponSlotAmmo(x, y, mHealth / mMaxHealth);
-				drawWeaponSlotCooldown(x, y, mw.shootTime / MaverickWeapon.summonerCooldown);
+				drawWeaponSlotCooldown(x, y, mw.shootCooldown / MaverickWeapon.summonerCooldown);
 			} else if (level.mainPlayer.isPuppeteer()) {
 				float mHealth = mw.maverick?.health ?? mw.lastHealth;
 				float mMaxHealth = mw.maverick?.maxHealth ?? maxHealth;
@@ -2304,12 +2286,12 @@ public class GameMode {
 			if (sigmaForm == 0) weapons.Add(new Weapon() {
 				weaponSlotIndex = 111,
 				ammo = dnaCore.rakuhouhaAmmo,
-				maxAmmo = 32,
+				maxAmmo = 20,
 			});
 			if (sigmaForm == 1) weapons.Add(new Weapon() {
 				weaponSlotIndex = 110,
 				ammo = dnaCore.rakuhouhaAmmo,
-				maxAmmo = 32,
+				maxAmmo = 28,
 			});
 		}
 		int counter = 0;

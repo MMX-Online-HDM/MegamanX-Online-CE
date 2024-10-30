@@ -61,7 +61,7 @@ public class DanchienWeapon : Weapon {
 	public DanchienWeapon() : base() {
 		//damager = new Damager(player, 2, 0, 0.5f);
 		index = (int)WeaponIds.QuakeBlazer;
-		rateOfFire = 0.3f;
+		fireRate = 18;
 		weaponBarBaseIndex = 38;
 		killFeedIndex = 82;
 		type = (int)ZeroDownthrustType.QuakeBlazer;

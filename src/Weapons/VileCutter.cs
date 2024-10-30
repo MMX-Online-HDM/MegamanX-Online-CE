@@ -18,7 +18,7 @@ public class VileCutter : Weapon {
 	public VileCutter(VileCutterType vileCutterType) : base() {
 		index = (int)WeaponIds.VileCutter;
 		type = (int)vileCutterType;
-		rateOfFire = 1;
+		fireRate = 60;
 
 		if (vileCutterType == VileCutterType.None) {
 			displayName = "None(MISSILE)";
@@ -57,7 +57,7 @@ public class VileCutter : Weapon {
 	}
 
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
-		if (shootTime == 0) {
+		if (shootCooldown == 0) {
 			if (vile.tryUseVileAmmo(vileAmmoUsage)) {
 				vile.setVileShootTime(this);
 				if (!vile.grounded) {

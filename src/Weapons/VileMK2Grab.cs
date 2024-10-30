@@ -2,7 +2,7 @@
 
 public class VileMK2Grab : Weapon {
 	public VileMK2Grab() : base() {
-		rateOfFire = 0.75f;
+		fireRate = 45;
 		index = (int)WeaponIds.VileMK2Grab;
 		killFeedIndex = 63;
 	}

@@ -15,8 +15,7 @@ public class Torpedo : Weapon {
 		weaponSlotIndex = 1;
 		weaknessIndex = (int)WeaponIds.RollingShield;
 		shootSounds = new string[] { "torpedo", "torpedo", "torpedo", "buster3" };
-		//rateOfFire = 0.625f;
-		fireRateFrames = 38;
+		fireRate = 38;
 		damage = "2/1";
 		effect = "A Homing Torpedo.. yeah.";
 		hitcooldown = "0/0";

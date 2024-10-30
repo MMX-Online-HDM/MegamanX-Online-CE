@@ -9,8 +9,7 @@ public class NovaStrike : Weapon {
 			damager = new Damager(player, 4, Global.defFlinch, 0.5f);
 		}
 		shootSounds = new string[] { "", "", "", "" };
-		//rateOfFire = 1.5f;
-		fireRateFrames = 90;
+		fireRate = 90;
 		index = (int)WeaponIds.NovaStrike;
 		weaponBarBaseIndex = 42;
 		weaponBarIndex = 36;
@@ -27,7 +26,7 @@ public class NovaStrike : Weapon {
 			character.changeState(new NovaStrikeState(inputDir), true);
 		}
 		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
-		mmx.novaStrikeCooldown = fireRateFrames;
+		mmx.novaStrikeCooldown = fireRate;
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {

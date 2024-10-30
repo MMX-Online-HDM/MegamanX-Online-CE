@@ -168,7 +168,7 @@ public class SigmaMenuWeapon : Weapon {
 		index = (int)WeaponIds.Sigma;
 		weaponSlotIndex = 65;
 		displayName = "Sigma";
-		rateOfFire = 4;
+		fireRate = 60 * 4;
 	}
 }
 

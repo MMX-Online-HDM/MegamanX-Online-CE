@@ -10,7 +10,7 @@ public class XUPParry : Weapon {
 	public static XUPParry netWeapon = new XUPParry();
 
 	public XUPParry() : base() {
-		rateOfFire = 0.75f;
+		fireRate = 45;
 		index = (int)WeaponIds.UPParry;
 		killFeedIndex = 168;
 	}
@@ -322,7 +322,7 @@ public class XUPParryProjState : CharState {
 
 public class XUPPunch : Weapon {
 	public XUPPunch(Player player) : base() {
-		rateOfFire = 0.75f;
+		fireRate = 45;
 		index = (int)WeaponIds.UPPunch;
 		killFeedIndex = 167;
 		damager = new Damager(player, 3, Global.defFlinch, 0.5f);
@@ -359,7 +359,7 @@ public class XUPPunchState : CharState {
 
 public class XUPGrab : Weapon {
 	public XUPGrab() : base() {
-		rateOfFire = 0.75f;
+		fireRate = 45;
 		index = (int)WeaponIds.UPGrab;
 		killFeedIndex = 92;
 	}

@@ -12,8 +12,7 @@ public class BubbleSplash : Weapon {
 
 	public BubbleSplash() : base() {
 		shootSounds = new string[] { "bubbleSplash", "bubbleSplash", "bubbleSplash", "bubbleSplashCharged" };
-		//rateOfFire = 0.1f;
-		fireRateFrames = 6;
+		fireRate = 6;
 		isStream = true;
 		index = (int)WeaponIds.BubbleSplash;
 		weaponBarBaseIndex = 10;
@@ -21,8 +20,6 @@ public class BubbleSplash : Weapon {
 		weaponSlotIndex = 10;
 		killFeedIndex = 21;
 		weaknessIndex = (int)WeaponIds.SpinWheel;
-		maxStreams = 7;
-		streamCooldown = 1;
 		//switchCooldown = 0.25f;
 		switchCooldownFrames = 15;
 		damage = "1/1";

@@ -143,7 +143,6 @@ public partial class Player {
 	public bool isVile { get { return charNum == (int)CharIds.Vile; } }
 	public bool isAxl { get { return charNum == (int)CharIds.Axl; } }
 	public bool isSigma { get { return charNum == (int)CharIds.Sigma; } }
-	public bool isIris { get { return charNum == (int)CharIds.Iris; } }
 
 	public float healthBackup;
 	public float _health;
@@ -228,7 +227,6 @@ public partial class Player {
 		{ (int)CharIds.PunchyZero, new List<SubTank>() },
 		{ (int)CharIds.BusterZero, new List<SubTank>() },
 		{ (int)CharIds.Rock, new List<SubTank>() },
-		{ (int)CharIds.Iris, new List<SubTank>() },
 	};
 	// Heart tanks
 	public Dictionary<int, int> charHeartTanks = new Dictionary<int, int>(){
@@ -240,7 +238,6 @@ public partial class Player {
 		{ (int)CharIds.PunchyZero, 0 },
 		{ (int)CharIds.BusterZero, 0 },
 		{ (int)CharIds.Rock, 0 },
-		{ (int)CharIds.Iris, 0 },
 	};
 	// Getter functions.
 	public List<SubTank> subtanks {
@@ -1163,11 +1160,6 @@ public partial class Player {
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
-		} else if (charNum == (int)CharIds.Iris) {
-			character = new Iris(
-				this, pos.x, pos.y, xDir,
-				false, charNetId, ownedByLocalPlayer
-			);
 		} else if (charNum == (int)CharIds.BusterZero) {
 			character = new BusterZero(
 				this, pos.x, pos.y, xDir,
@@ -1595,7 +1587,7 @@ public partial class Player {
 		character.cleanupBeforeTransform();
 		character = retChar;
 		if (weapon != null) {
-			weapon.shootTime = 0.25f;
+			weapon.shootCooldown = 0.25f;
 		}
 
 		if (character is Zero zero) {

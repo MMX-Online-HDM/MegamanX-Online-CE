@@ -16,7 +16,7 @@ public class Buster : Weapon {
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 0;
 		shootSounds = new string[] { "", "", "", "" };
-		rateOfFire = 0.15f;
+		fireRate = 9;
 		canHealAmmo = false;
 		drawAmmo = false;
 		drawCooldown = false;
@@ -28,8 +28,7 @@ public class Buster : Weapon {
 	}
 	public void setUnpoBuster(MegamanX mmx) {
 		isUnpoBuster = true;
-		//rateOfFire = 0.75f;
-		fireRateFrames = 45;
+		fireRate = 45;
 		weaponBarBaseIndex = 70;
 		weaponBarIndex = 59;
 		weaponSlotIndex = 121;

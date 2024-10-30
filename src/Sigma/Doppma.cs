@@ -38,8 +38,8 @@ public class Doppma : BaseSigma {
 				changeSpriteFromName(charState.sprite, true);
 			} else {
 				var shootPOI = getFirstPOI();
-				if (shootPOI != null && fireballWeapon.shootTime == 0) {
-					fireballWeapon.shootTime = 0.15f;
+				if (shootPOI != null && fireballWeapon.shootCooldown == 0) {
+					fireballWeapon.shootCooldown = 0.15f;
 					int upDownDir = MathF.Sign(player.input.getInputDir(player).y);
 					float ang = getShootXDir() == 1 ? 0 : 180;
 					if (charState.shootSprite.EndsWith("jump_shoot_downdiag")) {
@@ -90,7 +90,7 @@ public class Doppma : BaseSigma {
 				}
 			}
 
-			if (fireballWeapon.shootTime == 0 && fireballCooldown == 0) {
+			if (fireballWeapon.shootCooldown == 0 && fireballCooldown == 0) {
 				if (charState is WallSlide or LadderClimb) {
 					changeSpriteFromName(charState.shootSprite, true);
 				} else {

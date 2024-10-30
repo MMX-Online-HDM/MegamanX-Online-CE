@@ -14,7 +14,7 @@ public enum VileBallType {
 public class VileBall : Weapon {
 	public float vileAmmoUsage;
 	public VileBall(VileBallType vileBallType) : base() {
-		rateOfFire = 1f;
+		fireRate = 60;
 		index = (int)WeaponIds.VileBomb;
 		weaponBarBaseIndex = 27;
 		weaponBarIndex = weaponBarBaseIndex;
@@ -43,7 +43,7 @@ public class VileBall : Weapon {
 		} else if (vileBallType == VileBallType.PeaceOutRoller) {
 			displayName = "Peace Out Roller";
 			vileAmmoUsage = 16;
-			rateOfFire = 1.25f;
+			fireRate = 75;
 			description = new string[] { "This electric bombs splits into two upon", "upon contact with the ground." };
 			killFeedIndex = 80;
 			vileWeight = 3;
@@ -56,7 +56,7 @@ public class VileBall : Weapon {
 
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
 		if (type == (int)VileBallType.NoneNapalm || type == (int)VileBallType.NoneFlamethrower) return;
-		if (shootTime == 0) {
+		if (shootCooldown == 0) {
 			if (weaponInput == WeaponIds.VileBomb) {
 				var ground = Global.level.raycast(vile.pos, vile.pos.addxy(0, 25), new List<Type>() { typeof(Wall) });
 				if (ground == null) {
@@ -344,7 +344,7 @@ public class AirBombAttack : CharState {
 
 public class VileElectricBomb : Weapon {
 	public VileElectricBomb() : base() {
-		rateOfFire = 1f;
+		fireRate = 60;
 		index = (int)WeaponIds.VileBomb;
 		weaponBarBaseIndex = 55;
 		weaponBarIndex = 55;

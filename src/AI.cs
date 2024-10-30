@@ -1070,7 +1070,7 @@ public class AI {
 						zero.slideVel = zero.xDir * zero.getDashSpeed() * 2f;
 						break;		
 					case 5 when zero.grounded:
-						if (zero.gigaAttack.shootTime <= 0 && zero.gigaAttack.ammo >= zero.gigaAttack.getAmmoUsage(0)) {
+						if (zero.gigaAttack.shootCooldown <= 0 && zero.gigaAttack.ammo >= zero.gigaAttack.getAmmoUsage(0)) {
 							if (zero.gigaAttack is RekkohaWeapon) {
 								zero.gigaAttack.addAmmo(-zero.gigaAttack.getAmmoUsage(0), player);
 								zero.changeState(new Rekkoha(zero.gigaAttack), true);
@@ -1135,7 +1135,7 @@ public class AI {
 								zero.changeState(new ZeroCrouchSlashState(), true);
 								break;
 							case 3:
-								if (zero.gigaAttack.shootTime <= 0 && zero.gigaAttack.ammo >= zero.gigaAttack.getAmmoUsage(0)) {
+								if (zero.gigaAttack.shootCooldown <= 0 && zero.gigaAttack.ammo >= zero.gigaAttack.getAmmoUsage(0)) {
 									if (zero.gigaAttack is RekkohaWeapon) {
 										zero.gigaAttack.addAmmo(-zero.gigaAttack.getAmmoUsage(0), player);
 										zero.changeState(new Rekkoha(zero.gigaAttack), true);
@@ -1309,7 +1309,7 @@ public class AI {
 					|| proj.projId == (int)ProjIds.MagnetMine || proj.projId == (int)ProjIds.FrostShield || proj.projId == (int)ProjIds.FrostShieldCharged 
 					|| proj.projId == (int)ProjIds.FrostShieldAir || proj.projId == (int)ProjIds.FrostShieldChargedPlatform || proj.projId == (int)ProjIds.FrostShieldPlatform)	
 				){					
-					if (zero.gigaAttack.shootTime <= 0 && zero.grounded) {
+					if (zero.gigaAttack.shootCooldown <= 0 && zero.grounded) {
 						switch (zero.gigaAttack) {
 							case RekkohaWeapon when zero.gigaAttack.ammo >= 28:
 								zero.gigaAttack.addAmmo(-zero.gigaAttack.getAmmoUsage(0), player);
@@ -1398,7 +1398,7 @@ public class AI {
 		foreach (GameObject gameObject in pzero.getCloseActors(64, true, false, false)) {
 			if (gameObject is Projectile proj && player.character is PunchyZero pzero1
 			&& proj.damager.owner.alliance != player.alliance && pzero.charState.attackCtrl) { 									
-				if (pzero1.gigaAttack.shootTime <= 0 && pzero1.grounded) {
+				if (pzero1.gigaAttack.shootCooldown <= 0 && pzero1.grounded) {
 					switch (pzero1.gigaAttack) {
 						case RekkohaWeapon when pzero1.gigaAttack.ammo >= 28:
 							pzero1.gigaAttack.addAmmo(-pzero1.gigaAttack.getAmmoUsage(0), player);

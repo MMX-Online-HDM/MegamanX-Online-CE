@@ -14,8 +14,7 @@ public class ShotgunIce : Weapon {
 		weaponSlotIndex = 8;
 		weaknessIndex = (int)WeaponIds.FireWave;
 		shootSounds = new string[] { "shotgunIce", "shotgunIce", "shotgunIce", "icyWind" };
-		//rateOfFire = 0.5f;
-		fireRateFrames = 30;
+		fireRate = 30;
 		damage = "2/1-2";
 		effect = "Insta Freeze enemies. Ice sled up to 12 DMG.";
 		hitcooldown = "0.01/0.5";

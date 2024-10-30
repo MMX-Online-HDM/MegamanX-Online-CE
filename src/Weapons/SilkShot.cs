@@ -8,8 +8,7 @@ public class SilkShot : Weapon {
 
 	public SilkShot() : base() {
 		shootSounds = new string[] { "silkShot", "silkShot", "silkShot", "silkShotCharged" };
-		//rateOfFire = 0.75f;
-		fireRateFrames = 45;
+		fireRate = 45;
 		index = (int)WeaponIds.SilkShot;
 		weaponBarBaseIndex = 11;
 		weaponBarIndex = weaponBarBaseIndex;

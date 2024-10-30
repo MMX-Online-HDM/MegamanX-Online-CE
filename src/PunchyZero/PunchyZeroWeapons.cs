@@ -16,7 +16,7 @@ public class DropKickWeapon : Weapon {
 	public DropKickWeapon() : base() {
 		//damager = new Damager(player, 4, 12, 0.5f);
 		index = (int)WeaponIds.DropKick;
-		rateOfFire = 0;
+		fireRate = 0;
 		killFeedIndex = 112;
 		type = (int)ZeroDownthrustType.DropKick;
 	}
@@ -35,7 +35,7 @@ public class MegaPunchWeapon : Weapon {
 
 public class PZeroParryWeapon : Weapon {
 	public PZeroParryWeapon() : base() {
-		rateOfFire = 0.75f;
+		fireRate = 45;
 		index = (int)WeaponIds.KKnuckleParry;
 		killFeedIndex = 172;
 	}

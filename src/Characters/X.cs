@@ -557,7 +557,7 @@ public partial class MegamanX : Character {
 		if (shootCondition) {
 			if (specialPressed) {
 				int mod = player.weapon is Buster ? 2 : 1;
-				if (shootCooldown < player.weapon.fireRateFrames * 0.5f * mod) {
+				if (shootCooldown < player.weapon.fireRate * 0.5f * mod) {
 					specialShoot(getChargeLevel());
 					return true;
 				}	
@@ -654,7 +654,7 @@ public partial class MegamanX : Character {
 			-fw.streamAmmoUsage(this) : -player.weapon.getAmmoUsage(chargeLevel);
 		//Triggers weapon cooldown.
 		shootCooldown = player.weapon is HyperBuster hb ?
-			hb.getRateOfFire(player) : player.weapon.fireRateFrames;
+			hb.getRateOfFire(player) : player.weapon.fireRate;
 		//Triggers hypercharge special cooldown if used.
 		if (player.weapon is HyperBuster h) hyperchargeCooldown = h.getRateOfFire(player);
 		//Triggers hypercharge special cooldown when shooting a charged shot.
@@ -699,7 +699,7 @@ public partial class MegamanX : Character {
 
 		setShootAnim();
 
-		shootCooldown = buster.fireRateFrames;
+		shootCooldown = buster.fireRate;
 		buster.shoot(this, new int[] {chargeLevel});
 		stopCharge();
 

@@ -10,8 +10,7 @@ public class MagnetMine : Weapon {
 
 	public MagnetMine() : base() {
 		shootSounds = new string[] { "magnetMine", "magnetMine", "magnetMine", "magnetMineCharged" };
-		//rateOfFire = 0.75f;
-		fireRateFrames = 45;
+		fireRate = 45;
 		index = (int)WeaponIds.MagnetMine;
 		weaponBarBaseIndex = 15;
 		weaponBarIndex = weaponBarBaseIndex;

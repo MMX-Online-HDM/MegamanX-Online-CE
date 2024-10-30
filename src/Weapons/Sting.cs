@@ -13,8 +13,7 @@ public class Sting : Weapon {
 		weaponSlotIndex = 2;
 		weaknessIndex = (int)WeaponIds.Boomerang;
 		shootSounds = new string[] { "csting", "csting", "csting", "stingCharge" };
-		//rateOfFire = 0.75f;
-		fireRateFrames = 45;
+		fireRate = 45;
 		damage = "2";
 		effect = "Full Charge grants invulnerability.";
 		hitcooldown = "0";

@@ -472,7 +472,7 @@ public class RideArmor : Actor, IDamagable {
 				character is Vile vile &&
 				punchCooldown == 0 &&
 				raNum == 2 &&
-				vile.napalmWeapon.shootTime == 0 &&
+				vile.napalmWeapon.shootCooldown == 0 &&
 				player.input.isPressed(Control.Special1, player) &&
 				player.input.isHeld(Control.Down, player) &&
 				!rideArmorState.inTransition()
@@ -2199,7 +2199,7 @@ public class InRideArmor : CharState {
 
 	public void tossGrenade(Vile vile) {
 		Projectile? grenade = null;
-		if (vile.napalmWeapon.shootTime > 0) {
+		if (vile.napalmWeapon.shootCooldown > 0) {
 			return;
 		}
 		if (vile.napalmWeapon.type == (int)NapalmType.SplashHit) {

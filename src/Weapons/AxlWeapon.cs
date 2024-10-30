@@ -118,10 +118,10 @@ public class AxlWeapon : Weapon {
 			}
 
 			float rateOfFireMode = (axl.isWhiteAxl() ? whiteAxlFireRateMod() : 1);
-			shootTime = rateOfFire / rateOfFireMode;
+			shootCooldown = fireRate / rateOfFireMode;
 
 			if (axlBulletType == AxlBulletType.AltFire) {
-				altShootTime = altFireCooldown / rateOfFireMode;
+				altShotCooldown = altFireCooldown / rateOfFireMode;
 			}
 
 			float switchCooldown = 0.3f;
@@ -129,14 +129,14 @@ public class AxlWeapon : Weapon {
 
 			axl.switchTime = switchCooldown;
 			axl.altSwitchTime = switchCooldown;
-			if (shootTime > 0.25f || altShootTime > 0.25f) {
+			if (shootCooldown > 0.25f || altShotCooldown > 0.25f) {
 				axl.switchTime = slowSwitchCooldown;
 				axl.altSwitchTime = slowSwitchCooldown;
 			}
 
 			float aimBackwardsAmount = axl.getAimBackwardsAmount();
-			shootTime *= (1 + aimBackwardsAmount * 0.25f);
-			altShootTime *= (1 + aimBackwardsAmount * 0.25f);
+			shootCooldown *= (1 + aimBackwardsAmount * 0.25f);
+			altShotCooldown *= (1 + aimBackwardsAmount * 0.25f);
 
 			isSecondShot = !isSecondShot;
 		}
@@ -150,7 +150,7 @@ public class AxlWeapon : Weapon {
 
 	public float axlRechargeTime;
 	public virtual void rechargeAxlBulletAmmo(Player player, Axl axl, bool shootHeld, float modifier) {
-		if (shootTime == 0 && axl.shootAnimTime == 0 && !shootHeld && ammo < maxAmmo) {
+		if (shootCooldown == 0 && axl.shootAnimTime == 0 && !shootHeld && ammo < maxAmmo) {
 			float waMod = axl.isWhiteAxl() ? 0 : 1;
 			axlRechargeTime += Global.spf;
 			if (axlRechargeTime > 0.1f * modifier * waMod) {

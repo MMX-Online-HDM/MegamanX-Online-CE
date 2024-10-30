@@ -14,8 +14,7 @@ public class Tornado : Weapon {
 		weaponSlotIndex = 5;
 		weaknessIndex = (int)WeaponIds.Sting;
 		shootSounds = new string[] { "tornado", "tornado", "tornado", "buster3" };
-		//rateOfFire = 2f;
-		fireRateFrames = 120;
+		fireRate = 120;
 		//switchCooldown = 0.5f;
 		switchCooldownFrames = 30;
 		damage = "1/4";

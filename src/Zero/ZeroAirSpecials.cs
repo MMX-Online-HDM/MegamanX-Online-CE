@@ -55,8 +55,8 @@ public class FSplasherWeapon : Weapon {
 
 	public override void attack(Character character) {
 		if (character.dashedInAir > 0) return;
-		if (shootTime > 0) return;
-		shootTime = 1;
+		if (shootCooldown > 0) return;
+		shootCooldown = 1;
 		character.changeState(new FSplasherState(), true);
 	}
 }
@@ -90,7 +90,7 @@ public class FSplasherState : CharState {
 			fSplasherProj.destroySelf();
 			fSplasherProj = null;
 		}
-		zero.airSpecial.shootTime = 1;
+		zero.airSpecial.shootCooldown = 1;
 		base.onExit(newState);
 	}
 

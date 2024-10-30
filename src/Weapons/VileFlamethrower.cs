@@ -15,7 +15,7 @@ public abstract class VileFlamethrower : Weapon {
 	public int projId;
 
 	public VileFlamethrower() : base() {
-		rateOfFire = 1f;
+		fireRate = 60;
 		index = (int)WeaponIds.VileFlamethrower;
 	}
 
@@ -24,7 +24,7 @@ public abstract class VileFlamethrower : Weapon {
 	}
 
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
-		if (shootTime == 0 && vile.player.vileAmmo > 0) {
+		if (shootCooldown == 0 && vile.player.vileAmmo > 0) {
 			vile.setVileShootTime(this);
 			vile.changeState(new FlamethrowerState(), true);
 		}
@@ -35,7 +35,7 @@ public class WildHorseKick : VileFlamethrower {
 	public static WildHorseKick netWeapon = new();
 
 	public WildHorseKick() : base() {
-		rateOfFire = 1f;
+		fireRate = 60;
 		index = (int)WeaponIds.VileFlamethrower;
 		type = (int)VileFlamethrowerType.WildHorseKick;
 	
@@ -53,7 +53,7 @@ public class WildHorseKick : VileFlamethrower {
 	}
 
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
-		if (shootTime == 0 && vile.player.vileAmmo > 0) {
+		if (shootCooldown == 0 && vile.player.vileAmmo > 0) {
 			vile.setVileShootTime(this);
 			vile.changeState(new FlamethrowerState(), true);
 		}
@@ -65,7 +65,7 @@ public class SeaDragonRage : VileFlamethrower {
 	public static SeaDragonRage netWeapon = new();
 
 	public SeaDragonRage() : base() {
-		rateOfFire = 1f;
+		fireRate = 60;
 		index = (int)WeaponIds.VileFlamethrower;
 		type = (int)VileFlamethrowerType.SeaDragonRage;
 	
@@ -83,7 +83,7 @@ public class SeaDragonRage : VileFlamethrower {
 	}
 
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
-		if (shootTime == 0 && vile.player.vileAmmo > 0) {
+		if (shootCooldown == 0 && vile.player.vileAmmo > 0) {
 			vile.setVileShootTime(this);
 			vile.changeState(new FlamethrowerState(), true);
 		}
@@ -94,7 +94,7 @@ public class DragonsWrath : VileFlamethrower {
 	public static DragonsWrath netWeapon = new();
 
 	public DragonsWrath() : base() {
-		rateOfFire = 1f;
+		fireRate = 60;
 		index = (int)WeaponIds.VileFlamethrower;
 		type = (int)VileFlamethrowerType.DragonsWrath;
 	
@@ -112,7 +112,7 @@ public class DragonsWrath : VileFlamethrower {
 	}
 
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
-		if (shootTime == 0 && vile.player.vileAmmo > 0) {
+		if (shootCooldown == 0 && vile.player.vileAmmo > 0) {
 			vile.setVileShootTime(this);
 			vile.changeState(new FlamethrowerState(), true);
 		}

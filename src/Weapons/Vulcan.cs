@@ -25,7 +25,7 @@ public class Vulcan : Weapon {
 			description = new string[] { "Do not equip a Vulcan." };
 			killFeedIndex = 126;
 		} else if (vulcanType == VulcanType.CherryBlast) {
-			rateOfFire = 0.1f;
+			fireRate = 6;
 			displayName = "Cherry Blast";
 			vileAmmoUsage = 0.25f;
 			muzzleSprite = "vulcan_muzzle";
@@ -33,7 +33,7 @@ public class Vulcan : Weapon {
 			description = new string[] { "With a range of approximately 20 feet,", "this vulcan is easy to use." };
 			vileWeight = 2;
 		} else if (vulcanType == VulcanType.DistanceNeedler) {
-			rateOfFire = 0.25f;
+			fireRate = 15;
 			displayName = "Distance Needler";
 			vileAmmoUsage = 6f;
 			muzzleSprite = "vulcan_dn_muzzle";
@@ -43,7 +43,7 @@ public class Vulcan : Weapon {
 			description = new string[] { "This vulcan has good range and speed,", "but cannot fire rapidly." };
 			vileWeight = 2;
 		} else if (vulcanType == VulcanType.BuckshotDance) {
-			rateOfFire = 0.12f;
+			fireRate = 8;
 			displayName = "Buckshot Dance";
 			vileAmmoUsage = 0.3f;
 			muzzleSprite = "vulcan_bd_muzzle";
@@ -56,7 +56,7 @@ public class Vulcan : Weapon {
 	}
 
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
-		if (type == (int)VulcanType.DistanceNeedler && shootTime > 0) return;
+		if (type == (int)VulcanType.DistanceNeedler && shootCooldown > 0) return;
 		if (string.IsNullOrEmpty(vile.charState.shootSprite)) return;
 
 		Player player = vile.player;
@@ -72,7 +72,7 @@ public class Vulcan : Weapon {
 
 	public void shootVulcan(Vile vile) {
 		Player player = vile.player;
-		if (shootTime <= 0) {
+		if (shootCooldown <= 0) {
 			vile.vulcanLingerTime = 0f;
 			new VulcanMuzzleAnim(this, vile.getShootPos(), vile.getShootXDir(), vile, player.getNextActorNetId(), true, true);
 			new VulcanProj(this, vile.getShootPos(), vile.getShootXDir(), player, player.getNextActorNetId(), rpc: true);
@@ -80,8 +80,7 @@ public class Vulcan : Weapon {
 				new VulcanProj(this, vile.getShootPos(), vile.getShootXDir(), player, player.getNextActorNetId(), rpc: true);
 			}
 			vile.playSound("vulcan", sendRpc: true);
-			vile.vileLadderShootCooldown = rateOfFire;
-			shootTime = rateOfFire;
+			shootCooldown = fireRate;
 		}
 	}
 }

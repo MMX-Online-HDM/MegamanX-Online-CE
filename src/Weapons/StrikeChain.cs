@@ -9,8 +9,7 @@ public class StrikeChain : Weapon {
 	public static StrikeChain netWeapon = new();
 	public StrikeChain() : base() {
 		shootSounds = new string[] { "strikeChain", "strikeChain", "strikeChain", "strikeChainCharged" };
-		//rateOfFire = 0.75f;
-		fireRateFrames = 45;
+		fireRate = 45;
 		index = (int)WeaponIds.StrikeChain;
 		weaponBarBaseIndex = 14;
 		weaponBarIndex = weaponBarBaseIndex;

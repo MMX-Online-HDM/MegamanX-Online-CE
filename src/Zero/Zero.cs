@@ -470,7 +470,7 @@ public class Zero : Character {
 		int yDir = player.input.getYDir(player);
 		// Giga attacks.
 		if (yDir == 1 && specialPressed) {
-			if (gigaAttack.shootTime <= 0 && gigaAttack.ammo >= gigaAttack.getAmmoUsage(0)) {
+			if (gigaAttack.shootCooldown <= 0 && gigaAttack.ammo >= gigaAttack.getAmmoUsage(0)) {
 				if (gigaAttack is RekkohaWeapon) {
 					gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
 					changeState(new Rekkoha(gigaAttack), true);

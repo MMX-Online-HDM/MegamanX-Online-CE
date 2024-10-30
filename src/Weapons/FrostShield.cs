@@ -9,8 +9,7 @@ public class FrostShield : Weapon {
 
 	public FrostShield() : base() {
 		shootSounds = new string[] { "frostShield", "frostShield", "frostShield", "frostShieldCharged" };
-		//rateOfFire = 1f;
-		fireRateFrames = 60;
+		fireRate = 60;
 		index = (int)WeaponIds.FrostShield;
 		weaponBarBaseIndex = 23;
 		weaponBarIndex = weaponBarBaseIndex;

@@ -14,8 +14,7 @@ public class ElectricSpark : Weapon {
 		weaponSlotIndex = 6;
 		weaknessIndex = (int)WeaponIds.ShotgunIce;
 		shootSounds = new string[] { "electricSpark", "electricSpark", "electricSpark", "electricSpark" };
-		//rateOfFire = 0.5f;
-		fireRateFrames = 30;
+		fireRate = 30;
 		damage = "2/4";
 		effect =  "Can Split. Charged: Doesn't destroy on hit.";
 		hitcooldown = "0/0.5";

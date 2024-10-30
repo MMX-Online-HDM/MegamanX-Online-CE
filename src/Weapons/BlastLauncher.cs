@@ -13,7 +13,7 @@ public class BlastLauncher : AxlWeapon {
 		weaponSlotIndex = 29;
 		killFeedIndex = 29;
 		switchCooldown = 0.1f;
-		rateOfFire = 0.75f;
+		fireRate = 45;
 
 		sprite = "axl_arm_blastlauncher";
 		flashSprite = "axl_pistol_flash_charged";

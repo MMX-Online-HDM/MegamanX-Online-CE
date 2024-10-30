@@ -341,7 +341,6 @@ public class Projectile : Actor {
 		if (!defender.sprite.name.Contains("attack") && !defender.sprite.name.Contains("block")) return false;
 		if (defender.sprite.name.Contains("sigma2")) return false;
 		if ((attacker as Zero)?.hypermodeActive() == true) return false;
-		if ((attacker as Iris)?.hypermodeActive() == true) return false;
 
 		// Not facing each other
 		if (attacker.pos.x >= defender.pos.x && (attacker.xDir != -1 || defender.xDir != 1)) return false;
@@ -374,8 +373,7 @@ public class Projectile : Actor {
 			}
 		}
 
-		
-		var isSaber = GenericMeleeProj.isZSaberClang(projId) || GenericMeleeProj.isSaberIrisClang(projId) ;
+		var isSaber = GenericMeleeProj.isZSaberClang(projId);
 		if (isSaber && owner.character?.isCCImmune() != true) {
 			// Case 1: hitting a clangable projectile.
 			if (ownedByLocalPlayer && owner.character != null &&

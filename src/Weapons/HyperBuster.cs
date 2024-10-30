@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class HyperBuster : Weapon {
-	public const float ammoUsage = 8;
+	public const float ammoUsage = 7;
 	public const float weaponAmmoUsage = 8;
 
 	public HyperBuster() : base() {
@@ -14,13 +14,14 @@ public class HyperBuster : Weapon {
 		weaponBarIndex = 31;
 		weaponSlotIndex = 36;
 		//shootSounds = new string[] { "buster3X3", "buster3X3", "buster3X3", "buster3X3" };
-		//rateOfFire = 2f;
-		fireRateFrames = 120;
+		fireRate = 120;
 		//switchCooldown = 0.25f;
 		switchCooldownFrames = 15;
 		ammo = 0;
+		maxAmmo = 28;
 		drawGrayOnLowAmmo = true;
 		drawRoundedDown = true;
+		allowSmallBar = false;
 	}
 
 	public override void update() {
@@ -45,7 +46,7 @@ public class HyperBuster : Weapon {
 	}
 
 	public float getRateOfFire(Player player) {
-		return fireRateFrames * getRateofFireMod(player);
+		return fireRate * getRateofFireMod(player);
 	}
 
 	public override bool canShoot(int chargeLevel, Player player) {
@@ -83,7 +84,7 @@ public class HyperBuster : Weapon {
 			if (changeToWeaponSlot(wep)) player.changeWeaponSlot(player.hyperChargeSlot);
 			wep.shoot(character, new int[] {3});
 			wep.addAmmo(-wep.getAmmoUsage(3), player);
-			mmx.shootCooldown = MathF.Max(wep.fireRateFrames, switchCooldownFrames.GetValueOrDefault());
+			mmx.shootCooldown = MathF.Max(wep.fireRate, switchCooldownFrames.GetValueOrDefault());
 			if (!string.IsNullOrEmpty(wep.shootSounds[3])) {
 				character.playSound(wep.shootSounds[3]);
 			}

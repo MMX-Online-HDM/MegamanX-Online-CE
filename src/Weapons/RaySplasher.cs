@@ -10,8 +10,7 @@ public class RaySplasher : Weapon {
 
 	public RaySplasher() : base() {
 		shootSounds = new string[] { "raySplasher", "raySplasher", "raySplasher", "warpIn" };
-		//rateOfFire = 1f;
-		fireRateFrames = 60;
+		fireRate = 60;
 		index = (int)WeaponIds.RaySplasher;
 		weaponBarBaseIndex = 21;
 		weaponBarIndex = weaponBarBaseIndex;

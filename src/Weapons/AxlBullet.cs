@@ -54,7 +54,7 @@ public class AxlBullet : AxlWeapon {
 				flashSprite = "axl_pistol_flash";
 				chargedFlashSprite = "axl_pistol_flash_charged";
 				altFireCooldown = 0.3f;
-				rateOfFire = 0.75f;
+				fireRate = 45;
 				displayName = "Beast Killer";
 				shootSounds = new string[] { "beastKiller", "axlBullet", "axlBullet", "axlBulletCharged" };
 				break;
@@ -68,7 +68,7 @@ public class AxlBullet : AxlWeapon {
 				flashSprite = "axl_pistol_flash";
 				chargedFlashSprite = "axl_pistol_flash_charged";
 				altFireCooldown = 0.3f;
-				rateOfFire = 0.15f;
+				fireRate = 9;
 				displayName = "Machine Bullets";
 				shootSounds = new string[] { "machineBullets", "axlBullet", "axlBullet", "axlBulletCharged" };
 				break;
@@ -95,7 +95,7 @@ public class AxlBullet : AxlWeapon {
 				flashSprite = "axl_pistol_flash";
 				chargedFlashSprite = "axl_pistol_flash_charged";
 				altFireCooldown = 0.225f;
-				rateOfFire = 0.1f;
+				fireRate = 6;
 				displayName = "Ancient Gun";
 				shootSounds = new string[] { "ancientGun3", "axlBullet", "axlBullet", "axlBulletCharged" };
 				break;
@@ -173,7 +173,7 @@ public class DoubleBullet : AxlWeapon {
 		weaponSlotIndex = 35;
 		killFeedIndex = 34;
 		altFireCooldown = 0.225f;
-		rateOfFire = 0.1f;
+		fireRate = 6;
 		displayName = "Double Bullets";
 		type = (int)AxlBulletWeaponType.DoubleBullets;
 	}

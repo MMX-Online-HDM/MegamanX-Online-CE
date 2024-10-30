@@ -9,8 +9,7 @@ public class AcidBurst : Weapon {
 
 	public AcidBurst() : base() {
 		//shootSounds = new string[] { "acidBurst", "acidBurst", "acidBurst", "acidBurst" };
-		//rateOfFire = 0.5f;
-		fireRateFrames = 30;
+		fireRate = 30;
 		index = (int)WeaponIds.AcidBurst;
 		weaponBarBaseIndex = 17;
 		weaponBarIndex = 17;

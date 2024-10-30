@@ -184,8 +184,8 @@ public class BaseSigma : Character {
 						cantAffordMaverickMessage();
 					}
 				} else if (isSummoner && !mw.isMenuOpened) {
-					if (shootPressed && mw.shootTime == 0) {
-						mw.shootTime = MaverickWeapon.summonerCooldown;
+					if (shootPressed && mw.shootCooldown == 0) {
+						mw.shootCooldown = MaverickWeapon.summonerCooldown;
 						changeState(new CallDownMaverick(mw.maverick, false, false), true);
 						player.changeToSigmaSlot();
 					}
@@ -200,7 +200,7 @@ public class BaseSigma : Character {
 		bool isSigmaIdle = charState is Idle;
 		if (isTagTeam && shootPressed) {
 			if (isMaverickIdle && player.weapon is SigmaMenuWeapon sw &&
-				sw.shootTime == 0 && charState is not Die && tagTeamSwapProgress == 0
+				sw.shootCooldown == 0 && charState is not Die && tagTeamSwapProgress == 0
 			) {
 				tagTeamSwapProgress = Global.spf;
 				tagTeamSwapCase = 0;
@@ -233,7 +233,7 @@ public class BaseSigma : Character {
 				tagTeamSwapProgress = 0;
 				if (tagTeamSwapCase == 0) {
 					var sw = player.weapons.FirstOrDefault(w => w is SigmaMenuWeapon);
-					sw.shootTime = sw.rateOfFire;
+					sw.shootCooldown = sw.fireRate;
 					player.currentMaverick.changeState(new MExit(player.currentMaverick.pos, true));
 					becomeSigma(player.currentMaverick.pos, player.currentMaverick.xDir);
 				} else {

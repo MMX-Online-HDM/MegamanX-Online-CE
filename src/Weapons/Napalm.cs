@@ -31,14 +31,14 @@ public class Napalm : Weapon {
 		} else if (napalmType == NapalmType.RumblingBang) {
 			displayName = "Rumbling Bang";
 			vileAmmoUsage = 8;
-			rateOfFire = 2f;
+			fireRate = 60 * 2;
 			description = new string[] { "This napalm sports a wide horizontal", "range but cannot attack upward." };
 			vileWeight = 3;
 		}
 		if (napalmType == NapalmType.FireGrenade) {
 			displayName = "Flame Round";
 			vileAmmoUsage = 16;
-			rateOfFire = 4f;
+			fireRate = 60 * 4;
 			description = new string[] { "This napalm travels along the", "ground, laying a path of fire." };
 			killFeedIndex = 54;
 			vileWeight = 3;
@@ -46,7 +46,7 @@ public class Napalm : Weapon {
 		if (napalmType == NapalmType.SplashHit) {
 			displayName = "Splash Hit";
 			vileAmmoUsage = 16;
-			rateOfFire = 3f;
+			fireRate = 60 * 3;
 			description = new string[] { "This napalm can attack foes above,", "but has a narrow horizontal range." };
 			killFeedIndex = 79;
 			vileWeight = 3;
@@ -55,7 +55,7 @@ public class Napalm : Weapon {
 
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
 		if (type == (int)NapalmType.NoneBall || type == (int)NapalmType.NoneFlamethrower) return;
-		if (shootTime == 0) {
+		if (shootCooldown == 0) {
 			if (weaponInput == WeaponIds.Napalm) {
 				if (vile.tryUseVileAmmo(vileAmmoUsage)) {
 					vile.changeState(new NapalmAttack(NapalmAttackType.Napalm), true);

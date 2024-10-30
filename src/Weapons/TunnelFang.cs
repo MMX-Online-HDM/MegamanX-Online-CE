@@ -9,8 +9,7 @@ public class TunnelFang : Weapon {
 
 	public TunnelFang() : base() {
 		shootSounds = new string[] { "busterX3", "busterX3", "busterX3", "tunnelFang" };
-		//rateOfFire = 1;
-		fireRateFrames = 60;
+		fireRate = 60;
 		index = (int)WeaponIds.TunnelFang;
 		weaponBarBaseIndex = 24;
 		weaponBarIndex = weaponBarBaseIndex;
@@ -26,7 +25,7 @@ public class TunnelFang : Weapon {
 
 	public override float getAmmoUsage(int chargeLevel) {
 		if (chargeLevel < 3) {
-			if (timeSinceLastShoot != null && timeSinceLastShoot < fireRateFrames) return 1;
+			if (timeSinceLastShoot != null && timeSinceLastShoot < fireRate) return 1;
 			else return 2;
 		}
 		return 8;
@@ -40,7 +39,7 @@ public class TunnelFang : Weapon {
 
 		if (chargeLevel < 3) {
 			if (character.ownedByLocalPlayer && character is MegamanX mmx) {
-				if (timeSinceLastShoot != null && timeSinceLastShoot < fireRateFrames) {
+				if (timeSinceLastShoot != null && timeSinceLastShoot < fireRate) {
 					new TunnelFangProj(this, pos, xDir, 1, player, player.getNextActorNetId(), rpc: true);
 					new TunnelFangProj(this, pos, xDir, 2, player, player.getNextActorNetId(), rpc: true);
 					timeSinceLastShoot = null;

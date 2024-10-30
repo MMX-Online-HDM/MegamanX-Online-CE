@@ -26,14 +26,14 @@ public class RocketPunch : Weapon {
 			description = new string[] { "Do not equip a Rocket Punch." };
 			killFeedIndex = 126;
 		} else if (rocketPunchType == RocketPunchType.GoGetterRight) {
-			rateOfFire = 1f;
+			fireRate = 60;
 			displayName = "Go-Getter Right";
 			vileAmmoUsage = 8;
 			projSprite = "rocket_punch_proj";
 			description = new string[] { "A rocket punch sends your fist", "flying to teach enemies a lesson." };
 			vileWeight = 3;
 		} else if (rocketPunchType == RocketPunchType.SpoiledBrat) {
-			rateOfFire = 0.2f;
+			fireRate = 12;
 			displayName = "Spoiled Brat";
 			vileAmmoUsage = 8;
 			projSprite = "rocket_punch_sb_proj";
@@ -42,7 +42,7 @@ public class RocketPunch : Weapon {
 			vileWeight = 3;
 		}
 		if (rocketPunchType == RocketPunchType.InfinityGig) {
-			rateOfFire = 1f;
+			fireRate = 60;
 			displayName = "Infinity Gig";
 			vileAmmoUsage = 16;
 			projSprite = "rocket_punch_ig_proj";
@@ -55,7 +55,7 @@ public class RocketPunch : Weapon {
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
 		if (vile.charState is RocketPunchAttack && type != (int)RocketPunchType.SpoiledBrat) return;
 
-		if (shootTime == 0 && vile.charState is not Dash && vile.charState is not AirDash) {
+		if (shootCooldown == 0 && vile.charState is not Dash && vile.charState is not AirDash) {
 			if (vile.tryUseVileAmmo(vileAmmoUsage)) {
 				vile.setVileShootTime(this);
 				if (vile.charState is RocketPunchAttack rpa) {

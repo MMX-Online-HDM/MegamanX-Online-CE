@@ -9,8 +9,7 @@ public class SonicSlicer : Weapon {
 
 	public SonicSlicer() : base() {
 		shootSounds = new string[] { "sonicSlicer", "sonicSlicer", "sonicSlicer", "sonicSlicerCharged" };
-		//rateOfFire = 1f;
-		fireRateFrames = 60;
+		fireRate = 60;
 		index = (int)WeaponIds.SonicSlicer;
 		weaponBarBaseIndex = 13;
 		weaponBarIndex = weaponBarBaseIndex;

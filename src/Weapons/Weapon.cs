@@ -7,23 +7,19 @@ public class Weapon {
 	public string[] shootSounds = { "", "", "", ""};
 	public float ammo;
 	public float maxAmmo;
-	public float rateOfFire;
-	public float fireRateFrames;
+	public float fireRate;
+	public float shootCooldown;
+	public float altShotCooldown;
 	public float? switchCooldown;
 	public float? switchCooldownFrames;
 	public float soundTime = 0;
 	public bool isStream = false;
-	public float shootTime;
-	public float altShootTime;
-	public float streamTime;
 	public string displayName = "";
 	public string[] description = {""};
 	public Damager? damager;
 	public int type; // For "swappable category" weapons, like techniques, vile weapon sections, etc.
 
 	public int streams;
-	public int maxStreams;
-	public float streamCooldown;
 
 	public int index;
 	public int killFeedIndex;
@@ -67,8 +63,7 @@ public class Weapon {
 	public Weapon() {
 		ammo = 32;
 		maxAmmo = 32;
-		rateOfFire = 0.15f;
-		fireRateFrames = 9;
+		fireRate = 9;
 		effect = "";
 		damage = "0";
 		hitcooldown = "0";
@@ -304,8 +299,8 @@ public class Weapon {
 	}
 
 	public bool isCooldownPercentDone(float percent) {
-		if (rateOfFire == 0) { return true; }
-		return (shootTime / rateOfFire) < (1 - percent);
+		if (fireRate == 0) { return true; }
+		return (shootCooldown / fireRate) <= (1 - percent);
 	}
 
 	public void addAmmo(float amount, Player player) {
@@ -339,8 +334,8 @@ public class Weapon {
 	
 	public virtual void update() {
 		Helpers.decrementFrames(ref soundTime);
-		Helpers.decrementTime(ref shootTime);
-		Helpers.decrementTime(ref altShootTime);
+		Helpers.decrementFrames(ref shootCooldown);
+		Helpers.decrementFrames(ref altShotCooldown);
 		if (timeSinceLastShoot != null) {
 			timeSinceLastShoot += Global.speedMul;
 		}

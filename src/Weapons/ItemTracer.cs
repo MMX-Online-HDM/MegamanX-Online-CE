@@ -9,7 +9,7 @@ public class ItemTracer : Weapon {
 
 	public ItemTracer() : base() {
 		shootSounds = new string[] { "", "", "", "" };
-		rateOfFire = 1f;
+		fireRate = 60;
 		index = (int)WeaponIds.ItemTracer;
 		weaponBarBaseIndex = 26;
 		weaponBarIndex = weaponBarBaseIndex;

@@ -14,8 +14,7 @@ public class Boomerang : Weapon {
 		weaponSlotIndex = 7;
 		weaknessIndex = (int)WeaponIds.Torpedo;
 		shootSounds = new string[] { "boomerang", "boomerang", "boomerang", "buster3" };
-		//rateOfFire = 0.5f;
-		fireRateFrames = 30;
+		fireRate = 30;
 		damage = "2/2";
 		effect = "Charged: Doesn't destroy on hit.";
 		hitcooldown = "0/0.5";

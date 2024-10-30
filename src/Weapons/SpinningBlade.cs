@@ -11,8 +11,7 @@ public class SpinningBlade : Weapon {
 
 	public SpinningBlade() : base() {
 		shootSounds = new string[] { "", "", "", "spinningBladeCharged" };
-		//rateOfFire = 1.25f;
-		fireRateFrames = 75;
+		fireRate = 75;
 		index = (int)WeaponIds.SpinningBlade;
 		weaponBarBaseIndex = 20;
 		weaponBarIndex = weaponBarBaseIndex;

@@ -6,7 +6,7 @@ namespace MMXOnline;
 public class SpiralMagnum : AxlWeapon {
 	public SpiralMagnum(int altFire) : base(altFire) {
 		shootSounds = new string[] { "spiralMagnum", "spiralMagnum", "spiralMagnum", "sniperMissile" };
-		rateOfFire = 0.75f;
+		fireRate = 45;
 		altFireCooldown = 2;
 		index = (int)WeaponIds.SpiralMagnum;
 		weaponBarBaseIndex = 34;

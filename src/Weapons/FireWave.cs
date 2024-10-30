@@ -14,8 +14,7 @@ public class FireWave : Weapon {
 		weaponSlotIndex = 4;
 		weaknessIndex = (int)WeaponIds.Tornado;
 		shootSounds = new string[] { "fireWave", "fireWave", "fireWave", "fireWave" };
-		//rateOfFire = 0.06f;
-		fireRateFrames = 4;
+		fireRate = 4;
 		isStream = true;
 		//switchCooldown = 0.25f;
 		switchCooldownFrames = 15;

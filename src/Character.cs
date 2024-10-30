@@ -20,8 +20,8 @@ public partial class Character : Actor, IDamagable {
 	public Player player;
 	public bool isDashing;
 	public float shootTime {
-		get { return player.weapon.shootTime; }
-		set { player.weapon.shootTime = value; }
+		get { return player.weapon.shootCooldown; }
+		set { player.weapon.shootCooldown = value; }
 	}
 	public bool changedStateInFrame;
 	public bool pushedByTornadoInFrame;
@@ -1571,13 +1571,6 @@ public partial class Character : Actor, IDamagable {
 		if (isCharging()) {
 			chargeSound.play();
 			int chargeType = 0;
-			/*if (this is BusterZero) {
-				chargeType = 1;
-			} else if (player.isX && player.hasArmArmor(3)) {
-				if (player.hasGoldenArmor()) {
-					chargeType = 2;
-				}
-			} */
 			if (!sprite.name.Contains("ra_hide")) {
 				int level = getChargeLevel();
 				var renderGfx = RenderEffectType.ChargeBlue;
@@ -1898,7 +1891,7 @@ public partial class Character : Actor, IDamagable {
 		}
 	}
 
-	public int getChargeLevel() {
+	public virtual int getChargeLevel() {
 		bool clampTo3 = true;
 		switch (this) {
 			case MegamanX mmx:
@@ -1912,9 +1905,6 @@ public partial class Character : Actor, IDamagable {
 				break;
 			case BusterZero:
 				clampTo3 = false;
-				break;
-			case Iris iris:
-				clampTo3 = !iris.isHyperIris;
 				break;
 		}
 		if (chargeTime < charge1Time) {
@@ -2822,16 +2812,6 @@ public partial class Character : Actor, IDamagable {
 					Weapon.gigaAttackSoundLogic(
 						this, currentAmmo, punchyZero.gigaAttack.ammo,
 						punchyZero.gigaAttack.getAmmoUsage(0), punchyZero.gigaAttack.maxAmmo
-					);
-				}
-			}
-			if (this is Iris iris) {
-				float currentAmmo = iris.IrisRakuhouhaWeapon.ammo;
-				iris.IrisRakuhouhaWeapon.addAmmo(gigaAmmoToAdd, player);
-				if (player.isMainPlayer) {
-					Weapon.gigaAttackSoundLogic(
-						this, currentAmmo, iris.IrisRakuhouhaWeapon.ammo,
-						iris.IrisRakuhouhaWeapon.getAmmoUsage(0), iris.IrisRakuhouhaWeapon.maxAmmo
 					);
 				}
 			}

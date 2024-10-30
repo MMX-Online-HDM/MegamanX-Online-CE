@@ -10,7 +10,6 @@ public class Vile : Character {
 	public const int callNewMechCost = 5;
 	float mechBusterCooldown;
 	public bool usedAmmoLastFrame;
-	public float vileLadderShootCooldown;
 	public int buckshotDanceNum;
 	public float vileAmmoRechargeCooldown;
 	public bool isShootingLongshotGizmo;
@@ -173,7 +172,7 @@ public class Vile : Character {
 			}
 		}
 
-		if (vulcanLingerTime <= 0.1f && vulcanWeapon.shootTime == 0f) {
+		if (vulcanLingerTime <= 0.1f && vulcanWeapon.shootCooldown == 0f) {
 			vulcanLingerTime += Global.spf;
 			if (vulcanLingerTime > 0.1f && sprite.name.EndsWith("shoot")) {
 				changeSpriteFromName(charState.sprite, resetFrame: false);
@@ -194,7 +193,6 @@ public class Vile : Character {
 			if (calldownMechCooldown < 0) calldownMechCooldown = 0;
 		}
 		Helpers.decrementTime(ref grabCooldown);
-		Helpers.decrementTime(ref vileLadderShootCooldown);
 		Helpers.decrementTime(ref mechBusterCooldown);
 		Helpers.decrementTime(ref gizmoCooldown);
 
@@ -221,7 +219,7 @@ public class Vile : Character {
 			return normalAttacks();
 		}
 		if (shootHeld) {
-			if (cutterWeapon.shootTime < cutterWeapon.rateOfFire * 0.75f) 
+			if (cutterWeapon.shootCooldown < cutterWeapon.fireRate * 0.75f) 
 				cannonWeapon.vileShoot(0, this);
 		}
 		if (WeaponRightHeld) {
@@ -575,10 +573,10 @@ public class Vile : Character {
 		targetCooldownWeapon = targetCooldownWeapon ?? weapon;
 		if (isVileMK2) {
 			float innerModifier = 1f;
-			if (weapon is VileMissile) innerModifier = 0.33f;
-			weapon.shootTime = targetCooldownWeapon.rateOfFire * innerModifier * modifier;
+			if (weapon is VileMissile) innerModifier = 0.3333f;
+			weapon.shootCooldown = MathF.Ceiling(targetCooldownWeapon.fireRate * innerModifier * modifier);
 		} else {
-			weapon.shootTime = targetCooldownWeapon.rateOfFire * modifier;
+			weapon.shootCooldown = MathF.Ceiling(targetCooldownWeapon.fireRate * modifier);
 		}
 	}
 
@@ -601,13 +599,6 @@ public class Vile : Character {
 			return true;
 		}
 		return base.isSoftLocked();
-	}
-
-	public override bool canClimbLadder() {
-		if (vileLadderShootCooldown > 0) {
-			return false;
-		}
-		return base.canClimbLadder();
 	}
 
 	public override bool canChangeWeapons() {
