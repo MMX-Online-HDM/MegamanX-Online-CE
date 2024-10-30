@@ -8,7 +8,7 @@ public class AcidBurst : Weapon {
 	public static AcidBurst netWeapon = new();
 
 	public AcidBurst() : base() {
-		//shootSounds = new string[] { "acidBurst", "acidBurst", "acidBurst", "acidBurst" };
+		shootSounds = new string[] { "acidBurst", "acidBurst", "acidBurst", "acidBurst" };
 		fireRate = 30;
 		index = (int)WeaponIds.AcidBurst;
 		weaponBarBaseIndex = 17;

@@ -467,7 +467,7 @@ public partial class MegamanX : Character {
 
 		if ( (isSpecialSaber() || isHyperX) && canShoot() &&
 			canChangeWeapons() && player.armorFlag == 0 &&
-			specialPressed
+			specialPressed && !stingActive
 		) {
 			if (xSaberCooldown == 0) {
 				xSaberCooldown = 60;
@@ -902,7 +902,100 @@ public partial class MegamanX : Character {
 		return false;
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
+	public enum MeleeIds {
+		None = -1,
+		Headbutt,
+		SpeedBurnerCharged,
+		Shoryuken,
+		X3Saber,
+		X6Saber,
+		NovaStrike,
+		UPGrab,
+		UPPunch,
+		UPParryBlock,
+	}
+
+	public override int getHitboxMeleeId(Collider hitbox) {
+		string[] hs = headbuttSprite();
+		for (int i = 0; i < hs.Length; i++) {
+			if (sprite.name == hs[i]) return (int)MeleeIds.Headbutt;
+		}
+
+		return (int)(sprite.name switch {
+			"mmx_speedburner" => MeleeIds.SpeedBurnerCharged,
+			"mmx_shoryuken" => MeleeIds.Shoryuken,
+			"mmx_beam_saber" or
+			"mmx_beam_saber_air" => MeleeIds.X3Saber,
+			"mmx_beam_saber2" or
+			"mmx_beam_saber_air2" => MeleeIds.X6Saber,
+			"mmx_nova_strike" or
+			"mmx_nova_strike_down" or
+			"mmx_nova_strike_up" => MeleeIds.NovaStrike,
+			"mmx_unpo_grab_dash" => MeleeIds.UPGrab,
+			"mmx_unpo_punch" or
+			"mmx_unpo_air_punch" => MeleeIds.UPPunch,
+			"mmx_unpo_parry_start" => MeleeIds.UPParryBlock,
+
+			_ => MeleeIds.None
+		});
+	}
+
+	string[] headbuttSprite() {
+		return new string[] {
+			"mmx_jump",
+			"mmx_jump_shoot",
+			"mmx_wall_kick",
+			"mmx_wall_kick_shoot",
+			"mmx_up_dash",
+			"mmx_up_dash_shoot"
+		};
+	}
+
+	public override Projectile? getMeleeProjById(int id, Point projPos, bool addToLevel = true) {
+		// We create the headbutt melee attack ONLY when X is using x1 helmet, obviosly.
+		if (id == (int)MeleeIds.Headbutt && player.hasHelmetArmor(ArmorId.Light)) {
+			float hDamage = sprite.name.Contains("up_dash") ? 4 : 2;
+			int hFlinch = sprite.name.Contains("up_dash") ? Global.defFlinch : Global.halfFlinch;
+
+			return new GenericMeleeProj(
+				new Headbutt(), projPos, ProjIds.Headbutt, player,
+				hDamage, hFlinch, 0.5f
+			);
+		}
+
+		return id switch {
+			(int)MeleeIds.SpeedBurnerCharged => new GenericMeleeProj(
+				new SpeedBurner(player), projPos, ProjIds.SpeedBurnerCharged, player
+			),
+			(int)MeleeIds.Shoryuken => new GenericMeleeProj(
+				new ShoryukenWeapon(player), projPos, ProjIds.Shoryuken, player
+			),
+			(int)MeleeIds.X3Saber => new GenericMeleeProj(
+				new XSaber(player), projPos, ProjIds.XSaber, player
+			),
+			(int)MeleeIds.X6Saber => new GenericMeleeProj(
+				new XSaber(player), projPos, ProjIds.X6Saber, player,
+				damage: grounded ? 3 : 2, flinch: 0
+			),
+			(int)MeleeIds.NovaStrike => new GenericMeleeProj(
+				new NovaStrike(player), projPos, ProjIds.NovaStrike, player
+			),
+			(int)MeleeIds.UPGrab => new GenericMeleeProj(
+				new XUPGrab(), projPos, ProjIds.UPGrab, player, 0, 0, 0
+			),
+			(int)MeleeIds.UPPunch => new GenericMeleeProj(
+				new XUPPunch(player), projPos, ProjIds.UPPunch, player,
+				flinch: grounded ? Global.defFlinch : Global.halfFlinch
+			),
+			(int)MeleeIds.UPParryBlock => new GenericMeleeProj(
+				new XUPParry(), projPos, ProjIds.UPParryBlock, player, 0, 0, 1
+			),
+			
+			_ => null
+		};
+	}
+
+	/* public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		Projectile? proj = null;
 
 		if (sprite.name.Contains("beam_saber") && sprite.name.Contains("2")) {
@@ -928,7 +1021,7 @@ public partial class MegamanX : Character {
 		}
 
 		return proj;
-	}
+	} */
 
 	public void popAllBubbles() {
 		for (int i = chargedBubbles.Count - 1; i >= 0; i--) {
@@ -945,6 +1038,9 @@ public partial class MegamanX : Character {
 
 	public override bool canCharge() {
 		if (beeSwarm != null) return false;
+		if (chargedTunnelFang != null) return false;
+		if (chargedFrostShield != null) return false;
+		if (chargedSpinningBlade != null) return false;
 		Weapon weapon = player.weapon;
 		if (weapon is RollingShield && chargedRollingShieldProj != null) return false;
 		if (stingActive) return false;

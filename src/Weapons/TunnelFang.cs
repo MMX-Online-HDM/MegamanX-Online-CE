@@ -96,23 +96,23 @@ public class TunnelFangProj : Projectile {
 
 	public override void update() {
 		base.update();
-		Helpers.decrementTime(ref sparksCooldown);
+		Helpers.decrementFrames(ref sparksCooldown);
 		exhaust.pos = pos;
 		exhaust.xDir = xDir;
 		if (state == 0) {
 			if (type == 0) {
-				if (stateTime > 0.15f) {
+				if (stateTime > 9) {
 					vel.x = 0;
 				}
 			} else if (type == 1 || type == 2) {
-				if (stateTime > 0.15f) {
+				if (stateTime > 9) {
 					vel.y = 0;
 				}
-				if (stateTime > 0.15f && stateTime < 0.3f) vel.x = 100 * xDir;
+				if (stateTime > 9 && stateTime < 18) vel.x = 100 * xDir;
 				else vel.x = 0;
 			}
-			stateTime += Global.spf;
-			if (stateTime >= 0.75f) {
+			stateTime += Global.speedMul;
+			if (stateTime >= 45) {
 				state = 1;
 			}
 		} else if (state == 1) {
@@ -123,28 +123,36 @@ public class TunnelFangProj : Projectile {
 
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
-		vel.x = 4 * xDir;
-		// To update the reduced speed.
-		if (ownedByLocalPlayer) {
-			forceNetUpdateNextFrame = true;
-		}
 
-		if (damagable is not CrackedWall) {
-			time -= Global.spf;
-			if (time < 0) time = 0;
-		}
+		if (damagable.canBeDamaged(damager.owner.alliance, damager.owner.id, projId)) {
+			if (damagable.projectileCooldown.ContainsKey(projId + "_" + owner.id) &&
+				damagable.projectileCooldown[projId + "_" + owner.id] >= damager.hitCooldown
+			) {
+				vel.x = 4 * xDir;
+				// To update the reduced speed.
+				if (ownedByLocalPlayer) {
+				forceNetUpdateNextFrame = true;
+				}
 
-		if (sparksCooldown == 0) {
-			playSound("tunnelFangDrill");
-			var sparks = new Anim(pos, "tunnelfang_sparks", xDir, null, true);
-			sparks.setzIndex(zIndex + 100);
-			sparksCooldown = 0.25f;
-		}
-		var chr = damagable as Character;
-		if (chr != null && chr.ownedByLocalPlayer && !chr.isImmuneToKnockback()) {
-			chr.vel = Point.lerp(chr.vel, Point.zero, Global.spf * 10);
-			chr.slowdownTime = 0.25f;
-		}
+				if (damagable is not CrackedWall) {
+					time -= Global.spf;
+					if (time < 0) time = 0;
+				}
+
+				if (sparksCooldown == 0) {
+					playSound("tunnelFangDrill");
+					var sparks = new Anim(pos, "tunnelfang_sparks", xDir, null, true);
+					sparks.setzIndex(zIndex + 100);
+					sparksCooldown = 15;
+				}
+
+				var chr = damagable as Character;
+				if (chr != null && chr.ownedByLocalPlayer && !chr.isImmuneToKnockback()) {
+					chr.vel = Point.lerp(chr.vel, Point.zero, Global.speedMul);
+					chr.slowdownTime = 0.25f;
+				}
+			}
+		}	
 	}
 
 	public override void onDestroy() {
