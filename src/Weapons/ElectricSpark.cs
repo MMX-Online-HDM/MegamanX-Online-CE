@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection.Metadata.Ecma335;
 
 namespace MMXOnline;
 
@@ -30,7 +31,7 @@ public class ElectricSpark : Weapon {
 		Player player = character.player;
 
 		if (chargeLevel < 3) {
-			new ElectricSparkProj(this, pos, xDir, player, 0, player.getNextActorNetId(), true);
+			new ElectricSparkProj(this, pos, xDir, player, 0, player.getNextActorNetId(), rpc: true);
 		} else {
 			new ElectricSparkProjChargedStart(this, pos, xDir, player, player.getNextActorNetId(), true);
 		}
@@ -41,8 +42,8 @@ public class ElectricSparkProj : Projectile {
 	public int type = 0;
 	public bool split = false;
 	public ElectricSparkProj(
-		Weapon weapon, Point pos, int xDir,
-		Player player, int type, ushort netProjId, bool rpc = false
+		Weapon weapon, Point pos, int xDir, Player player, 
+		int type, ushort netProjId, (int x, int y)? vel = null, bool rpc = false
 	) : base(
 		weapon, pos, xDir, 150, 2, player, "electric_spark",
 		Global.miniFlinch, 0, netProjId, player.ownedByLocalPlayer
@@ -50,25 +51,30 @@ public class ElectricSparkProj : Projectile {
 		projId = (int)ProjIds.ElectricSpark;
 		maxTime = 1.2f;
 
-		if (type == 1) {
+		if (type >= 1) {
 			maxTime = 0.4f;
-			vel.x = 0;
-			vel.y = 450;
+
+			if (vel != null) base.vel = new Point(vel.Value.x, vel.Value.y);
 		}
-		else if (type == 2) {
-			maxTime = 0.4f;
-			vel.x = 0;
-			vel.y = -450;
-		} 
 
 		fadeSprite = "electric_spark_fade";
 		this.type = type;
 		reflectable = true;
 		shouldShieldBlock = false;
+		canBeLocal = false;
 
 		if (rpc) {
 			byte[] extraArgs;
-			extraArgs = new byte[] { (byte)type };
+
+			if (vel != null) {
+				extraArgs = new byte[] { 
+					(byte)type, 
+					(byte)(vel.Value.x + 128),
+					(byte)(vel.Value.y + 128) };
+			} else {
+				extraArgs = new byte[] { (byte)type, (byte)(128 + xDir), 128 };
+			}
+
 			rpcCreate(pos, player, netProjId, xDir, extraArgs);
 		}
 	}
@@ -76,7 +82,8 @@ public class ElectricSparkProj : Projectile {
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new ElectricSparkProj(
 			ElectricSpark.netWeapon, arg.pos, arg.xDir, 
-			arg.player, arg.extraData[0], arg.netId
+			arg.player, arg.extraData[0], arg.netId,
+			(arg.extraData[1] - 128, arg.extraData[2] - 128)
 		);
 	}
 
@@ -89,13 +96,22 @@ public class ElectricSparkProj : Projectile {
 				return;
 			}
 
+			var normal = other?.hitData?.normal;
+            if (normal != null) {
+                if (normal.Value.x == 0) normal = new Point(-1, 0);
+                normal = ((Point)normal).leftNormal();
+            }
+
+            Point normal2 = (Point)normal;
+            normal2.multiply(speed * 3);
+
 			new ElectricSparkProj(
 				weapon, pos.clone(), xDir, damager.owner, 1,
-				Global.level.mainPlayer.getNextActorNetId(), true
+				Global.level.mainPlayer.getNextActorNetId(), ((int)normal2.x, (int)normal2.y), true
 			);
 			new ElectricSparkProj(
 				weapon, pos.clone(), xDir, damager.owner, 2,
-				Global.level.mainPlayer.getNextActorNetId(), rpc: true
+				Global.level.mainPlayer.getNextActorNetId(), ((int)normal2.x * -1, (int)normal2.y * -1), rpc: true
 			);
 		}
 	}
