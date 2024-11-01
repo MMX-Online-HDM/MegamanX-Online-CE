@@ -83,7 +83,7 @@ public partial class MegamanX : Character {
 	public bool isShootingSpecialBuster;
 
 	public Buster staticBusterWeapon = new();
-	public Buster specialBuster => (player.weapons.OfType<Buster>().FirstOrDefault() ?? staticBusterWeapon);
+	public Buster specialBuster;
 	public float WeaknessT;
 
 	public MegamanX(
@@ -94,6 +94,7 @@ public partial class MegamanX : Character {
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn
 	) {
 		charId = CharIds.X;
+		specialBuster = new Buster();
 	}
 
 	public bool canShootSpecialBuster() {
@@ -101,7 +102,7 @@ public partial class MegamanX : Character {
 			return false;
 		}
 		return isSpecialBuster() &&
-			!Buster.isNormalBuster(player.weapon) &&
+			player.weapon is not Buster &&
 			!stingActive &&
 			player.armorFlag == 0 &&
 			streamCooldown == 0;
@@ -172,7 +173,7 @@ public partial class MegamanX : Character {
 
 		Helpers.decrementTime(ref shootAnimTime);
 		if (shootAnimTime <= 0 && charState.attackCtrl && !charState.isGrabbing) {
-			if (!hasBusterProj() && !isShootingRaySplasher) {
+			if (!hasBusterProj()) {
 				changeSpriteFromName(charState.defaultSprite, false);
 				if (charState is WallSlide) {
 					frameIndex = sprite.totalFrameNum - 1;
@@ -461,7 +462,7 @@ public partial class MegamanX : Character {
 			}
 		}
 
-		if ( (isSpecialSaber() || isHyperX) && canShoot() &&
+		if ( (isSpecialSaber() || isHyperX) && !hasBusterProj() &&
 			canChangeWeapons() && player.armorFlag == 0 &&
 			specialPressed && !stingActive
 		) {
@@ -552,16 +553,12 @@ public partial class MegamanX : Character {
 		
 		if (shootCondition) {
 			if (specialPressed) {
-				int mod = player.weapon is Buster ? 2 : 1;
-				if (shootCooldown < player.weapon.fireRateFrames * 0.5f * mod) {
-					specialShoot(getChargeLevel());
-					return true;
-				}	
+				specialShoot(getChargeLevel());
+				return true;
+					
 			} else {
-				if (shootCooldown <= 0) {
-					shoot(getChargeLevel());
-					return true;
-				}
+				shoot(getChargeLevel());
+				return true;
 			}
 		}
 
@@ -621,7 +618,6 @@ public partial class MegamanX : Character {
 		//We don't use hypercharge if its cooldown is not 0.
 		if (player.weapon is HyperBuster && hyperchargeCooldown > 0) return;
 		if (!canShoot()) return;
-		if (shootCooldown > 0) return;
 
 		//Set charge level.
 		chargeLevel = stockedCharge ? 3 : chargeLevel;
@@ -668,7 +664,7 @@ public partial class MegamanX : Character {
 		//player.weapon.shoot(this, new int[] {chargeLevel});
 		shootWeapon(this, new int[] {chargeLevel}, player.weapon);
 
-		if (!player.weapon.isStream) stopCharge();
+		if (!player.weapon.isStream || chargeLevel >= 3) stopCharge();
 		else streamCooldown = 15;
 
 		//Stock Chargeshots stuff
@@ -696,14 +692,14 @@ public partial class MegamanX : Character {
 
 	public void specialShoot(int chargeLevel) {
 		chargeLevel = stockedCharge ? 3 : chargeLevel;
-		Buster buster = new Buster();
-		if (!buster.canShoot(chargeLevel, player)) return;
+		if (!specialBuster.canShoot(chargeLevel, player)) return;
 		if (!canShootSpecialBuster()) return;
+		if (!canShoot()) return;
 
 		setShootAnim();
 
-		shootCooldown = buster.fireRateFrames;
-		buster.shoot(this, new int[] {chargeLevel});
+		shootCooldown = specialBuster.fireRateFrames;
+		shootWeapon(this, new int[] {chargeLevel}, specialBuster);
 		stopCharge();
 
 		lastShotWasSpecialBuster = true;
@@ -858,7 +854,8 @@ public partial class MegamanX : Character {
 			chargedFrostShield != null || 
 			chargedTunnelFang != null ||
 			strikeChainProj != null ||
-			strikeChainChargedProj != null;
+			strikeChainChargedProj != null ||
+			isShootingRaySplasher;
 	}
 
 	public void destroyBusterProjs() {
@@ -1053,7 +1050,7 @@ public partial class MegamanX : Character {
 	}
 
 	public override bool canClimbLadder() {
-		if (hasBusterProj() || isShootingRaySplasher) {
+		if (hasBusterProj()) {
 			return false;
 		}
 		return base.canClimbLadder();
@@ -1077,10 +1074,8 @@ public partial class MegamanX : Character {
 
 	public override bool canShoot() {
 		if (isInvulnerableAttack()) return false;
-		if (chargedSpinningBlade != null) return false;
-		if (isShootingRaySplasher) return false;
-		if (chargedFrostShield != null) return false;
-		if (chargedTunnelFang != null) return false;
+		if (hasBusterProj()) return false;
+		if (shootCooldown > 0) return false;
 		if (invulnTime > 0) return false;
 
 		return base.canShoot();
