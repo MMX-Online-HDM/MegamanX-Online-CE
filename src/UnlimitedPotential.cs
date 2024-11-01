@@ -661,14 +661,17 @@ public class XRevive : CharState {
 			character.addHealth(player.maxHealth);
 
 			player.weapons.RemoveAll(w => w is not Buster);
-			if (player.weapons.Count == 0) {
+			player.weapons.Add(new RagingChargeBuster());
+			player.weaponSlot = 0;
+			
+			/* if (player.weapons.Count == 0) {
 				player.weapons.Add(new Buster());
 			}
 			var busterWeapon = player.weapons.FirstOrDefault(w => w is Buster) as Buster;
 			if (busterWeapon != null) {
 				busterWeapon.setUnpoBuster(mmx);
-			}
-			player.weaponSlot = 0;
+			} */
+			
 
 			once = true;
 			var flash = new Anim(character.pos.addxy(0, -33), "up_flash", character.xDir, player.getNextActorNetId(), true, sendRpc: true);

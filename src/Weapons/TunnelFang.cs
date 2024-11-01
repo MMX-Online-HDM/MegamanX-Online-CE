@@ -26,8 +26,8 @@ public class TunnelFang : Weapon {
 
 	public override float getAmmoUsage(int chargeLevel) {
 		if (chargeLevel < 3) {
-			if (timeSinceLastShoot != null && timeSinceLastShoot < fireRateFrames) return 1;
-			else return 2;
+			if (timeSinceLastShoot != null && timeSinceLastShoot < fireRateFrames) return 2;
+			else return 1;
 		}
 		return 8;
 	}
@@ -201,8 +201,8 @@ public class TunnelFangProjCharged : Projectile {
 			return;
 		}
 
-		character.player.weapon.addAmmo(-Global.spf * 5, character.player);
-		if (character.player.weapon.ammo <= 0) {
+		weapon.addAmmo(-Global.spf * 5, character.player);
+		if (weapon.ammo <= 0) {
 			destroySelf();
 			return;
 		}

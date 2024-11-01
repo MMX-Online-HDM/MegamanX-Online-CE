@@ -301,10 +301,6 @@ public partial class MegamanX : Character {
 			}
 		}
 
-		/* if (chargedSpinningBlade != null || chargedFrostShield != null || chargedTunnelFang != null) {
-			changeSprite("mmx_" + charState.shootSprite, true);
-		} */
-
 		if (!isHyperX) {
 			player.changeWeaponControls();
 		}
@@ -650,8 +646,8 @@ public partial class MegamanX : Character {
 		}
 		
 		//Gets ammo usage.
-		float ammoUsage = player.weapon is FireWave fw ? 
-			-fw.streamAmmoUsage(this) : -player.weapon.getAmmoUsage(chargeLevel);
+		float ammoUsage = player.weapon.specialAmmoUse ? 
+			-player.weapon.getAmmoUsageEX(chargeLevel, this) : -player.weapon.getAmmoUsage(chargeLevel);
 		//Triggers weapon cooldown.
 		shootCooldown = player.weapon is HyperBuster hb ?
 			hb.getRateOfFire(player) : player.weapon.fireRateFrames;
@@ -668,19 +664,26 @@ public partial class MegamanX : Character {
 
 		//Spends ammo and spawns the projectile.
 		player.weapon.addAmmo(ammoUsage, player);
-		player.weapon.shoot(this, new int[] {chargeLevel});
+
+		//player.weapon.shoot(this, new int[] {chargeLevel});
+		shootWeapon(this, new int[] {chargeLevel}, player.weapon);
+
 		if (!player.weapon.isStream) stopCharge();
 		else streamCooldown = 15;
 
 		//Stock Chargeshots stuff
 		//Giga buster.
+		bool updatedStock = false;
 		if (chargeLevel >= 3 && player.hasArmArmor(2)) {
 			if (player.weapon is Buster && !stockedCharge) {
 				shootCooldown = hasUltimateArmor ? 30 : 15;
 			} else shootCooldown = 30;
 	
 			stockCharge(!stockedCharge);
+			updatedStock = true;
 		}
+
+		if (!updatedStock) stockCharge(false);
 
 		//Max Buster.
 		if (chargeLevel >= 3 && player.hasGoldenArmor() && player.weapon is Buster) {
@@ -704,6 +707,26 @@ public partial class MegamanX : Character {
 		stopCharge();
 
 		lastShotWasSpecialBuster = true;
+	}
+
+	void shootWeapon(Character character, int[] args, Weapon w) {
+		switch (player.armArmorNum) {
+			case (int)ArmorId.Light:
+				w.shootLight(character, args);
+				break;
+			
+			case (int)ArmorId.Giga:
+				w.shootSecond(character, args);
+				break;
+
+			case (int)ArmorId.Max:
+				w.shootMax(character, args);
+				break;
+
+			default:
+				w.shoot(character, args);
+				break;
+		}
 	}
 
 	// Fast upgrading via command key.
@@ -1230,7 +1253,7 @@ public partial class MegamanX : Character {
 			chargedRollingShieldProj == null && 
 			!stingActive && canAffordFgMove() && 
 			hadoukenCooldownTime == 0 && player.weapon is Buster && 
-			player.fgMoveAmmo >= player.fgMoveMaxAmmo;
+			player.fgMoveAmmo >= player.fgMoveMaxAmmo && grounded;
 	}
 
 	public bool shouldDrawFgCooldown() {

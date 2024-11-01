@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace MMXOnline;
 
@@ -18,6 +19,14 @@ public class Sting : Weapon {
 		damage = "2";
 		effect = "Full Charge grants invulnerability.";
 		hitcooldown = "0";
+		specialAmmoUse = true;
+	}
+
+	public override float getAmmoUsageEX(int chargeLevel, Character character) {
+		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
+
+		if (mmx.stingActive) return 8;
+		return getAmmoUsage(chargeLevel);
 	}
 
 	public override void shoot(Character character, int[] args) {

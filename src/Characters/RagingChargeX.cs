@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace MMXOnline;
 
-public class RGX : Character {
+public class RCX : Character {
 
 	public int unpoShotCount;
 	public float upPunchCooldown;
@@ -13,7 +13,7 @@ public class RGX : Character {
 	float UPDamageCooldown;
 	public float unpoDamageMaxCooldown = 2;
 	public Projectile? unpoAbsorbedProj;
-	public RGX(
+	public RCX(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
 		bool isWarpIn = true

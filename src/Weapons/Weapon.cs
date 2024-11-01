@@ -63,6 +63,7 @@ public class Weapon {
 	public string effect = "";
 	public string Flinch = "";
 	public string FlinchCD = "";
+	public bool specialAmmoUse;
 
 	public Weapon() {
 		ammo = 32;
@@ -75,6 +76,7 @@ public class Weapon {
 		Flinch = "0";
 		FlinchCD = "0";
 		ammousage = getAmmoUsage(0);
+		specialAmmoUse = false;
 	}
 
 	public Weapon(WeaponIds index, int killFeedIndex, Damager? damager = null) {
@@ -277,15 +279,32 @@ public class Weapon {
 	// Gacel:
 	// This is to be used locally to get projectiles.
 	// A replacement of the above. Remeber to send RPCs when using this one.
+	public virtual void shoot(Actor actor, int[] args) {
+	}
 	public virtual void shoot(Character character, int[] args) {
 	}
-	public virtual void shoot(Actor actor, int[] args) {
+	public virtual void shootLight(Character character, int[] args) {
+		shoot(character, args);
+	}
+	public virtual void shootSecond(Character character, int[] args) {
+		shoot(character, args);
+	}
+	public virtual void shootMax(Character character, int[] args) {
+		shoot(character, args);
+	}
+	public virtual void shootHypercharge(Character character, int[] args) {
+		shoot(character, args);
 	}
 
 	// ToDo: Remove default values from this.
 	public virtual float getAmmoUsage(int chargeLevel) {
 		if (chargeLevel >= 3) return 8;
 		else return 1;
+	}
+
+	public virtual float getAmmoUsageEX(int chargeLevel, Character character) {
+		if (chargeLevel >= 3) return 8;
+		return 1;
 	}
 
 	public virtual void rechargeAmmo(float maxRechargeTime) {
