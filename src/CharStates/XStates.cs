@@ -188,7 +188,7 @@ public class X2ChargeShot : CharState {
 
 public class X3ChargeShot : CharState {
 	bool fired;
-	int state = 0;
+	public int state = 0;
 	bool pressFire;
 	MegamanX mmx = null!;
 	public HyperBuster? hyperBusterWeapon;

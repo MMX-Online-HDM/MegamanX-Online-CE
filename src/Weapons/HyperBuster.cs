@@ -82,7 +82,7 @@ public class HyperBuster : Weapon {
 			character.playSound("buster3X3");
 		} else {
 			if (changeToWeaponSlot(wep)) player.changeWeaponSlot(player.hyperChargeSlot);
-			wep.shoot(character, new int[] {3});
+			wep.shootHypercharge(character, new int[] {3});
 			wep.addAmmo(-wep.getAmmoUsage(3), player);
 			mmx.shootCooldown = MathF.Max(wep.fireRate, switchCooldownFrames.GetValueOrDefault());
 			if (!string.IsNullOrEmpty(wep.shootSounds[3])) {

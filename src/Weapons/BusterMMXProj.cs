@@ -35,9 +35,9 @@ public class BusterProj : Projectile {
 
 	public override void update() {
 		base.update();
-		if (System.MathF.Abs(vel.x) < 360) {
+		if (MathF.Abs(vel.x) < 360 && reflectCount == 0) {
 			vel.x += Global.spf * xDir * 900f;
-			if (System.MathF.Abs(vel.x) >= 360) {
+			if (MathF.Abs(vel.x) >= 360) {
 				vel.x = (float)xDir * 360;
 			}
 		}
@@ -94,7 +94,7 @@ public class BusterUnpoProj : Projectile {
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new BusterUnpoProj(
-			Buster.netWeapon, arg.pos, arg.xDir, 
+			RagingChargeBuster.netWeapon, arg.pos, arg.xDir, 
 			arg.player, arg.netId
 		);
 	}

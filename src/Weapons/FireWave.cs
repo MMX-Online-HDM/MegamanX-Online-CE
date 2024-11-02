@@ -22,9 +22,10 @@ public class FireWave : Weapon {
 		ammousage = 0.5;
 		effect = "Inflicts burn to enemies. DOT: 0.5/2 seconds.";
 		hitcooldown = "0.2/0.33";
+		specialAmmoUse = true;
 	}
 
-	public float streamAmmoUsage(Character character) {
+	public override float getAmmoUsageEX(int chargeLevel, Character character) {
 		if (character.chargeTime < 60) return Global.spf * 10;
 		return Global.spf * 20;
 	}

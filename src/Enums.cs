@@ -86,6 +86,7 @@ public enum WeaponIds {
 	UPParry,
 	NovaStrike,
 	X6Saber,
+	RagingChargeBuster,
 
 	// DO NOT CHANGE THE ORDER OF THESE SIGMA WEAPONS
 	Sigma,
