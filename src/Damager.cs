@@ -600,10 +600,12 @@ public class Damager {
 				else if (weakness && !isShotgunIceAndFrozen && mmx?.WeaknessT <= 0) {
 					victim?.playSound("weakness");
 					if (!character.charState.superArmor) {
-						// Put a cooldown of 0.75s.
+						// Put a cooldown of 0.75s minimum.
 						if (flinchCooldown * 60 < 45) {
-							mmx.WeaknessT = 45f;
-						} else {
+							mmx.WeaknessT = 45;
+						}
+						// Set weakness cooldown to the same time as flinch cooldown.
+						else {
 							mmx.WeaknessT = MathF.Ceiling(flinchCooldown * 60);
 						}
 						if (flinch < Global.halfFlinch) {
