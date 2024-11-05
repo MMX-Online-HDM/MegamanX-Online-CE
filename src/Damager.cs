@@ -722,12 +722,11 @@ public class Damager {
 					if (maverick.player.isTagTeam()) {
 						// Large mavericks
 						if (maverick.armorClass == Maverick.ArmorClass.Heavy) {
-							/*if (flinch <= Global.miniFlinch) {
+							if (flinch <= Global.miniFlinch) {
 								flinch = 0;
 							} else {
 								flinch = Global.miniFlinch;
-							} */
-							flinch = 0;
+							}
 						}
 						// Medium mavericks
 						else if (maverick.armorClass == Maverick.ArmorClass.Medium) {
