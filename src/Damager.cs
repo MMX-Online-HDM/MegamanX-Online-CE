@@ -290,13 +290,14 @@ public class Damager {
 			}
 			if (damagerMessage?.flinch != null) flinch = damagerMessage.flinch.Value;
 			if (damagerMessage?.damage != null) damage = damagerMessage.damage.Value;
-
+			
 			if (projId == (int)ProjIds.CrystalHunter && weakness) {
 				damage = 4;
 				weakness = false;
 				flinch = 0;
 				victim?.playSound("weakness");
 			}
+			/*
 			if ((projId == (int)ProjIds.StrikeChain || projId == (int)ProjIds.StrikeChainCharged) && weakness) {
 				damage *= 2;
 				weakness = false;
@@ -318,6 +319,7 @@ public class Damager {
 				weakness = true;
 				flinch = Global.defFlinch;
 			}
+			*/
 			if (projId == (int)ProjIds.CSnailMelee && character != null && character.isCrystalized) {
 				damage *= 2;
 			}
@@ -556,6 +558,9 @@ public class Damager {
 						damage = 1;
 					}
 				}
+				if (mmx.checkWeakness((ProjIds)projId)) {
+					weakness = true;
+				}
 			}
 
 			if (!character.charState.superArmor &&
@@ -658,7 +663,10 @@ public class Damager {
 						if (character.charState.superArmor) {
 							flinch = 0;
 							//if the enemy is on super armor, negate the flinch
-						} else flinch = Global.halfFlinch; //Weakness always does Half Flinch
+						} else if (flinch < 26) {			
+							flinch = Global.halfFlinch;
+							//Weakness always does Half Flinch if is not charged.
+						} 
 						if (character.ownedByLocalPlayer) { //(idk if this thing is correctly set)
 							//set hurt state  hurtDir, if is mini flinch, do 6 frames of flinch, else do half flinch
 							character.setHurt(hurtDir, isMiniFlinch ? 6 : flinch, spiked);			
