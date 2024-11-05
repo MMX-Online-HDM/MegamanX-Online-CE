@@ -920,7 +920,74 @@ public partial class MegamanX : Character {
 
 		return false;
 	}
+	public bool checkWeakness(ProjIds projId) {
+		switch (player.weapon) {
+			case Torpedo:
+				return projId == ProjIds.RollingShield || projId == ProjIds.RollingShieldCharged;
+			case Sting:
+				return projId == ProjIds.Boomerang || projId == ProjIds.BoomerangCharged;
+			case RollingShield:
+				return projId == ProjIds.ElectricSpark || projId == ProjIds.ElectricSparkCharged ||
+					   projId == ProjIds.ElectricSparkChargedStart;
+			case FireWave:
+				return projId == ProjIds.Tornado || projId == ProjIds.TornadoCharged;
+			case Tornado:
+				return projId == ProjIds.Sting || projId == ProjIds.StingDiag;
+			case ElectricSpark:
+				return projId == ProjIds.ShotgunIce || projId == ProjIds.ShotgunIceSled || 
+					   projId == ProjIds.ShotgunIceCharged;
+			case Boomerang:
+				return projId == ProjIds.Torpedo || projId == ProjIds.TorpedoCharged;
+			case ShotgunIce:
+				return projId == ProjIds.FireWave || projId == ProjIds.FireWaveCharged ||
+					   projId == ProjIds.FireWaveChargedStart;
+			case CrystalHunter:
+				return projId == ProjIds.MagnetMine || projId == ProjIds.MagnetMineCharged;
+			case BubbleSplash:
+				return projId == ProjIds.SpinWheel || projId == ProjIds.SpinWheelCharged || 
+					   projId == ProjIds.SpinWheelChargedStart;
+			case SilkShot:
+				return projId == ProjIds.SpeedBurner || projId == ProjIds.SpeedBurnerCharged ||
+					   projId == ProjIds.SpeedBurnerWater || projId == ProjIds.SpeedBurnerTrail;
+			case SpinWheel:
+				return projId == ProjIds.StrikeChain || projId == ProjIds.StrikeChainCharged;
+			case SonicSlicer:
+				return projId == ProjIds.CrystalHunter || projId == ProjIds.CrystalHunterDash;
+			case StrikeChain:
+				return projId == ProjIds.SonicSlicer || projId == ProjIds.SonicSlicerCharged ||
+					   projId == ProjIds.SonicSlicerStart;
+			case MagnetMine:
+				return projId == ProjIds.SilkShot || projId == ProjIds.SilkShotCharged ||
+				       projId == ProjIds.SilkShotShrapnel;
+			case SpeedBurner:
+				return projId == ProjIds.BubbleSplash || projId == ProjIds.BubbleSplashCharged;
+			case AcidBurst:
+				return projId == ProjIds.FrostShield || projId == ProjIds.FrostShieldAir ||
+					   projId == ProjIds.FrostShieldCharged || projId == ProjIds.FrostShieldChargedGrounded || 
+					   projId == ProjIds.FrostShieldGround || projId == ProjIds.FrostShieldPlatform;
+			case ParasiticBomb:
+				return projId == ProjIds.GravityWell || projId == ProjIds.GravityWellCharged;
+			case TriadThunder:
+				return projId == ProjIds.TunnelFang || projId == ProjIds.TunnelFang2 || 
+					   projId == ProjIds.TunnelFangCharged;
+			case SpinningBlade:
+				return projId == ProjIds.TriadThunder || projId == ProjIds.TriadThunderBall || 
+					   projId == ProjIds.TriadThunderBeam || projId == ProjIds.TriadThunderCharged ||
+					   projId == ProjIds.TriadThunderQuake;
+			case RaySplasher:
+				return projId == ProjIds.SpinningBlade || projId == ProjIds.SpinningBladeCharged;
+			case GravityWell:
+				return projId == ProjIds.RaySplasher || projId == ProjIds.RaySplasherChargedProj;
+			case FrostShield:
+				return projId == ProjIds.ParasiticBomb || projId == ProjIds.ParasiticBombCharged ||
+					   projId == ProjIds.ParasiticBombExplode;
+			case TunnelFang:
+				return projId == ProjIds.AcidBurst || projId == ProjIds.AcidBurstCharged || 
+					   projId == ProjIds.AcidBurstSmall || projId == ProjIds.AcidBurstPoison;
+		}
 
+		return false;
+	}
 	public enum MeleeIds {
 		None = -1,
 		Headbutt,
