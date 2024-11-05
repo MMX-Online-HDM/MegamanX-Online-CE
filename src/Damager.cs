@@ -601,7 +601,11 @@ public class Damager {
 					victim?.playSound("weakness");
 					if (!character.charState.superArmor) {
 						// Put a cooldown of 0.75s.
-						mmx.WeaknessT = 45f;
+						if (flinchCooldown * 60 < 45) {
+							mmx.WeaknessT = 45f;
+						} else {
+							mmx.WeaknessT = MathF.Ceiling(flinchCooldown * 60);
+						}
 						if (flinch < Global.halfFlinch) {
 							flinch = Global.halfFlinch;
 						}
