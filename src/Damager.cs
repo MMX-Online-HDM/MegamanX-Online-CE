@@ -296,7 +296,6 @@ public class Damager {
 
 		// Character section
 		bool spiked = false;
-		bool playHurtSound = false;
 		if (character != null) {
 			MegamanX? mmx = character as MegamanX;
 
@@ -325,7 +324,6 @@ public class Damager {
 
 			if (character.isAlwaysHeadshot() && (projId == (int)ProjIds.RevolverBarrel || projId == (int)ProjIds.AncientGun)) {
 				damage *= 1.5f;
-				playHurtSound = true;
 			}
 			if (character.ownedByLocalPlayer && character.charState.superArmor) {
 				flinch = 0;

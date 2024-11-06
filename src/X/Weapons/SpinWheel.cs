@@ -4,7 +4,6 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class SpinWheel : Weapon {
-
 	public static SpinWheel netWeapon = new();
 
 	public SpinWheel() : base() {
@@ -20,11 +19,13 @@ public class SpinWheel : Weapon {
 		effect = "Inflicts Wince. Doesn't destroy on hit.";
 		hitcooldown = "0.2/0";
 		Flinch = "0/26";
+		maxAmmo = 16;
+		ammo = maxAmmo;
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
-		if (chargeLevel < 3) return 2;
-		return 8;
+		if (chargeLevel >= 3) { return 4; }
+		return 1;
 	}
 
 	public override void shoot(Character character, int[] args) {

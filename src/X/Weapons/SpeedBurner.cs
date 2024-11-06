@@ -4,7 +4,6 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class SpeedBurner : Weapon {
-
 	public static SpeedBurner netWeapon = new(null); 
 
 	public SpeedBurner(Player? player) : base() {

@@ -18,11 +18,13 @@ public class GravityWell : Weapon {
 		effect = "Disables Gravity to the enemy. C: Super Armor.";
 		hitcooldown = "0.5";
 		Flinch = "0/26";
+		maxAmmo = 16;
+		ammo = maxAmmo;
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
-		if (chargeLevel < 3) return 2;
-		return 8;
+		if (chargeLevel >= 3) { return 4; }
+		return 1;
 	}
 
 	public override void shoot(Character character, int[] args) {

@@ -26,14 +26,15 @@ public class BubbleSplash : Weapon {
 		ammousage = 0.5;
 		//effect = "Shoot a Stream up to 7 bubbles. C:Jump Boost.";
 		effect = "Charged: Grants Jump Boost.";
+		maxAmmo = 28;
+		ammo = maxAmmo;
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
 		if (chargeLevel >= 3) {
-			return base.getAmmoUsage(chargeLevel);
-		} else {
-			return 0.5f;// return Global.spf * 10;
+			return 7;
 		}
+		return 0.45f;
 	}
 
 	public override bool canShoot(int chargeLevel, Player player) {

@@ -28,7 +28,7 @@ public class GigaCrush : Weapon {
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
-		return 32;
+		return 28;
 	}
 
 	public override bool canShoot(int chargeLevel, Player player) {

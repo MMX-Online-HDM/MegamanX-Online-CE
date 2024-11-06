@@ -136,9 +136,6 @@ public class GenericMeleeProj : Projectile {
 		}
 		string SaberShotFade = "zsaber_shot_fade";
 		string SaberSlashFade = "zsaber_slash_fade";
-		string SparkVerticalFade = "sword_sparks_vertical";
-		//string SparkElectricFade = "tunnelfang_sparks";
-		//string PunchSpark = "sword_sparks_horizontal";
 		if (ownedByLocalPlayer) {
 			if (isZSaberEffect() || projId == (int)ProjIds.X6Saber || projId == (int)ProjIds.XSaber) {
 				new Anim(hitPoint.Value, SaberShotFade, xDir,

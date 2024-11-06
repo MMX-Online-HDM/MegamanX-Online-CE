@@ -19,13 +19,13 @@ public class TriadThunder : Weapon {
 		hitcooldown = "0.5/0.5-1";
 		Flinch = "6/26";
 		FlinchCD = "2.25/0";
+		maxAmmo = 10;
+		ammo = maxAmmo;
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
-		if (chargeLevel >= 3) {
-			return 8;
-		}
-		return 3;
+		if (chargeLevel >= 3) { return 2.5f; }
+		return 1;
 	}
 
 	public override void shoot(Character character, int[] args) {

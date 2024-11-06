@@ -23,11 +23,15 @@ public class FireWave : Weapon {
 		effect = "Inflicts burn to enemies. DOT: 0.5/2 seconds.";
 		hitcooldown = "0.2/0.33";
 		specialAmmoUse = true;
+		maxAmmo = 28;
+		ammo = maxAmmo;
 	}
 
-	public override float getAmmoUsageEX(int chargeLevel, Character character) {
-		if (character.chargeTime < 60) return Global.spf * 10;
-		return Global.spf * 20;
+	public override float getAmmoUsage(int chargeLevel) {
+		if (chargeLevel >= 3) {
+			return 7;
+		}
+		return 0.15f;
 	}
 
 	public override void shoot(Character character, int[] args) {

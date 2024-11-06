@@ -18,11 +18,13 @@ public class FrostShield : Weapon {
 		damage = "2+2/3+3";
 		hitcooldown = "0-0.5/1";
 		Flinch = "0/26-26";
+		maxAmmo = 16;
+		ammo = maxAmmo;
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
-		if (chargeLevel < 3) return 2;
-		return 8;
+		if (chargeLevel >= 3) { return 4; }
+		return 1;
 	}
 
 	public override void shoot(Character character, int[] args) {

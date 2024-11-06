@@ -1469,7 +1469,6 @@ class Program {
 		decimal deltaTime = 0;
 		decimal lastUpdateTime = 0;
 		decimal fpsLimit = (TimeSpan.TicksPerSecond / 60m);
-		bool exit = false;
 		Color clearColor = Color.Black;
 		Stopwatch watch = new Stopwatch();
 		int pos = textures.Length - 1;

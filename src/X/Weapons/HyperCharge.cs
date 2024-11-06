@@ -5,7 +5,6 @@ namespace MMXOnline;
 
 public class HyperCharge : Weapon {
 	public const float ammoUsage = 7;
-	public const float weaponAmmoUsage = 8;
 
 	public HyperCharge() : base() {
 		index = (int)WeaponIds.HyperCharge;
@@ -29,7 +28,7 @@ public class HyperCharge : Weapon {
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
-		return ammoUsage;
+		return 7;
 	}
 
 	public float getChipFactoredAmmoUsage(Player player) {

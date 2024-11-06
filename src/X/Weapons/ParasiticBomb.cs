@@ -4,7 +4,6 @@ using System.Linq;
 namespace MMXOnline;
 
 public class ParasiticBomb : Weapon {
-
 	public static ParasiticBomb netWeapon = new();
 	public static float carryRange = 120;
 	public static float beeRange = 120;
@@ -23,6 +22,11 @@ public class ParasiticBomb : Weapon {
 		hitcooldown = "0/0.5";
 		Flinch = "26-CarryT/26";
 		FlinchCD = "iwish";
+	}
+	
+	public override float getAmmoUsage(int chargeLevel) {
+		if (chargeLevel >= 3) { return 0.5f; }
+		return 1;
 	}
 
 	public override bool canShoot(int chargeLevel, Player player) {
@@ -45,11 +49,6 @@ public class ParasiticBomb : Weapon {
 				mmx.beeSwarm = new BeeSwarm(mmx);
 			}
 		}
-	}
-
-	public override float getAmmoUsage(int chargeLevel) {
-		if (chargeLevel < 3) return 1;
-		else return 2;
 	}
 }
 
@@ -171,13 +170,12 @@ public class BeeSwarm {
 	public BeeSwarm(MegamanX mmx) {
 		this.mmx = mmx;
 
-		beeCursors = new List<BeeCursorAnim>()
-		{
-				new BeeCursorAnim(getCursorStartPos(0), mmx),
-				new BeeCursorAnim(getCursorStartPos(1), mmx),
-				new BeeCursorAnim(getCursorStartPos(2), mmx),
-				new BeeCursorAnim(getCursorStartPos(3), mmx),
-			};
+		beeCursors = new List<BeeCursorAnim>() {
+			new BeeCursorAnim(getCursorStartPos(0), mmx),
+			new BeeCursorAnim(getCursorStartPos(1), mmx),
+			new BeeCursorAnim(getCursorStartPos(2), mmx),
+			new BeeCursorAnim(getCursorStartPos(3), mmx),
+		};
 	}
 
 	public Point getCursorStartPos(int index) {
@@ -304,7 +302,7 @@ public class BeeCursorAnim : Anim {
 						character.chargeTime = 0;
 						new ParasiticBombProjCharged(new ParasiticBomb(), character.getShootPos(), character.pos.x - target.getCenterPos().x < 0 ? 1 : -1, character.player, character.player.getNextActorNetId(), target, rpc: true);
 					}	
-				}			
+				}
 			}
 		}
 	}

@@ -19,11 +19,13 @@ public class HomingTorpedo : Weapon {
 		effect = "A Homing Torpedo.. yeah.";
 		hitcooldown = "0";
 		Flinch = "0/13";
+		maxAmmo = 16;
+		ammo = maxAmmo;
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
-		if (chargeLevel < 3) return 2;
-		return base.getAmmoUsage(chargeLevel);
+		if (chargeLevel >= 3) { return 4; }
+		return 1;
 	}
 
 	public override void shoot(Character character, int[] args) {

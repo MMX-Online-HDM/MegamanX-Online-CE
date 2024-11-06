@@ -3,7 +3,8 @@
 namespace MMXOnline;
 
 public class NovaStrike : Weapon {
-	public const float ammoUsage = 16;
+	public const float ammoUsage = 14;
+
 	public NovaStrike(Player? player) : base() {
 		if (player != null) {
 			damager = new Damager(player, 4, Global.defFlinch, 0.5f);
@@ -15,7 +16,7 @@ public class NovaStrike : Weapon {
 		weaponBarIndex = 36;
 		weaponSlotIndex = 95;
 		killFeedIndex = 104;
-		ammo = 32;
+		ammo = 28;
 		drawGrayOnLowAmmo = true;
 		drawRoundedDown = true;
 	}

@@ -6,7 +6,6 @@ using SFML.Graphics;
 namespace MMXOnline;
 
 public class SpinningBlade : Weapon {
-
 	public static SpinningBlade netWeapon = new();
 
 	public SpinningBlade() : base() {
@@ -23,6 +22,13 @@ public class SpinningBlade : Weapon {
 		hitcooldown = "0/0.5";
 		Flinch = "0/26";
 		FlinchCD = "0/1";
+		maxAmmo = 16;
+		ammo = maxAmmo;
+	}
+
+	public override float getAmmoUsage(int chargeLevel) {
+		if (chargeLevel >= 3) { return 4; }
+		return 1;
 	}
 
 	public override void shoot(Character character, int[] args) {
@@ -41,11 +47,6 @@ public class SpinningBlade : Weapon {
 				mmx.chargedSpinningBlade = csb;
 			}
 		}
-	}
-
-	public override float getAmmoUsage(int chargeLevel) {
-		if (chargeLevel < 3) return 2;
-		return base.getAmmoUsage(chargeLevel);
 	}
 }
 
