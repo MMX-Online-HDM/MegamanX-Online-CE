@@ -3,7 +3,6 @@
 namespace MMXOnline;
 
 public class RollingShield : Weapon {
-
 	public static RollingShield netWeapon = new();
 
 	public RollingShield() : base() {

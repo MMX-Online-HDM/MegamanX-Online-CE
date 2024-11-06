@@ -4,7 +4,6 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class SonicSlicer : Weapon {
-
 	public static SonicSlicer netWeapon = new();
 
 	public SonicSlicer() : base() {
