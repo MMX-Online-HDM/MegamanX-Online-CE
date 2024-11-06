@@ -4,7 +4,6 @@ using System.Linq;
 namespace MMXOnline;
 
 public class MagnetMine : Weapon {
-
 	public static MagnetMine netWeapon = new(); 
 	public const int maxMinesPerPlayer = 10;
 

@@ -22,8 +22,8 @@ public class BoomerangKuwanger : Maverick {
 
 		weapon = new Weapon(WeaponIds.BoomerangKGeneric, 97);
 
-		awardWeaponId = WeaponIds.Boomerang;
-		weakWeaponId = WeaponIds.Torpedo;
+		awardWeaponId = WeaponIds.BoomerangCutter;
+		weakWeaponId = WeaponIds.HomingTorpedo;
 		weakMaverickWeaponId = WeaponIds.LaunchOctopus;
 
 		netActorCreateId = NetActorCreateId.BoomerangKuwanger;

@@ -17,8 +17,8 @@ public class StormEagle : Maverick {
 
 		weapon = new Weapon(WeaponIds.StormEGeneric, 99);
 
-		awardWeaponId = WeaponIds.Tornado;
-		weakWeaponId = WeaponIds.Sting;
+		awardWeaponId = WeaponIds.StormTornado;
+		weakWeaponId = WeaponIds.ChameleonSting;
 		weakMaverickWeaponId = WeaponIds.StingChameleon;
 
 		netActorCreateId = NetActorCreateId.StormEagle;

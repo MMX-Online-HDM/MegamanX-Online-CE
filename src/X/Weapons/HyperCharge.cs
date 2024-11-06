@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 namespace MMXOnline;
 
-public class HyperBuster : Weapon {
+public class HyperCharge : Weapon {
 	public const float ammoUsage = 7;
 	public const float weaponAmmoUsage = 8;
 
-	public HyperBuster() : base() {
-		index = (int)WeaponIds.HyperBuster;
+	public HyperCharge() : base() {
+		index = (int)WeaponIds.HyperCharge;
 		killFeedIndex = 48;
 		weaponBarBaseIndex = 32;
 		weaponBarIndex = 31;
@@ -38,7 +38,7 @@ public class HyperBuster : Weapon {
 
 	public static float getRateofFireMod(Player player) {
 		if (player != null && player.hyperChargeSlot < player.weapons.Count &&
-			player.weapons[player.hyperChargeSlot] is Buster && !player.hasUltimateArmor()
+			player.weapons[player.hyperChargeSlot] is XBuster && !player.hasUltimateArmor()
 		) {
 			return 0.75f;
 		}
@@ -65,11 +65,11 @@ public class HyperBuster : Weapon {
 
 	bool changeToWeaponSlot(Weapon wep) {
 		return wep is
-			Sting or
+			ChameleonSting or
 			RollingShield or
 			BubbleSplash or
 			ParasiticBomb or
-			TunnelFang;
+			TornadoFang;
 	} 
 
 	public override void shoot(Character character, int[] args) {
@@ -77,7 +77,7 @@ public class HyperBuster : Weapon {
 		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
 		Weapon wep = player.weapons[player.hyperChargeSlot];
 
-		if (wep is Buster) {
+		if (wep is XBuster) {
 			character.changeState(new X3ChargeShot(this), true);
 			character.playSound("buster3X3");
 		} else {

@@ -33,7 +33,7 @@ public class Damager {
 		{ (int)ProjIds.MechDevilBearPunch, 1 },
 		{ (int)ProjIds.MechStomp, 1 },
 		{ (int)ProjIds.MechChain, 1 },
-		{ (int)ProjIds.TunnelFangCharged, 1 },
+		{ (int)ProjIds.TornadoFangCharged, 1 },
 		{ (int)ProjIds.Headbutt, 1 },
 		{ (int)ProjIds.RocketPunch, 1 },
 		{ (int)ProjIds.InfinityGig, 1 },
@@ -499,7 +499,7 @@ public class Damager {
 					break;
 			}
 			switch (weaponIndex) {
-				case (int)WeaponIds.Boomerang:
+				case (int)WeaponIds.BoomerangCutter:
 				case (int)WeaponIds.BoomerangKBoomerang:
 					if (character.player.isX)
 						character.stingChargeTime = 0;
@@ -1030,8 +1030,8 @@ public class Damager {
 			(int)ProjIds.BoomerangCharged => true,
 			(int)ProjIds.Napalm2Flame => true,
 			(int)ProjIds.Napalm2Wall => true,
-			(int)ProjIds.TunnelFang => true,
-			(int)ProjIds.TunnelFang2 => true,
+			(int)ProjIds.TornadoFang => true,
+			(int)ProjIds.TornadoFang2 => true,
 			(int)ProjIds.GravityWell => true,
 			(int)ProjIds.SpinWheel => true,
 			(int)ProjIds.DistanceNeedler => true,

@@ -1,9 +1,9 @@
 ﻿namespace MMXOnline;
 
-public class XSaber : Weapon {
+public class ZXSaber : Weapon {
 
-	public static XSaber netWeapon = new(null!);
-	public XSaber(Player player) : base() {
+	public static ZXSaber netWeapon = new(null!);
+	public ZXSaber(Player player) : base() {
 		damager = new Damager(player, 4, Global.defFlinch, 0.25f);
 		index = (int)WeaponIds.XSaber;
 		weaponBarBaseIndex = 21;
@@ -31,7 +31,7 @@ public class XSaberProj : Projectile {
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new XSaberProj(
-			XSaber.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
+			ZXSaber.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
 		);
 	}
 }
@@ -52,7 +52,7 @@ public class XSaberState : CharState {
 			fired = true;
 			character.playSound("zerosaberx3");
 			new XSaberProj(
-				new XSaber(player), character.pos.addxy(20 * character.xDir, -20), 
+				new ZXSaber(player), character.pos.addxy(20 * character.xDir, -20), 
 				character.xDir, player, player.getNextActorNetId(), rpc: true
 			);
 		}

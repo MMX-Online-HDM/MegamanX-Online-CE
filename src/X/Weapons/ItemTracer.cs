@@ -4,7 +4,6 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class ItemTracer : Weapon {
-
 	public static ItemTracer netWeapon = new();
 
 	public ItemTracer() : base() {

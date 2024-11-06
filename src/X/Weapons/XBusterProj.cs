@@ -28,7 +28,7 @@ public class BusterProj : Projectile {
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new BusterProj(
-			Buster.netWeapon, arg.pos, arg.xDir, 
+			XBuster.netWeapon, arg.pos, arg.xDir, 
 			arg.extraData[0], arg.player, arg.netId
 		);
 	}
@@ -66,7 +66,7 @@ public class Buster2Proj : Projectile {
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new Buster2Proj(
-			Buster.netWeapon, arg.pos, arg.xDir, 
+			XBuster.netWeapon, arg.pos, arg.xDir, 
 			arg.player, arg.netId
 		);
 	}
@@ -163,7 +163,7 @@ public class Buster3Proj : Projectile {
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new Buster3Proj(
-			Buster.netWeapon, arg.pos, arg.xDir, 
+			XBuster.netWeapon, arg.pos, arg.xDir, 
 			arg.extraData[0], arg.player, arg.netId
 		);
 	}
@@ -248,7 +248,7 @@ public class Buster4Proj : Projectile {
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new Buster4Proj(
-			Buster.netWeapon, arg.pos, arg.xDir, arg.player,
+			XBuster.netWeapon, arg.pos, arg.xDir, arg.player,
 			arg.extraData[0], arg.extraData[1], arg.netId
 		);
 	}
@@ -294,7 +294,7 @@ public class BusterX3Proj2 : Projectile {
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new BusterX3Proj2(
-			Buster.netWeapon, arg.pos, arg.xDir, 
+			XBuster.netWeapon, arg.pos, arg.xDir, 
 			arg.extraData[0], arg.player, arg.netId
 		);
 	}
@@ -339,7 +339,7 @@ public class BusterPlasmaProj : Projectile {
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new BusterPlasmaProj(
-			Buster.netWeapon, arg.pos, arg.xDir, 
+			XBuster.netWeapon, arg.pos, arg.xDir, 
 			arg.player, arg.netId
 		);
 	}
@@ -380,7 +380,7 @@ public class BusterPlasmaHitProj : Projectile {
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new BusterPlasmaHitProj(
-			Buster.netWeapon, arg.pos, arg.xDir, 
+			XBuster.netWeapon, arg.pos, arg.xDir, 
 			arg.player, arg.netId
 		);
 	}

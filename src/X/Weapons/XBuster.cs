@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace MMXOnline;
-
-public class Buster : Weapon {
-	public static Buster netWeapon = new();
+public class XBuster : Weapon {
+	public static XBuster netWeapon = new();
 	public List<BusterProj> lemonsOnField = new List<BusterProj>();
 	public bool isUnpoBuster;
 
-	public Buster() : base() {
+	public XBuster() : base() {
 		index = (int)WeaponIds.Buster;
 		killFeedIndex = 0;
 		weaponBarBaseIndex = 0;
@@ -53,11 +52,11 @@ public class Buster : Weapon {
 	}
 
 	public static bool isNormalBuster(Weapon weapon) {
-		return weapon is Buster buster && !buster.isUnpoBuster;
+		return weapon is XBuster buster && !buster.isUnpoBuster;
 	}
 
 	public static bool isWeaponUnpoBuster(Weapon weapon) {
-		return weapon is Buster buster && buster.isUnpoBuster;
+		return weapon is XBuster buster && buster.isUnpoBuster;
 	}
 
 	public override bool canShoot(int chargeLevel, Player player) {

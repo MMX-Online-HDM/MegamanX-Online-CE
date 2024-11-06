@@ -3,7 +3,6 @@
 namespace MMXOnline;
 
 public class GravityWell : Weapon {
-
 	public static GravityWell netWeapon = new();
 
 	public GravityWell() : base() {

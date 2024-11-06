@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection.Metadata.Ecma335;
 
 namespace MMXOnline;
 
 public class ElectricSpark : Weapon {
-
 	public static ElectricSpark netWeapon = new();
+
 	public ElectricSpark() : base() {
 		index = (int)WeaponIds.ElectricSpark;
 		killFeedIndex = 6;

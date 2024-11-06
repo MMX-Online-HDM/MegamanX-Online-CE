@@ -46,7 +46,7 @@ public class XLoadout {
 		indices.Add((byte)weapon1);
 		indices.Add((byte)weapon2);
 		indices.Add((byte)weapon3);
-		if (player.hasArmArmor(3)) indices.Add((int)WeaponIds.HyperBuster);
+		if (player.hasArmArmor(3)) indices.Add((int)WeaponIds.HyperCharge);
 		if (player.hasBodyArmor(2)) indices.Add((int)WeaponIds.GigaCrush);
 		if (player.hasUltimateArmor()) indices.Add((int)WeaponIds.NovaStrike);
 

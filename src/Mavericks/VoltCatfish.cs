@@ -23,7 +23,7 @@ public class VoltCatfish : Maverick {
 		meleeWeapon = getMeleeWeapon(player);
 
 		awardWeaponId = WeaponIds.TriadThunder;
-		weakWeaponId = WeaponIds.TunnelFang;
+		weakWeaponId = WeaponIds.TornadoFang;
 		weakMaverickWeaponId = WeaponIds.TunnelRhino;
 
 		netActorCreateId = NetActorCreateId.VoltCatfish;

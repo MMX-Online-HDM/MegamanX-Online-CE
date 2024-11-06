@@ -87,7 +87,7 @@ public class Weapon {
 	public static List<Weapon> getAllSwitchableWeapons(AxlLoadout axlLoadout) {
 		var weaponList = new List<Weapon>() {
 			new GigaCrush(),
-			new HyperBuster(),
+			new HyperCharge(),
 			new NovaStrike(null),
 			new DoubleBullet(),
 			new DNACore(),
@@ -147,14 +147,14 @@ public class Weapon {
 	public static List<Weapon> getAllXWeapons() {
 		return new List<Weapon>()
 		{
-				new Buster(),
-				new Torpedo(),
-				new Sting(),
+				new XBuster(),
+				new HomingTorpedo(),
+				new ChameleonSting(),
 				new RollingShield(),
 				new FireWave(),
-				new Tornado(),
+				new StormTornado(),
 				new ElectricSpark(),
-				new Boomerang(),
+				new BoomerangCutter(),
 				new ShotgunIce(),
 				new CrystalHunter(),
 				new BubbleSplash(),
@@ -171,7 +171,7 @@ public class Weapon {
 				new RaySplasher(),
 				new GravityWell(),
 				new FrostShield(),
-				new TunnelFang(),
+				new TornadoFang(),
 			};
 	}
 

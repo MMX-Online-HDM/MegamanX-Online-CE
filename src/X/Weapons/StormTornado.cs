@@ -3,16 +3,16 @@ using System.Collections.Generic;
 
 namespace MMXOnline;
 
-public class Tornado : Weapon {
+public class StormTornado : Weapon {
 
-	public static Tornado netWeapon = new();
-	public Tornado() : base() {
-		index = (int)WeaponIds.Tornado;
+	public static StormTornado netWeapon = new();
+	public StormTornado() : base() {
+		index = (int)WeaponIds.StormTornado;
 		killFeedIndex = 5;
 		weaponBarBaseIndex = 5;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 5;
-		weaknessIndex = (int)WeaponIds.Sting;
+		weaknessIndex = (int)WeaponIds.ChameleonSting;
 		shootSounds = new string[] { "tornado", "tornado", "tornado", "buster3" };
 		fireRate = 120;
 		//switchCooldown = 0.5f;
@@ -85,7 +85,7 @@ public class TornadoProj : Projectile {
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new TornadoProj(
-			Tornado.netWeapon, arg.pos, arg.xDir, 
+			StormTornado.netWeapon, arg.pos, arg.xDir, 
 			false, arg.player, arg.netId
 		);
 	}
@@ -185,7 +185,7 @@ public class TornadoProjCharged : Projectile {
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new TornadoProjCharged(
-			Tornado.netWeapon, arg.pos, arg.xDir, 
+			StormTornado.netWeapon, arg.pos, arg.xDir, 
 			arg.player, arg.netId
 		);
 	}

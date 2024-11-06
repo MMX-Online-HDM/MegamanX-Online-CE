@@ -3,16 +3,16 @@ using System.Collections.Generic;
 
 namespace MMXOnline;
 
-public class Sting : Weapon {
+public class ChameleonSting : Weapon {
+	public static ChameleonSting netWeapon = new();
 
-	public static Sting netWeapon = new();
-	public Sting() : base() {
-		index = (int)WeaponIds.Sting;
+	public ChameleonSting() : base() {
+		index = (int)WeaponIds.ChameleonSting;
 		killFeedIndex = 2;
 		weaponBarBaseIndex = 2;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 2;
-		weaknessIndex = (int)WeaponIds.Boomerang;
+		weaknessIndex = (int)WeaponIds.BoomerangCutter;
 		shootSounds = new string[] { "csting", "csting", "csting", "stingCharge" };
 		fireRate = 45;
 		damage = "2";
@@ -86,7 +86,7 @@ public class StingProj : Projectile {
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new StingProj(
-			Sting.netWeapon, arg.pos, arg.xDir, 
+			ChameleonSting.netWeapon, arg.pos, arg.xDir, 
 			arg.player, arg.extraData[0], arg.netId
 		);
 	}

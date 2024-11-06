@@ -24,7 +24,7 @@ public partial class MegamanX : Character {
 	public GravityWellProjCharged? chargedGravityWell;
 	public SpinningBladeProjCharged? chargedSpinningBlade;
 	public FrostShieldProjCharged? chargedFrostShield;
-	public TunnelFangProjCharged? chargedTunnelFang;
+	public TornadoFangProjCharged? chargedTornadoFang;
 	public GravityWellProj? gravityWell;
 	public int totalChipHealAmount;
 	public const int maxTotalChipHealAmount = 32;
@@ -82,8 +82,8 @@ public partial class MegamanX : Character {
 
 	public bool isShootingSpecialBuster;
 
-	public Buster staticBusterWeapon = new();
-	public Buster specialBuster;
+	public XBuster staticBusterWeapon = new();
+	public XBuster specialBuster;
 	public float WeaknessT;
 
 	public MegamanX(
@@ -94,7 +94,7 @@ public partial class MegamanX : Character {
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn
 	) {
 		charId = CharIds.X;
-		specialBuster = new Buster();
+		specialBuster = new XBuster();
 	}
 
 	public bool canShootSpecialBuster() {
@@ -102,7 +102,7 @@ public partial class MegamanX : Character {
 			return false;
 		}
 		return isSpecialBuster() &&
-			player.weapon is not Buster &&
+			player.weapon is not XBuster &&
 			!stingActive &&
 			player.armorFlag == 0 &&
 			streamCooldown == 0;
@@ -127,7 +127,7 @@ public partial class MegamanX : Character {
 			addRenderEffect(RenderEffectType.ChargeGreen, 0.05f, 0.1f);
 		}
 		if (stockedX3Buster) {
-			if (player.weapon is not Buster) {
+			if (player.weapon is not XBuster) {
 				stockedX3Buster = false;
 			} else {
 				addRenderEffect(RenderEffectType.ChargeOrange, 0.05f, 0.1f);
@@ -615,7 +615,7 @@ public partial class MegamanX : Character {
 		//We don't shoot if we have no ammo.
 		if (!player.weapon.canShoot(chargeLevel, player)) return;
 		//We don't use hypercharge if its cooldown is not 0.
-		if (player.weapon is HyperBuster && hyperchargeCooldown > 0) return;
+		if (player.weapon is HyperCharge && hyperchargeCooldown > 0) return;
 		if (!canShoot()) return;
 
 		//Set charge level.
@@ -644,13 +644,13 @@ public partial class MegamanX : Character {
 		float ammoUsage = player.weapon.specialAmmoUse ? 
 			-player.weapon.getAmmoUsageEX(chargeLevel, this) : -player.weapon.getAmmoUsage(chargeLevel);
 		//Triggers weapon cooldown.
-		shootCooldown = player.weapon is HyperBuster hb ?
+		shootCooldown = player.weapon is HyperCharge hb ?
 			hb.getRateOfFire(player) : player.weapon.fireRate;
 		//Triggers hypercharge special cooldown if used.
-		if (player.weapon is HyperBuster h) hyperchargeCooldown = h.getRateOfFire(player);
+		if (player.weapon is HyperCharge h) hyperchargeCooldown = h.getRateOfFire(player);
 		//Triggers hypercharge special cooldown when shooting a charged shot.
-		if (chargeLevel >= 2 && player.weapons.Any(w => w is HyperBuster b)) {
-			var hbWep = player.weapons.FirstOrDefault(w => w is HyperBuster) as HyperBuster;
+		if (chargeLevel >= 2 && player.weapons.Any(w => w is HyperCharge b)) {
+			var hbWep = player.weapons.FirstOrDefault(w => w is HyperCharge) as HyperCharge;
 			if (hbWep != null) {
 				hyperchargeCooldown = hbWep.getRateOfFire(player);
 			}
@@ -670,7 +670,7 @@ public partial class MegamanX : Character {
 		//Giga buster.
 		bool updatedStock = false;
 		if (chargeLevel >= 3 && player.hasArmArmor(2)) {
-			if (player.weapon is Buster && !stockedCharge) {
+			if (player.weapon is XBuster && !stockedCharge) {
 				shootCooldown = hasUltimateArmor ? 30 : 15;
 			} else shootCooldown = 30;
 	
@@ -681,7 +681,7 @@ public partial class MegamanX : Character {
 		if (!updatedStock) stockCharge(false);
 
 		//Max Buster.
-		if (chargeLevel >= 3 && player.hasGoldenArmor() && player.weapon is Buster) {
+		if (chargeLevel >= 3 && player.hasGoldenArmor() && player.weapon is XBuster) {
 			stockSaber(true);
 			xSaberCooldown = 40;
 		}
@@ -841,7 +841,7 @@ public partial class MegamanX : Character {
 	public void removeBusterProjs() {
 		chargedSpinningBlade = null;
 		chargedFrostShield = null;
-		chargedTunnelFang = null;
+		chargedTornadoFang = null;
 		strikeChainProj = null;
 		strikeChainChargedProj = null;
 		changeSprite("mmx_" + charState.sprite, true);
@@ -851,7 +851,7 @@ public partial class MegamanX : Character {
 		return 
 			chargedSpinningBlade != null || 
 			chargedFrostShield != null || 
-			chargedTunnelFang != null ||
+			chargedTornadoFang != null ||
 			strikeChainProj != null ||
 			strikeChainChargedProj != null ||
 			isShootingRaySplasher;
@@ -860,26 +860,26 @@ public partial class MegamanX : Character {
 	public void destroyBusterProjs() {
 		chargedSpinningBlade?.destroySelf();
 		chargedFrostShield?.destroySelf();
-		chargedTunnelFang?.destroySelf();
+		chargedTornadoFang?.destroySelf();
 		strikeChainProj?.destroySelf();
 		strikeChainChargedProj?.destroySelf();
 	}
 
 	public bool checkMaverickWeakness(ProjIds projId) {
 		switch (player.weapon) {
-			case Torpedo:
+			case HomingTorpedo:
 				return projId == ProjIds.ArmoredARoll;
-			case Sting:
+			case ChameleonSting:
 				return projId == ProjIds.BoomerangKBoomerang;
 			case RollingShield:
 				return projId == ProjIds.SparkMSpark;
 			case FireWave:
 				return projId == ProjIds.StormETornado;
-			case Tornado:
+			case StormTornado:
 				return projId == ProjIds.StingCSting;
 			case ElectricSpark:
 				return projId == ProjIds.ChillPIcePenguin || projId == ProjIds.ChillPIceShot;
-			case Boomerang:
+			case BoomerangCutter:
 				return projId == ProjIds.LaunchOMissle || projId == ProjIds.LaunchOTorpedo;
 			case ShotgunIce:
 				return projId == ProjIds.FlameMFireball || projId == ProjIds.FlameMOilFire;
@@ -914,7 +914,7 @@ public partial class MegamanX : Character {
 				return projId == ProjIds.NeonTRaySplasher;
 			case FrostShield:
 				return projId == ProjIds.BHornetBee || projId == ProjIds.BHornetHomingBee;
-			case TunnelFang:
+			case TornadoFang:
 				return projId == ProjIds.TSeahorseAcid1 || projId == ProjIds.TSeahorseAcid2;
 		}
 
@@ -922,21 +922,21 @@ public partial class MegamanX : Character {
 	}
 	public bool checkWeakness(ProjIds projId) {
 		switch (player.weapon) {
-			case Torpedo:
+			case HomingTorpedo:
 				return projId == ProjIds.RollingShield || projId == ProjIds.RollingShieldCharged;
-			case Sting:
+			case ChameleonSting:
 				return projId == ProjIds.Boomerang || projId == ProjIds.BoomerangCharged;
 			case RollingShield:
 				return projId == ProjIds.ElectricSpark || projId == ProjIds.ElectricSparkCharged ||
 					   projId == ProjIds.ElectricSparkChargedStart;
 			case FireWave:
 				return projId == ProjIds.Tornado || projId == ProjIds.TornadoCharged;
-			case Tornado:
+			case StormTornado:
 				return projId == ProjIds.Sting || projId == ProjIds.StingDiag;
 			case ElectricSpark:
 				return projId == ProjIds.ShotgunIce || projId == ProjIds.ShotgunIceSled || 
 					   projId == ProjIds.ShotgunIceCharged;
-			case Boomerang:
+			case BoomerangCutter:
 				return projId == ProjIds.Torpedo || projId == ProjIds.TorpedoCharged;
 			case ShotgunIce:
 				return projId == ProjIds.FireWave || projId == ProjIds.FireWaveCharged ||
@@ -968,8 +968,8 @@ public partial class MegamanX : Character {
 			case ParasiticBomb:
 				return projId == ProjIds.GravityWell || projId == ProjIds.GravityWellCharged;
 			case TriadThunder:
-				return projId == ProjIds.TunnelFang || projId == ProjIds.TunnelFang2 || 
-					   projId == ProjIds.TunnelFangCharged;
+				return projId == ProjIds.TornadoFang || projId == ProjIds.TornadoFang2 || 
+					   projId == ProjIds.TornadoFangCharged;
 			case SpinningBlade:
 				return projId == ProjIds.TriadThunder || projId == ProjIds.TriadThunderBall || 
 					   projId == ProjIds.TriadThunderBeam || projId == ProjIds.TriadThunderCharged ||
@@ -981,7 +981,7 @@ public partial class MegamanX : Character {
 			case FrostShield:
 				return projId == ProjIds.ParasiticBomb || projId == ProjIds.ParasiticBombCharged ||
 					   projId == ProjIds.ParasiticBombExplode;
-			case TunnelFang:
+			case TornadoFang:
 				return projId == ProjIds.AcidBurst || projId == ProjIds.AcidBurstCharged || 
 					   projId == ProjIds.AcidBurstSmall || projId == ProjIds.AcidBurstPoison;
 		}
@@ -1044,7 +1044,7 @@ public partial class MegamanX : Character {
 			int hFlinch = sprite.name.Contains("up_dash") ? Global.defFlinch : Global.halfFlinch;
 
 			return new GenericMeleeProj(
-				new Headbutt(), projPos, ProjIds.Headbutt, player,
+				new LhHeadbutt(), projPos, ProjIds.Headbutt, player,
 				hDamage, hFlinch, 0.5f
 			);
 		}
@@ -1057,10 +1057,10 @@ public partial class MegamanX : Character {
 				new ShoryukenWeapon(player), projPos, ProjIds.Shoryuken, player
 			),
 			(int)MeleeIds.X3Saber => new GenericMeleeProj(
-				new XSaber(player), projPos, ProjIds.XSaber, player
+				new ZXSaber(player), projPos, ProjIds.XSaber, player
 			),
 			(int)MeleeIds.X6Saber => new GenericMeleeProj(
-				new XSaber(player), projPos, ProjIds.X6Saber, player,
+				new ZXSaber(player), projPos, ProjIds.X6Saber, player,
 				damage: grounded ? 3 : 2, flinch: 0
 			),
 			(int)MeleeIds.NovaStrike => new GenericMeleeProj(
@@ -1124,7 +1124,7 @@ public partial class MegamanX : Character {
 
 	public override bool canCharge() {
 		if (beeSwarm != null) return false;
-		if (chargedTunnelFang != null) return false;
+		if (chargedTornadoFang != null) return false;
 		if (chargedFrostShield != null) return false;
 		if (chargedSpinningBlade != null) return false;
 		Weapon weapon = player.weapon;
@@ -1293,11 +1293,11 @@ public partial class MegamanX : Character {
 	}
 
 	public bool hasHadoukenEquipped() {
-		return !Global.level.is1v1() && player.hasArmArmor(1) && player.hasBootsArmor(1) && player.hasHelmetArmor(1) && player.hasBodyArmor(1) && player.weapons.Any(w => w is Buster);
+		return !Global.level.is1v1() && player.hasArmArmor(1) && player.hasBootsArmor(1) && player.hasHelmetArmor(1) && player.hasBodyArmor(1) && player.weapons.Any(w => w is XBuster);
 	}
 
 	public bool hasShoryukenEquipped() {
-		return !Global.level.is1v1() && player.hasArmArmor(2) && player.hasBootsArmor(2) && player.hasHelmetArmor(2) && player.hasBodyArmor(2) && player.weapons.Any(w => w is Buster);
+		return !Global.level.is1v1() && player.hasArmArmor(2) && player.hasBootsArmor(2) && player.hasHelmetArmor(2) && player.hasBodyArmor(2) && player.weapons.Any(w => w is XBuster);
 	}
 
 	public bool hasFgMoveEquipped() {
@@ -1313,7 +1313,7 @@ public partial class MegamanX : Character {
 			!isInvulnerableAttack() && 
 			chargedRollingShieldProj == null && 
 			!stingActive && canAffordFgMove() && 
-			hadoukenCooldownTime == 0 && player.weapon is Buster && 
+			hadoukenCooldownTime == 0 && player.weapon is XBuster && 
 			player.fgMoveAmmo >= player.fgMoveMaxAmmo && grounded;
 	}
 
@@ -1338,7 +1338,7 @@ public partial class MegamanX : Character {
 					flinch = Global.defFlinch;
 				}
 				Projectile proj = new GenericMeleeProj(
-					Headbutt.netWeapon, centerPoint, ProjIds.Headbutt, player,
+					LhHeadbutt.netWeapon, centerPoint, ProjIds.Headbutt, player,
 					damage, flinch, 0.5f
 				);
 				var rect = new Rect(0, 0, 14, 4);
@@ -1408,7 +1408,7 @@ public partial class MegamanX : Character {
 		) {
 			index = 0;
 		}
-		if (index == (int)WeaponIds.HyperBuster && ownedByLocalPlayer) {
+		if (index == (int)WeaponIds.HyperCharge && ownedByLocalPlayer) {
 			index = player.weapons[player.hyperChargeSlot].index;
 		}
 		if (player.hasGoldenArmor()) {
@@ -1461,7 +1461,7 @@ public partial class MegamanX : Character {
 			return player.weapon;
 		}
 		foreach (Weapon weapon in player.weapons) {
-			if (weapon is GigaCrush or NovaStrike or HyperBuster &&
+			if (weapon is GigaCrush or NovaStrike or HyperCharge &&
 			player.weapon.ammo < player.weapon.maxAmmo
 			) {
 				return weapon;
@@ -1517,7 +1517,7 @@ public partial class MegamanX : Character {
 	}
 
 	public bool shouldShowHyperBusterCharge() {
-		return player.weapon is HyperBuster hb && hb.canShootIncludeCooldown(player) || flag != null;
+		return player.weapon is HyperCharge hb && hb.canShootIncludeCooldown(player) || flag != null;
 	}
 
 	public override bool isInvulnerable(bool ignoreRideArmorHide = false, bool factorHyperMode = false) {
@@ -1532,7 +1532,7 @@ public partial class MegamanX : Character {
 		List<byte> customData = base.getCustomActorNetData();
 
 		int weaponIndex = player.weapon.index;
-		if (weaponIndex == (int)WeaponIds.HyperBuster) {
+		if (weaponIndex == (int)WeaponIds.HyperCharge) {
 			weaponIndex = player.weapons[player.hyperChargeSlot].index;
 		}
 		customData.Add((byte)weaponIndex);

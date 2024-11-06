@@ -3,16 +3,16 @@ using System.Collections.Generic;
 
 namespace MMXOnline;
 
-public class Boomerang : Weapon {
-	public static Boomerang netWeapon = new Boomerang();
+public class BoomerangCutter : Weapon {
+	public static BoomerangCutter netWeapon = new BoomerangCutter();
 
-	public Boomerang() : base() {
-		index = (int)WeaponIds.Boomerang;
+	public BoomerangCutter() : base() {
+		index = (int)WeaponIds.BoomerangCutter;
 		killFeedIndex = 7;
 		weaponBarBaseIndex = 7;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 7;
-		weaknessIndex = (int)WeaponIds.Torpedo;
+		weaknessIndex = (int)WeaponIds.HomingTorpedo;
 		shootSounds = new string[] { "boomerang", "boomerang", "boomerang", "buster3" };
 		fireRate = 30;
 		damage = "2/2";
@@ -98,7 +98,7 @@ public class BoomerangProj : Projectile {
 				pickup.changePos(character.getCenterPos());
 			}
 			destroySelf();
-			if (character.player.weapon is Boomerang) {
+			if (character.player.weapon is BoomerangCutter) {
 				if (character.player.hasChip(3)) character.player.weapon.ammo += 0.5f;
 				else character.player.weapon.ammo++;
 			}
@@ -148,7 +148,7 @@ public class BoomerangProj : Projectile {
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new BoomerangProj(
-			Boomerang.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId, arg.extraData[0] - 1
+			BoomerangCutter.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId, arg.extraData[0] - 1
 		);
 	}
 }
@@ -191,7 +191,7 @@ public class BoomerangProjCharged : Projectile {
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new BoomerangProjCharged(
-			Boomerang.netWeapon, arg.pos, null, arg.xDir, arg.player,
+			BoomerangCutter.netWeapon, arg.pos, null, arg.xDir, arg.player,
 			arg.angle, arg.extraData[0], arg.netId, null
 		);
 	}

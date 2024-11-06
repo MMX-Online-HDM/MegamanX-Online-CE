@@ -67,19 +67,19 @@ public partial class RPCCreateProj : RPC {
 				proj = new ZSaberProj(pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.XSaberProj:
-				proj = new XSaberProj(new XSaber(player), pos, xDir, player, netProjByte);
+				proj = new XSaberProj(new ZXSaber(player), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.Buster3:
-				proj = new Buster3Proj(new Buster(), pos, xDir, extraData[0], player, netProjByte);
+				proj = new Buster3Proj(new XBuster(), pos, xDir, extraData[0], player, netProjByte);
 				break;
 			case (int)ProjIds.BusterX3Proj2:
-				proj = new BusterX3Proj2(new Buster(), pos, xDir, extraData[0], player, netProjByte);
+				proj = new BusterX3Proj2(new XBuster(), pos, xDir, extraData[0], player, netProjByte);
 				break;
 			case (int)ProjIds.BusterX3Plasma:
-				proj = new BusterPlasmaProj(new Buster(), pos, xDir, player, netProjByte);
+				proj = new BusterPlasmaProj(new XBuster(), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.BusterX3PlasmaHit:
-				proj = new BusterPlasmaHitProj(new Buster(), pos, xDir, player, netProjByte);
+				proj = new BusterPlasmaHitProj(new XBuster(), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.ZBuster:
 				proj = new BusterProj(new ZeroBuster(), pos, xDir, 1, player, netProjByte);
@@ -95,7 +95,7 @@ public partial class RPCCreateProj : RPC {
 				break;
 			case (int)ProjIds.Sting:
 			case (int)ProjIds.StingDiag:
-				proj = new StingProj(new Sting(), pos, xDir, player, extraData[0], netProjByte);
+				proj = new StingProj(new ChameleonSting(), pos, xDir, player, extraData[0], netProjByte);
 				break;
 			case (int)ProjIds.FireWaveCharged:
 				proj = new FireWaveProjCharged(new FireWave(), pos, xDir, player, 0, netProjByte, 0);
@@ -254,8 +254,8 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.FrostShieldChargedPlatform:
 				proj = new FrostShieldProjPlatform(new FrostShield(), pos, xDir, player, netProjByte);
 				break;
-			case (int)ProjIds.TunnelFang or (int)ProjIds.TunnelFang2:
-				proj = new TunnelFangProj(new TunnelFang(), pos, xDir, extraData[0], player, netProjByte);
+			case (int)ProjIds.TornadoFang or (int)ProjIds.TornadoFang2:
+				proj = new TornadoFangProj(new TornadoFang(), pos, xDir, extraData[0], player, netProjByte);
 				break;
 			case (int)ProjIds.SplashLaser:
 				proj = new SplashLaserProj(new RayGun(0), pos, player, bulletDir, netProjByte);

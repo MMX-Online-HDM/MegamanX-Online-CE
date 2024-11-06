@@ -4,7 +4,6 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class AcidBurst : Weapon {
-
 	public static AcidBurst netWeapon = new();
 
 	public AcidBurst() : base() {

@@ -3,12 +3,11 @@ using System.Collections.Generic;
 
 namespace MMXOnline;
 
-public class Torpedo : Weapon {
+public class HomingTorpedo : Weapon {
+	public static HomingTorpedo netWeapon = new();
 
-	public static Torpedo netWeapon = new();
-
-	public Torpedo() : base() {
-		index = (int)WeaponIds.Torpedo;
+	public HomingTorpedo() : base() {
+		index = (int)WeaponIds.HomingTorpedo;
 		killFeedIndex = 1;
 		weaponBarBaseIndex = 1;
 		weaponBarIndex = weaponBarBaseIndex;
@@ -16,9 +15,9 @@ public class Torpedo : Weapon {
 		weaknessIndex = (int)WeaponIds.RollingShield;
 		shootSounds = new string[] { "torpedo", "torpedo", "torpedo", "buster3" };
 		fireRate = 38;
-		damage = "2/1";
+		damage = "2/1*6";
 		effect = "A Homing Torpedo.. yeah.";
-		hitcooldown = "0/0";
+		hitcooldown = "0";
 		Flinch = "0/13";
 	}
 
@@ -96,7 +95,7 @@ public class TorpedoProj : Projectile, IDamagable {
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new TorpedoProj(
-			Torpedo.netWeapon, arg.pos, arg.xDir, 
+			HomingTorpedo.netWeapon, arg.pos, arg.xDir, 
 			arg.player, arg.extraData[0], arg.netId
 		);
 	}

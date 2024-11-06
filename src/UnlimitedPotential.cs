@@ -39,7 +39,7 @@ public class XUPParryStartState : CharState {
 		Actor? counterAttackTarget = null;
 		Projectile? absorbedProj = null;
 		
-		if (player.weapon is Buster { isUnpoBuster: true }) {
+		if (player.weapon is XBuster { isUnpoBuster: true }) {
 			player.weapon.ammo = player.weapon.maxAmmo;
 		}
 		
@@ -628,7 +628,7 @@ public class XReviveStart : CharState {
 			"drlight", -character.xDir, player.getNextActorNetId(), false, sendRpc: true
 		);
 		drLightAnim.blink = true;
-		int busterIndex = player.weapons.FindIndex(w => w is Buster);
+		int busterIndex = player.weapons.FindIndex(w => w is XBuster);
 		if (busterIndex >= 0) {
 			player.changeWeaponSlot(busterIndex);
 		}
@@ -660,7 +660,7 @@ public class XRevive : CharState {
 			player.health = 1;
 			character.addHealth(player.maxHealth);
 
-			player.weapons.RemoveAll(w => w is not Buster);
+			player.weapons.RemoveAll(w => w is not XBuster);
 			player.weapons.Add(new RagingChargeBuster());
 			player.weaponSlot = 0;
 			

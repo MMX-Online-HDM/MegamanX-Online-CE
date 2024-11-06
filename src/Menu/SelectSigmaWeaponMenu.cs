@@ -365,10 +365,10 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 			1 => new int[] { new ChillPenguinWeapon(null).weaponSlotIndex, new ShotgunIce().weaponSlotIndex },
 			2 => new int[] { new SparkMandrillWeapon(null).weaponSlotIndex, new ElectricSpark().weaponSlotIndex },
 			3 => new int[] { new ArmoredArmadilloWeapon(null).weaponSlotIndex, new RollingShield().weaponSlotIndex },
-			4 => new int[] { new LaunchOctopusWeapon(null).weaponSlotIndex, new Torpedo().weaponSlotIndex },
-			5 => new int[] { new BoomerangKuwangerWeapon(null).weaponSlotIndex, new Boomerang().weaponSlotIndex },
-			6 => new int[] { new StingChameleonWeapon(null).weaponSlotIndex, new Sting().weaponSlotIndex },
-			7 => new int[] { new StormEagleWeapon(null).weaponSlotIndex, new Tornado().weaponSlotIndex },
+			4 => new int[] { new LaunchOctopusWeapon(null).weaponSlotIndex, new HomingTorpedo().weaponSlotIndex },
+			5 => new int[] { new BoomerangKuwangerWeapon(null).weaponSlotIndex, new BoomerangCutter().weaponSlotIndex },
+			6 => new int[] { new StingChameleonWeapon(null).weaponSlotIndex, new ChameleonSting().weaponSlotIndex },
+			7 => new int[] { new StormEagleWeapon(null).weaponSlotIndex, new StormTornado().weaponSlotIndex },
 			8 => new int[] { new ChillPenguinWeapon(null).weaponSlotIndex, new ShotgunIce().weaponSlotIndex },
 			9 => new int[] { new OverdriveOstrichWeapon(null).weaponSlotIndex, new SonicSlicer().weaponSlotIndex },
 			10 => new int[] { new WireSpongeWeapon(null).weaponSlotIndex, new StrikeChain().weaponSlotIndex },
@@ -382,7 +382,7 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 			18 => new int[] { new BlastHornetWeapon(null).weaponSlotIndex, new ParasiticBomb().weaponSlotIndex },
 			19 => new int[] { new BlizzardBuffaloWeapon(null).weaponSlotIndex, new FrostShield().weaponSlotIndex },
 			20 => new int[] { new ToxicSeahorseWeapon(null).weaponSlotIndex, new AcidBurst().weaponSlotIndex },
-			21 => new int[] { new TunnelRhinoWeapon(null).weaponSlotIndex, new TunnelFang().weaponSlotIndex },
+			21 => new int[] { new TunnelRhinoWeapon(null).weaponSlotIndex, new TornadoFang().weaponSlotIndex },
 			22 => new int[] { new VoltCatfishWeapon(null).weaponSlotIndex, new TriadThunder().weaponSlotIndex },
 			23 => new int[] { new CrushCrawfishWeapon(null).weaponSlotIndex, new SpinningBlade().weaponSlotIndex },
 			24 => new int[] { new NeonTigerWeapon(null).weaponSlotIndex, new RaySplasher().weaponSlotIndex },
@@ -402,11 +402,11 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 				new ArmoredArmadilloWeapon(null).weaponSlotIndex, new RollingShield().weaponSlotIndex
 			},
 			2 => new int[] {
-				new LaunchOctopusWeapon(null).weaponSlotIndex, new Torpedo().weaponSlotIndex
+				new LaunchOctopusWeapon(null).weaponSlotIndex, new HomingTorpedo().weaponSlotIndex
 			},
-			3 => new int[] { new BoomerangKuwangerWeapon(null).weaponSlotIndex, new Boomerang().weaponSlotIndex },
-			4 => new int[] { new StingChameleonWeapon(null).weaponSlotIndex, new Sting().weaponSlotIndex },
-			5 => new int[] { new StormEagleWeapon(null).weaponSlotIndex, new Tornado().weaponSlotIndex },
+			3 => new int[] { new BoomerangKuwangerWeapon(null).weaponSlotIndex, new BoomerangCutter().weaponSlotIndex },
+			4 => new int[] { new StingChameleonWeapon(null).weaponSlotIndex, new ChameleonSting().weaponSlotIndex },
+			5 => new int[] { new StormEagleWeapon(null).weaponSlotIndex, new StormTornado().weaponSlotIndex },
 			6 => new int[] { new FlameMammothWeapon(null).weaponSlotIndex, new FireWave().weaponSlotIndex },
 			7 => new int[] { new ChillPenguinWeapon(null).weaponSlotIndex, new ShotgunIce().weaponSlotIndex },
 			9 => new int[] { new WheelGatorWeapon(null).weaponSlotIndex, new SpinWheel().weaponSlotIndex },
@@ -423,7 +423,7 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 			18 => new int[] { new ToxicSeahorseWeapon(null).weaponSlotIndex, new AcidBurst().weaponSlotIndex },
 			19 => new int[] {
 				new TunnelRhinoWeapon(null).weaponSlotIndex,
-				new TunnelFang().weaponSlotIndex, new DrDopplerWeapon(null).weaponSlotIndex
+				new TornadoFang().weaponSlotIndex, new DrDopplerWeapon(null).weaponSlotIndex
 			},
 			20 => new int[] { new VoltCatfishWeapon(null).weaponSlotIndex, new TriadThunder().weaponSlotIndex },
 			21 => new int[] { new CrushCrawfishWeapon(null).weaponSlotIndex, new SpinningBlade().weaponSlotIndex },

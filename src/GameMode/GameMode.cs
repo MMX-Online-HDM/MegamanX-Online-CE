@@ -1490,7 +1490,7 @@ public class GameMode {
 					if (weapon.drawGrayOnLowAmmo && weapon.ammo < weapon.getAmmoUsage(0) ||
 						(weapon is GigaCrush && !weapon.canShoot(0, player)) ||
 						(weapon is NovaStrike && !weapon.canShoot(0, player)) ||
-						(weapon is HyperBuster hb && !hb.canShootIncludeCooldown(level.mainPlayer))) {
+						(weapon is HyperCharge hb && !hb.canShootIncludeCooldown(level.mainPlayer))) {
 						spriteIndex = grayAmmoIndex;
 					}
 					if (spriteIndex >= Global.sprites["hud_weapon_full"].frames.Length) {
@@ -1850,7 +1850,7 @@ public class GameMode {
 			var weapon = player.weapons[i];
 			var x = startX + (i * width);
 			var y = startY;
-			if (weapon is HyperBuster hb) {
+			if (weapon is HyperCharge hb) {
 				bool canShootHyperBuster = hb.canShootIncludeCooldown(player);
 				Color lineColor = canShootHyperBuster ? Color.White : Helpers.Gray;
 
@@ -1989,12 +1989,12 @@ public class GameMode {
 				mmx = mainPlayer.character as MegamanX ?? throw new NullReferenceException();
 			}
 
-			if (weapon is HyperBuster &&
+			if (weapon is HyperCharge &&
 				!mainPlayer.isSpectator &&
 				mainPlayer.weapons[level.mainPlayer.hyperChargeSlot].ammo == 0
 			) {
 				drawWeaponSlotAmmo(x, y, 0);
-			} else if (weapon is HyperBuster hb) {
+			} else if (weapon is HyperCharge hb) {
 				drawWeaponSlotCooldown(x, y, mmx.hyperchargeCooldown / hb.getRateOfFire(level.mainPlayer));
 			} else if (weapon is NovaStrike ns) {
 				drawWeaponSlotCooldown(x, y, mmx.novaStrikeCooldown / ns.fireRate);

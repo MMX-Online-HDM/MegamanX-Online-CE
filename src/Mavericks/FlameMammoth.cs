@@ -13,7 +13,7 @@ public class FlameMammoth : Maverick {
 		stateCooldowns.Add(typeof(FlameMOilState), new MaverickStateCooldown(false, true, 0.5f));
 
 		awardWeaponId = WeaponIds.FireWave;
-		weakWeaponId = WeaponIds.Tornado;
+		weakWeaponId = WeaponIds.StormTornado;
 		weakMaverickWeaponId = WeaponIds.StormEagle;
 
 		weapon = new Weapon(WeaponIds.FlameMGeneric, 100);

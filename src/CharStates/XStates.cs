@@ -191,9 +191,9 @@ public class X3ChargeShot : CharState {
 	public int state = 0;
 	bool pressFire;
 	MegamanX mmx = null!;
-	public HyperBuster? hyperBusterWeapon;
+	public HyperCharge? hyperBusterWeapon;
 
-	public X3ChargeShot(HyperBuster? hyperBusterWeapon) : base("x3_shot", "", "", "") {
+	public X3ChargeShot(HyperCharge? hyperBusterWeapon) : base("x3_shot", "", "", "") {
 		this.hyperBusterWeapon = hyperBusterWeapon;
 		airMove = true;
 		useDashJumpSpeed = true;
@@ -218,7 +218,7 @@ public class X3ChargeShot : CharState {
 						player.weapon, shootPos, shootDir,
 						3, player, player.getNextActorNetId(), rpc: true
 					);
-					if (!(player.weapon is HyperBuster)) {
+					if (!(player.weapon is HyperCharge)) {
 						character.playSound("buster3X3", sendRpc: true);
 					}
 				} else {

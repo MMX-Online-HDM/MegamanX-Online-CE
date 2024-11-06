@@ -936,7 +936,7 @@ public partial class Character : Actor, IDamagable {
 					acidHurtCooldown = 0;
 				}
 				acidDamager?.applyDamage(
-					this, player.weapon is TunnelFang,
+					this, player.weapon is TornadoFang,
 					new AcidBurst(), this, (int)ProjIds.AcidBurstPoison,
 					overrideDamage: 1f
 				);
@@ -2827,7 +2827,7 @@ public partial class Character : Actor, IDamagable {
 						);
 					}
 				}
-				var hyperBuster = player.weapons.FirstOrDefault(w => w is HyperBuster);
+				var hyperBuster = player.weapons.FirstOrDefault(w => w is HyperCharge);
 				if (hyperBuster != null) {
 					float currentAmmo = hyperBuster.ammo;
 					hyperBuster.addAmmo(gigaAmmoToAdd, player);

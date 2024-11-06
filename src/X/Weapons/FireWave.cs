@@ -12,7 +12,7 @@ public class FireWave : Weapon {
 		weaponBarBaseIndex = 4;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 4;
-		weaknessIndex = (int)WeaponIds.Tornado;
+		weaknessIndex = (int)WeaponIds.StormTornado;
 		shootSounds = new string[] { "fireWave", "fireWave", "fireWave", "fireWave" };
 		fireRate = 4;
 		isStream = true;

@@ -19,7 +19,7 @@ public class LaunchOctopus : Maverick {
 
 		weapon = new Weapon(WeaponIds.LaunchOGeneric, 96);
 
-		awardWeaponId = WeaponIds.Torpedo;
+		awardWeaponId = WeaponIds.HomingTorpedo;
 		weakWeaponId = WeaponIds.RollingShield;
 		weakMaverickWeaponId = WeaponIds.ArmoredArmadillo;
 

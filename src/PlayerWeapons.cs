@@ -306,7 +306,7 @@ label:
 		}
 
 		var oldGigaCrush = weapons?.Find(w => w is GigaCrush);
-		var oldHyperbuster = weapons?.Find(w => w is HyperBuster);
+		var oldHyperbuster = weapons?.Find(w => w is HyperCharge);
 		var oldWeapons = weapons;
 
 		if (preSigmaReviveWeapons != null) {
@@ -319,22 +319,22 @@ label:
 		if (isX) {
 			if (Global.level.isTraining() && !Global.level.server.useLoadout) {
 				weapons = Weapon.getAllXWeapons().Select(w => w.clone()).ToList();
-				if (hasArmArmor(3)) weapons.Add(new HyperBuster());
+				if (hasArmArmor(3)) weapons.Add(new HyperCharge());
 				if (hasBodyArmor(2)) weapons.Add(new GigaCrush());
 				if (hasUltimateArmor()) weapons.Add(new NovaStrike(this));
 			} else if (Global.level.is1v1()) {
 				if (xArmor1v1 == 1) {
-					weapons.Add(new Buster());
-					weapons.Add(new Torpedo());
-					weapons.Add(new Sting());
+					weapons.Add(new XBuster());
+					weapons.Add(new HomingTorpedo());
+					weapons.Add(new ChameleonSting());
 					weapons.Add(new RollingShield());
 					weapons.Add(new FireWave());
-					weapons.Add(new Tornado());
+					weapons.Add(new StormTornado());
 					weapons.Add(new ElectricSpark());
-					weapons.Add(new Boomerang());
+					weapons.Add(new BoomerangCutter());
 					weapons.Add(new ShotgunIce());
 				} else if (xArmor1v1 == 2) {
-					weapons.Add(new Buster());
+					weapons.Add(new XBuster());
 					weapons.Add(new CrystalHunter());
 					weapons.Add(new BubbleSplash());
 					weapons.Add(new SilkShot());
@@ -345,7 +345,7 @@ label:
 					weapons.Add(new SpeedBurner(this));
 					weapons.Add(new GigaCrush());
 				} else if (xArmor1v1 == 3) {
-					weapons.Add(new Buster());
+					weapons.Add(new XBuster());
 					weapons.Add(new AcidBurst());
 					weapons.Add(new ParasiticBomb());
 					weapons.Add(new TriadThunder());
@@ -353,8 +353,8 @@ label:
 					weapons.Add(new RaySplasher());
 					weapons.Add(new GravityWell());
 					weapons.Add(new FrostShield());
-					weapons.Add(new TunnelFang());
-					weapons.Add(new HyperBuster());
+					weapons.Add(new TornadoFang());
+					weapons.Add(new HyperCharge());
 				}
 
 				foreach (var enemyPlayer in Global.level.players) {
@@ -364,10 +364,10 @@ label:
 						if (enemyPlayer.maverick1v1 == 1) weaponToDeplete = weapons.FirstOrDefault(w => w is ShotgunIce);
 						if (enemyPlayer.maverick1v1 == 2) weaponToDeplete = weapons.FirstOrDefault(w => w is ElectricSpark);
 						if (enemyPlayer.maverick1v1 == 3) weaponToDeplete = weapons.FirstOrDefault(w => w is RollingShield);
-						if (enemyPlayer.maverick1v1 == 4) weaponToDeplete = weapons.FirstOrDefault(w => w is Torpedo);
-						if (enemyPlayer.maverick1v1 == 5) weaponToDeplete = weapons.FirstOrDefault(w => w is Boomerang);
-						if (enemyPlayer.maverick1v1 == 6) weaponToDeplete = weapons.FirstOrDefault(w => w is Sting);
-						if (enemyPlayer.maverick1v1 == 7) weaponToDeplete = weapons.FirstOrDefault(w => w is Tornado);
+						if (enemyPlayer.maverick1v1 == 4) weaponToDeplete = weapons.FirstOrDefault(w => w is HomingTorpedo);
+						if (enemyPlayer.maverick1v1 == 5) weaponToDeplete = weapons.FirstOrDefault(w => w is BoomerangCutter);
+						if (enemyPlayer.maverick1v1 == 6) weaponToDeplete = weapons.FirstOrDefault(w => w is ChameleonSting);
+						if (enemyPlayer.maverick1v1 == 7) weaponToDeplete = weapons.FirstOrDefault(w => w is StormTornado);
 						if (enemyPlayer.maverick1v1 == 8) weaponToDeplete = weapons.FirstOrDefault(w => w is ShotgunIce);
 
 						if (enemyPlayer.maverick1v1 == 9) weaponToDeplete = weapons.FirstOrDefault(w => w is SonicSlicer);
@@ -383,7 +383,7 @@ label:
 						if (enemyPlayer.maverick1v1 == 18) weaponToDeplete = weapons.FirstOrDefault(w => w is ParasiticBomb);
 						if (enemyPlayer.maverick1v1 == 19) weaponToDeplete = weapons.FirstOrDefault(w => w is FrostShield);
 						if (enemyPlayer.maverick1v1 == 20) weaponToDeplete = weapons.FirstOrDefault(w => w is AcidBurst);
-						if (enemyPlayer.maverick1v1 == 21) weaponToDeplete = weapons.FirstOrDefault(w => w is TunnelFang);
+						if (enemyPlayer.maverick1v1 == 21) weaponToDeplete = weapons.FirstOrDefault(w => w is TornadoFang);
 						if (enemyPlayer.maverick1v1 == 22) weaponToDeplete = weapons.FirstOrDefault(w => w is TriadThunder);
 						if (enemyPlayer.maverick1v1 == 23) weaponToDeplete = weapons.FirstOrDefault(w => w is SpinningBlade);
 						if (enemyPlayer.maverick1v1 == 24) weaponToDeplete = weapons.FirstOrDefault(w => w is RaySplasher);
@@ -493,7 +493,7 @@ label:
 	public int getLastWeaponIndex() {
 		int miscSlots = 0;
 		if (weapons.Any(w => w is GigaCrush)) miscSlots++;
-		if (weapons.Any(w => w is HyperBuster)) miscSlots++;
+		if (weapons.Any(w => w is HyperCharge)) miscSlots++;
 		if (weapons.Any(w => w is NovaStrike)) miscSlots++;
 		return weapons.Count - miscSlots;
 	}
@@ -505,8 +505,8 @@ label:
 	}
 
 	public void addHyperCharge() {
-		if (!weapons.Any(w => w is HyperBuster)) {
-			weapons.Insert(getLastWeaponIndex(), new HyperBuster());
+		if (!weapons.Any(w => w is HyperCharge)) {
+			weapons.Insert(getLastWeaponIndex(), new HyperCharge());
 		}
 	}
 
@@ -524,10 +524,10 @@ label:
 	}
 
 	public void removeHyperCharge() {
-		if (weapon is HyperBuster) {
+		if (weapon is HyperCharge) {
 			weaponSlot = 0;
 		}
-		weapons.RemoveAll(w => w is HyperBuster);
+		weapons.RemoveAll(w => w is HyperCharge);
 	}
 
 	public void removeGigaCrush() {

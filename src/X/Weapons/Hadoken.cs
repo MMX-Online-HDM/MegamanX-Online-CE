@@ -1,7 +1,6 @@
 ﻿namespace MMXOnline;
 
 public class HadoukenWeapon : Weapon {
-
 	public static HadoukenWeapon netWeapon = new(null!);
 
 	public HadoukenWeapon(Player player) : base() {

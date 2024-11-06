@@ -535,7 +535,7 @@ public class AI {
 			weaponTime += Global.spf;
 			if (weaponTime > 5) {
 				weaponTime = 0;
-				var wasBuster = (player.weapon is Buster or AxlBullet);
+				var wasBuster = (player.weapon is XBuster or AxlBullet);
 				player.changeWeaponSlot(getRandomWeaponIndex());
 				if (wasBuster && maxChargeTime > 0) {
 					maxChargeTime = 4.25f * 60f;
@@ -543,7 +543,7 @@ public class AI {
 			}
 		}
 
-		if (player.weapon != null && player.weapon.ammo <= 0 && player.weapon is not Buster or AxlBullet) {
+		if (player.weapon != null && player.weapon.ammo <= 0 && player.weapon is not XBuster or AxlBullet) {
 			player.changeWeaponSlot(getRandomWeaponIndex());
 		}
 
@@ -603,7 +603,7 @@ public class AI {
 			int FrostShield = player.weapons.FindIndex(w => w is FrostShield);
 			int TriadThunder = player.weapons.FindIndex(w => w is TriadThunder);
 			int GravityWell = player.weapons.FindIndex(w => w is GravityWell);
-			int TunnelFang = player.weapons.FindIndex(w => w is TunnelFang);
+			int TornadoFang = player.weapons.FindIndex(w => w is TornadoFang);
 			int AcidBurst = player.weapons.FindIndex(w => w is AcidBurst);
 			int ParasiticBomb = player.weapons.FindIndex(w => w is ParasiticBomb);
 			int CrystalHunter = player.weapons.FindIndex(w => w is CrystalHunter);
@@ -611,10 +611,10 @@ public class AI {
 			int SpinWheel = player.weapons.FindIndex(w => w is SpinWheel);
 			int ElectricSpark = player.weapons.FindIndex(w => w is ElectricSpark);
 			int RollingShield = player.weapons.FindIndex(w => w is RollingShield);
-			int Tornado = player.weapons.FindIndex(w => w is Tornado);
-			int Torpedo = player.weapons.FindIndex(w => w is Torpedo);
-			int Sting = player.weapons.FindIndex(w => w is Sting);
-			int Boomerang = player.weapons.FindIndex(w => w is Boomerang);
+			int Tornado = player.weapons.FindIndex(w => w is StormTornado);
+			int Torpedo = player.weapons.FindIndex(w => w is HomingTorpedo);
+			int Sting = player.weapons.FindIndex(w => w is ChameleonSting);
+			int Boomerang = player.weapons.FindIndex(w => w is BoomerangCutter);
 			int ShotgunIce = player.weapons.FindIndex(w => w is ShotgunIce);
 			int SonicSlicer = player.weapons.FindIndex(w => w is SonicSlicer);
 			int StrikeChain = player.weapons.FindIndex(w => w is StrikeChain);
@@ -656,7 +656,7 @@ public class AI {
 								// Tunnel Fang
 								case 4:
 									if (isTargetSuperClose)
-										megamanX.player.changeWeaponSlot(TunnelFang);
+										megamanX.player.changeWeaponSlot(TornadoFang);
 									megamanX.player.press(Control.Shoot);
 									break;
 								// Acid Burst
@@ -898,7 +898,7 @@ public class AI {
 						}
 						break;
 					case 8:
-						int hyperbuster = player.weapons.FindIndex(w => w is HyperBuster);
+						int hyperbuster = player.weapons.FindIndex(w => w is HyperCharge);
 						if (player.hasArmArmor(3)) {
 							player.changeWeaponSlot(hyperbuster);
 							if (megamanX.player.weapon.ammo >= 16) {

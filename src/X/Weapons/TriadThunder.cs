@@ -13,7 +13,7 @@ public class TriadThunder : Weapon {
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 19;
 		killFeedIndex = 42;
-		weaknessIndex = (int)WeaponIds.TunnelFang;
+		weaknessIndex = (int)WeaponIds.TornadoFang;
 		damage = "2/4+3";
 		effect = "Charged: Grants Super Armor.";
 		hitcooldown = "0.5/0.5-1";

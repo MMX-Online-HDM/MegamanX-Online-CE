@@ -19,7 +19,7 @@ public class GigaCrush : Weapon {
 		weaponSlotIndex = 25;
 		killFeedIndex = 13;
 	}
-	
+
 	public override void shoot(Character character, int[] args) {
 		if (character.ownedByLocalPlayer) {
 			character.changeState(new GigaCrushCharState(), true);
@@ -114,8 +114,8 @@ public class GigaCrushPilar : Effect {
 		double transparency = (time - 6) / (maxActiveTime - 6);
 		if (transparency < 0) { transparency = 0; }
 		if (transparency > 1) { transparency = 1; }
-	
-		float progess = time  / maxActiveTime;
+
+		float progess = time / maxActiveTime;
 		progess = MathF.Sqrt(progess);
 		float size = 150 * progess;
 		(float top, float bot)[] yOffsets = {

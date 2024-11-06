@@ -4,7 +4,6 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class FrostShield : Weapon {
-
 	public static FrostShield netWeapon = new();
 
 	public FrostShield() : base() {

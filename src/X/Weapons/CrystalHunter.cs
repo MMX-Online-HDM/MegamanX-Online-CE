@@ -6,8 +6,8 @@ using SFML.Graphics;
 namespace MMXOnline;
 
 public class CrystalHunter : Weapon {
-
 	public static CrystalHunter netWeapon = new();
+
 	public CrystalHunter() : base() {
 		shootSounds = new string[] { "crystalHunter", "crystalHunter", "crystalHunter", "crystalHunterCharged" };
 		fireRate = 75;
