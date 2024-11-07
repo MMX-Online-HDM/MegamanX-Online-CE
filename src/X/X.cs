@@ -641,8 +641,7 @@ public partial class MegamanX : Character {
 		}
 		
 		//Gets ammo usage.
-		float ammoUsage = player.weapon.specialAmmoUse ? 
-			-player.weapon.getAmmoUsageEX(chargeLevel, this) : -player.weapon.getAmmoUsage(chargeLevel);
+		float ammoUsage = -player.weapon.getAmmoUsageEX(chargeLevel, this);
 		//Triggers weapon cooldown.
 		shootCooldown = player.weapon is HyperCharge hb ?
 			hb.getRateOfFire(player) : player.weapon.fireRate;

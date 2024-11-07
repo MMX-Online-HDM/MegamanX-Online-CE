@@ -22,7 +22,6 @@ public class FireWave : Weapon {
 		ammousage = 0.5;
 		effect = "Inflicts burn to enemies. DOT: 0.5/2 seconds.";
 		hitcooldown = "0.2/0.33";
-		specialAmmoUse = true;
 		maxAmmo = 28;
 		ammo = maxAmmo;
 	}

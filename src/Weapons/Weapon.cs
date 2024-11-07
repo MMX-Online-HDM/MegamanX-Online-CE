@@ -59,7 +59,6 @@ public class Weapon {
 	public string effect = "";
 	public string Flinch = "";
 	public string FlinchCD = "";
-	public bool specialAmmoUse;
 
 	public Weapon() {
 		ammo = 32;
@@ -71,7 +70,6 @@ public class Weapon {
 		Flinch = "0";
 		FlinchCD = "0";
 		ammousage = getAmmoUsage(0);
-		specialAmmoUse = false;
 	}
 
 	public Weapon(WeaponIds index, int killFeedIndex, Damager? damager = null) {
@@ -298,8 +296,7 @@ public class Weapon {
 	}
 
 	public virtual float getAmmoUsageEX(int chargeLevel, Character character) {
-		if (chargeLevel >= 3) return 8;
-		return 1;
+		return getAmmoUsage(chargeLevel);
 	}
 
 	public virtual void rechargeAmmo(float maxRechargeTime) {

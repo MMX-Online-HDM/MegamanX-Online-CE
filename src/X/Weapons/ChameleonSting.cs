@@ -18,7 +18,6 @@ public class ChameleonSting : Weapon {
 		damage = "2";
 		effect = "Full Charge grants invulnerability.";
 		hitcooldown = "0";
-		specialAmmoUse = true;
 	}
 
 	public override float getAmmoUsageEX(int chargeLevel, Character character) {
