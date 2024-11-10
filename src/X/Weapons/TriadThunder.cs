@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace MMXOnline;
 
@@ -56,6 +57,7 @@ public class TriadThunder : Weapon {
 public class TriadThunderProj : Projectile {
 	int state;
 	Character? character;
+	MegamanX mmx = null!;
 	public List<TriadThunderBall> balls;
 	public TriadThunderProj(
 		Point pos, int xDir, int yDir, Player player, ushort netProjId, bool rpc = false
@@ -65,11 +67,13 @@ public class TriadThunderProj : Projectile {
 	) {
 		projId = (int)ProjIds.TriadThunder;
 		character = player.character;
+		mmx = player.character as MegamanX ?? throw new NullReferenceException();
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 		shouldVortexSuck = false;
 		this.yDir = yDir;
 		maxTime = 1.5f;
+		mmx.tThunder = this;
 
 		visible = false;
 
@@ -147,6 +151,11 @@ public class TriadThunderProj : Projectile {
 				destroySelf();
 			}
 		}
+	}
+
+	public override void onDestroy() {
+		base.onDestroy();
+		mmx.tThunder = null!;
 	}
 }
 

@@ -23,7 +23,7 @@ public class ChameleonSting : Weapon {
 	public override float getAmmoUsageEX(int chargeLevel, Character character) {
 		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
 
-		if (mmx.stingActive) return 8;
+		if (mmx.stingActive) return 4;
 		return getAmmoUsage(chargeLevel);
 	}
 
