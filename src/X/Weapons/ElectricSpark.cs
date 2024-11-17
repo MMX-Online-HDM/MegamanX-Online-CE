@@ -100,7 +100,8 @@ public class ElectricSparkProj : Projectile {
                 normal = ((Point)normal).leftNormal();
             }
 
-            Point normal2 = (Point)normal;
+            Point normal2 =  new Point(0, 1);
+			if (normal != null) normal2 = (Point)normal;
             normal2.multiply(speed * 3);
 
 			new ElectricSparkProj(

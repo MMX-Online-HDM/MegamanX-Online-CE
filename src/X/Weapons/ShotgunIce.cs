@@ -197,8 +197,9 @@ public class ShotgunIceProjSled : Projectile {
 		fadeSound = "iceBreak";
 		shouldShieldBlock = false;
 		isPlatform = true;
+		Global.level.modifyObjectGridGroups(this, isActor: true, isTerrain: true);
 		//this.collider.wallOnly = true;
-		canBeLocal = true;
+		canBeLocal = false;
 
 		if (rpc) rpcCreate(pos, player, netProjId, xDir);
 	}
