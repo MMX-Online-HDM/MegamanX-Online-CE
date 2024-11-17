@@ -112,11 +112,11 @@ public class XBuster : Weapon {
 				createBuster4Line(pos.x + xOff, pos.y, xDir, player, 0f);
 				// Create 2nd with a delay.
 				Global.level.delayedActions.Add(new DelayedAction(delegate {
-					createBuster4Line(pos.x + xOff, pos.y, xDir, player, 10f / 60f);
+					createBuster4Line(pos.x + xOff, pos.y, xDir, player, 10);
 				}, 2.8f / 60f));
 				// Use smooth spawn on the 3rd.
 				Global.level.delayedActions.Add(new DelayedAction(delegate {
-					createBuster4Line(pos.x + xOff, pos.y, xDir, player, 5f / 60f, true);
+					createBuster4Line(pos.x + xOff, pos.y, xDir, player, 5, true);
 				}, 5.8f / 60f));
 				sound = "buster4";
 			}
