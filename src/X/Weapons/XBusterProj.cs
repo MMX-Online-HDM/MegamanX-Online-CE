@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -235,16 +235,16 @@ public class Buster4Proj : Projectile {
 		fadeSprite = "buster4_fade";
 		this.type = type;
 		initY = this.pos.y;
-		this.offsetTime = offsetTime;
 		this.smoothStart = smoothStart;
 		maxTime = 0.6f;
 		projId = (int)ProjIds.Buster4;
-		canBeLocal = false;
 
 		if (rpc) {
-			byte[] extraArgs = new byte[] { (byte)type, (byte)offsetTime};
+			byte[] extraArgs = [(byte)type, (byte)offsetTime, (byte)(smoothStart ? 1 : 0)];
 			rpcCreate(pos, player, netProjId, xDir, extraArgs);
 		}
+
+		this.offsetTime = offsetTime / 60f;
 	}
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
