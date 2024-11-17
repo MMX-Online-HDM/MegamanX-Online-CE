@@ -50,7 +50,11 @@ public class Flag : Actor {
 
 		if (chr != null && !Global.level.gameObjects.Contains(chr)) {
 			dropFlag();
-		} else if (chr != null && chr.isWarpOut()) {
+		}
+		else if (chr != null && chr.isWarpOut()) {
+			dropFlag();
+		}
+		else if (chr?.canKeepFlag() != true) {
 			dropFlag();
 		}
 

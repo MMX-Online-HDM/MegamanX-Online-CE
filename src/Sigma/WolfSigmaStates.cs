@@ -784,7 +784,7 @@ public class WolfSigmaRevive : CharState {
 		} else if (state == 1) {
 			character.visible = true;
 			if (character.grounded || groundStart) {
-				character.sigmaHeadGroundCamCenterPos = character.getCamCenterPos();
+				sigma.sigmaHeadGroundCamCenterPos = character.getCamCenterPos();
 				state = 2;
 				stateTime = 0;
 			} else {

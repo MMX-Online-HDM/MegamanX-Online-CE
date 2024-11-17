@@ -32,11 +32,12 @@ public class ChameleonSting : Weapon {
 		Point pos = character.getShootPos();
 		int xDir = character.getShootXDir();
 		Player player = character.player;
+		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
 
 		if (chargeLevel < 3) {
 			new StingProj(this, pos, xDir, player, 0, player.getNextActorNetId(), true);
 		} else {
-			character.stingChargeTime = 8;
+			mmx.stingChargeTime = 8;
 		}
 	}
 }

@@ -5,6 +5,9 @@ using SFML.Graphics;
 namespace MMXOnline;
 
 public class ViralSigma : Character {
+	long originalZIndex;
+	bool viralOnce;
+
 	public float viralSigmaTackleCooldown;
 	public float viralSigmaTackleMaxCooldown = 1;
 
@@ -31,6 +34,25 @@ public class ViralSigma : Character {
 
 	public override void update() {
 		base.update();
+		if (!ownedByLocalPlayer) {
+			base.update();
+
+			if (sprite.name.Contains("sigma2_viral")) {
+				if (!viralOnce) {
+					viralOnce = true;
+					xScale = 0;
+					yScale = 0;
+					originalZIndex = zIndex;
+				}
+
+				if (sprite.name.Contains("sigma2_viral_possess")) {
+					setzIndex(ZIndex.Actor);
+				} else {
+					setzIndex(originalZIndex);
+				}
+			}
+			return;
+		}
 
 		Helpers.decrementTime(ref viralSigmaTackleCooldown);
 		if (viralSigmaBeamLength < 1 && charState is not ViralSigmaBeamState) {
@@ -153,5 +175,9 @@ public class ViralSigma : Character {
 			);
 			deductLabelY(labelCooldownOffY);
 		}
+	}
+
+	public override Point getCamCenterPos(bool ignoreZoom = false) {
+		return pos.round().addxy(camOffsetX, 25);
 	}
 }

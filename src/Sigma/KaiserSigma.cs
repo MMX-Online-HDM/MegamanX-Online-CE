@@ -273,4 +273,11 @@ public partial class KaiserSigma : Character {
 	public override Collider? getTerrainCollider() {
 		return null;
 	}
+
+	public override Point getCamCenterPos(bool ignoreZoom = false) {
+		if (sprite.name.StartsWith("kaisersigma_virus")) {
+			return pos.addxy(camOffsetX, -12);
+		}
+		return pos.round().addxy(camOffsetX, -55);
+	}
 }

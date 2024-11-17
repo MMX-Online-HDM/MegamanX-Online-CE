@@ -442,7 +442,7 @@ public class XUPGrabState : CharState {
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		character.useGravity = true;
-		character.grabCooldown = 1;
+		//character.grabCooldown = 1;
 		victim.grabInvulnTime = 2;
 		victim?.releaseGrab(character);
 	}

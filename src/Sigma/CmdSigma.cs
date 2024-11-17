@@ -4,6 +4,7 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class CmdSigma : BaseSigma {
+	public float saberCooldown;
 	public float leapSlashCooldown;
 	public float sigmaAmmoRechargeCooldown = 0;
 	public float sigmaAmmoRechargeTime;
@@ -28,6 +29,7 @@ public class CmdSigma : BaseSigma {
 			return;
 		}
 		// Cooldowns.
+		Helpers.decrementTime(ref saberCooldown);
 		Helpers.decrementTime(ref leapSlashCooldown);
 		Helpers.decrementFrames(ref sigmaAmmoRechargeCooldown);
 		// Ammo reload.
@@ -54,9 +56,6 @@ public class CmdSigma : BaseSigma {
 	}
 
 	public override bool attackCtrl() {
-		if (isAttacking()) {
-			return false;
-		}
 		if (isInvulnerableAttack() || player.weapon is MaverickWeapon) {
 			return false;
 		}

@@ -82,7 +82,7 @@ public partial class Player {
 	}
 
 	public bool shouldBlockMechSlotScroll() {
-		if (character is Vile { isVileMK5: true, startRideArmor: not null }) {
+		if (character is Vile { isVileMK5: true, linkedRideArmor: not null }) {
 			return false;
 		}
 		return Options.main.blockMechSlotScroll;
@@ -142,8 +142,8 @@ public partial class Player {
 			if (isDisguisedAxl && isZero && input.isHeld(Control.Down, this)) return;
 			weaponRight();
 		} else if (character != null && !Control.isNumberBound(realCharNum, Options.main.axlAimMode)) {
-			if (isVile && weapon is MechMenuWeapon mmw &&
-				character.startRideArmor == null &&
+			if (weapon is MechMenuWeapon mmw &&
+				character.linkedRideArmor == null &&
 				shouldBlockMechSlotScroll()
 			) {
 				if (input.isPressed(Key.Num1, canControl)) {

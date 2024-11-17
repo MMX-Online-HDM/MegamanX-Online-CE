@@ -1748,7 +1748,7 @@ public class GameMode {
 
 		if (player.character is Vile vilePilot &&
 			vilePilot.rideArmor != null &&
-			vilePilot.rideArmor == vilePilot.startRideArmor
+			vilePilot.rideArmor == vilePilot.linkedRideArmor
 			&& vilePilot.rideArmor.raNum == 2
 		) {
 			int x = 10, y = 155;
@@ -1932,8 +1932,8 @@ public class GameMode {
 	}
 
 	public void drawWeaponSlot(Weapon weapon, float x, float y, bool selected = false) {
-		if (weapon is MechMenuWeapon && !mainPlayer.isSpectator && level.mainPlayer.character?.startRideArmor != null) {
-			int index = 37 + level.mainPlayer.character.startRideArmor.raNum;
+		if (weapon is MechMenuWeapon && !mainPlayer.isSpectator && level.mainPlayer.character?.linkedRideArmor != null) {
+			int index = 37 + level.mainPlayer.character.linkedRideArmor.raNum;
 			if (index == 42) index = 119;
 			Global.sprites["hud_weapon_icon"].drawToHUD(index, x, y);
 		} else if (weapon is MechMenuWeapon && level.mainPlayer.isSelectingRA()) {

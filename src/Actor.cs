@@ -911,7 +911,7 @@ public partial class Actor : GameObject {
 				return false;
 			}
 			*/
-			if (character.isCStingInvisibleGraphics() && this is MegamanX mmx && mmx.cStingPaletteTime % 3 == 0) {
+			if (this is MegamanX mmx && mmx.isCStingInvisibleGraphics() && mmx.cStingPaletteTime % 3 == 0) {
 				return false;
 			}
 			if (character.invulnTime > 0) {

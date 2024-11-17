@@ -13,6 +13,7 @@ public class VileMK2GrabState : CharState {
 	float leechTime = 1;
 	public bool victimWasGrabbedSpriteOnce;
 	float timeWaiting;
+
 	public VileMK2GrabState(Character? victim) : base("grab", "", "", "") {
 		this.victim = victim;
 		grabTime = VileMK2Grabbed.maxGrabTime;
@@ -65,7 +66,9 @@ public class VileMK2GrabState : CharState {
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
-		character.grabCooldown = 1;
+		if (character is Vile vile) {
+			vile.grabCooldown = 1;
+		}
 		if (newState is not VileMK2GrabState && victim != null) {
 			victim.grabInvulnTime = 2;
 			victim.stunInvulnTime = 1;

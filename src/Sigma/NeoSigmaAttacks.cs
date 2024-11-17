@@ -61,7 +61,7 @@ public class SigmaClawState : CharState {
 			once = true;
 			sprite = "attack2";
 			defaultSprite = sprite;
-			character.saberCooldown = neoSigma.sigmaSaberMaxCooldown;
+			neoSigma.normalAttackCooldown = neoSigma.sigmaSaberMaxCooldown;
 			character.changeSpriteFromName(sprite, true);
 			character.playSound("sigma2slash", sendRpc: true);
 			return;

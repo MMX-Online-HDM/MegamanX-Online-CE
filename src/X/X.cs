@@ -5,6 +5,9 @@ using System.Linq;
 namespace MMXOnline;
 
 public partial class MegamanX : Character {
+	public float stingChargeTime;
+	public int lastShootPressed;
+	public float headbuttAirTime = 0;
 	public float shotgunIceChargeTime = 0;
 	public float shotgunIceChargeCooldown = 0;
 	public int shotgunIceChargeMod = 0;
@@ -50,7 +53,6 @@ public partial class MegamanX : Character {
 
 	public int cStingPaletteIndex;
 	public float cStingPaletteTime;
-	bool lastFrameSpecialHeld;
 	bool lastShotWasSpecialBuster;
 	public float upPunchCooldown;
 	public Projectile? unpoAbsorbedProj;
@@ -120,6 +122,21 @@ public partial class MegamanX : Character {
 	public override void update() {
 		fgMotion = false;
 		base.update();
+		if (!ownedByLocalPlayer) {
+			return;
+		}
+		if (stingChargeTime > 0) {
+			stingChargeTime -= Global.spf;
+
+			player.weapon.ammo -= (Global.spf * 3 * (player.hasChip(3) ? 0.5f : 1));
+			if (player.weapon.ammo < 0) player.weapon.ammo = 0;
+			stingChargeTime = player.weapon.ammo;
+
+			if (stingChargeTime <= 0) {
+				player.delaySubtank();
+				stingChargeTime = 0;
+			}
+		}
 
 		if (stockedCharge) {
 			addRenderEffect(RenderEffectType.ChargePink, 0.033333f, 0.1f);
@@ -218,7 +235,7 @@ public partial class MegamanX : Character {
 			}
 		}
 
-		if (player.hasChip(2) && !isInvisible() && totalChipHealAmount < maxTotalChipHealAmount) {
+		if (player.hasChip(2) && stingChargeTime > 0 && totalChipHealAmount < maxTotalChipHealAmount) {
 			noDamageTime += Global.speedMul;
 			if ((player.health < player.maxHealth || player.hasSubtankCapacity()) && noDamageTime > 240) {
 				Helpers.decrementFrames(ref rechargeHealthTime);
@@ -1412,6 +1429,14 @@ public partial class MegamanX : Character {
 		return shaders;
 	}
 
+	public bool isCStingInvisibleGraphics() {
+		return this is MegamanX {
+			hasUltimateArmor: false,
+			stingActive: true,
+		};
+	}
+	
+
 	public override bool canAddAmmo() {
 		if (player.weapon == null) { return false; }
 		bool hasEmptyAmmo = false;
@@ -1543,5 +1568,34 @@ public partial class MegamanX : Character {
 		isHyperX = boolData[1];
 		isHyperChargeActive = boolData[2];
 		hasUltimateArmor = boolData[3];
+	}
+
+	public override void changeSprite(string spriteName, bool resetFrame) {
+		if (!isHeadbuttSprite(sprite.name) && isHeadbuttSprite(spriteName)) {
+			headbuttAirTime = Global.spf;
+		}
+		if (isHeadbuttSprite(sprite.name) && !isHeadbuttSprite(spriteName)) {
+			headbuttAirTime = 0;
+		}
+		List<Trail>? trails = sprite?.lastFiveTrailDraws;
+		base.changeSprite(spriteName, resetFrame);
+		if (trails != null && sprite != null) {
+			sprite.lastFiveTrailDraws = trails;
+		}
+	}
+
+	public override void onFlagPickup(Flag flag) {
+		if (chargedRollingShieldProj != null) {
+			chargedRollingShieldProj.destroySelf();
+		}
+		popAllBubbles();
+		stockedCharge = false;
+		stockedX3Buster = false;
+		if (beeSwarm != null) {
+			beeSwarm.destroy();
+		}
+		stingChargeTime = 0;
+		
+		base.onFlagPickup(flag);
 	}
 }
