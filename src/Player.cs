@@ -8,6 +8,7 @@ using static SFML.Window.Keyboard;
 namespace MMXOnline;
 
 public partial class Player {
+	public SpawnPoint? firstSpawn;
 	public Input input;
 	public Character character;
 	public Character lastCharacter;
@@ -944,11 +945,27 @@ public partial class Player {
 
 		// Never spawn a character if it already exists
 		if (character == null && ownedByLocalPlayer) {
+			if (!warpedInOnce && firstSpawn == null) {
+				firstSpawn = Global.level.getSpawnPoint(this, true);
+				Global.level.camX = MathF.Round(firstSpawn.pos.x) - Global.halfScreenW * Global.viewSize;
+				Global.level.camY = MathF.Round(firstSpawn.getGroundY()) - Global.halfScreenH * Global.viewSize - 30;
+
+				Global.level.camX = Helpers.clamp(Global.level.camX, 0, Global.level.width - Global.viewScreenW);
+				Global.level.camY = Helpers.clamp(Global.level.camY, 0, Global.level.height - Global.viewScreenH);
+
+				Global.level.computeCamPos(
+					new Point(
+						Global.level.camX + Global.halfScreenW * Global.viewSize,
+						Global.level.camY + Global.halfScreenH * Global.viewSize
+					),
+					null
+				);
+			}
 			bool sendRpc = ownedByLocalPlayer;
 			if (shouldRespawn()) {
 				ushort charNetId = getNextATransNetId();
 
-				if (Global.level.gameMode is TeamDeathMatch && Global.level.teamNum > 2) {
+				if (Global.level.gameMode is TeamDeathMatch && Global.level.teamNum > 2 && warpedInOnce) {
 					List<Player> spawnPoints = Global.level.players.FindAll(
 						p => p.teamAlliance == teamAlliance && p.health > 0 && p.character != null
 					);
@@ -962,7 +979,8 @@ public partial class Player {
 							warpInPos, randomChar.xDir, charNetId, sendRpc
 						);
 					} else {
-						var spawnPoint = Global.level.getSpawnPoint(this, !warpedInOnce);
+						SpawnPoint spawnPoint = firstSpawn ?? Global.level.getSpawnPoint(this, !warpedInOnce);
+						firstSpawn = null;
 						int spawnPointIndex = Global.level.spawnPoints.IndexOf(spawnPoint);
 						spawnCharAtSpawnIndex(spawnPointIndex, charNetId, sendRpc);
 					}
@@ -1377,7 +1395,6 @@ public partial class Player {
 		retChar.infectedTime = character.infectedTime;
 
 		// Hit cooldowns.
-		retChar.grabCooldown = character.grabCooldown;
 		retChar.projectileCooldown = character.projectileCooldown;
 		retChar.flinchCooldown = character.flinchCooldown;
 
@@ -1580,7 +1597,6 @@ public partial class Player {
 		retChar.infectedTime = character.infectedTime;
 
 		// Hit cooldowns.
-		retChar.grabCooldown = character.grabCooldown;
 		retChar.projectileCooldown = character.projectileCooldown;
 		retChar.flinchCooldown = character.flinchCooldown;
 
@@ -2643,7 +2659,7 @@ public partial class Player {
 		if (subtank.health <= 0) return false;
 		if (character.charState is WarpOut) return false;
 		if (character.charState.invincible) return false;
-		if (character.isCStingInvisible()) return false;
+		if (character is MegamanX { stingActive: true }) return false;
 		// TODO: Add Wolf Check here.
 		//if (character.isHyperSigmaBS.getValue()) return false;
 

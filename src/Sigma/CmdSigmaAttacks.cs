@@ -258,7 +258,7 @@ public class SigmaWallDashState : CharState {
 		}
 
 		if (player.input.isPressed(Control.Shoot, player) &&
-			!fired && character.saberCooldown == 0 && character.invulnTime == 0
+			!fired && sigma.saberCooldown == 0 && character.invulnTime == 0
 		) {
 			if (yDir == 0) {
 				character.changeState(new SigmaSlashState(new Dash(Control.Dash)), true);
@@ -266,7 +266,7 @@ public class SigmaWallDashState : CharState {
 			}
 
 			fired = true;
-			character.saberCooldown = sigma.sigmaSaberMaxCooldown;
+			sigma.saberCooldown = sigma.sigmaSaberMaxCooldown;
 
 			character.playSound("sigmaSaber", sendRpc: true);
 			character.changeSpriteFromName("wall_dash_attack", true);

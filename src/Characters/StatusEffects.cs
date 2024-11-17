@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace MMXOnline;
@@ -76,13 +76,6 @@ public class Hurt : CharState {
 				if (player.charNum == 2) character.frameIndex = 1;
 				if (player.charNum == 3) character.frameIndex = 2;
 			}
-		}
-
-		if (player.character is MegamanX or Zero &&
-			player.character.canCharge() &&
-			player.character.chargeButtonHeld()
-		) {
-			player.character.increaseCharge();
 		}
 
 		if (stateFrames >= flinchTime) {

@@ -424,7 +424,7 @@ public class Zero : Character {
 				  !player.isDisguisedAxl || player.input.isHeld(Control.Down, player)
 			  )
 			) {
-			if (grounded && !isAttacking()) {
+			if (grounded) {
 				turnToInput(player.input, player);
 				changeState(new SwordBlock());
 			}

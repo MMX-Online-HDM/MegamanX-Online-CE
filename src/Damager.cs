@@ -499,8 +499,9 @@ public class Damager {
 			switch (weaponIndex) {
 				case (int)WeaponIds.BoomerangCutter:
 				case (int)WeaponIds.BoomerangKBoomerang:
-					if (character.player.isX)
-						character.stingChargeTime = 0;
+					if (mmx != null) {
+						mmx.stingChargeTime = 0;
+					}
 					break;
 			}
 

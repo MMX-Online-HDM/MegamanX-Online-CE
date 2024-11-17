@@ -603,7 +603,7 @@ public class RideArmor : Actor, IDamagable {
 						} else if (!(ownedByLocalPlayer && chr.ownedByLocalPlayer)) {
 							return;
 						}
-					} else if (chr?.startRideArmor != this || selfDestructTime > 0) {
+					} else if (chr?.linkedRideArmor != this || selfDestructTime > 0) {
 						return;
 					}
 				} else {
@@ -691,7 +691,7 @@ public class RideArmor : Actor, IDamagable {
 		chr.changeState(new InRideArmor(), true);
 		changeState(new RAIdle("ridearmor_activating"), true);
 		if (character != null) {
-			if (!healedOnEnter && raNum == 4 && character.ownedByLocalPlayer && character.startRideArmor == this) {
+			if (!healedOnEnter && raNum == 4 && character.ownedByLocalPlayer && character.linkedRideArmor == this) {
 				healedOnEnter = true;
 				character.fillHealthToMax();
 			}
@@ -750,7 +750,7 @@ public class RideArmor : Actor, IDamagable {
 			health = 0;
 		}
 		if (health <= 0) {
-			if (character != null && !ownedByMK5 && character.startRideArmor == this) {
+			if (character != null && !ownedByMK5 && character.linkedRideArmor == this) {
 				character.invulnTime = 1;
 			}
 

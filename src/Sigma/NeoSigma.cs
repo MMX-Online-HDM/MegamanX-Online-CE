@@ -4,6 +4,7 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class NeoSigma : BaseSigma {
+	public float normalAttackCooldown;
 	public float sigmaUpSlashCooldown;
 	public float sigmaDownSlashCooldown;
 
@@ -25,6 +26,7 @@ public class NeoSigma : BaseSigma {
 			return;
 		}
 		// Cooldowns.
+		Helpers.decrementTime(ref normalAttackCooldown);
 		Helpers.decrementTime(ref sigmaUpSlashCooldown);
 		Helpers.decrementTime(ref sigmaDownSlashCooldown);
 		// For ladder and slide attacks.
@@ -58,7 +60,7 @@ public class NeoSigma : BaseSigma {
 		bool lenientAttackPressed = (attackPressed || framesSinceLastAttack < 5);
 
 		// Shoot button attacks.
-		if (lenientAttackPressed && saberCooldown == 0) {
+		if (lenientAttackPressed && normalAttackCooldown == 0) {
 			if (player.input.isHeld(Control.Up, player) && flag == null && grounded) {
 				if (sigmaUpSlashCooldown == 0) {
 					sigmaUpSlashCooldown = 0.75f;
@@ -73,7 +75,7 @@ public class NeoSigma : BaseSigma {
 				}
 				return true;
 			}
-			saberCooldown = sigmaSaberMaxCooldown;
+			normalAttackCooldown = sigmaSaberMaxCooldown;
 
 			if (charState is WallSlide || charState is LadderClimb) {
 				if (charState is LadderClimb) {

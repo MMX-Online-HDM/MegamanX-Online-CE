@@ -22,6 +22,8 @@ public class ParasiticBomb : Weapon {
 		hitcooldown = "0/0.5";
 		Flinch = "26-CarryT/26";
 		FlinchCD = "iwish";
+		maxAmmo = 16;
+		ammo = maxAmmo;
 	}
 	
 	public override float getAmmoUsage(int chargeLevel) {

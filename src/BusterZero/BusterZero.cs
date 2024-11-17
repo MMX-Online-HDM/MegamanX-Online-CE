@@ -11,6 +11,7 @@ public class BusterZero : Character {
 	public bool stockedSaber;
 	public List<DZBusterProj> zeroLemonsOnField = new();
 	public ZBusterSaber meleeWeapon = new();
+	public int lastShootPressed;
 
 	public BusterZero(
 		Player player, float x, float y, int xDir,

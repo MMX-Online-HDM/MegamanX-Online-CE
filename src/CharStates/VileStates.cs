@@ -111,8 +111,8 @@ public class VileRevive : CharState {
 			drDopplerAnim = new Anim(character.pos.addxy(30 * character.xDir, -15), "drdoppler", -character.xDir, null, false);
 			drDopplerAnim.blink = true;
 		} else {
-			if (vile.startRideArmor != null) {
-				vile.startRideArmor.ownedByMK5 = true;
+			if (vile.linkedRideArmor != null) {
+				vile.linkedRideArmor.ownedByMK5 = true;
 			}
 		}
 	}

@@ -69,12 +69,8 @@ public class CharState {
 		stateTime = 0;
 	}
 
-	public bool canShoot() {
-		return !string.IsNullOrEmpty(shootSprite) && character.canShoot();
-	}
-
-	public bool canAttack() {
-		return !string.IsNullOrEmpty(attackSprite) && !character.isInvulnerableAttack() && character.saberCooldown == 0;
+	public bool canUseShootAnim() {
+		return !string.IsNullOrEmpty(shootSprite);
 	}
 
 	public Player player {
@@ -228,14 +224,14 @@ public class CharState {
 	}
 
 	public virtual void airTrasition() {
-		if (airSprite != null && !character.grounded && wasGrounded && sprite != airSprite) {
+		if (airSprite != "" && !character.grounded && wasGrounded && sprite != airSprite) {
 			sprite = airSprite;
 			int oldFrameIndex = character.sprite.frameIndex;
 			float oldFrameTime = character.sprite.frameTime;
 			character.changeSprite(sprite, false);
 			character.sprite.frameIndex = oldFrameIndex;
 			character.sprite.frameTime = oldFrameTime;
-		} else if (landSprite != null && character.grounded && !wasGrounded && sprite != landSprite) {
+		} else if (landSprite != "" && character.grounded && !wasGrounded && sprite != landSprite) {
 			sprite = landSprite;
 			int oldFrameIndex = character.sprite.frameIndex;
 			float oldFrameTime = character.sprite.frameTime;
@@ -277,6 +273,9 @@ public class CharState {
 	}
 
 	public void checkLadder(bool isGround) {
+		if (character.charState is LadderClimb) {
+			return;
+		}
 		if (player.input.isHeld(Control.Up, player)) {
 			List<CollideData> ladders = Global.level.getTerrainTriggerList(character, new Point(0, 0), typeof(Ladder));
 			if (ladders != null && ladders.Count > 0 && ladders[0].gameObject is Ladder ladder) {
@@ -301,8 +300,7 @@ public class CharState {
 				float xDist = snapX - character.pos.x;
 				if (MathF.Abs(xDist) < 10 && Global.level.checkTerrainCollisionOnce(character, xDist, 30) == null) {
 					var midX = ladders[0].otherCollider.shape.getRect().center().x;
-					character.changeState(new LadderClimb(ladder, midX));
-					character.move(new Point(0, 30), false);
+					character.changeState(new LadderClimb(ladder, midX, 30));
 					character.stopCamUpdate = true;
 				}
 			}
@@ -557,7 +555,7 @@ public class Idle : CharState {
 		base.update();
 
 		if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
-			if (!character.isAttacking() && !character.isSoftLocked() && character.canTurn()) {
+			if (!character.isSoftLocked() && character.canTurn()) {
 				if (player.input.isHeld(Control.Left, player)) character.xDir = -1;
 				if (player.input.isHeld(Control.Right, player)) character.xDir = 1;
 				if (player.character.canMove()) character.changeState(new Run());
@@ -1207,6 +1205,7 @@ public class LadderClimb : CharState {
 		this.snapX = MathF.Round(snapX);
 		this.incY = incY;
 		attackCtrl = true;
+		immuneToWind = true;
 	}
 
 	public override void onEnter(CharState oldState) {
@@ -1240,13 +1239,16 @@ public class LadderClimb : CharState {
 		if (inTransition()) {
 			return;
 		}
+		bool isAttacking = (
+			character.sprite.name != character.getSprite("ladder_climb")
+		);
 
-		if (character.isAttacking()) {
+		if (isAttacking) {
 			character.frameSpeed = 1;
 		} else {
 			character.frameSpeed = 0;
 		}
-		if (character.canClimbLadder()) {
+		if (!isAttacking && character.canClimbLadder()) {
 			if (player.input.isHeld(Control.Up, player)) {
 				character.move(new Point(0, -75));
 				character.frameSpeed = 1;
@@ -1268,7 +1270,7 @@ public class LadderClimb : CharState {
 				character.changeState(new Fall());
 			}
 		} else if (!player.isAI && player.input.isPressed(Control.Jump, player)) {
-			if (!character.isAttacking()) {
+			if (!isAttacking) {
 				dropFromLadder();
 			}
 		}
@@ -1313,6 +1315,7 @@ public class LadderEnd : CharState {
 			//this.character.pos.y = this.targetY;
 			character.incPos(new Point(0, targetY - character.pos.y));
 			character.stopCamUpdate = true;
+			character.grounded = true;
 			character.changeToIdleOrFall();
 		}
 	}
@@ -1378,8 +1381,8 @@ public class Die : CharState {
 		character.stopMoving();
 		character.stopCharge();
 		new Anim(character.pos.addxy(0, -12), "die_sparks", 1, null, true);
-		character.stingChargeTime = 0;
 		if (character is MegamanX mmx) {
+			mmx.stingChargeTime = 0;
 			mmx.removeBarrier();
 			player.lastDeathWasXHyper = mmx.isHyperX;
 		} else {
@@ -1561,9 +1564,9 @@ public class Die : CharState {
 	}
 
 	public void destroyRideArmor() {
-		if (character.startRideArmor != null) {
-			character.startRideArmor.selfDestructTime = Global.spf;
-			RPC.actorToggle.sendRpc(character.startRideArmor.netId, RPCActorToggleType.StartMechSelfDestruct);
+		if (character.linkedRideArmor != null) {
+			character.linkedRideArmor.selfDestructTime = Global.spf;
+			RPC.actorToggle.sendRpc(character.linkedRideArmor.netId, RPCActorToggleType.StartMechSelfDestruct);
 		}
 	}
 

@@ -39,7 +39,7 @@ public class RCX : Character {
 					changeState(new XUPPunchState(grounded), true);
 					return;
 				}
-			} else if (player.input.isPressed(Control.Special1, player) && !isInvisible() &&
+			} else if (player.input.isPressed(Control.Special1, player) &&
 				  (charState is Dash || charState is AirDash)) {
 				charState.isGrabbing = true;
 				changeSpriteFromName("unpo_grab_dash", true);
@@ -60,7 +60,7 @@ public class RCX : Character {
 
 		if (charState.attackCtrl && canShoot() && canChangeWeapons() && 
 			player.input.isPressed(Control.Special1, player) &&
-			!isAttacking() && !isInvisible() &&!charState.isGrabbing
+			charState.normalCtrl && !charState.isGrabbing
 		) {
 			if (xSaberCooldown == 0) {
 				xSaberCooldown = 60;
