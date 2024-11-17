@@ -239,6 +239,7 @@ public class Buster4Proj : Projectile {
 		this.smoothStart = smoothStart;
 		maxTime = 0.6f;
 		projId = (int)ProjIds.Buster4;
+		canBeLocal = false;
 
 		if (rpc) {
 			byte[] extraArgs = new byte[] { (byte)type, (byte)offsetTime};

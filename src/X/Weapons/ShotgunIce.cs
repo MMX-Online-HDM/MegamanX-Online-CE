@@ -92,7 +92,7 @@ public class ShotgunIceProj : Projectile {
 	}
 
 	public void onHit() {
-		if (!ownedByLocalPlayer) {
+		if (!ownedByLocalPlayer && type == 0) {
 			destroySelf(disableRpc: true);
 			return;
 		}

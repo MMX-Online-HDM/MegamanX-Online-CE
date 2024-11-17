@@ -210,6 +210,8 @@ public class BubbleSplashProjCharged : Projectile {
 
 	public override void update() {
 		base.update();
+		if (!ownedByLocalPlayer) return;
+
 		if (character == null || !Global.level.gameObjects.Contains(character)  || (character.player.weapon is not BubbleSplash)) {
 			destroySelf();
 			return;

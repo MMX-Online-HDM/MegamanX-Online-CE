@@ -192,6 +192,7 @@ public class SilkShotProjLv2 : Projectile {
 		maxTime = 6f;
 		fadeSprite = "explosion";
 		fadeSound = "explosion";
+		frameSpeed = 0;
 		useGravity = true;
 		vel.y = -100;
 		projId = (int)ProjIds.SilkShotChargedLv2;

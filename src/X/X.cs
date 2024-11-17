@@ -29,6 +29,7 @@ public partial class MegamanX : Character {
 	public FrostShieldProjCharged? chargedFrostShield;
 	public TornadoFangProjCharged? chargedTornadoFang;
 	public GravityWellProj? gravityWell;
+	public TriadThunderProj? tThunder;
 	public int totalChipHealAmount;
 	public const int maxTotalChipHealAmount = 32;
 	public int unpoShotCount;
@@ -188,7 +189,8 @@ public partial class MegamanX : Character {
 		Helpers.decrementFrames(ref upPunchCooldown);
 		isHyperChargeActive = shouldShowHyperBusterCharge();
 
-		Helpers.decrementTime(ref shootAnimTime);
+		//Shooting animation
+		Helpers.decrementFrames(ref shootAnimTime);
 		if (shootAnimTime <= 0 && charState.attackCtrl && !charState.isGrabbing) {
 			if (!hasBusterProj()) {
 				changeSpriteFromName(charState.defaultSprite, false);
@@ -196,7 +198,7 @@ public partial class MegamanX : Character {
 					frameIndex = sprite.totalFrameNum - 1;
 				}
 			}		
-		}
+		} 
 
 		if (lastShotWasSpecialBuster) chargeLogic(specialShoot);
 		else chargeLogic(shoot);
@@ -616,7 +618,7 @@ public partial class MegamanX : Character {
 				this.xDir = 1;
 			}
 		}
-		shootAnimTime = 0.3f;
+		shootAnimTime = 18;
 	}
 
 	public void shoot(int chargeLevel) {
@@ -1097,34 +1099,6 @@ public partial class MegamanX : Character {
 		};
 	}
 
-	/* public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		Projectile? proj = null;
-
-		if (sprite.name.Contains("beam_saber") && sprite.name.Contains("2")) {
-			float overrideDamage = 3;
-			if (!grounded) overrideDamage = 2;
-			proj = new GenericMeleeProj(new XSaber(player), centerPoint, ProjIds.X6Saber, player, damage: overrideDamage, flinch: 0);
-		} else if (sprite.name.Contains("beam_saber")) {
-			proj = new GenericMeleeProj(new XSaber(player), centerPoint, ProjIds.XSaber, player);
-		} else if (sprite.name.Contains("nova_strike")) {
-			proj = new GenericMeleeProj(new NovaStrike(player), centerPoint, ProjIds.NovaStrike, player);
-		} else if (sprite.name.Contains("speedburner")) {
-			proj = new GenericMeleeProj(new SpeedBurner(player), centerPoint, ProjIds.SpeedBurnerCharged, player);
-		} else if (sprite.name.Contains("shoryuken")) {
-			proj = new GenericMeleeProj(new ShoryukenWeapon(player), centerPoint, ProjIds.Shoryuken, player);
-		} else if (sprite.name.Contains("unpo_grab_dash")) {
-			proj = new GenericMeleeProj(new XUPGrab(), centerPoint, ProjIds.UPGrab, player, 0, 0, 0);
-		} else if (sprite.name.Contains("unpo_punch")) {
-			proj = new GenericMeleeProj(new XUPPunch(player), centerPoint, ProjIds.UPPunch, player);
-		} else if (sprite.name.Contains("unpo_air_punch")) {
-			proj = new GenericMeleeProj(new XUPPunch(player), centerPoint, ProjIds.UPPunch, player, damage: 3, flinch: Global.halfFlinch);
-		} else if (sprite.name.Contains("unpo_parry_start")) {
-			proj = new GenericMeleeProj(new XUPParry(), centerPoint, ProjIds.UPParryBlock, player, 0, 0, 1);
-		}
-
-		return proj;
-	} */
-
 	public void popAllBubbles() {
 		for (int i = chargedBubbles.Count - 1; i >= 0; i--) {
 			chargedBubbles[i].destroySelf();
@@ -1169,6 +1143,7 @@ public partial class MegamanX : Character {
 		if (isShootingRaySplasher) return false;
 		if (chargedSpinningBlade != null) return false;
 		if (chargedFrostShield != null) return false;
+		if (tThunder != null) return false;
 		if (charState is GravityWellChargedState) return false;
 		if (charState is XRevive || charState is XReviveStart) return false;
 
@@ -1212,6 +1187,8 @@ public partial class MegamanX : Character {
 		if (!hasChanged) {
 			return false;
 		}
+		if (shootAnimTime > 0 && !hasBusterProj()) changeSprite(getSprite(newState.shootSprite), true);
+
 		if (hasBusterProj() && string.IsNullOrEmpty(newState.shootSprite) && newState is not Hurt) {
 			destroyBusterProjs();
 		}
