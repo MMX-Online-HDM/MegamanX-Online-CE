@@ -778,7 +778,7 @@ public class Damager {
 							owner.character is Zero zero &&
 							!zero.hypermodeActive()
 						) {      //What in the..
-							if (GenericMeleeProj.isZSaberClang(projId)) {
+							if (damagingActor is Projectile proj1 && proj1.isZSaberClang) {
 								owner.character.changeState(new ZeroClang(-owner.character.xDir));
 							}
 						}
