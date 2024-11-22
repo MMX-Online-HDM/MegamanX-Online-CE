@@ -336,7 +336,7 @@ public class SelectWeaponMenu : IMainMenu {
 			//Global.sprites["hud_weapon_icon"].drawToHUD(weapon.weaponSlotIndex, Global.halfScreenW + 75, 148);
 			Fonts.drawText(FontType.Green, "Counters: ", 89, wsy - 17, Alignment.Right);
 			if (strongAgainstIndex > 0) {
-				Global.sprites["hud_weapon_icon"].drawToHUD(strongAgainstIndex, 92, wsy - 13);
+				Global.sprites["hud_weapon_icon"].drawToHUD(strongAgainstIndex, 89, wsy - 13);
 			} else {
 				Fonts.drawText(FontType.Grey, "None", 89, wsy - 17);
 			}
@@ -367,12 +367,37 @@ public class SelectWeaponMenu : IMainMenu {
 			Fonts.drawText(FontType.RedishOrange, hitcooldown, 279, wsy -17);
 			Fonts.drawText(FontType.RedishOrange, Flinch, 274, wsy + -5);
 			Fonts.drawText(FontType.RedishOrange, FlinchCD, 297, wsy +7);
+			if (weapon is XBuster) {
+				if (Global.level?.mainPlayer.hasUltimateArmor() == false) {
+					switch (Global.level?.mainPlayer.armArmorNum) {
+						case (int)ArmorId.Light:
+							effect = "Mega Buster Mark 17 with Spiral Crush Shot.";
+							break;
+						
+						case (int)ArmorId.Giga:
+							effect = "Mega Buster Mark 17 with Double Charge Shot.";
+							break;
+
+						case (int)ArmorId.Max:
+							effect = "Mega Buster Mark 17 with Cross Charge Shot.";
+							break;
+						default:
+							effect = "Mega Buster Mark 17 with Spiral Crush Shot.";
+							break;
+					}
+					Fonts.drawText(FontType.Blue, effect, 28, wsy + 20);
+				}
+				else if (Global.level?.mainPlayer.hasUltimateArmor() == true) {
+					effect = "Mega Buster Mark 17 with Plasma Charge Shot + Bonus.";
+					Fonts.drawText(FontType.Blue, effect, 28, wsy + 20);
+				}
+			}
 			if (weapon is FrostShield) {
 				if (Global.frameCount % 600 < 120) {
 					effect = "Missile,Mine,Shield,'Unbreakable' you name it."; } 
 				else { effect = "Blocks, Leaves Spikes. C:Tackle or Shoot it.";}	
-				Fonts.drawText(FontType.DarkPurple, 
-				effect, 74, wsy + 20);
+				Fonts.drawText(FontType.Blue, 
+				effect, 28, wsy + 20);
 			}
 		}
 
