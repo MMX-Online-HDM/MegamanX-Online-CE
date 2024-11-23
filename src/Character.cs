@@ -2675,7 +2675,7 @@ public partial class Character : Actor, IDamagable {
 			}
 		}
 
-		if (attacker != null && weaponIndex != null && damage > 0) {
+		if ((damage > 0 || Damager.alwaysAssist(projId)) && attacker != null && weaponIndex != null) {
 			damageHistory.Add(new DamageEvent(attacker, weaponIndex.Value, projId, false, Global.time));
 		}
 

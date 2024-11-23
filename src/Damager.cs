@@ -1012,7 +1012,22 @@ public class Damager {
 		return null;
 	}
 
+	// Count for kills and assist even if it does 0 damage.
+	public static bool alwaysAssist(int? projId) {
+		if (projId == null) {
+			return false;
+		}
+		return (ProjIds)projId switch {
+			ProjIds.AcidBurst => true,
+			ProjIds.AcidBurstCharged => true,
+			_ => false
+		};
+	}
+
 	public static bool unassistable(int? projId) {
+		if (projId == null) {
+			return false;
+		}
 		// Never assist in any mode as they are DOT or self-damage. (Also Volt Tornado)
 		bool alwaysNotAssist = (ProjIds)projId switch {
 			ProjIds.Burn => true,
