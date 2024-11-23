@@ -1,8 +1,10 @@
 ﻿namespace MMXOnline;
 
 public class ShoryukenWeapon : Weapon {
-	public ShoryukenWeapon(Player player) : base() {
-		damager = new Damager(player, Damager.ohkoDamage, Global.defFlinch, 0.5f);
+	public static ShoryukenWeapon netWeapon = new();
+
+	public ShoryukenWeapon() : base() {
+		//damager = new Damager(player, Damager.ohkoDamage, Global.defFlinch, 0.5f);
 		ammo = 0;
 		index = (int)WeaponIds.Shoryuken;
 		weaponBarBaseIndex = 32;

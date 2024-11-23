@@ -153,7 +153,7 @@ public class PunchyZero : Character {
 		}
 		// For the shooting animation.
 		if (shootAnimTime > 0) {
-			shootAnimTime -= Global.spf;
+			shootAnimTime -= Global.speedMul;
 			if (shootAnimTime <= 0) {
 				shootAnimTime = 0;
 				changeSpriteFromName(charState.defaultSprite, false);
@@ -203,7 +203,7 @@ public class PunchyZero : Character {
 				this.xDir = 1;
 			}
 		}
-		shootAnimTime = 0.3f;
+		shootAnimTime = DefaultShootAnimTime;
 	}
 
 	public void shoot(int chargeLevel) {
@@ -283,7 +283,7 @@ public class PunchyZero : Character {
 			time / 60f, player, player.getNextActorNetId(), rpc: true
 		);
 		playSound("shingetsurinx5", forcePlay: false, sendRpc: true);
-		shootAnimTime = 0.3f;
+		shootAnimTime = DefaultShootAnimTime;
 	}
 
 	public void updateAwakenedAura() {

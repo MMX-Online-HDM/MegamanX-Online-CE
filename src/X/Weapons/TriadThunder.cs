@@ -73,7 +73,7 @@ public class TriadThunderProj : Projectile {
 		shouldVortexSuck = false;
 		this.yDir = yDir;
 		maxTime = 1.5f;
-		mmx.tThunder = this;
+		mmx.linkedTriadThunder = this;
 
 		visible = false;
 
@@ -155,7 +155,7 @@ public class TriadThunderProj : Projectile {
 
 	public override void onDestroy() {
 		base.onDestroy();
-		mmx.tThunder = null!;
+		mmx.linkedTriadThunder = null;
 	}
 }
 

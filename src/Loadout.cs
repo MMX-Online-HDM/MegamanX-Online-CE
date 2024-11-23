@@ -48,7 +48,6 @@ public class XLoadout {
 		indices.Add((byte)weapon3);
 		if (player.hasArmArmor(3)) indices.Add((int)WeaponIds.HyperCharge);
 		if (player.hasBodyArmor(2)) indices.Add((int)WeaponIds.GigaCrush);
-		if (player.hasUltimateArmor()) indices.Add((int)WeaponIds.NovaStrike);
 
 		return indices.Select(index => {
 			return Weapon.getAllSwitchableWeapons(new AxlLoadout()).Find(w => w.index == index).clone();

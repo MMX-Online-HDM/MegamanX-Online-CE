@@ -162,7 +162,7 @@ public class TornadoFangProj : Projectile {
 }
 
 public class TornadoFangProjCharged : Projectile {
-	public MegamanX? character;
+	public MegamanX? mmx;
 	float sparksCooldown;
 
 	public TornadoFangProjCharged(
@@ -176,7 +176,7 @@ public class TornadoFangProjCharged : Projectile {
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 		shouldVortexSuck = false;
-		character = (player.character as MegamanX);
+		mmx = (player.character as MegamanX);
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
@@ -195,18 +195,18 @@ public class TornadoFangProjCharged : Projectile {
 
 		if (!ownedByLocalPlayer) return;
 
-		if (character == null || character.destroyed) {
+		if (mmx == null || mmx.destroyed) {
 			destroySelf();
 			return;
 		}
 
-		weapon.addAmmo(-Global.spf * 5, character.player);
+		weapon.addAmmo(-Global.spf * 5, mmx.player);
 		if (weapon.ammo <= 0) {
 			destroySelf();
 			return;
 		}
 
-		if (character.player.weapon is not TornadoFang && character.player.weapon is not HyperCharge) {
+		if (mmx.player.weapon is not TornadoFang && mmx.player.weapon is not HyperCharge) {
 			destroySelf();
 			return;
 		}
@@ -217,9 +217,9 @@ public class TornadoFangProjCharged : Projectile {
 		if (!ownedByLocalPlayer) return;
 		if (destroyed) return;
 
-		if (character != null) {
-			changePos(character.getShootPos());
-			xDir = character.getShootXDir();
+		if (mmx != null) {
+			changePos(mmx.getShootPos());
+			xDir = mmx.getShootXDir();
 		}
 		
 	}
@@ -241,6 +241,6 @@ public class TornadoFangProjCharged : Projectile {
 
 	public override void onDestroy() {
 		base.onDestroy();
-		character?.removeBusterProjs();
+		mmx?.removeLastingProjs();
 	}
 }

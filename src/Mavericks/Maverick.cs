@@ -177,7 +177,7 @@ public class Maverick : Actor, IDamagable {
 				_ => null
 			};
 			if (allianceEffect != null) {
-				addRenderEffect(allianceEffect.Value, time: 1/60f);
+				addRenderEffect(allianceEffect.Value, time: 1);
 			}
 		}
 
@@ -747,7 +747,7 @@ public class Maverick : Actor, IDamagable {
 			if (awardWeaponId == WeaponIds.SonicSlicer) weaponToAdd = new SonicSlicer();
 			if (awardWeaponId == WeaponIds.StrikeChain) weaponToAdd = new StrikeChain();
 			if (awardWeaponId == WeaponIds.MagnetMine) weaponToAdd = new MagnetMine();
-			if (awardWeaponId == WeaponIds.SpeedBurner) weaponToAdd = new SpeedBurner(player);
+			if (awardWeaponId == WeaponIds.SpeedBurner) weaponToAdd = new SpeedBurner();
 
 			if (awardWeaponId == WeaponIds.AcidBurst) weaponToAdd = new AcidBurst();
 			if (awardWeaponId == WeaponIds.ParasiticBomb) weaponToAdd = new ParasiticBomb();
@@ -1030,6 +1030,13 @@ public class Maverick : Actor, IDamagable {
 		DrawWrappers.DrawRect(topLeftBar.x, topLeftBar.y, botRightBar.x, botRightBar.y - yPos, true, Color.Black, 1, ZIndex.HUD);
 
 		deductLabelY(labelSubtankOffY);
+	}
+
+	public override bool shouldDraw() {
+		if (invulnTime > 0) {
+			if (Global.level.frameCount % 4 < 2) return false;
+		}
+		return base.shouldDraw();
 	}
 
 	public override void render(float x, float y) {

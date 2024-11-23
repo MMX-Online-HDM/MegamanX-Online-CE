@@ -36,7 +36,7 @@ public class GravityWell : Weapon {
 		if (chargeLevel < 3) {
 			var proj = new GravityWellProj(this, pos, xDir, player, player.getNextActorNetId(), true);
 			if (character.ownedByLocalPlayer && character is MegamanX mmx) {
-				mmx.gravityWell = proj;
+				mmx.linkedGravityWell = proj;
 			}
 		} else {
 			if (!character.ownedByLocalPlayer) return;
@@ -53,7 +53,7 @@ public class GravityWell : Weapon {
 				mmx.chargedGravityWell == null || mmx.chargedGravityWell.destroyed
 			);
 		}
-		return base.canShoot(chargeLevel, player) && (mmx.gravityWell == null || mmx.gravityWell.destroyed);
+		return base.canShoot(chargeLevel, player) && (mmx.linkedGravityWell == null || mmx.linkedGravityWell.destroyed);
 	}
 }
 
@@ -240,7 +240,7 @@ public class GravityWellProj : Projectile, IDamagable {
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
 		var actor = damagable.actor();
-		if (actor is Character chr && chr.isCCImmune()) return;
+		if (actor is Character chr && chr.isStatusImmune()) return;
 		if (actor is not Character && actor is not RideArmor && actor is not Maverick) return;
 
 		float mag = 100;
@@ -328,7 +328,7 @@ public class GravityWellProjCharged : Projectile, IDamagable {
 
 			if (actor != null && actor.ownedByLocalPlayer) {
 				if (chr != null && chr.player.alliance == damager.owner.alliance) continue;
-				if (chr != null && chr.isCCImmune()) continue;
+				if (chr != null && chr.isStatusImmune()) continue;
 				if (ra != null && ra.character == null) continue;
 				if (ra != null && ra.player != null && ra.player.alliance == damager.owner.alliance) continue;
 				if (rc != null && rc.character == null) continue;

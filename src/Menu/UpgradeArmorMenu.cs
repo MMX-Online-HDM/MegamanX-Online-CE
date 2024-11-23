@@ -22,6 +22,7 @@ public class UpgradeArmorMenu : IMainMenu {
 	}
 
 	public void update() {
+		MegamanX? mmx = Global.level.mainPlayer.character as MegamanX;
 		//if (updateHyperArmorUpgrades(mainPlayer)) return;
 
 		// Should not be able to reach here but preventing upgrades just in case
@@ -55,13 +56,13 @@ public class UpgradeArmorMenu : IMainMenu {
 			return;
 		}
 		// Enable this to disable 14.0 UAX Menu
-		if (mainPlayer.hasGoldenArmor() || mainPlayer.hasUltimateArmor()) {
+		if (mmx?.hasFullHyperMaxArmor == true || mmx?.hasSeraphArmor == true) {
 			return;
 		}
-		if (mainPlayer.hasGoldenArmor()) {
+		if (mmx?.hasFullHyperMaxArmor == true) {
 			Menu.change(new UpgradeArmorMenuGolden(GoldenMenu));
 		}
-		if (mainPlayer.hasUltimateArmor() || (mainPlayer.hasUltimateArmor() && mainPlayer.hasGoldenArmor())) {
+		if (mmx?.hasSeraphArmor == true) {
 			Menu.change(new UpgradeArmorMenuUAX(UAXMenu));
 		}
 		if (Global.input.isPressedMenu(Control.MenuConfirm)) {

@@ -4,12 +4,10 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class SpeedBurner : Weapon {
-	public static SpeedBurner netWeapon = new(null); 
+	public static SpeedBurner netWeapon = new(); 
 
-	public SpeedBurner(Player? player) : base() {
-		if (player != null) {
-			damager = new Damager(player, 4, Global.defFlinch, 0.5f);
-		}
+	public SpeedBurner() : base() {
+		//damager = new Damager(player, 4, Global.defFlinch, 0.5f);
 		shootSounds = new string[] { "speedBurner", "speedBurner", "speedBurner", "speedBurnerCharged" };
 		fireRate = 60;
 		index = (int)WeaponIds.SpeedBurner;
@@ -186,7 +184,7 @@ public class SpeedBurnerCharState : CharState {
 
 		character.move(new Point(character.xDir * 350, 0));
 
-		CollideData collideData = Global.level.checkTerrainCollisionOnce(character, character.xDir, 0);
+		CollideData? collideData = Global.level.checkTerrainCollisionOnce(character, character.xDir, 0);
 		if (collideData != null && collideData.isSideWallHit() && character.ownedByLocalPlayer) {
 			character.applyDamage(2, player, character, (int)WeaponIds.SpeedBurner, (int)ProjIds.SpeedBurnerRecoil);
 			//character.changeState(new Hurt(-character.xDir, Global.defFlinch, 0), true);

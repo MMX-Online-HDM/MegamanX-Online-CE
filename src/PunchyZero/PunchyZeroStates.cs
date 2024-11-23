@@ -283,7 +283,7 @@ public class PZeroParry : CharState {
 	public override void onExit(CharState newState) {
 		character.specialState = (int)SpecialStateIds.None;
 		base.onExit(newState);
-		zero.parryCooldown = 60;
+		zero.parryCooldown = 30;
 	}
 
 	public bool canParry(Actor? actor, int projId) {
@@ -314,7 +314,7 @@ public class PZeroParryCounter : CharState {
 	public override void update() {
 		base.update();
 		if (character.frameIndex < 5) {
-			character.addRenderEffect(RenderEffectType.ChargeOrange, 0.033333f, 0.1f);
+			character.addRenderEffect(RenderEffectType.ChargeOrange, 2, 6);
 		}
 		if (counterAttackTarget == null || calcOnce && !canCounterDash) {
 			if (character.frameIndex >= 2) {

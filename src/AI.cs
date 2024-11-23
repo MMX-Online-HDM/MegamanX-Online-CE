@@ -878,8 +878,8 @@ public class AI {
 						}
 						break;
 					case 6:
-						int novaStrikeSlot = player.weapons.FindIndex(w => w is NovaStrike);
-						if (player.hasUltimateArmor()) {
+						int novaStrikeSlot = player.weapons.FindIndex(w => w is HyperNovaStrike);
+						if (megamanX.hasSeraphArmor) {
 							megamanX.player.changeWeaponSlot(novaStrikeSlot);
 							if (megamanX.player.weapon.ammo >= 16) {
 								megamanX.player.press(Control.Shoot);
@@ -914,7 +914,7 @@ public class AI {
 						}
 						break;
 					case 10:
-						if (megamanX.stockedXSaber) {
+						if (megamanX.stockedSaber) {
 							megamanX.player.press(Control.Shoot);
 							megamanX.player.release(Control.Shoot);
 						}
@@ -934,6 +934,7 @@ public class AI {
 			}
 			int UPXAttack = Helpers.randomRange(0, 5);
 			//UP X section
+			/*
 			if (megamanX?.isHyperX == true) {
 				switch (UPXAttack) {
 					case 0:
@@ -961,6 +962,7 @@ public class AI {
 						break;
 				}
 			}
+			*/
 		}
 	}
 	public void dommxAI(Character mmx4) {
@@ -1013,7 +1015,7 @@ public class AI {
 						player.release(Control.Shoot);
 					}
 				}
-				int novaStrikeSlot = player.weapons.FindIndex(w => w is NovaStrike);
+				int novaStrikeSlot = player.weapons.FindIndex(w => w is HyperNovaStrike);
 				if (player.hasUltimateArmor()) {
 					X.player.changeWeaponSlot(novaStrikeSlot);
 					if (X.player.weapon.ammo >= 16) {

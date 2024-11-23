@@ -246,7 +246,11 @@ public class DevConsole {
 			false
 		),
 		new Command("invuln", (args) => Global.level.mainPlayer.character.invulnTime = 60),
-		new Command("ult", (args) => Global.level.mainPlayer.setUltimateArmor(true)),
+		new Command("ult", (args) => {
+			if (Global.level.mainPlayer.character is MegamanX mmx) {
+				mmx.hasSeraphArmor = true;
+			}
+		}),
 		new Command("health", (args) => setHealth(args)),
 		new Command("freeze", (args) => Global.level.mainPlayer.character.freeze()),
 		new Command("hurt", (args) => Global.level.mainPlayer.character.setHurt(-1, Global.defFlinch, false)),

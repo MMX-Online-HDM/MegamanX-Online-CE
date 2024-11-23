@@ -132,7 +132,7 @@ public class SpinningBladeProj : Projectile {
 }
 
 public class SpinningBladeProjCharged : Projectile {
-	public MegamanX? character;
+	public MegamanX? mmx;
 	public float xDist;
 	const float maxXDist = 90;
 	public float spinAngle;
@@ -148,7 +148,7 @@ public class SpinningBladeProjCharged : Projectile {
 		projId = (int)ProjIds.SpinningBladeCharged;
 		shouldShieldBlock = false;
 		destroyOnHit = false;
-		character = (player.character as MegamanX);
+		mmx = (player.character as MegamanX);
 		shouldVortexSuck = false;
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
@@ -172,7 +172,7 @@ public class SpinningBladeProjCharged : Projectile {
 
 		if (!ownedByLocalPlayer) return;
 
-		if (character == null || character.destroyed) {
+		if (mmx == null || mmx.destroyed) {
 			destroySelf();
 			return;
 		}
@@ -191,28 +191,28 @@ public class SpinningBladeProjCharged : Projectile {
 			} else {
 				xDist = 0;
 				destroySelf();
-				character.removeBusterProjs();
+				mmx.removeLastingProjs();
 			}
 		}
 
 		float xOff = Helpers.cosd(spinAngle) * xDist;
 		float yOff = Helpers.sind(spinAngle) * xDist;
-		changePos(character.getShootPos().addxy(xDir * xOff, yOff));
+		changePos(mmx.getShootPos().addxy(xDir * xOff, yOff));
 
-		if (character.player.input.isPressed(Control.Shoot, character.player) && xDist >= maxXDist) {
+		if (mmx.player.input.isPressed(Control.Shoot, mmx.player) && xDist >= maxXDist) {
 			retracted = true;
 		}
 
-		if (character.player.input.isHeld(Control.Up, character.player)) {
+		if (mmx.player.input.isHeld(Control.Up, mmx.player)) {
 			spinAngle -= Global.spf * 360;
-		} else if (character.player.input.isHeld(Control.Down, character.player)) {
+		} else if (mmx.player.input.isHeld(Control.Down, mmx.player)) {
 			spinAngle += Global.spf * 360;
 		}
 	}
 
 	public override void render(float x, float y) {
 		base.render(x, y);
-		Point sPos = character.getShootPos();
+		Point sPos = mmx.getShootPos();
 		DrawWrappers.DrawLine(sPos.x, sPos.y, pos.x, pos.y, new Color(0, 224, 0), 3, zIndex - 100);
 		DrawWrappers.DrawLine(sPos.x, sPos.y, pos.x, pos.y, new Color(224, 224, 96), 1, zIndex - 100);
 		Global.sprites["spinningblade_base"].draw(MathInt.Round(Global.frameCount * 0.25f) % 3, sPos.x, sPos.y, 1, 1, null, 1, 1, 1, zIndex);
@@ -221,6 +221,6 @@ public class SpinningBladeProjCharged : Projectile {
 	public override void onDestroy() {
 		base.onDestroy();
 		if (!ownedByLocalPlayer) return;
-		character?.removeBusterProjs();
+		mmx?.removeLastingProjs();
 	}
 }

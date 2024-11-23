@@ -177,7 +177,7 @@ public class FlameBurnerAltProj : Projectile {
 		if (character.charState.invincible) return;
 		if (character.charState.immuneToWind) return;
 		if (!character.ownedByLocalPlayer) return;
-		if (character.isCCImmune()) return;
+		if (character.isStatusImmune()) return;
 
 		//character.damageHistory.Add(new DamageEvent(damager.owner, weapon.killFeedIndex, true, Global.frameCount));
 		if (character.isClimbingLadder()) {

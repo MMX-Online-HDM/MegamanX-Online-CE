@@ -374,7 +374,7 @@ public class Projectile : Actor {
 		}
 
 		var isSaber = GenericMeleeProj.isZSaberClang(projId);
-		if (isSaber && owner.character?.isCCImmune() != true) {
+		if (isSaber && owner.character?.isStatusImmune() != true) {
 			// Case 1: hitting a clangable projectile.
 			if (ownedByLocalPlayer && owner.character != null &&
 				otherProj != null && otherProj.owner.alliance != owner.alliance

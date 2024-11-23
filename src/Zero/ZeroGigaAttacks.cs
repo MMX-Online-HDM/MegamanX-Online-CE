@@ -739,7 +739,7 @@ public class DarkHoldState : CharState {
 		if (character.darkHoldInvulnTime > 0 ||
 			character.isInvulnerable() ||
 			character.isVaccinated() ||
-			character.isCCImmune() ||
+			character.isStatusImmune() ||
 			character.charState.invincible
 		) {
 			return false;

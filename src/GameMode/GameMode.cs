@@ -633,7 +633,7 @@ public class GameMode {
 					"x" + drawPlayer.currency.ToString(), 16, 140, Alignment.Left
 				);
 			}
-			if (drawPlayer.character is MegamanX mmx && mmx.unpoShotCount > 0) {
+			if (drawPlayer.character is RagingChargeX mmx && mmx.unpoShotCount > 0) {
 				int x = 10, y = 156;
 				int count = mmx.unpoShotCount;
 				if (count >= 1) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x, y);
@@ -1304,9 +1304,7 @@ public class GameMode {
 		baseY -= 16;
 		int barIndex = 0;
 
-		if (player.character is MegamanX mmx &&
-			(mmx.isHyperX == true || player.character?.charState is XRevive)
-		) {
+		if (player.character is RagingChargeX mmx) {
 			float hpPercent = MathF.Floor(player.health / player.maxHealth * 100f);
 			if (hpPercent >= 75) barIndex = 1;
 			else if (hpPercent >= 50) barIndex = 3;
@@ -1373,7 +1371,7 @@ public class GameMode {
 		if (weapon == null) return false;
 		if (weapon.weaponSlotIndex == 0) return false;
 		if (!player.weapon.drawAmmo) return false;
-		if (weapon is NovaStrike && level.isHyper1v1()) return false;
+		if (weapon is HyperNovaStrike && level.isHyper1v1()) return false;
 
 		return true;
 	}
@@ -1489,7 +1487,7 @@ public class GameMode {
 					int spriteIndex = weapon.weaponBarIndex;
 					if (weapon.drawGrayOnLowAmmo && weapon.ammo < weapon.getAmmoUsage(0) ||
 						(weapon is GigaCrush && !weapon.canShoot(0, player)) ||
-						(weapon is NovaStrike && !weapon.canShoot(0, player)) ||
+						(weapon is HyperNovaStrike && !weapon.canShoot(0, player)) ||
 						(weapon is HyperCharge hb && !hb.canShootIncludeCooldown(level.mainPlayer))) {
 						spriteIndex = grayAmmoIndex;
 					}
@@ -1784,7 +1782,7 @@ public class GameMode {
 			}
 		}
 		if (player.isX && Options.main.novaStrikeSpecial) {
-			Weapon? novaStrike = player.weapons.FirstOrDefault((Weapon w) => w is NovaStrike);
+			Weapon? novaStrike = player.weapons.FirstOrDefault((Weapon w) => w is HyperNovaStrike);
 			if (novaStrike != null) {
 				drawWeaponSlot(novaStrike, gigaWeaponX, 159);
 				gigaWeaponX += 18;
@@ -1897,7 +1895,7 @@ public class GameMode {
 				offsetX -= width;
 				continue;
 			}
-			if (player.isX && Options.main.novaStrikeSpecial && weapon is NovaStrike) {
+			if (player.isX && Options.main.novaStrikeSpecial && weapon is HyperNovaStrike) {
 				offsetX -= width;
 				continue;
 			}
@@ -1965,14 +1963,24 @@ public class GameMode {
 				drawWeaponText(x, y, level.mainPlayer.fishMechaniloidCount().ToString());
 			}
 		}
-
-		if (weapon is MagnetMine && level.mainPlayer.magnetMines.Count > 0) {
-			drawWeaponText(x, y, level.mainPlayer.magnetMines.Count.ToString());
+		if (!mainPlayer.isSpectator && mainPlayer.character is MegamanX mmx) {
+			if (weapon is MagnetMine && mmx.magnetMines.Count > 0) {
+				drawWeaponText(x, y, mmx.magnetMines.Count.ToString());
+			}
+			if (weapon is HyperCharge hc) {
+				if (level.mainPlayer.hyperChargeSlot >= 0 &&
+					mainPlayer.weapons[level.mainPlayer.hyperChargeSlot].ammo == 0
+				) {
+					drawWeaponSlotAmmo(x, y, 0);
+				} else {
+					drawWeaponSlotCooldown(x, y, hc.shootCooldown / hc.fireRate);
+				}
+			}
+			else if (weapon is HyperNovaStrike ns) {
+				drawWeaponSlotCooldown(x, y, ns.shootCooldown / ns.fireRate);
+			}
 		}
 
-		if (weapon is RaySplasher && level.mainPlayer.turrets.Count > 0) {
-			// drawWeaponText(x, y, level.mainPlayer.turrets.Count.ToString());
-		}
 
 		if (weapon is BlastLauncher && level.mainPlayer.axlLoadout.blastLauncherAlt == 1 && level.mainPlayer.grenades.Count > 0) {
 			drawWeaponText(x, y, level.mainPlayer.grenades.Count.ToString());
@@ -1980,25 +1988,6 @@ public class GameMode {
 
 		if (weapon is DNACore dnaCore && level.mainPlayer.weapon == weapon && level.mainPlayer.input.isHeld(Control.Special1, level.mainPlayer)) {
 			drawTransformPreviewInfo(dnaCore, x, y);
-		}
-
-
-		if (mainPlayer.isX && mainPlayer.character != null && mainPlayer.character.charState is not XRevive) {
-			MegamanX mmx = null!;
-			if (mainPlayer.character != null && !mainPlayer.character.destroyed) {
-				mmx = mainPlayer.character as MegamanX ?? throw new NullReferenceException();
-			}
-
-			if (weapon is HyperCharge &&
-				!mainPlayer.isSpectator &&
-				mainPlayer.weapons[level.mainPlayer.hyperChargeSlot].ammo == 0
-			) {
-				drawWeaponSlotAmmo(x, y, 0);
-			} else if (weapon is HyperCharge hb) {
-				drawWeaponSlotCooldown(x, y, mmx.hyperchargeCooldown / hb.getRateOfFire(level.mainPlayer));
-			} else if (weapon is NovaStrike ns) {
-				drawWeaponSlotCooldown(x, y, mmx.novaStrikeCooldown / ns.fireRate);
-			}
 		}
 		 
 		if (weapon is SigmaMenuWeapon) {

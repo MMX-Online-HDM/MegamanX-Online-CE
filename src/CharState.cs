@@ -520,7 +520,7 @@ public class Idle : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		if ((character is MegamanX { isHyperX: true } || player.health < 4)) {
+		if ((character is RagingChargeX || player.health < 4)) {
 			if (Global.sprites.ContainsKey(character.getSprite("weak"))) {
 				defaultSprite = "weak";
 				if (!inTransition()) {
@@ -1035,7 +1035,7 @@ public class WallSlide : CharState {
 	public int wallDir;
 	public float dustTime;
 	public Collider wallCollider;
-	MegamanX mmx;
+	MegamanX? mmx;
 
 	public WallSlide(
 		int wallDir, Collider wallCollider
@@ -1381,13 +1381,8 @@ public class Die : CharState {
 		character.stopMoving();
 		character.stopCharge();
 		new Anim(character.pos.addxy(0, -12), "die_sparks", 1, null, true);
-		if (character is MegamanX mmx) {
-			mmx.stingChargeTime = 0;
-			mmx.removeBarrier();
-			player.lastDeathWasXHyper = mmx.isHyperX;
-		} else {
-			player.lastDeathWasXHyper = false;
-		}
+		player.lastDeathWasXHyper = character is RagingChargeX;
+		
 		if (character.ownedByLocalPlayer && character.player.isDisguisedAxl) {
 			character.player.revertToAxlDeath();
 			character.changeSpriteFromName("die", true);

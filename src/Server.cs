@@ -512,6 +512,9 @@ public class Server {
 		}
 		lastUpdateTime = timeNow;
 		iterations++;
+		if (iterations >= 480) {
+			iterations = 0;
+		}
 
 		if (killServer) {
 			shutdown("Server shut down by in-game mod.");
@@ -528,7 +531,7 @@ public class Server {
 			}
 		} else {
 			// We inform the masterServer that we are still alive.
-			if (isP2P && iterations % 120 == 0) {
+			if (isP2P && iterations % 240 == 0) {
 				NetOutgoingMessage msg = s_server.CreateMessage();
 				msg.Write((byte)MasterServerMsg.UpdatePlayerNum);
 				msg.Write(uniqueID);
@@ -538,7 +541,7 @@ public class Server {
 			if (iterations % 120 == 0) {
 				periodicPing(s_server);
 			}
-			if (iterations % 6 == 0) {
+			if (iterations % 24 == 0) {
 				RPC.periodicServerPing.sendFromServer(s_server, new byte[] { });
 			}
 

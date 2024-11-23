@@ -86,7 +86,7 @@ public class Weapon {
 		var weaponList = new List<Weapon>() {
 			new GigaCrush(),
 			new HyperCharge(),
-			new NovaStrike(null),
+			new HyperNovaStrike(),
 			new DoubleBullet(),
 			new DNACore(),
 			new VileMissile(VileMissileType.ElectricShock),
@@ -161,7 +161,7 @@ public class Weapon {
 				new SonicSlicer(),
 				new StrikeChain(),
 				new MagnetMine(),
-				new SpeedBurner(null),
+				new SpeedBurner(),
 				new AcidBurst(),
 				new ParasiticBomb(),
 				new TriadThunder(),

@@ -48,7 +48,7 @@ public class DNACore : AxlWeapon {
 		armorFlag = character.player.armorFlag;
 		frozenCastle = character.player.frozenCastle;
 		speedDevil = character.player.speedDevil;
-		ultimateArmor = character is MegamanX { hasUltimateArmor: true };
+		ultimateArmor = character is MegamanX { hasSeraphArmor: true };
 		if (charNum == 11) {
 			charNum = 1;
 		}

@@ -1,10 +1,9 @@
 ﻿namespace MMXOnline;
 
 public class ZXSaber : Weapon {
-
-	public static ZXSaber netWeapon = new(null!);
-	public ZXSaber(Player player) : base() {
-		damager = new Damager(player, 4, Global.defFlinch, 0.25f);
+	public static ZXSaber netWeapon = new();
+	public ZXSaber() : base() {
+		//damager = new Damager(player, 4, Global.defFlinch, 0.25f);
 		index = (int)WeaponIds.XSaber;
 		weaponBarBaseIndex = 21;
 		weaponBarIndex = weaponBarBaseIndex;
@@ -14,10 +13,10 @@ public class ZXSaber : Weapon {
 
 public class XSaberProj : Projectile {
 	public XSaberProj(
-		Weapon weapon, Point pos, int xDir,
+		Point pos, int xDir,
 		Player player, ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 300, 4, player, "zsaber_shot", 
+		ZXSaber.netWeapon, pos, xDir, 300, 4, player, "zsaber_shot", 
 		0, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
 		reflectable = true;
@@ -31,7 +30,7 @@ public class XSaberProj : Projectile {
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new XSaberProj(
-			ZXSaber.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
+			arg.pos, arg.xDir, arg.player, arg.netId
 		);
 	}
 }
@@ -52,7 +51,7 @@ public class XSaberState : CharState {
 			fired = true;
 			character.playSound("zerosaberx3");
 			new XSaberProj(
-				new ZXSaber(player), character.pos.addxy(20 * character.xDir, -20), 
+				character.pos.addxy(20 * character.xDir, -20), 
 				character.xDir, player, player.getNextActorNetId(), rpc: true
 			);
 		}

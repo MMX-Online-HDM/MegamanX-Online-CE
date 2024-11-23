@@ -96,14 +96,7 @@ public partial class Player {
 	public RaycastHitData assassinHitPos;
 
 	public bool canUpgradeXArmor() {
-		return (
-			realCharNum == 0 && (
-				character is not MegamanX mmx ||
-				mmx.isHyperX != true &&
-				mmx.charState is not XRevive &&
-				mmx.charState is not XReviveStart
-			)
-		);
+		return (realCharNum == 0);
 	}
 
 	public float adjustedZoomRange { get { return zoomRange - 40; } }
@@ -146,20 +139,17 @@ public partial class Player {
 	public bool isSigma { get { return charNum == (int)CharIds.Sigma; } }
 
 	public float healthBackup;
-	public float _health;
+
+	private ProtectedFloat _health = new();
 	public float health {
 		get {
 			if (!ownedByLocalPlayer) {
-				return _health;
+				return _health.unsafeVal;
 			}
-			if (healthBackup != _health * curMul) {
-				throw new OverflowException();
-			}
-			return _health;
+			return _health.value;
 		}
 		set {
-			_health = value;
-			healthBackup = value * curMul;
+			_health.value = value;
 		}
 	}
 
@@ -184,7 +174,6 @@ public partial class Player {
 	public int aiArmorPath;
 	public float teamHealAmount;
 	public List<CopyShotDamageEvent> copyShotDamageEvents = new List<CopyShotDamageEvent>();
-	public bool usedChipOnce;
 
 	public bool scanned;
 	public bool tagged;
@@ -219,7 +208,7 @@ public partial class Player {
 	public bool isMuted;
 
 	// Subtanks
-	public Dictionary<int, List<SubTank>> charSubTanks = new Dictionary<int, List<SubTank>>() {
+	private Dictionary<int, List<SubTank>> charSubTanks = new Dictionary<int, List<SubTank>>() {
 		{ (int)CharIds.X, new List<SubTank>() },
 		{ (int)CharIds.Zero, new List<SubTank>() },
 		{ (int)CharIds.Vile, new List<SubTank>() },
@@ -229,64 +218,50 @@ public partial class Player {
 		{ (int)CharIds.BusterZero, new List<SubTank>() },
 		{ (int)CharIds.Rock, new List<SubTank>() },
 	};
+
 	// Heart tanks
-	public Dictionary<int, int> charHeartTanks = new Dictionary<int, int>(){
-		{ (int)CharIds.X, 0 },
-		{ (int)CharIds.Zero, 0 },
-		{ (int)CharIds.Vile, 0 },
-		{ (int)CharIds.Axl, 0 },
-		{ (int)CharIds.Sigma, 0 },
-		{ (int)CharIds.PunchyZero, 0 },
-		{ (int)CharIds.BusterZero, 0 },
-		{ (int)CharIds.Rock, 0 },
+	private Dictionary<int, ProtectedInt> charHeartTanks = new Dictionary<int, ProtectedInt>(){
+		{ (int)CharIds.X, new() },
+		{ (int)CharIds.Zero, new() },
+		{ (int)CharIds.Vile, new() },
+		{ (int)CharIds.Axl, new() },
+		{ (int)CharIds.Sigma, new() },
+		{ (int)CharIds.PunchyZero, new() },
+		{ (int)CharIds.BusterZero, new() },
+		{ (int)CharIds.Rock, new() },
 	};
+
 	// Getter functions.
 	public List<SubTank> subtanks {
 		get { return charSubTanks[isDisguisedAxl ? 3 : charNum]; }
 		set { charSubTanks[isDisguisedAxl ? 3 : charNum] = value; }
 	}
-
-	public Dictionary<int, int> charHeartTanksBackup = new Dictionary<int, int>();
 	public int heartTanks {
 		get {
 			if (!ownedByLocalPlayer) {
-				return charHeartTanks[isDisguisedAxl ? 3 : charNum];
+				return charHeartTanks[isDisguisedAxl ? 3 : charNum].unsafeVal;
 			}
-			if (charHeartTanksBackup.GetValueOrDefault(isDisguisedAxl ? 3 : charNum)
-				!=
-				charHeartTanks[isDisguisedAxl ? 3 : charNum] * curMul
-			) {
-				throw new OverflowException();
-			}
-			return charHeartTanks[isDisguisedAxl ? 3 : charNum];
+			return charHeartTanks[isDisguisedAxl ? 3 : charNum].value;
 		}
 		set {
-			charHeartTanks[isDisguisedAxl ? 3 : charNum] = value;
-			charHeartTanksBackup[isDisguisedAxl ? 3 : charNum] = value * curMul;
+			charHeartTanks[isDisguisedAxl ? 3 : charNum].value = value;
 		}
 	}
 
 	// Currency
 	public const int maxCharCurrencyId = 12;
 	public static int curMul = Helpers.randomRange(2, 8);
-	public int[] charCurrencyBackup = new int[maxCharCurrencyId];
-	public int[] charCurrency = new int[maxCharCurrencyId];
+
+	public ProtectedArrayInt charCurrency = new ProtectedArrayInt(maxCharCurrencyId);
 	public int currency {
 		get {
 			if (!ownedByLocalPlayer) {
-				return charCurrency[isDisguisedAxl ? 3 : charNum];
-			}
-			if (charCurrencyBackup[isDisguisedAxl ? 3 : charNum] / curMul
-				!=
-				charCurrency[isDisguisedAxl ? 3 : charNum]
-			) {
-				throw new OverflowException();
+				return charCurrency.unsafeVal(isDisguisedAxl ? 3 : charNum);
 			}
 			return charCurrency[isDisguisedAxl ? 3 : charNum];
 		}
 		set {
 			charCurrency[isDisguisedAxl ? 3 : charNum] = value;
-			charCurrencyBackup[isDisguisedAxl ? 3 : charNum] = value * curMul;
 		}
 	}
 
@@ -463,8 +438,6 @@ public partial class Player {
 	public const float maxPossessedTime = 12;
 	public Player possesser;
 
-	public List<MagnetMineProj> magnetMines = new List<MagnetMineProj>();
-	public List<RaySplasherTurret> turrets = new List<RaySplasherTurret>();
 	public List<GrenadeProj> grenades = new List<GrenadeProj>();
 	public List<ChillPIceStatueProj> iceStatues = new List<ChillPIceStatueProj>();
 	public List<WSpongeSpike> seeds = new List<WSpongeSpike>();
@@ -599,7 +572,6 @@ public partial class Player {
 
 		for (int i = 0; i < charCurrency.Length; i++) {
 			charCurrency[i] = getStartCurrency();
-			charCurrencyBackup[i] = getStartCurrency() * curMul;
 		}
 		foreach (var key in charHeartTanks.Keys) {
 			int htCount = getStartHeartTanksForChar();
@@ -607,7 +579,7 @@ public partial class Player {
 			if (altHtCount > htCount) {
 				htCount = altHtCount;
 			}
-			charHeartTanks[key] = htCount;
+			charHeartTanks[key].value = htCount;
 		}
 		foreach (var key in charSubTanks.Keys) {
 			int stCount = key == charNum ? getStartSubTanksForChar() : getStartSubTanks();
@@ -856,7 +828,7 @@ public partial class Player {
 			respawnTime -= Global.spf;
 		}
 
-		if (ownedByLocalPlayer && Global.isOnFrame(30)) {
+		if (Global.canControlKillscore && Global.isOnFrame(30)) {
 			RPC.updatePlayer.sendRpc(id, kills, deaths);
 		}
 
@@ -1193,8 +1165,8 @@ public partial class Player {
 		}
 		// Hyper mode overrides (POST)
 		if (Global.level.isHyperMatch() && ownedByLocalPlayer) {
-			if (isX) {
-				setUltimateArmor(true);
+			if (character is MegamanX mmx) {
+				mmx.hasSeraphArmor = true;
 			}
 			if (character is Zero zero) {
 				if (loadout.zeroLoadout.hyperMode == 0) {
@@ -1318,7 +1290,7 @@ public partial class Player {
 
 	public bool canBePossessed() {
 		if (character == null || character.destroyed) return false;
-		if (character.isCCImmune()) return false;
+		if (character.isStatusImmune()) return false;
 		if (character.flag != null) return false;
 		if (possessedTime > 0) return false;
 		if (character.isVaccinated()) return false;
@@ -1415,7 +1387,7 @@ public partial class Player {
 				new byte[] { data.extraData[0], data.extraData[1] }
 			);
 			if (retChar is MegamanX retX) {
-				retX.hasUltimateArmor = (data.extraData[2] == 1);
+				retX.hasSeraphArmor = (data.extraData[2] == 1);
 			}
 		}
 		// Store old weapons.
@@ -1742,21 +1714,6 @@ public partial class Player {
 		return bodyArmorNum >= 3 && bootsArmorNum >= 3 && armArmorNum >= 3 && helmetArmorNum >= 3;
 	}
 
-	public bool canUpgradeGoldenX() {
-		return character != null &&
-			isX && !isDisguisedAxl &&
-			character.charState is not Die && !Global.level.is1v1() &&
-			hasAllX3Armor() && !hasAnyChip() && !hasUltimateArmor() &&
-			!hasGoldenArmor() && currency >= goldenArmorCost && !usedChipOnce;
-	}
-
-	public bool canUpgradeUltimateX() {
-		return character != null &&
-			isX && !isDisguisedAxl &&
-			character.charState is not Die && !Global.level.is1v1() &&
-			!hasUltimateArmor() && !canUpgradeGoldenX() && hasAllArmor() && currency >= ultimateArmorCost;
-	}
-
 	public void destroy() {
 		character?.destroySelf();
 		character = null;
@@ -1768,18 +1725,6 @@ public partial class Player {
 			if (go is Actor actor && actor.netOwner == this && actor.cleanUpOnPlayerLeave()) {
 				actor.destroySelf();
 			}
-		}
-	}
-
-	public void removeOwnedMines() {
-		for (int i = magnetMines.Count - 1; i >= 0; i--) {
-			magnetMines[i].destroySelf();
-		}
-	}
-
-	public void removeOwnedTurrets() {
-		for (int i = turrets.Count - 1; i >= 0; i--) {
-			turrets[i].destroySelf();
 		}
 	}
 
@@ -1838,19 +1783,16 @@ public partial class Player {
 				return false;
 			}
 			if (character != null && currentMaverick == null) {
-				InRideArmor inRideArmor = character?.charState as InRideArmor;
+				InRideArmor inRideArmor = character.charState as InRideArmor;
 				if (inRideArmor != null &&
 					(inRideArmor.frozenTime > 0 || inRideArmor.stunTime > 0 || inRideArmor.crystalizeTime > 0)
 				) {
 					return false;
 				}
-				if ((character as MegamanX)?.shotgunIceChargeTime > 0f) {
-					return false;
-				}
 				if (character.charState is GenericStun) {
 					return false;
 				}
-				if (character?.charState is SniperAimAxl) {
+				if (character.charState is SniperAimAxl) {
 					return false;
 				}
 				if (character.rideArmor?.rideArmorState is RADropIn) {
@@ -1897,7 +1839,9 @@ public partial class Player {
 		// Check for stuff that cannot gain scraps.
 		if (character?.isCCImmuneHyperMode() == true) return;
 		if (character?.rideArmor?.raNum == 4 && character.charState is InRideArmor) return;
-		if (isX && hasUltimateArmor()) return;
+		if (character is MegamanX mmx && mmx.hasSeraphArmor) {
+			return;
+		}
 		
 		if (Global.level?.server?.customMatchSettings != null) {
 			currency += Global.level.server.customMatchSettings.currencyGain;
@@ -2317,9 +2261,6 @@ public partial class Player {
 	}
 
 	public void setChipNum(int armorIndex, bool remove) {
-		if (!remove) {
-			usedChipOnce = true;
-		}
 		setArmorNum(0, 3);
 		setArmorNum(1, 3);
 		setArmorNum(2, 3);
@@ -2334,26 +2275,6 @@ public partial class Player {
 		} else {
 			armorFlag = savedArmorFlag;
 		}
-	}
-
-	public bool hasGoldenArmor() {
-		return armorFlag == ushort.MaxValue;
-	}
-
-	public void setUltimateArmor(bool addOrRemove) {
-		if (character is MegamanX mmx) {
-			if (addOrRemove) {
-				mmx.hasUltimateArmor = true;
-				addNovaStrike();
-			} else {
-				mmx.hasUltimateArmor = false;
-				removeNovaStrike();
-			}
-		}
-	}
-
-	public bool hasUltimateArmor() {
-		return character is MegamanX { hasUltimateArmor: true };
 	}
 
 	public int bootsArmorNum {
@@ -2502,7 +2423,7 @@ public partial class Player {
 	public void addKill() {
 		if (Global.serverClient == null) {
 			kills++;
-		} else if (ownedByLocalPlayer) {
+		} else if (Global.canControlKillscore) {
 			kills++;
 			if (!charNumToKills.ContainsKey(realCharNum)) {
 				charNumToKills[realCharNum] = 0;
@@ -2521,19 +2442,10 @@ public partial class Player {
 			return;
 		}
 
-		suicided = isSuicide;
 		if (Global.serverClient == null) {
 			deaths++;
-			if (isSuicide) {
-				kills = Helpers.clamp(kills - 1, 0, int.MaxValue);
-				currency = Helpers.clamp(currency - 1, 0, int.MaxValue);
-			}
-		} else if (ownedByLocalPlayer) {
+		} else if (Global.canControlKillscore) {
 			deaths++;
-			if (isSuicide) {
-				kills = Helpers.clamp(kills - 1, 0, int.MaxValue);
-				currency = Helpers.clamp(currency - 1, 0, int.MaxValue);
-			}
 			RPC.updatePlayer.sendRpc(id, kills, deaths);
 		}
 	}
@@ -2659,7 +2571,7 @@ public partial class Player {
 		if (subtank.health <= 0) return false;
 		if (character.charState is WarpOut) return false;
 		if (character.charState.invincible) return false;
-		if (character is MegamanX { stingActive: true }) return false;
+		if (character is MegamanX { stingActiveTime: >0 }) return false;
 		// TODO: Add Wolf Check here.
 		//if (character.isHyperSigmaBS.getValue()) return false;
 

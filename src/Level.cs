@@ -1277,7 +1277,7 @@ public partial class Level {
 						}
 						if (damagable.projectileCooldown["sigmavirus"] == 0) {
 							actor.playSound("hit");
-							actor.addRenderEffect(RenderEffectType.Hit, 0.05f, 0.1f);
+							actor.addRenderEffect(RenderEffectType.Hit, 3, 6);
 							damagable.applyDamage(2, null, null, null, null);
 							damagable.projectileCooldown["sigmavirus"] = 1;
 						}
@@ -1638,11 +1638,11 @@ public partial class Level {
 			foreach (var cch in chargedCrystalHunters) {
 				var chr = go as Character;
 				if (chr != null && chr.player.alliance == cch.owner.alliance) continue;
-				if (chr != null && chr.isCCImmune()) continue;
+				if (chr != null && chr.isStatusImmune()) continue;
 
 				var proj = go as Projectile;
 				if (proj != null && proj.damager.owner.alliance == cch.owner.alliance) continue;
-				if (proj != null && proj.damager?.owner?.character?.isCCImmune() == true) continue;
+				if (proj != null && proj.damager?.owner?.character?.isStatusImmune() == true) continue;
 
 				var mech = go as RideArmor;
 				if (mech != null && mech.player != null && mech.player.alliance == cch.owner.alliance) continue;

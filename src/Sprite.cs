@@ -157,12 +157,6 @@ public class Sprite {
 		bool isUltX = false;
 		Character? character = actor as Character;
 		if (character != null) {
-			// TODO: Fix this.
-			if (character is MegamanX { stingActive: true } &&
-				!Global.shaderWrappers.ContainsKey("invisible")
-			) {
-				alpha = 0.25f;
-			}
 			if (character.player.isX) {
 				armors = new int[] {
 					character.player.bootsArmorNum,
@@ -177,11 +171,8 @@ public class Sprite {
 			if (character.player.isAxl && character.player.axlWeapon != null) {
 				drawAxlArms = !character.player.axlWeapon.isTwoHanded(true);
 			}
-			isUPX = (
-				character is MegamanX { isHyperX: true } ||
-				character.sprite.name == "mmx_revive" && character.frameIndex > 3
-			);
-			isUltX = character is MegamanX { hasUltimateArmor: true };
+			isUPX = character is RagingChargeX;
+			isUltX = character is MegamanX { hasSeraphArmor: true };
 		}
 
 		if (name == "mmx_unpo_grab" || name == "mmx_unpo_grab2") zIndex = ZIndex.MainPlayer;

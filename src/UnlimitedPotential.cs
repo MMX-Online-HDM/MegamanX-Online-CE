@@ -18,7 +18,7 @@ public class XUPParry : Weapon {
 
 // If fixing parry code also fix kknuckle parry
 public class XUPParryStartState : CharState {
-	MegamanX mmx;
+	RagingChargeX mmx;
 
 	public XUPParryStartState() : base("unpo_parry_start", "", "", "") {
 	}
@@ -82,7 +82,7 @@ public class XUPParryStartState : CharState {
 				chr.changeState(new ParriedState(), true);
 			}
 		}
-		mmx.refillUnpoBuster();
+		mmx.addPercentAmmo(100);
 		character.playSound("upParry", sendRpc: true);
 		character.changeState(new XUPParryMeleeState(counterAttackTarget, damage), true);
 	}
@@ -93,7 +93,7 @@ public class XUPParryStartState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		mmx = character as MegamanX;
+		mmx = character as RagingChargeX;
 	}
 
 	public override void onExit(CharState newState) {
@@ -199,7 +199,7 @@ public class XUPParryMeleeState : CharState {
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
-		if (character is MegamanX mmx) {
+		if (character is RagingChargeX mmx) {
 			mmx.parryCooldown = mmx.maxParryCooldown;
 		}
 	}
@@ -314,7 +314,7 @@ public class XUPParryProjState : CharState {
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		absorbAnim?.destroySelf();
-		if (character is MegamanX mmx) {
+		if (character is RagingChargeX mmx) {
 			mmx.parryCooldown = mmx.maxParryCooldown;
 		}
 	}
@@ -503,7 +503,7 @@ public class XReviveStart : CharState {
 	float subStateTime;
 	Anim drLightAnim;
 
-	MegamanX mmx;
+	RagingChargeX mmx;
 
 	public XReviveStart() : base("revive_start") {
 		invincible = true;
@@ -632,7 +632,7 @@ public class XReviveStart : CharState {
 		if (busterIndex >= 0) {
 			player.changeWeaponSlot(busterIndex);
 		}
-		mmx = character as MegamanX;
+		mmx = character as RagingChargeX;
 	}
 
 	public override void onExit(CharState newState) {
@@ -644,7 +644,7 @@ public class XReviveStart : CharState {
 public class XRevive : CharState {
 	public float radius = 200;
 	XReviveAnim reviveAnim;
-	MegamanX mmx;
+	RagingChargeX mmx;
 
 	public XRevive() : base("revive_shake") {
 		invincible = true;
@@ -679,7 +679,6 @@ public class XRevive : CharState {
 		}
 
 		if (character.isAnimOver()) {
-			mmx.isHyperX = true;
 			character.changeToIdleOrFall();
 			return;
 		}
@@ -697,13 +696,12 @@ public class XRevive : CharState {
 		base.onEnter(oldState);
 		reviveAnim = new XReviveAnim(character.getCenterPos(), player.getNextActorNetId(), sendRpc: true);
 		character.playSound("xRevive", sendRpc: true);
-		mmx = character as MegamanX;
+		mmx = character as RagingChargeX;
 	}
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		character.useGravity = true;
-		mmx.isHyperX = true;
 		Global.level.addToGrid(character);
 		mmx.invulnTime = 2;
 	}
