@@ -16,7 +16,7 @@ public class BoomerangCutter : Weapon {
 		shootSounds = new string[] { "boomerang", "boomerang", "boomerang", "buster3" };
 		fireRate = 30;
 		damage = "2/2";
-		effect = "Charged: Doesn't destroy on hit.";
+		effect = "Charged: Doesn't destroy on hit.\nCharged won't give assists.";
 		hitcooldown = "0/0.5";
 		Flinch = "0/26";
 	}

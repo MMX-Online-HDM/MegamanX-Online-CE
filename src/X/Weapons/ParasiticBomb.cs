@@ -18,7 +18,7 @@ public class ParasiticBomb : Weapon {
 		killFeedIndex = 41;
 		weaknessIndex = (int)WeaponIds.GravityWell;
 		damage = "4/4";
-		effect = "Inflicts Wince. Can carry enemies. Homing bees.";
+		effect = "Slows enemies and slams them if detonated \nunless mashed off. Homing bees.";
 		hitcooldown = "0/0.5";
 		Flinch = "26-CarryT/26";
 		FlinchCD = "iwish";

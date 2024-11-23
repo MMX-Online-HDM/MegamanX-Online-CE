@@ -18,7 +18,7 @@ public class StormTornado : Weapon {
 		//switchCooldown = 0.5f;
 		switchCooldownFrames = 30;
 		damage = "1/4";
-		effect = "Weak push. Extinguishes Fire. Ignores Shields.";
+		effect = "Weak push. Extinguishes Fire. Ignores Shields.\nUncharged won't give assists.";
 		hitcooldown = "0.25/0.33";
 		Flinch = "0/26";
 		FlinchCD = "0/1";

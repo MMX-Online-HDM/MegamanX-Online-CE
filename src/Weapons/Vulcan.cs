@@ -61,7 +61,7 @@ public class Vulcan : Weapon {
 			vileWeight = 4;
 			ammousage = 0.3;
 			damage = "1";
-			effect = "None.";
+			effect = "Splits.";
 		}
 	}
 

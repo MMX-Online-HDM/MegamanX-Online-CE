@@ -207,19 +207,19 @@ public class SelectWeaponMenu : IMainMenu {
 
 		int startY = 45;
 		int startX = 30;
-		int startX2 = 120;
+		int startX2 = 64;
 		int wepW = 18;
 		int wepH = 20;
 
-		float rightArrowPos = 278;
+		float rightArrowPos = 224;
 		float leftArrowPos = startX2 - 15;
 
-		Global.sprites["cursor"].drawToHUD(0, startX, startY + (selCursorIndex * wepH));
+		Global.sprites["cursor"].drawToHUD(0, startX-6, startY + (selCursorIndex * wepH));
 		for (int i = 0; i < 4; i++) {
 			float yPos = startY - 6 + (i * wepH);
 
 			if (i == 3) {
-				Fonts.drawText(FontType.Blue, "Special ", 40, yPos + 2, selected: selCursorIndex == i);
+				Fonts.drawText(FontType.Blue, "S", 30, yPos + 2, selected: selCursorIndex == i);
 
 				for (int j = 0; j < 2; j++) {
 					if (j == 0) {
@@ -247,11 +247,11 @@ public class SelectWeaponMenu : IMainMenu {
 				break;
 			}
 
-			Fonts.drawText(FontType.Blue, "Slot " + (i + 1).ToString(), 40, yPos + 2, selected: selCursorIndex == i);
+			Fonts.drawText(FontType.Blue, (i + 1).ToString(), 30, yPos + 2, selected: selCursorIndex == i);
 
 			if (Global.frameCount % 60 < 30) {
 				Fonts.drawText(
-					FontType.Blue, ">", cursors[i].index < 9 ? rightArrowPos : rightArrowPos - 18, yPos + 2,
+					FontType.Blue, ">", cursors[i].index < 9 ? rightArrowPos : rightArrowPos - 20, yPos + 2,
 					Alignment.Center, selected: selCursorIndex == i
 				);
 				Fonts.drawText(
@@ -282,18 +282,25 @@ public class SelectWeaponMenu : IMainMenu {
 		int wsy = 162;
 
 		DrawWrappers.DrawRect(
-			25, wsy - 42, Global.screenW - 25, wsy + 30, true, new Color(0, 0, 0, 100),
+			25, wsy - 46, Global.screenW - 25, wsy + 30, true, new Color(0, 0, 0, 100),
 			1, ZIndex.HUD, false, outlineColor: outlineColor
-		);
+		); // bottom rect
 		DrawWrappers.DrawRect(
-			25, wsy - 42, Global.screenW - 25, wsy - 24, true, new Color(0, 0, 0, 100), 1,
+			25, wsy - 46, Global.screenW - 25, wsy - 30, true, new Color(0, 0, 0, 100), 1,
 			ZIndex.HUD, false, outlineColor: outlineColor
-		);
-
+		); //slot 1 weapon rect
+		DrawWrappers.DrawRect(
+			240, 38, 359, 92, true, new Color(0, 0, 0, 100),
+			1, ZIndex.HUD, false, outlineColor: outlineColor
+		); // Up Right Rect
+		DrawWrappers.DrawRect(
+			240, 38, 359, 52, true, new Color(0, 0, 0, 100),
+			1, ZIndex.HUD, false, outlineColor: outlineColor
+		); // Up Right Rect
 		if (selCursorIndex >= 3) {
 			Fonts.drawText(
 				FontType.Purple, "Special Key",
-				Global.halfScreenW, 126, Alignment.Center
+				Global.halfScreenW, 120, Alignment.Center
 			);
 			if (cursors[3].index == 0) {
 				Fonts.drawText(FontType.Blue, "X-Buster", Global.halfScreenW, 146, Alignment.Center);
@@ -326,47 +333,59 @@ public class SelectWeaponMenu : IMainMenu {
 
 
 			Fonts.drawText(
-				FontType.Purple, "Slot " + (selCursorIndex + 1).ToString() + " Weapon :",
-				Global.halfScreenW, 126, Alignment.Right
+				FontType.Purple, "Weapon Stats",
+				Global.halfScreenW, 121, Alignment.Center
 			);
+			/*Fonts.drawText(
+				FontType.Orange, weaponNames[selectedWeaponIndices[selCursorIndex]],
+				Global.halfScreenW + 10, 121, Alignment.Left
+			); */
 			Fonts.drawText(
 				FontType.Orange, weaponNames[selectedWeaponIndices[selCursorIndex]],
-				Global.halfScreenW + 10, 126, Alignment.Left
-			);
+				303, 42, Alignment.Center
+			); // up right name
 			//Global.sprites["hud_weapon_icon"].drawToHUD(weapon.weaponSlotIndex, Global.halfScreenW + 75, 148);
-			Fonts.drawText(FontType.Green, "Counters: ", 89, wsy - 17, Alignment.Right);
+			Fonts.drawText(FontType.Green, "Counters: ", 305, 58, Alignment.Right);
 			if (strongAgainstIndex > 0) {
-				Global.sprites["hud_weapon_icon"].drawToHUD(strongAgainstIndex, 89, wsy - 13);
+				Global.sprites["hud_weapon_icon"].drawToHUD(strongAgainstIndex, 308, 62);
 			} else {
-				Fonts.drawText(FontType.Grey, "None", 89, wsy - 17);
+				Fonts.drawText(FontType.Grey, "None", 308, 58);
 			}
 			for (int i = 0; i < strongAgainstMaverickIndices.Length; i++) {
 				if (strongAgainstMaverickIndices[0] == 0) {
 					continue;
 				}
-				Global.sprites["hud_weapon_icon"].drawToHUD(strongAgainstMaverickIndices[i], 107 + i * 15, wsy - 13);
+				Global.sprites["hud_weapon_icon"].drawToHUD(strongAgainstMaverickIndices[i], 325 + i * 17, 62);
 			}
-			Fonts.drawText(FontType.Green, "Weakness: ", 89, wsy, Alignment.Right);
+			Fonts.drawText(FontType.Green, "Weakness: ", 305, 80, Alignment.Right);
 			if (weakAgainstIndex > 0) {
-				Global.sprites["hud_weapon_icon"].drawToHUD(weakAgainstIndex, 89, wsy + 4);
+				Global.sprites["hud_weapon_icon"].drawToHUD(weakAgainstIndex, 308, 82);
 			} else {
-				Fonts.drawText(FontType.Grey, "None", 89, wsy);
+				Fonts.drawText(FontType.Grey, "None", 308, 80);
 			}
 			if (weakAgainstMaverickIndex > 0) {
-				Global.sprites["hud_weapon_icon"].drawToHUD(weakAgainstMaverickIndex, 107, wsy + 4);
+				Global.sprites["hud_weapon_icon"].drawToHUD(weakAgainstMaverickIndex, 325, 82);
 			}
-			Fonts.drawText(FontType.Red, "Damage:", 128, wsy - 17);
-			Fonts.drawText(FontType.Red, "Ammo: " + maxAmmo, 128, wsy - 5);
-			Fonts.drawText(FontType.Red, "Fire Rate:", 127, wsy + 7);
-			Fonts.drawText(FontType.RedishOrange, "Hit CD:", 232, wsy - 17);
-			Fonts.drawText(FontType.RedishOrange, "Flinch CD:", 231, wsy + 7);
-			Fonts.drawText(FontType.RedishOrange, "Flinch:", 231, wsy - 5);
-			Fonts.drawText(FontType.Blue, effect, 28, wsy + 20);
-			Fonts.drawText(FontType.Red, damage, 172, wsy - 17);
-			Fonts.drawText(FontType.Red, rateOfFire, 190, wsy + 7);
-			Fonts.drawText(FontType.RedishOrange, hitcooldown, 279, wsy -17);
-			Fonts.drawText(FontType.RedishOrange, Flinch, 274, wsy + -5);
-			Fonts.drawText(FontType.RedishOrange, FlinchCD, 297, wsy +7);
+			DrawWrappers.DrawRect(25, 133, 148, 147, true, new Color(0, 0, 0, 100), 
+			0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //DMG Rectangle
+			DrawWrappers.DrawRect(25, 147, 148, 158, true, new Color(0, 0, 0, 100), 
+			0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //Ammo Rectangle
+			DrawWrappers.DrawRect(25, 158, 148, 170, true, new Color(0, 0, 0, 100), 
+			0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //FireRate Rectangle
+			DrawWrappers.DrawRect(148, 133, 288, 147, true, new Color(0, 0, 0, 100), 
+			0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //HitCD Rectangle
+			DrawWrappers.DrawRect(148, 147, 288, 158, true, new Color(0, 0, 0, 100), 
+			0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //FlinchCD Rectangle
+			DrawWrappers.DrawRect(148, 158, 288, 170, true, new Color(0, 0, 0, 100), 
+			0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //Flinch Rectangle
+
+			Fonts.drawText(FontType.Blue, "Damage: " + damage, 26, 138);
+			Fonts.drawText(FontType.Blue, "Ammo: " + maxAmmo, 26, 150);
+			Fonts.drawText(FontType.Blue, "Fire Rate: " + rateOfFire, 25, 162);
+			Fonts.drawText(FontType.Blue, "Hit CD: " + hitcooldown, 152, 138);
+			Fonts.drawText(FontType.Blue, "Flinch CD: " + FlinchCD, 151, 150);
+			Fonts.drawText(FontType.Blue, "Flinch: " + Flinch, 151, 162);
+			Fonts.drawText(FontType.Blue, effect, 26, 172);
 			if (weapon is XBuster) {
 				if (Global.level?.mainPlayer.hasUltimateArmor() == false) {
 					switch (Global.level?.mainPlayer.armArmorNum) {
@@ -385,19 +404,19 @@ public class SelectWeaponMenu : IMainMenu {
 							effect = "Mega Buster Mark 17 with Spiral Crush Shot.";
 							break;
 					}
-					Fonts.drawText(FontType.Blue, effect, 28, wsy + 20);
+					Fonts.drawText(FontType.Blue, effect, 26, 172);
 				}
 				else if (Global.level?.mainPlayer.hasUltimateArmor() == true) {
 					effect = "Mega Buster Mark 17 with Plasma Charge Shot + Bonus.";
-					Fonts.drawText(FontType.Blue, effect, 28, wsy + 20);
+					Fonts.drawText(FontType.Blue, effect, 26, 172);
 				}
 			}
 			if (weapon is FrostShield) {
-				if (Global.frameCount % 600 < 120) {
-					effect = "Missile,Mine,Shield,'Unbreakable' you name it."; } 
-				else { effect = "Blocks, Leaves Spikes. C:Tackle or Shoot it.";}	
+				if (Global.frameCount % 600 < 80) {
+					effect = "Missile,Mine,Shield,'Unbreakable' you name it.\nihatethisweapon"; } 
+				else { effect = "Blocks, Leaves Spikes. C: Tackle or Shoot it.";}	
 				Fonts.drawText(FontType.Blue, 
-				effect, 28, wsy + 20);
+				effect, 26, 172);
 			}
 		}
 

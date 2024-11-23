@@ -48,7 +48,7 @@ public class Napalm : Weapon {
 			vileWeight = 3;
 			ammousage = vileAmmoUsage;
 			damage = "1/2";
-			hitcooldown = "1/2";
+			hitcooldown = "1/0.5";
 			effect = "Fire DOT: 0.5/1";
 		}
 		if (napalmType == NapalmType.SplashHit) {
