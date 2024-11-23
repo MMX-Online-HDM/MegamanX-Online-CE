@@ -136,7 +136,7 @@ public class SelectPunchyZeroWeaponMenu : IMainMenu {
 				_ => "ERROR"
 			};
 			weaponDescription = gigaAttack switch {
-				0 => "Cannels stored energy.\nCan flinch enemies.",
+				0 => "Channels stored energy.\nCan flinch enemies.",
 				1 => "Energy blast with pierce properties.\nIgnores enemy defense.",
 				2 => "Summon eleven beams of light.\nFull-screen range.",
 				_ => "ERROR"
