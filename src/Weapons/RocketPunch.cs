@@ -32,6 +32,12 @@ public class RocketPunch : Weapon {
 			projSprite = "rocket_punch_proj";
 			description = new string[] { "A rocket punch sends your fist", "flying to teach enemies a lesson." };
 			vileWeight = 3;
+			ammousage = vileAmmoUsage;
+			damage = "3";
+			hitcooldown = "0.5";
+			Flinch = "13";
+			FlinchCD = "1";
+			effect = "Won't destroy on hit.";
 		} else if (rocketPunchType == RocketPunchType.SpoiledBrat) {
 			fireRate = 12;
 			displayName = "Spoiled Brat";
@@ -40,6 +46,12 @@ public class RocketPunch : Weapon {
 			description = new string[] { "Though lacking in power, this", "rocket punch offers intense speed." };
 			killFeedIndex = 77;
 			vileWeight = 3;
+			ammousage = vileAmmoUsage;
+			damage = "2";
+			hitcooldown = "0.1";
+			Flinch = "13";
+			FlinchCD = "1";
+			effect = "Destroys on hit.";
 		}
 		if (rocketPunchType == RocketPunchType.InfinityGig) {
 			fireRate = 60;
@@ -49,6 +61,12 @@ public class RocketPunch : Weapon {
 			description = new string[] { "Advanced homing technology can be", "difficult to get a handle on." };
 			killFeedIndex = 78;
 			vileWeight = 3;
+			ammousage = vileAmmoUsage;
+			damage = "3";
+			hitcooldown = "0.5";
+			Flinch = "13";
+			FlinchCD = "1";
+			effect = "Homing,Travels further.";
 		}
 	}
 
@@ -82,7 +100,7 @@ public class RocketPunchProj : Projectile {
 		ushort netProjId, bool rpc = false
 	) : base(
 		weapon, pos, xDir, getSpeed(weapon.type), 3,
-		player, weapon.projSprite, Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+		player, weapon.projSprite, Global.halfFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.RocketPunch;
 		destroyOnHit = false;

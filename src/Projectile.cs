@@ -32,6 +32,12 @@ public class Projectile : Actor {
 	public bool isShield;
 	public bool isReflectShield;
 	public bool isDeflectShield;
+	//Hit sprites effect stuff
+	public bool isZSaberEffect;
+	public bool isZSaberEffect2;
+	public bool isZSaberEffect2B;
+	//Clang for Zero (or could be in all characters in general)
+	public bool isZSaberClang;
 	public bool shouldVortexSuck = true;
 	bool damagedOnce;
 	//public int? destroyFrames;
@@ -373,8 +379,8 @@ public class Projectile : Actor {
 			}
 		}
 
-		var isSaber = GenericMeleeProj.isZSaberClang(projId);
-		if (isSaber && owner.character?.isStatusImmune() != true) {
+		//var isSaber = GenericMeleeProj.isZSaberClangBool(otherProj);
+		if (isZSaberClang && owner.character?.isCCImmune() != true) {
 			// Case 1: hitting a clangable projectile.
 			if (ownedByLocalPlayer && owner.character != null &&
 				otherProj != null && otherProj.owner.alliance != owner.alliance

@@ -15,8 +15,8 @@ public class SpinWheel : Weapon {
 		weaponSlotIndex = 12;
 		killFeedIndex = 20 + (index - 9);
 		weaknessIndex = (int)WeaponIds.StrikeChain;
-		damage = "1/1";
-		effect = "Inflicts Wince. Doesn't destroy on hit.";
+		damage = "1/1*8";
+		effect = "Inflicts Slowdown. Doesn't destroy on hit.\nUncharged won't give assists.";
 		hitcooldown = "0.2/0";
 		Flinch = "0/26";
 		maxAmmo = 16;

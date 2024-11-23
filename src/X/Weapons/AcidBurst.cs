@@ -16,7 +16,7 @@ public class AcidBurst : Weapon {
 		killFeedIndex = 40;
 		weaknessIndex = (int)WeaponIds.FrostShield;
 		damage = "1/1";
-		effect = "DOT: 2+1/3+1. Reduces Enemy Defense.";
+		effect = "DOT: 2+1/3+1. Reduces Enemy Defense. Acid DMG can \nbe stopped by healing or getting inside water.";
 	}
 
 	public override void shoot(Character character, int[] args) {

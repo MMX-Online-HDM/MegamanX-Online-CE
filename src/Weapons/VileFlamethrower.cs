@@ -46,6 +46,9 @@ public class WildHorseKick : VileFlamethrower {
 		description = new string[] { "Shoot jets of flame from your leg.", "Strong, but not energy efficient." };
 		killFeedIndex = 117;
 		vileWeight = 2;
+		damage = "1";
+		hitcooldown = "0.1";
+		effect = "Fire DOT: 0.5";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
@@ -76,6 +79,9 @@ public class SeaDragonRage : VileFlamethrower {
 		description = new string[] { "This powerful flamethrower can freeze", "enemies and even be used underwater." };
 		killFeedIndex = 119;
 		vileWeight = 4;
+		damage = "1";
+		hitcooldown = "0.1";
+		effect = "Stack hits to freeze.";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
@@ -105,6 +111,9 @@ public class DragonsWrath : VileFlamethrower {
 		killFeedIndex = 118;
 		projId = (int)ProjIds.DragonsWrath;
 		vileWeight = 3;
+		damage = "1";
+		hitcooldown = "0.1";
+		effect = "None.";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {

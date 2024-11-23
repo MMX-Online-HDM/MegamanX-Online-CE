@@ -19,7 +19,7 @@ public class XBuster : Weapon {
 		canHealAmmo = false;
 		drawAmmo = false;
 		drawCooldown = false;
-		effect = "You only need this to win any match.";
+		//effect = "Mega Buster Mark 17";
 		hitcooldown = "0/0/0/1";
 		damage = "1/2/3/4";
 		Flinch = "0/0/13/26";

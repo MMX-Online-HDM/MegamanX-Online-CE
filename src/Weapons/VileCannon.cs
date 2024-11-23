@@ -33,14 +33,20 @@ public class VileCannon : Weapon {
 		} else if (vileCannonType == VileCannonType.FrontRunner) {
 			fireRate = 45;
 			vileAmmoUsage = 8;
+			ammousage = vileAmmoUsage;
+			damage = "3";
 			displayName = "Front Runner";
 			projSprite = "vile_mk2_proj";
 			fadeSprite = "vile_mk2_proj_fade";
 			description = new string[] { "This cannon not only offers power,", "but can be aimed up and down." };
 			vileWeight = 2;
+			effect = "None.";
 		} else if (vileCannonType == VileCannonType.FatBoy) {
 			fireRate = 45;
+			damage = "4";
+			Flinch = "26";
 			vileAmmoUsage = 24;
+			ammousage = vileAmmoUsage;
 			displayName = "Fat Boy";
 			projSprite = "vile_mk2_fb_proj";
 			fadeSprite = "vile_mk2_fb_proj_fade";
@@ -48,10 +54,13 @@ public class VileCannon : Weapon {
 			weaponSlotIndex = 61;
 			description = new string[] { "The most powerful cannon around,", "it consumes a lot of energy." };
 			vileWeight = 3;
+			effect = "None.";
 		}
 		if (vileCannonType == VileCannonType.LongshotGizmo) {
 			fireRate = 6;
+			damage = "1";
 			vileAmmoUsage = 4;
+			ammousage = vileAmmoUsage;
 			displayName = "Longshot Gizmo";
 			projSprite = "vile_mk2_lg_proj";
 			fadeSprite = "vile_mk2_lg_proj_fade";
@@ -59,6 +68,7 @@ public class VileCannon : Weapon {
 			weaponSlotIndex = 62;
 			description = new string[] { "This cannon fires 5 shots at once,", "but leaves you open to attack." };
 			vileWeight = 4;
+			effect = "Burst of 5 shots.";
 		}
 	}
 
