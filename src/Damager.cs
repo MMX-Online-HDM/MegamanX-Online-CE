@@ -1013,6 +1013,23 @@ public class Damager {
 	}
 
 	public static bool unassistable(int? projId) {
+		// Never assist in any mode as they are DOT or self-damage. (Also Volt Tornado)
+		bool alwaysNotAssist = (ProjIds)projId switch {
+			ProjIds.Burn => true,
+			ProjIds.AcidBurstPoison => true,
+			ProjIds.SelfDmg => true,
+			ProjIds.Napalm2Flame => true,
+			ProjIds.VoltTornado => true,
+			ProjIds.VoltTornadoHyper => true,
+			_ => false
+		};
+		if (alwaysNotAssist) {
+			return true;
+		}
+		// The GM19 list now only counts for FFA mode.
+		if (Global.level.gameMode is not FFADeathMatch) {
+			return false;
+		}
 		return projId switch {
 			(int)ProjIds.Burn => true,
 			(int)ProjIds.Tornado => true,

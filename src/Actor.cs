@@ -926,10 +926,14 @@ public partial class Actor : GameObject {
 				if (secondLastAttacker.attacker == killer) continue;
 
 				// Non-suicide case: prevent assists aggressively
-				if (killer != ownPlayer) {
-					if (secondLastAttacker.envKillOnly && weaponIndex != null) continue;
-					if (Damager.unassistable(secondLastAttacker.projId)) continue;
-					if (Global.time - secondLastAttacker.time > 2) continue;
+				if (killer != ownPlayer && (
+						secondLastAttacker.envKillOnly && weaponIndex != null ||
+						Global.time - secondLastAttacker.time > 2 ||
+						Damager.trueUnassistable(secondLastAttacker.projId) ||
+						Damager.unassistable(secondLastAttacker.projId)
+					)
+				) {
+					continue;
 				}
 				// Suicide case: grant assists liberally to "punish" suicider more
 				else if (Global.time - secondLastAttacker.time > 10) {
