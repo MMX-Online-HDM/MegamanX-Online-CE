@@ -32,6 +32,9 @@ public class Vulcan : Weapon {
 			projSprite = "vulcan_proj";
 			description = new string[] { "With a range of approximately 20 feet,", "this vulcan is easy to use." };
 			vileWeight = 2;
+			ammousage = vileAmmoUsage;
+			damage = "1";
+			effect = "None.";
 		} else if (vulcanType == VulcanType.DistanceNeedler) {
 			fireRate = 15;
 			displayName = "Distance Needler";
@@ -42,6 +45,10 @@ public class Vulcan : Weapon {
 			weaponSlotIndex = 59;
 			description = new string[] { "This vulcan has good range and speed,", "but cannot fire rapidly." };
 			vileWeight = 2;
+			ammousage = vileAmmoUsage;
+			damage = "2";
+			hitcooldown = "0.2";
+			effect = "Won't destroy on hit.";
 		} else if (vulcanType == VulcanType.BuckshotDance) {
 			fireRate = 8;
 			displayName = "Buckshot Dance";
@@ -52,6 +59,9 @@ public class Vulcan : Weapon {
 			weaponSlotIndex = 60;
 			description = new string[] { "The scattering power of this vulcan", "results in less than perfect aiming." };
 			vileWeight = 4;
+			ammousage = 0.3;
+			damage = "1";
+			effect = "None.";
 		}
 	}
 

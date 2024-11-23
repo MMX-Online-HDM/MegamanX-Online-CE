@@ -34,12 +34,19 @@ public class VileBall : Weapon {
 			vileAmmoUsage = 8;
 			description = new string[] { "These bombs split into two", "upon contact with the ground." };
 			vileWeight = 3;
+			ammousage = vileAmmoUsage;
+			damage = "2";
+			hitcooldown = "0.2";
+			effect = "Splits on ground.";
 		} else if (vileBallType == VileBallType.SpreadShot) {
 			displayName = "Spread Shot";
 			vileAmmoUsage = 5;
 			description = new string[] { "Unleash a fan of energy shots", "that stun enemies in their tracks." };
 			killFeedIndex = 55;
 			vileWeight = 3;
+			ammousage = vileAmmoUsage;
+			damage = "1";
+			effect = "Stuns Enemies. CD: 2";
 		} else if (vileBallType == VileBallType.PeaceOutRoller) {
 			displayName = "Peace Out Roller";
 			vileAmmoUsage = 16;
@@ -47,6 +54,11 @@ public class VileBall : Weapon {
 			description = new string[] { "This electric bombs splits into two upon", "upon contact with the ground." };
 			killFeedIndex = 80;
 			vileWeight = 3;
+			ammousage = vileAmmoUsage;
+			damage = "3";
+			hitcooldown = "0.5";
+			Flinch = "6";
+			effect = "Splits,no destroy on hit.";
 		}
 	}
 

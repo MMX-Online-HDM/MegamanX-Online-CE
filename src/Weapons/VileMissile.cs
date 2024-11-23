@@ -32,6 +32,11 @@ public class VileMissile : Weapon {
 			vileAmmo = 8;
 			description = new string[] { "Stops enemies in their tracks,", "but deals no damage." };
 			vileWeight = 3;
+			vileWeight = 2;
+			ammousage = vileAmmo;
+			damage = "0";
+			hitcooldown = "0.15";
+			effect = "Stuns Enemies. CD: 2";
 		} else if (vileMissileType == VileMissileType.HumerusCrush) {
 			fireRate = 45;
 			displayName = "Humerus Crush";
@@ -40,6 +45,11 @@ public class VileMissile : Weapon {
 			description = new string[] { "This missile shoots straight", "and deals decent damage." };
 			killFeedIndex = 74;
 			vileWeight = 3;
+			vileWeight = 2;
+			ammousage = vileAmmo;
+			damage = "3";
+			hitcooldown = "0.15";
+			effect = "None.";
 		} else if (vileMissileType == VileMissileType.PopcornDemon) {
 			fireRate = 45;
 			displayName = "Popcorn Demon";
@@ -48,6 +58,11 @@ public class VileMissile : Weapon {
 			description = new string[] { "This missile splits into 3", "and can cause great damage." };
 			killFeedIndex = 76;
 			vileWeight = 3;
+			vileWeight = 2;
+			ammousage = vileAmmo;
+			damage = "2";
+			hitcooldown = "0.15/0";
+			effect = "Can Split.";
 		}
 	}
 
