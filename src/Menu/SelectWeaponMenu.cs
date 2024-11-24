@@ -386,31 +386,29 @@ public class SelectWeaponMenu : IMainMenu {
 			Fonts.drawText(FontType.Blue, "Flinch CD: " + FlinchCD, 151, 150);
 			Fonts.drawText(FontType.Blue, "Flinch: " + Flinch, 151, 162);
 			Fonts.drawText(FontType.Blue, effect, 26, 172);
-			if (weapon is XBuster) {
-				if (Global.level?.mainPlayer.hasUltimateArmor() == false) {
-					switch (Global.level?.mainPlayer.armArmorNum) {
-						case (int)ArmorId.Light:
-							effect = "Mega Buster Mark 17 with Spiral Crush Shot.";
-							break;
-						
-						case (int)ArmorId.Giga:
-							effect = "Mega Buster Mark 17 with Double Charge Shot.";
-							break;
+				if (weapon is XBuster) {
+						switch (Global.level?.mainPlayer.armArmorNum) {
+							case (int)ArmorId.Light:
+								effect = "Mega Buster Mark 17 with Spiral Crush Shot.";
+								break;
+							
+							case (int)ArmorId.Giga:
+								effect = "Mega Buster Mark 17 with Double Charge Shot.";
+								break;
 
-						case (int)ArmorId.Max:
-							effect = "Mega Buster Mark 17 with Cross Charge Shot.";
-							break;
-						default:
-							effect = "Mega Buster Mark 17 with Spiral Crush Shot.";
-							break;
+							case (int)ArmorId.Max:
+								effect = "Mega Buster Mark 17 with Cross Charge Shot.";
+								break;
+							default:
+								effect = "Mega Buster Mark 17 with Spiral Crush Shot.";
+								break;
+						}
+						Fonts.drawText(FontType.Blue, effect, 26, 172);
 					}
-					Fonts.drawText(FontType.Blue, effect, 26, 172);
-				}
-				else if (Global.level?.mainPlayer.hasUltimateArmor() == true) {
-					effect = "Mega Buster Mark 17 with Plasma Charge Shot + Bonus.";
-					Fonts.drawText(FontType.Blue, effect, 26, 172);
-				}
-			}
+					if (Global.level?.mainPlayer.character is MegamanX mmx && mmx?.hasSeraphArmor == true) {
+						effect = "Mega Buster Mark 17 with Plasma Charge Shot + Bonus.";
+						Fonts.drawText(FontType.Blue, effect, 26, 172);
+					}			
 			if (weapon is FrostShield) {
 				if (Global.frameCount % 600 < 80) {
 					effect = "Missile,Mine,Shield,'Unbreakable' you name it.\nihatethisweapon"; } 

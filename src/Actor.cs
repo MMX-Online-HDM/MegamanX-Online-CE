@@ -929,7 +929,7 @@ public partial class Actor : GameObject {
 				if (killer != ownPlayer && (
 						secondLastAttacker.envKillOnly && weaponIndex != null ||
 						Global.time - secondLastAttacker.time > 2 ||
-						Damager.trueUnassistable(secondLastAttacker.projId) ||
+			//Needs Fix			Damager.trueUnassistable(secondLastAttacker.projId) ||
 						Damager.unassistable(secondLastAttacker.projId)
 					)
 				) {
