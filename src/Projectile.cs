@@ -380,7 +380,7 @@ public class Projectile : Actor {
 		}
 
 		//var isSaber = GenericMeleeProj.isZSaberClangBool(otherProj);
-		if (isZSaberClang && owner.character?.isCCImmune() != true) {
+		if (isZSaberClang && owner.character?.isStunImmune() == false) {
 			// Case 1: hitting a clangable projectile.
 			if (ownedByLocalPlayer && owner.character != null &&
 				otherProj != null && otherProj.owner.alliance != owner.alliance
@@ -560,23 +560,10 @@ public class Projectile : Actor {
 				}
 
 				if (shouldDealDamage(damagable)) {
-					if (Global.level.server.favorHost && Global.level.server.isP2P) {
-						if (Global.serverClient?.isHost == true) {
-							damager.applyDamage(damagable, weakness, weapon, this, projId);
-						}
-					} else {
-						if (!isDefenderFavored()) {
-							if (ownedByLocalPlayer) {
-								damager.applyDamage(damagable, weakness, weapon, this, projId);
-							}
-						} else {
-							if (damagable.actor().ownedByLocalPlayer) {
-								damager.applyDamage(damagable, weakness, weapon, this, projId);
-							}
-						}
+					if (isNetcodeDamageOwner(damagable.actor())) {
+						damager.applyDamage(damagable, weakness, weapon, this, projId);
 					}
 				}
-
 				onHitDamagable(damagable);
 			}
 
@@ -592,7 +579,8 @@ public class Projectile : Actor {
 					RPC.heal.sendRpc(owner, damagableActor?.netId ?? ushort.MaxValue, healAmount);
 				}
 				onHitDamagable(damagable);
-				if (destroyOnHit) {
+				if (destroyOnHit && !destroyed) {
+					damagedOnce = true;
 					destroySelf(fadeSprite, fadeSound, favorDefenderProjDestroy: isDefenderFavoredAndOwner());
 				}
 			}
@@ -616,6 +604,22 @@ public class Projectile : Actor {
 		return true;
 	}
 
+	public virtual bool isNetcodeDamageOwner(Actor enemyActor) {
+		if (Global.serverClient == null) {
+			return true;
+		}
+		if (Global.level.server.favorHost && Global.level.server.isP2P) {
+			if (isDefenderFavored()) {
+				return Global.serverClient.isHost;
+			}
+			return ownedByLocalPlayer;
+		}
+		if (isDefenderFavored()) {
+			return enemyActor.ownedByLocalPlayer;
+		}
+		return ownedByLocalPlayer;
+	}
+
 	// This method is run even on non-owners of the projectile, so it can be used to apply effects to other clients without creating a new RPC
 	// However, this means that if you want a owner-only effect, you need an ownedByLocalPlayer check in front.
 	// Keep in mind, the client's collision check would use a "favor the defender model", so if you want an effect to favor the shooter, then
@@ -624,14 +628,9 @@ public class Projectile : Actor {
 	public virtual void onHitDamagable(IDamagable damagable) {
 		if (destroyOnHit) {
 			damagedOnce = true;
-			if (Global.level.server.isP2P && Global.level.server.favorHost) {
-				if (Global.serverClient?.isHost != true) {
-					return;
-				}
+			if (isNetcodeDamageOwner(damagable.actor())) {
 				destroySelf(fadeSprite, fadeSound, doRpcEvenIfNotOwned: true);
-				return;
 			}
-			destroySelf(fadeSprite, fadeSound, favorDefenderProjDestroy: isDefenderFavoredAndOwner());
 		}
 	}
 

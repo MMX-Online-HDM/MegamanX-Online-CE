@@ -1293,7 +1293,6 @@ public partial class Player {
 		if (character.isStatusImmune()) return false;
 		if (character.flag != null) return false;
 		if (possessedTime > 0) return false;
-		if (character.isVaccinated()) return false;
 		return true;
 	}
 
@@ -1364,7 +1363,7 @@ public partial class Player {
 		retChar.acidTime = character.acidTime;
 		retChar.oilTime = character.oilTime;
 		retChar.igFreezeProgress = character.igFreezeProgress;
-		retChar.infectedTime = character.infectedTime;
+		retChar.virusTime = character.virusTime;
 
 		// Hit cooldowns.
 		retChar.projectileCooldown = character.projectileCooldown;
@@ -1566,7 +1565,7 @@ public partial class Player {
 		retChar.acidTime = character.acidTime;
 		retChar.oilTime = character.oilTime;
 		retChar.igFreezeProgress = character.igFreezeProgress;
-		retChar.infectedTime = character.infectedTime;
+		retChar.virusTime = character.virusTime;
 
 		// Hit cooldowns.
 		retChar.projectileCooldown = character.projectileCooldown;
@@ -1837,7 +1836,7 @@ public partial class Player {
 			return;
 		}
 		// Check for stuff that cannot gain scraps.
-		if (character?.isCCImmuneHyperMode() == true) return;
+		if (character is RagingChargeX or KaiserSigma or ViralSigma or WolfSigma) return;
 		if (character?.rideArmor?.raNum == 4 && character.charState is InRideArmor) return;
 		if (character is MegamanX mmx && mmx.hasSeraphArmor) {
 			return;

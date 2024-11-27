@@ -21,12 +21,12 @@ public class XTeleportState : CharState {
 
 		if (!isInvisible && stateFrames >= 12 && stateFrames < 18) {
 			isInvisible = true;
-			character.specialState = (int)SpecialStateIds.XTeleport;
+			specialId = SpecialStateIds.XTeleport;
 			character.useGravity = false;
 		}
 		if (isInvisible && stateFrames >= 18) {
 			isInvisible = false;
-			character.specialState = (int)SpecialStateIds.None;
+			specialId = SpecialStateIds.None;
 			character.useGravity = true;
 			if (cloneG != null && canChangePos(cloneG)) {
 				Point prevCamPos = player.character.getCamCenterPos();
@@ -148,7 +148,6 @@ public class XTeleportState : CharState {
 		if (cloneG != null) {
 			cloneG.destroySelf();
 		}
-		character.specialState = (int)SpecialStateIds.None;
 	}
 	public bool canChangePos(Actor actor) {
 		if (Global.level.checkTerrainCollisionOnce(actor, 0, 2) == null) {

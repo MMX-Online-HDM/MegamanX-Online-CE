@@ -387,16 +387,14 @@ public class SelectWeaponMenu : IMainMenu {
 			Fonts.drawText(FontType.Blue, "Flinch: " + Flinch, 151, 162);
 			Fonts.drawText(FontType.Blue, effect, 26, 172);
 			if (weapon is XBuster) {
-				if (Global.level?.mainPlayer.hasUltimateArmor() == false) {
+				if (Global.level?.mainPlayer.character is not MegamanX { hasSeraphArmor: true }) {
 					switch (Global.level?.mainPlayer.armArmorNum) {
 						case (int)ArmorId.Light:
 							effect = "Mega Buster Mark 17 with Spiral Crush Shot.";
 							break;
-						
 						case (int)ArmorId.Giga:
 							effect = "Mega Buster Mark 17 with Double Charge Shot.";
 							break;
-
 						case (int)ArmorId.Max:
 							effect = "Mega Buster Mark 17 with Cross Charge Shot.";
 							break;
@@ -406,7 +404,7 @@ public class SelectWeaponMenu : IMainMenu {
 					}
 					Fonts.drawText(FontType.Blue, effect, 26, 172);
 				}
-				else if (Global.level?.mainPlayer.hasUltimateArmor() == true) {
+				else {
 					effect = "Mega Buster Mark 17 with Plasma Charge Shot + Bonus.";
 					Fonts.drawText(FontType.Blue, effect, 26, 172);
 				}

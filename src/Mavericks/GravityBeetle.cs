@@ -421,7 +421,7 @@ public class GBeetleGravityWellProj : Projectile {
 		base.onHitDamagable(damagable);
 		var actor = damagable.actor();
 		Character chr = actor as Character;
-		if (chr != null && chr.isStatusImmune()) return;
+		if (chr != null && chr.isPushImmune()) return;
 		if (actor is not Character && actor is not RideArmor && actor is not Maverick) return;
 		if (chr != null && (chr.charState is DeadLiftGrabbed || chr.charState is BeetleGrabbedState)) return;
 
