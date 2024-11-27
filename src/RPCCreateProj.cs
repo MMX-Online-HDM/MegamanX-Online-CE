@@ -67,7 +67,7 @@ public partial class RPCCreateProj : RPC {
 				proj = new ZSaberProj(pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.XSaberProj:
-	//Needs Fix	proj = new XSaberProj(ZXSaber.netWeapon, pos, xDir, player, netProjByte);
+				proj = new XSaberProj(pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.Buster3:
 				proj = new Buster3Proj(new XBuster(), pos, xDir, extraData[0], player, netProjByte);

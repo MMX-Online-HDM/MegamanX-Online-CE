@@ -89,7 +89,6 @@ public partial class Character : Actor, IDamagable {
 	public int fakeAlliance;
 
 	// For states with special propieties.
-	public int specialState = 0;
 	// For doublejump.
 	public float lastJumpPressedTime;
 
@@ -112,8 +111,7 @@ public partial class Character : Actor, IDamagable {
 	public float acidTime;
 	public float acidHurtCooldown;
 	// Infected
-	public Damager? infectedDamager;
-	public float infectedTime;
+	public float virusTime;
 	// Oil
 	public Damager? oilDamager;
 	public float oilTime;
@@ -226,18 +224,15 @@ public partial class Character : Actor, IDamagable {
 	}
 	public bool isVaccinated() { return vaccineTime > 0; }
 
-	public void addInfectedTime(Player attacker, float time) {
+	public void addVirusTime(Player attacker, float time) {
 		if (!ownedByLocalPlayer) return;
 		if (isInvulnerable()) return;
 		if (isVaccinated()) return;
 		if (charState.invincible) return;
 
 		Damager damager = new Damager(attacker, 0, 0, 0);
-		if (infectedTime == 0 || infectedDamager == null) {
-			infectedDamager = damager;
-		} else if (infectedDamager.owner != damager.owner) return;
-		infectedTime += time;
-		if (infectedTime > 8) infectedTime = 8;
+		virusTime += time;
+		if (virusTime > 8) virusTime = 8;
 	}
 
 	public void addDarkHoldTime(float darkHoldTime, Player attacker) {
@@ -406,8 +401,8 @@ public partial class Character : Actor, IDamagable {
 			player.igShader.SetUniform("igFreezeProgress", igFreezeProgress / 4);
 			shaders.Add(player.igShader);
 		}
-		if (infectedTime > 0 && player.infectedShader != null) {
-			player.infectedShader.SetUniform("infectedFactor", infectedTime / 8f);
+		if (virusTime > 0 && player.infectedShader != null) {
+			player.infectedShader.SetUniform("infectedFactor", virusTime / 8f);
 			shaders.Add(player.infectedShader);
 		}
 		return shaders;
@@ -819,17 +814,17 @@ public partial class Character : Actor, IDamagable {
 			oilTime = 0;
 			burnTime = 0;
 			acidTime = 0;
-			infectedTime = 0;
+			virusTime = 0;
 			vaccineTime -= Global.spf;
 			if (vaccineTime <= 0) {
 				vaccineTime = 0;
 			}
 		}
 
-		if (infectedTime > 0) {
-			infectedTime -= Global.spf;
-			if (infectedTime <= 0) {
-				infectedTime = 0;
+		if (virusTime > 0) {
+			virusTime -= Global.spf;
+			if (virusTime <= 0) {
+				virusTime = 0;
 			}
 		}
 
@@ -1465,11 +1460,15 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool isPushImmune() {
-		return isStatusImmune();
+		return isTrueStatusImmune();
 	}
 
 	public virtual bool isStatusImmune() {
-		return isCCImmuneHyperMode();
+		return isTrueStatusImmune() || isInvulnerable() || isVaccinated() || charState.invincible;
+	}
+
+	public virtual bool isTrueStatusImmune() {
+		return false;
 	}
 
 	public virtual bool isCCImmuneHyperMode() {
@@ -1493,10 +1492,10 @@ public partial class Character : Actor, IDamagable {
 		if (!ignoreRideArmorHide && charState is InRideArmor && (charState as InRideArmor)?.isHiding == true) {
 			return true;
 		}
-		if (!ignoreRideArmorHide && !string.IsNullOrEmpty(sprite?.name) && sprite.name.Contains("ra_hide")) return true;
-		if (specialState == (int)SpecialStateIds.AxlRoll ||
-			specialState == (int)SpecialStateIds.XTeleport
-		) {
+		if (!ignoreRideArmorHide && !string.IsNullOrEmpty(sprite?.name) && sprite.name.Contains("ra_hide")) {
+			return true;
+		}
+		if (charState.specialId == SpecialStateIds.AxlRoll || charState.specialId == SpecialStateIds.XTeleport) {
 			return true;
 		}
 		if (sprite != null && sprite.name.Contains("viral_exit")) {
@@ -2902,7 +2901,7 @@ public partial class Character : Actor, IDamagable {
 		oilTime = 0;
 		player.possessedTime = 0;
 		igFreezeProgress = 0;
-		infectedTime = 0;
+		virusTime = 0;
 	}
 
 	
@@ -3311,8 +3310,8 @@ public partial class Character : Actor, IDamagable {
 			customData.Add((byte)MathF.Ceiling(oilTime * 30));
 			boolMask[4] = true;
 		}
-		if (infectedTime > 0) {
-			customData.Add((byte)MathF.Ceiling(infectedTime * 30));
+		if (virusTime > 0) {
+			customData.Add((byte)MathF.Ceiling(virusTime * 30));
 			boolMask[5] = true;
 		}
 		if (vaccineTime > 0) {
@@ -3379,7 +3378,7 @@ public partial class Character : Actor, IDamagable {
 			pos++;
 		}
 		if (boolMask[5]) {
-			infectedTime = data[pos] / 30f;
+			virusTime = data[pos] / 30f;
 			pos++;
 		}
 		if (boolMask[6]) {

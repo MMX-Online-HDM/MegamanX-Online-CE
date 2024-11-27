@@ -187,6 +187,7 @@ public class HyorogaWeapon : Weapon {
 
 public class HyorogaStartState : CharState {
 	public HyorogaStartState() : base("hyoroga_rise") {
+		specialId = SpecialStateIds.HyorogaStart;
 	}
 
 	public override void update() {
@@ -210,14 +211,13 @@ public class HyorogaStartState : CharState {
 		character.vel = new Point(0, 0);
 		character.gravityModifier = -1;
 		character.dashedInAir = 0;
-		character.specialState = (int)SpecialStateIds.HyorogaStart;
+		
 	}
 
 	public override void onExit(CharState newState) {
 		character.useGravity = true;
 		character.gravityModifier = 1;
 		base.onExit(newState);
-		character.specialState = (int)SpecialStateIds.None;
 	}
 }
 

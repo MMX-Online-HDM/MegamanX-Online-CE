@@ -329,10 +329,10 @@ public class Damager {
 				flinch = 0;
 			}
 			if ((owner?.character as Zero)?.isViral == true) {
-				character.addInfectedTime(owner, damage);
+				character.addVirusTime(owner, damage);
 			}
 			if ((owner?.character as PunchyZero)?.isViral == true) {
-				character.addInfectedTime(owner, damage);
+				character.addVirusTime(owner, damage);
 			}
 
 			switch (projId) {
@@ -473,7 +473,7 @@ public class Damager {
 					character.addDarkHoldTime(DarkHoldState.totalStunTime, owner);
 					break;
 				case (int)ProjIds.MagnaCTail:
-					character.addInfectedTime(owner, 4f);
+					character.addVirusTime(owner, 4f);
 					break;
 				case (int)ProjIds.MechPunch:
 				case (int)ProjIds.MechDevilBearPunch:
@@ -830,7 +830,7 @@ public class Damager {
 		}
 		if ((damage > 0 || finalDamage > 0) && character != null &&
 			character.ownedByLocalPlayer &&
-			character.specialState == (int)SpecialStateIds.PZeroParry &&
+			character.charState.specialId == SpecialStateIds.PZeroParry &&
 			charState is PZeroParry zeroParryState &&
 			zeroParryState.canParry(damagingActor, projId)
 		) {

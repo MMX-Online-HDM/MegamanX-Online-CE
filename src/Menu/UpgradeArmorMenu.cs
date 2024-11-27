@@ -247,7 +247,7 @@ public class UpgradeArmorMenu : IMainMenu {
 		var gameMode = level.gameMode;
 		DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
 		string armorName = xGame switch {
-			1 => "Light Armor",
+			1 => "Ligth Armor",
 			2 => "Giga Armor",
 			3 => "Max Armor",
 			_ => "ERROR"

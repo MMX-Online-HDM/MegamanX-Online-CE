@@ -132,6 +132,7 @@ public class DodgeRoll : CharState {
 	public DodgeRoll() : base("roll", "", "") {
 		attackCtrl = true;
 		normalCtrl = true;
+		specialId = SpecialStateIds.AxlRoll;
 	}
 
 	public override void onEnter(CharState oldState) {
@@ -146,13 +147,11 @@ public class DodgeRoll : CharState {
 		initialDashDir = character.xDir;
 		if (player.input.isHeld(Control.Left, player)) initialDashDir = -1;
 		else if (player.input.isHeld(Control.Right, player)) initialDashDir = 1;
-		character.specialState = (int)SpecialStateIds.AxlRoll;
 	}
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		axl.dodgeRollCooldown = Axl.maxDodgeRollCooldown;
-		character.specialState = (int)SpecialStateIds.None;
 	}
 
 	public override void update() {

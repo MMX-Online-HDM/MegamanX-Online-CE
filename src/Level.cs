@@ -1628,8 +1628,8 @@ public partial class Level {
 		bool isSlown = false;
 
 		if (actor is Character chr2) {
-			if (chr2.infectedTime > 0) {
-				slowAmount = 1 - (0.25f * (chr2.infectedTime / 8));
+			if (chr2.virusTime > 0) {
+				slowAmount = 1 - (0.25f * (chr2.virusTime / 8));
 				isSlown = true;
 			}
 		}

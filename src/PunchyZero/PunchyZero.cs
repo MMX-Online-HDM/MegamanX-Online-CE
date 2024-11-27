@@ -663,7 +663,7 @@ public class PunchyZero : Character {
 
 	// For parry purposes.
 	public override void onCollision(CollideData other) {
-		if (specialState == (int)SpecialStateIds.PZeroParry &&
+		if (charState.specialId == SpecialStateIds.PZeroParry &&
 			other.gameObject is Projectile proj &&
 			proj.damager?.owner?.teamAlliance != player.teamAlliance &&
 			charState is PZeroParry zeroParry &&
