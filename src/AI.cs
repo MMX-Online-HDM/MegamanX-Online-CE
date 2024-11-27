@@ -969,23 +969,23 @@ public class AI {
 		// X:
 		if (character is MegamanX mmx) {
 
-			if (player.canUpgradeUltimateX() && player.health >= player.maxHealth) {
+			/*if (!mmx.hasSeraphArmor && player.canUpgradeUltimateX() && player.health >= player.maxHealth) {
 				if (!mmx.boughtUltimateArmorOnce) {
 					player.currency -= Player.ultimateArmorCost;
 					mmx.boughtUltimateArmorOnce = true;
 				}
 				player.setUltimateArmor(true);
 				return;
-			}
+			}*/
 
-			if (player.hasAllX3Armor() && player.canUpgradeGoldenX() && player.health >= player.maxHealth) {
+			/*if (player.hasAllX3Armor() && player.canUpgradeGoldenX() && player.health >= player.maxHealth) {
 				if (!mmx.boughtGoldenArmorOnce) {
 					player.currency -= Player.goldenArmorCost;
 					mmx.boughtGoldenArmorOnce = true;
 				}
 				player.setGoldenArmor(true);
 				return;
-			}
+			}*/
 
 			if (player.canReviveX() && !player.isMainPlayer) {
 				player.reviveX();
@@ -995,11 +995,11 @@ public class AI {
 				player.character.increaseCharge();
 			}
 
-			if (mmx.isHyperX && mmx.canShoot()) {
+			/*if (mmx.isHyperX && mmx.canShoot()) {
 				//mmx.unpoShotCount = Math.Max(mmx.unpoShotCount, 4);
 				player.release(Control.Shoot);
 				player.press(Control.Shoot);
-			}
+			}*/
 		}
 	}
 
@@ -1008,7 +1008,7 @@ public class AI {
 		foreach (GameObject gameObject in mmx.getCloseActors(64, true, false, false)) {
 			if (gameObject is Projectile proj && proj.damager.owner.alliance != player.alliance
 			&& player.character is MegamanX X) {
-				if (player.hasArmor() || !player.hasArmor() && !X.isHyperX) {
+				if (player.hasArmor() || !player.hasArmor()) {
 					if (X.player.weapon.ammo > 0) {
 						player.changeWeaponSlot(RollingShield);
 						player.press(Control.Shoot);
@@ -1016,13 +1016,13 @@ public class AI {
 					}
 				}
 				int novaStrikeSlot = player.weapons.FindIndex(w => w is HyperNovaStrike);
-				if (player.hasUltimateArmor()) {
+				/*if (player.hasUltimateArmor()) {
 					X.player.changeWeaponSlot(novaStrikeSlot);
 					if (X.player.weapon.ammo >= 16) {
 						X.player.press(Control.Shoot);
 					} else { X.player.changeWeaponSlot(getRandomWeaponIndex()); }
-				}
-				if (X.isHyperX) {
+				}*/
+				/*if (X.isHyperX) {
 					if (X.unpoAbsorbedProj != null) {
 						X.changeState(new XUPParryProjState(X.unpoAbsorbedProj, true, false), true);
 						player.press(Control.WeaponLeft); player.release(Control.WeaponLeft);
@@ -1031,7 +1031,7 @@ public class AI {
 					} else {
 						X.changeState(new XUPParryStartState(), true); player.press(Control.WeaponLeft); player.release(Control.WeaponLeft);
 					}								
-				}	
+				}*/	
 			}
 		}
 	}
