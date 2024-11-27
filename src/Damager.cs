@@ -1020,6 +1020,8 @@ public class Damager {
 		return (ProjIds)projId switch {
 			ProjIds.AcidBurst => true,
 			ProjIds.AcidBurstCharged => true,
+			ProjIds.CrystalHunter => true,
+			ProjIds.ElectricShock => true,
 			_ => false
 		};
 	}
