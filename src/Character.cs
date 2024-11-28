@@ -1437,7 +1437,7 @@ public partial class Character : Actor, IDamagable {
 					_ when (chargeType == 1) => RenderEffectType.ChargeGreen,
 					_ => RenderEffectType.ChargeOrange
 				};
-				addRenderEffect(renderGfx, 2, 6);
+				addRenderEffect(renderGfx, 8, 6);
 			}
 			chargeEffect.update(getChargeLevel(), chargeType);
 		}
