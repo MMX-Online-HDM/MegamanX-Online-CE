@@ -423,7 +423,7 @@ public class SniperMissileProj : Projectile, IDamagable {
 			blinkTime -= Global.spf;
 			if (blinkTime < 0) {
 				blinkTime = maxBlinkTime * (1 - (time / maxTime));
-				addRenderEffect(RenderEffectType.Hit, 8, 10);
+				addRenderEffect(RenderEffectType.Hit, 10, 8);
 			}
 		}
 

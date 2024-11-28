@@ -422,13 +422,13 @@ public class KillZone : Geometry {
 			damagable.applyDamage(damage, null, null, null, null);
 			if (damagable is Character chr) {
 				chr.playSound(flinch ? "hurt" : "hit", sendRpc: true);
-				chr.addRenderEffect(RenderEffectType.Hit, 8, 10);
+				chr.addRenderEffect(RenderEffectType.Hit, 10, 8);
 				if (flinch && chr.ownedByLocalPlayer) {
 					chr.changeState(new Hurt(-chr.xDir, flinch ? Global.defFlinch : 0));
 				}
 			} else {
 				damagable.actor().playSound("hit", sendRpc: true);
-				damagable.actor().addRenderEffect(RenderEffectType.Hit, 8, 10);
+				damagable.actor().addRenderEffect(RenderEffectType.Hit, 10, 8);
 			}
 		}
 	}
