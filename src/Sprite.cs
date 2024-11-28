@@ -286,6 +286,49 @@ public class Sprite {
 				extraYOff = 0;
 				extraY = 2;
 			}
+			var x3ArmShaders = new List<ShaderWrapper>(shaders);
+			if (hyperBusterReady) {
+				if (Global.isOnFrameCycle(5)) {
+					if (Global.shaderWrappers.ContainsKey("hit")) {
+						x3ArmShaders.Add(Global.shaderWrappers["hit"]);
+					}
+				}
+			}
+
+			compositeBitmaps.Add(bitmap);
+			if (armors[2] > 0) {
+				compositeBitmaps.Add(xArmorHelmetBitmap[armors[2] - 1]);
+			}
+			if (armors[0] > 0) {
+				compositeBitmaps.Add(xArmorBootsBitmap[armors[0] - 1]);
+			}
+			if (armors[1] > 0) {
+				compositeBitmaps.Add(xArmorBodyBitmap[armors[1] - 1]);
+			}
+			if (armors[3] > 0) {
+				compositeBitmaps.Add(xArmorArmBitmap[armors[3] - 1]);
+			}
+			if (compositeBitmaps.Count > 1) {
+				isCompositeSprite = true;
+			}
+		}
+
+		if (!isUltX && armors != null && animData.isXSprite) {
+			bool isShootSprite = needsX3BusterCorrection();
+
+			if (isShootSprite) {
+				if (name.Contains("mmx_wall_slide_shoot")) {
+					flippedExtraW = 5;
+					extraW = flippedExtraW;
+					extraXOff = -flippedExtraW * flipX;
+				} else {
+					extraW = 5;
+				}
+			}
+			if (armors[2] == 2) {
+				extraYOff = 0;
+				extraY = 2;
+			}
 
 			var x3ArmShaders = new List<ShaderWrapper>(shaders);
 			if (hyperBusterReady) {
@@ -436,16 +479,31 @@ public class Sprite {
 				});
 			}
 		}
-		DrawWrappers.DrawTexture(
-			bitmap,
-			currentFrame.rect.x1,
-			currentFrame.rect.y1 - extraYOff,
+		if (!isCompositeSprite) {
+			DrawWrappers.DrawTexture(
+				bitmap,
+				currentFrame.rect.x1,
+				currentFrame.rect.y1 - extraYOff,
 				currentFrame.rect.w(),
 				currentFrame.rect.h() + extraY,
-				x + frameOffsetX, y + frameOffsetY - extraYOff,
-				zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true
+				x + frameOffsetX,
+				y + frameOffsetY - extraYOff,
+				zIndex, cx, cy, xDirArg, yDirArg,
+				angle, alpha, shaders, true
 			);
-
+		} else {
+			DrawWrappers.DrawCompositeTexture(
+				compositeBitmaps.ToArray(),
+				currentFrame.rect.x1 - flippedExtraW,
+				currentFrame.rect.y1 - extraYOff,
+				currentFrame.rect.w() + extraW,
+				currentFrame.rect.h() + extraY,
+				x + frameOffsetX + extraXOff,
+				y + frameOffsetY,
+				zIndex, cx, cy, xDirArg, yDirArg,
+				angle, alpha, shaders, true
+			);
+		}
 		if (isUPX) {
 			var upShaders = new List<ShaderWrapper>(shaders);
 			if (Global.isOnFrameCycle(5)) {
@@ -455,7 +513,6 @@ public class Sprite {
 			}
 			DrawWrappers.DrawTexture(Global.textures["XUPGlow"], currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, upShaders, true);
 		}
-
 		if (animData.isAxlSprite && drawAxlArms) {
 			DrawWrappers.DrawTexture(axlArmBitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, 0, alpha, shaders, true);
 		}
