@@ -807,7 +807,7 @@ public class Damager {
 		}
 
 		if (damage > 0 && character?.isDarkHoldState != true) {
-			victim?.addRenderEffect(RenderEffectType.Hit, 10, 8);
+			victim?.addRenderEffect(RenderEffectType.Hit, 3, 6);
 		}
 
 		float finalDamage = damage * (weakness ? 1.5f : 1) * owner.getDamageModifier();

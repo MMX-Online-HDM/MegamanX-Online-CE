@@ -313,7 +313,7 @@ public class PZeroParryCounter : CharState {
 	public override void update() {
 		base.update();
 		if (character.frameIndex < 5) {
-			character.addRenderEffect(RenderEffectType.ChargeOrange, 8, 6);
+			character.addRenderEffect(RenderEffectType.ChargeOrange, 2, 6);
 		}
 		if (counterAttackTarget == null || calcOnce && !canCounterDash) {
 			if (character.frameIndex >= 2) {
