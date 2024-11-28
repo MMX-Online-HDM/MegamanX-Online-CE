@@ -16,7 +16,7 @@ public class ChameleonSting : Weapon {
 		shootSounds = new string[] { "csting", "csting", "csting", "stingCharge" };
 		fireRate = 45;
 		damage = "2";
-		effect = "Full Charge grants invulnerability.";
+		effect = "Splits. \nFull Charge grants invulnerability.";
 		hitcooldown = "0";
 	}
 

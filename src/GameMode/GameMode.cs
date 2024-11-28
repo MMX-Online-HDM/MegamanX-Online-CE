@@ -2874,7 +2874,7 @@ public class GameMode {
 						Global.screenW / 2, 10 + Global.screenH / 2, Alignment.Center
 					);
 					string reviveText2 = Helpers.controlText(
-						$"[CMD]: Revive as MK-V (5 {Global.nameCoins})"
+						$"[CMD]: Revive as Vile V (5 {Global.nameCoins})"
 					);
 					Fonts.drawText(
 						FontType.Green, reviveText2,

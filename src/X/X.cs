@@ -158,13 +158,13 @@ public class MegamanX : Character {
 		base.postUpdate();
 
 		if (stockedSaber) {
-			addRenderEffect(RenderEffectType.ChargeGreen, 2, 6);
+			addRenderEffect(RenderEffectType.ChargeGreen, 8, 6);
 		}
 		else if (stockedX3Charge) {
-			addRenderEffect(RenderEffectType.ChargeOrange, 2, 6);
+			addRenderEffect(RenderEffectType.ChargeOrange, 8, 6);
 		}
 		else if (stockedBuster) {
-			addRenderEffect(RenderEffectType.ChargePink, 2, 6);
+			addRenderEffect(RenderEffectType.ChargePink, 8, 6);
 		}
 	}
 

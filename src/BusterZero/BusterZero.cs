@@ -31,7 +31,7 @@ public class BusterZero : Character {
 				2 => RenderEffectType.ChargeOrange,
 				_ => RenderEffectType.ChargeBlue
 			};
-			addRenderEffect(renderGfx, 2, 6);
+			addRenderEffect(renderGfx, 8, 6);
 		}
 		if (!ownedByLocalPlayer) {
 			return;
@@ -80,7 +80,7 @@ public class BusterZero : Character {
 				3 => RenderEffectType.ChargePink,
 				_ => RenderEffectType.ChargeGreen,
 			};
-			addRenderEffect(renderGfx, 2, 6);
+			addRenderEffect(renderGfx, 8, 6);
 			chargeEffect.update(getChargeLevel(), chargeType);
 		}
 	}

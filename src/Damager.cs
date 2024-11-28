@@ -807,7 +807,7 @@ public class Damager {
 		}
 
 		if (damage > 0 && character?.isDarkHoldState != true) {
-			victim?.addRenderEffect(RenderEffectType.Hit, 3, 6);
+			victim?.addRenderEffect(RenderEffectType.Hit, 10, 8);
 		}
 
 		float finalDamage = damage * (weakness ? 1.5f : 1) * owner.getDamageModifier();
@@ -1020,6 +1020,8 @@ public class Damager {
 		return (ProjIds)projId switch {
 			ProjIds.AcidBurst => true,
 			ProjIds.AcidBurstCharged => true,
+			ProjIds.CrystalHunter => true,
+			ProjIds.ElectricShock => true,
 			_ => false
 		};
 	}

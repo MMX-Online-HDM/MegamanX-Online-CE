@@ -396,7 +396,7 @@ public class AI {
 
 		//Always do as AI
 		if (character is MegamanX mmx4) {
-			dommxAI(mmx4);
+			//dommxAI(mmx4);
 		} else if (character is Zero zero) {
 			//doZeroAI(zero);
 		} else if (character is BaseSigma sigma4) {
@@ -463,7 +463,7 @@ public class AI {
 				axlAIDodge(axl3);
 			}
 			if (character is MegamanX mmx3) {
-				mmxAIDodge(mmx3);
+			//	mmxAIDodge(mmx3);
 			}
 			if (character is PunchyZero pzero) {
 				knuckleZeroAIDodge(pzero);
@@ -965,6 +965,7 @@ public class AI {
 			*/
 		}
 	}
+	/* Disabled until X is done
 	public void dommxAI(Character mmx4) {
 		// X:
 		if (character is MegamanX mmx) {
@@ -1035,6 +1036,7 @@ public class AI {
 			}
 		}
 	}
+	*/
 	//End of X
 	//Start of Saber Zero
 	public void zeroAIAttack(Zero zero) {
