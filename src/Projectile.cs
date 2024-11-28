@@ -620,9 +620,11 @@ public class Projectile : Actor {
 		return ownedByLocalPlayer;
 	}
 
-	// This method is run even on non-owners of the projectile, so it can be used to apply effects to other clients without creating a new RPC
+	// This method is run even on non-owners of the projectile,
+	// so it can be used to apply effects to other clients without creating a new RPC
 	// However, this means that if you want a owner-only effect, you need an ownedByLocalPlayer check in front.
-	// Keep in mind, the client's collision check would use a "favor the defender model", so if you want an effect to favor the shooter, then
+	// Keep in mind, the client's collision check would use a "favor the defender model",
+	// so if you want an effect to favor the shooter, then
 	// it needs to be in the Damager class as a "on<PROJ>Damage() method"
 	// Also, this runs on every hit regardless of hit cooldown, so if hit cooldown must be factored, use onDamage
 	public virtual void onHitDamagable(IDamagable damagable) {
@@ -634,7 +636,9 @@ public class Projectile : Actor {
 		}
 	}
 
-	// Can be used in lieu of the on<PROJ>Damage() method in damager method with caveat that this causes issues where the actor isn't created yet leading to point blank shots under lag not running this
+	// Can be used in lieu of the on<PROJ>Damage() method
+	// in damager method with caveat that this causes issues
+	// where the actor isn't created yet leading to point blank shots under lag not running this
 	public virtual DamagerMessage? onDamage(IDamagable damagable, Player attacker) {
 		return null;
 	}
