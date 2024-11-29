@@ -540,6 +540,7 @@ public partial class Global {
 	public static Server? localServer;
 	public static bool isOffline { get { return serverClient == null; } }
 	public static bool isHost { get { return level != null && level.isHost; } }
+	public static bool canControlKillscore { get { return level != null && (isOffline || level.isHost); } }
 	public static LeaveMatchSignal? leaveMatchSignal;
 	public const int basePort = 14242;
 	public const int clientPort = 14240;

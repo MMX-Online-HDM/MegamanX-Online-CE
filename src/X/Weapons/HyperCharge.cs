@@ -37,7 +37,8 @@ public class HyperCharge : Weapon {
 
 	public static float getRateofFireMod(Player player) {
 		if (player != null && player.hyperChargeSlot < player.weapons.Count &&
-			player.weapons[player.hyperChargeSlot] is XBuster && !player.hasUltimateArmor()
+			player.weapons[player.hyperChargeSlot] is XBuster &&
+			(player.character as MegamanX)?.hasSeraphArmor != true
 		) {
 			return 0.75f;
 		}

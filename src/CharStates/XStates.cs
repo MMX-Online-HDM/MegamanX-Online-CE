@@ -180,7 +180,7 @@ public class X2ChargeShot : CharState {
 		if (newState is not AirDash && newState is not WallSlide) {
 			character.shootAnimTime = 0;
 		} else {
-			character.shootAnimTime = 0.334f - character.animSeconds;
+			character.shootAnimTime = 20 - character.animTime;
 		}
 		base.onExit(newState);
 	}
@@ -209,7 +209,7 @@ public class X3ChargeShot : CharState {
 			if (state == 0) {
 				Point shootPos = character.getShootPos();
 				int shootDir = character.getShootXDir();
-				if (!player.hasUltimateArmor()) {
+				if (mmx.hasSeraphArmor) {
 					new Anim(
 						shootPos, "buster4_x3_muzzle", shootDir,
 						player.getNextActorNetId(), true, sendRpc: true
@@ -261,7 +261,7 @@ public class X3ChargeShot : CharState {
 						return;
 					}
 				} else {
-					mmx.stockedX3Buster = false;
+					mmx.stockedMaxBuster = false;
 				}
 				sprite = "x3_shot2";
 				landSprite = "x3_shot2";
@@ -300,9 +300,9 @@ public class X3ChargeShot : CharState {
 		if (mmx == null) {
 			throw new NullReferenceException();
 		}
-		if (!mmx.stockedX3Buster) {
+		if (!mmx.stockedMaxBuster) {
 			if (hyperBusterWeapon == null) {
-				mmx.stockedX3Buster = true;
+				mmx.stockedMaxBuster = true;
 			}
 			sprite = "x3_shot";
 			defaultSprite = sprite;
@@ -312,7 +312,7 @@ public class X3ChargeShot : CharState {
 			}
 			character.changeSpriteFromName(sprite, true);
 		} else {
-			mmx.stockedX3Buster = false;
+			mmx.stockedMaxBuster = false;
 			state = 1;
 			sprite = "x3_shot2";
 			defaultSprite = sprite;
@@ -326,9 +326,9 @@ public class X3ChargeShot : CharState {
 
 	public override void onExit(CharState newState) {
 		if (state == 0) {
-			mmx.stockedX3Buster = true;
+			mmx.stockedMaxBuster = true;
 		} else {
-			mmx.stockedX3Buster = false;
+			mmx.stockedMaxBuster = false;
 		}
 		character.shootAnimTime = 0;
 		base.onExit(newState);

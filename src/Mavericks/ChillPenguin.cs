@@ -378,7 +378,7 @@ public class ChillPBlizzardProj : Projectile {
 		if (character.charState.invincible) return;
 		if (character.charState.immuneToWind) return;
 		if (immuneToKnockback) return;
-		if (character.isCCImmune()) return;
+		if (character.isStatusImmune()) return;
 
 		float modifier = 1;
 		if (character.grounded) modifier = 0.5f;

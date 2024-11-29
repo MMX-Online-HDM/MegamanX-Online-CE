@@ -4,16 +4,17 @@ using System.Linq;
 
 namespace MMXOnline;
 
-public class RCX : Character {
+public class RagingChargeX : Character {
 
 	public int unpoShotCount;
 	public float upPunchCooldown;
 	public float xSaberCooldown;
 	public float parryCooldown;
+	public float maxParryCooldown = 30;
 	float UPDamageCooldown;
 	public float unpoDamageMaxCooldown = 2;
 	public Projectile? unpoAbsorbedProj;
-	public RCX(
+	public RagingChargeX(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
 		bool isWarpIn = true

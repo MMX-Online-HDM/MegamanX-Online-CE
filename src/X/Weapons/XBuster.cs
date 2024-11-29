@@ -19,7 +19,7 @@ public class XBuster : Weapon {
 		canHealAmmo = false;
 		drawAmmo = false;
 		drawCooldown = false;
-		effect = "You only need this to win any match.";
+		//effect = "Mega Buster Mark 17";
 		hitcooldown = "0/0/0/1";
 		damage = "1/2/3/4";
 		Flinch = "0/0/13/26";
@@ -44,11 +44,6 @@ public class XBuster : Weapon {
 		// HUD.
 		drawAmmo = true;
 		drawCooldown = true;
-		
-		// Remove charge.
-		mmx.stockedCharge = false;
-		mmx.stockedX3Buster = false;
-		mmx.stockedXSaber = false;
 	}
 
 	public static bool isNormalBuster(Weapon weapon) {
@@ -60,9 +55,6 @@ public class XBuster : Weapon {
 	}
 
 	public override bool canShoot(int chargeLevel, Player player) {
-		if ((player.character as MegamanX)?.isHyperX == true && ammo < getAmmoUsage(chargeLevel)) {
-			return false;
-		}
 		if (!base.canShoot(chargeLevel, player)) return false;
 		if (chargeLevel > 1) {
 			return true;
@@ -86,7 +78,7 @@ public class XBuster : Weapon {
 		Point pos = character.getShootPos();
 		int xDir = character.getShootXDir();
 		Player player = character.player;
-		bool isUA = (character as MegamanX)?.hasUltimateArmor == true;
+		bool isUA = (character as MegamanX)?.hasSeraphArmor == true;
 		string sound = "";
 
 		if (chargeLevel == 0) {
@@ -144,7 +136,7 @@ public class XBuster : Weapon {
 			sound = "buster3";
 		} else if (chargeLevel >= 3) {	
 			if (player.ownedByLocalPlayer) {
-				if (mmx.hasUltimateArmor && !mmx.stockedCharge) {
+				if (mmx.hasSeraphArmor && !mmx.stockedCharge) {
 					character.changeState(new X2ChargeShot(2), true);
 				} else {
 					if (character.charState is not WallSlide) {
@@ -167,7 +159,7 @@ public class XBuster : Weapon {
 		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
 		string sound = "";
 
-		if (mmx.stockedX3Buster || mmx.stockedCharge) {
+		if (mmx.stockedX3Charge || mmx.stockedCharge) {
 			mmx.changeState(new X3ChargeShot(null) {state = 1}, true);
 		} else if (chargeLevel == 0) {
 			lemonsOnField.Add(new BusterProj(this, pos, xDir, 0, player, player.getNextActorNetId(), true));

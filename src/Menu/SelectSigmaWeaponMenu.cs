@@ -374,11 +374,11 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 			10 => new int[] { new WireSpongeWeapon(null).weaponSlotIndex, new StrikeChain().weaponSlotIndex },
 			11 => new int[] { new WheelGatorWeapon(null).weaponSlotIndex, new SpinWheel().weaponSlotIndex },
 			12 => new int[] { new BubbleCrabWeapon(null).weaponSlotIndex, new BubbleSplash().weaponSlotIndex },
-			13 => new int[] { new FlameStagWeapon(null).weaponSlotIndex, new SpeedBurner(null).weaponSlotIndex },
+			13 => new int[] { new FlameStagWeapon(null).weaponSlotIndex, new SpeedBurner().weaponSlotIndex },
 			14 => new int[] { new MorphMothWeapon(null).weaponSlotIndex, new SilkShot().weaponSlotIndex },
 			15 => new int[] { new MagnaCentipedeWeapon(null).weaponSlotIndex, new MagnetMine().weaponSlotIndex },
 			16 => new int[] { new CrystalSnailWeapon(null).weaponSlotIndex, new CrystalHunter().weaponSlotIndex },
-			17 => new int[] { new FlameStagWeapon(null).weaponSlotIndex, new SpeedBurner(null).weaponSlotIndex },
+			17 => new int[] { new FlameStagWeapon(null).weaponSlotIndex, new SpeedBurner().weaponSlotIndex },
 			18 => new int[] { new BlastHornetWeapon(null).weaponSlotIndex, new ParasiticBomb().weaponSlotIndex },
 			19 => new int[] { new BlizzardBuffaloWeapon(null).weaponSlotIndex, new FrostShield().weaponSlotIndex },
 			20 => new int[] { new ToxicSeahorseWeapon(null).weaponSlotIndex, new AcidBurst().weaponSlotIndex },
@@ -411,7 +411,7 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 			7 => new int[] { new ChillPenguinWeapon(null).weaponSlotIndex, new ShotgunIce().weaponSlotIndex },
 			9 => new int[] { new WheelGatorWeapon(null).weaponSlotIndex, new SpinWheel().weaponSlotIndex },
 			10 => new int[] { new BubbleCrabWeapon(null).weaponSlotIndex, new BubbleSplash().weaponSlotIndex },
-			11 => new int[] { new FlameStagWeapon(null).weaponSlotIndex, new SpeedBurner(null).weaponSlotIndex },
+			11 => new int[] { new FlameStagWeapon(null).weaponSlotIndex, new SpeedBurner().weaponSlotIndex },
 			12 => new int[] {
 				new MorphMothWeapon(null).weaponSlotIndex, new SilkShot().weaponSlotIndex,
 				new FakeZeroWeapon(null).weaponSlotIndex

@@ -31,7 +31,7 @@ public class BusterZero : Character {
 				2 => RenderEffectType.ChargeOrange,
 				_ => RenderEffectType.ChargeBlue
 			};
-			addRenderEffect(renderGfx, 0.033333f, 0.1f);
+			addRenderEffect(renderGfx, 2, 6);
 		}
 		if (!ownedByLocalPlayer) {
 			return;
@@ -52,7 +52,7 @@ public class BusterZero : Character {
 
 		// For the shooting animation.
 		if (shootAnimTime > 0) {
-			shootAnimTime -= Global.spf;
+			shootAnimTime -= Global.speedMul;
 			if (shootAnimTime <= 0) {
 				shootAnimTime = 0;
 				changeSpriteFromName(charState.defaultSprite, false);
@@ -64,6 +64,7 @@ public class BusterZero : Character {
 		// Charge and release charge logic.
 		chargeLogic(shoot);
 	}
+
 	public override void chargeGfx() {
 		if (ownedByLocalPlayer) {
 			chargeEffect.stop();
@@ -79,7 +80,7 @@ public class BusterZero : Character {
 				3 => RenderEffectType.ChargePink,
 				_ => RenderEffectType.ChargeGreen,
 			};
-			addRenderEffect(renderGfx, 0.033333f, 0.1f);
+			addRenderEffect(renderGfx, 2, 6);
 			chargeEffect.update(getChargeLevel(), chargeType);
 		}
 	}
@@ -195,7 +196,7 @@ public class BusterZero : Character {
 				this.xDir = 1;
 			}
 		}
-		shootAnimTime = 0.3f;
+		shootAnimTime = DefaultShootAnimTime;
 		Point shootPos = getShootPos();
 		int xDir = getShootXDir();
 
@@ -258,7 +259,9 @@ public class BusterZero : Character {
 		Projectile? proj = id switch {
 			(int)MeleeIds.SaberSwing => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.DZMelee, player,
-				isBlackZero ? 4 : 3, Global.defFlinch, 0.5f, isReflectShield: true, addToLevel: addToLevel
+				isBlackZero ? 4 : 3, Global.defFlinch, 0.5f, isReflectShield: true,
+				isZSaberClang : true, isZSaberEffect : true,
+				addToLevel: addToLevel
 			),
 			_ => null
 		};

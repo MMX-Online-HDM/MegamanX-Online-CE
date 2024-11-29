@@ -33,7 +33,7 @@ public class ShotgunIce : Weapon {
 			pos = pos.addxy(xDir * 25, 0);
 			pos.y = mmx.pos.y;
 
-			mmx.shotgunIceChargeTime = 1.5f;
+			//mmx.shotgunIceChargeTime = 1.5f;
 
 			new ShotgunIceProjSled(this, pos, xDir, player, player.getNextActorNetId(), true);
 		}

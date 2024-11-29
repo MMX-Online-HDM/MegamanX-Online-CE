@@ -37,6 +37,6 @@ public class RenderEffect {
 	}
 
 	public bool isFlashing() {
-		return time < flashTime;
+		return Global.level.nonSkippedframeCount % (flashTime * 2) < flashTime;
 	}
 }

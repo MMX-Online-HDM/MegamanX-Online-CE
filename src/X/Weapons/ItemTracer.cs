@@ -16,26 +16,30 @@ public class ItemTracer : Weapon {
 		killFeedIndex = 20 + (index - 9);
 	}
 
-	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-		if (player?.character is not MegamanX mmx || !player.character.ownedByLocalPlayer) return;
+	public override void shoot(Character character, int[] args) {
+		int chargeLevel = args[0];
+		Point pos = character.getShootPos();
+		int xDir = character.getShootXDir();
+		Player player = character.player;
 
-		mmx.scannerCooldown = 60;
 		Character? target = null;
-		mmx.playSound("itemTracer", sendRpc: true);
-		CollideData hit = Global.level.raycast(pos, pos.addxy(150 * xDir, 0), new List<Type>() { typeof(Actor) });
+		character.playSound("itemTracer", sendRpc: true);
+		CollideData hit = Global.level.raycast(
+			character.pos, character.pos.addxy(150 * character.xDir, 0), new List<Type>() { typeof(Actor) }
+		);
 		if (hit?.gameObject is Character chr && chr.player.alliance != player.alliance && !chr.player.scanned) {
 			target = chr;
 		}
-		new ItemTracerProj(this, pos, xDir, player, target, netProjId, rpc: true);
+		new ItemTracerProj(this, pos, xDir, player, target, player.getNextActorNetId(), rpc: true);
 	}
 }
 
 public class ItemTracerProj : Projectile {
-	public Character target;
+	public Character? target;
 	public Character? scannedChar;
 	public ItemTracerProj(
 		Weapon weapon, Point pos, int xDir, Player player, 
-		Character target, ushort netProjId, bool rpc = false
+		Character? target, ushort netProjId, bool rpc = false
 	) : base(
 		weapon, pos, xDir, 300, 0, player, "itemscan_proj", 
 		0, 0.5f, netProjId, player.ownedByLocalPlayer

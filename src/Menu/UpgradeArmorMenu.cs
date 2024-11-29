@@ -22,6 +22,7 @@ public class UpgradeArmorMenu : IMainMenu {
 	}
 
 	public void update() {
+		MegamanX? mmx = Global.level.mainPlayer.character as MegamanX;
 		//if (updateHyperArmorUpgrades(mainPlayer)) return;
 
 		// Should not be able to reach here but preventing upgrades just in case
@@ -55,13 +56,13 @@ public class UpgradeArmorMenu : IMainMenu {
 			return;
 		}
 		// Enable this to disable 14.0 UAX Menu
-		if (mainPlayer.hasGoldenArmor() || mainPlayer.hasUltimateArmor()) {
+		if (mmx?.hasFullHyperMaxArmor == true || mmx?.hasSeraphArmor == true) {
 			return;
 		}
-		if (mainPlayer.hasGoldenArmor()) {
+		if (mmx?.hasFullHyperMaxArmor == true) {
 			Menu.change(new UpgradeArmorMenuGolden(GoldenMenu));
 		}
-		if (mainPlayer.hasUltimateArmor() || (mainPlayer.hasUltimateArmor() && mainPlayer.hasGoldenArmor())) {
+		if (mmx?.hasSeraphArmor == true) {
 			Menu.change(new UpgradeArmorMenuUAX(UAXMenu));
 		}
 		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
@@ -246,8 +247,8 @@ public class UpgradeArmorMenu : IMainMenu {
 		var gameMode = level.gameMode;
 		DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
 		string armorName = xGame switch {
-			1 => "Armor of Light",
-			2 => "Second Armor",
+			1 => "Ligth Armor",
+			2 => "Giga Armor",
 			3 => "Max Armor",
 			_ => "ERROR"
 		};
@@ -355,7 +356,7 @@ public class UpgradeArmorMenu : IMainMenu {
 			case 3:	//Max
 				if (!mainPlayer.hasAllX3Armor()) {
 					Fonts.drawText(FontType.Blue, "Communicates with the", optionPos1.x + 5, optionPos1.y + 10);
-					Fonts.drawText(FontType.DarkPurple,"State of the Art Orbital Satellite.", optionPos1.x + 5, optionPos1.y + 20);
+					Fonts.drawText(FontType.DarkPurple,"State of the Art Space Satellite.", optionPos1.x + 5, optionPos1.y + 20);
 					Fonts.drawText(FontType.Blue, "To uncover enemy position.", optionPos1.x + 5, optionPos1.y + 30);
 					Fonts.drawText(FontType.Blue, "Gain a Defensive Forcefield", optionPos2.x + 5, optionPos2.y + 10);
 					Fonts.drawText(FontType.Blue, "on taking Damage.", optionPos2.x + 5, optionPos2.y + 20);

@@ -22,7 +22,7 @@ public class BubbleSplash : Weapon {
 		weaknessIndex = (int)WeaponIds.SpinWheel;
 		//switchCooldown = 0.25f;
 		switchCooldownFrames = 15;
-		damage = "1/1";
+		damage = "1/1*6";
 		ammousage = 0.5;
 		//effect = "Shoot a Stream up to 7 bubbles. C:Jump Boost.";
 		effect = "Charged: Grants Jump Boost.";

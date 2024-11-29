@@ -18,7 +18,7 @@ public class ParasiticBomb : Weapon {
 		killFeedIndex = 41;
 		weaknessIndex = (int)WeaponIds.GravityWell;
 		damage = "4/4";
-		effect = "Inflicts Wince. Can carry enemies. Homing bees.";
+		effect = "Slows enemies and slams them if detonated \nunless mashed off. Homing bees.";
 		hitcooldown = "0/0.5";
 		Flinch = "26-CarryT/26";
 		FlinchCD = "iwish";
@@ -34,7 +34,7 @@ public class ParasiticBomb : Weapon {
 	public override bool canShoot(int chargeLevel, Player player) {
 		if (!base.canShoot(chargeLevel, player) || player.character is not MegamanX mmx) return false;
 
-		return mmx.beeSwarm == null;
+		return mmx.chargedParasiticBomb == null;
 	}
 
 	public override void shoot(Character character, int[] args) {
@@ -47,8 +47,8 @@ public class ParasiticBomb : Weapon {
 			character.playSound("busterX3");
 			new ParasiticBombProj(this, pos, xDir, player, player.getNextActorNetId(), true);
 		} else {
-			if (character.ownedByLocalPlayer && character is MegamanX mmx && mmx.beeSwarm == null) {
-				mmx.beeSwarm = new BeeSwarm(mmx);
+			if (character.ownedByLocalPlayer && character is MegamanX mmx && mmx.chargedParasiticBomb == null) {
+				mmx.chargedParasiticBomb = new BeeSwarm(mmx);
 			}
 		}
 	}
@@ -101,7 +101,7 @@ public class ParasiteCarry : CharState {
 	public override bool canEnter(Character character) {
 		if (!character.ownedByLocalPlayer) return false;
 		if (!base.canEnter(character)) return false;
-		if (character.isCCImmune()) return false;
+		if (character.isStatusImmune()) return false;
 		if (character.isInvulnerable()) return false;
 		if (character.charState.superArmor) return false;
 		return !character.charState.invincible;
@@ -250,7 +250,7 @@ public class BeeSwarm {
 			beeCursor.destroySelf();
 		}
 		beeCursors.Clear();
-		mmx.beeSwarm = null;
+		mmx.chargedParasiticBomb = null;
 	}
 }
 
@@ -299,7 +299,10 @@ public class BeeCursorAnim : Anim {
 					if (character != null) {
 						//character.chargeTime = character.charge3Time;
 						//character.shoot(character.getChargeLevel());
-						if (character.charState.attackCtrl) character.setShootAnim();
+						if (character.charState.attackCtrl) {
+							character.setShootAnim();
+							character.shootAnimTime = Character.DefaultShootAnimTime;
+						}
 						player.weapon.addAmmo(-player.weapon.getAmmoUsage(3), player);
 						character.chargeTime = 0;
 						new ParasiticBombProjCharged(new ParasiticBomb(), character.getShootPos(), character.pos.x - target.getCenterPos().x < 0 ? 1 : -1, character.player, character.player.getNextActorNetId(), target, rpc: true);

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace MMXOnline;
@@ -16,9 +17,9 @@ public class MagnetMine : Weapon {
 		weaponSlotIndex = 15;
 		killFeedIndex = 20 + (index - 9);
 		weaknessIndex = (int)WeaponIds.SilkShot;
-		effect = "C: Can absorb projectiles and grow it's size.";
+		effect = "C: Can absorb projectiles and grow it's size.\nSize growth depends on the damage of the projectile.";
 		hitcooldown = "0/0.2";
-		damage = "2,4/1,2,4";
+		damage = "2-4/1-2-4";
 		Flinch = "0/26";
 		FlinchCD = "0/1";
 	}
@@ -28,12 +29,14 @@ public class MagnetMine : Weapon {
 		Point pos = character.getShootPos();
 		int xDir = character.getShootXDir();
 		Player player = character.player;
+		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
 
 		if (chargeLevel < 3) {
 			var magnetMineProj = new MagnetMineProj(this, pos, xDir, player, player.getNextActorNetId(), true);
-			player.magnetMines.Add(magnetMineProj);
-			if (player.magnetMines.Count > maxMinesPerPlayer) {
-				player.magnetMines[0].destroySelf();
+			mmx.magnetMines.Add(magnetMineProj);
+			if (mmx.magnetMines.Count > maxMinesPerPlayer) {
+				mmx.magnetMines[0].destroySelf();
+				mmx.magnetMines.RemoveAt(0);
 			}
 		} else {
 			new MagnetMineProjCharged(this, pos, xDir, player, player.getNextActorNetId(), true);
@@ -149,7 +152,10 @@ public class MagnetMineProj : Projectile, IDamagable {
 	}
 
 	public override void onDestroy() {
-		player.magnetMines.Remove(this);
+		if (!ownedByLocalPlayer) {
+			return;
+		}
+		(player.character as MegamanX)?.magnetMines.Remove(this);
 	}
 
 	public bool canBeSucked(int alliance) {

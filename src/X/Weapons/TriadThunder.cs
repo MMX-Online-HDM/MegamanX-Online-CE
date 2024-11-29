@@ -16,7 +16,7 @@ public class TriadThunder : Weapon {
 		killFeedIndex = 42;
 		weaknessIndex = (int)WeaponIds.TornadoFang;
 		damage = "2/4+3";
-		effect = "Charged: Grants Super Armor.";
+		effect = "Charged: Grants Super Armor.\nUncharged won't give assists.";
 		hitcooldown = "0.5/0.5-1";
 		Flinch = "6/26";
 		FlinchCD = "2.25/0";
@@ -73,7 +73,7 @@ public class TriadThunderProj : Projectile {
 		shouldVortexSuck = false;
 		this.yDir = yDir;
 		maxTime = 1.5f;
-		mmx.tThunder = this;
+		mmx.linkedTriadThunder = this;
 
 		visible = false;
 
@@ -155,7 +155,7 @@ public class TriadThunderProj : Projectile {
 
 	public override void onDestroy() {
 		base.onDestroy();
-		mmx.tThunder = null!;
+		mmx.linkedTriadThunder = null;
 	}
 }
 

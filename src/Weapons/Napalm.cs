@@ -34,6 +34,10 @@ public class Napalm : Weapon {
 			fireRate = 60 * 2;
 			description = new string[] { "This napalm sports a wide horizontal", "range but cannot attack upward." };
 			vileWeight = 3;
+			ammousage = vileAmmoUsage;
+			damage = "2/1";
+			hitcooldown = "0.5";
+			effect = "None.";
 		}
 		if (napalmType == NapalmType.FireGrenade) {
 			displayName = "Flame Round";
@@ -42,6 +46,10 @@ public class Napalm : Weapon {
 			description = new string[] { "This napalm travels along the", "ground, laying a path of fire." };
 			killFeedIndex = 54;
 			vileWeight = 3;
+			ammousage = vileAmmoUsage;
+			damage = "1/2";
+			hitcooldown = "1/0.5";
+			effect = "Fire DOT: 0.5/1";
 		}
 		if (napalmType == NapalmType.SplashHit) {
 			displayName = "Splash Hit";
@@ -50,6 +58,10 @@ public class Napalm : Weapon {
 			description = new string[] { "This napalm can attack foes above,", "but has a narrow horizontal range." };
 			killFeedIndex = 79;
 			vileWeight = 3;
+			ammousage = vileAmmoUsage;
+			damage = "2/1";
+			hitcooldown = "0.5";
+			effect = "Pushes towards it.";
 		}
 	}
 

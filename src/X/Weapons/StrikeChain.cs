@@ -65,7 +65,7 @@ public class StrikeChainPullToWall : CharState {
 	}
 
 	public override bool canEnter(Character character) {
-		if (character.isCCImmune()) return false;
+		if (character.isStatusImmune()) return false;
 		return base.canEnter(character);
 	}
 
@@ -105,7 +105,7 @@ public class StrikeChainHooked : CharState {
 	public override bool canEnter(Character character) {
 		if (!character.ownedByLocalPlayer) return false;
 		if (!base.canEnter(character)) return false;
-		if (character.isCCImmune()) return false;
+		if (character.isStatusImmune()) return false;
 		return !character.charState.invincible;
 	}
 

@@ -28,6 +28,11 @@ public class VileLaser : Weapon {
 			description = new string[] { "It cannot be aimed,", "but its wide shape covers a large area." };
 			killFeedIndex = 120;
 			vileWeight = 3;
+			ammousage = 24;
+			damage = "6";
+			hitcooldown = "0.5";
+			Flinch = "26";
+			effect = "Insane Hitbox.";
 		} else if (vileLaserType == VileLaserType.NecroBurst) {
 			index = (int)WeaponIds.NecroBurst;
 			displayName = "Necro Burst";
@@ -35,6 +40,11 @@ public class VileLaser : Weapon {
 			description = new string[] { "Use up all your energy at once to", "unleash a powerful energy burst." };
 			killFeedIndex = 75;
 			vileWeight = 3;
+			ammousage = 32;
+			damage = "6";
+			hitcooldown = "0.5";
+			Flinch = "26";
+			effect = "No DMG inside Ride.";
 		} else if (vileLaserType == VileLaserType.StraightNightmare) {
 			index = (int)WeaponIds.StraightNightmare;
 			displayName = "Straight Nightmare";
@@ -42,6 +52,10 @@ public class VileLaser : Weapon {
 			description = new string[] { "Though slow, this laser can burn", "through multiple enemies in a row." };
 			killFeedIndex = 171;
 			vileWeight = 3;
+			ammousage = 24;
+			damage = "1";
+			hitcooldown = "0.15";
+			effect = "Won't destroy on hit.";
 		}
 	}
 

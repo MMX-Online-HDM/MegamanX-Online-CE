@@ -436,11 +436,9 @@ public class RPCDecShieldAmmo : RPC {
 		int playerId = arguments[0];
 		float decAmmoAmount = BitConverter.ToSingle(new byte[] { arguments[1], arguments[2], arguments[3], arguments[4] }, 0);
 
-		var player = Global.level.getPlayerById(playerId);
+		Player? player = Global.level.getPlayerById(playerId);
 
-		if ((player?.character as MegamanX)?.chargedRollingShieldProj != null) {
-			(player.character as MegamanX).chargedRollingShieldProj.decAmmo(decAmmoAmount);
-		}
+		(player?.character as MegamanX)?.chargedRollingShieldProj?.decAmmo(decAmmoAmount);
 	}
 }
 
@@ -565,8 +563,6 @@ public enum RPCToggleType {
 	StrikeChainChargedReversed,
 	StockCharge,
 	UnstockCharge,
-	StartRaySplasher,
-	StopRaySplasher,
 	StartBarrier,
 	StopBarrier,
 	StockSaber,
@@ -611,30 +607,22 @@ public class RPCPlayerToggle : RPC {
 			if (player?.character is MegamanX mmx) {
 				mmx.stockedCharge = false;
 			}
-		} else if (toggleId == RPCToggleType.StartRaySplasher) {
-			if (player.character is MegamanX mmx) {
-				mmx.isShootingRaySplasher = true;
-			}
-		} else if (toggleId == RPCToggleType.StopRaySplasher) {
-			if (player.character is MegamanX mmx) {
-				mmx.isShootingRaySplasher = false;
-			}
 		} else if (toggleId == RPCToggleType.StartBarrier) {
 			if (player.character is MegamanX mmx) {
-				mmx.barrierTime = mmx.barrierDuration;
+				mmx.barrierActiveTime = 90;
 			}
 		} else if (toggleId == RPCToggleType.StopBarrier) {
 			if (player.character is MegamanX mmx) {
-				mmx.barrierTime = 0;
+				mmx.barrierActiveTime = 0;
 			}
 		} else if (toggleId == RPCToggleType.StockSaber) {
 			if (player.character is MegamanX mmx) {
-				mmx.stockedXSaber = true;
+				mmx.stockedSaber = true;
 			}
 		} else if (toggleId == RPCToggleType.UnstockSaber) {
 			if (player.character is MegamanX mmx) {
-				mmx.stockedXSaber = false;
-			} 
+				mmx.stockedSaber = false;
+			}
 		} else if (toggleId == RPCToggleType.SetWhiteAxl) {
 			if (player.character is Axl axl) {
 				axl.whiteAxlTime = axl.maxHyperAxlTime;

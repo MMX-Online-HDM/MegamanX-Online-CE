@@ -27,13 +27,16 @@ public class RaySplasher : Weapon {
 
 		if (chargeLevel < 3) {
 			if (character is MegamanX mmx) {
-				mmx.setShootRaySplasher(true);
+				mmx.shootingRaySplasher = this;
 			}
 		} else {
 			if (character.ownedByLocalPlayer) {
 				character.changeState(new RaySplasherChargedState(), true);
 			}
 		}
+	}
+
+	public void burstLogic(MegamanX mmx) {
 	}
 }
 
@@ -88,6 +91,7 @@ public class RaySplasherProj : Projectile {
 }
 
 public class RaySplasherTurret : Actor, IDamagable {
+	MegamanX? mmx;
 	int state = 0;
 	Actor? target;
 	float health = 4;
@@ -102,8 +106,11 @@ public class RaySplasherTurret : Actor, IDamagable {
 	static ShaderWrapper replaceColorShaderRed = Helpers.cloneShaderSafe("replacecolor");
 	ShaderWrapper? replaceColorShader;
 
-	public RaySplasherTurret(Point pos, Player player, int xDir, ushort netId, bool ownedByLocalPlayer, bool rpc = false) :
-		base("raysplasher_turret_start", pos, netId, ownedByLocalPlayer, false) {
+	public RaySplasherTurret(
+		Point pos, Player player, int xDir, ushort netId, bool ownedByLocalPlayer, bool rpc = false, MegamanX? mmx = null
+	) : base("raysplasher_turret_start", pos, netId, ownedByLocalPlayer, false
+	) {
+		this.mmx = mmx;
 		useGravity = false;
 		velY = -50;
 
@@ -251,7 +258,7 @@ public class RaySplasherTurret : Actor, IDamagable {
 		new Anim(pos, "raysplasher_turret_pieces", -1, null, false) { ttl = 2, useGravity = true, vel = Point.random(50, 150, -100, -50), frameIndex = 0, frameSpeed = 0 };
 		new Anim(pos, "raysplasher_turret_pieces", 1, null, false) { ttl = 2, useGravity = true, vel = Point.random(-150, -50, -100, -50), frameIndex = 1, frameSpeed = 0 };
 		new Anim(pos, "raysplasher_turret_pieces", -1, null, false) { ttl = 2, useGravity = true, vel = Point.random(50, 150, -100, -50), frameIndex = 1, frameSpeed = 0 };
-		netOwner.turrets.Remove(this);
+		mmx?.rayTurrets.Remove(this);
 	}
 
 	public override void render(float x, float y) {
@@ -313,6 +320,7 @@ public class RaySplasherTurretProj : Projectile {
 
 
 public class RaySplasherChargedState : CharState {
+	MegamanX mmx;
 	bool fired = false;
 	public RaySplasherChargedState() : base("point_up", "", "", "") {
 		superArmor = true;
@@ -324,10 +332,15 @@ public class RaySplasherChargedState : CharState {
 		if (character.frameIndex >= 3 && !fired) {
 			fired = true;
 
-			var turret = new RaySplasherTurret(character.getShootPos(), player, character.xDir, player.getNextActorNetId(), character.ownedByLocalPlayer, rpc: true);
-			player.turrets.Add(turret);
-			if (player.turrets.Count > 1) {
-				player.turrets[0].destroySelf();
+			var turret = new RaySplasherTurret(
+				character.getShootPos(), player, character.xDir, 
+				player.getNextActorNetId(), character.ownedByLocalPlayer, rpc: true,
+				mmx
+			);
+			mmx.rayTurrets.Add(turret);
+			if (mmx.rayTurrets.Count > 1) {
+				mmx.rayTurrets[0].destroySelf();
+				mmx.rayTurrets.RemoveAt(0);
 			}
 		}
 
@@ -340,6 +353,7 @@ public class RaySplasherChargedState : CharState {
 		base.onEnter(oldState);
 		character.useGravity = false;
 		character.vel = new Point();
+		mmx = character as MegamanX ?? throw new NullReferenceException();
 	}
 
 	public override void onExit(CharState newState) {
