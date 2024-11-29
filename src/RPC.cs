@@ -595,11 +595,11 @@ public class RPCPlayerToggle : RPC {
 			player.character?.crystalizeStart();
 		} else if (toggleId == RPCToggleType.StopCrystalize) {
 			player.character?.crystalizeEnd();
-		} else if (toggleId == RPCToggleType.StrikeChainReversed) {
-			(player?.character as MegamanX)?.strikeChainProj?.reverseDir();
+		} /* else if (toggleId == RPCToggleType.StrikeChainReversed) {
+			(player?.character as MegamanX)?.strikeChainProj?.reverse(null);
 		} else if (toggleId == RPCToggleType.StrikeChainChargedReversed) {
 			(player?.character as MegamanX)?.strikeChainChargedProj?.reverseDir();
-		} else if (toggleId == RPCToggleType.StockCharge) {
+		} */ else if (toggleId == RPCToggleType.StockCharge) {
 			if (player?.character is MegamanX mmx) {
 				mmx.stockedCharge = true;
 			}
