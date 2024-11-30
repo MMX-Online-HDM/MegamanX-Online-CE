@@ -20,7 +20,7 @@ public class Damager {
 		{ (int)ProjIds.TriadThunder, 2.25f },
 		{ (int)ProjIds.TriadThunderBall, 2.25f },
 		{ (int)ProjIds.TriadThunderBeam, 2.25f },
-		{ (int)ProjIds.PlasmaGun2, 1 },
+		{ (int)ProjIds.PlasmaGunBeamProj, 1 },
 		{ (int)ProjIds.VoltTornado, 1 },
 		{ (int)ProjIds.TornadoCharged, 1 },
 		//{ (int)ProjIds.KKnuckle, 1 },
@@ -134,7 +134,7 @@ public class Damager {
 		if (projId == (int)ProjIds.Hyouretsuzan2) {
 			key = ((int)ProjIds.Hyouretsuzan).ToString() + "_" + owner.id.ToString();
 		}
-		if (projId == (int)ProjIds.BlastLauncherSplash) {
+		if (projId == (int)ProjIds.BlastLauncherGrenadeSplash) {
 			key += "_" + damagingActor?.netId?.ToString();
 		}
 
@@ -350,11 +350,11 @@ public class Damager {
 				case (int)ProjIds.SpeedBurner:
 					character.addBurnTime(owner, SpeedBurner.netWeapon, 1);
 					break;
-				case (int)ProjIds.Napalm2Wall:
-				case (int)ProjIds.Napalm2:
+				case (int)ProjIds.FlameRoundWallProj:
+				case (int)ProjIds.FlameRoundProj:
 					character.addBurnTime(owner, new Napalm(NapalmType.FireGrenade), 1); ;
 					break;
-				case (int)ProjIds.Napalm2Flame:
+				case (int)ProjIds.FlameRoundFlameProj:
 					character.addBurnTime(owner, new Napalm(NapalmType.FireGrenade), 0.5f);
 					break;
 				case (int)ProjIds.Ryuenjin:
@@ -441,7 +441,7 @@ public class Damager {
 					character.addIgFreezeProgress(1);
 					break;
 				//Other effects
-				case (int)ProjIds.PlasmaGun:
+				case (int)ProjIds.PlasmaGunProj:
 					if (mmx != null && mmx.player.hasBodyArmor(3)) {
 						mmx.barrierActiveTime = 0;
 						victim?.playSound("weakness");
@@ -885,9 +885,9 @@ public class Damager {
 			(int)ProjIds.Raijingeki2 => true,
 			(int)ProjIds.Denjin => true,
 			(int)ProjIds.PeaceOutRoller => true,
-			(int)ProjIds.PlasmaGun => true,
-			(int)ProjIds.PlasmaGun2 => true,
-			(int)ProjIds.PlasmaGun2Hyper => true,
+			(int)ProjIds.PlasmaGunProj => true,
+			(int)ProjIds.PlasmaGunBeamProj => true,
+			(int)ProjIds.PlasmaGunBeamProjHyper => true,
 			(int)ProjIds.VoltTornado => true,
 			(int)ProjIds.VoltTornadoHyper => true,
 			(int)ProjIds.SparkMSpark => true,
@@ -967,8 +967,8 @@ public class Damager {
 		if (projId >= 0 && (
 			projId == (int)ProjIds.Burn ||
 			projId == (int)ProjIds.SelfDmg ||
-			projId == (int)ProjIds.Napalm ||
-			projId == (int)ProjIds.Napalm2Flame ||
+			projId == (int)ProjIds.RumblingBangProj ||
+			projId == (int)ProjIds.FlameRoundFlameProj ||
 			projId == (int)ProjIds.MaroonedTomahawk ||
 			projId == (int)ProjIds.AcidBurstPoison
 		)) {
@@ -1022,6 +1022,20 @@ public class Damager {
 			ProjIds.AcidBurstCharged => true,
 			ProjIds.CrystalHunter => true,
 			ProjIds.ElectricShock => true,
+			ProjIds.AirBlastProj => true,
+			_ => false
+		};
+	}
+	public static bool lowTimeAssist(int? projId) {
+		if (projId == null) {
+			return false;
+		}
+		// The GM19 list now only counts for FFA mode.
+		if (Global.level.gameMode is not FFADeathMatch) {
+			return false;
+		}
+		return projId switch {
+
 			_ => false
 		};
 	}
@@ -1035,9 +1049,16 @@ public class Damager {
 			ProjIds.Burn => true,
 			ProjIds.AcidBurstPoison => true,
 			ProjIds.SelfDmg => true,
-			ProjIds.Napalm2Flame => true,
+			ProjIds.FlameRoundFlameProj => true,
+			ProjIds.BlastLauncherMineGrenadeProj => true, 
+			ProjIds.BoundBlasterRadar => true, 
+			ProjIds.RayGunChargeBeam => true,
+			ProjIds.PlasmaGunBeamProj => true,
+			ProjIds.PlasmaGunBeamProjHyper => true,
 			ProjIds.VoltTornado => true,
 			ProjIds.VoltTornadoHyper => true,
+			ProjIds.FlameBurner => true,
+			ProjIds.FlameBurnerHyper => true,
 			_ => false
 		};
 		if (alwaysNotAssist) {
@@ -1048,31 +1069,21 @@ public class Damager {
 			return false;
 		}
 		return projId switch {
-			(int)ProjIds.Burn => true,
 			(int)ProjIds.Tornado => true,
-			(int)ProjIds.VoltTornado => true,
-			(int)ProjIds.VoltTornadoHyper => true,
-			(int)ProjIds.FlameBurner => true,
-			(int)ProjIds.FlameBurner2 => true,
-			(int)ProjIds.FlameBurnerHyper => true,
 			(int)ProjIds.BoomerangCharged => true,
-			(int)ProjIds.Napalm2Flame => true,
-			(int)ProjIds.Napalm2Wall => true,
 			(int)ProjIds.TornadoFang => true,
 			(int)ProjIds.TornadoFang2 => true,
 			(int)ProjIds.GravityWell => true,
 			(int)ProjIds.SpinWheel => true,
-			(int)ProjIds.DistanceNeedler => true,
 			(int)ProjIds.TriadThunder => true,
 			(int)ProjIds.TriadThunderBeam => true,
-			(int)ProjIds.RayGun2 => true,
-			(int)ProjIds.Napalm => true,
+			(int)ProjIds.DistanceNeedler => true,
+			(int)ProjIds.RumblingBangProj => true,
+			(int)ProjIds.FlameRoundWallProj => true,
+			(int)ProjIds.SplashHitProj => true,
 			(int)ProjIds.CircleBlaze => true,
 			(int)ProjIds.CircleBlazeExplosion => true,
-			(int)ProjIds.BlastLauncher => true,
-			(int)ProjIds.BlastLauncherSplash => true,
-			(int)ProjIds.BoundBlaster2 => true,
-			(int)ProjIds.NapalmSplashHit => true,
+			(int)ProjIds.BlastLauncherGrenadeSplash => true,
 			_ => false
 		};
 	}
@@ -1097,8 +1108,8 @@ public class Damager {
 			(int)ProjIds.FireWaveCharged => true,
 			(int)ProjIds.SpeedBurner => true,
 			(int)ProjIds.SpeedBurnerCharged => true,
-			(int)ProjIds.Napalm2 => true,
-			(int)ProjIds.Napalm2Flame => true,
+			(int)ProjIds.FlameRoundProj => true,
+			(int)ProjIds.FlameRoundFlameProj => true,
 			(int)ProjIds.Ryuenjin => true,
 			(int)ProjIds.FlameBurner => true,
 			(int)ProjIds.FlameBurnerHyper => true,

@@ -27,7 +27,7 @@ public class AxlBullet : AxlWeapon {
 				sprite = "axl_arm_pistol";
 				flashSprite = "axl_pistol_flash";
 				chargedFlashSprite = "axl_pistol_flash_charged";
-				altFireCooldown = 0.3f;
+				altFireCooldown = 18;
 				displayName = "Axl Bullets";
 				canHealAmmo = true;
 				break;
@@ -40,7 +40,7 @@ public class AxlBullet : AxlWeapon {
 				sprite = "axl_arm_metteurcrash";
 				flashSprite = "axl_pistol_flash";
 				chargedFlashSprite = "axl_pistol_flash_charged";
-				altFireCooldown = 0.3f;
+				altFireCooldown = 18;
 				displayName = "Mettaur Crash";
 				shootSounds = new string[] { "mettaurCrash", "axlBullet", "axlBullet", "axlBulletCharged" };
 				break;
@@ -53,7 +53,7 @@ public class AxlBullet : AxlWeapon {
 				sprite = "axl_arm_beastkiller";
 				flashSprite = "axl_pistol_flash";
 				chargedFlashSprite = "axl_pistol_flash_charged";
-				altFireCooldown = 0.3f;
+				altFireCooldown = 18;
 				fireRate = 45;
 				displayName = "Beast Killer";
 				shootSounds = new string[] { "beastKiller", "axlBullet", "axlBullet", "axlBulletCharged" };
@@ -67,7 +67,7 @@ public class AxlBullet : AxlWeapon {
 				sprite = "axl_arm_machinebullets";
 				flashSprite = "axl_pistol_flash";
 				chargedFlashSprite = "axl_pistol_flash_charged";
-				altFireCooldown = 0.3f;
+				altFireCooldown = 18;
 				fireRate = 9;
 				displayName = "Machine Bullets";
 				shootSounds = new string[] { "machineBullets", "axlBullet", "axlBullet", "axlBulletCharged" };
@@ -81,7 +81,7 @@ public class AxlBullet : AxlWeapon {
 				sprite = "axl_arm_revolverbarrel";
 				flashSprite = "axl_pistol_flash";
 				chargedFlashSprite = "axl_pistol_flash_charged";
-				altFireCooldown = 0.3f;
+				altFireCooldown = 18;
 				displayName = "Revolver Barrel";
 				shootSounds = new string[] { "revolverBarrel", "axlBullet", "axlBullet", "axlBulletCharged" };
 				break;
@@ -94,7 +94,7 @@ public class AxlBullet : AxlWeapon {
 				sprite = "axl_arm_ancientgun";
 				flashSprite = "axl_pistol_flash";
 				chargedFlashSprite = "axl_pistol_flash_charged";
-				altFireCooldown = 0.225f;
+				altFireCooldown = 14;
 				fireRate = 6;
 				displayName = "Ancient Gun";
 				shootSounds = new string[] { "ancientGun3", "axlBullet", "axlBullet", "axlBulletCharged" };
@@ -172,7 +172,7 @@ public class DoubleBullet : AxlWeapon {
 		weaponBarIndex = 28;
 		weaponSlotIndex = 35;
 		killFeedIndex = 34;
-		altFireCooldown = 0.225f;
+		altFireCooldown = 14;
 		fireRate = 6;
 		displayName = "Double Bullets";
 		type = (int)AxlBulletWeaponType.DoubleBullets;

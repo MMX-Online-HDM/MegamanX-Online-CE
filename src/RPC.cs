@@ -1267,7 +1267,7 @@ public class RPCAxlShoot : RPC {
 			flash.angle = angle;
 			flash.frameSpeed = 3;
 			player.character.playSound("axlBulletCharged");
-		} else if (projId == (int)ProjIds.BlastLauncher) {
+		} else if (projId == (int)ProjIds.BlastLauncherGrenadeProj || projId == (int)ProjIds.BlastLauncherMineGrenadeProj) {
 			var pos = new Point(x, y);
 			var bullet = new GrenadeProj(
 				new BlastLauncher(0), pos, xDir, player, Point.createFromAngle(angle), null, new Point(), 0, netId
@@ -1285,13 +1285,13 @@ public class RPCAxlShoot : RPC {
 			flash.angle = angle;
 			flash.frameSpeed = 3;
 			player.character.playSound("rocketShoot");
-		} else if (projId == (int)ProjIds.RayGun || projId == (int)ProjIds.RayGun2) {
+		} else if (projId == (int)ProjIds.RayGun || projId == (int)ProjIds.RayGunChargeBeam) {
 			var pos = new Point(x, y);
 			Point velDir = Point.createFromAngle(angle);
 			if (projId == (int)ProjIds.RayGun) {
 				var bullet = new RayGunProj(new RayGun(0), pos, xDir, player, velDir, netId);
 				player.character.playSound("raygun");
-			} else if (projId == (int)ProjIds.RayGun2) {
+			} else if (projId == (int)ProjIds.RayGunChargeBeam) {
 				var bullet = Global.level.getActorByNetId(netId) as RayGunAltProj;
 				if (bullet == null) {
 					new RayGunAltProj(new RayGun(0), pos, pos, xDir, player, netId);

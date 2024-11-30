@@ -6,7 +6,7 @@ public class FlameBurner : AxlWeapon {
 	public FlameBurner(int altFire) : base(altFire) {
 		shootSounds = new string[] { "flameBurner", "flameBurner", "flameBurner", "circleBlaze" };
 		fireRate = 5;
-		altFireCooldown = 1.5f;
+		altFireCooldown = 90;
 		index = (int)WeaponIds.FlameBurner;
 		weaponBarBaseIndex = 38;
 		weaponSlotIndex = 58;
@@ -16,7 +16,7 @@ public class FlameBurner : AxlWeapon {
 
 		if (altFire == 1) {
 			shootSounds[3] = "flameBurner2";
-			altFireCooldown = 1;
+			altFireCooldown = 60;
 		}
 	}
 
@@ -114,7 +114,7 @@ public class FlameBurnerAltProj : Projectile {
 	public float maxSpeed = 400;
 	public FlameBurnerAltProj(Weapon weapon, Point pos, int xDir, Player player, Point bulletDir, ushort netProjId, bool sendRpc = false) :
 		base(weapon, pos, xDir, 100, 0, player, "airblast_proj", 0, 0.15f, netProjId, player.ownedByLocalPlayer) {
-		projId = (int)ProjIds.FlameBurner2;
+		projId = (int)ProjIds.AirBlastProj;
 		maxTime = 0.15f;
 		if (player.character is Axl axl && axl.isWhiteAxl() == true) {
 			maxTime *= 2;
