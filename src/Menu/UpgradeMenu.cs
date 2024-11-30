@@ -37,18 +37,18 @@ public class UpgradeMenu : IMainMenu {
 		return Math.Clamp(2 + mainPlayer.subtanks.Count, 1, getMaxSubTanks() + 1);
 	}
 
-	public int getHeartTankCost() {
+	public static int getHeartTankCost() {
 		if (Global.level.server?.customMatchSettings != null) {
 			return Global.level.server.customMatchSettings.heartTankCost;
 		}
 		return 2;
 	}
 
-	public int getMaxHeartTanks() {
+	public static int getMaxHeartTanks() {
 		return Global.level.server?.customMatchSettings?.maxHeartTanks ?? 8;
 	}
 
-	public int getMaxSubTanks() {
+	public static int getMaxSubTanks() {
 		return Global.level.server?.customMatchSettings?.maxSubTanks ?? 2;
 	}
 

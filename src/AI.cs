@@ -240,8 +240,10 @@ public class AI {
 			}
 		}
 		if (!player.isMainPlayer) {
-			if (player.heartTanks < 8 && player.currency >= 2) {
-				player.currency -= 2;
+			if (player.heartTanks < UpgradeMenu.getMaxHeartTanks() &&
+				player.currency >= UpgradeMenu.getHeartTankCost()
+			) {
+				player.currency -=  UpgradeMenu.getHeartTankCost();
 				player.heartTanks++;
 				float currentMaxHp = player.maxHealth;
 				player.maxHealth = player.getMaxHealth();

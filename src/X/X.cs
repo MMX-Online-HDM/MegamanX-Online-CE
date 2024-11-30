@@ -468,4 +468,15 @@ public class MegamanX : Character {
 
 		base.destroySelf(spriteName, fadeSound, disableRpc, doRpcEvenIfNotOwned, favorDefenderProjDestroy);
 	}
+
+	public override string getSprite(string spriteName) {
+		return "mmx_" + spriteName;
+	}
+
+	public override void render(float x, float y) {
+		if (!shouldRender(x, y)) {
+			return;
+		}
+		base.render(x, y);
+	}
 }

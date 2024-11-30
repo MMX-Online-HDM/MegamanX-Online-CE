@@ -413,6 +413,30 @@ public class Projectile : Actor {
 			}
 		}
 
+		if (otherProj != null && otherProj.ownedByLocalPlayer &&
+			(otherProj.isDeflectShield || otherProj.isReflectShield)
+		) {
+			if (otherProj.isReflectShield &&
+				reflectable && damager.owner.alliance != otherProj.damager.owner.alliance
+			) {
+				if (deltaPos.x != 0 && Math.Sign(deltaPos.x) != otherProj.xDir) {
+					reflect(otherProj.owner, sendRpc: true);
+					playSound("sigmaSaberBlock", sendRpc: true);
+					return;
+				}
+			}
+
+			if (otherProj.isDeflectShield && reflectable &&
+				damager.owner.alliance != otherProj.damager.owner.alliance
+			) {
+				if (deltaPos.x != 0 && Math.Sign(deltaPos.x) != otherProj.xDir) {
+					deflect(otherProj.owner, sendRpc: true);
+					playSound("sigmaSaberBlock", forcePlay: false, sendRpc: true);
+					return;
+				}
+			}
+		}
+
 		if (ownedByLocalPlayer) {
 			if (shouldVortexSuck && otherProj is GenericMeleeProj otherGmp && otherProj.projId == (int)ProjIds.WheelGEat && damager.owner.alliance != otherProj.damager.owner.alliance && otherGmp.owningActor is WheelGator wheelGator) {
 				destroySelfNoEffect();
@@ -470,6 +494,7 @@ public class Projectile : Actor {
 				if (deltaPos.x != 0 && Math.Sign(deltaPos.x) != otherProj.xDir) {
 					reflect(otherProj.owner, sendRpc: true);
 					playSound("sigmaSaberBlock", sendRpc: true);
+					return;
 				}
 			}
 
@@ -479,6 +504,7 @@ public class Projectile : Actor {
 				if (deltaPos.x != 0 && Math.Sign(deltaPos.x) != otherProj.xDir) {
 					deflect(otherProj.owner, sendRpc: true);
 					playSound("sigmaSaberBlock", forcePlay: false, sendRpc: true);
+					return;
 				}
 			}
 
