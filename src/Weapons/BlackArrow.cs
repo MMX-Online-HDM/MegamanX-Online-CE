@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using SFML.Graphics;
+using System.Linq;
 
 namespace MMXOnline;
 
 public class BlackArrow : AxlWeapon {
+	public static BlackArrow netWeapon = new(2);
 	public BlackArrow(int altFire) : base(altFire) {
 		shootSounds = new string[] { "blackArrow", "blackArrow", "blackArrow", "blackArrow" };
 		fireRate = 24;
@@ -58,6 +60,7 @@ public class BlackArrow : AxlWeapon {
 }
 
 public class BlackArrowProj : Projectile {
+	public bool landed;
 	int type;
 	public Actor? target;
 	public List<Point> lastPoses = new List<Point>();
@@ -71,17 +74,24 @@ public class BlackArrowProj : Projectile {
 		projId = (int)ProjIds.BlackArrow;
 		useGravity = true;
 		updateAngle();
-
+		if (type == 2) {
+			projId = (int)ProjIds.BlackArrowGround;
+		} 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreateByteAngle(pos, player, netProjId, bulletDir.byteAngle,  new byte[] { (byte)type });
 		}
 	}
 
 	public void updateAngle() {
-		angle = vel.angle;
+		byteAngle = vel.byteAngle;
 	}
 
 	public override void update() {
+		base.update();
+		if (landed && ownedByLocalPlayer) {
+			moveWithMovingPlatform();
+		}
+		forceNetUpdateNextFrame = true;
 		lastPoses.Add(pos);
 		if (lastPoses.Count > 5) lastPoses.RemoveAt(0);
 
@@ -119,26 +129,37 @@ public class BlackArrowProj : Projectile {
 				return;
 			}
 		}
-
-		base.update();
 	}
-
+	public override List<byte> getCustomActorNetData() {
+		List<byte> customData = new();
+		customData.Add((byte)(landed ? 1 : 0));
+		return customData;
+	}
+	public override void updateCustomActorNetData(byte[] data) {
+		if (data[0] == 1 && !landed) {
+			landed = true;
+			landingCode();
+		}
+	}
 	public override void onHitWall(CollideData other) {
 		base.onHitWall(other);
 		if (!ownedByLocalPlayer) return;
 		if (type != 2) {
-			useGravity = false;
-			maxTime = 4;
-			if ((owner.character as Axl)?.isWhiteAxl() == true) {
-				maxTime = 10;
-			}
-			time = 0;
-			type = 2;
-			changeSprite("blackarrow_stuck_proj", true);
-			vel = new Point();
+			landingCode();
+			forceNetUpdateNextFrame = true;
 		}
 	}
-
+	public void landingCode() {
+		changeSprite("blackarrow_stuck_proj", true);
+		time = 0;
+		type = 2;
+		vel = new Point();
+		useGravity = false;
+		maxTime = 4;
+		if ((owner.character as Axl)?.isWhiteAxl() == true) {
+			maxTime = 10;
+		}
+	}
 	public override void render(float x, float y) {
 		base.render(x, y);
 		if (Options.main.lowQualityParticles()) return;
