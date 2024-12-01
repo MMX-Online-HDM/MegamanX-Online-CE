@@ -36,7 +36,7 @@ public partial class RPCCreateProj : RPC {
 		} else {
 			extraData = new byte[0];
 		}
-		Point bulletDir = Point.createFromAngle(angle);
+		Point bulletDir = Point.createFromByteAngle(byteAngle);
 
 		var player = Global.level.getPlayerById(playerId);
 		if (player == null) return;

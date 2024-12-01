@@ -471,10 +471,22 @@ label:
 	}
 
 	private Weapon getAxlBullet(int axlBulletType) {
-		if (axlBulletType == (int)AxlBulletWeaponType.DoubleBullets) {
-			return new DoubleBullet();
+		switch (axlBulletType) {
+			case (int)AxlBulletWeaponType.DoubleBullets:
+				return new DoubleBullet();
+			case (int)AxlBulletWeaponType.MetteurCrash:
+				return new MettaurCrash();
+			case (int)AxlBulletWeaponType.BeastKiller:
+				return new BeastKiller();
+			case (int)AxlBulletWeaponType.MachineBullets:
+				return new MachineBullets();
+			case (int)AxlBulletWeaponType.RevolverBarrel:
+				return new RevolverBarrel();
+			case (int)AxlBulletWeaponType.AncientGun:
+				return new AncientGun();		
+			default:
+				return new AxlBullet((AxlBulletWeaponType)axlBulletType);
 		}
-		return new AxlBullet((AxlBulletWeaponType)axlBulletType);
 	}
 
 	public Weapon getAxlBulletWeapon() {
@@ -482,10 +494,21 @@ label:
 	}
 
 	public Weapon getAxlBulletWeapon(int type) {
-		if (type == (int)AxlBulletWeaponType.DoubleBullets) {
-			return new DoubleBullet();
-		} else {
-			return new AxlBullet((AxlBulletWeaponType)type);
+		switch (type) {
+			case (int)AxlBulletWeaponType.DoubleBullets:
+				return new DoubleBullet();
+			case (int)AxlBulletWeaponType.MetteurCrash:
+				return new MettaurCrash();
+			case (int)AxlBulletWeaponType.BeastKiller:
+				return new BeastKiller();
+			case (int)AxlBulletWeaponType.MachineBullets:
+				return new MachineBullets();
+			case (int)AxlBulletWeaponType.RevolverBarrel:
+				return new RevolverBarrel();
+			case (int)AxlBulletWeaponType.AncientGun:
+				return new AncientGun();			
+			default:
+				return new AxlBullet((AxlBulletWeaponType)type);
 		}
 	}
 

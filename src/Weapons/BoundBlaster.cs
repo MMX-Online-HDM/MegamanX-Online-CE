@@ -93,13 +93,13 @@ public class BoundBlasterProj : Projectile {
 		updateAngle();
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreateByteAngle(pos, player, netProjId, anglePoint.byteAngle);
 		}
 		canBeLocal = true;
 	}
 
 	public void updateAngle() {
-		angle = vel.angle;
+		byteAngle = vel.byteAngle;
 	}
 
 	public void reflectSide() {

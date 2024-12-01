@@ -23,7 +23,8 @@ public class IceGattling : AxlWeapon {
 		return 0.5f;
 	}
 
-	public override void axlGetProjectile(Weapon weapon, Point bulletPos, int xDir, Player player, float angle, IDamagable target, Character headshotTarget, Point cursorPos, int chargeLevel, ushort netId) {
+	public override void axlGetProjectile(Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
+				IDamagable target, Character headshotTarget, Point cursorPos, int chargeLevel, ushort netId) {
 		if (!player.ownedByLocalPlayer) { return; }
 		if (player.character is not Axl axl) {
 			return;
@@ -58,7 +59,7 @@ public class IceGattlingProj : Projectile {
 	}
 
 	public void updateAngle() {
-		angle = vel.angle;
+		byteAngle = vel.byteAngle;
 	}
 
 	public override void onHitWall(CollideData other) {
@@ -138,7 +139,7 @@ public class GaeaShieldProj : Projectile {
 		}
 
 		Point bulletPos = axl.getAxlBulletPos(1);
-		angle = axl.getShootAngle(true);
+		byteAngle = axl.getShootAngle(true);
 		changePos(bulletPos);
 	}
 

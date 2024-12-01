@@ -392,16 +392,7 @@ public class Axl : Character {
 		}
 
 		player.changeWeaponControls();
-
 		updateAxlAim();
-		//somehow you could do air dodge roll, added "grounded" to fix that "bug"
-		if (dodgeRollCooldown == 0 && player.canControl && grounded) {
-			if (charState is Crouch && player.input.isPressed(Control.Dash, player)) {
-				changeState(new DodgeRoll(), true);
-			} else if (player.input.isPressed(Control.Dash, player) && player.input.checkDoubleTap(Control.Dash)) {
-				changeState(new DodgeRoll(), true);
-			}
-		}
 
 		sprite.reversed = false;
 		if (player.axlWeapon != null && (player.axlWeapon.isTwoHanded(false) || isZooming()) && canChangeDir() && charState is not WallSlide) {
@@ -455,11 +446,15 @@ public class Axl : Character {
 
 		bool bothHeld = shootHeld && altShootHeld;
 
-		if (player.weapon is AxlBullet || player.weapon is DoubleBullet) {
+		if (player.weapon is AxlBullet || player.weapon is DoubleBullet || 
+			player.weapon is MettaurCrash || player.weapon is BeastKiller || player.weapon is MachineBullets || 
+			player.weapon is RevolverBarrel || player.weapon is AncientGun) {
 			(player.weapon as AxlWeapon)?.rechargeAxlBulletAmmo(player, this, shootHeld, 1);
 		} else {
 			foreach (var weapon in player.weapons) {
-				if (weapon is AxlBullet || weapon is DoubleBullet) {
+				if (weapon is AxlBullet || weapon is DoubleBullet || 
+					weapon is MettaurCrash || weapon is BeastKiller || weapon is MachineBullets || 
+					weapon is RevolverBarrel || weapon is AncientGun) {
 					(weapon as AxlWeapon)?.rechargeAxlBulletAmmo(player, this, shootHeld, 2);
 				}
 			}
@@ -470,7 +465,9 @@ public class Axl : Character {
 		}
 
 		if (player.weapon is not AssassinBullet) {
-			if (altShootHeld && !bothHeld && (player.weapon is AxlBullet || player.weapon is DoubleBullet) && invulnTime == 0 && flag == null) {
+			if (altShootHeld && !bothHeld && (player.weapon is AxlBullet || player.weapon is DoubleBullet ||
+			player.weapon is MettaurCrash || player.weapon is BeastKiller || player.weapon is MachineBullets || 
+			player.weapon is RevolverBarrel || player.weapon is AncientGun) && invulnTime == 0 && flag == null) {
 				increaseCharge();
 			} else {
 				/* if (isCharging() && getChargeLevel() >= 3 && player.scrap >= 10 && !isWhiteAxl() && !hyperAxlUsed && (player.axlHyperMode > 0 || player.axlBulletType == 0)) {
@@ -492,7 +489,9 @@ public class Axl : Character {
 					stingChargeTime = 0;
 					playSound("stingCharge", sendRpc: true);
 				} else if (isCharging()) {
-					if (player.weapon is AxlBullet || player.weapon is DoubleBullet) {
+					if (player.weapon is AxlBullet || player.weapon is DoubleBullet ||
+						player.weapon is MettaurCrash || player.weapon is BeastKiller || player.weapon is MachineBullets || 
+						player.weapon is RevolverBarrel || player.weapon is AncientGun) {
 						recoilTime = 0.2f;
 						if (!isWhiteAxl()) {
 							player.axlWeapon?.axlShoot(player, AxlBulletType.AltFire);
@@ -541,7 +540,6 @@ public class Axl : Character {
 			}
 		}
 		chargeGfx();
-
 		bool weCanShoot = (undisguiseTime == 0 && assassinTime == 0);
 		if (weCanShoot) {
 			// Axl bullet
@@ -555,7 +553,23 @@ public class Axl : Character {
 						player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
 					}
 				}
-
+				switch(player.weapon) {
+					case MettaurCrash:
+					case BeastKiller: 
+					case MachineBullets:
+					case RevolverBarrel:
+					case AncientGun:
+						if (canShoot() && !player.weapon.noAmmo()) {
+							if (shootHeld && shootTime == 0 && player.weapon.altShotCooldown == 0) {
+								recoilTime = 0.2f;
+								player.axlWeapon.axlShoot(player);
+							} else if ((altShootPressed || altShootRecentlyPressed) && shootTime == 0 && player.weapon.altShotCooldown == 0 && player.weapon.ammo >= 4) {
+								recoilTime = 0.2f;
+								player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
+							}
+						}
+						break; 
+				}
 				// Double bullet
 				if (player.weapon is DoubleBullet && canShoot() && !(charState is LadderClimb) && !player.weapon.noAmmo()) {
 					if (shootHeld && shootTime == 0) {
@@ -781,6 +795,15 @@ public class Axl : Character {
 			dashedInAir++;
 			changeState(new Hover(), true);
 			return true;
+		}
+		if (dodgeRollCooldown == 0 && player.canControl && grounded) {
+			if (charState is Crouch && player.input.isPressed(Control.Dash, player)) {
+				changeState(new DodgeRoll(), true);
+				return true;
+			} else if (player.input.isPressed(Control.Dash, player) && player.input.checkDoubleTap(Control.Dash)) {
+				changeState(new DodgeRoll(), true);
+				return true;
+			}
 		}
 		return base.normalCtrl();
 	}

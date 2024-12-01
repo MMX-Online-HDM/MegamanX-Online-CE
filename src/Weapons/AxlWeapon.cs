@@ -55,7 +55,10 @@ public class AxlWeapon : Weapon {
 				axl.stealthRevealTime = Axl.maxStealthRevealTime;
 			}
 			int chargeLevel = axlBulletType == AxlBulletType.AltFire ? 3 : axl.getChargeLevel();
-			if (chargeLevel == 3 && (this is AxlBullet || this is DoubleBullet)) {
+			if (chargeLevel == 3 && 
+				(this is AxlBullet || this is DoubleBullet || this is MettaurCrash ||
+				 this is BeastKiller || this is MachineBullets || this is RevolverBarrel || this is AncientGun))
+			{
 				chargeLevel = axl.getChargeLevel() + 1;
 			}
 			if (overrideChargeLevel != null) {

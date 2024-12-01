@@ -63,23 +63,24 @@ public class FlameBurnerProj : Projectile {
 		}
 		vel.x = bulletDir.x * speed;
 		vel.y = bulletDir.y * speed;
-
+		byteAngle = Helpers.randomRange(0, 360);
 		collider.wallOnly = true;
-		angle = Helpers.randomRange(0, 360);
+		isOwnerLinked = true;
+		if (player?.character != null) {
+			owningActor = player.character;
+		}
 		if (isUnderwater()) {
 			destroySelf();
 			return;
 		}
 		if (sendRpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreateByteAngle(pos, player, netProjId, bulletDir.byteAngle);
 		}
-
-		isOwnerLinked = true;
-		if (player?.character != null) {
-			owningActor = player.character;
-		}
+		updateAngle();
 	}
-
+	public void updateAngle() {
+		byteAngle = vel.byteAngle;
+	}
 	public override void update() {
 		base.update();
 		float progress = (time / maxTime);
@@ -125,14 +126,13 @@ public class FlameBurnerAltProj : Projectile {
 		vel.y = bulletDir.y * speed;
 		destroyOnHit = false;
 		shouldShieldBlock = false;
-		updateAngle();
 		if (sendRpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreateByteAngle(pos, player, netProjId, bulletDir.byteAngle);
 		}
+		updateAngle();
 	}
-
 	public void updateAngle() {
-		angle = vel.angle;
+		byteAngle = vel.byteAngle;
 	}
 
 	public override void onStart() {
@@ -206,14 +206,17 @@ public class CircleBlazeProj : Projectile {
 		maxTime = 0.5f;
 		vel.x = bulletDir.x * speed;
 		vel.y = bulletDir.y * speed;
-		angle = vel.angle;
 		if (isUnderwater()) {
 			destroySelf();
 			return;
 		}
 		if (sendRpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreateByteAngle(pos, player, netProjId, bulletDir.byteAngle);
 		}
+		updateAngle();
+	}
+	public void updateAngle() {
+		byteAngle = vel.byteAngle;
 	}
 
 	public override void update() {
