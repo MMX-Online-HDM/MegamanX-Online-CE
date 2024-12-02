@@ -373,7 +373,7 @@ public class Weapon {
 			ammo = Helpers.clampMax(ammo + ammoDisplayScale, maxAmmo);
 			if (weaponHealCount >= 1) {
 				weaponHealCount = 0;
-				if (isAlwaysOn || character.player.weapon == this) {
+				if (isAlwaysOn || character.currentWeapon == this) {
 					if (character.player.hasArmArmor(3)) {
 						character.playSound("healX3", forcePlay: true);
 					} else {

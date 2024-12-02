@@ -143,11 +143,7 @@ public class RollingShieldProjCharged : Projectile {
 		if (isAnimOver() && sprite.name == "rolling_shield_charge_flash") {
 			changeSprite("rolling_shield_charge", true);
 		}
-		if (mmx == null || mmx.charState is Die || (mmx.player.weapon is not RollingShield)) {
-			destroySelf();
-			return;
-		}
-		if (mmx.player.weapon.ammo == 0) {
+		if (mmx?.currentWeapon is RollingShield { ammo: >0 }) {
 			destroySelf();
 		}
 		if (rollingShieldSound != null) {

@@ -662,7 +662,6 @@ public class XRevive : CharState {
 
 			player.weapons.RemoveAll(w => w is not XBuster);
 			player.weapons.Add(new RagingChargeBuster());
-			player.weaponSlot = 0;
 			
 			/* if (player.weapons.Count == 0) {
 				player.weapons.Add(new Buster());

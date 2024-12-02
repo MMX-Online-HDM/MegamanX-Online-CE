@@ -70,19 +70,19 @@ public partial class RPCCreateProj : RPC {
 				proj = new XSaberProj(pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.Buster3:
-				proj = new Buster3Proj(new XBuster(), pos, xDir, extraData[0], player, netProjByte);
+				proj = new Buster3Proj(pos, xDir, extraData[0], player, netProjByte);
 				break;
 			case (int)ProjIds.BusterX3Proj2:
-				proj = new BusterX3Proj2(new XBuster(), pos, xDir, extraData[0], player, netProjByte);
+				proj = new BusterX3Proj2(pos, xDir, extraData[0], player, netProjByte);
 				break;
 			case (int)ProjIds.BusterX3Plasma:
-				proj = new BusterPlasmaProj(new XBuster(), pos, xDir, player, netProjByte);
+				proj = new BusterPlasmaProj(pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.BusterX3PlasmaHit:
 				proj = new BusterPlasmaHitProj(new XBuster(), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.ZBuster:
-				proj = new BusterProj(new ZeroBuster(), pos, xDir, 1, player, netProjByte);
+				proj = new BusterProj(pos, xDir, 1, player, netProjByte);
 				break;
 			case (int)ProjIds.ZBuster2:
 				proj = new ZBuster2Proj(pos, xDir, 0, player, netProjByte);
@@ -216,8 +216,9 @@ public partial class RPCCreateProj : RPC {
 				proj = new StrikeChainProj(
 					new StrikeChain(), pos, xDir, arguments[extraDataIndex],
 					arguments[extraDataIndex + 1] - 128, player, netProjByte
-				); */
+				); 
 				break;
+			*/
 			case (int)ProjIds.SpeedBurnerTrail:
 				proj = new SpeedBurnerProjGround(SpeedBurner.netWeapon, pos, xDir, player, netProjByte);
 				break;
@@ -240,7 +241,7 @@ public partial class RPCCreateProj : RPC {
 				proj = new TriadThunderProjCharged(new TriadThunder(), pos, xDir, 1, player, netProjByte);
 				break;
 			case (int)ProjIds.GravityWellCharged:
-				proj = new GravityWellProjCharged(new GravityWell(), pos, xDir, 1, player, netProjByte);
+				proj = new GravityWellProjCharged(pos, xDir, 1, player, netProjByte);
 				break;
 			case (int)ProjIds.FrostShieldAir:
 				proj = new FrostShieldProjAir(new FrostShield(), pos, xDir, 0, player, netProjByte);

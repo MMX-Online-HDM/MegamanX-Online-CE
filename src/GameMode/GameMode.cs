@@ -703,7 +703,10 @@ public class GameMode {
 				float cooldown = 1 - Helpers.progress(axl2.dodgeRollCooldown, Axl.maxDodgeRollCooldown);
 				drawGigaWeaponCooldown(50, cooldown, y: 170);
 			}
-			if (drawPlayer.weapons.Count > 1) {
+			if (drawPlayer.weapons == null) {
+				return;
+			}
+			if (drawPlayer.weapons!.Count > 1) {
 				drawWeaponSwitchHUD(drawPlayer);
 			} else if (drawPlayer.weapons.Count == 1 && drawPlayer.weapons[0] is MechMenuWeapon mmw) {
 				drawWeaponSwitchHUD(drawPlayer);
@@ -1370,7 +1373,7 @@ public class GameMode {
 	public bool shouldDrawWeaponAmmo(Player player, Weapon weapon) {
 		if (weapon == null) return false;
 		if (weapon.weaponSlotIndex == 0) return false;
-		if (!player.weapon.drawAmmo) return false;
+		if (!weapon.drawAmmo) return false;
 		if (weapon is HyperNovaStrike && level.isHyper1v1()) return false;
 
 		return true;
@@ -1382,9 +1385,26 @@ public class GameMode {
 		float baseY = hudHealthPosition.y;
 		bool forceSmallBarsOff = false;
 
+		// This runs once per character.
+		Weapon? weapon = player.lastHudWeapon;
+		if (player.character != null) {
+			weapon = player.weapon;
+			if (player.character is Zero zero) {
+				weapon = zero.gigaAttack;
+			}
+			if (player.character is PunchyZero punchyZero) {
+				weapon = punchyZero.gigaAttack;
+			}
+			player.lastHudWeapon = weapon;
+		}
+		// Return if there is no weapon to ren
+		if (weapon == null) {
+			return;
+		}
+
 		// Small Bars option.
 		float ammoDisplayMultiplier = 1;
-		if (player.weapon.allowSmallBar && Options.main.enableSmallBars && !forceSmallBarsOff) {
+		if (weapon.allowSmallBar && Options.main.enableSmallBars && !forceSmallBarsOff) {
 			ammoDisplayMultiplier = 0.5f;
 		}
 
@@ -1458,19 +1478,6 @@ public class GameMode {
 			}
 			Global.sprites["hud_health_top"].drawToHUD(0, baseX, baseY);
 			return;
-		}
-
-		// This runs once per character.
-		Weapon weapon = player.lastHudWeapon;
-		if (player.character != null) {
-			weapon = player.weapon;
-			if (player.character is Zero zero) {
-				weapon = zero.gigaAttack;
-			}
-			if (player.character is PunchyZero punchyZero) {
-				weapon = punchyZero.gigaAttack;
-			}
-			player.lastHudWeapon = weapon;
 		}
 
 		if (shouldDrawWeaponAmmo(player, weapon)) {

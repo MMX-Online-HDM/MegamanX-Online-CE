@@ -17,6 +17,14 @@ public partial class Character : Actor, IDamagable {
 		"Sigma"
 	};
 
+	public List<Weapon> weapons = new();
+	public int weaponSlot;
+	public Weapon? currentWeapon { get {
+		if (weaponSlot < 0 || weaponSlot >= weapons.Count) {
+			return null;
+		}
+		return weapons[weaponSlot];
+	}}
 	public CharState charState;
 	public Player player;
 	public bool isDashing;
@@ -1991,14 +1999,6 @@ public partial class Character : Actor, IDamagable {
 		if (!hideNoShaderIcon()) {
 			float dummy = 0;
 			getHealthNameOffsets(out bool shieldDrawn, ref dummy);
-			if (player.isX && !Global.shaderWrappers.ContainsKey("palette") && player != Global.level.mainPlayer && !isWarpIn() && !(charState is Die) && player.weapon.index != 0) {
-				int overrideIndex = player.weapon.index;
-				if (player.weapon is HyperNovaStrike) {
-					overrideIndex = 95;
-				}
-				Global.sprites["hud_weapon_icon"].draw(overrideIndex, pos.x, pos.y - 8 + currentLabelY, 1, 1, null, 1, 1, 1, ZIndex.HUD);
-				deductLabelY(labelWeaponIconOffY);
-			}
 		}
 
 		bool drewSubtankHealing = drawSubtankHealing();
@@ -2825,8 +2825,8 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual void onFlagPickup(Flag flag) {
-		if (isCharging()) {
-			stopCharge();
+		if (flag == null) {
+			return;
 		}
 		dropFlagProgress = 0;
 		this.flag = flag;

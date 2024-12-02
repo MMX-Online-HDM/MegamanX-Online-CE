@@ -16,8 +16,8 @@ public class Axl : Character {
 	public float stingChargeTime;
 	public int lastXDir;
 	public float shootTime {
-		get { return player.weapon.shootCooldown; }
-		set { player.weapon.shootCooldown = value; }
+		get { return player.weapon?.shootCooldown ?? 0; }
+		set { if (player.weapon != null) { player.weapon.shootCooldown = value; } }
 	}
 	public bool aiming;
 	public IDamagable? axlCursorTarget = null;
@@ -100,6 +100,8 @@ public class Axl : Character {
 		muzzleFlash = new Anim(new Point(), "axl_pistol_flash", xDir, null, false);
 		muzzleFlash.visible = false;
 		axlHyperMode = player.loadout?.axlLoadout?.hyperMode ?? 0;
+
+		configureWeapons();
 	}
 
 	public void zoomIn() {
@@ -1620,7 +1622,7 @@ public class Axl : Character {
 			var dnaCoreWeapon = new DNACore(hitChar);
 			dnaCoreWeapon.index = (int)WeaponIds.DNACore - player.weapons.Count;
 			if (player.isDisguisedAxl) {
-				player.oldWeapons?.Add(dnaCoreWeapon);
+				player.oldWeapons.Add(dnaCoreWeapon);
 			} else {
 				player.weapons.Add(dnaCoreWeapon);
 			}
@@ -1901,6 +1903,53 @@ public class Axl : Character {
 			return true;
 		}
 		return false;
+	}
+
+	public void configureWeapons() {
+		if (Global.level.isTraining() && !Global.level.server.useLoadout) {
+			weapons = Weapon.getAllAxlWeapons(player.axlLoadout).Select(w => w.clone()).ToList();
+			weapons[0] = getAxlBullet(player.axlBulletType);
+		} else if (Global.level.is1v1()) {
+			weapons.Add(new AxlBullet());
+			weapons.Add(new RayGun(player.axlLoadout.rayGunAlt));
+			weapons.Add(new BlastLauncher(player.axlLoadout.blastLauncherAlt));
+			weapons.Add(new BlackArrow(player.axlLoadout.blackArrowAlt));
+			weapons.Add(new SpiralMagnum(player.axlLoadout.spiralMagnumAlt));
+			weapons.Add(new BoundBlaster(player.axlLoadout.boundBlasterAlt));
+			weapons.Add(new PlasmaGun(player.axlLoadout.plasmaGunAlt));
+			weapons.Add(new IceGattling(player.axlLoadout.iceGattlingAlt));
+			weapons.Add(new FlameBurner(player.axlLoadout.flameBurnerAlt));
+		} else {
+			weapons = player.loadout.axlLoadout.getWeaponsFromLoadout();
+			weapons.Insert(0, getAxlBullet(player.axlBulletType));
+		}
+		if (ownedByLocalPlayer) {
+			foreach (var dnaCore in player.savedDNACoreWeapons) {
+				weapons.Add(dnaCore);
+			}
+		}
+		if (weapons[0].type > 0) {
+			weapons[0].ammo = player.axlBulletTypeLastAmmo[weapons[0].type];
+		}
+	}
+
+	public Weapon getAxlBullet(int axlBulletType) {
+		if (axlBulletType == (int)AxlBulletWeaponType.DoubleBullets) {
+			return new DoubleBullet();
+		}
+		return new AxlBullet((AxlBulletWeaponType)axlBulletType);
+	}
+
+	public Weapon getAxlBulletWeapon() {
+		return getAxlBulletWeapon(player.axlBulletType);
+	}
+
+	public Weapon getAxlBulletWeapon(int type) {
+		if (type == (int)AxlBulletWeaponType.DoubleBullets) {
+			return new DoubleBullet();
+		} else {
+			return new AxlBullet((AxlBulletWeaponType)type);
+		}
 	}
 
 	public override List<byte> getCustomActorNetData() {

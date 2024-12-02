@@ -172,7 +172,7 @@ public class Sprite {
 				drawAxlArms = !character.player.axlWeapon.isTwoHanded(true);
 			}
 			isUPX = character is RagingChargeX;
-			isUltX = character is MegamanX { hasSeraphArmor: true };
+			isUltX = character is MegamanX { hasUltimateArmor: true };
 		}
 
 		if (name == "mmx_unpo_grab" || name == "mmx_unpo_grab2") zIndex = ZIndex.MainPlayer;

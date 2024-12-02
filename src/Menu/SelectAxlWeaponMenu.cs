@@ -328,7 +328,7 @@ public class SelectAxlWeaponMenu : IMainMenu {
 				float oldAmmo = mainPlayer.weapons[0].ammo;
 
 				mainPlayer.weapons[0] = mainPlayer.getAxlBulletWeapon(selectedWeaponIndices[0]);
-				if (mainPlayer.oldWeapons?.Count > 0) mainPlayer.oldWeapons[0] = mainPlayer.getAxlBulletWeapon(selectedWeaponIndices[0]);
+				if (mainPlayer.oldWeapons.Count > 0) mainPlayer.oldWeapons[0] = mainPlayer.getAxlBulletWeapon(selectedWeaponIndices[0]);
 
 				//mainPlayer.weapons[0].ammo = oldAmmo;
 				mainPlayer.weapons[0].ammo = mainPlayer.axlBulletTypeLastAmmo[mainPlayer.weapons[0].type];

@@ -261,10 +261,10 @@ public class GravityWellProjCharged : Projectile, IDamagable {
 	public bool started;
 	float velY = -300;
 	public GravityWellProjCharged(
-		Weapon weapon, Point pos, int xDir, int yDir, 
+		Point pos, int xDir, int yDir, 
 		Player player, ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, 0, player, "gravitywell_charged", 
+		GravityWell.netWeapon, pos, xDir, 0, 0, player, "gravitywell_charged", 
 		0, 0, netProjId, player.ownedByLocalPlayer
 	) {
 		maxTime = 4;
@@ -281,7 +281,7 @@ public class GravityWellProjCharged : Projectile, IDamagable {
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new GravityWellProjCharged(
-			GravityWell.netWeapon, arg.pos, arg.xDir, 
+			arg.pos, arg.xDir, 
 			arg.extraData[0], arg.player, arg.netId
 		);
 	}
@@ -401,7 +401,7 @@ public class GravityWellChargedState : CharState {
 			stateTime = 0;
 			if (mmx != null) {
 				mmx.chargedGravityWell = new GravityWellProjCharged(
-					player.weapon, character.getShootPos(), 1,
+					character.getShootPos(), 1,
 					player.input.isHeld(Control.Down, player) ? -1 : 1,
 					player, player.getNextActorNetId(), rpc: true
 				);

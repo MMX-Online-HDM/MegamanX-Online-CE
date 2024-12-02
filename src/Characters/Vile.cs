@@ -487,7 +487,6 @@ public class Vile : Character {
 					if (isVileMK5) {
 						linkedRideArmor.ownedByMK5 = true;
 						linkedRideArmor.zIndex = zIndex - 1;
-						player.weaponSlot = 0;
 					}
 					changeState(new CallDownMech(linkedRideArmor, true), true);
 				}
@@ -509,8 +508,8 @@ public class Vile : Character {
 		}
 	}
 
-	public bool tryUseVileAmmo(float ammo) {
-		if (player.weapon is Vulcan) {
+	public bool tryUseVileAmmo(float ammo, bool isVulcan = false) {
+		if (isVulcan) {
 			usedAmmoLastFrame = true;
 		}
 		if (player.vileAmmo > ammo - 0.1f) {

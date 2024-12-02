@@ -841,11 +841,10 @@ public class WolfSigmaRevive : CharState {
 			}
 		} else if (state == 5) {
 			if (player.health >= player.maxHealth) {
-				player.weapons.Add(new WolfSigmaHandWeapon(player, sigma.leftHand));
-				player.weapons.Add(new WolfSigmaHeadWeapon());
-				player.weapons.Add(new WolfSigmaHandWeapon(player, sigma.rightHand));
-
-				player.weaponSlot = 1;
+				character.weapons.Add(new WolfSigmaHandWeapon(player, sigma.leftHand));
+				character.weapons.Add(new WolfSigmaHeadWeapon());
+				character.weapons.Add(new WolfSigmaHandWeapon(player, sigma.rightHand));
+				character.weaponSlot = 1;
 
 				character.changeState(new WolfSigmaHeadState(), true);
 				character.addMusicSource("wolfSigmaIntro", character.pos.addxy(0, -75), false, loop: false);

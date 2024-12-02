@@ -5,20 +5,23 @@ using System.Diagnostics.CodeAnalysis;
 namespace MMXOnline;
 public class BusterProj : Projectile {
 	public BusterProj(
-		Weapon weapon, Point pos, int xDir, 
+		Point pos, int xDir, 
 		int type, Player player, ushort netProjId, 
 		bool rpc = false
-	) : base
-	(
-		weapon, pos, xDir, 240, 1, 
+	) : base (
+		XBuster.netWeapon, pos, xDir, 240, 1, 
 		player, "buster1", 0, 0, netProjId, 
 		player.ownedByLocalPlayer
 	) {
 		fadeSprite = "buster1_fade";
 		reflectable = true;
 		maxTime = 0.5175f;
-		if (type == 0) projId = (int)ProjIds.Buster;
-		else if (type == 1) projId = (int)ProjIds.ZBuster;
+		if (type == 0) {
+			projId = (int)ProjIds.Buster;
+		} else {
+			projId = (int)ProjIds.ZBuster;
+			weapon = ZeroBuster.netWeapon;
+		}
 
 		if (rpc) {
 			byte[] extraArgs = new byte[] { (byte)type};
@@ -28,8 +31,8 @@ public class BusterProj : Projectile {
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new BusterProj(
-			XBuster.netWeapon, arg.pos, arg.xDir, 
-			arg.extraData[0], arg.player, arg.netId
+			arg.pos, arg.xDir,  arg.extraData[0],
+			arg.player, arg.netId
 		);
 	}
 
@@ -46,11 +49,11 @@ public class BusterProj : Projectile {
 
 public class Buster2Proj : Projectile {
 	public Buster2Proj(
-		Weapon weapon, Point pos, int xDir, 
+		Point pos, int xDir, 
 		Player player, ushort netProjId,
 		bool rpc = false
 	) : base(
-		weapon, pos, xDir, 350, 2, 
+		XBuster.netWeapon, pos, xDir, 350, 2, 
 		player, "buster2", 0, 0, netProjId, 
 		player.ownedByLocalPlayer
 	) {
@@ -66,7 +69,7 @@ public class Buster2Proj : Projectile {
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new Buster2Proj(
-			XBuster.netWeapon, arg.pos, arg.xDir, 
+			arg.pos, arg.xDir, 
 			arg.player, arg.netId
 		);
 	}
@@ -106,11 +109,11 @@ public class Buster3Proj : Projectile {
 	float partTime;
 
 	public Buster3Proj(
-		Weapon weapon, Point pos, int xDir, 
+		Point pos, int xDir, 
 		int type, Player player, ushort netProjId,
 		bool rpc = false
 	) : base(
-		weapon, pos, xDir, 350, 3, 
+		XBuster.netWeapon, pos, xDir, 350, 3, 
 		player, "buster3", Global.defFlinch, 0f, 
 		netProjId, player.ownedByLocalPlayer
 	) {
@@ -163,7 +166,7 @@ public class Buster3Proj : Projectile {
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new Buster3Proj(
-			XBuster.netWeapon, arg.pos, arg.xDir, 
+			arg.pos, arg.xDir, 
 			arg.extraData[0], arg.player, arg.netId
 		);
 	}
@@ -269,10 +272,10 @@ public class BusterX3Proj2 : Projectile {
 	public int type = 0;
 	public List<Point> lastPositions = new List<Point>();
 	public BusterX3Proj2(
-		Weapon weapon, Point pos, int xDir, int type,
+		Point pos, int xDir, int type,
 		Player player, ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 400, 1,
+		XBuster.netWeapon, pos, xDir, 400, 1,
 		player, type == 0 || type == 3 ? "buster4_x3_orbit" : "buster4_x3_orbit2",
 		0, 0, netProjId, player.ownedByLocalPlayer
 	) {
@@ -295,7 +298,7 @@ public class BusterX3Proj2 : Projectile {
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new BusterX3Proj2(
-			XBuster.netWeapon, arg.pos, arg.xDir, 
+			arg.pos, arg.xDir, 
 			arg.extraData[0], arg.player, arg.netId
 		);
 	}
@@ -321,10 +324,10 @@ public class BusterX3Proj2 : Projectile {
 public class BusterPlasmaProj : Projectile {
 	public HashSet<IDamagable> hitDamagables = new HashSet<IDamagable>();
 	public BusterPlasmaProj(
-		Weapon weapon, Point pos, int xDir, 
+		Point pos, int xDir, 
 		Player player, ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 400, 4, player, "buster_plasma",
+		XBuster.netWeapon, pos, xDir, 400, 4, player, "buster_plasma",
 		Global.defFlinch, 0.25f, netProjId, player.ownedByLocalPlayer
 	) {
 		maxTime = 0.5f;
@@ -340,7 +343,7 @@ public class BusterPlasmaProj : Projectile {
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new BusterPlasmaProj(
-			XBuster.netWeapon, arg.pos, arg.xDir, 
+			arg.pos, arg.xDir, 
 			arg.player, arg.netId
 		);
 	}

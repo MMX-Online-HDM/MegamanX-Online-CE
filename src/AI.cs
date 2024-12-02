@@ -880,7 +880,7 @@ public class AI {
 						break;
 					case 6:
 						int novaStrikeSlot = player.weapons.FindIndex(w => w is HyperNovaStrike);
-						if (megamanX.hasSeraphArmor) {
+						if (megamanX.hasUltimateArmor) {
 							megamanX.player.changeWeaponSlot(novaStrikeSlot);
 							if (megamanX.player.weapon.ammo >= 16) {
 								megamanX.player.press(Control.Shoot);

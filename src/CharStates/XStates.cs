@@ -110,19 +110,19 @@ public class X2ChargeShot : CharState {
 			fired = true;
 			if (type == 0) {
 				new Buster3Proj(
-					player.weapon, character.getShootPos(), character.getShootXDir(), 1,
+					character.getShootPos(), character.getShootXDir(), 1,
 					player, player.getNextActorNetId(), rpc: true
 				);
 				character.playSound("buster4X2", sendRpc: true);
 			} else if (type == 1) {
 				new Buster3Proj(
-					player.weapon, character.getShootPos(), character.getShootXDir(), 2,
+					character.getShootPos(), character.getShootXDir(), 2,
 					player, player.getNextActorNetId(), rpc: true
 				);
 				character.playSound("buster4X2", sendRpc: true);
 			} else if (type == 2) {
 				new BusterPlasmaProj(
-					player.weapon, character.getShootPos(), character.getShootXDir(),
+					character.getShootPos(), character.getShootXDir(),
 					player, player.getNextActorNetId(), rpc: true
 				);
 				character.playSound("plasmaShot", sendRpc: true);
@@ -209,13 +209,13 @@ public class X3ChargeShot : CharState {
 			if (state == 0) {
 				Point shootPos = character.getShootPos();
 				int shootDir = character.getShootXDir();
-				if (mmx.hasSeraphArmor) {
+				if (mmx.hasUltimateArmor) {
 					new Anim(
 						shootPos, "buster4_x3_muzzle", shootDir,
 						player.getNextActorNetId(), true, sendRpc: true
 					);
 					new Buster3Proj(
-						player.weapon, shootPos, shootDir,
+						shootPos, shootDir,
 						3, player, player.getNextActorNetId(), rpc: true
 					);
 					if (!(player.weapon is HyperCharge)) {
@@ -224,7 +224,7 @@ public class X3ChargeShot : CharState {
 				} else {
 					new Anim(shootPos, "buster4_muzzle_flash", shootDir, null, true);
 					new BusterPlasmaProj(
-						player.weapon, shootPos, shootDir,
+						shootPos, shootDir,
 						player, player.getNextActorNetId(), rpc: true
 					);
 					character.playSound("plasmaShot", sendRpc: true);
@@ -236,19 +236,19 @@ public class X3ChargeShot : CharState {
 				character.playSound("buster3X3", sendRpc: true);
 				float xDir = character.getShootXDir();
 				new BusterX3Proj2(
-					player.weapon, character.getShootPos().addxy(6 * xDir, -2), character.getShootXDir(), 0,
+					character.getShootPos().addxy(6 * xDir, -2), character.getShootXDir(), 0,
 					player, player.getNextActorNetId(), rpc: true
 				);
 				new BusterX3Proj2(
-					player.weapon, character.getShootPos().addxy(6 * xDir, -2), character.getShootXDir(), 1,
+					character.getShootPos().addxy(6 * xDir, -2), character.getShootXDir(), 1,
 					player, player.getNextActorNetId(), rpc: true
 				);
 				new BusterX3Proj2(
-					player.weapon, character.getShootPos().addxy(6 * xDir, -2), character.getShootXDir(), 2,
+					character.getShootPos().addxy(6 * xDir, -2), character.getShootXDir(), 2,
 					player, player.getNextActorNetId(), rpc: true
 				);
 				new BusterX3Proj2(
-					player.weapon, character.getShootPos().addxy(6 * xDir, -2), character.getShootXDir(), 3,
+					character.getShootPos().addxy(6 * xDir, -2), character.getShootXDir(), 3,
 					player, player.getNextActorNetId(), rpc: true
 				);
 			}
