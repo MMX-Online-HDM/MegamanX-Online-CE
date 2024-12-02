@@ -98,9 +98,12 @@ public class BoomerangProj : Projectile {
 				pickup.changePos(character.getCenterPos());
 			}
 			destroySelf();
-			if (character.player.weapon is BoomerangCutter) {
-				if (character.player.hasChip(3)) character.player.weapon.ammo += 0.5f;
-				else character.player.weapon.ammo++;
+			if (character.currentWeapon is BoomerangCutter bcWeapon) {
+				if (character.player.hasChip(3)) {
+					bcWeapon.ammo += 0.5f;
+				} else {
+					bcWeapon.ammo++;
+				}
 			}
 		}
 	}

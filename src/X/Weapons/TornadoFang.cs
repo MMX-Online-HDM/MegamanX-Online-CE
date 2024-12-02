@@ -206,7 +206,7 @@ public class TornadoFangProjCharged : Projectile {
 			return;
 		}
 
-		if (mmx.player.weapon is not TornadoFang && mmx.player.weapon is not HyperCharge) {
+		if (mmx.currentWeapon is not TornadoFang && mmx.currentWeapon is not HyperCharge) {
 			destroySelf();
 			return;
 		}

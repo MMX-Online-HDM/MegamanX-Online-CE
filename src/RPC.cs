@@ -1351,6 +1351,7 @@ public class RPCAxlShoot : RPC {
 public class RPCAxlDisguiseJson {
 	public int playerId;
 	public ushort dnaNetId;
+	public ushort axlNetId;
 	public string targetName;
 	public int charNum;
 	public byte[] extraData;
@@ -1387,7 +1388,7 @@ public class RPCAxlDisguise : RPC {
 			return;
 		}
 		if (axlDisguiseData.charNum == -1) {
-			player.revertToAxl();
+			player.revertToAxl(axlDisguiseData.axlNetId);
 		} else if (axlDisguiseData.charNum  == -2) {
 			player.revertToAxlDeath();
 		} else {

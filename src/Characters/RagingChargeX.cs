@@ -84,9 +84,10 @@ public class RagingChargeX : Character {
 				applyDamage(1, player, this, null, null);
 			}
 		}
-
-		unpoShotCount = MathInt.Floor(player.weapon.ammo / player.weapon.getAmmoUsage(0));
-		
+		unpoShotCount = 0;
+		if (player.weapon != null) {
+			unpoShotCount = MathInt.Floor(player.weapon.ammo / player.weapon.getAmmoUsage(0));
+		}
 	}
 
 	public override bool isCCImmuneHyperMode() {

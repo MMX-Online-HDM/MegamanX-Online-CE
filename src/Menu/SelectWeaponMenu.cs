@@ -405,7 +405,7 @@ public class SelectWeaponMenu : IMainMenu {
 						}
 						Fonts.drawText(FontType.Blue, effect, 26, 172);
 					}
-					if (Global.level?.mainPlayer.character is MegamanX mmx && mmx?.hasSeraphArmor == true) {
+					if (Global.level?.mainPlayer.character is MegamanX mmx && mmx?.hasUltimateArmor == true) {
 						effect = "Mega Buster Mark 17 with Plasma Charge Shot + Bonus.";
 						Fonts.drawText(FontType.Blue, effect, 26, 172);
 					}			

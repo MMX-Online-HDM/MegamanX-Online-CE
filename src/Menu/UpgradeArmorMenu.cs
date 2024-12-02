@@ -56,13 +56,13 @@ public class UpgradeArmorMenu : IMainMenu {
 			return;
 		}
 		// Enable this to disable 14.0 UAX Menu
-		if (mmx?.hasFullHyperMaxArmor == true || mmx?.hasSeraphArmor == true) {
+		if (mmx?.hasFullHyperMaxArmor == true || mmx?.hasUltimateArmor == true) {
 			return;
 		}
 		if (mmx?.hasFullHyperMaxArmor == true) {
 			Menu.change(new UpgradeArmorMenuGolden(GoldenMenu));
 		}
-		if (mmx?.hasSeraphArmor == true) {
+		if (mmx?.hasUltimateArmor == true) {
 			Menu.change(new UpgradeArmorMenuUAX(UAXMenu));
 		}
 		if (Global.input.isPressedMenu(Control.MenuConfirm)) {

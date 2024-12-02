@@ -71,6 +71,8 @@ public partial class Level {
 	public bool camSetFirstTime;
 	public float camX;
 	public float camY;
+	float lastCameraXDelta;
+	float lastCameraXDeltaTimer;
 	public float zoomScale;
 	public long frameCount;
 	public int nonSkippedframeCount;
@@ -1409,12 +1411,33 @@ public partial class Level {
 			if (!camPlayer.character.stopCamUpdate) {
 				Point camPos = camPlayer.character.getCamCenterPos();
 				Actor? followActor = camPlayer.character?.getFollowActor();
-				Point expectedCamPos = computeCamPos(camPos, new Point(playerX, playerY));
 
-				float moveDeltaX = camX - MathF.Round(playerX);
-				float moveDeltaY = camY - MathF.Round(playerY);
+				float extraPos = MathF.Floor(MathF.Abs(followActor.deltaPos.x));
+				if (extraPos >= 4) {
+					extraPos = extraPos * 16 * MathF.Sign(followActor.deltaPos.x);
+					if (lastCameraXDelta == 0 ||
+						extraPos > 0 && extraPos * 100 > lastCameraXDelta ||
+						extraPos < 0 && extraPos * 100 < lastCameraXDelta
+					) {
+						float speed = 100;
+						if (MathF.Sign(lastCameraXDelta) != MathF.Sign(extraPos)) {
+							speed = 600;
+						}
+						lastCameraXDelta = Helpers.moveTo(lastCameraXDelta, extraPos * 100, speed, true);
+					}
+					lastCameraXDeltaTimer = 30;
+				} else {
+					if (lastCameraXDeltaTimer <= 0) {
+						lastCameraXDelta = Helpers.moveTo(lastCameraXDelta, 0, 350, true);
+						extraPos = 0;
+					} else {
+						lastCameraXDeltaTimer--;
+					}
+				}
+				extraPos = MathF.Round(lastCameraXDelta / 100f);
 
-				float fullDeltaX = MathF.Round(expectedCamPos.x) - camX;
+				Point expectedCamPos = computeCamPos(camPos, new Point(playerX + extraPos, playerY));
+				float fullDeltaX = MathF.Round(expectedCamPos.x + extraPos) - camX;
 				float fullDeltaY = MathF.Round(expectedCamPos.y) - camY;
 
 				if (followActor != null && followActor.grounded == false) {
@@ -1423,7 +1446,6 @@ public partial class Level {
 							(not WallKick and not WallSlide and not LadderClimb) or InRideChaser
 					) {
 						if (!unlockfollow) {
-							moveDeltaY = 0;
 							fullDeltaY = 0;
 						}
 					} else {
@@ -1439,16 +1461,20 @@ public partial class Level {
 				if (camPlayer.character?.charState is not InRideChaser &&
 					(camPlayer.character as Axl)?.isZooming() != true
 				) {
-					int camSpeed = 4;
-					if (MathF.Abs(deltaX) > camSpeed) {
-						deltaX = camSpeed * MathF.Sign(fullDeltaX);
+					int camSpeedX = 4;
+					int camSpeedY = 4;
+					float diference;
+					if (MathF.Abs(deltaX) > camSpeedX) {
+						diference = MathF.Floor(MathF.Abs((camSpeedX - MathF.Abs(deltaX)) / 24f));
+						deltaX = (camSpeedX + diference) * MathF.Sign(fullDeltaX);
 					}
-					if (MathF.Abs(deltaY) > camSpeed) {
-						deltaY = camSpeed * MathF.Sign(fullDeltaY);
+					if (MathF.Abs(deltaY) > camSpeedY) {
+						diference = MathF.Floor(MathF.Abs((camSpeedY - MathF.Abs(deltaY)) / 24f));
+						deltaY = (camSpeedY + diference) * MathF.Sign(fullDeltaY);
 					}
 				}
 
-				updateCamPos(deltaX, deltaY);
+				updateCamPos(deltaX, deltaY, playerX + extraPos, playerY);
 			} else {
 				shakeX = 0;
 				shakeY = 0;
@@ -2126,15 +2152,12 @@ public partial class Level {
 		return mainPlayer.weapon is WolfSigmaHandWeapon || (mainPlayer.character as Axl)?.isAnyZoom() == true;
 	}
 
-	public void updateCamPos(float deltaX, float deltaY) {
-		var playerX = camPlayer.character.getCamCenterPos().x;
-		var playerY = camPlayer.character.getCamCenterPos().y;
+	public void updateCamPos(float deltaX, float deltaY, float playerX, float playerY) {
+		bool dontMoveX = false;
+		bool dontMoveY = false;
 
-		var dontMoveX = false;
-		var dontMoveY = false;
-
-		var scaledCanvasW = Global.viewScreenW;
-		var scaledCanvasH = Global.viewScreenH;
+		uint scaledCanvasW = Global.viewScreenW;
+		uint scaledCanvasH = Global.viewScreenH;
 
 		var halfScaledCanvasW = Global.halfScreenW * Global.viewSize;
 		var halfScaledCanvasH = Global.halfScreenH * Global.viewSize;

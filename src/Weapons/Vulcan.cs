@@ -70,7 +70,7 @@ public class Vulcan : Weapon {
 		if (string.IsNullOrEmpty(vile.charState.shootSprite)) return;
 
 		Player player = vile.player;
-		if (vile.tryUseVileAmmo(vileAmmoUsage)) {
+		if (vile.tryUseVileAmmo(vileAmmoUsage, true)) {
 			if (vile.charState is LadderClimb) {
 				if (player.input.isHeld(Control.Left, player)) vile.xDir = -1;
 				if (player.input.isHeld(Control.Right, player)) vile.xDir = 1;
@@ -165,7 +165,7 @@ public class VulcanCharState : CharState {
 			return;
 		}
 
-		if (!player.input.isHeld(Control.Shoot, player) || !(player.weapon is Vulcan)) {
+		if (!player.input.isHeld(Control.Shoot, player)) {
 			if (isCrouch) {
 				character.changeToCrouchOrFall();
 			} else {

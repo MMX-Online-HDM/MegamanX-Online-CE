@@ -591,16 +591,16 @@ public class Damager {
 					character.setHurt(hurtDir, flinch, spiked);
 				}
 				// Weakness is true and character is not frozen in Shotgun Ice.
-				else if (weakness && !isShotgunIceAndFrozen && mmx?.WeaknessCooldown <= 0) {
+				else if (weakness && !isShotgunIceAndFrozen && mmx?.weaknessCooldown <= 0) {
 					victim?.playSound("weakness");
 					if (!character.charState.superArmor) {
 						// Put a cooldown of 0.75s minimum.
 						if (flinchCooldown * 60 < 45) {
-							mmx.WeaknessCooldown = 45;
+							mmx.weaknessCooldown = 45;
 						}
 						// Set weakness cooldown to the same time as flinch cooldown.
 						else {
-							mmx.WeaknessCooldown = MathF.Ceiling(flinchCooldown * 60);
+							mmx.weaknessCooldown = MathF.Ceiling(flinchCooldown * 60);
 						}
 						if (flinch < Global.halfFlinch) {
 							flinch = Global.halfFlinch;

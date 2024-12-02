@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,7 +8,7 @@ public class MegamanX : Character {
 	// Shoot variables.
 	public float shootCooldown;
 	public int lastShootPressed;
-	public float xSaberCooldown;
+	public float specialSaberCooldown;
 	public XBuster specialBuster;
 	public int specialButtonMode;
 
@@ -47,7 +47,7 @@ public class MegamanX : Character {
 	public float maxShoryukenCooldownTime = 60;
 
 	// HyperX stuff.
-	public bool hasSeraphArmor;
+	public bool hasUltimateArmor;
 	public bool hasFullHyperMaxArmor => (
 		hyperBodyArmor == ArmorId.Max &&
 		hyperArmArmor == ArmorId.Max &&
@@ -58,7 +58,7 @@ public class MegamanX : Character {
 
 	// Giga-attacks and armor weapons.
 	public Weapon? gigaWeapon;
-	public HyperNovaStrike? seraphNovaStrike;
+	public HyperNovaStrike? hyperNovaStrike;
 	public ItemTracer? itemTracer;
 	public float barrierCooldown;
 	public float barrierActiveTime;
@@ -85,10 +85,10 @@ public class MegamanX : Character {
 
 	// Chamaleon Sting.
 	public float stingActiveTime;
-	public int cStingPaletteIndex;
-	public float cStingPaletteTime;
+	public int stingPaletteIndex;
+	public float stingPaletteTime;
 	// Other.
-	public float WeaknessCooldown;
+	public float weaknessCooldown;
 
 	// Creation code.
 	public MegamanX(
@@ -100,6 +100,8 @@ public class MegamanX : Character {
 	) {
 		charId = CharIds.X;
 		specialBuster = new XBuster();
+
+		weapons = XLoadoutSetup.getLoadout(player);
 	}
 
 	// Updates at the start of the frame.
@@ -119,13 +121,13 @@ public class MegamanX : Character {
 			}
 		}
 
-		Helpers.decrementFrames(ref WeaknessCooldown);
+		Helpers.decrementFrames(ref weaknessCooldown);
 		if (!ownedByLocalPlayer) {
 			return;
 		}
 		Helpers.decrementFrames(ref shootCooldown);
 		Helpers.decrementFrames(ref barrierCooldown);
-		Helpers.decrementFrames(ref xSaberCooldown);
+		Helpers.decrementFrames(ref specialSaberCooldown);
 
 		// For the shooting animation.
 		if (shootAnimTime > 0) {
@@ -148,9 +150,13 @@ public class MegamanX : Character {
 			return;
 		}
 		gigaWeapon?.update();
-		seraphNovaStrike?.update();
+		hyperNovaStrike?.update();
 		itemTracer?.update();
 		shootingRaySplasher?.burstLogic(this);
+
+		// Charge and release charge logic.
+		chargeLogic(shoot);
+		player.changeWeaponControls();
 	}
 
 	// Late updates. Before render.
@@ -168,17 +174,46 @@ public class MegamanX : Character {
 		}
 	}
 
+	public override bool attackCtrl() {
+		if (!isCharging() && currentWeapon != null && (
+				player.input.isPressed(Control.Shoot, player) ||
+				currentWeapon.isStream && getChargeLevel() < 2 &&
+				player.input.isHeld(Control.Shoot, player)
+			)
+		) {
+			if (currentWeapon.shootCooldown <= 0) {
+				shoot(0);
+				return true;
+			}
+		}
+		return base.attackCtrl();
+	}
+
 	// Shoots stuff.
 	public void shoot(int chargeLevel) {
+		// Check if can shoot.
+		if (shootCooldown > 0 ||
+			currentWeapon == null ||
+			!currentWeapon.canShoot(chargeLevel, player) ||
+			currentWeapon.shootCooldown > 0
+		) {
+			return;
+		}
 		// Changes to shoot animation.
 		setShootAnim();
 		shootAnimTime = DefaultShootAnimTime;
-
 		// Calls the weapon shoot function.
-		player.weapon.shoot(this, [chargeLevel]);
+		currentWeapon.shoot(this, [chargeLevel]);
 		// Sets up global shoot cooldown to the weapon shootCooldown.
-		shootCooldown = player.weapon.shootCooldown;
-
+		currentWeapon.shootCooldown = currentWeapon.fireRate;
+		shootCooldown = currentWeapon.fireRate;
+		// Add ammo.
+		currentWeapon.addAmmo(-currentWeapon.getAmmoUsageEX(chargeLevel, this), player);
+		// Play sound if any.
+		string shootSound = currentWeapon.shootSounds[chargeLevel];
+		if (shootSound != "") {
+			playSound(shootSound, sendRpc: true);
+		}
 		// Stop charge if this was a charge shot.
 		if (chargeLevel >= 1) {
 			stopCharge();
@@ -251,7 +286,11 @@ public class MegamanX : Character {
 	}
 
 	public override bool canCharge() {
-		return !isInvulnerableAttack() || hasLastingProj();
+		return !isInvulnerableAttack() && !hasLastingProj();
+	}
+
+	public override bool chargeButtonHeld() {
+		return player.input.isHeld(Control.Shoot, player);
 	}
 
 	public override bool canChangeWeapons() {
@@ -304,7 +343,7 @@ public class MegamanX : Character {
 			!isInvulnerableAttack() && 
 			chargedRollingShieldProj == null && 
 			stingActiveTime == 0 && canAffordFgMove() && 
-			hadoukenCooldownTime == 0 && player.weapon is XBuster && 
+			hadoukenCooldownTime == 0 && currentWeapon is XBuster && 
 			player.fgMoveAmmo >= player.fgMoveMaxAmmo && grounded;
 	}
 
@@ -439,9 +478,9 @@ public class MegamanX : Character {
 			shieldDrawn = true;
 			healthPct = rideArmor.health / rideArmor.maxHealth;
 		}
-		else if (chargedRollingShieldProj != null) {
+		else if (chargedRollingShieldProj != null && currentWeapon != null) {
 			shieldDrawn = true;
-			healthPct = player.weapon.ammo / player.weapon.maxAmmo;
+			healthPct = currentWeapon.ammo / currentWeapon.maxAmmo;
 		}
 	}
 

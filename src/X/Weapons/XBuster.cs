@@ -78,22 +78,22 @@ public class XBuster : Weapon {
 		Point pos = character.getShootPos();
 		int xDir = character.getShootXDir();
 		Player player = character.player;
-		bool isUA = (character as MegamanX)?.hasSeraphArmor == true;
+		bool isUA = (character as MegamanX)?.hasUltimateArmor == true;
 		string sound = "";
 
 		if (chargeLevel == 0) {
-			lemonsOnField.Add(new BusterProj(this, pos, xDir, 0, player, player.getNextActorNetId(), true));
+			lemonsOnField.Add(new BusterProj(pos, xDir, 0, player, player.getNextActorNetId(), true));
 			sound = "buster";
 		} else if (chargeLevel == 1) {
-			new Buster2Proj(this, pos, xDir, player, player.getNextActorNetId(), true);
+			new Buster2Proj(pos, xDir, player, player.getNextActorNetId(), true);
 			sound = "buster2";
 		} else if (chargeLevel == 2) {
-			new Buster3Proj(this, pos, xDir, 0, player, player.getNextActorNetId(), true);
+			new Buster3Proj(pos, xDir, 0, player, player.getNextActorNetId(), true);
 			sound = "buster3";
 		} else if (chargeLevel >= 3) {
 			if (isUA) {
 				new Anim(pos.clone(), "buster4_muzzle_flash", xDir, null, true);
-				new BusterPlasmaProj(this, pos, xDir, player, player.getNextActorNetId(), true);
+				new BusterPlasmaProj(pos, xDir, player, player.getNextActorNetId(), true);
 				sound = "plasmaShot";
 			} else {
 				new Anim(pos.clone(), "buster4_muzzle_flash", xDir, null, true);
@@ -126,17 +126,17 @@ public class XBuster : Weapon {
 		string sound = "";
 
 		if (chargeLevel == 0) {
-			lemonsOnField.Add(new BusterProj(this, pos, xDir, 0, player, player.getNextActorNetId(), true));
+			lemonsOnField.Add(new BusterProj(pos, xDir, 0, player, player.getNextActorNetId(), true));
 			sound = "buster";
 		} else if (chargeLevel == 1) {
-			new Buster2Proj(this, pos, xDir, player, player.getNextActorNetId(), true);
+			new Buster2Proj(pos, xDir, player, player.getNextActorNetId(), true);
 			sound = "buster2";
 		} else if (chargeLevel == 2) {
-			new Buster3Proj(this, pos, xDir, 0, player, player.getNextActorNetId(), true);
+			new Buster3Proj(pos, xDir, 0, player, player.getNextActorNetId(), true);
 			sound = "buster3";
 		} else if (chargeLevel >= 3) {	
 			if (player.ownedByLocalPlayer) {
-				if (mmx.hasSeraphArmor && !mmx.stockedCharge) {
+				if (mmx.hasUltimateArmor && !mmx.stockedCharge) {
 					character.changeState(new X2ChargeShot(2), true);
 				} else {
 					if (character.charState is not WallSlide) {
@@ -162,13 +162,13 @@ public class XBuster : Weapon {
 		if (mmx.stockedX3Charge || mmx.stockedCharge) {
 			mmx.changeState(new X3ChargeShot(null) {state = 1}, true);
 		} else if (chargeLevel == 0) {
-			lemonsOnField.Add(new BusterProj(this, pos, xDir, 0, player, player.getNextActorNetId(), true));
+			lemonsOnField.Add(new BusterProj(pos, xDir, 0, player, player.getNextActorNetId(), true));
 			sound = "buster";
 		} else if (chargeLevel == 1) {
-			new Buster2Proj(this, pos, xDir, player, player.getNextActorNetId(), true);
+			new Buster2Proj(pos, xDir, player, player.getNextActorNetId(), true);
 			sound = "buster2";
 		} else if (chargeLevel == 2) {
-			new Buster3Proj(this, pos, xDir, 0, player, player.getNextActorNetId(), true);
+			new Buster3Proj(pos, xDir, 0, player, player.getNextActorNetId(), true);
 			sound = "buster3";
 		} else if (chargeLevel == 3) {
 			if (player.ownedByLocalPlayer) {

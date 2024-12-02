@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using SFML.Graphics;
 
@@ -26,6 +27,11 @@ public class BaseSigma : Character {
 		// Special Sigma-only colider.
 		spriteToCollider["head*"] = getSigmaHeadCollider();
 
+		// Configure weapons if local.
+		if (ownedByLocalPlayer) {
+			weapons = configureWeapons();
+		}
+
 		// For 1v1 mavericks.
 		CharState intialCharState;
 		if (ownedByLocalPlayer) {
@@ -41,12 +47,12 @@ public class BaseSigma : Character {
 		}
 		changeState(intialCharState);
 	}
-	
+
 	public Collider getSigmaHeadCollider() {
 		var rect = new Rect(0, 0, 14, 20);
 		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
 	}
-	
+
 	public override Point getDashDustEffectPos(int xDir) {
 		float dashXPos = -35;
 		return pos.addxy(dashXPos * xDir + (5 * xDir), -4);
@@ -280,7 +286,7 @@ public class BaseSigma : Character {
 			return;
 		}
 		Helpers.decrementTime(ref noBlockTime);
-		
+
 		if (player.sigmaAmmo >= player.sigmaMaxAmmo) {
 			weaponHealAmount = 0;
 		}
@@ -585,5 +591,48 @@ public class BaseSigma : Character {
 			return maverick.pos.round().addxy(camOffsetX, -24);
 		}
 		return base.getCamCenterPos(ignoreZoom);
+	}
+
+	public List<Weapon> configureWeapons() {
+		List<Weapon> retWeapons = new();
+		if (Global.level.isTraining() && !Global.level.server.useLoadout) {
+			retWeapons = Weapon.getAllSigmaWeapons(player).Select(w => w.clone()).ToList();
+		} else if (Global.level.is1v1()) {
+			if (player.maverick1v1 != null) {
+				retWeapons = new List<Weapon>() {
+					Weapon.getAllSigmaWeapons(player).Select(w => w.clone()).ToList()[player.maverick1v1.Value + 1]
+				};
+			} else if (!Global.level.isHyper1v1()) {
+				int sigmaForm = Options.main.sigmaLoadout.sigmaForm;
+				retWeapons = Weapon.getAllSigmaWeapons(player, sigmaForm).Select(w => w.clone()).ToList();
+			}
+		} else {
+			retWeapons = player.loadout.sigmaLoadout.getWeaponsFromLoadout(player, Options.main.sigmaWeaponSlot);
+		}
+		// Preserve HP on death so can summon for free until they die.
+		if (player.oldWeapons != null && player.isRefundableMode() &&
+			player.previousLoadout?.sigmaLoadout?.commandMode == player.loadout.sigmaLoadout.commandMode
+		) {
+			foreach (var weapon in retWeapons) {
+				if (weapon is not MaverickWeapon mw) continue;
+				MaverickWeapon? matchingOldWeapon = player.oldWeapons.FirstOrDefault(
+					w => w is MaverickWeapon && w.GetType() == weapon.GetType()
+				) as MaverickWeapon;
+				if (matchingOldWeapon == null) {
+					continue;
+				}
+				if (matchingOldWeapon.lastHealth > 0 && matchingOldWeapon.summonedOnce) {
+					mw.summonedOnce = true;
+					mw.lastHealth = matchingOldWeapon.lastHealth;
+					mw.isMoth = matchingOldWeapon.isMoth;
+				}
+
+			}
+		}
+		weaponSlot = 0;
+		if (retWeapons.Count == 3) {
+			weaponSlot = Options.main.sigmaWeaponSlot;
+		}
+		return retWeapons;
 	}
 }

@@ -71,6 +71,12 @@ public class MaverickState {
 		stateTime = 0;
 	}
 
+	public virtual void preUpdate() {
+	}
+
+	public virtual void postUpdate() {
+	}
+
 	public virtual void update() {
 		if (inTransition()) {
 			maverick.frameSpeed = 1;
@@ -607,12 +613,19 @@ public class MTaunt : MaverickState {
 public class MRun : MaverickState {
 	float dustTime;
 	float runSoundTime;
+	int xDir = 1;
 
 	public MRun() : base("run", "") {
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		xDir = maverick.xDir;
+	}
+
 	public override void update() {
 		base.update();
+		int inputDir = input.getXDir(player);
 
 		var oo = maverick as OverdriveOstrich;
 		if (oo != null) {
@@ -627,20 +640,22 @@ public class MRun : MaverickState {
 				runSoundTime = 0.175f;
 			}
 
-			if (input.isHeld(Control.Left, player) && oo.xDir == 1 && oo.getRunSpeed() >= oo.skidSpeed) {
+			if (xDir == 1 && inputDir != 1 && oo.getRunSpeed() >= oo.skidSpeed) {
 				oo.changeState(new OverdriveOSkidState(), true);
 				return;
-			} else if (input.isHeld(Control.Right, player) && oo.xDir == -1 && oo.getRunSpeed() >= oo.skidSpeed) {
+			}
+			if (xDir == -1 && inputDir == 1 && oo.getRunSpeed() >= oo.skidSpeed) {
 				oo.changeState(new OverdriveOSkidState(), true);
 				return;
 			}
 		}
 
 		var move = new Point(0, 0);
-		if (input.isHeld(Control.Left, player)) {
+		if (inputDir == -1) {
 			maverick.xDir = -1;
 			move.x = -maverick.getRunSpeed();
-		} else if (input.isHeld(Control.Right, player)) {
+		}
+		else if (inputDir == 1) {
 			maverick.xDir = 1;
 			move.x = maverick.getRunSpeed();
 		}
@@ -650,8 +665,8 @@ public class MRun : MaverickState {
 			if (oo != null && oo.getRunSpeed() >= 100) {
 				oo.accSpeed -= Global.spf * 500;
 				maverick.move(new Point(oo.getRunSpeed() * oo.xDir, 0));
-				// oo.changeState(new OverdriveOSkidState(), true);
-				// return;
+				//oo.changeState(new OverdriveOSkidState(), true);
+				return;
 			} else {
 				maverick.changeState(new MIdle());
 			}
@@ -670,9 +685,9 @@ public class MRun : MaverickState {
 			}
 		}
 		if (maverick is FakeZero && !once && stateTime >= 14/60f) {
-				maverick.playSound("dashX2", sendRpc: true);
-				once = true;
-			}
+			maverick.playSound("dashX2", sendRpc: true);
+			once = true;
+		}
 	}
 
 	public override void onEnter(MaverickState oldState) {
@@ -693,11 +708,21 @@ public class MJumpStart : MaverickState {
 
 	public override void update() {
 		base.update();
+		int inputDir = input.getXDir(player);
+		if (inputDir != 0) {
+			maverick.xDir = inputDir;
+			maverick.move(new Point(maverick.getRunSpeed() * inputDir, 0));
+		}
+		if (stateFrame > 6) {
+			maverick.vel.y = -maverick.getJumpPower() * getJumpModifier() * maverick.getYMod();
+			maverick.changeState(new MJump());
+			return;
+		}
 
 		if (maverick is BoomerangKuwanger ||
 			(maverick is OverdriveOstrich oo && oo.deltaPos.magnitude > 100 * Global.spf) ||
 			(maverick is FakeZero fz)) {
-			maverick.vel.y = -maverick.getJumpPower() * getJumpModifier() * maverick.getYMod();
+			maverick.vel.y = -maverick.getJumpPower() * maverick.getYMod() * (MathF.Abs(maverick.deltaPos.x / 10f) + 1);
 			maverick.changeState(new MJump());
 			return;
 		}
@@ -763,14 +788,10 @@ public class MJump : MaverickState {
 	public override void update() {
 		base.update();
 
-		if (!player.input.isHeld(Control.Jump, player)) {
-			jumpFramesHeld = 6;
-		}
-
 		bool jumpHeld = player.input.isHeld(Control.Jump, player);
-		if (jumpHeld && jumpFramesHeld < 6) {
-			jumpFramesHeld++;
-			maverick.vel.y -= Global.spf * 1250 * maverick.getYMod();
+		if (stateFrame > 2 && jumpFramesHeld == 0 && !jumpHeld && maverick.vel.y < 0) {
+			jumpFramesHeld = 1;
+			maverick.vel.y *= 0.25f;
 		}
 
 		if (maverick.vel.y * maverick.getYMod() > 0) {
@@ -970,18 +991,12 @@ public class MLand : MaverickState {
 				maverick.changeState(new MIdle());
 			}
 		}
-		if (input.isHeld(Control.Left, player) || input.isHeld(Control.Right, player)) {
+		int inputDir = input.getXDir(player);
+		if (inputDir != 0) {
 			Point move = new(0, 0);
-			if (input.isHeld(Control.Left, player)) {
-				maverick.xDir = -1;
-				move.x = -maverick.getRunSpeed();
-			} else if (input.isHeld(Control.Right, player)) {
-				maverick.xDir = 1;
-				move.x = maverick.getRunSpeed();
-			}
-			if (move.magnitude > 0) {
-				maverick.move(move);
-			}
+			maverick.xDir = inputDir;
+			move.x = maverick.getRunSpeed() * inputDir;
+			maverick.move(move);
 		}
 	}
 }

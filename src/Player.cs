@@ -10,7 +10,7 @@ namespace MMXOnline;
 public partial class Player {
 	public SpawnPoint? firstSpawn;
 	public Input input;
-	public Character character;
+	public Character? character;
 	public Character lastCharacter;
 	public bool ownedByLocalPlayer;
 	public int? awakenedCurrencyEnd;
@@ -605,7 +605,6 @@ public partial class Player {
 				loadoutSet = true;
 			}
 		}
-		configureWeapons();
 
 		is1v1Combatant = !isSpectator;
 	}
@@ -1094,7 +1093,6 @@ public partial class Player {
 			loadout.axlLoadout.weapon2 = extraData[0];
 			loadout.xLoadout.weapon3 = extraData[1];
 		}
-		configureWeapons();
 		maxHealth = getMaxHealth();
 		health = maxHealth;
 		assassinHitPos = null;
@@ -1163,10 +1161,13 @@ public partial class Player {
 		} else {
 			throw new Exception("Error: Non-valid char ID: " + charNum);
 		}
+		// Do this once char has spawned and is not null.
+		configureWeapons();
+
 		// Hyper mode overrides (POST)
 		if (Global.level.isHyperMatch() && ownedByLocalPlayer) {
 			if (character is MegamanX mmx) {
-				mmx.hasSeraphArmor = true;
+				mmx.hasUltimateArmor = true;
 			}
 			if (character is Zero zero) {
 				if (loadout.zeroLoadout.hyperMode == 0) {
@@ -1386,7 +1387,7 @@ public partial class Player {
 				new byte[] { data.extraData[0], data.extraData[1] }
 			);
 			if (retChar is MegamanX retX) {
-				retX.hasSeraphArmor = (data.extraData[2] == 1);
+				retX.hasUltimateArmor = (data.extraData[2] == 1);
 			}
 		}
 		// Store old weapons.
@@ -1458,27 +1459,6 @@ public partial class Player {
 		oldAxlLoadout = loadout;
 		loadout = dnaCore.loadout;
 
-		oldWeapons = weapons;
-		weapons = new List<Weapon>(dnaCore.weapons);
-
-		if (charNum == (int)CharIds.Zero) {
-			weapons.Add(new ZSaber());
-		}
-		if (charNum == (int)CharIds.BusterZero) {
-			weapons.Add(new KKnuckleWeapon());
-		}
-		if (charNum == (int)CharIds.PunchyZero) {
-			weapons.Add(new ZeroBuster());
-		}
-		if (charNum == (int)CharIds.Sigma) {
-			weapons.Add(new SigmaMenuWeapon());
-		}
-		//weapons.Add(new AssassinBullet());
-		weapons.Add(new UndisguiseWeapon());
-		weaponSlot = 0;
-
-		sigmaAmmo = dnaCore.rakuhouhaAmmo;
-
 		Character? retChar = null;
 		if (charNum == (int)CharIds.X) {
 			retChar = new MegamanX(
@@ -1542,6 +1522,28 @@ public partial class Player {
 		}
 		retChar.addTransformAnim();
 
+		// Weapon configuration.
+		oldWeapons = weapons;
+		retChar.weapons = new List<Weapon>(dnaCore.weapons);
+
+		if (charNum == (int)CharIds.Zero) {
+			retChar.weapons.Add(new ZSaber());
+		}
+		if (charNum == (int)CharIds.BusterZero) {
+			retChar.weapons.Add(new KKnuckleWeapon());
+		}
+		if (charNum == (int)CharIds.PunchyZero) {
+			retChar.weapons.Add(new ZeroBuster());
+		}
+		if (charNum == (int)CharIds.Sigma) {
+			retChar.weapons.Add(new SigmaMenuWeapon());
+		}
+		//weapons.Add(new AssassinBullet());
+		retChar.weapons.Add(new UndisguiseWeapon());
+
+		sigmaAmmo = dnaCore.rakuhouhaAmmo;
+
+
 		if (isAI) {
 			retChar.addAI();
 		}
@@ -1603,7 +1605,7 @@ public partial class Player {
 	}
 
 	// If you change this method change revertToAxlDeath() too
-	public void revertToAxl() {
+	public void revertToAxl(ushort? backupNetId = null) {
 		disguise = null;
 		Character oldChar = character;
 
@@ -1622,7 +1624,15 @@ public partial class Player {
 		var oldPos = character.pos;
 		var oldDir = character.xDir;
 		character.destroySelf();
-		Global.level.addGameObject(preTransformedAxl);
+		// For if joined late and not locally owned.
+		if (!ownedByLocalPlayer && preTransformedAxl == null) {
+			if (backupNetId == null) {
+				throw new Exception("Error: Missing NetID on Axl trasform RPC.");
+			}
+			preTransformedAxl = new Axl(this, oldPos.x, oldPos.y, oldDir, true, backupNetId, ownedByLocalPlayer, false);
+		} else {
+			Global.level.addGameObject(preTransformedAxl);
+		}
 		character = preTransformedAxl;
 		character.addTransformAnim();
 		preTransformedAxl = null;
@@ -1632,8 +1642,8 @@ public partial class Player {
 		maxHealth = getMaxHealth();
 		health = Math.Min(health, maxHealth);
 		loadout = oldAxlLoadout;
-		weapons = oldWeapons;
-		weaponSlot = 0;
+		character.weapons = oldWeapons;
+		character.weaponSlot = 0;
 
 		armorFlag = oldArmorFlag;
 		speedDevil = oldSpeedDevil;
@@ -1674,11 +1684,11 @@ public partial class Player {
 		}
 		preTransformedAxl = null;
 		charNum = 3;
-		maxHealth = getMaxHealth();;
+		maxHealth = getMaxHealth();
 		health = 0;
 		loadout = oldAxlLoadout;
 		configureWeapons();
-		weaponSlot = 0;
+		character.weaponSlot = 0;
 
 		armorFlag = oldArmorFlag;
 		speedDevil = oldSpeedDevil;
@@ -1838,7 +1848,7 @@ public partial class Player {
 		// Check for stuff that cannot gain scraps.
 		if (character is RagingChargeX or KaiserSigma or ViralSigma or WolfSigma) return;
 		if (character?.rideArmor?.raNum == 4 && character.charState is InRideArmor) return;
-		if (character is MegamanX mmx && mmx.hasSeraphArmor) {
+		if (character is MegamanX mmx && mmx.hasUltimateArmor) {
 			return;
 		}
 		

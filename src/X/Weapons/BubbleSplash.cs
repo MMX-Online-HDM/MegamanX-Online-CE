@@ -169,7 +169,7 @@ public class BubbleSplashProj : Projectile {
 }
 
 public class BubbleSplashProjCharged : Projectile {
-	public MegamanX? character;
+	public MegamanX? mmx;
 	public float yPos;
 	public BubbleSplashProjCharged(
 		Weapon weapon, Point pos, int xDir, Player player, 
@@ -184,7 +184,7 @@ public class BubbleSplashProjCharged : Projectile {
 		int randColor = Helpers.randomRange(0, 2);
 		if (randColor == 0) changeSprite("bubblesplash_proj2", true);
 		if (randColor == 1) changeSprite("bubblesplash_proj3", true);
-		character = (player.character as MegamanX);
+		mmx = (player.character as MegamanX);
 		this.time = type * 0.2f;
 		sprite.doesLoop = true;
 		projId = (int)ProjIds.BubbleSplashCharged;
@@ -212,7 +212,7 @@ public class BubbleSplashProjCharged : Projectile {
 		base.update();
 		if (!ownedByLocalPlayer) return;
 
-		if (character == null || !Global.level.gameObjects.Contains(character)  || (character.player.weapon is not BubbleSplash)) {
+		if (mmx?.destroyed != false || mmx.currentWeapon is not BubbleSplash) {
 			destroySelf();
 			return;
 		}
@@ -221,13 +221,13 @@ public class BubbleSplashProjCharged : Projectile {
 
 		float x = 20 * MathF.Sin(time * 5);
 		yPos = -15 * time;
-		Point newPos = character.pos.addxy(x, yPos);
+		Point newPos = mmx.pos.addxy(x, yPos);
 		changePos(newPos);
 	}
 
 	public override void onDestroy() {
-		if (character != null) {
-			character?.chargedBubbles?.Remove(this);
+		if (mmx != null) {
+			mmx?.chargedBubbles?.Remove(this);
 		}
 	}
 }
