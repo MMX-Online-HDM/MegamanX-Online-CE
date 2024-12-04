@@ -72,21 +72,7 @@ public partial class Player {
 	public List<float> axlBulletTypeLastAmmo = new List<float>() { 32, 32, 32, 32, 32, 32, 32 };
 	public int lastDNACoreIndex = 4;
 	public DNACore lastDNACore;
-	public Point axlCursorPos;
-	public Point? assassinCursorPos;
-	public Point axlCursorWorldPos { get { return axlCursorPos.addxy(Global.level.camX, Global.level.camY); } }
-	public Point axlScopeCursorWorldPos;
-	public Point axlScopeCursorWorldLerpPos;
-	public Point axlZoomOutCursorDestPos;
-	public Point axlLockOnCursorPos;
-	public Point axlGenericCursorWorldPos {
-		get {
-			if (character is not Axl axl || !axl.isZooming() || axl.isZoomingIn || axl.isZoomOutPhase1Done) {
-				return axlCursorWorldPos;
-			}
-			return axlScopeCursorWorldPos;
-		}
-	}
+	
 	public float zoomRange {
 		get {
 			if (character is Axl axl && (axl.isWhiteAxl() || axl.hyperAxlStillZoomed)) return 100000;

@@ -1161,8 +1161,12 @@ public partial class Actor : GameObject {
 	}
 
 	public void commonHealLogic(Player healer, float healAmount, float currentHealth, float maxHealth, bool drawHealText) {
+		commonHealLogic(healer, (decimal)healAmount, (decimal)currentHealth, (decimal)maxHealth, drawHealText);
+	}
+
+	public void commonHealLogic(Player healer, decimal healAmount, decimal currentHealth, decimal maxHealth, bool drawHealText) {
 		if (drawHealText && ownedByLocalPlayer) {
-			float reportAmount = Helpers.clampMax(healAmount, maxHealth - currentHealth);
+			float reportAmount = (float)Helpers.clampMax(healAmount, maxHealth - currentHealth);
 			if (reportAmount == 0) {
 				bool hasSubtankCapacity = false;
 				if (this is Character chr && chr.player.hasSubtankCapacity()) hasSubtankCapacity = true;

@@ -56,7 +56,7 @@ public class SpiralMagnum : AxlWeapon {
 		} else {
 			float jumpDist = 0;
 			if (headshotTarget != null || target != null) {
-				bulletPos = player.axlGenericCursorWorldPos;
+				bulletPos = axl.axlGenericCursorWorldPos;
 				jumpDist = bulletPos.distanceTo(bulletPos);
 			}
 			bullet = new SpiralMagnumProj(weapon, bulletPos, jumpDist, 1, player, bulletDir.Value, target, headshotTarget, netId);			
@@ -429,12 +429,12 @@ public class SniperMissileProj : Projectile, IDamagable {
 
 		if (!ownedByLocalPlayer) return;
 
-		if (owner.isMainPlayer && time > 0.25f) {
+		if (owner.isMainPlayer && time > 0.25f && axl != null) {
 			if (Options.main.axlAimMode == 2) {
-				if (pos.distanceTo(owner.axlCursorWorldPos) > 25) {
+				if (pos.distanceTo(axl.axlCursorWorldPos) > 25) {
 					//vel = Point.lerp(vel, pos.directionToNorm(owner.axlCursorWorldPos).times(speed), Global.spf * 2.5f);
 
-					float destAngle = pos.directionToNorm(owner.axlCursorWorldPos).angle;
+					float destAngle = pos.directionToNorm(axl.axlCursorWorldPos).angle;
 					if (angle != null) {
 						if (MathF.Abs(angle.Value - destAngle) > 3) {
 							angle = Helpers.moveAngle(angle.Value, destAngle, Global.spf * 200 * turnSpeed);

@@ -221,6 +221,13 @@ public class MegamanX : Character {
 	}
 
 	// Movement related stuff.
+	public override float getRunSpeed() {
+		if (charState is XHover) {
+			return 2 * 60 * getRunDebuffs();;
+		}
+		return base.getRunSpeed();
+	}
+
 	public override float getDashSpeed() {
 		if (flag != null || !isDashing) {
 			return getRunSpeed();
@@ -271,6 +278,23 @@ public class MegamanX : Character {
 			frameIndex = 0;
 			frameTime = 0;
 		}
+	}
+
+	public override Point getShootPos() {
+		Point? busterOffsetPos = currentFrame.getBusterOffset();
+		if (busterOffsetPos == null) {
+			return getCenterPos();
+		}
+		Point busterOffset = busterOffsetPos.Value;
+		if (armArmor == ArmorId.Max && sprite.needsX3BusterCorrection()) {
+			if (busterOffset.x > 0) { busterOffset.x += 4; }
+			else if (busterOffset.x < 0) { busterOffset.x -= 4; }
+		}
+		busterOffset.x *= xDir;
+		if (player.weapon is RollingShield && charState is Dash) {
+			busterOffset.y -= 2;
+		}
+		return pos.add(busterOffset);
 	}
 	
 	public override bool canShoot() {
@@ -339,12 +363,13 @@ public class MegamanX : Character {
 	}
 
 	public bool canUseFgMove() {
-		return 
+		return (
 			!isInvulnerableAttack() && 
 			chargedRollingShieldProj == null && 
 			stingActiveTime == 0 && canAffordFgMove() && 
 			hadoukenCooldownTime == 0 && currentWeapon is XBuster && 
-			player.fgMoveAmmo >= player.fgMoveMaxAmmo && grounded;
+			player.fgMoveAmmo >= player.fgMoveMaxAmmo && grounded
+		);
 	}
 
 	public bool hasLastingProj() {
@@ -515,6 +540,14 @@ public class MegamanX : Character {
 	public override void render(float x, float y) {
 		if (!shouldRender(x, y)) {
 			return;
+		}
+		if (sprite.name == "mmx_frozen") {
+			Global.sprites["frozen_block"].draw(
+				0, pos.x + x - (xDir * 2), pos.y + y + 1, xDir, 1, null, 1, 1, 1, zIndex + 1
+			);
+		}
+		if (!hideHealthAndName()) {
+			
 		}
 		base.render(x, y);
 	}

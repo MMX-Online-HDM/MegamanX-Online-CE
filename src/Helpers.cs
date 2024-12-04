@@ -63,10 +63,19 @@ public class Helpers {
 		if (val < min) return min;
 		return val;
 	}
+	
+	public static int clampMax(int val, int max) {
+		if (val >= max) { return max; }
+		return val;
+	}
 
 	public static float clampMax(float val, float max) {
-		if (val > max) return max;
+		if (val >= max) { return max; }
 		return val;
+	}
+
+	public static decimal clampMax(decimal val, decimal max) {
+		return  Math.Clamp(val, Decimal.MinValue, max);
 	}
 
 	public static string getTypedString(string str, int maxLength) {

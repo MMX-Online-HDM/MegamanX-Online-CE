@@ -115,6 +115,8 @@ public class AssassinBulletProj : Projectile {
 public class Assassinate : CharState {
 	public float time;
 	bool fired;
+	public Axl? axl;
+
 	public Assassinate(bool isGrounded) : base(isGrounded ? "idle" : "fall", "shoot", "attack", "") {
 		superArmor = true;
 	}
@@ -122,8 +124,8 @@ public class Assassinate : CharState {
 	public override void update() {
 		base.update();
 		time += Global.spf;
-		if (!Options.main.useMouseAim && Options.main.lockOnSound && player.assassinCursorPos != null) {
-			player.axlCursorPos = player.assassinCursorPos.Value;
+		if (axl != null && !Options.main.useMouseAim && Options.main.lockOnSound && axl.assassinCursorPos != null) {
+			axl.axlCursorPos = axl.assassinCursorPos.Value;
 		}
 		if (!fired) {
 			fired = true;
@@ -141,7 +143,10 @@ public class Assassinate : CharState {
 		base.onEnter(oldState);
 		character.useGravity = false;
 		character.vel = new Point();
-		character.xDir = (character.pos.x > player.axlGenericCursorWorldPos.x ? -1 : 1);
+		axl = character as Axl;
+		if (axl != null) {
+			character.xDir = (character.pos.x > axl.axlGenericCursorWorldPos.x ? -1 : 1);
+		}
 	}
 
 	public override void onExit(CharState newState) {

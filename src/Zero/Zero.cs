@@ -220,6 +220,10 @@ public class Zero : Character {
 			(charState.attackCtrl || (charState.altCtrls.Length >= 2 && charState.altCtrls[1]))
 		);
 	}
+
+	public override int getMaxChargeLevel() {
+		return isBlack ? 4 : 3;
+	}
 	
 	public override bool canCharge() {
 		return ( !isInvulnerable
@@ -933,6 +937,13 @@ public class Zero : Character {
 		}
 		shaders.AddRange(baseShaders);
 		return shaders;
+	}
+
+	public override Point getParasitePos() {
+		if (sprite.name.Contains("_ra_")) {
+			return pos.addxy(0, -6);
+		}
+		return pos.addxy(0, -20);
 	}
 
 	public override float getLabelOffY() {

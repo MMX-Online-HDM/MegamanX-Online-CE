@@ -247,6 +247,10 @@ public class BusterZero : Character {
 		}
 	}
 
+	public override int getMaxChargeLevel() {
+		return 4;
+	}
+
 	// This can run on both owners and non-owners. So data used must be in sync.
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
