@@ -42,7 +42,7 @@ public class DNACore : AxlWeapon {
 	public DNACore(Character character) : base(0) {
 		charNum = character.player.charNum;
 		loadout = character.player.loadout;
-		maxHealth = character.player.maxHealth;
+		maxHealth = (float)Math.Ceiling(character.maxHealth);
 		name = character.player.name;
 		alliance = character.player.alliance;
 		armorFlag = character.player.armorFlag;

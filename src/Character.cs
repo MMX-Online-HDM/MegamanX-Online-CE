@@ -227,6 +227,9 @@ public partial class Character : Actor, IDamagable {
 
 		chargeEffect = new ChargeEffect();
 		lastGravityWellDamager = player;
+		maxHealth = (decimal)player.getMaxHealth();
+		health = 1;
+		healAmount = (float)maxHealth - 1;
 	}
 
 	public override void onStart() {

@@ -120,7 +120,7 @@ public class PunchyZero : Character {
 				hyperModeTimer = 0;
 				if (hyperOvertimeActive && isAwakened && player.currency >= 4) {
 					awakenedPhase = 2;
-					heal(player, player.maxHealth * 2, true);
+					heal(player, awakenedPhase, true);
 					gigaAttack.addAmmoPercentHeal(100);
 				} else {
 					awakenedPhase = 0;

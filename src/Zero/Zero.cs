@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace MMXOnline;
@@ -153,7 +153,7 @@ public class Zero : Character {
 				hyperModeTimer = 0;
 				if (hyperOvertimeActive && isAwakened && player.currency >= 4) {
 					awakenedPhase = 2;
-					heal(player, player.maxHealth * 2, true);
+					heal(player, (float)maxHealth * 2, true);
 					gigaAttack.addAmmoPercentHeal(100);
 				} else {
 					awakenedPhase = 0;
