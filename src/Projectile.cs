@@ -600,7 +600,7 @@ public class Projectile : Actor {
 				damagable.canBeHealed(damager.owner.alliance) && healAmount > 0
 			) {
 				if (Global.serverClient == null || damagableActor?.ownedByLocalPlayer == true) {
-					damagable.heal(owner, healAmount, allowStacking: true, drawHealText: true);
+					damagable.heal(owner, time, allowStacking: true, drawHealText: true);
 				} else {
 					RPC.heal.sendRpc(owner, damagableActor?.netId ?? ushort.MaxValue, healAmount);
 				}

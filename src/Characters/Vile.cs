@@ -336,6 +336,9 @@ public class Vile : Character {
 	public override bool canCharge() {
 		return !isInvulnerableAttack() && charState is not Die && invulnTime == 0;
 	}
+	public override int getMaxChargeLevel() {
+		return isVileMK5 ? 4 : 3;
+	}
 	public override bool canShoot() {
 		if (isInvulnerableAttack()) return false;
 		if (invulnTime > 0) return false;
@@ -735,6 +738,36 @@ public class Vile : Character {
 		}
 
 		return shaders;
+	}
+
+	public override float getRunSpeed() {
+		if (player.speedDevil) {
+			return base.getRunSpeed() * 1.1f;
+		}
+		return base.getRunSpeed();
+	}
+
+	public override float getDashSpeed() {
+		if (flag != null || !isDashing) {
+			return getRunSpeed();
+		}
+		float dashSpeed = 3.45f * 60f;
+		
+		if (player.speedDevil) {
+			dashSpeed *= 1.1f;
+		}
+	
+		return dashSpeed * getRunDebuffs();
+	}
+
+	public override Point getParasitePos() {
+		if (sprite.name.Contains("_ra_")) {
+			if (sprite.name.Contains("_ra_hide")) {
+				pos.addxy(0, -6 + 22 * (sprite.frameIndex / (float)sprite.totalFrameNum));
+			}
+			return pos.addxy(0, -6);
+		}
+		return pos.addxy(0, -24);
 	}
 
 	public override List<byte> getCustomActorNetData() {

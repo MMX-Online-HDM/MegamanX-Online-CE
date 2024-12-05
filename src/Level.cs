@@ -1483,8 +1483,8 @@ public partial class Level {
 			if (camPlayer.character is Axl axl && axl.isZooming()) {
 				Player p = camPlayer.character.player;
 
-				p.axlScopeCursorWorldPos.x = Helpers.clamp(p.axlScopeCursorWorldPos.x, camCenterX - Global.halfViewScreenW, camCenterX + Global.halfViewScreenW);
-				p.axlScopeCursorWorldPos.y = Helpers.clamp(p.axlScopeCursorWorldPos.y, camCenterY - Global.halfViewScreenH, camCenterY + Global.halfViewScreenH);
+				axl.axlScopeCursorWorldPos.x = Helpers.clamp(axl.axlScopeCursorWorldPos.x, camCenterX - Global.halfViewScreenW, camCenterX + Global.halfViewScreenW);
+				axl.axlScopeCursorWorldPos.y = Helpers.clamp(axl.axlScopeCursorWorldPos.y, camCenterY - Global.halfViewScreenH, camCenterY + Global.halfViewScreenH);
 			}
 		} else {
 			shakeX = 0;

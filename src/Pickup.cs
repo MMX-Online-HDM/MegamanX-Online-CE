@@ -43,7 +43,7 @@ public class Pickup : Actor {
 			if (!chr.ownedByLocalPlayer) return;
 
 			if (pickupType == PickupType.Health) {
-				if (chr.player.health >= chr.player.maxHealth && !chr.player.hasSubtankCapacity()) return;
+				if (chr.health >= chr.maxHealth && !chr.player.hasSubtankCapacity()) return;
 				chr.addHealth(healAmount);
 				destroySelf(doRpcEvenIfNotOwned: true);
 			} else if (pickupType == PickupType.Ammo) {
@@ -59,7 +59,7 @@ public class Pickup : Actor {
 				if (pickupType == PickupType.Health) {
 					if (rideArmor.health >= rideArmor.maxHealth) {
 						if (rideArmor.character != null && (
-							rideArmor.character.player.health >= rideArmor.character.player.maxHealth
+							rideArmor.character.health >= rideArmor.character.maxHealth
 						)) {
 							return;
 						} else {
@@ -81,7 +81,7 @@ public class Pickup : Actor {
 				if (pickupType == PickupType.Health) {
 					if (rideChaser.health >= rideChaser.maxHealth) {
 						if (rideChaser.character != null &&
-							rideChaser.character.player.health >= rideChaser.character.player.maxHealth
+							rideChaser.character.health >= rideChaser.character.maxHealth
 						) {
 							return;
 						} else {

@@ -72,21 +72,7 @@ public partial class Player {
 	public List<float> axlBulletTypeLastAmmo = new List<float>() { 32, 32, 32, 32, 32, 32, 32 };
 	public int lastDNACoreIndex = 4;
 	public DNACore lastDNACore;
-	public Point axlCursorPos;
-	public Point? assassinCursorPos;
-	public Point axlCursorWorldPos { get { return axlCursorPos.addxy(Global.level.camX, Global.level.camY); } }
-	public Point axlScopeCursorWorldPos;
-	public Point axlScopeCursorWorldLerpPos;
-	public Point axlZoomOutCursorDestPos;
-	public Point axlLockOnCursorPos;
-	public Point axlGenericCursorWorldPos {
-		get {
-			if (character is not Axl axl || !axl.isZooming() || axl.isZoomingIn || axl.isZoomOutPhase1Done) {
-				return axlCursorWorldPos;
-			}
-			return axlScopeCursorWorldPos;
-		}
-	}
+	
 	public float zoomRange {
 		get {
 			if (character is Axl axl && (axl.isWhiteAxl() || axl.hyperAxlStillZoomed)) return 100000;
@@ -140,20 +126,30 @@ public partial class Player {
 
 	public float healthBackup;
 
-	private ProtectedFloat _health = new();
 	public float health {
-		get {
-			if (!ownedByLocalPlayer) {
-				return _health.unsafeVal;
+		get => (float)(character?.health ?? 0);
+		set {
+			if (character != null) {
+				character.health = (decimal)value;
 			}
-			return _health.value;
+		}
+	}
+	public float _maxHealth = 16;
+	public float maxHealth {
+		get {
+			if (character != null) {
+				_maxHealth = (float)character.maxHealth;
+			}
+			return _maxHealth;
 		}
 		set {
-			_health.value = value;
+			if (character != null) {
+				character.maxHealth = (decimal)value;
+			}
+			_maxHealth = value;
 		}
 	}
 
-	public float maxHealth;
 	public bool isDead {
 		get {
 			if (isSigma && currentMaverick != null) {
@@ -607,6 +603,7 @@ public partial class Player {
 		}
 
 		is1v1Combatant = !isSpectator;
+		maxHealth = getMaxHealth();
 	}
 
 	public int getHeartTankModifier() {

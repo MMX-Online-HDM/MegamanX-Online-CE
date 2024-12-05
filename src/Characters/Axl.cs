@@ -74,6 +74,23 @@ public class Axl : Character {
 	public RayGunAltProj? rayGunAltProj;
 	public GaeaShieldProj? gaeaShield;
 
+	// Cursor stuff.
+	public Point axlCursorPos;
+	public Point? assassinCursorPos;
+	public Point axlCursorWorldPos => axlCursorPos.addxy(Global.level.camX, Global.level.camY);
+	public Point axlScopeCursorWorldPos;
+	public Point axlScopeCursorWorldLerpPos;
+	public Point axlZoomOutCursorDestPos;
+	public Point axlLockOnCursorPos;
+	public Point axlGenericCursorWorldPos {
+		get {
+			if (!isZooming() || isZoomingIn || isZoomOutPhase1Done) {
+				return axlCursorWorldPos;
+			}
+			return axlScopeCursorWorldPos;
+		}
+	}
+
 	// Used to be 0.5, 100
 	public const float maxStealthRevealTime = 0.25f;
 	// The ping divided by this number indicates stealth reveal time in online
@@ -110,12 +127,12 @@ public class Axl : Character {
 
 		_zoom = true;
 		if (isWhiteAxl()) hyperAxlStillZoomed = true;
-		player.axlCursorPos.x = Helpers.clamp(player.axlCursorPos.x, 0, Global.viewScreenW);
-		player.axlCursorPos.y = Helpers.clamp(player.axlCursorPos.y, 0, Global.viewScreenH);
+		axlCursorPos.x = Helpers.clamp(axlCursorPos.x, 0, Global.viewScreenW);
+		axlCursorPos.y = Helpers.clamp(axlCursorPos.y, 0, Global.viewScreenH);
 		savedCamX = Global.level.camX;
 		savedCamY = Global.level.camY;
-		player.axlScopeCursorWorldPos = player.character.getCamCenterPos(ignoreZoom: true);
-		player.axlScopeCursorWorldLerpPos = player.axlCursorWorldPos;
+		axlScopeCursorWorldPos = player.character.getCamCenterPos(ignoreZoom: true);
+		axlScopeCursorWorldLerpPos = axlCursorWorldPos;
 		isZoomingIn = true;
 		isZoomingOut = false;
 	}
@@ -125,8 +142,8 @@ public class Axl : Character {
 		if (!_zoom) return;
 
 		zoomCharge = 0;
-		player.axlZoomOutCursorDestPos = player.character.getCamCenterPos(ignoreZoom: true);
-		player.axlCursorPos = getAxlBulletPos().add(getAxlBulletDir().times(50)).addxy(-savedCamX, -savedCamY);
+		axlZoomOutCursorDestPos = player.character.getCamCenterPos(ignoreZoom: true);
+		axlCursorPos = getAxlBulletPos().add(getAxlBulletDir().times(50)).addxy(-savedCamX, -savedCamY);
 
 		isZoomingOut = true;
 		isZoomingIn = false;
@@ -398,7 +415,7 @@ public class Axl : Character {
 
 		sprite.reversed = false;
 		if (player.axlWeapon != null && (player.axlWeapon.isTwoHanded(false) || isZooming()) && canChangeDir() && charState is not WallSlide) {
-			int newXDir = (pos.x > player.axlGenericCursorWorldPos.x ? -1 : 1);
+			int newXDir = (pos.x > axlGenericCursorWorldPos.x ? -1 : 1);
 			if (charState is Run && xDir != newXDir) {
 				sprite.reversed = true;
 			}
@@ -832,21 +849,21 @@ public class Axl : Character {
 				if (!isZoomingIn && !isZoomingOut) {
 					updateAxlScopePos();
 				} else if (isZoomingIn) {
-					player.axlScopeCursorWorldPos = Point.lerp(player.axlScopeCursorWorldPos, player.axlScopeCursorWorldLerpPos, Global.spf * 15);
-					if (player.axlScopeCursorWorldPos.distanceTo(player.axlScopeCursorWorldLerpPos) < 1) {
-						player.axlScopeCursorWorldPos = player.axlScopeCursorWorldLerpPos;
+					axlScopeCursorWorldPos = Point.lerp(axlScopeCursorWorldPos, axlScopeCursorWorldLerpPos, Global.spf * 15);
+					if (axlScopeCursorWorldPos.distanceTo(axlScopeCursorWorldLerpPos) < 1) {
+						axlScopeCursorWorldPos = axlScopeCursorWorldLerpPos;
 						isZoomingIn = false;
 					}
 				} else if (isZoomingOut) {
-					Point destPos = player.axlZoomOutCursorDestPos;
-					player.axlScopeCursorWorldPos = Point.lerp(player.axlScopeCursorWorldPos, destPos, Global.spf * 15);
-					float dist = player.axlScopeCursorWorldPos.distanceTo(destPos);
+					Point destPos = axlZoomOutCursorDestPos;
+					axlScopeCursorWorldPos = Point.lerp(axlScopeCursorWorldPos, destPos, Global.spf * 15);
+					float dist = axlScopeCursorWorldPos.distanceTo(destPos);
 					if (dist < 50 && !isZoomOutPhase1Done) {
-						//player.axlCursorPos = player.axlScopeCursorWorldPos.addxy(-Global.level.camX, -Global.level.camY);
+						//axlCursorPos = axlScopeCursorWorldPos.addxy(-Global.level.camX, -Global.level.camY);
 						isZoomOutPhase1Done = true;
 					}
 					if (dist < 1) {
-						player.axlScopeCursorWorldPos = destPos;
+						axlScopeCursorWorldPos = destPos;
 						isZoomingOut = false;
 						isZoomOutPhase1Done = false;
 						_zoom = false;
@@ -869,7 +886,7 @@ public class Axl : Character {
 	public void updateAxlDirectionalAim() {
 		if (player.input.isCursorLocked(player)) {
 			Point worldCursorPos = pos.add(lastDirToCursor);
-			player.axlCursorPos = worldCursorPos.addxy(-Global.level.camX, -Global.level.camY);
+			axlCursorPos = worldCursorPos.addxy(-Global.level.camX, -Global.level.camY);
 			lockOn(out _);
 			return;
 		}
@@ -943,7 +960,7 @@ public class Axl : Character {
 		float yOff = -24;
 		if (charState is Crouch) yOff = -16;
 
-		//player.axlCursorPos = pos.addxy(xOff * xDir, yOff).addxy(aimDir.x, aimDir.y).addxy(-Global.level.camX, -Global.level.camY);
+		//axlCursorPos = pos.addxy(xOff * xDir, yOff).addxy(aimDir.x, aimDir.y).addxy(-Global.level.camX, -Global.level.camY);
 		Point destCursorPos = pos.addxy(xOff * xDir, yOff).addxy(aimDir.x, aimDir.y).addxy(-Global.level.camX, -Global.level.camY);
 
 		if (charState is Dash || charState is AirDash) {
@@ -951,23 +968,23 @@ public class Axl : Character {
 		}
 
 		// Try to see if where cursor will go to has auto-aim target. If it does, make that the dest, not the actual dest
-		Point oldCursorPos = player.axlCursorPos;
-		player.axlCursorPos = destCursorPos;
+		Point oldCursorPos = axlCursorPos;
+		axlCursorPos = destCursorPos;
 		lockOn(out Point? lockOnPoint);
 		if (lockOnPoint != null) {
 			destCursorPos = lockOnPoint.Value;
 		}
-		player.axlCursorPos = oldCursorPos;
+		axlCursorPos = oldCursorPos;
 
 		// Lerp to the new target
-		//player.axlCursorPos = Point.moveTo(player.axlCursorPos, destCursorPos, Global.spf * 1000);
+		//axlCursorPos = Point.moveTo(axlCursorPos, destCursorPos, Global.spf * 1000);
 		if (!Options.main.aimAnalog) {
-			player.axlCursorPos = Point.lerp(player.axlCursorPos, destCursorPos, Global.spf * 15);
+			axlCursorPos = Point.lerp(axlCursorPos, destCursorPos, Global.spf * 15);
 		} else {
-			player.axlCursorPos = destCursorPos;
+			axlCursorPos = destCursorPos;
 		}
 
-		lastDirToCursor = pos.directionTo(player.axlCursorWorldPos);
+		lastDirToCursor = pos.directionTo(axlCursorWorldPos);
 	}
 
 	Point lastDirToCursor;
@@ -983,7 +1000,7 @@ public class Axl : Character {
 			if (enemy.character != null && enemy.character.canBeDamaged(player.alliance, player.id, null) && enemy.character.pos.distanceTo(pos) < 150 && !enemy.character.isStealthy(player.alliance)) {
 				float distPercent = 1 - (enemy.character.pos.distanceTo(pos) / 150);
 				var dirToEnemy = getAxlBulletPos().directionTo(enemy.character.getAimCenterPos());
-				var dirToCursor = getAxlBulletPos().directionTo(player.axlGenericCursorWorldPos);
+				var dirToCursor = getAxlBulletPos().directionTo(axlGenericCursorWorldPos);
 
 				float angle = dirToEnemy.angleWith(dirToCursor);
 
@@ -1004,7 +1021,7 @@ public class Axl : Character {
 		var prevTarget = axlCursorTarget;
 		axlCursorTarget = null;
 		axlHeadshotTarget = null;
-		player.assassinCursorPos = null;
+		assassinCursorPos = null;
 
 		if (!Options.main.lockOnSound) return;
 		if (player.isDisguisedAxl && !player.isAxl && player.axlWeapon is not AssassinBullet) return;
@@ -1019,12 +1036,12 @@ public class Axl : Character {
 		}
 
 		if (axlCursorTarget != null) {
-			player.axlLockOnCursorPos = (axlCursorTarget as Character).getAimCenterPos();
-			lockOnPoint = player.axlLockOnCursorPos.addxy(-Global.level.camX, -Global.level.camY);
-			// player.axlCursorPos = (axlCursorTarget as Character).getAimCenterPos().addxy(-Global.level.camX, -Global.level.camY);
+			axlLockOnCursorPos = (axlCursorTarget as Character).getAimCenterPos();
+			lockOnPoint = axlLockOnCursorPos.addxy(-Global.level.camX, -Global.level.camY);
+			// axlCursorPos = (axlCursorTarget as Character).getAimCenterPos().addxy(-Global.level.camX, -Global.level.camY);
 
 			if (player.axlWeapon is AssassinBullet) {
-				player.assassinCursorPos = lockOnPoint;
+				assassinCursorPos = lockOnPoint;
 			}
 		}
 	}
@@ -1044,36 +1061,36 @@ public class Axl : Character {
 
 		// Controller joystick axis move section
 		if (Input.aimX > aimThreshold && Input.aimX >= Input.lastAimX) {
-			player.axlScopeCursorWorldPos.x += Global.spf * Global.screenW * (Input.aimX / 100f) * sensitivity;
+			axlScopeCursorWorldPos.x += Global.spf * Global.screenW * (Input.aimX / 100f) * sensitivity;
 			axisXMoved = true;
 		} else if (Input.aimX < -aimThreshold && Input.aimX <= Input.lastAimX) {
-			player.axlScopeCursorWorldPos.x -= Global.spf * Global.screenW * (MathF.Abs(Input.aimX) / 100f) * sensitivity;
+			axlScopeCursorWorldPos.x -= Global.spf * Global.screenW * (MathF.Abs(Input.aimX) / 100f) * sensitivity;
 			axisXMoved = true;
 		}
 		if (Input.aimY > aimThreshold && Input.aimY >= Input.lastAimY) {
-			player.axlScopeCursorWorldPos.y += Global.spf * Global.screenW * (Input.aimY / 100f) * sensitivity;
+			axlScopeCursorWorldPos.y += Global.spf * Global.screenW * (Input.aimY / 100f) * sensitivity;
 			axisYMoved = true;
 		} else if (Input.aimY < -aimThreshold && Input.aimY <= Input.lastAimY) {
-			player.axlScopeCursorWorldPos.y -= Global.spf * Global.screenW * (MathF.Abs(Input.aimY) / 100f) * sensitivity;
+			axlScopeCursorWorldPos.y -= Global.spf * Global.screenW * (MathF.Abs(Input.aimY) / 100f) * sensitivity;
 			axisYMoved = true;
 		}
 
 		// Controller or keyboard button based aim section
 		if (!axisXMoved) {
 			if (player.input.isHeld(Control.AimLeft, player)) {
-				player.axlScopeCursorWorldPos.x -= Global.spf * 200 * sensitivity;
+				axlScopeCursorWorldPos.x -= Global.spf * 200 * sensitivity;
 				axisXMoved = true;
 			} else if (player.input.isHeld(Control.AimRight, player)) {
-				player.axlScopeCursorWorldPos.x += Global.spf * 200 * sensitivity;
+				axlScopeCursorWorldPos.x += Global.spf * 200 * sensitivity;
 				axisXMoved = true;
 			}
 		}
 		if (!axisYMoved) {
 			if (player.input.isHeld(Control.AimUp, player)) {
-				player.axlScopeCursorWorldPos.y -= Global.spf * 200 * sensitivity;
+				axlScopeCursorWorldPos.y -= Global.spf * 200 * sensitivity;
 				axisYMoved = true;
 			} else if (player.input.isHeld(Control.AimDown, player)) {
-				player.axlScopeCursorWorldPos.y += Global.spf * 200 * sensitivity;
+				axlScopeCursorWorldPos.y += Global.spf * 200 * sensitivity;
 				axisYMoved = true;
 			}
 		}
@@ -1081,8 +1098,8 @@ public class Axl : Character {
 		// Mouse based aim
 		if (!Menu.inMenu && !player.isAI) {
 			if (Options.main.useMouseAim) {
-				player.axlScopeCursorWorldPos.x += Input.mouseDeltaX * 0.125f * sensitivity;
-				player.axlScopeCursorWorldPos.y += Input.mouseDeltaY * 0.125f * sensitivity;
+				axlScopeCursorWorldPos.x += Input.mouseDeltaX * 0.125f * sensitivity;
+				axlScopeCursorWorldPos.y += Input.mouseDeltaY * 0.125f * sensitivity;
 			}
 		}
 
@@ -1093,7 +1110,7 @@ public class Axl : Character {
 			float bestDist = float.MaxValue;
 			foreach (var enemy in Global.level.players) {
 				if (enemy.character != null && enemy.character.canBeDamaged(player.alliance, player.id, null) && !enemy.character.isStealthy(player.alliance)) {
-					float cursorDist = enemy.character.getAimCenterPos().distanceTo(player.axlScopeCursorWorldPos);
+					float cursorDist = enemy.character.getAimCenterPos().distanceTo(axlScopeCursorWorldPos);
 					if (cursorDist < bestDist) {
 						bestDist = cursorDist;
 						target = enemy.character;
@@ -1103,20 +1120,20 @@ public class Axl : Character {
 			const float aimAssistRange = 25;
 			if (target != null && bestDist < aimAssistRange) {
 				//float aimAssistPower = (float)Math.Pow(1 - (bestDist / aimAssistRange), 2);
-				player.axlScopeCursorWorldPos = Point.lerp(player.axlScopeCursorWorldPos, target.getAimCenterPos(), Global.spf * 5);
-				//player.axlScopeCursorWorldPos = target.getAimCenterPos();
+				axlScopeCursorWorldPos = Point.lerp(axlScopeCursorWorldPos, target.getAimCenterPos(), Global.spf * 5);
+				//axlScopeCursorWorldPos = target.getAimCenterPos();
 			}
 		}
 
 		// Aimbot
 		if (!player.isAI) {
-			//var target = Global.level.getClosestTarget(player.axlScopeCursorWorldPos, player.alliance, true);
-			//if (target != null && target.pos.distanceTo(player.axlScopeCursorWorldPos) < 100) player.axlScopeCursorWorldPos = target.getAimCenterPos();
+			//var target = Global.level.getClosestTarget(axlScopeCursorWorldPos, player.alliance, true);
+			//if (target != null && target.pos.distanceTo(axlScopeCursorWorldPos) < 100) axlScopeCursorWorldPos = target.getAimCenterPos();
 		}
 
 		Point centerPos = getAimCenterPos();
-		if (player.axlScopeCursorWorldPos.distanceTo(centerPos) > player.zoomRange) {
-			player.axlScopeCursorWorldPos = centerPos.add(centerPos.directionTo(player.axlScopeCursorWorldPos).normalize().times(player.zoomRange));
+		if (axlScopeCursorWorldPos.distanceTo(centerPos) > player.zoomRange) {
+			axlScopeCursorWorldPos = centerPos.add(centerPos.directionTo(axlScopeCursorWorldPos).normalize().times(player.zoomRange));
 		}
 
 		getMouseTargets();
@@ -1127,7 +1144,7 @@ public class Axl : Character {
 		axlHeadshotTarget = null;
 
 		int cursorSize = 1;
-		var shape = new Rect(player.axlGenericCursorWorldPos.x - cursorSize, player.axlGenericCursorWorldPos.y - cursorSize, player.axlGenericCursorWorldPos.x + cursorSize, player.axlGenericCursorWorldPos.y + cursorSize).getShape();
+		var shape = new Rect(axlGenericCursorWorldPos.x - cursorSize, axlGenericCursorWorldPos.y - cursorSize, axlGenericCursorWorldPos.x + cursorSize, axlGenericCursorWorldPos.y + cursorSize).getShape();
 		var hit = Global.level.checkCollisionsShape(shape, new List<GameObject>() { this }).FirstOrDefault(c => c.gameObject is IDamagable);
 		if (hit != null) {
 			var target = hit.gameObject as IDamagable;
@@ -1139,7 +1156,7 @@ public class Axl : Character {
 		}
 		foreach (var enemy in Global.level.players) {
 			if (enemy.character != null && enemy.character.canBeDamaged(player.alliance, player.id, null) && enemy.character.getHeadPos() != null) {
-				if (player.axlGenericCursorWorldPos.distanceTo(enemy.character.getHeadPos().Value) < headshotRadius) {
+				if (axlGenericCursorWorldPos.distanceTo(enemy.character.getHeadPos().Value) < headshotRadius) {
 					axlCursorTarget = enemy.character;
 					axlHeadshotTarget = enemy.character;
 				}
@@ -1162,55 +1179,55 @@ public class Axl : Character {
 
 		// Controller joystick axis move section
 		if (Input.aimX > aimThreshold && Input.aimX >= Input.lastAimX) {
-			player.axlCursorPos.x += Global.spf * Global.screenW * (Input.aimX / 100f) * sensitivity;
+			axlCursorPos.x += Global.spf * Global.screenW * (Input.aimX / 100f) * sensitivity;
 			axisXMoved = true;
 		} else if (Input.aimX < -aimThreshold && Input.aimX <= Input.lastAimX) {
-			player.axlCursorPos.x -= Global.spf * Global.screenW * (MathF.Abs(Input.aimX) / 100f) * sensitivity;
+			axlCursorPos.x -= Global.spf * Global.screenW * (MathF.Abs(Input.aimX) / 100f) * sensitivity;
 			axisXMoved = true;
 		}
 		if (Input.aimY > aimThreshold && Input.aimY >= Input.lastAimY) {
-			player.axlCursorPos.y += Global.spf * Global.screenW * (Input.aimY / 100f) * sensitivity;
+			axlCursorPos.y += Global.spf * Global.screenW * (Input.aimY / 100f) * sensitivity;
 			axisYMoved = true;
 		} else if (Input.aimY < -aimThreshold && Input.aimY <= Input.lastAimY) {
-			player.axlCursorPos.y -= Global.spf * Global.screenW * (MathF.Abs(Input.aimY) / 100f) * sensitivity;
+			axlCursorPos.y -= Global.spf * Global.screenW * (MathF.Abs(Input.aimY) / 100f) * sensitivity;
 			axisYMoved = true;
 		}
 
 		// Controller or keyboard button based aim section
 		if (!axisXMoved) {
 			if (player.input.isHeld(Control.AimLeft, player)) {
-				player.axlCursorPos.x -= Global.spf * 200 * sensitivity;
+				axlCursorPos.x -= Global.spf * 200 * sensitivity;
 			} else if (player.input.isHeld(Control.AimRight, player)) {
-				player.axlCursorPos.x += Global.spf * 200 * sensitivity;
+				axlCursorPos.x += Global.spf * 200 * sensitivity;
 			}
 		}
 		if (!axisYMoved) {
 			if (player.input.isHeld(Control.AimUp, player)) {
-				player.axlCursorPos.y -= Global.spf * 200 * sensitivity;
+				axlCursorPos.y -= Global.spf * 200 * sensitivity;
 			} else if (player.input.isHeld(Control.AimDown, player)) {
-				player.axlCursorPos.y += Global.spf * 200 * sensitivity;
+				axlCursorPos.y += Global.spf * 200 * sensitivity;
 			}
 		}
 
 		// Mouse based aim
 		if (!Menu.inMenu && !player.isAI) {
 			if (Options.main.useMouseAim) {
-				player.axlCursorPos.x += Input.mouseDeltaX * 0.125f * sensitivity;
-				player.axlCursorPos.y += Input.mouseDeltaY * 0.125f * sensitivity;
+				axlCursorPos.x += Input.mouseDeltaX * 0.125f * sensitivity;
+				axlCursorPos.y += Input.mouseDeltaY * 0.125f * sensitivity;
 			}
-			player.axlCursorPos.x = Helpers.clamp(player.axlCursorPos.x, 0, Global.viewScreenW);
-			player.axlCursorPos.y = Helpers.clamp(player.axlCursorPos.y, 0, Global.viewScreenH);
+			axlCursorPos.x = Helpers.clamp(axlCursorPos.x, 0, Global.viewScreenW);
+			axlCursorPos.y = Helpers.clamp(axlCursorPos.y, 0, Global.viewScreenH);
 		}
 
 		if (isWarpIn()) {
-			player.axlCursorPos = getCenterPos().addxy(-Global.level.camX + 50 * xDir, -Global.level.camY);
+			axlCursorPos = getCenterPos().addxy(-Global.level.camX + 50 * xDir, -Global.level.camY);
 		}
 
 		// aimbot
 		if (player.isAI) {
 			var target = Global.level.getClosestTarget(pos, player.alliance, true);
 			if (target != null) {
-				player.axlCursorPos = target.pos.addxy(
+				axlCursorPos = target.pos.addxy(
 					-Global.level.camX,
 					-Global.level.camY - ((target as Character)?.charState is InRideArmor ? 0 : 16)
 				);
@@ -1263,7 +1280,7 @@ public class Axl : Character {
 
 		if (charState is LadderClimb) {
 			if (isAxlLadderShooting()) {
-				xDir = (pos.x > player.axlGenericCursorWorldPos.x ? -1 : 1);
+				xDir = (pos.x > axlGenericCursorWorldPos.x ? -1 : 1);
 				changeSprite("axl_ladder_shoot", true);
 			} else {
 				changeSprite("axl_ladder_climb", true);
@@ -1320,8 +1337,8 @@ public class Axl : Character {
 		if (Global.showHitboxes) {
 			Point bulletPos = getAxlBulletPos();
 			DrawWrappers.DrawLine(
-				bulletPos.x, bulletPos.y, player.axlGenericCursorWorldPos.x,
-				player.axlGenericCursorWorldPos.y, Color.Magenta, 1, ZIndex.Default + 1
+				bulletPos.x, bulletPos.y, axlGenericCursorWorldPos.x,
+				axlGenericCursorWorldPos.y, Color.Magenta, 1, ZIndex.Default + 1
 			);
 		}
 
@@ -1347,9 +1364,9 @@ public class Axl : Character {
 
 		if (Options.main.useMouseAim || Global.showHitboxes) {
 			drawBloom();
-			Global.sprites["axl_cursor"].draw(0, player.axlCursorWorldPos.x, player.axlCursorWorldPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
+			Global.sprites["axl_cursor"].draw(0, axlCursorWorldPos.x, axlCursorWorldPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
 			if (player.assassinHitPos?.isHeadshot == true && player.weapon is AssassinBullet && Global.level.isTraining()) {
-				Global.sprites["hud_kill"].draw(0, player.axlCursorWorldPos.x, player.axlCursorWorldPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
+				Global.sprites["hud_kill"].draw(0, axlCursorWorldPos.x, axlCursorWorldPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
 			}
 		}
 		if (!Options.main.useMouseAim) {
@@ -1361,13 +1378,13 @@ public class Axl : Character {
 				float y = Helpers.sind(ang) * radius * getShootXDir();
 				DrawWrappers.DrawLine(bulletPos.x, bulletPos.y, bulletPos.x + x, bulletPos.y + y, new Color(255, 0, 0, 128), 2, ZIndex.HUD, true);
 				if (axlCursorTarget != null && player.assassinHitPos?.isHeadshot == true && player.weapon is AssassinBullet && Global.level.isTraining()) {
-					Global.sprites["hud_kill"].draw(0, player.axlLockOnCursorPos.x, player.axlLockOnCursorPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
+					Global.sprites["hud_kill"].draw(0, axlLockOnCursorPos.x, axlLockOnCursorPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
 				}
 			}
 			if (axlCursorTarget != null && !isAnyZoom()) {
 				axlCursorAngle += Global.spf * 360;
 				if (axlCursorAngle > 360) axlCursorAngle -= 360;
-				Global.sprites["axl_cursor_x7"].draw(0, player.axlLockOnCursorPos.x, player.axlLockOnCursorPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1, angle: axlCursorAngle);
+				Global.sprites["axl_cursor_x7"].draw(0, axlLockOnCursorPos.x, axlLockOnCursorPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1, angle: axlCursorAngle);
 				//drawBloom();
 			}
 		}
@@ -1377,8 +1394,8 @@ public class Axl : Character {
 		{
 			if (player.weapon.rechargeCooldown > 0)
 			{
-				float textPosX = player.axlCursorPos.x;
-				float textPosY = player.axlCursorPos.y - 20;
+				float textPosX = axlCursorPos.x;
+				float textPosY = axlCursorPos.y - 20;
 				if (!Options.main.useMouseAim)
 				{
 					textPosX = pos.x - Global.level.camX / Global.viewSize;
@@ -1398,11 +1415,11 @@ public class Axl : Character {
 	}
 
 	public void drawBloom() {
-		Global.sprites["axl_cursor_top"].draw(0, player.axlCursorWorldPos.x, player.axlCursorWorldPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
-		Global.sprites["axl_cursor_bottom"].draw(0, player.axlCursorWorldPos.x, player.axlCursorWorldPos.y + 1, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
-		Global.sprites["axl_cursor_left"].draw(0, player.axlCursorWorldPos.x, player.axlCursorWorldPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
-		Global.sprites["axl_cursor_right"].draw(0, player.axlCursorWorldPos.x + 1, player.axlCursorWorldPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
-		Global.sprites["axl_cursor_dot"].draw(0, player.axlCursorWorldPos.x, player.axlCursorWorldPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
+		Global.sprites["axl_cursor_top"].draw(0, axlCursorWorldPos.x, axlCursorWorldPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
+		Global.sprites["axl_cursor_bottom"].draw(0, axlCursorWorldPos.x, axlCursorWorldPos.y + 1, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
+		Global.sprites["axl_cursor_left"].draw(0, axlCursorWorldPos.x, axlCursorWorldPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
+		Global.sprites["axl_cursor_right"].draw(0, axlCursorWorldPos.x + 1, axlCursorWorldPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
+		Global.sprites["axl_cursor_dot"].draw(0, axlCursorWorldPos.x, axlCursorWorldPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
 	}
 
 	float mcFrameTime;
@@ -1502,7 +1519,7 @@ public class Axl : Character {
 
 	public Point getCorrectedCursorPos() {
 		if (player.axlWeapon == null) return new Point();
-		Point cursorPos = player.axlGenericCursorWorldPos;
+		Point cursorPos = axlGenericCursorWorldPos;
 		Point gunArmOrigin = getAxlGunArmOrigin();
 
 		Sprite sprite = getAxlArmSprite();
@@ -1569,7 +1586,7 @@ public class Axl : Character {
 		}
 
 		Point gunArmOrigin = getAxlGunArmOrigin();
-		Point cursorPos = player.axlGenericCursorWorldPos;
+		Point cursorPos = axlGenericCursorWorldPos;
 		float angle = gunArmOrigin.directionTo(cursorPos).angle;
 
 		Point adjustedOrigin = gunArmOrigin.add(getMuzzleOffset(angle));
@@ -1632,7 +1649,7 @@ public class Axl : Character {
 
 	public int getAxlXDir() {
 		if (player.axlWeapon != null && (player.axlWeapon.isTwoHanded(false))) {
-			return pos.x < player.axlGenericCursorWorldPos.x ? 1 : -1;
+			return pos.x < axlGenericCursorWorldPos.x ? 1 : -1;
 		}
 		return xDir;
 	}
@@ -1752,7 +1769,7 @@ public class Axl : Character {
 			return sniperMissileProj.getCenterPos();
 		}
 		if (isZooming() && !ignoreZoom) {
-			return player.axlScopeCursorWorldPos;
+			return axlScopeCursorWorldPos;
 		}
 		return base.getCamCenterPos(ignoreZoom);
 	}

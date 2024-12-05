@@ -271,7 +271,7 @@ public class MorphMothCocoon : Maverick {
 		);
 		return targets.FirstOrDefault((t) => {
 			if (t is Character chr) {
-				return chr.player.alliance != player.alliance || chr.player.health < chr.player.maxHealth;
+				return chr.player.alliance != player.alliance || chr.health < chr.maxHealth;
 			}
 			/*
 			// GMTODO: use an "isAtMaxHealth" boolstate

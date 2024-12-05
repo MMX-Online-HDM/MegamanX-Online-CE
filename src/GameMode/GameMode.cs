@@ -546,8 +546,8 @@ public class GameMode {
 			if (axl.isZooming() && !axl.isZoomOutPhase1Done) {
 				Point charPos = axl.getCenterPos();
 
-				float xOff = level.mainPlayer.axlScopeCursorWorldPos.x - level.camCenterX;
-				float yOff = level.mainPlayer.axlScopeCursorWorldPos.y - level.camCenterY;
+				float xOff = axl.axlScopeCursorWorldPos.x - level.camCenterX;
+				float yOff = axl.axlScopeCursorWorldPos.y - level.camCenterY;
 
 				Point bulletPos = axl.getAxlBulletPos();
 				Point scopePos = axl.getAxlScopePos();

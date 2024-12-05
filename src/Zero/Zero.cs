@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace MMXOnline;
@@ -153,7 +153,7 @@ public class Zero : Character {
 				hyperModeTimer = 0;
 				if (hyperOvertimeActive && isAwakened && player.currency >= 4) {
 					awakenedPhase = 2;
-					heal(player, player.maxHealth * 2, true);
+					heal(player, (float)maxHealth * 2, true);
 					gigaAttack.addAmmoPercentHeal(100);
 				} else {
 					awakenedPhase = 0;
@@ -219,6 +219,10 @@ public class Zero : Character {
 		return (!charState.invincible && !isInvulnerable() &&
 			(charState.attackCtrl || (charState.altCtrls.Length >= 2 && charState.altCtrls[1]))
 		);
+	}
+
+	public override int getMaxChargeLevel() {
+		return isBlack ? 4 : 3;
 	}
 	
 	public override bool canCharge() {
@@ -933,6 +937,13 @@ public class Zero : Character {
 		}
 		shaders.AddRange(baseShaders);
 		return shaders;
+	}
+
+	public override Point getParasitePos() {
+		if (sprite.name.Contains("_ra_")) {
+			return pos.addxy(0, -6);
+		}
+		return pos.addxy(0, -20);
 	}
 
 	public override float getLabelOffY() {
