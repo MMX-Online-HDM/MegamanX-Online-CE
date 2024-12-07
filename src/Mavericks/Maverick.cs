@@ -322,6 +322,14 @@ public class Maverick : Actor, IDamagable {
 		}
 	}
 
+	
+	public override void statePreUpdate() {
+		state.stateFrame += 1f * Global.speedMul;
+		base.stateUpdate();
+		state.preUpdate();
+	}
+	
+
 	public override void stateUpdate() {
 		base.stateUpdate();
 		state.update();
@@ -329,7 +337,7 @@ public class Maverick : Actor, IDamagable {
 	
 	public override void statePostUpdate() {
 		base.statePostUpdate();
-		state.stateFrame += 1f * Global.speedMul;
+		state.postUpdate();
 	}
 
 	public override void onCollision(CollideData other) {

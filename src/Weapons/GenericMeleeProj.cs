@@ -5,7 +5,7 @@ public class GenericMeleeProj : Projectile {
 		Weapon weapon, Point pos, ProjIds projId, Player player,
 		float? damage = null, int? flinch = null, float? hitCooldown = null,
 		Actor? owningActor = null, bool isShield = false, bool isDeflectShield = false, bool isReflectShield = false,
-		bool addToLevel = true,
+		bool addToLevel = false,
 		bool isZSaberEffect = false, bool isZSaberEffect2 = false, bool isZSaberEffect2B = false, bool isZSaberClang = false
 	) : base(
 		weapon, pos, 1, 0, 2, player, "empty", 0, 0.25f, null, player.ownedByLocalPlayer, addToLevel: addToLevel
