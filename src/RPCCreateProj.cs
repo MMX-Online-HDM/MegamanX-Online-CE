@@ -36,7 +36,7 @@ public partial class RPCCreateProj : RPC {
 		} else {
 			extraData = new byte[0];
 		}
-		Point bulletDir = Point.createFromAngle(angle);
+		Point bulletDir = Point.createFromByteAngle(byteAngle);
 
 		var player = Global.level.getPlayerById(playerId);
 		if (player == null) return;
@@ -159,28 +159,28 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.MechBuster2:
 				proj = new MechBusterProj2(new MechBusterWeapon(player), pos, xDir, 0, player, netProjByte);
 				break;
-			case (int)ProjIds.BlastLauncherSplash:
+			case (int)ProjIds.BlastLauncherGrenadeSplash:
 				proj = new GrenadeExplosionProj(new Weapon(), pos, xDir, player, 0, null, 0, netProjByte);
 				break;
 			case (int)ProjIds.GreenSpinnerSplash:
 				proj = new GreenSpinnerExplosionProj(new Weapon(), pos, xDir, player, 0, null, 1, netProjByte);
 				break;
-			case (int)ProjIds.NapalmGrenade:
+			case (int)ProjIds.RumblingBangGrenade:
 				proj = new NapalmGrenadeProj(new Weapon(), pos, xDir, player, netProjByte);
 				break;
-			case (int)ProjIds.Napalm:
+			case (int)ProjIds.RumblingBangProj:
 				proj = new NapalmPartProj(new Weapon(), pos, xDir, player, netProjByte, extraData[0]);
 				break;
-			case (int)ProjIds.NapalmGrenade2:
+			case (int)ProjIds.FlameRoundGrenade:
 				proj = new MK2NapalmGrenadeProj(new Napalm(NapalmType.FireGrenade), pos, xDir, player, netProjByte);
 				break;
-			case (int)ProjIds.Napalm2:
+			case (int)ProjIds.FlameRoundProj:
 				proj = new MK2NapalmProj(new Napalm(NapalmType.FireGrenade), pos, xDir, player, netProjByte);
 				break;
-			case (int)ProjIds.Napalm2Wall:
+			case (int)ProjIds.FlameRoundWallProj:
 				proj = new MK2NapalmWallProj(new Napalm(NapalmType.FireGrenade), pos, xDir, player, netProjByte);
 				break;
-			case (int)ProjIds.Napalm2Flame:
+			case (int)ProjIds.FlameRoundFlameProj:
 				proj = new MK2NapalmFlame(new Napalm(NapalmType.FireGrenade), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.RocketPunch:
@@ -261,8 +261,8 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.SplashLaser:
 				proj = new SplashLaserProj(new RayGun(0), pos, player, bulletDir, netProjByte);
 				break;
-			case (int)ProjIds.BlackArrow:
-				proj = new BlackArrowProj(new BlackArrow(0), pos, player, bulletDir, 0, netProjByte);
+			case (int)ProjIds.BlackArrow or (int)ProjIds.BlackArrowGround:
+				proj = new BlackArrowProj(new BlackArrow(0), pos, player, bulletDir, extraData[0], netProjByte);
 				break;
 			case (int)ProjIds.WindCutter:
 				proj = new WindCutterProj(new BlackArrow(0), pos, player, bulletDir, netProjByte);
@@ -276,16 +276,16 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.BoundBlaster:
 				proj = new BoundBlasterProj(new BoundBlaster(0), pos, angle, player, netProjByte);
 				break;
-			case (int)ProjIds.BoundBlaster2:
+			case (int)ProjIds.BoundBlasterRadar:
 				proj = new BoundBlasterAltProj(new BoundBlaster(0), pos, xDir, player, bulletDir, netProjByte);
 				break;
 			case (int)ProjIds.MovingWheel:
 				proj = new MovingWheelProj(new BoundBlaster(0), pos, xDir, player, netProjByte);
 				break;
-			case (int)ProjIds.PlasmaGun:
+			case (int)ProjIds.PlasmaGunProj:
 				proj = new PlasmaGunProj(new PlasmaGun(0), pos, xDir, player, bulletDir, netProjByte);
 				break;
-			case (int)ProjIds.PlasmaGun2 or (int)ProjIds.PlasmaGun2Hyper:
+			case (int)ProjIds.PlasmaGunBeamProj or (int)ProjIds.PlasmaGunBeamProjHyper:
 				proj = new PlasmaGunAltProj(new PlasmaGun(0), pos, pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.VoltTornado or (int)ProjIds.VoltTornadoHyper:
@@ -297,7 +297,7 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.FlameBurner or (int)ProjIds.FlameBurnerHyper:
 				proj = new FlameBurnerProj(new FlameBurner(0), pos, xDir, player, bulletDir, netProjByte);
 				break;
-			case (int)ProjIds.FlameBurner2:
+			case (int)ProjIds.AirBlastProj:
 				proj = new FlameBurnerAltProj(new FlameBurner(0), pos, xDir, player, bulletDir, netProjByte);
 				break;
 			case (int)ProjIds.CircleBlaze:
@@ -315,10 +315,10 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.MechFrogStompShockwave:
 				proj = new MechFrogStompShockwave(new MechFrogStompWeapon(null), pos, xDir, player, netProjByte);
 				break;
-			case (int)ProjIds.NapalmGrenadeSplashHit:
+			case (int)ProjIds.SplashHitGrenade:
 				proj = new SplashHitGrenadeProj(new Napalm(NapalmType.SplashHit), pos, xDir, player, netProjByte);
 				break;
-			case (int)ProjIds.NapalmSplashHit:
+			case (int)ProjIds.SplashHitProj:
 				proj = new SplashHitProj(new Napalm(NapalmType.SplashHit), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.ShinMessenkou:

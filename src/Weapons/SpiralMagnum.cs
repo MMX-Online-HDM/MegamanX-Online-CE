@@ -7,7 +7,7 @@ public class SpiralMagnum : AxlWeapon {
 	public SpiralMagnum(int altFire) : base(altFire) {
 		shootSounds = new string[] { "spiralMagnum", "spiralMagnum", "spiralMagnum", "sniperMissile" };
 		fireRate = 45;
-		altFireCooldown = 2;
+		altFireCooldown = 120;
 		index = (int)WeaponIds.SpiralMagnum;
 		weaponBarBaseIndex = 34;
 		weaponSlotIndex = 54;
@@ -19,7 +19,7 @@ public class SpiralMagnum : AxlWeapon {
 
 		if (altFire == 1) {
 			sprite = "axl_arm_spiralmagnum";
-			altFireCooldown = 1;
+			altFireCooldown = 60;
 			shootSounds[1] = "spiralMagnum";
 		}
 	}

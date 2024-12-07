@@ -8,7 +8,7 @@ public class PlasmaGun : AxlWeapon {
 	public PlasmaGun(int altFire) : base(altFire) {
 		shootSounds = new string[] { "plasmaGun", "plasmaGun", "plasmaGun", "plasmaGun" };
 		fireRate = 90;
-		altFireCooldown = 2f;
+		altFireCooldown = 120;
 		index = (int)WeaponIds.PlasmaGun;
 		weaponBarBaseIndex = 36;
 		weaponSlotIndex = 56;
@@ -16,7 +16,7 @@ public class PlasmaGun : AxlWeapon {
 		sprite = "axl_arm_plasmagun";
 
 		if (altFire == 1) {
-			altFireCooldown = 0.1f;
+			altFireCooldown = 10;
 			shootSounds[3] = "";
 		}
 	}
@@ -75,7 +75,7 @@ public class PlasmaGunProj : Projectile {
 		weapon, pos, 1, 600, 3, player, "plasmagun_proj",
 		Global.defFlinch, 0.25f, netProjId, player.ownedByLocalPlayer
 	) {
-		projId = (int)ProjIds.PlasmaGun;
+		projId = (int)ProjIds.PlasmaGunProj;
 		shouldShieldBlock = false;
 		shouldVortexSuck = false;
 		destroyOnHit = false;
@@ -115,7 +115,7 @@ public class PlasmaGunAltProj : Projectile {
 		weapon, pos, xDir, 0, 1, player, "plasmagun_alt_proj",
 		Global.miniFlinch, 0.25f, netProjId, player.ownedByLocalPlayer
 	) {
-		projId = (int)ProjIds.PlasmaGun2;
+		projId = (int)ProjIds.PlasmaGunBeamProj;
 
 		destroyOnHit = false;
 		shouldVortexSuck = false;
@@ -125,7 +125,7 @@ public class PlasmaGunAltProj : Projectile {
 		if (player.character is Axl axl && player.character != null) {
 			axl.nonOwnerAxlBulletPos = pos;
 			if (axl.isWhiteAxl() == true) {
-				projId = (int)ProjIds.PlasmaGun2Hyper;
+				projId = (int)ProjIds.PlasmaGunBeamProjHyper;
 			}
 		}
 

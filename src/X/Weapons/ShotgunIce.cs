@@ -16,7 +16,7 @@ public class ShotgunIce : Weapon {
 		shootSounds = new string[] { "shotgunIce", "shotgunIce", "shotgunIce", "icyWind" };
 		fireRate = 30;
 		damage = "2/1-2";
-		effect = "Insta Freeze enemies. Ice sled up to 12 DMG.";
+		effect = "U:Can Split.\nC: Insta Freeze enemies. Ice sled up to 12 DMG.";
 		hitcooldown = "0.01/0.5";
 		Flinch = "0";
 	}

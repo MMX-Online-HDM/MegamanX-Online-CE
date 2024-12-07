@@ -16,7 +16,7 @@ public class BoundBlaster : AxlWeapon {
 		sprite = "axl_arm_boundblaster";
 		flashSprite = "axl_pistol_flash";
 		chargedFlashSprite = "axl_pistol_flash_charged";
-		altFireCooldown = 2;
+		altFireCooldown = 120;
 
 		if (altFire == 1) {
 			shootSounds[3] = "boundBlaster";
@@ -93,13 +93,13 @@ public class BoundBlasterProj : Projectile {
 		updateAngle();
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreateByteAngle(pos, player, netProjId, anglePoint.byteAngle);
 		}
 		canBeLocal = true;
 	}
 
 	public void updateAngle() {
-		angle = vel.angle;
+		byteAngle = vel.byteAngle;
 	}
 
 	public void reflectSide() {
@@ -262,7 +262,7 @@ public class BoundBlasterAltProj : Projectile {
 		if (!ownedByLocalPlayer || player.character is Axl axl && axl.isWhiteAxl() == true) {
 			maxTime = float.MaxValue;
 		}
-		projId = (int)ProjIds.BoundBlaster2;
+		projId = (int)ProjIds.BoundBlasterRadar;
 		if (ownedByLocalPlayer) {
 			Global.level.boundBlasterAltProjs.Add(this);
 		}
