@@ -3039,9 +3039,9 @@ public class GameMode {
 		if (charNum == 0) {
 			charName = "X";
 			if (is1v1) {
-				if (player.bootsArmorNum == 1) charName += "1";
-				else if (player.bootsArmorNum == 2) charName += "2";
-				else if (player.bootsArmorNum == 3) charName += "3";
+				if (player.legArmorNum == 1) charName += "1";
+				else if (player.legArmorNum == 2) charName += "2";
+				else if (player.legArmorNum == 3) charName += "3";
 			}
 		} else if (charNum == 1) charName = "Zero";
 		else if (charNum == 2) charName = "Vile";

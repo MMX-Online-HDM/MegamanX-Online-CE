@@ -99,7 +99,7 @@ public class BoomerangProj : Projectile {
 			}
 			destroySelf();
 			if (character.currentWeapon is BoomerangCutter bcWeapon) {
-				if (character.player.hasChip(3)) {
+				if (character is MegamanX mmx && mmx.hyperArmArmor == ArmorId.Max) {
 					bcWeapon.ammo += 0.5f;
 				} else {
 					bcWeapon.ammo++;

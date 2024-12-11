@@ -376,10 +376,7 @@ public class Axl : Character {
 
 		if (stingChargeTime > 0) {
 			stingChargeTime -= Global.spf;
-			player.weapon.ammo -= (Global.spf * 3 * (player.hasChip(3) ? 0.5f : 1));
-			if (player.weapon.ammo < 0) player.weapon.ammo = 0;
-			stingChargeTime = player.weapon.ammo;
-			
+
 			if (stingChargeTime <= 0) {
 				player.delaySubtank();
 				stingChargeTime = 0;
@@ -2034,9 +2031,10 @@ public class Axl : Character {
 		data = data[data[0]..];
 
 		// Per-character data.
-		player.changeWeaponFromWi(data[0]);
-		if (player.weapon != null) {
-			player.weapon.ammo = data[1];
+		Weapon? targetWeapon = weapons.Find(w => w.index == data[0]);
+		if (targetWeapon != null) {
+			weaponSlot = weapons.IndexOf(targetWeapon);
+			targetWeapon.ammo = data[1];
 		}
 		netArmAngle = Helpers.byteToDegree(data[2]);
 		player.axlBulletType = data[3];

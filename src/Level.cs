@@ -946,7 +946,6 @@ public partial class Level {
 					new Point(hostPlayer.charXPos, hostPlayer.charYPos),
 					hostPlayer.charXDir, (ushort)hostPlayer.charNetId, false
 				);
-				player.changeWeaponFromWi(hostPlayer.weaponIndex);
 				if (hostPlayer.charRollingShieldNetId != null) {
 					new RollingShieldProjCharged(
 						player.weapon, player.character.pos,
@@ -1412,7 +1411,7 @@ public partial class Level {
 				Point camPos = camPlayer.character.getCamCenterPos();
 				Actor? followActor = camPlayer.character?.getFollowActor();
 
-				float extraPos = MathF.Floor(MathF.Abs(followActor.deltaPos.x));
+				float extraPos = 0;//MathF.Floor(MathF.Abs(followActor.deltaPos.x));
 				if (extraPos >= 4) {
 					extraPos = extraPos * 16 * MathF.Sign(followActor.deltaPos.x);
 					if (lastCameraXDelta == 0 ||

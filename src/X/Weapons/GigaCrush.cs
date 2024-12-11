@@ -32,8 +32,7 @@ public class GigaCrush : Weapon {
 	}
 
 	public override bool canShoot(int chargeLevel, Player player) {
-		return player.character?.flag == null && 
-		ammo >= (player.hasChip(3) ? getAmmoUsage(chargeLevel) / 2 : getAmmoUsage(chargeLevel));
+		return player.character?.flag == null && ammo >= getAmmoUsage(chargeLevel);
 	}
 }
 

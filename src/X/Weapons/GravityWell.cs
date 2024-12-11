@@ -48,7 +48,7 @@ public class GravityWell : Weapon {
 		if (player.character is not MegamanX mmx) {
 			return false;
 		}
-		if (chargeLevel >= 3 || mmx.stockedCharge == true) {
+		if (chargeLevel >= 3 || mmx.stockedBuster == true) {
 			return base.canShoot(chargeLevel, player) && (
 				mmx.chargedGravityWell == null || mmx.chargedGravityWell.destroyed
 			);

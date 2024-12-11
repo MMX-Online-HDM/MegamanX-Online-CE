@@ -8,7 +8,7 @@ public class XHover : CharState {
 	public SoundWrapper? sound;
 	float hoverTime;
 	int startXDir;
-	public XHover() : base("hover", "hover_shoot", "", "") {
+	public XHover() : base("hover", "hover_shoot") {
 		airMove = true;
 		attackCtrl = true;
 		normalCtrl = true;
@@ -60,7 +60,9 @@ public class XHover : CharState {
 		}
 
 		hoverTime += Global.spf;
-		if (hoverTime > 2 || player.input.checkDoubleTap(Control.Dash)) {
+		if (hoverTime > 2 || player.input.checkDoubleTap(Control.Dash) ||
+			stateFrames > 12 && player.input.isPressed(Control.Jump, player)
+		) {
 			character.changeState(new Fall(), true);
 		}
 	}
@@ -86,19 +88,97 @@ public class XHover : CharState {
 	}
 }
 
+
+public class UpDash : CharState {
+	public float dashTime = 0;
+	public string initialDashButton;
+
+	public UpDash(string initialDashButton) : base("up_dash", "up_dash_shoot") {
+		this.initialDashButton = initialDashButton;
+		attackCtrl = true;
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.vel = new Point(0, -4);
+		character.dashedInAir++;
+		character.frameSpeed = 2;
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+
+	public override void update() {
+		base.update();
+		if (!player.input.isHeld(initialDashButton, player)) {
+			changeToFall();
+			return;
+		}
+		int xDir = player.input.getXDir(player);
+		if (xDir != 0) {
+			character.xDir = xDir;
+			character.move(new Point(xDir * 60, 0));
+		}
+
+		if (!once) {
+			once = true;
+			character.vel = new Point(0, -character.getJumpPower() * 1.125f);
+			new Anim(character.pos.addxy(0, -10), "dash_sparks_up", character.xDir, player.getNextActorNetId(), true, sendRpc: true);
+			character.playSound("dash", sendRpc: true);
+		}
+
+		dashTime += Global.spf;
+		float maxDashTime = 0.4f;
+		if (dashTime > maxDashTime || character.vel.y > -1) {
+			changeToFall();
+			return;
+		}
+	}
+
+	public void changeToFall() {
+		if (character.vel.y < 0) {
+			character.vel.y *= 0.4f;
+			if (character.vel.y > -1) { character.vel.y = -1; }
+		}
+		bool animOver = character.isAnimOver();
+		string fullSpriteName = character.sprite.name;
+		string spriteName = character.sprite.name.RemovePrefix("mmx_");
+		int currentFrame = character.frameIndex;
+		float currentFrameTime = character.frameTime;
+
+		character.changeState(new Fall() { transitionSprite = spriteName, sprite = spriteName });
+		if (animOver) {
+			if (character.shootAnimTime > 0) {
+				character.changeSpriteFromName("fall_shoot", true);
+			} else {
+				character.changeSpriteFromName("fall", true);
+			}
+		} else {
+			character.changeSprite(fullSpriteName, true);
+			character.frameIndex = currentFrame;
+			character.frameTime = currentFrameTime;
+		}
+	}
+}
+
 public class X2ChargeShot : CharState {
 	bool fired;
-	int type;
+	int shootNum;
 	bool pressFire;
+	Weapon? weaponOverride;
+	Weapon weapon => (weaponOverride ?? mmx.currentWeapon);
 	MegamanX mmx = null!;
 
-	public X2ChargeShot(int type) : base(type == 0 || type == 2 ? "x2_shot" : "x2_shot2") {
-		this.type = type;
+	public X2ChargeShot(Weapon weaponOverride, int shootNum) : base(shootNum == 0 ? "x2_shot" : "x2_shot2") {
+		this.shootNum = shootNum;
+		this.weaponOverride = weaponOverride;
 		useDashJumpSpeed = true;
 		airMove = true;
 		landSprite = "x2_shot";
 		airSprite = "x2_air_shot";
-		if (type == 1) {
+		canJump = true;
+		if (shootNum == 1) {
 			landSprite = "x2_shot2";
 			airSprite = "x2_air_shot2";
 		}
@@ -108,31 +188,24 @@ public class X2ChargeShot : CharState {
 		base.update();
 		if (!fired && character.currentFrame.getBusterOffset() != null) {
 			fired = true;
-			if (type == 0) {
-				new Buster3Proj(
-					character.getShootPos(), character.getShootXDir(), 1,
-					player, player.getNextActorNetId(), rpc: true
-				);
+			if (shootNum == 0) {
+				weapon.shoot(mmx, [4, 0]);
 				character.playSound("buster4X2", sendRpc: true);
-			} else if (type == 1) {
-				new Buster3Proj(
-					character.getShootPos(), character.getShootXDir(), 2,
-					player, player.getNextActorNetId(), rpc: true
-				);
-				character.playSound("buster4X2", sendRpc: true);
-			} else if (type == 2) {
-				new BusterPlasmaProj(
-					character.getShootPos(), character.getShootXDir(),
-					player, player.getNextActorNetId(), rpc: true
-				);
-				character.playSound("plasmaShot", sendRpc: true);
+				if (weapon.shootSounds[3] != "") {
+					character.playSound(weapon.shootSounds[3], sendRpc: true);
+				}
+			} else {
+				mmx.stockedBuster = false;
+				weapon.shoot(mmx, [4, 1]);
+				if (weapon.shootSounds[3] != "") {
+					character.playSound(weapon.shootSounds[3], sendRpc: true);
+				}
 			}
 		}
 		if (character.isAnimOver()) {
-			if (type == 0 && pressFire) {
+			if (shootNum == 0 && pressFire) {
 				fired = false;
-				type = 1;
-				mmx.stockedCharge = false;
+				shootNum = 1;
 				Global.serverClient?.rpc(RPC.playerToggle, (byte)player.id, (int)RPCToggleType.UnstockCharge);
 				sprite = "x2_shot2";
 				defaultSprite = sprite;
@@ -146,19 +219,8 @@ public class X2ChargeShot : CharState {
 			} else {
 				character.changeToIdleOrFall();
 			}
-		} else {
-			if (!pressFire && stateTime > Global.spf && player.input.isPressed(Control.Shoot, player)) {
-				pressFire = true;
-			}
-			if (character.grounded && player.input.isPressed(Control.Jump, player)) {
-				character.vel.y = -character.getJumpPower();
-				if (type == 0) {
-					sprite = "x2_air_shot";
-				} else {
-					sprite = "x2_air_shot2";
-				}	
-				character.changeSpriteFromName(sprite, false);
-			}
+		} else if (!pressFire && stateTime > Global.spf && player.input.isPressed(Control.Shoot, player)) {
+			pressFire = true;
 		}
 	}
 
@@ -166,7 +228,7 @@ public class X2ChargeShot : CharState {
 		base.onEnter(oldState);
 		mmx = character as MegamanX ?? throw new NullReferenceException();
 		if (!character.grounded || character.vel.y > 0) {
-			if (type == 0) {
+			if (shootNum == 0) {
 				sprite = "x2_air_shot";
 			} else {
 				sprite = "x2_air_shot2";
@@ -209,7 +271,7 @@ public class X3ChargeShot : CharState {
 			if (state == 0) {
 				Point shootPos = character.getShootPos();
 				int shootDir = character.getShootXDir();
-				if (mmx.hasUltimateArmor) {
+				if (!mmx.hasUltimateArmor) {
 					new Anim(
 						shootPos, "buster4_x3_muzzle", shootDir,
 						player.getNextActorNetId(), true, sendRpc: true

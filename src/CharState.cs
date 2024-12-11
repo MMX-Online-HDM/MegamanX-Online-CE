@@ -172,7 +172,11 @@ public class CharState {
 			character.frameSpeed = 1;
 			if (character.isAnimOver() && !Global.level.gameMode.isOver) {
 				sprite = defaultSprite;
-				character.changeSpriteFromName(sprite, true);
+				if (character.shootAnimTime > 0 && shootSprite != "") {
+					character.changeSpriteFromName(shootSprite, true);
+				} else {
+					character.changeSpriteFromName(sprite, true);
+				}
 			}
 		}
 		var lastLeftWallData = character.getHitWall(-1, 0);
@@ -981,54 +985,6 @@ public class AirDash : CharState {
 	public override void onExit(CharState newState) {
 		character.useGravity = true;
 		base.onExit(newState);
-	}
-}
-
-public class UpDash : CharState {
-	public float dashTime = 0;
-	public string initialDashButton;
-
-	public UpDash(string initialDashButton) : base("up_dash", "up_dash_shoot") {
-		this.initialDashButton = initialDashButton;
-		attackCtrl = true;
-	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		character.isDashing = true;
-		character.useGravity = false;
-		character.vel = new Point(0, -4);
-		character.dashedInAir++;
-		character.frameSpeed = 2;
-	}
-
-	public override void onExit(CharState newState) {
-		character.useGravity = true;
-		character.vel.y = 0;
-		base.onExit(newState);
-	}
-
-	public override void update() {
-		base.update();
-		if (!player.input.isHeld(initialDashButton, player)) {
-			character.changeState(new Fall());
-			return;
-		}
-
-		if (!once) {
-			once = true;
-			character.vel = new Point(0, -250);
-			new Anim(character.pos.addxy(0, -10), "dash_sparks_up", character.xDir, player.getNextActorNetId(), true, sendRpc: true);
-			character.playSound("dash", sendRpc: true);
-		}
-
-		dashTime += Global.spf;
-		float maxDashTime = 0.4f;
-		if (character.isUnderwater()) maxDashTime *= 1.5f;
-		if (dashTime > maxDashTime) {
-			character.changeState(new Fall());
-			return;
-		}
 	}
 }
 

@@ -27,8 +27,8 @@ public class BusterZero : Character {
 		if (stockedBusterLv > 0 || stockedSaber) {
 			var renderGfx = stockedBusterLv switch {
 				_ when stockedSaber || stockedBusterLv == 2 => RenderEffectType.ChargeGreen,
-				1 => RenderEffectType.ChargePink,
-				2 => RenderEffectType.ChargeOrange,
+				1 or 3 => RenderEffectType.ChargePink,
+				2 or 4 => RenderEffectType.ChargeOrange,
 				_ => RenderEffectType.ChargeBlue
 			};
 			addRenderEffect(renderGfx, 2, 6);
@@ -131,25 +131,21 @@ public class BusterZero : Character {
 			}
 			int framesSinceLastShootPressed = Global.frameCount - lastShootPressed;
 			if (shootPressed || framesSinceLastShootPressed < 6) {
-				if (stockedBusterLv == 1) {
+				if (stockedBusterLv >= 1) {
 					if (charState is WallSlide) {
-						shoot(1);
+						int chargeLevel = stockedBusterLv;
+						if (stockedBusterLv >= 3) {
+							stockedBusterLv -= 2;
+							chargeLevel = stockedBusterLv;
+						} else {
+							stockedBusterLv = 0;
+						}
+						shoot(chargeLevel);
 						lemonCooldown = 22;
-						stockedBusterLv = 0;
-						return true;
-					}
-					changeState(new BusterZeroDoubleBuster(true, true), true);
-					return true;
-				}
-				if (stockedBusterLv == 2) {
-					if (charState is WallSlide) {
-						shoot(2);
-						lemonCooldown = 22;
-						stockedBusterLv = 0;
 						lastShootPressed = 0;
 						return true;
 					}
-					changeState(new BusterZeroDoubleBuster(true, false), true);
+					changeState(new BusterZeroDoubleBuster(true, stockedBusterLv), true);
 					return true;
 				}
 				if (stockedSaber) {
@@ -227,7 +223,7 @@ public class BusterZero : Character {
 				return;
 			} else {
 				shootAnimTime = 0;
-				changeState(new BusterZeroDoubleBuster(false, true), true);
+				changeState(new BusterZeroDoubleBuster(false, 3), true);
 			}
 		}
 		else if (chargeLevel >= 4) {
@@ -239,7 +235,7 @@ public class BusterZero : Character {
 				return;
 			} else {
 				shootAnimTime = 0;
-				changeState(new BusterZeroDoubleBuster(false, false), true);
+				changeState(new BusterZeroDoubleBuster(false, 4), true);
 			}
 		}
 		if (chargeLevel >= 1) {

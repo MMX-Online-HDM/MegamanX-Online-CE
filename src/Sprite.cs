@@ -157,12 +157,12 @@ public class Sprite {
 		bool isUltX = false;
 		Character? character = actor as Character;
 		if (character != null) {
-			if (character.player.isX) {
+			if (character is MegamanX mmx) {
 				armors = new int[] {
-					character.player.bootsArmorNum,
-					character.player.bodyArmorNum,
-					character.player.helmetArmorNum,
-					character.player.armArmorNum
+					(int)mmx.legArmor,
+					(int)mmx.chestArmor,
+					(int)mmx.helmetArmor,
+					(int)mmx.armArmor
 				};
 			}
 			if (character.flattenedTime > 0) {

@@ -81,15 +81,18 @@ public class UpgradeArmorMenu : IMainMenu {
 						upgradeHelmetArmor(mainPlayer, xGame);
 						Global.playSound("ching");
 					}
-				} else if (mainPlayer.hasAllX3Armor() && !mainPlayer.hasChip(2)) {
-					mainPlayer.setChipNum(2, false);
+				} else if (mainPlayer.hasAllX3Armor() && mmx?.hyperHelmetActive == false) {
+					mmx.hyperChestActive = false;
+					mmx.hyperArmActive = false;
+					mmx.hyperLegActive = false;
+					mmx.hyperHelmetActive = true;
 					Global.playSound("ching");
 				}
 			}
 			if (selectArrowPosY == 1) {
 				if (mainPlayer.bodyArmorNum != xGame) {
 					if (!mainPlayer.isBodyArmorPurchased(xGame)) {
-						if (mainPlayer.currency >= MegamanX.bodyArmorCost) {
+						if (mainPlayer.currency >= MegamanX.chestArmorCost) {
 							purchaseBodyArmor(mainPlayer, xGame);
 							Global.playSound("ching");
 							if (mainPlayer.bodyArmorNum == 0) {
@@ -101,8 +104,11 @@ public class UpgradeArmorMenu : IMainMenu {
 						upgradeBodyArmor(mainPlayer, xGame);
 						Global.playSound("ching");
 					}
-				} else if (mainPlayer.hasAllX3Armor() && !mainPlayer.hasChip(1)) {
-					mainPlayer.setChipNum(1, false);
+				} else if (mainPlayer.hasAllX3Armor() && mmx?.hyperChestActive == false) {
+					mmx.hyperChestActive = true;
+					mmx.hyperArmActive = false;
+					mmx.hyperLegActive = false;
+					mmx.hyperHelmetActive = false;
 					Global.playSound("ching");
 				}
 			}
@@ -121,18 +127,21 @@ public class UpgradeArmorMenu : IMainMenu {
 						upgradeArmArmor(mainPlayer, xGame);
 						Global.playSound("ching");
 					}
-				} else if (mainPlayer.hasAllX3Armor() && !mainPlayer.hasChip(3)) {
-					mainPlayer.setChipNum(3, false);
+				} else if (mainPlayer.hasAllX3Armor() && mmx?.hyperArmActive == false) {
+					mmx.hyperChestActive = false;
+					mmx.hyperArmActive = true;
+					mmx.hyperLegActive = false;
+					mmx.hyperHelmetActive = false;
 					Global.playSound("ching");
 				}
 			}
 			if (selectArrowPosY == 3) {
-				if (mainPlayer.bootsArmorNum != xGame) {
+				if (mainPlayer.legArmorNum != xGame) {
 					if (!mainPlayer.isBootsArmorPurchased(xGame)) {
 						if (mainPlayer.currency >= MegamanX.bootsArmorCost) {
 							purchaseBootsArmor(mainPlayer, xGame);
 							Global.playSound("ching");
-							if (mainPlayer.bootsArmorNum == 0) {
+							if (mainPlayer.legArmorNum == 0) {
 								upgradeBootsArmor(mainPlayer, xGame);
 							}
 						}
@@ -141,53 +150,66 @@ public class UpgradeArmorMenu : IMainMenu {
 						upgradeBootsArmor(mainPlayer, xGame);
 						Global.playSound("ching");
 					}
-				} else if (mainPlayer.hasAllX3Armor() && !mainPlayer.hasChip(0)) {
-					mainPlayer.setChipNum(0, false);
+				} else if (mainPlayer.hasAllX3Armor() && mmx?.hyperLegActive == false) {
+					mmx.hyperChestActive = false;
+					mmx.hyperArmActive = false;
+					mmx.hyperLegActive = true;
+					mmx.hyperHelmetActive = false;
 					Global.playSound("ching");
 				}
 			}
 		} else if (Global.input.isPressedMenu(Control.MenuAlt)) {
-			if (selectArrowPosY == 0) {
+			if (mmx != null && mmx.hasAnyHyperArmor) {
+				mmx.hyperChestActive = false;
+				mmx.hyperArmActive = false;
+				mmx.hyperLegActive = false;
+				mmx.hyperHelmetActive = false;
+			}
+			else if (selectArrowPosY == 0) {
 				if (mainPlayer.helmetArmorNum == xGame) {
-					if (mainPlayer.hasAllX3Armor() && mainPlayer.hasChip(2)) {
-						mainPlayer.setChipNum(2, true);
+					if (mainPlayer.hasAllX3Armor()) {
+						if (mmx != null) {
+							mmx.hyperChestActive = false;
+							mmx.hyperArmActive = false;
+							mmx.hyperLegActive = false;
+							mmx.hyperHelmetActive = true;
+						}
 					} else {
 						upgradeHelmetArmor(mainPlayer, 0);
 					}
 				}
 			}
-			if (selectArrowPosY == 1) {
+			else if (selectArrowPosY == 1) {
 				if (mainPlayer.bodyArmorNum == xGame) {
-					if (mainPlayer.hasAllX3Armor() && mainPlayer.hasChip(1)) {
-						mainPlayer.setChipNum(1, true);
-					} else {
-						upgradeBodyArmor(mainPlayer, 0);
-					}
+					upgradeBodyArmor(mainPlayer, 0);
 				}
 			}
-			if (selectArrowPosY == 2) {
+			else if (selectArrowPosY == 2) {
 				if (mainPlayer.armArmorNum == xGame) {
-					if (mainPlayer.hasAllX3Armor() && mainPlayer.hasChip(3)) {
-						mainPlayer.setChipNum(2, true);
-					} else {
-						upgradeArmArmor(mainPlayer, 0);
-					}
+					upgradeArmArmor(mainPlayer, 0);
 				}
 			}
-			if (selectArrowPosY == 3) {
-				if (mainPlayer.bootsArmorNum == xGame) {
-					if (mainPlayer.hasAllX3Armor() && mainPlayer.hasChip(0)) {
-						mainPlayer.setChipNum(0, true);
-					} else {
-						upgradeBootsArmor(mainPlayer, 0);
-					}
+			else if (selectArrowPosY == 3) {
+				if (mainPlayer.legArmorNum == xGame) {
+					upgradeBootsArmor(mainPlayer, 0);
 				}
 			}
 		}
 	}
+	
+	public static void clearAllHyperArmor(MegamanX mmx) {
+		mmx.hyperChestActive = false;
+		mmx.hyperArmActive = false;
+		mmx.hyperLegActive = false;
+		mmx.hyperHelmetActive = false;
+	}
 
 	public static void upgradeHelmetArmor(Player player, int type) {
 		player.helmetArmorNum = type;
+		if (player.character is MegamanX mmx) {
+			mmx.helmetArmor = (ArmorId)type;
+			clearAllHyperArmor(mmx);
+		}
 	}
 
 	public static void purchaseHelmetArmor(Player player, int type) {
@@ -201,16 +223,18 @@ public class UpgradeArmorMenu : IMainMenu {
 		player.bodyArmorNum = type;
 		if (type == 2) {
 			player.addGigaCrush();
-		}
-
-		if (type == 0) {
+		} else {
 			player.removeGigaCrush();
+		}
+		if (player.character is MegamanX mmx) {
+			mmx.chestArmor = (ArmorId)type;
+			clearAllHyperArmor(mmx);
 		}
 	}
 
 	public static void purchaseBodyArmor(Player player, int type) {
 		if (!player.isBodyArmorPurchased(type)) {
-			player.currency -= MegamanX.bodyArmorCost;
+			player.currency -= MegamanX.chestArmorCost;
 			player.setBodyArmorPurchased(type);
 		}
 	}
@@ -219,9 +243,12 @@ public class UpgradeArmorMenu : IMainMenu {
 		player.armArmorNum = type;
 		if (type == 3) {
 			player.addHyperCharge();
-		}
-		if (type == 0) {
+		} else {
 			player.removeHyperCharge();
+		}
+		if (player.character is MegamanX mmx) {
+			mmx.armArmor = (ArmorId)type;
+			clearAllHyperArmor(mmx);
 		}
 	}
 
@@ -233,7 +260,11 @@ public class UpgradeArmorMenu : IMainMenu {
 	}
 
 	public static void upgradeBootsArmor(Player player, int type) {
-		player.bootsArmorNum = type;
+		player.legArmorNum = type;
+		if (player.character is MegamanX mmx) {
+			mmx.legArmor = (ArmorId)type;
+			clearAllHyperArmor(mmx);
+		}
 	}
 
 	public static void purchaseBootsArmor(Player player, int type) {
@@ -321,7 +352,7 @@ public class UpgradeArmorMenu : IMainMenu {
 			case 2: Global.sprites["menu_xarm2"].drawToHUD(0, 300, 110); break;
 			case 3: Global.sprites["menu_xarm3"].drawToHUD(0, 300, 110); break;
 		}
-		switch (mainPlayer.bootsArmorNum) {
+		switch (mainPlayer.legArmorNum) {
 			case 1: Global.sprites["menu_xboots"].drawToHUD(0, 300, 110); break;
 			case 2: Global.sprites["menu_xboots2"].drawToHUD(0, 300, 110); break;
 			case 3: Global.sprites["menu_xboots3"].drawToHUD(0, 300, 110); break;
@@ -375,11 +406,12 @@ public class UpgradeArmorMenu : IMainMenu {
 					Fonts.drawText(FontType.Pink, "ENHANCEMENT CHIP", optionPos4.x + 5, optionPos4.y + 10, selected: selectArrowPosY == 3);
 					Fonts.drawText(FontType.Blue, "Dash Twice in the air", optionPos4.x + 5, optionPos4.y + 20);
 				}
-				if (mainPlayer.hasChip(2)) Global.sprites["menu_chip"].drawToHUD(0, 296, optionPos1.y-16);
-				if (mainPlayer.hasChip(1)) Global.sprites["menu_chip"].drawToHUD(0, 296, optionPos2.y+4);
-				if (mainPlayer.hasChip(3)) Global.sprites["menu_chip"].drawToHUD(0, 262, optionPos3.y-8);
-				if (mainPlayer.hasChip(0)) Global.sprites["menu_chip"].drawToHUD(0, 278, optionPos4.y+6);
-				if (mainPlayer.hasChip(0)) Global.sprites["menu_chip"].drawToHUD(0, 315, optionPos4.y+6);
+				if (mainPlayer.character is MegamanX mmx) {
+					if (mmx.hyperHelmetActive) Global.sprites["menu_chip"].drawToHUD(0, 296, optionPos1.y-16);
+					if (mmx.hyperChestActive) Global.sprites["menu_chip"].drawToHUD(0, 296, optionPos2.y+4);
+					if (mmx.hyperArmActive) Global.sprites["menu_chip"].drawToHUD(0, 262, optionPos3.y-8);
+					if (mmx.hyperLegActive) Global.sprites["menu_chip"].drawToHUD(0, 278, optionPos4.y+6);
+				}
 				/*
 				if (mainPlayer.hasChip(2)) Global.sprites["menu_x3armors"].drawToHUD(5, 313, 27);
 				if (mainPlayer.hasChip(1)) Global.sprites["menu_x3armors"].drawToHUD(4, 315, 65);
@@ -483,7 +515,7 @@ public class UpgradeArmorMenu : IMainMenu {
 		if (mainPlayer.isBodyArmorPurchased(xGame)) {
 			return mainPlayer.bodyArmorNum == xGame ? " (Active)" : " (Bought)";
 		}
-		return $" ({MegamanX.bodyArmorCost} {Global.nameCoins})";
+		return $" ({MegamanX.chestArmorCost} {Global.nameCoins})";
 	}
 
 	public string getArmArmorMessage() {
@@ -495,7 +527,7 @@ public class UpgradeArmorMenu : IMainMenu {
 
 	public string getBootsArmorMessage() {
 		if (mainPlayer.isBootsArmorPurchased(xGame)) {
-			return mainPlayer.bootsArmorNum == xGame ? " (Active)" : " (Bought)";
+			return mainPlayer.legArmorNum == xGame ? " (Active)" : " (Bought)";
 		}
 		return $" ({MegamanX.bootsArmorCost} {Global.nameCoins})";
 	}
@@ -555,11 +587,12 @@ public class UpgradeArmorMenuUAX : IMainMenu {
 			FontType.Grey, "[BACK]: Back",
 			Global.halfScreenW-20, 200
 		);
-		if (mainPlayer.hasChip(2)) Global.sprites["menu_chip"].drawToHUD(0, Global.halfScreenW-6, 52, alpha: 0.85f);
-		if (mainPlayer.hasChip(1)) Global.sprites["menu_chip"].drawToHUD(0, Global.halfScreenW+2, 70, alpha: 0.85f);
-		if (mainPlayer.hasChip(3)) Global.sprites["menu_chip"].drawToHUD(0, Global.halfScreenW-20, 45, alpha: 0.85f);
-		if (mainPlayer.hasChip(0)) Global.sprites["menu_chip"].drawToHUD(0, Global.halfScreenW-22, 96, alpha: 0.85f);
-		if (mainPlayer.hasChip(0)) Global.sprites["menu_chip"].drawToHUD(0, Global.halfScreenW+22, 105, alpha: 0.85f);
+		if (mainPlayer.character is MegamanX mmx) {
+			if (mmx.hyperLegActive) Global.sprites["menu_chip"].drawToHUD(0, Global.halfScreenW-6, 52, alpha: 0.85f);
+			if (mmx.hyperChestActive) Global.sprites["menu_chip"].drawToHUD(0, Global.halfScreenW+2, 70, alpha: 0.85f);
+			if (mmx.hyperHelmetActive) Global.sprites["menu_chip"].drawToHUD(0, Global.halfScreenW-20, 45, alpha: 0.85f);
+			if (mmx.hyperArmActive) Global.sprites["menu_chip"].drawToHUD(0, Global.halfScreenW-22, 96, alpha: 0.85f);
+		}
 	}
 }
 public class UpgradeArmorMenuGolden : IMainMenu {

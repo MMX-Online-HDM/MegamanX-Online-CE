@@ -4,6 +4,7 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class HyperCharge : Weapon {
+	public bool active;
 	public const float ammoUsage = 7;
 
 	public HyperCharge() : base() {
@@ -32,7 +33,7 @@ public class HyperCharge : Weapon {
 	}
 
 	public float getChipFactoredAmmoUsage(Player player) {
-		return player.hasChip(3) ? ammoUsage / 2 : ammoUsage;
+		return player.character is MegamanX mmx && mmx.hyperArmArmor == ArmorId.Max ? ammoUsage / 2 : ammoUsage;
 	}
 
 	public static float getRateofFireMod(Player player) {

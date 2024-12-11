@@ -30,7 +30,10 @@ public class ItemTracer : Weapon {
 		if (hit?.gameObject is Character chr && chr.player.alliance != player.alliance && !chr.player.scanned) {
 			target = chr;
 		}
-		new ItemTracerProj(this, pos, xDir, player, target, player.getNextActorNetId(), rpc: true);
+		new ItemTracerProj(
+			this, character.getHeadPos() ?? pos, xDir,
+			player, target, player.getNextActorNetId(), rpc: true
+		);
 	}
 }
 

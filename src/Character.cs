@@ -1013,10 +1013,10 @@ public partial class Character : Actor, IDamagable {
 					if (acidTime < 0) removeAcid();
 				}
 				if (player == Global.level.mainPlayer || playHealSound) {
-					if (!player.hasChip(2)) {
-						playSound("heal", forcePlay: true, sendRpc: true);
-					} else {
+					if (this is MegamanX { hyperHelmetActive: true, helmetArmor: ArmorId.Max }) {
 						playSound("goldenHelmetHP", forcePlay: true, sendRpc: true);
+					} else {
+						playSound("heal", forcePlay: true, sendRpc: true);
 					}
 				}
 			}
@@ -1677,7 +1677,7 @@ public partial class Character : Actor, IDamagable {
 		if (busterOffset == null) {
 			return getCenterPos();
 		}
-		return pos.add(busterOffset.Value);
+		return pos.addxy(busterOffset.Value.x * xDir, busterOffset.Value.y);
 	}
 
 	public void stopCharge() {
@@ -2509,7 +2509,7 @@ public partial class Character : Actor, IDamagable {
 			}
 			if (mmx != null) {
 				if (mmx.barrierActiveTime > 0) {
-					if (mmx.hyperBodyArmor == ArmorId.Max) {
+					if (mmx.hyperChestArmor == ArmorId.Max) {
 						damageSavings += (originalDamage * 0.5m);
 					} else {
 						damageSavings += (originalDamage * 0.25m);

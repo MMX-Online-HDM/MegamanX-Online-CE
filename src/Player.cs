@@ -560,7 +560,7 @@ public partial class Player {
 
 		this.xArmor1v1 = playerData?.armorSet ?? 1;
 		if (Global.level.is1v1() && isX) {
-			bootsArmorNum = xArmor1v1;
+			legArmorNum = xArmor1v1;
 			bodyArmorNum = xArmor1v1;
 			helmetArmorNum = xArmor1v1;
 			armArmorNum = xArmor1v1;
@@ -1706,19 +1706,19 @@ public partial class Player {
 	}
 
 	public bool hasArmor() {
-		return bodyArmorNum > 0 || bootsArmorNum > 0 || armArmorNum > 0 || helmetArmorNum > 0;
+		return bodyArmorNum > 0 || legArmorNum > 0 || armArmorNum > 0 || helmetArmorNum > 0;
 	}
 
 	public bool hasArmor(int version) {
-		return bodyArmorNum == version || bootsArmorNum == version || armArmorNum == version || helmetArmorNum == version;
+		return bodyArmorNum == version || legArmorNum == version || armArmorNum == version || helmetArmorNum == version;
 	}
 
 	public bool hasAllArmor() {
-		return bodyArmorNum > 0 && bootsArmorNum > 0 && armArmorNum > 0 && helmetArmorNum > 0;
+		return bodyArmorNum > 0 && legArmorNum > 0 && armArmorNum > 0 && helmetArmorNum > 0;
 	}
 
 	public bool hasAllX3Armor() {
-		return bodyArmorNum >= 3 && bootsArmorNum >= 3 && armArmorNum >= 3 && helmetArmorNum >= 3;
+		return bodyArmorNum >= 3 && legArmorNum >= 3 && armArmorNum >= 3 && helmetArmorNum >= 3;
 	}
 
 	public void destroy() {
@@ -2254,37 +2254,7 @@ public partial class Player {
 		armorFlag = Convert.ToUInt16(string.Join("", bits), 2);
 	}
 
-	public void removeArmorNum(int armorIndex) {
-		setArmorNum(armorIndex, 0);
-	}
-
-	public bool hasAnyChip() {
-		return hasChip(0) || hasChip(1) || hasChip(2) || hasChip(3);
-	}
-
-	public bool hasChip(int armorIndex) {
-		if (!hasAllX3Armor()) return false;
-		return getArmorNum(armorFlag, armorIndex, true) == 15;
-	}
-
-	public void setChipNum(int armorIndex, bool remove) {
-		setArmorNum(0, 3);
-		setArmorNum(1, 3);
-		setArmorNum(2, 3);
-		setArmorNum(3, 3);
-		setArmorNum(armorIndex, remove ? 3 : 15);
-	}
-
-	public void setGoldenArmor(bool addOrRemove) {
-		if (addOrRemove) {
-			savedArmorFlag = armorFlag;
-			armorFlag = ushort.MaxValue;
-		} else {
-			armorFlag = savedArmorFlag;
-		}
-	}
-
-	public int bootsArmorNum {
+	public int legArmorNum {
 		get { return getArmorNum(armorFlag, 0, false); }
 		set { setArmorNum(0, value); }
 	}
@@ -2301,12 +2271,12 @@ public partial class Player {
 		set { setArmorNum(3, value); }
 	}
 
-	public bool hasBootsArmor(ArmorId armorId) { return bootsArmorNum == (int)armorId; }
+	public bool hasBootsArmor(ArmorId armorId) { return legArmorNum == (int)armorId; }
 	public bool hasBodyArmor(ArmorId armorId) { return bodyArmorNum == (int)armorId; }
 	public bool hasHelmetArmor(ArmorId armorId) { return helmetArmorNum == (int)armorId; }
 	public bool hasArmArmor(ArmorId armorId) { return armArmorNum == (int)armorId; }
 
-	public bool hasBootsArmor(int xGame) { return bootsArmorNum == xGame; }
+	public bool hasBootsArmor(int xGame) { return legArmorNum == xGame; }
 	public bool hasBodyArmor(int xGame) { return bodyArmorNum == xGame; }
 	public bool hasHelmetArmor(int xGame) { return helmetArmorNum == xGame; }
 	public bool hasArmArmor(int xGame) { return armArmorNum == xGame; }
@@ -2342,7 +2312,7 @@ public partial class Player {
 	}
 
 	public bool hasAnyArmor() {
-		return bootsArmorNum > 0 || armArmorNum > 0 || bodyArmorNum > 0 || helmetArmorNum > 0;
+		return legArmorNum > 0 || armArmorNum > 0 || bodyArmorNum > 0 || helmetArmorNum > 0;
 	}
 
 	public void press(string inputMapping) {

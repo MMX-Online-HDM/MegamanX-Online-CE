@@ -218,7 +218,7 @@ public class AI {
 			if (upgradeNumber == 0 && player.currency >= MegamanX.bootsArmorCost) {
 				UpgradeArmorMenu.upgradeBootsArmor(player, player.aiArmorPath);
 				player.aiArmorUpgradeIndex++;
-			} else if (upgradeNumber == 1 && player.currency >= MegamanX.bodyArmorCost) {
+			} else if (upgradeNumber == 1 && player.currency >= MegamanX.chestArmorCost) {
 				UpgradeArmorMenu.upgradeBodyArmor(player, player.aiArmorPath);
 				player.aiArmorUpgradeIndex++;
 			} else if (upgradeNumber == 2 && player.currency >= MegamanX.headArmorCost) {
@@ -921,7 +921,7 @@ public class AI {
 						}
 						break;
 					case 11:
-						if (megamanX.stockedCharge) {
+						if (megamanX.stockedBuster) {
 							megamanX.player.press(Control.Shoot);
 							megamanX.player.release(Control.Shoot);
 						}

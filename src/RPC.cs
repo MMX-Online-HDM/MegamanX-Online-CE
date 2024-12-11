@@ -601,11 +601,11 @@ public class RPCPlayerToggle : RPC {
 			(player?.character as MegamanX)?.strikeChainChargedProj?.reverseDir();
 		} */ else if (toggleId == RPCToggleType.StockCharge) {
 			if (player?.character is MegamanX mmx) {
-				mmx.stockedCharge = true;
+				mmx.stockedBuster = true;
 			}
 		} else if (toggleId == RPCToggleType.UnstockCharge) {
 			if (player?.character is MegamanX mmx) {
-				mmx.stockedCharge = false;
+				mmx.stockedBuster = false;
 			}
 		} else if (toggleId == RPCToggleType.StartBarrier) {
 			if (player.character is MegamanX mmx) {
