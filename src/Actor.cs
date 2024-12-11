@@ -44,7 +44,7 @@ public partial class Actor : GameObject {
 		}
 	}
 
-	public float localSpeedMul { get; set; } = 1;
+	public float speedMul { get; set; } = 1;
 	public bool useFrameProjs;
 	public Dictionary<string, List<Projectile>> spriteFrameToProjs = new Dictionary<string, List<Projectile>>();
 	public List<Projectile> globalProjs = new List<Projectile>();

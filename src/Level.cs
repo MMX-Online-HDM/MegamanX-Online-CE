@@ -1238,7 +1238,7 @@ public partial class Level {
 			}
 			if (isTimeSlowed(go, out float slowAmount)) {
 				Global.speedMul = slowAmount;
-				go.localSpeedMul = slowAmount;
+				go.speedMul = slowAmount;
 			}
 			go.preUpdate();
 			go.statePreUpdate();
@@ -1255,7 +1255,7 @@ public partial class Level {
 			}
 			if (isTimeSlowed(go, out float slowAmount)) {
 				Global.speedMul = slowAmount;
-				go.localSpeedMul = slowAmount;
+				go.speedMul = slowAmount;
 			}
 			go.update();
 			go.stateUpdate();
@@ -1337,7 +1337,7 @@ public partial class Level {
 						currentGrid[i], currentGrid[j]
 					);
 					if (iDatas.Count > 0) {
-						Global.speedMul = currentGrid[i].localSpeedMul;
+						Global.speedMul = currentGrid[i].speedMul;
 						iDatas = organizeTriggers(iDatas);
 						foreach (CollideData collideDataI in iDatas) {
 							currentGrid[i].registerCollision(collideDataI);
@@ -1345,7 +1345,7 @@ public partial class Level {
 						Global.speedMul = 1;
 					}
 					if (jDatas.Count > 0) {
-						Global.speedMul = currentGrid[j].localSpeedMul;
+						Global.speedMul = currentGrid[j].speedMul;
 						jDatas = organizeTriggers(jDatas);
 						foreach (CollideData collideDataJ in jDatas) {
 							currentGrid[j].registerCollision(collideDataJ);
@@ -1378,12 +1378,12 @@ public partial class Level {
 						actor, geometry
 					);
 					if (iData != null) {
-						Global.speedMul = currentGrid[i].localSpeedMul;
+						Global.speedMul = currentGrid[i].speedMul;
 						currentGrid[i].registerCollision(iData);
 						Global.speedMul = 1;
 					}
 					if (jData != null) {
-						Global.speedMul = wallObj.localSpeedMul;
+						Global.speedMul = wallObj.speedMul;
 						wallObj.registerCollision(jData);
 						Global.speedMul = 1;
 					}
@@ -1398,7 +1398,7 @@ public partial class Level {
 			}
 			if (isTimeSlowed(go, out float slowAmount)) {
 				Global.speedMul = slowAmount;
-				go.localSpeedMul = slowAmount;
+				go.speedMul = slowAmount;
 			}
 			go.postUpdate();
 			go.statePostUpdate();

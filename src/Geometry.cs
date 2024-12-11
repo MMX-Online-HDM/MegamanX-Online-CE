@@ -8,7 +8,7 @@ public class Geometry : GameObject {
 	public bool iDestroyed => false;
 	public string name { get; set; }
 	public Collider collider { get; set; }
-	public float localSpeedMul { get; set; } = 1;
+	public float speedMul { get; set; } = 1;
 	public bool useTerrainGrid { get; set; } = true;
 	public bool useActorGrid { get; set; } = false;
 
