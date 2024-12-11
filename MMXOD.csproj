@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<!--Common properties-->
 	<PropertyGroup>
-		<LangVersion>preview</LangVersion>
+		<LangVersion>13.0</LangVersion>
 		<AssemblyName>MMXOD</AssemblyName>
 		<OutputType>WinExe</OutputType>
 		<Nullable>enable</Nullable>
@@ -34,16 +34,16 @@
 
 	<!--Dependencies-->
 	<ItemGroup>
-		<PackageReference Include="protobuf-net" Version="3.2.30" />
-		<PackageReference Include="protobuf-net.Core" Version="3.2.30" />
+		<PackageReference Include="protobuf-net" Version="3.2.45" />
+		<PackageReference Include="protobuf-net.Core" Version="3.2.45" />
 		<PackageReference Include="SFML.Graphics" Version="2.6.0" />
 		<PackageReference Include="SFML.Window" Version="2.6.0" />
 		<PackageReference Include="SFML.System" Version="2.6.0" />
 		<PackageReference Include="SFML.Audio" Version="2.6.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-		<PackageReference Include="DeviceId" Version="6.7.0" />
+		<PackageReference Include="DeviceId" Version="6.8.0" />
 		<PackageReference Include="Profanity.Detector" Version="0.1.8" />
 		<PackageReference Include="SpaceWizards.Lidgren.Network" Version="0.3.1" />
-		<PackageReference Include="System.IO.Hashing" Version="8.0.0" />
+		<PackageReference Include="System.IO.Hashing" Version="9.0.0" />
 	</ItemGroup>
 </Project>
