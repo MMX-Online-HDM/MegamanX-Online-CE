@@ -6,16 +6,6 @@ using SFML.Graphics;
 
 namespace MMXOnline;
 
-public class XUPParry : Weapon {
-	public static XUPParry netWeapon = new XUPParry();
-
-	public XUPParry() : base() {
-		fireRate = 45;
-		index = (int)WeaponIds.UPParry;
-		killFeedIndex = 168;
-	}
-}
-
 // If fixing parry code also fix kknuckle parry
 public class XUPParryStartState : CharState {
 	RagingChargeX mmx;
@@ -147,7 +137,7 @@ public class UPParryMeleeProj : Projectile {
 
 	public static Projectile rpcInvoke(ProjParameters args) {
 		return new UPParryMeleeProj(
-			XUPParry.netWeapon, args.pos,
+			RCXParry.netWeapon, args.pos,
 			args.xDir, args.extraData[0],
 			args.player, args.netId
 		);
@@ -182,7 +172,7 @@ public class XUPParryMeleeState : CharState {
 		Point? shootPos = character.getFirstPOI("melee");
 		if (!once && shootPos != null) {
 			once = true;
-			new UPParryMeleeProj(new XUPParry(), shootPos.Value, character.xDir, damage, player, player.getNextActorNetId(), rpc: true);
+			new UPParryMeleeProj(new RCXParry(), shootPos.Value, character.xDir, damage, player, player.getNextActorNetId(), rpc: true);
 			character.playSound("upParryAttack", sendRpc: true);
 			character.shakeCamera(sendRpc: true);
 		}
@@ -205,16 +195,6 @@ public class XUPParryMeleeState : CharState {
 	}
 }
 
-public class AbsorbWeapon : Weapon {
-	public Projectile absorbedProj;
-	public AbsorbWeapon(Projectile otherProj) {
-		index = (int)WeaponIds.UPParry;
-		weaponSlotIndex = 118;
-		killFeedIndex = 168;
-		this.absorbedProj = otherProj;
-		drawAmmo = false;
-	}
-}
 
 public class UPParryRangedProj : Projectile {
 	public UPParryRangedProj(
@@ -246,7 +226,7 @@ public class UPParryRangedProj : Projectile {
 		string sprite = Encoding.ASCII.GetString(args.extraData[6..]);
 
 		return new UPParryRangedProj(
-			XUPParry.netWeapon, args.pos,
+			RCXParry.netWeapon, args.pos,
 			args.xDir, sprite,
 			args.extraData[0], args.extraData[1], hitCooldown,
 			args.player, args.netId
@@ -295,7 +275,7 @@ public class XUPParryProjState : CharState {
 			//int flinch = otherProj.damager.flinch;
 			int flinch = Global.defFlinch;
 			float hitCooldown = otherProj.damager.hitCooldown;
-			new UPParryRangedProj(new XUPParry(), shootPos.Value, character.xDir, otherProj.sprite.name, damage, flinch, hitCooldown, player, player.getNextActorNetId(), rpc: true);
+			new UPParryRangedProj(new RCXParry(), shootPos.Value, character.xDir, otherProj.sprite.name, damage, flinch, hitCooldown, player, player.getNextActorNetId(), rpc: true);
 		}
 
 		if (character.isAnimOver()) {
@@ -320,14 +300,6 @@ public class XUPParryProjState : CharState {
 	}
 }
 
-public class XUPPunch : Weapon {
-	public XUPPunch(Player player) : base() {
-		fireRate = 45;
-		index = (int)WeaponIds.UPPunch;
-		killFeedIndex = 167;
-		damager = new Damager(player, 3, Global.defFlinch, 0.5f);
-	}
-}
 
 public class XUPPunchState : CharState {
 	float slideVelX;
@@ -354,14 +326,6 @@ public class XUPPunchState : CharState {
 		if (oldState is Dash) {
 			slideVelX = character.xDir * 250;
 		}
-	}
-}
-
-public class XUPGrab : Weapon {
-	public XUPGrab() : base() {
-		fireRate = 45;
-		index = (int)WeaponIds.UPGrab;
-		killFeedIndex = 92;
 	}
 }
 
@@ -420,7 +384,7 @@ public class XUPGrabState : CharState {
 			leechTime = 0;
 			character.addHealth(1);
 			var damager = new Damager(player, 1, 0, 0);
-			damager.applyDamage(victim, false, new XUPGrab(), character, (int)ProjIds.UPGrab);
+			damager.applyDamage(victim, false, new RCXGrab(), character, (int)ProjIds.UPGrab);
 		}
 
 		if (player.input.isPressed(Control.Special1, player)) {

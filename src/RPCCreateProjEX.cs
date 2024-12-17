@@ -8,7 +8,7 @@ public partial class RPCCreateProj : RPC {
 		//BUSTERS
 		{ (int)ProjIds.Buster, BusterProj.rpcInvoke },
 		{ (int)ProjIds.Buster2, Buster2Proj.rpcInvoke },
-		{ (int)ProjIds.BusterUnpo, BusterUnpoProj.rpcInvoke },
+		{ (int)ProjIds.BusterUnpo, RagingBusterProj.rpcInvoke },
 		{ (int)ProjIds.Buster3, Buster3Proj.rpcInvoke },
 		{ (int)ProjIds.Buster4, Buster4Proj.rpcInvoke },
 		{ (int)ProjIds.BusterX3Proj2, BusterX3Proj2.rpcInvoke },
