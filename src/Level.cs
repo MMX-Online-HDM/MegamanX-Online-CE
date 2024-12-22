@@ -304,7 +304,12 @@ public partial class Level {
 		scaledW = levelData.width * scaleW;
 		scaledH = levelData.height * scaleH;
 
-		Global.radarRenderTexture = new RenderTexture((uint)(scaledW * 4), (uint)(scaledH * 4));
+		Global.radarRenderTexture = new RenderTexture(
+			(uint)Math.Ceiling(scaledW), (uint)Math.Ceiling(scaledH)
+		);
+		Global.radarRenderTextureB = new RenderTexture(
+			(uint)Math.Ceiling(scaledW), (uint)Math.Ceiling(scaledH)
+		);
 		Global.input.lastUpdateTime = 0;
 
 		foreach (var serverPlayer in server.players) {

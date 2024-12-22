@@ -152,7 +152,7 @@ public class MegamanX : Character {
 		Helpers.decrementFrames(ref specialSaberCooldown);
 
 		// For the shooting animation.
-		if (shootAnimTime > 0) {
+		if (shootAnimTime > 0 && sprite.name == getSprite(charState.shootSprite)) {
 			shootAnimTime -= speedMul;
 			if (shootAnimTime <= 0) {
 				shootAnimTime = 0;
@@ -278,7 +278,7 @@ public class MegamanX : Character {
 	public void shoot(int chargeLevel) {
 		shoot(chargeLevel, currentWeapon, false);
 	}
-	
+
 	public void shoot(int chargeLevel, Weapon weapon, bool busterStock) {
 		// Check if can shoot.
 		if (shootCooldown > 0 ||
@@ -288,29 +288,39 @@ public class MegamanX : Character {
 		) {
 			return;
 		}
-		// Changes to shoot animation and gets sound.
-		setShootAnim();
-		shootAnimTime = DefaultShootAnimTime;
-		string shootSound = weapon.shootSounds[chargeLevel];
 		// Calls the weapon shoot function.
 		bool useCrossShotAnim = false;
 		if (chargeLevel >= 3 && armArmor == ArmorId.Giga || busterStock) {
 			if (!busterStock) {
 				stockedBuster = true;
+			} else if (chargeLevel < 3) {
+				stockedBuster = false;
 			}
 			if (charState.normalCtrl && charState.attackCtrl) {
 				useCrossShotAnim = true;
+			} else {
+				chargeLevel = 3;
 			}
 		}
+		// Changes to shoot animation and gets sound.
+		setShootAnim();
+		shootAnimTime = DefaultShootAnimTime;
+		string shootSound = weapon.shootSounds[chargeLevel];
+		// Shoot.
 		if (useCrossShotAnim) {
 			changeState(new X2ChargeShot(null, busterStock ? 1 : 0), true);
-			shootSound = "";
+			stopCharge();
+			return;
 		} else {
 			weapon.shoot(this, [chargeLevel, busterStock ? 1 : 0]);
 		}
 		// Sets up global shoot cooldown to the weapon shootCooldown.
-		weapon.shootCooldown = weapon.fireRate;
-		shootCooldown = weapon.fireRate;
+		if (!stockedBuster || busterStock || weapon.fireRate <= 12) {
+			weapon.shootCooldown = weapon.fireRate;
+		} else {
+			weapon.shootCooldown = 12;
+		}
+		shootCooldown = weapon.shootCooldown;
 		// Add ammo.
 		weapon.addAmmo(-weapon.getAmmoUsageEX(chargeLevel, this), player);
 		// Play sound if any.
@@ -710,7 +720,23 @@ public class MegamanX : Character {
 				0, pos.x + x - (xDir * 2), pos.y + y + 1, xDir, 1, null, 1, 1, 1, zIndex + 1
 			);
 		}
+		float backupAlpha = alpha;
+		if (stingActiveTime > 0) {
+			if (stingPaletteTime > 6) {
+				stingPaletteTime = 0;
+				stingPaletteIndex++;
+				if (stingPaletteIndex >= 9) {
+					stingPaletteIndex = 0;
+				}
+			} else {
+				stingPaletteTime++;
+			}
+			if (stingPaletteTime % 4 <= 1) {
+				alpha *= 0.25f;
+			}
+		}
 		base.render(x, y);
+		alpha = backupAlpha;
 	}
 
 	public override List<ShaderWrapper> getShaders() {
@@ -718,6 +744,15 @@ public class MegamanX : Character {
 		List<ShaderWrapper> shaders = new();
 		ShaderWrapper? palette = null;
 		int index = player.weapon.index;
+
+		if (stingActiveTime > 0 && stingPaletteIndex != 0){
+			palette = player.xStingPaletteShader;
+			palette.SetUniform("palette", stingPaletteIndex);
+
+			shaders.Add(palette);
+			shaders.AddRange(baseShaders);
+			return shaders;
+		}
 
 		if (index >= (int)WeaponIds.GigaCrush) {
 			index = 0;
@@ -734,7 +769,6 @@ public class MegamanX : Character {
 		palette = player.xPaletteShader;
 
 		palette?.SetUniform("palette", index);
-		palette?.SetUniform("paletteTexture", Global.textures["paletteTexture"]);
 
 		if (palette != null) {
 			shaders.Add(palette);

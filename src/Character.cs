@@ -179,7 +179,6 @@ public partial class Character : Actor, IDamagable {
 		this.player = player;
 		this.xDir = xDir;
 
-		isDashing = false;
 		splashable = true;
 		// Intialize state as soon as posible.
 		charState = new NetLimbo();
@@ -602,7 +601,7 @@ public partial class Character : Actor, IDamagable {
 		if (flag != null || !isDashing) {
 			return getRunSpeed();
 		}
-		return getRunSpeed();
+		return getDashSpeed();
 	}
 
 	public virtual float getJumpPower() {
@@ -1160,9 +1159,6 @@ public partial class Character : Actor, IDamagable {
 				}
 				vel.y = -getJumpPower();
 				playSound("jump", sendRpc: true);
-				if (charState.airSprite != "") {
-					changeSpriteFromName(charState.airSprite, false);
-				}
 			}
 		}
 		if (charState.normalCtrl) {
@@ -1793,6 +1789,9 @@ public partial class Character : Actor, IDamagable {
 		if (!newState.canEnter(this)) {
 			return false;
 		}
+		CharState oldState = charState;
+		oldState.onExit(newState);
+
 		changedStateInFrame = true;
 		bool hasShootAnim = newState.canUseShootAnim();
 		if (shootAnimTime > 0 && hasShootAnim) {
@@ -1809,8 +1808,6 @@ public partial class Character : Actor, IDamagable {
 				sprite.visible = true;
 			}
 		}
-		CharState oldState = charState;
-		oldState.onExit(newState);
 
 		charState = newState;
 		newState.onEnter(oldState);

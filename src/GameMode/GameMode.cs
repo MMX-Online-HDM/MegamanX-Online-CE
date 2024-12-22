@@ -977,58 +977,97 @@ public class GameMode {
 		if (Global.level.isRace()) {
 			revealedSpots.Add(new Point(level.camX, level.camY));
 			revealedRadius = float.MaxValue;
-			borderThickness = 0.5f;
+			borderThickness = 1;
 			dotRadius = 0.75f;
 		}
 
-		Global.radarRenderTexture.Clear(Color.Transparent);
+		Global.radarRenderTexture.Clear(new Color(33, 33, 74));
+		Global.radarRenderTextureB.Clear();
 		RenderStates states = new RenderStates(Global.radarRenderTexture.Texture);
-		states.BlendMode = new BlendMode(BlendMode.Factor.SrcColor, BlendMode.Factor.Zero, BlendMode.Equation.Add);
+		RenderStates statesB = new RenderStates(Global.radarRenderTextureB.Texture);
+		RenderStates statesB2 = new RenderStates(Global.radarRenderTextureB.Texture);
+		states.BlendMode = new BlendMode(BlendMode.Factor.SrcAlpha, BlendMode.Factor.OneMinusSrcAlpha, BlendMode.Equation.Add);
+		statesB.BlendMode = new BlendMode(BlendMode.Factor.SrcAlpha, BlendMode.Factor.OneMinusSrcAlpha, BlendMode.Equation.Add);
+		statesB2.BlendMode = new BlendMode(BlendMode.Factor.SrcAlpha, BlendMode.Factor.OneMinusSrcAlpha, BlendMode.Equation.Min);
 
 		float scaleW = level.scaleW;
 		float scaleH = level.scaleH;
 		float scaledW = level.scaledW;
 		float scaledH = level.scaledH;
 
-		float radarX = Global.screenW - 6 - scaledW;
-		float radarY = Global.screenH - 6 - scaledH;
+		float radarX = MathF.Floor(Global.screenW - 6 - scaledW);
+		float radarY = MathF.Floor(Global.screenH - 6 - scaledH);
 
 		// The "fog of war" rect
-		RectangleShape rect = new RectangleShape(new Vector2f(scaledW * 4, scaledH * 4));
+		RectangleShape rect = new RectangleShape(new Vector2f(scaledW + 20, scaledH + 20));
 		rect.Position = new Vector2f(0, 0);
-		rect.FillColor = new Color(0, 0, 0, 224);
-		Global.radarRenderTexture.Draw(rect, states);
+		rect.FillColor = new Color(0, 0, 0, 128 + 64);
+		Global.radarRenderTextureB.Draw(rect, statesB);
 
-		float camStartX = level.camX * scaleW;
-		float camStartY = level.camY * scaleH;
-		float camEndX = (level.camX + Global.viewScreenW) * scaleW;
-		float camEndY = (level.camY + Global.viewScreenH) * scaleH;
+		float camStartX = MathF.Floor(level.camX * scaleW);
+		float camStartY = MathF.Floor(level.camY * scaleH);
+		float camEndX = MathF.Floor(Global.viewScreenW * scaleW);
+		float camEndY = MathF.Floor(Global.viewScreenH * scaleH);
 
 		// The visible area circles
 		foreach (var spot in revealedSpots) {
-			float pxPos = spot.x * scaleW * 4;
-			float pyPos = spot.y * scaleH * 4;
-			float radius = revealedRadius * scaleW * 4;
+			float pxPos = spot.x * scaleW;
+			float pyPos = spot.y * scaleH;
+			float radius = revealedRadius * scaleW;
 			CircleShape circle1 = new CircleShape(radius);
-			circle1.FillColor = new Color(128, 128, 128, 192);
+			circle1.FillColor = new Color(0, 0, 0, 0);
 			circle1.Position = new Vector2f(pxPos - radius, pyPos - radius);
-			Global.radarRenderTexture.Draw(circle1, states);
+			Global.radarRenderTextureB.Draw(circle1, statesB2);
 		}
 
+		var sprite = new SFML.Graphics.Sprite(Global.radarRenderTextureB.Texture);
+		Global.radarRenderTextureB.Display();
+
+		foreach (GameObject gameObject in Global.level.gameObjects) {
+			if (gameObject is not Geometry geometry) {
+				continue;
+			}
+			if (gameObject is not Wall and not KillZone) {
+				continue;
+			}
+			Shape shape = geometry.collider.shape;
+			float pxPos = shape.minX * scaleH;
+			float pyPos = shape.minY * scaleH + 1;
+			float mxPos = shape.maxX * scaleH - pxPos;
+			float myPos = shape.maxY * scaleH - pyPos + 1;
+			if (mxPos <= 1) {
+				mxPos = 1;
+			}
+			if (myPos <= 1) {
+				myPos = 1;
+			}
+			RectangleShape wRect = new RectangleShape();
+			wRect.FillColor = new Color(128, 128, 255);
+			wRect.Position = new Vector2f(pxPos, pyPos);
+			wRect.Size = new Vector2f(mxPos, myPos);
+			Global.radarRenderTexture.Draw(wRect);
+		}
 		Global.radarRenderTexture.Display();
-		var sprite = new SFML.Graphics.Sprite(Global.radarRenderTexture.Texture);
-		sprite.Position = new Vector2f(radarX, radarY);
-		sprite.Scale = new Vector2f(0.25f, 0.25f);
+		Global.radarRenderTexture.Draw(sprite);
+		Global.radarRenderTexture.Display();
+		var sprite2 = new SFML.Graphics.Sprite(Global.radarRenderTexture.Texture);
+		sprite2.Position = new Vector2f(radarX, radarY);
+
 		Global.window.SetView(DrawWrappers.hudView);
-		Global.window.Draw(sprite);
+		Global.window.Draw(sprite2);
 		sprite.Dispose();
+		sprite2.Dispose();
 
 		if (level.mainPlayer.isSigma) {
 			foreach (Maverick maverick in level.mainPlayer.mavericks) {
 				if (maverick == level.mainPlayer.currentMaverick && !level.mainPlayer.isAlivePuppeteer()) continue;
 				float xPos = maverick.pos.x * scaleW;
 				float yPos = maverick.pos.y * scaleH;
-				DrawWrappers.DrawCircle(radarX + xPos, radarY + yPos, dotRadius, true, new Color(255, 128, 0), 0, ZIndex.HUD, isWorldPos: false);
+				DrawWrappers.DrawRect(
+					radarX + xPos, radarY + yPos,
+					radarX + xPos, radarY + yPos,
+					true, new Color(255, 128, 0), 0, ZIndex.HUD, isWorldPos: false
+				);
 			}
 		}
 
@@ -1039,7 +1078,7 @@ public class GameMode {
 		}
 
 		foreach (var player in level.nonSpecPlayers()) {
-			if (player.character == null) continue;
+			if (player.character == null || player.character.destroyed) continue;
 			if (player.character.isStealthy(level.mainPlayer.alliance)) continue;
 			if (player.isMainPlayer && player.isDead) continue;
 
@@ -1056,17 +1095,34 @@ public class GameMode {
 
 			foreach (var spot in revealedSpots) {
 				if (player.isMainPlayer || new Point(xPos, yPos).distanceTo(new Point(spot.x * scaleW, spot.y * scaleH)) < revealedRadius * scaleW) {
-					DrawWrappers.DrawCircle(radarX + xPos, radarY + yPos, dotRadius, true, color, 0, ZIndex.HUD, isWorldPos: false);
+					DrawWrappers.DrawRectWH(
+						radarX + MathF.Round(xPos),
+						radarY + MathF.Round(yPos),
+						1, 1,
+						true, color, 0,
+						ZIndex.HUD, isWorldPos: false
+					);
 					break;
 				}
 			}
 		}
 
 		// Radar rectangle itself (with border)
-		DrawWrappers.DrawRect(radarX, radarY, Global.screenW - 6, Global.screenH - 6, true, Color.Transparent, borderThickness, ZIndex.HUD, isWorldPos: false, outlineColor: Color.White);
+		DrawWrappers.DrawRectWH(
+			radarX, radarY,
+			scaledW, scaledH,
+			true, Color.Transparent, 1,
+			ZIndex.HUD, isWorldPos: false,
+			outlineColor: Color.White
+		);
 
 		// Camera
-		DrawWrappers.DrawRect(radarX + camStartX, radarY + camStartY, radarX + camEndX, radarY + camEndY, true, new Color(0, 0, 0, 0), borderThickness * 0.5f, ZIndex.HUD, isWorldPos: false, outlineColor: new Color(255, 255, 255));
+		DrawWrappers.DrawRectWH(
+			radarX + camStartX, radarY + camStartY,
+			camEndX, camEndY,
+			true, new Color(0, 0, 0, 0), 1,
+			ZIndex.HUD, isWorldPos: false, outlineColor: new Color(255, 255, 255, 128)
+		);
 	}
 
 	public void draw1v1PlayerTopHUD(Player? player, HUDHealthPosition position) {

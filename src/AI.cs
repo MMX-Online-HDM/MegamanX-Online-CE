@@ -1714,7 +1714,7 @@ public class AI {
 						player.press(Control.Shoot);
 						break;
 					case 1:
-						player.weapon.vileShoot(WeaponIds.FrontRunner, vile);
+						vile.cannonWeapon.vileShoot(WeaponIds.FrontRunner, vile);
 						break;
 					case 2:
 						vile.rocketPunchWeapon.vileShoot(WeaponIds.RocketPunch, vile);

@@ -229,20 +229,31 @@ public class CharState {
 	}
 
 	public virtual void airTrasition() {
-		if (airSprite != "" && !character.grounded && wasGrounded && sprite != airSprite) {
+		if (airSprite != "" && !character.grounded && wasGrounded && sprite == landSprite) {
 			sprite = airSprite;
 			int oldFrameIndex = character.sprite.frameIndex;
 			float oldFrameTime = character.sprite.frameTime;
 			character.changeSprite(sprite, false);
-			character.sprite.frameIndex = oldFrameIndex;
-			character.sprite.frameTime = oldFrameTime;
-		} else if (landSprite != "" && character.grounded && !wasGrounded && sprite != landSprite) {
+			if (oldFrameIndex < character.sprite.totalFrameNum) {
+				character.sprite.frameIndex = oldFrameIndex;
+				character.sprite.frameTime = oldFrameTime;
+			} else {
+				character.sprite.frameIndex = character.sprite.totalFrameNum - 1;
+				character.sprite.frameTime = character.sprite.getCurrentFrame().duration;
+			}
+		} else if (landSprite != "" && character.grounded && !wasGrounded && sprite == airSprite) {
+			character.playSound("land", sendRpc: true);
 			sprite = landSprite;
 			int oldFrameIndex = character.sprite.frameIndex;
 			float oldFrameTime = character.sprite.frameTime;
 			character.changeSpriteFromName(sprite, false);
-			character.sprite.frameIndex = oldFrameIndex;
-			character.sprite.frameTime = oldFrameTime;
+			if (oldFrameIndex < character.sprite.totalFrameNum) {
+				character.sprite.frameIndex = oldFrameIndex;
+				character.sprite.frameTime = oldFrameTime;
+			} else {
+				character.sprite.frameIndex = character.sprite.totalFrameNum - 1;
+				character.sprite.frameTime = character.sprite.getCurrentFrame().duration;
+			}
 		}
 	}
 

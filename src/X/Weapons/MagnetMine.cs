@@ -166,6 +166,7 @@ public class MagnetMineProj : Projectile, IDamagable {
 
 public class MagnetMineProjCharged : Projectile {
 	public float size;
+	public int phase;
 
 	float soundTime;
 	float startY;
@@ -234,27 +235,55 @@ public class MagnetMineProjCharged : Projectile {
 
 	public override void onCollision(CollideData other) {
 		base.onCollision(other);
-		if (!ownedByLocalPlayer) return;
-		var go = other.gameObject;
-		if (go is Projectile) {
-			var proj = go as Projectile;
-			if (proj != null) {
-				if (!proj.shouldVortexSuck) return;
-				if (proj is MagnetMineProj magnetMine && !magnetMine.canBeSucked(damager.owner.alliance)) return;
-				size += proj.damager.damage;
-				proj.destroySelfNoEffect(doRpcEvenIfNotOwned: true);
+		if (!ownedByLocalPlayer) {
+			return;
+		}
+		if (other.gameObject is Projectile proj && !proj.destroyed &&
+			(damager.owner.alliance != owner.alliance || damager.owner == owner && size < 10)
+		) {
+			if (!proj.shouldVortexSuck) { return; }
+			if (proj is MagnetMineProj magnetMine && !magnetMine.canBeSucked(damager.owner.alliance)) { return; }
+
+			if (proj.ownedByLocalPlayer && proj is MagnetMineProjCharged mineCharged) {
+				if (damager.owner.alliance != mineCharged.damager.owner.alliance &&
+					mineCharged.size != 0 && size <= mineCharged.size
+				) {
+					return;
+				}
+				if (mineCharged.damager.owner == damager.owner && size < mineCharged.size) {
+					return;
+				}
+				size += 12;
 			}
-			
-			
-			if (size > 10) {
-				changeSprite("magnetmine_charged3", true);
-				updateDamager(4);
-				forceNetUpdateNextFrame = true;
-			} else if (size > 5) {
-				changeSprite("magnetmine_charged2", true);
-				updateDamager(2);
+			size += proj.damager.damage;
+			proj.destroySelfNoEffect(doRpcEvenIfNotOwned: true);
+
+			if (updateSizeAndDamage()) {
 				forceNetUpdateNextFrame = true;
 			}
 		}
+	}
+
+	public override List<byte> getCustomActorNetData() {
+		List<byte> customData = base.getCustomActorNetData();
+		customData.Add((byte)MathF.Floor(size));
+
+		return customData;
+	}
+
+	public override void updateCustomActorNetData(byte[] data) {
+		size = data[0];
+		updateSizeAndDamage();
+	}
+
+	public bool updateSizeAndDamage() {
+		if (size >= 10 && phase < 2) {
+			changeSprite("magnetmine_charged3", true);
+			damager.damage = 4;
+		} else if (size >= 5 && phase < 1) {
+			changeSprite("magnetmine_charged2", true);
+			damager.damage = 2;
+		}
+		return false;
 	}
 }

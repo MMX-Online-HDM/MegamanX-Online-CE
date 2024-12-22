@@ -382,7 +382,8 @@ public partial class Player {
 	}
 
 	// Shaders
-	public ShaderWrapper xPaletteShader = Helpers.cloneShaderSafe("palette");
+	public ShaderWrapper xPaletteShader = Helpers.cloneGenericPaletteShader("paletteTexture");
+	public ShaderWrapper xStingPaletteShader = Helpers.cloneGenericPaletteShader("cStingPalette");
 	public ShaderWrapper invisibleShader = Helpers.cloneShaderSafe("invisible");
 	public ShaderWrapper zeroPaletteShader = Helpers.cloneGenericPaletteShader("hyperZeroPalette");
 	public ShaderWrapper nightmareZeroShader = Helpers.cloneGenericPaletteShader("paletteViralZero");
