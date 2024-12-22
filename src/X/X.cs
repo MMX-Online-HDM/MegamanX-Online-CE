@@ -153,7 +153,7 @@ public class MegamanX : Character {
 
 		// For the shooting animation.
 		if (shootAnimTime > 0) {
-			shootAnimTime -= Global.speedMul;
+			shootAnimTime -= speedMul;
 			if (shootAnimTime <= 0) {
 				shootAnimTime = 0;
 				changeSpriteFromName(charState.defaultSprite, false);
@@ -197,12 +197,37 @@ public class MegamanX : Character {
 	}
 
 	public override bool normalCtrl() {
-		if (!grounded) {
-			if (player.input.isPressed(Control.Dash, player) && canAirDash() && canDash() && flag == null) {
-				if (player.input.isHeld(Control.Up, player) && player.hasBootsArmor(3)) {
-					changeState(new UpDash(Control.Dash));
-					return true;
-				}
+		if (grounded) {
+			if (legArmor == ArmorId.Max &&
+				player.input.isPressed(Control.Dash, player) &&
+				player.input.isHeld(Control.Up, player) &&
+				canDash() && flag == null
+			) {
+				changeState(new UpDash(Control.Dash));
+				return true;
+			}
+			if (legArmor == ArmorId.Light && grounded &&
+				player.dashPressed(out string dashControlL) &&
+				canDash()
+			) {
+				changeState(new LigthDash(dashControlL), true);
+				return true;
+			}
+		} else if (!grounded) {
+			if (legArmor == ArmorId.Max &&
+				player.input.isPressed(Control.Dash, player) &&
+				player.input.isHeld(Control.Up, player) &&
+				canAirDash() && canDash() && flag == null
+			) {
+				changeState(new UpDash(Control.Dash));
+				return true;
+			}
+			if (legArmor == ArmorId.Giga && !grounded &&
+				player.dashPressed(out string dashControlG) &&
+				canAirDash() && canDash()
+			) {
+				changeState(new GigaAirDash(dashControlG), true);
+				return true;
 			}
 			if (!player.isAI && hasUltimateArmor &&
 				player.input.isPressed(Control.Jump, player) &&
@@ -311,11 +336,6 @@ public class MegamanX : Character {
 			return getRunSpeed();
 		}
 		float dashSpeed = 3.5f * 60;
-		if (legArmor == ArmorId.Light && charState is Dash) {
-			dashSpeed *= 1.15f;
-		} else if (legArmor == ArmorId.Giga && charState is AirDash) {
-			dashSpeed *= 1.15f;
-		}
 		return dashSpeed * getRunDebuffs();
 	}
 
@@ -393,10 +413,10 @@ public class MegamanX : Character {
 
 	public override void increaseCharge() {
 		if (armArmor == ArmorId.Light) {
-			chargeTime += Global.speedMul * 1.5f;
+			chargeTime += speedMul * 1.5f;
 			return;
 		}
-		chargeTime += Global.speedMul;
+		chargeTime += speedMul;
 	}
 
 	public override bool chargeButtonHeld() {

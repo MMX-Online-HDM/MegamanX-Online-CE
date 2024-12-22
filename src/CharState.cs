@@ -843,7 +843,6 @@ public class Dash : CharState {
 
 	public override void update() {
 		dashBackwardsCode(character, initialDashDir);
-
 		base.update();
 
 		if (!player.isAI && !player.input.isHeld(initialDashButton, player) && !stop) {
@@ -852,14 +851,6 @@ public class Dash : CharState {
 		float speedModifier = 1;
 		float distanceModifier = 1;
 		float inputXDir = player.input.getInputDir(player).x;
-		if (player.isX && player.hasBootsArmor(1)) {
-			speedModifier = 1.15f;
-			distanceModifier = 1.15f;
-		}
-		if (character.sprite.name.EndsWith("unpo_grab_dash")) {
-			speedModifier = 1.25f;
-			distanceModifier = 1.25f;
-		}
 		if (dashTime > Global.spf * 32 * distanceModifier || stop) {
 			if (!stop) {
 				dashTime = 0;
@@ -931,11 +922,7 @@ public class AirDash : CharState {
 		}
 		float speedModifier = 1;
 		float distanceModifier = 1;
-		if (player.isX && player.hasBootsArmor(2)) {
-			speedModifier = 1.15f;
-			distanceModifier = 1.15f;
-		}
-		if (player.character.sprite.name.EndsWith("unpo_grab_dash")) {
+		if (character.sprite.name.EndsWith("unpo_grab_dash")) {
 			speedModifier = 1.25f;
 			distanceModifier = 1.25f;
 		}

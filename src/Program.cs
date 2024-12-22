@@ -1404,7 +1404,7 @@ class Program {
 		// Fix simbols.
 		cpuName = cpuName.Replace("(R)", "®");
 		cpuName = cpuName.Replace("(C)", "©");
-		cpuName = cpuName.Replace("(TM)", "®"); //Todo, implement proper trademark simbol.
+		cpuName = cpuName.Replace("(TM)", "©"); //Todo, implement proper trademark simbol.
 		return cpuName;
 	}
 

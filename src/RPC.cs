@@ -387,7 +387,10 @@ public class RPCApplyDamage : RPC {
 						new Weapon(), mainActor.pos, (ProjIds)projId,
 						player, damage, flinch, hitCooldown, mainActor,
 						addToLevel: false
-					);
+					) {
+						meleeId = linkedMeleeId,
+						owningActor = mainActor
+					};
 				}
 			}
 		}
@@ -395,6 +398,10 @@ public class RPCApplyDamage : RPC {
 		else {
 			actor = (actorId == 0 ? null : Global.level.getActorByNetId(actorId, true));
 		}
+
+		//if (actor == null) {
+			// Add code for delayed projectile here.
+		//}
 
 		if (player != null && victim != null) {
 			Damager.applyDamage(
@@ -408,7 +415,8 @@ public class RPCApplyDamage : RPC {
 				weaponKillFeedIndex,
 				actor,
 				projId,
-				sendRpc: false);
+				sendRpc: false
+			);
 		}
 	}
 

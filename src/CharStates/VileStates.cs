@@ -254,10 +254,8 @@ public class VileHover : CharState {
 		}
 
 		float flyVelX = 0;
-		if (character.isDashing && character.deltaPos.x != 0) {
-			flyVelX = character.xDir * character.getDashSpeed() * 0.5f;
-		} else if (character.deltaPos.x != 0) {
-			flyVelX = character.xDir * character.getRunSpeed() * 0.5f;
+		if (character.deltaPos.x != 0) {
+			flyVelX = character.xDir * character.getDashOrRunSpeed() * 0.5f;
 		}
 
 		float flyVelY = 0;

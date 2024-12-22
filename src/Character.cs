@@ -595,11 +595,14 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual float getDashSpeed() {
+		return (3.45f * 60f) * getRunDebuffs();
+	}
+
+	public virtual float getDashOrRunSpeed() {
 		if (flag != null || !isDashing) {
 			return getRunSpeed();
 		}
-		float dashSpeed = 3.45f * 60f;
-		return dashSpeed * getRunDebuffs();
+		return getRunSpeed();
 	}
 
 	public virtual float getJumpPower() {
@@ -1288,7 +1291,7 @@ public partial class Character : Actor, IDamagable {
 		}
 		if (!wallKickMove && xDpadDir != 0) {
 			Point moveSpeed = new Point();
-			if (canMove()) { moveSpeed.x = getDashSpeed() * xDpadDir; }
+			if (canMove()) { moveSpeed.x = getDashOrRunSpeed() * xDpadDir; }
 			if (canTurn()) { xDir = xDpadDir; }
 			if (moveSpeed.magnitude > 0) { move(moveSpeed); }
 		}
