@@ -575,8 +575,6 @@ public class Idle : CharState {
 			} else {
 				if (!character.sprite.name.Contains("lose")) {
 					string loseSprite = "lose";
-					if (player.isX && character.player.hasArmor(2)) loseSprite = "mmx_lose_x2";
-					if (player.isX && character.player.hasArmor(3)) loseSprite = "mmx_lose_x3";
 					character.changeSpriteFromName(loseSprite, true);
 				}
 			}
@@ -806,7 +804,7 @@ public class Dash : CharState {
 		base.onEnter(oldState);
 
 		initialDashDir = character.xDir;
-		if (player.isAxl && player.axlWeapon?.isTwoHanded(false) == true) {
+		if (character is Axl && (character.currentWeapon as AxlWeapon)?.isTwoHanded(false) == true) {
 			if (player.input.isHeld(Control.Left, player)) initialDashDir = -1;
 			else if (player.input.isHeld(Control.Right, player)) initialDashDir = 1;
 		}
@@ -828,7 +826,7 @@ public class Dash : CharState {
 	}
 
 	public static void dashBackwardsCode(Character character, int initialDashDir) {
-		if (character.player.isAxl) {
+		if (character is Axl) {
 			if (character.xDir != initialDashDir) {
 				if (!character.sprite.name.EndsWith("backwards")) {
 					character.changeSpriteFromName("dash_backwards", false);
@@ -956,7 +954,7 @@ public class AirDash : CharState {
 
 		initialDashDir = character.xDir;
 
-		if (player.isAxl && player.axlWeapon?.isTwoHanded(false) == true) {
+		if (character is Axl && (character.currentWeapon as AxlWeapon)?.isTwoHanded(false) == true) {
 			if (player.input.isHeld(Control.Left, player)) initialDashDir = -1;
 			else if (player.input.isHeld(Control.Right, player)) initialDashDir = 1;
 		}
