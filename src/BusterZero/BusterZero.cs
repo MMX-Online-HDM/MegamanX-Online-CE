@@ -274,6 +274,9 @@ public class BusterZero : Character {
 	}
 
 	public override string getSprite(string spriteName) {
+		if (Global.sprites.ContainsKey("bzero_" + spriteName)) {
+			return "bzero_" + spriteName;
+		}
 		return "zero_" + spriteName;
 	}
 

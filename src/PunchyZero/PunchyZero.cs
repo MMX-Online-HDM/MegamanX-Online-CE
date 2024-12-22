@@ -483,6 +483,9 @@ public class PunchyZero : Character {
 	}
 
 	public override string getSprite(string spriteName) {
+		if (Global.sprites.ContainsKey("pzero_" + spriteName)) {
+			return "pzero_" + spriteName;
+		}
 		return "zero_" + spriteName;
 	}
 
