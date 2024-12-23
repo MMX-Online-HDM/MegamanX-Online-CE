@@ -1157,6 +1157,9 @@ public partial class Character : Actor, IDamagable {
 				} else {
 					grounded = false;
 				}
+				if (player.input.isHeld(Control.Dash, player) && charState.useDashJumpSpeed && canDash()) { 
+					isDashing = true;
+				}
 				vel.y = -getJumpPower();
 				playSound("jump", sendRpc: true);
 			}

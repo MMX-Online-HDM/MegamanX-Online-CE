@@ -986,8 +986,12 @@ public class GameMode {
 		RenderStates states = new RenderStates(Global.radarRenderTexture.Texture);
 		RenderStates statesB = new RenderStates(Global.radarRenderTextureB.Texture);
 		RenderStates statesB2 = new RenderStates(Global.radarRenderTextureB.Texture);
-		states.BlendMode = new BlendMode(BlendMode.Factor.SrcAlpha, BlendMode.Factor.OneMinusSrcAlpha, BlendMode.Equation.Add);
-		statesB.BlendMode = new BlendMode(BlendMode.Factor.SrcAlpha, BlendMode.Factor.OneMinusSrcAlpha, BlendMode.Equation.Add);
+		states.BlendMode = new BlendMode(BlendMode.Factor.SrcAlpha, BlendMode.Factor.OneMinusSrcAlpha, BlendMode.Equation.Add) {
+			AlphaEquation = BlendMode.Equation.Max
+		};
+		statesB.BlendMode = new BlendMode(BlendMode.Factor.SrcAlpha, BlendMode.Factor.OneMinusSrcAlpha, BlendMode.Equation.Add) {
+			AlphaEquation = BlendMode.Equation.Max
+		};
 		statesB2.BlendMode = new BlendMode(BlendMode.Factor.SrcAlpha, BlendMode.Factor.OneMinusSrcAlpha, BlendMode.Equation.Min);
 
 		float scaleW = level.scaleW;
@@ -1001,13 +1005,27 @@ public class GameMode {
 		// The "fog of war" rect
 		RectangleShape rect = new RectangleShape(new Vector2f(scaledW + 20, scaledH + 20));
 		rect.Position = new Vector2f(0, 0);
-		rect.FillColor = new Color(0, 0, 0, 128 + 64);
-		Global.radarRenderTextureB.Draw(rect, statesB);
+		rect.FillColor = new Color(0, 0, 0, 128);
+		Global.radarRenderTextureB.Draw(rect, statesB2);
 
-		float camStartX = MathF.Floor(level.camX * scaleW);
-		float camStartY = MathF.Floor(level.camY * scaleH);
-		float camEndX = MathF.Floor(Global.viewScreenW * scaleW);
-		float camEndY = MathF.Floor(Global.viewScreenH * scaleH);
+		float camStartX = MathF.Floor((level.camX - Global.halfScreenW) * scaleW);
+		float camStartY = MathF.Floor((level.camY - Global.halfScreenH) * scaleH);
+		if (camStartX < 0) {
+			camStartX = 0;
+		}
+		if (camStartY < 0) {
+			camStartY = 0;
+		}
+		float camEndX = MathF.Floor(Global.viewScreenW * 2 * scaleW);
+		float camEndY = MathF.Floor(Global.viewScreenH * 2 * scaleH);
+		if (camEndX > scaledW) {
+			camStartX -= camEndY - scaledH;
+			camEndX = scaledW;
+		}
+		if (camEndY > scaledH) {
+			camStartY -= camEndY - scaledH;
+			camEndY = scaledH;
+		}
 
 		// The visible area circles
 		foreach (var spot in revealedSpots) {
@@ -1027,8 +1045,12 @@ public class GameMode {
 			if (gameObject is not Geometry geometry) {
 				continue;
 			}
+			Color blockColor = new Color(128, 128, 255);
 			if (gameObject is not Wall and not KillZone) {
 				continue;
+			}
+			if (gameObject is KillZone) {
+				blockColor = new Color(255, 128, 128);
 			}
 			Shape shape = geometry.collider.shape;
 			float pxPos = shape.minX * scaleH;
@@ -1042,7 +1064,7 @@ public class GameMode {
 				myPos = 1;
 			}
 			RectangleShape wRect = new RectangleShape();
-			wRect.FillColor = new Color(128, 128, 255);
+			wRect.FillColor = blockColor;
 			wRect.Position = new Vector2f(pxPos, pyPos);
 			wRect.Size = new Vector2f(mxPos, myPos);
 			Global.radarRenderTexture.Draw(wRect);

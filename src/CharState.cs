@@ -233,7 +233,7 @@ public class CharState {
 			sprite = airSprite;
 			int oldFrameIndex = character.sprite.frameIndex;
 			float oldFrameTime = character.sprite.frameTime;
-			character.changeSprite(sprite, false);
+			character.changeSpriteFromName(sprite, false);
 			if (oldFrameIndex < character.sprite.totalFrameNum) {
 				character.sprite.frameIndex = oldFrameIndex;
 				character.sprite.frameTime = oldFrameTime;
