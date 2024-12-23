@@ -41,18 +41,6 @@ public class CrystalHunter : Weapon {
 		if (chargeLevel < 3) {
 			new CrystalHunterProj(this, pos, xDir, player, player.getNextActorNetId(), rpc: true);
 		} else {
-			int amount = Global.level.chargedCrystalHunters.Count(c => c.owner == player);
-			if (amount >= 1) {
-				for (int i = Global.level.chargedCrystalHunters.Count - 1; i >= 0; i--) {
-					var cch = Global.level.chargedCrystalHunters[i];
-					if (cch.owner == player) {
-						cch.destroySelf();
-						amount--;
-						if (amount < 2) break;
-					}
-				}
-			}
-
 			new CrystalHunterCharged(pos, player, player.getNextActorNetId(), player.ownedByLocalPlayer, sendRpc: true);
 		}
 	}
@@ -143,8 +131,11 @@ public class CrystalHunterCharged : Actor {
 			timeSlowShader.SetUniform("x", normalizedCoords.x);
 			timeSlowShader.SetUniform("y", normalizedCoords.y);
 			timeSlowShader.SetUniform("t", Global.time);
-			if (Global.viewSize == 2) timeSlowShader.SetUniform("r", 0.25f);
-			else timeSlowShader.SetUniform("r", 0.5f);
+			if (Global.viewSize == 2) {
+				timeSlowShader.SetUniform("r", 0.25f * (drawRadius / 60f));
+			} else {
+				timeSlowShader.SetUniform("r", 0.5f * (drawRadius / 130f));
+			}
 		}
 
 		if (timeSlowShader == null) {
@@ -164,23 +155,28 @@ public class CrystalHunterCharged : Actor {
 
 	public override void render(float x, float y) {
 		base.render(x, y);
-		if (timeSlowShader == null) {
-			var fillColor = new Color(96, 80, 240, Helpers.toByte(drawAlpha));
-			var lineColor = new Color(208, 200, 240, Helpers.toByte(drawAlpha));
-			if (owner.alliance == GameMode.redAlliance && Global.level?.gameMode?.isTeamMode == true) {
-				fillColor = new Color(240, 80, 96, Helpers.toByte(drawAlpha));
-			}
 
-			//if (Global.isOnFrameCycle(20))
-			{
-				DrawWrappers.DrawCircle(pos.x, pos.y, drawRadius, true, fillColor, 0, ZIndex.Character - 1, pointCount: 50u);
-				//DrawWrappers.DrawCircle(pos.x, pos.y, drawRadius, false, new Color(208, 200, 240, Helpers.toByte(drawAlpha)), 1f, ZIndex.Character - 1, pointCount: 50u);
+		Color fillColor = new Color(96, 80, 240, 48);
+		Color lineColor = new Color(208, 200, 240, 128);
+		if (owner.alliance != Global.level.mainPlayer.alliance) {
+			Level level = Global.level;
+			if (level != null && level.gameMode?.isTeamMode == true) {
+				fillColor = new Color(240, 80, 96, 48);
 			}
-
-			float randY = Helpers.randomRange(-1f, 1f);
-			float xLen = MathF.Sqrt(1 - MathF.Pow(randY, 2)) * drawRadius;
-			float randThickness = Helpers.randomRange(0.5f, 2f);
-			DrawWrappers.DrawLine(pos.x - xLen, pos.y + randY * drawRadius, pos.x + xLen, pos.y + randY * drawRadius, lineColor, randThickness, ZIndex.Character - 1);
 		}
+		float lineRadius = drawRadius - 8;
+		Color color = fillColor;
+		long depth = ZIndex.Backwall + 10;
+		uint? pointCount = 25;
+		DrawWrappers.DrawCircle(
+			 pos.x + x, pos.y + y, lineRadius, filled: true, color, 0f, depth, isWorldPos: true, null, pointCount
+		);
+		float randY = Helpers.randomRange(-1f, 1f);
+		float xLen = MathF.Sqrt(1f - MathF.Pow(randY, 2)) * lineRadius;
+		float randThickness = Helpers.randomRange(0.5f, 2f);
+		DrawWrappers.DrawLine(
+			pos.x - xLen, pos.y + randY * lineRadius, pos.x + xLen, pos.y + randY * lineRadius,
+			lineColor, randThickness, -2000001L
+		);
 	}
 }
