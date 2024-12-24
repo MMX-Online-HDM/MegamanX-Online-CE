@@ -1851,7 +1851,7 @@ public partial class Player {
 		}
 		
 		if (Global.level?.server?.customMatchSettings != null) {
-			currency += Global.level.server.customMatchSettings.currencyGain;
+			currency *= Global.level.server.customMatchSettings.currencyGain;
 		} else currency++;
 	}
 
