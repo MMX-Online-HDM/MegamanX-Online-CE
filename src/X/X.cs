@@ -100,6 +100,7 @@ public class MegamanX : Character {
 	public float stingPaletteTime;
 	// Other.
 	public float weaknessCooldown;
+	public float aiAttackCooldown;
 
 	// Creation code.
 	public MegamanX(
@@ -150,7 +151,7 @@ public class MegamanX : Character {
 		Helpers.decrementFrames(ref shootCooldown);
 		Helpers.decrementFrames(ref barrierCooldown);
 		Helpers.decrementFrames(ref specialSaberCooldown);
-
+		Helpers.decrementFrames(ref aiAttackCooldown);
 		// For the shooting animation.
 		if (shootAnimTime > 0 && sprite.name == getSprite(charState.shootSprite)) {
 			shootAnimTime -= speedMul;
@@ -865,4 +866,93 @@ public class MegamanX : Character {
 		hyperHelmetActive = armorBoolData[3];
 		hasUltimateArmor = armorBoolData[4];
 	}
+	public override void aiAttack(Actor? target) {
+		bool isTargetInAir = pos.y < target?.pos.y - 20;
+		bool isTargetClose = pos.x < target?.pos.x - 10;
+		bool isFacingTarget = (pos.x < target?.pos.x && xDir == 1) || (pos.x >= target?.pos.x && xDir == -1);
+		int Xattack = Helpers.randomRange(0, 7);
+		if (charState.normalCtrl) {
+			player.press(Control.Shoot);
+		} 
+		if (canShoot() && canChangeWeapons() && player != null &&
+		 charState is not LadderClimb && player.weapon != null && aiAttackCooldown <= 0) {
+			switch (Xattack) {
+				case 0 when getMaxChargeLevel() >= 3 && isFacingTarget:
+					player.release(Control.Shoot);		
+					break;
+				case 1 when target is MegamanX or Axl or Vile or NeoSigma && hasHadoukenEquipped() && canUseFgMove() && isTargetClose: 
+					player.currency -= 3;
+					changeState(new Hadouken(), true);
+					break;
+				case 2 when isTargetInAir && isTargetClose && hasShoryukenEquipped() && canUseFgMove():
+					player.currency -= 3;
+					changeState(new Shoryuken(isUnderwater()), true);
+					break;
+				case 3 when !hasAnyArmor && specialSaberCooldown <= 0:
+					specialSaberCooldown = 60;
+					changeState(new X6SaberState(grounded), true);
+					break;
+				case 4 when hasUltimateArmor:
+					int novaStrikeSlot = player.weapons.FindIndex(w => w is HyperNovaStrike);
+					player.changeWeaponSlot(novaStrikeSlot);
+					if (player.weapon.ammo >= 16) {
+						player.press(Control.Shoot);
+					} else { player.changeWeaponSlot(getRandomWeaponIndex()); }
+					break;
+				case 5 when player.hasBodyArmor(2):
+					int gCrushSlot = player.weapons.FindIndex(w => w is GigaCrush);			
+					player.changeWeaponSlot(gCrushSlot);
+					if (player.weapon.ammo >= 28)
+						player.press(Control.Shoot);
+					else {
+						player.changeWeaponSlot(getRandomWeaponIndex());
+					}
+					break;
+				case 6 when player.hasArmArmor(3):
+					int hyperbuster = player.weapons.FindIndex(w => w is HyperCharge);
+					player.changeWeaponSlot(hyperbuster);
+					if (player.weapon.ammo >= 16) {
+						player.press(Control.Shoot);
+						player.release(Control.Shoot);
+					} else { player.changeWeaponSlot(getRandomWeaponIndex()); }
+					break;
+				case 7 when stockedBuster || stockedMaxBuster || stockedSaber:
+					player.press(Control.Shoot);
+					player.release(Control.Shoot);
+					break;
+				default:
+					player.release(Control.Shoot);
+					break;
+			}
+			aiAttackCooldown = 10;
+		}
+		base.aiAttack(target);
+	}
+	public override void aiDodge(Actor? target) {
+		int RollingShield = player.weapons.FindIndex(w => w is RollingShield);
+		int novaStrikeSlot = player.weapons.FindIndex(w => w is HyperNovaStrike);
+		foreach (GameObject gameObject in getCloseActors(64, true, false, false)) {
+			if (player != null && player.weapon != null &&
+			aiAttackCooldown <= 0 && gameObject is Projectile proj && 
+			proj.damager.owner.alliance != player.alliance) {
+				if (player.weapon.ammo > 0) {
+					player.changeWeaponSlot(RollingShield);
+					player.press(Control.Shoot);
+					player.release(Control.Shoot);
+				} else if (hasUltimateArmor) {
+					player.changeWeaponSlot(novaStrikeSlot);
+					if (player.weapon.ammo >= 16) {
+						player.press(Control.Shoot);
+					} else { player.changeWeaponSlot(getRandomWeaponIndex()); }
+				}
+			}
+		}
+		base.aiDodge(target);
+	}
+	public override void aiUpdate() {
+		//Buying UAX and Golden Armor goes here
+		base.aiUpdate();
+	}
+
+
 }

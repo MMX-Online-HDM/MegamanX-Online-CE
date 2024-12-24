@@ -3234,12 +3234,18 @@ public partial class Character : Actor, IDamagable {
 		chargeGfx();
 	}
 
-	public virtual void aiUpdate(Actor? target) { }
+	public virtual void aiUpdate() { }
 
-	public virtual void aiAttack(Actor target) { }
+	public virtual void aiAttack(Actor? target) { }
 
 	public virtual void aiDodge(Actor? target) { }
 
+	public int getRandomWeaponIndex() {
+		if (player.weapons.Count == 0) return 0;
+		List<Weapon> weapons = player.weapons.FindAll(w => w is not DNACore).ToList();
+		return weapons.IndexOf(weapons.GetRandomItem());
+	}
+	
 	public override List<byte> getCustomActorNetData() {
 		List<byte> customData = new();
 

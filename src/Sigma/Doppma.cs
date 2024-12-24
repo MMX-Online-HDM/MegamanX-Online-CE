@@ -29,6 +29,7 @@ public class Doppma : BaseSigma {
 		fireballWeapon.update();
 		Helpers.decrementTime(ref fireballCooldown);
 		Helpers.decrementTime(ref shieldCooldown);
+		Helpers.decrementFrames(ref aiAttackCooldown);
 		// For ladder and slide shoot.
 		if (charState is WallSlide or LadderClimb &&
 			!string.IsNullOrEmpty(charState?.shootSprite) &&
@@ -142,5 +143,47 @@ public class Doppma : BaseSigma {
 		}
 		shaders.AddRange(baseShaders);
 		return shaders;
+	}
+	public float aiAttackCooldown;
+	public override void aiAttack(Actor? target) {
+		bool isTargetInAir = pos.y < target?.pos.y - 20;
+		bool isTargetClose = pos.x < target?.pos.x - 10;
+		bool isFacingTarget = (pos.x < target?.pos.x && xDir == 1) || (pos.x >= target?.pos.x && xDir == -1);
+		if (currentWeapon is MaverickWeapon mw &&
+			mw.maverick == null && canAffordMaverick(mw)
+		) {
+			buyMaverick(mw);
+			if (mw.maverick != null) {
+				changeState(new CallDownMaverick(mw.maverick, true, false), true);
+			}
+			mw.summon(player, pos.addxy(0, -112), pos, xDir);
+			player.changeToSigmaSlot();
+		}
+		if (charState is not LadderClimb) {
+			int DoppmaSigmaAttack = Helpers.randomRange(0, 4);
+			if (isTargetInAir) DoppmaSigmaAttack = 1;
+			if (charState?.isGrabbedState == false && !player.isDead && aiAttackCooldown <= 0 &&
+				!isInvulnerable() && !(charState is CallDownMaverick or SigmaThrowShieldState or Sigma3Shoot)) {
+				switch (DoppmaSigmaAttack) {
+					case 0 when isFacingTarget:
+						player.press(Control.Shoot);
+						break;
+					case 1 when isFacingTarget:
+						player.press(Control.Special1);
+						break;
+					case 2:
+						player.changeWeaponSlot(1);			
+						break;
+					case 3:
+						player.changeWeaponSlot(2);					
+						break;
+					case 4:
+						player.changeWeaponSlot(0);
+						break;
+				}
+				aiAttackCooldown = 20;
+			}
+		}
+		base.aiAttack(target);
 	}
 }

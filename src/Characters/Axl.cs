@@ -2045,4 +2045,41 @@ public class Axl : Character {
 
 		netAxlArmSpriteIndex = BitConverter.ToUInt16(data[5..7]);
 	}
+	public override void aiAttack(Actor? target) {
+		if (axlHyperMode == 0 && player.currency >= 10 && !player.isDead && !isInvulnerable() 
+			&& !(isWhiteAxl() || isStealthMode()) && charState.attackCtrl) {
+			changeState(new HyperAxlStart(grounded), true);
+		}
+		if (axlHyperMode == 1 && player.currency >= 10 && !player.isDead && !isInvulnerable() 
+			&& !(isWhiteAxl() || isStealthMode()) && charState.attackCtrl) {
+			stingChargeTime = 12;
+		}
+		int AAttack = Helpers.randomRange(0, 1);
+		if (canShoot() && player?.weapon?.ammo > 0 && player.axlWeapon != null
+			&& !player.isDead && canChangeWeapons() && charState.attackCtrl) {
+			switch (AAttack) {
+				case 0:
+					player.press(Control.Shoot);
+					break;
+				case 1 when player.weapon is not IceGattling or PlasmaGun:
+					player.press(Control.Special1);
+					break;
+			}
+		}
+		base.aiAttack(target);
+	}
+	public override void aiDodge(Actor? target) {
+		foreach (GameObject gameObject in getCloseActors(32, true, false, false)) {
+			if (gameObject is Projectile proj && proj.damager.owner.alliance != player?.alliance) {
+				if (grounded && canDash() && charState is not DodgeRoll && dodgeRollCooldown <= 0 && charState.normalCtrl) {
+					changeState(new DodgeRoll());
+					dodgeRollCooldown = maxDodgeRollCooldown;
+				} else if (currentWeapon is FlameBurner && player?.axlLoadout.flameBurnerAlt == 1 &&
+				 (proj is not GenericMeleeProj || (proj.reflectableFBurner == true)) && player?.weapon?.ammo > 0) {
+					player.press(Control.Special1);
+				}
+			}
+		}
+		base.aiDodge(target);
+	}
 }

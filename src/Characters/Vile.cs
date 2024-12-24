@@ -75,7 +75,7 @@ public class Vile : Character {
 		vulcanWeapon = new Vulcan((VulcanType)vileLoadout.vulcan);
 		cannonWeapon = new VileCannon((VileCannonType)vileLoadout.cannon);
 		missileWeapon = new VileMissile((VileMissileType)vileLoadout.missile);
-		rocketPunchWeapon = new RocketPunch((RocketPunchType)vileLoadout.vulcan);
+		rocketPunchWeapon = new RocketPunch((RocketPunchType)vileLoadout.rocketPunch);
 		napalmWeapon = new Napalm((NapalmType)vileLoadout.napalm);
 		grenadeWeapon = new VileBall((VileBallType)vileLoadout.ball);
 		cutterWeapon = new VileCutter((VileCutterType)vileLoadout.cutter);
@@ -197,6 +197,7 @@ public class Vile : Character {
 		Helpers.decrementTime(ref grabCooldown);
 		Helpers.decrementTime(ref mechBusterCooldown);
 		Helpers.decrementTime(ref gizmoCooldown);
+		Helpers.decrementFrames(ref aiAttackCooldown);
 
 
 		if (charState is InRideChaser) {
@@ -790,5 +791,60 @@ public class Vile : Character {
 		bool[] boolData = Helpers.byteToBoolArray(data[0]);
 		player.frozenCastle = boolData[0];
 		player.speedDevil = boolData[1];
+	}
+	public float aiAttackCooldown;
+	public override void aiAttack(Actor? target) {
+		int Vattack = Helpers.randomRange(1, 9);
+		bool isFacingTarget = (pos.x < target?.pos.x && xDir == 1) || (pos.x >= target?.pos.x && xDir == -1);
+		if (!charState.isGrabbedState && !player.isDead && !isInvulnerableAttack()
+			&& !(charState is VileRevive or HexaInvoluteState or NecroBurstAttack
+			or StraightNightmareAttack or RisingSpecterState or VileMK2GrabState 
+			or GenericStun or Hurt or Die) && aiAttackCooldown <= 0) {
+			if (isVileMK2 && charState is Dash or AirDash && isFacingTarget) {
+				player.press(Control.Special1);
+			}
+			switch (Vattack) {
+				case 1 when isFacingTarget:
+					cannonWeapon.vileShoot(WeaponIds.FrontRunner, this);
+					break;
+				case 2 when isFacingTarget:
+					rocketPunchWeapon.vileShoot(WeaponIds.RocketPunch, this);
+					break;
+				case 3 when !grounded:
+					grenadeWeapon.vileShoot(WeaponIds.VileBomb, this);
+					break;
+				case 4 when isFacingTarget:
+					missileWeapon.vileShoot(WeaponIds.ElectricShock, this);
+					break;
+				case 5 when isFacingTarget:
+					cutterWeapon.vileShoot(WeaponIds.VileCutter, this);
+					break;
+				case 6 when grounded:
+					napalmWeapon.vileShoot(WeaponIds.Napalm, this);
+					break;
+				case 7 when charState is Fall:
+					flamethrowerWeapon.vileShoot(WeaponIds.VileFlamethrower, this);
+					break;
+				case 8 when player.vileAmmo >= 24 && !player.isMainPlayer && isFacingTarget:
+					laserWeapon.vileShoot(WeaponIds.VileLaser, this);
+					break;
+				case 9 when isVileMK5 && player.vileAmmo >= 20 && !player.isMainPlayer:
+					changeState(new HexaInvoluteState(), true);
+					break;
+			}
+			aiAttackCooldown = 20;
+		}
+		base.aiAttack(target);
+	}
+	public override void aiUpdate() {
+		if (!player.isMainPlayer) {
+			if (player.canReviveVile() && isVileMK1) {
+				player.reviveVile(false);
+			}
+			if (isVileMK2 && player.canReviveVile()) {
+				player.reviveVile(true);
+			}
+		}
+		base.aiUpdate();
 	}
 }

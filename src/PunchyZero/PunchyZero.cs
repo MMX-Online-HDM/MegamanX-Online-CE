@@ -105,6 +105,7 @@ public class PunchyZero : Character {
 		Helpers.decrementFrames(ref dashAttackCooldown);
 		Helpers.decrementFrames(ref diveKickCooldown);
 		Helpers.decrementFrames(ref uppercutCooldown);
+		Helpers.decrementFrames(ref aiAttackCooldown);
 		gigaAttack.update();
 		gigaAttack.charLinkedUpdate(this, true);
 		base.update();
@@ -496,6 +497,9 @@ public class PunchyZero : Character {
 		if (isInvulnerableAttack()) return false;
 		return base.canShoot();
 	}
+	public bool hypermodeActive() {
+		return isBlack || isAwakened || isViral;
+	}
 
 	public override List<ShaderWrapper> getShaders() {
 		List<ShaderWrapper> baseShaders = base.getShaders();
@@ -781,5 +785,87 @@ public class PunchyZero : Character {
 		if (flags[0]) {
 			hypermodeBlink = data[2];
 		}
+	}
+	
+	public float aiAttackCooldown;
+	public override void aiAttack(Actor? target) {
+		bool isTargetInAir = pos.y < target?.pos.y - 20;
+		bool isTargetClose = pos.x < target?.pos.x - 10;
+		bool canHitMaxCharge = (!isTargetInAir && getChargeLevel() >= 4);
+		bool isFacingTarget = (pos.x < target?.pos.x && xDir == 1) || (pos.x >= target?.pos.x && xDir == -1);
+		if (player.currency >= Player.zeroHyperCost && !isInvulnerable() &&
+		   charState is not (HyperPunchyZeroStart or LadderClimb) && !hypermodeActive() && !player.isMainPlayer
+		) {
+			changeState(new HyperPunchyZeroStart(), true);
+		}
+		int ZKattack = Helpers.randomRange(0, 6);
+		if (!isInvulnerable() && charState is not LadderClimb && aiAttackCooldown <= 0 && charState.attackCtrl) {
+			switch (ZKattack) {
+				case 0 when grounded && isFacingTarget:
+					changeState(new PZeroPunch1(), true);
+					break;
+				case 1 when grounded && isFacingTarget:
+					changeState(new PZeroShoryuken(), true);
+					break;
+				case 2 when charState is Dash:
+					changeState(new PZeroSpinKick(), true);
+					break;
+				case 3 when grounded && gigaAttack.ammo >= 16:
+					changeState(new Rakuhouha(gigaAttack), true);
+					gigaAttack.addAmmo(-16, player);
+					break;
+				case 4 when grounded && isFacingTarget:
+					changeState(new PZeroYoudantotsu(), true);
+					break;
+				case 5 when charState is Fall:
+					changeState(new PZeroDiveKickState(), true);
+					break;
+				case 6 when charState is Jump or Fall:
+					changeState(new PZeroKick(), true);
+					break;
+			}
+			aiAttackCooldown = 10;
+		}
+		base.aiAttack(target);
+	}
+	public override void aiDodge(Actor? target) {
+		foreach (GameObject gameObject in getCloseActors(48, true, false, false)) {
+			if (gameObject is Projectile proj&& proj.damager.owner.alliance != player.alliance && charState.attackCtrl) {
+				//Projectile is not 
+				if (!(proj.projId == (int)ProjIds.RollingShieldCharged || proj.projId == (int)ProjIds.RollingShield
+					|| proj.projId == (int)ProjIds.MagnetMine || proj.projId == (int)ProjIds.FrostShield || proj.projId == (int)ProjIds.FrostShieldCharged
+					|| proj.projId == (int)ProjIds.FrostShieldAir || proj.projId == (int)ProjIds.FrostShieldChargedPlatform || proj.projId == (int)ProjIds.FrostShieldPlatform)
+				) {
+					if (gigaAttack.shootCooldown <= 0 && grounded) {
+						switch (gigaAttack) {
+							case RekkohaWeapon when gigaAttack.ammo >= 28:
+								gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
+								changeState(new Rekkoha(gigaAttack), true);
+								break;
+							case CFlasher when gigaAttack.ammo >= 7:
+								gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
+								changeState(new Rakuhouha(new CFlasher()), true);
+								break;
+							case RakuhouhaWeapon when gigaAttack.ammo >= 14:
+								gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
+								changeState(new Rakuhouha(new RakuhouhaWeapon()), true);
+								break;
+							case DarkHoldWeapon when gigaAttack.ammo >= 14 && isViral:
+								gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
+								changeState(new Rakuhouha(new DarkHoldWeapon()), true);
+								break;
+							case ShinMessenkou when gigaAttack.ammo >= 14 && isAwakened:
+								gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
+								changeState(new Rakuhouha(new ShinMessenkou()), true);
+								break;
+						}
+					} else if (!(proj.projId == (int)ProjIds.SwordBlock) && grounded) {
+					turnToInput(player.input, player);
+					changeState(new PZeroParry(), true);
+				}
+				}
+			}
+		}
+		base.aiDodge(target);
 	}
 }

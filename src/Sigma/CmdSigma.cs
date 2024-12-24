@@ -32,6 +32,7 @@ public class CmdSigma : BaseSigma {
 		Helpers.decrementTime(ref saberCooldown);
 		Helpers.decrementTime(ref leapSlashCooldown);
 		Helpers.decrementFrames(ref sigmaAmmoRechargeCooldown);
+		Helpers.decrementFrames(ref aiAttackCooldown);
 		// Ammo reload.
 		if (sigmaAmmoRechargeCooldown == 0) {
 			Helpers.decrementFrames(ref sigmaAmmoRechargeTime);
@@ -159,5 +160,59 @@ public class CmdSigma : BaseSigma {
 
 		// Per-player data.
 		player.sigmaAmmo = data[0];
+	}
+	public float aiAttackCooldown;
+	public override void aiAttack(Actor? target) {
+		bool isTargetInAir = pos.y < target?.pos.y - 20;
+		bool isTargetClose = pos.x < target?.pos.x - 10;
+		if (currentWeapon is MaverickWeapon mw &&
+			mw.maverick == null && canAffordMaverick(mw)
+		) {
+			buyMaverick(mw);
+			if (mw.maverick != null) {
+				changeState(new CallDownMaverick(mw.maverick, true, false), true);
+			}
+			mw.summon(player, pos.addxy(0, -112), pos, xDir);
+			player.changeToSigmaSlot();
+		}
+		if (charState is not LadderClimb) {
+			int Sattack = Helpers.randomRange(0, 5);
+			if (charState?.isGrabbedState == false && !player.isDead
+				&& !isInvulnerable() && !(charState is CallDownMaverick or SigmaSlashState)
+				&& aiAttackCooldown <= 0) {
+				switch (Sattack) {
+					case 0 when isTargetClose:
+						changeState(new SigmaSlashState(charState), true);
+						break;
+					case 1 when isTargetInAir:
+						changeState(new SigmaBallShoot(), true);
+						break;
+					case 2 when charState is Dash && grounded:
+						changeState(new SigmaWallDashState(xDir, true), true);
+						break;
+					case 3:
+						player.changeWeaponSlot(1);						
+						break;
+					case 4:
+						player.changeWeaponSlot(2);
+						break;
+					case 5:
+						player.changeWeaponSlot(0);
+						break;
+				}
+				aiAttackCooldown = 18;
+			}
+		}
+		base.aiAttack(target);
+	}
+	public override void aiDodge(Actor? target) {
+		foreach (GameObject gameObject in getCloseActors(32, true, false, false)) {
+			if (gameObject is Projectile proj && proj.damager.owner.alliance != player.alliance) {
+				if (!(proj.projId == (int)ProjIds.SwordBlock)) {
+						changeState(new SigmaBlock(), true);
+				}
+			}
+		}
+		base.aiDodge(target);
 	}
 }
