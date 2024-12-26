@@ -151,9 +151,7 @@ public class ShotgunIceProjCharged : Projectile {
 		0, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = isChillP ? (int)ProjIds.ChillPIceBlow : (int)ProjIds.ShotgunIceCharged;
-
 		shouldShieldBlock = false;
-
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}

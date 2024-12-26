@@ -174,6 +174,7 @@ public class MegamanX : Character {
 		if (!ownedByLocalPlayer) {
 			return;
 		}
+		chargedParasiticBomb?.update();
 		gigaWeapon?.update();
 		hyperNovaStrike?.update();
 		itemTracer?.update();
@@ -299,15 +300,17 @@ public class MegamanX : Character {
 			} else if (chargeLevel < 3) {
 				stockedBuster = false;
 			}
-			if (charState.normalCtrl && charState.attackCtrl) {
+			if (!weapon.hasCustomChargeAnim && charState.normalCtrl && charState.attackCtrl) {
 				useCrossShotAnim = true;
 			} else {
 				chargeLevel = 3;
 			}
 		}
 		// Changes to shoot animation and gets sound.
-		setShootAnim();
-		shootAnimTime = DefaultShootAnimTime;
+		if (chargeLevel < 3 || !weapon.hasCustomChargeAnim) {
+			setShootAnim();
+			shootAnimTime = DefaultShootAnimTime;
+		}
 		string shootSound = weapon.shootSounds[chargeLevel];
 		// Shoot.
 		if (useCrossShotAnim) {
@@ -412,6 +415,7 @@ public class MegamanX : Character {
 	public override bool canShoot() {
 		if (isInvulnerableAttack() ||
 			hasLastingProj() && !stockedBuster && !stockedMaxBuster && !stockedSaber ||
+			hasLockingProj() ||
 			shootCooldown > 0 ||
 			invulnTime > 0 ||
 			linkedTriadThunder != null
@@ -422,7 +426,7 @@ public class MegamanX : Character {
 	}
 
 	public override bool canCharge() {
-		return !isInvulnerableAttack() && !hasLastingProj();
+		return !isInvulnerableAttack() && !hasLockingProj();
 	}
 
 	public override void increaseCharge() {
@@ -553,6 +557,15 @@ public class MegamanX : Character {
 			chargedFrostShield?.destroyed == false ||
 			chargedTornadoFang?.destroyed == false ||
 			strikeChainProj?.destroyed == false
+		);
+	}
+
+	public bool hasLockingProj() {
+		return (
+			chargedFrostShield?.destroyed == false ||
+			chargedTornadoFang?.destroyed == false ||
+			chargedSpinningBlade?.destroyed == false ||
+			linkedTriadThunder?.destroyed == false
 		);
 	}
 

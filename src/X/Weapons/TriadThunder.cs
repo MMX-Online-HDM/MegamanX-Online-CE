@@ -22,6 +22,7 @@ public class TriadThunder : Weapon {
 		FlinchCD = "2.25/0";
 		maxAmmo = 10;
 		ammo = maxAmmo;
+		hasCustomChargeAnim = true;
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {

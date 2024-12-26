@@ -28,7 +28,7 @@ public class TornadoFang : Weapon {
 			if (doubleShootCooldown > 0) { return 2; }
 			else { return 1; }
 		}
-		return 8;
+		return 0;
 	}
 
 	public override void update() {
