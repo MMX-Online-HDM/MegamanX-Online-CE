@@ -8,6 +8,7 @@ public class MegamanX : Character {
 	// Shoot variables.
 	public float shootCooldown;
 	public int lastShootPressed;
+	public bool bufferedShotPressed => lastShootPressed < 6 || player.input.isPressed(Control.Shoot, player);
 	public float specialSaberCooldown;
 	public XBuster specialBuster;
 	public int specialButtonMode;
@@ -149,6 +150,9 @@ public class MegamanX : Character {
 		Helpers.decrementFrames(ref shootCooldown);
 		Helpers.decrementFrames(ref barrierCooldown);
 		Helpers.decrementFrames(ref specialSaberCooldown);
+		if (lastShootPressed < 100) {
+			lastShootPressed++;
+		}
 
 		// Strike chain extending the shoot anim.
 		if (hasLastingProj() && shootAnimTime > 0) {
@@ -174,6 +178,9 @@ public class MegamanX : Character {
 		if (!ownedByLocalPlayer) {
 			return;
 		}
+		if (player.input.isPressed(Control.Shoot, player)) {
+			lastShootPressed = 6;
+		}
 		chargedParasiticBomb?.update();
 		gigaWeapon?.update();
 		hyperNovaStrike?.update();
@@ -197,6 +204,9 @@ public class MegamanX : Character {
 		}
 		else if (stockedBuster) {
 			addRenderEffect(RenderEffectType.ChargePink, 2, 6);
+		}
+		if (!charState.normalCtrl) {
+			lastShootPressed = 100;	
 		}
 	}
 
@@ -256,11 +266,11 @@ public class MegamanX : Character {
 			changeState(new X6SaberState(grounded), true);
 			return true;
 		}
-		if (player.input.isPressed(Control.Shoot, player) && stockedMaxBuster) {
+		if (bufferedShotPressed && stockedMaxBuster) {
 			shoot(1, specialBuster, false);
 			return true;
 		}
-		if (player.input.isPressed(Control.Shoot, player) && stockedBuster) {
+		if (bufferedShotPressed && stockedBuster) {
 			shoot(1, currentWeapon, true);
 			return true;
 		}
@@ -284,6 +294,7 @@ public class MegamanX : Character {
 	}
 
 	public void shoot(int chargeLevel, Weapon weapon, bool busterStock) {
+		lastShootPressed = 100;
 		// Check if can shoot.
 		if (shootCooldown > 0 ||
 			weapon == null ||

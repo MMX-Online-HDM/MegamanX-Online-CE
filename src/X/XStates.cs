@@ -446,6 +446,7 @@ public class X2ChargeShot : CharState {
 		}  else {
 			character.shootAnimTime = 20 - character.animTime;
 		}
+		mmx.lastShootPressed = 100;
 		base.onExit(newState);
 	}
 }

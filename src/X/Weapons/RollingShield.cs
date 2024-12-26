@@ -5,6 +5,7 @@ namespace MMXOnline;
 
 public class RollingShield : Weapon {
 	public static RollingShield netWeapon = new();
+	public bool freeAmmoNextCharge;
 
 	public RollingShield() : base() {
 		index = (int)WeaponIds.RollingShield;
@@ -18,6 +19,17 @@ public class RollingShield : Weapon {
 		damage = "2/1";
 		effect = "Mobile Shield That Deletes Projectiles.";
 		hitcooldown = "0/0.33";	
+	}
+
+	public override float getAmmoUsage(int chargeLevel) {
+		if (chargeLevel >= 3) {
+			if (freeAmmoNextCharge) {
+				freeAmmoNextCharge = false;
+				return 0;
+			}
+			return 8;
+		}
+		return 1;
 	}
 
 	public override void shoot(Character character, int[] args) {
@@ -38,6 +50,7 @@ public class RollingShield : Weapon {
 				);
 			} else {
 				mmx.specialBuster.shoot(character, [3, 1]);
+				freeAmmoNextCharge = true;
 			}
 		}
 	}

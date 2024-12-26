@@ -134,7 +134,7 @@ public class CrystalHunterCharged : Actor {
 			if (Global.viewSize == 2) {
 				timeSlowShader.SetUniform("r", 0.25f * (drawRadius / 60f));
 			} else {
-				timeSlowShader.SetUniform("r", 0.5f * (drawRadius / 130f));
+				timeSlowShader.SetUniform("r", 0.5f * (drawRadius / 120f));
 			}
 		}
 
@@ -156,20 +156,23 @@ public class CrystalHunterCharged : Actor {
 	public override void render(float x, float y) {
 		base.render(x, y);
 
-		Color fillColor = new Color(96, 80, 240, 48);
+		Color fillColor = new Color(99, 82, 247, 32);
+		Color outlineColor = new Color(66, 49, 247, 32);
 		Color lineColor = new Color(208, 200, 240, 128);
 		if (owner.alliance != Global.level.mainPlayer.alliance) {
 			Level level = Global.level;
 			if (level != null && level.gameMode?.isTeamMode == true) {
-				fillColor = new Color(240, 80, 96, 48);
+				fillColor = new Color(247, 82, 99, 32);
+				outlineColor = new Color(247, 49, 66, 32);
 			}
 		}
 		float lineRadius = drawRadius - 8;
 		Color color = fillColor;
-		long depth = ZIndex.Backwall + 10;
+		long depth = ZIndex.Foreground + 10;
 		uint? pointCount = 25;
 		DrawWrappers.DrawCircle(
-			 pos.x + x, pos.y + y, lineRadius, filled: true, color, 0f, depth, isWorldPos: true, null, pointCount
+			 pos.x + x, pos.y + y, lineRadius - 4, filled: true,
+			 color, 4, depth, isWorldPos: true, outlineColor, pointCount
 		);
 		float randY = Helpers.randomRange(-1f, 1f);
 		float xLen = MathF.Sqrt(1f - MathF.Pow(randY, 2)) * lineRadius;
