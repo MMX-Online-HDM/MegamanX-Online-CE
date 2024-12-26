@@ -82,14 +82,17 @@ public class BubbleSplash : Weapon {
 				bubblesOnField.Add(proj);
 			}
 		} else if (chargeLevel >= 3 && character is MegamanX mmx) {
-			//player.setNextActorNetId(player.getNextActorNetId());
-			mmx.popAllBubbles();
-			for (int i = 0; i < 6; i++) {
-				var bubble = new BubbleSplashProjCharged(
-					this, pos, xDir, player, i, 
-					player.getNextActorNetId(true), true);
+			if (mmx.chargedBubbles.Count >= 5) {
+				mmx.specialBuster.shoot(character, [3, 1]);
+			} else {
+				mmx.popAllBubbles();
+				for (int i = 0; i < 6; i++) {
+					var bubble = new BubbleSplashProjCharged(
+						this, pos, xDir, player, i, 
+						player.getNextActorNetId(true), true);
 
-				mmx?.chargedBubbles?.Add(bubble);	
+					mmx?.chargedBubbles?.Add(bubble);	
+				}
 			}
 		}
 	}

@@ -390,6 +390,7 @@ public class X2ChargeShot : CharState {
 				if (weapon.shootSounds[3] != "") {
 					character.playSound(weapon.shootSounds[3], sendRpc: true);
 				}
+				weapon.addAmmo(-weapon.getAmmoUsageEX(3, character), player);
 			} else {
 				mmx.stockedBuster = false;
 				weapon.shoot(mmx, [4, 1]);
@@ -398,6 +399,7 @@ public class X2ChargeShot : CharState {
 				if (weapon.shootSounds[3] != "") {
 					character.playSound(weapon.shootSounds[3], sendRpc: true);
 				}
+				weapon.addAmmo(-weapon.getAmmoUsageEX(3, character), player);
 			}
 		}
 		if (character.isAnimOver()) {
@@ -430,13 +432,18 @@ public class X2ChargeShot : CharState {
 				sprite = "x2_air_shot2";
 			}
 		}
+		if (mmx.chargedTornadoFang != null) {
+			mmx.chargedTornadoFang = null;
+		}
 		character.changeSpriteFromName(sprite, true);
 	}
 
 	public override void onExit(CharState newState) {
-		if (newState is not AirDash && newState is not WallSlide) {
+		if (mmx.hasLastingProj()) {
+			character.shootAnimTime = 4;
+		} else if (newState is not AirDash and not WallSlide) {
 			character.shootAnimTime = 0;
-		} else {
+		}  else {
 			character.shootAnimTime = 20 - character.animTime;
 		}
 		base.onExit(newState);

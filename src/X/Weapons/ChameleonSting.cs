@@ -34,12 +34,16 @@ public class ChameleonSting : Weapon {
 		Point pos = character.getShootPos();
 		int xDir = character.getShootXDir();
 		Player player = character.player;
-		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
 
 		if (chargeLevel < 3) {
 			new StingProj(this, pos, xDir, player, 0, player.getNextActorNetId(), true);
 		} else {
-			mmx.stingActiveTime = 8;
+			MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
+			if (mmx.stingActiveTime == 0 && (args.Length == 1 || args[1] == 0)) {
+				mmx.stingActiveTime = 8;
+			} else {
+				mmx.specialBuster.shoot(character, [3, 1]);
+			}
 		}
 	}
 }

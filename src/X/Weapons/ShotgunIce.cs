@@ -19,6 +19,7 @@ public class ShotgunIce : Weapon {
 		effect = "U:Can Split.\nC: Insta Freeze enemies. Ice sled up to 12 DMG.";
 		hitcooldown = "0.01/0.5";
 		Flinch = "0";
+		hasCustomChargeAnim = true;
 	}
 
 	public override void shoot(Character character, int[] args) {

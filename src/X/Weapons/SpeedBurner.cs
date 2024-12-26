@@ -21,6 +21,7 @@ public class SpeedBurner : Weapon {
 		hitcooldown = "0-0.25/0";
 		Flinch = "0/26";
 		FlinchCD = "0/0.5";
+		hasCustomChargeAnim = true;
 	}
 
 	public override void shoot(Character character, int[] args) {
