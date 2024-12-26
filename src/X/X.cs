@@ -446,7 +446,11 @@ public class MegamanX : Character {
 	}
 
 	public override void onWeaponChange(Weapon oldWeapon, Weapon newWeapon) {
-		stingActiveTime = 0;
+		if (newWeapon is not ChameleonSting &&
+			(newWeapon is not HyperCharge || weapons[hyperChargeTarget] is not ChameleonSting)
+		) {
+			stingActiveTime = 0;
+		}
 	}
 
 	public override bool canAddAmmo() {
