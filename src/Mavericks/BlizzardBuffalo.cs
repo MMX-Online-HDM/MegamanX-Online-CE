@@ -474,8 +474,6 @@ public class BBuffaloDashState : MaverickState {
 		var hitWall = Global.level.checkTerrainCollisionOnce(maverick, maverick.xDir * 20, -5);
 		if (hitWall?.isSideWallHit() == true) {
 			crashAndDamage();
-			maverick.playSound("crash", sendRpc: true);
-			maverick.shakeCamera(sendRpc: true);
 			maverick.changeState(new MIdle());
 			return;
 		}
@@ -508,7 +506,7 @@ public class BBuffaloDashState : MaverickState {
 		*/
 
 		new BBuffaloCrashProj(maverick.weapon, maverick.pos, maverick.xDir, player, player.getNextActorNetId(), rpc: true);
-		maverick.playSound("crash", sendRpc: true);
+		maverick.playSound("crashX3", sendRpc: true);
 		maverick.shakeCamera(sendRpc: true);
 	}
 
