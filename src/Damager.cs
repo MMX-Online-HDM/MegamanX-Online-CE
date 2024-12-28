@@ -7,8 +7,8 @@ public class Damager {
 	public Player owner;
 	public float damage;
 	public float hitCooldownSeconds {
-		set => MathF.Ceiling(value / 60f);
-		get => hitCooldown * 60f;
+		set => MathF.Ceiling(value * 60f);
+		get => hitCooldown / 60f;
 	}
 	public float hitCooldown;
 	public int flinch; // Number of frames to flinch
