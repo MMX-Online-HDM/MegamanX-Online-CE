@@ -237,7 +237,9 @@ public partial class KaiserSigma : Character {
 				new Weapon(), pos, ProjIds.Sigma3KaiserSuit, player,
 				damage: 0, flinch: 0, hitCooldown: 60, isShield: true,
 				addToLevel: addToLevel
-			),
+			) {
+				lowPiority = true
+			},
 			MeleeIds.Stomp => new GenericMeleeProj(
 				new KaiserStompWeapon(player), pos, ProjIds.Sigma3KaiserStomp, player,
 				damage: 12, flinch: Global.defFlinch, hitCooldown: 60,

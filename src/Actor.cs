@@ -162,6 +162,7 @@ public partial class Actor : GameObject {
 
 	public float timeStopTime;
 	public bool highPiority;
+	public bool lowPiority;
 
 	public Actor(
 		string spriteName, Point pos, ushort? netId, bool ownedByLocalPlayer, bool dontAddToLevel
