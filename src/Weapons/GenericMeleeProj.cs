@@ -10,7 +10,7 @@ public class GenericMeleeProj : Projectile {
 		bool addToLevel = false, float? hitCooldownSeconds = null,
 		bool isZSaberEffect = false, bool isZSaberEffect2 = false, bool isZSaberEffect2B = false, bool isZSaberClang = false
 	) : base(
-		weapon, pos, 1, 0, 2, player, "empty", 0, 0.25f, null, player.ownedByLocalPlayer, addToLevel: addToLevel
+		weapon, pos, 1, 0, 2, player, "empty", 0, 0.5f, null, player.ownedByLocalPlayer, addToLevel: addToLevel
 	) {
 		destroyOnHit = false;
 		shouldVortexSuck = false;

@@ -753,104 +753,104 @@ public class Zero : Character {
 		return id switch {
 			// Ground
 			(int)MeleeIds.HuSlash => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.ZSaber1, player, 2, 0, 0.25f, isReflectShield: true,
+				meleeWeapon, projPos, ProjIds.ZSaber1, player, 2, 0, 15, isReflectShield: true,
 				isZSaberEffect2: true, isZSaberClang: true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.HaSlash => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.ZSaber2, player, 2, 0, 0.25f, isReflectShield: true,
+				meleeWeapon, projPos, ProjIds.ZSaber2, player, 2, 0, 15, isReflectShield: true,
 				isZSaberEffect2B: true, isZSaberClang: true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.HuhSlash => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.ZSaber3, player,
-				3, Global.defFlinch, 0.25f, isReflectShield: true,
+				3, Global.defFlinch, 15, isReflectShield: true,
 				isZSaberEffect: true, isZSaberClang: true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.CrouchSlash => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.ZSaberCrouch, player, 3, 0, 0.25f, isReflectShield: true,
+				meleeWeapon, projPos, ProjIds.ZSaberCrouch, player, 3, 0, 15, isReflectShield: true,
 				isZSaberEffect: true, isZSaberClang: true,
 				addToLevel: addToLevel
 			),
 			// Dash
 			(int)MeleeIds.DashSlash => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.ZSaberDash, player, 2, 0, 0.25f, isReflectShield: true,
+				meleeWeapon, projPos, ProjIds.ZSaberDash, player, 2, 0, 15, isReflectShield: true,
 				isZSaberEffect: true, isZSaberClang: true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Shippuuga => new GenericMeleeProj(
-				ShippuugaWeapon.staticWeapon, projPos, ProjIds.Shippuuga, player, 2, Global.halfFlinch, 0.25f,
+				ShippuugaWeapon.staticWeapon, projPos, ProjIds.Shippuuga, player, 2, Global.halfFlinch, 15,
 				isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
 			// Air
 			(int)MeleeIds.AirSlash => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.ZSaberAir, player, 2, 0, 0.25f, isReflectShield: true,
+				meleeWeapon, projPos, ProjIds.ZSaberAir, player, 2, 0, 15, isReflectShield: true,
 				isZSaberEffect: true, isZSaberClang: true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.RollingSlash =>  new GenericMeleeProj(
 				KuuenzanWeapon.staticWeapon, projPos, ProjIds.ZSaberRollingSlash, player,
-				1, 0, 0.125f, isDeflectShield: true,
+				1, 0, 8, isDeflectShield: true,
 				isZSaberEffect2: true, isZSaberClang: true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Hyoroga => new GenericMeleeProj(
-				HyorogaWeapon.staticWeapon, projPos, ProjIds.HyorogaSwing, player, 4, 0, 0.25f,
+				HyorogaWeapon.staticWeapon, projPos, ProjIds.HyorogaSwing, player, 4, 0, 15,
 				addToLevel: addToLevel
 			),
 			// Ground Specials
 			(int)MeleeIds.Raijingeki => new GenericMeleeProj(
-				RaijingekiWeapon.staticWeapon, projPos, ProjIds.Raijingeki, player, 2, Global.defFlinch, 0.06f,
+				RaijingekiWeapon.staticWeapon, projPos, ProjIds.Raijingeki, player, 2, Global.defFlinch, 4,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.RaijingekiWeak => new GenericMeleeProj(
-				Raijingeki2Weapon.staticWeapon, projPos, ProjIds.Raijingeki2, player, 2, Global.defFlinch, 0.06f,
+				Raijingeki2Weapon.staticWeapon, projPos, ProjIds.Raijingeki2, player, 2, Global.defFlinch, 4,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Dairettsui => new GenericMeleeProj(
-				TBreakerWeapon.staticWeapon, projPos, ProjIds.TBreaker, player, 6, Global.defFlinch, 0.5f,
+				TBreakerWeapon.staticWeapon, projPos, ProjIds.TBreaker, player, 6, Global.defFlinch, 30,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Suiretsusen => new GenericMeleeProj(
-				SuiretsusenWeapon.staticWeapon, projPos, ProjIds.SuiretsusanProj, player, 6, Global.defFlinch, 0.75f,
+				SuiretsusenWeapon.staticWeapon, projPos, ProjIds.SuiretsusanProj, player, 6, Global.defFlinch, 45,
 				addToLevel: addToLevel
 			),
 			// Up Specials
 			(int)MeleeIds.Ryuenjin => new GenericMeleeProj(
-				RyuenjinWeapon.staticWeapon, projPos, ProjIds.Ryuenjin, player, 4, 0, 0.2f,
+				RyuenjinWeapon.staticWeapon, projPos, ProjIds.Ryuenjin, player, 4, 0, 15,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Denjin => new GenericMeleeProj(
-				DenjinWeapon.staticWeapon, projPos, ProjIds.Denjin, player, 3, Global.defFlinch, 0.1f,
+				DenjinWeapon.staticWeapon, projPos, ProjIds.Denjin, player, 3, Global.defFlinch, 6,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.RisingFang => new GenericMeleeProj(
-				RisingFangWeapon.staticWeapon, projPos, ProjIds.RisingFang, player, 2, 0, 0.5f,
+				RisingFangWeapon.staticWeapon, projPos, ProjIds.RisingFang, player, 2, 0, 30,
 				isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
 			// Down specials
 			(int)MeleeIds.Hyouretsuzan => new GenericMeleeProj(
-				HyouretsuzanWeapon.staticWeapon, projPos, ProjIds.Hyouretsuzan2, player, 4, 12, 0.5f,
+				HyouretsuzanWeapon.staticWeapon, projPos, ProjIds.Hyouretsuzan2, player, 4, 12, 30,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Danchien => new GenericMeleeProj(
-				DanchienWeapon.staticWeapon, projPos, ProjIds.QuakeBlazer, player, 2, 0, 0.5f,
+				DanchienWeapon.staticWeapon, projPos, ProjIds.QuakeBlazer, player, 2, 0, 30,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Rakukojin => new GenericMeleeProj(
-				RakukojinWeapon.staticWeapon, projPos, ProjIds.Rakukojin, player, 2, 12, 0.5f,
+				RakukojinWeapon.staticWeapon, projPos, ProjIds.Rakukojin, player, 2, 12, 30,
 				addToLevel: addToLevel
 			),
 			// Others
 			(int)MeleeIds.LadderSlash => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.ZSaberLadder, player, 3, 0, 0.25f, isReflectShield: true,
+				meleeWeapon, projPos, ProjIds.ZSaberLadder, player, 3, 0, 15, isReflectShield: true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.WallSlash => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.ZSaberslide, player, 3, 0, 0.25f, isReflectShield: true,
+				meleeWeapon, projPos, ProjIds.ZSaberslide, player, 3, 0, 15, isReflectShield: true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Gokumonken => new GenericMeleeProj(
@@ -859,12 +859,12 @@ public class Zero : Character {
 			),
 			(int)MeleeIds.Hadangeki => new GenericMeleeProj(
 				saberSwingWeapon, projPos, ProjIds.ZSaberProjSwing, player,
-				3, Global.defFlinch, 0.5f, isReflectShield: true,
+				3, Global.defFlinch, 30, isReflectShield: true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.AwakenedAura => new GenericMeleeProj(
 				awakenedAuraWeapon, projPos, ProjIds.AwakenedAura, player,
-				2, 0, 0.5f,
+				2, 0, 30,
 				addToLevel: addToLevel
 			),
 			_ => null
@@ -886,7 +886,7 @@ public class Zero : Character {
 					}
 					Projectile proj = new GenericMeleeProj(
 						awakenedAuraWeapon, centerPoint,
-						ProjIds.AwakenedAura, player, damage, flinch, 0.5f
+						ProjIds.AwakenedAura, player, damage, flinch, 30
 					) {
 						globalCollider = globalCollider.clone(),
 						meleeId = (int)MeleeIds.AwakenedAura,

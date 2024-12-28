@@ -90,7 +90,7 @@ public class WheelGator : Maverick {
 
 	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (sprite.name.Contains("drill_loop")) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.WheelGSpin, player, damage: 1, flinch: Global.defFlinch, hitCooldownSeconds: 0.1f, owningActor: this);
+			return new GenericMeleeProj(weapon, centerPoint, ProjIds.WheelGSpin, player, damage: 1, flinch: Global.defFlinch, hitCooldown: 6, owningActor: this);
 		}
 		if (sprite.name.Contains("eat_start")) {
 			if (hitbox.name == "eat") {
@@ -108,7 +108,7 @@ public class WheelGator : Maverick {
 			if (deltaPos.y > 200 * Global.spf) damagePercent = 0.75f;
 			if (deltaPos.y > 300 * Global.spf) damagePercent = 1;
 			if (damagePercent > 0) {
-				return new GenericMeleeProj(weapon, centerPoint, ProjIds.WheelGStomp, player, damage: 4 * damagePercent, flinch: Global.defFlinch, hitCooldownSeconds: 1);
+				return new GenericMeleeProj(weapon, centerPoint, ProjIds.WheelGStomp, player, 4 * damagePercent, Global.defFlinch, 60);
 			}
 		}
 		return null;

@@ -146,7 +146,7 @@ public class BubbleCrab : Maverick {
 
 	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (sprite.name.Contains("jump_attack")) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.BCrabClaw, player, 1, Global.defFlinch, 0.15f);
+			return new GenericMeleeProj(weapon, centerPoint, ProjIds.BCrabClaw, player, 1, Global.defFlinch, 9);
 		}
 		return null;
 	}

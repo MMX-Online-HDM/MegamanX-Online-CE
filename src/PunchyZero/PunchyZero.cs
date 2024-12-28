@@ -564,27 +564,27 @@ public class PunchyZero : Character {
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Punch2 => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.PZeroPunch2, player, 2, Global.halfFlinch, 0.25f,
+				meleeWeapon, projPos, ProjIds.PZeroPunch2, player, 2, Global.halfFlinch, 15,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Spin => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.PZeroSenpuukyaku, player, 2, Global.halfFlinch, 0.5f,
+				meleeWeapon, projPos, ProjIds.PZeroSenpuukyaku, player, 2, Global.halfFlinch,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.AirKick => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.PZeroAirKick, player, 3, 0, 0.25f,
+				meleeWeapon, projPos, ProjIds.PZeroAirKick, player, 3, 0, 15,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Uppercut => new GenericMeleeProj(
-				ZeroShoryukenWeapon.staticWeapon, projPos, ProjIds.PZeroShoryuken, player, 4, Global.defFlinch, 0.5f,
+				ZeroShoryukenWeapon.staticWeapon, projPos, ProjIds.PZeroShoryuken, player, 4, Global.defFlinch,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.StrongPunch => new GenericMeleeProj(
-				MegaPunchWeapon.staticWeapon, projPos, ProjIds.PZeroYoudantotsu, player, 6, Global.defFlinch, 0.5f,
+				MegaPunchWeapon.staticWeapon, projPos, ProjIds.PZeroYoudantotsu, player, 6, Global.defFlinch,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.DropKick => new GenericMeleeProj(
-				DropKickWeapon.staticWeapon, projPos, ProjIds.PZeroEnkoukyaku, player, 4, Global.halfFlinch, 0.5f,
+				DropKickWeapon.staticWeapon, projPos, ProjIds.PZeroEnkoukyaku, player, 4, Global.halfFlinch,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Parry => new GenericMeleeProj(
@@ -592,20 +592,20 @@ public class PunchyZero : Character {
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.ParryAttack => (new GenericMeleeProj(
-				parryWeapon, projPos, ProjIds.PZeroParryAttack, player, 4, Global.defFlinch, 0.5f,
+				parryWeapon, projPos, ProjIds.PZeroParryAttack, player, 4, Global.defFlinch,
 				addToLevel: addToLevel
 			) {
 				netcodeOverride = NetcodeModel.FavorDefender
 			}),
 			(int)MeleeIds.AwakenedAura => (new GenericMeleeProj(
-				awakenedAuraWeapon, projPos, ProjIds.AwakenedAura, player, 2, 0, 0.5f,
+				awakenedAuraWeapon, projPos, ProjIds.AwakenedAura, player, 2, 0,
 				addToLevel: addToLevel
 			) {
 				netcodeOverride = NetcodeModel.FavorDefender
 			}),
 			(int)MeleeIds.SaberSwing => new GenericMeleeProj(
 				saberSwingWeapon, projPos, ProjIds.ZSaberProjSwing, player,
-				3, Global.defFlinch, 0.5f, isReflectShield: true,
+				3, Global.defFlinch, isReflectShield: true,
 				addToLevel: addToLevel
 			),
 			_ => null
@@ -627,7 +627,7 @@ public class PunchyZero : Character {
 					}
 					Projectile proj = new GenericMeleeProj(
 						awakenedAuraWeapon, centerPoint,
-						ProjIds.AwakenedAura, player, damage, flinch, 0.5f
+						ProjIds.AwakenedAura, player, damage, flinch
 					) {
 						globalCollider = globalCollider.clone(),
 						meleeId = (int)MeleeIds.AwakenedAura
