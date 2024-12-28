@@ -246,6 +246,7 @@ public partial class Actor {
 		if (proj != null) {
 			proj.meleeId = meleeId;
 			proj.owningActor = this;
+			updateProjFromHitbox(proj);
 		}
 		return proj;
 	}

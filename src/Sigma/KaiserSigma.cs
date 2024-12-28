@@ -240,8 +240,7 @@ public partial class KaiserSigma : Character {
 			),
 			MeleeIds.Stomp => new GenericMeleeProj(
 				new KaiserStompWeapon(player), pos, ProjIds.Sigma3KaiserStomp, player,
-				damage: addToLevel ? 12f : getKaiserStompDamage(),
-				flinch: Global.defFlinch, hitCooldown: 60,
+				damage: 12, flinch: Global.defFlinch, hitCooldown: 60,
 				addToLevel: addToLevel
 			),
 			_ => null
