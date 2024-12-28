@@ -109,7 +109,7 @@ public class WheelGator : Maverick {
 			"wheelg_drill_loop" => MeleeIds.Drill,
 			"wheelg_eat_start" => MeleeIds.Eat,
 			"wheelg_fall" => MeleeIds.Fall,
-			"wheelg_grab" => MeleeIds.Grab,
+			"wheelg_grab_start" => MeleeIds.Grab,
 			_ => MeleeIds.None
 		});
 	}
@@ -126,7 +126,7 @@ public class WheelGator : Maverick {
 				6, Global.defFlinch, addToLevel: addToLevel
 			),
 			MeleeIds.Fall => new GenericMeleeProj(
-				GatorFallWeapon, pos, ProjIds.WheelGEat, player,
+				GatorFallWeapon, pos, ProjIds.WheelGStomp, player,
 				4, Global.defFlinch, 60, addToLevel: addToLevel
 			),
 			MeleeIds.Grab => new GenericMeleeProj(
@@ -139,7 +139,7 @@ public class WheelGator : Maverick {
 
 	public override void updateProjFromHitbox(Projectile proj) {
 		if (proj.projId == (int)ProjIds.WheelGStomp) {
-			float damage = 1 + Helpers.clamp(MathF.Floor(deltaPos.y * 0.6125f), 1, 4);
+			float damage = Helpers.clamp(MathF.Floor(deltaPos.y * 0.9f), 1, 4);
 			proj.damager.damage = damage;
 		}
 	}

@@ -154,7 +154,7 @@ public class VoltCatfish : Maverick {
 
 	public override void updateProjFromHitbox(Projectile proj) {
 		if (proj.projId == (int)ProjIds.VoltCStomp) {
-			float damage = 1 + Helpers.clamp(MathF.Floor(deltaPos.y * 0.6125f), 1, 3);
+			float damage = Helpers.clamp(MathF.Floor(deltaPos.y * 0.6125f), 1, 3);
 			proj.damager.damage = damage;
 		}
 	}

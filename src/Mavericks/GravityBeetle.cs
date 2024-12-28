@@ -111,7 +111,7 @@ public class GravityBeetle : Maverick {
 
 	public override void updateProjFromHitbox(Projectile proj) {
 		if (proj.projId == (int)ProjIds.GBeetleStomp) {
-			float damage = 1 + Helpers.clamp(MathF.Floor(deltaPos.y * 0.6125f), 1, 4);
+			float damage = Helpers.clamp(MathF.Floor(deltaPos.y * 0.9f), 1, 4);
 			proj.damager.damage = damage;
 		}
 	}
