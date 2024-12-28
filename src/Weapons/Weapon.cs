@@ -4,6 +4,7 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class Weapon {
+	public static Weapon netWeapon = new();
 	public string[] shootSounds = { "", "", "", ""};
 	public float ammo;
 	public float maxAmmo;

@@ -177,6 +177,7 @@ public partial class Character : Actor, IDamagable {
 		null!, new Point(x, y), netId, ownedByLocalPlayer, dontAddToLevel: true
 	) {
 		this.player = player;
+		netOwner = player;
 		this.xDir = xDir;
 
 		splashable = true;

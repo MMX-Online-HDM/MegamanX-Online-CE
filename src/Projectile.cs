@@ -110,6 +110,37 @@ public class Projectile : Actor {
 		canBeLocal = true;
 	}
 
+	public Projectile(
+		Point pos, int xDir, Actor owner, string sprite,
+		ushort? netId, bool? ownedByLocalPlayer, bool addToLevel = true
+	) : base(
+		sprite, pos, netId, ownedByLocalPlayer ?? owner.ownedByLocalPlayer, !addToLevel
+	) {
+		weapon = Weapon.netWeapon;
+		useGravity = false;
+		damager = new Damager(owner.netOwner, 0, 0, 0);
+		ownerPlayer = owner.netOwner;
+		owningActor = owner;
+		this.xDir = xDir;
+		if ((Global.level.gameMode.isTeamMode && Global.level.mainPlayer != owner.netOwner) &&
+			this is not NapalmPartProj or FlameBurnerProj
+		) {
+			RenderEffectType? allianceEffect = owner.netOwner.alliance switch {
+				0 => RenderEffectType.BlueShadow,
+				1 => RenderEffectType.RedShadow,
+				2 => RenderEffectType.GreenShadow,
+				3 => RenderEffectType.PurpleShadow,
+				4 => RenderEffectType.YellowShadow,
+				5 => RenderEffectType.OrangeShadow,
+				_ => null
+			};
+			if (allianceEffect != null) {
+				addRenderEffect(allianceEffect.Value);
+			}
+		}
+		canBeLocal = true;
+	}
+
 	public void setIndestructableProperties() {
 		destroyOnHit = false;
 		shouldVortexSuck = false;

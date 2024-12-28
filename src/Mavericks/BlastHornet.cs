@@ -135,9 +135,11 @@ public class BHornetBeeProj : Projectile, IDamagable {
 	const float maxSpeed = 150;
 	public Actor? latchTarget;
 	float latchLerpTime;
-	public BHornetBeeProj(Weapon weapon, Point pos, int xDir, Point unitDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 2, player, "bhornet_proj_wasp_small", 0, 1f, netProjId, player.ownedByLocalPlayer) {
-		this.weapon = weapon;
+	public BHornetBeeProj(
+		Weapon weapon, Point pos, int xDir, Point unitDir, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 2, player, "bhornet_proj_wasp_small", 0, 1f, netProjId, player.ownedByLocalPlayer
+	) {
 		fadeSprite = "explosion";
 		fadeSound = "explosion";
 		maxTime = 1.25f;
@@ -237,7 +239,6 @@ public class BHornetHomingBeeProj : Projectile, IDamagable {
 	const float maxSpeed = 150;
 	public BHornetHomingBeeProj(Weapon weapon, Point pos, int xDir, Actor target, Player player, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, xDir, 0, 4, player, "bhornet_proj_wasp_small_glowing", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
-		this.weapon = weapon;
 		fadeSprite = "explosion";
 		fadeSound = "explosion";
 		maxTime = 3f;
@@ -371,7 +372,6 @@ public class BHornetCursorProj : Projectile {
 	) : base(
 		weapon, pos, xDir, 0, 0, player, "bhornet_particle_aim_small", 0, 0, netProjId, player.ownedByLocalPlayer
 	) {
-		this.weapon = weapon;
 		this.bh = bh;
 		if (ownedByLocalPlayer) {
 			maxTime = 0.6f;
