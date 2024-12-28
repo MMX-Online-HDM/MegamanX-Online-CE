@@ -4,11 +4,12 @@
 		<LangVersion>13.0</LangVersion>
 		<AssemblyName>MMXOD</AssemblyName>
 		<OutputType>WinExe</OutputType>
+		<!--Nullable>annotations</Nullable-->
 		<Nullable>enable</Nullable>
 		<Version>20</Version>
 		<AssemblyVersion>20.0</AssemblyVersion>
 		<ApplicationIcon>app.ico</ApplicationIcon>
-		<TargetFramework>net6.0-windows</TargetFramework>
+		<TargetFramework>net8.0-windows</TargetFramework>
 		<ImplicitUsings>false</ImplicitUsings>
 		<SelfContained>false</SelfContained>
 		<OutputPath>./bin/</OutputPath>
