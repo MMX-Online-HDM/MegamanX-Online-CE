@@ -46,7 +46,7 @@ public partial class Global {
 	public static uint windowW;
 	public static uint windowH;
 
-	public static int viewSize = 1;
+	public static float viewSize = 1;
 	internal static List<(uint width, uint height)> renderTextureQueue = new();
 	internal static HashSet<int> renderTextureQueueKeys = new();
 

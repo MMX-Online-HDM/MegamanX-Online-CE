@@ -131,11 +131,7 @@ public class CrystalHunterCharged : Actor {
 			timeSlowShader.SetUniform("x", normalizedCoords.x);
 			timeSlowShader.SetUniform("y", normalizedCoords.y);
 			timeSlowShader.SetUniform("t", Global.time);
-			if (Global.viewSize == 2) {
-				timeSlowShader.SetUniform("r", 0.25f * (drawRadius / 60f));
-			} else {
-				timeSlowShader.SetUniform("r", 0.5f * (drawRadius / 120f));
-			}
+			timeSlowShader.SetUniform("r", 0.5f * (drawRadius / (120f / Global.viewSize)));
 		}
 
 		if (timeSlowShader == null) {

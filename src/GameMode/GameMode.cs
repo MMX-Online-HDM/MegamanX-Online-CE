@@ -3190,11 +3190,11 @@ public class GameMode {
 			var dirTo = playerPos.directionTo(objPos).normalize();
 
 			//a = arrow, l = length, m = minus
-			int al = 10 / Global.viewSize;
-			int alm1 = 9 / Global.viewSize;
-			int alm2 = 8 / Global.viewSize;
-			int alm3 = 7 / Global.viewSize;
-			int alm4 = 5 / Global.viewSize;
+			float al = 10 / Global.viewSize;
+			float alm1 = 9 / Global.viewSize;
+			float alm2 = 8 / Global.viewSize;
+			float alm3 = 7 / Global.viewSize;
+			float alm4 = 5 / Global.viewSize;
 
 			intersectPoint.inc(dirTo.times(-10));
 			var posX = intersectPoint.x - Global.level.camX;

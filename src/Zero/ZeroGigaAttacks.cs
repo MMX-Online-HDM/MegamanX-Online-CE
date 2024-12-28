@@ -684,11 +684,7 @@ public class DarkHoldProj : Projectile {
 			screenShader.SetUniform("ratio", ratio);
 			screenShader.SetUniform("x", normalizedCoords.x);
 			screenShader.SetUniform("y", normalizedCoords.y);
-			if (Global.viewSize == 2) {
-				screenShader.SetUniform("r", normalizedRadius * 0.5f);
-			} else {
-				screenShader.SetUniform("r", normalizedRadius);
-			}
+			screenShader.SetUniform("r", normalizedRadius / Global.viewSize);
 		}
 	}
 
