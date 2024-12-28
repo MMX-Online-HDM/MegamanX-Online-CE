@@ -113,7 +113,7 @@ public class DrDoppler : Maverick {
 		} else if (sprite.name == "drdoppler_dash_water") {
 			return new GenericMeleeProj(weapon, centerPoint, ProjIds.DrDopplerDashWater, player, damage: 2, flinch: 0, owningActor: this);
 		} else if (sprite.name == "drdoppler_absorb") {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.DrDopplerAbsorb, player, damage: 0, flinch: 0, hitCooldownSeconds: 0.25f, owningActor: this);
+			return new GenericMeleeProj(weapon, centerPoint, ProjIds.DrDopplerAbsorb, player, damage: 0, flinch: 0, hitCooldown: 15, owningActor: this);
 		}
 		return null;
 	}

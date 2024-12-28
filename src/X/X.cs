@@ -626,35 +626,35 @@ public class MegamanX : Character {
 		return id switch {
 			(int)MeleeIds.SpeedBurnerCharged => new GenericMeleeProj(
 				SpeedBurner.netWeapon, projPos, ProjIds.SpeedBurnerCharged, player,
-				4, Global.defFlinch, 0.5f
+				4, Global.defFlinch, 30
 			),
 			(int)MeleeIds.LigthHeadbutt => new GenericMeleeProj(
 				LhHeadbutt.netWeapon, projPos, ProjIds.Headbutt, player,
-				2, Global.halfFlinch, 0.5f, addToLevel: addToLevel
+				2, Global.halfFlinch, 30, addToLevel: addToLevel
 			),
 			(int)MeleeIds.LigthHeadbuttEX => new GenericMeleeProj(
 				LhHeadbutt.netWeapon, projPos, ProjIds.Headbutt, player,
-				4, Global.defFlinch, 0.5f, addToLevel: addToLevel
+				4, Global.defFlinch, 30, addToLevel: addToLevel
 			),
 			(int)MeleeIds.Shoryuken => new GenericMeleeProj(
 				ShoryukenWeapon.netWeapon, projPos, ProjIds.Shoryuken, player,
-				Damager.ohkoDamage, Global.defFlinch, 0.5f, addToLevel: addToLevel
+				Damager.ohkoDamage, Global.defFlinch, 30, addToLevel: addToLevel
 			),
 			(int)MeleeIds.MaxZSaber => new GenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.XSaber, player,
-				4, Global.defFlinch, 0.5f, addToLevel: addToLevel
+				4, Global.defFlinch, 30, addToLevel: addToLevel
 			),
 			(int)MeleeIds.ZSaber => new GenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.X6Saber, player,
-				3, 0, 0.5f, addToLevel: addToLevel
+				3, 0, 30, addToLevel: addToLevel
 			),
 			(int)MeleeIds.ZSaberAir => new GenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.X6Saber, player,
-				2, 0, 0.5f, addToLevel: addToLevel
+				2, 0, 30, addToLevel: addToLevel
 			),
 			(int)MeleeIds.NovaStrike => new GenericMeleeProj(
 				HyperNovaStrike.netWeapon, projPos, ProjIds.NovaStrike, player,
-				4, Global.defFlinch, 0.5f, addToLevel: addToLevel
+				4, Global.defFlinch, 30, addToLevel: addToLevel
 			),
 			_ => null
 		};

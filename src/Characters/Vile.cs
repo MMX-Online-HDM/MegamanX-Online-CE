@@ -611,12 +611,31 @@ public class Vile : Character {
 		}
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		Projectile? proj = null;
+
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Grab,
+	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
 		if (sprite.name.Contains("dash_grab")) {
-			proj = new GenericMeleeProj(new VileMK2Grab(), centerPoint, ProjIds.VileMK2Grab, player, 0, 0, 0);
-		}
-		return proj;
+			return (int)MeleeIds.Grab;
+		};
+		return (int)MeleeIds.None;
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Grab => new GenericMeleeProj(
+				new VileMK2Grab(), pos, ProjIds.VileMK2Grab, player,
+				0, 0, 0,
+				addToLevel: true
+			),
+			_ => null
+		};
 	}
 
 	public override bool isSoftLocked() {

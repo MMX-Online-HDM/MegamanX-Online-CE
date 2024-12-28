@@ -124,15 +124,15 @@ public class RagingChargeX : Character {
 			),
 			(int)MeleeIds.ParryBlock => new GenericMeleeProj(
 				RCXParry.netWeapon, projPos, ProjIds.UPParryBlock, player,
-				0, 0, 1, addToLevel: addToLevel
+				0, 0, 60, addToLevel: addToLevel
 			),
 			(int)MeleeIds.Punch => new GenericMeleeProj(
 				RCXPunch.netWeapon, projPos, ProjIds.UPPunch, player,
-				3, Global.defFlinch, 0.5f, addToLevel: addToLevel
+				3, Global.defFlinch, 30, addToLevel: addToLevel
 			),
 			(int)MeleeIds.ZSaber => new GenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.X6Saber, player,
-				3, Global.halfFlinch, 0.5f, addToLevel: addToLevel
+				3, Global.halfFlinch, 30, addToLevel: addToLevel
 			),
 			_ => null
 		};

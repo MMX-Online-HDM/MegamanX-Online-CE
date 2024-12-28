@@ -130,7 +130,7 @@ public class CrystalSnail : Maverick {
 	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		Projectile? proj = null;
 		if (sprite.name.EndsWith("shell_dash")) {
-			proj = new GenericMeleeProj(weapon, centerPoint, ProjIds.CSnailMelee, player, 3, Global.defFlinch, 0.5f);
+			proj = new GenericMeleeProj(weapon, centerPoint, ProjIds.CSnailMelee, player, 3, Global.defFlinch);
 		}
 
 		return proj;

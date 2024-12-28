@@ -115,16 +115,36 @@ public class Doppma : BaseSigma {
 		return "sigma3_" + spriteName;
 	}
 
+	public enum MeleeIds {
+		None = -1,
+		Guard,
+		Shield,
+		ShieldGuard,
+	}
+
 	// This can run on both owners and non-owners. So data used must be in sync.
-	public override Projectile? getProjFromHitbox(Collider collider, Point centerPoint) {
+	public override int getHitboxMeleeId(Collider hitbox) {
 		if (collider.name == "shield") {
-			bool isBlock = sprite.name == getSprite("block");
-			return new GenericMeleeProj(
-				new Weapon(), centerPoint, ProjIds.Sigma3ShieldBlock, player,
-				damage: 0, flinch: 0, hitCooldownSeconds: 1, isDeflectShield: true, isShield: true, isReflectShield: isBlock
-			);
+			if (sprite.name.Contains("sigma_block")) {
+				return (int)MeleeIds.ShieldGuard;
+			}
+			return (int)MeleeIds.Shield;
 		}
-		return base.getProjFromHitbox(collider, centerPoint);
+		return (int)MeleeIds.None;
+	}
+
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		Projectile? proj = id switch {
+			(int)MeleeIds.Shield or (int)MeleeIds.ShieldGuard => new GenericMeleeProj(
+				new Weapon(), pos, ProjIds.Sigma3ShieldBlock, player,
+				damage: 0, flinch: 0, hitCooldown: 60,
+				isDeflectShield: true, isShield: true,
+				isReflectShield: id == (int)MeleeIds.ShieldGuard,
+				addToLevel: addToLevel
+			),
+			_ => null
+		};
+		return base.getMeleeProjById(id, pos, addToLevel);
 	}
 
 	public override List<ShaderWrapper> getShaders() {
