@@ -1,4 +1,6 @@
-﻿namespace MMXOnline;
+﻿using System;
+using System.Collections.Generic;
+namespace MMXOnline;
 
 public class FlameMammoth : Maverick {
 	public FlameMStompWeapon stompWeapon;
@@ -81,18 +83,39 @@ public class FlameMammoth : Maverick {
 		return attacks.GetRandomItem();
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name.Contains("fall")) {
-			float damage = 0;
-			if (deltaPos.y > 100 * Global.spf) damage = 2f;
-			if (deltaPos.y > 200 * Global.spf) damage = 4f;
-			if (deltaPos.y > 300 * Global.spf) damage = 6f;
-			if (damage > 0) {
-				return new GenericMeleeProj(stompWeapon, centerPoint, ProjIds.FlameMStomp, player, damage: damage);
-			}
-		}
-		return null;
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Fall,
 	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"flamem_fall" => MeleeIds.Fall,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Fall => new GenericMeleeProj(
+				stompWeapon, pos, ProjIds.FlameMStomp, player,
+				6, Global.defFlinch, addToLevel: addToLevel
+			),
+			_ => null
+		};
+	}
+
+	public override void updateProjFromHitbox(Projectile proj) {
+		if (proj.projId == (int)ProjIds.FlameMStomp) {
+			float damage = Helpers.clamp(MathF.Floor(vel.y / 75), 1, 6);
+			if (vel.y > 300) damage += 2;
+			proj.damager.damage = damage;
+		}
+	}
+
 }
 
 #region weapons

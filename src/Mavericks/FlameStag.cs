@@ -147,12 +147,31 @@ public class FlameStag : Maverick {
 		}
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name.Contains("dash_grab")) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.FStagUppercut, player, damage: 0, flinch: 0, hitCooldown: 0, owningActor: this);
-		}
-		return null;
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		DashGrab,
 	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"fstag_dash_grab" => MeleeIds.DashGrab,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.DashGrab => new GenericMeleeProj(
+				weapon, pos, ProjIds.FStagUppercut, player,
+				0, 0, 0, addToLevel: addToLevel
+			),
+			_ => null
+		};
+	}
+
 }
 
 public class FStagFireballProj : Projectile {

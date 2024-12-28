@@ -624,6 +624,7 @@ public enum ProjIds {
 	BBuffaloIceProjGround,
 	BBuffaloBeam,
 	BBuffaloDrag,
+	BBuffaloDash,
 	BBuffaloCrash,
 	BBuffaloStomp,
 	TSeahorseAcid1,

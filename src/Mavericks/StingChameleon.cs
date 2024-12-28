@@ -169,11 +169,32 @@ public class StingChameleon : Maverick {
 		return attacks.GetRandomItem();
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name.Contains("tongue")) {
-			return new GenericMeleeProj(tongueWeapon, centerPoint, ProjIds.StingCTongue, player);
-		}
-		return null;
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Tongue,
+	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"stingc_tongue" or "stingc_tongue2" or "stingc_tongue3" or
+			"stingc_cling_tongue" or "stingc_cling_tongue2" or 
+			"stingc_cling_tongue3" or "stingc_cling_tongue4" or
+			"stingc_cling_tongue5"  => MeleeIds.Tongue,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Tongue => new GenericMeleeProj(
+				tongueWeapon, pos, ProjIds.StingCTongue, player,
+				4, Global.defFlinch, addToLevel: addToLevel
+			),
+			_ => null
+		};
 	}
 
 	/*

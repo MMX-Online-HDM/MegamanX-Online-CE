@@ -123,13 +123,35 @@ public class OverdriveOstrich : Maverick {
 		return aiAttackStates().GetRandomItem();
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name.Contains("skip")) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.OverdriveOMelee, player, 3, Global.defFlinch, 60);
-		} else if (sprite.name.EndsWith("_run") && MathF.Abs(deltaPos.x) >= damageSpeed * Global.spf) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.OverdriveOMelee, player, 2, Global.halfFlinch, 60);
-		}
-		return null;
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Skip,
+		Run,
+	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"overdriveo_skip" or "overdriveo_skip2" => MeleeIds.Skip,
+			"overdriveo_run" => MeleeIds.Skip,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Skip => new GenericMeleeProj(
+				weapon, pos, ProjIds.OverdriveOMelee, player,
+				3, Global.defFlinch, 60, addToLevel: addToLevel
+			),
+			MeleeIds.Run => new GenericMeleeProj(
+				weapon, pos, ProjIds.OverdriveOMelee, player,
+				2, Global.defFlinch, 60, addToLevel: addToLevel
+			),
+			_ => null
+		};
 	}
 
 	public override void updateProjFromHitbox(Projectile proj) {

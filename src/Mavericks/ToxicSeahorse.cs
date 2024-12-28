@@ -87,14 +87,31 @@ public class ToxicSeahorse : Maverick {
 		return mshoot;
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name.Contains("teleport2")) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.TSeahorseEmerge, player, damage: 4, flinch: Global.defFlinch);;
-		} else if (sprite.name.Contains("teleport")) {
-			//return new GenericMeleeProj(weapon, centerPoint, ProjIds.TSeahorsePuddle, player, damage: 0, flinch: 0, hitCooldown: 1f, this);
-		}
-		return null;
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Teleport,
 	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"tseahorse_teleport2" => MeleeIds.Teleport,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Teleport => new GenericMeleeProj(
+				weapon, pos, ProjIds.TSeahorseEmerge, player,
+				4, Global.defFlinch, addToLevel: addToLevel
+			),
+			_ => null
+		};
+	}
+
 }
 
 public class TSeahorseAcidProj : Projectile, IDamagable {

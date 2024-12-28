@@ -108,11 +108,29 @@ public class LaunchOctopus : Maverick {
 		return attacks.GetRandomItem();
 	}
 
-	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name.Contains("launcho_spin")) {
-			return new GenericMeleeProj(meleeWeapon, centerPoint, ProjIds.LaunchODrain, player, damage: 0, flinch: 0, hitCooldown: 0, owningActor: this);
-		}
-		return null;
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		OctoSpin,
+	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"launcho_spin" => MeleeIds.OctoSpin,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.OctoSpin => new GenericMeleeProj(
+				meleeWeapon, pos, ProjIds.LaunchODrain, player,
+				0, 0, 0, addToLevel: addToLevel
+			),
+			_ => null
+		};
 	}
 }
 

@@ -182,13 +182,35 @@ public class MorphMothCocoon : Maverick {
 		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name.Contains("spin")) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.MorphMCSpin, player, 1, 0);
-		} else if (sprite.name.Contains("hang")) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.MorphMCSwing, player, 0, Global.defFlinch);
-		}
-		return null;
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Spin,
+		Hang,
+	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"morphmc_spin" => MeleeIds.Spin,
+			"morphmc_hang" or "morphmc_burn_hang" => MeleeIds.Hang,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Spin => new GenericMeleeProj(
+				weapon, pos, ProjIds.MorphMCSpin, player,
+				1, 0, addToLevel: addToLevel
+			),
+			MeleeIds.Hang => new GenericMeleeProj(
+				weapon, pos, ProjIds.MorphMCSwing, player,
+				0, Global.defFlinch, addToLevel: addToLevel
+			),
+			_ => null
+		};
 	}
 
 	public override void updateProjFromHitbox(Projectile proj) {

@@ -88,30 +88,55 @@ public class WheelGator : Maverick {
 		return new List<ShaderWrapper>();
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name.Contains("drill_loop")) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.WheelGSpin, player, damage: 1, flinch: Global.defFlinch, hitCooldown: 6, owningActor: this);
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Drill,
+		Eat,
+		Fall,
+		Grab,
+
+	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"wheelg_drill_loop" => MeleeIds.Drill,
+			"wheelg_eat_start" => MeleeIds.Eat,
+			"wheelg_fall" => MeleeIds.Fall,
+			"wheelg_grab" => MeleeIds.Grab,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Drill => new GenericMeleeProj(
+				weapon, pos, ProjIds.WheelGSpin, player,
+				1, Global.defFlinch, 6, addToLevel: addToLevel
+			),
+			MeleeIds.Eat => new GenericMeleeProj(
+				weapon, pos, ProjIds.WheelGEat, player,
+				6, Global.defFlinch, addToLevel: addToLevel
+			),
+			MeleeIds.Fall => new GenericMeleeProj(
+				weapon, pos, ProjIds.WheelGEat, player,
+				4, Global.defFlinch, 60, addToLevel: addToLevel
+			),
+			MeleeIds.Grab => new GenericMeleeProj(
+				weapon, pos, ProjIds.WheelGGrab, player,
+				0, 0, 0, addToLevel: addToLevel
+			),
+			_ => null
+		};
+	}
+
+	public override void updateProjFromHitbox(Projectile proj) {
+		if (proj.projId == (int)ProjIds.WheelGStomp) {
+			float damage = 1 + Helpers.clamp(MathF.Floor(deltaPos.y * 0.6125f), 1, 4);
+			proj.damager.damage = damage;
 		}
-		if (sprite.name.Contains("eat_start")) {
-			if (hitbox.name == "eat") {
-				return new GenericMeleeProj(weapon, centerPoint, ProjIds.WheelGEat, player, damage: 0, flinch: 0, owningActor: this);
-			} else {
-				return new GenericMeleeProj(weapon, centerPoint, ProjIds.WheelGBite, player, damage: 6, flinch: Global.defFlinch, owningActor: this);
-			}
-		}
-		if (sprite.name.Contains("grab_start") && deltaPos.y <= 0) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.WheelGGrab, player, damage: 0, flinch: 0, owningActor: this);
-		}
-		if (sprite.name.Contains("fall")) {
-			float damagePercent = 0;
-			if (deltaPos.y > 100 * Global.spf) damagePercent = 0.5f;
-			if (deltaPos.y > 200 * Global.spf) damagePercent = 0.75f;
-			if (deltaPos.y > 300 * Global.spf) damagePercent = 1;
-			if (damagePercent > 0) {
-				return new GenericMeleeProj(weapon, centerPoint, ProjIds.WheelGStomp, player, 4 * damagePercent, Global.defFlinch, 60);
-			}
-		}
-		return null;
 	}
 
 	public override MaverickState[] aiAttackStates() {

@@ -160,11 +160,35 @@ public class ArmoredArmadillo : Maverick {
 		return shootState;
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name.Contains("roll")) {
-			return new GenericMeleeProj(rollWeapon, centerPoint, ProjIds.ArmoredARoll, player, damage: hasNoArmor() ? 2 : 3);
-		}
-		return null;
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Roll,
+		RollArmorless,
+	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"armoreda_roll" => MeleeIds.Roll,
+			"armoreda_na_roll" => MeleeIds.RollArmorless,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Roll => new GenericMeleeProj(
+				rollWeapon, pos, ProjIds.ArmoredARoll, player,
+				3, Global.defFlinch, 45, addToLevel: addToLevel
+			),
+			MeleeIds.RollArmorless => new GenericMeleeProj(
+				rollWeapon, pos, ProjIds.ArmoredARoll, player,
+				3, Global.defFlinch, 45, addToLevel: addToLevel
+			),
+			_ => null
+		};
 	}
 }
 

@@ -127,19 +127,36 @@ public class ChillPenguin : Maverick {
 	}
 	*/
 
-	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		Projectile proj = null;
-		if (isSlidingAndCanDamage()) {
-			proj = new GenericMeleeProj(slideWeapon, centerPoint, ProjIds.ChillPSlide, player);
-		}
-
-		return proj;
-	}
-
 	public bool isSlidingAndCanDamage() {
 		return sprite.name.EndsWith("slide") && MathF.Abs(deltaPos.x) > 1.66f;
 	}
+	
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Slide,
+	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"chillp_slide" => MeleeIds.Slide,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Slide => new GenericMeleeProj(
+				slideWeapon, pos, ProjIds.ChillPSlide, player,
+				3, Global.defFlinch, addToLevel: addToLevel
+			),
+			_ => null
+		};
+	}
 }
+
 
 #region weapons
 public class ChillPIceShotWeapon : Weapon {
