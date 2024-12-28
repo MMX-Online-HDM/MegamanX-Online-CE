@@ -2990,14 +2990,6 @@ public partial class Character : Actor, IDamagable {
 		return retProjs;
 	}
 
-	public float getKaiserStompDamage() {
-		float damagePercent = 0.25f;
-		if (deltaPos.y > 150 * Global.spf) damagePercent = 0.5f;
-		if (deltaPos.y > 210 * Global.spf) damagePercent = 0.75f;
-		if (deltaPos.y > 300 * Global.spf) damagePercent = 1;
-		return damagePercent;
-	}
-
 	public void releaseGrab(Actor grabber, bool sendRpc = false) {
 		charState.releaseGrab();
 		if (!ownedByLocalPlayer) {

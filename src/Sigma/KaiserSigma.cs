@@ -212,27 +212,58 @@ public partial class KaiserSigma : Character {
 		return "kaisersigma_" + spriteName;
 	}
 
-	public override Projectile? getProjFromHitbox(Collider collider, Point centerPoint) {
+		// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Suit,
+		Stomp,
+	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
 		if (sprite.name == "kaisersigma_fall" && collider.isAttack()) {
-			return new GenericMeleeProj(
-				new KaiserStompWeapon(player), centerPoint, ProjIds.Sigma3KaiserStomp, player,
-				damage: 12 * getKaiserStompDamage(), flinch: Global.defFlinch, hitCooldown: 60
-			);
-		} else if (collider.name == "body") {
-			return new GenericMeleeProj(
-				new Weapon(), centerPoint, ProjIds.Sigma3KaiserSuit, player,
-				damage: 0, flinch: 0, hitCooldown: 60, isShield: true
-			);
+			return (int)MeleeIds.Stomp;
 		}
-		return null;
+		if (collider.name == "body") {
+			return (int)MeleeIds.Suit;
+		}
+		return (int)MeleeIds.None;
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Suit => new GenericMeleeProj(
+				new Weapon(), pos, ProjIds.Sigma3KaiserSuit, player,
+				damage: 0, flinch: 0, hitCooldown: 60, isShield: true,
+				addToLevel: addToLevel
+			),
+			MeleeIds.Stomp => new GenericMeleeProj(
+				new KaiserStompWeapon(player), pos, ProjIds.Sigma3KaiserStomp, player,
+				damage: addToLevel ? 12f : getKaiserStompDamage(),
+				flinch: Global.defFlinch, hitCooldown: 60,
+				addToLevel: addToLevel
+			),
+			_ => null
+		};
+	}
+
+	public float getKaiserStompDamage() {
+		if (deltaPos.y >= 5) {
+			return 12;
+		}
+		if (deltaPos.y >= 3.5) {
+			return 9;
+		}
+		if (deltaPos.y >= 2.5) {
+			return 6;
+		}
+		return 3;
 	}
 
 	public override void updateProjFromHitbox(Projectile proj) {
 		if (proj.projId == (int)ProjIds.Sigma3KaiserStomp) {
-			float damagePercent = getKaiserStompDamage();
-			if (damagePercent > 0) {
-				proj.damager.damage = 12 * damagePercent;
-			}
+			proj.damager.damage = getKaiserStompDamage();
 		}
 	}
 
