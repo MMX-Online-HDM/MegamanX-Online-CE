@@ -259,7 +259,7 @@ public class BusterZero : Character {
 		Projectile? proj = id switch {
 			(int)MeleeIds.SaberSwing => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.DZMelee, player,
-				isBlackZero ? 4 : 3, Global.defFlinch, 0.5f, isReflectShield: true,
+				isBlackZero ? 4 : 3, Global.defFlinch, isReflectShield: true,
 				isZSaberClang : true, isZSaberEffect : true,
 				addToLevel: addToLevel
 			),

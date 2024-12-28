@@ -149,7 +149,7 @@ public class CrystalSnail : Maverick {
 			character.isCrystalized && character.player.alliance != player.alliance
 		) {
 			Damager.applyDamage(
-				player, 3, 1f, Global.defFlinch, character,
+				player, 3, 60, Global.defFlinch, character,
 				false, (int)WeaponIds.CrystalHunter, 20, player.character, (int)ProjIds.CrystalHunterDash
 			);
 		}

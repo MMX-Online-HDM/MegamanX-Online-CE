@@ -109,7 +109,7 @@ public class Damager {
 		}
 
 		return applyDamage(
-			owner, newDamage, hitCooldownSeconds, newFlinch, victim as Actor,
+			owner, newDamage, hitCooldown, newFlinch, victim as Actor,
 			weakness, weapon.index, weapon.killFeedIndex, actor, projId, sendRpc
 		);
 	}

@@ -733,7 +733,7 @@ public partial class Character : Actor, IDamagable {
 			character.player.alliance != player.alliance
 		) {
 			Damager.applyDamage(
-				player, 3, 1f, Global.defFlinch, character, false,
+				player, 3, 60, Global.defFlinch, character, false,
 				(int)WeaponIds.CrystalHunter, 20, this,
 				(int)ProjIds.CrystalHunterDash
 			);
@@ -1046,7 +1046,7 @@ public partial class Character : Actor, IDamagable {
 			if (gravityWellModifier < 0 && vel.y < -300) {
 				Damager.applyDamage(
 					lastGravityWellDamager,
-					4, 0.5f, Global.halfFlinch, this,
+					4, 30, Global.halfFlinch, this,
 					false, (int)WeaponIds.GravityWell, 45, this,
 					(int)ProjIds.GravityWellCharged
 				);
