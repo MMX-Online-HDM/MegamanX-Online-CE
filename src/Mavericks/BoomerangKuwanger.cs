@@ -6,8 +6,8 @@ using SFML.Graphics;
 namespace MMXOnline;
 
 public class BoomerangKuwanger : Maverick {
-	public BoomerangKBoomerangWeapon boomerangWeapon = new BoomerangKBoomerangWeapon();
-	public BoomerangKDeadLiftWeapon deadLiftWeapon;
+	public BoomerangKBoomerangWeapon boomerangWeapon = new();
+	public BoomerangKDeadLiftWeapon deadLiftWeapon = new();
 	public bool bald;
 	public float dashSoundCooldown;
 	public float teleportCooldown;
@@ -16,8 +16,7 @@ public class BoomerangKuwanger : Maverick {
 		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
 		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
 		//stateCooldowns.Add(typeof(BoomerKDeadLiftState), new MaverickStateCooldown(false, true, 0.75f));
-		deadLiftWeapon = new BoomerangKDeadLiftWeapon(player);
-
+		
 		gravityModifier = 1.25f;
 
 		weapon = new Weapon(WeaponIds.BoomerangKGeneric, 97);
@@ -173,8 +172,7 @@ public class BoomerangKBoomerangWeapon : Weapon {
 }
 
 public class BoomerangKDeadLiftWeapon : Weapon {
-	public BoomerangKDeadLiftWeapon(Player player) {
-		damager = new Damager(player, 4, Global.defFlinch, 0.5f);
+	public BoomerangKDeadLiftWeapon() {
 		index = (int)WeaponIds.BoomerangKDeadLift;
 		killFeedIndex = 97;
 	}
@@ -486,7 +484,7 @@ public class DeadLiftGrabbed : GenericGrabbedState {
 				return;
 			}
 			if (character.stopCeiling()) {
-				new BoomerangKDeadLiftWeapon((grabber as Maverick).player).applyDamage(character, false, character, (int)ProjIds.BoomerangKDeadLift);
+				new BoomerangKDeadLiftWeapon().applyDamage(character, false, character, (int)ProjIds.BoomerangKDeadLift);
 				character.playSound("crash", sendRpc: true);
 				character.shakeCamera(sendRpc: true);
 			}

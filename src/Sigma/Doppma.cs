@@ -142,7 +142,9 @@ public class Doppma : BaseSigma {
 				isDeflectShield: true, isShield: true,
 				isReflectShield: id == (int)MeleeIds.ShieldGuard,
 				addToLevel: addToLevel
-			),
+			) {
+				highPiority = true
+			},
 			_ => null
 		};
 	}

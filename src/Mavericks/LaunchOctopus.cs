@@ -3,14 +3,13 @@
 namespace MMXOnline;
 
 public class LaunchOctopus : Maverick {
-	public LaunchOMissileWeapon missileWeapon = new LaunchOMissileWeapon();
-	public LaunchODrainWeapon meleeWeapon;
-	public LaunchOHomingTorpedoWeapon homingTorpedoWeapon = new LaunchOHomingTorpedoWeapon();
+	public LaunchOMissileWeapon missileWeapon = new();
+	public LaunchODrainWeapon meleeWeapon = new();
+	public LaunchOHomingTorpedoWeapon homingTorpedoWeapon = new();
 	public bool lastFrameWasUnderwater;
 
 	public LaunchOctopus(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
 		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
-		meleeWeapon = new LaunchODrainWeapon(player);
 
 		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 1f));
 		stateCooldowns.Add(typeof(LaunchOShoot), new MaverickStateCooldown(false, true, 0.325f));
@@ -150,10 +149,9 @@ public class LaunchOWhirlpoolWeapon : Weapon {
 }
 
 public class LaunchODrainWeapon : Weapon {
-	public LaunchODrainWeapon(Player player) {
+	public LaunchODrainWeapon() {
 		index = (int)WeaponIds.LaunchOMelee;
 		killFeedIndex = 96;
-		damager = new Damager(player, 3, Global.defFlinch, 0.5f);
 	}
 }
 
@@ -478,7 +476,7 @@ public class LaunchODrainState : MaverickState {
 			leechTime = 0;
 			maverick.addHealth(2, true);
 			var damager = new Damager(player, 2, 0, 0);
-			damager.applyDamage(victim, false, new LaunchODrainWeapon(player), maverick, (int)ProjIds.LaunchODrain);
+			damager.applyDamage(victim, false, new LaunchODrainWeapon(), maverick, (int)ProjIds.LaunchODrain);
 		}
 
 		soundTime += Global.spf;

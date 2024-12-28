@@ -4,6 +4,11 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class WheelGator : Maverick {
+	public WheelGatorDrillSpinWeapon GatorSpinWeapon = new WheelGatorDrillSpinWeapon();
+	public WheelGatorEatWeapon GatorEatWeapon = new WheelGatorEatWeapon();
+	public WheelGatorFallWeapon GatorFallWeapon = new WheelGatorFallWeapon();
+	public WheelGatorGrabWeapon GatorGrabWeapon = new WheelGatorGrabWeapon();
+
 	public static Weapon getWeapon() { return new Weapon(WeaponIds.WheelGGeneric, 142); }
 	public static Weapon getUpBiteWeapon(Player player) { return new Weapon(WeaponIds.WheelGGeneric, 142, new Damager(player, 4, Global.defFlinch, 0.25f)); }
 	public Weapon upBiteWeapon;
@@ -113,19 +118,19 @@ public class WheelGator : Maverick {
 	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
 		return (MeleeIds)id switch {
 			MeleeIds.Drill => new GenericMeleeProj(
-				weapon, pos, ProjIds.WheelGSpin, player,
+				GatorSpinWeapon, pos, ProjIds.WheelGSpin, player,
 				1, Global.defFlinch, 6, addToLevel: addToLevel
 			),
 			MeleeIds.Eat => new GenericMeleeProj(
-				weapon, pos, ProjIds.WheelGEat, player,
+				GatorEatWeapon, pos, ProjIds.WheelGEat, player,
 				6, Global.defFlinch, addToLevel: addToLevel
 			),
 			MeleeIds.Fall => new GenericMeleeProj(
-				weapon, pos, ProjIds.WheelGEat, player,
+				GatorFallWeapon, pos, ProjIds.WheelGEat, player,
 				4, Global.defFlinch, 60, addToLevel: addToLevel
 			),
 			MeleeIds.Grab => new GenericMeleeProj(
-				weapon, pos, ProjIds.WheelGGrab, player,
+				GatorGrabWeapon, pos, ProjIds.WheelGGrab, player,
 				0, 0, 0, addToLevel: addToLevel
 			),
 			_ => null
@@ -171,6 +176,33 @@ public class WheelGator : Maverick {
 		data = data[Maverick.CustomNetDataLength..];
 
 		damageEaten = data[0];
+	}
+}
+
+public class WheelGatorDrillSpinWeapon : Weapon {
+	public WheelGatorDrillSpinWeapon() {
+		index = (int)WeaponIds.WheelGSpinWeapon;
+		killFeedIndex = 142;
+	}
+}
+
+public class WheelGatorEatWeapon : Weapon {
+	public WheelGatorEatWeapon() {
+		index = (int)WeaponIds.WheelGEatWeapon;
+		killFeedIndex = 142;
+	}
+}
+public class WheelGatorFallWeapon : Weapon {
+	public WheelGatorFallWeapon() {
+		index = (int)WeaponIds.WheelGFallWeapon;
+		killFeedIndex = 142;
+	}
+}
+
+public class WheelGatorGrabWeapon : Weapon {
+	public WheelGatorGrabWeapon() {
+		index = (int)WeaponIds.WheelGGrabWeapon;
+		killFeedIndex = 142;
 	}
 }
 

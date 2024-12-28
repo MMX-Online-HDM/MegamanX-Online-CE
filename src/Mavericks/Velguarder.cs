@@ -3,7 +3,7 @@
 namespace MMXOnline;
 
 public class Velguarder : Maverick {
-	public VelGMeleeWeapon meleeWeapon;
+	public VelGMeleeWeapon meleeWeapon = new();
 
 	public Velguarder(
 		Player player, Point pos, Point destPos, int xDir,
@@ -12,7 +12,6 @@ public class Velguarder : Maverick {
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
 		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
-		meleeWeapon = new VelGMeleeWeapon(player);
 		canClimbWall = true;
 
 		awardWeaponId = WeaponIds.Buster;
@@ -131,10 +130,9 @@ public class VelGIceWeapon : Weapon {
 }
 
 public class VelGMeleeWeapon : Weapon {
-	public VelGMeleeWeapon(Player player) {
+	public VelGMeleeWeapon() {
 		index = (int)WeaponIds.VelGMelee;
 		killFeedIndex = 101;
-		damager = new Damager(player, 3, Global.defFlinch, 0.5f);
 	}
 }
 #endregion

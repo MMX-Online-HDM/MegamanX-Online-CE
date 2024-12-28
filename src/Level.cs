@@ -1299,6 +1299,17 @@ public partial class Level {
 		foreach ((int x, int y)gridData in arrayGrid) {
 			// Initalize data.
 			List<GameObject> currentGrid = new(grid[gridData.x, gridData.y]);
+			// Give piority to some objects.
+			currentGrid = currentGrid.OrderBy(gameObj => {
+				if (gameObj is not Actor actor) {
+					return 2;
+				}
+				if (actor.highPiority) {
+					return 0;
+				}
+				return 1;
+			}).ToList();
+			// Get the terrain.
 			List<GameObject>? currentTerrainGrid = null;
 			if (terrainGrid[gridData.x, gridData.y].Count >= 1) {
 				currentTerrainGrid = new List<GameObject>(terrainGrid[gridData.x, gridData.y]);

@@ -421,7 +421,7 @@ public partial class RPCCreateProj : RPC {
 				proj = new FlameMBigFireProj(new FlameMOilFireWeapon(), pos, xDir, 0, player, netProjByte);
 				break;
 			case (int)ProjIds.FlameMStompShockwave:
-				proj = new FlameMStompShockwave(new FlameMStompWeapon(player), pos, xDir, player, netProjByte);
+				proj = new FlameMStompShockwave(new FlameMStompWeapon(), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.VelGFire:
 				proj = new VelGFireProj(new VelGFireWeapon(), pos, xDir, player, netProjByte);

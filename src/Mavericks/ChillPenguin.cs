@@ -5,11 +5,11 @@ using System.Linq;
 namespace MMXOnline;
 
 public class ChillPenguin : Maverick {
-	public ChillPIceShotWeapon iceShotWeapon = new ChillPIceShotWeapon();
-	public ChillPIceStatueWeapon iceStatueWeapon = new ChillPIceStatueWeapon();
-	public ChillPIceBlowWeapon iceWindWeapon = new ChillPIceBlowWeapon();
-	public ChillPBlizzardWeapon blizzardWeapon = new ChillPBlizzardWeapon();
-	public ChillPSlideWeapon slideWeapon;
+	public ChillPIceShotWeapon iceShotWeapon = new();
+	public ChillPIceStatueWeapon iceStatueWeapon = new();
+	public ChillPIceBlowWeapon iceWindWeapon = new();
+	public ChillPBlizzardWeapon blizzardWeapon = new();
+	public ChillPSlideWeapon slideWeapon = new();
 
 	public ChillPenguin(
 		Player player, Point pos, Point destPos,
@@ -17,7 +17,6 @@ public class ChillPenguin : Maverick {
 	) : base(
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
-		slideWeapon = new ChillPSlideWeapon(player);
 		stateCooldowns.Add(typeof(ChillPIceBlowState), new MaverickStateCooldown(true, false, 2f));
 		stateCooldowns.Add(typeof(ChillPSlideState), new MaverickStateCooldown(true, false, 0.5f));
 		stateCooldowns.Add(typeof(ChillPBlizzardState), new MaverickStateCooldown(false, false, 3f));
@@ -157,7 +156,6 @@ public class ChillPenguin : Maverick {
 	}
 }
 
-
 #region weapons
 public class ChillPIceShotWeapon : Weapon {
 	public ChillPIceShotWeapon() {
@@ -188,10 +186,9 @@ public class ChillPBlizzardWeapon : Weapon {
 }
 
 public class ChillPSlideWeapon : Weapon {
-	public ChillPSlideWeapon(Player player) {
+	public ChillPSlideWeapon() {
 		index = (int)WeaponIds.ChillPSlide;
 		killFeedIndex = 93;
-		damager = new Damager(player, 3, Global.defFlinch, 0.75f);
 	}
 }
 

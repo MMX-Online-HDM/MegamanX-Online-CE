@@ -69,11 +69,29 @@ public class CrushCrawfish : Maverick {
 		return mshoot;
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name.EndsWith("_dash")) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.CrushCGrab, player, damage: 0, flinch: 0, hitCooldown: 0, owningActor: this);
-		}
-		return null;
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Grab,
+	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"crushc_grab" or "crushc_dash" => MeleeIds.Grab,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Grab => new GenericMeleeProj(
+				weapon, pos, ProjIds.CrushCGrab, player,
+				0, 0, 0, addToLevel: addToLevel
+			),
+			_ => null
+		};
 	}
 
 }

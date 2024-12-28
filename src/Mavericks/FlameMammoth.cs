@@ -3,7 +3,7 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class FlameMammoth : Maverick {
-	public FlameMStompWeapon stompWeapon;
+	public FlameMStompWeapon stompWeapon = new();
 
 	public FlameMammoth(
 		Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
@@ -11,7 +11,6 @@ public class FlameMammoth : Maverick {
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
 		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.5f));
-		stompWeapon = new FlameMStompWeapon(player);
 		stateCooldowns.Add(typeof(FlameMOilState), new MaverickStateCooldown(false, true, 0.5f));
 
 		awardWeaponId = WeaponIds.FireWave;
@@ -127,10 +126,9 @@ public class FlameMFireballWeapon : Weapon {
 }
 
 public class FlameMStompWeapon : Weapon {
-	public FlameMStompWeapon(Player player) {
+	public FlameMStompWeapon() {
 		index = (int)WeaponIds.FlameMStomp;
 		killFeedIndex = 100;
-		damager = new Damager(player, 6, Global.defFlinch, 0.5f);
 	}
 }
 

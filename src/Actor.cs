@@ -161,6 +161,7 @@ public partial class Actor : GameObject {
 	public float waterTime;
 
 	public float timeStopTime;
+	public bool highPiority;
 
 	public Actor(
 		string spriteName, Point pos, ushort? netId, bool ownedByLocalPlayer, bool dontAddToLevel

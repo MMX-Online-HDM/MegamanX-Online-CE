@@ -4,18 +4,15 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class SparkMandrill : Maverick {
-	public SparkMPunchWeapon punchWeapon;
-	public SparkMSparkWeapon sparkWeapon;
-	public SparkMStompWeapon stompWeapon;
+	public SparkMPunchWeapon punchWeapon = new();
+	public SparkMSparkWeapon sparkWeapon = new();
+	public SparkMStompWeapon stompWeapon = new();
 
 	public SparkMandrill(
 		Player player, Point pos, Point destPos, int xDir,
 		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
 	) : base(player, pos, destPos, xDir, netId, ownedByLocalPlayer
 ) {
-		punchWeapon = new SparkMPunchWeapon(player);
-		sparkWeapon = new SparkMSparkWeapon(player);
-		stompWeapon = new SparkMStompWeapon(player);
 
 		stateCooldowns.Add(typeof(SparkMPunchState), new MaverickStateCooldown(true, true, 1f));
 		stateCooldowns.Add(typeof(SparkMDashPunchState), new MaverickStateCooldown(true, false, 0.75f));
@@ -159,26 +156,23 @@ public class SparkMandrill : Maverick {
 
 #region weapons
 public class SparkMSparkWeapon : Weapon {
-	public SparkMSparkWeapon(Player player) {
+	public SparkMSparkWeapon() {
 		index = (int)WeaponIds.SparkMSpark;
 		killFeedIndex = 94;
-		damager = new Damager(player, 4, Global.defFlinch, 0.5f);
 	}
 }
 
 public class SparkMStompWeapon : Weapon {
-	public SparkMStompWeapon(Player player) {
+	public SparkMStompWeapon() {
 		index = (int)WeaponIds.SparkMStomp;
 		killFeedIndex = 94;
-		damager = new Damager(player, 4, Global.defFlinch, 0.5f);
 	}
 }
 
 public class SparkMPunchWeapon : Weapon {
-	public SparkMPunchWeapon(Player player) {
+	public SparkMPunchWeapon() {
 		index = (int)WeaponIds.SparkMPunch;
 		killFeedIndex = 94;
-		damager = new Damager(player, 4, Global.defFlinch, 0.75f);
 	}
 }
 #endregion

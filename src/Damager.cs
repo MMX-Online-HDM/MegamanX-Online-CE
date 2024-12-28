@@ -7,7 +7,7 @@ public class Damager {
 	public Player owner;
 	public float damage;
 	public float hitCooldownSeconds {
-		set => MathF.Ceiling(value * 60f);
+		set => hitCooldown = MathF.Ceiling(value * 60f);
 		get => hitCooldown / 60f;
 	}
 	public float hitCooldown;
@@ -70,7 +70,7 @@ public class Damager {
 		this.owner = owner;
 		this.damage = damage;
 		this.flinch = flinch;
-		this.hitCooldownSeconds = hitCooldown;
+		hitCooldownSeconds = hitCooldown;
 		this.knockback = knockback;
 	}
 

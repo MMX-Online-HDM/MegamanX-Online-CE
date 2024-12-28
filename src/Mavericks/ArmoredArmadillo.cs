@@ -3,15 +3,14 @@
 namespace MMXOnline;
 
 public class ArmoredArmadillo : Maverick {
-	public ArmoredAProjWeapon projWeapon = new ArmoredAProjWeapon();
-	public ArmoredAChargeReleaseWeapon chargeReleaseWeapon = new ArmoredAChargeReleaseWeapon();
-	public ArmoredARollWeapon rollWeapon;
+	public ArmoredAProjWeapon projWeapon = new();
+	public ArmoredAChargeReleaseWeapon chargeReleaseWeapon = new();
+	public ArmoredARollWeapon rollWeapon = new();
 	public const float rollTransJumpPower = 250;
 	public bool noArmor;
 
 	public ArmoredArmadillo(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
 		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
-		rollWeapon = new ArmoredARollWeapon(player);
 		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.6f));
 		//stateCooldowns.Add(typeof(ArmoredARollEnterState), new MaverickStateCooldown(false, false, 4));
 
@@ -208,8 +207,7 @@ public class ArmoredAChargeReleaseWeapon : Weapon {
 }
 
 public class ArmoredARollWeapon : Weapon {
-	public ArmoredARollWeapon(Player player) {
-		damager = new Damager(player, 3, Global.defFlinch, 0.75f);
+	public ArmoredARollWeapon() {
 		index = (int)WeaponIds.ArmoredARoll;
 		killFeedIndex = 95;
 	}
