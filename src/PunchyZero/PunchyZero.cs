@@ -526,20 +526,6 @@ public class PunchyZero : Character {
 		return shaders;
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		int meleeId = getHitboxMeleeId(hitbox);
-		if (meleeId == -1) {
-			return null;
-		}
-		Projectile? proj = getMeleeProjById(meleeId, centerPoint);
-		if (proj != null) {
-			proj.meleeId = meleeId;
-			proj.owningActor = this;
-			return proj;
-		}
-		return null;
-	}
-
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
 			"zero_punch" => MeleeIds.Punch,
