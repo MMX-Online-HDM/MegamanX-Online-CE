@@ -1302,10 +1302,13 @@ public partial class Level {
 			// Give piority to some objects.
 			currentGrid = currentGrid.OrderBy(gameObj => {
 				if (gameObj is not Actor actor) {
-					return 2;
+					return 10;
 				}
 				if (actor.highPiority) {
 					return 0;
+				}
+				if (actor is IDamagable) {
+					return 2;
 				}
 				return 1;
 			}).ToList();
