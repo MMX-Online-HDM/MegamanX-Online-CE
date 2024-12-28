@@ -122,8 +122,8 @@ public class BlizzardBuffalo : Maverick {
 	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
 		return (MeleeIds)id switch {
 			MeleeIds.Dash => new GenericMeleeProj(
-				weapon, pos, ProjIds.BBuffaloDash, player,
-				4, Global.defFlinch, addToLevel: addToLevel
+				weapon, pos, ProjIds.BBuffaloCrash, player,
+				4, Global.defFlinch, 60, addToLevel: addToLevel
 			),
 			MeleeIds.Fall => new GenericMeleeProj(
 				weapon, pos, ProjIds.BBuffaloStomp, player,
@@ -409,10 +409,9 @@ public class BBuffaloBeamProj : Projectile {
 
 public class BBuffaloShootBeamState : MaverickState {
 	bool shotOnce;
-	public Anim muzzle;
-	public BBuffaloBeamProj proj;
+	public Anim? muzzle;
+	public BBuffaloBeamProj? proj;
 	public BBuffaloShootBeamState() : base("shoot_beam", "shoot_beam_start") {
-		//enterSound = "bbuffaloBeamStart";
 	}
 
 	public override void update() {
@@ -429,7 +428,6 @@ public class BBuffaloShootBeamState : MaverickState {
 		if (proj != null && !proj.destroyed && input.isPressed(Control.Special1, player)) {
 			proj.release();
 		}
-
 		if (muzzle?.destroyed == true && proj == null) {
 			proj = new BBuffaloBeamProj(maverick.weapon, shootPos.Value.addxy(maverick.xDir * 20, 0), maverick.xDir, maverick as BlizzardBuffalo, player, player.getNextActorNetId(), sendRpc: true);
 		}
@@ -448,7 +446,7 @@ public class BBuffaloShootBeamState : MaverickState {
 
 public class BBuffaloDashState : MaverickState {
 	float dustTime;
-	Character victim;
+	Character? victim;
 	public BBuffaloDashState() : base("dash", "dash_start") {
 	}
 
@@ -487,6 +485,9 @@ public class BBuffaloDashState : MaverickState {
 		if (isHoldStateOver(1, 4, 2, Control.Dash)) {
 			maverick.changeToIdleOrFall();
 			return;
+		}
+		if (player.input.isPressed(Control.Special1, player)) {
+			maverick.changeSpriteFromName("dash_grab", false);
 		}
 	}
 
@@ -534,7 +535,7 @@ public class BBuffaloCrashProj : Projectile {
 	) {
 		setIndestructableProperties();
 		maxTime = 0.15f;
-
+		projId = (int)ProjIds.BBuffaloCrash;
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
