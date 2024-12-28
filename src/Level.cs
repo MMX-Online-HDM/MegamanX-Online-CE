@@ -866,7 +866,7 @@ public partial class Level {
 		//new Mechaniloid(new Point(128, 128), p, 1, new MechaniloidWeapon(p, MechaniloidType.Hopper), MechaniloidType.Hopper, p.getNextActorNetId(), true);
 	}
 
-	public void chamgeCameraScale(float scale) {
+	public void changeCameraScale(float scale) {
 		if (server.fixedCamera) {
 			scale *= 2;
 		}
