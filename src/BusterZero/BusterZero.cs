@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace MMXOnline;
@@ -169,7 +169,7 @@ public class BusterZero : Character {
 	public void shoot(int chargeLevel) {
 		if (chargeLevel == 0) {
 			for (int i = zeroLemonsOnField.Count - 1; i >= 0; i--) {
-				if (zeroLemonsOnField[i].destroyed) {
+				if (zeroLemonsOnField[i].destroyed || zeroLemonsOnField[i].reflectCount > 0) {
 					zeroLemonsOnField.RemoveAt(i);
 				}
 			}

@@ -1674,13 +1674,6 @@ public partial class Level {
 
 		bool isSlown = false;
 
-		if (actor is Character chr2) {
-			if (chr2.virusTime > 0) {
-				slowAmount = 1 - (0.25f * (chr2.virusTime / 8));
-				isSlown = true;
-			}
-		}
-
 		if (actor is Projectile || actor is Character || actor is Anim || actor is RideArmor || actor is OverdriveOstrich) {
 			foreach (var cch in chargedCrystalHunters) {
 				var chr = go as Character;
@@ -1688,23 +1681,39 @@ public partial class Level {
 				if (chr != null && chr.isStatusImmune()) continue;
 
 				var proj = go as Projectile;
-				if (proj != null && proj.damager.owner.alliance == cch.owner.alliance) continue;
-				if (proj != null && proj.damager?.owner?.character?.isStatusImmune() == true) continue;
-
+				if (proj != null && proj.damager.owner.alliance == cch.owner.alliance) {
+					continue;
+				}
 				var mech = go as RideArmor;
-				if (mech != null && mech.player != null && mech.player.alliance == cch.owner.alliance) continue;
-
-				var oo = actor as OverdriveOstrich;
-				if (oo != null && oo.player != null && oo.player.alliance == cch.owner.alliance) continue;
-
+				if (mech != null && mech.player != null && mech.player.alliance == cch.owner.alliance) {
+					continue;
+				}
+				var mvrk = actor as Maverick;
+				if (mvrk != null && mvrk.player != null && mvrk.player.alliance == cch.owner.alliance) {
+					continue;
+				}
 				if (cch.pos.distanceTo(actor.getCenterPos()) < CrystalHunterCharged.radius) {
-					if (cch.isSnails) slowAmount = 0.5f;
-					if (oo != null && oo.ownedByLocalPlayer && oo.state is not OverdriveOCrystalizedState && oo.crystalizeCooldown == 0) {
+					if (cch.isSnails) {
+						slowAmount = 0.5f;
+					}
+					if (actor is OverdriveOstrich oo && oo.ownedByLocalPlayer &&
+						oo.state is not OverdriveOCrystalizedState && oo.crystalizeCooldown == 0
+					) {
 						oo.changeState(new OverdriveOCrystalizedState());
 					}
 					isSlown = true;
 					break;
 				}
+			}
+		}
+
+		if (actor is Character chr2) {
+			if (chr2.virusTime > 0) {
+				if (!isSlown) {
+					slowAmount = 1;
+				}
+				slowAmount *= 1 - (0.25f * (chr2.virusTime / 8));
+				isSlown = true;
 			}
 		}
 
