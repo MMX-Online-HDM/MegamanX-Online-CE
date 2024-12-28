@@ -115,6 +115,7 @@ public class CmdSigma : BaseSigma {
 		return "sigma_" + spriteName;
 	}
 
+	// Melee IDs for attacks.
 	public enum MeleeIds {
 		None = -1,
 		Guard,

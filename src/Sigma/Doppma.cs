@@ -115,6 +115,7 @@ public class Doppma : BaseSigma {
 		return "sigma3_" + spriteName;
 	}
 
+	// Melee IDs for attacks.
 	public enum MeleeIds {
 		None = -1,
 		Guard,

@@ -611,7 +611,6 @@ public class Vile : Character {
 		}
 	}
 
-
 	// Melee IDs for attacks.
 	public enum MeleeIds {
 		None = -1,

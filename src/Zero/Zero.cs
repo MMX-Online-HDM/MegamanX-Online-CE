@@ -659,7 +659,7 @@ public class Zero : Character {
 		// Assing data variables.
 		proj.meleeId = meleeId;
 		proj.owningActor = this;
-		
+
 		// Damage based on tripleSlash time.
 		if (meleeId == (int)MeleeIds.HuhSlash) {
 			float timeSinceStart = zeroTripleSlashEndTime - zeroTripleStartTime;
