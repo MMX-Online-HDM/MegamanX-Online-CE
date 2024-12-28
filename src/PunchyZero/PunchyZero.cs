@@ -550,7 +550,7 @@ public class PunchyZero : Character {
 		Projectile? proj = id switch {
 			(int)MeleeIds.Punch => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.PZeroPunch, player,
-				2, 0, 0.25f,
+				2, 0, 15,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Punch2 => new GenericMeleeProj(

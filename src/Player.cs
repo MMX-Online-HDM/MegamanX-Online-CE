@@ -2504,19 +2504,19 @@ public partial class Player {
 	}
 
 	public bool isSummoner() {
-		return loadout?.sigmaLoadout != null && loadout.sigmaLoadout.commandMode == 0;
+		return isAI || loadout?.sigmaLoadout != null && loadout.sigmaLoadout.commandMode == 0;
 	}
 
 	public bool isPuppeteer() {
-		return loadout?.sigmaLoadout != null && loadout.sigmaLoadout.commandMode == 1;
+		return !isAI && loadout?.sigmaLoadout != null && loadout.sigmaLoadout.commandMode == 1;
 	}
 
 	public bool isStriker() {
-		return loadout?.sigmaLoadout != null && loadout.sigmaLoadout.commandMode == 2;
+		return !isAI && loadout?.sigmaLoadout != null && loadout.sigmaLoadout.commandMode == 2;
 	}
 
 	public bool isTagTeam() {
-		return loadout?.sigmaLoadout != null && loadout.sigmaLoadout.commandMode == 3;
+		return !isAI && loadout?.sigmaLoadout != null && loadout.sigmaLoadout.commandMode == 3;
 	}
 
 	public bool isRefundableMode() {
