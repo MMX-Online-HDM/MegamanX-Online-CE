@@ -125,9 +125,9 @@ public class OverdriveOstrich : Maverick {
 
 	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (sprite.name.Contains("skip")) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.OverdriveOMelee, player, 3, Global.defFlinch, 1);
+			return new GenericMeleeProj(weapon, centerPoint, ProjIds.OverdriveOMelee, player, 3, Global.defFlinch, 60);
 		} else if (sprite.name.EndsWith("_run") && MathF.Abs(deltaPos.x) >= damageSpeed * Global.spf) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.OverdriveOMelee, player, 2, Global.halfFlinch, 1);
+			return new GenericMeleeProj(weapon, centerPoint, ProjIds.OverdriveOMelee, player, 2, Global.halfFlinch, 60);
 		}
 		return null;
 	}

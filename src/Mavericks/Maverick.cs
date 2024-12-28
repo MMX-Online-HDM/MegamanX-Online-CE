@@ -594,7 +594,7 @@ public class Maverick : Actor, IDamagable {
 				Point centerPoint = globalCollider.shape.getRect().center();
 				float damage = 3;
 				int flinch = 0;
-				Projectile proj = new GenericMeleeProj(weapon, centerPoint, ProjIds.MaverickContactDamage, player, damage, flinch, 0.5f);
+				Projectile proj = new GenericMeleeProj(weapon, centerPoint, ProjIds.MaverickContactDamage, player, damage, flinch);
 				proj.globalCollider = globalCollider.clone();
 				return proj;
 			};
