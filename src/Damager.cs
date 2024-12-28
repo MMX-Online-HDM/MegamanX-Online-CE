@@ -6,6 +6,10 @@ namespace MMXOnline;
 public class Damager {
 	public Player owner;
 	public float damage;
+	public float hitCooldownSeconds {
+		set => MathF.Ceiling(value / 60f);
+		get => hitCooldown * 60f;
+	}
 	public float hitCooldown;
 	public int flinch; // Number of frames to flinch
 	public float knockback;
@@ -16,57 +20,57 @@ public class Damager {
 	public const float headshotModifier = 2;
 
 	public static readonly Dictionary<int, float> projectileFlinchCooldowns = new Dictionary<int, float>() {
-		{ (int)ProjIds.ElectricSpark, 1 },
-		{ (int)ProjIds.TriadThunder, 2.25f },
-		{ (int)ProjIds.TriadThunderBall, 2.25f },
-		{ (int)ProjIds.TriadThunderBeam, 2.25f },
-		{ (int)ProjIds.PlasmaGunBeamProj, 1 },
-		{ (int)ProjIds.VoltTornado, 1 },
-		{ (int)ProjIds.TornadoCharged, 1 },
-		//{ (int)ProjIds.KKnuckle, 1 },
-		{ (int)ProjIds.PZeroPunch2, 1 },
-		{ (int)ProjIds.PZeroSenpuukyaku, 1 },
-		{ (int)ProjIds.PZeroAirKick, 1 },
-		{ (int)ProjIds.MechPunch, 1 },
-		{ (int)ProjIds.MechKangarooPunch, 1 },
-		{ (int)ProjIds.MechGoliathPunch, 1 },
-		{ (int)ProjIds.MechDevilBearPunch, 1 },
-		{ (int)ProjIds.MechStomp, 1 },
-		{ (int)ProjIds.MechChain, 1 },
-		{ (int)ProjIds.TornadoFangCharged, 1 },
-		{ (int)ProjIds.Headbutt, 1 },
-		{ (int)ProjIds.RocketPunch, 1 },
-		{ (int)ProjIds.InfinityGig, 1 },
-		{ (int)ProjIds.SpoiledBrat, 1 },
-		{ (int)ProjIds.SpinningBladeCharged, 1 },
-		{ (int)ProjIds.Shingetsurin, 1 },
-		{ (int)ProjIds.MagnetMineCharged, 1 },
-		{ (int)ProjIds.Sigma2ViralBeam, 1 },
-		{ (int)ProjIds.Sigma2HopperDrill, 0.9f },
-		{ (int)ProjIds.WSpongeChainSpin, 1 },
-		{ (int)ProjIds.MorphMCSpin, 1 },
-		{ (int)ProjIds.BCrabClaw, 1 },
-		{ (int)ProjIds.SpeedBurnerCharged, 0.5f },
-		{ (int)ProjIds.VelGMelee, 1f },
-		{ (int)ProjIds.OverdriveOMelee, 1f },
-		{ (int)ProjIds.WheelGSpinWheel, 1f },
-		{ (int)ProjIds.Sigma3KaiserStomp, 1f },
-		{ (int)ProjIds.Sigma3KaiserBeam, 1f },
-		{ (int)ProjIds.UPPunch, 1f },
-		{ (int)ProjIds.CopyShot, 1f },
-		{ (int)ProjIds.NeonTClawAir, 1f },
-		{ (int)ProjIds.NeonTClawDash, 1f },
-		{ (int)ProjIds.VoltCTriadThunder, 1f },
-		{ (int)ProjIds.Rekkoha, 1f },
-		{ (int)ProjIds.HexaInvolute, 1f },
-		{ (int)ProjIds.ZSaber3, 1f },
+		{ (int)ProjIds.ElectricSpark, 60 },
+		{ (int)ProjIds.TriadThunder, 135 },
+		{ (int)ProjIds.TriadThunderBall, 135 },
+		{ (int)ProjIds.TriadThunderBeam, 135 },
+		{ (int)ProjIds.PlasmaGunBeamProj, 60 },
+		{ (int)ProjIds.VoltTornado, 60 },
+		{ (int)ProjIds.TornadoCharged, 60 },
+		//{ (int)ProjIds.KKnuckle, 60 },
+		{ (int)ProjIds.PZeroPunch2, 60 },
+		{ (int)ProjIds.PZeroSenpuukyaku, 60 },
+		{ (int)ProjIds.PZeroAirKick, 60 },
+		{ (int)ProjIds.MechPunch, 60 },
+		{ (int)ProjIds.MechKangarooPunch, 60 },
+		{ (int)ProjIds.MechGoliathPunch, 60 },
+		{ (int)ProjIds.MechDevilBearPunch, 60 },
+		{ (int)ProjIds.MechStomp, 60 },
+		{ (int)ProjIds.MechChain, 60 },
+		{ (int)ProjIds.TornadoFangCharged, 60 },
+		{ (int)ProjIds.Headbutt, 60 },
+		{ (int)ProjIds.RocketPunch, 60 },
+		{ (int)ProjIds.InfinityGig, 60 },
+		{ (int)ProjIds.SpoiledBrat, 60 },
+		{ (int)ProjIds.SpinningBladeCharged, 60 },
+		{ (int)ProjIds.Shingetsurin, 60 },
+		{ (int)ProjIds.MagnetMineCharged, 60 },
+		{ (int)ProjIds.Sigma2ViralBeam, 60 },
+		{ (int)ProjIds.Sigma2HopperDrill, 54 },
+		{ (int)ProjIds.WSpongeChainSpin, 60 },
+		{ (int)ProjIds.MorphMCSpin, 60 },
+		{ (int)ProjIds.BCrabClaw, 60 },
+		{ (int)ProjIds.SpeedBurnerCharged, 30 },
+		{ (int)ProjIds.VelGMelee, 60 },
+		{ (int)ProjIds.OverdriveOMelee, 60 },
+		{ (int)ProjIds.WheelGSpinWheel, 60 },
+		{ (int)ProjIds.Sigma3KaiserStomp, 60 },
+		{ (int)ProjIds.Sigma3KaiserBeam, 60 },
+		{ (int)ProjIds.UPPunch, 60 },
+		{ (int)ProjIds.CopyShot, 60 },
+		{ (int)ProjIds.NeonTClawAir, 60 },
+		{ (int)ProjIds.NeonTClawDash, 60 },
+		{ (int)ProjIds.VoltCTriadThunder, 60 },
+		{ (int)ProjIds.Rekkoha, 60 },
+		{ (int)ProjIds.HexaInvolute, 60 },
+		{ (int)ProjIds.ZSaber3, 60 },
 	};
 
 	public Damager(Player owner, float damage, int flinch, float hitCooldown, float knockback = 0) {
 		this.owner = owner;
 		this.damage = damage;
 		this.flinch = flinch;
-		this.hitCooldown = hitCooldown;
+		this.hitCooldownSeconds = hitCooldown;
 		this.knockback = knockback;
 	}
 
@@ -105,7 +109,7 @@ public class Damager {
 		}
 
 		return applyDamage(
-			owner, newDamage, hitCooldown, newFlinch, victim as Actor,
+			owner, newDamage, hitCooldownSeconds, newFlinch, victim as Actor,
 			weakness, weapon.index, weapon.killFeedIndex, actor, projId, sendRpc
 		);
 	}
@@ -673,8 +677,8 @@ public class Damager {
 			if (projectileFlinchCooldowns.ContainsKey(projId)) {
 				flinchCooldownTime = projectileFlinchCooldowns[projId];
 			}
-			if (!maverick.player.isTagTeam() && flinchCooldownTime < 0.75f) {
-				flinchCooldownTime = 0.75f;
+			if (!maverick.player.isTagTeam() && flinchCooldownTime < 45) {
+				flinchCooldownTime = 45;
 			}
 			if (!maverick.flinchCooldown.ContainsKey(flinchKey)) {
 				maverick.flinchCooldown[flinchKey] = 0;

@@ -274,7 +274,7 @@ public class XUPParryProjState : CharState {
 			float damage = Math.Max(otherProj.damager.damage * 2, 4);
 			//int flinch = otherProj.damager.flinch;
 			int flinch = Global.defFlinch;
-			float hitCooldown = otherProj.damager.hitCooldown;
+			float hitCooldown = otherProj.damager.hitCooldownSeconds;
 			new UPParryRangedProj(new RCXParry(), shootPos.Value, character.xDir, otherProj.sprite.name, damage, flinch, hitCooldown, player, player.getNextActorNetId(), rpc: true);
 		}
 

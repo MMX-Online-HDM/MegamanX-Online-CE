@@ -106,7 +106,7 @@ public class VulcanProj : Projectile {
 		if (weapon.type == (int)VulcanType.DistanceNeedler) {
 			maxTime = 0.3f;
 			destroyOnHit = false;
-			damager.hitCooldown = 0.2f;
+			damager.hitCooldown = 12;
 			damager.damage = 2;
 			projId = (int)ProjIds.DistanceNeedler;
 		} else if (weapon.type == (int)VulcanType.BuckshotDance) {

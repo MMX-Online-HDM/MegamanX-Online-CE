@@ -153,9 +153,13 @@ public class BHornetBeeProj : Projectile, IDamagable {
 		canBeLocal = false;
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
-		updateProjectileCooldown();
 		if (!ownedByLocalPlayer) return;
 
 		if (latchTarget?.destroyed == true) {
@@ -253,9 +257,13 @@ public class BHornetHomingBeeProj : Projectile, IDamagable {
 		canBeLocal = false;
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
-		updateProjectileCooldown();
 
 		if (Global.isOnFrameCycle(10)) {
 			changeSpriteIfDifferent("bhornet_proj_wasp_small", false);

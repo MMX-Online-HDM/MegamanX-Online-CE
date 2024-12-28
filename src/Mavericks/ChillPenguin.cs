@@ -287,9 +287,13 @@ public class ChillPIceStatueProj : Projectile, IDamagable {
 		}
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
-		updateProjectileCooldown();
 
 		if (sprite.isAnimOver()) {
 			useGravity = true;

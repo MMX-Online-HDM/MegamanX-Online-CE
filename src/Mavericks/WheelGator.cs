@@ -199,7 +199,7 @@ public class WheelGSpinWheelProj : Projectile {
 
 	public override void onHitDamagable(IDamagable damagable) {
 		if (damagable is CrackedWall) {
-			damager.hitCooldown = hitCooldown;
+			damager.hitCooldownSeconds = hitCooldown;
 			return;
 		}
 

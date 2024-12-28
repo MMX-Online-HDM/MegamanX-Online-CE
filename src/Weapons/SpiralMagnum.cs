@@ -412,11 +412,13 @@ public class SniperMissileProj : Projectile, IDamagable {
 		}
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
-
-		updateProjectileCooldown();
-
 		speed += (Global.spf * 25);
 
 		if (blinkTime > 0) {

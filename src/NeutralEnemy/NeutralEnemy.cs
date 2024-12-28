@@ -35,6 +35,10 @@ public class NeutralEnemy : Actor, IDamagable {
 		this.alliance = alliance;
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
 	// For state update.
 	public override void statePreUpdate() {
 		state.stateTime += Global.speedMul;

@@ -269,9 +269,13 @@ public class CrackedWall : Actor, IDamagable {
 		this.destroyInstanceName = destroyInstanceName;
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
-		updateProjectileCooldown();
 	}
 
 	public void move(Point deltaPos) {

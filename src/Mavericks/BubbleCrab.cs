@@ -332,9 +332,13 @@ public class BCrabShieldProj : Projectile, IDamagable {
 		canBeLocal = false;
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
-		updateProjectileCooldown();
 
 		if (!ownedByLocalPlayer) return;
 
@@ -431,6 +435,11 @@ public class BCrabSummonBubbleProj : Projectile, IDamagable {
 		canBeLocal = false;
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
 		if (!ownedByLocalPlayer) return;
@@ -508,6 +517,11 @@ public class BCrabSummonCrabProj : Projectile, IDamagable {
 		base.onStart();
 		if (!ownedByLocalPlayer) return;
 		shield = new BCrabSummonBubbleProj(maverick.weapon, pos, xDir, owner, owner.getNextActorNetId(), rpc: true);
+	}
+
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
 	}
 
 	public override void update() {

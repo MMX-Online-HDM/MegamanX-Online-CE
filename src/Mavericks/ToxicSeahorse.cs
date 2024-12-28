@@ -113,6 +113,11 @@ public class TSeahorseAcidProj : Projectile, IDamagable {
 		checkBigAcidUnderwater();
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
 

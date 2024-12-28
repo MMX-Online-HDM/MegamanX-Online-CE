@@ -159,7 +159,7 @@ public class VileCutterProj : Projectile {
 			maxAngleDist = 45;
 			returnTime = 0;
 			damager.damage = 1;
-			damager.hitCooldown = 0.33f;
+			damager.hitCooldown = 20;
 		}
 
 		this.vel.y = 50;

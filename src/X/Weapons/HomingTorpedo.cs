@@ -121,10 +121,13 @@ public class TorpedoProj : Projectile, IDamagable {
 		target = null;
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
-
-		updateProjectileCooldown();
 		checkLandFrogTorpedo();
 
 		if (ownedByLocalPlayer && homing) {
