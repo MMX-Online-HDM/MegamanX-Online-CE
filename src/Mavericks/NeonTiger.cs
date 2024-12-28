@@ -93,15 +93,15 @@ public class NeonTiger : Maverick {
 
 	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (sprite.name == "neont_slash") {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.NeonTClaw, player, damage: 2, flinch: 0, hitCooldown: 0.2f, owningActor: this);
+			return new GenericMeleeProj(weapon, centerPoint, ProjIds.NeonTClaw, player, damage: 2, flinch: 0, hitCooldownSeconds: 0.2f, owningActor: this);
 		} else if (sprite.name == "neont_slash2") {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.NeonTClaw2, player, damage: 2, flinch: Global.halfFlinch, hitCooldown: 0.25f, owningActor: this);
+			return new GenericMeleeProj(weapon, centerPoint, ProjIds.NeonTClaw2, player, damage: 2, flinch: Global.halfFlinch, hitCooldownSeconds: 0.25f, owningActor: this);
 		} else if (sprite.name == "neont_jump_slash") {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.NeonTClawAir, player, damage: 3, flinch: Global.defFlinch, hitCooldown: 0.25f, owningActor: this);
+			return new GenericMeleeProj(weapon, centerPoint, ProjIds.NeonTClawAir, player, damage: 3, flinch: Global.defFlinch, hitCooldownSeconds: 0.25f, owningActor: this);
 		} else if (sprite.name == "neont_dash_slash") {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.NeonTClawDash, player, damage: 3, flinch: Global.halfFlinch, hitCooldown: 0.25f, owningActor: this);
+			return new GenericMeleeProj(weapon, centerPoint, ProjIds.NeonTClawDash, player, damage: 3, flinch: Global.halfFlinch, hitCooldownSeconds: 0.25f, owningActor: this);
 		} else if (sprite.name == "neont_wall_slash") {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.NeonTClawWall, player, damage: 3, flinch: 0, hitCooldown: 0.25f, owningActor: this);
+			return new GenericMeleeProj(weapon, centerPoint, ProjIds.NeonTClawWall, player, damage: 3, flinch: 0, hitCooldownSeconds: 0.25f, owningActor: this);
 		}
 		return null;
 	}

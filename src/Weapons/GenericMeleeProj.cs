@@ -1,11 +1,13 @@
-﻿namespace MMXOnline;
+﻿using System;
+
+namespace MMXOnline;
 
 public class GenericMeleeProj : Projectile {
 	public GenericMeleeProj(
 		Weapon weapon, Point pos, ProjIds projId, Player player,
 		float? damage = null, int? flinch = null, float? hitCooldown = null,
 		Actor? owningActor = null, bool isShield = false, bool isDeflectShield = false, bool isReflectShield = false,
-		bool addToLevel = false,
+		bool addToLevel = false, float? hitCooldownSeconds = null,
 		bool isZSaberEffect = false, bool isZSaberEffect2 = false, bool isZSaberEffect2B = false, bool isZSaberClang = false
 	) : base(
 		weapon, pos, 1, 0, 2, player, "empty", 0, 0.25f, null, player.ownedByLocalPlayer, addToLevel: addToLevel
@@ -16,8 +18,16 @@ public class GenericMeleeProj : Projectile {
 		this.projId = (int)projId;
 		damager.damage = damage ?? weapon.damager.damage;
 		damager.flinch = flinch ?? weapon.damager.flinch;
-		damager.hitCooldown = hitCooldown ?? weapon.damager.hitCooldown;
-		if (hitCooldown == null && damager.hitCooldown <= 0) {
+		if (hitCooldown != null) {
+			damager.hitCooldown = hitCooldown.Value;
+		}
+		else if (hitCooldownSeconds != null) {
+			damager.hitCooldownSeconds = hitCooldownSeconds.Value;
+		}
+		else {
+			damager.hitCooldown = weapon.damager.hitCooldown;
+		}
+		if (hitCooldownSeconds == null && damager.hitCooldown <= 0) {
 			damager.hitCooldown = 30;
 		}
 		this.owningActor = owningActor;

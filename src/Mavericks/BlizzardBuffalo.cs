@@ -112,7 +112,7 @@ public class BlizzardBuffalo : Maverick {
 		if (sprite.name.EndsWith("_dash")) {
 			return new GenericMeleeProj(
 				weapon, centerPoint, ProjIds.BBuffaloDrag,
-				player, damage: 0, flinch: 0, hitCooldown: 0.5f, owningActor: this
+				player, damage: 0, flinch: 0, hitCooldownSeconds: 0.5f, owningActor: this
 			);
 		}
 		if (sprite.name.Contains("fall")) {
@@ -120,7 +120,7 @@ public class BlizzardBuffalo : Maverick {
 			if (damagePercent > 0) {
 				return new GenericMeleeProj(
 					weapon, centerPoint, ProjIds.BBuffaloStomp,
-					player, damage: 4 * damagePercent, flinch: Global.defFlinch, hitCooldown: 0.5f
+					player, damage: 4 * damagePercent, flinch: Global.defFlinch, hitCooldownSeconds: 0.5f
 				);
 			}
 		}

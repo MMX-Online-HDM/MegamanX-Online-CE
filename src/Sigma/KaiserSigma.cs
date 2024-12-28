@@ -216,12 +216,12 @@ public partial class KaiserSigma : Character {
 		if (sprite.name == "kaisersigma_fall" && collider.isAttack()) {
 			return new GenericMeleeProj(
 				new KaiserStompWeapon(player), centerPoint, ProjIds.Sigma3KaiserStomp, player,
-				damage: 12 * getKaiserStompDamage(), flinch: Global.defFlinch, hitCooldown: 1f
+				damage: 12 * getKaiserStompDamage(), flinch: Global.defFlinch, hitCooldownSeconds: 1f
 			);
 		} else if (collider.name == "body") {
 			return new GenericMeleeProj(
 				new Weapon(), centerPoint, ProjIds.Sigma3KaiserSuit, player,
-				damage: 0, flinch: 0, hitCooldown: 1, isShield: true
+				damage: 0, flinch: 0, hitCooldownSeconds: 1, isShield: true
 			);
 		}
 		return null;
