@@ -858,7 +858,9 @@ public class Zero : Character {
 			(int)MeleeIds.Gokumonken => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.SwordBlock, player, 0, 0, 0, isDeflectShield: true,
 				addToLevel: addToLevel
-			),
+			) {
+				highPiority = true
+			},
 			(int)MeleeIds.Hadangeki => new GenericMeleeProj(
 				saberSwingWeapon, projPos, ProjIds.ZSaberProjSwing, player,
 				3, Global.defFlinch, 30, isReflectShield: true,

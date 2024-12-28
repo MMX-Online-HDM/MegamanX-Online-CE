@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace MMXOnline;
@@ -136,7 +136,9 @@ public class CmdSigma : BaseSigma {
 			MeleeIds.Guard => new GenericMeleeProj(
 				SigmaSlashWeapon.netWeapon, pos, ProjIds.SigmaSwordBlock, player,
 				0, 0, 0, isDeflectShield: true, addToLevel: addToLevel
-			),
+			) {
+				highPiority = true
+			},
 			MeleeIds.GenericSlash => new GenericMeleeProj(
 				SigmaSlashWeapon.netWeapon, pos, ProjIds.SigmaSlash, player, 3, 0,
 				addToLevel: addToLevel
