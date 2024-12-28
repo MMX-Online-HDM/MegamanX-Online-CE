@@ -16,7 +16,7 @@ public class GenericMeleeProj : Projectile {
 		this.projId = (int)projId;
 		damager.damage = damage ?? weapon.damager.damage;
 		damager.flinch = flinch ?? weapon.damager.flinch;
-		damager.hitCooldownSeconds = hitCooldown ?? weapon.damager.hitCooldownSeconds;
+		damager.hitCooldown = hitCooldown ?? weapon.damager.hitCooldown;
 		if (hitCooldown == null && damager.hitCooldown <= 0) {
 			damager.hitCooldown = 30;
 		}
