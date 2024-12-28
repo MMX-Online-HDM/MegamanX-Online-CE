@@ -25,7 +25,7 @@ public class GenericMeleeProj : Projectile {
 			damager.hitCooldownSeconds = hitCooldownSeconds.Value;
 		}
 		else {
-			damager.hitCooldown = weapon.damager.hitCooldown;
+			damager.hitCooldown = weapon?.damager?.hitCooldown ?? 0;
 		}
 		if (hitCooldownSeconds == null && damager.hitCooldown <= 0) {
 			damager.hitCooldown = 30;
