@@ -144,11 +144,29 @@ public class BubbleCrab : Maverick {
 		return aiAttackStates().GetRandomItem();
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name.Contains("jump_attack")) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.BCrabClaw, player, 1, Global.defFlinch, 9);
-		}
-		return null;
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		JumpAttack,
+	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"bcrab_jump_attack" or "bcrab_jump_attack_start" => MeleeIds.JumpAttack,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.JumpAttack => new GenericMeleeProj(
+				weapon, pos, ProjIds.BCrabClaw, player,
+				1, Global.defFlinch, 9, addToLevel: addToLevel
+			),
+			_ => null
+		};
 	}
 
 	public override void onDestroy() {

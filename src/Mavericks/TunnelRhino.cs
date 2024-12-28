@@ -72,41 +72,44 @@ public class TunnelRhino : Maverick {
 		};
 	}
 
-	public float getStompDamage() {
-		float damagePercent = 0;
-		if (deltaPos.y > 150 * Global.spf) damagePercent = 0.5f;
-		if (deltaPos.y > 225 * Global.spf) damagePercent = 0.75f;
-		if (deltaPos.y > 300 * Global.spf) damagePercent = 1;
-		return damagePercent;
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Dash,
+		Fall,
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name.EndsWith("_dash")) {
-			return new GenericMeleeProj(
-				weapon, centerPoint, ProjIds.TunnelRDash, player,
-				damage: 4, flinch: Global.defFlinch, owningActor: this
-			);
-		}
-		if (sprite.name.Contains("fall")) {
-			float damagePercent = getStompDamage();
-			if (damagePercent > 0) {
-				return new GenericMeleeProj(
-					weapon, centerPoint, ProjIds.TunnelRStomp, player,
-					damage: 4 * damagePercent, flinch: Global.defFlinch
-				);
-			}
-		}
-		return null;
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"tunnelr_dash" => MeleeIds.Dash,
+			"tunnelr_fall" => MeleeIds.Fall,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Dash => new GenericMeleeProj(
+				weapon, pos, ProjIds.TunnelRDash, player,
+				4, Global.defFlinch, addToLevel: addToLevel
+			),
+			MeleeIds.Fall => new GenericMeleeProj(
+				weapon, pos, ProjIds.TunnelRStomp, player,
+				4, Global.defFlinch, addToLevel: addToLevel
+			),
+			_ => null
+		};
 	}
 
 	public override void updateProjFromHitbox(Projectile proj) {
-		if (sprite.name.EndsWith("fall")) {
-			float damagePercent = getStompDamage();
-			if (damagePercent > 0) {
-				proj.damager.damage = 4 * damagePercent;
-			}
+		if (proj.projId == (int)ProjIds.TunnelRStomp) {
+			float damage = 1 + Helpers.clamp(MathF.Floor(deltaPos.y * 0.6125f), 0, 4);
+			proj.damager.damage = damage;
 		}
 	}
+
 }
 
 public class TunnelRTornadoFang : Projectile {

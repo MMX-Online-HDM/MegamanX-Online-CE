@@ -87,6 +87,32 @@ public class Velguarder : Maverick {
 		}
 		return null;
 	}
+
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Pounce,
+	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"velg_pounce" => MeleeIds.Pounce,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Pounce => new GenericMeleeProj(
+				meleeWeapon, pos, ProjIds.VelGMelee, player,
+				3, Global.defFlinch, addToLevel: addToLevel
+			),
+			_ => null
+		};
+	}
+
 }
 
 #region weapons

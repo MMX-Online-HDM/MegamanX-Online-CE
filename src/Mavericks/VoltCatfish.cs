@@ -127,29 +127,38 @@ public class VoltCatfish : Maverick {
 		return mshoot;
 	}
 
-	public float getStompDamage() {
-		float damage = 0;
-		if (deltaPos.y > 150 * Global.spf) damage = 2;
-		if (deltaPos.y > 225 * Global.spf) damage = 2;
-		if (deltaPos.y > 300 * Global.spf) damage = 3;
-		return damage;
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Fall,
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name.Contains("fall")) {
-			float damagePercent = getStompDamage();
-			if (damagePercent > 0) {
-				return new GenericMeleeProj(weapon, centerPoint, ProjIds.VoltCStomp, player, damage: getStompDamage(), flinch: Global.defFlinch);;
-			}
-		}
-		return null;
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"voltc_fall" => MeleeIds.Fall,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Fall => new GenericMeleeProj(
+				weapon, pos, ProjIds.VoltCStomp, player,
+				3, Global.defFlinch, addToLevel: addToLevel
+			),
+			_ => null
+		};
 	}
 
 	public override void updateProjFromHitbox(Projectile proj) {
-		if (sprite.name.EndsWith("fall")) {
-			proj.damager.damage = getStompDamage();
+		if (proj.projId == (int)ProjIds.VoltCStomp) {
+			float damage = 1 + Helpers.clamp(MathF.Floor(deltaPos.y * 0.6125f), 1, 3);
+			proj.damager.damage = damage;
 		}
 	}
+
 }
 
 public class VoltCTriadThunderProj : Projectile {

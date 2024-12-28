@@ -106,24 +106,55 @@ public class SparkMandrill : Maverick {
 		return attacks.GetRandomItem();
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name.Contains("punch")) {
-			return new GenericMeleeProj(punchWeapon, centerPoint, ProjIds.SparkMPunch, player);
-		}
-		if (sprite.name.Contains("shoot")) {
-			return new GenericMeleeProj(sparkWeapon, centerPoint, ProjIds.SparkMSpark, player);
-		}
-		if (sprite.name.Contains("fall")) {
-			float damagePercent = 0;
-			if (deltaPos.y > 100 * Global.spf) damagePercent = 0.5f;
-			if (deltaPos.y > 200 * Global.spf) damagePercent = 0.75f;
-			if (deltaPos.y > 300 * Global.spf) damagePercent = 1;
-			if (damagePercent > 0) {
-				return new GenericMeleeProj(stompWeapon, centerPoint, ProjIds.GBeetleStomp, player, damage: stompWeapon.damager.damage * damagePercent);
-			}
-		}
-		return null;
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Punch,
+		DashPunch,
+		Shoot,
+		Fall,	
 	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"sparkm_punch" => MeleeIds.Punch,
+			"sparkm_dash_punch" => MeleeIds.DashPunch,
+			"sparkm_shoot" => MeleeIds.Shoot,
+			"sparkm_fall" => MeleeIds.Fall,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Punch => new GenericMeleeProj(
+				punchWeapon, pos, ProjIds.SparkMPunch, player,
+				4, Global.defFlinch, 45, addToLevel: addToLevel
+			),
+			MeleeIds.DashPunch => new GenericMeleeProj(
+				punchWeapon, pos, ProjIds.SparkMPunch, player,
+				4, Global.defFlinch, 45, addToLevel: addToLevel
+			),
+			MeleeIds.Shoot => new GenericMeleeProj(
+				sparkWeapon, pos, ProjIds.SparkMSpark, player,
+				4, Global.defFlinch, addToLevel: addToLevel
+			),
+			MeleeIds.Fall => new GenericMeleeProj(
+				stompWeapon, pos, ProjIds.SparkMStomp, player,
+				2, Global.defFlinch, addToLevel: addToLevel
+			),
+			_ => null
+		};
+	}
+	public override void updateProjFromHitbox(Projectile proj) {
+		if (proj.projId == (int)ProjIds.SparkMStomp) {
+			float damage = Helpers.clamp(MathF.Floor(vel.y / 68), 1, 4);
+			proj.damager.damage = damage;
+		}
+	}
+
 }
 
 #region weapons
