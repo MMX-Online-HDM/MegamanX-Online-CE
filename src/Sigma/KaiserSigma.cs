@@ -247,6 +247,12 @@ public partial class KaiserSigma : Character {
 		};
 	}
 
+	public override void updateProjFromHitbox(Projectile proj) {
+		if (proj.projId == (int)ProjIds.Sigma3KaiserStomp) {
+			proj.damager.damage = getKaiserStompDamage();
+		}
+	}
+
 	public float getKaiserStompDamage() {
 		if (deltaPos.y >= 5) {
 			return 12;
@@ -258,12 +264,6 @@ public partial class KaiserSigma : Character {
 			return 6;
 		}
 		return 3;
-	}
-
-	public override void updateProjFromHitbox(Projectile proj) {
-		if (proj.projId == (int)ProjIds.Sigma3KaiserStomp) {
-			proj.damager.damage = getKaiserStompDamage();
-		}
 	}
 
 	public override bool canPickupFlag() {
