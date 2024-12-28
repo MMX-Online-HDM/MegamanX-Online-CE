@@ -925,8 +925,7 @@ public class AirDash : CharState {
 		Dash.dashBackwardsCode(character, initialDashDir);
 
 		base.update();
-
-		if (!player.input.isHeld(initialDashButton, player) && !stop) {
+		if (!player.isAI && !player.input.isHeld(initialDashButton, player) && !stop) {
 			dashTime = 50;
 		}
 		float speedModifier = 1;

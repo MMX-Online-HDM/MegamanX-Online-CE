@@ -49,7 +49,7 @@ public class BusterZero : Character {
 		// Cooldowns.
 		Helpers.decrementFrames(ref zSaberCooldown);
 		Helpers.decrementFrames(ref lemonCooldown);
-
+		Helpers.decrementFrames(ref aiAttackCooldown);
 		// For the shooting animation.
 		if (shootAnimTime > 0) {
 			shootAnimTime -= Global.speedMul;
@@ -356,5 +356,65 @@ public class BusterZero : Character {
 		data = data[data[0]..];
 		bool[] flags = Helpers.byteToBoolArray(data[0]);
 		isBlackZero = flags[0];
+	}
+	public float aiAttackCooldown;
+	public override void aiAttack(Actor? target) {
+		if (charState.normalCtrl) {
+			player.press(Control.Shoot);
+		} 
+		// Go hypermode 
+		if (player.currency >= 10 && !isBlackZero && !isInvulnerable()
+			&& charState is not HyperBusterZeroStart and not WarpIn) {
+			changeState(new HyperBusterZeroStart(), true);
+		}
+		bool isTargetInAir = pos.y < target?.pos.y - 20;
+		bool isTargetClose = pos.x < target?.pos.x - 10;
+		bool canHitMaxCharge = (!isTargetInAir && getChargeLevel() >= 4);
+		bool isFacingTarget = (pos.x < target?.pos.x && xDir == 1) || (pos.x >= target?.pos.x && xDir == -1);
+		int ZBattack = Helpers.randomRange(0, 2);
+		if (isTargetInAir && vel.y >= 0) {
+			player.press(Control.Jump);
+		}
+		if (!isInvulnerable() && charState is not LadderClimb && aiAttackCooldown <= 0) {
+			switch (ZBattack) {
+				// Release full charge if we have it.
+				case >= 0 when canHitMaxCharge && isFacingTarget:
+					player.press(Control.Shoot);
+					break;
+				// Saber swing when target is close.
+				case 0 when isTargetClose:
+					player.press(Control.Special1);
+					break;
+				// Another action if the enemy is on Do Jump and do SaberSwing.
+				case 1 when isTargetClose:
+					if (vel.y >= 0) {
+						player.press(Control.Jump);
+					}
+					player.press(Control.Special1);
+					break;
+				// Press Shoot to lemon.
+				default:
+					player.press(Control.Shoot);
+					break;
+			}
+			aiAttackCooldown = 10;
+		}
+		base.aiAttack(target);
+	}
+	public override void aiDodge(Actor? target) {
+		foreach (GameObject gameObject in getCloseActors(64, true, false, false)) {
+			if (gameObject is Projectile proj && proj.damager.owner.alliance != player.alliance && charState.attackCtrl) {
+				if (!(proj.projId == (int)ProjIds.RollingShield || proj.projId == (int)ProjIds.FrostShield || proj.projId == (int)ProjIds.SwordBlock
+					|| proj.projId == (int)ProjIds.FrostShieldAir || proj.projId == (int)ProjIds.FrostShieldChargedPlatform || proj.projId == (int)ProjIds.FrostShieldPlatform)
+				) {
+					if (zSaberCooldown <= 0) {
+						turnToInput(player.input, player);
+						changeState(new BusterZeroMelee(), true);
+						zSaberCooldown = 36;
+					}
+				}
+			}
+		}
+		base.aiDodge(target);
 	}
 }

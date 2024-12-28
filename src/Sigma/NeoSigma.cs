@@ -29,6 +29,7 @@ public class NeoSigma : BaseSigma {
 		Helpers.decrementTime(ref normalAttackCooldown);
 		Helpers.decrementTime(ref sigmaUpSlashCooldown);
 		Helpers.decrementTime(ref sigmaDownSlashCooldown);
+		Helpers.decrementFrames(ref aiAttackCooldown);
 		// For ladder and slide attacks.
 		if (isAttacking() && charState is WallSlide or LadderClimb) {
 			if (isAnimOver() && charState != null && charState is not SigmaClawState) {
@@ -185,5 +186,65 @@ public class NeoSigma : BaseSigma {
 
 		// Per-player data.
 		player.sigmaAmmo = data[0];
+	}
+	public float aiAttackCooldown;
+	public override void aiAttack(Actor? target) {
+		bool isTargetInAir = pos.y < target?.pos.y - 20;
+		bool isTargetClose = pos.x < target?.pos.x - 10;
+		if (currentWeapon is MaverickWeapon mw &&
+			mw.maverick == null && canAffordMaverick(mw)
+		) {
+			buyMaverick(mw);
+			if (mw.maverick != null) {
+				changeState(new CallDownMaverick(mw.maverick, true, false), true);
+			}
+			mw.summon(player, pos.addxy(0, -112), pos, xDir);
+			player.changeToSigmaSlot();
+		}
+		if (charState is not LadderClimb) {
+				int Neoattack = Helpers.randomRange(0, 5);
+				if (charState?.isGrabbedState == false && !player.isDead
+				    && !isInvulnerable() && aiAttackCooldown <= 0
+					&& !(charState is CallDownMaverick or SigmaElectricBall2State or SigmaElectricBallState)) {
+					switch (Neoattack) {
+						case 0 when isTargetClose:
+							player.press(Control.Shoot);
+							break;
+						case 1 when sigmaDownSlashCooldown <= 0 && grounded && isTargetInAir:
+							changeState(new SigmaUpDownSlashState(true), true);
+							sigmaDownSlashCooldown = 1f;						
+							break;
+						case 2 when sigmaUpSlashCooldown <= 0 && !grounded:
+							changeState(new SigmaUpDownSlashState(false), true);
+							sigmaUpSlashCooldown = 0.75f;
+							break;
+						case 3:
+							player.changeWeaponSlot(1);
+							break;
+						case 4:
+							player.changeWeaponSlot(2);						
+							break;
+						case 5:
+							player.changeWeaponSlot(0);
+							break;
+					}
+					aiAttackCooldown = 14;
+				}
+			}
+		base.aiAttack(target);
+	}
+	public override void aiDodge(Actor? target) {
+		foreach (GameObject gameObject in getCloseActors(32, true, false, false)) {
+			if (gameObject is Projectile proj && proj.damager.owner.alliance != player.alliance) {
+				if (player.sigmaAmmo >= 16 && player.sigmaAmmo <= 24) {
+					player.sigmaAmmo -= 16;
+					changeState(new SigmaElectricBallState(), true);
+				} else if (player.sigmaAmmo >= 28) {
+					player.sigmaAmmo = 0;
+					changeState(new SigmaElectricBall2State(), true);
+				}
+			}
+		}
+		base.aiDodge(target);
 	}
 }
