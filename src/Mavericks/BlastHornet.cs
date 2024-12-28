@@ -132,7 +132,7 @@ public class BlastHornet : Maverick {
 	// This can run on both owners and non-owners. So data used must be in sync.
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
-			"bhornet_stinger_attack" => MeleeIds.Stinger,
+			"bhornet_fly_stinger_attack" => MeleeIds.Stinger,
 			_ => MeleeIds.None
 		});
 	}
@@ -142,7 +142,7 @@ public class BlastHornet : Maverick {
 		return (MeleeIds)id switch {
 			MeleeIds.Stinger => new GenericMeleeProj(
 				weapon, pos, ProjIds.BHornetSting, player,
-				damage: 7, flinch: Global.defFlinch, owningActor: this,
+				7, Global.defFlinch, owningActor: this,
 				addToLevel: addToLevel
 			),
 			_ => null

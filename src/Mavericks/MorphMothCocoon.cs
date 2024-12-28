@@ -554,7 +554,7 @@ public class MorphMCThreadState : MaverickState {
 			return;
 		}
 
-		if (input.isPressed(Control.Special1, player)) {
+		if (input.isPressed(Control.Shoot, player)) {
 			proj.reverse();
 		}
 
