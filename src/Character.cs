@@ -688,6 +688,7 @@ public partial class Character : Actor, IDamagable {
 
 	public override void preUpdate() {
 		base.preUpdate();
+		updateProjectileCooldown();
 		insideCharacter = false;
 		changedStateInFrame = false;
 		pushedByTornadoInFrame = false;
@@ -937,8 +938,6 @@ public partial class Character : Actor, IDamagable {
 				stopCharge();
 			}
 		}
-
-		updateProjectileCooldown();
 
 		igFreezeRecoveryCooldown += Global.spf;
 		if (igFreezeRecoveryCooldown > 0.2f) {

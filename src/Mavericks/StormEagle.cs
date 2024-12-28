@@ -231,6 +231,11 @@ public class StormEBirdProj : Projectile, IDamagable {
 		return false;
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
 		if (time > 0.25f) {

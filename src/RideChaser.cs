@@ -43,10 +43,13 @@ public class RideChaser : Actor, IDamagable {
 		}
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void postUpdate() {
 		base.postUpdate();
-
-		updateProjectileCooldown();
 		fadeXMomentum();
 
 		Helpers.decrementTime(ref slowdownTime);

@@ -185,7 +185,7 @@ public class RollingShieldProjCharged : Projectile {
 
 	public void decAmmo(float amount = 1) {
 		if (mmx.currentWeapon == weapon && ammoDecCooldown == 0) {
-			ammoDecCooldown = MathF.Ceiling(damager.hitCooldown * 60);
+			ammoDecCooldown = damager.hitCooldown;
 			weapon.addAmmo(-amount, damager.owner);
 		}
 	}

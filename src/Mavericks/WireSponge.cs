@@ -867,9 +867,13 @@ public class WSpongeSpike : Projectile, IDamagable {
 		return "wsponge_spike_ceiling";
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
-		updateProjectileCooldown();
 		moveWithMovingPlatform();
 	}
 

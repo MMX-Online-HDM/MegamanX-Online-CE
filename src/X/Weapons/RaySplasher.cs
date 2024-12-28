@@ -151,9 +151,13 @@ public class RaySplasherTurret : Actor, IDamagable {
 		return null;
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
-		updateProjectileCooldown();
 
 		if (!ownedByLocalPlayer) return;
 

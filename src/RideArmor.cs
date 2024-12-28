@@ -210,6 +210,7 @@ public class RideArmor : Actor, IDamagable {
 	public override void preUpdate() {
 		base.preUpdate();
 		changedStateInFrame = false;
+		updateProjectileCooldown();
 	}
 
 	public override void update() {
@@ -279,10 +280,7 @@ public class RideArmor : Actor, IDamagable {
 	public override void postUpdate() {
 		Player? player = this.player ?? netOwner;
 		RagingChargeX? rcx = character as RagingChargeX;
-
 		base.postUpdate();
-
-		updateProjectileCooldown();
 
 		if (grounded && flyTime > 0) {
 			flyTime -= Global.spf * 6;

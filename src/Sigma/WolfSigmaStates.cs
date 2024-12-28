@@ -155,6 +155,11 @@ public class WolfSigmaHead : Actor, IDamagable {
 			};
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
 
@@ -173,8 +178,6 @@ public class WolfSigmaHead : Actor, IDamagable {
 
 			return;
 		}
-
-		updateProjectileCooldown();
 
 		fadeinShader.update();
 		if (!ownedByLocalPlayer) return;
@@ -396,10 +399,13 @@ public class WolfSigmaHand : Actor, IDamagable {
 		}
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
-		updateProjectileCooldown();
-
 		fadeinShader.update();
 
 		if (beamMuzzle1 != null && beamMuzzle1.destroyed) beamMuzzle1 = null;
@@ -651,7 +657,7 @@ public class WolfSigmaBeam : Projectile {
 			startSound = "wspongeThunder";
 			fadeOnAutoDestroy = true;
 			damager.damage = 8;
-			damager.hitCooldown = 0.15f;
+			damager.hitCooldown = 9;
 		}
 
 		if (type == 0) maxTime = 0.5f;

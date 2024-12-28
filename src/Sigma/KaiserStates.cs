@@ -598,10 +598,13 @@ public class KaiserSigmaMissileProj : Projectile {
 		}
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
-
-		updateProjectileCooldown();
 
 		if (ownedByLocalPlayer) {
 			if (!Global.level.gameObjects.Contains(target)) {
@@ -683,9 +686,13 @@ public class KaiserSigmaMineProj : Projectile, IDamagable {
 		}
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
-		updateProjectileCooldown();
 		Helpers.decrementTime(ref hitWallCooldown);
 		if (startWall) {
 			if (Global.level.checkCollisionShape(collider.shape, null) == null) {

@@ -228,6 +228,11 @@ public class Maverick : Actor, IDamagable {
 		if (ammo < 0) ammo = 0;
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
 
@@ -283,8 +288,6 @@ public class Maverick : Actor, IDamagable {
 		if (usedSubtank != null && usedSubtank.health <= 0) {
 			usedSubtank = null;
 		}
-
-		updateProjectileCooldown();
 
 		foreach (var key in stateCooldowns.Keys) {
 			Helpers.decrementTime(ref stateCooldowns[key].cooldown);

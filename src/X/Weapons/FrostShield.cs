@@ -154,6 +154,7 @@ public class FrostShieldProjAir : Projectile {
 
 public class FrostShieldProjGround : Projectile, IDamagable {
 	float health = 4;
+	
 	public FrostShieldProjGround(
 		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
 	) : base(
@@ -175,9 +176,13 @@ public class FrostShieldProjGround : Projectile, IDamagable {
 		);
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
-		updateProjectileCooldown();
 		moveWithMovingPlatform();
 	}
 

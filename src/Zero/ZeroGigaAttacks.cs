@@ -278,7 +278,7 @@ public class RakuhouhaProj : Projectile {
 			fadeSprite = "rakuhouha_fade";
 		} else {
 			damager.damage = 2;
-			damager.hitCooldown = 0.5f;
+			damager.hitCooldown = 30;
 			damager.flinch = 0;
 			destroyOnHit = false;
 		}

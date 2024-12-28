@@ -65,7 +65,7 @@ public class TornadoProj : Projectile {
 		projId = isStormE ? (int)ProjIds.StormETornado : (int)ProjIds.Tornado;
 		if (isStormE) {
 			blowModifier = 1;
-			damager.hitCooldown = 0.5f;
+			damager.hitCooldown = 30;
 		}
 		maxTime = 2;
 		sprite.visible = false;

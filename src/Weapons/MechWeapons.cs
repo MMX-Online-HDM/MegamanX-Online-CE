@@ -227,10 +227,13 @@ public class MechMissileProj : Projectile, IDamagable {
 		}
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
-
-		updateProjectileCooldown();
 
 		smokeTime += Global.spf;
 		if (smokeTime > 0.2) {

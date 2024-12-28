@@ -173,9 +173,13 @@ public class LaunchOMissile : Projectile, IDamagable {
 		}
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
-		updateProjectileCooldown();
 
 		if (MathF.Abs(vel.x) < 300) {
 			vel.x += Global.spf * 300 * xDir;

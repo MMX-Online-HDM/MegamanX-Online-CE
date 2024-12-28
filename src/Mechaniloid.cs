@@ -54,9 +54,13 @@ public class BirdMechaniloidProj : Projectile, IDamagable {
 		}
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
-		updateProjectileCooldown();
 
 		if (MathF.Abs(deltaPos.x) > 100 * Global.spf) {
 			damager.damage = 6;
@@ -125,6 +129,7 @@ public class Mechaniloid : Actor, IDamagable {
 	MechaniloidWeapon weapon;
 	float speed;
 	float maxTime = 16;
+	float time;
 
 	public static string getSpriteFromType(MechaniloidType type) {
 		if (type == MechaniloidType.Tank) return "sigma2_tank";
@@ -186,10 +191,13 @@ public class Mechaniloid : Actor, IDamagable {
 		}
 	}
 
-	float time;
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
-		updateProjectileCooldown();
 
 		if (!ownedByLocalPlayer) return;
 

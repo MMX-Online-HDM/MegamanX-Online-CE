@@ -190,7 +190,7 @@ public class VoltCTriadThunderProj : Projectile {
 			damager.flinch = Global.miniFlinch;
 		} else if (sprite.name == "voltc_proj_triadt_electricity") {
 			damager.flinch = Global.miniFlinch;
-			damager.hitCooldown = 0.25f;
+			damager.hitCooldown = 15;
 		}
 		if (time > 0.75f) {
 			stopMoving();

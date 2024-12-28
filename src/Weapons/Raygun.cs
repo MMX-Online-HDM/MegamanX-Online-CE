@@ -187,7 +187,7 @@ public class RayGunAltProj : Projectile {
 		if (axl != null) {
 			if (axl.isWhiteAxl()) {
 				damager.damage = 4;
-				damager.hitCooldown = 0.125f;
+				damager.hitCooldown = 8;
 			}
 		}
 		if (!ownedByLocalPlayer && axl != null) {
@@ -287,15 +287,15 @@ public class RayGunAltProj : Projectile {
 
 		if (getChargeLevel() == 0) {
 			damager.damage = 1;
-			damager.hitCooldown = 0.33f;
+			damager.hitCooldown = 20;
 			angle = 0;
 		} else if (getChargeLevel() == 1) {
 			damager.damage = 2;
-			damager.hitCooldown = 0.15f;
+			damager.hitCooldown = 9;
 			angle = 90;
 		} else if (getChargeLevel() == 2) {
 			damager.damage = 4;
-			damager.hitCooldown = 0.125f;
+			damager.hitCooldown = 8;
 			angle = 180;
 		}
 

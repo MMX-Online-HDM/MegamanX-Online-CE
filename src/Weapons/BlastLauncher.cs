@@ -61,6 +61,7 @@ public class GrenadeProj : Projectile, IDamagable {
 	public IDamagable target;
 	int type = 0;
 	bool planted;
+	int framesNotMoved;
 	// We use player here due to airblast reflect potential.
 	// The explosion should still be the original owner's.
 	Player? player;
@@ -96,10 +97,13 @@ public class GrenadeProj : Projectile, IDamagable {
 		updateAngle();
 	}
 
-	int framesNotMoved;
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
-		updateProjectileCooldown();
 
 		updateAngle();
 		if (MathF.Abs(vel.y) < 0.5f && grounded) {

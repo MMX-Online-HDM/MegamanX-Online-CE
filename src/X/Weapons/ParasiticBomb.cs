@@ -353,9 +353,13 @@ public class ParasiticBombProjCharged : Projectile, IDamagable {
 		);
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
-		updateProjectileCooldown();
 		if (!ownedByLocalPlayer) return;
 
 		if (!host.destroyed) {

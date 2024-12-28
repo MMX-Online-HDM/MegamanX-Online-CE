@@ -146,7 +146,7 @@ public class SpinWheelProj : Projectile {
 
 	public override void onHitDamagable(IDamagable damagable) {
 		if (damagable is CrackedWall) {
-			damager.hitCooldown = hitCooldown;
+			damager.hitCooldownSeconds = hitCooldown;
 			return;
 		}
 
