@@ -168,11 +168,11 @@ public class NeoSigma : BaseSigma {
 			),
 			MeleeIds.WallSlash or MeleeIds.LadderSlash => new GenericMeleeProj(
 				SigmaClawWeapon.netWeapon, pos, ProjIds.Sigma2Claw, player,
-				3, 0, 15, addToLevel: true
+				3, 0, 15, addToLevel: addToLevel
 			),
 			MeleeIds.GigaAttackSlash => new GenericMeleeProj(
 				new SigmaElectricBall2Weapon(), pos, ProjIds.Sigma2Ball2, player,
-				6, Global.defFlinch, 15, addToLevel: true
+				6, Global.defFlinch, 15, addToLevel: addToLevel
 			),
 			_ => null
 		};
