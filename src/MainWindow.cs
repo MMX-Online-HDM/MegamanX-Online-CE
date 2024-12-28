@@ -34,8 +34,8 @@ public partial class Global {
 	public static uint screenW = 384;
 	public static uint screenH = 216;
 
-	public static uint viewScreenW { get { return screenW * (uint)viewSize; } }
-	public static uint viewScreenH { get { return screenH * (uint)viewSize; } }
+	public static uint viewScreenW { get { return (uint)MathF.Ceiling(screenW * viewSize); } }
+	public static uint viewScreenH { get { return (uint)MathF.Ceiling(screenH * viewSize); } }
 
 	public static uint halfViewScreenW { get { return viewScreenW / 2; } }
 	public static uint halfViewScreenH { get { return viewScreenH / 2; } }
@@ -46,7 +46,7 @@ public partial class Global {
 	public static uint windowW;
 	public static uint windowH;
 
-	public static int viewSize = 1;
+	public static float viewSize = 1;
 	internal static List<(uint width, uint height)> renderTextureQueue = new();
 	internal static HashSet<int> renderTextureQueueKeys = new();
 

@@ -638,14 +638,16 @@ public class DarkHoldProj : Projectile {
 					}
 					// For maverick and rides
 					if (actor is RideArmor or Maverick or Mechaniloid) {
-						if (actor.timeStopTime <= 0) {
+						if (actor.timeStopTime > 0) {
 							continue;
 						}
 						IDamagable? damagable = actor as IDamagable;
-						if (damagable?.canBeDamaged(damager.owner.alliance, damager.owner.id, null) == true) {
+						if (damagable?.canBeDamaged(damager.owner.alliance, damager.owner.id, null) != true) {
 							continue;
 						}
-						actor.timeStopTime = 160 - timeInFrames;
+						if (120 - timeInFrames > 0) {
+							actor.timeStopTime = 120 - timeInFrames;
+						}
 					}
 				}
 			}
@@ -682,11 +684,7 @@ public class DarkHoldProj : Projectile {
 			screenShader.SetUniform("ratio", ratio);
 			screenShader.SetUniform("x", normalizedCoords.x);
 			screenShader.SetUniform("y", normalizedCoords.y);
-			if (Global.viewSize == 2) {
-				screenShader.SetUniform("r", normalizedRadius * 0.5f);
-			} else {
-				screenShader.SetUniform("r", normalizedRadius);
-			}
+			screenShader.SetUniform("r", normalizedRadius / Global.viewSize);
 		}
 	}
 

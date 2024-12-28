@@ -788,7 +788,7 @@ public class MJump : MaverickState {
 	public override void update() {
 		base.update();
 
-		bool jumpHeld = player.input.isHeld(Control.Jump, player);
+		bool jumpHeld = player.input.isHeld(Control.Jump, player) || maverick.aiBehavior != MaverickAIBehavior.Control;
 		if (stateFrame > 2 && jumpFramesHeld == 0 && !jumpHeld && maverick.vel.y < 0) {
 			jumpFramesHeld = 1;
 			maverick.vel.y *= 0.25f;

@@ -72,7 +72,7 @@ public class ArmoredArmadillo : Maverick {
 			rechargeAmmo(2);
 		}
 
-		if (aiBehavior == MaverickAIBehavior.Control) {
+		if (aiBehavior == MaverickAIBehavior.Control && !player.isSummoner()) {
 			if (state is MIdle or MRun or MLand) {
 				if (shootPressed()) {
 					changeState(getShootState(false));
@@ -98,7 +98,9 @@ public class ArmoredArmadillo : Maverick {
 				}
 				var hits = Global.level.checkCollisionsShape(rect.getShape(), null);
 				foreach (var hit in hits) {
-					if (hit.gameObject is Projectile proj && proj.owner.alliance != player.alliance && MathF.Sign(proj.deltaPos.x) != xDir) {
+					if (hit.gameObject is Projectile proj && proj.owner.alliance != player.alliance &&
+						MathF.Sign(proj.deltaPos.x) != xDir
+					) {
 						shouldGuard = true;
 						break;
 					}
@@ -132,20 +134,14 @@ public class ArmoredArmadillo : Maverick {
 	}
 
 	public override MaverickState[] aiAttackStates() {
-		return new MaverickState[]
-		{
-				getShootState(true),
-				new ArmoredAGuardState(),
-				new ArmoredARollEnterState(),
-		};
+		return [
+			getShootState(true),
+			new ArmoredARollEnterState(),
+		];
 	}
 
 	public override MaverickState getRandomAttackState() {
-		var attacks = new MaverickState[]
-		{
-				getShootState(true),
-		};
-		return attacks.GetRandomItem();
+		return aiAttackStates().GetRandomItem();
 	}
 
 	private MaverickState getShootState(bool isAI) {
@@ -154,7 +150,7 @@ public class ArmoredArmadillo : Maverick {
 			new ArmoredAProj(projWeapon, pos, xDir, player, player.getNextActorNetId(), rpc: true);
 		}, null);
 		if (isAI) {
-			shootState.consecutiveData = new MaverickStateConsecutiveData(0, 6, 0.33f);
+			shootState.consecutiveData = new MaverickStateConsecutiveData(0, 2, 0.33f);
 		}
 		return shootState;
 	}
