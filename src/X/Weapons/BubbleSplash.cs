@@ -9,6 +9,7 @@ public class BubbleSplash : Weapon {
 	public List<BubbleSplashProj> bubblesOnField = new List<BubbleSplashProj>();
 	public List<float> bubbleAfterlifeTimes = new List<float>();
 	public float hyperChargeDelay;
+	public bool freeAmmoNextCharge;
 
 	public BubbleSplash() : base() {
 		shootSounds = new string[] { "bubbleSplash", "bubbleSplash", "bubbleSplash", "bubbleSplashCharged" };
@@ -32,6 +33,10 @@ public class BubbleSplash : Weapon {
 
 	public override float getAmmoUsage(int chargeLevel) {
 		if (chargeLevel >= 3) {
+			if (freeAmmoNextCharge) {
+				freeAmmoNextCharge = false;
+				return 0;
+			}
 			return 7;
 		}
 		return 0.45f;
@@ -82,14 +87,18 @@ public class BubbleSplash : Weapon {
 				bubblesOnField.Add(proj);
 			}
 		} else if (chargeLevel >= 3 && character is MegamanX mmx) {
-			//player.setNextActorNetId(player.getNextActorNetId());
-			mmx.popAllBubbles();
-			for (int i = 0; i < 6; i++) {
-				var bubble = new BubbleSplashProjCharged(
-					this, pos, xDir, player, i, 
-					player.getNextActorNetId(true), true);
+			if (mmx.chargedBubbles.Count >= 5) {
+				mmx.specialBuster.shoot(character, [3, 1]);
+				freeAmmoNextCharge = true;
+			} else {
+				mmx.popAllBubbles();
+				for (int i = 0; i < 6; i++) {
+					var bubble = new BubbleSplashProjCharged(
+						this, pos, xDir, player, i, 
+						player.getNextActorNetId(true), true);
 
-				mmx?.chargedBubbles?.Add(bubble);	
+					mmx?.chargedBubbles?.Add(bubble);	
+				}
 			}
 		}
 	}

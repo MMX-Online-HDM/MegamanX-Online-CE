@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace MMXOnline;
 
 public class RollingShield : Weapon {
 	public static RollingShield netWeapon = new();
+	public bool freeAmmoNextCharge;
 
 	public RollingShield() : base() {
 		index = (int)WeaponIds.RollingShield;
@@ -19,6 +21,17 @@ public class RollingShield : Weapon {
 		hitcooldown = "0/0.33";	
 	}
 
+	public override float getAmmoUsage(int chargeLevel) {
+		if (chargeLevel >= 3) {
+			if (freeAmmoNextCharge) {
+				freeAmmoNextCharge = false;
+				return 0;
+			}
+			return 8;
+		}
+		return 1;
+	}
+
 	public override void shoot(Character character, int[] args) {
 		int chargeLevel = args[0];
 		Point pos = character.getShootPos();
@@ -28,7 +41,17 @@ public class RollingShield : Weapon {
 		if (chargeLevel < 3) {
 			new RollingShieldProj(this, pos, xDir, player, player.getNextActorNetId(), true);	
 		} else {
-			new RollingShieldProjCharged(this, pos, xDir, player, player.getNextActorNetId(), true);
+			if (character is not MegamanX mmx) {
+				return;
+			}
+			if (mmx.stingActiveTime == 0 && (args.Length == 1 || args[1] == 0)) {
+				mmx.chargedRollingShieldProj = new RollingShieldProjCharged(
+					this, pos, xDir, player, player.getNextActorNetId(), true
+				);
+			} else {
+				mmx.specialBuster.shoot(character, [3, 1]);
+				freeAmmoNextCharge = true;
+			}
 		}
 	}
 }
@@ -107,9 +130,6 @@ public class RollingShieldProjCharged : Projectile {
 		useGravity = false;
 		mmx = (player.character as MegamanX);
 		rollingShieldSound = new LoopingSound("rollingShieldCharge", "rollingShieldChargeLoop", this);
-		if (mmx is not null) {
-			mmx.chargedRollingShieldProj = this;
-		}
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 		shouldVortexSuck = false;
@@ -143,7 +163,7 @@ public class RollingShieldProjCharged : Projectile {
 		if (isAnimOver() && sprite.name == "rolling_shield_charge_flash") {
 			changeSprite("rolling_shield_charge", true);
 		}
-		if (mmx?.currentWeapon is RollingShield { ammo: >0 }) {
+		if (mmx?.currentWeapon is not RollingShield { ammo: >0 }) {
 			destroySelf();
 		}
 		if (rollingShieldSound != null) {
@@ -151,8 +171,8 @@ public class RollingShieldProjCharged : Projectile {
 		}
 		changePos(mmx.getCenterPos());
 		if (ammoDecCooldown > 0) {
-			ammoDecCooldown += Global.spf;
-			if (ammoDecCooldown > 0.2) ammoDecCooldown = 0;
+			ammoDecCooldown -= speedMul;
+			if (ammoDecCooldown <= 0) ammoDecCooldown = 0;
 		}
 	}
 
@@ -164,9 +184,9 @@ public class RollingShieldProjCharged : Projectile {
 	}
 
 	public void decAmmo(float amount = 1) {
-		if (ammoDecCooldown == 0) {
-			ammoDecCooldown = Global.spf;
-			damager.owner.weapon.addAmmo(-amount, damager.owner);
+		if (mmx.currentWeapon == weapon && ammoDecCooldown == 0) {
+			ammoDecCooldown = MathF.Ceiling(damager.hitCooldown * 60);
+			weapon.addAmmo(-amount, damager.owner);
 		}
 	}
 

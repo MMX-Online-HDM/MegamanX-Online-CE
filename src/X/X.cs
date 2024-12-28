@@ -8,6 +8,7 @@ public class MegamanX : Character {
 	// Shoot variables.
 	public float shootCooldown;
 	public int lastShootPressed;
+	public bool bufferedShotPressed => lastShootPressed < 6 || player.input.isPressed(Control.Shoot, player);
 	public float specialSaberCooldown;
 	public XBuster specialBuster;
 	public int specialButtonMode;
@@ -81,8 +82,7 @@ public class MegamanX : Character {
 	// Weapon-specific.
 	public RollingShieldProjCharged? chargedRollingShieldProj;
 	public List<BubbleSplashProjCharged> chargedBubbles = new();
-	public StrikeChainProj? strikeChainProj;
-	public StrikeChainProjCharged? strikeChainChargedProj;
+	public Projectile? strikeChainProj;
 	public GravityWellProjCharged? chargedGravityWell;
 	public SpinningBladeProjCharged? chargedSpinningBlade;
 	public FrostShieldProjCharged? chargedFrostShield;
@@ -151,7 +151,14 @@ public class MegamanX : Character {
 		Helpers.decrementFrames(ref shootCooldown);
 		Helpers.decrementFrames(ref barrierCooldown);
 		Helpers.decrementFrames(ref specialSaberCooldown);
+		if (lastShootPressed < 100) {
+			lastShootPressed++;
+		}
 		Helpers.decrementFrames(ref aiAttackCooldown);
+		// Strike chain extending the shoot anim.
+		if (hasLastingProj() && shootAnimTime > 0) {
+			shootAnimTime = 2;
+		}
 		// For the shooting animation.
 		if (shootAnimTime > 0 && sprite.name == getSprite(charState.shootSprite)) {
 			shootAnimTime -= speedMul;
@@ -172,6 +179,10 @@ public class MegamanX : Character {
 		if (!ownedByLocalPlayer) {
 			return;
 		}
+		if (player.input.isPressed(Control.Shoot, player)) {
+			lastShootPressed = 6;
+		}
+		chargedParasiticBomb?.update();
 		gigaWeapon?.update();
 		hyperNovaStrike?.update();
 		itemTracer?.update();
@@ -194,6 +205,9 @@ public class MegamanX : Character {
 		}
 		else if (stockedBuster) {
 			addRenderEffect(RenderEffectType.ChargePink, 2, 6);
+		}
+		if (!charState.normalCtrl) {
+			lastShootPressed = 100;	
 		}
 	}
 
@@ -253,15 +267,15 @@ public class MegamanX : Character {
 			changeState(new X6SaberState(grounded), true);
 			return true;
 		}
-		if (player.input.isPressed(Control.Shoot, player) && stockedMaxBuster) {
+		if (bufferedShotPressed && stockedMaxBuster) {
 			shoot(1, specialBuster, false);
 			return true;
 		}
-		if (player.input.isPressed(Control.Shoot, player) && stockedBuster) {
+		if (bufferedShotPressed && stockedBuster) {
 			shoot(1, currentWeapon, true);
 			return true;
 		}
-		if (!isCharging() && currentWeapon != null && (
+		if (!isCharging() && currentWeapon != null && canShoot() && (
 				player.input.isPressed(Control.Shoot, player) ||
 				currentWeapon.isStream && getChargeLevel() < 2 &&
 				player.input.isHeld(Control.Shoot, player)
@@ -281,6 +295,7 @@ public class MegamanX : Character {
 	}
 
 	public void shoot(int chargeLevel, Weapon weapon, bool busterStock) {
+		lastShootPressed = 100;
 		// Check if can shoot.
 		if (shootCooldown > 0 ||
 			weapon == null ||
@@ -297,15 +312,17 @@ public class MegamanX : Character {
 			} else if (chargeLevel < 3) {
 				stockedBuster = false;
 			}
-			if (charState.normalCtrl && charState.attackCtrl) {
+			if (!weapon.hasCustomChargeAnim && charState.normalCtrl && charState.attackCtrl) {
 				useCrossShotAnim = true;
 			} else {
 				chargeLevel = 3;
 			}
 		}
 		// Changes to shoot animation and gets sound.
-		setShootAnim();
-		shootAnimTime = DefaultShootAnimTime;
+		if (chargeLevel < 3 || !weapon.hasCustomChargeAnim) {
+			setShootAnim();
+			shootAnimTime = DefaultShootAnimTime;
+		}
 		string shootSound = weapon.shootSounds[chargeLevel];
 		// Shoot.
 		if (useCrossShotAnim) {
@@ -316,10 +333,11 @@ public class MegamanX : Character {
 			weapon.shoot(this, [chargeLevel, busterStock ? 1 : 0]);
 		}
 		// Sets up global shoot cooldown to the weapon shootCooldown.
-		if (!stockedBuster || busterStock || weapon.fireRate <= 12) {
-			weapon.shootCooldown = weapon.fireRate;
+		float baseCooldown = weapon.getFireRate(this, chargeLevel, [busterStock ? 1 : 0]);
+		if (!stockedBuster || busterStock || weapon.fireRate <= 10) {
+			weapon.shootCooldown = baseCooldown;
 		} else {
-			weapon.shootCooldown = 12;
+			weapon.shootCooldown = 10;
 		}
 		shootCooldown = weapon.shootCooldown;
 		// Add ammo.
@@ -408,7 +426,8 @@ public class MegamanX : Character {
 	
 	public override bool canShoot() {
 		if (isInvulnerableAttack() ||
-			hasLastingProj() ||
+			hasLastingProj() && !stockedBuster && !stockedMaxBuster && !stockedSaber ||
+			hasLockingProj() ||
 			shootCooldown > 0 ||
 			invulnTime > 0 ||
 			linkedTriadThunder != null
@@ -419,7 +438,7 @@ public class MegamanX : Character {
 	}
 
 	public override bool canCharge() {
-		return !isInvulnerableAttack() && !hasLastingProj();
+		return !isInvulnerableAttack() && !hasLockingProj();
 	}
 
 	public override void increaseCharge() {
@@ -435,14 +454,15 @@ public class MegamanX : Character {
 	}
 
 	public override bool canChangeWeapons() {
-		if (hasLastingProj()) {
-			return false;
-		}
 		return base.canChangeWeapons();
 	}
 
 	public override void onWeaponChange(Weapon oldWeapon, Weapon newWeapon) {
-		stingActiveTime = 0;
+		if (newWeapon is not ChameleonSting &&
+			(newWeapon is not HyperCharge || weapons[hyperChargeTarget] is not ChameleonSting)
+		) {
+			stingActiveTime = 0;
+		}
 	}
 
 	public override bool canAddAmmo() {
@@ -549,11 +569,19 @@ public class MegamanX : Character {
 
 	public bool hasLastingProj() {
 		return (
-			chargedSpinningBlade != null ||
-			chargedFrostShield != null ||
-			chargedTornadoFang != null ||
-			strikeChainProj != null ||
-			strikeChainChargedProj != null
+			chargedSpinningBlade?.destroyed == false ||
+			chargedFrostShield?.destroyed == false ||
+			chargedTornadoFang?.destroyed == false ||
+			strikeChainProj?.destroyed == false
+		);
+	}
+
+	public bool hasLockingProj() {
+		return (
+			chargedFrostShield?.destroyed == false ||
+			chargedTornadoFang?.destroyed == false ||
+			chargedSpinningBlade?.destroyed == false ||
+			linkedTriadThunder?.destroyed == false
 		);
 	}
 
@@ -566,8 +594,6 @@ public class MegamanX : Character {
 		chargedTornadoFang = null;
 		strikeChainProj?.destroySelf();
 		strikeChainProj = null;
-		strikeChainChargedProj?.destroySelf();
-		strikeChainChargedProj = null;
 	}
 	
 	public void popAllBubbles() {
@@ -649,7 +675,6 @@ public class MegamanX : Character {
 	// Other overrides.
 	public override void onFlinchOrStun(CharState newState) {
 		strikeChainProj?.destroySelf();
-		strikeChainChargedProj?.destroySelf();
 		// Remove all linked stuff on stun.
 		if (newState is not Hurt hurtState) {
 			removeLastingProjs();
@@ -665,9 +690,6 @@ public class MegamanX : Character {
 		bool hasChanged = base.changeState(newState, forceChange);
 		if (!hasChanged || !ownedByLocalPlayer) {
 			return hasChanged;
-		}
-		if (!newState.canUseShootAnim() && charState is not Hurt) {
-			removeLastingProjs();
 		}
 		return true;
 	}
@@ -689,11 +711,8 @@ public class MegamanX : Character {
 		bool disableRpc = false, bool doRpcEvenIfNotOwned = false,
 		bool favorDefenderProjDestroy = false
 	) {
-
 		removeLastingProjs();
 		chargedRollingShieldProj?.destroySelfNoEffect();
-		strikeChainProj?.destroySelf();
-		strikeChainChargedProj?.destroySelf();
 		chargedParasiticBomb?.destroy();
 
 		for (int i = magnetMines.Count - 1; i >= 0; i--) {

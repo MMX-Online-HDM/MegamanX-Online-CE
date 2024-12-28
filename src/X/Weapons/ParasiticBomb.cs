@@ -47,7 +47,10 @@ public class ParasiticBomb : Weapon {
 			character.playSound("busterX3");
 			new ParasiticBombProj(this, pos, xDir, player, player.getNextActorNetId(), true);
 		} else {
-			if (character.ownedByLocalPlayer && character is MegamanX mmx && mmx.chargedParasiticBomb == null) {
+			if (character.ownedByLocalPlayer && character is MegamanX mmx) {
+				if (mmx.chargedParasiticBomb != null) {
+					mmx.chargedParasiticBomb.destroy();
+				}
 				mmx.chargedParasiticBomb = new BeeSwarm(mmx);
 			}
 		}
@@ -238,7 +241,6 @@ public class BeeSwarm {
 	}
 
 	public bool shouldDestroy() {
-		//if (!mmx.player.input.isHeld(Control.Shoot, mmx.player)) return true;
 		if (mmx.player.weapon is not ParasiticBomb) return true;
 		var pb = mmx.player.weapon as ParasiticBomb;
 		if (pb?.ammo <= 0) return true;
@@ -282,7 +284,7 @@ public class BeeCursorAnim : Anim {
 		} else if (state == 2) {
 			if (target!.destroyed) {
 				state = 3;
-				return;			
+				return;	
 			}
 			move(pos.directionToNorm(target.getCenterPos()).times(350));
 			if (pos.distanceTo(target.getCenterPos()) < 5) {

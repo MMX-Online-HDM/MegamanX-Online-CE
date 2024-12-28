@@ -254,7 +254,7 @@ public class FrostShieldProjCharged : Projectile {
 			return;
 		}
 
-		if (character.player.input.isPressed(Control.Shoot, character.player)) {
+		if (frameTime > 2 && character.player.input.isPressed(Control.Shoot, character.player)) {
 			destroySelf();
 		}
 	}

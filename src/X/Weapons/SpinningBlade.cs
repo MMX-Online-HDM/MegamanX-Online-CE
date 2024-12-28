@@ -180,10 +180,20 @@ public class SpinningBladeProjCharged : Projectile {
 		if (time > 2) retracted = true;
 
 		if (!retracted) {
-			if (xDist < maxXDist) {
-				xDist += Global.spf * 240;
+			if (mmx.chargedSpinningBlade != this) {
+				if (MathF.Abs(xDist - 50) < 4 * speedMul) {
+					xDist = 50;
+				} else if (xDist < 50) {
+					xDist += 4 * speedMul;
+				} else if (xDist > 50) {
+					xDist -= 4 * speedMul;
+				}
 			} else {
-				xDist = maxXDist;
+				if (xDist < maxXDist) {
+					xDist += Global.spf * 240;
+				} else {
+					xDist = maxXDist;
+				}
 			}
 		} else {
 			if (xDist > 0) {
@@ -191,7 +201,6 @@ public class SpinningBladeProjCharged : Projectile {
 			} else {
 				xDist = 0;
 				destroySelf();
-				mmx.removeLastingProjs();
 			}
 		}
 
@@ -199,11 +208,16 @@ public class SpinningBladeProjCharged : Projectile {
 		float yOff = Helpers.sind(spinAngle) * xDist;
 		changePos(mmx.getShootPos().addxy(xDir * xOff, yOff));
 
-		if (mmx.player.input.isPressed(Control.Shoot, mmx.player) && xDist >= maxXDist) {
+		if (mmx.charState.attackCtrl && !mmx.stockedBuster &&
+			mmx.player.input.isPressed(Control.Shoot, mmx.player) && xDist >= maxXDist
+		) {
 			retracted = true;
 		}
 
-		if (mmx.player.input.isHeld(Control.Up, mmx.player)) {
+		if (mmx.chargedSpinningBlade != this) {
+			spinAngle -= Global.spf * 360 * 1.5f;
+		}
+		else if (mmx.player.input.isHeld(Control.Up, mmx.player) ) {
 			spinAngle -= Global.spf * 360;
 		} else if (mmx.player.input.isHeld(Control.Down, mmx.player)) {
 			spinAngle += Global.spf * 360;
@@ -221,6 +235,8 @@ public class SpinningBladeProjCharged : Projectile {
 	public override void onDestroy() {
 		base.onDestroy();
 		if (!ownedByLocalPlayer) return;
-		mmx?.removeLastingProjs();
+		if (mmx.chargedSpinningBlade == this) {
+			mmx.chargedSpinningBlade = null;
+		}
 	}
 }

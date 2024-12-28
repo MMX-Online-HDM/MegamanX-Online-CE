@@ -31,14 +31,18 @@ public class StrikeChain : Weapon {
 		int xDir = character.getShootXDir();
 		Player player = character.player;
 
-		int upOrDown = 0;
-		if (player.input.isHeld(Control.Up, player)) upOrDown = -1;
-		else if (player.input.isHeld(Control.Down, player)) upOrDown = 1;
+		int upOrDown = player.input.getYDir(player);
 
+		Projectile proj;
 		if (chargeLevel >= 3) {
-			new StrikeChainProjCharged(this, pos, xDir, player, player.getNextActorNetId(), upOrDown, true);
+			proj = new StrikeChainProjCharged(this, pos, xDir, player, player.getNextActorNetId(), upOrDown, true);
 		} else {
-			new StrikeChainProj(this, pos, xDir, player, player.getNextActorNetId(), upOrDown, true);
+			proj = new StrikeChainProj(this, pos, xDir, player, player.getNextActorNetId(), upOrDown, true);
+		}
+
+		
+		if (character is MegamanX mmx) {
+			mmx.strikeChainProj = proj;
 		}
 	}
 }
@@ -440,7 +444,6 @@ public class StrikeChainProjCharged : Projectile {
 
 		//Set character and player
 		mmx = player.character as MegamanX ?? throw new NullReferenceException();
-		mmx.strikeChainChargedProj = this;
 		this.player = player;
 
 		//Reduce range if carrying a flag.
@@ -566,7 +569,9 @@ public class StrikeChainProjCharged : Projectile {
 	public override void onDestroy() {
 		base.onDestroy();
 		if (hookedActor != null) hookedActor.useGravity = true;
-		mmx.strikeChainChargedProj = null;
+		if (mmx != null && mmx.strikeChainProj == this) {
+			mmx.strikeChainProj = null;
+		}
 	}
 
 	public override void onHitWall(CollideData other) {

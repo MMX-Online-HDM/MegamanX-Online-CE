@@ -59,6 +59,7 @@ public class Weapon {
 	public string effect = "";
 	public string Flinch = "";
 	public string FlinchCD = "";
+	public bool hasCustomChargeAnim;
 
 	public Weapon() {
 		ammo = 32;
@@ -415,5 +416,9 @@ public class Weapon {
 				actor.playSound(normalSound);
 			}
 		}
+	}
+
+	public virtual float getFireRate(Character character, int chargeLevel, int[] args) {
+		return fireRate;
 	}
 }

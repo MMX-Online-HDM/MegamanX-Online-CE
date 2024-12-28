@@ -5,6 +5,7 @@ namespace MMXOnline;
 
 public class ChameleonSting : Weapon {
 	public static ChameleonSting netWeapon = new();
+	public bool freeAmmoNextCharge;
 
 	public ChameleonSting() : base() {
 		index = (int)WeaponIds.ChameleonSting;
@@ -23,8 +24,12 @@ public class ChameleonSting : Weapon {
 	public override float getAmmoUsageEX(int chargeLevel, Character character) {
 		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
 
-		if (mmx.stingActiveTime > 0) {
+		if (chargeLevel < 3 && mmx.stingActiveTime > 0) {
 			return 4;
+		}
+		if (chargeLevel >= 3 && freeAmmoNextCharge) {
+			freeAmmoNextCharge = false;
+			return 0;
 		}
 		return getAmmoUsage(chargeLevel);
 	}
@@ -34,12 +39,17 @@ public class ChameleonSting : Weapon {
 		Point pos = character.getShootPos();
 		int xDir = character.getShootXDir();
 		Player player = character.player;
-		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
 
 		if (chargeLevel < 3) {
 			new StingProj(this, pos, xDir, player, 0, player.getNextActorNetId(), true);
 		} else {
-			mmx.stingActiveTime = 8;
+			MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
+			if (mmx.stingActiveTime == 0 && (args.Length == 1 || args[1] == 0)) {
+				mmx.stingActiveTime = 8;
+			} else {
+				mmx.specialBuster.shoot(character, [3, 1]);
+				freeAmmoNextCharge = true;
+			}
 		}
 	}
 }
