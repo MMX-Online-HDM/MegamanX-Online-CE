@@ -94,13 +94,13 @@ public class WheelGator : Maverick {
 		}
 		if (sprite.name.Contains("eat_start")) {
 			if (hitbox.name == "eat") {
-				return new GenericMeleeProj(weapon, centerPoint, ProjIds.WheelGEat, player, damage: 0, flinch: 0, hitCooldownSeconds: 0.5f, owningActor: this);
+				return new GenericMeleeProj(weapon, centerPoint, ProjIds.WheelGEat, player, damage: 0, flinch: 0, owningActor: this);
 			} else {
-				return new GenericMeleeProj(weapon, centerPoint, ProjIds.WheelGBite, player, damage: 6, flinch: Global.defFlinch, hitCooldownSeconds: 0.5f, owningActor: this);
+				return new GenericMeleeProj(weapon, centerPoint, ProjIds.WheelGBite, player, damage: 6, flinch: Global.defFlinch, owningActor: this);
 			}
 		}
 		if (sprite.name.Contains("grab_start") && deltaPos.y <= 0) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.WheelGGrab, player, damage: 0, flinch: 0, hitCooldownSeconds: 0.5f, owningActor: this);
+			return new GenericMeleeProj(weapon, centerPoint, ProjIds.WheelGGrab, player, damage: 0, flinch: 0, owningActor: this);
 		}
 		if (sprite.name.Contains("fall")) {
 			float damagePercent = 0;
