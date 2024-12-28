@@ -110,7 +110,7 @@ public class LaunchOctopus : Maverick {
 
 	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (sprite.name.Contains("launcho_spin")) {
-			return new GenericMeleeProj(meleeWeapon, centerPoint, ProjIds.LaunchODrain, player, damage: 0, flinch: 0, hitCooldown: 0, owningActor: this);
+			return new GenericMeleeProj(meleeWeapon, centerPoint, ProjIds.LaunchODrain, player, damage: 0, flinch: 0, hitCooldownSeconds: 0, owningActor: this);
 		}
 		return null;
 	}

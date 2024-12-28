@@ -121,7 +121,7 @@ public class Doppma : BaseSigma {
 			bool isBlock = sprite.name == getSprite("block");
 			return new GenericMeleeProj(
 				new Weapon(), centerPoint, ProjIds.Sigma3ShieldBlock, player,
-				damage: 0, flinch: 0, hitCooldown: 1, isDeflectShield: true, isShield: true, isReflectShield: isBlock
+				damage: 0, flinch: 0, hitCooldownSeconds: 1, isDeflectShield: true, isShield: true, isReflectShield: isBlock
 			);
 		}
 		return base.getProjFromHitbox(collider, centerPoint);

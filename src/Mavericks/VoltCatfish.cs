@@ -139,7 +139,7 @@ public class VoltCatfish : Maverick {
 		if (sprite.name.Contains("fall")) {
 			float damagePercent = getStompDamage();
 			if (damagePercent > 0) {
-				return new GenericMeleeProj(weapon, centerPoint, ProjIds.VoltCStomp, player, damage: getStompDamage(), flinch: Global.defFlinch, hitCooldown: 0.5f);
+				return new GenericMeleeProj(weapon, centerPoint, ProjIds.VoltCStomp, player, damage: getStompDamage(), flinch: Global.defFlinch, hitCooldownSeconds: 0.5f);
 			}
 		}
 		return null;

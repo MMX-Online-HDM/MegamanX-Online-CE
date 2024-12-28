@@ -84,7 +84,7 @@ public class TunnelRhino : Maverick {
 		if (sprite.name.EndsWith("_dash")) {
 			return new GenericMeleeProj(
 				weapon, centerPoint, ProjIds.TunnelRDash, player,
-				damage: 4, flinch: Global.defFlinch, hitCooldown: 0.5f, owningActor: this
+				damage: 4, flinch: Global.defFlinch, hitCooldownSeconds: 0.5f, owningActor: this
 			);
 		}
 		if (sprite.name.Contains("fall")) {
@@ -92,7 +92,7 @@ public class TunnelRhino : Maverick {
 			if (damagePercent > 0) {
 				return new GenericMeleeProj(
 					weapon, centerPoint, ProjIds.TunnelRStomp, player,
-					damage: 4 * damagePercent, flinch: Global.defFlinch, hitCooldown: 0.5f
+					damage: 4 * damagePercent, flinch: Global.defFlinch, hitCooldownSeconds: 0.5f
 				);
 			}
 		}
