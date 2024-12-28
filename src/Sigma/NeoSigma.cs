@@ -117,47 +117,65 @@ public class NeoSigma : BaseSigma {
 		return "sigma2_" + spriteName;
 	}
 
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Guard,
+		Slash1,
+		Slash2,
+		DashSlash,
+		AirSlash,
+		UpSlash,
+		DownSlash,
+		LadderSlash,
+		WallSlash,
+		GigaAttackSlash
+	}
+
 	// This can run on both owners and non-owners. So data used must be in sync.
-	public override Projectile? getProjFromHitbox(Collider collider, Point centerPoint) {
-		Projectile? proj = sprite.name switch {
-			"sigma2_attack" => new GenericMeleeProj(
-				SigmaClawWeapon.netWeapon, centerPoint, ProjIds.Sigma2Claw, player,
-				2, 0, 0.2f, addToLevel: true
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"sigma2_attack" => MeleeIds.Slash1,
+			"sigma2_attack2" => MeleeIds.Slash2,
+			"sigma2_attack_air" => MeleeIds.AirSlash,
+			"sigma2_attack_dash" => MeleeIds.DashSlash,
+			"sigma2_upslash" => MeleeIds.UpSlash,
+			"sigma2_downslash" => MeleeIds.DownSlash,
+			"sigma2_ladder_attack" => MeleeIds.LadderSlash,
+			"sigma2_wall_slide_attack" => MeleeIds.WallSlash,
+			"sigma2_shoot2" => MeleeIds.GigaAttackSlash,
+			_ => MeleeIds.None
+		});
+	}
+
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Slash1 => new GenericMeleeProj(
+				SigmaClawWeapon.netWeapon, pos, ProjIds.Sigma2Claw, player,
+				2, 0, 12, addToLevel: addToLevel
 			),
-			"sigma2_attack2" => new GenericMeleeProj(
-				SigmaClawWeapon.netWeapon, centerPoint, ProjIds.Sigma2Claw2, player,
-				2, Global.halfFlinch, 0.5f, addToLevel: true
+			MeleeIds.Slash2 => new GenericMeleeProj(
+				SigmaClawWeapon.netWeapon, pos, ProjIds.Sigma2Claw2, player,
+				2, Global.halfFlinch, 30, addToLevel: addToLevel
 			),
-			"sigma2_attack_air" => new GenericMeleeProj(
-				SigmaClawWeapon.netWeapon, centerPoint, ProjIds.Sigma2Claw, player,
-				3, 0, 0.375f, addToLevel: true
+			MeleeIds.AirSlash or MeleeIds.DashSlash => new GenericMeleeProj(
+				SigmaClawWeapon.netWeapon, pos, ProjIds.Sigma2Claw, player,
+				3, 0, 22, addToLevel: addToLevel
 			),
-			"sigma2_attack_dash" => new GenericMeleeProj(
-				SigmaClawWeapon.netWeapon, centerPoint, ProjIds.Sigma2Claw, player,
-				3, 0, 0.375f, addToLevel: true
+			MeleeIds.UpSlash or MeleeIds.DownSlash => new GenericMeleeProj(
+				SigmaClawWeapon.netWeapon, pos, ProjIds.Sigma2UpDownClaw, player,
+				3, Global.defFlinch, 30, addToLevel: addToLevel
 			),
-			"sigma2_upslash" or "sigma2_downslash" => new GenericMeleeProj(
-				SigmaClawWeapon.netWeapon, centerPoint, ProjIds.Sigma2UpDownClaw, player,
-				3, Global.defFlinch, 0.5f, addToLevel: true
+			MeleeIds.WallSlash or MeleeIds.LadderSlash => new GenericMeleeProj(
+				SigmaClawWeapon.netWeapon, pos, ProjIds.Sigma2Claw, player,
+				3, 0, 15, addToLevel: true
 			),
-			"sigma2_ladder_attack" => new GenericMeleeProj(
-				SigmaClawWeapon.netWeapon, centerPoint, ProjIds.Sigma2Claw, player,
-				3, 0, 0.25f, addToLevel: true
-			),
-			"sigma2_wall_slide_attack" => new GenericMeleeProj(
-				SigmaClawWeapon.netWeapon, centerPoint, ProjIds.Sigma2Claw, player,
-				3, 0, 0.25f, addToLevel: true
-			),
-			"sigma2_shoot2" => new GenericMeleeProj(
-				new SigmaElectricBall2Weapon(), centerPoint, ProjIds.Sigma2Ball2, player,
-				6, Global.defFlinch, 1f, addToLevel: true
+			MeleeIds.GigaAttackSlash => new GenericMeleeProj(
+				new SigmaElectricBall2Weapon(), pos, ProjIds.Sigma2Ball2, player,
+				6, Global.defFlinch, 15, addToLevel: true
 			),
 			_ => null
 		};
-		if (proj != null) {
-			return proj;
-		}
-		return base.getProjFromHitbox(collider, centerPoint);
 	}
 
 	public override void addAmmo(float amount) {
