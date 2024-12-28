@@ -676,6 +676,7 @@ public class Zero : Character {
 			float damage = 3 + Helpers.clamp(MathF.Floor(deltaPos.y * 0.8f), 0, 10);
 			proj.damager.damage = damage;
 		}
+		updateProjFromHitbox(proj);
 		return proj;
 	}
 
