@@ -125,23 +125,24 @@ public class CmdSigma : BaseSigma {
 	// This can run on both owners and non-owners. So data used must be in sync.
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
+			"sigma_block" => MeleeIds.Guard,
 			"sigma_ladder_attack" or "sigma_wall_slide_attack" => MeleeIds.GenericSlash,
 			_ => MeleeIds.None
 		});
 	}
 
 	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
-		Projectile? proj = id switch {
-			(int)MeleeIds.GenericSlash => new GenericMeleeProj(
+		return (MeleeIds)id switch {
+			MeleeIds.Guard => new GenericMeleeProj(
+				SigmaSlashWeapon.netWeapon, pos, ProjIds.SigmaSwordBlock, player,
+				0, 0, 0, isDeflectShield: true, addToLevel: addToLevel
+			),
+			MeleeIds.GenericSlash => new GenericMeleeProj(
 				SigmaSlashWeapon.netWeapon, pos, ProjIds.SigmaSlash, player, 3, 0,
 				addToLevel: addToLevel
 			),
 			_ => null
 		};
-		if (proj != null) {
-			return proj;
-		}
-		return base.getMeleeProjById(id, pos, addToLevel);
 	}
 
 	public override void addAmmo(float amount) {

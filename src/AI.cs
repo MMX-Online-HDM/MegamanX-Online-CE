@@ -37,6 +37,7 @@ public class AI {
 	public bool isWildDance;
 	public float blocktime = 0;
 	public float stopDashSpam;
+	public float mashShootCooldown;
 
 	public AI(Character character) {
 		this.character = character;
@@ -187,7 +188,9 @@ public class AI {
 			}
 			if (trainingBehavior == AITrainingBehavior.Attack) {
 				player.release(Control.Jump);
-				player.press(Control.Shoot);
+				if (character.chargeTime == 0) {
+					player.press(Control.Shoot);
+				}
 				return;
 			}
 			if (trainingBehavior == AITrainingBehavior.Jump) {

@@ -357,11 +357,12 @@ public class BusterZero : Character {
 		bool[] flags = Helpers.byteToBoolArray(data[0]);
 		isBlackZero = flags[0];
 	}
+
 	public float aiAttackCooldown;
 	public override void aiAttack(Actor? target) {
 		if (charState.normalCtrl) {
 			player.press(Control.Shoot);
-		} 
+		}
 		// Go hypermode 
 		if (player.currency >= 10 && !isBlackZero && !isInvulnerable()
 			&& charState is not HyperBusterZeroStart and not WarpIn) {
@@ -401,6 +402,7 @@ public class BusterZero : Character {
 		}
 		base.aiAttack(target);
 	}
+
 	public override void aiDodge(Actor? target) {
 		foreach (GameObject gameObject in getCloseActors(64, true, false, false)) {
 			if (gameObject is Projectile proj && proj.damager.owner.alliance != player.alliance && charState.attackCtrl) {

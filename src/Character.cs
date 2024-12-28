@@ -1030,7 +1030,7 @@ public partial class Character : Actor, IDamagable {
 			usedSubtank = null;
 		}
 
-		if (ai != null ) {
+		if (ai != null) {
 			ai.update();
 		}
 

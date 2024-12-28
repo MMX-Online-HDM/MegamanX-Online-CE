@@ -369,31 +369,6 @@ public class BaseSigma : Character {
 		return false;
 	}
 
-	// Melee IDs for attacks.
-	public enum BaseMeleeIds {
-		None = -1,
-		Guard,
-	}
-
-	// This can run on both owners and non-owners. So data used must be in sync.
-	public override int getHitboxMeleeId(Collider hitbox) {
-		if (sprite.name.Contains("sigma_block") && !collider.isHurtBox()) {
-			return (int)BaseMeleeIds.Guard;
-		};
-		return (int)BaseMeleeIds.None;
-	}
-
-	// This can be called from a RPC, so make sure there is no character conditionals here.
-	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
-		return (BaseMeleeIds)id switch {
-			BaseMeleeIds.Guard => new GenericMeleeProj(
-				SigmaSlashWeapon.netWeapon, pos, ProjIds.SigmaSwordBlock, player,
-				0, 0, 0, isDeflectShield: true, addToLevel: addToLevel
-			),
-			_ => null
-		};
-	}
-
 	public void becomeSigma(Point pos, int xDir) {
 		var prevCamPos = getCamCenterPos();
 		if (player.isPuppeteer()) {

@@ -221,11 +221,11 @@ public partial class KaiserSigma : Character {
 
 	// This can run on both owners and non-owners. So data used must be in sync.
 	public override int getHitboxMeleeId(Collider hitbox) {
+		if (hitbox.name == "body") {
+			return (int)MeleeIds.Suit;
+		}
 		if (sprite.name == "kaisersigma_fall" && collider.isAttack()) {
 			return (int)MeleeIds.Stomp;
-		}
-		if (collider.name == "body") {
-			return (int)MeleeIds.Suit;
 		}
 		return (int)MeleeIds.None;
 	}

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace MMXOnline;
@@ -125,17 +125,17 @@ public class Doppma : BaseSigma {
 
 	// This can run on both owners and non-owners. So data used must be in sync.
 	public override int getHitboxMeleeId(Collider hitbox) {
-		if (collider.name == "shield") {
-			if (sprite.name.Contains("sigma_block")) {
-				return (int)MeleeIds.ShieldGuard;
-			}
+		if (hitbox.name == "shield") {
 			return (int)MeleeIds.Shield;
+		}
+		if (sprite.name == "sigma3_block") {
+			return (int)MeleeIds.ShieldGuard;
 		}
 		return (int)MeleeIds.None;
 	}
 
 	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
-		Projectile? proj = id switch {
+		return id switch {
 			(int)MeleeIds.Shield or (int)MeleeIds.ShieldGuard => new GenericMeleeProj(
 				new Weapon(), pos, ProjIds.Sigma3ShieldBlock, player,
 				damage: 0, flinch: 0, hitCooldown: 60,
@@ -145,7 +145,6 @@ public class Doppma : BaseSigma {
 			),
 			_ => null
 		};
-		return base.getMeleeProjById(id, pos, addToLevel);
 	}
 
 	public override List<ShaderWrapper> getShaders() {
