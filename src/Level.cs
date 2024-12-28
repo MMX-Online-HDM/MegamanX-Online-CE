@@ -1674,7 +1674,7 @@ public partial class Level {
 
 		bool isSlown = false;
 
-		if (actor is Projectile || actor is Character || actor is Anim || actor is RideArmor || actor is OverdriveOstrich) {
+		if (actor is Projectile || actor is Character || actor is Anim || actor is RideArmor || actor is Maverick) {
 			foreach (var cch in chargedCrystalHunters) {
 				var chr = go as Character;
 				if (chr != null && chr.player.alliance == cch.owner.alliance) continue;
