@@ -154,15 +154,30 @@ public class MagnaCentipede : Maverick {
 		changeSpriteFromName(state.sprite, false);
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		Projectile? proj = null;
-		if (sprite.name.EndsWith("_drain") && ((reversedGravity && hitbox.name == "flipped") || (!reversedGravity && hitbox.name != "flipped"))) {
-			var meleeProj = new GenericMeleeProj(weapon, getFirstPOIOrDefault(), ProjIds.MagnaCTail, player, damage: 0, flinch: 0, hitCooldown: 0, owningActor: this);
-			var rect = new Rect(0, 0, 10, 10);
-			meleeProj.globalCollider = new Collider(rect.getPoints(), true, meleeProj, false, false, HitboxFlag.Hitbox, Point.zero);
-			return meleeProj;
-		}
-		return proj;
+	
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Drain,
+	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"magnac_drain" => MeleeIds.Drain,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Drain => new GenericMeleeProj(
+				weapon, getFirstPOIOrDefault(), ProjIds.MagnaCTail, player,
+				0, 0, 0, addToLevel: addToLevel
+			),
+			_ => null
+		};
 	}
 
 	public override void onCollision(CollideData other) {
