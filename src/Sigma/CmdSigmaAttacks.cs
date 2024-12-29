@@ -118,10 +118,7 @@ public class SigmaBallProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
-	}
-	public override void update() {
-		forceNetUpdateNextFrame = true;
-		base.update();
+		canBeLocal = false;
 	}
 }
 

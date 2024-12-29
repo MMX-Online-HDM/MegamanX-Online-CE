@@ -217,6 +217,7 @@ public class TSeahorseAcid2Proj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 		checkBigAcidUnderwater();
 	}
 

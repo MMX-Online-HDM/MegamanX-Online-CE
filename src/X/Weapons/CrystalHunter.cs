@@ -110,12 +110,11 @@ public class CrystalHunterCharged : Actor {
 			createActorRpc(owner.id);
 		}
 
-		canBeLocal = true;
+		canBeLocal = false;
 	}
 
 	public override void update() {
 		base.update();
-
 		var screenCoords = new Point(pos.x - Global.level.camX, pos.y - Global.level.camY);
 		var normalizedCoords = new Point(screenCoords.x / Global.viewScreenW, 1 - screenCoords.y / Global.viewScreenH);
 

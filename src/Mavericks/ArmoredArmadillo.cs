@@ -230,16 +230,19 @@ public class ArmoredAProj : Projectile {
 }
 
 public class ArmoredAChargeReleaseProj : Projectile {
-	public ArmoredAChargeReleaseProj(Weapon weapon, Point pos, int xDir, Point vel, float damage, Player player, ushort netProjId, bool rpc = false) :
+	public ArmoredAChargeReleaseProj(Weapon weapon, Point pos, int xDir, Point? vel, float damage, Player player, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, xDir, 400, 4, player, "armoreda_proj_release", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.ArmoredAChargeRelease;
 		maxTime = 0.4f;
 		damager.damage = damage;
-		this.vel = vel.times(speed);
+		if (vel != null) {
+			this.vel = vel.Value.times(speed);
+		}
 
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 
 	public override void update() {

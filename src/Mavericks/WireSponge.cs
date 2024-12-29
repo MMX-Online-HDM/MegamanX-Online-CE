@@ -132,6 +132,7 @@ public class WSpongeChainSpinProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 }
 
@@ -855,7 +856,7 @@ public class WSpongeSpike : Projectile, IDamagable {
 		destroyOnHit = true;
 		fadeSprite = "explosion";
 		fadeSound = "explosion";
-
+		canBeLocal = false;
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}

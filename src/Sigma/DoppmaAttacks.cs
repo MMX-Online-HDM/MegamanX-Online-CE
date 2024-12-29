@@ -199,7 +199,7 @@ public class Sigma3FireProj : Projectile {
 
 		wallCrawlSpeed = 250;
 		wallCrawlUpdateAngle = true;
-
+		canBeLocal = false;
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
