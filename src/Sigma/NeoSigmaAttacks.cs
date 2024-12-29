@@ -101,20 +101,22 @@ public class SigmaElectricBallWeapon : Weapon {
 
 public class SigmaElectricBallProj : Projectile {
 	public SigmaElectricBallProj(
-		Weapon weapon, Point pos, float angle, Player
+		Weapon weapon, Point pos, float byteAngle, Player
 		player, ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, 1, 0, 3, player, "sigma2_ball", Global.miniFlinch, 0.2f,
+		weapon, pos, 1, 200, 3, player, "sigma2_ball", Global.miniFlinch, 0.2f,
 		netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.Sigma2Ball;
 		destroyOnHit = false;
 		maxTime = 0.5f;
-
-		this.vel = Point.createFromAngle(angle).times(200);
+		byteAngle = byteAngle % 256;
+		vel.x = 200 * Helpers.cosb(byteAngle);
+		vel.y = 200 * Helpers.sinb(byteAngle);
+		this.byteAngle = byteAngle;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreateByteAngle(pos, player, netProjId, xDir);
 		}
 		canBeLocal = false;
 	}
@@ -135,13 +137,10 @@ public class SigmaElectricBallState : CharState {
 			character.playSound("sigma2ball", sendRpc: true);
 			var weapon = new SigmaElectricBallWeapon();
 			Point pos = character.pos.addxy(0, -20);
-			new SigmaElectricBallProj(weapon, pos, 0, player, player.getNextActorNetId(), rpc: true);
-			new SigmaElectricBallProj(weapon, pos, -45, player, player.getNextActorNetId(), rpc: true);
-			new SigmaElectricBallProj(weapon, pos, -90, player, player.getNextActorNetId(), rpc: true);
-			new SigmaElectricBallProj(weapon, pos, -135, player, player.getNextActorNetId(), rpc: true);
-			new SigmaElectricBallProj(weapon, pos, -180, player, player.getNextActorNetId(), rpc: true);
+			for (int i = 256; i >= 128; i -= 32) {
+				new SigmaElectricBallProj(weapon, pos, i, player, player.getNextActorNetId(), rpc: true);
+			}
 		}
-
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		}
