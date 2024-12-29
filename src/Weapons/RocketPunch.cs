@@ -127,6 +127,7 @@ public class RocketPunchProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 
 	public bool ownerExists => (owner.character?.destroyed == false);

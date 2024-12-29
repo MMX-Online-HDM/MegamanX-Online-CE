@@ -33,6 +33,7 @@ public class MettaurCrashProj : Projectile {
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 
 	/*
@@ -62,6 +63,7 @@ public class BeastKillerProj : Projectile {
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 
 	public override void onHitWall(CollideData other) {
@@ -84,6 +86,7 @@ public class MachineBulletProj : Projectile {
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 
 	public override void onHitWall(CollideData other) {
@@ -106,6 +109,7 @@ public class RevolverBarrelProj : Projectile {
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 
 	public override void onHitWall(CollideData other) {
@@ -142,6 +146,7 @@ public class AncientGunProj : Projectile {
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 
 	public override void update() {
