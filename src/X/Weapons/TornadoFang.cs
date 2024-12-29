@@ -143,7 +143,7 @@ public class TornadoFangProj : Projectile {
 				vel.x = 4 * xDir;
 				// To update the reduced speed.
 				if (ownedByLocalPlayer) {
-				forceNetUpdateNextFrame = true;
+					forceNetUpdateNextFrame = true;
 				}
 
 				if (damagable is not CrackedWall) {
