@@ -188,8 +188,13 @@ public class BoomerangKBoomerangProj : Projectile {
 	public float maxSpeed = 400;
 	float returnTime = 0.15f;
 	public BoomerangKuwanger maverick;
-	public BoomerangKBoomerangProj(Weapon weapon, Point pos, int xDir, BoomerangKuwanger maverick, float throwDirAngle, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, 250, 3, player, "boomerk_proj_horn", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public BoomerangKBoomerangProj(
+		Weapon weapon, Point pos, int xDir, BoomerangKuwanger maverick,
+		float throwDirAngle, Player player, ushort netProjId, bool sendRpc = false
+	) : base(
+		weapon, pos, xDir, 250, 3, player, "boomerk_proj_horn",
+		Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.BoomerangKBoomerang;
 		angle = throwDirAngle;
 		this.maverick = maverick;
@@ -201,8 +206,6 @@ public class BoomerangKBoomerangProj : Projectile {
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
-		// ToDo: Make local.
-		canBeLocal = false;
 	}
 
 	public override void onCollision(CollideData other) {
