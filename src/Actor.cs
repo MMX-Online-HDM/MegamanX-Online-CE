@@ -1285,9 +1285,12 @@ public partial class Actor : GameObject {
 		frameSpeed = 1;
 	}
 
-	public void addRenderEffect(RenderEffectType type, float flashTime = 0, float time = float.MaxValue) {
+	public void addRenderEffect(
+		RenderEffectType type, float flashTime = 0,
+		float time = float.MaxValue, float cycleTime = -1
+	) {
 		if (renderEffects.ContainsKey(type)) return;
-		renderEffects[type] = new RenderEffect(type, flashTime, time);
+		renderEffects[type] = new RenderEffect(type, flashTime, time, cycleTime);
 	}
 
 	public void addRenderEffect(RenderEffectType type) {

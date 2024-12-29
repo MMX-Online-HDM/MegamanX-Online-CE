@@ -65,6 +65,11 @@ public class Zero : Character {
 	public float zeroTripleStartTime;
 	public float zeroTripleSlashEndTime;
 
+	// AI stuff.
+	public bool isWildDance;
+	public float aiBlocktime;
+	public float aiAttackCooldown;
+
 	// Creation code.
 	public Zero(
 		Player player, float x, float y, int xDir,
@@ -1033,8 +1038,7 @@ public class Zero : Character {
 			hypermodeBlink = data[2];
 		}
 	}
-	public bool isWildDance;
-	public float blocktime, aiAttackCooldown;
+
 	public override void aiAttack(Actor? target) {
 		bool isTargetInAir = pos.y > target?.pos.y - 20;
 		bool isTargetClose = pos.x < target?.pos.x - 10;
@@ -1120,8 +1124,9 @@ public class Zero : Character {
 		}
 		base.aiAttack(target);
 	}
+
 	public override void aiDodge(Actor? target) {
-		Helpers.decrementFrames(ref blocktime);
+		Helpers.decrementFrames(ref aiBlocktime);
 		foreach (GameObject gameObject in getCloseActors(64, true, false, false)) {
 			if (gameObject is Projectile proj&& proj.damager.owner.alliance != player.alliance && charState.attackCtrl) {
 				//Projectile is not 
@@ -1153,10 +1158,10 @@ public class Zero : Character {
 								break;
 						}
 					} else if (!(proj.projId == (int)ProjIds.SwordBlock) && grounded
-					&& blocktime <= 0) {
+					&& aiBlocktime <= 0) {
 						turnToInput(player.input, player);
 						changeState(new SwordBlock(), true);
-						blocktime = 40;
+						aiBlocktime = 40;
 					}
 				}
 			}

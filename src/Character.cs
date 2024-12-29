@@ -2055,10 +2055,6 @@ public partial class Character : Actor, IDamagable {
 				Alignment.Center, true, depth: ZIndex.HUD
 			);
 			if (ai != null) {
-				//DrawWrappers.DrawText(
-				//	"state:" + ai.aiState.GetType().Name, textPosX, textPosY -= 10,
-				//	Alignment.Center, fontSize: fontSize, outlineColor: outlineColor
-				//);
 				var charTarget = ai.target as Character;
 				Fonts.drawText(
 					FontType.Grey, "dest:" + ai.aiState.getDestNodeName(),
@@ -2071,6 +2067,10 @@ public partial class Character : Actor, IDamagable {
 				Fonts.drawText(
 					FontType.Grey, "prev:" + ai.aiState.getPrevNodeName(), textPosX, textPosY -= 10,
 					Alignment.Center, true, depth: ZIndex.HUD
+				);
+				Fonts.drawText(
+					FontType.Grey, ai.aiState.GetType().ToString().RemovePrefix("MMXOnline."),
+					textPosX, textPosY -= 10, Alignment.Center, true, depth: ZIndex.HUD
 				);
 				if (charTarget != null) {
 					Fonts.drawText(
