@@ -295,15 +295,14 @@ public class MorphMothCocoon : Maverick {
 			if (t is Character chr) {
 				return chr.player.alliance != player.alliance || chr.health < chr.maxHealth;
 			}
-			/*
+			
 			// GMTODO: use an "isAtMaxHealth" boolstate
 			else if (t is Maverick mvk) {
-				return mvk.player.alliance != player.alliance || mvk.health < mvk.maxHealth;
+				return mvk?.player?.alliance != player.alliance || mvk.health < mvk.maxHealth;
 			}
 			else if (t is RideArmor ra) {
-				return ra.player.alliance != player.alliance || ra.health < ra.maxHealth;
+				return ra?.player?.alliance != player.alliance || ra.health < ra.maxHealth;
 			}
-			*/
 			return false;
 		});
 	}

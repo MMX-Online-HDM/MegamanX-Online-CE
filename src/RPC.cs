@@ -1734,7 +1734,7 @@ public class RPCHeal : RPC {
 		}
 	}
 
-	public void sendRpc(Player player, ushort healNetId, int healAmount) {
+	public void sendRpc(Player player, ushort healNetId, float healAmount) {
 		var healNetIdBytes = BitConverter.GetBytes(healNetId);
 		Global.serverClient?.rpc(this, (byte)player.id, healNetIdBytes[0], healNetIdBytes[1], (byte)healAmount);
 	}
