@@ -340,7 +340,7 @@ public partial class Level {
 			Global.srtBuffer1 = Global.srtBuffer1L;
 			Global.srtBuffer2 = Global.srtBuffer2L;
 		} else {
-			Global.viewSize = 0.5f;
+			Global.viewSize = 1;
 			Global.view.Size = new Vector2f(Global.viewScreenW, Global.viewScreenH);
 			Global.screenRenderTexture = Global.screenRenderTextureS;
 			Global.srtBuffer1 = Global.srtBuffer1S;
@@ -864,6 +864,14 @@ public partial class Level {
 
 		//var p = Global.level.mainPlayer;
 		//new Mechaniloid(new Point(128, 128), p, 1, new MechaniloidWeapon(p, MechaniloidType.Hopper), MechaniloidType.Hopper, p.getNextActorNetId(), true);
+	}
+
+	public void changeCameraScale(float scale) {
+		if (server.fixedCamera) {
+			scale *= 2;
+		}
+		Global.viewSize = scale;
+		Global.view.Size = new Vector2f(Global.viewScreenW, Global.viewScreenH);
 	}
 
 	private long getZIndexFromProperty(dynamic property, long defaultZIndex) {
