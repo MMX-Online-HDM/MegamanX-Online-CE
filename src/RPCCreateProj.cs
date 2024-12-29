@@ -523,7 +523,7 @@ public partial class RPCCreateProj : RPC {
 				proj = new WSpongeSeedProj(WireSponge.getWeapon(), pos, xDir, Point.zero, player, netProjByte);
 				break;
 			case (int)ProjIds.WSpongeSpike:
-				proj = new WSpongeSpike(WireSponge.getWeapon(), pos, xDir, 0, player, netProjByte);
+				//proj = new WSpongeSpike(WireSponge.getWeapon(), pos, xDir, 0, player, netProjByte);
 				break;
 			case (int)ProjIds.WheelGSpinWheel:
 				proj = new WheelGSpinWheelProj(WheelGator.getWeapon(), pos, xDir, player, netProjByte);

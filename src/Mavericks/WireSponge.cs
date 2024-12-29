@@ -850,16 +850,26 @@ public class WSpongeSeedProj : Projectile {
 
 public class WSpongeSpike : Projectile, IDamagable {
 	public float health = 2;
-	public WSpongeSpike(Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 2, player, getSpriteFromType(type), Global.defFlinch, 0f, netProjId, player.ownedByLocalPlayer) {
+	public int type;
+	public WSpongeSpike(Weapon weapon, Point pos, int xDir, int type,
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 2, player, getSpriteFromType(type),
+		 Global.defFlinch, 0f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.WSpongeSpike;
 		destroyOnHit = true;
 		fadeSprite = "explosion";
 		fadeSound = "explosion";
-		canBeLocal = false;
+		this.type = type;
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, player, netProjId, xDir, (byte)type);
 		}
+	}
+		public static Projectile rpcInvoke(ProjParameters args) {
+		return new WSpongeSpike(WireSpongeWeapon.netWeapon,
+			args.pos, args.xDir, args.extraData[0], args.player, args.netId
+		);
 	}
 
 	private static string getSpriteFromType(int type) {
