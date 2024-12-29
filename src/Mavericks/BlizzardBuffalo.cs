@@ -218,8 +218,9 @@ public class BBuffaloIceProjGround : Projectile, IDamagable {
 		this.angle = angle;
 		updateHitboxes();
 		if (sendRpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreateByteAngle(pos, player, netProjId, angle);
 		}
+		canBeLocal = false;
 	}
 
 	public override void preUpdate() {

@@ -116,6 +116,7 @@ public class VileBombProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 
 	public override void update() {
@@ -167,6 +168,7 @@ public class PeaceOutRollerProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 
 	public override void update() {

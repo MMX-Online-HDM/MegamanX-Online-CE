@@ -169,6 +169,7 @@ public class VileCutterProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 
 	public override void onCollision(CollideData other) {

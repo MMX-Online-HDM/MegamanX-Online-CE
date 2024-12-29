@@ -28,7 +28,7 @@ public class Projectile : Actor {
 	public bool neverReflect = false;
 	public int projId;
 	public float speed;
-	public int healAmount;
+	public float healAmount;
 	public bool isShield;
 	public bool isReflectShield;
 	public bool isDeflectShield;
@@ -627,11 +627,11 @@ public class Projectile : Actor {
 			bool isMaverickHealProj = projId == (int)ProjIds.MorphMCScrap || projId == (int)ProjIds.MorphMPowder;
 			if (ownedByLocalPlayer &&
 				(damagable != damager.owner.character || isMaverickHealProj) &&
-				(damagable is not Maverick || !damager.owner.mavericks.Contains(damagable)) &&
+				/*(damagable is not Maverick || !damager.owner.mavericks.Contains(damagable)) && */
 				damagable.canBeHealed(damager.owner.alliance) && healAmount > 0
 			) {
 				if (Global.serverClient == null || damagableActor?.ownedByLocalPlayer == true) {
-					damagable.heal(owner, time, allowStacking: true, drawHealText: true);
+					damagable.heal(owner, healAmount, allowStacking: true, drawHealText: true);
 				} else {
 					RPC.heal.sendRpc(owner, damagableActor?.netId ?? ushort.MaxValue, healAmount);
 				}

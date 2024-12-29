@@ -118,6 +118,7 @@ public class SigmaBallProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 }
 

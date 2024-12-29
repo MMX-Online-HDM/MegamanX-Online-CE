@@ -116,6 +116,7 @@ public class SigmaElectricBallProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 }
 
@@ -169,6 +170,7 @@ public class SigmaElectricBall2Proj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 }
 

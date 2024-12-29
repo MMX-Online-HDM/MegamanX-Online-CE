@@ -214,6 +214,7 @@ public class BHornetBeeProj : Projectile, IDamagable {
 		if (!ownedByLocalPlayer) return;
 
 		maxTime = 3;
+		forceNetUpdateNextFrame = true;
 		if (latchTarget == null) {
 			stopMoving();
 			latchTarget = damagable.actor();

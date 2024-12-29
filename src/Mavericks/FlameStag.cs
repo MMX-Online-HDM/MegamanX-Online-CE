@@ -185,6 +185,7 @@ public class FStagFireballProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 
 	public override void update() {
@@ -378,6 +379,7 @@ public class FStagDashProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 }
 
