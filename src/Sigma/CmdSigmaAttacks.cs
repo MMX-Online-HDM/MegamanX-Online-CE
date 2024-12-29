@@ -119,6 +119,10 @@ public class SigmaBallProj : Projectile {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
 	}
+	public override void update() {
+		forceNetUpdateNextFrame = true;
+		base.update();
+	}
 }
 
 public class SigmaBallShoot : CharState {
