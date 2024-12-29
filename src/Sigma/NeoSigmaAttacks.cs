@@ -170,6 +170,36 @@ public class SigmaElectricBall2Proj : Projectile {
 		}
 	}
 }
+public class SigmaElectricBall2StateEX : CharState {
+	public bool fired, soundFired;
+	public SigmaElectricBall2Proj? SigmaBalls;
+	public SigmaElectricBall2StateEX() : base("shoot2") {
+		invincible = true;
+	}
+	public override void update() {
+		character.turnToInput(player.input, player);
+
+		if (character.frameIndex >= 13 && !soundFired) {
+			soundFired = true;
+			character.playSound("neoSigmaESpark", sendRpc: true);
+		}
+
+		Point shootPos = character.getCenterPos().addxy(52*character.xDir, -8);
+		if (character.frameIndex >= 17 && !fired) {
+			fired = true;
+			SigmaBalls = new SigmaElectricBall2Proj(
+				new SigmaElectricBall2Weapon(), shootPos,
+				character.xDir, player, player.getNextActorNetId(), rpc: true
+			);
+		}
+
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+		base.update();
+	}
+}
+
 
 public class SigmaElectricBall2State : CharState {
 	bool fired;
