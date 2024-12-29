@@ -144,8 +144,13 @@ public class NeonTiger : Maverick {
 public class NeonTRaySplasherProj : Projectile {
 	int shootNum;
 	bool isHanging;
-	public NeonTRaySplasherProj(Weapon weapon, Point pos, int xDir, int shootNum, bool isHanging, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, 0, 2, player, "neont_projectile_start", 0, 0.01f, netProjId, player.ownedByLocalPlayer) {
+	public NeonTRaySplasherProj(
+		Weapon weapon, Point pos, int xDir, int shootNum,
+		bool isHanging, Player player, ushort netProjId, bool sendRpc = false
+	) : base(
+		weapon, pos, xDir, 0, 2, player, "neont_projectile_start",
+		0, 0.01f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.NeonTRaySplasher;
 		maxTime = 0.875f;
 		this.shootNum = shootNum;

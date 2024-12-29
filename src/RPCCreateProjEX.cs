@@ -99,6 +99,7 @@ public partial class RPCCreateProj : RPC {
 		{ (int)ProjIds.DZBuster3, DZBuster3Proj.rpcInvoke },
 		// Mavericks
 		{ (int)ProjIds.VoltCSuck, VoltCSuckProj.rpcInvoke },
+		{ (int)ProjIds.TSeahorseAcid2, TSeahorseAcid2Proj.rpcInvoke }
 	};
 
 }

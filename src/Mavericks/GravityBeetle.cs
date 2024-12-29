@@ -370,8 +370,14 @@ public class GBeetleGravityWellProj : Projectile {
 	float randPartTime;
 	public float maxRadius = 50;
 	float ttl = 4;
-	public GBeetleGravityWellProj(Weapon weapon, Point pos, int xDir, float chargeTime, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, 0, 2, player, "gbeetle_proj_blackhole", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
+
+	public GBeetleGravityWellProj(
+		Weapon weapon, Point pos, int xDir, float chargeTime,
+		Player player, ushort netProjId, bool sendRpc = false
+	) : base(
+		weapon, pos, xDir, 0, 2, player, "gbeetle_proj_blackhole",
+		0, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.GBeetleGravityWell;
 		setIndestructableProperties();
 

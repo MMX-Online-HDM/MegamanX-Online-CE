@@ -648,9 +648,6 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.TSeahorseAcid1:
 				proj = new TSeahorseAcidProj(ToxicSeahorse.getWeapon(), pos, xDir, player, netProjByte);
 				break;
-			case (int)ProjIds.TSeahorseAcid2:
-				proj = new TSeahorseAcid2Proj(ToxicSeahorse.getWeapon(), pos, xDir, 0, player, netProjByte);
-				break;
 			case (int)ProjIds.TunnelRTornadoFang:
 			case (int)ProjIds.TunnelRTornadoFang2:
 				proj = new TunnelRTornadoFang(TunnelRhino.getWeapon(), pos, xDir, extraData[0], player, netProjByte);
