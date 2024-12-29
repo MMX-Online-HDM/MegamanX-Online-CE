@@ -30,13 +30,21 @@ public class RenderEffect {
 	public RenderEffectType type;
 	public float time;
 	public float flashTime;
-	public RenderEffect(RenderEffectType type, float flashTime = 0, float time = float.MaxValue) {
+	public float cycleTime;
+
+	public RenderEffect(RenderEffectType type, float flashTime = 0, float time = float.MaxValue, float cycleTime = -1) {
 		this.type = type;
 		this.flashTime = flashTime;
 		this.time = time;
+
+		if (cycleTime >= flashTime) {
+			this.cycleTime = cycleTime;
+		} else {
+			this.cycleTime = flashTime;
+		}
 	}
 
 	public bool isFlashing() {
-		return Global.level.nonSkippedframeCount % (flashTime * 2) < flashTime;
+		return time % (flashTime * 2) > cycleTime;
 	}
 }

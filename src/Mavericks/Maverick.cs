@@ -494,7 +494,9 @@ public class Maverick : Actor, IDamagable {
 					if (dist < 0) press(Control.Left);
 					else press(Control.Right);
 
-					var jumpZones = Global.level.getTriggerList(this, 0, 0, null, typeof(JumpZone));
+					var jumpZones = Global.level.getTerrainTriggerList(
+						this, Point.zero, typeof(JumpZone)
+					);
 					if (jumpZones.Count > 0) {
 						press(Control.Jump);
 					}
@@ -508,7 +510,9 @@ public class Maverick : Actor, IDamagable {
 				else press(Control.Right);
 			}
 
-			var jumpZones = Global.level.getTriggerList(this, 0, 0, null, typeof(JumpZone));
+			var jumpZones = Global.level.getTerrainTriggerList(
+				this, Point.zero, typeof(JumpZone)
+			);
 			if (jumpZones.Count > 0) {
 				press(Control.Jump);
 			}
