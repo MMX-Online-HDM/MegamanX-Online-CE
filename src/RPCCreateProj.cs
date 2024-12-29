@@ -375,7 +375,7 @@ public partial class RPCCreateProj : RPC {
 				break;
 			case (int)ProjIds.ArmoredAChargeRelease:
 				proj = new ArmoredAChargeReleaseProj(
-					new ArmoredAChargeReleaseWeapon(), pos, xDir, new Point(), 6, player, netProjByte
+					new ArmoredAChargeReleaseWeapon(), pos, xDir, byteAngle, 6, player, netProjByte
 				);
 				break;
 			case (int)ProjIds.LaunchOMissle:

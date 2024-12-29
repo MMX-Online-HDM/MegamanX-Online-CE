@@ -230,19 +230,19 @@ public class ArmoredAProj : Projectile {
 }
 
 public class ArmoredAChargeReleaseProj : Projectile {
-	public ArmoredAChargeReleaseProj(Weapon weapon, Point pos, int xDir, Point? vel, float damage, Player player, ushort netProjId, bool rpc = false) :
+	public ArmoredAChargeReleaseProj(Weapon weapon, Point pos, int xDir, float byteAngle, float damage, Player player, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, xDir, 400, 4, player, "armoreda_proj_release", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
+		byteAngle = byteAngle % 256;
+		vel.x = 400 * Helpers.cosb(byteAngle);
+		vel.y = 400 * Helpers.sinb(byteAngle);
+		this.byteAngle = byteAngle;
 		projId = (int)ProjIds.ArmoredAChargeRelease;
 		maxTime = 0.4f;
 		damager.damage = damage;
-		if (vel != null) {
-			this.vel = vel.Value.times(speed);
-		}
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreateByteAngle(pos, player, netProjId, byteAngle);
 		}
-		canBeLocal = false;
 	}
 
 	public override void update() {
@@ -329,11 +329,11 @@ public class ArmoredAGuardReleaseState : MaverickState {
 
 		if (!once && maverick.frameIndex >= 2) {
 			once = true;
-			for (int i = 0; i < 8; i++) {
-				Point vel = Point.createFromAngle(i * 45);
-				new ArmoredAChargeReleaseProj((maverick as ArmoredArmadillo).chargeReleaseWeapon, maverick.getCenterPos(), 1, vel, damage, player, player.getNextActorNetId(), rpc: true);
+			for (int i = 256; i >= 0; i -= 32) {
+				new ArmoredAChargeReleaseProj((maverick as ArmoredArmadillo).chargeReleaseWeapon,
+				 maverick.getCenterPos(), 1, i, damage, player, player.getNextActorNetId(), rpc: true);
 			}
-		}
+		}	
 
 		if (maverick.isAnimOver()) {
 			maverick.changeState(new MIdle());
