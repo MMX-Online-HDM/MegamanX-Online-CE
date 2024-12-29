@@ -433,7 +433,7 @@ public partial class RPCCreateProj : RPC {
 				proj = new SigmaSlashProj(new SigmaSlashWeapon(), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.SigmaBall:
-				proj = new SigmaBallProj(new SigmaBallWeapon(), pos, xDir, player, netProjByte);
+				proj = new SigmaBallProj(new SigmaBallWeapon(), pos, byteAngle, player, netProjByte);
 				break;
 			case (int)ProjIds.SigmaHandElecBeam:
 				proj = new WolfSigmaBeam(new WolfSigmaBeamWeapon(), pos, xDir, 1, 0, player, netProjByte);
