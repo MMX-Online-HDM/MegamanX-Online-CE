@@ -188,7 +188,7 @@ public class BBuffaloIceProj : Projectile {
 		var hitNormal = other.getNormalSafe();
 		destroySelf();
 		new BBuffaloIceProjGround(
-			weapon, other.getHitPointSafe(), hitNormal.angle,
+			weapon, other.getHitPointSafe(), hitNormal.byteAngle,
 			owner, owner.getNextActorNetId(), sendRpc: true
 		);
 	}
@@ -207,21 +207,21 @@ public class BBuffaloIceProjGround : Projectile, IDamagable {
 	float health = 6;
 
 	public BBuffaloIceProjGround(
-		Weapon weapon, Point pos, float angle, Player player, ushort netProjId, bool sendRpc = false
+		Weapon weapon, Point pos, float byteAngle, Player player, ushort netProjId, bool sendRpc = false
 	) : base(
 		weapon, pos, 1, 0, 3, player, "bbuffalo_proj_ice",
 		Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
+		byteAngle = byteAngle % 256;
+		this.byteAngle = byteAngle;
 		maxTime = 5;
 		projId = (int)ProjIds.BBuffaloIceProjGround;
 		destroyOnHit = true;
 		playSound("frostShield");
-		this.angle = angle;
 		updateHitboxes();
 		if (sendRpc) {
-			rpcCreateByteAngle(pos, player, netProjId, angle);
+			rpcCreateByteAngle(pos, player, netProjId, byteAngle);
 		}
-		canBeLocal = false;
 	}
 
 	public override void preUpdate() {
@@ -238,8 +238,8 @@ public class BBuffaloIceProjGround : Projectile, IDamagable {
 	public void updateHitboxes() {
 		if (angle == null || collider?._shape == null) return;
 
-		float angle360 = Helpers.to360(angle.Value);
-		if (angle360 >= 0 && angle360 <= 45) {
+		float angle360 = Helpers.to256(byteAngle.Value);
+		if (angle360 >= 0 && angle360 <= 32) {
 			collider._shape.points = new List<Point>()
 			{
 					new Point(-9, 0),
@@ -247,7 +247,7 @@ public class BBuffaloIceProjGround : Projectile, IDamagable {
 					new Point(26, 30),
 					new Point(-9, 30),
 				};
-		} else if (angle360 > 45 && angle360 <= 135) {
+		} else if (angle360 > 32 && angle360 <= 96) {
 			collider._shape.points = new List<Point>()
 			{
 					new Point(0 - 12, 0 + 12),
@@ -255,7 +255,7 @@ public class BBuffaloIceProjGround : Projectile, IDamagable {
 					new Point(30 - 12, 35 + 12),
 					new Point(0 - 12, 35 + 12),
 				};
-		} else if (angle360 > 135 && angle360 <= 225) {
+		} else if (angle360 > 96 && angle360 <= 160) {
 			collider._shape.points = new List<Point>()
 			{
 					new Point(-9 - 18, 0),
@@ -263,7 +263,7 @@ public class BBuffaloIceProjGround : Projectile, IDamagable {
 					new Point(26 - 18, 30),
 					new Point(-9 - 18, 30),
 				};
-		} else if (angle360 > 225) {
+		} else if (angle360 > 160) {
 			collider._shape.points = new List<Point>()
 			{
 					new Point(0 - 12, 0 - 12),

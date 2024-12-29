@@ -331,6 +331,11 @@ public class Helpers {
 		if (angle > 360) angle -= 360;
 		return angle;
 	}
+	public static float to256(float angle) {
+		if (angle < 0) angle += 256;
+		if (angle > 256) angle -= 256;
+		return angle;
+	}
 
 	// Given 2 angles, get the smallest difference between their values.
 	// Math.Abs(angle1 - angle2) won't work in such cases as angle1 = 359 and angle2 = 0,
