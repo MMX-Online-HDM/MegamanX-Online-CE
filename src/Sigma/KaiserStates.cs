@@ -577,7 +577,7 @@ public class KaiserMissileWeapon : Weapon {
 }
 
 public class KaiserSigmaMissileProj : Projectile {
-	public Actor target;
+	public Actor? target;
 	public float smokeTime = 0;
 	public float maxSpeed = 150;
 	public float health = 2;
@@ -594,8 +594,12 @@ public class KaiserSigmaMissileProj : Projectile {
 		angle = 270;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreateAngle(pos, player, netProjId, xDir);
 		}
+	}
+	public void reflect(float reflectAngle) {
+		angle = reflectAngle;
+		target = null;
 	}
 
 	public override void preUpdate() {
@@ -607,8 +611,10 @@ public class KaiserSigmaMissileProj : Projectile {
 		base.update();
 
 		if (ownedByLocalPlayer) {
-			if (!Global.level.gameObjects.Contains(target)) {
-				target = null;
+			if (target != null) {
+				if (!Global.level.gameObjects.Contains(target)) {
+					target = null;
+				}
 			}
 
 			if (target != null) {
@@ -616,15 +622,19 @@ public class KaiserSigmaMissileProj : Projectile {
 					var dTo = pos.directionTo(target.getCenterPos()).normalize();
 					var destAngle = MathF.Atan2(dTo.y, dTo.x) * 180 / MathF.PI;
 					destAngle = Helpers.to360(destAngle);
-					angle = Helpers.lerpAngle((float)angle, destAngle, Global.spf * 3);
+					if (angle != null) angle = Helpers.lerpAngle((float)angle, destAngle, Global.spf * 3);
 				}
 			}
 			if (time >= 0.1 && target == null) {
 				target = Global.level.getClosestTarget(pos, damager.owner.alliance, false, aMaxDist: Global.screenW);
 			}
 
-			vel.x = Helpers.cosd((float)angle) * maxSpeed;
-			vel.y = Helpers.sind((float)angle) * maxSpeed;
+			if (angle != null) {
+				forceNetUpdateNextFrame = true;
+				vel.x = Helpers.cosd((float)angle) * maxSpeed;
+				vel.y = Helpers.sind((float)angle) * maxSpeed;
+			}
+
 		}
 
 		smokeTime += Global.spf;
