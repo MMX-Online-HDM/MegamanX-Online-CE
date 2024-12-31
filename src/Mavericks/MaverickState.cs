@@ -1321,7 +1321,7 @@ public class MShoot : MaverickState {
 	bool shotOnce;
 	string shootSound;
 	public Action<Point, int> getProjectile;
-	public int shootFramesHeld;
+	public float shootFramesHeld;
 	bool shootReleased;
 	public MShoot(Action<Point, int> getProjectile, string shootSound) : base("shoot", "") {
 		this.getProjectile = getProjectile;
@@ -1334,7 +1334,7 @@ public class MShoot : MaverickState {
 
 		if (input.isHeld(Control.Shoot, player)) {
 			if (!shootReleased) {
-				shootFramesHeld++;
+				shootFramesHeld += maverick.speedMul;
 			}
 		} else {
 			shootReleased = true;

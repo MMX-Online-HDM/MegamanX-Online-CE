@@ -28,10 +28,16 @@ public partial class RPCCreateProj : RPC {
 			byteAngle = arguments[14];
 			angle = byteAngle * 1.40625f;
 		}
-		// Extra arguments.
+		// Optional arguments.
 		int extraDataIndex = 15;
+		Actor? owner = null;
+		if (dataInf[1]) {
+			owner = Global.level.getActorByNetId(BitConverter.ToUInt16(arguments[15..17], 0), true);
+			extraDataIndex = 17;
+		}
+		// Extra arguments.
 		byte[] extraData;
-		if (dataInf[1] && arguments.Length >= extraDataIndex + 1) {
+		if (dataInf[2] && arguments.Length >= extraDataIndex + 1) {
 			extraData = arguments[extraDataIndex..];
 		} else {
 			extraData = new byte[0];
@@ -52,7 +58,8 @@ public partial class RPCCreateProj : RPC {
 				netId = netProjByte,
 				angle = angle,
 				byteAngle = byteAngle,
-				extraData = extraData
+				extraData = extraData,
+				owner = owner,
 			};
 			functs[projId](args);
 			return;
@@ -710,18 +717,15 @@ public partial class RPCCreateProj : RPC {
 				proj = new RCProj(RideChaser.getGunWeapon(), pos, xDir, 0, player, netProjByte);
 				break;
 			case (int)ProjIds.BBuffaloCrash:
-				proj = new BBuffaloCrashProj(BlizzardBuffalo.getWeapon(), pos, xDir, player, netProjByte);
-				break;
-			case (int)ProjIds.BBuffaloIceProj:
-				proj = new BBuffaloIceProj(BlizzardBuffalo.getWeapon(), pos, xDir, Point.zero, 0, player, netProjByte);
+				proj = new BBuffaloCrashProj(BlizzardBuffalo.netWeapon, pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.BBuffaloIceProjGround:
-				proj = new BBuffaloIceProjGround(BlizzardBuffalo.getWeapon(), pos, byteAngle, player, netProjByte);
+				proj = new BBuffaloIceProjGround(BlizzardBuffalo.netWeapon, pos, byteAngle, player, netProjByte);
 				break;
 			case (int)ProjIds.BBuffaloBeam:
 				ushort bbNetIdBytes = BitConverter.ToUInt16(extraData[0..2], 0);
 				BlizzardBuffalo? bb = Global.level.getActorByNetId(bbNetIdBytes) as BlizzardBuffalo;
-				proj = new BBuffaloBeamProj(BlizzardBuffalo.getWeapon(), pos, xDir, bb, player, netProjByte);
+				proj = new BBuffaloBeamProj(BlizzardBuffalo.netWeapon, pos, xDir, bb, player, netProjByte);
 				break;
 			case (int)ProjIds.BHornetBee:
 				proj = new BHornetBeeProj(
