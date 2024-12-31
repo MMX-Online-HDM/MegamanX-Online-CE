@@ -184,21 +184,20 @@ public class BBuffaloIceProj : Projectile {
 
 	public override void onStart() {
 		base.onStart();
-		if (!ownedByLocalPlayer) return;
 
 		if (checkCollision(0, 0) != null) {
 			destroySelf();
-			Anim.createGibEffect("bbuffalo_proj_ice_gibs", getCenterPos(), owner, sendRpc: true);
-			playSound("iceBreak", sendRpc: true);
+			Anim.createGibEffect("bbuffalo_proj_ice_gibs", getCenterPos(), owner);
+			playSound("iceBreak");
 		}
 	}
 
 	public override void onHitWall(CollideData other) {
 		base.onHitWall(other);
-		if (!ownedByLocalPlayer) return;
 
-		var hitNormal = other.getNormalSafe();
 		destroySelf();
+		if (!ownedByLocalPlayer) return;
+		var hitNormal = other.getNormalSafe();
 		new BBuffaloIceProjGround(
 			weapon, other.getHitPointSafe(), hitNormal.byteAngle,
 			owner, owner.getNextActorNetId(), sendRpc: true
