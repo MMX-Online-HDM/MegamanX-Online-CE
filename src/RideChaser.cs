@@ -632,6 +632,17 @@ public class RideChaser : Actor, IDamagable {
 		}
 	}
 
+	public override List<ShaderWrapper>? getShaders() {
+		if (timeStopTime > timeStopThreshold) {
+			if (!Global.level.darkHoldProjs.Any(
+				dhp => dhp.screenShader != null && dhp.inRange(this))
+			) {
+				return [Player.darkHoldShader];
+			}
+		}
+		return null;
+	}
+
 	public override List<byte> getCustomActorNetData() {
 		List<byte> customData = new();
 

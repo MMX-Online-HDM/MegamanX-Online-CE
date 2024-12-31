@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MMXOnline;
 
@@ -430,6 +431,17 @@ public class Mechaniloid : Actor, IDamagable {
 		if (killZone != null) {
 			killZone.applyDamage(this);
 		}
+	}
+
+	public override List<ShaderWrapper>? getShaders() {
+		if (timeStopTime > timeStopThreshold) {
+			if (!Global.level.darkHoldProjs.Any(
+				dhp => dhp.screenShader != null && dhp.inRange(this))
+			) {
+				return [Player.darkHoldShader];
+			}
+		}
+		return null;
 	}
 }
 

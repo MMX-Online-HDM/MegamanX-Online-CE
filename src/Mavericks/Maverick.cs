@@ -1111,11 +1111,11 @@ public class Maverick : Actor, IDamagable {
 	}
 
 	public override List<ShaderWrapper>? getShaders() {
-		if (timeStopTime > 10) {
+		if (timeStopTime > timeStopThreshold) {
 			if (!Global.level.darkHoldProjs.Any(
 				dhp => dhp.screenShader != null && dhp.inRange(this))
 			) {
-				return [player.darkHoldShader];
+				return [Player.darkHoldShader];
 			}
 		}
 		return null;

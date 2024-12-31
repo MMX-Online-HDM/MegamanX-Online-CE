@@ -1003,6 +1003,13 @@ public class RideArmor : Actor, IDamagable {
 		if (colorShader != null) {
 			shaders.Add(colorShader);
 		}
+		if (timeStopTime > timeStopThreshold && player != null) {
+			if (!Global.level.darkHoldProjs.Any(
+				dhp => dhp.screenShader != null && dhp.inRange(this))
+			) {
+				shaders.Add(Player.darkHoldShader);
+			}
+		}
 		return shaders;
 	}
 

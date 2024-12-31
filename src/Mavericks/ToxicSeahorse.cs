@@ -292,8 +292,8 @@ public class TSeahorseShoot2State : MaverickState {
 		if (!shotOnce && shootPos != null) {
 			shotOnce = true;
 			maverick.playSound("acidBurst", sendRpc: true);
-			new TSeahorseAcid2Proj(maverick.weapon, shootPos.Value, maverick.xDir, 0, player, player.getNextActorNetId(), rpc: true);
-			new TSeahorseAcid2Proj(maverick.weapon, shootPos.Value, maverick.xDir, 1, player, player.getNextActorNetId(), rpc: true);
+			new TSeahorseAcid2Proj(shootPos.Value, maverick.xDir, 0, player, player.getNextActorNetId(), rpc: true);
+			new TSeahorseAcid2Proj(shootPos.Value, maverick.xDir, 1, player, player.getNextActorNetId(), rpc: true);
 		}
 	}
 }

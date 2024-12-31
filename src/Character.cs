@@ -394,19 +394,19 @@ public partial class Character : Actor, IDamagable {
 			shaders.Add(player.possessedShader);
 		}
 
-		if (isDarkHoldState && player.darkHoldShader != null) {
+		if (isDarkHoldState && Player.darkHoldShader != null) {
 			// If we are not already being affected by a dark hold shader, apply it. Otherwise for a brief period,
 			// victims will be double color inverted, appearing normal
 			if (!Global.level.darkHoldProjs.Any(dhp => dhp.screenShader != null && dhp.inRange(this))) {
-				shaders.Add(player.darkHoldShader);
+				shaders.Add(Player.darkHoldShader);
 			}
 		}
 
-		if (player.darkHoldShader != null) {
+		if (Player.darkHoldShader != null) {
 			// Invert the zero who used a dark hold so he appears to be drawn normally on top of it
 			var myDarkHold = Global.level.darkHoldProjs.FirstOrDefault(dhp => dhp.owner == player);
 			if (myDarkHold != null && myDarkHold.inRange(this)) {
-				shaders.Add(player.darkHoldShader);
+				shaders.Add(Player.darkHoldShader);
 			}
 		}
 
