@@ -99,7 +99,7 @@ public class CmdSigma : BaseSigma {
 		if (grounded && charState is Idle || charState is Run || charState is Crouch) {
 			if (player.input.isHeld(Control.Special1, player) && player.sigmaAmmo > 0) {
 				sigmaAmmoRechargeCooldown = 0.5f;
-				changeState(new SigmaBallShoot(), true);
+				changeState(new SigmaBallShootEX(), true);
 				return true;
 			}
 		}
@@ -198,7 +198,7 @@ public class CmdSigma : BaseSigma {
 						changeState(new SigmaSlashState(charState), true);
 						break;
 					case 1 when isTargetInAir:
-						changeState(new SigmaBallShoot(), true);
+						changeState(new SigmaBallShootEX(), true);
 						break;
 					case 2 when charState is Dash && grounded:
 						changeState(new SigmaWallDashState(xDir, true), true);

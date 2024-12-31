@@ -101,7 +101,7 @@ public class NeoSigma : BaseSigma {
 				return true;
 			} else {
 				player.sigmaAmmo = 0;
-				changeState(new SigmaElectricBall2State(), true);
+				changeState(new SigmaElectricBall2StateEX(), true);
 				return true;
 			}
 		}
@@ -223,7 +223,7 @@ public class NeoSigma : BaseSigma {
 				int Neoattack = Helpers.randomRange(0, 5);
 				if (charState?.isGrabbedState == false && !player.isDead
 				    && !isInvulnerable() && aiAttackCooldown <= 0
-					&& !(charState is CallDownMaverick or SigmaElectricBall2State or SigmaElectricBallState)) {
+					&& !(charState is CallDownMaverick or SigmaElectricBall2StateEX or SigmaElectricBallState)) {
 					switch (Neoattack) {
 						case 0 when isTargetClose:
 							player.press(Control.Shoot);
@@ -259,7 +259,7 @@ public class NeoSigma : BaseSigma {
 					changeState(new SigmaElectricBallState(), true);
 				} else if (player.sigmaAmmo >= 28) {
 					player.sigmaAmmo = 0;
-					changeState(new SigmaElectricBall2State(), true);
+					changeState(new SigmaElectricBall2StateEX(), true);
 				}
 			}
 		}
