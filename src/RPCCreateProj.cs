@@ -261,8 +261,11 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.SplashLaser:
 				proj = new SplashLaserProj(new RayGun(0), pos, player, bulletDir, netProjByte);
 				break;
-			case (int)ProjIds.BlackArrow or (int)ProjIds.BlackArrowGround:
-				proj = new BlackArrowProj(new BlackArrow(0), pos, player, bulletDir, extraData[0], netProjByte);
+			case (int)ProjIds.BlackArrow:
+				proj = new BlackArrowProj(new BlackArrow(0), pos, player, bulletDir, netProjByte);
+				break;
+			case (int)ProjIds.BlackArrow2:
+				proj = new BlackArrowProj2(new BlackArrow(0), pos, player, bulletDir, netProjByte);
 				break;
 			case (int)ProjIds.WindCutter:
 				proj = new WindCutterProj(new BlackArrow(0), pos, player, bulletDir, netProjByte);

@@ -100,7 +100,9 @@ public partial class RPCCreateProj : RPC {
 		// Mavericks
 		{ (int)ProjIds.VoltCSuck, VoltCSuckProj.rpcInvoke },
 		{ (int)ProjIds.TSeahorseAcid2, TSeahorseAcid2Proj.rpcInvoke },
-		{ (int)ProjIds.WSpongeSpike, WSpongeSpike.rpcInvoke }
+		{ (int)ProjIds.WSpongeSpike, WSpongeSpike.rpcInvoke },
+		//Axl
+		{ (int)ProjIds.BlackArrowGround, BlackArrowGrounded.rpcInvoke },
 	};
 
 }
