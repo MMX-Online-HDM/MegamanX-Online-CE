@@ -169,7 +169,7 @@ public class BBuffaloIceProj : Projectile {
 		if (sendRpc) {
 			rpcCreate(
 				pos, ownerPlayer, netProjId, xDir,
-				[(byte)(shootDirX + 128), (byte)(shootDirX + 128), (byte)shootFramesHeld]
+				[(byte)(shootDirX + 128), (byte)(shootDirY + 128), (byte)shootFramesHeld]
 			);
 		}
 	}
@@ -177,7 +177,7 @@ public class BBuffaloIceProj : Projectile {
 	public static Projectile rpcInvoke(ProjParameters args) {
 		return new BBuffaloIceProj(
 			args.pos, args.xDir,
-			args.extraData[0], args.extraData[1], args.extraData[2],
+			args.extraData[0] - 128, args.extraData[1] - 128, args.extraData[2],
 			args.owner, args.netId, player: args.player
 		);
 	}
