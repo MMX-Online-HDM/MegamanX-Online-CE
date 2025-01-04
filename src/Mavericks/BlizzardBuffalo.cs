@@ -84,7 +84,7 @@ public class BlizzardBuffalo : Maverick {
 				int shootFramesHeld = (int)MathF.Ceiling((state as MShoot)?.shootFramesHeld ?? 0);
 
 				new BBuffaloIceProj(
-					pos, xDir, (int)inputDir.x,  (int)inputDir.y, shootFramesHeld,
+					pos, xDir, (int)unitDir.x,  (int)unitDir.y, shootFramesHeld,
 					this, player.getNextActorNetId(), sendRpc: true
 				);
 			},
