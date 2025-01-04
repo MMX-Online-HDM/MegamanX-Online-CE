@@ -33,9 +33,10 @@ public class XUPParryStartState : CharState {
 			player.weapon.ammo = player.weapon.maxAmmo;
 		}
 		
-		if (damagingActor is GenericMeleeProj gmp) {
-			counterAttackTarget = gmp.owningActor;
-		} else if (damagingActor is Projectile proj) {
+		if (damagingActor is Projectile proj) {
+			if (proj.owningActor != null) {
+				counterAttackTarget = proj.owningActor;
+			}
 			if (!proj.isMelee && proj.shouldVortexSuck) {
 				absorbedProj = proj;
 				absorbedProj.destroySelfNoEffect(doRpcEvenIfNotOwned: true);

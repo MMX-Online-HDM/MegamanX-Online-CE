@@ -185,15 +185,18 @@ public class SaberParryStartState : CharState {
 
 	public void counterAttack(Player damagingPlayer, Actor damagingActor, float damage) {
 		Actor? counterAttackTarget = null;
-		if (damagingActor is GenericMeleeProj gmp) {
-			counterAttackTarget = gmp.owningActor;
+		bool stunnableParry = false;
+
+		if (damagingActor is Projectile proj) {
+			if (proj.owningActor != null) {
+				counterAttackTarget = proj.owningActor;
+			}
+			stunnableParry = proj.canBeParried();
 		}
 		if (counterAttackTarget == null) {
 			counterAttackTarget = damagingPlayer?.character ?? damagingActor;
 		}
 
-		Projectile? proj = damagingActor as Projectile;
-		bool stunnableParry = proj != null && proj.canBeParried();
 		if (counterAttackTarget != null && character.pos.distanceTo(counterAttackTarget.pos) < 75 &&
 			counterAttackTarget is Character chr && stunnableParry
 		) {
