@@ -614,6 +614,7 @@ public class ChillPSlideState : MaverickState {
 public class ChillPBurnState : MaverickState {
 	Point pushDir;
 	public ChillPBurnState() : base("burn") {
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {

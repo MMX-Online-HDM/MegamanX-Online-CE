@@ -437,6 +437,7 @@ public class FStagGrabState : MaverickState {
 	float endLagTime;
 	public FStagGrabState(bool fromDash) : base("dash_grab", "") {
 		if (!fromDash) xVel = 0;
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {

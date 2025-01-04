@@ -491,6 +491,7 @@ public class MagnaCTeleportState : MaverickState {
 	bool inverted;
 	public MagnaCTeleportState() : base("teleport_out", "") {
 		enterSound = "magnacTeleportOut";
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -769,6 +770,7 @@ public class MagnaCDrainGrabbed : GenericGrabbedState {
 
 public class MagnaCCeilingStartState : MaverickState {
 	public MagnaCCeilingStartState() : base("gravity_shift", "") {
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {

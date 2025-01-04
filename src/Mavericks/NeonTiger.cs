@@ -300,6 +300,9 @@ public class NeonTDashState : MaverickState {
 	float dustTime;
 	public NeonTDashState() : base("dash", "") {
 		enterSound = "dashX3";
+		normalCtrl = true;
+		attackCtrl = true;
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -349,6 +352,9 @@ public class NeonTPounceState : MaverickState {
 	public bool isWallPounce;
 	public NeonTPounceState() : base("fall") {
 		enterSound = "jump";
+		normalCtrl = true;
+		attackCtrl = true;
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {

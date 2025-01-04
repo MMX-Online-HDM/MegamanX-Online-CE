@@ -305,6 +305,7 @@ public class DrDopplerUncoatState : MaverickState {
 	public DrDopplerUncoatState() : base("uncoat", "") {
 		exitOnAnimEnd = true;
 		enterSound = "transform";
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {

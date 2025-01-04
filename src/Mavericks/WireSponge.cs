@@ -996,6 +996,7 @@ public class WSpongeHangSeedThrowState : MaverickState {
 	public WSpongeHangSeedThrowState(WSpongeUpChainProj proj, string shootControl) : base("vine_up_seedthrow", "") {
 		this.proj = proj;
 		this.shootControl = shootControl;
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -1061,6 +1062,7 @@ public class WSpongeChargeState : MaverickState {
 
 	public WSpongeChargeState() : base("angry_start", "") {
 		superArmor = true;
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {

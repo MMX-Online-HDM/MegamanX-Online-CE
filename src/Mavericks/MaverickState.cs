@@ -62,9 +62,13 @@ public class MaverickState {
 	public Player player { get { return maverick?.player; } }
 	public Input input { get { return maverick?.input; } }
 
+	public bool normalCtrl;
+	public bool attackCtrl;
+	public bool aiAttackCtrl;
+
 	public MaverickStateConsecutiveData consecutiveData;
 
-	public MaverickState(string sprite, string transitionSprite = null) {
+	public MaverickState(string sprite, string transitionSprite = "") {
 		this.sprite = string.IsNullOrEmpty(transitionSprite) ? sprite : transitionSprite;
 		this.transitionSprite = transitionSprite;
 		defaultSprite = sprite;
@@ -141,12 +145,14 @@ public class MaverickState {
 				nt.isDashing = false;
 			}
 		}
-
-		if (this is not MLand && this is not DrDopplerUncoatState && this is not MEnter && (newState is MIdle || newState is MFall)) {
-			maverick.aiCooldown = maverick.maxAICooldown;
+		if (aiAttackCtrl && (newState is MIdle || newState is MFall)) {
 			if (player.isStriker()) {
+				maverick.aiCooldown = maverick.maxAICooldown;
 				maverick.autoExit = true;
 			}
+		}
+		if (aiAttackCtrl && newState.attackCtrl) {
+			maverick.aiCooldown = maverick.maxAICooldown;
 		}
 		if (!useGravity) maverick.useGravity = true;
 	}
@@ -449,6 +455,9 @@ public class MaverickState {
 
 public class MIdle : MaverickState {
 	public MIdle(string transitionSprite = "") : base("idle", transitionSprite) {
+		normalCtrl = true;
+		attackCtrl = true;
+		aiAttackCtrl = true;
 	}
 
 	float attackCooldown = 0;
@@ -496,6 +505,7 @@ public class MEnter : MaverickState {
 	public float destY;
 	public MEnter(Point destPos) : base("enter", "") {
 		destY = destPos.y;
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -581,6 +591,8 @@ public class MExit : MaverickState {
 
 public class MTaunt : MaverickState {
 	public MTaunt() : base("taunt", "") {
+		attackCtrl = true;
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -622,6 +634,9 @@ public class MRun : MaverickState {
 	int xDir = 1;
 
 	public MRun() : base("run", "") {
+		normalCtrl = true;
+		attackCtrl = true;
+		aiAttackCtrl = true;
 	}
 
 	public override void preUpdate() {
@@ -710,6 +725,9 @@ public class MJumpStart : MaverickState {
 	float additionalJumpPower;
 	public MJumpStart(float additionalJumpPower = 1) : base("jump_start", "") {
 		this.additionalJumpPower = additionalJumpPower;
+		normalCtrl = true;
+		attackCtrl = true;
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -789,6 +807,9 @@ public class MJump : MaverickState {
 	public MJump(MaverickState followUpAiState = null) : base("jump", "") {
 		this.followUpAiState = followUpAiState;
 		enterSound = "jump";
+		normalCtrl = true;
+		attackCtrl = true;
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -810,6 +831,9 @@ public class MJump : MaverickState {
 
 public class MFall : MaverickState {
 	public MFall(string transitionSprite = "") : base("fall", transitionSprite) {
+		normalCtrl = true;
+		attackCtrl = true;
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -822,6 +846,9 @@ public class MFall : MaverickState {
 
 public class MFly : MaverickState {
 	public MFly(string transitionSprite = "") : base("fly", transitionSprite) {
+		normalCtrl = true;
+		attackCtrl = true;
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -957,6 +984,9 @@ public class MLand : MaverickState {
 	public MLand(float landingVelY) : base("land", "") {
 		this.landingVelY = landingVelY;
 		enterSound = "land";
+		normalCtrl = true;
+		attackCtrl = true;
+		aiAttackCtrl = true;
 	}
 
 	public override void onEnter(MaverickState oldState) {
@@ -1023,6 +1053,7 @@ public class MHurt : MaverickState {
 			isCombo = true;
 			flinchYPos = oldComboPos.Value;
 		}
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -1206,6 +1237,7 @@ public class MWallSlide : MaverickState {
 		this.wallDir = wallDir;
 		this.wall = wall;
 		enterSound = "land";
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -1289,6 +1321,7 @@ public class MWallKick : MaverickState {
 		this.kickDir = kickDir;
 		kickSpeed = kickDir * 150;
 		enterSound = "jump";
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {

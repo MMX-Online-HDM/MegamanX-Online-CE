@@ -358,6 +358,8 @@ public class CSnailShellState : MaverickState {
 	int aiChoice;
 	public CSnailShellState(bool isFirstTime) : base("shell", isFirstTime ? "shell_enter" : "") {
 		this.isFirstTime = isFirstTime;
+		attackCtrl = true;
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -657,6 +659,7 @@ public class CSnailWeaknessState : MaverickState {
 	float hurtSpeed;
 	float soundTime;
 	public CSnailWeaknessState(bool wasMagnetMine) : base(wasMagnetMine ? "weakness" : "hurt", "") {
+		aiAttackCtrl = true;
 		if (!wasMagnetMine) {
 			once = true;
 			stateTime = 1;
@@ -717,6 +720,7 @@ public class CSnailWeaknessState : MaverickState {
 
 public class CSnailDashState : MaverickState {
 	public CSnailDashState() : base("dash", "") {
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {

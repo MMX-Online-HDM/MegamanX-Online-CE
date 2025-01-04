@@ -407,6 +407,7 @@ public class BCrabShieldProj : Projectile, IDamagable {
 
 public class BCrabShieldStartState : MaverickState {
 	public BCrabShieldStartState() : base("shield_start", "") {
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {

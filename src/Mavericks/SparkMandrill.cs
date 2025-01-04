@@ -238,6 +238,7 @@ public class SparkMClimbState : MaverickState {
 	float climbSpeed = 100;
 	public SparkMClimbState(Point hitPoint) : base("climb", "") {
 		this.hitPoint = hitPoint;
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -300,6 +301,7 @@ public class SparkMClimbState : MaverickState {
 
 public class SparkMFrozenState : MaverickState {
 	public SparkMFrozenState() : base("freeze") {
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {

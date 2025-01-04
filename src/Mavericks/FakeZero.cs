@@ -314,6 +314,7 @@ public class FakeZeroMeleeState : MaverickState {
 	FakeZeroMeleeProj proj;
 	public FakeZeroMeleeState() : base("run_attack", "") {
 		enterSound = "saber3";
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -371,6 +372,7 @@ public class FakeZeroRockProj : Projectile {
 
 public class FakeZeroGuardState : MaverickState {
 	public FakeZeroGuardState() : base("guard", "") {
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {

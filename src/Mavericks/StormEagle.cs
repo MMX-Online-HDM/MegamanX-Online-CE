@@ -380,6 +380,7 @@ public class StormEGustState : MaverickState {
 	float soundTime = 0.5f;
 	float gustTime;
 	public StormEGustState() : base("flap", "") {
+		aiAttackCtrl = true;
 	}
 
 	public override bool canEnter(Maverick maverick) {

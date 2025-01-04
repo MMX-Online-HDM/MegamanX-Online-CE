@@ -214,7 +214,7 @@ public class BaseSigma : Character {
 						changeState(new CallDownMaverick(maverick, true, false), true);
 
 						if (isSummoner) {
-							maverick.aiCooldown = 1f;
+							maverick.aiCooldown = 60;
 						}
 
 						if (!isPuppeteer) {

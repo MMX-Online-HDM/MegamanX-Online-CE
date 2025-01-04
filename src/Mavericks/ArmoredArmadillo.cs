@@ -254,6 +254,7 @@ public class ArmoredAChargeReleaseProj : Projectile {
 #region states
 public class ArmoredAGuardState : MaverickState {
 	public ArmoredAGuardState() : base("block", "") {
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -345,6 +346,7 @@ public class ArmoredAZappedState : MaverickState {
 	Point pushDir;
 	public ArmoredAZappedState() : base("zapped", "") {
 		canEnterSelf = false;
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -503,6 +505,7 @@ public class ArmoredARollState : MaverickState {
 
 public class ArmoredARollExitState : MaverickState {
 	public ArmoredARollExitState() : base("roll_exit", "") {
+		aiAttackCtrl = true;
 	}
 
 	public override void onEnter(MaverickState oldState) {

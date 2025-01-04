@@ -280,6 +280,7 @@ public class BoomerKTeleportState : MaverickState {
 	bool isInvisible;
 	Actor clone;
 	public BoomerKTeleportState() : base("teleport") {
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -398,6 +399,9 @@ public class BoomerKDashState : MaverickState {
 
 	public BoomerKDashState(string initialDashButton) : base("dash") {
 		this.initialDashButton = initialDashButton;
+		normalCtrl = true;
+		attackCtrl = true;
+		aiAttackCtrl = true;
 	}
 
 	public override void onEnter(MaverickState oldState) {
