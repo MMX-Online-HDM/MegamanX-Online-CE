@@ -7,7 +7,7 @@ public class HyperAxlStart : CharState {
 	public float time;
 	public Axl axl;
 
-	public HyperAxlStart(bool isGrounded) : base(isGrounded ? "hyper_start" : "hyper_start_air", "", "", "") {
+	public HyperAxlStart(bool isGrounded) : base(isGrounded ? "hyper_start" : "hyper_start_air") {
 		invincible = true;
 	}
 
@@ -129,7 +129,7 @@ public class DodgeRoll : CharState {
 	public int initialDashDir;
 	Axl axl;
 
-	public DodgeRoll() : base("roll", "", "") {
+	public DodgeRoll() : base("roll") {
 		attackCtrl = true;
 		normalCtrl = true;
 		specialId = SpecialStateIds.AxlRoll;
@@ -179,7 +179,7 @@ public class DodgeRoll : CharState {
 public class SniperAimAxl : CharState {
 	public Axl axl;
 
-	public SniperAimAxl() : base("crouch", "", "") {
+	public SniperAimAxl() : base("crouch") {
 
 	}
 

@@ -13,7 +13,7 @@ public class SigmaSlashState : CharState {
 	CharState prevCharState;
 	int attackFrame = 2;
 	bool fired;
-	public SigmaSlashState(CharState prevCharState) : base(prevCharState.attackSprite, "", "", "") {
+	public SigmaSlashState(CharState prevCharState) : base(prevCharState.attackSprite) {
 		this.prevCharState = prevCharState;
 		if (prevCharState is Dash || prevCharState is AirDash) {
 			attackFrame = 1;
@@ -273,7 +273,7 @@ public class SigmaWallDashState : CharState {
 	bool fromGround;
 	public CmdSigma sigma;
 
-	public SigmaWallDashState(int yDir, bool fromGround) : base("wall_dash", "", "", "") {
+	public SigmaWallDashState(int yDir, bool fromGround) : base("wall_dash") {
 		this.yDir = yDir;
 		this.fromGround = fromGround;
 		superArmor = true;

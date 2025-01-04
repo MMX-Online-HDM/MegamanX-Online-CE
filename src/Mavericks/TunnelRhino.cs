@@ -189,7 +189,7 @@ public class TunnelRTornadoFang : Projectile {
 public class TunnelRShootState : MaverickState {
 	bool shotOnce;
 	bool isSecond;
-	public TunnelRShootState(bool isSecond) : base("shoot1", "") {
+	public TunnelRShootState(bool isSecond) : base("shoot1") {
 		this.isSecond = isSecond;
 		exitOnAnimEnd = true;
 		canEnterSelf = true;
@@ -239,7 +239,7 @@ public class TunnelRShoot2State : MaverickState {
 	bool shotOnce;
 	bool shotOnce2;
 	bool shotOnce3;
-	public TunnelRShoot2State() : base("shoot3", "") {
+	public TunnelRShoot2State() : base("shoot3") {
 		exitOnAnimEnd = true;
 	}
 

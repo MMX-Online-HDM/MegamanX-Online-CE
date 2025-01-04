@@ -338,7 +338,7 @@ public class Rekkoha : CharState {
 	int loop;
 	public RekkohaEffect? effect;
 	public Weapon weapon;
-	public Rekkoha(Weapon weapon) : base("rekkoha", "", "", "") {
+	public Rekkoha(Weapon weapon) : base("rekkoha") {
 		this.weapon = weapon;
 		invincible = true;
 	}

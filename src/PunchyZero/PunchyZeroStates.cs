@@ -304,7 +304,7 @@ public class PZeroParryCounter : CharState {
 	private float counterSpeed = 0.1f;
 	private float acumulatedPos = 0;
 
-	public PZeroParryCounter(Actor? counterAttackTarget, bool isMelee) : base("parry", "", "", "") {
+	public PZeroParryCounter(Actor? counterAttackTarget, bool isMelee) : base("parry") {
 		invincible = true;
 		this.counterAttackTarget = counterAttackTarget;
 		this.isMelee = isMelee;

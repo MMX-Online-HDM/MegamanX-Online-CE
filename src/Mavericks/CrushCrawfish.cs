@@ -193,7 +193,7 @@ public class CrushCArmProj : Projectile {
 
 public class CrushCShootArmState : MaverickState {
 	CrushCArmProj proj;
-	public CrushCShootArmState() : base("attack_claw", "") {
+	public CrushCShootArmState() : base("attack_claw") {
 		superArmor = true;
 	}
 
@@ -280,7 +280,7 @@ public class CrushCGrabState : MaverickState {
 	float hurtTime;
 	public bool victimWasGrabbedSpriteOnce;
 	float timeWaiting;
-	public CrushCGrabState(Character grabbedChar) : base("grab_attack", "") {
+	public CrushCGrabState(Character grabbedChar) : base("grab_attack") {
 		victim = grabbedChar;
 	}
 

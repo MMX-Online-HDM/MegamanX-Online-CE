@@ -192,7 +192,7 @@ public class FakeZeroSwordBeamProj : Projectile {
 }
 
 public class FakeZeroShootAirState : MaverickState {
-	public FakeZeroShootAirState() : base("shoot_air", "") {
+	public FakeZeroShootAirState() : base("shoot_air") {
 	}
 
 	public override void update() {
@@ -217,7 +217,7 @@ public class FakeZeroShootAirState : MaverickState {
 }
 
 public class FakeZeroShootAir2State : MaverickState {
-	public FakeZeroShootAir2State() : base("shoot_air2", "") {
+	public FakeZeroShootAir2State() : base("shoot_air2") {
 	}
 
 	public override void update() {
@@ -244,7 +244,7 @@ public class FakeZeroShootAir2State : MaverickState {
 public class FakeZeroShoot2State : MaverickState {
 	int shootNum;
 	int lastShootFrame;
-	public FakeZeroShoot2State() : base("shoot2", "") {
+	public FakeZeroShoot2State() : base("shoot2") {
 	}
 
 	public override void update() {
@@ -312,7 +312,7 @@ public class FakeZeroMeleeProj : Projectile {
 
 public class FakeZeroMeleeState : MaverickState {
 	FakeZeroMeleeProj proj;
-	public FakeZeroMeleeState() : base("run_attack", "") {
+	public FakeZeroMeleeState() : base("run_attack") {
 		enterSound = "saber3";
 		aiAttackCtrl = true;
 	}
@@ -371,7 +371,7 @@ public class FakeZeroRockProj : Projectile {
 }
 
 public class FakeZeroGuardState : MaverickState {
-	public FakeZeroGuardState() : base("guard", "") {
+	public FakeZeroGuardState() : base("guard") {
 		aiAttackCtrl = true;
 	}
 
@@ -385,7 +385,7 @@ public class FakeZeroGuardState : MaverickState {
 }
 
 public class FakeZeroGroundPunchState : MaverickState {
-	public FakeZeroGroundPunchState() : base("groundpunch", "") {
+	public FakeZeroGroundPunchState() : base("groundpunch") {
 	}
 
 	public override void update() {

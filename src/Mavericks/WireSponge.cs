@@ -138,7 +138,7 @@ public class WSpongeChainSpinProj : Projectile {
 
 public class WSpongeChainSpinState : MaverickState {
 	WSpongeChainSpinProj proj;
-	public WSpongeChainSpinState() : base("vine_spin", "") {
+	public WSpongeChainSpinState() : base("vine_spin") {
 	}
 
 	public override void update() {
@@ -419,7 +419,7 @@ public class WSpongeSideChainState : MaverickState {
 	bool jumpedOnce;
 	float spinTime;
 
-	public WSpongeSideChainState(float spinTime) : base("vine_throw", "") {
+	public WSpongeSideChainState(float spinTime) : base("vine_throw") {
 		this.spinTime = spinTime;
 	}
 
@@ -497,7 +497,7 @@ public class WSpongeClingState : MaverickState {
 	new int jumpFramesHeld;
 	new int maxJumpFrames = 1;
 	bool jumpedOnce;
-	public WSpongeClingState() : base("cling", "") {
+	public WSpongeClingState() : base("cling") {
 	}
 
 	public override void update() {
@@ -651,7 +651,7 @@ public class WSpongeUpChainProj : Projectile {
 
 public class WSpongeUpChainStartState : MaverickState {
 	WSpongeUpChainProj proj;
-	public WSpongeUpChainStartState() : base("vine_up_start", "") {
+	public WSpongeUpChainStartState() : base("vine_up_start") {
 	}
 
 	public override void update() {
@@ -697,7 +697,7 @@ public class WSpongeUpChainLatchState : MaverickState {
 	WSpongeUpChainProj proj;
 	float dist;
 	float distToTravel;
-	public WSpongeUpChainLatchState(WSpongeUpChainProj proj) : base("vine_up_loop", "") {
+	public WSpongeUpChainLatchState(WSpongeUpChainProj proj) : base("vine_up_loop") {
 		this.proj = proj;
 	}
 
@@ -738,7 +738,7 @@ public class WSpongeUpChainLatchState : MaverickState {
 
 public class WSpongeUpChainHangState : MaverickState {
 	WSpongeUpChainProj proj;
-	public WSpongeUpChainHangState(WSpongeUpChainProj proj) : base("vine_up_loop", "") {
+	public WSpongeUpChainHangState(WSpongeUpChainProj proj) : base("vine_up_loop") {
 		this.proj = proj;
 	}
 
@@ -921,7 +921,7 @@ public class WSpongeSeedThrowState : MaverickState {
 	int framesShootHeld;
 	bool frameStopHeld;
 	bool inputDirUpOnce;
-	public WSpongeSeedThrowState(string shootControl) : base("seedthrow", "") {
+	public WSpongeSeedThrowState(string shootControl) : base("seedthrow") {
 		this.shootControl = shootControl;
 		consecutiveData = new MaverickStateConsecutiveData(0, 4, 0.25f);
 	}
@@ -993,7 +993,7 @@ public class WSpongeHangSeedThrowState : MaverickState {
 	int framesShootHeld;
 	bool frameStopHeld;
 	bool inputDirUpOnce;
-	public WSpongeHangSeedThrowState(WSpongeUpChainProj proj, string shootControl) : base("vine_up_seedthrow", "") {
+	public WSpongeHangSeedThrowState(WSpongeUpChainProj proj, string shootControl) : base("vine_up_seedthrow") {
 		this.proj = proj;
 		this.shootControl = shootControl;
 		aiAttackCtrl = true;
@@ -1060,7 +1060,7 @@ public class WSpongeChargeState : MaverickState {
 	public const float maxChargeTime = 4;
 	SoundWrapper chargeSound;
 
-	public WSpongeChargeState() : base("angry_start", "") {
+	public WSpongeChargeState() : base("angry_start") {
 		superArmor = true;
 		aiAttackCtrl = true;
 	}
@@ -1112,7 +1112,7 @@ public class WSpongeChargeState : MaverickState {
 public class WSpongeLightningState : MaverickState {
 	int state;
 	Point poi;
-	public WSpongeLightningState() : base("angry_thunder_start", "") {
+	public WSpongeLightningState() : base("angry_thunder_start") {
 		superArmor = true;
 	}
 

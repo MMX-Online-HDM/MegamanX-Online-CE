@@ -458,7 +458,7 @@ public class X3ChargeShot : CharState {
 	MegamanX mmx = null!;
 	public HyperCharge? hyperBusterWeapon;
 
-	public X3ChargeShot(HyperCharge? hyperBusterWeapon) : base("x3_shot", "", "", "") {
+	public X3ChargeShot(HyperCharge? hyperBusterWeapon) : base("x3_shot") {
 		this.hyperBusterWeapon = hyperBusterWeapon;
 		airMove = true;
 		useDashJumpSpeed = true;

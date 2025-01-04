@@ -38,7 +38,7 @@ public class XSaberProj : Projectile {
 public class XSaberState : CharState {
 	bool fired;
 	bool grounded;
-	public XSaberState(bool grounded) : base(grounded ? "beam_saber" : "beam_saber_air", "", "", "") {
+	public XSaberState(bool grounded) : base(grounded ? "beam_saber" : "beam_saber_air") {
 		this.grounded = grounded;
 		landSprite = "beam_saber";
 		airMove = true;
@@ -65,7 +65,7 @@ public class XSaberState : CharState {
 public class X6SaberState : CharState {
 	bool fired;
 	bool grounded;
-	public X6SaberState(bool grounded) : base(grounded ? "beam_saber2" : "beam_saber_air2", "", "", "") {
+	public X6SaberState(bool grounded) : base(grounded ? "beam_saber2" : "beam_saber_air2") {
 		this.grounded = grounded;
 		landSprite = "beam_saber2";
 		airMove = true;

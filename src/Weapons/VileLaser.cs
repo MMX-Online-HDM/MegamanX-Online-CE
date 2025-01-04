@@ -87,7 +87,7 @@ public class RisingSpecterState : CharState {
 	bool shot = false;
 	bool grounded;
 
-	public RisingSpecterState(bool grounded) : base(grounded ? "idle_shoot" : "fall", "", "", "") {
+	public RisingSpecterState(bool grounded) : base(grounded ? "idle_shoot" : "fall") {
 		this.grounded = grounded;
 	}
 
@@ -225,7 +225,7 @@ public class NecroBurstAttack : CharState {
 	bool shot = false;
 	Vile vile = null!;
 
-	public NecroBurstAttack(bool grounded) : base(grounded ? "idle_shoot" : "cannon_air", "", "", "") {
+	public NecroBurstAttack(bool grounded) : base(grounded ? "idle_shoot" : "cannon_air") {
 	}
 
 	public override void update() {
@@ -338,7 +338,7 @@ public class RAShrapnelProj : Projectile {
 
 public class StraightNightmareAttack : CharState {
 	bool shot = false;
-	public StraightNightmareAttack(bool grounded) : base(grounded ? "idle_shoot" : "cannon_air", "", "", "") {
+	public StraightNightmareAttack(bool grounded) : base(grounded ? "idle_shoot" : "cannon_air") {
 		enterSound = "straightNightmareShoot";
 	}
 

@@ -474,7 +474,7 @@ public class GBeetleGravityWellState : MaverickState {
 	int state = 0;
 	float partTime;
 	float chargeTime;
-	public GBeetleGravityWellState() : base("blackhole_start", "") {
+	public GBeetleGravityWellState() : base("blackhole_start") {
 	}
 
 	public override void update() {

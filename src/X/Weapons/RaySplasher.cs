@@ -326,7 +326,7 @@ public class RaySplasherTurretProj : Projectile {
 public class RaySplasherChargedState : CharState {
 	MegamanX mmx;
 	bool fired = false;
-	public RaySplasherChargedState() : base("point_up", "", "", "") {
+	public RaySplasherChargedState() : base("point_up") {
 		superArmor = true;
 	}
 

@@ -206,7 +206,7 @@ public class ZeroDoubleBuster : CharState {
 	bool isPinkCharge;
 	Zero zero = null!;
 
-	public ZeroDoubleBuster(bool isSecond, bool isPinkCharge) : base("doublebuster", "", "", "") {
+	public ZeroDoubleBuster(bool isSecond, bool isPinkCharge) : base("doublebuster") {
 		this.isSecond = isSecond;
 		superArmor = true;
 		this.isPinkCharge = isPinkCharge;

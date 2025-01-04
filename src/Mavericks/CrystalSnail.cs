@@ -315,7 +315,7 @@ public class CSnailCrystalHunterProj : Projectile {
 
 public class CSnailShootState : MaverickState {
 	bool shotOnce;
-	public CSnailShootState() : base("spit", "") {
+	public CSnailShootState() : base("spit") {
 	}
 
 	public override void update() {
@@ -451,7 +451,7 @@ public class CSnailShellSpinDashState : MaverickState {
 	Anim shell;
 	int state;
 	float exhaustTime;
-	public CSnailShellSpinDashState() : base("shell", "") {
+	public CSnailShellSpinDashState() : base("shell") {
 	}
 
 	public override void update() {
@@ -543,7 +543,7 @@ public class CSnailShellSpinSlowState : MaverickState {
 	int state;
 	float soundTime;
 	float ammoTime;
-	public CSnailShellSpinSlowState() : base("shell", "") {
+	public CSnailShellSpinSlowState() : base("shell") {
 	}
 
 	public override void update() {
@@ -658,7 +658,7 @@ public class CSnailTimeStopState : MaverickState {
 public class CSnailWeaknessState : MaverickState {
 	float hurtSpeed;
 	float soundTime;
-	public CSnailWeaknessState(bool wasMagnetMine) : base(wasMagnetMine ? "weakness" : "hurt", "") {
+	public CSnailWeaknessState(bool wasMagnetMine) : base(wasMagnetMine ? "weakness" : "hurt") {
 		aiAttackCtrl = true;
 		if (!wasMagnetMine) {
 			once = true;
@@ -719,7 +719,7 @@ public class CSnailWeaknessState : MaverickState {
 }
 
 public class CSnailDashState : MaverickState {
-	public CSnailDashState() : base("dash", "") {
+	public CSnailDashState() : base("dash") {
 		aiAttackCtrl = true;
 	}
 

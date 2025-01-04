@@ -307,7 +307,7 @@ public class StormEDiveState : MaverickState {
 	bool reverse;
 	float incAmount;
 	bool wasPrevStateFly;
-	public StormEDiveState() : base("dive", "") {
+	public StormEDiveState() : base("dive") {
 	}
 
 	public override void update() {
@@ -379,7 +379,7 @@ public class StormEDiveState : MaverickState {
 public class StormEGustState : MaverickState {
 	float soundTime = 0.5f;
 	float gustTime;
-	public StormEGustState() : base("flap", "") {
+	public StormEGustState() : base("flap") {
 		aiAttackCtrl = true;
 	}
 
@@ -424,7 +424,7 @@ public class StormEGustState : MaverickState {
 
 public class StormEEggState : MaverickState {
 	bool isGrounded;
-	public StormEEggState(bool isGrounded) : base(isGrounded ? "air_eggshoot" : "air_eggshoot", "") {
+	public StormEEggState(bool isGrounded) : base(isGrounded ? "air_eggshoot" : "air_eggshoot") {
 		this.isGrounded = isGrounded;
 	}
 
@@ -458,7 +458,7 @@ public class StormEEggState : MaverickState {
 
 public class StormEAirShootState : MaverickState {
 	bool shotOnce;
-	public StormEAirShootState() : base("air_shoot", "") {
+	public StormEAirShootState() : base("air_shoot") {
 	}
 
 	public override void update() {

@@ -17,7 +17,7 @@ public class HexaInvoluteState : CharState {
 	float ammoTime;
 	Vile vile = null!;
 
-	public HexaInvoluteState() : base("super", "", "", "") {
+	public HexaInvoluteState() : base("super") {
 		superArmor = true;
 		immuneToWind = true;
 		invincible = true;

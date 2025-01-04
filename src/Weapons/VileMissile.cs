@@ -252,7 +252,7 @@ public class VileMK2StunShotProj : Projectile {
 }
 
 public class MissileAttack : CharState {
-	public MissileAttack() : base("idle_shoot", "", "", "") {
+	public MissileAttack() : base("idle_shoot") {
 		exitOnAirborne = true;
 		normalCtrl = true;
 	}

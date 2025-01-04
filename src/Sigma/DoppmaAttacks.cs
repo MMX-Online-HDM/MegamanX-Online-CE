@@ -143,7 +143,7 @@ public class SigmaShieldProj : Projectile {
 
 public class SigmaThrowShieldState : CharState {
 	SigmaShieldProj? proj;
-	public SigmaThrowShieldState() : base("throw", "", "", "") {
+	public SigmaThrowShieldState() : base("throw") {
 	}
 
 	public override void update() {

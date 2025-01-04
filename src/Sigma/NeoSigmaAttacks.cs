@@ -17,7 +17,7 @@ public class SigmaClawState : CharState {
 	bool isAir;
 	public NeoSigma neoSigma;
 
-	public SigmaClawState(CharState prevCharState, bool isAir) : base("attack", "", "", "") {
+	public SigmaClawState(CharState prevCharState, bool isAir) : base("attack") {
 		this.prevCharState = prevCharState;
 		this.isAir = isAir;
 		useDashJumpSpeed = true;
@@ -246,7 +246,7 @@ public class SigmaCooldownState : CharState {
 
 public class SigmaUpDownSlashState : CharState {
 	bool isUp;
-	public SigmaUpDownSlashState(bool isUp) : base(isUp ? "upslash" : "downslash", "", "", "") {
+	public SigmaUpDownSlashState(bool isUp) : base(isUp ? "upslash" : "downslash") {
 		this.isUp = isUp;
 		enterSound = "sigma2slash";
 		exitOnLanding = true;

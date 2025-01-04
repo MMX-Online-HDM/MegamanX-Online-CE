@@ -66,7 +66,7 @@ public class FSplasherState : CharState {
 	public Projectile fSplasherProj;
 	Zero zero;
 
-	public FSplasherState() : base("dash", "") {
+	public FSplasherState() : base("dash") {
 		enterSound = "fsplasher";
 	}
 

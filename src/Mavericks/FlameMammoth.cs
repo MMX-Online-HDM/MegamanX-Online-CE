@@ -374,7 +374,7 @@ public class FlameMStompShockwave : Projectile {
 #region states
 
 public class FlameMOilState : MaverickState {
-	public FlameMOilState() : base("shoot2", "") {
+	public FlameMOilState() : base("shoot2") {
 	}
 
 	public override bool canEnter(Maverick maverick) {

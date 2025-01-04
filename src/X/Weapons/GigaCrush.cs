@@ -146,7 +146,7 @@ public class GigaCrushCharState : CharState {
 	bool fired;
 	Point moveDir = new(0, -20);
 
-	public GigaCrushCharState() : base("gigacrush", "", "", "") {
+	public GigaCrushCharState() : base("gigacrush") {
 		invincible = true;
 	}
 

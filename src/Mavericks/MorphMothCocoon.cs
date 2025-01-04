@@ -386,7 +386,7 @@ public class MorphMCSpinState : MaverickState {
 	float shootTime;
 	float soundTime;
 
-	public MorphMCSpinState() : base("spin", "") {
+	public MorphMCSpinState() : base("spin") {
 	}
 
 	public override void update() {
@@ -542,7 +542,7 @@ public class MorphMCThreadProj : Projectile {
 
 public class MorphMCThreadState : MaverickState {
 	MorphMCThreadProj proj;
-	public MorphMCThreadState() : base("idle", "") {
+	public MorphMCThreadState() : base("idle") {
 	}
 
 	public override void update() {
@@ -582,7 +582,7 @@ public class MorphMCThreadState : MaverickState {
 
 public class MorphMCLatchState : MaverickState {
 	float latchDestY;
-	public MorphMCLatchState(float latchDestY) : base("latch", "") {
+	public MorphMCLatchState(float latchDestY) : base("latch") {
 		this.latchDestY = latchDestY;
 	}
 
@@ -621,7 +621,7 @@ public class MorphMCHangState : MaverickState {
 	Point origin;
 	Point swingVel;
 	float suckSoundTime;
-	public MorphMCHangState() : base("hang", "") {
+	public MorphMCHangState() : base("hang") {
 		aiAttackCtrl = true;
 	}
 
@@ -752,7 +752,7 @@ public class MorphMCHangState : MaverickState {
 }
 
 public class MorphMCBurnState : MaverickState {
-	public MorphMCBurnState() : base("burn", "") {
+	public MorphMCBurnState() : base("burn") {
 		aiAttackCtrl = true;
 	}
 

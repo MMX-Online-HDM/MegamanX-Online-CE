@@ -83,13 +83,13 @@ public class ZeroUppercut : CharState {
 	public Zero zero = null!;
 	int jumpFrame;
 
-	public ZeroUppercut(RisingType type, bool isUnderwater) : base(getSprite(type, isUnderwater), "", "") {
+	public ZeroUppercut(RisingType type, bool isUnderwater) : base(getSprite(type, isUnderwater)) {
 		this.type = type;
 		this.isUnderwater = type == RisingType.Ryuenjin && isUnderwater;
 		setStartupFrame(type);
 	}
 
-	public ZeroUppercut(int type, bool isUnderwater) : base(getSprite((RisingType)type, isUnderwater), "", "") {
+	public ZeroUppercut(int type, bool isUnderwater) : base(getSprite((RisingType)type, isUnderwater)) {
 		this.type = (RisingType)type;
 		this.isUnderwater = this.type == RisingType.Ryuenjin && isUnderwater;
 		setStartupFrame(this.type);

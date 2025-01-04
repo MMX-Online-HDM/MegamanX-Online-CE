@@ -14,7 +14,7 @@ public class VileMK2GrabState : CharState {
 	public bool victimWasGrabbedSpriteOnce;
 	float timeWaiting;
 
-	public VileMK2GrabState(Character? victim) : base("grab", "", "", "") {
+	public VileMK2GrabState(Character? victim) : base("grab") {
 		this.victim = victim;
 		grabTime = VileMK2Grabbed.maxGrabTime;
 	}

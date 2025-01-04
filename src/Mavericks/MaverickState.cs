@@ -503,7 +503,7 @@ public class MIdle : MaverickState {
 
 public class MEnter : MaverickState {
 	public float destY;
-	public MEnter(Point destPos) : base("enter", "") {
+	public MEnter(Point destPos) : base("enter") {
 		destY = destPos.y;
 		aiAttackCtrl = true;
 	}
@@ -549,7 +549,7 @@ public class MExit : MaverickState {
 	public Point destPos;
 	bool isRecall;
 	public const float yPos = 164;
-	public MExit(Point destPos, bool isRecall) : base("exit", "") {
+	public MExit(Point destPos, bool isRecall) : base("exit") {
 		this.destPos = destPos;
 		this.isRecall = isRecall;
 	}
@@ -590,7 +590,7 @@ public class MExit : MaverickState {
 }
 
 public class MTaunt : MaverickState {
-	public MTaunt() : base("taunt", "") {
+	public MTaunt() : base("taunt") {
 		attackCtrl = true;
 		aiAttackCtrl = true;
 	}
@@ -633,7 +633,7 @@ public class MRun : MaverickState {
 	float runSoundTime;
 	int xDir = 1;
 
-	public MRun() : base("run", "") {
+	public MRun() : base("run") {
 		normalCtrl = true;
 		attackCtrl = true;
 		aiAttackCtrl = true;
@@ -723,7 +723,7 @@ public class MJumpStart : MaverickState {
 	const float maxPreJumpFrames = 4;
 	new const float maxJumpFrames = 2;
 	float additionalJumpPower;
-	public MJumpStart(float additionalJumpPower = 1) : base("jump_start", "") {
+	public MJumpStart(float additionalJumpPower = 1) : base("jump_start") {
 		this.additionalJumpPower = additionalJumpPower;
 		normalCtrl = true;
 		attackCtrl = true;
@@ -804,7 +804,7 @@ public class MJump : MaverickState {
 	new int jumpFramesHeld = 0;
 	public bool fromCling;
 	public MaverickState followUpAiState;
-	public MJump(MaverickState followUpAiState = null) : base("jump", "") {
+	public MJump(MaverickState followUpAiState = null) : base("jump") {
 		this.followUpAiState = followUpAiState;
 		enterSound = "jump";
 		normalCtrl = true;
@@ -981,7 +981,7 @@ public class MFly : MaverickState {
 public class MLand : MaverickState {
 	float landingVelY;
 	bool jumpHeldOnce;
-	public MLand(float landingVelY) : base("land", "") {
+	public MLand(float landingVelY) : base("land") {
 		this.landingVelY = landingVelY;
 		enterSound = "land";
 		normalCtrl = true;
@@ -1356,7 +1356,7 @@ public class MShoot : MaverickState {
 	public Action<Point, int> getProjectile;
 	public float shootFramesHeld;
 	bool shootReleased;
-	public MShoot(Action<Point, int> getProjectile, string shootSound) : base("shoot", "") {
+	public MShoot(Action<Point, int> getProjectile, string shootSound) : base("shoot") {
 		this.getProjectile = getProjectile;
 		this.shootSound = shootSound;
 	}

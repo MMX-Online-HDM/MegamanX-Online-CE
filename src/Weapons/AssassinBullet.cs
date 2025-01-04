@@ -117,7 +117,7 @@ public class Assassinate : CharState {
 	bool fired;
 	public Axl? axl;
 
-	public Assassinate(bool isGrounded) : base(isGrounded ? "idle" : "fall", "shoot", "attack", "") {
+	public Assassinate(bool isGrounded) : base(isGrounded ? "idle" : "fall", "shoot", "attack") {
 		superArmor = true;
 	}
 

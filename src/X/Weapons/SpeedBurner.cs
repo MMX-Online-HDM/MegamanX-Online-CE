@@ -170,7 +170,7 @@ public class SpeedBurnerProjGround : Projectile {
 public class SpeedBurnerCharState : CharState {
 	Anim? proj;
 
-	public SpeedBurnerCharState() : base("speedburner", "", "", "") {
+	public SpeedBurnerCharState() : base("speedburner") {
 		superArmor = true;
 		immuneToWind = true;
 	}

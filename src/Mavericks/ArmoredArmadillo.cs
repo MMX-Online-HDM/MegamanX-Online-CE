@@ -253,7 +253,7 @@ public class ArmoredAChargeReleaseProj : Projectile {
 
 #region states
 public class ArmoredAGuardState : MaverickState {
-	public ArmoredAGuardState() : base("block", "") {
+	public ArmoredAGuardState() : base("block") {
 		aiAttackCtrl = true;
 	}
 
@@ -294,7 +294,7 @@ public class ArmoredAGuardState : MaverickState {
 
 public class ArmoredAGuardChargeState : MaverickState {
 	float damage;
-	public ArmoredAGuardChargeState(float damage) : base("charge", "") {
+	public ArmoredAGuardChargeState(float damage) : base("charge") {
 		this.damage = damage;
 	}
 
@@ -315,7 +315,7 @@ public class ArmoredAGuardChargeState : MaverickState {
 
 public class ArmoredAGuardReleaseState : MaverickState {
 	float damage;
-	public ArmoredAGuardReleaseState(float damage) : base("release", "") {
+	public ArmoredAGuardReleaseState(float damage) : base("release") {
 		this.damage = damage;
 	}
 
@@ -344,7 +344,7 @@ public class ArmoredAGuardReleaseState : MaverickState {
 
 public class ArmoredAZappedState : MaverickState {
 	Point pushDir;
-	public ArmoredAZappedState() : base("zapped", "") {
+	public ArmoredAZappedState() : base("zapped") {
 		canEnterSelf = false;
 		aiAttackCtrl = true;
 	}
@@ -410,7 +410,7 @@ public class ArmoredARollState : MaverickState {
 	float rollDirTime;
 	const float jumpPower = 350;
 	float jumpHeldTime;
-	public ArmoredARollState() : base("roll", "") {
+	public ArmoredARollState() : base("roll") {
 	}
 
 	public override void update() {
@@ -504,7 +504,7 @@ public class ArmoredARollState : MaverickState {
 }
 
 public class ArmoredARollExitState : MaverickState {
-	public ArmoredARollExitState() : base("roll_exit", "") {
+	public ArmoredARollExitState() : base("roll_exit") {
 		aiAttackCtrl = true;
 	}
 

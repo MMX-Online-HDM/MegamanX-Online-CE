@@ -226,7 +226,7 @@ public class FStagShoot : MaverickState {
 	bool shotOnce;
 	FStagFireballProj fireball;
 	bool isSecond;
-	public FStagShoot(bool isSecond) : base(isSecond ? "punch2" : "punch", "") {
+	public FStagShoot(bool isSecond) : base(isSecond ? "punch2" : "punch") {
 		this.isSecond = isSecond;
 	}
 
@@ -335,7 +335,7 @@ public class FStagDashChargeProj : Projectile {
 
 public class FStagDashChargeState : MaverickState {
 	FStagDashChargeProj proj;
-	public FStagDashChargeState() : base("angry", "") {
+	public FStagDashChargeState() : base("angry") {
 	}
 
 	public override void update() {
@@ -390,7 +390,7 @@ public class FStagDashState : MaverickState {
 	float trailTime;
 	FStagDashProj proj;
 	float chargeTime;
-	public FStagDashState(float chargeTime) : base("dash", "") {
+	public FStagDashState(float chargeTime) : base("dash") {
 		this.chargeTime = chargeTime;
 		enterSound = "fstagDash";
 	}
@@ -435,7 +435,7 @@ public class FStagGrabState : MaverickState {
 	float xVel = 400;
 	public Character victim;
 	float endLagTime;
-	public FStagGrabState(bool fromDash) : base("dash_grab", "") {
+	public FStagGrabState(bool fromDash) : base("dash_grab") {
 		if (!fromDash) xVel = 0;
 		aiAttackCtrl = true;
 	}
@@ -483,7 +483,7 @@ public class FStagUppercutState : MaverickState {
 	float topDelay;
 	int upHitCount;
 	int downHitCount;
-	public FStagUppercutState(Character victim) : base("updash", "") {
+	public FStagUppercutState(Character victim) : base("updash") {
 		this.victim = victim;
 		enterSound = "fstagUppercut";
 	}

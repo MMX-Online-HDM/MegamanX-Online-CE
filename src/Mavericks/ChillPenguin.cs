@@ -412,7 +412,7 @@ public class ChillPIceBlowState : MaverickState {
 	float shootTime;
 	bool soundOnce;
 	bool statueOnce;
-	public ChillPIceBlowState() : base("blow", "") {
+	public ChillPIceBlowState() : base("blow") {
 	}
 
 	public override void update() {
@@ -481,7 +481,7 @@ public class ChillPBlizzardState : MaverickState {
 	int state;
 	new bool isAI;
 	public const float switchSpriteHeight = 60;
-	public ChillPBlizzardState(bool isAI) : base("jump", "") {
+	public ChillPBlizzardState(bool isAI) : base("jump") {
 		this.isAI = isAI;
 	}
 
@@ -551,7 +551,7 @@ public class ChillPSlideState : MaverickState {
 	const float timeBeforeSlow = 0.75f;
 	const float slowTime = 0.5f;
 	bool soundOnce;
-	public ChillPSlideState(bool isAI) : base("slide", "") {
+	public ChillPSlideState(bool isAI) : base("slide") {
 	}
 
 	public override bool canEnter(Maverick maverick) {

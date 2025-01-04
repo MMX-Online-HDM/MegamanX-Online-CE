@@ -315,7 +315,7 @@ public class BHornetHomingBeeProj : Projectile, IDamagable {
 
 public class BHornetShootState : MaverickState {
 	bool shotOnce;
-	public BHornetShootState(bool isGrounded) : base(isGrounded ? "attack" : "fly_attack", "") {
+	public BHornetShootState(bool isGrounded) : base(isGrounded ? "attack" : "fly_attack") {
 	}
 
 	public override void update() {
@@ -351,7 +351,7 @@ public class BHornetShootState : MaverickState {
 
 public class BHornetShootCursorState : MaverickState {
 	bool shotOnce;
-	public BHornetShootCursorState(bool isGrounded) : base(isGrounded ? "attack" : "fly_attack", "") {
+	public BHornetShootCursorState(bool isGrounded) : base(isGrounded ? "attack" : "fly_attack") {
 	}
 
 	public override void update() {
@@ -481,7 +481,7 @@ public class BHornetShoot2State : MaverickState {
 	bool shotOnce;
 	Actor? target;
 	bool isAIRise;
-	public BHornetShoot2State(Actor? target) : base("fly_wasp_spawn", "") {
+	public BHornetShoot2State(Actor? target) : base("fly_wasp_spawn") {
 		this.target = target;
 	}
 

@@ -85,7 +85,7 @@ public class VileCutter : Weapon {
 public class CutterAttackState : CharState {
 	VileCutterProj proj;
 
-	public CutterAttackState(bool grounded) : base(getSprite(grounded), "", "", "") {
+	public CutterAttackState(bool grounded) : base(getSprite(grounded)) {
 		exitOnAirborne = true;
 		normalCtrl = true;
 	}

@@ -398,7 +398,7 @@ public class GravityWellChargedState : CharState {
 	bool fired = false;
 	MegamanX? mmx;
 
-	public GravityWellChargedState() : base("point_up", "", "", "") {
+	public GravityWellChargedState() : base("point_up") {
 		superArmor = true;
 	}
 

@@ -372,7 +372,7 @@ public class StingCClimb : MaverickState {
 }
 
 public class StingCTongueState : MaverickState {
-	public StingCTongueState(int type) : base(type == 0 ? "tongue" : (type == 1 ? "tongue2" : "tongue3"), "") {
+	public StingCTongueState(int type) : base(type == 0 ? "tongue" : (type == 1 ? "tongue2" : "tongue3")) {
 	}
 
 	public override bool canEnter(Maverick maverick) {
@@ -430,7 +430,7 @@ public class StingCClimbTongueState : MaverickState {
 public class StingCClingShootState : MaverickState {
 	bool shotOnce;
 	public MaverickState oldState;
-	public StingCClingShootState() : base("cling_shoot", "") {
+	public StingCClingShootState() : base("cling_shoot") {
 	}
 
 	public override void update() {
@@ -463,7 +463,7 @@ public class StingCHangState : MaverickState {
 	float spikeTime;
 	float endTime;
 	float ceilingY;
-	public StingCHangState(float ceilingY) : base("hang", "") {
+	public StingCHangState(float ceilingY) : base("hang") {
 		this.ceilingY = ceilingY;
 	}
 

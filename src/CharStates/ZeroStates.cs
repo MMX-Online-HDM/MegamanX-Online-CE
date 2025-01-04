@@ -167,7 +167,7 @@ public class HyperZeroStart : CharState {
 }
 
 public class SaberParryStartState : CharState {
-	public SaberParryStartState() : base("parry_start", "", "", "") {
+	public SaberParryStartState() : base("parry_start") {
 		superArmor = true;
 	}
 
@@ -229,7 +229,7 @@ public class SaberParryStartState : CharState {
 public class KKnuckleParryMeleeState : CharState {
 	Actor? counterAttackTarget;
 	Point counterAttackPos;
-	public KKnuckleParryMeleeState(Actor? counterAttackTarget) : base("parry", "", "", "") {
+	public KKnuckleParryMeleeState(Actor? counterAttackTarget) : base("parry") {
 		invincible = true;
 		this.counterAttackTarget = counterAttackTarget;
 	}

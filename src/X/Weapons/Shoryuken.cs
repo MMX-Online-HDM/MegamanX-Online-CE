@@ -21,7 +21,7 @@ public class Shoryuken : CharState {
 	float projTime;
 	MegamanX? mmx;
 
-	public Shoryuken(bool isUnderwater) : base("shoryuken", "", "") {
+	public Shoryuken(bool isUnderwater) : base("shoryuken") {
 		this.isUnderwater = isUnderwater;
 		superArmor = true;
 	}

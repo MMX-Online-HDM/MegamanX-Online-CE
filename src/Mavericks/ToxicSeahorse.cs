@@ -281,7 +281,7 @@ public class TSeahorseAcid2Proj : Projectile {
 
 public class TSeahorseShoot2State : MaverickState {
 	bool shotOnce;
-	public TSeahorseShoot2State() : base("shoot2", "") {
+	public TSeahorseShoot2State() : base("shoot2") {
 		exitOnAnimEnd = true;
 	}
 
@@ -301,7 +301,7 @@ public class TSeahorseShoot2State : MaverickState {
 public class TSeahorseTeleportState : MaverickState {
 	int state = 0;
 	float shootCooldown;
-	public TSeahorseTeleportState() : base("teleport", "") {
+	public TSeahorseTeleportState() : base("teleport") {
 		enterSound = "tseahorseTeleportOut";
 	}
 

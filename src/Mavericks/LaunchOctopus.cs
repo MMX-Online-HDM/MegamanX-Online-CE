@@ -275,7 +275,7 @@ public class LaunchOShoot : MaverickState {
 	int shootState;
 	bool isGrounded;
 	float afterShootTime;
-	public LaunchOShoot(bool isGrounded) : base(isGrounded ? "shoot" : "air_shoot", "") {
+	public LaunchOShoot(bool isGrounded) : base(isGrounded ? "shoot" : "air_shoot") {
 		this.isGrounded = isGrounded;
 	}
 
@@ -347,7 +347,7 @@ public class LaunchOShoot : MaverickState {
 
 public class LaunchOHomingTorpedoState : MaverickState {
 	public bool shootOnce;
-	public LaunchOHomingTorpedoState() : base("ht", "") {
+	public LaunchOHomingTorpedoState() : base("ht") {
 	}
 
 	public override bool canEnter(Maverick maverick) {
@@ -386,7 +386,7 @@ public class LaunchOWhirlpoolState : MaverickState {
 	LaunchOWhirlpoolProj whirlpool;
 	float whirlpoolSoundTime;
 	int initYDir = 1;
-	public LaunchOWhirlpoolState() : base("spin", "") {
+	public LaunchOWhirlpoolState() : base("spin") {
 	}
 
 	public override bool canEnter(Maverick maverick) {
@@ -441,7 +441,7 @@ public class LaunchODrainState : MaverickState {
 	float leechTime = 0.5f;
 	public bool victimWasGrabbedSpriteOnce;
 	float timeWaiting;
-	public LaunchODrainState(Character grabbedChar) : base("drain", "") {
+	public LaunchODrainState(Character grabbedChar) : base("drain") {
 		this.victim = grabbedChar;
 	}
 
