@@ -2676,8 +2676,9 @@ public partial class Character : Actor, IDamagable {
 		int? assisterWeaponId = null;
 		if (charState is not Die || !ownedByLocalPlayer) {
 			player.lastDeathCanRevive = Global.anyQuickStart || Global.debug || Global.level.isTraining() || killer != null;
-			changeState(new Die(), true);
-
+			if (ownedByLocalPlayer) {
+				changeState(new Die(), true);
+			}
 			if (ownedByLocalPlayer) {
 				getKillerAndAssister(player, ref killer, ref assister, ref weaponIndex, ref assisterProjId, ref assisterWeaponId);
 			}
