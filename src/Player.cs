@@ -1494,7 +1494,6 @@ public partial class Player {
 					this, character.pos.x, character.pos.y, character.xDir,
 					true, dnaNetId, true, isWarpIn: false
 				);
-				sigmaMaxAmmo = 20;
 			} else if (dnaCore.loadout.sigmaLoadout.sigmaForm == 1) {
 				retChar = new NeoSigma(
 					this, character.pos.x, character.pos.y, character.xDir,
@@ -1506,6 +1505,7 @@ public partial class Player {
 					this, character.pos.x, character.pos.y, character.xDir,
 					true, dnaNetId, true, isWarpIn: false
 				);
+				sigmaMaxAmmo = 20;
 			}
 		} else if (charNum == (int)CharIds.Rock) {
 			retChar = new Rock(
