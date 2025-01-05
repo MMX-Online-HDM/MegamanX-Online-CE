@@ -1515,22 +1515,24 @@ public partial class Character : Actor, IDamagable {
 	public virtual bool isInvulnerable(bool ignoreRideArmorHide = false, bool factorHyperMode = false) {
 		if (isWarpIn()) return true;
 		if (invulnTime > 0) return true;
+		
 		if (!ignoreRideArmorHide) { 
-			if (charState is InRideArmor && (charState as InRideArmor)?.isHiding == true) {
+			if (ownedByLocalPlayer && charState is InRideArmor { isHiding: true }) {
 				return true;
 			}
-			if (!string.IsNullOrEmpty(sprite?.name) && sprite.name.Contains("ra_hide")) {
+			if (sprite.name.EndsWith("ra_hide")) {
 				return true;
 			}
 			if (charState.specialId == SpecialStateIds.AxlRoll || charState.specialId == SpecialStateIds.XTeleport) {
 				return true;
 			}
-			if (sprite != null && sprite.name.Contains("viral_exit")) {
-				return true;
-			}
 		}
-		if (charState is WarpOut) return true;
-		if (charState is WolfSigmaRevive || charState is ViralSigmaRevive || charState is KaiserSigmaRevive) return true;
+		if (sprite.name == "sigma2_viral_exit") {
+			return true;
+		}
+		if (ownedByLocalPlayer && charState is WarpOut or WolfSigmaRevive or ViralSigmaRevive or KaiserSigmaRevive) {
+			return true;
+		}
 		return false;
 	}
 
