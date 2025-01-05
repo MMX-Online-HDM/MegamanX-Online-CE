@@ -1470,11 +1470,11 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool isStunImmune() {
-		return isStatusImmune() || charState.invincible;
+		return isStatusImmune() || isInvulnerable() || charState.invincible;
 	}
 
 	public virtual bool isFlinchImmune() {
-		return isStatusImmune() || charState.superArmor || charState.invincible;
+		return isStatusImmune() || isInvulnerable() || charState.superArmor || charState.invincible;
 	}
 
 	public virtual bool isPushImmune() {
@@ -1486,7 +1486,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool isGrabImmune() {
-		return isStatusImmune() || charState.invincible;
+		return isStatusImmune() || isInvulnerable() || charState.invincible;
 	}
 
 	public virtual bool isStatusImmune() {
