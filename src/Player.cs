@@ -899,7 +899,8 @@ public partial class Player {
 			if (canReviveSigma(out var spawnPoint) &&
 				(input.isPressed(Control.Special2, this) ||
 				Global.level.isHyper1v1() ||
-				Global.shouldAiAutoRevive)
+				Global.shouldAiAutoRevive
+			)
 			) {
 				reviveSigma(2, spawnPoint);
 			}
@@ -1528,7 +1529,7 @@ public partial class Player {
 				true, dnaNetId, true, isWarpIn: false
 			);
 		} else if  (charNum == (int)CharIds.KaiserSigma) {
-			character = new KaiserSigma(
+			retChar = new KaiserSigma(
 				this, character.pos.x, character.pos.y, character.xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
@@ -2053,8 +2054,6 @@ public partial class Player {
 		if (character.destroyed == false) {
 			character.destroySelf();
 		}
-		clearSigmaWeapons();
-		maxHealth = getModifiedHealth(32);
 		ushort newNetId = getNextATransNetId();
 		if (form == 0) {
 			if (Global.level.is1v1()) {
@@ -2084,8 +2083,6 @@ public partial class Player {
 	}
 
 	public void reviveSigmaNonOwner(int form, Point spawnPoint, ushort sigmaNetId) {
-		clearSigmaWeapons();
-		maxHealth = getModifiedHealth(32);
 		if (form >= 2) {
 			character.destroySelf();
 			KaiserSigma kaiserSigma = new KaiserSigma(

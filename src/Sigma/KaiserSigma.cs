@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace MMXOnline;
@@ -43,6 +44,10 @@ public partial class KaiserSigma : Character {
 		) {
 			visible = false
 		};
+		maxHealth = (decimal)Player.getModifiedHealth(32);
+		if (!ownedByLocalPlayer) {
+			health = maxHealth;
+		}
 	}
 
 	public override void update() {

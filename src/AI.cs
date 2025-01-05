@@ -25,7 +25,11 @@ public class AI {
 	public int framesChargeHeld = 0;
 	public float jumpZoneTime = 0;
 	public bool flagger = false; //Will this ai aggressively capture the flag?
-	public static AITrainingBehavior trainingBehavior;
+	private static AITrainingBehavior _trainingBehavior = AITrainingBehavior.Default;
+	public static AITrainingBehavior trainingBehavior {
+		set { _trainingBehavior = value; }
+		get => Global.level.isTraining() ? _trainingBehavior : AITrainingBehavior.Default; 
+	}
 	public int axlAccuracy;
 	public int mashType; //0=no mash, 1 = light, 2 = heavy
 

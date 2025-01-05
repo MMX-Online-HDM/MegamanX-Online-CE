@@ -97,7 +97,7 @@ public class BaseSigma : Character {
 			spcPressed = false;
 		}
 
-		if (player.isAI && charState.attackCtrl) {
+		if (player.isAI && charState.attackCtrl && AI.trainingBehavior == AITrainingBehavior.Default) {
 			foreach (Weapon weapon in weapons) {
 				if (weapon is MaverickWeapon mw && mw.maverick == null) {
 					if (mw.summonedOnce) {
