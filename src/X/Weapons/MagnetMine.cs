@@ -166,6 +166,10 @@ public class MagnetMineProj : Projectile, IDamagable {
 		if (player.alliance == alliance) return false;
 		return true;
 	}
+
+	public bool isPlayableDamagable() {
+		return false;
+	}
 }
 
 public class MagnetMineProjCharged : Projectile {

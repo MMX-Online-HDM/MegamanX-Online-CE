@@ -209,6 +209,10 @@ public class FrostShieldProjGround : Projectile, IDamagable {
 		return !Damager.canDamageFrostShield(projId.Value);
 	}
 
+	public bool isPlayableDamagable() {
+		return false;
+	}
+
 	public override void onDestroy() {
 		base.onDestroy();
 		breakFreeze(owner);

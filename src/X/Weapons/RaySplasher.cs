@@ -288,6 +288,10 @@ public class RaySplasherTurret : Actor, IDamagable {
 
 		renderDamageText(10);
 	}
+
+	public bool isPlayableDamagable() {
+		return false;
+	}
 }
 
 

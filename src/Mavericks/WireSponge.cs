@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace MMXOnline;
-
+ 
 public class WireSponge : Maverick {
-	public static Weapon getWeapon() { return new Weapon(WeaponIds.WSpongeGeneric, 141); }
+	public static Weapon netWeapon = new Weapon(WeaponIds.WSpongeGeneric, 141);
+	public static Weapon getWeapon() => netWeapon;
+
 	public static Weapon getChainWeapon(Player player) { return new Weapon(WeaponIds.WSpongeStrikeChain, 141, new Damager(player, 4, Global.defFlinch, 0.5f)); }
 	public Weapon chainWeapon;
 
@@ -799,8 +801,11 @@ public class WSpongeUpChainHangState : MaverickState {
 
 public class WSpongeSeedProj : Projectile {
 	bool once;
-	public WSpongeSeedProj(Weapon weapon, Point pos, int xDir, Point vel, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 3, player, "wsponge_seed", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public WSpongeSeedProj(
+		Weapon weapon, Point pos, int xDir, Point vel, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 3, player, "wsponge_seed", 0, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.WSpongeSeed;
 		maxTime = 2f;
 		destroyOnHit = true;
@@ -851,11 +856,12 @@ public class WSpongeSeedProj : Projectile {
 public class WSpongeSpike : Projectile, IDamagable {
 	public float health = 2;
 	public int type;
-	public WSpongeSpike(Weapon weapon, Point pos, int xDir, int type,
+	public WSpongeSpike(
+		Weapon weapon, Point pos, int xDir, int type,
 		Player player, ushort netProjId, bool rpc = false
 	) : base(
 		weapon, pos, xDir, 0, 2, player, getSpriteFromType(type),
-		 Global.defFlinch, 0f, netProjId, player.ownedByLocalPlayer
+		Global.defFlinch, 0f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.WSpongeSpike;
 		destroyOnHit = true;
@@ -866,9 +872,12 @@ public class WSpongeSpike : Projectile, IDamagable {
 			rpcCreate(pos, player, netProjId, xDir, (byte)type);
 		}
 	}
-		public static Projectile rpcInvoke(ProjParameters args) {
-		return new WSpongeSpike(WireSpongeWeapon.netWeapon,
-			args.pos, args.xDir, args.extraData[0], args.player, args.netId
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new WSpongeSpike(
+			WireSponge.netWeapon,
+			args.pos, args.xDir, args.extraData[0],
+			args.player, args.netId
 		);
 	}
 
@@ -914,6 +923,7 @@ public class WSpongeSpike : Projectile, IDamagable {
 		base.onDestroy();
 		owner.seeds.Remove(this);
 	}
+	public bool isPlayableDamagable() { return false; }
 }
 
 public class WSpongeSeedThrowState : MaverickState {

@@ -127,6 +127,10 @@ public class NeutralEnemy : Actor, IDamagable {
 		return invincibleFlag;
 	}
 
+	public bool isPlayableDamagable() {
+		return true;
+	}
+
 	// Sends net data to update.
 	public override List<byte> getCustomActorNetData() {
 		List<byte> customData = new();

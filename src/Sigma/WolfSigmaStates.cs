@@ -274,6 +274,10 @@ public class WolfSigmaHead : Actor, IDamagable {
 			explodeTime = Global.spf;
 		}
 	}
+
+	public bool isPlayableDamagable() {
+		return false;
+	}
 }
 
 public class WolfSigmaBall : Projectile {
@@ -623,6 +627,10 @@ public class WolfSigmaHand : Actor, IDamagable {
 			DrawWrappers.DrawRect(topLeft.x, topLeft.y, botRight.x, botRight.y, true, Color.Black, 0, ZIndex.HUD - 1, outlineColor: Color.White);
 			DrawWrappers.DrawRect(topLeft.x + 1, topLeft.y + 1, topLeft.x + 1 + width, botRight.y - 1, true, Color.Yellow, 0, ZIndex.HUD - 1);
 		}
+	}
+
+	public bool isPlayableDamagable() {
+		return false;
 	}
 }
 
