@@ -67,7 +67,6 @@ public class CallDownMaverick : CharState {
 
 public class SigmaBlock : CharState {
 	public SigmaBlock() : base("block") {
-		immuneToWind = true;
 		superArmor = true;
 		exitOnAirborne = true;
 		attackCtrl = true;
