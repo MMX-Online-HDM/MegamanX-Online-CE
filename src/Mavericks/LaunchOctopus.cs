@@ -224,6 +224,9 @@ public class LaunchOMissile : Projectile, IDamagable {
 			destroySelf();
 		}
 	}
+	public bool isPlayableDamagable() {
+		return false;
+	}
 }
 
 public class LaunchOWhirlpoolProj : Projectile {
@@ -259,12 +262,20 @@ public class LaunchOWhirlpoolProj : Projectile {
 
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
+		if (!damagable.isPlayableDamagable()) { return; }
+
 		if (damagable is Character chr) {
 			float modifier = 1;
 			if (chr.isUnderwater()) modifier = 2;
-			if (chr.isImmuneToKnockback()) return;
+			if (chr.isPushImmune()) return;
 			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
 			chr.move(new Point(xMoveVel * 100 * modifier, 0));
+		}
+		if (damagable is Actor actor) {
+			float modifier = 1;
+			if (actor.isUnderwater()) modifier = 2;
+			float xMoveVel = MathF.Sign(pos.x - actor.pos.x);
+			actor.move(new Point(xMoveVel * 100 * modifier, 0));
 		}
 	}
 }

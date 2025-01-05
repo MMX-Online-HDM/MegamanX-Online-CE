@@ -159,7 +159,7 @@ public class TornadoFangProj : Projectile {
 				}
 
 				var chr = damagable as Character;
-				if (chr != null && chr.ownedByLocalPlayer && !chr.isImmuneToKnockback()) {
+				if (chr != null && chr.ownedByLocalPlayer && !chr.isSlowImmune()) {
 					chr.vel = Point.lerp(chr.vel, Point.zero, Global.speedMul);
 					chr.slowdownTime = 0.25f;
 				}
@@ -261,7 +261,7 @@ public class TornadoFangProjCharged : Projectile {
 			sparksCooldown = 0.25f;
 		}
 
-		if (damagable is Character chr) {
+		if (damagable is Character chr && !chr.isSlowImmune()) {
 			chr.vel = Point.lerp(chr.vel, Point.zero, Global.spf * 10);
 			chr.slowdownTime = 0.25f;
 		}

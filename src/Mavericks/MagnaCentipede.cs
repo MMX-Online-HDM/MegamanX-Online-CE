@@ -629,7 +629,7 @@ public class MagnaCMagnetPullProj : Projectile {
 		base.update();
 		foreach (GameObject go in getCloseActors(MathInt.Ceiling(radius + 50))) {
 			var chr = go as Character;
-			if (chr == null || !chr.ownedByLocalPlayer || chr.isImmuneToKnockback()) continue;
+			if (chr == null || !chr.ownedByLocalPlayer || chr.isPushImmune()) continue;
 			var damagable = go as IDamagable;
 			if (!damagable.canBeDamaged(damager.owner.alliance, damager.owner.id, null)) continue;
 			if (chr.pos.distanceTo(pos) > radius + 15) continue;

@@ -436,7 +436,7 @@ public partial class Character : Actor, IDamagable {
 
 	public void splashLaserKnockback(Point splashDeltaPos) {
 		if (charState.invincible) return;
-		if (isImmuneToKnockback()) return;
+		if (isPushImmune()) return;
 
 		if (isClimbingLadder()) {
 			setFall();
@@ -548,7 +548,7 @@ public partial class Character : Actor, IDamagable {
 		if (dropFlagCooldown > 0) return false;
 		if (isInvulnerable()) return false;
 		if (player.isDisguisedAxl && !disguiseCoverBlown) return false;
-		if (isStatusImmuneHyperMode()) return false;
+		if (isNonDamageStatusImmune()) return false;
 		if (charState is Die || charState is VileRevive || charState is XReviveStart || charState is XRevive) return false;
 		if (player.currentMaverick != null && player.isTagTeam()) return false;
 		if (isWarpOut()) return false;
@@ -564,7 +564,7 @@ public partial class Character : Actor, IDamagable {
 		if (player.isPossessed()) return false;
 		if (health <= 0) return false;
 		if (isInvulnerable()) return false;
-		if (isStatusImmuneHyperMode()) return false;
+		if (isNonDamageStatusImmune()) return false;
 		if (charState is Die) return false;
 		if (isWarpOut()) return false;
 		if (Global.serverClient != null) {
@@ -1458,7 +1458,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool isDebuffImmune() {
-		return isStatusImmune();
+		return isStatusImmune() || isNonDamageStatusImmune();
 	}
 
 	public virtual bool isDotImmune() {
@@ -1466,19 +1466,22 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool isSlowImmune() {
-		return isStatusImmune();
+		return isStatusImmune() || isNonDamageStatusImmune();
 	}
 
 	public virtual bool isStunImmune() {
-		return isStatusImmune() || isInvulnerable() || charState.invincible;
+		return isStatusImmune() || isInvulnerable() || isNonDamageStatusImmune() || charState.invincible;
 	}
 
 	public virtual bool isFlinchImmune() {
-		return isStatusImmune() || isInvulnerable() || charState.superArmor || charState.invincible;
+		return (
+			isStatusImmune() || isInvulnerable() || isNonDamageStatusImmune() ||
+			charState.superArmor || charState.invincible
+		);
 	}
 
 	public virtual bool isPushImmune() {
-		return isTrueStatusImmune();
+		return isTrueStatusImmune() || charState?.immuneToWind == true || immuneToKnockback || isClimbingLadder();
 	}
 
 	public virtual bool isTimeImmune() {
@@ -1486,27 +1489,23 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool isGrabImmune() {
-		return isStatusImmune() || isInvulnerable() || charState.invincible;
+		return isStatusImmune() || isInvulnerable() || charState.invincible || isNonDamageStatusImmune();
 	}
 
 	public virtual bool isStatusImmune() {
-		return isTrueStatusImmune() || isVaccinated() || isStatusImmuneHyperMode();
+		return isTrueStatusImmune() || isVaccinated();
 	}
 
 	public virtual bool isTrueStatusImmune() {
 		return isInvulnerable(true) || ownedByLocalPlayer && charState is Die;
 	}
 
-	public virtual bool isStatusImmuneHyperMode() {
+	public virtual bool isNonDamageStatusImmune() {
 		return false;
 	}
 
 	public virtual bool isToughGuyHyperMode() {
 		return false;
-	}
-
-	public bool isImmuneToKnockback() {
-		return charState?.immuneToWind == true || immuneToKnockback || isStatusImmune();
 	}
 
 	// If factorHyperMode = true, then invuln frames in a hyper mode won't count as "invulnerable".
@@ -3230,6 +3229,10 @@ public partial class Character : Actor, IDamagable {
 			stopCharge();
 		}
 		chargeGfx();
+	}
+
+	public bool isPlayableDamagable() {
+		return true;
 	}
 
 	public virtual void aiUpdate() { }

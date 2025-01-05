@@ -5,14 +5,15 @@ using System.Linq;
 namespace MMXOnline;
 
 public class RagingChargeX : Character {
-	public int unpoShotCount;
-	public float upPunchCooldown;
-	public float xSaberCooldown;
+	public int shotCount;
+	public float punchCooldown;
+	public float saberCooldown;
 	public float parryCooldown;
 	public float maxParryCooldown = 30;
+	public bool doSelfDamage;
 	public float selfDamageCooldown;
 	public float selfDamageMaxCooldown = 120;
-	public Projectile? unpoAbsorbedProj;
+	public Projectile? absorbedProj;
 	public RagingChargeBuster ragingBuster;
 
 	public RagingChargeX(
@@ -24,14 +25,27 @@ public class RagingChargeX : Character {
 	) {
 		charId = CharIds.RagingChargeX;
 
+		// Start with 5s spawn leitency.
+		selfDamageCooldown = selfDamageMaxCooldown * 4;
+
 		// For easy HUD display we add it to weapon list.
 		ragingBuster = new RagingChargeBuster();
 		weapons.Add(ragingBuster);
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		if (selfDamageCooldown > 0 && isDecayImmune()) {
+			selfDamageCooldown -= speedMul;
+			if (selfDamageCooldown <= 0) {
+				selfDamageCooldown = 0;
+				doSelfDamage = true;
+			}
+		}
+	}
+
 	public override void update() {
 		base.update();
-	
 		if (musicSource == null) {
 			addMusicSource("introStageBreisX4_JX", getCenterPos(), true);
 		}
@@ -44,24 +58,22 @@ public class RagingChargeX : Character {
 		) {
 			enterParry();
 		}
-
-		if (charState is not XUPGrabState
-			and not XUPParryMeleeState
-			and not XUPParryProjState
-			and not Hurt
-			and not GenericStun
-			and not VileMK2Grabbed
-			and not GenericGrabbedState
-		) {
-			if (selfDamageCooldown >= selfDamageMaxCooldown) {
-				selfDamageCooldown = 0;
+		if (!isDecayImmune()) {
+			if (doSelfDamage) {
 				applyDamage(1, player, this, null, (int)ProjIds.SelfDmg);
-			} else {
-				selfDamageCooldown += speedMul;
 			}
+		} else {
+			doSelfDamage = false;
 		}
-		unpoShotCount = 0;
-		unpoShotCount = MathInt.Floor(ragingBuster.ammo / ragingBuster.getAmmoUsage(0));
+		shotCount = 0;
+		shotCount = MathInt.Floor(ragingBuster.ammo / ragingBuster.getAmmoUsage(0));
+	}
+
+	public override void postUpdate() {
+		base.preUpdate();
+		if (!isDecayImmune() && selfDamageCooldown < selfDamageMaxCooldown) {
+			selfDamageCooldown = selfDamageMaxCooldown;
+		}
 	}
 
 	public override bool normalCtrl() {
@@ -77,13 +89,13 @@ public class RagingChargeX : Character {
 			enterParry();
 			return true;
 		}
-		if (player.input.isPressed(Control.Shoot, player) && unpoShotCount <= 0) {
-			upPunchCooldown = 0.5f;
+		if (player.input.isPressed(Control.Shoot, player) && shotCount <= 0) {
+			punchCooldown = 0.5f;
 			changeState(new XUPPunchState(grounded), true);
 			return true;
 		}
-		if (player.input.isPressed(Control.Special1, player) && xSaberCooldown == 0) {
-			xSaberCooldown = 60;
+		if (player.input.isPressed(Control.Special1, player) && saberCooldown == 0) {
+			saberCooldown = 60;
 			changeState(new X6SaberState(grounded), true);
 			return true;
 		}
@@ -91,19 +103,30 @@ public class RagingChargeX : Character {
 	}
 
 	public void enterParry() {
-		if (unpoAbsorbedProj != null) {
-			changeState(new XUPParryProjState(unpoAbsorbedProj, true, false), true);
-			unpoAbsorbedProj = null;
+		if (absorbedProj != null) {
+			changeState(new XUPParryProjState(absorbedProj, true, false), true);
+			absorbedProj = null;
 			return;
 		}
 		changeState(new XUPParryStartState(), true);
 		return;
 	}
 
-	public override bool isStatusImmuneHyperMode() {
+	public override bool isNonDamageStatusImmune() {
 		return true;
 	}
 
+	public bool isDecayImmune() {
+		return (
+			charState is XUPGrabState
+			or XUPParryMeleeState
+			or XUPParryProjState
+			or Hurt
+			or GenericStun
+			or VileMK2Grabbed
+			or GenericGrabbedState
+		);
+	}
 	
 	// This can run on both owners and non-owners. So data used must be in sync.
 	public override int getHitboxMeleeId(Collider hitbox) {

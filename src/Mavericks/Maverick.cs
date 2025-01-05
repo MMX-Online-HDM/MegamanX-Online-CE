@@ -949,6 +949,10 @@ public class Maverick : Actor, IDamagable {
 		this.healAmount = healAmount;
 	}
 
+	public bool isPlayableDamagable() {
+		return true;
+	}
+
 	public virtual float getAirSpeed() {
 		return 1;
 	}

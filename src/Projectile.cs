@@ -119,7 +119,7 @@ public class Projectile : Actor {
 		(netId != null ? Global.level.getPlayerById(netId.Value).ownedByLocalPlayer : true),
 		!addToLevel
 	) {
-		weapon = Weapon.netWeapon;
+		weapon = Weapon.baseNetWeapon;
 		useGravity = false;
 		ownerPlayer = player ?? owner?.netOwner ?? Global.level.getPlayerById(netId!.Value);
 		damager = new Damager(ownerPlayer, 0, 0, 0);

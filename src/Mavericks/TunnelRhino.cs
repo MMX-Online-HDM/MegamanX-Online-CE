@@ -179,7 +179,7 @@ public class TunnelRTornadoFang : Projectile {
 			sparksCooldown = 0.25f;
 		}
 		var chr = damagable as Character;
-		if (chr != null && chr.ownedByLocalPlayer && !chr.isImmuneToKnockback()) {
+		if (chr != null && chr.ownedByLocalPlayer && !chr.isSlowImmune()) {
 			chr.vel = Point.lerp(chr.vel, Point.zero, Global.spf * 10);
 			chr.slowdownTime = 0.25f;
 		}

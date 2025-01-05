@@ -403,6 +403,9 @@ public class BCrabShieldProj : Projectile, IDamagable {
 	public bool isInvincible(Player attacker, int? projId) {
 		return false;
 	}
+	public bool isPlayableDamagable() {
+		return false;
+	}
 }
 
 public class BCrabShieldStartState : MaverickState {
@@ -495,6 +498,9 @@ public class BCrabSummonBubbleProj : Projectile, IDamagable {
 		}
 	}
 	public bool isInvincible(Player attacker, int? projId) {
+		return false;
+	}
+	public bool isPlayableDamagable() {
 		return false;
 	}
 }
@@ -648,6 +654,9 @@ public class BCrabSummonCrabProj : Projectile, IDamagable {
 	}
 	public bool isInvincible(Player attacker, int? projId) {
 		return false;
+	}
+	public bool isPlayableDamagable() {
+		return true;
 	}
 }
 

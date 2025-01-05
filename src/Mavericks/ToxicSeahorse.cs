@@ -198,6 +198,7 @@ public class TSeahorseAcidProj : Projectile, IDamagable {
 	public bool isInvincible(Player attacker, int? projId) => false;
 	public bool canBeHealed(int healerAlliance) => false;
 	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) { }
+	public bool isPlayableDamagable() { return false; }
 }
 
 public class TSeahorseAcid2Proj : Projectile {

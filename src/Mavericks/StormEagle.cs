@@ -249,6 +249,10 @@ public class StormEBirdProj : Projectile, IDamagable {
 		return false;
 	}
 
+	public bool isPlayableDamagable() {
+		return false;
+	}
+
 	public override void preUpdate() {
 		base.preUpdate();
 		updateProjectileCooldown();
@@ -282,21 +286,19 @@ public class StormEGustProj : Projectile {
 
 
 	public override void onHitDamagable(IDamagable damagable) {
-		var character = damagable as Character;
-		if (character == null) return;
-		if (character.charState.invincible) return;
-		if (character.isImmuneToKnockback()) return;
-
-		//character.damageHistory.Add(new DamageEvent(damager.owner, weapon.killFeedIndex, true, Global.frameCount));
-		if (character.isClimbingLadder()) {
-			character.setFall();
-		} else if (!character.pushedByTornadoInFrame) {
-			float modifier = 1;
-			if (character.grounded) modifier = 0.5f;
-			if (character.charState is Crouch) modifier = 0.25f;
-			character.move(new Point(maxSpeed * 0.9f * xDir * modifier, 0));
+		if (damagable.isPlayableDamagable()) { return; }
+		if (damagable is not Actor actor || !actor.ownedByLocalPlayer) {
+			return;
+		}
+		float modifier = 1;
+		if (actor.grounded) { modifier = 0.5f; };
+		if (damagable is Character character) {
+			if (character.isPushImmune()) { return; }
+			if (character.charState is Crouch) { modifier = 0.25f; }
 			character.pushedByTornadoInFrame = true;
 		}
+		//character.damageHistory.Add(new DamageEvent(damager.owner, weapon.killFeedIndex, true, Global.frameCount));
+		actor.move(new Point(maxSpeed * 0.9f * xDir * modifier, 0));
 	}
 }
 #endregion

@@ -357,6 +357,10 @@ public class CrackedWall : Actor, IDamagable {
 		}
 	}
 
+	public bool isPlayableDamagable() {
+		return false;
+	}
+
 	public override void onDestroy() {
 		base.onDestroy();
 		Global.level.removeGameObject(wall);

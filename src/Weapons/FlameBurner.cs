@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace MMXOnline;
 
@@ -172,22 +173,34 @@ public class FlameBurnerAltProj : Projectile {
 	}
 
 	public override void onHitDamagable(IDamagable damagable) {
-		var character = damagable as Character;
-		if (character == null) return;
-		if (character.charState.invincible) return;
-		if (character.charState.immuneToWind) return;
-		if (!character.ownedByLocalPlayer) return;
-		if (character.isStatusImmune()) return;
+		if (damagable.isPlayableDamagable()) { return; }
+		if (damagable is not Actor actor || !actor.ownedByLocalPlayer) {
+			return;
+		}
+		if (damagable is Character char1 && char1.isPushImmune()) {
+			return;
+		}
 
 		//character.damageHistory.Add(new DamageEvent(damager.owner, weapon.killFeedIndex, true, Global.frameCount));
-		if (character.isClimbingLadder()) {
-			character.setFall();
+		float modifier = 1.33f;
+		Point pushVel = getPushVel();
+		if (actor.useGravity) {
+			if (MathF.Sign(actor.vel.y) != MathF.Sign(pushVel.y)) {
+				actor.vel.y = 0;
+			}
+			actor.vel.y += pushVel.y * modifier;
+			if (damagable is Character character) {
+				if (character.charState.normalCtrl && character.charState is not Fall or Jump) {
+					character.changeState(new Fall());
+				}
+				else if (character.charState.canStopJump) {
+					character.charState.canStopJump = false;
+				}
+			}
 		} else {
-			float modifier = 1.33f;
-			Point pushVel = getPushVel();
-			character.vel.y = pushVel.y * modifier;
-			character.xPushVel = pushVel.x * modifier;
+			actor.yPushVel = pushVel.y * modifier;
 		}
+		actor.xPushVel = pushVel.x * modifier;
 	}
 
 	public Point getPushVel() {

@@ -605,6 +605,10 @@ public class RideChaser : Actor, IDamagable {
 		}
 	}
 
+	public bool isPlayableDamagable() {
+		return true;
+	}
+
 	public void creditKill(Player killer, Player assister, int? weaponIndex) {
 		if (killer != null && killer != player) {
 			killer.addKill();

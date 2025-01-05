@@ -356,6 +356,10 @@ public class ChillPIceStatueProj : Projectile, IDamagable {
 
 	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
 	}
+
+	public bool isPlayableDamagable() {
+		return false;
+	}
 }
 
 public class ChillPBlizzardProj : Projectile {
@@ -392,17 +396,17 @@ public class ChillPBlizzardProj : Projectile {
 
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
-		if (damagable is not Character character) return;
-		if (character.charState.invincible) return;
-		if (character.charState.immuneToWind) return;
-		if (immuneToKnockback) return;
-		if (character.isStatusImmune()) return;
-
+		if (damagable.isPlayableDamagable()) { return; }
+		if (damagable is not Actor actor || !actor.ownedByLocalPlayer) {
+			return;
+		}
 		float modifier = 1;
-		if (character.grounded) modifier = 0.5f;
-		if (character.charState is Crouch) modifier = 0.25f;
-		character.move(new Point(pushSpeed * xDir * modifier, 0));
-		character.pushedByTornadoInFrame = true;
+		if (actor.grounded) { modifier = 0.5f; };
+		if (damagable is Character character) {
+			if (character.isPushImmune()) { return; }
+			if (character.charState is Crouch) { modifier = 0.25f; }
+		}
+		actor.move(new Point(pushSpeed * xDir * modifier, 0));
 	}
 }
 #endregion

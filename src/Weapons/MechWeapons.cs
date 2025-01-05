@@ -262,6 +262,10 @@ public class MechMissileProj : Projectile, IDamagable {
 
 	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
 	}
+
+	public bool isPlayableDamagable() {
+		return false;
+	}
 }
 
 public class MechTorpedoWeapon : Weapon {

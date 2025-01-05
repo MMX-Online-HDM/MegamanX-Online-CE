@@ -1013,6 +1013,10 @@ public class RideArmor : Actor, IDamagable {
 		return shaders;
 	}
 
+	public bool isPlayableDamagable() {
+		return true;
+	}
+
 	public void creditKill(Player? killer, Player? assister, int? weaponIndex) {
 		if (killer != null && killer != player) {
 			/*

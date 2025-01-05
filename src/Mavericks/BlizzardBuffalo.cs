@@ -304,6 +304,7 @@ public class BBuffaloIceProjGround : Projectile, IDamagable {
 		//if (projId == null) return true;
 		//return !Damager.canDamageFrostShield(projId.Value);
 	}
+	public bool isPlayableDamagable() { return false; }
 
 	public override void onDestroy() {
 		base.onDestroy();

@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using SFML.Graphics;
 
 namespace MMXOnline;
 
-// If fixing parry code also fix kknuckle parry
 public class XUPParryStartState : CharState {
 	RagingChargeX mmx;
 
@@ -49,7 +47,7 @@ public class XUPParryStartState : CharState {
 				bool absorbThenShoot = false;
 				character.playSound("upParryAbsorb", sendRpc: true);
 				if (!player.input.isWeaponLeftOrRightHeld(player)) {
-					mmx.unpoAbsorbedProj = absorbedProj;
+					mmx.absorbedProj = absorbedProj;
 					//character.player.weapons.Add(new AbsorbWeapon(absorbedProj));
 				} else {
 					shootProj = true;

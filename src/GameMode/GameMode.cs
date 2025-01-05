@@ -633,9 +633,9 @@ public class GameMode {
 					"x" + drawPlayer.currency.ToString(), 16, 140, Alignment.Left
 				);
 			}
-			if (drawPlayer.character is RagingChargeX mmx && mmx.unpoShotCount > 0) {
+			if (drawPlayer.character is RagingChargeX mmx && mmx.shotCount > 0) {
 				int x = 10, y = 156;
-				int count = mmx.unpoShotCount;
+				int count = mmx.shotCount;
 				if (count >= 1) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x, y);
 				if (count >= 2) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x + 13, y);
 				if (count >= 3) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x, y + 11);

@@ -111,6 +111,7 @@ public class BirdMechaniloidProj : Projectile, IDamagable {
 	public bool isInvincible(Player attacker, int? projId) { return false; }
 	public bool canBeHealed(int healerAlliance) { return false; }
 	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) { }
+	public bool isPlayableDamagable() { return true; }
 
 	public override void onDestroy() {
 		base.onDestroy();
@@ -431,6 +432,10 @@ public class Mechaniloid : Actor, IDamagable {
 		if (killZone != null) {
 			killZone.applyDamage(this);
 		}
+	}
+
+	public bool isPlayableDamagable() {
+		return true;
 	}
 
 	public override List<ShaderWrapper>? getShaders() {

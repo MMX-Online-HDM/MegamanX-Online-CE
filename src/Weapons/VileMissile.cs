@@ -160,17 +160,16 @@ public class VileMissileProj : Projectile {
 	}
 
 	/*
-	public override void onHitDamagable(IDamagable damagable)
-	{
+	public override void onHitDamagable(IDamagable damagable){
 		base.onHitDamagable(damagable);
+		if (damagable.isPlayableDamagable()) { return; }
 
-		if (damagable is Character character)
-		{
-			var victimCenter = character.getCenterPos();
+		if (damagable is Actor actor) {
+			var victimCenter = actor.getCenterPos();
 			var bombCenter = pos;
 			var dirTo = bombCenter.directionToNorm(victimCenter);
-			character.vel.y = dirTo.y * 150;
-			character.xPushVel = dirTo.x * 300;
+			actor.vel.y = dirTo.y * 150;
+			actor.xPushVel = dirTo.x * 300;
 		}
 	}
 	*/
