@@ -246,7 +246,7 @@ public class GravityWellProj : Projectile, IDamagable {
 		base.onHitDamagable(damagable);
 		if (damagable.isPlayableDamagable()) { return; }
 		var actor = damagable.actor();
-		if (actor is Character chr && (chr.isPushImmune() || chr.isSlowImmune())) return;
+		if (actor is Character chr && (chr.isPushImmune() || chr.isSlowImmune() || chr.isFlinchImmune())) return;
 
 		float mag = 100;
 		if (!actor.grounded) actor.vel.y = 0;
