@@ -312,4 +312,12 @@ public partial class KaiserSigma : Character {
 		}
 		return pos.round().addxy(camOffsetX, -55);
 	}
+
+	public override bool isStatusImmuneHyperMode() {
+		return true;
+	}
+
+	public override bool isPushImmune() {
+		return true;
+	}
 }

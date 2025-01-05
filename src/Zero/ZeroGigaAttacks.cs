@@ -741,7 +741,7 @@ public class DarkHoldState : CharState {
 	}
 
 	public override bool canEnter(Character character) {
-		if (character.darkHoldInvulnTime > 0 || character.isTrueStatusImmune()) {
+		if (character.darkHoldInvulnTime > 0 || character.isTimeImmune()) {
 			return false;
 		}
 		return base.canEnter(character);

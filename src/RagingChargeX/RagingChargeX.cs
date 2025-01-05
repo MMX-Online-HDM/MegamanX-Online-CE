@@ -100,7 +100,7 @@ public class RagingChargeX : Character {
 		return;
 	}
 
-	public override bool isCCImmuneHyperMode() {
+	public override bool isStatusImmuneHyperMode() {
 		return true;
 	}
 

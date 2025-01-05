@@ -548,7 +548,7 @@ public partial class Character : Actor, IDamagable {
 		if (dropFlagCooldown > 0) return false;
 		if (isInvulnerable()) return false;
 		if (player.isDisguisedAxl && !disguiseCoverBlown) return false;
-		if (isCCImmuneHyperMode()) return false;
+		if (isStatusImmuneHyperMode()) return false;
 		if (charState is Die || charState is VileRevive || charState is XReviveStart || charState is XRevive) return false;
 		if (player.currentMaverick != null && player.isTagTeam()) return false;
 		if (isWarpOut()) return false;
@@ -564,7 +564,7 @@ public partial class Character : Actor, IDamagable {
 		if (player.isPossessed()) return false;
 		if (health <= 0) return false;
 		if (isInvulnerable()) return false;
-		if (isCCImmuneHyperMode()) return false;
+		if (isStatusImmuneHyperMode()) return false;
 		if (charState is Die) return false;
 		if (isWarpOut()) return false;
 		if (Global.serverClient != null) {
@@ -1470,22 +1470,37 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool isStunImmune() {
-		return isStatusImmune();
+		return isStatusImmune() || charState.invincible;
+	}
+
+	public virtual bool isFlinchImmune() {
+		return isStatusImmune() || charState.superArmor || charState.invincible;
 	}
 
 	public virtual bool isPushImmune() {
 		return isTrueStatusImmune();
 	}
 
+	public virtual bool isTimeImmune() {
+		return isTrueStatusImmune();
+	}
+
+	public virtual bool isGrabImmune() {
+		return isStatusImmune() || charState.invincible;
+	}
+
 	public virtual bool isStatusImmune() {
-		return isTrueStatusImmune() || isInvulnerable() || isVaccinated() || charState.invincible;
+		return (
+			isTrueStatusImmune() || isInvulnerable() ||
+			isVaccinated() || isStatusImmuneHyperMode()
+		);
 	}
 
 	public virtual bool isTrueStatusImmune() {
 		return false;
 	}
 
-	public virtual bool isCCImmuneHyperMode() {
+	public virtual bool isStatusImmuneHyperMode() {
 		return false;
 	}
 
@@ -1540,7 +1555,7 @@ public partial class Character : Actor, IDamagable {
 	public bool canBeGrabbed() {
 		return (
 			grabInvulnTime == 0 && !charState.invincible &&
-			!isInvulnerable() && !isStatusImmune() && !isDarkHoldState
+			!isInvulnerable() && !isGrabImmune() && !isDarkHoldState
 		);
 	}
 
@@ -2401,9 +2416,9 @@ public partial class Character : Actor, IDamagable {
 	
 	public virtual bool isInvincible(Player attacker, int? projId) {
 		if (ownedByLocalPlayer) {
-			return charState.invincible || genmuImmune(attacker);
+			return charState.invincible;
 		} else {
-			return isSpriteInvulnerable() || genmuImmune(attacker);
+			return isSpriteInvulnerable();
 		}
 	}
 
@@ -2965,10 +2980,6 @@ public partial class Character : Actor, IDamagable {
 		parasiteTime = 0;
 		parasiteMashTime = 0;
 		parasiteDamager = null;
-	}
-
-	public bool genmuImmune(Player owner) {
-		return false;
 	}
 
 	public override Dictionary<int, Func<Projectile>> getGlobalProjs() {

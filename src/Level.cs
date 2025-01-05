@@ -1699,7 +1699,7 @@ public partial class Level {
 			foreach (var cch in chargedCrystalHunters) {
 				var chr = go as Character;
 				if (chr != null && chr.player.alliance == cch.owner.alliance) continue;
-				if (chr != null && chr.isStatusImmune()) continue;
+				if (chr != null && chr.isTimeImmune()) continue;
 
 				var proj = go as Projectile;
 				if (proj != null && proj.damager.owner.alliance == cch.owner.alliance) {

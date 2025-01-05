@@ -1911,7 +1911,7 @@ public class Axl : Character {
 		return (player.alliance != alliance && (stealthActive || player.isDisguisedAxl && !disguiseCoverBlown));
 	}
 
-	public override bool isCCImmuneHyperMode() {
+	public override bool isStatusImmuneHyperMode() {
 		return isStealthMode();
 	}
 
