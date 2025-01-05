@@ -1494,7 +1494,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool isTrueStatusImmune() {
-		return isInvulnerable(true);
+		return isInvulnerable(true) || ownedByLocalPlayer && charState is Die;
 	}
 
 	public virtual bool isStatusImmuneHyperMode() {
