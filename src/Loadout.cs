@@ -350,11 +350,11 @@ public class SigmaLoadout {
 [ProtoContract]
 public class LoadoutData {
 	[ProtoMember(1)] public int playerId;
-	[ProtoMember(2)] public XLoadout xLoadout = new XLoadout();
-	[ProtoMember(3)] public ZeroLoadout zeroLoadout = new ZeroLoadout();
-	[ProtoMember(4)] public VileLoadout vileLoadout = new VileLoadout();
-	[ProtoMember(5)] public AxlLoadout axlLoadout = new AxlLoadout();
-	[ProtoMember(6)] public SigmaLoadout sigmaLoadout = new SigmaLoadout();
+	[ProtoMember(2)] public XLoadout xLoadout = new();
+	[ProtoMember(3)] public ZeroLoadout zeroLoadout = new();
+	[ProtoMember(4)] public VileLoadout vileLoadout = new();
+	[ProtoMember(5)] public AxlLoadout axlLoadout = new();
+	[ProtoMember(6)] public SigmaLoadout sigmaLoadout = new();
 	[ProtoMember(7)] public PZeroLoadout pzeroLoadout = new();
 
 	public static LoadoutData createRandom(int playerId) {
@@ -365,6 +365,7 @@ public class LoadoutData {
 			vileLoadout = VileLoadout.createRandom(),
 			axlLoadout = AxlLoadout.createRandom(),
 			sigmaLoadout = SigmaLoadout.createRandom(),
+			pzeroLoadout = PZeroLoadout.createRandom(),
 		};
 	}
 
