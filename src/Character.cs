@@ -1515,19 +1515,19 @@ public partial class Character : Actor, IDamagable {
 	public virtual bool isInvulnerable(bool ignoreRideArmorHide = false, bool factorHyperMode = false) {
 		if (isWarpIn()) return true;
 		if (invulnTime > 0) return true;
-		if (!ignoreRideArmorHide && charState is InRideArmor && (charState as InRideArmor)?.isHiding == true) {
-			return true;
-		}
-		if (!ignoreRideArmorHide && !string.IsNullOrEmpty(sprite?.name) && sprite.name.Contains("ra_hide")) {
-			return true;
-		}
-		if (!ignoreRideArmorHide && (
-			charState.specialId == SpecialStateIds.AxlRoll || charState.specialId == SpecialStateIds.XTeleport
-		)) {
-			return true;
-		}
-		if (sprite != null && sprite.name.Contains("viral_exit")) {
-			return true;
+		if (!ignoreRideArmorHide) { 
+			if (charState is InRideArmor && (charState as InRideArmor)?.isHiding == true) {
+				return true;
+			}
+			if (!string.IsNullOrEmpty(sprite?.name) && sprite.name.Contains("ra_hide")) {
+				return true;
+			}
+			if (charState.specialId == SpecialStateIds.AxlRoll || charState.specialId == SpecialStateIds.XTeleport) {
+				return true;
+			}
+			if (sprite != null && sprite.name.Contains("viral_exit")) {
+				return true;
+			}
 		}
 		if (charState is WarpOut) return true;
 		if (charState is WolfSigmaRevive || charState is ViralSigmaRevive || charState is KaiserSigmaRevive) return true;
