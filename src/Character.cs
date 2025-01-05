@@ -547,7 +547,7 @@ public partial class Character : Actor, IDamagable {
 		if (player.isPossessed()) return false;
 		if (dropFlagCooldown > 0) return false;
 		if (isInvulnerable()) return false;
-		if (player.isDisguisedAxl) return false;
+		if (player.isDisguisedAxl && !disguiseCoverBlown) return false;
 		if (isCCImmuneHyperMode()) return false;
 		if (charState is Die || charState is VileRevive || charState is XReviveStart || charState is XRevive) return false;
 		if (player.currentMaverick != null && player.isTagTeam()) return false;
@@ -1920,7 +1920,8 @@ public partial class Character : Actor, IDamagable {
 				!player.isMainPlayer && player.isDisguisedAxl &&
 				Global.level.gameMode.isTeamMode &&
 				player.alliance != Global.level.mainPlayer.alliance &&
-				player.disguise != null
+				player.disguise != null &&
+				!disguiseCoverBlown
 			) {
 				overrideName = player.disguise.targetName;
 				overrideColor = Global.level.gameMode.teamFonts[Global.level.mainPlayer.alliance];
@@ -1931,7 +1932,8 @@ public partial class Character : Actor, IDamagable {
 			else if (!player.isMainPlayer && Global.level.mainPlayer.isDisguisedAxl &&
 				Global.level.gameMode.isTeamMode &&
 				player.alliance != Global.level.mainPlayer.alliance &&
-				!isStealthy(Global.level.mainPlayer.alliance)
+				!isStealthy(Global.level.mainPlayer.alliance) &&
+				!disguiseCoverBlown
 			) {
 				overrideColor = FontType.Grey;
 				shouldDrawName = true;
@@ -2806,10 +2808,6 @@ public partial class Character : Actor, IDamagable {
 		}
 		dropFlagProgress = 0;
 		this.flag = flag;
-
-		if (player.isDisguisedAxl && player.ownedByLocalPlayer) {
-			player.revertToAxl();
-		}
 	}
 
 	public void setHurt(int dir, int flinchFrames, bool spiked) {

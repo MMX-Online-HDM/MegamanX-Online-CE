@@ -1156,6 +1156,11 @@ public partial class Player {
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
+		} else if  (charNum == (int)CharIds.KaiserSigma) {
+			character = new KaiserSigma(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
 		} else {
 			throw new Exception("Error: Non-valid char ID: " + charNum);
 		}

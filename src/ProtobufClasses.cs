@@ -99,8 +99,10 @@ public class PlayerPB {
 	[ProtoMember(16)] public float charXPos;
 	[ProtoMember(17)] public float charYPos;
 	[ProtoMember(18)] public int charXDir;
+	[ProtoMember(19)] public LoadoutData atransLoadout;
+	[ProtoMember(20)] public int? currentCharNum;
 
-	[ProtoMember(20)] public ServerPlayer serverPlayer;
+	[ProtoMember(21)] public ServerPlayer serverPlayer;
 
 	public PlayerPB() { }
 
@@ -110,6 +112,9 @@ public class PlayerPB {
 		newAlliance = player.newAlliance;
 		// weaponIndex = player.weaponIndex;
 		newCharNum = player.newCharNum;
+		if (player.character != null) {
+			currentCharNum = (int)player.character.charId;
+		}
 		curMaxNetId = player.curMaxNetId;
 		warpedIn = player.warpedIn;
 		readyTime = player.readyTime;
@@ -117,6 +122,7 @@ public class PlayerPB {
 		armorFlag = player.armorFlag;
 		loadoutData = player.loadout;
 		disguise = player.disguise;
+		atransLoadout = player.atransLoadout;
 		charNetId = player.character?.netId;
 		charRollingShieldNetId = player.charRollingShieldNetId;
 		charXPos = player.charXPos;
