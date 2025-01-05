@@ -1072,7 +1072,7 @@ public partial class Player {
 		if (charNum == (int)CharIds.Sigma) {
 			loadout.sigmaLoadout.sigmaForm = extraData[0];
 			loadout.sigmaLoadout.maverick1 = extraData[1];
-			loadout.sigmaLoadout.maverick1 = extraData[2];
+			loadout.sigmaLoadout.maverick2 = extraData[2];
 			if (isSigma1()) {
 				sigmaMaxAmmo = 20;
 				sigmaAmmo = sigmaMaxAmmo;
@@ -1315,7 +1315,7 @@ public partial class Player {
 		if (charNum == (int)CharIds.Sigma) {
 			loadout.sigmaLoadout.sigmaForm = data.extraData[0];
 			loadout.sigmaLoadout.maverick1 = data.extraData[1];
-			loadout.sigmaLoadout.maverick1 = data.extraData[2];
+			loadout.sigmaLoadout.maverick2 = data.extraData[2];
 			if (isSigma1()) {
 				sigmaMaxAmmo = 20;
 				sigmaAmmo = sigmaMaxAmmo;
@@ -1527,6 +1527,11 @@ public partial class Player {
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, dnaNetId, true, isWarpIn: false
 			);
+		} else if  (charNum == (int)CharIds.KaiserSigma) {
+			character = new KaiserSigma(
+				this, character.pos.x, character.pos.y, character.xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
 		} else {
 			throw new Exception("Error: Non-valid char ID: " + charNum);
 		}
@@ -1548,7 +1553,7 @@ public partial class Player {
 		if (charNum == (int)CharIds.PunchyZero) {
 			retChar.weapons.Add(new ZeroBuster());
 		}
-		if (charNum == (int)CharIds.Sigma) {
+		if (charNum == (int)CharIds.KaiserSigma) {
 			retChar.weapons.Add(new SigmaMenuWeapon());
 		}
 		//weapons.Add(new AssassinBullet());

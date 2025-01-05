@@ -50,9 +50,6 @@ public class DNACore : AxlWeapon {
 		if (charNum == (int)CharIds.RagingChargeX) {
 			charNum = (int)CharIds.X;
 		}
-		if (charNum == (int)CharIds.KaiserSigma) {
-			charNum = (int)CharIds.Sigma;
-		}
 		if (character is MegamanX mmx) {
 			weapons = loadout.xLoadout.getWeaponsFromLoadout(character.player);
 			armorFlag = mmx.getArmorByte();
