@@ -1466,7 +1466,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool isSlowImmune() {
-		return isStatusImmune() || isNonDamageStatusImmune();
+		return isStatusImmune() || isNonDamageStatusImmune() || isPushImmune();
 	}
 
 	public virtual bool isStunImmune() {
