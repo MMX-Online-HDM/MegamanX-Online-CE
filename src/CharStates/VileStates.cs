@@ -248,7 +248,7 @@ public class VileHover : CharState {
 		base.onEnter(oldState);
 		vile = character as Vile ?? throw new NullReferenceException();
 		character.useGravity = false;
-		if (player.speedDevil) {
+		if (vile.hasSpeedDevil) {
 			flyVelMaxSpeed *= 1.1f;
 			flyVelAcc *= 1.1f;
 		}

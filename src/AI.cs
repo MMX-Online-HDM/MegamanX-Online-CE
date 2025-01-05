@@ -385,6 +385,7 @@ public class AI {
 		if (character is Zero || player.isSigma || character is PunchyZero) return 80;
 		return maxDist;
 	}
+
 	public void buySection() {
 		if (!player.isMainPlayer && character is MegamanX &&
 			player.aiArmorUpgradeIndex < player.aiArmorUpgradeOrder.Count && !Global.level.is1v1()
@@ -404,13 +405,15 @@ public class AI {
 				player.aiArmorUpgradeIndex++;
 			}
 		}
-		if (!player.isMainPlayer && character is Vile) {
+		if (!player.isMainPlayer && character is Vile vile) {
 			if (player.currency >= 3 && !player.frozenCastle) {
 				player.frozenCastle = true;
+				vile.hasFrozenCastle = true;
 				player.currency -= Vile.frozenCastleCost;
 			}
 			if (player.currency >= 3 && !player.speedDevil) {
 				player.speedDevil = true;
+				vile.hasSpeedDevil = true;
 				player.currency -= Vile.speedDevilCost;
 			}
 		}

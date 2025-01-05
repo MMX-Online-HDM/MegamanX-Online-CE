@@ -30,7 +30,8 @@ public class DNACore : AxlWeapon {
 	public float maxHealth;
 	public string name;
 	public int alliance;
-	public ushort armorFlag;
+	public int armorFlag;
+	public byte hyperArmorBools;
 	public bool frozenCastle;
 	public bool speedDevil;
 	public bool ultimateArmor;
@@ -41,19 +42,27 @@ public class DNACore : AxlWeapon {
 
 	public DNACore(Character character) : base(0) {
 		charNum = character.player.charNum;
-		loadout = character.player.loadout;
+		loadout = character.player.atransLoadout ?? character.player.loadout;
 		maxHealth = (float)Math.Ceiling(character.maxHealth);
 		name = character.player.name;
 		alliance = character.player.alliance;
-		armorFlag = character.player.armorFlag;
-		frozenCastle = character.player.frozenCastle;
-		speedDevil = character.player.speedDevil;
-		ultimateArmor = character is MegamanX { hasUltimateArmor: true };
-		if (charNum == 11) {
-			charNum = 1;
+
+		if (charNum == (int)CharIds.RagingChargeX) {
+			charNum = (int)CharIds.X;
 		}
-		if (character is MegamanX) {
+		if (charNum == (int)CharIds.KaiserSigma) {
+			charNum = (int)CharIds.Sigma;
+		}
+		if (character is MegamanX mmx) {
 			weapons = loadout.xLoadout.getWeaponsFromLoadout(character.player);
+			armorFlag = mmx.getArmorByte();
+			ultimateArmor = mmx.hasUltimateArmor;
+			hyperArmorBools = Helpers.boolArrayToByte([
+				mmx.hyperChestActive,
+				mmx.hyperArmActive,
+				mmx.hyperLegActive,
+				mmx.hyperHelmetActive,
+			]);
 		}
 		else if (character is Zero zero) {
 			rakuhouhaAmmo = zero.gigaAttack.ammo;
@@ -84,7 +93,10 @@ public class DNACore : AxlWeapon {
 		else if (character is BaseSigma) {
 			rakuhouhaAmmo = character.player.sigmaAmmo;
 		}
-
+		else if (character is Vile vile) {
+			frozenCastle = vile.hasFrozenCastle;
+			speedDevil = vile.hasSpeedDevil;
+		}
 		// For any hyper modes added here.
 		// be sure to de-apply them if "preserve undisguise" is used in: axl.updateDisguisedAxl()
 		if (character.sprite.name.Contains("vilemk2")) {
@@ -99,7 +111,7 @@ public class DNACore : AxlWeapon {
 		weaponBarBaseIndex = 30 + charNum;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 30 + charNum;
-		if (charNum == 4) {
+		if (charNum == (int)CharIds.Sigma) {
 			weaponSlotIndex = 65;
 		}
 		if (charNum == (int)CharIds.BusterZero || charNum == (int)CharIds.PunchyZero) {

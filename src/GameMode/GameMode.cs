@@ -2294,10 +2294,11 @@ public class GameMode {
 				Global.sprites["menu_megaman"].drawToHUD(4, x, sy + 4);
 			} else {
 				Global.sprites["menu_megaman_armors"].drawToHUD(0, x, sy + 4);
-				int boots = Player.getArmorNum(dnaCore.armorFlag, 0, true);
-				int body = Player.getArmorNum(dnaCore.armorFlag, 1, true);
-				int helmet = Player.getArmorNum(dnaCore.armorFlag, 2, true);
-				int arm = Player.getArmorNum(dnaCore.armorFlag, 3, true);
+				int[] armorVals = MegamanX.getArmorVals(dnaCore.armorFlag);
+				int boots = armorVals[2];
+				int body = armorVals[0];
+				int helmet = armorVals[3];
+				int arm = armorVals[1];
 
 				if (helmet == 1) Global.sprites["menu_megaman_armors"].drawToHUD(1, x, sy + 4);
 				if (helmet == 2) Global.sprites["menu_megaman_armors"].drawToHUD(2, x, sy + 4);

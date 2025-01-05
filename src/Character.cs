@@ -2525,7 +2525,7 @@ public partial class Character : Actor, IDamagable {
 					damageSavings += originalDamage / 8m;
 				}
 			}
-			if (this is Vile vile && vile.hasFrozenCastleBarrier()) {
+			if (this is Vile vile && vile.hasFrozenCastle) {
 				damageSavings += originalDamage * Vile.frozenCastlePercent;
 			}
 		}
@@ -3113,10 +3113,6 @@ public partial class Character : Actor, IDamagable {
 				if (altShootPressed && player.currency >= 1) {
 					player.currency -= 1;
 					lastDNA.hyperMode = DNACoreHyperMode.None;
-					// Turn ultimate and golden armor into naked X
-					if (lastDNA.armorFlag >= byte.MaxValue - 1) {
-						lastDNA.armorFlag = 0;
-					}
 					// Turn ancient gun into regular axl bullet
 					if (lastDNA.weapons.Count > 0 &&
 						lastDNA.weapons[0] is AxlBullet ab &&

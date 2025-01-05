@@ -822,6 +822,21 @@ public class MegamanX : Character {
 		helmetArmor = (ArmorId)values[3];
 	}
 
+	public static int[] getArmorVals(int armorByte) {
+		int[] values = new int[4];
+		for (int i = values.Length - 1; i >= 0; i--) {
+			int offF = (i + 1) * 4;
+			int offB = i * 4;
+			values[i] = ((armorByte >> offF << offF) ^ armorByte) >> offB;
+		}
+		return [
+			values[0],
+			values[1],
+			values[2],
+			values[3]
+		];
+	}
+
 	public override List<byte> getCustomActorNetData() {
 		List<byte> customData = base.getCustomActorNetData();
 

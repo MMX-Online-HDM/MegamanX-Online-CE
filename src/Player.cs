@@ -326,7 +326,7 @@ public partial class Player {
 	public LoadoutData loadout;
 	public bool loadoutSet;
 	public LoadoutData previousLoadout;
-	public LoadoutData oldAxlLoadout;
+	public LoadoutData? atransLoadout;
 	public AxlLoadout axlLoadout { get { return loadout.axlLoadout; } }
 
 	public bool frozenCastlePurchased;
@@ -334,11 +334,8 @@ public partial class Player {
 
 	// Note: Every time you add an armor, add an "old" version and update DNA Core code appropriately
 	public ushort armorFlag;
-	public ushort oldArmorFlag;
 	public bool frozenCastle;
-	public bool oldFrozenCastle;
 	public bool speedDevil;
-	public bool oldSpeedDevil;
 
 	public Disguise? disguise;
 
@@ -1031,7 +1028,9 @@ public partial class Player {
 		}
 		if (charNum == (int)CharIds.Sigma) {
 			return [
-				(byte)loadout.sigmaLoadout.sigmaForm
+				(byte)loadout.sigmaLoadout.sigmaForm,
+				(byte)loadout.sigmaLoadout.maverick1,
+				(byte)loadout.sigmaLoadout.maverick2
 			];
 		}
 		return [];
@@ -1072,6 +1071,8 @@ public partial class Player {
 		}
 		if (charNum == (int)CharIds.Sigma) {
 			loadout.sigmaLoadout.sigmaForm = extraData[0];
+			loadout.sigmaLoadout.maverick1 = extraData[1];
+			loadout.sigmaLoadout.maverick1 = extraData[2];
 			if (isSigma1()) {
 				sigmaMaxAmmo = 20;
 				sigmaAmmo = sigmaMaxAmmo;
@@ -1302,10 +1303,34 @@ public partial class Player {
 		LoadoutData oldLoadout = loadout;
 		// If somehow even after all the safeguards fail we use the default one.
 		if (data.loadout == null) {
-			data.loadout = loadout;
+			data.loadout = new();
 		}
-		// Change character.
+
 		loadout = data.loadout;
+		if (charNum == (int)CharIds.Sigma) {
+			loadout.sigmaLoadout.sigmaForm = data.extraData[0];
+			loadout.sigmaLoadout.maverick1 = data.extraData[1];
+			loadout.sigmaLoadout.maverick1 = data.extraData[2];
+			if (isSigma1()) {
+				sigmaMaxAmmo = 20;
+				sigmaAmmo = sigmaMaxAmmo;
+			} else if (isSigma2()) {
+				sigmaMaxAmmo = 28;
+				sigmaAmmo = 0;
+			}
+		}
+		if (charNum == (int)CharIds.X) {
+			loadout.xLoadout.weapon1 = data.extraData[0];
+			loadout.xLoadout.weapon2 = data.extraData[1];
+			loadout.xLoadout.weapon3 = data.extraData[2];
+			loadout.xLoadout.melee = data.extraData[3];
+		}
+		if (charNum == (int)CharIds.Axl) {
+			loadout.axlLoadout.weapon2 = data.extraData[0];
+			loadout.xLoadout.weapon3 = data.extraData[1];
+		}
+
+		// Change character.
 		Character? retChar = null;
 		if (data.charNum == (int)CharIds.X) {
 			retChar = new MegamanX(
@@ -1381,11 +1406,6 @@ public partial class Player {
 		Global.level.removeGameObject(preTransformedAxl);
 		character = retChar;
 
-		// Save old flags.
-		oldArmorFlag = armorFlag;
-		oldSpeedDevil = speedDevil;
-		oldFrozenCastle = frozenCastle;;
-
 		// Armor flags for X.
 		if (data.charNum == (int)CharIds.X) {
 			armorFlag = BitConverter.ToUInt16(
@@ -1395,9 +1415,8 @@ public partial class Player {
 				retX.hasUltimateArmor = (data.extraData[2] == 1);
 			}
 		}
-		// Change weapons.
-		configureWeapons();
-		// Restore old loadout.
+		// Restore old loadout and save the transformed one.
+		atransLoadout = loadout;
 		loadout = oldLoadout;
 	}
 
@@ -1414,14 +1433,6 @@ public partial class Player {
 		disguise = new Disguise(dnaCore.name);
 		charNum = dnaCore.charNum;
 
-		oldArmorFlag = armorFlag;
-		oldFrozenCastle = frozenCastle;
-		oldSpeedDevil = speedDevil;
-
-		armorFlag = dnaCore.armorFlag;
-		frozenCastle = dnaCore.frozenCastle;
-		speedDevil = dnaCore.speedDevil;
-
 		bool isVileMK2 = charNum == 2 && dnaCore.hyperMode == DNACoreHyperMode.VileMK2;
 		bool isVileMK5 = charNum == 2 && dnaCore.hyperMode == DNACoreHyperMode.VileMK5;
 
@@ -1431,16 +1442,8 @@ public partial class Player {
 		}
 
 		if (ownedByLocalPlayer) {
-			byte[]? extraData = null;
-			if (dnaCore.charNum == (int)CharIds.X) {
-				byte[] armorBytes = BitConverter.GetBytes(character.player.armorFlag);
-
-				extraData = new byte[] {
-					armorBytes[0],
-					armorBytes[1],
-					dnaCore.ultimateArmor ? (byte)1 : (byte)0
-				};
-			} else if (dnaCore.charNum == (int)CharIds.Vile) {
+			byte[] extraData = getCharSpawnData(newCharNum);
+			if (dnaCore.charNum == (int)CharIds.Vile) {
 				extraData = new byte[1];
 				if (isVileMK2) {
 					extraData[0] = 1;
@@ -1448,9 +1451,6 @@ public partial class Player {
 				if (isVileMK5) {
 					extraData[0] = 2;
 				}
-			} else if (dnaCore.charNum == (int)CharIds.Sigma) {
-				extraData = new byte[1];
-				extraData[0] = (byte)dnaCore.loadout.sigmaLoadout.sigmaForm;
 			}
 			string json = JsonConvert.SerializeObject(
 				new RPCAxlDisguiseJson(
@@ -1460,7 +1460,7 @@ public partial class Player {
 			);
 			Global.serverClient?.rpc(RPC.axlDisguise, json);
 		}
-		oldAxlLoadout = loadout;
+		LoadoutData oldLoadout = loadout;
 		loadout = dnaCore.loadout;
 
 		Character? retChar = null;
@@ -1479,7 +1479,10 @@ public partial class Player {
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, dnaNetId, true, isWarpIn: false,
 				mk2VileOverride: isVileMK2, mk5VileOverride: isVileMK5
-			);
+			) {
+				hasFrozenCastle = dnaCore.frozenCastle,
+				hasSpeedDevil = dnaCore.speedDevil
+			};
 		} else if (charNum == (int)CharIds.Axl) {
 			retChar = new Axl(
 				this, character.pos.x, character.pos.y, character.xDir,
@@ -1602,18 +1605,25 @@ public partial class Player {
 			}
 			axl.axlSwapTime = 0.25f;
 		}
-
+		dnaCore.ultimateArmor = false;
 		dnaCore.usedOnce = true;
 		dnaCore.hyperMode = DNACoreHyperMode.None;
+
+		// Restore old loadout and save the transformed one.
+		atransLoadout = loadout;
+		loadout = oldLoadout;
 	}
 
 	// If you change this method change revertToAxlDeath() too
 	public void revertToAxl(ushort? backupNetId = null) {
 		disguise = null;
+		atransLoadout = null;
 		Character oldChar = character;
 
 		if (ownedByLocalPlayer) {
-			string json = JsonConvert.SerializeObject(new RPCAxlDisguiseJson(id, "", -1));
+			string json = JsonConvert.SerializeObject(
+				new RPCAxlDisguiseJson(id, "", -1, loadout, preTransformedAxl.netId.Value)
+			);
 			Global.serverClient?.rpc(RPC.axlDisguise, json);
 
 			if (character is Zero zero) {
@@ -1632,7 +1642,9 @@ public partial class Player {
 			if (backupNetId == null) {
 				throw new Exception("Error: Missing NetID on Axl trasform RPC.");
 			}
-			preTransformedAxl = new Axl(this, oldPos.x, oldPos.y, oldDir, true, backupNetId, ownedByLocalPlayer, false);
+			preTransformedAxl = new Axl(
+				this, oldPos.x, oldPos.y, oldDir, true, backupNetId, ownedByLocalPlayer, false
+			);
 		} else {
 			Global.level.addGameObject(preTransformedAxl);
 		}
@@ -1644,39 +1656,46 @@ public partial class Player {
 		character.xDir = oldDir;
 		maxHealth = getMaxHealth();
 		health = Math.Min(health, maxHealth);
-		loadout = oldAxlLoadout;
-		character.weapons = oldWeapons;
-		character.weaponSlot = 0;
-
-		armorFlag = oldArmorFlag;
-		speedDevil = oldSpeedDevil;
-		frozenCastle = oldFrozenCastle;
-
-		lastDNACore = null;
-		lastDNACoreIndex = 4;
-		character.ownedByLocalPlayer = ownedByLocalPlayer;
-
-		character.weapons.AddRange(oldChar.weapons.Where((Weapon w) => w is MaverickWeapon { summonedOnce: true }));
 
 		if (ownedByLocalPlayer) {
-			if (oldChar.charState.canStopJump) {
+			character.weaponSlot = 0;
+			lastDNACore = null;
+			lastDNACoreIndex = 4;
+			character.weapons.AddRange(oldChar.weapons.Where((Weapon w) => w is MaverickWeapon { summonedOnce: true }));
+			character.grounded = oldChar.grounded;
+			if (oldChar.charState.canStopJump && !oldChar.grounded) {
 				character.changeState(new Jump(), true);
 			} else {
 				character.changeToIdleOrFall();
 			}
+			// Speed
 			character.vel = oldChar.vel;
 			character.slideVel = oldChar.slideVel;
 			character.xFlinchPushVel = oldChar.xFlinchPushVel;
 			character.xIceVel = oldChar.xIceVel;
+
+			// Status effects.
+			character.burnTime = oldChar.burnTime;
+			character.acidTime = oldChar.acidTime;
+			character.oilTime = oldChar.oilTime;
+			character.igFreezeProgress = oldChar.igFreezeProgress;
+			character.virusTime = oldChar.virusTime;
+
+			// Hit cooldowns.
+			character.projectileCooldown = oldChar.projectileCooldown;
+			character.flinchCooldown = oldChar.flinchCooldown;
 		}
 	}
 
 	// If you change this method change revertToAxl() too
 	public void revertToAxlDeath() {
 		disguise = null;
+		atransLoadout = null;
 
 		if (ownedByLocalPlayer) {
-			string json = JsonConvert.SerializeObject(new RPCAxlDisguiseJson(id, "", -2));
+			string json = JsonConvert.SerializeObject(
+				new RPCAxlDisguiseJson(id, "", -2, loadout, character.netId.Value)
+			);
 			Global.serverClient?.rpc(RPC.axlDisguise, json);
 
 			if (character is Zero zero) {
@@ -1689,18 +1708,14 @@ public partial class Player {
 		}
 		preTransformedAxl = null;
 		charNum = 3;
-		maxHealth = getMaxHealth();
-		health = 0;
-		loadout = oldAxlLoadout;
-		configureWeapons();
-		character.weaponSlot = 0;
-
-		armorFlag = oldArmorFlag;
-		speedDevil = oldSpeedDevil;
-		frozenCastle = oldFrozenCastle;
-
-		lastDNACore = null;
-		lastDNACoreIndex = 4;
+		if (ownedByLocalPlayer) {
+			maxHealth = getMaxHealth();
+			health = 0;
+			configureWeapons();
+			character.weaponSlot = 0;
+			lastDNACore = null;
+			lastDNACoreIndex = 4;
+		}
 		character.addTransformAnim();
 	}
 
