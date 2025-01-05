@@ -259,6 +259,8 @@ public class GravityWellProj : Projectile, IDamagable {
 	public void heal(float healAmount, bool allowStacking = true) { }
 	public bool isInvincible(Player attacker, int? projId) { return false; }
 	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) { }
+
+	public bool isPlayableDamagable() { return false; }
 }
 
 public class GravityWellProjCharged : Projectile, IDamagable {
@@ -392,6 +394,7 @@ public class GravityWellProjCharged : Projectile, IDamagable {
 	public bool isInvincible(Player attacker, int? projId) { return false; }
 	public bool canBeHealed(int healerAlliance) { return false; }
 	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) { }
+	public bool isPlayableDamagable() { return false; }
 }
 
 public class GravityWellChargedState : CharState {
