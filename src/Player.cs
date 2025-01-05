@@ -1447,7 +1447,7 @@ public partial class Player {
 		}
 
 		if (ownedByLocalPlayer) {
-			byte[] extraData = getCharSpawnData(newCharNum);
+			byte[] extraData = getCharSpawnData(dnaCore.charNum);
 			if (dnaCore.charNum == (int)CharIds.Vile) {
 				extraData = new byte[1];
 				if (isVileMK2) {

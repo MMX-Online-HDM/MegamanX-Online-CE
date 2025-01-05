@@ -41,7 +41,7 @@ public class DNACore : AxlWeapon {
 	public bool usedOnce = false;
 
 	public DNACore(Character character) : base(0) {
-		charNum = character.player.charNum;
+		charNum = (int)character.charId;
 		loadout = character.player.atransLoadout ?? character.player.loadout;
 		maxHealth = (float)Math.Ceiling(character.maxHealth);
 		name = character.player.name;
