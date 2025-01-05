@@ -1298,6 +1298,14 @@ public partial class Player {
 		disguise = new Disguise(data.targetName);
 		charNum = data.charNum;
 
+		// We temporally change loadout to populate it.
+		LoadoutData oldLoadout = loadout;
+		// If somehow even after all the safeguards fail we use the default one.
+		if (data.loadout == null) {
+			data.loadout = loadout;
+		}
+		// Change character.
+		loadout = data.loadout;
 		Character? retChar = null;
 		if (data.charNum == (int)CharIds.X) {
 			retChar = new MegamanX(
@@ -1387,15 +1395,9 @@ public partial class Player {
 				retX.hasUltimateArmor = (data.extraData[2] == 1);
 			}
 		}
-		// Store old weapons.
-		oldWeapons = weapons;
-
 		// Change weapons.
-		// We temporally change loadout to populate it.
-		if (data.loadout == null) { return; }
-		LoadoutData oldLoadout = loadout;
-		loadout = data.loadout;
 		configureWeapons();
+		// Restore old loadout.
 		loadout = oldLoadout;
 	}
 
@@ -1422,6 +1424,11 @@ public partial class Player {
 
 		bool isVileMK2 = charNum == 2 && dnaCore.hyperMode == DNACoreHyperMode.VileMK2;
 		bool isVileMK5 = charNum == 2 && dnaCore.hyperMode == DNACoreHyperMode.VileMK5;
+
+		// If somehow the DNA core loadout is null we copy current one.
+		if (dnaCore.loadout == null) {
+			dnaCore.loadout = loadout;
+		}
 
 		if (ownedByLocalPlayer) {
 			byte[]? extraData = null;

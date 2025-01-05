@@ -1404,13 +1404,13 @@ public class RPCAxlDisguiseJson {
 	public string targetName;
 	public int charNum;
 	public byte[] extraData;
-	public LoadoutData? loadout;
+	public LoadoutData loadout;
 
 	public RPCAxlDisguiseJson() { }
 
 	public RPCAxlDisguiseJson(
 		int playerId, string targetName, int charNum,
-		LoadoutData? loadout = null,
+		LoadoutData loadout = null,
 		ushort dnaNetId = 0, byte[]? extraData = null
 	) {
 		this.playerId = playerId;
