@@ -1490,14 +1490,11 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool isStatusImmune() {
-		return (
-			isTrueStatusImmune() || isInvulnerable() ||
-			isVaccinated() || isStatusImmuneHyperMode()
-		);
+		return isTrueStatusImmune() || isVaccinated() || isStatusImmuneHyperMode();
 	}
 
 	public virtual bool isTrueStatusImmune() {
-		return false;
+		return isInvulnerable(true);
 	}
 
 	public virtual bool isStatusImmuneHyperMode() {
@@ -1524,7 +1521,9 @@ public partial class Character : Actor, IDamagable {
 		if (!ignoreRideArmorHide && !string.IsNullOrEmpty(sprite?.name) && sprite.name.Contains("ra_hide")) {
 			return true;
 		}
-		if (charState.specialId == SpecialStateIds.AxlRoll || charState.specialId == SpecialStateIds.XTeleport) {
+		if (!ignoreRideArmorHide && (
+			charState.specialId == SpecialStateIds.AxlRoll || charState.specialId == SpecialStateIds.XTeleport
+		)) {
 			return true;
 		}
 		if (sprite != null && sprite.name.Contains("viral_exit")) {

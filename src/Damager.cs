@@ -525,7 +525,7 @@ public class Damager {
 			}
 
 			if (!character.isFlinchImmune() &&
-				!character.isInvulnerable(true, true) &&
+				!character.isInvulnerable(false, true) &&
 				!isDot(projId) && (
 				owner?.character is Zero zero && zero.isBlack ||
 				owner?.character is PunchyZero pzero && pzero.isBlack
