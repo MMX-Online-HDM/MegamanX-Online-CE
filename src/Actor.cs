@@ -799,7 +799,7 @@ public partial class Actor : GameObject {
 		} else if (physicsCollider != null && !isStatic && (canBeGrounded || useGravity)) {
 			float yDist = 1;
 			if (grounded) {
-				yDist = 300 * Global.spf;
+				yDist = 1;
 			}
 			yDist *= yMod;
 
