@@ -1102,14 +1102,17 @@ public partial class Character : Actor, IDamagable {
 			player.input.isPressed(Control.Jump, player) &&
 			(charState.wallKickLeftWall != null || charState.wallKickRightWall != null)
 		) {
+			// Reset airdash and disable dash speed.
 			dashedInAir = 0;
 			isDashing = false;
+			// Enable dash speed if input if pressed.
 			if (player.input.isHeld(Control.Dash, player) &&
 				(charState.useDashJumpSpeed || charState is WallSlide or WallSlideAttack)
 			) {
 				isDashing = true;
 				dashedInAir++;
 			}
+			// Jump action.
 			vel.y = -getJumpPower();
 			wallKickDir = 0;
 			if (charState.wallKickLeftWall != null) {
@@ -1127,14 +1130,18 @@ public partial class Character : Actor, IDamagable {
 				}
 			}
 			wallKickTimer = maxWallKickTime;
+			// Set wallkick state if normal ctrl.
 			if (charState.normalCtrl || charState is WallSlide or WallSlideAttack) {
 				changeState(new WallKick(), true);
 				if (wallKickDir != 0) {
 					xDir = -wallKickDir;
 				}
-			} else {
+			}
+			// Play sound and wallkick mid-state if not.
+			else {
 				playSound("jump", sendRpc: true);
 			}
+			// GFX.
 			var wallSparkPoint = pos.addxy(12 * xDir, 0);
 			var rect = new Rect(wallSparkPoint.addxy(-2, -2), wallSparkPoint.addxy(2, 2));
 			if (Global.level.checkCollisionShape(rect.getShape(), null) != null) {
