@@ -11,6 +11,7 @@ public class BusterZeroMelee : CharState {
 	public BusterZeroMelee() : base("projswing") {
 		landSprite = "projswing";
 		airSprite = "projswing_air";
+		useDashJumpSpeed = true;
 		airMove = true;
 		canJump = true;
 		canStopJump = true;
@@ -91,6 +92,7 @@ public class BusterZeroDoubleBuster : CharState {
 	public BusterZeroDoubleBuster(bool isSecond, int startstockLevel) : base("doublebuster") {
 		this.isSecond = isSecond;
 		this.startStockLevel = startstockLevel;
+		useDashJumpSpeed = true;
 		airMove = true;
 		superArmor = false;
 		canStopJump = true;
@@ -198,6 +200,7 @@ public class BusterZeroHadangeki : CharState {
 		landSprite = "projswing";
 		airSprite = "projswing_air";
 		airMove = true;
+		useDashJumpSpeed = true;
 		superArmor = false;
 		canStopJump = true;
 		canJump = true;
@@ -244,6 +247,7 @@ public class BusterZeroHadangekiWall : CharState {
 	public BusterZeroHadangekiWall(int wallDir, Collider wallCollider) : base("wall_slide_attack") {
 		this.wallDir = wallDir;
 		this.wallCollider = wallCollider;
+		useDashJumpSpeed = true;
 		superArmor = true;
 		useGravity = false;
 	}

@@ -1144,10 +1144,12 @@ public partial class Character : Actor, IDamagable {
 			return true;
 		}
 		if (charState.canStopJump &&
+			!charState.stoppedJump &&
 			!grounded && vel.y < 0 &&
 			!player.input.isHeld(Control.Jump, player)
 		) {
 			vel.y = 0;
+			charState.stoppedJump = true;
 		}
 		if (charState.airMove && !grounded) {
 			airMove();
@@ -1161,6 +1163,9 @@ public partial class Character : Actor, IDamagable {
 				}
 				if (player.input.isHeld(Control.Dash, player) && charState.useDashJumpSpeed && canDash()) { 
 					isDashing = true;
+				}
+				if (charState.canStopJump) {
+					charState.stoppedJump = false;
 				}
 				vel.y = -getJumpPower();
 				playSound("jump", sendRpc: true);
@@ -1751,7 +1756,12 @@ public partial class Character : Actor, IDamagable {
 		if (grounded) {
 			changeState(new Idle(transitionSprite), true);
 		} else {
-			changeState(new Fall(), true);
+			if (vel.y * gravityModifier < 0 && charState.canStopJump && !charState.stoppedJump) {
+				changeState(new Jump() { enterSound = "" }, true);
+				frameIndex = sprite.totalFrameNum - 1;
+			} else {
+				changeState(new Fall(), true);
+			}
 		}
 	}
 
@@ -1759,7 +1769,12 @@ public partial class Character : Actor, IDamagable {
 		if (grounded) {
 			landingCode(useSound);
 		} else {
-			changeState(new Fall(), true);
+			if (vel.y * gravityModifier < 0 && charState.canStopJump && !charState.stoppedJump) {
+				changeState(new Jump() { enterSound = "" }, true);
+				frameIndex = sprite.totalFrameNum - 1;
+			} else {
+				changeState(new Fall(), true);
+			}
 		}
 	}
 
@@ -1767,7 +1782,12 @@ public partial class Character : Actor, IDamagable {
 		if (grounded) {
 			changeState(new Crouch(), true);
 		} else {
-			changeState(new Fall(), true);
+			if (vel.y * gravityModifier < 0 && charState.canStopJump && !charState.stoppedJump) {
+				changeState(new Jump() { enterSound = "" }, true);
+				frameIndex = sprite.totalFrameNum - 1;
+			} else {
+				changeState(new Fall(), true);
+			}
 		}
 	}
 

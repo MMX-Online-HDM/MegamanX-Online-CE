@@ -1569,7 +1569,7 @@ public partial class Player {
 
 		// Speed and state.
 		if (retChar.charId != CharIds.KaiserSigma) {
-			if (character.charState.canStopJump) {
+			if (character.charState.canStopJump && !character.charState.stoppedJump) {
 				retChar.changeState(new Jump(), true);
 			} else {
 				retChar.changeToIdleOrFall();

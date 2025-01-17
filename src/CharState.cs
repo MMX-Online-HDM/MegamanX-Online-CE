@@ -56,6 +56,7 @@ public class CharState {
 	public bool airMove;
 	public bool canJump;
 	public bool canStopJump;
+	public bool stoppedJump;
 	public bool exitOnLanding;
 	public bool exitOnAirborne;
 	public bool useDashJumpSpeed;
@@ -126,8 +127,8 @@ public class CharState {
 			character.stopMoving();
 		}
 		wasGrounded = character.grounded;
-		if (this is not Jump and not WallKick && oldState.canStopJump == false) {
-			canStopJump = false;
+		if (this is not Jump and not WallKick && (!oldState.canStopJump || oldState.stoppedJump)) {
+			stoppedJump = true;
 		}
 	}
 
