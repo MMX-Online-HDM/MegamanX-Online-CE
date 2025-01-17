@@ -289,7 +289,7 @@ public class BaseSigma : Character {
 						}
 
 						mw.summon(player, currentPos.addxy(0, -112), currentPos, xDir);
-						mw.maverick.health = mw.lastHealth;
+						mw.maverick!.health = mw.lastHealth;
 						becomeMaverick(mw.maverick);
 					}
 				}
@@ -323,7 +323,7 @@ public class BaseSigma : Character {
 			var mw = player.weapons[0] as MaverickWeapon;
 			if (mw != null) {
 				mw.summon(player, pos.addxy(0, -112), pos, xDir);
-				mw.maverick.health = mw.lastHealth;
+				mw.maverick!.health = mw.lastHealth;
 				becomeMaverick(mw.maverick);
 			}
 		}
@@ -343,25 +343,17 @@ public class BaseSigma : Character {
 		) {
 			return;
 		}
-		/*
-		if (charState.canAttack() &&
-			player.input.isHeld(Control.Shoot, player) &&
-			player.weapon is not MaverickWeapon && !isAttacking() &&
-			player.isSigma2() && saberCooldown == 0
-		) {
-			saberCooldown = 0.2f;
-			changeState(new SigmaClawState(charState, !grounded), true);
-			playSound("sigma2slash", sendRpc: true);
-			return;
-		}
-		*/
 		if (player.weapon is MaverickWeapon mw2 && player.input.isPressed(Control.Special2, player)) {
 			mw2.isMenuOpened = true;
 		}
 	}
 
 	public override bool normalCtrl() {
-		var changedState = base.normalCtrl();
+		if (grounded && player.isControllingPuppet()) {
+			changeState(new SigmaAutoBlock());
+			return true;
+		}
+		bool changedState = base.normalCtrl();
 		if (changedState || !charState.normalCtrl) {
 			return true;
 		}

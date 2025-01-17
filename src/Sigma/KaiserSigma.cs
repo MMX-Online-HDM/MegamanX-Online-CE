@@ -27,7 +27,7 @@ public partial class KaiserSigma : Character {
 
 	public KaiserSigma(
 		Player player, float x, float y, int xDir, bool isVisible,
-		ushort? netId, bool ownedByLocalPlayer, bool isWarpIn = false
+		ushort? netId, bool ownedByLocalPlayer, bool isWarpIn = false, bool isRevive = true
 	) : base(
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, false, false
 	) { 
@@ -45,9 +45,24 @@ public partial class KaiserSigma : Character {
 			visible = false
 		};
 		maxHealth = (decimal)Player.getModifiedHealth(32);
-		if (!ownedByLocalPlayer) {
+		if (!ownedByLocalPlayer || isRevive) {
 			health = maxHealth;
 		}
+		if (!ownedByLocalPlayer) {
+			visible = true;
+			return;
+		}
+		if (isRevive) {
+			useGravity = false;
+			changeSprite("kaisersigma_enter", true);
+			changeState(new KaiserSigmaRevive(player.explodeDieEffect), true);
+		} else {
+			visible = true;
+			changeSprite("kaisersigma_idle", true);
+			changeState(new KaiserSigmaIdleState(), true);
+		}
+		grounded = false;
+		canBeGrounded = false;
 	}
 
 	public override void update() {
@@ -84,6 +99,10 @@ public partial class KaiserSigma : Character {
 		} else {
 			kaiserExhaustL.visible = false;
 			kaiserExhaustR.visible = false;
+		}
+
+		if (weapons.Count > 0 && player.input.isHeld(Control.Down, player)) {
+			player.changeWeaponControls();
 		}
 	}
 
@@ -229,7 +248,7 @@ public partial class KaiserSigma : Character {
 		if (hitbox.name == "body") {
 			return (int)MeleeIds.Suit;
 		}
-		if (sprite.name == "kaisersigma_fall" && collider.isAttack()) {
+		if (sprite.name == "kaisersigma_fall") {
 			return (int)MeleeIds.Stomp;
 		}
 		return (int)MeleeIds.None;

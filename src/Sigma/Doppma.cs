@@ -125,11 +125,11 @@ public class Doppma : BaseSigma {
 
 	// This can run on both owners and non-owners. So data used must be in sync.
 	public override int getHitboxMeleeId(Collider hitbox) {
-		if (hitbox.name == "shield") {
-			return (int)MeleeIds.Shield;
-		}
 		if (sprite.name == "sigma3_block") {
 			return (int)MeleeIds.ShieldGuard;
+		}
+		if (hitbox.name == "shield") {
+			return (int)MeleeIds.Shield;
 		}
 		return (int)MeleeIds.None;
 	}

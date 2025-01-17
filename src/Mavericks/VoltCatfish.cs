@@ -310,7 +310,7 @@ public class VoltCSuckProj : Projectile {
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
 		if (vc == null) return;
-		if (damagable.isPlayableDamagable()) { return; }
+		if (!damagable.isPlayableDamagable()) { return; }
 		if (damagable is not Actor actor || !actor.ownedByLocalPlayer) {
 			return;
 		}

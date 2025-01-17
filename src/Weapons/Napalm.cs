@@ -565,7 +565,7 @@ public class SplashHitProj : Projectile {
 
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
-		if (damagable.isPlayableDamagable()) { return; }
+		if (!damagable.isPlayableDamagable()) { return; }
 		if (damagable is not Actor actor || !actor.ownedByLocalPlayer) {
 			return;
 		}

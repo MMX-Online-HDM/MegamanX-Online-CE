@@ -191,6 +191,7 @@ public class KaiserSigmaHoverState : KaiserSigmaBaseState {
 		immuneToWind = true;
 		showExhaust = true;
 		canShootBallistics = true;
+		useGravity = false;
 	}
 
 	public override void update() {
@@ -217,7 +218,8 @@ public class KaiserSigmaHoverState : KaiserSigmaBaseState {
 
 		exhaustMoveDir = 0;
 		if (!moveAmount.isZero()) {
-			if (moveAmount.y > 0 && character.checkCollision(0, moveAmount.y * Global.spf) != null) {
+			CollideData? collideData = character.checkCollision(0, moveAmount.y * Global.spf);
+			if (moveAmount.y > 0 && collideData?.isGroundHit() == true) {
 				kaiserSigma.changeToKaiserIdleOrFall();
 				character.playSound("crash", sendRpc: true);
 				character.shakeCamera(sendRpc: true);
@@ -764,9 +766,8 @@ public class KaiserSigmaRevive : CharState {
 	int state = 0;
 	public ExplodeDieEffect explodeDieEffect;
 	public Point spawnPoint;
-	public KaiserSigmaRevive(ExplodeDieEffect explodeDieEffect, Point spawnPoint) : base("enter") {
+	public KaiserSigmaRevive(ExplodeDieEffect explodeDieEffect) : base("enter") {
 		this.explodeDieEffect = explodeDieEffect;
-		this.spawnPoint = spawnPoint;
 	}
 
 	float alphaTime;
@@ -814,7 +815,7 @@ public class KaiserSigmaRevive : CharState {
 
 			if (player.health >= player.maxHealth) {
 				character.invulnTime = 0.5f;
-				character.useGravity = false;
+				character.useGravity = true;
 				character.stopMoving();
 				character.grounded = false;
 				character.canBeGrounded = false;
@@ -826,6 +827,7 @@ public class KaiserSigmaRevive : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		spawnPoint = character.pos;
 		character.syncScale = true;
 		character.frameIndex = 0;
 		character.frameSpeed = 0;

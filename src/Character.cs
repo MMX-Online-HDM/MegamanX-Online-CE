@@ -229,7 +229,9 @@ public partial class Character : Actor, IDamagable {
 		lastGravityWellDamager = player;
 		maxHealth = (decimal)player.getMaxHealth();
 		health = 1;
-		healAmount = (float)maxHealth - 1;
+		if (player.disguise == null) {
+			healAmount = (float)maxHealth - 1;
+		}
 	}
 
 	public override void onStart() {
@@ -1470,7 +1472,10 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool isStunImmune() {
-		return isStatusImmune() || isInvulnerable() || isNonDamageStatusImmune() || charState.invincible;
+		return (
+			isStatusImmune() || isInvulnerable() || isNonDamageStatusImmune() ||
+			charState.invincible || charState.stunResistant
+		);
 	}
 
 	public virtual bool isFlinchImmune() {
@@ -1481,7 +1486,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool isPushImmune() {
-		return isTrueStatusImmune() || charState?.immuneToWind == true || immuneToKnockback || isClimbingLadder();
+		return isTrueStatusImmune() || charState.immuneToWind == true || immuneToKnockback || isClimbingLadder();
 	}
 
 	public virtual bool isTimeImmune() {
@@ -2517,6 +2522,9 @@ public partial class Character : Actor, IDamagable {
 		// Damage increase/reduction section
 		if (!isArmorPiercing) {
 			if (charState is SwordBlock) {
+				damageSavings += (originalDamage * 0.5m);
+			}
+			if (charState is SigmaAutoBlock) {
 				damageSavings += (originalDamage * 0.25m);
 			}
 			if (charState is SigmaBlock) {

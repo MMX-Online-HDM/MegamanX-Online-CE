@@ -68,37 +68,41 @@ public class CallDownMaverick : CharState {
 public class SigmaBlock : CharState {
 	public SigmaBlock() : base("block") {
 		superArmor = true;
+		stunResistant = true;
+		immuneToWind = true;
 		exitOnAirborne = true;
 		attackCtrl = true;
 		normalCtrl = true;
+	}
+
+	public override void update() {
+		base.update();
+		bool isHoldingGuard = player.isCrouchHeld();
+		int inputXDir = player.input.getXDir(player); 
+		if (inputXDir != 0) {
+			character.xDir = inputXDir;
+		}
+		if (!isHoldingGuard || Global.level.gameMode.isOver) {
+			character.changeToIdleOrFall();
+			return;
+		}
+	}
+}
+
+public class SigmaAutoBlock : CharState {
+	public SigmaAutoBlock() : base("block") {
+		superArmor = true;
 		stunResistant = true;
+		immuneToWind = true;
+		exitOnAirborne = true;
 	}
 
 	public override void update() {
 		base.update();
 
-		bool isHoldingGuard = player.isCrouchHeld();
-		if (!player.isControllingPuppet()) {
-			bool leftGuard = player.input.isHeld(Control.Left, player);
-			bool rightGuard = player.input.isHeld(Control.Right, player);
-
-			if (leftGuard) character.xDir = -1;
-			else if (rightGuard) character.xDir = 1;
-		}
-		if (!isHoldingGuard) {
+		if (!!player.isControllingPuppet() || Global.level.gameMode.isOver) {
 			character.changeToIdleOrFall();
 			return;
-		}
-		if (Global.level.gameMode.isOver) {
-			if (Global.level.gameMode.playerWon(player)) {
-				if (!character.sprite.name.Contains("_win")) {
-					character.changeSpriteFromName("win", true);
-				}
-			} else {
-				if (!character.sprite.name.Contains("lose")) {
-					character.changeSpriteFromName("lose", true);
-				}
-			}
 		}
 	}
 }

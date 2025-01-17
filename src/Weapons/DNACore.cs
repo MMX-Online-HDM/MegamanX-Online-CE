@@ -108,7 +108,11 @@ public class DNACore : AxlWeapon {
 		weaponBarBaseIndex = 30 + charNum;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 30 + charNum;
-		if (charNum == (int)CharIds.Sigma) {
+		if (charNum == (int)CharIds.Sigma ||
+			charNum == (int)CharIds.WolfSigma ||
+			charNum == (int)CharIds.ViralSigma ||
+			charNum == (int)CharIds.KaiserSigma
+		) {
 			weaponSlotIndex = 65;
 		}
 		if (charNum == (int)CharIds.BusterZero || charNum == (int)CharIds.PunchyZero) {

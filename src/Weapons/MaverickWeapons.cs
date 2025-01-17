@@ -169,6 +169,8 @@ public class SigmaMenuWeapon : Weapon {
 		weaponSlotIndex = 65;
 		displayName = "Sigma";
 		fireRate = 60 * 4;
+		drawAmmo = false;
+		drawCooldown = false;
 	}
 }
 

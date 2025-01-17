@@ -165,7 +165,7 @@ class Program {
 			loadText.Add("User: " + Options.main.playerName);
 		}
 		// Get CPU name here.
-		loadText.Add("CPU: " + getCpuName());
+		loadText.Add("CPU : " + getCpuName());
 		loadText.Add("Memory: " + (GC.GetGCMemoryInfo().TotalAvailableMemoryBytes / 1024) + "kb");
 		loadText.Add("");
 
