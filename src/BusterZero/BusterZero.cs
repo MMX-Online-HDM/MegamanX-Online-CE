@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace MMXOnline;
 
@@ -55,9 +56,11 @@ public class BusterZero : Character {
 			shootAnimTime -= Global.speedMul;
 			if (shootAnimTime <= 0) {
 				shootAnimTime = 0;
-				changeSpriteFromName(charState.defaultSprite, false);
-				if (charState is WallSlide) {
-					frameIndex = sprite.totalFrameNum - 1;
+				if (sprite.name == getSprite(charState.shootSprite)) {
+					changeSpriteFromName(charState.defaultSprite, false);
+					if (charState is WallSlide) {
+						frameIndex = sprite.totalFrameNum - 1;
+					}
 				}
 			}
 		}

@@ -157,9 +157,11 @@ public class PunchyZero : Character {
 			shootAnimTime -= Global.speedMul;
 			if (shootAnimTime <= 0) {
 				shootAnimTime = 0;
-				changeSpriteFromName(charState.defaultSprite, false);
-				if (charState is WallSlide) {
-					frameIndex = sprite.totalFrameNum - 1;
+				if (sprite.name == getSprite(charState.shootSprite)) {
+					changeSpriteFromName(charState.defaultSprite, false);
+					if (charState is WallSlide) {
+						frameIndex = sprite.totalFrameNum - 1;
+					}
 				}
 			}
 		}
