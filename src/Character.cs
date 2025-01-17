@@ -1129,7 +1129,12 @@ public partial class Character : Actor, IDamagable {
 					wallKickDir -= 1;
 				}
 			}
+			// Set variables.
 			wallKickTimer = maxWallKickTime;
+			charState.wallKickLeftWall = null;
+			charState.wallKickRightWall = null;
+			charState.lastLeftWall = null;
+			charState.lastRightWall = null;
 			// Set wallkick state if normal ctrl.
 			if (charState.normalCtrl || charState is WallSlide or WallSlideAttack) {
 				changeState(new WallKick(), true);
