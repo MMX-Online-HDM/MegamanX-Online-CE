@@ -365,9 +365,8 @@ public partial class Actor {
 		// and stop moving past a collider if that's the case
 		else {
 			freeFromCollision();
-
-			var inc = amount.clone();
-			var incAmount = inc.multiply(times);
+			Point inc = amount.clone();
+			Point incAmount = inc.multiply(times);
 
 			// Hack to make it not get stuck sometimes
 			if (this is RideChaser) {
@@ -376,37 +375,40 @@ public partial class Actor {
 				return;
 			}
 
-			var mtv = Global.level.getMtvDir(this, incAmount.x, incAmount.y, incAmount, pushIncline);
+			Point? mtv = Global.level.getMtvDir(this, incAmount.x, incAmount.y, incAmount, pushIncline);
 			if (mtv != null && mtv?.magnitude > 10) {
 				mtv = Global.level.getMtvDir(this, incAmount.x, incAmount.y, null, false);
 			}
 			incPos(incAmount);
 			if (mtv != null) {
-				incPos(mtv.Value.unitInc(0.01f));
+				//incPos(mtv.Value.unitInc(0.01f));
 			}
-
-			//This shouldn't be needed, but sometimes getMtvDir doesn't free properly or isn't returned
 			freeFromCollision();
 		}
 	}
 
 	public void freeFromCollision() {
-		//Already were colliding in first place: free with path of least resistance
-		var currentCollideDatas = Global.level.checkTerrainCollision(this, 0, 0, null);
+		// Already were colliding in first place: free with path of least resistance
+		List<CollideData> currentCollideDatas = Global.level.checkTerrainCollision(this, 0, 0, null);
+
+		Collider? terrainCollider = getTerrainCollider() ?? physicsCollider ?? collider;
+		if (terrainCollider == null) {
+			return;
+		}
  
-		foreach (var collideData in currentCollideDatas) {
+		foreach (CollideData collideData in currentCollideDatas) {
 			if (this is Character chara && collideData.gameObject is Character otherChara) {
 				chara.insideCharacter = true;
 				otherChara.insideCharacter = true;
 				continue;
 			}
 			Point? freeVec = null;
-			if (this is RideChaser rc && physicsCollider != null) {
+			if (this is RideChaser rc) {
 				// Hack to make ride chasers not get stuck on inclines
-				freeVec = physicsCollider.shape.getMinTransVectorDir(collideData.otherCollider.shape, new Point(0, -1));
+				freeVec = terrainCollider.shape.getMinTransVectorDir(collideData.otherCollider.shape, new Point(0, -1));
 			}
-			if ((freeVec == null || freeVec.Value.magnitude > 20) && physicsCollider != null) {
-				freeVec = physicsCollider.shape.getMinTransVector(collideData.otherCollider.shape);
+			if ((freeVec == null || freeVec.Value.magnitude > 20)) {
+				freeVec = terrainCollider.shape.getMinTransVector(collideData.otherCollider.shape);
 			}
 			if (freeVec == null) {
 				return;
