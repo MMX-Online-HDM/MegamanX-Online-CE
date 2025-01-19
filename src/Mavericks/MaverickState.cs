@@ -65,6 +65,7 @@ public class MaverickState {
 	public bool normalCtrl;
 	public bool attackCtrl;
 	public bool aiAttackCtrl;
+	public bool canBeCanceled = true;
 
 	public MaverickStateConsecutiveData consecutiveData;
 
@@ -458,6 +459,7 @@ public class MIdle : MaverickState {
 		normalCtrl = true;
 		attackCtrl = true;
 		aiAttackCtrl = true;
+		canBeCanceled = false;
 	}
 
 	float attackCooldown = 0;
@@ -506,6 +508,7 @@ public class MEnter : MaverickState {
 	public MEnter(Point destPos) : base("enter") {
 		destY = destPos.y;
 		aiAttackCtrl = true;
+		canBeCanceled = false;
 	}
 
 	public override void update() {
@@ -552,6 +555,7 @@ public class MExit : MaverickState {
 	public MExit(Point destPos, bool isRecall) : base("exit") {
 		this.destPos = destPos;
 		this.isRecall = isRecall;
+		canBeCanceled = false;
 	}
 
 	public override void update() {
@@ -637,6 +641,7 @@ public class MRun : MaverickState {
 		normalCtrl = true;
 		attackCtrl = true;
 		aiAttackCtrl = true;
+		canBeCanceled = false;
 	}
 
 	public override void preUpdate() {
@@ -728,6 +733,7 @@ public class MJumpStart : MaverickState {
 		normalCtrl = true;
 		attackCtrl = true;
 		aiAttackCtrl = true;
+		canBeCanceled = false;
 	}
 
 	public override void update() {
@@ -810,6 +816,7 @@ public class MJump : MaverickState {
 		normalCtrl = true;
 		attackCtrl = true;
 		aiAttackCtrl = true;
+		canBeCanceled = false;
 	}
 
 	public override void update() {
@@ -834,6 +841,7 @@ public class MFall : MaverickState {
 		normalCtrl = true;
 		attackCtrl = true;
 		aiAttackCtrl = true;
+		canBeCanceled = false;
 	}
 
 	public override void update() {
@@ -849,6 +857,7 @@ public class MFly : MaverickState {
 		normalCtrl = true;
 		attackCtrl = true;
 		aiAttackCtrl = true;
+		canBeCanceled = false;
 	}
 
 	public override void update() {
@@ -987,6 +996,7 @@ public class MLand : MaverickState {
 		normalCtrl = true;
 		attackCtrl = true;
 		aiAttackCtrl = true;
+		canBeCanceled = false;
 	}
 
 	public override void onEnter(MaverickState oldState) {
@@ -1054,6 +1064,7 @@ public class MHurt : MaverickState {
 			flinchYPos = oldComboPos.Value;
 		}
 		aiAttackCtrl = true;
+		canBeCanceled = false;
 	}
 
 	public override void update() {
@@ -1128,6 +1139,7 @@ public class MDie : MaverickState {
 	Point deathPos;
 	public MDie(bool isEnvDeath) : base("die") {
 		this.isEnvDeath = isEnvDeath;
+		canBeCanceled = false;
 	}
 
 	public override void onEnter(MaverickState oldState) {
@@ -1238,6 +1250,7 @@ public class MWallSlide : MaverickState {
 		this.wall = wall;
 		enterSound = "land";
 		aiAttackCtrl = true;
+		canBeCanceled = false;
 	}
 
 	public override void update() {
@@ -1322,6 +1335,7 @@ public class MWallKick : MaverickState {
 		kickSpeed = kickDir * 150;
 		enterSound = "jump";
 		aiAttackCtrl = true;
+		canBeCanceled = false;
 	}
 
 	public override void update() {

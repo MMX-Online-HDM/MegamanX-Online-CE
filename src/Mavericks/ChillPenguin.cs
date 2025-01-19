@@ -619,6 +619,7 @@ public class ChillPBurnState : MaverickState {
 	Point pushDir;
 	public ChillPBurnState() : base("burn") {
 		aiAttackCtrl = true;
+		canBeCanceled = false;
 	}
 
 	public override void update() {

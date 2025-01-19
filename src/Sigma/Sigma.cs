@@ -410,7 +410,7 @@ public class BaseSigma : Character {
 		//Global.level.snapCamPos(getCamCenterPos());
 		if (maverick.state is not MEnter && maverick.state is not MorphMHatchState && maverick.state is not MFly) {
 			//To bring back puppeteer cancel, uncomment this
-			if (Options.main.puppeteerCancel) {
+			if (Options.main.puppeteerCancel && maverick.state.canBeCanceled) {
 				maverick.changeToIdleFallOrFly();
 			}
 		}

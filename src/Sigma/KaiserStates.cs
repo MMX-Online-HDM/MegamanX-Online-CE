@@ -16,7 +16,6 @@ public class KaiserSigmaBaseState : CharState {
 
 	public override void update() {
 		base.update();
-		character.stopMovingWeak();
 
 		if (this is not KaiserSigmaHoverState &&
 			this is not KaiserSigmaFallState &&
@@ -30,7 +29,7 @@ public class KaiserSigmaBaseState : CharState {
 		Helpers.decrementTime(ref kaiserSigma.kaiserRightMineShootTime);
 		Helpers.decrementTime(ref kaiserSigma.kaiserHoverCooldown);
 
-		if (!isKaiserSigmaTouchingGround()) {
+		if (!isKaiserSigmaTouchingGround() && character.charState is not KaiserSigmaJumpState) {
 			if (character.charState is KaiserSigmaIdleState || character.charState is KaiserSigmaBeamState) {
 				character.changeState(new KaiserSigmaHoverState(), true);
 			}
@@ -60,7 +59,7 @@ public class KaiserSigmaBaseState : CharState {
 	}
 
 	public bool isKaiserSigmaTouchingGround() {
-		return character.checkCollision(0, 5) != null;
+		return character.checkCollision(0, 1) != null;
 	}
 
 	public void ballisticAttackLogic() {
@@ -145,11 +144,60 @@ public class KaiserSigmaIdleState : KaiserSigmaBaseState {
 
 		if (player.input.isPressed(Control.Shoot, player)) {
 			character.changeState(new KaiserSigmaBeamState(player.input.isHeld(Control.Down, player)));
+		}
+		// Jump
+		else if (player.input.isPressed(Control.Jump, player)) {
+			if (kaiserSigma.kaiserHoverCooldown == 0 &&
+				kaiserSigma.kaiserHoverTime < kaiserSigma.kaiserMaxHoverTime - 0.25f
+			) {
+				character.vel.y -= 4.5f * 60;
+				character.changeState(new KaiserSigmaJumpState(), true);
+				return;
+			}
+		}
+		// Hover
+		else if (player.input.isHeld(Control.Up, player)) {
+			if (kaiserSigma.kaiserHoverCooldown == 0 &&
+				kaiserSigma.kaiserHoverTime < kaiserSigma.kaiserMaxHoverTime - 0.25f
+			) {
+				character.changeState(new KaiserSigmaHoverState(), true);
+				return;
+			}
 		} else if (
-			player.input.isHeld(Control.Up, player) ||
-			player.input.isHeld(Control.Left, player) ||
-			player.input.isHeld(Control.Right, player
-		)) {
+				player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)
+			) {
+			character.changeState(new KaiserSigmaWalkState(), true);
+			return;
+		} else if (player.input.isPressed(Control.Dash, player)) {
+			if (UpgradeMenu.subtankDelay > 0) {
+				Global.level.gameMode.setHUDErrorMessage(player, "Cannot become Virus in battle");
+			} else {
+				character.changeState(new KaiserSigmaVirusState(), true);
+			}
+			return;
+		} else if (player.input.isPressed(Control.Taunt, player)) {
+			character.changeState(new KaiserSigmaTauntState(), true);
+			return;
+		}
+
+		ballisticAttackLogic();
+	}
+}
+
+public class KaiserSigmaWalkState : KaiserSigmaBaseState {
+	public KaiserSigmaWalkState() : base("idle") {
+		canShootBallistics = true;
+		immuneToWind = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (player.input.isPressed(Control.Shoot, player)) {
+			character.changeState(new KaiserSigmaBeamState(player.input.isHeld(Control.Down, player)));
+		} else if (
+			player.input.isHeld(Control.Up, player)
+		) {
 			if (kaiserSigma.kaiserHoverCooldown == 0 &&
 				kaiserSigma.kaiserHoverTime < kaiserSigma.kaiserMaxHoverTime - 0.25f
 			) {
@@ -169,8 +217,60 @@ public class KaiserSigmaIdleState : KaiserSigmaBaseState {
 		}
 
 		ballisticAttackLogic();
+
+		int inputDir = player.input.getXDir(player);
+		if (inputDir != 0) {
+			character.move(new Point(75 * inputDir, 0));
+			character.xDir = inputDir;
+		} else {
+			character.changeState(new KaiserSigmaIdleState(), true);
+			return;
+		}
 	}
 }
+
+public class KaiserSigmaJumpState : KaiserSigmaBaseState {
+	public KaiserSigmaJumpState() : base("fall") {
+		canShootBallistics = true;
+		immuneToWind = true;
+		useGravity = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (player.input.isHeld(Control.Up, player)) {
+			if (kaiserSigma.kaiserHoverCooldown == 0 &&
+				kaiserSigma.kaiserHoverTime < kaiserSigma.kaiserMaxHoverTime - 0.25f
+			) {
+				character.changeState(new KaiserSigmaHoverState(), true);
+				return;
+			}
+		} else if (player.input.isPressed(Control.Dash, player)) {
+			if (UpgradeMenu.subtankDelay > 0) {
+				Global.level.gameMode.setHUDErrorMessage(player, "Cannot become Virus in battle");
+			} else {
+				character.changeState(new KaiserSigmaVirusState(), true);
+			}
+			return;
+		}
+
+		ballisticAttackLogic();
+
+		int inputDir = player.input.getXDir(player);
+		if (inputDir != 0) {
+			character.move(new Point(75 * inputDir, 0));
+			character.xDir = inputDir;
+		}
+		if (isKaiserSigmaTouchingGround()) {
+			character.playSound("crash", sendRpc: true);
+			character.shakeCamera(sendRpc: true);
+			character.changeState(new KaiserSigmaIdleState(), true);
+			return;
+		}
+	}
+}
+
 
 public class KaiserSigmaTauntState : KaiserSigmaBaseState {
 	public KaiserSigmaTauntState() : base("taunt") {
@@ -219,7 +319,7 @@ public class KaiserSigmaHoverState : KaiserSigmaBaseState {
 		exhaustMoveDir = 0;
 		if (!moveAmount.isZero()) {
 			CollideData? collideData = character.checkCollision(0, moveAmount.y * Global.spf);
-			if (moveAmount.y > 0 && collideData?.isGroundHit() == true) {
+			if (moveAmount.y > 0 && collideData?.isGroundHit() == true && isKaiserSigmaTouchingGround()) {
 				kaiserSigma.changeToKaiserIdleOrFall();
 				character.playSound("crash", sendRpc: true);
 				character.shakeCamera(sendRpc: true);
@@ -247,11 +347,6 @@ public class KaiserSigmaFallState : KaiserSigmaBaseState {
 
 	public override void update() {
 		base.update();
-
-		character.addGravity(ref velY);
-
-		var moveAmount = new Point(0, velY);
-
 		/*
 		if (!character.tryMove(moveAmount, out var hitData))
 		{
@@ -266,14 +361,11 @@ public class KaiserSigmaFallState : KaiserSigmaBaseState {
 		}
 		*/
 
-		if (!moveAmount.isZero()) {
-			if (moveAmount.y > 0 && character.checkCollision(0, moveAmount.y * Global.spf) != null) {
-				kaiserSigma.changeToKaiserIdleOrFall();
-				character.playSound("crash", sendRpc: true);
-				character.shakeCamera(sendRpc: true);
-				return;
-			}
-			character.move(new Point(moveAmount.x, moveAmount.y));
+		if (character.checkCollision(0, 1) != null) {
+			kaiserSigma.changeToKaiserIdleOrFall();
+			character.playSound("crash", sendRpc: true);
+			character.shakeCamera(sendRpc: true);
+			return;
 		}
 	}
 

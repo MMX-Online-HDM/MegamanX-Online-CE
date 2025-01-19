@@ -319,6 +319,7 @@ public class OverdriveOSkidState : MaverickState {
 		enterSound = "overdriveoSkid";
 		attackCtrl = true;
 		aiAttackCtrl = true;
+		canBeCanceled = false;
 	}
 
 	public override void update() {
@@ -365,6 +366,7 @@ public class OverdriveOCrystalizedState : MaverickState {
 	public OverdriveOCrystalizedState() : base("hurt_weakness") {
 		enterSound = "crystalize";
 		aiAttackCtrl = true;
+		canBeCanceled = false;
 	}
 
 	public override bool canEnter(Maverick maverick) {

@@ -41,8 +41,7 @@ public class ArmoredArmadillo : Maverick {
 	public override void setHealth(float lastHealth) {
 		base.setHealth(lastHealth);
 		/*
-		if (health < maxHealth * 0.5f)
-		{
+		if (health < maxHealth * 0.5f) {
 			removeArmor(false);
 		}
 		*/
@@ -255,6 +254,7 @@ public class ArmoredAChargeReleaseProj : Projectile {
 public class ArmoredAGuardState : MaverickState {
 	public ArmoredAGuardState() : base("block") {
 		aiAttackCtrl = true;
+		canBeCanceled = false;
 	}
 
 	public override void update() {
@@ -347,6 +347,7 @@ public class ArmoredAZappedState : MaverickState {
 	public ArmoredAZappedState() : base("zapped") {
 		canEnterSelf = false;
 		aiAttackCtrl = true;
+		canBeCanceled = false;
 	}
 
 	public override void update() {

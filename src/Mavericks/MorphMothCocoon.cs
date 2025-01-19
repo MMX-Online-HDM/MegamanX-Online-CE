@@ -623,6 +623,7 @@ public class MorphMCHangState : MaverickState {
 	float suckSoundTime;
 	public MorphMCHangState() : base("hang") {
 		aiAttackCtrl = true;
+		canBeCanceled = false;
 	}
 
 	float suckAngle;
@@ -754,6 +755,7 @@ public class MorphMCHangState : MaverickState {
 public class MorphMCBurnState : MaverickState {
 	public MorphMCBurnState() : base("burn") {
 		aiAttackCtrl = true;
+		canBeCanceled = false;
 	}
 
 	public override void update() {

@@ -237,7 +237,7 @@ public class Maverick : Actor, IDamagable {
 		base.update();
 
 		Helpers.decrementTime(ref invulnTime);
-		Helpers.decrementTime(ref weaknessCooldown);
+		Helpers.decrementFrames(ref weaknessCooldown);
 
 		if (grounded) {
 			lastGroundedPos = pos;
