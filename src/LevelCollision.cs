@@ -369,8 +369,10 @@ public partial class Level {
 			pushDir = vel?.times(-1).normalize();
 			if (collideDatas.Count > 0) {
 				foreach (var collideData in collideDatas) {
-					if (collideData.hitData != null && collideData.hitData.normal != null && ((Point)collideData.hitData.normal).isAngled() && pushIncline && onlyWalls) {
-						pushDir = new Point(0, -1); //Helpers.getInclinePushDir(collideData.hitData.normal, vel);
+					if (collideData.hitData != null && collideData.hitData.normal != null &&
+						((Point)collideData.hitData.normal).isAngled() && pushIncline && onlyWalls
+					) {
+						pushDir = new Point(0, -1);
 					}
 				}
 			}
@@ -379,7 +381,7 @@ public partial class Level {
 		if (collideDatas.Count > 0) {
 			float maxMag = 0;
 			Point? maxMtv = null;
-			foreach (var collideData in collideDatas) {
+			foreach (CollideData collideData in collideDatas) {
 				actor.registerCollision(collideData);
 				int hash = GetHashCode() ^ collideData.gameObject.GetHashCode();
 				if (!Global.level.collidedGObjs.Contains(hash)) {
