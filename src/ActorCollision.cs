@@ -364,10 +364,9 @@ public partial class Actor {
 		// Regular collider: need to detect collision incrementally
 		// and stop moving past a collider if that's the case
 		else {
-			var inc = amount.clone();
-			var incAmount = inc.multiply(times);
+			Point incAmount = amount * times;
 
-			var mtv = Global.level.getMtvDir(this, incAmount.x, incAmount.y, incAmount, pushIncline);
+			Point? mtv = Global.level.getMtvDir(this, incAmount.x, incAmount.y, incAmount, pushIncline);
 			if (mtv != null && mtv?.magnitude > 10) {
 				mtv = Global.level.getMtvDir(this, incAmount.x, incAmount.y, null, false);
 			}
