@@ -86,7 +86,7 @@ public class XHover : CharState {
 	}
 }
 
-public class LigthDash : CharState {
+public class LightDash : CharState {
 	public float dashTime;
 	public float dustTime;
 	public string initialDashButton;
@@ -95,7 +95,7 @@ public class LigthDash : CharState {
 	public Anim? dashSpark;
 	public Anim? exaust;
 
-	public LigthDash(string initialDashButton) : base("dash", "dash_shoot", "attack_dash") {
+	public LightDash(string initialDashButton) : base("dash", "dash_shoot", "attack_dash") {
 		enterSound = "dash";
 		this.initialDashButton = initialDashButton;
 		attackCtrl = true;
