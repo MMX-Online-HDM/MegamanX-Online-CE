@@ -364,18 +364,10 @@ public partial class Actor {
 		// Regular collider: need to detect collision incrementally
 		// and stop moving past a collider if that's the case
 		else {
-			freeFromCollision();
-			Point inc = amount.clone();
-			Point incAmount = inc.multiply(times);
+			var inc = amount.clone();
+			var incAmount = inc.multiply(times);
 
-			// Hack to make it not get stuck sometimes
-			if (this is RideChaser) {
-				incPos(incAmount);
-				freeFromCollision();
-				return;
-			}
-
-			Point? mtv = Global.level.getMtvDir(this, incAmount.x, incAmount.y, incAmount, pushIncline);
+			var mtv = Global.level.getMtvDir(this, incAmount.x, incAmount.y, incAmount, pushIncline);
 			if (mtv != null && mtv?.magnitude > 10) {
 				mtv = Global.level.getMtvDir(this, incAmount.x, incAmount.y, null, false);
 			}
