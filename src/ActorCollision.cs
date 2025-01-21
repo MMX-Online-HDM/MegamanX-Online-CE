@@ -381,7 +381,7 @@ public partial class Actor {
 			}
 			incPos(incAmount);
 			if (mtv != null) {
-				//incPos(mtv.Value.unitInc(0.01f));
+				incPos(mtv.Value.unitInc(0.01f));
 			}
 			freeFromCollision();
 		}
