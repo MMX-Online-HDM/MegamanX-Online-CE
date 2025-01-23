@@ -77,8 +77,8 @@ public class SuiretsusenProj : Projectile {
 		shouldVortexSuck = false;
 		shouldShieldBlock = false;
 		isMelee = true;
-		if (player.character != null) {
-			owningActor = player.character;
+		if (ownerPlayer?.character != null) {
+			owningActor = ownerPlayer.character;
 		}
 
 		if (sendRpc) {
