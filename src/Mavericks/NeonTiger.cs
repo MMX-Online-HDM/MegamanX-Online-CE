@@ -303,6 +303,7 @@ public class NeonTDashState : MaverickState {
 		normalCtrl = true;
 		attackCtrl = true;
 		aiAttackCtrl = true;
+		canBeCanceled = false;
 	}
 
 	public override void update() {
@@ -355,6 +356,7 @@ public class NeonTPounceState : MaverickState {
 		normalCtrl = true;
 		attackCtrl = true;
 		aiAttackCtrl = true;
+		canBeCanceled = false;
 	}
 
 	public override void update() {

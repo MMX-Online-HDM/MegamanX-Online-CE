@@ -660,6 +660,7 @@ public class CSnailWeaknessState : MaverickState {
 	float soundTime;
 	public CSnailWeaknessState(bool wasMagnetMine) : base(wasMagnetMine ? "weakness" : "hurt") {
 		aiAttackCtrl = true;
+		canBeCanceled = false;
 		if (!wasMagnetMine) {
 			once = true;
 			stateTime = 1;
@@ -721,6 +722,7 @@ public class CSnailWeaknessState : MaverickState {
 public class CSnailDashState : MaverickState {
 	public CSnailDashState() : base("dash") {
 		aiAttackCtrl = true;
+		canBeCanceled = false;
 	}
 
 	public override void update() {

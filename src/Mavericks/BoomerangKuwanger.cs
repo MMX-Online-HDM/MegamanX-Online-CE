@@ -402,6 +402,7 @@ public class BoomerKDashState : MaverickState {
 		normalCtrl = true;
 		attackCtrl = true;
 		aiAttackCtrl = true;
+		canBeCanceled = false;
 	}
 
 	public override void onEnter(MaverickState oldState) {

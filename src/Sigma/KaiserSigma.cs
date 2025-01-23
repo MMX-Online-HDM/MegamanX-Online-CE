@@ -204,7 +204,8 @@ public partial class KaiserSigma : Character {
 		kaiserBodySprite = sprite.name + "_body";
 		if (Global.sprites.ContainsKey(kaiserBodySprite)) {
 			Global.sprites[kaiserBodySprite].draw(
-				0, pos.x + x, pos.y + y, xDir, 1, null, 1, 1, 1, zIndex - 10
+				0, pos.x + x, pos.y + y,
+				xDir, 1, null, 1, 1, 1, zIndex - 10, useFrameOffsets: true
 			);
 		}
 

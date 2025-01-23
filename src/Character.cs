@@ -403,6 +403,13 @@ public partial class Character : Actor, IDamagable {
 				shaders.Add(Player.darkHoldShader);
 			}
 		}
+		else if (timeStopTime > timeStopThreshold && Player.darkHoldShader != null) {
+			if (!Global.level.darkHoldProjs.Any(
+				dhp => dhp.screenShader != null && dhp.inRange(this))
+			) {
+				shaders.Add(Player.darkHoldShader);
+			}
+		}
 
 		if (Player.darkHoldShader != null) {
 			// Invert the zero who used a dark hold so he appears to be drawn normally on top of it

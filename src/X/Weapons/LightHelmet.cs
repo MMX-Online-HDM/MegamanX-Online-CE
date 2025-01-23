@@ -5,7 +5,7 @@ public class LhHeadbutt : Weapon {
 
 	public LhHeadbutt() : base() {
 		//damager = new Damager(player, 2, 13, 0.5f);
-		index = (int)WeaponIds.LigthHelmetHeadbutt;
+		index = (int)WeaponIds.LightHelmetHeadbutt;
 		killFeedIndex = 64;
 	}
 }

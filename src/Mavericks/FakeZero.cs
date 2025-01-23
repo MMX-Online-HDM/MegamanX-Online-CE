@@ -373,6 +373,7 @@ public class FakeZeroRockProj : Projectile {
 public class FakeZeroGuardState : MaverickState {
 	public FakeZeroGuardState() : base("guard") {
 		aiAttackCtrl = true;
+		canBeCanceled = false;
 	}
 
 	public override void update() {

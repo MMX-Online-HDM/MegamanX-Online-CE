@@ -288,13 +288,13 @@ public class Damager {
 			if (damagerMessage?.damage != null) damage = damagerMessage.damage.Value;
 
 			if (projId == (int)ProjIds.CrystalHunter && weakness) {
-				damage = 4;
+				damage = 2;
 				weakness = false;
 				flinch = 0;
 				victim?.playSound("weakness");
 			}
 			if (projId == (int)ProjIds.CSnailMelee && character != null && character.isCrystalized) {
-				damage *= 2;
+				damage += 1;
 			}
 		}
 
@@ -657,8 +657,8 @@ public class Damager {
 			weakness = maverick.checkWeakness(
 				(WeaponIds)weaponIndex, (ProjIds)projId, out MaverickState newState, owner?.isSigma ?? true
 			);
-			if (weakness && damage < 2 && projId is (int)ProjIds.CrystalHunter or (int)ProjIds.CSnailCrystalHunter) {
-				damage = 2;
+			if (weakness && damage < 1 && projId is (int)ProjIds.CrystalHunter or (int)ProjIds.CSnailCrystalHunter) {
+				damage = 1;
 			}
 			if (weakness && damage < 1 && (
 				projId == (int)ProjIds.AcidBurst ||
@@ -667,8 +667,8 @@ public class Damager {
 			)) {
 				damage = 1;
 			}
-			if (weakness && damage < 2 && projId == (int)ProjIds.ParasiticBomb) {
-				damage = 2;
+			if (weakness && damage < 1 && projId == (int)ProjIds.ParasiticBomb) {
+				damage = 1;
 			}
 			// Get flinch cooldown index.
 			bool isOnFlinchCooldown = false;
@@ -677,24 +677,16 @@ public class Damager {
 			if (projectileFlinchCooldowns.ContainsKey(projId)) {
 				flinchCooldownTime = projectileFlinchCooldowns[projId];
 			}
-			if (!maverick.player.isTagTeam() && flinchCooldownTime < 45) {
+			if (!maverick.player.isTagTeam() && flinchCooldownTime < 45 && !weakness) {
 				flinchCooldownTime = 45;
 			}
 			if (!maverick.flinchCooldown.ContainsKey(flinchKey)) {
 				maverick.flinchCooldown[flinchKey] = 0;
 			}
-			// Weakness states and flinch weakness.
-			if (newState != null && maverick.weaknessCooldown == 0) {
-				maverick.weaknessCooldown = 1.75f;
-				flinch = 0;
-				if (maverick.ownedByLocalPlayer) {
-					maverick.changeState(newState, true);
-				}
-			}
 			// Weakness flinch.
-			else if (weakness && !isOnFlinchCooldown) {
+			if (weakness) {
 				if (flinch <= 0) {
-					flinchCooldownTime = 0.75f;
+					flinchCooldownTime = 45;
 					flinch = Global.miniFlinch;
 				} else if (flinch < Global.halfFlinch) {
 					flinch = Global.halfFlinch;
@@ -703,6 +695,16 @@ public class Damager {
 				} else if (flinch < Global.defFlinch) {
 					flinch = Global.superFlinch;
 				}
+			}
+			// Weakness states and flinch weakness.
+			if (newState != null && maverick.weaknessCooldown == 0) {
+				maverick.weaknessCooldown = 60 * 3;
+				flinch = 0;
+				if (maverick.ownedByLocalPlayer) {
+					maverick.changeState(newState, true);
+				}
+			} else {
+				newState = null!;
 			}
 			// Superarmor.
 			if (maverick.state.superArmor) {
@@ -723,34 +725,33 @@ public class Damager {
 					if (!maverick.player.isTagTeam()) {
 						flinch = 0;
 					}
-					if (maverick.player.isTagTeam()) {
-						// Large mavericks
-						if (maverick.armorClass == Maverick.ArmorClass.Heavy) {
-							if (flinch <= Global.miniFlinch) {
-								flinch = 0;
-							} else {
-								flinch = Global.miniFlinch;
-							}
+					// Large mavericks
+					if (maverick.armorClass == Maverick.ArmorClass.Heavy) {
+						if (flinch <= Global.miniFlinch) {
+							flinch = 0;
+						} else {
+							flinch = Global.miniFlinch;
 						}
-						// Medium mavericks
-						else if (maverick.armorClass == Maverick.ArmorClass.Medium) {
-							if (flinch <= Global.miniFlinch) {
-								flinch = 0;
-							} else if (flinch <= Global.halfFlinch) {
-								flinch = Global.miniFlinch;
-							} else {
-								flinch = Global.halfFlinch;
-							}
+					}
+					// Medium mavericks
+					else if (maverick.armorClass == Maverick.ArmorClass.Medium) {
+						if (flinch <= Global.miniFlinch) {
+							flinch = 0;
+						} else if (flinch <= Global.halfFlinch) {
+							flinch = Global.miniFlinch;
+						} else {
+							flinch = Global.halfFlinch;
 						}
 					}
 				}
 				if (maverick is ArmoredArmadillo aa) {
 					if ((hitFromBehind(maverick, damagingActor, owner, projId) ||
 						maverick.sprite.name == "armoreda_roll"
-						) && !aa.hasNoArmor() && !isArmorPiercingOrElectric(projId)
+						) && !aa.hasNoArmor() && !isArmorPiercing(projId)
 					) {
 						damage = MathF.Floor(damage * 0.5f);
 						if (damage == 0) {
+							flinch = 0;
 							maverick.playSound("m10ding");
 						}
 					}
@@ -763,7 +764,7 @@ public class Damager {
 					}
 				}
 				*/
-				if (maverick.sprite.name == "armoreda_block" && damage > 0 && !isArmorPiercingOrElectric(projId)) {
+				if (maverick.sprite.name == "armoreda_block" && damage > 0 && !isArmorPiercing(projId)) {
 					if (hitFromFront(maverick, damagingActor, owner, projId)) {
 						if (maverick.ownedByLocalPlayer && damage > 2 &&
 							damagingActor is Projectile proj && proj.shouldVortexSuck && proj.destroyOnHit
@@ -773,10 +774,11 @@ public class Damager {
 						flinch = 0;
 						damage = 0;
 						maverick.playSound("m10ding");
-						if (owner.ownedByLocalPlayer &&
+						if (owner?.ownedByLocalPlayer == true &&
 							owner.character is Zero zero &&
 							!zero.hypermodeActive()
-						) {      //What in the..
+						) {
+							//What in the..
 							if (damagingActor is Projectile proj1 && proj1.isZSaberClang) {
 								owner.character.changeState(new ZeroClang(-owner.character.xDir));
 							}
@@ -814,8 +816,13 @@ public class Damager {
 			victim?.addRenderEffect(RenderEffectType.Hit, 3, 6);
 		}
 
-		float finalDamage = damage * (weakness ? 1.5f : 1) * owner.getDamageModifier();
-
+		float finalDamage = damage;
+		if (weakness && damage > 0) {
+			damage += 1;
+		}
+		if (owner != null) {
+			finalDamage *= owner.getDamageModifier();
+		}
 		if (finalDamage > 0 && character != null &&
 			character.ownedByLocalPlayer && charState is XUPParryStartState parryState &&
 			parryState.canParry() && !isDot(projId)
@@ -844,10 +851,6 @@ public class Damager {
 		damagable?.applyDamage(finalDamage, owner, damagingActor, weaponKillFeedIndex, projId);
 
 		return true;
-	}
-
-	public static bool isArmorPiercingOrElectric(int? projId) {
-		return isArmorPiercing(projId) || isElectric(projId);
 	}
 
 	public static bool isArmorPiercing(int? projId) {
@@ -935,7 +938,7 @@ public class Damager {
 		);
 	}
 
-	public static bool hitFromFront(Actor actor, Actor damager, Player? projOwner, int projId) {
+	public static bool hitFromFront(Actor actor, Actor? damager, Player? projOwner, int projId) {
 		return hitFromSub(
 			actor, damager,
 			projOwner, projId,

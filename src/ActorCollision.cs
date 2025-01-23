@@ -102,7 +102,6 @@ public partial class Actor {
 		}
 		bool hasNonAttackColider = false;
 		foreach (Collider allCollider in getAllColliders()) {
-			
 			if (allCollider._shape.points.Count == 4) {
 				Color hitboxColor = new Color(50, 100, 255, 50);
 				Color outlineColor = new Color(0, 0, 255, 200);
@@ -113,10 +112,10 @@ public partial class Actor {
 					hasNonAttackColider = true;
 				}
 				Rect rect = allCollider.shape.getRect();
-				rect.x1 += 1;
-				rect.y1 += 1;
-				rect.x2 -= 1;
-				rect.y2 -= 1;
+				rect.x1 = MathF.Round(rect.x1 + 1);
+				rect.y1 = MathF.Round(rect.y1 + 1);
+				rect.x2 = MathF.Round(rect.x2 - 1);
+				rect.y2 = MathF.Round(rect.y2 - 1);
 				DrawWrappers.DrawRect(
 					rect.x1, rect.y1, rect.x2, rect.y2,
 					true, hitboxColor, 1, zIndex + 1, true,
@@ -141,10 +140,10 @@ public partial class Actor {
 				return;
 			}
 			Rect rect = terrainCollider.shape.getRect();
-			rect.x1 += 1;
-			rect.y1 += 1;
-			rect.x2 -= 1;
-			rect.y2 -= 1;
+			rect.x1 = MathF.Round(rect.x1 + 1);
+			rect.y1 = MathF.Round(rect.y1 + 1);
+			rect.x2 = MathF.Round(rect.x2 - 1);
+			rect.y2 = MathF.Round(rect.y2 - 1);
 			DrawWrappers.DrawPolygon(
 				rect.getPoints(),
 				new Color(0, 255, 0, 150),
@@ -364,16 +363,7 @@ public partial class Actor {
 		// Regular collider: need to detect collision incrementally
 		// and stop moving past a collider if that's the case
 		else {
-			freeFromCollision();
-			Point inc = amount.clone();
-			Point incAmount = inc.multiply(times);
-
-			// Hack to make it not get stuck sometimes
-			if (this is RideChaser) {
-				incPos(incAmount);
-				freeFromCollision();
-				return;
-			}
+			Point incAmount = amount * times;
 
 			Point? mtv = Global.level.getMtvDir(this, incAmount.x, incAmount.y, incAmount, pushIncline);
 			if (mtv != null && mtv?.magnitude > 10) {
@@ -381,7 +371,7 @@ public partial class Actor {
 			}
 			incPos(incAmount);
 			if (mtv != null) {
-				//incPos(mtv.Value.unitInc(0.01f));
+				incPos(mtv.Value.unitInc(0.01f));
 			}
 			freeFromCollision();
 		}

@@ -145,7 +145,7 @@ public class XBuster : Weapon {
 			else if (mmx.armArmor == ArmorId.Giga) {
 				new Buster3Proj(pos, xDir, 1, player, player.getNextActorNetId(), rpc: true);
 			} else {
-				shootLigthBuster4(player, pos, xDir);
+				shootLightBuster4(player, pos, xDir);
 			}
 		}
 		if (shootSound != "") {
@@ -173,7 +173,7 @@ public class XBuster : Weapon {
 		);
 	}
 
-	public void shootLigthBuster4(Player player, Point pos, int xDir) {
+	public void shootLightBuster4(Player player, Point pos, int xDir) {
 		new Anim(pos.clone(), "buster4_muzzle_flash", xDir, null, true);
 		//Create the buster effect
 		int xOff = xDir * -5;
