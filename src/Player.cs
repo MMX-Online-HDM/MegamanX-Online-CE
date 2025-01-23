@@ -1046,7 +1046,7 @@ public partial class Player {
 			alliance = newAlliance;
 		}
 
-		if (character != null) {
+		if (character != null && charNetId == character.netId) {
 			return;
 		}
 
@@ -1917,7 +1917,7 @@ public partial class Player {
 				return 8;
 			}
 			if (Global.level?.gameMode is KingOfTheHill) {
-				return 7;
+				return 8;
 			}
 		}
 		return 5;
@@ -2110,9 +2110,6 @@ public partial class Player {
 	}
 
 	public void explodeDieStart() {
-		respawnTime = getRespawnTime(); // * (suicided ? 2 : 1);
-		randomTip = Tips.getRandomTip(charNum);
-
 		explodeDieEffect = ExplodeDieEffect.createFromActor(character.player, character, 20, 1.5f, false);
 		Global.level.addEffect(explodeDieEffect);
 		limboChar = character;
@@ -2122,78 +2119,59 @@ public partial class Player {
 	public void explodeDieEnd() {
 		if (limboChar != null) {
 			limboChar.destroySelf();
+			RPC.destroyCharacter.sendRpc(this, limboChar);
 			limboChar = null;
 		}
 		explodeDieEffect = null;
-		Global.serverClient?.rpc(RPC.destroyCharacter, (byte)id);
 	}
 
 	public void destroySigmaEffect() {
 		ExplodeDieEffect.createFromActor(this, character, 25, 2, false);
 	}
 
-	public void destroySigma() {
-		respawnTime = getRespawnTime();// * (suicided ? 2 : 1);
-		randomTip = Tips.getRandomTip(charNum);
-
+	public void destroyCharacter(bool sendRpc = false) {
 		if (character == null) {
 			return;
 		}
-
 		character.destroySelf();
-		character = null;
-		Global.serverClient?.rpc(RPC.destroyCharacter, (byte)id);
 		onCharacterDeath();
+		if (sendRpc) {
+			RPC.destroyCharacter.sendRpc(this, character);
+		}
+		character = null;
 	}
 
-	public void destroyCharacter() {
-		respawnTime = getRespawnTime();// * (suicided ? 2 : 1);
-		randomTip = Tips.getRandomTip(charNum);
-
-		if (character == null) {
-			return;
+	public bool destroyCharacter(ushort netId) {
+		if (character?.netId != netId) {
+			return false;
 		}
-
-		if (isAxl) {
-			//axlBulletTypeBought[6] = false;
-			//if (axlBulletType == (int)AxlBulletWeaponType.AncientGun) axlBulletType = 0;
-		}
-
-		if (isZero && awakenedCurrencyEnd != null && currency >= awakenedCurrencyEnd) {
-			currency = awakenedCurrencyEnd.Value;
-			awakenedCurrencyEnd = null;
-		}
-
-		if (!character.player.isVile && !character.player.isSigma) {
-			character.playSound("die");
-			/*
-			if (character.player == Global.level.mainPlayer)
-			{
-				Global.playSound("die");
-			}
-			else
-			{
-				character.playSound("die");
-			}
-			*/
-			new DieEffect(character.getCenterPos(), charNum);
-		}
-
 		character.destroySelf();
+		onCharacterDeath();
 		character = null;
 
-		onCharacterDeath();
+		return true;
 	}
 
 	// Must be called on any character death
 	public void onCharacterDeath() {
+		delayedNewCharNum = null;
+		suicided = false;
+		unpossess();
+		if (!ownedByLocalPlayer) {
+			return;
+		}
 		if (delayedNewCharNum != null && Global.level.mainPlayer.charNum != delayedNewCharNum.Value) {
 			Global.level.mainPlayer.newCharNum = delayedNewCharNum.Value;
 			Global.serverClient?.rpc(RPC.switchCharacter, (byte)Global.level.mainPlayer.id, (byte)delayedNewCharNum.Value);
 		}
-		delayedNewCharNum = null;
-		suicided = false;
-		unpossess();
+		if (character == null) {
+			return;
+		}
+		foreach (Weapon weapon in character.weapons) {
+			if (weapon is MaverickWeapon mw && mw.maverick != null) {
+				mw.maverick.changeState(new MExit(mw.maverick.pos, true), true);
+			}
+		}
 	}
 
 	public void maverick1v1Kill() {

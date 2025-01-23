@@ -367,6 +367,7 @@ public class WarpIn : CharState {
 
 	public WarpIn(bool addInvulnFrames = true) : base("warp_in") {
 		this.addInvulnFrames = addInvulnFrames;
+		invincible = true;
 	}
 
 	public override void update() {
@@ -1447,7 +1448,7 @@ public class Die : CharState {
 		if (!character.ownedByLocalPlayer) {
 			return;
 		}
-		if (sigmaHasMavericks) {
+		/*if (sigmaHasMavericks) {
 			if (stateTime > 0.75f && !once) {
 				once = true;
 				player.destroySigmaEffect();
@@ -1455,57 +1456,31 @@ public class Die : CharState {
 			}
 
 			if (once) {
-				/*
-				// This code would allow controlling Mavs after death,
-				// but would result in camera issues and spectate issues that need to be resolved first.
-				if (player.currentMaverick == null)
-				{
-					if (player.isPuppeteer())
-					{
-						foreach (var weapon in new List<Weapon>(player.weapons))
-						{
-							if (weapon is MaverickWeapon mw && mw.maverick != null)
-							{
-								player.weapons.RemoveAll(w => w is SigmaMenuWeapon);
-								character.becomeMaverick(mw.maverick);
-								player.weaponSlot = player.weapons.IndexOf(weapon);
-								return;
-							}
-						}
-					}
-				}
-				else
-				{
-					return;
-				}
-				*/
-
-				if (!player.isTagTeam()) {
-					foreach (var weapon in new List<Weapon>(player.weapons)) {
-						if (weapon is MaverickWeapon mw && mw.maverick != null) {
-							mw.maverick.changeState(new MExit(mw.maverick.pos, true), true);
-						}
-					}
-				}
-
-				player.destroySigma();
+				player.destroyCharacter(true);
 			}
-		} else if (player.isVile || player.isSigma) {
-			if (stateTime > 0.75f && !once) {
+		} else
+		*/
+		if (character is Vile or BaseSigma or KaiserSigma) {
+			if (stateTime >= 1 && !once) {
+				player.respawnTime = player.getRespawnTime(); 
+				player.randomTip = Tips.getRandomTip(player.charNum);
 				once = true;
 				character.visible = false;
 				player.explodeDieStart();
 			}
-
-			if (stateTime > 2.25f) {
+			if (stateTime >= 2.5f) {
 				destroyRideArmor();
 				player.explodeDieEnd();
 			}
 		} else {
-			if (stateTime > 0.75f) {
+			if (stateTime >= 1 && !once) {
+				player.respawnTime = player.getRespawnTime(); 
+				player.randomTip = Tips.getRandomTip(player.charNum);
+				once = true;
 				destroyRideArmor();
-				player.destroyCharacter();
-				Global.serverClient?.rpc(RPC.destroyCharacter, (byte)player.id);
+				character.playSound("die", sendRpc: true);
+				new DieEffect(character.getCenterPos(), (int)character.charId);
+				player.destroyCharacter(true);
 			}
 		}
 	}
@@ -1514,6 +1489,19 @@ public class Die : CharState {
 		if (character.linkedRideArmor != null) {
 			character.linkedRideArmor.selfDestructTime = Global.spf;
 			RPC.actorToggle.sendRpc(character.linkedRideArmor.netId, RPCActorToggleType.StartMechSelfDestruct);
+		}
+	}
+
+	public void transformIntoMaverick() {
+		if (character is BaseSigma sigma && (player.isPuppeteer() || player.isSummoner())) {
+			foreach (var weapon in new List<Weapon>(player.weapons)) {
+				if (weapon is MaverickWeapon mw && mw.maverick != null) {
+					player.weapons.RemoveAll(w => w is SigmaMenuWeapon);
+					sigma.becomeMaverick(mw.maverick);
+					player.weaponSlot = player.weapons.IndexOf(weapon);
+					return;
+				}
+			}
 		}
 	}
 

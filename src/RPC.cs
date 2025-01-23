@@ -26,7 +26,7 @@ public class RPC {
 	public static RPCShoot shootFast = new RPCShoot(NetDeliveryMethod.Unreliable);
 	public static RPCDestroyActor destroyActor = new();
 	public static RPCPlayerToggle playerToggle = new();
-	public static RPCDestroyPlayer destroyCharacter = new();
+	public static RPCDestroyCharacter destroyCharacter = new();
 	public static RPCKillPlayer killPlayer = new();
 	public static RPCCreateAnim createAnim = new();
 	public static RPCCreateProj createProj = new();
@@ -549,16 +549,36 @@ public class RPCDestroyActor : RPC {
 	}
 }
 
-public class RPCDestroyPlayer : RPC {
-	public RPCDestroyPlayer() {
+public class RPCDestroyCharacter : RPC {
+	public RPCDestroyCharacter() {
 		netDeliveryMethod = NetDeliveryMethod.ReliableUnordered;
 	}
 
 	public override void invoke(params byte[] arguments) {
 		int playerId = arguments[0];
+		ushort charNetId = BitConverter.ToUInt16(arguments[1..3]);
+		Player? player = Global.level.getPlayerById(playerId);
+		// We start by trying to call the regular destroy.
+		bool destroyedChar = false;
+		if (player != null) {
+			destroyedChar = player.destroyCharacter(charNetId);
+		}
+		// If player was null attempt to destroy directly.
+		if (!destroyedChar) {
+			Actor? charObj = Global.level.getActorByNetId(charNetId);
+			charObj?.destroySelf();
+		}
+	}
 
-		var player = Global.level.getPlayerById(playerId);
-		player?.destroyCharacter();
+	public void sendRpc(Player player, Character? character) {
+		if (Global.serverClient == null || character?.netId == null) {
+			return;
+		}
+		List<byte> args = new();
+		args.Add((byte)player.id);
+		args.AddRange(BitConverter.GetBytes(character.netId.Value));
+
+		Global.serverClient?.rpc(RPC.destroyCharacter, args.ToArray());
 	}
 }
 
