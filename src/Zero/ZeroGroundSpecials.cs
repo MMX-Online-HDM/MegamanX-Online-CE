@@ -77,7 +77,7 @@ public class SuiretsusenProj : Projectile {
 		shouldVortexSuck = false;
 		shouldShieldBlock = false;
 		isMelee = true;
-		if (player?.character != null) {
+		if (player.character != null) {
 			owningActor = player.character;
 		}
 
@@ -91,6 +91,11 @@ public class SuiretsusenProj : Projectile {
 		if (isAnimOver()) {
 			destroySelf();
 		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new SuiretsusenProj(
+			args.pos, args.xDir, args.player, args.netId
+		);
 	}
 }
 

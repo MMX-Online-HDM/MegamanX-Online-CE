@@ -129,7 +129,7 @@ public class ElectricSparkProjChargedStart : Projectile {
 		weapon, pos, xDir, 0, 4, player, "electric_spark_charge_start",
 		Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
-		projId = (int)ProjIds.ElectricSparkChargedStart;
+		projId = (int)ProjIds.ElectricSparkCharged;
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 
