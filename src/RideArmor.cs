@@ -384,11 +384,11 @@ public class RideArmor : Actor, IDamagable {
 					healAmount--;
 					health = Helpers.clampMax(health + 1, maxHealth);
 					if (player == Global.level.mainPlayer || playHealSound) {
-						if(raNum == 0 || raNum == 5) {
-						playSound("heal", forcePlay: true, sendRpc: true);
+						if (raNum == 0 || raNum == 5) {
+							playSound("heal", forcePlay: true, sendRpc: true);
 						}
 						else {
-						playSound("healX3", forcePlay: true, sendRpc: true);
+							playSound("healX3", forcePlay: true, sendRpc: true);
 						}
 					}
 				}
@@ -417,7 +417,7 @@ public class RideArmor : Actor, IDamagable {
 					if (poiTag == "b" && player != null) {
 						Point shootPos = pos.addxy(poi.x * xDir, poi.y);
 						if (!isBombDrop) {
-							new MechMissileProj(new MechMissileWeapon(player), shootPos, xDir, sprite.name.Contains("down"), player, player.getNextActorNetId(), rpc: true);
+							new MechMissileProj(new MechMissileWeapon(), shootPos, xDir, sprite.name.Contains("down"), player, player.getNextActorNetId(), rpc: true);
 							new Anim(shootPos, "dust", 1, player.getNextActorNetId(), true, true, true) { vel = new Point(0, -100) };
 						} else {
 							if (character is Vile vile) {
@@ -447,7 +447,7 @@ public class RideArmor : Actor, IDamagable {
 					string poiTag = currentFrame.POITags[i];
 					if (poiTag == "b" && player != null) {
 						Point shootPos = pos.addxy(poi.x * xDir, poi.y);
-						new TorpedoProj(new MechTorpedoWeapon(player), shootPos, xDir, player, 2, player.getNextActorNetId(), rpc: true);
+						new TorpedoProj(new MechTorpedoWeapon(), shootPos, xDir, player, 2, player.getNextActorNetId(), rpc: true);
 					}
 				}
 				playSound("frogShootX3", forcePlay: false, sendRpc: true);
@@ -616,72 +616,114 @@ public class RideArmor : Actor, IDamagable {
 			}
 		}
 	}
+	
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Punch,
+		KPunch,
+		GPunch,
+		DPunch,
+		Charge,
+		Stomp,
+		KStomp,
+		GStomp,
+		DStomp,
+		HStomp,
+		FStomp,
+		FStomp2,
+		Groundpound,
+		Deactive,
+	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (hitbox == null || player == null || sprite?.name == null) {
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		if (sprite.name.Contains("attack")) {
+			if (raNum == 0) return (int)MeleeIds.Punch;
+			if (raNum == 1) return (int)MeleeIds.KPunch;
+			if (raNum == 4) return (int)MeleeIds.GPunch;
+			if (raNum == 5) return (int)MeleeIds.DPunch;
+		}
+		if (sprite.name.Contains("deactive")) {
+			return (int)MeleeIds.Deactive;
+		}
+		if (sprite.name.Contains("charge")) {
+			return (int)MeleeIds.Charge;
+		}
+		if (sprite.name.Contains("groundpound")) {
+			return (int)MeleeIds.FStomp2;
+		}
+		bool canDamage = deltaPos.y > 150 * Global.spf;
+		if (hitbox.name.Contains("stomp") && canDamage) {
+			if (raNum == 0) return (int)MeleeIds.Stomp;
+			if (raNum == 1) return (int)MeleeIds.KStomp;
+			if (raNum == 2) return (int)MeleeIds.HStomp;
+			if (raNum == 3) return (int)MeleeIds.FStomp;
+			if (raNum == 4) return (int)MeleeIds.GStomp;
+			if (raNum == 5) return (int)MeleeIds.DStomp;
+		}
+		return (int)MeleeIds.None;
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		if (player == null) {
 			return null;
 		}
-		// whats the center point value?
-		Projectile? proj = null;
-
-		if (sprite.name.Contains("attack")) {
-			switch (raNum) {
-				case 0:
-					proj = new GenericMeleeProj(new MechPunchWeapon(player),
-					 centerPoint, ProjIds.MechPunch, player);
-					break;
-				case 1:
-					proj = new GenericMeleeProj(new MechKangarooPunchWeapon(player),
-					 centerPoint, ProjIds.MechKangarooPunch, player);
-					break;
-				case 4:
-					proj = new GenericMeleeProj(new MechGoliathPunchWeapon(player),
-					 centerPoint, ProjIds.MechGoliathPunch, player);
-					break;
-				case 5:
-					proj = new GenericMeleeProj(new MechDevilBearPunchWeapon(player),
-					 centerPoint, ProjIds.MechDevilBearPunch, player);
-					break;
-			}
-		}
-		else if (sprite.name.Contains("charge")) {
-			proj = new GenericMeleeProj(new MechChainChargeWeapon(player), centerPoint, ProjIds.MechChain, player);
-		}
-		else if (hitbox.name == "stomp" && deltaPos.y > 150 * Global.spf && character != null) {
-			bool canDamage = deltaPos.y > 150 * Global.spf;
-			float? overrideDamage = sprite.name.EndsWith("groundpound") ? 4 : null;
-			if (!canDamage) overrideDamage = 0;
-			ProjIds overrideProjId = sprite.name.EndsWith("groundpound") ? ProjIds.MechFrogGroundPound : ProjIds.MechStomp;
-			switch (raNum) {
-				case 0:
-					proj = new GenericMeleeProj(new MechStompWeapon(player),
-					 centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null);
-					break;
-				case 1:
-					proj = new GenericMeleeProj(new MechKangarooStompWeapon(player),
-					 centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null);
-					break;
-				case 2:
-					proj = new GenericMeleeProj(new MechHawkStompWeapon(player),
-					 centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null);
-					break;
-				case 3:
-					proj = new GenericMeleeProj(new MechFrogStompWeapon(player),
-					 centerPoint, overrideProjId, player, damage: overrideDamage);
-					break;
-				case 4:
-					proj = new GenericMeleeProj(new MechGoliathStompWeapon(player),
-					 centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null);
-					break;
-				case 5:
-					proj = new GenericMeleeProj(new MechDevilBearStompWeapon(player),
-					 centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null);
-					break;
-			}
-		}
-
-		return proj;
+		bool canDamage = deltaPos.y > 150 * Global.spf;
+		return (MeleeIds)id switch {
+			MeleeIds.Punch =>new GenericMeleeProj(
+				new MechPunchWeapon(), pos, ProjIds.MechPunch, player,
+				damage: 3, flinch: Global.defFlinch, 30, addToLevel: addToLevel
+			),
+			MeleeIds.KPunch =>new GenericMeleeProj(
+				new MechKangarooPunchWeapon(), pos, ProjIds.MechKangarooPunch, player,
+				damage: 4, flinch: Global.defFlinch, 30, addToLevel: addToLevel
+			),
+			MeleeIds.GPunch =>new GenericMeleeProj(
+				new MechGoliathPunchWeapon(), pos, ProjIds.MechGoliathPunch, player,
+				damage: 4, flinch: Global.defFlinch, 30, addToLevel: addToLevel
+			),
+			MeleeIds.DPunch =>new GenericMeleeProj(
+				new MechDevilBearPunchWeapon(), pos, ProjIds.MechDevilBearPunch, player,
+				damage: 2, flinch: Global.defFlinch, 15, addToLevel: addToLevel
+			),
+			MeleeIds.Charge =>new GenericMeleeProj(
+				new MechChainChargeWeapon(), pos, ProjIds.MechChain, player,
+				damage: 1, flinch: Global.defFlinch, 6, addToLevel: addToLevel
+			),
+			MeleeIds.Stomp =>new GenericMeleeProj(
+				new MechStompWeapon(), pos, ProjIds.MechStomp, player,
+				damage: !canDamage ? 0 : 3, flinch: Global.defFlinch, 45, addToLevel: addToLevel
+			),
+			MeleeIds.KStomp =>new GenericMeleeProj(
+				new MechKangarooStompWeapon(), pos, ProjIds.MechStomp, player,
+				damage: 3, flinch: Global.defFlinch, 45, addToLevel: addToLevel
+			),
+			MeleeIds.GStomp =>new GenericMeleeProj(
+				new MechGoliathStompWeapon(), pos, ProjIds.MechStomp, player,
+				damage: 3, flinch: Global.defFlinch, 45, addToLevel: addToLevel
+			),
+			MeleeIds.DStomp =>new GenericMeleeProj(
+				new MechDevilBearStompWeapon(), pos, ProjIds.MechStomp, player,
+				damage: 3, flinch: Global.defFlinch, 45, addToLevel: addToLevel
+			),
+			MeleeIds.HStomp =>new GenericMeleeProj(
+				new MechHawkStompWeapon(), pos, ProjIds.MechStomp, player,
+				damage: 3, flinch: Global.defFlinch, 45, addToLevel: addToLevel
+			),
+			MeleeIds.FStomp =>new GenericMeleeProj(
+				new MechFrogStompWeapon(), pos, ProjIds.MechStomp, player,
+				damage: 3, flinch: Global.defFlinch, 45, addToLevel: addToLevel
+			),
+			MeleeIds.FStomp2 =>new GenericMeleeProj(
+				new MechFrogStompWeapon(), pos, ProjIds.MechFrogGroundPound, player,
+				damage: 4, flinch: Global.defFlinch, 45, addToLevel: addToLevel
+			),
+			_ => null
+		};
 	}
+	
 
 	bool healedOnEnter;
 	public void putCharInRideArmor(Character chr) {
@@ -1750,7 +1792,7 @@ public class RAGroundPoundLand : RideArmorState {
 		base.onEnter(oldState);
 		if (player == null) return;
 		rideArmor.playSound("crash", sendRpc: true);
-		new MechFrogStompShockwave(new MechFrogStompWeapon(player), rideArmor.pos.addxy(6 * rideArmor.xDir, 0), rideArmor.xDir, player, player.getNextActorNetId(), rpc: true);
+		new MechFrogStompShockwave(new MechFrogStompWeapon(), rideArmor.pos.addxy(6 * rideArmor.xDir, 0), rideArmor.xDir, player, player.getNextActorNetId(), rpc: true);
 		if (rideArmor.consecutiveJump < 2) rideArmor.consecutiveJumpTimeout = 0.25f;
 		else rideArmor.consecutiveJump = 0;
 	}
@@ -1804,7 +1846,7 @@ public class RADash : RideArmorState {
 					rideArmor.shakeCamera(sendRpc: true);
 					rideArmor.changeState(new RAIdle());
 					if (draggedChar != null) {
-						var mgpw = new MechGoliathPunchWeapon(player);
+						var mgpw = new MechGoliathPunchWeapon();
 						mgpw.applyDamage(draggedChar, false, rideArmor, (int)ProjIds.MechPunch);
 					}
 					return;
@@ -1837,7 +1879,7 @@ public class RACalldown : RideArmorState {
 	int phase = 0;
 	Point summonPos;
 	bool isNew;
-	public RACalldown(Point summonPos, bool isNew) : base("vile_warp_beam") {
+	public RACalldown(Point summonPos, bool isNew) : base("vile_warp_beam2") {
 		this.summonPos = summonPos;
 		this.isNew = isNew;
 		enterSound = "warpIn";
@@ -2023,7 +2065,7 @@ public class RAChainAttack : RideArmorState {
 
 		if (rideArmor.frameIndex == 1 && once == 0 && rideArmor.player != null) {
 			once = 1;
-			mcp = new MechChainProj(new MechChainWeapon(player), chainOrigin(), rideArmor.xDir, rideArmor.player, player.getNextActorNetId(), rpc: true);
+			mcp = new MechChainProj(new MechChainWeapon(), chainOrigin(), rideArmor.xDir, rideArmor.player, player.getNextActorNetId(), rpc: true);
 		}
 		if (rideArmor.frameIndex == 14 && once == 1) {
 			once = 2;
@@ -2081,7 +2123,7 @@ public class RAGoliathShoot : RideArmorState {
 			once = true;
 			//mechBusterCooldown = 1f;
 			if (player != null) {
-				var mbw = new MechBusterWeapon(player);
+				var mbw = new MechBusterWeapon();
 				rideArmor.playSound("buster2X3", forcePlay: false, sendRpc: true);
 				new MechBusterProj2(mbw, rideArmor.pos.addxy(15 * rideArmor.xDir, -36), rideArmor.xDir, 0, player, player.getNextActorNetId(), rpc: true);
 				new MechBusterProj(mbw, rideArmor.pos.addxy(15 * rideArmor.xDir, -36), rideArmor.xDir, player, player.getNextActorNetId(), rpc: true);

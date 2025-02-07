@@ -383,6 +383,7 @@ public partial class Player {
 	public ShaderWrapper xStingPaletteShader = Helpers.cloneGenericPaletteShader("cStingPalette");
 	public ShaderWrapper invisibleShader = Helpers.cloneShaderSafe("invisible");
 	public ShaderWrapper zeroPaletteShader = Helpers.cloneGenericPaletteShader("hyperZeroPalette");
+	public ShaderWrapper blackBusterZeroPaletteShader = Helpers.cloneGenericPaletteShader("hyperBusterZeroPalette");
 	public ShaderWrapper nightmareZeroShader = Helpers.cloneGenericPaletteShader("paletteViralZero");
 	public ShaderWrapper zeroAzPaletteShader = Helpers.cloneGenericPaletteShader("paletteAwakenedZero");
 	public ShaderWrapper axlPaletteShader = Helpers.cloneShaderSafe("hyperaxl");
@@ -408,6 +409,17 @@ public partial class Player {
 	// Projectile shaders.
 	public ShaderWrapper timeSlowShader = Helpers.cloneShaderSafe("timeslow");
 	public ShaderWrapper darkHoldScreenShader = Helpers.cloneShaderSafe("darkHoldScreen");
+	// Charge Lv
+	public ShaderWrapper ZeroPinkC = Helpers.cloneGenericPaletteShader("zeroPinkCharge");
+	public ShaderWrapper ZeroGreenC = Helpers.cloneGenericPaletteShader("zeroGreenCharge");
+	public ShaderWrapper ZeroBlueC = Helpers.cloneGenericPaletteShader("zeroBlueCharge");
+	public ShaderWrapper XPinkC = Helpers.cloneGenericPaletteShader("xPinkCharge");
+	public ShaderWrapper XGreenC = Helpers.cloneGenericPaletteShader("xGreenCharge");
+	public ShaderWrapper XBlueC = Helpers.cloneGenericPaletteShader("xBlueCharge");
+	public ShaderWrapper XOrangeC = Helpers.cloneGenericPaletteShader("xOrangeCharge");
+
+	public ShaderWrapper speedBurnerOrange = Helpers.cloneGenericPaletteShader("speedBurnerOrange");
+	public ShaderWrapper speedBurnerGrey = Helpers.cloneGenericPaletteShader("speedBurnerGrey");
 
 
 	// Character specific data populated on RPC request
@@ -2110,7 +2122,13 @@ public partial class Player {
 	}
 
 	public void explodeDieStart() {
-		explodeDieEffect = ExplodeDieEffect.createFromActor(character.player, character, 20, 1.5f, false);
+		explodeDieEffect = ExplodeDieEffect.createFromActor(character.player, character, 20, 1.5f, false, doExplosion: true);
+		Global.level.addEffect(explodeDieEffect);
+		limboChar = character;
+		character = null;
+	}
+	public void explodeDieStart2() {
+		explodeDieEffect = ExplodeDieEffect.createFromActor(character.player, character, 20, 1.5f, false, doExplosion: false);
 		Global.level.addEffect(explodeDieEffect);
 		limboChar = character;
 		character = null;
@@ -2576,9 +2594,15 @@ public partial class Player {
 				subtanks[i].health += amount;
 				if (subtanks[i].health >= SubTank.maxHealth) {
 					subtanks[i].health = SubTank.maxHealth;
-					if (isMainPlayer) Global.playSound("subtankFull");
+					if (isMainPlayer)  {
+						character?.charState.GameCharPlaySound("subtankFull");
+						character?.charState.GameCharXSound("subtankFull", false, false, false, true);
+					}
 				} else {
-					if (isMainPlayer) Global.playSound("subtankFill");
+					if (isMainPlayer) {
+						character?.charState.GameCharPlaySound("subtankFill");
+						character?.charState.GameCharXSound("subtankFill", false, false, false, true);
+					}
 				}
 				break;
 			}

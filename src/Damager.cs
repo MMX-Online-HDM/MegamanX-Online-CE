@@ -303,13 +303,7 @@ public class Damager {
 		if (character != null) {
 			MegamanX? mmx = character as MegamanX;
 
-			bool isStompWeapon = (
-				weaponKillFeedIndex == 19 ||
-				weaponKillFeedIndex == 58 ||
-				weaponKillFeedIndex == 51 ||
-				weaponKillFeedIndex == 59 ||
-				weaponKillFeedIndex == 60
-			) && projId != (int)ProjIds.MechFrogStompShockwave;
+			bool isStompWeapon = projId == (int)ProjIds.MechStomp;
 			if (projId == (int)ProjIds.FlameMStomp || projId == (int)ProjIds.TBreaker ||
 				projId == (int)ProjIds.SparkMStomp || projId == (int)ProjIds.WheelGStomp ||
 				projId == (int)ProjIds.GBeetleStomp || projId == (int)ProjIds.TunnelRStomp ||
@@ -591,7 +585,22 @@ public class Damager {
 
 				// Flinch above 0 and is not weakness
 				if (flinch > 0 && !weakness) {
-					victim?.playSound("hurt");
+					if (character.gameChar == Character.GameChar.X1) {
+						victim?.playSound("hurt");
+					} else if (character.gameChar == Character.GameChar.X2) {
+						victim?.playSound("hurtX2");
+					} else if (character.gameChar == Character.GameChar.X3) {
+						victim?.playSound("hurtX3");
+					}
+					if (mmx?.chestArmor == ArmorId.Light || mmx?.chestArmor == ArmorId.None) {
+						victim?.playSound("hurt");
+					} 
+					if (mmx?.chestArmor == ArmorId.Giga) {
+						victim?.playSound("hurtX2");
+					} 
+					if (mmx?.chestArmor == ArmorId.Max) {
+						victim?.playSound("hurtX3");
+					}
 					character.setHurt(hurtDir, flinch, spiked);
 				}
 				// Weakness is true and character is not frozen in Shotgun Ice.
@@ -616,8 +625,21 @@ public class Damager {
 							character.setHurt(hurtDir, flinch, spiked);
 						}
 					}
-				} else {
-					victim?.playSound("hit");
+				} else {			  
+					if (character.gameChar == Character.GameChar.X1) {
+						victim?.playSound("hit");
+					} else if (character.gameChar == Character.GameChar.X2) {
+						victim?.playSound("hitX2");
+					} else if (character.gameChar == Character.GameChar.X3) {
+						victim?.playSound("hitX3");
+					}
+					if (mmx?.chestArmor == ArmorId.Light || mmx?.chestArmor == ArmorId.None) {
+						victim?.playSound("hit");
+					} else if (mmx?.chestArmor == ArmorId.Giga) {
+						victim?.playSound("hitX2");
+					} else if (mmx?.chestArmor == ArmorId.Max) {
+						victim?.playSound("hitX3");
+					}
 				}
 			}
 		}
@@ -791,7 +813,13 @@ public class Damager {
 					if (weakness) {
 						victim?.playSound("weakness");
 					} else {
-						victim?.playSound("hurt");
+						if (maverick.gameMavs == Maverick.GameMavs.X1) {
+							victim?.playSound("hurt");
+						} else if (maverick.gameMavs == Maverick.GameMavs.X2) {
+							victim?.playSound("hurtX2");
+						} else if (maverick.gameMavs == Maverick.GameMavs.X3) {
+							victim?.playSound("hurtX3");
+						}
 					}
 					if (newState == null && maverick.ownedByLocalPlayer) {
 						int hurtDir = -maverick.xDir;
@@ -801,7 +829,13 @@ public class Damager {
 						maverick.changeState(new MHurt(hurtDir, flinch), true);
 					}
 				} else {
-					victim?.playSound("hit");
+					if (maverick.gameMavs == Maverick.GameMavs.X1) {
+						victim?.playSound("hit");
+					} else if (maverick.gameMavs == Maverick.GameMavs.X2) {
+						victim?.playSound("hitX2");
+					} else if (maverick.gameMavs == Maverick.GameMavs.X3) {
+						victim?.playSound("hitx3");
+					}
 				}
 			}
 		}
@@ -1158,7 +1192,6 @@ public class Damager {
 		};
 	}
 }
-
 public class DamagerMessage {
 	public int? flinch;
 	public float? damage;

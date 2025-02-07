@@ -23,6 +23,7 @@ public class CrushCrawfish : Maverick {
 		if (sendRpc) {
 			createActorRpc(player.id);
 		}
+		gameMavs = GameMavs.X3;
 	}
 
 	public override void update() {

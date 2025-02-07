@@ -69,6 +69,7 @@ public class PunchyZero : Character {
 			_ => new RakuhouhaWeapon(),
 		};
 		hyperMode = pzeroLoadout.hyperMode;
+		gameChar = GameChar.X3;
 	}
 
 	public override void update() {
@@ -467,10 +468,22 @@ public class PunchyZero : Character {
 			}
 			if (gigaAttack is RekkohaWeapon) {
 				gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-				changeState(new Rekkoha(gigaAttack), true);
-			} else {
+				changeState(new RekkohaState(gigaAttack), true);
+			} else if (gigaAttack is RakuhouhaWeapon) {
 				gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-				changeState(new Rakuhouha(gigaAttack), true);
+				changeState(new RakuhouhaState(gigaAttack), true);
+			}
+			else if (gigaAttack is CFlasher) {
+				gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
+				changeState(new CFlasherState(gigaAttack), true);
+			}
+			else if (gigaAttack is ShinMessenkou) {
+				gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
+				changeState(new ShinMessenkouState(gigaAttack), true);
+			}
+			else if (gigaAttack is DarkHoldWeapon) {
+				gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
+				changeState(new DarkHoldShootState(gigaAttack), true);
 			}
 			return true;
 		}
@@ -502,6 +515,16 @@ public class PunchyZero : Character {
 	public bool hypermodeActive() {
 		return isBlack || isAwakened || isViral;
 	}
+	public override void chargeGfx() {
+		if (ownedByLocalPlayer) {
+			chargeEffect.stop();
+		}
+		if (isCharging()) {
+			chargeSound.play();
+			int chargeType = 1;
+			chargeEffect.update(getChargeLevel(), chargeType);
+		}
+	}
 
 	public override List<ShaderWrapper> getShaders() {
 		List<ShaderWrapper> baseShaders = base.getShaders();
@@ -517,6 +540,19 @@ public class PunchyZero : Character {
 		}
 		if (isViral) {
 			palette = player.nightmareZeroShader;
+		}
+		if (Global.isOnFrameCycle(4)) {
+			switch (getChargeLevel()) {
+				case 1:
+					palette = player.ZeroBlueC;
+					break;
+				case 2:
+					palette = player.ZeroBlueC;
+					break;
+				case >=3:
+					palette = player.ZeroPinkC;
+					break;
+			}
 		}
 		if (palette != null && hypermodeBlink > 0) {
 			float blinkRate = MathInt.Ceiling(hypermodeBlink / 30f);
@@ -798,9 +834,26 @@ public class PunchyZero : Character {
 				case 2 when charState is Dash:
 					changeState(new PZeroSpinKick(), true);
 					break;
-				case 3 when grounded && gigaAttack.ammo >= 16:
-					changeState(new Rakuhouha(gigaAttack), true);
-					gigaAttack.addAmmo(-16, player);
+				case 3 when grounded && gigaAttack.shootCooldown <= 0 && gigaAttack.ammo >= gigaAttack.getAmmoUsage(0):
+					if (gigaAttack is RekkohaWeapon) {
+						gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
+						changeState(new RekkohaState(gigaAttack), true);
+					} else if (gigaAttack is RakuhouhaWeapon) {
+						gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
+						changeState(new RakuhouhaState(gigaAttack), true);
+					}
+					else if (gigaAttack is CFlasher) {
+						gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
+						changeState(new CFlasherState(gigaAttack), true);
+					}
+					else if (gigaAttack is ShinMessenkou) {
+						gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
+						changeState(new ShinMessenkouState(gigaAttack), true);
+					}
+					else if (gigaAttack is DarkHoldWeapon) {
+						gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
+						changeState(new DarkHoldShootState(gigaAttack), true);
+					}
 					break;
 				case 4 when grounded && isFacingTarget:
 					changeState(new PZeroYoudantotsu(), true);
@@ -828,23 +881,23 @@ public class PunchyZero : Character {
 						switch (gigaAttack) {
 							case RekkohaWeapon when gigaAttack.ammo >= 28:
 								gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-								changeState(new Rekkoha(gigaAttack), true);
+								changeState(new RekkohaState(gigaAttack), true);
 								break;
 							case CFlasher when gigaAttack.ammo >= 7:
 								gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-								changeState(new Rakuhouha(new CFlasher()), true);
+								changeState(new CFlasherState(gigaAttack), true);
 								break;
 							case RakuhouhaWeapon when gigaAttack.ammo >= 14:
 								gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-								changeState(new Rakuhouha(new RakuhouhaWeapon()), true);
+								changeState(new RakuhouhaState(gigaAttack), true);
 								break;
 							case DarkHoldWeapon when gigaAttack.ammo >= 14 && isViral:
 								gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-								changeState(new Rakuhouha(new DarkHoldWeapon()), true);
+								changeState(new DarkHoldShootState(gigaAttack), true);
 								break;
 							case ShinMessenkou when gigaAttack.ammo >= 14 && isAwakened:
 								gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-								changeState(new Rakuhouha(new ShinMessenkou()), true);
+								changeState(new ShinMessenkouState(gigaAttack), true);
 								break;
 						}
 					} else if (!(proj.projId == (int)ProjIds.SwordBlock) && grounded) {

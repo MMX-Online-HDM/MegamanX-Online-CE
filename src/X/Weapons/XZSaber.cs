@@ -41,8 +41,10 @@ public class XSaberState : CharState {
 	public XSaberState(bool grounded) : base(grounded ? "beam_saber" : "beam_saber_air") {
 		this.grounded = grounded;
 		landSprite = "beam_saber";
+		airSprite = "beam_saber_air";
 		airMove = true;
 		useDashJumpSpeed = true;
+		canJump = true;
 	}
 
 	public override void update() {
@@ -67,6 +69,7 @@ public class X6SaberState : CharState {
 	bool grounded;
 	public X6SaberState(bool grounded) : base(grounded ? "beam_saber2" : "beam_saber_air2") {
 		this.grounded = grounded;
+		airSprite = "beam_saber_air2";
 		landSprite = "beam_saber2";
 		airMove = true;
 		useDashJumpSpeed = true;

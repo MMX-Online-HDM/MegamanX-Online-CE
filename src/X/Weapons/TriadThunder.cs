@@ -367,7 +367,10 @@ public class TriadThunderChargedState : CharState {
 			character.playSound("crashX3", forcePlay: false, sendRpc: true);
 		}
 
-		if (stateTime > 0.75f) {
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+		else if (stateTime > 120f/120f) {
 			character.changeToIdleOrFall();
 		}
 	}

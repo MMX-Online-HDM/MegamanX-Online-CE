@@ -31,6 +31,7 @@ public class ToxicSeahorse : Maverick {
 		maxAmmo = 32;
 		grayAmmoLevel = 8;
 		barIndexes = (67, 56);
+		gameMavs = GameMavs.X3;
 	}
 
 	public override void update() {

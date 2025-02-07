@@ -1346,26 +1346,26 @@ public class GameMode {
 			frameIndex = player.character.rideArmor.raNum;
 			baseX = getHUDHealthPosition(position, false).x;
 			mechBarExists = false;
-			if (player.weapon.drawAmmo) {
+			if (player?.weapon?.drawAmmo == true) {
 				baseX += 15;
 			}
 			damageSavings = 0;
 		}
-		if (isMech && player.character?.rideArmorPlatform != null) {
+		if (isMech && player?.character?.rideArmorPlatform != null) {
 			spriteName = "hud_health_base_mech";
 			health = player.character.rideArmorPlatform.health;
 			maxHealth = player.character.rideArmorPlatform.maxHealth;
 			twoLayerHealth = player.character.rideArmorPlatform.goliathHealth;
 			frameIndex = player.character.rideArmorPlatform.raNum;
 			baseX = getHUDHealthPosition(position, false).x;
-			if (player.weapon.drawAmmo) {
+			if (player?.weapon?.drawAmmo == true) {
 				baseX += 15;
 			}
 			mechBarExists = false;
 			damageSavings = 0;
 		}
 
-		if (isMech && player.character?.rideChaser != null) {
+		if (isMech && player?.character?.rideChaser != null) {
 			spriteName = "hud_health_base_bike";
 			health = player.character.rideChaser.health;
 			maxHealth = player.character.rideChaser.maxHealth;
@@ -1385,7 +1385,7 @@ public class GameMode {
 		baseY -= 16;
 		int barIndex = 0;
 
-		if (player.character is RagingChargeX mmx) {
+		if (player?.character is RagingChargeX mmx) {
 			float hpPercent = MathF.Floor(player.health / player.maxHealth * 100f);
 			if (hpPercent >= 75) barIndex = 1;
 			else if (hpPercent >= 50) barIndex = 3;
@@ -2602,8 +2602,9 @@ public class GameMode {
 			if (Global.serverClient != null) {
 				Fonts.drawText(FontType.Blue, player.getDisplayPing(), col5x, topPlayerY + (i) * rowH, Alignment.Left);
 			}
-
-			Global.sprites[getCharIcon(player)].drawToHUD(player.realCharNum, col2x + 4, topPlayerY + i * rowH);
+			if (player.charNum == (int)CharIds.PunchyZero || player.charNum == (int)CharIds.BusterZero) {
+				Global.sprites[getCharIcon(player)].drawToHUD(1, col2x + 4, topPlayerY + i * rowH);
+			} else Global.sprites[getCharIcon(player)].drawToHUD(player.realCharNum, col2x + 4, topPlayerY + i * rowH);
 		}
 		//drawSpectators();
 	}

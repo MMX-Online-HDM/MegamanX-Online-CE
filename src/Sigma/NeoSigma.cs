@@ -17,6 +17,7 @@ public class NeoSigma : BaseSigma {
 		netId, ownedByLocalPlayer, isWarpIn
 	) {
 		sigmaSaberMaxCooldown = 0.5f;
+		gameChar = GameChar.X2;
 	}
 
 	public override void update() {
@@ -264,5 +265,15 @@ public class NeoSigma : BaseSigma {
 			}
 		}
 		base.aiDodge(target);
+	}
+	public override void aiUpdate() {
+		base.aiUpdate();
+		if (charState is Die) {
+			foreach (Weapon weapon in weapons) {
+				if (weapon is MaverickWeapon mw && mw.maverick != null) {
+					mw.maverick.changeState(new MExit(mw.maverick.pos, true), true);
+				}
+			}	
+		}
 	}
 }

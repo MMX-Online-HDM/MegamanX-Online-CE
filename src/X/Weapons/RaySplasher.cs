@@ -337,7 +337,7 @@ public class RaySplasherChargedState : CharState {
 	public override void update() {
 		base.update();
 
-		if (character.frameIndex >= 3 && !fired) {
+		if (character.frameIndex >= 5 && !fired) {
 			fired = true;
 
 			var turret = new RaySplasherTurret(
@@ -351,8 +351,10 @@ public class RaySplasherChargedState : CharState {
 				mmx.rayTurrets.RemoveAt(0);
 			}
 		}
-
-		if (stateTime > 0.5f) {
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+		if (!character.grounded && character.frameIndex > 8) {
 			character.changeToIdleOrFall();
 		}
 	}
@@ -362,6 +364,9 @@ public class RaySplasherChargedState : CharState {
 		character.useGravity = false;
 		character.vel = new Point();
 		mmx = character as MegamanX ?? throw new NullReferenceException();
+		if (!character.grounded) {
+			character.frameIndex = 2;
+		}
 	}
 
 	public override void onExit(CharState newState) {

@@ -136,10 +136,14 @@ public class Vile : Character {
 
 	public override void update() {
 		base.update();
+		if (isVileMK1) {
+			gameChar = GameChar.X1;
+		} else if (isVileMK2 || isVileMK5) {
+			gameChar = GameChar.X3;
+		}
 		if (!ownedByLocalPlayer) {
 			return;
-		}
-
+		} 
 		if ((grounded || charState is LadderClimb || charState is LadderEnd || charState is WallSlide) && vileHoverTime > 0) {
 			vileHoverTime -= Global.spf * 6;
 			if (vileHoverTime < 0) vileHoverTime = 0;
@@ -171,7 +175,11 @@ public class Vile : Character {
 				weaponHealTime = 0;
 				weaponHealAmount--;
 				player.vileAmmo = Helpers.clampMax(player.vileAmmo + 1, player.vileMaxAmmo);
-				playSound("heal", forcePlay: true);
+				if (isVileMK1) {
+					playSound("heal", forcePlay: true, true);
+				} else {
+					playSound("healX3", forcePlay: true, true);
+				}
 			}
 		}
 

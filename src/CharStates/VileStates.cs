@@ -111,6 +111,8 @@ public class VileRevive : CharState {
 			drDopplerAnim = new Anim(character.pos.addxy(30 * character.xDir, -15), "drdoppler", -character.xDir, null, false);
 			drDopplerAnim.blink = true;
 		} else {
+			drDopplerAnim = new Anim(character.pos.addxy(30 * character.xDir, -15), "vilemk5_lumine", character.xDir, null, false);
+			drDopplerAnim.blink = true;
 			if (vile.linkedRideArmor != null) {
 				vile.linkedRideArmor.ownedByMK5 = true;
 			}
@@ -141,14 +143,14 @@ public class VileRevive : CharState {
 }
 
 public class VileHover : CharState {
-	public SoundWrapper sound;
+	public SoundWrapper? soundh;
 	public Point flyVel;
 	float flyVelAcc = 500;
 	float flyVelMaxSpeed = 200;
 	public float fallY;
 	Vile vile = null!;
 
-	public VileHover(string transitionSprite = "") : base("hover", "hover_shoot", "", transitionSprite) {
+	public VileHover(string transitionSprite = "") : base("hover", "hover_shoot", transitionSprite) {
 		exitOnLanding = true;
 		attackCtrl = true;
 		normalCtrl = true;
@@ -198,7 +200,7 @@ public class VileHover : CharState {
 		}
 		if (base.player.input.isHeld("jump", base.player) && !once) {
 			once = true;
-			sound = character.playSound("vileHover", forcePlay: false, sendRpc: true);
+			soundh = character.playSound("vileHover", forcePlay: false, sendRpc: false);
 		}
 	}
 
@@ -279,8 +281,9 @@ public class VileHover : CharState {
 		character.useGravity = true;
 		character.sprite.restart();
 		character.stopMoving();
-		if (sound != null && !sound.deleted) {
-			sound.sound?.Stop();
+		if (soundh != null && !soundh.deleted) {
+			soundh.sound?.Stop();
+			soundh = null;
 		}
 		RPC.stopSound.sendRpc("vileHover", character.netId);
 

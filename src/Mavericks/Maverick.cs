@@ -71,6 +71,12 @@ public class Maverick : Actor, IDamagable {
 		Medium,
 		Heavy
 	}
+	public GameMavs gameMavs = GameMavs.X1;
+	public enum GameMavs {
+		X1,
+		X2,
+		X3
+	}
 
 	// Other vars.
 	public float width;
@@ -260,7 +266,13 @@ public class Maverick : Actor, IDamagable {
 					weaponHealTime = 0;
 					weaponHealAmount = 0;
 				}
-				playSound("heal", forcePlay: true);
+				if (gameMavs == Maverick.GameMavs.X1) {
+					playSound("heal", forcePlay: true, sendRpc: true);
+				} else if (gameMavs == Maverick.GameMavs.X1) {
+					playSound("healX2", forcePlay: true, sendRpc: true);
+				} else if (gameMavs == Maverick.GameMavs.X1) {
+					playSound("healX3", forcePlay: true, sendRpc: true);
+				}
 			}
 		}
 
@@ -280,7 +292,13 @@ public class Maverick : Actor, IDamagable {
 				}
 				health = Helpers.clampMax(health + 1, maxHealth);
 				if (player == Global.level.mainPlayer || playHealSound) {
-					playSound("heal", forcePlay: true, sendRpc: true);
+					if (gameMavs == Maverick.GameMavs.X1) {
+						playSound("heal", forcePlay: true, sendRpc: true);
+					} else if (gameMavs == Maverick.GameMavs.X1) {
+						playSound("healX2", forcePlay: true, sendRpc: true);
+					} else if (gameMavs == Maverick.GameMavs.X1) {
+						playSound("healX3", forcePlay: true, sendRpc: true);
+					}
 				}
 			}
 		}

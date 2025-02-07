@@ -56,6 +56,7 @@ public partial class Character : Actor, IDamagable {
 	public AI? ai;
 
 	public int dashedInAir = 0;
+	public int kuuenbuJump = 0;
 	public float healAmount = 0;
 	public SubTank? usedSubtank;
 	public float netSubtankHealAmount;
@@ -167,6 +168,13 @@ public partial class Character : Actor, IDamagable {
 
 	// Etc.
 	public int camOffsetX;
+	public GameChar gameChar = GameChar.None;
+	public enum GameChar {
+		X1,
+		X2,
+		X3,
+		None,
+	}
 
 	// Main character class starts here.
 	public Character(
@@ -1025,9 +1033,10 @@ public partial class Character : Actor, IDamagable {
 				}
 				if (player == Global.level.mainPlayer || playHealSound) {
 					if (this is MegamanX { hyperHelmetActive: true, helmetArmor: ArmorId.Max }) {
-						playSound("goldenHelmetHP", forcePlay: true, sendRpc: true);
+						playSound("subtankFillX3", forcePlay: true, sendRpc: true);
 					} else {
-						playSound("heal", forcePlay: true, sendRpc: true);
+						charState.GameCharXSound("heal", false, false, false, true);
+						charState.GameCharPlaySound("heal");
 					}
 				}
 			}
@@ -1151,7 +1160,8 @@ public partial class Character : Actor, IDamagable {
 			}
 			// Play sound and wallkick mid-state if not.
 			else {
-				playSound("jump", sendRpc: true);
+				charState.GameCharPlaySound("jump");
+				charState.GameCharXSound("jump", true, false, false, false);
 			}
 			// GFX.
 			var wallSparkPoint = pos.addxy(12 * xDir, 0);
@@ -1188,7 +1198,8 @@ public partial class Character : Actor, IDamagable {
 					charState.stoppedJump = false;
 				}
 				vel.y = -getJumpPower();
-				playSound("jump", sendRpc: true);
+				charState.GameCharPlaySound("jump");
+				charState.GameCharXSound("jump", true, false, false, false);
 			}
 		}
 		if (charState.normalCtrl) {
@@ -1237,8 +1248,8 @@ public partial class Character : Actor, IDamagable {
 				changeState(new Jump());
 				return true;
 			}
-			if (player.isCrouchHeld() && canCrouch() && charState is not Crouch) {
-				changeState(new Crouch());
+			if (player.isCrouchHeld() && canCrouch() && charState is not CrouchStart or Crouch) {
+				changeState(new CrouchStart());
 				return true;
 			}
 			if (player.input.isPressed(Control.Taunt, player)) {
@@ -1263,6 +1274,7 @@ public partial class Character : Actor, IDamagable {
 				) {
 					lastJumpPressedTime = 0;
 					dashedInAir++;
+					kuuenbuJump++;
 					vel.y = -getJumpPower();
 					changeState(new Jump(), true);
 					return true;
@@ -1787,7 +1799,7 @@ public partial class Character : Actor, IDamagable {
 
 	public virtual void changeToLandingOrFall(bool useSound = true) {
 		if (grounded) {
-			landingCode(useSound);
+			landingCode();
 		} else {
 			if (vel.y * gravityModifier < 0 && charState.canStopJump && !charState.stoppedJump) {
 				changeState(new Jump() { enterSound = "" }, true);
@@ -1811,12 +1823,9 @@ public partial class Character : Actor, IDamagable {
 		}
 	}
 
-	public virtual void landingCode(bool useSound = true) {
-		if (useSound) {
-			playSound("land", sendRpc: true);
-		}
+	public virtual void landingCode() {
 		dashedInAir = 0;
-		changeState(new Idle("land"), true);
+		changeState(new Land(), true);
 	}
 
 	public virtual bool changeState(CharState newState, bool forceChange = false) {
@@ -3020,7 +3029,7 @@ public partial class Character : Actor, IDamagable {
 			};
 		} else {
 			new Anim(getCenterPos(), "explosion", 1, player.getNextActorNetId(), true, sendRpc: true, ownedByLocalPlayer);
-			playSound("explosion", sendRpc: true);
+			playSound("explosionX3", sendRpc: true);
 			if (!carried) parasiteDamager.applyDamage(this, player.weapon is FrostShield, new ParasiticBomb(), this, (int)ProjIds.ParasiticBombExplode, overrideDamage: 4, overrideFlinch: Global.defFlinch);
 		}
 

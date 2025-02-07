@@ -32,6 +32,7 @@ public class MorphMoth : Maverick {
 		flyBarIndexes = (53, 42);
 		maxFlyBar = 960;
 		flyBar = 960;
+		gameMavs = GameMavs.X2;
 	}
 
 	public override void update() {

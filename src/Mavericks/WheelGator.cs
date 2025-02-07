@@ -42,6 +42,7 @@ public class WheelGator : Maverick {
 
 		armorClass = ArmorClass.Heavy;
 		canStomp = true;
+		gameMavs = GameMavs.X2;
 	}
 
 	public override void update() {

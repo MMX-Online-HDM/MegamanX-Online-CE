@@ -101,6 +101,7 @@ public class MegamanX : Character {
 	// Other.
 	public float weaknessCooldown;
 	public float aiAttackCooldown;
+	public float stockedTime;
 
 	// Creation code.
 	public MegamanX(
@@ -125,6 +126,7 @@ public class MegamanX : Character {
 		armArmor = (ArmorId)player.armArmorNum;
 		legArmor = (ArmorId)player.legArmorNum;
 		helmetArmor = (ArmorId)player.helmetArmorNum;
+		gameChar = GameChar.None;
 	}
 
 	// Updates at the start of the frame.
@@ -172,6 +174,13 @@ public class MegamanX : Character {
 				}
 			}
 		}
+		if (stockedSaber || stockedMaxBuster || stockedBuster) {
+			stockedTime += Global.spf;
+			if (stockedTime >= 61f/60f) {
+				stockedTime = 0;
+				playSound("stockedSaber");
+			}
+		}
 	}
 
 	// General update.
@@ -199,15 +208,6 @@ public class MegamanX : Character {
 	public override void postUpdate() {
 		base.postUpdate();
 
-		if (stockedSaber) {
-			addRenderEffect(RenderEffectType.ChargeGreen, 2, 6);
-		}
-		else if (stockedMaxBuster) {
-			addRenderEffect(RenderEffectType.ChargeOrange, 2, 6);
-		}
-		else if (stockedBuster) {
-			addRenderEffect(RenderEffectType.ChargePink, 2, 6);
-		}
 		if (!charState.normalCtrl) {
 			lastShootPressed = 100;	
 		}
@@ -628,7 +628,7 @@ public class MegamanX : Character {
 		return id switch {
 			(int)MeleeIds.SpeedBurnerCharged => new GenericMeleeProj(
 				SpeedBurner.netWeapon, projPos, ProjIds.SpeedBurnerCharged, player,
-				4, Global.defFlinch, 30
+				4, Global.defFlinch, 30, addToLevel: addToLevel
 			),
 			(int)MeleeIds.LightHeadbutt => new GenericMeleeProj(
 				LhHeadbutt.netWeapon, projPos, ProjIds.Headbutt, player,
@@ -761,6 +761,17 @@ public class MegamanX : Character {
 		alpha = backupAlpha;
 	}
 
+	public override void chargeGfx() {
+		if (ownedByLocalPlayer) {
+			chargeEffect.stop();
+		}
+		if (isCharging()) {
+			chargeSound.play();
+			int chargeType = 2;
+			chargeEffect.update(getChargeLevel(), chargeType);
+		}
+	}
+
 	public override List<ShaderWrapper> getShaders() {
 		List<ShaderWrapper> baseShaders = base.getShaders();
 		List<ShaderWrapper> shaders = new();
@@ -775,7 +786,6 @@ public class MegamanX : Character {
 			shaders.AddRange(baseShaders);
 			return shaders;
 		}
-
 		if (index >= (int)WeaponIds.GigaCrush) {
 			index = 0;
 		}
@@ -791,6 +801,50 @@ public class MegamanX : Character {
 		palette = player.xPaletteShader;
 
 		palette?.SetUniform("palette", index);
+
+		if (charState is SpeedBurnerCharState) {
+			palette = player.speedBurnerOrange;
+			if (Global.isOnFrameCycle(8)) {
+				palette = player.speedBurnerGrey;
+			}
+		}
+
+		else if (Global.isOnFrameCycle(4)) {
+			switch (getChargeLevel()) {
+				case 1:
+					palette = player.XBlueC;
+					break;
+				case 2:
+					palette = player.XBlueC;
+					break;
+				case >=3:
+				if (currentWeapon is not XBuster) 
+					palette = player.XPinkC;			
+				else if (armArmor == ArmorId.Max) 
+					palette = player.XOrangeC;
+				else if (hasFullHyperMaxArmor) 
+					palette = player.XGreenC;
+				else 
+					palette = player.XPinkC;		
+					break;
+			}
+			if (stockedSaber) {
+				palette = player.XGreenC;
+			}
+			if (stockedMaxBuster) {
+				palette = player.XOrangeC;
+			}
+			if (stockedBuster) {
+				palette = player.XPinkC;
+			}
+			if (currentWeapon is HyperCharge) {
+				if (!hasFullHyperMaxArmor) {
+					palette = player.XOrangeC;
+				} else {
+					palette = player.XGreenC;
+				}
+			}
+		}
 
 		if (palette != null) {
 			shaders.Add(palette);

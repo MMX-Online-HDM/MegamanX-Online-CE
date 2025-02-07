@@ -39,6 +39,7 @@ public class FakeZero : Maverick {
 		maxAmmo = 32;
 		grayAmmoLevel = 2;
 		barIndexes = (60, 49);
+		gameMavs = GameMavs.X2;
 	}
 
 	public override void preUpdate() {

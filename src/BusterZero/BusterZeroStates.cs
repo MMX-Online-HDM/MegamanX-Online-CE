@@ -113,6 +113,7 @@ public class BusterZeroDoubleBuster : CharState {
 				character.getShootPos(), character.getShootXDir(),
 				player, player.getNextActorNetId(), rpc: true
 			);
+			zero.stockedTime = 0;
 		}
 		if (!fired2 && character.frameIndex == 7) {
 			fired2 = true;
@@ -131,6 +132,7 @@ public class BusterZeroDoubleBuster : CharState {
 					player, player.getNextActorNetId(), rpc: true
 				);
 			}
+			zero.stockedTime = 0;
 		}
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
@@ -171,6 +173,7 @@ public class BusterZeroDoubleBuster : CharState {
 	}
 
 	public override void onExit(CharState newState) {
+		zero.stockedTime = 0;
 		base.onExit(newState);
 		// We check if we fired the second shot. If not we add the stocked charge.
 		if (!fired2) {
@@ -208,7 +211,7 @@ public class BusterZeroHadangeki : CharState {
 
 	public override void update() {
 		base.update();
-		if (character.frameIndex >= 7 && !fired) {
+		if (character.frameIndex >= 6 && !fired) {
 			character.playSound("zerosaberx3", sendRpc: true);
 			zero.stockedSaber = false;
 			fired = true;
@@ -235,6 +238,7 @@ public class BusterZeroHadangeki : CharState {
 	public override void onExit(CharState oldState) {
 		base.onExit(oldState);
 		zero.zSaberCooldown = 36;
+		zero.stockedTime = 0;
 	}
 }
 

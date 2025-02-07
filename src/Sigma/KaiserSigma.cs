@@ -63,6 +63,7 @@ public partial class KaiserSigma : Character {
 		}
 		grounded = false;
 		canBeGrounded = false;
+		gameChar = GameChar.X3;
 	}
 
 	public override void update() {

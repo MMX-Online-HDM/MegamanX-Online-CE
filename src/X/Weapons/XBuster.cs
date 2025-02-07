@@ -88,11 +88,12 @@ public class XBuster : Weapon {
 			0 => "buster",
 			1 => "buster2",
 			2 => "buster3",
-			_ when isStock => "buster4X2",
+			_ when isStock || mmx.armArmor == ArmorId.Giga => "buster4X2",
 			_ => "buster4"
 		};
 		if (mmx.armArmor == ArmorId.Giga && !isStock) {
 			shootSound = chargeLevel switch {
+				0 => "busterX2",
 				1 => "buster2X2",
 				2 => "buster3X2",
 				3 => "buster4X2",
@@ -100,6 +101,7 @@ public class XBuster : Weapon {
 			};
 		} else if (mmx.armArmor == ArmorId.Max && !isStock) {
 			shootSound = chargeLevel switch {
+				0 => "busterX3",
 				1 => "buster2X3",
 				2 => "buster3X3",
 				3 => "buster3X3",

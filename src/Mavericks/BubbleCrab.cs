@@ -41,6 +41,7 @@ public class BubbleCrab : Maverick {
 		barIndexes = (62, 51);
 
 		armorClass = ArmorClass.Light;
+		gameMavs = GameMavs.X2;
 	}
 
 	public override void update() {

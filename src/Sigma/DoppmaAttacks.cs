@@ -154,7 +154,7 @@ public class SigmaThrowShieldState : CharState {
 			return;
 		}
 
-		if (proj == null && character.frameIndex >= 1) {
+		if (proj == null && character.frameIndex >= 2) {
 			proj = new SigmaShieldProj(
 				character.getFirstPOIOrDefault(),
 				character.xDir, player, player.getNextActorNetId(), sendRpc: true
@@ -270,6 +270,7 @@ public class Sigma3Shoot : CharState {
 		canStopJump = true;
 		useDashJumpSpeed = true;
 		landSprite = "shoot";
+		airSprite = "jump_shoot";
 		shootSprite = sprite;
 	}
 

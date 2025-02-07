@@ -37,6 +37,7 @@ public class MagnaCentipede : Maverick {
 		maxAmmo = 32;
 		grayAmmoLevel = 8;
 		barIndexes = (59, 48);
+		gameMavs = GameMavs.X2;
 	}
 
 	bool shootHeldLastFrame;

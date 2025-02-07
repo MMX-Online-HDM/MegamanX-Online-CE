@@ -28,6 +28,7 @@ public class OverdriveOstrich : Maverick {
 		if (sendRpc) {
 			createActorRpc(player.id);
 		}
+		gameMavs = GameMavs.X2;
 	}
 
 	public override void update() {

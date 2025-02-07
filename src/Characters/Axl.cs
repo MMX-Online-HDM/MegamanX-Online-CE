@@ -119,6 +119,7 @@ public class Axl : Character {
 		axlHyperMode = player.loadout?.axlLoadout?.hyperMode ?? 0;
 
 		configureWeapons();
+		gameChar = GameChar.X3;
 	}
 
 	public void zoomIn() {
@@ -439,7 +440,7 @@ public class Axl : Character {
 				weaponHealTime = 0;
 				weaponHealAmount--;
 				player.weapon.ammo = Helpers.clampMax(player.weapon.ammo + 1, player.weapon.maxAmmo);
-				playSound("heal", forcePlay: true);
+				playSound("healX3", forcePlay: true, true);
 			}
 		}
 

@@ -33,6 +33,7 @@ public class DrDoppler : Maverick {
 		maxAmmo = 32;
 		grayAmmoLevel = 8;
 		barIndexes = (66, 55);
+		gameMavs = GameMavs.X3;
 	}
 
 	public override void update() {

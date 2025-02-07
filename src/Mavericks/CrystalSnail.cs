@@ -41,6 +41,7 @@ public class CrystalSnail : Maverick {
 		barIndexes = (54, 43);
 
 		armorClass = ArmorClass.Light;
+		gameMavs = GameMavs.X2;
 	}
 
 	public override void update() {

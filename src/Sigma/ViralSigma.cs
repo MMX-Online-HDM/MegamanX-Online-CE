@@ -30,6 +30,7 @@ public class ViralSigma : Character {
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, false, false
 	) { 
 		charId = CharIds.WolfSigma;
+		gameChar = GameChar.X2;
 	}
 
 	public override void update() {

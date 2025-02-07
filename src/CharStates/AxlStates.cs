@@ -109,7 +109,7 @@ public class Hover : CharState {
 		);
 		hoverExhaust.setzIndex(ZIndex.Character - 1);
 		if (character.ownedByLocalPlayer) {
-			sound = character.playSound("axlHover", forcePlay: false, sendRpc: true);
+			sound = character.playSound("axlHover", forcePlay: false, sendRpc: false);
 		}
 	}
 

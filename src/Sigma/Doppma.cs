@@ -19,6 +19,7 @@ public class Doppma : BaseSigma {
 		netId, ownedByLocalPlayer, isWarpIn
 	) {
 		sigmaSaberMaxCooldown = 0.5f;
+		gameChar = GameChar.X3;
 	}
 
 	public override void update() {
@@ -63,7 +64,7 @@ public class Doppma : BaseSigma {
 	}
 
 	public override Collider getBlockCollider() {
-		Rect rect = Rect.createFromWH(0, 0, 23, 55);
+		Rect rect = Rect.createFromWH(0, 0, 18, 40);
 		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
 	}
 
@@ -207,5 +208,15 @@ public class Doppma : BaseSigma {
 			}
 		}
 		base.aiAttack(target);
+	}
+	public override void aiUpdate() {
+		base.aiUpdate();
+		if (charState is Die) {
+			foreach (Weapon weapon in weapons) {
+				if (weapon is MaverickWeapon mw && mw.maverick != null) {
+					mw.maverick.changeState(new MExit(mw.maverick.pos, true), true);
+				}
+			}	
+		}
 	}
 }

@@ -8,7 +8,85 @@ public class SigmaSlashWeapon : Weapon {
 		killFeedIndex = 9;
 	}
 }
-
+public class SigmaSlashStateGround : CharState {
+	bool fired;
+	public SigmaSlashStateGround() : base("attack") {
+		useDashJumpSpeed = true;
+		airMove = true;
+		canJump = true;
+		canStopJump = true;
+		landSprite = "attack";
+		airSprite = "attack_air";
+	}
+	public override void update() {
+		if (character.frameIndex >= 2 && !fired) {
+			fired = true;
+			character.playSound("sigmaSaber", sendRpc: true);
+			Point off = new Point(30, -20);
+			new SigmaSlashProj(
+				SigmaSlashWeapon.netWeapon, character.pos.addxy(off.x * character.xDir, off.y),
+				character.xDir, player, player.getNextActorNetId(), 4, 26, rpc: true
+			);
+		}
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+		base.update();
+	}
+}
+public class SigmaSlashStateAir : CharState {
+	bool fired;
+	public SigmaSlashStateAir() : base("attack_air") {
+		useDashJumpSpeed = true;
+		airMove = true;
+		canJump = true;
+		canStopJump = true;
+		landSprite = "attack";
+		airSprite = "attack_air";
+	}
+	public override void update() {
+		if (character.frameIndex >= 2 && !fired) {
+			fired = true;
+			character.playSound("sigmaSaber", sendRpc: true);
+			Point off = new Point(20, -30);
+			new SigmaSlashProj(
+				SigmaSlashWeapon.netWeapon, character.pos.addxy(off.x * character.xDir, off.y),
+				character.xDir, player, player.getNextActorNetId(), 3, 13, rpc: true
+			);
+		}
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+		base.update();
+	}
+}
+public class SigmaSlashStateDash : CharState {
+	bool fired;
+	public SigmaSlashStateDash() : base("attack_dash") {
+		useDashJumpSpeed = true;
+		airMove = true;
+		canJump = true;
+		canStopJump = true;
+		landSprite = "attack";
+		airSprite = "attack_dash";
+	}
+	public override void update() {
+		if (character.frameIndex >= 2 && !fired) {
+			fired = true;
+			character.playSound("sigmaSaber", sendRpc: true);
+			Point off = new Point(30, -20);
+			new SigmaSlashProj(
+				SigmaSlashWeapon.netWeapon, character.pos.addxy(off.x * character.xDir, off.y),
+				character.xDir, player, player.getNextActorNetId(), 4, 26, rpc: true
+			);
+		}
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+		base.update();
+	}
+}
+/*
 public class SigmaSlashState : CharState {
 	CharState prevCharState;
 	int attackFrame = 2;
@@ -57,7 +135,7 @@ public class SigmaSlashState : CharState {
 		}
 	}
 }
-
+*/
 
 
 public class SigmaSlashProj : Projectile {
@@ -331,7 +409,7 @@ public class SigmaWallDashState : CharState {
 			!fired && sigma.saberCooldown == 0 && character.invulnTime == 0
 		) {
 			if (yDir == 0) {
-				character.changeState(new SigmaSlashState(new Dash(Control.Dash)), true);
+				character.changeState(new SigmaSlashStateDash());
 				return;
 			}
 

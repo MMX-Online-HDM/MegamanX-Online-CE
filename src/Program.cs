@@ -738,7 +738,7 @@ class Program {
 	static void loadImages() {
 		string spritesheetPath = "assets/spritesheets";
 		if (Options.main.shouldUseOptimizedAssets()) spritesheetPath += "_optimized";
-		var spritesheets = Helpers.getFiles(Global.assetPath + spritesheetPath, false, "png", "psd");
+		var spritesheets = Helpers.getFiles(Global.assetPath + spritesheetPath, true, "png", "psd");
 
 		var menuImages = Helpers.getFiles(Global.assetPath + "assets/menu", true, "png", "psd");
 		var fontSprites = Helpers.getFiles(Global.assetPath + "assets/fonts", true, "png", "psd");
@@ -960,6 +960,13 @@ class Program {
 		Sprite.xArmorHelmetBitmap[2] = Global.textures["XHelmet3"];
 		Sprite.xArmorArmBitmap[2] = Global.textures["XArm3"];
 
+		/*
+		Sprite.xArmorBootsBitmap[3] = Global.textures["UAXBoots"];
+		Sprite.xArmorBodyBitmap[3] = Global.textures["UAXChest"];
+		Sprite.xArmorHelmetBitmap[3] = Global.textures["UAXHelmet"];
+		Sprite.xArmorArmBitmap[3] = Global.textures["UAXPlasma"];
+		*/
+		
 		Sprite.axlArmBitmap = Global.textures["axlArm"];
 	}
 

@@ -20,6 +20,7 @@ public class CmdSigma : BaseSigma {
 		netId, ownedByLocalPlayer, isWarpIn
 	) {
 		sigmaSaberMaxCooldown = 1;
+		gameChar = GameChar.X1;
 	}
 
 	public override void update() {
@@ -45,7 +46,9 @@ public class CmdSigma : BaseSigma {
 		}
 		// For ladder and slide attacks.
 		if (isAttacking() && charState is WallSlide or LadderClimb && !isSigmaShooting()) {
-			if (isAnimOver() && charState != null && charState is not SigmaSlashState) {
+			if (isAnimOver() && charState != null && charState is not SigmaSlashStateGround 
+			or SigmaSlashStateDash or SigmaSlashStateAir
+			) {
 				changeSprite(getSprite(charState.defaultSprite), true);
 				if (charState is WallSlide && sprite != null) {
 					frameIndex = sprite.totalFrameNum - 1;
@@ -84,7 +87,10 @@ public class CmdSigma : BaseSigma {
 				playSound("sigmaSaber", sendRpc: true);
 				return true;
 			}
-			changeState(new SigmaSlashState(charState), true);
+			if (grounded) 
+				changeState(new SigmaSlashStateGround(), true);
+			else 
+				changeState(new SigmaSlashStateAir(), true);
 			return true;
 		}
 		if (charState is Dash dashState) {
@@ -191,11 +197,11 @@ public class CmdSigma : BaseSigma {
 		if (charState is not LadderClimb) {
 			int Sattack = Helpers.randomRange(0, 5);
 			if (charState?.isGrabbedState == false && !player.isDead
-				&& !isInvulnerable() && !(charState is CallDownMaverick or SigmaSlashState)
+				&& !isInvulnerable() && !(charState is CallDownMaverick or SigmaSlashStateGround)
 				&& aiAttackCooldown <= 0) {
 				switch (Sattack) {
 					case 0 when isTargetClose:
-						changeState(new SigmaSlashState(charState), true);
+						changeState(new SigmaSlashStateGround(), true);
 						break;
 					case 1 when isTargetInAir:
 						changeState(new SigmaBallShootEX(), true);
@@ -227,5 +233,15 @@ public class CmdSigma : BaseSigma {
 			}
 		}
 		base.aiDodge(target);
+	}
+	public override void aiUpdate() {
+		base.aiUpdate();
+		if (charState is Die) {
+			foreach (Weapon weapon in weapons) {
+				if (weapon is MaverickWeapon mw && mw.maverick != null) {
+					mw.maverick.changeState(new MExit(mw.maverick.pos, true), true);
+				}
+			}	
+		}
 	}
 }

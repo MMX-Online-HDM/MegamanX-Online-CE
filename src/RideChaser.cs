@@ -110,7 +110,7 @@ public class RideChaser : Actor, IDamagable {
 					healAmount--;
 					health = Helpers.clampMax(health + 1, maxHealth);
 					if (player == Global.level.mainPlayer) {
-						playSound("heal");
+						playSound("healX2");
 					}
 				}
 			}

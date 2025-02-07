@@ -32,6 +32,7 @@ public class BlizzardBuffalo : Maverick {
 
 		armorClass = ArmorClass.Heavy;
 		canStomp = true;
+		gameMavs = GameMavs.X3;
 	}
 
 	public override void update() {

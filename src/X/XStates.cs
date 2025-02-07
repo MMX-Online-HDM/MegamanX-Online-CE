@@ -124,7 +124,7 @@ public class LightDash : CharState {
 				if (inputXDir != 0 && character.grounded) {
 					character.changeState(new Run(), true);
 				} else {
-					character.changeToIdleOrFall();
+					character.changeState(new DashEnd());
 				}
 				return;
 			}
@@ -200,7 +200,7 @@ public class GigaAirDash : CharState {
 	public Anim? exaust = null!;
 
 	public GigaAirDash(string initialDashButton) : base("dash", "dash_shoot", "attack_dash") {
-		enterSound = "dash";
+		enterSound = "airdashX2";
 		this.initialDashButton = initialDashButton;
 		attackCtrl = true;
 		normalCtrl = true;
@@ -229,7 +229,7 @@ public class GigaAirDash : CharState {
 				if (inputXDir != 0 && character.grounded) {
 					character.changeState(new Run(), true);
 				} else {
-					character.changeToIdleOrFall();
+					character.changeState(new DashEnd());
 				}
 				return;
 			}
@@ -317,7 +317,7 @@ public class UpDash : CharState {
 			once = true;
 			character.vel = new Point(0, -character.getJumpPower() * 1.125f);
 			new Anim(character.pos.addxy(0, -10), "dash_sparks_up", character.xDir, player.getNextActorNetId(), true, sendRpc: true);
-			character.playSound("dash", sendRpc: true);
+			character.playSound("airdashupX3", sendRpc: true);
 		}
 
 		dashTime += Global.spf;
@@ -391,6 +391,7 @@ public class X2ChargeShot : CharState {
 					character.playSound(weapon.shootSounds[3], sendRpc: true);
 				}
 				weapon.addAmmo(-weapon.getAmmoUsageEX(3, character), player);
+				mmx.stockedTime = 0;
 			} else {
 				mmx.stockedBuster = false;
 				weapon.shoot(mmx, [4, 1]);
@@ -400,6 +401,7 @@ public class X2ChargeShot : CharState {
 					character.playSound(weapon.shootSounds[3], sendRpc: true);
 				}
 				weapon.addAmmo(-weapon.getAmmoUsageEX(3, character), player);
+				mmx.stockedTime = 0;
 			}
 		}
 		if (character.isAnimOver()) {
@@ -447,6 +449,7 @@ public class X2ChargeShot : CharState {
 			character.shootAnimTime = 20 - character.animTime;
 		}
 		mmx.lastShootPressed = 100;
+		mmx.stockedTime = 0;
 		base.onExit(newState);
 	}
 }
@@ -460,8 +463,12 @@ public class X3ChargeShot : CharState {
 
 	public X3ChargeShot(HyperCharge? hyperBusterWeapon) : base("x3_shot") {
 		this.hyperBusterWeapon = hyperBusterWeapon;
-		airMove = true;
 		useDashJumpSpeed = true;
+		airMove = true;
+		canStopJump = true;
+		landSprite = "x3_shot";
+		airSprite = "x3_air_shot";
+		canJump = true;
 	}
 
 	public override void update() {
@@ -494,6 +501,7 @@ public class X3ChargeShot : CharState {
 					);
 					character.playSound("plasmaShot", sendRpc: true);
 				}
+			mmx.stockedTime = 0;
 			} else {
 				if (hyperBusterWeapon != null) {
 					hyperBusterWeapon.ammo -= hyperBusterWeapon.getChipFactoredAmmoUsage(player);
@@ -517,6 +525,7 @@ public class X3ChargeShot : CharState {
 					player, player.getNextActorNetId(), rpc: true
 				);
 			}
+			mmx.stockedTime = 0;
 		}
 		if (character.isAnimOver()) {
 			if (state == 0 && pressFire) {
@@ -596,6 +605,7 @@ public class X3ChargeShot : CharState {
 			mmx.stockedMaxBuster = false;
 		}
 		character.shootAnimTime = 0;
+		mmx.stockedTime = 0;
 		base.onExit(newState);
 	}
 }

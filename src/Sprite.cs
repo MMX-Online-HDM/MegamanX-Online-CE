@@ -272,7 +272,7 @@ public class Sprite {
 
 		if (!isUltX && armors != null && animData.isXSprite) {
 			bool isShootSprite = needsX3BusterCorrection();
-
+			/*
 			if (isShootSprite) {
 				if (name.Contains("mmx_wall_slide_shoot")) {
 					flippedExtraW = 5;
@@ -281,7 +281,7 @@ public class Sprite {
 				} else {
 					extraW = 5;
 				}
-			}
+			} */
 			if (armors[2] == 2) {
 				extraYOff = 0;
 				extraY = 2;
@@ -315,7 +315,7 @@ public class Sprite {
 
 		if (!isUltX && armors != null && animData.isXSprite) {
 			bool isShootSprite = needsX3BusterCorrection();
-
+			/*
 			if (isShootSprite) {
 				if (name.Contains("mmx_wall_slide_shoot")) {
 					flippedExtraW = 5;
@@ -324,12 +324,11 @@ public class Sprite {
 				} else {
 					extraW = 5;
 				}
-			}
+			} */
 			if (armors[2] == 2) {
 				extraYOff = 0;
 				extraY = 2;
 			}
-
 			var x3ArmShaders = new List<ShaderWrapper>(shaders);
 			if (hyperBusterReady) {
 				if (Global.isOnFrameCycle(5)) {

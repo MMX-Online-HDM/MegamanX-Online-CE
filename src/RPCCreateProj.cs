@@ -152,19 +152,19 @@ public partial class RPCCreateProj : RPC {
 				proj = new VileBombProj(new VileBall(VileBallType.ExplosiveRound), pos, xDir, player, 1, netProjByte);
 				break;
 			case (int)ProjIds.MechMissile:
-				proj = new MechMissileProj(new MechMissileWeapon(player), pos, xDir, false, player, netProjByte);
+				proj = new MechMissileProj(new MechMissileWeapon(), pos, xDir, false, player, netProjByte);
 				break;
 			case (int)ProjIds.MechTorpedo:
-				proj = new TorpedoProj(new MechTorpedoWeapon(player), pos, xDir, player, 2, netProjByte);
+				proj = new TorpedoProj(new MechTorpedoWeapon(), pos, xDir, player, 2, netProjByte);
 				break;
 			case (int)ProjIds.MechChain:
-				proj = new MechChainProj(new MechChainWeapon(player), pos, xDir, player, netProjByte);
+				proj = new MechChainProj(new MechChainWeapon(), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.MechBuster:
-				proj = new MechBusterProj(new MechBusterWeapon(player), pos, xDir, player, netProjByte);
+				proj = new MechBusterProj(new MechBusterWeapon(), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.MechBuster2:
-				proj = new MechBusterProj2(new MechBusterWeapon(player), pos, xDir, 0, player, netProjByte);
+				proj = new MechBusterProj2(new MechBusterWeapon(), pos, xDir, 0, player, netProjByte);
 				break;
 			case (int)ProjIds.BlastLauncherGrenadeSplash:
 				proj = new GrenadeExplosionProj(new Weapon(), pos, xDir, player, 0, null, 0, netProjByte);
@@ -323,7 +323,7 @@ public partial class RPCCreateProj : RPC {
 				proj = new QuakeBlazerFlamePart(pos, xDir, (int)extraData[0] - 1, player, netProjByte);
 				break;
 			case (int)ProjIds.MechFrogStompShockwave:
-				proj = new MechFrogStompShockwave(new MechFrogStompWeapon(null), pos, xDir, player, netProjByte);
+				proj = new MechFrogStompShockwave(new MechFrogStompWeapon(), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.SplashHitGrenade:
 				proj = new SplashHitGrenadeProj(new Napalm(NapalmType.SplashHit), pos, xDir, player, netProjByte);

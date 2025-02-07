@@ -46,6 +46,7 @@ public class MorphMothCocoon : Maverick {
 		barIndexes = (52, 41);
 
 		armorClass = ArmorClass.Light;
+		gameMavs = GameMavs.X2;
 	}
 
 	public float selfDestructTime;

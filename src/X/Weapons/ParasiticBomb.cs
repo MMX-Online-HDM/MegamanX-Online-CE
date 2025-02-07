@@ -335,7 +335,7 @@ public class ParasiticBombProjCharged : Projectile, IDamagable {
 		this.weapon = weapon;
 		this.host = host;
 		fadeSprite = "explosion";
-		fadeSound = "explosion";
+		fadeSound = "explosionX3";
 		maxTime = 3f;
 		projId = (int)ProjIds.ParasiticBombCharged;
 		destroyOnHit = true;

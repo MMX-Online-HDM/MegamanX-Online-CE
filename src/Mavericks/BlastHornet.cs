@@ -37,6 +37,7 @@ public class BlastHornet : Maverick {
 		maxFlyBar = 960;
 		flyBar = 960;
 		flyBarIndexes = (68, 57);
+		gameMavs = GameMavs.X3;
 	}
 
 	public override void update() {

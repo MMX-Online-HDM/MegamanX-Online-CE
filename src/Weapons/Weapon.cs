@@ -376,11 +376,8 @@ public class Weapon {
 			if (weaponHealCount >= 1) {
 				weaponHealCount = 0;
 				if (isAlwaysOn || character.currentWeapon == this) {
-					if (character.player.hasArmArmor(3)) {
-						character.playSound("healX3", forcePlay: true);
-					} else {
-						character.playSound("heal", forcePlay: true);
-					}
+					character.charState.GameCharXSound("heal", false, false, true, false);
+					character.charState.GameCharPlaySound("heal");
 				}
 			}
 		}

@@ -384,7 +384,7 @@ public class GravityWellProjCharged : Projectile, IDamagable {
 		if (projId == (int)ProjIds.RaySplasher || projId == (int)ProjIds.RaySplasherTurret) damage *= 2;
 		health -= damage;
 		if (health <= 0) {
-			fadeSound = "explosion";
+			fadeSound = "explosionX3";
 			fadeSprite = "explosion";
 			destroySelf();
 		}
@@ -404,11 +404,10 @@ public class GravityWellChargedState : CharState {
 	public GravityWellChargedState() : base("point_up") {
 		superArmor = true;
 	}
-
 	public override void update() {
 		base.update();
 
-		if (character.frameIndex >= 3 && !fired) {
+		if (character.frameIndex >= 5 && !fired) {
 			fired = true;
 			stateTime = 0;
 			if (mmx != null) {
@@ -423,6 +422,9 @@ public class GravityWellChargedState : CharState {
 		if (stateTime > 0.65f) {
 			character.changeToIdleOrFall();
 		}
+		if (!character.grounded && character.frameIndex > 8) {
+			character.changeToIdleOrFall();
+		}
 	}
 
 	public override void onEnter(CharState oldState) {
@@ -430,6 +432,9 @@ public class GravityWellChargedState : CharState {
 		mmx = character as MegamanX;
 		character.useGravity = false;
 		character.vel = new Point();
+		if (!character.grounded) {
+			character.frameIndex = 2;
+		}
 	}
 
 	public override void onExit(CharState newState) {
