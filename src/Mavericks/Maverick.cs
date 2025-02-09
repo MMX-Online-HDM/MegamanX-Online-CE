@@ -268,9 +268,9 @@ public class Maverick : Actor, IDamagable {
 				}
 				if (gameMavs == Maverick.GameMavs.X1) {
 					playSound("heal", forcePlay: true, sendRpc: true);
-				} else if (gameMavs == Maverick.GameMavs.X1) {
+				} else if (gameMavs == Maverick.GameMavs.X2) {
 					playSound("healX2", forcePlay: true, sendRpc: true);
-				} else if (gameMavs == Maverick.GameMavs.X1) {
+				} else if (gameMavs == Maverick.GameMavs.X3) {
 					playSound("healX3", forcePlay: true, sendRpc: true);
 				}
 			}
