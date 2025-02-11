@@ -1818,7 +1818,7 @@ public class DashEnd : CharState {
 			exitOnLanding = true;
 		}
 		if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
-			exitOnAirborne = true;
+			character.frameTime = 6;
 		} else 
 		exitOnAirborne = false;
 	}
