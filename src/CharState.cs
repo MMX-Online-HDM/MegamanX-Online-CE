@@ -1811,10 +1811,12 @@ public class DashEnd : CharState {
 		if (character is Doppma doppma && !doppma.grounded) {
 			character.changeSprite("sigma3_fall", false);
 			exitOnLanding = true;
+			airMove = true;
 		}
 		if (character is CmdSigma cmdSigma && !cmdSigma.grounded) {
 			character.changeSprite("sigma_fall", false);
 			exitOnLanding = true;
+			airMove = true;
 		}
 		if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
 			exitOnAirborne = true;
