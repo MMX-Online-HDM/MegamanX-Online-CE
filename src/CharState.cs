@@ -1813,7 +1813,7 @@ public class DashEnd : CharState {
 			exitOnLanding = true;
 		}
 		if (character is CmdSigma cmdSigma && !cmdSigma.grounded) {
-			character.changeSprite("sigma3_fall", false);
+			character.changeSprite("sigma_fall", false);
 			exitOnLanding = true;
 		}
 		if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
