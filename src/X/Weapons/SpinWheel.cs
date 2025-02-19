@@ -29,15 +29,17 @@ public class SpinWheel : Weapon {
 	}
 
 	public override void shoot(Character character, int[] args) {
+		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
+
 		int chargeLevel = args[0];
 		Point pos = character.getShootPos();
 		int xDir = character.getShootXDir();
 		Player player = character.player;
 
 		if (chargeLevel < 3) {
-			new SpinWheelProj(this, pos, xDir, player, player.getNextActorNetId(), true);
+			new SpinWheelProj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 		} else {
-			new SpinWheelProjChargedStart(this, pos, xDir, player, player.getNextActorNetId(), true);
+			new SpinWheelProjChargedStart(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 		}
 	}
 }
@@ -53,25 +55,27 @@ public class SpinWheelProj : Projectile {
 	float maxTimeProj = 2.5f;
 
 	public SpinWheelProj(
-		Weapon weapon, Point pos, int xDir, 
-		Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, 1, player, "spinwheel_start", 
-		0, hitCooldown, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "spinwheel_start", netId, player	
 	) {
+		weapon = SpinWheel.netWeapon;
+		damager.damage = 1;
+		damager.hitCooldown = 12;
+		vel = new Point(0 * xDir, 0);
 		destroyOnHit = false;
 		projId = (int)ProjIds.SpinWheel;
 		maxTimeProj = startMaxTime;
 		maxTime = startMaxTime;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 	}
 
-	public static Projectile rpcInvoke(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters args) {
 		return new SpinWheelProj(
-			SpinWheel.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
+			args.pos, args.xDir, args.owner, args.player, args.netId
 		);
 	}
 
@@ -164,22 +168,25 @@ public class SpinWheelProj : Projectile {
 
 public class SpinWheelProjChargedStart : Projectile {
 	public SpinWheelProjChargedStart(
-		Weapon weapon, Point pos, int xDir, 
-		Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, 4, player, "spinwheel_charged_start", 
-		Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "spinwheel_charged_start", netId, player	
 	) {
+		weapon = SpinWheel.netWeapon;
+		damager.damage = 4;
+		damager.hitCooldown = 30;
+		damager.flinch = Global.defFlinch;
+		vel = new Point(0 * xDir, 0);
 		projId = (int)ProjIds.SpinWheelChargedStart;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 	}
 
-	public static Projectile rpcInvoke(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters args) {
 		return new SpinWheelProjChargedStart(
-			SpinWheel.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
+			args.pos, args.xDir, args.owner, args.player, args.netId
 		);
 	}
 
@@ -189,7 +196,7 @@ public class SpinWheelProjChargedStart : Projectile {
 			if (ownedByLocalPlayer) {
 				for (int i = 0; i < 8; i++) {
 					new SpinWheelProjCharged(
-						weapon, pos, 1, damager.owner, i,
+						pos, 1, this, damager.owner, i,
 						damager.owner.getNextActorNetId(), rpc: true
 					);
 				}
@@ -202,15 +209,16 @@ public class SpinWheelProjChargedStart : Projectile {
 public class SpinWheelProjCharged : Projectile {
 
 	public SpinWheelProjCharged(
-		Weapon weapon, Point pos, int xDir, Player player, 
-		int type, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, int type, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, 1, 200, 1, player, "spinwheel_charged", 
-		Global.defFlinch, 0, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "spinwheel_charged", netId, player	
 	) {
+		weapon = SpinWheel.netWeapon;
+		damager.damage = 1;
+		damager.flinch = Global.defFlinch;
 		projId = (int)ProjIds.SpinWheelCharged;
 		maxTime = 0.75f;
-		vel = Point.createFromByteAngle(type * 32).times(speed);
+		vel = Point.createFromByteAngle(type * 32).times(200);
 
 		if (vel.x < 0) {
 			xDir *= -1;
@@ -222,14 +230,13 @@ public class SpinWheelProjCharged : Projectile {
 		else if (type is 2 or 6) changeSprite("spinwheel_charged_up", true);
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir, new byte[] {(byte)type});
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, new byte[] {(byte)type});
 		}
 	}
 
-	public static Projectile rpcInvoke(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters args) {
 		return new SpinWheelProjCharged(
-			SpinWheel.netWeapon, arg.pos, arg.xDir, 
-			arg.player, arg.extraData[0], arg.netId
+			args.pos, args.xDir, args.owner, args.player, args.extraData[0], args.netId
 		);
 	}
 }

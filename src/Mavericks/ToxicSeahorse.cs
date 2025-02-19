@@ -3,6 +3,7 @@
 namespace MMXOnline;
 
 public class ToxicSeahorse : Maverick {
+	public static Weapon netWeapon = new Weapon(WeaponIds.TSeahorseGeneric, 152);
 	public static Weapon getWeapon() { return new Weapon(WeaponIds.TSeahorseGeneric, 152); }
 	public float teleportCooldown;
 	public ToxicSeahorse(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
@@ -80,8 +81,8 @@ public class ToxicSeahorse : Maverick {
 	public MaverickState getShootState(bool isAI) {
 		var mshoot = new MShoot((Point pos, int xDir) => {
 			// playSound("zbuster2", sendRpc: true);
-			new TSeahorseAcidProj(weapon, pos, xDir, player, player.getNextActorNetId(), sendRpc: true);
-		}, null);
+			new TSeahorseAcidProj(pos, xDir, this, player, player.getNextActorNetId(), rpc: true);
+		}, null!);
 		if (isAI) {
 			// mshoot.consecutiveData = new MaverickStateConsecutiveData(0, 4, 0.75f);
 		}
@@ -119,16 +120,26 @@ public class TSeahorseAcidProj : Projectile, IDamagable {
 	bool firstHit;
 	float hitWallCooldown;
 	float health = 3;
-	public TSeahorseAcidProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, 0, 2, player, "tseahorse_proj_acid_start", 0, 0.01f, netProjId, player.ownedByLocalPlayer) {
-		projId = (int)ProjIds.TSeahorseAcid1;
+	public TSeahorseAcidProj(
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "tseahorse_proj_acid_start", netId, player	
+	) {
+		weapon = ToxicSeahorse.getWeapon();
+		damager.damage = 2;
+		damager.hitCooldown = 1;
+		projId = (int)ProjIds.TSeahorseAcid3;
 		maxTime = 2;
 		useGravity = false;
-
-		if (sendRpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 		checkBigAcidUnderwater();
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new TSeahorseAcidProj(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
 	}
 
 	public override void preUpdate() {
@@ -180,8 +191,14 @@ public class TSeahorseAcidProj : Projectile, IDamagable {
 			//playSound("gbeetleProjBounce", sendRpc: true);
 			hitWallCooldown = 0.1f;
 			if (wasSideHit && ownedByLocalPlayer) {
-				new AcidBurstProjSmall(weapon, other.getHitPointSafe().addxy(-5 * moveDirX, 0), 1, new Point(-moveDirX * 50, 0), ProjIds.TSeahorseAcid1, owner, owner.getNextActorNetId(), rpc: true);
-				new AcidBurstProjSmall(weapon, other.getHitPointSafe().addxy(-5 * moveDirX, 0), 1, new Point(-moveDirX * 100, 0), ProjIds.TSeahorseAcid1, owner, owner.getNextActorNetId(), rpc: true);
+				new AcidBurstProjSmall(
+					other.getHitPointSafe().addxy(-5 * moveDirX, 0), 1, new Point(-moveDirX * 50, 0),
+					true, ProjIds.TSeahorseAcid1, this, owner, owner.getNextActorNetId(), rpc: true
+				);
+				new AcidBurstProjSmall(
+					other.getHitPointSafe().addxy(-5 * moveDirX, 0), 1, new Point(-moveDirX * 100, 0),
+					true, ProjIds.TSeahorseAcid1, this, owner, owner.getNextActorNetId(), rpc: true
+				);
 			}
 		}
 	}
@@ -191,7 +208,7 @@ public class TSeahorseAcidProj : Projectile, IDamagable {
 		health -= damage;
 		if (health <= 0) {
 			destroySelf();
-			Anim.createGibEffect("tseahorse_acid_gib", pos, owner, gibPattern: GibPattern.Random, sendRpc: true);
+			Anim.createGibEffect("tseahorse_acid_gib", pos, owner!, gibPattern: GibPattern.Random, sendRpc: true);
 		}
 	}
 
@@ -204,30 +221,33 @@ public class TSeahorseAcidProj : Projectile, IDamagable {
 
 public class TSeahorseAcid2Proj : Projectile {
 	int bounces = 0;
-	int type;
+	public int type = 0;
 	bool once;
 
 	public TSeahorseAcid2Proj(
-		Point pos, int xDir, int type,
-		Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, int type, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		ToxicSeahorse.getWeapon(), pos, xDir, 300, 0, player, "tseahorse_proj_acid",
-		0, 0.5f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "tseahorse_proj_acid", netId, player	
 	) {
+		weapon = ToxicSeahorse.getWeapon();
+		damager.hitCooldown = 30;
 		maxTime = 4f;
 		projId = (int)ProjIds.TSeahorseAcid2;
 		useGravity = true;
 		fadeSound = "acidBurst";
-		vel = new Point(xDir * 112, -235);
 		this.type = type;
-		if (type == 2) vel = new Point(xDir * 50, -300);
-
+		if (type == 1) vel = new Point(xDir * 50, -300);
+		else vel = new Point(xDir * 112, -235);
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir, (byte)type);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)type);
 		}
 		checkBigAcidUnderwater();
 	}
-
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new TSeahorseAcid2Proj(
+			args.pos, args.xDir, args.extraData[0], args.owner, args.player, args.netId
+		);
+	}
 	public override void update() {
 		base.update();
 		if (sprite.name == "acidburst_charged_start" && isAnimOver()) {
@@ -274,15 +294,11 @@ public class TSeahorseAcid2Proj : Projectile {
 		base.onHitDamagable(damagable);
 	}
 
-	public static Projectile rpcInvoke(ProjParameters args) {
-		return new TSeahorseAcid2Proj(
-			args.pos, args.xDir, args.extraData[0], args.player, args.netId
-		);
-	}
 }
 
 public class TSeahorseShoot2State : MaverickState {
 	bool shotOnce;
+	public ToxicSeahorse AcidSeaforce = null!;
 	public TSeahorseShoot2State() : base("shoot2") {
 		exitOnAnimEnd = true;
 	}
@@ -294,15 +310,26 @@ public class TSeahorseShoot2State : MaverickState {
 		if (!shotOnce && shootPos != null) {
 			shotOnce = true;
 			maverick.playSound("acidBurst", sendRpc: true);
-			new TSeahorseAcid2Proj(shootPos.Value, maverick.xDir, 0, player, player.getNextActorNetId(), rpc: true);
-			new TSeahorseAcid2Proj(shootPos.Value, maverick.xDir, 1, player, player.getNextActorNetId(), rpc: true);
+			new TSeahorseAcid2Proj(
+				shootPos.Value, maverick.xDir, 0, 
+				AcidSeaforce, player, player.getNextActorNetId(), rpc: true
+			);
+			new TSeahorseAcid2Proj(
+				shootPos.Value, maverick.xDir, 1,
+				AcidSeaforce, player, player.getNextActorNetId(), rpc: true
+			);
 		}
+	}
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		AcidSeaforce = maverick as ToxicSeahorse ?? throw new NullReferenceException();
 	}
 }
 
 public class TSeahorseTeleportState : MaverickState {
 	int state = 0;
 	float shootCooldown;
+	public ToxicSeahorse AcidSeaforce = null!;
 	public TSeahorseTeleportState() : base("teleport") {
 		enterSound = "tseahorseTeleportOut";
 	}
@@ -343,10 +370,14 @@ public class TSeahorseTeleportState : MaverickState {
 			}
 		}
 	}
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		AcidSeaforce = maverick as ToxicSeahorse ?? throw new NullReferenceException();
+	}
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
 		maverick.useGravity = true;
 		maverick.angle = 0;
-		(maverick as ToxicSeahorse).teleportCooldown = 0.25f;
+		AcidSeaforce.teleportCooldown = 0.25f;
 	}
 }

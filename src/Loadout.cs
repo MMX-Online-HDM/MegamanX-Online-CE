@@ -149,13 +149,13 @@ public class VileLoadout {
 	}
 
 	public void validate() {
-		if (!inRange(cannon, 0, 2)) { cannon = 0; }
-		if (!inRange(vulcan, 0, 2)) { vulcan = 0; }
-		if (!inRange(missile, 0, 2)) { missile = 0; }
-		if (!inRange(rocketPunch, 0, 2)) { rocketPunch = 0; }
-		if (!inRange(napalm, -1, 3)) { napalm = 0; }
-		if (!inRange(ball, -1, 3)) { ball = 0; }
-		if (!inRange(laser, 0, 2)) { laser = 0; }
+		if (!inRange(cannon, -1, 2)) { cannon = 0; }
+		if (!inRange(vulcan, -3, 2)) { vulcan = 0; }
+		if (!inRange(missile, -1, 2)) { missile = 0; }
+		if (!inRange(rocketPunch, -1, 2)) { rocketPunch = 0; }
+		if (!inRange(napalm, -3, 3)) { napalm = 0; }
+		if (!inRange(ball, -2, 3)) { ball = 0; }
+		if (!inRange(laser, -1, 2)) { laser = 0; }
 		if (!inRange(cutter, -1, 2)) { cutter = 0; }
 		if (!inRange(flamethrower, -1, 3)) { flamethrower = 0; }
 

@@ -105,14 +105,13 @@ public class BoomerangKuwanger : Maverick {
 	public MaverickState getShootState() {
 		return new MShoot((Point pos, int xDir) => {
 			bald = true;
-			playSound("boomerkBoomerang", sendRpc: true);
-			float inputAngle = 25;
+			int inputAngle = 25;
 			var inputDir = input.getInputDir(player);
 			if (inputDir.x != 0 && inputDir.y == 0) inputAngle = 0;
 			else if (inputDir.x != 0 && inputDir.y != 0) inputAngle = 30 * MathF.Sign(inputDir.y);
 			else if (inputDir.x == 0 && inputDir.y != 0) inputAngle = 60 * MathF.Sign(inputDir.y);
-			new BoomerangKBoomerangProj(boomerangWeapon, pos, xDir, this, inputAngle, player, player.getNextActorNetId(), sendRpc: true);
-		}, null);
+			new BoomerangKBoomerangProj(pos, xDir, this, (int)inputAngle, this, player, player.getNextActorNetId(), rpc: true);
+		}, "boomerkBoomerang");
 	}
 
 	public override MaverickState[] aiAttackStates() {
@@ -165,6 +164,7 @@ public class BoomerangKuwanger : Maverick {
 
 #region weapons
 public class BoomerangKBoomerangWeapon : Weapon {
+	public static BoomerangKBoomerangWeapon netWeapon = new();
 	public BoomerangKBoomerangWeapon() {
 		index = (int)WeaponIds.BoomerangKBoomerang;
 		killFeedIndex = 97;
@@ -184,28 +184,47 @@ public class BoomerangKDeadLiftWeapon : Weapon {
 public class BoomerangKBoomerangProj : Projectile {
 	public float angleDist = 0;
 	public float turnDir = 1;
-	public Pickup pickup;
+	public Pickup? pickup;
 	public float maxSpeed = 400;
 	float returnTime = 0.15f;
-	public BoomerangKuwanger maverick;
+	public BoomerangKuwanger BoomerangKuwanger;
 	public BoomerangKBoomerangProj(
-		Weapon weapon, Point pos, int xDir, BoomerangKuwanger maverick,
-		float throwDirAngle, Player player, ushort netProjId, bool sendRpc = false
+		Point pos, int xDir, BoomerangKuwanger BoomerangKuwanger,
+		int throwDirAngle, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 250, 3, player, "boomerk_proj_horn",
-		Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "boomerk_proj_horn", netId, player
 	) {
+		weapon = BoomerangKBoomerangWeapon.netWeapon;
+		damager.damage = 3;
+		damager.hitCooldown = 30;
+		damager.flinch = Global.defFlinch;
+		if (throwDirAngle >= 255) {
+			throwDirAngle = 255;
+		}
 		projId = (int)ProjIds.BoomerangKBoomerang;
 		angle = throwDirAngle;
-		this.maverick = maverick;
+		this.BoomerangKuwanger = BoomerangKuwanger;
 		if (xDir == -1) angle = -180 - angle;
+
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 		shouldVortexSuck = false;
 
-		if (sendRpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+		if (rpc) {
+			byte[] mavNetIdBytes = BitConverter.GetBytes(BoomerangKuwanger.netId ?? 0);
+			byte[] mavthrowDirAngle = new byte[] { (byte)throwDirAngle };
+
+			rpcCreateByteAngle(pos, owner, ownerPlayer, netId, xDir,
+			 new byte[] {mavthrowDirAngle[0], mavNetIdBytes[0], mavNetIdBytes[1]  }
+			);
 		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		ushort maverickId = BitConverter.ToUInt16(args.extraData, 0);
+		BoomerangKuwanger? BoomerangKuwanger = Global.level.getActorByNetId(maverickId) as BoomerangKuwanger;
+		return new BoomerangKBoomerangProj(
+			args.pos, args.xDir, BoomerangKuwanger!, args.extraData[0], args.owner, args.player, args.netId
+		);
 	}
 
 	public override void onCollision(CollideData other) {
@@ -215,9 +234,9 @@ public class BoomerangKBoomerangProj : Projectile {
 
 		if (other.gameObject is Pickup && pickup == null) {
 			pickup = other.gameObject as Pickup;
-			if (!pickup.ownedByLocalPlayer) {
-				pickup.takeOwnership();
-				RPC.clearOwnership.sendRpc(pickup.netId);
+			if (!pickup?.ownedByLocalPlayer == true) {
+				pickup?.takeOwnership();
+				RPC.clearOwnership.sendRpc(pickup?.netId);
 			}
 		}
 
@@ -242,15 +261,15 @@ public class BoomerangKBoomerangProj : Projectile {
 			pickup.changePos(pos);
 		}
 
-		if (time > returnTime) {
+		if (time > returnTime && angle != null) {
 			if (angleDist < 180) {
 				var angInc = (-xDir * turnDir) * Global.spf * maxSpeed;
 				angle += angInc;
 				angleDist += MathF.Abs(angInc);
 				vel.x = Helpers.cosd((float)angle) * maxSpeed;
 				vel.y = Helpers.sind((float)angle) * maxSpeed;
-			} else if (maverick != null && !maverick.destroyed) {
-				var dTo = pos.directionTo(maverick.getCenterPos()).normalize();
+			} else if (BoomerangKuwanger != null && !BoomerangKuwanger.destroyed) {
+				var dTo = pos.directionTo(BoomerangKuwanger.getCenterPos()).normalize();
 				var destAngle = MathF.Atan2(dTo.y, dTo.x) * 180 / MathF.PI;
 				destAngle = Helpers.to360(destAngle);
 				angle = Helpers.lerpAngle((float)angle, destAngle, Global.spf * 10);
@@ -258,8 +277,10 @@ public class BoomerangKBoomerangProj : Projectile {
 				destroySelf();
 			}
 		}
-		vel.x = Helpers.cosd((float)angle) * maxSpeed;
-		vel.y = Helpers.sind((float)angle) * maxSpeed;
+		if (angle != null) {
+			vel.x = Helpers.cosd((float)angle) * maxSpeed;
+			vel.y = Helpers.sind((float)angle) * maxSpeed;
+		}
 	}
 
 	public override void onDestroy() {
@@ -278,7 +299,7 @@ public class BoomerangKBoomerangProj : Projectile {
 public class BoomerKTeleportState : MaverickState {
 	public bool onceTeleportInSound;
 	bool isInvisible;
-	Actor clone;
+	Actor? clone;
 	public BoomerKTeleportState() : base("teleport") {
 		aiAttackCtrl = true;
 	}
@@ -298,7 +319,7 @@ public class BoomerKTeleportState : MaverickState {
 			clone.useGravity = false;
 			maverick.useGravity = false;
 		}
-		if (isInvisible && stateTime > 0.4f) {
+		if (isInvisible && stateTime > 0.4f && clone != null) {
 			isInvisible = false;
 			if (canChangePos()) {
 				Point? prevCamPos = null;
@@ -308,46 +329,48 @@ public class BoomerKTeleportState : MaverickState {
 				}
 				maverick.changePos(clone.pos);
 				if (prevCamPos != null && player.isTagTeam()) {
-					Global.level.snapCamPos(player.character.getCamCenterPos(), prevCamPos);
+					Global.level.snapCamPos(player?.character?.getCamCenterPos() ?? new Point(0,0), prevCamPos);
 				}
 			}
-			clone.destroySelf();
+			clone?.destroySelf();
 			clone = null;
 		}
 
-		if (isInvisible) {
+		if (isInvisible && player != null) {
 			var dir = input.getInputDir(player);
 			float moveAmount = dir.x * 300 * Global.spf;
+			if (clone != null) {
+				var hitWall = Global.level.checkTerrainCollisionOnce(clone, moveAmount, -2);
+				if (hitWall != null && hitWall.getNormalSafe().y == 0) {
+					float rectW = hitWall.otherCollider.shape.getRect().w();
+					if (rectW < 75) {
+						float wallClipAmount = moveAmount + dir.x * (rectW + maverick.width);
+						var hitWall2 = Global.level.checkTerrainCollisionOnce(clone, wallClipAmount, -2);
+						if (hitWall2 == null && clone.pos.x + wallClipAmount > 0 && clone.pos.x + wallClipAmount < Global.level.width) {
+							clone.incPos(new Point(wallClipAmount, 0));
+							clone.visible = true;
+						}
+					}
+				} else {
+					if (MathF.Abs(moveAmount) > 0) clone.visible = true;
+					clone.move(new Point(moveAmount, 0), useDeltaTime: false);
+				}
 
-			var hitWall = Global.level.checkTerrainCollisionOnce(clone, moveAmount, -2);
-			if (hitWall != null && hitWall.getNormalSafe().y == 0) {
-				float rectW = hitWall.otherCollider.shape.getRect().w();
-				if (rectW < 75) {
-					float wallClipAmount = moveAmount + dir.x * (rectW + maverick.width);
-					var hitWall2 = Global.level.checkTerrainCollisionOnce(clone, wallClipAmount, -2);
-					if (hitWall2 == null && clone.pos.x + wallClipAmount > 0 && clone.pos.x + wallClipAmount < Global.level.width) {
-						clone.incPos(new Point(wallClipAmount, 0));
+				if (!canChangePos()) {
+					var hits = Global.level.raycastAllSorted(clone.getCenterPos(), clone.getCenterPos().addxy(0, 200), new List<Type> { typeof(Wall) });
+					var hit = hits.FirstOrDefault();
+					if (hit != null) {
 						clone.visible = true;
+						clone.changePos(hit.getHitPointSafe());
 					}
 				}
-			} else {
-				if (MathF.Abs(moveAmount) > 0) clone.visible = true;
-				clone.move(new Point(moveAmount, 0), useDeltaTime: false);
-			}
+				
 
-			if (!canChangePos()) {
-				var hits = Global.level.raycastAllSorted(clone.getCenterPos(), clone.getCenterPos().addxy(0, 200), new List<Type> { typeof(Wall) });
-				var hit = hits.FirstOrDefault();
-				if (hit != null) {
-					clone.visible = true;
-					clone.changePos(hit.getHitPointSafe());
+				if (!canChangePos()) {
+					var redXPos = clone.getCenterPos();
+					DrawWrappers.DrawLine(redXPos.x - 10, redXPos.y - 10, redXPos.x + 10, redXPos.y + 10, Color.Red, 2, ZIndex.HUD);
+					DrawWrappers.DrawLine(redXPos.x - 10, redXPos.y + 10, redXPos.x + 10, redXPos.y - 10, Color.Red, 2, ZIndex.HUD);
 				}
-			}
-
-			if (!canChangePos()) {
-				var redXPos = clone.getCenterPos();
-				DrawWrappers.DrawLine(redXPos.x - 10, redXPos.y - 10, redXPos.x + 10, redXPos.y + 10, Color.Red, 2, ZIndex.HUD);
-				DrawWrappers.DrawLine(redXPos.x - 10, redXPos.y + 10, redXPos.x + 10, redXPos.y - 10, Color.Red, 2, ZIndex.HUD);
 			}
 		}
 
@@ -386,9 +409,12 @@ public class BoomerKTeleportState : MaverickState {
 	}
 
 	public bool canChangePos() {
+		if (clone != null)
 		if (Global.level.checkTerrainCollisionOnce(clone, 0, 5) == null) return false;
-		var hits = Global.level.getTerrainTriggerList(clone, new Point(0, 5), typeof(KillZone));
-		if (hits.Count > 0) return false;
+		if (clone != null) {
+			var hits = Global.level.getTerrainTriggerList(clone, new Point(0, 5), typeof(KillZone));
+			if (hits.Count > 0) return false;
+		}
 		return true;
 	}
 }
@@ -436,7 +462,7 @@ public class BoomerKDashState : MaverickState {
 }
 
 public class BoomerKDeadLiftState : MaverickState {
-	private Character grabbedChar;
+	private Character? grabbedChar;
 	float timeWaiting;
 	bool grabbedOnce;
 	public BoomerKDeadLiftState() : base("deadlift") {
@@ -493,7 +519,7 @@ public class DeadLiftGrabbed : GenericGrabbedState {
 				return;
 			}
 			if (Global.level.checkTerrainCollisionOnce(character, 0, -1) != null) {
-				new BoomerangKDeadLiftWeapon((grabber as Maverick).player).applyDamage(character, false, character, (int)ProjIds.BoomerangKDeadLift);
+				new BoomerangKDeadLiftWeapon((grabber as Maverick)?.player ?? player).applyDamage(character, false, character, (int)ProjIds.BoomerangKDeadLift);
 				character.playSound("crash", sendRpc: true);
 				character.shakeCamera(sendRpc: true);
 			}

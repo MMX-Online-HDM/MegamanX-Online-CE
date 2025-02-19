@@ -1,4 +1,5 @@
-﻿namespace MMXOnline;
+﻿using System;
+namespace MMXOnline;
 
 public class CrushCrawfish : Maverick {
 	public static Weapon getWeapon() { return new Weapon(WeaponIds.CrushCGeneric, 155); }
@@ -61,9 +62,11 @@ public class CrushCrawfish : Maverick {
 
 	public MaverickState getShootState(bool isAI) {
 		var mshoot = new MShoot((Point pos, int xDir) => {
-			playSound("crushcShoot", sendRpc: true);
-			new CrushCProj(weapon, pos, xDir, player, player.getNextActorNetId(), sendRpc: true);
-		}, null);
+			new CrushCProj(
+				pos, xDir, this, player,
+				player.getNextActorNetId(), rpc: true
+			);
+		}, "crushcShoot");
 		if (isAI) {
 			mshoot.consecutiveData = new MaverickStateConsecutiveData(0, 4, 0.75f);
 		}
@@ -99,14 +102,27 @@ public class CrushCrawfish : Maverick {
 
 public class CrushCProj : Projectile {
 	bool once;
-	public CrushCProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, 200, 3, player, "crushc_proj", 0, 0.01f, netProjId, player.ownedByLocalPlayer) {
+	public CrushCProj(
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "crushc_proj", netId, player
+	) {
+		weapon = CrushCrawfish.getWeapon();
+		damager.damage = 3;
+		damager.hitCooldown = 1;
+		vel = new Point(200 * xDir, 0);
 		projId = (int)ProjIds.CrushCProj;
 		maxDistance = 150f;
 
-		if (sendRpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new CrushCProj(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
 	}
 
 	public override void onHitDamagable(IDamagable damagable) {
@@ -138,29 +154,47 @@ public class CrushCProj : Projectile {
 }
 
 public class CrushCArmProj : Projectile {
-	public int state;
-	Point moveDir;
+	public int state = 0;
 	float moveDistance2;
 	float maxDistance2 = 100;
+	public float Speed = 200;
+	public int type = 0;
 	CrushCrawfish cc;
-	public CrushCArmProj(Weapon weapon, Point pos, int xDir, Point moveDir, CrushCrawfish cc, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, 0, 4, player, getSprite(moveDir), Global.defFlinch, 1f, netProjId, player.ownedByLocalPlayer) {
+	public CrushCArmProj(
+		Point pos, int xDir, int type, CrushCrawfish cc,
+		Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner,  getSprite(type), netId, player
+	) {
+		weapon = CrushCrawfish.getWeapon();
+		damager.damage = 4;
+		damager.flinch = Global.defFlinch;
+		damager.hitCooldown = 60;
 		projId = (int)ProjIds.CrushCArmProj;
-		this.moveDir = moveDir.normalize();
+		this.type = type;
 		this.cc = cc;
-		speed = 200;
 		setIndestructableProperties();
-
-		if (sendRpc) {
-			rpcCreate(pos, player, netProjId, xDir);
-		}
-		// ToDo: Make local.
+		//AAAAAAAAA WHY YOU DON'T WORK
 		canBeLocal = false;
+		if (rpc) {
+			byte[] ccbNetIdBytes = BitConverter.GetBytes(cc.netId ?? 0);
+			byte[] ccTypeBytes = new byte[] { (byte)type };
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, new byte[] {ccTypeBytes[0], ccbNetIdBytes[0], ccbNetIdBytes[1]});
+		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		ushort ScissorsShrimperId = BitConverter.ToUInt16(args.extraData, 0);
+		CrushCrawfish? ScissorsShrimper = Global.level.getActorByNetId(ScissorsShrimperId) as CrushCrawfish;
+
+		return new CrushCArmProj(
+		args.pos, args.xDir, args.extraData[0], ScissorsShrimper!, args.owner, args.player, args.netId
+		);
 	}
 
-	public static string getSprite(Point moveDir) {
-		if (moveDir.x != 0 && moveDir.y != 0) return "crushc_proj_claw2";
-		else if (moveDir.x == 0 && moveDir.y != 0) return "crushc_proj_claw3";
+	public static string getSprite(int type) {
+		if (type == 1) return "crushc_proj_claw2";
+		else if (type == 2) return "crushc_proj_claw3";
+		else if (type == 0) return "crushc_proj_claw";
 		return "crushc_proj_claw";
 	}
 
@@ -169,14 +203,19 @@ public class CrushCArmProj : Projectile {
 		if (!ownedByLocalPlayer) return;
 
 		if (state == 0) {
-			move(moveDir.times(speed));
-			moveDistance2 += speed * Global.spf;
+			if (type == 0) move(new Point(200 * xDir, 0));
+			if (type == 1) move(new Point(200 * xDir, -145));
+			if (type == 2) move(new Point(0, -200));
+			moveDistance2 += Speed * Global.spf;
 			if (moveDistance2 > maxDistance2 || (cc.input.isPressed(Control.Shoot, cc.player) && time > 0.25f)) {
 				state = 1;
 			}
 		} else if (state == 1) {
-			move(moveDir.times(-speed));
-			moveDistance2 += speed * Global.spf;
+			if (type == 0) move(new Point(-200 * xDir, 0));
+			if (type == 1) move(new Point(-200 * xDir, 145));
+			if (type == 2) move(new Point(0, 200));
+
+			moveDistance2 += Speed * Global.spf;
 			if (moveDistance2 > maxDistance2 * 2 || pos.distanceTo(cc.getFirstPOIOrDefault()) < 10) {
 				state = 2;
 				destroySelf();
@@ -193,26 +232,45 @@ public class CrushCArmProj : Projectile {
 }
 
 public class CrushCShootArmState : MaverickState {
-	CrushCArmProj proj;
+	CrushCArmProj? proj;
+	public CrushCrawfish ScissorsShrimper = null!;
 	public CrushCShootArmState() : base("attack_claw") {
 		superArmor = true;
+	}
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		ScissorsShrimper = maverick as CrushCrawfish ?? throw new NullReferenceException();
 	}
 
 	public override void update() {
 		base.update();
-
+		bool upHeld = player.input.isHeld(Control.Up, player);
+		bool LeftOrRightHeld = player.input.isHeld(Control.Right, player) || 
+							   player.input.isHeld(Control.Left, player);
 		Point? shootPos = maverick.getFirstPOI();
 		if (!once && shootPos != null) {
 			once = true;
 			maverick.playSound("crushcClaw", sendRpc: true);
-			var inputDir = input.getInputDir(player);
-			if (inputDir.y > 0) inputDir.y = 0;
-			if (inputDir.isZero()) inputDir = new Point(maverick.xDir, 0);
-			proj = new CrushCArmProj(maverick.weapon, shootPos.Value, maverick.xDir, inputDir, maverick as CrushCrawfish, player, player.getNextActorNetId(), sendRpc: true);
+			if (LeftOrRightHeld && upHeld) {
+				ArmProj(1);
+			} else if (upHeld) {
+				ArmProj(2);
+			} else {
+				ArmProj(0);
+			}
 		}
 
 		if (proj != null && proj.destroyed) {
 			maverick.changeToIdleOrFall();
+		}
+	}
+	public void ArmProj(int type) {
+		Point? shootPos = maverick.getFirstPOI();
+		if (shootPos != null) {
+			proj = new CrushCArmProj(
+				shootPos.Value, maverick.xDir, type, ScissorsShrimper,
+				ScissorsShrimper, player, player.getNextActorNetId(), rpc: true
+			);
 		}
 	}
 
@@ -281,10 +339,14 @@ public class CrushCGrabState : MaverickState {
 	float hurtTime;
 	public bool victimWasGrabbedSpriteOnce;
 	float timeWaiting;
+	public CrushCrawfish ScissorsShrimper = null!;
 	public CrushCGrabState(Character grabbedChar) : base("grab_attack") {
 		victim = grabbedChar;
 	}
-
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		ScissorsShrimper = maverick as CrushCrawfish ?? throw new NullReferenceException();
+	}
 	public override void update() {
 		base.update();
 		if (!victimWasGrabbedSpriteOnce) {
@@ -295,7 +357,7 @@ public class CrushCGrabState : MaverickState {
 				Helpers.decrementTime(ref hurtTime);
 				if (hurtTime == 0) {
 					hurtTime = 0.16666f;
-					(maverick as CrushCrawfish).meleeWeapon.applyDamage(victim, false, maverick, (int)ProjIds.CrushCGrabAttack);
+					ScissorsShrimper.meleeWeapon.applyDamage(victim, false, maverick, (int)ProjIds.CrushCGrabAttack);
 				}
 			}
 		}

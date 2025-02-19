@@ -8,6 +8,7 @@ public class VoltCatfish : Maverick {
 	public static Weapon getWeapon() { return new Weapon(WeaponIds.VoltCatfish, 154); }
 	public static Weapon mainWeapon = new Weapon(WeaponIds.VoltCatfish, 154);
 	public static Weapon getMeleeWeapon(Player player) { return new Weapon(WeaponIds.VoltCatfish, 154); }
+	public static Weapon netWeapon = new Weapon(WeaponIds.VoltCatfish, 154);
 
 	public Weapon meleeWeapon;
 	public List<VoltCTriadThunderProj> mines = new List<VoltCTriadThunderProj>();
@@ -44,6 +45,11 @@ public class VoltCatfish : Maverick {
 	}
 
 	public override void update() {
+		if (input.isPressed(Control.Special1, player)) {
+			foreach (var mine in mines) {
+			//	mine.stopMoving();
+			}
+		}
 		base.update();
 		if (aiBehavior == MaverickAIBehavior.Control) {
 			if (state is MIdle or MRun or MLand) {
@@ -51,12 +57,7 @@ public class VoltCatfish : Maverick {
 					changeState(getShootState(false));
 				} else if (input.isPressed(Control.Special1, player)) {
 					if (!mines.Any(m => m.electrified)) {
-						changeState(new VoltCTriadThunderState());
-						if (state is not VoltCTriadThunderState) {
-							foreach (var mine in mines) {
-								mine.stopMoving();
-							}
-						}
+						changeState(new VoltCTriadThunderState());		
 					} else {
 						changeState(new VoltCSuckState());
 					}
@@ -99,7 +100,7 @@ public class VoltCatfish : Maverick {
 		}
 	}
 
-	public MaverickState getDashState() {
+	public MaverickState? getDashState() {
 		if (ammo >= 32) {
 			return new VoltCSpecialState();
 		} else if (ammo >= 8) {
@@ -122,9 +123,8 @@ public class VoltCatfish : Maverick {
 
 	public MaverickState getShootState(bool isAI) {
 		var mshoot = new MShoot((Point pos, int xDir) => {
-			playSound("voltcCrash", sendRpc: true);
-			new TriadThunderProjCharged(weapon, pos, xDir, 2, player, player.getNextActorNetId(), rpc: true);
-		}, null);
+			new TriadThunderProjCharged(pos, xDir, 2, this, player, player.getNextActorNetId(), rpc: true);
+		}, "crashX3");
 		return mshoot;
 	}
 
@@ -164,26 +164,56 @@ public class VoltCatfish : Maverick {
 
 public class VoltCTriadThunderProj : Projectile {
 	public bool electrified;
-	public VoltCatfish vc;
+	public VoltCatfish ElectroNamazuros;
+	public int type;
+	public int num = 0;
+
 	public VoltCTriadThunderProj(
-		Weapon weapon, Point pos, int xDir, int type, Point velDir,
-		VoltCatfish vc, Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, int type, int num, Actor owner,
+		VoltCatfish ElectroNamazuros, Player player, ushort netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, 2, player, type == 0 ? "voltc_proj_triadt_deactivated" : "voltc_proj_ball",
-		0, 0.5f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, type == 0 ? "voltc_proj_triadt_deactivated" : "voltc_proj_ball", netId, player
 	) {
+		weapon = VoltCatfish.getWeapon();
+		damager.damage = 2;
+		damager.hitCooldown = 30;
 		projId = (int)ProjIds.VoltCTriadThunder;
+		if (type == 1) {
+			damager.flinch = Global.miniFlinch;
+		}
 		destroyOnHit = false;
 		shouldShieldBlock = false;
-		vel = velDir.normalize().times(150);
-		collider.wallOnly = true;
 		maxTime = 1.75f;
-		this.vc = vc;
+		this.ElectroNamazuros = ElectroNamazuros;
+		this.type = type;
+		this.num = num;
+		if (num == 0) vel = new Point(150 * xDir, 75);
+		if (num == 1) vel = new Point(150 * xDir, -75);
+		if (num == 2) vel = new Point(150 * xDir, 0);
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			byte[] ElectroNamazurosbNetIdBytes = BitConverter.GetBytes(ElectroNamazuros.netId ?? 0);
+			byte[] ElectroNamazurosTypeBytes = new byte[] { (byte)type };
+			byte[] ElectroNamazurosNumBytes = new byte[] { (byte)num };
+
+			rpcCreate(
+				pos, owner, ownerPlayer,
+				netId, xDir, new byte[] { 
+					ElectroNamazurosTypeBytes[0], ElectroNamazurosNumBytes[0],
+					ElectroNamazurosbNetIdBytes[0], ElectroNamazurosbNetIdBytes[1]
+				}
+			);
 		}
 		canBeLocal = false;
+		//skull
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		ushort ElectroNamazurosId = BitConverter.ToUInt16(args.extraData, 0);
+		VoltCatfish? ElectroNamazuros = Global.level.getActorByNetId(ElectroNamazurosId) as VoltCatfish;
+		return new VoltCTriadThunderProj(
+			args.pos, args.xDir, args.extraData[0], args.extraData[1],
+			args.owner, ElectroNamazuros!,  args.player, args.netId
+		);
 	}
 
 	public void electrify() {
@@ -196,14 +226,15 @@ public class VoltCTriadThunderProj : Projectile {
 
 	public override void update() {
 		base.update();
-		if (sprite.name == "voltc_proj_ball") {
-			damager.flinch = Global.miniFlinch;
-		} else if (sprite.name == "voltc_proj_triadt_electricity") {
+		if (sprite.name == "voltc_proj_triadt_electricity") {
 			damager.flinch = Global.miniFlinch;
 			damager.hitCooldown = 15;
 		}
 		if (time > 0.75f) {
 			stopMoving();
+		}
+		if (owner.input.isPressed(Control.Special1, owner)) {
+			stopMoving();	
 		}
 	}
 
@@ -211,23 +242,18 @@ public class VoltCTriadThunderProj : Projectile {
 		base.onCollision(other);
 		if (!ownedByLocalPlayer) return;
 
-		if (vel.isZero() && other.gameObject is VoltCTriadThunderProj ttp && ttp.ownedByLocalPlayer && ttp.owner == owner && ttp.sprite.name == "voltc_proj_ball") {
+		if (vel.isZero() && other.gameObject is VoltCTriadThunderProj ttp && 
+			ttp.ownedByLocalPlayer && ttp.owner == owner && ttp.sprite.name == "voltc_proj_ball"
+		) {
+			forceNetUpdateNextFrame = true;
 			electrify();
 			ttp.destroySelf();
-		} else if (other.gameObject is VoltCatfish vc && vc.state is VoltCSuckState && vc.ownedByLocalPlayer && vc == this.vc) {
-			vc.addAmmo(electrified ? 8 : 4);
+		} else if (
+			other.gameObject is VoltCatfish vc && vc.state is VoltCSuckState && 
+			vc.ownedByLocalPlayer && vc == this.ElectroNamazuros
+		) {
+			ElectroNamazuros.addAmmo(electrified ? 8 : 4);
 			destroySelf();
-		}
-	}
-
-	public override void onHitWall(CollideData other) {
-		base.onHitWall(other);
-		if (!ownedByLocalPlayer) return;
-
-		if (other.isGroundHit() || other.isCeilingHit()) {
-			vel.y = 0;
-		} else {
-			vel = Point.zero;
 		}
 	}
 
@@ -235,60 +261,76 @@ public class VoltCTriadThunderProj : Projectile {
 		base.onDestroy();
 		if (!ownedByLocalPlayer) return;
 
-		vc?.mines.Remove(this);
+		ElectroNamazuros?.mines.Remove(this);
 	}
 }
 
 public class VoltCTriadThunderState : MaverickState {
+	public VoltCatfish ElectroNamazuros = null!;
 	public VoltCTriadThunderState() : base("spit") {
 		exitOnAnimEnd = true;
+	}
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		ElectroNamazuros = maverick as VoltCatfish ?? throw new NullReferenceException();
 	}
 
 	public override void update() {
 		base.update();
-		Point? shootPos = maverick.getFirstPOI();
-		var vc = maverick as VoltCatfish;
-		if (!once && shootPos != null) {
+		int xDir = maverick.xDir;
+		if (!once && maverick.frameIndex >= 1) {
 			maverick.playSound("voltcTriadThunder", sendRpc: true);
 			once = true;
-			int type = (vc.mines.Count == 0 ? 0 : 1);
-			var proj1 = new VoltCTriadThunderProj(maverick.weapon, shootPos.Value, maverick.xDir, type, new Point(maverick.xDir, 0.5f), vc, player, player.getNextActorNetId(), rpc: true);
-			var proj2 = new VoltCTriadThunderProj(maverick.weapon, shootPos.Value, maverick.xDir, type, new Point(maverick.xDir, 0), vc, player, player.getNextActorNetId(), rpc: true);
-			var proj3 = new VoltCTriadThunderProj(maverick.weapon, shootPos.Value, maverick.xDir, type, new Point(maverick.xDir, -0.5f), vc, player, player.getNextActorNetId(), rpc: true);
+			int type = (ElectroNamazuros.mines.Count == 0 ? 0 : 1);
+			var proj1 = new VoltCTriadThunderProj(
+					ElectroNamazuros.getCenterPos().addxy(18*xDir,-23), xDir, type, 
+					0, ElectroNamazuros, ElectroNamazuros,
+					player, player.getNextActorNetId(), rpc: true
+				);
+			var proj2 = new VoltCTriadThunderProj(
+					ElectroNamazuros.getCenterPos().addxy(18*xDir,-23), xDir, type,
+					1, ElectroNamazuros, ElectroNamazuros, player,
+					player.getNextActorNetId(), rpc: true
+				);
+			var proj3 = new VoltCTriadThunderProj(
+					ElectroNamazuros.getCenterPos().addxy(18*xDir,-31), xDir, type,
+					2, ElectroNamazuros, ElectroNamazuros, player,
+					player.getNextActorNetId(), rpc: true
+				);
 			if (type == 0) {
-				vc.mines.Add(proj1);
-				vc.mines.Add(proj2);
-				vc.mines.Add(proj3);
+				ElectroNamazuros.mines.Add(proj1);
+				ElectroNamazuros.mines.Add(proj2);
+				ElectroNamazuros.mines.Add(proj3);
 			}
 		}
 	}
 }
 
 public class VoltCSuckProj : Projectile {
-	Player player;
 	public VoltCatfish vc;
 
 	public VoltCSuckProj(
-		Weapon weapon, Point pos, int xDir, VoltCatfish vc, Player player, ushort netProjId, bool sendRpc = false
+		Point pos, int xDir, VoltCatfish vc, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, 0, player, "voltc_proj_suck", 0, 0f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "voltc_proj_suck", netId, player
 	) {
+		weapon = VoltCatfish.getWeapon();
 		projId = (int)ProjIds.VoltCSuck;
 		setIndestructableProperties();
-		this.player = player;
 		this.vc = vc;
-
-		if (sendRpc) {
-			rpcCreate(pos, player, netProjId, xDir, BitConverter.GetBytes(vc.netId.Value));
+		maxTime = 12;
+		//Another projectile with infinite time
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, BitConverter.GetBytes(vc.netId ?? 0));
 		}
 	}
 
 	public static Projectile rpcInvoke(ProjParameters args) {
-		ushort catfishId = BitConverter.ToUInt16(args.extraData, 0);
-		VoltCatfish catfish = Global.level.getActorByNetId(catfishId) as VoltCatfish;
+		ushort ElectroNamazurosId = BitConverter.ToUInt16(args.extraData, 0);
+		VoltCatfish? ElectroNamazuros = Global.level.getActorByNetId(ElectroNamazurosId) as VoltCatfish;
 
 		return new VoltCSuckProj(
-			VoltCatfish.mainWeapon, args.pos, args.xDir, catfish, args.player, args.netId
+		args.pos, args.xDir, ElectroNamazuros!, args.owner, args.player, args.netId
 		);
 	}
 
@@ -325,7 +367,8 @@ public class VoltCSuckProj : Projectile {
 
 public class VoltCSuckState : MaverickState {
 	float partTime;
-	VoltCSuckProj suckProj;
+	VoltCSuckProj? suckProj;
+	public VoltCatfish ElectroNamazuros = null!;
 	public VoltCSuckState() : base("suck") {
 	}
 
@@ -351,7 +394,10 @@ public class VoltCSuckState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		suckProj = new VoltCSuckProj(maverick.weapon, maverick.pos.addxy(maverick.xDir * 75, 0), maverick.xDir, maverick as VoltCatfish, player, player.getNextActorNetId(), sendRpc: true);
+		ElectroNamazuros = maverick as VoltCatfish ?? throw new NullReferenceException();
+		suckProj = new VoltCSuckProj(
+			maverick.pos.addxy(maverick.xDir * 75, 0), maverick.xDir,
+			ElectroNamazuros, ElectroNamazuros, player, player.getNextActorNetId(), rpc: true);
 	}
 
 	public override void onExit(MaverickState newState) {
@@ -362,12 +408,18 @@ public class VoltCSuckState : MaverickState {
 
 
 public class VoltCUpBeamProj : Projectile {
-	public VoltCUpBeamProj(Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 4, player, "voltc_proj_thunder_small", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public VoltCUpBeamProj(
+		Point pos, int xDir, int type, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "voltc_proj_thunder_small", netId, player
+	) {
+		weapon = VoltCatfish.getWeapon();		
+		damager.damage = 4;
+		damager.flinch = Global.defFlinch;
+		damager.hitCooldown = 30;
 		projId = (int)ProjIds.VoltCUpBeam;
 		destroyOnHit = false;
 		shouldShieldBlock = false;
-
 		if (type == 0) {
 			vel = new Point(0, -150);
 			maxTime = 0.675f;
@@ -378,8 +430,13 @@ public class VoltCUpBeamProj : Projectile {
 		}
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)type);
 		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new VoltCUpBeamProj(
+			args.pos, args.xDir, args.extraData[0], args.owner, args.player, args.netId
+		);
 	}
 
 	public override void update() {
@@ -394,78 +451,134 @@ public class VoltCUpBeamProj : Projectile {
 }
 
 public class VoltCUpBeamState : MaverickState {
+	public VoltCatfish ElectroNamazuros = null!;
 	public VoltCUpBeamState() : base("thunder_vertical") {
 		exitOnAnimEnd = true;
+	}
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		ElectroNamazuros = maverick as VoltCatfish ?? throw new NullReferenceException();
 	}
 
 	public override void update() {
 		base.update();
 		Point? shootPos = maverick.getFirstPOI(0);
 		Point? shootPos2 = maverick.getFirstPOI(1);
-		if (!once && shootPos != null) {
+		if (!once && shootPos != null && shootPos2 != null) {
 			once = true;
 			maverick.playSound("voltcWeakBolt", sendRpc: true);
 			if (isAI || maverick.ammo >= 8) {
-				if (!isAI) maverick.deductAmmo(8);
-				new VoltCUpBeamProj(maverick.weapon, shootPos.Value, maverick.xDir, 0, player, player.getNextActorNetId(), rpc: true);
+				if (!isAI) ElectroNamazuros.deductAmmo(8);
+				new VoltCUpBeamProj(
+					shootPos.Value, maverick.xDir, 0, ElectroNamazuros,
+					player, player.getNextActorNetId(), rpc: true
+				);
 			}
 			if (isAI || maverick.ammo >= 8) {
-				if (!isAI) maverick.deductAmmo(8);
-				new VoltCUpBeamProj(maverick.weapon, shootPos2.Value, maverick.xDir, 0, player, player.getNextActorNetId(), rpc: true);
+				if (!isAI) ElectroNamazuros.deductAmmo(8);
+				new VoltCUpBeamProj(
+					shootPos2.Value, maverick.xDir, 0, ElectroNamazuros,
+					player, player.getNextActorNetId(), rpc: true
+				);
 			}
 		}
 	}
 }
 
 public class VoltCChargeProj : Projectile {
-	public VoltCChargeProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 2, player, "voltc_proj_charge", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public VoltCChargeProj(
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "voltc_proj_charge", netId, player
+	) {
+		weapon = VoltCatfish.getWeapon();
+		damager.damage = 2;
+		damager.flinch = Global.defFlinch;
+		damager.hitCooldown = 30;
 		projId = (int)ProjIds.VoltCCharge;
 		setIndestructableProperties();
-
+		maxTime = 12;
+		//Another projectile with infinite time
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new VoltCChargeProj(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
 	}
 }
 
 public class VoltCBarrierProj : Projectile {
-	public VoltCBarrierProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 2, player, "voltc_proj_wall", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public VoltCBarrierProj(
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "voltc_proj_wall", netId, player
+	) {
+		weapon = VoltCatfish.getWeapon();
+		damager.damage = 2;
+		damager.flinch = Global.defFlinch;
+		damager.hitCooldown = 30;
 		projId = (int)ProjIds.VoltCBarrier;
 		setIndestructableProperties();
 		isShield = true;
-
+		maxTime = 12;
+		//Another projectile with infinite time
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new VoltCBarrierProj(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
 	}
 }
 
 public class VoltCSparkleProj : Projectile {
-	public VoltCSparkleProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 2, player, "voltc_proj_sparkle", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public VoltCSparkleProj(
+		Point pos, int xDir, int type, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, type == 0 ? "voltc_proj_sparkle" : "voltc_proj_sparkle2", netId, player
+	) {
+		weapon = VoltCatfish.getWeapon();
+		damager.damage = 2;
+		damager.hitCooldown = 30;
 		projId = (int)ProjIds.VoltCSparkle;
-		vel = new Point(Helpers.randomRange(-200, 200), Helpers.randomRange(-400, -200));
+		vel = new Point(Helpers.randomRange(-150, 150), Helpers.randomRange(-400, -200));
 		useGravity = true;
 		maxTime = 0.75f;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)type);
 		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new VoltCSparkleProj(
+			args.pos, args.xDir, args.extraData[0], args.owner, args.player, args.netId
+		);
 	}
 }
 
 public class VoltCSpecialState : MaverickState {
 	int state = 0;
-	VoltCUpBeamProj upBeamProj;
-	VoltCChargeProj chargeProj1;
-	VoltCChargeProj chargeProj2;
-	VoltCBarrierProj barrierProj1;
-	VoltCBarrierProj barrierProj2;
+	VoltCUpBeamProj? upBeamProj;
+	VoltCChargeProj? chargeProj1;
+	VoltCChargeProj? chargeProj2;
+	VoltCBarrierProj? barrierProj1;
+	VoltCBarrierProj? barrierProj2;
 	const float drainAmmoRate = 6;
+	VoltCatfish ElectroNamazuros = null!;
 	public VoltCSpecialState() : base("charge_start") {
 		superArmor = true;
+	}
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		ElectroNamazuros = maverick as VoltCatfish ?? throw new NullReferenceException();
 	}
 
 	public override void update() {
@@ -473,15 +586,24 @@ public class VoltCSpecialState : MaverickState {
 		if (state == 0) {
 			maverick.ammo -= 8;
 			var beamPos = maverick.pos.addxy(0, -150);
-			upBeamProj = new VoltCUpBeamProj(maverick.weapon, beamPos, maverick.xDir, 1, player, player.getNextActorNetId(), rpc: true);
+			upBeamProj = new VoltCUpBeamProj(
+				beamPos, maverick.xDir, 1, ElectroNamazuros,
+				player, player.getNextActorNetId(), rpc: true
+			);
 			maverick.playSound("voltcStrongBolt", sendRpc: true);
 			state = 1;
 		} else if (state == 1) {
 			maverick.drainAmmo(drainAmmoRate);
-			if (upBeamProj.destroyed) {
+			if (upBeamProj?.destroyed == true) {
 				upBeamProj = null;
-				chargeProj2 = new VoltCChargeProj(maverick.weapon, maverick.getFirstPOI(1).Value, maverick.xDir, player, player.getNextActorNetId(), rpc: true);
-				chargeProj1 = new VoltCChargeProj(maverick.weapon, maverick.getFirstPOI(0).Value, maverick.xDir, player, player.getNextActorNetId(), rpc: true);
+				chargeProj2 = new VoltCChargeProj(
+					maverick.getFirstPOIOrDefault(1), maverick.xDir, ElectroNamazuros,
+					player, player.getNextActorNetId(), rpc: true
+				);
+				chargeProj1 = new VoltCChargeProj(
+					maverick.getFirstPOIOrDefault(0), maverick.xDir, ElectroNamazuros, 
+					player, player.getNextActorNetId(), rpc: true
+				);
 				stateTime = 0;
 				maverick.playSound("voltcStatic", sendRpc: true);
 				maverick.changeSpriteFromName("charge", true);
@@ -493,8 +615,14 @@ public class VoltCSpecialState : MaverickState {
 			if (stateTime > 0.5f) {
 				stateTime = 0;
 				state = 3;
-				barrierProj1 = new VoltCBarrierProj(maverick.weapon, maverick.getFirstPOI(2).Value, maverick.xDir, player, player.getNextActorNetId(), rpc: true);
-				barrierProj2 = new VoltCBarrierProj(maverick.weapon, maverick.getFirstPOI(3).Value, maverick.xDir, player, player.getNextActorNetId(), rpc: true);
+				barrierProj1 = new VoltCBarrierProj(
+					maverick.getFirstPOIOrDefault(2), maverick.xDir, ElectroNamazuros,
+					player, player.getNextActorNetId(), rpc: true
+				);
+				barrierProj2 = new VoltCBarrierProj(
+					maverick.getFirstPOIOrDefault(3), maverick.xDir, ElectroNamazuros,
+					player, player.getNextActorNetId(), rpc: true
+				);
 			}
 		} else if (state == 3) {
 			maverick.drainAmmo(drainAmmoRate);
@@ -509,27 +637,37 @@ public class VoltCSpecialState : MaverickState {
 
 	float partTime;
 	float partSoundTime;
+	float shakecameraTime;
 	public void spawnParticles() {
+		int type = Helpers.randomRange(0, 1);
 		partTime += Global.spf;
-		if (partTime > 0.25f) {
+		if (partTime > 15f/60f) {
 			partTime = 0;
-			new VoltCSparkleProj(maverick.weapon, maverick.getFirstPOI(0).Value, maverick.xDir, player, player.getNextActorNetId(), rpc: true);
+			new VoltCSparkleProj(
+				maverick.getFirstPOIOrDefault(0), maverick.xDir, type,
+				ElectroNamazuros, player, player.getNextActorNetId(), rpc: true
+			);
 		}
 		Helpers.decrementTime(ref partSoundTime);
 		if (partSoundTime <= 0) {
 			partSoundTime = 0.5f;
-			maverick.playSound("voltcCrash", sendRpc: true);
+			maverick.playSound("crashX3", sendRpc: true);
+		}
+		Helpers.decrementTime(ref shakecameraTime);
+		if (shakecameraTime <= 0) {
+			shakecameraTime = 0.2f;
+			maverick.shakeCamera(sendRpc: true);
 		}
 	}
 
 	public void updateChargeProjs() {
-		chargeProj1.changePos(maverick.getFirstPOI(0).Value);
-		chargeProj2.changePos(maverick.getFirstPOI(1).Value);
+		chargeProj1?.changePos(maverick.getFirstPOIOrDefault(0));
+		chargeProj2?.changePos(maverick.getFirstPOIOrDefault(1));
 	}
 
 	public void updateBarrierProjs() {
-		barrierProj1.changePos(maverick.getFirstPOI(2).Value);
-		barrierProj2.changePos(maverick.getFirstPOI(3).Value);
+		barrierProj1?.changePos(maverick.getFirstPOIOrDefault(2));
+		barrierProj2?.changePos(maverick.getFirstPOIOrDefault(3));
 	}
 
 	public override void onExit(MaverickState newState) {

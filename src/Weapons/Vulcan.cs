@@ -1,7 +1,9 @@
 ﻿namespace MMXOnline;
 
 public enum VulcanType {
-	None = -1,
+	None = -3,
+	NoneCutter = -2,
+	NoneMissile = -1,
 	CherryBlast,
 	DistanceNeedler,
 	BuckshotDance
@@ -9,9 +11,11 @@ public enum VulcanType {
 
 public class Vulcan : Weapon {
 	public float vileAmmoUsage;
-	public string muzzleSprite;
-	public string projSprite;
-
+	public string? muzzleSprite;
+	public string? projSprite;
+	public static Vulcan netWeaponCB = new Vulcan(VulcanType.CherryBlast);
+	public static Vulcan netWeaponDN = new Vulcan(VulcanType.DistanceNeedler);
+	public static Vulcan netWeaponBD = new Vulcan(VulcanType.BuckshotDance);
 	public Vulcan(VulcanType vulcanType) : base() {
 		index = (int)WeaponIds.Vulcan;
 		weaponBarBaseIndex = 26;
@@ -19,11 +23,32 @@ public class Vulcan : Weapon {
 		killFeedIndex = 62;
 		weaponSlotIndex = 44;
 		type = (int)vulcanType;
-
 		if (vulcanType == VulcanType.None) {
 			displayName = "None";
-			description = new string[] { "Do not equip a Vulcan." };
 			killFeedIndex = 126;
+			ammousage = 0;
+			vileAmmoUsage = 0;
+			fireRate = 0;
+			vileWeight = 0;
+			effect = "";
+		} else if (vulcanType == VulcanType.NoneCutter) {
+			displayName = "None(Cutter)";
+			description = new string[] { "Equip Missile." };
+			killFeedIndex = 126;
+			ammousage = 0;
+			vileAmmoUsage = 0;
+			fireRate = 0;
+			vileWeight = 0;
+			effect = "Equip Cutter";
+		} else if (vulcanType == VulcanType.NoneMissile) {
+			displayName = "None(Missile)";
+			description = new string[] { "Equip Missile." };
+			killFeedIndex = 126;
+			ammousage = 0;
+			vileAmmoUsage = 0;
+			fireRate = 0;
+			vileWeight = 0;
+			effect = "Equip Missile";
 		} else if (vulcanType == VulcanType.CherryBlast) {
 			fireRate = 6;
 			displayName = "Cherry Blast";
@@ -66,80 +91,160 @@ public class Vulcan : Weapon {
 	}
 
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+		if (vile.vulcanWeapon.type == (int)VulcanType.None) return;
+
 		if (type == (int)VulcanType.DistanceNeedler && shootCooldown > 0) return;
 		if (string.IsNullOrEmpty(vile.charState.shootSprite)) return;
 
 		Player player = vile.player;
-		if (vile.tryUseVileAmmo(vileAmmoUsage, true)) {
-			if (vile.charState is LadderClimb) {
-				if (player.input.isHeld(Control.Left, player)) vile.xDir = -1;
-				if (player.input.isHeld(Control.Right, player)) vile.xDir = 1;
+		if (vile.vulcanWeapon.type != (int)VulcanType.NoneMissile && vile.vulcanWeapon.type != (int)VulcanType.NoneCutter) {
+			if (vile.tryUseVileAmmo(vileAmmoUsage, true)) {
+				if (vile.charState is LadderClimb) {
+					if (player.input.isHeld(Control.Left, player)) vile.xDir = -1;
+					if (player.input.isHeld(Control.Right, player)) vile.xDir = 1;
+				}
+				vile.changeSpriteFromName(vile.charState.shootSprite, false);
+				shootVulcan(vile);
 			}
-			vile.changeSpriteFromName(vile.charState.shootSprite, false);
-			shootVulcan(vile);
 		}
+		if (vile.tryUseVileAmmo(vileAmmoUsage, false) && 
+			(vile.vulcanWeapon.type == (int)VulcanType.NoneMissile || 
+			vile.vulcanWeapon.type == (int)VulcanType.NoneCutter)
+		) {
+			shootVulcan(vile);
+			vile.setVileShootTime(this);
+		} 
 	}
 
 	public void shootVulcan(Vile vile) {
 		Player player = vile.player;
-		if (shootCooldown <= 0) {
-			vile.vulcanLingerTime = 0f;
-			new VulcanMuzzleAnim(this, vile.getShootPos(), vile.getShootXDir(), vile, player.getNextActorNetId(), true, true);
-			new VulcanProj(this, vile.getShootPos(), vile.getShootXDir(), player, player.getNextActorNetId(), rpc: true);
-			if (type == (int)VulcanType.BuckshotDance && Global.isOnFrame(3)) {
-				new VulcanProj(this, vile.getShootPos(), vile.getShootXDir(), player, player.getNextActorNetId(), rpc: true);
-			}
-			vile.playSound("vulcan", sendRpc: true);
-			shootCooldown = fireRate;
+			if (vile.vulcanWeapon.type == (int)VulcanType.NoneMissile) {
+				vile.missileWeapon.vileShoot(WeaponIds.ElectricShock, vile);		
+				vile.setVileShootTime(this);
+			} else if (vile.vulcanWeapon.type == (int)VulcanType.NoneCutter) {
+				vile.cutterWeapon.vileShoot(WeaponIds.VileCutter, vile);		
+				vile.setVileShootTime(this);
+			} else {
+				if (shootCooldown <= 0) {
+					vile.vulcanLingerTime = 0f;
+					new VulcanMuzzleAnim(this, vile.getShootPos(), vile.getShootXDir(), vile, player.getNextActorNetId(), true, true);
+					if (vile.vulcanWeapon.type == (int)VulcanType.CherryBlast) {
+						new VulcanCherryBlast(
+							vile.getShootPos(), vile.getShootXDir(), vile,
+							player, player.getNextActorNetId(), rpc: true
+						);
+					} else if (vile.vulcanWeapon.type == (int)VulcanType.DistanceNeedler) {
+						new VulcanDistanceNeedler(
+							vile.getShootPos(), vile.getShootXDir(), vile,
+							player, player.getNextActorNetId(), rpc: true
+						);
+					} else if (vile.vulcanWeapon.type == (int)VulcanType.BuckshotDance) {
+						new VulcanBuckshotDance(
+							vile.getShootPos(), vile.getShootXDir(), vile,
+							player, player.getNextActorNetId(), rpc: true
+						);
+						if (Global.isOnFrame(3)) {
+							new VulcanBuckshotDance(
+								vile.getShootPos(), vile.getShootXDir(), vile,
+								player, player.getNextActorNetId(), rpc: true
+							);
+						}
+					}
+					vile.playSound("vulcan", sendRpc: true);
+					shootCooldown = fireRate;
+				}
 		}
 	}
 }
-
-public class VulcanProj : Projectile {
-	public VulcanProj(Vulcan weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, weapon.type == (int)VulcanType.DistanceNeedler ? 600 : 500, 1, player, weapon.projSprite, 0, 0f, netProjId, player.ownedByLocalPlayer) {
-		projId = (int)ProjIds.Vulcan;
-		maxTime = 0.25f;
+public class VulcanCherryBlast : Projectile {
+	public VulcanCherryBlast(
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "vulcan_proj", netId, player
+	) {
+		weapon = Vulcan.netWeaponCB;
+		damager.damage = 1;
+		vel = new Point(500 * xDir, 0);
 		destroyOnHit = true;
 		reflectable = true;
-
-		if (weapon.type == (int)VulcanType.DistanceNeedler) {
-			maxTime = 0.3f;
-			destroyOnHit = false;
-			damager.hitCooldown = 12;
-			damager.damage = 2;
-			projId = (int)ProjIds.DistanceNeedler;
-		} else if (weapon.type == (int)VulcanType.BuckshotDance) {
-			//this.xDir = 1;
-			//pixelPerfectRotation = true;
-			int rand = 0;
-			if (player.character is Vile vile) {
-				rand = vile.buckshotDanceNum % 3;
-				vile.buckshotDanceNum++;
-			}
-			float angle = 0;
-			if (rand == 0) angle = 0;
-			if (rand == 1) angle = -20;
-			if (rand == 2) angle = 20;
-			if (xDir == -1) angle += 180;
-			vel = Point.createFromAngle(angle).times(speed);
-			projId = (int)ProjIds.BuckshotDance;
-		}
-
+		maxTime = 0.25f;
+		projId = (int)ProjIds.Vulcan;
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 	}
 
-	public override void update() {
-		base.update();
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new VulcanCherryBlast(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
+	}
+}
+public class VulcanDistanceNeedler : Projectile {
+	public VulcanDistanceNeedler(
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "vulcan_dn_proj", netId, player
+	) {
+		weapon = Vulcan.netWeaponDN;
+		damager.damage = 2;
+		damager.hitCooldown = 12;
+		vel = new Point(600 * xDir, 0);
+		destroyOnHit = false;
+		reflectable = true;
+		maxTime = 0.3f;
+		projId = (int)ProjIds.DistanceNeedler;
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new VulcanDistanceNeedler(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
+	}
+}
+public class VulcanBuckshotDance : Projectile {
+	public VulcanBuckshotDance(
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "vulcan_bd_proj", netId, player
+	) {
+		weapon = Vulcan.netWeaponBD;
+		damager.damage = 1;
+		destroyOnHit = true;
+		reflectable = true;
+		maxTime = 0.25f;
+		projId = (int)ProjIds.BuckshotDance;
+		int rand = 0;
+		if (player.character is Vile vile) {
+			rand = vile.buckshotDanceNum % 3;
+			vile.buckshotDanceNum++;
+		}
+		float angle = 0;
+		if (rand == 0) angle = 0;
+		if (rand == 1) angle = -20;
+		if (rand == 2) angle = 20;
+		if (xDir == -1) angle += 180;
+		vel = Point.createFromAngle(angle).times(500);
+		projId = (int)ProjIds.BuckshotDance;
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new VulcanBuckshotDance(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
 	}
 }
 
 public class VulcanMuzzleAnim : Anim {
 	Character chr;
 	public VulcanMuzzleAnim(Vulcan weapon, Point pos, int xDir, Character chr, ushort? netId = null, bool sendRpc = false, bool ownedByLocalPlayer = true) :
-		base(pos, weapon.muzzleSprite, xDir, netId, true, sendRpc, ownedByLocalPlayer) {
+		base(pos, weapon.muzzleSprite ?? "empty", xDir, netId, true, sendRpc, ownedByLocalPlayer) {
 		this.chr = chr;
 	}
 
@@ -150,31 +255,3 @@ public class VulcanMuzzleAnim : Anim {
 	}
 }
 
-public class VulcanCharState : CharState {
-	bool isCrouch;
-	public VulcanCharState(bool isCrouch) : base(isCrouch ? "crouch_shoot" : "idle_shoot") {
-		useDashJumpSpeed = true;
-		this.isCrouch = isCrouch;
-	}
-
-	public override void update() {
-		base.update();
-
-		if (isCrouch && !player.input.isHeld(Control.Down, player)) {
-			character.changeToIdleOrFall();
-			return;
-		}
-
-		if (!player.input.isHeld(Control.Shoot, player)) {
-			if (isCrouch) {
-				character.changeToCrouchOrFall();
-			} else {
-				character.changeToIdleOrFall();
-			}
-			return;
-		}
-
-		if (player.input.isHeld(Control.Left, player)) character.xDir = -1;
-		if (player.input.isHeld(Control.Right, player)) character.xDir = 1;
-	}
-}

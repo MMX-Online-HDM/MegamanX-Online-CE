@@ -120,6 +120,8 @@ public enum WeaponIds {
 
 	ZSaber,
 	ZSaberProjSwing,
+	PunchyZSaberProjSwing,
+
 	Raijingeki,
 	Raijingeki2,
 	Ryuenjin,
@@ -147,7 +149,7 @@ public enum WeaponIds {
 	MegaPunchWeapon,
 	DropKick,
 	DarkHold,
-
+	MechGenericWeapon,
 	MechMenuWeapon,
 	MechBuster,
 	MechPunch,
@@ -291,7 +293,12 @@ public enum ProjIds {
 	Buster,
 	Buster2,
 	Buster3,
+	Buster3Giga,
+	Buster3Max,
 	Buster4,
+	Buster4Giga,
+	Buster4Giga2,
+	Buster4Max,
 	BusterUnpo,
 	BusterX3Proj2,
 	BusterX3Plasma,
@@ -429,6 +436,7 @@ public enum ProjIds {
 	TBreakerProj,
 
 	ElectricShock,
+	SpreadShot,
 	MK2StunShot,
 	VileMissile,
 	PopcornDemon,
@@ -458,6 +466,7 @@ public enum ProjIds {
 	VileEBombStart,
 	VileEBomb,
 	PeaceOutRoller,
+	PeaceOutRollerSplit,
 	RumblingBangGrenade,
 	FlameRoundGrenade,
 	SplashHitGrenade,
@@ -623,6 +632,7 @@ public enum ProjIds {
 	FakeZeroMelee,
 	FakeZeroBuster,
 	FakeZeroBuster2,
+	FakeZeroBuster3,
 	FakeZeroSwordBeam,
 	FakeZeroGroundPunch,
 	BBuffaloIceProj,
@@ -634,6 +644,7 @@ public enum ProjIds {
 	BBuffaloStomp,
 	TSeahorseAcid1,
 	TSeahorseAcid2,
+	TSeahorseAcid3,
 	TSeahorsePuddle,
 	TSeahorseEmerge,
 	TunnelRTornadoFang,
@@ -701,6 +712,7 @@ public enum ProjIds {
 	PZeroYoudantotsu, // Strong Punch
 	PZeroParryStart,
 	PZeroParryAttack,
+	PZeroHadangeki,
 
 	// Dark Zero buster.
 	DZBuster,

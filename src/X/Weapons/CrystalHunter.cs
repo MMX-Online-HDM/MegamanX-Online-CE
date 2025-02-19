@@ -33,13 +33,15 @@ public class CrystalHunter : Weapon {
 	}
 
 	public override void shoot(Character character, int[] args) {
+		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
+
 		int chargeLevel = args[0];
 		Point pos = character.getShootPos();
 		int xDir = character.getShootXDir();
 		Player player = character.player;
 
 		if (chargeLevel < 3) {
-			new CrystalHunterProj(this, pos, xDir, player, player.getNextActorNetId(), rpc: true);
+			new CrystalHunterProj(pos, xDir, mmx, player, player.getNextActorNetId(), rpc: true);
 		} else {
 			new CrystalHunterCharged(pos, player, player.getNextActorNetId(), player.ownedByLocalPlayer, sendRpc: true);
 		}
@@ -48,12 +50,15 @@ public class CrystalHunter : Weapon {
 
 public class CrystalHunterProj : Projectile {
 	public CrystalHunterProj(
-		Weapon weapon, Point pos, int xDir, 
-		Player player, ushort netProjId,  bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 250, 0, player, "crystalhunter_proj", 
-		0, 0, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "crystalhunter_proj", netId, player	
 	) {
+		weapon = CrystalHunter.netWeapon;
+		damager.damage = 0;
+		damager.hitCooldown = 0;
+		damager.flinch = 0;
+		vel = new Point(250 * xDir, 0);
 		maxTime = 0.6f;
 		useGravity = true;
 		destroyOnHit = true;
@@ -62,14 +67,13 @@ public class CrystalHunterProj : Projectile {
 		projId = (int)ProjIds.CrystalHunter;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 	}
 
-	public static Projectile rpcInvoke(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters args) {
 		return new CrystalHunterProj(
-			CrystalHunter.netWeapon, arg.pos, 
-			arg.xDir, arg.player, arg.netId
+			args.pos, args.xDir, args.owner, args.player, args.netId
 		);
 	}
 }

@@ -41,21 +41,22 @@ public class TornadoFang : Weapon {
 		Point pos = character.getShootPos();
 		int xDir = character.getShootXDir();
 		Player player = character.player;
+		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
 
 		if (chargeLevel < 3) {
-			if (character.ownedByLocalPlayer && character is MegamanX mmx) {
+			if (character.ownedByLocalPlayer) {
 				if (doubleShootCooldown > 0) {
-					new TornadoFangProj(this, pos, xDir, 1, player, player.getNextActorNetId(), rpc: true);
-					new TornadoFangProj(this, pos, xDir, 2, player, player.getNextActorNetId(), rpc: true);
+					new TornadoFangProj(pos, xDir, 1, mmx, player, player.getNextActorNetId(), rpc: true);
+					new TornadoFangProj(pos, xDir, 2, mmx, player, player.getNextActorNetId(), rpc: true);
 					doubleShootCooldown = 0;
 				} else {
-					new TornadoFangProj(this, pos, xDir, 0, player, player.getNextActorNetId(), rpc: true);
+					new TornadoFangProj(pos, xDir, 0, mmx, player, player.getNextActorNetId(), rpc: true);
 					doubleShootCooldown = 30;
 				}
 			}
 		} else {
-			var ct = new TornadoFangProjCharged(this, pos, xDir, player, player.getNextActorNetId(), true);
-			if (character.ownedByLocalPlayer && character is MegamanX mmx) {
+			var ct = new TornadoFangProjCharged(pos, xDir, mmx, player, player.getNextActorNetId(), true);
+			if (character.ownedByLocalPlayer) {
 				mmx.chargedTornadoFang = ct;
 			}
 			doubleShootCooldown = 0;
@@ -78,10 +79,14 @@ public class TornadoFangProj : Projectile {
 	float sparksCooldown;
 
 	public TornadoFangProj(
-		Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, int type, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 100, 1, player, "tunnelfang_proj", 0, 0.25f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "tunnelfang_proj", netId, player
 	) {
+		weapon = TornadoFang.netWeapon;
+		damager.damage = 1;
+		damager.hitCooldown = 15;
+		vel = new Point(100 * xDir, 0);
 		maxTime = 1.5f;
 		projId = (int)ProjIds.TornadoFang;
 		exhaust = new Anim(pos, "tunnelfang_exhaust", xDir, null, false);
@@ -95,14 +100,14 @@ public class TornadoFangProj : Projectile {
 		}
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir, new byte[] { (byte)type });
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, new byte[] { (byte)type });
 		}
 	}
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new TornadoFangProj(
-			TornadoFang.netWeapon, arg.pos, arg.xDir, 
-			arg.extraData[0], arg.player, arg.netId
+			arg.pos, arg.xDir, arg.extraData[0],
+			arg.owner, arg.player, arg.netId
 		);
 	}
 
@@ -174,33 +179,35 @@ public class TornadoFangProj : Projectile {
 }
 
 public class TornadoFangProjCharged : Projectile {
-	public MegamanX? mmx;
+	public MegamanX mmx = null!;
 	float sparksCooldown;
 	public bool unliked;
 	public Point offset;
-	public Anim exhaust;
+	public Anim? exhaust;
 
 	public TornadoFangProjCharged(
-		Weapon weapon, Point pos, int xDir, 
-		Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 300, 1, player, "tunnelfang_charged", 
-		Global.defFlinch, 0.125f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "tunnelfang_charged", netId, player
 	) {
+		weapon = TornadoFang.netWeapon;
+		damager.damage = 1;
+		damager.hitCooldown = 7;
+		damager.flinch = Global.defFlinch;
 		projId = (int)ProjIds.TornadoFangCharged;
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 		shouldVortexSuck = false;
-		mmx = (player.character as MegamanX);
+		mmx = player.character as MegamanX ?? throw new NullReferenceException();
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 		canBeLocal = false;
 	}
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new TornadoFangProjCharged(
-			TornadoFang.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
+			arg.pos, arg.xDir, arg.owner, arg.player, arg.netId
 		);
 	}
 
@@ -214,14 +221,14 @@ public class TornadoFangProjCharged : Projectile {
 				destroySelf();
 				return;
 			}
-			if (weapon != TornadoFang.netWeapon) {
-				weapon.addAmmo(speedMul * -0.08f, mmx.player);
+			if (mmx?.currentWeapon is TornadoFang) {
+				mmx?.currentWeapon?.addAmmo(speedMul * -0.08f, mmx.player);
 			}
-			if (weapon.ammo <= 0) {
+			if (mmx?.currentWeapon?.ammo <= 0) {
 				destroySelf();
 				return;
 			}
-			if (mmx.currentWeapon is not TornadoFang && mmx.currentWeapon is not HyperCharge) {
+			if (mmx?.currentWeapon is not TornadoFang && mmx?.currentWeapon is not HyperCharge) {
 				destroySelf();
 				return;
 			}

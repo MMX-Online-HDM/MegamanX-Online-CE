@@ -21,17 +21,19 @@ public class SilkShot : Weapon {
 	}
 
 	public override void shoot(Character character, int[] args) {
+		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
+
 		int chargeLevel = args[0];
 		Point pos = character.getShootPos();
 		int xDir = character.getShootXDir();
 		Player player = character.player;
 
 		if (chargeLevel >= 3) {
-			new SilkShotProjCharged(this, pos, xDir, player, player.getNextActorNetId(), true);
-		} else if (chargeLevel >= 2) {
-			new SilkShotProjLv2(pos, xDir, player, player.getNextActorNetId(), true);
-		} else {
-			new SilkShotProj(this, pos, xDir, player, player.getNextActorNetId(), true);
+			new SilkShotProjCharged(pos, xDir, mmx, player, player.getNextActorNetId(), true);
+		// } else if (chargeLevel >= 2) {
+		//		new SilkShotProjLv2(pos, xDir, mmx, player, player.getNextActorNetId(), true);
+		} else if (chargeLevel < 3) {
+			new SilkShotProj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 		}
 	}
 
@@ -45,12 +47,15 @@ public class SilkShot : Weapon {
 public class SilkShotProj : Projectile {
 	bool splitOnce;
 	public SilkShotProj(
-		Weapon weapon, Point pos, int xDir, Player player, 
-		ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 200, 2, player, "silkshot_proj", 
-		0, 0, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "silkshot_proj", netId, player	
 	) {
+		weapon = SilkShot.netWeapon;
+		damager.damage = 2;
+		damager.hitCooldown = 0;
+		damager.flinch = 0;
+		vel = new Point(200 * xDir, 0);
 		maxTime = 6f;
 		fadeSprite = "explosion";
 		fadeSound = "explosion";
@@ -59,16 +64,15 @@ public class SilkShotProj : Projectile {
 		projId = (int)ProjIds.SilkShot;
 		healAmount = 2;
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 		frameSpeed = 0;
 		frameIndex = Helpers.randomRange(0, sprite.totalFrameNum - 1);
 	}
 
-	public static Projectile rpcInvoke(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters args) {
 		return new SilkShotProj(
-			SilkShot.netWeapon, arg.pos, 
-			arg.xDir, arg.player,  arg.netId
+			args.pos, args.xDir, args.owner, args.player, args.netId
 		);
 	}
 
@@ -91,7 +95,7 @@ public class SilkShotProj : Projectile {
 		else return;
 		for (int i = 0; i < 4; i++) {
 			new SilkShotProjShrapnel(
-				weapon, pos, xDir, damager.owner, 0, 64 * i + 32,
+				pos, xDir, this, damager.owner, 0, 64 * i + 32,
 				damager.owner.getNextActorNetId(), rpc: true
 			);
 		}
@@ -100,12 +104,15 @@ public class SilkShotProj : Projectile {
 
 public class SilkShotProjShrapnel : Projectile {
 	public SilkShotProjShrapnel(
-		Weapon weapon, Point pos, int xDir, Player player, int type,
-		float byteAngle, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, int type,
+		float byteAngle, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 300, 1, player, "silkshot_piece", 
-		0, 0.5f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "silkshot_piece", netId, player	
 	) {
+		weapon = SilkShot.netWeapon;
+		damager.damage = 1;
+		damager.hitCooldown = 30;
+		vel = new Point(300 * xDir, 0);
 		maxTime = 0.6f;
 		reflectable = true;
 		this.vel.x = MathInt.SquareSinB(byteAngle) * 300f;
@@ -116,14 +123,14 @@ public class SilkShotProjShrapnel : Projectile {
 			changeSprite("silkshot_proj", true);
 		}
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir, (byte)byteAngle, (byte)type);
+			rpcCreateByteAngle(pos, owner, ownerPlayer, netId, byteAngle, (byte)type);
 		}
 	}
 
-	public static Projectile rpcInvoke(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters args) {
 		return new SilkShotProjShrapnel(
-			SilkShot.netWeapon, arg.pos, arg.xDir, arg.player, 
-			arg.extraData[1], arg.extraData[0], arg.netId
+			args.pos, args.xDir, args.owner, args.player,
+			args.extraData[0], args.byteAngle, args.netId
 		);
 	}
 }
@@ -131,12 +138,14 @@ public class SilkShotProjShrapnel : Projectile {
 public class SilkShotProjCharged : Projectile {
 	bool splitOnce;
 	public SilkShotProjCharged(
-		Weapon weapon, Point pos, int xDir, Player player,
-		ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 200, 4, player, "silkshot_proj_charged",
-		Global.defFlinch, 0, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "silkshot_proj_charged", netId, player	
 	) {
+		weapon = SilkShot.netWeapon;
+		damager.damage = 4;
+		damager.flinch = Global.defFlinch;
+		vel = new Point(200 * xDir, 0);
 		maxTime = 6f;
 		fadeSprite = "explosion";
 		fadeSound = "silkShotChargedExplosion";
@@ -145,14 +154,13 @@ public class SilkShotProjCharged : Projectile {
 		projId = (int)ProjIds.SilkShotCharged;
 		healAmount = 6;
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 	}
 
-	public static Projectile rpcInvoke(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters args) {
 		return new SilkShotProjCharged(
-			SilkShot.netWeapon, arg.pos, 
-			arg.xDir, arg.player,  arg.netId
+			args.pos, args.xDir, args.owner, args.player, args.netId
 		);
 	}
 
@@ -173,7 +181,7 @@ public class SilkShotProjCharged : Projectile {
 
 		for (int i = 0; i < 8; i++) {
 			new SilkShotProjShrapnel(
-				weapon, pos, xDir, damager.owner, i % 2, i * 32,
+				pos, xDir, this, damager.owner, i % 2, i * 32,
 				damager.owner.getNextActorNetId(), rpc: true
 			);
 		}
@@ -184,11 +192,14 @@ public class SilkShotProjCharged : Projectile {
 public class SilkShotProjLv2 : Projectile {
 	bool splitOnce;
 	public SilkShotProjLv2(
-		Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netProjId, bool rpc = false
 	) : base(
-		SilkShot.netWeapon, pos, xDir, 200, 3, player, "silkshot_proj",
-		Global.defFlinch, 0, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "silkshot_proj", netProjId, player	
 	) {
+		weapon = SilkShot.netWeapon;
+		damager.damage = 3;
+		damager.flinch = Global.defFlinch;
+		vel = new Point(200 * xDir, 0);
 		maxTime = 6f;
 		fadeSprite = "explosion";
 		fadeSound = "explosion";
@@ -198,13 +209,13 @@ public class SilkShotProjLv2 : Projectile {
 		projId = (int)ProjIds.SilkShotChargedLv2;
 		healAmount = 6;
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netProjId, xDir);
 		}
 	}
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new SilkShotProjLv2(
-			arg.pos, arg.xDir, arg.player,  arg.netId
+			arg.pos, arg.xDir, arg.owner, arg.player,  arg.netId
 		);
 	}
 
@@ -228,7 +239,7 @@ public class SilkShotProjLv2 : Projectile {
 
 		for (int i = 0; i < 8; i++) {
 			new SilkShotProjShrapnel(
-				weapon, pos, xDir, damager.owner, 0, i * 32,
+				pos, xDir, this, damager.owner, 0, i * 32,
 				damager.owner.getNextActorNetId(), rpc: true
 			);
 		}

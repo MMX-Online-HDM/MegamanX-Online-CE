@@ -228,13 +228,13 @@ public class ZeroDoubleBuster : CharState {
 				character.playSound("buster3X3", sendRpc: true);
 				new ZBuster4Proj(
 					character.getShootPos(),
-					character.getShootXDir(), 1, player, player.getNextActorNetId(), rpc: true
+					character.getShootXDir(), zero, player, player.getNextActorNetId(), rpc: true
 				);
 			} else {
 				character.playSound("buster2X3", sendRpc: true);
 				new ZBuster2Proj(
 					character.getShootPos(), character.getShootXDir(),
-					0, player, player.getNextActorNetId(), rpc: true
+					zero, player, player.getNextActorNetId(), rpc: true
 				);
 			}
 		}
@@ -248,7 +248,7 @@ public class ZeroDoubleBuster : CharState {
 			character.playSound("buster3X3", sendRpc: true);
 			new ZBuster4Proj(
 				character.getShootPos(), character.getShootXDir(),
-				0, player, player.getNextActorNetId(), rpc: true
+				zero, player, player.getNextActorNetId(), rpc: true
 			);
 		}
 
@@ -303,7 +303,7 @@ public class ZeroDoubleBuster : CharState {
 
 public class AwakenedZeroHadangeki : CharState {
 	bool fired;
-
+	public Zero zero = null!;
 	public AwakenedZeroHadangeki() : base("projswing") {
 		landSprite = "projswing";
 		airSprite = "projswing_air";
@@ -321,7 +321,8 @@ public class AwakenedZeroHadangeki : CharState {
 			character.playSound("zerosaberx3", sendRpc: true);
 			fired = true;
 			new ZSaberProj(
-				character.pos.addxy(30 * character.xDir, -20), character.xDir,
+				character.pos.addxy(30 * character.xDir, -20), character.xDir, 
+				isAZ: zero.isAwakened ? true : false, zero,
 				player, player.getNextActorNetId(), rpc: true
 			);
 		}
@@ -343,6 +344,7 @@ public class AwakenedZeroHadangeki : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		zero = player.character as Zero ?? throw new NullReferenceException();
 		if (!character.grounded || character.vel.y < 0) {
 			sprite = "projswing_air";
 			defaultSprite = sprite;
@@ -359,7 +361,7 @@ public class AwakenedZeroHadangekiWall : CharState {
 	bool fired;
 	public int wallDir;
 	public Collider wallCollider;
-
+	public Zero zero = null!;
 	public AwakenedZeroHadangekiWall(int wallDir, Collider wallCollider) : base("wall_slide_attack") {
 		this.wallDir = wallDir;
 		this.wallCollider = wallCollider;
@@ -374,6 +376,7 @@ public class AwakenedZeroHadangekiWall : CharState {
 			fired = true;
 			new ZSaberProj(
 				character.pos.addxy(30 * -wallDir, -20), -wallDir,
+				isAZ: zero.isAwakened ? true : false, zero,
 				player, player.getNextActorNetId(), rpc: true
 			);
 		}
@@ -381,6 +384,10 @@ public class AwakenedZeroHadangekiWall : CharState {
 			character.changeState(new WallSlide(wallDir, wallCollider) { enterSound = "" });
 			character.sprite.frameIndex = character.sprite.totalFrameNum - 1;
 		}
+	}
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		zero = player.character as Zero ?? throw new NullReferenceException();
 	}
 
 	public override void onExit(CharState oldState) {
@@ -391,6 +398,7 @@ public class AwakenedZeroHadangekiWall : CharState {
 
 public class GenmureiState : CharState {
 	bool fired;
+	public Zero zero = null!;
 	public GenmureiState() : base("genmu") { }
 
 	public override void update() {
@@ -400,16 +408,22 @@ public class GenmureiState : CharState {
 			fired = true;
 			character.playSound("genmureix5", sendRpc: true);
 			new GenmuProj(
-				character.pos.addxy(30 * character.xDir, -25),
-				character.xDir, 0, player, player.getNextActorNetId(), rpc: true
+				character.pos.addxy(30 * character.xDir, -25), character.xDir, 0, 
+				isAZ: zero.isAwakened ? true : false,
+				zero, player, player.getNextActorNetId(), rpc: true
 			);
 			new GenmuProj(
-				character.pos.addxy(30 * character.xDir, -25),
-				character.xDir, 1, player, player.getNextActorNetId(), rpc: true
+				character.pos.addxy(30 * character.xDir, -25), character.xDir, 1, 
+				isAZ: zero.isAwakened ? true : false,
+				zero, player, player.getNextActorNetId(), rpc: true
 			);
 		}
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		}
+	}
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		zero = player.character as Zero ?? throw new NullReferenceException();
 	}
 }

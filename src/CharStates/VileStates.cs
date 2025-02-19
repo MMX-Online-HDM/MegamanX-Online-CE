@@ -51,9 +51,9 @@ public class CallDownMech : CharState {
 
 public class VileRevive : CharState {
 	public float radius = 200;
-	Anim drDopplerAnim;
+	Anim? drDopplerAnim;
 	bool isMK5;
-	Vile vile;
+	public Vile vile = null!;
 
 	public VileRevive(bool isMK5) : base(isMK5 ? "revive_to5" : "revive") {
 		invincible = true;

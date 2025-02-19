@@ -9,7 +9,7 @@ public class GravityBeetle : Maverick {
 	public static Weapon getMeleeWeapon(Player player) { return new Weapon(WeaponIds.GravityBeetle, 157, new Damager(player, 6, Global.defFlinch, 0.5f)); }
 
 	public Weapon meleeWeapon;
-	public GBeetleGravityWellProj well;
+	public GBeetleGravityWellProj? well;
 
 	public GravityBeetle(
 		Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
@@ -122,11 +122,17 @@ public class GravityBeetle : Maverick {
 public class GBeetleBallProj : Projectile {
 	bool firstHit;
 	int size;
-	float hitWallCooldown;
 	const float moveSpeed = 200;
 	bool isSecond;
-	public GBeetleBallProj(Weapon weapon, Point pos, int xDir, bool isSecond, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, moveSpeed, 2, player, "gbeetle_proj1", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public GBeetleBallProj(
+		Point pos, int xDir, bool isSecond, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "gbeetle_proj1", netId, player
+	) {
+		weapon = GravityBeetle.getWeapon();
+		damager.damage = 2;
+		damager.hitCooldown = 30;
+		vel = new Point (moveSpeed * xDir, 0);
 		projId = (int)ProjIds.GBeetleBall;
 		maxTime = 3f;
 		destroyOnHit = false;
@@ -135,15 +141,15 @@ public class GBeetleBallProj : Projectile {
 			vel = new Point(0, -moveSpeed);
 		}
 
-		if (sendRpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, isSecond ? (byte) 1 : (byte) 0);
 		}
-		canBeLocal = false;
 	}
 
-	public override void update() {
-		base.update();
-		Helpers.decrementTime(ref hitWallCooldown);
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new GBeetleBallProj(
+			args.pos, args.xDir, args.extraData[0] == 1, args.owner, args.player, args.netId
+		);
 	}
 
 	public void increaseSize() {
@@ -157,11 +163,11 @@ public class GBeetleBallProj : Projectile {
 
 		updateDamager((size + 1) * 2, flinch);
 		size++;
+		forceNetUpdateNextFrame = true;
 	}
 
 	public override void onHitWall(CollideData other) {
 		base.onHitWall(other);
-		if (hitWallCooldown > 0) return;
 		if (other.myCollider.isTrigger) return;
 
 		bool didHit = false;
@@ -185,7 +191,6 @@ public class GBeetleBallProj : Projectile {
 		if (didHit) {
 			playSound("gbeetleProjBounce", sendRpc: false);
 			increaseSize();
-			//hitWallCooldown += 0.1f;
 		}
 	}
 }
@@ -193,10 +198,15 @@ public class GBeetleBallProj : Projectile {
 public class GBeetleShoot : MaverickState {
 	bool shotOnce;
 	bool isSecond;
+	public GravityBeetle GravityBeetbood = null!;
 	public GBeetleShoot(bool isSecond) :
 		base(isSecond ? "attackproj2" : "attackproj", isSecond ? "attackproj2_start" : "attackproj_start") {
 		this.isSecond = isSecond;
 		exitOnAnimEnd = true;
+	}
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		GravityBeetbood = maverick as GravityBeetle ?? throw new NullReferenceException();
 	}
 
 	public override void update() {
@@ -205,7 +215,10 @@ public class GBeetleShoot : MaverickState {
 		Point? shootPos = maverick.getFirstPOI();
 		if (!shotOnce && shootPos != null) {
 			shotOnce = true;
-			new GBeetleBallProj(maverick.weapon, shootPos.Value, maverick.xDir, isSecond, player, player.getNextActorNetId(), sendRpc: true);
+			new GBeetleBallProj(
+				shootPos.Value, maverick.xDir, isSecond,
+				GravityBeetbood, player, player.getNextActorNetId(), rpc: true
+			);
 		}
 
 		if (!isSecond && maverick.frameIndex >= 5) {
@@ -320,12 +333,14 @@ public class GBeetleLiftState : MaverickState {
 }
 
 public class BeetleGrabbedState : GenericGrabbedState {
-	public Character grabbedChar;
+	public Character? grabbedChar;
 	public bool launched;
 	float launchTime;
+	public GravityBeetle? GravityBeetbood;
 	public BeetleGrabbedState(GravityBeetle grabber) : base(grabber, 1, "") {
 		customUpdate = true;
 	}
+
 
 	public override void update() {
 		base.update();
@@ -338,7 +353,7 @@ public class BeetleGrabbedState : GenericGrabbedState {
 				return;
 			}
 			if (Global.level.checkTerrainCollisionOnce(character, 0, -1) != null) {
-				(grabber as GravityBeetle).meleeWeapon.applyDamage(character, false, grabber, (int)ProjIds.GBeetleLiftCrash);
+				GravityBeetbood?.meleeWeapon.applyDamage(character, false, grabber, (int)ProjIds.GBeetleLiftCrash);
 				character.playSound("crashX3", sendRpc: true);
 				character.shakeCamera(sendRpc: true);
 			}
@@ -371,24 +386,36 @@ public class GBeetleGravityWellProj : Projectile {
 	float randPartTime;
 	public float maxRadius = 50;
 	float ttl = 4;
+	public int chargeTime;
 
 	public GBeetleGravityWellProj(
-		Weapon weapon, Point pos, int xDir, float chargeTime,
+		Point pos, int xDir, int chargeTime, Actor owner,
 		Player player, ushort netProjId, bool sendRpc = false
 	) : base(
-		weapon, pos, xDir, 0, 2, player, "gbeetle_proj_blackhole",
-		0, 0.5f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "gbeetle_proj_blackhole", netProjId, player
+
 	) {
+		weapon = GravityBeetle.getWeapon();
+		damager.damage = 2;
+		damager.hitCooldown = 30;
 		projId = (int)ProjIds.GBeetleGravityWell;
 		setIndestructableProperties();
-
+		this.chargeTime = chargeTime;
 		maxRadius = 25 + (50 * (chargeTime / 2f));
 		ttl = chargeTime * 2;
-
+		//Just in case
+		maxTime = 8;
 		if (sendRpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)chargeTime);
 		}
-		canBeLocal = false;
+		canBeLocal = false; 
+		//AAAAAA
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new GBeetleGravityWellProj(
+			args.pos, args.xDir, args.extraData[0],
+			args.owner, args.player, args.netId
+		);
 	}
 
 	public override void update() {
@@ -438,7 +465,7 @@ public class GBeetleGravityWellProj : Projectile {
 		base.onHitDamagable(damagable);
 		if (!damagable.isPlayableDamagable()) { return; }
 		var actor = damagable.actor();
-		Character chr = actor as Character;
+		Character? chr = actor as Character;
 		if (chr != null && !chr.isPushImmune()) return;
 		if (actor is not Character && actor is not RideArmor && actor is not Maverick) return;
 		if (chr != null && (chr.charState is DeadLiftGrabbed || chr.charState is BeetleGrabbedState)) return;
@@ -476,34 +503,51 @@ public class GBeetleGravityWellState : MaverickState {
 	int state = 0;
 	float partTime;
 	float chargeTime;
+	public GravityBeetle GravityBeetbood = null!;
 	public GBeetleGravityWellState() : base("blackhole_start") {
+	}
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		GravityBeetbood = maverick as GravityBeetle ?? throw new NullReferenceException();
 	}
 
 	public override void update() {
 		base.update();
-
 		if (state == 0) {
 			Helpers.decrementTime(ref partTime);
 			if (partTime <= 0) {
 				partTime = 0.2f;
 				var vel = new Point(0, 50);
-				new Anim(maverick.getFirstPOI(0).Value, "gbeetle_proj_flare", 1, player.getNextActorNetId(), false, sendRpc: true) { ttl = partTime, vel = vel };
-				new Anim(maverick.getFirstPOI(1).Value, "gbeetle_proj_flare", 1, player.getNextActorNetId(), false, sendRpc: true) { ttl = partTime, vel = vel };
-				new Anim(maverick.getFirstPOI(2).Value, "gbeetle_proj_flare", 1, player.getNextActorNetId(), false, sendRpc: true) { ttl = partTime, vel = vel };
-				new Anim(maverick.getFirstPOI(3).Value, "gbeetle_proj_flare", 1, player.getNextActorNetId(), false, sendRpc: true) { ttl = partTime, vel = vel };
-				new Anim(maverick.getFirstPOI(4).Value, "gbeetle_proj_flare", 1, player.getNextActorNetId(), false, sendRpc: true) { ttl = partTime, vel = vel };
+				new Anim(
+					maverick.getFirstPOIOrDefault(0), "gbeetle_proj_flare", 1, 
+					player.getNextActorNetId(), false, sendRpc: true) { ttl = partTime, vel = vel };
+				new Anim(
+					maverick.getFirstPOIOrDefault(1), "gbeetle_proj_flare", 1,
+					 player.getNextActorNetId(), false, sendRpc: true) { ttl = partTime, vel = vel };
+				new Anim(
+					maverick.getFirstPOIOrDefault(2), "gbeetle_proj_flare", 1,
+					player.getNextActorNetId(), false, sendRpc: true) { ttl = partTime, vel = vel };
+				new Anim(
+					maverick.getFirstPOIOrDefault(3), "gbeetle_proj_flare", 1,
+					player.getNextActorNetId(), false, sendRpc: true) { ttl = partTime, vel = vel };
+				new Anim(
+					maverick.getFirstPOIOrDefault(4), "gbeetle_proj_flare", 1,
+					player.getNextActorNetId(), false, sendRpc: true) { ttl = partTime, vel = vel };
 			}
 
-			if (isHoldStateOver(0.5f, 2f, 1f, Control.Special1)) {
+			if (isHoldStateOver(1f, 3f, 2f, Control.Special1)) {
 				maverick.changeSpriteFromName("blackhole", true);
-				chargeTime = stateTime;
+				chargeTime = (int)stateTime;
 				state = 1;
 			}
 		} else if (state == 1) {
 			Point? shootPos = maverick.getFirstPOI();
 			if (!once && shootPos != null) {
 				once = true;
-				(maverick as GravityBeetle).well = new GBeetleGravityWellProj(maverick.weapon, shootPos.Value, maverick.xDir, chargeTime, player, player.getNextActorNetId(), sendRpc: true);
+				GravityBeetbood.well = new GBeetleGravityWellProj(
+					shootPos.Value, maverick.xDir, (int)chargeTime,
+					GravityBeetbood, player, player.getNextActorNetId(), sendRpc: true
+				);
 			}
 			if (maverick.isAnimOver()) {
 				maverick.changeToIdleOrFall();

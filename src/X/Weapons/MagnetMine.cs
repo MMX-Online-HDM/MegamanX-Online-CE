@@ -32,14 +32,14 @@ public class MagnetMine : Weapon {
 		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
 
 		if (chargeLevel < 3) {
-			var magnetMineProj = new MagnetMineProj(this, pos, xDir, player, player.getNextActorNetId(), true);
+			var magnetMineProj = new MagnetMineProj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 			mmx.magnetMines.Add(magnetMineProj);
 			if (mmx.magnetMines.Count > maxMinesPerPlayer) {
 				mmx.magnetMines[0].destroySelf();
 				mmx.magnetMines.RemoveAt(0);
 			}
 		} else {
-			new MagnetMineProjCharged(this, pos, xDir, player, player.getNextActorNetId(), true);
+			new MagnetMineProjCharged(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 		}
 	}
 }
@@ -51,12 +51,13 @@ public class MagnetMineProj : Projectile, IDamagable {
 	float maxSpeed = 150;
 
 	public MagnetMineProj(
-		Weapon weapon, Point pos, int xDir,
-		Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 75, 2, player, "magnetmine_proj",
-		0, 0, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "magnetmine_proj", netId, player	
 	) {
+		weapon = MagnetMine.netWeapon;
+		damager.damage = 2;
+		vel = new Point(75 * xDir, 0);
 		//maxTime = 2f;
 		maxDistance = 224;
 		fadeSprite = "explosion";
@@ -65,15 +66,15 @@ public class MagnetMineProj : Projectile, IDamagable {
 		projId = (int)ProjIds.MagnetMine;
 		this.player = player;
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 		canBeLocal = false;
 		destroyOnHit = true;
 	}
 
-	public static Projectile rpcInvoke(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters args) {
 		return new MagnetMineProj(
-			MagnetMine.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
+			args.pos, args.xDir, args.owner, args.player, args.netId
 		);
 	}
 
@@ -179,24 +180,28 @@ public class MagnetMineProjCharged : Projectile {
 	float soundTime;
 	float startY;
 	public MagnetMineProjCharged(
-		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 50, 1, player, "magnetmine_charged",
-		Global.defFlinch, 0.2f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "magnetmine_charged", netId, player	
 	) {
+		weapon = MagnetMine.netWeapon;
+		damager.damage = 1;
+		damager.hitCooldown = 12;
+		damager.flinch = Global.defFlinch;
+		vel = new Point(50 * xDir, 0);
 		maxTime = 4f;
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 		projId = (int)ProjIds.MagnetMineCharged;
 		startY = pos.y;
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 	}
 
-	public static Projectile rpcInvoke(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters args) {
 		return new MagnetMineProjCharged(
-			MagnetMine.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
+			args.pos, args.xDir, args.owner, args.player, args.netId
 		);
 	}
 
@@ -272,9 +277,9 @@ public class MagnetMineProjCharged : Projectile {
 		}
 	}
 
-	public override List<byte> getCustomActorNetData() {
-		List<byte> customData = base.getCustomActorNetData();
-		customData.Add((byte)MathF.Floor(size));
+	public override List<byte>? getCustomActorNetData() {
+		List<byte>? customData = base.getCustomActorNetData();
+		customData?.Add((byte)MathF.Floor(size));
 
 		return customData;
 	}

@@ -24,11 +24,10 @@ public class RaySplasher : Weapon {
 
 	public override void shoot(Character character, int[] args) {
 		int chargeLevel = args[0];
+		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
 
 		if (chargeLevel < 3) {
-			if (character is MegamanX mmx) {
-				mmx.shootingRaySplasher = this;
-			}
+			mmx.shootingRaySplasher = this;
 		} else {
 			if (character.ownedByLocalPlayer) {
 				character.changeState(new RaySplasherChargedState(), true);
@@ -42,12 +41,15 @@ public class RaySplasher : Weapon {
 
 public class RaySplasherProj : Projectile {
 	public RaySplasherProj(
-		Weapon weapon, Point pos, int xDir, int spriteType, int dirType,
-		Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, int spriteType, int dirType, Actor owner,
+		Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 600, 1, player, "raysplasher_proj",
-		0, 0.075f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "raysplasher_proj", netId, player
 	) {
+		weapon = RaySplasher.netWeapon;
+		damager.damage = 1;
+		damager.hitCooldown = 5;
+		vel = new Point(600 * xDir, 0);
 		maxTime = 0.25f;
 		projId = (int)ProjIds.RaySplasher;
 		
@@ -66,17 +68,15 @@ public class RaySplasherProj : Projectile {
 		}
 
 		if (rpc) {
-			rpcCreate(
-				pos, player, netProjId, xDir,
-				new byte[] { (byte)spriteType, (byte)dirType}
-			);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir,
+			new byte[] { (byte)spriteType, (byte)dirType});
 		}
 	}
 
 	public static Projectile rpcInvoke(ProjParameters args) {
 		return new RaySplasherProj(
-			RaySplasher.netWeapon, args.pos, args.xDir,
-			args.extraData[0], args.extraData[1], args.player, args.netId
+			args.pos, args.xDir, args.extraData[0], args.extraData[1],
+			args.owner, args.player, args.netId
 		);
 	}
 
@@ -201,12 +201,12 @@ public class RaySplasherTurret : Actor, IDamagable {
 			} else {
 				raySplasherShootTime += Global.spf;
 				if (raySplasherShootTime > 0.1f) {
-					float ang = pos.directionToNorm(target.getCenterPos()).angle;
-					ang += Helpers.randomRange(-22.5f, 22.5f);
+					float ang = pos.directionToNorm(target.getCenterPos()).byteAngle;
+					byteAngle += Helpers.randomRange(-22.5f, 22.5f);
 
 					new RaySplasherTurretProj(
-						new RaySplasher(), pos, (pos.x > target.getCenterPos().x ? -1 : 1), 
-						raySplasherMod % 3, ang, netOwner, netOwner.getNextActorNetId(), rpc: true);
+						pos, (pos.x > target.getCenterPos().x ? -1 : 1), raySplasherMod % 3, ang,
+						this, netOwner, netOwner.getNextActorNetId(), rpc: true);
 
 					
 
@@ -297,38 +297,39 @@ public class RaySplasherTurret : Actor, IDamagable {
 
 public class RaySplasherTurretProj : Projectile {
 	public RaySplasherTurretProj(
-		Weapon weapon, Point pos, int xDir, int spriteType, float ang,
-		Player player, ushort? netProjId, bool rpc = false
+		Point pos, int xDir, int spriteType, float byteAngle, Actor owner,
+		Player player, ushort? netId, bool rpc = false
 	) : base (
-		weapon, pos, xDir, 600, 1, player, "raysplasher_proj",
-		0, 0, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "raysplasher_proj", netId, player
 	) {
+		weapon = RaySplasher.netWeapon;
+		damager.damage = 1;
 		maxTime = 0.25f;
 		projId = (int)ProjIds.RaySplasherChargedProj;
 		frameIndex = spriteType;
 		frameSpeed = 0;
 		fadeSprite = "raysplasher_fade";
-		vel = Point.createFromByteAngle(ang).times(speed);
-
+		byteAngle = byteAngle % 256;
+		this.byteAngle = byteAngle;
+		vel = Point.createFromByteAngle(byteAngle).times(600);
+			
 		if (rpc) {
-			rpcCreate(
-				pos, player, netProjId, xDir,
-				new byte[] { (byte)spriteType, (byte)ang }
-			);
+			rpcCreateByteAngle(pos, owner, ownerPlayer, netId, byteAngle, 
+			new byte[] { (byte)spriteType,});
 		}
 	}
 
 	public static Projectile rpcInvoke(ProjParameters args) {
 		return new RaySplasherTurretProj(
-			RaySplasher.netWeapon, args.pos, args.xDir,
-			args.extraData[0], args.extraData[1], args.player, args.netId
+			args.pos, args.xDir, args.extraData[0], args.byteAngle,
+			args.owner, args.player, args.netId
 		);
 	}
 }
 
 
 public class RaySplasherChargedState : CharState {
-	MegamanX mmx;
+	MegamanX mmx = null!;
 	bool fired = false;
 	public RaySplasherChargedState() : base("point_up") {
 		superArmor = true;
@@ -339,7 +340,6 @@ public class RaySplasherChargedState : CharState {
 
 		if (character.frameIndex >= 5 && !fired) {
 			fired = true;
-
 			var turret = new RaySplasherTurret(
 				character.getShootPos(), player, character.xDir, 
 				player.getNextActorNetId(), character.ownedByLocalPlayer, rpc: true,

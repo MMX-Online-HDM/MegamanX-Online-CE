@@ -607,6 +607,7 @@ public class HyperPunchyZeroStart : CharState {
 
 public class PunchyZeroHadangeki : CharState {
 	bool fired;
+	public PunchyZero pzero = null!;
 
 	public PunchyZeroHadangeki() : base("projswing") {
 		landSprite = "projswing";
@@ -626,7 +627,7 @@ public class PunchyZeroHadangeki : CharState {
 			fired = true;
 			new PZeroHadangeki(
 				character.pos.addxy(30 * character.xDir, -20), character.xDir,
-				player, player.getNextActorNetId(), rpc: true
+				pzero.isAwakened, pzero, player, player.getNextActorNetId(), rpc: true
 			);
 		}
 		if (character.isAnimOver()) {
@@ -647,6 +648,7 @@ public class PunchyZeroHadangeki : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		pzero = character as PunchyZero ?? throw new NullReferenceException();
 		if (!character.grounded || character.vel.y < 0) {
 			sprite = "projswing_air";
 			defaultSprite = sprite;
@@ -663,6 +665,7 @@ public class PunchyZeroHadangekiWall : CharState {
 	bool fired;
 	public int wallDir;
 	public Collider wallCollider;
+	public PunchyZero pzero = null!;
 
 	public PunchyZeroHadangekiWall(int wallDir, Collider wallCollider) : base("wall_slide_attack") {
 		this.wallDir = wallDir;
@@ -678,7 +681,7 @@ public class PunchyZeroHadangekiWall : CharState {
 			fired = true;
 			new PZeroHadangeki(
 				character.pos.addxy(30 * -wallDir, -20), -wallDir,
-				player, player.getNextActorNetId(), rpc: true
+			 	pzero.isAwakened, pzero, player, player.getNextActorNetId(), rpc: true
 			);
 		}
 		if (character.isAnimOver()) {
@@ -690,5 +693,9 @@ public class PunchyZeroHadangekiWall : CharState {
 	public override void onExit(CharState oldState) {
 		base.onExit(oldState);
 		useGravity = true;
+	}
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		pzero = character as PunchyZero ?? throw new NullReferenceException();
 	}
 }

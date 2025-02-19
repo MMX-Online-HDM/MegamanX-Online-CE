@@ -1,5 +1,8 @@
 ﻿using System;
-
+using System.Linq;
+using System.Collections.Generic;
+using System.Text;
+using SFML.Graphics;
 namespace MMXOnline;
 
 public enum VileMissileType {
@@ -12,7 +15,9 @@ public enum VileMissileType {
 public class VileMissile : Weapon {
 	public string projSprite = "";
 	public float vileAmmo;
-
+	public static VileMissile netWeaponES = new VileMissile(VileMissileType.ElectricShock);
+	public static VileMissile netWeaponHC = new VileMissile(VileMissileType.HumerusCrush);
+	public static VileMissile netWeaponPD = new VileMissile(VileMissileType.PopcornDemon);
 	public VileMissile(VileMissileType vileMissileType) : base() {
 		index = (int)WeaponIds.ElectricShock;
 		weaponBarBaseIndex = 26;
@@ -24,8 +29,11 @@ public class VileMissile : Weapon {
 		if (vileMissileType == VileMissileType.None) {
 			displayName = "None";
 			description = new string[] { "Do not equip a Missile." };
-			vileAmmo = 8;
 			killFeedIndex = 126;
+			ammousage = 0;
+			vileAmmo = 0;
+			fireRate = 0;
+			vileWeight = 0;			
 		} else if (vileMissileType == VileMissileType.ElectricShock) {
 			fireRate = 45;
 			displayName = "Electric Shock";
@@ -67,35 +75,55 @@ public class VileMissile : Weapon {
 	}
 
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
-		Player player = vile.player;
 		if (shootCooldown > 0) return;
-
-		if (vile.charState is Idle || vile.charState is Run || vile.charState is Crouch) {
-			if (vile.tryUseVileAmmo(vileAmmo)) {
-				if (!vile.isVileMK2) {
-					vile.setVileShootTime(this);
-					vile.changeState(new MissileAttack(), true);
-				} else if (!vile.charState.isGrabbing) {
-					vile.setVileShootTime(this);
-					MissileAttack.mk2ShootLogic(vile, vile.missileWeapon.type == (int)VileMissileType.ElectricShock);
-				}
-			}
-		} else if (vile.charState is InRideArmor) {
-			if (!vile.isVileMK2) {
+		if (vile.missileWeapon.type == (int)VileMissileType.None) return;
+		Point shootVel = vile.getVileShootVel(true);
+		bool isMK2 = vile.isVileMK2;
+		int xDir = vile.xDir;
+		
+		if (vile.tryUseVileAmmo(vileAmmo)) {
+			if (!isMK2) {
 				vile.setVileShootTime(this);
-				if (vile.missileWeapon.type == 2 || vile.missileWeapon.type == 1) {
-					vile.playSound("vileMissile", sendRpc: true);
-					new VileMissileProj(vile.missileWeapon, vile.getFirstPOIOrDefault(), vile.getShootXDir(), 0, vile.player, vile.player.getNextActorNetId(), new Point(vile.xDir, 0), rpc: true);
+			}
+			if (!vile.grounded) {
+				vile.changeState(new MissileAttack(grounded: false), true);
+			} else {
+				vile.changeState(new MissileAttack(grounded: true), true);
+			}
+		}
+		
+		if (vile.charState is InRideArmor) {
+			if (vile.getShootXDir() == -1) {
+				shootVel = new Point(shootVel.x * vile.getShootXDir(), shootVel.y);
+			}
+			vile.setVileShootTime(this);
+			if (vile.missileWeapon.type == ((int)VileMissileType.ElectricShock)) {
+				if (isMK2) {
+					vile.playSound("mk2stunshot", sendRpc: true);
+					new Anim(vile.getFirstPOIOrDefault(), "dust", 1, vile.player.getNextActorNetId(), true, true);
+					new VileMK2StunShotProj(
+						vile.getFirstPOIOrDefault(), xDir, MathF.Round(shootVel.byteAngle), vile,
+						vile.player, vile.player.getNextActorNetId(), rpc: true
+					);
 				} else {
-					new StunShotProj(this, vile.pos.addxy(15 * vile.xDir, -10), vile.getShootXDir(), 0, player, player.getNextActorNetId(), vile.getVileShootVel(true), rpc: true);
+					new StunShotProj(
+						vile.getFirstPOIOrDefault(), xDir, MathF.Round(shootVel.byteAngle), vile, 
+						vile.player, vile.player.getNextActorNetId(), rpc: true
+					);
 				}
 			} else {
-				vile.setVileShootTime(this);
-				if (vile.missileWeapon.type == 2 || vile.missileWeapon.type == 1) {
-					vile.playSound("mk2stunshot", sendRpc: true);
-					new VileMissileProj(vile.missileWeapon, vile.getFirstPOIOrDefault(), vile.getShootXDir(), 0, vile.player, vile.player.getNextActorNetId(), new Point(vile.xDir, 0), rpc: true);
-				} else {
-					MissileAttack.mk2ShootLogic(vile, true);
+				vile.playSound("vileMissile", sendRpc: true);
+				if (vile.missileWeapon.type == ((int)VileMissileType.HumerusCrush)) {
+					new VileMissileProj(
+						vile.getFirstPOIOrDefault(), xDir, 1, MathF.Round(shootVel.byteAngle),  vile.missileWeapon.projSprite,
+						vile, vile.player, vile.player.getNextActorNetId(), rpc: true
+					);
+				}
+				if (vile.missileWeapon.type == ((int)VileMissileType.PopcornDemon)) {
+					new VileMissileProj(
+						vile.getFirstPOIOrDefault(), xDir, 2 , MathF.Round(shootVel.byteAngle), vile.missileWeapon.projSprite,
+						vile, vile.player, vile.player.getNextActorNetId(), rpc: true
+					);
 				}
 			}
 		}
@@ -103,79 +131,91 @@ public class VileMissile : Weapon {
 }
 
 public class VileMissileProj : Projectile {
-	public VileMissile missileWeapon;
 	bool split;
-	int type;
-	public VileMissileProj(VileMissile weapon, Point pos, int xDir, int type, Player player, ushort netProjId, Point? vel = null, bool rpc = false) :
-		base(weapon, pos, xDir, 200, 3, player, weapon.projSprite, 0, 0.15f, netProjId, player.ownedByLocalPlayer) {
+	public int num = 0;
+	public VileMissileProj(
+		Point pos, int xDir, int num, float? byteAngle, string sprite,
+		Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, sprite , netId, player
+	) {
+		xScale = xDir;
 		fadeSprite = "explosion";
 		fadeSound = "explosion";
-		projId = (int)ProjIds.VileMissile;
 		maxTime = 0.6f;
 		destroyOnHit = true;
 		fadeOnAutoDestroy = true;
-		missileWeapon = weapon;
 		reflectableFBurner = true;
-		this.type = type;
-		canBeLocal = false; // TODO: Remove the need for this.
-
-		if (weapon.type == (int)VileMissileType.HumerusCrush) {
+		this.num = num;
+		byteAngle = byteAngle % 256;
+		this.byteAngle = byteAngle;
+		vel.x = 200 * Helpers.cosb(byteAngle.Value);
+		vel.y = 200 * Helpers.sinb(byteAngle.Value);
+		if (num == (int)VileMissileType.HumerusCrush) {
+			weapon = VileMissile.netWeaponHC;
+			projId = (int)ProjIds.VileMissile;
 			damager.damage = 3;
-			// damager.flinch = Global.halfFlinch;
-			this.vel.x = xDir * 350;
+			damager.hitCooldown = 9;
 			maxTime = 0.35f;
+			sprite = "missile_hc_proj";
+			vel.x = 350 * Helpers.cosb(byteAngle.Value);
+			vel.y = 350 * Helpers.sinb(byteAngle.Value);
 		}
-		if (weapon.type == (int)VileMissileType.PopcornDemon) {
+		if (num == (int)VileMissileType.PopcornDemon) {
+			weapon = VileMissile.netWeaponPD;
 			projId = (int)ProjIds.PopcornDemon;
 			damager.damage = 2;
+			damager.hitCooldown = 9;
+			sprite = "missile_pd_proj";
 		}
-		if (type == 1) {
+		if (num == 3) {
+			weapon = VileMissile.netWeaponPD;
 			projId = (int)ProjIds.PopcornDemonSplit;
-			this.xDir = 1;
-			this.vel = vel.Value.times(speed);
-			angle = this.vel.angle;
 			damager.damage = 2;
 			damager.hitCooldown = 0;
-		}
-
+			sprite = "missile_pd_proj";		
+		}		
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			List<Byte> extraBytes = new List<Byte> {
+			};
+			extraBytes.Add((byte)num);
+			extraBytes.AddRange(Encoding.ASCII.GetBytes(sprite));
+			rpcCreateByteAngle(pos, owner, ownerPlayer, netId, byteAngle.Value, extraBytes.ToArray());
+
 		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		string sprite = Encoding.ASCII.GetString(args.extraData[1..]);
+		return new VileMissileProj(
+			args.pos, args.xDir, args.extraData[0], args.byteAngle, sprite, args.owner, args.player, args.netId
+		);
 	}
 
 	public override void update() {
 		base.update();
 		if (!ownedByLocalPlayer) return;
 
-		if (missileWeapon.type == (int)VileMissileType.PopcornDemon && type == 0 && !split) {
+		if (num == (int)VileMissileType.PopcornDemon && !split) {
 			if (time > 0.3f || owner.input.isPressed(Control.Special1, owner)) {
 				split = true;
 				playSound("vileMissile", sendRpc: true);
 				destroySelfNoEffect();
-				new VileMissileProj(missileWeapon, pos, xDir, 1, owner, owner.getNextActorNetId(), new Point(xDir, -1).normalize(), rpc: true);
-				new VileMissileProj(missileWeapon, pos, xDir, 1, owner, owner.getNextActorNetId(), new Point(xDir, 0), rpc: true);
-				new VileMissileProj(missileWeapon, pos, xDir, 1, owner, owner.getNextActorNetId(), new Point(xDir, 1).normalize(), rpc: true);
+				new VileMissileProj(
+					pos, xDir, 3, byteAngle-30, "missile_pd_proj", this,
+					owner, owner.getNextActorNetId(),  rpc: true);
+				new VileMissileProj(
+					pos, xDir, 3, byteAngle, "missile_pd_proj", this, owner, 
+					owner.getNextActorNetId(),  rpc: true);
+				new VileMissileProj(
+					pos, xDir, 3, byteAngle+30, "missile_pd_proj", this, 
+					owner, owner.getNextActorNetId(),  rpc: true);
 			}
 		}
 	}
-
-	/*
-	public override void onHitDamagable(IDamagable damagable){
-		base.onHitDamagable(damagable);
-		if (damagable.isPlayableDamagable()) { return; }
-
-		if (damagable is Actor actor) {
-			var victimCenter = actor.getCenterPos();
-			var bombCenter = pos;
-			var dirTo = bombCenter.directionToNorm(victimCenter);
-			actor.vel.y = dirTo.y * 150;
-			actor.xPushVel = dirTo.x * 300;
-		}
-	}
-	*/
 }
 
 public class VileMK2StunShot : Weapon {
+	public static VileMK2StunShot netWeapon = new();
 	public VileMK2StunShot() : base() {
 		fireRate = 45;
 		index = (int)WeaponIds.MK2StunShot;
@@ -183,122 +223,189 @@ public class VileMK2StunShot : Weapon {
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-		new StunShotProj(this, pos, xDir, 0, player, netProjId);
+		//new StunShotProj(pos, xDir, 0, 0, 0, owner, player, netProjId);
 	}
 }
 
 public class StunShotProj : Projectile {
-	public StunShotProj(Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, Point? vel = null, bool rpc = false) :
-		base(weapon, pos, xDir, 150, 0, player, type == 0 ? "vile_stun_shot" : "vile_ebomb_start", 0, 0.15f, netProjId, player.ownedByLocalPlayer) {
+	public StunShotProj(
+		Point pos, int xDir, float byteAngle,
+		Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "vile_stun_shot", netId, player
+	) {
+		weapon = VileMissile.netWeaponES;
+		xScale = xDir;
+		damager.hitCooldown = 9;
 		fadeSprite = "vile_stun_shot_fade";
 		projId = (int)ProjIds.ElectricShock;
 		maxTime = 0.75f;
 		destroyOnHit = true;
-		canBeLocal = false; // TODO: Remove the need for this.
-
-		if (vel != null) {
-			if (type == 0) {
-				var norm = vel.Value.normalize();
-				this.vel.x = norm.x * speed * player.character.getShootXDir();
-				this.vel.y = norm.y * speed;
-				this.vel.x *= 1.5f;
-				this.vel.y *= 2f;
-			} else {
-				this.vel = vel.Value;
-			}
-		}
-
-		if (type == 1) {
-			damager.damage = 1;
-		}
-
+		byteAngle = byteAngle % 256;
+		this.byteAngle = byteAngle;
+		vel.x = 225 * Helpers.cosb(byteAngle);
+		vel.y = 225 * Helpers.sinb(byteAngle);	
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreateByteAngle(pos, owner, ownerPlayer, netId, byteAngle);
 		}
 	}
-
-	public override void update() {
-		base.update();
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new StunShotProj(
+			args.pos, args.xDir, args.byteAngle, args.owner, args.player, args.netId
+		);
 	}
+}
+public class StunShotProj2 : Projectile {
+	public int num = 0;
+	public int type = 0;
+	Point[] velnum = new Point[] {
+		new Point(150, 0),
+		new Point(133, 75),
+		new Point(75, 133),
+		new Point(0, 150),
+		new Point(-75, 133),
+		new Point(-133, 75),
+		new Point(-150, 0)
+	};
+	Point[] veltype = new Point[] {
+		new Point(80, -70),
+		new Point(90, -40),
+		new Point(100, 0),
+		new Point(100, 40),
+		new Point(90,70),
+		new Point(70,-100),
+		new Point(80,100)
+	};
+	public StunShotProj2(
+		Point pos, int xDir, int num, int type, 
+		Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "vile_ebomb_start" , netId, player
+	) {
+		weapon = VileElectricBomb.netWeapon;
+		damager.damage = 1;
+		damager.hitCooldown = 9;
+		fadeSprite = "vile_stun_shot_fade";
+		projId = (int)ProjIds.SpreadShot;
+		maxTime = 0.75f;
+		destroyOnHit = true;
+		this.num = num;
+		this.type = type;
+		if (num >= 1 && num <= 7) vel = new Point(velnum[num-1].x * xDir, velnum[num-1].y);
+		if (type >= 1 && type <= 7) vel = new Point(veltype[type-1].x * xDir, veltype[type-1].y);
+		
+		
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, new byte[] { (byte) num, (byte)type});
+		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new StunShotProj2(
+			args.pos, args.xDir, args.extraData[0], args.extraData[1], args.owner, args.player, args.netId
+		);
+	}
+
 }
 
 public class VileMK2StunShotProj : Projectile {
-	public VileMK2StunShotProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, Point? vel = null, bool rpc = false) :
-		base(weapon, pos, xDir, 150, 1, player, "vile_stun_shot2", 0, 0.15f, netProjId, player.ownedByLocalPlayer) {
+	public VileMK2StunShotProj(
+		Point pos, int xDir, float byteAngle,
+		Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "vile_stun_shot2" , netId, player
+	) {
+		weapon = VileMK2StunShot.netWeapon;
 		fadeSprite = "vile_stun_shot_fade";
 		projId = (int)ProjIds.MK2StunShot;
 		maxTime = 0.75f;
 		destroyOnHit = true;
-
-		if (vel != null) {
-			var norm = vel.Value.normalize();
-			this.vel.x = norm.x * speed * player.character.getShootXDir();
-			this.vel.y = norm.y * speed;
-			this.vel.x *= 1.5f;
-			if (player.character.charState is InRideArmor) this.vel.y *= 1.5f;
-			else this.vel.y *= 2f;
-			if (this.vel.y == 0) this.vel.y = 5;
-		}
-
+		damager.damage = 1;
+		damager.hitCooldown = 9;
+		byteAngle = byteAngle % 256;
+		this.byteAngle = byteAngle;
+		vel.x = 225 * Helpers.cosb(byteAngle);
+		vel.y = 225 * Helpers.sinb(byteAngle);	
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreateByteAngle(pos, owner, ownerPlayer, netId, byteAngle);
 		}
 	}
-
-	public override void update() {
-		base.update();
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new VileMK2StunShotProj(
+			args.pos, args.xDir, args.byteAngle, args.owner, args.player, args.netId
+		);
 	}
 }
 
 public class MissileAttack : CharState {
-	public MissileAttack() : base("idle_shoot") {
-		exitOnAirborne = true;
-		normalCtrl = true;
+	public Vile vile = null!;
+	public MissileAttack(bool grounded) : base(getSprite(grounded)) {
+		useDashJumpSpeed = true;
+		airMove = true;
+		canJump = true;
+		canStopJump = true;
+		airSprite = "cannon_air";
+		landSprite = "idle_shoot";
+	}
+	public static string getSprite(bool grounded) {
+		return grounded ? "idle_shoot" : "cannon_air";
 	}
 
 	public override void update() {
 		base.update();
-
-		groundCodeWithMove();
-
 		if (character.sprite.isAnimOver()) {
 			character.changeToIdleOrFall();
 		}
 	}
 
 	public static void shootLogic(Vile vile) {
-		Player player = vile.player;
-		bool isStunShot = vile.missileWeapon.type == (int)VileMissileType.ElectricShock;
 		if (vile.sprite.getCurrentFrame().POIs.IsNullOrEmpty()) return;
-		Point shootVel = vile.getVileShootVel(isStunShot);
-
-		Point shootPos = vile.setCannonAim(shootVel);
-
-		if (isStunShot) {
-			new StunShotProj(vile.missileWeapon, shootPos, vile.getShootXDir(), 0, vile.player, vile.player.getNextActorNetId(), shootVel, rpc: true);
-		} else {
-			vile.playSound("vileMissile", sendRpc: true);
-			new VileMissileProj(vile.missileWeapon, shootPos, vile.getShootXDir(), 0, vile.player, vile.player.getNextActorNetId(), shootVel, rpc: true);
-		}
-	}
-
-	public static void mk2ShootLogic(Vile vile, bool isStunShot) {
-		Player player = vile.player;
+		bool isMK2 = vile.isVileMK2;
 		Point? headPosNullable = vile.getVileMK2StunShotPos();
 		if (headPosNullable == null) return;
+		Point shootVel = vile.getVileShootVel(true);
+		Point shootPos = vile.setCannonAim(new Point(shootVel.x, shootVel.y));
+		int xDir = vile.xDir;
+		if (vile.getShootXDir() == -1) {
+			shootVel = new Point(shootVel.x * vile.getShootXDir(), shootVel.y);
+		}
 
-		vile.playSound("mk2stunshot", sendRpc: true);
-		new Anim(headPosNullable.Value, "dust", 1, vile.player.getNextActorNetId(), true, true);
-
-		if (isStunShot) {
-			new VileMK2StunShotProj(new VileMK2StunShot(), headPosNullable.Value, vile.getShootXDir(), vile.player, vile.player.getNextActorNetId(), vile.getVileShootVel(true), rpc: true);
+		if (vile.missileWeapon.type == ((int)VileMissileType.ElectricShock)) {
+			if (isMK2) {
+				vile.playSound("mk2stunshot", sendRpc: true);
+				new Anim(headPosNullable.Value, "dust", 1, vile.player.getNextActorNetId(), true, true);
+				new VileMK2StunShotProj(
+					headPosNullable.Value, xDir, MathF.Round(shootVel.byteAngle), vile,
+					vile.player, vile.player.getNextActorNetId(), rpc: true
+				);
+			} else {
+				new StunShotProj(
+					shootPos, xDir, MathF.Round(shootVel.byteAngle), vile, 
+					vile.player, vile.player.getNextActorNetId(), rpc: true
+				);
+			}
 		} else {
-			new VileMissileProj(vile.missileWeapon, headPosNullable.Value, vile.getShootXDir(), 0, vile.player, vile.player.getNextActorNetId(), vile.getVileShootVel(false), rpc: true);
+			vile.playSound("vileMissile", sendRpc: true);
+			if (vile.missileWeapon.type == ((int)VileMissileType.HumerusCrush)) {
+				new VileMissileProj(
+					shootPos, xDir, 1, MathF.Round(shootVel.byteAngle),   vile.missileWeapon.projSprite,
+					vile, vile.player, vile.player.getNextActorNetId(), rpc: true
+				);	
+			}
+			if (vile.missileWeapon.type == ((int)VileMissileType.PopcornDemon)) {
+				new VileMissileProj(
+					shootPos, xDir, 2 , MathF.Round(shootVel.byteAngle), vile.missileWeapon.projSprite,
+					vile, vile.player, vile.player.getNextActorNetId(), rpc: true
+				);	
+			}
 		}
 	}
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		shootLogic(character as Vile ?? throw new NullReferenceException());
+		vile = character as Vile ?? throw new NullReferenceException();
+		shootLogic(vile);
+		if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
+			exitOnAirborne = true;
+		}
 	}
 }

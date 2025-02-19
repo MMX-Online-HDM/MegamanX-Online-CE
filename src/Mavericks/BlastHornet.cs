@@ -6,6 +6,7 @@ namespace MMXOnline;
 
 public class BlastHornet : Maverick {
 	public static Weapon netWeapon = new Weapon(WeaponIds.BHornetGeneric, 158);
+	public static Weapon getWeapon() { return new Weapon(WeaponIds.BHornetGeneric, 158); }
 
 	public BHornetCursorProj? cursor;
 	//public Actor lockOnTarget;
@@ -156,24 +157,36 @@ public class BHornetBeeProj : Projectile, IDamagable {
 	const float maxSpeed = 150;
 	public Actor? latchTarget;
 	float latchLerpTime;
+	public int type = 1;
 	public BHornetBeeProj(
-		Weapon weapon, Point pos, int xDir, Point unitDir, Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, int type, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, 2, player, "bhornet_proj_wasp_small", 0, 1f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "bhornet_proj_wasp_small", netId, player
 	) {
-		fadeSprite = "explosion";
-		fadeSound = "explosion";
+		weapon = BlastHornet.getWeapon();
+		damager.damage = 2;
+		damager.hitCooldown = 60;
+		fadeOnAutoDestroy = true;
+		fadeSprite = "bhornet_particle_explosion";
+		fadeSound = "explosionX3";
 		maxTime = 1.25f;
 		projId = (int)ProjIds.BHornetBee;
 		destroyOnHit = false;
 		shouldShieldBlock = true;
-		vel = unitDir.times(150);
-
+		this.type = type;
+		if (type == 1) vel = new Point(170 * xDir, 30);	
+		if (type == 2) vel = new Point(150 * xDir, 80);
+		if (type == 3) vel = new Point(130 * xDir, 120);
+		if (type == 4) vel = new Point(110 * xDir, 150);
+		if (type == 5) vel = new Point(90 * xDir, 180);
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)type);
 		}
-		// ToDo: Make local.
-		canBeLocal = false;
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new BHornetBeeProj(
+			args.pos, args.xDir, args.extraData[0], args.owner, args.player, args.netId
+		);
 	}
 
 	public override void preUpdate() {
@@ -211,22 +224,23 @@ public class BHornetBeeProj : Projectile, IDamagable {
 		if (damagable is Character chr && chr.ownedByLocalPlayer && !chr.isSlowImmune()) {
 			chr.slowdownTime = Math.Max(0.05f, chr.slowdownTime);
 		}
-
-		if (!ownedByLocalPlayer) return;
-
-		maxTime = 3;
-		forceNetUpdateNextFrame = true;
 		if (latchTarget == null) {
 			stopMoving();
 			latchTarget = damagable.actor();
 			latchLerpTime = 0.1f;
 		}
+		maxTime = 3;
+		forceNetUpdateNextFrame = true;
+		if (!ownedByLocalPlayer) return;
+
+
 	}
 
 	public override void onHitWall(CollideData other) {
 		base.onHitWall(other);
 		stopMoving();
 		maxTime = 3;
+		forceNetUpdateNextFrame = true;
 	}
 
 	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
@@ -260,10 +274,18 @@ public class BHornetHomingBeeProj : Projectile, IDamagable {
 	public Actor? target;
 	public Point lastMoveAmount;
 	const float maxSpeed = 150;
-	public BHornetHomingBeeProj(Weapon weapon, Point pos, int xDir, Actor? target, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 4, player, "bhornet_proj_wasp_small_glowing", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
-		fadeSprite = "explosion";
-		fadeSound = "explosion";
+	public BHornetHomingBeeProj(
+		Point pos, int xDir, Actor? target, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "bhornet_proj_wasp_small_glowing", netId, player
+	) {
+		weapon = BlastHornet.getWeapon();
+		damager.damage = 4;
+		damager.flinch = Global.defFlinch;
+		damager.hitCooldown = 30;
+		fadeOnAutoDestroy = true;
+		fadeSprite = "bhornet_particle_explosion";
+		fadeSound = "explosionX3";
 		maxTime = 3f;
 		projId = (int)ProjIds.BHornetHomingBee;
 		destroyOnHit = true;
@@ -276,9 +298,14 @@ public class BHornetHomingBeeProj : Projectile, IDamagable {
 		}
 		this.target = target;
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 		canBeLocal = false;
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new BHornetHomingBeeProj(
+			args.pos, args.xDir, null, args.owner, args.player, args.netId
+		);
 	}
 
 	public override void preUpdate() {
@@ -318,31 +345,36 @@ public class BHornetHomingBeeProj : Projectile, IDamagable {
 
 public class BHornetShootState : MaverickState {
 	bool shotOnce;
+	public BlastHornet ExploseHorneck  = null!;
 	public BHornetShootState(bool isGrounded) : base(isGrounded ? "attack" : "fly_attack") {
 	}
 
 	public override void update() {
 		base.update();
 
-		var bh = maverick as BlastHornet;
 		Point? shootPos = maverick.getFirstPOI("s");
 		if (!shotOnce && shootPos != null) {
 			shotOnce = true;
-			//maverick.playSound("???", sendRpc: true);
-			new BHornetBeeProj(maverick.weapon, shootPos.Value, maverick.xDir, new Point(maverick.xDir, 0).normalize(), player, player.getNextActorNetId(), rpc: true);
-			new BHornetBeeProj(maverick.weapon, shootPos.Value, maverick.xDir, new Point(maverick.xDir, 0.5f).normalize(), player, player.getNextActorNetId(), rpc: true);
-			new BHornetBeeProj(maverick.weapon, shootPos.Value, maverick.xDir, new Point(maverick.xDir, 1).normalize(), player, player.getNextActorNetId(), rpc: true);
-			new BHornetBeeProj(maverick.weapon, shootPos.Value, maverick.xDir, new Point(maverick.xDir, 1.5f).normalize(), player, player.getNextActorNetId(), rpc: true);
-			new BHornetBeeProj(maverick.weapon, shootPos.Value, maverick.xDir, new Point(maverick.xDir, 2).normalize(), player, player.getNextActorNetId(), rpc: true);
+			for (int i = 1; i <= 5; i++)
+				HornetProj(i);
 		}
 
 		if (maverick.isAnimOver()) {
 			maverick.changeToIdleFallOrFly();
 		}
 	}
+	public void HornetProj(int type) {
+		Point? shootPos = maverick.getFirstPOI("s");
+		if (shootPos != null) {
+			new BHornetBeeProj(
+				shootPos.Value, maverick.xDir, type, ExploseHorneck,
+				player, player.getNextActorNetId(), rpc: true);
+		}
+	}
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
+		ExploseHorneck = maverick as BlastHornet ?? throw new NullReferenceException();
 		if (wasFlying) maverick.useGravity = false;
 	}
 
@@ -354,36 +386,48 @@ public class BHornetShootState : MaverickState {
 
 public class BHornetShootCursorState : MaverickState {
 	bool shotOnce;
+	public BlastHornet ExploseHorneck  = null!;
 	public BHornetShootCursorState(bool isGrounded) : base(isGrounded ? "attack" : "fly_attack") {
 	}
 
 	public override void update() {
 		base.update();
-
-		var bh = maverick as BlastHornet;
+		bool upHeld = player.input.isHeld(Control.Up, player);
+		bool downHeld = player.input.isHeld(Control.Down, player);
+		bool LeftOrRightHeld = player.input.isHeld(Control.Left, player) || 
+							   player.input.isHeld(Control.Right, player);
 		Point? shootPos = maverick.getFirstPOI("s");
 		if (!shotOnce && shootPos != null) {
 			shotOnce = true;
-			//maverick.playSound("???", sendRpc: true);
-			var inputDir = input.getInputDir(player);
-			if (inputDir.x != maverick.xDir) inputDir.x = 0;
-			if (inputDir.x == 0 && inputDir.y == 0) inputDir.x = maverick.xDir;
-			if (bh != null) {
-				bh.cursor = new BHornetCursorProj(
-					maverick.weapon, shootPos.Value, maverick.xDir,
-					inputDir, bh, player,
-					player.getNextActorNetId(), rpc: true
-				);
-			}		
+			if (downHeld && LeftOrRightHeld) {
+				CursorProj(4);
+			} else if (downHeld) {
+				CursorProj(1);
+			} else if (upHeld && LeftOrRightHeld) {
+				CursorProj(3);
+			} else if (upHeld) {
+				CursorProj(2);
+			} else 
+				CursorProj(0);
 		}
-
 		if (maverick.isAnimOver()) {
 			maverick.changeToIdleFallOrFly();
+		}
+	}
+	public void CursorProj(int type) {
+		Point? shootPos = maverick.getFirstPOI("s");
+		if (shootPos != null) {
+			ExploseHorneck.cursor = new BHornetCursorProj(
+				shootPos.Value, maverick.xDir, type,
+				ExploseHorneck, ExploseHorneck, player,
+				player.getNextActorNetId(), rpc: true
+			);
 		}
 	}
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
+		ExploseHorneck = maverick as BlastHornet ?? throw new NullReferenceException();
 		if (wasFlying) maverick.useGravity = false;
 	}
 
@@ -396,25 +440,38 @@ public class BHornetShootCursorState : MaverickState {
 public class BHornetCursorProj : Projectile {
 	public BlastHornet bh;
 	public Actor? target;
+	public int type = 0;
 	public BHornetCursorProj(
-		Weapon weapon, Point pos, int xDir, Point unitDir, BlastHornet bh,
-		Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, int type, BlastHornet bh, 
+		Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, 0, player, "bhornet_particle_aim_small", 0, 0, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "bhornet_particle_aim_small", netId, player
 	) {
+		weapon = BlastHornet.getWeapon();
 		this.bh = bh;
-		if (ownedByLocalPlayer) {
-			maxTime = 0.6f;
-		}
+		this.type = type;
+		maxTime = 0.8f;
 		projId = (int)ProjIds.BHornetCursor;
 		destroyOnHit = false;
-		vel = unitDir.times(200);
 		setIndestructableProperties();
+		if (type == 0) vel = new Point(200 * xDir, 0);	
+		if (type == 1) vel = new Point(200 * xDir, 180);
+		if (type == 2) vel = new Point(200 * xDir, -180);
+		if (type == 3) vel = new Point(200 * xDir, -90);
+		if (type == 4) vel = new Point(200 * xDir, 90);
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			byte[] bhbNetIdBytes = BitConverter.GetBytes(bh.netId ?? 0);
+			byte[] bhTypeBytes = new byte[] { (byte)type };
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, new byte[] {bhTypeBytes[0], bhbNetIdBytes[0], bhbNetIdBytes[1]});
 		}
-		// ToDo: Make local.
-		canBeLocal = false;
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		ushort ExploseHorneckId = BitConverter.ToUInt16(args.extraData, 1);
+		BlastHornet? ExploseHorneck = Global.level.getActorByNetId(ExploseHorneckId) as BlastHornet;
+		return new BHornetCursorProj(
+			args.pos, args.xDir, args.extraData[0], ExploseHorneck!, args.owner, args.player, args.netId
+		);
 	}
 
 	public override void postUpdate() {
@@ -449,6 +506,7 @@ public class BHornetCursorProj : Projectile {
 			stopMoving();
 			time = 0;
 			maxTime = 6;
+			forceNetUpdateNextFrame = true;
 			playSound("bhornetLockOn", sendRpc: true);
 			changeSprite("bhornet_particle_aim_big", true);
 		}
@@ -484,6 +542,7 @@ public class BHornetShoot2State : MaverickState {
 	bool shotOnce;
 	Actor? target;
 	bool isAIRise;
+	public BlastHornet ExploseHorneck  = null!;
 	public BHornetShoot2State(Actor? target) : base("fly_wasp_spawn") {
 		this.target = target;
 	}
@@ -505,8 +564,10 @@ public class BHornetShoot2State : MaverickState {
 		Point? shootPos = maverick.getFirstPOI("s");
 		if (!shotOnce && shootPos != null) {
 			shotOnce = true;
-			//maverick.playSound("???", sendRpc: true);
-			new BHornetHomingBeeProj(maverick.weapon, shootPos.Value, maverick.xDir, target, player, player.getNextActorNetId(), rpc: true);
+			new BHornetHomingBeeProj(
+				shootPos.Value, maverick.xDir, target,
+				ExploseHorneck, player, player.getNextActorNetId(), rpc: true
+			);
 		}
 
 		if (maverick.isAnimOver()) {
@@ -516,6 +577,7 @@ public class BHornetShoot2State : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
+		ExploseHorneck = maverick as BlastHornet ?? throw new NullReferenceException();
 		if (wasFlying) maverick.useGravity = false;
 		if (maverick.grounded && isAI) {
 			isAIRise = true;
@@ -554,7 +616,10 @@ public class BHornetStingState : MaverickState {
 
 			Point? stingAnimPos = maverick.getFirstPOI("spark");
 			if (stingAnim == null && stingAnimPos != null) {
-				stingAnim = new Anim(stingAnimPos.Value, "bhornet_particle_stingerflash", maverick.xDir, player.getNextActorNetId(), true, sendRpc: true);
+				stingAnim = new Anim(
+					stingAnimPos.Value, "bhornet_particle_stingerflash", maverick.xDir,
+					player.getNextActorNetId(), true, sendRpc: true
+				);
 			}
 
 			return;

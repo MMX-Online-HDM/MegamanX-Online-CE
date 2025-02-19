@@ -263,21 +263,21 @@ public class Zero : Character {
 		// Shoot stuff.
 		if (chargeLevel == 1) {
 			currencyUse = 1;
-			playSound("buster2X3", sendRpc: true);
+			playSound("buster2", sendRpc: true);
 			new ZBuster2Proj(
-				shootPos, xDir, 0, player, player.getNextActorNetId(), rpc: true
+				shootPos, xDir, this, player, player.getNextActorNetId(), rpc: true
 			);
 		} else if (chargeLevel == 2) {
 			currencyUse = 1;
-			playSound("buster3X3", sendRpc: true);
+			playSound("buster2X3", sendRpc: true);
 			new ZBuster3Proj(
-				shootPos, xDir, 0, player, player.getNextActorNetId(), rpc: true
+				shootPos, xDir, this, player, player.getNextActorNetId(), rpc: true
 			);
 		} else if (chargeLevel == 3 || chargeLevel >= 4) {
 			currencyUse = 1;
-			playSound("buster4", sendRpc: true);
+			playSound("buster3X3", sendRpc: true);
 			new ZBuster4Proj(
-				shootPos, xDir, 0, player, player.getNextActorNetId(), rpc: true
+				shootPos, xDir, this, player, player.getNextActorNetId(), rpc: true
 			);
 		}
 		if (currencyUse > 0) {
@@ -344,7 +344,7 @@ public class Zero : Character {
 
 		new ShingetsurinProj(
 			shootPos, xDir,
-			time / 60f, player, player.getNextActorNetId(), rpc: true
+			time / 60f, this, player, player.getNextActorNetId(), rpc: true
 		);
 		playSound("shingetsurinx5", forcePlay: false, sendRpc: true);
 		shootAnimTime = DefaultShootAnimTime;

@@ -6,8 +6,7 @@ using SFML.Graphics;
 namespace MMXOnline;
 
 public class XUPParryStartState : CharState {
-	RagingChargeX mmx;
-
+	public RagingChargeX mmx = null!;
 	public XUPParryStartState() : base("unpo_parry_start") {
 	}
 
@@ -82,7 +81,7 @@ public class XUPParryStartState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		mmx = character as RagingChargeX;
+		mmx = player.character as RagingChargeX ?? throw new NullReferenceException();
 	}
 
 	public override void onExit(CharState newState) {
@@ -113,18 +112,21 @@ public class ParriedState : CharState {
 
 public class UPParryMeleeProj : Projectile {
 	public UPParryMeleeProj(
-		Weapon weapon, Point pos, int xDir, float damage,
-		Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, float damage, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, damage, player, "mmx_unpo_parry_proj",
-		Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "mmx_unpo_parry_proj", netId, player
 	) {
+		weapon = RCXParry.netWeapon;
+		damager.damage = damage;
+		damager.hitCooldown = 30;
+		damager.flinch = Global.defFlinch;
+		vel = new Point(0 * xDir, 0);
 		projId = (int)ProjIds.UPParryMelee;
 		setIndestructableProperties();
 		maxTime = 0.25f;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir, (byte)damage);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)damage);
 		}
 	}
 
@@ -136,9 +138,7 @@ public class UPParryMeleeProj : Projectile {
 
 	public static Projectile rpcInvoke(ProjParameters args) {
 		return new UPParryMeleeProj(
-			RCXParry.netWeapon, args.pos,
-			args.xDir, args.extraData[0],
-			args.player, args.netId
+			args.pos, args.xDir, args.extraData[0], args.owner, args.player, args.netId
 		);
 	}
 }
@@ -146,6 +146,7 @@ public class UPParryMeleeProj : Projectile {
 public class XUPParryMeleeState : CharState {
 	Actor counterAttackTarget;
 	float damage;
+	public RagingChargeX mmx = null!;
 	public XUPParryMeleeState(Actor counterAttackTarget, float damage) : base("unpo_parry_attack") {
 		invincible = true;
 		this.counterAttackTarget = counterAttackTarget;
@@ -154,10 +155,8 @@ public class XUPParryMeleeState : CharState {
 
 	public override void update() {
 		base.update();
-
 		if (counterAttackTarget != null) {
 			character.turnToPos(counterAttackTarget.pos);
-
 			float dist = character.pos.distanceTo(counterAttackTarget.pos);
 			if (dist < 150) {
 				if (character.frameIndex >= 4 && !once) {
@@ -167,15 +166,14 @@ public class XUPParryMeleeState : CharState {
 				}
 			}
 		}
-
 		Point? shootPos = character.getFirstPOI("melee");
 		if (!once && shootPos != null) {
 			once = true;
-			new UPParryMeleeProj(new RCXParry(), shootPos.Value, character.xDir, damage, player, player.getNextActorNetId(), rpc: true);
+			new UPParryMeleeProj(shootPos.Value, character.xDir, damage,
+			mmx, player, player.getNextActorNetId(), rpc: true);
 			character.playSound("upParryAttack", sendRpc: true);
 			character.shakeCamera(sendRpc: true);
 		}
-
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		}
@@ -183,26 +181,29 @@ public class XUPParryMeleeState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		mmx = player.character as RagingChargeX ?? throw new NullReferenceException();
 		//character.frameIndex = 2;
 	}
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
-		if (character is RagingChargeX mmx) {
-			mmx.parryCooldown = mmx.maxParryCooldown;
-		}
+		mmx.parryCooldown = mmx.maxParryCooldown;
 	}
 }
 
 
 public class UPParryRangedProj : Projectile {
 	public UPParryRangedProj(
-		Weapon weapon, Point pos, int xDir, string sprite,
-		float damage, int flinch, float hitCooldown, Player player,
-		ushort netProjId, bool rpc = false
+		Point pos, int xDir, string sprite, float damage, int flinch, float hitCooldown,
+		Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 350, damage, player, sprite, flinch, hitCooldown, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, sprite, netId, player
 	) {
+		weapon = RCXParry.netWeapon;
+		damager.damage = damage;
+		damager.hitCooldown = hitCooldown;
+		damager.flinch = flinch;
+		vel = new Point(350 * xDir, 0);
 		projId = (int)ProjIds.UPParryProj;
 		maxDistance = 150;
 		damager.damage = MathInt.Ceiling(damage);
@@ -214,9 +215,8 @@ public class UPParryRangedProj : Projectile {
 			};
 			extraBytes.AddRange(BitConverter.GetBytes(hitCooldown));
 			extraBytes.AddRange(Encoding.ASCII.GetBytes(sprite));
-			rpcCreate(
-				pos, player, netProjId, xDir, extraBytes.ToArray()
-			);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, extraBytes.ToArray());
+
 		}
 	}
 
@@ -225,10 +225,8 @@ public class UPParryRangedProj : Projectile {
 		string sprite = Encoding.ASCII.GetString(args.extraData[6..]);
 
 		return new UPParryRangedProj(
-			RCXParry.netWeapon, args.pos,
-			args.xDir, sprite,
-			args.extraData[0], args.extraData[1], hitCooldown,
-			args.player, args.netId
+			args.pos, args.xDir, sprite, args.extraData[0],
+			args.extraData[1], hitCooldown, args.owner, args.player, args.netId
 		);
 	}
 }
@@ -238,6 +236,7 @@ public class XUPParryProjState : CharState {
 	Anim? absorbAnim;
 	bool shootProj;
 	bool absorbThenShoot;
+	public RagingChargeX mmx = null!;
 	public XUPParryProjState(Projectile otherProj, bool shootProj, bool absorbThenShoot) : base("unpo_parry_attack") {
 		this.otherProj = otherProj;
 		invincible = true;
@@ -247,12 +246,10 @@ public class XUPParryProjState : CharState {
 
 	public override void update() {
 		base.update();
-
 		if (!shootProj && character.sprite.frameIndex >= 1) {
 			character.sprite.frameIndex = 1;
 			character.sprite.frameSpeed = 0;
 		}
-
 		if (absorbAnim != null) {
 			absorbAnim.moveToPos(character.getFirstPOIOrDefault(), 350);
 			absorbAnim.xScale -= Global.spf * 5;
@@ -266,7 +263,6 @@ public class XUPParryProjState : CharState {
 				}
 			}
 		}
-
 		Point? shootPos = character.getFirstPOI("proj");
 		if (!once && shootPos != null) {
 			once = true;
@@ -274,9 +270,12 @@ public class XUPParryProjState : CharState {
 			//int flinch = otherProj.damager.flinch;
 			int flinch = Global.defFlinch;
 			float hitCooldown = otherProj.damager.hitCooldownSeconds;
-			new UPParryRangedProj(new RCXParry(), shootPos.Value, character.xDir, otherProj.sprite.name, damage, flinch, hitCooldown, player, player.getNextActorNetId(), rpc: true);
+			new UPParryRangedProj(
+				shootPos.Value, character.xDir,
+				otherProj.sprite.name, damage, flinch, hitCooldown,
+				mmx, player, player.getNextActorNetId(), rpc: true
+			);
 		}
-
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		}
@@ -284,8 +283,12 @@ public class XUPParryProjState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		mmx = player.character as RagingChargeX ?? throw new NullReferenceException();
 		if (!shootProj || absorbThenShoot) {
-			absorbAnim = new Anim(otherProj.pos, otherProj.sprite.name, otherProj.xDir, player.getNextActorNetId(), false, sendRpc: true);
+			absorbAnim = new Anim(
+				otherProj.pos, otherProj.sprite.name, otherProj.xDir, 
+				player.getNextActorNetId(), false, sendRpc: true
+			);
 			absorbAnim.syncScale = true;
 		}
 	}
@@ -293,9 +296,7 @@ public class XUPParryProjState : CharState {
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		absorbAnim?.destroySelf();
-		if (character is RagingChargeX mmx) {
-			mmx.parryCooldown = mmx.maxParryCooldown;
-		}
+		mmx.parryCooldown = mmx.maxParryCooldown;
 	}
 }
 

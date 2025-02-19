@@ -1,4 +1,5 @@
-﻿namespace MMXOnline;
+﻿using System;
+namespace MMXOnline;
 
 public class ZXSaber : Weapon {
 	public static ZXSaber netWeapon = new();
@@ -13,24 +14,27 @@ public class ZXSaber : Weapon {
 
 public class XSaberProj : Projectile {
 	public XSaberProj(
-		Point pos, int xDir,
-		Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		ZXSaber.netWeapon, pos, xDir, 300, 4, player, "zsaber_shot", 
-		0, 0.5f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "zsaber_shot", netId, player
 	) {
+		weapon = ZXSaber.netWeapon;
+		damager.damage = 4;
+		damager.hitCooldown = 30;
+		vel = new Point(300 * xDir, 0);
 		reflectable = true;
 		projId = (int)ProjIds.XSaberProj;
 		maxTime = 0.5f;
-
+		fadeOnAutoDestroy = true;
+		fadeSprite = "zsaber_shot_fade";
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 	}
 
-	public static Projectile rpcInvoke(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters args) {
 		return new XSaberProj(
-			arg.pos, arg.xDir, arg.player, arg.netId
+			args.pos, args.xDir, args.owner, args.player, args.netId
 		);
 	}
 }
@@ -38,6 +42,7 @@ public class XSaberProj : Projectile {
 public class XSaberState : CharState {
 	bool fired;
 	bool grounded;
+	MegamanX mmx = null!;
 	public XSaberState(bool grounded) : base(grounded ? "beam_saber" : "beam_saber_air") {
 		this.grounded = grounded;
 		landSprite = "beam_saber";
@@ -49,18 +54,21 @@ public class XSaberState : CharState {
 
 	public override void update() {
 		base.update();
-		if (character.frameIndex >= 6 && !fired) {
+		if (character.frameIndex >= 7 && !fired) {
 			fired = true;
 			character.playSound("zerosaberx3");
 			new XSaberProj(
-				character.pos.addxy(20 * character.xDir, -20), 
-				character.xDir, player, player.getNextActorNetId(), rpc: true
+				character.pos.addxy(28 * character.xDir, -17), character.xDir,
+				mmx, player, player.getNextActorNetId(), rpc: true
 			);
 		}
-
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		}
+	}
+	public override void onEnter(CharState oldState) {
+		mmx = player.character as MegamanX ?? throw new NullReferenceException();
+		base.onEnter(oldState);
 	}
 }
 
@@ -84,7 +92,7 @@ public class X6SaberState : CharState {
 			//new XSaberProj(new XSaber(player), character.pos.addxy(30 * character.xDir, -29), character.xDir, player, player.getNextActorNetId(), rpc: true);
 		}
 
-		if (player.character.canCharge() && player.input.isHeld(Control.Shoot, player)) {
+		if (player?.character?.canCharge() == true && player.input.isHeld(Control.Shoot, player)) {
 			player.character.increaseCharge();
 		}
 

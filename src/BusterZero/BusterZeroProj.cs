@@ -4,19 +4,20 @@ public class DZBusterProj : Projectile {
 	bool deflected;
 
 	public DZBusterProj(
-		Point pos, int xDir, Player player, ushort? netId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		ZeroBuster.netWeapon, pos, xDir,
-		240, 1, player, "buster1", 0, 0,
-		netId, player.ownedByLocalPlayer
+		pos, xDir, owner, "buster1", netId, player	
 	) {
+		weapon = ZeroBuster.netWeapon;
+		damager.damage = 1;
+		vel = new Point(240 * xDir, 0);
 		fadeSprite = "buster1_fade";
 		reflectable = true;
 		maxTime = 0.5175f;
 		projId = (int)ProjIds.DZBuster;
 
 		if (rpc) {
-			rpcCreate(pos, player, netId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 	}
 
@@ -37,19 +38,20 @@ public class DZBusterProj : Projectile {
 
 	public static Projectile rpcInvoke(ProjParameters args) {
 		return new DZBusterProj(
-			args.pos, args.xDir, args.player, args.netId
+			args.pos, args.xDir, args.owner, args.player, args.netId
 		);
 	}
 }
 
 public class DZBuster2Proj : Projectile {
 	public DZBuster2Proj(
-		Point pos, int xDir, Player player, ushort? netId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		ZeroBuster.netWeapon, pos, xDir,
-		350, 2, player, "zbuster2", 0, 0,
-		netId, player.ownedByLocalPlayer
+		pos, xDir, owner, "zbuster2", netId, player	
 	) {
+		weapon = ZeroBuster.netWeapon;
+		damager.damage = 2;
+		vel = new Point(350 * xDir, 0);
 		fadeOnAutoDestroy = true;
 		fadeSprite = "buster2_fade";
 		reflectable = true;
@@ -57,13 +59,13 @@ public class DZBuster2Proj : Projectile {
 		projId = (int)ProjIds.DZBuster2;
 
 		if (rpc) {
-			rpcCreate(pos, player, netId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 	}
 
 	public static Projectile rpcInvoke(ProjParameters args) {
 		return new DZBuster2Proj(
-			args.pos, args.xDir, args.player, args.netId
+			args.pos, args.xDir, args.owner, args.player, args.netId
 		);
 	}
 }
@@ -72,19 +74,21 @@ public class DZBuster3Proj : Projectile {
 	float partTime;
 
 	public DZBuster3Proj(
-		Point pos, int xDir, Player player, ushort? netId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		ZeroBuster.netWeapon, pos, xDir,
-		350, 3, player, "zbuster4", Global.halfFlinch, 0,
-		netId, player.ownedByLocalPlayer
+		pos, xDir, owner, "zbuster4", netId, player	
 	) {
+		weapon = ZeroBuster.netWeapon;
+		damager.damage = 3;
+		damager.flinch = Global.halfFlinch;
+		vel = new Point(350 * xDir, 0);
 		fadeOnAutoDestroy = true;
 		fadeSprite = "buster3_fade";
 		reflectable = true;
 		maxTime = 0.5f;
 		projId = (int)ProjIds.DZBuster3;
 		if (rpc) {
-			rpcCreate(pos, player, netId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 	}
 
@@ -105,36 +109,37 @@ public class DZBuster3Proj : Projectile {
 
 	public static Projectile rpcInvoke(ProjParameters args) {
 		return new DZBuster3Proj(
-			args.pos, args.xDir, args.player, args.netId
+			args.pos, args.xDir, args.owner, args.player, args.netId
 		);
 	}
 }
 
 public class DZHadangekiProj : Projectile {
 	public DZHadangekiProj(
-		Point pos, int xDir, bool isBZ, Player player, ushort? netId, bool rpc = false
+		Point pos, int xDir, bool isBZ, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		ZeroBuster.netWeapon, pos, xDir,
-		350, 3, player, "zsaber_shot", 0, 0,
-		netId, player.ownedByLocalPlayer
+		pos, xDir, owner, "zsaber_shot", netId, player
 	) {
+		weapon = ZeroBuster.netWeapon;
+		damager.damage = 3;
+		vel = new Point(350 * xDir, 0);
 		fadeOnAutoDestroy = true;
 		fadeSprite = "zsaber_shot_fade";
 		reflectable = true;
-		projId = (int)ProjIds.ZSaberProj;
+		projId = (int)ProjIds.DZHadangeki;
 		maxTime = 0.5f;
 		if (isBZ) {
 			damager.damage = 4;
 			genericShader = player.zeroPaletteShader;
 		}
 		if (rpc) {
-			rpcCreate(pos, player, netId, xDir, (isBZ ? (byte)0 : (byte)1));
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, isBZ ? (byte)1 : (byte)0);
 		}
 	}
 
 	public static Projectile rpcInvoke(ProjParameters args) {
 		return new DZHadangekiProj(
-			args.pos, args.xDir, args.extraData[0] == 1, args.player, args.netId
+			args.pos, args.xDir, args.extraData[0] == 1, args.owner, args.player, args.netId
 		);
 	}
 }

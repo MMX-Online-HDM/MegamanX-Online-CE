@@ -1,4 +1,5 @@
-﻿namespace MMXOnline;
+﻿using System;
+namespace MMXOnline;
 
 public class HadoukenWeapon : Weapon {
 	public static HadoukenWeapon netWeapon = new(null!);
@@ -15,12 +16,15 @@ public class HadoukenWeapon : Weapon {
 
 public class HadoukenProj : Projectile {
 	public HadoukenProj(
-		Weapon weapon, Point pos, int xDir, 
-		Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 250, Damager.ohkoDamage, player, "hadouken", 
-		Global.defFlinch, 0.15f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "hadouken", netId, player	
 	) {
+		weapon = HadoukenWeapon.netWeapon;
+		damager.damage = Damager.ohkoDamage;
+		damager.hitCooldown = 9;
+		damager.flinch = Global.defFlinch;
+		vel = new Point(250 * xDir, 0);
 		maxTime = 0.4f;
 		fadeSprite = "hadouken_fade";
 		reflectable = true;
@@ -28,21 +32,20 @@ public class HadoukenProj : Projectile {
 		projId = (int)ProjIds.Hadouken;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 	}
 
-	public static Projectile rpcInvoke(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters args) {
 		return new HadoukenProj(
-			HadoukenWeapon.netWeapon, arg.pos, 
-			arg.xDir, arg.player, arg.netId
+			args.pos, args.xDir, args.owner, args.player, args.netId
 		);
 	}
 }
 
 public class Hadouken : CharState {
 	bool fired = false;
-	MegamanX? mmx;
+	public MegamanX mmx = null!;
 
 	public Hadouken() : base("hadouken") {
 		superArmor = true;
@@ -50,19 +53,14 @@ public class Hadouken : CharState {
 
 	public override void update() {
 		base.update();
-
 		if (character.frameIndex >= 2 && !fired) {
 			fired = true;
-
-			Weapon weapon = new HadoukenWeapon(player);
 			float x = character.pos.x;
 			float y = character.pos.y;
-
-			new HadoukenProj(weapon, new Point(x + (20 * character.xDir), y - 20), character.xDir, player, player.getNextActorNetId(), rpc: true);
-
+			new HadoukenProj(new Point(x + (20 * character.xDir), y - 20), 
+			character.xDir, mmx, player, player.getNextActorNetId(), rpc: true);
 			character.playSound("hadouken", sendRpc: true);
 		}
-
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		}
@@ -70,7 +68,7 @@ public class Hadouken : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		mmx = character as MegamanX;
+		mmx = character as MegamanX ?? throw new NullReferenceException();
 		character.stopCharge();
 	}
 

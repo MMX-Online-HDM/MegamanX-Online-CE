@@ -23,20 +23,22 @@ public class ShotgunIce : Weapon {
 	}
 
 	public override void shoot(Character character, int[] args) {
+		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
+
 		int chargeLevel = args[0];
 		Point pos = character.getShootPos();
 		int xDir = character.getShootXDir();
 		Player player = character.player;
 
 		if (chargeLevel < 3) {
-			new ShotgunIceProj(this, pos, xDir, player, 0, player.getNextActorNetId(), rpc: true);
-		} else if (character is MegamanX mmx) {
+			new ShotgunIceProj(pos, xDir, mmx, player, 0, player.getNextActorNetId(), rpc: true);
+		} else {
 			pos = pos.addxy(xDir * 25, 0);
 			pos.y = mmx.pos.y;
 
 			//mmx.shotgunIceChargeTime = 1.5f;
 
-			new ShotgunIceProjSled(this, pos, xDir, player, player.getNextActorNetId(), true);
+			new ShotgunIceProjSled(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 		}
 	}
 }
@@ -49,11 +51,15 @@ public class ShotgunIceProj : Projectile {
 	public float maxSpeed = 400;
 
 	public ShotgunIceProj(
-		Weapon weapon, Point pos, int xDir, Player player, int type, ushort netProjId,
+		Point pos, int xDir, Actor owner, Player player, int type, ushort? netProjId,
 		(int x, int y)? velOverride = null, Character? hitChar = null, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 400, 2, player, "shotgun_ice", 0, 0.01f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "shotgun_ice", netProjId, player	
 	) {
+		weapon = ShotgunIce.netWeapon;
+		damager.damage = 2;
+		damager.hitCooldown = 1;
+		vel = new Point(400 * xDir, 0);
 		projId = (int)ProjIds.ShotgunIce;
 		maxTime = 0.4f;
 		this.hitChar = hitChar;
@@ -79,7 +85,7 @@ public class ShotgunIceProj : Projectile {
 			} else {
 				extraArgs = new byte[] { (byte)type, (byte)(128 + xDir), 128 };
 			}
-			rpcCreate(pos, player, netProjId, xDir, extraArgs);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, extraArgs);
 		}
 	}
 
@@ -101,30 +107,30 @@ public class ShotgunIceProj : Projectile {
 			destroySelf(disableRpc: true);
 			Character? chr = null;
 			new ShotgunIceProj(
-				weapon, pos.clone(), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
+				pos.clone(), xDir, this, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
 				((-1 * xDir), -2), chr, rpc: true
 			);
 			new ShotgunIceProj(
-				weapon, pos.clone(), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
+				pos.clone(), xDir, this, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
 				((-1 * xDir), -1), chr, rpc: true
 			);
 			new ShotgunIceProj(
-				weapon, pos.clone(), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
+				pos.clone(), xDir, this, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
 				((-1 * xDir), 0), chr, rpc: true
 			);
 			new ShotgunIceProj(
-				weapon, pos.clone(), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
+				pos.clone(), xDir, this, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
 				((-1 * xDir), 1), chr, rpc: true
 			);
 			new ShotgunIceProj(
-				weapon, pos.clone(), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
+				pos.clone(), xDir, this, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
 				((-1 * xDir), 2), chr, rpc: true
 			);
 		}
 	}
 
 	public override void onHitWall(CollideData other) {
-		if (!other.gameObject.collider.isClimbable) return;
+		if (!other.gameObject.collider?.isClimbable == true) return;
 		onHit();
 	}
 
@@ -134,38 +140,44 @@ public class ShotgunIceProj : Projectile {
 		base.onHitDamagable(damagable);
 	}
 
-	public static Projectile rpcInvoke(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters args) {
 		return new ShotgunIceProj(
-			ShotgunIce.netWeapon, arg.pos, arg.xDir, arg.player,
-			arg.extraData[0], arg.netId, (arg.extraData[1] - 128, arg.extraData[2] - 128)
+			args.pos, args.xDir, args.owner, args.player,
+			args.extraData[0], args.netId, (args.extraData[1] - 128, args.extraData[2] - 128)
 		);
 	}
 }
 
 public class ShotgunIceProjCharged : Projectile {
 	public ShotgunIceProjCharged(
-		Weapon weapon, Point pos, int xDir, Player player, int type, 
-		bool isChillP, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, int type, 
+		bool isChillP, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 150, 1, player, type == 0 ? "shotgun_ice_charge_wind2" : "shotgun_ice_charge_wind", 
-		0, 0.5f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, type == 0 ? "shotgun_ice_charge_wind2" : "shotgun_ice_charge_wind", netId, player	
 	) {
+		weapon = isChillP ? ChillPenguin.netWeapon : XBuster.netWeapon;
+		damager.damage = 1;
+		damager.hitCooldown = 30;
+		vel = new Point(150 * xDir, 0);
 		projId = isChillP ? (int)ProjIds.ChillPIceBlow : (int)ProjIds.ShotgunIceCharged;
 		shouldShieldBlock = false;
+		destroyOnHit = false;
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir,
+			new byte[] {  (byte)type, isChillP ? (byte)1 : (byte)0 }
+			);
 		}
 
 		isOwnerLinked = true;
-		if (player.character != null) {
-			owningActor = player.character;
+		if (ownerPlayer?.character != null) {
+			owningActor = ownerPlayer.character;
 		}
 	}
 
-	public static Projectile rpcInvoke(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters args) {
 		return new ShotgunIceProjCharged(
-			ShotgunIce.netWeapon, arg.pos, arg.xDir, 
-			arg.player, 0, false, arg.netId
+			args.pos, args.xDir, args.owner, args.player,
+			args.extraData[0], args.extraData[1] == 1, args.netId
 		);
 	}
 
@@ -186,12 +198,14 @@ public class ShotgunIceProjSled : Projectile {
 	public bool ridden;
 
 	public ShotgunIceProjSled(
-		Weapon weapon, Point pos, int xDir, 
-		Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, 2, player, "shotgun_ice_charge", 
-		0, 1, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "shotgun_ice_charge", netId, player	
 	) {
+		weapon = ShotgunIce.netWeapon;
+		damager.damage = 2;
+		damager.hitCooldown = 60;
+		vel = new Point(0 * xDir, 0);
 		projId = (int)ProjIds.ShotgunIceSled;
 		fadeSound = "iceBreak";
 		shouldShieldBlock = false;
@@ -200,7 +214,9 @@ public class ShotgunIceProjSled : Projectile {
 		//this.collider.wallOnly = true;
 		canBeLocal = false;
 
-		if (rpc) rpcCreate(pos, player, netProjId, xDir);
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+		}
 	}
 
 	public void increaseVel() {
@@ -219,10 +235,9 @@ public class ShotgunIceProjSled : Projectile {
 		}
 	}
 
-	public static Projectile rpcInvoke(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters args) {
 		return new ShotgunIceProjSled(
-			ShotgunIce.netWeapon, arg.pos, arg.xDir, 
-			arg.player, arg.netId
+			args.pos, args.xDir, args.owner, args.player, args.netId
 		);
 	}
 

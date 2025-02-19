@@ -971,8 +971,8 @@ public partial class Level {
 				);
 				if (hostPlayer.charRollingShieldNetId != null) {
 					new RollingShieldProjCharged(
-						player.weapon, player.character.pos,
-						player.character.xDir, player, hostPlayer.charRollingShieldNetId.Value
+						player.character.pos,
+						player.character.xDir, player.character, player, hostPlayer.charRollingShieldNetId.Value
 					);
 				}
 				player.loadout = currentLoadout;
@@ -1001,7 +1001,7 @@ public partial class Level {
 		foreach (var magnetMine in magnetMines) {
 			var player = getPlayerById(magnetMine.playerId);
 			if (player == null) continue;
-			new MagnetMineProj(new MagnetMine(), new Point(magnetMine.x, magnetMine.y), 1, player, magnetMine.netId);
+			new MagnetMineProj(new Point(magnetMine.x, magnetMine.y), 1, player.character, player, magnetMine.netId);
 		}
 	}
 

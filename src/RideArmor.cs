@@ -46,6 +46,7 @@ public class RideArmor : Actor, IDamagable {
 	public static ShaderWrapper? paletteFrog = Helpers.cloneGenericPaletteShader("paletteFrog");
 
 	bool netColorShadersSet;
+	public static Weapon netWeapon = new Weapon(WeaponIds.MechGenericWeapon, 0);
 
 	public RideArmor(
 		Player owner, Point pos, int raNum, int neutralId, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
@@ -425,11 +426,17 @@ public class RideArmor : Actor, IDamagable {
 								if (i == 1) xDirMod = 1;
 								Projectile grenade;
 								if (vile.napalmWeapon.type == (int)NapalmType.SplashHit) {
-									grenade = new SplashHitGrenadeProj(vile.napalmWeapon, shootPos, xDir * xDirMod, player, player.getNextActorNetId(), rpc: true);
+									grenade = new SplashHitGrenadeProj(
+										shootPos, xDir * xDirMod, vile, player, player.getNextActorNetId(), rpc: true
+									);
 								} else if (vile.napalmWeapon.type == (int)NapalmType.FireGrenade) {
-									grenade = new MK2NapalmGrenadeProj(vile.napalmWeapon, shootPos, xDir * xDirMod, player, player.getNextActorNetId(), rpc: true);
+									grenade = new MK2NapalmGrenadeProj(
+										shootPos, xDir * xDirMod, vile, player, player.getNextActorNetId(), rpc: true
+									);
 								} else {
-									grenade = new NapalmGrenadeProj(new Napalm(NapalmType.RumblingBang), shootPos, xDir * xDirMod, player, player.getNextActorNetId(), rpc: true);
+									grenade = new NapalmGrenadeProj(
+										shootPos, xDir * xDirMod, vile, player, player.getNextActorNetId(), rpc: true
+									);
 								}
 								grenade.vel = new Point();
 							}
@@ -447,7 +454,7 @@ public class RideArmor : Actor, IDamagable {
 					string poiTag = currentFrame.POITags[i];
 					if (poiTag == "b" && player != null) {
 						Point shootPos = pos.addxy(poi.x * xDir, poi.y);
-						new TorpedoProj(new MechTorpedoWeapon(), shootPos, xDir, player, 2, player.getNextActorNetId(), rpc: true);
+						new TorpedoProjMech(shootPos, xDir, this, player, player.getNextActorNetId(), rpc: true);
 					}
 				}
 				playSound("frogShootX3", forcePlay: false, sendRpc: true);
@@ -839,7 +846,9 @@ public class RideArmor : Actor, IDamagable {
 					piece.useGravity = true;
 					piece.vel = new Point(Helpers.randomRange(-300, 300), Helpers.randomRange(-300, 25));
 				} else {
-					piece = new RAShrapnelProj(new VileLaser(VileLaserType.NecroBurst), centerPos, piecesSpriteName, 1, hasRaColorShader, netOwner, netOwner.getNextActorNetId(), rpc: true);
+					piece = new RAShrapnelProj(
+						centerPos, piecesSpriteName, 1, hasRaColorShader, this,
+						netOwner, netOwner.getNextActorNetId(), rpc: true);
 					piece.vel = shrapnelVels[i];
 				}
 				piece.frameIndex = i;
@@ -2257,20 +2266,20 @@ public class InRideArmor : CharState {
 		if (vile.napalmWeapon.type == (int)NapalmType.SplashHit) {
 			vile.setVileShootTime(vile.napalmWeapon);
 			grenade = new SplashHitGrenadeProj(
-				vile.napalmWeapon, character.pos.addxy(0, -3),
-				character.xDir, character.player, character.player.getNextActorNetId(), rpc: true
+				character.pos.addxy(0, -3), character.xDir, vile,
+				character.player, character.player.getNextActorNetId(), rpc: true
 			);
 		} else if (vile.napalmWeapon.type == (int)NapalmType.FireGrenade) {
 			vile.setVileShootTime(vile.napalmWeapon);
 			grenade = new MK2NapalmGrenadeProj(
-				vile.napalmWeapon, character.pos.addxy(0, -3), character.xDir,
+				character.pos.addxy(0, -3), character.xDir, vile,
 				character.player, character.player.getNextActorNetId(), rpc: true
 			);
 		} else {
 			vile.setVileShootTime(vile.napalmWeapon, targetCooldownWeapon: new Napalm(NapalmType.RumblingBang));
 			grenade = new NapalmGrenadeProj(
-				new Napalm(NapalmType.RumblingBang), character.pos.addxy(0, -3),
-				character.xDir, character.player, character.player.getNextActorNetId(), rpc: true
+				character.pos.addxy(0, -3), character.xDir, vile, 
+				character.player, character.player.getNextActorNetId(), rpc: true
 			);
 		}
 		/*

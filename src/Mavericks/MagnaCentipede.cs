@@ -9,7 +9,7 @@ public class MagnaCentipede : Maverick {
 	public static Weapon getWeapon() { return new Weapon(WeaponIds.MagnaCGeneric, 147); }
 
 	public const float constHeight = 50;
-	public MagnaCMagnetMineParent magnetMineParent;
+	public MagnaCMagnetMineParent? magnetMineParent;
 	public bool noTail;
 	public float teleportCooldown;
 
@@ -90,7 +90,7 @@ public class MagnaCentipede : Maverick {
 					}
 
 					for (int i = 1; i <= 4; i++) {
-						CollideData collideData = Global.level.checkTerrainCollisionOnce(this, 0, -10 * i * getYMod(), autoVel: true);
+						CollideData? collideData = Global.level.checkTerrainCollisionOnce(this, 0, -15 * i * getYMod(), autoVel: true);
 						if (collideData != null && collideData.gameObject is Wall wall && !wall.isMoving && !wall.topWall && collideData.isCeilingHit()) {
 							changeState(new MagnaCCeilingStartState());
 							return;
@@ -210,7 +210,6 @@ public class MagnaCentipede : Maverick {
 public class MagnaCShurikenProj : Projectile {
 	public float angleDist = 0;
 	public float turnDir = -1;
-	public Pickup pickup;
 	public float maxSpeed = 250;
 	public MagnaCShurikenProj(Weapon weapon, Point pos, int xDir, Point velDir, Player player, ushort netProjId, bool sendRpc = false) :
 		base(weapon, pos, xDir, 0, 2, player, "magnac_shuriken", 0, 0, netProjId, player.ownedByLocalPlayer) {
@@ -234,8 +233,10 @@ public class MagnaCShurikenProj : Projectile {
 			var angInc = (-xDir * turnDir) * Global.spf * 200;
 			angle += angInc;
 			angleDist += MathF.Abs(angInc);
-			vel.x = Helpers.cosd((float)angle) * maxSpeed;
-			vel.y = Helpers.sind((float)angle) * maxSpeed;
+			if (angle != null) {
+				vel.x = Helpers.cosd((float)angle) * maxSpeed;
+				vel.y = Helpers.sind((float)angle) * maxSpeed;
+			}
 		}
 	}
 }
@@ -251,12 +252,21 @@ public class MagnaCShootState : MaverickState {
 		Point? shootPos = maverick.getFirstPOI(0);
 		Point? shootPos2 = maverick.getFirstPOI(1);
 		Point? shootPos3 = maverick.getFirstPOI(2);
-		if (!shotOnce && shootPos != null) {
+		if (!shotOnce && shootPos != null && shootPos2 != null&& shootPos3 != null) {
 			shotOnce = true;
 			maverick.playSound("magnacShoot", sendRpc: true);
-			new MagnaCShurikenProj(maverick.weapon, shootPos.Value, maverick.xDir, new Point(0, -maverick.getYMod()), player, player.getNextActorNetId(), sendRpc: true);
-			new MagnaCShurikenProj(maverick.weapon, shootPos2.Value, maverick.xDir, new Point(maverick.xDir, -maverick.getYMod()), player, player.getNextActorNetId(), sendRpc: true);
-			new MagnaCShurikenProj(maverick.weapon, shootPos3.Value, maverick.xDir, new Point(maverick.xDir, 0), player, player.getNextActorNetId(), sendRpc: true);
+			new MagnaCShurikenProj(
+				maverick.weapon, shootPos.Value, maverick.xDir, new Point(0, -maverick.getYMod()),
+				player, player.getNextActorNetId(), sendRpc: true
+			);
+			new MagnaCShurikenProj(
+				maverick.weapon, shootPos2.Value, maverick.xDir, new Point(maverick.xDir, -maverick.getYMod()),
+				player, player.getNextActorNetId(), sendRpc: true
+			);
+			new MagnaCShurikenProj(
+				maverick.weapon, shootPos3.Value, maverick.xDir, new Point(maverick.xDir, 0),
+				player, player.getNextActorNetId(), sendRpc: true
+			);
 		}
 
 		if (maverick.isAnimOver()) {
@@ -291,7 +301,7 @@ public class MagnaCMagnetMineParent : Actor {
 	public bool isComingBack;
 	public Point originOffset;
 	float lerpProgress;
-	public Actor target;
+	public Actor? target;
 	public float range = 60;
 	public bool controlled;
 
@@ -427,8 +437,8 @@ public class MagnaCMagnetMineParent : Actor {
 
 public class MagnaCMagnetMineState : MaverickState {
 	bool shotOnce;
-	public MagnaCentipede magnac;
-	public SoundWrapper sound;
+	public MagnaCentipede? magnac;
+	public SoundWrapper? sound;
 	public MagnaCMagnetMineState() : base("telekinesis") {
 	}
 
@@ -438,11 +448,11 @@ public class MagnaCMagnetMineState : MaverickState {
 		Point? shootPos = maverick.getFirstPOI();
 		if (!shotOnce && shootPos != null) {
 			shotOnce = true;
-			magnac.magnetMineParent = new MagnaCMagnetMineParent(shootPos.Value, magnac, true);
+			magnac!.magnetMineParent = new MagnaCMagnetMineParent(shootPos.Value, magnac, true);
 			sound = maverick.playSound("magnacMagnetMine", sendRpc: true);
 		}
 
-		if (magnac.magnetMineParent != null) {
+		if (magnac?.magnetMineParent != null) {
 			magnac.magnetMineParent.controlled = false;
 			var inputDir = input.getInputDir(player);
 			if (!inputDir.isZero()) {
@@ -478,7 +488,7 @@ public class MagnaCMagnetMineState : MaverickState {
 			sound.sound?.Stop();
 		}
 		RPC.stopSound.sendRpc("magnacMagnetMine", maverick.netId);
-		if (magnac.magnetMineParent != null && !magnac.magnetMineParent.destroyed) {
+		if (magnac?.magnetMineParent != null && !magnac.magnetMineParent.destroyed) {
 			magnac.noTail = true;
 			magnac.changeSpriteFromName(newState.sprite, false);
 			//magnac.setNoTail(true);
@@ -488,7 +498,8 @@ public class MagnaCMagnetMineState : MaverickState {
 
 public class MagnaCTeleportState : MaverickState {
 	int state = 0;
-	Actor clone;
+	Actor? clone;
+	public MagnaCentipede MagneHyakulegger = null!;
 	bool inverted;
 	public MagnaCTeleportState() : base("teleport_out") {
 		enterSound = "magnacTeleportOut";
@@ -498,7 +509,7 @@ public class MagnaCTeleportState : MaverickState {
 	public override void update() {
 		base.update();
 
-		if (state == 0) {
+		if (state == 0 && clone != null) {
 			var dir = new Point(0, 0);
 			if (input.isPressed(Control.Up, player)) dir.y = -1;
 			else if (input.isPressed(Control.Down, player)) dir.y = 1;
@@ -564,7 +575,7 @@ public class MagnaCTeleportState : MaverickState {
 					if ((inverted && !maverick.reversedGravity) || (!inverted && maverick.reversedGravity)) {
 						maverick.reverseGravity();
 					}
-					var prevCamPos = player.character.getCamCenterPos();
+					var prevCamPos = player!.character!.getCamCenterPos();
 					player.character.stopCamUpdate = true;
 					maverick.changePos(clone.pos);
 					if (player.isTagTeam()) Global.level.snapCamPos(player.character.getCamCenterPos(), prevCamPos);
@@ -581,19 +592,23 @@ public class MagnaCTeleportState : MaverickState {
 
 	public bool canChangePos() {
 		float yDir = inverted ? -5 : 5;
-		if (Global.level.checkTerrainCollisionOnce(clone, 0, yDir) == null) return false;
-		var hits = Global.level.getTerrainTriggerList(clone, new Point(0, yDir), typeof(KillZone));
-		if (hits.Count > 0) return false;
+		if (clone != null)
+			if (Global.level.checkTerrainCollisionOnce(clone, 0, yDir) == null) return false;
+		if (clone != null) {
+			var hits = Global.level.getTerrainTriggerList(clone, new Point(0, yDir), typeof(KillZone));
+			if (hits.Count > 0) return false;
+		}
 		return true;
 	}
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
+		MagneHyakulegger = maverick as MagnaCentipede ?? throw new NullReferenceException();
 		clone = new Actor("empty", maverick.pos, null, true, false);
 		var rect = new Rect(0, 0, maverick.width, maverick.height);
 		clone.spriteToCollider["teleport_out"] = new Collider(rect.getPoints(), false, clone, false, false, 0, new Point(0, 0));
 		clone.spriteToCollider["notail_teleport_out"] = new Collider(rect.getPoints(), false, clone, false, false, 0, new Point(0, 0));
-		clone.changeSprite((maverick as MagnaCentipede).noTail ? "magnac_notail_teleport_out" : "magnac_teleport_out", false);
+		clone.changeSprite(MagneHyakulegger.noTail ? "magnac_notail_teleport_out" : "magnac_teleport_out", false);
 		clone.frameSpeed = 0;
 		clone.alpha = 0.5f;
 		clone.xDir = maverick.xDir;
@@ -609,21 +624,31 @@ public class MagnaCTeleportState : MaverickState {
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
 		maverick.useGravity = true;
-		(maverick as MagnaCentipede).teleportCooldown = 0.25f;
-		clone.destroySelf();
+		MagneHyakulegger.teleportCooldown = 0.25f;
+		clone?.destroySelf();
 	}
 }
 
 public class MagnaCMagnetPullProj : Projectile {
 	public float radius = 150;
-	public MagnaCMagnetPullProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 0, player, "empty", 0, 0.01f, netProjId, player.ownedByLocalPlayer) {
+	public MagnaCMagnetPullProj(
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "empty", netId, player
+	) {
+		damager.hitCooldown = 1;
+		weapon = MagnaCentipede.getWeapon();
 		projId = (int)ProjIds.MagnaCMagnetPull;
 		setIndestructableProperties();
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new MagnaCMagnetPullProj(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
 	}
 
 	public override void update() {
@@ -632,7 +657,7 @@ public class MagnaCMagnetPullProj : Projectile {
 			var chr = go as Character;
 			if (chr == null || !chr.ownedByLocalPlayer || chr.isPushImmune()) continue;
 			var damagable = go as IDamagable;
-			if (!damagable.canBeDamaged(damager.owner.alliance, damager.owner.id, null)) continue;
+			if (!damagable!.canBeDamaged(damager.owner.alliance, damager.owner.id, null)) continue;
 			if (chr.pos.distanceTo(pos) > radius + 15) continue;
 			if (!Global.level.noWallsInBetween(chr.getCenterPos(), pos)) continue;
 
@@ -652,8 +677,9 @@ public class MagnaCMagnetPullProj : Projectile {
 }
 
 public class MagnaCMagnetPullState : MaverickState {
-	SoundWrapper pullSound;
-	public MagnaCMagnetPullProj proj;
+	SoundWrapper? pullSound;
+	public MagnaCMagnetPullProj? proj;
+	public MagnaCentipede MagneHyakulegger = null!;
 	public MagnaCMagnetPullState() : base("drain_start") {
 	}
 
@@ -663,10 +689,13 @@ public class MagnaCMagnetPullState : MaverickState {
 		if (maverick.sprite.name.EndsWith("drain_start") && maverick.isAnimOver()) {
 			maverick.changeSpriteFromName("drain", true);
 		}
-
-		if (proj == null && maverick.getFirstPOI() != null) {
+		Point? shootPos = maverick.getFirstPOI();
+		if (!once && shootPos != null) {
+			once = true;
 			pullSound = maverick.playSound("magnacPull", sendRpc: true);
-			proj = new MagnaCMagnetPullProj(maverick.weapon, maverick.getFirstPOI().Value, maverick.xDir, player, player.getNextActorNetId(), rpc: true);
+			proj = new MagnaCMagnetPullProj(
+				shootPos.Value, maverick.xDir,
+				MagneHyakulegger, player, player.getNextActorNetId(), rpc: true);
 		}
 
 		if (isAI) {
@@ -679,8 +708,11 @@ public class MagnaCMagnetPullState : MaverickState {
 
 		if (stateTime > 2) {
 			maverick.changeToIdleOrFall();
-			return;
 		}
+	}
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		MagneHyakulegger = maverick as MagnaCentipede ?? throw new NullReferenceException();
 	}
 
 	public override bool trySetGrabVictim(Character grabbed) {
@@ -689,7 +721,7 @@ public class MagnaCMagnetPullState : MaverickState {
 	}
 
 	public override bool canEnter(Maverick maverick) {
-		if (maverick is MagnaCentipede ms && ms.noTail) return false;
+		if (MagneHyakulegger?.noTail == true) return false;
 		return base.canEnter(maverick);
 	}
 

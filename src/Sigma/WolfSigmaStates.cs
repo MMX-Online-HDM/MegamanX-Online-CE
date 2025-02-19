@@ -100,6 +100,7 @@ public class WolfSigmaFadeInShader {
 
 #region Wolf Sigma Head
 public class WolfSigmaHeadWeapon : Weapon {
+	public static WolfSigmaHeadWeapon netWeapon = new();
 	public WolfSigmaHeadWeapon() : base() {
 		index = (int)WeaponIds.SigmaWolfHead;
 		killFeedIndex = 102;
@@ -112,6 +113,7 @@ public class WolfSigmaHead : Actor, IDamagable {
 	WolfSigmaFadeInShader fadeinShader;
 	public float shootTime;
 	public float shootComponentX;
+	public int BallsShot, FlamesShot;
 	public float shootXDir;
 	public bool isBall;
 	public float explodeTime;
@@ -181,6 +183,8 @@ public class WolfSigmaHead : Actor, IDamagable {
 
 		fadeinShader.update();
 		if (!ownedByLocalPlayer) return;
+		if (BallsShot > 9) BallsShot = 0;
+		if (FlamesShot > 64) FlamesShot = 0;
 
 		if (tauntTime > 0) {
 			if (sprite.loopCount > 3) {
@@ -204,7 +208,9 @@ public class WolfSigmaHead : Actor, IDamagable {
 				if (isBall) {
 					if (projTime > 0.2f) {
 						projTime = 0;
-						new WolfSigmaBall(owner.weapons[1], pos.addxy(0, 30), dir, owner, owner.getNextActorNetId(), rpc: true);
+						BallsShot++;
+						new WolfSigmaBall(pos.addxy(0, 30), 1, BallsShot,
+						this, owner, owner.getNextActorNetId(), rpc: true);
 					}
 				} else {
 					flameSoundTime += Global.spf;
@@ -214,7 +220,9 @@ public class WolfSigmaHead : Actor, IDamagable {
 					}
 					if (projTime > 0.06f) {
 						projTime = 0;
-						new WolfSigmaFlame(owner.weapons[1], pos.addxy(0, 35), dir, owner, owner.getNextActorNetId(), rpc: true);
+						FlamesShot++;
+						new WolfSigmaFlame(pos.addxy(0, 30), 1, FlamesShot,
+						this, owner, owner.getNextActorNetId(), rpc: true);
 					}
 				}
 
@@ -281,50 +289,74 @@ public class WolfSigmaHead : Actor, IDamagable {
 }
 
 public class WolfSigmaBall : Projectile {
-	Point dir;
 	bool once;
-	public WolfSigmaBall(Weapon weapon, Point pos, Point dir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, 1, 0, 6, player, "ws_proj_ball", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public int type = 0;
+	public WolfSigmaBall(
+		Point pos, int xDir, int type, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "ws_proj_ball", netId, player	
+	) {
+		weapon = WolfSigmaHeadWeapon.netWeapon;
+		damager.damage = 6;
+		damager.hitCooldown = 30;
+		damager.flinch = Global.defFlinch;
 		projId = (int)ProjIds.SigmaWolfHeadBallProj;
+		this.type = type;
 		destroyOnHit = false;
 		maxTime = 0.5f;
-		this.dir = dir;
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)type);
 		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new WolfSigmaBall(
+			args.pos, args.xDir, args.extraData[0], args.owner, args.player, args.netId
+		);
 	}
 
 	public override void update() {
 		if (frameIndex > 3 && !once) {
 			once = true;
 			playSound("energyBall");
-			vel = dir.times(400);
+			int x = 450 - 100 * type;
+			if (type <= 9) vel = new Point(x, 300);		
 		}
-
 		base.update();
 	}
 }
 
 public class WolfSigmaFlame : Projectile {
-	Point dir;
-	public WolfSigmaFlame(Weapon weapon, Point pos, Point dir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, 1, 0, 3, player, "ws_proj_flame", 0, 0.25f, netProjId, player.ownedByLocalPlayer) {
+	bool once;
+	public int type = 0;
+	public WolfSigmaFlame(
+		Point pos, int xDir, int type, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "ws_proj_flame", netId, player	
+	) {
+		weapon = WolfSigmaHeadWeapon.netWeapon;
+		damager.damage = 3;
+		damager.hitCooldown = 15;
 		projId = (int)ProjIds.SigmaWolfHeadFlameProj;
 		destroyOnHit = false;
 		maxTime = 0.35f;
-		vel = dir.times(400);
-		this.dir = dir;
-
+		this.type = type;
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)type);
 		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new WolfSigmaFlame(
+			args.pos, args.xDir, args.extraData[0], args.owner, args.player, args.netId
+		);
 	}
 
 	public override void update() {
-		base.update();
-		if (isUnderwater()) {
-			destroySelf();
+		if (!once) {
+			once = true;
+			int x = 450 - 25 * type;
+			if (type <= 64) vel = new Point(x, 300);		
 		}
+		base.update();
 	}
 }
 

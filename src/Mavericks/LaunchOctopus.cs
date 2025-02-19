@@ -3,6 +3,7 @@
 namespace MMXOnline;
 
 public class LaunchOctopus : Maverick {
+	public static Weapon netWeapon = new Weapon(WeaponIds.LaunchOGeneric, 96);
 	public LaunchOMissileWeapon missileWeapon = new();
 	public LaunchODrainWeapon meleeWeapon = new();
 	public LaunchOHomingTorpedoWeapon homingTorpedoWeapon = new();
@@ -135,6 +136,7 @@ public class LaunchOctopus : Maverick {
 
 #region weapons
 public class LaunchOMissileWeapon : Weapon {
+	public static LaunchOMissileWeapon netWeapon = new();
 	public LaunchOMissileWeapon() {
 		index = (int)WeaponIds.LaunchOMissile;
 		killFeedIndex = 96;
@@ -142,6 +144,7 @@ public class LaunchOMissileWeapon : Weapon {
 }
 
 public class LaunchOWhirlpoolWeapon : Weapon {
+	public static LaunchOWhirlpoolWeapon netWeapon = new();
 	public LaunchOWhirlpoolWeapon() {
 		index = (int)WeaponIds.LaunchOWhirlpool;
 		killFeedIndex = 96;
@@ -149,6 +152,7 @@ public class LaunchOWhirlpoolWeapon : Weapon {
 }
 
 public class LaunchODrainWeapon : Weapon {
+	public static LaunchODrainWeapon netWeapon = new();
 	public LaunchODrainWeapon() {
 		index = (int)WeaponIds.LaunchOMelee;
 		killFeedIndex = 96;
@@ -156,6 +160,7 @@ public class LaunchODrainWeapon : Weapon {
 }
 
 public class LaunchOHomingTorpedoWeapon : Weapon {
+	public static LaunchOHomingTorpedoWeapon netWeapon = new();
 	public LaunchOHomingTorpedoWeapon() {
 		index = (int)WeaponIds.LaunchOHomingTorpedo;
 		killFeedIndex = 96;
@@ -167,17 +172,20 @@ public class LaunchOHomingTorpedoWeapon : Weapon {
 public class LaunchOMissile : Projectile, IDamagable {
 	public float smokeTime = 0;
 	public LaunchOMissile(
-		Weapon weapon, Point pos, int xDir, Player player,
-		int unitVel, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, int unitVel, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 100, 3, player, "launcho_proj_missile",
-		0, 0.15f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "launcho_proj_missile", netId, player
 	) {
+		weapon = LaunchOMissileWeapon.netWeapon;
+		damager.damage = 3;
+		damager.hitCooldown = 9;
+		vel = new Point(100 * xDir, 0);
 		projId = (int)ProjIds.LaunchOMissle;
 		maxTime = 0.75f;
+		fadeOnAutoDestroy = true;
 		fadeSprite = "explosion";
 		fadeSound = "explosion";
-		vel.y = speed * (unitVel switch {
+		vel.y = 100 * (unitVel switch {
 			0 => -0.2f,
 			1 => -0.05f,
 			2 => 0.25f,
@@ -185,8 +193,13 @@ public class LaunchOMissile : Projectile, IDamagable {
 		});
 		reflectableFBurner = true;
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir, (byte)unitVel);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)unitVel);
 		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new LaunchOMissile(
+			args.pos, args.xDir, args.owner, args.player, args.extraData[0], args.netId
+		);
 	}
 
 	public override void preUpdate() {
@@ -230,18 +243,26 @@ public class LaunchOMissile : Projectile, IDamagable {
 }
 
 public class LaunchOWhirlpoolProj : Projectile {
-	Player player;
-	public LaunchOWhirlpoolProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, 1, 0, 0, player, "launcho_whirlpool", 0, 0.25f, netProjId, player.ownedByLocalPlayer) {
+	public LaunchOWhirlpoolProj(
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "launcho_whirlpool", netId, player
+	) {
+		weapon = LaunchOWhirlpoolWeapon.netWeapon;
+		damager.hitCooldown = 15;
+		vel = new Point(1 * xDir, 0);
 		projId = (int)ProjIds.LaunchOWhirlpool;
 		shouldShieldBlock = false;
 		shouldVortexSuck = false;
 		destroyOnHit = false;
-		this.player = player;
-
-		if (sendRpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new LaunchOWhirlpoolProj(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
 	}
 
 	public override void update() {
@@ -279,6 +300,134 @@ public class LaunchOWhirlpoolProj : Projectile {
 		}
 	}
 }
+public class TorpedoProjChargedOcto : Projectile, IDamagable {
+	public Actor? target;
+	public float smokeTime = 0;
+	public float maxSpeed = 150;
+	public TorpedoProjChargedOcto(
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, float? angle = null, bool rpc = false
+	) : base(
+		pos, xDir, owner, "launcho_proj_ht", netId, player	
+	) {
+		weapon = LaunchOctopus.netWeapon;
+		damager.damage = 1;
+		damager.flinch = Global.halfFlinch;
+		vel = new Point(150 * xDir, 0);
+		fadeSprite = "explosion";
+		fadeSound = "explosion";
+		maxTime = 2f;
+		projId = (int)ProjIds.LaunchOTorpedo;
+		fadeOnAutoDestroy = true;
+		reflectableFBurner = true;
+		customAngleRendering = true;
+		this.angle = this.xDir == -1 ? 180 : 0;
+		if (angle != null) {
+			this.angle = angle + (this.xDir == -1 ? 180 : 0);
+		}
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+		}
+		canBeLocal = false;
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new TorpedoProjChargedOcto(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
+	}
+	bool homing = true;
+	public void reflect(float reflectAngle) {
+		angle = reflectAngle;
+		target = null;
+	}
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+	public override void update() {
+		base.update();
+		if (ownedByLocalPlayer && homing) {
+			if (target != null) {
+				if (!Global.level.gameObjects.Contains(target)) {
+					target = null;
+				}
+			}
+			if (target != null) {
+				if (time < 3f) {
+					var dTo = pos.directionTo(target.getCenterPos()).normalize();
+					var destAngle = MathF.Atan2(dTo.y, dTo.x) * 180 / MathF.PI;
+					destAngle = Helpers.to360(destAngle);
+					if (angle != null) angle = Helpers.lerpAngle((float)angle, destAngle, Global.spf * 3);
+				}
+			}
+			if (time >= 0.15) {
+				target = Global.level.getClosestTarget(pos, damager.owner.alliance, true, aMaxDist: Global.screenW * 0.75f);
+			} else if (time < 0.15) {
+				//this.vel.x += this.xDir * Global.spf * 300;
+			}
+			if (angle != null) {
+				vel.x = Helpers.cosd((float)angle) * maxSpeed;
+				vel.y = Helpers.sind((float)angle) * maxSpeed;
+			}
+		}
+		smokeTime += Global.spf;
+		if (smokeTime > 0.2) {
+			smokeTime = 0;
+			if (homing) new Anim(pos, "torpedo_smoke", 1, null, true);
+		}
+	}
+	public override void renderFromAngle(float x, float y) {
+		var angle = this.angle;
+		var xDir = 1;
+		var yDir = 1;
+		var frameIndex = 0;
+		float normAngle = 0;
+		if (angle < 90) {
+			xDir = 1;
+			yDir = -1;
+			normAngle = (float)angle;
+		}
+		if (angle >= 90 && angle < 180) {
+			xDir = -1;
+			yDir = -1;
+			normAngle = 180 - (float)angle;
+		} else if (angle >= 180 && angle < 270) {
+			xDir = -1;
+			yDir = 1;
+			normAngle = (float)angle - 180;
+		} else if (angle >= 270 && angle < 360) {
+			xDir = 1;
+			yDir = 1;
+			normAngle = 360 - (float)angle;
+		}
+
+		if (normAngle < 18) frameIndex = 0;
+		else if (normAngle >= 18 && normAngle < 36) frameIndex = 1;
+		else if (normAngle >= 36 && normAngle < 54) frameIndex = 2;
+		else if (normAngle >= 54 && normAngle < 72) frameIndex = 3;
+		else if (normAngle >= 72 && normAngle < 90) frameIndex = 4;
+
+		sprite.draw(frameIndex, pos.x + x, pos.y + y, xDir, yDir, getRenderEffectSet(), 1, 1, 1, zIndex, actor: this);
+	}
+	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
+		if (damage > 0) {
+			destroySelf();
+		}
+	}
+	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
+		return damager.owner.alliance != damagerAlliance;
+	}
+	public bool isInvincible(Player attacker, int? projId) {
+		return false;
+	}
+	public bool canBeHealed(int healerAlliance) {
+		return false;
+	}
+	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
+	}
+	public bool isPlayableDamagable() {
+		return false;
+	}
+}
 #endregion
 
 #region states
@@ -286,13 +435,14 @@ public class LaunchOShoot : MaverickState {
 	int shootState;
 	bool isGrounded;
 	float afterShootTime;
+	public LaunchOctopus LauncherOctopuld= null!;
 	public LaunchOShoot(bool isGrounded) : base(isGrounded ? "shoot" : "air_shoot") {
 		this.isGrounded = isGrounded;
 	}
 
 	public override void update() {
 		base.update();
-		if (player == null) return;
+		if (LauncherOctopuld == null) return;
 
 		if (isGrounded && !maverick.grounded) {
 			sprite = "air_shoot";
@@ -307,14 +457,25 @@ public class LaunchOShoot : MaverickState {
 			airCode();
 		}
 
-		var lo = maverick as LaunchOctopus;
-		Point? shootPos = lo.getFirstPOI();
+		Point? shootPos = LauncherOctopuld.getFirstPOI();
+		int xDir = LauncherOctopuld.xDir;
 		if (shootState == 0 && shootPos != null) {
 			shootState = 1;
 			maverick.playSound("torpedo", sendRpc: true);
-			if (maverick.ammo >= 1) new LaunchOMissile(lo.missileWeapon, shootPos.Value.addxy(0, -3), lo.xDir, player, 0, player.getNextActorNetId(), rpc: true);
-			if (maverick.ammo >= 2) new LaunchOMissile(lo.missileWeapon, shootPos.Value.addxy(0, 0), lo.xDir, player, 1, player.getNextActorNetId(), rpc: true);
-			if (maverick.ammo >= 3) new LaunchOMissile(lo.missileWeapon, shootPos.Value.addxy(0, 5), lo.xDir, player, 2, player.getNextActorNetId(), rpc: true);
+
+			if (maverick.ammo >= 1) new LaunchOMissile(
+				shootPos.Value.addxy(0, -3), xDir, LauncherOctopuld,
+				player, 0, player.getNextActorNetId(), rpc: true
+			);
+			if (maverick.ammo >= 2) new LaunchOMissile(
+				shootPos.Value.addxy(0, 0), xDir, LauncherOctopuld,
+				player, 1, player.getNextActorNetId(), rpc: true
+			);
+			if (maverick.ammo >= 3) new LaunchOMissile(
+				shootPos.Value.addxy(0, 5), xDir, LauncherOctopuld,
+				player, 2, player.getNextActorNetId(), rpc: true
+			);
+
 			maverick.ammo -= 3;
 			if (maverick.ammo < 0) maverick.ammo = 0;
 		}
@@ -324,7 +485,7 @@ public class LaunchOShoot : MaverickState {
 			shootState = 2;
 		}
 
-		if (shootState == 2) {
+		if (shootState == 2 && shootPos != null) {
 			afterShootTime += Global.spf;
 			if (afterShootTime > 0.325f) {
 				shootState = 3;
@@ -332,23 +493,32 @@ public class LaunchOShoot : MaverickState {
 				sprite += "2";
 				maverick.changeSpriteFromName(sprite, true);
 				maverick.playSound("torpedo", sendRpc: true);
-				shootPos = lo.getFirstPOI();
-				if (maverick.ammo >= 1) new LaunchOMissile(lo.missileWeapon, shootPos.Value.addxy(0, -3), lo.xDir, player, 0, player.getNextActorNetId(), rpc: true);
-				if (maverick.ammo >= 2) new LaunchOMissile(lo.missileWeapon, shootPos.Value.addxy(0, 0), lo.xDir, player, 1, player.getNextActorNetId(), rpc: true);
-				if (maverick.ammo >= 3) new LaunchOMissile(lo.missileWeapon, shootPos.Value.addxy(0, 5), lo.xDir, player, 2, player.getNextActorNetId(), rpc: true);
+				if (maverick.ammo >= 1) new LaunchOMissile(
+					shootPos.Value.addxy(0, -3), xDir, LauncherOctopuld,
+					player, 0, player.getNextActorNetId(), rpc: true
+				);
+				if (maverick.ammo >= 2) new LaunchOMissile(
+					shootPos.Value.addxy(0, 0), xDir, LauncherOctopuld,
+					player, 1, player.getNextActorNetId(), rpc: true
+				);
+				if (maverick.ammo >= 3) new LaunchOMissile(
+					shootPos.Value.addxy(0, 5), xDir, LauncherOctopuld,
+					player, 2, player.getNextActorNetId(), rpc: true
+				);
 				maverick.ammo -= 3;
 				if (maverick.ammo < 0) maverick.ammo = 0;
 			}
 		}
 
-		if (maverick.ammo == 0 || lo.isAnimOver()) {
-			if (maverick.grounded) lo.changeState(new MIdle());
-			else lo.changeState(new MFall());
+		if (maverick.ammo == 0 || LauncherOctopuld.isAnimOver()) {
+			if (maverick.grounded) LauncherOctopuld.changeState(new MIdle());
+			else LauncherOctopuld.changeState(new MFall());
 		}
 	}
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
+		LauncherOctopuld = maverick as LaunchOctopus ?? throw new NullReferenceException();
 	}
 
 	public override void onExit(MaverickState newState) {
@@ -358,6 +528,7 @@ public class LaunchOShoot : MaverickState {
 
 public class LaunchOHomingTorpedoState : MaverickState {
 	public bool shootOnce;
+	public LaunchOctopus LauncherOctopuld= null!;
 	public LaunchOHomingTorpedoState() : base("ht") {
 	}
 
@@ -367,23 +538,34 @@ public class LaunchOHomingTorpedoState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
+		LauncherOctopuld = maverick as LaunchOctopus ?? throw new NullReferenceException();
 		maverick.stopMoving();
 	}
 
 	public override void update() {
 		base.update();
-		if (player == null) return;
+		if (LauncherOctopuld == null) return;
 
 		if (maverick.frameIndex == 3 && !shootOnce) {
 			shootOnce = true;
 			maverick.playSound("torpedo", sendRpc: true);
 			var pois = maverick.currentFrame.POIs;
-			var lo = (maverick as LaunchOctopus);
-
-			new TorpedoProj(lo.homingTorpedoWeapon, lo.pos.add(pois[0]), 1, player, 3, player.getNextActorNetId(), 0, rpc: true);
-			new TorpedoProj(lo.homingTorpedoWeapon, lo.pos.add(pois[1]), 1, player, 3, player.getNextActorNetId(), 0, rpc: true);
-			new TorpedoProj(lo.homingTorpedoWeapon, lo.pos.add(pois[2]), 1, player, 3, player.getNextActorNetId(), 180, rpc: true);
-			new TorpedoProj(lo.homingTorpedoWeapon, lo.pos.add(pois[3]), 1, player, 3, player.getNextActorNetId(), 180, rpc: true);
+			new TorpedoProjChargedOcto(
+				LauncherOctopuld.pos.add(pois[0]), 1, LauncherOctopuld, 
+				player, player.getNextActorNetId(), 0, rpc: true
+			);
+			new TorpedoProjChargedOcto(
+				LauncherOctopuld.pos.add(pois[1]), 1, LauncherOctopuld, 
+				player, player.getNextActorNetId(), 0, rpc: true
+			);
+			new TorpedoProjChargedOcto(
+				LauncherOctopuld.pos.add(pois[2]), 1, LauncherOctopuld,
+				player, player.getNextActorNetId(), 180, rpc: true
+			);
+			new TorpedoProjChargedOcto(
+				LauncherOctopuld.pos.add(pois[3]), 1, LauncherOctopuld,
+				player, player.getNextActorNetId(), 180, rpc: true
+			);
 		}
 
 		if (maverick.isAnimOver()) {
@@ -394,7 +576,8 @@ public class LaunchOHomingTorpedoState : MaverickState {
 
 public class LaunchOWhirlpoolState : MaverickState {
 	public bool shootOnce;
-	LaunchOWhirlpoolProj whirlpool;
+	LaunchOWhirlpoolProj? whirlpool;
+	public LaunchOctopus LauncherOctopuld= null!;
 	float whirlpoolSoundTime;
 	int initYDir = 1;
 	public LaunchOWhirlpoolState() : base("spin") {
@@ -408,13 +591,17 @@ public class LaunchOWhirlpoolState : MaverickState {
 		base.onEnter(oldState);
 		maverick.stopMoving();
 		maverick.useGravity = false;
-		whirlpool = new LaunchOWhirlpoolProj(new LaunchOWhirlpoolWeapon(), maverick.pos.addxy(0, isAI ? -100 : 25), 1, player, player.getNextActorNetId(), sendRpc: true);
+		LauncherOctopuld = maverick as LaunchOctopus ?? throw new NullReferenceException();
+		whirlpool = new LaunchOWhirlpoolProj(
+			maverick.pos.addxy(0, isAI ? -100 : 25), 1,
+			LauncherOctopuld ,player, player.getNextActorNetId(), rpc: true
+		);
 		maverick.playSound("launchoWhirlpool", sendRpc: true);
 	}
 
 	public override void update() {
 		base.update();
-		if (player == null) return;
+		if (LauncherOctopuld == null) return;
 
 		if (!maverick.tryMove(new Point(0, 100 * initYDir), out CollideData hit)) {
 			if (initYDir == 1) {
@@ -441,7 +628,7 @@ public class LaunchOWhirlpoolState : MaverickState {
 
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
-		whirlpool.destroySelf();
+		whirlpool?.destroySelf();
 		maverick.useGravity = true;
 	}
 }

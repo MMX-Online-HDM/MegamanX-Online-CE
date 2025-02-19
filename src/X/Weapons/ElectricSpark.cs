@@ -23,15 +23,17 @@ public class ElectricSpark : Weapon {
 	}
 
 	public override void shoot(Character character, int[] args) {
+		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
+
 		int chargeLevel = args[0];
 		Point pos = character.getShootPos();
 		int xDir = character.getShootXDir();
 		Player player = character.player;
 
 		if (chargeLevel < 3) {
-			new ElectricSparkProj(this, pos, xDir, player, 0, player.getNextActorNetId(), rpc: true);
+			new ElectricSparkProj(pos, xDir, mmx, player, 0, player.getNextActorNetId(), rpc: true);
 		} else {
-			new ElectricSparkProjChargedStart(this, pos, xDir, player, player.getNextActorNetId(), true);
+			new ElectricSparkProjChargedStart(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 		}
 	}
 }
@@ -40,15 +42,19 @@ public class ElectricSparkProj : Projectile {
 	public int type = 0;
 	public bool split = false;
 	public ElectricSparkProj(
-		Weapon weapon, Point pos, int xDir, Player player, 
-		int type, ushort netProjId, (int x, int y)? vel = null, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, int type, ushort netProjId,
+		(int x, int y)? vel = null, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 150, 2, player, "electric_spark",
-		Global.miniFlinch, 0, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "electric_spark", netProjId, player	
 	) {
+		weapon = ElectricSpark.netWeapon;
+		damager.damage = 2;
+		damager.flinch = Global.miniFlinch;
 		projId = (int)ProjIds.ElectricSpark;
 		maxTime = 1.2f;
-
+		if (type == 0) {
+			base.vel = new Point(150 * xDir, 0);
+		}
 		if (type >= 1) {
 			maxTime = 0.4f;
 
@@ -79,7 +85,7 @@ public class ElectricSparkProj : Projectile {
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new ElectricSparkProj(
-			ElectricSpark.netWeapon, arg.pos, arg.xDir, 
+			arg.pos, arg.xDir, arg.owner,
 			arg.player, arg.extraData[0], arg.netId,
 			(arg.extraData[1] - 128, arg.extraData[2] - 128)
 		);
@@ -102,14 +108,14 @@ public class ElectricSparkProj : Projectile {
 
             Point normal2 =  new Point(0, 1);
 			if (normal != null) normal2 = (Point)normal;
-            normal2.multiply(speed * 3);
+            normal2.multiply(150 * 3);
 
 			new ElectricSparkProj(
-				weapon, pos.clone(), xDir, damager.owner, 1,
+				pos.clone(), xDir, this , damager.owner, 1,
 				Global.level.mainPlayer.getNextActorNetId(), ((int)normal2.x, (int)normal2.y), true
 			);
 			new ElectricSparkProj(
-				weapon, pos.clone(), xDir, damager.owner, 2,
+				pos.clone(), xDir, this, damager.owner, 2,
 				Global.level.mainPlayer.getNextActorNetId(), ((int)normal2.x * -1, (int)normal2.y * -1), rpc: true
 			);
 		}
@@ -123,23 +129,24 @@ public class ElectricSparkProj : Projectile {
 
 public class ElectricSparkProjChargedStart : Projectile {
 	public ElectricSparkProjChargedStart(
-		Weapon weapon, Point pos, int xDir, 
-		Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, 4, player, "electric_spark_charge_start",
-		Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "electric_spark_charge_start", netId, player	
 	) {
-		projId = (int)ProjIds.ElectricSparkCharged;
+		weapon = ElectricSpark.netWeapon;
+		vel = new Point(0 * xDir, 0);
+		projId = (int)ProjIds.ElectricSparkChargedStart;
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 
-		if (rpc) rpcCreate(pos, player, netProjId, xDir);
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+		}
 	}
 
-	public static Projectile rpcInvoke(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters args) {
 		return new ElectricSparkProjChargedStart(
-			ElectricSpark.netWeapon, arg.pos, arg.xDir, 
-			arg.player, arg.netId
+			args.pos, args.xDir, args.owner, args.player, args.netId
 		);
 	}
 
@@ -149,11 +156,11 @@ public class ElectricSparkProjChargedStart : Projectile {
 			destroySelf();
 			if (ownedByLocalPlayer) {
 				new ElectricSparkProjCharged(
-					weapon, pos.addxy(-1, 0), -1, damager.owner,
+					pos.addxy(-1, 0), -1, this, damager.owner,
 					damager.owner.getNextActorNetId(true), rpc: true
 				);
 				new ElectricSparkProjCharged(
-					weapon, pos.addxy(1, 0), 1, damager.owner,
+					pos.addxy(1, 0), 1, this, damager.owner,
 					damager.owner.getNextActorNetId(true), rpc: true
 				);
 			}
@@ -163,26 +170,28 @@ public class ElectricSparkProjChargedStart : Projectile {
 
 public class ElectricSparkProjCharged : Projectile {
 	public ElectricSparkProjCharged(
-		Weapon weapon, Point pos, int xDir, 
-		Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 450, 4, player, "electric_spark_charge",
-		Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "electric_spark_charge_start", netId, player	
 	) {
+		weapon = ElectricSpark.netWeapon;
+		damager.damage = 4;
+		damager.flinch = Global.defFlinch;
+		damager.hitCooldown = 30;
+		vel = new Point(450 * xDir, 0);
 		projId = (int)ProjIds.ElectricSparkCharged;
 		maxTime = 0.3f;
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 	}
 
-	public static Projectile rpcInvoke(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters args) {
 		return new ElectricSparkProjCharged(
-			ElectricSpark.netWeapon, arg.pos, arg.xDir, 
-			arg.player, arg.netId
+			args.pos, args.xDir, args.owner, args.player, args.netId
 		);
 	}
 }

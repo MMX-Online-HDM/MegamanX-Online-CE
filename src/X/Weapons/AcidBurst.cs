@@ -24,25 +24,25 @@ public class AcidBurst : Weapon {
 		Point pos = character.getShootPos();
 		int xDir = character.getShootXDir();
 		Player player = character.player;
+		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
 
 		if (chargeLevel < 3) {
-			new AcidBurstProj(this, pos, xDir, player, player.getNextActorNetId(), true);
+			new AcidBurstProj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 		} else {
 			player.setNextActorNetId(player.getNextActorNetId());
-			new AcidBurstProjCharged(this, pos, xDir, 0, player, player.getNextActorNetId(true), true);
-			new AcidBurstProjCharged(this, pos, xDir, 1, player, player.getNextActorNetId(true), true);
+			new AcidBurstProjCharged(pos, xDir, 0, mmx, player, player.getNextActorNetId(true), true);
+			new AcidBurstProjCharged(pos, xDir, 1, mmx, player, player.getNextActorNetId(true), true);
 		}
 	}
 }
 
 public class AcidBurstProj : Projectile {
 	public AcidBurstProj(
-		Weapon weapon, Point pos, int xDir, 
-		Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 300, 0, player, "acidburst_proj", 
-		0, 0f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "acidburst_proj", netId, player	
 	) {
+		weapon = AcidBurst.netWeapon;
 		useGravity = true;
 		maxTime = 1.5f;
 		projId = (int)ProjIds.AcidBurst;
@@ -54,13 +54,13 @@ public class AcidBurstProj : Projectile {
 		canBeLocal = false;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 	}
 	
-	public static Projectile rpcInvoke(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters args) {
 		return new AcidBurstProj(
-			AcidBurst.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
+			args.pos, args.xDir, args.owner, args.player, args.netId
 		);
 	}
 
@@ -93,12 +93,12 @@ public class AcidBurstProj : Projectile {
 
 public class AcidBurstProjSmall : Projectile {
 	public AcidBurstProjSmall(
-		Weapon weapon, Point pos, int xDir, Point vel,
-		ProjIds projId, Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Point vel, bool isSeahorse,
+		ProjIds projId, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 300, 0, player,
-		"acidburst_proj_small", 0, 0f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "acidburst_proj_small", netId, player	
 	) {
+		weapon = isSeahorse ? ToxicSeahorse.netWeapon : AcidBurst.netWeapon;
 		useGravity = true;
 		maxTime = 1.5f;
 		this.projId = (int)projId;
@@ -108,16 +108,16 @@ public class AcidBurstProjSmall : Projectile {
 		canBeLocal = false;
 
 		if (rpc) {
-			byte[] extraArgs = new byte[] { (byte)(vel.x + 128), (byte)(vel.y + 128), (byte)projId }; 
-			rpcCreate(pos, player, netProjId, xDir, extraArgs);
+			byte[] extraArgs = new byte[] {  isSeahorse ? (byte)1 : (byte)0, (byte)(vel.x + 128),
+			(byte)(vel.y + 128), (byte)projId }; 
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, extraArgs);
 		}
 	}
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new AcidBurstProjSmall(
-			AcidBurst.netWeapon, arg.pos, arg.xDir, 
-			new Point(arg.extraData[0] - 128, arg.extraData[1]- 128),
-			(ProjIds)arg.extraData[2], arg.player, arg.netId
+		 	arg.pos, arg.xDir, new Point(arg.extraData[0] - 128, arg.extraData[1]- 128), arg.extraData[2] == 1, 
+			(ProjIds)arg.extraData[3], arg.owner, arg.player, arg.netId
 		);
 	}
 
@@ -147,12 +147,11 @@ public class AcidBurstProjSmall : Projectile {
 public class AcidBurstProjCharged : Projectile {
 	int bounces = 0;
 	public AcidBurstProjCharged(
-		Weapon weapon, Point pos, int xDir, int type, 
-		Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, int type, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 300, 0, player, "acidburst_charged_start", 
-		0, 0f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "acidburst_charged_start", netId, player	
 	) {
+		weapon = AcidBurst.netWeapon;
 		maxTime = 4f;
 		projId = (int)ProjIds.AcidBurstCharged;
 		useGravity = true;
@@ -163,7 +162,7 @@ public class AcidBurstProjCharged : Projectile {
 			vel = new Point(xDir * 150, -200);
 		}
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir, (byte)type);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)type);
 		}
 		checkBigAcidUnderwater();
 		
@@ -173,8 +172,8 @@ public class AcidBurstProjCharged : Projectile {
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new AcidBurstProjCharged(
-			AcidBurst.netWeapon, arg.pos, arg.xDir, 
-			arg.extraData[0], arg.player, arg.netId
+			arg.pos, arg.xDir, arg.extraData[0], 
+			arg.owner, arg.player, arg.netId
 		);
 	}
 

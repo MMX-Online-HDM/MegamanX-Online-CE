@@ -33,20 +33,19 @@ public class RollingShield : Weapon {
 	}
 
 	public override void shoot(Character character, int[] args) {
+		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
+
 		int chargeLevel = args[0];
 		Point pos = character.getShootPos();
 		int xDir = character.getShootXDir();
 		Player player = character.player;
 
 		if (chargeLevel < 3) {
-			new RollingShieldProj(this, pos, xDir, player, player.getNextActorNetId(), true);	
+			new RollingShieldProj(pos, xDir, mmx, player, player.getNextActorNetId(), true);	
 		} else {
-			if (character is not MegamanX mmx) {
-				return;
-			}
 			if (mmx.stingActiveTime == 0 && (args.Length == 1 || args[1] == 0)) {
 				mmx.chargedRollingShieldProj = new RollingShieldProjCharged(
-					this, pos, xDir, player, player.getNextActorNetId(), true
+					pos, xDir, mmx, player, player.getNextActorNetId(), true
 				);
 			} else {
 				mmx.specialBuster.shoot(character, [3, 1]);
@@ -59,12 +58,12 @@ public class RollingShield : Weapon {
 
 public class RollingShieldProj : Projectile {
 	public RollingShieldProj(
-		Weapon weapon, Point pos, int xDir, 
-		Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 200, 2, player, "rolling_shield", 
-		0, 0, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "rolling_shield", netId, player	
 	) {
+		weapon = RollingShield.netWeapon;
+		damager.damage = 2;
 		projId = (int)ProjIds.RollingShield;
 		fadeSprite = "explosion";
 		fadeSound = "explosion";
@@ -73,13 +72,14 @@ public class RollingShieldProj : Projectile {
 		vel.x = 0;
 		canBeLocal = false;
 
-		if (rpc) rpcCreate(pos, player, netProjId, xDir);
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+		}
 	}
 
-	public static Projectile rpcInvoke(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters args) {
 		return new RollingShieldProj(
-			RollingShield.netWeapon, arg.pos, arg.xDir, 
-			arg.player, arg.netId
+			args.pos, args.xDir, args.owner, args.player, args.netId
 		);
 	}
 
@@ -107,28 +107,32 @@ public class RollingShieldProj : Projectile {
 	}
 
 	public override void onHitDamagable(IDamagable damagable) {
-		if (damagable is not TorpedoProj) {
+		if (damagable is not TorpedoProjX or TorpedoProjChargedX or 
+			TorpedoProjChargedOcto or TorpedoProjMech
+		) {
 			base.onHitDamagable(damagable);
 		}
 	}
 }
 
 public class RollingShieldProjCharged : Projectile {
-	public MegamanX? mmx;
+	public MegamanX mmx = null!;
 	public LoopingSound? rollingShieldSound;
 	public float ammoDecCooldown = 0;
 	public RollingShieldProjCharged(
-		Weapon weapon, Point pos, int xDir, 
-		Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, 1, player, "rolling_shield_charge_flash",
-		0, 0.33f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "rolling_shield_charge_flash", netId, player	
 	) {
+		weapon = RollingShield.netWeapon;
+		damager.damage = 1;
+		damager.hitCooldown = 20;
+		vel = new Point(0 * xDir, 0);
 		projId = (int)ProjIds.RollingShieldCharged;
 		fadeSprite = "rolling_shield_charge_break";
 		fadeSound = "hit";
 		useGravity = false;
-		mmx = (player.character as MegamanX);
+		mmx = player.character as MegamanX ?? throw new NullReferenceException();
 		rollingShieldSound = new LoopingSound("rollingShieldCharge", "rollingShieldChargeLoop", this);
 		destroyOnHit = false;
 		shouldShieldBlock = false;
@@ -136,13 +140,14 @@ public class RollingShieldProjCharged : Projectile {
 		neverReflect = true;
 		canBeLocal = false;
 
-		if (rpc) rpcCreate(pos, player, netProjId, xDir);
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+		}
 	}
 
-	public static Projectile rpcInvoke(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters args) {
 		return new RollingShieldProjCharged(
-			RollingShield.netWeapon, arg.pos, arg.xDir, 
-			arg.player, arg.netId
+			args.pos, args.xDir, args.owner, args.player, args.netId
 		);
 	}
 
@@ -169,7 +174,7 @@ public class RollingShieldProjCharged : Projectile {
 		if (rollingShieldSound != null) {
 			rollingShieldSound.play();
 		}
-		changePos(mmx.getCenterPos());
+		changePos(mmx?.getCenterPos() ?? new Point(0,0));
 		if (ammoDecCooldown > 0) {
 			ammoDecCooldown -= speedMul;
 			if (ammoDecCooldown <= 0) ammoDecCooldown = 0;
@@ -184,9 +189,9 @@ public class RollingShieldProjCharged : Projectile {
 	}
 
 	public void decAmmo(float amount = 1) {
-		if (mmx.currentWeapon == weapon && ammoDecCooldown == 0) {
+		if (mmx?.currentWeapon is RollingShield && ammoDecCooldown == 0) {
 			ammoDecCooldown = damager.hitCooldown;
-			weapon.addAmmo(-amount, damager.owner);
+			mmx?.currentWeapon?.addAmmo(-amount, damager.owner);
 		}
 	}
 

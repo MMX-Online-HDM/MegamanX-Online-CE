@@ -34,6 +34,8 @@ public class FireWave : Weapon {
 	}
 
 	public override void shoot(Character character, int[] args) {
+		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
+
 		int chargeLevel = args[0];
 		Point pos = character.getShootPos();
 		int xDir = character.getShootXDir();
@@ -42,10 +44,10 @@ public class FireWave : Weapon {
 		if (character != null) {
 			if (character.isUnderwater()) return;
 			if (chargeLevel < 3) {
-				var proj = new FireWaveProj(this, pos, xDir, player, player.getNextActorNetId(), true);
+				var proj = new FireWaveProj( pos, xDir, mmx, player, player.getNextActorNetId(), true);
 				proj.vel.inc(character.vel.times(-0.5f));
 			} else {
-				new FireWaveProjChargedStart(this, pos, xDir, player, player.getNextActorNetId(), true);
+				new FireWaveProjChargedStart(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 			}
 		}
 	}
@@ -53,48 +55,54 @@ public class FireWave : Weapon {
 
 public class FireWaveProj : Projectile {
 	public FireWaveProj(
-		Weapon weapon, Point pos, int xDir, 
-		Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 400, 1, player, "fire_wave",
-		0, 0.2f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "fire_wave", netId, player	
 	) {
+		weapon = FireWave.netWeapon;
+		damager.damage = 1;
+		damager.hitCooldown = 12;
+		vel = new Point(400 * xDir, 0);
 		projId = (int)ProjIds.FireWave;
 		fadeSprite = "fire_wave_fade";
 		maxTime = 0.1f;
 		destroyOnHit = false;
 
-		if (rpc) rpcCreate(pos, player, netProjId, xDir);
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+		}
 	}
 
-	public static Projectile rpcInvoke(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters args) {
 		return new FireWaveProj(
-			FireWave.netWeapon, arg.pos, arg.xDir, 
-			arg.player, arg.netId
+			args.pos, args.xDir, args.owner, args.player, args.netId
 		);
 	}
 }
 
 public class FireWaveProjChargedStart : Projectile {
 	public FireWaveProjChargedStart(
-		Weapon weapon, Point pos, int xDir, 
-		Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 150, 2, player, "fire_wave_charge", 
-		0, 0.222f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "fire_wave_charge", netId, player	
 	) {
+		weapon = FireWave.netWeapon;
+		damager.damage = 2;
+		damager.hitCooldown = 13;
+		vel = new Point(150 * xDir, 0);
 		projId = (int)ProjIds.FireWaveChargedStart;
 		collider.wallOnly = true;
 		destroyOnHit = false;
 		shouldShieldBlock = false;
-
-		if (rpc) rpcCreate(pos, player, netProjId, xDir);
+		maxTime = 8; // WDYM IT WAS INFINITE BEFORE
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+		}
 	}
 
-	public static Projectile rpcInvoke(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters args) {
 		return new FireWaveProjChargedStart(
-			FireWave.netWeapon, arg.pos, arg.xDir, 
-			arg.player, arg.netId
+			args.pos, args.xDir, args.owner, args.player, args.netId
 		);
 	}
 
@@ -109,7 +117,7 @@ public class FireWaveProjChargedStart : Projectile {
 			destroySelf();
 			if (ownedByLocalPlayer) {
 				new FireWaveProjCharged(
-					weapon, pos, xDir, damager.owner, 0,
+					pos, xDir, this, damager.owner, 0,
 					Global.level.mainPlayer.getNextActorNetId(), 0, rpc: true
 				);
 				playSound("fireWave");
@@ -137,12 +145,15 @@ public class FireWaveProjCharged : Projectile {
 	public int timesReversed;
 	float soundCooldown;
 	public FireWaveProjCharged(
-		Weapon weapon, Point pos, int xDir, Player player, 
-		float parentTime, ushort netProjId, int timesReversed, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, float parentTime,
+		ushort? netId, int timesReversed, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, 1, player, "fire_wave_charge", 
-		0, 0.33f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "fire_wave_charge", netId, player	
 	) {
+		weapon = FireWave.netWeapon;
+		damager.damage = 1;
+		damager.hitCooldown = 19;
+		vel = new Point(0 * xDir, 0);
 		projId = (int)ProjIds.FireWaveCharged;
 		spriteMid = new Sprite("fire_wave_charge");
 		spriteMid.visible = false;
@@ -158,15 +169,14 @@ public class FireWaveProjCharged : Projectile {
 		new Anim(this.pos.clone(), "fire_wave_charge_flash", 1, null, true);
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 		maxTime = 0.48f;
 	}
 
-	public static Projectile rpcInvoke(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters args) {
 		return new FireWaveProjCharged(
-			FireWave.netWeapon, arg.pos, arg.xDir, 
-			arg.player, 0, arg.netId, 0
+		args.pos, args.xDir, args.owner, args.player, 0, args.netId, 0
 		);
 	}
 
@@ -211,7 +221,7 @@ public class FireWaveProjCharged : Projectile {
 					return;
 				}
 				child = new FireWaveProjCharged(
-					weapon, pos.addxy(16 * xDir, 0), xDir * sign,
+					pos.addxy(16 * xDir, 0), xDir * sign, this,
 					damager.owner, time + parentTime, Global.level.mainPlayer.getNextActorNetId(),
 					timesReversed, rpc: true
 				);

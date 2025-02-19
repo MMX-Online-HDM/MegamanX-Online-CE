@@ -261,6 +261,7 @@ public class Damager {
 				case (int)ProjIds.AcidBurstCharged:
 					damagerMessage = onAcidDamage(damagable, owner, 3);
 					break;
+				case (int)ProjIds.TSeahorseAcid3:
 				case (int)ProjIds.TSeahorseAcid1:
 					damagerMessage = onAcidDamage(damagable, owner, 2);
 					break;
@@ -278,6 +279,7 @@ public class Damager {
 				case (int)ProjIds.ParasiticBomb:
 					damagerMessage = onParasiticBombDamage(damagable, owner);
 					break;
+				case (int)ProjIds.SpreadShot:
 				case (int)ProjIds.ElectricShock:
 				case (int)ProjIds.MK2StunShot:
 				case (int)ProjIds.MorphMPowder:

@@ -7,6 +7,7 @@ public class SparkMandrill : Maverick {
 	public SparkMPunchWeapon punchWeapon = new();
 	public SparkMSparkWeapon sparkWeapon = new();
 	public SparkMStompWeapon stompWeapon = new();
+	public static Weapon netWeapon = new Weapon(WeaponIds.SparkMGeneric, 94);
 
 	public SparkMandrill(
 		Player player, Point pos, Point destPos, int xDir,
@@ -78,11 +79,9 @@ public class SparkMandrill : Maverick {
 	public MaverickState getShootState() {
 		return new MShoot((Point pos, int xDir) => {
 			shakeCamera(sendRpc: true);
-			playSound("sparkmSparkX1", forcePlay: false, sendRpc: true);
-			//deductAmmo(32);
-			new TriadThunderProjCharged(sparkWeapon, pos, xDir, 1, player, player.getNextActorNetId(), rpc: true);
-			new TriadThunderProjCharged(sparkWeapon, pos, -xDir, 1, player, player.getNextActorNetId(), rpc: true);
-		}, null);
+			new TriadThunderProjCharged(pos, xDir, 1, this, player, player.getNextActorNetId(), rpc: true);
+			new TriadThunderProjCharged(pos, -xDir, 1, this, player, player.getNextActorNetId(), rpc: true);
+		}, "sparkmSparkX1");
 	}
 
 	public override MaverickState[] aiAttackStates() {

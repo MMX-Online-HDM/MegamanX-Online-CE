@@ -111,7 +111,7 @@ public class XBuster : Weapon {
 
 		if (mmx.hasUltimateArmor && chargeLevel >= 3 && !isStock && mmx.armArmor != ArmorId.Max) {
 			new Anim(pos.clone(), "buster4_muzzle_flash", xDir, null, true);
-			new BusterPlasmaProj(pos, xDir, player, player.getNextActorNetId(), true);
+			new BusterPlasmaProj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 			character.playSound("plasmaShot", sendRpc: true);	
 			return;
 		}
@@ -125,19 +125,25 @@ public class XBuster : Weapon {
 			shootSound = "buster4X2";
 		}
 		else if (chargeLevel == 0) {
-			lemonsOnField.Add(new BusterProj(pos, xDir, 0, player, player.getNextActorNetId(), true));
+			lemonsOnField.Add(new BusterProj(pos, xDir, mmx, player, player.getNextActorNetId(), true));
 		} else if (chargeLevel == 1) {
-			new Buster2Proj(pos, xDir, player, player.getNextActorNetId(), true);
+			new Buster2Proj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 		} else if (chargeLevel == 2) {
-			new Buster3Proj(pos, xDir, 0, player, player.getNextActorNetId(), true);
+			if (mmx.armArmor == ArmorId.Light || mmx.armArmor == ArmorId.None) {
+				new Buster3LightProj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
+			} else if (mmx.armArmor == ArmorId.Giga) {
+				new Buster3GigaProj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
+			} else if (mmx.armArmor == ArmorId.Max) {
+				new Buster3MaxProj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
+			}
 		} else if (chargeLevel >= 3) {
 			if (isStock) {
-				new Buster3Proj(pos, xDir, 1, player, player.getNextActorNetId(), rpc: true);
+				new Buster4Giga2Proj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 			}
 			else if (mmx.armArmor == ArmorId.Max) {
 				if (!mmx.charState.attackCtrl || !mmx.charState.normalCtrl || mmx.charState is WallSlide) {
 					new Anim(pos, "buster4_x3_muzzle", xDir, player.getNextActorNetId(), true, sendRpc: true);
-					new Buster3Proj(pos, xDir, 3, player, player.getNextActorNetId(), rpc: true);
+					new Buster4MaxProj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 					mmx.stockedMaxBuster = true;
 				} else {
 					mmx.changeState(new X3ChargeShot(null));
@@ -145,7 +151,7 @@ public class XBuster : Weapon {
 				}
 			}
 			else if (mmx.armArmor == ArmorId.Giga) {
-				new Buster3Proj(pos, xDir, 1, player, player.getNextActorNetId(), rpc: true);
+				new Buster4GigaProj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 			} else {
 				shootLightBuster4(player, pos, xDir);
 			}
@@ -156,21 +162,22 @@ public class XBuster : Weapon {
 	}
 
 	public static void createX3SpreadShot(Character character, int xDir) {
-		Player player = character.player;
+		Player player = character.player;		
+		MegamanX mmx = player.character as MegamanX ?? throw new NullReferenceException();
 		new BusterX3Proj2(
-			character.getShootPos().addxy(6 * xDir, -2), character.getShootXDir(), 0,
+			character.getShootPos().addxy(6 * xDir, -2), character.getShootXDir(), 0, mmx,
 			player, player.getNextActorNetId(), rpc: true
 		);
 		new BusterX3Proj2(
-			character.getShootPos().addxy(6 * xDir, -2), character.getShootXDir(), 1,
+			character.getShootPos().addxy(6 * xDir, -2), character.getShootXDir(), 1, mmx,
 			player, player.getNextActorNetId(), rpc: true
 		);
 		new BusterX3Proj2(
-			character.getShootPos().addxy(6 * xDir, -2), character.getShootXDir(), 2,
+			character.getShootPos().addxy(6 * xDir, -2), character.getShootXDir(), 2, mmx,
 			player, player.getNextActorNetId(), rpc: true
 		);
 		new BusterX3Proj2(
-			character.getShootPos().addxy(6 * xDir, -2), character.getShootXDir(), 3,
+			character.getShootPos().addxy(6 * xDir, -2), character.getShootXDir(), 3, mmx,
 			player, player.getNextActorNetId(), rpc: true
 		);
 	}
@@ -196,14 +203,15 @@ public class XBuster : Weapon {
 		float x, float y, int xDir, Player player,
 		float offsetTime, bool smoothStart = false
 	) {
+		MegamanX mmx = player.character as MegamanX ?? throw new NullReferenceException();
 		new Buster4Proj(
-			this, new Point(x + xDir, y), xDir,
+			new Point(x + xDir, y), xDir, mmx,
 			player, 0, offsetTime,
 			player.getNextActorNetId(allowNonMainPlayer: true), smoothStart, true
 		);
 		Global.level.delayedActions.Add(new DelayedAction(delegate {
 			new Buster4Proj(
-				this, new Point(x + xDir, y), xDir,
+				new Point(x + xDir, y), xDir, mmx,
 				player, 1, offsetTime,
 				player.getNextActorNetId(allowNonMainPlayer: true), smoothStart, true
 			);
@@ -211,7 +219,7 @@ public class XBuster : Weapon {
 		));
 		Global.level.delayedActions.Add(new DelayedAction(delegate {
 			new Buster4Proj(
-				this, new Point(x + xDir, y), xDir,
+				new Point(x + xDir, y), xDir, mmx,
 				player, 2, offsetTime,
 				player.getNextActorNetId(allowNonMainPlayer: true), smoothStart, true
 			);
@@ -219,7 +227,7 @@ public class XBuster : Weapon {
 		));
 		Global.level.delayedActions.Add(new DelayedAction(delegate {
 			new Buster4Proj(
-				this, new Point(x + xDir, y), xDir,
+				new Point(x + xDir, y), xDir, mmx,
 				player, 2, offsetTime,
 				player.getNextActorNetId(allowNonMainPlayer: true), smoothStart, true
 			);
@@ -227,7 +235,7 @@ public class XBuster : Weapon {
 		));
 		Global.level.delayedActions.Add(new DelayedAction(delegate {
 			new Buster4Proj(
-				this, new Point(x + xDir, y), xDir,
+				new Point(x + xDir, y), xDir,mmx,
 				player, 3, offsetTime,
 				player.getNextActorNetId(allowNonMainPlayer: true), smoothStart, true
 			);

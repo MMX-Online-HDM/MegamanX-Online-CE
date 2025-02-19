@@ -223,16 +223,26 @@ public class MorphMShootAir : MaverickState {
 
 public class MorphMPowderProj : Projectile {
 	public float sparkleTime = 0;
-	public MorphMPowderProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 1, player, "morphm_sparkles", 0, 0f, netProjId, player.ownedByLocalPlayer) {
+	public MorphMPowderProj(
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "morphm_sparkles", netId, player
+	) {
+		weapon = MorphMoth.getWeapon();
+		damager.damage = 1;
 		projId = (int)ProjIds.MorphMPowder;
 		maxTime = 1f;
 		vel = new Point(0, 100);
 		healAmount = 1;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new MorphMPowderProj(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
 	}
 
 	public override void update() {
@@ -248,7 +258,7 @@ public class MorphMPowderProj : Projectile {
 public class MorphMSweepState : MaverickState {
 	public MorphMSweepState() : base("sweep", "sweep_start") {
 	}
-
+	public MorphMoth Moth = null!;
 	float shootTime;
 	float xVel;
 	float yVel;
@@ -256,7 +266,7 @@ public class MorphMSweepState : MaverickState {
 	const float startSpeed = 50;
 	public override void update() {
 		base.update();
-		if (player == null) return;
+		if (Moth == null) return;
 
 		Helpers.decrementTime(ref shootTime);
 		if (isAI || input.isHeld(Control.Shoot, player)) {
@@ -264,7 +274,10 @@ public class MorphMSweepState : MaverickState {
 			if (shootTime == 0) {
 				shootTime = 0.15f;
 				Point shootPos = maverick.getFirstPOIOrDefault().addRand(10, 5);
-				new MorphMPowderProj(maverick.weapon, shootPos, maverick.xDir, player, player.getNextActorNetId(), rpc: true);
+				new MorphMPowderProj(
+					shootPos, maverick.xDir, Moth,
+					player, player.getNextActorNetId(), rpc: true
+				);
 			}
 		}
 
@@ -317,6 +330,7 @@ public class MorphMSweepState : MaverickState {
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 		maverick.stopMoving();
+		Moth = maverick as MorphMoth ?? throw new NullReferenceException();
 		maverick.useGravity = false;
 		xVel = maverick.xDir * startSpeed;
 	}

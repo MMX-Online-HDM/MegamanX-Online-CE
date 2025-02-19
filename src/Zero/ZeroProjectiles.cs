@@ -4,27 +4,29 @@ namespace MMXOnline;
 
 public class ZBuster2Proj : Projectile {
 	public ZBuster2Proj(
-		Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		ZeroBuster.netWeapon, pos, xDir, 350, 2, player, "zbuster2",
-		Global.defFlinch, 0, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "buster2", netId, player	
 	) {
+		weapon = ZeroBuster.netWeapon;
+		damager.damage = 2;
+		damager.flinch = Global.defFlinch;
+		vel = new Point(350 * xDir, 0);
 		fadeOnAutoDestroy = true;
 		fadeSprite = "buster2_fade";
 		reflectable = true;
 		maxTime = 0.5f;
-		if (type == 0) {
-			projId = (int)ProjIds.ZBuster2;
-			changeSprite("buster2", true);
-		} else {
-			projId = (int)ProjIds.DZBuster2;
-			damager.flinch = 0;
-		}
+		projId = (int)ProjIds.ZBuster2;
 		ZBuster2Proj.hyorogaCode(this, player);
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new ZBuster2Proj(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
 	}
 
 	public static void hyorogaCode(Projectile proj, Player player) {
@@ -40,52 +42,56 @@ public class ZBuster2Proj : Projectile {
 
 public class ZBuster3Proj : Projectile {
 	public ZBuster3Proj(
-		Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		ZeroBuster.netWeapon, pos, xDir, 350, 4, player, "zbuster3",
-		Global.defFlinch, 0, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "zbuster2", netId, player	
 	) {
+		weapon = ZeroBuster.netWeapon;
+		damager.damage = 4;
+		damager.flinch = Global.defFlinch;
+		vel = new Point(350 * xDir, 0);
 		fadeOnAutoDestroy = true;
-		fadeSprite = "buster3_fade";
+		fadeSprite = "buster2_fade";
 		reflectable = true;
 		maxTime = 0.5f;
-		if (type == 0) {
-			projId = (int)ProjIds.ZBuster3;
-		} else {
-			projId = (int)ProjIds.DZBuster3;
-			damager.flinch = Global.halfFlinch;
-			damager.damage = 3;
-		}
+		projId = (int)ProjIds.ZBuster3;
 		ZBuster2Proj.hyorogaCode(this, player);
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new ZBuster3Proj(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
 	}
 }
 
 public class ZBuster4Proj : Projectile {
 	float partTime;
 	public ZBuster4Proj(
-		Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		ZeroBuster.netWeapon, pos, xDir, 350, 6, player, "zbuster4",
-		Global.defFlinch, 0, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "zbuster4", netId, player	
 	) {
+		weapon = ZeroBuster.netWeapon;
+		damager.damage = 6;
+		damager.flinch = Global.defFlinch;
+		vel = new Point(350 * xDir, 0);
 		fadeOnAutoDestroy = true;
 		fadeSprite = "buster3_fade";
 		reflectable = true;
 		maxTime = 0.5f;
-		if (type == 0) {
-			projId = (int)ProjIds.ZBuster4;
-		} else {
-			projId = (int)ProjIds.DZBuster4;
-			damager.damage = 3;
-			damager.flinch = Global.halfFlinch;
-		}
+		projId = (int)ProjIds.ZBuster4;
 		ZBuster2Proj.hyorogaCode(this, player);
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new ZBuster4Proj(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
 	}
 
 	public override void update() {
@@ -106,26 +112,29 @@ public class ZBuster4Proj : Projectile {
 
 public class ZSaberProj : Projectile {
 	public ZSaberProj(
-		Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, bool isAZ, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		ZSaber.staticWeapon, pos, xDir, 300, 3, player, "zsaber_shot",
-		0, 0.5f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "zsaber_shot", netId, player	
 	) {
+		weapon = ZSaber.staticWeapon;
+		damager.damage = 3;
+		damager.hitCooldown = 30;
+		vel = new Point(350 * xDir, 0);
 		fadeSprite = "zsaber_shot_fade";
 		reflectable = true;
 		projId = (int)ProjIds.ZSaberProj;
-		if (player.character is Zero zero) {
-			if (zero.isBlack == true) {
-				genericShader = player.zeroPaletteShader;
-			}
-			if (zero.isAwakened == true) {
-				genericShader = player.zeroAzPaletteShader;
-			}
+		if (isAZ) {
+			genericShader = player.zeroAzPaletteShader;
 		}
 		
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, player, netId, xDir, (isAZ ? (byte)1 : (byte)0));
 		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new ZSaberProj(
+			args.pos, args.xDir, args.extraData[0] == 1, args.owner, args.player, args.netId
+		);
 	}
 
 	public override void update() {
@@ -138,13 +147,18 @@ public class ZSaberProj : Projectile {
 
 public class ShingetsurinProj : Projectile {	
 	public Actor? target;
-
+	public float startTime = 0;
 	public ShingetsurinProj(
-		Point pos, int xDir, float startTime, Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, float startTime, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		Shingetsurin.netWeapon, pos, xDir, 150, 2, player, "shingetsurin_proj",
-		Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "shingetsurin_proj", netId, player
+
 	) {
+		weapon = Shingetsurin.netWeapon;
+		damager.damage = 2;
+		damager.hitCooldown = 30;
+		damager.flinch = Global.defFlinch;
+		vel = new Point(150 * xDir, 0);
 		maxTime = 3f;
 		destroyOnHit = false;
 		time = startTime;
@@ -154,8 +168,13 @@ public class ShingetsurinProj : Projectile {
 		canBeLocal = false;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)startTime);
 		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new ShingetsurinProj(
+			args.pos, args.xDir, args.extraData[0], args.owner, args.player, args.netId
+		);
 	}
 
 	public override void update() {
@@ -168,11 +187,10 @@ public class ShingetsurinProj : Projectile {
 		} else if (time >= 2) {
 			if (target == null) {
 				target = Global.level.getClosestTarget(pos, damager.owner.alliance, true);
-				if (target != null) {
-					vel = pos.directionToNorm(target.getCenterPos()).times(speed);
-				}
 			}
-			forceNetUpdateNextFrame = true;
+			else if (target != null) {
+				vel = pos.directionToNorm(target.getCenterPos()).times(150);
+			}
 		}
 	}
 }
@@ -182,11 +200,15 @@ public class GenmuProj : Projectile {
 	public float initY = 0;
 
 	public GenmuProj(
-		Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, int type, bool isAZ, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		Genmu.netWeapon, pos, xDir, 300, 12, player, "genmu_proj",
-		Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "genmu_proj", netId, player
 	) {
+		weapon = Genmu.netWeapon;
+		damager.damage = 12;
+		damager.hitCooldown = 30;
+		damager.flinch = Global.defFlinch;
+		vel = new Point(300 * xDir, 0);
 		this.type = type;
 		initY = pos.y;
 		maxTime = 0.5f;
@@ -194,21 +216,19 @@ public class GenmuProj : Projectile {
 		xScale = 0.75f;
 		yScale = 0.75f;
 		projId = (int)ProjIds.Gemnu;
-		if (player.character is Zero zero) {
-			if (zero.isBlack == true) {
-				genericShader = player.zeroPaletteShader;
-			}
-			if (zero.isAwakened == true) {
-				genericShader = player.zeroAzPaletteShader;
-			}
-			if (zero.isViral == true) {
-				genericShader = player.nightmareZeroShader;
-			}
+		if (isAZ) {
+			genericShader = player.zeroAzPaletteShader;
 		}
-
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir, (byte)type);
+			rpcCreate(pos, player, netId, xDir, 
+			new byte[] { (byte)type, isAZ ? (byte)1 : (byte)0}
+			);
 		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new GenmuProj(
+			args.pos, args.xDir, args.extraData[0], args.extraData[1] == 1, args.owner, args.player, args.netId
+		);
 	}
 
 	public override void update() {

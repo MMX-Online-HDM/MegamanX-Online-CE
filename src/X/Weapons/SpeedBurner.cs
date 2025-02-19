@@ -29,14 +29,15 @@ public class SpeedBurner : Weapon {
 		Point pos = character.getShootPos();
 		int xDir = character.getShootXDir();
 		Player player = character.player;
+		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
 
 		if (chargeLevel < 3) {
 			if (!character.isUnderwater()) {
-				new SpeedBurnerProj(this, pos, xDir, player, player.getNextActorNetId(), true);
+				new SpeedBurnerProj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 			} else {
 				player.setNextActorNetId(player.getNextActorNetId());
-				new SpeedBurnerProjWater(this, pos, xDir, 0, player, player.getNextActorNetId(true), true);
-				new SpeedBurnerProjWater(this, pos, xDir, 1, player, player.getNextActorNetId(true), true);
+				new SpeedBurnerProjWater(pos, xDir, 0, mmx, player, player.getNextActorNetId(true), true);
+				new SpeedBurnerProjWater(pos, xDir, 1, mmx, player, player.getNextActorNetId(true), true);
 			}
 		} else {
 			if (character.ownedByLocalPlayer) {
@@ -51,22 +52,23 @@ public class SpeedBurnerProj : Projectile {
 	float airSpawnTime;
 	int groundSpawns;
 	public SpeedBurnerProj(
-		Weapon weapon, Point pos, int xDir, 
-		Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 275, 2, player, "speedburner_start", 
-		0, 0, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "speedburner_start", netId, player	
 	) {
+		weapon = SpeedBurner.netWeapon;
+		damager.damage = 2;
+		vel = new Point(275 * xDir, 0);
 		maxTime = 0.6f;
 		projId = (int)ProjIds.SpeedBurner;
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 	}
 
-	public static Projectile rpcInvoke(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters args) {
 		return new SpeedBurnerProj(
-			SpeedBurner.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
+			args.pos, args.xDir, args.owner, args.player, args.netId
 		);
 	}
 
@@ -98,7 +100,7 @@ public class SpeedBurnerProj : Projectile {
 			Point spawnPos = pos.addxy((groundSpawns * -15 + 10) * xDir, 0);
 			spawnPos.y = hit.hitData.hitPoint?.y - 1 ?? pos.y;
 			new SpeedBurnerProjGround(
-				weapon, spawnPos, xDir, damager.owner, damager.owner.getNextActorNetId(), rpc: true
+				spawnPos, xDir, this, damager.owner, damager.owner.getNextActorNetId(), rpc: true
 			);
 			groundSpawns++;
 
@@ -112,12 +114,13 @@ public class SpeedBurnerProjWater : Projectile {
 	float offsetTime;
 	float smokeTime;
 	public SpeedBurnerProjWater(
-		Weapon weapon, Point pos, int xDir, int type, 
-		Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, int type, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 275, 1, player, "speedburner_underwater", 
-		0, 0, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "speedburner_underwater", netId, player	
 	) {
+		weapon = SpeedBurner.netWeapon;
+		damager.damage = 1;
+		vel = new Point(275 * xDir, 0);
 		maxTime = 0.6f;
 		projId = (int)ProjIds.SpeedBurnerWater;
 		initY = pos.y;
@@ -125,14 +128,14 @@ public class SpeedBurnerProjWater : Projectile {
 			offsetTime = MathF.PI / 2;
 		}
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir, (byte)type);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)type);
 		}
 	}
 
-	public static Projectile rpcInvoke(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters args) {
 		return new SpeedBurnerProjWater(
-			SpeedBurner.netWeapon, arg.pos, arg.xDir,
-			arg.extraData[0], arg.player, arg.netId
+			args.pos, args.xDir, args.extraData[0],
+			args.owner, args.player, args.netId
 		);
 	}
 
@@ -151,19 +154,27 @@ public class SpeedBurnerProjWater : Projectile {
 }
 
 public class SpeedBurnerProjGround : Projectile {
-	public SpeedBurnerProjGround(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 275, 1, player, "speedburner_ground", 0, 0.25f, netProjId, player.ownedByLocalPlayer) {
+	public SpeedBurnerProjGround(
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "speedburner_ground", netId, player	
+	) {
+		weapon = SpeedBurner.netWeapon;
+		damager.damage = 1;
+		damager.hitCooldown = 15;
+		vel = new Point(275 * xDir, 0);
 		maxTime = 0.4f;
 		destroyOnHit = true;
 		frameIndex = Helpers.randomRange(0, 2);
 		projId = (int)ProjIds.SpeedBurnerTrail;
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 	}
-
-	public override void update() {
-		base.update();
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new SpeedBurnerProjGround(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
 	}
 }
 

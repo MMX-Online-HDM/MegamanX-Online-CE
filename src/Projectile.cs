@@ -301,9 +301,11 @@ public class Projectile : Actor {
 		if (reflectCount > 0) return;
 		reflectCount++;
 
-		if (this is TorpedoProj torpedo) {
-			torpedo.reflect(reflectAngle);
-		} else if (this is GrenadeProj grenade) {
+		if (this is TorpedoProjX torpedo) torpedo.reflect(reflectAngle);
+		else if (this is TorpedoProjChargedX torpedoC) torpedoC.reflect(reflectAngle);
+		else if (this is TorpedoProjChargedOcto torpedoO) torpedoO.reflect(reflectAngle);
+		else if (this is TorpedoProjMech torpedoM) torpedoM.reflect(reflectAngle);		
+		else if (this is GrenadeProj grenade) {
 			if (grenade.deltaPos.isZero()) return;
 			grenade.vel = Point.createFromAngle(reflectAngle).times(grenade.speed);
 		} else {
@@ -796,6 +798,20 @@ public class Projectile : Actor {
 	) {
 		rpcCreateHelper(pos, player, netProjId, xDir, false, owner, extraData);
 	}
+	public virtual void rpcCreateByteAngle(
+		Point pos, Actor owner, Player player, ushort? netProjId,
+		float angle, params byte[] extraData
+	) {
+		int byteAngle = MathInt.Round(angle % 256f);
+		rpcCreateHelper(pos, player, netProjId, byteAngle, true, owner, extraData);
+	}
+	public virtual void rpcCreateAngle(
+		Point pos, Actor owner, Player player, ushort? netProjId,
+		float angle, params byte[] extraData
+	) {
+		int byteAngle = MathInt.Round((angle / 1.40625f) % 256f);
+		rpcCreateHelper(pos, player, netProjId, byteAngle, true, owner, extraData);
+	}
 
 	public void acidFadeEffect() {
 		if (!acidFadeOnce) acidFadeOnce = true;
@@ -832,15 +848,15 @@ public class Projectile : Actor {
 
 	public void acidSplashParticles(Point hitPoint, bool isSide, int yDir, int downY, ProjIds projId) {
 		if (!isSide) {
-			new AcidBurstProjSmall(weapon, hitPoint.addxy(0, -5 * yDir), 1, new Point(xDir * 50, -150 * downY), projId, owner, owner.getNextActorNetId(), rpc: true);
-			new AcidBurstProjSmall(weapon, hitPoint.addxy(0, -5 * yDir), 1, new Point(xDir * 25, -150 * downY), projId, owner, owner.getNextActorNetId(), rpc: true);
-			new AcidBurstProjSmall(weapon, hitPoint.addxy(0, -5 * yDir), 1, new Point(xDir * -25, -150 * downY), projId, owner, owner.getNextActorNetId(), rpc: true);
-			new AcidBurstProjSmall(weapon, hitPoint.addxy(0, -5 * yDir), 1, new Point(xDir * -50, -150 * downY), projId, owner, owner.getNextActorNetId(), rpc: true);
+			new AcidBurstProjSmall(hitPoint.addxy(0, -5 * yDir), 1, new Point(xDir * 50, -150 * downY), false, projId, this, owner, owner.getNextActorNetId(), rpc: true);
+			new AcidBurstProjSmall(hitPoint.addxy(0, -5 * yDir), 1, new Point(xDir * 25, -150 * downY), false, projId, this, owner, owner.getNextActorNetId(), rpc: true);
+			new AcidBurstProjSmall(hitPoint.addxy(0, -5 * yDir), 1, new Point(xDir * -25, -150 * downY), false, projId, this, owner, owner.getNextActorNetId(), rpc: true);
+			new AcidBurstProjSmall(hitPoint.addxy(0, -5 * yDir), 1, new Point(xDir * -50, -150 * downY), false, projId, this, owner, owner.getNextActorNetId(), rpc: true);
 		} else {
-			new AcidBurstProjSmall(weapon, hitPoint.addxy(-5 * xDir, 0), 1, new Point(-xDir * 10, -150), projId, owner, owner.getNextActorNetId(), rpc: true);
-			new AcidBurstProjSmall(weapon, hitPoint.addxy(-5 * xDir, 0), 1, new Point(-xDir * 20, -75), projId, owner, owner.getNextActorNetId(), rpc: true);
-			new AcidBurstProjSmall(weapon, hitPoint.addxy(-5 * xDir, 0), 1, new Point(-xDir * 30, -35), projId, owner, owner.getNextActorNetId(), rpc: true);
-			new AcidBurstProjSmall(weapon, hitPoint.addxy(-5 * xDir, 0), 1, new Point(-xDir * 40, 0), projId, owner, owner.getNextActorNetId(), rpc: true);
+			new AcidBurstProjSmall(hitPoint.addxy(-5 * xDir, 0), 1, new Point(-xDir * 10, -150), false, projId, this, owner, owner.getNextActorNetId(), rpc: true);
+			new AcidBurstProjSmall(hitPoint.addxy(-5 * xDir, 0), 1, new Point(-xDir * 20, -75), false, projId, this, owner, owner.getNextActorNetId(), rpc: true);
+			new AcidBurstProjSmall(hitPoint.addxy(-5 * xDir, 0), 1, new Point(-xDir * 30, -35), false, projId, this, owner, owner.getNextActorNetId(), rpc: true);
+			new AcidBurstProjSmall(hitPoint.addxy(-5 * xDir, 0), 1, new Point(-xDir * 40, 0), false, projId, this, owner, owner.getNextActorNetId(), rpc: true);
 		}
 	}
 

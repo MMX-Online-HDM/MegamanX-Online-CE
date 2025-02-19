@@ -119,10 +119,14 @@ public class TunnelRTornadoFang : Projectile {
 	int type;
 	float sparksCooldown;
 	public TunnelRTornadoFang(
-		Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool sendRpc = false
+		Point pos, int xDir, int type, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 100, 1, player, "tunnelr_proj_drillbig", 0, 0.25f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "tunnelr_proj_drillbig", netId, player	
 	) {
+		weapon = TunnelRhino.getWeapon();
+		damager.damage = 1;
+		damager.hitCooldown = 15;
+		vel = new Point(100 * xDir, 0);
 		maxTime = 1.5f;
 		projId = (int)ProjIds.TunnelRTornadoFang;
 		destroyOnHit = false;
@@ -133,9 +137,14 @@ public class TunnelRTornadoFang : Projectile {
 			projId = (int)ProjIds.TunnelRTornadoFang2;
 		}
 
-		if (sendRpc) {
-			rpcCreate(pos, player, netProjId, xDir, (byte)type);
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)type);
 		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new TunnelRTornadoFang(
+			args.pos, args.xDir, args.extraData[0], args.owner, args.player, args.netId
+		);
 	}
 
 	public override void update() {
@@ -190,10 +199,15 @@ public class TunnelRTornadoFang : Projectile {
 public class TunnelRShootState : MaverickState {
 	bool shotOnce;
 	bool isSecond;
+	public TunnelRhino ScrewMasaider = null!;
 	public TunnelRShootState(bool isSecond) : base("shoot1") {
 		this.isSecond = isSecond;
 		exitOnAnimEnd = true;
 		canEnterSelf = true;
+	}
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		ScrewMasaider = maverick as TunnelRhino ?? throw new NullReferenceException();
 	}
 
 	public override void update() {
@@ -204,10 +218,17 @@ public class TunnelRShootState : MaverickState {
 			shotOnce = true;
 			maverick.playSound("tunnelrShoot", sendRpc: true);
 			if (!isSecond) {
-				new TunnelRTornadoFang(maverick.weapon, shootPos.Value, maverick.xDir, 0, player, player.getNextActorNetId(), sendRpc: true);
+				new TunnelRTornadoFang(
+					shootPos.Value, maverick.xDir, 0, ScrewMasaider,
+					player, player.getNextActorNetId(), rpc: true
+				);
 			} else {
-				new TunnelRTornadoFang(maverick.weapon, shootPos.Value, maverick.xDir, 1, player, player.getNextActorNetId(), sendRpc: true);
-				new TunnelRTornadoFang(maverick.weapon, shootPos.Value, maverick.xDir, 2, player, player.getNextActorNetId(), sendRpc: true);
+				new TunnelRTornadoFang(
+					shootPos.Value, maverick.xDir, 1, ScrewMasaider,
+					 player, player.getNextActorNetId(), rpc: true);
+				new TunnelRTornadoFang(
+					shootPos.Value, maverick.xDir, 2, ScrewMasaider,
+					 player, player.getNextActorNetId(), rpc: true);
 			}
 		}
 
@@ -220,18 +241,28 @@ public class TunnelRShootState : MaverickState {
 
 public class TunnelRTornadoFangDiag : Projectile {
 	public TunnelRTornadoFangDiag(
-		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool sendRpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, 3, player, "tunnelr_proj_drill", Global.halfFlinch, 0.25f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "tunnelr_proj_drill", netId, player	
 	) {
+		weapon = TunnelRhino.getWeapon();
+		damager.damage = 3;
+		damager.flinch = Global.halfFlinch;
+		damager.hitCooldown = 15;
 		maxTime = 1.5f;
 		projId = (int)ProjIds.TunnelRTornadoFangDiag;
 		destroyOnHit = false;
 		vel = new Point(xDir * 150, -150);
 
-		if (sendRpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new TunnelRTornadoFangDiag(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
 	}
 }
 
@@ -240,8 +271,13 @@ public class TunnelRShoot2State : MaverickState {
 	bool shotOnce;
 	bool shotOnce2;
 	bool shotOnce3;
+	public TunnelRhino ScrewMasaider = null!;
 	public TunnelRShoot2State() : base("shoot3") {
 		exitOnAnimEnd = true;
+	}
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		ScrewMasaider = maverick as TunnelRhino ?? throw new NullReferenceException();
 	}
 
 	public override void update() {
@@ -251,8 +287,8 @@ public class TunnelRShoot2State : MaverickState {
 		if (!shotOnce && shootPos != null) {
 			shotOnce = true;
 			new TunnelRTornadoFang(
-				maverick.weapon, shootPos.Value, maverick.xDir, 0,
-				player, player.getNextActorNetId(), sendRpc: true
+				shootPos.Value, maverick.xDir, 0,
+				ScrewMasaider, player, player.getNextActorNetId(), rpc: true
 			);
 			maverick.playSound("tunnelrShoot", sendRpc: true);
 		}
@@ -261,16 +297,16 @@ public class TunnelRShoot2State : MaverickState {
 		if (!shotOnce2 && shootPos2 != null) {
 			shotOnce2 = true;
 			new TunnelRTornadoFangDiag(
-				maverick.weapon, shootPos2.Value, maverick.xDir * -1,
-				player, player.getNextActorNetId(), sendRpc: true);
+				shootPos2.Value, maverick.xDir * -1,
+				ScrewMasaider, player, player.getNextActorNetId(), rpc: true);
 		}
 
 		Point? shootPos3 = maverick.getFirstPOI("drillback");
 		if (!shotOnce3 && shootPos3 != null) {
 			shotOnce3 = true;
 			new TunnelRTornadoFangDiag(
-				maverick.weapon, shootPos3.Value, maverick.xDir,
-				player, player.getNextActorNetId(), sendRpc: true
+				shootPos3.Value, maverick.xDir,
+				ScrewMasaider, player, player.getNextActorNetId(), rpc: true
 			);
 		}
 	}

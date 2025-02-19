@@ -69,7 +69,7 @@ public class WireSponge : Maverick {
 		}
 	}
 
-	public override List<ShaderWrapper> getShaders() {
+	public override List<ShaderWrapper>? getShaders() {
 		if (sprite.name.EndsWith("angry_start") && player.spongeChargeShader != null) {
 			player.spongeChargeShader.SetUniform("chargeTexture", Global.textures["wspongeChargeRed"]);
 			float chargeFactor = Helpers.clamp01(1 - (chargeTime / WSpongeChargeState.maxChargeTime));
@@ -79,7 +79,7 @@ public class WireSponge : Maverick {
 		return base.getShaders();
 	}
 
-	public new CollideData getHitWall(float x, float y) {
+	public new CollideData? getHitWall(float x, float y) {
 		var rect = collider.shape.getRect();
 		rect.y1 += 20f;
 		rect.y2 -= 20f;
@@ -124,33 +124,50 @@ public class WireSponge : Maverick {
 		chargeTime = BitConverter.ToSingle(data);
 	}
 }
-
+public class WSpongeStrikeChainWeapon : Weapon {
+	public static WSpongeStrikeChainWeapon netWeapon = new();
+	public WSpongeStrikeChainWeapon() {
+		index = (int)WeaponIds.WSpongeStrikeChain;
+		weaponSlotIndex = 75;
+	}
+}
 public class WSpongeChainSpinProj : Projectile {
-	public WSpongeChainSpinProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 250, 1, player, "wsponge_vine_spin_shield", Global.defFlinch, 0.2f, netProjId, player.ownedByLocalPlayer) {
+	public WSpongeChainSpinProj(
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "wsponge_vine_spin_shield", netId, player
+	) {
+		weapon = WSpongeStrikeChainWeapon.netWeapon;
+		damager.damage = 1;
+		damager.hitCooldown = 12;
+		damager.flinch = Global.defFlinch;
 		projId = (int)ProjIds.WSpongeChainSpin;
 		setIndestructableProperties();
 		isDeflectShield = true;
-
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
-		canBeLocal = false;
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new WSpongeChainSpinProj(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
 	}
 }
 
 public class WSpongeChainSpinState : MaverickState {
-	WSpongeChainSpinProj proj;
+	WSpongeChainSpinProj? proj;
+	public WireSponge WireHetimarl = null!;
+	Anim? spinShield;
+
 	public WSpongeChainSpinState() : base("vine_spin") {
 	}
 
 	public override void update() {
 		base.update();
-
-		maverick.turnToInput(input, player);
-
-		proj.changePos(maverick.getFirstPOIOrDefault());
-
+		WireHetimarl.turnToInput(input, player);
+		proj?.changePos(WireHetimarl.getFirstPOIOrDefault());
+		spinShield?.changePos(WireHetimarl.getFirstPOIOrDefault());
 		if (isAI) {
 			if (stateTime > 1) {
 				maverick.changeState(new WSpongeSideChainState(stateTime));
@@ -162,16 +179,31 @@ public class WSpongeChainSpinState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		maverick.stopMoving();
-		proj = new WSpongeChainSpinProj(maverick.weapon, maverick.getFirstPOIOrDefault(), maverick.xDir, player, player.getNextActorNetId(), rpc: true);
+		WireHetimarl = maverick as WireSponge ?? throw new NullReferenceException();
+		WireHetimarl.stopMoving();
+		spinShield = new Anim(
+			WireHetimarl.getFirstPOIOrDefault(), "wsponge_vine_spin_shield2", WireHetimarl.xDir,
+			player.getNextActorNetId(), false, sendRpc: true
+		);
+		proj = new WSpongeChainSpinProj(
+			maverick.getFirstPOIOrDefault(), maverick.xDir,
+			WireHetimarl, player, player.getNextActorNetId(), rpc: true
+		);
 	}
 
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
-		proj.destroySelf();
+		proj?.destroySelf();
+		spinShield?.destroySelf();
 	}
 }
-
+public class WSpongeSideChainWeapon : Weapon {
+	public static WSpongeSideChainWeapon netWeapon = new();
+	public WSpongeSideChainWeapon() {
+		index = (int)WeaponIds.WSpongeStrikeChain;
+		weaponSlotIndex = 75;
+	}
+}
 public class WSpongeSideChainProj : Projectile {
 	public int state = 0;
 	public Player player;
@@ -179,20 +211,29 @@ public class WSpongeSideChainProj : Projectile {
 	public float distRetracted;
 	public bool reversed;
 	public Point toWallVel;
-	public Actor hookedActor;
+	public Actor? hookedActor;
 	public int maxDist = 100;
 	public int origXDir;
 	public int type;
 	public bool isCharged { get { return type == 1; } }
 	public float hookWaitTime;
 	public Point chainVel;
-	public Actor wireSponge;
+	public Actor WireHetimarl;
 	public Point netOrigin;
-	public WSpongeSideChainProj(Weapon weapon, Point pos, int xDir, Actor wireSponge, float spinTime, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 3, player, "wsponge_vine_spike", Global.defFlinch, 0.25f, netProjId, player.ownedByLocalPlayer) {
+	public WSpongeSideChainProj(
+		Point pos, int xDir, Actor WireHetimarl, float spinTime,
+		Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "wsponge_vine_spike", netId, player	
+	) {
+		weapon = WSpongeSideChainWeapon.netWeapon;
+		damager.damage = 3;
+		damager.flinch = Global.defFlinch;
+		damager.hitCooldown = 15;
+
 		setIndestructableProperties();
 		this.player = player;
-		this.wireSponge = wireSponge;
+		this.WireHetimarl = WireHetimarl;
 
 		origXDir = xDir;
 		projId = (int)ProjIds.WSpongeChain;
@@ -205,19 +246,24 @@ public class WSpongeSideChainProj : Projectile {
 		netOrigin = pos;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 		// ToDo: Make local.
 		canBeLocal = false;
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new WSpongeSideChainProj(
+			args.pos, args.xDir, null!, 0, args.owner, args.player, args.netId
+		);
 	}
 
 	public override void postUpdate() {
 		base.postUpdate();
 		if (!ownedByLocalPlayer) return;
 
-		if (wireSponge != null) {
-			var shootPos = wireSponge.getFirstPOIOrDefault();
-			changePos(new Point(shootPos.x + wireSponge.xDir * (distMoved - distRetracted), shootPos.y));
+		if (WireHetimarl != null) {
+			var shootPos = WireHetimarl.getFirstPOIOrDefault();
+			changePos(new Point(shootPos.x + WireHetimarl.xDir * (distMoved - distRetracted), shootPos.y));
 		}
 	}
 
@@ -258,11 +304,11 @@ public class WSpongeSideChainProj : Projectile {
 				}
 				hookedActor.useGravity = false;
 				hookedActor.grounded = false;
-				hookedActor.move(hookedActor.pos.directionTo(wireSponge.getCenterPos()).normalize().times(speed));
+				hookedActor.move(hookedActor.pos.directionTo(WireHetimarl.getCenterPos()).normalize().times(speed));
 			}
 			if (distRetracted >= distMoved + 10) {
 				if (hookedActor != null && !(hookedActor is Character)) {
-					hookedActor.changePos(wireSponge.getCenterPos());
+					hookedActor.changePos(WireHetimarl.getCenterPos());
 					hookedActor.useGravity = true;
 				}
 				destroySelf();
@@ -270,11 +316,11 @@ public class WSpongeSideChainProj : Projectile {
 		}
 		// Retracting (pulled towards wall)
 		else if (state == 2) {
-			wireSponge.useGravity = false;
-			wireSponge.stopMoving();
-			wireSponge.move(toWallVel);
+			WireHetimarl.useGravity = false;
+			WireHetimarl.stopMoving();
+			WireHetimarl.move(toWallVel);
 			distRetracted += MathF.Abs(toWallVel.magnitude * Global.spf);
-			var collision = Global.level.checkTerrainCollisionOnce(wireSponge, toWallVel.x * Global.spf, toWallVel.y * Global.spf, toWallVel);
+			var collision = Global.level.checkTerrainCollisionOnce(WireHetimarl, toWallVel.x * Global.spf, toWallVel.y * Global.spf, toWallVel);
 			if (distRetracted >= distMoved + 20 || collision?.gameObject is Wall) {
 				destroySelf();
 			}
@@ -291,13 +337,13 @@ public class WSpongeSideChainProj : Projectile {
 			hookedActor.useGravity = true;
 			hookedActor.vel.x = xDir * 150;
 			hookedActor.vel.y = -100;
-			(hookedActor as Anim).ttl = 0.5f;
+			(hookedActor as Anim)!.ttl = 0.5f;
 		}
 	}
 
 	public override void render(float x, float y) {
 		base.render(x, y);
-		Point origin = ownedByLocalPlayer ? wireSponge.getFirstPOIOrDefault() : netOrigin;
+		Point origin = ownedByLocalPlayer ? WireHetimarl.getFirstPOIOrDefault() : netOrigin;
 		renderGeneric(origin);
 		if (!ownedByLocalPlayer) return;
 		netOrigin = origin;
@@ -318,7 +364,7 @@ public class WSpongeSideChainProj : Projectile {
 		if (hookedActor != null) return;
 		if (destroyed) return;
 		if (state == 2) return;
-		if (wireSponge.destroyed) return;
+		if (WireHetimarl.destroyed) return;
 		if (reversed) return;
 		if (state == 1 && time > 0.2f) return;
 
@@ -340,16 +386,16 @@ public class WSpongeSideChainProj : Projectile {
 			chainVel.x = 0;
 			chainVel.y = 0;
 			var hitPoint = other.getHitPointSafe();
-			changePos(new Point(hitPoint.x - wireSponge.xDir * 8, pos.y));
-			distMoved = pos.distanceTo(wireSponge.getFirstPOIOrDefault());
-			// wireSponge.changeState(new StrikeChainPullToWall(this, wireSponge.charState.shootSprite, toWallVel.y < 0), true);
+			changePos(new Point(hitPoint.x - WireHetimarl.xDir * 8, pos.y));
+			distMoved = pos.distanceTo(WireHetimarl.getFirstPOIOrDefault());
+			// WireHetimarl.changeState(new StrikeChainPullToWall(this, WireHetimarl.charState.shootSprite, toWallVel.y < 0), true);
 		} else if (actor != null) {
 			var chr = actor as Character;
 			var pickup = actor as Pickup;
 			if (chr == null && pickup == null) return;
 			if (chr != null && (!chr.canBeDamaged(player.alliance, player.id, projId) || isDefenderFavored())) return;
-			changePos(new Point(chr.pos.x, pos.y));
-			distMoved = pos.distanceTo(wireSponge.getFirstPOIOrDefault());
+			changePos(new Point(chr?.pos.x ?? 0, pos.y));
+			distMoved = pos.distanceTo(WireHetimarl.getFirstPOIOrDefault());
 			hookActor(actor);
 			if (chr != null && chr.canBeDamaged(player.alliance, player.id, projId)) {
 				if (Global.serverClient != null) {
@@ -374,7 +420,7 @@ public class WSpongeSideChainProj : Projectile {
 		updateDamager(0);
 	}
 
-	public override DamagerMessage onDamage(IDamagable damagable, Player attacker) {
+	public override DamagerMessage? onDamage(IDamagable damagable, Player attacker) {
 		if (isDefenderFavored()) {
 			if (damagable is Character chr) {
 				if (Global.serverClient != null) {
@@ -416,7 +462,8 @@ public class WSpongeSideChainProj : Projectile {
 }
 
 public class WSpongeSideChainState : MaverickState {
-	WSpongeSideChainProj proj;
+	WSpongeSideChainProj? proj;
+	public WireSponge WireHetimarl = null!;
 	new int jumpFramesHeld;
 	new const int maxJumpFrames = 10;
 	bool jumpedOnce;
@@ -424,6 +471,10 @@ public class WSpongeSideChainState : MaverickState {
 
 	public WSpongeSideChainState(float spinTime) : base("vine_throw") {
 		this.spinTime = spinTime;
+	}
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		WireHetimarl = maverick as WireSponge ?? throw new NullReferenceException();
 	}
 
 	public override void update() {
@@ -461,7 +512,10 @@ public class WSpongeSideChainState : MaverickState {
 		}
 
 		if (proj == null && maverick.getFirstPOI() != null) {
-			proj = new WSpongeSideChainProj((maverick as WireSponge).chainWeapon, maverick.getFirstPOIOrDefault(), maverick.xDir, maverick, spinTime, player, player.getNextActorNetId(), rpc: true);
+			proj = new WSpongeSideChainProj(
+				maverick.getFirstPOIOrDefault(), maverick.xDir, maverick,
+				spinTime, WireHetimarl, player, player.getNextActorNetId(), rpc: true
+			);
 			maverick.playSound("wspongeChain", sendRpc: true);
 		} else if (proj != null) {
 			if (input.isPressed(Control.Shoot, player) && !proj.reversed) {
@@ -565,28 +619,46 @@ public class WSpongeClingState : MaverickState {
 		return 0;
 	}
 }
-
+public class WSpongeUpChainWeapon : Weapon {
+	public static WSpongeUpChainWeapon netWeapon = new();
+	public WSpongeUpChainWeapon() {
+		index = (int)WeaponIds.WSpongeStrikeChain;
+		weaponSlotIndex = 75;
+	}
+}
 public class WSpongeUpChainProj : Projectile {
 	public float dist;
 	public float maxDist;
 	public bool reversed;
-	public Actor wireSponge;
+	public Actor WireHetimarl;
 	public bool latched;
 	public Point netOrigin;
-	public WSpongeUpChainProj(Weapon weapon, Point pos, int xDir, Actor wireSponge, float spinTime, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 3, player, "wsponge_vine_spike_up", Global.defFlinch, 0.25f, netProjId, player.ownedByLocalPlayer) {
+	public WSpongeUpChainProj(
+		Point pos, int xDir, Actor WireHetimarl, float spinTime, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "wsponge_vine_spike_up", netId, player
+	) {
+		weapon = WSpongeUpChainWeapon.netWeapon;
+		damager.damage = 3;
+		damager.flinch = Global.defFlinch;
+		damager.hitCooldown = 15;
 		projId = (int)ProjIds.WSpongeUpChain;
 		setIndestructableProperties();
-		this.wireSponge = wireSponge;
+		this.WireHetimarl = WireHetimarl;
 		vel = new Point(0, -350);
 		maxDist = 50 + (int)(Helpers.clampMax(spinTime, 1.5f) * 100);
 		netOrigin = pos;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 		// ToDo: Make local.
 		canBeLocal = false;
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new WSpongeUpChainProj(
+			args.pos, args.xDir, null!, 0, args.owner, args.player, args.netId
+		);
 	}
 
 	public override void update() {
@@ -609,7 +681,7 @@ public class WSpongeUpChainProj : Projectile {
 			reverse();
 		}
 
-		if (dist > maxDist * 2 || (reversed && pos.y > wireSponge.getFirstPOIOrDefault().y)) {
+		if (dist > maxDist * 2 || (reversed && pos.y > WireHetimarl.getFirstPOIOrDefault().y)) {
 			destroySelf();
 			return;
 		}
@@ -622,7 +694,7 @@ public class WSpongeUpChainProj : Projectile {
 
 	public override void render(float x, float y) {
 		base.render(x, y);
-		Point origin = ownedByLocalPlayer ? wireSponge.getFirstPOIOrDefault() : netOrigin;
+		Point origin = ownedByLocalPlayer ? WireHetimarl.getFirstPOIOrDefault() : netOrigin;
 		renderGeneric(origin);
 		if (!ownedByLocalPlayer) return;
 		netOrigin = origin;
@@ -653,15 +725,23 @@ public class WSpongeUpChainProj : Projectile {
 }
 
 public class WSpongeUpChainStartState : MaverickState {
-	WSpongeUpChainProj proj;
+	public WSpongeUpChainProj? proj;
+	public WireSponge WireHetimarl = null!;
 	public WSpongeUpChainStartState() : base("vine_up_start") {
+	}
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		WireHetimarl = maverick as WireSponge ?? throw new NullReferenceException();
 	}
 
 	public override void update() {
 		base.update();
 
 		if (proj == null && maverick.getFirstPOI() != null) {
-			proj = new WSpongeUpChainProj((maverick as WireSponge).chainWeapon, maverick.getFirstPOIOrDefault(), maverick.xDir, maverick, 1, player, player.getNextActorNetId(), rpc: true);
+			proj = new WSpongeUpChainProj(
+				maverick.getFirstPOIOrDefault(), maverick.xDir, maverick, 1,
+				WireHetimarl, player, player.getNextActorNetId(), rpc: true
+			);
 			maverick.playSound("wspongeChain", sendRpc: true);
 		}
 
@@ -799,27 +879,52 @@ public class WSpongeUpChainHangState : MaverickState {
 		}
 	}
 }
-
+public class WSpongeSeedWeapon : Weapon {
+	public static WSpongeSeedWeapon netWeapon = new();
+	public WSpongeSeedWeapon() {
+		index = (int)WeaponIds.WSpongeGeneric;
+		weaponSlotIndex = 75;
+	}
+}
 public class WSpongeSeedProj : Projectile {
 	bool once;
 	public WSpongeSeedProj(
-		Weapon weapon, Point pos, int xDir, Point vel, Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, int shootDirX, int shootDirY, int shootFramesHeld,
+		Actor owner, Player player, ushort netProjId, bool sendRpc = false
 	) : base(
-		weapon, pos, xDir, 0, 3, player, "wsponge_seed", 0, 0.5f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "wsponge_seed", netProjId, player
 	) {
+		weapon = WireSponge.getWeapon();
+		damager.damage = 3;
+		damager.flinch = Global.defFlinch;
+		damager.hitCooldown = 1;
+		weapon = WSpongeSeedWeapon.netWeapon;
 		projId = (int)ProjIds.WSpongeSeed;
 		maxTime = 2f;
 		destroyOnHit = true;
 		useGravity = true;
 		startSound = "wspongeSeed";
 		collider.wallOnly = true;
-		this.vel = vel;
-
-		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+		if (shootFramesHeld >= 255) {
+			shootFramesHeld = 255;
 		}
-		// ToDo: Make local.
-		canBeLocal = false;
+		Point unitDir = new Point(shootDirX, shootDirY).normalize();
+		float speedModifier = Helpers.clamp((shootFramesHeld + 3) / 10f, 0.5f, 1.5f);
+		vel = new Point(unitDir.x * 275 * speedModifier, unitDir.y * 300 * speedModifier);
+
+		if (sendRpc) {
+			rpcCreate(
+				pos, ownerPlayer, netProjId, xDir,
+				[(byte)(shootDirX + 128), (byte)(shootDirY + 128), (byte)shootFramesHeld]
+			);
+		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new WSpongeSeedProj(
+			args.pos, args.xDir,
+			args.extraData[0] - 128, args.extraData[1] - 128, args.extraData[2],
+			args.owner, args.player, args.netId
+		);
 	}
 
 	public override void onHitWall(CollideData other) {
@@ -840,7 +945,10 @@ public class WSpongeSeedProj : Projectile {
 
 		var triggers = Global.level.getTriggerList(this, 0, 0);
 
-		var seedSpike = new WSpongeSpike(weapon, other?.getHitPointSafe() ?? getCenterPos(), -xDir, type, owner, owner.getNextActorNetId(), rpc: true);
+		var seedSpike = new WSpongeSpike(
+			other?.getHitPointSafe() ?? getCenterPos(), -xDir,
+			type, this, owner, owner.getNextActorNetId(), rpc: true
+		);
 
 		if (triggers.Any(t => t.gameObject is WSpongeSpike)) {
 			seedSpike.incPos(new Point(Helpers.randomRange(-2, 2), 0));
@@ -853,32 +961,41 @@ public class WSpongeSeedProj : Projectile {
 		destroySelf();
 	}
 }
-
+public class WSpongeSpikeWeapon : Weapon {
+	public static WSpongeSpikeWeapon netWeapon = new();
+	public WSpongeSpikeWeapon() {
+		index = (int)WeaponIds.WSpongeGeneric;
+		weaponSlotIndex = 75;
+	}
+}
 public class WSpongeSpike : Projectile, IDamagable {
 	public float health = 2;
 	public int type;
 	public WSpongeSpike(
-		Weapon weapon, Point pos, int xDir, int type,
-		Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, int type, Actor owner, 
+		Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, 2, player, getSpriteFromType(type),
-		Global.defFlinch, 0f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, getSpriteFromType(type), netId, player
 	) {
+		weapon = WireSponge.getWeapon();
+		damager.damage = 2;
+		damager.flinch = Global.defFlinch;
+		damager.hitCooldown = 1;
+		weapon = WSpongeSpikeWeapon.netWeapon;
 		projId = (int)ProjIds.WSpongeSpike;
 		destroyOnHit = true;
 		fadeSprite = "explosion";
-		fadeSound = "explosion";
+		fadeSound = "explosionX2";
 		this.type = type;
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir, (byte)type);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)type);
 		}
 	}
 
 	public static Projectile rpcInvoke(ProjParameters args) {
 		return new WSpongeSpike(
-			WireSponge.netWeapon,
 			args.pos, args.xDir, args.extraData[0],
-			args.player, args.netId
+			args.owner, args.player, args.netId
 		);
 	}
 
@@ -932,9 +1049,14 @@ public class WSpongeSeedThrowState : MaverickState {
 	int framesShootHeld;
 	bool frameStopHeld;
 	bool inputDirUpOnce;
+	public WireSponge WireHetimarl = null!;
 	public WSpongeSeedThrowState(string shootControl) : base("seedthrow") {
 		this.shootControl = shootControl;
 		consecutiveData = new MaverickStateConsecutiveData(0, 4, 0.25f);
+	}
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		WireHetimarl = maverick as WireSponge ?? throw new NullReferenceException();
 	}
 
 	public override void update() {
@@ -950,24 +1072,16 @@ public class WSpongeSeedThrowState : MaverickState {
 		var inputDir = input.getInputDir(player);
 		if (!inputDirUpOnce) inputDirUpOnce = inputDir.y < 0;
 
-		if (!once && maverick.getFirstPOI() != null) {
+		if (!once && WireHetimarl.getFirstPOI() != null) {
 			once = true;
-			Point vel;
-
-			float xMod = input.isXDirHeld(maverick.xDir, player) ? 2 : 1;
-			float mag = 0.5f + (framesShootHeld / 19f);
-			vel = new Point(100 * maverick.xDir * xMod * mag, -250 * (mag * 0.75f));
-
-			if (inputDirUpOnce && inputDir.x == 0) {
-				vel.x = 0;
-				vel.y /= 0.75f;
-			}
-
-			if (isAI) {
-				vel = new Point(maverick.xDir * Helpers.randomRange(0, 200), Helpers.randomRange(-250, -200));
-			}
-
-			new WSpongeSeedProj(maverick.weapon, maverick.getFirstPOIOrDefault(), maverick.xDir, vel, player, player.getNextActorNetId(), rpc: true);
+			Point unitDir = new Point(WireHetimarl.xDir, -1);
+			if (inputDir.y == -1) unitDir.y = -2;
+			if (inputDir.y == 1) unitDir.y = 0;
+			if (inputDir.x == WireHetimarl.xDir) unitDir.x = WireHetimarl.xDir * 2;
+	
+			new WSpongeSeedProj(WireHetimarl.getFirstPOIOrDefault(), WireHetimarl.xDir,
+			 (int)unitDir.x,  (int)unitDir.y, framesShootHeld,
+			  WireHetimarl, player, player.getNextActorNetId(), sendRpc: true);
 		}
 
 		if (isAI) {
@@ -1004,10 +1118,16 @@ public class WSpongeHangSeedThrowState : MaverickState {
 	int framesShootHeld;
 	bool frameStopHeld;
 	bool inputDirUpOnce;
+	public WireSponge WireHetimarl = null!;
 	public WSpongeHangSeedThrowState(WSpongeUpChainProj proj, string shootControl) : base("vine_up_seedthrow") {
 		this.proj = proj;
 		this.shootControl = shootControl;
 		aiAttackCtrl = true;
+	}
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		WireHetimarl = maverick as WireSponge ?? throw new NullReferenceException();
+		maverick.useGravity = false;
 	}
 
 	public override void update() {
@@ -1032,31 +1152,30 @@ public class WSpongeHangSeedThrowState : MaverickState {
 
 		if (!once && maverick.getFirstPOI() != null) {
 			once = true;
-			Point vel;
 
-			float xMod = input.isXDirHeld(maverick.xDir, player) ? 2 : 1;
-			float mag = 0.5f + (framesShootHeld / 19f);
-			vel = new Point(100 * maverick.xDir * xMod * mag, -250 * (mag * 0.75f));
-			if (inputDirUpOnce && inputDir.x == 0) {
-				vel.x = 0;
-				vel.y /= 0.75f;
-			}
+			Point unitDir = new Point(maverick.xDir, -1);
+			if (inputDir.y == -1) unitDir.y = -2;
+			if (inputDir.y == 1) unitDir.y = 0;
+			if (inputDir.x == WireHetimarl.xDir) unitDir.x = WireHetimarl.xDir * 2;
+			int xDirM = WireHetimarl.xDir;
 
-			new WSpongeSeedProj(maverick.weapon, maverick.getFirstPOIOrDefault(), maverick.xDir, vel, player, player.getNextActorNetId(), rpc: true);
-			new WSpongeSeedProj(maverick.weapon, maverick.getFirstPOIOrDefault(), maverick.xDir, vel.addxy(-50, 0), player, player.getNextActorNetId(), rpc: true);
-			new WSpongeSeedProj(maverick.weapon, maverick.getFirstPOIOrDefault(), maverick.xDir, vel.addxy(50, 0), player, player.getNextActorNetId(), rpc: true);
+			new WSpongeSeedProj(WireHetimarl.getFirstPOIOrDefault().addxy(30*xDirM, 0), xDirM,
+			 (int)unitDir.x,  (int)unitDir.y, framesShootHeld,
+			  WireHetimarl, player, player.getNextActorNetId(), sendRpc: true);
+
+			new WSpongeSeedProj(WireHetimarl.getFirstPOIOrDefault().addxy(15*xDirM, 0), xDirM,
+			(int)unitDir.x,  (int)unitDir.y, framesShootHeld,
+			WireHetimarl, player, player.getNextActorNetId(), sendRpc: true);
+
+			new WSpongeSeedProj(WireHetimarl.getFirstPOIOrDefault(), xDirM,
+			(int)unitDir.x,  (int)unitDir.y, framesShootHeld,
+			WireHetimarl, player, player.getNextActorNetId(), sendRpc: true);
 		}
 
 		if (maverick.isAnimOver()) {
 			maverick.changeState(new WSpongeUpChainHangState(proj));
 		}
 	}
-
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		maverick.useGravity = false;
-	}
-
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
 		if (newState is not WSpongeUpChainHangState) {
@@ -1069,7 +1188,8 @@ public class WSpongeHangSeedThrowState : MaverickState {
 public class WSpongeChargeState : MaverickState {
 	int state = 0;
 	public const float maxChargeTime = 4;
-	SoundWrapper chargeSound;
+	SoundWrapper? chargeSound;
+	public WireSponge WireHetimarl = null!;
 
 	public WSpongeChargeState() : base("angry_start") {
 		superArmor = true;
@@ -1079,14 +1199,14 @@ public class WSpongeChargeState : MaverickState {
 
 	public override void update() {
 		base.update();
-		if (player == null) return;
+		if (WireHetimarl == null) return;
 
 		if (state == 0) {
 			if (!isAI && !input.isHeld(Control.Dash, player)) {
 				maverick.changeToIdleOrFall();
 			}
 
-			(maverick as WireSponge).chargeTime = stateTime;
+			WireHetimarl.chargeTime = stateTime;
 			if (stateTime > maxChargeTime) {
 				state = 1;
 				stateTime = 0;
@@ -1106,14 +1226,13 @@ public class WSpongeChargeState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
+		WireHetimarl = maverick as WireSponge ?? throw new NullReferenceException();	
 		chargeSound = maverick.playSound("wspongeCharge", sendRpc: true);
 	}
 
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
-		if (maverick is WireSponge sponge) {
-			sponge.chargeTime = 0;
-		}
+		WireHetimarl.chargeTime = 0;
 		if (chargeSound != null && !chargeSound.deleted) {
 			chargeSound.sound.Stop();
 		}

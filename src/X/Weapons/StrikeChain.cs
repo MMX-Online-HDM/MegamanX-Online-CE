@@ -26,6 +26,7 @@ public class StrikeChain : Weapon {
 	}
 
 	public override void shoot(Character character, int[] args) {
+		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
 		int chargeLevel = args[0];
 		Point pos = character.getShootPos();
 		int xDir = character.getShootXDir();
@@ -35,15 +36,12 @@ public class StrikeChain : Weapon {
 
 		Projectile proj;
 		if (chargeLevel >= 3) {
-			proj = new StrikeChainProjCharged(this, pos, xDir, player, player.getNextActorNetId(), upOrDown, true);
+			proj = new StrikeChainProjCharged(pos, xDir, mmx, player, player.getNextActorNetId(), upOrDown, true);
 		} else {
-			proj = new StrikeChainProj(this, pos, xDir, player, player.getNextActorNetId(), upOrDown, true);
+			proj = new StrikeChainProj(pos, xDir, mmx, player, player.getNextActorNetId(), upOrDown, true);
 		}
 
-		
-		if (character is MegamanX mmx) {
-			mmx.strikeChainProj = proj;
-		}
+		mmx.strikeChainProj = proj;
 	}
 }
 
@@ -188,13 +186,14 @@ public class StrikeChainProj : Projectile {
 	float hookWaitTime;
 
 	public StrikeChainProj(
-		Weapon weapon, Point pos, int xDir, Player player,
-		ushort? netId, int upOrDown = 0, bool rpc = false
-	) : base (
-		weapon, pos, 1, 400, 2,
-		player, "strikechain_proj", 0, 0.5f,
-		netId, player.ownedByLocalPlayer
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, int upOrDown = 0, bool rpc = false
+	) : base(
+		pos, xDir, owner, "strikechain_proj", netId, player	
 	) {
+		weapon = StrikeChain.netWeapon;
+		damager.damage = 2;
+		damager.hitCooldown = 30;
+		vel = new Point(400 * xDir, 0);
 		projId = (int)ProjIds.StrikeChain;
 		destroyOnHit = false;
 		maxTime = 4;
@@ -214,18 +213,18 @@ public class StrikeChainProj : Projectile {
 		byteAngle = upOrDown * 32;
 		if (xDir < 0) byteAngle = -byteAngle + 128;
 		//if (byteAngle < 0) byteAngle += 256;
-		vel = Point.createFromByteAngle(byteAngle.Value).times(speed);
+		vel = Point.createFromByteAngle(byteAngle.Value).times(400);
 
 		canBeLocal = false;
 
 		if (rpc) {
-			rpcCreateByteAngle(pos, player, netId, byteAngle.Value);
+			rpcCreateByteAngle(pos, owner, ownerPlayer, netId, byteAngle.Value);
 		}
 	}
 
-	public static Projectile rpcInvoke(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters args) {
 		return new StrikeChainProj(
-			StrikeChain.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
+			args.pos, args.xDir, args.owner, args.player, args.netId
 		);
 	}
 
@@ -270,7 +269,7 @@ public class StrikeChainProj : Projectile {
 				}
 				hookedActor.useGravity = false;
 				hookedActor.grounded = false;
-				hookedActor.move(hookedActor.pos.directionTo(player.character.getCenterPos()).normalize().times(speed));
+				hookedActor.move(hookedActor.pos.directionTo(player.character.getCenterPos()).normalize().times(400));
 			}
 			if (distRetracted >= dist + 10) {
 				if (hookedActor != null && !(hookedActor is Character)) {
@@ -429,13 +428,14 @@ public class StrikeChainProjCharged : Projectile {
 	float hookWaitTime;
 
 	public StrikeChainProjCharged(
-		Weapon weapon, Point pos, int xDir, Player player,
-		ushort? netId, int upOrDown = 0, bool rpc = false
-	) : base (
-		weapon, pos, 1, 600, 4,
-		player, "strikechain_charged", 0, 0.5f,
-		netId, player.ownedByLocalPlayer
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, int upOrDown = 0, bool rpc = false
+	) : base(
+		pos, xDir, owner, "strikechain_charged", netId, player	
 	) {
+		weapon = StrikeChain.netWeapon;
+		damager.damage = 4;
+		damager.hitCooldown = 30;
+		vel = new Point(600 * xDir, 0);
 		projId = (int)ProjIds.StrikeChain;
 		destroyOnHit = false;
 		maxTime = 4;
@@ -454,18 +454,18 @@ public class StrikeChainProjCharged : Projectile {
 		byteAngle = upOrDown * 32;
 		if (xDir < 0) byteAngle = -byteAngle + 128;
 		//if (byteAngle < 0) byteAngle += 256;
-		vel = Point.createFromByteAngle(byteAngle.Value).times(speed);
+		vel = Point.createFromByteAngle(byteAngle.Value).times(600);
 
 		canBeLocal = false;
 
 		if (rpc) {
-			rpcCreateByteAngle(pos, player, netId, byteAngle.Value);
+			rpcCreateByteAngle(pos, owner, ownerPlayer, netId, byteAngle.Value);
 		}
 	}
 
-	public static Projectile rpcInvoke(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters args) {
 		return new StrikeChainProjCharged(
-			StrikeChain.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
+			args.pos, args.xDir, args.owner, args.player, args.netId
 		);
 	}
 
@@ -510,7 +510,7 @@ public class StrikeChainProjCharged : Projectile {
 				}
 				hookedActor.useGravity = false;
 				hookedActor.grounded = false;
-				hookedActor.move(hookedActor.pos.directionTo(player.character.getCenterPos()).normalize().times(speed));
+				hookedActor.move(hookedActor.pos.directionTo(player.character.getCenterPos()).normalize().times(600));
 			}
 			if (distRetracted >= dist + 10) {
 				if (hookedActor != null && !(hookedActor is Character)) {

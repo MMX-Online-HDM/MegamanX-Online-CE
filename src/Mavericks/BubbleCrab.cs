@@ -7,7 +7,7 @@ namespace MMXOnline;
 public class BubbleCrab : Maverick {
 	public static Weapon getWeapon() { return new Weapon(WeaponIds.BCrabGeneric, 143); }
 
-	public BCrabShieldProj shield;
+	public BCrabShieldProj? shield;
 	public List<BCrabSummonCrabProj> crabs = new List<BCrabSummonCrabProj>();
 	public bool lastFrameWasUnderwater;
 
@@ -124,7 +124,7 @@ public class BubbleCrab : Maverick {
 		} else if (crabs.Count < 3) {
 			return new BCrabSummonState();
 		} else {
-			return null;
+			return null!;
 		}
 	}
 
@@ -179,27 +179,45 @@ public class BubbleCrab : Maverick {
 		crabs.Clear();
 	}
 }
+public class BCrabGenericWeapon : Weapon {
+	public static BCrabGenericWeapon netWeapon = new();
+	public BCrabGenericWeapon() {
+		index = (int)WeaponIds.BCrabGeneric;
+		killFeedIndex = 143;
+	}
+}
 
 public class BCrabBubbleSplashProj : Projectile {
 	bool once;
 	int num;
 	int type;
 	public BCrabBubbleSplashProj(
-		Weapon weapon, Point pos, int xDir, int num,
-		int type, Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, int num,
+		int type, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, 0, player, "bcrab_bubble_ring_start",
-		0, 0.15f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "bcrab_bubble_ring_start", netId, player
 	) {
+		weapon = BCrabGenericWeapon.netWeapon;
+		damager.damage = 0;
+		damager.hitCooldown = 9;
+		damager.flinch = 0;
+		vel = new Point(0 * xDir, 0);
 		projId = (int)ProjIds.BCrabBubbleSplash;
 		this.num = num;
 		this.type = type;
 		fadeSprite = "bcrab_bubble_ring_poof";
 		destroyOnHit = false;
-
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir,
+			 new byte[] { (byte)num, (byte)type}
+			);
 		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new BCrabBubbleSplashProj(
+			args.pos, args.xDir, args.extraData[0], args.extraData[1], 
+			args.owner, args.player, args.netId
+		);
 	}
 
 	public override void update() {
@@ -232,12 +250,16 @@ public class BCrabShootState : MaverickState {
 	bool secondAnim;
 	float shootCooldown;
 	int num;
+	public BubbleCrab BubblyCrablos = null!;
 	public BCrabShootState() : base("ring_attack_start") {
 	}
-
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		BubblyCrablos = maverick as BubbleCrab ?? throw new NullReferenceException();
+	}
 	public override void update() {
 		base.update();
-		if (player == null) return;
+		if (BubblyCrablos == null) return;
 
 		if (maverick.frameIndex == 0) {
 			maverick.turnToInput(input, player);
@@ -251,8 +273,8 @@ public class BCrabShootState : MaverickState {
 			maverick.playSound("bcrabShoot", sendRpc: true);
 			int type = input.isHeld(Control.Up, player) ? 1 : 0;
 			new BCrabBubbleSplashProj(
-				maverick.weapon, shootPos.Value, maverick.xDir,
-				num, type, player, player.getNextActorNetId(), rpc: true
+				shootPos.Value, maverick.xDir, num, type,
+				BubblyCrablos, player, player.getNextActorNetId(), rpc: true
 			);
 		}
 
@@ -332,23 +354,31 @@ public class BCrabShieldProj : Projectile, IDamagable {
 
 	public bool once;
 	public BCrabShieldProj(
-		Weapon weapon, Point pos, int xDir,
-		Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, 0, player, "bcrab_shield",
-		0, 1, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "bcrab_shield", netId, player
 	) {
+		weapon = BCrabGenericWeapon.netWeapon;
+		damager.damage = 0;
+		damager.hitCooldown = 60;
+		damager.flinch = 0;
+		vel = new Point(0 * xDir, 0);
 		projId = (int)ProjIds.BCrabBubbleShield;
 		syncScale = true;
 		yScale = 0;
 		setIndestructableProperties();
-		if (player.character != null) setzIndex(player.character.zIndex - 100);
+		if (ownerPlayer.character != null) setzIndex(ownerPlayer.character.zIndex - 100);
 		alpha = 0.75f;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 		canBeLocal = false;
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new BCrabShieldProj(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
 	}
 
 	public override void preUpdate() {
@@ -410,24 +440,29 @@ public class BCrabShieldProj : Projectile, IDamagable {
 }
 
 public class BCrabShieldStartState : MaverickState {
+	public BubbleCrab BubblyCrablos = null!;
 	public BCrabShieldStartState() : base("shield_start") {
 		aiAttackCtrl = true;
 	}
-
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		BubblyCrablos = maverick as BubbleCrab ?? throw new NullReferenceException();
+	}
 	public override void update() {
 		base.update();
-		if (player == null) return;
+		if (BubblyCrablos == null) return;
 
 		if (!once) {
-			Point? shootPos = maverick.getFirstPOI("shield");
+			Point? shootPos = BubblyCrablos.getFirstPOI("shield");
 			if (!once && shootPos != null) {
 				once = true;
-				maverick.deductAmmo(8);
-				maverick.playSound("bcrabShield", sendRpc: true);
+				BubblyCrablos.deductAmmo(8);
+				BubblyCrablos.playSound("bcrabShield", sendRpc: true);
 				var shield = new BCrabShieldProj(
-					maverick.weapon, shootPos.Value, maverick.xDir, player, player.getNextActorNetId(), rpc: true
+					shootPos.Value, maverick.xDir, BubblyCrablos,
+					player, player.getNextActorNetId(), rpc: true
 				);
-				(maverick as BubbleCrab).shield = shield;
+				BubblyCrablos.shield = shield;
 			}
 		}
 
@@ -442,20 +477,30 @@ public class BCrabSummonBubbleProj : Projectile, IDamagable {
 	public float maxHealth = 2;
 
 	public BCrabSummonBubbleProj(
-		Weapon weapon, Point pos, int xDir,
-		Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner,
+		Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, 0, player, "bcrab_summon_bubble",
-		0, 1, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "bcrab_summon_bubble", netId, player
+
 	) {
+		weapon = BCrabGenericWeapon.netWeapon;
+		damager.damage = 0;
+		damager.hitCooldown = 60;
+		damager.flinch = 0;
+		vel = new Point(0 * xDir, 0);
 		projId = (int)ProjIds.BCrabCrablingBubble;
 		setIndestructableProperties();
 		syncScale = true;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 		canBeLocal = false;
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new BCrabSummonBubbleProj(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
 	}
 
 	public override void preUpdate() {
@@ -513,11 +558,10 @@ public class BCrabSummonCrabProj : Projectile, IDamagable {
 
 	int? moveDirOnce = null;
 
-	BCrabSummonBubbleProj shield;
-	BubbleCrab maverick;
-
+	BCrabSummonBubbleProj? shield;
+	public BubbleCrab Crab;
 	public BCrabSummonCrabProj(
-		Weapon weapon, Point pos, Point vel, BubbleCrab maverick,
+		Weapon weapon, Point pos, Point vel, BubbleCrab Crab,
 		Player player, ushort netProjId, bool rpc = false
 	) : base(
 		weapon, pos, 1, 0, 2, player, "bcrab_summon_crab",
@@ -525,9 +569,9 @@ public class BCrabSummonCrabProj : Projectile, IDamagable {
 	) {
 		projId = (int)ProjIds.BCrabCrabling;
 		this.vel = vel;
-		this.maverick = maverick;
+		this.Crab = Crab;
 		fadeSprite = "explosion";
-		fadeSound = "explosion";
+		fadeSound = "explosionX2";
 		collider.wallOnly = true;
 		useGravity = true;
 		netcodeOverride = NetcodeModel.FavorDefender;
@@ -542,7 +586,7 @@ public class BCrabSummonCrabProj : Projectile, IDamagable {
 	public override void onStart() {
 		base.onStart();
 		if (!ownedByLocalPlayer) return;
-		shield = new BCrabSummonBubbleProj(maverick.weapon, pos, xDir, owner, owner.getNextActorNetId(), rpc: true);
+		shield = new BCrabSummonBubbleProj(pos, xDir, Crab, owner, owner.getNextActorNetId(), rpc: true);
 	}
 
 	public override void preUpdate() {
@@ -564,7 +608,7 @@ public class BCrabSummonCrabProj : Projectile, IDamagable {
 			bubbleSummonCooldown -= Global.speedMul;
 			if (bubbleSummonCooldown <= 0) {
 				bubbleSummonCooldown = 0;
-				shield = new BCrabSummonBubbleProj(maverick.weapon, pos, xDir, owner, owner.getNextActorNetId(), rpc: true);
+				shield = new BCrabSummonBubbleProj(pos, xDir, Crab, owner, owner.getNextActorNetId(), rpc: true);
 			}
 		}
 		patrol();
@@ -619,7 +663,7 @@ public class BCrabSummonCrabProj : Projectile, IDamagable {
 		base.onDestroy();
 		if (!ownedByLocalPlayer) return;
 
-		maverick.crabs.Remove(this);
+		Crab.crabs.Remove(this);
 		shield?.destroySelf();
 	}
 
@@ -662,31 +706,34 @@ public class BCrabSummonCrabProj : Projectile, IDamagable {
 }
 
 public class BCrabSummonState : MaverickState {
+	public BubbleCrab BubblyCrablos = null!;
 	public BCrabSummonState() : base("summon") {
 	}
-
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		BubblyCrablos = maverick as BubbleCrab ?? throw new NullReferenceException();
+	}
 	public override void update() {
 		base.update();
-		if (player == null) return;
+		if (BubblyCrablos == null) return;
 
-		Point? shootPos = maverick.getFirstPOI("summon_crab");
+		Point? shootPos = BubblyCrablos.getFirstPOI("summon_crab");
 		if (!once && shootPos != null) {
 			once = true;
-			var bc = maverick as BubbleCrab;
-			if (bc.crabs.Count < 3) bc.crabs.Add(
+			if (BubblyCrablos.crabs.Count < 3) BubblyCrablos.crabs.Add(
 				new BCrabSummonCrabProj(
 					maverick.weapon, shootPos.Value, new Point(-50, -300),
-					bc, player, player.getNextActorNetId(), rpc: true)
+					BubblyCrablos, player, player.getNextActorNetId(), rpc: true)
 				);
-			if (bc.crabs.Count < 3) bc.crabs.Add(
+			if (BubblyCrablos.crabs.Count < 3) BubblyCrablos.crabs.Add(
 				new BCrabSummonCrabProj(
 					maverick.weapon, shootPos.Value, new Point(0, -300),
-					bc, player, player.getNextActorNetId(), rpc: true)
+					BubblyCrablos, player, player.getNextActorNetId(), rpc: true)
 				);
-			if (bc.crabs.Count < 3) bc.crabs.Add(
+			if (BubblyCrablos.crabs.Count < 3) BubblyCrablos.crabs.Add(
 				new BCrabSummonCrabProj(
 					maverick.weapon, shootPos.Value, new Point(50, -300),
-					bc, player, player.getNextActorNetId(), rpc: true)
+					BubblyCrablos, player, player.getNextActorNetId(), rpc: true)
 				);
 		}
 

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public enum VileFlamethrowerType {
+	None = -1,
 	WildHorseKick,
 	SeaDragonRage,
 	DragonsWrath,
@@ -29,6 +30,22 @@ public abstract class VileFlamethrower : Weapon {
 			vile.changeState(new FlamethrowerState(), true);
 		}
 	}
+}
+public class NoneFlamethrower : VileFlamethrower {
+	public static NoneFlamethrower netWeapon = new();
+	public NoneFlamethrower() : base() {
+		fireRate = 0;
+		index = (int)WeaponIds.VileFlamethrower;
+		type = (int)VileFlamethrowerType.None;
+		displayName = "None";
+		killFeedIndex = 126;
+		vileWeight = 0;
+		damage = "0";
+		hitcooldown = "0";
+		ammousage = 0;
+		fireRate = 0;
+		vileWeight = 0;
+	}	
 }
 
 public class WildHorseKick : VileFlamethrower {
@@ -157,14 +174,25 @@ public class FlamethrowerState : CharState {
 				poiPos = character.getPOIPos(shootPOI);
 			} else {
 				poiPos = (character.getFirstPOI() ?? character.getPOIPos(groundShotPOI));
-
 			}
-			new FlamethrowerProj(
-				vile.flamethrowerWeapon,
-				poiPos,
-				character.xDir, isGrounded, player,
-				player.getNextActorNetId(), sendRpc: true
-			);
+			if (vile.flamethrowerWeapon.type == (int)VileFlamethrowerType.DragonsWrath) {
+				new FlamethrowerDragonsWrath(
+					poiPos, character.xDir, isGrounded, vile, player,
+					player.getNextActorNetId(), rpc: true
+				);
+			}
+			else if (vile.flamethrowerWeapon.type == (int)VileFlamethrowerType.WildHorseKick) {
+				new FlamethrowerWildHorseKick(
+					poiPos, character.xDir, isGrounded, vile, player,
+					player.getNextActorNetId(), rpc: true
+				);
+			}
+			else if (vile.flamethrowerWeapon.type == (int)VileFlamethrowerType.SeaDragonRage) {
+				new FlamethrowerSeaDragonRage(
+					poiPos, character.xDir, isGrounded, vile, player,
+					player.getNextActorNetId(), rpc: true
+				);
+			}
 		}
 
 		if (character.loopCount >= 5 || !player.input.isHeld(Control.Special1, player)) {
@@ -182,7 +210,142 @@ public class FlamethrowerState : CharState {
 		}
 	}
 }
-
+public class FlamethrowerWildHorseKick : Projectile {
+	public bool groundedVariant;
+	public FlamethrowerWildHorseKick(
+		Point pos, int xDir, bool groundedVariant,
+		Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "flamethrower_whk", netId, player
+	) {
+		weapon = WildHorseKick.netWeapon;
+		damager.damage = 1;
+		damager.hitCooldown = 6;
+		maxTime = 0.3f;
+		destroyOnHit = true;
+		destroyOnHitWall = true;
+		this.groundedVariant = groundedVariant;
+		angle = vel.angle;
+		fadeOnAutoDestroy = true;
+		fadeSprite = "flamethrower_whk_fade";
+		projId = (int)ProjIds.WildHorseKick;
+		if (!groundedVariant) {
+			vel = new Point(100 * xDir, 350);
+		} else {
+			vel = new Point(350*xDir, -150);
+			maxTime = 0.35f;
+		}
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)(groundedVariant ? 1 : 0));
+		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new FlamethrowerWildHorseKick(
+			args.pos, args.xDir, args.extraData[0] == 1,
+			args.owner, args.player, args.netId
+		);
+	}
+	public override void update() {
+		base.update();
+		if (!groundedVariant) {
+			vel.x -= 5*xDir;
+		} else {
+			vel.y += 11;
+		}
+	}	
+}
+public class FlamethrowerDragonsWrath : Projectile {
+	public bool groundedVariant;
+	public FlamethrowerDragonsWrath(
+		Point pos, int xDir, bool groundedVariant,
+		Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "flamethrower_dw", netId, player
+	) {
+		weapon = DragonsWrath.netWeapon;
+		damager.damage = 1;
+		damager.hitCooldown = 6;
+		maxTime = 0.4f;
+		destroyOnHit = true;
+		destroyOnHitWall = true;
+		this.groundedVariant = groundedVariant;
+		angle = vel.angle;
+		fadeOnAutoDestroy = true;
+		fadeSprite = "flamethrower_dw_fade";
+		projId = (int)ProjIds.DragonsWrath;
+		if (!groundedVariant) {
+			vel.x = xDir * 350;
+			vel.y = 225;
+		} else {
+			vel.x = xDir * 450;
+			vel.y = -20;
+			maxTime = 0.4f;
+		}
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)(groundedVariant ? 1 : 0));
+		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new FlamethrowerDragonsWrath(
+			args.pos, args.xDir, args.extraData[0] == 1,
+			args.owner, args.player, args.netId
+		);
+	}
+	public override void update() {
+		base.update();
+		if (!groundedVariant) {
+			vel.y -= Global.speedMul * 13.4f;
+		} else {
+			vel.x -= 12*xDir;
+			vel.y -= 10;
+		}
+	}	
+}
+public class FlamethrowerSeaDragonRage : Projectile {
+	public bool groundedVariant;
+	public FlamethrowerSeaDragonRage(
+		Point pos, int xDir, bool groundedVariant,
+		Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "flamethrower_sdr", netId, player
+	) {
+		weapon = SeaDragonRage.netWeapon;
+		damager.damage = 1;
+		damager.hitCooldown = 6;
+		maxTime = 0.25f;
+		destroyOnHit = true;
+		destroyOnHitWall = true;
+		this.groundedVariant = groundedVariant;
+		angle = vel.angle;
+		fadeOnAutoDestroy = true;
+		fadeSprite = "flamethrower_sdr_fade";
+		projId = (int)ProjIds.SeaDragonRage;
+		if (!groundedVariant) {
+			vel = new Point(100 * xDir, 255);
+		} else {
+			maxTime = 0.225f;
+			vel = new Point(350*xDir, -150);
+		}
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)(groundedVariant ? 1 : 0));
+		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new FlamethrowerSeaDragonRage(
+			args.pos, args.xDir, args.extraData[0] == 1,
+			args.owner, args.player, args.netId
+		);
+	}
+	public override void update() {
+		base.update();
+		if (!groundedVariant) {
+			vel.x -= 5*xDir;
+		}  else {
+			vel.y += 11;
+		}
+	}	
+}
+/*
 public class FlamethrowerProj : Projectile {
 	bool groundedVariant;
 
@@ -198,9 +361,6 @@ public class FlamethrowerProj : Projectile {
 		this.groundedVariant = groundedVariant;
 
 		maxTime = 0.3f;
-		if (weapon.type == (int)VileFlamethrowerType.SeaDragonRage) {
-			maxTime = 0.2f;
-		}
 		if (!groundedVariant) {
 			vel = new Point(xDir, 2f);
 			vel = vel.normalize().times(350);
@@ -253,3 +413,4 @@ public class FlamethrowerProj : Projectile {
 		}
 	}
 }
+*/

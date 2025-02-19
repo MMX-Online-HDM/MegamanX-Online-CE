@@ -1,11 +1,12 @@
 using System.Linq;
+using System;
 
 namespace MMXOnline;
 
 public class HyperAxlStart : CharState {
 	public float radius = 200;
 	public float time;
-	public Axl axl;
+	public Axl axl = null!;
 
 	public HyperAxlStart(bool isGrounded) : base(isGrounded ? "hyper_start" : "hyper_start_air") {
 		invincible = true;
@@ -32,7 +33,7 @@ public class HyperAxlStart : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		axl = character as Axl;
+		axl = character as Axl ?? throw new NullReferenceException() ;
 		if (!axl.hyperAxlUsed) {
 			axl.hyperAxlUsed = true;
 			axl.player.currency -= 10;
@@ -52,10 +53,10 @@ public class HyperAxlStart : CharState {
 }
 
 public class Hover : CharState {
-	public SoundWrapper sound;
+	public SoundWrapper? sound;
 	float hoverTime;
-	Anim hoverExhaust;
-	Axl axl;
+	Anim? hoverExhaust;
+	public Axl axl = null!;
 
 	public Hover() : base("hover", "hover", "hover", "hover") {
 		exitOnLanding = true;
@@ -84,8 +85,10 @@ public class Hover : CharState {
 		}
 
 		hoverTime += Global.spf;
-		hoverExhaust.changePos(exhaustPos());
-		hoverExhaust.xDir = axl.getAxlXDir();
+		if (hoverExhaust != null) {
+			hoverExhaust.changePos(exhaustPos());
+			hoverExhaust.xDir = axl.getAxlXDir();
+		}
 		if ((hoverTime > 2 && !axl.isWhiteAxl()) ||
 			!character.player.input.isHeld(Control.Jump, character.player)
 		) {
@@ -101,7 +104,7 @@ public class Hover : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		axl = character as Axl;
+		axl = character as Axl ?? throw new NullReferenceException() ;
 		character.useGravity = false;
 		character.vel = new Point();
 		hoverExhaust = new Anim(
@@ -116,7 +119,7 @@ public class Hover : CharState {
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		character.useGravity = true;
-		hoverExhaust.destroySelf();
+		hoverExhaust?.destroySelf();
 		if (sound != null && !sound.deleted) {
 			sound.sound?.Stop();
 		}
@@ -127,7 +130,7 @@ public class Hover : CharState {
 public class DodgeRoll : CharState {
 	public float dashTime = 0;
 	public int initialDashDir;
-	Axl axl;
+	public Axl axl = null!;
 
 	public DodgeRoll() : base("roll") {
 		attackCtrl = true;
@@ -137,7 +140,7 @@ public class DodgeRoll : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		axl = character as Axl;
+		axl = character as Axl ?? throw new NullReferenceException() ;
 		character.isDashing = true;
 		character.burnTime -= 1;
 		if (character.burnTime < 0) {
@@ -177,7 +180,7 @@ public class DodgeRoll : CharState {
 }
 
 public class SniperAimAxl : CharState {
-	public Axl axl;
+	public Axl axl = null!;
 
 	public SniperAimAxl() : base("crouch") {
 
@@ -185,20 +188,20 @@ public class SniperAimAxl : CharState {
 
 	public override void update() {
 		base.update();
-		if (!axl.isZooming()) {
-			axl.changeToIdleOrFall();
+		if (!axl?.isZooming() == true) {
+			axl?.changeToIdleOrFall();
 		}
 	}
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		axl = character as Axl;
+		axl = character as Axl ?? throw new NullReferenceException() ;
 	}
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
-		if (axl.isZooming()) {
-			axl.zoomOut();
+		if (axl?.isZooming() == true) {
+			axl?.zoomOut();
 		}
 	}
 }

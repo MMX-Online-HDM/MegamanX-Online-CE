@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-
+using System;
 namespace MMXOnline;
 
 public class ParasiticBomb : Weapon {
@@ -42,12 +42,13 @@ public class ParasiticBomb : Weapon {
 		Point pos = character.getShootPos();
 		int xDir = character.getShootXDir();
 		Player player = character.player;
+		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
 
 		if (chargeLevel < 3) {
 			character.playSound("busterX3");
-			new ParasiticBombProj(this, pos, xDir, player, player.getNextActorNetId(), true);
+			new ParasiticBombProj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 		} else {
-			if (character.ownedByLocalPlayer && character is MegamanX mmx) {
+			if (character.ownedByLocalPlayer) {
 				if (mmx.chargedParasiticBomb != null) {
 					mmx.chargedParasiticBomb.destroy();
 				}
@@ -60,25 +61,24 @@ public class ParasiticBomb : Weapon {
 public class ParasiticBombProj : Projectile {
 	public Character? host;
 	public ParasiticBombProj(
-		Weapon weapon, Point pos, int xDir,
-		Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 200, 0, player, "parasitebomb", 
-		0, 0, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "parasitebomb", netId, player	
 	) {
-		this.weapon = weapon;
+		weapon = ParasiticBomb.netWeapon;
+		vel = new Point(200 * xDir, 0);
 		maxTime = 0.6f;
 		projId = (int)ProjIds.ParasiticBomb;
 		destroyOnHit = true;
 		shouldShieldBlock = true;
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 	}
 
-	public static Projectile rpcInvoke(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters args) {
 		return new ParasiticBombProj(
-			ParasiticBomb.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
+			args.pos, args.xDir, args.owner, args.player, args.netId
 		);
 	}
 
@@ -307,7 +307,8 @@ public class BeeCursorAnim : Anim {
 						}
 						character.currentWeapon?.addAmmo(-player.weapon.getAmmoUsage(3), player);
 						character.chargeTime = 0;
-						new ParasiticBombProjCharged(new ParasiticBomb(), character.getShootPos(), character.pos.x - target.getCenterPos().x < 0 ? 1 : -1, character.player, character.player.getNextActorNetId(), target, rpc: true);
+						new ParasiticBombProjCharged(character.getShootPos(), character.pos.x - target.getCenterPos().x < 0 ? 1 : -1,
+						character, character.player, character.player.getNextActorNetId(), target, rpc: true);
 					}	
 				}
 			}
@@ -326,13 +327,15 @@ public class ParasiticBombProjCharged : Projectile, IDamagable {
 	public Point lastMoveAmount;
 	const float maxSpeed = 150;
 	public ParasiticBombProjCharged(
-		Weapon weapon, Point pos, int xDir, Player player, 
-		ushort netProjId, Actor host, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, Actor host, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, 4, player, "parasitebomb_bee", 
-		Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "parasitebomb_bee", netId, player	
 	) {
-		this.weapon = weapon;
+		weapon = ParasiticBomb.netWeapon;
+		damager.damage = 4;
+		damager.hitCooldown = 30;
+		damager.flinch = Global.defFlinch;
+		vel = new Point(0 * xDir, 0);
 		this.host = host;
 		fadeSprite = "explosion";
 		fadeSound = "explosionX3";
@@ -341,15 +344,14 @@ public class ParasiticBombProjCharged : Projectile, IDamagable {
 		destroyOnHit = true;
 		shouldShieldBlock = true;
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 		canBeLocal = false;
 	}
 
-	public static Projectile rpcInvoke(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters args) {
 		return new ParasiticBombProjCharged(
-			ParasiticBomb.netWeapon, arg.pos, arg.xDir,
-			arg.player, arg.netId, null!
+			args.pos, args.xDir, args.owner, args.player, args.netId, null!
 		);
 	}
 

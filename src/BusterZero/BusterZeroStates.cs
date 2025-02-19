@@ -111,7 +111,7 @@ public class BusterZeroDoubleBuster : CharState {
 			character.playSound("buster3X3", sendRpc: true);
 			new DZBuster3Proj(
 				character.getShootPos(), character.getShootXDir(),
-				player, player.getNextActorNetId(), rpc: true
+				zero, player, player.getNextActorNetId(), rpc: true
 			);
 			zero.stockedTime = 0;
 		}
@@ -122,14 +122,14 @@ public class BusterZeroDoubleBuster : CharState {
 				character.playSound("buster3X3", sendRpc: true);
 				new DZBuster3Proj(
 					character.getShootPos(), character.getShootXDir(),
-					player, player.getNextActorNetId(), rpc: true
+					zero, player, player.getNextActorNetId(), rpc: true
 				);
 			} else {
 				zero.stockedBusterLv = 0;
 				character.playSound("buster2X3", sendRpc: true);
 				new DZBuster2Proj(
 					character.getShootPos(), character.getShootXDir(),
-					player, player.getNextActorNetId(), rpc: true
+					zero, player, player.getNextActorNetId(), rpc: true
 				);
 			}
 			zero.stockedTime = 0;
@@ -217,7 +217,7 @@ public class BusterZeroHadangeki : CharState {
 			fired = true;
 			new DZHadangekiProj(
 				character.pos.addxy(30 * character.xDir, -20), character.xDir,
-				zero.isBlackZero, player, player.getNextActorNetId(), rpc: true
+				zero.isBlackZero, zero, player, player.getNextActorNetId(), rpc: true
 			);
 		}
 		if (character.isAnimOver()) {
@@ -264,7 +264,7 @@ public class BusterZeroHadangekiWall : CharState {
 			fired = true;
 			new DZHadangekiProj(
 				character.pos.addxy(30 * -wallDir, -20), -wallDir,
-				zero.isBlackZero, player, player.getNextActorNetId(), rpc: true
+				zero.isBlackZero, zero, player, player.getNextActorNetId(), rpc: true
 			);
 		}
 		if (character.isAnimOver()) {

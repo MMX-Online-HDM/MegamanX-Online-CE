@@ -216,7 +216,7 @@ public class MaverickState {
 			maverick.playSound("crash", sendRpc: true);
 		}
 		if (maverick is FlameMammoth fm) {
-			new FlameMStompShockwave(fm.stompWeapon, fm.pos, fm.xDir, player, player.getNextActorNetId(), rpc: true);
+			new FlameMStompShockwave(fm.pos, fm.xDir, fm, player, player.getNextActorNetId(), rpc: true);
 		}
 		if (maverick is VoltCatfish vc) {
 			if (!vc.bouncedOnce) {

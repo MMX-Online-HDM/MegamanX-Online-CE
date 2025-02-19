@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
-
+using System.Collections.Generic;
+using System.Text;
+using SFML.Graphics;
 namespace MMXOnline;
 
 public enum VileCannonType {
@@ -30,6 +32,10 @@ public class VileCannon : Weapon {
 			displayName = "None";
 			description = new string[] { "Do not equip a cannon." };
 			killFeedIndex = 126;
+			ammousage = 0;
+			vileAmmoUsage = 0;
+			fireRate = 0;
+			vileWeight = 0;
 		} else if (vileCannonType == VileCannonType.FrontRunner) {
 			fireRate = 45;
 			vileAmmoUsage = 8;
@@ -73,6 +79,8 @@ public class VileCannon : Weapon {
 	}
 
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+		if (vile.cannonWeapon.type == (int)VileCannonType.None) return;
+
 		bool isLongshotGizmo = type == (int)VileCannonType.LongshotGizmo;
 		if (isLongshotGizmo && vile.gizmoCooldown > 0) return;
 
@@ -132,57 +140,61 @@ public class VileCannon : Weapon {
 }
 
 public class VileCannonProj : Projectile {
+	public int type = 0;
 	public VileCannonProj(
-		VileCannon weapon, Point pos, float byteAngle, Player player,
-		ushort netProjId, bool rpc = false
+		Point pos, int xDir, int type, float byteAngle, string sprite,
+		Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, 1, 300, 3, player, weapon.projSprite, 0, 0f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, sprite , netId, player
 	) {
-		fadeSprite = weapon.fadeSprite;
-		projId = (int)ProjIds.FrontRunner;
+		xScale = xDir;
 		maxTime = 0.5f;
 		destroyOnHit = true;
-
-		if (weapon.type == (int)VileCannonType.FrontRunner) {
-			// Nothing.
-		} else if (weapon.type == (int)VileCannonType.FatBoy) {
-			xScale = xDir;
+		this.type = type;
+		if (type == (int)VileCannonType.FrontRunner) {
+			weapon = VileCannon.netWeaponFR;
+			sprite = "vile_mk2_proj";
+			fadeSprite = "vile_mk2_proj_fade";
+			fadeOnAutoDestroy = true;
+			damager.damage = 3;
+			projId = (int)ProjIds.FrontRunner;
+		} else if (type == (int)VileCannonType.FatBoy) {
+			weapon = VileCannon.netWeaponFB;
+			sprite = "vile_mk2_fb_proj";
+			fadeSprite = "vile_mk2_fb_proj_fade";
+			fadeOnAutoDestroy = true;
 			damager.damage = 4;
 			damager.flinch = Global.defFlinch;
 			projId = (int)ProjIds.FatBoy;
 			maxTime = 0.35f;
-		} else if (weapon.type == (int)VileCannonType.LongshotGizmo) {
+		} else if (type == (int)VileCannonType.LongshotGizmo) {
+			weapon = VileCannon.netWeaponLG;	
+			sprite = "vile_mk2_lg_proj";
+			fadeSprite = "vile_mk2_lg_proj_fade";
+			fadeOnAutoDestroy = true;	
 			damager.damage = 1;
-			/*
-			if (ownedByLocalPlayer) {
-				if (player.vileAmmo >= 32 - weapon.vileAmmoUsage) { damager.damage = 3; }
-				else if (player.vileAmmo >= 32 - weapon.vileAmmoUsage * 2) { damager.damage = 2; }
-				else { damager.damage = 1; }
-			}*/
 			projId = (int)ProjIds.LongshotGizmo;
 		}
-		// Speed and angle.
-		Point norm = Point.createFromByteAngle(byteAngle);
-		this.vel.x = norm.x * speed * xDir;
-		this.vel.y = norm.y * speed;
+		byteAngle = byteAngle % 256;
 		this.byteAngle = byteAngle;
+		vel.x = 300 * Helpers.cosb(byteAngle);
+		vel.y = 300 * Helpers.sinb(byteAngle);
+		
 
 		if (rpc) {
-			rpcCreateByteAngle(pos, player, netProjId, byteAngle);
+			List<Byte> extraBytes = new List<Byte> {
+			};
+			extraBytes.Add((byte)type);
+			extraBytes.AddRange(Encoding.ASCII.GetBytes(sprite));
+			rpcCreateByteAngle(pos, owner, ownerPlayer, netId, byteAngle, extraBytes.ToArray());
+
 		}
 	}
 
 	public static Projectile rpcInvoke(ProjParameters args) {
-		VileCannon vileCannon;
-		if (args.projId == (int)ProjIds.LongshotGizmo) {
-			vileCannon = VileCannon.netWeaponLG;
-		} else if (args.projId == (int)ProjIds.FatBoy) {
-			vileCannon = VileCannon.netWeaponFB;
-		} else {
-			vileCannon = VileCannon.netWeaponFR;
-		}
+		string sprite = Encoding.ASCII.GetString(args.extraData[1..]);
 		return new VileCannonProj(
-			vileCannon, args.pos, args.byteAngle, args.player, args.netId
+			args.pos, args.xDir, args.extraData[0], args.byteAngle, sprite, args.owner, args.player, args.netId
 		);
 	}
 }
@@ -190,8 +202,8 @@ public class VileCannonProj : Projectile {
 public class CannonAttack : CharState {
 	bool isGizmo;
 	private Vile vile = null!;
-
 	public CannonAttack(bool isGizmo, bool grounded) : base(getSprite(isGizmo, grounded)) {
+		useDashJumpSpeed = true;
 		this.isGizmo = isGizmo;
 	}
 
@@ -246,20 +258,38 @@ public class CannonAttack : CharState {
 		if (vile.getShootXDir() == -1) {
 			shootVel = new Point(shootVel.x * vile.getShootXDir(), shootVel.y);
 		}
-
-		new VileCannonProj(
-			vile.cannonWeapon,
-			shootPos, MathF.Round(shootVel.byteAngle), //vile.longshotGizmoCount,
-			player, player.getNextActorNetId(), rpc: true
-		);
+		if (vile.cannonWeapon.type == (int)VileCannonType.FrontRunner) {
+			new VileCannonProj(
+				shootPos, vile.xDir, 0, MathF.Round(shootVel.byteAngle), vile.cannonWeapon.projSprite,
+				vile, player, player.getNextActorNetId(), rpc: true
+			);
+		}
+		else if (vile.cannonWeapon.type == (int)VileCannonType.FatBoy) {
+			new VileCannonProj(
+				shootPos, vile.xDir, 1, MathF.Round(shootVel.byteAngle), vile.cannonWeapon.projSprite,
+				vile, player, player.getNextActorNetId(), rpc: true
+			);
+		}
+		else if (vile.cannonWeapon.type == (int)VileCannonType.LongshotGizmo) {
+			new VileCannonProj(
+				shootPos, vile.xDir, 2, MathF.Round(shootVel.byteAngle), vile.cannonWeapon.projSprite,
+				vile, player, player.getNextActorNetId(), rpc: true
+			);
+		}
 	}
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		vile = character as Vile ?? throw new NullReferenceException();
 		shootLogic(vile);
-		character.useGravity = false;
-		character.stopMoving();
+		if (!isGizmo && (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player))) {
+			exitOnAirborne = true;
+		} else {
+			exitOnAirborne = false;
+			character.useGravity = false;
+			character.stopMoving();
+		}
+		
 	}
 
 	public override void onExit(CharState newState) {

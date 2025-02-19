@@ -18,6 +18,7 @@ public class DrDoppler : Maverick {
 		canClimb = true;
 		spriteFrameToSounds["drdoppler_run/1"] = "run";
 		spriteFrameToSounds["drdoppler_run/5"] = "run";
+		awardWeaponId = WeaponIds.Buster;
 		weakWeaponId = WeaponIds.AcidBurst;
 		weakMaverickWeaponId = WeaponIds.ToxicSeahorse;
 
@@ -46,7 +47,7 @@ public class DrDoppler : Maverick {
 		}
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (input.isPressed(Control.Up, player) || input.isPressed(Control.Down, player)) {
+			if (input.isPressed(Control.Special2, player)) {
 				if (state is not StingCClimb && grounded) {
 					ballType++;
 					if (ballType == 2) ballType = 0;
@@ -66,7 +67,7 @@ public class DrDoppler : Maverick {
 
 			if (state is MIdle or MRun or MLand) {
 				if (input.isPressed(Control.Shoot, player)) {
-					changeState(getShootState(false));
+					changeState(new DrDopplerShootState());
 				} else if (input.isPressed(Control.Special1, player) && ammo >= 8) {
 					deductAmmo(8);
 					changeState(new DrDopplerAbsorbState());
@@ -89,24 +90,29 @@ public class DrDoppler : Maverick {
 	public override MaverickState[] aiAttackStates() {
 		return new MaverickState[]
 		{
-				getShootState(true),
+				new DrDopplerShootState(),
 				new DrDopplerAbsorbState(),
 				new DrDopplerDashStartState(),
 		};
 	}
 
-	public MaverickState getShootState(bool isAI) {
+	/*public MaverickState getShootState(bool isAI) {
 		var mshoot = new MShoot((Point pos, int xDir) => {
-			if (ballType == 0) {
-			playSound("electricSpark", sendRpc: true);
-			} else { playSound("busterX3", sendRpc: true); }
-			new DrDopplerBallProj(weapon, pos, xDir, ballType, player, player.getNextActorNetId(), sendRpc: true);
-		}, null);
+
+			if (ballType == 0) 	playSound("electricSpark", sendRpc: true);
+			else playSound("busterX3", sendRpc: true); 
+
+			new DrDopplerBallProj(
+				pos, xDir, ballType, this, 
+				player, player.getNextActorNetId(), rpc: true
+			);
+
+		}, null!);
 		if (isAI) {
 			mshoot.consecutiveData = new MaverickStateConsecutiveData(0, 4, 0f);
 		}
 		return mshoot;
-	}
+	} */
 
 	// Melee IDs for attacks.
 	public enum MeleeIds {
@@ -158,31 +164,97 @@ public class DrDoppler : Maverick {
 }
 
 public class DrDopplerBallProj : Projectile {
+	public int type = 0;
+	public int num = 0;
 	public DrDopplerBallProj(
-		Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool sendRpc = false
+		Point pos, int xDir, int type, int num, Actor owner,
+		Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 250, 3, player, type == 0 ? "drdoppler_proj_ball" : "drdoppler_proj_ball2",
-		Global.miniFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, type == 0 ? "drdoppler_proj_ball" : "drdoppler_proj_ball2", netId, player
 	) {
+		weapon = DrDoppler.getWeapon();
+		damager.damage = 3;
+		damager.hitCooldown = 30;
+		this.type = type;
+		this.num = num;
 		if (type == 0) {
+			damager.flinch = Global.miniFlinch;
 			projId = (int)ProjIds.DrDopplerBall;
 		} else {
 			projId = (int)ProjIds.DrDopplerBall2;
 			damager.damage = 0;
 			destroyOnHit = false;
 		}
+		if (num == 0) vel = new Point(250 * xDir, 0);	
+		if (num == 1) vel = new Point(250 * xDir, 160);
+		if (num == 2) vel = new Point(250 * xDir, -160);
+		if (num == 3) vel = new Point(250 * xDir, -70);
+		if (num == 4) vel = new Point(250 * xDir, 70);
+		
 		maxTime = 0.75f;
 
-		if (sendRpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, 
+				new byte[] { (byte)type, (byte) num}
+			);
 		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new DrDopplerBallProj(
+			args.pos, args.xDir, args.extraData[0], args.extraData[1], args.owner, args.player, args.netId
+		);
+	}
+}
+public class DrDopplerShootState : MaverickState {
+	public DrDoppler drDoppler = null!;
+
+	public DrDopplerShootState() : base("shoot") {
+		attackCtrl = true;
+	}
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		drDoppler = maverick as DrDoppler ?? throw new NullReferenceException();
 	}
 
 	public override void update() {
 		base.update();
+		bool upHeld = player.input.isHeld(Control.Up, player);
+		bool downHeld = player.input.isHeld(Control.Down, player);
+		bool LeftOrRightHeld = player.input.isHeld(Control.Left, player) || 
+							   player.input.isHeld(Control.Right, player);
+		Point? shootPos = maverick.getFirstPOI();
+		if (shootPos != null) {
+			if (!once) {
+				once = true;
+				if (drDoppler.ballType == 0) drDoppler.playSound("electricSpark", sendRpc: true);
+				else drDoppler.playSound("busterX3", sendRpc: true); 
+				
+				if (downHeld && LeftOrRightHeld) {
+					DopplerProjectile(4);
+				} else if (downHeld) {
+					DopplerProjectile(1);
+				} else if (upHeld && LeftOrRightHeld) {
+					DopplerProjectile(3);
+				} else if (upHeld) {
+					DopplerProjectile(2);
+				} else 
+					DopplerProjectile(0);
+			}
+		}
+		if (maverick.isAnimOver()) {
+			maverick.changeToIdleOrFall();
+		}
+	}
+	public void DopplerProjectile(int type) {
+		Point? shootPos = maverick.getFirstPOI();
+		if (shootPos != null) {
+			new DrDopplerBallProj(
+				shootPos.Value, maverick.xDir, drDoppler.ballType, type,
+				drDoppler, player, player.getNextActorNetId(), rpc: true
+			);
+		}
 	}
 }
-
 public class DrDopplerDashStartState : MaverickState {
 	public DrDopplerDashStartState() : base("dash_charge") {
 		stopMovingOnEnter = true;

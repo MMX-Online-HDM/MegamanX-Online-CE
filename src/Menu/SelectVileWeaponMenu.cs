@@ -9,7 +9,7 @@ public class SelectVileWeaponMenu : IMainMenu {
 	public List<WeaponCursor> cursors;
 	public int selCursorIndex;
 	public bool inGame;
-	public string error = "";
+	public string? error = "";
 
 	public static (string name, Weapon[] weapons)[] vileWeaponCategories = {
 			("Cannon", [
@@ -20,6 +20,8 @@ public class SelectVileWeaponMenu : IMainMenu {
 			]),
 			("Vulcan", [
 				new Vulcan(VulcanType.None),
+				new Vulcan(VulcanType.NoneCutter),
+				new Vulcan(VulcanType.NoneMissile),
 				new Vulcan(VulcanType.CherryBlast),
 				new Vulcan(VulcanType.DistanceNeedler),
 				new Vulcan(VulcanType.BuckshotDance)
@@ -34,9 +36,10 @@ public class SelectVileWeaponMenu : IMainMenu {
 				new RocketPunch(RocketPunchType.None),
 				new RocketPunch(RocketPunchType.GoGetterRight),
 				new RocketPunch(RocketPunchType.SpoiledBrat),
-				new RocketPunch(RocketPunchType.InfinityGig)
+				new RocketPunch(RocketPunchType.InfinityGig),
 			]),
 			("Napalm", [
+				new Napalm(NapalmType.None),
 				new Napalm(NapalmType.NoneBall),
 				new Napalm(NapalmType.RumblingBang),
 				new Napalm(NapalmType.FireGrenade),
@@ -44,6 +47,7 @@ public class SelectVileWeaponMenu : IMainMenu {
 				new Napalm(NapalmType.NoneFlamethrower)
 			]),
 			("Grenade", [
+				new VileBall(VileBallType.None),
 				new VileBall(VileBallType.NoneNapalm),
 				new VileBall(VileBallType.ExplosiveRound),
 				new VileBall(VileBallType.SpreadShot),
@@ -57,11 +61,13 @@ public class SelectVileWeaponMenu : IMainMenu {
 				new VileCutter(VileCutterType.MaroonedTomahawk)
 			]),
 			("Flamethrower", [
+				NoneFlamethrower.netWeapon,
 				WildHorseKick.netWeapon,
 				SeaDragonRage.netWeapon,
 				DragonsWrath.netWeapon
 			]),
 			("Laser", [
+				new VileLaser(VileLaserType.None),
 				new VileLaser(VileLaserType.RisingSpecter),
 				new VileLaser(VileLaserType.NecroBurst),
 				new VileLaser(VileLaserType.StraightNightmare)
@@ -98,9 +104,9 @@ public class SelectVileWeaponMenu : IMainMenu {
 		int maxCatCount = vileWeaponCategories[selCursorIndex].weapons.Length;
 
 		int minIndex = 0;
-		if (selCursorIndex == 0 || selCursorIndex == 1 || selCursorIndex == 2 || selCursorIndex == 3) {
+		/*if (selCursorIndex == 0 || selCursorIndex == 1 || selCursorIndex == 2 || selCursorIndex == 3) {
 			minIndex = 1;
-		}
+		} */
 
 		Helpers.menuLeftRightInc(ref cursors[selCursorIndex].index, minIndex, maxCatCount - 1, wrap: true, playSound: true);
 
@@ -114,10 +120,10 @@ public class SelectVileWeaponMenu : IMainMenu {
 				return;
 			}
 
-			if (vileWeaponCategories[0].weapons[cursors[0].index].type == -1 && vileWeaponCategories[1].weapons[cursors[1].index].type == -1) {
+			/*if (vileWeaponCategories[0].weapons[cursors[0].index].type == -1 && vileWeaponCategories[1].weapons[cursors[1].index].type == -1) {
 				error = "Must equip either a Vulcan or Cannon.";
 				return;
-			}
+			} */
 
 			int[] oldArray = { Options.main.vileLoadout.cannon, Options.main.vileLoadout.vulcan, Options.main.vileLoadout.missile, Options.main.vileLoadout.rocketPunch, Options.main.vileLoadout.napalm, Options.main.vileLoadout.ball, Options.main.vileLoadout.cutter, Options.main.vileLoadout.flamethrower, Options.main.vileLoadout.laser };
 			Options.main.vileLoadout.cannon = vileWeaponCategories[0].weapons[cursors[0].index].type;

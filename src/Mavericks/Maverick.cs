@@ -764,7 +764,8 @@ public class Maverick : Actor, IDamagable {
 
 	public void awardXWeapon(Player player) {
 		if (player.isX && !player.isDisguisedAxl) {
-			Weapon weaponToAdd = null;
+			Weapon? weaponToAdd = null;
+			if (awardWeaponId == WeaponIds.Buster) weaponToAdd = new XBuster();
 			if (awardWeaponId == WeaponIds.ShotgunIce) weaponToAdd = new ShotgunIce();
 			if (awardWeaponId == WeaponIds.ElectricSpark) weaponToAdd = new ElectricSpark();
 			if (awardWeaponId == WeaponIds.RollingShield) weaponToAdd = new RollingShield();
@@ -803,7 +804,7 @@ public class Maverick : Actor, IDamagable {
 		}
 	}
 
-	public bool checkWeakness(WeaponIds weaponId, ProjIds projId, out MaverickState newState, bool isAttackerMaverick) {
+	public bool checkWeakness(WeaponIds weaponId, ProjIds projId, out MaverickState? newState, bool isAttackerMaverick) {
 		newState = null;
 		if (player.maverick1v1 != null && isAttackerMaverick) {
 			return false;

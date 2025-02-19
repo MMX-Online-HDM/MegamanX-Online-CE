@@ -101,7 +101,7 @@ public class RCXGrab : Weapon {
 
 	public RCXGrab() : base() {
 		fireRate = 45;
-		index = (int)WeaponIds.UPGrab;
+		//index = (int)WeaponIds.UPGrab;
 		killFeedIndex = 92;
 	}
 }

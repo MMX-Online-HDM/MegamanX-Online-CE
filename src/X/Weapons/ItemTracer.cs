@@ -21,6 +21,7 @@ public class ItemTracer : Weapon {
 		Point pos = character.getShootPos();
 		int xDir = character.getShootXDir();
 		Player player = character.player;
+		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
 
 		Character? target = null;
 		character.playSound("itemTracer", sendRpc: true);
@@ -31,7 +32,7 @@ public class ItemTracer : Weapon {
 			target = chr;
 		}
 		new ItemTracerProj(
-			this, character.getHeadPos() ?? pos, xDir,
+			character.getHeadPos() ?? pos, xDir, mmx,
 			player, target, player.getNextActorNetId(), rpc: true
 		);
 	}
@@ -41,12 +42,13 @@ public class ItemTracerProj : Projectile {
 	public Character? target;
 	public Character? scannedChar;
 	public ItemTracerProj(
-		Weapon weapon, Point pos, int xDir, Player player, 
-		Character? target, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, Character? target, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 300, 0, player, "itemscan_proj", 
-		0, 0.5f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "itemscan_proj", netId, player	
 	) {
+		weapon = ItemTracer.netWeapon;
+		damager.hitCooldown = 30;
+		vel = new Point(300 * xDir, 0);
 		maxTime = 1f;
 		destroyOnHit = false;
 		shouldShieldBlock = false;
@@ -55,16 +57,15 @@ public class ItemTracerProj : Projectile {
 		this.target = target;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 
 		canBeLocal = false;
 	}
 
-	public static Projectile rpcInvoke(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters args) {
 		return new ItemTracerProj(
-			ItemTracer.netWeapon, arg.pos, arg.xDir,
-			arg.player, null!, arg.netId
+			args.pos, args.xDir, args.owner, args.player, null, args.netId
 		);
 	}
 
@@ -75,7 +76,7 @@ public class ItemTracerProj : Projectile {
 			changePos(scannedChar.getCenterPos());
 		}
 		if (target != null) {
-			vel = pos.directionTo(target.getCenterPos()).normalize().times(speed);
+			vel = pos.directionTo(target.getCenterPos()).normalize().times(300);
 		}
 		if (isAnimOver()) {
 			destroySelf();

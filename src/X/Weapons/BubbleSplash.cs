@@ -72,6 +72,8 @@ public class BubbleSplash : Weapon {
 
 	// Friendly reminder that this method MUST be deterministic across all clients, i.e. don't vary it on a field that could vary locally.
 	public override void shoot(Character character, int[] args) {
+		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
+
 		int chargeLevel = args[0];
 		Point pos = character.getShootPos();
 		int xDir = character.getShootXDir();
@@ -83,10 +85,10 @@ public class BubbleSplash : Weapon {
 				if (player.input.isHeld(Control.Up, player)) {
 					type = 1;
 				}
-				var proj = new BubbleSplashProj(type, pos, xDir, player, player.getNextActorNetId(), rpc: true);
+				var proj = new BubbleSplashProj(type, pos, xDir, mmx, player, player.getNextActorNetId(), rpc: true);
 				bubblesOnField.Add(proj);
 			}
-		} else if (chargeLevel >= 3 && character is MegamanX mmx) {
+		} else if (chargeLevel >= 3) {
 			if (mmx.chargedBubbles.Count >= 5) {
 				mmx.specialBuster.shoot(character, [3, 1]);
 				freeAmmoNextCharge = true;
@@ -94,10 +96,10 @@ public class BubbleSplash : Weapon {
 				mmx.popAllBubbles();
 				for (int i = 0; i < 6; i++) {
 					var bubble = new BubbleSplashProjCharged(
-						this, pos, xDir, player, i, 
+						pos, xDir, mmx, player, i, 
 						player.getNextActorNetId(true), true);
 
-					mmx?.chargedBubbles?.Add(bubble);	
+					mmx.chargedBubbles?.Add(bubble);	
 				}
 			}
 		}
@@ -108,14 +110,15 @@ public class BubbleSplashProj : Projectile {
 	int size;
 
 	public BubbleSplashProj(
-		int type, Point pos, int xDir, Player player, ushort netProjId,
+		int type, Point pos, int xDir, Actor owner, Player player, ushort? netId,
 		int? size = null, int? randX = null, int? randY = null,
 		bool rpc = false
 	) : base(
-		BubbleSplash.netWeapon, pos, xDir,
-		75, 1, player, "bubblesplash_proj_start", 0, 0f,
-		netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "bubblesplash_proj_start", netId, player	
 	) {
+		weapon = BubbleSplash.netWeapon;
+		damager.damage = 1;
+		vel = new Point(75 * xDir, 0);
 		// RNG shenanigans.
 		if (randX == null) {
 			randX = Helpers.randomRange(75, 125);
@@ -147,10 +150,7 @@ public class BubbleSplashProj : Projectile {
 		projId = (int)ProjIds.BubbleSplash;
 
 		if (rpc) {
-			rpcCreate(
-				pos, player, netProjId, xDir,
-				(byte)type, (byte)size, (byte)randX, (byte)randY
-			);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)type, (byte)size, (byte)randX, (byte)randY);
 		}
 	}
 
@@ -171,48 +171,48 @@ public class BubbleSplashProj : Projectile {
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new BubbleSplashProj(
-			arg.extraData[0], arg.pos, arg.xDir, arg.player, arg.netId,
+			arg.extraData[0], arg.pos, arg.xDir, arg.owner, arg.player, arg.netId,
 			arg.extraData[1], arg.extraData[2], arg.extraData[3]
 		);
 	}
 }
 
 public class BubbleSplashProjCharged : Projectile {
-	public MegamanX? mmx;
+	public MegamanX mmx = null!;
 	public float yPos;
 	public BubbleSplashProjCharged(
-		Weapon weapon, Point pos, int xDir, Player player, 
-		int type, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, int type, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 75, 1, player, "bubblesplash_proj1", 
-		0, 0, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "bubblesplash_proj1", netId, player	
 	) {
+		weapon = BubbleSplash.netWeapon;
+		damager.damage = 1;
+		vel = new Point(75 * xDir, 0);
 		useGravity = false;
 		fadeSprite = "bubblesplash_pop";
 
 		int randColor = Helpers.randomRange(0, 2);
 		if (randColor == 0) changeSprite("bubblesplash_proj2", true);
 		if (randColor == 1) changeSprite("bubblesplash_proj3", true);
-		mmx = (player.character as MegamanX);
+		mmx = player.character as MegamanX ?? throw new NullReferenceException();
 		this.time = type * 0.2f;
 		sprite.doesLoop = true;
 		projId = (int)ProjIds.BubbleSplashCharged;
 
 		isOwnerLinked = true;
-		if (player.character != null) {
-			owningActor = player.character;
-		} 
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir, new byte[] { (byte)type });
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, new byte[] { (byte)type });
 		}
-
+		if (ownerPlayer?.character != null) {
+			owningActor = ownerPlayer.character;
+		} 
 		canBeLocal = false;
 	}
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new BubbleSplashProjCharged(
-			BubbleSplash.netWeapon, arg.pos, arg.xDir, 
+			arg.pos, arg.xDir, arg.owner,
 			arg.player, arg.extraData[0], arg.netId
 		);
 	}

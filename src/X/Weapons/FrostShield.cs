@@ -32,16 +32,17 @@ public class FrostShield : Weapon {
 		Point pos = character.getShootPos();
 		int xDir = character.getShootXDir();
 		Player player = character.player;
+		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
 
 		if (chargeLevel < 3) {
-			new FrostShieldProj(this, pos, xDir, player, player.getNextActorNetId(), true);
+			new FrostShieldProj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 		} else {
 			if (character.isUnderwater() == true) {
-				new FrostShieldProjPlatform(this, pos, xDir, player, player.getNextActorNetId(), true);
+				new FrostShieldProjPlatform(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 			} else {
-				var cfs = new FrostShieldProjCharged(this, pos, xDir, player, player.getNextActorNetId(), true);
+				var cfs = new FrostShieldProjCharged(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 				if (character != null) {
-					if (character.ownedByLocalPlayer && player.character is MegamanX mmx) {
+					if (character.ownedByLocalPlayer) {
 						mmx.chargedFrostShield = cfs;
 					}
 				}	
@@ -56,23 +57,26 @@ public class FrostShieldProj : Projectile {
 	public Anim exhaust;
 	public bool noSpawn;
 	public FrostShieldProj(
-		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 3, 2, player, "frostshield_start", 0, 0, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "frostshield_start", netId, player
 	) {
+		weapon = FrostShield.netWeapon;
+		damager.damage = 2;
+		vel = new Point(3 * xDir, 0);
 		maxTime = 3;
 		projId = (int)ProjIds.FrostShield;
 		destroyOnHit = true;
 		exhaust = new Anim(pos, "frostshield_exhaust", xDir, null, false);
 		isShield = true;
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 	}
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new FrostShieldProj(
-			FrostShield.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
+			arg.pos, arg.xDir, arg.owner, arg.player, arg.netId
 		);
 	}
 
@@ -102,7 +106,7 @@ public class FrostShieldProj : Projectile {
 	public void shatter() {
 		breakFreeze(owner);
 		if (ownedByLocalPlayer && noSpawn == false) {
-			new FrostShieldProjAir(weapon, pos, -xDir, vel.x, owner, owner.getNextActorNetId(), rpc: true);
+			new FrostShieldProjAir(pos, -xDir, vel.x, this, owner, owner.getNextActorNetId(), rpc: true);
 		}
 	}
 
@@ -115,10 +119,11 @@ public class FrostShieldProj : Projectile {
 
 public class FrostShieldProjAir : Projectile {
 	public FrostShieldProjAir(
-		Weapon weapon, Point pos, int xDir, float xVel, Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, float xVel, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 100, 0, player, "frostshield_air", 0, 0, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "frostshield_air", netId, player
 	) {
+		weapon = FrostShield.netWeapon;
 		maxTime = 3;
 		projId = (int)ProjIds.FrostShieldAir;
 		useGravity = true;
@@ -127,14 +132,14 @@ public class FrostShieldProjAir : Projectile {
 		canBeLocal = false; // TODO: Allow local.
 		vel = new Point(-xVel * 0.5f, -150);
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir, (byte)(xVel + 128));
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)(xVel + 128));
 		}
 	}
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new FrostShieldProjAir(
-			FrostShield.netWeapon, arg.pos, arg.xDir, 
-			arg.extraData[0] - 128, arg.player, arg.netId
+			arg.pos, arg.xDir, arg.extraData[0] - 128,
+			arg.owner, arg.player, arg.netId
 		);
 	}
 
@@ -147,7 +152,7 @@ public class FrostShieldProjAir : Projectile {
 		if (!ownedByLocalPlayer) return;
 		if (grounded) {
 			destroySelf();
-			new FrostShieldProjGround(weapon, pos, xDir, owner, owner.getNextActorNetId(), rpc: true);
+			new FrostShieldProjGround(pos, xDir, this, owner, owner.getNextActorNetId(), rpc: true);
 		}
 	}
 }
@@ -156,23 +161,27 @@ public class FrostShieldProjGround : Projectile, IDamagable {
 	float health = 4;
 	
 	public FrostShieldProjGround(
-		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, 2, player, "frostshield_ground_start", 0, 0.5f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "frostshield_ground_start", netId, player
 	) {
+		weapon = FrostShield.netWeapon;
+		damager.damage = 2;
+		damager.hitCooldown = 30;
+		vel = new Point(0 * xDir, 0);
 		maxTime = 5;
 		projId = (int)ProjIds.FrostShieldGround;
 		destroyOnHit = true;
 		isShield = true;
 		playSound("frostShield");
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 	}
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new FrostShieldProjGround(
-			FrostShield.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
+			arg.pos, arg.xDir, arg.owner, arg.player, arg.netId
 		);
 	}
 
@@ -220,14 +229,17 @@ public class FrostShieldProjGround : Projectile, IDamagable {
 }
 
 public class FrostShieldProjCharged : Projectile {
-	public Character character;
+	public Character? character;
 	public FrostShieldProjCharged(
-		Weapon weapon, Point pos, int xDir, 
-		Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 300, 3, player, "frostshield_charged_start", 
-		Global.defFlinch, 1, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "frostshield_charged_start", netId, player
 	) {
+		weapon = FrostShield.netWeapon;
+		damager.damage = 3;
+		damager.hitCooldown = 60;
+		damager.flinch = Global.defFlinch;
+		vel = new Point(300 * xDir, 0);
 		maxTime = 5;
 		projId = (int)ProjIds.FrostShieldCharged;
 		destroyOnHit = false;
@@ -235,14 +247,14 @@ public class FrostShieldProjCharged : Projectile {
 		character = player.character;
 		isShield = true;
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 		canBeLocal = false;
 	}
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new FrostShieldProjCharged(
-			FrostShield.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
+			arg.pos, arg.xDir, arg.owner, arg.player, arg.netId
 		);
 	}
 
@@ -251,7 +263,7 @@ public class FrostShieldProjCharged : Projectile {
 		if (!ownedByLocalPlayer) return;
 
 		if (isAnimOver()) {
-			if (character.charState is Dash || character.charState is AirDash) {
+			if (character?.charState is Dash || character?.charState is AirDash) {
 				if (damager.damage != 3) updateDamager(3);
 			} else {
 				if (damager.damage != 0) updateDamager(0);
@@ -273,8 +285,8 @@ public class FrostShieldProjCharged : Projectile {
 		if (!ownedByLocalPlayer) return;
 		if (destroyed) return;
 
-		changePos(character.getShootPos());
-		xDir = character.getShootXDir();
+		changePos(character?.getShootPos() ?? new Point (0,0));
+		xDir = character?.getShootXDir() ?? 1;
 	}
 
 	public override void onDestroy() {
@@ -285,20 +297,22 @@ public class FrostShieldProjCharged : Projectile {
 		if (owner.character is MegamanX mmx) {
 			mmx.chargedFrostShield = null;
 		}
-		new FrostShieldProjChargedGround(weapon, pos, character.xDir, owner, owner.getNextActorNetId(), rpc: true);
+		new FrostShieldProjChargedGround(pos, character?.xDir ?? 1, this, owner, owner.getNextActorNetId(), rpc: true);
 	}
 }
 
 public class FrostShieldProjChargedGround : Projectile {
 	public Anim slideAnim;
-	public Character character;
+	public Character? character;
 	public FrostShieldProjChargedGround(
-		Weapon weapon, Point pos, int xDir, 
-		Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, 3, player, "frostshield_charged_ground", 
-		Global.defFlinch, 1, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "frostshield_charged_ground", netId, player
 	) {
+		weapon = FrostShield.netWeapon;
+		damager.damage = 3;
+		damager.hitCooldown = 60;
+		damager.flinch = Global.defFlinch;
 		maxTime = 4;
 		projId = (int)ProjIds.FrostShieldChargedGrounded;
 		destroyOnHit = true;
@@ -310,13 +324,13 @@ public class FrostShieldProjChargedGround : Projectile {
 		collider.wallOnly = true;
 		slideAnim = new Anim(pos, "frostshield_charged_slide", xDir, null, false);
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 	}
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new FrostShieldProjChargedGround(
-			FrostShield.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
+			arg.pos, arg.xDir, arg.owner, arg.player, arg.netId
 		);
 	}
 
@@ -345,12 +359,14 @@ public class FrostShieldProjChargedGround : Projectile {
 
 public class FrostShieldProjPlatform : Projectile {
 	public FrostShieldProjPlatform(
-		Weapon weapon, Point pos, int xDir, 
-		Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, 3, player, "frostshield_charged_platform", 
-		Global.defFlinch, 1, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "frostshield_charged_platform", netId, player
 	) {
+		weapon = FrostShield.netWeapon;
+		damager.damage = 3;
+		damager.hitCooldown = 60;
+		damager.flinch = Global.defFlinch;
 		maxTime = 8;
 		projId = (int)ProjIds.FrostShieldChargedPlatform;
 		setIndestructableProperties();
@@ -362,13 +378,13 @@ public class FrostShieldProjPlatform : Projectile {
 		isPlatform = true;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 	}
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new FrostShieldProjPlatform(
-			FrostShield.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
+			arg.pos, arg.xDir, arg.owner, arg.player, arg.netId
 		);
 	}
 

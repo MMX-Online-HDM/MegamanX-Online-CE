@@ -104,7 +104,7 @@ public class FlameBurnerProj : Projectile {
 			hitWall = true;
 			vel.multiply(0.5f);
 			if (projId == (int)ProjIds.FlameBurnerHyper) {
-				new MK2NapalmFlame(weapon, other?.hitData?.hitPoint ?? pos, xDir, owner, owner.getNextActorNetId(), rpc: true) {
+				new MK2NapalmFlame(other?.hitData?.hitPoint ?? pos, xDir, this, owner, owner.getNextActorNetId(), rpc: true) {
 					useGravity = false
 				};
 			}

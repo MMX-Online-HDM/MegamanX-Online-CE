@@ -260,14 +260,14 @@ public class Sprite {
 		float extraXOff = 0;
 
 		if (isUltX) {
-			bitmap = Global.textures["XUltimate"];
+			//bitmap = Global.textures["XUltimate"];
 			extraYOff = 3;
 			extraY = 3;
 			armors = null;
 		}
 
 		if (isUPX) {
-			bitmap = Global.textures["XUP"];
+			//bitmap = Global.textures["XUP"];
 		}
 
 		if (!isUltX && armors != null && animData.isXSprite) {

@@ -32,15 +32,17 @@ public class StormTornado : Weapon {
 	}
 
 	public override void shoot(Character character, int[] args) {
+		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
+
 		int chargeLevel = args[0];
 		Point pos = character.getShootPos();
 		int xDir = character.getShootXDir();
 		Player player = character.player;
 
 		if (chargeLevel < 3) {
-			new TornadoProj(this, pos, xDir, false, player, player.getNextActorNetId(), true);
+			new TornadoProj(pos, xDir, false, mmx, player, player.getNextActorNetId(), true);
 		} else {
-			new TornadoProjCharged(this, pos, xDir, player, player.getNextActorNetId(), true);
+			new TornadoProjCharged(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 		}
 	}
 }
@@ -56,12 +58,14 @@ public class TornadoProj : Projectile {
 	public float blowModifier = 0.25f;
 
 	public TornadoProj(
-		Weapon weapon, Point pos, int xDir, bool isStormE,
-		Player player, ushort netProjId, bool sendRpc = false
+		Point pos, int xDir, bool isStormE, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 400, 1, player, "tornado_mid", 
-		0, 0.25f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "tornado_mid", netId, player	
 	) {
+		weapon = isStormE ? StormEagle.netWeapon : StormTornado.netWeapon;
+		damager.damage = 1;
+		vel = new Point(400 * xDir, 0);
+		damager.hitCooldown = 15;
 		projId = isStormE ? (int)ProjIds.StormETornado : (int)ProjIds.Tornado;
 		if (isStormE) {
 			blowModifier = 1;
@@ -80,15 +84,14 @@ public class TornadoProj : Projectile {
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 
-		if (sendRpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, isStormE ? (byte) 1 : (byte)0);
 		}
 	}
 
-	public static Projectile rpcInvoke(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters args) {
 		return new TornadoProj(
-			StormTornado.netWeapon, arg.pos, arg.xDir, 
-			false, arg.player, arg.netId
+			args.pos, args.xDir, args.extraData[0] == 1, args.owner, args.player, args.netId
 		);
 	}
 
@@ -163,12 +166,15 @@ public class TornadoProjCharged : Projectile {
 	public float maxLengthTime = 0;
 
 	public TornadoProjCharged(
-		Weapon weapon, Point pos, int xDir, 
-		Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, 2, player, "tornado_charge", 
-		Global.defFlinch, 0.33f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "tornado_charge", netId, player	
 	) {
+		weapon = StormTornado.netWeapon;
+		damager.damage = 2;
+		damager.hitCooldown = Global.defFlinch;
+		vel = new Point(0 * xDir, 0);
+		damager.hitCooldown = 20;
 		projId = (int)ProjIds.TornadoCharged;
 		sprite.visible = false;
 		spriteStart = new Sprite("tornado_charge");
@@ -181,13 +187,14 @@ public class TornadoProjCharged : Projectile {
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 
-		if (rpc) rpcCreate(pos, player, netProjId, xDir);
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+		}	
 	}
 
-	public static Projectile rpcInvoke(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters args) {
 		return new TornadoProjCharged(
-			StormTornado.netWeapon, arg.pos, arg.xDir, 
-			arg.player, arg.netId
+			args.pos, args.xDir, args.owner, args.player, args.netId
 		);
 	}
 

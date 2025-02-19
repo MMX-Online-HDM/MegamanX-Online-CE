@@ -36,13 +36,14 @@ public class SpinningBlade : Weapon {
 		Point pos = character.getShootPos();
 		int xDir = character.getShootXDir();
 		Player player = character.player;
+		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
 
 		if (chargeLevel < 3) {
 			player.setNextActorNetId(player.getNextActorNetId());
-			new SpinningBladeProj(this, pos, xDir, 0, player, player.getNextActorNetId(true), true);
-			new SpinningBladeProj(this, pos, xDir, 1, player, player.getNextActorNetId(true), true);
-		} else if (character is MegamanX mmx) {
-			var csb = new SpinningBladeProjCharged(this, pos, xDir, player, player.getNextActorNetId(), true);
+			new SpinningBladeProj(pos, xDir, 0, mmx, player, player.getNextActorNetId(true), true);
+			new SpinningBladeProj(pos, xDir, 1, mmx, player, player.getNextActorNetId(true), true);
+		} else {
+			var csb = new SpinningBladeProjCharged(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 			if (mmx.ownedByLocalPlayer) {
 				mmx.chargedSpinningBlade = csb;
 			}
@@ -55,12 +56,13 @@ public class SpinningBladeProj : Projectile {
 	bool once;
 
 	public SpinningBladeProj(
-		Weapon weapon, Point pos, int xDir, int type, 
-		Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, int type, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 250, 2, player, "spinningblade_proj", 
-		0, 0, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "spinningblade_proj", netId, player
 	) {
+		weapon = SpinningBlade.netWeapon;
+		damager.damage = 2;
+		vel = new Point(250 * xDir, 0);
 		maxTime = 2f;
 		projId = (int)ProjIds.SpinningBlade;
 		fadeSprite = "explosion";
@@ -83,14 +85,13 @@ public class SpinningBladeProj : Projectile {
 			yScale = -1;
 		}
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir, (byte)type);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)type);
 		}
 	}
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new SpinningBladeProj(
-			SpinningBlade.netWeapon, arg.pos, arg.xDir,
-			arg.extraData[0], arg.player, arg.netId
+			arg.pos, arg.xDir, arg.extraData[0], arg.owner, arg.player, arg.netId
 		);
 	}
 
@@ -132,33 +133,36 @@ public class SpinningBladeProj : Projectile {
 }
 
 public class SpinningBladeProjCharged : Projectile {
-	public MegamanX? mmx;
+	public MegamanX mmx = null!;
 	public float xDist;
 	const float maxXDist = 90;
 	public float spinAngle;
 	bool retracted;
 	bool soundPlayed;
 	public SpinningBladeProjCharged(
-		Weapon weapon, Point pos, int xDir, 
-		Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 250, 2, player, "spinningblade_charged", 
-		Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "spinningblade_charged", netId, player
 	) {
+		weapon = SpinningBlade.netWeapon;
+		damager.damage = 2;
+		damager.hitCooldown = 30;
+		damager.flinch = Global.defFlinch;
+		vel = new Point(250 * xDir, 0);
 		projId = (int)ProjIds.SpinningBladeCharged;
 		shouldShieldBlock = false;
 		destroyOnHit = false;
-		mmx = (player.character as MegamanX);
+		mmx = player.character as MegamanX ?? throw new NullReferenceException();
 		shouldVortexSuck = false;
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 		canBeLocal = false;
 	}
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new SpinningBladeProjCharged(
-			SpinningBlade.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
+			arg.pos, arg.xDir, arg.owner, arg.player, arg.netId
 		);
 	}
 

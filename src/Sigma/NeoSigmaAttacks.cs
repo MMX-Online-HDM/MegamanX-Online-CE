@@ -15,7 +15,7 @@ public class SigmaClawState : CharState {
 	CharState prevCharState;
 	float slideVel;
 	bool isAir;
-	public NeoSigma neoSigma;
+	public NeoSigma neoSigma = null!;
 
 	public SigmaClawState(CharState prevCharState, bool isAir) : base("attack") {
 		this.prevCharState = prevCharState;
@@ -74,7 +74,7 @@ public class SigmaClawState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		neoSigma = character as NeoSigma;
+		neoSigma = character as NeoSigma ?? throw new NullReferenceException();
 		if (oldState is Dash) {
 			slideVel = character.xDir * character.getDashSpeed();
 		}
@@ -93,6 +93,7 @@ public class SigmaClawState : CharState {
 }
 
 public class SigmaElectricBallWeapon : Weapon {
+	public static SigmaElectricBallWeapon netWeapon = new();
 	public SigmaElectricBallWeapon() : base() {
 		index = (int)WeaponIds.Sigma2Ball;
 		killFeedIndex = 135;
@@ -101,12 +102,15 @@ public class SigmaElectricBallWeapon : Weapon {
 
 public class SigmaElectricBallProj : Projectile {
 	public SigmaElectricBallProj(
-		Weapon weapon, Point pos, float byteAngle, Player
-		player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, float byteAngle, Actor owner, 
+		Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, 1, 200, 3, player, "sigma2_ball", Global.miniFlinch, 0.2f,
-		netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "sigma2_ball", netId, player
 	) {
+		weapon = SigmaElectricBallWeapon.netWeapon;
+		damager.damage = 3;
+		damager.flinch = Global.miniFlinch;
+		damager.hitCooldown = 12;
 		projId = (int)ProjIds.Sigma2Ball;
 		destroyOnHit = false;
 		maxTime = 0.5f;
@@ -114,15 +118,20 @@ public class SigmaElectricBallProj : Projectile {
 		vel.x = 200 * Helpers.cosb(byteAngle);
 		vel.y = 200 * Helpers.sinb(byteAngle);
 		this.byteAngle = byteAngle;
-
 		if (rpc) {
-			rpcCreateByteAngle(pos, player, netProjId, xDir);
+			rpcCreateByteAngle(pos, owner, ownerPlayer, netId, byteAngle);
 		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new SigmaElectricBallProj(
+			args.pos, args.xDir, args.byteAngle, args.owner, args.player, args.netId
+		);
 	}
 }
 
 public class SigmaElectricBallState : CharState {
 	bool fired;
+	public NeoSigma neoSigma = null!;
 	public SigmaElectricBallState() : base("shoot") {
 		enterSound = "sigma2shoot";
 		invincible = true;
@@ -134,19 +143,26 @@ public class SigmaElectricBallState : CharState {
 		if (character.frameIndex > 0 && !fired) {
 			fired = true;
 			character.playSound("sigma2ball", sendRpc: true);
-			var weapon = new SigmaElectricBallWeapon();
 			Point pos = character.pos.addxy(0, -20);
 			for (int i = 256; i >= 128; i -= 32) {
-				new SigmaElectricBallProj(weapon, pos, i, player, player.getNextActorNetId(), rpc: true);
+				new SigmaElectricBallProj(
+					pos, 1, i, neoSigma, player, 
+					player.getNextActorNetId(), rpc: true
+				);
 			}
 		}
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		}
 	}
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		neoSigma = character as NeoSigma ?? throw new NullReferenceException();
+	}
 }
 
 public class SigmaElectricBall2Weapon : Weapon {
+	public static SigmaElectricBall2Weapon netWeapon = new();
 	public SigmaElectricBall2Weapon() : base() {
 		index = (int)WeaponIds.Sigma2Ball2;
 		killFeedIndex = 135;
@@ -155,24 +171,32 @@ public class SigmaElectricBall2Weapon : Weapon {
 
 public class SigmaElectricBall2Proj : Projectile {
 	public SigmaElectricBall2Proj(
-		Weapon weapon, Point pos, int xDir,
-		Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 300, 6, player, "sigma2_ball2",
-		Global.defFlinch, 0.2f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "sigma2_ball2", netId, player
 	) {
+		weapon = SigmaElectricBall2Weapon.netWeapon;
+		damager.damage = 6;
+		damager.flinch = Global.defFlinch;
+		damager.hitCooldown = 12;
 		projId = (int)ProjIds.Sigma2Ball2;
 		destroyOnHit = false;
 		maxTime = 0.4f;
-
+		vel = new Point(300*xDir,0);
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new SigmaElectricBall2Proj(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
 	}
 }
 public class SigmaElectricBall2StateEX : CharState {
 	public bool fired, soundFired;
 	public SigmaElectricBall2Proj? SigmaBalls;
+	public NeoSigma neoSigma = null!;
 	public SigmaElectricBall2StateEX() : base("shoot2") {
 		invincible = true;
 	}
@@ -188,8 +212,7 @@ public class SigmaElectricBall2StateEX : CharState {
 		if (character.frameIndex >= 17 && !fired) {
 			fired = true;
 			SigmaBalls = new SigmaElectricBall2Proj(
-				new SigmaElectricBall2Weapon(), shootPos,
-				character.xDir, player, player.getNextActorNetId(), rpc: true
+				shootPos, character.xDir, neoSigma, player, player.getNextActorNetId(), rpc: true
 			);
 		}
 
@@ -198,9 +221,13 @@ public class SigmaElectricBall2StateEX : CharState {
 		}
 		base.update();
 	}
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		neoSigma = character as NeoSigma ?? throw new NullReferenceException();
+	}
 }
 
-
+/*
 public class SigmaElectricBall2State : CharState {
 	bool fired;
 	bool sound;
@@ -218,10 +245,10 @@ public class SigmaElectricBall2State : CharState {
 			character.playSound("neoSigmaESpark", sendRpc: true);
 		}
 
-		if (!fired && character.getFirstPOI() != null) {
+		if (!fired) {
 			fired = true;
 			new SigmaElectricBall2Proj(
-				new SigmaElectricBall2Weapon(), character.getFirstPOI().Value,
+				new SigmaElectricBall2Weapon(), character.getCenterPos(),
 				character.xDir, player, player.getNextActorNetId(), rpc: true
 			);
 		}
@@ -231,7 +258,7 @@ public class SigmaElectricBall2State : CharState {
 		}
 	}
 }
-
+*/
 public class SigmaCooldownState : CharState {
 	public SigmaCooldownState(string sprite) : base(sprite) {
 	}

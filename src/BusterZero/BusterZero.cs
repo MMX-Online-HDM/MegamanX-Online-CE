@@ -198,20 +198,20 @@ public class BusterZero : Character {
 		if (chargeLevel == 0) {
 			playSound("busterX3", sendRpc: true);
 			var lemon = new DZBusterProj(
-				shootPos, xDir, player, player.getNextActorNetId(), rpc: true
+				shootPos, xDir, this, player, player.getNextActorNetId(), rpc: true
 			);
 			zeroLemonsOnField.Add(lemon);
 			lemonCooldown = 9;
 		} else if (chargeLevel == 1) {
 			playSound("buster2X3", sendRpc: true);
 			new DZBuster2Proj(
-				shootPos, xDir, player, player.getNextActorNetId(), rpc: true
+				shootPos, xDir, this, player, player.getNextActorNetId(), rpc: true
 			);
 			lemonCooldown = 22;
 		} else if (chargeLevel == 2) {
 			playSound("buster3X3", sendRpc: true);
 			new DZBuster3Proj(
-				shootPos, xDir, player, player.getNextActorNetId(), rpc: true
+				shootPos, xDir, this, player, player.getNextActorNetId(), rpc: true
 			);
 			lemonCooldown = 22;
 		} else if (chargeLevel == 3) {

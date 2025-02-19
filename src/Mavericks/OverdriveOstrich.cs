@@ -168,8 +168,14 @@ public class OverdriveOstrich : Maverick {
 
 public class OverdriveOSonicSlicerProj : Projectile {
 	bool once;
-	public OverdriveOSonicSlicerProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 3, player, "overdriveo_slicer_start", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public OverdriveOSonicSlicerProj(
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "overdriveo_slicer_start", netId, player
+	) {
+		weapon = OverdriveOstrich.getWeapon();
+		damager.damage = 3;
+		damager.hitCooldown = 30;
 		projId = (int)ProjIds.OverdriveOSonicSlicer;
 		maxTime = 0.5f;
 		destroyOnHit = false;
@@ -177,8 +183,13 @@ public class OverdriveOSonicSlicerProj : Projectile {
 		fadeOnAutoDestroy = true;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new OverdriveOSonicSlicerProj(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
 	}
 
 	public override void update() {
@@ -194,9 +205,13 @@ public class OverdriveOSonicSlicerProj : Projectile {
 
 public class OverdriveOShootState : MaverickState {
 	bool shotOnce;
+	public OverdriveOstrich SonicOstreague = null!;
 	public OverdriveOShootState() : base("attack") {
 	}
-
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		SonicOstreague = maverick as OverdriveOstrich ?? throw new NullReferenceException();
+	}
 	public override void update() {
 		base.update();
 
@@ -208,7 +223,8 @@ public class OverdriveOShootState : MaverickState {
 			shotOnce = true;
 			maverick.playSound("overdriveoShoot", sendRpc: true);
 			new OverdriveOSonicSlicerProj(
-				maverick.weapon, shootPos.Value, maverick.xDir, player, player.getNextActorNetId(), rpc: true
+				shootPos.Value, maverick.xDir, SonicOstreague,
+				player, player.getNextActorNetId(), rpc: true
 			);
 			//proj.vel.x += maverick.getRunSpeed() * 3 * proj.xDir;
 		}
@@ -225,13 +241,20 @@ public class OverdriveOSonicSlicerUpProj : Projectile {
 	public Point dest;
 	public bool fall;
 
-	public OverdriveOSonicSlicerUpProj(Weapon weapon, Point pos, int num, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, 1, 0, 3, player, "overdriveo_slicer_vertical", Global.defFlinch, 0.25f, netProjId, player.ownedByLocalPlayer) {
+	public OverdriveOSonicSlicerUpProj(
+		Point pos, int xDir, int num, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "overdriveo_slicer_vertical", netId, player
+	) {
+		weapon = OverdriveOstrich.getWeapon();
+		damager.damage = 3;
+		damager.hitCooldown = 15;
+		damager.flinch = Global.defFlinch;
 		fadeSprite = "sonicslicer_charged_fade";
 		maxTime = 1;
 		projId = (int)ProjIds.OverdriveOSonicSlicerUp;
 		destroyOnHit = false;
-
+		fadeOnAutoDestroy = true;
 		if (num == 0) dest = new Point(-90, -100);
 		if (num == 1) dest = new Point(-45, -100);
 		if (num == 2) dest = new Point(-0, -100);
@@ -242,8 +265,13 @@ public class OverdriveOSonicSlicerUpProj : Projectile {
 		useGravity = true;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir, (byte)num);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)num);
 		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new OverdriveOSonicSlicerUpProj(
+			args.pos, args.xDir, args.extraData[0], args.owner, args.player, args.netId
+		);
 	}
 
 	public override void update() {
@@ -265,6 +293,7 @@ public class OverdriveOSonicSlicerUpProj : Projectile {
 
 public class OverdriveOShoot2State : MaverickState {
 	bool shotOnce;
+	public OverdriveOstrich SonicOstreague = null!;
 	public OverdriveOShoot2State() : base("attack2") {
 	}
 
@@ -277,7 +306,7 @@ public class OverdriveOShoot2State : MaverickState {
 			maverick.playSound("overdriveoShoot2", sendRpc: true);
 			for (int i = 0; i < 5; i++) {
 				new OverdriveOSonicSlicerUpProj(
-					maverick.weapon, shootPos.Value, i, player,
+					shootPos.Value, 1, i, SonicOstreague, player,
 					player.getNextActorNetId(), rpc: true
 				);
 			}
@@ -316,6 +345,7 @@ public class OverdriveOJumpKickState : MaverickState {
 
 public class OverdriveOSkidState : MaverickState {
 	float dustTime;
+	OverdriveOstrich SonicOstreague = null!;
 	public OverdriveOSkidState() : base("skid") {
 		enterSound = "overdriveoSkid";
 		attackCtrl = true;
@@ -326,8 +356,7 @@ public class OverdriveOSkidState : MaverickState {
 	public override void update() {
 		base.update();
 
-		var oo = maverick as OverdriveOstrich;
-		oo.accSpeed = Helpers.lerp(oo.accSpeed, 0, Global.spf * 5);
+		SonicOstreague.accSpeed = Helpers.lerp(SonicOstreague.accSpeed, 0, Global.spf * 5);
 
 		Helpers.decrementTime(ref dustTime);
 		if (dustTime == 0) {
@@ -336,7 +365,7 @@ public class OverdriveOSkidState : MaverickState {
 		}
 
 		var inputDir = input.getInputDir(player);
-		if (inputDir.x == -oo.xDir) maverick.frameSpeed = 1.5f;
+		if (inputDir.x == -SonicOstreague.xDir) maverick.frameSpeed = 1.5f;
 		else maverick.frameSpeed = 1;
 
 		var move = new Point(maverick.getRunSpeed() * maverick.xDir, 0);
@@ -355,28 +384,27 @@ public class OverdriveOSkidState : MaverickState {
 			}
 		}
 	}
-
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		SonicOstreague = maverick as OverdriveOstrich ?? throw new NullReferenceException();
+	}
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
-		var oo = maverick as OverdriveOstrich;
-		oo.accSpeed = 0;
+		SonicOstreague.accSpeed = 0;
 	}
 }
 
 public class OverdriveOCrystalizedState : MaverickState {
+	OverdriveOstrich SonicOstreague = null!;
 	public OverdriveOCrystalizedState() : base("hurt_weakness") {
 		enterSound = "crystalize";
 		aiAttackCtrl = true;
 		canBeCanceled = false;
 	}
-
-	public override bool canEnter(Maverick maverick) {
-		return base.canEnter(maverick);
-	}
-
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 		maverick.stopMoving();
+		SonicOstreague = maverick as OverdriveOstrich ?? throw new NullReferenceException();
 	}
 
 	public override void update() {
@@ -391,6 +419,6 @@ public class OverdriveOCrystalizedState : MaverickState {
 
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
-		(maverick as OverdriveOstrich).crystalizeCooldown = 1;
+		SonicOstreague.crystalizeCooldown = 2;
 	}
 }

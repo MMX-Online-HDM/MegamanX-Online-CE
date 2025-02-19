@@ -75,7 +75,6 @@ public class BlizzardBuffalo : Maverick {
 	public MaverickState getShootState(bool isAI) {
 		var mshoot = new MShoot(
 			(Point pos, int xDir) => {
-				playSound("bbuffaloShoot", sendRpc: true);
 
 				Point unitDir = new Point(xDir, -1);
 				var inputDir = input.getInputDir(player);
@@ -89,7 +88,7 @@ public class BlizzardBuffalo : Maverick {
 					this, player.getNextActorNetId(), sendRpc: true
 				);
 			},
-			null
+			"bbuffaloShoot"
 		);
 		if (isAI) {
 			mshoot.consecutiveData = new MaverickStateConsecutiveData(0, 4, 0.75f);
@@ -201,8 +200,8 @@ public class BBuffaloIceProj : Projectile {
 		if (!ownedByLocalPlayer) return;
 		var hitNormal = other.getNormalSafe();
 		new BBuffaloIceProjGround(
-			weapon, other.getHitPointSafe(), hitNormal.byteAngle,
-			owner, owner.getNextActorNetId(), sendRpc: true
+			other.getHitPointSafe(), 1, hitNormal.byteAngle, this,
+			owner, owner.getNextActorNetId(), rpc: true
 		);
 	}
 
@@ -220,11 +219,14 @@ public class BBuffaloIceProjGround : Projectile, IDamagable {
 	float health = 6;
 
 	public BBuffaloIceProjGround(
-		Weapon weapon, Point pos, float byteAngle, Player player, ushort netProjId, bool sendRpc = false
+		Point pos, int xDir, float byteAngle, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, 1, 0, 3, player, "bbuffalo_proj_ice",
-		Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "bbuffalo_proj_ice", netId, player
 	) {
+		damager.damage = 3;
+		damager.flinch = Global.defFlinch;
+		damager.hitCooldown = 30;
+		weapon = BlizzardBuffalo.netWeapon;
 		byteAngle = byteAngle % 256;
 		this.byteAngle = byteAngle;
 		maxTime = 5;
@@ -232,9 +234,14 @@ public class BBuffaloIceProjGround : Projectile, IDamagable {
 		destroyOnHit = true;
 		playSound("frostShield");
 		updateHitboxes();
-		if (sendRpc) {
-			rpcCreateByteAngle(pos, player, netProjId, byteAngle);
+		if (rpc) {
+			rpcCreateByteAngle(pos, owner, ownerPlayer, netId, byteAngle);
 		}
+	}
+		public static Projectile rpcInvoke(ProjParameters args) {
+		return new BBuffaloIceProjGround(
+			args.pos, args.xDir, args.byteAngle, args.owner, args.player, args.netId
+		);
 	}
 
 	public override void preUpdate() {
@@ -251,7 +258,7 @@ public class BBuffaloIceProjGround : Projectile, IDamagable {
 	public void updateHitboxes() {
 		if (angle == null || collider?._shape == null) return;
 
-		float angle360 = Helpers.to256(byteAngle.Value);
+		float angle360 = Helpers.to256(byteAngle!.Value);
 		if (angle360 >= 0 && angle360 <= 32) {
 			collider._shape.points = new List<Point>()
 			{
@@ -321,26 +328,34 @@ public class BBuffaloBeamProj : Projectile {
 	public float moveDistance2;
 	public float maxDistance2;
 	public BBuffaloBeamProj(
-		Weapon weapon, Point pos, int xDir, BlizzardBuffalo bb,
-		Player player, ushort netProjId, bool sendRpc = false
+		Point pos, int xDir, BlizzardBuffalo bb, Actor owner,
+		Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 150, 0, player, "bbuffalo_proj_beam_head",
-		0, 0.5f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "bbuffalo_proj_beam_head", netId, player
 	) {
+		damager.hitCooldown = 30;
+		weapon = BlizzardBuffalo.netWeapon;
+		vel = new Point(150*xDir,0);
 		projId = (int)ProjIds.BBuffaloBeam;
 		setStartPos(pos.addxy(-xDir * 10, 0));
 		maxDistance2 = 200;
 		this.bb = bb;
 		setIndestructableProperties();
 
-		if (sendRpc) {
+		if (rpc) {
 			byte[] bbNetIdBytes = BitConverter.GetBytes(bb.netId ?? 0);
-			rpcCreate(pos, player, netProjId, xDir, bbNetIdBytes[0], bbNetIdBytes[1]);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir,  new byte[] { bbNetIdBytes[0], bbNetIdBytes[1] });
 		}
 		// ToDo: Make local.
-		canBeLocal = false;
 	}
-
+	public static Projectile rpcInvoke(ProjParameters args) {
+		ushort FrozenBuffalioId = BitConverter.ToUInt16(args.extraData, 0);
+		BlizzardBuffalo? FrozenBuffalio = Global.level.getActorByNetId(FrozenBuffalioId) as BlizzardBuffalo;
+		return new BBuffaloBeamProj(
+			args.pos, args.xDir, FrozenBuffalio!, 
+			args.owner, args.player, args.netId
+		);
+	}
 	public override void update() {
 		base.update();
 		if (!ownedByLocalPlayer) return;
@@ -377,7 +392,7 @@ public class BBuffaloBeamProj : Projectile {
 
 	public void setStartPos(Point startPos) {
 		this.startPos = startPos;
-		globalCollider = new Collider(getPoints(), true, null, false, false, 0, Point.zero);
+		globalCollider = new Collider(getPoints(), true, null!, false, false, 0, Point.zero);
 	}
 
 	public List<Point> getPoints() {
@@ -427,6 +442,7 @@ public class BBuffaloShootBeamState : MaverickState {
 	bool shotOnce;
 	public Anim? muzzle;
 	public BBuffaloBeamProj? proj;
+	public BlizzardBuffalo FrozenBuffalio = null!;
 	public BBuffaloShootBeamState() : base("shoot_beam", "shoot_beam_start") {
 	}
 
@@ -437,33 +453,48 @@ public class BBuffaloShootBeamState : MaverickState {
 		Point? shootPos = maverick.getFirstPOI();
 		if (!shotOnce && shootPos != null) {
 			shotOnce = true;
-			muzzle = new Anim(shootPos.Value, "bbuffalo_beam_muzzle", maverick.xDir, player.getNextActorNetId(), true, sendRpc: true, host: maverick);
+			muzzle = new Anim(
+				shootPos.Value, "bbuffalo_beam_muzzle", maverick.xDir,
+				player.getNextActorNetId(), true,
+				sendRpc: true, host: null
+			);
 			maverick.playSound("bbuffaloBeam", sendRpc: true);
 		}
 
 		if (proj != null && !proj.destroyed && input.isPressed(Control.Special1, player)) {
 			proj.release();
 		}
-		if (muzzle?.destroyed == true && proj == null) {
-			proj = new BBuffaloBeamProj(maverick.weapon, shootPos.Value.addxy(maverick.xDir * 20, 0), maverick.xDir, maverick as BlizzardBuffalo, player, player.getNextActorNetId(), sendRpc: true);
+		if (muzzle?.destroyed == true && proj == null && shootPos != null) {
+			proj = new BBuffaloBeamProj(
+				shootPos.Value.addxy(maverick.xDir * 20, 0), maverick.xDir, 
+				FrozenBuffalio, FrozenBuffalio, player, player.getNextActorNetId(), rpc: true
+			);
 		}
 
 		if (proj?.released == true || proj?.destroyed == true) {
 			maverick.changeToIdleOrFall();
 		}
 	}
-
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		FrozenBuffalio = maverick as BlizzardBuffalo ?? throw new NullReferenceException();
+	}
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
 		muzzle?.destroySelf();
-		proj?.release();
+		proj?.destroySelf();
 	}
 }
 
 public class BBuffaloDashState : MaverickState {
 	float dustTime;
 	Character? victim;
+	public BlizzardBuffalo FrozenBuffalio = null!;
 	public BBuffaloDashState() : base("dash", "dash_start") {
+	}
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		FrozenBuffalio = maverick as BlizzardBuffalo ?? throw new NullReferenceException();
 	}
 
 	public override void update() {
@@ -505,7 +536,7 @@ public class BBuffaloDashState : MaverickState {
 		}
 	}
 
-	public Character getVictim() {
+	public Character? getVictim() {
 		if (victim == null) return null;
 		if (!victim.sprite.name.EndsWith("_grabbed")) {
 			return null;
@@ -521,7 +552,10 @@ public class BBuffaloDashState : MaverickState {
 		}
 		*/
 
-		new BBuffaloCrashProj(maverick.weapon, maverick.pos, maverick.xDir, player, player.getNextActorNetId(), rpc: true);
+		new BBuffaloCrashProj(
+			maverick.pos, maverick.xDir, FrozenBuffalio,
+			player, player.getNextActorNetId(), rpc: true
+		);
 		maverick.playSound("crashX3", sendRpc: true);
 		maverick.shakeCamera(sendRpc: true);
 	}
@@ -542,17 +576,25 @@ public class BBuffaloDashState : MaverickState {
 
 public class BBuffaloCrashProj : Projectile {
 	public BBuffaloCrashProj(
-		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, 4, player, "bbuffalo_proj_crash",
-		Global.defFlinch, 1, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "bbuffalo_proj_crash", netId, player
 	) {
+		damager.damage = 4;
+		damager.flinch = Global.defFlinch;
+		damager.hitCooldown = 60;
+		weapon = BlizzardBuffalo.netWeapon;
 		setIndestructableProperties();
 		maxTime = 0.15f;
 		projId = (int)ProjIds.BBuffaloCrash;
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new BBuffaloCrashProj(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
 	}
 }
 

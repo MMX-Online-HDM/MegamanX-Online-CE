@@ -8,7 +8,7 @@ public class KaiserSigmaBaseState : CharState {
 	public bool canShootBallistics;
 	public bool showExhaust;
 	public int exhaustMoveDir;
-	public KaiserSigma kaiserSigma;
+	public KaiserSigma kaiserSigma = null!;
 
 	public KaiserSigmaBaseState(string sprite) : base(sprite) {
 		immuneToWind = true;
@@ -49,7 +49,7 @@ public class KaiserSigmaBaseState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		kaiserSigma = character as KaiserSigma;
+		kaiserSigma = character as KaiserSigma ?? throw new NullReferenceException();
 	}
 
 	public void tauntLogic() {
@@ -74,9 +74,8 @@ public class KaiserSigmaBaseState : CharState {
 				Global.level.delayedActions.Add(
 					new DelayedAction(() => {
 						new KaiserSigmaMissileProj(
-						new KaiserMissileWeapon(),
 						posL.addxy(-8 * character.xDir, 0),
-						player, player.getNextActorNetId(),
+						1, kaiserSigma, player, player.getNextActorNetId(),
 						rpc: true
 					);
 					},
@@ -85,8 +84,7 @@ public class KaiserSigmaBaseState : CharState {
 				Global.level.delayedActions.Add(
 					new DelayedAction(() => {
 						new KaiserSigmaMissileProj(
-						new KaiserMissileWeapon(),
-						posL, player, player.getNextActorNetId(),
+						posL, 1, kaiserSigma, player, player.getNextActorNetId(),
 						rpc: true
 					);
 					},
@@ -94,8 +92,7 @@ public class KaiserSigmaBaseState : CharState {
 				));
 				Global.level.delayedActions.Add(new DelayedAction(() => {
 					new KaiserSigmaMissileProj(
-					new KaiserMissileWeapon(),
-					posR, player, player.getNextActorNetId(),
+					posR, 1, kaiserSigma, player, player.getNextActorNetId(),
 					rpc: true
 				);
 				},
@@ -104,9 +101,8 @@ public class KaiserSigmaBaseState : CharState {
 				Global.level.delayedActions.Add(
 					new DelayedAction(() => {
 						new KaiserSigmaMissileProj(
-						new KaiserMissileWeapon(),
 						posR.addxy(8 * character.xDir, 0),
-						player, player.getNextActorNetId(),
+						1, kaiserSigma, player, player.getNextActorNetId(),
 						rpc: true
 					);
 					},
@@ -117,15 +113,31 @@ public class KaiserSigmaBaseState : CharState {
 			if ((weaponR && character.xDir == 1) || (weaponL && character.xDir == -1)) {
 				if (kaiserSigma.kaiserRightMineShootTime == 0) {
 					kaiserSigma.kaiserRightMineShootTime = 1;
-					if (kaiserSigma.rightMineMod % 2 == 0) new KaiserSigmaMineProj(new KaiserMineWeapon(), character.getFirstPOIOrDefault("mineR1"), character.xDir, 0, player, player.getNextActorNetId(), rpc: true);
-					else new KaiserSigmaMineProj(new KaiserMineWeapon(), character.getFirstPOIOrDefault("mineR2"), character.xDir, 1, player, player.getNextActorNetId(), rpc: true);
+					if (kaiserSigma.rightMineMod % 2 == 0) 
+						new KaiserSigmaMineProj(
+							character.getFirstPOIOrDefault("mineR1"), character.xDir,
+							0, kaiserSigma, player, player.getNextActorNetId(), rpc: true
+						);
+					else 
+						new KaiserSigmaMineProj(
+							character.getFirstPOIOrDefault("mineR2"), character.xDir,
+							1, kaiserSigma, player, player.getNextActorNetId(), rpc: true
+						);
 					kaiserSigma.rightMineMod++;
 				}
 			} else if ((weaponR && character.xDir == -1) || (weaponL && character.xDir == 1)) {
 				if (kaiserSigma.kaiserRightMineShootTime == 0) {
 					kaiserSigma.kaiserRightMineShootTime = 1;
-					if (kaiserSigma.leftMineMod % 2 == 0) new KaiserSigmaMineProj(new KaiserMineWeapon(), character.getFirstPOIOrDefault("mineL1"), -character.xDir, 0, player, player.getNextActorNetId(), rpc: true);
-					else new KaiserSigmaMineProj(new KaiserMineWeapon(), character.getFirstPOIOrDefault("mineL2"), -character.xDir, 1, player, player.getNextActorNetId(), rpc: true);
+					if (kaiserSigma.leftMineMod % 2 == 0) 
+						new KaiserSigmaMineProj(
+							character.getFirstPOIOrDefault("mineL1"), -character.xDir,
+							0, kaiserSigma, player, player.getNextActorNetId(), rpc: true
+						);
+					else 
+						new KaiserSigmaMineProj(
+							character.getFirstPOIOrDefault("mineL2"), -character.xDir,
+							1, kaiserSigma, player, player.getNextActorNetId(), rpc: true
+						);
 					kaiserSigma.leftMineMod++;
 				}
 			}
@@ -376,9 +388,9 @@ public class KaiserSigmaFallState : KaiserSigmaBaseState {
 }
 
 public class KaiserSigmaVirusState : CharState {
-	public Anim kaiserShell;
-	public Anim relocatedKaiserShell;
-	public Anim viralSigmaHeadReturn;
+	public Anim? kaiserShell;
+	public Anim? relocatedKaiserShell;
+	public Anim? viralSigmaHeadReturn;
 
 	public bool isLerpingBack;
 	Point kaiserSigmaDestPos;
@@ -386,7 +398,7 @@ public class KaiserSigmaVirusState : CharState {
 	public bool isRelocating;
 	public int origXDir;
 
-	public KaiserSigma kaiserSigma;
+	public KaiserSigma kaiserSigma = null!;
 
 	public KaiserSigmaVirusState() : base("virus") {
 		immuneToWind = true;
@@ -494,7 +506,7 @@ public class KaiserSigmaVirusState : CharState {
 		character.destroyMusicSource();
 		character.addMusicSource("demo_X3", character.getCenterPos(), true, loop: false);
 
-		kaiserSigma = character as KaiserSigma;
+		kaiserSigma = character as KaiserSigma ?? throw new NullReferenceException();
 	}
 
 	public override void onExit(CharState newState) {
@@ -523,11 +535,11 @@ public class KaiserSigmaVirusState : CharState {
 public class KaiserSigmaBeamState : KaiserSigmaBaseState {
 	int state = 0;
 	float chargeTime;
-	KaiserSigmaBeamProj proj;
+	KaiserSigmaBeamProj? proj;
 	float randPartTime;
 	bool isDown;
-	SoundWrapper chargeSound;
-	SoundWrapper beamSound;
+	SoundWrapper? chargeSound;
+	SoundWrapper? beamSound;
 	public KaiserSigmaBeamState(bool isDown) : base(isDown ? "shoot" : "shoot2") {
 		immuneToWind = true;
 		canShootBallistics = true;
@@ -561,13 +573,13 @@ public class KaiserSigmaBeamState : KaiserSigmaBaseState {
 			if (chargeTime > 1f) {
 				state = 1;
 				proj = new KaiserSigmaBeamProj(
-					new KaiserBeamWeapon(), shootPos, character.xDir,
-					!isDown, player, player.getNextActorNetId(), rpc: true
+					shootPos, character.xDir, !isDown,
+					kaiserSigma, player, player.getNextActorNetId(), rpc: true
 				);
 				beamSound = character.playSound("kaiserSigmaBeam", sendRpc: true);
 			}
 		} else if (state == 1) {
-			if (proj.destroyed) {
+			if (proj?.destroyed == true) {
 				kaiserSigma.changeToKaiserIdleOrFall();
 			}
 		}
@@ -588,6 +600,7 @@ public class KaiserSigmaBeamState : KaiserSigmaBaseState {
 }
 
 public class KaiserBeamWeapon : Weapon {
+	public static KaiserBeamWeapon netWeapon = new();
 	public KaiserBeamWeapon() : base() {
 		weaponSlotIndex = 116;
 		index = (int)WeaponIds.Sigma3KaiserBeam;
@@ -601,10 +614,14 @@ public class KaiserSigmaBeamProj : Projectile {
 	const float beamLen = 150;
 	const float maxBeamTime = 2;
 	public KaiserSigmaBeamProj(
-		Weapon weapon, Point pos, int xDir, bool isUp, Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, bool isUp, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, 1, 0, 1, player, "empty", Global.miniFlinch, 0.15f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "empty", netId, player	
 	) {
+		weapon = KaiserBeamWeapon.netWeapon;
+		damager.damage = 1;
+		damager.hitCooldown = 15;
+		damager.flinch = Global.miniFlinch;
 		projId = (int)ProjIds.Sigma3KaiserBeam;
 		setIndestructableProperties();
 
@@ -614,15 +631,20 @@ public class KaiserSigmaBeamProj : Projectile {
 		if (xDir == 1 && isUp) beamAngle = 315;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir, (byte)(isUp ? 1 : 0));
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)(isUp ? 1 : 0));
 		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new KaiserSigmaBeamProj(
+			args.pos, args.xDir, args.extraData[0] == 1, args.owner, args.player, args.netId
+		);
 	}
 
 	public override void update() {
 		base.update();
 
 		if (globalCollider == null) {
-			globalCollider = new Collider(getPoints(), true, null, false, false, 0, new Point(0, 0));
+			globalCollider = new Collider(getPoints(), true, null!, false, false, 0, new Point(0, 0));
 		} else {
 			changeGlobalCollider(getPoints());
 		}
@@ -663,6 +685,7 @@ public class KaiserSigmaBeamProj : Projectile {
 }
 
 public class KaiserMissileWeapon : Weapon {
+	public static KaiserMissileWeapon netWeapon = new();
 	public KaiserMissileWeapon() : base() {
 		weaponSlotIndex = 114;
 		index = (int)WeaponIds.Sigma3KaiserMissile;
@@ -675,8 +698,14 @@ public class KaiserSigmaMissileProj : Projectile {
 	public float smokeTime = 0;
 	public float maxSpeed = 150;
 	public float health = 2;
-	public KaiserSigmaMissileProj(Weapon weapon, Point pos, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, 1, 0, 2, player, "kaisersigma_missile", Global.defFlinch, 0f, netProjId, player.ownedByLocalPlayer) {
+	public KaiserSigmaMissileProj(
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "kaisersigma_missile", netId, player	
+	) {
+		weapon = KaiserMissileWeapon.netWeapon;
+		damager.damage = 2;
+		damager.flinch = Global.defFlinch;
 		projId = (int)ProjIds.Sigma3KaiserMissile;
 		maxTime = 2f;
 		fadeOnAutoDestroy = true;
@@ -688,8 +717,13 @@ public class KaiserSigmaMissileProj : Projectile {
 		angle = 270;
 
 		if (rpc) {
-			rpcCreateAngle(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new KaiserSigmaMissileProj(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
 	}
 	public void reflect(float reflectAngle) {
 		angle = reflectAngle;
@@ -751,6 +785,7 @@ public class KaiserSigmaMissileProj : Projectile {
 }
 
 public class KaiserMineWeapon : Weapon {
+	public static KaiserMineWeapon netWeapon = new();
 	public KaiserMineWeapon() : base() {
 		weaponSlotIndex = 115;
 		index = (int)WeaponIds.Sigma3KaiserMine;
@@ -764,23 +799,34 @@ public class KaiserSigmaMineProj : Projectile, IDamagable {
 	float health = 3;
 	int type;
 	bool startWall;
-	public KaiserSigmaMineProj(Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 100, 4, player, "kaisersigma_mine", Global.defFlinch, 0.15f, netProjId, player.ownedByLocalPlayer) {
+	public KaiserSigmaMineProj(
+		Point pos, int xDir, int type, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "kaisersigma_mine", netId, player	
+	) {
+		weapon = KaiserMineWeapon.netWeapon;
+		damager.damage = 4;
+		damager.hitCooldown = 15;
+		damager.flinch = Global.defFlinch;
+		vel = new Point(100 * xDir, 0);
 		projId = (int)ProjIds.Sigma3KaiserMine;
 		maxTime = 4f;
 		this.type = type;
 		fadeSprite = "explosion";
-		fadeSound = "explosion";
+		fadeSound = "explosionX3";
 		netcodeOverride = NetcodeModel.FavorDefender;
-
 		if (type == 1) {
-			vel.y = 100;
-			vel = vel.normalize().times(speed);
+			vel = new Point(100 * xDir, 100);
 		}
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)type);
 		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new KaiserSigmaMineProj(
+			args.pos, args.xDir, args.extraData[0], args.owner, args.player, args.netId
+		);
 	}
 
 	public override void onStart() {
@@ -926,6 +972,6 @@ public class KaiserSigmaRevive : CharState {
 		//character.immuneToKnockback = true;
 		character.alpha = 0;
 		player.sigmaAmmo = player.sigmaMaxAmmo;
-		KaiserSigma kaiserSigma = character as KaiserSigma;
+		KaiserSigma kaiserSigma = (character as KaiserSigma)!;
 	}
 }

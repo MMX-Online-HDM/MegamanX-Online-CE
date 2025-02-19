@@ -5,6 +5,7 @@ using SFML.Graphics;
 namespace MMXOnline;
 
 public class GigaCrush : Weapon {
+	public static GigaCrush netWeapon = new();
 	public GigaCrush() : base() {
 		shootSounds = new string[] { "gigaCrushX2", "gigaCrushX2", "gigaCrushX2", "gigaCrushX2" };
 		fireRate = 60;
@@ -42,20 +43,27 @@ public class GigaCrushProj : Projectile {
 	bool pilarCreated;
 
 	public GigaCrushProj(
-		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, 12, player, "empty", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "empty", netId, player
 	) {
+		weapon = GigaCrush.netWeapon;
+		damager.damage = 12;
+		damager.hitCooldown = 30;
+		damager.flinch = Global.defFlinch;
 		maxActiveTime = 0.4f;
-		destroyOnHit = false;
-		shouldShieldBlock = false;
 		vel = new Point();
 		projId = (int)ProjIds.GigaCrush;
-		shouldVortexSuck = false;
+		setIndestructableProperties();
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new GigaCrushProj(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
 	}
 
 	public override void update() {
@@ -145,6 +153,7 @@ public class GigaCrushCharState : CharState {
 	GigaCrushProj? proj;
 	bool fired;
 	Point moveDir = new(0, -20);
+	public MegamanX mmx = null!;
 
 	public GigaCrushCharState() : base("gigacrush") {
 		invincible = true;
@@ -155,8 +164,8 @@ public class GigaCrushCharState : CharState {
 		if (character.frameIndex == 4 && !fired) {
 			fired = true;
 			proj = new GigaCrushProj(
-				new GigaCrush(), character.getCenterPos(), character.xDir,
-				player, player.getNextActorNetId(), rpc: true
+				character.getCenterPos(), character.xDir, 
+				mmx, player, player.getNextActorNetId(), rpc: true
 			);
 		}
 		if (character.isAnimOver()) {
@@ -174,8 +183,9 @@ public class GigaCrushCharState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		player.character.useGravity = false;
-		player.character.vel.y = 0;
+		mmx = character as MegamanX ?? throw new NullReferenceException();
+		mmx.useGravity = false;
+		mmx.vel.y = 0;
 		if (character.ownedByLocalPlayer && player == Global.level.mainPlayer) {
 			new GigaCrushBackwall(character.pos, character);
 		}
@@ -191,7 +201,7 @@ public class GigaCrushCharState : CharState {
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
-		player.character.useGravity = true;
+		mmx.useGravity = true;
 		if (proj != null && !proj.destroyed) proj.destroySelf();
 	}
 }
