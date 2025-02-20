@@ -256,7 +256,6 @@ public class NecroBurstAttack : CharState {
 		if (!shot) {
 			shot = true;
 			shoot(vile);
-			vile.health -= 6;
 		}
 		if (character.sprite.isAnimOver()) {
 			character.changeToIdleOrFall();
