@@ -262,9 +262,10 @@ public class RevolverBarrel : AxlWeapon {
 	}
 }
 public class AncientGun : AxlWeapon {
-	public AncientGun() : base(0) {
+	public AncientGun(AxlBulletWeaponType type = AxlBulletWeaponType.AncientGun) : base(0) {
 		index = (int)WeaponIds.AncientGun;
 		weaponBarBaseIndex = 49;
+		this.type = (int)type;
 		weaponBarIndex = 28;
 		weaponSlotIndex = 100;
 		killFeedIndex = 131;
