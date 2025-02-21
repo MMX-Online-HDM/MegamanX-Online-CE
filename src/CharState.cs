@@ -1550,6 +1550,14 @@ public class Die : CharState {
 				once = true;
 				character.visible = false;
 				player.explodeDieStart2();
+				if (character is BaseSigma)
+				if (!player.isTagTeam()) {
+					foreach (var weapon in new List<Weapon>(player.weapons)) {
+						if (weapon is MaverickWeapon mw && mw.maverick != null) {
+							mw.maverick.changeState(new MExit(mw.maverick.pos, true), true);
+						}
+					}
+				}
 			}
 			if (stateTime >= 2.5f) {
 				destroyRideArmor();
