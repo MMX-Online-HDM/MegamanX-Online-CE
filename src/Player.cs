@@ -719,11 +719,6 @@ public partial class Player {
 		return (ushort)(Level.firstNormalNetId + (ushort)(id * netIdsPerPlayer));
 	}
 
-	// The character net id is always the first net id of the player
-	public ushort getCharActorNetId() {
-		return getStartNetId();
-	}
-
 	public static int? getPlayerIdFromCharNetId(ushort charNetId) {
 		int netIdInt = charNetId;
 		int maxIdInt = Level.firstNormalNetId;
@@ -755,7 +750,8 @@ public partial class Player {
 		return retId;
 	}
 
-	// Usually, only the main player is allowed to get the next actor net id. The exception is if you call setNextActorNetId() first. The assert checks for that in debug.
+	// Usually, only the main player is allowed to get the next actor net id. 
+	// The exception is if you call setNextActorNetId() first. The assert checks for that in debug.
 	public ushort getNextActorNetId(bool allowNonMainPlayer = false) {
 		// Increase by 1 normall.
 		int retId = curMaxNetId;

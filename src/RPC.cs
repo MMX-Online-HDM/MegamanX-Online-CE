@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Numerics;
 using Lidgren.Network;
 using Newtonsoft.Json;
 
@@ -22,7 +23,7 @@ public class RPC {
 	public static RPCUpdateActor updateActor = new();
 	public static RPCApplyDamage applyDamage = new();
 	public static RPCDecShieldAmmo decShieldAmmo = new();
-	public static RPCShoot shoot =  new RPCShoot(NetDeliveryMethod.ReliableOrdered);
+	public static RPCShoot shoot = new RPCShoot(NetDeliveryMethod.ReliableOrdered);
 	public static RPCShoot shootFast = new RPCShoot(NetDeliveryMethod.Unreliable);
 	public static RPCDestroyActor destroyActor = new();
 	public static RPCPlayerToggle playerToggle = new();
@@ -107,7 +108,7 @@ public class RPC {
 		reportPlayerResponse,
 		kickPlayerRequest,
 		kickPlayerResponse,
-		updatePlayer, 
+		updatePlayer,
 		addBot,
 		removeBot,
 		makeSpectator,
@@ -253,7 +254,7 @@ public class BackloggedSpawns {
 	public byte[] extraData;
 
 	public BackloggedSpawns(
-		int charNum, byte[] extraData, int playerId, 
+		int charNum, byte[] extraData, int playerId,
 		Point spawnPoint, int xDir, ushort charNetId
 	) {
 		this.charNum = charNum;
@@ -367,7 +368,7 @@ public class RPCApplyDamage : RPC {
 		ushort projId = BitConverter.ToUInt16(
 			new byte[] { arguments[17], arguments[18] }, 0
 		);
-		byte linkedMeleeId = arguments[19];
+		int linkedMeleeId = arguments[19];
 		bool isLinkedMelee = (linkedMeleeId != byte.MaxValue);
 
 		var player = Global.level.getPlayerById(ownerId);
@@ -376,61 +377,98 @@ public class RPCApplyDamage : RPC {
 		// For when the projectile was a melee without a NetID.
 		if (isLinkedMelee) {
 			Actor? mainActor = Global.level.getActorByNetId(actorId, true);
-			List<Projectile> projs = new();
 			if (mainActor != null) {
-				// We try to search anything with a matching MeleeID.
-				actor = mainActor.getMeleeProjById(linkedMeleeId, mainActor.pos, false);
-
-				// If that fails... screw it we create one.
-				if (actor == null) {
-					actor = new GenericMeleeProj(
-						new Weapon(), mainActor.pos, (ProjIds)projId,
-						player, damage, flinch, hitCooldown, mainActor,
-						addToLevel: false
-					) {
-						meleeId = linkedMeleeId,
-						owningActor = mainActor
-					};
-				}
+				searchMeleeProj(mainActor, linkedMeleeId, player, projId, damage, flinch, hitCooldown);
 			}
 		}
 		// For normal projectiles.
 		else {
 			actor = (actorId == 0 ? null : Global.level.getActorByNetId(actorId, true));
+			linkedMeleeId = -1;
+		}
+		if (player == null || victim == null) {
+			return;
 		}
 
-		//if (actor == null) {
-			// Add code for delayed projectile here.
-		//}
-
-		if (player != null && victim != null) {
-			Damager.applyDamage(
-				player,
-				damage,
-				hitCooldown,
-				flinch,
-				victim,
-				weakness,
-				weaponIndex,
-				weaponKillFeedIndex,
-				actor,
-				projId,
-				sendRpc: false
-			);
+		// Add code for delayed projectile here.
+		if (actor == null && actorId != 0) {
+			Global.level.backloggedDamages.Add(new BackloggedDamage(
+				actorId, linkedMeleeId,
+				(Actor? damagerActor, int linkedMeleeId) => {
+					if (damagerActor != null && linkedMeleeId >= 0) {
+						searchMeleeProj(
+							damagerActor, linkedMeleeId,
+							player, projId, damage, flinch, hitCooldown
+						);
+					}
+					Damager.applyDamage(
+						player,
+						damage,
+						hitCooldown,
+						flinch,
+						victim,
+						weakness,
+						weaponIndex,
+						weaponKillFeedIndex,
+						damagerActor,
+						projId,
+						sendRpc: false
+					);
+				}
+			));
+			return;
 		}
+
+		Damager.applyDamage(
+			player,
+			damage,
+			hitCooldown,
+			flinch,
+			victim,
+			weakness,
+			weaponIndex,
+			weaponKillFeedIndex,
+			actor,
+			projId,
+			sendRpc: false
+		);
 	}
 
 	public void sendRpc(byte[] byteArray) {
 		Global.serverClient?.rpc(applyDamage, byteArray);
 	}
+
+	public static Actor searchMeleeProj(
+		Actor mainActor, int meleeId,
+		Player player, int projId,
+		float damage, int flinch, float hitCooldown
+	) {
+		// We try to search anything with a matching MeleeID.
+		Actor? actor = mainActor.getMeleeProjById(meleeId, mainActor.pos, false);
+
+		// If that fails... screw it we create one.
+		if (actor == null) {
+			actor = new GenericMeleeProj(
+				new Weapon(), mainActor.pos, (ProjIds)projId,
+				player, damage, flinch, hitCooldown, mainActor,
+				addToLevel: false
+			) {
+				meleeId = meleeId,
+				owningActor = mainActor
+			};
+		}
+		return actor;
+	}
 }
 
 public class BackloggedDamage {
 	public ushort actorId;
-	public Action<Actor> damageAction;
+	public int meleeId;
+	public Action<Actor?, int> damageAction;
 	public float time;
-	public BackloggedDamage(ushort actorId, Action<Actor> damageAction) {
+	public BackloggedDamage(ushort actorId, int meleeId, Action<Actor?, int> damageAction) {
 		this.actorId = actorId;
+		this.meleeId = meleeId;
 		this.damageAction = damageAction;
 	}
 }
@@ -578,7 +616,7 @@ public class RPCDestroyCharacter : RPC {
 		args.Add((byte)player.id);
 		args.AddRange(BitConverter.GetBytes(character.netId.Value));
 
-		Global.serverClient?.rpc(RPC.destroyCharacter, args.ToArray());
+		Global.serverClient.rpc(destroyCharacter, args.ToArray());
 	}
 }
 
@@ -739,8 +777,7 @@ public class RPCActorToggle : RPC {
 			new Anim(actor.pos, "sonicslicer_sparks", actor.xDir, null, true);
 		} else if (toggleId == RPCActorToggleType.StartGravityWell && actor is GravityWellProjCharged gw) {
 			gw.started = true;
-		}
-		else if (toggleId == RPCActorToggleType.AddWolfSigmaMusicSource) {
+		} else if (toggleId == RPCActorToggleType.AddWolfSigmaMusicSource) {
 			actor.addMusicSource("wolfSigma", actor.pos.addxy(0, -75), false);
 		} else if (toggleId == RPCActorToggleType.AddWolfSigmaIntroMusicSource) {
 			actor.addMusicSource("wolfSigmaIntro", actor.pos.addxy(0, -75), false, loop: false);
@@ -758,8 +795,7 @@ public class RPCActorToggle : RPC {
 		} else if (toggleId == RPCActorToggleType.AddKaiserViralSigmaMusicSource) {
 			actor.destroyMusicSource();
 			actor.addMusicSource("demo_X3", actor.getCenterPos(), true);
-		}
-		else if (toggleId == RPCActorToggleType.StartMechSelfDestruct && actor is RideArmor ra) {
+		} else if (toggleId == RPCActorToggleType.StartMechSelfDestruct && actor is RideArmor ra) {
 			ra.selfDestructTime = Global.spf;
 		} else if (toggleId == RPCActorToggleType.ShakeCamera) {
 			actor.shakeCamera();
@@ -1264,7 +1300,7 @@ public class RPCAxlShoot : RPC {
 		var player = Global.level.getPlayerById(playerId);
 		if (player?.character == null) return;
 		//this is just a mess
-		
+
 		switch (projId) {
 			case (int)ProjIds.AxlBullet:
 			case (int)ProjIds.MetteurCrash:
@@ -1457,7 +1493,7 @@ public class RPCAxlDisguise : RPC {
 		}
 		if (axlDisguiseData.charNum == -1) {
 			player.revertToAxl(axlDisguiseData.dnaNetId);
-		} else if (axlDisguiseData.charNum  == -2) {
+		} else if (axlDisguiseData.charNum == -2) {
 			player.revertToAxlDeath();
 		} else {
 			player.transformAxlNet(axlDisguiseData);
