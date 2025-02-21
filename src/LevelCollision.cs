@@ -352,17 +352,22 @@ public partial class Level {
 
 	public Point? getMtvDir(
 		Actor actor, float inX, float inY, Point? vel,
-		bool pushIncline, List<CollideData> overrideCollideDatas = null
+		bool pushIncline, List<CollideData>? overrideCollideDatas = null
 	) {
-		var collideDatas = overrideCollideDatas;
-		if (collideDatas == null) {
-			collideDatas = Global.level.checkTerrainCollision(actor, inX, inY, vel);
+		Collider? terrainCollider = actor.getTerrainCollider() ?? actor.physicsCollider ?? actor.collider;
+
+		if (terrainCollider == null) {
+			return null;
 		}
 
-		var onlyWalls = collideDatas.Where(cd => !(cd.gameObject is Wall)).Count() == 0;
-		//var onlyWalls = (_.filter(collideDatas, (cd) => { return !(cd.gameObject is Wall); })).Count == 0;
-
-		var actorShape = actor.collider.shape.clone(inX, inY);
+		List<CollideData> collideDatas;
+		if (overrideCollideDatas == null) {
+			collideDatas = Global.level.checkTerrainCollision(actor, inX, inY, vel);
+		} else {
+			collideDatas = overrideCollideDatas;
+		}
+		bool onlyWalls = collideDatas.Where(cd => !(cd.gameObject is Wall)).Count() == 0;
+		Shape actorShape = terrainCollider.shape.clone(inX, inY);
 		Point? pushDir = null;
 
 		if (vel != null) {
