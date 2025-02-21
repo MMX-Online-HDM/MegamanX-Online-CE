@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using SFML.Graphics;
 using SFML.System;
-using static SFML.Graphics.BlendMode;
 
 namespace MMXOnline;
 
