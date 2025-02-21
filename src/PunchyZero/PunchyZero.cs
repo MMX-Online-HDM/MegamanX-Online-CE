@@ -468,22 +468,22 @@ public class PunchyZero : Character {
 			}
 			if (gigaAttack is RekkohaWeapon) {
 				gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-				changeState(new RekkohaState(gigaAttack), true);
+				changeState(new PunchyZeroRekkohaState(gigaAttack), true);
 			} else if (gigaAttack is RakuhouhaWeapon) {
 				gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-				changeState(new RakuhouhaState(gigaAttack), true);
+				changeState(new PunchyZeroRakuhouhaState(gigaAttack), true);
 			}
 			else if (gigaAttack is CFlasher) {
 				gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-				changeState(new CFlasherState(gigaAttack), true);
+				changeState(new PunchyZeroCFlasherState(gigaAttack), true);
 			}
 			else if (gigaAttack is ShinMessenkou) {
 				gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-				changeState(new ShinMessenkouState(gigaAttack), true);
+				changeState(new PunchyZeroShinMessenkouState(gigaAttack), true);
 			}
 			else if (gigaAttack is DarkHoldWeapon) {
 				gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-				changeState(new DarkHoldShootState(gigaAttack), true);
+				changeState(new PunchyZeroDarkHoldShootState(gigaAttack), true);
 			}
 			return true;
 		}
@@ -837,22 +837,22 @@ public class PunchyZero : Character {
 				case 3 when grounded && gigaAttack.shootCooldown <= 0 && gigaAttack.ammo >= gigaAttack.getAmmoUsage(0):
 					if (gigaAttack is RekkohaWeapon) {
 						gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-						changeState(new RekkohaState(gigaAttack), true);
+						changeState(new PunchyZeroRekkohaState(gigaAttack), true);
 					} else if (gigaAttack is RakuhouhaWeapon) {
 						gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-						changeState(new RakuhouhaState(gigaAttack), true);
+						changeState(new PunchyZeroRakuhouhaState(gigaAttack), true);
 					}
 					else if (gigaAttack is CFlasher) {
 						gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-						changeState(new CFlasherState(gigaAttack), true);
+						changeState(new PunchyZeroCFlasherState(gigaAttack), true);
 					}
 					else if (gigaAttack is ShinMessenkou) {
 						gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-						changeState(new ShinMessenkouState(gigaAttack), true);
+						changeState(new PunchyZeroShinMessenkouState(gigaAttack), true);
 					}
 					else if (gigaAttack is DarkHoldWeapon) {
 						gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-						changeState(new DarkHoldShootState(gigaAttack), true);
+						changeState(new PunchyZeroDarkHoldShootState(gigaAttack), true);
 					}
 					break;
 				case 4 when grounded && isFacingTarget:
