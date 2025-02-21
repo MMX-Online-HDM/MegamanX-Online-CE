@@ -9,7 +9,7 @@
 		<Version>20</Version>
 		<AssemblyVersion>20.0</AssemblyVersion>
 		<ApplicationIcon>app.ico</ApplicationIcon>
-		<TargetFramework>net9.0-windows</TargetFramework>
+		<TargetFramework>net6.0-windows</TargetFramework>
 		<ImplicitUsings>false</ImplicitUsings>
 		<SelfContained>false</SelfContained>
 		<OutputPath>./bin/</OutputPath>
@@ -20,7 +20,6 @@
 		<Deterministic>true</Deterministic>
 		<NeutralLanguage>en</NeutralLanguage>
 		<FileVersion>20.0</FileVersion>
-		<Configurations>Debug;Release;Debug2</Configurations>
 	</PropertyGroup>
 
 	<!--For making output go to anycpu if the RuntimeIdentifier is empty-->
