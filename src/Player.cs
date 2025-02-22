@@ -358,10 +358,8 @@ public partial class Player {
 		name = serverPlayer.name;
 		ping = serverPlayer.ping;
 
-		if (!ownedByLocalPlayer) {
-			kills = serverPlayer.kills;
-			deaths = serverPlayer.deaths;
-		}
+		kills = serverPlayer.kills;
+		deaths = serverPlayer.deaths;
 
 		if (ownedByLocalPlayer && serverPlayer.autobalanceAlliance != null &&
 			newAlliance != serverPlayer.autobalanceAlliance.Value
