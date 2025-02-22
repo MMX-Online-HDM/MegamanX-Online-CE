@@ -941,6 +941,7 @@ public partial class Level {
 			if (hostPlayer.serverPlayer.id == mainPlayer.id) continue;
 			var player = players.Find(p => p.id == hostPlayer.serverPlayer.id);
 			if (player == null) continue;
+			if (player.ownedByLocalPlayer) continue;
 
 			player.alliance = hostPlayer.serverPlayer.alliance;
 			player.newAlliance = hostPlayer.newAlliance;
