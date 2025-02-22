@@ -90,6 +90,7 @@ public class Hurt : CharState {
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
+		character.dashedInAir = 0;
 	}
 }
 
