@@ -91,7 +91,7 @@ public class Hurt : CharState {
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		//Intended. Do not remove.
-		character.dashedInAir = 0;
+		//character.dashedInAir = 0;
 	}
 }
 
