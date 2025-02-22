@@ -29,7 +29,9 @@ public partial class Actor {
 
 	public void changeGlobalCollider(List<Point> newPoints) {
 		Global.level.removeFromGrid(this);
-		_globalCollider._shape.points = newPoints;
+		if (_globalCollider != null) {
+			_globalCollider._shape.points = newPoints;
+		}
 		Global.level.addToGrid(this);
 	}
 
@@ -64,7 +66,7 @@ public partial class Actor {
 		return new Rect(minX, minY, maxX, maxY).getShape();
 	}
 
-	public Collider collider {
+	public Collider? collider {
 		get {
 			Collider? stdColl = getAllColliders().FirstOrDefault();
 			if (stdColl == null) {
@@ -188,7 +190,7 @@ public partial class Actor {
 	public Dictionary<string, Collider?> spriteToCollider = new();
 
 	public void changeGlobalColliderOnSpriteChange(string newSpriteName) {
-		if (spriteToColliderMatch(newSpriteName, out Collider overrideGlobalCollider)) {
+		if (spriteToColliderMatch(newSpriteName, out Collider? overrideGlobalCollider)) {
 			changeGlobalColliderWithoutGridChange(overrideGlobalCollider);
 		} else {
 			changeGlobalColliderWithoutGridChange(getGlobalCollider());
@@ -299,7 +301,7 @@ public partial class Actor {
 		move(dir.times(speed));
 	}
 
-	public bool tryMoveExact(Point amount, out CollideData hit) {
+	public bool tryMoveExact(Point amount, out CollideData? hit) {
 		hit = Global.level.checkTerrainCollisionOnce(this, amount.x, amount.y);
 		if (hit != null) {
 			return false;
@@ -308,7 +310,7 @@ public partial class Actor {
 		return true;
 	}
 
-	public bool tryMove(Point amount, out CollideData hit) {
+	public bool tryMove(Point amount, out CollideData? hit) {
 		hit = Global.level.checkTerrainCollisionOnce(this, amount.x * Global.spf * 2, amount.y * Global.spf * 2);
 		if (hit != null) {
 			return false;
@@ -427,7 +429,7 @@ public partial class Actor {
 		}
 	}
 
-	public CollideData checkCollision(float incX, float incY) {
+	public CollideData? checkCollision(float incX, float incY) {
 		return Global.level.checkTerrainCollisionOnce(this, incX, incY, autoVel: true);
 	}
 }

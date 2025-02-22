@@ -3,7 +3,7 @@ namespace MMXOnline;
 
 public class FlameStag : Maverick {
 	public static Weapon getWeapon() { return new Weapon(WeaponIds.FStagGeneric, 144); }
-	public static Weapon getUppercutWeapon(Player player) { return new Weapon(WeaponIds.FStagGeneric, 144, new Damager(player, 4, Global.defFlinch, 0.25f)); }
+	public static Weapon staticUppercutWeapon = new Weapon(WeaponIds.FStagGeneric, 144);
 	public Weapon uppercutWeapon;
 
 	public Sprite antler;
@@ -13,7 +13,7 @@ public class FlameStag : Maverick {
 	public FlameStag(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
 		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
 		weapon = getWeapon();
-		uppercutWeapon = getUppercutWeapon(player);
+		uppercutWeapon = new Weapon(WeaponIds.FStagGeneric, 144, new Damager(player, 0, 0, 0));
 
 		canClimbWall = true;
 		width = 20;
@@ -593,8 +593,11 @@ public class FStagUppercutState : MaverickState {
 
 	public void crashAndDamage(bool isCeiling) {
 		if (getVictim() != null) {
-				FlameStagger.uppercutWeapon.applyDamage(victim, false, FlameStagger, (int)ProjIds.FStagUppercut,
-				overrideDamage: isCeiling ? 3 : 5, overrideFlinch: isCeiling ? 0 : Global.defFlinch, sendRpc: true);
+			FlameStagger.uppercutWeapon.applyDamage(
+				victim, false, FlameStagger, (int)ProjIds.FStagUppercut,
+				overrideDamage: isCeiling ? 3 : 5, overrideFlinch: isCeiling ? 0 : Global.defFlinch,
+				sendRpc: true
+			);
 		}
 		maverick.playSound("crash", sendRpc: true);
 		maverick.shakeCamera(sendRpc: true);
@@ -636,7 +639,7 @@ public class FStagUppercutState : MaverickState {
 public class FStagGrabbed : GenericGrabbedState {
 	public Character? grabbedChar;
 	public float timeNotGrabbed;
-	string lastGrabberSpriteName;
+	string lastGrabberSpriteName = "";
 	public const float maxGrabTime = 4;
 	public FStagGrabbed(FlameStag grabber) : base(grabber, maxGrabTime, "_dash_grab") {
 		customUpdate = true;

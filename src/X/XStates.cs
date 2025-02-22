@@ -359,10 +359,10 @@ public class X2ChargeShot : CharState {
 	int shootNum;
 	bool pressFire;
 	Weapon? weaponOverride;
-	Weapon weapon => (weaponOverride ?? mmx.currentWeapon);
+	Weapon weapon => (weaponOverride ?? mmx.currentWeapon ?? mmx.specialBuster);
 	MegamanX mmx = null!;
 
-	public X2ChargeShot(Weapon weaponOverride, int shootNum) : base("x2_shot") {
+	public X2ChargeShot(Weapon? weaponOverride, int shootNum) : base("x2_shot") {
 		this.shootNum = shootNum;
 		this.weaponOverride = weaponOverride;
 		useDashJumpSpeed = true;

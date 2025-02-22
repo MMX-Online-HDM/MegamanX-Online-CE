@@ -274,7 +274,7 @@ public class MegamanX : Character {
 			return true;
 		}
 		if (bufferedShotPressed && stockedBuster) {
-			shoot(1, currentWeapon, true);
+			shoot(1, currentWeapon ?? specialBuster, true);
 			return true;
 		}
 		if (!isCharging() && currentWeapon != null && canShoot() && (
@@ -293,7 +293,7 @@ public class MegamanX : Character {
 
 	// Shoots stuff.
 	public void shoot(int chargeLevel) {
-		shoot(chargeLevel, currentWeapon, false);
+		shoot(chargeLevel, currentWeapon ?? specialBuster, false);
 	}
 
 	public void shoot(int chargeLevel, Weapon weapon, bool busterStock) {
@@ -776,7 +776,7 @@ public class MegamanX : Character {
 		List<ShaderWrapper> baseShaders = base.getShaders();
 		List<ShaderWrapper> shaders = new();
 		ShaderWrapper? palette = null;
-		int index = player.weapon.index;
+		int index = currentWeapon?.index ?? 0;
 
 		if (stingActiveTime > 0 && stingPaletteIndex != 0){
 			palette = player.xStingPaletteShader;

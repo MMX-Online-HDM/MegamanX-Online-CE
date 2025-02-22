@@ -81,7 +81,7 @@ public class CharState {
 		}
 	}
 
-	public virtual void onExit(CharState newState) {
+	public virtual void onExit(CharState? newState) {
 		if (!useGravity) {
 			character.useGravity = true;
 		}

@@ -88,7 +88,7 @@ public class Hurt : CharState {
 		}
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		//Intended. Do not remove.
 		character.dashedInAir = 0;
@@ -324,8 +324,8 @@ public class KnockedDown : CharState {
 			character.move(new Point(hurtSpeed, 0));
 		}
 
-		if (player.character.canCharge() && player.input.isHeld(Control.Shoot, player)) {
-			player.character.increaseCharge();
+		if (character.canCharge() && player.input.isHeld(Control.Shoot, player)) {
+			character.increaseCharge();
 		}
 
 		if (stateTime >= flinchTime) {
