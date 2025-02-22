@@ -737,7 +737,7 @@ public partial class Character : Actor, IDamagable {
 				wsr.groundStart = true;
 				return;
 			}
-			if (!killZone.killInvuln && player.isKaiserSigma()) return;
+			if (!killZone.killInvuln && this is KaiserSigma) return;
 			if (!killZone.killInvuln && this is MegamanX { stingActiveTime: >0 } ) return;
 			if (!killZone.killInvuln && this is Axl { stealthActive: true} ) return;
 			if (rideArmor != null && rideArmor.rideArmorState is RADropIn) return;
@@ -1640,13 +1640,7 @@ public partial class Character : Actor, IDamagable {
 		if (sprite.name.Contains("_ra_")) {
 			return pos.addxy(0, -10);
 		}
-		if (player.isSigma) {
-			if (player.isKaiserSigma() && !player.isKaiserViralSigma()) {
-				return pos.addxy(13 * xDir, -95);
-			}
-			return getCenterPos();
-		}
-		return pos.addxy(0, -18);
+		return getCenterPos();
 	}
 
 	public virtual Point getParasitePos() {
@@ -2932,6 +2926,10 @@ public partial class Character : Actor, IDamagable {
 		// This ensures that the "onExit" charState function
 		// Can do any cleanup it needs to do without having to copy-paste that code here too.
 		charState?.onExit(null);
+	}
+
+	public virtual void onDeath() {
+		
 	}
 
 	public void cleanupBeforeTransform() {

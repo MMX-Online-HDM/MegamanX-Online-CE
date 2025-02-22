@@ -674,12 +674,6 @@ public class RPCPlayerToggle : RPC {
 			if (player.character is Axl axl) {
 				axl.whiteAxlTime = axl.maxHyperAxlTime;
 			}
-		} else if (toggleId == RPCToggleType.ReviveVileTo2) {
-			player.reviveVileNonOwner(false);
-		} else if (toggleId == RPCToggleType.ReviveVileTo5) {
-			player.reviveVileNonOwner(true);
-		} else if (toggleId == RPCToggleType.ReviveX) {
-			player.reviveXNonOwner();
 		} else if (toggleId == RPCToggleType.StartRev) {
 			if (player.character is Axl axl) {
 				axl.isNonOwnerRev = true;

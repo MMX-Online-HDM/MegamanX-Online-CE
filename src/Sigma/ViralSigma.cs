@@ -200,4 +200,24 @@ public class ViralSigma : Character {
 	public override Point getCamCenterPos(bool ignoreZoom = false) {
 		return pos.round().addxy(camOffsetX, 25);
 	}
+
+	public override void onDeath() {
+		base.onDeath();
+		player.lastDeathWasSigmaHyper = true;
+
+		visible = false;
+		Anim anim = new Anim(
+			pos, lastViralSprite, 1, player.getNextActorNetId(), false, sendRpc: true
+		);
+		anim.ttl = 3;
+		anim.blink = true;
+		anim.frameIndex = lastViralFrameIndex;
+		anim.frameSpeed = 0;
+		anim.angle = lastViralAngle;
+		var ede = new ExplodeDieEffect(
+			player, pos, pos, "empty", 1, zIndex, false, 20, 3, false
+		);
+		ede.host = anim;
+		Global.level.addEffect(ede);
+	}
 }

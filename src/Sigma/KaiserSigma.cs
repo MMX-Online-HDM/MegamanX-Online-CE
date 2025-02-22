@@ -228,11 +228,12 @@ public partial class KaiserSigma : Character {
 	}
 
 	public override Point getAimCenterPos() {
-		if (!player.isKaiserViralSigma()) {
+		if (isVirus()) {
 			return pos.addxy(13 * xDir, -95);
 		}
 		return getCenterPos();
 	}
+
 
 	public override string getSprite(string spriteName) {
 		return "kaisersigma_" + spriteName;
@@ -345,5 +346,57 @@ public partial class KaiserSigma : Character {
 
 	public override bool isPushImmune() {
 		return true;
+	}
+
+	public bool isVirus() {
+		return sprite.name.StartsWith("kaisersigma_virus");
+	}
+	
+	public override void onDeath() {
+		base.onDeath();
+		player.lastDeathWasSigmaHyper = true;
+
+		visible = false;
+		string deathSprite = "";
+		if (lastHyperSigmaSprite.StartsWith("kaisersigma_virus")) {
+			deathSprite = lastHyperSigmaSprite;
+			Point explodeCenterPos = pos.addxy(0, -16);
+			var ede = new ExplodeDieEffect(
+				player, explodeCenterPos, explodeCenterPos,
+				"empty", 1, zIndex, false, 16, 3, false
+			);
+			Global.level.addEffect(ede);
+		} else {
+			deathSprite = lastHyperSigmaSprite + "_body";
+			if (!Global.sprites.ContainsKey(deathSprite)) {
+				deathSprite = "kaisersigma_idle";
+			}
+			Point explodeCenterPos = pos.addxy(0, -55);
+			var ede = new ExplodeDieEffect(
+				player, explodeCenterPos, explodeCenterPos, "empty",
+				1, zIndex, false, 60, 3, false
+			);
+			Global.level.addEffect(ede);
+
+			var headAnim = new Anim(
+				pos, lastHyperSigmaSprite, 1,
+				player.getNextActorNetId(), false, sendRpc: true
+			);
+			headAnim.ttl = 3;
+			headAnim.blink = true;
+			headAnim.setFrameIndexSafe(lastHyperSigmaFrameIndex);
+			headAnim.xDir = lastHyperSigmaXDir;
+			headAnim.frameSpeed = 0;
+		}
+
+		var anim = new Anim(
+			pos, deathSprite, 1, player.getNextActorNetId(),
+			false, sendRpc: true, zIndex: ZIndex.Background + 1000
+		);
+		anim.ttl = 3;
+		anim.blink = true;
+		anim.setFrameIndexSafe(lastHyperSigmaFrameIndex);
+		anim.xDir = lastHyperSigmaXDir;
+		anim.frameSpeed = 0;
 	}
 }
