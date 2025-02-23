@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using SFML.Graphics;
 
 namespace MMXOnline;
@@ -18,7 +19,7 @@ public class ViralSigma : Character {
 
 	public float viralSigmaBeamLength;
 	public int lastViralXDir = 1;
-	public Character possessTarget;
+	public Character? possessTarget;
 	public float possessEnemyTime;
 	public float maxPossessEnemyTime;
 	public int numPossesses;
@@ -62,7 +63,7 @@ public class ViralSigma : Character {
 		}
 
 		if (charState is not Die) {
-			lastViralSprite = sprite?.name;
+			lastViralSprite = sprite.name;
 			lastViralFrameIndex = frameIndex;
 			lastViralAngle = angle ?? 0;
 
@@ -119,6 +120,24 @@ public class ViralSigma : Character {
 			}
 		}
 		return false;
+	}
+
+		public override Dictionary<int, Func<Projectile>> getGlobalProjs() {
+		var retProjs = new Dictionary<int, Func<Projectile>>();
+
+		// TODO: Move this to viral Sigma class.
+		if (sprite.name.Contains("viral_tackle") && sprite.time > 0.15f) {
+			retProjs[(int)ProjIds.Sigma2ViralTackle] = () => {
+				var damageCollider = getAllColliders().FirstOrDefault(c => c.isAttack());
+				Point centerPoint = damageCollider.shape.getRect().center();
+				Projectile proj = new GenericMeleeProj(
+					new ViralSigmaTackleWeapon(player), centerPoint, ProjIds.Sigma2ViralTackle, player
+				);
+				proj.globalCollider = damageCollider.clone();
+				return proj;
+			};
+		}
+		return retProjs;
 	}
 
 	public override bool isSoundCentered() {
@@ -180,5 +199,25 @@ public class ViralSigma : Character {
 
 	public override Point getCamCenterPos(bool ignoreZoom = false) {
 		return pos.round().addxy(camOffsetX, 25);
+	}
+
+	public override void onDeath() {
+		base.onDeath();
+		player.lastDeathWasSigmaHyper = true;
+
+		visible = false;
+		Anim anim = new Anim(
+			pos, lastViralSprite, 1, player.getNextActorNetId(), false, sendRpc: true
+		);
+		anim.ttl = 3;
+		anim.blink = true;
+		anim.frameIndex = lastViralFrameIndex;
+		anim.frameSpeed = 0;
+		anim.angle = lastViralAngle;
+		var ede = new ExplodeDieEffect(
+			player, pos, pos, "empty", 1, zIndex, false, 20, 3, false
+		);
+		ede.host = anim;
+		Global.level.addEffect(ede);
 	}
 }

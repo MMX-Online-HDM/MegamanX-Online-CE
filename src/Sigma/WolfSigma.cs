@@ -13,7 +13,7 @@ public class WolfSigma : Character {
 		ushort? netId, bool ownedByLocalPlayer, bool isWarpIn = false
 	) : base(
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, false, false
-	) { 
+	) {
 		charId = CharIds.WolfSigma;
 		gameChar = GameChar.X1;
 	}
@@ -73,5 +73,26 @@ public class WolfSigma : Character {
 			return sigmaHeadGroundCamCenterPos.Value;
 		}
 		return pos.round().addxy(camOffsetX, 0);
+	}
+
+	public override void onDeath() {
+		base.onDeath();
+		player.lastDeathWasSigmaHyper = true;
+
+		visible = false;
+		Anim anim = new Anim(
+			pos, "sigma_wolf_head_drop", 1, player.getNextActorNetId(), false, sendRpc: true
+		);
+		anim.useGravity = true;
+		anim.ttl = 3;
+		anim.blink = true;
+		if (anim.collider != null) {
+			anim.collider.wallOnly = true;
+		}
+		var ede = new ExplodeDieEffect(
+			player, pos, pos, "empty", 1, zIndex, false, 20, 3, false
+		);
+		ede.host = anim;
+		Global.level.addEffect(ede);
 	}
 }

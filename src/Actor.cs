@@ -449,11 +449,11 @@ public partial class Actor : GameObject {
 		deltaPos = pos.subtract(prevPos);
 		prevPos = pos;
 
-		if (locallyControlled && sprite != null) {
+		if (locallyControlled && sprite.name != "null") {
 			int oldFrameIndex = sprite.frameIndex;
-			sprite?.update();
+			sprite.update();
 
-			if (sprite != null && sprite.frameIndex != oldFrameIndex) {
+			if (sprite.frameIndex != oldFrameIndex) {
 				string spriteFrameKey = sprite.name + "/" + sprite.frameIndex.ToString(CultureInfo.InvariantCulture);
 				if (spriteFrameToSounds.ContainsKey(spriteFrameKey)) {
 					playSound(spriteFrameToSounds[spriteFrameKey], sendRpc: true);
@@ -859,7 +859,7 @@ public partial class Actor : GameObject {
 				}
 
 				//If already grounded, snap to ground further
-				CollideData collideDataCloseCheck = Global.level.checkTerrainCollisionOnce(this, 0, 0.05f * yMod);
+				CollideData? collideDataCloseCheck = Global.level.checkTerrainCollisionOnce(this, 0, 0.05f * yMod);
 				if (collideDataCloseCheck == null) {
 					var yVel = new Point(0, yDist);
 					var mtv = Global.level.getMtvDir(

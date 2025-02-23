@@ -132,7 +132,7 @@ public class Axl : Character {
 		axlCursorPos.y = Helpers.clamp(axlCursorPos.y, 0, Global.viewScreenH);
 		savedCamX = Global.level.camX;
 		savedCamY = Global.level.camY;
-		axlScopeCursorWorldPos = player.character.getCamCenterPos(ignoreZoom: true);
+		axlScopeCursorWorldPos = getCamCenterPos(ignoreZoom: true);
 		axlScopeCursorWorldLerpPos = axlCursorWorldPos;
 		isZoomingIn = true;
 		isZoomingOut = false;
@@ -143,7 +143,7 @@ public class Axl : Character {
 		if (!_zoom) return;
 
 		zoomCharge = 0;
-		axlZoomOutCursorDestPos = player.character.getCamCenterPos(ignoreZoom: true);
+		axlZoomOutCursorDestPos = getCamCenterPos(ignoreZoom: true);
 		axlCursorPos = getAxlBulletPos().add(getAxlBulletDir().times(50)).addxy(-savedCamX, -savedCamY);
 
 		isZoomingOut = true;
@@ -216,7 +216,7 @@ public class Axl : Character {
 					}
 					// Detect headshots
 					else if (h?.hitData?.hitPoint != null && c.getHeadPos() != null) {
-						Point headPos = c.getHeadPos().Value;
+						Point headPos = c.getHeadPos()!.Value;
 						Rect headRect = c.getHeadRect();
 
 						Point hitPoint = h.hitData.hitPoint.Value;
@@ -431,15 +431,15 @@ public class Axl : Character {
 		Helpers.decrementTime(ref voltTornadoTime);
 		Helpers.decrementTime(ref stealthRevealTime);
 
-		if (player.weapon.ammo >= player.weapon.maxAmmo) {
+		if (currentWeapon != null && currentWeapon.ammo >= currentWeapon.maxAmmo) {
 			weaponHealAmount = 0;
 		}
-		if (weaponHealAmount > 0 && player.health > 0) {
+		if (currentWeapon != null && weaponHealAmount > 0 && player.health > 0) {
 			weaponHealTime += Global.spf;
 			if (weaponHealTime > 0.05) {
 				weaponHealTime = 0;
 				weaponHealAmount--;
-				player.weapon.ammo = Helpers.clampMax(player.weapon.ammo + 1, player.weapon.maxAmmo);
+				currentWeapon.ammo = Helpers.clampMax(currentWeapon.ammo + 1, currentWeapon.maxAmmo);
 				playSound("healX3", forcePlay: true, true);
 			}
 		}
@@ -675,7 +675,7 @@ public class Axl : Character {
 						if (player.axlLoadout.rayGunAlt == 0) {
 							Point bulletDir = getAxlBulletDir();
 							float whiteAxlMod = isWhiteAxl() ? 2 : 1;
-							player.character.move(bulletDir.times(-50 * whiteAxlMod));
+							move(bulletDir.times(-50 * whiteAxlMod));
 						}
 					}
 				}
@@ -1069,8 +1069,8 @@ public class Axl : Character {
 			targetSoundCooldown = Global.spf;
 		}
 
-		if (axlCursorTarget != null) {
-			axlLockOnCursorPos = (axlCursorTarget as Character).getAimCenterPos();
+		if (axlCursorTarget is Character chara) {
+			axlLockOnCursorPos = chara.getAimCenterPos();
 			lockOnPoint = axlLockOnCursorPos.addxy(-Global.level.camX, -Global.level.camY);
 			// axlCursorPos = (axlCursorTarget as Character).getAimCenterPos().addxy(-Global.level.camX, -Global.level.camY);
 
@@ -1189,8 +1189,11 @@ public class Axl : Character {
 			}
 		}
 		foreach (var enemy in Global.level.players) {
-			if (enemy.character != null && enemy.character.canBeDamaged(player.alliance, player.id, null) && enemy.character.getHeadPos() != null) {
-				if (axlGenericCursorWorldPos.distanceTo(enemy.character.getHeadPos().Value) < headshotRadius) {
+			if (enemy.character != null &&
+				enemy.character.canBeDamaged(player.alliance, player.id, null) &&
+				enemy.character.getHeadPos() != null
+			) {
+				if (axlGenericCursorWorldPos.distanceTo(enemy.character.getHeadPos()!.Value) < headshotRadius) {
 					axlCursorTarget = enemy.character;
 					axlHeadshotTarget = enemy.character;
 				}
@@ -1274,7 +1277,10 @@ public class Axl : Character {
 	public bool isAxlLadderShooting() {
 		if (player.weapon is AssassinBullet) return false;
 		if (recoilTime > 0) return true;
-		bool canShootBool = canShoot() && !player.weapon.noAmmo() && player.axlWeapon != null && !player.axlWeapon.isTwoHanded(true) && shootTime == 0;
+		bool canShootBool = (
+			canShoot() && currentWeapon?.noAmmo() == true && player.axlWeapon != null &&
+			!player.axlWeapon.isTwoHanded(true) && shootTime == 0
+		);
 		if (player.input.isHeld(Control.Shoot, player) && canShootBool) {
 			return true;
 		}
@@ -1819,7 +1825,7 @@ public class Axl : Character {
 	}
 
 	public override void destroySelf(
-		string spriteName = null, string fadeSound = null,
+		string spriteName = "", string fadeSound = "",
 		bool disableRpc = false, bool doRpcEvenIfNotOwned = false,
 		bool favorDefenderProjDestroy = false
 	) {
@@ -1868,7 +1874,7 @@ public class Axl : Character {
 	}
 
 	public Weapon? getRefillTargetWeapon() {
-		if (player.weapon.canHealAmmo && player.weapon.ammo < player.weapon.maxAmmo) {
+		if (currentWeapon != null && currentWeapon.canHealAmmo && currentWeapon.ammo < currentWeapon.maxAmmo) {
 			return player.weapon;
 		}
 		Weapon? targetWeapon = null;

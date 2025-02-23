@@ -553,7 +553,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool canChangeWeapons() {
-		if (player.weapon is AssassinBullet && chargeTime > 0) return false;
+		if (currentWeapon is AssassinBullet && chargeTime > 0) return false;
 		if (charState is ViralSigmaPossess) return false;
 		if (charState is InRideChaser) return false;
 
@@ -737,7 +737,7 @@ public partial class Character : Actor, IDamagable {
 				wsr.groundStart = true;
 				return;
 			}
-			if (!killZone.killInvuln && player.isKaiserSigma()) return;
+			if (!killZone.killInvuln && this is KaiserSigma) return;
 			if (!killZone.killInvuln && this is MegamanX { stingActiveTime: >0 } ) return;
 			if (!killZone.killInvuln && this is Axl { stealthActive: true} ) return;
 			if (rideArmor != null && rideArmor.rideArmorState is RADropIn) return;
@@ -880,7 +880,7 @@ public partial class Character : Actor, IDamagable {
 					acidHurtCooldown = 0;
 				}
 				acidDamager?.applyDamage(
-					this, player.weapon is TornadoFang,
+					this, currentWeapon is TornadoFang,
 					new AcidBurst(), this, (int)ProjIds.AcidBurstPoison,
 					overrideDamage: 1f
 				);
@@ -1640,13 +1640,7 @@ public partial class Character : Actor, IDamagable {
 		if (sprite.name.Contains("_ra_")) {
 			return pos.addxy(0, -10);
 		}
-		if (player.isSigma) {
-			if (player.isKaiserSigma() && !player.isKaiserViralSigma()) {
-				return pos.addxy(13 * xDir, -95);
-			}
-			return getCenterPos();
-		}
-		return pos.addxy(0, -18);
+		return getCenterPos();
 	}
 
 	public virtual Point getParasitePos() {
@@ -2682,7 +2676,7 @@ public partial class Character : Actor, IDamagable {
 				}
 			}
 			if (this is MegamanX) {
-				var gigaCrush = player.weapons.FirstOrDefault(w => w is GigaCrush);
+				var gigaCrush = weapons.FirstOrDefault(w => w is GigaCrush);
 				if (gigaCrush != null) {
 					float currentAmmo = gigaCrush.ammo;
 					gigaCrush.addAmmo(gigaAmmoToAdd, player);
@@ -2693,7 +2687,7 @@ public partial class Character : Actor, IDamagable {
 						);
 					}
 				}
-				var hyperBuster = player.weapons.FirstOrDefault(w => w is HyperCharge);
+				var hyperBuster = weapons.FirstOrDefault(w => w is HyperCharge);
 				if (hyperBuster != null) {
 					float currentAmmo = hyperBuster.ammo;
 					hyperBuster.addAmmo(gigaAmmoToAdd, player);
@@ -2705,7 +2699,7 @@ public partial class Character : Actor, IDamagable {
 						);
 					}
 				}
-				var novaStrike = player.weapons.FirstOrDefault(w => w is HyperNovaStrike);
+				var novaStrike = weapons.FirstOrDefault(w => w is HyperNovaStrike);
 				if (novaStrike != null) {
 					float currentAmmo = novaStrike.ammo;
 					novaStrike.addAmmo(gigaAmmoToAdd, player);
@@ -2851,11 +2845,11 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual void addAmmo(float amount) {
-		player.weapon?.addAmmoHeal(amount);
+		currentWeapon?.addAmmoHeal(amount);
 	}
 
 	public virtual void addPercentAmmo(float amount) {
-		player.weapon?.addAmmoPercentHeal(amount);
+		currentWeapon?.addAmmoPercentHeal(amount);
 	}
 
 	public virtual bool canAddAmmo() {
@@ -2932,6 +2926,10 @@ public partial class Character : Actor, IDamagable {
 		// This ensures that the "onExit" charState function
 		// Can do any cleanup it needs to do without having to copy-paste that code here too.
 		charState?.onExit(null);
+	}
+
+	public virtual void onDeath() {
+		
 	}
 
 	public void cleanupBeforeTransform() {
@@ -3030,30 +3028,12 @@ public partial class Character : Actor, IDamagable {
 		} else {
 			new Anim(getCenterPos(), "explosion", 1, player.getNextActorNetId(), true, sendRpc: true, ownedByLocalPlayer);
 			playSound("explosionX3", sendRpc: true);
-			if (!carried) parasiteDamager.applyDamage(this, player.weapon is FrostShield, new ParasiticBomb(), this, (int)ProjIds.ParasiticBombExplode, overrideDamage: 4, overrideFlinch: Global.defFlinch);
+			if (!carried) parasiteDamager.applyDamage(this, currentWeapon is FrostShield, new ParasiticBomb(), this, (int)ProjIds.ParasiticBombExplode, overrideDamage: 4, overrideFlinch: Global.defFlinch);
 		}
 
 		parasiteTime = 0;
 		parasiteMashTime = 0;
 		parasiteDamager = null;
-	}
-
-	public override Dictionary<int, Func<Projectile>> getGlobalProjs() {
-		var retProjs = new Dictionary<int, Func<Projectile>>();
-
-		// TODO: Move this to viral Sigma class.
-		if (sprite.name.Contains("viral_tackle") && sprite.time > 0.15f) {
-			retProjs[(int)ProjIds.Sigma2ViralTackle] = () => {
-				var damageCollider = getAllColliders().FirstOrDefault(c => c.isAttack());
-				Point centerPoint = damageCollider.shape.getRect().center();
-				Projectile proj = new GenericMeleeProj(
-					new ViralSigmaTackleWeapon(player), centerPoint, ProjIds.Sigma2ViralTackle, player
-				);
-				proj.globalCollider = damageCollider.clone();
-				return proj;
-			};
-		}
-		return retProjs;
 	}
 
 	public void releaseGrab(Actor grabber, bool sendRpc = false) {
@@ -3071,10 +3051,10 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public bool canEjectFromRideArmor() {
-		if (rideArmor == null) {
+		if (rideArmor == null || globalCollider == null) {
 			return true;
 		}
-		var shape = globalCollider.shape;
+		Shape shape = globalCollider.shape;
 		if (shape.minY < 0 && shape.maxY < 0) {
 			shape = shape.clone(0, MathF.Abs(shape.maxY) + 1);
 		}
@@ -3147,7 +3127,7 @@ public partial class Character : Actor, IDamagable {
 
 	// Axl DNA shenanigans.
 	public void updateDisguisedAxl() {
-		if (player.weapon is AssassinBullet) {
+		if (currentWeapon is AssassinBullet) {
 			// URGENT TODO
 			// player.assassinHitPos = player.character.getFirstHitPos(AssassinBulletProj.range);
 		}
@@ -3165,7 +3145,7 @@ public partial class Character : Actor, IDamagable {
 			player.changeWeaponControls();
 		}
 
-		if (player.weapon is UndisguiseWeapon) {
+		if (currentWeapon is UndisguiseWeapon) {
 			bool shootPressed = player.input.isPressed(Control.Shoot, player);
 			bool altShootPressed = player.input.isPressed(Control.Special1, player);
 			if ((shootPressed || altShootPressed)) {
@@ -3173,7 +3153,7 @@ public partial class Character : Actor, IDamagable {
 				DNACore lastDNA = player.lastDNACore;
 				int lastDNAIndex = player.lastDNACoreIndex;
 				player.revertToAxl();
-				player.character.undisguiseTime = 0.33f;
+				undisguiseTime = 0.33f;
 				// To keep DNA.
 				if (altShootPressed && player.currency >= 1) {
 					player.currency -= 1;
@@ -3185,13 +3165,13 @@ public partial class Character : Actor, IDamagable {
 					) {
 						lastDNA.weapons[0] = player.getAxlBulletWeapon(0);
 					}
-					player.weapons.Insert(lastDNAIndex, lastDNA);
+					weapons.Insert(lastDNAIndex, lastDNA);
 				}
 				return;
 			}
 		}
 
-		if (player.weapon is AssassinBullet) {
+		if (currentWeapon is AssassinBullet) {
 			if (player.input.isPressed(Control.Special1, player) && !isCharging()) {
 				if (player.currency >= 2) {
 					player.currency -= 2;
@@ -3205,7 +3185,7 @@ public partial class Character : Actor, IDamagable {
 			}
 		}
 
-		if (player.weapon is AssassinBullet && (this is Vile or BaseSigma)) {
+		if (currentWeapon is AssassinBullet && (this is Vile or BaseSigma)) {
 			if (player.input.isHeld(Control.Shoot, player)) {
 				increaseCharge();
 			} else {
@@ -3218,7 +3198,7 @@ public partial class Character : Actor, IDamagable {
 		}
 
 		/*
-		if (player.weapon is AssassinBullet && chargeTime > 7)
+		if (currentWeapon is AssassinBullet && chargeTime > 7)
 		{
 			shootAssassinShot();
 			stopCharge();
@@ -3231,10 +3211,10 @@ public partial class Character : Actor, IDamagable {
 			player.revertToAxl();
 			assassinTime = 0.5f;
 			assassinTime = 0.5f;
-			player.character.useGravity = false;
-			player.character.vel = new Point();
-			player.character.isQuickAssassinate = isAltFire;
-			player.character.changeState(new Assassinate(grounded), true);
+			useGravity = false;
+			vel = new Point();
+			isQuickAssassinate = isAltFire;
+			changeState(new Assassinate(grounded), true);
 		} else {
 			stopCharge();
 		}
@@ -3299,9 +3279,9 @@ public partial class Character : Actor, IDamagable {
 	public virtual void aiDodge(Actor? target) { }
 
 	public int getRandomWeaponIndex() {
-		if (player.weapons.Count == 0) return 0;
-		List<Weapon> weapons = player.weapons.FindAll(w => w is not DNACore).ToList();
-		return weapons.IndexOf(weapons.GetRandomItem());
+		if (weapons.Count == 0) return 0;
+		List<Weapon> weaponsList = weapons.FindAll(w => w is not DNACore).ToList();
+		return weaponsList.IndexOf(weaponsList.GetRandomItem());
 	}
 	
 	public override List<byte> getCustomActorNetData() {

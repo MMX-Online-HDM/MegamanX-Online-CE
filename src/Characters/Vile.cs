@@ -809,6 +809,12 @@ public class Vile : Character {
 		return pos.addxy(0, -24);
 	}
 
+	public override void onDeath() {
+		base.onDeath();
+		player.lastDeathWasVileMK2 = isVileMK2;
+		player.lastDeathWasVileV = isVileMK5;
+	}
+
 	public override List<byte> getCustomActorNetData() {
 		List<byte> customData = base.getCustomActorNetData();
 

@@ -96,7 +96,7 @@ public partial class Player {
 
 	public Point? lastDeathPos;
 	public bool lastDeathWasVileMK2;
-	public bool lastDeathWasVileMK5;
+	public bool lastDeathWasVileV;
 	public bool lastDeathWasSigmaHyper;
 	public bool lastDeathWasXHyper;
 	public const int zeroHyperCost = 10;
@@ -447,8 +447,7 @@ public partial class Player {
 	public List<WSpongeSpike> seeds = new List<WSpongeSpike>();
 	public List<Actor> mechaniloids = new List<Actor>();
 
-	public ExplodeDieEffect explodeDieEffect;
-	public Character limboChar;
+	public ExplodeDieEffect? explodeDieEffect;
 	public bool suicided;
 
 	ushort savedArmorFlag;
@@ -899,7 +898,7 @@ public partial class Player {
 				}
 			}
 
-			if (canReviveSigma(out var spawnPoint) &&
+			if (canReviveSigma(out var spawnPoint, 2) &&
 				(input.isPressed(Control.Special2, this) ||
 				Global.level.isHyper1v1() ||
 				Global.shouldAiAutoRevive
@@ -1073,14 +1072,16 @@ public partial class Player {
 				Options.main.maverickStartFollow ? MaverickAIBehavior.Follow : MaverickAIBehavior.Defend
 			);
 		}
+		int sigmaForm = 0;
 		if (charNum == (int)CharIds.Sigma) {
+			sigmaForm = extraData[0];
 			loadout.sigmaLoadout.sigmaForm = extraData[0];
 			loadout.sigmaLoadout.maverick1 = extraData[1];
 			loadout.sigmaLoadout.maverick2 = extraData[2];
-			if (isSigma1()) {
+			if (sigmaForm == 0) {
 				sigmaMaxAmmo = 20;
 				sigmaAmmo = sigmaMaxAmmo;
-			} else if (isSigma2()) {
+			} else if (sigmaForm == 1) {
 				sigmaMaxAmmo = 28;
 				sigmaAmmo = 0;
 			}
@@ -1129,12 +1130,12 @@ public partial class Player {
 				false, charNetId, ownedByLocalPlayer
 			);
 		} else if (charNum == (int)CharIds.Sigma) {
-			if (isSigma3()) {
+			if (sigmaForm == 2) {
 				character = new Doppma(
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer
 				);
-			} else if (isSigma2()) {
+			} else if (sigmaForm == 1) {
 				character = new NeoSigma(
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer
@@ -1317,13 +1318,14 @@ public partial class Player {
 
 		loadout = data.loadout;
 		if (charNum == (int)CharIds.Sigma) {
+			int sigmaForm = data.extraData[0];
 			loadout.sigmaLoadout.sigmaForm = data.extraData[0];
 			loadout.sigmaLoadout.maverick1 = data.extraData[1];
 			loadout.sigmaLoadout.maverick2 = data.extraData[2];
-			if (isSigma1()) {
+			if (sigmaForm == 0) {
 				sigmaMaxAmmo = 20;
 				sigmaAmmo = sigmaMaxAmmo;
-			} else if (isSigma2()) {
+			} else if (sigmaForm == 1) {
 				sigmaMaxAmmo = 28;
 				sigmaAmmo = 0;
 			}
@@ -1920,10 +1922,10 @@ public partial class Player {
 			return Global.level.server.customMatchSettings.respawnTime;
 		} else {
 			if (Global.level?.gameMode is ControlPoints && alliance == GameMode.redAlliance) {
-				return 8;
+				return 7;
 			}
 			if (Global.level?.gameMode is KingOfTheHill) {
-				return 8;
+				return 7;
 			}
 		}
 		return 5;
@@ -1932,41 +1934,45 @@ public partial class Player {
 	public bool canReviveVile() {
 		if (Global.level.isElimination() ||
 			!lastDeathCanRevive ||
-			newCharNum != 2 ||
-			currency < reviveVileCost ||
-			lastDeathWasVileMK5
+			newCharNum != (int)CharIds.Vile ||
+			currency < reviveVileCost
 		) {
 			return false;
 		}
-		if (limboChar is not Vile vile || vile.summonedGoliath) {
+		if (character?.charState is not Die) {
+			return false;
+		}
+		if (character is not Vile vile || vile.summonedGoliath) {
 			return false;
 		}
 		return true;
 	}
 
-	public bool canReviveSigma(out Point spawnPoint) {
+	public bool canReviveSigma(out Point spawnPoint, int sigmaHypermode) {
 		spawnPoint = Point.zero;
-
+		if (character?.charState is not Die) {
+			return false;
+		}
+		spawnPoint = character.pos;
 		if (Global.level.isHyper1v1() &&
 			!lastDeathWasSigmaHyper &&
-			limboChar != null && isSigma
-			&& newCharNum == 4
+			character is BaseSigma &&
+			newCharNum == (int)CharIds.Sigma
 		) {
 			return true;
 		}
-		if (limboChar == null ||
+		if (character == null ||
 			!lastDeathCanRevive ||
 			!isSigma ||
-			newCharNum != 4 ||
+			newCharNum != (int)CharIds.Sigma ||
 			currency < reviveSigmaCost ||
 			lastDeathWasSigmaHyper
 		) {
 			return false;
 		}
-		int sigmaHypermode = 2;
 
 		if (sigmaHypermode == 0) {
-			Point deathPos = limboChar.pos;
+			Point deathPos = character.pos;
 
 			// Get ground snapping pos
 			var rect = new Rect(deathPos.addxy(-7, 0), deathPos.addxy(7, 112));
@@ -1974,10 +1980,6 @@ public partial class Player {
 			Point? closestHitPoint = Helpers.getClosestHitPoint(hits, deathPos, typeof(Wall));
 			if (closestHitPoint != null) {
 				deathPos = new Point(deathPos.x, closestHitPoint.Value.y);
-			} else {
-				if (isSigma1()) {
-					return false;
-				}
 			}
 
 			// Check if ample space to revive in
@@ -2003,7 +2005,7 @@ public partial class Player {
 				}
 			}
 		} else if (sigmaHypermode == 2) {
-			return limboChar != null && KaiserSigma.canKaiserSpawn(limboChar, out spawnPoint);
+			return character != null && KaiserSigma.canKaiserSpawn(character, out spawnPoint);
 		}
 		return true;
 	}
@@ -2014,7 +2016,9 @@ public partial class Player {
 
 	public void reviveVile(bool toMK5) {
 		currency -= reviveVileCost;
-		Vile vile = (limboChar as Vile);
+		if (character is not Vile vile) {
+			return;
+		}
 
 		if (toMK5) {
 			vileFormToRespawnAs = 2;
@@ -2025,78 +2029,66 @@ public partial class Player {
 		}
 
 		respawnTime = 0;
-		character = limboChar;
 		vile.alreadySummonedNewMech = false;
 		character.visible = true;
 		if (explodeDieEffect != null) {
 			explodeDieEffect.destroySelf();
 			explodeDieEffect = null;
 		}
-		limboChar = null;
 		vile.rideMenuWeapon = new MechMenuWeapon(VileMechMenuType.All);
 		character.changeState(new VileRevive(vileFormToRespawnAs == 2), true);
 		RPC.playerToggle.sendRpc(id, vileFormToRespawnAs == 2 ? RPCToggleType.ReviveVileTo5 : RPCToggleType.ReviveVileTo2);
 	}
 
 	public void reviveVileNonOwner(bool toMK5) {
-		Vile vile = (character as Vile);
-
+		if (character is not Vile vile) {
+			return;
+		}
 		if (toMK5) {
-			vileFormToRespawnAs = 2;
+			vile.vileForm = 2;
 		} else {
-			vileFormToRespawnAs = 1;
+			vile.vileForm = 1;
 		}
-
-		respawnTime = 0;
-		vile.alreadySummonedNewMech = false;
-		character.visible = true;
-		if (explodeDieEffect != null) {
-			explodeDieEffect.destroySelf();
-			explodeDieEffect = null;
-		}
-		character.changeState(new VileRevive(toMK5), true);
 	}
 
 	public void reviveSigma(int form, Point spawnPoint) {
 		currency -= reviveSigmaCost;
 		hyperSigmaRespawn = true;
 		respawnTime = 0;
-		character = limboChar;
-		limboChar = null;
-		if (character.destroyed == false) {
-			character.destroySelf();
+		if (character is not BaseSigma sigma) {
+			return;
 		}
+		if (character?.destroyed == false) {
+			destroyCharacter();
+		}
+		explodeDieEnd();
 		ushort newNetId = getNextATransNetId();
 		if (form == 0) {
-			if (Global.level.is1v1()) {
-				character.changePos(new Point(Global.level.width / 2, character.pos.y));
-			}
-			character.changeState(new WolfSigmaRevive(explodeDieEffect), true);
+			WolfSigma wolfSigma = new WolfSigma(
+				this, spawnPoint.x, spawnPoint.y, sigma.xDir, true,
+				newNetId, true
+			);
+			character = wolfSigma;
 		} else if (form == 1) {
-			explodeDieEffect.changeSprite("sigma2_revive");
-			character.changeState(new ViralSigmaRevive(explodeDieEffect), true);
+			ViralSigma viralSigma = new ViralSigma(
+				this, spawnPoint.x, spawnPoint.y, sigma.xDir, true,
+				newNetId, true
+			);
+			character = viralSigma;
 		} else {
 			KaiserSigma kaiserSigma = new KaiserSigma(
-				this, spawnPoint.x, spawnPoint.y, character.xDir, true,
+				this, spawnPoint.x, spawnPoint.y, sigma.xDir, true,
 				newNetId, true
 			);
 			character = kaiserSigma;
-			//explodeDieEffect.changeSprite("sigma3_revive");
-			if (Global.level.is1v1() && spawnPoint.isZero()) {
-				var closestSpawn = Global.level.spawnPoints.OrderBy(
-					s => s.pos.distanceTo(character.pos)
-				).FirstOrDefault();
-				spawnPoint = closestSpawn?.pos ?? new Point(Global.level.width / 2, character.pos.y);
-			}
 		}
 		RPC.reviveSigma.sendRpc(form, spawnPoint, id, newNetId);
 	}
 
 	public void reviveSigmaNonOwner(int form, Point spawnPoint, ushort sigmaNetId) {
 		if (form >= 2) {
-			character.destroySelf();
 			KaiserSigma kaiserSigma = new KaiserSigma(
-				this, spawnPoint.x, spawnPoint.y, character.xDir, true,
+				this, spawnPoint.x, spawnPoint.y, character?.xDir ?? 1, true,
 				sigmaNetId, false
 			);
 			character = kaiserSigma;
@@ -2109,36 +2101,19 @@ public partial class Player {
 		currency -= reviveXCost;
 		hyperXRespawn = true;
 		respawnTime = 0;
-		character.changeState(new XRevive(), true);
-	}
-
-	public void reviveXNonOwner() {
+		character?.changeState(new XRevive(), true);
 	}
 
 	public void explodeDieStart() {
-		explodeDieEffect = ExplodeDieEffect.createFromActor(character.player, character, 20, 1.5f, false, doExplosion: true);
+		if (character == null) {
+			return;
+		}
+		explodeDieEffect = ExplodeDieEffect.createFromActor(this, character, 20, 1.5f, false, doExplosion: true);
 		Global.level.addEffect(explodeDieEffect);
-		limboChar = character;
-		character = null;
-	}
-	public void explodeDieStart2() {
-		explodeDieEffect = ExplodeDieEffect.createFromActor(character.player, character, 20, 1.5f, false, doExplosion: false);
-		Global.level.addEffect(explodeDieEffect);
-		limboChar = character;
-		character = null;
 	}
 
 	public void explodeDieEnd() {
-		if (limboChar != null) {
-			limboChar.destroySelf();
-			RPC.destroyCharacter.sendRpc(this, limboChar);
-			limboChar = null;
-		}
 		explodeDieEffect = null;
-	}
-
-	public void destroySigmaEffect() {
-		ExplodeDieEffect.createFromActor(this, character, 25, 2, false);
 	}
 
 	public void destroyCharacter(bool sendRpc = false) {
@@ -2151,6 +2126,20 @@ public partial class Player {
 			RPC.destroyCharacter.sendRpc(this, character);
 		}
 		character = null;
+	}
+
+	public void destroyCharacter(Character? targetChar, bool sendRpc = false) {
+		if (targetChar == null) {
+			return;
+		}
+		targetChar.destroySelf();
+		if (sendRpc) {
+			RPC.destroyCharacter.sendRpc(this, targetChar);
+		}
+		if (character == targetChar) {
+			onCharacterDeath();
+			character = null;
+		}
 	}
 
 	public bool destroyCharacter(ushort netId) {
@@ -2479,41 +2468,12 @@ public partial class Player {
 	}
 
 	// Sigma helper functions
-
-	public bool isSigma1AndSigma() {
-		return isSigma1() && isSigma;
-	}
-
-	public bool isSigma2AndSigma() {
-		return isSigma2() && isSigma;
-	}
-
-	public bool isSigma3AndSigma() {
-		return isSigma3() && isSigma;
-	}
-
-	public bool isSigma1() {
-		return loadout?.sigmaLoadout?.sigmaForm == 0;
-	}
-
 	public bool isSigma2() {
 		return loadout?.sigmaLoadout?.sigmaForm == 1;
 	}
 
 	public bool isSigma3() {
 		return loadout?.sigmaLoadout?.sigmaForm == 2;
-	}
-
-	public bool isSigma1Or3() {
-		return isSigma1() || isSigma3();
-	}
-
-	public bool isWolfSigma() {
-		return character is WolfSigma;
-	}
-
-	public bool isViralSigma() {
-		return character is ViralSigma;
 	}
 
 	public bool isKaiserSigma() {
@@ -2568,6 +2528,7 @@ public partial class Player {
 
 	public bool canUseSubtank(SubTank subtank) {
 		if (isDead) return false;
+		if (character == null) return false;
 		if (character.healAmount > 0) return false;
 		if (health <= 0 || health >= maxHealth) return false;
 		if (subtank.health <= 0) return false;

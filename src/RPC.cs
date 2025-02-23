@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Numerics;
 using Lidgren.Network;
 using Newtonsoft.Json;
 
@@ -13,6 +12,8 @@ public class RPC {
 	public bool isString;
 	public bool toHostOnly;
 	public bool isServerMessage;
+	public bool isPreUpdate;
+	public bool levelless;
 	public int index;
 
 	// Need templates? Use these:
@@ -23,8 +24,6 @@ public class RPC {
 	public static RPCUpdateActor updateActor = new();
 	public static RPCApplyDamage applyDamage = new();
 	public static RPCDecShieldAmmo decShieldAmmo = new();
-	public static RPCShoot shoot = new RPCShoot(NetDeliveryMethod.ReliableOrdered);
-	public static RPCShoot shootFast = new RPCShoot(NetDeliveryMethod.Unreliable);
 	public static RPCDestroyActor destroyActor = new();
 	public static RPCPlayerToggle playerToggle = new();
 	public static RPCDestroyCharacter destroyCharacter = new();
@@ -161,8 +160,6 @@ public class RPC {
 		syncControlPoints,
 		// XOD Only stuff.
 		decShieldAmmo,
-		shoot,
-		shootFast,
 		axlShoot,
 		axlDisguise,
 		setHyperAxlTime,
@@ -213,6 +210,7 @@ public class RPCSendString : RPC {
 	public RPCSendString() {
 		netDeliveryMethod = NetDeliveryMethod.ReliableOrdered;
 		isString = true;
+		levelless = true;
 	}
 }
 
@@ -220,6 +218,7 @@ public class RPCStartLevel : RPC {
 	public RPCStartLevel() {
 		netDeliveryMethod = NetDeliveryMethod.ReliableOrdered;
 		isString = true;
+		levelless = true;
 	}
 
 	public override void invoke(string message) {
@@ -282,6 +281,7 @@ public class BackloggedSpawns {
 public class RPCSpawnCharacter : RPC {
 	public RPCSpawnCharacter() {
 		netDeliveryMethod = NetDeliveryMethod.ReliableOrdered;
+		isPreUpdate = true;
 	}
 
 	public override void invoke(params byte[] arguments) {
@@ -488,27 +488,6 @@ public class RPCDecShieldAmmo : RPC {
 	}
 }
 
-public class RPCShoot : RPC {
-	public RPCShoot(NetDeliveryMethod netDeliveryMethod) {
-		this.netDeliveryMethod = netDeliveryMethod;
-	}
-
-	public override void invoke(params byte[] arguments) {
-		int playerId = arguments[0];
-		int xPos = BitConverter.ToInt16(new byte[] { arguments[1], arguments[2] }, 0);
-		int yPos = BitConverter.ToInt16(new byte[] { arguments[3], arguments[4] }, 0);
-		int xDir = arguments[5] - 128;
-		int chargeLevel = arguments[6];
-		ushort projNetId = BitConverter.ToUInt16(new byte[] { arguments[7], arguments[8] }, 0);
-		int weaponIndex = arguments[9];
-
-		var player = Global.level.getPlayerById(playerId);
-		/* (player?.character as MegamanX)?.shootRpc(
-			new Point(xPos, yPos), weaponIndex, xDir, chargeLevel, projNetId, false
-		); */
-	}
-}
-
 public class BufferedDestroyActor {
 	public ushort netId;
 	public string destroySprite;
@@ -524,6 +503,7 @@ public class BufferedDestroyActor {
 public class RPCDestroyActor : RPC {
 	public RPCDestroyActor() {
 		netDeliveryMethod = NetDeliveryMethod.ReliableUnordered;
+		isPreUpdate = true;
 	}
 
 	public override void invoke(params byte[] arguments) {
@@ -590,6 +570,7 @@ public class RPCDestroyActor : RPC {
 public class RPCDestroyCharacter : RPC {
 	public RPCDestroyCharacter() {
 		netDeliveryMethod = NetDeliveryMethod.ReliableUnordered;
+		isPreUpdate = true;
 	}
 
 	public override void invoke(params byte[] arguments) {
@@ -693,12 +674,6 @@ public class RPCPlayerToggle : RPC {
 			if (player.character is Axl axl) {
 				axl.whiteAxlTime = axl.maxHyperAxlTime;
 			}
-		} else if (toggleId == RPCToggleType.ReviveVileTo2) {
-			player.reviveVileNonOwner(false);
-		} else if (toggleId == RPCToggleType.ReviveVileTo5) {
-			player.reviveVileNonOwner(true);
-		} else if (toggleId == RPCToggleType.ReviveX) {
-			player.reviveXNonOwner();
 		} else if (toggleId == RPCToggleType.StartRev) {
 			if (player.character is Axl axl) {
 				axl.isNonOwnerRev = true;
@@ -845,6 +820,7 @@ public class RPCActorToggle : RPC {
 public class RPCKillPlayer : RPC {
 	public RPCKillPlayer() {
 		netDeliveryMethod = NetDeliveryMethod.ReliableOrdered;
+		isPreUpdate = true;
 	}
 	public override void invoke(params byte[] arguments) {
 		int hasOwnerId = arguments[0];
@@ -873,7 +849,8 @@ public class RPCKillPlayer : RPC {
 
 public class RPCCreateAnim : RPC {
 	public RPCCreateAnim() {
-		netDeliveryMethod = NetDeliveryMethod.Unreliable;
+		netDeliveryMethod = NetDeliveryMethod.ReliableUnordered;
+		isPreUpdate = true;
 	}
 
 	public override void invoke(params byte[] arguments) {
@@ -964,6 +941,7 @@ public class RPCSwitchTeam : RPC {
 public class RPCReflectProj : RPC {
 	public RPCReflectProj() {
 		netDeliveryMethod = NetDeliveryMethod.ReliableOrdered;
+		isPreUpdate = true;
 	}
 
 	public override void invoke(params byte[] arguments) {
@@ -993,6 +971,7 @@ public class RPCReflectProj : RPC {
 public class RPCJoinLateRequest : RPC {
 	public RPCJoinLateRequest() {
 		netDeliveryMethod = NetDeliveryMethod.ReliableOrdered;
+		isPreUpdate = true;
 		toHostOnly = true;
 	}
 
@@ -1064,6 +1043,7 @@ public class RPCJoinLateRequest : RPC {
 public class RPCJoinLateResponse : RPC {
 	public RPCJoinLateResponse() {
 		netDeliveryMethod = NetDeliveryMethod.ReliableOrdered;
+		levelless = true;
 	}
 
 	public override void invoke(params byte[] arguments) {
@@ -1099,12 +1079,14 @@ public class RPCUpdateStarted : RPC {
 	public RPCUpdateStarted() {
 		netDeliveryMethod = NetDeliveryMethod.ReliableOrdered;
 		isServerMessage = true;
+		levelless = true;
 	}
 }
 
 public class RPCHostPromotion : RPC {
 	public RPCHostPromotion() {
 		netDeliveryMethod = NetDeliveryMethod.ReliableOrdered;
+		levelless = true;
 	}
 
 	public override void invoke(params byte[] arguments) {
@@ -1124,6 +1106,7 @@ public class RPCMatchOver : RPC {
 	public RPCMatchOver() {
 		netDeliveryMethod = NetDeliveryMethod.ReliableOrdered;
 		isString = true;
+		levelless = true;
 	}
 
 	public override void invoke(string message) {
@@ -1147,6 +1130,7 @@ public class RPCSyncTeamScores : RPC {
 public class RPCSyncGameTime : RPC {
 	public RPCSyncGameTime() {
 		netDeliveryMethod = NetDeliveryMethod.ReliableOrdered;
+		isPreUpdate = true;
 	}
 
 	public override void invoke(params byte[] arguments) {
@@ -1770,6 +1754,7 @@ public class RPCSyncValue : RPC {
 public class RPCHeal : RPC {
 	public RPCHeal() {
 		netDeliveryMethod = NetDeliveryMethod.ReliableOrdered;
+		isPreUpdate = true;
 	}
 
 	public override void invoke(params byte[] arguments) {
@@ -2293,6 +2278,7 @@ public class RPCCreditPlayerKillVehicle : RPC {
 public class RPCChangeDamage : RPC {
 	public RPCChangeDamage() {
 		netDeliveryMethod = NetDeliveryMethod.ReliableOrdered;
+		isPreUpdate = true;
 	}
 
 	public override void invoke(params byte[] arguments) {

@@ -109,7 +109,7 @@ public class Damager {
 		}
 
 		return applyDamage(
-			owner, newDamage, hitCooldown, newFlinch, victim as Actor,
+			owner, newDamage, hitCooldown, newFlinch, victim.actor(),
 			weakness, weapon.index, weapon.killFeedIndex, actor, projId, sendRpc
 		);
 	}
@@ -117,8 +117,11 @@ public class Damager {
 	public static bool applyDamage(
 		Player owner, float damage, float hitCooldown, int flinch,
 		Actor victim, bool weakness, int weaponIndex, int weaponKillFeedIndex,
-		Actor damagingActor, int projId, bool sendRpc = true
+		Actor? damagingActor, int projId, bool sendRpc = true
 	) {
+		if (owner == null) {
+			throw new Exception("Null damage player source. Use stage or self if not from another player.");
+		}
 		if (victim is Character chr && chr.invulnTime > 0) {
 			return false;
 		}
@@ -222,7 +225,7 @@ public class Damager {
 			return true;
 		}
 
-		if (damagable != null && damagable is not CrackedWall && owner != null && owner.isMainPlayer && !isDot(projId)) {
+		if (damagable != null && damagable is not CrackedWall && owner.isMainPlayer && !isDot(projId)) {
 			owner.delaySubtank();
 		}
 
@@ -235,7 +238,7 @@ public class Damager {
 			damage = overrideDamage ?? damage;
 		}
 
-		if (damagable != null && owner != null) {
+		if (damagable != null) {
 			DamagerMessage? damagerMessage = null;
 
 			var proj = damagingActor as Projectile;
@@ -328,10 +331,10 @@ public class Damager {
 			if (character.ownedByLocalPlayer && character.isFlinchImmune()) {
 				flinch = 0;
 			}
-			if ((owner?.character as Zero)?.isViral == true) {
+			if ((owner.character as Zero)?.isViral == true) {
 				character.addVirusTime(owner, damage);
 			}
-			if ((owner?.character as PunchyZero)?.isViral == true) {
+			if ((owner.character as PunchyZero)?.isViral == true) {
 				character.addVirusTime(owner, damage);
 			}
 
@@ -394,7 +397,7 @@ public class Damager {
 					character.addBurnTime(owner, FlameStag.getWeapon(), 1f);
 					break;
 				case (int)ProjIds.FStagDash:
-					character.addBurnTime(owner, FlameStag.getUppercutWeapon(null), 2f);
+					character.addBurnTime(owner, FlameStag.staticUppercutWeapon, 2f);
 					break;
 				case (int)ProjIds.DrDopplerDash:
 					character.addBurnTime(owner, new Weapon(WeaponIds.DrDopplerGeneric, 156), 1f);
