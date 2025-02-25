@@ -217,6 +217,35 @@ public partial class Level {
 	public float scaledH;
 	public int teamNum;
 
+	// Random stage stuff.
+	float powerplant2DarkTime = -1;
+	int powerplant2State = 0;   //0 = light, 1 = fade to black, 2 = black, 3 = fade to light
+	public float blackJoinTime;
+	public int camNotSetFrames;	int virusColorState = 0;
+	float virusColorTime;
+	Color virusColor1 = new Color(99, 20, 99, 128);
+	Color virusColor2 = new Color(66, 20, 99, 128);
+
+	// Camera.
+	public float camCenterX { get { return camX + Global.halfScreenW * Global.viewSize; } }
+	public float camCenterY { get { return camY + Global.halfScreenH * Global.viewSize; } }
+	public float shakeX;
+	public float shakeY;
+
+	// Netcode.
+	public List<PendingRPC> pendingPreUpdateRpcs = new();
+	public List<PendingRPC> pendingUpdateRpcs = new();
+	public List<PendingRPC> pendingCollisionRpcs = new();
+
+	public float killY {
+		get {
+			if (levelData.killY != null) {
+				return (float)levelData.killY;
+			}
+			return height + 60;
+		}
+	}
+
 	public Level(LevelData levelData, PlayerCharData playerData, ExtraCpuCharData extraCpuCharData, bool joinedLate) {
 		this.levelData = levelData;
 		zoomScale = 3;
@@ -1250,6 +1279,9 @@ public partial class Level {
 				delayedActions.RemoveAt(i);
 			}
 		}
+		
+		// Call net update before the frame starts.
+		netUpdate();
 
 		float playerX = 0;
 		float playerY = 0;
@@ -1272,6 +1304,12 @@ public partial class Level {
 			go.statePreUpdate();
 			Global.speedMul = 1;
 		}
+
+		// Preupdate RPCs.
+		foreach (PendingRPC pendingRpc in pendingPreUpdateRpcs) {
+			pendingRpc.invoke();
+		}
+		pendingPreUpdateRpcs.Clear();
 
 		foreach (Actor ms in mapSprites) {
 			ms.sprite?.update();
@@ -1315,6 +1353,12 @@ public partial class Level {
 			}
 			Global.speedMul = 1;
 		}
+
+		// Normal update RPCs.
+		foreach (PendingRPC pendingRpc in pendingUpdateRpcs) {
+			pendingRpc.invoke();
+		}
+		pendingUpdateRpcs.Clear();
 
 		// Collision shenanigans.
 		collidedGObjs.Clear();
@@ -1436,6 +1480,12 @@ public partial class Level {
 			}
 			Global.speedMul = 1;
 		}
+
+		// Collision RPCs.
+		foreach (PendingRPC pendingRpc in pendingCollisionRpcs) {
+			pendingRpc.invoke();
+		}
+		pendingCollisionRpcs.Clear();
 
 		for (int i = backloggedDamages.Count - 1; i >= 0; i--) {
 			BackloggedDamage bd = backloggedDamages[i];
@@ -1587,98 +1637,110 @@ public partial class Level {
 		if (twoFrameCycle > 2) { twoFrameCycle = -2; }
 
 		gameMode.update();
+		//this.getTotalCountInGrid();
+		updateMusicSources();
 
+		// Send RPCs.
 		if (Global.serverClient != null) {
-			if (isSendMessageFrame()) {
-				Global.serverClient.flush();
-			}
+			Global.serverClient.flush();
+		}
+	}
 
-			Global.serverClient.getMessages(out var messages, true);
+	public void netUpdate() {
+		if (Global.serverClient == null) {
+			return;
+		}
+		if (isSendMessageFrame()) {
+			Global.serverClient.flush();
+		}
+		Global.serverClient.getMessages(out var messages, true);
 
-			foreach (var message in messages) {
-				if (message.StartsWith("hostdisconnect:")) {
-					string reason = message.Split(':')[1];
-					if (reason == "RecreateMS" &&
-						Global.serverClient.serverId != null
-					) {
-						server.uniqueID = Global.serverClient.serverId.Value;
-						Global.leaveMatchSignal = new LeaveMatchSignal(
-							LeaveMatchScenario.RejoinMS, server, null, true
-						);
-					} else if (reason == "Recreate") {
-						Global.leaveMatchSignal = new LeaveMatchSignal(
-							LeaveMatchScenario.Rejoin, server, null
-						);
-					} else {
-						Global.leaveMatchSignal = new LeaveMatchSignal(
-							LeaveMatchScenario.ServerShutdown, null, null
-						);
+		foreach (var message in messages) {
+			if (message.StartsWith("hostdisconnect:")) {
+				string reason = message.Split(':')[1];
+				if (reason == "RecreateMS" &&
+					Global.serverClient.serverId != null
+				) {
+					server.uniqueID = Global.serverClient.serverId.Value;
+					Global.leaveMatchSignal = new LeaveMatchSignal(
+						LeaveMatchScenario.RejoinMS, server, "", true
+					);
+				} else if (reason == "Recreate") {
+					Global.leaveMatchSignal = new LeaveMatchSignal(
+						LeaveMatchScenario.Rejoin, server
+					);
+				} else {
+					Global.leaveMatchSignal = new LeaveMatchSignal(
+						LeaveMatchScenario.ServerShutdown, null
+					);
+				}
+			} else if (message.StartsWith("clientdisconnect:")) {
+				var playerLeft = JsonConvert.DeserializeObject<ServerPlayer>(
+					message.RemovePrefix("clientdisconnect:")
+				);
+				if (playerLeft != null) {
+					var player = Global.level.getPlayerById(playerLeft.id);
+					if (player != null) {
+						removePlayer(player);
 					}
-				} else if (message.StartsWith("clientdisconnect:")) {
-					var playerLeft = JsonConvert.DeserializeObject<ServerPlayer>(message.RemovePrefix("clientdisconnect:"));
-					if (playerLeft != null) {
-						var player = Global.level.getPlayerById(playerLeft.id);
-						if (player != null) {
-							removePlayer(player);
-						}
-					}
-				}
-			}
-
-			for (int i = bufferedDestroyActors.Count - 1; i >= 0; i--) {
-				var bufferedDestroyedActor = bufferedDestroyActors[i];
-				bufferedDestroyedActor.time += Global.spf;
-				var actor = getActorByNetId(bufferedDestroyedActor.netId);
-				if (actor != null) {
-					actor.destroySelf(bufferedDestroyedActor.destroySprite, bufferedDestroyedActor.destroySound, disableRpc: true);
-					bufferedDestroyActors.RemoveAt(i);
-				} else if (bufferedDestroyedActor.time > 5) {
-					bufferedDestroyActors.RemoveAt(i);
-				}
-			}
-
-			for (int i = backloggedSpawns.Count - 1; i >= 0; i--) {
-				backloggedSpawns[i].time += Global.spf;
-				if (backloggedSpawns[i].time >= 5 || backloggedSpawns[i].trySpawnPlayer()) {
-					backloggedSpawns.RemoveAt(i);
-				}
-			}
-
-			var keysToRemove = new List<int>();
-			foreach (var kvp in failedSpawns) {
-				var player = getPlayerById(kvp.Key);
-				if (player == null || player.character != null) {
-					keysToRemove.Add(kvp.Key);
-				} else if (kvp.Value.time >= 4f) {
-					keysToRemove.Add(kvp.Key);
-					if (player.character == null && player.loadoutSet) {
-						player?.spawnCharAtPoint(
-							player.newCharNum, player.getCharSpawnData(player.newCharNum),
-							kvp.Value.spawnPos, kvp.Value.xDir, kvp.Value.netId, false
-						);
-					}
-				}
-			}
-			foreach (var key in keysToRemove) {
-				failedSpawns.Remove(key);
-			}
-
-			foreach (var key in recentlyDestroyedNetActors.Keys.ToList()) {
-				recentlyDestroyedNetActors[key] += Global.spf;
-				if (recentlyDestroyedNetActors[key] > 5) {
-					recentlyDestroyedNetActors.Remove(key);
 				}
 			}
 		}
 
-		//this.getTotalCountInGrid();
-		updateMusicSources();
+		for (int i = bufferedDestroyActors.Count - 1; i >= 0; i--) {
+			var bufferedDestroyedActor = bufferedDestroyActors[i];
+			bufferedDestroyedActor.time += Global.spf;
+			var actor = getActorByNetId(bufferedDestroyedActor.netId);
+			if (actor != null) {
+				actor.destroySelf(
+					bufferedDestroyedActor.destroySprite,
+					bufferedDestroyedActor.destroySound, disableRpc: true
+				);
+				bufferedDestroyActors.RemoveAt(i);
+			} else if (bufferedDestroyedActor.time > 5) {
+				bufferedDestroyActors.RemoveAt(i);
+			}
+		}
+
+		for (int i = backloggedSpawns.Count - 1; i >= 0; i--) {
+			backloggedSpawns[i].time += Global.spf;
+			if (backloggedSpawns[i].time >= 5 || backloggedSpawns[i].trySpawnPlayer()) {
+				backloggedSpawns.RemoveAt(i);
+			}
+		}
+
+		var keysToRemove = new List<int>();
+		foreach (var kvp in failedSpawns) {
+			var player = getPlayerById(kvp.Key);
+			if (player == null || player.character != null) {
+				keysToRemove.Add(kvp.Key);
+			} else if (kvp.Value.time >= 4f) {
+				keysToRemove.Add(kvp.Key);
+				if (player.character == null && player.loadoutSet) {
+					player?.spawnCharAtPoint(
+						player.newCharNum, player.getCharSpawnData(player.newCharNum),
+						kvp.Value.spawnPos, kvp.Value.xDir, kvp.Value.netId, false
+					);
+				}
+			}
+		}
+		foreach (var key in keysToRemove) {
+			failedSpawns.Remove(key);
+		}
+
+		foreach (var key in recentlyDestroyedNetActors.Keys.ToList()) {
+			recentlyDestroyedNetActors[key] += Global.spf;
+			if (recentlyDestroyedNetActors[key] > 5) {
+				recentlyDestroyedNetActors.Remove(key);
+			}
+		}
 	}
 
 	private void updateMusicSources() {
 		Point listenerPos = new Point(camCenterX, camCenterY);
-		if ((is1v1() || isTraining()) && mainPlayer.character != null) listenerPos = mainPlayer.character.getCenterPos();
-
+		if ((is1v1() || isTraining()) && mainPlayer.character != null) {
+			listenerPos = mainPlayer.character.getCenterPos();
+		}
 		bool found = false;
 		float foundVolume = 0;
 		for (int i = musicSources.Count - 1; i >= 0; i--) {
@@ -1760,11 +1822,6 @@ public partial class Level {
 
 		return isSlown;
 	}
-
-	float powerplant2DarkTime = -1;
-	int powerplant2State = 0;   //0 = light, 1 = fade to black, 2 = black, 3 = fade to light
-	public float blackJoinTime;
-	public int camNotSetFrames;
 
 	public void render() {
 		if (Global.level.mainPlayer == null) return;
@@ -1994,10 +2051,6 @@ public partial class Level {
 
 	}
 
-	int virusColorState = 0;
-	float virusColorTime;
-	Color virusColor1 = new Color(99, 20, 99, 128);
-	Color virusColor2 = new Color(66, 20, 99, 128);
 	private void drawSigmaVirus() {
 		var rect = gameMode.safeZoneRect;
 
@@ -2207,18 +2260,6 @@ public partial class Level {
 		DrawWrappers.DrawRect(0, 0, width, height, true, new Color(0, 0, 0, alpha), 1, Global.level.mainPlayer?.character?.zIndex ?? ZIndex.HUD, isWorldPos: true);
 	}
 
-	public float camCenterX { get { return camX + Global.halfScreenW * Global.viewSize; } }
-	public float camCenterY { get { return camY + Global.halfScreenH * Global.viewSize; } }
-
-	public float killY {
-		get {
-			if (levelData.killY != null) {
-				return (float)levelData.killY;
-			}
-			return height + 60;
-		}
-	}
-
 	public bool ignoreNoScrolls() {
 		return mainPlayer.weapon is WolfSigmaHandWeapon || (mainPlayer.character as Axl)?.isAnyZoom() == true;
 	}
@@ -2344,9 +2385,6 @@ public partial class Level {
 			}
 		}
 	}
-
-	public float shakeX;
-	public float shakeY;
 
 	public void snapCamPos(Point point, Point? prevCamPos) {
 		var camPos = computeCamPos(point, prevCamPos);

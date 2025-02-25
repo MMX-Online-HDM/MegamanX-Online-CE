@@ -9,6 +9,7 @@ namespace MMXOnline;
 public class RPCCustom : RPC {
 	public RPCCustom() {
 		netDeliveryMethod = NetDeliveryMethod.ReliableOrdered;
+		isPreUpdate = true;
 	}
 
 	// Use custom invoke here.

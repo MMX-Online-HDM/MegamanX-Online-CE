@@ -11,7 +11,7 @@ namespace MMXOnline;
 public class ServerClient {
 	public NetClient client;
 	public bool isHost;
-	public ServerPlayer serverPlayer;
+	public ServerPlayer serverPlayer = null!;
 	Stopwatch packetLossStopwatch = new Stopwatch();
 	Stopwatch gameLoopStopwatch = new Stopwatch();
 	public long packetsReceived;
@@ -42,12 +42,12 @@ public class ServerClient {
 		return client;
 	}
 
-	public static ServerClient Create(
+	public static ServerClient? Create(
 		string serverIp, string serverName, int serverPort,
-		ServerPlayer inputServerPlayer, out JoinServerResponse joinServerResponse,
+		ServerPlayer inputServerPlayer, out JoinServerResponse? joinServerResponse,
 		out string error
 	) {
-		error = null;
+		error = "";
 		NetPeerConfiguration config = new NetPeerConfiguration(serverName);
 		config.EnableMessageType(NetIncomingMessageType.ConnectionLatencyUpdated);
 		config.AutoFlushSendQueue = false;
@@ -76,8 +76,11 @@ public class ServerClient {
 						JsonConvert.DeserializeObject<JoinServerResponse>(
 							message.RemovePrefix("joinservertargetedresponse:")
 						)
+					) ?? throw new Exception("Error Deserializing server response");
+					serverClient.serverPlayer = (
+						joinServerResponse.getLastPlayer()
+						?? throw new Exception("Error Recovering player list.")
 					);
-					serverClient.serverPlayer = joinServerResponse.getLastPlayer();
 					return serverClient;
 				} else if (message.StartsWith("hostdisconnect:")) {
 					var reason = message.Split(':')[1];
@@ -97,21 +100,28 @@ public class ServerClient {
 		return null;
 	}
 
-	public static ServerClient CreateHolePunch(
+	public static ServerClient? CreateHolePunch(
 		NetClient client, long serverId, IPEndPoint serverIP, IPEndPoint? radminIP, ServerPlayer inputServerPlayer,
-		out JoinServerResponse joinServerResponse, out string log
+		out JoinServerResponse? joinServerResponse, out string log
 	) {
 		// Enable autoflush temporally.
 		string localAdress = LANIPHelper.GetLocalIPAddress() + ":" + client.Port;
 		client.Configuration.AutoFlushSendQueue = true;
 		client.FlushSendQueue();
-		log = null;
+		log = "";
 		// UDP Hole Punching happens here.
 		NetOutgoingMessage regMsg = client.CreateMessage();
 		regMsg.Write((byte)MasterServerMsg.ConnectPeersShort);
 		regMsg.Write(serverId);
 		regMsg.Write(IPEndPoint.Parse(localAdress));
-		IPEndPoint masterServerLocation = NetUtility.Resolve(MasterServerData.serverIp, MasterServerData.serverPort);
+		IPEndPoint? masterServerLocation = NetUtility.Resolve(
+			MasterServerData.serverIp, MasterServerData.serverPort
+		);
+		if (masterServerLocation == null) {
+			joinServerResponse = null;
+			log = "Error getting host IP directon.";
+			return null;
+		}
 		client.SendUnconnectedMessage(regMsg, masterServerLocation);
 		client.FlushSendQueue();
 		NetOutgoingMessage hail = client.CreateMessage(JsonConvert.SerializeObject(inputServerPlayer));
@@ -120,12 +130,17 @@ public class ServerClient {
 		log += "\nLAN IP: " + localAdress;
 		int count = 0;
 		bool connected = false;
-		NetIncomingMessage msg;
+		NetIncomingMessage? msg;
 		while (count < 20) {
 			while ((msg = client.ReadMessage()) != null && !connected) {
 				if (msg.MessageType == NetIncomingMessageType.NatIntroductionSuccess) {
 					connected = true;
 					log += "\nGot Connection MSG!";
+					if (msg.SenderEndPoint == null) {
+						joinServerResponse = null;
+						log += "\nError: Null server endpoint.";
+						return null;
+					}
 					client.Connect(msg.SenderEndPoint, hail);
 					Thread.Sleep(100);
 					goto exitLoop;
@@ -209,8 +224,11 @@ public class ServerClient {
 						JsonConvert.DeserializeObject<JoinServerResponse>(
 							message.RemovePrefix("joinservertargetedresponse:")
 						)
+					) ?? throw new Exception("Error Deserializing server response");
+					serverClient.serverPlayer = (
+						joinServerResponse.getLastPlayer()
+						?? throw new Exception("Error Recovering player list.")
 					);
-					serverClient.serverPlayer = joinServerResponse.getLastPlayer();
 					client.Configuration.AutoFlushSendQueue = false;
 					return serverClient;
 				} else if (message.StartsWith("hostdisconnect:")) {
@@ -237,11 +255,11 @@ public class ServerClient {
 		return null;
 	}
 
-	public static ServerClient CreateDirect(
+	public static ServerClient? CreateDirect(
 		string serverIp, int port, ServerPlayer inputServerPlayer,
-		out JoinServerResponse joinServerResponse, out string error
+		out JoinServerResponse? joinServerResponse, out string error
 	) {
-		error = null;
+		error = "";
 		NetPeerConfiguration config = new NetPeerConfiguration("XOD-P2P");
 		config.EnableMessageType(NetIncomingMessageType.ConnectionLatencyUpdated);
 		config.EnableMessageType(NetIncomingMessageType.NatIntroductionSuccess);
@@ -281,8 +299,11 @@ public class ServerClient {
 						JsonConvert.DeserializeObject<JoinServerResponse>(
 							message.RemovePrefix("joinservertargetedresponse:")
 						)
+					) ?? throw new Exception("Error Deserializing server response");
+					serverClient.serverPlayer = (
+						joinServerResponse.getLastPlayer()
+						?? throw new Exception("Error Recovering player list.")
 					);
-					serverClient.serverPlayer = joinServerResponse.getLastPlayer();
 					client.Configuration.AutoFlushSendQueue = false;
 					return serverClient;
 				} else if (message.StartsWith("hostdisconnect:")) {
@@ -384,7 +405,7 @@ public class ServerClient {
 		Helpers.decrementTime(ref gameLoopLagTime);
 
 		stringMessages = new List<string>();
-		NetIncomingMessage im;
+		NetIncomingMessage? im;
 		while ((im = client.ReadMessage()) != null) {
 			string text = "";
 			// handle incoming message
@@ -425,13 +446,35 @@ public class ServerClient {
 					if (!rpcTemplate.isString) {
 						ushort argCount = BitConverter.ToUInt16(im.ReadBytes(2), 0);
 						var bytes = im.ReadBytes(argCount);
-						if (invokeRpcs) {
-							rpcTemplate.invoke(bytes);
+						if (invokeRpcs && Global.level != null) {
+							if (rpcTemplate.isServerMessage || rpcTemplate.levelless) {
+								rpcTemplate.invoke(bytes);
+							}
+							else if (rpcTemplate.isPreUpdate) {
+								Global.level.pendingPreUpdateRpcs.Add(new PendingRPC(rpcTemplate, bytes));
+							}
+							else if (rpcTemplate.isCollision) {
+								Global.level.pendingCollisionRpcs.Add(new PendingRPC(rpcTemplate, bytes));
+							}
+							else {
+								Global.level.pendingUpdateRpcs.Add(new PendingRPC(rpcTemplate, bytes));
+							}
 						}
 					} else {
 						var message = im.ReadString();
-						if (invokeRpcs) {
-							rpcTemplate.invoke(message);
+						if (invokeRpcs && Global.level != null) {
+							if (rpcTemplate.isServerMessage || rpcTemplate.levelless) {
+								rpcTemplate.invoke(message);
+							}
+							else if (rpcTemplate.isPreUpdate) {
+								Global.level.pendingPreUpdateRpcs.Add(new PendingRPC(rpcTemplate, message));
+							}
+							else if (rpcTemplate.isCollision) {
+								Global.level.pendingCollisionRpcs.Add(new PendingRPC(rpcTemplate, message));
+							}
+							else {
+								Global.level.pendingUpdateRpcs.Add(new PendingRPC(rpcTemplate, message));
+							}
 						}
 						stringMessages.Add(message);
 					}

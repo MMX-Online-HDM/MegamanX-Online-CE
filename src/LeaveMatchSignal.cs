@@ -18,13 +18,13 @@ public enum LeaveMatchScenario {
 
 public class LeaveMatchSignal {
 	public LeaveMatchScenario leaveMatchScenario;
-	public Server newServerData;
+	public Server? newServerData;
 	public string kickReason;
 	public bool isMasterServer;
 
 	public LeaveMatchSignal(
 		LeaveMatchScenario leaveMatchScenario,
-		Server newServerData, string kickReason,
+		Server? newServerData, string kickReason = "",
 		bool isMasterServer = false
 	) {
 		this.leaveMatchScenario = leaveMatchScenario;
@@ -34,9 +34,12 @@ public class LeaveMatchSignal {
 	}
 
 	public void createNewServer() {
+		if (newServerData == null || newServerData.region == null) {
+			return;
+		}
 		Stopwatch stopWatch = new Stopwatch();
 		stopWatch.Start();
-		byte[] serverResponse = null;
+		byte[]? serverResponse = null;
 		do {
 			serverResponse = Global.matchmakingQuerier.send(
 				newServerData.region.ip, "GetServer:" + newServerData.name, 1000
