@@ -67,18 +67,11 @@ public class WaitMenu : IMainMenu {
 		if (Global.serverClient.isHost) {
 			if ((Global.input.isPressedMenu(Control.MenuConfirm) || Global.quickStartOnline) && recreateWaitTime <= 0) {
 				Action onCreate = new Action(() => {
-					/*if (server.players.Count > 1) {
-						Logger.logEvent(
-							"host_2ormore", Logger.getMatchLabel(server.level, server.gameMode),
-							server.players.Count
-						);
-					}*/
 					Global.level.startLevel(server, false);
 					var rpcStartLevelJson = new RPCStartLevelJson(server);
 					Global.serverClient.rpc(RPC.startLevel, JsonConvert.SerializeObject(rpcStartLevelJson));
 					Global.serverClient.flush();
 				});
-
 				if (Global.level.is1v1() && server.players.Count(p => !p.isSpectator) > 4) {
 					Menu.change(new ConfirmLeaveMenu(this, "More than four combatants. Proceed anyway?", () => {
 						onCreate();
@@ -88,7 +81,6 @@ public class WaitMenu : IMainMenu {
 					Menu.change(new ErrorMenu("Two combatants are required.", this));
 					return;
 				}
-
 				onCreate();
 				return;
 			} else if (Global.input.isPressedMenu(Control.MenuBack)) {
@@ -98,7 +90,6 @@ public class WaitMenu : IMainMenu {
 					Menu.change(previous);
 				}));
 			}
-
 			Helpers.menuUpDown(ref selCursorY, 0, server.players.Count - 1);
 
 			bool isLeft = Global.input.isPressedMenu(Control.MenuLeft);
@@ -149,7 +140,7 @@ public class WaitMenu : IMainMenu {
 		}
 
 		autoRefreshTime += Global.spf;
-		if (server.isP2P) {
+		if (server.isP2P || server.region == null) {
 			return;
 		}
 		if (Global.input.isPressedMenu(Control.MenuAlt) ||

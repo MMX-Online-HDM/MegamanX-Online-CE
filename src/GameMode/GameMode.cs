@@ -2968,7 +2968,7 @@ public class GameMode {
 						Global.screenW / 2, 22 + Global.screenH / 2, Alignment.Center
 					);
 				}
-			} else if (level.mainPlayer.canReviveSigma(out _)) {
+			} else if (level.mainPlayer.canReviveSigma(out _, 2)) {
 				Fonts.drawText(
 					FontType.BlueMenu, respawnStr,
 					Global.screenW / 2, -10 + Global.screenH / 2, Alignment.Center

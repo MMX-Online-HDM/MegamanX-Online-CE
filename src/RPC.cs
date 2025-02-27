@@ -13,6 +13,7 @@ public class RPC {
 	public bool toHostOnly;
 	public bool isServerMessage;
 	public bool isPreUpdate;
+	public bool isCollision;
 	public bool levelless;
 	public int index;
 
@@ -345,6 +346,7 @@ public class FailedSpawn {
 public class RPCApplyDamage : RPC {
 	public RPCApplyDamage() {
 		netDeliveryMethod = NetDeliveryMethod.ReliableOrdered;
+		isCollision = true;
 	}
 
 	public override void invoke(params byte[] arguments) {
@@ -511,8 +513,8 @@ public class RPCDestroyActor : RPC {
 		int spriteIndex = BitConverter.ToUInt16(new byte[] { arguments[2], arguments[3] }, 0);
 		int soundIndex = BitConverter.ToUInt16(new byte[] { arguments[4], arguments[5] }, 0);
 
-		string destroySprite = null;
-		string destroySound = null;
+		string destroySprite = "";
+		string destroySound = "";
 		if (spriteIndex < Global.spriteCount) {
 			destroySprite = Global.spriteNameByIndex[spriteIndex];
 		}
@@ -540,10 +542,10 @@ public class RPCDestroyActor : RPC {
 
 			actor.changePos(destroyPos);
 			// Any actors with custom destroySelf methods that are invoked by RPC need to be specified here
-			if (actor is Character) {
-				(actor as Character).destroySelf(destroySprite, destroySound, disableRpc: true);
-			} else if (actor is RollingShieldProjCharged) {
-				(actor as RollingShieldProjCharged).destroySelf(destroySprite, destroySound, disableRpc: true);
+			if (actor is Character character) {
+				character.destroySelf(destroySprite, destroySound, disableRpc: true);
+			} else if (actor is RollingShieldProjCharged rshield) {
+				rshield.destroySelf(destroySprite, destroySound, disableRpc: true);
 			} else {
 				actor.destroySelf(destroySprite, destroySound, disableRpc: true);
 			}
@@ -874,7 +876,7 @@ public class RPCCreateAnim : RPC {
 		}
 
 		// The rest of the bytes are for optional, expensive-to-sync data that should be used sparingly.
-		RPCAnimModel extendedAnimModel = null;
+		RPCAnimModel? extendedAnimModel = null;
 		Actor? zIndexRelActor = null;
 		if (arguments.Length > 13) {
 			var argumentsList = arguments.ToList();
@@ -1047,7 +1049,7 @@ public class RPCJoinLateResponse : RPC {
 	}
 
 	public override void invoke(params byte[] arguments) {
-		JoinLateResponseModel joinLateResponseModel = null;
+		JoinLateResponseModel joinLateResponseModel;
 		try {
 			joinLateResponseModel = Helpers.deserialize<JoinLateResponseModel>(arguments);
 		} catch {
@@ -2616,3 +2618,30 @@ public class RPCResetFlag : RPC {
 		Global.serverClient?.rpc(RPC.resetFlags);
 	}
 }
+
+public class PendingRPC {
+	public RPC rpc;
+	public byte[] bytes = [];
+	public string stringData = "";
+	public bool isString;
+
+	public PendingRPC(RPC rpc, byte[] bytes) {
+		this.rpc = rpc;
+		this.bytes = bytes;
+	}
+
+	public PendingRPC(RPC rpc, string stringData) {
+		this.rpc = rpc;
+		this.stringData = stringData;
+		isString = true;
+	}
+
+	public void invoke() {
+		if (isString) {
+			rpc.invoke(stringData);
+			return;
+		}
+		rpc.invoke(bytes);
+	}
+}
+
