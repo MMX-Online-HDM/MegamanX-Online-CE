@@ -277,22 +277,14 @@ label:
 		changeWeaponSlot(ws);
 	}
 
-	public List<Weapon>? preSigmaReviveWeapons;
-	public void configureWeapons() {
+	public void configureWeapons(Character character) {
 		// Save weapons for cross-life maverick HP if not an Axl.
-		var weapons = character.weapons;
-
+		List<Weapon> weapons = character.weapons;
 		if (disguise == null) {
-			oldWeapons = weapons;
-
-			if (preSigmaReviveWeapons != null) {
-				oldWeapons = preSigmaReviveWeapons;
-				preSigmaReviveWeapons = null;
-			}
+			oldWeapons = character.weapons;
 		}
-		weaponSlot = 0;
-		if (ownedByLocalPlayer && isSigma && weapons.Count == 3) {
-			weaponSlot = Options.main.sigmaWeaponSlot;
+		if (ownedByLocalPlayer && character is BaseSigma && weapons.Count == 3) {
+			character.weaponSlot = Options.main.sigmaWeaponSlot;
 		}
 	}
 

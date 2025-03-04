@@ -265,6 +265,7 @@ public class BackloggedSpawns {
 		this.charNetId = charNetId;
 		time = 0;
 	}
+
 	public bool trySpawnPlayer() {
 		var player = Global.level.getPlayerById(playerId);
 		// Player could not exist yet if late joiner.
