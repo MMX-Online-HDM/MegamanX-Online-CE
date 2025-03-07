@@ -1421,7 +1421,6 @@ public class Die : CharState {
 			character.player.revertToAxlDeath();
 			character.changeSpriteFromName("die", true);
 		}
-		player.lastDeathWasXHyper = false;
 		player.lastDeathWasVileMK2 = false;
 		player.lastDeathWasVileV = false;
 		player.lastDeathWasSigmaHyper = false;

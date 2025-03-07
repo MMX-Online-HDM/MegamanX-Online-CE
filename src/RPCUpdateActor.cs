@@ -153,15 +153,6 @@ public class RPCUpdateActor : RPC {
 		Actor? actor = Global.level.getActorByNetId(netId, true);
 
 		if (actor == null) {
-			int? playerId = Player.getPlayerIdFromCharNetId(netId);
-			if (playerId != null) {
-				var player = Global.level.getPlayerById(playerId.Value);
-				if (player != null && netId == player.getStartNetId()) {
-					Global.level.addFailedSpawn(
-						playerId.Value, new Point(xPos ?? 0, yPos ?? 0), xDir ?? 1, netId
-					);
-				}
-			}
 			return;
 		}
 

@@ -607,8 +607,8 @@ public class XReviveStart : CharState {
 
 public class XRevive : CharState {
 	public float radius = 200;
-	XReviveAnim reviveAnim;
-	RagingChargeX mmx;
+	XReviveAnim reviveAnim = null!;
+	RagingChargeX rcx = null!;
 
 	public XRevive() : base("revive_shake") {
 		invincible = true;
@@ -617,35 +617,21 @@ public class XRevive : CharState {
 
 	public override void update() {
 		base.update();
-		if (!character.ownedByLocalPlayer) return;
-
 		if (!once && character.frameIndex >= 1 && sprite == "revive") {
 			character.playSound("ching", sendRpc: true);
 			player.health = 1;
 			character.addHealth(player.maxHealth);
-
-			player.weapons.RemoveAll(w => w is not XBuster);
-			player.weapons.Add(new RagingChargeBuster());
-			
-			/* if (player.weapons.Count == 0) {
-				player.weapons.Add(new Buster());
-			}
-			var busterWeapon = player.weapons.FirstOrDefault(w => w is Buster) as Buster;
-			if (busterWeapon != null) {
-				busterWeapon.setUnpoBuster(mmx);
-			} */
-			
-
 			once = true;
-			var flash = new Anim(character.pos.addxy(0, -33), "up_flash", character.xDir, player.getNextActorNetId(), true, sendRpc: true);
+			var flash = new Anim(
+				character.pos.addxy(0, -33), "up_flash",
+				character.xDir, player.getNextActorNetId(), true, sendRpc: true
+			);
 			flash.grow = true;
 		}
-
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 			return;
 		}
-
 		if (sprite == "revive_shake" && character.loopCount > 6) {
 			sprite = "revive_shake2";
 			character.changeSpriteFromName(sprite, true);
@@ -659,21 +645,24 @@ public class XRevive : CharState {
 		base.onEnter(oldState);
 		reviveAnim = new XReviveAnim(character.getCenterPos(), player.getNextActorNetId(), sendRpc: true);
 		character.playSound("xRevive", sendRpc: true);
-		mmx = character as RagingChargeX;
+		rcx = character as RagingChargeX ?? throw new NullReferenceException();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
-		Global.level.addToGrid(character);
-		mmx.invulnTime = 2;
+		rcx.invulnTime = 2;
 	}
 }
 
 public class XReviveAnim : Anim {
 	public float startRadius = 150;
-	public XReviveAnim(Point pos, ushort? netId = null, bool sendRpc = false, bool ownedByLocalPlayer = true) :
-		base(pos, "empty", 1, netId, false, sendRpc, ownedByLocalPlayer) {
+
+	public XReviveAnim(
+		Point pos, ushort? netId = null, bool sendRpc = false, bool ownedByLocalPlayer = true
+	) : base(
+		pos, "empty", 1, netId, false, sendRpc, ownedByLocalPlayer
+	) {
 		ttl = 1f;
 	}
 
@@ -683,6 +672,9 @@ public class XReviveAnim : Anim {
 
 	public override void render(float x, float y) {
 		base.render(x, y);
-		DrawWrappers.DrawCircle(pos.x + x, pos.y + y, startRadius * (1 - (time / ttl.Value)), false, Color.White, 5, zIndex + 1, true, Color.White);
+		DrawWrappers.DrawCircle(
+			pos.x + x, pos.y + y, startRadius * (1 - (time / ttl.Value)),
+			false, Color.White, 5, zIndex + 1, true, Color.White
+		);
 	}
 }
