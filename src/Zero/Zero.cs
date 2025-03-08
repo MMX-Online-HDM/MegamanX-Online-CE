@@ -97,10 +97,8 @@ public class Zero : Character {
 
 		hyperMode = zeroLoadout.hyperMode;
 		altCtrlsLength = 2;
-		gameChar = GameChar.X3;
+		altSoundId = AltSoundIds.X3;
 	}
-
-
 
 	public override void preUpdate() {
 		base.preUpdate();

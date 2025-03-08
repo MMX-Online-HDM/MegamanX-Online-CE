@@ -168,12 +168,12 @@ public partial class Character : Actor, IDamagable {
 
 	// Etc.
 	public int camOffsetX;
-	public GameChar gameChar = GameChar.None;
-	public enum GameChar {
+	public AltSoundIds altSoundId = AltSoundIds.None;
+	public enum AltSoundIds {
+		None,
 		X1,
 		X2,
 		X3,
-		None,
 	}
 
 	// Main character class starts here.
@@ -1035,8 +1035,7 @@ public partial class Character : Actor, IDamagable {
 					if (this is MegamanX { hyperHelmetActive: true, helmetArmor: ArmorId.Max }) {
 						playSound("subtankFillX3", forcePlay: true, sendRpc: true);
 					} else {
-						charState.GameCharXSound("heal", false, false, false, true);
-						charState.GameCharPlaySound("heal");
+						playAltSound("land", sendRpc: true, altParams: "carmor");
 					}
 				}
 			}
@@ -1160,8 +1159,7 @@ public partial class Character : Actor, IDamagable {
 			}
 			// Play sound and wallkick mid-state if not.
 			else {
-				charState.GameCharPlaySound("jump");
-				charState.GameCharXSound("jump", true, false, false, false);
+				playAltSound("jump", sendRpc: true, altParams: "larmor");
 			}
 			// GFX.
 			var wallSparkPoint = pos.addxy(12 * xDir, 0);
@@ -1198,8 +1196,7 @@ public partial class Character : Actor, IDamagable {
 					charState.stoppedJump = false;
 				}
 				vel.y = -getJumpPower();
-				charState.GameCharPlaySound("jump");
-				charState.GameCharXSound("jump", true, false, false, false);
+				playAltSound("jump", sendRpc: true, altParams: "larmor");
 			}
 		}
 		if (charState.normalCtrl) {
@@ -3270,6 +3267,29 @@ public partial class Character : Actor, IDamagable {
 
 	public bool isPlayableDamagable() {
 		return true;
+	}
+
+	public SoundWrapper? playAltSound(
+		string soundKey, bool forcePlay = false,
+		bool sendRpc = false, string altParams = ""
+	) {
+		if (altParams == null) {
+			return playSound(getAltSound(soundKey), forcePlay, sendRpc);
+		}
+		return playSound(getAltSound(soundKey, altParams), forcePlay, sendRpc);
+	}
+
+	public virtual string getAltSound(string sound, string options = "") {
+		string apendix = altSoundId switch {
+			AltSoundIds.X1 => "x1",
+			AltSoundIds.X2 => "x2",
+			AltSoundIds.X3 => "x3",
+			_ => ""
+		};
+		if (apendix != "" && Global.soundBuffers.ContainsKey(sound+apendix)) {
+			return sound+apendix;
+		}
+		return sound;
 	}
 
 	public virtual void aiUpdate() { }

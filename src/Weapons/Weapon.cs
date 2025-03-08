@@ -376,8 +376,7 @@ public class Weapon {
 			if (weaponHealCount >= 1) {
 				weaponHealCount = 0;
 				if (isAlwaysOn || character.currentWeapon == this) {
-					character.charState.GameCharXSound("heal", false, false, true, false);
-					character.charState.GameCharPlaySound("heal");
+					character.playAltSound("subtankFull", altParams: "aarmor");
 				}
 			}
 		}

@@ -2594,14 +2594,12 @@ public partial class Player {
 				subtanks[i].health += amount;
 				if (subtanks[i].health >= SubTank.maxHealth) {
 					subtanks[i].health = SubTank.maxHealth;
-					if (isMainPlayer)  {
-						character?.charState.GameCharPlaySound("subtankFull");
-						character?.charState.GameCharXSound("subtankFull", false, false, false, true);
+					if (isMainPlayer && character != null)  {
+						character.playAltSound("subtankFull", altParams: "carmor");
 					}
 				} else {
-					if (isMainPlayer) {
-						character?.charState.GameCharPlaySound("subtankFill");
-						character?.charState.GameCharXSound("subtankFill", false, false, false, true);
+					if (isMainPlayer && character != null) {
+						character.playAltSound("subtankFill", altParams: "carmor");
 					}
 				}
 				break;

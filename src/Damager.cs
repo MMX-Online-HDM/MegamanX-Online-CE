@@ -146,8 +146,8 @@ public class Damager {
 		}
 
 		IDamagable? damagable = victim as IDamagable;
-		Character? character = victim as Character;
-		CharState? charState = character?.charState;
+		Character? preCharacter = victim as Character;
+		CharState? charState = preCharacter?.charState;
 		RideArmor? rideArmor = victim as RideArmor;
 		Maverick? maverick = victim as Maverick;
 
@@ -250,10 +250,10 @@ public class Damager {
 
 			switch (projId) {
 				case (int)ProjIds.CrystalHunter:
-					character?.crystalize();
+					preCharacter?.crystalize();
 					break;
 				case (int)ProjIds.CSnailCrystalHunter:
-					character?.crystalize();
+					preCharacter?.crystalize();
 					break;
 				case (int)ProjIds.AcidBurst:
 					damagerMessage = onAcidDamage(damagable, owner, 2);
@@ -286,7 +286,7 @@ public class Damager {
 				case (int)ProjIds.ElectricShock:
 				case (int)ProjIds.MK2StunShot:
 				case (int)ProjIds.MorphMPowder:
-					character?.paralize();
+					preCharacter?.paralize();
 					break;
 			}
 			if (damagerMessage?.flinch != null) flinch = damagerMessage.flinch.Value;
@@ -298,14 +298,14 @@ public class Damager {
 				flinch = 0;
 				victim?.playSound("weakness");
 			}
-			if (projId == (int)ProjIds.CSnailMelee && character != null && character.isCrystalized) {
+			if (projId == (int)ProjIds.CSnailMelee && preCharacter != null && preCharacter.isCrystalized) {
 				damage += 1;
 			}
 		}
 
 		// Character section
 		bool spiked = false;
-		if (character != null) {
+		if (victim is Character character) {
 			MegamanX? mmx = character as MegamanX;
 
 			bool isStompWeapon = projId == (int)ProjIds.MechStomp;
@@ -546,7 +546,7 @@ public class Damager {
 			}
 			// Disallow flinch stack for non-BZ.
 			else if (!Global.canFlinchCombo) {
-				if (character != null && character.charState is Hurt hurtState &&
+				if (character.charState is Hurt hurtState &&
 					hurtState.stateFrames < hurtState.flinchTime - 4
 				) {
 					flinchCooldown = 0;
@@ -583,29 +583,19 @@ public class Damager {
 			//Damage above 0
 			if (damage > 0) {
 				//bool if the character is frozen
-				bool isShotgunIceAndFrozen = character?.sprite.name.Contains("frozen") == true && weaponKillFeedIndex == 8;
+				bool isShotgunIceAndFrozen = (
+					character.sprite.name.Contains("frozen") == true && weaponKillFeedIndex == 8
+				);
 				int hurtDir = -character.xDir; //Hurt Direction
-				if (damagingActor != null && hitFromBehind(character, damagingActor, owner, projId)) hurtDir *= -1;
-				if (projId == (int)ProjIds.GravityWellCharged) hurtDir = 0;
-
+				if (damagingActor != null && hitFromBehind(character, damagingActor, owner, projId)) {
+					hurtDir *= -1;
+				}
+				if (projId == (int)ProjIds.GravityWellCharged) {
+					hurtDir = 0;
+				}
 				// Flinch above 0 and is not weakness
 				if (flinch > 0 && !weakness) {
-					if (character.gameChar == Character.GameChar.X1) {
-						victim?.playSound("hurt");
-					} else if (character.gameChar == Character.GameChar.X2) {
-						victim?.playSound("hurtX2");
-					} else if (character.gameChar == Character.GameChar.X3) {
-						victim?.playSound("hurtX3");
-					}
-					if (mmx?.chestArmor == ArmorId.Light || mmx?.chestArmor == ArmorId.None) {
-						victim?.playSound("hurt");
-					} 
-					if (mmx?.chestArmor == ArmorId.Giga) {
-						victim?.playSound("hurtX2");
-					} 
-					if (mmx?.chestArmor == ArmorId.Max) {
-						victim?.playSound("hurtX3");
-					}
+					character.playAltSound("hurt", altParams: "carmor");
 					character.setHurt(hurtDir, flinch, spiked);
 				}
 				// Weakness is true and character is not frozen in Shotgun Ice.
@@ -631,11 +621,11 @@ public class Damager {
 						}
 					}
 				} else {			  
-					if (character.gameChar == Character.GameChar.X1) {
+					if (character.altSoundId == Character.AltSoundIds.X1) {
 						victim?.playSound("hit");
-					} else if (character.gameChar == Character.GameChar.X2) {
+					} else if (character.altSoundId == Character.AltSoundIds.X2) {
 						victim?.playSound("hitX2");
-					} else if (character.gameChar == Character.GameChar.X3) {
+					} else if (character.altSoundId == Character.AltSoundIds.X3) {
 						victim?.playSound("hitX3");
 					}
 					if (mmx?.chestArmor == ArmorId.Light || mmx?.chestArmor == ArmorId.None) {
@@ -851,7 +841,7 @@ public class Damager {
 			}
 		}
 
-		if (damage > 0 && character?.isDarkHoldState != true) {
+		if (damage > 0 && preCharacter?.isDarkHoldState != true) {
 			victim?.addRenderEffect(RenderEffectType.Hit, 3, 6);
 		}
 
@@ -862,15 +852,15 @@ public class Damager {
 		if (owner != null) {
 			finalDamage *= owner.getDamageModifier();
 		}
-		if (finalDamage > 0 && character != null &&
-			character.ownedByLocalPlayer && charState is XUPParryStartState parryState &&
+		if (finalDamage > 0 && preCharacter != null &&
+			preCharacter.ownedByLocalPlayer && charState is XUPParryStartState parryState &&
 			parryState.canParry() && !isDot(projId)
 		) {
 			parryState.counterAttack(owner, damagingActor, Math.Max(finalDamage * 2, 4));
 			return true;
 		}
-		if (finalDamage > 0 && character != null &&
-			character.ownedByLocalPlayer &&
+		if (finalDamage > 0 && preCharacter != null &&
+			preCharacter.ownedByLocalPlayer &&
 			charState is SaberParryStartState parryState2
 			&& parryState2.canParry(damagingActor) &&
 			!isDot(projId)
@@ -878,9 +868,9 @@ public class Damager {
 			parryState2.counterAttack(owner, damagingActor, finalDamage);
 			return true;
 		}
-		if ((damage > 0 || finalDamage > 0) && character != null &&
-			character.ownedByLocalPlayer &&
-			character.charState.specialId == SpecialStateIds.PZeroParry &&
+		if ((damage > 0 || finalDamage > 0) && preCharacter != null &&
+			preCharacter.ownedByLocalPlayer &&
+			preCharacter.charState.specialId == SpecialStateIds.PZeroParry &&
 			charState is PZeroParry zeroParryState &&
 			zeroParryState.canParry(damagingActor, projId)
 		) {

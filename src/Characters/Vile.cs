@@ -138,9 +138,9 @@ public class Vile : Character {
 	public override void update() {
 		base.update();
 		if (isVileMK1) {
-			gameChar = GameChar.X1;
+			altSoundId = AltSoundIds.X1;
 		} else if (isVileMK2 || isVileMK5) {
-			gameChar = GameChar.X3;
+			altSoundId = AltSoundIds.X3;
 		}
 		if (!ownedByLocalPlayer) {
 			return;

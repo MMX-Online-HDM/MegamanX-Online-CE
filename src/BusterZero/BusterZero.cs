@@ -22,7 +22,7 @@ public class BusterZero : Character {
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn
 	) {
 		charId = CharIds.BusterZero;
-		gameChar = GameChar.X3;
+		altSoundId = AltSoundIds.X3;
 	}
 	public override void preUpdate() {
 		base.preUpdate();
