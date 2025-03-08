@@ -1133,14 +1133,14 @@ public class HostMenu : IMainMenu {
 		*/
 		Global.serverClient = ServerClient.CreateDirect(
 			"127.0.0.1", localServer.port, me,
-			out JoinServerResponse joinServerResponse, out string error
+			out JoinServerResponse? joinServerResponse, out string error
 		);
 
-		if (joinServerResponse != null && error == null) {
+		if (joinServerResponse != null && error == "") {
 			Menu.change(new WaitMenu(new MainMenu(), localServer, false));
 		} else {
 			errorMessage = error;
-			if (string.IsNullOrEmpty(errorMessage)) {
+			if (errorMessage == "") {
 				errorMessage = "Could not connect to self.";
 			}
 		}
@@ -1181,9 +1181,9 @@ public class HostMenu : IMainMenu {
 		);
 		Global.serverClient = ServerClient.CreateDirect(
 			"127.0.0.1", localServer.port, me,
-			out JoinServerResponse joinServerResponse, out string error
+			out JoinServerResponse? joinServerResponse, out string error
 		);
-		if (joinServerResponse != null && error == null) {
+		if (joinServerResponse != null && error == "") {
 			Menu.change(new WaitMenu(new MainMenu(), localServer, false));
 		} else {
 			errorMessage = error;
