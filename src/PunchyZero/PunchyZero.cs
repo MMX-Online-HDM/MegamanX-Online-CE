@@ -69,7 +69,7 @@ public class PunchyZero : Character {
 			_ => new RakuhouhaWeapon(),
 		};
 		hyperMode = pzeroLoadout.hyperMode;
-		gameChar = GameChar.X3;
+		altSoundId = AltSoundIds.X3;
 	}
 
 	public override void update() {

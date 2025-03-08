@@ -20,7 +20,7 @@ public class CmdSigma : BaseSigma {
 		netId, ownedByLocalPlayer, isWarpIn
 	) {
 		sigmaSaberMaxCooldown = 1;
-		gameChar = GameChar.X1;
+		altSoundId = AltSoundIds.X1;
 	}
 
 	public override void update() {

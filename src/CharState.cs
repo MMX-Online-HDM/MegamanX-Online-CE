@@ -243,8 +243,7 @@ public class CharState {
 				character.sprite.frameTime = character.sprite.getCurrentFrame().duration;
 			}
 		} else if (landSprite != "" && character.grounded && !wasGrounded && sprite == airSprite) {
-			GameCharPlaySound("land");
-			GameCharXSound("land", true, false, false, false);
+			character.playAltSound("land", sendRpc: true, altParams: "larmor");
 			sprite = landSprite;
 			int oldFrameIndex = character.sprite.frameIndex;
 			float oldFrameTime = character.sprite.frameTime;
@@ -269,11 +268,11 @@ public class CharState {
 	}
 
 	public void groundCodeWithMove() {
-		if (player.character.canTurn()) {
+		if (character.canTurn()) {
 			if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
 				if (player.input.isHeld(Control.Left, player)) character.xDir = -1;
 				if (player.input.isHeld(Control.Right, player)) character.xDir = 1;
-				if (player.character.canMove()) character.changeState(new Run());
+				if (character.canMove()) character.changeState(new Run());
 			}
 		}
 	}
@@ -345,54 +344,6 @@ public class CharState {
 			Point destPos = new Point(rightBounds, character.pos.y);
 			Point lerpPos = Point.lerp(character.pos, destPos, Global.spf * 10);
 			character.changePos(lerpPos);
-		}
-	}
-
-	public void GameCharPlaySound(string sound) {
-		if (character.gameChar == Character.GameChar.X1) {
-			character.playSound(sound, false, true);
-		} else if (character.gameChar == Character.GameChar.X2) {
-			character.playSound(sound+"X2", false, true);
-		} else if (character.gameChar == Character.GameChar.X3) {
-			character.playSound(sound+"X3", false, true);
-		}
-	}
-
-	public void GameCharXSound(string sound, bool isLeg, bool isChest, bool isArm, bool isHelmet) {
-		if (character is MegamanX mmx) {
-			if (isArm) {
-				if (mmx.armArmor == ArmorId.Light || mmx.armArmor == ArmorId.None) {
-					character.playSound(sound, false, true);
-				} else if (mmx.armArmor == ArmorId.Giga) {
-					character.playSound(sound+"X2", false, true);
-				} else if (mmx.armArmor == ArmorId.Max) {
-					character.playSound(sound+"X3", false, true);
-				}
-			} else if (isChest) {
-				if (mmx.chestArmor == ArmorId.Light || mmx.chestArmor == ArmorId.None) {
-					character.playSound(sound, false, true);
-				} else if (mmx.chestArmor == ArmorId.Giga) {
-					character.playSound(sound+"X2", false, true);
-				} else if (mmx.chestArmor == ArmorId.Max) {
-					character.playSound(sound+"X3", false, true);
-				}
-			} else if (isLeg) {
-				if (mmx.legArmor == ArmorId.Light || mmx.legArmor == ArmorId.None) {
-					character.playSound(sound, false, true);
-				} else if (mmx.legArmor == ArmorId.Giga) {
-					character.playSound(sound+"X2", false, true);
-				} else if (mmx.legArmor == ArmorId.Max) {
-					character.playSound(sound+"X3", false, true);
-				}
-			} else if (isHelmet) {
-				if (mmx.helmetArmor == ArmorId.Light || mmx.helmetArmor == ArmorId.None) {
-					character.playSound(sound, false, true);
-				} else if (mmx.helmetArmor == ArmorId.Giga) {
-					character.playSound(sound+"X2", false, true);
-				} else if (mmx.helmetArmor == ArmorId.Max) {
-					character.playSound(sound+"X3", false, true);
-				}
-			}
 		}
 	}
  }
@@ -799,8 +750,7 @@ public class Jump : CharState {
 		}
 		if (character.frameIndex <= 0 && !once) {
 			once = true;
-			GameCharPlaySound("jump");
-			GameCharXSound("jump", true, false, false, false);
+			character.playAltSound("jump", sendRpc: true, altParams: "larmor");
 		}
 	}
 }
@@ -869,8 +819,7 @@ public class Dash : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		GameCharPlaySound("dash");
-		GameCharXSound("dash", true, false, false, false);
+		character.playAltSound("dash", sendRpc: true, altParams: "larmor");
 		initialDashDir = character.xDir;
 		if (character is Axl && (character.currentWeapon as AxlWeapon)?.isTwoHanded(false) == true) {
 			if (player.input.isHeld(Control.Left, player)) initialDashDir = -1;
@@ -1023,8 +972,7 @@ public class AirDash : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		GameCharPlaySound("airdash");
-		GameCharXSound("airdash", true, false, false, false);
+		character.playAltSound("airdash", sendRpc: true, altParams: "larmor");
 		initialDashDir = character.xDir;
 
 		if (character is Axl && (character.currentWeapon as AxlWeapon)?.isTwoHanded(false) == true) {
@@ -1073,10 +1021,9 @@ public class WallSlide : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		mmx = character as MegamanX;
-		GameCharPlaySound("wallLand");
-		GameCharXSound("wallLand", true, false, false, false);
+		character.playAltSound("wallLand", sendRpc: true, altParams: "larmor");
 		character.dashedInAir = 0;
-		if (player.isAI) {
+		if (player.isAI && character.ai != null) {
 			character.ai.jumpTime = 0;
 		}
 	}
@@ -1217,8 +1164,7 @@ public class WallKick : CharState {
 		}
 	}
 	public override void onEnter(CharState oldState) {
-		GameCharPlaySound("jump");
-		GameCharXSound("jump", true, false, false, false);
+		character.playAltSound("jump", sendRpc: true, altParams: "larmor");
 		base.onEnter(oldState);
 	}
 }
@@ -1676,8 +1622,7 @@ public class Land : CharState {
 		}
 	}
 	public override void onEnter(CharState oldState) {
-		GameCharPlaySound("land");
-		GameCharXSound("land", true, false, false, false);
+		character.playAltSound("land", sendRpc: true, altParams: "larmor");
 		base.onEnter(oldState);
 	}
 }

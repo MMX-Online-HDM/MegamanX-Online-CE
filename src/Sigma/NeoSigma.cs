@@ -17,7 +17,7 @@ public class NeoSigma : BaseSigma {
 		netId, ownedByLocalPlayer, isWarpIn
 	) {
 		sigmaSaberMaxCooldown = 0.5f;
-		gameChar = GameChar.X2;
+		altSoundId = AltSoundIds.X2;
 	}
 
 	public override void update() {

@@ -15,7 +15,7 @@ public class WolfSigma : Character {
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, false, false
 	) {
 		charId = CharIds.WolfSigma;
-		gameChar = GameChar.X1;
+		altSoundId = AltSoundIds.X1;
 	}
 
 	public override bool isSoundCentered() {

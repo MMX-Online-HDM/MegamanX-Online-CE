@@ -31,7 +31,7 @@ public class RagingChargeX : Character {
 		// For easy HUD display we add it to weapon list.
 		ragingBuster = new RagingChargeBuster();
 		weapons.Add(ragingBuster);
-		gameChar = GameChar.X1;
+		altSoundId = AltSoundIds.X1;
 	}
 
 	public override void preUpdate() {

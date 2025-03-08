@@ -19,7 +19,7 @@ public class Doppma : BaseSigma {
 		netId, ownedByLocalPlayer, isWarpIn
 	) {
 		sigmaSaberMaxCooldown = 0.5f;
-		gameChar = GameChar.X3;
+		altSoundId = AltSoundIds.X3;
 	}
 
 	public override void update() {

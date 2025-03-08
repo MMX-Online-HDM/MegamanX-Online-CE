@@ -119,7 +119,7 @@ public class Axl : Character {
 		axlHyperMode = player.loadout?.axlLoadout?.hyperMode ?? 0;
 
 		configureWeapons();
-		gameChar = GameChar.X3;
+		altSoundId = AltSoundIds.X3;
 	}
 
 	public void zoomIn() {

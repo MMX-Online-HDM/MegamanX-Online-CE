@@ -126,7 +126,6 @@ public class MegamanX : Character {
 		armArmor = (ArmorId)player.armArmorNum;
 		legArmor = (ArmorId)player.legArmorNum;
 		helmetArmor = (ArmorId)player.helmetArmorNum;
-		gameChar = GameChar.None;
 	}
 
 	// Updates at the start of the frame.
@@ -770,6 +769,26 @@ public class MegamanX : Character {
 			int chargeType = 2;
 			chargeEffect.update(getChargeLevel(), chargeType);
 		}
+	}
+
+	public override string getAltSound(string sound, string options = "") {
+		int gameSound = options switch {
+			"larmor" => (int)legArmor,
+			"aarmor" => (int)armArmor,
+			"carmor" => (int)chestArmor,
+			"harmor" => (int)helmetArmor,
+			_ => 0
+		};
+		string apendix = gameSound switch {
+			1 => "x1",
+			2 => "x2",
+			3 => "x3",
+			_ => ""
+		};
+		if (apendix != "" && Global.soundBuffers.ContainsKey(sound+apendix)) {
+			return sound+apendix;
+		}
+		return sound;
 	}
 
 	public override List<ShaderWrapper> getShaders() {
