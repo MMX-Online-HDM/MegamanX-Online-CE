@@ -626,7 +626,7 @@ public partial class Player {
 	}
 
 	public bool hasAllItems() {
-		return subtanks.Count >= 4 && heartTanks >= 8;
+		return subtanks.Count >= UpgradeMenu.getMaxSubTanks() && heartTanks >= UpgradeMenu.getMaxHeartTanks();
 	}
 
 	public static float getBaseHealth() {
@@ -904,11 +904,11 @@ public partial class Player {
 				Global.shouldAiAutoRevive
 			)
 			) {
-				reviveSigma(2, spawnPoint);
+				//reviveSigma(2, spawnPoint);
 			}
 		} else if (isX) {
 			if (canReviveX() && (input.isPressed(Control.Special2, this) || Global.shouldAiAutoRevive)) {
-				reviveX();
+				//reviveX();
 			}
 		}
 
@@ -1575,15 +1575,15 @@ public partial class Player {
 			retChar.weapons.Add(new ZSaber());
 		}
 		if (charNum == (int)CharIds.BusterZero) {
-			retChar.weapons.Add(new KKnuckleWeapon());
+			retChar.weapons.Add(new ZeroBuster());
 		}
 		if (charNum == (int)CharIds.PunchyZero) {
-			retChar.weapons.Add(new ZeroBuster());
+			retChar.weapons.Add(new KKnuckleWeapon());
 		}
 		if (charNum == (int)CharIds.KaiserSigma) {
 			retChar.weapons.Add(new SigmaMenuWeapon());
 		}
-		//weapons.Add(new AssassinBullet());
+		retChar.weapons.Add(new AssassinBulletChar());
 		retChar.weapons.Add(new UndisguiseWeapon());
 
 		sigmaAmmo = dnaCore.rakuhouhaAmmo;
@@ -2153,7 +2153,7 @@ public partial class Player {
 		if (character == null) {
 			return;
 		}
-		explodeDieEffect = ExplodeDieEffect.createFromActor(this, character, 20, 1.5f, false, doExplosion: true);
+		explodeDieEffect = ExplodeDieEffect.createFromActor(this, character, 20, 1.5f, false, doExplosion: false);
 		Global.level.addEffect(explodeDieEffect);
 	}
 
@@ -2221,7 +2221,7 @@ public partial class Player {
 	}
 
 	public void maverick1v1Kill() {
-		character?.applyDamage(1000, null, null, null, null);
+		character?.applyDamage(Damager.forceKillDamage, null, null, null, null);
 		character?.destroySelf();
 		character = null;
 		respawnTime = getRespawnTime() * (suicided ? 2 : 1);
@@ -2233,17 +2233,17 @@ public partial class Player {
 	public void forceKill() {
 		if (maverick1v1 != null && Global.level.is1v1()) {
 			//character?.applyDamage(null, null, 1000, null);
-			currentMaverick?.applyDamage(1000, this, character, null, null);
+			currentMaverick?.applyDamage(Damager.forceKillDamage, this, character, null, null);
 			return;
 		}
 
 		if (currentMaverick != null && isTagTeam()) {
 			destroyCharacter();
 		} else {
-			character?.applyDamage(1000, this, character, null, null);
+			character?.applyDamage(Damager.forceKillDamage, this, character, null, null);
 		}
 		foreach (var maverick in mavericks) {
-			maverick.applyDamage(1000, this, character, null, null);
+			maverick.applyDamage(Damager.forceKillDamage, this, character, null, null);
 		}
 	}
 
@@ -2595,11 +2595,11 @@ public partial class Player {
 				if (subtanks[i].health >= SubTank.maxHealth) {
 					subtanks[i].health = SubTank.maxHealth;
 					if (isMainPlayer && character != null)  {
-						character.playAltSound("subtankFull", altParams: "carmor");
+						character.playAltSound("subtankFull", altParams: "harmor");
 					}
 				} else {
 					if (isMainPlayer && character != null) {
-						character.playAltSound("subtankFill", altParams: "carmor");
+						character.playAltSound("subtankFill", altParams: "harmor");
 					}
 				}
 				break;

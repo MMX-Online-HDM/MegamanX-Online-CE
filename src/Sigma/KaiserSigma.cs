@@ -363,7 +363,7 @@ public partial class KaiserSigma : Character {
 			Point explodeCenterPos = pos.addxy(0, -16);
 			var ede = new ExplodeDieEffect(
 				player, explodeCenterPos, explodeCenterPos,
-				"empty", 1, zIndex, false, 16, 3, false
+				"empty", 1, zIndex, false, 16, 3, false, false
 			);
 			Global.level.addEffect(ede);
 		} else {
@@ -374,13 +374,13 @@ public partial class KaiserSigma : Character {
 			Point explodeCenterPos = pos.addxy(0, -55);
 			var ede = new ExplodeDieEffect(
 				player, explodeCenterPos, explodeCenterPos, "empty",
-				1, zIndex, false, 60, 3, false
+				1, zIndex, false, 60, 3, false, false
 			);
 			Global.level.addEffect(ede);
 
 			var headAnim = new Anim(
 				pos, lastHyperSigmaSprite, 1,
-				player.getNextActorNetId(), false, sendRpc: true
+				player.getNextActorNetId(), true, sendRpc: true
 			);
 			headAnim.ttl = 3;
 			headAnim.blink = true;
@@ -391,7 +391,7 @@ public partial class KaiserSigma : Character {
 
 		var anim = new Anim(
 			pos, deathSprite, 1, player.getNextActorNetId(),
-			false, sendRpc: true, zIndex: ZIndex.Background + 1000
+			true, sendRpc: true, zIndex: ZIndex.Background + 1000
 		);
 		anim.ttl = 3;
 		anim.blink = true;

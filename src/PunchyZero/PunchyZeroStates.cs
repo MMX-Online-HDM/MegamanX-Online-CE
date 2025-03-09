@@ -140,7 +140,7 @@ public class PZeroSpinKick : CharState {
 		character.sprite.tempOffY = 2;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		character.slideVel = character.xDir * character.getRunSpeed();
 		character.isDashing = false;
 		base.onExit(newState);
@@ -200,7 +200,7 @@ public class PZeroDiveKickState : CharState {
 		character.useGravity = false;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 		character.stopMovingWeak();
@@ -280,7 +280,7 @@ public class PZeroParry : CharState {
 		zero = character as PunchyZero ?? throw new NullReferenceException();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		zero.parryCooldown = 30;
 	}
@@ -372,7 +372,7 @@ public class PZeroParryCounter : CharState {
 		}
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		character.useGravity = true;
 		base.onExit(newState);
 	}
@@ -534,7 +534,7 @@ public class HyperPunchyZeroStart : CharState {
 		}
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 		if (character != null) {
@@ -655,10 +655,6 @@ public class PunchyZeroHadangeki : CharState {
 			character.changeSpriteFromName(sprite, true);
 		}
 	}
-
-	public override void onExit(CharState oldState) {
-		base.onExit(oldState);
-	}
 }
 
 public class PunchyZeroHadangekiWall : CharState {
@@ -690,7 +686,7 @@ public class PunchyZeroHadangekiWall : CharState {
 		}
 	}
 
-	public override void onExit(CharState oldState) {
+	public override void onExit(CharState? oldState) {
 		base.onExit(oldState);
 		useGravity = true;
 	}
@@ -738,7 +734,7 @@ public abstract class PunchyZeroGigaAttack : CharState {
 		base.onEnter(oldState);
 		pzero = character as PunchyZero ?? throw new NullReferenceException();
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		weapon.shootCooldown = weapon.fireRate;
 		if (Anim != null) {
 			Anim.destroySelf();
@@ -921,5 +917,87 @@ public class PunchyZeroDarkHoldShootState : PunchyZeroGigaAttack {
 			);
 			playSound("darkhold");	
 		}
+	}
+}
+public class AwakenedPunchyZeroHadangeki : CharState {
+	bool fired;
+	public PunchyZero zero = null!;
+	public AwakenedPunchyZeroHadangeki() : base("projswing") {
+		landSprite = "projswing";
+		airSprite = "projswing_air";
+		useDashJumpSpeed = true;
+		airMove = true;
+		superArmor = true;
+	}
+
+	public override void update() {
+		base.update();
+		if (character.grounded) {
+			character.isDashing = false;
+		}
+		if (character.frameIndex >= 7 && !fired) {
+			character.playSound("zerosaberx3", sendRpc: true);
+			fired = true;
+			new ZSaberProj(
+				character.pos.addxy(30 * character.xDir, -20), character.xDir, 
+				isAZ: zero.isAwakened ? true : false, zero,
+				player, player.getNextActorNetId(), rpc: true
+			);
+		}
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		} else {
+			if ((character.grounded || character.canAirJump() && character.flag == null) &&
+				player.input.isPressed(Control.Jump, player)
+			) {
+				if (!character.grounded) {
+					character.dashedInAir++;
+				}
+				character.vel.y = -character.getJumpPower();
+				sprite = "projswing_air";
+				character.changeSpriteFromName(sprite, false);
+			}
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		zero = player.character as PunchyZero ?? throw new NullReferenceException();
+		if (!character.grounded || character.vel.y < 0) {
+			sprite = "projswing_air";
+			defaultSprite = sprite;
+			character.changeSpriteFromName(sprite, true);
+		}
+	}
+}
+public class PunchyZeroGenmureiState : CharState {
+	bool fired;
+	public PunchyZero zero = null!;
+	public PunchyZeroGenmureiState() : base("genmu") { }
+
+	public override void update() {
+		base.update();
+
+		if (character.frameIndex >= 8 && !fired) {
+			fired = true;
+			character.playSound("genmureix5", sendRpc: true);
+			new GenmuProj(
+				character.pos.addxy(30 * character.xDir, -25), character.xDir, 0, 
+				isAZ: zero.isAwakened ? true : false,
+				zero, player, player.getNextActorNetId(), rpc: true
+			);
+			new GenmuProj(
+				character.pos.addxy(30 * character.xDir, -25), character.xDir, 1, 
+				isAZ: zero.isAwakened ? true : false,
+				zero, player, player.getNextActorNetId(), rpc: true
+			);
+		}
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		zero = player.character as PunchyZero ?? throw new NullReferenceException();
 	}
 }

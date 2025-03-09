@@ -152,9 +152,15 @@ public class MegamanX : Character {
 		Helpers.decrementFrames(ref shootCooldown);
 		Helpers.decrementFrames(ref barrierCooldown);
 		Helpers.decrementFrames(ref specialSaberCooldown);
+		Helpers.decrementFrames(ref hadoukenCooldownTime);
+		Helpers.decrementFrames(ref shoryukenCooldownTime);
+
 		if (lastShootPressed < 100) {
 			lastShootPressed++;
 		}
+		player.fgMoveAmmo += Global.speedMul;
+		if (player.fgMoveAmmo > player.fgMoveMaxAmmo) player.fgMoveAmmo = player.fgMoveMaxAmmo;
+
 		Helpers.decrementFrames(ref aiAttackCooldown);
 		// Strike chain extending the shoot anim.
 		if (hasLastingProj() && shootAnimTime > 0) {
@@ -286,6 +292,30 @@ public class MegamanX : Character {
 				shoot(0);
 				return true;
 			}
+		}
+		bool inputCheckH = false;
+		bool inputCheckS = false;
+		if (hasHadoukenEquipped()) {
+			inputCheckH = player.input.isHeld(Control.Down, player) && 
+			player.input.isHeld(Control.Shoot, player) 
+			&& (player.input.isHeld(Control.Right, player) || player.input.isHeld(Control.Left, player));
+		}
+		if (hasShoryukenEquipped()) {
+			inputCheckS = player.input.isHeld(Control.Down, player) && 
+			player.input.isHeld(Control.Shoot, player) 
+			&& (player.input.isHeld(Control.Right, player) || player.input.isHeld(Control.Left, player));
+		}
+		if (inputCheckH && canUseFgMove() && grounded) {
+			if (!player.hasAllItems()) player.currency -= 3;
+			player.fgMoveAmmo = 0;
+			changeState(new Hadouken(), true);
+			return true;
+		}
+		if (inputCheckS && canUseFgMove() && grounded) {
+			if (!player.hasAllItems()) player.currency -= 3;
+			player.fgMoveAmmo = 0;
+			changeState(new Shoryuken(isUnderwater()), true);
+			return true;
 		}
 		return base.attackCtrl();
 	}

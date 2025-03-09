@@ -338,7 +338,7 @@ public class PunchyZero : Character {
 		}
 		if (player.currency >= cost &&
 			player.input.isHeld(Control.Special2, player) &&
-			charState is not HyperZeroStart and not WarpIn && (
+			charState is not HyperPunchyZeroStart and not WarpIn && (
 				!isViral && !isAwakened && !isBlack ||
 				isAwakened && !hyperOvertimeActive
 			)
@@ -377,11 +377,11 @@ public class PunchyZero : Character {
 			if (grounded && vel.y >= 0 && isGenmuZero) {
 				if (genmureiCooldown == 0) {
 					genmureiCooldown = 120;
-					changeState(new GenmureiState(), true);
+					changeState(new PunchyZeroGenmureiState(), true);
 					return true;
 				}
 			} else {
-				changeState(new AwakenedZeroHadangeki(), true);
+				changeState(new AwakenedPunchyZeroHadangeki(), true);
 				return true;
 			}
 			return true;

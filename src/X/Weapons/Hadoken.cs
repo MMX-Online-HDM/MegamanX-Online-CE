@@ -65,6 +65,10 @@ public class Hadouken : CharState {
 			character.changeToIdleOrFall();
 		}
 	}
+	public override bool canEnter(Character character) {
+		if (!character.grounded) return false;
+		return base.canEnter(character);
+	}
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
@@ -72,7 +76,7 @@ public class Hadouken : CharState {
 		character.stopCharge();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		if (mmx != null) mmx.hadoukenCooldownTime = mmx.maxHadoukenCooldownTime;
 		base.onExit(newState);
 	}

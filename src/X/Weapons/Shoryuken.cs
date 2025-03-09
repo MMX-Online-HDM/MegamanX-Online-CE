@@ -32,7 +32,9 @@ public class Shoryuken : CharState {
 		if (character.isUnderwater() && anim != null) {
 			anim.visible = false;
 		}
-
+		if (character.sprite.frameIndex == 1) {
+			character.sprite.frameIndex = 2;
+		}
 		if (character.sprite.frameIndex >= 2 && !jumpedYet) {
 			jumpedYet = true;
 			character.dashedInAir++;
@@ -67,23 +69,26 @@ public class Shoryuken : CharState {
 		var wallAbove = Global.level.checkTerrainCollisionOnce(character, 0, -10);
 		if (wallAbove != null && wallAbove.gameObject is Wall) {
 			timeInWall += Global.spf;
-			if (timeInWall > 0.1f) {
+			if (timeInWall > 0.2f) {
 				character.changeState(new Fall());
 				return;
 			}
 		}
 
 		if (character.isAnimOver()) {
-			character.changeState(new Fall());
+			character.changeToIdleOrFall();
 		}
 	}
-
+	public override bool canEnter(Character character) {
+		if (!character.grounded) return false;
+		return base.canEnter(character);
+	}
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		mmx = character as MegamanX;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		if (anim != null) {
 			anim.destroySelf();
 			anim = null;

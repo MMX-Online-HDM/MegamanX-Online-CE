@@ -17,6 +17,7 @@ public class Damager {
 	public const float envKillDamage = 2000;
 	public const float switchKillDamage = 1000;
 	public const float ohkoDamage = 500;
+	public const float forceKillDamage = 999;
 	public const float headshotModifier = 2;
 
 	public static readonly Dictionary<int, float> projectileFlinchCooldowns = new Dictionary<int, float>() {
@@ -77,7 +78,7 @@ public class Damager {
 	// Normally, sendRpc would default to false, but literally over 20 places need it to true
 	// and one place needs it false so in this case, we invert the convention
 	public bool applyDamage(
-		IDamagable victim, bool weakness, Weapon weapon, Actor actor,
+		IDamagable? victim, bool weakness, Weapon weapon, Actor actor,
 		int projId, float? overrideDamage = null, int? overrideFlinch = null, bool sendRpc = true
 	) {
 		if (weapon == null) return false;
@@ -109,7 +110,7 @@ public class Damager {
 		}
 
 		return applyDamage(
-			owner, newDamage, hitCooldown, newFlinch, victim.actor(),
+			owner, newDamage, hitCooldown, newFlinch, victim?.actor(),
 			weakness, weapon.index, weapon.killFeedIndex, actor, projId, sendRpc
 		);
 	}

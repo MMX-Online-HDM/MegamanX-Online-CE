@@ -517,7 +517,7 @@ public class Axl : Character {
 			player.axlBulletTypeLastAmmo[player.weapons[0].type] = player.weapons[0].ammo;
 		}
 
-		if (player.weapon is not AssassinBullet) {
+		if (player.weapon is not AssassinBulletChar) {
 			if (altShootHeld && !bothHeld && (player.weapon is AxlBullet || player.weapon is DoubleBullet ||
 			player.weapon is MettaurCrash || player.weapon is BeastKiller || player.weapon is MachineBullets || 
 			player.weapon is RevolverBarrel || player.weapon is AncientGun) && invulnTime == 0 && flag == null) {
@@ -924,11 +924,9 @@ public class Axl : Character {
 			lockOn(out _);
 			return;
 		}
-
-		if (charState is Assassinate) {
+		if (charState is AssassinateChar) {
 			return;
 		}
-
 		Point aimDir = new Point(0, 0);
 
 		if (Options.main.aimAnalog) {
@@ -1058,7 +1056,7 @@ public class Axl : Character {
 		assassinCursorPos = null;
 
 		if (!Options.main.lockOnSound) return;
-		if (player.isDisguisedAxl && !player.isAxl && player.axlWeapon is not AssassinBullet) return;
+		if (player.isDisguisedAxl && !player.isAxl && player.weapon is not AssassinBulletChar) return;
 		if (player.isDisguisedAxl && player.axlWeapon is UndisguiseWeapon) return;
 		if (player.input.isCursorLocked(player)) return;
 
@@ -1074,9 +1072,7 @@ public class Axl : Character {
 			lockOnPoint = axlLockOnCursorPos.addxy(-Global.level.camX, -Global.level.camY);
 			// axlCursorPos = (axlCursorTarget as Character).getAimCenterPos().addxy(-Global.level.camX, -Global.level.camY);
 
-			if (player.axlWeapon is AssassinBullet) {
-				assassinCursorPos = lockOnPoint;
-			}
+			
 		}
 	}
 
@@ -1275,7 +1271,7 @@ public class Axl : Character {
 	}
 
 	public bool isAxlLadderShooting() {
-		if (player.weapon is AssassinBullet) return false;
+		if (player.weapon is AssassinBulletChar) return false;
 		if (recoilTime > 0) return true;
 		bool canShootBool = (
 			canShoot() && currentWeapon?.noAmmo() == true && player.axlWeapon != null &&
@@ -1405,19 +1401,19 @@ public class Axl : Character {
 		if (Options.main.useMouseAim || Global.showHitboxes) {
 			drawBloom();
 			Global.sprites["axl_cursor"].draw(0, axlCursorWorldPos.x, axlCursorWorldPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
-			if (player.assassinHitPos?.isHeadshot == true && player.weapon is AssassinBullet && Global.level.isTraining()) {
+			if (player.assassinHitPos?.isHeadshot == true && player.weapon is AssassinBulletChar && Global.level.isTraining()) {
 				Global.sprites["hud_kill"].draw(0, axlCursorWorldPos.x, axlCursorWorldPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
 			}
 		}
 		if (!Options.main.useMouseAim) {
-			if (player.axlWeapon != null && (player.axlWeapon is AssassinBullet || player.input.isCursorLocked(player))) {
+			if (player.axlWeapon != null && (player.weapon is AssassinBulletChar || player.input.isCursorLocked(player))) {
 				Point bulletPos = getAxlBulletPos();
 				float radius = 120;
 				float ang = getShootAngle();
 				float x = Helpers.cosd(ang) * radius * getShootXDir();
 				float y = Helpers.sind(ang) * radius * getShootXDir();
 				DrawWrappers.DrawLine(bulletPos.x, bulletPos.y, bulletPos.x + x, bulletPos.y + y, new Color(255, 0, 0, 128), 2, ZIndex.HUD, true);
-				if (axlCursorTarget != null && player.assassinHitPos?.isHeadshot == true && player.weapon is AssassinBullet && Global.level.isTraining()) {
+				if (axlCursorTarget != null && player.assassinHitPos?.isHeadshot == true && player.weapon is AssassinBulletChar && Global.level.isTraining()) {
 					Global.sprites["hud_kill"].draw(0, axlLockOnCursorPos.x, axlLockOnCursorPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
 				}
 			}
@@ -1469,7 +1465,8 @@ public class Axl : Character {
 	public void drawArm(float angle) {
 		long zIndex = this.zIndex - 1;
 		Point gunArmOrigin;
-		if (charState is Assassinate assasinate) {
+		/*
+		if (charState is AssassinateEX assasinate) {
 			gunArmOrigin = getAxlGunArmOrigin();
 			getAxlArmSprite().draw(
 				0, gunArmOrigin.x, gunArmOrigin.y,
@@ -1477,7 +1474,7 @@ public class Axl : Character {
 				zIndex, angle: angle, shaders: getShaders()
 			);
 			return;
-		}
+		} */
 
 		if (player.axlWeapon != null && player.axlWeapon.isTwoHanded(false)) {
 			zIndex = this.zIndex + 1;

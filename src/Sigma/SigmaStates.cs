@@ -100,7 +100,7 @@ public class SigmaAutoBlock : CharState {
 	public override void update() {
 		base.update();
 
-		if (!!player.isControllingPuppet() || Global.level.gameMode.isOver) {
+		if (!player.isControllingPuppet() || Global.level.gameMode.isOver) {
 			character.changeToIdleOrFall();
 			return;
 		}

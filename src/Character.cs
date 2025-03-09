@@ -553,7 +553,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool canChangeWeapons() {
-		if (currentWeapon is AssassinBullet && chargeTime > 0) return false;
+		if (currentWeapon is AssassinBulletChar && chargeTime > 0) return false;
 		if (charState is ViralSigmaPossess) return false;
 		if (charState is InRideChaser) return false;
 
@@ -1035,7 +1035,7 @@ public partial class Character : Actor, IDamagable {
 					if (this is MegamanX { hyperHelmetActive: true, helmetArmor: ArmorId.Max }) {
 						playSound("subtankFillX3", forcePlay: true, sendRpc: true);
 					} else {
-						playAltSound("land", sendRpc: true, altParams: "carmor");
+						playAltSound("heal", sendRpc: true, altParams: "harmor");
 					}
 				}
 			}
@@ -2499,6 +2499,7 @@ public partial class Character : Actor, IDamagable {
 		decimal originalHP = health;
 		Axl? axl = this as Axl;
 		MegamanX? mmx = this as MegamanX;
+		Vile? vile = this as Vile;
 
 		// For Dark Hold break.
 		if (damage > 0 && charState is DarkHoldState dhs && dhs.stateFrames > 10 && !Damager.isDot(projId)) {
@@ -2560,7 +2561,11 @@ public partial class Character : Actor, IDamagable {
 			damage -= 1;
 		}
 		// Damage increase/reduction section
-		if (!isArmorPiercing) {
+		if (!isArmorPiercing && (
+			damage != (decimal)Damager.forceKillDamage ||
+			damage != (decimal)Damager.ohkoDamage ||
+			damage != (decimal)Damager.envKillDamage
+		)) {
 			if (charState is SwordBlock) {
 				damageSavings += (originalDamage * 0.5m);
 			}
@@ -2589,7 +2594,7 @@ public partial class Character : Actor, IDamagable {
 					damageSavings += originalDamage / 8m;
 				}
 			}
-			if (this is Vile vile && vile.hasFrozenCastle) {
+			if (vile != null && vile.hasFrozenCastle) {
 				damageSavings += originalDamage * Vile.frozenCastlePercent;
 			}
 		}
@@ -3136,15 +3141,17 @@ public partial class Character : Actor, IDamagable {
 			} else {
 				updateAxlDirectionalAim();
 			}
+		}
 		*/
 
 		if (this is Zero or PunchyZero or BusterZero or Vile) {
 			player.changeWeaponControls();
 		}
-
+		bool shootPressed = player.input.isHeld(Control.Shoot, player);
+		bool altShootPressed = player.input.isHeld(Control.Special1, player);
+		bool specialPressed = player.input.isPressed(Control.Special1, player);
+		bool upPressed = player.input.isHeld(Control.Up, player);
 		if (currentWeapon is UndisguiseWeapon) {
-			bool shootPressed = player.input.isPressed(Control.Shoot, player);
-			bool altShootPressed = player.input.isPressed(Control.Special1, player);
 			if ((shootPressed || altShootPressed)) {
 				undisguiseTime = 0.33f;
 				DNACore lastDNA = player.lastDNACore;
@@ -3168,11 +3175,11 @@ public partial class Character : Actor, IDamagable {
 			}
 		}
 
-		if (currentWeapon is AssassinBullet) {
-			if (player.input.isPressed(Control.Special1, player) && !isCharging()) {
+		if (currentWeapon is AssassinBulletChar) {
+			if (specialPressed && !isCharging()) {
 				if (player.currency >= 2) {
 					player.currency -= 2;
-					shootAssassinShot(isAltFire: true);
+					shootAssassinShot(isAlt: true);
 					return;
 				} else {
 					Global.level.gameMode.setHUDErrorMessage(
@@ -3182,16 +3189,17 @@ public partial class Character : Actor, IDamagable {
 			}
 		}
 
-		if (currentWeapon is AssassinBullet && (this is Vile or BaseSigma)) {
-			if (player.input.isHeld(Control.Shoot, player)) {
-				increaseCharge();
+		if (currentWeapon is AssassinBulletChar) {
+			if (shootPressed && !(this is Vile)) {
+				//do not touch
+			} else if (upPressed && (this is Vile)) {
+				
 			} else {
 				if (isCharging()) {
 					shootAssassinShot();
 				}
 				stopCharge();
 			}
-			chargeGfx();
 		}
 
 		/*
@@ -3203,15 +3211,13 @@ public partial class Character : Actor, IDamagable {
 		*/
 	}
 
-	public void shootAssassinShot(bool isAltFire = false) {
-		if (getChargeLevel() >= 3 || isAltFire) {
+	public void shootAssassinShot(bool isAlt = false) {
+		if (getChargeLevel() >= 3 || isAlt) {
 			player.revertToAxl();
-			assassinTime = 0.5f;
-			assassinTime = 0.5f;
+			assassinTime = 0.75f;
 			useGravity = false;
 			vel = new Point();
-			isQuickAssassinate = isAltFire;
-			changeState(new Assassinate(grounded), true);
+			changeState(new AssassinateChar(), true);
 		} else {
 			stopCharge();
 		}

@@ -354,7 +354,7 @@ public class WarpIn : CharState {
 	public float destY;
 	public float destX;
 	public float startY;
-	public Anim warpAnim;
+	public Anim? warpAnim;
 	bool warpAnimOnce;
 
 	// Sigma-specific
@@ -470,7 +470,7 @@ public class WarpIn : CharState {
 		}
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.visible = true;
 		character.useGravity = true;
@@ -489,7 +489,7 @@ public class WarpOut : CharState {
 	public bool warpSoundPlayed;
 	public float destY;
 	public float startY;
-	public Anim warpAnim;
+	public Anim? warpAnim;
 	public const float yOffset = 200;
 	public bool isSigma { get { return player.isSigma; } }
 	public bool is1v1MaverickStart;
@@ -532,7 +532,7 @@ public class WarpOut : CharState {
 		}
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		if (warpAnim != null) {
 			warpAnim.destroySelf();
@@ -568,7 +568,7 @@ public class Idle : CharState {
 			if (!character.isSoftLocked() && character.canTurn()) {
 				if (player.input.isHeld(Control.Left, player)) character.xDir = -1;
 				if (player.input.isHeld(Control.Right, player)) character.xDir = 1;
-				if (player.character.canMove()) character.changeState(new Run());
+				if (character.canMove()) character.changeState(new Run());
 			}
 		}
 
@@ -604,10 +604,10 @@ public class Run : CharState {
 		}
 		if (player.input.isHeld(Control.Left, player)) {
 			character.xDir = -1;
-			if (player.character.canMove()) move.x = -runSpeed;
+			if (character.canMove()) move.x = -runSpeed;
 		} else if (player.input.isHeld(Control.Right, player)) {
 			character.xDir = 1;
-			if (player.character.canMove()) move.x = runSpeed;
+			if (character.canMove()) move.x = runSpeed;
 		}
 		if (move.magnitude > 0) {
 			character.move(move);
@@ -665,6 +665,7 @@ public class SwordBlock : CharState {
 		attackCtrl = true;
 		normalCtrl = true;
 		stunResistant = true;
+		immuneToWind = true;
 	}
 
 	public override void update() {
@@ -756,7 +757,7 @@ public class Jump : CharState {
 
 public class Fall : CharState {
 	public float limboVehicleCheckTime;
-	public Actor limboVehicle;
+	public Actor? limboVehicle;
 
 	public Fall() : base("fall", "fall_shoot", Options.main.getAirAttack(), "fall_start") {
 		accuracy = 5;
@@ -772,7 +773,7 @@ public class Fall : CharState {
 		base.update();
 		if (limboVehicleCheckTime > 0) {
 			limboVehicleCheckTime -= Global.spf;
-			if (limboVehicle.destroyed || limboVehicleCheckTime <= 0) {
+			if (limboVehicle?.destroyed == true || limboVehicleCheckTime <= 0) {
 				limboVehicleCheckTime = 0;
 				character.useGravity = true;
 				character.limboRACheckCooldown = 1;
@@ -795,7 +796,7 @@ public class Fall : CharState {
 		}
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -806,7 +807,7 @@ public class Dash : CharState {
 	public string initialDashButton;
 	public int initialDashDir;
 	public bool stop;
-	public Anim dashSpark;
+	public Anim? dashSpark;
 
 	public Dash(string initialDashButton) : base("dash", "dash_shoot", "attack_dash") {
 		this.initialDashButton = initialDashButton;
@@ -834,10 +835,10 @@ public class Dash : CharState {
 		);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
-		if (!dashSpark.destroyed) {
-			dashSpark.destroySelf();
+		if (!dashSpark?.destroyed == true) {
+			dashSpark?.destroySelf();
 		}
 	}
 
@@ -918,7 +919,7 @@ public class AirDash : CharState {
 	public string initialDashButton;
 	public int initialDashDir;
 	public bool stop;
-	public Anim dashSpark;
+	public Anim? dashSpark;
 
 	public AirDash(string initialDashButton) : base("dash", "dash_shoot") {
 		this.initialDashButton = initialDashButton;
@@ -993,9 +994,9 @@ public class AirDash : CharState {
 		);
 	}
 
-	public override void onExit(CharState newState) {
-		if (!dashSpark.destroyed) {
-			dashSpark.destroySelf();
+	public override void onExit(CharState? newState) {
+		if (!dashSpark?.destroyed == true) {
+			dashSpark?.destroySelf();
 		}
 		character.useGravity = true;
 		base.onExit(newState);
@@ -1075,11 +1076,11 @@ public class WallSlide : CharState {
 				var hitWall = hit?.gameObject as Wall;
 
 				if (wallDir != player.input.getXDir(player)) {
-					player.character.changeState(new Fall());
+					character.changeState(new Fall());
 				} else if (hitWall == null || !hitWall.collider.isClimbable) {
 					var hitActor = hit?.gameObject as Actor;
 					if (hitActor == null || !hitActor.isPlatform) {
-						player.character.changeState(new Fall());
+						character.changeState(new Fall());
 					}
 				}
 			}
@@ -1093,7 +1094,7 @@ public class WallSlide : CharState {
 		}
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		character.useGravity = true;
 		base.onExit(newState);
 	}
@@ -1197,7 +1198,7 @@ public class LadderClimb : CharState {
 		character.dashedInAir = 0;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.frameSpeed = 1;
 		character.useGravity = true;
@@ -1271,7 +1272,7 @@ public class LadderEnd : CharState {
 		character.stopMoving();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -1306,7 +1307,7 @@ public class Taunt : CharState {
 		if (player.charNum == 3) tauntTime = 0.75f;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		zeroching?.destroySelf();
 	}
@@ -1417,7 +1418,7 @@ public class Die : CharState {
 			if (stateTime >= 2.5f) {
 				destroyRideArmor();
 				player.explodeDieEnd();
-				player.destroyCharacter(character);
+				player.destroyCharacter(character, true);
 			}
 		} else {
 			if (stateTime >= 1 && !once) {
@@ -1588,7 +1589,7 @@ public class GenericGrabbedState : CharState {
 		else character.setzIndex(grabber.zIndex + 100);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.grabInvulnTime = 2;
 		if (this is VileMK2Grabbed) {

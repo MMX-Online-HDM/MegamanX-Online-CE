@@ -355,6 +355,7 @@ public class Vile : Character {
 		} 
 	}
 	public override bool chargeButtonHeld() {
+		if (currentWeapon is AssassinBulletChar) return player.input.isHeld(Control.Up, player);
 		return player.input.isHeld(Control.Special1, player);
 	}
 	public override bool canCharge() {
@@ -370,7 +371,10 @@ public class Vile : Character {
 		return base.canShoot();
 	}
 	public override void chargeLogic(Action<int> shootFunct) {
-		if (chargeButtonHeld() && flag == null && player.vileAmmo >= laserWeapon.getAmmoUsage(0)) {
+		if (flag == null && chargeButtonHeld() &&
+			(player.vileAmmo >= laserWeapon.getAmmoUsage(0) || 
+			currentWeapon is AssassinBulletChar)
+		) {
 			if (canCharge()) {
 				increaseCharge();
 			}

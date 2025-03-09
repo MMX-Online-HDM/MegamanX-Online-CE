@@ -172,7 +172,7 @@ public class TornadoProjCharged : Projectile {
 	) {
 		weapon = StormTornado.netWeapon;
 		damager.damage = 2;
-		damager.hitCooldown = Global.defFlinch;
+		damager.flinch = Global.defFlinch;
 		vel = new Point(0 * xDir, 0);
 		damager.hitCooldown = 20;
 		projId = (int)ProjIds.TornadoCharged;

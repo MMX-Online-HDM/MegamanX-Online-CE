@@ -376,7 +376,7 @@ public class Weapon {
 			if (weaponHealCount >= 1) {
 				weaponHealCount = 0;
 				if (isAlwaysOn || character.currentWeapon == this) {
-					character.playAltSound("subtankFull", altParams: "aarmor");
+					character.playAltSound("heal", altParams: "aarmor");
 				}
 			}
 		}
