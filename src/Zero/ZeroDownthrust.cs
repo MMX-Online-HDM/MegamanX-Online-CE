@@ -168,6 +168,7 @@ public class ZeroDownthrustLand : CharState {
 	public ZeroDownthrustLand(ZeroDownthrustType type) : base(getSpriteName(type)) {
 		exitOnAirborne = true;
 		this.type = type;
+		enterSound = "land";
 	}
 
 	public static string getSpriteName(ZeroDownthrustType type) {
@@ -188,7 +189,6 @@ public class ZeroDownthrustLand : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		altCtrls[1] = true;
-		character.playSound("land", sendRpc: true);
 		switch (type) {
 			case ZeroDownthrustType.Hyouretsuzan:
 				character.breakFreeze(player, character.pos.addxy(character.xDir * 5, 0), sendRpc: true);

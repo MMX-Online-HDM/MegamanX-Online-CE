@@ -3292,7 +3292,7 @@ public partial class Character : Actor, IDamagable {
 			AltSoundIds.X3 => "x3",
 			_ => ""
 		};
-		if (apendix != "" && Global.soundBuffers.ContainsKey(sound+apendix)) {
+		if (apendix != "" && Global.soundBuffers.ContainsKey(sound.ToLower() + apendix)) {
 			return sound+apendix;
 		}
 		return sound;
