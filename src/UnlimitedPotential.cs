@@ -84,7 +84,7 @@ public class XUPParryStartState : CharState {
 		mmx = player.character as RagingChargeX ?? throw new NullReferenceException();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		mmx.parryCooldown = mmx.maxParryCooldown;
 	}
@@ -613,6 +613,7 @@ public class XRevive : CharState {
 	public XRevive() : base("revive_shake") {
 		invincible = true;
 		immuneToWind = true;
+		enterSound = "xRevive";
 	}
 
 	public override void update() {
@@ -644,7 +645,6 @@ public class XRevive : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		reviveAnim = new XReviveAnim(character.getCenterPos(), player.getNextActorNetId(), sendRpc: true);
-		character.playSound("xRevive", sendRpc: true);
 		rcx = character as RagingChargeX ?? throw new NullReferenceException();
 	}
 

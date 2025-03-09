@@ -1787,6 +1787,7 @@ public class RAGroundPound : RideArmorState {
 
 public class RAGroundPoundLand : RideArmorState {
 	public RAGroundPoundLand(string transitionSprite = "") : base("frog_groundpound_land") {
+		enterSound = "crash";
 	}
 
 	public override void update() {
@@ -1800,7 +1801,6 @@ public class RAGroundPoundLand : RideArmorState {
 	public override void onEnter(RideArmorState? oldState) {
 		base.onEnter(oldState);
 		if (player == null) return;
-		rideArmor.playSound("crash", sendRpc: true);
 		new MechFrogStompShockwave(new MechFrogStompWeapon(), rideArmor.pos.addxy(6 * rideArmor.xDir, 0), rideArmor.xDir, player, player.getNextActorNetId(), rpc: true);
 		if (rideArmor.consecutiveJump < 2) rideArmor.consecutiveJumpTimeout = 0.25f;
 		else rideArmor.consecutiveJump = 0;
@@ -1813,17 +1813,14 @@ public class RADash : RideArmorState {
 	public Character? draggedChar;
 
 	public RADash() : base("ridearmor_dash", "ridearmor_attack_dash", "ridearmor_carry_dash") {
-		enterSound = "";
+		enterSound = "ridedash";
 	}
 
 	public override void onEnter(RideArmorState? oldState) {
+		if (enterSound == "ridedash" && rideArmor.raNum >= 1 && rideArmor.raNum <= 4) {
+			enterSound = "ridedashx3";
+		}
 		base.onEnter(oldState);
-		if (rideArmor.raNum == 0 || rideArmor.raNum == 5) {
-			rideArmor.playSound("ridedash", false, true);
-		}
-		if (rideArmor.raNum == 1 || rideArmor.raNum == 2 || rideArmor.raNum == 3 || rideArmor.raNum == 4) {
-			rideArmor.playSound("ridedashX3", false, true);
-		}
 		rideArmor.isDashing = true;
 		new Anim(rideArmor.pos.addxy(rideArmor.xDir * -15, 0), "dash_sparks", rideArmor.xDir, null, true);
 	}
@@ -1943,10 +1940,6 @@ public class RAChainCharge : RideArmorState {
 	public RAChainCharge() : base("ridearmor_charge") {
 	}
 
-	public override void onEnter(RideArmorState? oldState) {
-		base.onEnter(oldState);
-	}
-
 	public override void onExit(RideArmorState? newState) {
 		base.onExit(newState);
 		if (!(newState is RAChainChargeDash)) {
@@ -1991,12 +1984,14 @@ public class RAChainChargeDash : RideArmorState {
 	public RAChainChargeDash(string dashControl, bool isSlow) : base("ridearmor_charge_dash") {
 		this.dashControl = dashControl;
 		this.isSlow = isSlow;
-		enterSound = "dash";
+		enterSound = "ridedash";
 	}
 
 	public override void onEnter(RideArmorState? oldState) {
+		if (enterSound == "ridedash" && rideArmor.raNum >= 1 && rideArmor.raNum <= 4) {
+			enterSound = "ridedashx3";
+		}
 		base.onEnter(oldState);
-		rideArmor.playSound("ridedashX3", false, true);	
 		rideArmor.isDashing = true;
 		new Anim(rideArmor.pos, "dash_sparks", rideArmor.xDir, null, true);
 	}
@@ -2110,14 +2105,6 @@ public class RAGoliathShoot : RideArmorState {
 	bool once;
 	public RAGoliathShoot(bool grounded) : base(grounded ? "ridearmor_shoot" : "ridearmor_jump_shoot") {
 		this.grounded = grounded;
-	}
-
-	public override void onEnter(RideArmorState? oldState) {
-		base.onEnter(oldState);
-	}
-
-	public override void onExit(RideArmorState? newState) {
-		base.onExit(newState);
 	}
 
 	public override void update() {

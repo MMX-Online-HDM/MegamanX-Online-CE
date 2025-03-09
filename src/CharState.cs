@@ -727,6 +727,8 @@ public class Jump : CharState {
 		canStopJump = true;
 		attackCtrl = true;
 		normalCtrl = true;
+		enterSound = "jump";
+		enterSoundArgs = "larmor";
 	}
 
 	public override void update() {
@@ -748,10 +750,6 @@ public class Jump : CharState {
 				pzero.kuuenbuJump = 0;
 				character.changeSpriteFromName("kuuenbu", true);
 			}
-		}
-		if (character.frameIndex <= 0 && !once) {
-			once = true;
-			character.playAltSound("jump", sendRpc: true, altParams: "larmor");
 		}
 	}
 }
@@ -816,11 +814,12 @@ public class Dash : CharState {
 		exitOnAirborne = true;
 		attackCtrl = true;
 		normalCtrl = true;
+		enterSound = "dash";
+		enterSoundArgs = "larmor";
 	}
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.playAltSound("dash", sendRpc: true, altParams: "larmor");
 		initialDashDir = character.xDir;
 		if (character is Axl && (character.currentWeapon as AxlWeapon)?.isTwoHanded(false) == true) {
 			if (player.input.isHeld(Control.Left, player)) initialDashDir = -1;
@@ -925,6 +924,8 @@ public class AirDash : CharState {
 		this.initialDashButton = initialDashButton;
 		accuracy = 10;
 		attackCtrl = true;
+		enterSound = "airdash";
+		enterSoundArgs = "larmor";
 	}
 
 	public override void update() {
@@ -973,7 +974,6 @@ public class AirDash : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.playAltSound("airdash", sendRpc: true, altParams: "larmor");
 		initialDashDir = character.xDir;
 
 		if (character is Axl && (character.currentWeapon as AxlWeapon)?.isTwoHanded(false) == true) {
@@ -1017,12 +1017,13 @@ public class WallSlide : CharState {
 		this.wallCollider = wallCollider;
 		accuracy = 2;
 		attackCtrl = true;
+		enterSound = "wallLand";
+		enterSoundArgs = "larmor";
 	}
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		mmx = character as MegamanX;
-		character.playAltSound("wallLand", sendRpc: true, altParams: "larmor");
 		character.dashedInAir = 0;
 		if (player.isAI && character.ai != null) {
 			character.ai.jumpTime = 0;
@@ -1156,6 +1157,8 @@ public class WallKick : CharState {
 		canStopJump = true;
 		attackCtrl = true;
 		normalCtrl = true;
+		enterSound = "jump";
+		enterSoundArgs = "larmor";
 	}
 
 	public override void update() {
@@ -1163,10 +1166,6 @@ public class WallKick : CharState {
 		if (character.vel.y > 0) {
 			character.changeState(new Fall());
 		}
-	}
-	public override void onEnter(CharState oldState) {
-		character.playAltSound("jump", sendRpc: true, altParams: "larmor");
-		base.onEnter(oldState);
 	}
 }
 
@@ -1657,6 +1656,7 @@ public class CrouchEnd : CharState {
 		}
 	}
 }
+
 public class DashEnd : CharState {
 	public DashEnd() : base("dash_end", "dash_end_shoot") {
 		attackCtrl = true;
@@ -1664,6 +1664,7 @@ public class DashEnd : CharState {
 		useDashJumpSpeed = true;
 		airMove = true;
 	}
+
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		if (character is Doppma doppma && !doppma.grounded) {
@@ -1676,13 +1677,14 @@ public class DashEnd : CharState {
 		}
 		if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
 			character.frameTime = 6;
-		} else 
-		exitOnAirborne = false;
+		}
 	}
+
 	public override void update() {
 		base.update();
+
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
-		} 
+		}
 	}
 }

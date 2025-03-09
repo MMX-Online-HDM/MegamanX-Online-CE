@@ -736,7 +736,7 @@ public class InRideChaser : CharState {
 		character.setGlobalColliderTrigger(true);
 		var mechWeapon = player.weapons.FirstOrDefault(m => m is MechMenuWeapon) as MechMenuWeapon;
 		if (mechWeapon != null) mechWeapon.isMenuOpened = false;
-		character.rideChaser.setzIndex(character.zIndex - 1);
+		character.rideChaser?.setzIndex(character.zIndex - 1);
 		if (character.isCharging()) {
 			character.stopCharge();
 		}
