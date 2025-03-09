@@ -23,6 +23,7 @@ public class CharState {
 	public float stateTime;
 	public float stateFrames;
 	public string enterSound = "";
+	public string enterSoundArgs = "";
 	public float framesJumpNotHeld = 0;
 	public bool once;
 	public bool useGravity = true;
@@ -117,7 +118,7 @@ public class CharState {
 
 	public virtual void onEnter(CharState oldState) {
 		if (!string.IsNullOrEmpty(enterSound)) {
-			character.playSound(enterSound, sendRpc: true);
+			character.playAltSound(enterSound, sendRpc: true, altParams: enterSoundArgs);
 		}
 		if (oldState is VileHover) {
 			wasVileHovering = true;
@@ -1608,6 +1609,7 @@ public class Land : CharState {
 	public Land() : base("land", "land_shoot") {
 		attackCtrl = true;
 		normalCtrl = true;
+		enterSound = "land";
 	}
 
 	public override void update() {
@@ -1622,7 +1624,6 @@ public class Land : CharState {
 		}
 	}
 	public override void onEnter(CharState oldState) {
-		character.playAltSound("land", sendRpc: true, altParams: "larmor");
 		base.onEnter(oldState);
 	}
 }

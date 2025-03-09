@@ -1814,7 +1814,7 @@ public partial class Character : Actor, IDamagable {
 		}
 	}
 
-	public virtual void landingCode() {
+	public virtual void landingCode(bool useSound = true) {
 		dashedInAir = 0;
 		changeState(new Land(), true);
 	}
