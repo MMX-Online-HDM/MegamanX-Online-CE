@@ -1610,6 +1610,7 @@ public class Land : CharState {
 		attackCtrl = true;
 		normalCtrl = true;
 		enterSound = "land";
+		enterSoundArgs = "larmor";
 	}
 
 	public override void update() {
