@@ -82,9 +82,7 @@ public class VileMissile : Weapon {
 		int xDir = vile.xDir;
 		
 		if (vile.tryUseVileAmmo(vileAmmo)) {
-			if (!isMK2) {
-				vile.setVileShootTime(this);
-			}
+			vile.setVileShootTime(this);
 			if (!vile.grounded) {
 				vile.changeState(new MissileAttack(grounded: false), true);
 			} else {

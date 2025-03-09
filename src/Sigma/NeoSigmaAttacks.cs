@@ -109,7 +109,6 @@ public class SigmaElectricBallProj : Projectile {
 	) {
 		weapon = SigmaElectricBallWeapon.netWeapon;
 		damager.damage = 3;
-		damager.flinch = Global.miniFlinch;
 		damager.hitCooldown = 12;
 		projId = (int)ProjIds.Sigma2Ball;
 		destroyOnHit = false;

@@ -1192,7 +1192,11 @@ public partial class Actor : GameObject {
 
 		float reportDamage = Helpers.clampMax(damage, maxHealth);
 		if (damage == Damager.ohkoDamage && damage >= maxHealth) {
-			addDamageText("Instakill!", (int)FontType.RedishOrange);
+			if (Helpers.randomRange(0, 20) != 10) {
+				addDamageText("Instakill!", (int)FontType.RedishOrange);
+			} else {
+				addDamageText("Fatality!", (int)FontType.RedishOrange);
+			}
 		} else if (attacker.isMainPlayer) {
 			addDamageText(reportDamage);
 		} else if (ownedByLocalPlayer && sendRpc) {

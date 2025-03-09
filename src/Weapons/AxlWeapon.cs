@@ -101,7 +101,8 @@ public class AxlWeapon : Weapon {
 			}
 
 			Weapon weapon = player.weapon;
-			if (axlBulletType == AxlBulletType.Assassin) weapon = new AssassinBullet();
+			if (axlBulletType == AxlBulletType.Assassin) weapon = new AssassinBulletChar();
+
 			axlGetProjectile(weapon, bulletPos, axl.axlXDir, player, aimAngle, axl.axlCursorTarget, axl.axlHeadshotTarget, cursorPos, chargeLevel, player.getNextActorNetId());
 
 			string? fs = !isCharged ? flashSprite : chargedFlashSprite;
