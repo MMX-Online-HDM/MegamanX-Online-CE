@@ -2575,6 +2575,12 @@ public partial class Character : Actor, IDamagable {
 						damageSavings += (originalDamage * 0.25m);
 					}
 				}
+				if (mmx.chestArmor == ArmorId.Light) {
+					damageSavings += (originalDamage * 0.125m);
+				}
+				if (mmx.chestArmor == ArmorId.Giga) {
+					damageSavings += (originalDamage * 0.125m);
+				}
 			}
 			if (vile != null && vile.hasFrozenCastle) {
 				damageSavings += originalDamage * Vile.frozenCastlePercent;
