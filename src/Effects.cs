@@ -5,7 +5,11 @@ namespace MMXOnline;
 
 public class ChargeParticle : Actor {
 	public float time;
-	public ChargeParticle(Point pos, float time, ushort? netId) : base("charge_part_1", new Point(pos.x, pos.y), netId, true, true) {
+	public ChargeParticle(
+		Point pos, float time, ushort? netId
+	) : base(
+		"charge_part_1", new Point(pos.x, pos.y), netId, true, true
+	) {
 		this.time = time;
 	}
 
@@ -116,8 +120,8 @@ public class ChargeEffect {
 	}
 
 	public void destroy() {
-		foreach (var chargePart in chargeParts) {
-			chargePart.destroySelf(null, null);
+		foreach (ChargeParticle chargePart in chargeParts) {
+			chargePart.destroySelf();
 		}
 	}
 
