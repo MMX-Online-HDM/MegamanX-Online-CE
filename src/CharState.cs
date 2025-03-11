@@ -1418,7 +1418,7 @@ public class Die : CharState {
 			if (stateTime >= 2.5f) {
 				destroyRideArmor();
 				player.explodeDieEnd();
-				player.destroyCharacter(character, true);
+				player.destroyCharacter(character);
 			}
 		} else {
 			if (stateTime >= 1 && !once) {
