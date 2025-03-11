@@ -296,14 +296,10 @@ public class MegamanX : Character {
 		bool inputCheckH = false;
 		bool inputCheckS = false;
 		if (hasHadoukenEquipped()) {
-			inputCheckH = player.input.isHeld(Control.Down, player) && 
-			player.input.isHeld(Control.Shoot, player) 
-			&& (player.input.isHeld(Control.Right, player) || player.input.isHeld(Control.Left, player));
+			inputCheckH = player.input.checkHadoken(player, xDir, Control.Shoot);
 		}
 		if (hasShoryukenEquipped()) {
-			inputCheckS = player.input.isHeld(Control.Down, player) && 
-			player.input.isHeld(Control.Shoot, player) 
-			&& (player.input.isHeld(Control.Right, player) || player.input.isHeld(Control.Left, player));
+			inputCheckS = player.input.checkShoryuken(player, xDir, Control.Shoot);
 		}
 		if (inputCheckH && canUseFgMove() && grounded) {
 			if (!player.hasAllItems()) player.currency -= 3;
