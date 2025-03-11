@@ -2575,12 +2575,6 @@ public partial class Character : Actor, IDamagable {
 						damageSavings += (originalDamage * 0.25m);
 					}
 				}
-				if (player.isX && player.hasBodyArmor(1)) {
-					damageSavings += originalDamage / 8m;
-				}
-				if (player.isX && player.hasBodyArmor(2)) {
-					damageSavings += originalDamage / 8m;
-				}
 			}
 			if (vile != null && vile.hasFrozenCastle) {
 				damageSavings += originalDamage * Vile.frozenCastlePercent;
@@ -2698,6 +2692,14 @@ public partial class Character : Actor, IDamagable {
 							this, currentAmmo, novaStrike.ammo,
 							novaStrike.getAmmoUsage(0), novaStrike.maxAmmo
 						);
+					}
+				}
+				if (mmx != null) {
+					if (mmx.fullArmor == ArmorId.Light) {
+						player.hadoukenAmmo += (float)(originalDamage * 32);
+					}
+					if (mmx.fullArmor == ArmorId.Giga) {
+						player.shoryukenAmmo += (float)(originalDamage * 32);
 					}
 				}
 			}
