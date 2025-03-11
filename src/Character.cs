@@ -2696,10 +2696,10 @@ public partial class Character : Actor, IDamagable {
 				}
 				if (mmx != null) {
 					if (mmx.fullArmor == ArmorId.Light) {
-						player.hadoukenAmmo += (float)(originalDamage * 64);
+						player.hadoukenAmmo += (float)(originalDamage * 32);
 					}
 					if (mmx.fullArmor == ArmorId.Giga) {
-						player.shoryukenAmmo += (float)(originalDamage * 64);
+						player.shoryukenAmmo += (float)(originalDamage * 32);
 					}
 				}
 			}
