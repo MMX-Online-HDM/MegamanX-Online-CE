@@ -23,6 +23,14 @@ public class MegamanX : Character {
 	public ArmorId hyperArmArmor => (hyperArmActive ? armArmor : ArmorId.None);
 	public ArmorId hyperLegArmor => (hyperLegActive ? legArmor : ArmorId.None);
 	public ArmorId hyperHelmetArmor => (hyperHelmetActive ? helmetArmor : ArmorId.None);
+	
+	public ArmorId fullArmor => (
+		chestArmor == armArmor &&
+		armArmor == legArmor &&
+		legArmor == helmetArmor
+		? chestArmor
+		: 0
+	);
 
 	public bool hyperChestActive;
 	public bool hyperArmActive;
@@ -158,8 +166,10 @@ public class MegamanX : Character {
 		if (lastShootPressed < 100) {
 			lastShootPressed++;
 		}
-		player.fgMoveAmmo += Global.speedMul;
-		if (player.fgMoveAmmo > player.fgMoveMaxAmmo) player.fgMoveAmmo = player.fgMoveMaxAmmo;
+		player.hadoukenAmmo += Global.speedMul;
+		if (player.hadoukenAmmo > player.fgMoveMaxAmmo) player.hadoukenAmmo = player.fgMoveMaxAmmo;
+		player.shoryukenAmmo += Global.speedMul;
+		if (player.shoryukenAmmo > player.fgMoveMaxAmmo) player.shoryukenAmmo = player.fgMoveMaxAmmo;
 
 		Helpers.decrementFrames(ref aiAttackCooldown);
 		// Strike chain extending the shoot anim.
@@ -282,6 +292,32 @@ public class MegamanX : Character {
 			shoot(1, currentWeapon ?? specialBuster, true);
 			return true;
 		}
+		bool inputCheckH = false;
+		bool inputCheckS = false;
+		if (hasHadoukenEquipped()) {
+			inputCheckH = player.input.checkHadoken(player, xDir, Control.Shoot);
+		}
+		if (hasShoryukenEquipped()) {
+			inputCheckS = player.input.checkShoryuken(player, xDir, Control.Shoot);
+		}
+		if (inputCheckH && canUseFgMove() && grounded &&
+			player.hadoukenAmmo >= player.fgMoveMaxAmmo && 
+			hadoukenCooldownTime == 0
+		) {
+			if (!player.hasAllItems()) player.currency -= 3;
+			player.hadoukenAmmo = 0;
+			changeState(new Hadouken(), true);
+			return true;
+		}
+		if (inputCheckS && canUseFgMove() && grounded &&
+			player.shoryukenAmmo >= player.fgMoveMaxAmmo && 
+			shoryukenCooldownTime == 0
+		) {
+			if (!player.hasAllItems()) player.currency -= 3;
+			player.shoryukenAmmo = 0;
+			changeState(new Shoryuken(isUnderwater()), true);
+			return true;
+		}
 		if (!isCharging() && currentWeapon != null && canShoot() && (
 				player.input.isPressed(Control.Shoot, player) ||
 				currentWeapon.isStream && getChargeLevel() < 2 &&
@@ -292,26 +328,6 @@ public class MegamanX : Character {
 				shoot(0);
 				return true;
 			}
-		}
-		bool inputCheckH = false;
-		bool inputCheckS = false;
-		if (hasHadoukenEquipped()) {
-			inputCheckH = player.input.checkHadoken(player, xDir, Control.Shoot);
-		}
-		if (hasShoryukenEquipped()) {
-			inputCheckS = player.input.checkShoryuken(player, xDir, Control.Shoot);
-		}
-		if (inputCheckH && canUseFgMove() && grounded) {
-			if (!player.hasAllItems()) player.currency -= 3;
-			player.fgMoveAmmo = 0;
-			changeState(new Hadouken(), true);
-			return true;
-		}
-		if (inputCheckS && canUseFgMove() && grounded) {
-			if (!player.hasAllItems()) player.currency -= 3;
-			player.fgMoveAmmo = 0;
-			changeState(new Shoryuken(isUnderwater()), true);
-			return true;
 		}
 		return base.attackCtrl();
 	}
@@ -588,9 +604,7 @@ public class MegamanX : Character {
 		return (
 			!isInvulnerableAttack() && 
 			chargedRollingShieldProj == null && 
-			stingActiveTime == 0 && canAffordFgMove() && 
-			hadoukenCooldownTime == 0 && currentWeapon is XBuster && 
-			player.fgMoveAmmo >= player.fgMoveMaxAmmo && grounded
+			stingActiveTime == 0 && canAffordFgMove()
 		);
 	}
 
