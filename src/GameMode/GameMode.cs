@@ -1874,10 +1874,22 @@ public class GameMode {
 			}
 		}
 		if (player.character is MegamanX mmx && mmx.hasFgMoveEquipped() && mmx.canAffordFgMove()) {
-			int x = gigaWeaponX, y = 159;
-			Global.sprites["hud_weapon_icon"].drawToHUD(mmx.hasHadoukenEquipped() ? 112 : 113, x, y);
-			float cooldown = Helpers.progress(player.fgMoveAmmo, 1920f);
-			drawWeaponSlotCooldown(x, y, cooldown);
+			if (mmx.hasHadoukenEquipped()) {
+				int x = gigaWeaponX;
+				int y = 159;
+				Global.sprites["hud_weapon_icon"].drawToHUD(112, x, y);
+				float cooldown = Helpers.progress(player.hadoukenAmmo, 1920f);
+				drawWeaponSlotCooldown(x, y, cooldown);
+				gigaWeaponX += 18;
+			}
+			if (mmx.hasShoryukenEquipped()) {
+				int x = gigaWeaponX;
+				int y = 159;
+				Global.sprites["hud_weapon_icon"].drawToHUD(113, x, y);
+				float cooldown = Helpers.progress(player.shoryukenAmmo, 1920f);
+				drawWeaponSlotCooldown(x, y, cooldown);
+				gigaWeaponX += 18;
+			}
 		}
 
 		if (player.isAxl && player.weapons[0].type > 0) {

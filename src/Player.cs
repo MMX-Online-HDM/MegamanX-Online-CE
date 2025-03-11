@@ -16,7 +16,8 @@ public partial class Player {
 	public Character lastCharacter;
 	public bool ownedByLocalPlayer;
 	public int? awakenedCurrencyEnd;
-	public float fgMoveAmmo = 1920;
+	public float hadoukenAmmo = 1920;
+	public float shoryukenAmmo = 1920;
 	public float fgMoveMaxAmmo = 1920;
 	public bool isDefenderFavoredNonOwner;
 
