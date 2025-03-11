@@ -166,7 +166,7 @@ public partial class Actor : GameObject {
 	public bool lowPiority;
 
 	public Actor(
-		string spriteName, Point pos, ushort? netId, bool ownedByLocalPlayer, bool dontAddToLevel
+		string spriteName, Point pos, ushort? netId, bool ownedByLocalPlayer, bool addToLevel
 	) {
 		// Intialize sprites as soon as posible to prevent crashes.
 		if (spriteName is not null and not "") {
@@ -216,7 +216,7 @@ public partial class Actor : GameObject {
 			Global.level.actorsById[netId.Value] = this;
 		}
 
-		if (!dontAddToLevel) {
+		if (!addToLevel) {
 			Global.level.addGameObject(this);
 		}
 

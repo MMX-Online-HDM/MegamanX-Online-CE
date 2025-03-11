@@ -182,7 +182,7 @@ public partial class Character : Actor, IDamagable {
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
 		bool isWarpIn = true, bool mk2VileOverride = false, bool mk5VileOverride = false
 	) : base(
-		null!, new Point(x, y), netId, ownedByLocalPlayer, dontAddToLevel: true
+		null!, new Point(x, y), netId, ownedByLocalPlayer, addToLevel: true
 	) {
 		this.player = player;
 		netOwner = player;
@@ -710,6 +710,10 @@ public partial class Character : Actor, IDamagable {
 		insideCharacter = false;
 		changedStateInFrame = false;
 		pushedByTornadoInFrame = false;
+		debuffGfx();
+		if (!ownedByLocalPlayer) { return; }
+		// Local only starts here.
+		debuffCooldowns();
 		if (grounded && !isDashing) {
 			dashedInAir = 0;
 		}
@@ -775,16 +779,163 @@ public partial class Character : Actor, IDamagable {
 		}
 	}
 
+	public void debuffGfx() {
+		if (burnTime > 0) {
+			burnEffectTime += Global.speedMul;
+			if (burnEffectTime >= 6) {
+				burnEffectTime = 0;
+				Point burnPos = pos.addxy(0, -10);
+				bool hiding = false;
+				if (charState is InRideArmor inRideArmor) {
+					if (inRideArmor.isHiding) {
+						burnPos = pos.addxy(0, 0);
+						hiding = true;
+					}
+				}
+				var f1 = new Anim(burnPos.addRand(5, 10), "burn_flame", 1, null, true, host: this);
+				if (hiding) f1.setzIndex(zIndex - 100);
+
+				if (burnTime > 2) {
+					var f2 = new Anim(burnPos.addRand(5, 10), "burn_flame", 1, null, true, host: this);
+					if (hiding) f2.setzIndex(zIndex - 100);
+				}
+				if (burnTime > 4) {
+					var f3 = new Anim(burnPos.addRand(5, 10), "burn_flame", 1, null, true, host: this);
+					if (hiding) f3.setzIndex(zIndex - 100);
+				}
+				if (burnTime > 6) {
+					var f4 = new Anim(burnPos.addRand(5, 10), "burn_flame", 1, null, true, host: this);
+					if (hiding) f4.setzIndex(zIndex - 100);
+				}
+			}
+		}
+	}
+
+	public void debuffCooldowns() {
+		Helpers.decrementTime(ref limboRACheckCooldown);
+		Helpers.decrementTime(ref dropFlagCooldown);
+
+		if (Global.level.mainPlayer.readyTextOver) {
+			Helpers.decrementTime(ref invulnTime);
+		}
+
+		if (vaccineTime > 0) {
+			oilTime = 0;
+			burnTime = 0;
+			acidTime = 0;
+			virusTime = 0;
+			vaccineTime -= Global.spf;
+			if (vaccineTime <= 0) {
+				vaccineTime = 0;
+			}
+		}
+		Helpers.decrementTime(ref virusTime);
+		Helpers.decrementTime(ref oilTime);
+
+		if (acidTime > 0) {
+			acidTime -= Global.spf;
+			acidHurtCooldown += Global.speedMul;
+			if (acidHurtCooldown >= 60) {
+				acidHurtCooldown -= 60;
+				if (acidHurtCooldown <= 0) {
+					acidHurtCooldown = 0;
+				}
+				acidDamager?.applyDamage(
+					this, currentWeapon is TornadoFang,
+					new AcidBurst(), this, (int)ProjIds.AcidBurstPoison,
+					overrideDamage: 1f
+				);
+				new Anim(
+					getCenterPos().addxy(Helpers.randomRange(-6, 6), -20),
+					"torpedo_smoke", 1, player.getNextActorNetId(), true, true
+				) {
+					vel = new Point(0, -50)
+				};
+			}
+			if (acidTime <= 0) {
+				removeAcid();
+			}
+		}
+		if (burnTime > 0) {
+			burnTime -= Global.spf;
+			burnHurtCooldown += Global.speedMul;
+			if (burnHurtCooldown >= 60) {
+				burnHurtCooldown -= 60;
+				if (burnHurtCooldown <= 0) {
+					burnHurtCooldown = 0;
+				}
+				burnDamager?.applyDamage(this, false, burnWeapon, this, (int)ProjIds.Burn, overrideDamage: 1f);
+			}
+			if (isUnderwater()) {
+				burnTime = 0;
+			}
+			if (burnTime <= 0) {
+				removeBurn();
+			}
+		}
+		if (flattenedTime > 0 && !(charState is Die)) {
+			flattenedTime -= Global.spf;
+			if (flattenedTime < 0) flattenedTime = 0;
+		}
+		Helpers.decrementTime(ref slowdownTime);
+		igFreezeRecoveryCooldown += speedMul;
+		if (igFreezeRecoveryCooldown > 12) {
+			igFreezeRecoveryCooldown = 0;
+			igFreezeProgress = Helpers.clampMin0(igFreezeProgress - 1);
+		}
+		Helpers.decrementTime(ref freezeInvulnTime);
+		Helpers.decrementTime(ref stunInvulnTime);
+		Helpers.decrementTime(ref crystalizeInvulnTime);
+		Helpers.decrementTime(ref grabInvulnTime);
+		Helpers.decrementTime(ref darkHoldInvulnTime);
+	}
+
 	public override void update() {
 		if (charState is not InRideChaser) {
 			camOffsetX = MathInt.Round(Helpers.lerp(camOffsetX, 0, 10));
 		}
 
-		Helpers.decrementTime(ref limboRACheckCooldown);
-		Helpers.decrementTime(ref dropFlagCooldown);
-
 		if (ownedByLocalPlayer && player.possessedTime > 0) {
 			player.possesseeUpdate();
+		}
+
+		if (Global.level.gameMode.isTeamMode && Global.level.mainPlayer != player) {
+			int alliance = player.alliance;
+			// If this is an enemy disguised Axl, change the alliance
+			if (player.alliance != Global.level.mainPlayer.alliance && player.isDisguisedAxl && !disguiseCoverBlown) {
+				alliance = fakeAlliance;
+			}
+			RenderEffectType? allianceEffect = alliance switch {
+				0 => RenderEffectType.BlueShadow,
+				1 => RenderEffectType.RedShadow,
+				2 => RenderEffectType.GreenShadow,
+				3 => RenderEffectType.PurpleShadow,
+				4 => RenderEffectType.YellowShadow,
+				5 => RenderEffectType.OrangeShadow,
+				_ => null
+			};
+			if (allianceEffect != null) {
+				addRenderEffect(allianceEffect.Value);
+			}
+		}
+
+		if (flag != null && flag.ownedByLocalPlayer) {
+			flag.changePos(getCenterPos());
+		}
+
+		if (linkedRideArmor != null && !Global.level.hasGameObject(linkedRideArmor)) {
+			linkedRideArmor = null;
+		}
+
+		// Cutoff point for things that run but aren't owned by the player
+		if (!ownedByLocalPlayer) {
+			if (isCharging()) {
+				chargeGfx();
+			} else {
+				stopCharge();
+			}
+			base.update();
+			return;
 		}
 
 		if (flag != null) {
@@ -819,164 +970,6 @@ public partial class Character : Actor, IDamagable {
 			dropFlagUnlocked = false;
 		}
 
-		if (Global.level.gameMode.isTeamMode && Global.level.mainPlayer != player) {
-			int alliance = player.alliance;
-			// If this is an enemy disguised Axl, change the alliance
-			if (player.alliance != Global.level.mainPlayer.alliance && player.isDisguisedAxl && !disguiseCoverBlown) {
-				alliance = fakeAlliance;
-			}
-			RenderEffectType? allianceEffect = alliance switch {
-				0 => RenderEffectType.BlueShadow,
-				1 => RenderEffectType.RedShadow,
-				2 => RenderEffectType.GreenShadow,
-				3 => RenderEffectType.PurpleShadow,
-				4 => RenderEffectType.YellowShadow,
-				5 => RenderEffectType.OrangeShadow,
-				_ => null
-			};
-			if (allianceEffect != null) {
-				addRenderEffect(allianceEffect.Value);
-			}
-		}
-
-		if (Global.level.mainPlayer.readyTextOver) {
-			Helpers.decrementTime(ref invulnTime);
-		}
-
-		if (vaccineTime > 0) {
-			oilTime = 0;
-			burnTime = 0;
-			acidTime = 0;
-			virusTime = 0;
-			vaccineTime -= Global.spf;
-			if (vaccineTime <= 0) {
-				vaccineTime = 0;
-			}
-		}
-
-		if (virusTime > 0) {
-			virusTime -= Global.spf;
-			if (virusTime <= 0) {
-				virusTime = 0;
-			}
-		}
-
-		if (oilTime > 0) {
-			oilTime -= Global.spf;
-			if (isUnderwater() || charState.invincible || isStatusImmune()) {
-				oilTime = 0;
-			}
-			if (oilTime <= 0) {
-				oilTime = 0;
-			}
-		}
-
-		if (acidTime > 0) {
-			acidTime -= Global.spf;
-			acidHurtCooldown += Global.speedMul;
-			if (acidHurtCooldown >= 60) {
-				acidHurtCooldown -= 60;
-				if (acidHurtCooldown <= 0) {
-					acidHurtCooldown = 0;
-				}
-				acidDamager?.applyDamage(
-					this, currentWeapon is TornadoFang,
-					new AcidBurst(), this, (int)ProjIds.AcidBurstPoison,
-					overrideDamage: 1f
-				);
-				new Anim(
-					getCenterPos().addxy(Helpers.randomRange(-6, 6), -20),
-					"torpedo_smoke", 1, null, true) {
-						vel = new Point(0, -50)
-					};
-			}
-			if (isUnderwater() || charState.invincible || isStatusImmune()) {
-				acidTime = 0;
-			}
-			if (acidTime <= 0) {
-				removeAcid();
-			}
-		}
-
-		if (burnTime > 0) {
-			burnTime -= Global.spf;
-			burnHurtCooldown += Global.speedMul;
-			burnEffectTime += Global.speedMul;
-			if (burnEffectTime >= 6) {
-				burnEffectTime = 0;
-				Point burnPos = pos.addxy(0, -10);
-				bool hiding = false;
-				if (charState is InRideArmor inRideArmor) {
-					if (inRideArmor.isHiding) {
-						burnPos = pos.addxy(0, 0);
-						hiding = true;
-					}
-				}
-				var f1 = new Anim(burnPos.addRand(5, 10), "burn_flame", 1, null, true, host: this);
-				if (hiding) f1.setzIndex(zIndex - 100);
-
-				if (burnTime > 2) {
-					var f2 = new Anim(burnPos.addRand(5, 10), "burn_flame", 1, null, true, host: this);
-					if (hiding) f2.setzIndex(zIndex - 100);
-				}
-				if (burnTime > 4) {
-					var f3 = new Anim(burnPos.addRand(5, 10), "burn_flame", 1, null, true, host: this);
-					if (hiding) f3.setzIndex(zIndex - 100);
-				}
-				if (burnTime > 6) {
-					var f4 = new Anim(burnPos.addRand(5, 10), "burn_flame", 1, null, true, host: this);
-					if (hiding) f4.setzIndex(zIndex - 100);
-				}
-			}
-			if (burnHurtCooldown >= 60) {
-				burnHurtCooldown -= 60;
-				if (burnHurtCooldown <= 0) {
-					burnHurtCooldown = 0;
-				}
-				burnDamager?.applyDamage(this, false, burnWeapon, this, (int)ProjIds.Burn, overrideDamage: 1f);
-			}
-			if (isUnderwater() || charState.invincible || isStatusImmune()) {
-				burnTime = 0;
-			}
-			if (burnTime <= 0) {
-				removeBurn();
-			}
-		}
-
-		if (flattenedTime > 0 && !(charState is Die)) {
-			flattenedTime -= Global.spf;
-			if (flattenedTime < 0) flattenedTime = 0;
-		}
-		Helpers.decrementTime(ref slowdownTime);
-
-		if (!ownedByLocalPlayer) {
-			if (isCharging()) {
-				chargeGfx();
-			} else {
-				stopCharge();
-			}
-		}
-
-		igFreezeRecoveryCooldown += Global.spf;
-		if (igFreezeRecoveryCooldown > 0.2f) {
-			igFreezeRecoveryCooldown = 0;
-			igFreezeProgress--;
-			if (igFreezeProgress < 0) igFreezeProgress = 0;
-		}
-		Helpers.decrementTime(ref freezeInvulnTime);
-		Helpers.decrementTime(ref stunInvulnTime);
-		Helpers.decrementTime(ref crystalizeInvulnTime);
-		Helpers.decrementTime(ref grabInvulnTime);
-		Helpers.decrementTime(ref darkHoldInvulnTime);
-
-		if (flag != null && flag.ownedByLocalPlayer) {
-			flag.changePos(getCenterPos());
-		}
-
-		if (linkedRideArmor != null && !Global.level.hasGameObject(linkedRideArmor)) {
-			linkedRideArmor = null;
-		}
-
 		if (transformAnim != null) {
 			transformSmokeTime += Global.spf;
 			if (transformSmokeTime > 0) {
@@ -993,11 +986,6 @@ public partial class Character : Actor, IDamagable {
 			if (transformAnim.destroyed) {
 				transformAnim = null;
 			}
-		}
-		// Cutoff point for things that run but aren't owned by the player
-		if (!ownedByLocalPlayer) {
-			base.update();
-			return;
 		}
 		updateParasite();
 
@@ -2931,7 +2919,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual void onDeath() {
-		
+
 	}
 
 	public void cleanupBeforeTransform() {
@@ -3190,21 +3178,15 @@ public partial class Character : Actor, IDamagable {
 		}
 
 		if (currentWeapon is AssassinBulletChar) {
-			if (shootPressed && !(this is Vile)) {
-				//do not touch
-			} else if (upPressed && (this is Vile)) {
-				
-			} else {
+			if (!shootPressed && (!upPressed || this is not Vile)) {
 				if (isCharging()) {
 					shootAssassinShot();
 				}
 				stopCharge();
 			}
 		}
-
 		/*
-		if (currentWeapon is AssassinBullet && chargeTime > 7)
-		{
+		if (currentWeapon is AssassinBullet && chargeTime > 7) {
 			shootAssassinShot();
 			stopCharge();
 		}
@@ -3229,7 +3211,7 @@ public partial class Character : Actor, IDamagable {
 	public bool disguiseCoverBlown;
 
 	public void addTransformAnim() {
-		transformAnim = new Anim(pos, "axl_transform", xDir, player.getNextActorNetId(), true);
+		transformAnim = new Anim(pos, "axl_transform", xDir, player.getNextActorNetId(), true, true);
 		playSound("transform", sendRpc: true);
 	}
 
@@ -3407,30 +3389,37 @@ public partial class Character : Actor, IDamagable {
 		bool[] boolMask = Helpers.byteToBoolArray(data[6]);
 		int pos = 7;
 		// Update and increase pos as we go.
+		acidTime = 0;
 		if (boolMask[0]) {
 			acidTime = data[pos] / 30f;
 			pos++;
 		}
+		burnTime = 0;
 		if (boolMask[1]) {
 			burnTime = data[pos] / 30f;
 			pos++;
 		}
+		chargeTime = 0;
 		if (boolMask[2]) {
 			chargeTime = data[pos] * 3;
 			pos++;
 		}
+		igFreezeProgress = 0;
 		if (boolMask[3]) {
 			igFreezeProgress = data[pos] / 30f;
 			pos++;
 		}
+		oilTime = 0;
 		if (boolMask[4]) {
 			oilTime = data[pos] / 30f;
 			pos++;
 		}
+		virusTime = 0;
 		if (boolMask[5]) {
 			virusTime = data[pos] / 30f;
 			pos++;
 		}
+		vaccineTime = 0;
 		if (boolMask[6]) {
 			vaccineTime = data[pos] / 30f;
 			pos++;
