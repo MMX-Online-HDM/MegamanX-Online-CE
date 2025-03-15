@@ -40,12 +40,12 @@ public class FrostShield : Weapon {
 			if (character.isUnderwater() == true) {
 				new FrostShieldProjPlatform(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 			} else {
-				var cfs = new FrostShieldProjCharged(pos, xDir, mmx, player, player.getNextActorNetId(), true);
-				if (character != null) {
-					if (character.ownedByLocalPlayer) {
-						mmx.chargedFrostShield = cfs;
-					}
-				}	
+				if (mmx.chargedFrostShield?.destroyed == false) {
+					mmx.chargedFrostShield.destroySelf();
+				}
+				mmx.chargedFrostShield = new FrostShieldProjCharged(
+					pos, xDir, mmx, player, player.getNextActorNetId(), true
+				);
 			}
 		}
 	}
@@ -285,8 +285,10 @@ public class FrostShieldProjCharged : Projectile {
 		if (!ownedByLocalPlayer) return;
 		if (destroyed) return;
 
-		changePos(character?.getShootPos() ?? new Point (0,0));
-		xDir = character?.getShootXDir() ?? 1;
+		if (character != null) {
+			changePos(character.getNullableShootPos() ?? character.pos.addxy(14, -18));
+			xDir = character.getShootXDir();
+		}
 	}
 
 	public override void onDestroy() {
@@ -294,7 +296,7 @@ public class FrostShieldProjCharged : Projectile {
 		breakFreeze(owner);
 		if (!ownedByLocalPlayer) return;
 
-		if (owner.character is MegamanX mmx) {
+		if (owner.character is MegamanX mmx && mmx.chargedFrostShield == this) {
 			mmx.chargedFrostShield = null;
 		}
 		new FrostShieldProjChargedGround(pos, character?.xDir ?? 1, this, owner, owner.getNextActorNetId(), rpc: true);

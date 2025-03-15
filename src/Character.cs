@@ -1713,9 +1713,13 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual Point getShootPos() {
+		return getNullableShootPos() ?? getCenterPos();
+	}
+
+	public virtual Point? getNullableShootPos() {
 		var busterOffset = currentFrame.getBusterOffset();
 		if (busterOffset == null) {
-			return getCenterPos();
+			return null;
 		}
 		return pos.addxy(busterOffset.Value.x * xDir, busterOffset.Value.y);
 	}
