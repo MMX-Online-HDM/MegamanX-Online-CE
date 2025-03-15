@@ -14,10 +14,11 @@ public class Sprite {
 	public Collider[] hitboxes;
 	public Collider[][] frameHitboxes;
 
-	public static Texture[] xArmorBootsBitmap = new Texture[3];
-	public static Texture[] xArmorBodyBitmap = new Texture[3];
-	public static Texture[] xArmorHelmetBitmap = new Texture[3];
-	public static Texture[] xArmorArmBitmap = new Texture[3];
+	public static Texture[] xArmorBootsBitmap = new Texture[4];
+	public static Texture[] xArmorBodyBitmap = new Texture[4];
+	public static Texture[] xArmorHelmetBitmap = new Texture[4];
+	public static Texture[] xArmorArmBitmap = new Texture[4];
+	public static Texture[] xSaberBitmap = new Texture[2];
 	public static Texture axlArmBitmap = null!;
 
 	public float time;
@@ -151,6 +152,7 @@ public class Sprite {
 
 		// Character-specific draw section
 		int[]? armors = null;
+		bool drawXSaber = false;
 		bool drawAxlArms = true;
 		bool hyperBusterReady = false;
 		bool isUPX = false;
@@ -164,6 +166,7 @@ public class Sprite {
 					(int)mmx.helmetArmor,
 					(int)mmx.armArmor
 				};
+				drawXSaber = !mmx.hasAnyArmor && mmx.specialButtonMode == 1 || mmx.hasFullHyperMaxArmor;
 			}
 			if (character.flattenedTime > 0) {
 				scaleY = 0.5f;
@@ -260,17 +263,20 @@ public class Sprite {
 		float extraXOff = 0;
 
 		if (isUltX) {
-			//bitmap = Global.textures["XUltimate"];
 			extraYOff = 3;
 			extraY = 3;
-			armors = null;
+			armors[0] = 4;
+			armors[1] = 4;
+			armors[2] = 4;
+			armors[3] = 4;
 		}
 
 		if (isUPX) {
-			//bitmap = Global.textures["XUP"];
+			bitmap = Global.textures["XUP"];
+			drawXSaber = true;
 		}
 
-		if (!isUltX && armors != null && animData.isXSprite) {
+		if (armors != null && animData.isXSprite) {
 			bool isShootSprite = needsX3BusterCorrection();
 			/*
 			if (isShootSprite) {
@@ -313,7 +319,7 @@ public class Sprite {
 			}
 		}
 
-		if (!isUltX && armors != null && animData.isXSprite) {
+		if ((armors != null || drawXSaber) && animData.isXSprite) {
 			bool isShootSprite = needsX3BusterCorrection();
 			/*
 			if (isShootSprite) {
@@ -325,9 +331,13 @@ public class Sprite {
 					extraW = 5;
 				}
 			} */
-			if (armors[2] == 2) {
+			if (armors[2] == 2 || drawXSaber) {
 				extraYOff = 0;
 				extraY = 2;
+			}
+			if (drawXSaber) {
+				flippedExtraW += 1;
+				extraXOff = 1 * flipX;
 			}
 			var x3ArmShaders = new List<ShaderWrapper>(shaders);
 			if (hyperBusterReady) {
@@ -337,7 +347,9 @@ public class Sprite {
 					}
 				}
 			}
-
+			if (drawXSaber) {
+				compositeBitmaps.Add(xSaberBitmap[0]);
+			}
 			compositeBitmaps.Add(bitmap);
 			if (armors[2] > 0) {
 				compositeBitmaps.Add(xArmorHelmetBitmap[armors[2] - 1]);
@@ -350,6 +362,9 @@ public class Sprite {
 			}
 			if (armors[3] > 0) {
 				compositeBitmaps.Add(xArmorArmBitmap[armors[3] - 1]);
+			}
+			if (drawXSaber) {
+				compositeBitmaps.Add(xSaberBitmap[1]);
 			}
 			if (compositeBitmaps.Count > 1) {
 				isCompositeSprite = true;
@@ -528,7 +543,7 @@ public class Sprite {
 				currentFrame.rect.w() + extraW,
 				currentFrame.rect.h() + extraY,
 				x, y, zIndex,
-				cx - frameOffsetX * xDirArg,
+				cx - (frameOffsetX - extraXOff) * xDirArg,
 				cy - (frameOffsetY - extraYOff) * yDirArg,
 				xDirArg, yDirArg,
 				angle, alpha, shaders, true

@@ -110,18 +110,30 @@ public class MegamanX : Character {
 	public float weaknessCooldown;
 	public float aiAttackCooldown;
 	public float stockedTime;
+	public XLoadout loadout;
 
 	// Creation code.
 	public MegamanX(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
-		bool isWarpIn = true
+		bool isWarpIn = true, XLoadout? xLoadout = null
 	) : base(
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn
 	) {
 		charId = CharIds.X;
 		// Configure loadout.
-		weapons = XLoadoutSetup.getLoadout(player);
+		if (xLoadout == null) {
+			// Copy if null;
+			XLoadout playerLoadout = player.loadout.xLoadout;
+			xLoadout = new XLoadout();
+			xLoadout.weapon1 = playerLoadout.weapon1;
+			xLoadout.weapon2 = playerLoadout.weapon2;
+			xLoadout.weapon3 = playerLoadout.weapon3;
+			xLoadout.melee = playerLoadout.melee;
+		}
+		// Set up final loadout.
+		weapons = XLoadoutSetup.getLoadout(player, xLoadout);
+		specialButtonMode = xLoadout.melee;
 		// Link X-Buster or create one.
 		XBuster? tempBuster = weapons.Find((Weapon w) => w is XBuster) as XBuster;
 		if (tempBuster != null) {
@@ -174,7 +186,7 @@ public class MegamanX : Character {
 		Helpers.decrementFrames(ref aiAttackCooldown);
 		// Strike chain extending the shoot anim.
 		if (hasLastingProj() && shootAnimTime > 0) {
-			shootAnimTime = 2;
+			shootAnimTime = 4;
 		}
 		// For the shooting animation.
 		if (shootAnimTime > 0 && sprite.name == getSprite(charState.shootSpriteEx)) {
@@ -282,8 +294,13 @@ public class MegamanX : Character {
 			itemTracer.shootCooldown = itemTracer.fireRate;
 		}
 		if (player.input.isPressed(Control.Special1, player) && !hasAnyArmor) {
-			changeState(new X6SaberState(grounded), true);
-			return true;
+			if (specialButtonMode == 1) {
+				changeState(new X6SaberState(grounded), true);
+				return true;
+			} else {
+				shoot(0, specialBuster, false);
+				return true;
+			}
 		}
 		if (bufferedShotPressed && stockedMaxBuster) {
 			shoot(1, specialBuster, false);
@@ -493,10 +510,10 @@ public class MegamanX : Character {
 		}
 	}
 
-	public override Point getShootPos() {
+	public override Point? getNullableShootPos() {
 		Point? busterOffsetPos = currentFrame.getBusterOffset();
 		if (busterOffsetPos == null) {
-			return getCenterPos();
+			return null;
 		}
 		Point busterOffset = busterOffsetPos.Value;
 		if (armArmor == ArmorId.Max && sprite.needsX3BusterCorrection()) {
@@ -893,8 +910,8 @@ public class MegamanX : Character {
 		if (hasFullHyperMaxArmor) {
 			index = 25;
 		}
-		if (hasUltimateArmor) {
-			index = 0;
+		if (hasUltimateArmor && index == 0) {
+			index = 30;
 		}
 		palette = player.xPaletteShader;
 

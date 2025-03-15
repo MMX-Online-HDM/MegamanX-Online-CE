@@ -439,7 +439,7 @@ public class X2ChargeShot : CharState {
 
 	public override void onExit(CharState newState) {
 		if (mmx.hasLastingProj()) {
-			character.shootAnimTime = 4;
+			character.shootAnimTime = 8;
 		} else if (newState is not AirDash and not WallSlide) {
 			character.shootAnimTime = 0;
 		}  else {

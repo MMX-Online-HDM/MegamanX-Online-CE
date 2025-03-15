@@ -8,7 +8,7 @@ using MMXOnline;
 namespace MMXOnline;
 
 public class XLoadoutSetup {
-	public static List<Weapon> getLoadout(Player player) {
+	public static List<Weapon> getLoadout(Player player, XLoadout xLoadout) {
 		List<Weapon> weapons = new();
 		// 1v1/Training loadout.
 		if (Global.level.isTraining() && !Global.level.server.useLoadout || Global.level.is1v1()) {
@@ -53,7 +53,7 @@ public class XLoadoutSetup {
 		}
 		// Regular Loadout.
 		else {
-			weapons = player.loadout.xLoadout.getWeaponsFromLoadout(player);
+			weapons = xLoadout.getWeaponsFromLoadout(player);
 		}
 
 		return weapons;

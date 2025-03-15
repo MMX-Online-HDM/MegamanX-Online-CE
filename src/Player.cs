@@ -1112,7 +1112,8 @@ public partial class Player {
 			}
 			newChar = new MegamanX(
 				this, pos.x, pos.y, xDir,
-				false, charNetId, ownedByLocalPlayer
+				false, charNetId, ownedByLocalPlayer,
+				xLoadout: xLoadout
 			);
 		}
 		// Saber Zero.
