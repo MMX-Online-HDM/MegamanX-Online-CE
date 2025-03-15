@@ -400,8 +400,11 @@ public class GravityWellProjCharged : Projectile, IDamagable {
 public class GravityWellChargedState : CharState {
 	bool fired = false;
 	MegamanX mmx = null!;
+
 	public GravityWellChargedState() : base("point_up") {
 		superArmor = true;
+		landSprite = "point_up";
+		airSprite = "point_up_air";
 	}
 	public override void update() {
 		base.update();
@@ -430,7 +433,8 @@ public class GravityWellChargedState : CharState {
 		character.useGravity = false;
 		character.vel = new Point();
 		if (!character.grounded) {
-			character.frameIndex = 2;
+			sprite = airSprite;
+			character.changeSpriteFromName(sprite, true);
 		}
 	}
 

@@ -333,6 +333,9 @@ public class RaySplasherChargedState : CharState {
 	bool fired = false;
 	public RaySplasherChargedState() : base("point_up") {
 		superArmor = true;
+
+		landSprite = "point_up";
+		airSprite = "point_up_air";
 	}
 
 	public override void update() {
@@ -365,7 +368,8 @@ public class RaySplasherChargedState : CharState {
 		character.vel = new Point();
 		mmx = character as MegamanX ?? throw new NullReferenceException();
 		if (!character.grounded) {
-			character.frameIndex = 2;
+			sprite = airSprite;
+			character.changeSpriteFromName(sprite, true);
 		}
 	}
 
