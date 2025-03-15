@@ -107,7 +107,8 @@ public class LightDash : CharState {
 		if (!player.isAI && !player.input.isHeld(initialDashButton, player) && !stop) {
 			dashTime = 900;
 		}
-		float inputXDir = player.input.getInputDir(player).x;
+		int inputXDir = player.input.getXDir(player);
+		bool dashHeld = player.input.isHeld(initialDashButton, player);
 
 		if (dashTime > 37 || stop) {
 			if (!stop) {
@@ -115,36 +116,23 @@ public class LightDash : CharState {
 					exaust.destroySelf();
 				}
 				dashTime = 0;
-				character.frameIndex = 0;
-				character.sprite.frameTime = 0;
-				character.sprite.animTime = 0;
-				character.sprite.frameSpeed = 0.1f;
 				stop = true;
-			} else {
-				if (inputXDir != 0 && character.grounded) {
-					character.changeState(new Run(), true);
-				} else {
-					character.changeState(new DashEnd());
-				}
-				return;
+				normalCtrl = true;
+				sprite = "dash_end";
+				shootSprite = "dash_end_shoot";
+				character.changeSpriteFromName(character.shootAnimTime > 0 ? shootSprite : sprite, true);
 			}
 		}
-		if (dashTime > 3 || stop) {
-			character.move(new Point(character.getDashSpeed() * 1.15f * dashDir, 0));
-		} else {
-			character.move(new Point(Physics.DashStartSpeed * character.getRunDebuffs() * dashDir * 1.15f, 0));
-		}
-
 		if (dashTime <= 3 || stop) {
 			if (inputXDir != 0 && inputXDir != dashDir) {
 				character.xDir = (int)inputXDir;
 				dashDir = character.xDir;
 			}
 		}
-
-		if (!character.grounded) {
-			character.dashedInAir++;
-			character.changeState(new Fall());
+		if (dashTime > 3 && !stop || stop && dashHeld) {
+			character.move(new Point(character.getDashSpeed() * 1.15f * dashDir, 0));
+		} else {
+			character.move(new Point(Physics.DashStartSpeed * character.getRunDebuffs() * dashDir * 1.15f, 0));
 		}
 
 		if (exaust == null && dashTime > 3 && !stop) {
@@ -154,7 +142,6 @@ public class LightDash : CharState {
 				false, sendRpc: true, zIndex: character.zIndex - 100, host: character 
 			);
 		}
-
 		if (dustTime >= 6 && !character.isUnderwater()) {
 			dustTime = 0;
 			new Anim(
@@ -166,6 +153,16 @@ public class LightDash : CharState {
 			dustTime += character.speedMul;
 		}
 		dashTime += character.speedMul;
+
+		if (stop && character.isAnimOver()) {
+			character.changeToIdleOrFall();
+			return;
+		}
+		if (!character.grounded) {
+			character.dashedInAir++;
+			character.changeState(new Fall());
+			return;
+		}
 	}
 
 	public override void onEnter(CharState oldState) {
@@ -213,6 +210,7 @@ public class GigaAirDash : CharState {
 			dashTime = 900;
 		}
 		float inputXDir = player.input.getInputDir(player).x;
+		bool dashHeld = player.input.isHeld(initialDashButton, player);
 
 		if (dashTime > 37 || stop) {
 			if (!stop) {
@@ -220,23 +218,24 @@ public class GigaAirDash : CharState {
 					exaust.destroySelf();
 				}
 				dashTime = 0;
-				character.frameIndex = 0;
-				character.sprite.frameTime = 0;
-				character.sprite.animTime = 0;
-				character.sprite.frameSpeed = 0.1f;
 				stop = true;
-			} else {
-				if (inputXDir != 0 && character.grounded) {
-					character.changeState(new Run(), true);
-				} else {
-					character.changeState(new DashEnd());
-				}
-				return;
+				sprite = "dash_end";
+				shootSprite = "dash_end_shoot";
+				character.changeSpriteFromName(character.shootAnimTime > 0 ? shootSprite : sprite, true);
+				stop = true;
+				normalCtrl = true;
 			}
 		}
-		if (dashTime > 3 || stop) {
+		if (dashTime <= 3 || stop) {
+			if (inputXDir != 0 && inputXDir != dashDir) {
+				character.xDir = (int)inputXDir;
+				dashDir = character.xDir;
+			}
+		}
+		if (dashTime > 3 && !stop || stop && dashHeld) {
 			character.move(new Point(character.getDashSpeed() * 1.15f * dashDir, 0));
-		} else {
+		}
+		else if (!stop) {
 			character.move(new Point(character.getRunSpeed() * dashDir * 1.15f, 0));
 		}
 		if (exaust == null && dashTime > 3 && !stop) {
@@ -246,14 +245,12 @@ public class GigaAirDash : CharState {
 				false, sendRpc: true, zIndex: character.zIndex - 100, host: character 
 			);
 		}
-
-		if (dashTime <= 3 || stop) {
-			if (inputXDir != 0 && inputXDir != dashDir) {
-				character.xDir = (int)inputXDir;
-				dashDir = character.xDir;
-			}
-		}
 		dashTime += character.speedMul;
+
+		if (stop && character.isAnimOver()) {
+			character.changeToIdleOrFall();
+			return;
+		}
 	}
 
 	public override void onEnter(CharState oldState) {
@@ -362,20 +359,20 @@ public class X2ChargeShot : CharState {
 	Weapon weapon => (weaponOverride ?? mmx.currentWeapon ?? mmx.specialBuster);
 	MegamanX mmx = null!;
 
-	public X2ChargeShot(Weapon? weaponOverride, int shootNum) : base("x2_shot") {
+	public X2ChargeShot(Weapon? weaponOverride, int shootNum) : base("cross_shot") {
 		this.shootNum = shootNum;
 		this.weaponOverride = weaponOverride;
 		useDashJumpSpeed = true;
 		airMove = true;
 		canStopJump = true;
-		landSprite = "x2_shot";
-		airSprite = "x2_air_shot";
+		landSprite = "cross_shot";
+		airSprite = "cross_air_shot";
 		canJump = true;
 		if (shootNum == 1) {
-			sprite = "x2_shot2";
+			sprite = "cross_shot2";
 			defaultSprite = sprite;
 			landSprite = sprite;
-			airSprite = "x2_air_shot2";
+			airSprite = "cross_air_shot2";
 		}
 	}
 
@@ -408,12 +405,12 @@ public class X2ChargeShot : CharState {
 			if (shootNum == 0 && pressFire) {
 				fired = false;
 				shootNum = 1;
-				sprite = "x2_shot2";
+				sprite = "cross_shot2";
 				defaultSprite = sprite;
 				landSprite = sprite;
-				airSprite = "x2_air_shot2";
+				airSprite = "cross_air_shot2";
 				if (!character.grounded || character.vel.y < 0) {
-					sprite = "x2_air_shot2";
+					sprite = "cross_air_shot2";
 				}
 				character.changeSpriteFromName(sprite, true);
 			} else {
@@ -429,9 +426,9 @@ public class X2ChargeShot : CharState {
 		mmx = character as MegamanX ?? throw new NullReferenceException();
 		if (!character.grounded || character.vel.y > 0) {
 			if (shootNum == 0) {
-				sprite = "x2_air_shot";
+				sprite = "cross_air_shot";
 			} else {
-				sprite = "x2_air_shot2";
+				sprite = "cross_air_shot2";
 			}
 		}
 		if (mmx.chargedTornadoFang != null) {
@@ -461,13 +458,13 @@ public class X3ChargeShot : CharState {
 	MegamanX mmx = null!;
 	public HyperCharge? hyperBusterWeapon;
 
-	public X3ChargeShot(HyperCharge? hyperBusterWeapon) : base("x3_shot") {
+	public X3ChargeShot(HyperCharge? hyperBusterWeapon) : base("cross_shot") {
 		this.hyperBusterWeapon = hyperBusterWeapon;
 		useDashJumpSpeed = true;
 		airMove = true;
 		canStopJump = true;
-		landSprite = "x3_shot";
-		airSprite = "x3_air_shot";
+		landSprite = "cross_shot";
+		airSprite = "cross_air_shot";
 		canJump = true;
 	}
 
@@ -537,10 +534,10 @@ public class X3ChargeShot : CharState {
 				} else {
 					mmx.stockedMaxBuster = false;
 				}
-				sprite = "x3_shot2";
-				landSprite = "x3_shot2";
+				sprite = "cross_shot2";
+				landSprite = "cross_shot2";
 				if (!character.grounded || character.vel.y < 0) {
-					sprite = "x3_air_shot2";
+					sprite = "cross_air_shot2";
 					defaultSprite = sprite;
 				}
 				defaultSprite = sprite;
@@ -557,10 +554,10 @@ public class X3ChargeShot : CharState {
 			if (character.grounded && player.input.isPressed(Control.Jump, player)) {
 				character.vel.y = -character.getJumpPower();
 				if (state == 0) {
-					sprite = "x2_air_shot";
+					sprite = "cross_air_shot";
 					defaultSprite = sprite;
 				} else {
-					sprite = "x2_air_shot2";
+					sprite = "cross_air_shot2";
 					defaultSprite = sprite;
 				}
 				character.changeSpriteFromName(sprite, false);
@@ -578,21 +575,21 @@ public class X3ChargeShot : CharState {
 			if (hyperBusterWeapon == null) {
 				mmx.stockedMaxBuster = true;
 			}
-			sprite = "x3_shot";
+			sprite = "cross_shot";
 			defaultSprite = sprite;
-			landSprite = "x3_shot";
+			landSprite = "cross_shot";
 			if (!character.grounded) {
-				sprite = "x3_air_shot";
+				sprite = "cross_air_shot";
 			}
 			character.changeSpriteFromName(sprite, true);
 		} else {
 			mmx.stockedMaxBuster = false;
 			state = 1;
-			sprite = "x3_shot2";
+			sprite = "cross_shot2";
 			defaultSprite = sprite;
-			landSprite = "x3_shot2";
+			landSprite = "cross_shot2";
 			if (!character.grounded) {
-				sprite = "x3_air_shot2";
+				sprite = "cross_air_shot2";
 			}
 			character.changeSpriteFromName(sprite, true);
 		}

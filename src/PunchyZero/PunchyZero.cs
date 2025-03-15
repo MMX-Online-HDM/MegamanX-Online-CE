@@ -158,7 +158,7 @@ public class PunchyZero : Character {
 			shootAnimTime -= Global.speedMul;
 			if (shootAnimTime <= 0) {
 				shootAnimTime = 0;
-				if (sprite.name == getSprite(charState.shootSprite)) {
+				if (sprite.name == getSprite(charState.shootSpriteEx)) {
 					changeSpriteFromName(charState.defaultSprite, false);
 					if (charState is WallSlide) {
 						frameIndex = sprite.totalFrameNum - 1;
@@ -189,7 +189,7 @@ public class PunchyZero : Character {
 	}
 
 	public void setShootAnim() {
-		string shootSprite = getSprite(charState.shootSprite);
+		string shootSprite = getSprite(charState.shootSpriteEx);
 		if (!Global.sprites.ContainsKey(shootSprite)) {
 			if (grounded) { shootSprite = "zero_shoot"; }
 			else { shootSprite = "zero_fall_shoot"; }

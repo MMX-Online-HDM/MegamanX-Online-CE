@@ -717,6 +717,9 @@ public partial class Character : Actor, IDamagable {
 		if (grounded && !isDashing) {
 			dashedInAir = 0;
 		}
+		if (ai != null) {
+			ai.preUpdate();
+		}
 	}
 
 	public override void onCollision(CollideData other) {
@@ -1220,7 +1223,7 @@ public partial class Character : Actor, IDamagable {
 				}
 				changeState(new Jump());
 				return true;
-			} else if (player.dashPressed(out string dashControl) && canDash() && charState is not Dash) {
+			} else if (player.dashPressed(out string dashControl) && canDash()) {
 				changeState(new Dash(dashControl), true);
 				return true;
 			} else if (
@@ -1233,8 +1236,8 @@ public partial class Character : Actor, IDamagable {
 				changeState(new Jump());
 				return true;
 			}
-			if (player.isCrouchHeld() && canCrouch() && charState is not CrouchStart or Crouch) {
-				changeState(new CrouchStart());
+			if (player.isCrouchHeld() && canCrouch() && charState is not Crouch) {
+				changeState(new Crouch());
 				return true;
 			}
 			if (player.input.isPressed(Control.Taunt, player)) {
@@ -1763,9 +1766,12 @@ public partial class Character : Actor, IDamagable {
 		return Helpers.clampMax(chargeLevel, maxCharge);
 	}
 
-	public virtual void changeToIdleOrFall(string transitionSprite = "") {
+	public virtual void changeToIdleOrFall(
+		string transitionSprite = "",
+		string transShootSprite = ""
+	) {
 		if (grounded) {
-			changeState(new Idle(transitionSprite), true);
+			changeState(new Idle(transitionSprite, transShootSprite), true);
 		} else {
 			if (vel.y * gravityModifier < 0 && charState.canStopJump && !charState.stoppedJump) {
 				changeState(new Jump() { enterSound = "" }, true);
@@ -1778,7 +1784,7 @@ public partial class Character : Actor, IDamagable {
 
 	public virtual void changeToLandingOrFall(bool useSound = true) {
 		if (grounded) {
-			landingCode();
+			landingCode(useSound);
 		} else {
 			if (vel.y * gravityModifier < 0 && charState.canStopJump && !charState.stoppedJump) {
 				changeState(new Jump() { enterSound = "" }, true);
@@ -1804,7 +1810,17 @@ public partial class Character : Actor, IDamagable {
 
 	public virtual void landingCode(bool useSound = true) {
 		dashedInAir = 0;
-		changeState(new Land(), true);
+		if (useSound) {
+			playAltSound("land", sendRpc: true, altParams: "larmor");
+		}
+		if (grounded && (
+			player.input.isHeld(Control.Left, player) ||
+			player.input.isHeld(Control.Right, player)
+		)) {
+			changeState(new Run());
+			return;
+		}
+		changeState(new Idle("land", "land_shoot"), true);
 	}
 
 	public virtual bool changeState(CharState newState, bool forceChange = false) {
@@ -1845,7 +1861,7 @@ public partial class Character : Actor, IDamagable {
 		changedStateInFrame = true;
 		bool hasShootAnim = newState.canUseShootAnim();
 		if (shootAnimTime > 0 && hasShootAnim) {
-			changeSprite(getSprite(newState.shootSprite), true);
+			changeSprite(getSprite(newState.shootSpriteEx), true);
 		} else {
 			string spriteName = sprite.name;
 			changeSprite(getSprite(newState.sprite), true);
@@ -2493,11 +2509,6 @@ public partial class Character : Actor, IDamagable {
 		if (damage > 0 && charState is DarkHoldState dhs && dhs.stateFrames > 10 && !Damager.isDot(projId)) {
 			changeToIdleOrFall();
 		}
-		//this made Axl immortal to pits, suicide button, etc
-		/*
-		if (attacker == player && axl?.isWhiteAxl() == true) {
-			damage = 0;
-		} */
 		if (Global.level.isRace() &&
 			damage != (decimal)Damager.envKillDamage &&
 			damage != (decimal)Damager.switchKillDamage &&
@@ -2729,8 +2740,10 @@ public partial class Character : Actor, IDamagable {
 			}
 			killPlayer(attacker, null, weaponIndex, projId);
 		} else {
-			if (mmx != null && player.hasBodyArmor(3) && damage > 0) {
-				mmx.activateMaxBarrier(charState is Hurt or GenericStun);
+			if (mmx != null && mmx.chestArmor == ArmorId.Max && damage > 0) {
+				mmx.activateMaxBarrier(
+					charState is Hurt or GenericGrabbedState or VileMK2Grabbed or GenericStun
+				);
 			}
 		}
 	}
