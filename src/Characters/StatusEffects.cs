@@ -38,13 +38,14 @@ public class Hurt : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		if (player.isX && player.hasBodyArmor(1)) {
-			flinchTime = MathF.Floor(flinchTime * 0.75f);
-			sprite = "hurt2";
-			character.changeSpriteFromName("hurt2", true);
-		}
-		if (player.isX && (player.hasBodyArmor(2) || player.hasBodyArmor(3))) {
-			character.changeSpriteFromName("hurt2", true);
+		if (character is MegamanX mmx) {
+			if (mmx.chestArmor == ArmorId.Light) {
+				flinchTime = MathF.Floor(flinchTime * 0.75f);
+			}
+			if (mmx.chestArmor != ArmorId.None && hurtDir == -mmx.xDir) {
+				sprite = "hurt2";
+				character.changeSpriteFromName("hurt2", true);
+			}
 		}
 		if (!spiked) {
 			float flichLimitusTime = flinchTime <= 30 ? flinchTime : 30;

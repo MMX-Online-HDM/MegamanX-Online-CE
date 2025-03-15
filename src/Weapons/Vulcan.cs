@@ -94,7 +94,7 @@ public class Vulcan : Weapon {
 		if (vile.vulcanWeapon.type == (int)VulcanType.None) return;
 
 		if (type == (int)VulcanType.DistanceNeedler && shootCooldown > 0) return;
-		if (string.IsNullOrEmpty(vile.charState.shootSprite)) return;
+		if (string.IsNullOrEmpty(vile.charState.shootSpriteEx)) return;
 
 		Player player = vile.player;
 		if (vile.vulcanWeapon.type != (int)VulcanType.NoneMissile && vile.vulcanWeapon.type != (int)VulcanType.NoneCutter) {
@@ -103,7 +103,7 @@ public class Vulcan : Weapon {
 					if (player.input.isHeld(Control.Left, player)) vile.xDir = -1;
 					if (player.input.isHeld(Control.Right, player)) vile.xDir = 1;
 				}
-				vile.changeSpriteFromName(vile.charState.shootSprite, false);
+				vile.changeSpriteFromName(vile.charState.shootSpriteEx, false);
 				shootVulcan(vile);
 			}
 		}

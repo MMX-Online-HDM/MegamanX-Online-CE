@@ -445,12 +445,6 @@ public class Damager {
 					character.addIgFreezeProgress(1);
 					break;
 				//Other effects
-				case (int)ProjIds.PlasmaGunProj:
-					if (mmx != null && mmx.player.hasBodyArmor(3)) {
-						mmx.barrierActiveTime = 0;
-						victim?.playSound("weakness");
-					}
-					break;
 				case (int)ProjIds.SplashLaser:
 					if (damagingActor != null) {
 						character.splashLaserKnockback(damagingActor.deltaPos);
@@ -886,6 +880,7 @@ public class Damager {
 	public static bool isArmorPiercing(int? projId) {
 		if (projId == null) return false;
 		return projId switch {
+			(int)ProjIds.PlasmaGunProj => true,
 			(int)ProjIds.SpiralMagnum => true,
 			(int)ProjIds.AssassinBullet => true,
 			(int)ProjIds.AssassinBulletQuick => true,
@@ -896,8 +891,8 @@ public class Damager {
 			(int)ProjIds.Raijingeki => true,
 			(int)ProjIds.Raijingeki2 => true,
 			(int)ProjIds.CFlasher => true,
-			(int)ProjIds.AcidBurstPoison => true,
 			(int)ProjIds.MetteurCrash => true,
+			(int)ProjIds.AcidBurstPoison => true,
 			_ => false
 		};
 	}
@@ -1059,7 +1054,7 @@ public class Damager {
 			ProjIds.AcidBurstCharged => true,
 			ProjIds.CrystalHunter => true,
 			ProjIds.ElectricShock => true,
-			ProjIds.AirBlastProj => true,
+			//ProjIds.AirBlastProj => true,
 			_ => false
 		};
 	}
@@ -1087,7 +1082,6 @@ public class Damager {
 			ProjIds.AcidBurstPoison => true,
 			ProjIds.SelfDmg => true,
 			ProjIds.FlameRoundFlameProj => true,
-			ProjIds.BlastLauncherMineGrenadeProj => true, 
 			ProjIds.BoundBlasterRadar => true, 
 			ProjIds.RayGunChargeBeam => true,
 			ProjIds.PlasmaGunBeamProj => true,
@@ -1121,6 +1115,7 @@ public class Damager {
 			(int)ProjIds.CircleBlaze => true,
 			(int)ProjIds.CircleBlazeExplosion => true,
 			(int)ProjIds.BlastLauncherGrenadeSplash => true,
+			(int)ProjIds.BlastLauncherMineGrenadeProj => true, 
 			_ => false
 		};
 	}

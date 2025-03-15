@@ -253,7 +253,9 @@ public class StrikeChainProj : Projectile {
 				destroySelf();
 				float momentum = 0.25f * (distRetracted / maxDist);
 				mmx.xSwingVel = toWallVel.x * (0.25f + momentum) * 0.5f;
-				if (mmx.isDashing && mmx.player.hasBootsArmor(ArmorId.Giga) && mmx.flag == null) mmx.xSwingVel *= 1.1f;
+				if (mmx.isDashing && mmx.legArmor == ArmorId.Giga && mmx.flag == null) {
+					mmx.xSwingVel *= 1.1f;
+				}
 				mmx.vel.y = toWallVel.y;
 				//Yes, X2 Boots increase it.
 			}	
@@ -344,7 +346,7 @@ public class StrikeChainProj : Projectile {
 			stopMoving();
 			reverse(toWallVel);
 			if (mmx.grounded) mmx.incPos(new Point(0, -4));
-			mmx.changeState(new StrikeChainPullToWall(this, mmx.charState.shootSprite, toWallVel.y < 0), true);
+			mmx.changeState(new StrikeChainPullToWall(this, mmx.charState.shootSpriteEx, toWallVel.y < 0), true);
 		}
 	}
 
@@ -494,7 +496,9 @@ public class StrikeChainProjCharged : Projectile {
 				destroySelf();
 				float momentum = 0.25f * (distRetracted / maxDist);
 				mmx.xSwingVel = toWallVel.x * (0.25f + momentum) * 0.5f;
-				if (mmx.isDashing && mmx.player.hasBootsArmor(ArmorId.Giga) && mmx.flag == null) mmx.xSwingVel *= 1.1f;
+				if (mmx.isDashing && mmx.legArmor == ArmorId.Giga && mmx.flag == null) {
+					mmx.xSwingVel *= 1.1f;
+				}
 				mmx.vel.y = toWallVel.y;
 				//Yes, X2 Boots increase it.
 			}	
@@ -587,7 +591,7 @@ public class StrikeChainProjCharged : Projectile {
 			stopMoving();
 			reverse(toWallVel);
 			if (mmx.grounded) mmx.incPos(new Point(0, -4));
-			mmx.changeState(new StrikeChainPullToWall(this, mmx.charState.shootSprite, toWallVel.y < 0), true);
+			mmx.changeState(new StrikeChainPullToWall(this, mmx.charState.shootSpriteEx, toWallVel.y < 0), true);
 		}
 	}
 

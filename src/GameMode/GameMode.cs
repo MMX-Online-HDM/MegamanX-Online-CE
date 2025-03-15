@@ -1010,12 +1010,6 @@ public class GameMode {
 
 		float camStartX = MathF.Floor((level.camX - Global.halfScreenW) * scaleW);
 		float camStartY = MathF.Floor((level.camY - Global.halfScreenH) * scaleH);
-		if (camStartX < 0) {
-			camStartX = 0;
-		}
-		if (camStartY < 0) {
-			camStartY = 0;
-		}
 		float camEndX = MathF.Floor(Global.viewScreenW * 2 * scaleW);
 		float camEndY = MathF.Floor(Global.viewScreenH * 2 * scaleH);
 		if (camEndX > scaledW) {
@@ -1026,6 +1020,20 @@ public class GameMode {
 			camStartY -= camEndY - scaledH;
 			camEndY = scaledH;
 		}
+		if (camStartX < 0) {
+			camStartX = 0;
+		}
+		if (camStartY < 0) {
+			camStartY = 0;
+		}
+
+		// Radar BG.
+		DrawWrappers.DrawRectWH(
+			radarX, radarY,
+			scaledW, scaledH,
+			true, Color.Black, 0,
+			ZIndex.HUD, isWorldPos: false
+		);
 
 		// The visible area circles
 		foreach (var spot in revealedSpots) {

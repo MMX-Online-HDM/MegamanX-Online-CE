@@ -177,11 +177,11 @@ public class MegamanX : Character {
 			shootAnimTime = 2;
 		}
 		// For the shooting animation.
-		if (shootAnimTime > 0 && sprite.name == getSprite(charState.shootSprite)) {
+		if (shootAnimTime > 0 && sprite.name == getSprite(charState.shootSpriteEx)) {
 			shootAnimTime -= speedMul;
 			if (shootAnimTime <= 0) {
 				shootAnimTime = 0;
-				if (sprite.name == getSprite(charState.shootSprite)) {
+				if (sprite.name == getSprite(charState.shootSpriteEx)) {
 					changeSpriteFromName(charState.defaultSprite, false);
 					if (charState is WallSlide) {
 						frameIndex = sprite.totalFrameNum - 1;
@@ -229,6 +229,7 @@ public class MegamanX : Character {
 	}
 
 	public override bool normalCtrl() {
+		quickArmorUpgrade();
 		if (grounded) {
 			if (legArmor == ArmorId.Max &&
 				player.input.isPressed(Control.Dash, player) &&
@@ -395,6 +396,48 @@ public class MegamanX : Character {
 		}
 	}
 
+	public void quickArmorUpgrade() {
+		if (!player.input.isHeld(Control.Special2, player)) {
+			hyperProgress = 0;
+			return;
+		}
+		if (player.health <= 0 || hasUltimateArmor) {
+			hyperProgress = 0;
+			return;
+		}
+		if (fullArmor == ArmorId.Max && !hasFullHyperMaxArmor) {
+			if (player.currency < Player.goldenArmorCost || hasAnyHyperArmor) {
+				hyperProgress = 0;
+				return;
+			}
+		}
+		else if (player.currency < Player.ultimateArmorCost) {
+			hyperProgress = 0;
+			return;
+		}
+		if (charState is not WarpIn && fullArmor != ArmorId.None) {
+			hyperProgress += Global.spf;
+		}
+		if (hyperProgress < 1) {
+			return;
+		}
+		hyperProgress = 0;
+		if (fullArmor == ArmorId.Max && !hasFullHyperMaxArmor) {
+			player.currency -= Player.goldenArmorCost;
+			hyperChestActive = true;
+			hyperArmActive = true;
+			hyperLegActive = true;
+			hyperHelmetActive = true;
+			Global.playSound("ching");
+			return;
+		}
+		// Ultimate or Seraph armor.
+		player.currency -= Player.ultimateArmorCost;
+		hasUltimateArmor = true;
+		Global.playSound("chingX4");
+		return;
+	}
+
 	// Movement related stuff.
 	public override float getRunSpeed() {
 		if (charState is XHover) {
@@ -438,7 +481,7 @@ public class MegamanX : Character {
 
 	// Attack related stuff.
 	public void setShootAnim() {
-		string shootSprite = getSprite(charState.shootSprite);
+		string shootSprite = getSprite(charState.shootSpriteEx);
 		if (!Global.sprites.ContainsKey(shootSprite)) {
 			if (grounded) { shootSprite = getSprite("shoot"); } else { shootSprite = getSprite("fall_shoot"); }
 		}
@@ -581,15 +624,11 @@ public class MegamanX : Character {
 	}
 
 	public bool hasHadoukenEquipped() {
-		return !Global.level.is1v1() &&
-		player.hasArmArmor(1) && player.hasBootsArmor(1) &&
-		player.hasHelmetArmor(1) && player.hasBodyArmor(1);
+		return !Global.level.is1v1() && fullArmor == ArmorId.Light;
 	}
 
 	public bool hasShoryukenEquipped() {
-		return !Global.level.is1v1() &&
-		player.hasArmArmor(2) && player.hasBootsArmor(2) &&
-		player.hasHelmetArmor(2) && player.hasBodyArmor(2);
+		return !Global.level.is1v1() && fullArmor == ArmorId.Giga;
 	}
 
 	public bool hasFgMoveEquipped() {
@@ -1057,7 +1096,7 @@ public class MegamanX : Character {
 						player.changeWeaponSlot(getRandomWeaponIndex());
 					}
 					break;
-				case 6 when player.hasArmArmor(3):
+				case 6 when armArmor == ArmorId.Max:
 					int hyperbuster = player.weapons.FindIndex(w => w is HyperCharge);
 					player.changeWeaponSlot(hyperbuster);
 					if (player.weapon.ammo >= 16) {

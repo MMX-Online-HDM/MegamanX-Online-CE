@@ -33,8 +33,8 @@ public class Doppma : BaseSigma {
 		Helpers.decrementFrames(ref aiAttackCooldown);
 		// For ladder and slide shoot.
 		if (charState is WallSlide or LadderClimb &&
-			!string.IsNullOrEmpty(charState?.shootSprite) &&
-			sprite?.name?.EndsWith(charState.shootSprite) == true
+			charState.shootSpriteEx != "" &&
+			sprite.name.EndsWith(charState.shootSpriteEx) == true
 		) {
 			if (isAnimOver() && charState is not Sigma3Shoot) {
 				changeSpriteFromName(charState.sprite, true);

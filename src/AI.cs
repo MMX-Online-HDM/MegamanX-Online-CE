@@ -184,13 +184,8 @@ public class AI {
 		}
 	}
 	//End of Ride Chaser AI
-
-	public virtual void update() {
-		if (Global.level.isRace() && Global.level.supportsRideChasers && Global.level.levelData.raceOnly) {
-			raceChaserAI();
-			return;
-		}
-		if (Global.debug || Global.level.isTraining()) {
+	public virtual void preUpdate() {
+		if (Global.level.isTraining()) {
 			if (trainingBehavior == AITrainingBehavior.Idle) {
 				player.release(Control.Shoot);
 				player.release(Control.Jump);
@@ -198,7 +193,8 @@ public class AI {
 			}
 			if (trainingBehavior == AITrainingBehavior.Attack) {
 				player.release(Control.Jump);
-				if (character.chargeTime == 0) {
+				player.release(Control.Shoot);
+				if (Global.frameCount % 4 == 0) {
 					player.press(Control.Shoot);
 				}
 				return;
@@ -220,6 +216,16 @@ public class AI {
 				player.press(Control.Down);
 				return;
 			}
+		}
+	}
+
+	public virtual void update() {
+		if (Global.level.isRace() && Global.level.supportsRideChasers && Global.level.levelData.raceOnly) {
+			raceChaserAI();
+			return;
+		}
+		if (Global.level.isTraining() && trainingBehavior != AITrainingBehavior.Default) {
+			return;
 		}
 		if (Global.level.gameMode.isOver) {
 			return;

@@ -2331,11 +2331,8 @@ public partial class Player {
 		set { setArmorNum(3, value); }
 	}
 
-	public bool hasBootsArmor(ArmorId armorId) { return legArmorNum == (int)armorId; }
-	public bool hasBodyArmor(ArmorId armorId) { return bodyArmorNum == (int)armorId; }
 	public bool hasHelmetArmor(ArmorId armorId) { return helmetArmorNum == (int)armorId; }
 	public bool hasArmArmor(ArmorId armorId) { return armArmorNum == (int)armorId; }
-
 	public bool hasBootsArmor(int xGame) { return legArmorNum == xGame; }
 	public bool hasBodyArmor(int xGame) { return bodyArmorNum == xGame; }
 	public bool hasHelmetArmor(int xGame) { return helmetArmorNum == xGame; }
