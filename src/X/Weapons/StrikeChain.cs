@@ -73,14 +73,14 @@ public class StrikeChainPullToWall : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		player.character.useGravity = false;
-		player.character.vel.y = 0;
+		character.useGravity = false;
+		character.vel.y = 0;
 		character.changeSpriteFromName(sprite, true);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
-		player.character.useGravity = true;
+		character.useGravity = true;
 		if (scp != null && !scp.destroyed) scp.destroySelf();
 	}
 }
@@ -118,17 +118,17 @@ public class StrikeChainHooked : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		player.character.useGravity = false;
-		player.character.vel.y = 0;
+		character.useGravity = false;
+		character.vel.y = 0;
 		if (player.character is Vile vile) {
 			vile.rideArmorPlatform = null;
 		}
 		character.isStrikeChainState = true;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
-		player.character.useGravity = true;
+		character.useGravity = true;
 		character.isStrikeChainState = false;
 	}
 
@@ -145,7 +145,7 @@ public class StrikeChainHooked : CharState {
 		}
 
 		if (scp.destroyed || stateTime >= 5) {
-			player.character.useGravity = true;
+			character.useGravity = true;
 			stunTime += Global.spf;
 			if (!flinch || stunTime > 0.375f) {
 				isDone = true;
