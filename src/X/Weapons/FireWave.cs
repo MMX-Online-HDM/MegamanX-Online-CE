@@ -16,8 +16,7 @@ public class FireWave : Weapon {
 		shootSounds = new string[] { "fireWave", "fireWave", "fireWave", "fireWave" };
 		fireRate = 4;
 		isStream = true;
-		//switchCooldown = 0.25f;
-		switchCooldownFrames = 15;
+		switchCooldown = 15;
 		damage = "1/1";
 		ammousage = 0.5;
 		effect = "Inflicts burn to enemies. DOT: 0.5/2 seconds.\nBurn won't give assists.";

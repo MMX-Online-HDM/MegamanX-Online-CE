@@ -15,8 +15,7 @@ public class StormTornado : Weapon {
 		weaknessIndex = (int)WeaponIds.ChameleonSting;
 		shootSounds = new string[] { "tornado", "tornado", "tornado", "buster3" };
 		fireRate = 120;
-		//switchCooldown = 0.5f;
-		switchCooldownFrames = 30;
+		switchCooldown = 30;
 		damage = "1/4";
 		effect = "Weak push. Extinguishes Fire. Ignores Shields.\nUncharged won't give assists.";
 		hitcooldown = "0.25/0.33";

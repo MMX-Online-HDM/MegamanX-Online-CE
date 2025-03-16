@@ -11,8 +11,7 @@ public class Weapon {
 	public float fireRate;
 	public float shootCooldown;
 	public float altShotCooldown;
-	public float? switchCooldown;
-	public float? switchCooldownFrames;
+	public float switchCooldown = float.MaxValue;
 	public float soundTime = 0;
 	public bool isStream = false;
 	public string displayName = "";
@@ -333,6 +332,14 @@ public class Weapon {
 
 	public virtual bool canShoot(int chargeLevel, Player player) {
 		return ammo > 0;
+	}
+
+	public virtual bool canShoot(int chargeLevel, Character character) {
+		return canShoot(chargeLevel, character.player);
+	}
+
+	public virtual bool canShoot(int chargeLevel, MegamanX mmx) {
+		return canShoot(chargeLevel, mmx as Character);
 	}
 
 	public virtual bool applyDamage(

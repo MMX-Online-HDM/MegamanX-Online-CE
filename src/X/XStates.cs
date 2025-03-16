@@ -508,11 +508,8 @@ public class X3ChargeShot : CharState {
 					);
 					character.playSound("plasmaShot", sendRpc: true);
 				}
-			mmx.stockedTime = 0;
+				mmx.stockedTime = 0;
 			} else {
-				if (hyperBusterWeapon != null) {
-					hyperBusterWeapon.ammo -= hyperBusterWeapon.getChipFactoredAmmoUsage(player);
-				}
 				character.playSound("buster3X3", sendRpc: true);
 				float xDir = character.getShootXDir();
 				new BusterX3Proj2(
@@ -536,14 +533,6 @@ public class X3ChargeShot : CharState {
 		}
 		if (character.isAnimOver()) {
 			if (state == 0 && pressFire) {
-				if (hyperBusterWeapon != null) {
-					if (hyperBusterWeapon.ammo < hyperBusterWeapon.getChipFactoredAmmoUsage(player)) {
-						character.changeToIdleOrFall();
-						return;
-					}
-				} else {
-					mmx.stockedMaxBuster = false;
-				}
 				sprite = "cross_shot2";
 				landSprite = "cross_shot2";
 				if (!character.grounded || character.vel.y < 0) {

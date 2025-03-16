@@ -530,14 +530,16 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public bool canStartClimbLadder() {
-		if (!charState.normalCtrl) return false;
+		if (!charState.normalCtrl) {
+			return false;
+		}
+		if (rideArmorPlatform != null) {
+			return false;
+		}
 		return true;
 	}
 
 	public virtual bool canClimbLadder() {
-		if (rideArmorPlatform != null) {
-			return false;
-		}
 		if (shootAnimTime > 0 || isSoftLocked()) {
 			return false;
 		}
@@ -550,6 +552,10 @@ public partial class Character : Actor, IDamagable {
 
 	public virtual bool canShoot() {
 		return charState.attackCtrl;
+	}
+
+	public virtual bool canShootCharge() {
+		return canShoot();
 	}
 
 	public virtual bool canChangeWeapons() {
@@ -3266,13 +3272,14 @@ public partial class Character : Actor, IDamagable {
 		}
 		// Release charge only if not holding and we can attack.
 		// This to prevent from losing charge.
-		else if (canShoot()) {
+		else if (canShootCharge()) {
 			int chargeLevel = getChargeLevel();
-			if (isCharging()) {
-				if (chargeLevel >= 1) {
-					shootFunct(chargeLevel);
-				}
+			if (isCharging() && chargeLevel >= 1) {
+				shootFunct(chargeLevel);
 			}
+			stopCharge();
+		}
+		else if (!isCharging()) {
 			stopCharge();
 		}
 		chargeGfx();

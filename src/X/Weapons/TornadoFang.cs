@@ -10,6 +10,7 @@ public class TornadoFang : Weapon {
 	public TornadoFang() : base() {
 		shootSounds = new string[] { "busterX3", "busterX3", "busterX3", "tunnelFang" };
 		fireRate = 60;
+		switchCooldown = 45;
 		index = (int)WeaponIds.TornadoFang;
 		weaponBarBaseIndex = 24;
 		weaponBarIndex = weaponBarBaseIndex;

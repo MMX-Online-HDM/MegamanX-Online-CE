@@ -180,7 +180,7 @@ public class BusterZero : Character {
 		}
 		if (shootAnimTime == 0) {
 			changeSprite(shootSprite, false);
-		} else if (charState is Idle) {
+		} else if (charState is Idle && !charState.inTransition()) {
 			frameIndex = 0;
 			frameTime = 0;
 		}

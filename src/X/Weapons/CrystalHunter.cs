@@ -11,14 +11,13 @@ public class CrystalHunter : Weapon {
 	public CrystalHunter() : base() {
 		shootSounds = new string[] { "crystalHunter", "crystalHunter", "crystalHunter", "crystalHunterCharged" };
 		fireRate = 75;
+		switchCooldown = 45;
 		index = (int)WeaponIds.CrystalHunter;
 		weaponBarBaseIndex = 9;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 9;
 		killFeedIndex = 20;
 		weaknessIndex = (int)WeaponIds.MagnetMine;
-		//switchCooldown = 0.5f;
-		switchCooldownFrames = 30;
 		damage = "0-3/0";
 		effect = "Crystalizes enemies on contact.\nC: Slows down the area by 25%.";
 		hitcooldown = "0-1/0";
