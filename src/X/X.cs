@@ -887,7 +887,7 @@ public class MegamanX : Character {
 	}
 
 	public override string getAltSound(string sound, string options = "") {
-		int gameSound = options switch {
+		int gameSound = options.ToLower() switch {
 			"larmor" => (int)legArmor,
 			"aarmor" => (int)armArmor,
 			"carmor" => (int)chestArmor,
@@ -900,7 +900,7 @@ public class MegamanX : Character {
 			3 => "x3",
 			_ => ""
 		};
-		if (apendix != "" && Global.soundBuffers.ContainsKey(sound+apendix)) {
+		if (apendix != "" && Global.soundBuffers.ContainsKey(sound.ToLower()+apendix)) {
 			return sound+apendix;
 		}
 		return sound;
@@ -1099,6 +1099,7 @@ public class MegamanX : Character {
 		hyperHelmetActive = armorBoolData[3];
 		hasUltimateArmor = armorBoolData[4];
 	}
+
 	public override void aiAttack(Actor? target) {
 		bool isTargetInAir = pos.y < target?.pos.y - 20;
 		bool isTargetClose = pos.x < target?.pos.x - 10;
@@ -1113,7 +1114,8 @@ public class MegamanX : Character {
 				case 0 when getMaxChargeLevel() >= 3 && isFacingTarget:
 					player.release(Control.Shoot);		
 					break;
-				case 1 when target is MegamanX or Axl or Vile or NeoSigma && hasHadoukenEquipped() && canUseFgMove() && isTargetClose: 
+				case 1 when target is MegamanX or Axl or Vile or NeoSigma && hasHadoukenEquipped()
+					&& canUseFgMove() && isTargetClose: 
 					player.currency -= 3;
 					changeState(new Hadouken(), true);
 					break;
@@ -1133,7 +1135,7 @@ public class MegamanX : Character {
 					} else { player.changeWeaponSlot(getRandomWeaponIndex()); }
 					break;
 				case 5 when player.hasBodyArmor(2):
-					int gCrushSlot = player.weapons.FindIndex(w => w is GigaCrush);			
+					int gCrushSlot = player.weapons.FindIndex(w => w is GigaCrush);
 					player.changeWeaponSlot(gCrushSlot);
 					if (player.weapon.ammo >= 28)
 						player.press(Control.Shoot);
@@ -1182,10 +1184,9 @@ public class MegamanX : Character {
 		}
 		base.aiDodge(target);
 	}
+
 	public override void aiUpdate() {
 		//Buying UAX and Golden Armor goes here
 		base.aiUpdate();
 	}
-
-
 }
