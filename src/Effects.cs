@@ -82,6 +82,9 @@ public class ChargeEffect {
 			}
 			if (chargeType == 3 && chargeLevel >= 3) {
 				chargePart = "charge_part_4";
+			}
+			else if (chargeType == 1 && chargeLevel >= 3) {
+				chargePart = "hypercharge_part_1";
 			} else {
 				chargePart = "charge_part_" + chargeLevel.ToString();
 			}

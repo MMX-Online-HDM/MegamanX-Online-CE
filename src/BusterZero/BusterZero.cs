@@ -180,7 +180,7 @@ public class BusterZero : Character {
 		}
 		if (shootAnimTime == 0) {
 			changeSprite(shootSprite, false);
-		} else if (charState is Idle) {
+		} else if (charState is Idle && !charState.inTransition()) {
 			frameIndex = 0;
 			frameTime = 0;
 		}
@@ -333,23 +333,23 @@ public class BusterZero : Character {
 		if (Global.isOnFrameCycle(4)) {
 			switch (getChargeLevel()) {
 				case 1:
-					palette = player.ZeroBlueC;
+					palette = Player.ZeroBlueC;
 					break;
 				case 2:
-					palette = player.ZeroBlueC;
+					palette = Player.ZeroBlueC;
 					break;
 				case 3:
-					palette = player.ZeroPinkC;
+					palette = Player.ZeroPinkC;
 					break;
 				case 4:
-					palette = player.ZeroGreenC;
+					palette = Player.ZeroGreenC;
 					break;
 			}
 			if (stockedSaber || stockedBusterLv == 2) {
-					palette = player.ZeroGreenC;
+					palette = Player.ZeroGreenC;
 			}
 			if (stockedBusterLv == 1) {
-				palette = player.ZeroPinkC;
+				palette = Player.ZeroPinkC;
 			}
 		}
 		if (palette != null) {

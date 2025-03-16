@@ -410,13 +410,14 @@ public partial class Player {
 	public ShaderWrapper timeSlowShader = Helpers.cloneShaderSafe("timeslow");
 	public ShaderWrapper darkHoldScreenShader = Helpers.cloneShaderSafe("darkHoldScreen");
 	// Charge Lv
-	public ShaderWrapper ZeroPinkC = Helpers.cloneGenericPaletteShader("zeroPinkCharge");
-	public ShaderWrapper ZeroGreenC = Helpers.cloneGenericPaletteShader("zeroGreenCharge");
-	public ShaderWrapper ZeroBlueC = Helpers.cloneGenericPaletteShader("zeroBlueCharge");
-	public ShaderWrapper XPinkC = Helpers.cloneGenericPaletteShader("xPinkCharge");
-	public ShaderWrapper XGreenC = Helpers.cloneGenericPaletteShader("xGreenCharge");
-	public ShaderWrapper XBlueC = Helpers.cloneGenericPaletteShader("xBlueCharge");
-	public ShaderWrapper XOrangeC = Helpers.cloneGenericPaletteShader("xOrangeCharge");
+	public static ShaderWrapper ZeroPinkC = Helpers.cloneGenericPaletteShader("zeroPinkCharge");
+	public static ShaderWrapper ZeroGreenC = Helpers.cloneGenericPaletteShader("zeroGreenCharge");
+	public static ShaderWrapper ZeroBlueC = Helpers.cloneGenericPaletteShader("zeroBlueCharge");
+	public static ShaderWrapper XPinkC = Helpers.cloneGenericPaletteShader("xPinkCharge");
+	public static ShaderWrapper XGreenC = Helpers.cloneGenericPaletteShader("xGreenCharge");
+	public static ShaderWrapper XBlueC = Helpers.cloneGenericPaletteShader("xBlueCharge");
+	public static ShaderWrapper XYellowC = Helpers.cloneGenericPaletteShader("xYellowCharge");
+	public static ShaderWrapper XOrangeC = Helpers.cloneGenericPaletteShader("xOrangeCharge");
 
 	public ShaderWrapper speedBurnerOrange = Helpers.cloneGenericPaletteShader("speedBurnerOrange");
 	public ShaderWrapper speedBurnerGrey = Helpers.cloneGenericPaletteShader("speedBurnerGrey");

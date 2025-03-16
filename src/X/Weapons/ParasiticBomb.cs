@@ -11,6 +11,7 @@ public class ParasiticBomb : Weapon {
 	public ParasiticBomb() : base() {
 		shootSounds = new string[] { "", "", "", "" };
 		fireRate = 60;
+		switchCooldown = 45;
 		index = (int)WeaponIds.ParasiticBomb;
 		weaponBarBaseIndex = 18;
 		weaponBarIndex = weaponBarBaseIndex;

@@ -490,6 +490,7 @@ public partial class Global {
 	public static float currentFPS = 60;
 	public static float logicFPS = 60;
 	public static float speedMul = 1;
+	public static float gameSpeed = 1;
 	public static readonly float secondsFrameDuration = 1f / 60f;
 	public static float spf {
 		get {

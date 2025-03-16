@@ -43,13 +43,13 @@ public class RollingShield : Weapon {
 		if (chargeLevel < 3) {
 			new RollingShieldProj(pos, xDir, mmx, player, player.getNextActorNetId(), true);	
 		} else {
-			if (mmx.stingActiveTime == 0 && (args.Length == 1 || args[1] == 0)) {
+			if (mmx.chargedRollingShieldProj?.destroyed == false && args.Length >= 1 && args[1] != 0) {
+				mmx.specialBuster.shoot(character, [3, 1]);
+				freeAmmoNextCharge = true;
+			} else {
 				mmx.chargedRollingShieldProj = new RollingShieldProjCharged(
 					pos, xDir, mmx, player, player.getNextActorNetId(), true
 				);
-			} else {
-				mmx.specialBuster.shoot(character, [3, 1]);
-				freeAmmoNextCharge = true;
 			}
 		}
 	}

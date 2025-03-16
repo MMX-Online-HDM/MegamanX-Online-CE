@@ -45,12 +45,12 @@ public class ChameleonSting : Weapon {
 		if (chargeLevel < 3) {
 			new StingProj(pos, xDir, mmx, player, 0, player.getNextActorNetId(), true);
 		} else {
-			if (mmx.stingActiveTime == 0 && (args.Length == 1 || args[1] == 0)) {
-				mmx.stingActiveTime = 8;
-			} else {
+			if (mmx.stingActiveTime > 0 && args.Length >= 1 && args[1] != 0) {
 				mmx.specialBuster.shoot(character, [3, 1]);
 				freeAmmoNextCharge = true;
+				return;
 			}
+			mmx.stingActiveTime = 8;
 		}
 	}
 }

@@ -10,6 +10,7 @@ public class TornadoFang : Weapon {
 	public TornadoFang() : base() {
 		shootSounds = new string[] { "busterX3", "busterX3", "busterX3", "tunnelFang" };
 		fireRate = 60;
+		switchCooldown = 45;
 		index = (int)WeaponIds.TornadoFang;
 		weaponBarBaseIndex = 24;
 		weaponBarIndex = weaponBarBaseIndex;
@@ -216,29 +217,29 @@ public class TornadoFangProjCharged : Projectile {
 		Helpers.decrementTime(ref sparksCooldown);
 		if (!ownedByLocalPlayer) return;
 
-		if (mmx.chargedTornadoFang == this) {
+		if (!unliked && mmx.chargedTornadoFang == this) {
+			if (mmx.player.input.isPressed(Control.Shoot, mmx.player)) {
+				unlink();
+				return;
+			}
 			if (mmx == null || mmx.destroyed) {
 				destroySelf();
 				return;
 			}
-			if (mmx?.currentWeapon is TornadoFang) {
-				mmx?.currentWeapon?.addAmmo(speedMul * -0.08f, mmx.player);
+			if (mmx.currentWeapon is TornadoFang && time >= 6f / 60f) {
+				mmx.currentWeapon.addAmmo(speedMul * -0.04f, mmx.player);
 			}
-			if (mmx?.currentWeapon?.ammo <= 0) {
+			if (mmx.currentWeapon.ammo <= 0) {
 				destroySelf();
 				return;
 			}
-			if (mmx?.currentWeapon is not TornadoFang && mmx?.currentWeapon is not HyperCharge) {
+			if (mmx.currentWeapon is not TornadoFang && mmx.currentWeapon is not HyperCharge) {
 				destroySelf();
 				return;
 			}
-		} else if (!unliked) {
-			unliked = true;
-			vel.x = xDir * 125;
-			time = 0;
-			maxTime = 2;
-			exhaust = new Anim(pos.addxy(-7 * xDir, 0), "tunnelfang_exhaust", xDir, null, false, host: this);
-			exhaust.setzIndex(zIndex - 100);
+		}
+		else if (!unliked) {
+			unlink();
 		}
 	}
 
@@ -247,16 +248,38 @@ public class TornadoFangProjCharged : Projectile {
 		if (!ownedByLocalPlayer) return;
 		if (destroyed) return;
 
-		if (mmx != null && mmx.chargedTornadoFang == this) {
+		if (!unliked && mmx != null && mmx.chargedTornadoFang == this) {
+			xDir = mmx.getShootXDir();
 			if (mmx.currentFrame.POIs.Length == 0) {
 				changePos(mmx.pos.add(offset));
 			} else {
-				Point busterPos = mmx.getShootPos();
+				int busterOffset = 2;
+				if (mmx.armArmor == ArmorId.Max) {
+					busterOffset = 3;
+				}
+				Point busterPos = mmx.getShootPos().addxy(-busterOffset * xDir, -1);
 				changePos(busterPos);
 				offset = busterPos - mmx.pos;
 			}
-			xDir = mmx.getShootXDir();
 		}
+	}
+
+	public void unlink() {
+		if (unliked) {
+			return;
+		}
+		if (mmx.chargedTornadoFang == this) {
+			mmx.chargedTornadoFang = null;
+		}
+		if (mmx.currentWeapon is TornadoFang) {
+			mmx.currentWeapon.addAmmo(-6, mmx.player);
+		}
+		unliked = true;
+		vel.x = xDir * 125;
+		time = 0;
+		maxTime = 2;
+		exhaust = new Anim(pos.addxy(-3 * xDir, 0), "tunnelfang_exhaust", xDir, null, false, host: this);
+		exhaust.setzIndex(zIndex - 100);
 	}
 
 	public override void onHitDamagable(IDamagable damagable) {
@@ -279,11 +302,11 @@ public class TornadoFangProjCharged : Projectile {
 		if (exhaust != null) {
 			exhaust.destroySelf();
 		}
-		if (mmx.chargedTornadoFang == this) {
-			mmx.chargedTornadoFang = null;
-		}
 		if (!ownedByLocalPlayer) {
 			return;
+		}
+		if (mmx.chargedTornadoFang == this) {
+			mmx.chargedTornadoFang = null;
 		}
 		if (unliked) {
 			new Anim(pos, "explosion", xDir, damager.owner.getNextActorNetId(), true, true);
