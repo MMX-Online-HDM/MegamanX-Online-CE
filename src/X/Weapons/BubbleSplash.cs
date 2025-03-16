@@ -70,7 +70,12 @@ public class BubbleSplash : Weapon {
 		}
 	}
 
-	// Friendly reminder that this method MUST be deterministic across all clients, i.e. don't vary it on a field that could vary locally.
+	// Friendly reminder that this method MUST be deterministic across all clients,
+	// i.e. don't vary it on a field that could vary locally.
+	// Gacel:
+	// Uh. Well. Not really. This does not run by local players.
+	// Just make sure you send all the extra data in a RPC.
+	// AKA: Do not edit the speed of projectiles externally on this function.
 	public override void shoot(Character character, int[] args) {
 		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
 
@@ -80,14 +85,13 @@ public class BubbleSplash : Weapon {
 		Player player = character.player;
 
 		if (chargeLevel < 3) {
-			if (player.ownedByLocalPlayer) {
-				int type = 0;
-				if (player.input.isHeld(Control.Up, player)) {
-					type = 1;
-				}
-				var proj = new BubbleSplashProj(type, pos, xDir, mmx, player, player.getNextActorNetId(), rpc: true);
-				bubblesOnField.Add(proj);
+			int type = 0;
+			if (player.input.isHeld(Control.Up, player)) {
+				type = 1;
 			}
+			bubblesOnField.Add(
+				new BubbleSplashProj(type, pos, xDir, mmx, player, player.getNextActorNetId(), rpc: true)
+			);
 		} else if (chargeLevel >= 3) {
 			if (mmx.chargedBubbles.Count >= 5) {
 				mmx.specialBuster.shoot(character, [3, 1]);

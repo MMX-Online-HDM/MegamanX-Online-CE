@@ -106,6 +106,7 @@ public class MegamanX : Character {
 	public float stingActiveTime;
 	public int stingPaletteIndex;
 	public float stingPaletteTime;
+	public float chargePalleteTime;
 	// Other.
 	public float weaknessCooldown;
 	public float aiAttackCooldown;
@@ -340,8 +341,8 @@ public class MegamanX : Character {
 			changeState(new Shoryuken(isUnderwater()), true);
 			return true;
 		}
-		if (!isCharging() && currentWeapon != null && canShoot() && (
-				player.input.isPressed(Control.Shoot, player) ||
+		if (currentWeapon != null && canShoot() && (
+				player.input.isPressed(Control.Shoot, player) && !isCharging() ||
 				currentWeapon.isStream && getChargeLevel() < 2 &&
 				player.input.isHeld(Control.Shoot, player)
 			)
@@ -838,11 +839,16 @@ public class MegamanX : Character {
 	public override void render(float x, float y) {
 		if (!shouldRender(x, y)) {
 			return;
-		} 
+		}
 		if (sprite.name == "mmx_frozen") {
 			Global.sprites["frozen_block"].draw(
 				0, pos.x + x - (xDir * 2), pos.y + y + 1, xDir, 1, null, 1, 1, 1, zIndex + 1
 			);
+		}
+		if (getChargeShaders().Count != 0) {
+			chargePalleteTime += Global.gameSpeed;
+		} else {
+			chargePalleteTime = 0;
 		}
 		float backupAlpha = alpha;
 		if (stingActiveTime > 0) {
@@ -856,7 +862,7 @@ public class MegamanX : Character {
 				stingPaletteTime++;
 			}
 			if (stingPaletteTime % 4 <= 1) {
-				alpha *= 0.25f;
+				alpha *= 0.3f;
 			}
 		}
 		base.render(x, y);
@@ -930,14 +936,37 @@ public class MegamanX : Character {
 
 		palette?.SetUniform("palette", index);
 
+		List<ShaderWrapper?> chargePalletes = getChargeShaders();
+		if (chargePalletes.Count > 0) {
+			if (chargePalletes.Count == 1) {
+				chargePalletes.Add(null);
+			}
+			ShaderWrapper? targetChargePallete = chargePalletes[MathInt.Floor(
+				(chargePalleteTime % (chargePalletes.Count * 2)) / 2f
+			)];
+			if (targetChargePallete != null) {
+				palette = targetChargePallete;
+			}
+		}
+
 		if (charState is SpeedBurnerCharState) {
 			palette = player.speedBurnerOrange;
 			if (Global.isOnFrameCycle(8)) {
 				palette = player.speedBurnerGrey;
 			}
 		}
-		
-		List<ShaderWrapper?> chargePalletes = new();
+		if (palette != null) {
+			shaders.Add(palette);
+		}
+		if (shaders.Count == 0) {
+			return baseShaders;
+		}
+		shaders.AddRange(baseShaders);
+		return shaders;
+	}
+
+	public List<ShaderWrapper> getChargeShaders() {
+		List<ShaderWrapper> chargePalletes = new();
 		ShaderWrapper? defaultChargePallete = null;
 		int chargeLevel = getChargeLevel();
 		if (chargeLevel > 0) {
@@ -960,31 +989,14 @@ public class MegamanX : Character {
 			chargePalletes.Add(Player.XGreenC);
 		}
 		if (currentWeapon is HyperCharge) {
-			if (!hasFullHyperMaxArmor && !stockedMaxBuster) {
+			if (!hasFullHyperMaxArmor && !stockedMaxBuster && defaultChargePallete != Player.XOrangeC) {
 				chargePalletes.Add(Player.XOrangeC);
-			} else if (!stockedSaber) {
+			}
+			else if (!stockedSaber && defaultChargePallete != Player.XGreenC) {
 				chargePalletes.Add(Player.XGreenC);
 			}
 		}
-		if (chargePalletes.Count > 0) {
-			if (chargePalletes.Count == 1) {
-				chargePalletes.Add(null);
-			}
-			ShaderWrapper? targetChargePallete = chargePalletes[MathInt.Floor(
-				(Global.frameCount % (chargePalletes.Count * 2)) / 2f
-			)];
-			if (targetChargePallete != null) {
-				palette = targetChargePallete;
-			}
-		}
-		if (palette != null) {
-			shaders.Add(palette);
-		}
-		if (shaders.Count == 0) {
-			return baseShaders;
-		}
-		shaders.AddRange(baseShaders);
-		return shaders;
+		return chargePalletes;
 	}
 
 	public int getArmorByte() {

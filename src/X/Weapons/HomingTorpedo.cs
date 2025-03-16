@@ -58,6 +58,7 @@ public class TorpedoProjX : Projectile, IDamagable {
 		pos, xDir, owner, "torpedo", netId, player	
 	) {
 		weapon = HomingTorpedo.netWeapon;
+		netcodeOverride = NetcodeModel.FavorDefender;
 		damager.damage = 2;
 		vel = new Point(150 * xDir, 0);
 		fadeSprite = "explosion";
@@ -185,6 +186,7 @@ public class TorpedoProjChargedX : Projectile, IDamagable {
 		pos, xDir, owner, "torpedo_charge", netId, player	
 	) {
 		weapon = HomingTorpedo.netWeapon;
+		netcodeOverride = NetcodeModel.FavorDefender;
 		damager.damage = 1;
 		damager.flinch = Global.halfFlinch;
 		vel = new Point(150 * xDir, 0);
@@ -258,12 +260,12 @@ public class TorpedoProjChargedX : Projectile, IDamagable {
 		float normAngle = 0;
 		if (angle < 90) {
 			xDir = 1;
-			yDir = -1;
+			//yDir = -1;
 			normAngle = (float)angle;
 		}
 		if (angle >= 90 && angle < 180) {
 			xDir = -1;
-			yDir = -1;
+			//yDir = -1;
 			normAngle = 180 - (float)angle;
 		} else if (angle >= 180 && angle < 270) {
 			xDir = -1;
