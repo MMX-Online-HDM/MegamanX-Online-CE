@@ -125,6 +125,7 @@ public class CmdSigma : BaseSigma {
 	public enum MeleeIds {
 		None = -1,
 		Guard,
+		AutoGuard,
 		GenericSlash,
 	}
 
@@ -132,6 +133,7 @@ public class CmdSigma : BaseSigma {
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
 			"sigma_block" => MeleeIds.Guard,
+			"sigma_block_auto" => MeleeIds.AutoGuard,
 			"sigma_ladder_attack" or "sigma_wall_slide_attack" => MeleeIds.GenericSlash,
 			_ => MeleeIds.None
 		});
@@ -140,6 +142,12 @@ public class CmdSigma : BaseSigma {
 	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
 		return (MeleeIds)id switch {
 			MeleeIds.Guard => new GenericMeleeProj(
+				SigmaSlashWeapon.netWeapon, pos, ProjIds.SigmaSwordBlock, player,
+				0, 0, 0, isDeflectShield: true, addToLevel: addToLevel
+			) {
+				highPiority = true
+			},
+			MeleeIds.AutoGuard => new GenericMeleeProj(
 				SigmaSlashWeapon.netWeapon, pos, ProjIds.SigmaSwordBlock, player,
 				0, 0, 0, isDeflectShield: true, addToLevel: addToLevel
 			) {
