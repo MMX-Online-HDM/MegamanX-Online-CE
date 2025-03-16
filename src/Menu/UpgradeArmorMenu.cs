@@ -373,8 +373,7 @@ public class UpgradeArmorMenu : IMainMenu {
 				Fonts.drawText(FontType.Blue, "Reduces Flinch by 25.0%", optionPos2.x + 5, optionPos2.y + 20);
 				Fonts.drawText(FontType.Blue, "Powers up your Spiral Crush Buster", optionPos3.x + 5, optionPos3.y + 10);
 				Fonts.drawText(FontType.Blue, "by charging shots 50% Faster.", optionPos3.x + 5, optionPos3.y + 20);
-				Fonts.drawText(FontType.Blue, "Ground Dash 15% Faster.", optionPos4.x + 5, optionPos4.y + 10);
-				Fonts.drawText(FontType.Blue, "And increases its length by 15%.", optionPos4.x + 5, optionPos4.y + 20);
+				Fonts.drawText(FontType.Blue, "Ground Dash 15% faster and konger.", optionPos4.x + 5, optionPos4.y + 10);
 				break;
 			case 2: //Second
 				Fonts.drawText(FontType.Blue, "Trace enemy hp and positioning", optionPos1.x + 5, optionPos1.y + 10);
@@ -383,8 +382,7 @@ public class UpgradeArmorMenu : IMainMenu {
 				Fonts.drawText(FontType.Blue, "Reduces Damage by 12.5%", optionPos2.x + 5, optionPos2.y + 20);
 				Fonts.drawText(FontType.Blue, "Grants the Double X-Buster.", optionPos3.x + 5, optionPos3.y + 10);
 				Fonts.drawText(FontType.Blue, "Store an extra charge shot.", optionPos3.x + 5, optionPos3.y + 20);
-				Fonts.drawText(FontType.Blue, "Air dash 15% Faster.", optionPos4.x + 5, optionPos4.y + 10);
-				Fonts.drawText(FontType.Blue, "And increases its length by 15%.", optionPos4.x + 5, optionPos4.y + 20);
+				Fonts.drawText(FontType.Blue, "Air dash 15% faster and longer.", optionPos4.x + 5, optionPos4.y + 10);
 				break;
 			case 3:	//Max
 				if (!mainPlayer.hasAllX3Armor()) {
