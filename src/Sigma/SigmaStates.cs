@@ -90,9 +90,8 @@ public class SigmaBlock : CharState {
 }
 
 public class SigmaAutoBlock : CharState {
-	public SigmaAutoBlock() : base("block") {
+	public SigmaAutoBlock() : base("block_auto") {
 		superArmor = true;
-		stunResistant = true;
 		immuneToWind = true;
 		exitOnAirborne = true;
 	}
