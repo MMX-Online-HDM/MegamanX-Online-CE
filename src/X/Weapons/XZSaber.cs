@@ -39,16 +39,16 @@ public class XSaberProj : Projectile {
 	}
 }
 
-public class XSaberState : CharState {
+public class XMaxWaveSaberState : CharState {
 	bool fired;
-	bool grounded;
 	MegamanX mmx = null!;
-	public XSaberState(bool grounded) : base(grounded ? "beam_saber" : "beam_saber_air") {
-		this.grounded = grounded;
+
+	public XMaxWaveSaberState() : base("beam_saber") {
 		landSprite = "beam_saber";
 		airSprite = "beam_saber_air";
 		airMove = true;
 		useDashJumpSpeed = true;
+		canStopJump = true;
 		canJump = true;
 	}
 
@@ -56,6 +56,7 @@ public class XSaberState : CharState {
 		base.update();
 		if (character.frameIndex >= 7 && !fired) {
 			fired = true;
+			mmx.stockedSaber = false;
 			character.playSound("zerosaberx3");
 			new XSaberProj(
 				character.pos.addxy(28 * character.xDir, -17), character.xDir,
@@ -69,6 +70,10 @@ public class XSaberState : CharState {
 	public override void onEnter(CharState oldState) {
 		mmx = player.character as MegamanX ?? throw new NullReferenceException();
 		base.onEnter(oldState);
+		if (!character.grounded) {
+			sprite = airSprite;
+			character.changeSpriteFromName(airSprite, true);
+		}
 	}
 }
 
@@ -81,6 +86,7 @@ public class X6SaberState : CharState {
 		landSprite = "beam_saber2";
 		airMove = true;
 		useDashJumpSpeed = true;
+		canStopJump = true;
 	}
 
 	public override void update() {
@@ -89,13 +95,7 @@ public class X6SaberState : CharState {
 		if (character.frameIndex >= frameSound && !fired) {
 			fired = true;
 			character.playSound("raijingeki");
-			//new XSaberProj(new XSaber(player), character.pos.addxy(30 * character.xDir, -29), character.xDir, player, player.getNextActorNetId(), rpc: true);
 		}
-
-		if (player?.character?.canCharge() == true && player.input.isHeld(Control.Shoot, player)) {
-			player.character.increaseCharge();
-		}
-
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		}

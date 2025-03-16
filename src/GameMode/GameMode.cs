@@ -972,12 +972,12 @@ public class GameMode {
 			revealedRadius = Global.viewScreenW;
 		}
 
-		float borderThickness = 1;
+		//float borderThickness = 1;
 		float dotRadius = 0.75f;
 		if (Global.level.isRace()) {
 			revealedSpots.Add(new Point(level.camX, level.camY));
 			revealedRadius = float.MaxValue;
-			borderThickness = 1;
+			//borderThickness = 1;
 			dotRadius = 0.75f;
 		}
 

@@ -287,11 +287,9 @@ public class MegamanX : Character {
 	}
 
 	public override bool attackCtrl() {
-		if (player.input.isPressed(Control.Special1, player) && helmetArmor == ArmorId.Giga &&
-			itemTracer.shootCooldown == 0
-		) {
-			itemTracer.shoot(this, [0, hyperHelmetArmor == ArmorId.Giga ? 1 : 0]);
-			itemTracer.shootCooldown = itemTracer.fireRate;
+		if (stockedSaber && player.input.isPressed(Control.Special1, player)) {
+			changeState(new XMaxWaveSaberState(), true);
+			return true;
 		}
 		if (player.input.isPressed(Control.Special1, player) && !hasAnyArmor) {
 			if (specialButtonMode == 1) {
@@ -301,6 +299,12 @@ public class MegamanX : Character {
 				shoot(0, specialBuster, false);
 				return true;
 			}
+		}
+		if (player.input.isPressed(Control.Special1, player) && helmetArmor == ArmorId.Giga &&
+			itemTracer.shootCooldown == 0
+		) {
+			itemTracer.shoot(this, [0, hyperHelmetArmor == ArmorId.Giga ? 1 : 0]);
+			itemTracer.shootCooldown = itemTracer.fireRate;
 		}
 		if (bufferedShotPressed && stockedMaxBuster) {
 			shoot(1, specialBuster, false);
@@ -378,6 +382,9 @@ public class MegamanX : Character {
 			} else {
 				chargeLevel = 3;
 			}
+		}
+		if (!busterStock && chargeLevel >= 3 && hasFullHyperMaxArmor) {
+			stockedSaber = true;
 		}
 		// Changes to shoot animation and gets sound.
 		if (chargeLevel < 3 || !weapon.hasCustomChargeAnim) {
@@ -862,7 +869,13 @@ public class MegamanX : Character {
 		}
 		if (isCharging()) {
 			chargeSound.play();
-			int chargeType = 2;
+			int chargeType = 0;
+			if (hasFullHyperMaxArmor) {
+				chargeType = 3;
+			}
+			else if (armArmor == ArmorId.Max) {
+				chargeType = 1;
+			}
 			chargeEffect.update(getChargeLevel(), chargeType);
 		}
 	}
@@ -923,44 +936,47 @@ public class MegamanX : Character {
 				palette = player.speedBurnerGrey;
 			}
 		}
-
-		else if (Global.isOnFrameCycle(4)) {
-			switch (getChargeLevel()) {
-				case 1:
-					palette = player.XBlueC;
-					break;
-				case 2:
-					palette = player.XBlueC;
-					break;
-				case >=3:
-				if (currentWeapon is not XBuster) 
-					palette = player.XPinkC;			
-				else if (armArmor == ArmorId.Max) 
-					palette = player.XOrangeC;
-				else if (hasFullHyperMaxArmor) 
-					palette = player.XGreenC;
-				else 
-					palette = player.XPinkC;		
-					break;
-			}
-			if (stockedSaber) {
-				palette = player.XGreenC;
-			}
-			if (stockedMaxBuster) {
-				palette = player.XOrangeC;
-			}
-			if (stockedBuster) {
-				palette = player.XPinkC;
-			}
-			if (currentWeapon is HyperCharge) {
-				if (!hasFullHyperMaxArmor) {
-					palette = player.XOrangeC;
-				} else {
-					palette = player.XGreenC;
-				}
+		
+		List<ShaderWrapper?> chargePalletes = new();
+		ShaderWrapper? defaultChargePallete = null;
+		int chargeLevel = getChargeLevel();
+		if (chargeLevel > 0) {
+			defaultChargePallete = getChargeLevel() switch {
+				1 => Player.XBlueC,
+				2 => Player.XYellowC,
+				3 when hasFullHyperMaxArmor => Player.XGreenC,
+				3 when armArmor == ArmorId.Max => Player.XOrangeC,
+				_ => Player.XPinkC,
+			};
+			chargePalletes.Add(defaultChargePallete);
+		}
+		if (stockedMaxBuster && defaultChargePallete != Player.XOrangeC) {
+			chargePalletes.Add(Player.XOrangeC);
+		}
+		if (stockedBuster && defaultChargePallete != Player.XPinkC) {
+			chargePalletes.Add(Player.XPinkC);
+		}
+		if (stockedSaber && defaultChargePallete != Player.XGreenC) {
+			chargePalletes.Add(Player.XGreenC);
+		}
+		if (currentWeapon is HyperCharge) {
+			if (!hasFullHyperMaxArmor && !stockedMaxBuster) {
+				chargePalletes.Add(Player.XOrangeC);
+			} else if (!stockedSaber) {
+				chargePalletes.Add(Player.XGreenC);
 			}
 		}
-
+		if (chargePalletes.Count > 0) {
+			if (chargePalletes.Count == 1) {
+				chargePalletes.Add(null);
+			}
+			ShaderWrapper? targetChargePallete = chargePalletes[MathInt.Floor(
+				(Global.frameCount % (chargePalletes.Count * 2)) / 2f
+			)];
+			if (targetChargePallete != null) {
+				palette = targetChargePallete;
+			}
+		}
 		if (palette != null) {
 			shaders.Add(palette);
 		}
