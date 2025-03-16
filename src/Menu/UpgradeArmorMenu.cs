@@ -375,7 +375,7 @@ public class UpgradeArmorMenu : IMainMenu {
 				Fonts.drawText(FontType.Blue, "by charging shots 50% Faster.", optionPos3.x + 5, optionPos3.y + 20);
 				Fonts.drawText(FontType.Blue, "Ground Dash 15% faster and konger.", optionPos4.x + 5, optionPos4.y + 10);
 				break;
-			case 2: //Second
+			case 2: //Giga
 				Fonts.drawText(FontType.Blue, "Trace enemy hp and positioning", optionPos1.x + 5, optionPos1.y + 10);
 				Fonts.drawText(FontType.Blue, "by pressing SPECIAL button.", optionPos1.x + 5, optionPos1.y + 20);
 				Fonts.drawText(FontType.Blue, "Grants the Giga Crush attack", optionPos2.x + 5, optionPos2.y + 10);
@@ -412,12 +412,6 @@ public class UpgradeArmorMenu : IMainMenu {
 					if (mmx.hyperArmActive) Global.sprites["menu_chip"].drawToHUD(0, 262, optionPos3.y-8);
 					if (mmx.hyperLegActive) Global.sprites["menu_chip"].drawToHUD(0, 278, optionPos4.y+6);
 				}
-				/*
-				if (mainPlayer.hasChip(2)) Global.sprites["menu_x3armors"].drawToHUD(5, 313, 27);
-				if (mainPlayer.hasChip(1)) Global.sprites["menu_x3armors"].drawToHUD(4, 315, 65);
-				if (mainPlayer.hasChip(3)) Global.sprites["menu_x3armors"].drawToHUD(6, 331, 74);
-				if (mainPlayer.hasChip(0)) Global.sprites["menu_x3armors"].drawToHUD(7, 295, 142);
-				*/
 				break;
 		} 
 		//drawHyperArmorUpgrades(mainPlayer, 0);
