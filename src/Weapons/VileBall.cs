@@ -102,7 +102,7 @@ public class VileBall : Weapon {
 					vile.changeState(new FlamethrowerState(), true);
 				}			
 		} else if (vile.grenadeWeapon.type == (int)VileBallType.NoneNapalm) {
-			if (vile.napalmWeapon.type != (int)NapalmType.None)
+			if (vile.napalmWeapon.type > -1)
 				if (vile.tryUseVileAmmo(vileAmmoUsage)) {
 					vile.changeState(new AirBombNapalm(), true);
 				}
