@@ -426,7 +426,9 @@ public class X2ChargeShot : CharState {
 			} else {
 				character.changeToIdleOrFall();
 			}
-		} else if (!pressFire && stateTime > Global.spf && player.input.isPressed(Control.Shoot, player)) {
+		} else if (
+			!pressFire && stateTime > 6f / 60f && player.input.isPressed(Control.Shoot, player)
+		) {
 			pressFire = true;
 		}
 	}

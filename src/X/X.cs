@@ -235,10 +235,13 @@ public class MegamanX : Character {
 	// Late updates. Before render.
 	public override void postUpdate() {
 		base.postUpdate();
-
+		if (!ownedByLocalPlayer) {
+			return;
+		}
 		if (!charState.normalCtrl) {
 			lastShootPressed = 100;	
 		}
+		hyperChargeActive = currentWeapon is HyperCharge;
 	}
 
 	public override bool normalCtrl() {
@@ -942,7 +945,12 @@ public class MegamanX : Character {
 		List<ShaderWrapper?> chargePalletes = getChargeShaders();
 		if (chargePalletes.Count > 0) {
 			if (chargePalletes.Count == 1) {
-				chargePalletes.Add(null);
+				if (!hyperChargeActive) {
+					chargePalletes.Add(null);
+				}
+				else if (!chargePalletes.Contains(Player.XYellowC)) {
+					chargePalletes.Add(Player.XYellowC);
+				}
 			}
 			ShaderWrapper? targetChargePallete = chargePalletes[MathInt.Floor(
 				(chargePalleteTime % (chargePalletes.Count * 2)) / 2f
@@ -982,20 +990,34 @@ public class MegamanX : Character {
 			};
 			chargePalletes.Add(defaultChargePallete);
 		}
-		if (stockedMaxBuster && defaultChargePallete != Player.XOrangeC) {
-			chargePalletes.Add(Player.XOrangeC);
+		if (stockedMaxBuster) {
+			if (defaultChargePallete != Player.XOrangeC) {
+				chargePalletes.Add(Player.XOrangeC);
+			} else {
+				chargePalletes.Add(Player.XPinkC);
+			}
 		}
-		if (stockedBuster && defaultChargePallete != Player.XPinkC) {
-			chargePalletes.Add(Player.XPinkC);
-		}
-		if (stockedSaber && defaultChargePallete != Player.XGreenC) {
-			chargePalletes.Add(Player.XGreenC);
-		}
-		if (currentWeapon is HyperCharge) {
-			if (!hasFullHyperMaxArmor && !stockedMaxBuster && defaultChargePallete != Player.XOrangeC) {
+		if (stockedBuster) {
+			if (!chargePalletes.Contains(Player.XPinkC)) {
+				chargePalletes.Add(Player.XPinkC);
+			}
+			else if (!chargePalletes.Contains(Player.XOrangeC)) {
 				chargePalletes.Add(Player.XOrangeC);
 			}
-			else if (!stockedSaber && defaultChargePallete != Player.XPinkC) {
+		}
+		if (stockedSaber) {
+			if (!chargePalletes.Contains(Player.XGreenC)) {
+				chargePalletes.Add(Player.XGreenC);
+			}
+			else if (!chargePalletes.Contains(Player.XOrangeC)) {
+				chargePalletes.Add(Player.XOrangeC);
+			}
+		}
+		if (hyperChargeActive) {
+			if (!hasFullHyperMaxArmor && !stockedMaxBuster && !chargePalletes.Contains(Player.XOrangeC)) {
+				chargePalletes.Add(Player.XOrangeC);
+			}
+			else if (!stockedSaber && !chargePalletes.Contains(Player.XPinkC)) {
 				chargePalletes.Add(Player.XPinkC);
 			}
 		}
