@@ -773,12 +773,15 @@ public class Helpers {
 		return placeStr;
 	}
 
-	public static SoundBufferWrapper getRandomMatchingVoice(
+	public static SoundBufferWrapper? getRandomMatchingVoice(
 		Dictionary<string, SoundBufferWrapper> buffers, string soundKey, int charNum
 	) {
 		var voices = buffers.Values.ToList().FindAll(
 			v => v.soundKey.Split('.')[0] == soundKey && (v.charNum == null || v.charNum.Value == charNum)
 		);
+		if (voices.Count == 0) {
+			return null;
+		}
 		return voices.GetRandomItem();
 	}
 
