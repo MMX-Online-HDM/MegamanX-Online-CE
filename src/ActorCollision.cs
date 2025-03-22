@@ -157,8 +157,11 @@ public partial class Actor {
 
 	public HashSet<Tuple<Collider, Collider>> collidedInFrame = new HashSet<Tuple<Collider, Collider>>();
 	public void registerCollision(CollideData collideData) {
+		if (collideData.myCollider == null || collideData.otherCollider == null) {
+			return;
+		}
 		var tuple = new Tuple<Collider, Collider>(collideData.myCollider, collideData.otherCollider);
-		
+
 		if (!collidedInFrame.Contains(tuple)) {
 			collidedInFrame.Add(tuple);
 			onCollision(collideData);
@@ -392,6 +395,9 @@ public partial class Actor {
 			if (this is Character chara && collideData.gameObject is Character otherChara) {
 				chara.insideCharacter = true;
 				otherChara.insideCharacter = true;
+				continue;
+			}
+			if (collideData.otherCollider == null) {
 				continue;
 			}
 			Point? freeVec = null;

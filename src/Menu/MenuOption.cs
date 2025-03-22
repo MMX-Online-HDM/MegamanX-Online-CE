@@ -8,7 +8,7 @@ public class MenuOption {
 	public Action<Point, int> render;
 	public string configureMessage;
 
-	public MenuOption(int x, int y, Action update, Action<Point, int> render, string configureMessage = null) {
+	public MenuOption(int x, int y, Action update, Action<Point, int> render, string configureMessage = "") {
 		pos = new Point(x, y);
 		this.update = update;
 		this.render = render;

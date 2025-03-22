@@ -66,14 +66,14 @@ public class Collider {
 
 public class CollideData {
 	public Collider? myCollider; //My own collider that collided the otherCollider with
-	public Collider? otherCollider; //The other thing that was collided with
+	public Collider otherCollider; //The other thing that was collided with
 	public GameObject gameObject; //Gameobject of otherCollider
 	public Point vel; //The velocity at which we collided with the other thing above
 	public bool isTrigger;
 	public HitData hitData;
 
 	public CollideData(
-		Collider? myCollider, Collider? otherCollider,
+		Collider? myCollider, Collider otherCollider,
 		Point? vel, bool isTrigger, GameObject gameObject, HitData hitData
 	) {
 		this.myCollider = myCollider;
