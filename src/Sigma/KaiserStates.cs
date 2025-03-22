@@ -846,7 +846,7 @@ public class KaiserSigmaMineProj : Projectile, IDamagable {
 
 	public override void onStart() {
 		base.onStart();
-		if (Global.level.checkCollisionShape(collider.shape, null) != null) {
+		if (Global.level.checkCollisionShape(collider?.shape, null) != null) {
 			startWall = true;
 		}
 	}
@@ -860,7 +860,7 @@ public class KaiserSigmaMineProj : Projectile, IDamagable {
 		base.update();
 		Helpers.decrementTime(ref hitWallCooldown);
 		if (startWall) {
-			if (Global.level.checkCollisionShape(collider.shape, null) == null) {
+			if (Global.level.checkCollisionShape(collider?.shape, null) == null) {
 				startWall = false;
 			}
 		}

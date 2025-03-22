@@ -183,7 +183,10 @@ public class RaySplasherTurret : Actor, IDamagable {
 			}
 		} else if (state == 1) {
 			isStatic = true;
-			var closestTarget = Global.level.getClosestTarget(pos, netOwner.alliance, true, aMaxDist: range);
+			Actor? closestTarget = null;
+			if (netOwner != null) {
+				closestTarget = Global.level.getClosestTarget(pos, netOwner.alliance, true, aMaxDist: range);
+			}
 			if (closestTarget != null) {
 				target = closestTarget;
 				state = 2;
@@ -194,7 +197,9 @@ public class RaySplasherTurret : Actor, IDamagable {
 			if (target != null) {
 				Actor oldTarget = target;
 			}
-			target = Global.level.getClosestTarget(pos, netOwner.alliance, true);
+			if (netOwner != null) {
+				target = Global.level.getClosestTarget(pos, netOwner.alliance, true);
+			}
 			if (target == null || pos.distanceTo(target.getCenterPos()) >= range) {
 				state = 1;
 				target = null;
@@ -207,10 +212,8 @@ public class RaySplasherTurret : Actor, IDamagable {
 
 					new RaySplasherTurretProj(
 						pos, (pos.x > target.getCenterPos().x ? -1 : 1), raySplasherMod % 3, ang,
-						this, netOwner, netOwner.getNextActorNetId(), rpc: true);
-
-					
-
+						this, netOwner!, netOwner!.getNextActorNetId(), rpc: true
+					);
 					//float randAngle = Helpers.randomRange(0, 360);
 					//proj.vel = new Point(600 * Helpers.cosd(randAngle), 600 * Helpers.sind(randAngle));
 
@@ -237,7 +240,7 @@ public class RaySplasherTurret : Actor, IDamagable {
 
 	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
 		if (sprite.name == "raysplasher_turret_start") return false;
-		return projId == (int)ProjIds.RaySplasherHurtSelf || netOwner.alliance != damagerAlliance;
+		return projId == (int)ProjIds.RaySplasherHurtSelf || netOwner?.alliance != damagerAlliance;
 	}
 
 	public bool isInvincible(Player attacker, int? projId) {
@@ -245,7 +248,7 @@ public class RaySplasherTurret : Actor, IDamagable {
 	}
 
 	public bool canBeHealed(int healerAlliance) {
-		return netOwner.alliance == healerAlliance && health < maxHealth;
+		return netOwner?.alliance == healerAlliance && health < maxHealth;
 	}
 
 	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
@@ -268,7 +271,7 @@ public class RaySplasherTurret : Actor, IDamagable {
 
 	public override void render(float x, float y) {
 		base.render(x, y);
-		if (netOwner.alliance == Global.level.mainPlayer.alliance) {
+		if (netOwner?.alliance == Global.level.mainPlayer.alliance) {
 			float healthBarInnerWidth = 14;
 			Color color = new Color();
 
@@ -283,7 +286,7 @@ public class RaySplasherTurret : Actor, IDamagable {
 			DrawWrappers.DrawRect(pos.x - 7, pos.y - 2 - offY, pos.x - 7 + width, pos.y - 1 - offY, true, color, 0, ZIndex.HUD - 1);
 		}
 
-		if (netOwner.isMainPlayer && replaceColorShader == null) {
+		if (netOwner?.isMainPlayer == true && replaceColorShader == null) {
 			Global.sprites["cursorchar"].draw(0, pos.x + x, pos.y + y - 17, 1, 1, null, 1, 1, 1, zIndex + 1);
 		}
 

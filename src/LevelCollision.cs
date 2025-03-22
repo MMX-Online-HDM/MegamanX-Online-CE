@@ -407,7 +407,7 @@ public partial class Level {
 		}
 	}
 
-	public CollideData checkCollisionPoint(Point point, List<GameObject> exclusions) {
+	public CollideData? checkCollisionPoint(Point point, List<GameObject> exclusions) {
 		var points = new List<Point>();
 		points.Add(point);
 		points.Add(point.addxy(1, 0));
@@ -417,14 +417,17 @@ public partial class Level {
 		return checkCollisionShape(shape, exclusions);
 	}
 
-	public CollideData checkCollisionShape(Shape shape, List<GameObject>? exclusions) {
-		var gameObjects = getTerrainInSameCell(shape);
+	public CollideData? checkCollisionShape(Shape? shape, List<GameObject>? exclusions) {
+		if (shape == null) {
+			return null;
+		}
+		var gameObjects = getTerrainInSameCell(shape.Value);
 		foreach (var go in gameObjects) {
 			if (go.collider == null) continue;
 			if (go is not Actor && go.collider.isTrigger) continue;
 			if (go is Actor && (go.collider.isTrigger || go.collider.wallOnly)) continue;
 			if (exclusions != null && exclusions.Contains(go)) continue;
-			var hitData = shape.intersectsShape(go.collider.shape);
+			var hitData = shape.Value.intersectsShape(go.collider.shape);
 			if (hitData != null) {
 				return new CollideData(null, go.collider, null, false, go, hitData);
 			}

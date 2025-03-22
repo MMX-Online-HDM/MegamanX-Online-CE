@@ -159,7 +159,7 @@ public class FireWaveProjCharged : Projectile {
 		spriteTop = new Sprite("fire_wave_charge");
 		spriteTop.visible = false;
 		useGravity = true;
-		collider.wallOnly = true;
+		if (collider != null) { collider.wallOnly = true; }
 		frameSpeed = 0;
 		this.parentTime = parentTime;
 		destroyOnHit = false;

@@ -129,7 +129,7 @@ public class FrostShieldProjAir : Projectile {
 		projId = (int)ProjIds.FrostShieldAir;
 		useGravity = true;
 		destroyOnHit = false;
-		collider.wallOnly = true;
+		if (collider != null) { collider.wallOnly = true; }
 		canBeLocal = false; // TODO: Allow local.
 		vel = new Point(-xVel * 0.5f, -150);
 		if (rpc) {
@@ -324,7 +324,7 @@ public class FrostShieldProjChargedGround : Projectile {
 		useGravity = true;
 		isShield = true;
 		vel = new Point(xDir * 150, -100);
-		collider.wallOnly = true;
+		if (collider != null) { collider.wallOnly = true; }
 		slideAnim = new Anim(pos, "frostshield_charged_slide", xDir, null, false);
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
@@ -374,7 +374,7 @@ public class FrostShieldProjPlatform : Projectile {
 		projId = (int)ProjIds.FrostShieldChargedPlatform;
 		setIndestructableProperties();
 		isShield = true;
-		collider.wallOnly = true;
+		if (collider != null) { collider.wallOnly = true; }
 		grounded = false;
 		canBeGrounded = false;
 		useGravity = false;

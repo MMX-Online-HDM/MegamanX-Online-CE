@@ -91,7 +91,9 @@ public class SonicSlicerProj : Projectile {
 		vel = new Point(200 * xDir, 0);
 		maxTime = 0.75f;
 		this.type = type;
-		collider.wallOnly = true;
+		if (collider != null) {
+			collider.wallOnly = true;
+		}
 		projId = (int)ProjIds.SonicSlicer;
 
 		twin = new Sprite("sonicslicer_twin");
