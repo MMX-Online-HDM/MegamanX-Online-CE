@@ -19,6 +19,8 @@ public class UpgradeArmorMenu : IMainMenu {
 
 	public UpgradeArmorMenu(IMainMenu prevMenu) {
 		this.prevMenu = prevMenu;
+		GoldenMenu = new UpgradeArmorMenuGolden(prevMenu);
+		UAXMenu = new UpgradeArmorMenuUAX(prevMenu);
 	}
 
 	public void update() {
@@ -56,14 +58,13 @@ public class UpgradeArmorMenu : IMainMenu {
 			return;
 		}
 		// Enable this to disable 14.0 UAX Menu
-		if (mmx?.hasFullHyperMaxArmor == true || mmx?.hasUltimateArmor == true) {
-			return;
-		}
 		if (mmx?.hasFullHyperMaxArmor == true) {
 			Menu.change(new UpgradeArmorMenuGolden(GoldenMenu));
+			return;
 		}
 		if (mmx?.hasUltimateArmor == true) {
 			Menu.change(new UpgradeArmorMenuUAX(UAXMenu));
+			return;
 		}
 		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 			if (selectArrowPosY == 0) {

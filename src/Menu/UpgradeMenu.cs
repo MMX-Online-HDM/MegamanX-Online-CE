@@ -147,6 +147,7 @@ public class UpgradeMenu : IMainMenu {
 					if (subtankTargets.Count > 0) {
 						var currentTarget = subtankTargets[subtankTargetIndex];
 						if (currentTarget is MaverickWeapon mw &&
+							mw.maverick != null &&
 							canUseSubtankInMenu(mw.canUseSubtank(mainPlayer.subtanks[selectArrowPosY - 1]))
 						) {
 							mainPlayer.subtanks[selectArrowPosY - 1].use(mw.maverick);

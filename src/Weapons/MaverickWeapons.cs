@@ -247,7 +247,7 @@ public class VelguarderWeapon : MaverickWeapon {
 }
 
 public class WireSpongeWeapon : MaverickWeapon {
-	public WireSpongeWeapon(Player player) : base(player) {
+	public WireSpongeWeapon(Player? player) : base(player) {
 		index = (int)WeaponIds.WireSponge;
 		weaponSlotIndex = 75;
 		displayName = "Wire Sponge";

@@ -12,7 +12,7 @@ public class TextExportMenu : IMainMenu {
 	bool inGame;
 	uint textSize;
 
-	string fileError;
+	string fileError = "";
 	float fileTime;
 	float clipboardTime;
 #if WINDOWS
