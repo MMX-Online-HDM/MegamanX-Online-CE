@@ -307,10 +307,13 @@ public class CharState {
 		}
 		if (player.input.isHeld(Control.Up, player)) {
 			List<CollideData> ladders = Global.level.getTerrainTriggerList(character, new Point(0, 0), typeof(Ladder));
-			if (ladders != null && ladders.Count > 0 && ladders[0].gameObject is Ladder ladder) {
-				var midX = ladders[0].otherCollider.shape.getRect().center().x;
+			if (ladders != null && ladders.Count > 0 &&
+				ladders[0].gameObject is Ladder ladder &&
+				ladders[0].otherCollider != null
+			) {
+				var midX = ladders[0].otherCollider!.shape.getRect().center().x;
 				if (Math.Abs(character.pos.x - midX) < 12) {
-					var rect = ladders[0].otherCollider.shape.getRect();
+					var rect = ladders[0].otherCollider!.shape.getRect();
 					var snapX = (rect.x1 + rect.x2) / 2;
 					if (Global.level.checkTerrainCollisionOnce(character, snapX - character.pos.x, 0) == null) {
 						float? incY = null;
@@ -323,12 +326,14 @@ public class CharState {
 		if (isGround && player.input.isPressed(Control.Down, player)) {
 			character.checkLadderDown = true;
 			var ladders = Global.level.getTerrainTriggerList(character, new Point(0, 1), typeof(Ladder));
-			if (ladders.Count > 0 && ladders[0].gameObject is Ladder ladder) {
-				var rect = ladders[0].otherCollider.shape.getRect();
+			if (ladders.Count > 0 && ladders[0].gameObject is Ladder ladder &&
+				ladders[0].otherCollider != null
+			) {
+				var rect = ladders[0].otherCollider!.shape.getRect();
 				var snapX = (rect.x1 + rect.x2) / 2;
 				float xDist = snapX - character.pos.x;
 				if (MathF.Abs(xDist) < 10 && Global.level.checkTerrainCollisionOnce(character, xDist, 30) == null) {
-					var midX = ladders[0].otherCollider.shape.getRect().center().x;
+					var midX = ladders[0].otherCollider!.shape.getRect().center().x;
 					character.changeState(new LadderClimb(ladder, midX, 30));
 					character.stopCamUpdate = true;
 				}
@@ -1240,11 +1245,16 @@ public class LadderClimb : CharState {
 		}
 
 		var ladderTop = ladder.collider.shape.getRect().y1;
-		var yDist = character.physicsCollider.shape.getRect().y2 - ladderTop;
-		if (!ladder.collider.isCollidingWith(character.physicsCollider) || MathF.Abs(yDist) < 12) {
+		var yDist = (character.physicsCollider?.shape.getRect().y2 ?? character.pos.y) - ladderTop;
+		if (character.physicsCollider == null ||
+			!ladder.collider.isCollidingWith(character.physicsCollider) ||
+			MathF.Abs(yDist) < 12
+		) {
 			if (player.input.isHeld(Control.Up, player)) {
 				var targetY = ladderTop - 1;
-				if (Global.level.checkTerrainCollisionOnce(character, 0, targetY - character.pos.y) == null && MathF.Abs(targetY - character.pos.y) < 20) {
+				if (Global.level.checkTerrainCollisionOnce(character, 0, targetY - character.pos.y) == null &&
+					MathF.Abs(targetY - character.pos.y) < 20
+				) {
 					character.changeState(new LadderEnd(targetY));
 				}
 			} else {

@@ -18,8 +18,10 @@ public class Pickup : Actor {
 	public Pickup(Player owner, Point pos, string sprite, ushort? netId, bool ownedByLocalPlayer, NetActorCreateId netActorCreateId, bool sendRpc = false) :
 		base(sprite, pos, netId, ownedByLocalPlayer, false) {
 		netOwner = owner;
-		collider.wallOnly = true;
-		collider.isTrigger = false;
+		if (collider != null) {
+			collider.wallOnly = true;
+			collider.isTrigger = false;
+		}
 
 		this.netActorCreateId = netActorCreateId;
 		if (sendRpc) {

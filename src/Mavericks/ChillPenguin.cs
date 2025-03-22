@@ -218,7 +218,7 @@ public class ChillPIceProj : Projectile {
 		maxTime = 0.75f;
 		this.hitChar = hitChar;
 		this.type = type;
-		collider.wallOnly = true;
+		if (collider != null) { collider.wallOnly = true; }
 		isShield = true;
 		if (type == 1) {
 			useGravity = true;
@@ -334,7 +334,7 @@ public class ChillPIceStatueProj : Projectile, IDamagable {
 
 		if (sprite.isAnimOver()) {
 			useGravity = true;
-			collider.wallOnly = true;
+			if (collider != null) { collider.wallOnly = true; }
 			damager.flinch = Global.defFlinch;
 			damager.damage = 4;
 		}

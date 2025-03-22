@@ -29,23 +29,23 @@ public class XTeleportState : CharState {
 			specialId = SpecialStateIds.None;
 			character.useGravity = true;
 			if (cloneG != null && canChangePos(cloneG)) {
-				Point prevCamPos = player.character.getCamCenterPos();
-				player.character.stopCamUpdate = true;
+				Point prevCamPos = character.getCamCenterPos();
+				character.stopCamUpdate = true;
 				character.changePos(cloneG.pos);
 			}
 			clone?.destroySelf();
 			clone = null;
 		}
-		if (clone != null && !clone.destroyed) {
+		if (clone != null && !clone.destroyed && cloneG != null) {
 			int xDir = player.input.getXDir(player);
 			float moveAmount = xDir * 6 * Global.speedMul;
 
-			CollideData hitWall = Global.level.checkTerrainCollisionOnce(clone, moveAmount, -2);
+			CollideData? hitWall = Global.level.checkTerrainCollisionOnce(clone, moveAmount, -2);
 			if (hitWall != null && hitWall.getNormalSafe().y == 0) {
 				float rectW = hitWall.otherCollider.shape.getRect().w();
 				if (rectW < 75) {
 					float wallClipAmount = moveAmount + xDir * (rectW + width);
-					CollideData hitWall2 = Global.level.checkTerrainCollisionOnce(clone, wallClipAmount, -2);
+					CollideData? hitWall2 = Global.level.checkTerrainCollisionOnce(clone, wallClipAmount, -2);
 					if (hitWall2 == null && clone.pos.x + wallClipAmount > 0 &&
 						clone.pos.x + wallClipAmount < Global.level.width
 					) {
@@ -53,7 +53,7 @@ public class XTeleportState : CharState {
 						clone.visible = true;
 					}
 				} else if (xDir != 0) {
-					CollideData hitWall2 = Global.level.checkTerrainCollisionOnce(clone, moveAmount, -16);
+					CollideData? hitWall2 = Global.level.checkTerrainCollisionOnce(clone, moveAmount, -16);
 					float wallY = MathInt.Floor(hitWall.otherCollider.shape.minY);
 					if (hitWall2 == null) {
 						clone.changePos(new Point(clone.pos.x + moveAmount, clone.pos.y - 64));
@@ -81,8 +81,8 @@ public class XTeleportState : CharState {
 					clone.getCenterPos().addxy(widthH, 200),
 					new List<Type> { typeof(Wall) }
 				);
-				CollideData hit = hits.FirstOrDefault();
-				CollideData hit2 = hits2.FirstOrDefault();
+				CollideData? hit = hits.FirstOrDefault();
+				CollideData? hit2 = hits2.FirstOrDefault();
 				if (hit != null && (
 					hit2 == null ||
 					hit2 != null && hit.otherCollider.shape.minY < hit2.otherCollider.shape.minY

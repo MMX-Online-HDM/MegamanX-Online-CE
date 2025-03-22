@@ -68,7 +68,9 @@ public class RollingShieldProj : Projectile {
 		fadeSprite = "explosion";
 		fadeSound = "explosion";
 		useGravity = true;
-		collider.wallOnly = true;
+		if (collider != null) {
+			collider.wallOnly = true;
+		}
 		vel.x = 0;
 		canBeLocal = false;
 

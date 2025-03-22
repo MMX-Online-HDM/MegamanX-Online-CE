@@ -78,7 +78,7 @@ public class Damager {
 	// Normally, sendRpc would default to false, but literally over 20 places need it to true
 	// and one place needs it false so in this case, we invert the convention
 	public bool applyDamage(
-		IDamagable? victim, bool weakness, Weapon weapon, Actor actor,
+		IDamagable victim, bool weakness, Weapon weapon, Actor actor,
 		int projId, float? overrideDamage = null, int? overrideFlinch = null, bool sendRpc = true
 	) {
 		if (weapon == null) return false;
@@ -110,7 +110,7 @@ public class Damager {
 		}
 
 		return applyDamage(
-			owner, newDamage, hitCooldown, newFlinch, victim?.actor(),
+			owner, newDamage, hitCooldown, newFlinch, victim.actor(),
 			weakness, weapon.index, weapon.killFeedIndex, actor, projId, sendRpc
 		);
 	}
@@ -180,7 +180,7 @@ public class Damager {
 				if (gmp.owningActor?.netId != null) {
 					actorNetIdBytes = BitConverter.GetBytes(gmp.owningActor?.netId ?? 0);
 				} else {
-					actorNetIdBytes = BitConverter.GetBytes(gmp.owner?.character?.netId ?? 0);
+					actorNetIdBytes = BitConverter.GetBytes(gmp.owner.character?.netId ?? 0);
 				}
 			}
 			var byteParams = new List<byte> {
@@ -297,7 +297,7 @@ public class Damager {
 				damage = 2;
 				weakness = false;
 				flinch = 0;
-				victim?.playSound("weakness");
+				victim.playSound("weakness");
 			}
 			if (projId == (int)ProjIds.CSnailMelee && preCharacter != null && preCharacter.isCrystalized) {
 				damage += 1;
@@ -348,7 +348,7 @@ public class Damager {
 					character.addBurnTime(owner, new FireWave(), 2f);
 					break;
 				case (int)ProjIds.SpeedBurnerCharged:
-					if (character != owner?.character)
+					if (character != owner.character)
 						character.addBurnTime(owner, SpeedBurner.netWeapon, 1);
 					break;
 				case (int)ProjIds.SpeedBurner:
@@ -477,16 +477,16 @@ public class Damager {
 				case (int)ProjIds.MechDevilBearPunch:
 					switch (Helpers.randomRange(0, 1)) {
 						case 0:
-							victim?.playSound("ridepunch");
+							victim.playSound("ridepunch");
 							break;
 						case 1:
-							victim?.playSound("ridepunch2");
+							victim.playSound("ridepunch2");
 							break;
 					}
 					break;
 				case (int)ProjIds.MechKangarooPunch:
 				case (int)ProjIds.MechGoliathPunch:
-					victim?.playSound("ridepunchX3");
+					victim.playSound("ridepunchX3");
 					break;
 			}
 			switch (weaponIndex) {
@@ -521,8 +521,8 @@ public class Damager {
 			if (!character.isFlinchImmune() &&
 				!character.isInvulnerable(false, true) &&
 				!isDot(projId) && (
-				owner?.character is Zero zero && zero.isBlack ||
-				owner?.character is PunchyZero pzero && pzero.isBlack
+				owner.character is Zero zero && zero.isBlack ||
+				owner.character is PunchyZero pzero && pzero.isBlack
 			)) {
 				if (flinch <= 0) {
 					flinch = Global.halfFlinch;
@@ -595,7 +595,7 @@ public class Damager {
 				}
 				// Weakness is true and character is not frozen in Shotgun Ice.
 				else if (weakness && !isShotgunIceAndFrozen && mmx?.weaknessCooldown <= 0) {
-					victim?.playSound("weakness");
+					victim.playSound("weakness");
 					if (!character.isFlinchImmune()) {
 						// Put a cooldown of 0.75s minimum.
 						if (flinchCooldown * 60 < 45) {
@@ -617,18 +617,18 @@ public class Damager {
 					}
 				} else {			  
 					if (character.altSoundId == Character.AltSoundIds.X1) {
-						victim?.playSound("hit");
+						victim.playSound("hit");
 					} else if (character.altSoundId == Character.AltSoundIds.X2) {
-						victim?.playSound("hitX2");
+						victim.playSound("hitX2");
 					} else if (character.altSoundId == Character.AltSoundIds.X3) {
-						victim?.playSound("hitX3");
+						victim.playSound("hitX3");
 					}
 					if (mmx?.chestArmor == ArmorId.Light || mmx?.chestArmor == ArmorId.None) {
-						victim?.playSound("hit");
+						victim.playSound("hit");
 					} else if (mmx?.chestArmor == ArmorId.Giga) {
-						victim?.playSound("hitX2");
+						victim.playSound("hitX2");
 					} else if (mmx?.chestArmor == ArmorId.Max) {
-						victim?.playSound("hitX3");
+						victim.playSound("hitX3");
 					}
 				}
 			}
@@ -641,23 +641,23 @@ public class Damager {
 			}
 			// Ride armor flinch push system.
 			float tempPush = 0;
-			if (flinch > 0 && rideArmor.ownedByLocalPlayer && owner != null) {
+			if (flinch > 0 && rideArmor.ownedByLocalPlayer) {
 				tempPush = 240f * (flinch / 26f);
 			}
 			// Apply push only if the new push is stronger than the current one.
 			if (tempPush > System.Math.Abs(rideArmor.xFlinchPushVel)) {
 				float pushDirection = -victim.xDir;
-				if (owner != null && owner.character != null) {
+				if (owner.character != null) {
 					if (victim.pos.x > owner.character.pos.x) pushDirection = 1;
 					if (victim.pos.x < owner.character.pos.x) pushDirection = -1;
 				}
 				rideArmor.xFlinchPushVel = pushDirection * tempPush;
 			}
 			if (damage > 1 || flinch > 0) {
-				victim?.playSound("hurt");
+				victim.playSound("hurt");
 				rideArmor.playHurtAnim();
 			} else {
-				victim?.playSound("hit");
+				victim.playSound("hit");
 			}
 		}
 		// Maverick section
@@ -667,7 +667,7 @@ public class Damager {
 			}
 			// Weakness system.
 			weakness = maverick.checkWeakness(
-				(WeaponIds)weaponIndex, (ProjIds)projId, out MaverickState newState, owner?.isSigma ?? true
+				(WeaponIds)weaponIndex, (ProjIds)projId, out MaverickState? newState, owner.isSigma
 			);
 			if (weakness && damage < 1 && projId is (int)ProjIds.CrystalHunter or (int)ProjIds.CSnailCrystalHunter) {
 				damage = 1;
@@ -786,7 +786,7 @@ public class Damager {
 						flinch = 0;
 						damage = 0;
 						maverick.playSound("m10ding");
-						if (owner?.ownedByLocalPlayer == true &&
+						if (owner.ownedByLocalPlayer == true &&
 							owner.character is Zero zero &&
 							!zero.hypermodeActive()
 						) {
@@ -801,14 +801,14 @@ public class Damager {
 			if (damage > 0) {
 				if (flinch > 0 && !isOnFlinchCooldown) {
 					if (weakness) {
-						victim?.playSound("weakness");
+						victim.playSound("weakness");
 					} else {
 						if (maverick.gameMavs == Maverick.GameMavs.X1) {
-							victim?.playSound("hurt");
+							victim.playSound("hurt");
 						} else if (maverick.gameMavs == Maverick.GameMavs.X2) {
-							victim?.playSound("hurtX2");
+							victim.playSound("hurtX2");
 						} else if (maverick.gameMavs == Maverick.GameMavs.X3) {
-							victim?.playSound("hurtX3");
+							victim.playSound("hurtX3");
 						}
 					}
 					if (newState == null && maverick.ownedByLocalPlayer) {
@@ -820,11 +820,11 @@ public class Damager {
 					}
 				} else {
 					if (maverick.gameMavs == Maverick.GameMavs.X1) {
-						victim?.playSound("hit");
+						victim.playSound("hit");
 					} else if (maverick.gameMavs == Maverick.GameMavs.X2) {
-						victim?.playSound("hitX2");
+						victim.playSound("hitX2");
 					} else if (maverick.gameMavs == Maverick.GameMavs.X3) {
-						victim?.playSound("hitx3");
+						victim.playSound("hitx3");
 					}
 				}
 			}
@@ -832,21 +832,20 @@ public class Damager {
 		// Misc section
 		else {
 			if (damage > 0) {
-				victim?.playSound("hit");
+				victim.playSound("hit");
 			}
 		}
 
 		if (damage > 0 && preCharacter?.isDarkHoldState != true) {
-			victim?.addRenderEffect(RenderEffectType.Hit, 3, 6);
+			victim.addRenderEffect(RenderEffectType.Hit, 3, 6);
 		}
 
 		float finalDamage = damage;
 		if (weakness && damage > 0) {
 			damage += 1;
 		}
-		if (owner != null) {
-			finalDamage *= owner.getDamageModifier();
-		}
+		finalDamage *= owner.getDamageModifier();
+
 		if (finalDamage > 0 && preCharacter != null &&
 			preCharacter.ownedByLocalPlayer && charState is XUPParryStartState parryState &&
 			parryState.canParry() && !isDot(projId)

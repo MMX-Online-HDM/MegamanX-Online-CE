@@ -45,7 +45,7 @@ public class Control {
 	public const string Taunt = "taunt";
 	public const string Special2 = "command";
 
-	public static JoystickInfo joystick;
+	public static JoystickInfo? joystick;
 
 	public static bool isJoystick() {
 		return joystick != null;
@@ -83,7 +83,7 @@ public class Control {
 
 		if (key == Key.Enter) return "Enter";
 
-		return Enum.GetName(typeof(Key), key);
+		return Enum.GetName(typeof(Key), key) ?? "";
 	}
 
 	public static string getButtonName(int? button) {
@@ -96,7 +96,7 @@ public class Control {
 	}
 
 	public static string getControllerName() {
-		if (joystick == null) return null;
+		if (joystick == null) return "";
 		return joystick.name;
 	}
 
@@ -195,7 +195,7 @@ public class Control {
 			};
 	}
 
-	private static Dictionary<string, Dictionary<string, int?>> _controllerNameToMapping;
+	private static Dictionary<string, Dictionary<string, int?>>? _controllerNameToMapping;
 	public static Dictionary<string, Dictionary<string, int?>> controllerNameToMapping {
 		get {
 			if (_controllerNameToMapping == null) {
@@ -289,7 +289,7 @@ public class Control {
 					}
 				}
 			}
-			return _controllerNameToMapping;
+			return _controllerNameToMapping!;
 		}
 	}
 

@@ -24,7 +24,7 @@ public class Flag : Actor {
 		alliance == GameMode.blueAlliance ? "blue_flag" : "red_flag", pos, netId, ownedByLocalPlayer, false
 	) {
 		this.alliance = alliance;
-		collider.wallOnly = true;
+		if (collider != null) { collider.wallOnly = true; }
 		setzIndex(ZIndex.Character - 2);
 		for (int i = 0; i < 4; i++) {
 			particles.Add(getRandomParticle(i * (UpdraftParticle.maxTime * 0.25f)));

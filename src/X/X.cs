@@ -133,6 +133,7 @@ public class MegamanX : Character {
 			xLoadout.melee = playerLoadout.melee;
 		}
 		// Set up final loadout.
+		loadout = xLoadout;
 		weapons = XLoadoutSetup.getLoadout(player, xLoadout);
 		specialButtonMode = xLoadout.melee;
 		// Link X-Buster or create one.
@@ -942,7 +943,7 @@ public class MegamanX : Character {
 
 		palette?.SetUniform("palette", index);
 
-		List<ShaderWrapper?> chargePalletes = getChargeShaders();
+		List<ShaderWrapper?> chargePalletes = getChargeShaders() as List<ShaderWrapper?>;
 		if (chargePalletes.Count > 0) {
 			if (chargePalletes.Count == 1) {
 				if (!hyperChargeActive) {

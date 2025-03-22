@@ -572,7 +572,7 @@ public class BCrabSummonCrabProj : Projectile, IDamagable {
 		this.Crab = Crab;
 		fadeSprite = "explosion";
 		fadeSound = "explosionX2";
-		collider.wallOnly = true;
+		if (collider != null) { collider.wallOnly = true; }
 		useGravity = true;
 		netcodeOverride = NetcodeModel.FavorDefender;
 		setIndestructableProperties();

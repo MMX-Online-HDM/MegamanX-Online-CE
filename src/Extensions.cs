@@ -15,7 +15,9 @@ public static class Extensions {
 	}
 
 	public static T GetRandomItem<T>(this IList<T> list) {
-		if (list.Count == 0) return default(T);
+		if (list.Count == 0) {
+			throw new Exception("Error: Ran GetRandomItem() on a empty list.");
+		}
 		int randomIndex = Helpers.randomRange(0, list.Count - 1);
 		return list[randomIndex];
 	}

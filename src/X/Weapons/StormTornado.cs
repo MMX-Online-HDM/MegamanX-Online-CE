@@ -210,8 +210,8 @@ public class TornadoProjCharged : Projectile {
 
 	public void ground() {
 		var ground = Global.level.raycast(pos.addxy(0, -10), pos.addxy(0, Global.level.height), new List<Type> { typeof(Wall) });
-		if (ground != null) {
-			pos.y = ((Point)ground.hitData.hitPoint).y;
+		if (ground.hitData.hitPoint != null) {
+			pos.y = ground.hitData.hitPoint.Value.y;
 		}
 	}
 

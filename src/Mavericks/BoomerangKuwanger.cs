@@ -256,7 +256,7 @@ public class BoomerangKBoomerangProj : Projectile {
 		if (!ownedByLocalPlayer) return;
 
 		if (!destroyed && pickup != null) {
-			pickup.collider.isTrigger = true;
+			if (pickup.collider != null) { pickup.collider.isTrigger = true; }
 			pickup.useGravity = false;
 			pickup.changePos(pos);
 		}
@@ -287,7 +287,7 @@ public class BoomerangKBoomerangProj : Projectile {
 		base.onDestroy();
 		if (pickup != null) {
 			pickup.useGravity = true;
-			pickup.collider.isTrigger = false;
+			if (pickup.collider != null) { pickup.collider.isTrigger = false; }
 		}
 	}
 }

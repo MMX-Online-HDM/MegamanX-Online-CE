@@ -904,7 +904,7 @@ public class WSpongeSeedProj : Projectile {
 		destroyOnHit = true;
 		useGravity = true;
 		startSound = "wspongeSeed";
-		collider.wallOnly = true;
+		if (collider != null) { collider.wallOnly = true; }
 		if (shootFramesHeld >= 255) {
 			shootFramesHeld = 255;
 		}

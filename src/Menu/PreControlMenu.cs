@@ -10,8 +10,8 @@ public class PreControlMenu : IMainMenu {
 	public Point optionPos3 = new Point(40, 110);
 	public Point optionPos5 = new Point(50, 170);
 	public IMainMenu prevMenu;
-	public string message;
-	public Action yesAction;
+	public string message = "";
+	public Action? yesAction;
 	public bool inGame;
 	public bool isAxl;
 

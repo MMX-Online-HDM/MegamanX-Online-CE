@@ -482,7 +482,7 @@ class Program {
 	/// <summary>
 	/// Function called when the window is closed
 	/// </summary>
-	private static void onClosed(object sender, EventArgs e) {
+	private static void onClosed(object? sender, EventArgs e) {
 		var openClients = new List<NetClient>();
 		if (Global.serverClient?.client != null) {
 			openClients.Add(Global.serverClient.client);
@@ -513,7 +513,7 @@ class Program {
 		window.Close();
 	}
 
-	private static void onWindowResized(object sender, SizeEventArgs e) {
+	private static void onWindowResized(object? sender, SizeEventArgs e) {
 		// Compares the aspect ratio of the window to the aspect ratio of the view,
 		// and sets the view's viewport accordingly in order to archieve a letterbox effect.
 		float windowRatio = Global.window.Size.X / (float)Global.window.Size.Y;
@@ -543,7 +543,7 @@ class Program {
 	/// <summary>
 	/// Function called when a key is pressed
 	/// </summary>
-	private static void onKeyPressed(object sender, KeyEventArgs e) {
+	private static void onKeyPressed(object? sender, KeyEventArgs e) {
 		RenderWindow window = (RenderWindow)sender;
 		//if (e.Code == Keyboard.Key.Escape)
 		//    window.Close();
@@ -607,18 +607,18 @@ class Program {
 		}
 	}
 
-	private static void onKeyReleased(object sender, KeyEventArgs e) {
+	private static void onKeyReleased(object? sender, KeyEventArgs e) {
 		Global.input.keyHeld[e.Code] = false;
 		Global.input.keyPressed[e.Code] = false;
 	}
 
-	static void onMouseMove(object sender, MouseMoveEventArgs e) {
+	static void onMouseMove(object? sender, MouseMoveEventArgs e) {
 		Input.mouseDeltaX = e.X - Global.halfScreenW;
 		Input.mouseDeltaY = e.Y - Global.halfScreenH;
 		Global.input.setLastUpdateTime();
 	}
 
-	static void onMousePressed(object sender, MouseButtonEventArgs e) {
+	static void onMousePressed(object? sender, MouseButtonEventArgs e) {
 		if (Global.debug && Global.level == null) {
 			if (e.Button == Mouse.Button.Middle) {
 				Global.debugString1 = (e.X / Options.main.windowScale) + "," + (e.Y / Options.main.windowScale);
@@ -632,13 +632,13 @@ class Program {
 		Global.input.mashCount++;
 	}
 
-	static void onMouseReleased(object sender, MouseButtonEventArgs e) {
+	static void onMouseReleased(object? sender, MouseButtonEventArgs e) {
 		int button = (int)e.Button;
 		Input.mousePressed[e.Button] = false;
 		Input.mouseHeld[e.Button] = false;
 	}
 
-	static void onMouseScrolled(object sender, MouseWheelScrollEventArgs e) {
+	static void onMouseScrolled(object? sender, MouseWheelScrollEventArgs e) {
 		if (e.Delta > 0) Input.mouseScrollUp = true;
 		else if (e.Delta < 0) Input.mouseScrollDown = true;
 		Global.input.setLastUpdateTime();

@@ -271,11 +271,11 @@ public class StrikeChainProj : Projectile {
 				}
 				hookedActor.useGravity = false;
 				hookedActor.grounded = false;
-				hookedActor.move(hookedActor.pos.directionTo(player.character.getCenterPos()).normalize().times(400));
+				hookedActor.move(hookedActor.pos.directionTo(mmx.getCenterPos()).normalize().times(400));
 			}
 			if (distRetracted >= dist + 10) {
 				if (hookedActor != null && !(hookedActor is Character)) {
-					hookedActor.changePos(player.character.getCenterPos());
+					hookedActor.changePos(mmx.getCenterPos());
 					hookedActor.useGravity = true;
 				}
 				destroySelf();
@@ -514,11 +514,11 @@ public class StrikeChainProjCharged : Projectile {
 				}
 				hookedActor.useGravity = false;
 				hookedActor.grounded = false;
-				hookedActor.move(hookedActor.pos.directionTo(player.character.getCenterPos()).normalize().times(600));
+				hookedActor.move(hookedActor.pos.directionTo(mmx.getCenterPos()).normalize().times(600));
 			}
 			if (distRetracted >= dist + 10) {
 				if (hookedActor != null && !(hookedActor is Character)) {
-					hookedActor.changePos(player.character.getCenterPos());
+					hookedActor.changePos(mmx.getCenterPos());
 					hookedActor.useGravity = true;
 				}
 				destroySelf();

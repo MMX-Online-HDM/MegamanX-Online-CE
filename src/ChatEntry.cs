@@ -3,14 +3,17 @@
 namespace MMXOnline;
 
 public class ChatEntry {
-	public string message;
+	public string message = "";
 	public int? alliance;
 	public float time;
 	public string sender;
 	public bool alwaysShow;
 	public bool isSpectator;
 
+	// For JSON.
+	#nullable disable
 	public ChatEntry() { }
+	#nullable enable
 
 	public ChatEntry(string message, string sender, int? alliance, bool alwaysShow, bool isSpectator = false) {
 		this.message = message;

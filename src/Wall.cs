@@ -298,7 +298,7 @@ public class CrackedWall : Actor, IDamagable {
 	}
 
 	// Only if 0 is returned, it can't damage it. Even if null, it still can
-	public static float? canDamageCrackedWall(int projId, CrackedWall cw) {
+	public static float? canDamageCrackedWall(int projId, CrackedWall? cw) {
 		if (cw?.flag == 3) return null;
 
 		if (projId == (int)ProjIds.GigaCrush) return 12;

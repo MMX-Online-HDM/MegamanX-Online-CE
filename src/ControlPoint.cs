@@ -46,7 +46,9 @@ public class ControlPoint : Actor {
 	public override void onStart() {
 		isInit = true;
 		var hit = Global.level.raycast(pos.addxy(0, -10), pos.addxy(0, 60), new List<Type>() { typeof(Wall) });
-		pos = hit.hitData.hitPoint.Value.addxy(0, 2 + yOff);
+		if (hit.hitData.hitPoint != null) {
+			pos = hit.hitData.hitPoint.Value.addxy(0, 2 + yOff);
+		}
 	}
 
 	public override void preUpdate() {

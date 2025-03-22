@@ -226,14 +226,16 @@ public class TornadoFangProjCharged : Projectile {
 				destroySelf();
 				return;
 			}
-			if (mmx.currentWeapon is TornadoFang && time >= 6f / 60f) {
-				mmx.currentWeapon.addAmmo(speedMul * -0.04f, mmx.player);
+			if (mmx.currentWeapon is TornadoFang tfang) {
+				if (time >= 6f / 60f) {
+					mmx.currentWeapon.addAmmo(speedMul * -0.04f, mmx.player);
+				}
+				if (mmx.currentWeapon.ammo <= 0) {
+					destroySelf();
+					return;
+				}
 			}
-			if (mmx.currentWeapon.ammo <= 0) {
-				destroySelf();
-				return;
-			}
-			if (mmx.currentWeapon is not TornadoFang && mmx.currentWeapon is not HyperCharge) {
+			else if (mmx.currentWeapon is not HyperCharge) {
 				destroySelf();
 				return;
 			}

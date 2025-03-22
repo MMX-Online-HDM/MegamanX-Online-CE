@@ -164,7 +164,7 @@ public class BBuffaloIceProj : Projectile {
 		float speedModifier = Helpers.clamp((shootFramesHeld + 3) / 10f, 0.5f, 1.5f);
 		vel = new Point(unitDir.x * 200 * speedModifier, unitDir.y * 250 * speedModifier);
 
-		collider.wallOnly = true;
+		if (collider != null) { collider.wallOnly = true; }
 		destroyOnHit = true;
 
 		if (sendRpc) {
