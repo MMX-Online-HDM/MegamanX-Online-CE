@@ -200,7 +200,7 @@ public class ZeroUppercut : CharState {
 		zero = character as Zero ?? throw new NullReferenceException();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		zero.airRisingUses++;	
 	}

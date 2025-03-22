@@ -12,13 +12,15 @@ public partial class Actor {
 	public virtual void updateCustomActorNetData(byte[] data) { }
 
 	public virtual void sendActorNetData() {
-		byte[] networkIdBytes = Helpers.convertToBytes(netId ?? ushort.MaxValue);
-		if ((netId == 10 || netId == 11) && this is not Flag) {
-			//string msg = string.Format(
-			//"NetId {0} was not flag. Was {1}", netId.Value.ToString(), this.GetType().ToString()
-			//);
-			//Logger.logException(new Exception(msg), false);
+		if (netId == null) {
 			return;
+		}
+		byte[] networkIdBytes = Helpers.convertToBytes(netId.Value);
+		if ((netId == 10 || netId == 11) && this is not Flag) {
+			string msg = string.Format(
+				"NetId {0} was not flag. Was {1}", netId.Value.ToString(), this.GetType().ToString()
+			);
+			throw new Exception(msg);
 		}
 
 		var args = new List<byte>() { networkIdBytes[0], networkIdBytes[1] };
@@ -26,13 +28,14 @@ public partial class Actor {
 		ushort spriteIndex = Global.spriteIndexByName.GetValueOrCreate(sprite.name, ushort.MaxValue);
 
 		List<bool> mask = new List<bool>();
-		for (int i = 0; i < 8; i++) mask.Add(false);
-
+		for (int i = 0; i < 8; i++) {
+			mask.Add(false);
+		}
 		// These masks are for whether to send the following fields or not.
 		mask[0] = !isStatic;                            // pos x
 		mask[1] = !isStatic;                            // pos y
 		mask[2] = syncScale;                            // scale data
-		mask[3] = (sprite.totalFrameNum != 0); // frame index data
+		mask[3] = (sprite.totalFrameNum != 0);          // frame index data
 		mask[4] = byteAngle != null;                    // angle
 
 		// The rest are just always sent and contain actual bool data
@@ -151,7 +154,6 @@ public class RPCUpdateActor : RPC {
 		i += 2;
 
 		Actor? actor = Global.level.getActorByNetId(netId, true);
-
 		if (actor == null) {
 			return;
 		}

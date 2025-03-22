@@ -582,7 +582,7 @@ public abstract class ZeroGigaAttack : CharState {
 		base.onEnter(oldState);
 		zero = character as Zero ?? throw new NullReferenceException();
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		weapon.shootCooldown = weapon.fireRate;
 		if (Anim != null) {
 			Anim.destroySelf();
@@ -815,7 +815,7 @@ public class DarkHoldState : CharState {
 		specialId = oldState.specialId;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 		character.frameSpeed = 1;

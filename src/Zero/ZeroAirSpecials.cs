@@ -89,7 +89,7 @@ public class FSplasherState : CharState {
 		);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		character.useGravity = true;
 		if (fSplasherProj != null) {
 			fSplasherProj.destroySelf();
@@ -230,7 +230,7 @@ public class HyorogaStartState : CharState {
 		
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		character.useGravity = true;
 		character.gravityModifier = 1;
 		base.onExit(newState);
@@ -262,7 +262,7 @@ public class HyorogaState : CharState {
 		character.gravityModifier = 0;
 		zero = character as Zero;
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		character.useGravity = true;
 		character.gravityModifier = 1;
 		base.onExit(newState);

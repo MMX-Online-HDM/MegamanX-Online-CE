@@ -564,7 +564,7 @@ public abstract class NapalmAttackTypes : CharState {
 		character.turnToInput(player.input, player);
 		vile = character as Vile ?? throw new NullReferenceException();
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		if (vile.grenadeWeapon.type == (int)VileBallType.NoneNapalm) {
 			if (vile.napalmWeapon.type == (int)NapalmType.RumblingBang) {
@@ -655,7 +655,7 @@ public class NapalmAttackBombs: NapalmAttackTypes {
 			}
 		}
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		if (vile.grenadeWeapon.type == (int)VileBallType.PeaceOutRoller) {
 			vile.grenadeWeapon.shootCooldown = 75;
@@ -716,7 +716,7 @@ public class NapalmAttackFlamethrower: NapalmAttackTypes {
 		}
 
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		vile.flamethrowerWeapon.shootCooldown = 60;
 		vile.grenadeWeapon.shootCooldown = 60;

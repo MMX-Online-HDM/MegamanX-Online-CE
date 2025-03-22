@@ -292,7 +292,7 @@ public class CannonAttack : CharState {
 		
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		vile.isShootingLongshotGizmo = false;
 		character.useGravity = true;

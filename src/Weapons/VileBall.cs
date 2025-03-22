@@ -380,7 +380,7 @@ public class AirBombAttack : CharState {
 		vile = character as Vile ?? throw new NullReferenceException();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 		if (vile.napalmWeapon.type == (int)NapalmType.NoneBall) {
@@ -456,7 +456,7 @@ public class AirBombNapalm : NapalmAttackTypes {
 		return base.canEnter(character);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 		if (vile.grenadeWeapon.type != (int)VileBallType.NoneNapalm && vile.grenadeWeapon.type != (int)VileBallType.NoneFlamethrower) {

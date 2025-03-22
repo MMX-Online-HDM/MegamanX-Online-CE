@@ -43,7 +43,7 @@ public class HyperAxlStart : CharState {
 		axl.fillHealthToMax();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		axl.useGravity = true;
 		if (axl != null) {
@@ -116,7 +116,7 @@ public class Hover : CharState {
 		}
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 		hoverExhaust?.destroySelf();
@@ -152,7 +152,7 @@ public class DodgeRoll : CharState {
 		else if (player.input.isHeld(Control.Right, player)) initialDashDir = 1;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		axl.dodgeRollCooldown = Axl.maxDodgeRollCooldown;
 	}
@@ -198,7 +198,7 @@ public class SniperAimAxl : CharState {
 		axl = character as Axl ?? throw new NullReferenceException() ;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		if (axl?.isZooming() == true) {
 			axl?.zoomOut();

@@ -37,8 +37,8 @@ public class BusterZeroMelee : CharState {
 		}
 	}
 
-	public override void onExit(CharState oldState) {
-		base.onExit(oldState);
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
 		zero.zSaberCooldown = 36;
 	}
 }
@@ -73,8 +73,8 @@ public class BusterZeroMeleeWall : CharState {
 		zero = character as BusterZero ?? throw new NullReferenceException();
 	}
 
-	public override void onExit(CharState oldState) {
-		base.onExit(oldState);
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
 		useGravity = true;
 		zero.zSaberCooldown = 36;
 	}
@@ -172,7 +172,7 @@ public class BusterZeroDoubleBuster : CharState {
 		}
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		zero.stockedTime = 0;
 		base.onExit(newState);
 		// We check if we fired the second shot. If not we add the stocked charge.
@@ -235,8 +235,8 @@ public class BusterZeroHadangeki : CharState {
 		}
 	}
 
-	public override void onExit(CharState oldState) {
-		base.onExit(oldState);
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
 		zero.zSaberCooldown = 36;
 		zero.stockedTime = 0;
 	}
@@ -278,8 +278,8 @@ public class BusterZeroHadangekiWall : CharState {
 		zero = character as BusterZero ?? throw new NullReferenceException();
 	}
 
-	public override void onExit(CharState oldState) {
-		base.onExit(oldState);
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
 		useGravity = true;
 		zero.zSaberCooldown = 36;
 	}
@@ -334,7 +334,7 @@ public class HyperBusterZeroStart : CharState {
 		character.playSound("blackzeroentry", forcePlay: false, sendRpc: true);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		LightX3?.destroySelf();
 		character.useGravity = true;

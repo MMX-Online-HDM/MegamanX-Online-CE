@@ -293,7 +293,7 @@ public class ZeroDoubleBuster : CharState {
 		}
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		if (isSecond && character is Zero zero) {
 			//zero.doubleBusterDone = true;
@@ -352,8 +352,8 @@ public class AwakenedZeroHadangeki : CharState {
 		}
 	}
 
-	public override void onExit(CharState oldState) {
-		base.onExit(oldState);
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
 	}
 }
 
@@ -390,8 +390,8 @@ public class AwakenedZeroHadangekiWall : CharState {
 		zero = player.character as Zero ?? throw new NullReferenceException();
 	}
 
-	public override void onExit(CharState oldState) {
-		base.onExit(oldState);
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
 		useGravity = true;
 	}
 }

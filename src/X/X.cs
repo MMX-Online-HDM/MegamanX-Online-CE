@@ -250,7 +250,7 @@ public class MegamanX : Character {
 			if (legArmor == ArmorId.Max &&
 				player.input.isPressed(Control.Dash, player) &&
 				player.input.isHeld(Control.Up, player) &&
-				canDash() && flag == null
+				canDash() && ctfFlag == null
 			) {
 				changeState(new UpDash(Control.Dash));
 				return true;
@@ -266,7 +266,7 @@ public class MegamanX : Character {
 			if (legArmor == ArmorId.Max &&
 				player.input.isPressed(Control.Dash, player) &&
 				player.input.isHeld(Control.Up, player) &&
-				canAirDash() && canDash() && flag == null
+				canAirDash() && canDash() && ctfFlag == null
 			) {
 				changeState(new UpDash(Control.Dash));
 				return true;

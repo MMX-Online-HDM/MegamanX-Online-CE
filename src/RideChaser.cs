@@ -742,7 +742,7 @@ public class InRideChaser : CharState {
 		}
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		character.rideChaser = null;
 		character.useGravity = true;
 		character.setGlobalColliderTrigger(false);

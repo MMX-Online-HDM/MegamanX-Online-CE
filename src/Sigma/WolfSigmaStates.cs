@@ -43,7 +43,7 @@ public class WolfSigmaHeadState : CharState {
 		startPos = character.pos;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		sigma.leftHand.destroySelf();
 		sigma.rightHand.destroySelf();

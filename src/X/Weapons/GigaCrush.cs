@@ -200,7 +200,7 @@ public class GigaCrushCharState : CharState {
 		}
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		mmx.useGravity = true;
 		if (proj != null && !proj.destroyed) proj.destroySelf();

@@ -686,8 +686,8 @@ public class PunchyZeroHadangekiWall : CharState {
 		}
 	}
 
-	public override void onExit(CharState? oldState) {
-		base.onExit(oldState);
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
 		useGravity = true;
 	}
 	public override void onEnter(CharState oldState) {

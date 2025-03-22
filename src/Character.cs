@@ -67,6 +67,7 @@ public partial class Character : Actor, IDamagable {
 	public float healthBarInnerWidth;
 	public float slideVel = 0;
 	public Flag? flag;
+	public Flag? ctfFlag;
 	public bool isCrystalized;
 	public bool insideCharacter;
 	public float invulnTime = 0;

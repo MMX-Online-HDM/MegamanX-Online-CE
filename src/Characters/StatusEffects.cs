@@ -266,7 +266,7 @@ public class GenericStun : CharState {
 		}
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		if (paralyzeAnim != null) {
 			paralyzeAnim.destroySelf();
 			paralyzeAnim = null;
@@ -347,7 +347,7 @@ public class GoliathDragged : CharState {
 		character.vel.y = 0;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}

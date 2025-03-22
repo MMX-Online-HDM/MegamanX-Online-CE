@@ -185,7 +185,7 @@ public class XUPParryMeleeState : CharState {
 		//character.frameIndex = 2;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		mmx.parryCooldown = mmx.maxParryCooldown;
 	}
@@ -293,7 +293,7 @@ public class XUPParryProjState : CharState {
 		}
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		absorbAnim?.destroySelf();
 		mmx.parryCooldown = mmx.maxParryCooldown;
@@ -403,7 +403,7 @@ public class XUPGrabState : CharState {
 		character.useGravity = false;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 		//character.grabCooldown = 1;
@@ -433,7 +433,7 @@ public class UPGrabbed : CharState {
 		character.setzIndex(grabber.zIndex - 100);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.grabInvulnTime = 2;
 		character.setzIndex(savedZIndex);
@@ -599,7 +599,7 @@ public class XReviveStart : CharState {
 		mmx = character as RagingChargeX;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		drLightAnim.destroySelf();
 	}

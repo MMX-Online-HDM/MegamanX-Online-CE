@@ -110,7 +110,7 @@ public class NovaStrikeState : CharState {
 		);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.yDir = 1;
 		character.visible = true;

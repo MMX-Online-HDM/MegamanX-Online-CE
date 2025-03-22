@@ -184,7 +184,7 @@ public class ViralSigmaPossess : CharState {
 		state = 1;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		target?.player?.unpossess(sendRpc: true);
 		sigma.possessTarget = null;
@@ -227,7 +227,7 @@ public class ViralSigmaShoot : CharState {
 		character.angle = null;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.xDir = 1;
 	}
@@ -306,7 +306,7 @@ public class ViralSigmaTackle : CharState {
 		}
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		sigma.viralAngle = 0;
 		character.frameSpeed = 1;
@@ -349,7 +349,7 @@ public class ViralSigmaBeamState : CharState {
 		proj = new ViralSigmaBeamProj(new ViralSigmaBeamWeapon(), character.getFirstPOIOrDefault(), player, player.getNextActorNetId(), rpc: true);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.angle = 0;
 		character.frameSpeed = 1;

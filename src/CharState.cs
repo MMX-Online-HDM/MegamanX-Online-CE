@@ -906,7 +906,7 @@ public class Dash : CharState {
 		);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		if (dashSpark?.destroyed == false) {
 			dashSpark.destroySelf();

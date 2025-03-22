@@ -77,7 +77,7 @@ public class XHover : CharState {
 		}
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		if (sound != null && !sound.deleted) {
 			sound.sound?.Stop();
@@ -184,7 +184,7 @@ public class LightDash : CharState {
 		);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		if (dashSpark?.destroyed == false) {
 			dashSpark.destroySelf();
@@ -276,7 +276,7 @@ public class GigaAirDash : CharState {
 		);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		if (dashSpark?.destroyed == false) {
 			dashSpark.destroySelf();
@@ -304,7 +304,7 @@ public class UpDash : CharState {
 		character.frameSpeed = 2;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	}
 
@@ -449,7 +449,7 @@ public class X2ChargeShot : CharState {
 		character.changeSpriteFromName(sprite, true);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		if (mmx.hasLastingProj()) {
 			character.shootAnimTime = 8;
 		} else if (newState is not AirDash and not WallSlide) {
@@ -596,7 +596,7 @@ public class X3ChargeShot : CharState {
 		}
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		if (state == 0) {
 			mmx.stockedMaxBuster = true;
 		} else {

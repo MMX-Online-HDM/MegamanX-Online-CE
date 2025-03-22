@@ -138,7 +138,7 @@ public class XTeleportState : CharState {
 		cloneG = createClone();
 		character.sprite.frameIndex = 1;
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.visible = true;
 		character.useGravity = true;

@@ -405,7 +405,7 @@ public class SigmaWallDashState : CharState {
 		character.useGravity = false;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		character.useGravity = true;
 		Sigma.leapSlashCooldown = CmdSigma.maxLeapSlashCooldown;
 		base.onExit(newState);

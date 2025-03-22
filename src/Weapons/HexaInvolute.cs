@@ -62,7 +62,7 @@ public class HexaInvoluteState : CharState {
 		vile.getOffMK5Platform();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		proj?.destroySelf();
 		character.useGravity = true;
