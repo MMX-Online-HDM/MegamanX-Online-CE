@@ -881,23 +881,23 @@ public class PunchyZero : Character {
 						switch (gigaAttack) {
 							case RekkohaWeapon when gigaAttack.ammo >= 28:
 								gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-								changeState(new RekkohaState(gigaAttack), true);
+								changeState(new PunchyZeroRekkohaState(gigaAttack), true);
 								break;
 							case CFlasher when gigaAttack.ammo >= 7:
 								gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-								changeState(new CFlasherState(gigaAttack), true);
+								changeState(new PunchyZeroCFlasherState(gigaAttack), true);
 								break;
 							case RakuhouhaWeapon when gigaAttack.ammo >= 14:
 								gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-								changeState(new RakuhouhaState(gigaAttack), true);
+								changeState(new PunchyZeroRakuhouhaState(gigaAttack), true);
 								break;
 							case DarkHoldWeapon when gigaAttack.ammo >= 14 && isViral:
 								gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-								changeState(new DarkHoldShootState(gigaAttack), true);
+								changeState(new PunchyZeroDarkHoldShootState(gigaAttack), true);
 								break;
 							case ShinMessenkou when gigaAttack.ammo >= 14 && isAwakened:
 								gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-								changeState(new ShinMessenkouState(gigaAttack), true);
+								changeState(new PunchyZeroShinMessenkouState(gigaAttack), true);
 								break;
 						}
 					} else if (!(proj.projId == (int)ProjIds.SwordBlock) && grounded) {
