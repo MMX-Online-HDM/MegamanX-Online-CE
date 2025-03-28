@@ -521,7 +521,7 @@ public class PunchyZero : Character {
 		}
 		if (isCharging()) {
 			chargeSound.play();
-			int chargeType = 1;
+			int chargeType = 0;
 			chargeEffect.update(getChargeLevel(), chargeType);
 		}
 	}

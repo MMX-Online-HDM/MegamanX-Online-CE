@@ -92,9 +92,9 @@ public class Axl : Character {
 	}
 
 	// Used to be 0.5, 100
-	public const float maxStealthRevealTime = 0.25f;
+	public const float maxStealthRevealTime = 0.5f;
 	// The ping divided by this number indicates stealth reveal time in online
-	public const float stealthRevealPingDenom = 200;
+	public const float stealthRevealPingDenom = 100;
 
 	public PlasmaGunAltProj? plasmaGunAltProj;
 
@@ -1837,7 +1837,7 @@ public class Axl : Character {
 	}
 
 	public bool isInvisible() {
-		return stingChargeTime > 0 && stealthRevealTime == 0;
+		return stingChargeTime > 0 && stealthRevealTime <= 0;
 	}
 
 	public override string getSprite(string spriteName) {

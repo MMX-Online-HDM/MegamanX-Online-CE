@@ -50,7 +50,7 @@ public class ChameleonSting : Weapon {
 				freeAmmoNextCharge = true;
 				return;
 			}
-			mmx.stingActiveTime = 8;
+			mmx.stingActiveTime = 480;
 		}
 	}
 }

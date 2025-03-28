@@ -577,7 +577,11 @@ public class Zero : Character {
 		// Air attack.
 		if (specialPressed) {
 			if (airSpecial.type == 0 && charState is not ZeroRollingSlashtate) {
-				changeState(new ZeroRollingSlashtate(), true);
+				if (Options.main.swapAirAttacks == false) {
+					changeState(new ZeroRollingSlashtate(), true);					
+				} else {
+					changeState(new ZeroAirSlashState(), true);
+				}
 			}
 			if (airSpecial.type != 0) {
 				airSpecial.attack(this);
@@ -589,7 +593,11 @@ public class Zero : Character {
 			if (charState is WallSlide wallSlide) {
 				changeState(new ZeroMeleeWall(wallSlide.wallDir, wallSlide.wallCollider), true);
 			} else {
-				changeState(new ZeroAirSlashState(), true);
+				if (Options.main.swapAirAttacks == false) {
+					changeState(new ZeroAirSlashState(), true);					
+				} else {
+					changeState(new ZeroRollingSlashtate(), true);
+				}
 			}
 			return true;
 		}
@@ -939,7 +947,7 @@ public class Zero : Character {
 		}
 		if (isCharging()) {
 			chargeSound.play();
-			int chargeType = 1;
+			int chargeType = 0;
 			chargeEffect.update(getChargeLevel(), chargeType);
 		}
 	}

@@ -112,6 +112,8 @@ public class MegamanX : Character {
 	public float aiAttackCooldown;
 	public float stockedTime;
 	public XLoadout loadout;
+	public int totalChipHealAmount;
+	public const int maxTotalChipHealAmount = 32;
 
 	// Creation code.
 	public MegamanX(
@@ -176,6 +178,7 @@ public class MegamanX : Character {
 		Helpers.decrementFrames(ref specialSaberCooldown);
 		Helpers.decrementFrames(ref hadoukenCooldownTime);
 		Helpers.decrementFrames(ref shoryukenCooldownTime);
+		Helpers.decrementFrames(ref stingActiveTime);
 
 		if (lastShootPressed < 100) {
 			lastShootPressed++;
@@ -210,6 +213,22 @@ public class MegamanX : Character {
 				playSound("stockedSaber");
 			}
 		}
+		if (stingActiveTime > 0 && currentWeapon is ChameleonSting) {
+			currentWeapon.ammo -= Global.spf * 3 * (hyperArmActive ? 0.5f : 1);
+			if (currentWeapon.ammo < 0) currentWeapon.ammo = 0;
+			player.delaySubtank();
+		}
+		if (hyperHelmetActive && stingActiveTime <= 0 && totalChipHealAmount < maxTotalChipHealAmount) {
+			noDamageTime += Global.speedMul;
+			if ((player.health < player.maxHealth || player.hasSubtankCapacity()) && noDamageTime > 240) {
+				Helpers.decrementFrames(ref rechargeHealthTime);
+				if (rechargeHealthTime <= 0) {
+					rechargeHealthTime = 60;
+					addHealth(1);
+					totalChipHealAmount++;
+				}
+			}
+		}
 	}
 
 	// General update.
@@ -219,7 +238,10 @@ public class MegamanX : Character {
 		if (!ownedByLocalPlayer) {
 			return;
 		}
-		if (player.input.isPressed(Control.Shoot, player)) {
+		if (player.input.isPressed(Control.Shoot, player) || 
+			(specialButtonMode == 0 && 
+			player.input.isPressed(Control.Special1, player))
+		) {
 			lastShootPressed = 6;
 		}
 		chargedParasiticBomb?.update();
@@ -247,6 +269,7 @@ public class MegamanX : Character {
 
 	public override bool normalCtrl() {
 		quickArmorUpgrade();
+		fastChipActivation();
 		if (grounded) {
 			if (legArmor == ArmorId.Max &&
 				player.input.isPressed(Control.Dash, player) &&
@@ -297,10 +320,11 @@ public class MegamanX : Character {
 			return true;
 		}
 		if (player.input.isPressed(Control.Special1, player) && !hasAnyArmor) {
-			if (specialButtonMode == 1) {
+			if (specialButtonMode == 1 && stingActiveTime <= 0 && specialSaberCooldown <= 0) {
 				changeState(new X6SaberState(grounded), true);
+				specialSaberCooldown = 60;
 				return true;
-			} else {
+			} else if (specialButtonMode == 0 && stingActiveTime <= 0) {
 				shoot(0, specialBuster, false);
 				return true;
 			}
@@ -466,6 +490,40 @@ public class MegamanX : Character {
 		Global.playSound("chingX4");
 		return;
 	}
+	public void fastChipActivation() {
+		if (charState is not Die && fullArmor == ArmorId.Max && 
+			!hasFullHyperMaxArmor && !hasUltimateArmor && 
+		 	player.input.isPressed(Control.Special1, player)
+		) {
+			if (player.input.isHeld(Control.Down, player)) {
+				fastChipActive(false, false, false, true);
+				fastChipMessage("Foot");
+			} else if (player.input.isHeld(Control.Up, player)) {
+				fastChipActive(true, false, false, false);
+				fastChipMessage("Head");
+			} else if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
+				fastChipActive(false, false, true, false);
+				fastChipMessage("Arm");
+			} else {
+				fastChipActive(false, true, false, false);
+				fastChipMessage("Body");
+			}
+		}
+		return;
+	}
+	public void fastChipMessage(string Armor) {
+		Global.level.gameMode.setHUDErrorMessage
+		(
+     	    player, "Equipped " + Armor + " chip.",
+			playSound: false, resetCooldown: true
+		);
+	}
+	public void fastChipActive(bool Helmet, bool Chest, bool Arm, bool Leg) {
+		hyperHelmetActive = Helmet;
+		hyperChestActive = Chest;		
+		hyperArmActive = Arm;
+		hyperLegActive = Leg;
+	}
 
 	// Movement related stuff.
 	public override float getRunSpeed() {
@@ -560,6 +618,8 @@ public class MegamanX : Character {
 	}
 
 	public override bool canCharge() {
+		if (stingActiveTime > 0) return false;
+		if (currentWeapon is RollingShield && chargedRollingShieldProj != null) return false;
 		return !isInvulnerableAttack() && !hasLockingProj();
 	}
 
@@ -572,6 +632,7 @@ public class MegamanX : Character {
 	}
 
 	public override bool chargeButtonHeld() {
+		if (specialButtonMode == 0 && player.input.isHeld(Control.Special1, player)) return true;
 		return player.input.isHeld(Control.Shoot, player);
 	}
 
@@ -754,15 +815,15 @@ public class MegamanX : Character {
 			),
 			(int)MeleeIds.MaxZSaber => new GenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.XSaber, player,
-				4, Global.defFlinch, 30, addToLevel: addToLevel
+				4, Global.defFlinch, 30, addToLevel: addToLevel, isZSaberEffect: true
 			),
 			(int)MeleeIds.ZSaber => new GenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.X6Saber, player,
-				3, 0, 30, addToLevel: addToLevel
+				3, 0, 30, addToLevel: addToLevel, isZSaberEffect: true
 			),
 			(int)MeleeIds.ZSaberAir => new GenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.X6Saber, player,
-				2, 0, 30, addToLevel: addToLevel
+				2, 0, 30, addToLevel: addToLevel, isZSaberEffect: true
 			),
 			(int)MeleeIds.NovaStrike => new GenericMeleeProj(
 				HyperNovaStrike.netWeapon, projPos, ProjIds.NovaStrike, player,
@@ -887,7 +948,7 @@ public class MegamanX : Character {
 				chargeType = 3;
 			}
 			else if (armArmor == ArmorId.Max) {
-				chargeType = 1;
+				chargeType = 0;
 			}
 			chargeEffect.update(getChargeLevel(), chargeType);
 		}

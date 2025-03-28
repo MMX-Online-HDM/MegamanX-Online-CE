@@ -779,7 +779,7 @@ public class Fall : CharState {
 	public float limboVehicleCheckTime;
 	public Actor? limboVehicle;
 
-	public Fall() : base("fall", "fall_shoot", Options.main.getAirAttack(), "fall_start") {
+	public Fall() : base("fall", "fall_shoot", Options.main.getAirAttack(), "fall_start", "fall_start_shoot") {
 		accuracy = 5;
 		exitOnLanding = true;
 		useDashJumpSpeed = true;
@@ -1568,6 +1568,9 @@ public class GenericGrabbedState : CharState {
 		grabTime -= player.mashValue();
 		if (grabTime <= 0) {
 			character.changeToIdleOrFall();
+		}
+		if (character is Axl axl) {
+			axl.stealthRevealTime = Axl.maxStealthRevealTime;
 		}
 	}
 
