@@ -114,6 +114,11 @@ public class MegamanX : Character {
 	public XLoadout loadout;
 	public int totalChipHealAmount;
 	public const int maxTotalChipHealAmount = 32;
+	float hyperChargeAnimTime;
+	float hyperChargeAnimTime2 = 0.125f;
+	const float maxHyperChargeAnimTime = 0.25f;
+	public Sprite hyperChargePartSprite =  new Sprite("hypercharge_part_1");
+	public Sprite hyperChargePart2Sprite =  new Sprite("hypercharge_part_1");
 
 	// Creation code.
 	public MegamanX(
@@ -229,6 +234,9 @@ public class MegamanX : Character {
 				}
 			}
 		}
+		if (hasUltimateArmor) {
+			player.addNovaStrike();
+		}
 	}
 
 	// General update.
@@ -335,6 +343,7 @@ public class MegamanX : Character {
 			itemTracer.shoot(this, [0, hyperHelmetArmor == ArmorId.Giga ? 1 : 0]);
 			itemTracer.shootCooldown = itemTracer.fireRate;
 		}
+		gigaAttackSpecialOption();
 		if (bufferedShotPressed && stockedMaxBuster) {
 			shoot(1, specialBuster, false);
 			return true;
@@ -343,6 +352,50 @@ public class MegamanX : Character {
 			shoot(1, currentWeapon ?? specialBuster, true);
 			return true;
 		}
+		shotokanMoves();
+		if (currentWeapon != null && canShoot() && (
+				player.input.isPressed(Control.Shoot, player) && !isCharging() ||
+				currentWeapon.isStream && getChargeLevel() < 2 &&
+				player.input.isHeld(Control.Shoot, player)
+			)
+		) {
+			if (currentWeapon.shootCooldown <= 0) {
+				shoot(0);
+				return true;
+			}
+		}
+		return base.attackCtrl();
+	}
+	public bool gigaAttackSpecialOption() {
+		Point inputDir = player.input.getInputDir(player);
+		int oldSlot, newSlot;
+		if (Options.main.gigaCrushSpecial &&
+			player.input.isPressed(Control.Special1, player) &&
+			player.input.isHeld(Control.Down, player) &&
+			player.weapons.Any(w => w is GigaCrush)
+		) {
+			oldSlot = player.weaponSlot;
+			newSlot = player.weapons.FindIndex(w => w is GigaCrush);
+			player.changeWeaponSlot(newSlot);
+			shoot(getChargeLevel());
+			player.changeWeaponSlot(oldSlot);
+			return true;
+		} 
+		else if (Options.main.novaStrikeSpecial &&
+			player.input.isPressed(Control.Special1, player) &&
+			player.weapons.Any(w => w is HyperNovaStrike) &&
+			!inputDir.isZero()
+		) {
+			oldSlot = player.weaponSlot;
+			newSlot = player.weapons.FindIndex(w => w is HyperNovaStrike);
+			player.changeWeaponSlot(newSlot);
+			shoot(getChargeLevel());
+			player.changeWeaponSlot(oldSlot);
+			return true;
+		}
+		return false;
+	}
+	public bool shotokanMoves() {
 		bool inputCheckH = false;
 		bool inputCheckS = false;
 		if (hasHadoukenEquipped()) {
@@ -369,18 +422,7 @@ public class MegamanX : Character {
 			changeState(new Shoryuken(isUnderwater()), true);
 			return true;
 		}
-		if (currentWeapon != null && canShoot() && (
-				player.input.isPressed(Control.Shoot, player) && !isCharging() ||
-				currentWeapon.isStream && getChargeLevel() < 2 &&
-				player.input.isHeld(Control.Shoot, player)
-			)
-		) {
-			if (currentWeapon.shootCooldown <= 0) {
-				shoot(0);
-				return true;
-			}
-		}
-		return base.attackCtrl();
+		return false;
 	}
 
 	// Shoots stuff.
@@ -933,8 +975,41 @@ public class MegamanX : Character {
 				alpha *= 0.3f;
 			}
 		}
+		if (hyperChargeActive) {
+			drawHyperCharge(x, y);
+		}
 		base.render(x, y);
 		alpha = backupAlpha;
+	}
+	public void drawHyperCharge(float x, float y) {
+		hyperChargeAnimTime += Global.spf;
+		if (hyperChargeAnimTime >= maxHyperChargeAnimTime) hyperChargeAnimTime = 0;
+		float sx = pos.x + x + 2;
+		float sy = pos.y + y - 18;
+
+		var sprite1 = hyperChargePartSprite;
+		float distFromCenter = 12;
+		float posOffset = hyperChargeAnimTime * 50;
+		int hyperChargeAnimFrame = MathInt.Floor((hyperChargeAnimTime / maxHyperChargeAnimTime) * sprite1.totalFrameNum);
+		sprite1.draw(hyperChargeAnimFrame, sx + distFromCenter + posOffset, sy, 1, 1, null, 1, 1, 1, zIndex + 1);
+		sprite1.draw(hyperChargeAnimFrame, sx - distFromCenter - posOffset, sy, 1, 1, null, 1, 1, 1, zIndex + 1);
+		sprite1.draw(hyperChargeAnimFrame, sx, sy + distFromCenter + posOffset, 1, 1, null, 1, 1, 1, zIndex + 1);
+		sprite1.draw(hyperChargeAnimFrame, sx, sy - distFromCenter - posOffset, 1, 1, null, 1, 1, 1, zIndex + 1);
+
+		hyperChargeAnimTime2 += Global.spf;
+		if (hyperChargeAnimTime2 >= maxHyperChargeAnimTime) hyperChargeAnimTime2 = 0;
+		var sprite2 = hyperChargePart2Sprite;
+		float distFromCenter2 = 12;
+		float posOffset2 = hyperChargeAnimTime2 * 50;
+		int hyperChargeAnimFrame2 = MathInt.Floor(
+			(hyperChargeAnimTime2 / maxHyperChargeAnimTime) * sprite2.totalFrameNum
+		);
+		float xOff = Helpers.cosd(45) * (distFromCenter2 + posOffset2);
+		float yOff = Helpers.sind(45) * (distFromCenter2 + posOffset2);
+		sprite2.draw(hyperChargeAnimFrame2, sx - xOff, sy + yOff, 1, 1, null, 1, 1, 1, zIndex + 1);
+		sprite2.draw(hyperChargeAnimFrame2, sx + xOff, sy - yOff, 1, 1, null, 1, 1, 1, zIndex + 1);
+		sprite2.draw(hyperChargeAnimFrame2, sx + xOff, sy + yOff, 1, 1, null, 1, 1, 1, zIndex + 1);
+		sprite2.draw(hyperChargeAnimFrame2, sx - xOff, sy - yOff, 1, 1, null, 1, 1, 1, zIndex + 1);
 	}
 
 	public override void chargeGfx() {

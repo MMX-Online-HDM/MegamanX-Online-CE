@@ -962,9 +962,19 @@ public class AirDash : CharState {
 			character.useGravity = true;
 			dashTime = 0;
 			stop = true;
-			sprite = "dash_end";
-			shootSprite = "dash_end_shoot";
-			character.changeSpriteFromName(character.shootAnimTime > 0 ? shootSprite : sprite, true);
+			if (character is not Doppma or CmdSigma) {
+				sprite = "dash_end";
+				shootSprite = "dash_end_shoot";
+				character.changeSpriteFromName(character.shootAnimTime > 0 ? shootSprite : sprite, true);
+			}
+			else if (character is Doppma) {
+				character.changeSpriteFromName("fall", false);
+				exitOnLanding = true;
+			}
+			if (character is CmdSigma) {
+				character.changeSpriteFromName("fall", false);
+				exitOnLanding = true;
+			}
 		}
 		if (dashTime <= 3 || stop) {
 			if (inputXDir != 0 && inputXDir != dashDir) {
@@ -981,7 +991,7 @@ public class AirDash : CharState {
 			character.move(new Point(character.getDashSpeed() * inputXDir, 0));
 		}
 		// Speed at start and end.
-		else if (!stop || dashHeld) {
+		else if (!stop) {
 			character.move(new Point(Physics.DashStartSpeed * character.getRunDebuffs() * dashDir, 0));
 		}
 		// Timer
@@ -1005,6 +1015,9 @@ public class AirDash : CharState {
 			"dash_sparks", dashDir, player.getNextActorNetId(),
 			true, sendRpc: true
 		);
+		if (character is CmdSigma or Doppma) {
+			character.frameIndex = 1;
+		}
 	}
 
 	public override void onExit(CharState? newState) {
@@ -1364,6 +1377,20 @@ public class Taunt : CharState {
 				player.getNextActorNetId(),
 				destroyOnEnd: true, sendRpc: true
 			);
+		}
+		if (character.sprite.name == "mmx_win" && !once) {
+			once = true;
+			character.playSound("ching", sendRpc: true);
+			zeroching = new Anim(
+				character.pos.addxy(character.xDir*4, -22f),
+				"zero_ching", -character.xDir,
+				player.getNextActorNetId(),
+				destroyOnEnd: true, sendRpc: true
+			);
+		}
+		if (character.sprite.name == "axl_win" && !once) {
+			once = true;
+			character.playSound("ching", sendRpc: true);
 		}
 	}
 }
