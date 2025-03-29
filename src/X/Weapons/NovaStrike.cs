@@ -17,6 +17,7 @@ public class HyperNovaStrike : Weapon {
 		weaponSlotIndex = 95;
 		killFeedIndex = 104;
 		ammo = 28;
+		maxAmmo = 28;
 		drawGrayOnLowAmmo = true;
 		drawRoundedDown = true;
 	}

@@ -194,8 +194,8 @@ public class ZeroUppercut : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		if (!character.grounded) {
-			character.sprite.frameIndex = 3;
+		if (!character.grounded && type == RisingType.RisingFang) {
+			character.sprite.frameIndex = 4;
 		}
 		zero = character as Zero ?? throw new NullReferenceException();
 	}
