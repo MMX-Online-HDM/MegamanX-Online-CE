@@ -39,7 +39,7 @@ public class Pickup : Actor {
 
 	public override void onCollision(CollideData other) {
 		base.onCollision(other);
-		if (other.otherCollider.flag == (int)HitboxFlag.Hitbox) return;
+		if (other.otherCollider?.flag == (int)HitboxFlag.Hitbox) return;
 
 		if (other.gameObject is Character chr) {
 			if (!chr.ownedByLocalPlayer) return;
