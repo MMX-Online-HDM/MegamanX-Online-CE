@@ -169,8 +169,20 @@ public class MegamanX : Character {
 
 		// Max armor barrier sprite.
 		if (barrierActiveTime > 0) {
+			if (!barrierAnim.isAnimOver()) {
+				barrierAnim.update();
+			}
+			else {
+				barrierAnimRed.update();
+				barrierAnimBlue.update();
+			}
 			barrierAnimTime += speedMul;
 		} else {
+			if (barrierAnimTime != 0) {
+				barrierAnim.restart();
+				barrierAnimBlue.restart();
+				barrierAnimRed.restart();
+			}
 			barrierAnimTime = 0;
 		}
 
@@ -502,11 +514,6 @@ public class MegamanX : Character {
 			stopCharge();
 		}
 	}
-
-	public override void onHealing(decimal amount) {
-
-	}
-
 
 	public void quickArmorUpgrade() {
 		if (!player.input.isHeld(Control.Special2, player)) {
@@ -981,29 +988,21 @@ public class MegamanX : Character {
 			);
 		}
 		if (barrierActiveTime > 0) {
+			float bAlpha = barrierAnimTime % 4 <= 1 ? 0.5f : 0.25f;
 			if (!barrierAnim.isAnimOver()) {
-				barrierAnim.update();
 				barrierAnim.drawSimple(
-					getCenterPos().addxy(x, y), xDir, zIndex + 10, alpha: 0.5f, actor: this
+					getCenterPos().addxy(x, y), xDir, zIndex + 10, alpha: barrierAnimTime, actor: this
 				);
 			}
 			else if (hyperChestArmor == ArmorId.Max) {
-				float bAlpha = barrierAnimTime % 4 <= 1 ? 0.5f : 0.25f;
-				barrierAnimRed.update();
-				barrierAnim.drawSimple(
+				barrierAnimRed.drawSimple(
 					getCenterPos().addxy(x, y), xDir, zIndex + 10, alpha: bAlpha, actor: this
 				);
 			} else {
-				float bAlpha = barrierAnimTime % 4 <= 1 ? 0.5f : 0.25f;
-				barrierAnimBlue.update();
-				barrierAnim.drawSimple(
+				barrierAnimBlue.drawSimple(
 					getCenterPos().addxy(x, y), xDir, zIndex + 10, alpha: bAlpha, actor: this
 				);
 			}
-		} else {
-			barrierAnim.restart();
-			barrierAnimBlue.restart();
-			barrierAnimRed.restart();
 		}
 		if (getChargeShaders().Count != 0) {
 			chargePalleteTime += Global.gameSpeed;
