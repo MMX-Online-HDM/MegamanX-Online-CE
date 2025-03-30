@@ -136,6 +136,16 @@ public class Sprite {
 
 	public List<Trail> lastFiveTrailDraws = new List<Trail>();
 	public List<Trail> lastTwoBkTrailDraws = new List<Trail>();
+
+	
+	public void drawSimple(Point pos, int xDir, long zIndex, float alpha = 1, Actor? actor = null) {
+		draw(
+			frameIndex, pos.x, pos.y, xDir, 1,
+			null, alpha, 1, 1, zIndex,
+			null, 0, actor: actor, useFrameOffsets: true
+		);
+	}
+
 	public void draw(
 		int frameIndex, float x, float y, int flipX, int flipY,
 		HashSet<RenderEffectType>? renderEffects, float alpha,

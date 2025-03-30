@@ -80,6 +80,9 @@ public class MegamanX : Character {
 	public float barrierCooldown;
 	public float barrierActiveTime;
 	public Sprite barrierAnim = new Sprite("barrier_start");
+	public Sprite barrierAnimBlue = new Sprite("barrier");
+	public Sprite barrierAnimRed = new Sprite("barrier");
+	public float barrierAnimTime;
 	public bool stockedSaber;
 	public bool hyperChargeActive;
 	public bool stockedBuster;
@@ -108,7 +111,7 @@ public class MegamanX : Character {
 
 	// X3 Helmet.
 	public bool isHealingWithChip;
-	public decimal lastChipBaseHP = short.MaxValue;
+	public decimal lastChipBaseHP;
 	public float headChipHealthCooldown;
 
 	// Other.
@@ -166,14 +169,9 @@ public class MegamanX : Character {
 
 		// Max armor barrier sprite.
 		if (barrierActiveTime > 0) {
-			barrierAnim.update();
-			if (barrierAnim.name == "barrier_start" && barrierAnim.isAnimOver()) {
-				if (hyperChestArmor == ArmorId.Max) {
-					barrierAnim = new Sprite("barrier2");
-				} else {
-					barrierAnim = new Sprite("barrier");
-				}
-			}
+			barrierAnimTime += speedMul;
+		} else {
+			barrierAnimTime = 0;
 		}
 
 		Helpers.decrementFrames(ref weaknessCooldown);
@@ -229,17 +227,19 @@ public class MegamanX : Character {
 			player.delaySubtank();
 		}
 
-		if (hyperHelmetArmor == ArmorId.Max &&
-			health > 0 && stingActiveTime <= 0 &&
-			health < lastChipBaseHP
-		) {
-			if (headChipHealthCooldown <= 0) {
-				isHealingWithChip = true;
-				addHealth(1, false);
-				isHealingWithChip = false;
-				headChipHealthCooldown = 45;
-			} else {
-				headChipHealthCooldown -= speedMul;
+		if (hyperHelmetArmor == ArmorId.Max && health > 0) {
+			if (health >= lastChipBaseHP) {
+				lastChipBaseHP = health;
+			}
+			if (stingActiveTime <= 0 && health < lastChipBaseHP) {
+				if (headChipHealthCooldown <= 0) {
+					isHealingWithChip = true;
+					addHealth(1, false);
+					isHealingWithChip = false;
+					headChipHealthCooldown = 45;
+				} else {
+					headChipHealthCooldown -= speedMul;
+				}
 			}
 		}
 	}
@@ -504,13 +504,7 @@ public class MegamanX : Character {
 	}
 
 	public override void onHealing(decimal amount) {
-		if (!isHealingWithChip) {
-			lastChipBaseHP += amount;
-			decimal decHealAmount = (decimal)healAmount;
-			if (health + decHealAmount > lastChipBaseHP) {
-				lastChipBaseHP = health + decHealAmount;
-			}
-		}
+
 	}
 
 
@@ -984,6 +978,31 @@ public class MegamanX : Character {
 			Global.sprites["frozen_block"].draw(
 				0, pos.x + x - (xDir * 2), pos.y + y + 1, xDir, 1, null, 1, 1, 1, zIndex + 1
 			);
+		}
+		if (barrierActiveTime > 0) {
+			if (!barrierAnim.isAnimOver()) {
+				barrierAnim.update();
+				barrierAnim.drawSimple(
+					getCenterPos().addxy(x, y), xDir, zIndex + 10, alpha: 0.5f, actor: this
+				);
+			}
+			else if (hyperChestArmor == ArmorId.Max) {
+				float bAlpha = barrierAnimTime % 4 <= 1 ? 0.5f : 0.25f;
+				barrierAnimRed.update();
+				barrierAnim.drawSimple(
+					getCenterPos().addxy(x, y), xDir, zIndex + 10, alpha: bAlpha, actor: this
+				);
+			} else {
+				float bAlpha = barrierAnimTime % 4 <= 1 ? 0.5f : 0.25f;
+				barrierAnimBlue.update();
+				barrierAnim.drawSimple(
+					getCenterPos().addxy(x, y), xDir, zIndex + 10, alpha: bAlpha, actor: this
+				);
+			}
+		} else {
+			barrierAnim.restart();
+			barrierAnimBlue.restart();
+			barrierAnimRed.restart();
 		}
 		if (getChargeShaders().Count != 0) {
 			chargePalleteTime += Global.gameSpeed;

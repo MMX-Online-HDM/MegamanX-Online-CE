@@ -2736,7 +2736,7 @@ public partial class Character : Actor, IDamagable {
 		if (damage > 0 && mmx != null) {
 			mmx.headChipHealthCooldown = 60 * 3;
 			decimal targetDamage = originalDamage > damage ? originalDamage : damage;
-			decimal newChipBaseHP = Math.Ceiling(health * 1.25m);
+			decimal newChipBaseHP = Math.Ceiling(health + (maxHealth * 0.15m));
 			decimal newChipBaseHPAlt = Math.Ceiling(health + targetDamage);
 			if (newChipBaseHPAlt > newChipBaseHP) {
 				newChipBaseHP = newChipBaseHPAlt;
