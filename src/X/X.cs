@@ -503,11 +503,6 @@ public class MegamanX : Character {
 		}
 	}
 
-	public override void onHealing(decimal amount) {
-
-	}
-
-
 	public void quickArmorUpgrade() {
 		if (!player.input.isHeld(Control.Special2, player)) {
 			hyperProgress = 0;
