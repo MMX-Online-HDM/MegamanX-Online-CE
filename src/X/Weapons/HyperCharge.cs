@@ -87,6 +87,7 @@ public class HyperCharge : Weapon {
 
 		if (wep is XBuster) {
 			character.changeState(new X3ChargeShot(this), true);
+			if (!mmx.hasUltimateArmor)
 			character.playSound("buster3X3");
 		} else {
 			if (changeToWeaponSlot(wep)) player.changeWeaponSlot(player.hyperChargeSlot);
