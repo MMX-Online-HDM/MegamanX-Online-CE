@@ -213,7 +213,7 @@ public class MegamanX : Character {
 		}
 		if (stockedSaber || stockedMaxBuster || stockedBuster) {
 			stockedTime += speedMul;
-			if (stockedTime >= 61f) {
+			if (stockedTime >= 62f) {
 				stockedTime = 0;
 				playSound("stockedSaber");
 			}
@@ -545,6 +545,7 @@ public class MegamanX : Character {
 		// Ultimate or Seraph armor.
 		player.currency -= Player.ultimateArmorCost;
 		hasUltimateArmor = true;
+		player.addNovaStrike();
 		Global.playSound("chingX4");
 		return;
 	}
