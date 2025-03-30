@@ -1321,16 +1321,22 @@ public class GameMode {
 		float health = player.health;
 		float maxHealth = player.maxHealth;
 		float damageSavings = 0;
-
-		if (player.character != null && player.health > 0 && player.health < player.maxHealth) {
-			damageSavings = MathInt.Floor(player.character.damageSavings);
-		}
+		float greyHp = 0;
 
 		if (player.currentMaverick != null) {
 			health = player.currentMaverick.health;
 			maxHealth = player.currentMaverick.maxHealth;
 			damageSavings = 0;
 		}
+		else if (player.character != null) {
+			if (player.health > 0 && player.health < player.maxHealth) {
+				damageSavings = MathInt.Floor(player.character.damageSavings);
+			}
+			if (player.character is MegamanX rmx && rmx.hyperHelmetArmor == ArmorId.Max) {
+				greyHp = (float)rmx.lastChipBaseHP;
+			}
+		}
+
 
 		int frameIndex = player.charNum;
 		if (player.charNum == (int)CharIds.PunchyZero) {
@@ -1407,6 +1413,8 @@ public class GameMode {
 				Global.sprites["hud_health_full"].drawToHUD(barIndex, baseX, baseY);
 			} else if (i < MathInt.Ceiling(health) + damageSavings) {
 				Global.sprites["hud_health_full"].drawToHUD(4, baseX, baseY);
+			} else if (i < MathInt.Ceiling(greyHp)) {
+				Global.sprites["hud_weapon_full"].drawToHUD(30, baseX, baseY);
 			} else {
 				Global.sprites["hud_health_empty"].drawToHUD(0, baseX, baseY);
 			}

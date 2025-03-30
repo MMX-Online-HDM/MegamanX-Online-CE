@@ -1030,11 +1030,7 @@ public partial class Character : Actor, IDamagable {
 					if (acidTime < 0) removeAcid();
 				}
 				if (player == Global.level.mainPlayer || playHealSound) {
-					if (this is MegamanX { hyperHelmetActive: true, helmetArmor: ArmorId.Max }) {
-						playSound("subtankFillX3", forcePlay: true, sendRpc: true);
-					} else {
-						playAltSound("heal", sendRpc: true, altParams: "harmor");
-					}
+					playAltSound("heal", sendRpc: true, altParams: "harmor");
 				}
 			}
 		} else {
@@ -2646,11 +2642,6 @@ public partial class Character : Actor, IDamagable {
 			player.trainingDpsTotalDamage += (float)damage;
 		}
 
-		if (damage > 0 && mmx != null) {
-			mmx.noDamageTime = 0;
-			mmx.rechargeHealthTime = 0;
-		}
-
 		if (damage > 0 && attacker != null) {
 			if (projId != (int)ProjIds.Burn && projId != (int)ProjIds.AcidBurstPoison) {
 				player.delaySubtank();
@@ -2736,8 +2727,23 @@ public partial class Character : Actor, IDamagable {
 			}
 		}
 
-		if ((damage > 0 || Damager.alwaysAssist(projId)) && attacker != null && weaponIndex != null) {
+		if ((damage > 0 || originalDamage > 0 ||
+			Damager.alwaysAssist(projId)) && attacker != null && weaponIndex != null
+		) {
 			damageHistory.Add(new DamageEvent(attacker, weaponIndex.Value, projId, false, Global.time));
+		}
+
+		if (damage > 0 && mmx != null) {
+			mmx.headChipHealthCooldown = 60 * 3;
+			decimal targetDamage = originalDamage > damage ? originalDamage : damage;
+			decimal newChipBaseHP = Math.Ceiling(health * 1.25m);
+			decimal newChipBaseHPAlt = Math.Ceiling(health + targetDamage);
+			if (newChipBaseHPAlt > newChipBaseHP) {
+				newChipBaseHP = newChipBaseHPAlt;
+			}
+			if (mmx.lastChipBaseHP > newChipBaseHP) {
+				mmx.lastChipBaseHP = newChipBaseHP;
+			}
 		}
 
 		if (health <= 0) {
@@ -2860,11 +2866,15 @@ public partial class Character : Actor, IDamagable {
 			player.fillSubtank(amount);
 		}
 		healAmount += amount;
+		onHealing((decimal)amount);
 	}
 
 	public void fillHealthToMax() {
 		healAmount += (float)Math.Ceiling(maxHealth);
+		onHealing(Math.Ceiling(maxHealth));
 	}
+
+	public virtual void onHealing(decimal amount) { }
 
 	public virtual void addAmmo(float amount) {
 		currentWeapon?.addAmmoHeal(amount);
