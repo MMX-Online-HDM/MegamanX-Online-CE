@@ -73,7 +73,7 @@ public class Sprite {
 		frameTime += Global.speedMul * frameSpeed;
 		animTime += Global.speedMul * frameSpeed;
 		time += Global.spf;
-		var currentFrame = getCurrentFrame();
+		Frame? currentFrame = getCurrentFrame();
 		if (currentFrame != null && frameTime >= currentFrame.duration) {
 			bool onceEnd = !animData.loop && frameIndex == animData.frames.Length - 1;
 			if (!onceEnd) {
