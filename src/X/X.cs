@@ -987,19 +987,17 @@ public class MegamanX : Character {
 			);
 		}
 		if (barrierActiveTime > 0) {
+			float bAlpha = barrierAnimTime % 4 <= 1 ? 0.5f : 0.25f;
 			if (!barrierAnim.isAnimOver()) {
-				float bAlpha = barrierAnimTime % 4 <= 1 ? 0.5f : 0.25f;
 				barrierAnim.drawSimple(
 					getCenterPos().addxy(x, y), xDir, zIndex + 10, alpha: barrierAnimTime, actor: this
 				);
 			}
 			else if (hyperChestArmor == ArmorId.Max) {
-				float bAlpha = barrierAnimTime % 4 <= 1 ? 0.5f : 0.25f;
 				barrierAnimRed.drawSimple(
 					getCenterPos().addxy(x, y), xDir, zIndex + 10, alpha: bAlpha, actor: this
 				);
 			} else {
-				float bAlpha = barrierAnimTime % 4 <= 1 ? 0.5f : 0.25f;
 				barrierAnimBlue.drawSimple(
 					getCenterPos().addxy(x, y), xDir, zIndex + 10, alpha: bAlpha, actor: this
 				);
