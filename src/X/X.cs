@@ -81,7 +81,7 @@ public class MegamanX : Character {
 	public float barrierActiveTime;
 	public Sprite barrierAnim = new Sprite("barrier_start");
 	public Sprite barrierAnimBlue = new Sprite("barrier");
-	public Sprite barrierAnimRed = new Sprite("barrier");
+	public Sprite barrierAnimRed = new Sprite("barrier2");
 	public float barrierAnimTime;
 	public bool stockedSaber;
 	public bool hyperChargeActive;
