@@ -301,7 +301,7 @@ public class UpDash : CharState {
 		base.onEnter(oldState);
 		character.vel = new Point(0, -4);
 		character.dashedInAir++;
-		character.frameSpeed = 2;
+		character.frameSpeed = 1;
 	}
 
 	public override void onExit(CharState? newState) {
@@ -315,14 +315,21 @@ public class UpDash : CharState {
 			return;
 		}
 		int xDir = player.input.getXDir(player);
-		if (xDir != 0) {
+		if (character.sprite.frameIndex <= 5) {
+			character.vel += new Point(0, -18);
+			if (xDir != 0) {
+				character.xDir = xDir;
+				character.move(new Point(xDir * 10, 0));
+			}
+		}
+		if (xDir != 0 && character.sprite.frameIndex >= 6) {
 			character.xDir = xDir;
 			character.move(new Point(xDir * 60, 0));
 		}
 
-		if (!once) {
+		if (!once && character.sprite.frameIndex >= 6) {
 			once = true;
-			character.vel = new Point(0, -character.getJumpPower() * 1.125f);
+			character.vel = new Point(0, -character.getJumpPower() * 2.125f);
 			new Anim(character.pos.addxy(0, -10), "dash_sparks_up", character.xDir, player.getNextActorNetId(), true, sendRpc: true);
 			character.playSound("airdashupX3", sendRpc: true);
 		}
