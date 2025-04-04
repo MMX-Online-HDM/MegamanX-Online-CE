@@ -93,22 +93,18 @@ public struct Shape {
 			var point = myLine.getIntersectPoint(line);
 			if (point != null) {
 				var normal = normals[i];
-				var collideData = new CollideData(
-					null, null, null, false, null, new HitData(
-						normal, new List<Point>() { point.Value }, new List<Line>() { myLine }
-					)
-				);
+				var collideData = new CollideData(null, null, null, false, null, new HitData(normal, new List<Point>() { point.Value }, new List<Line>() { myLine }));
 				collideDatas.Add(collideData);
 			}
 		}
 		return collideDatas;
 	}
 
-	// GM19: IMPORTANT NOTE, When determining normals, it is always off "other".
+	//IMPORTANT NOTE- When determining normals, it is always off "other".
 	public HitData? intersectsShape(Shape other, Point? vel = null) {
 		Global.collisionCalls++;
-
-		// Skip if the square hitbox are not overlapping.
+		
+		// Skip
 		if (minX > other.maxX ||
 			maxX < other.minX ||
 			minY > other.maxY ||
@@ -222,21 +218,26 @@ public struct Shape {
 	}
 
 	// project vectors on to normal and return min/max value
-	public float[] minMaxDotProd(Point normal) {
+	public float[]? minMaxDotProd(Point normal) {
 		float? min = null;
 		float? max = null;
-		foreach (var point in points) {
+		if (points.Count == 0) {
+			return null;
+		}
+		foreach (Point point in points) {
 			var dp = point.dotProduct(normal);
 			if (min == null || dp < min) min = dp;
 			if (max == null || dp > max) max = dp;
 		}
-		return new float[] { min ?? 0, max ?? 0 };
+		return [min ?? 0, max ?? 0];
 	}
 
 	public Point? checkNormal(Shape other, Point normal) {
-		var aMinMax = minMaxDotProd(normal);
-		var bMinMax = other.minMaxDotProd(normal);
-
+		float[]? aMinMax = minMaxDotProd(normal);
+		float[]? bMinMax = other.minMaxDotProd(normal);
+		if (aMinMax == null || bMinMax == null) {
+			return null;
+		}
 		//Containment
 		float overlap = 0;
 		if (aMinMax[0] > bMinMax[0] && aMinMax[1] < bMinMax[1]) {
