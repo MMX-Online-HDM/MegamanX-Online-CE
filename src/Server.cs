@@ -589,7 +589,7 @@ public class Server {
 				if (rpcTemplate.isServerMessage) {
 					processServerMessage(im, rpcTemplate, rpcChannel);
 				} else {
-					processClientMessage(im, rpcTemplate, rpcChannel, rpcIndexByte, all);
+					processClientMessage(im, rpcTemplate, rpcIndexByte, rpcChannel, all);
 				}
 			} else if (im.MessageType == NetIncomingMessageType.ConnectionApproval) {
 				if (im.SenderConnection != null) {

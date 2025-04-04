@@ -258,7 +258,7 @@ public class BBuffaloIceProjGround : Projectile, IDamagable {
 	public void updateHitboxes() {
 		if (angle == null || collider?._shape == null) return;
 
-		float angle360 = Helpers.to256(byteAngle!.Value);
+		float angle360 = Helpers.to256(byteAngle);
 		if (angle360 >= 0 && angle360 <= 32) {
 			collider._shape.points = new List<Point>()
 			{
