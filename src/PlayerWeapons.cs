@@ -350,12 +350,6 @@ label:
 		}
 	}
 
-	public void addNovaStrike() {
-		if (!weapons.Any(w => w is HyperNovaStrike)) {
-			weapons.Add(new HyperNovaStrike());
-		}
-	}
-
 	public void removeNovaStrike() {
 		if (weapon is HyperNovaStrike) {
 			weaponSlot = 0;

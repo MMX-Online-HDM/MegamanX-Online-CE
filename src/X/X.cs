@@ -552,7 +552,9 @@ public class MegamanX : Character {
 		// Ultimate or Seraph armor.
 		player.currency -= Player.ultimateArmorCost;
 		hasUltimateArmor = true;
-		player.addNovaStrike();
+		if (!weapons.Any(w => w is HyperNovaStrike)) {
+			weapons.Add(new HyperNovaStrike());
+		}
 		Global.playSound("chingX4");
 		return;
 	}
