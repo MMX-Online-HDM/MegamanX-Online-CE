@@ -20,6 +20,8 @@ using static SFML.Window.Keyboard;
 namespace MMXOnline;
 
 class Program {
+	public static string exceptionExtraData = "";
+
 	#if WINDOWS
 	[STAThread]
 	#endif

@@ -130,12 +130,13 @@ public partial class Actor : GameObject {
 	public Point? targetNetPos;
 	public bool interplorateNetPos = true;
 
-	private Point lastPos;
-	private int lastSpriteIndex;
-	private int lastFrameIndex;
-	private int lastXDir;
-	private int lastYDir;
+	private Point? lastPos;
+	private int? lastSpriteIndex;
+	private int? lastFrameIndex;
+	private int? lastXDir;
+	private int? lastYDir;
 	private float? lastAngle;
+	private bool? lastVisible;
 	public float lastNetUpdate;
 
 	public NetActorCreateId netActorCreateId;
@@ -398,6 +399,7 @@ public partial class Actor : GameObject {
 		}
 	}
 
+	
 	public float? angle {
 		get {
 			return _byteAngle * 1.40625f;
@@ -406,21 +408,22 @@ public partial class Actor : GameObject {
 			if (value == null) {
 				return;
 			}
+			angleSet = true;
 			_byteAngle = (value / 1.40625f) % 256;
 		}
 	}
 
-	public float? byteAngle {
+	public bool angleSet;
+	public float byteAngle {
 		get {
-			return _byteAngle;
+			return _byteAngle ?? 0;
 		}
 		set {
-			if (value == null) {
-				return;
-			}
+			angleSet = true;
 			_byteAngle = value % 256;
 		}
 	}
+
 
 	public void setzIndex(long val) {
 		this.zIndex = val;

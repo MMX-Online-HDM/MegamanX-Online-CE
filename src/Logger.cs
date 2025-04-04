@@ -75,10 +75,17 @@ public class Logger {
 	}
 
 	public static void LogFatalException(Exception e) {
-		string crashDump = e.Message + "\n\n" +
+		string crashDump = (
+			e.Message + "\n\n" +
 			e.StackTrace + "\n\nInner exception: " +
 			e.InnerException?.Message + "\n\n" +
-			e.InnerException?.StackTrace;
+			e.InnerException?.StackTrace
+		);
+
+		if (Program.exceptionExtraData != "") {
+			crashDump = Program.exceptionExtraData + "\n\n" + crashDump;
+		}
+		Program.exceptionExtraData = "";
 
 		Helpers.showMessageBox(crashDump.Truncate(1000), "Fatal Error!");
 

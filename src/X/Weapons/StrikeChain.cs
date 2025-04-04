@@ -213,12 +213,12 @@ public class StrikeChainProj : Projectile {
 		byteAngle = upOrDown * 32;
 		if (xDir < 0) byteAngle = -byteAngle + 128;
 		//if (byteAngle < 0) byteAngle += 256;
-		vel = Point.createFromByteAngle(byteAngle.Value).times(400);
+		vel = Point.createFromByteAngle(byteAngle).times(400);
 
 		canBeLocal = false;
 
 		if (rpc) {
-			rpcCreateByteAngle(pos, owner, ownerPlayer, netId, byteAngle.Value);
+			rpcCreateByteAngle(pos, owner, ownerPlayer, netId, byteAngle);
 		}
 	}
 
@@ -303,15 +303,12 @@ public class StrikeChainProj : Projectile {
 		base.postUpdate();
 		//Syncs with current buster position.
 		Point shootPos = mmx.getShootPos();
-		if (byteAngle != null) {
-			changePos(
-				new Point(
-					shootPos.x + (dist - distRetracted) * Helpers.cosb(byteAngle.Value), 
-					shootPos.y + (dist - distRetracted) * Helpers.sinb(byteAngle.Value)
-				)
-			);
-		}
-		
+		changePos(
+			new Point(
+				shootPos.x + (dist - distRetracted) * Helpers.cosb(byteAngle), 
+				shootPos.y + (dist - distRetracted) * Helpers.sinb(byteAngle)
+			)
+		);
 	}
 
 	public void reverse(Point newVel) {
@@ -384,14 +381,13 @@ public class StrikeChainProj : Projectile {
 
 	public override void render(float x, float y) {
 		base.render(x,y);
-		if (byteAngle == null) return;
 
 		float length = dist - distRetracted;
 		int pieceSize = 8;
 		int maxI = MathInt.Floor(length / pieceSize);
 		int chainFrame = Helpers.clamp((int)(5 * length / maxDist), 0, 5);
-		float xOff = (length) * Helpers.cosb(byteAngle.Value);
-		float yOff = (length) * Helpers.cosb(byteAngle.Value);
+		float xOff = (length) * Helpers.cosb(byteAngle);
+		float yOff = (length) * Helpers.cosb(byteAngle);
 
 		DrawWrappers.DrawLine(
 			pos.x, pos.y, mmx.getShootPos().x, mmx.getShootPos().y,
@@ -399,13 +395,13 @@ public class StrikeChainProj : Projectile {
 		);
 
 		for (int i = 0; i < maxI; i++) {
-			xOff = (length - (pieceSize * i)) * Helpers.cosb(byteAngle.Value);
-			yOff = (length - (pieceSize * i)) * Helpers.sinb(byteAngle.Value);
+			xOff = (length - (pieceSize * i)) * Helpers.cosb(byteAngle);
+			yOff = (length - (pieceSize * i)) * Helpers.sinb(byteAngle);
 			
 			Global.sprites["strikechain_chain"].draw(
 				chainFrame, pos.x - xOff, pos.y - yOff, 
 				xDir, yDir, getRenderEffectSet(), 1, 1, 1, 
-				ZIndex.Character - 1, angle: byteAngle.Value * 1.40625f
+				ZIndex.Character - 1, angle: byteAngle * 1.40625f
 			);
 		}
 	}
@@ -456,12 +452,12 @@ public class StrikeChainProjCharged : Projectile {
 		byteAngle = upOrDown * 32;
 		if (xDir < 0) byteAngle = -byteAngle + 128;
 		//if (byteAngle < 0) byteAngle += 256;
-		vel = Point.createFromByteAngle(byteAngle.Value).times(600);
+		vel = Point.createFromByteAngle(byteAngle).times(600);
 
 		canBeLocal = false;
 
 		if (rpc) {
-			rpcCreateByteAngle(pos, owner, ownerPlayer, netId, byteAngle.Value);
+			rpcCreateByteAngle(pos, owner, ownerPlayer, netId, byteAngle);
 		}
 	}
 
@@ -546,15 +542,12 @@ public class StrikeChainProjCharged : Projectile {
 		base.postUpdate();
 		//Syncs with current buster position.
 		Point shootPos = mmx.getShootPos();
-		if (byteAngle != null) {
-			changePos(
-				new Point(
-					shootPos.x + (dist - distRetracted) * Helpers.cosb(byteAngle.Value), 
-					shootPos.y + (dist - distRetracted) * Helpers.sinb(byteAngle.Value)
-				)
-			);
-		}
-		
+		changePos(
+			new Point(
+				shootPos.x + (dist - distRetracted) * Helpers.cosb(byteAngle), 
+					shootPos.y + (dist - distRetracted) * Helpers.sinb(byteAngle)
+			)
+		);
 	}
 
 	public void reverse(Point newVel) {
@@ -629,14 +622,13 @@ public class StrikeChainProjCharged : Projectile {
 
 	public override void render(float x, float y) {
 		base.render(x,y);
-		if (byteAngle == null) return;
 
 		float length = dist - distRetracted;
 		int pieceSize = 8;
 		int maxI = MathInt.Floor(length / pieceSize);
 		int chainFrame = Helpers.clamp((int)(5 * length / maxDist), 0, 5);
-		float xOff = (length) * Helpers.cosb(byteAngle.Value);
-		float yOff = (length) * Helpers.cosb(byteAngle.Value);
+		float xOff = (length) * Helpers.cosb(byteAngle);
+		float yOff = (length) * Helpers.cosb(byteAngle);
 
 		DrawWrappers.DrawLine(
 			pos.x, pos.y, mmx.getShootPos().x, mmx.getShootPos().y,
@@ -644,13 +636,13 @@ public class StrikeChainProjCharged : Projectile {
 		);
 
 		for (int i = 0; i < maxI; i++) {
-			xOff = (length - (pieceSize * i)) * Helpers.cosb(byteAngle.Value);
-			yOff = (length - (pieceSize * i)) * Helpers.sinb(byteAngle.Value);
+			xOff = (length - (pieceSize * i)) * Helpers.cosb(byteAngle);
+			yOff = (length - (pieceSize * i)) * Helpers.sinb(byteAngle);
 			
 			Global.sprites["strikechain_charged_chain"].draw(
 				chainFrame, pos.x - xOff, pos.y - yOff, 
 				xDir, yDir, getRenderEffectSet(), 1, 1, 1, 
-				ZIndex.Character - 1, angle: byteAngle.Value * 1.40625f
+				ZIndex.Character - 1, angle: byteAngle * 1.40625f
 			);
 		}
 	}

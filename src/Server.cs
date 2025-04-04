@@ -578,6 +578,7 @@ public class Server {
 				}
 			} else if (im.MessageType == NetIncomingMessageType.Data) {
 				byte rpcIndexByte = im.ReadByte();
+				int rpcChannel = im.ReadByte();
 				RPC rpcTemplate;
 				if (rpcIndexByte >= RPC.templates.Length) {
 					rpcTemplate = new RPCUnknown();
@@ -586,9 +587,9 @@ public class Server {
 					rpcTemplate = RPC.templates[rpcIndexByte];
 				}
 				if (rpcTemplate.isServerMessage) {
-					processServerMessage(im, rpcTemplate);
+					processServerMessage(im, rpcTemplate, rpcChannel);
 				} else {
-					processClientMessage(im, rpcTemplate, rpcIndexByte, all);
+					processClientMessage(im, rpcTemplate, rpcChannel, rpcIndexByte, all);
 				}
 			} else if (im.MessageType == NetIncomingMessageType.ConnectionApproval) {
 				if (im.SenderConnection != null) {
@@ -791,7 +792,7 @@ public class Server {
 		}
 	}
 
-	public void processServerMessage(NetIncomingMessage im, RPC rpcTemplate) {
+	public void processServerMessage(NetIncomingMessage im, RPC rpcTemplate, int channel) {
 		if (rpcTemplate is RPCUpdateStarted) {
 			started = true;
 			nonSpecPlayerCountOnStart = players.Count(p => p.isSpectator);
@@ -886,7 +887,7 @@ public class Server {
 	}
 
 	public void processClientMessage(
-		NetIncomingMessage im, RPC rpcTemplate, byte rpcIndexByte, List<NetConnection> all
+		NetIncomingMessage im, RPC rpcTemplate, byte rpcIndexByte, int channel, List<NetConnection> all
 	) {
 		NetOutgoingMessage om = s_server.CreateMessage();
 
@@ -894,6 +895,7 @@ public class Server {
 			ushort argCount = BitConverter.ToUInt16(im.ReadBytes(2), 0);
 
 			om.Write(rpcIndexByte);
+			om.Write(channel);
 			om.Write(argCount);
 			byte[] bytes;
 
@@ -949,6 +951,7 @@ public class Server {
 		} else {
 			var message = im.ReadString();
 			om.Write(rpcIndexByte);
+			om.Write(channel);
 			om.Write(message);
 
 			if (rpcIndexByte == RPC.templates.IndexOf(RPC.switchTeam)) {
@@ -969,10 +972,10 @@ public class Server {
 
 		if (rpcTemplate.toHostOnly) {
 			if (host?.connection != null) {
-				s_server.SendMessage(om, host.connection, rpcTemplate.netDeliveryMethod, 0);
+				s_server.SendMessage(om, host.connection, rpcTemplate.netDeliveryMethod, channel);
 			}
 		} else if (all.Count > 0) {
-			s_server.SendMessage(om, all, rpcTemplate.netDeliveryMethod, 0);
+			s_server.SendMessage(om, all, rpcTemplate.netDeliveryMethod, channel);
 		}
 	}
 

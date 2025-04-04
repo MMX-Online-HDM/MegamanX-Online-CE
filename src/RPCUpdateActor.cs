@@ -22,66 +22,81 @@ public partial class Actor {
 			);
 			throw new Exception(msg);
 		}
-
+		bool send = false;
 		var args = new List<byte>() { networkIdBytes[0], networkIdBytes[1] };
-
 		ushort spriteIndex = Global.spriteIndexByName.GetValueOrCreate(sprite.name, ushort.MaxValue);
 
-		List<bool> mask = new List<bool>();
-		for (int i = 0; i < 8; i++) {
-			mask.Add(false);
-		}
 		// These masks are for whether to send the following fields or not.
-		mask[0] = !isStatic;                            // pos x
-		mask[1] = !isStatic;                            // pos y
-		mask[2] = syncScale;                            // scale data
-		mask[3] = (sprite.totalFrameNum != 0);          // frame index data
-		mask[4] = byteAngle != null;                    // angle
+		bool[] mask = new bool[8];
 
-		// The rest are just always sent and contain actual bool data
-		mask[5] = visible;                      // visibility
-		mask[6] = xDir == -1 ? false : true;    // xDir
-		mask[7] = yDir == -1 ? false : true;    // yDir
+		// Add a dummy mask.
+		int maskPos = args.Count;
+		args.Add(0);
 
-		// add the mask
-		byte maskByte = Convert.ToByte(string.Join("", mask.Select(b => b ? 1 : 0)), 2);
-		args.Add(maskByte);
-
-		// add pos x
-		if (mask[0]) {
+		// Pos.
+		if (!isStatic && lastPos != pos) {
 			byte[] xBytes = BitConverter.GetBytes(pos.x);
-			args.AddRange(xBytes);
-		}
-		// add pos y
-		if (mask[1]) {
 			byte[] yBytes = BitConverter.GetBytes(pos.y);
+			args.AddRange(xBytes);
 			args.AddRange(yBytes);
+			mask[0] = true;
+			send = true;
 		}
-		// add the scale bytes
-		if (mask[2]) {
-			args.Add((byte)(int)(xScale * 20));
-			args.Add((byte)(int)(yScale * 20));
+		// Scale.
+		if (syncScale) {
+			args.Add((byte)MathF.Round(xScale * 20));
+			args.Add((byte)MathF.Round(yScale * 20));
+			mask[1] = true;
+			send = true;
 		}
-		// add the frame index byte
-		if (mask[3]) {
-			args.Add((byte)frameIndex);
+		// Do not send sprite data if not in the sprite table.
+		if (spriteIndex != ushort.MaxValue) {
+			// We also send both changed if for some reason packets get lost.
+			bool frameChanged = sprite.totalFrameNum != 0 && lastFrameIndex != frameIndex;
+			// Sprite index.
+			if (lastSpriteIndex != spriteIndex || frameChanged) {
+				byte[] spriteBytes = BitConverter.GetBytes((ushort)spriteIndex);
+				args.AddRange(spriteBytes);
+				mask[2] = true;
+				send = true;
+			}
+			// Frame index.
+			if (frameChanged) {
+				args.Add((byte)frameIndex);
+				mask[3] = true;
+				send = true;
+			}
 		}
-		// add angle
-		if (mask[4]) {
-			byte[] angleBytes = BitConverter.GetBytes(byteAngle ?? 0);
-			args.AddRange(angleBytes);
+		// Angle.
+		if (angleSet && lastAngle != byteAngle) {
+			args.Add((byte)MathF.Round(byteAngle));
+			mask[4] = true;
+			send = true;
 		}
+		// The rest are just contain actual bool data.
+		mask[5] = visible;                      // Visibility
+		mask[6] = (xDir > -1);	// xDir
+		mask[7] = (yDir > -1);	// yDir
 
-		// Sprite index (always sent)
-		byte[] spriteBytes = BitConverter.GetBytes((ushort)spriteIndex);
-		args.AddRange(spriteBytes);
+		// Check if anything changed on these bools.
+		if (lastXDir != xDir || lastYDir != yDir || lastVisible != visible) {
+			send = true;
+		}
 
 		List<byte>? customData = getCustomActorNetData();
 		if (customData != null) {
 			args.AddRange(customData);
+			send = true;
 		}
 
-		Global.serverClient?.rpc(RPC.updateActor, args.ToArray());
+		// Update the mask info.
+		args[maskPos] = Helpers.boolArrayToByte(mask);
+
+		// Send if anything changed.
+		// Otherwise skip.
+		if (send) {
+			Global.serverClient?.rpcSequenced(RPC.updateActor, (int)netId, args.ToArray());
+		}
 
 		lastPos = pos;
 		lastSpriteIndex = spriteIndex;
@@ -89,105 +104,99 @@ public partial class Actor {
 		lastXDir = xDir;
 		lastYDir = yDir;
 		lastAngle = byteAngle;
+		lastVisible = visible;
 	}
 }
 
 public class RPCUpdateActor : RPC {
 	public RPCUpdateActor() {
-		netDeliveryMethod = NetDeliveryMethod.Unreliable;
+		netDeliveryMethod = NetDeliveryMethod.ReliableSequenced;
+		isPreUpdate = true;
 	}
 
 	public override void invoke(params byte[] arguments) {
 		if (Global.level == null || !Global.level.started) return;
-
 		int i = 0;
 
-		ushort netId = BitConverter.ToUInt16(new byte[] { arguments[i], arguments[i + 1] }, 0);
-		byte mask = arguments[i + 2];
-
-		i += 3;
-
-		var maskBools = Convert.ToString(mask, 2).Select(s => s.Equals('1')).ToList();
-		while (maskBools.Count < 8) {
-			maskBools.Insert(0, false);
-		}
-
-		float? xPos = null;
-		float? yPos = null;
-		float? xScale = null;
-		float? yScale = null;
-		int? spriteIndex = null;
-		int? frameIndex = null;
-		bool visible = maskBools[5];
-		int? xDir = maskBools[6] ? 1 : -1;
-		int? yDir = maskBools[7] ? 1 : -1;
-		float? byteAngle = null;
-
-		if (maskBools[0]) {
-			xPos = BitConverter.ToSingle(
-				new byte[] { arguments[i], arguments[i + 1], arguments[i + 2], arguments[i + 3] }, 0
-			);
-			i += 4;
-		}
-		if (maskBools[1]) {
-			yPos = BitConverter.ToSingle(
-				new byte[] { arguments[i], arguments[i + 1], arguments[i + 2], arguments[i + 3] }, 0
-			);
-			i += 4;
-		}
-		if (maskBools[2]) {
-			xScale = arguments[i++] / 20f;
-			yScale = arguments[i++] / 20f;
-		}
-		if (maskBools[3]) {
-			frameIndex = arguments[i];
-			i++;
-		}
-		if (maskBools[4]) {
-			byteAngle = BitConverter.ToSingle(
-				new byte[] { arguments[i], arguments[i + 1], arguments[i + 2], arguments[i + 3] }, 0
-			);
-			i += 4;
-		}
-
-		spriteIndex = BitConverter.ToUInt16(new byte[] { arguments[i], arguments[i + 1] }, 0);
+		// Actor ID. Return if does not exist or we own it.
+		ushort netId = BitConverter.ToUInt16([ arguments[0], arguments[1] ]);
+		Actor? actor = Global.level.getActorByNetId(netId, true);
+		if (actor == null || actor.ownedByLocalPlayer) {
+			return;
+		};
 		i += 2;
 
-		Actor? actor = Global.level.getActorByNetId(netId, true);
-		if (actor == null) {
-			return;
+		// Bool mask
+		byte maskByte = arguments[i];
+		bool[] mask = Helpers.byteToBoolArray(arguments[i]);
+		i++;
+
+		actor.visible = mask[5];
+		actor.xDir = mask[6] ? 1 : -1;
+		actor.yDir = mask[7] ? 1 : -1;
+
+		// Pos.
+		if (mask[0]) {
+			float posX = BitConverter.ToSingle(arguments.AsSpan()[i..(i + 4)]);
+			i += 4;
+			float posY = BitConverter.ToSingle(arguments.AsSpan()[i..(i + 4)]);
+			i += 4;
+
+			actor.changePos(new Point(posX, posY));
+		}
+		// Scale.
+		if (mask[1]) {
+			actor.xScale = arguments[i++] / 20f;
+			actor.yScale = arguments[i++] / 20f;
+		}
+		// Sprite index.
+		bool spriteError = false;
+		if (mask[2]) {
+			int spriteIndex = BitConverter.ToUInt16(arguments.AsSpan()[i..(i + 2)]);
+			if (spriteIndex >= 0 && spriteIndex < Global.spriteCount) {
+				string spriteName = Global.spriteNameByIndex[spriteIndex];
+				actor.changeSprite(spriteName, true);
+			} else {
+				spriteError = true;
+			}
+			i += 2;
+		}
+		// Frame index.
+		if (mask[3] && !spriteError) {
+			actor.frameIndex = arguments[i++];
+		}
+		// Angle.
+		if (mask[4]) {
+			actor.byteAngle = arguments[i++];
 		}
 
 		try {
-			if (actor != null && !actor.ownedByLocalPlayer) {
-				// In case we are updating a local object.
-				actor.forceNetUpdateNextFrame = true;
-				// Update data.
-				if (spriteIndex != null) actor.netSpriteIndex = (int)spriteIndex;
-				if (xPos != null) actor.netXPos = (float)xPos;
-				if (yPos != null) actor.netYPos = (float)yPos;
-				//actor.netIncPos = actor.netPos.subtract(actor.pos).times(0.33f);
-				if (frameIndex != null) actor.netFrameIndex = (int)frameIndex;
-				if (xDir != null) actor.netXDir = (int)xDir;
-				if (yDir != null) actor.netYDir = (int)yDir;
-				if (byteAngle != null) actor.netAngle = (float)byteAngle;
-				if (xScale != null) actor.xScale = xScale.Value;
-				if (yScale != null) actor.yScale = yScale.Value;
-
-				actor.visible = visible;
-				actor.lastNetUpdate = Global.time;
-			}
-		} catch (IndexOutOfRangeException) {
-			string msg = string.Format("Index out of bounds. Actor type: {0}, args len: {1}, i: {2}, netId: {3}",
-				actor.GetType().ToString(), arguments.Length.ToString(), i.ToString(), netId.ToString());
-			throw new Exception(msg);
-		}
-
-		if (actor != null) {
-			// We send custom data here.
+			// We parse custom data here.
 			if (i < arguments.Length) {
 				actor.updateCustomActorNetData(arguments[i..]);
 			}
 		}
+		catch {
+			string playerName = "null";
+			if (actor is Character character) {
+				playerName = character.player.name;
+			}
+			else if (actor.netOwner?.name != null) {
+				playerName = actor.netOwner.name;
+			}
+			Program.exceptionExtraData = (
+				"Index out of bounds.\n" + 
+				$"Actor type: {actor.GetType().ToString().RemovePrefix("MMXOnline.")}, " +
+				$"player: {playerName}, " +
+				$"args len: {arguments.Length}, " +
+				$"extra args pos: {i}, " + 
+				$"netId: {netId}, " +
+				$"maskBool: {Convert.ToString(maskByte, 2).PadLeft(8, '0')}"
+			);
+
+			throw;
+		}
+
+		actor.lastNetUpdate = Global.time;
 	}
 }

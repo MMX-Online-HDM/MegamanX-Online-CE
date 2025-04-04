@@ -377,9 +377,13 @@ public class ServerClient {
 		if (rpcIndex == -1) {
 			throw new Exception("RPC index not found!");
 		}
+		if (rpcTemplate.netDeliveryMethod == NetDeliveryMethod.ReliableSequenced) {
+			throw new Exception("Warning, cannot send Sequenced RPC on channel 0.");
+		}
 		byte rpcIndexByte = (byte)rpcIndex;
 		NetOutgoingMessage om = client.CreateMessage();
 		om.Write(rpcIndexByte);
+		om.Write(0);
 		om.Write((ushort)arguments.Length);
 		om.Write(arguments);
 		client.SendMessage(om, rpcTemplate.netDeliveryMethod);
@@ -393,8 +397,26 @@ public class ServerClient {
 		byte rpcIndexByte = (byte)rpcIndex;
 		NetOutgoingMessage om = client.CreateMessage();
 		om.Write(rpcIndexByte);
+		om.Write(0);
 		om.Write(message);
 		client.SendMessage(om, rpcTemplate.netDeliveryMethod);
+	}
+
+	public void rpcSequenced(RPC rpcTemplate, int channel, params byte[] arguments) {
+		int rpcIndex = RPC.templates.IndexOf(rpcTemplate);
+		if (rpcIndex == -1) {
+			throw new Exception("RPC index not found!");
+		}
+		if (channel <= 0) {
+			throw new Exception("Warning, cannot send Sequenced RPC on channel 0.");
+		}
+		byte rpcIndexByte = (byte)rpcIndex;
+		NetOutgoingMessage om = client.CreateMessage();
+		om.Write(rpcIndexByte);
+		om.Write(channel);
+		om.Write((ushort)arguments.Length);
+		om.Write(arguments);
+		client.SendMessage(om, rpcTemplate.netDeliveryMethod, channel);
 	}
 
 	public void getMessages(out List<string> stringMessages, bool invokeRpcs) {
@@ -431,6 +453,7 @@ public class ServerClient {
 					break;
 				case NetIncomingMessageType.Data:
 					byte rpcIndexByte = im.ReadByte();
+					_ = im.ReadByte(); // Channel data. Not needed for recieving.
 					RPC rpcTemplate;
 					if (rpcIndexByte >= RPC.templates.Length) {
 						rpcTemplate = new RPCUnknown();
