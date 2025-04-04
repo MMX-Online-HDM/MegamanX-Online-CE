@@ -428,25 +428,10 @@ public class MaverickState {
 	}
 
 	// Use this for code that needs to check for an accurate normal especially when hitting corners.
-	public CollideData checkCollisionNormal(float x, float y) {
-		var hitWall = checkCollisionSlide(x, y);
-		if (hitWall == null) return null;
-
-		var hitPoint = hitWall.getHitPointSafe();
-		var maverickColliderPoints = maverick.collider.shape.getRect().getPoints().OrderBy(p => p.distanceTo(hitPoint));
-
-		var raycastDir = new Point(x, y).normalize().times(25);
-		// Raycast from each of the 4 corners of the maverick collision box, ordered by ones closest to the first hitWall check.
-		// The hitData from the first raycast that hits the same wall will give the most accurate normal when hitting a wall corner.
-		foreach (var origin in maverickColliderPoints) {
-			var hitWall2 = Global.level.raycast(origin, origin.add(raycastDir), new List<Type>() { typeof(Wall) });
-			if (hitWall2?.gameObject == hitWall.gameObject) {
-				hitWall.hitData = hitWall2.hitData;
-				break;
-			}
-		}
-
-		return hitWall;
+	public CollideData? checkCollisionNormal(float x, float y) {
+		return Global.level.checkTerrainCollisionOnce(
+			maverick, x, y, checkPlatforms: true
+		);
 	}
 
 	public virtual bool trySetGrabVictim(Character grabbed) {
