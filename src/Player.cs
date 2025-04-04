@@ -1904,12 +1904,16 @@ public partial class Player {
 		if (axlBulletType == (int)AxlBulletWeaponType.AncientGun && isAxl) return;
 
 		// First we fill ST.
-		if (isVile) {
-			fillSubtank(2);
-		} else if (isAxl) {
-			fillSubtank(3);
+		if (Global.level?.server?.customMatchSettings != null) {
+			fillSubtank(Global.level.server.customMatchSettings.SubtankGain);
 		} else {
-			fillSubtank(4);
+			if (isVile) {
+				fillSubtank(2);
+			} else if (isAxl) {
+				fillSubtank(3);
+			} else {
+				fillSubtank(4);
+			}
 		}
 		if (character is Zero zero && zero.isViral) {
 			zero.freeBusterShots++;

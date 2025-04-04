@@ -20,6 +20,7 @@ public class CustomMatchSettings {
 	[ProtoMember(12)] public int currencyGain;
 	[ProtoMember(13)] public int respawnTime;
 	[ProtoMember(14)] public bool pickupItems;
+	[ProtoMember(15)] public int SubtankGain;
 
 	public CustomMatchSettings() {
 	}
@@ -41,6 +42,7 @@ public class CustomMatchSettings {
 			currencyGain = 1,
 			respawnTime = 5,
 			pickupItems = true,
+			SubtankGain = 3,
 		};
 	}
 }
@@ -53,6 +55,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 	public const uint fontSize = 24;
 	public IMainMenu prevMenu;
 	public bool inGame;
+	public int Page;
 	public bool isOffline;
 	public List<MenuOption> menuOptions = new List<MenuOption>();
 
@@ -336,6 +339,21 @@ public class CustomMatchSettingsMenu : IMainMenu {
 				}
 			)
 		);
+		menuOptions.Add(
+				new MenuOption(startX, currentY += lineH,
+					() => {
+						Helpers.menuLeftRightInc(ref savedMatchSettings.customMatchSettings.SubtankGain, 1, 4, true);
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							FontType.Blue,
+							"SubTank Gain: " +
+							savedMatchSettings.customMatchSettings.SubtankGain.ToString(),
+							pos.x, pos.y, selected: selectArrowPosY == 15
+						);
+					}
+				)
+			);
 	}
 
 	public string getSameCharString(int charNum) {
@@ -389,7 +407,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 
 		Fonts.drawTextEX(
 			FontType.Grey, "[MLEFT]/[MRIGHT]: Change setting, [BACK]: Back",
-			Global.screenW * 0.5f, Global.screenH - 26, Alignment.Center
+			Global.halfScreenW+60, Global.screenH - 26, Alignment.Center
 		);
 	}
 }

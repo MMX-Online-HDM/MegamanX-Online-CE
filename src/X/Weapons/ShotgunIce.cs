@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using SFML.System;
 
 namespace MMXOnline;
 
@@ -37,7 +38,7 @@ public class ShotgunIce : Weapon {
 			pos.y = mmx.pos.y;
 
 			//mmx.shotgunIceChargeTime = 1.5f;
-
+			character.changeState(new ShotgunIceChargedShot(), true);
 			new ShotgunIceProjSled(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 		}
 	}
@@ -155,7 +156,7 @@ public class ShotgunIceProjCharged : Projectile {
 	) : base(
 		pos, xDir, owner, type == 0 ? "shotgun_ice_charge_wind2" : "shotgun_ice_charge_wind", netId, player	
 	) {
-		weapon = isChillP ? ChillPenguin.netWeapon : XBuster.netWeapon;
+		weapon = isChillP ? ChillPenguin.netWeapon : ShotgunIce.netWeapon;
 		damager.damage = 1;
 		damager.hitCooldown = 30;
 		vel = new Point(150 * xDir, 0);
@@ -304,5 +305,56 @@ public class ShotgunIceProjSled : Projectile {
 
 	public override void onDestroy() {
 		breakFreeze(owner);
+	}
+}
+
+public class ShotgunIceChargedShot : CharState {
+	public float[] StateTime = { 2/60f, 10/60f, 18/60f, 26/60f, 34/60f, 42/60f, 50/60f, 58/60f};
+	public bool[] fired = { false, false, false, false, false, false, false, false };
+	MegamanX mmx = null!;
+	public float time;
+	public ShotgunIceChargedShot() : base("shoot") {
+	}
+	public override void update() {
+		base.update();
+		for (int i = 0; i < StateTime.Length; i++) {
+			if (stateTime > StateTime[i] && !fired[i]) {
+				fired[i] = true;
+		        ShotProjectile();
+			}
+		}
+		States();
+		if (stateTime > 60f/60f) {
+			character.changeToIdleOrFall();
+		}
+	}
+	public void States() {
+		if (!character.grounded) {
+			character.changeSpriteFromName(character.vel.y < 0 ? "jump_shoot" : "fall_start_shoot" , false);
+			if (character.isAnimOver()) {
+				character.changeSpriteFromName("fall_shoot", false);
+			}
+		}
+		if (character.sprite.name == "mmx_fall_shoot" && character.grounded) {
+			character.changeSpriteFromName("land_shoot", false);
+		}
+		if (character.sprite.name == "mmx_land_shoot") {
+			time++;
+			if (time >= 8) character.changeSpriteFromName("shoot", false);
+		}
+	}
+	public void ShotProjectile() {
+		int xDir = character.xDir;
+		new ShotgunIceProjCharged(
+			mmx.getShootPos(), xDir, mmx, player, 1,
+			false, player.getNextActorNetId(), true
+		);
+	}
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		mmx = character as MegamanX ?? throw new NullReferenceException();
+	}
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
 	}
 }

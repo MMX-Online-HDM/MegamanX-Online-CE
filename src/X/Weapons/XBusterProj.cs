@@ -338,6 +338,7 @@ public class BusterX3Proj2 : Projectile {
 		damager.damage = 1;
 		vel = new Point(400 * xDir, 0);
 		fadeSprite = "buster4_fade";
+		fadeOnAutoDestroy = true;
 		this.type = type;
 		reflectable = true;
 		maxTime = 0.675f;
@@ -392,6 +393,8 @@ public class BusterPlasmaProj : Projectile {
 		vel = new Point(400 * xDir, 0);
 		maxTime = 0.5f;
 		projId = (int)ProjIds.BusterX3Plasma;
+		fadeSprite = "buster4_x3_muzzle";
+		fadeOnAutoDestroy = true;
 		destroyOnHit = false;
 		xScale = 0.75f;
 		yScale = 0.75f;

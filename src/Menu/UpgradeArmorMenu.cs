@@ -374,7 +374,7 @@ public class UpgradeArmorMenu : IMainMenu {
 				Fonts.drawText(FontType.Blue, "Reduces Flinch by 25.0%", optionPos2.x + 5, optionPos2.y + 20);
 				Fonts.drawText(FontType.Blue, "Powers up your Spiral Crush Buster", optionPos3.x + 5, optionPos3.y + 10);
 				Fonts.drawText(FontType.Blue, "by charging shots 50% Faster.", optionPos3.x + 5, optionPos3.y + 20);
-				Fonts.drawText(FontType.Blue, "Ground Dash 15% faster and konger.", optionPos4.x + 5, optionPos4.y + 10);
+				Fonts.drawText(FontType.Blue, "Ground Dash 15% faster and longer.", optionPos4.x + 5, optionPos4.y + 10);
 				break;
 			case 2: //Giga
 				Fonts.drawText(FontType.Blue, "Trace enemy hp and positioning", optionPos1.x + 5, optionPos1.y + 10);

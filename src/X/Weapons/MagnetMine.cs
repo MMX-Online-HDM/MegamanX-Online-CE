@@ -61,7 +61,7 @@ public class MagnetMineProj : Projectile, IDamagable {
 		//maxTime = 2f;
 		maxDistance = 224;
 		fadeSprite = "explosion";
-		fadeSound = "explosion";
+		fadeSound = "explosionX2";
 		reflectable = false;
 		projId = (int)ProjIds.MagnetMine;
 		this.player = player;
@@ -251,7 +251,7 @@ public class MagnetMineProjCharged : Projectile {
 		if (!ownedByLocalPlayer) {
 			return;
 		}
-		if (other.gameObject is Projectile proj && !proj.destroyed &&
+		if (other.gameObject is Projectile proj && !proj.destroyed && proj is not MagnetMineProjCharged &&
 			(damager.owner.alliance != owner.alliance || damager.owner == owner && size < 10)
 		) {
 			if (!proj.shouldVortexSuck) { return; }
