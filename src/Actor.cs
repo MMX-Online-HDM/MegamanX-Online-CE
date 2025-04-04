@@ -464,6 +464,10 @@ public partial class Actor : GameObject {
 			}
 		}
 
+		updateHitboxes();
+	}
+
+	public void updateHitboxes() {
 		if (!useFrameProjs) {
 			return;
 		}
@@ -1080,7 +1084,6 @@ public partial class Actor : GameObject {
 				}
 			}
 
-			
 			int spriteIndex = -1;
 			if (Global.spriteIndexByName.ContainsKey(sprite.name)) {
 				spriteIndex = Global.spriteIndexByName[sprite.name];
@@ -1105,7 +1108,7 @@ public partial class Actor : GameObject {
 				yDir = (int)netYDir;
 			}
 			if (netAngle != null && netAngle != lastAngle) {
-				byteAngle = netAngle;
+				byteAngle = netAngle.Value;
 			}
 		}
 	}
