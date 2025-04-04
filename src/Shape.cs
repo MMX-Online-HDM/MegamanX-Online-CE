@@ -93,21 +93,26 @@ public struct Shape {
 			var point = myLine.getIntersectPoint(line);
 			if (point != null) {
 				var normal = normals[i];
-				var collideData = new CollideData(null, null, null, false, null, new HitData(normal, new List<Point>() { point.Value }, new List<Line>() { myLine }));
+				var collideData = new CollideData(
+					null, null, null, false, null, new HitData(
+						normal, new List<Point>() { point.Value }, new List<Line>() { myLine }
+					)
+				);
 				collideDatas.Add(collideData);
 			}
 		}
 		return collideDatas;
 	}
 
-	//IMPORTANT NOTE- When determining normals, it is always off "other".
+	// GM19: IMPORTANT NOTE, When determining normals, it is always off "other".
 	public HitData? intersectsShape(Shape other, Point? vel = null) {
 		Global.collisionCalls++;
 
+		// Skip if the square hitbox are not overlapping.
 		if (minX > other.maxX ||
 			maxX < other.minX ||
 			minY > other.maxY ||
-			maxY < other.minY			
+			maxY < other.minY
 		) {
 			return null;
 		}
