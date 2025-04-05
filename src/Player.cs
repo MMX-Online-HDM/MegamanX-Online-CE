@@ -2097,7 +2097,7 @@ public partial class Player {
 			return;
 		}
 		if (character?.destroyed == false) {
-			destroyCharacter();
+			destroyCharacter(true);
 		}
 		explodeDieEnd();
 		ushort newNetId = getNextATransNetId();
@@ -2143,7 +2143,7 @@ public partial class Player {
 		respawnTime = 0;
 		// Save old char to variable and nuke him.
 		Character oldChar = character;
-		destroyCharacter(oldChar);
+		destroyCharacter(oldChar, true);
 		// Spawn RCX in the old position in the same frame.
 		character = spawnCharAtPoint(
 			(int)CharIds.RagingChargeX, [],
@@ -2249,7 +2249,7 @@ public partial class Player {
 		}
 
 		if (currentMaverick != null && isTagTeam()) {
-			destroyCharacter();
+			destroyCharacter(true);
 		} else {
 			character?.applyDamage(Damager.forceKillDamage, this, character, null, null);
 		}

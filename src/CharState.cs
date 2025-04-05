@@ -1451,7 +1451,7 @@ public class Die : CharState {
 			if (stateTime >= 2.5f) {
 				destroyRideArmor();
 				player.explodeDieEnd();
-				player.destroyCharacter(character);
+				player.destroyCharacter(character, true);
 			}
 		} else if (character is KaiserSigma) {
 			if (stateTime >= 1 && !once) {
@@ -1462,7 +1462,7 @@ public class Die : CharState {
 			if (stateTime >= 2.5f) {
 				destroyRideArmor();
 				player.explodeDieEnd();
-				player.destroyCharacter(character);
+				player.destroyCharacter(character, true);
 			}
 		} else {
 			if (stateTime >= 1 && !once) {
@@ -1477,7 +1477,7 @@ public class Die : CharState {
 			if (stateTime >= 2.5f) {
 				destroyRideArmor();
 				player.explodeDieEnd();
-				player.destroyCharacter(character);
+				player.destroyCharacter(character, true);
 			}
 		}
 		spawnTime += Global.spf;
