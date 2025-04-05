@@ -9,7 +9,6 @@ namespace MMXOnline;
 
 public class RPC {
 	public NetDeliveryMethod netDeliveryMethod;
-	public int sequenceChannel;
 	public bool isString;
 	public bool toHostOnly;
 	public bool isServerMessage;

@@ -383,7 +383,7 @@ public class ServerClient {
 		byte rpcIndexByte = (byte)rpcIndex;
 		NetOutgoingMessage om = client.CreateMessage();
 		om.Write(rpcIndexByte);
-		om.Write(0);
+		om.Write((ushort)0);
 		om.Write((ushort)arguments.Length);
 		om.Write(arguments);
 		client.SendMessage(om, rpcTemplate.netDeliveryMethod);
@@ -397,12 +397,12 @@ public class ServerClient {
 		byte rpcIndexByte = (byte)rpcIndex;
 		NetOutgoingMessage om = client.CreateMessage();
 		om.Write(rpcIndexByte);
-		om.Write(0);
+		om.Write((ushort)0);
 		om.Write(message);
 		client.SendMessage(om, rpcTemplate.netDeliveryMethod);
 	}
 
-	public void rpcSequenced(RPC rpcTemplate, int channel, params byte[] arguments) {
+	public void rpcSequenced(RPC rpcTemplate, ushort channel, params byte[] arguments) {
 		int rpcIndex = RPC.templates.IndexOf(rpcTemplate);
 		if (rpcIndex == -1) {
 			throw new Exception("RPC index not found!");
@@ -453,7 +453,7 @@ public class ServerClient {
 					break;
 				case NetIncomingMessageType.Data:
 					byte rpcIndexByte = im.ReadByte();
-					_ = im.ReadByte(); // Channel data. Not needed for recieving.
+					_ = im.ReadUInt16(); // Channel data. Not needed for recieving.
 					RPC rpcTemplate;
 					if (rpcIndexByte >= RPC.templates.Length) {
 						rpcTemplate = new RPCUnknown();
@@ -467,7 +467,7 @@ public class ServerClient {
 					}
 
 					if (!rpcTemplate.isString) {
-						ushort argCount = BitConverter.ToUInt16(im.ReadBytes(2), 0);
+						ushort argCount = im.ReadUInt16();
 						var bytes = im.ReadBytes(argCount);
 						if (invokeRpcs && Global.level != null) {
 							if (rpcTemplate.isServerMessage || rpcTemplate.levelless) {
