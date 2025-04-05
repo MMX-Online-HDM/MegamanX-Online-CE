@@ -2213,9 +2213,13 @@ public partial class Player {
 		if (!ownedByLocalPlayer) {
 			return;
 		}
-		if (delayedNewCharNum != null && Global.level.mainPlayer.charNum != delayedNewCharNum.Value) {
+		if (delayedNewCharNum != null &&
+			Global.level.mainPlayer.charNum != delayedNewCharNum.Value
+		) {
 			Global.level.mainPlayer.newCharNum = delayedNewCharNum.Value;
-			Global.serverClient?.rpc(RPC.switchCharacter, (byte)Global.level.mainPlayer.id, (byte)delayedNewCharNum.Value);
+			Global.serverClient?.rpc(
+				RPC.switchCharacter, (byte)Global.level.mainPlayer.id, (byte)delayedNewCharNum.Value
+			);
 		}
 		if (character == null) {
 			return;

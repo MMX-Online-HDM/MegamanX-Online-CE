@@ -587,8 +587,8 @@ public class RPCDestroyCharacter : RPC {
 			destroyedChar = player.destroyCharacter(charNetId);
 		}
 		// If player was null attempt to destroy directly.
-		if (!destroyedChar) {
-			Actor? charObj = Global.level.getActorByNetId(charNetId);
+		Actor? charObj = Global.level.getActorByNetId(charNetId);
+		if (!destroyedChar || charObj != null) {
 			charObj?.destroySelf();
 		}
 	}
