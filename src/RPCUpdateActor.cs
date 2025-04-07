@@ -95,7 +95,7 @@ public partial class Actor {
 		// Send if anything changed.
 		// Otherwise skip.
 		if (send) {
-			Global.serverClient?.rpcSequenced(RPC.updateActor, netId.Value, args.ToArray());
+			Global.serverClient?.rpc(RPC.updateActor, args.ToArray());
 		}
 
 		lastPos = pos;
