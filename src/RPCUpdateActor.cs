@@ -110,7 +110,7 @@ public partial class Actor {
 
 public class RPCUpdateActor : RPC {
 	public RPCUpdateActor() {
-		netDeliveryMethod = NetDeliveryMethod.ReliableSequenced;
+		netDeliveryMethod = NetDeliveryMethod.ReliableOrdered;
 		isPreUpdate = true;
 	}
 
