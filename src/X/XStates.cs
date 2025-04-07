@@ -287,7 +287,6 @@ public class GigaAirDash : CharState {
 	}
 }
 
-
 public class UpDash : CharState {
 	public float dashTime = 0;
 	public string initialDashButton;
@@ -296,18 +295,7 @@ public class UpDash : CharState {
 		this.initialDashButton = initialDashButton;
 		attackCtrl = true;
 	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		character.vel = new Point(0, -4);
-		character.dashedInAir++;
-		character.frameSpeed = 1;
-	}
-
-	public override void onExit(CharState? newState) {
-		base.onExit(newState);
-	}
-
+	
 	public override void update() {
 		base.update();
 		if (!player.input.isHeld(initialDashButton, player)) {
@@ -315,22 +303,18 @@ public class UpDash : CharState {
 			return;
 		}
 		int xDir = player.input.getXDir(player);
-		if (character.sprite.frameIndex <= 5) {
-			character.vel += new Point(0, -18);
-			if (xDir != 0) {
-				character.xDir = xDir;
-				character.move(new Point(xDir * 10, 0));
-			}
-		}
-		if (xDir != 0 && character.sprite.frameIndex >= 6) {
+		if (xDir != 0) {
 			character.xDir = xDir;
-			character.move(new Point(xDir * 60, 0));
+			character.move(new Point(xDir * 60 * character.getRunDebuffs(), 0));
 		}
 
-		if (!once && character.sprite.frameIndex >= 6) {
+		if (!once) {
 			once = true;
-			character.vel = new Point(0, -character.getJumpPower() * 2.125f);
-			new Anim(character.pos.addxy(0, -10), "dash_sparks_up", character.xDir, player.getNextActorNetId(), true, sendRpc: true);
+			character.vel = new Point(0, -character.getJumpPower() * 1.125f);
+			new Anim(
+				character.pos.addxy(0, -10), "dash_sparks_up",
+				character.xDir, player.getNextActorNetId(), true, sendRpc: true
+			);
 			character.playSound("airdashupX3", sendRpc: true);
 		}
 
@@ -340,6 +324,13 @@ public class UpDash : CharState {
 			changeToFall();
 			return;
 		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.vel = new Point(0, -4);
+		character.dashedInAir++;
+		character.frameSpeed = 1;
 	}
 
 	public void changeToFall() {
