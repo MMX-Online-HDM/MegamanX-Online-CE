@@ -542,7 +542,7 @@ public class Server {
 				periodicPing(s_server);
 			}
 			if (iterations % 24 == 0) {
-				RPC.periodicServerPing.sendFromServer(s_server, new byte[] { });
+				RPC.periodicServerPing.sendFromServer(s_server, []);
 			}
 
 			framesZeroPlayers = 0;
@@ -715,6 +715,7 @@ public class Server {
 
 		NetOutgoingMessage omTargeted = s_server.CreateMessage();
 		omTargeted.Write(sendStringRPCByte);
+		omTargeted.Write((ushort)0);
 		var joinServerResponse = new JoinServerResponse(this);
 		omTargeted.Write("joinservertargetedresponse:" + JsonConvert.SerializeObject(joinServerResponse));
 		Helpers.debugLog("Sending response to: " + im.SenderConnection.RemoteEndPoint.ToString());
@@ -764,7 +765,7 @@ public class Server {
 							player.connection = host.connection;
 						}
 					}
-					RPC.hostPromotion.sendFromServer(s_server, new byte[] { (byte)host.id });
+					RPC.hostPromotion.sendFromServer(s_server, [(byte)host.id]);
 
 					// Remove all bots if host leaves, to prevent a class of unmaintainable bugs
 					foreach (var player in players.ToList()) {

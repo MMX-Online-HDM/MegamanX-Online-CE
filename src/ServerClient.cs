@@ -453,7 +453,6 @@ public class ServerClient {
 					break;
 				case NetIncomingMessageType.Data:
 					byte rpcIndexByte = im.ReadByte();
-					_ = im.ReadUInt16(); // Channel data. Not needed for recieving.
 					RPC rpcTemplate;
 					if (rpcIndexByte >= RPC.templates.Length) {
 						rpcTemplate = new RPCUnknown();
@@ -464,7 +463,9 @@ public class ServerClient {
 					if (rpcTemplate is RPCPeriodicServerPing) {
 						packetLossStopwatch.Restart();
 						packetsReceived++;
+						continue;
 					}
+					ushort channel = im.ReadUInt16(); // Channel data. Not needed for recieving.
 
 					if (!rpcTemplate.isString) {
 						ushort argCount = im.ReadUInt16();

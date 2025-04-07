@@ -201,7 +201,8 @@ public class RPC {
 		om.Write(argCountBytes[0]);
 		om.Write(argCountBytes[1]);
 		if (bytes.Length > 0) {
-			om.Write(bytes);
+			om.Write((ushort)0);
+			om.Write(argCount);
 		}
 		s_server.SendToAll(om, netDeliveryMethod, 0);
 	}
