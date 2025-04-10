@@ -548,7 +548,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool canCharge() {
-		return true;
+		return charState is not Die;
 	}
 
 	public virtual bool canShoot() {

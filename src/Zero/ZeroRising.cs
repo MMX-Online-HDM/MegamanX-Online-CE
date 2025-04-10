@@ -97,8 +97,9 @@ public class ZeroUppercut : CharState {
 
 	public void setStartupFrame(RisingType type) {
 		jumpFrame = type switch {
-			RisingType.Ryuenjin => 4,
-			RisingType.Denjin => 5,
+			RisingType.Ryuenjin => 5,
+			RisingType.Denjin => 4,
+			RisingType.RisingFang => 5,
 			_ => 4
 		};
 	}

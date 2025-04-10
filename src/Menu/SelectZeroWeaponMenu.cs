@@ -37,7 +37,7 @@ public class SelectZeroWeaponMenu : IMainMenu {
 
 	public static List<Weapon> gigaAttackWeapons = new List<Weapon>() {
 		new RakuhouhaWeapon(),
-		new CFlasher(),
+		new Messenkou(),
 		new RekkohaWeapon()
 	};
 

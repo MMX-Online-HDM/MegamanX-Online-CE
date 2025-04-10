@@ -714,7 +714,6 @@ public class Server {
 
 		NetOutgoingMessage omTargeted = s_server.CreateMessage();
 		omTargeted.Write(sendStringRPCByte);
-		omTargeted.Write((ushort)0);
 		var joinServerResponse = new JoinServerResponse(this);
 		omTargeted.Write("joinservertargetedresponse:" + JsonConvert.SerializeObject(joinServerResponse));
 		Helpers.debugLog("Sending response to: " + im.SenderConnection.RemoteEndPoint.ToString());
@@ -804,7 +803,6 @@ public class Server {
 			if (player != null) {
 				NetOutgoingMessage om = s_server.CreateMessage();
 				om.Write((byte)RPC.templates.IndexOf(RPC.reportPlayerResponse));
-				om.Write((ushort)0);
 				ReportedPlayer reportedPlayer = new ReportedPlayer(
 					player.name, player.connection?.RemoteEndPoint?.Address?.ToString() ?? "", player.deviceId
 				);
@@ -827,7 +825,6 @@ public class Server {
 
 			NetOutgoingMessage om = s_server.CreateMessage();
 			om.Write((byte)RPC.templates.IndexOf(RPC.kickPlayerResponse));
-			om.Write((ushort)0);
 			om.Write(kickPlayerJson);
 			s_server.SendToAll(om, rpcTemplate.netDeliveryMethod, 0);
 		} else if (rpcTemplate is RPCUpdatePlayer) {

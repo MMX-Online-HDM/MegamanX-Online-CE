@@ -703,6 +703,15 @@ public class GameMode {
 				float cooldown = 1 - Helpers.progress(axl2.dodgeRollCooldown, Axl.maxDodgeRollCooldown);
 				drawGigaWeaponCooldown(50, cooldown, y: 170);
 			}
+			if (drawPlayer.character is CmdSigma cmdSigma) {
+				int xStart = 11;
+				if (cmdSigma.leapSlashCooldown > 0) {
+					float cooldown = 1 - Helpers.progress(
+						cmdSigma.leapSlashCooldown, BaseSigma.maxLeapSlashCooldown
+					);
+					drawGigaWeaponCooldown(102, cooldown);
+				}
+			}
 			if (drawPlayer.weapons == null) {
 				return;
 			}
@@ -2403,7 +2412,7 @@ public class GameMode {
 			float slotY = sy;
 			Global.sprites["hud_weapon_icon"].drawToHUD(weapon.weaponSlotIndex, slotX, slotY);
 			float ammo = weapon.ammo;
-			if (weapon is RakuhouhaWeapon || weapon is RekkohaWeapon || weapon is CFlasher || weapon is DarkHoldWeapon) ammo = dnaCore.rakuhouhaAmmo;
+			if (weapon is RakuhouhaWeapon || weapon is RekkohaWeapon || weapon is Messenkou || weapon is DarkHoldWeapon) ammo = dnaCore.rakuhouhaAmmo;
 			if (weapon is not MechMenuWeapon) {
 				DrawWrappers.DrawRectWH(slotX - 8, slotY - 8, 16, 16 - MathF.Floor(16 * (ammo / weapon.maxAmmo)), true, new Color(0, 0, 0, 128), 1, ZIndex.HUD, false);
 			}

@@ -10,6 +10,8 @@ public class CmdSigma : BaseSigma {
 	public float sigmaAmmoRechargeTime;
 	public float sigmaHeadBeamRechargePeriod = 5;
 	public float sigmaHeadBeamTimeBeforeRecharge = 20;
+	public float aiAttackCooldown;
+	public float dashSlashCooldown;
 
 	public CmdSigma(
 		Player player, float x, float y, int xDir,
@@ -31,6 +33,7 @@ public class CmdSigma : BaseSigma {
 		}
 		// Cooldowns.
 		Helpers.decrementTime(ref saberCooldown);
+		Helpers.decrementFrames(ref dashSlashCooldown);
 		Helpers.decrementTime(ref leapSlashCooldown);
 		Helpers.decrementFrames(ref sigmaAmmoRechargeCooldown);
 		Helpers.decrementFrames(ref aiAttackCooldown);
@@ -73,6 +76,14 @@ public class CmdSigma : BaseSigma {
 		framesSinceLastAttack = Global.level.frameCount - lastAttackFrame;
 		bool lenientAttackPressed = (attackPressed || framesSinceLastAttack < 5);
 
+		if (charState is Dash dashState) {
+			if (!dashState.stop && player.input.isPressed(Control.Special1, player) &&
+				flag == null && leapSlashCooldown == 0
+			) {
+				changeState(new SigmaWallDashState(-1, true), true);
+				return true;
+			}
+		}
 		if (lenientAttackPressed && saberCooldown == 0) {
 			saberCooldown = sigmaSaberMaxCooldown;
 
@@ -87,20 +98,18 @@ public class CmdSigma : BaseSigma {
 				playSound("sigmaSaber", sendRpc: true);
 				return true;
 			}
-			if (grounded) 
+			if (grounded) {
+				/*if (isDashing && sprite.name != getSprite("dash_end") && dashSlashCooldown <= 0) {
+					slideVel = getDashSpeed() * 0.9f * xDir;
+					dashSlashCooldown = 90;
+					changeState(new SigmaSlashStateDash(), true);
+					return true;
+				}*/
 				changeState(new SigmaSlashStateGround(), true);
-			else 
-				changeState(new SigmaSlashStateAir(), true);
-			return true;
-		}
-		if (charState is Dash dashState) {
-			if (!dashState.stop && player.isSigma &&
-				player.input.isPressed(Control.Special1, player) &&
-				flag == null && leapSlashCooldown == 0
-			) {
-				changeState(new SigmaWallDashState(-1, true), true);
 				return true;
 			}
+			changeState(new SigmaSlashStateAir(), true);
+			return true;
 		}
 		if (grounded && charState is Idle || charState is Run || charState is Crouch) {
 			if (player.input.isHeld(Control.Special1, player) && player.sigmaAmmo > 0) {
@@ -188,7 +197,7 @@ public class CmdSigma : BaseSigma {
 		// Per-player data.
 		player.sigmaAmmo = data[0];
 	}
-	public float aiAttackCooldown;
+
 	public override void aiAttack(Actor? target) {
 		bool isTargetInAir = pos.y < target?.pos.y - 20;
 		bool isTargetClose = pos.x < target?.pos.x - 10;

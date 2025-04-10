@@ -64,7 +64,7 @@ public class PunchyZero : Character {
 
 		gigaAttackSelected = pzeroLoadout.gigaAttack;
 		gigaAttack = pzeroLoadout.gigaAttack switch {
-			1 => new CFlasher(),
+			1 => new Messenkou(),
 			2 => new RekkohaWeapon(),
 			_ => new RakuhouhaWeapon(),
 		};
@@ -129,7 +129,7 @@ public class PunchyZero : Character {
 					isBlack = false;
 					float oldAmmo = gigaAttack.ammo;
 					gigaAttack = gigaAttackSelected switch {
-						1 => new CFlasher(),
+						1 => new Messenkou(),
 						2 => new RekkohaWeapon(),
 						_ => new RakuhouhaWeapon(),
 					};
@@ -466,25 +466,7 @@ public class PunchyZero : Character {
 			if (gigaAttack.shootCooldown > 0 || gigaAttack.ammo < gigaAttack.getAmmoUsage(0)) {
 				return false;
 			}
-			if (gigaAttack is RekkohaWeapon) {
-				gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-				changeState(new PunchyZeroRekkohaState(gigaAttack), true);
-			} else if (gigaAttack is RakuhouhaWeapon) {
-				gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-				changeState(new PunchyZeroRakuhouhaState(gigaAttack), true);
-			}
-			else if (gigaAttack is CFlasher) {
-				gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-				changeState(new PunchyZeroCFlasherState(gigaAttack), true);
-			}
-			else if (gigaAttack is ShinMessenkou) {
-				gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-				changeState(new PunchyZeroShinMessenkouState(gigaAttack), true);
-			}
-			else if (gigaAttack is DarkHoldWeapon) {
-				gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-				changeState(new PunchyZeroDarkHoldShootState(gigaAttack), true);
-			}
+			gigaAttack.shoot(this, []);
 			return true;
 		}
 		if (isDashing) {
@@ -842,7 +824,7 @@ public class PunchyZero : Character {
 						gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
 						changeState(new PunchyZeroRakuhouhaState(gigaAttack), true);
 					}
-					else if (gigaAttack is CFlasher) {
+					else if (gigaAttack is Messenkou) {
 						gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
 						changeState(new PunchyZeroCFlasherState(gigaAttack), true);
 					}
@@ -883,7 +865,7 @@ public class PunchyZero : Character {
 								gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
 								changeState(new PunchyZeroRekkohaState(gigaAttack), true);
 								break;
-							case CFlasher when gigaAttack.ammo >= 7:
+							case Messenkou when gigaAttack.ammo >= 7:
 								gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
 								changeState(new PunchyZeroCFlasherState(gigaAttack), true);
 								break;

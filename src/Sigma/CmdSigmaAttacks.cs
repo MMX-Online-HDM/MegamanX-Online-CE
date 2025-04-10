@@ -59,7 +59,7 @@ public class SigmaSlashStateAir : CharState {
 		if (character.frameIndex >= 2 && !fired) {
 			fired = true;
 			character.playSound("sigmaSaber", sendRpc: true);
-			Point off = new Point(20, -30);
+			Point off = new Point(24, -22);
 			new SigmaSlashProj(
 				character.pos.addxy(off.x * character.xDir, off.y), character.xDir,
 				Sigma, player, player.getNextActorNetId(), 3, 13, rpc: true
@@ -90,7 +90,7 @@ public class SigmaSlashStateDash : CharState {
 		if (character.frameIndex >= 2 && !fired) {
 			fired = true;
 			character.playSound("sigmaSaber", sendRpc: true);
-			Point off = new Point(30, -20);
+			Point off = new Point(26, -22);
 			new SigmaSlashProj(
 				character.pos.addxy(off.x * character.xDir, off.y), character.xDir,
 				Sigma, player, player.getNextActorNetId(), 4, 26, rpc: true
@@ -167,7 +167,7 @@ public class SigmaSlashProj : Projectile {
 		damager.hitCooldown = 30;
 		reflectable = false;
 		setIndestructableProperties();
-		maxTime = 0.1f;
+		maxTime = 10f / 60f;
 		projId = (int)ProjIds.SigmaSlash;
 		isMelee = true;
 		if (rpc) {
@@ -182,6 +182,16 @@ public class SigmaSlashProj : Projectile {
 			args.pos, args.xDir, args.owner, args.player, args.netId
 		);
 	}
+
+	public override void preUpdate() {
+		base.preUpdate();
+		if (frameIndex % 2 == 1) {
+			alpha = 0.125f;
+		} else {
+			alpha = 1f;
+		}
+	}
+
 	public override void postUpdate() {
 		base.postUpdate();
 		if (owner?.character != null) {

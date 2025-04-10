@@ -443,10 +443,9 @@ public class ServerClient {
 						packetsReceived++;
 						continue;
 					}
-					ushort channel = im.ReadUInt16(); // Channel data. Not needed for recieving.
 
 					if (!rpcTemplate.isString) {
-						ushort argCount = im.ReadUInt16();
+						ushort argCount = BitConverter.ToUInt16(im.ReadBytes(2));
 						var bytes = im.ReadBytes(argCount);
 						if (invokeRpcs && Global.level != null) {
 							if (rpcTemplate.isServerMessage || rpcTemplate.levelless) {
