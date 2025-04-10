@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 namespace MMXOnline;
 
 public class SigmaSlashWeapon : Weapon {
@@ -8,17 +8,14 @@ public class SigmaSlashWeapon : Weapon {
 		killFeedIndex = 9;
 	}
 }
+
 public class SigmaSlashStateGround : CharState {
 	bool fired;
 	public CmdSigma Sigma = null!;
 	public SigmaSlashStateGround() : base("attack") {
-		useDashJumpSpeed = true;
 		airMove = true;
-		canJump = true;
-		canStopJump = true;
-		landSprite = "attack";
-		airSprite = "attack_air";
 	}
+
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		Sigma = player.character as CmdSigma ?? throw new NullReferenceException();
@@ -46,15 +43,16 @@ public class SigmaSlashStateAir : CharState {
 	public SigmaSlashStateAir() : base("attack_air") {
 		useDashJumpSpeed = true;
 		airMove = true;
-		canJump = true;
 		canStopJump = true;
 		landSprite = "attack";
 		airSprite = "attack_air";
 	}
+
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		Sigma = player.character as CmdSigma ?? throw new NullReferenceException();
 	}
+
 	public override void update() {
 		if (character.frameIndex >= 2 && !fired) {
 			fired = true;
@@ -71,6 +69,7 @@ public class SigmaSlashStateAir : CharState {
 		base.update();
 	}
 }
+
 public class SigmaSlashStateDash : CharState {
 	bool fired;
 	public CmdSigma Sigma = null!;
@@ -79,13 +78,13 @@ public class SigmaSlashStateDash : CharState {
 		airMove = true;
 		canJump = true;
 		canStopJump = true;
-		landSprite = "attack";
-		airSprite = "attack_dash";
 	}
+
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		Sigma = player.character as CmdSigma ?? throw new NullReferenceException();
 	}
+
 	public override void update() {
 		if (character.frameIndex >= 2 && !fired) {
 			fired = true;
