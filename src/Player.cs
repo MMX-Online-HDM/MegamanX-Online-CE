@@ -1602,7 +1602,7 @@ public partial class Player {
 		// Speed and state.
 		if (retChar.charId != CharIds.KaiserSigma) {
 			if (character.charState.canStopJump && !character.charState.stoppedJump) {
-				retChar.changeState(new Jump(), true);
+				retChar.changeState(retChar.getJumpState(), true);
 			} else {
 				retChar.changeToIdleOrFall();
 			}
@@ -1715,7 +1715,7 @@ public partial class Player {
 
 			character.grounded = oldChar.grounded;
 			if (oldChar.charState.canStopJump && !oldChar.grounded) {
-				character.changeState(new Jump(), true);
+				character.changeState(character.getJumpState(), true);
 			} else {
 				character.changeToIdleOrFall();
 			}

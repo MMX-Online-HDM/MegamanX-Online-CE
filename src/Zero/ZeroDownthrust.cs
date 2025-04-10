@@ -149,7 +149,7 @@ public class ZeroDownthrust : CharState {
 				character.vel.y = Physics.JumpSpeed;
 				quakeBlazerBounces++;
 			}
-			character.changeState(new Fall(), true);
+			character.changeState(character.getFallState(), true);
 		}
 	}
 

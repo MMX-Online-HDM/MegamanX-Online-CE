@@ -100,6 +100,9 @@ public class Zero : Character {
 		altSoundId = AltSoundIds.X3;
 	}
 
+	// State overdrive.
+	public override CharState getAirJumpState() => new Jump() { sprite = "kuuenbu" };
+
 	public override void preUpdate() {
 		base.preUpdate();
 		if (grounded && charState is not ZeroUppercut) {

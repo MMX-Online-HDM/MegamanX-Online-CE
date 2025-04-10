@@ -199,7 +199,7 @@ public partial class Character : Actor, IDamagable {
 
 		if (ownedByLocalPlayer) {
 			if (isWarpIn) { initialCharState = new WarpIn(); }
-			else { initialCharState = new Idle(); }
+			else { initialCharState = getIdleState(); }
 		} else {
 			initialCharState = new NetLimbo();
 			useGravity = false;
@@ -457,7 +457,7 @@ public partial class Character : Actor, IDamagable {
 		if (isPushImmune()) return;
 
 		if (isClimbingLadder()) {
-			setFall();
+			changeState(getFallState());
 		} else {
 			float modifier = 1;
 			if (grounded) modifier = 0.5f;
@@ -604,6 +604,12 @@ public partial class Character : Actor, IDamagable {
 		}
 		return true;
 	}
+
+	public virtual CharState getIdleState() => new Idle();
+	public virtual CharState getRunState(bool skipInto = false) => new Run();
+	public virtual CharState getJumpState() => new Jump();
+	public virtual CharState getAirJumpState() => new Jump();
+	public virtual CharState getFallState() => new Fall();
 
 	public virtual float getRunSpeed() {
 		return Physics.WalkSpeed * getRunDebuffs();
@@ -783,7 +789,7 @@ public partial class Character : Actor, IDamagable {
 		if (ownedByLocalPlayer && other.gameObject is Flag flag && flag.alliance != player.alliance) {
 			if (!Global.level.players.Any(p => p != player && p.character?.flag == flag)) {
 				if (charState is SpeedBurnerCharState || charState is SigmaWallDashState || charState is FSplasherState) {
-					changeState(new Fall(), true);
+					changeState(getFallState(), true);
 				}
 			}
 		}
@@ -1100,7 +1106,7 @@ public partial class Character : Actor, IDamagable {
 			landingCode();
 		}
 		if (charState.exitOnAirborne && !grounded) {
-			changeState(new Fall());
+			changeState(getFallState());
 		}
 		if (canWallClimb() &&
 			!grounded && vel.y >= 0 &&
@@ -1224,7 +1230,7 @@ public partial class Character : Actor, IDamagable {
 				if (isDashing) {
 					dashedInAir++;
 				}
-				changeState(new Jump());
+				changeState(getJumpState());
 				return true;
 			} else if (player.dashPressed(out string dashControl) && canDash()) {
 				changeState(new Dash(dashControl), true);
@@ -1236,7 +1242,7 @@ public partial class Character : Actor, IDamagable {
 				canEjectFromRideArmor()
 			  ) {
 				getOffMK5Platform();
-				changeState(new Jump());
+				changeState(getJumpState());
 				return true;
 			}
 			if (player.isCrouchHeld() && canCrouch() && charState is not Crouch) {
@@ -1267,7 +1273,7 @@ public partial class Character : Actor, IDamagable {
 					dashedInAir++;
 					kuuenbuJump++;
 					vel.y = -getJumpPower();
-					changeState(new Jump(), true);
+					changeState(getAirJumpState(), true);
 					return true;
 				}
 			} else {
@@ -1696,10 +1702,6 @@ public partial class Character : Actor, IDamagable {
 		return this;
 	}
 
-	public void setFall() {
-		changeState(new Fall());
-	}
-
 	public bool isClimbingLadder() {
 		return charState is LadderClimb;
 	}
@@ -1778,13 +1780,18 @@ public partial class Character : Actor, IDamagable {
 		string transShootSprite = ""
 	) {
 		if (grounded) {
-			changeState(new Idle(transitionSprite, transShootSprite), true);
+			CharState idleState = getIdleState();
+			idleState.transitionSprite = transitionSprite;
+			idleState.transShootSprite = transShootSprite;
+			changeState(idleState, true);
 		} else {
 			if (vel.y * gravityModifier < 0 && charState.canStopJump && !charState.stoppedJump) {
-				changeState(new Jump() { enterSound = "" }, true);
+				CharState jumpState = getJumpState();
+				jumpState.enterSound = "";
+				changeState(jumpState, true);
 				frameIndex = sprite.totalFrameNum - 1;
 			} else {
-				changeState(new Fall(), true);
+				changeState(getFallState(), true);
 			}
 		}
 	}
@@ -1794,10 +1801,12 @@ public partial class Character : Actor, IDamagable {
 			landingCode(useSound);
 		} else {
 			if (vel.y * gravityModifier < 0 && charState.canStopJump && !charState.stoppedJump) {
-				changeState(new Jump() { enterSound = "" }, true);
+				CharState jumpState = getJumpState();
+				jumpState.enterSound = "";
+				changeState(jumpState, true);
 				frameIndex = sprite.totalFrameNum - 1;
 			} else {
-				changeState(new Fall(), true);
+				changeState(getFallState(), true);
 			}
 		}
 	}
@@ -1807,10 +1816,12 @@ public partial class Character : Actor, IDamagable {
 			changeState(new Crouch(), true);
 		} else {
 			if (vel.y * gravityModifier < 0 && charState.canStopJump && !charState.stoppedJump) {
-				changeState(new Jump() { enterSound = "" }, true);
+				CharState jumpState = getJumpState();
+				jumpState.enterSound = "";
+				changeState(jumpState, true);
 				frameIndex = sprite.totalFrameNum - 1;
 			} else {
-				changeState(new Fall(), true);
+				changeState(getFallState(), true);
 			}
 		}
 	}
@@ -1824,10 +1835,13 @@ public partial class Character : Actor, IDamagable {
 			player.input.isHeld(Control.Left, player) ||
 			player.input.isHeld(Control.Right, player)
 		)) {
-			changeState(new Run());
+			changeState(getRunState(true));
 			return;
 		}
-		changeState(new Idle("land", "land_shoot"), true);
+		CharState idleState = getIdleState();
+		idleState.transitionSprite = "land";
+		idleState.transShootSprite = "land_shoot";
+		changeState(idleState, true);
 	}
 
 	public virtual bool changeState(CharState newState, bool forceChange = false) {

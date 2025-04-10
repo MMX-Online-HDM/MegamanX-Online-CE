@@ -1039,7 +1039,7 @@ public class RideArmor : Actor, IDamagable {
 
 		if (character != null && !(character.charState is Die)) {
 			if (!ownedByMK5) {
-				character.changeState(new Fall(), true);
+				character.changeState(character.getFallState(), true);
 				character.changePos(pos.addxy(0, -10));
 			}
 
@@ -1372,7 +1372,7 @@ public class RADeactive : RideArmorState {
 	public override void onEnter(RideArmorState? oldState) {
 		base.onEnter(oldState);
 		if (rideArmor.character != null) {
-			rideArmor.character.changeState(new Fall(), true);
+			rideArmor.character.changeState(character.getFallState(), true);
 			rideArmor.removeCharacter();
 		}
 		rideArmor.consecutiveJumpTimeout = 0;
@@ -1920,7 +1920,7 @@ public class RACalldown : RideArmorState {
 		rideArmor.useGravity = false;
 		origYPos = rideArmor.pos.y;
 		if (rideArmor.character != null && !rideArmor.ownedByMK5 && (rideArmor.character as Vile)?.isVileMK5 != true) {
-			rideArmor.character.changeState(new Fall(), false);
+			rideArmor.character.changeState(rideArmor.character.getFallState(), false);
 			rideArmor.character.changePos(rideArmor.pos.addxy(0, -10));
 			rideArmor.removeCharacter();
 		}
@@ -2240,7 +2240,7 @@ public class InRideArmor : CharState {
 		if (ejectInput) {
 			if (character.canEjectFromRideArmor()) {
 				character.vel.y = -character.getJumpPower();
-				character.changeState(new Jump(), true);
+				character.changeState(character.getJumpState(), true);
 			}
 		}
 	}

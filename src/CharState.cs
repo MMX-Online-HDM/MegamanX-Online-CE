@@ -271,33 +271,13 @@ public class CharState {
 		}
 	}
 
-	public void landingCode() {
-		character.playSound("land", sendRpc: true);
-		character.dashedInAir = 0;
-		changeToIdle();
-		if (character.ai != null) {
-			character.ai.jumpTime = 0;
-		}
-	}
-
 	public void groundCodeWithMove() {
 		if (character.canTurn()) {
 			if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
 				if (player.input.isHeld(Control.Left, player)) character.xDir = -1;
 				if (player.input.isHeld(Control.Right, player)) character.xDir = 1;
-				if (character.canMove()) character.changeState(new Run());
+				if (character.canMove()) character.changeState(character.getRunState());
 			}
-		}
-	}
-
-	public void changeToIdle(string ts = "") {
-		if (character.grounded && (
-			player.input.isHeld(Control.Left, player) ||
-			player.input.isHeld(Control.Right, player)
-		)) {
-			character.changeState(new Run());
-		} else {
-			character.changeToIdleOrFall(ts);
 		}
 	}
 
@@ -557,11 +537,7 @@ public class WarpOut : CharState {
 }
 
 public class Idle : CharState {
-	public Idle(
-		string transitionSprite = "", string transShootSprite = ""
-	) : base(
-		"idle", "shoot", "attack", transitionSprite, transShootSprite
-	) {
+	public Idle() : base("idle", "shoot", "attack") {
 		exitOnAirborne = true;
 		attackCtrl = true;
 		normalCtrl = true;
@@ -588,7 +564,7 @@ public class Idle : CharState {
 			if (!character.isSoftLocked() && character.canTurn()) {
 				if (player.input.isHeld(Control.Left, player)) character.xDir = -1;
 				if (player.input.isHeld(Control.Right, player)) character.xDir = 1;
-				if (character.canMove()) character.changeState(new Run());
+				if (character.canMove()) character.changeState(character.getRunState());
 			}
 		}
 
@@ -756,21 +732,9 @@ public class Jump : CharState {
 		base.update();
 		if (character.vel.y > 0) {
 			if (character.sprite.name.EndsWith("cannon_air") == false) {
-				character.changeState(new Fall());
+				character.changeState(character.getFallState());
 			}
 			return;
-		}
-		if (character is Zero zero) {
-			if (zero.kuuenbuJump >= 1) {
-				zero.kuuenbuJump = 0;
-				character.changeSpriteFromName("kuuenbu", true);
-			}
-		}
-		if (character is PunchyZero pzero) {
-			if (pzero.kuuenbuJump >= 1) {
-				pzero.kuuenbuJump = 0;
-				character.changeSpriteFromName("kuuenbu", true);
-			}
 		}
 	}
 }
@@ -866,7 +830,7 @@ public class Dash : CharState {
 		// End move.
 		else if (stop && inputXDir != 0) {
 			character.move(new Point(character.getRunSpeed() * inputXDir, 0));
-			character.changeState(new Run(), true);
+			character.changeState(character.getRunState(true), true);
 			return;
 		}
 		// Speed at start and end.
@@ -1101,11 +1065,11 @@ public class WallSlide : CharState {
 				var hitWall = hit?.gameObject as Wall;
 
 				if (wallDir != player.input.getXDir(player)) {
-					character.changeState(new Fall());
+					character.changeState(character.getFallState());
 				} else if (hitWall == null || !hitWall.collider.isClimbable) {
 					var hitActor = hit?.gameObject as Actor;
 					if (hitActor == null || !hitActor.isPlatform) {
-						character.changeState(new Fall());
+						character.changeState(character.getFallState());
 					}
 				}
 			}
@@ -1190,7 +1154,7 @@ public class WallKick : CharState {
 	public override void update() {
 		base.update();
 		if (character.vel.y > 0) {
-			character.changeState(new Fall());
+			character.changeState(character.getFallState());
 		}
 	}
 }
@@ -1271,7 +1235,7 @@ public class LadderClimb : CharState {
 					character.changeState(new LadderEnd(targetY));
 				}
 			} else {
-				character.changeState(new Fall());
+				character.changeState(character.getFallState());
 			}
 		} else if (!player.isAI && player.input.isPressed(Control.Jump, player)) {
 			if (!isAttacking) {
@@ -1286,7 +1250,7 @@ public class LadderClimb : CharState {
 
 	// AI should call this manually when they want to drop from a ladder
 	public void dropFromLadder() {
-		character.changeState(new Fall());
+		character.changeState(character.getFallState());
 	}
 }
 

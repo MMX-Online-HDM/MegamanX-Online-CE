@@ -72,6 +72,14 @@ public class PunchyZero : Character {
 		altSoundId = AltSoundIds.X3;
 	}
 
+	public override CharState getAirJumpState() => new Jump() { sprite = "kuuenbu" };
+	public override CharState getJumpState() {
+		if (isDashing) {
+			return new Jump() { sprite = "kuuenbu" };
+		}
+		return new Jump();
+	}
+
 	public override void update() {
 		if (isAwakened) {
 			updateAwakenedAura();

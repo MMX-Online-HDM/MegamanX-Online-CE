@@ -40,10 +40,10 @@ public class BaseSigma : Character {
 			} else if (isWarpIn) {
 				intialCharState = new WarpIn();
 			} else {
-				intialCharState = new Idle();
+				intialCharState = getIdleState();
 			}
 		} else {
-			intialCharState = new Idle();
+			intialCharState =  getIdleState();
 		}
 		changeState(intialCharState);
 	}

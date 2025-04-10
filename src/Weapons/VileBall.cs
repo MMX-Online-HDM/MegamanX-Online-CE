@@ -311,7 +311,7 @@ public class AirBombAttack : CharState {
 		base.update();
 		if (vile.grenadeWeapon.type == (int)VileBallType.ExplosiveRound) {
 			if (bombNum > 0 && player.input.isPressed(Control.Special1, player)) {
-				character.changeState(new Fall(), true);
+				character.changeState(character.getFallState(), true);
 				return;
 			}
 			if (stateTime > 0f && bombNum == 0) {
@@ -363,7 +363,7 @@ public class AirBombAttack : CharState {
 		var inputDir = player.input.getInputDir(player);
 		if (inputDir.x == 0) inputDir.x = character.xDir;
 		if (!vile.tryUseVileAmmo(8)) {
-			character.changeState(new Fall(), true);
+			character.changeState(character.getFallState(), true);
 			return;
 		}
 		bombNum++;

@@ -64,7 +64,7 @@ public class XHover : CharState {
 		if (hoverTime > 2 || player.input.checkDoubleTap(Control.Dash) ||
 			stateFrames > 12 && player.input.isPressed(Control.Jump, player)
 		) {
-			character.changeState(new Fall(), true);
+			character.changeState(character.getFallState(), true);
 		}
 	}
 
@@ -134,7 +134,7 @@ public class LightDash : CharState {
 		// End move.
 		else if (stop && inputXDir != 0) {
 			character.move(new Point(character.getRunSpeed() * inputXDir * 1.15f, 0));
-			character.changeState(new Run(), true);
+			character.changeState(character.getRunState(), true);
 			return;
 		}
 		// Speed at start and end.
@@ -344,7 +344,10 @@ public class UpDash : CharState {
 		int currentFrame = character.frameIndex;
 		float currentFrameTime = character.frameTime;
 
-		character.changeState(new Fall() { transitionSprite = spriteName, sprite = spriteName });
+		CharState fallState = character.getFallState();
+		fallState.transitionSprite = spriteName;
+		fallState.sprite = spriteName;
+		character.changeState(fallState);
 		if (animOver) {
 			if (character.shootAnimTime > 0) {
 				character.changeSpriteFromName("fall_shoot", true);
