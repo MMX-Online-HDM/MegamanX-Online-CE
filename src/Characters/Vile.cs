@@ -232,7 +232,7 @@ public class Vile : Character {
 			airDownAttacks();
 		}
 		if (shootHeld && cannonWeapon.type > -1) {
-			if (cutterWeapon.shootCooldown < cutterWeapon.fireRate * 0.75f) 
+			if (cannonWeapon.shootCooldown < cannonWeapon.fireRate * 0.75f) 
 				cannonWeapon.vileShoot(0, this);
 		}
 		if (WeaponRightHeld && vulcanWeapon.type > -3) {
@@ -241,7 +241,6 @@ public class Vile : Character {
 		return base.attackCtrl();
 	}
 	public bool normalAttacks() {
-		bool dashorairdash = charState is Dash || charState is AirDash;
 		bool LeftorRightHeld = player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player);
 		bool UpHeld = player.input.isHeld(Control.Up, player);
 		if (charState is Crouch) {
@@ -256,8 +255,7 @@ public class Vile : Character {
 		}
 		if (!UpHeld && missileWeapon.type > -1)
 		 {
-			if (!grounded && 
-			(grenadeWeapon.shootCooldown > 0 || flamethrowerWeapon.shootCooldown > 0)
+			if (!grounded && grenadeWeapon.type == -2 && flamethrowerWeapon.type == -1
 			) {
 				missileWeapon.vileShoot(WeaponIds.ElectricShock, this);
 			} if (grounded) {
@@ -266,8 +264,7 @@ public class Vile : Character {
 			return true;			
 		}
 		if (UpHeld && cutterWeapon.type > -1) {
-			if (!grounded && 
-				(grenadeWeapon.shootCooldown > 0 || flamethrowerWeapon.shootCooldown > 0)
+			if (!grounded && grenadeWeapon.type == -2 && flamethrowerWeapon.type == -1
 			) {
 				cutterWeapon.vileShoot(WeaponIds.VileCutter, this);
 			} if (grounded) {
