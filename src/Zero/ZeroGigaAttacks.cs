@@ -818,6 +818,7 @@ public class DarkHoldShootState : CharState {
 		}
 
 		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
 			return;
 		}
 	}
