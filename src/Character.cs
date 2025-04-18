@@ -752,7 +752,7 @@ public partial class Character : Actor, IDamagable {
 				return;
 			}
 			if (!killZone.killInvuln && this is KaiserSigma) return;
-			if (!killZone.killInvuln && this is MegamanX { stingActiveTime: >0 } ) return;
+			if (!killZone.killInvuln && this is MegamanX { stingActiveTime: > 0 } ) return;
 			if (!killZone.killInvuln && this is Axl { stealthActive: true} ) return;
 			if (rideArmor != null && rideArmor.rideArmorState is RADropIn) return;
 			killZone.applyDamage(this);
