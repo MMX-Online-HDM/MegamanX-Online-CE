@@ -28,7 +28,7 @@ public class ViralSigma : Character {
 		Player player, float x, float y, int xDir, bool isVisible,
 		ushort? netId, bool ownedByLocalPlayer, bool isWarpIn = false
 	) : base(
-		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, false, false
+		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn
 	) { 
 		charId = CharIds.WolfSigma;
 		altSoundId = AltSoundIds.X2;
