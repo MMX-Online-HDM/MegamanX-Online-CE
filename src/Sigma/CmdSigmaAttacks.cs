@@ -74,9 +74,7 @@ public class SigmaSlashStateDash : CharState {
 	bool fired;
 	public CmdSigma Sigma = null!;
 	public SigmaSlashStateDash() : base("attack_dash") {
-		useDashJumpSpeed = true;
 		airMove = true;
-		canJump = true;
 		canStopJump = true;
 	}
 
@@ -441,7 +439,7 @@ public class SigmaWallDashState : CharState {
 		character.move(vel);
 
 		if (stateTime > 0.7f) {
-			character.changeState(new Fall(), true);
+			character.changeState(character.getFallState(), true);
 		}
 		if (player.input.isPressed(Control.Shoot, player) &&
 			!fired && Sigma.saberCooldown == 0 && character.invulnTime == 0

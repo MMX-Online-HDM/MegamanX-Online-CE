@@ -109,7 +109,7 @@ public class Axl : Character {
 		bool isWarpIn = true
 	) : base(
 		player, x, y, xDir, isVisible,
-		netId, ownedByLocalPlayer, isWarpIn, false, false
+		netId, ownedByLocalPlayer, isWarpIn
 	) {
 		charId = CharIds.Axl;
 		iceGattlingSound = new LoopingSound("iceGattlingLoopStart", "iceGattlingLoopStop", "iceGattlingLoop", this);

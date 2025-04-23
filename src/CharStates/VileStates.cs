@@ -83,12 +83,12 @@ public class VileRevive : CharState {
 		if (character.ownedByLocalPlayer) {
 			if (character.isAnimOver()) {
 				setFlags();
-				character.changeState(new Fall(), true);
+				character.changeState(character.getFallState(), true);
 			}
 		} else if (character?.sprite?.name != null) {
 			if (!character.sprite.name.EndsWith("_revive") && !character.sprite.name.EndsWith("_revive_to5") && radius <= 0) {
 				setFlags();
-				character.changeState(new Fall(), true);
+				character.changeState(character.getFallState(), true);
 			}
 		}
 	}

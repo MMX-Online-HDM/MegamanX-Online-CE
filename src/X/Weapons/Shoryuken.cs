@@ -70,7 +70,7 @@ public class Shoryuken : CharState {
 		if (wallAbove != null && wallAbove.gameObject is Wall) {
 			timeInWall += Global.spf;
 			if (timeInWall > 0.2f) {
-				character.changeState(new Fall());
+				character.changeState(character.getFallState());
 				return;
 			}
 		}

@@ -99,12 +99,12 @@ public class CmdSigma : BaseSigma {
 				return true;
 			}
 			if (grounded) {
-				/*if (isDashing && sprite.name != getSprite("dash_end") && dashSlashCooldown <= 0) {
-					slideVel = getDashSpeed() * 0.9f * xDir;
+				if (isDashing && sprite.name != getSprite("dash_end") && dashSlashCooldown <= 0) {
+					slideVel = getDashSpeed() * 0.7f * xDir;
 					dashSlashCooldown = 90;
 					changeState(new SigmaSlashStateDash(), true);
 					return true;
-				}*/
+				}
 				changeState(new SigmaSlashStateGround(), true);
 				return true;
 			}

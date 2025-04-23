@@ -289,7 +289,7 @@ public class SigmaUpDownSlashState : CharState {
 			Global.level.checkTerrainCollisionOnce(character, moveAmount.x, moveAmount.y, moveAmount) != null
 		) {
 			character.changeState(
-				character.grounded ? new SigmaCooldownState("downslash_land") : new Fall(), true
+				character.grounded ? new SigmaCooldownState("downslash_land") : character.getFallState(), true
 			);
 			return;
 		}

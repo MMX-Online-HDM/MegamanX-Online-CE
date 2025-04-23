@@ -191,7 +191,7 @@ public class FlameBurnerAltProj : Projectile {
 			actor.vel.y += pushVel.y * modifier;
 			if (damagable is Character character) {
 				if (character.charState.normalCtrl && character.charState is not Fall or Jump) {
-					character.changeState(new Fall());
+					character.changeState(character.getFallState());
 				}
 				else if (character.charState.canStopJump) {
 					character.charState.stoppedJump = true;

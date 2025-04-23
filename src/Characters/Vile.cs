@@ -54,7 +54,7 @@ public class Vile : Character {
 		bool isWarpIn = true, bool mk2VileOverride = false, bool mk5VileOverride = false
 	) : base(
 		player, x, y, xDir, isVisible,
-		netId, ownedByLocalPlayer, isWarpIn, false, false
+		netId, ownedByLocalPlayer, isWarpIn
 	) {
 		charId = CharIds.Vile;
 		if (isWarpIn) {

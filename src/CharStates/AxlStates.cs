@@ -92,7 +92,7 @@ public class Hover : CharState {
 		if ((hoverTime > 2 && !axl.isWhiteAxl()) ||
 			!character.player.input.isHeld(Control.Jump, character.player)
 		) {
-			character.changeState(new Fall(), true);
+			character.changeState(character.getFallState(), true);
 		}
 	}
 

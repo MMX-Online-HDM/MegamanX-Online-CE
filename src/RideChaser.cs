@@ -720,7 +720,7 @@ public class InRideChaser : CharState {
 			if (ejectInput && !character.rideChaser.isTurning) {
 				character.vel.y = -character.getJumpPower();
 				character.incPos(new Point(0, -5));
-				character.changeState(new Jump(), true);
+				character.changeState(character.getJumpState(), true);
 			}
 		}
 

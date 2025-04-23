@@ -21,6 +21,8 @@ dotnet_diagnostic.IDE0090.severity = none
 [*.cs]
 # Disable "can be static" on Linter.
 dotnet_diagnostic.CA1822.severity = none
+# Allow folder difer from namespace.
+dotnet_style_namespace_match_folder = false
 # Allow visible non-constant fields.
 dotnet_diagnostic.CA2211.severity = none
 # Stop warning of "unused objects" that are actually used.

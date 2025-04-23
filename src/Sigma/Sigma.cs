@@ -21,7 +21,7 @@ public class BaseSigma : Character {
 		bool isWarpIn = true
 	) : base(
 		player, x, y, xDir, isVisible,
-		netId, ownedByLocalPlayer, isWarpIn, false, false
+		netId, ownedByLocalPlayer, isWarpIn
 	) {
 		charId = CharIds.Sigma;
 		// Special Sigma-only colider.
@@ -40,10 +40,10 @@ public class BaseSigma : Character {
 			} else if (isWarpIn) {
 				intialCharState = new WarpIn();
 			} else {
-				intialCharState = new Idle();
+				intialCharState = getIdleState();
 			}
 		} else {
-			intialCharState = new Idle();
+			intialCharState =  getIdleState();
 		}
 		changeState(intialCharState);
 	}

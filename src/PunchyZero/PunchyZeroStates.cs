@@ -177,7 +177,7 @@ public class PZeroDiveKickState : CharState {
 			character, character.vel.x * Global.spf, character.vel.y * Global.spf
 		);
 		if (hit?.isSideWallHit() == true) {
-			character.changeState(new Fall(), true);
+			character.changeState(character.getFallState(), true);
 			return;
 		} else if (hit != null) {
 			stuckTime += Global.speedMul;
@@ -408,7 +408,7 @@ public class PZeroShoryuken : CharState {
 		if (wallAbove != null && wallAbove.gameObject is Wall) {
 			timeInWall += Global.speedMul;
 			if (timeInWall >= 6) {
-				character.changeState(new Fall());
+				character.changeState(character.getFallState());
 				return;
 			}
 		}
@@ -422,7 +422,7 @@ public class PZeroShoryuken : CharState {
 		}
 
 		if (character.isAnimOver()) {
-			character.changeState(new Fall());
+			character.changeState(character.getFallState());
 		}
 	}
 

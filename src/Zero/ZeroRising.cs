@@ -158,7 +158,7 @@ public class ZeroUppercut : CharState {
 		if (wallAbove != null && wallAbove.gameObject is Wall) {
 			timeInWall += Global.spf;
 			if (timeInWall > 0.1f) {
-				character.changeState(new Fall());
+				character.changeState(character.getFallState());
 				return;
 			}
 		}
@@ -178,7 +178,7 @@ public class ZeroUppercut : CharState {
 		}
 
 		if (character.isAnimOver()) {
-			character.changeState(new Fall());
+			character.changeState(character.getFallState());
 		}
 	}
 

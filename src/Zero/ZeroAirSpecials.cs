@@ -125,14 +125,14 @@ public class FSplasherState : CharState {
 		}
 		CollideData? collideData = Global.level.checkTerrainCollisionOnce(character, character.xDir, upSpeed);
 		if (collideData != null) {
-			character.changeState(new Fall(), true);
+			character.changeState(character.getFallState(), true);
 			return;
 		}
 
 		float modifier = 1f;
 		dashTime += Global.spf;
 		if (dashTime > 0.6) {
-			character.changeState(new Fall());
+			character.changeState(character.getFallState());
 			return;
 		}
 
@@ -251,7 +251,7 @@ public class HyorogaState : CharState {
 			character.changeState(new HyorogaStateB(), true);	
 		}
 		if (player.input.isPressed(Control.Jump, player)) {
-			character.changeState(new Fall(), true);
+			character.changeState(character.getFallState(), true);
 		}
 		character.turnToInput(player.input, player);
 	}	
