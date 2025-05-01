@@ -1075,6 +1075,9 @@ public class Damager {
 		if (projId == null) {
 			return false;
 		}
+		if (Global.level.server?.customMatchSettings?.Assistable == false) {
+			return false;		
+		}
 		// Never assist in any mode as they are DOT or self-damage. (Also Volt Tornado)
 		bool alwaysNotAssist = (ProjIds)projId switch {
 			ProjIds.Burn => true,

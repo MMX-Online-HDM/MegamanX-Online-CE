@@ -21,6 +21,8 @@ public class CustomMatchSettings {
 	[ProtoMember(13)] public int respawnTime;
 	[ProtoMember(14)] public bool pickupItems;
 	[ProtoMember(15)] public int SubtankGain;
+	[ProtoMember(16)] public int AssistTime;
+	[ProtoMember(16)] public bool Assistable;
 
 	public CustomMatchSettings() {
 	}
@@ -43,21 +45,28 @@ public class CustomMatchSettings {
 			respawnTime = 5,
 			pickupItems = true,
 			SubtankGain = 3,
+			AssistTime = 2,
+			Assistable = true,
 		};
 	}
 }
 
 public class CustomMatchSettingsMenu : IMainMenu {
 	public int selectArrowPosY;
+	public int selectArrowPosY2;
 	public const int startX = 30;
 	public int startY = 40;
 	public const int lineH = 10;
+	public const int startX2 = 30;
+	public int startY2 = 40;
+	public const int lineH2 = 10;
 	public const uint fontSize = 24;
 	public IMainMenu prevMenu;
 	public bool inGame;
-	public int Page;
+	public int Page = 1;
 	public bool isOffline;
 	public List<MenuOption> menuOptions = new List<MenuOption>();
+	public List<MenuOption> menuOptions2 = new List<MenuOption>();
 
 	SavedMatchSettings savedMatchSettings { get { return isOffline ? SavedMatchSettings.mainOffline : SavedMatchSettings.mainOnline; } }
 
@@ -65,7 +74,9 @@ public class CustomMatchSettingsMenu : IMainMenu {
 		this.prevMenu = prevMenu;
 		this.inGame = inGame;
 		int currentY = startY;
+		int currentY2 = startY2;
 		this.isOffline = isOffline;
+		#region  Page 1
 		menuOptions.Add(
 			new MenuOption(
 				startX, currentY,
@@ -339,8 +350,11 @@ public class CustomMatchSettingsMenu : IMainMenu {
 				}
 			)
 		);
-		menuOptions.Add(
-				new MenuOption(startX, currentY += lineH,
+		#endregion
+		#region  Page 2
+		menuOptions2.Add(
+				new MenuOption(
+					startX2, currentY2,
 					() => {
 						Helpers.menuLeftRightInc(ref savedMatchSettings.customMatchSettings.SubtankGain, 1, 4, true);
 					},
@@ -349,11 +363,44 @@ public class CustomMatchSettingsMenu : IMainMenu {
 							FontType.Blue,
 							"SubTank Gain: " +
 							savedMatchSettings.customMatchSettings.SubtankGain.ToString(),
-							pos.x, pos.y, selected: selectArrowPosY == 15
+							pos.x, pos.y, selected: selectArrowPosY2 == 0
 						);
 					}
 				)
 			);
+		menuOptions2.Add(
+				new MenuOption(
+					startX2, currentY2 += lineH2,
+					() => {
+						Helpers.menuLeftRightInc(ref savedMatchSettings.customMatchSettings.AssistTime, 0, 5, true);
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							FontType.Blue,
+							"Assist Time: " +
+							savedMatchSettings.customMatchSettings.AssistTime.ToString(),
+							pos.x, pos.y, selected: selectArrowPosY2 == 1
+						);
+					}
+				)
+			);
+		menuOptions2.Add(
+			new MenuOption(
+				startX2, currentY2 += lineH2,
+				() => {
+					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.Assistable);
+				},
+				(Point pos, int index) => {
+					Fonts.drawText(
+						FontType.Blue,
+						"Unassistable List: " +
+						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.Assistable),
+						pos.x, pos.y, selected: selectArrowPosY2 == 2
+					);
+				}
+			)
+		);
+		#endregion
 	}
 
 	public string getSameCharString(int charNum) {
@@ -362,7 +409,18 @@ public class CustomMatchSettingsMenu : IMainMenu {
 	}
 
 	public void update() {
-		Helpers.menuUpDown(ref selectArrowPosY, 0, menuOptions.Count - 1);
+		if (Global.input.isPressedMenu(Control.Special1)) {
+			Page++;
+			if (Page > 2) Page = 1;
+		}
+		if (Page == 1) {
+			menuOptions[selectArrowPosY].update();
+			Helpers.menuUpDown(ref selectArrowPosY, 0, menuOptions.Count - 1);
+		} else if (Page == 2) {
+			menuOptions2[selectArrowPosY2].update();
+			Helpers.menuUpDown(ref selectArrowPosY2, 0, menuOptions2.Count - 1);
+		}
+
 		if (Global.input.isPressedMenu(Control.MenuBack)) {
 			if (savedMatchSettings.customMatchSettings.maxHeartTanks < savedMatchSettings.customMatchSettings.startHeartTanks) {
 				Menu.change(new ErrorMenu(new string[] { "Error: Max heart tanks can't be", "less than start heart tanks." }, this));
@@ -376,38 +434,64 @@ public class CustomMatchSettingsMenu : IMainMenu {
 
 			Menu.change(prevMenu);
 		}
-
-		menuOptions[selectArrowPosY].update();
 	}
 
 	public void render() {
-		if (!inGame) {
-			DrawWrappers.DrawTextureHUD(Global.textures["severbrowser"], 0, 0);
-			DrawWrappers.DrawTextureHUD(
-				Global.textures["cursor"], menuOptions[selectArrowPosY].pos.x - 8,
-				menuOptions[selectArrowPosY].pos.y - 1
-			);
-		} else {
-			DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
-			Global.sprites["cursor"].drawToHUD(
-				0, menuOptions[selectArrowPosY].pos.x - 8, menuOptions[selectArrowPosY].pos.y + 5
-			);
-		}
-
-		Fonts.drawText(
-			FontType.Yellow, "Custom Match Options",
-			Global.halfScreenW, 20, alignment: Alignment.Center
-		);
-
+		Cursor();
+		drawText();
 		int i = 0;
+		if (Page == 1)
 		foreach (var menuOption in menuOptions) {
 			menuOption.render(menuOption.pos, i);
 			i++;
 		}
-
-		Fonts.drawTextEX(
-			FontType.Grey, "[MLEFT]/[MRIGHT]: Change setting, [BACK]: Back",
-			Global.halfScreenW+60, Global.screenH - 26, Alignment.Center
+		if (Page == 2)
+		foreach (var menuOption2 in menuOptions2) {
+			menuOption2.render(menuOption2.pos, i);
+			i++;
+		}
+	}
+	public void drawText() {
+		Fonts.drawText(
+			FontType.Yellow, "Custom Match Options",
+			Global.halfScreenW, 20, alignment: Alignment.Center
 		);
+		Fonts.drawText(
+			FontType.Yellow, "Page: " + Page,
+			Global.halfScreenW+150, 20, alignment: Alignment.Center
+		);
+		Fonts.drawTextEX(
+			FontType.Grey, "[MLEFT]/[MRIGHT]: Change setting, [SPC]: Change Page, [BACK]: Back",
+			Global.halfScreenW-6, Global.screenH - 26, Alignment.Center
+		);
+	}
+	public void Cursor() {
+		if (Page == 1) {
+			if (!inGame) {
+				DrawWrappers.DrawTextureHUD(Global.textures["severbrowser"], 0, 0);
+				DrawWrappers.DrawTextureHUD(
+					Global.textures["cursor"], menuOptions[selectArrowPosY].pos.x - 8,
+					menuOptions[selectArrowPosY].pos.y - 1
+				);
+			} else {
+				DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
+				Global.sprites["cursor"].drawToHUD(
+					0, menuOptions[selectArrowPosY].pos.x - 8, menuOptions[selectArrowPosY].pos.y + 5
+				);
+			}
+		} else if (Page == 2) {
+			if (!inGame) {
+				DrawWrappers.DrawTextureHUD(Global.textures["severbrowser"], 0, 0);
+				DrawWrappers.DrawTextureHUD(
+					Global.textures["cursor"], menuOptions2[selectArrowPosY2].pos.x - 8,
+					menuOptions2[selectArrowPosY2].pos.y - 1
+				);
+			} else {
+				DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
+				Global.sprites["cursor"].drawToHUD(
+					0, menuOptions2[selectArrowPosY2].pos.x - 8, menuOptions2[selectArrowPosY2].pos.y + 5
+				);
+			}
+		}
 	}
 }
