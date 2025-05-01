@@ -117,7 +117,7 @@ public class LargeHealthPickup : Pickup {
 		owner, pos, "pickup_health_large", netId, ownedByLocalPlayer,
 		NetActorCreateId.LargeHealth, sendRpc: sendRpc
 	) {
-		healAmount = 8;
+		healAmount = Global.level?.server?.customMatchSettings?.LargeHealthPickup ?? 8;
 		pickupType = PickupType.Health;
 	}
 }
@@ -130,7 +130,7 @@ public class SmallHealthPickup : Pickup {
 		owner, pos, "pickup_health_small", netId, ownedByLocalPlayer,
 		NetActorCreateId.SmallHealth, sendRpc: sendRpc
 	) {
-		healAmount = 4;
+		healAmount = Global.level?.server?.customMatchSettings?.SmallHealthPickup ?? 4;
 		pickupType = PickupType.Health;
 	}
 }
@@ -143,7 +143,7 @@ public class LargeAmmoPickup : Pickup {
 		owner, pos, "pickup_ammo_large", netId, ownedByLocalPlayer,
 		NetActorCreateId.LargeAmmo, sendRpc: sendRpc
 	) {
-		healAmount = 50;
+		healAmount = Global.level?.server?.customMatchSettings?.LargeAmmoPickup ?? 50;
 		pickupType = PickupType.Ammo;
 	}
 }
@@ -156,7 +156,7 @@ public class SmallAmmoPickup : Pickup {
 		owner, pos, "pickup_ammo_small", netId, ownedByLocalPlayer,
 		NetActorCreateId.SmallAmmo, sendRpc: sendRpc
 	) {
-		healAmount = 25;
+		healAmount = Global.level?.server?.customMatchSettings?.SmallAmmoPickup ?? 25;
 		pickupType = PickupType.Ammo;
 	}
 }
