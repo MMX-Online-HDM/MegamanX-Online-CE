@@ -43,6 +43,12 @@ public class UpgradeMenu : IMainMenu {
 		}
 		return 2;
 	}
+	public static int getSubTankCost() {
+		if (Global.level.server?.customMatchSettings != null) {
+			return Global.level.server.customMatchSettings.SubTankCost;
+		}
+		return 4;
+	}
 
 	public static int getMaxHeartTanks() {
 		return Global.level.server?.customMatchSettings?.maxHeartTanks ?? 8;
@@ -139,8 +145,8 @@ public class UpgradeMenu : IMainMenu {
 					*/
 				}
 			} else if (selectArrowPosY >= 1) {
-				if (mainPlayer.subtanks.Count < selectArrowPosY && mainPlayer.currency >= subtankCost) {
-					mainPlayer.currency -= subtankCost;
+				if (mainPlayer.subtanks.Count < selectArrowPosY && mainPlayer.currency >= getSubTankCost()) {
+					mainPlayer.currency -= getSubTankCost();
 					mainPlayer.subtanks.Add(new SubTank());
 					Global.playSound("upgrade");
 				} else if (mainPlayer.subtanks.InRange(selectArrowPosY - 1)) {
@@ -290,7 +296,7 @@ public class UpgradeMenu : IMainMenu {
 				);
 			}
 			if (buyOrUse) {
-				string costStr = $" ({subtankCost} {Global.nameCoins})";
+				string costStr = $" ({getSubTankCost()} {Global.nameCoins})";
 				int posOffset = Fonts.measureText(FontType.Blue, buyOrUseStr);
 				Fonts.drawText(FontType.Green, costStr, textX + posOffset, optionPos.y);
 			}
