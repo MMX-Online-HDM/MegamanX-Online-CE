@@ -210,8 +210,40 @@ public class CustomMatchSettingsMenu : IMainMenu {
 				}
 			)
 		);
-
 		menuOptions.Add(
+				new MenuOption(
+					startX, currentY += lineH,
+					() => {
+						Helpers.menuLeftRightInc(ref savedMatchSettings.customMatchSettings.SubtankGain, 1, 4, true);
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							FontType.Blue,
+							"SubTank Gain: " +
+							savedMatchSettings.customMatchSettings.SubtankGain.ToString(),
+							pos.x, pos.y, selected: selectArrowPosY == 8
+						);
+					}
+				)
+		);
+		menuOptions.Add(
+			new MenuOption(
+				startX, currentY += lineH,
+				() => {
+					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.hyperModeMatch);
+				},
+				(Point pos, int index) => {
+					Fonts.drawText(
+						FontType.Blue,
+						"1v1 or Hypermode Match : " +
+						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.hyperModeMatch),
+						pos.x, pos.y, selected: selectArrowPosY == 9
+					);
+				}
+			)
+		);
+		/*
+			menuOptions.Add(
 			new MenuOption(startX, currentY += lineH,
 				() => {
 					Helpers.menuLeftRightInc(ref savedMatchSettings.customMatchSettings.damageModifier, 1, 4, true);
@@ -221,7 +253,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 						FontType.Blue,
 						"Damage modifier: " +
 						(savedMatchSettings.customMatchSettings.damageModifier * 100).ToString() + "%",
-						pos.x, pos.y, selected: selectArrowPosY == 8
+						pos.x, pos.y, selected: selectArrowPosY == 9
 					);
 				}
 			)
@@ -257,23 +289,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 				}
 			)
 		);
-		menuOptions.Add(
-			new MenuOption(
-				startX, currentY += lineH,
-				() => {
-					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.hyperModeMatch);
-				},
-				(Point pos, int index) => {
-					Fonts.drawText(
-						FontType.Blue,
-						"1v1 or Hypermode Match : " +
-						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.hyperModeMatch),
-						pos.x, pos.y, selected: selectArrowPosY == 11
-					);
-				}
-			)
-		);
-
+		*/
 		#endregion
 		#region  Page 2
 		//Currency Gain Custom Setting
@@ -310,39 +326,6 @@ public class CustomMatchSettingsMenu : IMainMenu {
 				}
 			)
 		);
-		//
-		menuOptions2.Add(
-			new MenuOption(
-				startX2, currentY2 += lineH2,
-				() => {
-					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.pickupItems);
-				},
-				(Point pos, int index) => {
-					Fonts.drawText(
-						FontType.Blue,
-						"Pick Up Items: " +
-						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.pickupItems),
-						pos.x, pos.y, selected: selectArrowPosY2 == 2
-					);
-				}
-			)
-		);
-		menuOptions2.Add(
-				new MenuOption(
-					startX2, currentY2 += lineH2,
-					() => {
-						Helpers.menuLeftRightInc(ref savedMatchSettings.customMatchSettings.SubtankGain, 1, 4, true);
-					},
-					(Point pos, int index) => {
-						Fonts.drawText(
-							FontType.Blue,
-							"SubTank Gain: " +
-							savedMatchSettings.customMatchSettings.SubtankGain.ToString(),
-							pos.x, pos.y, selected: selectArrowPosY2 == 3
-						);
-					}
-				)
-			);
 		menuOptions2.Add(
 				new MenuOption(
 					startX2, currentY2 += lineH2,
@@ -354,7 +337,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 							FontType.Blue,
 							"Assist Time: " +
 							savedMatchSettings.customMatchSettings.AssistTime.ToString(),
-							pos.x, pos.y, selected: selectArrowPosY2 == 4
+							pos.x, pos.y, selected: selectArrowPosY2 == 2
 						);
 					}
 				)
@@ -370,7 +353,23 @@ public class CustomMatchSettingsMenu : IMainMenu {
 						FontType.Blue,
 						"Unassistable List: " +
 						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.Assistable),
-						pos.x, pos.y, selected: selectArrowPosY2 == 5
+						pos.x, pos.y, selected: selectArrowPosY2 == 3
+					);
+				}
+			)
+		);
+		menuOptions2.Add(
+			new MenuOption(
+				startX2, currentY2 += lineH2,
+				() => {
+					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.pickupItems);
+				},
+				(Point pos, int index) => {
+					Fonts.drawText(
+						FontType.Blue,
+						"Pick Up Items: " +
+						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.pickupItems),
+						pos.x, pos.y, selected: selectArrowPosY2 == 4
 					);
 				}
 			)
@@ -386,7 +385,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 						FontType.Blue,
 						"Large Health Recovery: " +
 						savedMatchSettings.customMatchSettings.LargeHealthPickup.ToString(),
-						pos.x, pos.y, selected: selectArrowPosY2 == 6
+						pos.x, pos.y, selected: selectArrowPosY2 == 5
 					);
 				}
 			)
@@ -402,7 +401,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 						FontType.Blue,
 						"Small Health Recovery: " +
 						savedMatchSettings.customMatchSettings.SmallHealthPickup.ToString(),
-						pos.x, pos.y, selected: selectArrowPosY2 == 7
+						pos.x, pos.y, selected: selectArrowPosY2 == 6
 					);
 				}
 			)
@@ -418,7 +417,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 						FontType.Blue,
 						"Large Ammo Recovery: " +
 						savedMatchSettings.customMatchSettings.LargeAmmoPickup.ToString(),
-						pos.x, pos.y, selected: selectArrowPosY2 == 8
+						pos.x, pos.y, selected: selectArrowPosY2 == 7
 					);
 				}
 			)
@@ -434,7 +433,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 						FontType.Blue,
 						"Small Ammo Recovery: " +
 						savedMatchSettings.customMatchSettings.SmallAmmoPickup.ToString(),
-						pos.x, pos.y, selected: selectArrowPosY2 == 9
+						pos.x, pos.y, selected: selectArrowPosY2 == 8
 					);
 				}
 			)
