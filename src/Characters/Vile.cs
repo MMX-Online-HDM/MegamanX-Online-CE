@@ -590,7 +590,7 @@ public class Vile : Character {
 			} else {
 				vel = new Point(1, -3);
 			}
-		} else if (player.input.isHeld(Control.Down, player) && charState is not Crouch) {
+		} else if (player.input.isHeld(Control.Down, player) && charState is not Crouch && charState is not MissileAttack) {
 			vel = new Point(1, 0.5f);
 		} else if (player.input.isHeld(Control.Down, player) && player.input.isLeftOrRightHeld(player) && charState is Crouch) {
 			vel = new Point(1, 0.5f);
