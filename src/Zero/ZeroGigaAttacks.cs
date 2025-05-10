@@ -574,7 +574,6 @@ public abstract class ZeroGigaAttack : CharState {
 	public string effectName = "";
 	public Action? onShoot;
 	public Weapon weapon;
-	public Zero zero = null!;
 	public int attackMaxTime = 38;
 	public int effectFrame = 9;
 	public int shootFrame = 8;
@@ -623,7 +622,6 @@ public abstract class ZeroGigaAttack : CharState {
 	
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		zero = character as Zero ?? throw new NullReferenceException();
 	}
 
 	public override void onExit(CharState newState) {
@@ -643,7 +641,7 @@ public class RakuhouhaState : ZeroGigaAttack {
 		Point shootPos = character.pos.addxy(4 * xDir, 0);
 		for (int i = 256; i >= 128; i -= 16) {
 			new RakuhouhaProj(
-				shootPos, false, i, 1, zero,
+				shootPos, false, i, 1, character,
 				player, player.getNextActorNetId(), rpc: true
 			);
 		}
@@ -664,7 +662,7 @@ public class MessenkouState : ZeroGigaAttack {
 		Point shootPos = character.pos.addxy(4 * xDir, 0);
 		for (int i = 256; i >= 128; i -= 16) {
 			new RakuhouhaProj(
-				shootPos, true, i, 1, zero,
+				shootPos, true, i, 1, character,
 				player, player.getNextActorNetId(), rpc: true
 			);
 		}
@@ -786,11 +784,11 @@ public class ShinMessenkouState : ZeroGigaAttack {
 		Point shootPos = character.pos.addxy(4 * character.xDir, 0);
 		new ShinMessenkouProj(
 			shootPos.addxy(shotDistance * i * character.xDir, 0),
-			1, zero, player, player.getNextActorNetId(), rpc: true
+			1, character, player, player.getNextActorNetId(), rpc: true
 		);
 		new ShinMessenkouProj(
 			shootPos.addxy(shotDistance * i * -character.xDir, 0),
-			-1, zero, player, player.getNextActorNetId(), rpc: true
+			-1, character, player, player.getNextActorNetId(), rpc: true
 		);
 		character.playSound("zeroshinmessenkoubullet");
 	}

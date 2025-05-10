@@ -103,6 +103,24 @@ public class RagingChargeX : Character {
 		return base.attackCtrl();
 	}
 
+	public void shoot() {
+		string shootSprite = getSprite(charState.shootSpriteEx);
+		if (!Global.sprites.ContainsKey(shootSprite)) {
+			shootSprite = grounded ? getSprite("shoot") : getSprite("fall_shoot");
+		}
+		if (shootAnimTime == 0) {
+			changeSprite(shootSprite, false);
+		} else if (charState is Idle && !charState.inTransition()) {
+			frameIndex = 0;
+			frameTime = 0;
+		}
+		
+	}
+
+	public override string getSprite(string spriteName) {
+		return "mmx_" + spriteName;
+	}
+
 	public void enterParry() {
 		if (absorbedProj != null) {
 			changeState(new XUPParryProjState(absorbedProj, true, false), true);

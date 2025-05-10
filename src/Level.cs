@@ -2349,10 +2349,12 @@ public partial class Level {
 		float offsetX = 0;
 		float offsetY = 0;
 		if (shakeX > 0 || shakeY > 0) {
-			offsetX = 3 * (float)Math.Sin(shakeX * 100);
-			offsetY = 3 * (float)Math.Sin(shakeY * 100);
-			shakeX = Helpers.clampMin(shakeX - Global.spf, 0);
-			shakeY = Helpers.clampMin(shakeY - Global.spf, 0);
+			float shakePower = 4 + (shakeY / 12);
+			float piMul = 55f / MathF.PI;
+			offsetX = shakePower * MathF.Sin(shakeX * piMul);
+			offsetY = MathF.Round(shakePower * MathF.Sin(shakeY * piMul));
+			shakeX = Helpers.clampMin(shakeX - 1, 0);
+			shakeY = Helpers.clampMin(shakeY - 1, 0);
 		}
 
 		float yOff = 0;
