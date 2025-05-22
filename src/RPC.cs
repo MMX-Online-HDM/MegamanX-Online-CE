@@ -23,6 +23,9 @@ public class RPC {
 	public static RPCStartLevel startLevel = new();
 	public static RPCSpawnCharacter spawnCharacter = new();
 	public static RPCUpdateActor updateActor = new();
+	public static RPCUpdateActor updateActorUnreliable = new() {
+		netDeliveryMethod = NetDeliveryMethod.Unreliable
+	};
 	public static RPCApplyDamage applyDamage = new();
 	public static RPCDecShieldAmmo decShieldAmmo = new();
 	public static RPCDestroyActor destroyActor = new();
@@ -130,6 +133,7 @@ public class RPC {
 		applyDamage,
 		heal,
 		updateActor,
+		updateActorUnreliable,
 		destroyActor,
 		actorToggle,
 		spawnCharacter,
@@ -287,11 +291,11 @@ public class RPCSpawnCharacter : RPC {
 	}
 
 	public override void invoke(params byte[] arguments) {
-		float x = BitConverter.ToSingle(new byte[] { arguments[0], arguments[1], arguments[2], arguments[3] }, 0);
-		float y = BitConverter.ToSingle(new byte[] { arguments[4], arguments[5], arguments[6], arguments[7] }, 0);
+		float x = BitConverter.ToSingle(arguments.AsSpan()[0..4]);
+		float y = BitConverter.ToSingle(arguments.AsSpan()[4..8]);
 		int xDir = arguments[8] - 128;
 		int playerId = arguments[9];
-		ushort charNetId = BitConverter.ToUInt16(new byte[] { arguments[10], arguments[11] }, 0);
+		ushort charNetId = BitConverter.ToUInt16(arguments.AsSpan()[10..12]);
 		int charNum = arguments[12];
 		byte[] extraData;
 		if (arguments.Length > 13) {
@@ -304,7 +308,8 @@ public class RPCSpawnCharacter : RPC {
 		if (player != null) {
 			player.spawnCharAtPoint(
 				charNum, extraData,
-				new Point(x, y), xDir, charNetId, false
+				new Point(x, y), xDir, charNetId, false,
+				forceSpawn: true, isWarpIn: false
 			);
 		} else {
 			Global.level.backloggedSpawns.Add(
@@ -317,18 +322,19 @@ public class RPCSpawnCharacter : RPC {
 	}
 
 	public void sendRpc(int charNum, byte[] extraData, Point spawnPos, int xDir, int playerId, ushort charNetId) {
-		if (Global.serverClient == null) return;
-		List<byte> sendBytes = new();
-
-		sendBytes.AddRange(BitConverter.GetBytes(spawnPos.x));
-		sendBytes.AddRange(BitConverter.GetBytes(spawnPos.y));
-		sendBytes.Add((byte)(xDir + 128));
-		sendBytes.Add((byte)playerId);
-		sendBytes.AddRange(BitConverter.GetBytes(charNetId));
-		sendBytes.Add((byte)charNum);
-		sendBytes.AddRange(extraData);
-
-		Global.serverClient.rpc(this, sendBytes.ToArray());
+		if (Global.serverClient == null) {
+			return;
+		}
+		byte[] sendBytes = [
+			.. BitConverter.GetBytes(spawnPos.x),
+			.. BitConverter.GetBytes(spawnPos.y),
+			(byte)(xDir + 128),
+			(byte)playerId,
+			.. BitConverter.GetBytes(charNetId),
+			(byte)charNum,
+			.. extraData,
+		];
+		Global.serverClient.rpc(this, sendBytes);
 	}
 }
 

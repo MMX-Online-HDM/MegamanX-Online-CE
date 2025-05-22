@@ -1044,7 +1044,7 @@ public partial class Player {
 	public Character? spawnCharAtPoint(
 		int spawnCharNum, byte[] extraData,
 		Point pos, int xDir, ushort charNetId, bool sendRpc,
-		bool isMainChar = true, bool forceSpawn = false
+		bool isMainChar = true, bool forceSpawn = false, bool isWarpIn = true
 	) {
 		if (sendRpc) {
 			RPC.spawnCharacter.sendRpc(spawnCharNum, extraData, pos, xDir, id, charNetId);
@@ -1054,7 +1054,7 @@ public partial class Player {
 			alliance = newAlliance;
 		}
 
-		if (isMainChar && character != null && charNetId == character.netId) {
+		if (forceSpawn || isMainChar && character != null && charNetId == character.netId) {
 			return null;
 		}
 
@@ -1102,11 +1102,12 @@ public partial class Player {
 		Character newChar;
 		// X
 		if (charNum == (int)CharIds.X) {
-			XLoadout xLoadout = new();
-			xLoadout.weapon1 = extraData[0];
-			xLoadout.weapon2 = extraData[1];
-			xLoadout.weapon3 = extraData[2];
-			xLoadout.melee = extraData[3];
+			XLoadout xLoadout = new() {
+				weapon1 = extraData[0],
+				weapon2 = extraData[1],
+				weapon3 = extraData[2],
+				melee = extraData[3]
+			};
 
 			if (isMainChar) {
 				loadout.xLoadout = xLoadout;
@@ -1114,7 +1115,7 @@ public partial class Player {
 			newChar = new MegamanX(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer,
-				xLoadout: xLoadout
+				xLoadout: xLoadout, isWarpIn: isWarpIn
 			);
 		}
 		// Saber Zero.
@@ -1130,14 +1131,14 @@ public partial class Player {
 
 			newChar = new Vile(
 				this, pos.x, pos.y, xDir, false, charNetId,
-				ownedByLocalPlayer, mk2VileOverride: mk2VileOverride
+				ownedByLocalPlayer, mk2VileOverride: mk2VileOverride, isWarpIn: isWarpIn
 			);
 		}
 		// GM19 Axl.
 		else if (charNum == (int)CharIds.Axl) {
 			newChar = new Axl(
 				this, pos.x, pos.y, xDir,
-				false, charNetId, ownedByLocalPlayer
+				false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
 			);
 		}
 		// Sigma.
@@ -1145,17 +1146,17 @@ public partial class Player {
 			if (sigmaForm == 2) {
 				newChar = new Doppma(
 					this, pos.x, pos.y, xDir,
-					false, charNetId, ownedByLocalPlayer
+					false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
 				);
 			} else if (sigmaForm == 1) {
 				newChar = new NeoSigma(
 					this, pos.x, pos.y, xDir,
-					false, charNetId, ownedByLocalPlayer
+					false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
 				);
 			} else {
 				newChar = new CmdSigma(
 					this, pos.x, pos.y, xDir,
-					false, charNetId, ownedByLocalPlayer
+					false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
 				);
 			}
 		}
@@ -1163,28 +1164,28 @@ public partial class Player {
 		else if (charNum == (int)CharIds.BusterZero) {
 			newChar = new BusterZero(
 				this, pos.x, pos.y, xDir,
-				false, charNetId, ownedByLocalPlayer
+				false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
 			);
 		}
 		// Punchy Zero.
 		else if (charNum == (int)CharIds.PunchyZero) {
 			newChar = new PunchyZero(
 				this, pos.x, pos.y, xDir,
-				false, charNetId, ownedByLocalPlayer
+				false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
 			);
 		}
 		// Kaiser Sigma (Hypermode)
 		else if  (charNum == (int)CharIds.KaiserSigma) {
 			newChar = new KaiserSigma(
 				this, pos.x, pos.y, xDir,
-				false, charNetId, ownedByLocalPlayer
+				false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
 			);
 		}
 		// Raging Charge X.
 		else if  (charNum == (int)CharIds.RagingChargeX) {
 			newChar = new RagingChargeX(
 				this, pos.x, pos.y, xDir,
-				false, charNetId, ownedByLocalPlayer
+				false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
 			);
 		}
 		// Error out if invalid id.
