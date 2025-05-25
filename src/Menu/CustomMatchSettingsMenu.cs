@@ -28,6 +28,9 @@ public class CustomMatchSettings {
 	[ProtoMember(19)] public int LargeAmmoPickup;
 	[ProtoMember(20)] public int SmallAmmoPickup;
 	[ProtoMember(21)] public int SubTankCost;
+	[ProtoMember(22)] public bool FrostShieldNerf;
+	[ProtoMember(23)] public bool FrostShieldChargedNerf;
+
 
 
 	public CustomMatchSettings() {
@@ -58,6 +61,8 @@ public class CustomMatchSettings {
 			LargeAmmoPickup = 50,
 			SmallAmmoPickup = 25,
 			SubTankCost = 4,
+			FrostShieldNerf = false,
+			FrostShieldChargedNerf = false,
 		};
 	}
 }
@@ -65,12 +70,16 @@ public class CustomMatchSettings {
 public class CustomMatchSettingsMenu : IMainMenu {
 	public int selectArrowPosY;
 	public int selectArrowPosY2;
+	public int selectArrowPosY3;
 	public const int startX = 30;
 	public int startY = 40;
 	public const int lineH = 10;
 	public const int startX2 = 30;
 	public int startY2 = 40;
 	public const int lineH2 = 10;
+	public const int startX3 = 30;
+	public int startY3 = 40;
+	public const int lineH3 = 10;
 	public const uint fontSize = 24;
 	public IMainMenu prevMenu;
 	public bool inGame;
@@ -78,6 +87,8 @@ public class CustomMatchSettingsMenu : IMainMenu {
 	public bool isOffline;
 	public List<MenuOption> menuOptions = new List<MenuOption>();
 	public List<MenuOption> menuOptions2 = new List<MenuOption>();
+	public List<MenuOption> menuOptions3 = new List<MenuOption>();
+
 
 	SavedMatchSettings savedMatchSettings { get { return isOffline ? SavedMatchSettings.mainOffline : SavedMatchSettings.mainOnline; } }
 
@@ -86,6 +97,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 		this.inGame = inGame;
 		int currentY = startY;
 		int currentY2 = startY2;
+		int currentY3 = startY3;
 		this.isOffline = isOffline;
 		#region  Page 1
 		menuOptions.Add(
@@ -457,6 +469,40 @@ public class CustomMatchSettingsMenu : IMainMenu {
 			)
 		);
 		#endregion
+		#region Page 3
+		menuOptions3.Add(
+			new MenuOption(
+				startX3, currentY3,
+				() => {
+					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.FrostShieldNerf);
+				},
+				(Point pos, int index) => {
+					Fonts.drawText(
+						FontType.Purple,
+						"Frost Shield Uncharged 'Shield' Nerf: " +
+						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.FrostShieldNerf),
+						pos.x, pos.y, selected: selectArrowPosY3 == 0
+					);
+				}
+			)
+		);
+		menuOptions3.Add(
+			new MenuOption(
+				startX3, currentY3 += lineH3,
+				() => {
+					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.FrostShieldChargedNerf);
+				},
+				(Point pos, int index) => {
+					Fonts.drawText(
+						FontType.Purple,
+						"Frost Shield Charged 'Shield' Nerf: " +
+						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.FrostShieldChargedNerf),
+						pos.x, pos.y, selected: selectArrowPosY3 == 1
+					);
+				}
+			)
+		);
+		#endregion
 	}
 
 	public string getSameCharString(int charNum) {
@@ -467,7 +513,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 	public void update() {
 		if (Global.input.isPressedMenu(Control.Special1)) {
 			Page++;
-			if (Page > 2) Page = 1;
+			if (Page > 3) Page = 1;
 		}
 		if (Page == 1) {
 			menuOptions[selectArrowPosY].update();
@@ -475,6 +521,10 @@ public class CustomMatchSettingsMenu : IMainMenu {
 		} else if (Page == 2) {
 			menuOptions2[selectArrowPosY2].update();
 			Helpers.menuUpDown(ref selectArrowPosY2, 0, menuOptions2.Count - 1);
+		}
+		else if (Page == 3) {
+			menuOptions3[selectArrowPosY3].update();
+			Helpers.menuUpDown(ref selectArrowPosY3, 0, menuOptions3.Count - 1);
 		}
 
 		if (Global.input.isPressedMenu(Control.MenuBack)) {
@@ -504,6 +554,11 @@ public class CustomMatchSettingsMenu : IMainMenu {
 		if (Page == 2)
 		foreach (var menuOption2 in menuOptions2) {
 			menuOption2.render(menuOption2.pos, i);
+			i++;
+		}
+		if (Page == 3)
+		foreach (var menuOption3 in menuOptions3) {
+			menuOption3.render(menuOption3.pos, i);
 			i++;
 		}
 	}
@@ -546,6 +601,20 @@ public class CustomMatchSettingsMenu : IMainMenu {
 				DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
 				Global.sprites["cursor"].drawToHUD(
 					0, menuOptions2[selectArrowPosY2].pos.x - 8, menuOptions2[selectArrowPosY2].pos.y + 5
+				);
+			}
+		}
+		else if (Page == 3) {
+			if (!inGame) {
+				DrawWrappers.DrawTextureHUD(Global.textures["severbrowser"], 0, 0);
+				DrawWrappers.DrawTextureHUD(
+					Global.textures["cursor"], menuOptions3[selectArrowPosY3].pos.x - 8,
+					menuOptions3[selectArrowPosY3].pos.y - 1
+				);
+			} else {
+				DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
+				Global.sprites["cursor"].drawToHUD(
+					0, menuOptions3[selectArrowPosY3].pos.x - 8, menuOptions3[selectArrowPosY3].pos.y + 5
 				);
 			}
 		}

@@ -939,7 +939,6 @@ public partial class Actor : GameObject {
 				if (killer != ownPlayer && (
 						secondLastAttacker.envKillOnly && weaponIndex != null ||
 						Global.time - secondLastAttacker.time > (Global.level?.server?.customMatchSettings?.AssistTime ?? 2) ||	
-						Global.time - secondLastAttacker.time > 0.5f && Damager.lowTimeAssist(secondLastAttacker.projId) ||
 						Damager.unassistable(secondLastAttacker.projId)
 					)
 				) {

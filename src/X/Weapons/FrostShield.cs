@@ -69,7 +69,12 @@ public class FrostShieldProj : Projectile {
 		projId = (int)ProjIds.FrostShield;
 		destroyOnHit = true;
 		exhaust = new Anim(pos, "frostshield_exhaust", xDir, null, false);
-		isShield = true;
+		if (Global.level.server?.customMatchSettings?.FrostShieldNerf == false) {
+			isShield = true;	
+		} else if (Global.level.server?.customMatchSettings?.FrostShieldNerf == true) {
+			isShield = false;
+		}
+
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
@@ -173,7 +178,11 @@ public class FrostShieldProjGround : Projectile, IDamagable {
 		maxTime = 5;
 		projId = (int)ProjIds.FrostShieldGround;
 		destroyOnHit = true;
-		isShield = true;
+		if (Global.level.server?.customMatchSettings?.FrostShieldNerf == false) {
+			isShield = true;	
+		} else if (Global.level.server?.customMatchSettings?.FrostShieldNerf == true) {
+			isShield = false;
+		}
 		playSound("frostShield");
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
@@ -216,6 +225,9 @@ public class FrostShieldProjGround : Projectile, IDamagable {
 
 	public bool isInvincible(Player attacker, int? projId) {
 		if (projId == null) return true;
+		if (Global.level.server?.customMatchSettings?.FrostShieldNerf == true) {
+			return false;
+		}
 		return !Damager.canDamageFrostShield(projId.Value);
 	}
 
@@ -246,7 +258,11 @@ public class FrostShieldProjCharged : Projectile {
 		destroyOnHit = false;
 		shouldVortexSuck = false;
 		character = player.character;
-		isShield = true;
+		if (Global.level.server?.customMatchSettings?.FrostShieldChargedNerf == false) {
+			isShield = true;	
+		} else if (Global.level.server?.customMatchSettings?.FrostShieldChargedNerf == true) {
+			isShield = false;
+		}
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
@@ -322,7 +338,11 @@ public class FrostShieldProjChargedGround : Projectile {
 		shouldVortexSuck = false;
 		character = player.character;
 		useGravity = true;
-		isShield = true;
+		if (Global.level.server?.customMatchSettings?.FrostShieldChargedNerf == false) {
+			isShield = true;	
+		} else if (Global.level.server?.customMatchSettings?.FrostShieldChargedNerf == true) {
+			isShield = false;
+		}
 		vel = new Point(xDir * 150, -100);
 		if (collider != null) { collider.wallOnly = true; }
 		slideAnim = new Anim(pos, "frostshield_charged_slide", xDir, null, false);
