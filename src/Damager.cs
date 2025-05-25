@@ -1057,19 +1057,6 @@ public class Damager {
 			_ => false
 		};
 	}
-	public static bool lowTimeAssist(int? projId) {
-		if (projId == null) {
-			return false;
-		}
-		// The GM19 list now only counts for FFA mode.
-		if (Global.level.gameMode is not FFADeathMatch) {
-			return false;
-		}
-		return projId switch {
-
-			_ => false
-		};
-	}
 
 	public static bool unassistable(int? projId) {
 		if (projId == null) {
