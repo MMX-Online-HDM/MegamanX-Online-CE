@@ -154,7 +154,9 @@ public class DodgeRoll : CharState {
 
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
-		axl.dodgeRollCooldown = Axl.maxDodgeRollCooldown;
+		if (Global.level.server?.customMatchSettings != null)
+			 axl.dodgeRollCooldown = Global.level.server.customMatchSettings.AxlDodgerollCooldown;
+		else axl.dodgeRollCooldown = Axl.maxDodgeRollCooldown;
 	}
 
 	public override void update() {

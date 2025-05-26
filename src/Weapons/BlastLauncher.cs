@@ -14,11 +14,12 @@ public class BlastLauncher : AxlWeapon {
 		killFeedIndex = 29;
 		switchCooldown = 6;
 		fireRate = 45;
-
 		sprite = "axl_arm_blastlauncher";
 		flashSprite = "axl_pistol_flash_charged";
 		chargedFlashSprite = "axl_pistol_flash_charged";
 		altFireCooldown = 90;
+		rechargeAmmoCooldown = 240;
+		altRechargeAmmoCooldown = 240;
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {

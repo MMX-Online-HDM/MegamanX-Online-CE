@@ -12,6 +12,8 @@ public class SpiralMagnum : AxlWeapon {
 		weaponBarBaseIndex = 34;
 		weaponSlotIndex = 54;
 		killFeedIndex = 69;
+		rechargeAmmoCooldown = 120;
+		altRechargeAmmoCooldown = 200;
 
 		sprite = "axl_arm_spiralmagnum2";
 		flashSprite = "axl_pistol_flash";

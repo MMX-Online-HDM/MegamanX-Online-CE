@@ -14,9 +14,11 @@ public class PlasmaGun : AxlWeapon {
 		weaponSlotIndex = 56;
 		killFeedIndex = 71;
 		sprite = "axl_arm_plasmagun";
-
+		rechargeAmmoCooldown = 180;
+		altRechargeAmmoCooldown = 240;
 		if (altFire == 1) {
 			altFireCooldown = 10;
+			altRechargeAmmoCooldown = 180;
 			shootSounds[3] = "";
 		}
 	}

@@ -521,12 +521,34 @@ public class Helpers {
 			}
 		}
 	}
+	public static void menuLeftRightIncFloat(ref float val, float min, float max, bool wrap = false, bool playSound = false) {
+		if (min == max) return;
+		if (Global.input.isPressedMenu(Control.MenuLeft)) {
+			val -= 0.25f;
+			if (val < min) {
+				val = wrap ? max : min;
+				if (wrap && playSound) Global.playSound("menuX2");
+			} else {
+				if (playSound) Global.playSound("menuX2");
+			}
+		} else if (Global.input.isPressedMenu(Control.MenuRight)) {
+			val += 0.25f;
+			if (val > max) {
+				val = wrap ? min : max;
+				if (wrap && playSound) Global.playSound("menuX2");
+			} else {
+				if (playSound) Global.playSound("menuX2");
+			}
+		}
+	}
 
-	public static void menuLeftRightBool(ref bool val) {
+	public static void menuLeftRightBool(ref bool val, bool playSound = false) {
 		if (Global.input.isPressedMenu(Control.MenuLeft)) {
 			val = false;
+			if (playSound) Global.playSound("menuX2");
 		} else if (Global.input.isPressedMenu(Control.MenuRight)) {
 			val = true;
+			if (playSound) Global.playSound("menuX2");
 		}
 	}
 

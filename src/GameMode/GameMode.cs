@@ -703,8 +703,29 @@ public class GameMode {
 				float cooldown = 1 - Helpers.progress(axl2.dodgeRollCooldown, Axl.maxDodgeRollCooldown);
 				drawGigaWeaponCooldown(50, cooldown, y: 170);
 			}
+			if (drawPlayer.character is Axl && Global.level.server?.customMatchSettings?.AxlCustomReload == true) {
+				if (drawPlayer.weapon?.rechargeAmmoCustomSettingAxl > 0 ||
+					drawPlayer.weapon?.rechargeAmmoCustomSettingAxl2 > 0) {
+					Fonts.drawText(
+						FontType.RedishOrange, "Reloading :",
+						Global.halfScreenW - 157, 5, Alignment.Center
+					);
+				}
+				if (drawPlayer.weapon?.rechargeAmmoCustomSettingAxl2 <= 0 && drawPlayer.weapon?.rechargeAmmoCustomSettingAxl > 0) {
+					Fonts.drawText(
+							FontType.RedishOrange, drawPlayer.weapon.rechargeAmmoCustomSettingAxl.ToString(),
+							Global.halfScreenW - 120, 5, Alignment.Left
+						);
+					}
+				if (drawPlayer.weapon?.rechargeAmmoCustomSettingAxl2 > 0) {
+					Fonts.drawText(
+						FontType.RedishOrange, drawPlayer.weapon.rechargeAmmoCustomSettingAxl2.ToString(),
+						Global.halfScreenW - 120, 5, Alignment.Left
+					);
+				}
+			}
 			if (drawPlayer.character is CmdSigma cmdSigma) {
-				int xStart = 11;
+				//int xStart = 11;
 				if (cmdSigma.leapSlashCooldown > 0) {
 					float cooldown = 1 - Helpers.progress(
 						cmdSigma.leapSlashCooldown, BaseSigma.maxLeapSlashCooldown

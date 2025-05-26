@@ -368,7 +368,7 @@ public class Axl : Character {
 
 		if (linkedRideArmor != null &&
 			player.input.isHeld(Control.Down, player) &&
-			player.input.isHeld(Control.Special2, player) && 
+			player.input.isHeld(Control.Special2, player) &&
 			linkedRideArmor.rideArmorState is not RACalldown
 		) {
 			linkedRideArmor.changeState(new RACalldown(pos, false), true);
@@ -499,27 +499,27 @@ public class Axl : Character {
 
 		bool bothHeld = shootHeld && altShootHeld;
 
-		if (player.weapon is AxlBullet || player.weapon is DoubleBullet || 
-			player.weapon is MettaurCrash || player.weapon is BeastKiller || player.weapon is MachineBullets || 
+		if (player.weapon is AxlBullet || player.weapon is DoubleBullet ||
+			player.weapon is MettaurCrash || player.weapon is BeastKiller || player.weapon is MachineBullets ||
 			player.weapon is RevolverBarrel || player.weapon is AncientGun) {
 			(player.weapon as AxlWeapon)?.rechargeAxlBulletAmmo(player, this, shootHeld, 1);
 		} else {
 			foreach (var weapon in player.weapons) {
-				if (weapon is AxlBullet || weapon is DoubleBullet || 
-					weapon is MettaurCrash || weapon is BeastKiller || weapon is MachineBullets || 
+				if (weapon is AxlBullet || weapon is DoubleBullet ||
+					weapon is MettaurCrash || weapon is BeastKiller || weapon is MachineBullets ||
 					weapon is RevolverBarrel || weapon is AncientGun) {
 					(weapon as AxlWeapon)?.rechargeAxlBulletAmmo(player, this, shootHeld, 2);
 				}
 			}
 		}
-
+		customSettingReloadWeapon();
 		if (player.weapons.Count > 0 && player.weapons[0].type > 0) {
 			player.axlBulletTypeLastAmmo[player.weapons[0].type] = player.weapons[0].ammo;
 		}
 
 		if (player.weapon is not AssassinBulletChar) {
 			if (altShootHeld && !bothHeld && (player.weapon is AxlBullet || player.weapon is DoubleBullet ||
-			player.weapon is MettaurCrash || player.weapon is BeastKiller || player.weapon is MachineBullets || 
+			player.weapon is MettaurCrash || player.weapon is BeastKiller || player.weapon is MachineBullets ||
 			player.weapon is RevolverBarrel || player.weapon is AncientGun) && invulnTime == 0 && flag == null) {
 				increaseCharge();
 			} else {
@@ -543,7 +543,7 @@ public class Axl : Character {
 					playSound("stingCharge", sendRpc: true);
 				} else if (isCharging()) {
 					if (player.weapon is AxlBullet || player.weapon is DoubleBullet ||
-						player.weapon is MettaurCrash || player.weapon is BeastKiller || player.weapon is MachineBullets || 
+						player.weapon is MettaurCrash || player.weapon is BeastKiller || player.weapon is MachineBullets ||
 						player.weapon is RevolverBarrel || player.weapon is AncientGun) {
 						recoilTime = 0.2f;
 						if (!isWhiteAxl()) {
@@ -606,9 +606,9 @@ public class Axl : Character {
 						player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
 					}
 				}
-				switch(player.weapon) {
+				switch (player.weapon) {
 					case MettaurCrash:
-					case BeastKiller: 
+					case BeastKiller:
 					case MachineBullets:
 					case RevolverBarrel:
 					case AncientGun:
@@ -621,7 +621,7 @@ public class Axl : Character {
 								player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
 							}
 						}
-						break; 
+						break;
 				}
 				// Double bullet
 				if (player.weapon is DoubleBullet && canShoot() && !(charState is LadderClimb) && !player.weapon.noAmmo()) {
@@ -870,6 +870,9 @@ public class Axl : Character {
 
 		float dist = MathF.Abs(forwardAngle - bulletAngle);
 		dist = Helpers.clampMin0(dist - 90);
+		if (Global.level.server?.customMatchSettings?.AxlBackwardsDebuff == false) {
+			dist = 0;
+		}
 		return Helpers.clamp01(dist / 90f);
 	}
 
@@ -2001,6 +2004,41 @@ public class Axl : Character {
 			return new DoubleBullet();
 		} else {
 			return new AxlBullet((AxlBulletWeaponType)type);
+		}
+	}
+	public void customSettingReloadWeapon() {
+		//Reload Weapon Custom Setting
+		bool shootHeld = player.input.isHeld(Control.Shoot, player);
+		switch (player.weapon) {
+			case RayGun:
+				(player.weapon as RayGun)?.rechargeAmmoCustomSetting(player, this, shootHeld, 1, 1);
+				break;
+			case BlastLauncher:
+				(player.weapon as BlastLauncher)?.rechargeAmmoCustomSetting(player, this, shootHeld, 1, 4);
+				break;
+			case BlackArrow:
+				(player.weapon as BlackArrow)?.rechargeAmmoCustomSetting(player, this, shootHeld, 1, 1);
+				break;
+			case SpiralMagnum:
+				(player.weapon as SpiralMagnum)?.rechargeAmmoCustomSetting(player, this, shootHeld, 1, 1);
+				break;
+			case BoundBlaster:
+				(player.weapon as BoundBlaster)?.rechargeAmmoCustomSetting(player, this, shootHeld, 1, 1);
+				break;
+			case PlasmaGun:
+				(player.weapon as PlasmaGun)?.rechargeAmmoCustomSetting(player, this, shootHeld, 1, 1);
+				break;
+			case IceGattling:
+				(player.weapon as IceGattling)?.rechargeAmmoCustomSetting(player, this, shootHeld, 1, 4);
+				break;
+			case FlameBurner:
+				(player.weapon as FlameBurner)?.rechargeAmmoCustomSetting(player, this, shootHeld, 1, 4);
+				break;
+		}
+		if (player.axlWeapon != null) {
+			if (isAnyZoom()) {
+				player.axlWeapon.rechargeAmmoCustomSettingAxl2 = 200;
+			}
 		}
 	}
 

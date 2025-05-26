@@ -176,6 +176,7 @@ public class AssassinBulletChar : Weapon {
 }
 public class AssassinationProj : Projectile {
 	bool once;
+	float time1;
 	public AssassinationProj(
 		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
@@ -184,8 +185,8 @@ public class AssassinationProj : Projectile {
 		weapon = AssassinBulletChar.netWeapon;
 		damager.damage = 8;
 		damager.hitCooldown = 0;
-		damager.flinch = 0;		
-		vel = new Point(800 * xDir, 0);
+		damager.flinch = 0;
+		vel = new Point(600 * xDir, 0);
 		fadeSprite = "axl_bullet_fade";
 		reflectable = true;
 		maxTime = 0.5f;
@@ -206,11 +207,12 @@ public class AssassinationProj : Projectile {
 		destroySelf();
 	}
 	public override void update() {
+		time1 += Global.spf;
 		if (ownedByLocalPlayer && getHeadshotVictim(owner, out IDamagable? victim, out Point? hitPoint)) {
 			if (hitPoint != null) changePos(hitPoint.Value);
-			if (maxTime >= 0.35f) {
+			if (time1 >= 0.35f) {
 				damager.applyDamage(victim, false, weapon, this, projId, 16, Global.defFlinch);
-			} else damager.applyDamage(victim, false, weapon, this, projId, overrideDamage: Damager.ohkoDamage);
+			} else if (time1 < 0.35f) damager.applyDamage(victim, false, weapon, this, projId, overrideDamage: Damager.ohkoDamage);
 			damager.damage = 0;
 			playSound("hurt");
 			destroySelf();

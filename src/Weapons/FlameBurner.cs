@@ -12,7 +12,8 @@ public class FlameBurner : AxlWeapon {
 		weaponBarBaseIndex = 38;
 		weaponSlotIndex = 58;
 		killFeedIndex = 73;
-
+		rechargeAmmoCooldown = 240;
+		altRechargeAmmoCooldown = 240;
 		sprite = "axl_arm_flameburner";
 
 		if (altFire == 1) {

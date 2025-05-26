@@ -60,6 +60,11 @@ public class Weapon {
 	public string Flinch = "";
 	public string FlinchCD = "";
 	public bool hasCustomChargeAnim;
+	// Axl Custom Setting Reload
+	public float rechargeAmmoCustomSettingAxl;
+	public float rechargeAmmoCustomSettingAxl2;
+	public float rechargeAmmoCooldown;
+	public float altRechargeAmmoCooldown;
 
 	public Weapon() {
 		ammo = 32;
@@ -363,9 +368,13 @@ public class Weapon {
 		Helpers.decrementFrames(ref soundTime);
 		Helpers.decrementFrames(ref shootCooldown);
 		Helpers.decrementFrames(ref altShotCooldown);
-		if (timeSinceLastShoot != null) {
-			timeSinceLastShoot += Global.speedMul;
+		if (Global.level.server?.customMatchSettings?.AxlCustomReload == true) {
+			Helpers.decrementFrames(ref rechargeAmmoCustomSettingAxl);
+			Helpers.decrementFrames(ref rechargeAmmoCustomSettingAxl2);
 		}
+		if (timeSinceLastShoot != null) {
+				timeSinceLastShoot += Global.speedMul;
+			}
 	}
 
 	public void charLinkedUpdate(Character character, bool isAlwaysOn) {

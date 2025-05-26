@@ -12,13 +12,15 @@ public class BoundBlaster : AxlWeapon {
 		weaponBarBaseIndex = 35;
 		weaponSlotIndex = 55;
 		killFeedIndex = 70;
-
+		rechargeAmmoCooldown = 120;
+		altRechargeAmmoCooldown = 200;
 		sprite = "axl_arm_boundblaster";
 		flashSprite = "axl_pistol_flash";
 		chargedFlashSprite = "axl_pistol_flash_charged";
 		altFireCooldown = 120;
 
 		if (altFire == 1) {
+			altRechargeAmmoCooldown = 120;
 			shootSounds[3] = "boundBlaster";
 		}
 	}

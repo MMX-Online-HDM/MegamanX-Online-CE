@@ -10,10 +10,14 @@ public class IceGattling : AxlWeapon {
 		weaponBarBaseIndex = 37;
 		weaponSlotIndex = 57;
 		killFeedIndex = 72;
-
+		rechargeAmmoCooldown = 300;
+		altRechargeAmmoCooldown = 300;
 		sprite = "axl_arm_icegattling";
 		flashSprite = "axl_pistol_flash";
 		chargedFlashSprite = "axl_pistol_flash";
+		if (altFire == 1) {
+			altRechargeAmmoCooldown = 0;
+		}
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {

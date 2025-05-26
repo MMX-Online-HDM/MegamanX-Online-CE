@@ -30,6 +30,9 @@ public class CustomMatchSettings {
 	[ProtoMember(21)] public int SubTankCost;
 	[ProtoMember(22)] public bool FrostShieldNerf;
 	[ProtoMember(23)] public bool FrostShieldChargedNerf;
+	[ProtoMember(24)] public bool AxlBackwardsDebuff;
+	[ProtoMember(25)] public float AxlDodgerollCooldown;
+	[ProtoMember(26)] public bool AxlCustomReload;
 
 
 
@@ -63,6 +66,9 @@ public class CustomMatchSettings {
 			SubTankCost = 4,
 			FrostShieldNerf = false,
 			FrostShieldChargedNerf = false,
+			AxlBackwardsDebuff = true,
+			AxlDodgerollCooldown = 1,
+			AxlCustomReload = false,
 		};
 	}
 }
@@ -474,7 +480,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 			new MenuOption(
 				startX3, currentY3,
 				() => {
-					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.FrostShieldNerf);
+					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.FrostShieldNerf, true);
 				},
 				(Point pos, int index) => {
 					Fonts.drawText(
@@ -490,7 +496,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 			new MenuOption(
 				startX3, currentY3 += lineH3,
 				() => {
-					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.FrostShieldChargedNerf);
+					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.FrostShieldChargedNerf, true);
 				},
 				(Point pos, int index) => {
 					Fonts.drawText(
@@ -498,6 +504,54 @@ public class CustomMatchSettingsMenu : IMainMenu {
 						"Frost Shield Charged 'Shield' Nerf: " +
 						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.FrostShieldChargedNerf),
 						pos.x, pos.y, selected: selectArrowPosY3 == 1
+					);
+				}
+			)
+		);
+		menuOptions3.Add(
+			new MenuOption(
+				startX3, currentY3 += lineH3,
+				() => {
+					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.AxlBackwardsDebuff, true);
+				},
+				(Point pos, int index) => {
+					Fonts.drawText(
+						FontType.Purple,
+						"Axl Shooting Backwards Debuff: " +
+						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.AxlBackwardsDebuff),
+						pos.x, pos.y, selected: selectArrowPosY3 == 2
+					);
+				}
+			)
+		);
+		menuOptions3.Add(
+			new MenuOption(
+				startX3, currentY3 += lineH3,
+				() => {
+					Helpers.menuLeftRightIncFloat(ref savedMatchSettings.customMatchSettings.AxlDodgerollCooldown, 1.25f, 3, true, true);
+				},
+				(Point pos, int index) => {
+					Fonts.drawText(
+						FontType.Purple,
+						"Axl Dodge Roll Cooldown: " +
+						savedMatchSettings.customMatchSettings.AxlDodgerollCooldown.ToString(),
+						pos.x, pos.y, selected: selectArrowPosY3 == 3
+					);
+				}
+			)
+		);
+		menuOptions3.Add(
+			new MenuOption(
+				startX3, currentY3 += lineH3,
+				() => {
+					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.AxlCustomReload, true);
+				},
+				(Point pos, int index) => {
+					Fonts.drawText(
+						FontType.Purple,
+						"Axl Weapons Capable to Reload: " +
+						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.AxlCustomReload),
+						pos.x, pos.y, selected: selectArrowPosY3 == 4
 					);
 				}
 			)

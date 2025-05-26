@@ -15,8 +15,12 @@ public class BlackArrow : AxlWeapon {
 		weaponBarBaseIndex = 33;
 		weaponSlotIndex = 53;
 		killFeedIndex = 68;
-
+		rechargeAmmoCooldown = 120;
+		altRechargeAmmoCooldown = 150;
 		sprite = "axl_arm_blackarrow";
+		if (altFire == 1) {
+			altRechargeAmmoCooldown = 240;
+		}
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
