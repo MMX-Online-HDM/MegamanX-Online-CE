@@ -67,7 +67,7 @@ public class CustomMatchSettings {
 			FrostShieldNerf = false,
 			FrostShieldChargedNerf = false,
 			AxlBackwardsDebuff = true,
-			AxlDodgerollCooldown = 1,
+			AxlDodgerollCooldown = 1.25f,
 			AxlCustomReload = false,
 		};
 	}
