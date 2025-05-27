@@ -69,6 +69,7 @@ public class CustomMatchSettings {
 			AxlBackwardsDebuff = true,
 			AxlDodgerollCooldown = 1.25f,
 			AxlCustomReload = false,
+			AxlFTADodgeroll = false,
 		};
 	}
 }
