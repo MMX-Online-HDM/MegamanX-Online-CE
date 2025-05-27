@@ -33,7 +33,7 @@ public class CustomMatchSettings {
 	[ProtoMember(24)] public bool AxlBackwardsDebuff;
 	[ProtoMember(25)] public float AxlDodgerollCooldown;
 	[ProtoMember(26)] public bool AxlCustomReload;
-
+	[ProtoMember(26)] public bool AxlFTADodgeroll;
 
 
 	public CustomMatchSettings() {
