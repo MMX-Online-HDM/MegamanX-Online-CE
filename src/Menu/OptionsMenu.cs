@@ -36,6 +36,202 @@ public class OptionsMenu : IMainMenu {
 
 	public FontType optionFontText = FontType.Blue;
 	public FontType optionFontValue = FontType.Blue;
+	public enum Language {
+		English = 1,
+		Spanish = 2,
+		Portuguese = 3
+	}	
+	public static class Localization {
+	private static readonly Dictionary<Language, Dictionary<string, string>> Translations =
+		new Dictionary<Language, Dictionary<string, string>> {
+			{
+				Language.English, new Dictionary<string, string> {
+					{ "You aint translating english", "to english" }
+				}
+			},
+			{
+				Language.Spanish, new Dictionary<string, string> {
+					{ "Fullscreen:", "Pantalla completa:" },
+					{ "Set to Yes to make the game render fullscreen.", "Activalo para que el juego se vea a pantalla completa." },
+
+					{ "Windowed Resolution:", "Resolucion en ventana:" },
+					{ "Change the windowed resolution of the game.", "Cambia la resolucion del juego en modo ventana." },
+
+					{ "Show FPS:", "Mostrar FPS:" },
+					{ "Show the frames per second (FPS) in the bottom right.", "Muestra los cuadros por segundo (FPS) \nen la esquina inferior derecha." },
+
+					{ "Max FPS:", "FPS maximos:" },
+					{ "Controls the max framerate the game can run.\nLower values are more choppy but use less GPU.", "Controla el limite de FPS. Valores bajos \nreducen uso de GPU pero hacen el juego menos fluido." },
+
+					{ "Enable VSYNC:", "Activar VSYNC:" },
+					{ "Set to Yes to enable vsync.\nMakes movement/scrolling smoother, but adds input lag.", "Activa VSYNC para hacer el movimiento mas suave.\nPuede causar retraso en los controles." },
+
+					{ "Use optimized assets:", "Usar sprites optimizados:" },
+					{ "Set to Yes to use optimized assets.\nThis can result in better performance.", "Activalo para mejorar el rendimiento del juego." },
+
+					{ "Integer fullscreen:", "Pantalla completa entera:" },
+					{ "Rounds down fullscreen pixels to the nearest integer.\nReduces distortion when going fullscreen.", "Usa multiplos enteros en pantalla completa.\nReduce distorsion." },
+
+					{ "Enable small bars:", "Activar barras pequenas:" },
+					{ "Makes some of the energy bars smaller.", "Reduce el tamano de algunas barras de energia." },
+
+					{ "Preset Quality:", "Calidad predefinida:" },
+					{ "Choose a pre-configured set of graphics settings.", "Elige un conjunto preconfigurado de ajustes graficos." },
+
+					{ "-Enable shaders:", "-Activar sombreadores:" },
+					{ "Enables special effects like weapon palettes.\nNot all PCs support this.", "Activa efectos especiales como las paletas de armas.\nNo todos los PCs lo soportan." },
+
+					{ "-Enable post-processing:", "-Activar post-procesado:" },
+					{ "Enables special screen distortion effects.\nNot all PCs support this.", "Activa efectos visuales de post-procesado.\nNo todos los PCs lo soportan." },
+
+					{ "-Particle quality:", "-Calidad de particulas:" },
+					{ "Set the particle effect quality.\nLower quality results in faster performance.", "Cambia la calidad de los efectos de particulas.\nA menor calidad, mayor rendimiento." },
+
+					{ "-Enable map sprites:", "-Activar sprites del mapa:" },
+					{ "Enable or disable map sprites.\nDisabling map sprites results in faster performance.", "Activa o desactiva sprites del mapa.\nDesactivarlos mejora el rendimiento." },
+
+					{ "Music Volume:", "Volumen de Musica:" },
+					{ "Adjust the game music volume.", "Ajusta el volumen de la musica del juego." },
+
+					{ "Sound Volume:", "Volumen de Sonido:" },
+					{ "Adjust the game sound volume.", "Ajusta el volumen de los efectos de sonido." },
+
+					{ "Multiplayer name:", "Nombre Multijugador:" },
+					{ "Your name that appears to others when you play online.", "Tu nombre visible para otros jugadores al jugar en linea." },
+
+					{ "Multiplayer region:", "Region del Multijugador:" },
+					{ "Region for RELAY type servers. You may need ask for the\n region on discord or is built in already on the game." , "Region para los servidores de tipo RELAY. Tal vez necesites\npedir la region en discord o ya este incluido en el juego."},
+
+					{ "Show startup warnings:", "Mostrar avisos al iniciar:"},
+					{ "On launch, check for system requirements\nand other startup warnings." , "Al iniciar, chequear los requisitos del sistema \n y otro tipo de avisos"},
+
+					{ "Disable chat:" , "Desactivar chat:"},
+					{ "Set to Yes to disable sending and receiving\nchat messages in online matches." , "Seleccionalo en Si para desactivar el envio y recibo \n de mensajes en las partidas en linea."},
+
+					{ "Enable dev console:" , "Activar Consola:"},
+					{ "If enabled, press F10 to open the dev-console in-match\nSee the game website for a list of commands." , "En activo, presiona F10 para abrir la Consola en una partida\nBusca los comandos en la web oficial del juego."},
+
+					{ "Language setting:", "Opcion de lenguaje:"},
+					{ "Change the language of the game.\nCurrent languages: English, Spanish, Portuguese." , "Cambia el idioma del juego.\nIdiomas disponibles: Ingles, Espanol, Portugues."},
+
+					{ "Show mash progress:" , "Mostrar progreso de 'Mash" },
+					{ "When hit by moves that can be mashed out of,\nshows the mash progress above your head." , "Ciertos ataques se necesita de presionar teclas para \nsalir de ello. Muestra un progreso arriba del jugador."},
+
+					{ "Matchmaking timeout:", "Tiempo de Busqueda:" },
+					{ "How long match search will take before erroring out.\n If always erroring out in search, try increasing this." , "Cuanto tiempo durara la busqueda de partida antes de fallar.\n Si siempre falla, intenta aumentarlo." },
+
+					{ "Weapon switch grid mode:", "Modo cuadricula de armas:" },
+					{ "For weapon switch in certain or all modes.\nHold WEAPON L/R and use a directon to switch weapon.", "Para cambiar de arma en ciertos o todos los modos.\nMantener WEAPON L/R y usar una direccion para cambiar de arma." },
+
+					{ "Hyper Charge slot:", "Ranura de Hyper Charge:" },
+					{ "Weapon slot number which Hyper Charge uses.", "Numero de ranura que usa Hyper Charge." },
+
+					{ "Giga Attack down special:", "Giga Attack abajo especial:" },
+					{ "Allows to perform Giga Crush by pressing DOWN + SPC,\nbut you lose the ability to switch to Giga Crush.", "Permite usar Giga Crush presionando ABAJO + SPC,\npero pierdes la habilidad de cambiar a Giga Crush." },
+
+					{ "N.Strike side special:", "N.Strike lateral especial:" },
+					{ "Allows to perform Nova Strike by pressing SPC,\nbut you lose the ability to switch to Nova Strike.", "Permite usar Nova Strike presionando SPC,\npero pierdes la habilidad de cambiar a Nova Strike." },
+
+					{ "Swap air attacks:", "Cambiar ataques aereos:" },
+					{ "Swaps the inputs for air slash attack,\nand Kuuenzan (or any other air special).", "Intercambia los controles del slash aereo\ny el Kuuenzan (u otro especial aereo)." },
+
+					{ "Show giga cooldown:", "Mostrar cooldown de giga:" },
+					{ "Shows a cooldown circle for giga attacks.", "Muestra un circulo de cooldown para ataques giga." },
+
+					{ "Swap goliath shoot:", "Intercambiar disparo de goliath:" },
+					{ "You can swap the inputs for\nGoliath buster and missiles.", "Puedes intercambiar los controles del buster y misiles de Goliath." },
+
+					{ "Block mech scroll:", "Bloquear cambio a armadura:" },
+					{ "Prevents ability to scroll to the Ride Armor slot.\nYou will only be able to switch to it by pressing 3.", "Evita cambiar al slot de armadura mecanica.\nSolo podras cambiar a ella presionando 3." },
+
+					{ "Weapon order:", "Orden de armas:" },
+					{ "Choose the order in which Vile's weapons are arranged.", "Elige el orden en el que se muestran las armas de Vile." },
+
+					{ "Vile V ride control:", "Control del ride de Vile V:" },
+					{ "If set to Hold, Vile V will control the Ride\nonly as long as WEAPON L/R is held.", "Si esta en Mantener, Vile V controlara el ride\nsolo mientras se mantenga WEAPON L/R." },
+
+					{ "Lock in air cannon:", "Fijar canon en aire:" },
+					{ "If No, Front Runner and Fat Boy cannons will not\nroot Vile in the air when shot.", "Si esta en No, los canones Front Runner y Fat Boy no fijaran a Vile en el aire al disparar." },
+
+					{ "Aim mode:", "Modo de apuntado:" },
+					{ "Change Axl's aim controls to either use\nARROW KEYS (Directional) or mouse aim (Cursor).", "Cambia el modo de apuntado de Axl a teclas \nde direccion o al cursor del raton." },
+
+					{ "Aim sensitivity:", "Sensibilidad de apuntado:" },
+					{ "Change aim sensitivity (for Cursor aim mode only.)", "Cambia la sensibilidad al apuntar (solo modo Cursor)." },
+
+					{ "Auto aim:", "Autoapuntado:" },
+					{ "Enable/disable auto-aim\n(For Directional aim mode only.)", "Activa o desactiva el autoapuntado (solo modo Direccional)." },
+
+					{ "Analog stick aim:", "Mira con stick analogico:" },
+					{ "Enables 360 degree aim if binding Axl aim controls\nto a controller analog stick.", "Permite apuntar en 360° si se usa el stick analogico del mando." },
+
+					{ "Aim key function:", "Tipo de tecla de apuntado:" },
+					{ "Change the behavior of Axl's aim key.", "Cambia el comportamiento de la tecla de apuntado de Axl." },
+
+					{ "Aim key behavior:", "Forma de tecla de apuntado:" },
+					{ "Change whether Axl's aim key\nis toggle or hold based.", "Elige si la tecla de apuntado de Axl es mantener o alternar." },
+
+					{ "Move in diagonal aim:", "Mover en apuntado diagonal:" },
+					{ "Allows Axl to move when aiming diagonally,\notherwise he is locked in place when shooting.", "Permite mover a Axl al apuntar en diagonal,\nde lo contrario queda fijo al disparar." },
+
+					{ "Aim down & crouch:", "Apuntar abajo y agacharse:" },
+					{ "If mixed, Aim down and crouch will bind to\nthe same button and crouching will not aim down.", "Si es combinado, apuntar abajo y agacharse usaran el mismo boton,\ny al agacharse no apuntara hacia abajo." },
+
+					{ "Enables Grid Mode for Axl\nwhich works the same way as X.", "Activa el modo de cuadricula para Axl,\nfunciona igual que con X." },
+
+					{ "Show roll cooldown:", "Mostrar recarga de rodar:" },
+					{ "If enabled, shows a cooldown circle above Axl head\nindicating Dodge Roll cooldown.", "Muestra un circulo de recarga sobre la cabeza de Axl\nindicando la recarga del rodar." },
+
+					{ "Sigma slot:", "Ranura de Sigma:" },
+					{ "Changes the position of the\nSigma slot in Sigma's hotbar.", "Cambia la posicion de la ranura de Sigma en la barra de armas de Sigma." },
+
+					{ "Puppeteer control:", "Control de Marionetista:" },
+					{ "If set to Hold, Puppeteer Sigma will control\na Maverick only as long as WEAPON L/R is held.", "Si se establece en Mantener, Sigma marionetista controlara a un Maverick solo mientras se mantenga pulsado WEAPON L/R." },
+
+					{ "Maverick start mode:", "Modo inicial de Maverick:" },
+					{ "Change whether Mavericks will follow Sigma,\nor hold position, after summoned.", "Cambia si los Mavericks seguiran a Sigma o se mantendran en su lugar tras ser invocados." },
+
+					{ "Puppeteer cancel:", "Cancelar marioneta:" },
+					{ "If set to Yes, Mavericks will revert to\ntheir idle state when switched to in Puppeteer mode.", "Si se activa, los Mavericks volveran a su estado inactivo al cambiar de control en modo marioneta." },
+
+					{ "Pup small energy bars:", "Barras pequenas (Marioneta):" },
+					{ "Makes the energy bars smaller for Puppeteer.\nRequires the small bars option to work.", "Reduce el tamano de las barras de energia para el modo marioneta.\nRequiere activar la opcion de barras pequenas." },
+
+					{ "Hold", "Mantener" },
+					{ "Simul", "Simul" },
+					{ "seconds", "segundos" },
+					{ "English", "Ingles" },
+					{ "Spanish", "Espanol" },
+					{ "Portuguese", "Portugues" },
+					{ "Yes", "Si" },
+					{ "No", "No" },
+					{ "Directional", "Direccional" },
+					{ "Cursor", "Cursor" },
+					{ "Toggle", "Alternar" },
+					{ "Separate", "Separado" },
+					{ "Mixed", "Combinado" },
+					{ "Follow", "Seguir" },
+					{ "Hold Position", "Mantener posicion" },
+				}
+			},
+			{
+				Language.Portuguese, new Dictionary<string, string> {
+					{ "ou macaco", "macacooooo" }
+				}
+			},
+		};
+
+	public static string Translate(string key, int languageSetting) {
+		Language lang = (Language)languageSetting;
+		if (Translations.TryGetValue(lang, out var langDict)) {
+			if (langDict.TryGetValue(key, out string translated)) {
+				return translated;
+			}
+		}
+		// Fallback: return key itself
+		return key;
+	}
+}
 
 	public OptionsMenu(IMainMenu mainMenu, bool inGame, int? charNum, int selectY) {
 		previous = mainMenu;
@@ -76,18 +272,14 @@ public class OptionsMenu : IMainMenu {
 					() => {
 						if (inGame) return;
 						if (Global.input.isPressedMenu(Control.MenuLeft)) {
-							if (Options.main.fullScreen) {
-								Options.main.fullScreen = false;
-							}
+							if (Options.main.fullScreen) Options.main.fullScreen = false;
 						} else if (Global.input.isPressedMenu(Control.MenuRight)) {
-							if (!Options.main.fullScreen) {
-								Options.main.fullScreen = true;
-							}
+							if (!Options.main.fullScreen) Options.main.fullScreen = true;
 						}
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Fullscreen:",
+							optionFontText, Localization.Translate("Fullscreen:", Options.main.languageSetting),
 							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
@@ -95,25 +287,22 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Set to Yes to make the game render fullscreen."
+					Localization.Translate("Set to Yes to make the game render fullscreen.", Options.main.languageSetting)
 				),
+
 				// Windowed resolution
 				new MenuOption(
 					30, startY,
 					() => {
 						if (Global.input.isPressedMenu(Control.MenuLeft)) {
-							Options.main.windowScale = (uint) Helpers.clamp(
-								(int) Options.main.windowScale - 1, 1, 6
-							);
+							Options.main.windowScale = (uint)Helpers.clamp((int)Options.main.windowScale - 1, 1, 6);
 						} else if (Global.input.isPressedMenu(Control.MenuRight)) {
-							Options.main.windowScale = (uint) Helpers.clamp(
-								(int) Options.main.windowScale + 1, 1, 6
-							);
+							Options.main.windowScale = (uint)Helpers.clamp((int)Options.main.windowScale + 1, 1, 6);
 						}
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Windowed Resolution:",
+							optionFontText, Localization.Translate("Windowed Resolution:", Options.main.languageSetting),
 							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
@@ -121,8 +310,9 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Change the windowed resolution of the game."
+					Localization.Translate("Change the windowed resolution of the game.", Options.main.languageSetting)
 				),
+
 				// Show FPS
 				new MenuOption(
 					30, startY,
@@ -135,7 +325,7 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Show FPS:",
+							optionFontText, Localization.Translate("Show FPS:", Options.main.languageSetting),
 							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
@@ -143,8 +333,9 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Show the frames per second (FPS) in the bottom right."
+					Localization.Translate("Show the frames per second (FPS) in the bottom right.", Options.main.languageSetting)
 				),
+
 				// Lock FPS
 				new MenuOption(
 					30, startY,
@@ -158,7 +349,7 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Max FPS:",
+							optionFontText, Localization.Translate("Max FPS:", Options.main.languageSetting),
 							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
@@ -166,8 +357,9 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Controls the max framerate the game can run.\nLower values are more choppy but use less GPU."
+					Localization.Translate("Controls the max framerate the game can run.\nLower values are more choppy but use less GPU.", Options.main.languageSetting)
 				),
+
 				// VSYNC
 				new MenuOption(
 					30, startY,
@@ -177,7 +369,7 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Enable VSYNC:",
+							optionFontText, Localization.Translate("Enable VSYNC:", Options.main.languageSetting),
 							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
@@ -185,8 +377,9 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Set to Yes to enable vsync.\nMakes movement/scrolling smoother, but adds input lag."
+					Localization.Translate("Set to Yes to enable vsync.\nMakes movement/scrolling smoother, but adds input lag.", Options.main.languageSetting)
 				),
+
 				// Use optimized sprites
 				new MenuOption(
 					30, startY,
@@ -196,7 +389,7 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Use optimized assets:",
+							optionFontText, Localization.Translate("Use optimized assets:", Options.main.languageSetting),
 							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
@@ -204,8 +397,9 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Set to Yes to use optimized assets.\nThis can result in better performance."
+					Localization.Translate("Set to Yes to use optimized assets.\nThis can result in better performance.", Options.main.languageSetting)
 				),
+
 				// Full screen integer
 				new MenuOption(
 					30, startY,
@@ -214,17 +408,17 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Integer fullscreen:",
+							optionFontText, Localization.Translate("Integer fullscreen:", Options.main.languageSetting),
 							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
-							optionFontValue,Helpers.boolYesNo(Options.main.integerFullscreen),
+							optionFontValue, Helpers.boolYesNo(Options.main.integerFullscreen),
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Rounds down fullscreen pixels to the nearest integer.\n" +
-					"Reduces distortion when going fullscreen."
+					Localization.Translate("Rounds down fullscreen pixels to the nearest integer.\nReduces distortion when going fullscreen.", Options.main.languageSetting)
 				),
+
 				// Small Bars
 				new MenuOption(
 					30, startY,
@@ -237,7 +431,7 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Enable small bars:",
+							optionFontText, Localization.Translate("Enable small bars:", Options.main.languageSetting),
 							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
@@ -245,8 +439,9 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Makes some of the energy bars smaller."
+					Localization.Translate("Makes some of the energy bars smaller.", Options.main.languageSetting)
 				),
+
 				// Preset
 				new MenuOption(
 					30, startY,
@@ -271,7 +466,7 @@ public class OptionsMenu : IMainMenu {
 							color = FontType.Grey;
 						}
 						Fonts.drawText(
-							optionFontText, "Preset Quality:",
+							optionFontText, Localization.Translate("Preset Quality:", Options.main.languageSetting),
 							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
@@ -279,8 +474,9 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Choose a pre-configured set of graphics settings."
+					Localization.Translate("Choose a pre-configured set of graphics settings.", Options.main.languageSetting)
 				),
+
 				// Shaders
 				new MenuOption(40, startY,
 					() => {
@@ -294,7 +490,7 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							getVideoSettingColor(), "-Enable shaders:",
+							getVideoSettingColor(), Localization.Translate("-Enable shaders:", Options.main.languageSetting),
 							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
@@ -302,8 +498,9 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Enables special effects like weapon palettes.\nNot all PCs support this."
+					Localization.Translate("Enables special effects like weapon palettes.\nNot all PCs support this.", Options.main.languageSetting)
 				),
+
 				// Post processing
 				new MenuOption(40, startY,
 					() => {
@@ -313,7 +510,7 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							getVideoSettingColor(), "-Enable post-processing: ",
+							getVideoSettingColor(), Localization.Translate("-Enable post-processing:", Options.main.languageSetting),
 							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
@@ -321,8 +518,49 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Enables special screen distortion effects.\nNot all PCs support this."
+					Localization.Translate("Enables special screen distortion effects.\nNot all PCs support this.", Options.main.languageSetting)
 				),
+
+				// Particle quality
+				new MenuOption(40, startY,
+					() => {
+						if (inGame) return;
+						if (Options.main.graphicsPreset < 3) return;
+						Helpers.menuLeftRightInc(ref Options.main.particleQuality, 0, 2);
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							getVideoSettingColor(), Localization.Translate("-Particle quality:", Options.main.languageSetting),
+							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							getVideoSettingColor(), qualityToString(Options.main.particleQuality),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					Localization.Translate("Set the particle effect quality.\nLower quality results in faster performance.", Options.main.languageSetting)
+				),
+
+				// Map sprites
+				new MenuOption(40, startY,
+					() => {
+						if (inGame) return;
+						if (Options.main.graphicsPreset < 3) return;
+						Helpers.menuLeftRightBool(ref Options.main.enableMapSprites);
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							getVideoSettingColor(), Localization.Translate("-Enable map sprites:", Options.main.languageSetting),
+							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							getVideoSettingColor(), Helpers.boolYesNo(Options.main.enableMapSprites),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					Localization.Translate("Enable or disable map sprites.\nDisabling map sprites results in faster performance.", Options.main.languageSetting)
+				),
+
 				// fontType
 				/*new MenuOption(40, startY,
 					() => {
@@ -343,44 +581,6 @@ public class OptionsMenu : IMainMenu {
 					"Set the font type. Bitmap uses PNG, Vector uses TFF.\n" +
 					"Hybrid will use Bitmap in menus and Vector in-game."
 				),*/
-				// particleQuality
-				new MenuOption(40, startY,
-					() => {
-						if (inGame) return;
-						if (Options.main.graphicsPreset < 3) return;
-						Helpers.menuLeftRightInc(ref Options.main.particleQuality, 0, 2);
-					},
-					(Point pos, int index) => {
-						Fonts.drawText(
-							getVideoSettingColor(), "-Particle quality:",
-							pos.x, pos.y, selected: selectedArrowPosY == index
-						);
-						Fonts.drawText(
-							getVideoSettingColor(), qualityToString(Options.main.particleQuality),
-							pos.x + 166, pos.y, selected: selectedArrowPosY == index
-						);
-					},
-					"Set the particle effect quality.\nLower quality results in faster performance."
-				),
-				// map sprites
-				new MenuOption(40, startY,
-					() => {
-						if (inGame) return;
-						if (Options.main.graphicsPreset < 3) return;
-						Helpers.menuLeftRightBool(ref Options.main.enableMapSprites);
-					},
-					(Point pos, int index) => {
-						Fonts.drawText(
-							getVideoSettingColor(), "-Enable map sprites:",
-							pos.x, pos.y, selected: selectedArrowPosY == index
-						);
-						Fonts.drawText(
-							getVideoSettingColor(), Helpers.boolYesNo(Options.main.enableMapSprites),
-							pos.x + 166, pos.y, selected: selectedArrowPosY == index
-						);
-					},
-					"Enable or disable map sprites.\nDisabling map sprites results in faster performance."
-				),
 			};
 		} else if (isGameplay) {
 			menuOptions = new List<MenuOption>() {
@@ -483,9 +683,10 @@ public class OptionsMenu : IMainMenu {
 						}
 					},
 					(Point pos, int index) => {
-						var musicVolume100 = (int) Math.Round(Options.main.musicVolume * 100);
+						var musicVolume100 = (int)Math.Round(Options.main.musicVolume * 100);
 						Fonts.drawText(
-							optionFontText, "Music Volume:",
+							optionFontText,
+							Localization.Translate("Music Volume:", Options.main.languageSetting),
 							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
@@ -493,7 +694,7 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Adjust the game music volume."
+					Localization.Translate("Adjust the game music volume.", Options.main.languageSetting)
 				),
 				// Sound volume
 				new MenuOption(
@@ -506,17 +707,18 @@ public class OptionsMenu : IMainMenu {
 						}
 					},
 					(Point pos, int index) => {
-						var soundVolume100 = (int) Math.Round(Options.main.soundVolume * 100);
+						var soundVolume100 = (int)Math.Round(Options.main.soundVolume * 100);
 						Fonts.drawText(
-							optionFontText, "Sound Volume:",
- 							pos.x, pos.y, selected: selectedArrowPosY == index
+							optionFontText,
+							Localization.Translate("Sound Volume:", Options.main.languageSetting),
+							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
 							optionFontValue, soundVolume100.ToString(),
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Adjust the game sound volume."
+					Localization.Translate("Adjust the game sound volume.", Options.main.languageSetting)
 				),
 				// Multiplayer Name
 				new MenuOption(
@@ -534,7 +736,8 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Multiplayer name:",
+							optionFontText,
+							Localization.Translate("Multiplayer name:", Options.main.languageSetting),
  							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
@@ -542,7 +745,7 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Your name that appears to others when you play online."
+					Localization.Translate("Your name that appears to others when you play online.", Options.main.languageSetting)
 				),
 				// Multiplayer region
 				new MenuOption(
@@ -561,7 +764,8 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Multiplayer region:",
+							optionFontText,
+							Localization.Translate("Multiplayer region:", Options.main.languageSetting),
 							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
@@ -572,7 +776,8 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Preferred server region for hosting matches.\nChoose the one with lowest ping."
+					Localization.Translate("Region for RELAY type servers. You may need ask for the\n region on discord or is built in already on the game."
+					, Options.main.languageSetting)				
 				),
 				// Hide Menu Helper Text
 				/*new MenuOption(
@@ -608,15 +813,14 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Show startup warnings:",
+							optionFontText, Localization.Translate("Show startup warnings:", Options.main.languageSetting),
  							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
 							optionFontValue, Helpers.boolYesNo(Options.main.showSysReqPrompt),
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
-					},
-					"On launch, check for system requirements\nand other startup warnings."
+					}, Localization.Translate("On launch, check for system requirements\nand other startup warnings.", Options.main.languageSetting)
 				),
 				// Disable Chat
 				new MenuOption(
@@ -630,7 +834,7 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Disable chat:",
+							optionFontText, Localization.Translate("Disable chat:", Options.main.languageSetting),
  							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
@@ -638,7 +842,7 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Set to Yes to disable sending and receiving\nchat messages in online matches."
+					Localization.Translate("Set to Yes to disable sending and receiving\nchat messages in online matches.", Options.main.languageSetting)
 				),
 				// Mash progress
 				new MenuOption(
@@ -648,7 +852,7 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Show mash progress:",
+							optionFontText, Localization.Translate("Show mash progress:", Options.main.languageSetting),
  							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
@@ -656,8 +860,7 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"When hit by moves that can be mashed out of,\n" +
-					"shows the mash progress above your head."
+					Localization.Translate("When hit by moves that can be mashed out of,\nshows the mash progress above your head." , Options.main.languageSetting)
 				),
 				// Matchmaking Timeout
 				new MenuOption(
@@ -675,7 +878,8 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Matchmaking timeout:",
+							optionFontText,
+							Localization.Translate("Matchmaking timeout:", Options.main.languageSetting),
  							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
@@ -683,8 +887,10 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"How long match search will take before erroring out.\n" +
-					"If always erroring out in search, try increasing this."
+					Localization.Translate(
+						"How long match search will take before erroring out.\n If always erroring out in search, try increasing this.",
+						Options.main.languageSetting
+					)
 				),
 				// Dev console.
 				new MenuOption(
@@ -694,7 +900,7 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Enable dev console:",
+							optionFontText, Localization.Translate("Enable dev console:", Options.main.languageSetting),
  							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
@@ -702,12 +908,43 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"If enabled, press F10 to open the dev-console in-match\n" +
-					"See the game website for a list of commands."
+					Localization.Translate(
+						"If enabled, press F10 to open the dev-console in-match\nSee the game website for a list of commands.",
+						Options.main.languageSetting
+					)
+				),
+				new MenuOption(
+					30, startY,
+					() => {
+						Helpers.menuLeftRightInc(ref Options.main.languageSetting, 1, 3, true, true);
+					},
+					(Point pos, int index) => {
+						string language = Localization.Translate(
+							Options.main.languageSetting == 1 ? "English" :
+							Options.main.languageSetting == 2 ? "Spanish" :
+							Options.main.languageSetting == 3 ? "Portugues" : "English",
+							Options.main.languageSetting
+						);
+						Fonts.drawText(
+							optionFontText,
+							Localization.Translate("Language setting:", Options.main.languageSetting),
+							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue,
+							language,
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					Localization.Translate(
+						"Change the language of the game.\nCurrent languages: English, Spanish, Portuguese.",
+						Options.main.languageSetting
+					)
 				),
 			};
 		} else if (charNum == 0) {
 			menuOptions = new List<MenuOption>() {
+				// Weapon switch grid mode
 				new MenuOption(
 					30, startY,
 					() => {
@@ -715,37 +952,37 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Weapon switch grid mode:",
- 							pos.x, pos.y, selected: selectedArrowPosY == index
+							optionFontText, Localization.Translate("Weapon switch grid mode:", Options.main.languageSetting),
+							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
 							optionFontValue, gridModeToStr(Options.main.gridModeX),
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"For weapon switch in certain or all modes.\n" +
-					"Hold WEAPON L/R and use a directon to switch weapon."
+					Localization.Translate("For weapon switch in certain or all modes.\nHold WEAPON L/R and use a directon to switch weapon.", Options.main.languageSetting)
 				),
-				// Hyper Charge slot.
+
+				// Hyper Charge slot
 				new MenuOption(
 					30, startY,
 					() => {
 						Helpers.menuLeftRightInc(ref Options.main.hyperChargeSlot, 0, 2);
 					},
 					(Point pos, int index) => {
-						// ToDo: Implement "Buster" option for hypercharge like HDM.
 						Fonts.drawText(
-							optionFontText, "Hyper charge slot:",
- 							pos.x, pos.y, selected: selectedArrowPosY == index
+							optionFontText, Localization.Translate("Hyper charge slot:", Options.main.languageSetting),
+							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
 							optionFontValue, (Options.main.hyperChargeSlot + 1).ToString(),
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Weapon slot number which Hyper Charge uses."
+					Localization.Translate("Weapon slot number which Hyper Charge uses.", Options.main.languageSetting)
 				),
-				// Down+Special Giga Attacks
+
+				// Giga Attack down special
 				new MenuOption(
 					30, startY,
 					() => {
@@ -753,18 +990,18 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Giga Attack down special:",
- 							pos.x, pos.y, selected: selectedArrowPosY == index
+							optionFontText, Localization.Translate("Giga Attack down special:", Options.main.languageSetting),
+							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
 							optionFontValue, Helpers.boolYesNo(Options.main.gigaCrushSpecial),
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Allows to perform Giga Crush by pressing DOWN + SP,\n" +
-					"but you lose the ability to switch to Giga Crush."
+					Localization.Translate("Allows to perform Giga Crush by pressing DOWN + SP,\nbut you lose the ability to switch to Giga Crush.", Options.main.languageSetting)
 				),
-				// Nova Strike special.
+
+				// Nova Strike side special
 				new MenuOption(
 					30, startY,
 					() => {
@@ -772,16 +1009,15 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "N.Strike side special:",
- 							pos.x, pos.y, selected: selectedArrowPosY == index
+							optionFontText, Localization.Translate("N.Strike side special:", Options.main.languageSetting),
+							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
 							optionFontValue, Helpers.boolYesNo(Options.main.novaStrikeSpecial),
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Allows to perform Nova Strike by pressing SPC,\n" +
-					"but you lose the ability to switch to Nova Strike."
+					Localization.Translate("Allows to perform Nova Strike by pressing SPC,\nbut you lose the ability to switch to Nova Strike.", Options.main.languageSetting)
 				),
 				/*
 				new MenuOption(
@@ -810,6 +1046,7 @@ public class OptionsMenu : IMainMenu {
 			};
 		} else if (charNum == 1) {
 			menuOptions = new List<MenuOption>() {
+				// Swap Air Attacks
 				new MenuOption(
 					30, startY,
 					() => {
@@ -817,18 +1054,18 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Swap air attacks:",
- 							pos.x, pos.y, selected: selectedArrowPosY == index
+							optionFontText, Localization.Translate("Swap air attacks:", Options.main.languageSetting),
+							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
 							optionFontValue, Helpers.boolYesNo(Options.main.swapAirAttacks),
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Swaps the inputs for air slash attack,\n" +
-					"and Kuuenzan (or any other air special)."
+					Localization.Translate("Swaps the inputs for air slash attack,\nand Kuuenzan (or any other air special).", Options.main.languageSetting)
 				),
-				// Zero Giga cooldown.
+
+				// Show Giga Cooldown
 				new MenuOption(
 					30, startY,
 					() => {
@@ -836,20 +1073,20 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Show giga cooldown:",
- 							pos.x, pos.y, selected: selectedArrowPosY == index
+							optionFontText, Localization.Translate("Show giga cooldown:", Options.main.languageSetting),
+							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
 							optionFontValue, Helpers.boolYesNo(Options.main.showGigaAttackCooldown),
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Shows a cooldown circle for giga attacks."
+					Localization.Translate("Shows a cooldown circle for giga attacks.", Options.main.languageSetting)
 				),
 			};
 		} else if (charNum == 2) {
 			menuOptions = new List<MenuOption>() {
-				// Swap goliath inputs
+				// Swap Goliath Inputs
 				new MenuOption(
 					30, startY,
 					() => {
@@ -857,17 +1094,18 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Swap goliath shoot:",
- 							pos.x, pos.y, selected: selectedArrowPosY == index
+							optionFontText, Localization.Translate("Swap goliath shoot:", Options.main.languageSetting),
+							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
 							optionFontValue, Helpers.boolYesNo(Options.main.swapGoliathInputs),
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"You can swap the inputs for\nGoliath buster and missiles."
+					Localization.Translate("You can swap the inputs for\nGoliath buster and missiles.", Options.main.languageSetting)
 				),
-				// Block ride armor scroll
+
+				// Block Ride Armor Scroll
 				new MenuOption(
 					30, startY,
 					() => {
@@ -875,17 +1113,17 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Block mech scroll:",
- 							pos.x, pos.y, selected: selectedArrowPosY == index
+							optionFontText, Localization.Translate("Block mech scroll:", Options.main.languageSetting),
+							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
 							optionFontValue, Helpers.boolYesNo(Options.main.blockMechSlotScroll),
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Prevents ability to scroll to the Ride Armor slot.\n" +
-					"You will only be able to switch to it by pressing 3."
+					Localization.Translate("Prevents ability to scroll to the Ride Armor slot.\nYou will only be able to switch to it by pressing 3.", Options.main.languageSetting)
 				),
+
 				// Weapon Ordering
 				new MenuOption(
 					30, startY,
@@ -893,22 +1131,22 @@ public class OptionsMenu : IMainMenu {
 						Helpers.menuLeftRightInc(ref Options.main.weaponOrderingVile, 0, 1);
 					},
 					(Point pos, int index) => {
-						string str = "F.Runner,Vulcan,R.Armors";
-						if (Options.main.weaponOrderingVile == 1) {
-							str = "Vulcan,F.Runner,R.Armors";
-						}
+						string str = Options.main.weaponOrderingVile == 1 ?
+							Localization.Translate("Vulcan,F.Runner,R.Armors", Options.main.languageSetting) :
+							Localization.Translate("F.Runner,Vulcan,R.Armors", Options.main.languageSetting);
 						Fonts.drawText(
-							optionFontText, "Weapon order:",
- 							pos.x, pos.y, selected: selectedArrowPosY == index
+							optionFontText, Localization.Translate("Weapon order:", Options.main.languageSetting),
+							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
 							optionFontValue, str,
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Choose the order in which Vile's weapons are arranged."
+					Localization.Translate("Choose the order in which Vile's weapons are arranged.", Options.main.languageSetting)
 				),
-				// MK5 Ride control
+
+				// MK5 Ride Control
 				new MenuOption(
 					30, startY,
 					() => {
@@ -916,16 +1154,17 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Vile V ride control:",
- 							pos.x, pos.y, selected: selectedArrowPosY == index
+							optionFontText, Localization.Translate("Vile V ride control:", Options.main.languageSetting),
+							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
-							optionFontValue, (Options.main.mk5PuppeteerHoldOrToggle ? "Hold" : "Simul"),
+							optionFontValue, Options.main.mk5PuppeteerHoldOrToggle ? Localization.Translate("Hold", Options.main.languageSetting) : Localization.Translate("Simul", Options.main.languageSetting),
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"If set to Hold, Vile V will control the Ride\nonly as long as WEAPON L/R is held."
+					Localization.Translate("If set to Hold, Vile V will control the Ride\nonly as long as WEAPON L/R is held.", Options.main.languageSetting)
 				),
+
 				// Lock Cannon Air
 				new MenuOption(
 					30, startY,
@@ -934,15 +1173,15 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Lock in air cannon:",
- 							pos.x, pos.y, selected: selectedArrowPosY == index
+							optionFontText, Localization.Translate("Lock in air cannon:", Options.main.languageSetting),
+							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
-							optionFontValue, (Options.main.lockInAirCannon ? "Yes" : "No"),
+							optionFontValue, Options.main.lockInAirCannon ? Localization.Translate("Yes", Options.main.languageSetting) : Localization.Translate("No", Options.main.languageSetting),
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"If No, Front Runner and Fat Boy cannons will not\nroot Vile in the air when shot."
+					Localization.Translate("If No, Front Runner and Fat Boy cannons will not\nroot Vile in the air when shot.", Options.main.languageSetting)
 				),
 			};
 		} else if (charNum == 3) {
@@ -962,7 +1201,7 @@ public class OptionsMenu : IMainMenu {
 						if (Options.main.axlAimMode == 1) aimMode = "Directional";
 						else if (Options.main.axlAimMode == 2) aimMode = "Cursor";
 						Fonts.drawText(
-							optionFontText, "Aim mode:",
+							optionFontText, Localization.Translate("Aim mode:", Options.main.languageSetting),
  							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
@@ -970,7 +1209,7 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Change Axl's aim controls to either use\nARROW KEYS (Directional) or mouse aim (Cursor)."
+					Localization.Translate("Change Axl's aim controls to either use\nARROW KEYS (Directional) or mouse aim (Cursor).", Options.main.languageSetting)
 				),
 				// Axl Mouse sensitivity
 				new MenuOption(
@@ -985,7 +1224,7 @@ public class OptionsMenu : IMainMenu {
 					(Point pos, int index) => {
 						var str = (int)Math.Round(Options.main.aimSensitivity * 100);
 						Fonts.drawText(
-							optionFontText, "Aim sensitivity:",
+							optionFontText, Localization.Translate("Aim sensitivity:", Options.main.languageSetting),
  							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
@@ -993,7 +1232,7 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Change aim sensitivity (for Cursor aim mode only.)"
+					Localization.Translate("Change aim sensitivity (for Cursor aim mode only.)", Options.main.languageSetting)
 				),
 				// Axl Lock On
 				new MenuOption(
@@ -1008,7 +1247,7 @@ public class OptionsMenu : IMainMenu {
 					(Point pos, int index) => {
 						//ToDo: Add an actual option for the sound.
 						Fonts.drawText(
-							optionFontText, "Auto aim:",
+							optionFontText, Localization.Translate("Auto aim:", Options.main.languageSetting),
  							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
@@ -1016,7 +1255,7 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Enable/disable auto-aim-\n(For Directional aim mode only.)"
+					Localization.Translate("Enable/disable auto-aim\n(For Directional aim mode only.)", Options.main.languageSetting)
 				),
 				// Axl Backwards Aim Invert
 				new MenuOption(
@@ -1030,7 +1269,7 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Analog stick aim:",
+							optionFontText, Localization.Translate("Analog stick aim:", Options.main.languageSetting),
  							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
@@ -1038,7 +1277,7 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Enables 360 degree aim if binding Axl aim controls\nto a controller analog stick."
+					Localization.Translate("Enables 360 degree aim if binding Axl aim controls\nto a controller analog stick.", Options.main.languageSetting)
 				),
 				// Aim key function
 				new MenuOption(
@@ -1048,7 +1287,7 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Aim key function:",
+							optionFontText, Localization.Translate("Aim key function:", Options.main.languageSetting),
  							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
@@ -1056,7 +1295,7 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Change the behavior of Axl's \"aim key\"."
+					Localization.Translate("Change the behavior of Axl's aim key.", Options.main.languageSetting)
 				),
 				// Aim key toggle
 				new MenuOption(
@@ -1066,15 +1305,15 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Aim key behavior:",
+							optionFontText, Localization.Translate("Aim key behavior:", Options.main.languageSetting),
  							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
-							optionFontValue, (Options.main.aimKeyToggle ? "Toggle" : "Hold"),
+							optionFontValue, Options.main.aimKeyToggle ? Localization.Translate("Toggle", Options.main.languageSetting) : Localization.Translate("Hold", Options.main.languageSetting),
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Change whether Axl's \"aim key\"\nis toggle or hold based."
+					Localization.Translate("Change whether Axl's aim key\nis toggle or hold based.", Options.main.languageSetting)
 				),
 				// Diag aim movement
 				new MenuOption(
@@ -1084,7 +1323,7 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Move in diagonal aim:",
+							optionFontText, Localization.Translate("Move in diagonal aim:", Options.main.languageSetting),
  							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
@@ -1092,7 +1331,7 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Allows Axl tomove when aiming diagonally,\notherwise he is locked in place when shooting."
+					Localization.Translate("Allows Axl to move when aiming diagonally,\notherwise he is locked in place when shooting.", Options.main.languageSetting)
 				),
 				// Axl Separate aim crouch
 				new MenuOption(
@@ -1106,16 +1345,15 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Aim down & crouch:",
+							optionFontText, Localization.Translate("Aim down & crouch:", Options.main.languageSetting),
  							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
-							optionFontValue, Options.main.axlSeparateAimDownAndCrouch ? "Separate" : "Mixed",
+							optionFontValue, Options.main.axlSeparateAimDownAndCrouch ? Localization.Translate("Separate", Options.main.languageSetting) : Localization.Translate("Mixed", Options.main.languageSetting),
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"If \"mixed\" Aim down and crounch will bind to\n" +
-					"the same button and crouching will not aim down."
+					Localization.Translate("If mixed, Aim down and crouch will bind to\nthe same button and crouching will not aim down.", Options.main.languageSetting)
 				),
 				// Grid mode Axl
 				new MenuOption(
@@ -1125,7 +1363,7 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "weapon switch grid mode:",
+							optionFontText,  Localization.Translate("Weapon switch grid mode:", Options.main.languageSetting),
  							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
@@ -1133,7 +1371,7 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Enables Grid Mode for Axl,\nwhich works the same way as X's."
+					Localization.Translate("Enables Grid Mode for Axl\nwhich works the same way as X.", Options.main.languageSetting)
 				),
 				// Roll Cooldown HUD.
 				new MenuOption(
@@ -1143,7 +1381,7 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Show roll cooldown:",
+							optionFontText, Localization.Translate("Show roll cooldown:", Options.main.languageSetting),
  							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
@@ -1151,12 +1389,12 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"If enabled, shows a cooldown circle above Axl's head\n" +
-					"indicating Dodge Roll cooldown."
+					Localization.Translate("If enabled, shows a cooldown circle above Axl head\nindicating Dodge Roll cooldown.", Options.main.languageSetting)
 				),
 			};
 		} else if (charNum == 4) {
 			menuOptions = new List<MenuOption>() {
+				// Sigma Slot
 				new MenuOption(
 					30, startY,
 					() => {
@@ -1164,17 +1402,17 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Sigma slot:",
- 							pos.x, pos.y, selected: selectedArrowPosY == index
+							optionFontText, Localization.Translate("Sigma slot:", Options.main.languageSetting),
+							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
 							optionFontValue, (Options.main.sigmaWeaponSlot + 1).ToString(),
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Changes the position of the\nSigma slot in Sigma's hotbar."
+					Localization.Translate("Changes the position of the\nSigma slot in Sigma's hotbar.", Options.main.languageSetting)
 				),
-				// Pupeteer control mode.
+				// Puppeteer Control
 				new MenuOption(
 					30, startY,
 					() => {
@@ -1182,17 +1420,17 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Puppeteer control:",
- 							pos.x, pos.y, selected: selectedArrowPosY == index
+							optionFontText, Localization.Translate("Puppeteer control:", Options.main.languageSetting),
+							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
-							optionFontValue, (Options.main.puppeteerHoldOrToggle ? "Hold" : "Toggle"),
+							optionFontValue, Localization.Translate(Options.main.puppeteerHoldOrToggle ? "Hold" : "Toggle", Options.main.languageSetting),
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"If set to Hold, Puppeteer Sigma will control\na Maverick only as long as WEAPON L/R is held."
+					Localization.Translate("If set to Hold, Puppeteer Sigma will control\na Maverick only as long as WEAPON L/R is held.", Options.main.languageSetting)
 				),
-				// Maverick follow start.
+				// Maverick Start Mode
 				new MenuOption(
 					30, startY,
 					() => {
@@ -1200,17 +1438,17 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Maverick start mode:",
- 							pos.x, pos.y, selected: selectedArrowPosY == index
+							optionFontText, Localization.Translate("Maverick start mode:", Options.main.languageSetting),
+							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
-							optionFontValue, (Options.main.maverickStartFollow ? "Follow" : "Hold Position"),
+							optionFontValue, Localization.Translate(Options.main.maverickStartFollow ? "Follow" : "Hold Position", Options.main.languageSetting),
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Change whether Mavericks will follow Sigma,\nor hold position, after summoned."
+					Localization.Translate("Change whether Mavericks will follow Sigma,\nor hold position, after summoned.", Options.main.languageSetting)
 				),
-				// Pupeteer cancel.
+				// Puppeteer Cancel
 				new MenuOption(
 					30, startY,
 					() => {
@@ -1218,17 +1456,17 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Puppeteer cancel:",
- 							pos.x, pos.y, selected: selectedArrowPosY == index
+							optionFontText, Localization.Translate("Puppeteer cancel:", Options.main.languageSetting),
+							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
-							optionFontValue, (Options.main.puppeteerCancel ? "Yes" : "No"),
+							optionFontValue, Localization.Translate(Options.main.puppeteerCancel ? "Yes" : "No", Options.main.languageSetting),
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"If set to Yes, Mavericks will revert to\ntheir idle state when switched to in Puppeteer mode."
+					Localization.Translate("If set to Yes, Mavericks will revert to\ntheir idle state when switched to in Puppeteer mode.", Options.main.languageSetting)
 				),
-				// Small Bars for Pup Sigma
+				// Pup Small Energy Bars
 				new MenuOption(
 					30, startY,
 					() => {
@@ -1236,15 +1474,16 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Pup small energy bars:",
- 							pos.x, pos.y, selected: selectedArrowPosY == index
+							optionFontText, Localization.Translate("Pup small energy bars:", Options.main.languageSetting),
+							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
-							optionFontValue, (Options.main.smallBarsEx ? "Yes" : "No"),
+							optionFontValue, Localization.Translate(Options.main.smallBarsEx ? "Yes" : "No", Options.main.languageSetting),
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Makes the energy bars smaller for Puppeteer.\nRequires the \"small\" bars option to work.")
+					Localization.Translate("Makes the energy bars smaller for Puppeteer.\nRequires the small bars option to work.", Options.main.languageSetting)
+				),
 			};
 		}
 		for (int i = 0; i < menuOptions.Count; i++) {
@@ -1439,7 +1678,6 @@ public class OptionsMenu : IMainMenu {
 			DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
 			Global.sprites["cursor"].drawToHUD(0, cursorPos, 35 + (selectedArrowPosY * 10) + 3);
 		}
-
 		string subtitle = "GENERAL SETTINGS";
 		if (isGraphics) subtitle = "GRAPHICS SETTINGS";
 		else if (charNum == 0) subtitle = "X SETTINGS";
@@ -1460,7 +1698,7 @@ public class OptionsMenu : IMainMenu {
 		float rectY = 170;
 		if (!string.IsNullOrEmpty(helpText)) {
 			DrawWrappers.DrawRect(
-				20, rectY, Global.screenW - 20, rectY + 24, true,
+				8, rectY, Global.screenW - 8, rectY + 24, true,
 				new Color(0, 0, 0, 224), 1, ZIndex.HUD, false, outlineColor: Color.White
 			);
 			Fonts.drawText(
