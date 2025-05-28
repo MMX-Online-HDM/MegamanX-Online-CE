@@ -114,14 +114,14 @@ public class OptionsMenu : IMainMenu {
 					{ "Language setting:", "Opcion de lenguaje:"},
 					{ "Change the language of the game.\nCurrent languages: English, Spanish, Portuguese." , "Cambia el idioma del juego.\nIdiomas disponibles: Ingles, Espanol, Portugues."},
 
-					{ "Show mash progress:" , "Mostrar progreso de 'Mash" },
+					{ "Show mash progress:" , "Mostrar progreso de 'Mash':" },
 					{ "When hit by moves that can be mashed out of,\nshows the mash progress above your head." , "Ciertos ataques se necesita de presionar teclas para \nsalir de ello. Muestra un progreso arriba del jugador."},
 
 					{ "Matchmaking timeout:", "Tiempo de Busqueda:" },
 					{ "How long match search will take before erroring out.\n If always erroring out in search, try increasing this." , "Cuanto tiempo durara la busqueda de partida antes de fallar.\n Si siempre falla, intenta aumentarlo." },
 
 					{ "Weapon switch grid mode:", "Modo cuadricula de armas:" },
-					{ "For weapon switch in certain or all modes.\nHold WEAPON L/R and use a directon to switch weapon.", "Para cambiar de arma en ciertos o todos los modos.\nMantener WEAPON L/R y usar una direccion para cambiar de arma." },
+					{ "For weapon switch in certain or all modes.\nHold WEAPON L/R and use a directon to switch weapon.", "Para cambiar de arma en ciertos o todos los modos. Mantener \nWEAPON L/R y usar una direccion para cambiar de arma." },
 
 					{ "Hyper Charge slot:", "Ranura de Hyper Charge:" },
 					{ "Weapon slot number which Hyper Charge uses.", "Numero de ranura que usa Hyper Charge." },
@@ -135,11 +135,11 @@ public class OptionsMenu : IMainMenu {
 					{ "Swap air attacks:", "Cambiar ataques aereos:" },
 					{ "Swaps the inputs for air slash attack,\nand Kuuenzan (or any other air special).", "Intercambia los controles del slash aereo\ny el Kuuenzan (u otro especial aereo)." },
 
-					{ "Show giga cooldown:", "Mostrar cooldown de giga:" },
-					{ "Shows a cooldown circle for giga attacks.", "Muestra un circulo de cooldown para ataques giga." },
+					{ "Show giga cooldown:", "Mostrar cooldown de Giga:" },
+					{ "Shows a cooldown circle for giga attacks.", "Muestra un circulo de cooldown para los Giga Attacks." },
 
-					{ "Swap goliath shoot:", "Intercambiar disparo de goliath:" },
-					{ "You can swap the inputs for\nGoliath buster and missiles.", "Puedes intercambiar los controles del buster y misiles de Goliath." },
+					{ "Swap goliath shoot:", "cambiar disparo de goliath:" },
+					{ "You can swap the inputs for\nGoliath buster and missiles.", "Puedes intercambiar los controles\n del buster y misiles de Goliath." },
 
 					{ "Block mech scroll:", "Bloquear cambio a armadura:" },
 					{ "Prevents ability to scroll to the Ride Armor slot.\nYou will only be able to switch to it by pressing 3.", "Evita cambiar al slot de armadura mecanica.\nSolo podras cambiar a ella presionando 3." },
@@ -151,7 +151,7 @@ public class OptionsMenu : IMainMenu {
 					{ "If set to Hold, Vile V will control the Ride\nonly as long as WEAPON L/R is held.", "Si esta en Mantener, Vile V controlara el ride\nsolo mientras se mantenga WEAPON L/R." },
 
 					{ "Lock in air cannon:", "Fijar canon en aire:" },
-					{ "If No, Front Runner and Fat Boy cannons will not\nroot Vile in the air when shot.", "Si esta en No, los canones Front Runner y Fat Boy no fijaran a Vile en el aire al disparar." },
+					{ "If No, Front Runner and Fat Boy cannons will not\nroot Vile in the air when shot.", "Si esta en No, los canones Front Runner y Fat Boy\nno fijaran a Vile en el aire al disparar." },
 
 					{ "Aim mode:", "Modo de apuntado:" },
 					{ "Change Axl's aim controls to either use\nARROW KEYS (Directional) or mouse aim (Cursor).", "Cambia el modo de apuntado de Axl a teclas \nde direccion o al cursor del raton." },
@@ -163,7 +163,7 @@ public class OptionsMenu : IMainMenu {
 					{ "Enable/disable auto-aim\n(For Directional aim mode only.)", "Activa o desactiva el autoapuntado (solo modo Direccional)." },
 
 					{ "Analog stick aim:", "Mira con stick analogico:" },
-					{ "Enables 360 degree aim if binding Axl aim controls\nto a controller analog stick.", "Permite apuntar en 360° si se usa el stick analogico del mando." },
+					{ "Enables 360 degree aim if binding Axl aim controls\nto a controller analog stick.", "Permite apuntar en 360°\nsi se usa el stick analogico del mando." },
 
 					{ "Aim key function:", "Tipo de tecla de apuntado:" },
 					{ "Change the behavior of Axl's aim key.", "Cambia el comportamiento de la tecla de apuntado de Axl." },
@@ -175,7 +175,7 @@ public class OptionsMenu : IMainMenu {
 					{ "Allows Axl to move when aiming diagonally,\notherwise he is locked in place when shooting.", "Permite mover a Axl al apuntar en diagonal,\nde lo contrario queda fijo al disparar." },
 
 					{ "Aim down & crouch:", "Apuntar abajo y agacharse:" },
-					{ "If mixed, Aim down and crouch will bind to\nthe same button and crouching will not aim down.", "Si es combinado, apuntar abajo y agacharse usaran el mismo boton,\ny al agacharse no apuntara hacia abajo." },
+					{ "If mixed, Aim down and crouch will bind to\nthe same button and crouching will not aim down.", "Si es combinado, apuntar abajo y agacharse usaran \nel mismo boton, y al agacharse no apuntara hacia abajo." },
 
 					{ "Enables Grid Mode for Axl\nwhich works the same way as X.", "Activa el modo de cuadricula para Axl,\nfunciona igual que con X." },
 
@@ -183,22 +183,34 @@ public class OptionsMenu : IMainMenu {
 					{ "If enabled, shows a cooldown circle above Axl head\nindicating Dodge Roll cooldown.", "Muestra un circulo de recarga sobre la cabeza de Axl\nindicando la recarga del rodar." },
 
 					{ "Sigma slot:", "Ranura de Sigma:" },
-					{ "Changes the position of the\nSigma slot in Sigma's hotbar.", "Cambia la posicion de la ranura de Sigma en la barra de armas de Sigma." },
+					{ "Changes the position of the\nSigma slot in Sigma's hotbar.", "Cambia la posicion de la ranura de Sigma\nen la barra de armas de Sigma." },
 
-					{ "Puppeteer control:", "Control de Marionetista:" },
-					{ "If set to Hold, Puppeteer Sigma will control\na Maverick only as long as WEAPON L/R is held.", "Si se establece en Mantener, Sigma marionetista controlara a un Maverick solo mientras se mantenga pulsado WEAPON L/R." },
+					{ "Puppeteer control:", "Control de Marionetas:" },
+					{ "If set to Hold, Puppeteer Sigma will control\na Maverick only as long as WEAPON L/R is held.", "Si se establece en Mantener, Sigma controlara a un Maverick\n solo mientras se mantenga pulsado WEAPON L/R." },
 
 					{ "Maverick start mode:", "Modo inicial de Maverick:" },
-					{ "Change whether Mavericks will follow Sigma,\nor hold position, after summoned.", "Cambia si los Mavericks seguiran a Sigma o se mantendran en su lugar tras ser invocados." },
+					{ "Change whether Mavericks will follow Sigma,\nor hold position, after summoned.", "Cambia si los Mavericks seguiran a Sigma\no se mantendran en su lugar tras ser invocados." },
 
 					{ "Puppeteer cancel:", "Cancelar marioneta:" },
-					{ "If set to Yes, Mavericks will revert to\ntheir idle state when switched to in Puppeteer mode.", "Si se activa, los Mavericks volveran a su estado inactivo al cambiar de control en modo marioneta." },
+					{ "If set to Yes, Mavericks will revert to\ntheir idle state when switched to in Puppeteer mode.", "Si se activa, los Mavericks volveran a su estado inactivo\n al cambiar de control en modo marioneta." },
 
-					{ "Pup small energy bars:", "Barras pequenas (Marioneta):" },
-					{ "Makes the energy bars smaller for Puppeteer.\nRequires the small bars option to work.", "Reduce el tamano de las barras de energia para el modo marioneta.\nRequiere activar la opcion de barras pequenas." },
+					{ "Pup small energy bars:", "Barras pequenas Marioneta:" },
+					{ "Makes the energy bars smaller for Puppeteer.\n Requires the small bars option to work.", "Reduce el tamano de las barras de energia para el modo\nmarioneta.Requiere activar la opcion de barras pequenas." },
+
+					{ "Preferred character:", "Personaje preferido:" },
+					{ "Choose a default character the game will\npre-select for you.", "Elige un personaje por defecto\n que el juego preseleccionara para ti." },
+
+					{ "Disable double-tap dash:", "Desactivar doble dash:"},
+					{ "Disables ability to dash by quickly\ntapping LEFT or RIGHT twice.", "Desactiva la posibilidad de hacer dash tocando\nIZQUIERDA o DERECHA dos veces rapidamente." },
+
+					{ "Kill on loadout change:", "Morir por cambio de equipo:" },
+					{ "If Yes, will instantly die on loadout change mid-match.\nIf No, on next death loadout changes will apply.", "Si activo, moriras al cambiar equipamiento si estas con vida.\nSi esta desactivado, el cambio se aplicara despues de morir." },
+
+					{ "Kill on character change:", "Morir al cambiar personaje:" },
+					{ "If Yes, will instantly die on character change.\nIf No, on next death character change will apply.", "Si activo, moriras al cambiar de personaje.\nSi estadesactivado, el cambio se aplicara despues de morir." },
 
 					{ "Hold", "Mantener" },
-					{ "Simul", "Simul" },
+					{ "Simul", "Simultaneo" },
 					{ "seconds", "segundos" },
 					{ "English", "Ingles" },
 					{ "Spanish", "Espanol" },
@@ -212,6 +224,25 @@ public class OptionsMenu : IMainMenu {
 					{ "Mixed", "Combinado" },
 					{ "Follow", "Seguir" },
 					{ "Hold Position", "Mantener posicion" },
+					{ "Aim backwards/backpedal", "Apuntar hacia atras"},
+					{ "Lock position" , "Mantener posicion"},
+					{ "Lock aim" , "Mantener apuntado"},
+					{ "1v1 Only" , "Solo en 1vs1"},
+					{ "Always", "Siempre"},
+					{ "Low", "Bajo"},
+					{ "Medium", "Medio"},
+					{ "High", "Alto"},
+					{ "Custom", "Personalizado"},
+					{ "Error: same weapon selected twice", "Error: Mismo tipo de arma seleccionada"},
+					{ "Note: options were changed that require restart to apply.", "Nota: Ciertas opciones necesita reiniciar el juego"},
+					{ "GENERAL SETTINGS","Ajustes Generales" },
+					{ "GRAPHICS SETTINGS", "Ajustes de Graficos"},
+					{ "X SETTINGS", "Ajustes de X"},
+					{ "ZERO SETTINGS", "Ajustes de Zero"},
+					{ "VILE SETTINGS", "Ajustes de Vile"},
+					{ "AXL SETTINGS", "Ajustes de Axl"},
+					{ "SIGMA SETTINGS", "Ajustes de Sigma"}, 
+					{ "Type in a multiplayer name", "Escribe tu nombre de jugador"}
 				}
 			},
 			{
@@ -593,17 +624,18 @@ public class OptionsMenu : IMainMenu {
 					(Point pos, int index) => {
 						string preferredChar = Character.charDisplayNames[Options.main.preferredCharacter];
 						Fonts.drawText(
-							optionFontText, "Preferred character:",
- 							pos.x, pos.y, selected: selectedArrowPosY == index
+							optionFontText, Localization.Translate("Preferred character:", Options.main.languageSetting),
+							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
 							optionFontValue, preferredChar,
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Choose a default character the game will\npre-select for you."
+					Localization.Translate("Choose a default character the game will\npre-select for you.", Options.main.languageSetting)
 				),
-				// Double dash
+
+				// Disable double-tap dash
 				new MenuOption(
 					30, startY,
 					() => {
@@ -615,17 +647,18 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Disable double-tap dash:",
- 							pos.x, pos.y, selected: selectedArrowPosY == index
+							optionFontText, Localization.Translate("Disable double-tap dash:", Options.main.languageSetting),
+							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
-							optionFontValue, Helpers.boolYesNo(Options.main.disableDoubleDash),
+							optionFontValue, Localization.Translate(Helpers.boolYesNo(Options.main.disableDoubleDash), Options.main.languageSetting),
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Disables ability to dash by quickly\ntapping LEFT or RIGHT twice."
+					Localization.Translate("Disables ability to dash by quickly\ntapping LEFT or RIGHT twice.", Options.main.languageSetting)
 				),
-				// Kill on Loadout change.
+
+				// Kill on loadout change
 				new MenuOption(
 					30, startY,
 					() => {
@@ -633,18 +666,18 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Kill on loadout change:",
- 							pos.x, pos.y, selected: selectedArrowPosY == index
+							optionFontText, Localization.Translate("Kill on loadout change:", Options.main.languageSetting),
+							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
-							optionFontValue, Helpers.boolYesNo(Options.main.killOnLoadoutChange),
+							optionFontValue, Localization.Translate(Helpers.boolYesNo(Options.main.killOnLoadoutChange), Options.main.languageSetting),
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"If Yes, will instantly die on loadout change mid-match.\n" +
-					"If No, on next death loadout changes will apply."
+					Localization.Translate("If Yes, will instantly die on loadout change mid-match.\nIf No, on next death loadout changes will apply.", Options.main.languageSetting)
 				),
-				// Kill on character change.
+
+				// Kill on character change
 				new MenuOption(
 					30, startY,
 					() => {
@@ -652,17 +685,17 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Kill on character change:",
- 							pos.x, pos.y, selected: selectedArrowPosY == index
+							optionFontText, Localization.Translate("Kill on character change:", Options.main.languageSetting),
+							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
-							optionFontValue, Helpers.boolYesNo(Options.main.killOnCharChange),
+							optionFontValue, Localization.Translate(Helpers.boolYesNo(Options.main.killOnCharChange), Options.main.languageSetting),
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"If Yes, will instantly die on character change.\n" +
-					"If No, on next death character change will apply."
+					Localization.Translate("If Yes, will instantly die on character change.\nIf No, on next death character change will apply.", Options.main.languageSetting)
 				),
+
 			};
 		} else if (charNum == null) {
 			if (!Global.regionPingTask.IsCompleted) {
@@ -971,7 +1004,7 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, Localization.Translate("Hyper charge slot:", Options.main.languageSetting),
+							optionFontText, Localization.Translate("Hyper Charge slot:", Options.main.languageSetting),
 							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
@@ -998,7 +1031,7 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					Localization.Translate("Allows to perform Giga Crush by pressing DOWN + SP,\nbut you lose the ability to switch to Giga Crush.", Options.main.languageSetting)
+					Localization.Translate("Allows to perform Giga Crush by pressing DOWN + SPC,\nbut you lose the ability to switch to Giga Crush.", Options.main.languageSetting)
 				),
 
 				// Nova Strike side special
@@ -1104,7 +1137,7 @@ public class OptionsMenu : IMainMenu {
 					},
 					Localization.Translate("You can swap the inputs for\nGoliath buster and missiles.", Options.main.languageSetting)
 				),
-
+				/*
 				// Block Ride Armor Scroll
 				new MenuOption(
 					30, startY,
@@ -1123,7 +1156,7 @@ public class OptionsMenu : IMainMenu {
 					},
 					Localization.Translate("Prevents ability to scroll to the Ride Armor slot.\nYou will only be able to switch to it by pressing 3.", Options.main.languageSetting)
 				),
-
+				/*
 				// Weapon Ordering
 				new MenuOption(
 					30, startY,
@@ -1145,7 +1178,7 @@ public class OptionsMenu : IMainMenu {
 					},
 					Localization.Translate("Choose the order in which Vile's weapons are arranged.", Options.main.languageSetting)
 				),
-
+				*/
 				// MK5 Ride Control
 				new MenuOption(
 					30, startY,
@@ -1528,22 +1561,22 @@ public class OptionsMenu : IMainMenu {
 	}
 
 	private string qualityToString(int quality) {
-		if (quality == 0) return "Low";
-		else if (quality == 1) return "Medium";
-		else if (quality == 2) return "High";
-		else return "Custom";
+		if (quality == 0) return Localization.Translate("Low", Options.main.languageSetting);
+		else if (quality == 1) return Localization.Translate("Medium", Options.main.languageSetting);
+		else if (quality == 2) return Localization.Translate("High", Options.main.languageSetting);
+		else return Localization.Translate("Custom", Options.main.languageSetting);
 	}
 
 	private string aimKeyFunctionToStr(int aimKeyFunction) {
-		if (aimKeyFunction == 0) return "Aim backwards/backpedal";
-		else if (aimKeyFunction == 1) return "Lock position";
-		else return "Lock aim";
+		if (aimKeyFunction == 0) return Localization.Translate("Aim backwards/backpedal", Options.main.languageSetting);
+		else if (aimKeyFunction == 1) return Localization.Translate("Lock position", Options.main.languageSetting);
+		else return Localization.Translate("Lock aim", Options.main.languageSetting);
 	}
 
 	string gridModeToStr(int gridMode) {
-		if (gridMode == 0) return "No";
-		if (gridMode == 1) return "1v1 Only";
-		if (gridMode == 2) return "Always";
+		if (gridMode == 0) return Localization.Translate("No", Options.main.languageSetting);
+		if (gridMode == 1) return Localization.Translate("1v1 Only", Options.main.languageSetting);
+		if (gridMode == 2) return Localization.Translate("Always", Options.main.languageSetting);
 		return "Error";
 	}
 
@@ -1622,14 +1655,14 @@ public class OptionsMenu : IMainMenu {
 				(Options.main.xLoadout.weapon1 == Options.main.xLoadout.weapon3 && Options.main.xLoadout.weapon2 >= 0) ||
 				(Options.main.xLoadout.weapon2 == Options.main.xLoadout.weapon3 && Options.main.xLoadout.weapon3 >= 0)) {
 				Menu.change(new ErrorMenu(new string[] {
-					"Error: same weapon selected twice"
+					Localization.Translate("Error: same weapon selected twice", Options.main.languageSetting)
 				}, this));
 				return;
 			}
 
 			if (Options.main.axlLoadout.weapon2 == Options.main.axlLoadout.weapon3) {
 				Menu.change(new ErrorMenu(new string[] {
-					"Error: same weapon selected twice"
+					Localization.Translate("Error: same weapon selected twice", Options.main.languageSetting)
 				}, this));
 				return;
 			}
@@ -1650,8 +1683,7 @@ public class OptionsMenu : IMainMenu {
 				oldVsync != Options.main.vsync
 			) {
 				Menu.change(new ErrorMenu(new string[] {
-					"Note: options were changed that",
-					"require restart to apply."
+					Localization.Translate("Note: options were changed that require restart to apply.", Options.main.languageSetting)				
 				}, previous));
 			} else {
 				Menu.change(previous);
@@ -1678,13 +1710,13 @@ public class OptionsMenu : IMainMenu {
 			DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
 			Global.sprites["cursor"].drawToHUD(0, cursorPos, 35 + (selectedArrowPosY * 10) + 3);
 		}
-		string subtitle = "GENERAL SETTINGS";
-		if (isGraphics) subtitle = "GRAPHICS SETTINGS";
-		else if (charNum == 0) subtitle = "X SETTINGS";
-		else if (charNum == 1) subtitle = "ZERO SETTINGS";
-		else if (charNum == 2) subtitle = "VILE SETTINGS";
-		else if (charNum == 3) subtitle = "AXL SETTINGS";
-		else if (charNum == 4) subtitle = "SIGMA SETTINGS";
+		string subtitle = Localization.Translate("GENERAL SETTINGS", Options.main.languageSetting);
+		if (isGraphics) subtitle = Localization.Translate("GRAPHICS SETTINGS", Options.main.languageSetting);
+		else if (charNum == 0) subtitle = Localization.Translate("X SETTINGS", Options.main.languageSetting);
+		else if (charNum == 1) subtitle = Localization.Translate("ZERO SETTINGS", Options.main.languageSetting);
+		else if (charNum == 2) subtitle = Localization.Translate("VILE SETTINGS", Options.main.languageSetting);
+		else if (charNum == 3) subtitle = Localization.Translate("AXL SETTINGS", Options.main.languageSetting);
+		else if (charNum == 4) subtitle = Localization.Translate("SIGMA SETTINGS", Options.main.languageSetting);
 		Fonts.drawText(FontType.Yellow, subtitle, Global.halfScreenW, 20, Alignment.Center);
 		Fonts.drawTextEX(
 			FontType.Grey, "[MLEFT]/[MRIGHT]: Change, [BACK]: Save and Back",
@@ -1718,7 +1750,7 @@ public class OptionsMenu : IMainMenu {
 				true, new Color(0, 0, 0, 224), 0, ZIndex.HUD, false
 			);
 			Fonts.drawText(
-				FontType.Orange, "Type in a multiplayer name",
+				FontType.Orange, Localization.Translate("Type in a multiplayer name", Options.main.languageSetting),
 				Global.screenW / 2, top, alignment: Alignment.Center
 			);
 			int xPos = MathInt.Round(Global.screenW * 0.33f);
