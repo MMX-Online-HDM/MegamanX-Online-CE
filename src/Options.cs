@@ -17,7 +17,6 @@ public class Options {
 	//public bool showInGameMenuHUD = false;
 	public bool showSysReqPrompt = true;
 	public bool enableDeveloperConsole;
-	public int languageSetting;
 	public bool disableChat;
 	public int maxFPS = 60;
 	public bool cheatWarningShown;
