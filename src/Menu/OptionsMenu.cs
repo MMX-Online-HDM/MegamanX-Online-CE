@@ -393,7 +393,7 @@ public class OptionsMenu : IMainMenu {
 					(Point pos, int index) => {
 						string preferredChar = Character.charDisplayNames[Options.main.preferredCharacter];
 						Fonts.drawText(
-							optionFontText, Localization.Translate("Preferred character:", Options.main.languageSetting),
+							optionFontText, "Preferred character:",
 							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
@@ -401,7 +401,7 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					Localization.Translate("Choose a default character the game will\npre-select for you.", Options.main.languageSetting)
+					"Choose a default character the game will\npre-select for you."
 				),
 
 				// Disable double-tap dash
@@ -416,15 +416,15 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, Localization.Translate("Disable double-tap dash:", Options.main.languageSetting),
+							optionFontText, "Disable double-tap dash:",
 							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
-							optionFontValue, Localization.Translate(Helpers.boolYesNo(Options.main.disableDoubleDash), Options.main.languageSetting),
+							optionFontValue, Helpers.boolYesNo(Options.main.disableDoubleDash),
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					Localization.Translate("Disables ability to dash by quickly\ntapping LEFT or RIGHT twice.", Options.main.languageSetting)
+					"Disables ability to dash by quickly\ntapping LEFT or RIGHT twice."
 				),
 
 				// Kill on loadout change
@@ -435,17 +435,17 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, Localization.Translate("Kill on loadout change:", Options.main.languageSetting),
+							optionFontText, "Kill on loadout change:",
 							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
-							optionFontValue, Localization.Translate(Helpers.boolYesNo(Options.main.killOnLoadoutChange), Options.main.languageSetting),
+							optionFontValue, Helpers.boolYesNo(Options.main.killOnLoadoutChange),
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					Localization.Translate("If Yes, will instantly die on loadout change mid-match.\nIf No, on next death loadout changes will apply.", Options.main.languageSetting)
+					"If Yes, will instantly die on loadout change mid-match.\n" +
+					"If No, on next death loadout changes will apply."
 				),
-
 				// Kill on character change
 				new MenuOption(
 					30, startY,
@@ -454,15 +454,16 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, Localization.Translate("Kill on character change:", Options.main.languageSetting),
+							optionFontText, "Kill on character change:",
 							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
-							optionFontValue, Localization.Translate(Helpers.boolYesNo(Options.main.killOnCharChange), Options.main.languageSetting),
+							optionFontValue, Helpers.boolYesNo(Options.main.killOnCharChange),
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					Localization.Translate("If Yes, will instantly die on character change.\nIf No, on next death character change will apply.", Options.main.languageSetting)
+					"If Yes, will instantly die on character change.\n" +
+					"If No, on next death character change will apply."
 				),
 
 			};
@@ -1291,22 +1292,22 @@ public class OptionsMenu : IMainMenu {
 	}
 
 	private string qualityToString(int quality) {
-		if (quality == 0) return Localization.Translate("Low", Options.main.languageSetting);
-		else if (quality == 1) return Localization.Translate("Medium", Options.main.languageSetting);
-		else if (quality == 2) return Localization.Translate("High", Options.main.languageSetting);
-		else return Localization.Translate("Custom", Options.main.languageSetting);
+		if (quality == 0) return "Low";
+		else if (quality == 1) return "Medium";
+		else if (quality == 2) return "High";
+		else return "Custom";
 	}
 
 	private string aimKeyFunctionToStr(int aimKeyFunction) {
-		if (aimKeyFunction == 0) return Localization.Translate("Aim backwards/backpedal", Options.main.languageSetting);
-		else if (aimKeyFunction == 1) return Localization.Translate("Lock position", Options.main.languageSetting);
-		else return Localization.Translate("Lock aim", Options.main.languageSetting);
+		if (aimKeyFunction == 0) return "Aim backwards/backpedal";
+		else if (aimKeyFunction == 1) return "Lock position";
+		else return "Lock aim";
 	}
 
 	string gridModeToStr(int gridMode) {
-		if (gridMode == 0) return Localization.Translate("No", Options.main.languageSetting);
-		if (gridMode == 1) return Localization.Translate("1v1 Only", Options.main.languageSetting);
-		if (gridMode == 2) return Localization.Translate("Always", Options.main.languageSetting);
+		if (gridMode == 0) return "No";
+		if (gridMode == 1) return "1v1 Only";
+		if (gridMode == 2) return "Always";
 		return "Error";
 	}
 
@@ -1385,14 +1386,14 @@ public class OptionsMenu : IMainMenu {
 				(Options.main.xLoadout.weapon1 == Options.main.xLoadout.weapon3 && Options.main.xLoadout.weapon2 >= 0) ||
 				(Options.main.xLoadout.weapon2 == Options.main.xLoadout.weapon3 && Options.main.xLoadout.weapon3 >= 0)) {
 				Menu.change(new ErrorMenu(new string[] {
-					Localization.Translate("Error: same weapon selected twice", Options.main.languageSetting)
+					"Error: same weapon selected twice"
 				}, this));
 				return;
 			}
 
 			if (Options.main.axlLoadout.weapon2 == Options.main.axlLoadout.weapon3) {
 				Menu.change(new ErrorMenu(new string[] {
-					Localization.Translate("Error: same weapon selected twice", Options.main.languageSetting)
+					"Error: same weapon selected twice"
 				}, this));
 				return;
 			}
@@ -1413,7 +1414,8 @@ public class OptionsMenu : IMainMenu {
 				oldVsync != Options.main.vsync
 			) {
 				Menu.change(new ErrorMenu(new string[] {
-					Localization.Translate("Note: options were changed that require restart to apply.", Options.main.languageSetting)				
+					"Note: options were changed that",
+					"require restart to apply."				
 				}, previous));
 			} else {
 				Menu.change(previous);
@@ -1481,7 +1483,7 @@ public class OptionsMenu : IMainMenu {
 				true, new Color(0, 0, 0, 224), 0, ZIndex.HUD, false
 			);
 			Fonts.drawText(
-				FontType.Orange, Localization.Translate("Type in a multiplayer name", Options.main.languageSetting),
+				FontType.Orange, "Type in a multiplayer name",
 				Global.screenW / 2, top, alignment: Alignment.Center
 			);
 			int xPos = MathInt.Round(Global.screenW * 0.33f);
