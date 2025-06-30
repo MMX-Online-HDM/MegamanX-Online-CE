@@ -4,6 +4,9 @@ namespace MMXOnline;
 
 public class MaverickWeapon : Weapon {
 	public Player? player;
+	public MaverickMode controlMode;
+	public MaverickMode trueControlMode;
+
 	public bool isMenuOpened;
 	public float cooldown;
 	public bool summonedOnce;
@@ -16,7 +19,7 @@ public class MaverickWeapon : Weapon {
 	public Maverick? maverick {
 		get {
 			if (_maverick != null && _maverick.destroyed) {
-				cooldown = _maverick.player.isTagTeam() ? tagTeamCooldown : strikerCooldown;
+				cooldown = _maverick.controlMode == MaverickMode.TagTeam ? tagTeamCooldown : strikerCooldown;
 				lastHealth = _maverick.health;
 				if (_maverick.health <= 0) smd = null;
 				else smd = new SavedMaverickData(_maverick);
@@ -42,8 +45,9 @@ public class MaverickWeapon : Weapon {
 
 	public bool isMoth;
 
-	public MaverickWeapon(Player? player) {
-		lastHealth = player?.getMaverickMaxHp() ?? 32;
+	public MaverickWeapon(Player? player, int controlMode) {
+		this.controlMode = (MaverickMode)controlMode;
+		lastHealth = player?.getMaverickMaxHp(this.controlMode) ?? 32;
 		this.player = player;
 	}
 
@@ -51,7 +55,7 @@ public class MaverickWeapon : Weapon {
 		base.update();
 		Helpers.decrementTime(ref cooldown);
 
-		if (player != null && !summonedOnce && !player.isStriker() && player.character != null) {
+		if (player != null && !summonedOnce && player.character != null) {
 			if (currencyGainCooldown < currencyGainMaxCooldown) {
 				currencyGainCooldown += Global.spf;
 				if (currencyGainCooldown >= currencyGainMaxCooldown) {
@@ -143,16 +147,20 @@ public class MaverickWeapon : Weapon {
 		if (maverick == null) {
 			throw new Exception("Error summoning maverick on maverick weapon " + this.GetType().ToString());
 		}
+		maverick.controlMode = controlMode;
+		maverick.trueControlMode = trueControlMode;
+		maverick.rootWeapon = this;
+		maverick.maxHealth = player.getMaverickMaxHp(controlMode);
+		maverick.health = maverick.maxHealth;
+
 		if (summonedOnce) {
 			maverick.setHealth(lastHealth);
 		} else {
 			lastHealth = maverick.maxHealth;
 		}
-		smd?.applySavedMaverickData(maverick, player.isPuppeteer());
-		if (player.isStriker()) {
-			if (maverick is not MorphMothCocoon) {
-				maverick.ammo = maverick.maxAmmo;
-			}
+		smd?.applySavedMaverickData(maverick, controlMode == MaverickMode.Puppeteer);
+		if (controlMode == MaverickMode.Striker) {
+			maverick.ammo = maverick.maxAmmo;
 		}
 		summonedOnce = true;
 		return maverick;
@@ -160,6 +168,14 @@ public class MaverickWeapon : Weapon {
 
 	public bool canUseSubtank(SubTank subtank) {
 		return maverick != null && maverick.health < maverick.maxHealth;
+	}
+
+	public bool canIssueOrders() {
+		return controlMode is MaverickMode.Summoner or MaverickMode.Puppeteer;
+	}
+
+	public bool canIssueAttack() {
+		return controlMode is MaverickMode.Summoner;
 	}
 }
 
@@ -175,7 +191,9 @@ public class SigmaMenuWeapon : Weapon {
 }
 
 public class ChillPenguinWeapon : MaverickWeapon {
-	public ChillPenguinWeapon(Player? player) : base(player) {
+	public static ChillPenguinWeapon netWeapon = new();
+
+	public ChillPenguinWeapon(Player? player = null, int controlMode = 0) : base(player, controlMode) {
 		index = (int)WeaponIds.ChillPenguin;
 		weaponSlotIndex = 66;
 		displayName = "Chill Penguin";
@@ -183,7 +201,9 @@ public class ChillPenguinWeapon : MaverickWeapon {
 }
 
 public class SparkMandrillWeapon : MaverickWeapon {
-	public SparkMandrillWeapon(Player? player) : base(player) {
+	public static SparkMandrillWeapon netWeapon = new();
+
+	public SparkMandrillWeapon(Player? player = null, int controlMode = 0) : base(player, controlMode) {
 		index = (int)WeaponIds.SparkMandrill;
 		weaponSlotIndex = 67;
 		displayName = "Spark Mandrill";
@@ -191,7 +211,9 @@ public class SparkMandrillWeapon : MaverickWeapon {
 }
 
 public class ArmoredArmadilloWeapon : MaverickWeapon {
-	public ArmoredArmadilloWeapon(Player? player) : base(player) {
+	public static ArmoredArmadilloWeapon netWeapon = new();
+
+	public ArmoredArmadilloWeapon(Player? player = null, int controlMode = 0) : base(player, controlMode) {
 		index = (int)WeaponIds.ArmoredArmadillo;
 		weaponSlotIndex = 68;
 		displayName = "Armored Armadillo";
@@ -199,7 +221,9 @@ public class ArmoredArmadilloWeapon : MaverickWeapon {
 }
 
 public class LaunchOctopusWeapon : MaverickWeapon {
-	public LaunchOctopusWeapon(Player? player) : base(player) {
+	public static LaunchOctopusWeapon netWeapon = new();
+
+	public LaunchOctopusWeapon(Player? player = null, int controlMode = 0) : base(player, controlMode) {
 		index = (int)WeaponIds.LaunchOctopus;
 		weaponSlotIndex = 69;
 		displayName = "Launch Octopus";
@@ -207,7 +231,9 @@ public class LaunchOctopusWeapon : MaverickWeapon {
 }
 
 public class BoomerangKuwangerWeapon : MaverickWeapon {
-	public BoomerangKuwangerWeapon(Player? player) : base(player) {
+	public static BoomerangKuwangerWeapon netWeapon = new();
+
+	public BoomerangKuwangerWeapon(Player? player = null, int controlMode = 0) : base(player, controlMode) {
 		index = (int)WeaponIds.BoomerangKuwanger;
 		weaponSlotIndex = 70;
 		displayName = "Boomerang Kuwanger";
@@ -215,7 +241,9 @@ public class BoomerangKuwangerWeapon : MaverickWeapon {
 }
 
 public class StingChameleonWeapon : MaverickWeapon {
-	public StingChameleonWeapon(Player? player) : base(player) {
+	public static StingChameleonWeapon netWeapon = new();
+
+	public StingChameleonWeapon(Player? player = null, int controlMode = 0) : base(player, controlMode) {
 		index = (int)WeaponIds.StingChameleon;
 		weaponSlotIndex = 71;
 		displayName = "Sting Chameleon";
@@ -223,7 +251,9 @@ public class StingChameleonWeapon : MaverickWeapon {
 }
 
 public class StormEagleWeapon : MaverickWeapon {
-	public StormEagleWeapon(Player? player) : base(player) {
+	public static StormEagleWeapon netWeapon = new();
+
+	public StormEagleWeapon(Player? player = null, int controlMode = 0) : base(player, controlMode) {
 		index = (int)WeaponIds.StormEagle;
 		weaponSlotIndex = 72;
 		displayName = "Storm Eagle";
@@ -231,7 +261,9 @@ public class StormEagleWeapon : MaverickWeapon {
 }
 
 public class FlameMammothWeapon : MaverickWeapon {
-	public FlameMammothWeapon(Player? player) : base(player) {
+	public static FlameMammothWeapon netWeapon = new();
+
+	public FlameMammothWeapon(Player? player = null, int controlMode = 0) : base(player, controlMode) {
 		index = (int)WeaponIds.FlameMammoth;
 		weaponSlotIndex = 73;
 		displayName = "Flame Mammoth";
@@ -239,7 +271,9 @@ public class FlameMammothWeapon : MaverickWeapon {
 }
 
 public class VelguarderWeapon : MaverickWeapon {
-	public VelguarderWeapon(Player? player) : base(player) {
+	public static VelguarderWeapon netWeapon = new();
+
+	public VelguarderWeapon(Player? player = null, int controlMode = 0) : base(player, controlMode) {
 		index = (int)WeaponIds.Velguarder;
 		weaponSlotIndex = 74;
 		displayName = "Velguarder";
@@ -247,7 +281,9 @@ public class VelguarderWeapon : MaverickWeapon {
 }
 
 public class WireSpongeWeapon : MaverickWeapon {
-	public WireSpongeWeapon(Player? player) : base(player) {
+	public static WireSpongeWeapon netWeapon = new();
+
+	public WireSpongeWeapon(Player? player = null, int controlMode = 0) : base(player, controlMode) {
 		index = (int)WeaponIds.WireSponge;
 		weaponSlotIndex = 75;
 		displayName = "Wire Sponge";
@@ -255,7 +291,9 @@ public class WireSpongeWeapon : MaverickWeapon {
 }
 
 public class WheelGatorWeapon : MaverickWeapon {
-	public WheelGatorWeapon(Player? player) : base(player) {
+	public static WheelGatorWeapon netWeapon = new();
+
+	public WheelGatorWeapon(Player? player = null, int controlMode = 0) : base(player, controlMode) {
 		index = (int)WeaponIds.WheelGator;
 		weaponSlotIndex = 76;
 		displayName = "Wheel Gator";
@@ -263,7 +301,9 @@ public class WheelGatorWeapon : MaverickWeapon {
 }
 
 public class BubbleCrabWeapon : MaverickWeapon {
-	public BubbleCrabWeapon(Player? player) : base(player) {
+	public static BubbleCrabWeapon netWeapon = new();
+
+	public BubbleCrabWeapon(Player? player = null, int controlMode = 0) : base(player, controlMode) {
 		index = (int)WeaponIds.BubbleCrab;
 		weaponSlotIndex = 77;
 		displayName = "Bubble Crab";
@@ -271,7 +311,9 @@ public class BubbleCrabWeapon : MaverickWeapon {
 }
 
 public class FlameStagWeapon : MaverickWeapon {
-	public FlameStagWeapon(Player? player) : base(player) {
+	public static FlameStagWeapon netWeapon = new();
+
+	public FlameStagWeapon(Player? player = null, int controlMode = 0) : base(player, controlMode) {
 		index = (int)WeaponIds.FlameStag;
 		weaponSlotIndex = 78;
 		displayName = "Flame Stag";
@@ -279,7 +321,9 @@ public class FlameStagWeapon : MaverickWeapon {
 }
 
 public class MorphMothWeapon : MaverickWeapon {
-	public MorphMothWeapon(Player? player) : base(player) {
+	public static MorphMothWeapon netWeapon = new();
+
+	public MorphMothWeapon(Player? player = null, int controlMode = 0) : base(player, controlMode) {
 		index = (int)WeaponIds.MorphMoth;
 		weaponSlotIndex = 79;
 		displayName = "Morph Moth";
@@ -293,7 +337,9 @@ public class MorphMothWeapon : MaverickWeapon {
 }
 
 public class MagnaCentipedeWeapon : MaverickWeapon {
-	public MagnaCentipedeWeapon(Player? player) : base(player) {
+	public static MagnaCentipedeWeapon netWeapon = new();
+
+	public MagnaCentipedeWeapon(Player? player = null, int controlMode = 0) : base(player, controlMode) {
 		index = (int)WeaponIds.MagnaCentipede;
 		weaponSlotIndex = 80;
 		displayName = "Magna Centipede";
@@ -301,7 +347,9 @@ public class MagnaCentipedeWeapon : MaverickWeapon {
 }
 
 public class CrystalSnailWeapon : MaverickWeapon {
-	public CrystalSnailWeapon(Player? player) : base(player) {
+	public static CrystalSnailWeapon netWeapon = new();
+
+	public CrystalSnailWeapon(Player? player = null, int controlMode = 0) : base(player, controlMode) {
 		index = (int)WeaponIds.CrystalSnail;
 		weaponSlotIndex = 81;
 		displayName = "Crystal Snail";
@@ -309,7 +357,9 @@ public class CrystalSnailWeapon : MaverickWeapon {
 }
 
 public class OverdriveOstrichWeapon : MaverickWeapon {
-	public OverdriveOstrichWeapon(Player? player) : base(player) {
+	public static OverdriveOstrichWeapon netWeapon = new();
+
+	public OverdriveOstrichWeapon(Player? player = null, int controlMode = 0) : base(player, controlMode) {
 		index = (int)WeaponIds.OverdriveOstrich;
 		weaponSlotIndex = 82;
 		displayName = "Overdrive Ostrich";
@@ -317,7 +367,9 @@ public class OverdriveOstrichWeapon : MaverickWeapon {
 }
 
 public class FakeZeroWeapon : MaverickWeapon {
-	public FakeZeroWeapon(Player? player) : base(player) {
+	public static FakeZeroWeapon netWeapon = new();
+
+	public FakeZeroWeapon(Player? player = null, int controlMode = 0) : base(player, controlMode) {
 		index = (int)WeaponIds.FakeZero;
 		weaponSlotIndex = 83;
 		displayName = "Fake Zero";
@@ -325,7 +377,9 @@ public class FakeZeroWeapon : MaverickWeapon {
 }
 
 public class BlizzardBuffaloWeapon : MaverickWeapon {
-	public BlizzardBuffaloWeapon(Player? player) : base(player) {
+	public static BlizzardBuffaloWeapon netWeapon = new();
+
+	public BlizzardBuffaloWeapon(Player? player = null, int controlMode = 0) : base(player, controlMode) {
 		index = (int)WeaponIds.BlizzardBuffalo;
 		weaponSlotIndex = 84;
 		displayName = "Blizzard Buffalo";
@@ -333,7 +387,9 @@ public class BlizzardBuffaloWeapon : MaverickWeapon {
 }
 
 public class ToxicSeahorseWeapon : MaverickWeapon {
-	public ToxicSeahorseWeapon(Player? player) : base(player) {
+	public static ToxicSeahorseWeapon netWeapon = new();
+
+	public ToxicSeahorseWeapon(Player? player = null, int controlMode = 0) : base(player, controlMode) {
 		index = (int)WeaponIds.ToxicSeahorse;
 		weaponSlotIndex = 85;
 		displayName = "Toxic Seahorse";
@@ -341,7 +397,9 @@ public class ToxicSeahorseWeapon : MaverickWeapon {
 }
 
 public class TunnelRhinoWeapon : MaverickWeapon {
-	public TunnelRhinoWeapon(Player? player) : base(player) {
+	public static TunnelRhinoWeapon netWeapon = new();
+
+	public TunnelRhinoWeapon(Player? player = null, int controlMode = 0) : base(player, controlMode) {
 		index = (int)WeaponIds.TunnelRhino;
 		weaponSlotIndex = 86;
 		displayName = "Tunnel Rhino";
@@ -349,7 +407,9 @@ public class TunnelRhinoWeapon : MaverickWeapon {
 }
 
 public class VoltCatfishWeapon : MaverickWeapon {
-	public VoltCatfishWeapon(Player? player) : base(player) {
+	public static VoltCatfishWeapon netWeapon = new();
+
+	public VoltCatfishWeapon(Player? player = null, int controlMode = 0) : base(player, controlMode) {
 		index = (int)WeaponIds.VoltCatfish;
 		weaponSlotIndex = 87;
 		displayName = "Volt Catfish";
@@ -357,7 +417,9 @@ public class VoltCatfishWeapon : MaverickWeapon {
 }
 
 public class CrushCrawfishWeapon : MaverickWeapon {
-	public CrushCrawfishWeapon(Player? player) : base(player) {
+	public static CrushCrawfishWeapon netWeapon = new();
+
+	public CrushCrawfishWeapon(Player? player = null, int controlMode = 0) : base(player, controlMode) {
 		index = (int)WeaponIds.CrushCrawfish;
 		weaponSlotIndex = 88;
 		displayName = "Crush Crawfish";
@@ -365,7 +427,9 @@ public class CrushCrawfishWeapon : MaverickWeapon {
 }
 
 public class NeonTigerWeapon : MaverickWeapon {
-	public NeonTigerWeapon(Player? player) : base(player) {
+	public static NeonTigerWeapon netWeapon = new();
+
+	public NeonTigerWeapon(Player? player = null, int controlMode = 0) : base(player, controlMode) {
 		index = (int)WeaponIds.NeonTiger;
 		weaponSlotIndex = 89;
 		displayName = "Neon Tiger";
@@ -373,7 +437,9 @@ public class NeonTigerWeapon : MaverickWeapon {
 }
 
 public class GravityBeetleWeapon : MaverickWeapon {
-	public GravityBeetleWeapon(Player? player) : base(player) {
+	public static GravityBeetleWeapon netWeapon = new();
+
+	public GravityBeetleWeapon(Player? player = null, int controlMode = 0) : base(player, controlMode) {
 		index = (int)WeaponIds.GravityBeetle;
 		weaponSlotIndex = 90;
 		displayName = "Gravity Beetle";
@@ -381,7 +447,9 @@ public class GravityBeetleWeapon : MaverickWeapon {
 }
 
 public class BlastHornetWeapon : MaverickWeapon {
-	public BlastHornetWeapon(Player? player) : base(player) {
+	public static BlastHornetWeapon netWeapon = new();
+
+	public BlastHornetWeapon(Player? player = null, int controlMode = 0) : base(player, controlMode) {
 		index = (int)WeaponIds.BlastHornet;
 		weaponSlotIndex = 91;
 		displayName = "Blast Hornet";
@@ -389,8 +457,10 @@ public class BlastHornetWeapon : MaverickWeapon {
 }
 
 public class DrDopplerWeapon : MaverickWeapon {
+	public static DrDopplerWeapon netWeapon = new();
+
 	public int ballType; // 0 = shock gun, 1 = vaccine
-	public DrDopplerWeapon(Player? player) : base(player) {
+	public DrDopplerWeapon(Player? player = null, int controlMode = 0) : base(player, controlMode) {
 		index = (int)WeaponIds.DrDoppler;
 		weaponSlotIndex = 92;
 		displayName = "Dr. Doppler";

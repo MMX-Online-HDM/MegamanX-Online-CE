@@ -71,7 +71,7 @@ public class ArmoredArmadillo : Maverick {
 			rechargeAmmo(3);
 		}
 
-		if (aiBehavior == MaverickAIBehavior.Control && !player.isSummoner()) {
+		if (aiBehavior == MaverickAIBehavior.Control) {
 			if (state is MIdle or MRun or MLand) {
 				if (shootPressed()) {
 					changeState(getShootState(false));

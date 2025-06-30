@@ -1403,8 +1403,7 @@ public class Die : CharState {
 				once = true;
 				character.visible = false;
 				player.explodeDieStart();
-				if (character is BaseSigma)
-				if (!player.isTagTeam()) {
+				if (character is BaseSigma sigma && sigma.loadout.commandMode != (int)MaverickMode.TagTeam) {
 					foreach (var weapon in new List<Weapon>(player.weapons)) {
 						if (weapon is MaverickWeapon mw && mw.maverick != null) {
 							mw.maverick.changeState(new MExit(mw.maverick.pos, true), true);
@@ -1471,19 +1470,6 @@ public class Die : CharState {
 		if (character.linkedRideArmor != null) {
 			character.linkedRideArmor.selfDestructTime = Global.spf;
 			RPC.actorToggle.sendRpc(character.linkedRideArmor.netId, RPCActorToggleType.StartMechSelfDestruct);
-		}
-	}
-
-	public void transformIntoMaverick() {
-		if (character is BaseSigma sigma && (player.isPuppeteer() || player.isSummoner())) {
-			foreach (var weapon in new List<Weapon>(player.weapons)) {
-				if (weapon is MaverickWeapon mw && mw.maverick != null) {
-					player.weapons.RemoveAll(w => w is SigmaMenuWeapon);
-					sigma.becomeMaverick(mw.maverick);
-					player.weaponSlot = player.weapons.IndexOf(weapon);
-					return;
-				}
-			}
 		}
 	}
 
