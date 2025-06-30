@@ -18,6 +18,7 @@ public class BaseSigma : Character {
 	public bool tempAiSummoner;
 	public SigmaLoadout loadout;
 	public MaverickAIBehavior currentMaverickCommand;
+	public bool summonerAttackModeActive;
 
 	public BaseSigma(
 		Player player, float x, float y, int xDir,
@@ -200,6 +201,7 @@ public class BaseSigma : Character {
 					currentMaverickCommand = MaverickAIBehavior.Defend;
 					Global.level.gameMode.setHUDErrorMessage(player, "Issued hold position command.", playSound: false);
 				}
+				summonerAttackModeActive = false;
 
 				foreach (var maverick in player.mavericks) {
 					if (maverick != currentMaverick) {
@@ -234,7 +236,7 @@ public class BaseSigma : Character {
 			if (player.input.isCommandButtonPressed(player)) {
 				Global.level.gameMode.hudErrorMsgTime = 0;
 
-				currentMaverickCommand = MaverickAIBehavior.Attack;
+				summonerAttackModeActive = true;
 				Global.level.gameMode.setHUDErrorMessage(player, "Issued attack-move command.", playSound: false);
 				int attackDir = player.input.getXDir(player);
 				if (attackDir == 0) {
@@ -243,7 +245,7 @@ public class BaseSigma : Character {
 
 				foreach (var maverick in player.mavericks) {
 					if (maverick.rootWeapon.canIssueAttack()) {
-						maverick.aiBehavior = currentMaverickCommand;
+						maverick.aiBehavior = MaverickAIBehavior.Attack;
 						maverick.attackDir = attackDir;
 					}
 				}
@@ -512,6 +514,9 @@ public class BaseSigma : Character {
 			if (weapon is MaverickWeapon mw) {
 				if (mw.maverick != null && mw.maverick.aiBehavior == MaverickAIBehavior.Control) {
 					mw.maverick.aiBehavior = currentMaverickCommand;
+					if (mw.maverick.controlMode == MaverickMode.Summoner && summonerAttackModeActive) {
+						mw.maverick.aiBehavior = MaverickAIBehavior.Attack;
+					}
 				}
 				if (mw.isMenuOpened) {
 					mw.isMenuOpened = false;
