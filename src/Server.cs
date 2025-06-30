@@ -220,7 +220,7 @@ public class Server {
 		if (isBot) {
 			serverPlayer = serverPlayer.clone();
 			serverPlayer.isHost = false;
-			serverPlayer.charNum = overrideCharNum ?? Helpers.randomRange(0, 3);
+			serverPlayer.charNum = overrideCharNum ?? Helpers.randomRange((int)CharIds.X, (int)CharIds.BusterZero);
 			serverPlayer.preferredAlliance = overrideAlliance;
 		}
 
@@ -369,7 +369,7 @@ public class Server {
 		return Array.IndexOf(teamSizes, smallerTeam);
 	}
 
-	public ServerPlayer selectPlayerToAutobalance(
+	public ServerPlayer? selectPlayerToAutobalance(
 		int allianceToChooseFrom, ServerPlayer? prioritizedAutobalancePlayer
 	) {
 		var pool = players.FindAll(p => p.alliance == allianceToChooseFrom && !p.isSpectator);
@@ -388,6 +388,12 @@ public class Server {
 			pool.ForEach(p => p.alreadyAutobalanced = false);
 		}
 		pool = pool.FindAll(p => !p.alreadyAutobalanced);
+		if (pool.Count == 0) { 
+			pool = players.FindAll(p => p.alliance == allianceToChooseFrom && !p.isSpectator);
+		}
+		if (pool.Count == 0) {
+			return null;
+		}
 		return pool.GetRandomItem();
 	}
 
@@ -847,7 +853,7 @@ public class Server {
 				int charNum = bytes[0];
 				int team = bytes[1];
 
-				if (charNum == 255) charNum = Helpers.randomRange(0, 3);
+				if (charNum == 255) charNum = Helpers.randomRange((int)CharIds.X, (int)CharIds.BusterZero);
 				int? preferredAlliance = null;
 
 				if (team >= 0 && team <= teamNum) {
