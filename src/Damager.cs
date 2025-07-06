@@ -663,7 +663,7 @@ public class Damager {
 		// Maverick section
 		else if (maverick != null) {
 			if (projId == (int)ProjIds.BeastKiller || projId == (int)ProjIds.AncientGun) {
-				damage *= 2;
+				damage *= 1.25f;
 			}
 			// Weakness system.
 			weakness = maverick.checkWeakness(
@@ -689,7 +689,7 @@ public class Damager {
 			if (projectileFlinchCooldowns.ContainsKey(projId)) {
 				flinchCooldownTime = projectileFlinchCooldowns[projId];
 			}
-			if (!maverick.player.isTagTeam() && flinchCooldownTime < 45 && !weakness) {
+			if (maverick.controlMode != MaverickMode.TagTeam && flinchCooldownTime < 45 && !weakness) {
 				flinchCooldownTime = 45;
 			}
 			if (!maverick.flinchCooldown.ContainsKey(flinchKey)) {
@@ -734,7 +734,7 @@ public class Damager {
 			if (!weakness) {
 				// Flinch reduction.
 				if (flinch > 0) {
-					if (!maverick.player.isTagTeam()) {
+					if (maverick.controlMode != MaverickMode.TagTeam) {
 						flinch = 0;
 					}
 					// Large mavericks

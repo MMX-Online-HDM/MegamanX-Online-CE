@@ -574,7 +574,6 @@ public partial class Character : Actor, IDamagable {
 		if (player.isDisguisedAxl && !disguiseCoverBlown) return false;
 		if (isNonDamageStatusImmune()) return false;
 		if (charState is Die || charState is VileRevive || charState is XReviveStart || charState is XRevive) return false;
-		if (player.currentMaverick != null && player.isTagTeam()) return false;
 		if (isWarpOut()) return false;
 		if (Global.serverClient != null) {
 			if (Global.serverClient.isLagging() == true) return false;
@@ -715,6 +714,19 @@ public partial class Character : Actor, IDamagable {
 	public virtual Collider getBlockCollider() {
 		var rect = new Rect(0, 0, 18, 34);
 		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
+	}
+
+	public Maverick? currentMaverick {
+		get {
+			Weapon? mw = weapons.FirstOrDefault(
+				w => w is MaverickWeapon mw && mw.maverick?.aiBehavior == MaverickAIBehavior.Control
+			);
+			return (mw as MaverickWeapon)?.maverick;
+		}
+	}
+
+	public bool isControllingPuppet() {
+		return currentMaverick?.controlMode == MaverickMode.Puppeteer;
 	}
 
 	public override void preUpdate() {
@@ -1653,8 +1665,8 @@ public partial class Character : Actor, IDamagable {
 		if (rideArmorPlatform != null) {
 			return rideArmorPlatform;
 		}
-		if (player.currentMaverick != null && player.isTagTeam()) {
-			return player.currentMaverick;
+		if (currentMaverick != null && currentMaverick.controlMode == MaverickMode.TagTeam) {
+			return currentMaverick;
 		}
 		if (rideArmor != null) {
 			return rideArmor;
@@ -1973,7 +1985,7 @@ public partial class Character : Actor, IDamagable {
 		}
 		if (Global.overrideDrawCursorChar) drawCursorChar = true;
 
-		if (!isWarpIn() && drawCursorChar && player.currentMaverick == null) {
+		if (!isWarpIn() && drawCursorChar && currentMaverick == null) {
 			Global.sprites["cursorchar"].draw(
 				0, pos.x + x, pos.y + y + currentLabelY, 1, 1, null, 1, 1, 1, zIndex + 1
 			);

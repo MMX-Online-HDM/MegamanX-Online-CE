@@ -16,10 +16,10 @@ public class CmdSigma : BaseSigma {
 	public CmdSigma(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId,
-		bool ownedByLocalPlayer, bool isWarpIn = true
+		bool ownedByLocalPlayer, bool isWarpIn = true, SigmaLoadout? sigmaLoadout = null
 	) : base(
 		player, x, y, xDir, isVisible,
-		netId, ownedByLocalPlayer, isWarpIn
+		netId, ownedByLocalPlayer, isWarpIn, sigmaLoadout
 	) {
 		sigmaSaberMaxCooldown = 1;
 		altSoundId = AltSoundIds.X1;

@@ -81,6 +81,7 @@ public class ServerClient {
 						joinServerResponse.getLastPlayer()
 						?? throw new Exception("Error Recovering player list.")
 					);
+
 					return serverClient;
 				} else if (message.StartsWith("hostdisconnect:")) {
 					var reason = message.Split(':')[1];
@@ -236,6 +237,7 @@ public class ServerClient {
 					log = "\nCould not join: " + reason;
 					joinServerResponse = null;
 					serverClient.disconnect("Client couldn't get response");
+
 					client.Configuration.AutoFlushSendQueue = false;
 					return null;
 				} else if (message.StartsWith("joinserverresponse:")) {
@@ -357,7 +359,7 @@ public class ServerClient {
 	float gameLoopLagTime;
 	public bool isLagging() {
 		//Global.debugString1 = packetLossStopwatch.ElapsedMilliseconds.ToString();
-		if (packetLossStopwatch.ElapsedMilliseconds > 1500 || gameLoopLagTime > 0) {
+		if (packetLossStopwatch.ElapsedMilliseconds > 1000 || gameLoopLagTime > 0) {
 			return true;
 		}
 		return false;
@@ -376,6 +378,9 @@ public class ServerClient {
 		int rpcIndex = RPC.templates.IndexOf(rpcTemplate);
 		if (rpcIndex == -1) {
 			throw new Exception("RPC index not found!");
+		}
+		if (!rpcTemplate.isString && arguments.Length > 1480) {
+			throw new Exception("Error, RPC exceeds the MTU.");
 		}
 		byte rpcIndexByte = (byte)rpcIndex;
 		NetOutgoingMessage om = client.CreateMessage();
@@ -441,7 +446,6 @@ public class ServerClient {
 					if (rpcTemplate is RPCPeriodicServerPing) {
 						packetLossStopwatch.Restart();
 						packetsReceived++;
-						continue;
 					}
 
 					if (!rpcTemplate.isString) {

@@ -106,19 +106,23 @@ public class Axl : Character {
 	public Axl(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
-		bool isWarpIn = true
+		bool isWarpIn = true, AxlLoadout? axlLoadout = null
 	) : base(
 		player, x, y, xDir, isVisible,
 		netId, ownedByLocalPlayer, isWarpIn
 	) {
 		charId = CharIds.Axl;
+		if (axlLoadout == null) {
+			axlLoadout = player.loadout.axlLoadout;
+		}
 		iceGattlingSound = new LoopingSound("iceGattlingLoopStart", "iceGattlingLoopStop", "iceGattlingLoop", this);
 
-		muzzleFlash = new Anim(new Point(), "axl_pistol_flash", xDir, null, false);
-		muzzleFlash.visible = false;
-		axlHyperMode = player.loadout?.axlLoadout?.hyperMode ?? 0;
+		muzzleFlash = new Anim(new Point(), "axl_pistol_flash", xDir, null, false) {
+			visible = false
+		};
+		axlHyperMode = axlLoadout.hyperMode;
 
-		configureWeapons();
+		configureWeapons(axlLoadout);
 		altSoundId = AltSoundIds.X3;
 	}
 
@@ -298,7 +302,7 @@ public class Axl : Character {
 				foreach (var weapon in player.weapons) {
 					if (weapon is MaverickWeapon mw) {
 						if (mw.maverick != null && mw.maverick.aiBehavior == MaverickAIBehavior.Control) {
-							mw.maverick.aiBehavior = player.currentMaverickCommand;
+							mw.maverick.aiBehavior = MaverickAIBehavior.Follow;
 						}
 						if (mw.isMenuOpened) {
 							mw.isMenuOpened = false;
@@ -307,11 +311,11 @@ public class Axl : Character {
 				}
 				mw2.maverick.aiBehavior = MaverickAIBehavior.Control;
 			}
-		} else if (player.currentMaverick != null) {
-			foreach (var weapon in player.weapons) {
+		} else if (currentMaverick != null) {
+			foreach (var weapon in weapons) {
 				if (weapon is MaverickWeapon mw) {
 					if (mw.maverick != null && mw.maverick.aiBehavior == MaverickAIBehavior.Control) {
-						mw.maverick.aiBehavior = player.currentMaverickCommand;
+						mw.maverick.aiBehavior = MaverickAIBehavior.Follow;
 					}
 					if (mw.isMenuOpened) {
 						mw.isMenuOpened = false;
@@ -1744,7 +1748,7 @@ public class Axl : Character {
 		if (isAnyZoom() || sniperMissileProj != null) {
 			return true;
 		}
-		if (player.currentMaverick != null) return true;
+		if (currentMaverick != null) return true;
 
 		return base.isSoftLocked();
 	}
@@ -1960,22 +1964,22 @@ public class Axl : Character {
 		return false;
 	}
 
-	public void configureWeapons() {
+	public void configureWeapons(AxlLoadout axlLoadout) {
 		if (Global.level.isTraining() && !Global.level.server.useLoadout) {
-			weapons = Weapon.getAllAxlWeapons(player.axlLoadout).Select(w => w.clone()).ToList();
+			weapons = Weapon.getAllAxlWeapons(axlLoadout).Select(w => w.clone()).ToList();
 			weapons[0] = getAxlBullet(player.axlBulletType);
 		} else if (Global.level.is1v1()) {
 			weapons.Add(new AxlBullet());
-			weapons.Add(new RayGun(player.axlLoadout.rayGunAlt));
-			weapons.Add(new BlastLauncher(player.axlLoadout.blastLauncherAlt));
-			weapons.Add(new BlackArrow(player.axlLoadout.blackArrowAlt));
-			weapons.Add(new SpiralMagnum(player.axlLoadout.spiralMagnumAlt));
-			weapons.Add(new BoundBlaster(player.axlLoadout.boundBlasterAlt));
-			weapons.Add(new PlasmaGun(player.axlLoadout.plasmaGunAlt));
-			weapons.Add(new IceGattling(player.axlLoadout.iceGattlingAlt));
-			weapons.Add(new FlameBurner(player.axlLoadout.flameBurnerAlt));
+			weapons.Add(new RayGun(axlLoadout.rayGunAlt));
+			weapons.Add(new BlastLauncher(axlLoadout.blastLauncherAlt));
+			weapons.Add(new BlackArrow(axlLoadout.blackArrowAlt));
+			weapons.Add(new SpiralMagnum(axlLoadout.spiralMagnumAlt));
+			weapons.Add(new BoundBlaster(axlLoadout.boundBlasterAlt));
+			weapons.Add(new PlasmaGun(axlLoadout.plasmaGunAlt));
+			weapons.Add(new IceGattling(axlLoadout.iceGattlingAlt));
+			weapons.Add(new FlameBurner(axlLoadout.flameBurnerAlt));
 		} else {
-			weapons = player.loadout.axlLoadout.getWeaponsFromLoadout();
+			weapons = axlLoadout.getWeaponsFromLoadout();
 			weapons.Insert(0, getAxlBullet(player.axlBulletType));
 		}
 		if (ownedByLocalPlayer) {

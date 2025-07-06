@@ -1,15 +1,30 @@
 namespace MMXOnline;
 
 public class IssueGlobalCommand : CharState {
-	public IssueGlobalCommand(string transitionSprite = "") : base("summon_maverick", "", "", transitionSprite) {
+	public bool isAutoGuarding;
+
+	public IssueGlobalCommand() : base("summon_maverick") {
 		superArmor = true;
 	}
 
 	public override void update() {
 		base.update();
 
-		if (character.isAnimOver()) {
+		if (character.isAnimOver() || isAutoGuarding && stateFrames > 20) {
+			if (isAutoGuarding && character.grounded && character.isControllingPuppet()) {
+				character.changeState(new SigmaAutoBlock(), true);
+				return;
+			}
 			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (oldState is SigmaAutoBlock) {
+			isAutoGuarding = true;
+			sprite = "block_auto";
+			character.changeSpriteFromName(sprite, true);
 		}
 	}
 }
@@ -35,7 +50,7 @@ public class CallDownMaverick : CharState {
 
 		frame++;
 
-		if (frame > 0 && frame < 10 && (player.isStriker() || player.isSummoner())) {
+		if (frame > 0 && frame < 10 && maverick.controlMode is MaverickMode.Striker or MaverickMode.Summoner) {
 			if (player.input.isPressed(Control.Shoot, player) &&
 				maverick.startMoveControl == Control.Special1
 			) {
@@ -99,7 +114,7 @@ public class SigmaAutoBlock : CharState {
 	public override void update() {
 		base.update();
 
-		if (!player.isControllingPuppet() || Global.level.gameMode.isOver) {
+		if (!character.isControllingPuppet() || Global.level.gameMode.isOver) {
 			character.changeToIdleOrFall();
 			return;
 		}

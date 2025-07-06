@@ -104,7 +104,7 @@ public class MorphMothCocoon : Maverick {
 			if (selfDestructTime > 1.1f) {
 				var mmw = player.weapons.FirstOrDefault(w => w is MorphMothWeapon mmw) as MorphMothWeapon;
 				if (mmw != null) {
-					bool wasCocoon = player.currentMaverick == this;
+					bool wasCocoon = ownerChar?.currentMaverick == this;
 					mmw.isMoth = true;
 					//Point spawnPos = getCenterPos().addxy(0, 27 * yScale);
 					Point spawnPos = getCenterPos().addxy(0, 0);

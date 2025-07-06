@@ -13,6 +13,13 @@ public enum MaverickAIBehavior {
 	Attack
 }
 
+public enum MaverickMode {
+	Summoner,
+	Puppeteer,
+	Striker,
+	TagTeam,
+}
+
 public class SavedMaverickData {
 	public bool noArmor;
 	public int cloakUses;
@@ -24,10 +31,10 @@ public class SavedMaverickData {
 		stateCooldowns = maverick.stateCooldowns;
 	}
 
-	public void applySavedMaverickData(Maverick maverick, bool isPuppeteer) {
+	public void applySavedMaverickData(Maverick maverick, bool keepCooldowns) {
 		if (maverick == null) return;
 		//if (maverick is ArmoredArmadillo aa) aa.noArmor = noArmor;
-		if (isPuppeteer) {
+		if (keepCooldowns) {
 			maverick.stateCooldowns = stateCooldowns;
 		}
 		maverick.ammo = ammo;
@@ -42,6 +49,11 @@ public class Maverick : Actor, IDamagable {
 	public float weaponHealAmount = 0;
 	public float weaponHealTime = 0;
 	public bool playHealSound;
+	public MaverickMode controlMode;
+	public MaverickMode trueControlMode;
+
+	public MaverickWeapon rootWeapon;
+	public Character? ownerChar;
 
 	// New ammo variables.
 	public float ammo = 32;
@@ -136,11 +148,20 @@ public class Maverick : Actor, IDamagable {
 	}
 
 	public bool isPuppeteerTooFar() {
-		return player.isSigma && player.isPuppeteer() && player.character != null && getCenterPos().distanceTo(player.character.pos) > Global.screenW * 1.25f;
+		return (
+			controlMode == MaverickMode.Puppeteer &&
+			ownerChar != null &&
+			getCenterPos().distanceTo(ownerChar.pos) > 374
+		);
 	}
 
-	public Maverick(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, MaverickState overrideState = null) :
-		base(null, pos, netId, ownedByLocalPlayer, true) {
+	public Maverick(
+		Player player, Point pos, Point destPos, int xDir,
+		ushort? netId, bool ownedByLocalPlayer,
+		MaverickState overrideState = null
+	) : base(
+		null, pos, netId, ownedByLocalPlayer, true
+	) {
 		this.player = player;
 		this.xDir = xDir;
 
@@ -166,7 +187,7 @@ public class Maverick : Actor, IDamagable {
 		}
 
 		useFrameProjs = true;
-		maxHealth = player.getMaverickMaxHp();
+		maxHealth = player.getMaverickMaxHp(controlMode);
 		health = maxHealth;
 		splashable = true;
 		changeState(overrideState ?? new MEnter(destPos));
@@ -329,7 +350,7 @@ public class Maverick : Actor, IDamagable {
 
 		if (player == null) return;
 
-		if (player.isStriker()) {
+		if (controlMode == MaverickMode.Striker) {
 			strikerTime += Global.spf;
 			if (strikerTime > 3) {
 				if (this is WireSponge || this is ToxicSeahorse) {
@@ -429,9 +450,11 @@ public class Maverick : Actor, IDamagable {
 
 		Helpers.decrementFrames(ref aiCooldown);
 
-		bool isSummonerOrStrikerDoppler = (player.isSummoner() || player.isStriker()) && this is DrDoppler;
-		bool isSummonerCocoon = player.isSummoner() && this is MorphMothCocoon;
-		bool isStrikerCocoon = player.isStriker() && this is MorphMothCocoon;
+		bool isSummonerOrStrikerDoppler = (
+			controlMode is MaverickMode.Striker or MaverickMode.Summoner
+		) && this is DrDoppler;
+		bool isSummonerCocoon = controlMode == MaverickMode.Summoner && this is MorphMothCocoon;
+		bool isStrikerCocoon = controlMode == MaverickMode.Striker && this is MorphMothCocoon;
 		var mmc = this as MorphMothCocoon;
 		var doppler = this as DrDoppler;
 
@@ -446,7 +469,7 @@ public class Maverick : Actor, IDamagable {
 			}
 		} else if (isSummonerCocoon || isStrikerCocoon) {
 			target = mmc.getHealTarget();
-		} else if (!player.isPuppeteer() && !player.isTagTeam()) {
+		} else if (controlMode is not MaverickMode.Puppeteer and not MaverickMode.TagTeam) {
 			target = Global.level.getClosestTarget(
 				getCenterPos(), player.alliance, true, isRequesterAI: true,
 				aMaxDist: 300
@@ -465,7 +488,7 @@ public class Maverick : Actor, IDamagable {
 			doStartMoveControlIfNoTarget = false;
 		}
 
-		if ((target != null || doStartMoveControlIfNoTarget) && isAIState && !player.isPuppeteer()) {
+		if ((target != null || doStartMoveControlIfNoTarget) && isAIState && controlMode != MaverickMode.Puppeteer) {
 			if (isSummonerCocoon) {
 				if (target != null) {
 					mmc.changeState(new MorphMCSpinState());
@@ -494,7 +517,7 @@ public class Maverick : Actor, IDamagable {
 					changeState(mState);
 				}
 			}
-		} else if (aiBehavior == MaverickAIBehavior.Follow && !player.isStriker()) {
+		} else if (aiBehavior == MaverickAIBehavior.Follow && controlMode != MaverickMode.Striker) {
 			Character chr = player.character;
 			if (chr != null) {
 				float dist = chr.pos.x - pos.x;
@@ -1082,7 +1105,7 @@ public class Maverick : Actor, IDamagable {
 		base.render(x, y);
 		currentLabelY = -getLabelOffY();
 
-		if (player == Global.level.mainPlayer && player.currentMaverick != this && health > 0) {
+		if (player == Global.level.mainPlayer && ownerChar?.currentMaverick != this && health > 0) {
 			drawHealthBar();
 		}
 
@@ -1102,8 +1125,10 @@ public class Maverick : Actor, IDamagable {
 	}
 
 	public bool showCursor() {
-		if (this is StingChameleon sc && sc.isInvisible && ownedByLocalPlayer) return true;
-		return player.currentMaverick == this && !player.isTagTeam();
+		if (this is StingChameleon sc && sc.isInvisible && ownedByLocalPlayer) {
+			return true;
+		}
+		return ownerChar?.currentMaverick == this && controlMode == MaverickMode.Puppeteer;
 	}
 
 	public void changeToIdleOrFall(string transitionSprite = "") {

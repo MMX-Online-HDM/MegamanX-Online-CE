@@ -42,6 +42,7 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 	public string error = "";
 	public int maxRows = 1;
 	public int maxCols = 9;
+	public Weapon[] weapons;
 
 	public IMainMenu prevMenu;
 
@@ -58,6 +59,10 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 		cursors.Add(new SigmaWeaponCursor(Options.main.sigmaLoadout.maverick2));
 		cursors.Add(new SigmaWeaponCursor(Options.main.sigmaLoadout.sigmaForm));
 		cursors.Add(new SigmaWeaponCursor(Options.main.sigmaLoadout.commandMode));
+
+		List<Weapon> tempWp = Weapon.getAllSigmaWeapons(null);
+		tempWp.RemoveAt(0);
+		weapons = tempWp.ToArray();
 	}
 
 	public void update() {
@@ -186,7 +191,10 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 
 			for (int j = 0; j < cursors[i].numWeapons(); j++) {
 				int jIndex = j + cursors[i].startOffset();
-				Global.sprites["hud_weapon_icon"].drawToHUD(66 + jIndex, startX2 + (j * wepW), startY + (i * wepH));
+				Global.sprites["hud_weapon_icon"].drawToHUD(
+					weapons[jIndex].weaponSlotIndex,
+					startX2 + (j * wepW), startY + (i * wepH)
+				);
 				if (cursors[i].index != jIndex) {
 					DrawWrappers.DrawRectWH(
 						startX2 + (j * wepW) - 7, startY + (i * wepH) - 7, 14, 14, true,
@@ -206,21 +214,22 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 		int wsy = 128;
 		if (selCursorIndex < 2) {
 			int wi = cursors[selCursorIndex].index;
-			int[] strongAgainstIndices = getStrongAgainstFrameIndices(wi);
-			int[] weakAgainstIndices = getWeakAgainstFrameIndices(wi);
+			int weaponIcon = getMaverickIcon(wi);
+			Weapon[] strongAgainstIndices = getStrongAgainstFrameIndices(wi);
+			Weapon[] weakAgainstIndices = getWeakAgainstFrameIndices(wi);
 
 			DrawWrappers.DrawRect(
 				wsx, wsy - 8, Global.screenW - wsx, wsy + 48 + 8, true,
 				new Color(0, 0, 0, 100), 1, ZIndex.HUD, false, outlineColor: outlineColor
 			);
-			Global.sprites["hud_maverick"].drawToHUD(wi, startX, wsy);
+			Global.sprites["hud_maverick"].drawToHUD(weaponIcon, startX, wsy);
 
 			Fonts.drawText(FontType.Purple, getMaverickName(wi), startX + 48 + 8, wsy);
 			Fonts.drawText(FontType.Green, "Strong aganist:", startX + 48 + 8, wsy + 16);
 
 			for (int i = 0; i < strongAgainstIndices.Length; i++) {
-				int drawIndex = strongAgainstIndices[i];
-				if (strongAgainstIndices[i] == 0) {
+				int drawIndex = strongAgainstIndices[i].weaponSlotIndex;
+				if (drawIndex == 0) {
 					drawIndex = 118;
 				}
 				Global.sprites["hud_weapon_icon"].drawToHUD(
@@ -235,8 +244,8 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 				startX + weakOffset + 48 + 8, wsy + 32, Alignment.Right
 			);
 			for (int i = 0; i < weakAgainstIndices.Length; i++) {
-				int drawIndex = weakAgainstIndices[i];
-				if (weakAgainstIndices[i] == 0) {
+				int drawIndex = weakAgainstIndices[i].weaponSlotIndex;
+				if (drawIndex == 0) {
 					drawIndex = 118;
 				}
 				Global.sprites["hud_weapon_icon"].drawToHUD(
@@ -326,112 +335,135 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 		}
 	}
 
+	private int getMaverickIcon(int wi) {
+		return wi switch {
+			7 => 0,
+			5 => 1,
+			2 => 2,
+			0 => 3,
+			6 => 4,
+			1 => 5,
+			4 => 6,
+			3 => 7,
+			8 => 8,
+			14 => 9,
+			12 => 10,
+			10 => 11,
+			16 => 12,
+			11 => 13,
+			15 => 14,
+			9 => 15,
+			13 => 16,
+			17 => 17,
+			25 => 18,
+			18 => 19,
+			24 => 20,
+			20 => 21,
+			21 => 22,
+			22 => 23,
+			23 => 24,
+			19 => 25,
+			26 => 26,
+			_ => -1
+		};
+	}
+
 	private string getMaverickName(int wi) {
 		return wi switch {
-			0 => "Chill Penguin",
-			1 => "Spark Mandrill",
+			7 => "Chill Penguin",
+			5 => "Spark Mandrill",
 			2 => "Armored Armadillo",
-			3 => "Launch Octopus",
-			4 => "Boomerang Kuwanger",
-			5 => "Sting Chameleon",
-			6 => "Storm Eagle",
-			7 => "Flame Mammoth",
+			0 => "Launch Octopus",
+			6 => "Boomerang Kuwanger",
+			1 => "Sting Chameleon",
+			4 => "Storm Eagle",
+			3 => "Flame Mammoth",
 			8 => "Velguarder",
-			9 => "Wire Sponge",
-			10 => "Wheel Gator",
-			11 => "Bubble Crab",
-			12 => "Flame Stag",
-			13 => "Morph Moth",
-			14 => "Magna Centipede",
-			15 => "Crystal Snail",
-			16 => "Overdrive Ostrich",
+			14 => "Wire Sponge",
+			12 => "Wheel Gator",
+			10 => "Bubble Crab",
+			16 => "Flame Stag",
+			11 => "Morph Moth",
+			15 => "Magna Centipede",
+			9 => "Crystal Snail",
+			13 => "Overdrive Ostrich",
 			17 => "Fake Zero",
-			18 => "Blizzard Buffalo",
-			19 => "Toxic Seahorse",
-			20 => "Tunnel Rhino",
-			21 => "Volt Catfish",
-			22 => "Crush Crawfish",
-			23 => "Neon Tiger",
-			24 => "Gravity Beetle",
-			25 => "Blast Hornet",
+			25 => "Blizzard Buffalo",
+			18 => "Toxic Seahorse",
+			24 => "Tunnel Rhino",
+			20 => "Volt Catfish",
+			21 => "Crush Crawfish",
+			22 => "Neon Tiger",
+			23 => "Gravity Beetle",
+			19 => "Blast Hornet",
 			26 => "Dr. Doppler",
-			_ => ""
+			_ => "ERROR"
 		};
 	}
 
-	private int[] getWeakAgainstFrameIndices(int wi) {
+	private Weapon[] getWeakAgainstFrameIndices(int wi) {
 		return wi switch {
-			0 => new int[] { new FlameMammothWeapon(null).weaponSlotIndex, new FireWave().weaponSlotIndex },
-			1 => new int[] { new ChillPenguinWeapon(null).weaponSlotIndex, new ShotgunIce().weaponSlotIndex },
-			2 => new int[] { new SparkMandrillWeapon(null).weaponSlotIndex, new ElectricSpark().weaponSlotIndex },
-			3 => new int[] { new ArmoredArmadilloWeapon(null).weaponSlotIndex, new RollingShield().weaponSlotIndex },
-			4 => new int[] { new LaunchOctopusWeapon(null).weaponSlotIndex, new HomingTorpedo().weaponSlotIndex },
-			5 => new int[] { new BoomerangKuwangerWeapon(null).weaponSlotIndex, new BoomerangCutter().weaponSlotIndex },
-			6 => new int[] { new StingChameleonWeapon(null).weaponSlotIndex, new ChameleonSting().weaponSlotIndex },
-			7 => new int[] { new StormEagleWeapon(null).weaponSlotIndex, new StormTornado().weaponSlotIndex },
-			8 => new int[] { new ChillPenguinWeapon(null).weaponSlotIndex, new ShotgunIce().weaponSlotIndex },
-			9 => new int[] { new OverdriveOstrichWeapon(null).weaponSlotIndex, new SonicSlicer().weaponSlotIndex },
-			10 => new int[] { new WireSpongeWeapon(null).weaponSlotIndex, new StrikeChain().weaponSlotIndex },
-			11 => new int[] { new WheelGatorWeapon(null).weaponSlotIndex, new SpinWheel().weaponSlotIndex },
-			12 => new int[] { new BubbleCrabWeapon(null).weaponSlotIndex, new BubbleSplash().weaponSlotIndex },
-			13 => new int[] { new FlameStagWeapon(null).weaponSlotIndex, new SpeedBurner().weaponSlotIndex },
-			14 => new int[] { new MorphMothWeapon(null).weaponSlotIndex, new SilkShot().weaponSlotIndex },
-			15 => new int[] { new MagnaCentipedeWeapon(null).weaponSlotIndex, new MagnetMine().weaponSlotIndex },
-			16 => new int[] { new CrystalSnailWeapon(null).weaponSlotIndex, new CrystalHunter().weaponSlotIndex },
-			17 => new int[] { new FlameStagWeapon(null).weaponSlotIndex, new SpeedBurner().weaponSlotIndex },
-			18 => new int[] { new BlastHornetWeapon(null).weaponSlotIndex, new ParasiticBomb().weaponSlotIndex },
-			19 => new int[] { new BlizzardBuffaloWeapon(null).weaponSlotIndex, new FrostShield().weaponSlotIndex },
-			20 => new int[] { new ToxicSeahorseWeapon(null).weaponSlotIndex, new AcidBurst().weaponSlotIndex },
-			21 => new int[] { new TunnelRhinoWeapon(null).weaponSlotIndex, new TornadoFang().weaponSlotIndex },
-			22 => new int[] { new VoltCatfishWeapon(null).weaponSlotIndex, new TriadThunder().weaponSlotIndex },
-			23 => new int[] { new CrushCrawfishWeapon(null).weaponSlotIndex, new SpinningBlade().weaponSlotIndex },
-			24 => new int[] { new NeonTigerWeapon(null).weaponSlotIndex, new RaySplasher().weaponSlotIndex },
-			25 => new int[] { new GravityBeetleWeapon(null).weaponSlotIndex, new GravityWell().weaponSlotIndex },
-			26 => new int[] { new ToxicSeahorseWeapon(null).weaponSlotIndex, new AcidBurst().weaponSlotIndex },
-			_ => new int[] { 0 }
+			7 => [FlameMammothWeapon.netWeapon, FireWave.netWeapon],
+			5 => [ChillPenguinWeapon.netWeapon, ShotgunIce.netWeapon],
+			2 => [SparkMandrillWeapon.netWeapon, ElectricSpark.netWeapon],
+			0 => [ArmoredArmadilloWeapon.netWeapon, RollingShield.netWeapon],
+			6 => [LaunchOctopusWeapon.netWeapon, HomingTorpedo.netWeapon],
+			1 => [BoomerangKuwangerWeapon.netWeapon, BoomerangCutter.netWeapon],
+			4 => [StingChameleonWeapon.netWeapon, ChameleonSting.netWeapon],
+			3 => [StormEagleWeapon.netWeapon, StormTornado.netWeapon],
+			8 => [ChillPenguinWeapon.netWeapon, ShotgunIce.netWeapon],
+			14 => [OverdriveOstrichWeapon.netWeapon, SonicSlicer.netWeapon],
+			12 => [WireSpongeWeapon.netWeapon, StrikeChain.netWeapon],
+			10 => [WheelGatorWeapon.netWeapon, SpinWheel.netWeapon],
+			16 => [BubbleCrabWeapon.netWeapon, BubbleSplash.netWeapon],
+			11 => [FlameStagWeapon.netWeapon, SpeedBurner.netWeapon],
+			15 => [MorphMothWeapon.netWeapon, SilkShot.netWeapon],
+			9 => [MagnaCentipedeWeapon.netWeapon, MagnetMine.netWeapon],
+			13 => [CrystalSnailWeapon.netWeapon, CrystalHunter.netWeapon],
+			17 => [FlameStagWeapon.netWeapon, SpeedBurner.netWeapon],
+			25 => [BlastHornetWeapon.netWeapon, ParasiticBomb.netWeapon],
+			18 => [BlizzardBuffaloWeapon.netWeapon, FrostShield.netWeapon],
+			24 => [ToxicSeahorseWeapon.netWeapon, AcidBurst.netWeapon],
+			20 => [TunnelRhinoWeapon.netWeapon, TornadoFang.netWeapon],
+			21 => [VoltCatfishWeapon.netWeapon, TriadThunder.netWeapon],
+			22 => [CrushCrawfishWeapon.netWeapon, SpinningBlade.netWeapon],
+			23 => [NeonTigerWeapon.netWeapon, RaySplasher.netWeapon],
+			19 => [GravityBeetleWeapon.netWeapon, GravityWell.netWeapon],
+			26 => [ToxicSeahorseWeapon.netWeapon, AcidBurst.netWeapon],
+			_ => [Weapon.baseNetWeapon]
 		};
 	}
 
-	private int[] getStrongAgainstFrameIndices(int wi) {
+	private Weapon[] getStrongAgainstFrameIndices(int wi) {
 		return wi switch {
-			0 => new int[] {
-				new SparkMandrillWeapon(null).weaponSlotIndex,
-				new ElectricSpark().weaponSlotIndex, new VelguarderWeapon(null).weaponSlotIndex
-			},
-			1 => new int[] {
-				new ArmoredArmadilloWeapon(null).weaponSlotIndex, new RollingShield().weaponSlotIndex
-			},
-			2 => new int[] {
-				new LaunchOctopusWeapon(null).weaponSlotIndex, new HomingTorpedo().weaponSlotIndex
-			},
-			3 => new int[] { new BoomerangKuwangerWeapon(null).weaponSlotIndex, new BoomerangCutter().weaponSlotIndex },
-			4 => new int[] { new StingChameleonWeapon(null).weaponSlotIndex, new ChameleonSting().weaponSlotIndex },
-			5 => new int[] { new StormEagleWeapon(null).weaponSlotIndex, new StormTornado().weaponSlotIndex },
-			6 => new int[] { new FlameMammothWeapon(null).weaponSlotIndex, new FireWave().weaponSlotIndex },
-			7 => new int[] { new ChillPenguinWeapon(null).weaponSlotIndex, new ShotgunIce().weaponSlotIndex },
-			9 => new int[] { new WheelGatorWeapon(null).weaponSlotIndex, new SpinWheel().weaponSlotIndex },
-			10 => new int[] { new BubbleCrabWeapon(null).weaponSlotIndex, new BubbleSplash().weaponSlotIndex },
-			11 => new int[] { new FlameStagWeapon(null).weaponSlotIndex, new SpeedBurner().weaponSlotIndex },
-			12 => new int[] {
-				new MorphMothWeapon(null).weaponSlotIndex, new SilkShot().weaponSlotIndex,
-				new FakeZeroWeapon(null).weaponSlotIndex
-			},
-			13 => new int[] { new MagnaCentipedeWeapon(null).weaponSlotIndex, new MagnetMine().weaponSlotIndex },
-			14 => new int[] { new CrystalSnailWeapon(null).weaponSlotIndex, new CrystalHunter().weaponSlotIndex },
-			15 => new int[] { new OverdriveOstrichWeapon(null).weaponSlotIndex, new SonicSlicer().weaponSlotIndex },
-			16 => new int[] { new WireSpongeWeapon(null).weaponSlotIndex, new StrikeChain().weaponSlotIndex },
-			18 => new int[] { new ToxicSeahorseWeapon(null).weaponSlotIndex, new AcidBurst().weaponSlotIndex },
-			19 => new int[] {
-				new TunnelRhinoWeapon(null).weaponSlotIndex,
-				new TornadoFang().weaponSlotIndex, new DrDopplerWeapon(null).weaponSlotIndex
-			},
-			20 => new int[] { new VoltCatfishWeapon(null).weaponSlotIndex, new TriadThunder().weaponSlotIndex },
-			21 => new int[] { new CrushCrawfishWeapon(null).weaponSlotIndex, new SpinningBlade().weaponSlotIndex },
-			22 => new int[] { new NeonTigerWeapon(null).weaponSlotIndex, new RaySplasher().weaponSlotIndex },
-			23 => new int[] { new GravityBeetleWeapon(null).weaponSlotIndex, new GravityWell().weaponSlotIndex },
-			24 => new int[] { new BlastHornetWeapon(null).weaponSlotIndex, new ParasiticBomb().weaponSlotIndex },
-			25 => new int[] { new BlizzardBuffaloWeapon(null).weaponSlotIndex, new FrostShield().weaponSlotIndex },
-			_ => new int[] { 0 }
+			7 => [SparkMandrillWeapon.netWeapon, ElectricSpark.netWeapon, VelguarderWeapon.netWeapon],
+			5 => [ArmoredArmadilloWeapon.netWeapon, RollingShield.netWeapon],
+			2 => [LaunchOctopusWeapon.netWeapon, HomingTorpedo.netWeapon],
+			0 => [BoomerangKuwangerWeapon.netWeapon, BoomerangCutter.netWeapon],
+			6 => [StingChameleonWeapon.netWeapon, ChameleonSting.netWeapon],
+			1 => [StormEagleWeapon.netWeapon, StormTornado.netWeapon],
+			4 => [FlameMammothWeapon.netWeapon, FireWave.netWeapon],
+			3 => [ChillPenguinWeapon.netWeapon, ShotgunIce.netWeapon],
+			8 => [Weapon.baseNetWeapon],
+			14 => [WheelGatorWeapon.netWeapon, SpinWheel.netWeapon],
+			12 => [BubbleCrabWeapon.netWeapon, BubbleSplash.netWeapon],
+			10 => [FlameStagWeapon.netWeapon, SpeedBurner.netWeapon],
+			16 => [MorphMothWeapon.netWeapon, SilkShot.netWeapon, FakeZeroWeapon.netWeapon],
+			11 => [MagnaCentipedeWeapon.netWeapon, MagnetMine.netWeapon],
+			15 => [CrystalSnailWeapon.netWeapon, CrystalHunter.netWeapon],
+			9 => [OverdriveOstrichWeapon.netWeapon, SonicSlicer.netWeapon],
+			13 => [WireSpongeWeapon.netWeapon, StrikeChain.netWeapon],
+			17 => [Weapon.baseNetWeapon],
+			25 => [ToxicSeahorseWeapon.netWeapon, AcidBurst.netWeapon],
+			18 => [TunnelRhinoWeapon.netWeapon, TornadoFang.netWeapon, DrDopplerWeapon.netWeapon],
+			24 => [VoltCatfishWeapon.netWeapon, TriadThunder.netWeapon],
+			20 => [CrushCrawfishWeapon.netWeapon, SpinningBlade.netWeapon],
+			21 => [NeonTigerWeapon.netWeapon, RaySplasher.netWeapon],
+			22 => [GravityBeetleWeapon.netWeapon, GravityWell.netWeapon],
+			23 => [BlastHornetWeapon.netWeapon, ParasiticBomb.netWeapon],
+			19 => [BlizzardBuffaloWeapon.netWeapon, FrostShield.netWeapon],
+			26 => [Weapon.baseNetWeapon],
+			_ => [Weapon.baseNetWeapon]
 		};
 	}
 }

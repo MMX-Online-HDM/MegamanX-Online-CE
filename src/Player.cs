@@ -620,8 +620,8 @@ public partial class Player {
 		return Global.level.server?.customMatchSettings?.heartTankHp ?? 1;
 	}
 
-	public float getMaverickMaxHp() {
-		if (!Global.level.is1v1() && isTagTeam()) {
+	public float getMaverickMaxHp(MaverickMode controlMode) {
+		if (!Global.level.is1v1() && controlMode == MaverickMode.TagTeam) {
 			return getModifiedHealth(20) + (heartTanks * getHeartTankModifier());
 		}
 		return MathF.Ceiling(getModifiedHealth(24));
@@ -670,8 +670,8 @@ public partial class Player {
 			return getModifiedHealth(28);
 		}
 		int bonus = 0;
-		if (isSigma && isPuppeteer()) {
-			bonus = 4;
+		if (isSigma) {
+			bonus = 6;
 		}
 		return MathF.Ceiling(
 			getModifiedHealth(16 + bonus) + (heartTanks * getHeartTankModifier())
@@ -1077,24 +1077,6 @@ public partial class Player {
 				);
 			}
 		}
-		int sigmaForm = 0;
-		if (charNum == (int)CharIds.Sigma) {
-			sigmaForm = extraData[0];
-			loadout.sigmaLoadout.sigmaForm = extraData[0];
-			loadout.sigmaLoadout.maverick1 = extraData[1];
-			loadout.sigmaLoadout.maverick2 = extraData[2];
-			if (sigmaForm == 0) {
-				sigmaMaxAmmo = 20;
-				sigmaAmmo = sigmaMaxAmmo;
-			} else if (sigmaForm == 1) {
-				sigmaMaxAmmo = 28;
-				sigmaAmmo = 0;
-			}
-		}
-		if (charNum == (int)CharIds.Axl) {
-			loadout.axlLoadout.weapon2 = extraData[0];
-			loadout.xLoadout.weapon3 = extraData[1];
-		}
 		maxHealth = getMaxHealth();
 		health = maxHealth;
 		assassinHitPos = null;
@@ -1136,13 +1118,34 @@ public partial class Player {
 		}
 		// GM19 Axl.
 		else if (charNum == (int)CharIds.Axl) {
+			AxlLoadout axlLoadout = loadout?.axlLoadout?.clone() ?? new();
+			axlLoadout.weapon2 = extraData[0];
+			axlLoadout.weapon3 = extraData[1];
+			axlLoadout.hyperMode = extraData[2];
+
+			if (isMainChar) {
+				loadout.axlLoadout = axlLoadout;
+			}
 			newChar = new Axl(
 				this, pos.x, pos.y, xDir,
-				false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
+				false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn,
+				axlLoadout: axlLoadout
 			);
 		}
 		// Sigma.
 		else if (charNum == (int)CharIds.Sigma) {
+			int sigmaForm = extraData[0];
+			loadout.sigmaLoadout.sigmaForm = extraData[0];
+			loadout.sigmaLoadout.maverick1 = extraData[1];
+			loadout.sigmaLoadout.maverick2 = extraData[2];
+			if (sigmaForm == 0) {
+				sigmaMaxAmmo = 20;
+				sigmaAmmo = sigmaMaxAmmo;
+			} else if (sigmaForm == 1) {
+				sigmaMaxAmmo = 28;
+				sigmaAmmo = 0;
+			}
+
 			if (sigmaForm == 2) {
 				newChar = new Doppma(
 					this, pos.x, pos.y, xDir,
@@ -1342,19 +1345,6 @@ public partial class Player {
 		}
 
 		loadout = data.loadout;
-		if (charNum == (int)CharIds.Sigma) {
-			int sigmaForm = data.extraData[0];
-			loadout.sigmaLoadout.sigmaForm = data.extraData[0];
-			loadout.sigmaLoadout.maverick1 = data.extraData[1];
-			loadout.sigmaLoadout.maverick2 = data.extraData[2];
-			if (sigmaForm == 0) {
-				sigmaMaxAmmo = 20;
-				sigmaAmmo = sigmaMaxAmmo;
-			} else if (sigmaForm == 1) {
-				sigmaMaxAmmo = 28;
-				sigmaAmmo = 0;
-			}
-		}
 		if (charNum == (int)CharIds.X) {
 			loadout.xLoadout.weapon1 = data.extraData[0];
 			loadout.xLoadout.weapon2 = data.extraData[1];
@@ -1390,20 +1380,33 @@ public partial class Player {
 				true, data.dnaNetId, false, isWarpIn: false
 			);
 		} else if (data.charNum == (int)CharIds.Sigma) {
+			SigmaLoadout sigmaLoadout = new() {
+				sigmaForm = data.extraData[0],
+				maverick1 = data.extraData[1],
+				maverick2 = data.extraData[2]
+			};
+
+			if (sigmaLoadout.sigmaForm == 0) {
+				sigmaMaxAmmo = 20;
+				sigmaAmmo = sigmaMaxAmmo;
+			} else if (sigmaLoadout.sigmaForm == 1) {
+				sigmaMaxAmmo = 28;
+				sigmaAmmo = 0;
+			}
 			if (data.extraData[0] == 2) {
 				retChar = new Doppma(
 					this, character.pos.x, character.pos.y, character.xDir,
-					true, data.dnaNetId, false, isWarpIn: false
+					true, data.dnaNetId, false, isWarpIn: false, sigmaLoadout: sigmaLoadout
 				);
 			} else if (data.extraData[0] == 1) {
 				retChar = new NeoSigma(
 					this, character.pos.x, character.pos.y, character.xDir,
-					true, data.dnaNetId, false, isWarpIn: false
+					true, data.dnaNetId, false, isWarpIn: false, sigmaLoadout: sigmaLoadout
 				);
 			} else {
 				retChar = new CmdSigma(
 					this, character.pos.x, character.pos.y, character.xDir,
-					true, data.dnaNetId, false, isWarpIn: false
+					true, data.dnaNetId, false, isWarpIn: false, sigmaLoadout: sigmaLoadout
 				);
 			}
 		} else if (data.charNum == (int)CharIds.Rock) {
@@ -2249,7 +2252,7 @@ public partial class Player {
 			return;
 		}
 
-		if (currentMaverick != null && isTagTeam()) {
+		if (currentMaverick != null && currentMaverick.controlMode == MaverickMode.TagTeam) {
 			destroyCharacter(true);
 		} else {
 			character?.applyDamage(Damager.forceKillDamage, this, character, null, null);
@@ -2542,32 +2545,12 @@ public partial class Player {
 		return isKaiserSigma() && !isKaiserViralSigma();
 	}
 
-	public bool isSummoner() {
-		return isAI || loadout?.sigmaLoadout != null && loadout.sigmaLoadout.commandMode == 0;
-	}
-
-	public bool isPuppeteer() {
-		return !isAI && loadout?.sigmaLoadout != null && loadout.sigmaLoadout.commandMode == 1;
-	}
-
-	public bool isStriker() {
-		return !isAI && loadout?.sigmaLoadout != null && loadout.sigmaLoadout.commandMode == 2;
-	}
-
-	public bool isTagTeam() {
-		return !isAI && loadout?.sigmaLoadout != null && loadout.sigmaLoadout.commandMode == 3;
-	}
-
-	public bool isRefundableMode() {
-		return isSummoner() || isPuppeteer() || isTagTeam();
-	}
-
 	public bool isAlivePuppeteer() {
-		return isPuppeteer() && health > 0;
-	}
-
-	public bool isControllingPuppet() {
-		return isSigma && isPuppeteer() && currentMaverick != null && weapon is MaverickWeapon;
+		return (
+			!isAI && loadout?.sigmaLoadout != null &&
+			loadout.sigmaLoadout.commandMode == (int)MaverickMode.Puppeteer &&
+			health > 0
+		);
 	}
 
 	public bool hasSubtankCapacity() {

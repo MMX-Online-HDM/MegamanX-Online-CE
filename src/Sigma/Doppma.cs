@@ -13,10 +13,10 @@ public class Doppma : BaseSigma {
 	public Doppma(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId,
-		bool ownedByLocalPlayer, bool isWarpIn = true
+		bool ownedByLocalPlayer, bool isWarpIn = true, SigmaLoadout? sigmaLoadout = null
 	) : base(
 		player, x, y, xDir, isVisible,
-		netId, ownedByLocalPlayer, isWarpIn
+		netId, ownedByLocalPlayer, isWarpIn, sigmaLoadout
 	) {
 		sigmaSaberMaxCooldown = 0.5f;
 		altSoundId = AltSoundIds.X3;

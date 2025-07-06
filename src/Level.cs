@@ -41,11 +41,13 @@ public partial class Level {
 	public List<DelayedAction> delayedActions = new List<DelayedAction>();
 	public Dictionary<ushort, float> recentlyDestroyedNetActors = new Dictionary<ushort, float>();
 	public List<BufferedDestroyActor> bufferedDestroyActors = new List<BufferedDestroyActor>();
-	public Dictionary<int, FailedSpawn> failedSpawns = new Dictionary<int, FailedSpawn>();
+	//public Dictionary<int, FailedSpawn> failedSpawns = new Dictionary<int, FailedSpawn>();
 
 	public string getListCounts() {
-		return effects.Count + "," + recentClipCount.Keys.Count + "," + loopingSounds.Count + "," + musicSources.Count + "," + boundBlasterAltProjs.Count + "," + chargedCrystalHunters.Count + "," + unchargedGravityWells.Count + "," + backloggedSpawns.Count + "," +
-			delayedActions.Count + "," + recentlyDestroyedNetActors.Keys.Count + "," + bufferedDestroyActors.Count + "," + failedSpawns.Keys.Count;
+		return effects.Count + "," + recentClipCount.Keys.Count + "," +
+		loopingSounds.Count + "," + musicSources.Count + "," + boundBlasterAltProjs.Count + "," +
+		chargedCrystalHunters.Count + "," + unchargedGravityWells.Count + "," + backloggedSpawns.Count + "," +
+		delayedActions.Count + "," + recentlyDestroyedNetActors.Keys.Count + "," + bufferedDestroyActors.Count;
 	}
 	#endregion
 
@@ -943,13 +945,13 @@ public partial class Level {
 		return levelData.name == "giantdam" && !levelData.isMirrored && gameMode is CTF;
 	}
 
-	public void addFailedSpawn(int playerId, Point point, int xDir, ushort netId) {
+	/*public void addFailedSpawn(int playerId, Point point, int xDir, ushort netId) {
 		if (!failedSpawns.ContainsKey(playerId)) {
 			failedSpawns[playerId] = new FailedSpawn(point, xDir, netId);
 		} else {
 			failedSpawns[playerId].time += Global.spf;
 		}
-	}
+	}*/
 
 	public bool pickupRestricted(dynamic instance) {
 		if (isNon1v1Elimination()) return true;
@@ -1710,7 +1712,7 @@ public partial class Level {
 		}
 
 		var keysToRemove = new List<int>();
-		foreach (var kvp in failedSpawns) {
+		/*foreach (var kvp in failedSpawns) {
 			var player = getPlayerById(kvp.Key);
 			if (player == null || player.character != null) {
 				keysToRemove.Add(kvp.Key);
@@ -1726,7 +1728,7 @@ public partial class Level {
 		}
 		foreach (var key in keysToRemove) {
 			failedSpawns.Remove(key);
-		}
+		}*/
 
 		foreach (var key in recentlyDestroyedNetActors.Keys.ToList()) {
 			recentlyDestroyedNetActors[key] += Global.spf;

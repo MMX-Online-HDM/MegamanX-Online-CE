@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using ProtoBuf;
@@ -288,6 +289,22 @@ public class AxlLoadout {
 			hyperMode = Helpers.randomRange(0, 1),
 		};
 	}
+
+	public AxlLoadout clone() {
+		return new AxlLoadout() {
+			weapon2 = weapon2,
+			weapon3 = weapon3,
+			hyperMode = hyperMode,
+			blastLauncherAlt = blastLauncherAlt,
+			rayGunAlt = rayGunAlt,
+			blackArrowAlt = blackArrowAlt,
+			spiralMagnumAlt = spiralMagnumAlt,
+			boundBlasterAlt = boundBlasterAlt,
+			plasmaGunAlt = plasmaGunAlt,
+			iceGattlingAlt = iceGattlingAlt,
+			flameBurnerAlt = flameBurnerAlt
+		};
+	}
 }
 
 [ProtoContract]
@@ -317,7 +334,7 @@ public class SigmaLoadout {
 		sigmaForm = Helpers.clamp(sigmaForm, 0, 2);
 	}
 
-	public List<Weapon> getWeaponsFromLoadout(Player player, int sigmaWeaponSlot) {
+	/*public List<Weapon> getWeaponsFromLoadout(Player player, int sigmaWeaponSlot) {
 		sigmaWeaponSlot = Helpers.clamp(sigmaWeaponSlot, 0, 2);
 		var indices = new List<byte>();
 		indices.Add((byte)(maverick1 + startMaverick));
@@ -327,7 +344,7 @@ public class SigmaLoadout {
 		return indices.Select(index => {
 			return Weapon.getAllSigmaWeapons(player).Find(w => w.index == index).clone();
 		}).ToList();
-	}
+	}*/
 
 	public static SigmaLoadout createRandom() {
 		List<int> weaponPool = new List<int>();
@@ -343,6 +360,42 @@ public class SigmaLoadout {
 			commandMode = 2,
 			// Gacel: So it was an option for third maverick before?
 			//maverick3 = randPool[2],
+		};
+	}
+
+	public static Weapon getWeaponById(Player player, int weaponId, int commandMode) {
+		return weaponId switch {
+			// X1 stuff.
+			0 => new LaunchOctopusWeapon(player, commandMode),
+			1 => new StingChameleonWeapon(player, commandMode),
+			2 => new ArmoredArmadilloWeapon(player, commandMode),
+			3 => new FlameMammothWeapon(player, commandMode),
+			4 => new StormEagleWeapon(player, commandMode),
+			5 => new SparkMandrillWeapon(player, commandMode),
+			6 => new BoomerangKuwangerWeapon(player, commandMode),
+			7 => new ChillPenguinWeapon(player, commandMode),
+			8 => new VelguarderWeapon(player, commandMode),
+			// X2 Stuff.
+			9 => new CrystalSnailWeapon(player, commandMode),
+			10 => new BubbleCrabWeapon(player, commandMode),
+			11 => new MorphMothWeapon(player, commandMode),
+			12 => new WheelGatorWeapon(player, commandMode),
+			13 => new OverdriveOstrichWeapon(player, commandMode),
+			14 => new WireSpongeWeapon(player, commandMode),
+			15 => new MagnaCentipedeWeapon(player, commandMode),
+			16 => new FlameStagWeapon(player, commandMode),
+			17 => new FakeZeroWeapon(player, commandMode),
+			// X3 Stuff.
+			18 => new ToxicSeahorseWeapon(player, commandMode),
+			19 => new BlastHornetWeapon(player, commandMode),
+			20 => new VoltCatfishWeapon(player, commandMode),
+			21 => new CrushCrawfishWeapon(player, commandMode),
+			22 => new NeonTigerWeapon(player, commandMode),
+			23 => new GravityBeetleWeapon(player, commandMode),
+			24 => new BlizzardBuffaloWeapon(player, commandMode),
+			25 => new TunnelRhinoWeapon(player, commandMode),
+			26 => new DrDopplerWeapon(player, commandMode),
+			_ =>  new SigmaMenuWeapon()
 		};
 	}
 }

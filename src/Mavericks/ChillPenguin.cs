@@ -570,8 +570,9 @@ public class ChillPBlizzardState : MaverickState {
 				if (!once && maverick.frameIndex == 3) {
 					once = true;
 					float topY = Global.level.getTopScreenY(maverick.pos.y);
-					if (player.isPuppeteer() && player.currentMaverick == maverick) topY = maverick.pos.y - 80;
-
+					if (maverick.controlMode == MaverickMode.Puppeteer && player.currentMaverick == maverick) {
+						topY = maverick.pos.y - 80;
+					}
 					new ChillPBlizzardProj(
 						new Point(maverick.pos.x, topY), maverick.xDir, IcyPenguigo,
 						player, player.getNextActorNetId(), rpc: true

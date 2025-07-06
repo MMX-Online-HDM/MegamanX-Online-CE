@@ -147,7 +147,7 @@ public class MaverickState {
 			}
 		}
 		if (aiAttackCtrl && (newState is MIdle || newState is MFall)) {
-			if (player.isStriker()) {
+			if (maverick.controlMode == MaverickMode.Striker) {
 				maverick.aiCooldown = maverick.maxAICooldown;
 				maverick.autoExit = true;
 			}
@@ -519,7 +519,7 @@ public class MEnter : MaverickState {
 		base.onEnter(oldState);
 		maverick.useGravity = false;
 		maverick.alpha = 0;
-		if (player.isPuppeteer() || player.isSummoner() || player.isStriker() && !once) {
+		if (maverick.controlMode != MaverickMode.TagTeam && !once) {
 			maverick.playSound("warpIn", sendRpc: true);
 			once = true;
 		} 
@@ -564,7 +564,7 @@ public class MExit : MaverickState {
 		maverick.vel.x = 0;
 		maverick.vel.y = -400 * maverick.getYMod();
 		destY = maverick.pos.y - (yPos * maverick.getYMod());
-		if (player.isPuppeteer() || player.isSummoner() || player.isStriker() && !once) {
+		if (maverick.controlMode != MaverickMode.TagTeam && !once) {
 			maverick.playSound("warpOut", sendRpc: true);
 			once = true;
 		} 
@@ -1169,7 +1169,7 @@ public class MDie : MaverickState {
 
 			if (player.maverick1v1 != null) {
 				player.maverick1v1Kill();
-			} else if (player.currentMaverick == maverick) {
+			} else if (maverick.ownerChar?.currentMaverick == maverick) {
 				// If sigma is not dead, become sigma
 				if (player.character != null && player.character.charState is not Die) {
 					Point spawnPos;

@@ -105,44 +105,47 @@ public class Weapon {
 		return weaponList;
 	}
 
-	public static List<Weapon> getAllSigmaWeapons(Player? player, int? sigmaForm = null) {
-		var weapons = new List<Weapon>()
-		{
-				new SigmaMenuWeapon(),
-			};
+	public static List<Weapon> getAllSigmaWeapons(Player? player, int? sigmaForm = null, int commandMode = 0) {
+		List<Weapon> weapons = [new SigmaMenuWeapon()];
 
 		if (sigmaForm == null || sigmaForm == 0) {
-			weapons.Add(new ChillPenguinWeapon(player));
-			weapons.Add(new SparkMandrillWeapon(player));
-			weapons.Add(new ArmoredArmadilloWeapon(player));
-			weapons.Add(new LaunchOctopusWeapon(player));
-			weapons.Add(new BoomerangKuwangerWeapon(player));
-			weapons.Add(new StingChameleonWeapon(player));
-			weapons.Add(new StormEagleWeapon(player));
-			weapons.Add(new FlameMammothWeapon(player));
-			weapons.Add(new VelguarderWeapon(player));
+			weapons.AddRange([
+				new LaunchOctopusWeapon(player, commandMode),
+				new StingChameleonWeapon(player, commandMode),
+				new ArmoredArmadilloWeapon(player, commandMode),
+				new FlameMammothWeapon(player, commandMode),
+				new StormEagleWeapon(player, commandMode),
+				new SparkMandrillWeapon(player, commandMode),
+				new BoomerangKuwangerWeapon(player, commandMode),
+				new ChillPenguinWeapon(player, commandMode),
+				new VelguarderWeapon(player, commandMode),
+			]);
 		}
 		if (sigmaForm == null || sigmaForm == 1) {
-			weapons.Add(new WireSpongeWeapon(player));
-			weapons.Add(new WheelGatorWeapon(player));
-			weapons.Add(new BubbleCrabWeapon(player));
-			weapons.Add(new FlameStagWeapon(player));
-			weapons.Add(new MorphMothWeapon(player));
-			weapons.Add(new MagnaCentipedeWeapon(player));
-			weapons.Add(new CrystalSnailWeapon(player));
-			weapons.Add(new OverdriveOstrichWeapon(player));
-			weapons.Add(new FakeZeroWeapon(player));
+			weapons.AddRange([
+				new CrystalSnailWeapon(player, commandMode),
+				new BubbleCrabWeapon(player, commandMode),
+				new MorphMothWeapon(player, commandMode),
+				new WheelGatorWeapon(player, commandMode),
+				new OverdriveOstrichWeapon(player, commandMode),
+				new WireSpongeWeapon(player, commandMode),
+				new MagnaCentipedeWeapon(player, commandMode),
+				new FlameStagWeapon(player, commandMode),
+				new FakeZeroWeapon(player, commandMode),
+			]);
 		}
 		if (sigmaForm == null || sigmaForm == 2) {
-			weapons.Add(new BlizzardBuffaloWeapon(player));
-			weapons.Add(new ToxicSeahorseWeapon(player));
-			weapons.Add(new TunnelRhinoWeapon(player));
-			weapons.Add(new VoltCatfishWeapon(player));
-			weapons.Add(new CrushCrawfishWeapon(player));
-			weapons.Add(new NeonTigerWeapon(player));
-			weapons.Add(new GravityBeetleWeapon(player));
-			weapons.Add(new BlastHornetWeapon(player));
-			weapons.Add(new DrDopplerWeapon(player));
+			weapons.AddRange([
+				new ToxicSeahorseWeapon(player, commandMode),
+				new BlastHornetWeapon(player, commandMode),
+				new VoltCatfishWeapon(player, commandMode),
+				new CrushCrawfishWeapon(player, commandMode),
+				new NeonTigerWeapon(player, commandMode),
+				new GravityBeetleWeapon(player, commandMode),
+				new BlizzardBuffaloWeapon(player, commandMode),
+				new TunnelRhinoWeapon(player, commandMode),
+				new DrDopplerWeapon(player, commandMode),
+			]);
 		}
 
 		return weapons;

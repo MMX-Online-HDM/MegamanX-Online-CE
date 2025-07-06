@@ -50,6 +50,7 @@ public enum TCat {
 public enum WeaponIds {
 	// DO NOT change the order of these X weapons
 	Buster,
+	// X1 Weapons.
 	HomingTorpedo,
 	ChameleonSting,
 	RollingShield,
@@ -58,6 +59,7 @@ public enum WeaponIds {
 	ElectricSpark,
 	BoomerangCutter,
 	ShotgunIce,
+	// X2 Weapons.
 	CrystalHunter,
 	BubbleSplash,
 	SilkShot,
@@ -66,6 +68,7 @@ public enum WeaponIds {
 	StrikeChain,
 	MagnetMine,
 	SpeedBurner,
+	// X3 Weapons.
 	AcidBurst,
 	ParasiticBomb,
 	TriadThunder,
@@ -74,6 +77,7 @@ public enum WeaponIds {
 	GravityWell,
 	FrostShield,
 	TornadoFang,
+	// Other stuff whose order does not matter.
 	GigaCrush,
 	ItemTracer,
 	XSaber,
@@ -90,34 +94,39 @@ public enum WeaponIds {
 
 	// DO NOT CHANGE THE ORDER OF THESE SIGMA WEAPONS
 	Sigma,
-	ChillPenguin,
-	SparkMandrill,
-	ArmoredArmadillo,
+	// X1 Summons.
 	LaunchOctopus,
-	BoomerangKuwanger,
 	StingChameleon,
-	StormEagle,
+	ArmoredArmadillo,
 	FlameMammoth,
+	StormEagle,
+	SparkMandrill,
+	BoomerangKuwanger,
+	ChillPenguin,
 	Velguarder,
-	WireSponge,
-	WheelGator,
-	BubbleCrab,
-	FlameStag,
-	MorphMoth,
-	MagnaCentipede,
+	// X2 Summons.
 	CrystalSnail,
+	BubbleCrab,
+	MorphMoth,
+	WheelGator,
 	OverdriveOstrich,
+	WireSponge,
+	MagnaCentipede,
+	FlameStag,
 	FakeZero,
-	BlizzardBuffalo,
+	// X3 Summons.
 	ToxicSeahorse,
-	TunnelRhino,
+	BlastHornet,
 	VoltCatfish,
 	CrushCrawfish,
 	NeonTiger,
 	GravityBeetle,
-	BlastHornet,
+	BlizzardBuffalo,
+	TunnelRhino,
 	DrDoppler,
-
+	// Sigma summons end here.
+	
+	// Zero stuff.
 	ZSaber,
 	ZSaberProjSwing,
 	PunchyZSaberProjSwing,

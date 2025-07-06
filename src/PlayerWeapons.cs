@@ -45,6 +45,7 @@ public partial class Player {
 		}
 	}
 
+	/// <summary> Returns the current manually-controlled maverick. </summary>
 	public MaverickWeapon? currentMaverickWeapon {
 		get {
 			if (character == null) {
@@ -59,14 +60,7 @@ public partial class Player {
 		}
 	}
 
-	public Maverick? currentMaverick {
-		get {
-			Weapon? mw = weapons.FirstOrDefault(
-				w => w is MaverickWeapon mw && mw.maverick?.aiBehavior == MaverickAIBehavior.Control
-			);
-			return (mw as MaverickWeapon)?.maverick;
-		}
-	}
+	public Maverick? currentMaverick => character?.currentMaverick;
 
 	public bool shouldBlockMechSlotScroll() {
 		if (character is Vile { isVileMK5: true, linkedRideArmor: not null }) {
