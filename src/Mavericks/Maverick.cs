@@ -156,9 +156,11 @@ public class Maverick : Actor, IDamagable {
 	}
 
 	public Maverick(
-		Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer
+		Player player, Point pos, Point destPos, int xDir,
+		ushort? netId, bool ownedByLocalPlayer,
 		MaverickState overrideState = null
-	) : base(null, pos, netId, ownedByLocalPlayer, true
+	) : base(
+		null, pos, netId, ownedByLocalPlayer, true
 	) {
 		this.player = player;
 		this.xDir = xDir;

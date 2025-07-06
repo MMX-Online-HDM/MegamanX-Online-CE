@@ -45,6 +45,7 @@ public partial class Player {
 		}
 	}
 
+	/// <summary> Returns the current manually-controlled maverick. </summary>
 	public MaverickWeapon? currentMaverickWeapon {
 		get {
 			if (character == null) {
