@@ -53,7 +53,7 @@ public class InGameMainMenu : IMainMenu {
 					if (UpgradeMenu.onUpgradeMenu && !Global.level.server.disableHtSt) {
 						Menu.change(new UpgradeMenu(this));
 					} else if (Global.level.mainPlayer.realCharNum == 0) {
-						Menu.change(new UpgradeArmorMenu(this));
+						Menu.change(new UpgradeArmorMenuEX(this));
 					} else if (Global.level.mainPlayer.realCharNum == 2) {
 						Menu.change(new SelectVileArmorMenu(this));
 					}
