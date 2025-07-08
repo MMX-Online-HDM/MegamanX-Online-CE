@@ -33,6 +33,10 @@ public class PreOptionsMenu : IMainMenu {
 			if (Global.input.isPressedMenu(Control.MenuBack)) Confirm2 = true;
 			if (Confirm2 == true) Time2 += Global.spf * 2;
 		}
+		if (inGame) {
+			Time = 0;
+			Time2 = 0;
+		}
 	}
 	public void update() {
 		TimeUpdate();

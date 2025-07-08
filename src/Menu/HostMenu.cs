@@ -1423,12 +1423,18 @@ public class HostMenu : IMainMenu {
 
 	}
 	public void TimeUpdate() {
-		if (Confirm == false) Time -= Global.spf * 2;
-		if (Time <= 0) {
-			Confirm = true;
-			Time = 0;
+		if (!inGame) {
+			if (Confirm == false) Time -= Global.spf * 2;
+			if (Time <= 0) {
+				Confirm = true;
+				Time = 0;
+			}
+			if (Global.input.isPressedMenu(Control.MenuBack)) Confirm2 = true;
+			if (Confirm2 == true) Time2 += Global.spf * 2;
 		}
-		if (Global.input.isPressedMenu(Control.MenuBack)) Confirm2 = true;
-		if (Confirm2 == true) Time2 += Global.spf * 2;
+		if (inGame) {
+			Time = 0;
+			Time2 = 0;
+		}
 	}
 }
