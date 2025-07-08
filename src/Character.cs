@@ -609,6 +609,7 @@ public partial class Character : Actor, IDamagable {
 	public virtual CharState getJumpState() => new Jump();
 	public virtual CharState getAirJumpState() => new Jump();
 	public virtual CharState getFallState() => new Fall();
+	public virtual CharState getTauntState() => new Taunt();
 
 	public virtual float getRunSpeed() {
 		return Physics.WalkSpeed * getRunDebuffs();
@@ -1264,7 +1265,7 @@ public partial class Character : Actor, IDamagable {
 				return true;
 			}
 			if (player.input.isPressed(Control.Taunt, player)) {
-				changeState(new Taunt());
+				changeState(getTauntState());
 				return true;
 			}
 		}

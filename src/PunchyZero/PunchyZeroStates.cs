@@ -982,12 +982,12 @@ public class PunchyZeroGenmureiState : CharState {
 			fired = true;
 			character.playSound("genmureix5", sendRpc: true);
 			new GenmuProj(
-				character.pos.addxy(30 * character.xDir, -25), character.xDir, 0, 
+				character.pos.addxy(30 * character.xDir, -25), character.xDir, 0,
 				isAZ: zero.isAwakened ? true : false,
 				zero, player, player.getNextActorNetId(), rpc: true
 			);
 			new GenmuProj(
-				character.pos.addxy(30 * character.xDir, -25), character.xDir, 1, 
+				character.pos.addxy(30 * character.xDir, -25), character.xDir, 1,
 				isAZ: zero.isAwakened ? true : false,
 				zero, player, player.getNextActorNetId(), rpc: true
 			);
@@ -999,5 +999,50 @@ public class PunchyZeroGenmureiState : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		zero = player.character as PunchyZero ?? throw new NullReferenceException();
+	}
+}
+public class PAwakenedTaunt : CharState {
+	PunchyZero zero = null!;
+	public PAwakenedTaunt() : base("az_taunt") {
+
+	}
+	public override void update() {
+		base.update();
+		if (stateTime >= 150f / 60f && !Global.level.gameMode.playerWon(player)) {
+			character.changeToIdleOrFall();
+		}
+		if (!once) {
+			once = true;
+			character.playSound("awakenedaura", forcePlay: true, sendRpc: true);
+		}
+	}
+	public override void onEnter(CharState oldState) {
+		zero = character as PunchyZero ?? throw new NullReferenceException();
+		base.onEnter(oldState);
+	}
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		zero.tauntCooldown = 180;
+	}
+}
+public class PZeroTaunt : CharState {
+	public PZeroTaunt() : base("taunt") {
+
+	}
+	public override void update() {
+		base.update();
+		if (character.isAnimOver() && !Global.level.gameMode.playerWon(player)) {
+			character.changeToIdleOrFall();
+		}
+		if (character.frameIndex == 6 && !once) {
+			once = true;
+			character.playSound("ching", sendRpc: true);
+			new Anim(
+				character.pos.addxy(character.xDir * -7, -28f),
+				"zero_ching", -character.xDir,
+				player.getNextActorNetId(),
+				destroyOnEnd: true, sendRpc: true
+			);
+		}
 	}
 }

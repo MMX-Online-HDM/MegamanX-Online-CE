@@ -575,8 +575,8 @@ public abstract class ZeroGigaAttack : CharState {
 	public Action? onShoot;
 	public Weapon weapon;
 	public int attackMaxTime = 38;
-	public int effectFrame = 9;
-	public int shootFrame = 8;
+	public int effectFrame = 11;
+	public int shootFrame = 11;
 	// Tracking variables.
 	public bool shotProjectile;
 	public bool effectPlayed;
@@ -609,7 +609,7 @@ public abstract class ZeroGigaAttack : CharState {
 		if (character.frameIndex >= effectFrame && !effectPlayed) {
 			effectPlayed = true;
 			new Anim(
-				character.pos, effectName, character.xDir,
+				character.pos.addxy(4*character.xDir, 4), effectName, character.xDir,
 				player.getNextActorNetId(),
 				destroyOnEnd: true, sendRpc: true
 			);

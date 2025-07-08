@@ -24,6 +24,9 @@ public class BusterZero : Character {
 		charId = CharIds.BusterZero;
 		altSoundId = AltSoundIds.X3;
 	}
+	public override CharState getTauntState() {
+		return new BZeroTaunt();
+	}
 	public override void preUpdate() {
 		base.preUpdate();
 		if (!ownedByLocalPlayer) {
@@ -48,7 +51,7 @@ public class BusterZero : Character {
 		}
 		if (stockedSaber || stockedBusterLv > 0) {
 			stockedTime += Global.spf;
-			if (stockedTime >= 61f/60f) {
+			if (stockedTime >= 61f / 60f) {
 				stockedTime = 0;
 				playSound("stockedSaber");
 			}

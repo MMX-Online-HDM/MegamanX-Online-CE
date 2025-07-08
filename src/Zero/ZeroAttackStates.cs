@@ -109,12 +109,14 @@ public class ZeroSlash3State : ZeroGenericMeleeState {
 public class ZeroAirSlashState : ZeroGenericMeleeState {
 	public ZeroAirSlashState() : base("attack_air") {
 		sound = "saber1";
+		airSprite = "attack_air";
+		landSprite = "attack_air_ground";
 		soundFrame = 3;
 		comboFrame = 7;
 
 		airMove = true;
 		canJump = true;
-		exitOnLanding = true;
+		exitOnLanding = false;
 		useDashJumpSpeed = true;
 		canStopJump = true;
 	}

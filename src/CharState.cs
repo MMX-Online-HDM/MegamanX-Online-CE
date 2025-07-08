@@ -570,9 +570,7 @@ public class Idle : CharState {
 
 		if (Global.level.gameMode.isOver) {
 			if (Global.level.gameMode.playerWon(player)) {
-				if (!character.sprite.name.Contains("_win")) {
-					character.changeSpriteFromName("win", true);
-				}
+				character.changeState(character.getTauntState());
 			} else {
 				if (!character.sprite.name.Contains("lose")) {
 					string loseSprite = "lose";
@@ -642,9 +640,7 @@ public class Crouch : CharState {
 		}
 		if (Global.level.gameMode.isOver) {
 			if (Global.level.gameMode.playerWon(player)) {
-				if (!character.sprite.name.Contains("_win")) {
-					character.changeSpriteFromName("win", true);
-				}
+				character.changeState(character.getTauntState());
 			} else {
 				if (!character.sprite.name.Contains("lose")) {
 					character.changeSpriteFromName("lose", true);
@@ -677,9 +673,7 @@ public class SwordBlock : CharState {
 		}
 		if (Global.level.gameMode.isOver) {
 			if (Global.level.gameMode.playerWon(player)) {
-				if (!character.sprite.name.Contains("_win")) {
-					character.changeSpriteFromName("win", true);
-				}
+				character.changeState(character.getTauntState());
 			} else {
 				if (!character.sprite.name.Contains("lose")) {
 					character.changeSpriteFromName("lose", true);
@@ -742,7 +736,6 @@ public class Jump : CharState {
 public class Fall : CharState {
 	public float limboVehicleCheckTime;
 	public Actor? limboVehicle;
-
 	public Fall() : base("fall", "fall_shoot", Options.main.getAirAttack(), "fall_start", "fall_start_shoot") {
 		accuracy = 5;
 		exitOnLanding = true;
@@ -1291,70 +1284,12 @@ public class LadderEnd : CharState {
 
 public class Taunt : CharState {
 	float tauntTime = 1;
-	Anim? zeroching;
 	public Taunt() : base("win") {
 	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		if (player.charNum == 0) tauntTime = 0.75f;
-		if (player.charNum == 3) tauntTime = 0.75f;
-	}
-
-	public override void onExit(CharState? newState) {
-		base.onExit(newState);
-		zeroching?.destroySelf();
-	}
-
 	public override void update() {
 		base.update();
-
-		if (player.charNum == 2) {
-			if (character.isAnimOver()) {
-				character.changeToIdleOrFall();
-			}
-		} else if (stateTime >= tauntTime) {
+		if (stateTime >= tauntTime) {
 			character.changeToIdleOrFall();
-		}
-		if (player.charNum == (int)CharIds.Zero || player.charNum == (int)CharIds.PunchyZero) {
-			character.changeSprite("zero_taunt", true);
-			if (character.isAnimOver()) {
-				character.changeToIdleOrFall();
-			} 
-		}
-		if (character.sprite.name == "bzero_win" && character.frameIndex == 1 && !once) {
-			once = true;
-			character.playSound("ching", sendRpc: true);
-			zeroching = new Anim(
-				character.pos.addxy(character.xDir, -25f),
-				"zero_ching", -character.xDir,
-				player.getNextActorNetId(),
-				destroyOnEnd: true, sendRpc: true
-			);
-		}
-		if ((character.sprite.name == "zero_win" || character.sprite.name == "zero_taunt") && character.frameIndex == 6 && !once) {
-			once = true;
-			character.playSound("ching", sendRpc: true);
-			zeroching = new Anim(
-				character.pos.addxy(character.xDir * -7, -28f),
-				"zero_ching", -character.xDir,
-				player.getNextActorNetId(),
-				destroyOnEnd: true, sendRpc: true
-			);
-		}
-		if (character.sprite.name == "mmx_win" && !once) {
-			once = true;
-			character.playSound("ching", sendRpc: true);
-			zeroching = new Anim(
-				character.pos.addxy(character.xDir*4, -22f),
-				"zero_ching", -character.xDir,
-				player.getNextActorNetId(),
-				destroyOnEnd: true, sendRpc: true
-			);
-		}
-		if (character.sprite.name == "axl_win" && !once) {
-			once = true;
-			character.playSound("ching", sendRpc: true);
 		}
 	}
 }

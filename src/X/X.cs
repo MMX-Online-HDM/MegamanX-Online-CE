@@ -166,6 +166,9 @@ public class MegamanX : Character {
 		legArmor = (ArmorId)player.legArmorNum;
 		helmetArmor = (ArmorId)player.helmetArmorNum;
 	}
+	public override CharState getTauntState() {
+		return new XTaunt();
+	}
 
 	// Updates at the start of the frame.
 	public override void preUpdate() {

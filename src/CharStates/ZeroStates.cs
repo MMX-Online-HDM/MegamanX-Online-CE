@@ -262,3 +262,93 @@ public class KKnuckleParryMeleeState : CharState {
 		}
 	}
 }
+public class AwakenedTaunt : CharState {
+	Zero zero = null!;
+	public AwakenedTaunt() : base("az_taunt") {
+
+	}
+	public override void update() {
+		base.update();
+		if (stateTime >= 150f / 60f  && !Global.level.gameMode.playerWon(player)) {
+			character.changeToIdleOrFall();
+		}
+		if (!once) {
+			once = true;
+			character.playSound("awakenedaura", forcePlay: true, sendRpc: true);
+		}
+	}
+	public override void onEnter(CharState oldState) {
+		zero = character as Zero ?? throw new NullReferenceException();
+		base.onEnter(oldState);
+	}
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		zero.tauntCooldown = 180;
+	}
+}
+public class ZeroTaunt : CharState {
+	public ZeroTaunt() : base("taunt") {
+
+	}
+	public override void update() {
+		base.update();
+		if (character.isAnimOver() && !Global.level.gameMode.playerWon(player)) {
+			character.changeToIdleOrFall();
+		}
+		if (character.frameIndex == 6 && !once) {
+			once = true;
+			character.playSound("ching", sendRpc: true);
+			new Anim(
+				character.pos.addxy(character.xDir * -7, -28f),
+				"zero_ching", -character.xDir,
+				player.getNextActorNetId(),
+				destroyOnEnd: true, sendRpc: true
+			);
+		}
+	}
+}
+public class FallSaber : CharState {
+	public float limboVehicleCheckTime;
+	public Actor? limboVehicle;
+	public FallSaber() : base("fall_saber", "fall_shoot", Options.main.getAirAttack(), "fall_start_saber", "fall_start_shoot") {
+		accuracy = 5;
+		exitOnLanding = true;
+		useDashJumpSpeed = true;
+		airMove = true;
+		canStopJump = false;
+		attackCtrl = true;
+		normalCtrl = true;
+	}
+
+	public override void update() {
+		base.update();
+		if (limboVehicleCheckTime > 0) {
+			limboVehicleCheckTime -= Global.spf;
+			if (limboVehicle?.destroyed == true || limboVehicleCheckTime <= 0) {
+				limboVehicleCheckTime = 0;
+				character.useGravity = true;
+				character.limboRACheckCooldown = 1;
+				limboVehicleCheckTime = 0;
+			}
+		}
+	}
+
+	public void setLimboVehicleCheck(Actor limboVehicle) {
+		if (limboVehicleCheckTime == 0 && character.limboRACheckCooldown == 0) {
+			this.limboVehicle = limboVehicle;
+			limboVehicleCheckTime = 1;
+			character.stopMoving();
+			character.useGravity = false;
+			if (limboVehicle is RideArmor ra) {
+				RPC.checkRAEnter.sendRpc(player.id, ra.netId, ra.neutralId, ra.raNum);
+			} else if (limboVehicle is RideChaser rc) {
+				RPC.checkRCEnter.sendRpc(player.id, rc.netId, rc.neutralId);
+			}
+		}
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+}
