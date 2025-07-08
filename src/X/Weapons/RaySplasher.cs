@@ -10,7 +10,7 @@ public class RaySplasher : Weapon {
 
 	public RaySplasher() : base() {
 		shootSounds = new string[] { "raySplasher", "raySplasher", "raySplasher", "warpIn" };
-		fireRate = 60;
+		fireRate = 80;
 		index = (int)WeaponIds.RaySplasher;
 		weaponBarBaseIndex = 21;
 		weaponBarIndex = weaponBarBaseIndex;
@@ -37,6 +37,35 @@ public class RaySplasher : Weapon {
 	}
 
 	public void burstLogic(MegamanX mmx) {
+		if (mmx.currentWeapon is RaySplasher) {
+			if (mmx.shootingRaySplasher != null) {
+				mmx.raySplasherCooldown += Global.speedMul;
+				if (mmx.raySplasherCooldown > 1) {
+					if (mmx.raySplasherCooldown >= 4) {
+						addAmmo(-0.15f, mmx.player);
+						mmx.raySplasherCooldown = 1;
+						new RaySplasherProj(
+							mmx.getShootPos(), mmx.getShootXDir(), mmx.raySplasherFrameIndex % 3,
+							 (mmx.raySplasherFrameIndex / 5) % 5, mmx,
+							mmx.player, mmx.player.getNextActorNetId(), true
+						);
+						mmx.raySplasherFrameIndex++;
+					}
+					mmx.shootAnimTime = 10;
+					mmx.raySplasherCooldown2 += Global.speedMul;
+				}
+				if (mmx.raySplasherCooldown2 >= 76) {
+					mmx.shootingRaySplasher = null;
+					mmx.raySplasherCooldown2 = 0;
+				}
+			}
+		} else {
+			mmx.shootingRaySplasher = null;
+			mmx.raySplasherFrameIndex = 0;
+		}
+		if (mmx.shootingRaySplasher == null) {
+			mmx.raySplasherFrameIndex = 0;
+		}
 	}
 }
 
@@ -49,7 +78,7 @@ public class RaySplasherProj : Projectile {
 	) {
 		weapon = RaySplasher.netWeapon;
 		damager.damage = 1;
-		damager.hitCooldown = 5;
+		damager.hitCooldown = 6;
 		vel = new Point(600 * xDir, 0);
 		maxTime = 0.25f;
 		projId = (int)ProjIds.RaySplasher;
@@ -66,6 +95,12 @@ public class RaySplasherProj : Projectile {
 		}
 		if (dirType == 2) {
 			vel = new Point(600 * xDir, 0);
+		}
+		if (dirType == 3) {
+			vel = new Point(600 * xDir, -250);
+		}
+		if (dirType == 4) {
+			vel = new Point(600 * xDir, 250);
 		}
 
 		if (rpc) {

@@ -109,6 +109,11 @@ public class MegamanX : Character {
 	public float stingPaletteTime;
 	public float chargePalleteTime;
 
+	// RaySplasher
+	public float raySplasherCooldown;
+	public float raySplasherCooldown2;
+	public int raySplasherFrameIndex;
+
 	// X3 Helmet.
 	public bool isHealingWithChip;
 	public decimal lastChipBaseHP;
@@ -171,8 +176,7 @@ public class MegamanX : Character {
 		if (barrierActiveTime > 0) {
 			if (!barrierAnim.isAnimOver()) {
 				barrierAnim.update();
-			}
-			else {
+			} else {
 				barrierAnimRed.update();
 				barrierAnimBlue.update();
 			}
@@ -784,13 +788,23 @@ public class MegamanX : Character {
 		bool damaged = base.canBeDamaged(damagerAlliance, damagerPlayerId, projId);
 
 		// Bommerang can go thru invisibility check
+		if (player.alliance != damagerAlliance && projId != null && Damager.isBoomerang(projId)) {
+			return damaged;
+		}
 		if (stingActiveTime > 0) {
-			if (player.alliance != damagerAlliance && projId != null && Damager.isBoomerang(projId)) {
-				return damaged;
-			}
 			return false;
 		}
 		return damaged;
+	}
+	public override bool isInvulnerable(bool ignoreRideArmorHide = false, bool factorHyperMode = false) {
+		bool invul = base.isInvulnerable(ignoreRideArmorHide, factorHyperMode);
+		if (stingActiveTime > 0) {
+			return !factorHyperMode;
+		}
+		return invul;
+	}
+	public override bool isStealthy(int alliance) {
+		return player.alliance != alliance && stingActiveTime > 0;
 	}
 
 	public bool hasHadoukenEquipped() {

@@ -655,12 +655,6 @@ public partial class Player {
 	}
 
 	public float getDamageModifier() {
-		if (Global.level.server.customMatchSettings != null) {
-			/*if (Global.level.gameMode.isTeamMode && alliance == GameMode.redAlliance) {
-				return Global.level.server.customMatchSettings.redDamageModifier;
-			}*/
-			return Global.level.server.customMatchSettings.damageModifier;
-		}
 		return 1;
 	}
 
