@@ -708,6 +708,25 @@ public class OptionsMenu : IMainMenu {
 					"If enabled, press F10 to open the dev-console in-match\n" +
 					"See the game website for a list of commands."
 				),
+				// Dev console.
+				new MenuOption(
+					30, startY,
+					() => {
+						if (inGame) return;
+						Helpers.menuLeftRightBool(ref Options.main.blackFade);
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							optionFontText, "Black fade option:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.blackFade),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"If enabled, a fade transition between menus will appear."
+				),
 			};
 		} else if (charNum == 0) {
 			menuOptions = new List<MenuOption>() {

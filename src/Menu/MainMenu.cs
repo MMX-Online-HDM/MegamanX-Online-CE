@@ -71,25 +71,43 @@ public class MainMenu : IMainMenu {
 			);
 			return;
 		}
-		
-		if (Time == 0) Helpers.menuUpDown(ref selectY, 0, 5);
-		TimeUpdate();
-		if (Time >= 1) {
-			Time = 0;
-			Confirm = false;
-			// Before joining or creating make sure client is up to date
-			if (selectY == 0 || selectY == 1) {
-				Menu.change(new PreJoinOrHostMenu(this, selectY == 0));
-			} else if (selectY == 2) {
-				Menu.change(new HostMenu(this, null, true, true));
-			} else if (selectY == 3) {
-				Menu.change(new PreLoadoutMenu(this));
-			//} else if (selectY == 4) {
-			//	Menu.change(new PreControlMenu(this, false));
-			} else if (selectY == 4) {
-				Menu.change(new PreOptionsMenu(this, false));
-			} else if (selectY == 5) {
-				System.Environment.Exit(1);
+		if (Options.main.blackFade) {
+			if (Time == 0) Helpers.menuUpDown(ref selectY, 0, 5);
+			TimeUpdate();
+			if (Time >= 1) {
+				Time = 0;
+				Confirm = false;
+				// Before joining or creating make sure client is up to date
+				if (selectY == 0 || selectY == 1) {
+					Menu.change(new PreJoinOrHostMenu(this, selectY == 0));
+				} else if (selectY == 2) {
+					Menu.change(new HostMenu(this, null, true, true));
+				} else if (selectY == 3) {
+					Menu.change(new PreLoadoutMenu(this));
+					//} else if (selectY == 4) {
+					//	Menu.change(new PreControlMenu(this, false));
+				} else if (selectY == 4) {
+					Menu.change(new PreOptionsMenu(this, false));
+				} else if (selectY == 5) {
+					System.Environment.Exit(1);
+				}
+			}
+		} else {
+			Helpers.menuUpDown(ref selectY, 0, 5);
+			if (Global.input.isPressedMenu(Control.MenuConfirm)) {
+				if (selectY == 0 || selectY == 1) {
+					Menu.change(new PreJoinOrHostMenu(this, selectY == 0));
+				} else if (selectY == 2) {
+					Menu.change(new HostMenu(this, null, true, true));
+				} else if (selectY == 3) {
+					Menu.change(new PreLoadoutMenu(this));
+					//} else if (selectY == 4) {
+					//	Menu.change(new PreControlMenu(this, false));
+				} else if (selectY == 4) {
+					Menu.change(new PreOptionsMenu(this, false));
+				} else if (selectY == 5) {
+					System.Environment.Exit(1);
+				}
 			}
 		}
 		MenuConfirmSound();
@@ -182,8 +200,10 @@ public class MainMenu : IMainMenu {
 				Fonts.drawText(FontType.DarkGreen, "Radmin", 2, offset);
 			}
 		}
-		DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0,0, Time);
-		DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0,0, Time2);
+		if (Options.main.blackFade) {
+			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, Time);
+			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, Time2);
+		}
 	}
 	public void TimeUpdate() {
 		if (Global.input.isPressedMenu(Control.MenuConfirm)) Confirm = true;

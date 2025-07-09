@@ -873,7 +873,6 @@ public class HostMenu : IMainMenu {
 		return "match" + Helpers.randomRange(1, 999).ToString();
 	}
 	public void update() {
-		TimeUpdate();
 		if (Global.leaveMatchSignal != null) return;
 
 		if (inGame) {
@@ -927,13 +926,21 @@ public class HostMenu : IMainMenu {
 				Global.serverClient = null;
 				Menu.change(previous);
 			} */
-			if (Time2 >= 1 && !inGame) {
-				Menu.change(previous);
-				Global.serverClient = null;
-				previous.Time = 0;
-				previous.Time2 = 1;
-				previous.Confirm = false;
-				previous.Confirm2 = false;
+			if (Options.main.blackFade) {
+				TimeUpdate();
+				if (Time2 >= 1 && !inGame) {
+					Menu.change(previous);
+					Global.serverClient = null;
+					previous.Time = 0;
+					previous.Time2 = 1;
+					previous.Confirm = false;
+					previous.Confirm2 = false;
+				}
+			} else {
+				if (Global.input.isPressedMenu(Control.MenuBack) && !inGame) {
+					Menu.change(previous);
+					Global.serverClient = null;
+				}
 			}
 			/*
 			else if (Global.input.isPressedMenu(Control.MenuEnter) && inGame)
@@ -1418,8 +1425,10 @@ public class HostMenu : IMainMenu {
 				Global.screenW * 0.5f, 20 + top, alignment: Alignment.Center
 			);
 		}
-		DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, Time);
-		DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, Time2);		
+		if (Options.main.blackFade) {
+			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, Time);
+			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, Time2);
+		}	
 
 	}
 	public void TimeUpdate() {
