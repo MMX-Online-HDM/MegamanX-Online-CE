@@ -14,7 +14,7 @@ public class ZeroState : CharState {
 		sprite, shootSprite, attackSprite, transitionSprite, transShootSprite
 	) {
 	}
-	
+
 	public override void onEnter(CharState oldState) {
 		zero = character as Zero ?? throw new NullReferenceException();
 	}
@@ -25,7 +25,7 @@ public class HyperZeroStart : ZeroState {
 	public float time;
 	Anim? virusEffectParts;
 	Anim[] virusAnim = new Anim[3];
-	float[] delayedVirusTimer = {0, 7, 14};
+	float[] delayedVirusTimer = { 0, 7, 14 };
 	string virusAnimName = "";
 
 	public HyperZeroStart() : base("hyper_start") {
@@ -274,14 +274,14 @@ public class KKnuckleParryMeleeState : CharState {
 		}
 	}
 }
-public class AwakenedTaunt : CharState {
-	Zero zero = null!;
-	public AwakenedTaunt() : base("az_taunt") {
 
+public class AwakenedTaunt : ZeroState {
+	public AwakenedTaunt() : base("az_taunt") {
 	}
+
 	public override void update() {
 		base.update();
-		if (stateTime >= 150f / 60f  && !Global.level.gameMode.playerWon(player)) {
+		if (stateTime >= 150f / 60f && !Global.level.gameMode.playerWon(player)) {
 			character.changeToIdleOrFall();
 		}
 		if (!once) {
@@ -289,19 +289,22 @@ public class AwakenedTaunt : CharState {
 			character.playSound("awakenedaura", forcePlay: true, sendRpc: true);
 		}
 	}
+
 	public override void onEnter(CharState oldState) {
 		zero = character as Zero ?? throw new NullReferenceException();
 		base.onEnter(oldState);
 	}
+
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		zero.tauntCooldown = 180;
 	}
 }
+
 public class ZeroTaunt : CharState {
 	public ZeroTaunt() : base("taunt") {
-
 	}
+
 	public override void update() {
 		base.update();
 		if (character.isAnimOver() && !Global.level.gameMode.playerWon(player)) {
@@ -319,9 +322,11 @@ public class ZeroTaunt : CharState {
 		}
 	}
 }
+
 public class FallSaber : CharState {
 	public float limboVehicleCheckTime;
 	public Actor? limboVehicle;
+
 	public FallSaber() : base("fall_saber", "fall_shoot", Options.main.getAirAttack(), "fall_start_saber", "fall_start_shoot") {
 		accuracy = 5;
 		exitOnLanding = true;

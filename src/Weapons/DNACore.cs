@@ -87,8 +87,11 @@ public class DNACore : AxlWeapon {
 				weapons[0] = character.player.getAxlBulletWeapon();
 			}
 		}
-		else if (character is BaseSigma) {
-			rakuhouhaAmmo = character.player.sigmaAmmo;
+		else if (character is CmdSigma sigma) {
+			sigma.ballWeapon.ammo = rakuhouhaAmmo;
+		}
+		else if (character is NeoSigma neoSigma) {
+			neoSigma.gigaAttack.ammo = rakuhouhaAmmo;
 		}
 		else if (character is Vile vile) {
 			frozenCastle = vile.hasFrozenCastle;

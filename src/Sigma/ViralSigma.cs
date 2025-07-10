@@ -6,8 +6,9 @@ using SFML.Graphics;
 namespace MMXOnline;
 
 public class ViralSigma : Character {
-	long originalZIndex;
-	bool viralOnce;
+	public Weapon mainWeapon = new ViralSigmaWeapon();
+	public long originalZIndex;
+	public bool viralOnce;
 
 	public float viralSigmaTackleCooldown;
 	public float viralSigmaTackleMaxCooldown = 1;
@@ -219,5 +220,17 @@ public class ViralSigma : Character {
 		);
 		ede.host = anim;
 		Global.level.addEffect(ede);
+	}
+}
+
+public class ViralSigmaWeapon : Weapon {
+	public ViralSigmaWeapon() {
+		index = (int)WeaponIds.Sigma2Ball2;
+		weaponBarBaseIndex = 61;
+		weaponBarIndex = 50;
+		allowSmallBar = false;
+
+		maxAmmo = 28;
+		ammo = maxAmmo;
 	}
 }

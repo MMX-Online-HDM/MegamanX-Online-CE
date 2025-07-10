@@ -436,8 +436,6 @@ public partial class Player {
 	public int xArmor1v1;
 	public float vileAmmo = 32;
 	public float vileMaxAmmo = 32;
-	public float sigmaAmmo = 32;
-	public float sigmaMaxAmmo = 32;
 	public int? maverick1v1;
 	public bool maverick1v1Spawned;
 
@@ -1138,14 +1136,6 @@ public partial class Player {
 			loadout.sigmaLoadout.maverick2 = extraData[2];
 			loadout.sigmaLoadout.commandMode = extraData[3];
 
-			if (sigmaForm == 0) {
-				sigmaMaxAmmo = 20;
-				sigmaAmmo = sigmaMaxAmmo;
-			} else if (sigmaForm == 1) {
-				sigmaMaxAmmo = 28;
-				sigmaAmmo = 0;
-			}
-
 			if (sigmaForm == 2) {
 				newChar = new Doppma(
 					this, pos.x, pos.y, xDir,
@@ -1386,13 +1376,6 @@ public partial class Player {
 				maverick2 = data.extraData[2]
 			};
 
-			if (sigmaLoadout.sigmaForm == 0) {
-				sigmaMaxAmmo = 20;
-				sigmaAmmo = sigmaMaxAmmo;
-			} else if (sigmaLoadout.sigmaForm == 1) {
-				sigmaMaxAmmo = 28;
-				sigmaAmmo = 0;
-			}
 			if (data.extraData[0] == 2) {
 				retChar = new Doppma(
 					this, character.pos.x, character.pos.y, character.xDir,
@@ -1538,13 +1521,11 @@ public partial class Player {
 					this, character.pos.x, character.pos.y, character.xDir,
 					true, dnaNetId, true, isWarpIn: false
 				);
-				sigmaMaxAmmo = 28;
 			} else {
 				retChar = new CmdSigma(
 					this, character.pos.x, character.pos.y, character.xDir,
 					true, dnaNetId, true, isWarpIn: false
 				);
-				sigmaMaxAmmo = 20;
 			}
 		} else if (charNum == (int)CharIds.Rock) {
 			retChar = new Rock(
@@ -1593,9 +1574,6 @@ public partial class Player {
 		retChar.weapons.Add(new AssassinBulletChar());
 		retChar.weapons.Add(new UndisguiseWeapon());
 
-		sigmaAmmo = dnaCore.rakuhouhaAmmo;
-
-
 		if (isAI) {
 			retChar.addAI();
 		}
@@ -1638,7 +1616,6 @@ public partial class Player {
 
 		if (character is Zero zero) {
 			zero.gigaAttack.ammo = dnaCore.rakuhouhaAmmo;
-			zero.gigaAttack.ammo = dnaCore.rakuhouhaAmmo;
 
 			if (dnaCore.hyperMode == DNACoreHyperMode.BlackZero) {
 				zero.isBlack = true;
@@ -1655,6 +1632,12 @@ public partial class Player {
 				axl.whiteAxlTime = axl.maxHyperAxlTime;
 			}
 			axl.axlSwapTime = 0.25f;
+		}
+		else if (character is CmdSigma sigma) {
+			sigma.ballWeapon.ammo = dnaCore.rakuhouhaAmmo;
+		}
+		else if (character is NeoSigma neoSigma) {
+			neoSigma.gigaAttack.ammo = dnaCore.rakuhouhaAmmo;
 		}
 		dnaCore.ultimateArmor = false;
 		dnaCore.usedOnce = true;
@@ -1681,8 +1664,10 @@ public partial class Player {
 				lastDNACore.rakuhouhaAmmo = zero.gigaAttack.ammo;
 			} else if (character is PunchyZero pzero) {
 				lastDNACore.rakuhouhaAmmo = pzero.gigaAttack.ammo;
-			} else if (isSigma) {
-				lastDNACore.rakuhouhaAmmo = sigmaAmmo;
+			} else if (character is CmdSigma sigma) {
+				lastDNACore.rakuhouhaAmmo = sigma.ballWeapon.ammo;
+			} else if (character is NeoSigma neoSigma) {
+				lastDNACore.rakuhouhaAmmo = neoSigma.gigaAttack.ammo;
 			}
 		}
 		var oldPos = character.pos;
@@ -1759,8 +1744,10 @@ public partial class Player {
 				lastDNACore.rakuhouhaAmmo = zero.gigaAttack.ammo;
 			} else if (character is PunchyZero pzero) {
 				lastDNACore.rakuhouhaAmmo = pzero.gigaAttack.ammo;
-			} else if (isSigma) {
-				lastDNACore.rakuhouhaAmmo = sigmaAmmo;
+			} else if (character is CmdSigma sigma) {
+				lastDNACore.rakuhouhaAmmo = sigma.ballWeapon.ammo;
+			} else if (character is NeoSigma neoSigma) {
+				lastDNACore.rakuhouhaAmmo = neoSigma.gigaAttack.ammo;
 			}
 		}
 		if (character == null) {

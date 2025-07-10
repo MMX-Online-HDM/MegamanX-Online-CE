@@ -238,17 +238,20 @@ public class SigmaBallProj : Projectile {
 		);
 	}
 }
-public class SigmaBallShootEX : CmdSigmaState {
+
+public class SigmaBallShoot : CmdSigmaState {
 	public SigmaBallProj? SigmaBallsProjHead;
 	public Anim? anim;
 	public bool shoot;
 	public float angle;
 
-	public SigmaBallShootEX() : base("shoot") {
+	public SigmaBallShoot() : base("shoot") {
 	}
 
 	public override void update() {
+		base.update();
 		character.turnToInput(player.input, player);
+	
 		if (character.frameIndex >= 1 && !shoot) {
 			shoot = true;
 			ammoReduction();
@@ -256,16 +259,17 @@ public class SigmaBallShootEX : CmdSigmaState {
 		} else if (character.sprite.frameIndex == 0) {
 			shoot = false;
 		}
-		if (player.sigmaAmmo <= 0 || character.isAnimOver()) {
+	
+		if (sigma.ballWeapon.ammo <= 0 || character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		}
-		//By disabling the code bellow, you can sort of make it MMX1 Accurate
+
+		// By disabling the code bellow, you can sort of make it MMX1 Accurate
 		if (character.sprite.loopCount > 0 && !player.input.isHeld(Control.Special1, player)) {
 			character.changeToIdleOrFall();
-			return;
 		}
-		base.update();
 	}
+
 	public void shootProjectiles() {
 		character.playSound("energyBall", sendRpc: true);
 		Point shootPos = sigma.getFirstPOI() ?? sigma.getCenterPos();
@@ -278,13 +282,12 @@ public class SigmaBallShootEX : CmdSigmaState {
 		anim = new Anim(shootPos, "sigma_proj_ball_muzzle", character.xDir,
 			player.getNextActorNetId(), true, sendRpc: true);
 	}
+
 	public void ammoReduction() {
-		player.sigmaAmmo -= 4;
-		if (player.sigmaAmmo < 0) player.sigmaAmmo = 0;
-		if (sigma != null) {
-			sigma.sigmaAmmoRechargeCooldown = sigma.sigmaHeadBeamTimeBeforeRecharge;
-		}
+		sigma.ballWeapon.addAmmo(-4, player);
+		sigma.sigmaAmmoRechargeCooldown = sigma.sigmaHeadBeamTimeBeforeRecharge;
 	}
+
 	public void angleShoot() {
 		if (character.xDir == 1) {
 			if (player.input.isHeld(Control.Down, player)) {
@@ -305,82 +308,6 @@ public class SigmaBallShootEX : CmdSigmaState {
 		}
 	}
 }
-/*
-public class SigmaBallShoot : CmdSigmaState {
-	bool shot;
-
-	public SigmaBallShoot(string transitionSprite = "") : base("shoot", "", "", transitionSprite) {
-	}
-
-	public override void update() {
-		base.update();
-
-		if (character.sprite.loopCount > 0 && !player.input.isHeld(Control.Special1, player)) {
-			character.changeToIdleOrFall();
-			return;
-		}
-
-		Point vel = new Point(0, 0.2f);
-		bool lHeld = player.input.isHeld(Control.Left, player) && !player.isAI;
-		bool rHeld = player.input.isHeld(Control.Right, player) && !player.isAI;
-		bool uHeld = player.input.isHeld(Control.Up, player) || player.isAI;
-		bool dHeld = player.input.isHeld(Control.Down, player) && !player.isAI;
-
-		if (lHeld) {
-			character.xDir = -1;
-			vel.x = -2;
-		} else if (rHeld) {
-			character.xDir = 1;
-			vel.x = 2;
-		}
-
-		if (uHeld) {
-			vel.y = -1;
-			if (vel.x == 0) vel.x = character.xDir * 0.5f;
-		} else if (dHeld) {
-			vel.y = 1;
-			if (vel.x == 0) vel.x = character.xDir * 0.5f;
-		} else vel.x = character.xDir;
-
-		if (!uHeld && !dHeld && (lHeld || rHeld)) {
-			vel.y = 0;
-			vel.x = character.xDir;
-		}
-
-		if (character.sprite.frameIndex == 0) {
-			shot = false;
-		}
-		if (character.sprite.frameIndex == 1 && !shot) {
-			shot = true;
-			Point poi = character.getFirstPOI() ?? character.getCenterPos();
-
-			player.sigmaAmmo -= 4;
-			if (player.sigmaAmmo < 0) player.sigmaAmmo = 0;
-			sigma.sigmaAmmoRechargeCooldown = sigma.sigmaHeadBeamTimeBeforeRecharge;
-			character.playSound("energyBall", sendRpc: true);
-			/*
-			new SigmaBallProj(
-				SigmaBallWeapon.netWeapon, poi, character.xDir, player,
-				player.getNextActorNetId(), rpc: true
-			);
-			new Anim(
-				poi, "sigma_proj_ball_muzzle", character.xDir,
-				player.getNextActorNetId(), true, sendRpc: true
-			);
-			
-		}
-
-		if (character.sprite.loopCount > 5 || player.sigmaAmmo <= 0) {
-			character.changeToIdleOrFall();
-		}
-	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		character.vel = new Point();
-	}
-} */
-
 
 public class SigmaWallDashState : CmdSigmaState {
 	public bool fired;

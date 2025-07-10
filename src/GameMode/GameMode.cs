@@ -1518,6 +1518,7 @@ public class GameMode {
 				CmdSigma sigma => sigma.ballWeapon,
 				NeoSigma neoSigma => neoSigma.gigaAttack,
 				PunchyZero punchyZero => punchyZero.gigaAttack,
+				ViralSigma viralSigma => viralSigma.mainWeapon,
 				_ => player.character?.currentWeapon ?? player.weapon,
 			};
 			player.lastHudWeapon = weapon;
@@ -1528,63 +1529,32 @@ public class GameMode {
 			ammoDisplayMultiplier = 0.5f;
 		}
 
-		if (player.isSigma) {
-			if (player.character == null ||
-				(player.character is KaiserSigma && player.currentMaverick == null)
-			) {
-				return;
-			}
-			if (player.currentMaverick != null && player.isMainPlayer &&
-				player.currentMaverick.canFly && player.currentMaverick.flyBar < player.currentMaverick.maxFlyBar
-			) {
+		if (player.character?.currentMaverick != null) {
+			Maverick currentMaverick = player.character.currentMaverick;
+
+			if (currentMaverick.canFly && currentMaverick.flyBar < currentMaverick.maxFlyBar) {
 				renderAmmo(
 					baseX, ref baseY,
-					player.currentMaverick.flyBarIndexes.icon,
-					player.currentMaverick.flyBarIndexes.units,
-					MathF.Ceiling((player.currentMaverick.flyBar / player.currentMaverick.maxFlyBar) * 28),
+					currentMaverick.flyBarIndexes.icon,
+					currentMaverick.flyBarIndexes.units,
+					MathF.Ceiling(currentMaverick.flyBar / currentMaverick.maxFlyBar * 28),
 					maxAmmo: 28, allowSmall: false
 				);
 			}
-			if (player.currentMaverick != null && player.isMainPlayer && player.currentMaverick.usesAmmo) {
+			if (currentMaverick.usesAmmo) {
 				renderAmmo(
 					baseX, ref baseY,
-					player.currentMaverick.barIndexes.icon,
-					player.currentMaverick.barIndexes.units,
-					player.currentMaverick.ammo,
-					player.currentMaverick.grayAmmoLevel,
-					player.currentMaverick.maxAmmo
+					currentMaverick.barIndexes.icon,
+					currentMaverick.barIndexes.units,
+					currentMaverick.ammo,
+					currentMaverick.grayAmmoLevel,
+					currentMaverick.maxAmmo
 				);
-			}
-			if (player.character is ViralSigma) {
-				renderAmmo(baseX, ref baseY, 61, 50, player.sigmaAmmo, grayAmmo: player.weapon.getAmmoUsage(0));
-			} else if (player.isMainPlayer && player.currentMaverick == null && !player.isSigma3()) {
-				int hudWeaponBaseIndex = 50;
-				int hudWeaponFullIndex = 39;
-				ammoDisplayMultiplier = 1;
-				int floorOrCeil = MathInt.Ceiling(player.sigmaMaxAmmo * ammoDisplayMultiplier);
-				if (player.isSigma2()) {
-					hudWeaponBaseIndex = 51;
-					hudWeaponFullIndex = player.sigmaAmmo < 16 ? 30 : 40;
-					floorOrCeil = MathInt.Floor(player.sigmaMaxAmmo * ammoDisplayMultiplier);
-				}
-				baseY += 25;
-				Global.sprites["hud_weapon_base"].drawToHUD(hudWeaponBaseIndex, baseX, baseY);
-				baseY -= 16;
-				for (var i = 0; i < floorOrCeil; i++) {
-					if (i < Math.Ceiling(player.sigmaAmmo * ammoDisplayMultiplier)) {
-						Global.sprites["hud_weapon_full"].drawToHUD(hudWeaponFullIndex, baseX, baseY);
-					} else {
-						Global.sprites["hud_health_empty"].drawToHUD(0, baseX, baseY);
-					}
-					baseY -= 2;
-				}
-				Global.sprites["hud_health_top"].drawToHUD(0, baseX, baseY);
-				return;
 			}
 			return;
 		}
 
-		if (player.isVile) {
+		if (player.character is Vile) {
 			baseY += 25;
 			Global.sprites["hud_weapon_base"].drawToHUD(39, baseX, baseY);
 			baseY -= 16;

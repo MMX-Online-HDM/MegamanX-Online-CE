@@ -49,7 +49,7 @@ public class ViralSigmaIdle : CharState {
 				return;
 			}
 
-			if (player.input.isPressed(Control.Shoot, player) && player.sigmaAmmo >= player.weapon.getAmmoUsage(0)) {
+			if (player.input.isPressed(Control.Shoot, player) && sigma.mainWeapon.ammo >= player.weapon.getAmmoUsage(0)) {
 				character.changeState(new ViralSigmaShoot(inputDir.x != 0 ? inputDir.x : sigma.lastViralXDir), true);
 				return;
 			}
@@ -120,8 +120,8 @@ public class ViralSigmaPossessStart : CharState {
 			sigma.possessEnemyTime = 0;
 			sigma.numPossesses++;
 			float ammoToRefill = 32; //character.player.health
-			player.sigmaAmmo += ammoToRefill;
-			if (player.sigmaAmmo > player.sigmaMaxAmmo) player.sigmaAmmo = player.sigmaMaxAmmo;
+			sigma.mainWeapon.ammo += ammoToRefill;
+			if (sigma.mainWeapon.ammo > sigma.mainWeapon.maxAmmo) sigma.mainWeapon.ammo = sigma.mainWeapon.maxAmmo;
 			target.player.startPossess(player, sendRpc: true);
 			character.changeState(new ViralSigmaPossess(target), true);
 			return;
@@ -192,8 +192,10 @@ public class ViralSigmaPossess : CharState {
 }
 
 public class ViralSigmaShoot : CharState {
+	public ViralSigma sigma;
 	int xDir;
 	ViralSigmaShootProj proj;
+
 	public ViralSigmaShoot(float xDir) : base("viral_spit") {
 		immuneToWind = true;
 		this.xDir = MathF.Sign(xDir);
@@ -206,7 +208,7 @@ public class ViralSigmaShoot : CharState {
 		var mechaniloidWeapon = player.weapon as MechaniloidWeapon;
 		var poi = character.getFirstPOI();
 		if (poi != null && !once) {
-			player.sigmaAmmo -= mechaniloidWeapon.getAmmoUsage(0);
+			sigma.mainWeapon.ammo -= mechaniloidWeapon.getAmmoUsage(0);
 			once = true;
 			character.playSound("viralSigmaShoot", sendRpc: true);
 			proj = new ViralSigmaShootProj(mechaniloidWeapon, poi.Value, xDir, player, player.getNextActorNetId(), rpc: true);
@@ -222,7 +224,8 @@ public class ViralSigmaShoot : CharState {
 	}
 
 	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
+		base.onEnter(oldState);		
+		sigma = character as ViralSigma;
 		character.xDir = xDir;
 		character.angle = null;
 	}
@@ -526,6 +529,6 @@ public class ViralSigmaRevive : CharState {
 		character.yScale = 0;
 		character.incPos(new Point(0, -33));
 		character.immuneToKnockback = true;
-		player.sigmaAmmo = player.sigmaMaxAmmo;
+		sigma.mainWeapon.ammo = sigma.mainWeapon.maxAmmo;
 	}
 }

@@ -2769,8 +2769,8 @@ public partial class Character : Actor, IDamagable {
 					}
 				}
 			}
-			if (this is NeoSigma) {
-				player.sigmaAmmo = Helpers.clampMax(player.sigmaAmmo + gigaAmmoToAdd, player.sigmaMaxAmmo);
+			if (this is NeoSigma neoSigma) {
+				neoSigma.gigaAttack.addAmmo(gigaAmmoToAdd, player);
 			}
 		}
 
