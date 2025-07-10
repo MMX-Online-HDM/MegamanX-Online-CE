@@ -1174,7 +1174,7 @@ public partial class MegamanXA : Character {
 		return jumpModifier + base.getJumpPower();
 	}
 
-	public override bool changeState(CharState newState, bool forceChange = false) {
+	public override bool changeState(CharState newState, bool forceChange = true) {
 		bool hasChanged = base.changeState(newState, forceChange);
 		if (!hasChanged) {
 			return false;

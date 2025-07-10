@@ -410,7 +410,7 @@ public class PunchyZero : Character {
 	}
 
 
-	public override bool changeState(CharState newState, bool forceChange = false) {
+	public override bool changeState(CharState newState, bool forceChange = true) {
 		// Save old state.
 		CharState oldState = charState;
 		// Base function call.

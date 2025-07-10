@@ -4,6 +4,7 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class NeoSigma : BaseSigma {
+	public Weapon gigaAttack;
 	public float normalAttackCooldown;
 	public float sigmaUpSlashCooldown;
 	public float sigmaDownSlashCooldown;
@@ -18,6 +19,7 @@ public class NeoSigma : BaseSigma {
 	) {
 		sigmaSaberMaxCooldown = 0.5f;
 		altSoundId = AltSoundIds.X2;
+		gigaAttack = new NeoSigmaGigaAttackWeapon();
 	}
 
 	public override void update() {
@@ -94,14 +96,14 @@ public class NeoSigma : BaseSigma {
 			return true;
 		}
 		if (grounded && player.input.isPressed(Control.Special1, player) &&
-			flag == null && player.sigmaAmmo >= 14
+			flag == null && gigaAttack.ammo >= 14
 		) {
-			if (player.sigmaAmmo < 28) {
-				player.sigmaAmmo -= 14;
+			if (gigaAttack.ammo < 28) {
+				gigaAttack.ammo -= 14;
 				changeState(new SigmaElectricBallState(), true);
 				return true;
 			} else {
-				player.sigmaAmmo = 0;
+				gigaAttack.ammo = 0;
 				changeState(new SigmaElectricBall2StateEX(), true);
 				return true;
 			}
@@ -172,7 +174,7 @@ public class NeoSigma : BaseSigma {
 				3, 0, 15, addToLevel: addToLevel
 			),
 			MeleeIds.GigaAttackSlash => new GenericMeleeProj(
-				new SigmaElectricBall2Weapon(), pos, ProjIds.Sigma2Ball2, player,
+				new NeoSigmaGigaAttackWeapon(), pos, ProjIds.Sigma2Ball2, player,
 				6, Global.defFlinch, 15, addToLevel: addToLevel
 			),
 			_ => null
@@ -188,12 +190,12 @@ public class NeoSigma : BaseSigma {
 	}
 
 	public override bool canAddAmmo() {
-		return (player.sigmaAmmo < 28);
+		return gigaAttack.ammo < gigaAttack.maxAmmo;
 	}
 
 	public override List<byte> getCustomActorNetData() {
 		List<byte> customData = base.getCustomActorNetData();
-		customData.Add((byte)MathF.Floor(player.sigmaAmmo));
+		customData.Add((byte)MathF.Floor(gigaAttack.ammo));
 
 		return customData;
 	}
@@ -204,7 +206,7 @@ public class NeoSigma : BaseSigma {
 		data = data[data[0]..];
 
 		// Per-player data.
-		player.sigmaAmmo = data[0];
+		gigaAttack.ammo = data[0];
 	}
 	public float aiAttackCooldown;
 	public override void aiAttack(Actor? target) {
@@ -255,11 +257,11 @@ public class NeoSigma : BaseSigma {
 	public override void aiDodge(Actor? target) {
 		foreach (GameObject gameObject in getCloseActors(32, true, false, false)) {
 			if (gameObject is Projectile proj && proj.damager.owner.alliance != player.alliance) {
-				if (player.sigmaAmmo >= 16 && player.sigmaAmmo <= 24) {
-					player.sigmaAmmo -= 16;
+				if (gigaAttack.ammo >= 16 && gigaAttack.ammo <= 24) {
+					gigaAttack.ammo -= 16;
 					changeState(new SigmaElectricBallState(), true);
-				} else if (player.sigmaAmmo >= 28) {
-					player.sigmaAmmo = 0;
+				} else if (gigaAttack.ammo >= 28) {
+					gigaAttack.ammo = 0;
 					changeState(new SigmaElectricBall2StateEX(), true);
 				}
 			}

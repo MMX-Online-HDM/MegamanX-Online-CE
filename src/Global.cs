@@ -537,6 +537,7 @@ public partial class Global {
 
 	public static int defaultThresholdPing = 300;
 	public static Level level;
+	public static Character.CurrentState currentState;
 	public static ServerClient? serverClient;
 	public static Server? localServer;
 	public static bool isOffline { get { return serverClient == null; } }

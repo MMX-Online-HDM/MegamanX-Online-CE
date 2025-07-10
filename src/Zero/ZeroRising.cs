@@ -80,7 +80,6 @@ public class ZeroUppercut : CharState {
 	public bool isHeld = true;
 	public float holdTime;
 	public RisingType type;
-	public Zero zero = null!;
 	int jumpFrame;
 
 	public ZeroUppercut(RisingType type, bool isUnderwater) : base(getSprite(type, isUnderwater)) {
@@ -198,8 +197,6 @@ public class ZeroUppercut : CharState {
 		if (!character.grounded && type == RisingType.RisingFang) {
 			character.sprite.frameIndex = 4;
 		}
-		zero = character as Zero ?? throw new NullReferenceException();
-		zero.airRisingUses++;
 	}
 
 	public override void onExit(CharState? newState) {

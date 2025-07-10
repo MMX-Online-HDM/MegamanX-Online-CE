@@ -2,11 +2,8 @@ using System;
 
 namespace MMXOnline;
 
-public abstract class ZeroGenericMeleeState : CharState {
-	public Zero zero = null!;
-
+public abstract class ZeroGenericMeleeState : ZeroState {
 	public int comboFrame = Int32.MaxValue;
-
 	public string sound = "";
 	public bool soundPlayed;
 	public int soundFrame = Int32.MaxValue;
@@ -32,7 +29,6 @@ public abstract class ZeroGenericMeleeState : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.turnToInput(player.input, player);
-		zero = character as Zero ?? throw new NullReferenceException();
 	}
 
 	public virtual bool altCtrlUpdate(bool[] ctrls) {
@@ -200,13 +196,12 @@ public class ZeroMeleeWall : WallSlideAttack {
 	}
 }
 
-public class ZeroDoubleBuster : CharState {
-	bool fired1;
-	bool fired2;
-	bool isSecond;
-	bool shootPressedAgain;
-	bool isPinkCharge;
-	Zero zero = null!;
+public class ZeroDoubleBuster : ZeroState {
+	public bool fired1;
+	public bool fired2;
+	public bool isSecond;
+	public bool shootPressedAgain;
+	public bool isPinkCharge;
 
 	public ZeroDoubleBuster(bool isSecond, bool isPinkCharge) : base("doublebuster") {
 		this.isSecond = isSecond;
@@ -275,7 +270,6 @@ public class ZeroDoubleBuster : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		zero = character as Zero ?? throw new NullReferenceException();
 
 		if (!isPinkCharge) {
 			//character.stockSaber(true);
@@ -303,9 +297,9 @@ public class ZeroDoubleBuster : CharState {
 	}
 }
 
-public class AwakenedZeroHadangeki : CharState {
+public class AwakenedZeroHadangeki : ZeroState {
 	bool fired;
-	public Zero zero = null!;
+
 	public AwakenedZeroHadangeki() : base("projswing") {
 		landSprite = "projswing";
 		airSprite = "projswing_air";
@@ -346,24 +340,19 @@ public class AwakenedZeroHadangeki : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		zero = player.character as Zero ?? throw new NullReferenceException();
 		if (!character.grounded || character.vel.y < 0) {
 			sprite = "projswing_air";
 			defaultSprite = sprite;
 			character.changeSpriteFromName(sprite, true);
 		}
 	}
-
-	public override void onExit(CharState? newState) {
-		base.onExit(newState);
-	}
 }
 
-public class AwakenedZeroHadangekiWall : CharState {
+public class AwakenedZeroHadangekiWall : ZeroState {
 	bool fired;
 	public int wallDir;
 	public Collider wallCollider;
-	public Zero zero = null!;
+
 	public AwakenedZeroHadangekiWall(int wallDir, Collider wallCollider) : base("wall_slide_attack") {
 		this.wallDir = wallDir;
 		this.wallCollider = wallCollider;
@@ -387,10 +376,6 @@ public class AwakenedZeroHadangekiWall : CharState {
 			character.sprite.frameIndex = character.sprite.totalFrameNum - 1;
 		}
 	}
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		zero = player.character as Zero ?? throw new NullReferenceException();
-	}
 
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
@@ -398,9 +383,8 @@ public class AwakenedZeroHadangekiWall : CharState {
 	}
 }
 
-public class GenmureiState : CharState {
+public class GenmureiState : ZeroState {
 	bool fired;
-	public Zero zero = null!;
 	public GenmureiState() : base("genmu") { }
 
 	public override void update() {
@@ -423,9 +407,5 @@ public class GenmureiState : CharState {
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		}
-	}
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		zero = player.character as Zero ?? throw new NullReferenceException();
 	}
 }

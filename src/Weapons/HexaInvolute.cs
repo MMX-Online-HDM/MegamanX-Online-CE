@@ -11,11 +11,10 @@ public class HexaInvoluteWeapon : Weapon {
 	}
 }
 
-public class HexaInvoluteState : CharState {
+public class HexaInvoluteState : VileState {
 	HexaInvoluteProj proj;
 	bool startGrounded;
 	float ammoTime;
-	Vile vile = null!;
 
 	public HexaInvoluteState() : base("super") {
 		superArmor = true;
@@ -51,7 +50,6 @@ public class HexaInvoluteState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		vile = character as Vile ?? throw new NullReferenceException();
 		if (character.grounded) {
 			startGrounded = true;
 		}

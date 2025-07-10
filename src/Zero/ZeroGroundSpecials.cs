@@ -9,10 +9,10 @@ public enum GroundSpecialType {
 	MegaPunch
 }
 
-public class Raijingeki : CharState {
+public class Raijingeki : ZeroState {
 	bool playedSoundYet;
 	bool isAlt;
-	public Zero zero = null!;
+
 	public Raijingeki(bool isAlt) : base(isAlt ? "raijingeki2" : "raijingeki") {
 		this.isAlt = isAlt;
 	}
@@ -34,15 +34,11 @@ public class Raijingeki : CharState {
 			character.changeToIdleOrFall();
 		}
 	}
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		zero = character as Zero ?? throw new NullReferenceException();
-	}
 }
 
-public class SuiretsusanState : CharState {
+public class SuiretsusanState : ZeroState {
 	public bool isAlt;
-	public Zero zero = null!;
+
 	public SuiretsusanState(bool isAlt) : base("spear") {
 		this.isAlt = isAlt;
 	}
@@ -68,10 +64,6 @@ public class SuiretsusanState : CharState {
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		}
-	}
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		zero = character as Zero ?? throw new NullReferenceException();
 	}
 }
 
@@ -112,17 +104,11 @@ public class SuiretsusenProj : Projectile {
 	}
 }
 
-public class TBreakerState : CharState {
+public class TBreakerState : ZeroState {
 	public float dashTime = 0;
 	public bool isAlt;
-	public Zero zero = null!;
 	public TBreakerState(bool isAlt) : base("tbreaker") {
 		this.isAlt = isAlt;
-	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		zero = character as Zero ?? throw new NullReferenceException();
 	}
 
 	public override void update() {

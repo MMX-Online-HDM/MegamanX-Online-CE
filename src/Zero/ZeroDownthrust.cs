@@ -77,7 +77,6 @@ public class DanchienWeapon : Weapon {
 public class ZeroDownthrust : CharState {
 	public ZeroDownthrustType type;
 	public int quakeBlazerBounces;
-	public Zero zero = null!;
 
 	public ZeroDownthrust(
 		ZeroDownthrustType type
@@ -158,7 +157,6 @@ public class ZeroDownthrust : CharState {
 		if (character.vel.y < 0) {
 			character.vel.y = 0;
 		}
-		zero = character as Zero ?? throw new NullReferenceException();
 	}
 }
 

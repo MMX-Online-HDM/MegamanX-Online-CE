@@ -61,11 +61,10 @@ public class FSplasherWeapon : Weapon {
 	}
 }
 
-public class FSplasherState : CharState {
+public class FSplasherState : ZeroState {
 	public float dashTime = 0;
 	public Projectile? fSplasherProj;
 	public Anim? ProjVisible;
-	Zero zero = null!;
 
 	public FSplasherState() : base("dash") {
 		enterSound = "fsplasher";
@@ -74,7 +73,6 @@ public class FSplasherState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		zero = character as Zero ?? throw new NullReferenceException();
 		ProjVisible = new Anim(
 			character.pos, "fsplasher_proj", character.xDir,
 			player.getNextActorNetId(), false, sendRpc: true
@@ -150,7 +148,7 @@ public class FSplasherProj : Projectile {
 	public FSplasherProj(
 		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool sendRpc = false
 	) : base(
-		pos, xDir, owner, "fsplasher_proj", netId, player	
+		pos, xDir, owner, "fsplasher_proj", netId, player
 	) {
 		weapon = FSplasherWeapon.staticWeapon;
 		damager.damage = 2;
@@ -206,8 +204,8 @@ public class HyorogaStartState : CharState {
 
 	public override void update() {
 		base.update();
-		if (stateTime > 60f/60f) {
-		character.changeToIdleOrFall();
+		if (stateTime > 60f / 60f) {
+			character.changeToIdleOrFall();
 		}
 		if (character.sprite.name == "zero_hyoroga_rise") {
 			if (character.deltaPos.isCloseToZero()) {
@@ -227,7 +225,7 @@ public class HyorogaStartState : CharState {
 		character.vel = new Point(0, 0);
 		character.gravityModifier = -1;
 		character.dashedInAir = 0;
-		
+
 	}
 
 	public override void onExit(CharState? newState) {
@@ -246,15 +244,15 @@ public class HyorogaState : CharState {
 		base.update();
 		if (player.input.isPressed(Control.Special1, player)) {
 			character.changeState(new HyorogaStateA(), true);
-		}	
+		}
 		if (player.input.isPressed(Control.Shoot, player) && character.getChargeLevel() >= 1) {
-			character.changeState(new HyorogaStateB(), true);	
+			character.changeState(new HyorogaStateB(), true);
 		}
 		if (player.input.isPressed(Control.Jump, player)) {
 			character.changeState(character.getFallState(), true);
 		}
 		character.turnToInput(player.input, player);
-	}	
+	}
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.vel = new Point(0, 0);
@@ -268,8 +266,7 @@ public class HyorogaState : CharState {
 		base.onExit(newState);
 	}
 }
-public class HyorogaStateA : CharState {
-	public Zero zero = null!;
+public class HyorogaStateA : ZeroState {
 	public HyorogaStateA() : base("hyoroga_attack") {
 	}
 	public override void update() {
@@ -277,7 +274,7 @@ public class HyorogaStateA : CharState {
 		character.useGravity = false;
 		character.gravityModifier = 0;
 		base.update();
-		var pois = character.sprite.getCurrentFrame().POIs;	
+		var pois = character.sprite.getCurrentFrame().POIs;
 		if (pois != null && pois.Length > 0 && !once) {
 			once = true;
 			var poi = character.getFirstPOIOrDefault();
@@ -295,19 +292,16 @@ public class HyorogaStateA : CharState {
 			);
 		}
 		if (character.isAnimOver()) {
-			character.changeState(new HyorogaState(), true);			
+			character.changeState(new HyorogaState(), true);
 		}
 	}
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		zero = character as Zero ?? throw new NullReferenceException();
-	}
 }
-public class HyorogaStateB : CharState {
+public class HyorogaStateB : ZeroState {
 	public bool fired;
-	public Zero zero = null!;
+
 	public HyorogaStateB() : base("hyoroga_shoot") {
 	}
+
 	public override void update() {
 		character.vel = new Point(0, 0);
 		character.useGravity = false;
@@ -318,30 +312,27 @@ public class HyorogaStateB : CharState {
 			switch (character.getChargeLevel()) {
 				case 1:
 					character.playSound("buster2", sendRpc: true);
-					new ZBuster2Proj(character.getShootPos(), character.xDir, zero, 
+					new ZBuster2Proj(character.getShootPos(), character.xDir, zero,
 					player, player.getNextActorNetId(), rpc: true);
 					break;
 				case 2:
 					character.playSound("buster2X3", sendRpc: true);
-					new ZBuster3Proj(character.getShootPos(), character.xDir, zero, 
+					new ZBuster3Proj(character.getShootPos(), character.xDir, zero,
 					player, player.getNextActorNetId(), rpc: true);
 					break;
-				case >=3:
+				case >= 3:
 					character.playSound("buster3X3", sendRpc: true);
-					new ZBuster4Proj(character.getShootPos(), character.xDir, zero, 
+					new ZBuster4Proj(character.getShootPos(), character.xDir, zero,
 					player, player.getNextActorNetId(), rpc: true);
 					break;
 			}
 			player.currency--;
-			character.stopCharge();		
+			character.stopCharge();
 		}
+
 		if (character.isAnimOver()) {
-			character.changeState(new HyorogaState(), true);			
+			character.changeState(new HyorogaState(), true);
 		}
-	}
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		zero = character as Zero ?? throw new NullReferenceException();
 	}
 }
 
@@ -349,7 +340,7 @@ public class HyorogaProj : Projectile {
 	public HyorogaProj(
 		Point pos, int velDir, int xDir, Actor owner, Player player, ushort? netId, bool sendRpc = false
 	) : base(
-		pos, xDir, owner, "hyoroga_proj", netId, player	
+		pos, xDir, owner, "hyoroga_proj", netId, player
 	) {
 		weapon = HyorogaWeapon.staticWeapon;
 		damager.damage = 3;

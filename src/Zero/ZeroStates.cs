@@ -3,10 +3,26 @@ using System.Diagnostics.CodeAnalysis;
 using SFML.Graphics;
 
 namespace MMXOnline;
-public class HyperZeroStart : CharState {
+
+public class ZeroState : CharState {
+	public Zero zero = null!;
+
+	public ZeroState(
+		string sprite, string shootSprite = "", string attackSprite = "",
+		string transitionSprite = "", string transShootSprite = ""
+	) : base(
+		sprite, shootSprite, attackSprite, transitionSprite, transShootSprite
+	) {
+	}
+	
+	public override void onEnter(CharState oldState) {
+		zero = character as Zero ?? throw new NullReferenceException();
+	}
+}
+
+public class HyperZeroStart : ZeroState {
 	public float radius = 200;
 	public float time;
-	Zero zero = null!;
 	Anim? virusEffectParts;
 	Anim[] virusAnim = new Anim[3];
 	float[] delayedVirusTimer = {0, 7, 14};
@@ -28,7 +44,7 @@ public class HyperZeroStart : CharState {
 					if (virusAnim[i].destroyed) {
 						character.playSound("shingetsurinx5", true);
 						if (stateFrames > 55) {
-							virusAnim[i] = null!;
+							virusAnim[i] = null;
 							continue;
 						}
 						virusAnim[i] = virusAnim[i] = createVirusAnim();
@@ -71,12 +87,8 @@ public class HyperZeroStart : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		zero = character as Zero ?? throw new NullReferenceException();
 		character.useGravity = false;
 		character.vel = new Point();
-		if (zero == null) {
-			throw new NullReferenceException();
-		}
 		character.player.currency -= 10;
 		if (zero.hyperMode == 2) {
 			zero.changeSpriteFromName("hyper_viral", true);

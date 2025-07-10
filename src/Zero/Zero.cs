@@ -609,7 +609,7 @@ public class Zero : Character {
 	// This is to prevent accidental combo activation between attacks.
 
 	// This is to prevent accidental combo activation between attacks.
-	public override bool changeState(CharState newState, bool forceChange = false) {
+	public override bool changeState(CharState newState, bool forceChange = true) {
 		// Save old state.
 		CharState oldState = charState;
 		// Base function call.

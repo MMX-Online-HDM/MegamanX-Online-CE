@@ -255,11 +255,10 @@ public class RocketPunchProj : Projectile {
 	}
 }
 
-public class RocketPunchAttack : CharState {
+public class RocketPunchAttack : VileState {
 	bool shot = false;
 	RocketPunchProj? proj;
 	float specialPressTime;
-	Vile vile = null!;
 
 	public RocketPunchAttack(string transitionSprite = "") : base("rocket_punch", "", "", transitionSprite) {
 	}
@@ -333,6 +332,5 @@ public class RocketPunchAttack : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		vile = character as Vile ?? throw new NullReferenceException();
 	}
 }

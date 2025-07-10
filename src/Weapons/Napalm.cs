@@ -29,7 +29,7 @@ public class Napalm : Weapon {
 			ammousage = 0;
 			vileAmmoUsage = 0;
 			fireRate = 0;
-			vileWeight = 0; 
+			vileWeight = 0;
 		} else if (napalmType == NapalmType.NoneBall) {
 			displayName = "None(GRENADE)";
 			description = new string[] { "Do not equip a Napalm.", "GRENADE will be used instead." };
@@ -180,7 +180,7 @@ public class NapalmPartProj : Projectile {
 	) {
 		weapon = Napalm.netWeaponRB;
 		damager.damage = 1;
-		damager.hitCooldown = 30;	
+		damager.hitCooldown = 30;
 		projId = (int)ProjIds.RumblingBangProj;
 		vel.y = -40;
 		useGravity = true;
@@ -224,8 +224,7 @@ public class NapalmPartProj : Projectile {
 			if (xDist > MathF.Abs(maxXDist)) {
 				xDist = MathF.Abs(maxXDist);
 			}
-		}
-		else if (grounded && useGravity) {
+		} else if (grounded && useGravity) {
 			useGravity = false;
 			isStatic = true;
 		}
@@ -351,7 +350,7 @@ public class MK2NapalmProj : Projectile {
 		base.update();
 		if (!ownedByLocalPlayer) return;
 		flameCreateTime += Global.spf;
-		if (flameCreateTime > 6f/60f) {
+		if (flameCreateTime > 6f / 60f) {
 			flameCreateTime = 0;
 			new MK2NapalmFlame(pos, xDir, this, owner, owner.getNextActorNetId(), rpc: true);
 		}
@@ -381,7 +380,7 @@ public class MK2NapalmFlame : Projectile {
 		destroyOnHit = true;
 		shouldShieldBlock = false;
 		gravityModifier = 0.25f;
-		maxTime = 48f/60f;
+		maxTime = 48f / 60f;
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
@@ -395,7 +394,7 @@ public class MK2NapalmFlame : Projectile {
 
 	public override void update() {
 		base.update();
-		
+
 	}
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
@@ -481,7 +480,7 @@ public class SplashHitGrenadeProj : Projectile {
 		new SplashHitProj(
 			pos, xDir, this, owner,
 			owner.getNextActorNetId(), rpc: true
-		);	
+		);
 	}
 }
 
@@ -494,7 +493,7 @@ public class SplashHitProj : Projectile {
 		weapon = Napalm.netWeaponSH;
 		damager.damage = 1;
 		damager.hitCooldown = 30;
-		vel = new Point (0,0);
+		vel = new Point(0, 0);
 		projId = (int)ProjIds.SplashHitProj;
 		shouldShieldBlock = false;
 		shouldVortexSuck = false;
@@ -541,14 +540,15 @@ public class SplashHitProj : Projectile {
 	}
 }
 
-public abstract class NapalmAttackTypes : CharState {
-	public 	Vile vile = null!;
+public abstract class NapalmAttackTypes : VileState {
 	public string sound = "";
 	public bool soundPlayed;
 	public int soundFrame = Int32.MaxValue;
 	public bool shot;
+
 	public NapalmAttackTypes(string spr) : base(spr) {
 	}
+
 	public override void update() {
 		base.update();
 		if (character.sprite.frameIndex >= soundFrame && !soundPlayed) {
@@ -559,11 +559,12 @@ public abstract class NapalmAttackTypes : CharState {
 			character.changeState(new Crouch(""), true);
 		}
 	}
+
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.turnToInput(player.input, player);
-		vile = character as Vile ?? throw new NullReferenceException();
 	}
+
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		if (vile.grenadeWeapon.type == (int)VileBallType.NoneNapalm) {
@@ -612,7 +613,7 @@ public class NapalmAttackNapalm : NapalmAttackTypes {
 		}
 	}
 }
-public class NapalmAttackBombs: NapalmAttackTypes {
+public class NapalmAttackBombs : NapalmAttackTypes {
 	int bombNum = 0;
 	public NapalmAttackBombs() : base("crouch_nade") {
 		sound = "FireNappalmMK2";
@@ -621,34 +622,34 @@ public class NapalmAttackBombs: NapalmAttackTypes {
 	public override void update() {
 		base.update();
 		int xDir = vile.xDir;
-		if (vile.grenadeWeapon.type == (int)VileBallType.ExplosiveRound && 
+		if (vile.grenadeWeapon.type == (int)VileBallType.ExplosiveRound &&
 			character.frameIndex == 2 && bombNum <= 2
 		) {
 			if (vile.tryUseVileAmmo(vile.grenadeWeapon.vileAmmoUsage)) {
 				new VileBombProj(
-					character.getCenterPos().addxy(15*xDir,2), xDir, 1, vile, player,
+					character.getCenterPos().addxy(15 * xDir, 2), xDir, 1, vile, player,
 					character.player.getNextActorNetId(), rpc: true
 				);
 				character.sprite.frameIndex = 0;
 				bombNum++;
 			}
-		} 
+		}
 		if (!shot && character.sprite.frameIndex == 2) {
 			if (vile.grenadeWeapon.type == (int)VileBallType.SpreadShot) {
 				shot = true;
 				if (vile.tryUseVileAmmo(vile.grenadeWeapon.vileAmmoUsage)) {
 					for (int i = 0; i < 7; i++) {
 						new StunShotProj2(
-							character.getCenterPos().addxy(20*xDir,0), xDir, 0, i + 1, vile, 
+							character.getCenterPos().addxy(20 * xDir, 0), xDir, 0, i + 1, vile,
 							character.player, character.player.getNextActorNetId(), rpc: true
-						); 	
+						);
 					}
 				}
 			} else if (vile.grenadeWeapon.type == (int)VileBallType.PeaceOutRoller) {
 				shot = true;
 				if (vile.tryUseVileAmmo(vile.grenadeWeapon.vileAmmoUsage)) {
 					new PeaceOutRollerProj(
-						character.getCenterPos().addxy(20*xDir,0), xDir, 1, vile, player, 
+						character.getCenterPos().addxy(20 * xDir, 0), xDir, 1, vile, player,
 						character.player.getNextActorNetId(), rpc: true
 					);
 				}
@@ -666,7 +667,7 @@ public class NapalmAttackBombs: NapalmAttackTypes {
 		}
 	}
 }
-public class NapalmAttackFlamethrower: NapalmAttackTypes {
+public class NapalmAttackFlamethrower : NapalmAttackTypes {
 	int bombNum = 0;
 	public NapalmAttackFlamethrower() : base("crouch_nade") {
 		sound = "FireNappalmMK2";
@@ -679,7 +680,7 @@ public class NapalmAttackFlamethrower: NapalmAttackTypes {
 			if (character.frameIndex == 2 && bombNum <= 6) {
 				if (vile.tryUseVileAmmo(3.5f)) {
 					new FlamethrowerDragonsWrath(
-						character.getCenterPos().addxy(15*xDir,2), character.xDir, true, vile, player,
+						character.getCenterPos().addxy(15 * xDir, 2), character.xDir, true, vile, player,
 						player.getNextActorNetId(), rpc: true
 					);
 					character.sprite.frameIndex = 1;
@@ -691,7 +692,7 @@ public class NapalmAttackFlamethrower: NapalmAttackTypes {
 			if (character.frameIndex == 2 && bombNum <= 5) {
 				if (vile.tryUseVileAmmo(3.5f)) {
 					new FlamethrowerSeaDragonRage(
-						character.getCenterPos().addxy(15*xDir,2), character.xDir, true, vile, player,
+						character.getCenterPos().addxy(15 * xDir, 2), character.xDir, true, vile, player,
 						player.getNextActorNetId(), rpc: true
 					);
 					character.sprite.frameIndex = 1;
@@ -703,7 +704,7 @@ public class NapalmAttackFlamethrower: NapalmAttackTypes {
 			if (character.frameIndex == 2 && bombNum <= 5) {
 				if (vile.tryUseVileAmmo(3.5f)) {
 					new FlamethrowerWildHorseKick(
-						character.getCenterPos().addxy(15*xDir,2), character.xDir, true, vile, player,
+						character.getCenterPos().addxy(15 * xDir, 2), character.xDir, true, vile, player,
 						player.getNextActorNetId(), rpc: true
 					);
 					character.sprite.frameIndex = 1;
@@ -723,12 +724,11 @@ public class NapalmAttackFlamethrower: NapalmAttackTypes {
 	}
 }
 /*
-public class NapalmAttack : CharState {
+public class NapalmAttack : VileState {
 	bool shot;
 	NapalmAttackType napalmAttackType;
 	float shootTime;
 	int shootCount;
-	Vile vile = null!;
 
 	public NapalmAttack(NapalmAttackType napalmAttackType, string transitionSprite = "") :
 		base(getSprite(napalmAttackType), "", "", transitionSprite) {
@@ -865,10 +865,5 @@ public class NapalmAttack : CharState {
 		if (character.isAnimOver()) {
 			character.changeState(new Crouch(""), true);
 		}
-	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		vile = character as Vile ?? throw new NullReferenceException();
 	}
 } */

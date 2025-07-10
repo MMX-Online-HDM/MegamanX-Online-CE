@@ -4,6 +4,7 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class CmdSigma : BaseSigma {
+	public Weapon ballWeapon;
 	public float saberCooldown;
 	public float leapSlashCooldown;
 	public float sigmaAmmoRechargeCooldown = 0;
@@ -23,6 +24,7 @@ public class CmdSigma : BaseSigma {
 	) {
 		sigmaSaberMaxCooldown = 1;
 		altSoundId = AltSoundIds.X1;
+		ballWeapon = new SigmaBallWeapon();
 	}
 
 	public override void update() {
@@ -41,7 +43,7 @@ public class CmdSigma : BaseSigma {
 		if (sigmaAmmoRechargeCooldown == 0) {
 			Helpers.decrementFrames(ref sigmaAmmoRechargeTime);
 			if (sigmaAmmoRechargeTime == 0) {
-				player.sigmaAmmo = Helpers.clampMax(player.sigmaAmmo + 1, player.sigmaMaxAmmo);
+				ballWeapon.addAmmo(1, player);
 				sigmaAmmoRechargeTime = sigmaHeadBeamRechargePeriod;
 			}
 		} else {
@@ -112,7 +114,7 @@ public class CmdSigma : BaseSigma {
 			return true;
 		}
 		if (grounded && charState is Idle || charState is Run || charState is Crouch) {
-			if (player.input.isHeld(Control.Special1, player) && player.sigmaAmmo > 0) {
+			if (player.input.isHeld(Control.Special1, player) && ballWeapon.ammo > 0) {
 				sigmaAmmoRechargeCooldown = 0.5f;
 				changeState(new SigmaBallShootEX(), true);
 				return true;
@@ -179,12 +181,12 @@ public class CmdSigma : BaseSigma {
 	}
 
 	public override bool canAddAmmo() {
-		return (player.sigmaAmmo < player.sigmaMaxAmmo);
+		return ballWeapon.ammo < ballWeapon.maxAmmo;
 	}
 
 	public override List<byte> getCustomActorNetData() {
 		List<byte> customData = base.getCustomActorNetData();
-		customData.Add((byte)MathF.Ceiling(player.sigmaAmmo));
+		customData.Add((byte)MathF.Ceiling(ballWeapon.ammo));
 
 		return customData;
 	}
@@ -195,7 +197,7 @@ public class CmdSigma : BaseSigma {
 		data = data[data[0]..];
 
 		// Per-player data.
-		player.sigmaAmmo = data[0];
+		ballWeapon.ammo = data[0];
 	}
 
 	public override void aiAttack(Actor? target) {
