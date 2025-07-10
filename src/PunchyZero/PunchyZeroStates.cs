@@ -432,7 +432,7 @@ public class PZeroShoryuken : PZeroState {
 	public bool canDownSpecial() {
 		return (
 			zero.diveKickCooldown == 0 &&
-			character.sprite.frameIndex >= character.sprite.totalFrameNum- 3
+			character.sprite.frameIndex >= character.sprite.totalFrameNum - 3
 		);
 	}
 
@@ -449,7 +449,7 @@ public class HyperPunchyZeroStart : PZeroState {
 	public float time;
 	Anim? virusEffectParts;
 	Anim[] virusAnim = new Anim[3];
-	float[] delayedVirusTimer = {0, 7, 14};
+	float[] delayedVirusTimer = { 0, 7, 14 };
 	string virusAnimName = "";
 
 	public HyperPunchyZeroStart() : base("hyper_start") {
@@ -605,9 +605,8 @@ public class HyperPunchyZeroStart : PZeroState {
 	}
 }
 
-public class PunchyZeroHadangeki : CharState {
+public class PunchyZeroHadangeki : PZeroState {
 	bool fired;
-	public PunchyZero pzero = null!;
 
 	public PunchyZeroHadangeki() : base("projswing") {
 		landSprite = "projswing";
@@ -627,7 +626,7 @@ public class PunchyZeroHadangeki : CharState {
 			fired = true;
 			new PZeroHadangeki(
 				character.pos.addxy(30 * character.xDir, -20), character.xDir,
-				pzero.isAwakened, pzero, player, player.getNextActorNetId(), rpc: true
+				zero.isAwakened, zero, player, player.getNextActorNetId(), rpc: true
 			);
 		}
 		if (character.isAnimOver()) {
@@ -648,7 +647,6 @@ public class PunchyZeroHadangeki : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		pzero = character as PunchyZero ?? throw new NullReferenceException();
 		if (!character.grounded || character.vel.y < 0) {
 			sprite = "projswing_air";
 			defaultSprite = sprite;
@@ -657,11 +655,10 @@ public class PunchyZeroHadangeki : CharState {
 	}
 }
 
-public class PunchyZeroHadangekiWall : CharState {
+public class PunchyZeroHadangekiWall : PZeroState {
 	bool fired;
 	public int wallDir;
 	public Collider wallCollider;
-	public PunchyZero pzero = null!;
 
 	public PunchyZeroHadangekiWall(int wallDir, Collider wallCollider) : base("wall_slide_attack") {
 		this.wallDir = wallDir;
@@ -677,7 +674,7 @@ public class PunchyZeroHadangekiWall : CharState {
 			fired = true;
 			new PZeroHadangeki(
 				character.pos.addxy(30 * -wallDir, -20), -wallDir,
-			 	pzero.isAwakened, pzero, player, player.getNextActorNetId(), rpc: true
+			 	zero.isAwakened, zero, player, player.getNextActorNetId(), rpc: true
 			);
 		}
 		if (character.isAnimOver()) {
@@ -690,17 +687,13 @@ public class PunchyZeroHadangekiWall : CharState {
 		base.onExit(newState);
 		useGravity = true;
 	}
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		pzero = character as PunchyZero ?? throw new NullReferenceException();
-	}
 }
-public abstract class PunchyZeroGigaAttack : CharState {
+public abstract class PunchyZeroGigaAttack : PZeroState {
 	public bool exitOnOver = true;
 	public int loop;
 	public Anim? Anim;
 	public Weapon weapon;
-	public PunchyZero pzero = null!;
+
 	public PunchyZeroGigaAttack(Weapon weapon, string spr) : base(spr) {
 		invincible = true;
 		this.weapon = weapon;
@@ -712,14 +705,16 @@ public abstract class PunchyZeroGigaAttack : CharState {
 			character.changeToIdleOrFall();
 		}
 	}
+
 	public void GigaAttackAnim(string sprite) {
 		int xDir = character.getShootXDir();
 		Anim = new Anim(
-			character.getCenterPos().addxy(4*xDir, 24),
+			character.getCenterPos().addxy(4 * xDir, 24),
 			sprite, xDir, player.getNextActorNetId(),
 			destroyOnEnd: true, sendRpc: true
 		);
 	}
+
 	public void LoopSprite(int firstFrame, int secondFrame, int frameloop) {
 		if (character.frameIndex == firstFrame && loop < frameloop) {
 			character.frameIndex = secondFrame;
@@ -727,13 +722,11 @@ public abstract class PunchyZeroGigaAttack : CharState {
 			loop++;
 		}
 	}
+
 	public void playSound(string sound) {
 		character.playSound(sound, forcePlay: false, sendRpc: true);
 	}
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		pzero = character as PunchyZero ?? throw new NullReferenceException();
-	}
+
 	public override void onExit(CharState? newState) {
 		weapon.shootCooldown = weapon.fireRate;
 		if (Anim != null) {
@@ -757,7 +750,7 @@ public class PunchyZeroRakuhouhaState : PunchyZeroGigaAttack {
 		float x = character.getCenterPos().x + 4 * xDir;
 		float y = character.getCenterPos().y + 12;
 		for (int i = 256; i >= 128; i -= 16) {
-			new RakuhouhaProj(new Point(x, y), isCFlasher, i, 1, pzero,
+			new RakuhouhaProj(new Point(x, y), isCFlasher, i, 1, zero,
 			player, player.getNextActorNetId(), rpc: true
 			);
 		}
@@ -776,7 +769,7 @@ public class PunchyZeroRakuhouhaState : PunchyZeroGigaAttack {
 
 public class PunchyZeroCFlasherState : PunchyZeroGigaAttack {
 	public PunchyZeroCFlasherState(Weapon weapon) : base(weapon, "cflasher") {
-		this.weapon = weapon;	
+		this.weapon = weapon;
 	}
 
 	public override void update() {
@@ -788,7 +781,7 @@ public class PunchyZeroCFlasherState : PunchyZeroGigaAttack {
 		float x = character.getCenterPos().x + 4 * xDir;
 		float y = character.getCenterPos().y + 12;
 		for (int i = 256; i >= 128; i -= 16) {
-			new RakuhouhaProj(new Point(x, y), isCFlasher, i, 1, pzero,
+			new RakuhouhaProj(new Point(x, y), isCFlasher, i, 1, zero,
 			player, player.getNextActorNetId(), rpc: true
 			);
 		}
@@ -806,22 +799,22 @@ public class PunchyZeroCFlasherState : PunchyZeroGigaAttack {
 }
 
 public class PunchyZeroRekkohaState : PunchyZeroGigaAttack {
-	public float[] StateTime = { 36f/60f, 48f/60f, 60f/60f, 72f/60f, 84f/60f };
+	public float[] StateTime = { 36f / 60f, 48f / 60f, 60f / 60f, 72f / 60f, 84f / 60f };
 	public bool[] fired = { false, false, false, false, false };
 	public int[] Space = { 0, 35, 70, 110, 150 };
 	public bool sound;
 	public RekkohaEffect? effect;
 	public PunchyZeroRekkohaState(Weapon weapon) : base(weapon, "rekkoha") {
-		this.weapon = weapon;	
+		this.weapon = weapon;
 		immuneToWind = true;
 	}
 
 	public override void update() {
-		base.update();	
+		base.update();
 		for (int i = 0; i < StateTime.Length; i++) {
 			if (stateTime > StateTime[i] && !fired[i]) {
 				fired[i] = true;
-		        RekkohaProj(i == 0 ? false : true, Space[i]);
+				RekkohaProj(i == 0 ? false : true, Space[i]);
 			}
 		}
 		LoopSprite(11, 9, 11);
@@ -832,12 +825,12 @@ public class PunchyZeroRekkohaState : PunchyZeroGigaAttack {
 		float y = character.pos.y;
 		float topScreenY = Global.level.getTopScreenY(y);
 		if (isDouble) {
-			new RekkohaProj(new Point(x + Space, topScreenY), 1, pzero,
+			new RekkohaProj(new Point(x + Space, topScreenY), 1, zero,
 			player, player.getNextActorNetId(), rpc: true);
-			new RekkohaProj(new Point(x - Space, topScreenY), 1, pzero,
+			new RekkohaProj(new Point(x - Space, topScreenY), 1, zero,
 			player, player.getNextActorNetId(), rpc: true);
 		} else {
-			new RekkohaProj(new Point(x, topScreenY), 1, pzero,
+			new RekkohaProj(new Point(x, topScreenY), 1, zero,
 			player, player.getNextActorNetId(), rpc: true);
 		}
 	}
@@ -857,7 +850,7 @@ public class PunchyZeroRekkohaState : PunchyZeroGigaAttack {
 }
 
 public class PunchyZeroShinMessenkouState : PunchyZeroGigaAttack {
-	public float[] AnimSeconds = { 20f/60f, 28f/60f, 36f/60f };
+	public float[] AnimSeconds = { 20f / 60f, 28f / 60f, 36f / 60f };
 	public bool[] fired = { false, false, false };
 	public const float shinMessenkouWidth = 40;
 	public PunchyZeroShinMessenkouState(Weapon weapon) : base(weapon, "rakuhouha") {
@@ -873,11 +866,11 @@ public class PunchyZeroShinMessenkouState : PunchyZeroGigaAttack {
 		float y = character.pos.y;
 		new ShinMessenkouProj(
 			new Point(x - shinMessenkouWidth * multiplier, y),
-			character.xDir, pzero, player, player.getNextActorNetId(), rpc: true
+			character.xDir, zero, player, player.getNextActorNetId(), rpc: true
 		);
 		new ShinMessenkouProj(
 			new Point(x + shinMessenkouWidth * multiplier, y),
-			character.xDir, pzero, player, player.getNextActorNetId(), rpc: true
+			character.xDir, zero, player, player.getNextActorNetId(), rpc: true
 		);
 		playSound("zeroshinmessenkoubullet");
 	}
@@ -885,10 +878,10 @@ public class PunchyZeroShinMessenkouState : PunchyZeroGigaAttack {
 		for (int i = 0; i < AnimSeconds.Length; i++) {
 			if (stateTime > AnimSeconds[i] && !fired[i]) {
 				fired[i] = true;
-		        ShinMessenkouProj(i+1);
+				ShinMessenkouProj(i + 1);
 				if (i == 0) {
 					GigaAttackAnim("zero_rakuanim");
-      				playSound("crash");
+					playSound("crash");
 				}
 			}
 		}
@@ -899,7 +892,7 @@ public class PunchyZeroShinMessenkouState : PunchyZeroGigaAttack {
 public class PunchyZeroDarkHoldShootState : PunchyZeroGigaAttack {
 	public DarkHoldProj? darkHoldProj;
 	public PunchyZeroDarkHoldShootState(Weapon weapon) : base(weapon, "darkhold") {
-		this.weapon = weapon;	
+		this.weapon = weapon;
 	}
 	public override void update() {
 		base.update();
@@ -912,15 +905,17 @@ public class PunchyZeroDarkHoldShootState : PunchyZeroGigaAttack {
 		if (character.frameIndex >= 10 && !once) {
 			once = true;
 			darkHoldProj = new DarkHoldProj(
-				new Point(x, y - 20), xDir, pzero,
+				new Point(x, y - 20), xDir, zero,
 				player, player.getNextActorNetId(), rpc: true
 			);
-			playSound("darkhold");	
+			playSound("darkhold");
 		}
 	}
 }
+
 public class AwakenedPunchyZeroHadangeki : PZeroState {
 	bool fired;
+
 	public AwakenedPunchyZeroHadangeki() : base("projswing") {
 		landSprite = "projswing";
 		airSprite = "projswing_air";
@@ -938,11 +933,12 @@ public class AwakenedPunchyZeroHadangeki : PZeroState {
 			character.playSound("zerosaberx3", sendRpc: true);
 			fired = true;
 			new ZSaberProj(
-				character.pos.addxy(30 * character.xDir, -20), character.xDir, 
-				isAZ: zero.isAwakened ? true : false, zero,
+				character.pos.addxy(30 * character.xDir, -20), character.xDir,
+				isAZ: zero.isAwakened, zero,
 				player, player.getNextActorNetId(), rpc: true
 			);
 		}
+
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		} else {
@@ -961,7 +957,6 @@ public class AwakenedPunchyZeroHadangeki : PZeroState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		zero = player.character as PunchyZero ?? throw new NullReferenceException();
 		if (!character.grounded || character.vel.y < 0) {
 			sprite = "projswing_air";
 			defaultSprite = sprite;
@@ -969,6 +964,7 @@ public class AwakenedPunchyZeroHadangeki : PZeroState {
 		}
 	}
 }
+
 public class PunchyZeroGenmureiState : PZeroState {
 	bool fired;
 	public PunchyZeroGenmureiState() : base("genmu") { }
@@ -980,12 +976,12 @@ public class PunchyZeroGenmureiState : PZeroState {
 			fired = true;
 			character.playSound("genmureix5", sendRpc: true);
 			new GenmuProj(
-				character.pos.addxy(30 * character.xDir, -25), character.xDir, 0, 
+				character.pos.addxy(30 * character.xDir, -25), character.xDir, 0,
 				isAZ: zero.isAwakened ? true : false,
 				zero, player, player.getNextActorNetId(), rpc: true
 			);
 			new GenmuProj(
-				character.pos.addxy(30 * character.xDir, -25), character.xDir, 1, 
+				character.pos.addxy(30 * character.xDir, -25), character.xDir, 1,
 				isAZ: zero.isAwakened ? true : false,
 				zero, player, player.getNextActorNetId(), rpc: true
 			);
@@ -993,9 +989,5 @@ public class PunchyZeroGenmureiState : PZeroState {
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		}
-	}
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		zero = player.character as PunchyZero ?? throw new NullReferenceException();
 	}
 }
