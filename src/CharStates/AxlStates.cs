@@ -207,4 +207,18 @@ public class SniperAimAxl : CharState {
 		}
 	}
 }
+public class AxlTaunt : CharState {
+	public AxlTaunt() : base("win") {
 
+	}
+	public override void update() {
+		base.update();
+		if (character.isAnimOver() && !Global.level.gameMode.playerWon(player)) {
+			character.changeToIdleOrFall();
+		}
+		if (!once) {
+			once = true;
+			character.playSound("ching", sendRpc: true);
+		}
+	}
+}

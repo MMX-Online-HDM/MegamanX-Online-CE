@@ -294,7 +294,7 @@ public partial class Level {
 
 		InGameMainMenu.selectY = 0;
 		UpgradeMenu.onUpgradeMenu = true;
-		UpgradeArmorMenu.xGame = 1;
+		UpgradeArmorMenuEX.xGame = 1;
 
 		Menu.exit();
 		this.server = server;

@@ -6,7 +6,7 @@ public class PreOptionsMenu : IMainMenu {
 	public int selectY;
 	public int[] optionPos = new int[9];
 	public int lineH = 14;
-	public MainMenu? prevMenu1;
+	public MainMenu prevMenu1;
 	public IMainMenu prevMenu;
 	public string message;
 	public Action yesAction;
@@ -15,8 +15,8 @@ public class PreOptionsMenu : IMainMenu {
 	public float startX = 32;
 	public float Time = 1, Time2;
 	public bool Confirm = false, Confirm2 = false;
-	public PreOptionsMenu(IMainMenu prevMenu, bool inGame) {
-		this.prevMenu = prevMenu;
+	public PreOptionsMenu(MainMenu prevMenu1, bool inGame) {
+		this.prevMenu1 = prevMenu1;
 		this.inGame = inGame;
 		for (int i = 0; i < optionPos.Length; i++) {
 			optionPos[i] = 35 + lineH * i;
@@ -33,9 +33,12 @@ public class PreOptionsMenu : IMainMenu {
 			if (Global.input.isPressedMenu(Control.MenuBack)) Confirm2 = true;
 			if (Confirm2 == true) Time2 += Global.spf * 2;
 		}
+		if (inGame) {
+			Time = 0;
+			Time2 = 0;
+		}
 	}
 	public void update() {
-		TimeUpdate();
 		Helpers.menuUpDown(ref selectY, 0, 8);
 		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 			int? charNum = null;
@@ -49,17 +52,24 @@ public class PreOptionsMenu : IMainMenu {
 		if  (Global.input.isPressedMenu(Control.MenuConfirm)) {
 			if (selectY == 8) {Menu.change(new PreControlMenu(this, false));}
 		}
-		if (Time2 >= 1 && !inGame) {
-			Menu.change(prevMenu);
-			if (prevMenu1 != null) {		
-				prevMenu1.Time = 0;
-				prevMenu1.Time2 = 1;
-				prevMenu1.Confirm = false;
-				prevMenu1.Confirm2 = false;
+		if (Options.main.blackFade) {
+			TimeUpdate();
+			if (Time2 >= 1 && !inGame) {
+				Menu.change(prevMenu1);
+				if (prevMenu1 != null) {
+					prevMenu1.Time = 0;
+					prevMenu1.Time2 = 1;
+					prevMenu1.Confirm = false;
+					prevMenu1.Confirm2 = false;
+				}
+			}
+		} else {
+			if (Global.input.isPressedMenu(Control.MenuBack) && !inGame) {
+				Menu.change(prevMenu1);
 			}
 		}
-		else if (Global.input.isPressedMenu(Control.MenuBack) && inGame) {
-			Menu.change(prevMenu);
+		if (Global.input.isPressedMenu(Control.MenuBack) && inGame) {
+			Menu.change(prevMenu1);
 		}
 	}
 
@@ -93,9 +103,11 @@ public class PreOptionsMenu : IMainMenu {
 		Fonts.drawText(menuFont, "Controls", startX, optionPos[8], selected: selectY == 8);
 
 		Fonts.drawTextEX(FontType.Grey, "[OK]: Choose, [BACK]: Back", Global.halfScreenW, 198, Alignment.Center);
-		if (!inGame) {
-			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0,0, Time);
-			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0,0, Time2);
+		if (Options.main.blackFade) {
+			if (!inGame) {
+				DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, Time);
+				DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, Time2);
+			}
 		}
 	}
 }

@@ -979,6 +979,11 @@ public partial class Actor : GameObject {
 		if (this is Projectile proj) {
 			return proj.owner?.isDefenderFavored == true;
 		}
+		if (this is Character character) {
+			if (character.charState is DodgeRoll && Global.level.server?.customMatchSettings?.AxlFTADodgeroll == true) {
+				return character.player?.isDefenderFavored == false;
+			}
+		}
 		return false;
 	}
 

@@ -97,8 +97,8 @@ public class UpgradeMenu : IMainMenu {
 		if (Global.input.isPressedMenu(Control.MenuLeft)) {
 			if (mainPlayer.realCharNum == 0) {
 				if (mainPlayer.canUpgradeXArmor()) {
-					UpgradeArmorMenu.xGame = 3;
-					Menu.change(new UpgradeArmorMenu(prevMenu));
+					UpgradeArmorMenuEX.xGame = 1;
+					Menu.change(new UpgradeArmorMenuEX(prevMenu));
 					onUpgradeMenu = false;
 					return;
 				}
@@ -108,8 +108,8 @@ public class UpgradeMenu : IMainMenu {
 		if (Global.input.isPressedMenu(Control.MenuRight)) {
 			if (mainPlayer.realCharNum == 0) {
 				if (mainPlayer.canUpgradeXArmor()) {
-					UpgradeArmorMenu.xGame = 1;
-					Menu.change(new UpgradeArmorMenu(prevMenu));
+					UpgradeArmorMenuEX.xGame = 1;
+					Menu.change(new UpgradeArmorMenuEX(prevMenu));
 					onUpgradeMenu = false;
 					return;
 				}

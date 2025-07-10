@@ -55,6 +55,7 @@ public class Zero : Character {
 	public float hadangekiCooldown;
 	public float genmureiCooldown;
 	public int airRisingUses;
+	public float tauntCooldown;
 
 	// Hypermode stuff.
 	public float donutTimer;
@@ -102,6 +103,18 @@ public class Zero : Character {
 
 	// State overdrive.
 	public override CharState getAirJumpState() => new Jump() { sprite = "kuuenbu" };
+	public override CharState getFallState() {
+		if (airRisingUses > 0) {
+			return new FallSaber();
+		}
+		return new Fall();
+	}
+	public override CharState getTauntState() {
+		if (isAwakened && tauntCooldown <= 0) {
+			return new AwakenedTaunt();
+		}
+		return new ZeroTaunt();
+	}
 
 	public override void preUpdate() {
 		base.preUpdate();
@@ -145,6 +158,7 @@ public class Zero : Character {
 		Helpers.decrementFrames(ref genmureiCooldown);
 		Helpers.decrementFrames(ref dashAttackCooldown);
 		Helpers.decrementFrames(ref aiAttackCooldown);
+		Helpers.decrementFrames(ref tauntCooldown);
 		airSpecial.update();
 		gigaAttack.update();
 		gigaAttack.charLinkedUpdate(this, true);
@@ -736,7 +750,7 @@ public class Zero : Character {
 			"zero_attack_dash" => MeleeIds.DashSlash,
 			"zero_attack_dash2" => MeleeIds.Shippuuga,
 			// Air
-			"zero_attack_air" => MeleeIds.AirSlash,
+			"zero_attack_air" or "zero_attack_air_ground" => MeleeIds.AirSlash,
 			"zero_attack_air2" => MeleeIds.RollingSlash,
 			"zero_hyoroga_attack"  => MeleeIds.Hyoroga,
 			// Ground Speiclas
@@ -756,7 +770,7 @@ public class Zero : Character {
 			"zero_ladder_attack" => MeleeIds.LadderSlash,
 			"zero_wall_slide_attack" => MeleeIds.WallSlash,
 			"zero_block" => MeleeIds.Gokumonken,
-			"zero_projswing" => MeleeIds.Hadangeki,
+			"zero_projswing" or "zero_projswing_air" => MeleeIds.Hadangeki,
 			_ => MeleeIds.None
 		});
 	}
@@ -932,7 +946,29 @@ public class Zero : Character {
 			chargeEffect.update(getChargeLevel(), chargeType);
 		}
 	}
-	
+	public override void landingCode(bool useSound = true) {
+		dashedInAir = 0;
+		if (useSound) {
+			playAltSound("land", sendRpc: true, altParams: "larmor");
+		}
+		if (grounded && (
+			player.input.isHeld(Control.Left, player) ||
+			player.input.isHeld(Control.Right, player)
+		)) {
+			changeState(getRunState(true));
+			return;
+		}
+		CharState idleState = getIdleState();
+		idleState.transitionSprite = "land";
+		idleState.transShootSprite = "land_shoot";
+		if (airRisingUses > 0) {
+			idleState.transitionSprite = "land_saber";
+		}
+		if (idleState.transitionSprite != "") {
+			idleState.sprite = idleState.transitionSprite;
+		}
+		changeState(idleState, true);
+	}
 	// Shader and display.
 	public override List<ShaderWrapper> getShaders() {
 		List<ShaderWrapper> baseShaders = base.getShaders();

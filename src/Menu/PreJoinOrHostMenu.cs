@@ -26,7 +26,6 @@ public class PreJoinOrHostMenu : IMainMenu {
 	}
 
 	public void update() {
-		TimeUpdate();
 		if (state == 0) {
 			Helpers.menuUpDown(ref selectY, 0, 2);
 			if (Global.input.isPressedMenu(Control.MenuConfirm)) {
@@ -46,40 +45,47 @@ public class PreJoinOrHostMenu : IMainMenu {
 					Menu.change(nextMenu);
 				}
 			}
-			if (Time2 >= 1) {
-				Menu.change(prevMenu);
-				prevMenu.Time = 0;
-				prevMenu.Time2 = 1;
-				prevMenu.Confirm = false;
-				prevMenu.Confirm2 = false;
+			else if (Options.main.blackFade) {
+				TimeUpdate();
+				if (Time2 >= 1) {
+					Menu.change(prevMenu);
+					prevMenu.Time = 0;
+					prevMenu.Time2 = 1;
+					prevMenu.Confirm = false;
+					prevMenu.Confirm2 = false;
+				}
+			} else {
+				if (Global.input.isPressedMenu(Control.MenuBack)) {
+					Menu.change(prevMenu);				
+				}
 			}
 		} else if (state == 1) {
-			if (Global.regions.Count == 0) {
-				state = 0;
-				Menu.change(new ErrorMenu(new string[] {
+				if (Global.regions.Count == 0) {
+					state = 0;
+					Menu.change(new ErrorMenu(new string[] {
 						"No multiplayer regions configured.",
 						"Please add a region name/ip to region.json",
 						"in game or MMXOD folder, then restart the game.",
 				}, this));
-			} else {
-				state1Time = 0;
-				state = 0;
-				IMainMenu nextMenu = null;
-				if (isJoin) nextMenu = new JoinMenu(false);
-				else nextMenu = new HostMenu(prevMenu, null, false, false);
-				// Bans are useless and do not work without a main relay so are disabled.
-				/*
-				if (canPlayOnline(out string[] warningMessage)) {
-					if (warningMessage != null) {
-						Menu.change(new ErrorMenu(warningMessage, nextMenu));
-					} else {
-						Menu.change(nextMenu);
+				} else {
+					state1Time = 0;
+					state = 0;
+					IMainMenu nextMenu = null;
+					if (isJoin) nextMenu = new JoinMenu(false);
+					else nextMenu = new HostMenu(prevMenu, null, false, false);
+					// Bans are useless and do not work without a main relay so are disabled.
+					/*
+					if (canPlayOnline(out string[] warningMessage)) {
+						if (warningMessage != null) {
+							Menu.change(new ErrorMenu(warningMessage, nextMenu));
+						} else {
+							Menu.change(nextMenu);
+						}
 					}
+					*/
+					Menu.change(nextMenu);
 				}
-				*/
-				Menu.change(nextMenu);
 			}
-		}
 	}
 	public void TimeUpdate() {
 		if (Confirm == false) Time -= Global.spf * 2;
@@ -197,9 +203,10 @@ public class PreJoinOrHostMenu : IMainMenu {
 		Fonts.drawText(FontType.DarkBlue, "  P2P  ", WD, optionPos[0].y,
 		Alignment.Center, selected: selectY == 0);
 		Fonts.drawTextEX(FontType.Grey, "[OK]: Choose, [BACK]: Back", WD, 206, Alignment.Center);
-
-		DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0,0, Time);
-		DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0,0, Time2);
+		if (Options.main.blackFade) {
+			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, Time);
+			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, Time2);
+		}
 	}
 	public void Guide() {
 		int msgPos = 140;

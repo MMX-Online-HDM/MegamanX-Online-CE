@@ -394,7 +394,7 @@ public class OptionsMenu : IMainMenu {
 						string preferredChar = Character.charDisplayNames[Options.main.preferredCharacter];
 						Fonts.drawText(
 							optionFontText, "Preferred character:",
- 							pos.x, pos.y, selected: selectedArrowPosY == index
+							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
 							optionFontValue, preferredChar,
@@ -403,7 +403,8 @@ public class OptionsMenu : IMainMenu {
 					},
 					"Choose a default character the game will\npre-select for you."
 				),
-				// Double dash
+
+				// Disable double-tap dash
 				new MenuOption(
 					30, startY,
 					() => {
@@ -416,7 +417,7 @@ public class OptionsMenu : IMainMenu {
 					(Point pos, int index) => {
 						Fonts.drawText(
 							optionFontText, "Disable double-tap dash:",
- 							pos.x, pos.y, selected: selectedArrowPosY == index
+							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
 							optionFontValue, Helpers.boolYesNo(Options.main.disableDoubleDash),
@@ -425,7 +426,8 @@ public class OptionsMenu : IMainMenu {
 					},
 					"Disables ability to dash by quickly\ntapping LEFT or RIGHT twice."
 				),
-				// Kill on Loadout change.
+
+				// Kill on loadout change
 				new MenuOption(
 					30, startY,
 					() => {
@@ -434,7 +436,7 @@ public class OptionsMenu : IMainMenu {
 					(Point pos, int index) => {
 						Fonts.drawText(
 							optionFontText, "Kill on loadout change:",
- 							pos.x, pos.y, selected: selectedArrowPosY == index
+							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
 							optionFontValue, Helpers.boolYesNo(Options.main.killOnLoadoutChange),
@@ -444,7 +446,7 @@ public class OptionsMenu : IMainMenu {
 					"If Yes, will instantly die on loadout change mid-match.\n" +
 					"If No, on next death loadout changes will apply."
 				),
-				// Kill on character change.
+				// Kill on character change
 				new MenuOption(
 					30, startY,
 					() => {
@@ -453,7 +455,7 @@ public class OptionsMenu : IMainMenu {
 					(Point pos, int index) => {
 						Fonts.drawText(
 							optionFontText, "Kill on character change:",
- 							pos.x, pos.y, selected: selectedArrowPosY == index
+							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
 							optionFontValue, Helpers.boolYesNo(Options.main.killOnCharChange),
@@ -463,6 +465,7 @@ public class OptionsMenu : IMainMenu {
 					"If Yes, will instantly die on character change.\n" +
 					"If No, on next death character change will apply."
 				),
+
 			};
 		} else if (charNum == null) {
 			if (!Global.regionPingTask.IsCompleted) {
@@ -704,6 +707,25 @@ public class OptionsMenu : IMainMenu {
 					},
 					"If enabled, press F10 to open the dev-console in-match\n" +
 					"See the game website for a list of commands."
+				),
+				// Dev console.
+				new MenuOption(
+					30, startY,
+					() => {
+						if (inGame) return;
+						Helpers.menuLeftRightBool(ref Options.main.blackFade);
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							optionFontText, "Black fade option:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.blackFade),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"If enabled, a fade transition between menus will appear."
 				),
 			};
 		} else if (charNum == 0) {
@@ -1412,7 +1434,7 @@ public class OptionsMenu : IMainMenu {
 			) {
 				Menu.change(new ErrorMenu(new string[] {
 					"Note: options were changed that",
-					"require restart to apply."
+					"require restart to apply."				
 				}, previous));
 			} else {
 				Menu.change(previous);

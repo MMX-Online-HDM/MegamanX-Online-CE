@@ -53,7 +53,7 @@ public class InGameMainMenu : IMainMenu {
 					if (UpgradeMenu.onUpgradeMenu && !Global.level.server.disableHtSt) {
 						Menu.change(new UpgradeMenu(this));
 					} else if (Global.level.mainPlayer.realCharNum == 0) {
-						Menu.change(new UpgradeArmorMenu(this));
+						Menu.change(new UpgradeArmorMenuEX(this));
 					} else if (Global.level.mainPlayer.realCharNum == 2) {
 						Menu.change(new SelectVileArmorMenu(this));
 					}
@@ -71,7 +71,7 @@ public class InGameMainMenu : IMainMenu {
 			} else if (selectY == 4) {
 				Menu.change(new PreControlMenu(this, true));
 			} else if (selectY == 5) {
-				Menu.change(new PreOptionsMenu(this, true));
+				Menu.change(new PreOptionsMenu(null, true));
 			} else if (selectY == 6) {
 				Menu.change(new ConfirmLeaveMenu(this, "Are you sure you want to leave?", () => {
 					Global._quickStart = false;

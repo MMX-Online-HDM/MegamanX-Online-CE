@@ -45,6 +45,7 @@ public class PunchyZero : Character {
 	public float parryCooldown;
 	public float hadangekiCooldown;
 	public float genmureiCooldown;
+	public float tauntCooldown;
 
 	// Hypermode stuff.
 	public float donutTimer = 0;
@@ -78,6 +79,12 @@ public class PunchyZero : Character {
 			return new Jump() { sprite = "kuuenbu" };
 		}
 		return new Jump();
+	}
+	public override CharState getTauntState() {
+		if (isAwakened && tauntCooldown <= 0) {
+			return new PAwakenedTaunt();
+		}
+		return new PZeroTaunt();
 	}
 
 	public override void update() {
@@ -114,7 +121,9 @@ public class PunchyZero : Character {
 		Helpers.decrementFrames(ref dashAttackCooldown);
 		Helpers.decrementFrames(ref diveKickCooldown);
 		Helpers.decrementFrames(ref uppercutCooldown);
+		Helpers.decrementFrames(ref genmureiCooldown);
 		Helpers.decrementFrames(ref aiAttackCooldown);
+		Helpers.decrementFrames(ref tauntCooldown);
 		gigaAttack.update();
 		gigaAttack.charLinkedUpdate(this, true);
 		base.update();

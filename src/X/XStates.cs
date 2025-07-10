@@ -608,3 +608,24 @@ public class X3ChargeShot : CharState {
 		base.onExit(newState);
 	}
 }
+public class XTaunt : CharState {
+	public XTaunt() : base("win") {
+
+	}
+	public override void update() {
+		base.update();
+		if (stateTime >= 30f/60f && !Global.level.gameMode.playerWon(player)) {
+			character.changeToIdleOrFall();
+		}
+		if (!once) {
+			once = true;
+			character.playSound("ching", sendRpc: true);
+			new Anim(
+				character.pos.addxy(character.xDir * 4, -22f),
+				"zero_ching", -character.xDir,
+				player.getNextActorNetId(),
+				destroyOnEnd: true, sendRpc: true
+			);
+		}
+	}
+}

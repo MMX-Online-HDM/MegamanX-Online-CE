@@ -97,8 +97,8 @@ public class ZeroUppercut : CharState {
 	public void setStartupFrame(RisingType type) {
 		jumpFrame = type switch {
 			RisingType.Ryuenjin => 5,
-			RisingType.Denjin => 4,
-			RisingType.RisingFang => 5,
+			RisingType.Denjin => 6,
+			RisingType.RisingFang => 6,
 			_ => 4
 		};
 	}
@@ -157,7 +157,7 @@ public class ZeroUppercut : CharState {
 		if (wallAbove != null && wallAbove.gameObject is Wall) {
 			timeInWall += Global.spf;
 			if (timeInWall > 0.1f) {
-				character.changeState(character.getFallState());
+				character.changeState(character.getFallState(), true);
 				return;
 			}
 		}
@@ -177,7 +177,7 @@ public class ZeroUppercut : CharState {
 		}
 
 		if (character.isAnimOver()) {
-			character.changeState(character.getFallState());
+			character.changeState(character.getFallState(), true);
 		}
 	}
 
@@ -201,6 +201,5 @@ public class ZeroUppercut : CharState {
 
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
-		zero.airRisingUses++;	
 	}
 }

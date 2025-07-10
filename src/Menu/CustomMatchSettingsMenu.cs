@@ -33,7 +33,7 @@ public class CustomMatchSettings {
 	[ProtoMember(24)] public bool AxlBackwardsDebuff;
 	[ProtoMember(25)] public float AxlDodgerollCooldown;
 	[ProtoMember(26)] public bool AxlCustomReload;
-
+	[ProtoMember(26)] public bool AxlFTADodgeroll;
 
 
 	public CustomMatchSettings() {
@@ -69,6 +69,7 @@ public class CustomMatchSettings {
 			AxlBackwardsDebuff = true,
 			AxlDodgerollCooldown = 1.25f,
 			AxlCustomReload = false,
+			AxlFTADodgeroll = false,
 		};
 	}
 }
@@ -544,6 +545,22 @@ public class CustomMatchSettingsMenu : IMainMenu {
 			new MenuOption(
 				startX3, currentY3 += lineH3,
 				() => {
+					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.AxlFTADodgeroll, true);
+				},
+				(Point pos, int index) => {
+					Fonts.drawText(
+						FontType.Purple,
+						"Axl FTA Dodge Roll : " +
+						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.AxlFTADodgeroll),
+						pos.x, pos.y, selected: selectArrowPosY3 == 4
+					);
+				}
+			)
+		);
+		menuOptions3.Add(
+			new MenuOption(
+				startX3, currentY3 += lineH3,
+				() => {
 					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.AxlCustomReload, true);
 				},
 				(Point pos, int index) => {
@@ -551,7 +568,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 						FontType.Purple,
 						"Axl Weapons Capable to Reload: " +
 						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.AxlCustomReload),
-						pos.x, pos.y, selected: selectArrowPosY3 == 4
+						pos.x, pos.y, selected: selectArrowPosY3 == 5
 					);
 				}
 			)

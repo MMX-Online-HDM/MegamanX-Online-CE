@@ -34,7 +34,7 @@ public class BusterZeroMelee : BusterZeroState {
 
 	public override void update() {
 		base.update();
-		if (character.frameIndex >= 3 && !fired) {
+		if (character.frameIndex >= 5 && !fired) {
 			fired = true;
 			character.playSound("zerosaberx3", sendRpc: true);
 		}
@@ -344,3 +344,25 @@ public class HyperBusterZeroStart : BusterZeroState {
 		);
 	}
 }
+public class BZeroTaunt : CharState {
+	public BZeroTaunt() : base("win") {
+
+	}
+	public override void update() {
+		base.update();
+		if (character.isAnimOver() && !Global.level.gameMode.playerWon(player)) {
+			character.changeToIdleOrFall();
+		}
+		if (character.frameIndex == 1 && !once) {
+			once = true;
+			character.playSound("ching", sendRpc: true);
+			new Anim(
+				character.pos.addxy(character.xDir, -25f),
+				"zero_ching", -character.xDir,
+				player.getNextActorNetId(),
+				destroyOnEnd: true, sendRpc: true
+			);
+		}
+	}
+}
+
