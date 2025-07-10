@@ -39,6 +39,23 @@ public partial class Character : Actor, IDamagable {
 	public CharState charState;
 	public bool isDashing;
 
+	public CurrentState currentState {
+		get {
+			if (Global.currentState == _currentState) {
+				return _currentState;
+			}
+			return CurrentState.None;
+		}
+		set => _currentState = value;
+	}
+	private CurrentState _currentState;
+	public enum CurrentState { 
+		None,
+		PreUpdate,
+		Update,
+		PostUpdate
+	}
+
 	// Movement and charge.
 	public bool changedStateInFrame;
 	public bool pushedByTornadoInFrame;
@@ -1864,7 +1881,7 @@ public partial class Character : Actor, IDamagable {
 		changeState(idleState, true);
 	}
 
-	public virtual bool changeState(CharState newState, bool forceChange = false) {
+	public virtual bool changeState(CharState newState, bool forceChange = true) {
 		// Set the character as soon as posible.
 		newState.character = this;
 		newState.altCtrls = new bool[altCtrlsLength];
@@ -2151,7 +2168,8 @@ public partial class Character : Actor, IDamagable {
 			//);
 
 			Fonts.drawText(
-				FontType.Grey, player.name, textPosX, textPosY,
+				FontType.Grey, player.name + " " + charState.GetType().ToString().RemovePrefix("MMXOnline."),
+				textPosX, textPosY,
 				Alignment.Center, true, depth: ZIndex.HUD
 			);
 			if (ai != null) {

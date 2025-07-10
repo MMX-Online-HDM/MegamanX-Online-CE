@@ -28,7 +28,7 @@ public class HyperZeroStart : CharState {
 					if (virusAnim[i].destroyed) {
 						character.playSound("shingetsurinx5", true);
 						if (stateFrames > 55) {
-							virusAnim[i] = null!;
+							virusAnim[i] = null;
 							continue;
 						}
 						virusAnim[i] = virusAnim[i] = createVirusAnim();

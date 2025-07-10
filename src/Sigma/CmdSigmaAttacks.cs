@@ -9,17 +9,29 @@ public class SigmaSlashWeapon : Weapon {
 	}
 }
 
-public class SigmaSlashStateGround : CharState {
+public class CmdSigmaState : CharState {
+	public CmdSigma sigma = null!;
+
+	public CmdSigmaState(
+		string sprite, string shootSprite = "", string attackSprite = "",
+		string transitionSprite = "", string transShootSprite = ""
+	) : base(sprite, shootSprite, attackSprite, transitionSprite, transShootSprite
+	) {
+	}
+
+	public override void onEnter(CharState oldState) {
+		sigma = player.character as CmdSigma ?? throw new NullReferenceException();
+		base.onEnter(oldState);
+	}
+}
+
+public class SigmaSlashStateGround : CmdSigmaState {
 	bool fired;
-	public CmdSigma Sigma = null!;
+
 	public SigmaSlashStateGround() : base("attack") {
 		airMove = true;
 	}
 
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		Sigma = player.character as CmdSigma ?? throw new NullReferenceException();
-	}
 
 	public override void update() {
 		if (character.frameIndex >= 2 && !fired) {
@@ -28,7 +40,7 @@ public class SigmaSlashStateGround : CharState {
 			Point off = new Point(30, -20);
 			new SigmaSlashProj(
 				character.pos.addxy(off.x * character.xDir, off.y), character.xDir,
-				Sigma, player, player.getNextActorNetId(), 4, 26, rpc: true
+				sigma, player, player.getNextActorNetId(), 4, 26, rpc: true
 			);
 		}
 		if (character.isAnimOver()) {
@@ -37,20 +49,14 @@ public class SigmaSlashStateGround : CharState {
 		base.update();
 	}
 }
-public class SigmaSlashStateAir : CharState {
+public class SigmaSlashStateAir : CmdSigmaState {
 	bool fired;
-	public CmdSigma Sigma = null!;
 	public SigmaSlashStateAir() : base("attack_air") {
 		useDashJumpSpeed = true;
 		airMove = true;
 		canStopJump = true;
 		landSprite = "attack";
 		airSprite = "attack_air";
-	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		Sigma = player.character as CmdSigma ?? throw new NullReferenceException();
 	}
 
 	public override void update() {
@@ -60,7 +66,7 @@ public class SigmaSlashStateAir : CharState {
 			Point off = new Point(24, -22);
 			new SigmaSlashProj(
 				character.pos.addxy(off.x * character.xDir, off.y), character.xDir,
-				Sigma, player, player.getNextActorNetId(), 3, 13, rpc: true
+				sigma, player, player.getNextActorNetId(), 3, 13, rpc: true
 			);
 		}
 		if (character.isAnimOver()) {
@@ -70,18 +76,13 @@ public class SigmaSlashStateAir : CharState {
 	}
 }
 
-public class SigmaSlashStateDash : CharState {
+public class SigmaSlashStateDash : CmdSigmaState {
 	bool fired;
-	public CmdSigma Sigma = null!;
 	public SigmaSlashStateDash() : base("attack_dash") {
 		airMove = true;
 		canStopJump = true;
 	}
 
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		Sigma = player.character as CmdSigma ?? throw new NullReferenceException();
-	}
 
 	public override void update() {
 		if (character.frameIndex >= 2 && !fired) {
@@ -90,7 +91,7 @@ public class SigmaSlashStateDash : CharState {
 			Point off = new Point(26, -22);
 			new SigmaSlashProj(
 				character.pos.addxy(off.x * character.xDir, off.y), character.xDir,
-				Sigma, player, player.getNextActorNetId(), 4, 26, rpc: true
+				sigma, player, player.getNextActorNetId(), 4, 26, rpc: true
 			);
 		}
 		if (character.isAnimOver()) {
@@ -100,7 +101,7 @@ public class SigmaSlashStateDash : CharState {
 	}
 }
 /*
-public class SigmaSlashState : CharState {
+public class SigmaSlashState : CmdSigmaState {
 	CharState prevCharState;
 	int attackFrame = 2;
 	bool fired;
@@ -156,7 +157,7 @@ public class SigmaSlashProj : Projectile {
 		Point pos, int xDir, Actor owner, Player player, ushort? netId,
 		float damage = 6, int flinch = 26, bool rpc = false
 	) : base(
-		pos, xDir, owner, "sigma_proj_slash", netId, player	
+		pos, xDir, owner, "sigma_proj_slash", netId, player
 	) {
 		weapon = SigmaSlashWeapon.netWeapon;
 		damager.damage = damage;
@@ -201,7 +202,12 @@ public class SigmaBallWeapon : Weapon {
 	public static SigmaBallWeapon netWeapon = new();
 	public SigmaBallWeapon() : base() {
 		index = (int)WeaponIds.SigmaBall;
+		weaponBarBaseIndex = 50;
+		weaponBarIndex = 39;
 		killFeedIndex = 103;
+
+		maxAmmo = 20;
+		ammo = maxAmmo;
 	}
 }
 
@@ -210,7 +216,7 @@ public class SigmaBallProj : Projectile {
 		Point pos, int xDir, float byteAngle, Actor owner,
 		Player player, ushort? netId, bool rpc = false
 	) : base(
-		pos, xDir, owner, "sigma_proj_ball", netId, player	
+		pos, xDir, owner, "sigma_proj_ball", netId, player
 	) {
 		weapon = SigmaBallWeapon.netWeapon;
 		damager.damage = 2;
@@ -232,18 +238,15 @@ public class SigmaBallProj : Projectile {
 		);
 	}
 }
-public class SigmaBallShootEX : CharState {
-	public CmdSigma Sigma = null!;
+public class SigmaBallShootEX : CmdSigmaState {
 	public SigmaBallProj? SigmaBallsProjHead;
 	public Anim? anim;
 	public bool shoot;
 	public float angle;
+
 	public SigmaBallShootEX() : base("shoot") {
 	}
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		Sigma = player.character as CmdSigma ?? throw new NullReferenceException();
-	}
+
 	public override void update() {
 		character.turnToInput(player.input, player);
 		if (character.frameIndex >= 1 && !shoot) {
@@ -265,11 +268,11 @@ public class SigmaBallShootEX : CharState {
 	}
 	public void shootProjectiles() {
 		character.playSound("energyBall", sendRpc: true);
-		Point shootPos = Sigma.getFirstPOI() ?? Sigma.getCenterPos();
+		Point shootPos = sigma.getFirstPOI() ?? sigma.getCenterPos();
 		angleShoot();
 		SigmaBallsProjHead = new SigmaBallProj
 		(
-			shootPos, 1, angle, Sigma,
+			shootPos, 1, angle, sigma,
 			player, player.getNextActorNetId(), rpc: true
 		);
 		anim = new Anim(shootPos, "sigma_proj_ball_muzzle", character.xDir,
@@ -278,8 +281,8 @@ public class SigmaBallShootEX : CharState {
 	public void ammoReduction() {
 		player.sigmaAmmo -= 4;
 		if (player.sigmaAmmo < 0) player.sigmaAmmo = 0;
-		if (Sigma != null) {
-			Sigma.sigmaAmmoRechargeCooldown = Sigma.sigmaHeadBeamTimeBeforeRecharge;
+		if (sigma != null) {
+			sigma.sigmaAmmoRechargeCooldown = sigma.sigmaHeadBeamTimeBeforeRecharge;
 		}
 	}
 	public void angleShoot() {
@@ -303,9 +306,8 @@ public class SigmaBallShootEX : CharState {
 	}
 }
 /*
-public class SigmaBallShoot : CharState {
+public class SigmaBallShoot : CmdSigmaState {
 	bool shot;
-	public CmdSigma? Sigma = null!;
 
 	public SigmaBallShoot(string transitionSprite = "") : base("shoot", "", "", transitionSprite) {
 	}
@@ -354,7 +356,7 @@ public class SigmaBallShoot : CharState {
 
 			player.sigmaAmmo -= 4;
 			if (player.sigmaAmmo < 0) player.sigmaAmmo = 0;
-			Sigma.sigmaAmmoRechargeCooldown = Sigma.sigmaHeadBeamTimeBeforeRecharge;
+			sigma.sigmaAmmoRechargeCooldown = sigma.sigmaHeadBeamTimeBeforeRecharge;
 			character.playSound("energyBall", sendRpc: true);
 			/*
 			new SigmaBallProj(
@@ -375,18 +377,16 @@ public class SigmaBallShoot : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		Sigma = player.character as CmdSigma ?? throw new NullReferenceException();
 		character.vel = new Point();
 	}
 } */
 
 
-public class SigmaWallDashState : CharState {
-	bool fired;
-	int yDir;
-	Point vel;
-	bool fromGround;
-	public CmdSigma Sigma = null!;
+public class SigmaWallDashState : CmdSigmaState {
+	public bool fired;
+	public int yDir;
+	public Point vel;
+	public bool fromGround;
 
 	public SigmaWallDashState(int yDir, bool fromGround) : base("wall_dash") {
 		this.yDir = yDir;
@@ -397,7 +397,7 @@ public class SigmaWallDashState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		Sigma = player.character as CmdSigma ?? throw new NullReferenceException();
+
 		float xSpeed = 350;
 		if (!fromGround) {
 			character.xDir *= -1;
@@ -414,7 +414,7 @@ public class SigmaWallDashState : CharState {
 
 	public override void onExit(CharState? newState) {
 		character.useGravity = true;
-		Sigma.leapSlashCooldown = CmdSigma.maxLeapSlashCooldown;
+		sigma.leapSlashCooldown = CmdSigma.maxLeapSlashCooldown;
 		base.onExit(newState);
 	}
 
@@ -442,20 +442,20 @@ public class SigmaWallDashState : CharState {
 			character.changeState(character.getFallState(), true);
 		}
 		if (player.input.isPressed(Control.Shoot, player) &&
-			!fired && Sigma.saberCooldown == 0 && character.invulnTime == 0
+			!fired && sigma.saberCooldown == 0 && character.invulnTime == 0
 		) {
 			if (yDir == 0) {
 				character.changeState(new SigmaSlashStateDash());
 				return;
 			}
 			fired = true;
-			Sigma.saberCooldown = Sigma.sigmaSaberMaxCooldown;
+			sigma.saberCooldown = sigma.sigmaSaberMaxCooldown;
 			character.playSound("sigmaSaber", sendRpc: true);
 			character.changeSpriteFromName("wall_dash_attack", true);
 			Point off = new Point(30, -20);
 			new SigmaSlashProj(
-				character.pos.addxy(off.x * character.xDir, off.y), character.xDir, 
-				Sigma, player, player.getNextActorNetId(), damage: 4, rpc: true
+				character.pos.addxy(off.x * character.xDir, off.y), character.xDir,
+				sigma, player, player.getNextActorNetId(), damage: 4, rpc: true
 			);
 		}
 	}

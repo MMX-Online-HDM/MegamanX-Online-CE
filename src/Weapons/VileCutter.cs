@@ -82,8 +82,7 @@ public class VileCutter : Weapon {
 	}
 }
 
-public class CutterAttackState : CharState {
-	Vile vile = null!;
+public class CutterAttackState : VileState {
 	public CutterAttackState(bool grounded) : base(getSprite(grounded)) {
 		useDashJumpSpeed = true;
 		airMove = true;
@@ -135,7 +134,6 @@ public class CutterAttackState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		vile = player.character as Vile ?? throw new NullReferenceException();
 		if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
 			exitOnAirborne = true;
 		}

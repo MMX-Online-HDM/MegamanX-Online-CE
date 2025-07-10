@@ -16,6 +16,7 @@ public class BaseSigma : Character {
 	public long framesSinceLastAttack = 1000;
 	public bool isTrueAI;
 	public bool tempAiSummoner;
+
 	public SigmaLoadout loadout;
 	public MaverickAIBehavior currentMaverickCommand;
 	public bool summonerAttackModeActive;

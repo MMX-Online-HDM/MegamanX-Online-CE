@@ -346,6 +346,16 @@ public class SigmaLoadout {
 		}).ToList();
 	}*/
 
+
+	public static SigmaLoadout createDefault() {
+		return new SigmaLoadout() {
+			maverick1 = 8,
+			maverick2 = 17,
+			sigmaForm = 0,
+			commandMode = 0
+		};
+	}
+
 	public static SigmaLoadout createRandom() {
 		List<int> weaponPool = new List<int>();
 		for (int i = (int)WeaponIds.ChillPenguin; i <= (int)WeaponIds.DrDoppler; i++) {

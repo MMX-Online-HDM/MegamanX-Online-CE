@@ -161,11 +161,24 @@ public class SigmaElectricBallState : CharState {
 	}
 }
 
-public class SigmaElectricBall2Weapon : Weapon {
-	public static SigmaElectricBall2Weapon netWeapon = new();
-	public SigmaElectricBall2Weapon() : base() {
+public class NeoSigmaGigaAttackWeapon : Weapon {
+	public static NeoSigmaGigaAttackWeapon netWeapon = new();
+	public NeoSigmaGigaAttackWeapon() : base() {
 		index = (int)WeaponIds.Sigma2Ball2;
+		weaponBarBaseIndex = 51;
+		weaponBarIndex = 40;
 		killFeedIndex = 135;
+
+		allowSmallBar = false;
+		drawGrayOnLowAmmo = true;
+		drawRoundedDown = true;
+
+		maxAmmo = 28;
+		ammo = 0;
+	}
+
+	public override float getAmmoUsage(int chargeLevel) {
+		return 28;
 	}
 }
 
@@ -175,7 +188,7 @@ public class SigmaElectricBall2Proj : Projectile {
 	) : base(
 		pos, xDir, owner, "sigma2_ball2", netId, player
 	) {
-		weapon = SigmaElectricBall2Weapon.netWeapon;
+		weapon = NeoSigmaGigaAttackWeapon.netWeapon;
 		damager.damage = 6;
 		damager.flinch = Global.defFlinch;
 		damager.hitCooldown = 12;

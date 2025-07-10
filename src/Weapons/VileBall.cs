@@ -299,10 +299,10 @@ public class PeaceOutRollerSplitProj : Projectile {
 	}
 }
 
-public class AirBombAttack : CharState {
+public class AirBombAttack : VileState {
 	int bombNum;
 	bool isNapalm;
-	Vile vile = null!;
+
 	public AirBombAttack(bool isNapalm, string transitionSprite = "") : base("air_bomb_attack", "", "", transitionSprite) {
 		this.isNapalm = isNapalm;
 		useDashJumpSpeed = true;
@@ -377,7 +377,6 @@ public class AirBombAttack : CharState {
 		base.onEnter(oldState);
 		character.useGravity = false;
 		character.vel = new Point();
-		vile = character as Vile ?? throw new NullReferenceException();
 	}
 
 	public override void onExit(CharState? newState) {

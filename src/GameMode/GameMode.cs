@@ -1513,13 +1513,13 @@ public class GameMode {
 		// This runs once per character.
 		Weapon? weapon = player.lastHudWeapon;
 		if (player.character != null) {
-			weapon = player.weapon;
-			if (player.character is Zero zero) {
-				weapon = zero.gigaAttack;
-			}
-			if (player.character is PunchyZero punchyZero) {
-				weapon = punchyZero.gigaAttack;
-			}
+			weapon = player.character switch {
+				Zero zero => zero.gigaAttack,
+				CmdSigma sigma => sigma.ballWeapon,
+				NeoSigma neoSigma => neoSigma.gigaAttack,
+				PunchyZero punchyZero => punchyZero.gigaAttack,
+				_ => player.character?.currentWeapon ?? player.weapon,
+			};
 			player.lastHudWeapon = weapon;
 		}
 		// Small Bars option.

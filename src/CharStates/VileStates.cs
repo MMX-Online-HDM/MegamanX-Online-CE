@@ -3,10 +3,25 @@ using SFML.Graphics;
 
 namespace MMXOnline;
 
-public class CallDownMech : CharState {
-	Vile vile = null!;
-	RideArmor rideArmor;
-	bool isNew;
+public class VileState : CharState {
+	public Vile vile = null!;
+
+	public VileState(
+		string sprite, string shootSprite = "", string attackSprite = "",
+		string transitionSprite = "", string transShootSprite = ""
+	) : base(
+		sprite, shootSprite, attackSprite, transitionSprite, transShootSprite
+	) {
+	}
+	
+	public override void onEnter(CharState oldState) {
+		vile = character as Vile ?? throw new NullReferenceException();
+	}
+}
+
+public class CallDownMech : VileState {
+	public RideArmor rideArmor;
+	public bool isNew;
 
 	public CallDownMech(RideArmor rideArmor, bool isNew, string transitionSprite = "") : base("call_down_mech", "", "", transitionSprite) {
 		this.rideArmor = rideArmor;
@@ -45,15 +60,13 @@ public class CallDownMech : CharState {
 		base.onEnter(oldState);
 		rideArmor.changeState(new RACalldown(character.pos, isNew), true);
 		rideArmor.xDir = character.xDir;
-		vile = character as Vile ?? throw new NullReferenceException();
 	}
 }
 
-public class VileRevive : CharState {
+public class VileRevive : VileState {
 	public float radius = 200;
-	Anim? drDopplerAnim;
-	bool isMK5;
-	public Vile vile = null!;
+	public Anim? drDopplerAnim;
+	public bool isMK5;
 
 	public VileRevive(bool isMK5) : base(isMK5 ? "revive_to5" : "revive") {
 		invincible = true;
@@ -103,7 +116,6 @@ public class VileRevive : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		vile = character as Vile ?? throw new NullReferenceException();
 		//character.setzIndex(ZIndex.Foreground);
 		character.playSound("revive");
 		character.addMusicSource("demo_X3", character.getCenterPos(), false, loop: false);
@@ -142,13 +154,12 @@ public class VileRevive : CharState {
 	}
 }
 
-public class VileHover : CharState {
+public class VileHover : VileState {
 	public SoundWrapper? soundh;
 	public Point flyVel;
 	float flyVelAcc = 500;
 	float flyVelMaxSpeed = 200;
 	public float fallY;
-	Vile vile = null!;
 
 	public VileHover(string transitionSprite = "") : base("hover", "hover_shoot", transitionSprite) {
 		exitOnLanding = true;
@@ -248,7 +259,6 @@ public class VileHover : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		vile = character as Vile ?? throw new NullReferenceException();
 		character.useGravity = false;
 		if (vile.hasSpeedDevil) {
 			flyVelMaxSpeed *= 1.1f;

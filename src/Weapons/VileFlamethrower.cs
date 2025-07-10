@@ -145,12 +145,11 @@ public class DragonsWrath : VileFlamethrower {
 	}
 }
 
-public class FlamethrowerState : CharState {
+public class FlamethrowerState : VileState {
 	bool isGrounded;
 	public float shootTime;
 	public Point shootPOI = new Point(-1, -1);
 	public Point groundShotPOI = new Point(12, -11);
-	Vile vile = null!;
 
 	public FlamethrowerState() : base("flamethrower") {
 		useGravity = false;
@@ -202,7 +201,6 @@ public class FlamethrowerState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		vile = character as Vile ?? throw new NullReferenceException();
 		character.stopMovingWeak();
 		if (character.grounded && character.vel.y >= 0) {
 			character.changeSpriteFromName("crouch_flamethrower", true);

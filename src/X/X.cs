@@ -340,6 +340,12 @@ public class MegamanX : Character {
 	}
 
 	public override bool attackCtrl() {
+		if (player.input.isPressed(Control.Special1, player) && helmetArmor == ArmorId.Giga &&
+			itemTracer.shootCooldown == 0
+		) {
+			itemTracer.shoot(this, [0, hyperHelmetArmor == ArmorId.Giga ? 1 : 0]);
+			itemTracer.shootCooldown = itemTracer.fireRate;
+		}
 		if (stockedSaber && player.input.isPressed(Control.Special1, player)) {
 			changeState(new XMaxWaveSaberState(), true);
 			return true;
@@ -355,12 +361,6 @@ public class MegamanX : Character {
 				shoot(0, specialBuster, false);
 				return true;
 			}
-		}
-		if (player.input.isPressed(Control.Special1, player) && helmetArmor == ArmorId.Giga &&
-			itemTracer.shootCooldown == 0
-		) {
-			itemTracer.shoot(this, [0, hyperHelmetArmor == ArmorId.Giga ? 1 : 0]);
-			itemTracer.shootCooldown = itemTracer.fireRate;
 		}
 		if (gigaAttackSpecialOption()) {
 			return true;
@@ -478,7 +478,7 @@ public class MegamanX : Character {
 			stockedSaber = true;
 		}
 		// Changes to shoot animation and gets sound.
-		if (chargeLevel < 3 || !weapon.hasCustomChargeAnim) {
+		if (!useCrossShotAnim && (chargeLevel < 3 || !weapon.hasCustomChargeAnim)) {
 			setShootAnim();
 			shootAnimTime = DefaultShootAnimTime;
 		}
@@ -936,7 +936,7 @@ public class MegamanX : Character {
 		base.onFlinchOrStun(newState);
 	}
 
-	public override bool changeState(CharState newState, bool forceChange = false) {
+	public override bool changeState(CharState newState, bool forceChange = true) {
 		bool hasChanged = base.changeState(newState, forceChange);
 		if (!hasChanged || !ownedByLocalPlayer) {
 			return hasChanged;

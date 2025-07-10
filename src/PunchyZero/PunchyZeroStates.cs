@@ -4,9 +4,23 @@ using SFML.Graphics;
 
 namespace MMXOnline;
 
-public abstract class PZeroGenericMeleeState : CharState {
+public abstract class PZeroState : CharState {
 	public PunchyZero zero = null!;
 
+	protected PZeroState(
+		string sprite, string shootSprite = "", string attackSprite = "",
+		string transitionSprite = "", string transShootSprite = ""
+	) : base(
+		sprite, shootSprite, attackSprite, transitionSprite, transShootSprite
+	) {
+	}
+
+	public override void onEnter(CharState oldState) {
+		zero = character as PunchyZero ?? throw new NullReferenceException();
+	}
+}
+
+public abstract class PZeroGenericMeleeState : PZeroState {
 	public float projMaxTime;
 	public int projId;
 	public int comboFrame = Int32.MaxValue;
@@ -35,7 +49,6 @@ public abstract class PZeroGenericMeleeState : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.turnToInput(player.input, player);
-		zero = character as PunchyZero ?? throw new NullReferenceException();
 	}
 
 	public virtual bool altCtrlUpdate(bool[] ctrls) {
@@ -150,10 +163,9 @@ public class PZeroSpinKick : CharState {
 	}
 }
 
-public class PZeroDiveKickState : CharState {
+public class PZeroDiveKickState : PZeroState {
 	float stuckTime;
 	float diveTime;
-	PunchyZero zero = null!;
 
 	public PZeroDiveKickState() : base("dropkick") {
 	}
@@ -195,7 +207,6 @@ public class PZeroDiveKickState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		zero = character as PunchyZero ?? throw new NullReferenceException();
 		character.stopMovingWeak();
 		character.useGravity = false;
 	}
@@ -227,9 +238,7 @@ public class ZeroDropkickLand : CharState {
 	}
 }
 
-public class PZeroParry : CharState {
-	PunchyZero zero = null!;
-
+public class PZeroParry : PZeroState {
 	public PZeroParry() : base("parry_start") {
 		superArmor = true;
 		specialId = SpecialStateIds.PZeroParry;
@@ -273,11 +282,6 @@ public class PZeroParry : CharState {
 			character.playSound("zeroParry2", forcePlay: false, sendRpc: true);
 		}
 		character.changeState(new PZeroParryCounter(counterAttackTarget, isMelee), true);
-	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		zero = character as PunchyZero ?? throw new NullReferenceException();
 	}
 
 	public override void onExit(CharState? newState) {
@@ -379,10 +383,9 @@ public class PZeroParryCounter : CharState {
 }
 
 
-public class PZeroShoryuken : CharState {
+public class PZeroShoryuken : PZeroState {
 	bool jumpedYet;
 	float timeInWall;
-	public PunchyZero zero = null!;
 
 	public PZeroShoryuken() : base("shoryuken") {
 	}
@@ -438,14 +441,12 @@ public class PZeroShoryuken : CharState {
 		if (!character.grounded) {
 			character.sprite.frameIndex = 3;
 		}
-		zero = character as PunchyZero ?? throw new NullReferenceException();
 	}
 }
 
-public class HyperPunchyZeroStart : CharState {
+public class HyperPunchyZeroStart : PZeroState {
 	public float radius = 200;
 	public float time;
-	PunchyZero zero = null!;
 	Anim? virusEffectParts;
 	Anim[] virusAnim = new Anim[3];
 	float[] delayedVirusTimer = {0, 7, 14};
@@ -510,7 +511,6 @@ public class HyperPunchyZeroStart : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		zero = character as PunchyZero ?? throw new NullReferenceException();
 		character.useGravity = false;
 		character.vel = new Point();
 		if (zero == null) {
@@ -919,9 +919,8 @@ public class PunchyZeroDarkHoldShootState : PunchyZeroGigaAttack {
 		}
 	}
 }
-public class AwakenedPunchyZeroHadangeki : CharState {
+public class AwakenedPunchyZeroHadangeki : PZeroState {
 	bool fired;
-	public PunchyZero zero = null!;
 	public AwakenedPunchyZeroHadangeki() : base("projswing") {
 		landSprite = "projswing";
 		airSprite = "projswing_air";
@@ -970,9 +969,8 @@ public class AwakenedPunchyZeroHadangeki : CharState {
 		}
 	}
 }
-public class PunchyZeroGenmureiState : CharState {
+public class PunchyZeroGenmureiState : PZeroState {
 	bool fired;
-	public PunchyZero zero = null!;
 	public PunchyZeroGenmureiState() : base("genmu") { }
 
 	public override void update() {

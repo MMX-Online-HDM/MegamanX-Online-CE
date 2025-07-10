@@ -1029,13 +1029,15 @@ public partial class Player {
 			return [
 				(byte)loadout.axlLoadout.weapon2,
 				(byte)loadout.axlLoadout.weapon3,
+				(byte)loadout.axlLoadout.hyperMode
 			];
 		}
 		if (charNum == (int)CharIds.Sigma) {
 			return [
 				(byte)loadout.sigmaLoadout.sigmaForm,
 				(byte)loadout.sigmaLoadout.maverick1,
-				(byte)loadout.sigmaLoadout.maverick2
+				(byte)loadout.sigmaLoadout.maverick2,
+				(byte)loadout.sigmaLoadout.commandMode
 			];
 		}
 		return [];
@@ -1054,7 +1056,9 @@ public partial class Player {
 			alliance = newAlliance;
 		}
 
-		if (forceSpawn || isMainChar && character != null && charNetId == character.netId) {
+		// Skip if a is a main character and it already exists.
+		// Or if we are creating a character with the same netId as the current one.
+		if (!forceSpawn && isMainChar && character != null || charNetId == character?.netId) {
 			return null;
 		}
 
@@ -1138,6 +1142,8 @@ public partial class Player {
 			loadout.sigmaLoadout.sigmaForm = extraData[0];
 			loadout.sigmaLoadout.maverick1 = extraData[1];
 			loadout.sigmaLoadout.maverick2 = extraData[2];
+			loadout.sigmaLoadout.commandMode = extraData[3];
+
 			if (sigmaForm == 0) {
 				sigmaMaxAmmo = 20;
 				sigmaAmmo = sigmaMaxAmmo;
