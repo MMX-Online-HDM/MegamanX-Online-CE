@@ -393,22 +393,6 @@ public class BaseSigma : Character {
 		}
 		Helpers.decrementTime(ref noBlockTime);
 
-		if (player.sigmaAmmo >= player.sigmaMaxAmmo) {
-			weaponHealAmount = 0;
-		}
-		if (weaponHealAmount > 0 && player.health > 0) {
-			weaponHealTime += Global.spf;
-			if (weaponHealTime > 0.05) {
-				weaponHealTime = 0;
-				weaponHealAmount--;
-				player.sigmaAmmo = Helpers.clampMax(player.sigmaAmmo + 1, player.sigmaMaxAmmo);
-				if (this is CmdSigma) {
-					playSound("heal", forcePlay: true);
-				} else {
-					playSound("healX3", forcePlay: true);
-				}
-			}
-		}
 		if (player.maverick1v1 != null && player.readyTextOver &&
 			!player.maverick1v1Spawned && player.respawnTime <= 0 && player.weapons.Count > 0
 		) {

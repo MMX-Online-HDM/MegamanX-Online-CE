@@ -72,8 +72,8 @@ public class DevConsole {
 	}
 
 	public static void setHealth(string[] args) {
-		if (Global.level.mainPlayer.currentMaverick != null) {
-			Global.level.mainPlayer.currentMaverick.health = int.Parse(args[0]);
+		if (Global.level.mainPlayer.character?.currentMaverick != null) {
+			Global.level.mainPlayer.character.currentMaverick.health = int.Parse(args[0]);
 		}
 		Global.level.mainPlayer.health = int.Parse(args[0]);
 	}

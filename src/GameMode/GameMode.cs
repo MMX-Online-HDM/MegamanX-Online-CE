@@ -967,12 +967,12 @@ public class GameMode {
 		if (level.mainPlayer.isAxl && level.boundBlasterAltProjs.Any(b => b.state == 1)) {
 			return true;
 		}
-		if (level.mainPlayer.isSigma && level.mainPlayer.currentMaverick != null) {
+		if (level.mainPlayer.currentMaverick != null) {
 			if (level.mainPlayer.currentMaverick.controlMode is MaverickMode.Puppeteer or MaverickMode.Summoner) {
 				return level.mainPlayer.mavericks.Count > 0;
 			}
 		}
-		if (level.mainPlayer.isSigma && level.mainPlayer.currentMaverick != null) {
+		if (level.mainPlayer.currentMaverick != null) {
 			if (level.mainPlayer.currentMaverick.controlMode == MaverickMode.Puppeteer) {
 				return level.mainPlayer.health > 0;
 			}
@@ -1367,7 +1367,6 @@ public class GameMode {
 				greyHp = (float)rmx.lastChipBaseHP;
 			}
 		}
-
 
 		int frameIndex = player.charNum;
 		if (player.charNum == (int)CharIds.PunchyZero) {
