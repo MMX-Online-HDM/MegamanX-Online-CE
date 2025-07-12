@@ -74,7 +74,7 @@ public class DanchienWeapon : Weapon {
 	}
 }
 
-public class ZeroDownthrust : CharState {
+public class ZeroDownthrust : ZeroState {
 	public ZeroDownthrustType type;
 	public int quakeBlazerBounces;
 

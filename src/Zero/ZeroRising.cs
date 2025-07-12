@@ -73,7 +73,7 @@ public class RisingFangWeapon : Weapon {
 	}
 }
 
-public class ZeroUppercut : CharState {
+public class ZeroUppercut : ZeroState {
 	bool jumpedYet;
 	float timeInWall;
 	bool isUnderwater;
@@ -197,6 +197,7 @@ public class ZeroUppercut : CharState {
 		if (!character.grounded && type == RisingType.RisingFang) {
 			character.sprite.frameIndex = 4;
 		}
+		zero.airRisingUses++;
 	}
 
 	public override void onExit(CharState? newState) {
