@@ -44,16 +44,16 @@ public class PreLoadoutMenu : IMainMenu {
 				Menu.change(new SelectZeroWeaponMenu(this, false));
 			}
 			if (selectY == 2) {
-				Menu.change(new SelectVileWeaponMenu(this, false));
+				Menu.change(new SelectPunchyZeroWeaponMenu(this, false));
 			}
 			if (selectY == 3) {
-				Menu.change(new SelectAxlWeaponMenu(this, false));
+				Menu.change(new SelectVileWeaponMenu(this, false));
 			}
 			if (selectY == 4) {
-				Menu.change(new SelectSigmaWeaponMenu(this, false));
+				Menu.change(new SelectAxlWeaponMenu(this, false));
 			}
-			if (selectY == (int)CharIds.PunchyZero) {
-				Menu.change(new SelectPunchyZeroWeaponMenu(this, false));
+			if (selectY == 5) {
+				Menu.change(new SelectSigmaWeaponMenu(this, false));
 			}
 		}
 		if (Options.main.blackFade) {
@@ -85,10 +85,10 @@ public class PreLoadoutMenu : IMainMenu {
 
 		Fonts.drawText(FontType.DarkBlue, "X Loadout", startX, optionPos[0], selected: selectY == 0);
 		Fonts.drawText(FontType.DarkBlue, "Zero Loadout", startX, optionPos[1], selected: selectY == 1);
-		Fonts.drawText(FontType.DarkBlue, "Vile Loadout", startX, optionPos[2], selected: selectY == 2);
-		Fonts.drawText(FontType.DarkBlue, "Axl Loadout", startX, optionPos[3], selected: selectY == 3);
-		Fonts.drawText(FontType.DarkBlue, "Sigma Loadout", startX, optionPos[4], selected: selectY == 4);
-		Fonts.drawText(FontType.DarkBlue, "KZero Loadout", startX, optionPos[5], selected: selectY == 5);
+		Fonts.drawText(FontType.DarkBlue, "K.Zero Loadout", startX, optionPos[2], selected: selectY == 2);
+		Fonts.drawText(FontType.DarkBlue, "Vile Loadout", startX, optionPos[3], selected: selectY == 3);
+		Fonts.drawText(FontType.DarkBlue, "Axl Loadout", startX, optionPos[4], selected: selectY == 4);
+		Fonts.drawText(FontType.DarkBlue, "Sigma Loadout", startX, optionPos[5], selected: selectY == 5);
 
 		Fonts.drawTextEX(FontType.Grey, "[OK]: Choose, [BACK]: Back", Global.halfScreenW, 200, Alignment.Center);
 		if (Options.main.blackFade) {
