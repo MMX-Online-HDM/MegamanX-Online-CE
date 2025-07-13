@@ -733,6 +733,22 @@ public class GameMode {
 					drawGigaWeaponCooldown(102, cooldown);
 				}
 			}
+			if (drawPlayer.character is Vile vilePilot &&
+			vilePilot.rideArmor != null &&
+			vilePilot.rideArmor == vilePilot.linkedRideArmor
+			&& vilePilot.rideArmor.raNum == 2
+			) {
+				int x = 13, y = 155;
+				int napalmNum = drawPlayer.loadout.vileLoadout.napalm;
+				if (napalmNum < 0) napalmNum = 0;
+				if (napalmNum > 2) napalmNum = 0;
+				Global.sprites["hud_hawk_bombs"].drawToHUD(
+					napalmNum, x, y, alpha: vilePilot.napalmWeapon.shootCooldown == 0 ? 1 : 0.5f
+				);
+				Fonts.drawText(
+					FontType.Grey, "x" + vilePilot.rideArmor.hawkBombCount.ToString(), x + 10, y - 4
+				);
+			}
 			if (drawPlayer.weapons == null) {
 				return;
 			}
@@ -1829,22 +1845,6 @@ public class GameMode {
 			drawRideArmorIcons();
 		}
 
-		if (player.character is Vile vilePilot &&
-			vilePilot.rideArmor != null &&
-			vilePilot.rideArmor == vilePilot.linkedRideArmor
-			&& vilePilot.rideArmor.raNum == 2
-		) {
-			int x = 10, y = 155;
-			int napalmNum = player.loadout.vileLoadout.napalm;
-			if (napalmNum < 0) napalmNum = 0;
-			if (napalmNum > 2) napalmNum = 0;
-			Global.sprites["hud_hawk_bombs"].drawToHUD(
-				napalmNum, x, y, alpha: vilePilot.napalmWeapon.shootCooldown == 0 ? 1 : 0.5f
-			);
-			Fonts.drawText(
-				FontType.Grey, "x" + vilePilot.rideArmor.hawkBombCount.ToString(), x + 10, y - 4
-			);
-		}
 
 		if (player.character?.rideArmor != null || player.character?.rideChaser != null) {
 			return;
