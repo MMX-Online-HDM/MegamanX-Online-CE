@@ -202,6 +202,8 @@ public class FlamethrowerState : VileState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.stopMovingWeak();
+		character.useGravity = false;
+		character.vel = new Point();
 		if (character.grounded && character.vel.y >= 0) {
 			character.changeSpriteFromName("crouch_flamethrower", true);
 			isGrounded = true;
