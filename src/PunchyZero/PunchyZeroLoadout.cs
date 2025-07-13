@@ -22,19 +22,19 @@ public class SelectPunchyZeroWeaponMenu : IMainMenu {
 	// Menu controls.
 	public IMainMenu prevMenu;
 	public int cursorRow;
-	bool inGame;
+	readonly bool inGame;
 
 	// Loadout items.
 	public int gigaAttack;
 	public int hyperMode;
 
 	public int[][] weaponIcons = {
-		new int[] {51, 64, 63},
-		new int[] {118, 118, 122}
+		[51, 64, 63],
+		[118, 118, 122]
 	};
 	public int[][] weaponIconsL2 = {
-		new int[] {-1, -1, -1},
-		new int[] {125, 86, -1}
+		[-1, -1, -1],
+		[125, 86, -1]
 	};
 
 	public SelectPunchyZeroWeaponMenu(IMainMenu prevMenu, bool inGame) {
@@ -123,10 +123,11 @@ public class SelectPunchyZeroWeaponMenu : IMainMenu {
 			}
 		}
 
-		string menuTitle = "";
-		string weaponTitle = "";
-		string weaponDescription = "";
-		string weaponSubDescription = "";
+		string menuTitle;
+		string weaponTitle;
+		string weaponDescription;
+		string weaponSubDescription;
+
 		if (cursorRow == 0) {
 			menuTitle = "Giga Attack";
 			weaponTitle = gigaAttack switch {
@@ -142,9 +143,9 @@ public class SelectPunchyZeroWeaponMenu : IMainMenu {
 				_ => "ERROR"
 			};
 			weaponSubDescription = gigaAttack switch {
-				0 => "Ammo use: 16",
-				1 => "Ammo use: 8",
-				2 => "Ammo use: 32",
+				0 => "Ammo use: 14",
+				1 => "Ammo use: 7",
+				2 => "Ammo use: 28",
 				_ => "ERROR"
 			};
 		} else {
