@@ -1496,7 +1496,6 @@ public class GameMode {
 
 	public bool shouldDrawWeaponAmmo(Player player, Weapon weapon) {
 		if (weapon == null) return false;
-		if (weapon.weaponSlotIndex == 0) return false;
 		if (!weapon.drawAmmo) return false;
 		if (weapon is HyperNovaStrike && level.isHyper1v1()) return false;
 
@@ -1514,6 +1513,7 @@ public class GameMode {
 		if (player.character != null) {
 			weapon = player.character switch {
 				Zero zero => zero.gigaAttack,
+				Vile vile => vile.energy,
 				CmdSigma sigma => sigma.ballWeapon,
 				NeoSigma neoSigma => neoSigma.gigaAttack,
 				PunchyZero punchyZero => punchyZero.gigaAttack,
@@ -1550,22 +1550,6 @@ public class GameMode {
 					currentMaverick.maxAmmo
 				);
 			}
-			return;
-		}
-
-		if (player.character is Vile) {
-			baseY += 25;
-			Global.sprites["hud_weapon_base"].drawToHUD(39, baseX, baseY);
-			baseY -= 16;
-			for (var i = 0; i < MathF.Ceiling(player.vileMaxAmmo * ammoDisplayMultiplier); i++) {
-				if (i < Math.Ceiling(player.vileAmmo * ammoDisplayMultiplier)) {
-					Global.sprites["hud_weapon_full"].drawToHUD(32, baseX, baseY);
-				} else {
-					Global.sprites["hud_health_empty"].drawToHUD(0, baseX, baseY);
-				}
-				baseY -= 2;
-			}
-			Global.sprites["hud_health_top"].drawToHUD(0, baseX, baseY);
 			return;
 		}
 

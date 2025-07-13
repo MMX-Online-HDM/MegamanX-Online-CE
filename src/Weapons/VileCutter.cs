@@ -268,7 +268,7 @@ public class VileQuickHomesick : Projectile {
 				pickup.changePos(character.getCenterPos());
 			}
 			destroySelf();
-			character.player.vileAmmo = Helpers.clampMax(character.player.vileAmmo + 8, character.player.vileMaxAmmo);
+			character.addAmmo(8);
 		}
 	}
 	public override void onDestroy() {

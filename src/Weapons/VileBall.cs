@@ -89,7 +89,7 @@ public class VileBall : Weapon {
 
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
 		if (shootCooldown > 0) return;
-		if (vile.player.vileAmmo < 8) return;
+		if (vile.energy.ammo < 8) return;
 		if (vile.grenadeWeapon.type == (int)VileBallType.None) return;
 		if (vile.grenadeWeapon.type != (int)VileBallType.NoneNapalm && vile.grenadeWeapon.type != (int)VileBallType.NoneFlamethrower) {
 			if (vile.tryUseVileAmmo(vileAmmoUsage)) {
@@ -393,7 +393,7 @@ public class AirBombAttack : VileState {
 		}
 	}
 	public override bool canEnter(Character character) {
-		if (player.vileAmmo < 8) return false;
+		if (vile.energy.ammo < 8) return false;
 		return base.canEnter(character);
 	}
 }

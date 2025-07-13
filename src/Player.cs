@@ -15,7 +15,6 @@ public partial class Player {
 	public Character? character;
 	public Character lastCharacter;
 	public bool ownedByLocalPlayer;
-	public int? awakenedCurrencyEnd;
 	public float hadoukenAmmo = 1920;
 	public float shoryukenAmmo = 1920;
 	public float fgMoveMaxAmmo = 1920;
@@ -101,7 +100,6 @@ public partial class Player {
 	public bool lastDeathWasVileMK2;
 	public bool lastDeathWasVileV;
 	public bool lastDeathWasSigmaHyper;
-	public bool lastDeathWasXHyper;
 	public const int zeroHyperCost = 10;
 	public const int zBusterZeroHyperCost = 8;
 	public const int AxlHyperCost = 10;
@@ -434,8 +432,6 @@ public partial class Player {
 
 	public int hyperChargeSlot;
 	public int xArmor1v1;
-	public float vileAmmo = 32;
-	public float vileMaxAmmo = 32;
 	public int? maverick1v1;
 	public bool maverick1v1Spawned;
 

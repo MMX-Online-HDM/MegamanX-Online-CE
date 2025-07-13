@@ -39,11 +39,11 @@ public class HexaInvoluteState : VileState {
 			Helpers.decrementTime(ref ammoTime);
 			if (ammoTime == 0) {
 				ammoTime = 0.125f;
-				player.vileAmmo--;
+				vile.addAmmo(-1);
 			}
 		}
 
-		if (player.vileAmmo <= 0 || (player.input.isPressed(Control.Special1, player) && stateTime > 1)) {
+		if (vile.energy.ammo <= 0 || (player.input.isPressed(Control.Special1, player) && stateTime > 1)) {
 			character.changeToIdleOrFall();
 		}
 	}

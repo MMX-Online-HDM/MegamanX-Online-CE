@@ -889,25 +889,6 @@ public class OptionsMenu : IMainMenu {
 					},
 					"You can swap the inputs for\nGoliath buster and missiles."
 				),
-				// Block ride armor scroll
-				new MenuOption(
-					30, startY,
-					() => {
-						Helpers.menuLeftRightBool(ref Options.main.blockMechSlotScroll);
-					},
-					(Point pos, int index) => {
-						Fonts.drawText(
-							optionFontText, "Block mech scroll:",
- 							pos.x, pos.y, selected: selectedArrowPosY == index
-						);
-						Fonts.drawText(
-							optionFontValue, Helpers.boolYesNo(Options.main.blockMechSlotScroll),
-							pos.x + 166, pos.y, selected: selectedArrowPosY == index
-						);
-					},
-					"Prevents ability to scroll to the Ride Armor slot.\n" +
-					"You will only be able to switch to it by pressing 3."
-				),
 				// Weapon Ordering
 				new MenuOption(
 					30, startY,

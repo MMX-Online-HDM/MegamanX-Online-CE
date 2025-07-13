@@ -92,8 +92,7 @@ public class VileCannon : Weapon {
 		if (isLongshotGizmo && vile.longshotGizmoCount > 0) {
 			vile.usedAmmoLastFrame = true;
 			if (vile.weaponHealAmount == 0) {
-				player.vileAmmo -= vileAmmoUsage;
-				if (player.vileAmmo < 0) player.vileAmmo = 0;
+				vile.addAmmo(-vileAmmoUsage);
 			}
 		} else if (!vile.tryUseVileAmmo(overrideAmmoUsage)) return;
 
@@ -131,7 +130,7 @@ public class VileCannon : Weapon {
 
 		if (isLongshotGizmo) {
 			vile.longshotGizmoCount++;
-			if (vile.longshotGizmoCount >= 5 || player.vileAmmo <= 3) {
+			if (vile.longshotGizmoCount >= 5 || vile.energy.ammo <= 3) {
 				vile.longshotGizmoCount = 0;
 				vile.isShootingLongshotGizmo = false;
 			}
@@ -221,7 +220,7 @@ public class CannonAttack : VileState {
 			if (vile.cannonWeapon.shootCooldown == 0) {
 				vile.cannonWeapon.vileShoot(0, vile);
 			}
-			if (player.vileAmmo <= 0) {
+			if (vile.energy.ammo <= 0) {
 				vile.isShootingLongshotGizmo = false;
 			}
 			return;

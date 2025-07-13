@@ -62,14 +62,6 @@ public partial class Player {
 
 	public Maverick? currentMaverick => character?.currentMaverick;
 
-	public bool shouldBlockMechSlotScroll() {
-		if (character is Vile { isVileMK5: true, linkedRideArmor: not null }) {
-			return false;
-		}
-		return Options.main.blockMechSlotScroll;
-		
-	}
-
 	public bool gridModeHeld;
 	public Point gridModePos = new Point();
 	public void changeWeaponControls() {
@@ -123,44 +115,28 @@ public partial class Player {
 			if (isDisguisedAxl && isZero && input.isHeld(Control.Down, this)) return;
 			weaponRight();
 		} else if (character != null && !Control.isNumberBound(realCharNum, Options.main.axlAimMode)) {
-			if (weapon is MechMenuWeapon mmw &&
-				character.linkedRideArmor == null &&
-				shouldBlockMechSlotScroll()
-			) {
-				if (input.isPressed(Key.Num1, canControl)) {
-					selectedRAIndex = 0;
-					character.onMechSlotSelect(mmw);
-				} else if (input.isPressed(Key.Num2, canControl)) {
-					selectedRAIndex = 1;
-					character.onMechSlotSelect(mmw);
-				} else if (input.isPressed(Key.Num3, canControl)) {
-					selectedRAIndex = 2;
-					character.onMechSlotSelect(mmw);
-				} else if (input.isPressed(Key.Num4, canControl)) {
-					selectedRAIndex = 3;
-					character.onMechSlotSelect(mmw);
-				} else if (input.isPressed(Key.Num5, canControl)) {
-					selectedRAIndex = 4;
-					character.onMechSlotSelect(mmw);
-				}
-			} else {
-				if (input.isPressed(Key.Num1, canControl) && weapons.Count >= 1) {
-					changeWeaponSlot(0);
-					if (isVile && weapon is MechMenuWeapon mmw2 && shouldBlockMechSlotScroll()) {
-						character.onMechSlotSelect(mmw2);
-					}
-				} else if (input.isPressed(Key.Num2, canControl) && weapons.Count >= 2) {
-					changeWeaponSlot(1);
-					if (isVile && weapon is MechMenuWeapon mmw2 && shouldBlockMechSlotScroll()) {
-						character.onMechSlotSelect(mmw2);
-					}
-				} else if (input.isPressed(Key.Num3, canControl) && weapons.Count >= 3) {
-					changeWeaponSlot(2);
-					if (isVile && weapon is MechMenuWeapon mmw2 && shouldBlockMechSlotScroll()) {
-						character.onMechSlotSelect(mmw2);
-					}
-				} else if (input.isPressed(Key.Num4, canControl) && weapons.Count >= 4) { changeWeaponSlot(3); } else if (input.isPressed(Key.Num5, canControl) && weapons.Count >= 5) { changeWeaponSlot(4); } else if (input.isPressed(Key.Num6, canControl) && weapons.Count >= 6) { changeWeaponSlot(5); } else if (input.isPressed(Key.Num7, canControl) && weapons.Count >= 7) { changeWeaponSlot(6); } else if (input.isPressed(Key.Num8, canControl) && weapons.Count >= 8) { changeWeaponSlot(7); } else if (input.isPressed(Key.Num9, canControl) && weapons.Count >= 9) { changeWeaponSlot(8); } else if (input.isPressed(Key.Num0, canControl) && weapons.Count >= 10) { changeWeaponSlot(9); }
+			if (input.isPressed(Key.Num1, canControl) && weapons.Count >= 1) {
+				changeWeaponSlot(0);
+			} else if (input.isPressed(Key.Num2, canControl) && weapons.Count >= 2) {
+				changeWeaponSlot(1);
+			} else if (input.isPressed(Key.Num3, canControl) && weapons.Count >= 3) {
+				changeWeaponSlot(2);
+			} else if (input.isPressed(Key.Num4, canControl) && weapons.Count >= 4) {
+				changeWeaponSlot(3);
+			} else if (input.isPressed(Key.Num5, canControl) && weapons.Count >= 5) {
+				changeWeaponSlot(4);
+			} else if (input.isPressed(Key.Num6, canControl) && weapons.Count >= 6) {
+				changeWeaponSlot(5);
+			} else if (input.isPressed(Key.Num7, canControl) && weapons.Count >= 7) {
+				changeWeaponSlot(6);
+			} else if (input.isPressed(Key.Num8, canControl) && weapons.Count >= 8) {
+				changeWeaponSlot(7);
+			} else if (input.isPressed(Key.Num9, canControl) && weapons.Count >= 9) {
+				changeWeaponSlot(8);
+			} else if (input.isPressed(Key.Num0, canControl) && weapons.Count >= 10) {
+				changeWeaponSlot(9);
 			}
+		
 		}
 	}
 
@@ -242,12 +218,10 @@ public partial class Player {
 label:
 		if (ws < 0) {
 			ws = weapons.Count - 1;
-			if (shouldBlockMechSlotScroll() && isVile && weapons.ElementAtOrDefault(ws) is MechMenuWeapon) {
-				ws--;
-				if (ws < 0) ws = 0;
-			}
 		}
-		if ((weapons.ElementAtOrDefault(ws) is GigaCrush && Options.main.gigaCrushSpecial) || (weapons.ElementAtOrDefault(ws) is HyperNovaStrike && Options.main.novaStrikeSpecial)) {
+		if ((weapons.ElementAtOrDefault(ws) is GigaCrush && Options.main.gigaCrushSpecial) ||
+			(weapons.ElementAtOrDefault(ws) is HyperNovaStrike && Options.main.novaStrikeSpecial)
+		) {
 			ws--;
 			goto label;
 		}
@@ -258,9 +232,6 @@ label:
 		int ws = weaponSlot + 1;
 label:
 		int max = weapons.Count;
-		if (shouldBlockMechSlotScroll() && isVile && weapons.ElementAtOrDefault(max - 1) is MechMenuWeapon) {
-			max--;
-		}
 		if (ws >= max) {
 			ws = 0;
 		}

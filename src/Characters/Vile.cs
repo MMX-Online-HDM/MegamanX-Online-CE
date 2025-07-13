@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace MMXOnline;
 
@@ -37,6 +38,7 @@ public class Vile : Character {
 	
 	public float calldownMechCooldown;
 
+	public VileAmmoWeapon energy = new();
 	public VileCannon cannonWeapon;
 	public Vulcan vulcanWeapon;
 	public VileMissile missileWeapon;
@@ -91,7 +93,7 @@ public class Vile : Character {
 	}
 
 	public Sprite? getCannonSprite(out Point poiPos, out int zIndexDir) {
-		poiPos = getCenterPos();
+		poiPos = getNullableShootPos() ?? getCenterPos();
 		zIndexDir = 0;
 
 		string vilePrefix = "vile_";
@@ -109,8 +111,10 @@ public class Vile : Character {
 			if (tag.StartsWith("cannon4") && cannonAimNum == 3) frameIndexToDraw = 3;
 			if (tag.StartsWith("cannon5") && cannonAimNum == 4) frameIndexToDraw = 4;
 			if (frameIndexToDraw != null) {
-				poiPos = new Point(pos.x + (poi.x * getShootXDirSynced()), pos.y + poi.y);
-				return new Sprite(cannonSprite);
+				Sprite? retSprite = new Sprite(cannonSprite);
+				Point? altPOI = retSprite.animData.frames.ElementAtOrDefault(cannonAimNum)?.POIs?.FirstOrDefault();
+				poiPos = altPOI ?? new Point(pos.x + (poi.x * getShootXDirSynced()), pos.y + poi.y);
+				return retSprite;
 			}
 		}
 		return null;
@@ -126,13 +130,8 @@ public class Vile : Character {
 		else if (ratio <= 0.25f && ratio > -0.25f) cannonAimNum = 0;
 		else cannonAimNum = 4;
 
-		var cannonSprite = getCannonSprite(out Point poiPos, out _);
-		Point? nullablePos = cannonSprite?.animData.frames?.ElementAtOrDefault(cannonAimNum)?.POIs?.FirstOrDefault();
-		if (nullablePos == null) {
-		}
-		Point cannonSpritePOI = nullablePos ?? Point.zero;
-
-		return poiPos.addxy(cannonSpritePOI.x * getShootXDir(), cannonSpritePOI.y);
+		getCannonSprite(out Point poiPos, out _);
+		return poiPos;
 	}
 
 	public override void update() {
@@ -160,14 +159,11 @@ public class Vile : Character {
 		} else if (usedAmmoLastFrame) {
 			usedAmmoLastFrame = false;
 		} else if (!isShootingLongshotGizmo && !isShootingVulcan) {
-			player.vileAmmo += Global.spf * 15;
-			if (player.vileAmmo > player.vileMaxAmmo) {
-				player.vileAmmo = player.vileMaxAmmo;
-			}
+			energy.addAmmo(0.25f * speedMul, player);
 		}
 
 
-		if (player.vileAmmo >= player.vileMaxAmmo) {
+		if (energy.ammo >= energy.maxAmmo) {
 			weaponHealAmount = 0;
 		}
 		if (weaponHealAmount > 0 && player.health > 0) {
@@ -175,7 +171,7 @@ public class Vile : Character {
 			if (weaponHealTime > 0.05) {
 				weaponHealTime = 0;
 				weaponHealAmount--;
-				player.vileAmmo = Helpers.clampMax(player.vileAmmo + 1, player.vileMaxAmmo);
+				energy.addAmmo(1, player);
 				if (isVileMK1) {
 					playSound("heal", forcePlay: true, true);
 				} else {
@@ -369,7 +365,7 @@ public class Vile : Character {
 	}
 	public override void chargeLogic(Action<int> shootFunct) {
 		if (flag == null && chargeButtonHeld() &&
-			(player.vileAmmo >= laserWeapon.getAmmoUsage(0) || 
+			(energy.ammo >= laserWeapon.getAmmoUsage(0) || 
 			currentWeapon is AssassinBulletChar)
 		) {
 			if (canCharge()) {
@@ -448,7 +444,7 @@ public class Vile : Character {
 	}
 
 	public bool canVileHover() {
-		return isVileMK5 && player.vileAmmo > 0 && flag == null;
+		return isVileMK5 && energy.ammo > 0 && flag == null;
 	}
 
 	public override bool canTurn() {
@@ -540,24 +536,25 @@ public class Vile : Character {
 		if (isVulcan) {
 			usedAmmoLastFrame = true;
 		}
-		if (player.vileAmmo > ammo - 0.1f) {
+		if (energy.ammo >= ammo) {
 			usedAmmoLastFrame = true;
-			if (weaponHealAmount == 0) {
-				player.vileAmmo -= ammo;
-				if (player.vileAmmo < 0) player.vileAmmo = 0;
-			}
+			energy.addAmmo(-ammo, player);
 			return true;
 		}
 		return false;
 	}
 	public override void addAmmo(float amount) {
+		if (amount < 0) {
+			energy.addAmmo(amount, player);
+			return;
+		}
 		weaponHealAmount += amount;
 	}
 	public override void addPercentAmmo(float amount) {
 		weaponHealAmount += amount * 0.32f;
 	}
 	public override bool canAddAmmo() {
-		return player.vileAmmo < player.vileMaxAmmo;
+		return energy.ammo < energy.maxAmmo;
 	}
 
 	private void cantAffordRideArmorMessage() {
@@ -870,10 +867,10 @@ public class Vile : Character {
 				case 7 when charState is Fall:
 					flamethrowerWeapon.vileShoot(WeaponIds.VileFlamethrower, this);
 					break;
-				case 8 when player.vileAmmo >= 24 && !player.isMainPlayer && isFacingTarget:
+				case 8 when energy.ammo >= 24 && !player.isMainPlayer && isFacingTarget:
 					laserWeapon.vileShoot(WeaponIds.VileLaser, this);
 					break;
-				case 9 when isVileMK5 && player.vileAmmo >= 20 && !player.isMainPlayer:
+				case 9 when isVileMK5 && energy.ammo >= 20 && !player.isMainPlayer:
 					changeState(new HexaInvoluteState(), true);
 					break;
 			}
@@ -891,5 +888,19 @@ public class Vile : Character {
 			}
 		}
 		base.aiUpdate();
+	}
+}
+
+
+public class VileAmmoWeapon : Weapon {
+	public VileAmmoWeapon() { 
+		index = (int)WeaponIds.VileLaser;
+		weaponBarBaseIndex = 39;
+		weaponBarIndex = 32;
+		allowSmallBar = true;
+		drawRoundedDown = true;
+
+		maxAmmo = 32;
+		ammo = maxAmmo;
 	}
 }
