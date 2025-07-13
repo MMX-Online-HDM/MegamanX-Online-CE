@@ -889,6 +889,7 @@ public class OptionsMenu : IMainMenu {
 					},
 					"You can swap the inputs for\nGoliath buster and missiles."
 				),
+				/*
 				// Block ride armor scroll
 				new MenuOption(
 					30, startY,
@@ -908,6 +909,7 @@ public class OptionsMenu : IMainMenu {
 					"Prevents ability to scroll to the Ride Armor slot.\n" +
 					"You will only be able to switch to it by pressing 3."
 				),
+				/*
 				// Weapon Ordering
 				new MenuOption(
 					30, startY,
@@ -929,7 +931,8 @@ public class OptionsMenu : IMainMenu {
 						);
 					},
 					"Choose the order in which Vile's weapons are arranged."
-				),
+					
+				),*/
 				// MK5 Ride control
 				new MenuOption(
 					30, startY,

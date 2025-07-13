@@ -255,7 +255,9 @@ public class Vile : Character {
 		}
 		if (!UpHeld && missileWeapon.type > -1)
 		 {
-			if (!grounded && grenadeWeapon.type == -2 && flamethrowerWeapon.type == -1
+			if (!grounded &&
+			grenadeWeapon.type == (int)VileBallType.None &&
+			flamethrowerWeapon.type == (int)VileFlamethrowerType.None
 			) {
 				missileWeapon.vileShoot(WeaponIds.ElectricShock, this);
 			} if (grounded) {
@@ -264,7 +266,9 @@ public class Vile : Character {
 			return true;			
 		}
 		if (UpHeld && cutterWeapon.type > -1) {
-			if (!grounded && grenadeWeapon.type == -2 && flamethrowerWeapon.type == -1
+			if (!grounded &&
+			grenadeWeapon.type == (int)VileBallType.None &&
+			flamethrowerWeapon.type == (int)VileFlamethrowerType.None
 			) {
 				cutterWeapon.vileShoot(WeaponIds.VileCutter, this);
 			} if (grounded) {
@@ -311,7 +315,7 @@ public class Vile : Character {
 					stunShotPressed = goliathShotPressed;
 					goliathShotPressed = oldStunShotPressed;
 				}
-				if (stunShotPressed && !HeldDown) {
+				if (stunShotPressed && !HeldDown && missileWeapon.shootCooldown <= 0) {
 					if (tryUseVileAmmo(missileWeapon.vileAmmo)) {
 						missileWeapon.vileShoot(WeaponIds.ElectricShock, this);
 					}
