@@ -84,75 +84,85 @@ public class Vulcan : Weapon {
 			weaponSlotIndex = 60;
 			description = new string[] { "The scattering power of this vulcan", "results in less than perfect aiming." };
 			vileWeight = 4;
-			ammousage = 0.3;
+			ammousage = vileAmmoUsage;
 			damage = "1";
 			effect = "Splits.";
 		}
 	}
+	public static bool isVulcanTypes(Vile vile) {
+		if (vile.vulcanWeapon.type == (int)VulcanType.BuckshotDance) return true;
+		if (vile.vulcanWeapon.type == (int)VulcanType.DistanceNeedler) return true;
+		return vile.vulcanWeapon.type == (int)VulcanType.CherryBlast;
+	}
+	public static bool isNotVulcanTypes(Vile vile) {
+		if (vile.vulcanWeapon.type == (int)VulcanType.NoneMissile) return true;
+		return vile.vulcanWeapon.type == (int)VulcanType.NoneCutter;
+	}
+	public static bool ladderVoid(Vile vile) {
+		if (vile.charState is LadderClimb) {
+			if (vile.player.input.isHeld(Control.Left, vile.player)) {
+				vile.xDir = -1;
+				return true;
+			}
+			if (vile.player.input.isHeld(Control.Right, vile.player)) {
+				vile.xDir = 1;
+				return true;
+			}
+		}
+		return false;
+	}
 
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
 		if (vile.vulcanWeapon.type == (int)VulcanType.None) return;
-
 		if (type == (int)VulcanType.DistanceNeedler && shootCooldown > 0) return;
 		if (string.IsNullOrEmpty(vile.charState.shootSpriteEx)) return;
-
-		Player player = vile.player;
-		if (vile.vulcanWeapon.type != (int)VulcanType.NoneMissile && vile.vulcanWeapon.type != (int)VulcanType.NoneCutter) {
-			if (vile.tryUseVileAmmo(vileAmmoUsage, true)) {
-				if (vile.charState is LadderClimb) {
-					if (player.input.isHeld(Control.Left, player)) vile.xDir = -1;
-					if (player.input.isHeld(Control.Right, player)) vile.xDir = 1;
-				}
-				vile.changeSpriteFromName(vile.charState.shootSpriteEx, false);
-				shootVulcan(vile);
-			}
-		}
-		if (vile.tryUseVileAmmo(vileAmmoUsage, false) && 
-			(vile.vulcanWeapon.type == (int)VulcanType.NoneMissile || 
-			vile.vulcanWeapon.type == (int)VulcanType.NoneCutter)
-		) {
+		if (isVulcanTypes(vile) && vile.tryUseVileAmmo(vileAmmoUsage, true)) {
+			vile.changeSpriteFromName(vile.charState.shootSpriteEx, false);
+			ladderVoid(vile);
+			shootVulcan(vile);
+		} else if (isNotVulcanTypes(vile) && vile.tryUseVileAmmo(vileAmmoUsage, false)) {
 			shootVulcan(vile);
 			vile.setVileShootTime(this);
-		} 
+		}
 	}
 
 	public void shootVulcan(Vile vile) {
 		Player player = vile.player;
-			if (vile.vulcanWeapon.type == (int)VulcanType.NoneMissile) {
-				vile.missileWeapon.vileShoot(WeaponIds.ElectricShock, vile);		
-				vile.setVileShootTime(this);
-			} else if (vile.vulcanWeapon.type == (int)VulcanType.NoneCutter) {
-				vile.cutterWeapon.vileShoot(WeaponIds.VileCutter, vile);		
-				vile.setVileShootTime(this);
-			} else {
-				if (shootCooldown <= 0) {
-					vile.vulcanLingerTime = 0f;
-					new VulcanMuzzleAnim(this, vile.getShootPos(), vile.getShootXDir(), vile, player.getNextActorNetId(), true, true);
-					if (vile.vulcanWeapon.type == (int)VulcanType.CherryBlast) {
-						new VulcanCherryBlast(
-							vile.getShootPos(), vile.getShootXDir(), vile,
-							player, player.getNextActorNetId(), rpc: true
-						);
-					} else if (vile.vulcanWeapon.type == (int)VulcanType.DistanceNeedler) {
-						new VulcanDistanceNeedler(
-							vile.getShootPos(), vile.getShootXDir(), vile,
-							player, player.getNextActorNetId(), rpc: true
-						);
-					} else if (vile.vulcanWeapon.type == (int)VulcanType.BuckshotDance) {
+		if (vile.vulcanWeapon.type == (int)VulcanType.NoneMissile) {
+			vile.missileWeapon.vileShoot(WeaponIds.ElectricShock, vile);		
+			vile.setVileShootTime(this);
+		} else if (vile.vulcanWeapon.type == (int)VulcanType.NoneCutter) {
+			vile.cutterWeapon.vileShoot(WeaponIds.VileCutter, vile);		
+			vile.setVileShootTime(this);
+		} else {
+			if (shootCooldown <= 0) {
+				vile.vulcanLingerTime = 0f;
+				new VulcanMuzzleAnim(this, vile.getShootPos(), vile.getShootXDir(), vile, player.getNextActorNetId(), true, true);
+				if (vile.vulcanWeapon.type == (int)VulcanType.CherryBlast) {
+					new VulcanCherryBlast(
+						vile.getShootPos(), vile.getShootXDir(), vile,
+						player, player.getNextActorNetId(), rpc: true
+					);
+				} else if (vile.vulcanWeapon.type == (int)VulcanType.DistanceNeedler) {
+					new VulcanDistanceNeedler(
+						vile.getShootPos(), vile.getShootXDir(), vile,
+						player, player.getNextActorNetId(), rpc: true
+					);
+				} else if (vile.vulcanWeapon.type == (int)VulcanType.BuckshotDance) {
+					new VulcanBuckshotDance(
+						vile.getShootPos(), vile.getShootXDir(), vile,
+						player, player.getNextActorNetId(), rpc: true
+					);
+					if (Global.isOnFrame(3)) {
 						new VulcanBuckshotDance(
 							vile.getShootPos(), vile.getShootXDir(), vile,
 							player, player.getNextActorNetId(), rpc: true
 						);
-						if (Global.isOnFrame(3)) {
-							new VulcanBuckshotDance(
-								vile.getShootPos(), vile.getShootXDir(), vile,
-								player, player.getNextActorNetId(), rpc: true
-							);
-						}
 					}
-					vile.playSound("vulcan", sendRpc: true);
-					shootCooldown = fireRate;
 				}
+				vile.playSound("vulcan", sendRpc: true);
+				shootCooldown = fireRate;
+			}
 		}
 	}
 }

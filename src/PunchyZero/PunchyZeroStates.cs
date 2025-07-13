@@ -102,6 +102,7 @@ public class PZeroKick : PZeroGenericMeleeState {
 		airMove = true;
 		exitOnLanding = true;
 		useDashJumpSpeed = true;
+		canStopJump = true;
 	}
 }
 
@@ -113,15 +114,15 @@ public class PZeroYoudantotsu : PZeroGenericMeleeState {
 	}
 }
 
-public class PZeroSpinKick : CharState {
+public class PZeroSpinKick : PZeroGenericMeleeState {
 	public float dashTime = 0;
 	public float soundTime = 0;
 
 	public PZeroSpinKick() : base("spinkick") {
 		exitOnAirborne = true;
-		airMove = true;
 		attackCtrl = false;
 		normalCtrl = true;
+		useDashJumpSpeed = true;
 	}
 
 	public override void update() {
@@ -154,8 +155,6 @@ public class PZeroSpinKick : CharState {
 	}
 
 	public override void onExit(CharState? newState) {
-		character.slideVel = character.xDir * character.getRunSpeed();
-		character.isDashing = false;
 		base.onExit(newState);
 		if (character is PunchyZero zero) {
 			zero.dashAttackCooldown = 30;
@@ -220,7 +219,7 @@ public class PZeroDiveKickState : PZeroState {
 }
 
 
-public class ZeroDropkickLand : CharState {
+public class ZeroDropkickLand : PZeroGenericMeleeState {
 	public ZeroDropkickLand() : base("land") {
 		exitOnAirborne = true;
 	}

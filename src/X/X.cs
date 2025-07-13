@@ -360,7 +360,7 @@ public class MegamanX : Character {
 		if (player.input.isPressed(Control.Special1, player) && !hasAnyArmor &&
 			stingActiveTime <= 0
 		) {
-			if (specialButtonMode == 1 && specialSaberCooldown <= 0) {
+			if (specialButtonMode == 1 && specialSaberCooldown <= 0 && !hasLockingProj()) {
 				changeState(new X6SaberState(grounded), true);
 				specialSaberCooldown = 60;
 				return true;
@@ -839,7 +839,8 @@ public class MegamanX : Character {
 			chargedSpinningBlade?.destroyed == false ||
 			chargedFrostShield?.destroyed == false ||
 			chargedTornadoFang?.destroyed == false ||
-			strikeChainProj?.destroyed == false
+			strikeChainProj?.destroyed == false ||
+			shootingRaySplasher != null
 		);
 	}
 
@@ -848,7 +849,8 @@ public class MegamanX : Character {
 			chargedFrostShield?.destroyed == false ||
 			chargedTornadoFang?.destroyed == false ||
 			chargedSpinningBlade?.destroyed == false ||
-			linkedTriadThunder?.destroyed == false
+			linkedTriadThunder?.destroyed == false ||
+			shootingRaySplasher != null
 		);
 	}
 

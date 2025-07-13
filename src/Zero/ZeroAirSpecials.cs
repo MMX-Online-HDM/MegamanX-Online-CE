@@ -54,9 +54,11 @@ public class FSplasherWeapon : Weapon {
 	}
 
 	public override void attack(Character character) {
-		if (character.dashedInAir > 0) return;
-		if (shootCooldown > 0) return;
-		shootCooldown = 1;
+		if (character is not Zero zero) {
+			return;
+		}
+		if (zero.fSplasherUses > 1) return;
+		zero.fSplasherUses++;
 		character.changeState(new FSplasherState(), true);
 	}
 }

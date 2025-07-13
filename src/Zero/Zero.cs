@@ -56,6 +56,7 @@ public class Zero : Character {
 	public float genmureiCooldown;
 	public int airRisingUses;
 	public float tauntCooldown;
+	public int fSplasherUses;
 
 	// Hypermode stuff.
 	public float donutTimer;
@@ -120,6 +121,9 @@ public class Zero : Character {
 		base.preUpdate();
 		if (grounded && charState is not ZeroUppercut) {
 			airRisingUses = 0;
+		}
+		if (grounded) {
+			fSplasherUses = 0;
 		}
 	}
 
