@@ -839,7 +839,8 @@ public class MegamanX : Character {
 			chargedSpinningBlade?.destroyed == false ||
 			chargedFrostShield?.destroyed == false ||
 			chargedTornadoFang?.destroyed == false ||
-			strikeChainProj?.destroyed == false
+			strikeChainProj?.destroyed == false ||
+			shootingRaySplasher != null
 		);
 	}
 
