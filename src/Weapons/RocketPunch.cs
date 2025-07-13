@@ -46,8 +46,8 @@ public class RocketPunch : Weapon {
 			ammousage = vileAmmoUsage;
 			damage = "3";
 			hitcooldown = "0.5";
-			Flinch = "13";
-			FlinchCD = "1";
+			flinch = "13";
+			flinchCD = "1";
 			effect = "Won't destroy on hit.";
 		} else if (rocketPunchType == RocketPunchType.SpoiledBrat) {
 			fireRate = 12;
@@ -60,8 +60,8 @@ public class RocketPunch : Weapon {
 			ammousage = vileAmmoUsage;
 			damage = "2";
 			hitcooldown = "0.1";
-			Flinch = "13";
-			FlinchCD = "1";
+			flinch = "13";
+			flinchCD = "1";
 			effect = "Destroys on hit.";
 		}
 		if (rocketPunchType == RocketPunchType.InfinityGig) {
@@ -75,8 +75,8 @@ public class RocketPunch : Weapon {
 			ammousage = vileAmmoUsage;
 			damage = "3";
 			hitcooldown = "0.5";
-			Flinch = "13";
-			FlinchCD = "1";
+			flinch = "13";
+			flinchCD = "1";
 			effect = "Homing,Travels further.";
 		}
 	}

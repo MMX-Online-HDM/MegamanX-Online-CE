@@ -7,7 +7,8 @@ public class FrostShield : Weapon {
 	public static FrostShield netWeapon = new();
 
 	public FrostShield() : base() {
-		shootSounds = new string[] { "frostShield", "frostShield", "frostShield", "frostShieldCharged" };
+		displayName = "Frost Shield";
+		shootSounds = ["frostShield", "frostShield", "frostShield", "frostShieldCharged"];
 		fireRate = 60;
 		switchCooldown = 45;
 		index = (int)WeaponIds.FrostShield;
@@ -17,8 +18,8 @@ public class FrostShield : Weapon {
 		killFeedIndex = 46;
 		weaknessIndex = (int)WeaponIds.ParasiticBomb;
 		damage = "2+2/3+3";
-		hitcooldown = "0-0.5/1";
-		Flinch = "0/26-26";
+		hitcooldown = "0/60";
+		flinch = "0/26-26";
 		maxAmmo = 16;
 		ammo = maxAmmo;
 	}

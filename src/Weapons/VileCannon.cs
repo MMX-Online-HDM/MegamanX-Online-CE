@@ -50,7 +50,7 @@ public class VileCannon : Weapon {
 		} else if (vileCannonType == VileCannonType.FatBoy) {
 			fireRate = 45;
 			damage = "4";
-			Flinch = "26";
+			flinch = "26";
 			vileAmmoUsage = 24;
 			ammousage = vileAmmoUsage;
 			displayName = "Fat Boy";

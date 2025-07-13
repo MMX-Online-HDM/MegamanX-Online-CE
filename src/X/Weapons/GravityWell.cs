@@ -6,6 +6,7 @@ public class GravityWell : Weapon {
 	public static GravityWell netWeapon = new();
 
 	public GravityWell() : base() {
+		displayName = "Gravity Well";
 		shootSounds = new string[] { "busterX3", "busterX3", "busterX3", "warpIn" };
 		fireRate = 30;
 		index = (int)WeaponIds.GravityWell;
@@ -16,8 +17,8 @@ public class GravityWell : Weapon {
 		weaknessIndex = (int)WeaponIds.RaySplasher;
 		damage = "2/4";
 		effect = "Disables Gravity to the enemy. C: Super Armor.\nUncharged won't give assists.";
-		hitcooldown = "0.5";
-		Flinch = "0/26";
+		hitcooldown = "30";
+		flinch = "0/26";
 		maxAmmo = 16;
 		ammo = maxAmmo;
 		hasCustomChargeAnim = true;

@@ -7,6 +7,7 @@ public class ElectricSpark : Weapon {
 	public static ElectricSpark netWeapon = new();
 
 	public ElectricSpark() : base() {
+		displayName = "Electric Spark";
 		index = (int)WeaponIds.ElectricSpark;
 		killFeedIndex = 6;
 		weaponBarBaseIndex = 6;
@@ -18,8 +19,8 @@ public class ElectricSpark : Weapon {
 		damage = "2/4";
 		effect =  "Can Split. Charged: Doesn't destroy on hit.";
 		hitcooldown = "0/0.5";
-		Flinch = "6/26";
-		FlinchCD = "1/0";
+		flinch = "6/26";
+		flinchCD = "1/0";
 	}
 
 	public override void shoot(Character character, int[] args) {
@@ -156,11 +157,11 @@ public class ElectricSparkProjChargedStart : Projectile {
 			destroySelf();
 			if (ownedByLocalPlayer) {
 				new ElectricSparkProjCharged(
-					pos.addxy(-1, 0), -1, this, damager.owner,
+					pos.addxy(-1 * xDir, 0), -1 * xDir, this, damager.owner,
 					damager.owner.getNextActorNetId(true), rpc: true
 				);
 				new ElectricSparkProjCharged(
-					pos.addxy(1, 0), 1, this, damager.owner,
+					pos.addxy(1 * xDir, 0), 1 * xDir, this, damager.owner,
 					damager.owner.getNextActorNetId(true), rpc: true
 				);
 			}

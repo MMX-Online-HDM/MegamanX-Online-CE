@@ -9,6 +9,7 @@ public class CrystalHunter : Weapon {
 	public static CrystalHunter netWeapon = new();
 
 	public CrystalHunter() : base() {
+		displayName = "Crystal Hunter";
 		shootSounds = new string[] { "crystalHunter", "crystalHunter", "crystalHunter", "crystalHunterCharged" };
 		fireRate = 75;
 		switchCooldown = 45;
@@ -21,7 +22,7 @@ public class CrystalHunter : Weapon {
 		damage = "0-3/0";
 		effect = "Crystalizes enemies on contact.\nC: Slows down the area by 25%.";
 		hitcooldown = "0-1/0";
-		Flinch = "0-26/0";
+		flinch = "0-26/0";
 		maxAmmo = 16;
 		ammo = maxAmmo;
 	}
@@ -42,7 +43,9 @@ public class CrystalHunter : Weapon {
 		if (chargeLevel < 3) {
 			new CrystalHunterProj(pos, xDir, mmx, player, player.getNextActorNetId(), rpc: true);
 		} else {
-			new CrystalHunterCharged(pos, player, player.getNextActorNetId(), player.ownedByLocalPlayer, sendRpc: true);
+			new CrystalHunterCharged(
+				pos, player, player.getNextActorNetId(), player.ownedByLocalPlayer, sendRpc: true
+			);
 		}
 	}
 }
@@ -85,8 +88,10 @@ public class CrystalHunterCharged : Actor {
 	public float drawRadius = 120;
 	public float drawAlpha = 64;
 	public bool isSnails;
-	float maxTime = 4;
-	float soundTime;
+	public float maxTime = 4;
+	public float soundTime;
+	public Actor? rootProj;
+
 	public CrystalHunterCharged(
 		Point pos, Player owner, ushort? netId, bool ownedByLocalPlayer, 
 		float? overrideTime = null, bool sendRpc = false
@@ -143,6 +148,9 @@ public class CrystalHunterCharged : Actor {
 		time += Global.spf;
 		if (time > maxTime) {
 			destroySelf(disableRpc: true);
+		}
+		if (ownedByLocalPlayer && rootProj != null) {
+			changePos(rootProj.pos);
 		}
 	}
 

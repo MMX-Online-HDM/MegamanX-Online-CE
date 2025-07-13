@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using SFML.Graphics;
 
 namespace MMXOnline;
@@ -19,9 +20,10 @@ public class XWeaponCursor {
 	}
 
 	public int startOffset() {
-		if (index < 9) return 0;
-		else if (index >= 9 && index <= 16) return 9;
-		else return 17;
+		if (index < 9) {
+			return 0;
+		}
+		return MathInt.Floor((index - 1) / 8f) * 8 + 1;
 	}
 
 	public int numWeapons() {
@@ -44,73 +46,53 @@ public class XWeaponCursor {
 
 public class SelectWeaponMenu : IMainMenu {
 	public bool inGame;
-	public List<XWeaponCursor> cursors;
+	public XWeaponCursor[] cursors;
 	public int selCursorIndex;
-	public List<Point> weaponPositions = new List<Point>();
+	public Point[] weaponPositions = new Point[9];
+	public Weapon[] weaponList = Weapon.getAllXWeapons().ToArray();
+	public int[] selectedWeaponsInts;
+	public int[] selectedWeaponsIntsRound = new int[3];
+	public int[] selectedWeaponsOffset = new int[3];
+	public int[] oldWeaponsInts;
 	public string error = "";
-	public int maxRows = 1;
-	public int maxCols = 9;
-	public static List<string> weaponNames = new List<string>()
-	{
-			"X-Buster",
-			"Homing Torpedo",
-			"Chameleon Sting",
-			"Rolling Shield",
-			"Fire Wave",
-			"Storm Tornado",
-			"Electric Spark",
-			"Boomerang Cutter",
-			"Shotgun Ice",
-			"Crystal Hunter",
-			"Bubble Splash",
-			"Silk Shot",
-			"Spin Wheel",
-			"Sonic Slicer",
-			"Strike Chain",
-			"Magnet Mine",
-			"Speed Burner",
-			"Acid Burst",
-			"Parasitic Bomb",
-			"Triad Thunder",
-			"Spinning Blade",
-			"Ray Splasher",
-			"Gravity Well",
-			"Frost Shield",
-			"Tornado Fang",
-		};
-
-	public List<int> selectedWeaponIndices;
 	public IMainMenu prevMenu;
 
 	public SelectWeaponMenu(IMainMenu prevMenu, bool inGame) {
 		this.prevMenu = prevMenu;
 		for (int i = 0; i < 9; i++) {
-			weaponPositions.Add(new Point(80, 42 + (i * 18)));
+			weaponPositions[i] = new Point(80, 42 + (i * 18));
 		}
 
-		selectedWeaponIndices = Options.main.xLoadout.getXWeaponIndices();
+		selectedWeaponsInts = Options.main.xLoadout.getXWeaponIndices().ToArray();
+		oldWeaponsInts = Options.main.xLoadout.getXWeaponIndices().ToArray();
 		this.inGame = inGame;
 
-		cursors = new List<XWeaponCursor>();
-		foreach (var selectedWeaponIndex in selectedWeaponIndices) {
-			cursors.Add(new XWeaponCursor(selectedWeaponIndex));
+		cursors = new XWeaponCursor[selectedWeaponsInts.Length + 1];
+		for (int i = 0; i < selectedWeaponsInts.Length; i++) {
+			cursors[i] = new XWeaponCursor(selectedWeaponsInts[i]); ;
 		}
-		cursors.Add(new XWeaponCursor(Options.main.xLoadout.melee));
+		cursors[^1] = new XWeaponCursor(Options.main.xLoadout.melee);
+
+		for (int i = 0; i < 3; i++) {
+			selectedWeaponsOffset[i] = (selectedWeaponsInts[i] - 1) % weaponList.Length;
+			selectedWeaponsIntsRound[i] = selectedWeaponsInts[i];
+		}
 	}
 
 	public bool duplicateWeapons() {
 		return (
-			selectedWeaponIndices[0] == selectedWeaponIndices[1] ||
-			selectedWeaponIndices[1] == selectedWeaponIndices[2] ||
-			selectedWeaponIndices[0] == selectedWeaponIndices[2]
+			selectedWeaponsInts[0] == selectedWeaponsInts[1] ||
+			selectedWeaponsInts[1] == selectedWeaponsInts[2] ||
+			selectedWeaponsInts[0] == selectedWeaponsInts[2]
 		);
 	}
 
-	public bool areWeaponArrSame(List<int> wepArr1, List<int> wepArr2) {
-		for (int i = 0; i < wepArr1.Count; i++) {
-			if (wepArr1[i] != wepArr2[i]) return false;
+	public bool areWeaponArrSame(int[] wepArr1, int[] wepArr2) {
+		for (int i = 0; i < wepArr1.Length; i++) {
+			if (wepArr1[i] != wepArr2[i]) {
+				return false;
+			}
 		}
-
 		return true;
 	}
 
@@ -123,23 +105,21 @@ public class SelectWeaponMenu : IMainMenu {
 		}
 
 		if (selCursorIndex < 3) {
+			int maxCursorIndex = weaponList.Length - 1;
 			if (Global.input.isPressedMenu(Control.MenuLeft)) {
 				cursors[selCursorIndex].index--;
-				if (cursors[selCursorIndex].index == -1) cursors[selCursorIndex].index = 24; //8;
-				else if (cursors[selCursorIndex].index == 8) cursors[selCursorIndex].index = 8; //16;
-				else if (cursors[selCursorIndex].index == 16) cursors[selCursorIndex].index = 16; //24;
+				selectedWeaponsIntsRound[selCursorIndex]--;
+				if (cursors[selCursorIndex].index == -1) {
+					cursors[selCursorIndex].index = maxCursorIndex;
+				}
 				Global.playSound("menuX2");
 			} else if (Global.input.isPressedMenu(Control.MenuRight)) {
 				cursors[selCursorIndex].index++;
-				if (cursors[selCursorIndex].index == 9) cursors[selCursorIndex].index = 9; //0;
-				else if (cursors[selCursorIndex].index == 17) cursors[selCursorIndex].index = 17; //9;
-				else if (cursors[selCursorIndex].index == 25) cursors[selCursorIndex].index = 0; //17;
+				selectedWeaponsIntsRound[selCursorIndex]++;
+				if (cursors[selCursorIndex].index == maxCursorIndex + 1) {
+					cursors[selCursorIndex].index = 0;
+				}
 				Global.playSound("menuX2");
-			}
-			if (Global.input.isPressedMenu(Control.WeaponLeft)) {
-				cursors[selCursorIndex].cycleLeft();
-			} else if (Global.input.isPressedMenu(Control.WeaponRight)) {
-				cursors[selCursorIndex].cycleRight();
 			}
 		} else {
 			Helpers.menuLeftRightInc(ref cursors[selCursorIndex].index, 0, 1, playSound: true);
@@ -148,7 +128,7 @@ public class SelectWeaponMenu : IMainMenu {
 		Helpers.menuUpDown(ref selCursorIndex, 0, 3);
 
 		for (int i = 0; i < 3; i++) {
-			selectedWeaponIndices[i] = cursors[i].index;
+			selectedWeaponsInts[i] = cursors[i].index;
 		}
 
 		bool backPressed = Global.input.isPressedMenu(Control.MenuBack);
@@ -169,16 +149,18 @@ public class SelectWeaponMenu : IMainMenu {
 				shouldSave = true;
 			}
 
-			if (!areWeaponArrSame(selectedWeaponIndices, Options.main.xLoadout.getXWeaponIndices())) {
-				Options.main.xLoadout.weapon1 = selectedWeaponIndices[0];
-				Options.main.xLoadout.weapon2 = selectedWeaponIndices[1];
-				Options.main.xLoadout.weapon3 = selectedWeaponIndices[2];
+			if (!areWeaponArrSame(selectedWeaponsInts, oldWeaponsInts)) {
+				Options.main.xLoadout.weapon1 = selectedWeaponsInts[0];
+				Options.main.xLoadout.weapon2 = selectedWeaponsInts[1];
+				Options.main.xLoadout.weapon3 = selectedWeaponsInts[2];
 				shouldSave = true;
 				if (inGame && Global.level != null) {
 					if (Options.main.killOnLoadoutChange) {
 						Global.level.mainPlayer.forceKill();
 					} else if (!Global.level.mainPlayer.isDead) {
-						Global.level.gameMode.setHUDErrorMessage(Global.level.mainPlayer, "Change will apply on next death", playSound: false);
+						Global.level.gameMode.setHUDErrorMessage(
+							Global.level.mainPlayer, "Change will apply on next death", playSound: false
+						);
 					}
 				}
 			}
@@ -214,7 +196,7 @@ public class SelectWeaponMenu : IMainMenu {
 		float rightArrowPos = 224;
 		float leftArrowPos = startX2 - 15;
 
-		Global.sprites["cursor"].drawToHUD(0, startX-6, startY + (selCursorIndex * wepH));
+		Global.sprites["cursor"].drawToHUD(0, startX - 6, startY + (selCursorIndex * wepH));
 		for (int i = 0; i < 4; i++) {
 			float yPos = startY - 6 + (i * wepH);
 
@@ -259,18 +241,23 @@ public class SelectWeaponMenu : IMainMenu {
 				);
 			}
 
-			for (int j = 0; j < cursors[i].numWeapons(); j++) {
-				int jIndex = j + cursors[i].startOffset();
-				Global.sprites["hud_weapon_icon"].drawToHUD(jIndex, startX2 + (j * wepW), startY + (i * wepH));
-				/*Helpers.drawTextStd(
-					(j + 1).ToString(), startX2 + (j * wepW), startY + (i * wepH) + 10, Alignment.Center
-				);*/
-				if (selectedWeaponIndices[i] == jIndex) {
-					/*DrawWrappers.DrawRectWH(
-						startX2 + (j * wepW) - 7, startY + (i * wepH) - 7, 14, 14, false,
-						Helpers.DarkGreen, 1, ZIndex.HUD, false
-					);*/
-				} else {
+			for (int j = 0; j < 9; j++) {
+				if (selectedWeaponsIntsRound[i] <= selectedWeaponsOffset[i]) {
+					selectedWeaponsOffset[i] = selectedWeaponsOffset[i] - 1;
+				}
+				if (selectedWeaponsIntsRound[i] >= selectedWeaponsOffset[i] + 8) {
+					selectedWeaponsOffset[i] = selectedWeaponsOffset[i] + 1;
+				}
+				int jIndex = selectedWeaponsOffset[i] + j;
+				while (jIndex < 0) {
+					jIndex += weaponList.Length;
+				}
+				while (jIndex >= weaponList.Length) {
+					jIndex -= weaponList.Length;
+				}
+				int displayIndex = weaponList[jIndex].weaponSlotIndex;
+				Global.sprites["hud_weapon_icon"].drawToHUD(displayIndex, startX2 + (j * wepW), startY + (i * wepH));
+				if (selectedWeaponsInts[i] != jIndex) {
 					DrawWrappers.DrawRectWH(
 						startX2 + (j * wepW) - 7, startY + (i * wepH) - 7, 14, 14, true,
 						Helpers.FadedIconColor, 1, ZIndex.HUD, false
@@ -317,9 +304,9 @@ public class SelectWeaponMenu : IMainMenu {
 				);
 			}
 		} else {
-			int wi = selectedWeaponIndices[selCursorIndex];
-			int strongAgainstIndex = Weapon.getAllXWeapons().FindIndex(w => w.weaknessIndex == wi);
-			var weapon = Weapon.getAllXWeapons()[wi];
+			int wi = selectedWeaponsInts[selCursorIndex];
+			int strongAgainstIndex = weaponList.FindIndex(w => w.weaknessIndex == wi);
+			var weapon = weaponList[wi];
 			int weakAgainstIndex = weapon.weaknessIndex;
 			int[] strongAgainstMaverickIndices = getStrongAgainstMaverickFrameIndex(wi);
 			int weakAgainstMaverickIndex = getWeakAgainstMaverickFrameIndex(wi);
@@ -328,28 +315,23 @@ public class SelectWeaponMenu : IMainMenu {
 			string maxAmmo = weapon.maxAmmo.ToString();
 			string effect = weapon.effect;
 			string hitcooldown = weapon.hitcooldown;
-			string Flinch = weapon.Flinch;
-			string FlinchCD = weapon.FlinchCD;
+			string flinch = weapon.flinch;
+			string flinchCD = weapon.flinchCD;
 
 
 			Fonts.drawText(
-				FontType.Purple, "Weapon Stats",
+				FontType.Orange, weaponList[selectedWeaponsInts[selCursorIndex]].displayName,
 				Global.halfScreenW, 121, Alignment.Center
 			);
-			/*Fonts.drawText(
-				FontType.Orange, weaponNames[selectedWeaponIndices[selCursorIndex]],
-				Global.halfScreenW + 10, 121, Alignment.Left
-			); */
 			Fonts.drawText(
-				FontType.Orange, weaponNames[selectedWeaponIndices[selCursorIndex]],
+				FontType.Orange, "Element Chart",
 				303, 42, Alignment.Center
-			); // up right name
-			//Global.sprites["hud_weapon_icon"].drawToHUD(weapon.weaponSlotIndex, Global.halfScreenW + 75, 148);
-			Fonts.drawText(FontType.Green, "Counters: ", 305, 58, Alignment.Right);
+			);
+			Fonts.drawText(FontType.Purple, "Counters: ", 305, 62, Alignment.Right);
 			if (strongAgainstIndex > 0) {
 				Global.sprites["hud_weapon_icon"].drawToHUD(strongAgainstIndex, 308, 62);
 			} else {
-				Fonts.drawText(FontType.Grey, "None", 308, 58);
+				Fonts.drawText(FontType.Grey, "None", 300, 62);
 			}
 			for (int i = 0; i < strongAgainstMaverickIndices.Length; i++) {
 				if (strongAgainstMaverickIndices[0] == 0) {
@@ -357,64 +339,50 @@ public class SelectWeaponMenu : IMainMenu {
 				}
 				Global.sprites["hud_weapon_icon"].drawToHUD(strongAgainstMaverickIndices[i], 325 + i * 17, 62);
 			}
-			Fonts.drawText(FontType.Green, "Weakness: ", 305, 80, Alignment.Right);
+			Fonts.drawText(FontType.Red, "Weakness: ", 305, 82, Alignment.Right);
 			if (weakAgainstIndex > 0) {
 				Global.sprites["hud_weapon_icon"].drawToHUD(weakAgainstIndex, 308, 82);
 			} else {
-				Fonts.drawText(FontType.Grey, "None", 308, 80);
+				Fonts.drawText(FontType.Grey, "None", 300, 82);
 			}
 			if (weakAgainstMaverickIndex > 0) {
 				Global.sprites["hud_weapon_icon"].drawToHUD(weakAgainstMaverickIndex, 325, 82);
 			}
-			DrawWrappers.DrawRect(25, 133, 148, 147, true, new Color(0, 0, 0, 100), 
-			0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //DMG Rectangle
-			DrawWrappers.DrawRect(25, 147, 148, 158, true, new Color(0, 0, 0, 100), 
-			0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //Ammo Rectangle
-			DrawWrappers.DrawRect(25, 158, 148, 170, true, new Color(0, 0, 0, 100), 
-			0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //FireRate Rectangle
-			DrawWrappers.DrawRect(148, 133, 288, 147, true, new Color(0, 0, 0, 100), 
-			0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //HitCD Rectangle
-			DrawWrappers.DrawRect(148, 147, 288, 158, true, new Color(0, 0, 0, 100), 
-			0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //FlinchCD Rectangle
-			DrawWrappers.DrawRect(148, 158, 288, 170, true, new Color(0, 0, 0, 100), 
-			0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //Flinch Rectangle
+			int basePos = 192;
+			int yOffSet = 11;
 
-			Fonts.drawText(FontType.Blue, "Damage: " + damage, 26, 138);
-			Fonts.drawText(FontType.Blue, "Ammo: " + maxAmmo, 26, 150);
-			Fonts.drawText(FontType.Blue, "Fire Rate: " + rateOfFire, 25, 162);
-			Fonts.drawText(FontType.Blue, "Hit CD: " + hitcooldown, 152, 138);
-			Fonts.drawText(FontType.Blue, "Flinch CD: " + FlinchCD, 151, 150);
-			Fonts.drawText(FontType.Blue, "Flinch: " + Flinch, 151, 162);
-			Fonts.drawText(FontType.Blue, effect, 26, 172);
-				if (weapon is XBuster) {
-						switch (Global.level?.mainPlayer.armArmorNum) {
-							case (int)ArmorId.Light:
-								effect = "Mega Buster Mark 17 with Spiral Crush Shot.";
-								break;
-							
-							case (int)ArmorId.Giga:
-								effect = "Mega Buster Mark 17 with Double Charge Shot.";
-								break;
+			
+			DrawWrappers.DrawRect(
+				25, basePos - yOffSet * 2, 359, basePos, true, new Color(0,0,0,100), 1, ZIndex.HUD, false
+			);
+			DrawWrappers.DrawRect(25, basePos - yOffSet, 137, basePos, false, outlineColor, 1, ZIndex.HUD, false);
+			DrawWrappers.DrawRect(138, basePos - yOffSet, 260, basePos, false, outlineColor, 1, ZIndex.HUD, false);
+			DrawWrappers.DrawRect(261, basePos - yOffSet, 359, basePos, false, outlineColor, 1, ZIndex.HUD, false);
+			basePos -= yOffSet + 1;
+			DrawWrappers.DrawRect(25, basePos - yOffSet, 106, basePos, false, outlineColor, 1, ZIndex.HUD, false);
+			DrawWrappers.DrawRect(107, basePos - yOffSet, 209, basePos, false, outlineColor, 1, ZIndex.HUD, false);
+			DrawWrappers.DrawRect(210, basePos - yOffSet, 359, basePos, false, outlineColor, 1, ZIndex.HUD, false);
 
-							case (int)ArmorId.Max:
-								effect = "Mega Buster Mark 17 with Cross Charge Shot.";
-								break;
-							default:
-								effect = "Mega Buster Mark 17 with Spiral Crush Shot.";
-								break;
-						}
-						Fonts.drawText(FontType.Blue, effect, 26, 172);
-					}
-					if (Global.level?.mainPlayer.character is MegamanX mmx && mmx?.hasUltimateArmor == true) {
-						effect = "Mega Buster Mark 17 with Plasma Charge Shot + Bonus.";
-						Fonts.drawText(FontType.Blue, effect, 26, 172);
-					}			
-			if (weapon is FrostShield) {
-				if (Global.frameCount % 600 < 80) {
-					effect = "Missile,Mine,Shield,'Unbreakable' you name it.\nihatethisweapon"; } 
-				else { effect = "Blocks, Leaves Spikes. C: Tackle or Shoot it.";}	
-				Fonts.drawText(FontType.Blue, 
-				effect, 26, 172);
+			Fonts.drawText(FontType.RedishOrange, "Damage: " + damage, 27, 183);
+			Fonts.drawText(FontType.Yellow, "Flinch: " + flinch, 139, 183);
+			Fonts.drawText(FontType.Orange, "FCD: " + flinchCD, 262, 183);
+
+			Fonts.drawText(FontType.Blue, "Ammo: " + maxAmmo, 27, 171);
+			Fonts.drawText(FontType.Purple, "Fire Rate: " + rateOfFire, 108, 171);
+			Fonts.drawText(FontType.Pink, "Hit CD: " + hitcooldown, 212, 171);
+
+			Fonts.drawText(FontType.Green, effect, 27, 136);
+			if (weapon is XBuster) {
+				effect = (ArmorId)(Global.level?.mainPlayer.armArmorNum ?? 0) switch {
+					ArmorId.Light => "Mega Buster Mark 17 with Spiral Shot.",
+					ArmorId.Giga => "Mega Buster Mark 17 with Double Shot.",
+					ArmorId.Max => "Mega Buster Mark 17 with Cross Shot.",
+					_ => "Mega Buster Mark 17 baseline form.",
+				};
+				if (Global.level?.mainPlayer.character is MegamanX mmx && mmx.hasUltimateArmor == true) {
+					effect = "Mega Buster Mark 17 with Plasma Shot.";
+				}
+				Fonts.drawText(FontType.Green, effect, 27, 136);
 			}
 		}
 

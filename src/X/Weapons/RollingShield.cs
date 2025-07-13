@@ -8,6 +8,7 @@ public class RollingShield : Weapon {
 	public bool freeAmmoNextCharge;
 
 	public RollingShield() : base() {
+		displayName = "Rolling Shield";
 		index = (int)WeaponIds.RollingShield;
 		killFeedIndex = 3;
 		weaponBarBaseIndex = 3;
@@ -18,7 +19,7 @@ public class RollingShield : Weapon {
 		fireRate = 45;
 		damage = "2/1";
 		effect = "Mobile Shield That Deletes Projectiles.";
-		hitcooldown = "0/0.33";	
+		hitcooldown = "0/20";	
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
@@ -187,7 +188,6 @@ public class RollingShieldProjCharged : Projectile {
 		if (mmx is not null) {
 			base.onHitDamagable(mmx);
 		}
-		decAmmo(1);
 	}
 
 	public void decAmmo(float amount = 1) {

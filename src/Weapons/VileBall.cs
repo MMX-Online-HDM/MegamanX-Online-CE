@@ -78,7 +78,7 @@ public class VileBall : Weapon {
 			ammousage = vileAmmoUsage;
 			damage = "3";
 			hitcooldown = "0.5";
-			Flinch = "6";
+			flinch = "6";
 			effect = "Splits,no destroy on hit.";
 		}
 	}

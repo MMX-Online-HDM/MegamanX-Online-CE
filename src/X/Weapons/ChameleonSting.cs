@@ -8,13 +8,14 @@ public class ChameleonSting : Weapon {
 	public bool freeAmmoNextCharge;
 
 	public ChameleonSting() : base() {
+		displayName = "Chameleon Sting";
 		index = (int)WeaponIds.ChameleonSting;
 		killFeedIndex = 2;
 		weaponBarBaseIndex = 2;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 2;
 		weaknessIndex = (int)WeaponIds.BoomerangCutter;
-		shootSounds = new string[] { "csting", "csting", "csting", "stingCharge" };
+		shootSounds = ["csting", "csting", "csting", "stingCharge"];
 		fireRate = 45;
 		damage = "2";
 		effect = "Splits. \nFull Charge grants invulnerability.";

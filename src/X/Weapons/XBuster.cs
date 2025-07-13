@@ -9,6 +9,7 @@ public class XBuster : Weapon {
 	public bool isUnpoBuster;
 
 	public XBuster() : base() {
+		displayName = "X-Buster";
 		index = (int)WeaponIds.Buster;
 		killFeedIndex = 0;
 		weaponBarBaseIndex = 0;
@@ -20,10 +21,10 @@ public class XBuster : Weapon {
 		drawAmmo = false;
 		drawCooldown = false;
 		//effect = "Mega Buster Mark 17";
-		hitcooldown = "0/0/0/1";
+		hitcooldown = "0/0/0/60";
 		damage = "1/2/3/4";
-		Flinch = "0/0/13/26";
-		FlinchCD = "0";
+		flinch = "0/0/13/26";
+		flinchCD = "0";
 	}
 
 	public void setUnpoBuster(MegamanX mmx) {

@@ -33,7 +33,7 @@ public class RakuhouhaWeapon : Weapon {
 		allowSmallBar = false;
 		damage = "4";
 		hitcooldown = "1";
-		Flinch = "26";
+		flinch = "26";
 		effect = "42 Frames of Invincibility.";
 	}
 
@@ -77,7 +77,7 @@ public class RekkohaWeapon : Weapon {
 		allowSmallBar = false;
 		damage = "3";
 		hitcooldown = "0.5";
-		Flinch = "26";
+		flinch = "26";
 		effect = "79 Frames of Invincibility.";
 	}
 
@@ -112,7 +112,7 @@ public class Messenkou : Weapon {
 		allowSmallBar = false;
 		damage = "2";
 		hitcooldown = "0.5";
-		Flinch = "0";
+		flinch = "0";
 		effect = "42 Frames of Invincibility. Ignores Defense.";
 	}
 
@@ -144,7 +144,7 @@ public class ShinMessenkou : Weapon {
 		allowSmallBar = false;
 		damage = "4";
 		hitcooldown = "1";
-		Flinch = "26";
+		flinch = "26";
 		effect = "42 Frames of Invincibility";
 	}
 

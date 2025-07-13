@@ -7,18 +7,19 @@ public class HomingTorpedo : Weapon {
 	public static HomingTorpedo netWeapon = new();
 
 	public HomingTorpedo() : base() {
+		displayName = "Homing Torpedo";
 		index = (int)WeaponIds.HomingTorpedo;
 		killFeedIndex = 1;
 		weaponBarBaseIndex = 1;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 1;
 		weaknessIndex = (int)WeaponIds.RollingShield;
-		shootSounds = new string[] { "torpedo", "torpedo", "torpedo", "buster3" };
+		shootSounds = ["torpedo", "torpedo", "torpedo", "buster3"];
 		fireRate = 38;
 		damage = "2/1*6";
 		effect = "Destroys on contact with projectiles or enemies.\nBesides of it's homing capabilities.";
 		hitcooldown = "0";
-		Flinch = "0/13";
+		flinch = "0/13";
 		maxAmmo = 16;
 		ammo = maxAmmo;
 	}

@@ -12,6 +12,7 @@ public class BubbleSplash : Weapon {
 	public bool freeAmmoNextCharge;
 
 	public BubbleSplash() : base() {
+		displayName = "Bubble Splash";
 		shootSounds = new string[] { "bubbleSplash", "bubbleSplash", "bubbleSplash", "bubbleSplashCharged" };
 		fireRate = 6;
 		isStream = true;
@@ -100,8 +101,8 @@ public class BubbleSplash : Weapon {
 				for (int i = 0; i < 6; i++) {
 					var bubble = new BubbleSplashProjCharged(
 						pos, xDir, mmx, player, i, 
-						player.getNextActorNetId(true), true);
-
+						player.getNextActorNetId(true), true
+					);
 					mmx.chargedBubbles?.Add(bubble);	
 				}
 			}

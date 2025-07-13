@@ -23,7 +23,7 @@ public class RyuenjinWeapon : Weapon {
 		description = new string[] { "A fiery uppercut that burns enemies." };
 		damage = "4";
 		hitcooldown = "0.2";
-		Flinch = "0";
+		flinch = "0";
 		effect = "Burn DOT: 2 Seconds.";
 	}
 
@@ -49,7 +49,7 @@ public class DenjinWeapon : Weapon {
 		description = new string[] { "An electrical uppercut that flinches enemies", "and can hit multiple times." };
 		damage = "3";
 		hitcooldown = "0.1";
-		Flinch = "26";
+		flinch = "26";
 		effect = "None.";
 	}
 }
@@ -68,7 +68,7 @@ public class RisingFangWeapon : Weapon {
 		description = new string[] { "A fast, element-neutral uppercut.", "Can be used in the air to gain height." };
 		damage = "2";
 		hitcooldown = "0.5";
-		Flinch = "0";
+		flinch = "0";
 		effect = "Can be used in the air to gain height.";
 	}
 }

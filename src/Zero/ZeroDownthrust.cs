@@ -23,7 +23,7 @@ public class HyouretsuzanWeapon : Weapon {
 		description = new string[] { "A dive attack that can freeze enemies." };
 		damage = "4";
 		hitcooldown = "0.5";
-		Flinch = "12";
+		flinch = "12";
 		effect = "Freeze Time: 2 seconds.";
 	}
 
@@ -50,7 +50,7 @@ public class RakukojinWeapon : Weapon {
 		description = new string[] { "Drop with a metal blade that deals high damage."};
 		damage = "3";
 		hitcooldown = "0.5";
-		Flinch = "12";
+		flinch = "12";
 		effect = "Bonus Damage via Fall Time.";
 	}
 }
@@ -69,7 +69,7 @@ public class DanchienWeapon : Weapon {
 		description = new string[] { "A dive attack that can burn enemies."};
 		damage = "2";
 		hitcooldown = "0.5";
-		Flinch = "0";
+		flinch = "0";
 		effect = "Burn DOT: 1 Second.Bounce on enemy by jumping.";
 	}
 }

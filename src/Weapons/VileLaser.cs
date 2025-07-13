@@ -40,7 +40,7 @@ public class VileLaser : Weapon {
 			ammousage = 24;
 			damage = "6";
 			hitcooldown = "0.5";
-			Flinch = "26";
+			flinch = "26";
 			effect = "Insane Hitbox.";
 		} else if (vileLaserType == VileLaserType.NecroBurst) {
 			index = (int)WeaponIds.NecroBurst;
@@ -52,7 +52,7 @@ public class VileLaser : Weapon {
 			ammousage = 32;
 			damage = "6";
 			hitcooldown = "0.5";
-			Flinch = "26";
+			flinch = "26";
 			effect = "No DMG inside Ride.";
 		} else if (vileLaserType == VileLaserType.StraightNightmare) {
 			index = (int)WeaponIds.StraightNightmare;

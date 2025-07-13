@@ -54,11 +54,11 @@ public class Weapon {
 	public bool drawRoundedDown = false;
 	public bool drawGrayOnLowAmmo = false;
 	public string damage = "";
-	public string hitcooldown= "";
+	public string hitcooldown = "";
 	public double ammousage;
 	public string effect = "";
-	public string Flinch = "";
-	public string FlinchCD = "";
+	public string flinch = "";
+	public string flinchCD = "";
 	public bool hasCustomChargeAnim;
 	// Axl Custom Setting Reload
 	public float rechargeAmmoCustomSettingAxl;
@@ -73,8 +73,8 @@ public class Weapon {
 		effect = "";
 		damage = "0";
 		hitcooldown = "0";
-		Flinch = "0";
-		FlinchCD = "0";
+		flinch = "0";
+		flinchCD = "0";
 		ammousage = getAmmoUsage(0);
 	}
 

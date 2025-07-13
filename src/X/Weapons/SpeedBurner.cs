@@ -7,6 +7,7 @@ public class SpeedBurner : Weapon {
 	public static SpeedBurner netWeapon = new(); 
 
 	public SpeedBurner() : base() {
+		displayName = "Speed Burner";
 		//damager = new Damager(player, 4, Global.defFlinch, 0.5f);
 		shootSounds = new string[] { "speedBurner", "speedBurner", "speedBurner", "speedBurnerCharged" };
 		fireRate = 60;
@@ -19,9 +20,9 @@ public class SpeedBurner : Weapon {
 		weaknessIndex = (int)WeaponIds.BubbleSplash;
 		damage = "2/4";
 		effect = "Fire DOT: 1. Charged Grants Super Armor. Self Damage\non contact of a wall. Burn won't give assists.";
-		hitcooldown = "0-0.25/0";
-		Flinch = "0/26";
-		FlinchCD = "0/0.5";
+		hitcooldown = "0";
+		flinch = "0/26";
+		flinchCD = "0/0.5";
 		hasCustomChargeAnim = true;
 	}
 

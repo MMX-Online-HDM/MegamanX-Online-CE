@@ -9,6 +9,7 @@ public class ParasiticBomb : Weapon {
 	public static float beeRange = 120;
 
 	public ParasiticBomb() : base() {
+		displayName = "Parasitic Bomb";
 		shootSounds = new string[] { "", "", "", "" };
 		fireRate = 60;
 		switchCooldown = 45;
@@ -20,9 +21,9 @@ public class ParasiticBomb : Weapon {
 		weaknessIndex = (int)WeaponIds.GravityWell;
 		damage = "4/4";
 		effect = "Slows enemies and slams them if detonated \nunless mashed off. Homing bees.";
-		hitcooldown = "0/0.5";
-		Flinch = "26-CarryT/26";
-		FlinchCD = "iwish";
+		hitcooldown = "0";
+		flinch = "26/26";
+		flinchCD = "0";
 		maxAmmo = 16;
 		ammo = maxAmmo;
 	}

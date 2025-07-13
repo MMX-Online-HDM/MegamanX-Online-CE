@@ -33,7 +33,7 @@ public class ShippuugaWeapon : Weapon {
 		weaponBarBaseIndex = 21;
 		killFeedIndex = 39;
 		damage = "2";
-		Flinch = "13";
+		flinch = "13";
 		effect = "None.";		
 	}
 }
@@ -59,7 +59,7 @@ public class Shingetsurin : Weapon {
 		index = (int)WeaponIds.Shingetsurin;
 		killFeedIndex = 85;
 		damage = "2";
-		Flinch = "26";
+		flinch = "26";
 		hitcooldown = "0.5";
 		effect = "Homing Projectile, Time on screen: 3 seconds.";
 		//damager = new Damager(player, 4, Global.defFlinch, 0.5f);
@@ -72,7 +72,7 @@ public class ZSaberProjSwing : Weapon {
 		killFeedIndex = 9;
 		damage = "3";
 		hitcooldown = "0.5";
-		Flinch = "26";
+		flinch = "26";
 		effect = "None.";
 		//damager = new Damager(player, 3, Global.defFlinch, 0.5f);
 	}
@@ -93,7 +93,7 @@ public class RaijingekiWeapon : Weapon {
 		description = new string[] { "Powerful lightning attack." };
 		damage = "2";
 		hitcooldown = "0.06";
-		Flinch = "26";
+		flinch = "26";
 		effect = "Ignores Defense.";
 	}
 
@@ -125,7 +125,7 @@ public class Raijingeki2Weapon : Weapon {
 		killFeedIndex = 35;
 		damage = "2";
 		hitcooldown = "0.06";
-		Flinch = "26";
+		flinch = "26";
 		effect = "Ignores Armor Defense.";
 	}
 }
@@ -142,7 +142,7 @@ public class TBreakerWeapon : Weapon {
 		description = new string[] { "A mighty hammer that can shatter barriers." };
 		damage = "6";
 		hitcooldown = "0.5";
-		Flinch = "26";
+		flinch = "26";
 		effect = "Knocks Down the grounded enemy.";
 	}
 

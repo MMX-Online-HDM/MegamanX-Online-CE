@@ -227,7 +227,7 @@ public class SelectZeroWeaponMenu : IMainMenu {
 			var wep1 = zeroWeaponCategories[selCursorIndex].Item2[cursors[selCursorIndex].index];
 			Fonts.drawText(FontType.DarkPurple, wep1.effect, 72, 173);
 			Fonts.drawText(FontType.Red, wep1.damage, 73, 186);
-			Fonts.drawText(FontType.Red, wep1.Flinch, 170, 186);
+			Fonts.drawText(FontType.Red, wep1.flinch, 170, 186);
 			Fonts.drawText(FontType.Red, wep1.hitcooldown, 268, 186);
 		} else {
 			if (cursors[7].index == 0) {

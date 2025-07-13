@@ -230,8 +230,8 @@ public class SelectVileWeaponMenu : IMainMenu {
 		string ammousage = wep.ammousage.ToString();
 		string effect = wep.effect;
 		string hitcooldown = wep.hitcooldown;
-		string Flinch = wep.Flinch;
-		string FlinchCD = wep.FlinchCD;
+		string Flinch = wep.flinch;
+		string FlinchCD = wep.flinchCD;
 
 		DrawWrappers.DrawRect(25, wsy - 7, Global.screenW - 30, wsy + 28, true, new Color(0, 0, 0, 100), 
 		0.5f, ZIndex.HUD, false, outlineColor: outlineColor); // Big Rectangle

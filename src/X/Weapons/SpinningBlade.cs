@@ -9,6 +9,7 @@ public class SpinningBlade : Weapon {
 	public static SpinningBlade netWeapon = new();
 
 	public SpinningBlade() : base() {
+		displayName = "Spinning Blade";
 		shootSounds = new string[] { "", "", "", "spinningBladeCharged" };
 		fireRate = 75;
 		switchCooldown = 45;
@@ -20,9 +21,9 @@ public class SpinningBlade : Weapon {
 		weaknessIndex = (int)WeaponIds.TriadThunder;
 		damage = "2/2";
 		effect = "Goes back after some time on screen.";
-		hitcooldown = "0/0.5";
-		Flinch = "0/26";
-		FlinchCD = "0/1";
+		hitcooldown = "0/30";
+		flinch = "0/26";
+		flinchCD = "0/1";
 		maxAmmo = 16;
 		ammo = maxAmmo;
 	}

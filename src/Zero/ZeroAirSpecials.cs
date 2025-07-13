@@ -23,7 +23,7 @@ public class KuuenzanWeapon : Weapon {
 		description = new string[] { "Standard spin attack in the air." };
 		damage = "1";
 		hitcooldown = "0.125";
-		Flinch = "0";
+		flinch = "0";
 		effect = "None.";
 	}
 
@@ -49,7 +49,7 @@ public class FSplasherWeapon : Weapon {
 		description = new string[] { "A Mobile Aereal slightly faster Dash." };
 		damage = "2";
 		hitcooldown = "0.5";
-		Flinch = "0";
+		flinch = "0";
 		effect = "None.";
 	}
 
@@ -179,7 +179,7 @@ public class HyorogaWeapon : Weapon {
 		description = new string[] { "Cling to ceilings and rain down icicles with ATTACK." };
 		damage = "4-3";
 		hitcooldown = "0.25-0.15";
-		Flinch = "0-13";
+		flinch = "0-13";
 		effect = "Can Freeze enemies on contact.";
 	}
 
