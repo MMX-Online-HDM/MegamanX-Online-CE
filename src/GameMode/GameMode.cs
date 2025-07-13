@@ -1574,38 +1574,38 @@ public class GameMode {
 			return;
 		}
 
-		if (shouldDrawWeaponAmmo(player, weapon)) {
-			baseY += 25;
-			Global.sprites["hud_weapon_base"].drawToHUD(weapon.weaponBarBaseIndex, baseX, baseY);
-			baseY -= 16;
-			for (var i = 0; i < MathF.Ceiling(weapon.maxAmmo * ammoDisplayMultiplier); i++) {
-				var floorOrCeiling = Math.Ceiling(weapon.ammo * ammoDisplayMultiplier);
-				// Weapons that cost the whole bar go here, so they don't show up as full but still grayed out
-				if (weapon.drawRoundedDown || weapon is RekkohaWeapon || weapon is GigaCrush) {
-					floorOrCeiling = Math.Floor(weapon.ammo * ammoDisplayMultiplier);
-				}
-				if (i < floorOrCeiling) {
-					int spriteIndex = weapon.weaponBarIndex;
-					if (weapon.drawGrayOnLowAmmo && weapon.ammo < weapon.getAmmoUsage(0) ||
-						(weapon is GigaCrush && !weapon.canShoot(0, player)) ||
-						(weapon is HyperNovaStrike && !weapon.canShoot(0, player)) ||
-						(weapon is HyperCharge hb && !hb.canShootIncludeCooldown(level.mainPlayer))) {
-						spriteIndex = grayAmmoIndex;
-					}
-					if (spriteIndex >= Global.sprites["hud_weapon_full"].frames.Length) {
-						spriteIndex = 0;
-					}
-					Global.sprites["hud_weapon_full"].drawToHUD(spriteIndex, baseX, baseY);	
-				} else {
-					Global.sprites["hud_health_empty"].drawToHUD(0, baseX, baseY);
-				}
-				baseY -= 2;
-			}
-			Global.sprites["hud_health_top"].drawToHUD(0, baseX, baseY);
+		if (!shouldDrawWeaponAmmo(player, weapon)) {
+			return;
 		}
-		//if (shouldDrawWeaponAmmo(player, weapon) && player.isIris) {
-		//	Global.sprites["iris_hud"].drawToHUD(0, 25, 125);
-		//}
+		ammoDisplayMultiplier /= weapon.ammoDisplayScale;
+		baseY += 25;
+		Global.sprites["hud_weapon_base"].drawToHUD(weapon.weaponBarBaseIndex, baseX, baseY);
+		baseY -= 16;
+
+		for (var i = 0; i < MathF.Ceiling(weapon.maxAmmo * ammoDisplayMultiplier); i++) {
+			var floorOrCeiling = Math.Ceiling(weapon.ammo * ammoDisplayMultiplier);
+			// Weapons that cost the whole bar go here, so they don't show up as full but still grayed out
+			if (weapon.drawRoundedDown || weapon is RekkohaWeapon || weapon is GigaCrush) {
+				floorOrCeiling = Math.Floor(weapon.ammo * ammoDisplayMultiplier);
+			}
+			if (i < floorOrCeiling) {
+				int spriteIndex = weapon.weaponBarIndex;
+				if (weapon.drawGrayOnLowAmmo && weapon.ammo < weapon.getAmmoUsage(0) ||
+					(weapon is GigaCrush && !weapon.canShoot(0, player)) ||
+					(weapon is HyperNovaStrike && !weapon.canShoot(0, player)) ||
+					(weapon is HyperCharge hb && !hb.canShootIncludeCooldown(level.mainPlayer))) {
+					spriteIndex = grayAmmoIndex;
+				}
+				if (spriteIndex >= Global.sprites["hud_weapon_full"].frames.Length) {
+					spriteIndex = 0;
+				}
+				Global.sprites["hud_weapon_full"].drawToHUD(spriteIndex, baseX, baseY);
+			} else {
+				Global.sprites["hud_health_empty"].drawToHUD(0, baseX, baseY);
+			}
+			baseY -= 2;
+		}
+		Global.sprites["hud_health_top"].drawToHUD(0, baseX, baseY);
 	}
 
 	public void addKillFeedEntry(KillFeedEntry killFeed, bool sendRpc = false) {
