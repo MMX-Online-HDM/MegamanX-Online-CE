@@ -197,6 +197,7 @@ public class ZeroUppercut : ZeroState {
 		if (!character.grounded && type == RisingType.RisingFang) {
 			character.sprite.frameIndex = 4;
 		}
+		zero.airRisingUses++;
 	}
 
 	public override void onExit(CharState? newState) {

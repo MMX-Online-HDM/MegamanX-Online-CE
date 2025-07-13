@@ -67,7 +67,6 @@ public class FSplasherState : ZeroState {
 	public Anim? ProjVisible;
 
 	public FSplasherState() : base("dash") {
-		enterSound = "fsplasher";
 		attackCtrl = true;
 	}
 
@@ -85,6 +84,7 @@ public class FSplasherState : ZeroState {
 			character.pos, character.xDir, zero,
 			player, player.getNextActorNetId(), sendRpc: true
 		);
+		zero.playSound("fsplasher", false, true);
 	}
 
 	public override void onExit(CharState? newState) {
