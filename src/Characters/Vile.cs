@@ -484,7 +484,8 @@ public class Vile : Character {
 				return;
 			}
 		}
-
+		int randomString = Helpers.randomRange(1, 2);
+		string brownOrGoliath = randomString == 1 ? "Brown Bear" : randomString == 2 ? "Goliath" : "";
 		if (player.isAI) {
 			calldownMechCooldown = maxCalldownMechCooldown;
 		}
@@ -493,6 +494,9 @@ public class Vile : Character {
 				Global.level.gameMode.setHUDErrorMessage(player, "Can only summon a mech once per life");
 			} else if (canAffordRideArmor()) {
 				if (!(charState is Idle || charState is Run || charState is Crouch)) return;
+				if (isVileMK1 && player.selectedRAIndex == 4) {
+					Global.level.gameMode.setHUDErrorMessage(player, brownOrGoliath + " only available as MKII"); return;
+				}
 				if (player.selectedRAIndex == 4 && player.currency < 10) {
 					if (isVileMK2) {
 						Global.level.gameMode.setHUDErrorMessage(
