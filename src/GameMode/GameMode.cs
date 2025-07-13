@@ -1337,11 +1337,22 @@ public class GameMode {
 		if (level.is1v1() && player.deaths >= playingTo) return;
 
 		//Health
-		renderHealth(player, position, false);
-		bool mechBarExists = renderHealth(player, position, true);
+		Point pos = getHUDHealthPosition(position, true);
+		int dir = 1;
+		if (position is HUDHealthPosition.Right or HUDHealthPosition.TopRight or HUDHealthPosition.BotRight) {
+			dir = -1;
+		}
+		renderHealth(player, pos, false, false);
+		if (renderHealth(player, pos.addxy(6 * dir, 0), true, false)) {
+			pos.x += dir * 6;
+		};
+		if (renderHealth(player, pos.addxy(6 * dir, 0), false, true)) {
+			pos.x += dir * 6;
+		};
+		pos.x += dir * 16;
 
 		//Weapon
-		if (!mechBarExists) renderWeapon(player, position);
+		renderWeapon(player, pos);
 	}
 
 	public Point getHUDHealthPosition(HUDHealthPosition position, bool isHealth) {
@@ -1361,7 +1372,7 @@ public class GameMode {
 		return new Point(x, y);
 	}
 
-	public bool renderHealth(Player player, HUDHealthPosition position, bool isMech) {
+	public bool renderHealth(Player player, Point position, bool isMech, bool isMaverick) {
 		bool mechBarExists = false;
 
 		string spriteName = "hud_health_base";
@@ -1370,10 +1381,14 @@ public class GameMode {
 		float damageSavings = 0;
 		float greyHp = 0;
 
-		if (player.currentMaverick != null) {
-			health = player.currentMaverick.health;
-			maxHealth = player.currentMaverick.maxHealth;
-			damageSavings = 0;
+		if (isMaverick) {
+			if (player.currentMaverick != null) {
+				health = player.currentMaverick.health;
+				maxHealth = player.currentMaverick.maxHealth;
+				damageSavings = 0;
+			} else {
+				return false;
+			}
 		}
 		else if (player.character != null) {
 			if (player.health > 0 && player.health < player.maxHealth) {
@@ -1393,9 +1408,8 @@ public class GameMode {
 		}
 		if (player.isDisguisedAxl) frameIndex = 3;
 
-		var hudHealthPosition = getHUDHealthPosition(position, true);
-		float baseX = hudHealthPosition.x;
-		float baseY = hudHealthPosition.y;
+		float baseX = position.x;
+		float baseY = position.y;
 
 		float twoLayerHealth = 0;
 		if (isMech && player.character?.rideArmor != null && player.character.rideArmor.raNum != 5) {
@@ -1404,11 +1418,7 @@ public class GameMode {
 			maxHealth = player.character.rideArmor.maxHealth;
 			twoLayerHealth = player.character.rideArmor.goliathHealth;
 			frameIndex = player.character.rideArmor.raNum;
-			baseX = getHUDHealthPosition(position, false).x;
-			mechBarExists = false;
-			if (player?.weapon?.drawAmmo == true) {
-				baseX += 15;
-			}
+			mechBarExists = true;
 			damageSavings = 0;
 		}
 		if (isMech && player?.character?.rideArmorPlatform != null) {
@@ -1417,11 +1427,7 @@ public class GameMode {
 			maxHealth = player.character.rideArmorPlatform.maxHealth;
 			twoLayerHealth = player.character.rideArmorPlatform.goliathHealth;
 			frameIndex = player.character.rideArmorPlatform.raNum;
-			baseX = getHUDHealthPosition(position, false).x;
-			if (player?.weapon?.drawAmmo == true) {
-				baseX += 15;
-			}
-			mechBarExists = false;
+			mechBarExists = true;
 			damageSavings = 0;
 		}
 
@@ -1430,9 +1436,12 @@ public class GameMode {
 			health = player.character.rideChaser.health;
 			maxHealth = player.character.rideChaser.maxHealth;
 			frameIndex = 0;
-			baseX = getHUDHealthPosition(position, false).x;
 			mechBarExists = true;
 			damageSavings = 0;
+		}
+
+		if (isMech && !mechBarExists) {
+			return false;
 		}
 
 		//maxHealth /= player.getHealthModifier();
@@ -1474,7 +1483,7 @@ public class GameMode {
 		}
 		Global.sprites["hud_health_top"].drawToHUD(0, baseX, baseY);
 
-		return mechBarExists;
+		return true;
 	}
 
 	const int grayAmmoIndex = 30;
@@ -1518,10 +1527,9 @@ public class GameMode {
 		return true;
 	}
 
-	public void renderWeapon(Player player, HUDHealthPosition position) {
-		var hudHealthPosition = getHUDHealthPosition(position, false);
-		float baseX = hudHealthPosition.x;
-		float baseY = hudHealthPosition.y;
+	public void renderWeapon(Player player, Point position) {
+		float baseX = position.x;
+		float baseY = position.y;
 		bool forceSmallBarsOff = false;
 
 		// This runs once per character.
