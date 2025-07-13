@@ -5,7 +5,7 @@ namespace MMXOnline;
 
 public class Weapon {
 	public static Weapon baseNetWeapon = new();
-	public string[] shootSounds = { "", "", "", ""};
+	public string[] shootSounds = ["", "", "", ""];
 	public float ammo;
 	public float maxAmmo;
 	public float fireRate;
@@ -36,7 +36,6 @@ public class Weapon {
 	// Ammo display vars.
 	public bool allowSmallBar = true;
 	public float ammoDisplayScale = 1;
-	public float ammoDisplayScaleSmall = 2;
 
 	// Ammo recharge vars.
 	public float weaponHealAmount = 0;
