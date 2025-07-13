@@ -73,7 +73,7 @@ public class RisingFangWeapon : Weapon {
 	}
 }
 
-public class ZeroUppercut : CharState {
+public class ZeroUppercut : ZeroState {
 	bool jumpedYet;
 	float timeInWall;
 	bool isUnderwater;
