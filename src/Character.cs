@@ -1275,6 +1275,7 @@ public partial class Character : Actor, IDamagable {
 			  ) {
 				getOffMK5Platform();
 				changeState(getJumpState());
+				vel.y = -getJumpPower();
 				return true;
 			}
 			if (player.isCrouchHeld() && canCrouch() && charState is not Crouch) {
