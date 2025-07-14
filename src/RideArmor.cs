@@ -1441,16 +1441,16 @@ public class RAIdle : RideArmorState {
 				float modifier = 1;
 				if (rideArmor.consecutiveJump == 1) {
 					sound = "frogjump2X3";
-					modifier = 1.25f;
+					modifier = 1.75f;
 				} else if (rideArmor.consecutiveJump == 2) {
 					sound = "frogjump3X3";
-					modifier = 1.5f;
+					modifier = 2.1f;
 				}
 
 				if (dashHeld) modifier *= 0.75f;
 
 				rideArmor.playSound(sound, forcePlay: true, sendRpc: true);
-				rideArmor.vel.y = -rideArmor.getJumpPower() * 1.5f * modifier;
+				rideArmor.vel.y = -rideArmor.getJumpPower() * modifier;
 				rideArmor.changeState(new RAJump(isDash: dashHeld));
 				return;
 			}
@@ -1700,12 +1700,13 @@ public class RAFall : RideArmorState {
 			if (!rideArmor.sprite.name.Contains("swim") && !rideArmor.sprite.name.Contains("attack")) {
 				rideArmor.changeSprite("frog_swim", true);
 			}
-
+			rideArmor.vel.x = 120 * character.xDir;
 			rideArmor.vel.y = -106;
 		} else {
 			if (rideArmor.raNum == 3 && rideArmor.sprite.name.Contains("swim") && swimTime == 0) {
 				rideArmor.changeSprite("frog_fall", true);
 			}
+			rideArmor.vel.x = 0;
 		}
 
 		if (!rideArmor.isUnderwater() && player != null) {
