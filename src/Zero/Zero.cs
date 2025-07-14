@@ -122,8 +122,7 @@ public class Zero : Character {
 
 	public override void preUpdate() {
 		base.preUpdate();
-		CollideData? collideData = Global.level.checkTerrainCollisionOnce(this, xDir, 0);
-		if (grounded || (collideData != null && collideData.isSideWallHit())) {
+		if (grounded || charState is WallSlide) {
 			if (charState is not ZeroUppercut) 
 				airRisingUses = 0;		
 			if (charState is not FSplasherState) 
