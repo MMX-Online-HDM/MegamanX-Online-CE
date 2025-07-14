@@ -133,18 +133,24 @@ public class ZeroUppercut : ZeroState {
 		if (!player.input.isHeld(Control.Special1, player) && !player.input.isHeld(Control.Shoot, player)) {
 			isHeld = false;
 		}
-
-		if (character.sprite.frameIndex == 8 && type == RisingType.RisingFang) {
-			if (isHeld && holdTime < 0.2f) {
-				holdTime += Global.spf;
-				character.frameSpeed = 0;
-				character.frameIndex = 8;
-			} else {
-				character.frameSpeed = 1;
-				character.frameIndex = 8;
+		if (type == RisingType.RisingFang) {
+			if (character.sprite.frameIndex == 8) {
+				if (isHeld && holdTime < 0.2f) {
+					holdTime += Global.spf;
+					character.frameSpeed = 0;
+					character.frameIndex = 8;
+				} else {
+					character.frameSpeed = 1;
+					character.frameIndex = 8;
+				}
+			}
+			if (character.sprite.frameIndex >= 9) {
+				if (!isHeld) {
+					character.vel.y = character.vel.y/1.25f;
+					character.changeToIdleOrFall();
+				}
 			}
 		}
-
 		if (character.sprite.frameIndex >= 4 && character.sprite.frameIndex < 7) {
 			float speed = 100;
 			if (type == RisingType.Denjin) {
@@ -202,5 +208,9 @@ public class ZeroUppercut : ZeroState {
 
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
+	}
+	public override bool canEnter(Character character) {
+		if (character.charState is WallSlide) return false;
+		return base.canEnter(character);
 	}
 }

@@ -145,6 +145,10 @@ public class ZeroRollingSlashtate : ZeroGenericMeleeState {
 			return;
 		}
 	}
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		zero.kuuenzanCooldown = 30;
+	}
 }
 
 public class ZeroCrouchSlashState : ZeroGenericMeleeState {

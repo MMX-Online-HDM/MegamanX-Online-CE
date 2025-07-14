@@ -57,7 +57,9 @@ public class FSplasherWeapon : Weapon {
 		if (character is not Zero zero) {
 			return;
 		}
-		if (zero.fSplasherUses > 1) return;
+		if (zero.fSplasherCooldown > 0) return;
+		if (zero.fSplasherUses > 0) return;
+		zero.fSplasherCooldown = 50;
 		zero.fSplasherUses++;
 		character.changeState(new FSplasherState(), true);
 	}
@@ -99,18 +101,17 @@ public class FSplasherState : ZeroState {
 			ProjVisible.destroySelf();
 			ProjVisible = null;
 		}
-		zero.airSpecial.shootCooldown = 1;
 		base.onExit(newState);
 	}
 
 	public override bool canEnter(Character character) {
 		if (!base.canEnter(character)) return false;
+		if (character.charState is WallSlide) return false;
 		return character.flag == null;
 	}
 
 	public override void update() {
 		base.update();
-
 		float upSpeed = 0;
 		var inputDir = player.input.getInputDir(player);
 		if (inputDir.y < 0) upSpeed = -1;

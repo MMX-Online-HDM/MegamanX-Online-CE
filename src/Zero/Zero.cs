@@ -57,6 +57,9 @@ public class Zero : Character {
 	public int airRisingUses;
 	public float tauntCooldown;
 	public int fSplasherUses;
+	public float fSplasherCooldown;
+	public int quakeBlazerBounces;
+	public float kuuenzanCooldown;
 
 	// Hypermode stuff.
 	public float donutTimer;
@@ -119,11 +122,14 @@ public class Zero : Character {
 
 	public override void preUpdate() {
 		base.preUpdate();
-		if (grounded && charState is not ZeroUppercut) {
-			airRisingUses = 0;
-		}
-		if (grounded) {
-			fSplasherUses = 0;
+		CollideData? collideData = Global.level.checkTerrainCollisionOnce(this, xDir, 0);
+		if (grounded || (collideData != null && collideData.isSideWallHit())) {
+			if (charState is not ZeroUppercut) 
+				airRisingUses = 0;		
+			if (charState is not FSplasherState) 
+				fSplasherUses = 0;
+			if (charState is not ZeroDownthrust) 
+				quakeBlazerBounces = 0;	
 		}
 	}
 
@@ -163,6 +169,8 @@ public class Zero : Character {
 		Helpers.decrementFrames(ref dashAttackCooldown);
 		Helpers.decrementFrames(ref aiAttackCooldown);
 		Helpers.decrementFrames(ref tauntCooldown);
+		Helpers.decrementFrames(ref fSplasherCooldown);
+		Helpers.decrementFrames(ref kuuenzanCooldown);
 		airSpecial.update();
 		gigaAttack.update();
 		gigaAttack.charLinkedUpdate(this, true);
@@ -576,7 +584,7 @@ public class Zero : Character {
 		// Air attack.
 		if (specialPressed) {
 			if (airSpecial.type == 0 && charState is not ZeroRollingSlashtate) {
-				if (Options.main.swapAirAttacks == false) {
+				if (Options.main.swapAirAttacks == false && kuuenzanCooldown <= 0) {
 					changeState(new ZeroRollingSlashtate(), true);					
 				} else {
 					changeState(new ZeroAirSlashState(), true);
@@ -594,7 +602,7 @@ public class Zero : Character {
 			} else {
 				if (Options.main.swapAirAttacks == false) {
 					changeState(new ZeroAirSlashState(), true);					
-				} else {
+				} else if (kuuenzanCooldown <= 0) {
 					changeState(new ZeroRollingSlashtate(), true);
 				}
 			}
