@@ -67,6 +67,7 @@ public class Axl : Character {
 	public float dodgeRollCooldown;
 	public const float maxDodgeRollCooldown = 1.5f;
 	public bool hyperAxlUsed;
+	public bool hyperAxlFix;
 	//public ShaderWrapper axlPaletteShader;
 	public float maxHyperAxlTime = 30;
 	public List<int> ammoUsages = new List<int>();
@@ -548,6 +549,7 @@ public class Axl : Character {
 				if (isCharging() && getChargeLevel() >= 3 && isStealthMode()) {
 					stingChargeTime = 0;
 					playSound("stingCharge", sendRpc: true);
+					hyperAxlFix = true;
 				} else if (isCharging()) {
 					if (player.weapon is AxlBullet || player.weapon is DoubleBullet ||
 						player.weapon is MettaurCrash || player.weapon is BeastKiller || player.weapon is MachineBullets ||
@@ -563,16 +565,21 @@ public class Axl : Character {
 				stopCharge();
 
 				// Handles Hyper activation.
-
+				if (isStealthMode() || isWhiteAxl()) {
+					hyperAxlUsed = true;
+				} else {
+					hyperAxlUsed = false;
+				}
 				if (player.input.isHeld(Control.Special2, player) &&
-					player.currency >= 10 && (!(charState is HyperAxlStart)) &&
-					(!hyperAxlUsed) && (!(charState is WarpIn))
+					player.currency >= Player.AxlHyperCost &&
+					charState is not HyperAxlStart and not WarpIn &&
+					(!hyperAxlUsed)
 				) {
 					hyperProgress += Global.spf;
 				} else {
 					hyperProgress = 0;
 				}
-				if (hyperProgress >= 1 && player.currency >= 10) {
+				if (hyperProgress >= 1 && player.currency >= Player.AxlHyperCost) {
 					hyperProgress = 0;
 					if (axlHyperMode == 0) {
 						changeState(new HyperAxlStart(grounded), true);
@@ -580,8 +587,9 @@ public class Axl : Character {
 						if (!hyperAxlUsed) {
 							hyperAxlUsed = true;
 							//addHealth(player.maxHealth);
-							foreach (var weapon in player.weapons) {
-								weapon.ammo = weapon.maxAmmo;
+							if (!hyperAxlFix) {
+								foreach (var weapon in player.weapons) 
+									weapon.ammo = weapon.maxAmmo;				
 							}
 							stingChargeTime = 12;
 							playSound("stingCharge", sendRpc: true);
