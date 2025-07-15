@@ -548,8 +548,11 @@ public class PunchyZero : Character {
 				case 2:
 					palette = Player.ZeroBlueC;
 					break;
-				case >=3:
+				case 3:
 					palette = Player.ZeroPinkC;
+					break;
+				case 4:
+					palette = Player.ZeroGreenC;
 					break;
 			}
 		}

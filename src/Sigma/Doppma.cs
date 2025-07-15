@@ -9,6 +9,7 @@ public class Doppma : BaseSigma {
 	public float maxFireballCooldown = 0.39f;
 	public float shieldCooldown;
 	public float maxShieldCooldown = 1.125f;
+	public bool shootOnce;
 
 	public Doppma(
 		Player player, float x, float y, int xDir,
@@ -31,6 +32,9 @@ public class Doppma : BaseSigma {
 		Helpers.decrementTime(ref fireballCooldown);
 		Helpers.decrementTime(ref shieldCooldown);
 		Helpers.decrementFrames(ref aiAttackCooldown);
+		if (sprite.name.EndsWith(charState.shootSpriteEx) == false) {
+			shootOnce = false;
+		}
 		// For ladder and slide shoot.
 		if (charState is WallSlide or LadderClimb &&
 			charState.shootSpriteEx != "" &&
@@ -53,11 +57,14 @@ public class Doppma : BaseSigma {
 					if (ang != 0 && ang != 180) {
 						upDownDir = 0;
 					}
-					playSound("sigma3shoot", sendRpc: true);
-					new Sigma3FireProj(
-						shootPOI.Value, ang, upDownDir,
-						player, player.getNextActorNetId(), sendRpc: true
-					);
+					if (!shootOnce) {
+						playSound("sigma3shoot", sendRpc: true);
+						new Sigma3FireProj(
+							shootPOI.Value, ang, upDownDir,
+							player, player.getNextActorNetId(), sendRpc: true
+						);
+						shootOnce = true;
+					}
 				}
 			}
 		}
