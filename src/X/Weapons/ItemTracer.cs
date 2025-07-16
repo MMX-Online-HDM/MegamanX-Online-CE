@@ -55,7 +55,7 @@ public class ItemTracerProj : Projectile {
 		frameSpeed = 0;
 		projId = (int)ProjIds.ItemTracer;
 		this.target = target;
-
+		setIndestructableProperties();
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}

@@ -105,6 +105,8 @@ public class LevelData {
 	public bool supportsVehicles;
 	public bool raceOnly;
 	public int customSize = -1;
+	public bool twoDisplayNames;
+	public string displayName2;
 
 	public LevelData() {
 	}
@@ -121,7 +123,7 @@ public class LevelData {
 					"medium" => 3,
 					"large" => 4,
 					"xl" or "collosal" => 5,
-					_=> -1 
+					_ => -1
 				};
 			}
 		}
@@ -296,7 +298,7 @@ public class LevelData {
 			}
 			customMapUrl = levelJson.customMapUrl ?? null;
 		}
-
+		correctMapNames();
 		validate();
 	}
 
@@ -335,7 +337,7 @@ public class LevelData {
 		if (shortName?.Length > 14) {
 			throw new Exception("Short name too long.");
 		}
-		if (displayName?.Length > 25) {
+		if (displayName?.Length > 48) {
 			throw new Exception("Display name too long.");
 		}
 		if (maxPlayers > Server.maxPlayerCap) {
@@ -562,6 +564,7 @@ public class LevelData {
 		{ "mountain", "chillPenguin" },
 		{ "ocean", "launchOctopus" },
 		{ "powerplant", "sparkMandrill" },
+		{ "powerplant2", "sparkMandrill" },
 		{ "sigma1", "sigmaFortress" },
 		{ "sigma2", "sigmaFortress2" },
 		{ "sigma3", "sigmaFortress3" },
@@ -571,7 +574,7 @@ public class LevelData {
 		{ "crystalmine", "crystalSnail" },
 		{ "deepseabase", "bubbleCrab" },
 		{ "desertbase", "overdriveOstrich" },
-		{ "desertbase2", "overdriveOstrich" },
+		{ "desertbase2", "credits_X2" },
 		{ "dinosaurtank", "wheelGator" },
 		{ "maverickfactory", "maverickFactory" },
 		{ "robotjunkyard", "morphMoth" },
@@ -711,4 +714,99 @@ public class LevelData {
 
 		return "password_X1";
 	}
+	public void correctMapNames() {
+		var nameMappings = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+			{
+			#region Large-Collosal
+			{ "doppler's lab", "Doppler Stage A" },
+			{ "safari park", "Safari Park Stage" },
+			{ "quarry", "Quarry Stage" },
+			{ "power control center", "Hydroelectric Power Plant Stage" },
+			{ "shipyard", "Shipyard Stage" },
+			{ "airborne aircraft carrier", "Airborne Aircraft Carrier Stage" },
+			{ "weapons factory", "Weapons Factory Stage" },
+			{ "giant dam", "Giant Dam Stage" },
+			{ "giant dam 2", "Giant Dam Stage 2" },
+			{ "frozen town", "Frozen Town Stage" },
+			{ "hunter base", "Hunter Base" },
+			{ "hunterbase 2", "Credits Scenario X3" },
+			{ "dinosaur tank", "Dinosaur Type Terrestrial"},
+			{ "x-hunter stage 2", "Counter Hunter Stage 2"},
+			{ "x-hunter stage 1", "Counter Hunter Stage 1"},
+			{ "central computer", "Giant Computer Interior Stage"},
+			{ "energen crystal", "Energen Crystal Stage"},
+			{ "desert base", "Missile Launch Base Stage"},
+			{ "desert base 2", "Credits Scenario X2"},
+			{ "weather control", "Weather Control Center Stage"},
+			{ "robot junkyard", "Scrap Processing Plant Stage"},
+			{ "volcanic zone", "Volcanic Zone Stage"},
+			{ "deep-sea base", "Deep-Sea Base Stage"},
+			{ "maverick factory", "Maverick Factory Stage"},
+			{ "highway", "Central Highway"},
+			{ "highway 2", "Credits Scenario X1"},
+			{ "powerplant", "Electromagnetic Power Plant"},
+			{ "powerplant2", "Electromagnetic Power Plant 2"},
+			{ "factory", "Prototype Weapons Plant"},
+			{ "Missile Base", "Abandoned Missile Base"},
+			{ "ocean", "Subterranean Base"},
+			{ "tower", "Fortress Tower"},
+			{ "forest", "Recon Base Ruins"},
+			{ "forest 2", "Recon Base Ruins 2"},
+			{ "airport", "New-type Airport"},
+			{ "gallery", "Energy Mine Ruins"},
+			{ "sigma stage 1", "Sigma Palace 1"},
+			{ "sigma stage 2", "Sigma Palace 2"},
+			{ "sigma stage 3", "Sigma Palace 3"},
+			#endregion
+			#region Medium
+			{ "sigma stage 1 md", "Sigma Palace 1 MD"},
+			{ "sigma stage 2 md", "Sigma Palace 2 MD"},
+			{ "forest md", "Recon Base Ruins MD"},
+			{ "ocean md", "Subterranean Base MD"},
+			{ "Missile Base MD", "Abandoned Missile Base MD"},
+			{ "highway md", "Central Highway MD"},
+			{ "weather control md", "Weather Control Center MD"},
+			{ "desert base md", "Missile Launch Base MD"},
+			{ "maverick factory md", "Maverick Factory MD"},
+			{ "factory md", "Prototype Weapons Plant MD"},
+			{ "airport md", "New-type Airport MD"},
+			#endregion
+			#region small
+			{ "sigma1_1v1", "Sigma Palace 1 VS. 1 "},
+			{ "airport 1v1", "New-type Airport 1 VS. 1"},
+			{ "doppler lab 1v1", "Doppler Stage B 1 VS. 1" },
+			{ "sigma stage 4 1v1", "Sigma Palace 4 1 VS. 1"},
+			{ "factory 1v1", "Prototype Weapons"},
+			{ "hunterbase 1v1", "Hunter Base 1 VS. 1" },
+			{ "forest 1v1", "Recon Base Ruins 1 VS. 1"},
+			{ "highway 1v1", "Central Highway 1 VS. 1"},
+			{ "zero virus 1v1", "Zero Space Stage 3: "},
+			{ "central computer 1v1", "Central Computer Stage 1 VS. 1"},
+			{ "jape tribute 1v1", "Jape Tribute 1 VS. 1"},
+			{ "ocean 1v1", "Subterranean Base 1 VS. 1"},
+			{ "Missile Base 1v1", "Abandoned Missile Base 1 VS. 1"},
+			{ "tower 1v1", "Fortress Tower 1 VS. 1"},
+			{ "powerplant 1v1", "Electromagnetic Power"},
+			#endregion
+		};
+		if (nameMappings.TryGetValue(displayName, out var newName))
+			displayName = newName;
+		if (displayName == "Dinosaur Type Terrestrial") {
+			twoDisplayNames = true;
+			displayName2 = "Aircraft Carrier Stage";
+		}
+		if (displayName == "Zero Space Stage 3: ") {
+			twoDisplayNames = true;
+			displayName2 = "Awakening 1 VS. 1";
+		}
+		if (displayName == "Electromagnetic Power") {
+			twoDisplayNames = true;
+			displayName2 = "Plant 1 VS. 1";
+		}
+		if (displayName == "Prototype Weapons") {
+			twoDisplayNames = true;
+			displayName2 = "Plant 1 VS. 1";
+		}
+	}
+	
 }

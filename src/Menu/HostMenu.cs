@@ -34,13 +34,11 @@ public class HostMenu : IMainMenu {
 	public List<MenuOption> menuOptions;
 	public int selectArrowPosY;
 	public static int startX = 20;
-	public static int startY = 40;
+	public static int startY = 34;
 	public static int lineH = 10;
-
 	public MainMenu previous;
 	public bool listenForKey = false;
 	public Point mapPos = new Point(178, 43);
-
 	public string serverName;
 	public bool isOffline;
 	public bool isLAN;
@@ -463,25 +461,57 @@ public class HostMenu : IMainMenu {
 				"Random Map"
 			)
 		);
-		if (isTraining) {
+		if (selectedLevel.twoDisplayNames) {
 			menuOptions.Add(
 				new MenuOption(startX, startY,
 					() => {
+						if (currentMapSizePool.Count == 0) {
+							return;
+						}
 						if (Global.input.isPressedMenu(Control.MenuLeft)) {
-							useLoadout = false;
+							mapIndex--;
+							if (mapIndex < 0) mapIndex = currentMapSizePool.Count - 1;
+							onMapChange();
 						} else if (Global.input.isPressedMenu(Control.MenuRight)) {
-							useLoadout = true;
+							mapIndex++;
+							if (mapIndex >= currentMapSizePool.Count) mapIndex = 0;
+							onMapChange();
+						} else if (Global.input.isPressedMenu(Control.MenuAlt)) {
+							mapIndex = Helpers.randomRange(0, currentMapSizePool.Count - 1);
+							onMapChange();
 						}
 					},
 					(Point pos, int index) => {
-						Fonts.drawText(
-							FontType.Blue, "Use loadout: " + Helpers.boolYesNo(useLoadout),
-							pos.x, pos.y, selected: index == selectArrowPosY
-						);
-					}
+						if (selectedLevel.twoDisplayNames) {
+							Fonts.drawText(
+								FontType.Blue, isMapSelected ? selectedLevel.displayName2 : "[Select]",
+								pos.x, pos.y, selected: index == selectArrowPosY
+							);
+						}
+					},
+					"Random Map"
 				)
 			);
 		}
+		if (isTraining) {
+				menuOptions.Add(
+					new MenuOption(startX, startY,
+						() => {
+							if (Global.input.isPressedMenu(Control.MenuLeft)) {
+								useLoadout = false;
+							} else if (Global.input.isPressedMenu(Control.MenuRight)) {
+								useLoadout = true;
+							}
+						},
+						(Point pos, int index) => {
+							Fonts.drawText(
+								FontType.Blue, "Use loadout: " + Helpers.boolYesNo(useLoadout),
+								pos.x, pos.y, selected: index == selectArrowPosY
+							);
+						}
+					)
+				);
+			}
 		// Mode
 		if (!isTraining) {
 			menuOptions.Add(
@@ -1408,7 +1438,7 @@ public class HostMenu : IMainMenu {
 		msg = "[OK]: Next, [BACK]: Back" + extraMsg;
 		Fonts.drawTextEX(
 			FontType.Grey, msg + "\nLeft/Right: Change setting",
-			Global.screenW * 0.5f, 178, Alignment.Center
+			Global.screenW * 0.5f, 182, Alignment.Center
 		);
 
 		if (errorMessage != null) {

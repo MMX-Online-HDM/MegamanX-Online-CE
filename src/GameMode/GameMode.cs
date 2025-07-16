@@ -8,14 +8,14 @@ using SFML.System;
 namespace MMXOnline;
 
 public class GameMode {
-	public const string Deathmatch = "deathmatch";
-	public const string TeamDeathmatch = "team deathmatch";
-	public const string CTF = "ctf";
-	public const string ControlPoint = "control point";
-	public const string Elimination = "elimination";
-	public const string TeamElimination = "team elimination";
-	public const string KingOfTheHill = "king of the hill";
-	public const string Race = "race";
+	public const string Deathmatch = "Deathmatch";
+	public const string TeamDeathmatch = "Team Deathmatch";
+	public const string CTF = "Capture The Flag";
+	public const string ControlPoint = "Control Point";
+	public const string Elimination = "Elimination";
+	public const string TeamElimination = "Team Elimination";
+	public const string KingOfTheHill = "King Of The Hill";
+	public const string Race = "Race";
 	public static List<string> allGameModes = new List<string>() {
 		Deathmatch, TeamDeathmatch, CTF, KingOfTheHill,
 		ControlPoint, Elimination, TeamElimination
@@ -643,6 +643,10 @@ public class GameMode {
 			}
 			if (drawPlayer.character is Zero zero) {
 				int yStart = 159;
+				Fonts.drawText(
+						FontType.Grey,
+						zero.kuuenzanCooldown.ToString(), 16, 152, Alignment.Left
+					);
 				if (zero.isViral) {
 					Global.sprites["hud_killfeed_weapon"].drawToHUD(170, 7, 155);
 					Fonts.drawText(
@@ -2520,6 +2524,14 @@ public class GameMode {
 
 	public void drawNetcodeData() {
 		int top2 = -3;
+		string netcodePingStr = "";
+		int iconXPos = 280;
+		if (level.server.netcodeModel == NetcodeModel.FavorAttacker) {
+			netcodePingStr = " < " + level.server.netcodeModelPing.ToString();
+			if (level.server.netcodeModelPing < 100) iconXPos = 260;
+			else iconXPos = 253;
+		}
+
 		if (!Global.level.server.isP2P) {
 			Fonts.drawText(
 				FontType.DarkPurple, Global.level.server.region.name,
@@ -2527,23 +2539,11 @@ public class GameMode {
 			);
 		} else {
 			Fonts.drawText(
-				FontType.DarkPurple, "P2P Server",
-				Global.screenW - 12, top2 + 12, Alignment.Right
+				FontType.DarkPurple, "P2P Server" + netcodePingStr,
+				261, top2 + 14, Alignment.Left
 			);
 		}
-
-		string netcodePingStr = "";
-		int iconXPos = 280;
-		if (level.server.netcodeModel == NetcodeModel.FavorAttacker) {
-			netcodePingStr = "<" + level.server.netcodeModelPing.ToString();
-			if (level.server.netcodeModelPing < 100) iconXPos = 260;
-			else iconXPos = 253;
-		}
-		Fonts.drawText(
-			FontType.DarkPurple, netcodePingStr,
-			Global.screenW - 12, top2 + 22, Alignment.Right
-		);
-		Global.sprites["hud_netcode"].drawToHUD((int)level.server.netcodeModel, iconXPos, top2 + 26);
+		Global.sprites["hud_netcode"].drawToHUD((int)level.server.netcodeModel, 364, top2 + 30);
 		if (Global.level.server.isLAN) {
 			Fonts.drawText(
 				FontType.DarkPurple, "IP: " + Global.level.server.ip,
@@ -2576,7 +2576,7 @@ public class GameMode {
 		drawMapName(padding, top + 10);
 		if (Global.serverClient != null) {
 			Fonts.drawText(
-				FontType.BlueMenu, "Match: " + Global.level.server.name, padding + 100, top + 10
+				FontType.BlueMenu, "Match: " + Global.level.server.name, padding + 245, top + 10
 			);
 			drawNetcodeData();
 		}
@@ -2606,7 +2606,7 @@ public class GameMode {
 
 			if (Global.serverClient != null && player.serverPlayer.isHost) {
 				Fonts.drawText(
-					FontType.Yellow, "H", col1x - 8, 3 + topPlayerY + i * rowH
+					FontType.Yellow, "H", col1x - 8, 1 + topPlayerY + i * rowH
 				);
 			} else if (Global.serverClient != null && player.serverPlayer.isBot) {
 				Fonts.drawText(
@@ -2660,7 +2660,7 @@ public class GameMode {
 
 		if (Global.serverClient != null) {
 			Fonts.drawText(
-				FontType.BlueMenu, "Match: " + Global.level.server.name, padding + 100, top + 10
+				FontType.BlueMenu, "Match: " + Global.level.server.name, padding + 245, top + 10
 			);
 			drawNetcodeData();
 		}
