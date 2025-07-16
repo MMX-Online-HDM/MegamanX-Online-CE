@@ -222,10 +222,11 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 				wsx, wsy - 8, Global.screenW - wsx, wsy + 48 + 8, true,
 				new Color(0, 0, 0, 100), 1, ZIndex.HUD, false, outlineColor: outlineColor
 			);
-			Global.sprites["hud_maverick"].drawToHUD(weaponIcon, startX, wsy);
+			Global.sprites["hud_maverick"].drawToHUD(weaponIcon, startX, wsy+3);
 
-			Fonts.drawText(FontType.Purple, getMaverickName(wi), startX + 48 + 8, wsy);
-			Fonts.drawText(FontType.Green, "Strong aganist:", startX + 48 + 8, wsy + 16);
+			Fonts.drawText(FontType.Orange, getMaverickName(wi), startX + 48 + 8, wsy+1);
+			Fonts.drawText(FontType.Purple, getMaverickTitle(wi), startX + 48 + 8, wsy + 13);
+			Fonts.drawText(FontType.Green, "Strong aganist:", startX + 48 + 8, wsy + 27);
 
 			for (int i = 0; i < strongAgainstIndices.Length; i++) {
 				int drawIndex = strongAgainstIndices[i].weaponSlotIndex;
@@ -235,13 +236,13 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 				Global.sprites["hud_weapon_icon"].drawToHUD(
 					drawIndex,
 					startX + 152 + i * 16 + 8,
-					wsy + 18
+					wsy + 30
 				);
 			}
 			int weakOffset = Fonts.measureText(FontType.Green, "Strong aganist:");
 			Fonts.drawText(
 				FontType.Green, "Weak against:",
-				startX + weakOffset + 48 + 8, wsy + 32, Alignment.Right
+				startX + weakOffset + 45, wsy + 42, Alignment.Right
 			);
 			for (int i = 0; i < weakAgainstIndices.Length; i++) {
 				int drawIndex = weakAgainstIndices[i].weaponSlotIndex;
@@ -251,7 +252,7 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 				Global.sprites["hud_weapon_icon"].drawToHUD(
 					drawIndex,
 					startX + 152 + i * 16 + 8,
-					wsy + 34
+					wsy + 46
 				);
 			}
 		} else if (selCursorIndex == 2) {
@@ -387,7 +388,7 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 			15 => "Magna Centipede",
 			9 => "Crystal Snail",
 			13 => "Overdrive Ostrich",
-			17 => "Fake Zero",
+			17 => "Dark Zero",
 			25 => "Blizzard Buffalo",
 			18 => "Toxic Seahorse",
 			24 => "Tunnel Rhino",
@@ -397,6 +398,38 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 			23 => "Gravity Beetle",
 			19 => "Blast Hornet",
 			26 => "Dr. Doppler",
+			_ => "ERROR"
+		};
+	}
+	private string getMaverickTitle(int wi) {
+		return wi switch {
+			7 => "Glacial Emperor",
+			5 => "Quick-Fisted King of Lightning",
+			2 => "Armored Warrior",
+			0 => "General of The Deep Sea",
+			6 => "Blade Demon of Space and Time",
+			1 => "Frightening Forest's Strike",
+			4 => "Nobleman of The Skies",
+			3 => "Blazing Oil Tank", 
+			8 => "",
+			14 => "Little Forest Demon",
+			12 => "Fanged Heavy Tank",
+			10 => "Shredder of The Deep",
+			16 => "Heat Knuckle Champion",
+			11 => "Fallen Angel from The Islands of Dreams",
+			15 => "Crimson Assassin",
+			9 => "Crystal Ball Magician",
+			13 => "Swift Runner of The Sands",
+			17 => "Sigma & Zero",
+			25 => "Silver Snowman",
+			18 => "President of The Water Dragons",
+			24 => "Subterranean Barbarian",
+			20 => "Rescue Power Plant",
+			21 => "Destroyer of The Seven Seas",
+			22 => "Protector of The Jungle",
+			23 => "Steel Revenger",
+			19 => "Flying Shadow Ninja",
+			26 => "Dark Ambitionist",
 			_ => "ERROR"
 		};
 	}
