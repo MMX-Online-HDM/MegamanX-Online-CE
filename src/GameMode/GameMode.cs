@@ -643,10 +643,6 @@ public class GameMode {
 			}
 			if (drawPlayer.character is Zero zero) {
 				int yStart = 159;
-				Fonts.drawText(
-						FontType.Grey,
-						zero.kuuenzanCooldown.ToString(), 16, 152, Alignment.Left
-					);
 				if (zero.isViral) {
 					Global.sprites["hud_killfeed_weapon"].drawToHUD(170, 7, 155);
 					Fonts.drawText(
