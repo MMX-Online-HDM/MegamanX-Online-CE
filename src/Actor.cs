@@ -138,6 +138,7 @@ public partial class Actor : GameObject {
 	private float? lastAngle;
 	private bool? lastVisible;
 	public float lastNetUpdate;
+	public int lastNetFrame;
 
 	public NetActorCreateId netActorCreateId;
 	public Player? netOwner;
@@ -1832,5 +1833,9 @@ public partial class Actor : GameObject {
 			}
 		}
 		return closeActors.ToArray();
+	}
+
+	public string getActorTypeName() {
+		return GetType().ToString().RemovePrefix("MMXOnline.");
 	}
 }
