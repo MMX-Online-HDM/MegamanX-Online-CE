@@ -1019,7 +1019,7 @@ public partial class Actor : GameObject {
 	}
 
 	public void netUpdate() {
-		if (netId == null) return;
+			if (netId == null) return;
 		if (destroyPosSet) {
 			destroyPosTime += Global.spf;
 			incPos(vel.times(Global.spf));
@@ -1042,7 +1042,8 @@ public partial class Actor : GameObject {
 				return;
 			}
 
-			float frameSmooth = Global.tickRate;
+			float frameSmooth = Global.frameCount - lastNetFrame + 1;
+			if (frameSmooth < 1) { frameSmooth = 1; }
 
 			if (frameSmooth > 1 && interplorateNetPos) {
 				if (targetNetPos != null) {
@@ -1089,6 +1090,7 @@ public partial class Actor : GameObject {
 				}
 			}
 
+			
 			int spriteIndex = -1;
 			if (Global.spriteIndexByName.ContainsKey(sprite.name)) {
 				spriteIndex = Global.spriteIndexByName[sprite.name];
@@ -1112,7 +1114,7 @@ public partial class Actor : GameObject {
 			if (netYDir != null && yDir != netYDir) {
 				yDir = (int)netYDir;
 			}
-			if (netAngle != null && netAngle != lastAngle) {
+			if (netAngle != null && netAngle != byteAngle) {
 				byteAngle = netAngle.Value;
 			}
 		}

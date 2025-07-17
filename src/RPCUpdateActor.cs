@@ -100,9 +100,9 @@ public class RPCUpdateActor : RPC {
 
 		// General flags.
 		if (mask[0]) {
-			actor.netXPos = BitConverter.ToSingle(arguments.AsSpan()[i..(i+4)]);
+			actor.netXPos = BitConverter.ToSingle(arguments.AsSpan()[i..(i + 4)]);
 			i += 4;
-			actor.netYPos = BitConverter.ToSingle(arguments.AsSpan()[i..(i+4)]);
+			actor.netYPos = BitConverter.ToSingle(arguments.AsSpan()[i..(i + 4)]);
 			i += 4;
 			//actor.netIncPos = actor.netPos.subtract(actor.pos).times(0.33f);
 		}
@@ -117,7 +117,7 @@ public class RPCUpdateActor : RPC {
 			actor.netAngle = arguments[i++];
 		}
 		// Spriteindex.
-		actor.netSpriteIndex = BitConverter.ToUInt16(arguments.AsSpan()[i..(i+2)]);
+		actor.netSpriteIndex = BitConverter.ToUInt16(arguments.AsSpan()[i..(i + 2)]);
 		i += 2;
 		// Other flags.
 		actor.visible = mask[5];
@@ -135,16 +135,15 @@ public class RPCUpdateActor : RPC {
 			string playerName = "null";
 			if (actor is Character character) {
 				playerName = character.player.name;
-			}
-			else if (actor.netOwner?.name != null) {
+			} else if (actor.netOwner?.name != null) {
 				playerName = actor.netOwner.name;
 			}
 			Program.exceptionExtraData = (
-				"Index out of bounds.\n" + 
+				"Index out of bounds.\n" +
 				$"actor type: {actor.getActorTypeName()}, " +
 				$"player: {playerName}, " +
 				$"args len: {arguments.Length}, " +
-				$"extraArgs pos/len: {i} {arguments.Length - i}, " + 
+				$"extraArgs pos/len: {i} {arguments.Length - i}, " +
 				$"netId: {netId}, " +
 				$"maskBool: {Convert.ToString(maskByte, 2).PadLeft(8, '0')}"
 			);
