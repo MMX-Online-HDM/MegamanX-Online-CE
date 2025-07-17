@@ -3391,26 +3391,35 @@ public partial class Character : Actor, IDamagable {
 		customData.Add(0);
 
 		// Always on values.
-		customData.Add((byte)Math.Ceiling(health));
-		customData.Add((byte)Math.Ceiling(maxHealth));
-		customData.Add((byte)player.alliance);
-		customData.Add((byte)player.currency);
+		byte netHP = (byte)Math.Ceiling(health);
+		byte netMaxHP = (byte)Math.Ceiling(maxHealth);
+		byte netAlliance = (byte)player.alliance;
+		byte netCurrency = (byte)player.currency;
 
 		// Bool variables. Packed in a single byte.
-		customData.Add(Helpers.boolArrayToByte([
+		byte stateFlag = Helpers.boolArrayToByte([
 			player.isDefenderFavored,
 			invulnTime > 0,
 			isDarkHoldState,
 			isStrikeChainState,
 			charState.immuneToWind
-		]));
+		]);
 
-		// Bool mask. Pos 5.
+		customData.Add(netHP);
+		customData.Add(netMaxHP);
+		customData.Add(netAlliance);
+		customData.Add(netCurrency);
+		customData.Add(stateFlag);
+
+		// Bool mask. Pos 6.
 		// For things not always enabled.
 		// We also edit this later.
 		int boolMaskPos = customData.Count;
 		bool[] boolMask = new bool[8];
 		customData.Add(0);
+
+		// Crash report stuff.
+		customData.Add((byte)charId);
 
 		// Add each status effect and enabled their respective flag.
 		if (acidTime > 0) {
@@ -3478,7 +3487,12 @@ public partial class Character : Actor, IDamagable {
 
 		// Optional statuses.
 		bool[] boolMask = Helpers.byteToBoolArray(data[6]);
-		int pos = 7;
+
+		// For crash reports.
+		//int netCharNum = data[7];
+
+		// Set pointer to last.
+		int pos = 8;
 		// Update and increase pos as we go.
 		acidTime = 0;
 		if (boolMask[0]) {
