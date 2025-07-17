@@ -886,7 +886,7 @@ public class Vile : Character {
 		}
 		base.aiAttack(target);
 	}
-	public override void aiUpdate() {
+	public override void aiUpdate(Actor? target) {
 		if (!player.isMainPlayer) {
 			if (player.canReviveVile() && isVileMK1) {
 				player.reviveVile(false);
@@ -895,7 +895,6 @@ public class Vile : Character {
 				player.reviveVile(true);
 			}
 		}
-		base.aiUpdate();
 	}
 }
 

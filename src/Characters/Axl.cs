@@ -127,9 +127,8 @@ public class Axl : Character {
 		altSoundId = AltSoundIds.X3;
 	}
 
-	public override CharState getTauntState() {
-		return new AxlTaunt();
-	}
+	public override CharState getTauntState() => new AxlTaunt();
+
 	public void zoomIn() {
 		if (isZoomingIn) return;
 		if (_zoom) return;

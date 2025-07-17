@@ -113,6 +113,7 @@ public class Zero : Character {
 		}
 		return new Fall();
 	}
+
 	public override CharState getTauntState() {
 		if (isAwakened && tauntCooldown <= 0) {
 			return new AwakenedTaunt();

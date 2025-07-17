@@ -10,6 +10,17 @@ using static SFML.Window.Keyboard;
 namespace MMXOnline;
 
 public partial class Player {
+	public static Player stagePlayer = new Player(
+		"Stage", 255, -1,
+		new PlayerCharData() { charNum = -1 },
+		false, true, GameMode.neutralAlliance,
+		new Input(false),
+		new ServerPlayer(
+			"Stage", 255, false,
+			-1, GameMode.neutralAlliance, "NULL", null, 0
+		)
+	);
+	
 	public SpawnPoint? firstSpawn;
 	public Input input;
 	public Character? character;
@@ -2468,7 +2479,7 @@ public partial class Player {
 		assists++;
 	}
 
-	public void addDeath(bool isSuicide) {
+	public void addDeath() {
 		if (isSigma && maverick1v1 == null && Global.level.isHyper1v1() && !lastDeathWasSigmaHyper) {
 			return;
 		}

@@ -361,7 +361,7 @@ public class AI {
 		}	
 		randomlyChangeStuff();
 		aiState.update();
-		character.aiUpdate();
+		character.aiUpdate(target);
 		if (aiState.shouldAttack && target != null) {
 			character.aiAttack(target);
 		}
