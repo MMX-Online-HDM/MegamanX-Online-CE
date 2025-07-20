@@ -364,19 +364,25 @@ public class BusterZero : Character {
 		shaders.AddRange(baseShaders);
 		return shaders;
 	}
+
 	public override List<byte> getCustomActorNetData() {
 		List<byte> customData = base.getCustomActorNetData();
 		customData.Add(Helpers.boolArrayToByte([
 			isBlackZero,
+			stockedSaber
 		]));
+		customData.Add((byte)stockedBusterLv);
 		return customData;
 	}
+
 	public override void updateCustomActorNetData(byte[] data) {
 		// Update base arguments.
 		base.updateCustomActorNetData(data);
 		data = data[data[0]..];
 		bool[] flags = Helpers.byteToBoolArray(data[0]);
 		isBlackZero = flags[0];
+		stockedSaber = flags[1];
+		stockedBusterLv = data[1];
 	}
 
 	public float aiAttackCooldown;
