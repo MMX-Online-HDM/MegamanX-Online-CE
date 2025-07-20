@@ -1975,6 +1975,9 @@ public partial class Player {
 		if (character?.charState is not Die) {
 			return false;
 		}
+		if (character is Vile vile2 && vile2.isVileMK5) {
+			return false;
+		}
 		if (character is not Vile vile || vile.summonedGoliath) {
 			return false;
 		}
