@@ -1582,9 +1582,6 @@ public partial class Player {
 		if (charNum == (int)CharIds.KaiserSigma) {
 			retChar.weapons.Add(new SigmaMenuWeapon());
 		}
-		if (charNum == (int)CharIds.Sigma) {
-            retChar.weapons.Add(new SigmaMenuWeapon());			
-		}
 		if (charNum == (int)CharIds.Vile) {
 			retChar.weapons.Add(new VileAmmoWeapon());
 		}
