@@ -320,9 +320,8 @@ public class HyperBusterZeroStart : BusterZeroState {
 				character.pos.addxy(50 * character.xDir, 0f),
 				"LightX3", -character.xDir,
 				player.getNextActorNetId(),
-				destroyOnEnd: false, sendRpc: true
+				destroyOnEnd: false, sendRpc: true, fadeIn: true
 			);
-		LightX3.fadeIn = true;
 		character.player.currency -= Player.zBusterZeroHyperCost;
 		character.playSound("blackzeroentry", forcePlay: false, sendRpc: true);
 	}

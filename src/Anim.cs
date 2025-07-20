@@ -9,6 +9,7 @@ public class Anim : Actor {
 	bool destroyOnEnd;
 	public float? ttl;
 	public float time;
+	public float timeSpeedMul;
 	public Point acc;
 	public Actor? host;
 	public bool fadeIn;
@@ -144,8 +145,8 @@ public class Anim : Actor {
 		base.update();
 
 		if (sprite.name == "risingspecter_muzzle") {
-			float sin = MathF.Sin(Global.time * 100);
-			float sinDamp = Helpers.clamp01(1 - (time / 0.5f));
+			float sin = MathF.Sin(timeSpeedMul * 100);
+			float sinDamp = Helpers.clamp01(1 - (timeSpeedMul / 0.5f));
 			xScale = (0.75f + sin * 0.25f) * sinDamp;
 			yScale = xScale;
 		}
@@ -164,29 +165,28 @@ public class Anim : Actor {
 		}
 
 		if (maverickFade && fadeBlackShader != null) {
-			const float blackStartTime = 2.5f;
-			const float blackDuration = 1;
-			const float fadeStartTime = 5f;
-			const float fadeDuration = 0.5f;
-
-			float blackTime = Helpers.clamp01((time - blackStartTime) * (1 / blackDuration));
-			float fadeTime = 1 - Helpers.clamp01((time - fadeStartTime) * (1 / fadeDuration));
+			const float blackStartTime = 150f;
+			const float blackDuration = 60f;
+			const float fadeStartTime = 300f;
+			const float fadeDuration = 30f;
+			float blackTime = Helpers.clamp01((timeSpeedMul - blackStartTime) * (1 / blackDuration));
+			float fadeTime = 1 - Helpers.clamp01((timeSpeedMul - fadeStartTime) * (1 / fadeDuration));
 
 			fadeBlackShader.SetUniform("factor", blackTime);
 			fadeBlackShader.SetUniform("alpha", fadeTime);
 		}
 
 		time += Global.spf;
-
+		timeSpeedMul += Global.speedMul;
 		if (fadeIn) {
-			alpha = Helpers.clamp01(time / sprite.getAnimLength());
+			alpha = Helpers.clamp01(timeSpeedMul / sprite.getAnimLength());
 		} else if (fadeOut) {
-			alpha = Helpers.clamp01(1 - (time / sprite.getAnimLength()));
+			alpha = Helpers.clamp01(1 - (timeSpeedMul / sprite.getAnimLength()));
 		}
 
 		if (grow) {
-			xScale = 1 + 2 * Helpers.clamp01(time / sprite.getAnimLength());
-			yScale = 1 + 2 * Helpers.clamp01(time / sprite.getAnimLength());
+			xScale = 1 + 2 * Helpers.clamp01(timeSpeedMul / sprite.getAnimLength());
+			yScale = 1 + 2 * Helpers.clamp01(timeSpeedMul / sprite.getAnimLength());
 		}
 
 		if (sprite.name == "kaisersigma_virus_return") {
