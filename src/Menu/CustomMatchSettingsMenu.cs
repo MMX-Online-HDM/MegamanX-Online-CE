@@ -34,6 +34,7 @@ public class CustomMatchSettings {
 	[ProtoMember(25)] public float AxlDodgerollCooldown;
 	[ProtoMember(26)] public bool AxlCustomReload;
 	[ProtoMember(26)] public bool AxlFTADodgeroll;
+	[ProtoMember(27)] public bool oldATrans;
 
 
 	public CustomMatchSettings() {

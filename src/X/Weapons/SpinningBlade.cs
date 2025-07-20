@@ -135,7 +135,7 @@ public class SpinningBladeProj : Projectile {
 }
 
 public class SpinningBladeProjCharged : Projectile {
-	public MegamanX mmx = null!;
+	public MegamanX? mmx = null;
 	public float xDist;
 	const float maxXDist = 90;
 	public float spinAngle;
@@ -154,7 +154,7 @@ public class SpinningBladeProjCharged : Projectile {
 		projId = (int)ProjIds.SpinningBladeCharged;
 		shouldShieldBlock = false;
 		destroyOnHit = false;
-		mmx = player.character as MegamanX ?? throw new NullReferenceException();
+		mmx = player.character as MegamanX;
 		shouldVortexSuck = false;
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
