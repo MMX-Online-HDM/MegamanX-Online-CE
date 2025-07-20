@@ -124,6 +124,11 @@ public partial class Character : Actor, IDamagable {
 	public float undisguiseTime;
 	public float transformSmokeTime;
 	public int fakeAlliance;
+	public bool isATrans;
+	public bool oldATrans => (
+		isATrans &&
+		Global.level.server?.customMatchSettings?.oldATrans == true
+	);
 
 	// For states with special propieties.
 	// For doublejump.
@@ -197,6 +202,7 @@ public partial class Character : Actor, IDamagable {
 	public bool isControllingPuppet() {
 		return currentMaverick?.controlMode == MaverickMode.Puppeteer;
 	}
+	public Weapon? lastMaverickWeapon = null;
 
 	// Etc.
 	public int camOffsetX;
@@ -214,11 +220,12 @@ public partial class Character : Actor, IDamagable {
 	public Character(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
-		bool isWarpIn = true
+		bool isWarpIn = true, bool isATrans = false
 	) : base(
 		null!, new Point(x, y), netId, ownedByLocalPlayer, addToLevel: true
 	) {
 		//hasStateMachine = true;
+		this.isATrans = isATrans;
 		this.player = player;
 		netOwner = player;
 		this.xDir = xDir;
@@ -940,6 +947,39 @@ public partial class Character : Actor, IDamagable {
 		Helpers.decrementTime(ref crystalizeInvulnTime);
 		Helpers.decrementTime(ref grabInvulnTime);
 		Helpers.decrementTime(ref darkHoldInvulnTime);
+	}
+
+	public void genericPuppetControl() {
+		// Return if Sigma or if weapon is the same.
+		if (this is BaseSigma || currentWeapon == lastMaverickWeapon) {
+			return;
+		}
+		// Set all mavericks to follow mode.
+		foreach (var weapon in weapons) {
+			if (weapon is MaverickWeapon altMw) {
+				if (altMw.maverick != null && altMw.maverick.aiBehavior == MaverickAIBehavior.Control) {
+					altMw.maverick.aiBehavior = MaverickAIBehavior.Follow;
+				}
+			}
+		}
+		// Set last weapon as current.
+		lastMaverickWeapon = currentWeapon;
+		// Return if not a maverick weapon.
+		if (currentWeapon is not MaverickWeapon mw) {
+			return;
+		}
+		// Activate pupepter for current maverick if exists.
+		if (mw.maverick != null) {
+			if (mw.maverick.aiBehavior != MaverickAIBehavior.Control &&
+				mw.maverick.state is not MExit
+			) {
+				mw.maverick.aiBehavior = MaverickAIBehavior.Control;
+			}
+		}
+		// Summon if maverick is not spawned.
+		else if (player.input.isPressed(Control.Shoot, player)) {
+			mw.summon(player, pos.addxy(0, -112), pos, xDir);
+		}
 	}
 
 	public override void update() {
@@ -3252,7 +3292,6 @@ public partial class Character : Actor, IDamagable {
 
 	// Axl DNA shenanigans.
 	public void updateDisguisedAxl() {
-
 		if (this is Zero or PunchyZero or BusterZero or Vile) {
 			player.changeWeaponControls();
 		}
@@ -3260,29 +3299,29 @@ public partial class Character : Actor, IDamagable {
 		bool altShootPressed = player.input.isHeld(Control.Special1, player);
 		bool specialPressed = player.input.isPressed(Control.Special1, player);
 		bool upPressed = player.input.isHeld(Control.Up, player);
-		if (currentWeapon is UndisguiseWeapon) {
-			if ((shootPressed || altShootPressed)) {
-				undisguiseTime = 0.33f;
-				DNACore lastDNA = player.lastDNACore;
-				int lastDNAIndex = player.lastDNACoreIndex;
-				playSound("transform", sendRpc: true);
-				player.revertToAxl();
-				undisguiseTime = 0.33f;
-				// To keep DNA.
-				if (altShootPressed && player.currency >= 1) {
-					player.currency -= 1;
-					lastDNA.hyperMode = DNACoreHyperMode.None;
-					// Turn ancient gun into regular axl bullet
-					if (lastDNA.weapons.Count > 0 &&
-						lastDNA.weapons[0] is AxlBullet ab &&
-						ab.type == (int)AxlBulletWeaponType.AncientGun
-					) {
-						lastDNA.weapons[0] = player.getAxlBulletWeapon(0);
-					}
-					weapons.Insert(lastDNAIndex, lastDNA);
+		if (currentWeapon is UndisguiseWeapon && (shootPressed || altShootPressed)) {
+			changeState(new ATransTransition());
+			undisguiseTime = 0.33f;
+			DNACore lastDNA = player.lastDNACore;
+			int lastDNAIndex = player.lastDNACoreIndex;
+			playSound("transform", sendRpc: true);
+			Character oldAxl = player.revertToAxl();
+			// To keep DNA.
+			if (oldATrans && altShootPressed && player.currency >= 1) {
+				player.currency -= 1;
+				lastDNA.hyperMode = DNACoreHyperMode.None;
+				// Turn ancient gun into regular axl bullet
+				if (lastDNA.weapons.Count > 0 &&
+					lastDNA.weapons[0] is AxlBullet ab &&
+					ab.type == (int)AxlBulletWeaponType.AncientGun
+				) {
+					lastDNA.weapons[0] = player.getAxlBulletWeapon(0);
 				}
-				return;
+				oldAxl.weapons.Insert(lastDNAIndex, lastDNA);
+			} else {
+				oldAxl.weapons.Insert(lastDNAIndex, lastDNA);
 			}
+			return;
 		}
 
 		if (currentWeapon is AssassinBulletChar) {

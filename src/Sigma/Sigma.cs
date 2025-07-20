@@ -24,10 +24,11 @@ public class BaseSigma : Character {
 	public BaseSigma(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
-		bool isWarpIn = true, SigmaLoadout? sigmaLoadout = null
+		bool isWarpIn = true, SigmaLoadout? sigmaLoadout = null,
+		bool isAtrans = false
 	) : base(
 		player, x, y, xDir, isVisible,
-		netId, ownedByLocalPlayer, isWarpIn
+		netId, ownedByLocalPlayer, isWarpIn, isAtrans
 	) {
 		charId = CharIds.Sigma;
 		// Special Sigma-only colider.
@@ -706,10 +707,12 @@ public class BaseSigma : Character {
 				commandMode = (int)MaverickMode.Summoner;
 			}
 			// Get weapons.
-			retWeapons = [
-				SigmaLoadout.getWeaponById(player, sigmaLoadout.maverick1, sigmaLoadout.commandMode),
-				SigmaLoadout.getWeaponById(player, sigmaLoadout.maverick2, sigmaLoadout.commandMode)
-			];
+			if (!oldATrans) {
+				retWeapons = [
+					SigmaLoadout.getWeaponById(player, sigmaLoadout.maverick1, sigmaLoadout.commandMode),
+					SigmaLoadout.getWeaponById(player, sigmaLoadout.maverick2, sigmaLoadout.commandMode)
+				];
+			}
 			// Push the generic Sigma slot.
 			int sigmaWeaponSlot = 1;
 			// Always put the AI and enemies slot in the center.

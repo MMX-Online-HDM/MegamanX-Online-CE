@@ -63,7 +63,6 @@ public class Server {
 	[ProtoMember(34)] public byte teamNum = 2;
 	[ProtoMember(35)] public int altPlayTo;
 
-
 	[JsonIgnore]
 	public bool favorHost = true;
 

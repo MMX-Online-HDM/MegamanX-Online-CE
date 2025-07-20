@@ -53,10 +53,11 @@ public class Vile : Character {
 	public Vile(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
-		bool isWarpIn = true, bool mk2VileOverride = false, bool mk5VileOverride = false
+		bool isWarpIn = true, bool mk2VileOverride = false, bool mk5VileOverride = false,
+		bool isATrans = false
 	) : base(
 		player, x, y, xDir, isVisible,
-		netId, ownedByLocalPlayer, isWarpIn
+		netId, ownedByLocalPlayer, isWarpIn, isATrans
 	) {
 		charId = CharIds.Vile;
 		if (isWarpIn) {
@@ -413,8 +414,11 @@ public class Vile : Character {
 				onMechSlotSelect(rideMenuWeapon);
 				return;
 			}
-		//Ride Menu
-		} else if (player.input.isPressed(Control.Special2, player) && !player.input.isHeld(Control.Down, player)) {
+		// Ride Menu
+		} else if (!oldATrans &&
+			player.input.isPressed(Control.Special2, player) &&
+			!player.input.isHeld(Control.Down, player)
+		) {
 			onMechSlotSelect(rideMenuWeapon);
 			return;
 		}
@@ -886,6 +890,7 @@ public class Vile : Character {
 		}
 		base.aiAttack(target);
 	}
+
 	public override void aiUpdate(Actor? target) {
 		if (!player.isMainPlayer) {
 			if (player.canReviveVile() && isVileMK1) {

@@ -1614,6 +1614,18 @@ public class GenericGrabbedState : CharState {
 	}
 }
 
+public class ATransTransition : CharState {
+	public ATransTransition() : base("win") {
+		airMove = true;
+		normalCtrl = false;
+		attackCtrl = false;
+	}
+
+	public override bool canExit(Character character, CharState newState) {
+		return false;
+	}
+}
+
 public class NetLimbo : CharState {
 	public NetLimbo() : base("not_a_real_sprite") {
 

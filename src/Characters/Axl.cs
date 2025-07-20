@@ -298,33 +298,6 @@ public class Axl : Character {
 	public override void preUpdate() {
 		lastXDir = xDir;
 		base.preUpdate();
-
-		if (player.weapon is MaverickWeapon mw2 && mw2.maverick != null) {
-			if (mw2.maverick.aiBehavior != MaverickAIBehavior.Control && mw2.maverick.state is not MExit) {
-				foreach (var weapon in player.weapons) {
-					if (weapon is MaverickWeapon mw) {
-						if (mw.maverick != null && mw.maverick.aiBehavior == MaverickAIBehavior.Control) {
-							mw.maverick.aiBehavior = MaverickAIBehavior.Follow;
-						}
-						if (mw.isMenuOpened) {
-							mw.isMenuOpened = false;
-						}
-					}
-				}
-				mw2.maverick.aiBehavior = MaverickAIBehavior.Control;
-			}
-		} else if (currentMaverick != null) {
-			foreach (var weapon in weapons) {
-				if (weapon is MaverickWeapon mw) {
-					if (mw.maverick != null && mw.maverick.aiBehavior == MaverickAIBehavior.Control) {
-						mw.maverick.aiBehavior = MaverickAIBehavior.Follow;
-					}
-					if (mw.isMenuOpened) {
-						mw.isMenuOpened = false;
-					}
-				}
-			}
-		}
 	}
 
 	public override void update() {
