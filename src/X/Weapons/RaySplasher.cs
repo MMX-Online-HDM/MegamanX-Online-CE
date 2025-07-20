@@ -38,7 +38,7 @@ public class RaySplasher : Weapon {
 	}
 
 	public void burstLogic(MegamanX mmx) {
-		if (mmx.currentWeapon is RaySplasher) {
+		if (mmx.currentWeapon is RaySplasher && mmx.invulnTime <= 0 && mmx.charState is not WarpIn) {
 			if (mmx.shootingRaySplasher != null) {
 				mmx.raySplasherCooldown += Global.speedMul;
 				if (mmx.raySplasherCooldown > 1) {
