@@ -222,7 +222,12 @@ public class Vile : Character {
 	public override bool attackCtrl() {
 		bool specialPressed = player.input.isPressed(Control.Special1, player);
 		bool shootHeld = player.input.isHeld(Control.Shoot, player);
-		bool WeaponRightHeld = player.input.isHeld(Control.WeaponRight, player);
+
+		bool WeaponRightHeld = (
+			player.input.isHeld(Control.WeaponRight, player) && 
+			(!isATrans || !player.input.isHeld(Control.Up, player))
+		);
+
 		if (specialPressed) {
 			dashGrabSpecial();
 			normalAttacks();
@@ -907,6 +912,7 @@ public class Vile : Character {
 public class VileAmmoWeapon : Weapon {
 	public VileAmmoWeapon() { 
 		index = (int)WeaponIds.VileLaser;
+		weaponSlotIndex = 32;
 		weaponBarBaseIndex = 39;
 		weaponBarIndex = 32;
 		allowSmallBar = true;

@@ -511,6 +511,7 @@ public partial class Character : Actor, IDamagable {
 
 	// Stuck in place and can't do any action but still can activate controls, etc.
 	public virtual bool isSoftLocked() {
+		if (currentMaverick != null) return true;
 		if (charState is WarpOut) return true;
 		return false;
 	}
@@ -784,6 +785,7 @@ public partial class Character : Actor, IDamagable {
 		if (!ownedByLocalPlayer) { return; }
 		// Local only starts here.
 		debuffCooldowns();
+		genericPuppetControl();
 		if (grounded && !isDashing) {
 			dashedInAir = 0;
 		}
@@ -871,6 +873,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public void debuffCooldowns() {
+		Helpers.decrementFrames(ref undisguiseTime);
 		Helpers.decrementTime(ref limboRACheckCooldown);
 		Helpers.decrementTime(ref dropFlagCooldown);
 
@@ -1317,7 +1320,7 @@ public partial class Character : Actor, IDamagable {
 		if (charState.normalCtrl) {
 			normalCtrl();
 		}
-		if (charState.attackCtrl && invulnTime <= 0) {
+		if (charState.attackCtrl && invulnTime <= 0 && undisguiseTime <= 0 && !isSoftLocked()) {
 			return attackCtrl();
 		}
 		if (charState.altCtrls.Any(b => b)) {
@@ -3292,20 +3295,27 @@ public partial class Character : Actor, IDamagable {
 
 	// Axl DNA shenanigans.
 	public void updateDisguisedAxl() {
-		if (this is Zero or PunchyZero or BusterZero or Vile) {
-			player.changeWeaponControls();
-		}
 		bool shootPressed = player.input.isHeld(Control.Shoot, player);
 		bool altShootPressed = player.input.isHeld(Control.Special1, player);
 		bool specialPressed = player.input.isPressed(Control.Special1, player);
 		bool upPressed = player.input.isHeld(Control.Up, player);
+
+		// Change Weapon controls.
+		if (this is BusterZero) {
+			player.changeWeaponControls();
+		}
+		if (this is Zero or PunchyZero or Vile && upPressed) {
+			player.changeWeaponControls();
+		}
+		// Tranform.
 		if (currentWeapon is UndisguiseWeapon && (shootPressed || altShootPressed)) {
+			undisguiseTime = 6;
 			changeState(new ATransTransition());
-			undisguiseTime = 0.33f;
 			DNACore lastDNA = player.lastDNACore;
 			int lastDNAIndex = player.lastDNACoreIndex;
 			playSound("transform", sendRpc: true);
 			Character oldAxl = player.revertToAxl();
+			oldAxl.undisguiseTime = 6;
 			// To keep DNA.
 			if (oldATrans && altShootPressed && player.currency >= 1) {
 				player.currency -= 1;
@@ -3317,8 +3327,6 @@ public partial class Character : Actor, IDamagable {
 				) {
 					lastDNA.weapons[0] = player.getAxlBulletWeapon(0);
 				}
-				oldAxl.weapons.Insert(lastDNAIndex, lastDNA);
-			} else {
 				oldAxl.weapons.Insert(lastDNAIndex, lastDNA);
 			}
 			return;

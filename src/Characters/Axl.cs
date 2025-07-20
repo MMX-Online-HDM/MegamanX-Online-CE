@@ -395,7 +395,6 @@ public class Axl : Character {
 		if (targetSoundCooldown > 0) targetSoundCooldown += Global.spf;
 		if (targetSoundCooldown >= 1) targetSoundCooldown = 0;
 		Helpers.decrementTime(ref dodgeRollCooldown);
-		Helpers.decrementTime(ref undisguiseTime);
 		Helpers.decrementTime(ref axlSwapTime);
 		Helpers.decrementTime(ref axlAltSwapTime);
 		Helpers.decrementTime(ref switchTime);
@@ -770,20 +769,10 @@ public class Axl : Character {
 				}
 
 				// DNA Core
-				if (player.weapon is DNACore && canShoot()) {
-					AxlWeapon? realWeapon = player.weapons[player.weaponSlot] as AxlWeapon;
-					if (realWeapon != null) {
+				if (currentWeapon is DNACore && canShoot()) {
+					if (currentWeapon is AxlWeapon realWeapon) {
 						if (shootPressed && shootTime == 0) {
-							if (flag != null) {
-								Global.level.gameMode.setHUDErrorMessage(player, "Cannot transform with flag");
-							} else if (player.currency < 1) {
-								Global.level.gameMode.setHUDErrorMessage(player, "Transformation requires 1 Metal");
-							} else if (isWhiteAxl() || isStealthMode()) {
-								Global.level.gameMode.setHUDErrorMessage(player, "Cannot transform as Hyper Axl");
-							} else {
-								player.currency--;
-								realWeapon.axlShoot(player);
-							}
+							realWeapon.axlShoot(player);
 						}
 					}
 				}
@@ -1725,7 +1714,6 @@ public class Axl : Character {
 		if (isAnyZoom() || sniperMissileProj != null) {
 			return true;
 		}
-		if (currentMaverick != null) return true;
 		if (assassinTime > 0) return true;
 		return base.isSoftLocked();
 	}

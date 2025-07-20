@@ -142,16 +142,37 @@ public class DNACore : AxlWeapon {
 		Player player, AxlBulletType axlBulletType = AxlBulletType.Normal,
 		int? overrideChargeLevel = null
 	) {
-		if (!player.ownedByLocalPlayer) {
+		if (!player.ownedByLocalPlayer || player.character is not Axl axl) {
 			return;
 		}
+		bool oldATrans = Global.level.server?.customMatchSettings?.oldATrans == true;
+
+		if (axl.flag != null) {
+			Global.level.gameMode.setHUDErrorMessage(player, "Cannot transform with flag");
+			return;
+		}
+		if (!oldATrans && (axl.isWhiteAxl() || axl.isStealthMode())) {
+			Global.level.gameMode.setHUDErrorMessage(player, "Cannot transform as Hyper Axl");
+			return;
+		}
+		if (oldATrans || !usedOnce) {
+			if (player.currency < 1) {
+				Global.level.gameMode.setHUDErrorMessage(player, "Transformation requires 1 Metal");
+				return;
+			}
+			player.currency--;
+		}
+
 		player.lastDNACore = this;
 		player.lastDNACoreIndex = player.weaponSlot;
 		player.savedDNACoreWeapons.Remove(this);
-		player.weapons.RemoveAt(player.weaponSlot);
+		if (oldATrans) {
+			player.weapons.RemoveAt(player.weaponSlot);
+		}
 		player.preTransformedAxl = player.character;
 		Global.level.removeGameObject(player.preTransformedAxl);
-		player.character?.playSound("transform", sendRpc: true);
 		player.transformAxl(this, player.getNextATransNetId());
+		player.character.playSound("transform", sendRpc: true);
+		player.character.undisguiseTime = 6;
 	}
 }
