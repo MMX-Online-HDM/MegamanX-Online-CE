@@ -652,7 +652,10 @@ public class Idle : CharState {
 }
 
 public class Run : CharState {
-	public Run() : base("run", "run_shoot", "attack") {
+	public bool skipIntro;
+
+	public Run(bool skipIntro = false) : base("run", "run_shoot", "attack") {
+		this.skipIntro = skipIntro;
 		accuracy = 5;
 		exitOnAirborne = true;
 		attackCtrl = true;
@@ -677,6 +680,14 @@ public class Run : CharState {
 			character.move(move);
 		} else {
 			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (skipIntro) {
+			character.frameIndex = 1;
+			stateFrames = 5;
 		}
 	}
 }
