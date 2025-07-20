@@ -538,6 +538,13 @@ public class BaseSigma : Character {
 		if (isTrueAI) {
 			return 0;
 		}
+		// ATrans puppeter price.
+		if (isATrans) {
+			return mw.trueControlMode switch {
+				MaverickMode.Striker => 0,
+				_ => 5
+			};
+		}
 		// Regular prices for humans.
 		return mw.trueControlMode switch {
 			MaverickMode.TagTeam => 5,
