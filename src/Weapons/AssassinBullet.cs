@@ -221,7 +221,7 @@ public class AssassinationProj : Projectile {
 		}
 		if (!once) {
 			once = true;
-			playSound("assassinate");
+			playSound("assassinate", false, true);
 		}
 		base.update();
 	}
