@@ -785,14 +785,17 @@ public partial class Character : Actor, IDamagable {
 
 	public override void onCollision(CollideData other) {
 		base.onCollision(other);
-		if (other.myCollider?.flag == (int)HitboxFlag.Hitbox || other.myCollider?.flag == (int)HitboxFlag.None) return;
-
-		var killZone = other.gameObject as KillZone;
-		if (killZone != null && !isInvulnerable(true)) {
-			if (rideArmor != null && rideArmor.rideArmorState is RADropIn) {
-				killZone.applyDamage(this);
-			}
+		if (other.myCollider?.flag == null ||
+			other.myCollider?.flag == (int)HitboxFlag.Hitbox ||
+			other.myCollider?.flag == (int)HitboxFlag.None
+		) {
+			return;
 		}
+
+		if (other.gameObject is KillZone killZone && !isInvulnerable(true)) {
+			killZone.applyDamage(this);
+		}
+
 		// Crystal break.
 		if ((charState is Dash || charState is AirDash) &&
 			other.gameObject is Character character && character.isCrystalized &&
