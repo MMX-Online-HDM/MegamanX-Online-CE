@@ -151,6 +151,7 @@ public class DNACore : AxlWeapon {
 		player.weapons.RemoveAt(player.weaponSlot);
 		player.preTransformedAxl = player.character;
 		Global.level.removeGameObject(player.preTransformedAxl);
+		player.character?.playSound("transform", sendRpc: true);
 		player.transformAxl(this, player.getNextATransNetId());
 	}
 }

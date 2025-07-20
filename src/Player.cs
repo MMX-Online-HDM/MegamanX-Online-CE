@@ -1741,6 +1741,9 @@ public partial class Player {
 			// Hit cooldowns.
 			character.projectileCooldown = oldChar.projectileCooldown;
 			character.flinchCooldown = oldChar.flinchCooldown;
+			//
+			character.undisguiseTime = oldChar.undisguiseTime;
+			character.assassinTime = oldChar.assassinTime;
 		}
 	}
 

@@ -188,6 +188,7 @@ public class AssassinationProj : Projectile {
 		damager.flinch = 0;
 		vel = new Point(600 * xDir, 0);
 		fadeSprite = "axl_bullet_fade";
+		fadeOnAutoDestroy = true;		
 		reflectable = true;
 		maxTime = 0.5f;
 		projId = (int)ProjIds.AssassinBulletEX;
@@ -237,10 +238,12 @@ public class AssassinateChar : CharState {
 		if (!fired) {
 			int xDir = character.xDir;
 			fired = true;
-			new AssassinationProj(
-				character.getCenterPos().addxy(10 * xDir,-10), xDir,
-				character, player, player.getNextActorNetId(), true
-			);
+			Global.level.delayedActions.Add(new DelayedAction(() => {
+				new AssassinationProj(
+					character.getCenterPos().addxy(16 * xDir, -5), xDir,
+					character, player, player.getNextActorNetId(), true
+				);
+			}, 0.55f));
 		}
 		if (stateTime >= 0.75f) {
 			character.changeToIdleOrFall();

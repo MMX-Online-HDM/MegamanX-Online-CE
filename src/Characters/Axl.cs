@@ -291,7 +291,6 @@ public class Axl : Character {
 		return !(charState is InRideArmor) && !(charState is Die) && !(charState is GenericStun);
 	}
 
-	float assassinSmokeTime;
 	float lastAltShootPressedTime;
 	float voltTornadoTime;
 
@@ -411,23 +410,15 @@ public class Axl : Character {
 			if (isWhiteAxl()) zoomCharge = 1;
 			if (zoomCharge > 1) zoomCharge = 1;
 		}
-
 		if (assassinTime > 0) {
-			assassinSmokeTime += Global.spf;
-			if (assassinSmokeTime > 0.06f) {
-				assassinSmokeTime = 0;
-				// new Anim(getAxlBulletPos(0), "torpedo_smoke", 1, player.getNextActorNetId(), false, true, true) { vel = new Point(0, -100) };
-			}
-			assassinTime -= Global.spf;
-			if (assassinTime < 0) {
-				assassinTime = 0;
-				useGravity = true;
-			}
-			return;
+			stopMoving();
+			useGravity = false;
+		} else {
+			useGravity = true;
 		}
 		if (targetSoundCooldown > 0) targetSoundCooldown += Global.spf;
 		if (targetSoundCooldown >= 1) targetSoundCooldown = 0;
-
+		Helpers.decrementFrames(ref assassinTime);
 		Helpers.decrementTime(ref dodgeRollCooldown);
 		Helpers.decrementTime(ref undisguiseTime);
 		Helpers.decrementTime(ref axlSwapTime);
@@ -587,8 +578,8 @@ public class Axl : Character {
 							hyperAxlUsed = true;
 							//addHealth(player.maxHealth);
 							if (!hyperAxlFix) {
-								foreach (var weapon in player.weapons) 
-									weapon.ammo = weapon.maxAmmo;				
+								foreach (var weapon in player.weapons)
+									weapon.ammo = weapon.maxAmmo;
 							}
 							stingChargeTime = 12;
 							playSound("stingCharge", sendRpc: true);
@@ -1073,7 +1064,8 @@ public class Axl : Character {
 		assassinCursorPos = null;
 
 		if (!Options.main.lockOnSound) return;
-		if (player.isDisguisedAxl && !player.isAxl && player.weapon is not AssassinBulletChar) return;
+		//This sht was bugging assassin time, i was like +2 hours trying to see whats wrong with it
+		//if (player.isDisguisedAxl && !player.isAxl && player.weapon is not AssassinBulletChar) return;
 		if (player.isDisguisedAxl && player.axlWeapon is UndisguiseWeapon) return;
 		if (player.input.isCursorLocked(player)) return;
 
@@ -1759,7 +1751,7 @@ public class Axl : Character {
 			return true;
 		}
 		if (currentMaverick != null) return true;
-
+		if (assassinTime > 0) return true;
 		return base.isSoftLocked();
 	}
 
