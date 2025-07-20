@@ -909,11 +909,11 @@ public partial class Player {
 				Global.shouldAiAutoRevive
 			)
 			) {
-				//reviveSigma(2, spawnPoint);
+				reviveSigma(2, spawnPoint);
 			}
 		} else if (isX) {
 			if (canReviveX() && (input.isPressed(Control.Special2, this) || Global.shouldAiAutoRevive)) {
-				//reviveX();
+				reviveX();
 			}
 		}
 
