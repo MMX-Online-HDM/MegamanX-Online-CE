@@ -1226,13 +1226,13 @@ public class MegamanX : Character {
 		return chargePalletes;
 	}
 
-	public int getArmorByte() {
+	public ushort getArmorByte() {
 		int armorByte = (byte)chestArmor;
 		armorByte += (byte)armArmor << 4;
 		armorByte += (byte)legArmor << 8;
 		armorByte += (byte)helmetArmor << 12;
 
-		return armorByte;
+		return (ushort)armorByte;
 	}
 
 	public void setArmorByte(int armorByte) {
