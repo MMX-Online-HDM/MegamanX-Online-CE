@@ -643,7 +643,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual CharState getIdleState() => new Idle();
-	public virtual CharState getRunState(bool skipInto = false) => new Run();
+	public virtual CharState getRunState(bool skipInto = false) => new Run(skipInto);
 	public virtual CharState getJumpState() => new Jump();
 	public virtual CharState getAirJumpState() => new Jump();
 	public virtual CharState getFallState() => new Fall();
