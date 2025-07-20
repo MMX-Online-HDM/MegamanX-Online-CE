@@ -345,7 +345,7 @@ label:
 		}
 		foreach (var weapon in character.weapons) {
 			weapon.update();
-			if (character != null && health > 0) {
+			if (character != null && character.alive) {
 				bool alwaysOn = false;
 				if (weapon is GigaCrush && Options.main.gigaCrushSpecial ||
 					weapon is HyperNovaStrike && Options.main.novaStrikeSpecial

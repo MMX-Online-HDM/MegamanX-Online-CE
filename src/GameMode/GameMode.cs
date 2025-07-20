@@ -990,7 +990,7 @@ public class GameMode {
 		}
 		if (level.mainPlayer.currentMaverick != null) {
 			if (level.mainPlayer.currentMaverick.controlMode == MaverickMode.Puppeteer) {
-				return level.mainPlayer.health > 0;
+				return level.mainPlayer.character?.alive == true;
 			}
 			else if (level.mainPlayer.currentMaverick.controlMode == MaverickMode.Summoner) {
 				return level.mainPlayer.mavericks.Count > 1;
@@ -1391,7 +1391,7 @@ public class GameMode {
 			}
 		}
 		else if (player.character != null) {
-			if (player.health > 0 && player.health < player.maxHealth) {
+			if (player.character.alive && player.health < player.maxHealth) {
 				damageSavings = MathInt.Floor(player.character.damageSavings);
 			}
 			if (player.character is MegamanX rmx && rmx.hyperHelmetArmor == ArmorId.Max) {

@@ -441,7 +441,7 @@ public class Axl : Character {
 		if (currentWeapon != null && currentWeapon.ammo >= currentWeapon.maxAmmo) {
 			weaponHealAmount = 0;
 		}
-		if (currentWeapon != null && weaponHealAmount > 0 && player.health > 0) {
+		if (currentWeapon != null && weaponHealAmount > 0 && alive) {
 			weaponHealTime += Global.spf;
 			if (weaponHealTime > 0.05) {
 				weaponHealTime = 0;

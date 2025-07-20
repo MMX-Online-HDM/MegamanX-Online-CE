@@ -20,6 +20,9 @@ public partial class Character : Actor, IDamagable {
 	// Health.
 	public decimal health;
 	public decimal maxHealth = 28;
+	public int spawnHealthToAdd;
+	public float spawnHealthAddTime;
+	public bool alive = true;
 
 	// Player linked data.
 	public Player player;
@@ -227,7 +230,7 @@ public partial class Character : Actor, IDamagable {
 		CharState initialCharState;
 
 		if (ownedByLocalPlayer) {
-			if (isWarpIn) { initialCharState = new WarpIn(); }
+			if (isWarpIn) { initialCharState = new WarpIn(true, true); ; }
 			else { initialCharState = getIdleState(); }
 		} else {
 			initialCharState = new NetLimbo();
@@ -266,7 +269,7 @@ public partial class Character : Actor, IDamagable {
 		chargeEffect = new ChargeEffect();
 		lastGravityWellDamager = player;
 		maxHealth = 16;
-		if (!ownedByLocalPlayer) {
+		if (!ownedByLocalPlayer || !isWarpIn) {
 			health = maxHealth;
 		}
 	}
@@ -1066,7 +1069,7 @@ public partial class Character : Actor, IDamagable {
 			healAmount = 0;
 			usedSubtank = null;
 		}
-		if (healAmount > 0 && health > 0) {
+		if (healAmount > 0 && alive) {
 			healTime += Global.spf;
 			if (healTime > 0.05) {
 				healTime = 0;
@@ -1081,7 +1084,23 @@ public partial class Character : Actor, IDamagable {
 				}
 				if (player == Global.level.mainPlayer || playHealSound) {
 					playAltSound("heal", sendRpc: true, altParams: "harmor");
+					playHealSound = false;
 				}
+			}
+		} else {
+			playHealSound = false;
+		}
+		if (spawnHealthToAdd > 0 && alive) {
+			if (spawnHealthAddTime <= 0) {
+				spawnHealthToAdd--;
+				health = Helpers.clampMax(health + 1, maxHealth);
+				spawnHealthAddTime = 4;
+				if (player == Global.level.mainPlayer || playHealSound) {
+					playAltSound("heal", sendRpc: true, altParams: "harmor");
+					playHealSound = false;
+				}
+			} else {
+				spawnHealthAddTime -= speedMul;
 			}
 		} else {
 			playHealSound = false;
@@ -1596,7 +1615,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool isTrueStatusImmune() {
-		return isInvulnerable(true) || ownedByLocalPlayer && charState is Die;
+		return !alive || isInvulnerable(true);
 	}
 
 	public virtual bool isNonDamageStatusImmune() {
@@ -1613,6 +1632,7 @@ public partial class Character : Actor, IDamagable {
 	public virtual bool isInvulnerable(bool ignoreRideArmorHide = false, bool factorHyperMode = false) {
 		if (isWarpIn()) return true;
 		if (invulnTime > 0) return true;
+		if (charState.specialId == SpecialStateIds.WarpIdle) return true;
 		if (!ignoreRideArmorHide) {
 			if (ownedByLocalPlayer && charState is InRideArmor { isHiding: true }) {
 				return true;
@@ -1620,7 +1640,9 @@ public partial class Character : Actor, IDamagable {
 			if (sprite.name.EndsWith("ra_hide")) {
 				return true;
 			}
-			if (charState.specialId == SpecialStateIds.AxlRoll || charState.specialId == SpecialStateIds.XTeleport) {
+			if (charState.specialId == SpecialStateIds.AxlRoll ||
+				charState.specialId == SpecialStateIds.XTeleport
+			) {
 				return true;
 			}
 		}
@@ -2528,7 +2550,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool canBeHealed(int healerAlliance) {
-		return player.alliance == healerAlliance && health > 0 && health < maxHealth;
+		return player.alliance == healerAlliance && alive && health < maxHealth;
 	}
 
 	public virtual void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
@@ -2707,7 +2729,7 @@ public partial class Character : Actor, IDamagable {
 			health = 0;
 		}
 
-		if (player.showTrainingDps && health > 0 && originalDamage > 0) {
+		if (player.showTrainingDps && alive && originalDamage > 0) {
 			if (player.trainingDpsStartTime == 0) {
 				player.trainingDpsStartTime = Global.time;
 				Global.level.gameMode.dpsString = "";
@@ -2723,7 +2745,7 @@ public partial class Character : Actor, IDamagable {
 		if (originalHP > 0 && (originalDamage > 0 || damage > 0)) {
 			addDamageTextHelper(attacker, (float)damage, (float)maxHealth, true);
 		}
-		if (health > 0 && (originalDamage > 0 || damage > 0) && ownedByLocalPlayer) {
+		if (alive && (originalDamage > 0 || damage > 0) && ownedByLocalPlayer) {
 			decimal modifier = (32 / maxHealth);
 			decimal gigaDamage = damage;
 			if (originalDamage > damage) {
@@ -2819,7 +2841,7 @@ public partial class Character : Actor, IDamagable {
 			}
 		}
 
-		if (health <= 0) {
+		if (health <= 0 && alive) {
 			if (player.showTrainingDps && player.trainingDpsStartTime > 0) {
 				float timeToKill = Global.time - player.trainingDpsStartTime;
 				float dps = player.trainingDpsTotalDamage / timeToKill;
@@ -2840,6 +2862,7 @@ public partial class Character : Actor, IDamagable {
 
 	public void killPlayer(Player? killer, Player? assister, int? weaponIndex, int? projId) {
 		health = 0;
+		alive = false;
 		int? assisterProjId = null;
 		int? assisterWeaponId = null;
 		if (charState is not Die || !ownedByLocalPlayer) {
@@ -3411,6 +3434,7 @@ public partial class Character : Actor, IDamagable {
 
 		// Bool variables. Packed in a single byte.
 		byte stateFlag = Helpers.boolArrayToByte([
+			alive,
 			player.isDefenderFavored,
 			invulnTime > 0,
 			isDarkHoldState,
@@ -3493,12 +3517,13 @@ public partial class Character : Actor, IDamagable {
 		// Bool variables.
 		bool[] boolData = Helpers.byteToBoolArray(data[5]);
 
-		player.isDefenderFavoredNonOwner = boolData[0];
-		invulnTime = boolData[1] ? 10 : 0;
-		isDarkHoldState = boolData[2];
-		isStrikeChainState = boolData[3];
-		charState.immuneToWind = boolData[4];
-		charState.stunResistant = boolData[5];
+		alive = boolData[0];
+		player.isDefenderFavoredNonOwner = boolData[1];
+		invulnTime = boolData[2] ? 10 : 0;
+		isDarkHoldState = boolData[3];
+		isStrikeChainState = boolData[4];
+		charState.immuneToWind = boolData[5];
+		charState.stunResistant = boolData[6];
 
 		// Optional statuses.
 		bool[] boolMask = Helpers.byteToBoolArray(data[6]);

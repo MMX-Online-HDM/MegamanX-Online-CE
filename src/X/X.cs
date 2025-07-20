@@ -246,7 +246,7 @@ public class MegamanX : Character {
 			player.delaySubtank();
 		}
 
-		if (hyperHelmetArmor == ArmorId.Max && health > 0) {
+		if (hyperHelmetArmor == ArmorId.Max && alive) {
 			if (health >= lastChipBaseHP) {
 				lastChipBaseHP = health;
 			}

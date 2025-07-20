@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using static System.Reflection.Metadata.BlobBuilder;
 
 namespace MMXOnline;
 
@@ -360,9 +361,12 @@ public class WarpIn : CharState {
 	public bool landOnce;
 	public bool decloaked;
 	public bool addInvulnFrames;
+	public bool refillHP;
 	public bool sigma2Once;
-	public WarpIn(bool addInvulnFrames = true) : base("warp_in") {
+
+	public WarpIn(bool addInvulnFrames = true, bool refillHP = false) : base("warp_in") {
 		this.addInvulnFrames = addInvulnFrames;
+		this.refillHP = refillHP;
 		invincible = true;
 	}
 
@@ -403,7 +407,11 @@ public class WarpIn : CharState {
 				character.grounded = true;
 				character.pos.y = destY;
 				character.pos.x = destX;
-				character.changeToIdleOrFall();
+				if (refillHP && !player.warpedInOnce) {
+					character.changeState(new WarpIdle(player.warpedInOnce));
+				} else {
+					character.changeToIdleOrFall();
+				}
 			}
 			return;
 		}
@@ -477,7 +485,69 @@ public class WarpIn : CharState {
 		if (addInvulnFrames && character.ownedByLocalPlayer) {
 			character.invulnTime = (player.warpedInOnce || Global.level.joinedLate) ? 2 : 0;
 		}
+		if (refillHP && character.ownedByLocalPlayer && newState is not WarpIdle) {
+			character.spawnHealthToAdd = MathInt.Ceiling(character.maxHealth);
+		}
 		player.warpedInOnce = true;
+	}
+}
+
+public class WarpIdle : CharState {
+	public bool firstSpawn;
+	public bool fullHP;
+	public bool fullAlt;
+	float healTime = -4;
+
+	public WarpIdle(bool firstSpawn = false) : base("win") {
+		invincible = true;
+		this.firstSpawn = firstSpawn;
+	}
+
+	public override void update() {
+		base.update();
+		refillNormal();
+
+		if ((character.isAnimOver() || character.sprite.loopCount >= 1) && fullHP && fullAlt) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+
+	public void refillNormal() {
+		fullAlt = true;
+		healTime++;
+		if (fullHP || healTime < 3) {
+			return;
+		}
+		// Health.
+		if (character.health < character.maxHealth) {
+			character.health = Helpers.clampMax(character.health + 1, character.maxHealth);
+		} else {
+			fullHP = true;
+		}
+		if (Global.level.mainPlayer.character == character) {
+			character.playSound("heal", forcePlay: true);
+		}
+		healTime = 0;
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.stopMoving();
+		character.useGravity = false;
+		specialId = SpecialStateIds.WarpIdle;
+		character.invulnTime = firstSpawn ? 5 : 0;
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.visible = true;
+		character.useGravity = true;
+		character.splashable = true;
+		specialId = SpecialStateIds.None;
+		if (character.ownedByLocalPlayer) {
+			character.invulnTime = firstSpawn ? 1 : 0;
+		}
 	}
 }
 
@@ -545,7 +615,7 @@ public class Idle : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		if ((character is RagingChargeX || player.health < 4)) {
+		if (character is RagingChargeX || character.health < 4 && character.spawnHealthToAdd <= 0) {
 			if (Global.sprites.ContainsKey(character.getSprite("weak"))) {
 				defaultSprite = "weak";
 				if (!inTransition()) {

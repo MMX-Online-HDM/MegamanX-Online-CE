@@ -48,7 +48,7 @@ public class BaseSigma : Character {
 			if (player.maverick1v1 != null) {
 				intialCharState = new WarpOut(true);
 			} else if (isWarpIn) {
-				intialCharState = new WarpIn();
+				intialCharState = new WarpIn(true, true);
 			} else {
 				intialCharState = getIdleState();
 			}

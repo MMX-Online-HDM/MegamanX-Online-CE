@@ -216,18 +216,20 @@ public partial class Player {
 
 	// Subtanks
 	private Dictionary<int, List<SubTank>> charSubTanks = new Dictionary<int, List<SubTank>>() {
-		{ (int)CharIds.X, new List<SubTank>() },
-		{ (int)CharIds.Zero, new List<SubTank>() },
-		{ (int)CharIds.Vile, new List<SubTank>() },
-		{ (int)CharIds.Axl, new List<SubTank>() },
-		{ (int)CharIds.Sigma, new List<SubTank>() },
-		{ (int)CharIds.PunchyZero, new List<SubTank>() },
-		{ (int)CharIds.BusterZero, new List<SubTank>() },
-		{ (int)CharIds.Rock, new List<SubTank>() },
+		{ -1, new() },
+		{ (int)CharIds.X, new() },
+		{ (int)CharIds.Zero, new() },
+		{ (int)CharIds.Vile, new() },
+		{ (int)CharIds.Axl, new() },
+		{ (int)CharIds.Sigma, new() },
+		{ (int)CharIds.PunchyZero, new() },
+		{ (int)CharIds.BusterZero, new() },
+		{ (int)CharIds.Rock, new() },
 	};
 
 	// Heart tanks
 	private Dictionary<int, ProtectedInt> charHeartTanks = new Dictionary<int, ProtectedInt>(){
+		{ -1, new() },
 		{ (int)CharIds.X, new() },
 		{ (int)CharIds.Zero, new() },
 		{ (int)CharIds.Vile, new() },
@@ -557,14 +559,16 @@ public partial class Player {
 		newAlliance = alliance;
 		this.isAI = isAI;
 
-		if (getSameCharNum() != -1) charNum = getSameCharNum();
+		if (getSameCharNum() != -1) {
+			charNum = getSameCharNum();
+		}
 		if (charNum >= 210) {
 			if (Global.level.is1v1()) {
 				maverick1v1 = charNum - 210;
-				charNum = 4;
+				charNum = (int)CharIds.Sigma;
 			} else {
-				charNum = 4;
-				playerData.charNum = 4;
+				charNum = (int)CharIds.Sigma;
+				playerData.charNum = (int)CharIds.Sigma;
 			}
 		}
 		this.charNum = charNum;
@@ -573,7 +577,7 @@ public partial class Player {
 		this.input = input;
 		this.ownedByLocalPlayer = ownedByLocalPlayer;
 
-		this.xArmor1v1 = playerData?.armorSet ?? 1;
+		xArmor1v1 = playerData?.armorSet ?? 1;
 		if (Global.level.is1v1() && isX) {
 			legArmorNum = xArmor1v1;
 			bodyArmorNum = xArmor1v1;
@@ -936,7 +940,7 @@ public partial class Player {
 
 				if (Global.level.gameMode is TeamDeathMatch && Global.level.teamNum > 2 && warpedInOnce) {
 					List<Player> spawnPoints = Global.level.players.FindAll(
-						p => p.teamAlliance == teamAlliance && p.health > 0 && p.character != null
+						p => p.teamAlliance == teamAlliance && p.character?.alive == true
 					);
 					if (spawnPoints.Count != 0) {
 						Character randomChar = spawnPoints[Helpers.randomRange(0, spawnPoints.Count - 1)].character!;
@@ -2543,7 +2547,7 @@ public partial class Player {
 		return (
 			!isAI && loadout?.sigmaLoadout != null &&
 			loadout.sigmaLoadout.commandMode == (int)MaverickMode.Puppeteer &&
-			health > 0
+			character?.alive == true
 		);
 	}
 

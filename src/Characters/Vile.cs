@@ -166,7 +166,7 @@ public class Vile : Character {
 		if (energy.ammo >= energy.maxAmmo) {
 			weaponHealAmount = 0;
 		}
-		if (weaponHealAmount > 0 && player.health > 0) {
+		if (weaponHealAmount > 0 && alive) {
 			weaponHealTime += Global.spf;
 			if (weaponHealTime > 0.05) {
 				weaponHealTime = 0;
