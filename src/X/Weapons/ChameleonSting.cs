@@ -86,7 +86,6 @@ public class StingProj : Projectile {
 			damager.damage = 2;
 			projId = (int)ProjIds.StingDiag;
 		}
-		fadeSprite = "buster1_fade";
 		this.type = type;
 		/*
 		if (player.character?.isInvisibleBS?.getValue() == true)

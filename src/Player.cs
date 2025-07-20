@@ -909,11 +909,11 @@ public partial class Player {
 				Global.shouldAiAutoRevive
 			)
 			) {
-				//reviveSigma(2, spawnPoint);
+				reviveSigma(2, spawnPoint);
 			}
 		} else if (isX) {
 			if (canReviveX() && (input.isPressed(Control.Special2, this) || Global.shouldAiAutoRevive)) {
-				//reviveX();
+				reviveX();
 			}
 		}
 
@@ -1612,6 +1612,9 @@ public partial class Player {
 		if (charNum == (int)CharIds.KaiserSigma) {
 			retChar.weapons.Add(new SigmaMenuWeapon());
 		}
+		if (charNum == (int)CharIds.Vile) {
+			retChar.weapons.Add((retChar as Vile)?.energy ?? new VileAmmoWeapon());
+		}
 		if (oldATrans) {
 			retChar.weapons.Add(new AssassinBulletChar());
 		} else {
@@ -1713,7 +1716,7 @@ public partial class Player {
 	}
 
 	// If you change this method change revertToAxlDeath() too
-	public void revertToAxl(ushort? backupNetId = null) {
+	public Character revertToAxl(ushort? backupNetId = null) {
 		disguise = null;
 		atransLoadout = null;
 		Character oldChar = character;
@@ -1793,7 +1796,12 @@ public partial class Player {
 			// Hit cooldowns.
 			character.projectileCooldown = oldChar.projectileCooldown;
 			character.flinchCooldown = oldChar.flinchCooldown;
+			//
+			character.undisguiseTime = oldChar.undisguiseTime;
+			character.assassinTime = oldChar.assassinTime;
 		}
+
+		return character;
 	}
 
 	// If you change this method change revertToAxl() too
@@ -2031,6 +2039,9 @@ public partial class Player {
 			return false;
 		}
 		if (character?.charState is not Die) {
+			return false;
+		}
+		if (character is Vile vile2 && vile2.isVileMK5) {
 			return false;
 		}
 		if (character is not Vile vile || vile.summonedGoliath) {

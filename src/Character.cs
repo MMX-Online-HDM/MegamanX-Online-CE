@@ -120,7 +120,9 @@ public partial class Character : Actor, IDamagable {
 
 	// Was on Axl.cs before
 	public Anim? transformAnim;
-	float transformSmokeTime;
+	public float assassinTime;
+	public float undisguiseTime;
+	public float transformSmokeTime;
 	public int fakeAlliance;
 	public bool isATrans;
 	public bool oldATrans => (
@@ -3290,21 +3292,6 @@ public partial class Character : Actor, IDamagable {
 
 	// Axl DNA shenanigans.
 	public void updateDisguisedAxl() {
-		if (currentWeapon is AssassinBullet) {
-			// URGENT TODO
-			// player.assassinHitPos = player.character.getFirstHitPos(AssassinBulletProj.range);
-		}
-		/*
-		// TODO: Check if this has any impact.
-		if (!player.isAxl) {
-			if (Options.main.axlAimMode == 2) {
-				updateAxlCursorPos();
-			} else {
-				updateAxlDirectionalAim();
-			}
-		}
-		*/
-
 		if (this is Zero or PunchyZero or BusterZero or Vile) {
 			player.changeWeaponControls();
 		}
@@ -3317,8 +3304,8 @@ public partial class Character : Actor, IDamagable {
 			undisguiseTime = 0.33f;
 			DNACore lastDNA = player.lastDNACore;
 			int lastDNAIndex = player.lastDNACoreIndex;
-			player.revertToAxl();
-			undisguiseTime = 0.33f;
+			playSound("transform", sendRpc: true);
+			Character oldAxl = player.revertToAxl();
 			// To keep DNA.
 			if (oldATrans && altShootPressed && player.currency >= 1) {
 				player.currency -= 1;
@@ -3330,7 +3317,9 @@ public partial class Character : Actor, IDamagable {
 				) {
 					lastDNA.weapons[0] = player.getAxlBulletWeapon(0);
 				}
-				weapons.Insert(lastDNAIndex, lastDNA);
+				oldAxl.weapons.Insert(lastDNAIndex, lastDNA);
+			} else {
+				oldAxl.weapons.Insert(lastDNAIndex, lastDNA);
 			}
 			return;
 		}
@@ -3367,24 +3356,18 @@ public partial class Character : Actor, IDamagable {
 
 	public void shootAssassinShot(bool isAlt = false) {
 		if (getChargeLevel() >= 3 || isAlt) {
+			assassinTime = 33f;
 			player.revertToAxl();
-			assassinTime = 0.75f;
-			useGravity = false;
-			vel = new Point();
 			changeState(new AssassinateChar(), true);
 		} else {
 			stopCharge();
 		}
 	}
-
-	public float assassinTime;
 	public bool isQuickAssassinate;
-	public float undisguiseTime;
 	public bool disguiseCoverBlown;
 
 	public void addTransformAnim() {
 		transformAnim = new Anim(pos, "axl_transform", xDir, player.getNextActorNetId(), true, true);
-		playSound("transform", sendRpc: true);
 	}
 
 	public virtual void onFlinchOrStun(CharState state) { }

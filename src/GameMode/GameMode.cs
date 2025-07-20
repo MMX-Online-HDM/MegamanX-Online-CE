@@ -2927,38 +2927,21 @@ public class GameMode {
 	}
 
 	public void drawRespawnHUD() {
-		if (level.mainPlayer.character != null && level.mainPlayer.readyTextOver && level.mainPlayer.canReviveX()) {
-			Fonts.drawTextEX(
-				FontType.Blue, Helpers.controlText("[CMD]: Activate Raging Charge"),
-				Global.screenW / 2, 10 + Global.screenH / 2, Alignment.Center
-			);
-		}
-
-		if (level.mainPlayer.randomTip == null) return;
-		if (level.mainPlayer.isSpectator) return;
-
-		if (level.mainPlayer.character == null && level.mainPlayer.readyTextOver) {
-			string respawnStr = (
+		string respawnStr = (
 				(level.mainPlayer.respawnTime > 0) ?
 				"Respawn in " + Math.Round(level.mainPlayer.respawnTime).ToString() :
 				Helpers.controlText("Press [OK] to respawn")
 			);
-
-			if (level.mainPlayer.eliminated()) {
-				Fonts.drawText(
-					FontType.Red, "You were eliminated!",
-					Global.screenW / 2, -15 + Global.screenH / 2, Alignment.Center
+		if (level.mainPlayer.character != null && level.mainPlayer.readyTextOver) {
+			if (level.mainPlayer.canReviveX()) {
+				Fonts.drawTextEX(
+					FontType.Blue, Helpers.controlText("[CMD]: Activate Raging Charge"),
+					Global.screenW / 2, 10 + Global.screenH / 2, Alignment.Center
 				);
-				Fonts.drawText(
-					FontType.BlueMenu, "Spectating in " + Math.Round(level.mainPlayer.respawnTime).ToString(),
-					Global.screenW / 2, Global.screenH / 2, Alignment.Center
-				);
-			} else if (level.mainPlayer.canReviveVile()) {
+			}
+			#region  ReviveVile HUD
+			if (level.mainPlayer.canReviveVile()) {
 				if (level.mainPlayer.lastDeathWasVileMK2) {
-					Fonts.drawText(
-						FontType.BlueMenu, respawnStr,
-						Global.screenW / 2, -10 + Global.screenH / 2, Alignment.Center
-					);
 					string reviveText = Helpers.controlText(
 						$"[SPC]: Revive as Vile V (5 {Global.nameCoins})"
 					);
@@ -2967,10 +2950,6 @@ public class GameMode {
 						Global.screenW / 2, 10 + Global.screenH / 2, Alignment.Center
 					);
 				} else {
-					Fonts.drawText(
-						FontType.BlueMenu, respawnStr,
-						Global.screenW / 2, -10 + Global.screenH / 2, Alignment.Center
-					);
 					string reviveText = Helpers.controlText(
 						$"[SPC]: Revive as MK-II (5 {Global.nameCoins})"
 					);
@@ -2986,11 +2965,9 @@ public class GameMode {
 						Global.screenW / 2, 22 + Global.screenH / 2, Alignment.Center
 					);
 				}
+				#endregion
+				#region  ReviveSigma HUD
 			} else if (level.mainPlayer.canReviveSigma(out _, 2)) {
-				Fonts.drawText(
-					FontType.BlueMenu, respawnStr,
-					Global.screenW / 2, -10 + Global.screenH / 2, Alignment.Center
-				);
 				string hyperType = "Kaiser";
 				string reviveText = (
 					$"[CMD]: Revive as {hyperType} Sigma ({Player.reviveSigmaCost.ToString()} {Global.nameCoins})"
@@ -2999,12 +2976,28 @@ public class GameMode {
 					FontType.Green, reviveText,
 					Global.screenW / 2, 10 + Global.screenH / 2, Alignment.Center
 				);
-			} else {
+                #endregion
+			} 
+		}
+
+		if (level.mainPlayer.randomTip == null) return;
+		if (level.mainPlayer.isSpectator) return;
+
+		if (level.mainPlayer.character == null && level.mainPlayer.readyTextOver) {
+			if (level.mainPlayer.eliminated()) {
 				Fonts.drawText(
-					FontType.BlueMenu, respawnStr,
+					FontType.Red, "You were eliminated!",
+					Global.screenW / 2, -15 + Global.screenH / 2, Alignment.Center
+				);
+				Fonts.drawText(
+					FontType.BlueMenu, "Spectating in " + Math.Round(level.mainPlayer.respawnTime).ToString(),
 					Global.screenW / 2, Global.screenH / 2, Alignment.Center
 				);
-			}
+			}  
+			Fonts.drawText(
+				FontType.BlueMenu, respawnStr,
+				Global.screenW / 2, -10 + Global.screenH / 2, Alignment.Center
+			);
 
 			if (!Menu.inMenu) {
 				DrawWrappers.DrawRect(0, Global.halfScreenH + 40, Global.screenW, Global.halfScreenH + 40 + (14 * level.mainPlayer.randomTip.Length), true, new Color(0, 0, 0, 224), 0, ZIndex.HUD, false);
