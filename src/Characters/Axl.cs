@@ -413,12 +413,14 @@ public class Axl : Character {
 		if (assassinTime > 0) {
 			stopMoving();
 			useGravity = false;
-		} else {
-			useGravity = true;
+			Helpers.decrementFrames(ref assassinTime);
+			if (assassinTime <= 0) {
+				useGravity = true;
+				return;
+			}
 		}
 		if (targetSoundCooldown > 0) targetSoundCooldown += Global.spf;
 		if (targetSoundCooldown >= 1) targetSoundCooldown = 0;
-		Helpers.decrementFrames(ref assassinTime);
 		Helpers.decrementTime(ref dodgeRollCooldown);
 		Helpers.decrementTime(ref undisguiseTime);
 		Helpers.decrementTime(ref axlSwapTime);
