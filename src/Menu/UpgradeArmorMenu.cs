@@ -1047,9 +1047,9 @@ public class SNESArmorHandler : IMenuHandler {
 			{ 14, new Point(-110, -10) }, //Arm
 			{ 15, new Point(-90, -10) }, //Foot
 			{ 0, new Point(-150, 10) }, //Helmet
-			{ 2, new Point(-130, 10) }, //Body
-			{ 3, new Point(-110, 10) }, //Arm
-			{ 1, new Point(-90, 10) }, //Foot
+			{ 1, new Point(-130, 10) }, //Body
+			{ 2, new Point(-110, 10) }, //Arm
+			{ 3, new Point(-90, 10) }, //Foot
         };
 		foreach (var icons in iconsD) {
 			icon.drawToHUD(icons.Key, ghw + icons.Value.x, ghh + icons.Value.y, opacity);
@@ -1077,6 +1077,12 @@ public class UpgradeArmorMenuEX : IMainMenu {
 	public void update() {
 		if (mainP.character is not MegamanX mmx) {
 			return;
+		}
+		if (mmx.hasAnyHyperArmor && mmx.fullArmor != ArmorId.Max) {
+			mmx.hyperHelmetActive = false;
+			mmx.hyperChestActive = false;
+			mmx.hyperArmActive = false;
+			mmx.hyperLegActive = false;
 		}
 		if (xGame >= 1) {
 			switch (slot) {

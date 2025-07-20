@@ -1397,6 +1397,7 @@ public class Die : CharState {
 		character.xPushVel = 0;
 		character.vel.x = 0;
 		character.vel.y = 0;
+		character.stopCharge();
 		base.update();
 		if (!character.ownedByLocalPlayer) {
 			return;
