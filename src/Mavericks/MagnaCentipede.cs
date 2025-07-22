@@ -71,8 +71,8 @@ public class MagnaCentipede : Maverick {
 			return;
 		}
 
-		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand) {
+		if (aiBehavior == MaverickAIBehavior.Control && state.normalCtrl) {
+			if (grounded) {
 				if (shootHeldTime > 0.2f && magnetMineParent == null && !noTail) {
 					shootHeldTime = 0;
 					changeState(new MagnaCMagnetMineState());
@@ -84,7 +84,7 @@ public class MagnaCentipede : Maverick {
 					deductAmmo(8);
 					changeState(new MagnaCTeleportState());
 				}
-			} else if (state is MJump || state is MFall) {
+			} else {
 				if (input.isPressed(Control.Special1, player)) {
 					if (reversedGravity) {
 						changeState(new MagnaCCeilingStartState());

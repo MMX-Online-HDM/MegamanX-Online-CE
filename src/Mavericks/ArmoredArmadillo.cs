@@ -72,16 +72,16 @@ public class ArmoredArmadillo : Maverick {
 		}
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand) {
+			if (grounded && state.normalCtrl) {
 				if (shootPressed()) {
 					changeState(getShootState(false));
-				} else if (specialPressed() && !noArmor) {
+				} else if (specialPressed() && !noArmor && state is not ArmoredAGuardState) {
 					if (ammo > 0) {
 						changeState(new ArmoredAGuardState());
 					}
 				} else if (input.isPressed(Control.Dash, player)) {
-					if (ammo >= 6) {
-						deductAmmo(6);
+					if (ammo >= 2) {
+						deductAmmo(2);
 						changeState(new ArmoredARollEnterState());
 					}
 				}
@@ -275,6 +275,7 @@ public class ArmoredAChargeReleaseProj : Projectile {
 public class ArmoredAGuardState : MaverickState {
 	public ArmoredAGuardState() : base("block") {
 		aiAttackCtrl = true;
+		attackCtrl = true;
 		canBeCanceled = false;
 	}
 
