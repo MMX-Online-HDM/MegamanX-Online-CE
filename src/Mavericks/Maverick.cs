@@ -651,7 +651,7 @@ public class Maverick : Actor, IDamagable {
 			return new MTaunt();
 		}
 		// Otherwise, return all usable states.
-		return aiAttackStates().GetRandomItem();
+		return targetStates.GetRandomItem();
 	}
 
 	public virtual MaverickState[] aiAttackStates() {
