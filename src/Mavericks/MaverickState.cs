@@ -153,7 +153,7 @@ public class MaverickState {
 				maverick.autoExit = true;
 			}
 		}
-		else if (aiAttackCtrl && !newState.aiAttackCtrl) {
+		else if (!newState.aiAttackCtrl) {
 			maverick.aiCooldown = maverick.maxAICooldown;
 		}
 		if (!useGravity) maverick.useGravity = true;
