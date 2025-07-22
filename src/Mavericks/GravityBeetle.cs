@@ -334,7 +334,13 @@ public class GBeetleLiftState : MaverickState {
 		}
 	}
 }
-
+public class GravityBeetboodDeadLiftWeapon : Weapon {
+	public GravityBeetboodDeadLiftWeapon(Player player) {
+		index = (int)WeaponIds.GravityBeetle;
+		killFeedIndex = 97;
+		damager = new Damager(player, 4, Global.defFlinch, 0.5f);
+	}
+}
 public class BeetleGrabbedState : GenericGrabbedState {
 	public Character? grabbedChar;
 	public bool launched;
@@ -356,7 +362,7 @@ public class BeetleGrabbedState : GenericGrabbedState {
 				return;
 			}
 			if (Global.level.checkTerrainCollisionOnce(character, 0, -1) != null) {
-				GravityBeetbood?.meleeWeapon.applyDamage(character, false, grabber, (int)ProjIds.GBeetleLiftCrash);
+				new GravityBeetboodDeadLiftWeapon((grabber as Maverick)?.player ?? player).applyDamage(character, false, character, (int)ProjIds.GBeetleLiftCrash);
 				character.playSound("crashX3", sendRpc: true);
 				character.shakeCamera(sendRpc: true);
 			}
