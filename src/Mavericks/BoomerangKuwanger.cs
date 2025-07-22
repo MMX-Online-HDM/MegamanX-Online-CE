@@ -140,7 +140,7 @@ public class BoomerangKuwanger : Maverick {
 			aiStates.Add(new BoomerKDeadLiftState());
 		}
 		if ((enemyDist >= 26 && canGrabTarget || enemyDist <= 80 && !canGrabTarget) &&
-			(bald || Helpers.randomRange(0, 3) == 3
+			(!bald || Helpers.randomRange(0, 3) == 3
 		)) {
 			aiStates.Add(new BoomerKTeleportState());
 		}

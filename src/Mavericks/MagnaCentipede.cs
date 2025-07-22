@@ -135,7 +135,6 @@ public class MagnaCentipede : Maverick {
 	}
 
 	public override MaverickState[] aiAttackStates() {
-		
 		float enemyDist = 300;
 		if (target != null) {
 			enemyDist = MathF.Abs(target.pos.x - pos.x);
@@ -146,15 +145,16 @@ public class MagnaCentipede : Maverick {
 		List<MaverickState> aiStates = [
 			new MagnaCShootState()
 		];
-		if (enemyDist <= 40 && canGrabTarget) {
-			aiStates.Add(new MagnaCMagnetPullState());
-		} else if (Helpers.randomRange(0, 3) == 3) {
-			aiStates.Add(new MagnaCMagnetMineState());
-		}
-		if ((enemyDist >= 30 && canGrabTarget || enemyDist <= 120 && !canGrabTarget) &&
-			Helpers.randomRange(0, 3) == 3
+
+		if (enemyDist >= 30 && canGrabTarget && Helpers.randomRange(0, 3) != 3 ||
+			enemyDist <= 120 && !canGrabTarget
 		) {
 			aiStates.Add(new MagnaCTeleportState());
+		}
+		if (enemyDist <= 40 && canGrabTarget) {
+			aiStates.Add(new MagnaCMagnetPullState());
+		} else {
+			aiStates.Add(new MagnaCMagnetMineState());
 		}
 		return aiStates.ToArray();
 	}

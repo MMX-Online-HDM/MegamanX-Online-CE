@@ -112,7 +112,7 @@ public class Maverick : Actor, IDamagable {
 	public MaverickAIBehavior aiBehavior;
 	public Actor target;
 	public float aiCooldown;
-	public float maxAICooldown = 60;
+	public float maxAICooldown = 75;
 	public string startMoveControl;
 
 	public Weapon weapon;
@@ -490,9 +490,10 @@ public class Maverick : Actor, IDamagable {
 		) {
 			if (isSummonerCocoon) {
 				if (target != null) {
-					mmc.changeState(new MorphMCSpinState());
+					mmc?.changeState(new MorphMCSpinState());
 				}
-			} else if (aiCooldown == 0 && isAIState) {
+			}
+			else if (aiCooldown == 0 && isAIState) {
 				MaverickState mState = getRandomAttackState();
 				if (isSummonerOrStrikerDoppler && doppler.ballType == 1) {
 					mState = strikerStates()[0];
@@ -510,7 +511,7 @@ public class Maverick : Actor, IDamagable {
 					}
 					mState = aiAttackStateArray[mIndex];
 
-					startMoveControl = null;
+					startMoveControl = "";
 				}
 
 				if (mState != null) {
