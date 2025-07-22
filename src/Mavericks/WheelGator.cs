@@ -145,24 +145,28 @@ public class WheelGator : Maverick {
 		}
 	}
 
-	public override MaverickState[] aiAttackStates() {
-		var attacks = new MaverickState[]
-		{
-				new WheelGBiteState(),
-				new WheelGShootState(),
-				new WheelGSpinState(),
-		};
-		return attacks;
+	public override MaverickState[] strikerStates() {
+		return [
+			new WheelGBiteState(),
+			new WheelGShootState(),
+			new WheelGSpinState(),
+		];
 	}
 
-	public override MaverickState getRandomAttackState() {
-		var attacks = new MaverickState[]
-		{
-				new WheelGBiteState(),
-				new WheelGShootState(),
-				new WheelGUpBiteState(),
-		};
-		return attacks.GetRandomItem();
+	public override MaverickState[] aiAttackStates() {
+		float enemyDist = 300;
+			if (target != null) {
+			enemyDist = MathF.Abs(target.pos.x - pos.x);
+		}
+		List<MaverickState> aiStates = [
+			new WheelGShootState(),
+			new WheelGSpinState()
+		];
+		if (enemyDist <= 50) {
+			aiStates.Add(new WheelGBiteState());
+		}
+
+		return aiStates.ToArray();
 	}
 
 	public override List<byte> getCustomActorNetData() {

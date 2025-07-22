@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace MMXOnline;
@@ -35,6 +35,8 @@ public class NeoSigma : BaseSigma {
 		Helpers.decrementTime(ref sigmaUpSlashCooldown);
 		Helpers.decrementTime(ref sigmaDownSlashCooldown);
 		Helpers.decrementFrames(ref aiAttackCooldown);
+		gigaAttack.update();
+		gigaAttack.charLinkedUpdate(this, true);
 		// For ladder and slide attacks.
 		if (isAttacking() && charState is WallSlide or LadderClimb) {
 			if (isAnimOver() && charState != null && charState is not SigmaClawState) {
@@ -184,11 +186,11 @@ public class NeoSigma : BaseSigma {
 	}
 
 	public override void addAmmo(float amount) {
-		weaponHealAmount += amount;
+		gigaAttack.addAmmoHeal(amount);
 	}
 
 	public override void addPercentAmmo(float amount) {
-		weaponHealAmount += amount * 0.32f;
+		gigaAttack.addAmmoPercentHeal(amount);
 	}
 
 	public override bool canAddAmmo() {

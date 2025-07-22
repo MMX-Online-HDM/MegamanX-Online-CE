@@ -12,6 +12,10 @@ public class MagnaCentipede : Maverick {
 	public MagnaCMagnetMineParent? magnetMineParent;
 	public bool noTail;
 	public float teleportCooldown;
+	public float aiAproachCooldown;
+
+	public bool shootHeldLastFrame;
+	public float shootHeldTime;
 
 	public MagnaCentipede(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
 		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
@@ -40,8 +44,6 @@ public class MagnaCentipede : Maverick {
 		gameMavs = GameMavs.X2;
 	}
 
-	bool shootHeldLastFrame;
-	float shootHeldTime;
 	public override void update() {
 		base.update();
 		if (!ownedByLocalPlayer) return;
@@ -125,18 +127,36 @@ public class MagnaCentipede : Maverick {
 		return "magnac";
 	}
 
-	public override MaverickState[] aiAttackStates() {
-		var attacks = new List<MaverickState>
-		{
-				new MagnaCShootState(),
-				new MagnaCTeleportState(),
-			};
-		if (!noTail) attacks.Insert(1, new MagnaCMagnetPullState());
-		return attacks.ToArray();
+	public override MaverickState[] strikerStates() {
+		return [
+			new MagnaCShootState(),
+			new MagnaCMagnetPullState()
+		];
 	}
 
-	public override MaverickState getRandomAttackState() {
-		return aiAttackStates().GetRandomItem();
+	public override MaverickState[] aiAttackStates() {
+		float enemyDist = 300;
+		if (target != null) {
+			enemyDist = MathF.Abs(target.pos.x - pos.x);
+		}
+		bool canGrabTarget = (
+			!noTail && target is Character chara && chara.canBeGrabbed()
+		);
+		List<MaverickState> aiStates = [
+			new MagnaCShootState()
+		];
+
+		if (enemyDist >= 30 && canGrabTarget && Helpers.randomRange(0, 3) != 3 ||
+			enemyDist <= 120 && !canGrabTarget
+		) {
+			aiStates.Add(new MagnaCTeleportState());
+		}
+		if (enemyDist <= 40 && canGrabTarget) {
+			aiStates.Add(new MagnaCMagnetPullState());
+		} else {
+			aiStates.Add(new MagnaCMagnetMineState());
+		}
+		return aiStates.ToArray();
 	}
 
 	public override void onDestroy() {
@@ -499,8 +519,10 @@ public class MagnaCMagnetMineState : MaverickState {
 public class MagnaCTeleportState : MaverickState {
 	int state = 0;
 	Actor? clone;
-	public MagnaCentipede MagneHyakulegger = null!;
 	bool inverted;
+	public int aiPosOffset = Helpers.randomRange(0, 65);
+	public MagnaCentipede centipede = null!;
+
 	public MagnaCTeleportState() : base("teleport_out") {
 		enterSound = "magnacTeleportOut";
 		aiAttackCtrl = true;
@@ -509,86 +531,126 @@ public class MagnaCTeleportState : MaverickState {
 	public override void update() {
 		base.update();
 
-		if (state == 0 && clone != null) {
-			var dir = new Point(0, 0);
-			if (input.isPressed(Control.Up, player)) dir.y = -1;
-			else if (input.isPressed(Control.Down, player)) dir.y = 1;
-			if (input.isHeld(Control.Left, player)) dir.x = -1;
-			else if (input.isHeld(Control.Right, player)) dir.x = 1;
-
-			float moveAmount = dir.x * 200 * Global.spf;
-			if (dir.x != 0) clone.xDir = MathInt.Round(dir.x);
-
-			if (dir.y == -1 && !inverted) {
-				var hits = Global.level.raycastAllSorted(clone.getCenterPos(), clone.getCenterPos().addxy(0, -200), new List<Type> { typeof(Wall) });
-				var hit = hits.FirstOrDefault();
-				if (hit != null && hit.gameObject is Wall wall && !wall.topWall) {
-					clone.visible = true;
-					inverted = true;
-					clone.yScale = -1;
-					clone.changePos(hit.getHitPointSafe().addxy(0, MagnaCentipede.constHeight));
-				}
-			}
-			if (dir.y == 1 && inverted) {
-				var hits = Global.level.raycastAllSorted(clone.getCenterPos(), clone.getCenterPos().addxy(0, 200), new List<Type> { typeof(Wall) });
-				var hit = hits.FirstOrDefault();
-				if (hit != null && hit.gameObject is Wall wall && !wall.topWall) {
-					clone.visible = true;
-					inverted = false;
-					clone.yScale = 1;
-					clone.changePos(hit.getHitPointSafe());
-				}
-			}
-
-			clone.move(new Point(moveAmount, 0), useDeltaTime: false);
-			if (MathF.Abs(moveAmount) > 0) {
-				clone.visible = true;
-			}
-
-			if (!canChangePos()) {
-				if (inverted) {
-					var hits = Global.level.raycastAllSorted(clone.getCenterPos(), clone.getCenterPos().addxy(0, -200), new List<Type> { typeof(Wall) });
-					var hit = hits.FirstOrDefault();
-					if (hit != null && hit.gameObject is Wall wall && !wall.topWall) {
-						clone.changePos(hit.getHitPointSafe().addxy(0, MagnaCentipede.constHeight));
-					}
-				} else {
-					var hits = Global.level.raycastAllSorted(clone.getCenterPos(), clone.getCenterPos().addxy(0, 200), new List<Type> { typeof(Wall) });
-					var hit = hits.FirstOrDefault();
-					if (hit != null && hit.gameObject is Wall wall && !wall.topWall) {
-						clone.changePos(hit.getHitPointSafe());
-					}
-				}
-			}
-
-			if (!canChangePos()) {
-				var redXPos = clone.getCenterPos();
-				DrawWrappers.DrawLine(redXPos.x - 10, redXPos.y - 10, redXPos.x + 10, redXPos.y + 10, Color.Red, 2, ZIndex.HUD);
-				DrawWrappers.DrawLine(redXPos.x - 10, redXPos.y + 10, redXPos.x + 10, redXPos.y - 10, Color.Red, 2, ZIndex.HUD);
-			}
-
-			if (maverick.isAnimOver()) {
-				state = 1;
-				clone.visible = false;
-				maverick.changeSpriteFromName("teleport_in", true);
-				if (canChangePos()) {
-					if ((inverted && !maverick.reversedGravity) || (!inverted && maverick.reversedGravity)) {
-						maverick.reverseGravity();
-					}
-					var prevCamPos = player!.character!.getCamCenterPos();
-					player.character.stopCamUpdate = true;
-					maverick.changePos(clone.pos);
-					if (maverick.controlMode == MaverickMode.TagTeam) {
-						Global.level.snapCamPos(player.character.getCamCenterPos(), prevCamPos);
-					}
-					maverick.xDir = clone.xDir;
-				}
-				maverick.playSound("magnacTeleportIn", sendRpc: true);
-			}
-		} else if (state == 1) {
+		if (state != 0 || clone == null) {
 			if (maverick.isAnimOver()) {
 				maverick.changeToIdleOrFall();
 			}
+			return;
+		}
+		Point dir = input.getInputDir(player);
+		if (maverick.controlMode == MaverickModeId.Summoner &&
+			maverick.target != null
+		) {
+			float enemyDist = MathF.Abs(maverick.target.pos.x - clone.pos.x);
+
+			if ((centipede.aiAproachCooldown <= 0 || enemyDist <= 40) &&
+				maverick.target is Character chara && chara.canBeGrabbed()
+			) {
+				if (maverick.target.pos.x > clone.pos.x + 20) {
+					dir.x = 1;
+				} else if (maverick.target.pos.x < clone.pos.x - 20) {
+					dir.x = -1;
+				} else {
+					dir.x = 0;
+				}
+			} else if (enemyDist <= 120 - aiPosOffset) {
+				if (maverick.target.pos.x >= clone.pos.x) {
+					dir.x = -1;
+				} else {
+					dir.x = 1;
+				}
+			} else if (enemyDist >= 125 - aiPosOffset) {
+				if (maverick.target.pos.x >= clone.pos.x) {
+					dir.x = 1;
+				} else {
+					dir.x = -1;
+				}
+			} else {
+				dir.x = 0;
+			}
+		}
+
+		float moveAmount = dir.x * 200 * Global.spf;
+		if (dir.x != 0) {
+			clone.xDir = MathInt.Round(dir.x);
+		}
+		if (dir.y == -1 && !inverted) {
+			List<CollideData> hits = Global.level.raycastAllSorted(
+				clone.getCenterPos(), clone.getCenterPos().addxy(0, -200), [typeof(Wall)]
+			);
+			CollideData? hit = hits.FirstOrDefault();
+			if (hit != null && hit.gameObject is Wall wall && !wall.topWall) {
+				clone.visible = true;
+				inverted = true;
+				clone.yScale = -1;
+				clone.changePos(hit.getHitPointSafe().addxy(0, MagnaCentipede.constHeight));
+			}
+		}
+		if (dir.y == 1 && inverted) {
+			var hits = Global.level.raycastAllSorted(
+				clone.getCenterPos(), clone.getCenterPos().addxy(0, 200), [typeof(Wall)]
+			);
+			var hit = hits.FirstOrDefault();
+			if (hit != null && hit.gameObject is Wall wall && !wall.topWall) {
+				clone.visible = true;
+				inverted = false;
+				clone.yScale = 1;
+				clone.changePos(hit.getHitPointSafe());
+			}
+		}
+
+		clone.move(new Point(moveAmount, 0), useDeltaTime: false);
+		if (MathF.Abs(moveAmount) > 0) {
+			clone.visible = true;
+		}
+
+		if (!canChangePos()) {
+			if (inverted) {
+				var hits = Global.level.raycastAllSorted(
+					clone.getCenterPos(), clone.getCenterPos().addxy(0, -200), [typeof(Wall)]
+				);
+				var hit = hits.FirstOrDefault();
+				if (hit != null && hit.gameObject is Wall wall && !wall.topWall) {
+					clone.changePos(hit.getHitPointSafe().addxy(0, MagnaCentipede.constHeight));
+				}
+			} else {
+				var hits = Global.level.raycastAllSorted(
+					clone.getCenterPos(), clone.getCenterPos().addxy(0, 200), [typeof(Wall)]
+				);
+				var hit = hits.FirstOrDefault();
+				if (hit != null && hit.gameObject is Wall wall && !wall.topWall) {
+					clone.changePos(hit.getHitPointSafe());
+				}
+			}
+		}
+
+		if (!canChangePos()) {
+			var redXPos = clone.getCenterPos();
+			DrawWrappers.DrawLine(
+				redXPos.x - 10, redXPos.y - 10, redXPos.x + 10, redXPos.y + 10, Color.Red, 2, ZIndex.HUD
+			);
+			DrawWrappers.DrawLine(
+				redXPos.x - 10, redXPos.y + 10, redXPos.x + 10, redXPos.y - 10, Color.Red, 2, ZIndex.HUD
+			);
+		}
+
+		if (maverick.isAnimOver()) {
+			state = 1;
+			clone.visible = false;
+			maverick.changeSpriteFromName("teleport_in", true);
+			if (canChangePos()) {
+				if ((inverted && !maverick.reversedGravity) || (!inverted && maverick.reversedGravity)) {
+					maverick.reverseGravity();
+				}
+				var prevCamPos = player!.character!.getCamCenterPos();
+				player.character.stopCamUpdate = true;
+				maverick.changePos(clone.pos);
+				if (maverick.controlMode == MaverickModeId.TagTeam) {
+					Global.level.snapCamPos(player.character.getCamCenterPos(), prevCamPos);
+				}
+				maverick.xDir = clone.xDir;
+			}
+			maverick.playSound("magnacTeleportIn", sendRpc: true);
 		}
 	}
 
@@ -605,12 +667,12 @@ public class MagnaCTeleportState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		MagneHyakulegger = maverick as MagnaCentipede ?? throw new NullReferenceException();
+		centipede = maverick as MagnaCentipede ?? throw new NullReferenceException();
 		clone = new Actor("empty", maverick.pos, null, true, false);
 		var rect = new Rect(0, 0, maverick.width, maverick.height);
 		clone.spriteToCollider["teleport_out"] = new Collider(rect.getPoints(), false, clone, false, false, 0, new Point(0, 0));
 		clone.spriteToCollider["notail_teleport_out"] = new Collider(rect.getPoints(), false, clone, false, false, 0, new Point(0, 0));
-		clone.changeSprite(MagneHyakulegger.noTail ? "magnac_notail_teleport_out" : "magnac_teleport_out", false);
+		clone.changeSprite(centipede.noTail ? "magnac_notail_teleport_out" : "magnac_teleport_out", false);
 		clone.frameSpeed = 0;
 		clone.alpha = 0.5f;
 		clone.xDir = maverick.xDir;
@@ -626,7 +688,7 @@ public class MagnaCTeleportState : MaverickState {
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
 		maverick.useGravity = true;
-		MagneHyakulegger.teleportCooldown = 0.25f;
+		centipede.teleportCooldown = 0.25f;
 		clone?.destroySelf();
 	}
 }

@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 namespace MMXOnline;
 
 public class FakeZero : Maverick {
 	public static Weapon getWeapon() { return new Weapon(WeaponIds.FakeZeroGeneric, 150); }
-
 	float dashDist;
 	float baseSpeed = 50;
 	float accSpeed;
@@ -13,12 +13,35 @@ public class FakeZero : Maverick {
 	public float jumpXMomentum = 1;
 	public float shootTime;
 
-	public FakeZero(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
-		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
-		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, false, 0));
-		stateCooldowns.Add(typeof(FakeZeroGroundPunchState), new MaverickStateCooldown(false, false, 1.5f));
-		stateCooldowns.Add(typeof(FakeZeroShootAirState), new MaverickStateCooldown(false, true, 0.5f));
-		stateCooldowns.Add(typeof(FakeZeroShootAir2State), new MaverickStateCooldown(false, true, 0.5f));
+	// Ammo uses.
+	public static int shootLv2Ammo = 4;
+	public static int shootLv3Ammo = 5;
+	public static int hadangekiAmmo = 4;
+
+	public FakeZero(
+		Player player, Point pos, Point destPos, int xDir,
+		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(
+		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+	) {
+		stateCooldowns.Add(
+			typeof(MShoot), new MaverickStateCooldown(false, false, 0)
+		);
+		stateCooldowns.Add(
+			typeof(FakeZeroGroundPunchState), new MaverickStateCooldown(false, false, 1f)
+		);
+		stateCooldowns.Add(
+			typeof(FakeZeroShootAirState), new MaverickStateCooldown(false, true, 0.5f)
+		);
+		stateCooldowns.Add(
+			typeof(FakeZeroShootAir2State), new MaverickStateCooldown(false, true, 0.5f)
+		);
+		stateCooldowns.Add(
+			typeof(FakeZeroShootState), new MaverickStateCooldown(false, true, 0.5f)
+		);
+		stateCooldowns.Add(
+			typeof(FakeZeroShoot3State), new MaverickStateCooldown(false, true, 0.5f)
+		);
 
 		weapon = getWeapon();
 		awardWeaponId = WeaponIds.Buster;
@@ -26,7 +49,6 @@ public class FakeZero : Maverick {
 		weakMaverickWeaponId = WeaponIds.FlameStag;
 		canClimbWall = true;
 		canClimb = true;
-
 
 		netActorCreateId = NetActorCreateId.FakeZero;
 		netOwner = player;
@@ -37,7 +59,9 @@ public class FakeZero : Maverick {
 		exhaust = new Anim(
 			pos, "fakezero_exhaust", xDir,
 			player.getNextActorNetId(), false, sendRpc: false
-		);
+		) {
+			visible = false
+		};
 
 		usesAmmo = true;
 		canHealAmmo = true;
@@ -71,11 +95,9 @@ public class FakeZero : Maverick {
 
 		if (!ownedByLocalPlayer) return;
 
-		if (state is not FakeZeroShoot2State or FakeZeroShoot3State
-		 	or FakeZeroShootAir2State or FakeZeroShootAir3State) {
+		if (state.normalCtrl || state.attackCtrl || state.aiAttackCtrl) {
 			rechargeAmmo(2);
 		}
-
 		shootTime -= Global.spf;
 		if (lastDirX != xDir) {
 			accSpeed = 0;
@@ -102,29 +124,29 @@ public class FakeZero : Maverick {
 			accSpeed = 0;
 		}
 
-		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand) {
-				if (input.isHeld(Control.Shoot, player) && state is MRun) {
-					changeState(new FakeZeroMeleeState());
-				} else if (input.isPressed(Control.Shoot, player)) {
-					changeState(getShootState(false), true);
-				} else if (input.isPressed(Control.Up, player) && ammo >= 4 && shootTime <= 0) {
-					changeState(new FakeZeroShoot2State(), false);
-				} else if (input.isPressed(Control.Special1, player) && ammo >= 7 && shootTime <= 0) {
-					changeState(new FakeZeroShoot3State());
-				} else if (input.isPressed(Control.Dash, player)) {
-					changeState(new FakeZeroGroundPunchState());
-				} else if (input.isHeld(Control.Down, player)) {
-					changeState(new FakeZeroGuardState());
-				}
-			} else if (state is MJump || state is MFall || state is MWallKick) {
-				if (input.isPressed(Control.Shoot, player)) {
-					changeState(new FakeZeroShootAirState(), true);
-				} else if (input.isPressed(Control.Up, player) && ammo >= 4 && shootTime <= 0) {
-					changeState(new FakeZeroShootAir2State());
-				} else if (input.isPressed(Control.Special1, player) && ammo >= 7 && shootTime <= 0) {
-					changeState(new FakeZeroShootAir3State());
-				}
+		if (aiBehavior != MaverickAIBehavior.Control) {
+			return;
+		}
+		if (!state.attackCtrl) {
+			return;
+		}
+		if (grounded) {
+			if (input.isHeld(Control.Shoot, player) && state is MRun) {
+				changeState(new FakeZeroMeleeState());
+			} else if (input.isHeld(Control.Shoot, player)) {
+				changeState(new FakeZeroShootState(), false);
+			} else if (input.isPressed(Control.Special1, player) && ammo >= 7 && shootTime <= 0) {
+				changeState(new FakeZeroShoot3State());
+			} else if (input.isPressed(Control.Dash, player)) {
+				changeState(new FakeZeroGroundPunchState());
+			} else if (input.isHeld(Control.Down, player)) {
+				changeState(new FakeZeroGuardState());
+			}
+		} else {
+			if (input.isPressed(Control.Shoot, player) && ammo >= 4) {
+				changeState(new FakeZeroShootAir2State());
+			} else if (input.isPressed(Control.Special1, player) && ammo >= 7) {
+				changeState(new FakeZeroShootAir3State());
 			}
 		}
 	}
@@ -138,29 +160,42 @@ public class FakeZero : Maverick {
 		return "fakezero";
 	}
 
-	public override MaverickState[] aiAttackStates() {
-		var attacks = new MaverickState[]
-		{
-				getShootState(true),
-				new FakeZeroShoot2State(),
-				new FakeZeroShoot3State(),
-				new FakeZeroGroundPunchState(),
-		};
-		return attacks;
+	public override MaverickState[] strikerStates() {
+		return [
+			new FakeZeroShootState(2),
+			new FakeZeroShoot3State(),
+			new FakeZeroGroundPunchState(),
+		];
 	}
 
-	public override MaverickState getRandomAttackState() {
-		return aiAttackStates().GetRandomItem();
+	public override MaverickState[] aiAttackStates() {
+		List<MaverickState> aiStates = [
+			new FakeZeroShootState(1)
+		];
+		float enemyDist = 300;
+		if (target != null) {
+			enemyDist = MathF.Abs(target.pos.x - pos.x);
+		}
+		if (ammo >= shootLv2Ammo) {
+			aiStates.Add(new FakeZeroShootState(2));
+		}
+		if (ammo >= shootLv3Ammo) {
+			aiStates.Add(new FakeZeroShoot3State());
+		}
+		if (enemyDist <= 70) {
+			aiStates.Add(new FakeZeroGroundPunchState());
+		}
+		return aiStates.ToArray();
 	}
 
 	public MaverickState getShootState(bool isAI) {
 		var mshoot = new MShoot((Point pos, int xDir) => {
 			new FakeZeroBusterProj(
-				pos, xDir, this, player, player.getNextActorNetId(), rpc: true
+				pos, xDir, this, player.getNextActorNetId(), sendRpc: true
 			);
 		}, "busterX2");
 		if (isAI) {
-			mshoot.consecutiveData = new MaverickStateConsecutiveData(0, 4, 0.15f);
+			mshoot.consecutiveData = new MaverickStateConsecutiveData(0, 4, 0.001f);
 		}
 		return mshoot;
 	}
@@ -170,9 +205,28 @@ public class FakeZero : Maverick {
 		exhaust?.destroySelf();
 	}
 }
+
+
+public class FakeZeroMState : MaverickState {
+	public FakeZero zero = null!;
+
+	public FakeZeroMState(
+		string sprite, string transitionSprite = ""
+	) : base(
+		sprite, transitionSprite
+	) {
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		zero = maverick as FakeZero ?? throw new NullReferenceException();
+	}
+}
+
 public class FakeZeroBusterProj : Projectile {
 	public FakeZeroBusterProj(
-		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
+		Point pos, int xDir, Actor owner, ushort? netId,
+		bool sendRpc = false, Player? player = null
 	) : base(
 		pos, xDir, owner, "buster1", netId, player
 	) {
@@ -183,13 +237,13 @@ public class FakeZeroBusterProj : Projectile {
 		reflectable = true;
 		maxTime = 0.5f;
 
-		if (rpc) {
+		if (sendRpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 	}
 	public static Projectile rpcInvoke(ProjParameters args) {
 		return new FakeZeroBusterProj(
-			args.pos, args.xDir, args.owner, args.player, args.netId
+			args.pos, args.xDir, args.owner, args.netId, player: args.player
 		);
 	}
 	public override void update() {
@@ -203,11 +257,12 @@ public class FakeZeroBusterProj : Projectile {
 	}
 }
 
-public class FakeZeroBusterProj2 : Projectile {
-	public FakeZeroBusterProj2(
-		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
+public class FakeZeroBuster2Proj : Projectile {
+	public FakeZeroBuster2Proj(
+		Point pos, int xDir, Actor owner, ushort? netId,
+		bool sendRpc = false, Player? player = null
 	) : base(
-		pos, xDir, owner, "fakezero_buster_proj", netId, player	
+		pos, xDir, owner, "fakezero_buster_proj", netId, player
 	) {
 		weapon = FakeZero.getWeapon();
 		damager.damage = 2;
@@ -216,13 +271,13 @@ public class FakeZeroBusterProj2 : Projectile {
 		reflectable = true;
 		maxTime = 0.5f;
 
-		if (rpc) {
+		if (sendRpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 	}
 	public static Projectile rpcInvoke(ProjParameters args) {
-		return new FakeZeroBusterProj2(
-			args.pos, args.xDir, args.owner, args.player, args.netId
+		return new FakeZeroBuster2Proj(
+			args.pos, args.xDir, args.owner, args.netId, player: args.player
 		);
 	}
 }
@@ -232,7 +287,7 @@ public class FakeZeroBusterProj3 : Projectile {
 	public FakeZeroBusterProj3(
 		Point pos, int xDir, int type, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		pos, xDir, owner, "fakezero_buster2_proj", netId, player	
+		pos, xDir, owner, "fakezero_buster2_proj", netId, player
 	) {
 		weapon = FakeZero.getWeapon();
 		damager.flinch = Global.halfFlinch;
@@ -268,7 +323,7 @@ public class FakeZeroSwordBeamProj : Projectile {
 	public FakeZeroSwordBeamProj(
 		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		pos, xDir, owner, "fakezero_sword_proj", netId, player	
+		pos, xDir, owner, "fakezero_sword_proj", netId, player
 	) {
 		weapon = FakeZero.getWeapon();
 		damager.damage = 3;
@@ -295,47 +350,79 @@ public class FakeZeroSwordBeamProj : Projectile {
 	}
 }
 
-public class FakeZeroShoot2State : MaverickState {
-	public FakeZeroShoot2State() : base("shoot") {
-		attackCtrl = true;
-	}
-	public FakeZero darkZero = null!;
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		darkZero = maverick as FakeZero ?? throw new NullReferenceException();
+public class FakeZeroShootState : FakeZeroMState {
+	private bool shotOnce;
+	private bool shootReleased;
+	private bool shootPressedAgain;
+	public int busterType = 1;
+	public int shootCount = 0;
+	private int aiAttack;
+
+	public FakeZeroShootState(int aiAttack = 0) : base("shoot", "") {
+		this.aiAttack = aiAttack;
 	}
 
 	public override void update() {
 		base.update();
-		maverick.turnToInput(input,player);
+
+		if (aiAttack != 2 && !input.isHeld("shoot", player)) {
+			shootReleased = true;
+			maverick.sprite.frameSpeed = 1;
+		}
 		Point? shootPos = maverick.getFirstPOI();
-		if (shootPos != null) {
-			if (!once) {
-				once = true;
-				maverick.deductAmmo(4);
+		if (!shotOnce && shootPos.HasValue) {
+			shotOnce = true;
+			if (busterType == 1 && maverick.ammo >= 4
+				&& (aiAttack == 2 || !isAI && !shootReleased && input.isHeld("shoot", player))
+			) {
 				maverick.playSound("buster2X2", forcePlay: false, sendRpc: true);
-				new FakeZeroBusterProj2(
-					shootPos.Value, maverick.xDir, darkZero,
-					player, player.getNextActorNetId(), rpc: true
+				maverick.deductAmmo(FakeZero.shootLv2Ammo);
+				new FakeZeroBuster2Proj(
+					shootPos.Value, maverick.xDir, maverick,
+					player.getNextActorNetId(), sendRpc: true
 				);
+				busterType = 2;
+			} else {
+				maverick.playSound("busterX2", forcePlay: false, sendRpc: true);
+				new FakeZeroBusterProj(
+					shootPos.Value, maverick.xDir, maverick,
+					player.getNextActorNetId(), sendRpc: true
+				);
+				busterType = 0;
+				shootCount++;
 			}
+			maverick.sprite.frameSpeed = 1;
+		}
+		if (!isAI && shootReleased && input.isPressed("shoot", player)) {
+			shootPressedAgain = true;
+		}
+		if (busterType == 0 && shootCount < 2 && maverick.frameIndex >= 2 &&
+			(shootPressedAgain || isAI && maverick.controlMode == MaverickModeId.Summoner)
+		) {
+			maverick.sprite.frameIndex = 0;
+			maverick.sprite.frameTime = 0;
+			shotOnce = false;
 		}
 		if (maverick.isAnimOver()) {
 			maverick.changeToIdleOrFall();
 		}
 	}
-	public override void onExit(MaverickState newState) {
-		base.onExit(newState);
-		darkZero.shootTime = 1;
-	}
-}
-public class FakeZeroShootAirState : MaverickState {
-	public FakeZero darkZero = null!;
-	public FakeZeroShootAirState() : base("shoot_air") {
-	}
+
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		darkZero = maverick as FakeZero ?? throw new NullReferenceException();
+		maverick.sprite.frameSpeed = 0.6f;
+	}
+
+	public override void onExit(MaverickState newState) {
+		base.onExit(newState);
+		if (busterType == 0) {
+			maverick.stateCooldowns[typeof(FakeZeroShootState)].cooldown = 0;
+		}
+	}
+}
+
+public class FakeZeroShootAirState : FakeZeroMState {
+	public FakeZeroShootAirState() : base("shoot_air") {
 	}
 
 	public override void update() {
@@ -348,9 +435,9 @@ public class FakeZeroShootAirState : MaverickState {
 			if (!once) {
 				once = true;
 				maverick.playSound("busterX2", forcePlay: false, sendRpc: true);
-				new FakeZeroBusterProj(
-					shootPos.Value, maverick.xDir, darkZero,
-					player, player.getNextActorNetId(), rpc: true
+				new FakeZeroBuster2Proj(
+					shootPos.Value, maverick.xDir, maverick,
+					player.getNextActorNetId(), sendRpc: true
 				);
 			}
 		}
@@ -361,14 +448,9 @@ public class FakeZeroShootAirState : MaverickState {
 	}
 }
 
-public class FakeZeroShootAir2State : MaverickState {
+public class FakeZeroShootAir2State : FakeZeroMState {
 	public FakeZeroShootAir2State() : base("shoot_air2") {
 	}
-	public FakeZero darkZero = null!;
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		darkZero = maverick as FakeZero ?? throw new NullReferenceException();
-	}
 
 	public override void update() {
 		base.update();
@@ -378,12 +460,12 @@ public class FakeZeroShootAir2State : MaverickState {
 		if (shootPos != null) {
 			if (!once) {
 				once = true;
-				maverick.deductAmmo(4);
+				maverick.deductAmmo(FakeZero.shootLv2Ammo);
 				maverick.playSound("buster2X2", forcePlay: false, sendRpc: true);
-				new FakeZeroBusterProj2(
-					shootPos.Value, maverick.xDir, darkZero,
-					player, player.getNextActorNetId(), rpc: true
-				);			
+				new FakeZeroBuster2Proj(
+					shootPos.Value, maverick.xDir, maverick,
+					player.getNextActorNetId(), sendRpc: true
+				);
 			}
 		}
 
@@ -393,18 +475,12 @@ public class FakeZeroShootAir2State : MaverickState {
 	}
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
-		darkZero.shootTime = 1;
+		zero.shootTime = 1;
 	}
 }
-public class FakeZeroShootAir3State : MaverickState {
+public class FakeZeroShootAir3State : FakeZeroMState {
 	public FakeZeroShootAir3State() : base("shoot_air2") {
 	}
-	public FakeZero darkZero = null!;
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		darkZero = maverick as FakeZero ?? throw new NullReferenceException();
-
-	}
 
 	public override void update() {
 		base.update();
@@ -415,12 +491,12 @@ public class FakeZeroShootAir3State : MaverickState {
 		if (shootPos != null) {
 			if (!once) {
 				once = true;
-				maverick.deductAmmo(5);
+				maverick.deductAmmo(FakeZero.shootLv3Ammo);
 				maverick.playSound("buster3X2", forcePlay: false, sendRpc: true);
 				new FakeZeroBusterProj3(
-					shootPos.Value, maverick.xDir, 0, darkZero,
+					shootPos.Value, maverick.xDir, 0, zero,
 					player, player.getNextActorNetId(), rpc: true
-				);			
+				);
 			}
 		}
 
@@ -430,19 +506,15 @@ public class FakeZeroShootAir3State : MaverickState {
 	}
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
-		darkZero.shootTime = 1;
+		zero.shootTime = 1;
 	}
 }
 
-public class FakeZeroShoot3State : MaverickState {
+public class FakeZeroShoot3State : FakeZeroMState {
 	int shootNum;
 	int lastShootFrame;
+
 	public FakeZeroShoot3State() : base("shoot2") {
-	}
-	public FakeZero darkZero = null!;
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		darkZero = maverick as FakeZero ?? throw new NullReferenceException();
 	}
 
 	public override void update() {
@@ -461,26 +533,26 @@ public class FakeZeroShoot3State : MaverickState {
 
 		if (shootPos != null && maverick.frameIndex != lastShootFrame) {
 			if (shootNum == 0) {
-				maverick.deductAmmo(5);
+				maverick.deductAmmo(FakeZero.shootLv3Ammo);
 				maverick.playSound("buster3X2", forcePlay: false, sendRpc: true);
 				new FakeZeroBusterProj3(
-					shootPos.Value, maverick.xDir, 0, darkZero,
+					shootPos.Value, maverick.xDir, 0, zero,
 					player, player.getNextActorNetId(), rpc: true
-				);	
+				);
 			} else if (shootNum == 1) {
-				maverick.deductAmmo(7);
+				maverick.deductAmmo(FakeZero.shootLv3Ammo);
 				maverick.playSound("buster3X2", forcePlay: false, sendRpc: true);
 				new FakeZeroBusterProj3(
-					shootPos.Value, maverick.xDir, 1, darkZero,
+					shootPos.Value, maverick.xDir, 1, zero,
 					player, player.getNextActorNetId(), rpc: true
-				);	
+				);
 			} else if (shootNum == 2) {
-				maverick.deductAmmo(4);
+				maverick.deductAmmo(FakeZero.hadangekiAmmo);
 				maverick.playSound("buster4X2", forcePlay: false, sendRpc: true);
 				new FakeZeroSwordBeamProj(
-					shootPos.Value, maverick.xDir, darkZero,
+					shootPos.Value, maverick.xDir, zero,
 					player, player.getNextActorNetId(), rpc: true
-				);	
+				);
 			}
 			shootNum++;
 			lastShootFrame = maverick.frameIndex;
@@ -492,7 +564,7 @@ public class FakeZeroShoot3State : MaverickState {
 	}
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
-		darkZero.shootTime = 1;
+		zero.shootTime = 1;
 	}
 }
 
@@ -500,7 +572,7 @@ public class FakeZeroMeleeProj : Projectile {
 	public FakeZeroMeleeProj(
 		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		pos, xDir, owner, "fakezero_run_sword", netId, player	
+		pos, xDir, owner, "fakezero_run_sword", netId, player
 	) {
 		weapon = FakeZero.getWeapon();
 		damager.damage = 2;
@@ -533,10 +605,10 @@ public class FakeZeroMeleeProj : Projectile {
 	}
 }
 
-public class FakeZeroMeleeState : MaverickState {
+public class FakeZeroMeleeState : FakeZeroMState {
 	public FakeZeroMeleeProj? proj;
-	Anim? ProjVisible;
-	public FakeZero darkZero = null!;
+	Anim? projVisible;
+
 	public FakeZeroMeleeState() : base("run_attack") {
 		enterSound = "saber3";
 		aiAttackCtrl = true;
@@ -544,16 +616,16 @@ public class FakeZeroMeleeState : MaverickState {
 
 	public override void update() {
 		base.update();
-		darkZero.turnToInput(input, player);
+		zero.turnToInput(input, player);
 		proj?.turnToInput(input, player);
-		ProjVisible?.turnToInput(input, player);
-		proj?.changePos(darkZero.getFirstPOIOrDefault(1));
-		ProjVisible?.changePos(darkZero.getFirstPOIOrDefault(1));
+		projVisible?.turnToInput(input, player);
+		proj?.changePos(zero.getFirstPOIOrDefault(1));
+		projVisible?.changePos(zero.getFirstPOIOrDefault(1));
 
 		var move = new Point(0, 0);
-		if (input.isHeld(Control.Left, player)) {	
+		if (input.isHeld(Control.Left, player)) {
 			move.x = -maverick.getRunSpeed();
-		} else if (input.isHeld(Control.Right, player)) {	
+		} else if (input.isHeld(Control.Right, player)) {
 			move.x = maverick.getRunSpeed();
 		}
 		if (move.magnitude > 0) {
@@ -566,21 +638,19 @@ public class FakeZeroMeleeState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		darkZero = maverick as FakeZero ?? throw new NullReferenceException();
-		ProjVisible = new Anim(
+		projVisible = new Anim(
 			maverick.getFirstPOIOrDefault(1), "fakezero_run_sword", maverick.xDir,
 			player.getNextActorNetId(), false, sendRpc: true
 		);
-
 		proj = new FakeZeroMeleeProj(
 			maverick.getFirstPOIOrDefault(1), maverick.xDir,
-			darkZero, player, player.getNextActorNetId(), rpc: true);
+			zero, player, player.getNextActorNetId(), rpc: true);
 	}
 
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
 		proj?.destroySelf();
-		ProjVisible?.destroySelf();
+		projVisible?.destroySelf();
 	}
 }
 
@@ -588,7 +658,7 @@ public class FakeZeroRockProj : Projectile {
 	public FakeZeroRockProj(
 		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		pos, xDir, owner, "fakezero_rock", netId, player	
+		pos, xDir, owner, "fakezero_rock", netId, player
 	) {
 		weapon = FakeZero.getWeapon();
 		damager.damage = 3;
@@ -625,13 +695,8 @@ public class FakeZeroGuardState : MaverickState {
 	}
 }
 
-public class FakeZeroGroundPunchState : MaverickState {
-	public FakeZero darkZero = null!;
+public class FakeZeroGroundPunchState : FakeZeroMState {
 	public FakeZeroGroundPunchState() : base("groundpunch") {
-	}
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		darkZero = maverick as FakeZero ?? throw new NullReferenceException();
 	}
 
 	public override void update() {
@@ -661,7 +726,7 @@ public class FakeZeroGroundPunchState : MaverickState {
 	}
 	public void RockProjectile(int dist) {
 		new FakeZeroRockProj(
-			maverick.pos.addxy(dist, 0), maverick.xDir, darkZero,
+			maverick.pos.addxy(dist, 0), maverick.xDir, zero,
 			player, player.getNextActorNetId(), rpc: true
 		);
 

@@ -59,17 +59,20 @@ public class BlizzardBuffalo : Maverick {
 		return "bbuffalo";
 	}
 
-	public override MaverickState getRandomAttackState() {
-		return aiAttackStates().GetRandomItem();
+	public override MaverickState[] strikerStates() {
+		return [
+			getShootState(false),
+			new BBuffaloShootBeamState(),
+			new BBuffaloDashState(),
+		];
 	}
 
 	public override MaverickState[] aiAttackStates() {
-		return new MaverickState[]
-		{
-				getShootState(false),
-				new BBuffaloShootBeamState(),
-				new BBuffaloDashState(),
-		};
+		return [
+			getShootState(false),
+			new BBuffaloShootBeamState(),
+			new BBuffaloDashState(),
+		];
 	}
 
 	public MaverickState getShootState(bool isAI) {

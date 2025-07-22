@@ -77,19 +77,32 @@ public class VoltCatfish : Maverick {
 		return "voltc";
 	}
 
-	public override MaverickState getRandomAttackState() {
-		return aiAttackStates().GetRandomItem();
+	public override MaverickState[] strikerStates() {
+		return [
+			getShootState(true),
+			getSpecialState(),
+			new VoltCUpBeamState(),
+		];
 	}
 
 	public override MaverickState[] aiAttackStates() {
-		var states = new List<MaverickState>
-		{
-				getShootState(true),
-				getSpecialState(),
-				new VoltCUpBeamState(),
-			};
-
-		return states.ToArray();
+		List<MaverickState> aiStates = [
+			getShootState(isAI: true),
+			getSpecialState()
+		];
+		if (ammo >= 32f) {
+			aiStates.Add(new VoltCSpecialState());
+		}
+		if (mines.Count == 0) {
+			float enemyDist = 300;
+			if (target != null) {
+				enemyDist = MathF.Abs(target.pos.x - pos.x);
+			}
+			if (enemyDist >= 30) {
+				aiStates.Add(new VoltCSuckState());
+			}
+		}
+		return aiStates.ToArray();
 	}
 
 	public MaverickState getSpecialState() {

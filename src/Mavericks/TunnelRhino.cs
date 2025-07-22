@@ -60,17 +60,20 @@ public class TunnelRhino : Maverick {
 		return "tunnelr";
 	}
 
-	public override MaverickState getRandomAttackState() {
-		return aiAttackStates().GetRandomItem();
+	public override MaverickState[] strikerStates() {
+		return [
+			new TunnelRShootState(false),
+			new TunnelRShoot2State(),
+			new TunnelRDashState(),
+		];
 	}
 
 	public override MaverickState[] aiAttackStates() {
-		return new MaverickState[]
-		{
-				new TunnelRShootState(false),
-				new TunnelRShoot2State(),
-				new TunnelRDashState(),
-		};
+		return [
+			new TunnelRShootState(false),
+			new TunnelRShoot2State(),
+			new TunnelRDashState(),
+		];
 	}
 
 	// Melee IDs for attacks.

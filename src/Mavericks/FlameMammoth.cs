@@ -63,23 +63,23 @@ public class FlameMammoth : Maverick {
 		return shootState;
 	}
 
-	public override MaverickState[] aiAttackStates() {
-		return new MaverickState[]
-		{
-				getShootState(true),
-				new FlameMOilState(),
-				new MJumpStart(),
-		};
+	public override MaverickState[] strikerStates() {
+		return [
+			getShootState(true),
+			new FlameMOilState(),
+			new MJumpStart(),
+		];
 	}
 
-	public override MaverickState getRandomAttackState() {
-		var attacks = new MaverickState[] {
-				getShootState(true),
-				new FlameMOilState(),
-				new MJumpStart(),
-		};
-		return attacks.GetRandomItem();
+	public override MaverickState[] aiAttackStates() {
+		return [
+			getShootState(true),
+			getShootState(true),
+			new FlameMOilState(),
+			new MJumpStart(),
+		];
 	}
+
 
 	// Melee IDs for attacks.
 	public enum MeleeIds {

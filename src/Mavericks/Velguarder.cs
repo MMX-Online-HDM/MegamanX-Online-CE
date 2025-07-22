@@ -61,23 +61,20 @@ public class Velguarder : Maverick {
 		return new VelGShootIceState();
 	}
 
-	public override MaverickState[] aiAttackStates() {
-		return new MaverickState[]
-		{
-				new VelGShootFireState(),
-				new VelGShootIceState(),
-				new VelGPounceStartState(),
-		};
+	public override MaverickState[] strikerStates() {
+		return [
+			new VelGShootFireState(),
+			new VelGShootIceState(),
+			new VelGPounceStartState(),
+		];
 	}
 
-	public override MaverickState getRandomAttackState() {
-		var attacks = new MaverickState[]
-		{
-				new VelGShootFireState(),
-				new VelGShootIceState(),
-				new VelGPounceStartState(),
-		};
-		return attacks.GetRandomItem();
+	public override MaverickState[] aiAttackStates() {
+		return [
+			new VelGShootFireState(),
+			new VelGShootIceState(),
+			new VelGPounceStartState(),
+		];
 	}
 
 	// Melee IDs for attacks.

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 namespace MMXOnline;
 
 public class NeonTiger : Maverick {
@@ -68,20 +69,30 @@ public class NeonTiger : Maverick {
 		return 1f;
 	}
 
-	public override MaverickState getRandomAttackState() {
-		return aiAttackStates().GetRandomItem();
+	public override MaverickState[] strikerStates() {
+		return [
+			new NeonTClawState(false),
+			new NeonTShootState(),
+			new NeonTDashClawState()
+		];
 	}
 
 	public override MaverickState[] aiAttackStates() {
-		return new MaverickState[]
-		{
-				new NeonTClawState(false),
-				new NeonTShootState(),
-				new NeonTDashState(),
-		};
+		float enemyDist = 300;
+		if (target != null) {
+			enemyDist = MathF.Abs(target.pos.x - pos.x);
+		}
+		List<MaverickState> aiStates = [];
+		if (enemyDist <= 60) {
+			aiStates.Add(new NeonTClawState(isSecond: false));
+			aiStates.Add(new NeonTShootState());
+			aiStates.Add(new NeonTDashClawState());
+		} else {
+			aiStates.Add(new NeonTDashState());
+		}
+		
+		return aiStates.ToArray();
 	}
-
-	
 
 	// Melee IDs for attacks.
 	public enum MeleeIds {

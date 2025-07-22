@@ -200,7 +200,7 @@ public partial class Character : Actor, IDamagable {
 		}
 	}
 	public bool isControllingPuppet() {
-		return currentMaverick?.controlMode == MaverickMode.Puppeteer;
+		return currentMaverick?.controlMode == MaverickModeId.Puppeteer;
 	}
 	public Weapon? lastMaverickWeapon = null;
 
@@ -1781,7 +1781,7 @@ public partial class Character : Actor, IDamagable {
 		if (rideArmorPlatform != null) {
 			return rideArmorPlatform;
 		}
-		if (currentMaverick != null && currentMaverick.controlMode == MaverickMode.TagTeam) {
+		if (currentMaverick != null && currentMaverick.controlMode == MaverickModeId.TagTeam) {
 			return currentMaverick;
 		}
 		if (rideArmor != null) {

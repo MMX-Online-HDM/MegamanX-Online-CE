@@ -161,16 +161,13 @@ public class MorphMothCocoon : Maverick {
 		return pos.addxy(0, (height * yScale) / 2f);
 	}
 
-	public override MaverickState[] aiAttackStates() {
-		var attacks = new MaverickState[]
-		{
-				new MorphMCSpinState(),
-		};
-		return attacks;
+	
+	public override MaverickState[] strikerStates() {
+		return [new MorphMCSpinState()];
 	}
 
-	public override MaverickState getRandomAttackState() {
-		return aiAttackStates().GetRandomItem();
+	public override MaverickState[] aiAttackStates() {
+		return [new MorphMCSpinState()];
 	}
 
 	public override Collider getGlobalCollider() {

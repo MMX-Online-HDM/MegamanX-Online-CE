@@ -665,11 +665,11 @@ public partial class Level {
 		return results;
 	}
 
-	public CollideData raycast(Point pos1, Point pos2, List<Type> classNames) {
+	public CollideData? raycast(Point pos1, Point pos2, List<Type> classNames) {
 		var hits = raycastAll(pos1, pos2, classNames);
 
 		float minDist = float.MaxValue;
-		CollideData best = null;
+		CollideData? best = null;
 		foreach (var collideData in hits) {
 			float? dist = collideData.hitData.hitPoint?.distanceTo(pos1);
 			if (dist == null) continue;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 namespace MMXOnline;
 
 public class CrushCrawfish : Maverick {
@@ -47,17 +48,27 @@ public class CrushCrawfish : Maverick {
 		return "crushc";
 	}
 
-	public override MaverickState getRandomAttackState() {
-		return aiAttackStates().GetRandomItem();
+	public override MaverickState[] strikerStates() {
+		return [
+			new CrushCShootArmState(),
+			getShootState(true),
+			new CrushCDashState(),
+		];
 	}
 
 	public override MaverickState[] aiAttackStates() {
-		return new MaverickState[]
-		{
-				new CrushCShootArmState(),
-				getShootState(true),
-				new CrushCDashState(),
-		};
+		float enemyDist = 300;
+		if (target != null) {
+			enemyDist = MathF.Abs(target.pos.x - pos.x);
+		}
+		List<MaverickState> aiStates = [
+			getShootState(isAI: true),
+			new CrushCDashState()
+		];
+		if (enemyDist <= 110) {
+			aiStates.Add(new CrushCShootArmState());
+		}
+		return aiStates.ToArray();
 	}
 
 	public MaverickState getShootState(bool isAI) {

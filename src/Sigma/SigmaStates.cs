@@ -1,4 +1,4 @@
-namespace MMXOnline;
+﻿namespace MMXOnline;
 
 public class IssueGlobalCommand : CharState {
 	public bool isAutoGuarding;
@@ -43,6 +43,7 @@ public class CallDownMaverick : CharState {
 		this.isNew = isNew;
 		this.isRecall = isRecall;
 		superArmor = true;
+		airMove = true;
 	}
 
 	public override void update() {
@@ -50,7 +51,7 @@ public class CallDownMaverick : CharState {
 
 		frame++;
 
-		if (frame > 0 && frame < 10 && maverick.controlMode is MaverickMode.Striker or MaverickMode.Summoner) {
+		if (frame > 0 && frame < 10 && maverick.controlMode is MaverickModeId.Striker or MaverickModeId.Summoner) {
 			if (player.input.isPressed(Control.Shoot, player) &&
 				maverick.startMoveControl == Control.Special1
 			) {

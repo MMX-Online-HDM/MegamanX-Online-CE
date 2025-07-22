@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace MMXOnline;
@@ -224,7 +224,7 @@ public partial class RPCCreateProj : RPC {
 		{ (int)ProjIds.OverdriveOSonicSlicer, OverdriveOSonicSlicerProj.rpcInvoke },
 		{ (int)ProjIds.OverdriveOSonicSlicerUp, OverdriveOSonicSlicerUpProj.rpcInvoke },
 		{ (int)ProjIds.FakeZeroBuster, FakeZeroBusterProj.rpcInvoke },
-		{ (int)ProjIds.FakeZeroBuster2, FakeZeroBusterProj2.rpcInvoke },
+		{ (int)ProjIds.FakeZeroBuster2, FakeZeroBuster2Proj.rpcInvoke },
 		{ (int)ProjIds.FakeZeroBuster3, FakeZeroBusterProj3.rpcInvoke },
 		{ (int)ProjIds.FakeZeroSwordBeam, FakeZeroSwordBeamProj.rpcInvoke },
 		{ (int)ProjIds.FakeZeroMelee, FakeZeroMeleeProj.rpcInvoke },

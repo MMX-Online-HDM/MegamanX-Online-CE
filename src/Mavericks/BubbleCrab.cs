@@ -132,17 +132,30 @@ public class BubbleCrab : Maverick {
 		return "bcrab";
 	}
 
-	public override MaverickState[] aiAttackStates() {
-		return new MaverickState[]
-		{
-				new BCrabShootState(),
-				getSpecialState(),
-				new BCrabClawState(),
-		};
+	public override MaverickState[] strikerStates() {
+		return [
+			new BCrabShootState(),
+			new BCrabSummonState(),
+			new BCrabClawState()
+		];
 	}
 
-	public override MaverickState getRandomAttackState() {
-		return aiAttackStates().GetRandomItem();
+	public override MaverickState[] aiAttackStates() {
+		float enemyDist = 300;
+		if (target != null) {
+			enemyDist = MathF.Abs(target.pos.x - pos.x);
+		}
+		if (enemyDist <= 30) {
+			return [
+				new BCrabShootState(),
+				getSpecialState(),
+				new BCrabClawState()
+			];
+		}
+		return [
+			new BCrabShootState(),
+			getSpecialState(),
+		];
 	}
 
 	// Melee IDs for attacks.

@@ -89,23 +89,30 @@ public class LaunchOctopus : Maverick {
 		return "launcho";
 	}
 
-	public override MaverickState[] aiAttackStates() {
-		return new MaverickState[]
-		{
-				new LaunchOShoot(grounded),
-				new LaunchOHomingTorpedoState(),
-				new LaunchOWhirlpoolState(),
-		};
+	public override MaverickState[] strikerStates() {
+		return [
+			new LaunchOShoot(grounded),
+			new LaunchOHomingTorpedoState(),
+			new LaunchOWhirlpoolState(),
+		];
 	}
 
-	public override MaverickState getRandomAttackState() {
-		var attacks = new MaverickState[]
-		{
+	public override MaverickState[] aiAttackStates() {
+		float enemyDist = 300;
+		if (target != null) {
+			enemyDist = MathF.Abs(target.pos.x - pos.x);
+		}
+		if (enemyDist <= 70) {
+			return [
 				new LaunchOShoot(grounded),
-				new LaunchOWhirlpoolState(),
 				new LaunchOHomingTorpedoState(),
-		};
-		return attacks.GetRandomItem();
+				new LaunchOWhirlpoolState()
+			];
+		}
+		return [
+			new LaunchOShoot(grounded),
+			new LaunchOHomingTorpedoState()
+		];
 	}
 
 	// Melee IDs for attacks.

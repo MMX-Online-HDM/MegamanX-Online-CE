@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.ConstrainedExecution;
 using SFML.Graphics;
 using static SFML.Window.Keyboard;
 
@@ -13,7 +14,7 @@ public enum MaverickAIBehavior {
 	Attack
 }
 
-public enum MaverickMode {
+public enum MaverickModeId {
 	Summoner,
 	Puppeteer,
 	Striker,
@@ -49,8 +50,8 @@ public class Maverick : Actor, IDamagable {
 	public float weaponHealAmount = 0;
 	public float weaponHealTime = 0;
 	public bool playHealSound;
-	public MaverickMode controlMode;
-	public MaverickMode trueControlMode;
+	public MaverickModeId controlMode;
+	public MaverickModeId trueControlMode;
 
 	public MaverickWeapon rootWeapon;
 	public Character? ownerChar;
@@ -111,7 +112,7 @@ public class Maverick : Actor, IDamagable {
 	public MaverickAIBehavior aiBehavior;
 	public Actor target;
 	public float aiCooldown;
-	public float maxAICooldown = 60;
+	public float maxAICooldown = 75;
 	public string startMoveControl;
 
 	public Weapon weapon;
@@ -149,7 +150,7 @@ public class Maverick : Actor, IDamagable {
 
 	public bool isPuppeteerTooFar() {
 		return (
-			controlMode == MaverickMode.Puppeteer &&
+			controlMode == MaverickModeId.Puppeteer &&
 			ownerChar != null &&
 			getCenterPos().distanceTo(ownerChar.pos) > 374
 		);
@@ -340,8 +341,8 @@ public class Maverick : Actor, IDamagable {
 		}
 
 		if (autoExit) {
-			autoExitTime += Global.spf;
-			if (autoExitTime > 1 && state is not MExit) {
+			autoExitTime += speedMul;
+			if (autoExitTime > 10 && state is not MExit) {
 				changeState(new MExit(pos, true));
 			}
 		} else if (aiBehavior != MaverickAIBehavior.Control) {
@@ -350,7 +351,7 @@ public class Maverick : Actor, IDamagable {
 
 		if (player == null) return;
 
-		if (controlMode == MaverickMode.Striker) {
+		if (controlMode == MaverickModeId.Striker) {
 			strikerTime += Global.spf;
 			if (strikerTime > 3) {
 				if (this is WireSponge || this is ToxicSeahorse) {
@@ -451,10 +452,10 @@ public class Maverick : Actor, IDamagable {
 		Helpers.decrementFrames(ref aiCooldown);
 
 		bool isSummonerOrStrikerDoppler = (
-			controlMode is MaverickMode.Striker or MaverickMode.Summoner
+			controlMode is MaverickModeId.Striker or MaverickModeId.Summoner
 		) && this is DrDoppler;
-		bool isSummonerCocoon = controlMode == MaverickMode.Summoner && this is MorphMothCocoon;
-		bool isStrikerCocoon = controlMode == MaverickMode.Striker && this is MorphMothCocoon;
+		bool isSummonerCocoon = controlMode == MaverickModeId.Summoner && this is MorphMothCocoon;
+		bool isStrikerCocoon = controlMode == MaverickModeId.Striker && this is MorphMothCocoon;
 		var mmc = this as MorphMothCocoon;
 		var doppler = this as DrDoppler;
 
@@ -469,7 +470,7 @@ public class Maverick : Actor, IDamagable {
 			}
 		} else if (isSummonerCocoon || isStrikerCocoon) {
 			target = mmc.getHealTarget();
-		} else if (controlMode is not MaverickMode.Puppeteer and not MaverickMode.TagTeam) {
+		} else if (controlMode is not MaverickModeId.Puppeteer and not MaverickModeId.TagTeam) {
 			target = Global.level.getClosestTarget(
 				getCenterPos(), player.alliance, true, isRequesterAI: true,
 				aMaxDist: 300
@@ -484,42 +485,42 @@ public class Maverick : Actor, IDamagable {
 		}
 
 		bool doStartMoveControlIfNoTarget = !string.IsNullOrEmpty(startMoveControl);
-		if (doStartMoveControlIfNoTarget && target == null && startMoveControl == Control.Shoot) {
-			doStartMoveControlIfNoTarget = false;
-		}
-
-		if ((target != null || doStartMoveControlIfNoTarget) && isAIState && controlMode != MaverickMode.Puppeteer) {
+		if ((target != null || doStartMoveControlIfNoTarget) &&
+			isAIState && controlMode != MaverickModeId.Puppeteer
+		) {
 			if (isSummonerCocoon) {
 				if (target != null) {
-					mmc.changeState(new MorphMCSpinState());
+					mmc?.changeState(new MorphMCSpinState());
 				}
-			} else if (aiCooldown == 0 && isAIState) {
+			}
+			else if (aiCooldown == 0 && isAIState) {
 				MaverickState mState = getRandomAttackState();
 				if (isSummonerOrStrikerDoppler && doppler.ballType == 1) {
-					mState = aiAttackStates()[0];
+					mState = strikerStates()[0];
 				} else if (!string.IsNullOrEmpty(startMoveControl)) {
-					var aiAttackStateArray = aiAttackStates();
-					int mIndex = 0;
+					var aiAttackStateArray = strikerStates();
 
-					if (startMoveControl == Control.Shoot) mIndex = 0;
-					else if (startMoveControl == Control.Special1) mIndex = 1;
-					else if (startMoveControl == Control.Dash) mIndex = 2;
+					int mIndex = startMoveControl switch {
+						Control.Dash => 2,
+						Control.Special1 => 1,
+						_ => 0
+					};
 
 					while (mIndex >= aiAttackStateArray.Length) {
 						mIndex--;
 					}
 					mState = aiAttackStateArray[mIndex];
 
-					startMoveControl = null;
+					startMoveControl = "";
 				}
 
 				if (mState != null) {
 					changeState(mState);
 				}
 			}
-		} else if (aiBehavior == MaverickAIBehavior.Follow && controlMode != MaverickMode.Striker) {
-			Character chr = player.character;
-			if (chr != null) {
+		} else if (aiBehavior == MaverickAIBehavior.Follow && controlMode != MaverickModeId.Striker) {
+			if (player.character != null) {
+				Character chr = player.character;
 				float dist = chr.pos.x - pos.x;
 				float assignedDist = 40;
 
@@ -529,12 +530,38 @@ public class Maverick : Actor, IDamagable {
 					}
 				}
 				if (!grounded) {
-					assignedDist = 10f;
+					assignedDist = 4;
 				}
-				if (MathF.Abs(dist) > assignedDist) {
-					if (dist < 0) press(Control.Left);
-					else press(Control.Right);
+				int walkDir = dist < 0 ? -1 : 1;
+				bool doWalk = MathF.Abs(dist) > assignedDist && chr.grounded;
 
+				// For while we are jumping.
+				if (!grounded) {
+					// Start falling and on top of grounded Sigma.
+					if (chr.grounded && MathF.Abs(chr.pos.x - pos.x) <= 4) {
+						doWalk = false;
+					}
+					// If on top of death. NEVER STOP.
+					else if (Global.level.getGroundPosNoKillzone(pos, 128) == null) {
+						walkDir = xDir;
+						doWalk = true;
+					}
+					// Check if pit on front and falling. If so, stop.
+					else if (
+						vel.y >= 0 &&
+						Global.level.getGroundPosNoKillzone(
+							pos.addxy(xDir * 32, 0), 128
+						) == null
+					) {
+						doWalk = false;
+					}
+				}
+				if (doWalk) {
+					if (walkDir == -1) {
+						press(Control.Left);
+					} else {
+						press(Control.Right);
+					}
 					var jumpZones = Global.level.getTerrainTriggerList(
 						this, Point.zero, typeof(JumpZone)
 					);
@@ -544,19 +571,50 @@ public class Maverick : Actor, IDamagable {
 				}
 			}
 		} else if (aiBehavior == MaverickAIBehavior.Attack) {
-			float raycastDist = (width / 2) + 5;
-			var hit = Global.level.raycastAll(
-				getCenterPos(), getCenterPos().addxy(attackDir * raycastDist, 0), new List<Type>() { typeof(Wall) }
-			);
-			if (hit.Count == 0) {
-				if (attackDir < 0) press(Control.Left);
-				else press(Control.Right);
+			// For air-walk.
+			bool doWalk = false;
+			// For while we are jumping.
+			if (!grounded) {
+				// If on top of death. NEVER STOP.
+				if (Global.level.getGroundPosNoKillzone(pos, 128) == null) {
+					doWalk = true;
+				}
+				// Check if pit on front and falling. If so, stop.
+				else if (
+					vel.y >= 0 &&
+					Global.level.getGroundPosNoKillzone(
+						pos.addxy(xDir * 32, 0), 128
+					) == null
+				) {
+					doWalk = false;
+				}
 			}
+			// Jump on jump zones.
 			var jumpZones = Global.level.getTerrainTriggerList(
 				this, Point.zero, typeof(JumpZone)
 			);
-			if (jumpZones.Count > 0) {
+			if (grounded && jumpZones.Count > 0) {
 				press(Control.Jump);
+			}
+			// Air walk. Keep moving in the same direction.
+			if (doWalk) {
+				if (xDir == -1) {
+					press(Control.Left);
+				} else {
+					press(Control.Right);
+				}
+			} else {
+				float raycastDist = (width / 2) + 5;
+				List<CollideData> hit = Global.level.raycastAll(
+					getCenterPos(), getCenterPos().addxy(attackDir * raycastDist, 0), [typeof(Wall)]
+				);
+				if (hit.Count == 0) {
+					if (attackDir < 0) {
+						press(Control.Left);
+					} else {
+						press(Control.Right);
+					}
+				}
 			}
 		}
 	}
@@ -583,11 +641,26 @@ public class Maverick : Actor, IDamagable {
 	}
 
 	public virtual MaverickState getRandomAttackState() {
-		return null;
+		// Get all posible states.
+		MaverickState[] targetStates = aiAttackStates();
+		// Skip states on cooldown.
+		targetStates = targetStates.Where(
+			tState => !(stateCooldowns.GetValueOrDefault(tState.GetType())?.cooldown > 0)
+		).ToArray();
+		// If the total state count is 0. Then we just taunt.
+		if (targetStates.Length == 0) {
+			return new MTaunt();
+		}
+		// Otherwise, return all usable states.
+		return targetStates.GetRandomItem();
 	}
 
 	public virtual MaverickState[] aiAttackStates() {
-		return new MaverickState[] { };
+		return [new MTaunt()];
+	}
+
+	public virtual MaverickState[] strikerStates() {
+		return [new MTaunt()];
 	}
 
 	// For terrain collision.
@@ -1105,13 +1178,20 @@ public class Maverick : Actor, IDamagable {
 		base.render(x, y);
 		currentLabelY = -getLabelOffY();
 
-		if (player == Global.level.mainPlayer && ownerChar?.currentMaverick != this && health > 0) {
-			drawHealthBar();
-		}
+		if (ownerChar?.currentMaverick != this &&
+			!sprite.name.EndsWith("exit") &&
+			!sprite.name.EndsWith("enter") &&
+			controlMode != MaverickModeId.Striker &&
+			controlMode != MaverickModeId.TagTeam
+		) {
+			if (player == Global.level.mainPlayer && ownerChar?.currentMaverick != this && health > 0) {
+				drawHealthBar();
+			}
 
-		if (player != Global.level.mainPlayer && player.alliance == Global.level.mainPlayer.alliance) {
-			drawHealthBar();
-			drawName();
+			if (player != Global.level.mainPlayer && player.alliance == Global.level.mainPlayer.alliance) {
+				drawHealthBar();
+				drawName();
+			}
 		}
 
 		drawSubtankHealing();
@@ -1128,7 +1208,7 @@ public class Maverick : Actor, IDamagable {
 		if (this is StingChameleon sc && sc.isInvisible && ownedByLocalPlayer) {
 			return true;
 		}
-		return ownerChar?.currentMaverick == this && controlMode == MaverickMode.Puppeteer;
+		return ownerChar?.currentMaverick == this && controlMode == MaverickModeId.Puppeteer;
 	}
 
 	public void changeToIdleOrFall(string transitionSprite = "") {

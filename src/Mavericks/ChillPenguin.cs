@@ -96,24 +96,20 @@ public class ChillPenguin : Maverick {
 		return mshoot;
 	}
 
-	public override MaverickState[] aiAttackStates() {
-		return new MaverickState[]
-		{
-				getShootState(true),
-				new ChillPIceBlowState(),
-				new ChillPSlideState(true),
-		};
+	public override MaverickState[] strikerStates() {
+		return [
+			getShootState(true),
+			new ChillPIceBlowState(),
+			new ChillPSlideState(true),
+		];
 	}
 
-	public override MaverickState getRandomAttackState() {
-		var attacks = new MaverickState[]
-		{
-				getShootState(true),
-				new ChillPIceBlowState(),
-			//new ChillPSlideState(true),
-			//new ChillPBlizzardState(true),
-		};
-		return attacks.GetRandomItem();
+	public override MaverickState[] aiAttackStates() {
+		return [
+			getShootState(true),
+			new ChillPIceBlowState(),
+			new ChillPSlideState(true),
+		];
 	}
 
 	/*
@@ -570,7 +566,7 @@ public class ChillPBlizzardState : MaverickState {
 				if (!once && maverick.frameIndex == 3) {
 					once = true;
 					float topY = Global.level.getTopScreenY(maverick.pos.y);
-					if (maverick.controlMode == MaverickMode.Puppeteer && player.currentMaverick == maverick) {
+					if (maverick.controlMode == MaverickModeId.Puppeteer && player.currentMaverick == maverick) {
 						topY = maverick.pos.y - 80;
 					}
 					new ChillPBlizzardProj(

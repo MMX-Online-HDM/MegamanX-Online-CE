@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace MMXOnline;
 
@@ -110,18 +111,27 @@ public class OverdriveOstrich : Maverick {
 		return "overdriveo";
 	}
 
-	public override MaverickState[] aiAttackStates() {
-		var attacks = new MaverickState[]
-		{
-				new OverdriveOShootState(),
-				new OverdriveOShoot2State(),
-				new OverdriveOJumpKickState(),
-		};
-		return attacks;
+	public override MaverickState[] strikerStates() {
+		return [
+			new OverdriveOShootState(),
+			new OverdriveOShoot2State(),
+			new OverdriveOJumpKickState(),
+		];
 	}
 
-	public override MaverickState getRandomAttackState() {
-		return aiAttackStates().GetRandomItem();
+	public override MaverickState[] aiAttackStates() {
+		float enemyDist = 300;
+		if (target != null) {
+			enemyDist = MathF.Abs(target.pos.x - pos.x);
+		}
+		List<MaverickState> aiStates = [
+			new OverdriveOShootState(),
+			new OverdriveOJumpKickState()
+		];
+		if (enemyDist <= 70) {
+			aiStates.Add(new OverdriveOShoot2State());
+		}
+		return aiStates.ToArray();
 	}
 
 	// Melee IDs for attacks.

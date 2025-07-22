@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace MMXOnline;
 
@@ -81,31 +82,27 @@ public class StormEagle : Maverick {
 		}, "tornado");
 	}
 
-	public override MaverickState[] aiAttackStates() {
-		return new MaverickState[]
-		{
-				getShootState(),
-				new StormEEggState(true),
-				new StormEGustState(),
-		};
+	public override MaverickState[] strikerStates() {
+		return [
+			getShootState(),
+			new StormEEggState(true),
+			new StormEGustState(),
+		];
 	}
 
-	public override MaverickState getRandomAttackState() {
-		if (grounded) {
-			var attacks = new MaverickState[]
-			{
-					getShootState(),
-					new StormEEggState(true),
-					new StormEGustState(),
-			};
-			return attacks.GetRandomItem();
-		} else {
-			var attacks = new MaverickState[]
-			{
-					new StormEEggState(false),
-			};
-			return attacks.GetRandomItem();
+	public override MaverickState[] aiAttackStates() {
+		float enemyDist = 300;
+		if (target != null) {
+			enemyDist = target.pos.distanceTo(pos);
 		}
+		List<MaverickState> aiStates = [
+			getShootState(),
+			new StormEEggState(grounded)
+		];
+		if (grounded && enemyDist <= 90) {
+			aiStates.Add(new StormEGustState());
+		}
+		return aiStates.ToArray();
 	}
 
 	// Melee IDs for attacks.

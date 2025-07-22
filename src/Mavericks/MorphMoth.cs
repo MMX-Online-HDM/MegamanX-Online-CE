@@ -70,19 +70,24 @@ public class MorphMoth : Maverick {
 		return "morphm";
 	}
 
-	public override MaverickState[] aiAttackStates() {
-		var attacks = new List<MaverickState>
-		{
-				grounded ? new MorphMShoot() : new MorphMShootAir()
-			};
-		if (!grounded) {
-			attacks.Add(new MorphMSweepState());
-		}
-		return attacks.ToArray();
+	public override MaverickState[] strikerStates() {
+		return [
+			new MorphMShoot(),
+			new MorphMSweepState()
+		];
 	}
 
-	public override MaverickState getRandomAttackState() {
-		return aiAttackStates().GetRandomItem();
+	public override MaverickState[] aiAttackStates() {
+		if (grounded) {
+			return [
+				new MorphMShoot(),
+				new MJumpStart()
+			];
+		}
+		return [
+			new MorphMShootAir(),
+			new MorphMSweepState()
+		];
 	}
 }
 
