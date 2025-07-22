@@ -135,6 +135,16 @@ public class Vile : Character {
 		return poiPos;
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		if (!ownedByLocalPlayer) {
+			return;
+		}
+		if (weapons.Count == 1 && currentWeapon == energy) {
+			energy.charLinkedUpdate(this, true);
+		}
+	}
+
 	public override void update() {
 		base.update();
 		if (isVileMK1) {

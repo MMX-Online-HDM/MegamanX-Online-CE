@@ -284,18 +284,6 @@ public class Weapon {
 	}
 	public virtual void shoot(Character character, int[] args) {
 	}
-	public virtual void shootLight(Character character, int[] args) {
-		shoot(character, args);
-	}
-	public virtual void shootSecond(Character character, int[] args) {
-		shoot(character, args);
-	}
-	public virtual void shootMax(Character character, int[] args) {
-		shoot(character, args);
-	}
-	public virtual void shootHypercharge(Character character, int[] args) {
-		shoot(character, args);
-	}
 
 	// ToDo: Remove default values from this.
 	public virtual float getAmmoUsage(int chargeLevel) {
