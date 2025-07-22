@@ -1420,7 +1420,7 @@ public class Die : CharState {
 				once = true;
 				character.visible = false;
 				player.explodeDieStart();
-				if (character is BaseSigma sigma && sigma.loadout.commandMode != (int)MaverickMode.TagTeam) {
+				if (character is BaseSigma sigma && sigma.loadout.commandMode != (int)MaverickModeId.TagTeam) {
 					foreach (var weapon in new List<Weapon>(player.weapons)) {
 						if (weapon is MaverickWeapon mw && mw.maverick != null) {
 							mw.maverick.changeState(new MExit(mw.maverick.pos, true), true);

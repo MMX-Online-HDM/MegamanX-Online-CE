@@ -83,17 +83,20 @@ public class DrDoppler : Maverick {
 		return "drdoppler";
 	}
 
-	public override MaverickState getRandomAttackState() {
-		return aiAttackStates().GetRandomItem();
+	public override MaverickState[] strikerStates() {
+		return [
+			new DrDopplerShootState(),
+			new DrDopplerAbsorbState(),
+			new DrDopplerDashStartState(),
+		];
 	}
 
 	public override MaverickState[] aiAttackStates() {
-		return new MaverickState[]
-		{
-				new DrDopplerShootState(),
-				new DrDopplerAbsorbState(),
-				new DrDopplerDashStartState(),
-		};
+		return [
+			new DrDopplerShootState(),
+			new DrDopplerAbsorbState(),
+			new DrDopplerDashStartState(),
+		];
 	}
 
 	/*public MaverickState getShootState(bool isAI) {

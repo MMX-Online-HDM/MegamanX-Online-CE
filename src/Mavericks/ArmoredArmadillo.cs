@@ -132,15 +132,18 @@ public class ArmoredArmadillo : Maverick {
 		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
 	}
 
-	public override MaverickState[] aiAttackStates() {
+	public override MaverickState[] strikerStates() {
 		return [
 			getShootState(true),
 			new ArmoredARollEnterState(),
 		];
 	}
 
-	public override MaverickState getRandomAttackState() {
-		return aiAttackStates().GetRandomItem();
+	public override MaverickState[] aiAttackStates() {
+		return [
+			getShootState(true),
+			new ArmoredARollEnterState(),
+		];
 	}
 
 	private MaverickState getShootState(bool isAI) {
@@ -434,6 +437,7 @@ public class ArmoredARollState : MaverickState {
 	float rollDirTime;
 	const float jumpPower = 350;
 	float jumpHeldTime;
+
 	public ArmoredARollState() : base("roll") {
 	}
 
@@ -512,7 +516,10 @@ public class ArmoredARollState : MaverickState {
 			rollDirTime += Global.spf;
 		}
 
-		if (stopBouncing || maverick.ammo <= 0) {
+		if (stopBouncing || 
+			maverick.ammo <= 0 ||
+			maverick.controlMode is MaverickModeId.Summoner or MaverickModeId.Striker && stateTime > 0.8f
+		) {
 			maverick.changeState(new ArmoredARollExitState());
 		}
 	}

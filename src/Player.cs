@@ -629,8 +629,8 @@ public partial class Player {
 		return Global.level.server?.customMatchSettings?.heartTankHp ?? 1;
 	}
 
-	public float getMaverickMaxHp(MaverickMode controlMode) {
-		if (!Global.level.is1v1() && controlMode == MaverickMode.TagTeam) {
+	public float getMaverickMaxHp(MaverickModeId controlMode) {
+		if (!Global.level.is1v1() && controlMode == MaverickModeId.TagTeam) {
 			return getModifiedHealth(20) + (heartTanks * getHeartTankModifier());
 		}
 		return MathF.Ceiling(getModifiedHealth(24));
@@ -2319,7 +2319,7 @@ public partial class Player {
 			return;
 		}
 
-		if (currentMaverick != null && currentMaverick.controlMode == MaverickMode.TagTeam) {
+		if (currentMaverick != null && currentMaverick.controlMode == MaverickModeId.TagTeam) {
 			destroyCharacter(true);
 		} else {
 			character?.applyDamage(Damager.forceKillDamage, this, character, null, null);
@@ -2615,7 +2615,7 @@ public partial class Player {
 	public bool isAlivePuppeteer() {
 		return (
 			!isAI && loadout?.sigmaLoadout != null &&
-			loadout.sigmaLoadout.commandMode == (int)MaverickMode.Puppeteer &&
+			loadout.sigmaLoadout.commandMode == (int)MaverickModeId.Puppeteer &&
 			character?.alive == true
 		);
 	}

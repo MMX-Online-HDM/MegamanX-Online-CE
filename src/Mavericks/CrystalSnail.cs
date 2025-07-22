@@ -102,6 +102,14 @@ public class CrystalSnail : Maverick {
 		return noShell ? 100 : 75;
 	}
 
+	public override MaverickState[] strikerStates() {
+		return [
+			new CSnailShootState(),
+			new CSnailShellState(true),
+			new CSnailShellState(false),
+		];
+	}
+
 	public override MaverickState[] aiAttackStates() {
 		MaverickState[] attacks;
 		if (noShell) {
@@ -117,10 +125,6 @@ public class CrystalSnail : Maverick {
 			};
 		}
 		return attacks;
-	}
-
-	public override MaverickState getRandomAttackState() {
-		return aiAttackStates().GetRandomItem();
 	}
 
 	public Collider getShellCollider() {

@@ -88,19 +88,20 @@ public class BlastHornet : Maverick {
 		}
 	}
 
-	public override MaverickState getRandomAttackState() {
-		return aiAttackStates().GetRandomItem();
+	public override MaverickState[] strikerStates() {
+		return [
+			new BHornetShootState(grounded),
+			new BHornetShoot2State(null),
+			new BHornetStingState(),
+		];
 	}
 
 	public override MaverickState[] aiAttackStates() {
-		var states = new List<MaverickState>
-		{
-				new BHornetShootState(grounded),
-				new BHornetShoot2State(null),
-				new BHornetStingState(),
-			};
-
-		return states.ToArray();
+		return [
+			new BHornetShootState(grounded),
+			new BHornetShoot2State(null),
+			new BHornetStingState(),
+		];
 	}
 
 	public Point? getWingPOI(out string tag) {

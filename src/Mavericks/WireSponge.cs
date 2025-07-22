@@ -96,18 +96,20 @@ public class WireSponge : Maverick {
 		return "wsponge";
 	}
 
-	public override MaverickState[] aiAttackStates() {
-		var attacks = new MaverickState[]
-		{
-				new WSpongeChainSpinState(),
-				new WSpongeSeedThrowState(Control.Special1),
-				new WSpongeChargeState(),
-		};
-		return attacks;
+	public override MaverickState[] strikerStates() {
+		return [
+			new WSpongeChainSpinState(),
+			new WSpongeSeedThrowState(Control.Special1),
+			new WSpongeChargeState(),
+		];
 	}
 
-	public override MaverickState getRandomAttackState() {
-		return aiAttackStates().GetRandomItem();
+	public override MaverickState[] aiAttackStates() {
+		return [
+			new WSpongeChainSpinState(),
+			new WSpongeSeedThrowState(Control.Special1),
+			new WSpongeChargeState(),
+		];
 	}
 
 	public override List<byte> getCustomActorNetData() {

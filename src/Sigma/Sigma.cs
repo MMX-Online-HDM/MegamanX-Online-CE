@@ -90,9 +90,9 @@ public class BaseSigma : Character {
 			tempAiSummoner = true;
 			foreach (Weapon weapon in weapons) {
 				if (weapon is MaverickWeapon mw) {
-					mw.controlMode = MaverickMode.Summoner;
-					if (mw.maverick != null && mw.trueControlMode != MaverickMode.TagTeam) {
-						mw.maverick.controlMode = MaverickMode.Summoner;
+					mw.controlMode = MaverickModeId.Summoner;
+					if (mw.maverick != null && mw.trueControlMode != MaverickModeId.TagTeam) {
+						mw.maverick.controlMode = MaverickModeId.Summoner;
 					}
 				}
 			}
@@ -104,7 +104,7 @@ public class BaseSigma : Character {
 				if (weapon is MaverickWeapon mw) {
 					mw.controlMode = mw.trueControlMode ;
 					if (mw.maverick != null) {
-						if (mw.trueControlMode == MaverickMode.TagTeam) {
+						if (mw.trueControlMode == MaverickModeId.TagTeam) {
 							mw.maverick.changeState(new MExit(mw.maverick.pos, true), ignoreCooldown: true);
 						} else {
 							mw.maverick.controlMode = mw.trueControlMode ;
@@ -119,11 +119,11 @@ public class BaseSigma : Character {
 		bool canIssueOrders = false;
 		if (!player.isAI) {
 			foreach (Weapon weapon in weapons) {
-				if (weapon is MaverickWeapon { controlMode: MaverickMode.Summoner }) {
+				if (weapon is MaverickWeapon { controlMode: MaverickModeId.Summoner }) {
 					canIssueAttack = true;
 					canIssueOrders = true;
 				}
-				if (weapon is MaverickWeapon { controlMode: MaverickMode.Puppeteer }) {
+				if (weapon is MaverickWeapon { controlMode: MaverickModeId.Puppeteer }) {
 					canIssueOrders = true;
 					isPuppeteer = true;
 				}
@@ -166,7 +166,7 @@ public class BaseSigma : Character {
 
 		if (isPuppeteer) {
 			if (player.weapon is MaverickWeapon mw2 && mw2.maverick != null &&
-				mw2.maverick.controlMode == MaverickMode.Puppeteer
+				mw2.maverick.controlMode == MaverickModeId.Puppeteer
 			) {
 				if (mw2.maverick.aiBehavior != MaverickAIBehavior.Control && mw2.maverick.state is not MExit) {
 					becomeMaverick(mw2.maverick);
@@ -175,7 +175,7 @@ public class BaseSigma : Character {
 				Maverick? tagMaverick = null;
 				if (charState is WarpOut) {
 					foreach (Weapon weapon in weapons) {
-						if (weapon is MaverickWeapon mw && mw.maverick?.controlMode == MaverickMode.TagTeam) {
+						if (weapon is MaverickWeapon mw && mw.maverick?.controlMode == MaverickModeId.TagTeam) {
 							tagMaverick = mw.maverick;
 						}
 					}
@@ -258,50 +258,42 @@ public class BaseSigma : Character {
 			}
 		}
 
-		if (currentWeapon is MaverickWeapon { controlMode: not MaverickMode.TagTeam }) {
+		if (currentWeapon is MaverickWeapon { controlMode: not MaverickModeId.TagTeam }) {
 			if (player.weapon is MaverickWeapon mw &&
-				(mw.cooldown == 0 || mw.controlMode != MaverickMode.Striker) && (shootPressed || spcPressed)
+				(mw.cooldown == 0 || mw.controlMode != MaverickModeId.Striker) && (shootPressed || spcPressed)
 			) {
 				if (mw.maverick == null) {
 					if (canAffordMaverick(mw)) {
-						if (!grounded || !charState.attackCtrl) return;
+						if (!charState.attackCtrl) {
+							return;
+						}
 						buyMaverick(mw);
 						var maverick = mw.summon(player, pos.addxy(0, -112), pos, xDir);
-						if (mw.controlMode == MaverickMode.Striker) {
+						if (mw.controlMode == MaverickModeId.Striker) {
 							mw.maverick.health = mw.lastHealth;
-							if (player.input.isPressed(Control.Shoot, player)) {
+							bool shootHeld = player.input.isHeld(Control.Shoot, player);
+							bool spcHeld = player.input.isHeld(Control.Special1, player);
+							if (shootHeld && spcHeld) {
+								maverick.startMoveControl = Control.Special1;
+							}
+							else if (shootHeld) {
 								maverick.startMoveControl = Control.Shoot;
-							} else if (player.input.isPressed(Control.Special1, player)) {
+							}
+							else if (spcHeld) {
 								maverick.startMoveControl = Control.Special1;
 							}
 						}
-						/*
-						else if (isSummoner)
-						{
-							mw.shootTime = MaverickWeapon.summonerCooldown;
-							if (player.input.isPressed(Control.Shoot, player))
-							{
-								maverick.startMoveControl = Control.Shoot;
-							}
-							else if (player.input.isPressed(Control.Special1, player))
-							{
-								maverick.startMoveControl = Control.Special1;
-							}
-						}
-						*/
-
 						changeState(new CallDownMaverick(maverick, true, false), true);
-
-						if (mw.controlMode == MaverickMode.Striker) {
+						if (mw.controlMode == MaverickModeId.Striker) {
 							maverick.aiCooldown = 30;
 						}
-						if (mw.controlMode != MaverickMode.Puppeteer) {
+						if (mw.controlMode != MaverickModeId.Puppeteer) {
 							player.changeToSigmaSlot();
 						}
 					} else {
 						cantAffordMaverickMessage(mw);
 					}
-				} else if (mw.controlMode == MaverickMode.Summoner) {
+				} else if (mw.controlMode == MaverickModeId.Summoner) {
 					if (shootPressed && mw.shootCooldown == 0) {
 						mw.isMenuOpened = false;
 						mw.shootCooldown = MaverickWeapon.summonerCooldown;
@@ -321,10 +313,10 @@ public class BaseSigma : Character {
 		if (tagTeamSwapProgress == 0 &&
 			shootPressed && (
 				currentWeapon is MaverickWeapon ttmw &&
-				ttmw.controlMode == MaverickMode.TagTeam &&
+				ttmw.controlMode == MaverickModeId.TagTeam &&
 				(ttmw.maverick == null || ttmw.maverick != currentMaverick)
 			||
-				currentMaverick?.controlMode == MaverickMode.TagTeam &&
+				currentMaverick?.controlMode == MaverickModeId.TagTeam &&
 				currentWeapon is SigmaMenuWeapon
 			)
 		) {
@@ -334,7 +326,7 @@ public class BaseSigma : Character {
 				tagTeamSwapProgress = 30;
 				tagTeamSwapCase = 0;
 			} else if (player.weapon is MaverickWeapon mw &&
-				mw.controlMode == MaverickMode.TagTeam &&
+				mw.controlMode == MaverickModeId.TagTeam &&
 				(mw.maverick == null || mw.maverick != currentMaverick) &&
 				mw.cooldown == 0 && (isSigmaIdle || isMaverickIdle)
 			) {
@@ -459,7 +451,7 @@ public class BaseSigma : Character {
 	public void becomeSigma(Point pos, int xDir) {
 		var prevCamPos = getCamCenterPos();
 
-		if (currentMaverick?.controlMode != MaverickMode.TagTeam && charState is not WarpOut) {
+		if (currentMaverick?.controlMode != MaverickModeId.TagTeam && charState is not WarpOut) {
 			resetMaverickBehavior();
 			//stopCamUpdate = true;
 			//Global.level.snapCamPos(getCamCenterPos());
@@ -500,7 +492,7 @@ public class BaseSigma : Character {
 			if (weapon is MaverickWeapon mw) {
 				if (mw.maverick != null && mw.maverick.aiBehavior == MaverickAIBehavior.Control) {
 					mw.maverick.aiBehavior = currentMaverickCommand;
-					if (mw.maverick.controlMode == MaverickMode.Summoner && summonerAttackModeActive) {
+					if (mw.maverick.controlMode == MaverickModeId.Summoner && summonerAttackModeActive) {
 						mw.maverick.aiBehavior = MaverickAIBehavior.Attack;
 					}
 				}
@@ -541,14 +533,14 @@ public class BaseSigma : Character {
 		// ATrans puppeter price.
 		if (isATrans) {
 			return mw.trueControlMode switch {
-				MaverickMode.Striker => 0,
+				MaverickModeId.Striker => 0,
 				_ => 5
 			};
 		}
 		// Regular prices for humans.
 		return mw.trueControlMode switch {
-			MaverickMode.TagTeam => 5,
-			MaverickMode.Striker => 0,
+			MaverickModeId.TagTeam => 5,
+			MaverickModeId.Striker => 0,
 			_ => 3
 		};
 	}
@@ -624,7 +616,7 @@ public class BaseSigma : Character {
 	}
 
 	public override float getLabelOffY() {
-		if (player.isMainPlayer && currentMaverick?.controlMode == MaverickMode.TagTeam) {
+		if (player.isMainPlayer && currentMaverick?.controlMode == MaverickModeId.TagTeam) {
 			return currentMaverick.getLabelOffY();
 		}
 		if (sprite.name.Contains("_ra_")) {
@@ -673,7 +665,7 @@ public class BaseSigma : Character {
 
 	public override Point getCamCenterPos(bool ignoreZoom = false) {
 		Maverick? maverick = currentMaverick;
-		if (maverick != null && maverick.controlMode == MaverickMode.TagTeam) {
+		if (maverick != null && maverick.controlMode == MaverickModeId.TagTeam) {
 			if (maverick.state is MEnter me) {
 				return me.getDestPos().round().addxy(camOffsetX, -24);
 			}
@@ -711,7 +703,7 @@ public class BaseSigma : Character {
 			int commandMode = sigmaLoadout.commandMode;
 			// Always force AI into summoner.
 			if (isTrueAI) {
-				commandMode = (int)MaverickMode.Summoner;
+				commandMode = (int)MaverickModeId.Summoner;
 			}
 			// Get weapons.
 			if (!oldATrans) {

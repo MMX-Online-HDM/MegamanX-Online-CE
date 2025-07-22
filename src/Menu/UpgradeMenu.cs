@@ -73,7 +73,7 @@ public class UpgradeMenu : IMainMenu {
 		subtankTargets.Clear();
 		if (mainPlayer.isSigma && mainPlayer.character is BaseSigma sigma) {
 			if (mainPlayer.currentMaverick != null &&
-				mainPlayer.currentMaverick.controlMode == MaverickMode.TagTeam
+				mainPlayer.currentMaverick.controlMode == MaverickModeId.TagTeam
 			) {
 				var currentMaverickWeapon = mainPlayer.weapons.FirstOrDefault(
 					w => w is MaverickWeapon mw && mw.maverick == mainPlayer.currentMaverick
@@ -81,7 +81,7 @@ public class UpgradeMenu : IMainMenu {
 				if (currentMaverickWeapon != null) {
 					subtankTargets.Add(currentMaverickWeapon);
 				}
-			} else if (sigma.loadout.commandMode != (int)MaverickMode.Striker) {
+			} else if (sigma.loadout.commandMode != (int)MaverickModeId.Striker) {
 				subtankTargets = mainPlayer.weapons.FindAll(
 					w => (w is MaverickWeapon mw && mw.maverick != null) || w is SigmaMenuWeapon
 				).ToList();
@@ -240,7 +240,7 @@ public class UpgradeMenu : IMainMenu {
 				var subtank = mainPlayer.subtanks[i];
 				canUseSubtank = mainPlayer.canUseSubtank(subtank);
 				if (mainPlayer.currentMaverick != null &&
-					mainPlayer.currentMaverick.controlMode == MaverickMode.TagTeam
+					mainPlayer.currentMaverick.controlMode == MaverickModeId.TagTeam
 				) {
 					canUseSubtank = mainPlayer.currentMaverickWeapon.canUseSubtank(subtank);
 				}

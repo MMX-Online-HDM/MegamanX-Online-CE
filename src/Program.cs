@@ -559,52 +559,36 @@ class Program {
 
 		// Check for AI takeover
 		if (e.Code == Key.F12 && Global.level?.mainPlayer != null) {
-			if (Global.level.isTraining() && Global.serverClient == null) {
-				if (AI.trainingBehavior == AITrainingBehavior.Default) AI.trainingBehavior = AITrainingBehavior.Idle;
-				else if (AI.trainingBehavior == AITrainingBehavior.Idle) AI.trainingBehavior = AITrainingBehavior.Attack;
-				else if (AI.trainingBehavior == AITrainingBehavior.Attack) AI.trainingBehavior = AITrainingBehavior.Jump;
-				else if (AI.trainingBehavior == AITrainingBehavior.Jump) AI.trainingBehavior = AITrainingBehavior.Default;
+			if (!Global.level.mainPlayer.isAI) {
+				Global.level.mainPlayer.aiTakeover = true;
+				Global.level.mainPlayer.isAI = true;
+				Global.level.mainPlayer.character?.addAI();
 			} else {
-				if (Global.level.isTraining()) {
-					if (!Global.level.mainPlayer.isAI) {
-						AI.trainingBehavior = AITrainingBehavior.Attack;
-						Global.level.mainPlayer.aiTakeover = true;
-						Global.level.mainPlayer.isAI = true;
-						Global.level.mainPlayer.character?.addAI();
-					} else {
-						if (AI.trainingBehavior == AITrainingBehavior.Attack) {
-							AI.trainingBehavior = AITrainingBehavior.Jump;
-						} else if (AI.trainingBehavior == AITrainingBehavior.Jump) {
-							AI.trainingBehavior = AITrainingBehavior.Default;
-						} else if (AI.trainingBehavior == AITrainingBehavior.Default) {
-							AI.trainingBehavior = AITrainingBehavior.Idle;
-							Global.level.mainPlayer.aiTakeover = false;
-							Global.level.mainPlayer.isAI = false;
-							if (Global.level.mainPlayer.character != null) Global.level.mainPlayer.character.ai = null;
-						}
-					}
-				} else {
-					if (!Global.level.mainPlayer.isAI) {
-						Global.level.mainPlayer.aiTakeover = true;
-						Global.level.mainPlayer.isAI = true;
-						Global.level.mainPlayer.character?.addAI();
-					} else {
-						if (Global.level.isTraining()) {
-							AI.trainingBehavior = AITrainingBehavior.Idle;
-						}
-						Global.level.mainPlayer.aiTakeover = false;
-						Global.level.mainPlayer.isAI = false;
-						if (Global.level.mainPlayer.character != null) Global.level.mainPlayer.character.ai = null;
-					}
+				Global.level.mainPlayer.aiTakeover = false;
+				Global.level.mainPlayer.isAI = false;
+				if (Global.level.mainPlayer.character != null) {
+					Global.level.mainPlayer.character.ai = null;
 				}
 			}
 		}
-		if (e.Code == Key.F12) {
+		if (e.Code == Key.F11 && Global.level?.isTraining() == true) {
+			if (AI.trainingBehavior == AITrainingBehavior.Default) {
+			AI.trainingBehavior = AITrainingBehavior.Idle;
+			} else if (AI.trainingBehavior == AITrainingBehavior.Idle) {
+				AI.trainingBehavior = AITrainingBehavior.Attack;
+			} else if (AI.trainingBehavior == AITrainingBehavior.Attack) {
+				AI.trainingBehavior = AITrainingBehavior.Jump;
+			} else if (AI.trainingBehavior == AITrainingBehavior.Jump) {
+				AI.trainingBehavior = AITrainingBehavior.Default;
+			}
+		}
+		if (e.Code == Key.F12 || e.Code == Key.F11) {
 			return;
 		}
-
-		ControlMenu controlMenu = Menu.mainMenu as ControlMenu;
-		if (controlMenu != null && controlMenu.listenForKey && controlMenu.bindFrames == 0) {
+		if (Menu.mainMenu is ControlMenu controlMenu &&
+			controlMenu.listenForKey &&
+			controlMenu.bindFrames == 0
+		) {
 			controlMenu.bind((int)e.Code);
 		}
 	}

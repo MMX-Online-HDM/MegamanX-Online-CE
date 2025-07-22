@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace MMXOnline;
 
@@ -65,17 +66,27 @@ public class ToxicSeahorse : Maverick {
 		return "tseahorse";
 	}
 
-	public override MaverickState getRandomAttackState() {
-		return aiAttackStates().GetRandomItem();
+	public override MaverickState[] strikerStates() {
+		return [
+			getShootState(false),
+			new TSeahorseShoot2State(),
+			new TSeahorseTeleportState()
+		];
 	}
 
 	public override MaverickState[] aiAttackStates() {
-		return new MaverickState[]
-		{
-				getShootState(false),
-				new TSeahorseShoot2State(),
-				new TSeahorseTeleportState(),
-		};
+		float enemyDist = 300;
+		if (target != null) {
+			enemyDist = target.pos.distanceTo(pos);
+		}
+		List<MaverickState> aiStates = [
+			getShootState(isAI: false),
+			new TSeahorseShoot2State()
+		];
+		if (enemyDist <= 70) {
+			aiStates.Add(new TSeahorseTeleportState());
+		}
+		return aiStates.ToArray();
 	}
 
 	public MaverickState getShootState(bool isAI) {
@@ -329,7 +340,7 @@ public class TSeahorseShoot2State : MaverickState {
 public class TSeahorseTeleportState : MaverickState {
 	int state = 0;
 	float shootCooldown;
-	public ToxicSeahorse AcidSeaforce = null!;
+
 	public TSeahorseTeleportState() : base("teleport") {
 		enterSound = "tseahorseTeleportOut";
 	}
@@ -345,13 +356,34 @@ public class TSeahorseTeleportState : MaverickState {
 				maverick.frameSpeed = 0;
 			}
 		} else if (state == 1) {
+			bool isSummoner = maverick.controlMode == MaverickModeId.Summoner;
+			bool isStriker = maverick.controlMode == MaverickModeId.Striker;
+			bool isAiOnly = isSummoner || isStriker;
+			float enemyDist = 300;
+
 			Helpers.decrementTime(ref shootCooldown);
 			maverick.frameSpeed = 0;
-			var dir = input.getInputDir(player);
+			int dir = isAiOnly ? maverick.xDir : input.getXDir(player);
 			maverick.turnToInput(input, player);
-			if (dir.x != 0) {
-				var move = new Point(100 * dir.x, 0);
-				var hitGroundMove = Global.level.checkTerrainCollisionOnce(maverick, dir.x * 20, 20);
+
+			if (isSummoner) {
+				bool back = false;
+				if (maverick.target != null) {
+					enemyDist = MathF.Abs(maverick.target.pos.x - maverick.pos.x);
+					back = maverick.target.pos.x > maverick.pos.x;
+				}
+				if (enemyDist >= 120) {
+					dir = 0;
+				} else if (back) {
+					dir = -1;
+				} else {
+					dir = 1;
+				}
+			}
+
+			if (dir != 0) {
+				var move = new Point(100 * dir, 0);
+				var hitGroundMove = Global.level.checkTerrainCollisionOnce(maverick, dir * 20, 20);
 				if (hitGroundMove == null) {
 				} else {
 					maverick.move(move);
@@ -359,25 +391,28 @@ public class TSeahorseTeleportState : MaverickState {
 				}
 			}
 
-			if (input.isPressed(Control.Dash, player) || maverick.ammo <= 0 || (isAI && stateTime > 1)) {
+			if (!isAI && input.isPressed(Control.Dash, player) ||
+				isSummoner && enemyDist >= 110 ||
+				maverick.ammo <= 0 ||
+				isAI && stateTime > 1
+			) {
 				state = 2;
 				maverick.changeSpriteFromName("teleport2", true);
 				maverick.playSound("tseahorseTeleportIn", sendRpc: true);
 			}
-		} else if (state == 2) {
-			if (maverick.isAnimOver()) {
-				maverick.changeToIdleOrFall();
-			}
+		} else if (state == 2 && maverick.isAnimOver()) {
+			maverick.changeToIdleOrFall();
 		}
 	}
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		AcidSeaforce = maverick as ToxicSeahorse ?? throw new NullReferenceException();
 	}
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
 		maverick.useGravity = true;
 		maverick.angle = 0;
-		AcidSeaforce.teleportCooldown = 0.25f;
+		if (maverick is ToxicSeahorse seaforce) {
+			seaforce.teleportCooldown = 0.25f;
+		}
 	}
 }

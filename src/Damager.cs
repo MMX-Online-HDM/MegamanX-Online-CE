@@ -689,7 +689,7 @@ public class Damager {
 			if (projectileFlinchCooldowns.ContainsKey(projId)) {
 				flinchCooldownTime = projectileFlinchCooldowns[projId];
 			}
-			if (maverick.controlMode != MaverickMode.TagTeam && flinchCooldownTime < 45 && !weakness) {
+			if (maverick.controlMode != MaverickModeId.TagTeam && flinchCooldownTime < 45 && !weakness) {
 				flinchCooldownTime = 45;
 			}
 			if (!maverick.flinchCooldown.ContainsKey(flinchKey)) {
@@ -734,7 +734,7 @@ public class Damager {
 			if (!weakness) {
 				// Flinch reduction.
 				if (flinch > 0) {
-					if (maverick.controlMode != MaverickMode.TagTeam) {
+					if (maverick.controlMode != MaverickModeId.TagTeam) {
 						flinch = 0;
 					}
 					// Large mavericks

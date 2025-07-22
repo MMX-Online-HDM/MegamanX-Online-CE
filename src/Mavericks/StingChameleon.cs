@@ -150,22 +150,27 @@ public class StingChameleon : Maverick {
 		return shootState;
 	}
 
-	public override MaverickState[] aiAttackStates() {
-		return new MaverickState[]
-		{
-				new StingCTongueState(0),
-				getShootState(true),
-		};
+	public override MaverickState[] strikerStates() {
+		return [
+			new StingCTongueState(0),
+			getShootState(true),
+			new StingCHangState(null)
+		];
 	}
 
-	public override MaverickState getRandomAttackState() {
-		var attacks = new MaverickState[]
-		{
-				getShootState(true),
-				new StingCTongueState(0),
-			//new StingCHangState(),
-		};
-		return attacks.GetRandomItem();
+	public override MaverickState[] aiAttackStates() {
+		float enemyDist = 300;
+		if (target != null) {
+			enemyDist = MathF.Abs(target.pos.x - pos.x);
+		}
+		List<MaverickState> aiStates = [getShootState(isAI: false)];
+		if (enemyDist <= 120) {
+			aiStates.Add(new StingCTongueState(0));
+		}
+		if (Helpers.randomRange(0, 30) == 0) {
+			aiStates.Add(new StingCHangState(null));
+		}
+		return aiStates.ToArray();
 	}
 
 	// Melee IDs for attacks.
@@ -494,10 +499,12 @@ public class StingCHangState : MaverickState {
 	int state;
 	float spikeTime;
 	float endTime;
-	float ceilingY;
+	float? _ceilingY;
+	float ceilingY => _ceilingY ?? 0;
 	public StingChameleon StingChameleao= null!;
-	public StingCHangState(float ceilingY) : base("hang") {
-		this.ceilingY = ceilingY;
+
+	public StingCHangState(float? ceilingY) : base("hang") {
+		_ceilingY = ceilingY;
 	}
 
 	public override bool canEnter(Maverick maverick) {
@@ -515,6 +522,12 @@ public class StingCHangState : MaverickState {
 		maverick.useGravity = false;
 		maverick.changePos(getTargetPos(maverick));
 		maverick.frameSpeed = 0;
+
+		if (_ceilingY == null) {
+			_ceilingY = Global.level.raycast(
+				maverick.pos, maverick.pos.addxy(0, -105), [typeof(Wall)]
+			)?.getHitPointSafe().y;
+		}
 	}
 
 	private Point getTargetPos(Maverick maverick) {

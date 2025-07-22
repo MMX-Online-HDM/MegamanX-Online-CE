@@ -84,22 +84,29 @@ public class SparkMandrill : Maverick {
 		}, "sparkmSparkX1");
 	}
 
-	public override MaverickState[] aiAttackStates() {
-		return new MaverickState[]
-		{
-				new SparkMPunchState(),
-				getShootState(),
-				new SparkMDashPunchState(),
-		};
+	public override MaverickState[] strikerStates() {
+		return [
+			getShootState(),
+			new SparkMDashPunchState(),
+			new MJumpStart()
+		];
 	}
 
-	public override MaverickState getRandomAttackState() {
-		var attacks = new MaverickState[]
-		{
-				getShootState(),
-				new SparkMDashPunchState(),
-		};
-		return attacks.GetRandomItem();
+	public override MaverickState[] aiAttackStates() {
+		float enemyDist = 300;
+		if (target != null) {
+			enemyDist = MathF.Abs(target.pos.x - pos.x);
+		}
+		List<MaverickState> aiStates = [
+			new SparkMDashPunchState(),
+			new SparkMPunchState()
+		];
+		if (enemyDist <= 40) {
+			aiStates.Add(getShootState());
+		} else {
+			aiStates.Add(new MRun());
+		}
+		return aiStates.ToArray();
 	}
 
 	// Melee IDs for attacks.

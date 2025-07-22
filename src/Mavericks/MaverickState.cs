@@ -146,13 +146,14 @@ public class MaverickState {
 				nt.isDashing = false;
 			}
 		}
-		if (aiAttackCtrl && (newState is MIdle || newState is MFall)) {
-			if (maverick.controlMode == MaverickMode.Striker) {
+
+		if (maverick.controlMode == MaverickModeId.Striker) {
+			if (!aiAttackCtrl && this is not MEnter && (newState is MIdle || newState is MFall)) {			
 				maverick.aiCooldown = maverick.maxAICooldown;
 				maverick.autoExit = true;
 			}
 		}
-		if (aiAttackCtrl && newState.attackCtrl) {
+		else if (aiAttackCtrl && !newState.aiAttackCtrl) {
 			maverick.aiCooldown = maverick.maxAICooldown;
 		}
 		if (!useGravity) maverick.useGravity = true;
@@ -519,7 +520,8 @@ public class MEnter : MaverickState {
 		base.onEnter(oldState);
 		maverick.useGravity = false;
 		maverick.alpha = 0;
-		if (maverick.controlMode != MaverickMode.TagTeam && !once) {
+		maverick.pos.y = destY - 32;
+		if (maverick.controlMode != MaverickModeId.TagTeam && !once) {
 			maverick.playSound("warpIn", sendRpc: true);
 			once = true;
 		} 
@@ -534,7 +536,9 @@ public class MEnter : MaverickState {
 
 public class MExit : MaverickState {
 	public float destY;
+	public float startY;
 	public Point destPos;
+
 	bool isRecall;
 	public const float yPos = 164;
 	public MExit(Point destPos, bool isRecall) : base("exit") {
@@ -545,7 +549,11 @@ public class MExit : MaverickState {
 
 	public override void update() {
 		base.update();
-		maverick.alpha = Helpers.clamp01(1 - stateTime * 2);
+		float dist = MathF.Abs(startY - destY);
+		float trav = MathF.Abs(maverick.pos.y - destY);
+		float per = trav / dist;
+
+		maverick.alpha = Helpers.clamp01(per);
 		maverick.incPos(new Point(0, maverick.vel.y * Global.spf));
 		maverick.vel.y += Physics.Gravity * Global.speedMul * maverick.getYMod();
 		if ((maverick.getYMod() == 1 && maverick.pos.y < destY) || (maverick.getYMod() == -1 && maverick.pos.y > destY)) {
@@ -563,8 +571,9 @@ public class MExit : MaverickState {
 		maverick.useGravity = false;
 		maverick.vel.x = 0;
 		maverick.vel.y = -400 * maverick.getYMod();
-		destY = maverick.pos.y - (yPos * maverick.getYMod());
-		if (maverick.controlMode != MaverickMode.TagTeam && !once) {
+		startY = maverick.pos.y;
+		destY = maverick.pos.y - (32 * maverick.getYMod());
+		if (maverick.controlMode != MaverickModeId.TagTeam && !once) {
 			maverick.playSound("warpOut", sendRpc: true);
 			once = true;
 		} 

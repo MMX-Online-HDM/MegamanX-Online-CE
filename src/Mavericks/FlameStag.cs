@@ -90,23 +90,30 @@ public class FlameStag : Maverick {
 		return "fstag";
 	}
 
-	public override MaverickState[] aiAttackStates() {
-		var attacks = new MaverickState[]
-		{
-				new FStagShoot(false),
-				new FStagGrabState(false),
-				new FStagDashChargeState(),
-		};
-		return attacks;
+	public override MaverickState[] strikerStates() {
+		return [
+			new FStagShoot(false),
+			new FStagGrabState(true),
+			new FStagDashChargeState(),
+		];
 	}
 
-	public override MaverickState getRandomAttackState() {
-		var attacks = new MaverickState[]
-		{
+	public override MaverickState[] aiAttackStates() {
+		float enemyDist = 300;
+		if (target != null) {
+			enemyDist = MathF.Abs(target.pos.x - pos.x);
+		}
+		if (enemyDist <= 80) {
+			return [
 				new FStagShoot(false),
-				new FStagGrabState(false),
-		};
-		return attacks.GetRandomItem();
+				new FStagGrabState(true),
+				new FStagDashChargeState(),
+			];
+		}
+		return [
+			new FStagShoot(false),
+			new FStagDashChargeState(),
+		];
 	}
 
 	public Point? getAntlerPOI(out string tag) {

@@ -30,6 +30,9 @@ public class AI {
 		set { _trainingBehavior = value; }
 		get => Global.level.isTraining() ? _trainingBehavior : AITrainingBehavior.Default; 
 	}
+	public AITrainingBehavior localTrainBehavior => (
+		Global.level.mainPlayer != character.player ? trainingBehavior : AITrainingBehavior.Default
+	);
 	public int axlAccuracy;
 	public int mashType; //0=no mash, 1 = light, 2 = heavy
 
@@ -186,12 +189,12 @@ public class AI {
 	//End of Ride Chaser AI
 	public virtual void preUpdate() {
 		if (Global.level.isTraining()) {
-			if (trainingBehavior == AITrainingBehavior.Idle) {
+			if (localTrainBehavior == AITrainingBehavior.Idle) {
 				player.release(Control.Shoot);
 				player.release(Control.Jump);
 				return;
 			}
-			if (trainingBehavior == AITrainingBehavior.Attack) {
+			if (localTrainBehavior == AITrainingBehavior.Attack) {
 				player.release(Control.Jump);
 				player.release(Control.Shoot);
 				if (Global.frameCount % 4 == 0) {
@@ -199,12 +202,12 @@ public class AI {
 				}
 				return;
 			}
-			if (trainingBehavior == AITrainingBehavior.Jump) {
+			if (localTrainBehavior == AITrainingBehavior.Jump) {
 				player.release(Control.Shoot);
 				player.press(Control.Jump);
 				return;
 			}
-			if (trainingBehavior == AITrainingBehavior.Guard) {
+			if (localTrainBehavior == AITrainingBehavior.Guard) {
 				if (character is BaseSigma) {
 					player.press(Control.Down);
 				} else if (character is Zero) {
@@ -212,7 +215,7 @@ public class AI {
 				}
 				return;
 			}
-			if (trainingBehavior == AITrainingBehavior.Crouch) {
+			if (localTrainBehavior == AITrainingBehavior.Crouch) {
 				player.press(Control.Down);
 				return;
 			}
@@ -224,7 +227,7 @@ public class AI {
 			raceChaserAI();
 			return;
 		}
-		if (Global.level.isTraining() && trainingBehavior != AITrainingBehavior.Default) {
+		if (Global.level.isTraining() && localTrainBehavior != AITrainingBehavior.Default) {
 			return;
 		}
 		if (Global.level.gameMode.isOver) {

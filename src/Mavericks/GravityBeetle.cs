@@ -66,17 +66,20 @@ public class GravityBeetle : Maverick {
 		return "gbeetle";
 	}
 
-	public override MaverickState getRandomAttackState() {
-		return aiAttackStates().GetRandomItem();
+	public override MaverickState[] strikerStates() {
+		return [
+			new GBeetleShoot(false),
+			new GBeetleGravityWellState(),
+			new GBeetleDashState(),
+		];
 	}
 
 	public override MaverickState[] aiAttackStates() {
-		return new MaverickState[]
-		{
-				new GBeetleShoot(false),
-				new GBeetleGravityWellState(),
-				new GBeetleDashState(),
-		};
+		return [
+			new GBeetleShoot(false),
+			new GBeetleGravityWellState(),
+			new GBeetleDashState(),
+		];
 	}
 
 	// Melee IDs for attacks.

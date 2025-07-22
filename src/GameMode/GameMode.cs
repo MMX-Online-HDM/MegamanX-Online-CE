@@ -871,7 +871,7 @@ public class GameMode {
 				Global.halfScreenW, 8, Alignment.Center
 			);
 		} else if (
-			level.mainPlayer.currentMaverick?.controlMode == MaverickMode.Puppeteer &&
+			level.mainPlayer.currentMaverick?.controlMode == MaverickModeId.Puppeteer &&
 			level.mainPlayer.weapon is MaverickWeapon mw
 		) {
 			if (level.mainPlayer.currentMaverick.isPuppeteerTooFar()) {
@@ -984,15 +984,15 @@ public class GameMode {
 			return true;
 		}
 		if (level.mainPlayer.currentMaverick != null) {
-			if (level.mainPlayer.currentMaverick.controlMode is MaverickMode.Puppeteer or MaverickMode.Summoner) {
+			if (level.mainPlayer.currentMaverick.controlMode is MaverickModeId.Puppeteer or MaverickModeId.Summoner) {
 				return level.mainPlayer.mavericks.Count > 0;
 			}
 		}
 		if (level.mainPlayer.currentMaverick != null) {
-			if (level.mainPlayer.currentMaverick.controlMode == MaverickMode.Puppeteer) {
+			if (level.mainPlayer.currentMaverick.controlMode == MaverickModeId.Puppeteer) {
 				return level.mainPlayer.character?.alive == true;
 			}
-			else if (level.mainPlayer.currentMaverick.controlMode == MaverickMode.Summoner) {
+			else if (level.mainPlayer.currentMaverick.controlMode == MaverickModeId.Summoner) {
 				return level.mainPlayer.mavericks.Count > 1;
 			}
 		}
@@ -2106,27 +2106,23 @@ public class GameMode {
 		MaverickWeapon? mw = weapon as MaverickWeapon;
 		if (mw != null) {
 			float maxHealth = level.mainPlayer.getMaverickMaxHp(mw.controlMode);
-			if (mw.controlMode == MaverickMode.Summoner) {
+			if (mw.controlMode == MaverickModeId.Summoner) {
 				float mHealth = mw.maverick?.health ?? mw.lastHealth;
 				float mMaxHealth = mw.maverick?.maxHealth ?? maxHealth;
 				if (!mw.summonedOnce) mHealth = 0;
 				drawWeaponSlotAmmo(x, y, mHealth / mMaxHealth);
 				drawWeaponSlotCooldown(x, y, mw.shootCooldown / MaverickWeapon.summonerCooldown);
-			} else if (mw.controlMode == MaverickMode.Puppeteer) {
+			} else if (mw.controlMode == MaverickModeId.Puppeteer) {
 				float mHealth = mw.maverick?.health ?? mw.lastHealth;
 				float mMaxHealth = mw.maverick?.maxHealth ?? maxHealth;
 				if (!mw.summonedOnce) mHealth = 0;
 				drawWeaponSlotAmmo(x, y, mHealth / mMaxHealth);
-			} else if (mw.controlMode == MaverickMode.Striker) {
+			} else if (mw.controlMode == MaverickModeId.Striker) {
 				float mHealth = mw.maverick?.health ?? mw.lastHealth;
 				float mMaxHealth = mw.maverick?.maxHealth ?? maxHealth;
-				if (level.mainPlayer.mavericks.Count > 0 && mw.maverick == null) {
-					mHealth = 0;
-				}
-
 				drawWeaponSlotAmmo(x, y, mHealth / mMaxHealth);
 				drawWeaponSlotCooldown(x, y, mw.cooldown / MaverickWeapon.strikerCooldown);
-			} else if (mw.controlMode == MaverickMode.TagTeam) {
+			} else if (mw.controlMode == MaverickModeId.TagTeam) {
 				float mHealth = mw.maverick?.health ?? mw.lastHealth;
 				float mMaxHealth = mw.maverick?.maxHealth ?? maxHealth;
 				if (!mw.summonedOnce) mHealth = 0;
@@ -2164,7 +2160,7 @@ public class GameMode {
 		if (weapon is SigmaMenuWeapon && level.mainPlayer.character is BaseSigma baseSigma) {
 			if (baseSigma.currentMaverickCommand == MaverickAIBehavior.Follow &&
 				level.mainPlayer.weapons.First(
-					wp => wp is MaverickWeapon mw && mw.controlMode is MaverickMode.Summoner or MaverickMode.Puppeteer
+					wp => wp is MaverickWeapon mw && mw.controlMode is MaverickModeId.Summoner or MaverickModeId.Puppeteer
 				) != null
 			) {
 				Helpers.drawWeaponSlotSymbol(x - 8, y - 8, "ª");
