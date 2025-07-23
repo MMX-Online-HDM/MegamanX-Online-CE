@@ -106,12 +106,12 @@ public class LaunchOctopus : Maverick {
 			return [
 				new LaunchOShoot(grounded),
 				new LaunchOHomingTorpedoState(),
-				new LaunchOWhirlpoolState()
 			];
 		}
 		return [
 			new LaunchOShoot(grounded),
-			new LaunchOHomingTorpedoState()
+			new LaunchOHomingTorpedoState(),
+			new LaunchOWhirlpoolState(),
 		];
 	}
 
