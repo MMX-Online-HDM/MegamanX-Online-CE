@@ -1,10 +1,10 @@
 ﻿using System;
-
+using System.Collections.Generic;
 namespace MMXOnline;
 
 public class DrDoppler : Maverick {
 	public static Weapon getWeapon() { return new Weapon(WeaponIds.DrDoppler, 159); }
-
+	public int shootTimes;
 	public Weapon? meleeWeapon;
 	public int ballType;
 	public DrDoppler(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
@@ -92,11 +92,22 @@ public class DrDoppler : Maverick {
 	}
 
 	public override MaverickState[] aiAttackStates() {
-		return [
-			new DrDopplerShootState(),
-			new DrDopplerAbsorbState(),
-			new DrDopplerDashStartState(),
-		];
+		List<MaverickState> aiStates = [];
+		foreach (GameObject gameObject in getCloseActors(64, true, false, false)) {
+			if (gameObject is Projectile proj && proj.damager.owner.alliance != player.alliance) {
+				if (proj.isMelee == false) continue;
+				aiStates.Add(new DrDopplerAbsorbState());
+				//yo why this doesn't work well
+			}
+		}
+		if (shootTimes < 3) {
+			shootTimes++;
+			aiStates.Add(new DrDopplerShootState());
+		} else {
+			aiStates.Add(new DrDopplerDashStartState());
+			shootTimes = 0;
+		}		
+		return aiStates.ToArray();
 	}
 
 	/*public MaverickState getShootState(bool isAI) {
