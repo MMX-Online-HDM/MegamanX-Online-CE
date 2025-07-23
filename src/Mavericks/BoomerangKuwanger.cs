@@ -58,44 +58,40 @@ public class BoomerangKuwanger : Maverick {
 			changeSpriteFromName(state.sprite, true);
 		}
 
-		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand or BoomerKDashState) {
-				if (state is not BoomerKDashState) {
-					if (input.isHeld(Control.Left, player)) {
-						xDir = -1;
-						changeState(new BoomerKDashState(Control.Left));
-						return;
-					} else if (input.isHeld(Control.Right, player)) {
-						xDir = 1;
-						changeState(new BoomerKDashState(Control.Right));
-						return;
-					}
-				}
-				if (shootPressed() && !bald) {
-					changeState(getShootState());
-				} else if (specialPressed() && !bald) {
-					changeState(new BoomerKDeadLiftState());
-				} else if (player.dashPressed(out string dashControl) && teleportCooldown == 0 && !bald) {
-					if (ammo >= 8) {
-						deductAmmo(8);
-						changeState(new BoomerKTeleportState());
-					}
-				}
-			} else if (state is BoomerKTeleportState teleportState && teleportState.onceTeleportInSound) {
-				if (specialPressed() && !bald) {
-					changeState(new BoomerKDeadLiftState());
+		if (aiBehavior != MaverickAIBehavior.Control || !state.attackCtrl) {
+			return;
+		}
+		if (grounded) {
+			if (state is not BoomerKDashState) {
+				if (input.isHeld(Control.Left, player)) {
+					xDir = -1;
+					changeState(new BoomerKDashState(Control.Left));
+					return;
+				} else if (input.isHeld(Control.Right, player)) {
+					xDir = 1;
+					changeState(new BoomerKDashState(Control.Right));
+					return;
 				}
 			}
-		} else {
-			if (!bald && (state is MIdle or MRun or MLand or BoomerKDashState)) {
-				foreach (var enemyPlayer in Global.level.players) {
-					if (enemyPlayer.character == null || enemyPlayer == player) continue;
-					var chr = enemyPlayer.character;
-					if (!chr.canBeDamaged(player.alliance, player.id, null)) return;
-					if (isFacing(chr) && getCenterPos().distanceTo(chr.getCenterPos()) < 10) {
-						changeState(new BoomerKDeadLiftState());
-					}
+			if (bald) {
+				return;
+			}
+
+			if (shootPressed()) {
+				changeState(getShootState());
+			}
+			else if (specialPressed()) {
+				changeState(new BoomerKDeadLiftState());
+			}
+			else if (player.dashPressed(out _) && teleportCooldown == 0) {
+				if (ammo >= 8) {
+					deductAmmo(8);
+					changeState(new BoomerKTeleportState());
 				}
+			}
+		} else if (state is BoomerKTeleportState teleportState && teleportState.onceTeleportInSound) {
+			if (specialPressed() && !bald) {
+				changeState(new BoomerKDeadLiftState());
 			}
 		}
 	}
@@ -112,7 +108,7 @@ public class BoomerangKuwanger : Maverick {
 		return new MShoot((Point pos, int xDir) => {
 			bald = true;
 			int inputAngle = 25;
-			var inputDir = input.getInputDir(player);
+			var inputDir = !isAI ? input.getInputDir(player) : Point.zero;
 			if (inputDir.x != 0 && inputDir.y == 0) inputAngle = 0;
 			else if (inputDir.x != 0 && inputDir.y != 0) inputAngle = 30 * MathF.Sign(inputDir.y);
 			else if (inputDir.x == 0 && inputDir.y != 0) inputAngle = 60 * MathF.Sign(inputDir.y);
@@ -136,16 +132,19 @@ public class BoomerangKuwanger : Maverick {
 			target is Character chara && chara.canBeGrabbed()
 		);
 		List<MaverickState> aiStates = [];
-		if (!bald && enemyDist <= 25 && canGrabTarget) {
+		if (!bald && enemyDist <= 25 && canGrabTarget && aiAproachCooldown <= 0) {
 			aiStates.Add(new BoomerKDeadLiftState());
 		}
-		if ((enemyDist >= 26 && canGrabTarget || enemyDist <= 80 && !canGrabTarget) &&
-			(!bald || Helpers.randomRange(0, 3) == 3
+		if (!bald && enemyDist >= 40) {
+			aiStates.Add(getShootState());
+		}
+		if (!bald && (
+			enemyDist >= 26 && canGrabTarget ||
+			enemyDist <= 80 && !canGrabTarget ||
+			enemyDist <= 40 ||
+			Helpers.randomRange(0, 1) == 1
 		)) {
 			aiStates.Add(new BoomerKTeleportState());
-		}
-		if (!bald && (enemyDist > 25 || Helpers.randomRange(0, 1) == 1)) {
-			aiStates.Add(getShootState());
 		}
 		return aiStates.ToArray();
 	}

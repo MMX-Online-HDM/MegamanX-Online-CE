@@ -134,6 +134,7 @@ public class Maverick : Actor, IDamagable {
 			return _input;
 		}
 	}
+	public bool isAI => aiBehavior != MaverickAIBehavior.Control;
 
 	public bool maverickCanControl() {
 		if (this is StingChameleon sc && sc.isCloakTransition()) {
@@ -644,9 +645,11 @@ public class Maverick : Actor, IDamagable {
 		// Get all posible states.
 		MaverickState[] targetStates = aiAttackStates();
 		// Skip states on cooldown.
-		targetStates = targetStates.Where(
-			tState => !(stateCooldowns.GetValueOrDefault(tState.GetType())?.cooldown > 0)
-		).ToArray();
+		if (targetStates.Length != 0) {
+			targetStates = targetStates.Where(
+				tState => !(stateCooldowns.GetValueOrDefault(tState.GetType())?.cooldown > 0)
+			).ToArray();
+		}
 		// If the total state count is 0. Then we just taunt.
 		if (targetStates.Length == 0) {
 			return new MTaunt();
