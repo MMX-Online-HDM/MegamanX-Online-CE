@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<!--Common properties-->
 	<PropertyGroup>
-		<LangVersion>13</LangVersion>
+		<!--LangVersion>14</LangVersion-->
 		<AssemblyName>MMXOD</AssemblyName>
 		<OutputType>WinExe</OutputType>
 		<!--Nullable>annotations</Nullable-->
@@ -9,7 +9,7 @@
 		<Version>20</Version>
 		<AssemblyVersion>20.0</AssemblyVersion>
 		<ApplicationIcon>app.ico</ApplicationIcon>
-		<TargetFramework>net6.0-windows</TargetFramework>
+		<TargetFramework>net10.0-windows</TargetFramework>
 		<ImplicitUsings>false</ImplicitUsings>
 		<SelfContained>false</SelfContained>
 		<OutputPath>./bin/</OutputPath>
@@ -20,6 +20,7 @@
 		<Deterministic>true</Deterministic>
 		<NeutralLanguage>en</NeutralLanguage>
 		<FileVersion>20.0</FileVersion>
+		<Configurations>Debug;Release;Debug2</Configurations>
 	</PropertyGroup>
 
 	<!--For making output go to anycpu if the RuntimeIdentifier is empty-->

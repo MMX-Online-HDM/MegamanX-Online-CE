@@ -520,7 +520,7 @@ public class Maverick : Actor, IDamagable {
 				}
 			}
 		} else if (aiBehavior == MaverickAIBehavior.Follow && controlMode != MaverickModeId.Striker) {
-			if (player.character != null) {
+			if (player.character != null && state.normalCtrl) {
 				Character chr = player.character;
 				float dist = chr.pos.x - pos.x;
 				float assignedDist = 40;
@@ -571,7 +571,7 @@ public class Maverick : Actor, IDamagable {
 					}
 				}
 			}
-		} else if (aiBehavior == MaverickAIBehavior.Attack) {
+		} else if (aiBehavior == MaverickAIBehavior.Attack && state.normalCtrl) {
 			// For air-walk.
 			bool doWalk = false;
 			// For while we are jumping.
