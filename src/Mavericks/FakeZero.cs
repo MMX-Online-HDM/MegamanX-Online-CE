@@ -124,9 +124,6 @@ public class FakeZero : Maverick {
 			accSpeed = 0;
 		}
 
-		if (aiBehavior != MaverickAIBehavior.Control) {
-			return;
-		}
 		if (!state.attackCtrl) {
 			return;
 		}
@@ -173,10 +170,11 @@ public class FakeZero : Maverick {
 			new FakeZeroShootState(1)
 		];
 		float enemyDist = 300;
+
 		if (target != null) {
 			enemyDist = MathF.Abs(target.pos.x - pos.x);
 		}
-		if (ammo >= shootLv2Ammo) {
+		if (ammo >= shootLv2Ammo * 2 || ammo >= shootLv2Ammo && Helpers.randomRange(0, 2) == 0) {
 			aiStates.Add(new FakeZeroShootState(2));
 		}
 		if (ammo >= shootLv3Ammo) {
@@ -184,6 +182,9 @@ public class FakeZero : Maverick {
 		}
 		if (enemyDist <= 70) {
 			aiStates.Add(new FakeZeroGroundPunchState());
+		}
+		else {
+			aiStates.Add(new FakeZeroMeleeState(true));
 		}
 		return aiStates.ToArray();
 	}
@@ -607,11 +608,12 @@ public class FakeZeroMeleeProj : Projectile {
 
 public class FakeZeroMeleeState : FakeZeroMState {
 	public FakeZeroMeleeProj? proj;
+	private bool isAiAttack;
 	Anim? projVisible;
 
-	public FakeZeroMeleeState() : base("run_attack") {
+	public FakeZeroMeleeState(bool isAiAttack = false) : base("run_attack") {
+		this.isAiAttack = isAiAttack;
 		enterSound = "saber3";
-		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -622,16 +624,20 @@ public class FakeZeroMeleeState : FakeZeroMState {
 		proj?.changePos(zero.getFirstPOIOrDefault(1));
 		projVisible?.changePos(zero.getFirstPOIOrDefault(1));
 
-		var move = new Point(0, 0);
-		if (input.isHeld(Control.Left, player)) {
-			move.x = -maverick.getRunSpeed();
-		} else if (input.isHeld(Control.Right, player)) {
-			move.x = maverick.getRunSpeed();
+		Point move = new Point(input.getXDir(player), 0);
+		if (isAiAttack) {
+			move.x = zero.xDir;
 		}
 		if (move.magnitude > 0) {
+			move.x *= zero.getRunSpeed();
 			maverick.move(move);
 		} else {
-			maverick.changeState(new MIdle());
+			maverick.changeToIdleOrFall();
+			return;
+		}
+		if (isAiAttack && stateFrame >= 25) {
+			maverick.changeToIdleOrFall();
+			return;
 		}
 		groundCode();
 	}

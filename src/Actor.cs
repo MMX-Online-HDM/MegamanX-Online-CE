@@ -1593,10 +1593,9 @@ public partial class Actor : GameObject {
 	}
 
 	public void turnToInput(Input input, Player player) {
-		if (input.isHeld(Control.Left, player)) {
-			xDir = -1;
-		} else if (input.isHeld(Control.Right, player)) {
-			xDir = 1;
+		int dir = input.getXDir(player);
+		if (dir != 0) {
+			xDir = dir;
 		}
 	}
 

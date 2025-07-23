@@ -501,7 +501,9 @@ public class Input {
 		}
 
 		if (player?.character != null && player.gridModeHeld) {
-			if (inputName == Control.Left || inputName == Control.Right || inputName == Control.Up || inputName == Control.Down) {
+			if (inputName == Control.Left || inputName == Control.Right ||
+				inputName == Control.Up || inputName == Control.Down
+			) {
 				return false;
 			}
 		}
