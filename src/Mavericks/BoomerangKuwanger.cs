@@ -132,15 +132,18 @@ public class BoomerangKuwanger : Maverick {
 			target is Character chara && chara.canBeGrabbed()
 		);
 		List<MaverickState> aiStates = [];
-		if (!bald && enemyDist <= 25 && canGrabTarget) {
+		if (!bald && enemyDist <= 25 && canGrabTarget && aiAproachCooldown <= 0) {
 			aiStates.Add(new BoomerKDeadLiftState());
 		}
-		if (!bald && enemyDist >= 26) {
+		if (!bald && enemyDist >= 40) {
 			aiStates.Add(getShootState());
 		}
-		if ((enemyDist >= 26 && canGrabTarget || enemyDist <= 80 && !canGrabTarget) &&
-			!bald && (enemyDist <= 30 || Helpers.randomRange(0, 3) == 3)
-		) {
+		if (!bald && (
+			enemyDist >= 26 && canGrabTarget ||
+			enemyDist <= 80 && !canGrabTarget ||
+			enemyDist <= 40 ||
+			Helpers.randomRange(0, 1) == 1
+		)) {
 			aiStates.Add(new BoomerKTeleportState());
 		}
 		return aiStates.ToArray();
