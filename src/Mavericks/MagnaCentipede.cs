@@ -51,6 +51,7 @@ public class MagnaCentipede : Maverick {
 	public override void preUpdate() {
 		base.preUpdate();
 		Helpers.decrementTime(ref teleportCooldown);
+		Helpers.decrementFrames(ref aiAproachCooldown);
 	}
 
 	public override void update() {
@@ -136,7 +137,8 @@ public class MagnaCentipede : Maverick {
 	public override MaverickState[] strikerStates() {
 		return [
 			new MagnaCShootState(),
-			new MagnaCMagnetPullState()
+			new MagnaCMagnetPullState(),
+			new MagnaCMagnetMineState(true)
 		];
 	}
 
@@ -151,9 +153,16 @@ public class MagnaCentipede : Maverick {
 		if (enemyDist <= 40 && canGrabTarget && aiAproachCooldown <= 0) {
 			return [new MagnaCMagnetPullState()];
 		}
-		else if (enemyDist >= 40 && enemyDist <= 120) {
+		else if (enemyDist >= 40) {
+			if (Helpers.randomRange(0, 2) == 0) {
+				return [
+					new MagnaCMagnetMineState(true),
+					new MagnaCTeleportState(),
+					new MagnaCShootState(),
+				];
+			}
 			return [
-				new MagnaCMagnetMineState(),
+				new MagnaCMagnetMineState(true),
 				new MagnaCTeleportState(),
 				new MagnaCShootState(),
 			];
@@ -539,7 +548,9 @@ public class MagnaCMagnetMineState : CentipedeMState {
 
 		if (isAiState && centipede.target != null && centipede.magnetMineParent != null) {
 			centipede.magnetMineParent.controlled = false;
-			Point inputDir = centipede.magnetMineParent.pos - target.getCenterPos();
+			Point inputDir = maverick.target.getCenterPos() - centipede.magnetMineParent.pos;
+			inputDir.x = MathF.Sign(inputDir.x);
+			inputDir.y = MathF.Sign(inputDir.y);
 			if (!inputDir.isZero()) {
 				centipede.magnetMineParent.moveMaxDist(
 					inputDir.times(200),
@@ -554,7 +565,7 @@ public class MagnaCMagnetMineState : CentipedeMState {
 			return;
 		}
 
-		if (stateTime > 4) {
+		if (stateTime > 4 || stateTime > 1.5f && isAiState) {
 			maverick.changeToIdleOrFall();
 			return;
 		}
@@ -571,11 +582,9 @@ public class MagnaCMagnetMineState : CentipedeMState {
 			sound.sound?.Stop();
 		}
 		RPC.stopSound.sendRpc("magnacMagnetMine", maverick.netId);
-		/*if (centipede.magnetMineParent != null && !centipede.magnetMineParent.destroyed) {
-			centipede.noTail = true;
-			centipede.changeSpriteFromName(newState.sprite, false);
-			centipede.setNoTail(true);
-		}*/
+		if (centipede.magnetMineParent != null && !centipede.magnetMineParent.destroyed) {
+			centipede.magnetMineParent.destroySelf();
+		}
 	}
 }
 
@@ -583,7 +592,7 @@ public class MagnaCTeleportState : CentipedeMState {
 	int state = 0;
 	Actor? clone;
 	bool inverted;
-	public int aiPosOffset = Helpers.randomRange(0, 65);
+	public int aiPosOffset = Helpers.randomRange(-24, 48);
 
 	public MagnaCTeleportState() : base("teleport_out") {
 		enterSound = "magnacTeleportOut";
