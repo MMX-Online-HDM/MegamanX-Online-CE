@@ -155,17 +155,21 @@ public class WheelGator : Maverick {
 
 	public override MaverickState[] aiAttackStates() {
 		float enemyDist = 300;
-			if (target != null) {
+		float enemyDistY = 30;
+		if (target != null) {
 			enemyDist = MathF.Abs(target.pos.x - pos.x);
+			enemyDistY = MathF.Abs(target.pos.y - pos.y);
 		}
 		List<MaverickState> aiStates = [
 			new WheelGShootState(),
 			new WheelGSpinState()
 		];
-		if (enemyDist <= 50) {
+		if (enemyDist <= 20) {
 			aiStates.Add(new WheelGBiteState());
 		}
-
+		if (enemyDistY > 15 && enemyDist <= 15) {
+			aiStates.Add(new WheelGUpBiteState());
+		}
 		return aiStates.ToArray();
 	}
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 namespace MMXOnline;
 
 public class FlameStag : Maverick {
@@ -93,27 +94,29 @@ public class FlameStag : Maverick {
 	public override MaverickState[] strikerStates() {
 		return [
 			new FStagShoot(false),
-			new FStagGrabState(true),
+			new FStagGrabState(false),
 			new FStagDashChargeState(),
 		];
 	}
 
 	public override MaverickState[] aiAttackStates() {
-		float enemyDist = 300;
+		float enemyDist = 200;
 		if (target != null) {
 			enemyDist = MathF.Abs(target.pos.x - pos.x);
 		}
-		if (enemyDist <= 80) {
-			return [
-				new FStagShoot(false),
-				new FStagGrabState(true),
-				new FStagDashChargeState(),
-			];
+		bool canGrabTarget = (
+			target is Character chara && chara.canBeGrabbed()
+		);
+		List<MaverickState> aiStates = [];
+		if (enemyDist <= 15 && canGrabTarget) {
+			aiStates.Add(new FStagGrabState(false));
 		}
-		return [
-			new FStagShoot(false),
-			new FStagDashChargeState(),
-		];
+		if (enemyDist > 40) {
+			aiStates.Add(new FStagDashChargeState());
+		} else {
+			aiStates.Add(new FStagShoot(false));
+		}
+		return aiStates.ToArray();
 	}
 
 	public Point? getAntlerPOI(out string tag) {
