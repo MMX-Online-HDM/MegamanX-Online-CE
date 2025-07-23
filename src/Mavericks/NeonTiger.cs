@@ -9,6 +9,8 @@ public class NeonTiger : Maverick {
 	public const float wallPounceSpeed = 325;
 	public int shootNum;
 	public bool isDashing;
+	public int shootTimes;
+	public float dashAICooldown;
 	public NeonTiger(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
 		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
 		stateCooldowns.Add(typeof(NeonTClawState), new MaverickStateCooldown(false, true, 0.33f));
@@ -33,7 +35,7 @@ public class NeonTiger : Maverick {
 
 	public override void update() {
 		base.update();
-
+		Helpers.decrementFrames(ref dashAICooldown);
 		if (aiBehavior == MaverickAIBehavior.Control) {
 			if (state is MIdle or MRun or MLand) {
 				if (input.isHeld(Control.Special1, player)) {
@@ -83,11 +85,19 @@ public class NeonTiger : Maverick {
 			enemyDist = MathF.Abs(target.pos.x - pos.x);
 		}
 		List<MaverickState> aiStates = [];
-		if (enemyDist <= 60) {
-			aiStates.Add(new NeonTClawState(isSecond: false));
+		if (state is MFall or MJump) {
+			aiStates.Add(new NeonTAirClawState());
+		}
+		if (enemyDist >= 70 && shootTimes < 4) {
 			aiStates.Add(new NeonTShootState());
+		}
+		if (enemyDist <= 40) {
+			aiStates.Add(new NeonTClawState(isSecond: false));
 			aiStates.Add(new NeonTDashClawState());
-		} else {
+			shootTimes = 0;
+		}
+		if (dashAICooldown <= 0) {
+			dashAICooldown = 90;
 			aiStates.Add(new NeonTDashState());
 		}
 		
@@ -189,8 +199,6 @@ public class NeonTShootState : MaverickState {
 	}
 	public override void update() {
 		base.update();
-		bool upHeld = player.input.isHeld(Control.Up, player);
-		bool downHeld = player.input.isHeld(Control.Down, player);
 		Point? shootPos = maverick.getFirstPOI();
 		if (shootPos != null) {
 			if (stateTime > 4f/60f && !once2) {
@@ -198,20 +206,33 @@ public class NeonTShootState : MaverickState {
 				new Anim(shootPos.Value, "neont_projectile_start", maverick.xDir,
 				player.getNextActorNetId(), true, sendRpc: true);
 			}
-			if (!once && stateTime > 16f/60f) {
-				once = true;
-				maverick.playSound("neontRaySplasher", sendRpc: true);
-				if (downHeld) {
-					SplasherProj(2);
-				} else if (upHeld) {
-					SplasherProj(1);
-				} else {
-					SplasherProj(0);
+			if (!isAI) {
+				if (!once && stateTime > 16f / 60f) {
+					once = true;
+					maverick.playSound("neontRaySplasher", sendRpc: true);
+					shotProj();
 				}
+			}
+			if (isAI && ShiningTigerd.shootTimes < 4 && stateTime > 16f / 60f) {
+				shotProj();
+				maverick.playSound("neontRaySplasher", sendRpc: true);
+				maverick.changeState(new NeonTShootState(), true);
+				ShiningTigerd.shootTimes++;
 			}
 		}
 		if (maverick.isAnimOver()) {
 			maverick.changeToIdleOrFall();
+		}
+	}
+	public void shotProj() {
+		bool upHeld = player.input.isHeld(Control.Up, player);
+		bool downHeld = player.input.isHeld(Control.Down, player);
+		if (downHeld) {
+			SplasherProj(2);
+		} else if (upHeld) {
+			SplasherProj(1);
+		} else {
+			SplasherProj(0);
 		}
 	}
 	public void SplasherProj(int type) {
@@ -377,13 +398,15 @@ public class NeonTDashState : MaverickState {
 		enterSound = "dashX3";
 		normalCtrl = true;
 		attackCtrl = true;
-		aiAttackCtrl = true;
 		canBeCanceled = false;
 	}
 
 	public override void update() {
 		base.update();
-
+		float enemyDist = 300;
+		if (maverick.target != null) {
+			enemyDist = MathF.Abs(maverick.target.pos.x - maverick.pos.x);
+		}
 		Helpers.decrementTime(ref dustTime);
 		if (dustTime == 0) {
 			new Anim(maverick.pos.addxy(-maverick.xDir * 27, 0), "dust", maverick.xDir, player.getNextActorNetId(), true, sendRpc: true);
@@ -408,14 +431,12 @@ public class NeonTDashState : MaverickState {
 			maverick.changeState(new MIdle());
 			return;
 		}
-
 		maverick.move(move);
-
-		if (input.isPressed(Control.Shoot, player) || isAI) {
+		if (input.isPressed(Control.Shoot, player) || (isAI && enemyDist <= 10)) {
 			maverick.changeState(new NeonTDashClawState());
-		} else if (isHoldStateOver(0.1f, 0.6f, 0.4f, Control.Dash)) {
+		} else if (isHoldStateOver(0.1f, 0.6f, 50f / 60f, Control.Dash)) {
 			maverick.changeToIdleOrFall();
-		}
+		} 
 	}
 
 	public override void onEnter(MaverickState oldState) {
