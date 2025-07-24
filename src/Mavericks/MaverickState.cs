@@ -211,7 +211,7 @@ public class MaverickState {
 		get { return maverick.aiBehavior != MaverickAIBehavior.Control; }
 	}
 
-	public void landingCode() {
+	public void landingCode(bool exitMLand = true) {
 		if (maverick.canStomp) {
 			maverick.shakeCamera(sendRpc: true);
 			maverick.playSound("crash", sendRpc: true);
@@ -229,7 +229,8 @@ public class MaverickState {
 			}
 		}
 		maverick.dashSpeed = 1;
-		maverick.changeState(new MLand(maverick.landingVelY));
+		if (exitMLand) maverick.changeState(new MLand(maverick.landingVelY));
+		else maverick.changeToIdleFallOrFly();
 	}
 
 	public void airCode(bool canMove = true) {

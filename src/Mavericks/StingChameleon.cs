@@ -153,8 +153,9 @@ public class StingChameleon : Maverick {
 	public override MaverickState[] strikerStates() {
 		return [
 			new StingCTongueState(0),
+			new StingCTongueState(1),
 			getShootState(true),
-			new StingCHangState(null)
+			new StingCJumpAI()
 		];
 	}
 
@@ -163,12 +164,14 @@ public class StingChameleon : Maverick {
 		if (target != null) {
 			enemyDist = MathF.Abs(target.pos.x - pos.x);
 		}
-		List<MaverickState> aiStates = [getShootState(isAI: false)];
-		if (enemyDist <= 120) {
+		List<MaverickState> aiStates = [];
+		if (enemyDist <= 125) {
 			aiStates.Add(new StingCTongueState(0));
 		}
-		if (Helpers.randomRange(0, 30) == 0) {
-			aiStates.Add(new StingCHangState(null));
+		if (Helpers.randomRange(0, 10) == 0 && grounded && stateCooldowns[typeof(StingCHangState)].cooldown <= 0) {
+			aiStates.Add(new StingCJumpAI());
+		} else {
+			aiStates.Add(getShootState(isAI: false));
 		}
 		return aiStates.ToArray();
 	}
@@ -392,6 +395,23 @@ public class StingCClimb : MaverickState {
 		if (maverick.grounded) {
 			maverick.changeState(new MIdle());
 		}
+	}
+}
+public class StingCJumpAI : MaverickState {
+	public StingCJumpAI() : base("jump", "jump_start") {
+	}
+
+	public override void update() {
+		base.update();
+		var hit = Global.level.raycast(maverick.pos, maverick.pos.addxy(0, -105), new List<Type>() { typeof(Wall) });
+		if (maverick.vel.y < 100 && hit?.gameObject is Wall wall && !wall.topWall) {
+			maverick.changeState(new StingCHangState(hit.getHitPointSafe().y));
+		}
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		maverick.vel.y = -maverick.getJumpPower() * 1.25f;
 	}
 }
 

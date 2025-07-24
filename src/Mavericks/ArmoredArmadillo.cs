@@ -151,7 +151,7 @@ public class ArmoredArmadillo : Maverick {
 			new ArmoredAProj(pos, xDir, this, player, player.getNextActorNetId(), rpc: true);
 		}, "energyBall");
 		if (isAI) {
-			shootState.consecutiveData = new MaverickStateConsecutiveData(0, 2, 0.33f);
+			shootState.consecutiveData = new MaverickStateConsecutiveData(0, 3, 0.33f);
 		}
 		return shootState;
 	}

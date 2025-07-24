@@ -52,7 +52,7 @@ public class CallDownMaverick : CharState {
 		frame++;
 
 		if (frame > 0 && frame < 10 && maverick.controlMode is MaverickModeId.Striker or MaverickModeId.Summoner) {
-			if (player.input.isPressed(Control.Shoot, player) &&
+			/*if (player.input.isPressed(Control.Shoot, player) &&
 				maverick.startMoveControl == Control.Special1
 			) {
 				maverick.startMoveControl = Control.Dash;
@@ -61,7 +61,7 @@ public class CallDownMaverick : CharState {
 				maverick.startMoveControl == Control.Shoot
 			) {
 				maverick.startMoveControl = Control.Dash;
-			}
+			} */
 		}
 
 		if (character.isAnimOver()) {

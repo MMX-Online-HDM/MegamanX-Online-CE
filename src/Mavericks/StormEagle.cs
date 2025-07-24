@@ -87,6 +87,8 @@ public class StormEagle : Maverick {
 			getShootState(),
 			new StormEEggState(true),
 			new StormEGustState(),
+			new StormEJumpAI(false),
+			new StormEJumpAI(true)
 		];
 	}
 
@@ -101,6 +103,12 @@ public class StormEagle : Maverick {
 		];
 		if (grounded && enemyDist <= 90) {
 			aiStates.Add(new StormEGustState());
+		}
+		if (grounded && enemyDist <= 30) {
+			aiStates.Add(new StormEJumpAI(false));
+		}
+		if (grounded && enemyDist <= 90) {
+			aiStates.Add(new StormEJumpAI(true));
 		}
 		return aiStates.ToArray();
 	}
@@ -523,7 +531,9 @@ public class StormEAirShootState : MaverickState {
 				player, player.getNextActorNetId(), rpc: true
 			);
 		}
-
+		if (maverick.isAI && maverick.controlMode == MaverickModeId.Striker) {
+			maverick.changeToIdleOrFall();
+		}
 		if (maverick.isAnimOver()) {
 			maverick.changeState(new MFly());
 		}
@@ -540,4 +550,30 @@ public class StormEAirShootState : MaverickState {
 		base.onExit(newState);
 	}
 }
+
+public class StormEJumpAI : MaverickState {
+	public bool isTornado;
+	public StormEJumpAI(bool isTornado) : base("jump", "jump_start") {
+		this.isTornado = isTornado;
+	}
+
+	public override void update() {
+		base.update();
+		if (stateTime > 24 / 60f && !isTornado) {
+			maverick.changeState(new StormEDiveState());
+		}
+		if (isTornado && stateTime > 18 / 60f) {
+			maverick.changeState(new StormEAirShootState());
+		}
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		if (isTornado) {
+			maverick.vel.y = -maverick.getJumpPower() * 0.75f;
+		} else 
+		maverick.vel.y = -maverick.getJumpPower() * 1.25f;
+	}
+}
+
 #endregion

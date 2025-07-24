@@ -257,10 +257,11 @@ public class BaseSigma : Character {
 				}
 			}
 		}
-
+		bool spcHeld2P = player.input.isPressed(Control.Special2, player);
 		if (currentWeapon is MaverickWeapon { controlMode: not MaverickModeId.TagTeam }) {
 			if (player.weapon is MaverickWeapon mw &&
-				(mw.cooldown == 0 || mw.controlMode != MaverickModeId.Striker) && (shootPressed || spcPressed)
+				(mw.cooldown == 0 || mw.controlMode != MaverickModeId.Striker) &&
+				(shootPressed || spcPressed && mw.controlMode != MaverickModeId.Striker)
 			) {
 				if (mw.maverick == null) {
 					if (canAffordMaverick(mw)) {
@@ -272,16 +273,27 @@ public class BaseSigma : Character {
 						if (mw.controlMode == MaverickModeId.Striker) {
 							mw.maverick.health = mw.lastHealth;
 							bool shootHeld = player.input.isHeld(Control.Shoot, player);
-							bool spcHeld = player.input.isHeld(Control.Special1, player);
+							bool UpHeld = player.input.isHeld(Control.Up, player);
+							bool DownHeld = player.input.isHeld(Control.Down, player);
+							bool LeftHeld = player.input.isHeld(Control.Left, player);
+							bool RightHeld = player.input.isHeld(Control.Right, player);
+							if (shootHeld) maverick.startMoveControl = Control.Shoot;
+							if (shootHeld && UpHeld) maverick.startMoveControl = Control.Up;
+							if (shootHeld && DownHeld) maverick.startMoveControl = Control.Down;
+							if (shootHeld && LeftHeld) maverick.startMoveControl = Control.Left;
+							if (shootHeld && RightHeld) maverick.startMoveControl = Control.Right;
+							//bool spcHeld = player.input.isHeld(Control.Special1, player);
+							//bool spcHeld2 = player.input.isHeld(Control.Special2, player);
+							/*
 							if (shootHeld && spcHeld) {
 								maverick.startMoveControl = Control.Special1;
-							}
-							else if (shootHeld) {
+							} else if (shootHeld) {
 								maverick.startMoveControl = Control.Shoot;
-							}
-							else if (spcHeld) {
+							} else if (spcHeld) {
 								maverick.startMoveControl = Control.Special1;
-							}
+							} else if (spcHeld2) {
+								maverick.startMoveControl = Control.Special2;
+							} */
 						}
 						changeState(new CallDownMaverick(maverick, true, false), true);
 						if (mw.controlMode == MaverickModeId.Striker) {

@@ -502,8 +502,10 @@ public class Maverick : Actor, IDamagable {
 					var aiAttackStateArray = strikerStates();
 
 					int mIndex = startMoveControl switch {
-						Control.Dash => 2,
-						Control.Special1 => 1,
+						Control.Right => 4,
+						Control.Left => 3,
+						Control.Down => 2,
+						Control.Up => 1,
 						_ => 0
 					};
 

@@ -67,17 +67,25 @@ public class FlameMammoth : Maverick {
 		return [
 			getShootState(true),
 			new FlameMOilState(),
-			new MJumpStart(),
+			new FlameMJumpStateAI(),
 		];
 	}
 
 	public override MaverickState[] aiAttackStates() {
-		return [
-			getShootState(true),
-			getShootState(true),
-			new FlameMOilState(),
-			new MJumpStart(),
-		];
+		float enemyDist = 300;
+		if (target != null) {
+			enemyDist = target.pos.distanceTo(pos);
+		}
+		List<MaverickState> aiStates = [];
+		if (enemyDist <= 70) {
+			aiStates.Add(new FlameMOilState());
+		}
+		if (grounded && enemyDist <= 30) {
+			aiStates.Add(new FlameMJumpStateAI());
+		} else {
+			aiStates.Add(getShootState(true));
+		}
+		return aiStates.ToArray();
 	}
 
 
@@ -460,13 +468,34 @@ public class FlameMJumpPressState : MaverickState {
 		if (player == null) return;
 
 		if (maverick.grounded) {
-			landingCode();
+			if (maverick.isAI && maverick.controlMode == MaverickModeId.Striker) {
+				landingCode(false);
+			} else {
+				landingCode();				
+			}
 		}
 	}
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 		maverick.vel = new Point(0, 300);
+	}
+}
+public class FlameMJumpStateAI : MaverickState {
+	public FlameMJumpStateAI() : base("jump", "jump_start") {
+	}
+
+	public override void update() {
+		base.update();
+		if (player == null) return;
+		if (stateTime >= 24f/60f) {
+			maverick.changeState(new FlameMJumpPressState());
+		}
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		maverick.vel.y = -maverick.getJumpPower() * 1.25f;
 	}
 }
 #endregion
