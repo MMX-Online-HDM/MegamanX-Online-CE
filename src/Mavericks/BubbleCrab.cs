@@ -19,7 +19,9 @@ public class BubbleCrab : Maverick {
 	) : base(
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
-		//stateCooldowns.Add(typeof(BCrabShieldStartState), new MaverickStateCooldown(false, true, 0.75f));
+		/*stateCooldowns = new() {
+			{ typeof(BCrabShieldStartState), new(45, true) }
+		};*/
 
 		weapon = getWeapon();
 

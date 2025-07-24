@@ -13,10 +13,16 @@ public class BoomerangKuwanger : Maverick {
 	public float teleportCooldown;
 	public float aiAproachCooldown;
 
-	public BoomerangKuwanger(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
-		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
-		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
-		//stateCooldowns.Add(typeof(BoomerKDeadLiftState), new MaverickStateCooldown(false, true, 0.75f));
+	public BoomerangKuwanger(
+		Player player, Point pos, Point destPos, int xDir,
+		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(
+		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+	) {
+		stateCooldowns = new() {
+			{ typeof(MShoot), new(45, true) },
+			//{ typeof(BoomerKDeadLiftState), new(45, true) }
+		};
 		deadLiftWeapon = new BoomerangKDeadLiftWeapon(player);
 		gravityModifier = 1.25f;
 

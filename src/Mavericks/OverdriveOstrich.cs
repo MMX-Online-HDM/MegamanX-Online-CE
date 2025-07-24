@@ -12,11 +12,17 @@ public class OverdriveOstrich : Maverick {
 	public int lastDirX;
 	public float crystalizeCooldown;
 
-	public OverdriveOstrich(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
-		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
-		stateCooldowns.Add(typeof(OverdriveOShootState), new MaverickStateCooldown(false, true, 0.75f));
-		stateCooldowns.Add(typeof(OverdriveOShoot2State), new MaverickStateCooldown(true, true, 2f));
-		stateCooldowns.Add(typeof(OverdriveOJumpKickState), new MaverickStateCooldown(true, true, 1f));
+	public OverdriveOstrich(
+		Player player, Point pos, Point destPos, int xDir,
+		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(
+		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+	) {
+		stateCooldowns = new() {
+			{ typeof(OverdriveOShootState), new(45, true) },
+			{ typeof(OverdriveOShoot2State), new(2 * 60, true, true) },
+			{ typeof(OverdriveOJumpKickState), new(60, true, true) }
+		};
 
 		weapon = getWeapon();
 

@@ -24,24 +24,13 @@ public class FakeZero : Maverick {
 	) : base(
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
-		stateCooldowns.Add(
-			typeof(MShoot), new MaverickStateCooldown(false, false, 0)
-		);
-		stateCooldowns.Add(
-			typeof(FakeZeroGroundPunchState), new MaverickStateCooldown(false, false, 1f)
-		);
-		stateCooldowns.Add(
-			typeof(FakeZeroShootAirState), new MaverickStateCooldown(false, true, 0.5f)
-		);
-		stateCooldowns.Add(
-			typeof(FakeZeroShootAir2State), new MaverickStateCooldown(false, true, 0.5f)
-		);
-		stateCooldowns.Add(
-			typeof(FakeZeroShootState), new MaverickStateCooldown(false, true, 0.5f)
-		);
-		stateCooldowns.Add(
-			typeof(FakeZeroShoot3State), new MaverickStateCooldown(false, true, 0.5f)
-		);
+		stateCooldowns = new() {
+			{ typeof(FakeZeroGroundPunchState), new(60) },
+			{ typeof(FakeZeroShootAirState), new(30, true) },
+			{ typeof(FakeZeroShootAir2State), new(30, true) },
+			{ typeof(FakeZeroShootState), new(30, true) },
+			{ typeof(FakeZeroShoot3State), new(30, true) }
+		};
 
 		weapon = getWeapon();
 		awardWeaponId = WeaponIds.Buster;
@@ -136,7 +125,7 @@ public class FakeZero : Maverick {
 				changeState(new FakeZeroShoot3State());
 			} else if (input.isPressed(Control.Dash, player)) {
 				changeState(new FakeZeroGroundPunchState());
-			} else if (input.isHeld(Control.Down, player)) {
+			} else if (input.isHeld(Control.Down, player) && state is not FakeZeroGuardState) {
 				changeState(new FakeZeroGuardState());
 			}
 		} else {
@@ -689,6 +678,7 @@ public class FakeZeroRockProj : Projectile {
 public class FakeZeroGuardState : MaverickState {
 	public FakeZeroGuardState() : base("guard") {
 		aiAttackCtrl = true;
+		attackCtrl = true;
 		canBeCanceled = false;
 	}
 

@@ -14,12 +14,17 @@ public class WireSponge : Maverick {
 	//public ShaderWrapper chargeShader;
 	public float chargeTime;
 
-	public WireSponge(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
-		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
-		stateCooldowns.Add(typeof(WSpongeSeedThrowState), new MaverickStateCooldown(false, true, 0.75f));
-		stateCooldowns.Add(typeof(WSpongeHangSeedThrowState), new MaverickStateCooldown(false, true, 0.75f));
-		stateCooldowns.Add(typeof(WSpongeLightningState), new MaverickStateCooldown(false, true, 0.75f));
-		stateCooldowns.Add(typeof(WSpongeChainSpinState), new MaverickStateCooldown(false, true, 0.75f));
+	public WireSponge(Player player, Point pos, Point destPos, int xDir,
+		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(
+		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+	) {
+		stateCooldowns = new() {
+			{ typeof(WSpongeSeedThrowState), new MaverickStateCooldown(45, true) },
+			{ typeof(WSpongeHangSeedThrowState), new MaverickStateCooldown(45, true) },
+			{ typeof(WSpongeLightningState), new MaverickStateCooldown(45, true) },
+			{ typeof(WSpongeChainSpinState), new MaverickStateCooldown(45, true) }
+		};
 
 		weapon = getWeapon();
 		chainWeapon = getChainWeapon(player);

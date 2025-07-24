@@ -12,12 +12,14 @@ public class SparkMandrill : Maverick {
 	public SparkMandrill(
 		Player player, Point pos, Point destPos, int xDir,
 		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
-	) : base(player, pos, destPos, xDir, netId, ownedByLocalPlayer
-) {
-
-		stateCooldowns.Add(typeof(SparkMPunchState), new MaverickStateCooldown(true, true, 1f));
-		stateCooldowns.Add(typeof(SparkMDashPunchState), new MaverickStateCooldown(true, false, 0.75f));
-		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(true, true, 2f));
+	) : base(
+		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+	) {
+		stateCooldowns = new() {
+			{ typeof(SparkMPunchState), new(60, true, true) },
+			{ typeof(SparkMDashPunchState), new(45, false, true) },
+			{ typeof(MShoot), new(2 * 60, true, true) }
+		};
 		spriteToCollider["dash_punch"] = getDashCollider();
 
 		weapon = new Weapon(WeaponIds.SparkMGeneric, 94);

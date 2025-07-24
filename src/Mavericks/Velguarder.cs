@@ -11,7 +11,9 @@ public class Velguarder : Maverick {
 	) : base(
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
-		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
+		stateCooldowns = new() {
+			{ typeof(MShoot), new(45, true) }
+		};
 		canClimbWall = true;
 
 		awardWeaponId = WeaponIds.Buster;

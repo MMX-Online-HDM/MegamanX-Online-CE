@@ -5,12 +5,13 @@ using System.Linq;
 namespace MMXOnline;
 
 public class MaverickStateCooldown {
-	public readonly bool isGlobal;  // "Global" states no longer shares the global cooldown but sets all states at their max
+	// "Global" states no longer shares the global cooldown but sets all states at their max.
+	public readonly bool isGlobal;
 	public readonly bool startOnEnter;
 	public readonly float maxCooldown;
 	public float cooldown;
 
-	public MaverickStateCooldown(bool isGlobal, bool startOnEnter, float maxCooldown) {
+	public MaverickStateCooldown(float maxCooldown, bool startOnEnter = false, bool isGlobal = false) {
 		this.isGlobal = isGlobal;
 		this.startOnEnter = startOnEnter;
 		this.maxCooldown = maxCooldown;

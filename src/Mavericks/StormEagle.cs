@@ -7,16 +7,21 @@ public class StormEagle : Maverick {
 	public static Weapon netWeapon = new Weapon(WeaponIds.StormEGeneric, 99);
 	public StormEDiveWeapon diveWeapon;
 
-	public StormEagle(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
-		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
+	public StormEagle(
+		Player player, Point pos, Point destPos, int xDir,
+		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(
+		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+	) {
+		stateCooldowns = new() {
+			{ typeof(StormEAirShootState), new(2f, true, true) },
+			{ typeof(MShoot), new(2f, true, true) },
+			{ typeof(StormEEggState), new(90, true) },
+			{ typeof(StormEGustState), new(45, true) },
+			{ typeof(StormEDiveState), new(60) }
+		};
+
 		diveWeapon = new StormEDiveWeapon();
-
-		stateCooldowns.Add(typeof(StormEAirShootState), new MaverickStateCooldown(true, true, 2f));
-		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(true, true, 2f));
-		stateCooldowns.Add(typeof(StormEEggState), new MaverickStateCooldown(false, true, 1.5f));
-		stateCooldowns.Add(typeof(StormEGustState), new MaverickStateCooldown(false, true, 0.75f));
-		stateCooldowns.Add(typeof(StormEDiveState), new MaverickStateCooldown(false, false, 1f));
-
 		weapon = new Weapon(WeaponIds.StormEGeneric, 99);
 
 		awardWeaponId = WeaponIds.StormTornado;

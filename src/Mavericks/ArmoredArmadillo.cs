@@ -9,10 +9,16 @@ public class ArmoredArmadillo : Maverick {
 	public const float rollTransJumpPower = 250;
 	public bool noArmor;
 
-	public ArmoredArmadillo(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
-		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
-		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.6f));
-		//stateCooldowns.Add(typeof(ArmoredARollEnterState), new MaverickStateCooldown(false, false, 4));
+	public ArmoredArmadillo(
+		Player player, Point pos, Point destPos, int xDir,
+		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(
+		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+	) {
+		stateCooldowns = new() {
+			{ typeof(MShoot), new(36, true) },
+			//{ typeof(ArmoredARollEnterState), new(4 * 60)) }
+		};
 
 		spriteToCollider["roll"] = getRollCollider();
 		spriteToCollider["na_roll"] = getRollCollider();

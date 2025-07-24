@@ -8,10 +8,17 @@ namespace MMXOnline;
 public class MorphMoth : Maverick {
 	public static Weapon getWeapon() { return new Weapon(WeaponIds.MorphMGeneric, 146); }
 
-	public MorphMoth(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool isHatch, bool sendRpc = false) :
-		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer, overrideState: isHatch ? new MorphMHatchState() : null) {
-		stateCooldowns.Add(typeof(MorphMShoot), new MaverickStateCooldown(true, false, 0.5f));
-		stateCooldowns.Add(typeof(MorphMShootAir), new MaverickStateCooldown(true, false, 0.5f));
+	public MorphMoth(
+		Player player, Point pos, Point destPos, int xDir,
+		ushort? netId, bool ownedByLocalPlayer, bool isHatch, bool sendRpc = false
+	) : base(
+		player, pos, destPos, xDir, netId, ownedByLocalPlayer,
+		overrideState: isHatch ? new MorphMHatchState() : null
+	) {
+		stateCooldowns = new() {
+			{ typeof(MorphMShoot), new(30, false, true) },
+			{ typeof(MorphMShootAir), new(30, false, true) }
+		};
 
 		weapon = getWeapon();
 		spriteToCollider["sweep"] = getDashCollider();

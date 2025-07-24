@@ -10,8 +10,12 @@ public class FlameStag : Maverick {
 	public Sprite antlerDown;
 	public Sprite antlerSide;
 
-	public FlameStag(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
-		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
+	public FlameStag(
+		Player player, Point pos, Point destPos, int xDir, ushort? netId,
+		bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(
+		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+	) {
 		weapon = getWeapon();
 		uppercutWeapon = new Weapon(WeaponIds.FStagGeneric, 144, new Damager(player, 0, 0, 0));
 
@@ -25,8 +29,8 @@ public class FlameStag : Maverick {
 		spriteFrameToSounds["fstag_run/6"] = "run";
 
 		//stateCooldowns.Add(typeof(FStagShoot), new MaverickStateCooldown(false, false, 0.25f));
-		stateCooldowns.Add(typeof(FStagDashChargeState), new MaverickStateCooldown(true, false, 0.75f));
-		stateCooldowns.Add(typeof(FStagDashState), new MaverickStateCooldown(true, false, 0.75f));
+		stateCooldowns.Add(typeof(FStagDashChargeState), new MaverickStateCooldown(45, false, true));
+		stateCooldowns.Add(typeof(FStagDashState), new MaverickStateCooldown(45, false, true));
 
 		awardWeaponId = WeaponIds.SpeedBurner;
 		weakWeaponId = WeaponIds.BubbleSplash;

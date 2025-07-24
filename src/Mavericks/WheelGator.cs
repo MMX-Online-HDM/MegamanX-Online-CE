@@ -17,12 +17,15 @@ public class WheelGator : Maverick {
 	//public ShaderWrapper eatenShader;
 
 	public WheelGator(
-		Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+		Player player, Point pos, Point destPos, int xDir,
+		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
 	) : base(
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
-		stateCooldowns.Add(typeof(WheelGShootState), new MaverickStateCooldown(false, false, 1.25f));
-		stateCooldowns.Add(typeof(WheelGSpinState), new MaverickStateCooldown(false, false, 2f));
+		stateCooldowns = new() {
+			{ typeof(WheelGShootState), new MaverickStateCooldown(75) },
+			{ typeof(WheelGSpinState), new MaverickStateCooldown(2 * 60) }
+		};
 
 		weapon = getWeapon();
 		upBiteWeapon = getUpBiteWeapon(player);
