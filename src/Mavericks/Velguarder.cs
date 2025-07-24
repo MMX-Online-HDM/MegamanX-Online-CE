@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace MMXOnline;
 
@@ -70,11 +71,21 @@ public class Velguarder : Maverick {
 	}
 
 	public override MaverickState[] aiAttackStates() {
-		return [
-			new VelGShootFireState(),
-			new VelGShootIceState(),
-			new VelGPounceStartState(),
-		];
+		float enemyDist = 300;
+		if (target != null) {
+			enemyDist = MathF.Abs(target.pos.x - pos.x);
+		}
+		List<MaverickState> aiStates = [];
+		if (enemyDist > 70) {
+			aiStates.Add(new VelGPounceStartState());
+		}
+		if (enemyDist < 50) {
+			aiStates.Add(getShootState2());
+			aiStates.Add(getShootState());
+		} else {
+			aiStates.Add(new VelGPounceStartState());
+		}
+		return aiStates.ToArray();
 	}
 
 	// Melee IDs for attacks.

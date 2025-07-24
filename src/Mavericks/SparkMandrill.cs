@@ -88,7 +88,7 @@ public class SparkMandrill : Maverick {
 		return [
 			getShootState(),
 			new SparkMDashPunchState(),
-			new MJumpStart()
+			new SparkMPunchState()
 		];
 	}
 
