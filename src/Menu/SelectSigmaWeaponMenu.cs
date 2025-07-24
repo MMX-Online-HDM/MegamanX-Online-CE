@@ -411,7 +411,7 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 			1 => "Frightening Forest's Strike",
 			4 => "Nobleman of The Skies",
 			3 => "Blazing Oil Tank", 
-			8 => "Guardian of the underworld",
+			8 => "Guardian of The Underworld",
 			14 => "Little Forest Demon",
 			12 => "Fanged Heavy Tank",
 			10 => "Shredder of The Deep",
