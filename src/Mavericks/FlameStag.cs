@@ -108,7 +108,7 @@ public class FlameStag : Maverick {
 			target is Character chara && chara.canBeGrabbed()
 		);
 		List<MaverickState> aiStates = [];
-		if (enemyDist <= 15 && canGrabTarget) {
+		if (enemyDist <= 20 && canGrabTarget) {
 			aiStates.Add(new FStagGrabState(false));
 		}
 		if (enemyDist > 40) {
