@@ -11,12 +11,17 @@ public class NeonTiger : Maverick {
 	public bool isDashing;
 	public int shootTimes;
 	public float dashAICooldown;
-	public NeonTiger(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
-		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
-		stateCooldowns.Add(typeof(NeonTClawState), new MaverickStateCooldown(false, true, 0.33f));
-		//stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.33f));
-		// stateCooldowns.Add(typeof(NeonTDashState), new MaverickStateCooldown(false, true, 0.5f));
-
+	public NeonTiger(
+		Player player, Point pos, Point destPos, int xDir,
+		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(
+		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+	) {
+		stateCooldowns = new() {
+			{ typeof(NeonTClawState), new(20, true) },
+			//{ typeof(MShoot), new(20, true) },
+			//{ typeof(NeonTDashClawState), new(30, true) }
+		};
 		weapon = getWeapon();
 
 		canClimbWall = true;

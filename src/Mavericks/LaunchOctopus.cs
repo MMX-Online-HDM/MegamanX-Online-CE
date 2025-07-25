@@ -9,13 +9,18 @@ public class LaunchOctopus : Maverick {
 	public LaunchOHomingTorpedoWeapon homingTorpedoWeapon = new();
 	public bool lastFrameWasUnderwater;
 
-	public LaunchOctopus(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
-		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
-
-		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 1f));
-		stateCooldowns.Add(typeof(LaunchOShoot), new MaverickStateCooldown(false, true, 0.325f));
-		stateCooldowns.Add(typeof(LaunchOHomingTorpedoState), new MaverickStateCooldown(false, true, 1.5f));
-		stateCooldowns.Add(typeof(LaunchOWhirlpoolState), new MaverickStateCooldown(false, false, 2));
+	public LaunchOctopus(
+		Player player, Point pos, Point destPos, int xDir,
+		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(
+		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+	) {
+		stateCooldowns = new() {
+			{ typeof(MShoot), new(60, true) },
+			{ typeof(LaunchOShoot), new(20, true) },
+			{ typeof(LaunchOHomingTorpedoState), new(90, true) },
+			{ typeof(LaunchOWhirlpoolState), new(2 * 60) }
+		};
 
 		weapon = new Weapon(WeaponIds.LaunchOGeneric, 96);
 

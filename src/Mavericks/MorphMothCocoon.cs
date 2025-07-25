@@ -21,8 +21,10 @@ public class MorphMothCocoon : Maverick {
 	) : base(
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
-		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
-		stateCooldowns.Add(typeof(MorphMCThreadState), new MaverickStateCooldown(false, true, 0.75f));
+		stateCooldowns = new() {
+			{ typeof(MShoot), new(45, true) },
+			{ typeof(MorphMCThreadState), new(45, true) }
+		};
 
 		weapon = getWeapon();
 		angle = 0;

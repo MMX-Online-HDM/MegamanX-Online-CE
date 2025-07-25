@@ -7,11 +7,18 @@ public class ToxicSeahorse : Maverick {
 	public static Weapon netWeapon = new Weapon(WeaponIds.TSeahorseGeneric, 152);
 	public static Weapon getWeapon() { return new Weapon(WeaponIds.TSeahorseGeneric, 152); }
 	public float teleportCooldown;
-	public ToxicSeahorse(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
-		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
-		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(true, true, 1f));
-		stateCooldowns.Add(typeof(TSeahorseShoot2State), new MaverickStateCooldown(true, true, 2f));
-		stateCooldowns.Add(typeof(TSeahorseTeleportState), new MaverickStateCooldown(false, true, 0.75f));
+
+	public ToxicSeahorse(
+		Player player, Point pos, Point destPos, int xDir,
+		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(
+		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+	) {
+		stateCooldowns = new() {
+			{ typeof(MShoot), new(60, true, true) },
+			{ typeof(TSeahorseShoot2State), new(2 * 60, true, true) },
+			{ typeof(TSeahorseTeleportState), new(45, true) }
+		};
 
 		weapon = getWeapon();
 

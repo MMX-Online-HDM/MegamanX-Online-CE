@@ -72,12 +72,12 @@ public static class Extensions {
 		return s.Substring(0, maxLength) + "...";
 	}
 
-	public static TValue GetValueOrDefault<TKey, TValue>(
+	/*public static TValue GetValueOrDefault<TKey, TValue>(
 		this IDictionary<TKey, TValue> dictionary,
 		TKey key) {
 		TValue value;
 		return dictionary.TryGetValue(key, out value) ? value : default;
-	}
+	}*/
 
 	public static TValue GetValueOrCreate<TKey, TValue>(
 		this IDictionary<TKey, TValue> dictionary,
@@ -120,7 +120,7 @@ public static class Extensions {
 	}
 
 	public static Actor actor(this IDamagable damagable) {
-		return damagable as Actor;
+		return damagable as Actor ?? throw new Exception("Damagable could not be converted into actor");
 	}
 
 	public static void SendStringMessage(this TcpClient client, string message, NetworkStream networkStream) {

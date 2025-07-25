@@ -14,15 +14,20 @@ public class StingChameleon : Maverick {
 	public float cloakTransitionTime;
 	public float uncloakTransitionTime;
 
-	public StingChameleon(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
-		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
+	public StingChameleon(
+		Player player, Point pos, Point destPos, int xDir, ushort? netId,
+		bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(
+		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+	) {
 		tongueWeapon = new StingCTongueWeapon();
-
-		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
-		stateCooldowns.Add(typeof(StingCTongueState), new MaverickStateCooldown(false, true, 1));
-		stateCooldowns.Add(typeof(StingCClimbTongueState), new MaverickStateCooldown(false, true, 1));
-		stateCooldowns.Add(typeof(StingCHangState), new MaverickStateCooldown(false, false, 2f));
-		stateCooldowns.Add(typeof(StingCClingShootState), new MaverickStateCooldown(false, true, 0.5f));
+		stateCooldowns = new() {
+			{ typeof(MShoot), new(45, true) },
+			{ typeof(StingCTongueState), new(60, true) },
+			{ typeof(StingCClimbTongueState), new(60, true) },
+			{ typeof(StingCHangState), new(2 * 60) },
+			{ typeof(StingCClingShootState), new(30) }
+		};
 
 		weapon = new Weapon(WeaponIds.StingCGeneric, 98);
 

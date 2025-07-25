@@ -7,11 +7,17 @@ public class CrushCrawfish : Maverick {
 	public static Weapon getMeleeWeapon(Player player) { return new Weapon(WeaponIds.CrushCGeneric, 155, new Damager(player, 1, 0, 0)); }
 
 	public Weapon meleeWeapon;
-	public CrushCrawfish(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
-		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
-		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
-		stateCooldowns.Add(typeof(CrushCShootArmState), new MaverickStateCooldown(false, true, 0.75f));
-		stateCooldowns.Add(typeof(CrushCDashState), new MaverickStateCooldown(false, false, 0.5f));
+	public CrushCrawfish(
+		Player player, Point pos, Point destPos, int xDir,
+		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(
+		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+	) {
+		stateCooldowns = new() {
+			{ typeof(MShoot), new(45, true) },
+			{ typeof(CrushCShootArmState), new(45, true) },
+			{ typeof(CrushCDashState), new(30) }
+		};
 
 		weapon = getWeapon();
 		meleeWeapon = getMeleeWeapon(player);

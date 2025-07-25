@@ -99,7 +99,7 @@ public class Maverick : Actor, IDamagable {
 	public MaverickState state;
 	public Player player;
 	public bool changedStateInFrame;
-	public Dictionary<Type, MaverickStateCooldown> stateCooldowns = new Dictionary<Type, MaverickStateCooldown>();
+	public Dictionary<Type, MaverickStateCooldown> stateCooldowns = new();
 	public Point? lastGroundedPos;
 	public bool autoExit;
 	public float autoExitTime;
@@ -160,9 +160,9 @@ public class Maverick : Actor, IDamagable {
 	public Maverick(
 		Player player, Point pos, Point destPos, int xDir,
 		ushort? netId, bool ownedByLocalPlayer,
-		MaverickState overrideState = null
+		MaverickState? overrideState = null
 	) : base(
-		null, pos, netId, ownedByLocalPlayer, true
+		"", pos, netId, ownedByLocalPlayer, true
 	) {
 		this.player = player;
 		this.xDir = xDir;
@@ -331,7 +331,7 @@ public class Maverick : Actor, IDamagable {
 		}
 
 		foreach (var key in stateCooldowns.Keys) {
-			Helpers.decrementTime(ref stateCooldowns[key].cooldown);
+			Helpers.decrementFrames(ref stateCooldowns[key].cooldown);
 		}
 
 		if (!ownedByLocalPlayer) return;
@@ -727,22 +727,27 @@ public class Maverick : Actor, IDamagable {
 		return retProjs;
 	}
 
-	public void maxOutAllCooldowns(float maxAllowedCooldown) {
+	public void maxOutGlobalCooldowns(float maxAllowedCooldown) {
 		foreach (var stateCooldown in stateCooldowns.Values) {
-			if (stateCooldown.isGlobal) {
+			if (stateCooldown.isGlobal && stateCooldown.cooldown < maxAllowedCooldown) {
 				stateCooldown.cooldown = Math.Min(stateCooldown.maxCooldown, maxAllowedCooldown);
 			}
 		}
 	}
 
 	public void changeState(MaverickState newState, bool ignoreCooldown = false) {
-		if (state != null && newState != null && !newState.canEnterSelf && state.GetType() == newState.GetType()) return;
-		if (newState == null) return;
-		if (state is MDie) return;
-		if (!newState.canEnter(this)) return;
-
-		MaverickStateCooldown oldStateCooldown = state == null ? null : stateCooldowns.GetValueOrDefault(state.GetType());
-		MaverickStateCooldown newStateCooldown = stateCooldowns.GetValueOrDefault(newState.GetType());
+		//if (state != null && newState != null && !newState.canEnterSelf && state.GetType() == newState.GetType()) {
+		// return;
+		//}
+		//if (newState == null) return;
+		if (state is MDie) {
+			return;
+		}
+		if (!newState.canEnter(this)) {
+			return;
+		}
+		MaverickStateCooldown? oldStateCooldown = stateCooldowns.GetValueOrDefault(state.GetType());
+		MaverickStateCooldown? newStateCooldown = stateCooldowns.GetValueOrDefault(newState.GetType());
 
 		if (newStateCooldown != null && !ignoreCooldown) {
 			if (newStateCooldown.cooldown > 0) return;
@@ -759,7 +764,7 @@ public class Maverick : Actor, IDamagable {
 			if (oldStateCooldown != null && !oldStateCooldown.startOnEnter) {
 				oldStateCooldown.cooldown = oldStateCooldown.maxCooldown;
 				if (oldStateCooldown.isGlobal) {
-					maxOutAllCooldowns(oldStateCooldown.maxCooldown);
+					maxOutGlobalCooldowns(oldStateCooldown.maxCooldown);
 				}
 			}
 		}
@@ -768,7 +773,7 @@ public class Maverick : Actor, IDamagable {
 		if (newStateCooldown != null && newStateCooldown.startOnEnter) {
 			newStateCooldown.cooldown = newStateCooldown.maxCooldown;
 			if (newStateCooldown.isGlobal) {
-				maxOutAllCooldowns(newStateCooldown.maxCooldown);
+				maxOutGlobalCooldowns(newStateCooldown.maxCooldown);
 			}
 		}
 	}

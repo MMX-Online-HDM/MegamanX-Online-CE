@@ -8,13 +8,16 @@ public class TunnelRhino : Maverick {
 
 	public Weapon meleeWeapon;
 	public TunnelRhino(
-		Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+		Player player, Point pos, Point destPos, int xDir,
+		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
 	) : base(
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
-		stateCooldowns.Add(typeof(TunnelRShootState), new MaverickStateCooldown(true, false, 0.75f));
-		stateCooldowns.Add(typeof(TunnelRShoot2State), new MaverickStateCooldown(true, false, 0.75f));
-		stateCooldowns.Add(typeof(TunnelRDashState), new MaverickStateCooldown(false, false, 1f));
+		stateCooldowns = new() {
+			{ typeof(TunnelRShootState), new(45, false, true) },
+			{ typeof(TunnelRShoot2State), new(45, false, true) },
+			{ typeof(TunnelRDashState), new(60) }
+		};
 
 		weapon = getWeapon();
 		meleeWeapon = getMeleeWeapon(player);

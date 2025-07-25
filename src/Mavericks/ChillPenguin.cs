@@ -18,10 +18,12 @@ public class ChillPenguin : Maverick {
 	) : base(
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
-		stateCooldowns.Add(typeof(ChillPIceBlowState), new MaverickStateCooldown(true, false, 2f));
-		stateCooldowns.Add(typeof(ChillPSlideState), new MaverickStateCooldown(true, false, 0.5f));
-		stateCooldowns.Add(typeof(ChillPBlizzardState), new MaverickStateCooldown(false, false, 3f));
-		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
+		stateCooldowns = new() {
+			{ typeof(ChillPIceBlowState), new(2 * 60, false, true) },
+			{ typeof(ChillPSlideState), new(30, false, true) },
+			{ typeof(ChillPBlizzardState), new(3 * 60) },
+			{ typeof(MShoot), new(45, true) }
+		};
 		spriteToCollider["slide"] = getDashCollider();
 
 		weapon = new Weapon(WeaponIds.ChillPGeneric, 93);

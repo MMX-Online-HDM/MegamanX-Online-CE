@@ -15,10 +15,16 @@ public class VoltCatfish : Maverick {
 	//public ShaderWrapper chargeShader;
 	public bool bouncedOnce;
 
-	public VoltCatfish(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
-		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
-		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, false, 1));
-		stateCooldowns.Add(typeof(VoltCTriadThunderState), new MaverickStateCooldown(false, true, 0.75f));
+	public VoltCatfish(
+		Player player, Point pos, Point destPos, int xDir,
+		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(
+		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+	) {
+		stateCooldowns = new() {
+			{ typeof(MShoot), new(60) },
+			{ typeof(VoltCTriadThunderState), new(45, true) }
+		};
 
 		weapon = getWeapon();
 		meleeWeapon = getMeleeWeapon(player);

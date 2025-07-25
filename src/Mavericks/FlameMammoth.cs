@@ -6,12 +6,15 @@ public class FlameMammoth : Maverick {
 	public FlameMStompWeapon stompWeapon = new();
 
 	public FlameMammoth(
-		Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+		Player player, Point pos, Point destPos, int xDir,
+		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
 	) : base(
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
-		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.5f));
-		stateCooldowns.Add(typeof(FlameMOilState), new MaverickStateCooldown(false, true, 0.5f));
+		stateCooldowns = new() {
+			{ typeof(MShoot), new(30, true) },
+			{ typeof(FlameMOilState), new(30, true) }
+		};
 
 		awardWeaponId = WeaponIds.FireWave;
 		weakWeaponId = WeaponIds.StormTornado;

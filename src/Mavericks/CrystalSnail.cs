@@ -16,7 +16,9 @@ public class CrystalSnail : Maverick {
 	) : base(
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
-		stateCooldowns.Add(typeof(CSnailShootState), new MaverickStateCooldown(false, false, 0.75f));
+		stateCooldowns = new() {
+			{ typeof(CSnailShootState), new(45) }
+		};
 
 		spriteToCollider["shell"] = getShellCollider();
 		spriteToCollider["shell_spin"] = getShellCollider();

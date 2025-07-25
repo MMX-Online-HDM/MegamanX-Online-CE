@@ -7,11 +7,17 @@ public class DrDoppler : Maverick {
 	public int shootTimes;
 	public Weapon? meleeWeapon;
 	public int ballType;
-	public DrDoppler(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
-		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
-		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
-		stateCooldowns.Add(typeof(DrDopplerAbsorbState), new MaverickStateCooldown(false, true, 0.75f));
-		stateCooldowns.Add(typeof(DrDopplerDashStartState), new MaverickStateCooldown(false, false, 1.5f));
+	public DrDoppler(
+		Player player, Point pos, Point destPos, int xDir,
+		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(
+		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+	) {
+		stateCooldowns = new() {
+			{ typeof(MShoot), new(45, true) },
+			{ typeof(DrDopplerAbsorbState), new(45, true) },
+			{ typeof(DrDopplerDashStartState), new(90) }
+		};
 
 		weapon = getWeapon();
 		canClimbWall = true;

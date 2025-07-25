@@ -12,13 +12,16 @@ public class GravityBeetle : Maverick {
 	public GBeetleGravityWellProj? well;
 
 	public GravityBeetle(
-		Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+		Player player, Point pos, Point destPos, int xDir,
+		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
 	) : base(
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
-		stateCooldowns.Add(typeof(GBeetleShoot), new MaverickStateCooldown(false, false, 1f));
-		stateCooldowns.Add(typeof(GBeetleGravityWellState), new MaverickStateCooldown(false, false, 1));
-		stateCooldowns.Add(typeof(GBeetleDashState), new MaverickStateCooldown(false, false, 1.5f));
+		stateCooldowns = new() {
+			{ typeof(GBeetleShoot), new(60) },
+			{ typeof(GBeetleGravityWellState), new(60) },
+			{ typeof(GBeetleDashState), new(90) }
+		};
 
 		weapon = getWeapon();
 		meleeWeapon = getMeleeWeapon(player);
