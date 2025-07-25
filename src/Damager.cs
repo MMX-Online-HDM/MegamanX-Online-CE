@@ -71,7 +71,7 @@ public class Damager {
 		this.owner = owner;
 		this.damage = damage;
 		this.flinch = flinch;
-		hitCooldownSeconds = hitCooldown;
+		this.hitCooldown = hitCooldown;
 		this.knockback = knockback;
 	}
 
