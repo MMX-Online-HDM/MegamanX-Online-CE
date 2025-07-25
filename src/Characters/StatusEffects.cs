@@ -47,7 +47,7 @@ public class Hurt : CharState {
 				character.changeSpriteFromName("hurt2", true);
 			}
 		}
-		if (!spiked) {
+		if (!spiked && character is not BaseSigma && !character.isToughGuyHyperMode()) {
 			float flichLimitusTime = flinchTime <= 30 ? flinchTime : 30;
 
 			character.vel.y = (-0.125f * (flichLimitusTime - 1)) * 60f;
@@ -66,7 +66,8 @@ public class Hurt : CharState {
 		base.update();
 		if (hurtSpeed != 0) {
 			hurtSpeed = Helpers.toZero(hurtSpeed, 1.6f / flinchTime * Global.speedMul, hurtDir);
-			character.move(new Point(hurtSpeed * 60f, 0));
+			if (character is not BaseSigma && !character.isToughGuyHyperMode()) //Tough guy
+				character.move(new Point(hurtSpeed * 60f, 0));
 		}
 		if (character is Axl axl) {
 			axl.stealthRevealTime = Axl.maxStealthRevealTime;

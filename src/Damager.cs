@@ -99,12 +99,20 @@ public class Damager {
 			if (chr.player.isAxl && newFlinch > 0) {
 				if (newFlinch < Global.halfFlinch) {
 					newFlinch = Global.halfFlinch;
-				}
-				else if (newFlinch < Global.defFlinch) {
+				} else if (newFlinch < Global.defFlinch) {
 					newFlinch = Global.defFlinch;
-				}
-				else {
+				} else {
 					newFlinch = Global.superFlinch;
+				}
+			}
+			// Tough Guy.
+			if (chr.player.isSigma || chr.isToughGuyHyperMode()) {
+				if (newFlinch >= Global.superFlinch) {
+					newFlinch = Global.halfFlinch;
+				} else if (newFlinch > Global.miniFlinch) {
+					newFlinch = Global.miniFlinch;
+				} else if (newFlinch <= Global.miniFlinch) {
+					newFlinch = 0;
 				}
 			}
 		}
@@ -505,8 +513,8 @@ public class Damager {
 			if (mmx != null) {
 				if (XWeaknesses.checkMaverickWeakness(mmx.player, (ProjIds)projId)) {
 					weakness = true;
-					if (flinch == 0 && flinchCooldown == 0) {
-						flinchCooldown = 1;
+					if (flinch <= 0 && flinchCooldown <= 0) {
+						flinchCooldown = 60;
 					}
 					flinch = Global.defFlinch;
 					if (damage == 0) {
@@ -526,18 +534,15 @@ public class Damager {
 			)) {
 				if (flinch <= 0) {
 					flinch = Global.halfFlinch;
-					flinchCooldown = 1;
-				}
-				else if (flinch < Global.halfFlinch) {
+				} else if (flinch < Global.halfFlinch) {
 					flinch = Global.halfFlinch;
-				}
-				else if (flinch < Global.defFlinch) {
+				} else if (flinch < Global.defFlinch) {
 					flinch = Global.defFlinch;
-				}
-				else {
+				} else {
 					flinch = Global.superFlinch;
 				}
-				damage = MathF.Ceiling(damage * 1.5f);
+				flinchCooldown = 60;
+				damage = MathF.Ceiling(damage * 0.01f);
 			}
 			// Disallow flinch stack for non-BZ.
 			else if (!Global.canFlinchCombo) {
