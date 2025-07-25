@@ -441,6 +441,14 @@ public class MaverickState {
 	}
 }
 
+
+public class MLimboState : MaverickState {
+	public MLimboState() : base("") {
+		aiAttackCtrl = true;
+		canBeCanceled = false;
+	}
+}
+
 public class MIdle : MaverickState {
 	public MIdle(string transitionSprite = "") : base("idle", transitionSprite) {
 		normalCtrl = true;

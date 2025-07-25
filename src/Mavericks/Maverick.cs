@@ -192,7 +192,7 @@ public class Maverick : Actor, IDamagable {
 		maxHealth = player.getMaverickMaxHp(controlMode);
 		health = maxHealth;
 		splashable = true;
-		state = new MaverickState("");
+		state = new MLimboState();
 		if (ownedByLocalPlayer) {
 			changeState(overrideState ?? new MEnter(destPos));
 		}
