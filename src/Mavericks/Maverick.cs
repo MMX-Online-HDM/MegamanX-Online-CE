@@ -192,7 +192,10 @@ public class Maverick : Actor, IDamagable {
 		maxHealth = player.getMaverickMaxHp(controlMode);
 		health = maxHealth;
 		splashable = true;
-		changeState(overrideState ?? new MEnter(destPos));
+		state = new MaverickState("");
+		if (ownedByLocalPlayer) {
+			changeState(overrideState ?? new MEnter(destPos));
+		}
 		_input = new Input(true);
 
 		if (Global.level.gameMode.isTeamMode && Global.level.mainPlayer != player) {
@@ -734,10 +737,9 @@ public class Maverick : Actor, IDamagable {
 	}
 
 	public void changeState(MaverickState newState, bool ignoreCooldown = false) {
-		//if (state != null && newState != null && !newState.canEnterSelf && state.GetType() == newState.GetType()) {
-		// return;
-		//}
-		//if (newState == null) return;
+		if (!newState.canEnterSelf && state.GetType() == newState.GetType()) {
+			return;
+		}
 		if (state is MDie) {
 			return;
 		}
