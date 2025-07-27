@@ -71,7 +71,7 @@ public class Damager {
 		this.owner = owner;
 		this.damage = damage;
 		this.flinch = flinch;
-		this.hitCooldown = hitCooldown;
+		this.hitCooldownSeconds = hitCooldown;
 		this.knockback = knockback;
 	}
 
@@ -542,7 +542,7 @@ public class Damager {
 					flinch = Global.superFlinch;
 				}
 				flinchCooldown = 60;
-				damage = MathF.Ceiling(damage * 0.01f);
+				damage = MathF.Ceiling(damage * 1.5f);
 			}
 			// Disallow flinch stack for non-BZ.
 			else if (!Global.canFlinchCombo) {
