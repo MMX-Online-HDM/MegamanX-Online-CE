@@ -1206,6 +1206,9 @@ public partial class Player {
 		if (Global.level.isHyperMatch() && ownedByLocalPlayer) {
 			if (newChar is MegamanX mmx) {
 				mmx.hasUltimateArmor = true;
+				if (!weapons.Any(w => w is HyperNovaStrike)) {
+					weapons.Add(new HyperNovaStrike());
+				}
 			}
 			if (newChar is Zero zero) {
 				if (loadout.zeroLoadout.hyperMode == 0) {
@@ -1225,8 +1228,20 @@ public partial class Player {
 				} else {
 					axl.stingChargeTime = 8;
 					axl.hyperAxlUsed = true;
-					currency = 9999;
+					currency = 9999; //wat
 				}
+			}
+			if (newChar is PunchyZero pzero) {
+				if (loadout.pzeroLoadout.hyperMode == 0) {
+					pzero.isBlack = true;
+				} else if (loadout.pzeroLoadout.hyperMode == 1) {
+					pzero.awakenedPhase = 1;
+				} else {
+					pzero.isViral = true;
+				}
+			}
+			if (newChar is BusterZero bzero) {
+				bzero.isBlackZero = true;
 			}
 		}
 		if (isAI) {
@@ -1679,9 +1694,14 @@ public partial class Player {
 		if (weapon != null && oldATrans) {
 			weapon.shootCooldown = 0.25f;
 		}
+		if (character is MegamanX mmx) {
+			if (dnaCore.hyperMode == DNACoreHyperMode.UltimateArmor) {
+				mmx.hasUltimateArmor = true;
+				//retChar.weapons.Add(new HyperNovaStrike());
+			}
+		}
 		if (character is Zero zero) {
 			zero.gigaAttack.ammo = dnaCore.rakuhouhaAmmo;
-
 			if (dnaCore.hyperMode == DNACoreHyperMode.BlackZero) {
 				zero.isBlack = true;
 				zero.hyperMode = 0;
@@ -1692,16 +1712,30 @@ public partial class Player {
 				zero.isViral = true;
 				zero.hyperMode = 2;
 			}
+		} else if (character is PunchyZero pzero) {
+			pzero.gigaAttack.ammo = dnaCore.rakuhouhaAmmo;
+			if (dnaCore.hyperMode == DNACoreHyperMode.BlackZero) {
+				pzero.isBlack = true;
+				pzero.hyperMode = 0;
+			} else if (dnaCore.hyperMode == DNACoreHyperMode.AwakenedZero) {
+				pzero.awakenedPhase = 1;
+				pzero.hyperMode = 1;
+			} else if (dnaCore.hyperMode == DNACoreHyperMode.NightmareZero) {
+				pzero.isViral = true;
+				pzero.hyperMode = 2;
+			}
+		} else if (character is BusterZero bzero) {
+			if (dnaCore.hyperMode == DNACoreHyperMode.BlackZero) {
+				bzero.isBlackZero = true;
+			}
 		} else if (charNum == (int)CharIds.Axl && character is Axl axl) {
 			if (dnaCore.hyperMode == DNACoreHyperMode.WhiteAxl) {
 				axl.whiteAxlTime = axl.maxHyperAxlTime;
 			}
 			axl.axlSwapTime = 0.25f;
-		}
-		else if (character is CmdSigma sigma) {
+		} else if (character is CmdSigma sigma) {
 			sigma.ballWeapon.ammo = dnaCore.rakuhouhaAmmo;
-		}
-		else if (character is NeoSigma neoSigma) {
+		} else if (character is NeoSigma neoSigma) {
 			neoSigma.gigaAttack.ammo = dnaCore.rakuhouhaAmmo;
 		}
 		if (oldATrans) {

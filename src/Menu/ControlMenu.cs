@@ -184,21 +184,16 @@ public class ControlMenu : IMainMenu {
 	}
 
 	public void render() {
-		var topLeft = new Point(startX + 10, 28);
-		int startYOff = 10;
+		var topLeft = new Point(startX + 86, 34);
+		int startYOff = 8;
 		int cursorYOff = 6;
 
 		if (!inGame) {
 			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0);
-			DrawWrappers.DrawTextureHUD(
-				Global.textures["cursor"], startX,
-				topLeft.y + startYOff + (selectArrowPosY * 8) + cursorYOff
-			);
+			//DrawWrappers.DrawTextureHUD(Global.textures["cursor"], startX, topLeft.y + startYOff + (selectArrowPosY * 8) + cursorYOff);
 		} else {
 			DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
-			Global.sprites["cursor"].drawToHUD(
-				0, startX, topLeft.y + startYOff + (selectArrowPosY * 8) + cursorYOff + 5
-			);
+			//Global.sprites["cursor"].drawToHUD(0, startX, topLeft.y + startYOff + (selectArrowPosY * 8) + cursorYOff + 5);
 		}
 
 		string subtitle = charNum switch {
@@ -212,20 +207,33 @@ public class ControlMenu : IMainMenu {
 			4 => "SIGMA CONTROLS",
 			_ => "GENERAL CONTROLS"
 		};
-		Fonts.drawText(FontType.Yellow, subtitle, Global.halfScreenW, 24, Alignment.Center);
+		if (charNum != 3) {
+			Fonts.drawText(inGame ? FontType.Yellow : FontType.Golden, subtitle, Global.halfScreenW,
+			24, Alignment.Center); //Not axl
+		} else {
+			Fonts.drawText(inGame ? FontType.Yellow : FontType.Golden, subtitle, Global.halfScreenW,
+			inGame ? - 10 : 3, Alignment.Center); // Axl
+		}
 
 		if (isController) {
-			Fonts.drawText(
-				FontType.Golden, "Setting controls for controller \"" +
-				Control.getControllerName() + "\"",
-				Global.halfScreenW, 32, alignment: Alignment.Center
-			);
-		} else {
-			Fonts.drawText(
-				FontType.Golden, "Setting controls for keyboard",
-				Global.halfScreenW, 32, alignment: Alignment.Center
-			);
-		}
+				Fonts.drawText(
+					inGame ? FontType.Yellow : FontType.Golden, "CONTROLLER CONFIG \"" +
+					Control.getControllerName() + "\"",
+					Global.halfScreenW, 44, alignment: Alignment.Center
+				);
+			} else {
+				if (charNum != 3) { //Not Axl
+					Fonts.drawText(
+						inGame ? FontType.Yellow : FontType.Golden, "KEY CONFIG",
+						Global.halfScreenW, 36, alignment: Alignment.Center
+					);
+				} else { // Axl
+					Fonts.drawText(
+						inGame ? FontType.Yellow : FontType.Golden, "KEY CONFIG",
+						Global.halfScreenW, 12, alignment: Alignment.Center
+					);
+				}
+			}
 
 		for (int i = 0; i < bindableControls.Count; i++) {
 			var bindableControl = bindableControls[i];
@@ -234,14 +242,20 @@ public class ControlMenu : IMainMenu {
 				boundKeyDisplay = "(Inherit)";
 			}
 			Fonts.drawText(
-				FontType.Blue, bindableControl[1] + ":",
-				topLeft.x, topLeft.y + startYOff + 8 * (i + 1),
-				selected: selectArrowPosY == i
+				inGame ? FontType.Blue : FontType.DarkBlue,
+				bindableControl[1] + "",
+				topLeft.x,
+				charNum != 3 ? topLeft.y + startYOff + 9 * (i + 1) //Not Axl
+				: topLeft.y - 29 + startYOff + 9 * (i + 1), // Axl
+				alignment: Alignment.Center, selected: selectArrowPosY == i, selectedFont: FontType.Pink
 			);
 			Fonts.drawText(
-				FontType.Blue, boundKeyDisplay,
-				topLeft.x + 80, topLeft.y + startYOff + 8 * (i + 1),
-				selected: selectArrowPosY == i
+				inGame ? FontType.Blue : FontType.DarkOrange, boundKeyDisplay,
+				boundKeyDisplay != null ? topLeft.x + 70 : topLeft.x + 80,
+				charNum != 3 ? topLeft.y + startYOff + 9 * (i + 1) //Not Axl
+				: topLeft.y - 29 + startYOff + 9 * (i + 1), // Axl
+				alignment: Alignment.Center, selected: selectArrowPosY == i,
+				selectedFont: inGame ? FontType.Blue : FontType.DarkOrange
 			);
 		}
 
@@ -276,6 +290,41 @@ public class ControlMenu : IMainMenu {
 				FontType.Grey, Helpers.controlText("Press [OK] to continue"),
 				Global.screenW / 2, 20 + top, alignment: Alignment.Center
 			);
+		}
+		if (charNum != 3) { //Not Axl
+			for (int i = 0; i < 40; i++)
+				Global.sprites["optionMode_tubes"].drawToHUD(1, Global.halfScreenW - 80, Global.halfScreenH - 64 + i * 3);
+			for (int i = 0; i < 40; i++)
+				Global.sprites["optionMode_tubes"].drawToHUD(1, Global.halfScreenW + 80, Global.halfScreenH - 64 + i * 3);
+			for (int i = 0; i < 51; i++)
+				Global.sprites["optionMode_tubes"].drawToHUD(0, Global.halfScreenW - 75 + i * 3, Global.halfScreenH + 58);
+			for (int i = 0; i < 11; i++)
+				Global.sprites["optionMode_tubes"].drawToHUD(0, Global.halfScreenW - 75 + i * 3, Global.halfScreenH - 69);
+			for (int i = 0; i < 11; i++)
+				Global.sprites["optionMode_tubes"].drawToHUD(0, Global.halfScreenW + 45 + i * 3, Global.halfScreenH - 69);
+			Global.sprites["optionMode_tubes"].drawToHUD(5, Global.halfScreenW - 79, Global.halfScreenH + 58);
+			Global.sprites["optionMode_tubes"].drawToHUD(4, Global.halfScreenW + 80, Global.halfScreenH + 58);
+			Global.sprites["optionMode_tubes"].drawToHUD(7, Global.halfScreenW - 79, Global.halfScreenH - 68);
+			Global.sprites["optionMode_tubes"].drawToHUD(6, Global.halfScreenW + 80, Global.halfScreenH - 68);
+			Global.sprites["optionMode_tubes"].drawToHUD(2, Global.halfScreenW + 42, Global.halfScreenH - 69);
+			Global.sprites["optionMode_tubes"].drawToHUD(3, Global.halfScreenW - 42, Global.halfScreenH - 69);
+		} else { //Axl
+			for (int i = 0; i < 56; i++)
+				Global.sprites["optionMode_tubes"].drawToHUD(1, Global.halfScreenW - 80, Global.halfScreenH - 88 + i * 3);
+			for (int i = 0; i < 56; i++)
+				Global.sprites["optionMode_tubes"].drawToHUD(1, Global.halfScreenW + 80, Global.halfScreenH - 88 + i * 3);
+			for (int i = 0; i < 51; i++)
+				Global.sprites["optionMode_tubes"].drawToHUD(0, Global.halfScreenW - 75 + i * 3, Global.halfScreenH + 80);
+			for (int i = 0; i < 11; i++)
+				Global.sprites["optionMode_tubes"].drawToHUD(0, Global.halfScreenW - 75 + i * 3, Global.halfScreenH - 94);
+			for (int i = 0; i < 11; i++)
+				Global.sprites["optionMode_tubes"].drawToHUD(0, Global.halfScreenW + 45 + i * 3, Global.halfScreenH - 93);
+			Global.sprites["optionMode_tubes"].drawToHUD(5, Global.halfScreenW - 79, Global.halfScreenH + 80);
+			Global.sprites["optionMode_tubes"].drawToHUD(4, Global.halfScreenW + 80, Global.halfScreenH + 80);
+			Global.sprites["optionMode_tubes"].drawToHUD(7, Global.halfScreenW - 79, Global.halfScreenH - 92);
+			Global.sprites["optionMode_tubes"].drawToHUD(6, Global.halfScreenW + 80, Global.halfScreenH - 92);
+			Global.sprites["optionMode_tubes"].drawToHUD(2, Global.halfScreenW + 42, Global.halfScreenH - 93);
+			Global.sprites["optionMode_tubes"].drawToHUD(3, Global.halfScreenW - 42, Global.halfScreenH - 94);
 		}
 	}
 }

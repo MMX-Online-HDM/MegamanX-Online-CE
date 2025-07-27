@@ -71,6 +71,7 @@ public class CustomMatchSettings {
 			AxlDodgerollCooldown = 1.25f,
 			AxlCustomReload = false,
 			AxlFTADodgeroll = false,
+			oldATrans = false,
 		};
 	}
 }
@@ -257,7 +258,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 				(Point pos, int index) => {
 					Fonts.drawText(
 						FontType.Blue,
-						"1v1 or Hypermode Match : " +
+						"Hypermode Match : " +
 						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.hyperModeMatch),
 						pos.x, pos.y, selected: selectArrowPosY == 9
 					);
@@ -570,6 +571,22 @@ public class CustomMatchSettingsMenu : IMainMenu {
 						"Axl Weapons Capable to Reload: " +
 						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.AxlCustomReload),
 						pos.x, pos.y, selected: selectArrowPosY3 == 5
+					);
+				}
+			)
+		);
+		menuOptions3.Add(
+			new MenuOption(
+				startX3, currentY3 += lineH3,
+				() => {
+					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.oldATrans, true);
+				},
+				(Point pos, int index) => {
+					Fonts.drawText(
+						FontType.Purple,
+						"Axl Vanilla DNA: " +
+						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.oldATrans),
+						pos.x, pos.y, selected: selectArrowPosY3 == 6
 					);
 				}
 			)

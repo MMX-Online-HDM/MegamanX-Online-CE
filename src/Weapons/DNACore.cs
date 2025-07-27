@@ -22,6 +22,7 @@ public enum DNACoreHyperMode {
 	WhiteAxl,
 	AwakenedZero,
 	NightmareZero,
+	UltimateArmor,
 }
 
 public class DNACore : AxlWeapon {
@@ -37,6 +38,7 @@ public class DNACore : AxlWeapon {
 	public bool ultimateArmor;
 	public DNACoreHyperMode hyperMode;
 	public float rakuhouhaAmmo;
+	public float hyperNovaAmmo;
 	public List<Weapon> weapons = new List<Weapon>();
 	public bool usedOnce = false;
 
@@ -54,6 +56,9 @@ public class DNACore : AxlWeapon {
 			weapons = loadout.xLoadout.getWeaponsFromLoadout(character.player);
 			armorFlag = mmx.getArmorByte();
 			ultimateArmor = mmx.hasUltimateArmor;
+			if (mmx.hasUltimateArmor) {
+				hyperMode = DNACoreHyperMode.UltimateArmor;
+			}
 			hyperArmorBools = Helpers.boolArrayToByte([
 				mmx.hyperChestActive,
 				mmx.hyperArmActive,
@@ -79,6 +84,10 @@ public class DNACore : AxlWeapon {
 					2 => DNACoreHyperMode.NightmareZero,
 					_ => DNACoreHyperMode.BlackZero
 				};
+			}
+		} else if (character is BusterZero bzero) {
+			if (bzero.isBlackZero) {
+				hyperMode = DNACoreHyperMode.BlackZero;
 			}
 		}
 		else if (character is Axl) {
@@ -151,7 +160,7 @@ public class DNACore : AxlWeapon {
 			Global.level.gameMode.setHUDErrorMessage(player, "Cannot transform with flag");
 			return;
 		}
-		if (!oldATrans && (axl.isWhiteAxl() || axl.isStealthMode())) {
+		if (!oldATrans && (!Global.level.isHyperMatch() && (axl.isWhiteAxl() || axl.isStealthMode()))) {
 			Global.level.gameMode.setHUDErrorMessage(player, "Cannot transform as Hyper Axl");
 			return;
 		}

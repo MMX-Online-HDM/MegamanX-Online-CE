@@ -4,8 +4,8 @@ namespace MMXOnline;
 
 public class ConfirmLeaveMenu : IMainMenu {
 	public int selectY;
-	public Point optionPos1 = new Point(80, 70);
-	public Point optionPos2 = new Point(80, 90);
+	public Point optionPos1 = new Point(Global.halfScreenW, 70);
+	public Point optionPos2 = new Point(Global.halfScreenW, 90);
 	public Point optionPos5 = new Point(50, 170);
 	public IMainMenu prevMenu;
 	public string message;
@@ -46,13 +46,22 @@ public class ConfirmLeaveMenu : IMainMenu {
 			}
 		} else {
 			Fonts.drawText(
-				FontType.Yellow, message, Global.screenW * 0.5f, 20, Alignment.Center
+				FontType.Yellow, message, Global.screenW * 0.5f+7, 20, Alignment.Center
 			);
 		}
-		Global.sprites["cursor"].drawToHUD(0, 70, 76 + (selectY * 20) - 3);
-
-		Fonts.drawText(FontType.Blue, "No", optionPos1.x, optionPos1.y, selected: selectY == 0);
-		Fonts.drawText(FontType.Blue, "Yes", optionPos2.x, optionPos2.y, selected: selectY == 1);
+		//Global.sprites["cursor"].drawToHUD(0, 70, 76 + (selectY * 20) - 3);
+		if (Global.frameCount % 60 < 30) {
+			if (selectY == 0) {
+				Fonts.drawText(FontType.Blue, "<", optionPos1.x - 15, optionPos1.y, Alignment.Center, selected: selectY == 0);
+				Fonts.drawText(FontType.Blue, ">", optionPos1.x + 15, optionPos1.y, Alignment.Center, selected: selectY == 0);
+			}
+			if (selectY == 1) {
+				Fonts.drawText(FontType.Blue, "<", optionPos2.x - 15, optionPos2.y, Alignment.Center, selected: selectY == 1);
+				Fonts.drawText(FontType.Blue, ">", optionPos2.x + 15, optionPos2.y, Alignment.Center, selected: selectY == 1);
+			}
+		}
+		Fonts.drawText(FontType.Blue, "No", optionPos1.x, optionPos1.y, Alignment.Center, selected: selectY == 0);
+		Fonts.drawText(FontType.Blue, "Yes", optionPos2.x, optionPos2.y, Alignment.Center, selected: selectY == 1);
 
 		Fonts.drawText(
 			FontType.Grey, "[OK]: Choose, [BACK]: Back",

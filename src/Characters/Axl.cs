@@ -468,7 +468,9 @@ public class Axl : Character {
 			altShootHeld = false;
 			altShootRecentlyPressed = false;
 		}
-
+		if (player.weapon is DoubleBullet && Global.level.isHyperMatch() && player.axlBulletTypeAmmo[4] < 99) {
+			player.axlBulletTypeAmmo[4] += 1;
+		}
 		bool bothHeld = shootHeld && altShootHeld;
 
 		if (player.weapon is AxlBullet || player.weapon is DoubleBullet ||

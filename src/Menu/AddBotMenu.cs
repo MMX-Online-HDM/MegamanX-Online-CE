@@ -12,8 +12,8 @@ public class AddBotMenu : IMainMenu {
 
 	public List<Point> optionPoses = new List<Point>()
 	{
-			new Point(30, 100),
-			new Point(30, 120),
+			new Point(Global.halfScreenW, 70),
+			new Point(Global.halfScreenW, 90),
 		};
 	public int ySep = 10;
 
@@ -79,7 +79,7 @@ public class AddBotMenu : IMainMenu {
 
 	public void render() {
 		DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
-		Global.sprites["cursor"].drawToHUD(0, 15, optionPoses[selectArrowPosY].y + 5);
+		//Global.sprites["cursor"].drawToHUD(0, optionPoses[0].x- 80, optionPoses[selectArrowPosY].y + 3);
 
 		Fonts.drawText(FontType.Orange, "Add Bot", Global.halfScreenW, 15, alignment: Alignment.Center);
 
@@ -96,11 +96,11 @@ public class AddBotMenu : IMainMenu {
 
 		Fonts.drawText(
 			FontType.Blue, "Character: " + botCharStr,
-			optionPoses[0].x, optionPoses[0].y, selected: selectArrowPosY == 0
+			optionPoses[0].x, optionPoses[0].y, Alignment.Center, selected: selectArrowPosY == 0
 		);
 		Fonts.drawText(
-			teamOptionEnabled() ? FontType.Green : FontType.DarkGreen, "Team: " + botTeamStr,
-			optionPoses[1].x, optionPoses[1].y,
+			teamOptionEnabled() ? FontType.DarkPurple : FontType.Grey, "Team: " + botTeamStr,
+			optionPoses[1].x, optionPoses[1].y, Alignment.Center,
 			selected: selectArrowPosY == 1
 		);
 

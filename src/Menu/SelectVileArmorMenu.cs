@@ -55,50 +55,61 @@ public class SelectVileArmorMenu : IMainMenu {
 
 	public void render() {
 		var mainPlayer = Global.level.mainPlayer;
+		Vile? CVile = mainPlayer.character as Vile;
 		var gameMode = Global.level.gameMode;
 		DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
-		Global.sprites["menu_viledefault"].drawToHUD(0, 310, 110);
+		DrawWrappers.DrawTextureHUD(Global.textures["vileNewMenuDefault"],  Global.halfScreenW+60, Global.halfScreenH-103);
 
 		if (!Global.level.server.disableHtSt && Global.frameCount % 60 < 30) {
 			Fonts.drawText(FontType.DarkPurple, "<", 18, Global.halfScreenH + 10, Alignment.Center);
 			Fonts.drawText(FontType.DarkPurple, "Items", 18, Global.halfScreenH + 20, Alignment.Center);
 		}
 
-		if (mainPlayer.speedDevil) Global.sprites["menu_vilespeeddevil"].drawToHUD(0, 310, 110);
-		if (mainPlayer.frozenCastle) Global.sprites["menu_vilefrozencastle"].drawToHUD(0, 310, 110);
+		//if (mainPlayer.speedDevil) Global.sprites["menu_vilespeeddevil"].drawToHUD(0, 310, 110);
+		//if (mainPlayer.frozenCastle) Global.sprites["menu_vilefrozencastle"].drawToHUD(0, 310, 110);
 
 		Global.sprites["cursor"].drawToHUD(0, optionPosX - 6, optionPosY[0] + selectArrowPosY * 40 + 3);
 
 		Fonts.drawText(FontType.Yellow, "Vile Armor", Global.screenW * 0.5f, 10, Alignment.Center);
+
 		Fonts.drawText(
 			FontType.Golden,
 			Global.nameCoins + ": " + mainPlayer.currency,
 			Global.screenW * 0.5f, 20, Alignment.Center
 		);
 
-		Fonts.drawText(FontType.Blue, "Frozen Castle", optionPosX, optionPosY[0],
+		Fonts.drawText(
+			mainPlayer.currency < Vile.frozenCastleCost && CVile?.hasFrozenCastle == false ? FontType.Grey : FontType.Blue,
+			"Frozen Castle", optionPosX, optionPosY[0],
 			selected: selectArrowPosY == 0
 		);
 		Fonts.drawText(
-			FontType.Purple, $" ({Vile.frozenCastleCost} {Global.nameCoins})",
-			optionPosX + 110, optionPosY[0]
+			mainPlayer.currency < Vile.frozenCastleCost && CVile?.hasFrozenCastle == false ? FontType.Grey :
+			CVile?.hasFrozenCastle == true ? FontType.Orange : FontType.Purple ,
+			CVile?.hasFrozenCastle == false ? $"({Vile.frozenCastleCost} {Global.nameCoins})" : "(Bought)",
+			optionPosX + 86, optionPosY[0]
 		);
 		Fonts.drawText(
-			FontType.Green, "By utilizing a thin layer of ice," +
+			mainPlayer.currency < Vile.frozenCastleCost && CVile?.hasFrozenCastle == false ? FontType.Grey : FontType.DarkPurple,
+			"By utilizing a thin layer of ice," +
 			"\nthis armor reduces damage by 12.5%",
 			optionPosX, optionPosY[1]
 		);
 
 		Fonts.drawText(
-			FontType.Blue, "Speed Devil", optionPosX, optionPosY[2],
+			mainPlayer.currency < Vile.speedDevilCost && CVile?.hasSpeedDevil == false ? FontType.Grey : FontType.Blue,
+			"Speed Devil", optionPosX, optionPosY[2],
 			selected: selectArrowPosY == 1
 		);
 		Fonts.drawText(
-			FontType.Purple, $" ({Vile.speedDevilCost} {Global.nameCoins})",
-			optionPosX + 110, optionPosY[2]
+			mainPlayer.currency < Vile.speedDevilCost && CVile?.hasSpeedDevil == false ? FontType.Grey :
+			CVile?.hasSpeedDevil == true ? FontType.Orange : FontType.Purple,
+			CVile?.hasSpeedDevil == false ? $"({Vile.speedDevilCost} {Global.nameCoins})" : "(Bought)",
+			optionPosX + 86, optionPosY[2]
 		);
 		Fonts.drawText(
-			FontType.Green, "A layer of atmospheric pressure\nincreases movement speed by 10%.",
+			mainPlayer.currency < Vile.speedDevilCost && CVile?.hasSpeedDevil == false ? FontType.Grey : FontType.DarkPurple,
+			"A layer of atmospheric pressure\nincreases movement speed by 10%.",
 			optionPosX, optionPosY[3]
 		);
 

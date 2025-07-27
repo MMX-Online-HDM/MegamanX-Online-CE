@@ -2185,6 +2185,9 @@ public class GameMode {
 				float alpha = Helpers.clamp01(1 - animProgress);
 				Global.sprites["hud_scrap"].drawToHUD(0, x - 6, y - yOff - 10, alpha);
 				//DrawWrappers.DrawText("+1", x - 6, y - yOff - 10, Alignment.Center, )
+				if (Global.level.isHyperMatch()) {
+					Fonts.drawText(FontType.RedishOrange, "+5", x - 4, y - yOff - 15, Alignment.Left);	
+				} else 
 				Fonts.drawText(FontType.RedishOrange, "+1", x - 4, y - yOff - 15, Alignment.Left);
 			}
 		}

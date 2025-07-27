@@ -188,6 +188,7 @@ public class OptionsMenu : IMainMenu {
 					"Set to Yes to enable vsync.\nMakes movement/scrolling smoother, but adds input lag."
 				),
 				// Use optimized sprites
+				/*
 				new MenuOption(
 					30, startY,
 					() => {
@@ -206,6 +207,7 @@ public class OptionsMenu : IMainMenu {
 					},
 					"Set to Yes to use optimized assets.\nThis can result in better performance."
 				),
+				*/
 				// Full screen integer
 				new MenuOption(
 					30, startY,

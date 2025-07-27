@@ -61,7 +61,11 @@ public class MaverickWeapon : Weapon {
 				if (currencyGainCooldown >= currencyGainMaxCooldown) {
 					currencyGainCooldown = 0;
 					currencyHUDAnimTime = Global.spf;
-					player.currency++;
+					if (Global.level.isHyperMatch()) {
+						player.currency += 5;
+					} else {
+						player.currency++;
+					}
 				}
 			}
 		}

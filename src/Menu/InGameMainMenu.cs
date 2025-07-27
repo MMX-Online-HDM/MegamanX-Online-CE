@@ -11,7 +11,25 @@ public class InGameMainMenu : IMainMenu {
 		150,
 		170
 	};
-	public float startX = 92;
+	public int[] optionPos2 = {
+		(int)Global.halfScreenW - 50,
+		(int)Global.halfScreenW - 50,
+		(int)Global.halfScreenW - 60,
+		(int)Global.halfScreenW - 50,
+		(int)Global.halfScreenW - 40,
+		(int)Global.halfScreenW - 40,
+		(int)Global.halfScreenW - 50
+	};
+	public int[] optionPos3 = {
+		(int)Global.halfScreenW + 50,
+		(int)Global.halfScreenW + 50,
+		(int)Global.halfScreenW + 60,
+		(int)Global.halfScreenW + 50,
+		(int)Global.halfScreenW + 40,
+		(int)Global.halfScreenW + 40,
+		(int)Global.halfScreenW + 50
+	};
+	public float startX = Global.halfScreenW - 1;
 
 	public InGameMainMenu() {
 	}
@@ -124,29 +142,36 @@ public class InGameMainMenu : IMainMenu {
 
 	public void render() {
 		DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
-		Fonts.drawText(FontType.Yellow, "MENU", Global.screenW * 0.5f, 20, Alignment.Center);
-
-		Global.sprites["cursor"].drawToHUD(0, startX - 10, optionPos[0] + 3 + (selectY * 20));
+		Fonts.drawText(FontType.Yellow, "MENU", Global.halfScreenW-2, 20, Alignment.Center);
+		if (Global.frameCount % 60 < 30) {
+			for (int i = 0; i < 7; i++) {
+				if (selectY == i) {
+					Fonts.drawText(FontType.Blue, "<", optionPos2[i], optionPos[i], Alignment.Center, selected: selectY == i);
+					Fonts.drawText(FontType.Blue, ">", optionPos3[i]-1, optionPos[i], Alignment.Center, selected: selectY == i);
+				}
+			}
+		}
+//		Global.sprites["cursor"].drawToHUD(0, startX - 60, optionPos[0] + 3 + (selectY * 20));
 
 		Fonts.drawText(
 			isSelWepDisabled() ? FontType.DarkBlue : FontType.Blue,
-			"Edit Loadout", startX, optionPos[0], selected: selectY == 0
+			"Edit Loadout", startX, optionPos[0], Alignment.Center, selected: selectY == 0
 		);
 		Fonts.drawText(
 			isSelArmorDisabled() ? FontType.DarkBlue : FontType.Blue,
-			"Upgrade Menu", startX, optionPos[1], selected: selectY == 1
+			"Upgrade Menu", startX, optionPos[1], Alignment.Center, selected: selectY == 1
 		);
 		Fonts.drawText(
 			isSelCharDisabled() ? FontType.DarkBlue : FontType.Blue,
-			"Switch Character", startX, optionPos[2], selected: selectY == 2
+			"Switch Character", startX, optionPos[2], Alignment.Center, selected: selectY == 2
 		);
 		Fonts.drawText(
 			isMatchOptionsDisabled() ? FontType.DarkBlue : FontType.Blue,
-			"Match Options", startX, optionPos[3], selected: selectY == 3
+			"Match Options", startX, optionPos[3], Alignment.Center, selected: selectY == 3
 		);
-		Fonts.drawText(FontType.Blue, "Controls", startX, optionPos[4], selected: selectY == 4);
-		Fonts.drawText(FontType.Blue, "Settings", startX, optionPos[5], selected: selectY == 5);
-		Fonts.drawText(FontType.Blue, "Leave Match", startX, optionPos[6], selected: selectY == 6);
+		Fonts.drawText(FontType.Blue, "Controls", startX, optionPos[4], Alignment.Center, selected: selectY == 4);
+		Fonts.drawText(FontType.Blue, "Settings", startX, optionPos[5], Alignment.Center, selected: selectY == 5);
+		Fonts.drawText(FontType.Blue, "Leave Match", startX, optionPos[6], Alignment.Center, selected: selectY == 6);
 		Fonts.drawTextEX(FontType.Grey, "[OK]: Choose, [ESC]: Cancel", Global.halfScreenW, 198, Alignment.Center);
 	}
 }
