@@ -193,6 +193,7 @@ public class Maverick : Actor, IDamagable {
 		health = maxHealth;
 		splashable = true;
 		state = new MLimboState();
+		state.maverick = this;
 		if (ownedByLocalPlayer) {
 			changeState(overrideState ?? new MEnter(destPos));
 		}
