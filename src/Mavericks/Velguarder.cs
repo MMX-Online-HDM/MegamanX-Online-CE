@@ -77,17 +77,14 @@ public class Velguarder : Maverick {
 		if (target != null) {
 			enemyDist = MathF.Abs(target.pos.x - pos.x);
 		}
-		List<MaverickState> aiStates = [];
-		if (enemyDist > 70) {
-			aiStates.Add(new VelGPounceStartState());
+		if (enemyDist > 50) {
+			return [new VelGPounceStartState()];
 		}
-		if (enemyDist < 50) {
-			aiStates.Add(getShootState2());
-			aiStates.Add(getShootState());
-		} else {
-			aiStates.Add(new VelGPounceStartState());
-		}
-		return aiStates.ToArray();
+		return [
+			getShootState2(),
+			getShootState(),
+			new VelGPounceStartState()
+		];
 	}
 
 	// Melee IDs for attacks.

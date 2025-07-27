@@ -170,7 +170,7 @@ public class WheelGator : Maverick {
 		if (enemyDist <= 20) {
 			aiStates.Add(new WheelGBiteState());
 		}
-		if (enemyDistY > 15 && enemyDist <= 15) {
+		if (enemyDistY >= 15 && enemyDist <= 15) {
 			aiStates.Add(new WheelGUpBiteState());
 		}
 		return aiStates.ToArray();

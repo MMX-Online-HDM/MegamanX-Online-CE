@@ -23,7 +23,7 @@ public class MaverickStateConsecutiveData {
 	public int maxConsecutiveCount;
 	public float consecutiveDelay;
 
-	public MaverickStateConsecutiveData(int consecutiveCount, int maxConsecutiveCount, float consecutiveDelay) {
+	public MaverickStateConsecutiveData(int consecutiveCount, int maxConsecutiveCount, float consecutiveDelay = 0) {
 		this.consecutiveCount = consecutiveCount;
 		this.maxConsecutiveCount = maxConsecutiveCount;
 		this.consecutiveDelay = consecutiveDelay;

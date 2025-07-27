@@ -25,6 +25,7 @@ public class StingChameleon : Maverick {
 			{ typeof(MShoot), new(45, true) },
 			{ typeof(StingCTongueState), new(60, true) },
 			{ typeof(StingCClimbTongueState), new(60, true) },
+			{ typeof(StingCJumpAI), new(2 * 60) },
 			{ typeof(StingCHangState), new(2 * 60) },
 			{ typeof(StingCClingShootState), new(30) }
 		};
@@ -150,7 +151,7 @@ public class StingChameleon : Maverick {
 			new StingCStingProj(pos, xDir, 5, this, player, player.getNextActorNetId(), rpc: true);
 		}, "stingcSting");
 		if (isAI) {
-			shootState.consecutiveData = new MaverickStateConsecutiveData(0, 2, 0.5f);
+			shootState.consecutiveData = new MaverickStateConsecutiveData(0, 2);
 		}
 		return shootState;
 	}
@@ -169,14 +170,14 @@ public class StingChameleon : Maverick {
 		if (target != null) {
 			enemyDist = MathF.Abs(target.pos.x - pos.x);
 		}
-		List<MaverickState> aiStates = [];
+		List<MaverickState> aiStates = [
+			getShootState(isAI: false)
+		];
 		if (enemyDist <= 125) {
 			aiStates.Add(new StingCTongueState(0));
 		}
-		if (Helpers.randomRange(0, 10) == 0 && grounded && stateCooldowns[typeof(StingCHangState)].cooldown <= 0) {
+		if (Helpers.randomRange(0, 10) == 0 && grounded) {
 			aiStates.Add(new StingCJumpAI());
-		} else {
-			aiStates.Add(getShootState(isAI: false));
 		}
 		return aiStates.ToArray();
 	}

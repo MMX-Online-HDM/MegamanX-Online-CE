@@ -112,15 +112,15 @@ public class ChillPenguin : Maverick {
 		if (target != null) {
 			enemyDist = MathF.Abs(target.pos.x - pos.x);
 		}
-		List<MaverickState> aiStates = [];
+		List<MaverickState> aiStates = [
+			getShootState(false),
+			new ChillPIceBlowState()
+		];
 		if (enemyDist <= 180) {
 			aiStates.Add(new ChillPSlideState(true));
 		}
-		if (Helpers.randomRange(0, 3) == 0 && grounded && player.iceStatues.Count >= 1) {
+		if (Helpers.randomRange(0, 2) == 0 && grounded && player.iceStatues.Count >= 1) {
 			aiStates.Add(new ChillPBlizzardState(true));
-		} else {
-			aiStates.Add(getShootState(false));
-			aiStates.Add(new ChillPIceBlowState());
 		}
 		return aiStates.ToArray();
 	}

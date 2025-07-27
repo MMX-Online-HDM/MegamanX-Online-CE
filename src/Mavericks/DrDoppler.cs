@@ -98,21 +98,24 @@ public class DrDoppler : Maverick {
 	}
 
 	public override MaverickState[] aiAttackStates() {
-		List<MaverickState> aiStates = [];
-		foreach (GameObject gameObject in getCloseActors(64, true, false, false)) {
-			if (gameObject is Projectile proj && proj.damager.owner.alliance != player.alliance) {
-				if (proj.isMelee == false) continue;
-				aiStates.Add(new DrDopplerAbsorbState());
-				//yo why this doesn't work well
+		if (Helpers.randomRange(0, 2) == 1) {
+			foreach (GameObject gameObject in getCloseActors(64, true, false, false)) {
+				if (gameObject is Projectile proj &&
+					proj.damager.owner.alliance != player.alliance &&
+					!proj.isMelee
+				) {
+					return [new DrDopplerAbsorbState()];
+				}
 			}
 		}
+		List<MaverickState> aiStates = [];
 		if (shootTimes < 3) {
 			shootTimes++;
 			aiStates.Add(new DrDopplerShootState());
 		} else {
 			aiStates.Add(new DrDopplerDashStartState());
 			shootTimes = 0;
-		}		
+		}
 		return aiStates.ToArray();
 	}
 

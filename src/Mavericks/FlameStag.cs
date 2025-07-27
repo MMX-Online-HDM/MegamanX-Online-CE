@@ -98,7 +98,7 @@ public class FlameStag : Maverick {
 	public override MaverickState[] strikerStates() {
 		return [
 			new FStagShoot(false),
-			new FStagGrabState(false),
+			new FStagGrabState(true),
 			new FStagDashChargeState(),
 		];
 	}
@@ -111,14 +111,14 @@ public class FlameStag : Maverick {
 		bool canGrabTarget = (
 			target is Character chara && chara.canBeGrabbed()
 		);
-		List<MaverickState> aiStates = [];
+		List<MaverickState> aiStates = [
+			new FStagShoot(false)
+		];
 		if (enemyDist <= 20 && canGrabTarget) {
-			aiStates.Add(new FStagGrabState(false));
+			aiStates.Add(new FStagGrabState(true));
 		}
 		if (enemyDist > 40) {
 			aiStates.Add(new FStagDashChargeState());
-		} else {
-			aiStates.Add(new FStagShoot(false));
 		}
 		return aiStates.ToArray();
 	}

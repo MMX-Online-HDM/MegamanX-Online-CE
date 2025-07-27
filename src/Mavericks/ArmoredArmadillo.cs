@@ -15,10 +15,10 @@ public class ArmoredArmadillo : Maverick {
 	) : base(
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
-		stateCooldowns = new() {
-			{ typeof(MShoot), new(36, true) },
+		/*stateCooldowns = new() {
+			typeof(MShoot), new(36, true),
 			//{ typeof(ArmoredARollEnterState), new(4 * 60)) }
-		};
+		};*/
 
 		spriteToCollider["roll"] = getRollCollider();
 		spriteToCollider["na_roll"] = getRollCollider();
@@ -40,7 +40,7 @@ public class ArmoredArmadillo : Maverick {
 		canHealAmmo = true;
 		ammo = 32;
 		maxAmmo = 32;
-		grayAmmoLevel = 6;
+		grayAmmoLevel = 2;
 		barIndexes = (56, 45);
 	}
 
@@ -157,7 +157,7 @@ public class ArmoredArmadillo : Maverick {
 			new ArmoredAProj(pos, xDir, this, player, player.getNextActorNetId(), rpc: true);
 		}, "energyBall");
 		if (isAI) {
-			shootState.consecutiveData = new MaverickStateConsecutiveData(0, 3, 0.33f);
+			shootState.consecutiveData = new MaverickStateConsecutiveData(0, 2);//; 0.33f);
 		}
 		return shootState;
 	}

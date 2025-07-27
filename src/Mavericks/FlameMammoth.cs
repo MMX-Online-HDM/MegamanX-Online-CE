@@ -61,7 +61,7 @@ public class FlameMammoth : Maverick {
 			);
 		}, "flamemShoot");
 		if (isAI) {
-			shootState.consecutiveData = new MaverickStateConsecutiveData(0, 4, 0.5f);
+			shootState.consecutiveData = new MaverickStateConsecutiveData(0, 3);
 		}
 		return shootState;
 	}
@@ -86,7 +86,7 @@ public class FlameMammoth : Maverick {
 		if (grounded && enemyDist <= 30) {
 			aiStates.Add(new FlameMJumpStateAI());
 		} else {
-			aiStates.Add(getShootState(true));
+			aiStates.Add(getShootState(false));
 		}
 		return aiStates.ToArray();
 	}
