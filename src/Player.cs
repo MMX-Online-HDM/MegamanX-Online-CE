@@ -1821,7 +1821,7 @@ public partial class Player {
 		charNum = (int)CharIds.Axl;
 		character.pos = oldPos;
 		character.xDir = oldDir;
-		maxHealth = getMaxHealth();
+		maxHealth = character.getMaxHealth();
 		health = Math.Min(health, maxHealth);
 
 		if (ownedByLocalPlayer) {
@@ -1892,8 +1892,7 @@ public partial class Player {
 			return;
 		}
 		if (ownedByLocalPlayer) {
-			maxHealth = getMaxHealth();
-			health = 0;
+			character.health = 0;
 			configureWeapons(character);
 			character.weaponSlot = 0;
 			lastDNACore = null;
