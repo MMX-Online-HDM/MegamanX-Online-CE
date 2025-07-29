@@ -5,6 +5,7 @@ using System.Linq;
 namespace MMXOnline;
 
 public partial class KaiserSigma : Character {
+	public bool isVirus => sprite.name.StartsWith("kaisersigma_virus");
 	public bool kaiserWinTauntOnce;
 	public float kaiserMissileShootTime;
 	public Anim kaiserExhaustL = null!;
@@ -27,9 +28,10 @@ public partial class KaiserSigma : Character {
 
 	public KaiserSigma(
 		Player player, float x, float y, int xDir, bool isVisible,
-		ushort? netId, bool ownedByLocalPlayer, bool isWarpIn = false, bool isRevive = true
+		ushort? netId, bool ownedByLocalPlayer, bool isWarpIn = false,
+		bool isRevive = true, bool isATrans = false
 	) : base(
-		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn
+		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, 0, isATrans
 	) { 
 		charId = CharIds.KaiserSigma;
 		kaiserExhaustL = new Anim(
@@ -64,6 +66,13 @@ public partial class KaiserSigma : Character {
 		grounded = false;
 		canBeGrounded = false;
 		altSoundId = AltSoundIds.X3;
+	}
+
+	public override int getMaxHealth() {
+		if (isATrans) {
+			return base.getMaxHealth();
+		}
+		return Player.getModifiedHealth(32);
 	}
 
 	public override void update() {
@@ -112,7 +121,7 @@ public partial class KaiserSigma : Character {
 	}
 
 	public override Collider? getGlobalCollider() {
-		if (player.isKaiserViralSigma()) {
+		if (isVirus) {
 			if (sprite.name == "kaisersigma_virus_return") {
 				return null;
 			}
@@ -193,7 +202,7 @@ public partial class KaiserSigma : Character {
 	}
 
 	public override float getLabelOffY() {
-		if (player.isKaiserViralSigma()) {
+		if (isVirus) {
 			return 60;
 		}
 		return 125;
@@ -228,7 +237,7 @@ public partial class KaiserSigma : Character {
 	}
 
 	public override Point getAimCenterPos() {
-		if (isVirus()) {
+		if (isVirus) {
 			return pos.addxy(13 * xDir, -95);
 		}
 		return getCenterPos();
@@ -346,10 +355,6 @@ public partial class KaiserSigma : Character {
 
 	public override bool isPushImmune() {
 		return true;
-	}
-
-	public bool isVirus() {
-		return sprite.name.StartsWith("kaisersigma_virus");
 	}
 	
 	public override void onDeath() {

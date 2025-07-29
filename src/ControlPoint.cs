@@ -246,13 +246,11 @@ public class ControlPoint : Actor {
 	}
 
 	public bool canDefend(Character c) {
-		if (c.player.isDisguisedAxl) return false;
-		return true;
+		return !c.isATrans || c.disguiseCoverBlown;
 	}
 
 	public bool canAttack(Character c) {
-		if (c.player.isDisguisedAxl) return false;
-		return true;
+		return !c.isATrans || c.disguiseCoverBlown;
 	}
 
 	public override void render(float x, float y) {

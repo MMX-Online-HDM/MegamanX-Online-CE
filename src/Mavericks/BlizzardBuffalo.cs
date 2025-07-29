@@ -313,9 +313,10 @@ public class BBuffaloIceProjGround : Projectile, IDamagable {
 		return damagerAlliance != owner.alliance;
 	}
 	public bool isInvincible(Player attacker, int? projId) {
-		return false;
-		//if (projId == null) return true;
-		//return !Damager.canDamageFrostShield(projId.Value);
+		if (projId == null) {
+			return true;
+		}
+		return !Damager.canDamageFrostShield(projId.Value);
 	}
 	public bool isPlayableDamagable() { return false; }
 

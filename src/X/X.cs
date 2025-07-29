@@ -134,25 +134,20 @@ public class MegamanX : Character {
 	public MegamanX(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
-		bool isWarpIn = true, XLoadout? xLoadout = null
+		bool isWarpIn = true, XLoadout? loadout = null,
+		int? heartTanks = null, bool isATrans = false
 	) : base(
-		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn
+		player, x, y, xDir, isVisible,
+		netId, ownedByLocalPlayer, isWarpIn,
+		heartTanks, isATrans
 	) {
 		charId = CharIds.X;
-		// Configure loadout.
-		if (xLoadout == null) {
-			// Copy if null;
-			XLoadout playerLoadout = player.loadout.xLoadout;
-			xLoadout = new XLoadout();
-			xLoadout.weapon1 = playerLoadout.weapon1;
-			xLoadout.weapon2 = playerLoadout.weapon2;
-			xLoadout.weapon3 = playerLoadout.weapon3;
-			xLoadout.melee = playerLoadout.melee;
-		}
+		// Configure loadout. Copy if null;
+		loadout ??= player.loadout.xLoadout.clone();
 		// Set up final loadout.
-		loadout = xLoadout;
-		weapons = XLoadoutSetup.getLoadout(player, xLoadout);
-		specialButtonMode = xLoadout.melee;
+		this.loadout = loadout;
+		weapons = XLoadoutSetup.getLoadout(player, loadout);
+		specialButtonMode = loadout.melee;
 		// Link X-Buster or create one.
 		XBuster? tempBuster = weapons.Find((Weapon w) => w is XBuster) as XBuster;
 		if (tempBuster != null) {

@@ -295,7 +295,7 @@ public class AI {
 						if (character.charState is not LadderClimb) {
 							doJump();
 							jumpZoneTime += Global.spf;
-							if (jumpZoneTime > 2 && character.player.isVile) {
+							if (jumpZoneTime > 2 && character is Vile) {
 								jumpZoneTime = 0;
 								player.press(Control.Up);
 							}
@@ -395,7 +395,7 @@ public class AI {
 		var maxDist = Global.screenW / 4;
 		int? raNum = player.character?.rideArmor?.raNum;
 		if (raNum != null && raNum != 2) maxDist = 60;
-		if (character is Zero || player.isSigma || character is PunchyZero) return 80;
+		if (character is Zero or BaseSigma or PunchyZero) return 80;
 		return maxDist;
 	}
 
@@ -430,15 +430,16 @@ public class AI {
 				player.currency -= Vile.speedDevilCost;
 			}
 		}
-		if (!player.isMainPlayer) {
-			if (player.heartTanks < UpgradeMenu.getMaxHeartTanks() &&
+		if (!player.isMainPlayer && player.character != null) {
+			if (character.heartTanks < UpgradeMenu.getMaxHeartTanks() &&
 				player.currency >= UpgradeMenu.getHeartTankCost()
 			) {
 				player.currency -=  UpgradeMenu.getHeartTankCost();
 				player.heartTanks++;
-				float currentMaxHp = player.maxHealth;
-				player.maxHealth = player.getMaxHealth();
-				player.character?.addHealth(player.maxHealth - currentMaxHp);
+				character.heartTanks++;
+				decimal currentMaxHp = character.maxHealth;
+				character.maxHealth = character.getMaxHealth();
+				character.addHealth(MathInt.Ceiling(character.maxHealth - currentMaxHp));
 			}
 		}
 	}
@@ -490,7 +491,7 @@ public class AI {
 		}
 
 		if (aiState.randomlyChangeWeapon &&
-            (player.isX || player.isAxl) &&
+            character is MegamanX or Axl &&
             !player.lockWeapon && player.character?.isStealthy(-1) != null &&
             (character as MegamanX)?.chargedRollingShieldProj == null
         ) {

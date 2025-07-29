@@ -355,7 +355,6 @@ public class WarpIn : CharState {
 	bool warpAnimOnce;
 
 	// Sigma-specific
-	public bool isSigma { get { return player.isSigma; } }
 	public int sigmaRounds;
 	public const float yOffset = 200;
 	public bool landOnce;
@@ -398,7 +397,7 @@ public class WarpIn : CharState {
 				cloakAnim2.setzIndex(character.zIndex - 1);
 			}
 
-			if (isSigma && player.isSigma2() && character.sprite.frameIndex >= 11 && !sigma2Once) {
+			if (character is NeoSigma && character.sprite.frameIndex >= 11 && !sigma2Once) {
 				sigma2Once = true;
 				character.playSound("sigma2start", sendRpc: true);
 			}
@@ -428,13 +427,13 @@ public class WarpIn : CharState {
 		float yInc = Global.spf * 450 * getSigmaRoundsMod(sigmaRounds);
 		warpAnim.incPos(new Point(0, yInc));
 
-		if ((isSigma || player.isVile) && !landOnce && warpAnim.pos.y >= destY - 1) {
+		if (character is BaseSigma or Vile && !landOnce && warpAnim.pos.y >= destY - 1) {
 			landOnce = true;
 			warpAnim.changePos(new Point(warpAnim.pos.x, destY - 1));
 		}
 
 		if (warpAnim.pos.y >= destY) {
-			if (!(isSigma || player.isVile) || sigmaRounds > 6) {
+			if (character is not BaseSigma and not Vile || sigmaRounds > 6) {
 				warpAnim.destroySelf();
 				warpAnim = null;
 			} else {
@@ -446,8 +445,7 @@ public class WarpIn : CharState {
 	}
 
 	float getSigmaRoundsMod(int aSigmaRounds) {
-		if (!(isSigma || player.isVile)) return 1;
-		return 2;
+		return character is BaseSigma ? 2 : 1;
 	}
 
 	float getSigmaYOffset(int aSigmaRounds) {
@@ -557,7 +555,6 @@ public class WarpOut : CharState {
 	public float startY;
 	public Anim? warpAnim;
 	public const float yOffset = 200;
-	public bool isSigma { get { return player.isSigma; } }
 	public bool is1v1MaverickStart;
 
 	public WarpOut(bool is1v1MaverickStart = false) : base("warp_beam") {
@@ -1388,7 +1385,7 @@ public class Die : CharState {
 		character.stopCharge();
 		new Anim(character.pos.addxy(0, -12), "die_sparks", 1, null, true);
 
-		if (character.ownedByLocalPlayer && character.player.isDisguisedAxl) {
+		if (character.ownedByLocalPlayer && character.isATrans) {
 			character.player.revertToAxlDeath();
 			character.changeSpriteFromName("die", true);
 		}

@@ -872,44 +872,46 @@ public class Maverick : Actor, IDamagable {
 	}
 
 	public void awardXWeapon(Player player) {
-		if (player.isX && !player.isDisguisedAxl) {
-			Weapon? weaponToAdd = null;
-			if (awardWeaponId == WeaponIds.Buster) weaponToAdd = new XBuster();
-			if (awardWeaponId == WeaponIds.ShotgunIce) weaponToAdd = new ShotgunIce();
-			if (awardWeaponId == WeaponIds.ElectricSpark) weaponToAdd = new ElectricSpark();
-			if (awardWeaponId == WeaponIds.RollingShield) weaponToAdd = new RollingShield();
-			if (awardWeaponId == WeaponIds.HomingTorpedo) weaponToAdd = new HomingTorpedo();
-			if (awardWeaponId == WeaponIds.BoomerangCutter) weaponToAdd = new BoomerangCutter();
-			if (awardWeaponId == WeaponIds.ChameleonSting) weaponToAdd = new ChameleonSting();
-			if (awardWeaponId == WeaponIds.StormTornado) weaponToAdd = new StormTornado();
-			if (awardWeaponId == WeaponIds.FireWave) weaponToAdd = new FireWave();
-
-			if (awardWeaponId == WeaponIds.CrystalHunter) weaponToAdd = new CrystalHunter();
-			if (awardWeaponId == WeaponIds.BubbleSplash) weaponToAdd = new BubbleSplash();
-			if (awardWeaponId == WeaponIds.SilkShot) weaponToAdd = new SilkShot();
-			if (awardWeaponId == WeaponIds.SpinWheel) weaponToAdd = new SpinWheel();
-			if (awardWeaponId == WeaponIds.SonicSlicer) weaponToAdd = new SonicSlicer();
-			if (awardWeaponId == WeaponIds.StrikeChain) weaponToAdd = new StrikeChain();
-			if (awardWeaponId == WeaponIds.MagnetMine) weaponToAdd = new MagnetMine();
-			if (awardWeaponId == WeaponIds.SpeedBurner) weaponToAdd = new SpeedBurner();
-
-			if (awardWeaponId == WeaponIds.AcidBurst) weaponToAdd = new AcidBurst();
-			if (awardWeaponId == WeaponIds.ParasiticBomb) weaponToAdd = new ParasiticBomb();
-			if (awardWeaponId == WeaponIds.TriadThunder) weaponToAdd = new TriadThunder();
-			if (awardWeaponId == WeaponIds.SpinningBlade) weaponToAdd = new SpinningBlade();
-			if (awardWeaponId == WeaponIds.RaySplasher) weaponToAdd = new RaySplasher();
-			if (awardWeaponId == WeaponIds.GravityWell) weaponToAdd = new GravityWell();
-			if (awardWeaponId == WeaponIds.FrostShield) weaponToAdd = new FrostShield();
-			if (awardWeaponId == WeaponIds.TornadoFang) weaponToAdd = new TornadoFang();
-
-			if (weaponToAdd != null) {
-				var matchingW = player.weapons.FirstOrDefault(w => w.index == weaponToAdd.index);
-				if (matchingW != null) {
-					matchingW.ammo = matchingW.maxAmmo;
-				} else if (player.weapons.Count >= 3 && player.weapons.Count < 9) {
-					player.weapons.Insert(3, weaponToAdd);
-				}
-			}
+		if (player.character is not MegamanX) {
+			return;
+		}
+		Weapon? weaponToAdd = awardWeaponId switch {
+			WeaponIds.Buster => new XBuster(),
+			WeaponIds.ShotgunIce => new ShotgunIce(),
+			WeaponIds.ElectricSpark => new ElectricSpark(),
+			WeaponIds.RollingShield => new RollingShield(),
+			WeaponIds.HomingTorpedo => new HomingTorpedo(),
+			WeaponIds.BoomerangCutter => new BoomerangCutter(),
+			WeaponIds.ChameleonSting => new ChameleonSting(),
+			WeaponIds.StormTornado => new StormTornado(),
+			WeaponIds.FireWave => new FireWave(),
+			WeaponIds.CrystalHunter => new CrystalHunter(),
+			WeaponIds.BubbleSplash => new BubbleSplash(),
+			WeaponIds.SilkShot => new SilkShot(),
+			WeaponIds.SpinWheel => new SpinWheel(),
+			WeaponIds.SonicSlicer => new SonicSlicer(),
+			WeaponIds.StrikeChain => new StrikeChain(),
+			WeaponIds.MagnetMine => new MagnetMine(),
+			WeaponIds.SpeedBurner => new SpeedBurner(),
+			WeaponIds.AcidBurst => new AcidBurst(),
+			WeaponIds.ParasiticBomb => new ParasiticBomb(),
+			WeaponIds.TriadThunder => new TriadThunder(),
+			WeaponIds.SpinningBlade => new SpinningBlade(),
+			WeaponIds.RaySplasher => new RaySplasher(),
+			WeaponIds.GravityWell => new GravityWell(),
+			WeaponIds.FrostShield => new FrostShield(),
+			WeaponIds.TornadoFang => new TornadoFang(),
+			_ => null,
+		};
+		if (weaponToAdd == null) {
+			return;
+		}
+		Weapon? matchingW = player.weapons.FirstOrDefault(w => w.index == weaponToAdd.index);
+		if (matchingW != null) {
+			matchingW.ammo = matchingW.maxAmmo;
+		}
+		else if (player.weapons.Count >= 3 && player.weapons.Count < 9) {
+			player.weapons.Insert(3, weaponToAdd);
 		}
 	}
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace MMXOnline;
 
@@ -28,31 +29,31 @@ public enum DNACoreHyperMode {
 public class DNACore : AxlWeapon {
 	public int charNum;
 	public LoadoutData loadout;
-	public float maxHealth;
 	public string name;
 	public int alliance;
-	public int armorFlag;
-	public byte hyperArmorBools;
-	public bool frozenCastle;
-	public bool speedDevil;
-	public bool ultimateArmor;
-	public DNACoreHyperMode hyperMode;
-	public float rakuhouhaAmmo;
-	public float hyperNovaAmmo;
-	public List<Weapon> weapons = new List<Weapon>();
-	public bool usedOnce = false;
+	[JsonIgnore] public byte hyperArmorBools;
+	[JsonIgnore] public DNACoreHyperMode hyperMode;
+	[JsonIgnore] public bool frozenCastle;
+	[JsonIgnore] public bool speedDevil;
+	[JsonIgnore] public bool ultimateArmor;
+	[JsonIgnore] public float rakuhouhaAmmo;
+	[JsonIgnore] public float hyperNovaAmmo;
+	[JsonIgnore] public int armorFlag;
+	[JsonIgnore] public float maxHealth;
+	[JsonIgnore] public List<Weapon> weapons = [];
+	[JsonIgnore] public bool usedOnce = false;
 
-	public DNACore(Character character) : base(0) {
+	public DNACore(Character character, Player player) : base(0) {
 		charNum = (int)character.charId;
-		loadout = character.player.atransLoadout ?? character.player.loadout;
+		loadout = (
+			character.player.atransLoadout.clone(player.id) ?? character.player.loadout.clone(player.id)
+		);
 		maxHealth = (float)Math.Ceiling(character.maxHealth);
 		name = character.player.name;
 		alliance = character.player.alliance;
 
-		if (charNum == (int)CharIds.RagingChargeX) {
-			charNum = (int)CharIds.X;
-		}
 		if (character is MegamanX mmx) {
+			loadout.xLoadout = mmx.loadout;
 			weapons = loadout.xLoadout.getWeaponsFromLoadout(character.player);
 			armorFlag = mmx.getArmorByte();
 			ultimateArmor = mmx.hasUltimateArmor;
@@ -67,6 +68,7 @@ public class DNACore : AxlWeapon {
 			]);
 		}
 		else if (character is Zero zero) {
+			loadout.zeroLoadout = zero.loadout;
 			rakuhouhaAmmo = zero.gigaAttack.ammo;
 			if (zero.hypermodeActive()) {
 				hyperMode = zero.hyperMode switch {
@@ -77,6 +79,7 @@ public class DNACore : AxlWeapon {
 			}
 		}
 		else if (character is PunchyZero pzero) {
+			loadout.pzeroLoadout = pzero.loadout;
 			rakuhouhaAmmo = pzero.gigaAttack.ammo;
 			if (pzero.isBlack || pzero.isAwakened || pzero.isViral) {
 				hyperMode = pzero.hyperMode switch {
@@ -90,19 +93,22 @@ public class DNACore : AxlWeapon {
 				hyperMode = DNACoreHyperMode.BlackZero;
 			}
 		}
-		else if (character is Axl) {
+		else if (character is Axl axl) {
+			loadout.axlLoadout = axl.loadout;
 			weapons = loadout.axlLoadout.getWeaponsFromLoadout();
 			if (weapons.Count > 0 && character.player.axlBulletType > 0) {
 				weapons[0] = character.player.getAxlBulletWeapon();
 			}
 		}
-		else if (character is CmdSigma sigma) {
-			sigma.ballWeapon.ammo = rakuhouhaAmmo;
-		}
-		else if (character is NeoSigma neoSigma) {
-			neoSigma.gigaAttack.ammo = rakuhouhaAmmo;
-		}
-		else if (character is Vile vile) {
+		else if (character is BaseSigma baseSigma) {
+			loadout.sigmaLoadout = baseSigma.loadout;
+			if (character is CmdSigma cmdSigma) {
+				cmdSigma.ballWeapon.ammo = rakuhouhaAmmo;
+			} else if (character is NeoSigma neoSigma) {
+				neoSigma.gigaAttack.ammo = rakuhouhaAmmo;
+			}
+		} else if (character is Vile vile) {
+			loadout.vileLoadout = vile.loadout;
 			frozenCastle = vile.hasFrozenCastle;
 			speedDevil = vile.hasSpeedDevil;
 		}

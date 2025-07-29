@@ -30,6 +30,7 @@ public class PunchyZero : Character {
 	public AwakenedAura awakenedAuraWeapon = new();
 	public ZSaber saberSwingWeapon = new();
 	public ZeroBuster busterWeapon = new();
+	public PZeroLoadout loadout;
 	public int gigaAttackSelected;
 	
 	// Inputs.
@@ -55,21 +56,26 @@ public class PunchyZero : Character {
 	// Creation code.
 	public PunchyZero(
 		Player player, float x, float y, int xDir,
-		bool isVisible, ushort? netId, bool ownedByLocalPlayer, bool isWarpIn = true
+		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
+		bool isWarpIn = true, PZeroLoadout? loadout = null,
+		int? heartTanks = null, bool isATrans = false
 	) : base(
-		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn
+		player, x, y, xDir, isVisible,
+		netId, ownedByLocalPlayer,
+		isWarpIn, heartTanks, isATrans
 	) {
 		charId = CharIds.PunchyZero;
 		// Loadout stuff.
-		PZeroLoadout pzeroLoadout = player.loadout.pzeroLoadout;
+		loadout ??= player.loadout.pzeroLoadout.clone();
+		this.loadout = loadout;
 
-		gigaAttackSelected = pzeroLoadout.gigaAttack;
-		gigaAttack = pzeroLoadout.gigaAttack switch {
+		gigaAttackSelected = loadout.gigaAttack;
+		gigaAttack = loadout.gigaAttack switch {
 			1 => new Messenkou(),
 			2 => new RekkohaWeapon(),
 			_ => new RakuhouhaWeapon(),
 		};
-		hyperMode = pzeroLoadout.hyperMode;
+		hyperMode = loadout.hyperMode;
 		altSoundId = AltSoundIds.X3;
 	}
 

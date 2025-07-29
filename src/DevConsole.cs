@@ -96,7 +96,7 @@ public class DevConsole {
 		for (int i = 0; i < count; i++) {
 			Character? chr = Global.level.players.FirstOrDefault(p => p != Global.level.mainPlayer)?.character;
 			if (chr != null) {
-				Global.level.mainPlayer.weapons.Add(new DNACore(chr));
+				Global.level.mainPlayer.weapons.Add(new DNACore(chr, Global.level.mainPlayer));
 			}
 		}
 	}

@@ -23,6 +23,7 @@ public partial class Character : Actor, IDamagable {
 	public int spawnHealthToAdd;
 	public float spawnHealthAddTime;
 	public bool alive = true;
+	public int heartTanks;
 
 	// Player linked data.
 	public Player player;
@@ -220,7 +221,7 @@ public partial class Character : Actor, IDamagable {
 	public Character(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
-		bool isWarpIn = true, bool isATrans = false
+		bool isWarpIn = true, int? heartTanks = null, bool isATrans = false
 	) : base(
 		null!, new Point(x, y), netId, ownedByLocalPlayer, addToLevel: true
 	) {
@@ -277,7 +278,8 @@ public partial class Character : Actor, IDamagable {
 
 		chargeEffect = new ChargeEffect();
 		lastGravityWellDamager = player;
-		maxHealth = 16;
+		this.heartTanks = heartTanks ?? player.getHeartTanks((int)charId);
+		maxHealth = getMaxHealth();
 		if (!ownedByLocalPlayer || !isWarpIn) {
 			health = maxHealth;
 		}
@@ -619,7 +621,7 @@ public partial class Character : Actor, IDamagable {
 		if (player.isPossessed()) return false;
 		if (dropFlagCooldown > 0) return false;
 		if (isInvulnerable()) return false;
-		if (player.isDisguisedAxl && !disguiseCoverBlown) return false;
+		if (isATrans && !disguiseCoverBlown) return false;
 		if (isNonDamageStatusImmune()) return false;
 		if (charState is Die || charState is VileRevive || charState is XReviveStart || charState is XRevive) return false;
 		if (isWarpOut()) return false;
@@ -997,7 +999,7 @@ public partial class Character : Actor, IDamagable {
 		if (Global.level.gameMode.isTeamMode && Global.level.mainPlayer != player) {
 			int alliance = player.alliance;
 			// If this is an enemy disguised Axl, change the alliance
-			if (player.alliance != Global.level.mainPlayer.alliance && player.isDisguisedAxl && !disguiseCoverBlown) {
+			if (player.alliance != Global.level.mainPlayer.alliance && isATrans && !disguiseCoverBlown) {
 				alliance = fakeAlliance;
 			}
 			RenderEffectType? allianceEffect = alliance switch {
@@ -1193,7 +1195,7 @@ public partial class Character : Actor, IDamagable {
 			}
 		}
 
-		if (player.isDisguisedAxl) {
+		if (isATrans) {
 			updateDisguisedAxl();
 		}
 
@@ -2123,7 +2125,7 @@ public partial class Character : Actor, IDamagable {
 				}
 			}
 			// Special case: labeling the own player's disguised Axl
-			else if (player.isMainPlayer && player.isDisguisedAxl && 
+			else if (player.isMainPlayer && isATrans &&
 				Global.level.gameMode.isTeamMode && player.disguise != null
 			) {
 				overrideName = player.disguise.targetName;
@@ -2131,7 +2133,7 @@ public partial class Character : Actor, IDamagable {
 			}
 			// Special case: labeling an enemy player's disguised Axl
 			else if (
-				!player.isMainPlayer && player.isDisguisedAxl &&
+				!player.isMainPlayer && isATrans &&
 				Global.level.gameMode.isTeamMode &&
 				player.alliance != Global.level.mainPlayer.alliance &&
 				player.disguise != null &&
@@ -2239,7 +2241,7 @@ public partial class Character : Actor, IDamagable {
 				);
 
 				int label = 125;
-				if (player.isAxl || player.isDisguisedAxl) {
+				if (this is Axl || isATrans) {
 					label = 123;
 				}
 				Global.sprites["hud_killfeed_weapon"].draw(
@@ -2248,7 +2250,7 @@ public partial class Character : Actor, IDamagable {
 				deductLabelY(labelCooldownOffY);
 			}
 		}
-		if (player.isKaiserSigma() && !player.isKaiserViralSigma()) {
+		if (this is KaiserSigma { isVirus: false }) {
 			renderDamageText(100);
 		} else {
 			renderDamageText(35);
@@ -2595,6 +2597,18 @@ public partial class Character : Actor, IDamagable {
 		);
 
 		deductLabelY(labelNameOffY);
+	}
+
+
+	public virtual int baselineMaxHealth() {
+		return 16;
+	}
+
+	public virtual int getMaxHealth() {
+		if (Global.level.is1v1()) {
+			return Player.getModifiedHealth(28);
+		}
+		return Player.getModifiedHealth(baselineMaxHealth() + (heartTanks * Player.getHeartTankModifier()));
 	}
 
 	public virtual bool canBeHealed(int healerAlliance) {

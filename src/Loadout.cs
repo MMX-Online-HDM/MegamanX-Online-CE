@@ -64,6 +64,15 @@ public class XLoadout {
 			melee = Helpers.randomRange(0, 1),
 		};
 	}
+
+	internal XLoadout clone() {
+		return new XLoadout {
+			weapon1 = weapon1,
+			weapon2 = weapon2,
+			weapon3 = weapon3,
+			melee = melee
+		};
+	}
 }
 
 [ProtoContract]
@@ -111,6 +120,19 @@ public class ZeroLoadout {
 
 	private bool inRange(int weaponNum) {
 		return weaponNum >= 0 && weaponNum <= 2;
+	}
+
+	public ZeroLoadout clone() {
+		return new ZeroLoadout() {
+			uppercutS = uppercutS,
+			uppercutA = uppercutA,
+			downThrustS = downThrustS,
+			downThrustA = downThrustA,
+			gigaAttack = gigaAttack,
+			hyperMode = hyperMode,
+			groundSpecial = groundSpecial,
+			airSpecial = airSpecial,
+		};
 	}
 }
 
@@ -189,6 +211,20 @@ public class VileLoadout {
 
 	private bool inRange(int weaponNum, int min = -1, int max = 2) {
 		return weaponNum >= min && weaponNum <= max;
+	}
+
+	internal VileLoadout clone() {
+		return new VileLoadout() {
+			cannon = cannon,
+			vulcan = vulcan,
+			missile = missile,
+			rocketPunch = rocketPunch,
+			napalm = napalm,
+			ball = ball,
+			laser = laser,
+			cutter = cutter,
+			flamethrower = flamethrower
+		};
 	}
 }
 
@@ -357,17 +393,16 @@ public class SigmaLoadout {
 	}
 
 	public static SigmaLoadout createRandom() {
-		List<int> weaponPool = new List<int>();
-		for (int i = (int)WeaponIds.ChillPenguin; i <= (int)WeaponIds.DrDoppler; i++) {
+		List<int> weaponPool = [];
+		for (int i = 0; i <= 26; i++) {
 			weaponPool.Add(i);
 		}
-
-		var randPool = Helpers.getRandomSubarray(weaponPool, 2);
+		List<int> randPool = Helpers.getRandomSubarray(weaponPool, 2);
 		return new SigmaLoadout() {
-			maverick1 = randPool[0] - (int)WeaponIds.ChillPenguin,
-			maverick2 = randPool[1] - (int)WeaponIds.ChillPenguin,
+			maverick1 = randPool[0],
+			maverick2 = randPool[1],
 			sigmaForm = Helpers.randomRange(0, 2),
-			commandMode = 2,
+			commandMode = (int)MaverickModeId.Summoner,
 			// Gacel: So it was an option for third maverick before?
 			//maverick3 = randPool[2],
 		};
@@ -408,6 +443,15 @@ public class SigmaLoadout {
 			_ =>  new SigmaMenuWeapon()
 		};
 	}
+
+	internal SigmaLoadout clone() {
+		return new SigmaLoadout() {
+			maverick1 = maverick1,
+			maverick2 = maverick2,
+			sigmaForm = sigmaForm,
+			commandMode = commandMode
+		};
+	}
 }
 
 [ProtoContract]
@@ -429,6 +473,18 @@ public class LoadoutData {
 			axlLoadout = AxlLoadout.createRandom(),
 			sigmaLoadout = SigmaLoadout.createRandom(),
 			pzeroLoadout = PZeroLoadout.createRandom(),
+		};
+	}
+
+	public LoadoutData clone(int playerId) {
+		return new LoadoutData() {
+			playerId = playerId,
+			xLoadout = xLoadout.clone(),
+			zeroLoadout = zeroLoadout.clone(),
+			vileLoadout = vileLoadout.clone(),
+			axlLoadout = axlLoadout.clone(),
+			sigmaLoadout = sigmaLoadout.clone(),
+			pzeroLoadout = pzeroLoadout.clone()
 		};
 	}
 

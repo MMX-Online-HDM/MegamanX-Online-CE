@@ -998,14 +998,16 @@ public partial class Level {
 					player.loadout = player.atransLoadout;
 				}
 				player.spawnCharAtPoint(
-					targetCharNum, player.getCharSpawnData(targetCharNum),
+					targetCharNum, player.getCharSpawnData(targetCharNum, false, currentLoadout),
 					new Point(hostPlayer.charXPos, hostPlayer.charYPos),
 					hostPlayer.charXDir, (ushort)hostPlayer.charNetId, false
 				);
 				if (hostPlayer.charRollingShieldNetId != null) {
 					new RollingShieldProjCharged(
 						player.character.pos,
-						player.character.xDir, player.character, player, hostPlayer.charRollingShieldNetId.Value
+						player.character.xDir,
+						player.character, player,
+						hostPlayer.charRollingShieldNetId.Value
 					);
 				}
 				player.loadout = currentLoadout;

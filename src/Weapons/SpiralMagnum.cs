@@ -263,7 +263,7 @@ public class SpiralMagnumProj : Projectile {
 			var hitChar = victim as Character;
 
 			bool canBlock = (
-				reflectable && !weakness && hitChar != null && hitChar.player.isZero && (
+				reflectable && !weakness && hitChar != null && hitChar is Zero && (
 					hitChar.sprite.name == "zero_block" ||
 					(hitChar.sprite.name.Contains("zero_attack") &&
 					hitChar.sprite.frameHitboxes[hitChar.sprite.getFrameIndexSafe()].Length > 0)

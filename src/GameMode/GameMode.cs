@@ -703,7 +703,7 @@ public class GameMode {
 				float cooldown = 1 - Helpers.progress(axl2.dodgeRollCooldown, Axl.maxDodgeRollCooldown);
 				drawGigaWeaponCooldown(50, cooldown, y: 170);
 			}
-			if (drawPlayer.character is Axl && Global.level.server?.customMatchSettings?.AxlCustomReload == true) {
+			if (drawPlayer.character is Axl && Global.level.server?.customMatchSettings?.axlCustomReload == true) {
 				if (drawPlayer.weapon?.rechargeAmmoCustomSettingAxl > 0 ||
 					drawPlayer.weapon?.rechargeAmmoCustomSettingAxl2 > 0) {
 					Fonts.drawText(
@@ -817,7 +817,7 @@ public class GameMode {
 				FontType.BlueMenu, hudErrorMsg,
 				Global.halfScreenW, 50, Alignment.Center
 			);
-		} else if (mainPlayer?.isKaiserViralSigma() == true) {
+		} else if (mainPlayer.character is KaiserSigma) {
 			string msg = "";
 			if (KaiserSigma.canKaiserSpawn(mainPlayer.character, out _)) msg += "[JUMP]: Relocate";
 			if (msg != "") {
@@ -1847,8 +1847,6 @@ public class GameMode {
 	}
 
 	public void drawWeaponSwitchHUD(Player player) {
-		if (player.isZero && !player.isDisguisedAxl) return;
-
 		if (player.isSelectingRA()) {
 			drawRideArmorIcons();
 		}
@@ -2774,22 +2772,20 @@ public class GameMode {
 	}
 
 	public FontType getCharFont(Player player) {
-		if (player.isDead && !isOver) {
-			return FontType.Grey;
-		} else if (player.eliminated()) {
+		//if (player.isDead && !isOver) {
+		//	return FontType.Grey;
+		//}
+		if (player.eliminated()) {
 			return FontType.DarkOrange;
-		} else if (player.isX) {
-			return FontType.Blue;
-		} else if (player.isZero) {
-			return FontType.Red;
-		} else if (player.isAxl) {
-			return FontType.Yellow;
-		} else if (player.isVile) {
-			return FontType.Pink;
-		} else if (player.isSigma) {
-			return FontType.Green;
 		}
-		return FontType.Grey;
+		return (CharIds)player.charNum switch {
+			CharIds.X => FontType.Blue,
+			CharIds.Zero => FontType.Red,
+			CharIds.Axl => FontType.Yellow,
+			CharIds.Vile => FontType.Pink,
+			CharIds.Sigma => FontType.Green,
+			_ => FontType.Grey
+		};
 	}
 
 	public string getCharIcon(Player player) {

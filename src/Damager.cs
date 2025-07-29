@@ -216,8 +216,14 @@ public class Damager {
 			RPC.applyDamage.sendRpc(byteParams.ToArray());
 		}
 
-		if (owner.isDisguisedAxl && owner.character != null) {
+		if (owner.character != null && owner.character.isATrans) {
 			owner.character.disguiseCoverBlown = true;
+		}
+		if (damagingActor is Projectile tempProj &&
+			tempProj.owningActor is Character atChar &&
+			atChar.isATrans
+		) {
+			atChar.disguiseCoverBlown = true;
 		}
 
 		if (damagable.isInvincible(owner, projId) && damage > 0) {
@@ -1067,7 +1073,7 @@ public class Damager {
 		if (projId == null) {
 			return false;
 		}
-		if (Global.level.server?.customMatchSettings?.Assistable == false) {
+		if (Global.level.server?.customMatchSettings?.assistable == false) {
 			return false;		
 		}
 		// Never assist in any mode as they are DOT or self-damage. (Also Volt Tornado)
@@ -1127,6 +1133,9 @@ public class Damager {
 
 	public static bool canDamageFrostShield(int projId) {
 		if (CrackedWall.canDamageCrackedWall(projId, null) != 0) {
+			return true;
+		}
+		if (Global.level.server.customMatchSettings?.frostShieldNerf != false) {
 			return true;
 		}
 		return projId switch {

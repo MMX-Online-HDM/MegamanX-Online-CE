@@ -609,7 +609,7 @@ public class Projectile : Actor {
 				if (hitPos != null && destroyOnHit) changePos(hitPos.Value);
 
 				bool weakness = false;
-				if (character != null && character.player.isX) {
+				if (character is MegamanX) {
 					int wi = character.player.weapon.weaknessIndex;
 					if (wi > 0 && wi == weapon.index) weakness = true;
 				}

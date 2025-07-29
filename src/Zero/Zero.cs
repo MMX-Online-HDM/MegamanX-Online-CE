@@ -31,6 +31,7 @@ public class Zero : Character {
 	public AwakenedAura awakenedAuraWeapon = new();
 	public ZSaberProjSwing saberSwingWeapon = new();
 	public ZeroBuster busterWeapon = new();
+	public ZeroLoadout loadout;
 
 	// Loadout weapons.
 	public Weapon groundSpecial;
@@ -78,29 +79,32 @@ public class Zero : Character {
 	// Creation code.
 	public Zero(
 		Player player, float x, float y, int xDir,
-		bool isVisible, ushort? netId, bool ownedByLocalPlayer, bool isWarpIn = true
+		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
+		bool isWarpIn = true, ZeroLoadout? loadout = null,
+		int? heartTanks = null, bool isATrans = false
 	) : base(
-		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn
+		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, heartTanks, isATrans
 	) {
 		charId = CharIds.Zero;
 		// Loadout stuff.
-		ZeroLoadout zeroLoadout = player.loadout.zeroLoadout;
+		loadout ??= player.loadout.zeroLoadout.clone();
+		this.loadout = loadout;
 
-		groundSpecial = RaijingekiWeapon.getWeaponFromIndex(zeroLoadout.groundSpecial);
-		airSpecial = KuuenzanWeapon.getWeaponFromIndex(zeroLoadout.airSpecial);
-		uppercutA = RyuenjinWeapon.getWeaponFromIndex(zeroLoadout.uppercutA);
-		uppercutS = RyuenjinWeapon.getWeaponFromIndex(zeroLoadout.uppercutS);
-		downThrustA = HyouretsuzanWeapon.getWeaponFromIndex(zeroLoadout.downThrustA);
-		downThrustS = HyouretsuzanWeapon.getWeaponFromIndex(zeroLoadout.downThrustS);
+		groundSpecial = RaijingekiWeapon.getWeaponFromIndex(loadout.groundSpecial);
+		airSpecial = KuuenzanWeapon.getWeaponFromIndex(loadout.airSpecial);
+		uppercutA = RyuenjinWeapon.getWeaponFromIndex(loadout.uppercutA);
+		uppercutS = RyuenjinWeapon.getWeaponFromIndex(loadout.uppercutS);
+		downThrustA = HyouretsuzanWeapon.getWeaponFromIndex(loadout.downThrustA);
+		downThrustS = HyouretsuzanWeapon.getWeaponFromIndex(loadout.downThrustS);
 
-		gigaAttackSelected = zeroLoadout.gigaAttack;
-		gigaAttack = zeroLoadout.gigaAttack switch {
+		gigaAttackSelected = loadout.gigaAttack;
+		gigaAttack = loadout.gigaAttack switch {
 			1 => new Messenkou(),
 			2 => new RekkohaWeapon(),
 			_ => new RakuhouhaWeapon(),
 		};
 
-		hyperMode = zeroLoadout.hyperMode;
+		hyperMode = loadout.hyperMode;
 		altCtrlsLength = 2;
 		altSoundId = AltSoundIds.X3;
 	}
@@ -449,7 +453,7 @@ public class Zero : Character {
 				player.input.isHeld(Control.WeaponLeft, player) ||
 				(player.input.isHeld(Control.WeaponRight, player) && !isAwakened)
 			) && (
-				!player.isDisguisedAxl ||
+				!isATrans ||
 				player.input.isHeld(Control.Down, player)
 			)
 		) {
@@ -461,7 +465,7 @@ public class Zero : Character {
 				player.input.isPressed(Control.WeaponLeft, player) ||
 				(player.input.isHeld(Control.WeaponRight, player) && !isAwakened)
 			  ) && (
-				  !player.isDisguisedAxl || player.input.isHeld(Control.Down, player)
+				!isATrans || player.input.isHeld(Control.Down, player)
 			  )
 			) {
 			if (grounded) {

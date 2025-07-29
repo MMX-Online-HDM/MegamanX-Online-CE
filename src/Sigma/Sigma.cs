@@ -25,10 +25,10 @@ public class BaseSigma : Character {
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
 		bool isWarpIn = true, SigmaLoadout? sigmaLoadout = null,
-		bool isAtrans = false
+		int? heartTanks = null, bool isATrans = false
 	) : base(
 		player, x, y, xDir, isVisible,
-		netId, ownedByLocalPlayer, isWarpIn, isAtrans
+		netId, ownedByLocalPlayer, isWarpIn, heartTanks, isATrans
 	) {
 		charId = CharIds.Sigma;
 		// Special Sigma-only colider.
@@ -39,8 +39,8 @@ public class BaseSigma : Character {
 			isTrueAI = true;
 		}
 		// Configure weapons if local.
-		sigmaLoadout ??= player.loadout.sigmaLoadout ?? new();
-		this.loadout = sigmaLoadout;
+		sigmaLoadout ??= player.loadout.sigmaLoadout.clone();
+		loadout = sigmaLoadout;
 		weapons = configureWeapons(sigmaLoadout);
 
 		// For 1v1 mavericks.
@@ -57,6 +57,10 @@ public class BaseSigma : Character {
 			intialCharState =  getIdleState();
 		}
 		changeState(intialCharState);
+	}
+
+	public override int baselineMaxHealth() {
+		return 20;
 	}
 
 	public Collider getSigmaHeadCollider() {

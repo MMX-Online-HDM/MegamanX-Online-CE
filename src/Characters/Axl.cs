@@ -62,6 +62,7 @@ public class Axl : Character {
 	public bool isRevving;
 	public bool isNonOwnerRev;
 	public SniperMissileProj? sniperMissileProj;
+	public AxlLoadout loadout;
 	public LoopingSound iceGattlingSound;
 	public float whiteAxlTime;
 	public float dodgeRollCooldown;
@@ -107,23 +108,23 @@ public class Axl : Character {
 	public Axl(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
-		bool isWarpIn = true, AxlLoadout? axlLoadout = null
+		bool isWarpIn = true, AxlLoadout? loadout = null,
+		int? heartTanks = null, bool isATrans = false
 	) : base(
 		player, x, y, xDir, isVisible,
-		netId, ownedByLocalPlayer, isWarpIn
+		netId, ownedByLocalPlayer, isWarpIn, heartTanks, isATrans
 	) {
 		charId = CharIds.Axl;
-		if (axlLoadout == null) {
-			axlLoadout = player.loadout.axlLoadout;
-		}
+		loadout ??= player.loadout.axlLoadout.clone();
+		this.loadout = loadout;
 		iceGattlingSound = new LoopingSound("iceGattlingLoopStart", "iceGattlingLoopStop", "iceGattlingLoop", this);
 
 		muzzleFlash = new Anim(new Point(), "axl_pistol_flash", xDir, null, false) {
 			visible = false
 		};
-		axlHyperMode = axlLoadout.hyperMode;
+		axlHyperMode = loadout.hyperMode;
 
-		configureWeapons(axlLoadout);
+		configureWeapons(loadout);
 		altSoundId = AltSoundIds.X3;
 	}
 
@@ -841,7 +842,7 @@ public class Axl : Character {
 
 		float dist = MathF.Abs(forwardAngle - bulletAngle);
 		dist = Helpers.clampMin0(dist - 90);
-		if (Global.level.server?.customMatchSettings?.AxlBackwardsDebuff == false) {
+		if (Global.level.server?.customMatchSettings?.axlBackwardsDebuff == false) {
 			dist = 0;
 		}
 		return Helpers.clamp01(dist / 90f);
@@ -1648,12 +1649,13 @@ public class Axl : Character {
 		if (Global.level.is1v1()) return;
 
 		if (player.weapons.Count((Weapon weapon) => weapon is DNACore) < 4) {
-			var dnaCoreWeapon = new DNACore(hitChar);
-			dnaCoreWeapon.index = (int)WeaponIds.DNACore - player.weapons.Count;
-			if (player.isDisguisedAxl) {
-				player.oldWeapons.Add(dnaCoreWeapon);
+			var dnaCoreWeapon = new DNACore(hitChar, player) {
+				index = (int)WeaponIds.DNACore - player.weapons.Count
+			};
+			if (isATrans) {
+				player.preTransformedAxl?.weapons.Add(dnaCoreWeapon);
 			} else {
-				player.weapons.Add(dnaCoreWeapon);
+				weapons.Add(dnaCoreWeapon);
 			}
 			player.savedDNACoreWeapons.Add(dnaCoreWeapon);
 		}
@@ -1886,7 +1888,10 @@ public class Axl : Character {
 	}
 
 	public override bool isStealthy(int alliance) {
-		return (player.alliance != alliance && (stealthActive || player.isDisguisedAxl && !disguiseCoverBlown));
+		return (
+			player.alliance != alliance &&
+			(stealthActive || isATrans && !disguiseCoverBlown)
+		);
 	}
 
 	public override bool isNonDamageStatusImmune() {

@@ -462,6 +462,7 @@ public class Input {
 	}
 
 	public bool allowInput(Player player, string inputName) {
+		/*
 		if (player != null && player.isVile && player.weapon is MechMenuWeapon mmw && mmw.isMenuOpened) {
 			if (inputName == Control.Up || inputName == Control.Down) {
 				return false;
@@ -471,7 +472,7 @@ public class Input {
 			if (inputName == Control.Up || inputName == Control.Down) {
 				return false;
 			}
-		}
+		}*/
 		return true;
 	}
 

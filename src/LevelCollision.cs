@@ -626,7 +626,7 @@ public partial class Level {
 			var goCollider = go.collider;
 
 			// Fix a one-off case where charge beam wouldn't lock onto Kaiser's head
-			if (isChargeBeam && go is Character chr && chr.player.isKaiserNonViralSigma()) {
+			if (isChargeBeam && go is KaiserSigma { isVirus: false }) {
 				goCollider = go.getAllColliders().FirstOrDefault(c => c.name == "head");
 				if (goCollider == null) continue;
 			}
@@ -709,7 +709,7 @@ public partial class Level {
 				if (character.player.isDead) continue;
 				if (!includeAllies && character.player.alliance == alliance) continue;
 				if (character.player.alliance != alliance &&
-					character.player.isDisguisedAxl && gameMode.isTeamMode
+					character.isATrans && gameMode.isTeamMode
 				) {
 					if (!isRequesterAI) continue;
 					else if (!character.disguiseCoverBlown) continue;

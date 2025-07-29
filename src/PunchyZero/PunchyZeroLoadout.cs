@@ -1,3 +1,4 @@
+using System;
 using ProtoBuf;
 using SFML.Graphics;
 
@@ -14,6 +15,13 @@ public class PZeroLoadout {
 		return new PZeroLoadout() {
 			gigaAttack = Helpers.randomRange(0, 2),
 			hyperMode = Helpers.randomRange(0, 2)
+		};
+	}
+
+	internal PZeroLoadout clone() {
+		return new PZeroLoadout() {
+			gigaAttack = gigaAttack,
+			hyperMode = hyperMode
 		};
 	}
 }

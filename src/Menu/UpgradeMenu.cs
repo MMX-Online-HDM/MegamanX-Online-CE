@@ -45,7 +45,7 @@ public class UpgradeMenu : IMainMenu {
 	}
 	public static int getSubTankCost() {
 		if (Global.level.server?.customMatchSettings != null) {
-			return Global.level.server.customMatchSettings.SubTankCost;
+			return Global.level.server.customMatchSettings.subTankCost;
 		}
 		return 4;
 	}
@@ -128,17 +128,20 @@ public class UpgradeMenu : IMainMenu {
 					mainPlayer.currency -= getHeartTankCost();
 					mainPlayer.heartTanks++;
 					Global.playSound("hearthX1");
-					float currentMaxHp = mainPlayer.maxHealth;
-					float newHP = mainPlayer.getMaxHealth();
-					mainPlayer.maxHealth = newHP;
-					mainPlayer.character?.addHealth(newHP - currentMaxHp);
+					if (mainPlayer.character != null) {
+						Character chara = mainPlayer.character;
+						chara.heartTanks++;
+						decimal currentMaxHp = chara.maxHealth;
+						chara.maxHealth = chara.getMaxHealth();
+						chara.addHealth(MathInt.Ceiling(chara.maxHealth - currentMaxHp));
+					} else {
+						mainPlayer.maxHealth = mainPlayer.getMaxHealth();
+					}
 					/*
-					if (mainPlayer.isVile && mainPlayer.character?.vileStartRideArmor != null)
-					{
+					if (mainPlayer.character?.vileStartRideArmor != null) {
 						mainPlayer.character.vileStartRideArmor.addHealth(mainPlayer.getHeartTankModifier());
 					}
-					else if (mainPlayer.isSigma && mainPlayer.currentMaverick != null)
-					{
+					else if (mainPlayer?.currentMaverick != null) {
 						mainPlayer.currentMaverick.addHealth(mainPlayer.getHeartTankModifier(), false);
 						mainPlayer.currentMaverick.maxHealth += mainPlayer.getHeartTankModifier();
 					}

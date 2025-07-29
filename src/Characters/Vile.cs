@@ -40,6 +40,7 @@ public class Vile : Character {
 
 	public VileAmmoWeapon energy = new();
 	public VileCannon cannonWeapon;
+	public VileLoadout loadout;
 	public Vulcan vulcanWeapon;
 	public VileMissile missileWeapon;
 	public RocketPunch rocketPunchWeapon;
@@ -54,10 +55,11 @@ public class Vile : Character {
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
 		bool isWarpIn = true, bool mk2VileOverride = false, bool mk5VileOverride = false,
-		bool isATrans = false
+		VileLoadout loadout = null,
+		int? heartTanks = null, bool isATrans = false
 	) : base(
 		player, x, y, xDir, isVisible,
-		netId, ownedByLocalPlayer, isWarpIn, isATrans
+		netId, ownedByLocalPlayer, isWarpIn, heartTanks, isATrans
 	) {
 		charId = CharIds.Vile;
 		if (isWarpIn) {
@@ -72,22 +74,23 @@ public class Vile : Character {
 				vileForm = 1;
 			}
 		}
-		VileLoadout vileLoadout = player.loadout.vileLoadout;
+		loadout ??= player.loadout.vileLoadout.clone();
+		this.loadout = loadout;
 
-		vulcanWeapon = new Vulcan((VulcanType)vileLoadout.vulcan);
-		cannonWeapon = new VileCannon((VileCannonType)vileLoadout.cannon);
-		missileWeapon = new VileMissile((VileMissileType)vileLoadout.missile);
-		rocketPunchWeapon = new RocketPunch((RocketPunchType)vileLoadout.rocketPunch);
-		napalmWeapon = new Napalm((NapalmType)vileLoadout.napalm);
-		grenadeWeapon = new VileBall((VileBallType)vileLoadout.ball);
-		cutterWeapon = new VileCutter((VileCutterType)vileLoadout.cutter);
-		flamethrowerWeapon = vileLoadout.flamethrower switch {
+		vulcanWeapon = new Vulcan((VulcanType)loadout.vulcan);
+		cannonWeapon = new VileCannon((VileCannonType)loadout.cannon);
+		missileWeapon = new VileMissile((VileMissileType)loadout.missile);
+		rocketPunchWeapon = new RocketPunch((RocketPunchType)loadout.rocketPunch);
+		napalmWeapon = new Napalm((NapalmType)loadout.napalm);
+		grenadeWeapon = new VileBall((VileBallType)loadout.ball);
+		cutterWeapon = new VileCutter((VileCutterType)loadout.cutter);
+		flamethrowerWeapon = loadout.flamethrower switch {
 			-1 => new NoneFlamethrower(),
 			1 => new SeaDragonRage(),
 			2 => new DragonsWrath(),
 			_ => new WildHorseKick()
 		};
-		laserWeapon = new VileLaser((VileLaserType)vileLoadout.laser);
+		laserWeapon = new VileLaser((VileLaserType)loadout.laser);
 		rideMenuWeapon = new MechMenuWeapon(VileMechMenuType.All);
 		hasFrozenCastle = player.frozenCastle;
 		hasSpeedDevil = player.speedDevil;

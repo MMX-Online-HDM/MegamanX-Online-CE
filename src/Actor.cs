@@ -732,7 +732,7 @@ public partial class Actor : GameObject {
 
 		if (Math.Abs(xSwingVel) > 0) {
 			if (chr != null) {
-				if (chr.player.isX) {
+				if (chr is MegamanX) {
 					if (!chr.player.input.isHeld(Control.Dash, chr.player) || chr.flag != null) {
 						xSwingVel = Helpers.lerp(xSwingVel, 0, Global.spf * 5);
 						if (MathF.Abs(xSwingVel) < 20) xSwingVel = 0;
@@ -939,7 +939,7 @@ public partial class Actor : GameObject {
 				// Non-suicide case: prevent assists aggressively
 				if (killer != ownPlayer && (
 						secondLastAttacker.envKillOnly && weaponIndex != null ||
-						Global.time - secondLastAttacker.time > (Global.level?.server?.customMatchSettings?.AssistTime ?? 2) ||	
+						Global.time - secondLastAttacker.time > (Global.level?.server?.customMatchSettings?.assistTime ?? 2) ||	
 						Damager.unassistable(secondLastAttacker.projId)
 					)
 				) {
@@ -981,7 +981,7 @@ public partial class Actor : GameObject {
 			return proj.owner?.isDefenderFavored == true;
 		}
 		if (this is Character character) {
-			if (character.charState is DodgeRoll && Global.level.server?.customMatchSettings?.AxlFTADodgeroll == true) {
+			if (character.charState is DodgeRoll && Global.level.server?.customMatchSettings?.axlFtaDodgeroll == true) {
 				return character.player?.isDefenderFavored == false;
 			}
 		}

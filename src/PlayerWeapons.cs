@@ -109,10 +109,8 @@ public partial class Player {
 		}
 
 		if (input.isPressed(Control.WeaponLeft, this)) {
-			if (isDisguisedAxl && isZero && input.isHeld(Control.Down, this)) return;
 			weaponLeft();
 		} else if (input.isPressed(Control.WeaponRight, this)) {
-			if (isDisguisedAxl && isZero && input.isHeld(Control.Down, this)) return;
 			weaponRight();
 		} else if (character != null && !Control.isNumberBound(realCharNum, Options.main.axlAimMode)) {
 			if (input.isPressed(Key.Num1, canControl) && weapons.Count >= 1) {
