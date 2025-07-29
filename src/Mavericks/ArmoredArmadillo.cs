@@ -224,9 +224,10 @@ public class ArmoredARollWeapon : Weapon {
 #region projectiles
 public class ArmoredAProj : Projectile {
 	public ArmoredAProj(
-		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
+		Point pos, int xDir, Actor owner, ushort? netId,
+		bool sendRpc = false, Player? altPlayer = null
 	) :	base(
-		pos, xDir, owner, "armoreda_proj", netId, player
+		pos, xDir, owner, "armoreda_proj", netId, altPlayer
 	) {
 		weapon = ArmoredAProjWeapon.netWeapon;
 		damager.damage = 3;
@@ -236,7 +237,7 @@ public class ArmoredAProj : Projectile {
 		maxTime = 0.7f;
 		fadeSprite = "armoreda_proj_fade";
 
-		if (rpc) {
+		if (sendRpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 	}
@@ -278,6 +279,45 @@ public class ArmoredAChargeReleaseProj : Projectile {
 #endregion
 
 #region states
+public class ArmoredAShootState : MaverickState {
+	public bool shoot;
+
+	public ArmoredAShootState() : base("shoot") {
+	}
+
+	public override void update() {
+		base.update();
+
+		Point? shootPos = maverick.getFirstPOI();
+		if (!shoot && shootPos != null) {
+			shoot = true;
+			maverick.playSound("energyBall", sendRpc: true);
+			new ArmoredAProj(
+				shootPos.Value, maverick.xDir, maverick, player.getNextActorNetId(), sendRpc: true
+			);
+		}
+
+		if (maverick.frameIndex >= 3) {
+			attackCtrl = true;
+			normalCtrl = true;
+			aiAttackCtrl = true;
+		}
+
+		if (maverick.isAnimOver()) {
+			maverick.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+	}
+
+	public override void onExit(MaverickState newState) {
+		base.onExit(newState);
+	}
+}
+
+
 public class ArmoredAGuardState : MaverickState {
 	public ArmoredAGuardState() : base("block") {
 		aiAttackCtrl = true;

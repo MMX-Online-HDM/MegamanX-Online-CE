@@ -11,12 +11,15 @@ public class ZeroBuster : Weapon {
 		killFeedIndex = 160;
 		weaponBarBaseIndex = 0;
 		weaponBarIndex = weaponBarBaseIndex;
-		weaponSlotIndex = 0;
+		weaponSlotIndex = 117;
 		shootSounds = new string[] { "buster", "buster2", "buster3", "buster4" };
 		fireRate = 9;
 		displayName = "Z-Buster";
 		description = new string[] { "Shoot uncharged Z-Buster with ATTACK." };
 		type = (int)ZeroAttackLoadoutType.ZBuster;
+
+		drawAmmo = false;
+		drawCooldown = false;
 	}
 }
 

@@ -606,7 +606,7 @@ public class MTaunt : MaverickState {
 	public override void update() {
 		base.update();
 		if (maverick.isAnimOver() && !Global.level.gameMode.playerWon(player)) {
-			maverick.changeState(new MIdle());
+			maverick.changeToIdleFallOrFly();
 		}
 		if (maverick.sprite.name == "bcrab_taunt" && stateTime >= 14/60f && !once) {
 			once = true;
@@ -1261,7 +1261,7 @@ public class MWallSlide : MaverickState {
 	public override void update() {
 		base.update();
 		if (maverick.grounded) {
-			maverick.changeState(new MIdle());
+			maverick.changeToIdleFall();
 			return;
 		}
 		if (input.isPressed(Control.Jump, player)) {
@@ -1416,7 +1416,7 @@ public class MShoot : MaverickState {
 					consecutiveWaitTime = Global.spf;
 				}
 			} else {
-				maverick.changeState(new MIdle());
+				maverick.changeToIdleFallOrFly();
 			}
 		}
 	}

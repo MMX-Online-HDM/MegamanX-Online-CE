@@ -14,6 +14,7 @@ public class BusterZero : Character {
 	public List<DZBusterProj> zeroLemonsOnField = new();
 	public ZBusterSaber meleeWeapon = new();
 	public int lastShootPressed;
+	public float aiAttackCooldown;
 
 	public BusterZero(
 		Player player, float x, float y, int xDir,
@@ -388,7 +389,6 @@ public class BusterZero : Character {
 		stockedBusterLv = data[1];
 	}
 
-	public float aiAttackCooldown;
 	public override void aiAttack(Actor? target) {
 		if (charState.normalCtrl) {
 			player.press(Control.Shoot);
@@ -434,19 +434,26 @@ public class BusterZero : Character {
 	}
 
 	public override void aiDodge(Actor? target) {
+		base.aiDodge(target);
+		if (!charState.attackCtrl) {
+			return;
+		}
 		foreach (GameObject gameObject in getCloseActors(64, true, false, false)) {
-			if (gameObject is Projectile proj && proj.damager.owner.alliance != player.alliance && charState.attackCtrl) {
-				if (!(proj.projId == (int)ProjIds.RollingShield || proj.projId == (int)ProjIds.FrostShield || proj.projId == (int)ProjIds.SwordBlock
-					|| proj.projId == (int)ProjIds.FrostShieldAir || proj.projId == (int)ProjIds.FrostShieldChargedPlatform || proj.projId == (int)ProjIds.FrostShieldPlatform)
+			if (gameObject is Projectile proj &&
+				proj.damager.owner.alliance != player.alliance && charState.attackCtrl
+			) {
+				if (proj.projId != (int)ProjIds.RollingShield &&
+					proj.projId != (int)ProjIds.FrostShield &&
+					proj.projId != (int)ProjIds.SwordBlock &&
+					proj.projId != (int)ProjIds.FrostShieldAir &&
+					proj.projId != (int)ProjIds.FrostShieldChargedPlatform &&
+					proj.projId != (int)ProjIds.FrostShieldPlatform &&
+					zSaberCooldown <= 0
 				) {
-					if (zSaberCooldown <= 0) {
-						turnToInput(player.input, player);
-						changeState(new BusterZeroMelee(), true);
-						zSaberCooldown = 36;
-					}
+					turnToInput(player.input, player);
+					changeState(new BusterZeroMelee(), true);
 				}
 			}
 		}
-		base.aiDodge(target);
 	}
 }

@@ -164,7 +164,9 @@ public class AssassinBulletChar : Weapon {
 		weaponBarIndex = 26;
 		weaponSlotIndex = 47;
 		killFeedIndex = 61;
-		drawAmmo = true;
+
+		drawAmmo = false;
+		drawCooldown = false;
 	}
 	public override bool canShoot(int chargeLevel, Player player) {
 		if (!base.canShoot(chargeLevel, player)) return false;

@@ -21,6 +21,9 @@ public class ZSaber : Weapon {
 		type = (int)ZeroAttackLoadoutType.ZSaber;
 		displayName = "Z-Saber";
 		description = new string[] { "Zero's trusty beam saber." };
+
+		drawAmmo = false;
+		drawCooldown = false;
 	}
 }
 
@@ -49,6 +52,9 @@ public class KKnuckleWeapon : Weapon {
 		type = (int)ZeroAttackLoadoutType.KKnuckle;
 		displayName = "K-Knuckle";
 		description = new string[] { "Use your fists to teach foes a lesson." };
+
+		drawAmmo = false;
+		drawCooldown = false;;
 	}
 }
 

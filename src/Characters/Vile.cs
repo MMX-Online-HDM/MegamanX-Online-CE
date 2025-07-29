@@ -933,5 +933,6 @@ public class VileAmmoWeapon : Weapon {
 
 		maxAmmo = 32;
 		ammo = maxAmmo;
+		drawCooldown = false;
 	}
 }

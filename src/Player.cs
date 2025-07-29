@@ -1522,7 +1522,6 @@ public partial class Player {
 		if (spawnCharNum == (int)CharIds.Axl && character is Axl ownAxl) {
 			dnaCore.loadout.axlLoadout.hyperMode = ownAxl.loadout.hyperMode;
 		}
-
 		// If somehow the DNA core loadout is null we copy current one.
 		dnaCore.loadout ??= loadout;
 

@@ -12,6 +12,9 @@ public class UndisguiseWeapon : AxlWeapon {
 		sprite = "axl_arm_pistol";
 		drawAmmo = false;
 		drawCooldown = false;
+
+		drawAmmo = false;
+		drawCooldown = false;
 	}
 }
 
@@ -134,10 +137,12 @@ public class DNACore : AxlWeapon {
 			weaponSlotIndex = 65;
 		}
 		if (charNum == (int)CharIds.BusterZero || charNum == (int)CharIds.PunchyZero) {
-			weaponBarBaseIndex = 31;
+			weaponSlotIndex = 31;
 		}
+
 		sprite = "axl_arm_pistol";
 		drawAmmo = false;
+		drawCooldown = false;
 	}
 
 	public DNACore() : base(0) {

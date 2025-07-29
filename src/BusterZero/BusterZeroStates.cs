@@ -34,7 +34,7 @@ public class BusterZeroMelee : BusterZeroState {
 
 	public override void update() {
 		base.update();
-		if (character.frameIndex >= 5 && !fired) {
+		if (character.frameIndex >= 3 && !fired) {
 			fired = true;
 			character.playSound("zerosaberx3", sendRpc: true);
 		}
@@ -49,11 +49,11 @@ public class BusterZeroMelee : BusterZeroState {
 			sprite = "projswing_air";
 			character.changeSpriteFromName(sprite, true);
 		}
+		zero.zSaberCooldown = 56;
 	}
 
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
-		zero.zSaberCooldown = 36;
 	}
 }
 
@@ -81,10 +81,14 @@ public class BusterZeroMeleeWall : BusterZeroState {
 		}
 	}
 
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		zero.zSaberCooldown = 56;
+	}
+
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		useGravity = true;
-		zero.zSaberCooldown = 36;
 	}
 }
 
@@ -202,7 +206,9 @@ public class BusterZeroDoubleBuster : BusterZeroState {
 }
 
 public class BusterZeroHadangeki : BusterZeroState {
-	bool fired;
+	public bool fired;
+	public bool sound;
+
 
 	public BusterZeroHadangeki() : base("projswing") {
 		landSprite = "projswing";
@@ -216,7 +222,12 @@ public class BusterZeroHadangeki : BusterZeroState {
 
 	public override void update() {
 		base.update();
-		if (character.frameIndex >= 6 && !fired) {
+
+		if (character.frameIndex >= 2 && !sound) {
+			fired = true;
+			character.playSound("zerosaberx3", sendRpc: true);
+		}
+		if (character.frameIndex >= 3 && !fired) {
 			character.playSound("zerosaberx3", sendRpc: true);
 			zero.stockedSaber = false;
 			fired = true;
@@ -237,11 +248,11 @@ public class BusterZeroHadangeki : BusterZeroState {
 			defaultSprite = sprite;
 			character.changeSpriteFromName(sprite, true);
 		}
+		zero.zSaberCooldown = 56;
 	}
 
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
-		zero.zSaberCooldown = 36;
 		zero.stockedTime = 0;
 	}
 }
@@ -261,7 +272,7 @@ public class BusterZeroHadangekiWall : BusterZeroState {
 
 	public override void update() {
 		base.update();
-		if (character.frameIndex >= 4 && !fired) {
+		if (character.frameIndex >= 2 && !fired) {
 			character.playSound("zerosaberx3", sendRpc: true);
 			zero.stockedSaber = false;
 			fired = true;
@@ -276,10 +287,14 @@ public class BusterZeroHadangekiWall : BusterZeroState {
 		}
 	}
 
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		zero.zSaberCooldown = 56;
+	}
+
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		useGravity = true;
-		zero.zSaberCooldown = 36;
 	}
 }
 
