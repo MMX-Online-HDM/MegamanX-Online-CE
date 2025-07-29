@@ -1968,15 +1968,29 @@ public partial class Character : Actor, IDamagable {
 			AirDash airDash when canDash() => (
 				new AirDash(airDash.initialDashButton) { dashTime = airDash.dashTime }
 			),
+			WallSlide wallSlide => (
+				new WallSlide(wallSlide.wallDir, wallSlide.wallCollider) {
+					stateFrames = wallSlide.stateFrames
+				}
+			),
 			Crouch when canCrouch() => new Crouch(),
 			Run => getRunState(true),
 			_ => null
 		};
 		if (newState != null) {
 			changeState(newState);
+			if (charState is WallSlide) {
+				frameIndex = sprite.totalFrameNum - 1;
+			}
+			if (charState is Dash dash && dash.dashTime >= 4) {
+				frameIndex = sprite.totalFrameNum - 1;
+			}
 			return;
 		}
-		if (!grounded && oldChar.charState.canStopJump && oldChar.charState.stoppedJump) {
+		if (!oldChar.grounded && oldChar.isDashing) {
+			isDashing = true;
+		}
+		if (!grounded && oldChar.charState.canStopJump && !oldChar.charState.stoppedJump) {
 			changeState(getJumpState());
 			return;
 		}
