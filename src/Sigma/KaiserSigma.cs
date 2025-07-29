@@ -29,9 +29,9 @@ public partial class KaiserSigma : Character {
 	public KaiserSigma(
 		Player player, float x, float y, int xDir, bool isVisible,
 		ushort? netId, bool ownedByLocalPlayer, bool isWarpIn = false,
-		bool isRevive = true, bool isATrans = false
+		bool isRevive = true, int? heartTanks = null, bool isATrans = false
 	) : base(
-		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, 0, isATrans
+		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, heartTanks, isATrans
 	) { 
 		charId = CharIds.KaiserSigma;
 		kaiserExhaustL = new Anim(

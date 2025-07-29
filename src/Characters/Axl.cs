@@ -1653,7 +1653,7 @@ public class Axl : Character {
 				index = (int)WeaponIds.DNACore - player.weapons.Count
 			};
 			if (isATrans) {
-				player.preTransformedAxl?.weapons.Add(dnaCoreWeapon);
+				player.preTransformedChar?.weapons.Add(dnaCoreWeapon);
 			} else {
 				weapons.Add(dnaCoreWeapon);
 			}

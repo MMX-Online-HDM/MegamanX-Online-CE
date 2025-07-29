@@ -1961,6 +1961,28 @@ public partial class Character : Actor, IDamagable {
 		}
 	}
 
+
+	public virtual void atransStateChange(Character oldChar) {
+		CharState? newState = oldChar.charState switch {
+			Dash dash when canDash() => new Dash(dash.initialDashButton) { dashTime = dash.dashTime },
+			AirDash airDash when canDash() => (
+				new AirDash(airDash.initialDashButton) { dashTime = airDash.dashTime }
+			),
+			Crouch when canCrouch() => new Crouch(),
+			Run => getRunState(true),
+			_ => null
+		};
+		if (newState != null) {
+			changeState(newState);
+			return;
+		}
+		if (!grounded && oldChar.charState.canStopJump && oldChar.charState.stoppedJump) {
+			changeState(getJumpState());
+			return;
+		}
+		changeToIdleOrFall();
+	}
+
 	public virtual void landingCode(bool useSound = true) {
 		dashedInAir = 0;
 		if (useSound) {
@@ -3324,7 +3346,6 @@ public partial class Character : Actor, IDamagable {
 		// Tranform.
 		if (currentWeapon is UndisguiseWeapon && (shootPressed || altShootPressed)) {
 			undisguiseTime = 6;
-			changeState(new ATransTransition());
 			DNACore lastDNA = player.lastDNACore;
 			int lastDNAIndex = player.lastDNACoreIndex;
 			playSound("transform", sendRpc: true);
@@ -3389,7 +3410,9 @@ public partial class Character : Actor, IDamagable {
 	public bool disguiseCoverBlown;
 
 	public void addTransformAnim() {
-		transformAnim = new Anim(pos, "axl_transform", xDir, player.getNextActorNetId(), true, true);
+		transformAnim = new Anim(
+			pos, "axl_transform", xDir, player.getNextActorNetId(), true, true
+		);
 	}
 
 	public virtual void onFlinchOrStun(CharState state) { }

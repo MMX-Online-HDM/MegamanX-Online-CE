@@ -1268,9 +1268,9 @@ public class RPCAxlDisguise : RPC {
 		if (axlDisguiseData.charNum == -1) {
 			player.revertToAxl(axlDisguiseData.dnaNetId);
 		} else if (axlDisguiseData.charNum == -2) {
-			player.revertToAxlDeath();
+			player.revertAtransDeath();
 		} else {
-			player.transformAxlNet(axlDisguiseData);
+			player.startAtransNet(axlDisguiseData);
 		}
 	}
 }

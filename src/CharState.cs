@@ -1386,7 +1386,7 @@ public class Die : CharState {
 		new Anim(character.pos.addxy(0, -12), "die_sparks", 1, null, true);
 
 		if (character.ownedByLocalPlayer && character.isATrans) {
-			character.player.revertToAxlDeath();
+			character.player.revertAtransDeath();
 			character.changeSpriteFromName("die", true);
 		}
 		player.lastDeathWasVileMK2 = false;
@@ -1612,6 +1612,8 @@ public class GenericGrabbedState : CharState {
 }
 
 public class ATransTransition : CharState {
+	public bool allowChange = false;
+
 	public ATransTransition() : base("win") {
 		airMove = true;
 		normalCtrl = false;
@@ -1619,7 +1621,7 @@ public class ATransTransition : CharState {
 	}
 
 	public override bool canExit(Character character, CharState newState) {
-		return false;
+		return allowChange;
 	}
 }
 

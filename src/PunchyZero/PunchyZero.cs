@@ -59,7 +59,7 @@ public class PunchyZero : Character {
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
 		bool isWarpIn = true, PZeroLoadout? loadout = null,
 		int? heartTanks = null, bool isATrans = false
-	) : base(
+	) : base( 
 		player, x, y, xDir, isVisible,
 		netId, ownedByLocalPlayer,
 		isWarpIn, heartTanks, isATrans
