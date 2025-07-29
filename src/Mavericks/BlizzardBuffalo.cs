@@ -63,18 +63,33 @@ public class BlizzardBuffalo : Maverick {
 
 	public override MaverickState[] strikerStates() {
 		return [
-			getShootState(false),
+			new BBuffaloShootAI(null, isStriker: true),
 			new BBuffaloShootBeamState(),
 			new BBuffaloDashState(),
 		];
 	}
 
 	public override MaverickState[] aiAttackStates() {
-		return [
-			getShootState(false),
-			new BBuffaloShootBeamState(),
-			new BBuffaloDashState(),
-		];
+		float enemyDist = 300;
+		if (target != null) {
+			enemyDist = MathF.Abs(target.pos.x - pos.x);
+		}
+		List<MaverickState> aiStates = [];
+		if (enemyDist > 170) {
+			aiStates.Add(new BBuffaloShootAI(target, isStriker: false));
+		}
+		if (enemyDist < 170 && enemyDist > 55) {
+			aiStates.Add(new BBuffaloShootBeamState());
+		}
+		if (enemyDist < 170 && enemyDist > 30) {
+			aiStates.Add(new BBuffaloDashState());
+		}
+		if (enemyDist <= 30) {
+			xDir = -xDir;
+			aiStates.Add(new BBuffaloDashState());
+			aiStates.Add(new BuffaloJumpAI());
+		}
+		return aiStates.ToArray();
 	}
 
 	public MaverickState getShootState(bool isAI) {
@@ -612,5 +627,208 @@ public class BBuffaloDragged : GenericGrabbedState {
 		grabber, maxGrabTime, "_dash", reverseZIndex: true,
 		freeOnHitWall: false, lerp: true, additionalGrabSprite: "_dash_grab"
 	) {
+	}
+}
+
+public class BBuffaloShootAI : MaverickState {
+	public BlizzardBuffalo FrozenBuffalio = null!;
+	Actor? target;
+	public bool isStriker;
+	public BBuffaloShootAI(Actor? target, bool isStriker) : base("shoot") {
+		this.target = target;
+		this.isStriker = isStriker;
+	}
+
+	public override void update() {
+		base.update();
+		Point? shootPos = maverick.getFirstPOI();
+		if (shootPos != null && !once && !isStriker) {
+			once = true;
+			new BBuffaloIceProjAI(
+				shootPos.Value, maverick.xDir, target,
+				FrozenBuffalio, player.getNextActorNetId(), sendRpc: true
+			);
+			maverick.playSound("bbuffaloShoot", sendRpc: true);
+		}
+		if (isStriker && shootPos != null && !once) {
+			once = true;
+			new BBuffaloIceProjAIStriker(
+				shootPos.Value, maverick.xDir, 0,
+				FrozenBuffalio, player.getNextActorNetId(), sendRpc: true
+			);
+			new BBuffaloIceProjAIStriker(
+				shootPos.Value, maverick.xDir, 1,
+				FrozenBuffalio, player.getNextActorNetId(), sendRpc: true
+			);
+			new BBuffaloIceProjAIStriker(
+				shootPos.Value, maverick.xDir, 2,
+				FrozenBuffalio, player.getNextActorNetId(), sendRpc: true
+			);
+			maverick.playSound("bbuffaloShoot", sendRpc: true);
+		}
+		if (maverick.isAnimOver()) {
+			maverick.changeToIdleOrFall();
+		}
+	}
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		FrozenBuffalio = maverick as BlizzardBuffalo ?? throw new NullReferenceException();
+	}
+	public override void onExit(MaverickState newState) {
+		base.onExit(newState);
+
+	}
+}
+public class BBuffaloIceProjAI : Projectile {
+	public Actor? target;
+	public BBuffaloIceProjAI(
+		Point pos, int xDir, Actor? target,
+		Actor owner, ushort netProjId, bool sendRpc = false
+	) : base(
+		pos, xDir, owner, "bbuffalo_proj_iceball", netProjId
+	) {
+		damager.damage = 3f;
+		damager.flinch = Global.defFlinch;
+		damager.hitCooldown = 1;
+		weapon = BlizzardBuffalo.netWeapon;
+		projId = (int)ProjIds.BBuffaloIceProjAI;
+		maxTime = 1.5f;
+		useGravity = true;
+		this.target = target;
+		if (target != null) {
+			if (owner.xDir == 1) {
+				vel = new Point((int)target.pos.x, (int)(-target.pos.y + (owner.pos.y * Helpers.randomRange(0.25f, 0.75f))));
+			} else if (owner.xDir == -1) {
+				vel = new Point((int)-target.pos.x - owner.pos.x * Helpers.randomRange(1.25f, 1.45f), (int)(-target.pos.y + (owner.pos.y * Helpers.randomRange(0.25f, 0.75f))));
+			}
+		} else {
+			vel = new Point(0, 0);
+		}
+
+		if (collider != null) { collider.wallOnly = true; }
+		destroyOnHit = true;
+
+		if (sendRpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+		}
+
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new BBuffaloIceProjAI(
+			args.pos, args.xDir, null, args.owner, args.netId
+		);
+	}
+
+	public override void onStart() {
+		base.onStart();
+
+		if (checkCollision(0, 0) != null) {
+			destroySelf();
+			Anim.createGibEffect("bbuffalo_proj_ice_gibs", getCenterPos(), owner);
+			playSound("iceBreak");
+		}
+	}
+
+	public override void onHitWall(CollideData other) {
+		base.onHitWall(other);
+
+		destroySelf();
+		if (!ownedByLocalPlayer) return;
+		var hitNormal = other.getNormalSafe();
+		new BBuffaloIceProjGround(
+			other.getHitPointSafe(), 1, hitNormal.byteAngle, this,
+			owner, owner.getNextActorNetId(), rpc: true
+		);
+	}
+
+	public override void onHitDamagable(IDamagable damagable) {
+		base.onHitDamagable(damagable);
+		if (!ownedByLocalPlayer) return;
+
+		destroySelf();
+		Anim.createGibEffect("bbuffalo_proj_ice_gibs", getCenterPos(), owner, sendRpc: true);
+		playSound("iceBreak", sendRpc: true);
+	}
+}
+public class BuffaloJumpAI : MaverickState {
+	public BuffaloJumpAI() : base("jump", "jump_start") {
+	}
+
+	public override void update() {
+		base.update();
+		if (stateTime > 12f / 60f) {
+			maverick.changeState(new MFall());
+		}
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		maverick.vel.y = -maverick.getJumpPower() * 1.25f;
+	}
+}
+public class BBuffaloIceProjAIStriker : Projectile {
+	public int type;
+	public BBuffaloIceProjAIStriker(
+		Point pos, int xDir, int type,
+		Actor owner, ushort netProjId, bool sendRpc = false
+	) : base(
+		pos, xDir, owner, "bbuffalo_proj_iceball", netProjId
+	) {
+		damager.damage = 3f;
+		damager.flinch = Global.defFlinch;
+		damager.hitCooldown = 1;
+		weapon = BlizzardBuffalo.netWeapon;
+		projId = (int)ProjIds.BBuffaloIceProjAIStriker;
+		maxTime = 1.5f;
+		useGravity = true;
+		this.type = type;
+		if (type == 0) vel = new Point(Helpers.randomRange(50,90), -Helpers.randomRange(270,300));
+		else if (type == 1) vel = new Point(Helpers.randomRange(140,180), -Helpers.randomRange(300,350));
+		else if (type == 2) vel = new Point(Helpers.randomRange(230,270), -Helpers.randomRange(300,350));
+		if (collider != null) { collider.wallOnly = true; }
+		destroyOnHit = true;
+
+		if (sendRpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)type);
+		}
+
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new BBuffaloIceProjAIStriker(
+			args.pos, args.xDir, args.extraData[0], args.owner, args.netId
+		);
+	}
+
+	public override void onStart() {
+		base.onStart();
+
+		if (checkCollision(0, 0) != null) {
+			destroySelf();
+			Anim.createGibEffect("bbuffalo_proj_ice_gibs", getCenterPos(), owner);
+			playSound("iceBreak");
+		}
+	}
+
+	public override void onHitWall(CollideData other) {
+		base.onHitWall(other);
+
+		destroySelf();
+		if (!ownedByLocalPlayer) return;
+		var hitNormal = other.getNormalSafe();
+		new BBuffaloIceProjGround(
+			other.getHitPointSafe(), 1, hitNormal.byteAngle, this,
+			owner, owner.getNextActorNetId(), rpc: true
+		);
+	}
+
+	public override void onHitDamagable(IDamagable damagable) {
+		base.onHitDamagable(damagable);
+		if (!ownedByLocalPlayer) return;
+
+		destroySelf();
+		Anim.createGibEffect("bbuffalo_proj_ice_gibs", getCenterPos(), owner, sendRpc: true);
+		playSound("iceBreak", sendRpc: true);
 	}
 }

@@ -53,7 +53,7 @@ public class VoltCatfish : Maverick {
 	public override void update() {
 		if (input.isPressed(Control.Special1, player)) {
 			foreach (var mine in mines) {
-			//	mine.stopMoving();
+				//	mine.stopMoving();
 			}
 		}
 		base.update();
@@ -63,7 +63,7 @@ public class VoltCatfish : Maverick {
 					changeState(getShootState(false));
 				} else if (input.isPressed(Control.Special1, player)) {
 					if (!mines.Any(m => m.electrified)) {
-						changeState(new VoltCTriadThunderState());		
+						changeState(new VoltCTriadThunderState());
 					} else {
 						changeState(new VoltCSuckState());
 					}
@@ -93,20 +93,28 @@ public class VoltCatfish : Maverick {
 
 	public override MaverickState[] aiAttackStates() {
 		List<MaverickState> aiStates = [
-			getShootState(isAI: true),
-			getSpecialState()
 		];
-		if (ammo >= 32f) {
+		float enemyDist = 300;
+		float enemyDistY = 30;
+		if (target != null) {
+			enemyDist = MathF.Abs(target.pos.x - pos.x);
+			enemyDistY = MathF.Abs(target.pos.y - pos.y);
+		}
+		if (ammo >= 32f && enemyDist <= 20) {
 			aiStates.Add(new VoltCSpecialState());
 		}
+		if (enemyDist <= 20 && enemyDistY >= 15) {
+			if (ammo >= 8f) aiStates.Add(new VoltCUpBeamState());
+			aiStates.Add(new VoltCJumpAI());
+		}
+		if (!mines.Any(m => m.electrified) && enemyDist <= 160) {
+			aiStates.Add(new VoltCTriadThunderState());
+		}
+		if (mines.Any(m => m.electrified)) {
+			aiStates.Add(new VoltCSuckState());
+		}
 		if (mines.Count == 0) {
-			float enemyDist = 300;
-			if (target != null) {
-				enemyDist = MathF.Abs(target.pos.x - pos.x);
-			}
-			if (enemyDist >= 30) {
-				aiStates.Add(new VoltCSuckState());
-			}
+			aiStates.Add(getShootState(true));
 		}
 		return aiStates.ToArray();
 	}
@@ -202,7 +210,7 @@ public class VoltCTriadThunderProj : Projectile {
 		}
 		destroyOnHit = false;
 		shouldShieldBlock = false;
-		maxTime = 1.75f;
+		maxTime = ElectroNamazuros.isAI ? 2 : 1.75f;
 		this.ElectroNamazuros = ElectroNamazuros;
 		this.type = type;
 		this.num = num;
@@ -717,5 +725,21 @@ public class VoltCBounce : MaverickState {
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 		maverick.vel.y = -maverick.getJumpPower() * 0.4f;
+	}
+}
+public class VoltCJumpAI : MaverickState {
+	public VoltCJumpAI() : base("jump", "jump_start") {
+	}
+
+	public override void update() {
+		base.update();
+		if (stateTime > 24f / 60f) {
+			maverick.changeState(new MFall());
+		}
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		maverick.vel.y = -maverick.getJumpPower() * 1.25f;
 	}
 }

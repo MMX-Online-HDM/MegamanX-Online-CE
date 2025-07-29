@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace MMXOnline;
 
@@ -72,11 +73,27 @@ public class TunnelRhino : Maverick {
 	}
 
 	public override MaverickState[] aiAttackStates() {
-		return [
-			new TunnelRShootState(false),
-			new TunnelRShoot2State(),
-			new TunnelRDashState(),
-		];
+		float enemyDist = 300;
+		int enemyxDir = 1;
+		if (target != null) {
+			enemyDist = MathF.Abs(target.pos.x - pos.x);
+			enemyxDir = target.xDir * -1;
+		}
+		List<MaverickState> aiStates = [];
+		if (enemyDist > 30) {
+			aiStates.Add(new TunnelRShootState(false));
+			aiStates.Add(new TunnelRShoot2State());
+
+		}
+		if (enemyDist > 30) {
+			aiStates.Add(new TunnelRDashState());
+		}
+		if (enemyDist <= 30) {
+			xDir = -xDir;
+			aiStates.Add(new TunnelRDashState());
+			aiStates.Add(new TunnelRJumpAI());
+		}
+		return aiStates.ToArray();
 	}
 
 	// Melee IDs for attacks.
@@ -355,9 +372,25 @@ public class TunnelRDashState : MaverickState {
 
 		maverick.move(move);
 
-		if (isHoldStateOver(0.5f, 1.5f, 1f, Control.Dash)) {
+		if (isHoldStateOver(0.5f, 1.5f, 1.5f, Control.Dash)) {
 			maverick.changeToIdleOrFall();
 			return;
 		}
+	}
+}
+public class TunnelRJumpAI : MaverickState {
+	public TunnelRJumpAI() : base("jump", "jump_start") {
+	}
+
+	public override void update() {
+		base.update();
+		if (stateTime > 12f / 60f) {
+			maverick.changeState(new MFall());
+		}
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		maverick.vel.y = -maverick.getJumpPower() * 1.25f;
 	}
 }

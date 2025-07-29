@@ -257,6 +257,9 @@ public partial class RPCCreateProj : RPC {
 		{ (int)ProjIds.BBuffaloIceProjGround, BBuffaloIceProjGround.rpcInvoke },
 		{ (int)ProjIds.BBuffaloBeam, BBuffaloBeamProj.rpcInvoke },
 		{ (int)ProjIds.BBuffaloCrash, BBuffaloCrashProj.rpcInvoke },
+		{ (int)ProjIds.BBuffaloIceProjAI, BBuffaloIceProjAI.rpcInvoke },
+		{ (int)ProjIds.BBuffaloIceProjAIStriker, BBuffaloIceProjAIStriker.rpcInvoke },
+
 
 		// Axl
 		{ (int)ProjIds.BlackArrowGround, BlackArrowGrounded.rpcInvoke },

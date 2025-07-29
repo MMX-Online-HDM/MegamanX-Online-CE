@@ -646,6 +646,9 @@ public enum ProjIds {
 	FakeZeroSwordBeam,
 	FakeZeroGroundPunch,
 	BBuffaloIceProj,
+	BBuffaloIceProjAI,
+	BBuffaloIceProjAIStriker,
+
 	BBuffaloIceProjGround,
 	BBuffaloBeam,
 	BBuffaloDrag,

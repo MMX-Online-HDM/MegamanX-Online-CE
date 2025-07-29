@@ -103,11 +103,18 @@ public class BlastHornet : Maverick {
 	}
 
 	public override MaverickState[] aiAttackStates() {
-		return [
+		float enemyDist = 300;
+		if (target != null) {
+			enemyDist = MathF.Abs(target.pos.x - pos.x);
+		}
+		List<MaverickState> aiStates = [
 			new BHornetShootState(grounded),
 			new BHornetShoot2State(null),
-			new BHornetStingState(),
 		];
+		if (enemyDist <= 40) {
+			aiStates.Add(new BHornetStingState());
+		}
+		return aiStates.ToArray();
 	}
 
 	public Point? getWingPOI(out string tag) {

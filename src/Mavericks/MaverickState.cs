@@ -1261,7 +1261,7 @@ public class MWallSlide : MaverickState {
 	public override void update() {
 		base.update();
 		if (maverick.grounded) {
-			maverick.changeToIdleFall();
+			maverick.changeToIdleOrFall();
 			return;
 		}
 		if (input.isPressed(Control.Jump, player)) {

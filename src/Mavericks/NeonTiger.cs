@@ -101,7 +101,7 @@ public class NeonTiger : Maverick {
 			aiStates.Add(new NeonTDashClawState());
 			shootTimes = 0;
 		}
-		if (dashAICooldown <= 0) {
+		if (dashAICooldown <= 0 && shootTimes >= 4) {
 			dashAICooldown = 90;
 			aiStates.Add(new NeonTDashState());
 		}
@@ -437,7 +437,7 @@ public class NeonTDashState : MaverickState {
 			return;
 		}
 		maverick.move(move);
-		if (input.isPressed(Control.Shoot, player) || (isAI && enemyDist <= 10)) {
+		if (input.isPressed(Control.Shoot, player) || (isAI && enemyDist <= 30)) {
 			maverick.changeState(new NeonTDashClawState());
 		} else if (isHoldStateOver(0.1f, 0.6f, 50f / 60f, Control.Dash)) {
 			maverick.changeToIdleOrFall();

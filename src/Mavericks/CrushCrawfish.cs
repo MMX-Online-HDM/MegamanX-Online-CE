@@ -85,7 +85,7 @@ public class CrushCrawfish : Maverick {
 			);
 		}, "crushcShoot");
 		if (isAI) {
-			mshoot.consecutiveData = new MaverickStateConsecutiveData(0, 4, 0.75f);
+			mshoot.consecutiveData = new MaverickStateConsecutiveData(0, 2, 0.25f);
 		}
 		return mshoot;
 	}

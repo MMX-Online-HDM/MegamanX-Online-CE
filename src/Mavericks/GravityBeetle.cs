@@ -78,11 +78,18 @@ public class GravityBeetle : Maverick {
 	}
 
 	public override MaverickState[] aiAttackStates() {
-		return [
+		float enemyDist = 300;
+		if (target != null) {
+			enemyDist = MathF.Abs(target.pos.x - pos.x);
+		}
+		List<MaverickState> aiStates = [
 			new GBeetleShoot(false),
-			new GBeetleGravityWellState(),
-			new GBeetleDashState(),
+			new GBeetleDashState()
 		];
+		if (enemyDist <= 80) {
+			aiStates.Add(new GBeetleGravityWellState());
+		}
+		return aiStates.ToArray();
 	}
 
 	// Melee IDs for attacks.
@@ -547,7 +554,7 @@ public class GBeetleGravityWellState : MaverickState {
 					player.getNextActorNetId(), false, sendRpc: true) { ttl = partTime, vel = vel };
 			}
 
-			if (isHoldStateOver(1f, 3f, 2f, Control.Special1)) {
+			if (isHoldStateOver(1f, 3f, 3f, Control.Special1)) {
 				maverick.changeSpriteFromName("blackhole", true);
 				chargeTime = (int)stateTime;
 				state = 1;
