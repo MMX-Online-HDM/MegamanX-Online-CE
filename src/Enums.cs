@@ -598,6 +598,8 @@ public enum ProjIds {
 	Sigma2HopperDrill,
 	Sigma2ViralPossess,
 	WSpongeSeed,
+	WSpongeSeedAI,
+	WSpongeSeedAIStriker,
 	WSpongeSpike,
 	WSpongeChainSpin,
 	WSpongeChain,

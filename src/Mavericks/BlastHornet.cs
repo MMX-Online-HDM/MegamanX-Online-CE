@@ -109,7 +109,7 @@ public class BlastHornet : Maverick {
 		}
 		List<MaverickState> aiStates = [
 			new BHornetShootState(grounded),
-			new BHornetShoot2State(null),
+			new BHornetShoot2State(target),
 		];
 		if (enemyDist <= 40) {
 			aiStates.Add(new BHornetStingState());
