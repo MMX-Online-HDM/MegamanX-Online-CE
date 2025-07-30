@@ -104,6 +104,7 @@ public class Maverick : Actor, IDamagable {
 	public bool autoExit;
 	public float autoExitTime;
 	public float strikerTime;
+	public float strikerOverrideTime = 3;
 	public int attackDir;
 	public SubTank usedSubtank;
 	public float netSubtankHealAmount;
@@ -358,7 +359,7 @@ public class Maverick : Actor, IDamagable {
 
 		if (controlMode == MaverickModeId.Striker) {
 			strikerTime += Global.spf;
-			if (strikerTime > 3) {
+			if (strikerTime > strikerOverrideTime) {
 				if (this is WireSponge || this is ToxicSeahorse) {
 					if (state is MIdle) {
 						changeState(new MExit(pos, true));
@@ -473,7 +474,7 @@ public class Maverick : Actor, IDamagable {
 				target = Global.level.getClosestTarget(getCenterPos(), player.alliance, true, isRequesterAI: true);
 				doppler.ballType = 0;
 			}
-		} else if (isSummonerCocoon || isStrikerCocoon) {
+		} else if (isSummonerCocoon) {
 			target = mmc.getHealTarget();
 		} else if (controlMode is not MaverickModeId.Puppeteer and not MaverickModeId.TagTeam) {
 			target = Global.level.getClosestTarget(
@@ -493,12 +494,7 @@ public class Maverick : Actor, IDamagable {
 		if ((target != null || doStartMoveControlIfNoTarget) &&
 			isAIState && controlMode != MaverickModeId.Puppeteer
 		) {
-			if (isSummonerCocoon) {
-				if (target != null) {
-					mmc?.changeState(new MorphMCSpinState());
-				}
-			}
-			else if (aiCooldown == 0 && isAIState) {
+			if (aiCooldown == 0 && isAIState) {
 				MaverickState mState = getRandomAttackState();
 				if (isSummonerOrStrikerDoppler && doppler.ballType == 1) {
 					mState = strikerStates()[0];
@@ -811,6 +807,9 @@ public class Maverick : Actor, IDamagable {
 		if (this is FakeZero fz && fz.state is FakeZeroGuardState) {
 			ammo += damage;
 			if (ammo > 32) ammo = 32;
+			if (controlMode == MaverickModeId.Summoner)
+				damage *= 0.5f;
+			else
 			damage *= 0.75f;
 		}
 

@@ -261,11 +261,11 @@ public class BaseSigma : Character {
 				}
 			}
 		}
-		bool spcHeld2P = player.input.isPressed(Control.Special2, player);
 		if (currentWeapon is MaverickWeapon { controlMode: not MaverickModeId.TagTeam }) {
 			if (player.weapon is MaverickWeapon mw &&
 				(mw.cooldown == 0 || mw.controlMode != MaverickModeId.Striker) &&
-				(shootPressed || spcPressed && mw.controlMode != MaverickModeId.Striker)
+				(shootPressed || spcPressed && (mw.controlMode != MaverickModeId.Striker ||
+				mw.controlMode == MaverickModeId.Striker && mw is MorphMothWeapon))
 			) {
 				if (mw.maverick == null) {
 					if (canAffordMaverick(mw)) {
@@ -286,7 +286,12 @@ public class BaseSigma : Character {
 							if (shootHeld && DownHeld) maverick.startMoveControl = Control.Down;
 							if (shootHeld && LeftHeld) maverick.startMoveControl = Control.Left;
 							if (shootHeld && RightHeld) maverick.startMoveControl = Control.Right;
-							//bool spcHeld = player.input.isHeld(Control.Special1, player);
+							bool spcHeld = player.input.isHeld(Control.Special1, player);
+							if (spcHeld) maverick.startMoveControl = Control.Shoot;
+							if (spcHeld && UpHeld) maverick.startMoveControl = Control.Up;
+							if (spcHeld && DownHeld) maverick.startMoveControl = Control.Down;
+							if (spcHeld && LeftHeld) maverick.startMoveControl = Control.Left;
+							if (spcHeld && RightHeld) maverick.startMoveControl = Control.Right;
 							//bool spcHeld2 = player.input.isHeld(Control.Special2, player);
 							/*
 							if (shootHeld && spcHeld) {

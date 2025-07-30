@@ -61,7 +61,7 @@ public class FlameMammoth : Maverick {
 			);
 		}, "flamemShoot");
 		if (isAI) {
-			shootState.consecutiveData = new MaverickStateConsecutiveData(0, 3);
+			shootState.consecutiveData = new MaverickStateConsecutiveData(0, 3, 0.1f);
 		}
 		return shootState;
 	}

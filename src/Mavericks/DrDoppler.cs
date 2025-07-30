@@ -7,6 +7,7 @@ public class DrDoppler : Maverick {
 	public int shootTimes;
 	public Weapon? meleeWeapon;
 	public int ballType;
+	public float targetTime;
 	public DrDoppler(
 		Player player, Point pos, Point destPos, int xDir,
 		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
@@ -51,7 +52,7 @@ public class DrDoppler : Maverick {
 		} else {
 			drainAmmo(2);
 		}
-
+		Helpers.decrementFrames(ref targetTime);
 		if (aiBehavior == MaverickAIBehavior.Control) {
 			if (input.isPressed(Control.Special2, player)) {
 				if (state is not StingCClimb && grounded) {
@@ -94,20 +95,11 @@ public class DrDoppler : Maverick {
 			new DrDopplerShootState(),
 			new DrDopplerAbsorbState(),
 			new DrDopplerDashStartState(),
+			getShootState(true),
 		];
 	}
 
 	public override MaverickState[] aiAttackStates() {
-		if (Helpers.randomRange(0, 2) == 1) {
-			foreach (GameObject gameObject in getCloseActors(64, true, false, false)) {
-				if (gameObject is Projectile proj &&
-					proj.damager.owner.alliance != player.alliance &&
-					!proj.isMelee
-				) {
-					return [new DrDopplerAbsorbState()];
-				}
-			}
-		}
 		List<MaverickState> aiStates = [];
 		if (shootTimes < 3) {
 			shootTimes++;
@@ -118,24 +110,46 @@ public class DrDoppler : Maverick {
 		}
 		return aiStates.ToArray();
 	}
+	public override void aiUpdate() {
+		base.aiUpdate();
+		if (controlMode == MaverickModeId.Summoner && Helpers.randomRange(0, 10) == 1 &&
+			ammo >= 8 && state is not DrDopplerAbsorbState or DrDopplerDashState && health < maxHealth) {
+			foreach (GameObject gameObject in getCloseActors(64, true, false, false)) {
+				if (gameObject is Projectile proj &&
+					proj.damager.owner.alliance != player.alliance &&
+					!proj.isMelee
+				) {
+					deductAmmo(4);
+					changeState(new DrDopplerAbsorbState());
+				}
+			}
+		}
+		if (controlMode == MaverickModeId.Summoner) {
+			if (target == null && targetTime <= 0) {
+				ballType = 1;
+				changeState(getShootState(false));
+			} else if (target != null) {
+				ballType = 0;
+				targetTime = 120;
+			}
+		}
 
-	/*public MaverickState getShootState(bool isAI) {
+	}
+
+	public MaverickState getShootState(bool isAI) {
 		var mshoot = new MShoot((Point pos, int xDir) => {
-
-			if (ballType == 0) 	playSound("electricSpark", sendRpc: true);
-			else playSound("busterX3", sendRpc: true); 
-
+			 playSound("busterX3", sendRpc: true); 
 			new DrDopplerBallProj(
-				pos, xDir, ballType, this, 
+				pos, xDir, 1, 0, this, 
 				player, player.getNextActorNetId(), rpc: true
 			);
 
 		}, null!);
 		if (isAI) {
-			mshoot.consecutiveData = new MaverickStateConsecutiveData(0, 4, 0f);
+			mshoot.consecutiveData = new MaverickStateConsecutiveData(0, 5, 0f);
 		}
 		return mshoot;
-	} */
+	} 
 
 	// Melee IDs for attacks.
 	public enum MeleeIds {
@@ -382,7 +396,14 @@ public class DrDopplerAbsorbState : MaverickState {
 			maverick.changeToIdleOrFall();
 			return;
 		}
-
+		if (isAI) {
+			if (maverick.frameIndex == 13) {
+				maverick.frameIndex = 9;
+			}
+			if (stateTime > 90f / 60f) {
+				maverick.changeToIdleOrFall();
+			}
+		}
 		if (input.isHeld(Control.Special1, player) && maverick.frameIndex == 13) {
 			maverick.frameIndex = 9;
 		}
