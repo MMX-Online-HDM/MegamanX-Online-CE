@@ -44,34 +44,46 @@ public class MaverickState {
 	public float flySoundTime;
 
 	public bool once;
-	public string enterSound;
-	public bool stopMoving;
+	public string enterSound = "";
 	public bool canEnterSelf = true;
 	public bool useGravity = true;
 	public bool superArmor;
 	public float consecutiveWaitTime;
-	public bool stopMovingOnEnter;
+	public bool stopMoving;
 	public bool exitOnAnimEnd;
 	public bool wasFlying;
 
-	public Collider lastLeftWallCollider;
-	public Collider lastRightWallCollider;
-	public Wall lastLeftWall;
-	public Wall lastRightWall;
+	public Collider? lastLeftWallCollider;
+	public Collider? lastRightWallCollider;
+	public Wall? lastLeftWall;
+	public Wall? lastRightWall;
+	public bool hitLadder;
 
-	public Maverick maverick;
-	public Player player { get { return maverick?.player; } }
-	public Input input { get { return maverick?.input; } }
+	public Maverick maverick = null!;
+	public Player player { get { return maverick.player; } }
+	public Input input { get { return maverick.input; } }
 
+	// Control system.
+	// This dictates if it can attack or land.
 	public bool normalCtrl;
 	public bool attackCtrl;
 	public bool aiAttackCtrl;
+
+	// Other movement stuff.
+	public bool airMove;
+	public bool canJump;
+	public bool canStopJump;
+	public bool stoppedJump;
+	public bool exitOnLanding;
+	public bool exitOnAirborne;
+	public bool useDashJumpSpeed;
 	public bool canBeCanceled = true;
 
-	public MaverickStateConsecutiveData consecutiveData;
+	public MaverickStateConsecutiveData? consecutiveData;
+	public bool isAI => maverick.aiBehavior != MaverickAIBehavior.Control && !player.isAI;
 
 	public MaverickState(string sprite, string transitionSprite = "") {
-		this.sprite = string.IsNullOrEmpty(transitionSprite) ? sprite : transitionSprite;
+		this.sprite = transitionSprite == "" ? sprite : transitionSprite;
 		this.transitionSprite = transitionSprite;
 		defaultSprite = sprite;
 		stateTime = 0;
@@ -84,40 +96,43 @@ public class MaverickState {
 	}
 
 	public virtual void update() {
+		stateTime += Global.spf;
+
 		if (inTransition()) {
-			maverick.frameSpeed = 1;
 			if (maverick.isAnimOver() && !Global.level.gameMode.isOver) {
 				sprite = defaultSprite;
 				maverick.changeSpriteFromName(sprite, true);
 			}
 		}
 
-		stateTime += Global.spf;
-
-		var lastLeftWallData = maverick.getHitWall(-Global.spf * 60, 0);
-		lastLeftWallCollider = lastLeftWallData != null ? lastLeftWallData.otherCollider : null;
+		CollideData? lastLeftWallData = maverick.getHitWall(-1, 0);
+		lastLeftWallCollider = lastLeftWallData?.otherCollider;
 		if (lastLeftWallCollider != null && !lastLeftWallCollider.isClimbable) lastLeftWallCollider = null;
 		lastLeftWall = lastLeftWallData?.gameObject as Wall;
 
-		var lastRightWallData = maverick.getHitWall(Global.spf * 60, 0);
-		lastRightWallCollider = lastRightWallData != null ? lastRightWallData.otherCollider : null;
+		CollideData? lastRightWallData = maverick.getHitWall(1, 0);
+		lastRightWallCollider = lastRightWallData?.otherCollider;
 		if (lastRightWallCollider != null && !lastRightWallCollider.isClimbable) lastRightWallCollider = null;
 		lastRightWall = lastRightWallData?.gameObject as Wall;
 
 		// Moving platforms detection
-		CollideData leftWallPlat = maverick.getHitWall(-Global.spf * 300, 0);
+		CollideData? leftWallPlat = maverick.getHitWall(-5, 0);
 		if (leftWallPlat?.gameObject is Wall leftWall && leftWall.isMoving) {
 			maverick.move(leftWall.deltaMove, useDeltaTime: true);
 			lastLeftWallCollider = leftWall.collider;
-		} else if (leftWallPlat?.gameObject is Actor leftActor && leftActor.isPlatform && leftActor.pos.x < maverick.pos.x) {
+		} else if (leftWallPlat?.gameObject is Actor leftActor &&
+			leftActor.isPlatform && leftActor.pos.x < maverick.pos.x
+		) {
 			lastLeftWallCollider = leftActor.collider;
 		}
 
-		CollideData rightWallPlat = maverick.getHitWall(Global.spf * 300, 0);
+		CollideData? rightWallPlat = maverick.getHitWall(5, 0);
 		if (rightWallPlat?.gameObject is Wall rightWall && rightWall.isMoving) {
 			maverick.move(rightWall.deltaMove, useDeltaTime: true);
 			lastRightWallCollider = rightWall.collider;
-		} else if (rightWallPlat?.gameObject is Actor rightActor && rightActor.isPlatform && rightActor.pos.x > maverick.pos.x) {
+		} else if (rightWallPlat?.gameObject is Actor rightActor &&
+			rightActor.isPlatform && rightActor.pos.x > maverick.pos.x
+		) {
 			lastRightWallCollider = rightActor.collider;
 		}
 
@@ -129,56 +144,39 @@ public class MaverickState {
 	}
 
 	public virtual bool canEnter(Maverick maverick) {
-		if (!canEnterSelf && maverick.state.GetType() == GetType()) return false;
-		return true;
+		return canEnterSelf || maverick.state.GetType() != GetType();
 	}
 
 	public virtual void onEnter(MaverickState oldState) {
 		if (oldState is MFly) wasFlying = true;
-		if (stopMoving) maverick.stopMoving();
-		if (!string.IsNullOrEmpty(enterSound)) maverick.playSound(enterSound, sendRpc: true);
+		if (enterSound != "") maverick.playSound(enterSound, sendRpc: true);
 		if (!useGravity) maverick.useGravity = false;
-		if (stopMovingOnEnter) maverick.stopMoving();
+		if (stopMoving) maverick.stopMovingWeak();
 	}
 
 	public virtual void onExit(MaverickState newState) {
 		if (maverick is NeonTiger nt) {
-			if (newState is not MJumpStart && newState is not MJump && newState is not MFall && newState is not NeonTPounceState && newState is not NeonTAirClawState) {
+			if (newState is not MJumpStart and not MJump and not MFall
+				and not NeonTPounceState and not NeonTAirClawState
+			) {
 				nt.isDashing = false;
 			}
 		}
-
 		if (maverick.controlMode == MaverickModeId.Striker) {
-			if (!aiAttackCtrl && this is not MEnter && (newState is MIdle || newState is MFall)) {			
+			if (!aiAttackCtrl && this is not MEnter && (newState is MIdle || newState is MFall)) {
 				maverick.aiCooldown = maverick.maxAICooldown;
 				maverick.autoExit = true;
 			}
-		}
-		else if (!newState.aiAttackCtrl) {
+		} else if (!newState.aiAttackCtrl) {
 			maverick.aiCooldown = maverick.maxAICooldown;
 		}
-		if (!useGravity) maverick.useGravity = true;
+		if (!useGravity) {
+			maverick.useGravity = true;
+		}
 	}
 
 	public bool inTransition() {
-		return !string.IsNullOrEmpty(transitionSprite) && sprite == transitionSprite && maverick?.sprite?.name != null && maverick.sprite.name.Contains(transitionSprite);
-	}
-
-	public int jumpFramesHeld;
-	public const int maxJumpFrames = 10;
-
-	public float getJumpModifier() {
-		if (jumpFramesHeld == 1) return 1f;
-		if (jumpFramesHeld == 2) return 1f;
-		if (jumpFramesHeld == 3) return 1.01f;
-		if (jumpFramesHeld == 4) return 1.015f;
-		if (jumpFramesHeld == 5) return 1.02f;
-		if (jumpFramesHeld == 6) return 1.025f;
-		if (jumpFramesHeld == 7) return 1.05f;
-		if (jumpFramesHeld == 8) return 1.1f;
-		if (jumpFramesHeld == 9) return 1.25f;
-		if (jumpFramesHeld >= 10) return 1.5f;
-		return 0;
+		return transitionSprite != "" && sprite == transitionSprite;
 	}
 
 	public bool isHoldStateOver(float minTime, float maxTime, float aiTime, string control) {
@@ -187,29 +185,6 @@ public class MaverickState {
 		} else {
 			return stateTime > maxTime || (!input.isHeld(control, player) && stateTime > minTime);
 		}
-	}
-
-	// Useful for non-jump states
-	public void genericJumpCode() {
-		if (maverick.grounded) {
-			bool jumpHeld = input.isHeld(Control.Jump, player);
-			if (jumpHeld) {
-				jumpFramesHeld++;
-				if (jumpFramesHeld > maxJumpFrames) {
-					jumpHeld = false;
-				}
-			}
-			if (!jumpHeld) {
-				if (jumpFramesHeld > 0) {
-					maverick.vel.y = -maverick.getJumpPower() * getJumpModifier();
-					jumpFramesHeld = 0;
-				}
-			}
-		}
-	}
-
-	public bool isAI {
-		get { return maverick.aiBehavior != MaverickAIBehavior.Control; }
 	}
 
 	public void landingCode(bool exitMLand = true) {
@@ -234,52 +209,6 @@ public class MaverickState {
 		else maverick.changeToIdleFallOrFly();
 	}
 
-	public void airCode(bool canMove = true) {
-		if (player == null || maverick == null) return;
-
-		if (maverick.grounded) {
-			landingCode();
-			return;
-		}
-
-		if (Global.level.checkTerrainCollisionOnce(maverick, 0, -maverick.getYMod()) != null && maverick.vel.y * maverick.getYMod() < 0) {
-			maverick.vel.y = 0;
-		}
-
-		var move = new Point(0, 0);
-		if (canMove) {
-			var wallKick = this as MWallKick;
-			if (input.isHeld(Control.Left, player)) {
-				if (wallKick == null || wallKick.kickSpeed <= 0) {
-					move.x = -maverick.getRunSpeed() * maverick.getDashSpeed() * maverick.getAirSpeed();
-					maverick.xDir = -1;
-				}
-			} else if (input.isHeld(Control.Right, player)) {
-				if (wallKick == null || wallKick.kickSpeed >= 0) {
-					move.x = maverick.getRunSpeed() * maverick.getDashSpeed() * maverick.getAirSpeed();
-					maverick.xDir = 1;
-				}
-			}
-		}
-
-		if (maverick.canFly && (input.isPressed(Control.Up, player) ||
-			(input.isPressed(Control.Jump, player) && !isAI))
-		) {
-			maverick.changeState(new MFly());
-			return;
-		}
-
-		if (maverick.canClimb) {
-			climbIfCheckClimbTrue();
-		}
-
-		if (move.magnitude > 0) {
-			maverick.move(move);
-		}
-
-		wallClimbCode();
-	}
-
 	public void climbIfCheckClimbTrue() {
 		if (input.isHeld(Control.Up, player) && this is not StingCClimb && checkClimb()) {
 			if (maverick.grounded) {
@@ -289,9 +218,11 @@ public class MaverickState {
 		}
 	}
 
-	public bool hitLadder;
 	public bool checkClimb() {
-		var rect = maverick.collider.shape.getRect();
+		if (maverick.collider == null) {
+			return false;
+		}
+		Rect rect = maverick.collider.shape.getRect();
 		rect.x1 += 10;
 		rect.x2 -= 10;
 		rect.y1 += 15;
@@ -301,7 +232,10 @@ public class MaverickState {
 		var backwallZones = maverick is StingChameleon ? Global.level.getTerrainTriggerList(
 			shape, typeof(BackwallZone)
 		) : new List<CollideData>();
-		if (ladders.Count > 0 || (backwallZones.Count > 0 && !backwallZones.Any(bw => (bw.gameObject as BackwallZone).isExclusion))) {
+		if (ladders.Count > 0 || (
+			backwallZones.Count > 0 &&
+			!backwallZones.Any(bw => bw.gameObject is BackwallZone { isExclusion: true }))
+		) {
 			if (ladders.Count > 0) hitLadder = true;
 			return true;
 		}
@@ -338,70 +272,6 @@ public class MaverickState {
 		}
 	}
 
-	public float shootHeldTime;
-
-	public void commonGroundCode() {
-		if (!maverick.grounded) {
-			maverick.changeState(new MFall());
-			return;
-		}
-	}
-
-	public void groundCode() {
-		commonGroundCode();
-		if (maverick.isAttacking()) {
-			return;
-		}
-
-		if (input.isPressed(Control.Jump, player)) {
-			maverick.changeState(new MJumpStart());
-			return;
-		} else if (input.isPressed(Control.Up, player) && maverick.canFly) {
-			maverick.stopMoving();
-			maverick.incPos(new Point(0, -10));
-			maverick.changeState(new MFly());
-			return;
-		} else if (input.isPressed(Control.Taunt, player)) {
-			maverick.changeState(new MTaunt());
-		} else if (player.input.isPressed(Control.Down, player) && !maverick.canClimb) {
-			maverick.checkLadderDown = true;
-			var ladders = Global.level.getTerrainTriggerList(
-				maverick, new Point(0, 1), typeof(Ladder)
-			);
-			if (ladders.Count > 0) {
-				var rect = ladders[0].otherCollider.shape.getRect();
-				var snapX = (rect.x1 + rect.x2) / 2;
-				float xDist = snapX - maverick.pos.x;
-				if (MathF.Abs(xDist) < 10 && Global.level.checkTerrainCollisionOnce(maverick, xDist, 30) == null) {
-					maverick.move(new Point(xDist, 1), false);
-				}
-			}
-			maverick.checkLadderDown = false;
-		} else if (player.input.isPressed(Control.Down, player) && maverick.canClimb) {
-			maverick.checkLadderDown = true;
-			var ladders = Global.level.getTerrainTriggerList(
-				maverick, new Point(0, 1), typeof(Ladder)
-			);
-			if (ladders.Count > 0) {
-				var rect = ladders[0].otherCollider.shape.getRect();
-				var snapX = (rect.x1 + rect.x2) / 2;
-				float xDist = snapX - maverick.pos.x;
-				if (MathF.Abs(xDist) < 10 && Global.level.checkTerrainCollisionOnce(maverick, xDist, 30) == null) {
-					maverick.changeState(new StingCClimb());
-					maverick.move(new Point(0, 30), false);
-					player.character.stopCamUpdate = true;
-					maverick.changePos(new Point(snapX, maverick.pos.y));
-					if (maverick.player == Global.level.mainPlayer) {
-						Global.level.lerpCamTime = 0.25f;
-					}
-				}
-			}
-			maverick.checkLadderDown = false;
-		} else if (maverick.canClimb) {
-			climbIfCheckClimbTrue();
-		}
-	}
-
 	public void morphMothBeam(Point shootPos, bool isGround) {
 		maverick.playSound("morphmBeam", sendRpc: true);
 		Point shootDir;
@@ -415,14 +285,14 @@ public class MaverickState {
 		new MorphMBeamProj(maverick.weapon, shootPos, shootPos.add(shootDir.normalize().times(150)), maverick.xDir, player, player.getNextActorNetId(), rpc: true);
 	}
 
-	public CollideData checkCollision(float x, float y, bool autoVel = false) {
+	public CollideData? checkCollision(float x, float y, bool autoVel = false) {
 		return Global.level.checkTerrainCollisionOnce(maverick, x, y, autoVel: autoVel);
 	}
 
 	// Use this for code that slides the maverick across the ground and needs to check if a side wall was hit.
 	// Be sure to pass in y = -2 (or -2 offset).
 	// This will handle inclines properly, for example sliding from an incline to another inline, or to flat ground.
-	public CollideData checkCollisionSlide(float x, float y) {
+	public CollideData? checkCollisionSlide(float x, float y) {
 		var hitWall = Global.level.checkTerrainCollisionOnce(maverick, x, y, autoVel: true);
 		if (maverick.deltaPos.isCloseToZero(1) && stateFrame > 1) {
 			return hitWall;
@@ -467,7 +337,6 @@ public class MIdle : MaverickState {
 		Helpers.decrementTime(ref attackCooldown);
 
 		bool dashCondition = input.isHeld(Control.Left, player) || input.isHeld(Control.Right, player);
-		// if (maverick is FakeZero) dashCondition = input.isPressed(Control.Left, player) || input.isPressed(Control.Right, player);
 
 		if (dashCondition) {
 			if (!maverick.isAttacking() && (maverick.aiBehavior != MaverickAIBehavior.Control || maverick is not BoomerangKuwanger)) {
@@ -489,7 +358,6 @@ public class MIdle : MaverickState {
 				}
 			}
 		}
-		groundCode();
 
 		if (Global.level.gameMode.isOver && player != null && maverick != null) {
 			if (Global.level.gameMode.playerWon(player)) {
@@ -534,7 +402,7 @@ public class MEnter : MaverickState {
 		if (maverick.controlMode != MaverickModeId.TagTeam && !once) {
 			maverick.playSound("warpIn", sendRpc: true);
 			once = true;
-		} 
+		}
 	}
 
 	public override void onExit(MaverickState newState) {
@@ -586,7 +454,7 @@ public class MExit : MaverickState {
 		if (maverick.controlMode != MaverickModeId.TagTeam && !once) {
 			maverick.playSound("warpOut", sendRpc: true);
 			once = true;
-		} 
+		}
 	}
 
 	public override void onExit(MaverickState newState) {
@@ -608,7 +476,7 @@ public class MTaunt : MaverickState {
 		if (maverick.isAnimOver() && !Global.level.gameMode.playerWon(player)) {
 			maverick.changeToIdleFallOrFly();
 		}
-		if (maverick.sprite.name == "bcrab_taunt" && stateTime >= 14/60f && !once) {
+		if (maverick.sprite.name == "bcrab_taunt" && stateTime >= 14 / 60f && !once) {
 			once = true;
 			maverick.playSound("sigma2start", sendRpc: true);
 		}
@@ -684,8 +552,7 @@ public class MRun : MaverickState {
 		if (inputDir == -1) {
 			maverick.xDir = -1;
 			move.x = -maverick.getRunSpeed();
-		}
-		else if (inputDir == 1) {
+		} else if (inputDir == 1) {
 			maverick.xDir = 1;
 			move.x = maverick.getRunSpeed();
 		}
@@ -701,10 +568,9 @@ public class MRun : MaverickState {
 				maverick.changeState(new MIdle());
 			}
 		}
-		groundCode();
 
 		if (maverick is OverdriveOstrich oo2 && move.x != 0) {
-			bool overWallSkidSpeed = oo.getRunSpeed() >= oo.wallSkidSpeed;
+			bool overWallSkidSpeed = oo2.getRunSpeed() >= oo2.wallSkidSpeed;
 			var hit = checkCollisionSlide(MathF.Sign(move.x), -2);
 			if (hit?.isSideWallHit() == true && maverick.deltaPos.isZero() && stateFrame > 1) {
 				if (overWallSkidSpeed) {
@@ -714,7 +580,7 @@ public class MRun : MaverickState {
 				}
 			}
 		}
-		if (maverick is FakeZero && !once && stateTime >= 14/60f) {
+		if (maverick is FakeZero && !once && stateTime >= 14 / 60f) {
 			maverick.playSound("dashX2", sendRpc: true);
 			once = true;
 		}
@@ -727,11 +593,13 @@ public class MRun : MaverickState {
 }
 
 public class MJumpStart : MaverickState {
-	new float jumpFramesHeld;
-	float preJumpFramesHeld;
-	const float maxPreJumpFrames = 4;
-	new const float maxJumpFrames = 2;
-	float additionalJumpPower;
+	public float jumpFramesHeld;
+	public float preJumpFramesHeld;
+	public float maxPreJumpFrames = 2;
+	public float maxJumpFrames = 10;
+	public float additionalJumpPower;
+	public bool isChargeJump;
+
 	public MJumpStart(float additionalJumpPower = 1) : base("jump_start") {
 		this.additionalJumpPower = additionalJumpPower;
 		normalCtrl = true;
@@ -746,11 +614,6 @@ public class MJumpStart : MaverickState {
 		if (inputDir != 0) {
 			maverick.xDir = inputDir;
 			maverick.move(new Point(maverick.getRunSpeed() * inputDir, 0));
-		}
-		if (stateFrame > 6) {
-			maverick.vel.y = -maverick.getJumpPower() * getJumpModifier() * maverick.getYMod();
-			maverick.changeState(new MJump());
-			return;
 		}
 
 		if (maverick is BoomerangKuwanger ||
@@ -768,42 +631,51 @@ public class MJumpStart : MaverickState {
 			return;
 		}
 
+		if (!maverick.useChargeJump) {
+			if (stateFrame > 2) {
+				maverick.vel.y = -maverick.getJumpPower() * maverick.getYMod() * additionalJumpPower;;
+				maverick.changeState(new MJump());
+			}
+			return;
+		}
+
 		bool jumpHeld = player.input.isHeld(Control.Jump, player);
 		if (maverick.aiBehavior != MaverickAIBehavior.Control) {
 			jumpHeld = true;
 		}
-
-		if (jumpHeld) {
-			preJumpFramesHeld++;
-			if (preJumpFramesHeld > maxPreJumpFrames) {
-				jumpFramesHeld++;
-			}
-		} else {
+		if (!jumpHeld) {
 			maverick.vel.y = -maverick.getJumpPower() * getJumpModifier() * maverick.getYMod() * additionalJumpPower;
 			maverick.changeState(new MJump());
 			return;
 		}
-
-		if (maverick.isAnimOver()) {
+		else if (stateFrame > maxPreJumpFrames) {
+			jumpFramesHeld += maverick.speedMul;
+			if (jumpFramesHeld > maxJumpFrames) { jumpFramesHeld = maxJumpFrames; }
+		}
+		if (maverick.isAnimOver() && stateFrame >= 10) {
 			maverick.vel.y = -maverick.getJumpPower() * getJumpModifier() * maverick.getYMod() * additionalJumpPower;
 			maverick.changeState(new MJump());
 		}
 	}
 
-	public new float getJumpModifier() {
-		float minHeight = 1f;
-		float maxHeight = 1.25f;
+	public float getJumpModifier() {
+		if (!isChargeJump) {
+			return 1;
+		}
+		float minHeight = 0.75f;
+		float maxHeight = 1.5f;
 
-		return minHeight + (maxHeight - minHeight) * Helpers.clamp01((jumpFramesHeld + preJumpFramesHeld) / (maxPreJumpFrames + maxJumpFrames));
+		return minHeight + (maxHeight - minHeight) * (jumpFramesHeld / maxJumpFrames);
 	}
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
+		isChargeJump = maverick.useChargeJump;
 	}
 
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
-		if ((player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player))) {
+		if (isChargeJump && player.input.getXDir(player) != 0) {
 			maverick.dashSpeed = 1.5f;
 			if (jumpFramesHeld >= 5) maverick.dashSpeed = 2;
 		}
@@ -811,32 +683,30 @@ public class MJumpStart : MaverickState {
 }
 
 public class MJump : MaverickState {
-	new int jumpFramesHeld = 0;
+	public int jumpFramesHeld = 0;
 	public bool fromCling;
-	public MaverickState followUpAiState;
-	public MJump(MaverickState followUpAiState = null) : base("jump") {
+	public MaverickState? followUpAiState;
+
+	public MJump(MaverickState? followUpAiState = null) : base("jump") {
 		this.followUpAiState = followUpAiState;
 		enterSound = "jump";
 		normalCtrl = true;
 		attackCtrl = true;
 		aiAttackCtrl = true;
 		canBeCanceled = false;
+		exitOnLanding = true;
+		airMove = true;
+		canJump = true;
+		canStopJump = true;
 	}
 
 	public override void update() {
 		base.update();
 
-		bool jumpHeld = player.input.isHeld(Control.Jump, player) || maverick.aiBehavior != MaverickAIBehavior.Control;
-		if (stateFrame > 2 && jumpFramesHeld == 0 && !jumpHeld && maverick.vel.y < 0) {
-			jumpFramesHeld = 1;
-			maverick.vel.y *= 0.25f;
-		}
-
 		if (maverick.vel.y * maverick.getYMod() > 0) {
 			maverick.changeState(followUpAiState ?? new MFall());
 			return;
 		}
-		airCode();
 	}
 }
 
@@ -846,13 +716,15 @@ public class MFall : MaverickState {
 		attackCtrl = true;
 		aiAttackCtrl = true;
 		canBeCanceled = false;
+		exitOnLanding = true;
+		airMove = true;
+		canJump = true;
+		canStopJump = true;
 	}
 
 	public override void update() {
 		base.update();
 		if (player == null) return;
-
-		airCode();
 	}
 }
 
@@ -1011,14 +883,15 @@ public class MLand : MaverickState {
 
 	public override void update() {
 		base.update();
-		if (player == null) return;
+		int inputDir = input.getXDir(player);
+		
 		if (maverick is OverdriveOstrich oo) {
 			if (oo.getRunSpeed() > 100) maverick.frameSpeed = 2;
 			if (oo.getRunSpeed() > 200) maverick.frameSpeed = 3;
 			if (maverick.isAnimOver() || oo.getRunSpeed() > 300) {
 				maverick.changeState(new MIdle());
 			}
-			if (input.isHeld(Control.Left, player) || input.isHeld(Control.Right, player)) {
+			if (inputDir != 0) {
 				maverick.changeState(new MRun());
 			}
 		} else if (maverick is BubbleCrab bc && bc.shield != null) {
@@ -1033,20 +906,17 @@ public class MLand : MaverickState {
 					float additionalJumpPower = 1 + (landingVelY / 400) * 0.25f;
 					bc.changeState(new MJumpStart(additionalJumpPower));
 				} else {
-					maverick.changeState(new MIdle());
+					maverick.changeToIdleRunOrFall();
 				}
 			}
 		} else {
 			if (maverick.isAnimOver()) {
-				maverick.changeState(new MIdle());
+				maverick.changeToIdleRunOrFall();
 			}
 		}
-		int inputDir = input.getXDir(player);
 		if (inputDir != 0) {
-			Point move = new(0, 0);
 			maverick.xDir = inputDir;
-			move.x = maverick.getRunSpeed() * inputDir;
-			maverick.move(move);
+			maverick.move(new(maverick.getRunSpeed() * inputDir, 0));
 		}
 	}
 }
@@ -1074,7 +944,7 @@ public class MHurt : MaverickState {
 	public override void update() {
 		base.update();
 		if (hurtSpeed != 0) {
-			hurtSpeed = Helpers.toZero(hurtSpeed, 1.6f / flinchTime  * Global.speedMul, hurtDir);
+			hurtSpeed = Helpers.toZero(hurtSpeed, 1.6f / flinchTime * Global.speedMul, hurtDir);
 			maverick.move(new Point(hurtSpeed * 60f, 0));
 		}
 		if (stateFrame >= flinchTime) {
@@ -1093,8 +963,7 @@ public class MHurt : MaverickState {
 		) {
 			wasFlying = true;
 			maverick.useGravity = false;
-		}
-		else if (oldState is MHurt flinchState) {
+		} else if (oldState is MHurt flinchState) {
 			isCombo = true;
 			flinchYPos = flinchState.flinchYPos;
 			wasFlying = flinchState.wasFlying;
@@ -1335,7 +1204,7 @@ public class MWallSlide : MaverickState {
 public class MWallKick : MaverickState {
 	public int kickDir;
 	public float kickSpeed;
-	public MWallKick(int kickDir, string overrideSprite = null) : base(overrideSprite ?? "wall_kick") {
+	public MWallKick(int kickDir, string? overrideSprite = null) : base(overrideSprite ?? "wall_kick") {
 		this.kickDir = kickDir;
 		kickSpeed = kickDir * 150;
 		enterSound = "jump";
@@ -1351,8 +1220,9 @@ public class MWallKick : MaverickState {
 			if (player.input.isHeld(Control.Left, player) && !player.input.isHeld(Control.Right, player) && kickSpeed < 0) stopMove = true;
 			if (player.input.isHeld(Control.Right, player) && !player.input.isHeld(Control.Left, player) && kickSpeed > 0) stopMove = true;
 			if (!stopMove) maverick.move(new Point(kickSpeed, 0));
+		} else {
+			airMove = true;
 		}
-		airCode();
 		if (maverick.vel.y > 0) {
 			maverick.changeState(new MFall());
 		}
@@ -1399,12 +1269,13 @@ public class MShoot : MaverickState {
 			getProjectile(shootPos.Value, maverick.xDir);
 		}
 
-		if (consecutiveWaitTime > 0) {
+		if (consecutiveWaitTime > 0 && consecutiveData != null) {
 			consecutiveWaitTime += Global.spf;
 			if (consecutiveWaitTime >= consecutiveData.consecutiveDelay) {
 				consecutiveData.consecutiveCount++;
-				var newState = new MShoot(getProjectile, shootSound);
-				newState.consecutiveData = consecutiveData;
+				MShoot newState = new MShoot(getProjectile, shootSound) {
+					consecutiveData = consecutiveData
+				};
 				maverick.changeState(newState, ignoreCooldown: true);
 			}
 		}

@@ -49,6 +49,8 @@ public class MaverickWeapon : Weapon {
 		this.controlMode = (MaverickModeId)controlMode;
 		lastHealth = player?.getMaverickMaxHp(this.controlMode) ?? 32;
 		this.player = player;
+
+		drawAmmo = false;
 	}
 
 	public override void update() {

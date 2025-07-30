@@ -505,7 +505,6 @@ public class BoomerKDashState : MaverickState {
 
 	public override void update() {
 		base.update();
-		groundCode();
 
 		dashTime += Global.spf;
 		float modifier = 1;

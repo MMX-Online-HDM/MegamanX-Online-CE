@@ -415,8 +415,11 @@ public class MorphMCSpinState : MaverickState {
 	public float hit2;
 
 	public MorphMCSpinState(int stateAI) : base("spin") {
+		canJump = true;
+		canStopJump = true;
 		this.stateAI = stateAI;
 	}
+
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 		if (stateAI == 0) {
@@ -425,11 +428,11 @@ public class MorphMCSpinState : MaverickState {
 
 		MetamorMothmeanos = maverick as MorphMothCocoon ?? throw new NullReferenceException();
 	}
+
 	public override void update() {
 		base.update();
 
 		Point airMove = new Point(0, 0);
-		genericJumpCode();
 		if (!maverick.grounded) {
 			if (Global.level.checkTerrainCollisionOnce(maverick, 0, -1) != null && maverick.vel.y < 0) {
 				maverick.vel.y = 0;

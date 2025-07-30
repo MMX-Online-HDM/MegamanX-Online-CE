@@ -426,12 +426,14 @@ public class FakeZeroShootState : FakeZeroMState {
 
 public class FakeZeroShootAirState : FakeZeroMState {
 	public FakeZeroShootAirState() : base("shoot_air") {
+		exitOnLanding = true;
+		airMove = true;
+		canStopJump = true;
 	}
 
 	public override void update() {
 		base.update();
 
-		airCode();
 		Point? shootPos = maverick.getFirstPOI();
 
 		if (shootPos != null) {
@@ -453,11 +455,13 @@ public class FakeZeroShootAirState : FakeZeroMState {
 
 public class FakeZeroShootAir2State : FakeZeroMState {
 	public FakeZeroShootAir2State() : base("shoot_air2") {
+		exitOnLanding = true;
+		airMove = true;
+		canStopJump = true;
 	}
 
 	public override void update() {
 		base.update();
-		airCode();
 		Point? shootPos = maverick.getFirstPOI();
 
 		if (shootPos != null) {
@@ -483,12 +487,13 @@ public class FakeZeroShootAir2State : FakeZeroMState {
 }
 public class FakeZeroShootAir3State : FakeZeroMState {
 	public FakeZeroShootAir3State() : base("shoot_air2") {
+		exitOnLanding = true;
+		airMove = true;
+		canStopJump = true;
 	}
 
 	public override void update() {
 		base.update();
-
-		airCode();
 		Point? shootPos = maverick.getFirstPOI();
 
 		if (shootPos != null) {
@@ -616,6 +621,7 @@ public class FakeZeroMeleeState : FakeZeroMState {
 	public FakeZeroMeleeState(bool isAiAttack = false) : base("run_attack") {
 		this.isAiAttack = isAiAttack;
 		enterSound = "saber3";
+		normalCtrl = true;
 	}
 
 	public override void update() {
@@ -641,7 +647,6 @@ public class FakeZeroMeleeState : FakeZeroMState {
 			maverick.changeToIdleOrFall();
 			return;
 		}
-		groundCode();
 	}
 
 	public override void onEnter(MaverickState oldState) {

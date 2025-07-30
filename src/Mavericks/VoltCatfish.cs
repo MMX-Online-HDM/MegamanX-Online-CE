@@ -710,6 +710,7 @@ public class VoltCBounce : MaverickState {
 	public VoltCBounce() : base("jump") {
 		aiAttackCtrl = true;
 		canBeCanceled = false;
+		airMove = true;
 	}
 
 	public override void update() {
@@ -719,7 +720,6 @@ public class VoltCBounce : MaverickState {
 			maverick.changeState(new MFall());
 			return;
 		}
-		airCode();
 	}
 
 	public override void onEnter(MaverickState oldState) {

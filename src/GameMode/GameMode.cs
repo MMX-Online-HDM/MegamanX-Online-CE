@@ -961,7 +961,10 @@ public class GameMode {
 		}
 	}
 
-	public void setHUDErrorMessage(Player player, string message, bool playSound = true, bool resetCooldown = false) {
+	public void setHUDErrorMessage(
+		Player player, string message,
+		bool playSound = true, bool resetCooldown = false
+	) {
 		if (player != level.mainPlayer) return;
 		if (resetCooldown) hudErrorMsgTime = 0;
 		if (hudErrorMsgTime == 0) {
@@ -971,6 +974,10 @@ public class GameMode {
 				Global.playSound("error");
 			}
 		}
+	}
+
+	public void setDebugMessage(string message) {
+		setHUDErrorMessage(Global.level.mainPlayer, message, false, true);
 	}
 
 	public bool shouldDrawRadar() {

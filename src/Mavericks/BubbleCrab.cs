@@ -313,7 +313,8 @@ public class BCrabShootState : MaverickState {
 }
 
 public class BCrabClawState : MaverickState {
-	public BCrabClawState() : base("jump_attack_start") {
+	public BCrabClawState() : base("jump_attack_start") {canJump = true;
+		canStopJump = true;
 	}
 
 	public override void update() {
@@ -321,7 +322,6 @@ public class BCrabClawState : MaverickState {
 		if (player == null) return;
 
 		maverick.turnToInput(input, player);
-		genericJumpCode();
 		if (!maverick.grounded) {
 			maverick.changeState(new BCrabClawJumpState());
 			return;
@@ -340,13 +340,14 @@ public class BCrabClawState : MaverickState {
 
 public class BCrabClawJumpState : MaverickState {
 	public BCrabClawJumpState() : base("jump_attack") {
+		airMove = true;
+		canStopJump = true;
 	}
 
 	public override void update() {
 		base.update();
 		if (player == null) return;
 
-		airCode();
 		if (maverick.grounded) {
 			maverick.changeState(new BCrabClawState());
 			return;

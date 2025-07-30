@@ -357,11 +357,13 @@ public class NeonTAirClawState : MaverickState {
 	public NeonTAirClawState() : base("jump_slash") {
 		exitOnAnimEnd = true;
 		enterSound = "neontSlash";
+		exitOnLanding = true;
+		canStopJump = true;
+		airMove = true;
 	}
 
 	public override void update() {
 		base.update();
-		airCode(canMove: !wasPounce);
 		if (wasPounce) {
 			maverick.move(new Point(maverick.xDir * (wasWallPounce ? NeonTiger.wallPounceSpeed : NeonTiger.pounceSpeed), 0));
 		}
@@ -372,6 +374,8 @@ public class NeonTAirClawState : MaverickState {
 		ShiningTigerd = maverick as NeonTiger ?? throw new NullReferenceException();
 		if (oldState is NeonTPounceState || ShiningTigerd.isDashing) {
 			wasPounce = true;
+			canStopJump = false;
+			airMove = false;
 			wasWallPounce = (oldState as NeonTPounceState)?.isWallPounce ?? false;
 		}
 	}
