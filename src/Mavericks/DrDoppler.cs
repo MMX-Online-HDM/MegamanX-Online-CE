@@ -280,7 +280,7 @@ public class DrDopplerShootState : MaverickState {
 }
 public class DrDopplerDashStartState : MaverickState {
 	public DrDopplerDashStartState() : base("dash_charge") {
-		stopMovingOnEnter = true;
+		stopMoving = true;
 		enterSound = "ryuenjin";
 	}
 
@@ -296,7 +296,7 @@ public class DrDopplerDashState : MaverickState {
 	Anim? barrier;
 	float soundTime;
 	public DrDopplerDashState() : base("dash", "dash_start") {
-		stopMovingOnEnter = true;
+		stopMoving = true;
 	}
 
 	public override void update() {

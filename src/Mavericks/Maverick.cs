@@ -26,6 +26,7 @@ public class SavedMaverickData {
 	public int cloakUses;
 	public Dictionary<Type, MaverickStateCooldown> stateCooldowns;
 	public float ammo;
+
 	public SavedMaverickData(Maverick maverick) {
 		//if (maverick is ArmoredArmadillo aa) noArmor = aa.noArmor;
 		ammo = maverick.ammo;
@@ -43,10 +44,14 @@ public class SavedMaverickData {
 }
 
 public class Maverick : Actor, IDamagable {
+	// HP stuff.
 	public float health;
 	public float maxHealth;
+	public bool alive;
 	private float healAmount = 0;
 	public float healTime = 0;
+
+	// Ammo stuff.
 	public float weaponHealAmount = 0;
 	public float weaponHealTime = 0;
 	public bool playHealSound;
@@ -67,6 +72,7 @@ public class Maverick : Actor, IDamagable {
 	public (int icon, int units) barIndexes = (0, 0);
 
 	// Movement.
+	public bool useChargeJump;
 	public bool canStomp;
 	public float dashSpeed = 1;
 	public bool canClimb;
@@ -94,7 +100,6 @@ public class Maverick : Actor, IDamagable {
 	// Other vars.
 	public float width;
 	public float height;
-	public float time;
 	public const float maxWidth = 26;
 	public MaverickState state;
 	public Player player;
@@ -134,7 +139,7 @@ public class Maverick : Actor, IDamagable {
 			return _input;
 		}
 	}
-	public bool isAI => aiBehavior != MaverickAIBehavior.Control;
+	public bool isAI => aiBehavior != MaverickAIBehavior.Control && !player.isAI;
 
 	public bool maverickCanControl() {
 		if (this is StingChameleon sc && sc.isCloakTransition()) {
@@ -264,13 +269,30 @@ public class Maverick : Actor, IDamagable {
 	public override void preUpdate() {
 		base.preUpdate();
 		updateProjectileCooldown();
+
+		if (!ownedByLocalPlayer) {
+			return;
+		}
+
+		Helpers.decrementTime(ref invulnTime);
+		Helpers.decrementFrames(ref weaknessCooldown);
+
+		foreach (var key in stateCooldowns.Keys) {
+			Helpers.decrementFrames(ref stateCooldowns[key].cooldown);
+		}
+		if (grounded) {
+			lastGroundedPos = pos;
+		}
+
+		useChargeJump = controlMode == MaverickModeId.Puppeteer;
 	}
 
 	public override void update() {
 		base.update();
 
-		Helpers.decrementTime(ref invulnTime);
-		Helpers.decrementFrames(ref weaknessCooldown);
+		if (!ownedByLocalPlayer) {
+			return;
+		}
 
 		if (grounded) {
 			lastGroundedPos = pos;
@@ -284,8 +306,8 @@ public class Maverick : Actor, IDamagable {
 			weaponHealAmount = 0;
 		}
 		if (weaponHealAmount > 0 && health > 0) {
-			weaponHealTime += Global.spf;
-			if (weaponHealTime > 0.05) {
+			weaponHealTime += speedMul;
+			if (weaponHealTime > 3) {
 				weaponHealTime = 0;
 				weaponHealAmount--;
 				ammo = Helpers.clampMax(ammo + 1, maxAmmo);
@@ -303,13 +325,11 @@ public class Maverick : Actor, IDamagable {
 			}
 		}
 
-		time += Global.spf;
-
-		if (health >= maxHealth) {
+		if (health >= maxHealth || !alive) {
 			healAmount = 0;
 			usedSubtank = null;
 		}
-		if (healAmount > 0 && health > 0) {
+		if (healAmount > 0 && alive) {
 			healTime += Global.spf;
 			if (healTime > 0.05) {
 				healTime = 0;
@@ -334,12 +354,6 @@ public class Maverick : Actor, IDamagable {
 			usedSubtank = null;
 		}
 
-		foreach (var key in stateCooldowns.Keys) {
-			Helpers.decrementFrames(ref stateCooldowns[key].cooldown);
-		}
-
-		if (!ownedByLocalPlayer) return;
-
 		if (pos.y > Global.level.killY && state is not MEnter && state is not MExit) {
 			incPos(new Point(0, 50));
 			applyDamage(Damager.envKillDamage, player, this, null, null);
@@ -350,41 +364,125 @@ public class Maverick : Actor, IDamagable {
 			if (autoExitTime > 10 && state is not MExit) {
 				changeState(new MExit(pos, true));
 			}
-		} else if (aiBehavior != MaverickAIBehavior.Control) {
+			return;
+		}
+		if (aiBehavior != MaverickAIBehavior.Control) {
 			aiUpdate();
 		}
+		updateCtrl();
+	}
 
-		if (player == null) return;
+	public virtual bool updateCtrl() {
+		if (state.exitOnLanding && grounded) {
+			state.landingCode();
+			return true;
+		}
+		if (state.exitOnAirborne && !grounded) {
+			changeState(new MFall());
+			return true;
+		}
+		if (!useChargeJump &&
+			state.canStopJump &&
+			!state.stoppedJump &&
+			!grounded && vel.y < 0 &&
+			!player.input.isHeld(Control.Jump, player)
+		) {
+			vel.y *= 0.21875f;
+			state.stoppedJump = true;
+		}
+		if (state.normalCtrl && canClimb) {
+			state.climbIfCheckClimbTrue();
+		}
+		if (state.normalCtrl && canClimbWall) {
+			state.wallClimbCode();
+		}
+		if (state.canJump && grounded && player.input.isPressed(Control.Jump, player)) {
+			grounded = false;
+			if (state.canStopJump) {
+				state.stoppedJump = false;
+			}
+			vel.y = -getJumpPower();
+			playSound("jump", sendRpc: true);
+		}
+		if (state.normalCtrl) {
+			normalCtrl();
+		}
+		if (state.attackCtrl && invulnTime <= 0) {
+			return attackCtrl();
+		}
+		return false;
+	}
 
-		if (controlMode == MaverickModeId.Striker) {
-			strikerTime += Global.spf;
-			if (strikerTime > 3) {
-				if (this is WireSponge || this is ToxicSeahorse) {
-					if (state is MIdle) {
-						changeState(new MExit(pos, true));
+	public virtual bool normalCtrl() {
+		if (input.isPressed(Control.Up, player) && canFly && state is not MFly && !state.wasFlying) {
+			stopMovingWeak();
+			incPos(new Point(0, -4));
+			changeState(new MFly());
+			return true;
+		}
+		if (grounded) {
+			if (input.isPressed(Control.Taunt, player)) {
+				changeState(new MTaunt());
+				return true;
+			}
+			if (input.isPressed(Control.Jump, player)) {
+				changeState(new MJumpStart());
+				return true;
+			}
+			if (player.input.isPressed(Control.Down, player)) {
+				checkLadderDown = true;
+				List<CollideData> ladders = Global.level.getTerrainTriggerList(
+					this, new Point(0, 1), typeof(Ladder)
+				);
+				if (ladders.Count > 0) {
+					Rect rect = ladders[0].otherCollider.shape.getRect();
+					float snapX = (rect.x1 + rect.x2) / 2;
+					float xDist = snapX - pos.x;
+					if (MathF.Abs(xDist) < 10 &&
+						Global.level.checkTerrainCollisionOnce(this, xDist, 30) == null
+					) {
+						if (!canClimb) {
+							move(new Point(xDist, 1), false);
+						} else {
+							changeState(new StingCClimb());
+							move(new Point(0, 30), false);
+							player.character.stopCamUpdate = true;
+							changePos(new Point(snapX, pos.y));
+							if (player == Global.level.mainPlayer) {
+								Global.level.lerpCamTime = 0.25f;
+							}
+						}
 					}
-				} else if (state is not MExit) {
-					changeState(new MExit(pos, true));
 				}
+				checkLadderDown = false;
+			}
+			return false;
+		}
+		if (state.airMove) {
+			int inputDir =  input.getXDir(player);
+			if (inputDir != 0 && (state is not MWallKick wallKick || wallKick.kickSpeed == 0)) {
+				xDir = inputDir;
+				move(new Point(inputDir * getRunSpeed() * getDashSpeed() * getAirSpeed(), 0));
 			}
 		}
+		return false;
 	}
 
+	public virtual bool attackCtrl() {
+		return false;
+	}
 	
 	public override void statePreUpdate() {
-		state.stateFrame += 1f * Global.speedMul;
-		base.stateUpdate();
+		state.stateFrame += speedMul;
 		state.preUpdate();
 	}
-	
+
 
 	public override void stateUpdate() {
-		base.stateUpdate();
 		state.update();
 	}
 	
 	public override void statePostUpdate() {
-		base.statePostUpdate();
 		state.postUpdate();
 	}
 
@@ -759,7 +857,16 @@ public class Maverick : Actor, IDamagable {
 		changedStateInFrame = true;
 		newState.maverick = this;
 
-		changeSpriteFromName(newState.sprite, true);
+		if (Global.sprites.ContainsKey($"{getMaverickPrefix()}_{newState.sprite}")) {
+			changeSpriteFromName(newState.sprite, true);
+		}
+		else if (
+			newState.sprite == newState.transitionSprite &&
+			Global.sprites.ContainsKey($"{getMaverickPrefix()}_{newState.defaultSprite}")
+		) {
+			newState.sprite = newState.defaultSprite;
+			changeSpriteFromName(newState.defaultSprite, true);
+		}
 
 		var oldState = state;
 		if (oldState != null) {

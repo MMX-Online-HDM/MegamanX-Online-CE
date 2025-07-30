@@ -450,6 +450,9 @@ public class LaunchOShoot : MaverickState {
 	public LaunchOctopus LauncherOctopuld= null!;
 	public LaunchOShoot(bool isGrounded) : base(isGrounded ? "shoot" : "air_shoot") {
 		this.isGrounded = isGrounded;
+		airMove = true;
+		canJump = true;
+		canStopJump = true;
 	}
 
 	public override void update() {
@@ -463,10 +466,6 @@ public class LaunchOShoot : MaverickState {
 		} else if (!isGrounded && maverick.grounded) {
 			maverick.changeState(new MIdle());
 			return;
-		}
-
-		if (!isGrounded) {
-			airCode();
 		}
 
 		Point? shootPos = LauncherOctopuld.getFirstPOI();

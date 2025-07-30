@@ -78,9 +78,9 @@ public class ArmoredArmadillo : Maverick {
 		}
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (grounded && state.normalCtrl) {
+			if (grounded && state.attackCtrl) {
 				if (shootPressed()) {
-					changeState(getShootState(false));
+					changeState(new ArmoredAShootState());
 				} else if (specialPressed() && !noArmor && state is not ArmoredAGuardState) {
 					if (ammo > 0) {
 						changeState(new ArmoredAGuardState());
@@ -140,26 +140,16 @@ public class ArmoredArmadillo : Maverick {
 
 	public override MaverickState[] strikerStates() {
 		return [
-			getShootState(true),
+			new ArmoredAShootState(),
 			new ArmoredARollEnterState(),
 		];
 	}
 
 	public override MaverickState[] aiAttackStates() {
 		return [
-			getShootState(true),
+			new ArmoredAShootState(),
 			new ArmoredARollEnterState(),
 		];
-	}
-
-	private MaverickState getShootState(bool isAI) {
-		var shootState = new MShoot((Point pos, int xDir) => {
-			new ArmoredAProj(pos, xDir, this, player, player.getNextActorNetId(), rpc: true);
-		}, "energyBall");
-		if (isAI) {
-			shootState.consecutiveData = new MaverickStateConsecutiveData(0, 2);//; 0.33f);
-		}
-		return shootState;
 	}
 
 	// Melee IDs for attacks.
@@ -243,7 +233,7 @@ public class ArmoredAProj : Projectile {
 	}
 	public static Projectile rpcInvoke(ProjParameters args) {
 		return new ArmoredAProj(
-			args.pos, args.xDir, args.owner, args.player, args.netId
+			args.pos, args.xDir, args.owner, args.netId, altPlayer: args.player
 		);
 	}
 }
