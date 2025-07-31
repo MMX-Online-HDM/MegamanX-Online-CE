@@ -268,7 +268,7 @@ public class MorphMShootAir : MaverickState {
 		}
 
 		if (maverick.isAnimOver()) {
-			maverick.changeState(new MFly());
+			maverick.changeToIdleFallOrFly();
 		}
 		if (isAI) {
 			maverick.vel.y = 0;

@@ -77,7 +77,7 @@ public class ToxicSeahorse : Maverick {
 		return [
 			getShootState(false),
 			new TSeahorseShoot2State(),
-			new TSeahorseTeleportState()
+			new TSeahorseTeleportState(true)
 		];
 	}
 
@@ -91,7 +91,7 @@ public class ToxicSeahorse : Maverick {
 			new TSeahorseShoot2State()
 		];
 		if (enemyDist <= 70) {
-			aiStates.Add(new TSeahorseTeleportState());
+			aiStates.Add(new TSeahorseTeleportState(true));
 		}
 		return aiStates.ToArray();
 	}
@@ -347,9 +347,11 @@ public class TSeahorseShoot2State : MaverickState {
 public class TSeahorseTeleportState : MaverickState {
 	int state = 0;
 	float shootCooldown;
+	public bool useAi;
 
-	public TSeahorseTeleportState() : base("teleport") {
+	public TSeahorseTeleportState(bool useAi = false) : base("teleport") {
 		enterSound = "tseahorseTeleportOut";
+		this.useAi = useAi;
 	}
 
 	public override void update() {
@@ -398,10 +400,10 @@ public class TSeahorseTeleportState : MaverickState {
 				}
 			}
 
-			if (!isAI && input.isPressed(Control.Dash, player) ||
+			if (input.isPressed(Control.Dash, player) ||
 				isSummoner && enemyDist >= 110 ||
 				maverick.ammo <= 0 ||
-				isAI && stateTime > 1
+				useAi && stateTime > 1
 			) {
 				state = 2;
 				maverick.changeSpriteFromName("teleport2", true);
@@ -411,9 +413,11 @@ public class TSeahorseTeleportState : MaverickState {
 			maverick.changeToIdleOrFall();
 		}
 	}
+
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 	}
+
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
 		maverick.useGravity = true;

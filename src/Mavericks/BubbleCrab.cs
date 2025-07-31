@@ -266,8 +266,10 @@ public class BCrabShootState : MaverickState {
 	float shootCooldown;
 	int num;
 	public BubbleCrab BubblyCrablos = null!;
+
 	public BCrabShootState() : base("ring_attack_start") {
 	}
+
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 		BubblyCrablos = maverick as BubbleCrab ?? throw new NullReferenceException();

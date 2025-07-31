@@ -97,8 +97,8 @@ public class BlastHornet : Maverick {
 	public override MaverickState[] strikerStates() {
 		return [
 			new BHornetShootState(grounded),
-			new BHornetShoot2State(null),
-			new BHornetStingState(),
+			new BHornetShoot2State(null, true),
+			new BHornetStingState(true),
 		];
 	}
 
@@ -109,10 +109,10 @@ public class BlastHornet : Maverick {
 		}
 		List<MaverickState> aiStates = [
 			new BHornetShootState(grounded),
-			new BHornetShoot2State(target),
+			new BHornetShoot2State(target, true),
 		];
 		if (enemyDist <= 40) {
-			aiStates.Add(new BHornetStingState());
+			aiStates.Add(new BHornetStingState(true));
 		}
 		return aiStates.ToArray();
 	}
@@ -555,16 +555,18 @@ public class BHornetCursorProj : Projectile {
 public class BHornetShoot2State : MaverickState {
 	bool shotOnce;
 	Actor? target;
-	bool isAIRise;
+	bool aiRise;
 	public BlastHornet ExploseHorneck  = null!;
-	public BHornetShoot2State(Actor? target) : base("fly_wasp_spawn") {
+
+	public BHornetShoot2State(Actor? target, bool aiRise = false) : base("fly_wasp_spawn") {
 		this.target = target;
+		this.aiRise = aiRise;
 	}
 
 	public override void update() {
 		base.update();
 
-		if (isAIRise) {
+		if (aiRise) {
 			if (stateTime < 0.25f) {
 				maverick.useGravity = false;
 				maverick.grounded = false;
@@ -592,9 +594,8 @@ public class BHornetShoot2State : MaverickState {
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 		ExploseHorneck = maverick as BlastHornet ?? throw new NullReferenceException();
-		if (wasFlying) maverick.useGravity = false;
-		if (maverick.grounded && isAI) {
-			isAIRise = true;
+		if (wasFlying) {
+			maverick.useGravity = false;
 		}
 	}
 
@@ -607,15 +608,17 @@ public class BHornetShoot2State : MaverickState {
 public class BHornetStingState : MaverickState {
 	float moveTime;
 	Anim? stingAnim;
-	bool isAIRise;
-	public BHornetStingState() : base("fly_stinger_attack", "fly_stinger_start") {
+	bool aiRise;
+
+	public BHornetStingState(bool aiRise = false) : base("fly_stinger_attack", "fly_stinger_start") {
 		useGravity = false;
+		this.aiRise = aiRise;
 	}
 
 	public override void update() {
 		base.update();
 		if (inTransition()) {
-			if (isAIRise && maverick.frameIndex < 7) {
+			if (aiRise && maverick.frameIndex < 7) {
 				maverick.useGravity = false;
 				maverick.grounded = false;
 				maverick.move(new Point(0, -200));
@@ -667,8 +670,5 @@ public class BHornetStingState : MaverickState {
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 		maverick.stopMoving();
-		if (maverick.grounded && isAI) {
-			isAIRise = true;
-		}
 	}
 }
