@@ -207,6 +207,8 @@ public partial class RPCCreateProj : RPC {
 		{ (int)ProjIds.WSpongeUpChain, WSpongeUpChainProj.rpcInvoke },
 		{ (int)ProjIds.WSpongeChainSpin, WSpongeChainSpinProj.rpcInvoke },
 		{ (int)ProjIds.WSpongeSeed, WSpongeSeedProj.rpcInvoke },
+		{ (int)ProjIds.WSpongeSeedAI, WSpongeSeedProjAI.rpcInvoke },
+		{ (int)ProjIds.WSpongeSeedAIStriker, WSpongeSeedProjAIStriker.rpcInvoke },
 		{ (int)ProjIds.WSpongeSpike, WSpongeSpike.rpcInvoke },
 		{ (int)ProjIds.WheelGSpinWheel, WheelGSpinWheelProj.rpcInvoke },
 		{ (int)ProjIds.WheelGSpit, WheelGSpitProj.rpcInvoke },

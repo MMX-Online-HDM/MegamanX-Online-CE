@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace MMXOnline;
 
@@ -68,7 +69,6 @@ public class ArmoredArmadillo : Maverick {
 	public override void update() {
 		base.update();
 		if (!ownedByLocalPlayer) return;
-
 		if (state is ArmoredARollState) {
 			drainAmmo(4);
 		} else if (state is ArmoredAGuardState) {
@@ -142,15 +142,44 @@ public class ArmoredArmadillo : Maverick {
 		return [
 			new ArmoredAShootState(),
 			new ArmoredARollEnterState(),
-			new ArmoredARollEnterState(),
+			new ArmoredAGuardState()
 		];
 	}
 
 	public override MaverickState[] aiAttackStates() {
-		return [
-			new ArmoredAShootState(),
-			new ArmoredARollEnterState(),
+		float enemyDist = 300;
+		if (target != null) {
+			enemyDist = MathF.Abs(target.pos.x - pos.x);
+		}
+		List<MaverickState> aiStates = [
+			new ArmoredARollEnterState()
 		];
+		if (enemyDist <= 150) {
+			aiStates.Add(getShootState(true));
+		}
+		return aiStates.ToArray();
+	}
+	public override void aiUpdate() {
+		base.aiUpdate();
+		if (controlMode == MaverickModeId.Summoner && Helpers.randomRange(0, 10) == 1 &&
+			 ammo >= 10 && !state.aiAttackCtrl && state.normalCtrl) {
+			foreach (GameObject gameObject in getCloseActors(32, true, false, false)) {
+				if (gameObject is Projectile proj && proj.damager.owner.alliance != player.alliance && !proj.isMelee
+				) {
+					changeState(new ArmoredAGuardState());
+				}
+			}
+		}
+	}
+
+	private MaverickState getShootState(bool isAI) {
+		var shootState = new MShoot((Point pos, int xDir) => {
+			new ArmoredAProj(pos, xDir, this, player.getNextActorNetId(), sendRpc: true);
+		}, "energyBall");
+		if (isAI) {
+			shootState.consecutiveData = new MaverickStateConsecutiveData(0, 2, 0.1f);//; 0.33f);
+		}
+		return shootState;
 	}
 
 	// Melee IDs for attacks.
@@ -274,6 +303,7 @@ public class ArmoredAShootState : MaverickState {
 	public bool shoot;
 
 	public ArmoredAShootState() : base("shoot") {
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -332,11 +362,11 @@ public class ArmoredAGuardState : MaverickState {
 			maverick.changeState(new MIdle());
 			return;
 		}
-
-		if (maverick.aiBehavior != MaverickAIBehavior.Control) {
-			if (stateTime > 1) {
-				maverick.changeState(new MIdle());
-				return;
+		if (isAI) {
+			if (maverick is ArmoredArmadillo armored) {
+				if (stateTime > 30f / 60f) {
+					maverick.changeToIdleFallOrFly();
+				}
 			}
 		}
 
@@ -356,6 +386,7 @@ public class ArmoredAGuardChargeState : MaverickState {
 	float damage;
 	public ArmoredAGuardChargeState(float damage) : base("charge") {
 		this.damage = damage;
+		aiAttackCtrl = true;
 	}
 
 	public override void onEnter(MaverickState oldState) {
@@ -378,6 +409,7 @@ public class ArmoredAGuardReleaseState : MaverickState {
 	float damage;
 	public ArmoredArmadillo ArmorArmarge= null!;
 	public ArmoredAGuardReleaseState(float damage) : base("release") {
+		aiAttackCtrl = true;
 		this.damage = damage;
 	}
 
@@ -477,6 +509,7 @@ public class ArmoredARollState : MaverickState {
 	float jumpHeldTime;
 
 	public ArmoredARollState() : base("roll") {
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {

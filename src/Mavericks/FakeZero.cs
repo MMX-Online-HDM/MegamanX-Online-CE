@@ -177,6 +177,19 @@ public class FakeZero : Maverick {
 		}
 		return aiStates.ToArray();
 	}
+	public override void aiUpdate() {
+		base.aiUpdate();
+		if (controlMode == MaverickModeId.Summoner && Helpers.randomRange(0, 2) == 1 && ammo >= 8 && state.aiAttackCtrl) {
+			foreach (GameObject gameObject in getCloseActors(64, true, false, false)) {
+				if (gameObject is Projectile proj &&
+					proj.damager.owner.alliance != player.alliance &&
+					!proj.isMelee
+				) {
+					changeState(new FakeZeroGuardState());
+				}
+			}
+		}
+	}
 
 	public MaverickState getShootState(bool isAI) {
 		var mshoot = new MShoot((Point pos, int xDir) => {
@@ -689,9 +702,14 @@ public class FakeZeroGuardState : MaverickState {
 
 	public override void update() {
 		base.update();
-
-		if (!input.isHeld(Control.Down, player)) {
-			maverick.changeToIdleOrFall();
+		if (isAI) {
+			if (stateTime > 12f / 60f) {
+				maverick.changeToIdleOrFall();
+			}
+		} else {
+			if (!input.isHeld(Control.Down, player)) {
+				maverick.changeToIdleOrFall();
+			}
 		}
 	}
 }

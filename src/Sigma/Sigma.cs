@@ -387,16 +387,6 @@ public class BaseSigma : Character {
 			}
 		}
 
-		/*if (currentMaverick != null) {
-			if (!isMaverickIdle || !currentMaverick.grounded) {
-				tagTeamSwapProgress = 0;
-			}
-		} else {
-			if (!isSigmaIdle || !grounded) {
-				tagTeamSwapProgress = 0;
-			}
-		}*/
-
 		if (tagTeamSwapProgress > 0) {
 			tagTeamSwapProgress -= speedMul;
 			if (tagTeamSwapProgress <= 0) {

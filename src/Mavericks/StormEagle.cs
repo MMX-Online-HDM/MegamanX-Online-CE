@@ -103,17 +103,19 @@ public class StormEagle : Maverick {
 			enemyDist = target.pos.distanceTo(pos);
 		}
 		List<MaverickState> aiStates = [
-			getShootState(),
 			new StormEEggState(grounded)
 		];
-		if (grounded && enemyDist <= 90) {
+		if (enemyDist > 50) {
+			aiStates.Add(getShootState());
+		}
+		if (grounded && enemyDist <= 80) {
 			aiStates.Add(new StormEGustState());
 		}
-		if (grounded && enemyDist <= 30) {
+		if (grounded && enemyDist <= 100) {
 			aiStates.Add(new StormEJumpAI(false));
 		}
-		if (grounded && enemyDist <= 90) {
-			aiStates.Add(new StormEJumpAI(true));
+		if (!grounded && enemyDist <= 100) {
+			aiStates.Add(new StormEDiveState());
 		}
 		return aiStates.ToArray();
 	}
