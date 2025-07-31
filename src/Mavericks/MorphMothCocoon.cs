@@ -690,14 +690,15 @@ public class MorphMCHangState : MaverickState {
 	Point origin;
 	Point swingVel;
 	float suckSoundTime;
-	public bool isStriker;
+	public int stateAI;
 	public float velXAI;
 	public float timeAI;
 	public int xdirAI = 1;
-	public MorphMCHangState(bool isStriker = false) : base("hang") {
+
+	public MorphMCHangState(int stateAI = -1) : base("hang") {
 		aiAttackCtrl = true;
 		canBeCanceled = false;
-		this.isStriker = isStriker;
+		this.stateAI = stateAI;
 	}
 
 	float suckAngle;
@@ -831,7 +832,9 @@ public class MorphMCHangState : MaverickState {
 		maverick.stopMoving();
 		maverick.angle = 0;
 		MetamorMothmeanos = maverick as MorphMothCocoon ?? throw new NullReferenceException();
-		maverick.maxStrikerTime = 450;
+		if (stateAI >= 0) {
+			maverick.maxStrikerTime = 7.5f;
+		}
 	}
 
 	public override void onExit(MaverickState newState) {
