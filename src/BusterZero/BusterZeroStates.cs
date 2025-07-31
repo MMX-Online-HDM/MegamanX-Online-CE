@@ -223,8 +223,8 @@ public class BusterZeroHadangeki : BusterZeroState {
 	public override void update() {
 		base.update();
 		
-		if (character.frameIndex >= 2 && !sound) {
-			fired = true;
+		if (character.frameIndex >= 3 && !sound) {
+			sound = true;
 			character.playSound("zerosaberx3", sendRpc: true);
 		}
 		if (character.frameIndex >= 5 && !fired) {
