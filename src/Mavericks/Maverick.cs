@@ -109,6 +109,7 @@ public class Maverick : Actor, IDamagable {
 	public bool autoExit;
 	public float autoExitTime;
 	public float strikerTime;
+	public float? maxStrikerTime;
 	public int attackDir;
 	public SubTank usedSubtank;
 	public float netSubtankHealAmount;
@@ -285,6 +286,16 @@ public class Maverick : Actor, IDamagable {
 		}
 
 		useChargeJump = controlMode == MaverickModeId.Puppeteer;
+
+		// Striker auto-exit for some states.
+		if (maxStrikerTime != null) {
+			if (strikerTime >= maxStrikerTime && state is not MExit) {
+				maxStrikerTime = null;
+				changeState(new MExit(pos, true));
+			} else {
+				strikerTime += speedMul;
+			}
+		}
 	}
 
 	public override void update() {
