@@ -128,10 +128,6 @@ public class MagnaCentipede : Maverick {
 		return 200;
 	}
 
-	public override float getDashSpeed() {
-		return 1;
-	}
-
 	public override string getMaverickPrefix() {
 		return "magnac";
 	}

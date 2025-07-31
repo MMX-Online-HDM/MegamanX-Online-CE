@@ -596,7 +596,7 @@ public class MJumpStart : MaverickState {
 	public float jumpFramesHeld;
 	public float preJumpFramesHeld;
 	public float maxPreJumpFrames = 2;
-	public float maxJumpFrames = 10;
+	public float maxJumpFrames = 12;
 	public float additionalJumpPower;
 	public bool isChargeJump;
 
@@ -613,7 +613,7 @@ public class MJumpStart : MaverickState {
 		int inputDir = input.getXDir(player);
 		if (inputDir != 0) {
 			maverick.xDir = inputDir;
-			maverick.move(new Point(maverick.getRunSpeed() * inputDir, 0));
+			maverick.move(new Point(Physics.WalkSpeed * inputDir, 0));
 		}
 
 		if (maverick is BoomerangKuwanger ||
@@ -675,9 +675,8 @@ public class MJumpStart : MaverickState {
 
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
-		if (isChargeJump && player.input.getXDir(player) != 0) {
-			maverick.dashSpeed = 1.5f;
-			if (jumpFramesHeld >= 5) maverick.dashSpeed = 2;
+		if (isChargeJump) {
+			maverick.dashSpeed = 1 + (jumpFramesHeld / maxJumpFrames);
 		}
 	}
 }
@@ -798,23 +797,23 @@ public class MFly : MaverickState {
 		Point move = new Point();
 
 		if (input.isHeld(Control.Left, player)) {
-			move.x = -maverick.getRunSpeed() * maverick.getDashSpeed() * maverick.getAirSpeed();
+			move.x = -maverick.getRunSpeed() * maverick.getAirSpeed();
 			maverick.xDir = -1;
 		} else if (input.isHeld(Control.Right, player)) {
-			move.x = maverick.getRunSpeed() * maverick.getDashSpeed() * maverick.getAirSpeed();
+			move.x = maverick.getRunSpeed() * maverick.getAirSpeed();
 			maverick.xDir = 1;
 		}
 
 		if (maverick.flyBar > 0 && maverick.gravityWellModifier <= 1) {
 			if (input.isHeld(Control.Up, player)) {
 				if (maverick.pos.y > -5) {
-					move.y = -maverick.getRunSpeed() * maverick.getDashSpeed();
+					move.y = -maverick.getRunSpeed();
 				}
 			} else if (input.isHeld(Control.Down, player)) {
-				move.y = maverick.getRunSpeed() * maverick.getDashSpeed();
+				move.y = maverick.getRunSpeed();
 			}
 		} else {
-			move.y = maverick.getRunSpeed() * maverick.getDashSpeed();
+			move.y = maverick.getRunSpeed();
 		}
 
 		if (!maverick.isUnderwater()) {

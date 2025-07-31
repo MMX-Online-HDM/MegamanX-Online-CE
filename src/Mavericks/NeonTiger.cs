@@ -72,10 +72,6 @@ public class NeonTiger : Maverick {
 		return 200f;
 	}
 
-	public override float getDashSpeed() {
-		return 1f;
-	}
-
 	public override MaverickState[] strikerStates() {
 		return [
 			new NeonTClawState(false),

@@ -19,7 +19,7 @@ public class BlizzardBuffalo : Maverick {
 		};
 
 		spriteFrameToSounds["bbuffalo_run/2"] = "walkStomp";
-		spriteFrameToSounds["bbuffalo_run/6"] = "walkStomp";
+		spriteFrameToSounds["bbuffalo_run/8"] = "walkStomp";
 		weapon = netWeapon;
 
 		awardWeaponId = WeaponIds.FrostShield;
@@ -54,7 +54,7 @@ public class BlizzardBuffalo : Maverick {
 	}
 
 	public override float getRunSpeed() {
-		return 75;
+		return Physics.WalkSpeed;
 	}
 
 	public override string getMaverickPrefix() {

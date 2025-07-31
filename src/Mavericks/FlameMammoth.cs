@@ -69,8 +69,8 @@ public class FlameMammoth : Maverick {
 	public override MaverickState[] strikerStates() {
 		return [
 			getShootState(true),
-			new FlameMOilState(),
 			new FlameMJumpStateAI(),
+			new FlameMOilState(),
 		];
 	}
 

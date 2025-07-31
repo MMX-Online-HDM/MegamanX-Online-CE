@@ -89,8 +89,8 @@ public class SparkMandrill : Maverick {
 	public override MaverickState[] strikerStates() {
 		return [
 			getShootState(),
-			new SparkMDashPunchState(),
-			new SparkMPunchState()
+			new SparkMPunchState(),
+			new SparkMDashPunchState()
 		];
 	}
 

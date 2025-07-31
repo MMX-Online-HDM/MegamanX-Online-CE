@@ -46,7 +46,8 @@ public class MaverickWeapon : Weapon {
 	public bool isMoth;
 
 	public MaverickWeapon(Player? player, int controlMode) {
-		this.controlMode = (MaverickModeId)controlMode;
+		trueControlMode = (MaverickModeId)controlMode;
+		this.controlMode = trueControlMode;
 		lastHealth = player?.getMaverickMaxHp(this.controlMode) ?? 32;
 		this.player = player;
 
@@ -153,6 +154,7 @@ public class MaverickWeapon : Weapon {
 		if (maverick == null) {
 			throw new Exception("Error summoning maverick on maverick weapon " + this.GetType().ToString());
 		}
+		maverick.ownerChar = player.character;
 		maverick.controlMode = controlMode;
 		maverick.trueControlMode = trueControlMode;
 		maverick.rootWeapon = this;

@@ -109,7 +109,7 @@ public class Maverick : Actor, IDamagable {
 	public bool autoExit;
 	public float autoExitTime;
 	public float strikerTime;
-	public float strikerOverrideTime = 3;
+	public float? maxStrikerTime;
 	public int attackDir;
 	public SubTank usedSubtank;
 	public float netSubtankHealAmount;
@@ -119,7 +119,7 @@ public class Maverick : Actor, IDamagable {
 	public Actor target;
 	public float aiCooldown;
 	public float maxAICooldown = 75;
-	public string startMoveControl;
+	public int startMoveControl = -1;
 
 	public Weapon weapon;
 	public WeaponIds awardWeaponId;
@@ -286,6 +286,16 @@ public class Maverick : Actor, IDamagable {
 		}
 
 		useChargeJump = controlMode == MaverickModeId.Puppeteer;
+
+		// Striker auto-exit for some states.
+		if (maxStrikerTime != null) {
+			if (strikerTime >= maxStrikerTime && state is not MExit) {
+				maxStrikerTime = null;
+				changeState(new MExit(pos, true));
+			} else {
+				strikerTime += speedMul;
+			}
+		}
 	}
 
 	public override void update() {
@@ -588,7 +598,7 @@ public class Maverick : Actor, IDamagable {
 			turnToPos(target.getCenterPos());
 		}
 
-		bool doStartMoveControlIfNoTarget = !string.IsNullOrEmpty(startMoveControl);
+		bool doStartMoveControlIfNoTarget = startMoveControl >= 0;
 		if ((target != null || doStartMoveControlIfNoTarget) &&
 			isAIState && controlMode != MaverickModeId.Puppeteer
 		) {
@@ -596,23 +606,13 @@ public class Maverick : Actor, IDamagable {
 				MaverickState mState = getRandomAttackState();
 				if (isSummonerOrStrikerDoppler && doppler.ballType == 1) {
 					mState = strikerStates()[0];
-				} else if (!string.IsNullOrEmpty(startMoveControl)) {
-					var aiAttackStateArray = strikerStates();
-
-					int mIndex = startMoveControl switch {
-						Control.Right => 4,
-						Control.Left => 3,
-						Control.Down => 2,
-						Control.Up => 1,
-						_ => 0
-					};
-
-					while (mIndex >= aiAttackStateArray.Length) {
-						mIndex--;
+				} else if (startMoveControl >= 0) {
+					MaverickState[] aiAttackStateArray = strikerStates();
+					while (startMoveControl >= aiAttackStateArray.Length) {
+						startMoveControl = 0;
 					}
-					mState = aiAttackStateArray[mIndex];
-
-					startMoveControl = "";
+					mState = aiAttackStateArray[startMoveControl];
+					startMoveControl = -1;
 				}
 
 				if (mState != null) {
@@ -1329,7 +1329,7 @@ public class Maverick : Actor, IDamagable {
 		if (this is StingChameleon sc && sc.isInvisible && ownedByLocalPlayer) {
 			return true;
 		}
-		return ownerChar?.currentMaverick == this && controlMode == MaverickModeId.Puppeteer;
+		return false;
 	}
 
 	public void changeToIdleOrFall(string transitionSprite = "") {

@@ -156,11 +156,11 @@ public class MorphMothCocoon : Maverick {
 				if (input.isPressed(Control.Special1, player)) {
 					changeState(new MorphMCThreadState(stateAI: 0));
 				} else if (input.isPressed(Control.Dash, player) || input.isPressed(Control.Shoot, player)) {
-					changeState(new MorphMCSpinState(0));
+					changeState(new MorphMCSpinState());
 				}
 			} else if (state is MJump || state is MFall) {
 				if (input.isPressed(Control.Dash, player) || input.isPressed(Control.Shoot, player)) {
-					changeState(new MorphMCSpinState(0));
+					changeState(new MorphMCSpinState());
 				}
 			}
 		}
@@ -414,7 +414,7 @@ public class MorphMCSpinState : MaverickState {
 	public bool hit;
 	public float hit2;
 
-	public MorphMCSpinState(int stateAI) : base("spin") {
+	public MorphMCSpinState(int stateAI = -1) : base("spin") {
 		canJump = true;
 		canStopJump = true;
 		this.stateAI = stateAI;
@@ -423,9 +423,8 @@ public class MorphMCSpinState : MaverickState {
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 		if (stateAI == 0) {
-			maverick.strikerOverrideTime = 1.75f;
-		} else maverick.strikerOverrideTime = 3;
-
+			maverick.maxStrikerTime = 105 * 60;
+		}
 		MetamorMothmeanos = maverick as MorphMothCocoon ?? throw new NullReferenceException();
 	}
 
