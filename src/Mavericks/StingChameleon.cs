@@ -160,8 +160,8 @@ public class StingChameleon : Maverick {
 		return [
 			new StingCTongueState(0),
 			new StingCTongueState(1),
-			getShootState(true),
-			new StingCJumpAI()
+			new StingCJumpAI(),
+			getShootState(true)
 		];
 	}
 

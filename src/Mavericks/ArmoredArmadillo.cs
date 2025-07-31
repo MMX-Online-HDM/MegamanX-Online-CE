@@ -142,6 +142,7 @@ public class ArmoredArmadillo : Maverick {
 		return [
 			new ArmoredAShootState(),
 			new ArmoredARollEnterState(),
+			new ArmoredARollEnterState(),
 		];
 	}
 

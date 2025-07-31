@@ -46,7 +46,8 @@ public class MaverickWeapon : Weapon {
 	public bool isMoth;
 
 	public MaverickWeapon(Player? player, int controlMode) {
-		this.controlMode = (MaverickModeId)controlMode;
+		trueControlMode = (MaverickModeId)controlMode;
+		this.controlMode = trueControlMode;
 		lastHealth = player?.getMaverickMaxHp(this.controlMode) ?? 32;
 		this.player = player;
 

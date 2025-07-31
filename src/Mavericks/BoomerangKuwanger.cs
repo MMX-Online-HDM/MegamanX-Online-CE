@@ -125,7 +125,8 @@ public class BoomerangKuwanger : Maverick {
 	public override MaverickState[] strikerStates() {
 		return [
 			getShootState(),
-			new BoomerKDeadLiftState()
+			new BoomerKDeadLiftState(),
+			new BoomerKDeadLiftState(),
 		];
 	}
 
