@@ -227,11 +227,11 @@ public class BusterZeroHadangeki : BusterZeroState {
 			sound = true;
 			character.playSound("zerosaberx3", sendRpc: true);
 		}
-		if (character.frameIndex >= 5 && !fired) {
+		if (character.frameIndex >= 6 && !fired) {
 			zero.stockedSaber = false;
 			fired = true;
 			new DZHadangekiProj(
-				character.pos.addxy(30 * character.xDir, -20), character.xDir,
+				character.pos.addxy(46 * character.xDir, -20), character.xDir,
 				zero.isBlackZero, zero, player, player.getNextActorNetId(), rpc: true
 			);
 		}
