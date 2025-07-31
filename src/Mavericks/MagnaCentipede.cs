@@ -135,8 +135,8 @@ public class MagnaCentipede : Maverick {
 	public override MaverickState[] strikerStates() {
 		return [
 			new MagnaCShootState(),
-			new MagnaCMagnetMineState(true)
 			new MagnaCMagnetPullState(),
+			new MagnaCMagnetMineState(true)
 		];
 	}
 
