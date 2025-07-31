@@ -516,7 +516,7 @@ public partial class Actor : GameObject {
 		}
 
 		// Get misc. projectiles based on conditions (i.e. headbutt, awakened zero aura)
-		var projToCreateDict = getGlobalProjs();
+		Dictionary<int, Func<Projectile>> projToCreateDict = getGlobalProjs();
 
 		// If the projectile id wasn't returned, remove it from current globalProj list.
 		for (int i = globalProjs.Count - 1; i >= 0; i--) {
@@ -525,14 +525,17 @@ public partial class Actor : GameObject {
 				globalProjs[i].destroySelf();
 				globalProjs.RemoveAt(i);
 			}
+			else if (globalProjs[i].destroyed) {
+				globalProjs.RemoveAt(i);
+			}
 		}
 
 		// For all projectiles to create, add to the global proj list ONLY if the proj id doesn't already exist
 		foreach (var kvp in projToCreateDict) {
-			var projIdToCreate = kvp.Key;
-			var projFunction = kvp.Value;
+			int projIdToCreate = kvp.Key;
+			Func<Projectile> projFunction = kvp.Value;
 			if (!globalProjs.Any(p => p.projId == projIdToCreate)) {
-				var newlyCreatedProj = projFunction();
+				Projectile newlyCreatedProj = projFunction();
 				globalProjs.Add(newlyCreatedProj);
 			}
 		}
@@ -1411,8 +1414,8 @@ public partial class Actor : GameObject {
 			}
 		}
 
-		foreach (var proj in globalProjs) {
-			proj?.destroySelf();
+		foreach (Projectile proj in globalProjs) {
+			proj.destroySelf();
 		}
 
 		destroyMusicSource();

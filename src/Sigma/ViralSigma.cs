@@ -132,7 +132,9 @@ public class ViralSigma : Character {
 				var damageCollider = getAllColliders().FirstOrDefault(c => c.isAttack());
 				Point centerPoint = damageCollider.shape.getRect().center();
 				Projectile proj = new GenericMeleeProj(
-					new ViralSigmaTackleWeapon(player), centerPoint, ProjIds.Sigma2ViralTackle, player
+					new ViralSigmaTackleWeapon(player), centerPoint,
+					ProjIds.Sigma2ViralTackle, player,
+					addToLevel: true
 				);
 				proj.globalCollider = damageCollider.clone();
 				return proj;

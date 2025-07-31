@@ -654,7 +654,6 @@ public class PunchyZero : Character {
 			Dictionary<int, Func<Projectile>> retProjs = new() {
 				[(int)ProjIds.AwakenedAura] = () => {
 					playSound("awakenedaura", forcePlay: true, sendRpc: true); 
-					Point centerPoint = globalCollider.shape.getRect().center();
 					float damage = 2;
 					int flinch = 0;
 					if (isGenmuZero) {
@@ -662,11 +661,17 @@ public class PunchyZero : Character {
 						flinch = Global.defFlinch;
 					}
 					Projectile proj = new GenericMeleeProj(
-						awakenedAuraWeapon, centerPoint,
-						ProjIds.AwakenedAura, player, damage, flinch
+						awakenedAuraWeapon, pos,
+						ProjIds.AwakenedAura, player, damage, flinch, 30,
+						addToLevel: true
 					) {
-						globalCollider = globalCollider.clone(),
-						meleeId = (int)MeleeIds.AwakenedAura
+						globalCollider = new Collider(
+							new Rect(0f, 0f, 30, 40).getPoints(),
+							false, this, false, false,
+							HitboxFlag.Hitbox, Point.zero
+						),
+						meleeId = (int)MeleeIds.AwakenedAura,
+						owningActor = this
 					};
 					return proj;
 				}

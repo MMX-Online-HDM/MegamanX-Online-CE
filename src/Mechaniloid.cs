@@ -375,7 +375,11 @@ public class Mechaniloid : Actor, IDamagable {
 	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		Projectile proj = null;
 		if (sprite.name == "sigma2_hopper_attack") {
-			proj = new GenericMeleeProj(weapon, centerPoint, ProjIds.Sigma2HopperDrill, netOwner, 1, Global.defFlinch, 9);
+			proj = new GenericMeleeProj(
+				weapon, centerPoint, ProjIds.Sigma2HopperDrill,
+				netOwner, 1, Global.defFlinch, 9,
+				addToLevel: true
+			);
 			proj.netcodeOverride = NetcodeModel.FavorDefender;
 		}
 		return proj;
