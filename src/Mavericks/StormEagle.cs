@@ -14,8 +14,8 @@ public class StormEagle : Maverick {
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
 		stateCooldowns = new() {
-			{ typeof(StormEAirShootState), new(2f, true, true) },
-			{ typeof(MShoot), new(2f, true, true) },
+			{ typeof(StormEAirShootState), new(120, true, true) },
+			{ typeof(MShoot), new(120, false, false) },
 			{ typeof(StormEEggState), new(90, true) },
 			{ typeof(StormEGustState), new(45, true) },
 			{ typeof(StormEDiveState), new(60) }
@@ -85,6 +85,7 @@ public class StormEagle : Maverick {
 		return new MShoot((Point pos, int xDir) => {
 			new TornadoProj(pos, xDir, true, this, player, player.getNextActorNetId(), rpc: true);
 		}, "tornado");
+
 	}
 
 	public override MaverickState[] strikerStates() {
