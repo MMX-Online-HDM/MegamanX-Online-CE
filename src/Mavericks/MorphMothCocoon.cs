@@ -154,7 +154,7 @@ public class MorphMothCocoon : Maverick {
 		if (aiBehavior == MaverickAIBehavior.Control) {
 			if (state is MIdle or MRun or MLand) {
 				if (input.isPressed(Control.Special1, player)) {
-					changeState(new MorphMCThreadState(stateAI: 0));
+					changeState(new MorphMCThreadState());
 				} else if (input.isPressed(Control.Dash, player) || input.isPressed(Control.Shoot, player)) {
 					changeState(new MorphMCSpinState());
 				}
@@ -606,7 +606,7 @@ public class MorphMCThreadState : MaverickState {
 	MorphMCThreadProj? proj;
 	MorphMothCocoon MetamorMothmeanos = null!;
 	public int stateAI;
-	public MorphMCThreadState(int stateAI) : base("idle") {
+	public MorphMCThreadState(int stateAI = -1) : base("idle") {
 		this.stateAI = stateAI;
 	}
 
@@ -626,7 +626,7 @@ public class MorphMCThreadState : MaverickState {
 			var latchPos = new Point(maverick.pos.x, proj.pos.y);
 			MetamorMothmeanos.setLatchPos(latchPos);
 			float latchDestY = ((maverick.getFirstPOIOrDefault().y + latchPos.y) / 2) + 10;
-			maverick.changeState(new MorphMCLatchState(latchDestY, isAI ? stateAI : 0));
+			maverick.changeState(new MorphMCLatchState(latchDestY, stateAI : 0));
 		}
 	}
 
@@ -650,7 +650,7 @@ public class MorphMCLatchState : MaverickState {
 	float latchDestY;
 	public int stateAI;
 	MorphMothCocoon MetamorMothmeanos = null!;
-	public MorphMCLatchState(float latchDestY, int stateAI) : base("latch") {
+	public MorphMCLatchState(float latchDestY, int stateAI = -1) : base("latch") {
 		this.latchDestY = latchDestY;
 		this.stateAI = stateAI;
 	}
@@ -661,7 +661,7 @@ public class MorphMCLatchState : MaverickState {
 		if (maverick.pos.y < latchDestY) {
 			maverick.incPos(new Point(0, -14 * maverick.yScale));
 			MetamorMothmeanos.setLatchLen();
-			maverick.changeState(new MorphMCHangState(isAI));
+			maverick.changeState(new MorphMCHangState(stateAI));
 		}
 	}
 
