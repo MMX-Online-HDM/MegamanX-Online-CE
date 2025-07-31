@@ -153,6 +153,7 @@ public class MaverickWeapon : Weapon {
 		if (maverick == null) {
 			throw new Exception("Error summoning maverick on maverick weapon " + this.GetType().ToString());
 		}
+		maverick.ownerChar = player.character;
 		maverick.controlMode = controlMode;
 		maverick.trueControlMode = trueControlMode;
 		maverick.rootWeapon = this;

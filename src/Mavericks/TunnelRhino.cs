@@ -57,7 +57,7 @@ public class TunnelRhino : Maverick {
 	}
 
 	public override float getRunSpeed() {
-		return 75;
+		return Physics.WalkSpeed;
 	}
 
 	public override string getMaverickPrefix() {

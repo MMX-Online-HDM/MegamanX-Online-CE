@@ -105,14 +105,6 @@ public class OverdriveOstrich : Maverick {
 		else return Math.Max(100, speed);
 	}
 
-	public override float getDashSpeed() {
-		float runSpeed = getRunSpeed();
-		if (runSpeed > 150) {
-			return 1;
-		}
-		return dashSpeed;
-	}
-
 	public override string getMaverickPrefix() {
 		return "overdriveo";
 	}

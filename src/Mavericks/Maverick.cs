@@ -1330,7 +1330,7 @@ public class Maverick : Actor, IDamagable {
 		if (this is StingChameleon sc && sc.isInvisible && ownedByLocalPlayer) {
 			return true;
 		}
-		return ownerChar?.currentMaverick == this && controlMode == MaverickModeId.Puppeteer;
+		return false;
 	}
 
 	public void changeToIdleOrFall(string transitionSprite = "") {
