@@ -227,7 +227,7 @@ public class BusterZeroHadangeki : BusterZeroState {
 			fired = true;
 			character.playSound("zerosaberx3", sendRpc: true);
 		}
-		if (character.frameIndex >= 4 && !fired) {
+		if (character.frameIndex >= 5 && !fired) {
 			zero.stockedSaber = false;
 			fired = true;
 			new DZHadangekiProj(
