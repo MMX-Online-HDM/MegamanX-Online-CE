@@ -40,6 +40,7 @@ public class OptionsMenu : IMainMenu {
 	public OptionsMenu(IMainMenu mainMenu, bool inGame, int? charNum, int selectY) {
 		previous = mainMenu;
 		this.inGame = inGame;
+		//GsU: What is this stupid thing
 		if (selectY == 1) {
 			isGameplay = true;
 		}

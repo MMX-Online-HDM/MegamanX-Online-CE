@@ -1076,6 +1076,7 @@ public class UpgradeArmorMenuEX : IMainMenu {
 
 	public void update() {
 		if (mainP.character is not MegamanX mmx) {
+			Menu.change(new UpgradeMenu(prevMenu));
 			return;
 		}
 		if (mmx.hasAnyHyperArmor && mmx.fullArmor != ArmorId.Max) {
