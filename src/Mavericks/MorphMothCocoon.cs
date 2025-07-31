@@ -661,7 +661,7 @@ public class MorphMCLatchState : MaverickState {
 		if (maverick.pos.y < latchDestY) {
 			maverick.incPos(new Point(0, -14 * maverick.yScale));
 			MetamorMothmeanos.setLatchLen();
-			maverick.changeState(new MorphMCHangState(isAI ? stateAI : 0));
+			maverick.changeState(new MorphMCHangState(isAI));
 		}
 	}
 
@@ -690,14 +690,14 @@ public class MorphMCHangState : MaverickState {
 	Point origin;
 	Point swingVel;
 	float suckSoundTime;
-	public int stateAI;
+	public bool isStriker;
 	public float velXAI;
 	public float timeAI;
 	public int xdirAI = 1;
-	public MorphMCHangState(int stateAI) : base("hang") {
+	public MorphMCHangState(bool isStriker = false) : base("hang") {
 		aiAttackCtrl = true;
 		canBeCanceled = false;
-		this.stateAI = stateAI;
+		this.isStriker = isStriker;
 	}
 
 	float suckAngle;
@@ -831,7 +831,7 @@ public class MorphMCHangState : MaverickState {
 		maverick.stopMoving();
 		maverick.angle = 0;
 		MetamorMothmeanos = maverick as MorphMothCocoon ?? throw new NullReferenceException();
-		maverick.strikerOverrideTime = 7.5f;
+		maverick.maxStrikerTime = 450;
 	}
 
 	public override void onExit(MaverickState newState) {
