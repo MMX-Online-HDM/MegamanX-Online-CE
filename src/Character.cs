@@ -126,6 +126,8 @@ public partial class Character : Actor, IDamagable {
 	public float transformSmokeTime;
 	public int fakeAlliance;
 	public bool isATrans;
+	public DNACore? linkedDna;
+	public Character? linkedATransChar;
 	public bool oldATrans => (
 		isATrans &&
 		Global.level.server?.customMatchSettings?.oldATrans == true
@@ -3360,23 +3362,32 @@ public partial class Character : Actor, IDamagable {
 		// Tranform.
 		if (currentWeapon is UndisguiseWeapon && (shootPressed || altShootPressed)) {
 			undisguiseTime = 6;
-			DNACore lastDNA = player.lastDNACore;
 			int lastDNAIndex = player.lastDNACoreIndex;
 			playSound("transform", sendRpc: true);
-			Character oldAxl = player.revertToAxl();
-			oldAxl.undisguiseTime = 6;
+
+			Character? newChar;
+			if (player.character == this) {
+				player.revertAtransMain();
+				newChar = player.character;
+			} else {
+				newChar = player.revertAtrans(this, linkedATransChar);
+			}
+			if (newChar == null) {
+				return;
+			}
+			newChar.undisguiseTime = 6;
 			// To keep DNA.
-			if (oldATrans && altShootPressed && player.currency >= 1) {
+			if (oldATrans && altShootPressed && player.currency >= 1 && linkedDna != null) {
 				player.currency -= 1;
-				lastDNA.hyperMode = DNACoreHyperMode.None;
+				linkedDna.hyperMode = DNACoreHyperMode.None;
 				// Turn ancient gun into regular axl bullet
-				if (lastDNA.weapons.Count > 0 &&
-					lastDNA.weapons[0] is AxlBullet ab &&
+				if (linkedDna.weapons.Count > 0 &&
+					linkedDna.weapons[0] is AxlBullet ab &&
 					ab.type == (int)AxlBulletWeaponType.AncientGun
 				) {
-					lastDNA.weapons[0] = player.getAxlBulletWeapon(0);
+					linkedDna.weapons[0] = player.getAxlBulletWeapon(0);
 				}
-				oldAxl.weapons.Insert(lastDNAIndex, lastDNA);
+				newChar.weapons.Insert(lastDNAIndex, linkedDna);
 			}
 			return;
 		}
@@ -3414,7 +3425,7 @@ public partial class Character : Actor, IDamagable {
 	public void shootAssassinShot(bool isAlt = false) {
 		if (getChargeLevel() >= 3 || isAlt) {
 			assassinTime = 33f;
-			player.revertToAxl();
+			player.revertAtransMain();
 			changeState(new AssassinateChar(), true);
 		} else {
 			stopCharge();

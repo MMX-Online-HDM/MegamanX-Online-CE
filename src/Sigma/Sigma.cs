@@ -154,7 +154,7 @@ public class BaseSigma : Character {
 				}
 			}
 		}
-		if (weapons.Count > 3) {
+		if (weapons.Count > 3 || isATrans) {
 			isTruePuppeter = false;
 			isTrueStriker = false;
 		}
@@ -191,7 +191,6 @@ public class BaseSigma : Character {
 					}
 				}
 			}
-
 			return;
 		}
 
@@ -308,7 +307,7 @@ public class BaseSigma : Character {
 		if (targetWeapon is MaverickWeapon mWeapon &&
 			mWeapon.controlMode != MaverickModeId.TagTeam &&
 			(mWeapon.cooldown == 0 || mWeapon.controlMode != MaverickModeId.Striker) &&
-			(shootPressed || spcPressed || mWeapon.controlMode == MaverickModeId.Striker)
+			(shootPressed || spcPressed || isTrueStriker && mWeapon.controlMode == MaverickModeId.Striker)
 		) {
 			if (mWeapon.maverick == null) {
 				if (canAffordMaverick(mWeapon)) {

@@ -683,7 +683,9 @@ public class Run : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		if (skipIntro) {
-			character.frameIndex = 1;
+			if (character is CmdSigma) {
+				character.frameIndex = 1;
+			}
 			stateFrames = 5;
 		}
 	}

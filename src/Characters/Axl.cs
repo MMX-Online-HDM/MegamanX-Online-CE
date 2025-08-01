@@ -628,7 +628,7 @@ public class Axl : Character {
 						player.axlWeapon.axlShoot(player);
 					}
 
-					if (player.axlLoadout.blastLauncherAlt == 0) {
+					if (loadout.blastLauncherAlt == 0) {
 						if (altShootPressed && shootTime == 0 && player.weapon.altShotCooldown == 0 && player.weapon.ammo >= 1) {
 							recoilTime = 0.2f;
 							player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
@@ -654,7 +654,7 @@ public class Axl : Character {
 						}
 						altRayGunHeld = player.axlWeapon.ammo > 0;
 
-						if (player.axlLoadout.rayGunAlt == 0) {
+						if (loadout.rayGunAlt == 0) {
 							Point bulletDir = getAxlBulletDir();
 							float whiteAxlMod = isWhiteAxl() ? 2 : 1;
 							move(bulletDir.times(-50 * whiteAxlMod));
@@ -679,7 +679,7 @@ public class Axl : Character {
 							player.axlWeapon.axlShoot(player);
 						}
 					} else {
-						if (player.axlLoadout.spiralMagnumAlt == 0) {
+						if (loadout.spiralMagnumAlt == 0) {
 							if (altShootPressed && player.axlWeapon.ammo > 0 && shootTime == 0 && player.weapon.altShotCooldown == 0) {
 								recoilTime = 0.2f;
 								player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
@@ -712,7 +712,7 @@ public class Axl : Character {
 						player.axlWeapon.altShotCooldown = player.axlWeapon.altFireCooldown;
 						player.axlWeapon.axlShoot(player);
 					} else if (altShootHeld) {
-						if (player.axlLoadout.plasmaGunAlt == 0) {
+						if (loadout.plasmaGunAlt == 0) {
 							if (player.axlWeapon.altShotCooldown == 0 && grounded) {
 								recoilTime = 0.2f;
 								voltTornadoTime = 0.2f;
@@ -729,12 +729,12 @@ public class Axl : Character {
 				}
 
 				if (player.weapon is IceGattling && canShoot() && !(charState is LadderClimb) && player.weapon.ammo > 0) {
-					if (altShootPressed && player.axlLoadout.iceGattlingAlt == 0 && gaeaShield == null) {
+					if (altShootPressed && loadout.iceGattlingAlt == 0 && gaeaShield == null) {
 						recoilTime = 0.2f;
 						player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
 					}
 
-					bool isAltRev = (altShootHeld && player.axlLoadout.iceGattlingAlt == 1);
+					bool isAltRev = (altShootHeld && loadout.iceGattlingAlt == 1);
 					if (shootHeld || isAltRev) {
 						isRevving = true;
 						revTime += Global.spf * 2 * (isWhiteAxl() ? 10 : (isAltRev ? 2 : 1));
@@ -755,7 +755,7 @@ public class Axl : Character {
 						player.axlWeapon.axlShoot(player);
 					}
 
-					if (player.axlLoadout.flameBurnerAlt == 0) {
+					if (loadout.flameBurnerAlt == 0) {
 						if (altShootHeld && shootTime == 0 && player.weapon.altShotCooldown == 0) {
 							recoilTime = 0.2f;
 							player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
@@ -1653,7 +1653,7 @@ public class Axl : Character {
 				index = (int)WeaponIds.DNACore - player.weapons.Count
 			};
 			if (isATrans) {
-				player.preTransformedChar?.weapons.Add(dnaCoreWeapon);
+				linkedATransChar?.weapons.Add(dnaCoreWeapon);
 			} else {
 				weapons.Add(dnaCoreWeapon);
 			}
@@ -2088,7 +2088,7 @@ public class Axl : Character {
 				if (grounded && canDash() && charState is not DodgeRoll && dodgeRollCooldown <= 0 && charState.normalCtrl) {
 					changeState(new DodgeRoll());
 					dodgeRollCooldown = maxDodgeRollCooldown;
-				} else if (currentWeapon is FlameBurner && player?.axlLoadout.flameBurnerAlt == 1 &&
+				} else if (currentWeapon is FlameBurner && loadout.flameBurnerAlt == 1 &&
 				 (proj is not GenericMeleeProj || (proj.reflectableFBurner == true)) && player?.weapon?.ammo > 0) {
 					player.press(Control.Special1);
 				}

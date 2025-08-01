@@ -8,7 +8,7 @@ namespace MMXOnline;
 
 public partial class Player {
 	public List<Weapon> weapons => character?.weapons ?? oldWeapons;
-	public List<Weapon> oldWeapons = new();
+	public List<Weapon> oldWeapons = [];
 
 	public int weaponSlot {
 		get => character?.weaponSlot ?? 0;
@@ -243,7 +243,7 @@ label:
 	public void configureWeapons(Character character) {
 		// Save weapons for cross-life maverick HP if not an Axl.
 		List<Weapon> weapons = character.weapons;
-		if (disguise == null) {
+		if (!character.isATrans) {
 			oldWeapons = character.weapons;
 		}
 		if (ownedByLocalPlayer && character is BaseSigma && weapons.Count == 3) {

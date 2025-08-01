@@ -74,7 +74,7 @@ public class GrenadeProj : Projectile, IDamagable {
 	) {
 		this.target = target;
 
-		if (player?.axlLoadout?.blastLauncherAlt == 1) {
+		if (player?.character is Axl { loadout.blastLauncherAlt: 1 }) {
 			type = 1;
 			speed = 250;
 		}

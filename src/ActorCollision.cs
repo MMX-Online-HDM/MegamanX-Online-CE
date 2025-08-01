@@ -104,7 +104,7 @@ public partial class Actor {
 		}
 		bool hasNonAttackColider = false;
 		foreach (Collider allCollider in getAllColliders()) {
-			if (allCollider._shape.points.Count == 4) {
+			if (allCollider._shape.points.Count == 4 && allCollider._shape.isRect()) {
 				Color hitboxColor = new Color(50, 100, 255, 50);
 				Color outlineColor = new Color(0, 0, 255, 200);
 				if (allCollider.isAttack()) {

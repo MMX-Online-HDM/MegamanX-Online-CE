@@ -72,19 +72,15 @@ public partial class Player {
 		return ping.Value;
 	}
 
-	public Character preTransformedChar;
-	public bool isDisguisedAxl {
-		get {
-			return disguise != null;
-		}
-	}
+	public Character? preTransformedChar;
+	public bool isDisguisedAxl => character?.isATrans == true;
 	public List<Weapon> savedDNACoreWeapons = new List<Weapon>();
 	public int axlBulletType;
 	public List<bool> axlBulletTypeBought = new List<bool>() { true, false, false, false, false, false, false };
 	public List<float> axlBulletTypeAmmo = new List<float>() { 0, 0, 0, 0, 0, 0, 0 };
 	public List<float> axlBulletTypeLastAmmo = new List<float>() { 32, 32, 32, 32, 32, 32, 32 };
 	public int lastDNACoreIndex = 4;
-	public DNACore lastDNACore;
+	public DNACore? lastDNACore;
 	
 	public float zoomRange {
 		get {
@@ -338,7 +334,6 @@ public partial class Player {
 	public bool loadoutSet;
 	public LoadoutData previousLoadout;
 	public LoadoutData? atransLoadout;
-	public AxlLoadout axlLoadout { get { return loadout.axlLoadout; } }
 
 	public bool frozenCastlePurchased;
 	public bool speedDevilPurchased;
@@ -1351,8 +1346,8 @@ public partial class Player {
 		return true;
 	}
 
-	public void startAtransNet(RPCAxlDisguiseJson data) {
-		if (character == null) {
+	public Character startAtransNet(Character? oldChar, RPCAxlDisguiseJson data) {
+		if (oldChar == null) {
 			throw new Exception("Error, A-Trans activated on null character.");
 		}
 		disguise = new Disguise(data.targetName);
@@ -1376,10 +1371,10 @@ public partial class Player {
 				atLoadout.xLoadout.melee = data.extraData[3];
 			}
 			retChar = new MegamanX(
-				this, character.pos.x, character.pos.y, character.xDir,
+				this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir,
 				true, data.dnaNetId, false, isWarpIn: false,
 				loadout: atLoadout.xLoadout.clone(),
-				heartTanks: character.heartTanks, isATrans: true
+				heartTanks: oldChar.heartTanks, isATrans: true
 			) {
 				hasUltimateArmor = data.extraData[2] == 1
 			};
@@ -1387,18 +1382,19 @@ public partial class Player {
 		// Saber Zero.
 		else if (data.charNum == (int)CharIds.Zero) {
 			retChar = new Zero(
-				this, character.pos.x, character.pos.y, character.xDir,
-				true, data.dnaNetId, false, isWarpIn: false
+				this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir,
+				true, data.dnaNetId, false, isWarpIn: false,
+				loadout: atLoadout.zeroLoadout.clone()
 			);
 		}
 		// Vile.
 		else if (data.charNum == (int)CharIds.Vile) {
 			retChar = new Vile(
-				this, character.pos.x, character.pos.y, character.xDir,
+				this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir,
 				true, data.dnaNetId, false, isWarpIn: false,
 				mk2VileOverride: data.extraData[0] == 1, mk5VileOverride: data.extraData[0] == 2,
 				loadout: atLoadout.vileLoadout.clone(),
-				heartTanks: character.heartTanks, isATrans: true
+				heartTanks: oldChar.heartTanks, isATrans: true
 			);
 		}
 		// Axl.
@@ -1409,10 +1405,10 @@ public partial class Player {
 				hyperMode = data.extraData[2],
 			};
 			retChar = new Axl(
-				this, character.pos.x, character.pos.y, character.xDir,
+				this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir,
 				true, data.dnaNetId, false, isWarpIn: false,
 				loadout: axlLoadout,
-				heartTanks: character.heartTanks, isATrans: true
+				heartTanks: oldChar.heartTanks, isATrans: true
 			);
 		}
 		// Sigma.
@@ -1421,70 +1417,91 @@ public partial class Player {
 				sigmaForm = data.extraData[0],
 				maverick1 = data.extraData[1],
 				maverick2 = data.extraData[2],
-				commandMode = (int)MaverickModeId.Puppeteer
+				commandMode =  data.extraData[3]
 			};
 			if (data.extraData[0] == 2) {
 				retChar = new Doppma(
-					this, character.pos.x, character.pos.y, character.xDir,
+					this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir,
 					true, data.dnaNetId, false, isWarpIn: false,
 					loadout: sigmaLoadout,
-					heartTanks: character.heartTanks, isATrans: true
+					heartTanks: oldChar.heartTanks, isATrans: true
 				);
 			} else if (data.extraData[0] == 1) {
 				retChar = new NeoSigma(
-					this, character.pos.x, character.pos.y, character.xDir,
+					this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir,
 					true, data.dnaNetId, false, isWarpIn: false,
 					loadout: sigmaLoadout,
-					heartTanks: character.heartTanks, isATrans: true
+					heartTanks: oldChar.heartTanks, isATrans: true
 				);
 			} else {
 				retChar = new CmdSigma(
-					this, character.pos.x, character.pos.y, character.xDir,
+					this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir,
 					true, data.dnaNetId, false, isWarpIn: false,
 					loadout: sigmaLoadout,
-					heartTanks: character.heartTanks, isATrans: true
+					heartTanks: oldChar.heartTanks, isATrans: true
 				);
 			}
 		}
 		// Buster Zero.
 		else if (data.charNum == (int)CharIds.BusterZero) {
 			retChar = new BusterZero(
-				this, character.pos.x, character.pos.y, character.xDir,
+				this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir,
 				true, data.dnaNetId, false, isWarpIn: false,
-				heartTanks: character.heartTanks, isATrans: true
+				heartTanks: oldChar.heartTanks, isATrans: true
 			);
 		}
 		// Punchy Zero.
 		else if (data.charNum == (int)CharIds.PunchyZero) {
 			retChar = new PunchyZero(
-				this, character.pos.x, character.pos.y, character.xDir,
-				true, data.dnaNetId, false, isWarpIn: false,
+				this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir,
+				true, data.dnaNetId, oldChar.ownedByLocalPlayer, isWarpIn: false,
 				loadout: atLoadout.pzeroLoadout.clone(),
-				heartTanks: character.heartTanks, isATrans: true
+				heartTanks: oldChar.heartTanks, isATrans: true
+			);
+		}
+		// Kaiser Sigma.
+		else if (data.charNum == (int)CharIds.KaiserSigma) {
+			retChar = new KaiserSigma(
+				this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir,
+				true, data.dnaNetId, false, isWarpIn: false,
+				heartTanks: oldChar.heartTanks, isATrans: true
 			);
 		} else {
 			throw new Exception("Error: Non-valid char ID: " + data.charNum);
 		}
 
 		// Status effects.
-		retChar.burnTime = character.burnTime;
-		retChar.acidTime = character.acidTime;
-		retChar.oilTime = character.oilTime;
-		retChar.igFreezeProgress = character.igFreezeProgress;
-		retChar.virusTime = character.virusTime;
+		retChar.burnTime = oldChar.burnTime;
+		retChar.acidTime = oldChar.acidTime;
+		retChar.oilTime = oldChar.oilTime;
+		retChar.igFreezeProgress = oldChar.igFreezeProgress;
+		retChar.virusTime = oldChar.virusTime;
 
 		// Hit cooldowns.
-		retChar.projectileCooldown = character.projectileCooldown;
-		retChar.flinchCooldown = character.flinchCooldown;
+		retChar.projectileCooldown = oldChar.projectileCooldown;
+		retChar.flinchCooldown = oldChar.flinchCooldown;
 
 		// Change character.
-		character.cleanupBeforeTransform();
-		preTransformedChar = character;
-		Global.level.removeGameObject(preTransformedChar);
-		character = retChar;
+		oldChar.cleanupBeforeTransform();
+		Global.level.removeGameObject(oldChar);
+		return retChar;
 	}
 
-	public void startAtrans(DNACore dnaCore, ushort dnaNetId) {
+	public void startAtransMain(DNACore dnaCore, ushort dnaNetId) {
+		if (character == null) {
+			return;
+		}
+		character = startAtrans(character, dnaCore, dnaNetId);
+		atransLoadout = dnaCore.loadout;
+		disguise = new Disguise(dnaCore.name);
+	}
+
+	[return: NotNullIfNotNull(nameof(oldChar))]
+	public Character? startAtrans(Character? oldChar, DNACore dnaCore, ushort dnaNetId) {
+		// Return null if we sent a dead char.
+		if (oldChar == null) {
+			return null;
+		}
 		// Flag to enable vanilla A-Trans behaviour.
 		bool oldATrans = Global.level.server?.customMatchSettings?.oldATrans == true;
 
@@ -1509,7 +1526,6 @@ public partial class Player {
 
 		// Transform.
 		int spawnCharNum = dnaCore.charNum;
-		disguise = new Disguise(dnaCore.name);
 
 		// Vile
 		bool isVileMK2 = false;
@@ -1519,11 +1535,11 @@ public partial class Player {
 			isVileMK5 = dnaCore.hyperMode == DNACoreHyperMode.VileMK5;
 		}
 		// Axl transfers hypermode.
-		if (spawnCharNum == (int)CharIds.Axl && character is Axl ownAxl) {
+		if (spawnCharNum == (int)CharIds.Axl && oldChar is Axl ownAxl) {
 			dnaCore.loadout.axlLoadout.hyperMode = ownAxl.loadout.hyperMode;
 		}
 		// If somehow the DNA core loadout is null we copy current one.
-		dnaCore.loadout ??= loadout;
+		dnaCore.loadout ??= loadout.clone(id);
 
 		// Send data if local.
 		if (ownedByLocalPlayer) {
@@ -1539,7 +1555,7 @@ public partial class Player {
 			}
 			string json = JsonConvert.SerializeObject(
 				new RPCAxlDisguiseJson(
-					id, disguise.targetName, dnaCore.charNum,
+					id, dnaCore.name, dnaCore.charNum,
 					dnaCore.loadout, dnaNetId, extraData
 				)
 			);
@@ -1547,91 +1563,90 @@ public partial class Player {
 		}
 
 		// Set up backup loadout for netcode.
-		atransLoadout = dnaCore.loadout;
-		LoadoutData atLoadout = atransLoadout;
+		LoadoutData atLoadout = dnaCore.loadout;
 
 		// Spawn character.
 		Character? retChar = null;
 		// X
 		if (spawnCharNum == (int)CharIds.X) {
 			retChar = new MegamanX(
-				this, character.pos.x, character.pos.y, character.xDir,
+				this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir,
 				true, dnaNetId, true, isWarpIn: false,
 				loadout: atLoadout.xLoadout.clone(),
-				heartTanks: character.heartTanks, isATrans: true
+				heartTanks: oldChar.heartTanks, isATrans: true
 			);
 		} else if (spawnCharNum == (int)CharIds.Zero) {
 			retChar = new Zero(
-				this, character.pos.x, character.pos.y, character.xDir,
+				this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir,
 				true, dnaNetId, true, isWarpIn: false,
 				loadout: atLoadout.zeroLoadout.clone(),
-				heartTanks: character.heartTanks, isATrans: true
+				heartTanks: oldChar.heartTanks, isATrans: true
 			);
 		} else if (spawnCharNum == (int)CharIds.Vile) {
 			retChar = new Vile(
-				this, character.pos.x, character.pos.y, character.xDir,
+				this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir,
 				true, dnaNetId, true, isWarpIn: false,
 				mk2VileOverride: isVileMK2, mk5VileOverride: isVileMK5,
 				loadout: atLoadout.vileLoadout.clone(),
-				heartTanks: character.heartTanks, isATrans: true
+				heartTanks: oldChar.heartTanks, isATrans: true
 			) {
 				hasFrozenCastle = dnaCore.frozenCastle,
 				hasSpeedDevil = dnaCore.speedDevil
 			};
 		} else if (spawnCharNum == (int)CharIds.Axl) {
 			retChar = new Axl(
-				this, character.pos.x, character.pos.y, character.xDir,
+				this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir,
 				true, dnaNetId, true, isWarpIn: false,
 				loadout: atLoadout.axlLoadout.clone(),
-				heartTanks: character.heartTanks, isATrans: true
+				heartTanks: oldChar.heartTanks, isATrans: true
 			);
 		} else if (spawnCharNum == (int)CharIds.Sigma) {
 			if (dnaCore.loadout.sigmaLoadout.sigmaForm == 2) {
 				retChar = new Doppma(
-					this, character.pos.x, character.pos.y, character.xDir,
+					this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir,
 					true, dnaNetId, true, isWarpIn: false,
 					loadout: atLoadout.sigmaLoadout.clone(),
-					heartTanks: character.heartTanks, isATrans: true
+					heartTanks: oldChar.heartTanks, isATrans: true
 				);
 			} else if (dnaCore.loadout.sigmaLoadout.sigmaForm == 1) {
 				retChar = new NeoSigma(
-					this, character.pos.x, character.pos.y, character.xDir,
+					this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir,
 					true, dnaNetId, true, isWarpIn: false,
 					loadout: atLoadout.sigmaLoadout.clone(),
-					heartTanks: character.heartTanks, isATrans: true
+					heartTanks: oldChar.heartTanks, isATrans: true
 				);
 			} else {
 				retChar = new CmdSigma(
-					this, character.pos.x, character.pos.y, character.xDir,
+					this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir,
 					true, dnaNetId, true, isWarpIn: false,
 					loadout: atLoadout.sigmaLoadout.clone(),
-					heartTanks: character.heartTanks, isATrans: true
+					heartTanks: oldChar.heartTanks, isATrans: true
 				);
 			}
 		} else if (spawnCharNum == (int)CharIds.BusterZero) {
 			retChar = new BusterZero(
-				this, character.pos.x, character.pos.y, character.xDir,
+				this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir,
 				true, dnaNetId, true, isWarpIn: false,
-				heartTanks: character.heartTanks, isATrans: true
+				heartTanks: oldChar.heartTanks, isATrans: true
 			);
 		} else if (spawnCharNum == (int)CharIds.PunchyZero) {
 			retChar = new PunchyZero(
-				this, character.pos.x, character.pos.y, character.xDir,
+				this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir,
 				true, dnaNetId, true, isWarpIn: false,
 				loadout: atLoadout.pzeroLoadout.clone(),
-				heartTanks: character.heartTanks, isATrans: true
+				heartTanks: oldChar.heartTanks, isATrans: true
 			);
 		} else if  (spawnCharNum == (int)CharIds.KaiserSigma) {
 			retChar = new KaiserSigma(
-				this, character.pos.x, character.pos.y, character.xDir,
+				this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir,
 				false, charNetId, ownedByLocalPlayer, isRevive: false,
-				heartTanks: character.heartTanks, isATrans: true
+				heartTanks: oldChar.heartTanks, isATrans: true
 			);
 		} else if  (spawnCharNum == (int)CharIds.RagingChargeX) {
 			retChar = new RagingChargeX(
-				this, character.pos.x, character.pos.y, character.xDir,
+				this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir,
 				false, charNetId, ownedByLocalPlayer, isWarpIn: false,
-				heartTanks: character.heartTanks, isATrans: true
+				heartTanks: oldChar.heartTanks, isATrans: true
 			);
 		} else {
 			throw new Exception("Error: Non-valid char ID: " + spawnCharNum);
@@ -1641,9 +1656,6 @@ public partial class Player {
 			else if (isVileMK2) vile.vileForm = 1;
 		}
 		retChar.addTransformAnim();
-
-		// Weapon configuration.
-		oldWeapons = weapons;
 
 		if (spawnCharNum == (int)CharIds.Zero) {
 			retChar.weapons.Add(new ZSaber());
@@ -1661,14 +1673,14 @@ public partial class Player {
 			retChar.weapons.Add((retChar as Vile)?.energy ?? new VileAmmoWeapon());
 		}
 		// Assassination.
-		if (oldATrans || (retChar is Axl && character is Axl)) {
+		if (oldATrans || (retChar is Axl && oldChar is Axl)) {
 			retChar.weapons.Add(new AssassinBulletChar());
 		}
 		// Local player stuff.
 		else if (ownedByLocalPlayer) {
 			List<Weapon> mvWeapons = [];
 
-			foreach (Weapon weapon in character.weapons) {
+			foreach (Weapon weapon in oldChar.weapons) {
 				// Skip if is not a summoned maverick weapon.
 				if (weapon is not MaverickWeapon { summonedOnce: true }) {
 					continue;
@@ -1692,48 +1704,46 @@ public partial class Player {
 			retChar.addAI();
 		}
 
-		retChar.xDir = character.xDir;
+		retChar.xDir = oldChar.xDir;
 		//retChar.heal(maxHealth);
 
 		// Speed and state.
 		if (retChar.charId != CharIds.KaiserSigma) {
-			retChar.grounded = character.grounded;
-			retChar.atransStateChange(character);
-			retChar.vel = character.vel;
-			retChar.slideVel = character.slideVel;
-			retChar.xFlinchPushVel = character.xFlinchPushVel;
-			retChar.xIceVel = character.xIceVel;
+			retChar.grounded = oldChar.grounded;
+			retChar.atransStateChange(oldChar);
+			retChar.vel = oldChar.vel;
+			retChar.slideVel = oldChar.slideVel;
+			retChar.xFlinchPushVel = oldChar.xFlinchPushVel;
+			retChar.xIceVel = oldChar.xIceVel;
 		}
-		character.changeState(new ATransTransition());
+		oldChar.changeState(new ATransTransition());
 
-		retChar.health = character.health;
-		retChar.maxHealth = character.maxHealth;
-		retChar.healAmount = character.healAmount;
+		retChar.health = oldChar.health;
+		retChar.maxHealth = oldChar.maxHealth;
+		retChar.healAmount = oldChar.healAmount;
 
 		// Status effects.
-		retChar.burnTime = character.burnTime;
-		retChar.acidTime = character.acidTime;
-		retChar.oilTime = character.oilTime;
-		retChar.igFreezeProgress = character.igFreezeProgress;
-		retChar.virusTime = character.virusTime;
+		retChar.burnTime = oldChar.burnTime;
+		retChar.acidTime = oldChar.acidTime;
+		retChar.oilTime = oldChar.oilTime;
+		retChar.igFreezeProgress = oldChar.igFreezeProgress;
+		retChar.virusTime = oldChar.virusTime;
 
 		// Hit cooldowns.
-		retChar.projectileCooldown = character.projectileCooldown;
-		retChar.flinchCooldown = character.flinchCooldown;
+		retChar.projectileCooldown = oldChar.projectileCooldown;
+		retChar.flinchCooldown = oldChar.flinchCooldown;
 
-		character.cleanupBeforeTransform();
-		character = retChar;
 		if (weapon != null && oldATrans) {
 			weapon.shootCooldown = 0.25f;
 		}
-		if (character is MegamanX mmx) {
+		if (retChar is MegamanX mmx) {
 			if (dnaCore.hyperMode == DNACoreHyperMode.UltimateArmor) {
 				mmx.hasUltimateArmor = true;
 				//retChar.weapons.Add(new HyperNovaStrike());
 			}
 		}
-		if (character is Zero zero) {
-			zero.gigaAttack.ammo = dnaCore.rakuhouhaAmmo;
+		if (retChar is Zero zero) {
+			zero.gigaAttack.ammo = dnaCore.altCharAmmo;
 			if (dnaCore.hyperMode == DNACoreHyperMode.BlackZero) {
 				zero.isBlack = true;
 				zero.hyperMode = 0;
@@ -1744,8 +1754,8 @@ public partial class Player {
 				zero.isViral = true;
 				zero.hyperMode = 2;
 			}
-		} else if (character is PunchyZero pzero) {
-			pzero.gigaAttack.ammo = dnaCore.rakuhouhaAmmo;
+		} else if (retChar is PunchyZero pzero) {
+			pzero.gigaAttack.ammo = dnaCore.altCharAmmo;
 			if (dnaCore.hyperMode == DNACoreHyperMode.BlackZero) {
 				pzero.isBlack = true;
 				pzero.hyperMode = 0;
@@ -1756,128 +1766,153 @@ public partial class Player {
 				pzero.isViral = true;
 				pzero.hyperMode = 2;
 			}
-		} else if (character is BusterZero bzero) {
+		} else if (retChar is BusterZero bzero) {
 			if (dnaCore.hyperMode == DNACoreHyperMode.BlackZero) {
 				bzero.isBlackZero = true;
 			}
-		} else if (character is Axl axl) {
+		} else if (retChar is Axl axl) {
 			if (dnaCore.hyperMode == DNACoreHyperMode.WhiteAxl) {
 				axl.whiteAxlTime = axl.maxHyperAxlTime;
 			}
 			axl.axlSwapTime = 0.25f;
-		} else if (character is CmdSigma sigma) {
-			sigma.ballWeapon.ammo = dnaCore.rakuhouhaAmmo;
-		} else if (character is NeoSigma neoSigma) {
-			neoSigma.gigaAttack.ammo = dnaCore.rakuhouhaAmmo;
+		} else if (retChar is CmdSigma sigma) {
+			sigma.ballWeapon.ammo = dnaCore.altCharAmmo;
+		} else if (retChar is NeoSigma neoSigma) {
+			neoSigma.gigaAttack.ammo = dnaCore.altCharAmmo;
 		}
 		if (oldATrans) {
 			dnaCore.ultimateArmor = false;
 			dnaCore.hyperMode = DNACoreHyperMode.None;
 		}
 		dnaCore.usedOnce = true;
+
+		// If multiple layers of A-Trans, use the root char.
+		if (oldChar.linkedATransChar != null) {
+			retChar.linkedATransChar = oldChar.linkedATransChar;
+			oldChar.destroySelf();
+		}
+		// Otherwise, use the current one.
+		else {
+			retChar.linkedATransChar = oldChar;
+		}
+		oldChar.cleanupBeforeTransform();
+		Global.level.removeGameObject(oldChar);
+
+		return retChar;
 	}
 
 	// If you change this method change revertToAxlDeath() too
-	public Character revertToAxl(ushort? backupNetId = null) {
-		disguise = null;
+	public void revertAtransMain(ushort? backupNetId = null) {
+		character = revertAtrans(
+			character,
+			character.linkedATransChar,
+			backupNetId
+		);
 		atransLoadout = null;
-		Character oldChar = character;
-		Character retChar = preTransformedChar;
+		disguise = null;
+	}
 
+	[return: NotNullIfNotNull(nameof(oldChar))]
+	public Character? revertAtrans(Character? oldChar, Character? newChar, ushort? backupNetId = null) {
+		if (oldChar == null) {
+			return null;
+		}
 		// Flag to enable vanilla A-Trans behaviour.
 		bool oldATrans = Global.level.server?.customMatchSettings?.oldATrans == true;
 
 		if (ownedByLocalPlayer) {
 			string json = JsonConvert.SerializeObject(
-				new RPCAxlDisguiseJson(id, "", -1, loadout, retChar.netId.Value)
+				new RPCAxlDisguiseJson(id, "", -1, loadout, newChar.netId.Value)
 			);
 			Global.serverClient?.rpc(RPC.axlDisguise, json);
 
-			if (oldChar is Zero zero) {
-				lastDNACore.rakuhouhaAmmo = zero.gigaAttack.ammo;
-			} else if (oldChar is PunchyZero pzero) {
-				lastDNACore.rakuhouhaAmmo = pzero.gigaAttack.ammo;
-			} else if (oldChar is CmdSigma sigma) {
-				lastDNACore.rakuhouhaAmmo = sigma.ballWeapon.ammo;
-			} else if (oldChar is NeoSigma neoSigma) {
-				lastDNACore.rakuhouhaAmmo = neoSigma.gigaAttack.ammo;
+			if (oldChar.linkedDna != null) {
+				if (oldChar is Zero zero) {
+					oldChar.linkedDna.altCharAmmo = zero.gigaAttack.ammo;
+				} else if (oldChar is PunchyZero pzero) {
+					oldChar.linkedDna.altCharAmmo = pzero.gigaAttack.ammo;
+				} else if (oldChar is CmdSigma sigma) {
+					oldChar.linkedDna.altCharAmmo = sigma.ballWeapon.ammo;
+				} else if (oldChar is NeoSigma neoSigma) {
+					oldChar.linkedDna.altCharAmmo = neoSigma.gigaAttack.ammo;
+				}
 			}
 		}
 		// For if joined late and not locally owned.
-		if (!ownedByLocalPlayer && preTransformedChar == null) {
+		if (!ownedByLocalPlayer && newChar == null) {
 			if (backupNetId == null) {
 				throw new Exception("Error: Missing NetID on Axl trasform RPC.");
 			}
-			preTransformedChar = new Axl(
+			character.linkedATransChar = new Axl(
 				this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir, true, backupNetId, ownedByLocalPlayer, false
 			);
+		} else if (newChar == null) {
+			throw new Exception("Error: Null newChar on atrans tranform..");
 		} else {
-			Global.level.addGameObject(preTransformedChar);
+			Global.level.addGameObject(newChar);
 		}
-		character = preTransformedChar;
-		preTransformedChar = null;
-		retChar.pos = oldChar.pos;
-		retChar.xDir = oldChar.xDir;
+		newChar.pos = oldChar.pos;
+		newChar.xDir = oldChar.xDir;
 
 		if (ownedByLocalPlayer) {
-			retChar.weaponSlot = 0;
+			newChar.weaponSlot = 0;
 			lastDNACore = null;
 			lastDNACoreIndex = 4;
 
 			if (!oldATrans) {
-				retChar.weapons.AddRange(oldChar.weapons.Where(
-					(Weapon w) => w is MaverickWeapon { summonedOnce: true } && !retChar.weapons.Contains(w)
+				newChar.weapons.AddRange(oldChar.weapons.Where(
+					(Weapon w) => w is MaverickWeapon { summonedOnce: true } && !newChar.weapons.Contains(w)
 				));
 			}
 
 			// Speed
-			retChar.vel = oldChar.vel;
-			retChar.slideVel = oldChar.slideVel;
-			retChar.xFlinchPushVel = oldChar.xFlinchPushVel;
-			retChar.xIceVel = oldChar.xIceVel;
+			newChar.vel = oldChar.vel;
+			newChar.slideVel = oldChar.slideVel;
+			newChar.xFlinchPushVel = oldChar.xFlinchPushVel;
+			newChar.xIceVel = oldChar.xIceVel;
 
 			// Status effects.
-			retChar.burnTime = oldChar.burnTime;
-			retChar.acidTime = oldChar.acidTime;
-			retChar.oilTime = oldChar.oilTime;
-			retChar.igFreezeProgress = oldChar.igFreezeProgress;
-			retChar.virusTime = oldChar.virusTime;
+			newChar.burnTime = oldChar.burnTime;
+			newChar.acidTime = oldChar.acidTime;
+			newChar.oilTime = oldChar.oilTime;
+			newChar.igFreezeProgress = oldChar.igFreezeProgress;
+			newChar.virusTime = oldChar.virusTime;
 
 			// Hit cooldowns.
-			retChar.projectileCooldown = oldChar.projectileCooldown;
-			retChar.flinchCooldown = oldChar.flinchCooldown;
+			newChar.projectileCooldown = oldChar.projectileCooldown;
+			newChar.flinchCooldown = oldChar.flinchCooldown;
 
 			// Etc.
-			retChar.undisguiseTime = 6;
-			retChar.assassinTime = oldChar.assassinTime;
+			newChar.undisguiseTime = 6;
+			newChar.assassinTime = oldChar.assassinTime;
 
 			// State data.
-			if (retChar.charState is ATransTransition atState) {
+			if (newChar.charState is ATransTransition atState) {
 				atState.allowChange = true;
 			}
-			retChar.grounded = oldChar.grounded;
-			retChar.atransStateChange(oldChar);
+			newChar.grounded = oldChar.grounded;
+			newChar.atransStateChange(oldChar);
 			oldChar.changeState(new ATransTransition());
 		}
 
 		// HP Data.
-		retChar.heartTanks = oldChar.heartTanks;
-		retChar.maxHealth = retChar.getMaxHealth();
-		retChar.health = Math.Min(oldChar.health, oldChar.maxHealth);
+		newChar.heartTanks = oldChar.heartTanks;
+		newChar.maxHealth = newChar.getMaxHealth();
+		newChar.health = Math.Min(oldChar.health, oldChar.maxHealth);
 
 		oldChar.destroySelf();
-		character = retChar;
-		retChar.addTransformAnim();
+		newChar.addTransformAnim();
 
-		return retChar;
+		return newChar;
 	}
 
 	// If you change this method change revertToAxl() too
 	public void revertAtransDeath() {
 		disguise = null;
 		atransLoadout = null;
-		preTransformedChar = null;
-
+		if (character == null) {
+			return;
+		}
 		if (ownedByLocalPlayer) {
 			string json = JsonConvert.SerializeObject(
 				new RPCAxlDisguiseJson(id, "", -2, loadout, character.netId.Value)
@@ -1885,13 +1920,13 @@ public partial class Player {
 			Global.serverClient?.rpc(RPC.axlDisguise, json);
 
 			if (character is Zero zero) {
-				lastDNACore.rakuhouhaAmmo = zero.gigaAttack.ammo;
+				lastDNACore.altCharAmmo = zero.gigaAttack.ammo;
 			} else if (character is PunchyZero pzero) {
-				lastDNACore.rakuhouhaAmmo = pzero.gigaAttack.ammo;
+				lastDNACore.altCharAmmo = pzero.gigaAttack.ammo;
 			} else if (character is CmdSigma sigma) {
-				lastDNACore.rakuhouhaAmmo = sigma.ballWeapon.ammo;
+				lastDNACore.altCharAmmo = sigma.ballWeapon.ammo;
 			} else if (character is NeoSigma neoSigma) {
-				lastDNACore.rakuhouhaAmmo = neoSigma.gigaAttack.ammo;
+				lastDNACore.altCharAmmo = neoSigma.gigaAttack.ammo;
 			}
 		}
 		if (character == null) {

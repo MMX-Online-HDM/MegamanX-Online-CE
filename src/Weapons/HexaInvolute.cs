@@ -185,16 +185,20 @@ public class HexaInvoluteProj : Projectile {
 	}
 
 	public Collider getHitbox(Point origin, Point dest) {
-		var points = new List<Point>();
-		points.Add(origin);
-		points.Add(dest);
-		var dirTo = origin.directionTo(dest);
-		dest = dest.add(dirTo.leftNormal().normalize().times(5));
-		points.Add(dest);
-		dest = dest.subtract(dirTo);
-		points.Add(dest);
+		Point dirTo = origin.directionTo(dest);
+		Point dest1 = dest.add(dirTo.leftNormal().normalize().times(5));
+		Point dest2 = dest.subtract(dirTo);
+		List<Point> points = [
+			origin,
+			dest,
+			dest1,
+			dest2
+		];
 
-		return new Collider(points, true, null, false, false, 0, Point.zero);
+		return new Collider(
+			points, false, this,
+			false, false, HitboxFlag.Hitbox, Point.zero
+		);
 	}
 
 	public List<Point> getNodes(Point origin, Point dest) {

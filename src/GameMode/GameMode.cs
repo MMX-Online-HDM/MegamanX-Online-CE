@@ -2091,7 +2091,10 @@ public class GameMode {
 		}
 
 
-		if (weapon is BlastLauncher && level.mainPlayer.axlLoadout.blastLauncherAlt == 1 && level.mainPlayer.grenades.Count > 0) {
+		if (weapon is BlastLauncher &&
+			level.mainPlayer.character is Axl { loadout.blastLauncherAlt: 1 } &&
+			level.mainPlayer.grenades.Count > 0
+		) {
 			drawWeaponText(x, y, level.mainPlayer.grenades.Count.ToString());
 		}
 
@@ -2378,7 +2381,7 @@ public class GameMode {
 		}
 		if (dnaCore.charNum == (int)CharIds.Zero) {
 			if (dnaCore.hyperMode == DNACoreHyperMode.NightmareZero) {
-				weapons.Add(new DarkHoldWeapon() { ammo = dnaCore.rakuhouhaAmmo });
+				weapons.Add(new DarkHoldWeapon() { ammo = dnaCore.altCharAmmo });
 			} else {
 				weapons.Add(RakuhouhaWeapon.getWeaponFromIndex(dnaCore.loadout?.zeroLoadout.gigaAttack ?? 0));
 			}
@@ -2386,12 +2389,12 @@ public class GameMode {
 		if (dnaCore.charNum == (int)CharIds.Sigma) {
 			if (sigmaForm == 0) weapons.Add(new Weapon() {
 				weaponSlotIndex = 111,
-				ammo = dnaCore.rakuhouhaAmmo,
+				ammo = dnaCore.altCharAmmo,
 				maxAmmo = 20,
 			});
 			if (sigmaForm == 1) weapons.Add(new Weapon() {
 				weaponSlotIndex = 110,
-				ammo = dnaCore.rakuhouhaAmmo,
+				ammo = dnaCore.altCharAmmo,
 				maxAmmo = 28,
 			});
 		}
@@ -2402,7 +2405,7 @@ public class GameMode {
 			float slotY = sy;
 			Global.sprites["hud_weapon_icon"].drawToHUD(weapon.weaponSlotIndex, slotX, slotY);
 			float ammo = weapon.ammo;
-			if (weapon is RakuhouhaWeapon || weapon is RekkohaWeapon || weapon is Messenkou || weapon is DarkHoldWeapon) ammo = dnaCore.rakuhouhaAmmo;
+			if (weapon is RakuhouhaWeapon || weapon is RekkohaWeapon || weapon is Messenkou || weapon is DarkHoldWeapon) ammo = dnaCore.altCharAmmo;
 			if (weapon is not MechMenuWeapon) {
 				DrawWrappers.DrawRectWH(slotX - 8, slotY - 8, 16, 16 - MathF.Floor(16 * (ammo / weapon.maxAmmo)), true, new Color(0, 0, 0, 128), 1, ZIndex.HUD, false);
 			}

@@ -45,107 +45,106 @@ public class AxlWeapon : Weapon {
 		if (axlBulletType == AxlBulletType.WhiteAxlCopyShot2) axlBulletType = AxlBulletType.AltFire;
 
 		Axl? axl = player.character as Axl;
-		if (axl != null) {
-
-			if (player.ping != null) {
-				float ping = player.ping.Value;
-				axl.stealthRevealTime = ping / Axl.stealthRevealPingDenom;
-				if (axl.stealthRevealTime < Axl.maxStealthRevealTime) axl.stealthRevealTime = Axl.maxStealthRevealTime;
-			} else {
-				axl.stealthRevealTime = Axl.maxStealthRevealTime;
-			}
-			int chargeLevel = axlBulletType == AxlBulletType.AltFire ? 3 : axl.getChargeLevel();
-			if (chargeLevel == 3 && 
-				(this is AxlBullet || this is DoubleBullet || this is MettaurCrash ||
-				 this is BeastKiller || this is MachineBullets || this is RevolverBarrel || this is AncientGun))
-			{
-				chargeLevel = axl.getChargeLevel() + 1;
-			}
-			if (overrideChargeLevel != null) {
-				chargeLevel = overrideChargeLevel.Value;
-			}
-			if (axl.isWhiteAxl()) {
-				if (this is AxlBullet) {
-					chargeLevel += 1;
-					if (chargeLevel >= 3) chargeLevel = 3;
-				}
-			}
-
-			float ammoUsage = getAmmoUsage(chargeLevel) * Global.level.gameMode.getAmmoModifier() * (axl.isWhiteAxl() ? whiteAxlAmmoMod() : 1) * miscAmmoMod(axl);
-			ammo -= ammoUsage;
-			if (ammo < 0) ammo = 0;
-
-			if (player.weapon.type > 0 && !axl.isWhiteAxl()) {
-				if (axlBulletType == AxlBulletType.AltFire && player.weapon is not DoubleBullet) {
-					for (int i = 0; i < ammoUsage; i++) {
-						axl.ammoUsages.Add(0);
-					}
-				} else {
-					for (int i = 0; i < ammoUsage; i++) {
-						axl.ammoUsages.Add(1);
-					}
-				}
-			}
-
-			bool isCharged = chargeLevel >= 3;
-
-			Point bulletPos = axl.getAxlBulletPos();
-
-			Point cursorPos = axl.getCorrectedCursorPos();
-
-			var dirTo = bulletPos.directionTo(cursorPos);
-			float aimAngle = dirTo.angle;
-
-			if (isWhiteAxlCopyShot && isSecondShot) {
-				bulletPos.inc(dirTo.normalize().times(-5));
-			}
-
-			Weapon weapon = player.weapon;
-			if (axlBulletType == AxlBulletType.Assassin) weapon = new AssassinBulletChar();
-
-			axlGetProjectile(weapon, bulletPos, axl.axlXDir, player, aimAngle, axl.axlCursorTarget, axl.axlHeadshotTarget, cursorPos, chargeLevel, player.getNextActorNetId());
-
-			string? fs = !isCharged ? flashSprite : chargedFlashSprite;
-			if (this is RayGun && axlBulletType == AxlBulletType.AltFire && player.axlLoadout.rayGunAlt == 0) fs = "";
-			if (!string.IsNullOrEmpty(fs)) {
-				if (fs == "axl_raygun_flash" && Global.level.gameMode.isTeamMode && player.alliance == GameMode.redAlliance) fs = "axl_raygun_flash2";
-				axl.muzzleFlash.changeSprite(fs, true);
-				axl.muzzleFlash.sprite.restart();
-			}
-			// Shoot sound.
-			string soundToPlay = !isCharged ? shootSounds[0] : shootSounds[3];
-			if (axlBulletType == AxlBulletType.AltFire && !isCharged) {
-				soundToPlay = "axlBullet";
-			}
-			if (soundToPlay != "") {
-				axl.playSound(soundToPlay);
-			}
-
-			float rateOfFireMode = (axl.isWhiteAxl() ? whiteAxlFireRateMod() : 1);
-			shootCooldown = fireRate / rateOfFireMode;
-			rechargeAmmoCustomSettingAxl = rechargeAmmoCooldown;
-
-			if (axlBulletType == AxlBulletType.AltFire) {
-				altShotCooldown = altFireCooldown / rateOfFireMode;
-				rechargeAmmoCustomSettingAxl2 = altRechargeAmmoCooldown;
-			}
-
-			float switchCooldown = 0.3f;
-			float slowSwitchCooldown = 0.6f;
-
-			axl.switchTime = switchCooldown;
-			axl.altSwitchTime = switchCooldown;
-			if (shootCooldown > 0.25f || altShotCooldown > 0.25f) {
-				axl.switchTime = slowSwitchCooldown;
-				axl.altSwitchTime = slowSwitchCooldown;
-			}
-
-			float aimBackwardsAmount = axl.getAimBackwardsAmount();
-			shootCooldown *= (1 + aimBackwardsAmount * 0.25f);
-			altShotCooldown *= (1 + aimBackwardsAmount * 0.25f);
-
-			isSecondShot = !isSecondShot;
+		if (axl == null) {
+			return;
 		}
+		if (player.ping != null) {
+			float ping = player.ping.Value;
+			axl.stealthRevealTime = ping / Axl.stealthRevealPingDenom;
+			if (axl.stealthRevealTime < Axl.maxStealthRevealTime) axl.stealthRevealTime = Axl.maxStealthRevealTime;
+		} else {
+			axl.stealthRevealTime = Axl.maxStealthRevealTime;
+		}
+		int chargeLevel = axlBulletType == AxlBulletType.AltFire ? 3 : axl.getChargeLevel();
+		if (chargeLevel == 3 &&
+			(this is AxlBullet || this is DoubleBullet || this is MettaurCrash ||
+			 this is BeastKiller || this is MachineBullets || this is RevolverBarrel || this is AncientGun)) {
+			chargeLevel = axl.getChargeLevel() + 1;
+		}
+		if (overrideChargeLevel != null) {
+			chargeLevel = overrideChargeLevel.Value;
+		}
+		if (axl.isWhiteAxl()) {
+			if (this is AxlBullet) {
+				chargeLevel += 1;
+				if (chargeLevel >= 3) chargeLevel = 3;
+			}
+		}
+
+		float ammoUsage = getAmmoUsage(chargeLevel) * Global.level.gameMode.getAmmoModifier() * (axl.isWhiteAxl() ? whiteAxlAmmoMod() : 1) * miscAmmoMod(axl);
+		ammo -= ammoUsage;
+		if (ammo < 0) ammo = 0;
+
+		if (player.weapon.type > 0 && !axl.isWhiteAxl()) {
+			if (axlBulletType == AxlBulletType.AltFire && player.weapon is not DoubleBullet) {
+				for (int i = 0; i < ammoUsage; i++) {
+					axl.ammoUsages.Add(0);
+				}
+			} else {
+				for (int i = 0; i < ammoUsage; i++) {
+					axl.ammoUsages.Add(1);
+				}
+			}
+		}
+
+		bool isCharged = chargeLevel >= 3;
+
+		Point bulletPos = axl.getAxlBulletPos();
+
+		Point cursorPos = axl.getCorrectedCursorPos();
+
+		var dirTo = bulletPos.directionTo(cursorPos);
+		float aimAngle = dirTo.angle;
+
+		if (isWhiteAxlCopyShot && isSecondShot) {
+			bulletPos.inc(dirTo.normalize().times(-5));
+		}
+
+		Weapon weapon = player.weapon;
+		if (axlBulletType == AxlBulletType.Assassin) weapon = new AssassinBulletChar();
+
+		axlGetProjectile(weapon, bulletPos, axl.axlXDir, player, aimAngle, axl.axlCursorTarget, axl.axlHeadshotTarget, cursorPos, chargeLevel, player.getNextActorNetId());
+
+		string? fs = !isCharged ? flashSprite : chargedFlashSprite;
+		if (this is RayGun && axlBulletType == AxlBulletType.AltFire && axl.loadout.rayGunAlt == 0) fs = "";
+		if (!string.IsNullOrEmpty(fs)) {
+			if (fs == "axl_raygun_flash" && Global.level.gameMode.isTeamMode && player.alliance == GameMode.redAlliance) fs = "axl_raygun_flash2";
+			axl.muzzleFlash.changeSprite(fs, true);
+			axl.muzzleFlash.sprite.restart();
+		}
+		// Shoot sound.
+		string soundToPlay = !isCharged ? shootSounds[0] : shootSounds[3];
+		if (axlBulletType == AxlBulletType.AltFire && !isCharged) {
+			soundToPlay = "axlBullet";
+		}
+		if (soundToPlay != "") {
+			axl.playSound(soundToPlay);
+		}
+
+		float rateOfFireMode = (axl.isWhiteAxl() ? whiteAxlFireRateMod() : 1);
+		shootCooldown = fireRate / rateOfFireMode;
+		rechargeAmmoCustomSettingAxl = rechargeAmmoCooldown;
+
+		if (axlBulletType == AxlBulletType.AltFire) {
+			altShotCooldown = altFireCooldown / rateOfFireMode;
+			rechargeAmmoCustomSettingAxl2 = altRechargeAmmoCooldown;
+		}
+
+		float switchCooldown = 0.3f;
+		float slowSwitchCooldown = 0.6f;
+
+		axl.switchTime = switchCooldown;
+		axl.altSwitchTime = switchCooldown;
+		if (shootCooldown > 0.25f || altShotCooldown > 0.25f) {
+			axl.switchTime = slowSwitchCooldown;
+			axl.altSwitchTime = slowSwitchCooldown;
+		}
+
+		float aimBackwardsAmount = axl.getAimBackwardsAmount();
+		shootCooldown *= (1 + aimBackwardsAmount * 0.25f);
+		altShotCooldown *= (1 + aimBackwardsAmount * 0.25f);
+
+		isSecondShot = !isSecondShot;
 	}
 
 	public virtual void axlGetProjectile(

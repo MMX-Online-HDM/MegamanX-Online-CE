@@ -1262,15 +1262,20 @@ public class RPCAxlDisguise : RPC {
 			JsonConvert.DeserializeObject<RPCAxlDisguiseJson>(json) ?? throw new NullReferenceException()
 		);
 		var player = Global.level.getPlayerById(axlDisguiseData.playerId);
-		if (player == null) {
+		if (player.character == null) {
 			return;
 		}
 		if (axlDisguiseData.charNum == -1) {
-			player.revertToAxl(axlDisguiseData.dnaNetId);
+			if (player.character == null) {
+				player.atransLoadout = null;
+			} else {
+				player.revertAtransMain(axlDisguiseData.dnaNetId);
+			}
 		} else if (axlDisguiseData.charNum == -2) {
 			player.revertAtransDeath();
 		} else {
-			player.startAtransNet(axlDisguiseData);
+			player.character = player.startAtransNet(player.character, axlDisguiseData);
+			player.atransLoadout = axlDisguiseData.loadout;
 		}
 	}
 }
