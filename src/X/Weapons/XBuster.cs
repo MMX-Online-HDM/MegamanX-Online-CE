@@ -117,14 +117,24 @@ public class XBuster : Weapon {
 			character.playSound("plasmaShot", sendRpc: true);	
 			return;
 		}
-		else if (mmx.stockedMaxBuster) {
+		else if (mmx.stockedMaxBusterLv >= 1) {
 			if (mmx.charState.attackCtrl && mmx.charState.normalCtrl) {
 				mmx.changeState(new X3ChargeShot(null));
 				return;
 			}
-			createX3SpreadShot(mmx, xDir);
-			mmx.stockedMaxBuster = false;
-			shootSound = "buster4X2";
+			if (mmx.stockedMaxBusterLv % 2 == 0) {
+				new Anim(
+					pos, "buster4_x3_muzzle", xDir,
+					player.getNextActorNetId(), true, sendRpc: true
+				);
+				new Buster4MaxProj(
+					pos, xDir, mmx, player, player.getNextActorNetId(), true
+				);
+			} else {
+				createX3SpreadShot(mmx, xDir);
+			}
+			shootSound = "buster3X3";
+			mmx.stockedMaxBusterLv--;
 		}
 		else if (chargeLevel == 0) {
 			lemonsOnField.Add(new BusterProj(pos, xDir, mmx, player, player.getNextActorNetId(), true));
@@ -143,10 +153,20 @@ public class XBuster : Weapon {
 				new Buster4Giga2Proj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 			}
 			else if (mmx.armArmor == ArmorId.Max) {
-				if (!mmx.charState.attackCtrl || !mmx.charState.normalCtrl || mmx.charState is WallSlide) {
-					new Anim(pos, "buster4_x3_muzzle", xDir, player.getNextActorNetId(), true, sendRpc: true);
-					new Buster4MaxProj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
-					mmx.stockedMaxBuster = true;
+				mmx.stockedMaxBusterLv += 2;
+				if (!mmx.charState.attackCtrl ||
+					!mmx.charState.normalCtrl ||
+					mmx.charState is WallSlide
+				) {
+					new Anim(
+						pos, "buster4_x3_muzzle", xDir, player.getNextActorNetId(),
+						true, sendRpc: true
+					);
+					new Buster4MaxProj(
+						pos, xDir, mmx, player,
+						player.getNextActorNetId(), true
+					);
+					mmx.stockedMaxBusterLv--;
 				} else {
 					mmx.changeState(new X3ChargeShot(null));
 					return;

@@ -53,7 +53,7 @@ public class HyperCharge : Weapon {
 	}
 
 	public override bool canShoot(int chargeLevel, MegamanX mmx) {
-		if (mmx.stockedMaxBuster) {
+		if (mmx.stockedMaxBusterLv >= 1) {
 			return false;
 		}
 		return (

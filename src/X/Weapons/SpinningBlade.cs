@@ -214,7 +214,7 @@ public class SpinningBladeProjCharged : Projectile {
 		float yOff = Helpers.sind(spinAngle) * xDist;
 		changePos(mmx.getShootPos().addxy(xDir * xOff, yOff));
 
-		if (mmx.charState.attackCtrl && !mmx.stockedBuster &&
+		if (mmx.charState.attackCtrl && mmx.stockedBusterLv == 0 &&
 			mmx.player.input.isPressed(Control.Shoot, mmx.player) && xDist >= maxXDist
 		) {
 			retracted = true;

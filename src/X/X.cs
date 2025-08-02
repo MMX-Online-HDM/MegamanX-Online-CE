@@ -85,8 +85,8 @@ public class MegamanX : Character {
 	public float barrierAnimTime;
 	public bool stockedSaber;
 	public bool hyperChargeActive;
-	public bool stockedBuster;
-	public bool stockedMaxBuster;
+	public int stockedBusterLv;
+	public int stockedMaxBusterLv;
 
 	// Weapon-specific.
 	public RollingShieldProjCharged? chargedRollingShieldProj;
@@ -225,7 +225,7 @@ public class MegamanX : Character {
 				}
 			}
 		}
-		if (stockedSaber || stockedMaxBuster || stockedBuster) {
+		if (stockedSaber || stockedMaxBusterLv >= 1 || stockedBusterLv >= 1) {
 			stockedTime += speedMul;
 			if (stockedTime >= 62f) {
 				stockedTime = 0;
@@ -367,11 +367,11 @@ public class MegamanX : Character {
 		if (gigaAttackSpecialOption()) {
 			return true;
 		}
-		if (bufferedShotPressed && stockedMaxBuster) {
+		if (bufferedShotPressed && stockedMaxBusterLv >= 1) {
 			shoot(1, specialBuster, false);
 			return true;
 		}
-		if (bufferedShotPressed && stockedBuster) {
+		if (bufferedShotPressed && stockedBusterLv >= 1) {
 			shoot(1, currentWeapon ?? specialBuster, true);
 			return true;
 		}
@@ -466,9 +466,7 @@ public class MegamanX : Character {
 		bool useCrossShotAnim = false;
 		if (chargeLevel >= 3 && armArmor == ArmorId.Giga || busterStock) {
 			if (!busterStock) {
-				stockedBuster = true;
-			} else if (chargeLevel < 3) {
-				stockedBuster = false;
+				stockedBusterLv = 2;
 			}
 			if (!weapon.hasCustomChargeAnim && charState.normalCtrl && charState.attackCtrl) {
 				useCrossShotAnim = true;
@@ -487,7 +485,7 @@ public class MegamanX : Character {
 		string shootSound = weapon.shootSounds[chargeLevel];
 		// Shoot.
 		if (useCrossShotAnim) {
-			changeState(new X2ChargeShot(null, busterStock ? 1 : 0), true);
+			changeState(new X2ChargeShot(null, stockedBusterLv), true);
 			stopCharge();
 			return;
 		} else {
@@ -495,7 +493,7 @@ public class MegamanX : Character {
 		}
 		// Sets up global shoot cooldown to the weapon shootCooldown.
 		float baseCooldown = weapon.getFireRate(this, chargeLevel, [busterStock ? 1 : 0]);
-		if (!stockedBuster || busterStock || weapon.fireRate <= 10) {
+		if (stockedBusterLv == 0 || busterStock || weapon.fireRate <= 10) {
 			weapon.shootCooldown = baseCooldown;
 		} else {
 			weapon.shootCooldown = 10;
@@ -681,7 +679,7 @@ public class MegamanX : Character {
 	}
 
 	public override bool canShootCharge() {
-		bool hasStockCharge = stockedBuster && stockedMaxBuster && stockedSaber;
+		bool hasStockCharge = stockedBusterLv >= 1 && stockedMaxBusterLv >= 1 && stockedSaber;
 		if (isInvulnerableAttack() ||
 			hasLastingProj() && !hasStockCharge ||
 			hasLockingProj() ||
@@ -1190,14 +1188,14 @@ public class MegamanX : Character {
 			};
 			chargePalletes.Add(defaultChargePallete);
 		}
-		if (stockedMaxBuster) {
+		if (stockedMaxBusterLv >= 1) {
 			if (defaultChargePallete != Player.XOrangeC) {
 				chargePalletes.Add(Player.XOrangeC);
 			} else {
 				chargePalletes.Add(Player.XPinkC);
 			}
 		}
-		if (stockedBuster) {
+		if (stockedBusterLv >= 1) {
 			if (!chargePalletes.Contains(Player.XPinkC)) {
 				chargePalletes.Add(Player.XPinkC);
 			} else if (!chargePalletes.Contains(Player.XOrangeC)) {
@@ -1212,7 +1210,9 @@ public class MegamanX : Character {
 			}
 		}
 		if (hyperChargeActive) {
-			if (!hasFullHyperMaxArmor && !stockedMaxBuster && !chargePalletes.Contains(Player.XOrangeC)) {
+			if (!hasFullHyperMaxArmor && stockedMaxBusterLv == 0 &&
+				!chargePalletes.Contains(Player.XOrangeC)
+			) {
 				chargePalletes.Add(Player.XOrangeC);
 			} else if (!stockedSaber && !chargePalletes.Contains(Player.XPinkC)) {
 				chargePalletes.Add(Player.XPinkC);
@@ -1274,8 +1274,8 @@ public class MegamanX : Character {
 		// Stocked charge flags.
 		customData.Add(Helpers.boolArrayToByte([
 			stingActiveTime > 0,
-			stockedBuster,
-			stockedMaxBuster,
+			stockedBusterLv >= 1,
+			stockedMaxBusterLv >= 1,
 			stockedSaber,
 			hyperChargeActive,
 		]));
@@ -1308,8 +1308,8 @@ public class MegamanX : Character {
 		// Stocked charge and weapon flags.
 		bool[] boolData = Helpers.byteToBoolArray(data[4]);
 		stingActiveTime = boolData[0] ? 20 : 0;
-		stockedBuster = boolData[1];
-		stockedMaxBuster = boolData[2];
+		stockedBusterLv = boolData[1] ? 1 : 0;
+		stockedMaxBusterLv = boolData[2] ? 1 : 0;
 		stockedSaber = boolData[3];
 		hyperChargeActive = boolData[4];
 
@@ -1373,7 +1373,7 @@ public class MegamanX : Character {
 						player.release(Control.Shoot);
 					} else { player.changeWeaponSlot(getRandomWeaponIndex()); }
 					break;
-				case 7 when stockedBuster || stockedMaxBuster || stockedSaber:
+				case 7 when stockedBusterLv >= 1 || stockedMaxBusterLv >= 1 || stockedSaber:
 					player.press(Control.Shoot);
 					player.release(Control.Shoot);
 					break;

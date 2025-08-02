@@ -371,7 +371,7 @@ public class X2ChargeShot : CharState {
 	MegamanX mmx = null!;
 
 	public X2ChargeShot(Weapon? weaponOverride, int shootNum) : base("cross_shot") {
-		this.shootNum = shootNum;
+		this.shootNum = shootNum % 2;
 		this.weaponOverride = weaponOverride;
 		useDashJumpSpeed = true;
 		airMove = true;
@@ -393,24 +393,19 @@ public class X2ChargeShot : CharState {
 			fired = true;
 			if (shootNum == 0) {
 				weapon.shoot(mmx, [4, 0]);
-				weapon.shootCooldown = weapon.fireRate;
-				mmx.shootCooldown = weapon.fireRate;
-				if (weapon.shootSounds[3] != "") {
-					character.playSound(weapon.shootSounds[3], sendRpc: true);
-				}
-				weapon.addAmmo(-weapon.getAmmoUsageEX(3, character), player);
-				mmx.stockedTime = 0;
 			} else {
-				mmx.stockedBuster = false;
 				weapon.shoot(mmx, [4, 1]);
-				weapon.shootCooldown = weapon.fireRate;
-				mmx.shootCooldown = weapon.fireRate;
-				if (weapon.shootSounds[3] != "") {
-					character.playSound(weapon.shootSounds[3], sendRpc: true);
-				}
-				weapon.addAmmo(-weapon.getAmmoUsageEX(3, character), player);
-				mmx.stockedTime = 0;
 			}
+			if (mmx.stockedBusterLv >= 1) {
+				mmx.stockedBusterLv--;
+			}
+			weapon.shootCooldown = weapon.fireRate;
+			mmx.shootCooldown = weapon.fireRate;
+			if (weapon.shootSounds[3] != "") {
+				character.playSound(weapon.shootSounds[3], sendRpc: true);
+			}
+			weapon.addAmmo(-weapon.getAmmoUsageEX(3, character), player);
+			mmx.stockedTime = 0;
 		}
 		if (character.isAnimOver()) {
 			if (shootNum == 0 && pressFire) {
@@ -533,6 +528,9 @@ public class X3ChargeShot : CharState {
 				);
 			}
 			mmx.stockedTime = 0;
+			if (mmx.stockedMaxBusterLv >= 1) {
+				mmx.stockedMaxBusterLv--;
+			}
 		}
 		if (character.isAnimOver()) {
 			if (state == 0 && pressFire) {
@@ -573,10 +571,7 @@ public class X3ChargeShot : CharState {
 		if (mmx == null) {
 			throw new NullReferenceException();
 		}
-		if (!mmx.stockedMaxBuster) {
-			if (hyperBusterWeapon == null) {
-				mmx.stockedMaxBuster = true;
-			}
+		if (mmx.stockedMaxBusterLv >= 2) {
 			sprite = "cross_shot";
 			defaultSprite = sprite;
 			landSprite = "cross_shot";
@@ -585,7 +580,6 @@ public class X3ChargeShot : CharState {
 			}
 			character.changeSpriteFromName(sprite, true);
 		} else {
-			mmx.stockedMaxBuster = false;
 			state = 1;
 			sprite = "cross_shot2";
 			defaultSprite = sprite;
@@ -598,11 +592,6 @@ public class X3ChargeShot : CharState {
 	}
 
 	public override void onExit(CharState? newState) {
-		if (state == 0) {
-			mmx.stockedMaxBuster = true;
-		} else {
-			mmx.stockedMaxBuster = false;
-		}
 		character.shootAnimTime = 0;
 		mmx.stockedTime = 0;
 		base.onExit(newState);
