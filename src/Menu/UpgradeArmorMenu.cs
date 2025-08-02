@@ -659,21 +659,19 @@ public class UpgradeArmorMenuGolden : IMainMenu {
 	}
 }
 public class Skill {
-	public MegamanX? mmx;
 	public string name = "";
-	public Func<MegamanX, bool> isUnlocked;
-	public Func<MegamanX, bool> canUnlock;
-	public Func<MegamanX, bool> canLock;
-	public Action<MegamanX> unlock;
-	public Action<MegamanX> lockit;
-	public Func<MegamanX, bool> Requirements;
+	public Func<Player, bool>? isUnlocked;
+	public Func<Player, bool>? canUnlock;
+	public Func<Player, bool>? canLock;
+	public Action<Player>? unlock;
+	public Action<Player>? lockit;
 	public string description = "";
 	public string price = "";
 }
 public interface IMenuHandler {
-	void handleInput(MegamanX mmx, int ud, int lr);
+	void handleInput(Player? player, int ud, int lr);
 	void renderCursor(int ud, int lr, AnimData cursor, uint ghw, uint ghh);
-	void renderDescription(MegamanX mmx, int ud, int lr, uint ghw, uint ghh);
+	void renderDescription(Player? player, int ud, int lr, uint ghw, uint ghh);
 	void renderIcons(int frame, AnimData icon, uint ghw, uint ghh, float opacity);
 }
 public class SNESArmorHandler : IMenuHandler {
@@ -682,86 +680,87 @@ public class SNESArmorHandler : IMenuHandler {
 		#region Light
 		menu[(1, 1)] = new Skill {
 			name = "Helmet",
-			isUnlocked = mmx => mmx.helmetArmor == ArmorId.Light,
-			canUnlock = mmx => mmx.helmetArmor != ArmorId.Light && mmx.player.currency >= MegamanX.headArmorCost || mmx.player.headArmorsPurchased[0] == true,
-			canLock = mmx => mmx.helmetArmor == ArmorId.Light,
-			unlock = (mmx) => {
-				mmx.helmetArmor = ArmorId.Light;
-				mmx.player.helmetArmorNum = (int)ArmorId.Light;
-				if (mmx.player.headArmorsPurchased[0] == false)
-					mmx.player.currency -= MegamanX.headArmorCost;
-				mmx.player.headArmorsPurchased[0] = true;
+			isUnlocked = player => player.helmetArmorNum == (int)ArmorId.Light,
+			canUnlock = player => player.helmetArmorNum != (int)ArmorId.Light && player.currency >= MegamanX.headArmorCost || player.headArmorsPurchased[0] == true,
+			canLock = player => player.helmetArmorNum == (int)ArmorId.Light,
+			unlock = (player) => {
+				//Kill me
+				setHelmet(player, (int)ArmorId.Light);
+				player.helmetArmorNum = (int)ArmorId.Light;
+				if (player.headArmorsPurchased[0] == false)
+					player.currency -= MegamanX.headArmorCost;
+				player.headArmorsPurchased[0] = true;
 			},
-			lockit = (mmx) => {
-				mmx.helmetArmor = ArmorId.None;
-				mmx.player.helmetArmorNum = (int)ArmorId.None;
-				if (mmx.player.headArmorsPurchased[0] == false)
-					mmx.player.currency += MegamanX.headArmorCost;
+			lockit = (player) => {
+				setHelmet(player, (int)ArmorId.None);
+				player.helmetArmorNum = (int)ArmorId.None;
+				if (player.headArmorsPurchased[0] == false)
+					player.currency += MegamanX.headArmorCost;
 			},
 			description = "Grants a headbutt attack on Jump.\nCan be combined with Upward Dash.",
 			price = MegamanX.headArmorCost.ToString(),
 		};
 		menu[(1, 2)] = new Skill {
 			name = "Body",
-			isUnlocked = mmx => mmx.chestArmor == ArmorId.Light,
-			canUnlock = mmx => mmx.chestArmor != ArmorId.Light && mmx.player.currency >= MegamanX.chestArmorCost || mmx.player.bodyArmorsPurchased[0] == true,
-			canLock = mmx => mmx.chestArmor == ArmorId.Light,
-			unlock = (mmx) => {
-				mmx.player.removeGigaCrush();
-				mmx.chestArmor = ArmorId.Light;
-				mmx.player.bodyArmorNum = (int)ArmorId.Light;
-				if (mmx.player.bodyArmorsPurchased[0] == false)
-					mmx.player.currency -= MegamanX.chestArmorCost;
-				mmx.player.bodyArmorsPurchased[0] = true;
+			isUnlocked = player => player.bodyArmorNum == (int)ArmorId.Light,
+			canUnlock = player => player.bodyArmorNum != (int)ArmorId.Light && player.currency >= MegamanX.chestArmorCost || player.bodyArmorsPurchased[0] == true,
+			canLock = player => player.bodyArmorNum == (int)ArmorId.Light,
+			unlock = (player) => {
+				setBody(player, (int)ArmorId.Light);
+				player.removeGigaCrush();
+				player.bodyArmorNum = (int)ArmorId.Light;
+				if (player.bodyArmorsPurchased[0] == false)
+					player.currency -= MegamanX.chestArmorCost;
+				player.bodyArmorsPurchased[0] = true;
 			},
-			lockit = (mmx) => {
-				mmx.chestArmor = ArmorId.None;
-				mmx.player.bodyArmorNum = (int)ArmorId.None;
-				if (mmx.player.bodyArmorsPurchased[0] == false)
-					mmx.player.currency += MegamanX.chestArmorCost;
+			lockit = (player) => {
+				setBody(player, (int)ArmorId.None);
+				player.bodyArmorNum = (int)ArmorId.None;
+				if (player.bodyArmorsPurchased[0] == false)
+					player.currency += MegamanX.chestArmorCost;
 			},
 			description = "Reduces Damage by 12.5%\nReduces Flinch by 25.0%",
 			price = MegamanX.chestArmorCost.ToString(),
 		};
 		menu[(1, 3)] = new Skill {
 			name = "Arm",
-			isUnlocked = mmx => mmx.armArmor == ArmorId.Light,
-			canUnlock = mmx => mmx.armArmor != ArmorId.Light && mmx.player.currency >= MegamanX.armArmorCost || mmx.player.armArmorsPurchased[0] == true,
-			canLock = mmx => mmx.armArmor == ArmorId.Light,
-			unlock = (mmx) => {
-				mmx.player.removeHyperCharge();
-				mmx.armArmor = ArmorId.Light;
-				mmx.player.armArmorNum = (int)ArmorId.Light;
-				if (mmx.player.armArmorsPurchased[0] == false)
-					mmx.player.currency -= MegamanX.armArmorCost;
-				mmx.player.armArmorsPurchased[0] = true;
+			isUnlocked = player => player.armArmorNum == (int)ArmorId.Light,
+			canUnlock = player => player.armArmorNum != (int)ArmorId.Light && player.currency >= MegamanX.armArmorCost || player.armArmorsPurchased[0] == true,
+			canLock = player => player.armArmorNum == (int)ArmorId.Light,
+			unlock = (player) => {
+				setArm(player, (int)ArmorId.Light);
+				player.removeHyperCharge();
+				player.armArmorNum = (int)ArmorId.Light;
+				if (player.armArmorsPurchased[0] == false)
+					player.currency -= MegamanX.armArmorCost;
+				player.armArmorsPurchased[0] = true;
 			},
-			lockit = (mmx) => {
-				mmx.armArmor = ArmorId.None;
-				mmx.player.armArmorNum = (int)ArmorId.None;
-				if (mmx.player.armArmorsPurchased[0] == false)
-					mmx.player.currency += MegamanX.armArmorCost;
+			lockit = (player) => {
+				setArm(player, (int)ArmorId.None);
+				player.armArmorNum = (int)ArmorId.None;
+				if (player.armArmorsPurchased[0] == false)
+					player.currency += MegamanX.armArmorCost;
 			},
 			description = "Powers up your Spiral Crush Buster.",
 			price = MegamanX.armArmorCost.ToString(),
 		};
 		menu[(1, 4)] = new Skill {
 			name = "Boots",
-			isUnlocked = mmx => mmx.legArmor == ArmorId.Light,
-			canUnlock = mmx => mmx.legArmor != ArmorId.Light && mmx.player.currency >= MegamanX.bootsArmorCost || mmx.player.bootsArmorsPurchased[0] == true,
-			canLock = mmx => mmx.legArmor == ArmorId.Light,
-			unlock = (mmx) => {
-				mmx.legArmor = ArmorId.Light;
-				mmx.player.legArmorNum = (int)ArmorId.Light;
-				if (mmx.player.bootsArmorsPurchased[0] == false)
-					mmx.player.currency -= MegamanX.bootsArmorCost;
-				mmx.player.bootsArmorsPurchased[0] = true;
+			isUnlocked = player => player.legArmorNum == (int)ArmorId.Light,
+			canUnlock = player => player.legArmorNum != (int)ArmorId.Light && player.currency >= MegamanX.bootsArmorCost || player.bootsArmorsPurchased[0] == true,
+			canLock = player => player.legArmorNum == (int)ArmorId.Light,
+			unlock = (player) => {
+				setLegs(player, (int)ArmorId.Light);
+				player.legArmorNum = (int)ArmorId.Light;
+				if (player.bootsArmorsPurchased[0] == false)
+					player.currency -= MegamanX.bootsArmorCost;
+				player.bootsArmorsPurchased[0] = true;
 			},
-			lockit = (mmx) => {
-				mmx.legArmor = ArmorId.None;
-				mmx.player.legArmorNum = (int)ArmorId.None;
-				if (mmx.player.bootsArmorsPurchased[0] == false)
-					mmx.player.currency += MegamanX.bootsArmorCost;
+			lockit = (player) => {
+				setLegs(player, (int)ArmorId.None);
+				player.legArmorNum = (int)ArmorId.None;
+				if (player.bootsArmorsPurchased[0] == false)
+					player.currency += MegamanX.bootsArmorCost;
 			},
 			description = "Ground Dash 15% faster and longer.",
 			price = MegamanX.bootsArmorCost.ToString(),
@@ -770,87 +769,91 @@ public class SNESArmorHandler : IMenuHandler {
 		#region Giga
 		menu[(2, 1)] = new Skill {
 			name = "Helmet",
-			isUnlocked = mmx => mmx.helmetArmor == ArmorId.Giga,
-			canUnlock = mmx => mmx.helmetArmor != ArmorId.Giga && mmx.player.currency >= MegamanX.headArmorCost || mmx.player.headArmorsPurchased[1] == true,
-			canLock = mmx => mmx.helmetArmor == ArmorId.Giga,
-			unlock = (mmx) => {
-				mmx.helmetArmor = ArmorId.Giga;
-				mmx.player.helmetArmorNum = (int)ArmorId.Giga;
-				if (mmx.player.headArmorsPurchased[1] == false)
-					mmx.player.currency -= MegamanX.headArmorCost;
-				mmx.player.headArmorsPurchased[1] = true;
+			isUnlocked = player => player.helmetArmorNum == (int)ArmorId.Giga,
+			canUnlock = player => player.helmetArmorNum != (int)ArmorId.Giga && player.currency >= MegamanX.headArmorCost || player.headArmorsPurchased[1] == true,
+			canLock = player => player.helmetArmorNum == (int)ArmorId.Giga,
+			unlock = (player) => {
+				setHelmet(player, (int)ArmorId.Giga);
+				player.helmetArmorNum = (int)ArmorId.Giga;
+				if (player.headArmorsPurchased[1] == false)
+					player.currency -= MegamanX.headArmorCost;
+				player.headArmorsPurchased[1] = true;
 			},
-			lockit = (mmx) => {
-				mmx.helmetArmor = ArmorId.None;
-				if (mmx.player.headArmorsPurchased[1] == false)
-					mmx.player.currency += MegamanX.headArmorCost;
-				mmx.player.helmetArmorNum = (int)ArmorId.None;
+			lockit = (player) => {
+				setHelmet(player, (int)ArmorId.None);
+				player.helmetArmorNum = (int)ArmorId.None;
+				if (player.headArmorsPurchased[1] == false)
+					player.currency += MegamanX.headArmorCost;
+				player.helmetArmorNum = (int)ArmorId.None;
 			},
 			description = "Trace enemy hp and positioning\nby pressing SPECIAL button.",
 			price = MegamanX.headArmorCost.ToString(),
 		};
 		menu[(2, 2)] = new Skill {
 			name = "Body",
-			isUnlocked = mmx => mmx.chestArmor == ArmorId.Giga,
-			canUnlock = mmx => mmx.chestArmor != ArmorId.Giga && mmx.player.currency >= MegamanX.chestArmorCost || mmx.player.bodyArmorsPurchased[1] == true,
-			canLock = mmx => mmx.chestArmor == ArmorId.Giga,
-			unlock = (mmx) => {
-				mmx.chestArmor = ArmorId.Giga;
-				mmx.player.bodyArmorNum = (int)ArmorId.Giga;
-				if (mmx.player.bodyArmorsPurchased[1] == false)
-					mmx.player.currency -= MegamanX.chestArmorCost;
-				mmx.player.addGigaCrush();
-				mmx.player.bodyArmorsPurchased[1] = true;
+			isUnlocked = player => player.bodyArmorNum == (int)ArmorId.Giga,
+			canUnlock = player => player.bodyArmorNum != (int)ArmorId.Giga && player.currency >= MegamanX.chestArmorCost || player.bodyArmorsPurchased[1] == true,
+			canLock = player => player.bodyArmorNum == (int)ArmorId.Giga,
+			unlock = (player) => {
+				setBody(player, (int)ArmorId.Giga);
+				player.bodyArmorNum = (int)ArmorId.Giga;
+				if (player.bodyArmorsPurchased[1] == false)
+					player.currency -= MegamanX.chestArmorCost;
+				player.addGigaCrush();
+				player.bodyArmorsPurchased[1] = true;
 			},
-			lockit = (mmx) => {
-				mmx.chestArmor = ArmorId.None;
-				if (mmx.player.bodyArmorsPurchased[1] == false)
-					mmx.player.currency += MegamanX.chestArmorCost;
-				mmx.player.bodyArmorNum = (int)ArmorId.None;
-				mmx.player.removeGigaCrush();
+			lockit = (player) => {
+				setBody(player, (int)ArmorId.None);
+				player.bodyArmorNum = (int)ArmorId.None;
+				if (player.bodyArmorsPurchased[1] == false)
+					player.currency += MegamanX.chestArmorCost;
+				player.bodyArmorNum = (int)ArmorId.None;
+				player.removeGigaCrush();
 			},
 			description = "Grants the Giga Crush attack.\nReduces Damage by 12.5%",
 			price = MegamanX.chestArmorCost.ToString(),
 		};
 		menu[(2, 3)] = new Skill {
 			name = "Arm",
-			isUnlocked = mmx => mmx.armArmor == ArmorId.Giga,
-			canUnlock = mmx => mmx.armArmor != ArmorId.Giga && mmx.player.currency >= MegamanX.armArmorCost || mmx.player.armArmorsPurchased[1] == true,
-			canLock = mmx => mmx.armArmor == ArmorId.Giga,
-			unlock = (mmx) => {
-				mmx.player.removeHyperCharge();
-				mmx.armArmor = ArmorId.Giga;
-				mmx.player.armArmorNum = (int)ArmorId.Giga;
-				if (mmx.player.armArmorsPurchased[1] == false)
-					mmx.player.currency -= MegamanX.armArmorCost;
-				mmx.player.armArmorsPurchased[1] = true;
+			isUnlocked = player => player.armArmorNum == (int)ArmorId.Giga,
+			canUnlock = player => player.armArmorNum != (int)ArmorId.Giga && player.currency >= MegamanX.armArmorCost || player.armArmorsPurchased[1] == true,
+			canLock = player => player.armArmorNum == (int)ArmorId.Giga,
+			unlock = (player) => {
+				setArm(player, (int)ArmorId.Giga);
+				player.removeHyperCharge();
+				player.armArmorNum = (int)ArmorId.Giga;
+				if (player.armArmorsPurchased[1] == false)
+					player.currency -= MegamanX.armArmorCost;
+				player.armArmorsPurchased[1] = true;
 			},
-			lockit = (mmx) => {
-				mmx.armArmor = ArmorId.None;
-				if (mmx.player.armArmorsPurchased[1] == false)
-					mmx.player.currency += MegamanX.armArmorCost;
-				mmx.player.armArmorNum = (int)ArmorId.None; ;
+			lockit = (player) => {
+				setArm(player, (int)ArmorId.None);
+				player.armArmorNum = (int)ArmorId.None;
+				if (player.armArmorsPurchased[1] == false)
+					player.currency += MegamanX.armArmorCost;
+				player.armArmorNum = (int)ArmorId.None; ;
 			},
 			description = "Grants the Double X-Buster.\nStore an extra charge shot.",
 			price = MegamanX.armArmorCost.ToString(),
 		};
 		menu[(2, 4)] = new Skill {
 			name = "Boots",
-			isUnlocked = mmx => mmx.legArmor == ArmorId.Giga,
-			canUnlock = mmx => mmx.legArmor != ArmorId.Giga && mmx.player.currency >= MegamanX.bootsArmorCost || mmx.player.bootsArmorsPurchased[1] == true,
-			canLock = mmx => mmx.legArmor == ArmorId.Giga,
-			unlock = (mmx) => {
-				mmx.legArmor = ArmorId.Giga;
-				mmx.player.legArmorNum = (int)ArmorId.Giga;
-				if (mmx.player.bootsArmorsPurchased[1] == false)
-					mmx.player.currency -= MegamanX.bootsArmorCost;
-				mmx.player.bootsArmorsPurchased[1] = true;
+			isUnlocked = player => player.legArmorNum == (int)ArmorId.Giga,
+			canUnlock = player => player.legArmorNum != (int)ArmorId.Giga && player.currency >= MegamanX.bootsArmorCost || player.bootsArmorsPurchased[1] == true,
+			canLock = player => player.legArmorNum == (int)ArmorId.Giga,
+			unlock = (player) => {
+				setLegs(player, (int)ArmorId.Giga);
+				player.legArmorNum = (int)ArmorId.Giga;
+				if (player.bootsArmorsPurchased[1] == false)
+					player.currency -= MegamanX.bootsArmorCost;
+				player.bootsArmorsPurchased[1] = true;
 			},
-			lockit = (mmx) => {
-				mmx.legArmor = ArmorId.None;
-				if (mmx.player.bootsArmorsPurchased[1] == false)
-					mmx.player.currency += MegamanX.bootsArmorCost;
-				mmx.player.legArmorNum = (int)ArmorId.None;
+			lockit = (player) => {
+				setLegs(player, (int)ArmorId.None);
+				player.legArmorNum = (int)ArmorId.None;
+				if (player.bootsArmorsPurchased[1] == false)
+					player.currency += MegamanX.bootsArmorCost;
+				player.legArmorNum = (int)ArmorId.None;
 			},
 			description = "Air dash 15% faster and longer.",
 			price = MegamanX.bootsArmorCost.ToString(),
@@ -859,87 +862,91 @@ public class SNESArmorHandler : IMenuHandler {
 		#region Max
 		menu[(3, 1)] = new Skill {
 			name = "Helmet",
-			isUnlocked = mmx => mmx.helmetArmor == ArmorId.Max,
-			canUnlock = mmx => mmx.helmetArmor != ArmorId.Max && mmx.player.currency >= MegamanX.headArmorCost || mmx.player.headArmorsPurchased[2] == true,
-			canLock = mmx => mmx.helmetArmor == ArmorId.Max,
-			unlock = (mmx) => {
-				mmx.helmetArmor = ArmorId.Max;
-				mmx.player.helmetArmorNum = (int)ArmorId.Max;
-				if (mmx.player.headArmorsPurchased[2] == false)
-					mmx.player.currency -= MegamanX.headArmorCost;
-				mmx.player.headArmorsPurchased[2] = true;
+			isUnlocked = player => player.helmetArmorNum == (int)ArmorId.Max,
+			canUnlock = player => player.helmetArmorNum != (int)ArmorId.Max && player.currency >= MegamanX.headArmorCost || player.headArmorsPurchased[2] == true,
+			canLock = player => player.helmetArmorNum == (int)ArmorId.Max,
+			unlock = (player) => {
+				setHelmet(player, (int)ArmorId.Max);
+				player.helmetArmorNum = (int)ArmorId.Max;
+				if (player.headArmorsPurchased[2] == false)
+					player.currency -= MegamanX.headArmorCost;
+				player.headArmorsPurchased[2] = true;
 			},
-			lockit = (mmx) => {
-				mmx.helmetArmor = ArmorId.None;
-				if (mmx.player.headArmorsPurchased[2] == false)
-					mmx.player.currency += MegamanX.headArmorCost;
-				mmx.player.helmetArmorNum = (int)ArmorId.None;
+			lockit = (player) => {
+				setHelmet(player, (int)ArmorId.None);
+				player.helmetArmorNum = (int)ArmorId.None;
+				if (player.headArmorsPurchased[2] == false)
+					player.currency += MegamanX.headArmorCost;
+				player.helmetArmorNum = (int)ArmorId.None;
 			},
 			description = "Grants minimap to track down enemies\nthrough The State of the Art Space Satellite.",
 			price = MegamanX.headArmorCost.ToString(),
 		};
 		menu[(3, 2)] = new Skill {
 			name = "Body",
-			isUnlocked = mmx => mmx.chestArmor == ArmorId.Max,
-			canUnlock = mmx => mmx.chestArmor != ArmorId.Max && mmx.player.currency >= MegamanX.chestArmorCost || mmx.player.bodyArmorsPurchased[2] == true,
-			canLock = mmx => mmx.chestArmor == ArmorId.Max,
-			unlock = (mmx) => {
-				mmx.chestArmor = ArmorId.Max;
-				mmx.player.bodyArmorNum = (int)ArmorId.Max;
-				if (mmx.player.bodyArmorsPurchased[2] == false)
-					mmx.player.currency -= MegamanX.chestArmorCost;
-				mmx.player.bodyArmorsPurchased[2] = true;
-				mmx.player.removeGigaCrush();
+			isUnlocked = player => player.bodyArmorNum == (int)ArmorId.Max,
+			canUnlock = player => player.bodyArmorNum != (int)ArmorId.Max && player.currency >= MegamanX.chestArmorCost || player.bodyArmorsPurchased[2] == true,
+			canLock = player => player.bodyArmorNum == (int)ArmorId.Max,
+			unlock = (player) => {
+				setBody(player, (int)ArmorId.Max);
+				player.bodyArmorNum = (int)ArmorId.Max;
+				if (player.bodyArmorsPurchased[2] == false)
+					player.currency -= MegamanX.chestArmorCost;
+				player.bodyArmorsPurchased[2] = true;
+				player.removeGigaCrush();
 			},
-			lockit = (mmx) => {
-				mmx.chestArmor = ArmorId.None;
-				if (mmx.player.bodyArmorsPurchased[2] == false)
-					mmx.player.currency += MegamanX.chestArmorCost;
-				mmx.player.bodyArmorNum = (int)ArmorId.None;
+			lockit = (player) => {
+				setBody(player, (int)ArmorId.None);
+				player.bodyArmorNum = (int)ArmorId.None;
+				if (player.bodyArmorsPurchased[2] == false)
+					player.currency += MegamanX.chestArmorCost;
+				player.bodyArmorNum = (int)ArmorId.None;
 			},
 			description = "Gain a Defensive Forcefield on taking\ndamage. Forcefield Defense: 25%",
 			price = MegamanX.chestArmorCost.ToString(),
 		};
 		menu[(3, 3)] = new Skill {
 			name = "Arm",
-			isUnlocked = mmx => mmx.armArmor == ArmorId.Max,
-			canUnlock = mmx => mmx.armArmor != ArmorId.Max && mmx.player.currency >= MegamanX.armArmorCost || mmx.player.armArmorsPurchased[2] == true,
-			canLock = mmx => mmx.armArmor == ArmorId.Max,
-			unlock = (mmx) => {
-				mmx.armArmor = ArmorId.Max;
-				mmx.player.armArmorNum = (int)ArmorId.Max;
-				if (mmx.player.armArmorsPurchased[2] == false)
-					mmx.player.currency -= MegamanX.armArmorCost;
-				mmx.player.addHyperCharge();
-				mmx.player.armArmorsPurchased[2] = true;
+			isUnlocked = player => player.armArmorNum == (int)ArmorId.Max,
+			canUnlock = player => player.armArmorNum != (int)ArmorId.Max && player.currency >= MegamanX.armArmorCost || player.armArmorsPurchased[2] == true,
+			canLock = player => player.armArmorNum == (int)ArmorId.Max,
+			unlock = (player) => {
+				setArm(player, (int)ArmorId.Max);
+				player.armArmorNum = (int)ArmorId.Max;
+				if (player.armArmorsPurchased[2] == false)
+					player.currency -= MegamanX.armArmorCost;
+				player.addHyperCharge();
+				player.armArmorsPurchased[2] = true;
 			},
-			lockit = (mmx) => {
-				mmx.armArmor = ArmorId.None;
-				if (mmx.player.armArmorsPurchased[2] == false)
-					mmx.player.currency += MegamanX.armArmorCost;
-				mmx.player.armArmorNum = (int)ArmorId.None;
-				mmx.player.removeHyperCharge();
+			lockit = (player) => {
+				setArm(player, (int)ArmorId.None);
+				player.armArmorNum = (int)ArmorId.None;
+				if (player.armArmorsPurchased[2] == false)
+					player.currency += MegamanX.armArmorCost;
+				player.armArmorNum = (int)ArmorId.None;
+				player.removeHyperCharge();
 			},
 			description = "Grants the Hyper Charge.\nGrants the Cross Charge shot.",
 			price = MegamanX.armArmorCost.ToString(),
 		};
 		menu[(3, 4)] = new Skill {
 			name = "Boots",
-			isUnlocked = mmx => mmx.legArmor == ArmorId.Max,
-			canUnlock = mmx => mmx.legArmor != ArmorId.Max && mmx.player.currency >= MegamanX.bootsArmorCost || mmx.player.bootsArmorsPurchased[2] == true,
-			canLock = mmx => mmx.legArmor == ArmorId.Max,
-			unlock = (mmx) => {
-				mmx.legArmor = ArmorId.Max;
-				mmx.player.legArmorNum = (int)ArmorId.Max;
-				if (mmx.player.bootsArmorsPurchased[2] == false)
-					mmx.player.currency -= MegamanX.bootsArmorCost;
-				mmx.player.bootsArmorsPurchased[2] = true;
+			isUnlocked = player => player.legArmorNum == (int)ArmorId.Max,
+			canUnlock = player => player.legArmorNum != (int)ArmorId.Max && player.currency >= MegamanX.bootsArmorCost || player.bootsArmorsPurchased[2] == true,
+			canLock = player => player.legArmorNum == (int)ArmorId.Max,
+			unlock = (player) => {
+				setLegs(player, (int)ArmorId.Max);
+				player.legArmorNum = (int)ArmorId.Max;
+				if (player.bootsArmorsPurchased[2] == false)
+					player.currency -= MegamanX.bootsArmorCost;
+				player.bootsArmorsPurchased[2] = true;
 			},
-			lockit = (mmx) => {
-				mmx.legArmor = ArmorId.None;
-				if (mmx.player.bootsArmorsPurchased[2] == false)
-					mmx.player.currency += MegamanX.bootsArmorCost;
-				mmx.player.legArmorNum = (int)ArmorId.None;
+			lockit = (player) => {
+				setLegs(player, (int)ArmorId.None);
+				player.legArmorNum = (int)ArmorId.None;
+				if (player.bootsArmorsPurchased[2] == false)
+					player.currency += MegamanX.bootsArmorCost;
+				player.legArmorNum = (int)ArmorId.None;
 			},
 			description = "Grants an Upwards Dash.",
 			price = MegamanX.bootsArmorCost.ToString(),
@@ -948,47 +955,47 @@ public class SNESArmorHandler : IMenuHandler {
 		#region HyperChip
 		menu[(4, 1)] = new Skill {
 			name = "Helmet",
-			isUnlocked = mmx => mmx.hyperHelmetActive,
-			canUnlock = mmx => mmx.fullArmor == ArmorId.Max && !mmx.hasAnyHyperArmor,
-			canLock = mmx => mmx.hyperHelmetActive,
-			unlock = (mmx) => { mmx.hyperHelmetActive = true; },
-			lockit = (mmx) => { mmx.hyperHelmetActive = false; },
+			isUnlocked = player => player.character is MegamanX mmx && mmx.hyperHelmetActive, //Kill me
+			canUnlock = player => player.character is MegamanX mmx && player.hasAllX3Armor() && !mmx.hasAnyHyperArmor,
+			canLock = player => player.character is MegamanX mmx && mmx.hyperHelmetActive,
+			unlock = (player) => { if (player.character is MegamanX mmx) mmx.hyperHelmetActive = true; },
+			lockit = (player) => { if (player.character is MegamanX mmx) mmx.hyperHelmetActive = false; },
 			description = "ENHANCEMENT CHIP\nSlowly regenerate Health after not taking Damage.",
 			price = "0",
 		};
 		menu[(4, 2)] = new Skill {
 			name = "Body",
-			isUnlocked = mmx => mmx.hyperChestActive,
-			canUnlock = mmx => mmx.fullArmor == ArmorId.Max && !mmx.hasAnyHyperArmor,
-			canLock = mmx => mmx.hyperChestActive,
-			unlock = (mmx) => { mmx.hyperChestActive = true; },
-			lockit = (mmx) => { mmx.hyperChestActive = false; },
+			isUnlocked = player => player.character is MegamanX mmx && mmx.hyperChestActive,
+			canUnlock = player => player.character is MegamanX mmx && player.hasAllX3Armor() && !mmx.hasAnyHyperArmor,
+			canLock = player => player.character is MegamanX mmx && player.hasAllX3Armor() && !mmx.hyperChestActive,
+			unlock = (player) => { if (player.character is MegamanX mmx) mmx.hyperChestActive = true; },
+			lockit = (player) => { if (player.character is MegamanX mmx) mmx.hyperChestActive = false; },
 			description = "ENHANCEMENT CHIP\nForcefield Defense: 50%",
 			price = "0",
 		};
 		menu[(4, 3)] = new Skill {
 			name = "Arm",
-			isUnlocked = mmx => mmx.hyperArmActive,
-			canUnlock = mmx => mmx.fullArmor == ArmorId.Max && !mmx.hasAnyHyperArmor,
-			canLock = mmx => mmx.hyperArmActive,
-			unlock = (mmx) => { mmx.hyperArmActive = true; },
-			lockit = (mmx) => { mmx.hyperArmActive = false; },
+			isUnlocked = player => player.character is MegamanX mmx && mmx.hyperArmActive,
+			canUnlock = player => player.character is MegamanX mmx && player.hasAllX3Armor() && !mmx.hasAnyHyperArmor,
+			canLock = player => player.character is MegamanX mmx && mmx.hyperArmActive,
+			unlock = (player) => { if (player.character is MegamanX mmx) mmx.hyperArmActive = true; },
+			lockit = (player) => { if (player.character is MegamanX mmx) mmx.hyperArmActive = false; },
 			description = "ENHANCEMENT CHIP\nReduce ammo usage by half.",
 			price = "0",
 		};
 		menu[(4, 4)] = new Skill {
 			name = "Boots",
-			isUnlocked = mmx => mmx.hyperLegActive,
-			canUnlock = mmx => mmx.fullArmor == ArmorId.Max && !mmx.hasAnyHyperArmor,
-			canLock = mmx => mmx.hyperLegActive,
-			unlock = (mmx) => { mmx.hyperLegActive = true; },
-			lockit = (mmx) => { mmx.hyperLegActive = false; },
+			isUnlocked = player => player.character is MegamanX mmx && mmx.hyperLegActive,
+			canUnlock = player => player.character is MegamanX mmx && player.hasAllX3Armor() && !mmx.hasAnyHyperArmor,
+			canLock = player => player.character is MegamanX mmx && mmx.hyperLegActive,
+			unlock = (player) => { if (player.character is MegamanX mmx) mmx.hyperLegActive = true; },
+			lockit = (player) => { if (player.character is MegamanX mmx) mmx.hyperLegActive = false; },
 			description = "ENHANCEMENT CHIP\nDash Twice in the air",
 			price = MegamanX.bootsArmorCost.ToString(),
 		};
 		#endregion
 	}
-	public void renderDescription(MegamanX p, int ud, int lr, uint ghw, uint ghh) {
+	public void renderDescription(Player? p, int ud, int lr, uint ghw, uint ghh) {
 		if (!menu.TryGetValue((ud, lr), out var skill)) return;
 		if (string.IsNullOrWhiteSpace(skill.description)) return;
 		bool met = skill.canUnlock(p);
@@ -998,13 +1005,13 @@ public class SNESArmorHandler : IMenuHandler {
 		Fonts.drawTextEX(font, skill.description, ghw - 170, ghh + 54, Alignment.Left);
 	}
 
-	public void handleInput(MegamanX mmx, int ud, int lr) {
+	public void handleInput(Player? player, int ud, int lr) {
 		if (!menu.TryGetValue((ud, lr), out var skill)) return;
-		if (Global.input.isPressedMenu(Control.MenuConfirm) && skill.canUnlock(mmx)) {
-			skill.unlock(mmx);
+		if (Global.input.isPressedMenu(Control.MenuConfirm) && skill.canUnlock(player)) {
+			skill.unlock(player);
 			Global.playSound("ching");
-		} else if (Global.input.isPressedMenu(Control.MenuAlt) && skill.canLock(mmx)) {
-			skill.lockit(mmx);
+		} else if (Global.input.isPressedMenu(Control.MenuAlt) && skill.canLock(player)) {
+			skill.lockit(player);
 			Global.playSound("busterX3");
 		}
 	}
@@ -1055,6 +1062,23 @@ public class SNESArmorHandler : IMenuHandler {
 			icon.drawToHUD(icons.Key, ghw + icons.Value.x, ghh + icons.Value.y, opacity);
 		}
 	}
+	//Kill me
+	public void setHelmet(Player player, int armorID) {
+		if (player.character is MegamanX mmx && mmx != null)
+			mmx.helmetArmor = (ArmorId)armorID;
+	}
+	public void setBody(Player player, int armorID) {
+		if (player.character is MegamanX mmx && mmx != null)
+			mmx.chestArmor = (ArmorId)armorID;
+	}
+	public void setArm(Player player, int armorID) {
+		if (player.character is MegamanX mmx && mmx != null)
+			mmx.armArmor = (ArmorId)armorID;
+	}
+	public void setLegs(Player player, int armorID) {
+		if (player.character is MegamanX mmx && mmx != null)
+			mmx.legArmor = (ArmorId)armorID;
+	}
 }
 public class UpgradeArmorMenuEX : IMainMenu {
 	public IMainMenu prevMenu;
@@ -1073,24 +1097,23 @@ public class UpgradeArmorMenuEX : IMainMenu {
 	Player mainP => Global.level.mainPlayer;
 	uint ghw => Global.halfScreenW;
 	uint ghh => Global.halfScreenH;
+	
 
 	public void update() {
-		if (mainP.character is not MegamanX mmx) {
-			Menu.change(new UpgradeMenu(prevMenu));
-			return;
-		}
-		if (mmx.hasAnyHyperArmor && mmx.fullArmor != ArmorId.Max) {
-			mmx.hyperHelmetActive = false;
-			mmx.hyperChestActive = false;
-			mmx.hyperArmActive = false;
-			mmx.hyperLegActive = false;
+		if (mainP.character is MegamanX mmx && mmx != null) {
+			if (mmx.hasAnyHyperArmor && mmx.fullArmor != ArmorId.Max) {
+				mmx.hyperHelmetActive = false;
+				mmx.hyperChestActive = false;
+				mmx.hyperArmActive = false;
+				mmx.hyperLegActive = false;
+			}
 		}
 		if (xGame >= 1) {
 			switch (slot) {
 				case 1:
 					Helpers.menuLeftRightInc(ref snesLR, 1, 4, true, true);
 					Helpers.menuUpDown(ref snesUD, 1, 4, true, true);
-					snesArmorHandler.handleInput(mmx, snesUD, snesLR);
+					snesArmorHandler.handleInput(mainP, snesUD, snesLR);
 					break;
 			}
 		}
@@ -1099,9 +1122,6 @@ public class UpgradeArmorMenuEX : IMainMenu {
 	}
 
 	public void render() {
-		if (mainP.character is not MegamanX mmx) {
-			return;
-		}
 		DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
 		DrawWrappers.DrawRect(364, 40, 20, 180, true, new Color(0, 0, 0, 100), 1,
 		ZIndex.HUD, false, outlineColor: Color.White);
@@ -1112,7 +1132,7 @@ public class UpgradeArmorMenuEX : IMainMenu {
 		if (xGame >= 1) {
 			snesArmorHandler.renderIcons(frame, icon, ghw, ghh, 1);
 			snesArmorHandler.renderCursor(snesUD, snesLR, cursor, ghw, ghh);
-			snesArmorHandler.renderDescription(mmx, snesUD, snesLR, ghw, ghh);
+			snesArmorHandler.renderDescription(mainP, snesUD, snesLR, ghw, ghh);
 		}
 		Fonts.drawText(FontType.Blue, "Metals: " + mainP.currency.ToString(), 294, 160, Alignment.Left);
 	}
