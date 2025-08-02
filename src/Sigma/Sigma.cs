@@ -54,7 +54,7 @@ public class BaseSigma : Character {
 				intialCharState = getIdleState();
 			}
 		} else {
-			intialCharState =  getIdleState();
+			intialCharState = getIdleState();
 		}
 		changeState(intialCharState);
 	}
@@ -106,12 +106,12 @@ public class BaseSigma : Character {
 			tempAiSummoner = false;
 			foreach (Weapon weapon in weapons) {
 				if (weapon is MaverickWeapon mw) {
-					mw.controlMode = mw.trueControlMode ;
+					mw.controlMode = mw.trueControlMode;
 					if (mw.maverick != null) {
 						if (mw.trueControlMode == MaverickModeId.TagTeam) {
 							mw.maverick.changeState(new MExit(mw.maverick.pos, true), ignoreCooldown: true);
 						} else {
-							mw.maverick.controlMode = mw.trueControlMode ;
+							mw.maverick.controlMode = mw.trueControlMode;
 						}
 					}
 				}
@@ -350,7 +350,6 @@ public class BaseSigma : Character {
 			return;
 		}
 
-		
 		if (tagTeamSwapProgress == 0 &&
 			shootPressed && (
 				currentWeapon is MaverickWeapon ttmw &&
@@ -685,7 +684,7 @@ public class BaseSigma : Character {
 
 			DrawWrappers.DrawRect(
 				topLeft.x, topLeft.y, botRight.x, botRight.y,
-				true, Color.Black, 0, ZIndex.HUD -+ 1, outlineColor: Color.White
+				true, Color.Black, 0, ZIndex.HUD - +1, outlineColor: Color.White
 			);
 			DrawWrappers.DrawRect(
 				topLeft.x + 1, topLeft.y + 1, topLeft.x + 1 + width, botRight.y - 1,
@@ -791,5 +790,13 @@ public class BaseSigma : Character {
 			weaponSlot = Options.main.sigmaWeaponSlot;
 		}
 		return retWeapons;
+	}
+	public override void onDeath() {
+		base.onDeath();
+		foreach (var maverick in player.mavericks) {
+			if (maverick != null) {
+				maverick.autoExit = true;
+			}
+		}
 	}
 }
