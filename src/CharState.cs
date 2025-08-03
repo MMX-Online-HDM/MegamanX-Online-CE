@@ -1315,6 +1315,13 @@ public class LadderClimb : CharState {
 				dropFromLadder();
 			}
 		}
+		if (character is Axl axl) {
+			if (axl.isAxlLadderShooting()) {
+				axl.changeSprite("axl_ladder_shoot", true);
+			} else if (character.sprite.name != "axl_ladder_end" && character.sprite.name != "axl_fall_start"){
+				axl.changeSprite("axl_ladder_climb", true);
+			}
+		}
 
 		if (character.grounded) {
 			character.changeToIdleOrFall();
