@@ -72,8 +72,20 @@ public class PreOptionsMenu : IMainMenu {
 			//if selectY is 2, it will throw graphics option menu
 			//why would you hard code that
 			Menu.change(new OptionsMenu(this, inGame, null, selectY));
-			if (selectY == 3) { Menu.change(new PreOptionsMenuCharacter(this, false)); }
-			if (selectY == 4) { Menu.change(new PreControlMenu(this, false)); }
+			if (selectY == 3) {
+				if (inGame) {
+					Menu.change(new PreOptionsMenuCharacter(this, true));
+				} else {
+					Menu.change(new PreOptionsMenuCharacter(this, false));
+				}
+			}
+			if (selectY == 4) {
+				if (inGame) {
+					Menu.change(new PreControlMenu(this, true));
+				} else {
+					Menu.change(new PreControlMenu(this, false));
+				}
+			}
 			if (!inGame)
 				if (selectY == 5) { Menu.change(new SoundMode(this, false)); }
 		}
@@ -206,8 +218,12 @@ public class PreOptionsMenuCharacter : IMainMenu {
 	}
 
 	public void render() {
-		DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0);
-		FontType menuFont = FontType.DarkBlue;
+		if (!inGame) {
+			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0);
+		} else {
+			DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
+		}
+		FontType menuFont = inGame ? FontType.Blue : FontType.DarkBlue;
 		Global.sprites["optionMode"].drawToHUD(inGame ? 2 : 2, Global.screenW * 0.5f + 1, 20);
 		if (Global.frameCount % 60 < 30) {
 			for (int i = 0; i < 5; i++) {
