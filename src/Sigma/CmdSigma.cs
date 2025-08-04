@@ -42,6 +42,8 @@ public class CmdSigma : BaseSigma {
 		Helpers.decrementTime(ref leapSlashCooldown);
 		Helpers.decrementFrames(ref sigmaAmmoRechargeCooldown);
 		Helpers.decrementFrames(ref aiAttackCooldown);
+		ballWeapon.update();
+		ballWeapon.charLinkedUpdate(this, true);
 		// Ammo reload.
 		if (sigmaAmmoRechargeCooldown == 0) {
 			Helpers.decrementFrames(ref sigmaAmmoRechargeTime);
@@ -177,10 +179,12 @@ public class CmdSigma : BaseSigma {
 
 	public override void addAmmo(float amount) {
 		weaponHealAmount += amount;
+		ballWeapon.addAmmoHeal(amount);
 	}
 
 	public override void addPercentAmmo(float amount) {
 		weaponHealAmount += amount * 0.32f;
+		ballWeapon.addAmmoPercentHeal(amount);
 	}
 
 	public override bool canAddAmmo() {
