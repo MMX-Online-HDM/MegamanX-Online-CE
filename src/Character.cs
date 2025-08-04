@@ -2763,8 +2763,8 @@ public partial class Character : Actor, IDamagable {
 		}
 		// Damage increase/reduction section
 		if (!isArmorPiercing && (
-			damage != (decimal)Damager.forceKillDamage ||
-			damage != (decimal)Damager.ohkoDamage ||
+			damage != (decimal)Damager.forceKillDamage &&
+			damage != (decimal)Damager.ohkoDamage &&
 			damage != (decimal)Damager.envKillDamage
 		)) {
 			if (charState is SwordBlock) {
@@ -2795,7 +2795,7 @@ public partial class Character : Actor, IDamagable {
 					damageSavings += (originalDamage * 0.125m);
 				}
 			}
-			if (vile != null && vile.hasFrozenCastle) {
+			if (vile != null && vile.hasFrozenCastle && charState is not Die or VileRevive) {
 				damageSavings += originalDamage * Vile.frozenCastlePercent;
 			}
 		}
