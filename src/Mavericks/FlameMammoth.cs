@@ -34,6 +34,7 @@ public class FlameMammoth : Maverick {
 
 	public override void update() {
 		base.update();
+		subtractTargetDistance = 70;
 		if (aiBehavior == MaverickAIBehavior.Control) {
 			if (state is MIdle or MRun or MLand) {
 				if (shootPressed()) {
@@ -79,14 +80,12 @@ public class FlameMammoth : Maverick {
 		if (target != null) {
 			enemyDist = target.pos.distanceTo(pos);
 		}
-		List<MaverickState> aiStates = [];
-		if (enemyDist <= 70) {
-			aiStates.Add(new FlameMOilState());
-		}
+		List<MaverickState> aiStates = [
+			new FlameMOilState(),
+			getShootState(false)
+		];
 		if (grounded && enemyDist <= 30) {
 			aiStates.Add(new FlameMJumpStateAI());
-		} else {
-			aiStates.Add(getShootState(false));
 		}
 		return aiStates.ToArray();
 	}
@@ -429,9 +428,22 @@ public class FlameMStompShockwave : Projectile {
 #endregion
 
 #region states
+public class MammothMState : MaverickState {
+	public FlameMammoth BurninNoumander = null!;
+	public MammothMState(
+		string sprite, string transitionSprite = ""
+	) : base(
+		sprite, transitionSprite
+	) {
+	}
 
-public class FlameMOilState : MaverickState {
-	public FlameMammoth BurninNoumander  = null!;
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		BurninNoumander = maverick as FlameMammoth ?? throw new NullReferenceException();
+	}
+}
+
+public class FlameMOilState : MammothMState {
 	public FlameMOilState() : base("shoot2") {
 	}
 
@@ -441,7 +453,6 @@ public class FlameMOilState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		BurninNoumander = maverick as FlameMammoth ?? throw new NullReferenceException();		
 		maverick.stopMoving();
 	}
 
@@ -457,12 +468,12 @@ public class FlameMOilState : MaverickState {
 		}
 
 		if (maverick.isAnimOver()) {
-			maverick.changeState(new MIdle());
+			maverick.changeToIdleOrFall();
 		}
 	}
 }
 
-public class FlameMJumpPressState : MaverickState {
+public class FlameMJumpPressState : MammothMState {
 	public FlameMJumpPressState() : base("fall") {
 	}
 
@@ -484,7 +495,7 @@ public class FlameMJumpPressState : MaverickState {
 		maverick.vel = new Point(0, 300);
 	}
 }
-public class FlameMJumpStateAI : MaverickState {
+public class FlameMJumpStateAI : MammothMState {
 	public FlameMJumpStateAI() : base("jump", "jump_start") {
 	}
 

@@ -50,7 +50,7 @@ public class SparkMandrill : Maverick {
 		base.update();
 
 		//rechargeAmmo(8);
-
+		subtractTargetDistance = 70;
 		if (aiBehavior == MaverickAIBehavior.Control) {
 			if (state is MIdle or MRun or MLand) {
 				if (specialPressed()) {
@@ -101,12 +101,10 @@ public class SparkMandrill : Maverick {
 		}
 		List<MaverickState> aiStates = [
 			new SparkMDashPunchState(),
-			new SparkMPunchState()
+			getShootState(),
 		];
-		if (enemyDist <= 40) {
-			aiStates.Add(getShootState());
-		} else {
-			aiStates.Add(new MRun());
+		if (enemyDist <= 60) {
+			aiStates.Add(new SparkMPunchState());
 		}
 		return aiStates.ToArray();
 	}

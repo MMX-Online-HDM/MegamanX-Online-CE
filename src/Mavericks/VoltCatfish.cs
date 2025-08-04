@@ -57,6 +57,7 @@ public class VoltCatfish : Maverick {
 			}
 		}
 		base.update();
+		subtractTargetDistance = 60;
 		if (aiBehavior == MaverickAIBehavior.Control) {
 			if (state is MIdle or MRun or MLand) {
 				if (input.isPressed(Control.Shoot, player)) {
@@ -291,17 +292,24 @@ public class VoltCTriadThunderProj : Projectile {
 		ElectroNamazuros?.mines.Remove(this);
 	}
 }
-
-public class VoltCTriadThunderState : MaverickState {
+public class VoltCMState : MaverickState {
 	public VoltCatfish ElectroNamazuros = null!;
-	public VoltCTriadThunderState() : base("spit") {
-		exitOnAnimEnd = true;
+	public VoltCMState(
+		string sprite, string transitionSprite = ""
+	) : base(
+		sprite, transitionSprite
+	) {
 	}
+
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 		ElectroNamazuros = maverick as VoltCatfish ?? throw new NullReferenceException();
 	}
-
+}
+public class VoltCTriadThunderState : VoltCMState {
+	public VoltCTriadThunderState() : base("spit") {
+		exitOnAnimEnd = true;
+	}
 	public override void update() {
 		base.update();
 		int xDir = maverick.xDir;
@@ -392,10 +400,9 @@ public class VoltCSuckProj : Projectile {
 	}
 }
 
-public class VoltCSuckState : MaverickState {
+public class VoltCSuckState : VoltCMState {
 	float partTime;
 	VoltCSuckProj? suckProj;
-	public VoltCatfish ElectroNamazuros = null!;
 	public VoltCSuckState() : base("suck") {
 	}
 
@@ -421,7 +428,6 @@ public class VoltCSuckState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		ElectroNamazuros = maverick as VoltCatfish ?? throw new NullReferenceException();
 		suckProj = new VoltCSuckProj(
 			maverick.pos.addxy(maverick.xDir * 75, 0), maverick.xDir,
 			ElectroNamazuros, ElectroNamazuros, player, player.getNextActorNetId(), rpc: true);
@@ -477,16 +483,10 @@ public class VoltCUpBeamProj : Projectile {
 	}
 }
 
-public class VoltCUpBeamState : MaverickState {
-	public VoltCatfish ElectroNamazuros = null!;
+public class VoltCUpBeamState : VoltCMState {
 	public VoltCUpBeamState() : base("thunder_vertical") {
 		exitOnAnimEnd = true;
 	}
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		ElectroNamazuros = maverick as VoltCatfish ?? throw new NullReferenceException();
-	}
-
 	public override void update() {
 		base.update();
 		Point? shootPos = maverick.getFirstPOI(0);
@@ -591,7 +591,7 @@ public class VoltCSparkleProj : Projectile {
 	}
 }
 
-public class VoltCSpecialState : MaverickState {
+public class VoltCSpecialState : VoltCMState {
 	int state = 0;
 	VoltCUpBeamProj? upBeamProj;
 	VoltCChargeProj? chargeProj1;
@@ -599,15 +599,9 @@ public class VoltCSpecialState : MaverickState {
 	VoltCBarrierProj? barrierProj1;
 	VoltCBarrierProj? barrierProj2;
 	const float drainAmmoRate = 6;
-	VoltCatfish ElectroNamazuros = null!;
 	public VoltCSpecialState() : base("charge_start") {
 		superArmor = true;
 	}
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		ElectroNamazuros = maverick as VoltCatfish ?? throw new NullReferenceException();
-	}
-
 	public override void update() {
 		base.update();
 		if (state == 0) {

@@ -144,7 +144,7 @@ public class TunnelRTornadoFang : Projectile {
 	public TunnelRTornadoFang(
 		Point pos, int xDir, int type, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		pos, xDir, owner, "tunnelr_proj_drillbig", netId, player	
+		pos, xDir, owner, "tunnelr_proj_drillbig", netId, player
 	) {
 		weapon = TunnelRhino.getWeapon();
 		damager.damage = 1;
@@ -218,19 +218,28 @@ public class TunnelRTornadoFang : Projectile {
 		}
 	}
 }
+public class TunnelRMState : MaverickState {
+	public TunnelRhino ScrewMasaider = null!;
+	public TunnelRMState(
+		string sprite, string transitionSprite = ""
+	) : base(
+		sprite, transitionSprite
+	) {
+	}
 
-public class TunnelRShootState : MaverickState {
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		ScrewMasaider = maverick as TunnelRhino ?? throw new NullReferenceException();
+	}
+}
+
+public class TunnelRShootState : TunnelRMState {
 	bool shotOnce;
 	bool isSecond;
-	public TunnelRhino ScrewMasaider = null!;
 	public TunnelRShootState(bool isSecond) : base("shoot1") {
 		this.isSecond = isSecond;
 		exitOnAnimEnd = true;
 		canEnterSelf = true;
-	}
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		ScrewMasaider = maverick as TunnelRhino ?? throw new NullReferenceException();
 	}
 
 	public override void update() {
@@ -290,19 +299,13 @@ public class TunnelRTornadoFangDiag : Projectile {
 }
 
 
-public class TunnelRShoot2State : MaverickState {
+public class TunnelRShoot2State : TunnelRMState {
 	bool shotOnce;
 	bool shotOnce2;
 	bool shotOnce3;
-	public TunnelRhino ScrewMasaider = null!;
 	public TunnelRShoot2State() : base("shoot3") {
 		exitOnAnimEnd = true;
 	}
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		ScrewMasaider = maverick as TunnelRhino ?? throw new NullReferenceException();
-	}
-
 	public override void update() {
 		base.update();
 

@@ -46,7 +46,7 @@ public class GravityBeetle : Maverick {
 		if (well?.destroyed == true) {
 			well = null;
 		}
-
+		subtractTargetDistance = 20;
 		if (aiBehavior == MaverickAIBehavior.Control) {
 			if (state is MIdle or MRun or MLand) {
 				if (input.isPressed(Control.Shoot, player)) {
@@ -208,18 +208,27 @@ public class GBeetleBallProj : Projectile {
 	}
 }
 
-public class GBeetleShoot : MaverickState {
+public class BeetleMState : MaverickState {
+	public GravityBeetle GravityBeetbood = null!;
+	public BeetleMState(
+		string sprite, string transitionSprite = ""
+	) : base(
+		sprite, transitionSprite
+	) {
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		GravityBeetbood = maverick as GravityBeetle ?? throw new NullReferenceException();
+	}
+}
+public class GBeetleShoot : BeetleMState {
 	bool shotOnce;
 	bool isSecond;
-	public GravityBeetle GravityBeetbood = null!;
 	public GBeetleShoot(bool isSecond) :
 		base(isSecond ? "attackproj2" : "attackproj", isSecond ? "attackproj2_start" : "attackproj_start") {
 		this.isSecond = isSecond;
 		exitOnAnimEnd = true;
-	}
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		GravityBeetbood = maverick as GravityBeetle ?? throw new NullReferenceException();
 	}
 
 	public override void update() {
@@ -243,7 +252,7 @@ public class GBeetleShoot : MaverickState {
 	}
 }
 
-public class GBeetleDashState : MaverickState {
+public class GBeetleDashState : BeetleMState {
 	float soundTime;
 	float dustTime;
 	float partTime;
@@ -317,7 +326,7 @@ public class GBeetleDashState : MaverickState {
 	}
 }
 
-public class GBeetleLiftState : MaverickState {
+public class GBeetleLiftState : BeetleMState {
 	public Character grabbedChar;
 	float timeWaiting;
 	bool grabbedOnce;
@@ -518,16 +527,11 @@ public class GBeetleGravityWellProj : Projectile {
 	}
 }
 
-public class GBeetleGravityWellState : MaverickState {
+public class GBeetleGravityWellState : BeetleMState {
 	int state = 0;
 	float partTime;
 	float chargeTime;
-	public GravityBeetle GravityBeetbood = null!;
 	public GBeetleGravityWellState() : base("blackhole_start") {
-	}
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		GravityBeetbood = maverick as GravityBeetle ?? throw new NullReferenceException();
 	}
 
 	public override void update() {

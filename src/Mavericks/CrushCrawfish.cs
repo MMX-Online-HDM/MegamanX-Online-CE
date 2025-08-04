@@ -36,6 +36,7 @@ public class CrushCrawfish : Maverick {
 
 	public override void update() {
 		base.update();
+		subtractTargetDistance = 50;
 		if (aiBehavior == MaverickAIBehavior.Control) {
 			if (state is MIdle or MRun or MLand) {
 				if (input.isPressed(Control.Shoot, player)) {
@@ -247,16 +248,24 @@ public class CrushCArmProj : Projectile {
 		state = 1;
 	}
 }
-
-public class CrushCShootArmState : MaverickState {
-	CrushCArmProj? proj;
+public class CrawfishMState : MaverickState {
 	public CrushCrawfish ScissorsShrimper = null!;
-	public CrushCShootArmState() : base("attack_claw") {
-		superArmor = true;
+	public CrawfishMState(
+		string sprite, string transitionSprite = ""
+	) : base(
+		sprite, transitionSprite
+	) {
 	}
+
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 		ScissorsShrimper = maverick as CrushCrawfish ?? throw new NullReferenceException();
+	}
+}
+public class CrushCShootArmState : CrawfishMState {
+	CrushCArmProj? proj;
+	public CrushCShootArmState() : base("attack_claw") {
+		superArmor = true;
 	}
 
 	public override void update() {
@@ -297,7 +306,7 @@ public class CrushCShootArmState : MaverickState {
 	}
 }
 
-public class CrushCDashState : MaverickState {
+public class CrushCDashState : CrawfishMState {
 	float dustTime;
 	float ftdWaitTime;
 	public CrushCDashState() : base("dash", "dash_start") {
@@ -351,18 +360,13 @@ public class CrushCDashState : MaverickState {
 	}
 }
 
-public class CrushCGrabState : MaverickState {
+public class CrushCGrabState : CrawfishMState {
 	Character victim;
 	float hurtTime;
 	public bool victimWasGrabbedSpriteOnce;
 	float timeWaiting;
-	public CrushCrawfish ScissorsShrimper = null!;
 	public CrushCGrabState(Character grabbedChar) : base("grab_attack") {
 		victim = grabbedChar;
-	}
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		ScissorsShrimper = maverick as CrushCrawfish ?? throw new NullReferenceException();
 	}
 	public override void update() {
 		base.update();

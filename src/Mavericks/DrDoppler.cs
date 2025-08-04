@@ -222,17 +222,17 @@ public class DrDopplerBallProj : Projectile {
 			damager.damage = 0;
 			destroyOnHit = false;
 		}
-		if (num == 0) vel = new Point(250 * xDir, 0);	
+		if (num == 0) vel = new Point(250 * xDir, 0);
 		if (num == 1) vel = new Point(250 * xDir, 160);
 		if (num == 2) vel = new Point(250 * xDir, -160);
 		if (num == 3) vel = new Point(250 * xDir, -70);
 		if (num == 4) vel = new Point(250 * xDir, 70);
-		
+
 		maxTime = 0.75f;
 
 		if (rpc) {
-			rpcCreate(pos, owner, ownerPlayer, netId, xDir, 
-				new byte[] { (byte)type, (byte) num}
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir,
+				new byte[] { (byte)type, (byte)num }
 			);
 		}
 	}
@@ -242,30 +242,39 @@ public class DrDopplerBallProj : Projectile {
 		);
 	}
 }
-public class DrDopplerShootState : MaverickState {
+public class DrDopplerMState : MaverickState {
 	public DrDoppler drDoppler = null!;
-
-	public DrDopplerShootState() : base("shoot") {
-		attackCtrl = true;
+	public DrDopplerMState(
+		string sprite, string transitionSprite = ""
+	) : base(
+		sprite, transitionSprite
+	) {
 	}
+
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 		drDoppler = maverick as DrDoppler ?? throw new NullReferenceException();
+	}
+}
+public class DrDopplerShootState : DrDopplerMState {
+
+	public DrDopplerShootState() : base("shoot") {
+		attackCtrl = true;
 	}
 
 	public override void update() {
 		base.update();
 		bool upHeld = player.input.isHeld(Control.Up, player);
 		bool downHeld = player.input.isHeld(Control.Down, player);
-		bool LeftOrRightHeld = player.input.isHeld(Control.Left, player) || 
+		bool LeftOrRightHeld = player.input.isHeld(Control.Left, player) ||
 							   player.input.isHeld(Control.Right, player);
 		Point? shootPos = maverick.getFirstPOI();
 		if (shootPos != null) {
 			if (!once) {
 				once = true;
 				if (drDoppler.ballType == 0) drDoppler.playSound("electricSpark", sendRpc: true);
-				else drDoppler.playSound("busterX3", sendRpc: true); 
-				
+				else drDoppler.playSound("busterX3", sendRpc: true);
+
 				if (downHeld && LeftOrRightHeld) {
 					DopplerProjectile(4);
 				} else if (downHeld) {
@@ -274,7 +283,7 @@ public class DrDopplerShootState : MaverickState {
 					DopplerProjectile(3);
 				} else if (upHeld) {
 					DopplerProjectile(2);
-				} else 
+				} else
 					DopplerProjectile(0);
 			}
 		}
@@ -292,7 +301,7 @@ public class DrDopplerShootState : MaverickState {
 		}
 	}
 }
-public class DrDopplerDashStartState : MaverickState {
+public class DrDopplerDashStartState : DrDopplerMState {
 	public DrDopplerDashStartState() : base("dash_charge") {
 		stopMoving = true;
 		enterSound = "ryuenjin";
@@ -306,7 +315,7 @@ public class DrDopplerDashStartState : MaverickState {
 	}
 }
 
-public class DrDopplerDashState : MaverickState {
+public class DrDopplerDashState : DrDopplerMState {
 	Anim? barrier;
 	float soundTime;
 	public DrDopplerDashState() : base("dash", "dash_start") {
@@ -374,7 +383,7 @@ public class DrDopplerDashState : MaverickState {
 	}
 }
 
-public class DrDopplerAbsorbState : MaverickState {
+public class DrDopplerAbsorbState : DrDopplerMState {
 	float soundTime = 119f/60f;
 	public SoundWrapper? sound;
 	public DrDopplerAbsorbState() : base("absorb") {
@@ -418,7 +427,7 @@ public class DrDopplerAbsorbState : MaverickState {
 	}
 }
 
-public class DrDopplerUncoatState : MaverickState {
+public class DrDopplerUncoatState : DrDopplerMState {
 	public DrDopplerUncoatState() : base("uncoat") {
 		exitOnAnimEnd = true;
 		enterSound = "transform";

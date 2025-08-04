@@ -207,15 +207,24 @@ public class VelGIceProj : Projectile {
 #endregion
 
 #region states
-public class VelGShootFireState : MaverickState {
-	float shootTime;
+public class VelguarderMState : MaverickState {
 	public Velguarder Velguader = null!;
-	public VelGShootFireState() : base("shoot2") {
-
+	public VelguarderMState(
+		string sprite, string transitionSprite = ""
+	) : base(
+		sprite, transitionSprite
+	) {
 	}
+
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 		Velguader = maverick as Velguarder ?? throw new NullReferenceException();
+	}
+}
+public class VelGShootFireState : VelguarderMState {
+	float shootTime;
+	public VelGShootFireState() : base("shoot2") {
+
 	}
 
 	public override void update() {
@@ -241,17 +250,11 @@ public class VelGShootFireState : MaverickState {
 	}
 }
 
-public class VelGShootIceState : MaverickState {
+public class VelGShootIceState : VelguarderMState {
 	bool shot;
 	int index = 0;
-	public Velguarder Velguader = null!;
 	public VelGShootIceState() : base("shoot") {
 	}
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		Velguader = maverick as Velguarder ?? throw new NullReferenceException();
-	}
-
 	public override void update() {
 		base.update();
 		if (Velguader == null) return;

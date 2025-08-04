@@ -51,6 +51,7 @@ public class BlastHornet : Maverick {
 		base.update();
 		wings.update();
 		if (!ownedByLocalPlayer) return;
+		subtractTargetDistance = 50;
 
 		if (cursor != null && cursor.destroyed) {
 			cursor = null;
@@ -109,7 +110,7 @@ public class BlastHornet : Maverick {
 		}
 		List<MaverickState> aiStates = [
 			new BHornetShootState(grounded),
-			new BHornetShoot2State(target, true),
+			new BHornetShoot2State(null, true),
 		];
 		if (enemyDist <= 40) {
 			aiStates.Add(new BHornetStingState(true));
@@ -356,11 +357,26 @@ public class BHornetHomingBeeProj : Projectile, IDamagable {
 	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) { }
 	public bool isPlayableDamagable() { return false; }
 }
+public class HornetMState : MaverickState {
+	public BlastHornet ExploseHorneck = null!;
+	public HornetMState(
+		string sprite, string transitionSprite = ""
+	) : base(
+		sprite, transitionSprite
+	) {
+	}
 
-public class BHornetShootState : MaverickState {
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		ExploseHorneck = maverick as BlastHornet ?? throw new NullReferenceException();
+
+	}
+}
+public class BHornetShootState : HornetMState {
 	bool shotOnce;
-	public BlastHornet ExploseHorneck  = null!;
+	public bool isGrounded;
 	public BHornetShootState(bool isGrounded) : base(isGrounded ? "attack" : "fly_attack") {
+		this.isGrounded = isGrounded;
 	}
 
 	public override void update() {
@@ -398,10 +414,11 @@ public class BHornetShootState : MaverickState {
 	}
 }
 
-public class BHornetShootCursorState : MaverickState {
+public class BHornetShootCursorState : HornetMState {
 	bool shotOnce;
-	public BlastHornet ExploseHorneck  = null!;
+	public bool isGrounded;
 	public BHornetShootCursorState(bool isGrounded) : base(isGrounded ? "attack" : "fly_attack") {
+		this.isGrounded = isGrounded;
 	}
 
 	public override void update() {
@@ -441,7 +458,6 @@ public class BHornetShootCursorState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		ExploseHorneck = maverick as BlastHornet ?? throw new NullReferenceException();
 		if (wasFlying) maverick.useGravity = false;
 	}
 
@@ -552,11 +568,10 @@ public class BHornetCursorProj : Projectile {
 	}
 }
 
-public class BHornetShoot2State : MaverickState {
+public class BHornetShoot2State : HornetMState {
 	bool shotOnce;
 	Actor? target;
 	bool aiRise;
-	public BlastHornet ExploseHorneck  = null!;
 
 	public BHornetShoot2State(Actor? target, bool aiRise = false) : base("fly_wasp_spawn") {
 		this.target = target;
@@ -593,7 +608,6 @@ public class BHornetShoot2State : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		ExploseHorneck = maverick as BlastHornet ?? throw new NullReferenceException();
 		if (wasFlying) {
 			maverick.useGravity = false;
 		}
@@ -605,7 +619,7 @@ public class BHornetShoot2State : MaverickState {
 	}
 }
 
-public class BHornetStingState : MaverickState {
+public class BHornetStingState : HornetMState {
 	float moveTime;
 	Anim? stingAnim;
 	bool aiRise;

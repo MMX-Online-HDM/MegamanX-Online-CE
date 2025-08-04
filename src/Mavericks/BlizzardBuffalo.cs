@@ -15,7 +15,8 @@ public class BlizzardBuffalo : Maverick {
 		stateCooldowns = new() {
 			{ typeof(MShoot), new(45, true) },
 			{ typeof(BBuffaloDashState), new(75, true) },
-			{ typeof(BBuffaloShootBeamState), new(2 * 60) }
+			{ typeof(BBuffaloShootBeamState), new(2 * 60) },
+			{ typeof(BBuffaloShootAI), new(60, true) },
 		};
 
 		spriteFrameToSounds["bbuffalo_run/2"] = "walkStomp";
@@ -63,7 +64,7 @@ public class BlizzardBuffalo : Maverick {
 
 	public override MaverickState[] strikerStates() {
 		return [
-			new BBuffaloShootAI(null, isStriker: true),
+			new BBuffaloShootAI(isStriker: true),
 			new BBuffaloShootBeamState(),
 			new BBuffaloDashState(),
 		];
@@ -76,7 +77,7 @@ public class BlizzardBuffalo : Maverick {
 		}
 		List<MaverickState> aiStates = [];
 		if (enemyDist > 170) {
-			aiStates.Add(new BBuffaloShootAI(target, isStriker: false));
+			aiStates.Add(new BBuffaloShootAI(isStriker: false));
 		}
 		if (enemyDist < 170 && enemyDist > 55) {
 			aiStates.Add(new BBuffaloShootBeamState());
@@ -458,12 +459,26 @@ public class BBuffaloBeamProj : Projectile {
 		setStartPos(new Point(startX, startY));
 	}
 }
+#region states
+public class BuffaloMState : MaverickState {
+	public BlizzardBuffalo FrozenBuffalio = null!;
+	public BuffaloMState(
+		string sprite, string transitionSprite = ""
+	) : base(
+		sprite, transitionSprite
+	) {
+	}
 
-public class BBuffaloShootBeamState : MaverickState {
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		FrozenBuffalio = maverick as BlizzardBuffalo ?? throw new NullReferenceException();
+
+	}
+}
+public class BBuffaloShootBeamState : BuffaloMState {
 	bool shotOnce;
 	public Anim? muzzle;
 	public BBuffaloBeamProj? proj;
-	public BlizzardBuffalo FrozenBuffalio = null!;
 	public BBuffaloShootBeamState() : base("shoot_beam", "shoot_beam_start") {
 	}
 
@@ -498,7 +513,6 @@ public class BBuffaloShootBeamState : MaverickState {
 	}
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		FrozenBuffalio = maverick as BlizzardBuffalo ?? throw new NullReferenceException();
 	}
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
@@ -507,15 +521,10 @@ public class BBuffaloShootBeamState : MaverickState {
 	}
 }
 
-public class BBuffaloDashState : MaverickState {
+public class BBuffaloDashState : BuffaloMState {
 	float dustTime;
 	Character? victim;
-	public BlizzardBuffalo FrozenBuffalio = null!;
 	public BBuffaloDashState() : base("dash", "dash_start") {
-	}
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		FrozenBuffalio = maverick as BlizzardBuffalo ?? throw new NullReferenceException();
 	}
 
 	public override void update() {
@@ -630,27 +639,28 @@ public class BBuffaloDragged : GenericGrabbedState {
 	}
 }
 
-public class BBuffaloShootAI : MaverickState {
-	public BlizzardBuffalo FrozenBuffalio = null!;
-	Actor? target;
+public class BBuffaloShootAI : BuffaloMState {
 	public bool isStriker;
-	public BBuffaloShootAI(Actor? target, bool isStriker) : base("shoot") {
-		this.target = target;
+	public BBuffaloShootAI(bool isStriker) : base("shoot") {
 		this.isStriker = isStriker;
 	}
 
 	public override void update() {
 		base.update();
 		Point? shootPos = maverick.getFirstPOI();
-		if (shootPos != null && !once && !isStriker) {
+		if (!isStriker && shootPos != null && !once) {
 			once = true;
 			new BBuffaloIceProjAI(
-				shootPos.Value, maverick.xDir, target,
+				shootPos.Value, maverick.xDir, 0,
+				FrozenBuffalio, player.getNextActorNetId(), sendRpc: true
+			);
+			new BBuffaloIceProjAI(
+				shootPos.Value, maverick.xDir, 1,
 				FrozenBuffalio, player.getNextActorNetId(), sendRpc: true
 			);
 			maverick.playSound("bbuffaloShoot", sendRpc: true);
 		}
-		if (isStriker && shootPos != null && !once) {
+		else if (isStriker && shootPos != null && !once) {
 			once = true;
 			new BBuffaloIceProjAIStriker(
 				shootPos.Value, maverick.xDir, 0,
@@ -670,19 +680,11 @@ public class BBuffaloShootAI : MaverickState {
 			maverick.changeToIdleOrFall();
 		}
 	}
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		FrozenBuffalio = maverick as BlizzardBuffalo ?? throw new NullReferenceException();
-	}
-	public override void onExit(MaverickState newState) {
-		base.onExit(newState);
-
-	}
 }
 public class BBuffaloIceProjAI : Projectile {
-	public Actor? target;
+	public int type;
 	public BBuffaloIceProjAI(
-		Point pos, int xDir, Actor? target,
+		Point pos, int xDir, int type,
 		Actor owner, ushort netProjId, bool sendRpc = false
 	) : base(
 		pos, xDir, owner, "bbuffalo_proj_iceball", netProjId
@@ -694,29 +696,21 @@ public class BBuffaloIceProjAI : Projectile {
 		projId = (int)ProjIds.BBuffaloIceProjAI;
 		maxTime = 1.5f;
 		useGravity = true;
-		this.target = target;
-		if (target != null) {
-			if (owner.xDir == 1) {
-				vel = new Point((int)target.pos.x, (int)(-target.pos.y + (owner.pos.y * Helpers.randomRange(0.25f, 0.75f))));
-			} else if (owner.xDir == -1) {
-				vel = new Point((int)-target.pos.x - owner.pos.x * Helpers.randomRange(1.25f, 1.45f), (int)(-target.pos.y + (owner.pos.y * Helpers.randomRange(0.25f, 0.75f))));
-			}
-		} else {
-			vel = new Point(0, 0);
-		}
-
+		this.type = type;
+		if (type == 0) vel = new Point(Helpers.randomRange(150,210) * owner.xDir, -Helpers.randomRange(250,300));
+		else if (type == 1) vel = new Point(Helpers.randomRange(210,250) * owner.xDir, -Helpers.randomRange(300,350));
 		if (collider != null) { collider.wallOnly = true; }
 		destroyOnHit = true;
 
 		if (sendRpc) {
-			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)type);
 		}
 
 	}
 
 	public static Projectile rpcInvoke(ProjParameters args) {
 		return new BBuffaloIceProjAI(
-			args.pos, args.xDir, null, args.owner, args.netId
+			args.pos, args.xDir, args.extraData[0], args.owner, args.netId
 		);
 	}
 
@@ -832,3 +826,4 @@ public class BBuffaloIceProjAIStriker : Projectile {
 		playSound("iceBreak", sendRpc: true);
 	}
 }
+#endregion

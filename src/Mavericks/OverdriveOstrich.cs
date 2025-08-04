@@ -41,7 +41,7 @@ public class OverdriveOstrich : Maverick {
 	public override void update() {
 		base.update();
 		if (!ownedByLocalPlayer) return;
-
+		subtractTargetDistance = 50;
 		Helpers.decrementTime(ref crystalizeCooldown);
 
 		if (lastDirX != xDir) {
@@ -210,15 +210,24 @@ public class OverdriveOSonicSlicerProj : Projectile {
 		}
 	}
 }
-
-public class OverdriveOShootState : MaverickState {
-	bool shotOnce;
+public class OOstrichMState : MaverickState {
 	public OverdriveOstrich SonicOstreague = null!;
-	public OverdriveOShootState() : base("attack") {
+	public OOstrichMState(
+		string sprite, string transitionSprite = ""
+	) : base(
+		sprite, transitionSprite
+	) {
 	}
+
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 		SonicOstreague = maverick as OverdriveOstrich ?? throw new NullReferenceException();
+	}
+}
+
+public class OverdriveOShootState : OOstrichMState {
+	bool shotOnce;
+	public OverdriveOShootState() : base("attack") {
 	}
 	public override void update() {
 		base.update();
@@ -299,9 +308,8 @@ public class OverdriveOSonicSlicerUpProj : Projectile {
 	}
 }
 
-public class OverdriveOShoot2State : MaverickState {
+public class OverdriveOShoot2State : OOstrichMState {
 	bool shotOnce;
-	public OverdriveOstrich SonicOstreague = null!;
 	public OverdriveOShoot2State() : base("attack2") {
 	}
 
@@ -326,7 +334,7 @@ public class OverdriveOShoot2State : MaverickState {
 	}
 }
 
-public class OverdriveOJumpKickState : MaverickState {
+public class OverdriveOJumpKickState : OOstrichMState {
 	public OverdriveOJumpKickState() : base("skip") {
 	}
 
@@ -351,9 +359,8 @@ public class OverdriveOJumpKickState : MaverickState {
 	}
 }
 
-public class OverdriveOSkidState : MaverickState {
+public class OverdriveOSkidState : OOstrichMState {
 	float dustTime;
-	OverdriveOstrich SonicOstreague = null!;
 	public OverdriveOSkidState() : base("skid") {
 		enterSound = "overdriveoSkid";
 		attackCtrl = true;
@@ -392,18 +399,13 @@ public class OverdriveOSkidState : MaverickState {
 			}
 		}
 	}
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		SonicOstreague = maverick as OverdriveOstrich ?? throw new NullReferenceException();
-	}
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
 		SonicOstreague.accSpeed = 0;
 	}
 }
 
-public class OverdriveOCrystalizedState : MaverickState {
-	OverdriveOstrich SonicOstreague = null!;
+public class OverdriveOCrystalizedState : OOstrichMState {
 	public OverdriveOCrystalizedState() : base("hurt_weakness") {
 		enterSound = "crystalize";
 		aiAttackCtrl = true;
@@ -412,7 +414,6 @@ public class OverdriveOCrystalizedState : MaverickState {
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 		maverick.stopMoving();
-		SonicOstreague = maverick as OverdriveOstrich ?? throw new NullReferenceException();
 	}
 
 	public override void update() {

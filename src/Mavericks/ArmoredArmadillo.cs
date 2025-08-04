@@ -35,7 +35,6 @@ public class ArmoredArmadillo : Maverick {
 		if (sendRpc) {
 			createActorRpc(player.id);
 		}
-
 		// Ammo.
 		usesAmmo = true;
 		canHealAmmo = true;
@@ -69,6 +68,7 @@ public class ArmoredArmadillo : Maverick {
 	public override void update() {
 		base.update();
 		if (!ownedByLocalPlayer) return;
+		subtractTargetDistance = 50;
 		if (state is ArmoredARollState) {
 			drainAmmo(4);
 		} else if (state is ArmoredAGuardState) {
@@ -147,16 +147,10 @@ public class ArmoredArmadillo : Maverick {
 	}
 
 	public override MaverickState[] aiAttackStates() {
-		float enemyDist = 300;
-		if (target != null) {
-			enemyDist = MathF.Abs(target.pos.x - pos.x);
-		}
 		List<MaverickState> aiStates = [
+			getShootState(true),
 			new ArmoredARollEnterState()
 		];
-		if (enemyDist <= 150) {
-			aiStates.Add(getShootState(true));
-		}
 		return aiStates.ToArray();
 	}
 	public override void aiUpdate() {
@@ -299,7 +293,22 @@ public class ArmoredAChargeReleaseProj : Projectile {
 #endregion
 
 #region states
-public class ArmoredAShootState : MaverickState {
+public class ArmadilloMState : MaverickState {
+	public ArmoredArmadillo ArmorArmarge = null!;
+	public ArmadilloMState(
+		string sprite, string transitionSprite = ""
+	) : base(
+		sprite, transitionSprite
+	) {
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		ArmorArmarge = maverick as ArmoredArmadillo ?? throw new NullReferenceException();
+
+	}
+}
+public class ArmoredAShootState : ArmadilloMState {
 	public bool shoot;
 
 	public ArmoredAShootState() : base("shoot") {
@@ -339,7 +348,7 @@ public class ArmoredAShootState : MaverickState {
 }
 
 
-public class ArmoredAGuardState : MaverickState {
+public class ArmoredAGuardState : ArmadilloMState {
 	public ArmoredAGuardState() : base("block") {
 		aiAttackCtrl = true;
 		attackCtrl = true;
@@ -381,8 +390,7 @@ public class ArmoredAGuardState : MaverickState {
 	}
 }
 
-public class ArmoredAGuardChargeState : MaverickState {
-	public ArmoredArmadillo ArmorArmarge= null!;
+public class ArmoredAGuardChargeState : ArmadilloMState {
 	float damage;
 	public ArmoredAGuardChargeState(float damage) : base("charge") {
 		this.damage = damage;
@@ -391,7 +399,6 @@ public class ArmoredAGuardChargeState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		ArmorArmarge = maverick as ArmoredArmadillo ?? throw new NullReferenceException();		
 		maverick.playSound("4earmoredaCharge", sendRpc: true);
 	}
 
@@ -405,9 +412,8 @@ public class ArmoredAGuardChargeState : MaverickState {
 	}
 }
 
-public class ArmoredAGuardReleaseState : MaverickState {
+public class ArmoredAGuardReleaseState : ArmadilloMState {
 	float damage;
-	public ArmoredArmadillo ArmorArmarge= null!;
 	public ArmoredAGuardReleaseState(float damage) : base("release") {
 		aiAttackCtrl = true;
 		this.damage = damage;
@@ -415,7 +421,6 @@ public class ArmoredAGuardReleaseState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		ArmorArmarge = maverick as ArmoredArmadillo ?? throw new NullReferenceException();		
 		maverick.playSound("armoredaRelease", sendRpc: true);
 	}
 
@@ -438,7 +443,7 @@ public class ArmoredAGuardReleaseState : MaverickState {
 	}
 }
 
-public class ArmoredAZappedState : MaverickState {
+public class ArmoredAZappedState : ArmadilloMState {
 	Point pushDir;
 	public ArmoredAZappedState() : base("zapped") {
 		canEnterSelf = false;
@@ -475,7 +480,7 @@ public class ArmoredAZappedState : MaverickState {
 	}
 }
 
-public class ArmoredARollEnterState : MaverickState {
+public class ArmoredARollEnterState : ArmadilloMState {
 	public ArmoredARollEnterState() : base("roll_enter") {
 	}
 
@@ -500,7 +505,7 @@ public class ArmoredARollEnterState : MaverickState {
 	}
 }
 
-public class ArmoredARollState : MaverickState {
+public class ArmoredARollState : ArmadilloMState {
 	public Point rollDir;
 	const float rollSpeed = 300;
 	public int bounceCount;
@@ -605,7 +610,7 @@ public class ArmoredARollState : MaverickState {
 	}
 }
 
-public class ArmoredARollExitState : MaverickState {
+public class ArmoredARollExitState : ArmadilloMState {
 	public ArmoredARollExitState() : base("roll_exit") {
 		aiAttackCtrl = true;
 	}

@@ -68,7 +68,7 @@ public class ChillPenguin : Maverick {
 				} else if (specialPressed()) {
 					changeState(new ChillPIceBlowState());
 				} else if (input.isPressed(Control.Dash, player)) {
-					changeState(new ChillPSlideState(false));
+					changeState(new ChillPSlideState());
 				}
 			} else if (state is MJump || state is MFall) {
 				if (input.isHeld(Control.Special1, player)) {
@@ -102,7 +102,7 @@ public class ChillPenguin : Maverick {
 		return [
 			getShootState(true),
 			new ChillPIceBlowState(),
-			new ChillPSlideState(true),
+			new ChillPSlideState(),
 			new ChillPBlizzardState(true)
 		];
 	}
@@ -117,7 +117,7 @@ public class ChillPenguin : Maverick {
 			new ChillPIceBlowState()
 		];
 		if (enemyDist <= 180) {
-			aiStates.Add(new ChillPSlideState(true));
+			aiStates.Add(new ChillPSlideState());
 		}
 		if (Helpers.randomRange(0, 2) == 0 && grounded && player.iceStatues.Count >= 1) {
 			aiStates.Add(new ChillPBlizzardState(true));
@@ -449,16 +449,26 @@ public class ChillPBlizzardProj : Projectile {
 #endregion
 
 #region states
-public class ChillPIceBlowState : MaverickState {
+public class PenguinMState : MaverickState {
+	public ChillPenguin IcyPenguigo = null!;
+	public PenguinMState(
+		string sprite, string transitionSprite = ""
+	) : base(
+		sprite, transitionSprite
+	) {
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		IcyPenguigo = maverick as ChillPenguin ?? throw new NullReferenceException();
+
+	}
+}
+public class ChillPIceBlowState : PenguinMState {
 	float shootTime;
 	bool soundOnce;
 	bool statueOnce;
-	public ChillPenguin IcyPenguigo= null!;
 	public ChillPIceBlowState() : base("blow") {
-	}
-	public override void onEnter(MaverickState oldState) {
-		IcyPenguigo = maverick as ChillPenguin ?? throw new NullReferenceException();		
-		base.onEnter(oldState);
 	}
 
 	public override void update() {
@@ -523,12 +533,11 @@ public class ChillPIceBlowState : MaverickState {
 	}
 }
 
-public class ChillPBlizzardState : MaverickState {
+public class ChillPBlizzardState : PenguinMState {
 	Point? switchPos;
 	int state;
 	new bool isAI;
 	public const float switchSpriteHeight = 60;
-	public ChillPenguin IcyPenguigo = null!;
 	public ChillPBlizzardState(bool isAI) : base("jump") {
 		this.isAI = isAI;
 	}
@@ -548,7 +557,6 @@ public class ChillPBlizzardState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		IcyPenguigo = maverick as ChillPenguin ?? throw new NullReferenceException();
 		if (!isAI) {
 			state = 1;
 		} else {
@@ -597,13 +605,13 @@ public class ChillPBlizzardState : MaverickState {
 	}
 }
 
-public class ChillPSlideState : MaverickState {
+public class ChillPSlideState : PenguinMState {
 	public float slideTime;
 	float slideSpeed = 350;
 	const float timeBeforeSlow = 0.75f;
 	const float slowTime = 0.5f;
 	bool soundOnce;
-	public ChillPSlideState(bool isAI) : base("slide") {
+	public ChillPSlideState() : base("slide") {
 	}
 
 	public override bool canEnter(Maverick maverick) {
@@ -663,7 +671,7 @@ public class ChillPSlideState : MaverickState {
 	}
 }
 
-public class ChillPBurnState : MaverickState {
+public class ChillPBurnState : PenguinMState {
 	Point pushDir;
 	public ChillPBurnState() : base("burn") {
 		aiAttackCtrl = true;

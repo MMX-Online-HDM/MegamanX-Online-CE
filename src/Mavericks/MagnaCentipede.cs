@@ -59,6 +59,7 @@ public class MagnaCentipede : Maverick {
 	public override void update() {
 		base.update();
 		if (!ownedByLocalPlayer) return;
+		subtractTargetDistance = 30;
 		if (state is not MagnaCMagnetMineState) {
 			magnetMineParent?.comeBack();
 		}
