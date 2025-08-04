@@ -3502,7 +3502,20 @@ public partial class Character : Actor, IDamagable {
 		return sound;
 	}
 
-	public virtual void aiUpdate(Actor? target) { }
+	public virtual void aiUpdate(Actor? target) {
+		if (!player.isMainPlayer && player.character != null && !Global.level.is1v1()) {
+			if (heartTanks < UpgradeMenu.getMaxHeartTanks() &&
+				player.currency >= UpgradeMenu.getHeartTankCost()
+			) {
+				player.currency -= UpgradeMenu.getHeartTankCost();
+				player.heartTanks++;
+				heartTanks++;
+				decimal currentMaxHp = maxHealth;
+				maxHealth = getMaxHealth();
+				addHealth(MathInt.Ceiling(maxHealth - currentMaxHp));
+			}
+		}
+	}
 
 	public virtual void aiAttack(Actor? target) { }
 

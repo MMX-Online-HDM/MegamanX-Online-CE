@@ -400,6 +400,7 @@ public class AI {
 	}
 
 	public void buySection() {
+		/*
 		if (!player.isMainPlayer && character is MegamanX &&
 			player.aiArmorUpgradeIndex < player.aiArmorUpgradeOrder.Count && !Global.level.is1v1()
 		) {
@@ -442,6 +443,7 @@ public class AI {
 				character.addHealth(MathInt.Ceiling(character.maxHealth - currentMaxHp));
 			}
 		}
+		*/
 	}
 
 	public void randomlyChangeStuff() {

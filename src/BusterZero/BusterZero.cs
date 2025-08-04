@@ -406,7 +406,7 @@ public class BusterZero : Character {
 			enemyDistY = MathF.Abs(target.pos.y - pos.y);
 		}
 		bool isTargetClose = enemyDist <= 40;
-		bool isTargetInAir = enemyDistY >= 15;
+		bool isTargetInAir = enemyDistY >= 20;
 		bool canHitMaxCharge = (!isTargetInAir && getChargeLevel() >= 4);
 		bool isFacingTarget = (pos.x < target?.pos.x && xDir == 1) || (pos.x >= target?.pos.x && xDir == -1);
 		int ZBattack = Helpers.randomRange(0, 2);
