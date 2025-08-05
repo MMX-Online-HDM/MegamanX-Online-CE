@@ -266,7 +266,8 @@ public class CmdSigma : BaseSigma {
 				if (weapon is MaverickWeapon mw && mw.maverick != null) {
 					mw.maverick.changeState(new MExit(mw.maverick.pos, true), true);
 				}
-			}	
+			}
 		}
+		base.aiUpdate(target);
 	}
 }
