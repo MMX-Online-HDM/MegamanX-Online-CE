@@ -61,6 +61,7 @@ public class StingChameleon : Maverick {
 		base.update();
 
 		Helpers.decrementTime(ref invisibleCooldown);
+		subtractTargetDistance = 90;
 
 		if (!isCloakTransition()) {
 			if (isInvisible) {
@@ -176,7 +177,7 @@ public class StingChameleon : Maverick {
 		if (enemyDist <= 125) {
 			aiStates.Add(new StingCTongueState(0));
 		}
-		if (Helpers.randomRange(0, 10) == 0 && grounded) {
+		if (Helpers.randomRange(0, 5) == 1 && grounded) {
 			aiStates.Add(new StingCJumpAI());
 		}
 		return aiStates.ToArray();
@@ -341,6 +342,20 @@ public class StingCSpikeProj : Projectile {
 #endregion
 
 #region states
+public class StingCMState : MaverickState {
+	public StingChameleon StingChameleao = null!;
+	public StingCMState(
+		string sprite, string transitionSprite = ""
+	) : base(
+		sprite, transitionSprite
+	) {
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		StingChameleao = maverick as StingChameleon ?? throw new NullReferenceException();
+	}
+}
 public class StingCClimb : MaverickState {
 	public StingCClimb() : base("climb") {
 		aiAttackCtrl = true;
@@ -477,10 +492,9 @@ public class StingCClimbTongueState : MaverickState {
 	}
 }
 
-public class StingCClingShootState : MaverickState {
+public class StingCClingShootState : StingCMState {
 	bool shotOnce;
 	public MaverickState? oldState;
-	public StingChameleon StingChameleao= null!;
 	public StingCClingShootState() : base("cling_shoot") {
 	}
 
@@ -516,18 +530,15 @@ public class StingCClingShootState : MaverickState {
 		base.onEnter(oldState);
 		maverick.useGravity = false;
 		this.oldState = oldState;
-		StingChameleao = maverick as StingChameleon ?? throw new NullReferenceException();
-
 	}
 }
 
-public class StingCHangState : MaverickState {
+public class StingCHangState : StingCMState {
 	int state;
 	float spikeTime;
 	float endTime;
 	float? _ceilingY;
 	float ceilingY => _ceilingY ?? 0;
-	public StingChameleon StingChameleao= null!;
 
 	public StingCHangState(float? ceilingY) : base("hang") {
 		_ceilingY = ceilingY;
@@ -543,7 +554,6 @@ public class StingCHangState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		StingChameleao = maverick as StingChameleon ?? throw new NullReferenceException();
 		maverick.stopMoving();
 		maverick.useGravity = false;
 		maverick.changePos(getTargetPos(maverick));

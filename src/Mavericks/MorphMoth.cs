@@ -65,9 +65,9 @@ public class MorphMoth : Maverick {
 				}
 			} else if (state is MFly) {
 				if (input.isPressed(Control.Dash, player)) {
-					changeState(new MorphMSweepState());
+					changeState(new MorphMSweepState(isStriker: false));
 				} else if (input.isPressed(Control.Shoot, player)) {
-					changeState(new MorphMShootAir(0));
+					changeState(new MorphMShootAir());
 				}
 			}
 		}
@@ -109,7 +109,7 @@ public class MorphMoth : Maverick {
 				aiStates.Add(new MorphMShoot());
 			}
 		} else if (!grounded) {
-			aiStates.Add(new MorphMSweepState());
+			aiStates.Add(new MorphMSweepState(isStriker: false));
 			if (enemyDist <= 30) {
 				aiStates.Add(new MorphMShootAir(3));
 			}
@@ -232,7 +232,7 @@ public class MorphMShoot : MaverickState {
 public class MorphMShootAir : MaverickState {
 	bool shotOnce;
 	public int stateAI;
-	public MorphMShootAir(int stateAI) : base("shoot", "shoot_start") {
+	public MorphMShootAir(int stateAI = 1) : base("shoot", "shoot_start") {
 		this.stateAI = stateAI;
 	}
 
@@ -244,26 +244,25 @@ public class MorphMShootAir : MaverickState {
 		Point? shootPos = maverick.getFirstPOI();
 		if (!shotOnce && shootPos != null) {
 			shotOnce = true;
-			if (isAI) {
-				if (stateAI == 2) {
-					maverick.playSound("morphmBeam", sendRpc: true);
-					new MorphMBeamProj(
-						maverick.weapon, shootPos.Value,
-						maverick.getCenterPos().addxy(160 * maverick.xDir, 50),
-						maverick.xDir, player, player.getNextActorNetId(), rpc: true
-					);
-				} else if (stateAI == 3)
-					morphMothBeam(shootPos.Value, false);
-				else if (stateAI == 4) {
-					new MorphMBeamProj(
-						maverick.weapon, shootPos.Value,
-						maverick.getCenterPos().addxy(160 * maverick.xDir, -50),
-						maverick.xDir, player, player.getNextActorNetId(), rpc: true
-					);
-					maverick.playSound("morphmBeam", sendRpc: true);
-				}
-			} else {
+			if (stateAI == 1) {
 				morphMothBeam(shootPos.Value, false);
+			}
+			if (stateAI == 2) {
+				maverick.playSound("morphmBeam", sendRpc: true);
+				new MorphMBeamProj(
+					maverick.weapon, shootPos.Value,
+					maverick.getCenterPos().addxy(160 * maverick.xDir, 50),
+					maverick.xDir, player, player.getNextActorNetId(), rpc: true
+				);
+			} else if (stateAI == 3) {
+				morphMothBeam(shootPos.Value, false);
+			} else if (stateAI == 4) {
+				new MorphMBeamProj(
+					maverick.weapon, shootPos.Value,
+					maverick.getCenterPos().addxy(160 * maverick.xDir, -50),
+					maverick.xDir, player, player.getNextActorNetId(), rpc: true
+				);
+				maverick.playSound("morphmBeam", sendRpc: true);
 			}
 		}
 
@@ -319,7 +318,9 @@ public class MorphMPowderProj : Projectile {
 }
 
 public class MorphMSweepState : MaverickState {
-	public MorphMSweepState() : base("sweep", "sweep_start") {
+	public bool isStriker;
+	public MorphMSweepState(bool isStriker) : base("sweep", "sweep_start") {
+		this.isStriker = isStriker;
 	}
 	public MorphMoth Moth = null!;
 	float shootTime;
@@ -335,7 +336,7 @@ public class MorphMSweepState : MaverickState {
 		if (isAI || input.isHeld(Control.Shoot, player)) {
 			Helpers.decrementTime(ref maverick.ammo);
 			if (shootTime == 0) {
-				shootTime = isAI ? 0.1f : 0.15f;
+				shootTime = isStriker ? 0.1f : 0.15f;
 				Point shootPos = maverick.getFirstPOIOrDefault().addRand(10, 5);
 				new MorphMPowderProj(
 					shootPos, maverick.xDir, Moth,
@@ -343,7 +344,7 @@ public class MorphMSweepState : MaverickState {
 				);
 			}
 		}
-		if (isAI) {
+		if (isStriker) {
 			maverick.move(new Point(20*maverick.xDir, -20));
 			if (stateTime > 60f / 60f) maverick.changeToIdleFallOrFly();
 		}
@@ -438,7 +439,7 @@ public class MorphMAIJump : MaverickState {
 	public override void update() {
 		base.update();
 		if (stateAI == 1 && stateTime > 24f / 60f) {
-			maverick.changeState(new MorphMSweepState());
+			maverick.changeState(new MorphMSweepState(isStriker: false));
 		} else if (stateAI == 2 && stateTime > 8f / 60f) {
 			maverick.changeState(new MorphMShootAir(2));			
 		} else if (stateAI == 3 && stateTime > 8f / 60f) {

@@ -208,6 +208,8 @@ public class PunchyZero : Character {
 	}
 
 	public override bool chargeButtonHeld() {
+		if (charState.normalCtrl && player.currency > 0 && !player.isMainPlayer &&
+		ai?.aiState.randomlyChargeWeapon == true && getChargeLevel() <= getMaxChargeLevel()) return true;
 		return player.input.isHeld(Control.Shoot, player);
 	}
 
@@ -826,37 +828,47 @@ public class PunchyZero : Character {
 	
 	public float aiAttackCooldown;
 	public override void aiAttack(Actor? target) {
-		bool isTargetInAir = pos.y < target?.pos.y - 20;
-		bool isTargetClose = pos.x < target?.pos.x - 10;
-		bool canHitMaxCharge = (!isTargetInAir && getChargeLevel() >= 4);
+		float enemyDist = 300;
+		float enemyDistY = 30;
+		if (target != null) {
+			enemyDist = MathF.Abs(target.pos.x - pos.x);
+			enemyDistY = MathF.Abs(target.pos.y - pos.y);
+		}
+		bool isTargetClose = enemyDist <= 50;
+		bool isTargetDistant = enemyDist <= 90;
+		bool isTargetInAir = enemyDistY >= 20;
 		bool isFacingTarget = (pos.x < target?.pos.x && xDir == 1) || (pos.x >= target?.pos.x && xDir == -1);
 		if (player.currency >= Player.zeroHyperCost && !isInvulnerable() &&
 		   charState is not (HyperPunchyZeroStart or LadderClimb) && !hypermodeActive() && !player.isMainPlayer
 		) {
 			changeState(new HyperPunchyZeroStart(), true);
 		}
+		if (isAwakened) hyperOvertimeActive = true;
+		if (grounded && isTargetInAir && charState.attackCtrl && isTargetClose && !isInvulnerable()) {
+			changeState(new PZeroShoryuken(), true);
+		}
 		int ZKattack = Helpers.randomRange(0, 6);
 		if (!isInvulnerable() && charState is not LadderClimb && aiAttackCooldown <= 0 && charState.attackCtrl) {
 			switch (ZKattack) {
-				case 0 when grounded && isFacingTarget:
+				case 0 when grounded && isFacingTarget && isTargetClose:
 					changeState(new PZeroPunch1(), true);
 					break;
-				case 1 when grounded && isFacingTarget:
+				case 1 when grounded && isFacingTarget && isTargetInAir:
 					changeState(new PZeroShoryuken(), true);
 					break;
-				case 2 when charState is Dash:
+				case 2 when charState is Dash && isTargetDistant:
 					changeState(new PZeroSpinKick(), true);
 					break;
 				case 3 when grounded && gigaAttack.shootCooldown <= 0 && gigaAttack.ammo >= gigaAttack.getAmmoUsage(0):
 					gigaAttack.shoot(this, []);
 					break;
-				case 4 when grounded && isFacingTarget:
+				case 4 when grounded && isFacingTarget && isTargetClose:
 					changeState(new PZeroYoudantotsu(), true);
 					break;
 				case 5 when charState is Fall:
 					changeState(new PZeroDiveKickState(), true);
 					break;
-				case 6 when charState is Jump or Fall:
+				case 6 when charState is Jump or Fall && isTargetClose:
 					changeState(new PZeroKick(), true);
 					break;
 			}
@@ -864,9 +876,17 @@ public class PunchyZero : Character {
 		}
 		base.aiAttack(target);
 	}
+	public override void aiUpdate(Actor? target) {
+		base.aiUpdate(target);
+		if (sprite.name == "zero_fall_shoot" && grounded) {
+			changeToIdleOrFall();
+		}
+		if (target != null && charState is not PZeroShoryuken && !charState.normalCtrl)
+			turnToPos(target.getCenterPos());
+	}
 	public override void aiDodge(Actor? target) {
 		foreach (GameObject gameObject in getCloseActors(48, true, false, false)) {
-			if (gameObject is Projectile proj&& proj.damager.owner.alliance != player.alliance && charState.attackCtrl) {
+			if (gameObject is Projectile proj && proj.damager.owner.alliance != player.alliance && charState.attackCtrl) {
 				//Projectile is not 
 				if (!(proj.projId == (int)ProjIds.RollingShieldCharged || proj.projId == (int)ProjIds.RollingShield
 					|| proj.projId == (int)ProjIds.MagnetMine || proj.projId == (int)ProjIds.FrostShield || proj.projId == (int)ProjIds.FrostShieldCharged
@@ -875,9 +895,10 @@ public class PunchyZero : Character {
 					if (gigaAttack.shootCooldown <= 0 && grounded && gigaAttack.ammo >= gigaAttack.getAmmoUsage(0)) {
 						gigaAttack.shoot(this, []);
 					} else if (!(proj.projId == (int)ProjIds.SwordBlock) && grounded) {
-					turnToInput(player.input, player);
-					changeState(new PZeroParry(), true);
-				}
+						if (target != null)
+							turnToPos(target.getCenterPos());
+						changeState(new PZeroParry(), true);
+					}
 				}
 			}
 		}

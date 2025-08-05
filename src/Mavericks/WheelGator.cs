@@ -301,16 +301,25 @@ public class WheelGSpinWheelProj : Projectile {
 		base.onHitDamagable(damagable);
 	}
 }
-
-public class WheelGShootState : MaverickState {
-	int state;
-	bool shotOnce;
+public class WheelGMState : MaverickState {
 	public WheelGator WheelAlligates = null!;
-	public WheelGShootState() : base("wheelthrow_start") {
+	public WheelGMState(
+		string sprite, string transitionSprite = ""
+	) : base(
+		sprite, transitionSprite
+	) {
 	}
+
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 		WheelAlligates = maverick as WheelGator ?? throw new NullReferenceException();
+	}
+}
+
+public class WheelGShootState : WheelGMState {
+	int state;
+	bool shotOnce;
+	public WheelGShootState() : base("wheelthrow_start") {
 	}
 	public override void update() {
 		base.update();
@@ -450,10 +459,9 @@ public class WheelGSpitProj : Projectile {
 	}
 }
 
-public class WheelGSpitState : MaverickState {
+public class WheelGSpitState : WheelGMState {
 	bool shotOnce;
 	float damageEaten;
-	public WheelGator WheelAlligates = null!;
 	public int UPorDown;
 	public WheelGSpitState(float damageEaten) : base("eat_spit") {
 		this.damageEaten = damageEaten;
@@ -507,7 +515,6 @@ public class WheelGSpitState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		WheelAlligates = maverick as WheelGator ?? throw new NullReferenceException();
 		maverick.frameSpeed = 1;
 		maverick.frameIndex = 0;
 	}
@@ -561,12 +568,11 @@ public class WheelGSpinState : MaverickState {
 	}
 }
 
-public class WheelGUpBiteState : MaverickState {
+public class WheelGUpBiteState : WheelGMState {
 	public Character? victim;
 	int state;
 	int shootFramesHeld;
 	bool shootReleased;
-	public WheelGator WheelAlligates = null!;
 	public WheelGUpBiteState() : base("grab_start", "jump_start") {
 	}
 
@@ -611,10 +617,6 @@ public class WheelGUpBiteState : MaverickState {
 			return true;
 		}
 		return false;
-	}
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		WheelAlligates = maverick as WheelGator ?? throw new NullReferenceException();
 	}
 
 	public override void onExit(MaverickState newState) {

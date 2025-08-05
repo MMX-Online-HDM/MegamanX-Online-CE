@@ -747,9 +747,11 @@ public class SwordBlock : CharState {
 			player.input.isHeld(Control.WeaponLeft, player) ||
 			player.input.isHeld(Control.WeaponRight, player)
 		);
-		if (!isHoldingGuard) {
+		if (!isHoldingGuard && !player.isAI) {
 			character.changeToIdleOrFall();
 			return;
+		} else if (player.isAI && stateTime >= 32f/60f) {
+			character.changeToIdleOrFall();
 		}
 		if (Global.level.gameMode.isOver) {
 			if (Global.level.gameMode.playerWon(player)) {
@@ -1313,6 +1315,13 @@ public class LadderClimb : CharState {
 		} else if (!player.isAI && player.input.isPressed(Control.Jump, player)) {
 			if (!isAttacking) {
 				dropFromLadder();
+			}
+		}
+		if (character is Axl axl) {
+			if (axl.isAxlLadderShooting()) {
+				axl.changeSprite("axl_ladder_shoot", true);
+			} else if (character.sprite.name != "axl_ladder_end" && character.sprite.name != "axl_fall_start"){
+				axl.changeSprite("axl_ladder_climb", true);
 			}
 		}
 

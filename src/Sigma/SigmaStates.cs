@@ -98,9 +98,11 @@ public class SigmaBlock : CharState {
 		if (inputXDir != 0) {
 			character.xDir = inputXDir;
 		}
-		if (!isHoldingGuard || Global.level.gameMode.isOver) {
+		if ((!isHoldingGuard || Global.level.gameMode.isOver) && !player.isAI) {
 			character.changeToIdleOrFall();
 			return;
+		} else if (player.isAI && stateTime >= 32f/60f) {
+			character.changeToIdleOrFall();
 		}
 	}
 }

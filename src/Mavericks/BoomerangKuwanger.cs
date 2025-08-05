@@ -319,8 +319,23 @@ public class BoomerangKBoomerangProj : Projectile {
 #endregion
 
 #region states
+public class BoomerMState : MaverickState {
+	public BoomerangKuwanger BoomerKuwanger = null!;
+	public BoomerMState(
+		string sprite, string transitionSprite = ""
+	) : base(
+		sprite, transitionSprite
+	) {
+	}
 
-public class BoomerKTeleportState : MaverickState {
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		BoomerKuwanger = maverick as BoomerangKuwanger ?? throw new NullReferenceException();
+
+	}
+}
+
+public class BoomerKTeleportState : BoomerMState {
 	public bool onceTeleportInSound;
 	private bool isInvisible;
 	private Actor? clone;
@@ -480,7 +495,7 @@ public class BoomerKTeleportState : MaverickState {
 	}
 }
 
-public class BoomerKDashState : MaverickState {
+public class BoomerKDashState : BoomerMState {
 	public float dashTime = 0;
 	public string initialDashButton;
 
@@ -521,16 +536,12 @@ public class BoomerKDashState : MaverickState {
 	}
 }
 
-public class BoomerKDeadLiftState : MaverickState {
+public class BoomerKDeadLiftState : BoomerMState {
 	private Character? grabbedChar;
 	float timeWaiting;
 	bool grabbedOnce;
 
 	public BoomerKDeadLiftState() : base("deadlift") {
-	}
-
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
 	}
 
 	public override void update() {

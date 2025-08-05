@@ -117,6 +117,7 @@ public class Maverick : Actor, IDamagable {
 
 	public MaverickAIBehavior aiBehavior;
 	public Actor target;
+	public float subtractTargetDistance = 0;
 	public float aiCooldown;
 	public float maxAICooldown = 75;
 	public int startMoveControl = -1;
@@ -587,8 +588,8 @@ public class Maverick : Actor, IDamagable {
 			target = mmc.getHealTarget();
 		} else if (controlMode is not MaverickModeId.Puppeteer and not MaverickModeId.TagTeam) {
 			target = Global.level.getClosestTarget(
-				getCenterPos(), player.alliance, true, isRequesterAI: true,
-				aMaxDist: 300
+				getCenterPos().substractxy(subtractTargetDistance * xDir, 0),
+				player.alliance, true, isRequesterAI: true, aMaxDist: 300
 			);
 		}
 

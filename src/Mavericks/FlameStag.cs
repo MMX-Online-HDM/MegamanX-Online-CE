@@ -63,6 +63,7 @@ public class FlameStag : Maverick {
 		antlerSide.update();
 
 		if (!ownedByLocalPlayer) return;
+		subtractTargetDistance = 60;
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
 			if (state is MIdle or MRun or MLand) {
@@ -98,7 +99,7 @@ public class FlameStag : Maverick {
 	public override MaverickState[] strikerStates() {
 		return [
 			new FStagShoot(false),
-			new FStagGrabState(true),
+			new FStagGrabState(false),
 			new FStagDashChargeState(),
 		];
 	}
@@ -115,7 +116,7 @@ public class FlameStag : Maverick {
 			new FStagShoot(false)
 		];
 		if (enemyDist <= 20 && canGrabTarget) {
-			aiStates.Add(new FStagGrabState(true));
+			aiStates.Add(new FStagGrabState(false));
 		}
 		if (enemyDist > 40) {
 			aiStates.Add(new FStagDashChargeState());
@@ -224,19 +225,27 @@ public class FStagFireballProj : Projectile {
 	}
 
 }
-
-public class FStagShoot : MaverickState {
-	bool shotOnce;
-	FStagFireballProj? fireball;
-	bool isSecond;
+public class StagMState : MaverickState {
 	public FlameStag FlameStagger = null!;
-
-	public FStagShoot(bool isSecond) : base(isSecond ? "punch2" : "punch") {
-		this.isSecond = isSecond;
+	public StagMState(
+		string sprite, string transitionSprite = ""
+	) : base(
+		sprite, transitionSprite
+	) {
 	}
+
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 		FlameStagger = maverick as FlameStag ?? throw new NullReferenceException();
+	}
+}
+
+public class FStagShoot : StagMState {
+	bool shotOnce;
+	FStagFireballProj? fireball;
+	bool isSecond;
+	public FStagShoot(bool isSecond) : base(isSecond ? "punch2" : "punch") {
+		this.isSecond = isSecond;
 	}
 
 	public override void update() {
@@ -352,9 +361,8 @@ public class FStagDashChargeProj : Projectile {
 	}
 }
 
-public class FStagDashChargeState : MaverickState {
+public class FStagDashChargeState : StagMState {
 	FStagDashChargeProj? proj;
-	public FlameStag FlameStagger = null!;
 	public FStagDashChargeState() : base("angry") {
 	}
 
@@ -377,7 +385,6 @@ public class FStagDashChargeState : MaverickState {
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 		maverick.stopMoving();
-		FlameStagger = maverick as FlameStag ?? throw new NullReferenceException();
 		proj = new FStagDashChargeProj(
 			maverick.getFirstPOIOrDefault("fire_body"), maverick.xDir,
 			FlameStagger, player, player.getNextActorNetId(), rpc: true
@@ -420,11 +427,10 @@ public class  FStagDashProj : Projectile {
 	}
 }
 
-public class FStagDashState : MaverickState {
+public class FStagDashState : StagMState {
 	float trailTime;
 	FStagDashProj? proj;
 	float chargeTime;
-	public FlameStag FlameStagger = null!;
 	public Anim? ProjVisible;
 	public FStagDashState(float chargeTime) : base("dash") {
 		this.chargeTime = chargeTime;
@@ -458,7 +464,6 @@ public class FStagDashState : MaverickState {
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 		maverick.stopMoving();
-		FlameStagger = maverick as FlameStag ?? throw new NullReferenceException();
 
 		ProjVisible = new Anim(
 			maverick.getFirstPOIOrDefault("fire_dash"), "fstag_fire_dash", maverick.xDir,
@@ -477,7 +482,7 @@ public class FStagDashState : MaverickState {
 	}
 }
 
-public class FStagGrabState : MaverickState {
+public class FStagGrabState : StagMState {
 	float xVel = 400;
 	public Character? victim;
 	float endLagTime;
@@ -521,10 +526,9 @@ public class FStagGrabState : MaverickState {
 	}
 }
 
-public class FStagUppercutState : MaverickState {
+public class FStagUppercutState : StagMState {
 	FStagDashProj? proj;
 	float yDist;
-	public FlameStag FlameStagger = null!;
 	int state;
 	public Anim? ProjVisible;
 	public Character victim;
@@ -629,7 +633,6 @@ public class FStagUppercutState : MaverickState {
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 		maverick.unstickFromGround();
-		FlameStagger = maverick as FlameStag ?? throw new NullReferenceException();
 		ProjVisible = new Anim(
 			FlameStagger.pos, "fstag_fire_updash", maverick.xDir,
 			player.getNextActorNetId(), false, sendRpc: true
@@ -688,7 +691,7 @@ public class FStagGrabbed : GenericGrabbedState {
 	}
 }
 
-public class FStagWallDashState : MaverickState {
+public class FStagWallDashState : StagMState {
 	public FStagWallDashState() : base("wall_dash") {
 	enterSound = "jumpx2";
 	}

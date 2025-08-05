@@ -46,7 +46,6 @@ public class ToxicSeahorse : Maverick {
 	public override void update() {
 		base.update();
 		Helpers.decrementTime(ref teleportCooldown);
-
 		if (state is not TSeahorseTeleportState) {
 			rechargeAmmo(4);
 		} else {
@@ -313,10 +312,22 @@ public class TSeahorseAcid2Proj : Projectile {
 	}
 
 }
-
-public class TSeahorseShoot2State : MaverickState {
-	bool shotOnce;
+public class TSeahorseMState : MaverickState {
 	public ToxicSeahorse AcidSeaforce = null!;
+	public TSeahorseMState(
+		string sprite, string transitionSprite = ""
+	) : base(
+		sprite, transitionSprite
+	) {
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		AcidSeaforce = maverick as ToxicSeahorse ?? throw new NullReferenceException();
+	}
+}
+public class TSeahorseShoot2State : TSeahorseMState {
+	bool shotOnce;
 	public TSeahorseShoot2State() : base("shoot2") {
 		exitOnAnimEnd = true;
 	}
@@ -337,10 +348,6 @@ public class TSeahorseShoot2State : MaverickState {
 				AcidSeaforce, player, player.getNextActorNetId(), rpc: true
 			);
 		}
-	}
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		AcidSeaforce = maverick as ToxicSeahorse ?? throw new NullReferenceException();
 	}
 }
 

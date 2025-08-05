@@ -866,7 +866,7 @@ public class Vile : Character {
 	}
 	public float aiAttackCooldown;
 	public override void aiAttack(Actor? target) {
-		int Vattack = Helpers.randomRange(1, 9);
+		int Vattack = Helpers.randomRange(1, 7);
 		bool isFacingTarget = (pos.x < target?.pos.x && xDir == 1) || (pos.x >= target?.pos.x && xDir == -1);
 		if (!charState.isGrabbedState && !player.isDead && !isInvulnerableAttack()
 			&& !(charState is VileRevive or HexaInvoluteState or NecroBurstAttack
@@ -897,12 +897,6 @@ public class Vile : Character {
 				case 7 when charState is Fall:
 					flamethrowerWeapon.vileShoot(WeaponIds.VileFlamethrower, this);
 					break;
-				case 8 when energy.ammo >= 24 && !player.isMainPlayer && isFacingTarget:
-					laserWeapon.vileShoot(WeaponIds.VileLaser, this);
-					break;
-				case 9 when isVileMK5 && energy.ammo >= 20 && !player.isMainPlayer:
-					changeState(new HexaInvoluteState(), true);
-					break;
 			}
 			aiAttackCooldown = 20;
 		}
@@ -910,12 +904,25 @@ public class Vile : Character {
 	}
 
 	public override void aiUpdate(Actor? target) {
+		base.aiUpdate(target);
 		if (!player.isMainPlayer) {
 			if (player.canReviveVile() && isVileMK1) {
 				player.reviveVile(false);
 			}
 			if (isVileMK2 && player.canReviveVile()) {
 				player.reviveVile(true);
+			}
+		}
+		if (!player.isMainPlayer) {
+			if (player.currency >= 3 && !player.frozenCastle) {
+				player.frozenCastle = true;
+				hasFrozenCastle = true;
+				player.currency -= Vile.frozenCastleCost;
+			}
+			if (player.currency >= 3 && !player.speedDevil) {
+				player.speedDevil = true;
+				hasSpeedDevil = true;
+				player.currency -= Vile.speedDevilCost;
 			}
 		}
 	}

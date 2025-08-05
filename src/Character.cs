@@ -2763,8 +2763,8 @@ public partial class Character : Actor, IDamagable {
 		}
 		// Damage increase/reduction section
 		if (!isArmorPiercing && (
-			damage != (decimal)Damager.forceKillDamage ||
-			damage != (decimal)Damager.ohkoDamage ||
+			damage != (decimal)Damager.forceKillDamage &&
+			damage != (decimal)Damager.ohkoDamage &&
 			damage != (decimal)Damager.envKillDamage
 		)) {
 			if (charState is SwordBlock) {
@@ -2795,7 +2795,7 @@ public partial class Character : Actor, IDamagable {
 					damageSavings += (originalDamage * 0.125m);
 				}
 			}
-			if (vile != null && vile.hasFrozenCastle) {
+			if (vile != null && vile.hasFrozenCastle && charState is not Die or VileRevive) {
 				damageSavings += originalDamage * Vile.frozenCastlePercent;
 			}
 		}
@@ -3502,7 +3502,20 @@ public partial class Character : Actor, IDamagable {
 		return sound;
 	}
 
-	public virtual void aiUpdate(Actor? target) { }
+	public virtual void aiUpdate(Actor? target) {
+		if (!player.isMainPlayer && player.character != null && !Global.level.is1v1()) {
+			if (heartTanks < UpgradeMenu.getMaxHeartTanks() &&
+				player.currency >= UpgradeMenu.getHeartTankCost()
+			) {
+				player.currency -= UpgradeMenu.getHeartTankCost();
+				player.heartTanks++;
+				heartTanks++;
+				decimal currentMaxHp = maxHealth;
+				maxHealth = getMaxHealth();
+				addHealth(MathInt.Ceiling(maxHealth - currentMaxHp));
+			}
+		}
+	}
 
 	public virtual void aiAttack(Actor? target) { }
 

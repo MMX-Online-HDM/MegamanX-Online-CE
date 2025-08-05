@@ -606,7 +606,7 @@ public class Axl : Character {
 						break;
 				}
 				// Double bullet
-				if (player.weapon is DoubleBullet && canShoot() && !(charState is LadderClimb) && !player.weapon.noAmmo()) {
+				if (player.weapon is DoubleBullet && canShoot() && !player.weapon.noAmmo()) {
 					if (shootHeld && shootTime == 0) {
 						recoilTime = 0.2f;
 						player.axlWeapon.axlShoot(player);
@@ -622,7 +622,7 @@ public class Axl : Character {
 					}
 				}
 
-				if (player.weapon is BlastLauncher && canShoot() && !(charState is LadderClimb)) {
+				if (player.weapon is BlastLauncher && canShoot()) {
 					if (shootHeld && shootTime == 0 && player.weapon.ammo >= 1) {
 						recoilTime = 0.2f;
 						player.axlWeapon.axlShoot(player);
@@ -728,7 +728,7 @@ public class Axl : Character {
 					}
 				}
 
-				if (player.weapon is IceGattling && canShoot() && !(charState is LadderClimb) && player.weapon.ammo > 0) {
+				if (player.weapon is IceGattling && canShoot() && player.weapon.ammo > 0) {
 					if (altShootPressed && loadout.iceGattlingAlt == 0 && gaeaShield == null) {
 						recoilTime = 0.2f;
 						player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
@@ -749,7 +749,7 @@ public class Axl : Character {
 					}
 				}
 
-				if (player.weapon is FlameBurner && canShoot() && !(charState is LadderClimb) && player.weapon.ammo > 0) {
+				if (player.weapon is FlameBurner && canShoot() && player.weapon.ammo > 0) {
 					if (shootHeld && shootTime == 0) {
 						recoilTime = 0.05f;
 						player.axlWeapon.axlShoot(player);
@@ -1250,8 +1250,7 @@ public class Axl : Character {
 		if (player.weapon is AssassinBulletChar) return false;
 		if (recoilTime > 0) return true;
 		bool canShootBool = (
-			canShoot() && currentWeapon?.noAmmo() == true && player.axlWeapon != null &&
-			!player.axlWeapon.isTwoHanded(true) && shootTime == 0
+			canShoot() && shootTime == 0
 		);
 		if (player.input.isHeld(Control.Shoot, player) && canShootBool) {
 			return true;
@@ -1290,6 +1289,7 @@ public class Axl : Character {
 			netArmAngle = dhs.lastArmAngle;
 		}
 
+		/*
 		if (charState is LadderClimb) {
 			if (isAxlLadderShooting()) {
 				xDir = (pos.x > axlGenericCursorWorldPos.x ? -1 : 1);
@@ -1297,7 +1297,7 @@ public class Axl : Character {
 			} else {
 				changeSprite("axl_ladder_climb", true);
 			}
-		}
+		}*/
 
 		if (shootTime > 0 && !muzzleFlash.isAnimOver()) {
 			muzzleFlash.xDir = axlXDir;
