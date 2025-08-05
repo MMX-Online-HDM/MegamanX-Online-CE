@@ -395,7 +395,7 @@ public class AI {
 		var maxDist = Global.screenW / 4;
 		int? raNum = player.character?.rideArmor?.raNum;
 		if (raNum != null && raNum != 2) maxDist = 60;
-		if (character is Zero or BaseSigma or PunchyZero) return 80;
+		if (character is Zero or BaseSigma or PunchyZero) return 60;
 		return maxDist;
 	}
 

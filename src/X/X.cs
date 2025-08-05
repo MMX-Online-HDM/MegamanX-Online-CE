@@ -1426,28 +1426,29 @@ public class MegamanX : Character {
 					player.aiArmorUpgradeIndex++;
 				}
 			}
-			if (!hasUltimateArmor && player.currency >= Player.ultimateArmorCost) {
-				player.currency -= Player.ultimateArmorCost;
-				hasUltimateArmor = true;
-				if (!weapons.Any(w => w is HyperNovaStrike)) {
-					weapons.Add(new HyperNovaStrike());
+			if (player.health >= player.maxHealth) {
+				if (!hasUltimateArmor && player.currency >= Player.ultimateArmorCost) {
+					player.currency -= Player.ultimateArmorCost;
+					hasUltimateArmor = true;
+					if (!weapons.Any(w => w is HyperNovaStrike)) {
+						weapons.Add(new HyperNovaStrike());
+					}
 				}
-			}
-			if (fullArmor == ArmorId.Max && !hasFullHyperMaxArmor &&
-				player.currency >= Player.goldenArmorCost
-			) {
-				player.currency -= Player.goldenArmorCost;
-				hyperChestActive = true;
-				hyperArmActive = true;
-				hyperLegActive = true;
-				hyperHelmetActive = true;
+				if (fullArmor == ArmorId.Max && !hasFullHyperMaxArmor &&
+					player.currency >= Player.goldenArmorCost
+				) {
+					player.currency -= Player.goldenArmorCost;
+					hyperChestActive = true;
+					hyperArmActive = true;
+					hyperLegActive = true;
+					hyperHelmetActive = true;
+				}
 			}
 		}
 		base.aiUpdate(target);
 	}
 	public void doJumpAI(float jumpTimeAI = 0.75f) {
-		if (jumpTimeAI <= 0) {
-			player.release(Control.Jump);
+		if (jumpTimeAI > 0) {
 			player.press(Control.Jump);
 		}
 	}

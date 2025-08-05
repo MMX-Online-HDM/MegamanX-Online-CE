@@ -747,9 +747,11 @@ public class SwordBlock : CharState {
 			player.input.isHeld(Control.WeaponLeft, player) ||
 			player.input.isHeld(Control.WeaponRight, player)
 		);
-		if (!isHoldingGuard) {
+		if (!isHoldingGuard && !player.isAI) {
 			character.changeToIdleOrFall();
 			return;
+		} else if (player.isAI && stateTime >= 32f/60f) {
+			character.changeToIdleOrFall();
 		}
 		if (Global.level.gameMode.isOver) {
 			if (Global.level.gameMode.playerWon(player)) {

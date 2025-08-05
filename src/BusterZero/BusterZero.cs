@@ -413,18 +413,21 @@ public class BusterZero : Character {
 		if (isTargetInAir) {
 			doJumpAI();
 		}
-		if (!isInvulnerable() && charState is not LadderClimb && aiAttackCooldown <= 0) {
+		if (!isInvulnerable() && charState is not LadderClimb && aiAttackCooldown <= 0 && target != null) {
 			switch (ZBattack) {
 				// Release full charge if we have it.
 				case >= 0 when canHitMaxCharge && isFacingTarget:
+					turnToPos(target.getCenterPos());
 					player.release(Control.Shoot);
 					break;
 				// Saber swing when target is close.
 				case 0 when isTargetClose:
+					turnToPos(target.getCenterPos());
 					player.press(Control.Special1);
 					break;
 				// Another action if the enemy is on Do Jump and do SaberSwing.
 				case 1 when isTargetClose:
+					turnToPos(target.getCenterPos());
 					if (isTargetInAir) doJumpAI();	
 					player.press(Control.Special1);
 					break;
@@ -455,15 +458,15 @@ public class BusterZero : Character {
 					proj.projId != (int)ProjIds.FrostShieldPlatform &&
 					zSaberCooldown <= 0
 				) {
-					turnToInput(player.input, player);
+					if (target != null)
+					turnToPos(target.getCenterPos());
 					changeState(new BusterZeroMelee(), true);
 				}
 			}
 		}
 	}
 	public void doJumpAI(float jumpTimeAI = 0.75f) {
-		if (jumpTimeAI <= 0) {
-			player.release(Control.Jump);
+		if (jumpTimeAI > 0) {
 			player.press(Control.Jump);
 		}
 	}
