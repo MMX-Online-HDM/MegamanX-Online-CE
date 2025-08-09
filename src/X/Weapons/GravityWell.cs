@@ -404,7 +404,9 @@ public class GravityWellChargedState : CharState {
 		superArmor = true;
 		landSprite = "point_up";
 		airSprite = "point_up_air";
+		useDashJumpSpeed = true;
 	}
+
 	public override void update() {
 		base.update();
 		if (character.frameIndex >= 4 && !fired) {

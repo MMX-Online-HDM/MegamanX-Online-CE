@@ -3171,7 +3171,9 @@ public partial class Character : Actor, IDamagable {
 
 	public void crystalizeStart() {
 		isCrystalized = true;
-		if (globalCollider != null) globalCollider.isClimbable = true;
+		if (globalCollider != null) {
+			globalCollider.isClimbable = true;
+		}
 		new Anim(getCenterPos(), "crystalhunter_activate", 1, null, true);
 		playSound("crystalize");
 	}

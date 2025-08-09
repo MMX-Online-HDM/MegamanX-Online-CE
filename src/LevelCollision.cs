@@ -281,7 +281,7 @@ public partial class Level {
 			var actorChar = actor as Character;
 			var goChar = gameObject as Character;
 
-			if (actorChar.isCrystalized || goChar.isCrystalized) return false;
+			if (actorChar.isCrystalized || goChar.isCrystalized) return true;
 			//if (actorChar.sprite.name.Contains("frozen") || goChar.sprite.name.Contains("frozen")) return false;
 			return true;
 		}

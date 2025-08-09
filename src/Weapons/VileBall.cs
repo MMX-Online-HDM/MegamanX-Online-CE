@@ -299,10 +299,15 @@ public class AirBombAttack : VileState {
 	int bombNum;
 	bool isNapalm;
 
-	public AirBombAttack(bool isNapalm, string transitionSprite = "") : base("air_bomb_attack", "", "", transitionSprite) {
+	public AirBombAttack(
+		bool isNapalm, string transitionSprite = ""
+	) : base(
+		"air_bomb_attack", "", "", transitionSprite
+	) {
 		this.isNapalm = isNapalm;
 		useDashJumpSpeed = true;
 	}
+
 	public override void update() {
 		base.update();
 		if (vile.grenadeWeapon.type == (int)VileBallType.ExplosiveRound) {

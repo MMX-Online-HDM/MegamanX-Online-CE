@@ -92,12 +92,6 @@ public class Hurt : CharState {
 			character.changeToLandingOrFall(false);
 		}
 	}
-
-	public override void onExit(CharState? newState) {
-		base.onExit(newState);
-		//Intended. Do not remove.
-		//character.dashedInAir = 0;
-	}
 }
 
 // Applies to freeze, stun, other effects.
@@ -281,7 +275,9 @@ public class GenericStun : CharState {
 		}
 		if (character.crystalizedTime != 0 || character.isCrystalized) {
 			character.crystalizeEnd();
-			Global.serverClient?.rpc(RPC.playerToggle, (byte)character.player.id, (byte)RPCToggleType.StopCrystalize);
+			Global.serverClient?.rpc(
+				RPC.playerToggle, (byte)character.player.id, (byte)RPCToggleType.StopCrystalize
+			);
 		}
 		character.paralyzedTime = 0;
 		character.frozenTime = 0;
