@@ -1308,7 +1308,6 @@ public partial class Level {
 			go.preUpdate();
 			go.statePreUpdate();
 			Global.speedMul = Global.gameSpeed;
-			go.speedMul = Global.gameSpeed;
 		}
 
 		// Preupdate RPCs.
@@ -1359,7 +1358,6 @@ public partial class Level {
 				}
 			}
 			Global.speedMul = Global.gameSpeed;
-			go.speedMul = Global.gameSpeed;
 		}
 
 		// Normal update RPCs.
@@ -1527,6 +1525,7 @@ public partial class Level {
 			Global.speedMul = Global.gameSpeed;
 			go.speedMul = Global.gameSpeed;
 			go.netUpdate();
+			go.speedMul = slowAmount * Global.gameSpeed;
 		}
 
 		if (camPlayer.character != null) {
