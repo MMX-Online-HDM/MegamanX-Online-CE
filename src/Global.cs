@@ -502,14 +502,14 @@ public partial class Global {
 	}
 	public static float time;
 	public static int frameCount = 0;
-	public static float fFrameCount => frameCount * gameSpeed;
+	public static float flFrameCount => frameCount * gameSpeed;
+	public static int floorFrameCount => MathInt.Floor(frameCount * gameSpeed);
 
 	public static int normalizeFrames(int frames) {
-		/*
-		float fpsRatio = 1;
-		frames = MathInt.Round(frames * fpsRatio);
-		*/
-		if (frames <= 0) frames = 1;
+		frames = MathInt.Round(frames * gameSpeed);
+		if (frames <= 0) {
+			frames = 1;
+		}
 		return frames;
 	}
 	public static bool isOnFrame(int frame) {
@@ -517,8 +517,7 @@ public partial class Global {
 	}
 	// cycle = 2: 2 frames show visible, 2 frames hide, for a blink/flash effect
 	public static bool isOnFrameCycle(int cycle) {
-		int frames = normalizeFrames(cycle);
-		return frameCount % frames * 2 < frames;
+		return floorFrameCount % cycle * 2 < cycle;
 	}
 
 	public static bool isSkippingFrames = false;

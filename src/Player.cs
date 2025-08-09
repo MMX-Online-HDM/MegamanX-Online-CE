@@ -2688,14 +2688,14 @@ public partial class Player {
 		float healthPercent = 0.3333f + ((health / maxHealth) * 0.6666f);
 		float mashAmount = (healthPercent * mashCount * 0.25f);
 
-		if (Global.frameCount - lastMashAmountSetFrame > 10) {
+		if (Global.floorFrameCount - lastMashAmountSetFrame > 10) {
 			lastMashAmount = 0;
 		}
 
 		float prevLastMashAmount = lastMashAmount;
 		lastMashAmount += mashAmount;
 		if (mashAmount > 0 && prevLastMashAmount == 0) {
-			lastMashAmountSetFrame = Global.frameCount;
+			lastMashAmountSetFrame = Global.floorFrameCount;
 		}
 
 		return (Global.spf + mashAmount);

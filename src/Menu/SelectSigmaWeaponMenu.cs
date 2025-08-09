@@ -203,7 +203,7 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 				}
 			}
 
-			if (Global.frameCount % 60 < 30) {
+			if (Global.flFrameCount % 60 < 30) {
 				Fonts.drawText(FontType.Blue, ">", rightArrowPos, yPos, selected: selCursorIndex == i);
 				Fonts.drawText(FontType.Blue, "<", leftArrowPos, yPos, selected: selCursorIndex == i);
 			}

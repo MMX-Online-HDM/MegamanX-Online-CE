@@ -296,7 +296,7 @@ public class SelectCharacterMenu : IMainMenu {
 
 		// Draw text
 
-		if (Global.frameCount % 60 < 30) {
+		if (Global.flFrameCount % 60 < 30) {
 			Fonts.drawText(
 				FontType.Orange, "<", Global.halfScreenW - 60, Global.halfScreenH + 36,
 				Alignment.Center

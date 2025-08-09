@@ -79,7 +79,7 @@ public class VileRevive : VileState {
 			radius -= Global.spf * 150;
 		}
 		if (character.frameIndex < 2) {
-			if (Global.frameCount % 4 < 2) {
+			if (Global.flFrameCount % 4 < 2) {
 				character.addRenderEffect(RenderEffectType.Flash);
 			} else {
 				character.removeRenderEffect(RenderEffectType.Flash);

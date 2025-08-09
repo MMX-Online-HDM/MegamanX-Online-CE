@@ -98,7 +98,7 @@ public class PreLoadoutMenu : IMainMenu {
 			DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
 			//Global.sprites["cursor"].drawToHUD(0, startX - 10, 53 + (selectY * 20));
 		}
-		if (Global.frameCount % 60 < 30) {
+		if (Global.flFrameCount % 60 < 30) {
 			for (int i = 0; i < 6; i++) {
 				if (selectY == i) {
 					Fonts.drawText(FontType.Blue, "<", optionPos2[i], optionPos[i], Alignment.Center, selected: selectY == i, selectedFont: FontType.DarkOrange);

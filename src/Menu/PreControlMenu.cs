@@ -65,7 +65,7 @@ public class PreControlMenu : IMainMenu {
 	}
 
 	public string getLeftRightStr(string str) {
-		if (Global.frameCount % 60 < 30) {
+		if (Global.flFrameCount % 60 < 30) {
 			return "<  " + str + "  >";
 		}
 		return "" + str + "";

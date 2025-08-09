@@ -545,18 +545,18 @@ public class XReviveStart : CharState {
 				dialogWaitTime = 0;
 				if (dialogIndex < 4) {
 					dialogWaitTime = 0.03f;
-					if (Global.frameCount % 5 == 0) Global.playSound("text");
+					if (Global.flFrameCount % 5 == 0) Global.playSound("text");
 				} else if (dialogIndex == 4) {
 					dialogWaitTime = 0.4f;
 				} else {
-					if (Global.frameCount % 5 == 0) Global.playSound("text");
+					if (Global.flFrameCount % 5 == 0) Global.playSound("text");
 				}
 			} else {
 				dialogWaitTime = 0.03f;
 				if (dialogIndex == dialogLine3Content.Length) {
 					dialogWaitTime = 0.4f;
 				} else {
-					if (Global.frameCount % 5 == 0) Global.playSound("text");
+					if (Global.flFrameCount % 5 == 0) Global.playSound("text");
 				}
 			}
 

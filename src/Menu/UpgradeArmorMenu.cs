@@ -292,7 +292,7 @@ public class UpgradeArmorMenu : IMainMenu {
 		);
 		Fonts.drawText(FontType.OrangeMenu, Global.nameCoins + ": " + mainPlayer.currency, 20, 20);
 
-		if (Global.frameCount % 60 < 30) {
+		if (Global.flFrameCount % 60 < 30) {
 			bool stEnabled = !Global.level.server.disableHtSt;
 			string leftText = xGame switch {
 				1 when stEnabled => "Items",
@@ -632,7 +632,7 @@ public class UpgradeArmorMenuGolden : IMainMenu {
 		DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
 		Fonts.drawText(FontType.Pink, "Hyper Chip Active",Global.screenW * 0.5f, 20, Alignment.Center);
 		Global.sprites["menu_x3"].drawToHUD(2, 295, 110);
-		if (Global.frameCount % 6 < 4) 
+		if (Global.flFrameCount % 6 < 4) 
 			 Global.sprites["LightX3"].drawToHUD(10, 50, 130);
 		else Global.sprites["LightX3"].drawToHUD(11, 50, 130);
 		DrawWrappers.DrawRect(
@@ -643,7 +643,7 @@ public class UpgradeArmorMenuGolden : IMainMenu {
 		Fonts.drawText(FontType.DarkBlue, "Your battles should",90, 60);
 		Fonts.drawText(FontType.DarkBlue, "be easier now.",90, 70);
 		Fonts.drawText(FontType.DarkBlue, "Do your Best, X.",90, 80);
-		if (Global.frameCount % 60 < 30)
+		if (Global.flFrameCount % 60 < 30)
 		Global.sprites["cursorchar"].drawToHUD(0, 94, 94);
 		Fonts.drawText(FontType.RedishOrange, "Enhances The Max Armor.", 30, 150);
 		Fonts.drawText(FontType.RedishOrange, "Grants the Z-Saber", 30, 160);
@@ -1172,7 +1172,7 @@ public class UpgradeArmorMenuEX : IMainMenu {
 			FontType.Pink, string.Format($"Upgrade {upgrades}", xGame),
 			Global.screenW * 0.5f, 20, Alignment.Center
 		);
-		if (Global.frameCount % 60 < 30) {
+		if (Global.flFrameCount % 60 < 30) {
 			bool stEnabled = !Global.level.server.disableHtSt;
 			string leftText = xGame switch {
 				1 when stEnabled => "Items",

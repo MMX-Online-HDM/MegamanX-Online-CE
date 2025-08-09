@@ -143,7 +143,7 @@ public class InGameMainMenu : IMainMenu {
 	public void render() {
 		DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
 		Fonts.drawText(FontType.Yellow, "MENU", Global.halfScreenW-2, 20, Alignment.Center);
-		if (Global.frameCount % 60 < 30) {
+		if (Global.flFrameCount % 60 < 30) {
 			for (int i = 0; i < 7; i++) {
 				if (selectY == i) {
 					Fonts.drawText(FontType.Blue, "<", optionPos2[i], optionPos[i], Alignment.Center, selected: selectY == i);

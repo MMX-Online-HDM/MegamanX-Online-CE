@@ -1008,7 +1008,7 @@ public class Zero : Character {
 		}
 		if (palette != null && hypermodeBlink > 0) {
 			float blinkRate = MathInt.Ceiling(hypermodeBlink / 30f);
-			palette = ((Global.frameCount % (blinkRate * 2) >= blinkRate) ? null : palette);
+			palette = (Global.floorFrameCount % (blinkRate * 2) >= blinkRate) ? null : palette;
 		}
 		if (Global.isOnFrameCycle(4)) {
 			switch (getChargeLevel()) {
@@ -1059,7 +1059,7 @@ public class Zero : Character {
 		float auraAlpha = 1;
 		if (isAwakened && visible && hypermodeBlink > 0) {
 			float blinkRate = MathInt.Ceiling(hypermodeBlink / 2f);
-			bool blinkActive = Global.frameCount % (blinkRate * 2) >= blinkRate;
+			bool blinkActive = Global.floorFrameCount % (blinkRate * 2) >= blinkRate;
 			if (!blinkActive) {
 				auraAlpha = 0.5f;
 			}
@@ -1076,7 +1076,7 @@ public class Zero : Character {
 			}
 			var shaders = new List<ShaderWrapper>();
 			if (isGenmuZero &&
-				Global.frameCount % Global.normalizeFrames(6) > Global.normalizeFrames(3) &&
+				Global.flFrameCount % 6 > 3 &&
 				Global.shaderWrappers.ContainsKey("awakened")
 			) {
 				shaders.Add(Global.shaderWrappers["awakened"]);

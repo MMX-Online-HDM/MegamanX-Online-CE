@@ -60,7 +60,7 @@ public class SelectVileArmorMenu : IMainMenu {
 		DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
 		DrawWrappers.DrawTextureHUD(Global.textures["vileNewMenuDefault"],  Global.halfScreenW+60, Global.halfScreenH-103);
 
-		if (!Global.level.server.disableHtSt && Global.frameCount % 60 < 30) {
+		if (!Global.level.server.disableHtSt && Global.flFrameCount % 60 < 30) {
 			Fonts.drawText(FontType.DarkPurple, "<", 18, Global.halfScreenH + 10, Alignment.Center);
 			Fonts.drawText(FontType.DarkPurple, "Items", 18, Global.halfScreenH + 20, Alignment.Center);
 		}

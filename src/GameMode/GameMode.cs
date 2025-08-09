@@ -325,7 +325,7 @@ public class GameMode {
 		if (!isOver) {
 			if (setupTime == 0 && Global.isHost) {
 				// Just in case packets were dropped, keep syncing "0" time
-				if (Global.frameCount % 30 == 0) {
+				if (Global.flFrameCount % 30 == 0) {
 					Global.serverClient?.rpc(RPC.syncSetupTime, 0, 0);
 				}
 			}

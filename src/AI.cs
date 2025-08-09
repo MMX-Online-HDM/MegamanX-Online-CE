@@ -197,7 +197,7 @@ public class AI {
 			if (localTrainBehavior == AITrainingBehavior.Attack) {
 				player.release(Control.Jump);
 				player.release(Control.Shoot);
-				if (Global.frameCount % 4 == 0) {
+				if (Global.flFrameCount % 4 < 1) {
 					player.press(Control.Shoot);
 				}
 				return;

@@ -428,7 +428,7 @@ public class MatchOptionsMenu : IMainMenu {
 		);
 
 		//Global.sprites["cursor"].drawToHUD(0, startX - 80, startY + 3 + (selectY * lineH));
-		if (Global.frameCount % 60 < 30) {
+		if (Global.flFrameCount % 60 < 30) {
 			for (int a = 0; a < 11; a++) {
 				if (selectY == a) {
 					Fonts.drawText(FontType.Blue, "<", optionPos2[a], startY  + (selectY * lineH), Alignment.Center, selected: selectY == a);

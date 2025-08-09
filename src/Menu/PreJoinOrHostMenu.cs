@@ -196,7 +196,7 @@ public class PreJoinOrHostMenu : IMainMenu {
 		Fonts.drawText(FontType.DarkBlue, "LAN", WD, optionPos[1].y,
 		Alignment.Center, selected: selectY == 1, alpha: 40);
 
-		if (Global.frameCount % 60 < 30) {
+		if (Global.flFrameCount % 60 < 30) {
 		Fonts.drawText(FontType.DarkBlue, "[     ]", WD, optionPos[0].y,
 		Alignment.Center,selected: selectY == 0);
 		}

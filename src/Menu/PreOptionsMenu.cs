@@ -126,7 +126,7 @@ public class PreOptionsMenu : IMainMenu {
 			tileFont = FontType.Yellow;
 			menuFont = FontType.Blue;
 		}
-		if (Global.frameCount % 60 < 30) {
+		if (Global.flFrameCount % 60 < 30) {
 			for (int i = 0; i < 6; i++) {
 				if (selectY == i) {
 					Fonts.drawText(FontType.Blue, "<", cursorHandler[i], optionPos[i], Alignment.Center, selected: selectY == i,
@@ -225,7 +225,7 @@ public class PreOptionsMenuCharacter : IMainMenu {
 		}
 		FontType menuFont = inGame ? FontType.Blue : FontType.DarkBlue;
 		Global.sprites["optionMode"].drawToHUD(inGame ? 2 : 2, Global.screenW * 0.5f + 1, 20);
-		if (Global.frameCount % 60 < 30) {
+		if (Global.flFrameCount % 60 < 30) {
 			for (int i = 0; i < 5; i++) {
 				if (selectY == i) {
 					Fonts.drawText(FontType.Blue, "<", cursorHandler[i], optionPos[i], Alignment.Center, selected: selectY == i,

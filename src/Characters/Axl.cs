@@ -1700,7 +1700,7 @@ public class Axl : Character {
 		if (whiteAxlTime > 3) paletteNum = 1;
 		else if (whiteAxlTime > 0) {
 			int mod = MathInt.Ceiling(whiteAxlTime) * 2;
-			paletteNum = (Global.frameCount % (mod * 2)) < mod ? 0 : 1;
+			paletteNum = (Global.floorFrameCount % (mod * 2)) < mod ? 0 : 1;
 		}
 		palette = player.axlPaletteShader;
 		palette?.SetUniform("palette", paletteNum);

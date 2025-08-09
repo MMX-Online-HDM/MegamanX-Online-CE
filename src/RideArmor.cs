@@ -299,7 +299,7 @@ public class RideArmor : Actor, IDamagable {
 			else if (selfDestructTime >= 6 && selfDestructTime < 8) flashFrequency = 15;
 			else if (selfDestructTime >= 8) flashFrequency = 5;
 
-			if (Global.frameCount % flashFrequency == 0) {
+			if (Global.floorFrameCount % flashFrequency == 0) {
 				addRenderEffect(RenderEffectType.Hit);
 			} else {
 				removeRenderEffect(RenderEffectType.Hit);

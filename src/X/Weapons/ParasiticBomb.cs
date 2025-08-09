@@ -86,7 +86,7 @@ public class ParasiticBombProj : Projectile {
 
 	public override void render(float x, float y) {
 		base.render(x, y);
-		Global.sprites["parasitebomb_light"].draw(MathInt.Round(Global.frameCount * 0.25f) % 4, pos.x + x, pos.y + y, 1, 1, null, 1, 1, 1, zIndex);
+		Global.sprites["parasitebomb_light"].draw(MathInt.Round(Global.flFrameCount * 0.25f) % 4, pos.x + x, pos.y + y, 1, 1, null, 1, 1, 1, zIndex);
 	}
 }
 

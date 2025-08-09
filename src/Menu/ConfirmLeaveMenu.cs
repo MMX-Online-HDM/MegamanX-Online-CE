@@ -50,7 +50,7 @@ public class ConfirmLeaveMenu : IMainMenu {
 			);
 		}
 		//Global.sprites["cursor"].drawToHUD(0, 70, 76 + (selectY * 20) - 3);
-		if (Global.frameCount % 60 < 30) {
+		if (Global.flFrameCount % 60 < 30) {
 			if (selectY == 0) {
 				Fonts.drawText(FontType.Blue, "<", optionPos1.x - 15, optionPos1.y, Alignment.Center, selected: selectY == 0);
 				Fonts.drawText(FontType.Blue, ">", optionPos1.x + 15, optionPos1.y, Alignment.Center, selected: selectY == 0);

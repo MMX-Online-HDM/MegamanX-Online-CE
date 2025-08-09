@@ -75,7 +75,7 @@ public class Hurt : CharState {
 
 		if (isMiniFlinch()) {
 			character.frameSpeed = 0;
-			if (Global.frameCount % 2 == 0) {
+			if (Global.floorFrameCount % 2 == 0) {
 				if (player.charNum == 0) character.frameIndex = 3;
 				if (player.charNum == 1) character.frameIndex = 3;
 				if (player.charNum == 2) character.frameIndex = 0;

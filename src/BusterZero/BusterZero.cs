@@ -134,9 +134,9 @@ public class BusterZero : Character {
 		}
 		if (!isCharging()) {
 			if (shootPressed) {
-				lastShootPressed = Global.frameCount;
+				lastShootPressed = Global.floorFrameCount;
 			}
-			int framesSinceLastShootPressed = Global.frameCount - lastShootPressed;
+			int framesSinceLastShootPressed = Global.floorFrameCount - lastShootPressed;
 			if (shootPressed || framesSinceLastShootPressed < 6) {
 				if (stockedBusterLv >= 1) {
 					if (charState is WallSlide) {

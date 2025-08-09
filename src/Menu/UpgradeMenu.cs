@@ -207,10 +207,10 @@ public class UpgradeMenu : IMainMenu {
 			);
 		}
 
-		if (Global.frameCount % 60 < 30 && mainPlayer.realCharNum == 2) {
+		if (Global.flFrameCount % 60 < 30 && mainPlayer.realCharNum == 2) {
 			Fonts.drawText(FontType.DarkPurple, ">", Global.screenW - 14, Global.halfScreenH, Alignment.Center);
 			//Fonts.drawText(FontType.DarkPurple, "Armor", Global.screenW - 25, Global.halfScreenH + 15, Alignment.Center);
-		} else if (Global.frameCount % 60 < 30 && mainPlayer.canUpgradeXArmor()) {
+		} else if (Global.flFrameCount % 60 < 30 && mainPlayer.canUpgradeXArmor()) {
 			Fonts.drawText(FontType.DarkPurple, "<", 14, Global.halfScreenH, Alignment.Center);
 			//Fonts.drawText(FontType.DarkPurple, "X3", 12, Global.halfScreenH + 15, Alignment.Center);
 
@@ -279,7 +279,7 @@ public class UpgradeMenu : IMainMenu {
 					float targetXPos = 113;
 					if (subtankTargets.Count > 1) {
 						Global.sprites["hud_weapon_icon"].drawToHUD(currentTarget.weaponSlotIndex, optionPos.x + targetXPos, optionPos.y + 4);
-						if (Global.frameCount % 60 < 30) {
+						if (Global.flFrameCount % 60 < 30) {
 							Fonts.drawText(FontType.DarkPurple, "<", optionPos.x + targetXPos - 12, optionPos.y - 2, Alignment.Center);
 							Fonts.drawText(FontType.DarkPurple, ">", optionPos.x + targetXPos + 12, optionPos.y - 2, Alignment.Center);
 						}

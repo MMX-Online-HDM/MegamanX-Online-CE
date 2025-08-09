@@ -660,7 +660,11 @@ public partial class Actor : GameObject {
 					if (bigBubbleTime <= 0) {
 						bigBubbleTime = 0.08f;
 						var points = globalCollider?.shape.points;
-						if (points != null && points.Count >= 1) new BubbleAnim(new Point(pos.x, points[0].y), "bigbubble" + ((Global.frameCount % 3) + 1));
+						if (points != null && points.Count >= 1) {
+							new BubbleAnim(
+								new Point(pos.x, points[0].y), "bigbubble" + ((Global.floorFrameCount % 3) + 1)
+							);
+						}
 					}
 				}
 			} else {
