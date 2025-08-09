@@ -7,8 +7,8 @@ namespace MMXOnline;
 public class MegamanX : Character {
 	// Shoot variables.
 	public float shootCooldown;
-	public int lastShootPressed;
-	public bool bufferedShotPressed => lastShootPressed < 6 || player.input.isPressed(Control.Shoot, player);
+	public float lastShootPressed;
+	public bool bufferedShotPressed => lastShootPressed <= 5 || player.input.isPressed(Control.Shoot, player);
 	public float specialSaberCooldown;
 	public XBuster specialBuster;
 	public int specialButtonMode;
@@ -203,7 +203,7 @@ public class MegamanX : Character {
 		Helpers.decrementFrames(ref stingActiveTime);
 
 		if (lastShootPressed < 100) {
-			lastShootPressed++;
+			lastShootPressed += Global.gameSpeed;
 		}
 		player.hadoukenAmmo += Global.speedMul;
 		if (player.hadoukenAmmo > player.fgMoveMaxAmmo) player.hadoukenAmmo = player.fgMoveMaxAmmo;
