@@ -1578,14 +1578,14 @@ public partial class Actor : GameObject {
 			string projName = key;
 			float cooldown = projectileCooldown[key];
 			if (cooldown > 0) {
-				projectileCooldown[projName] = Helpers.clampMin(cooldown - 1, 0);
+				projectileCooldown[projName] = Helpers.clampMin(cooldown - Global.gameSpeed, 0);
 			}
 		}
 		foreach (var key in flinchCooldown.Keys.ToList()) {
 			int projName = key;
 			float cooldown = flinchCooldown[key];
 			if (cooldown > 0) {
-				flinchCooldown[projName] = Helpers.clampMin(cooldown - 1, 0);
+				flinchCooldown[projName] = Helpers.clampMin(cooldown - Global.gameSpeed, 0);
 			}
 		}
 	}

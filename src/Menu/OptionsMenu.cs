@@ -1289,7 +1289,7 @@ public class OptionsMenu : IMainMenu {
 	public static void setPresetQuality(int graphicsPreset) {
 		if (graphicsPreset >= 3) return;
 		Options.main.graphicsPreset = graphicsPreset;
-		Options.main.fontType = 0; //(graphicsPreset == 0 ? 0 : 1);
+		//Options.main.fontType = 0; //(graphicsPreset == 0 ? 0 : 1);
 		Options.main.particleQuality = graphicsPreset;
 		Options.main.enablePostProcessing = (graphicsPreset > 0);
 		Options.main.disableShaders = (graphicsPreset == 0);

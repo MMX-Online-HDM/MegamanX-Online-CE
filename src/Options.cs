@@ -47,7 +47,7 @@ public class Options {
 		return disableShaders;
 	}
 	public int textQuality = 0;
-	public int fontType = 0; // 0 = bitmap only, 1 = bitmap + vector, 2 = vector only
+	//public int fontType = 0; // 0 = bitmap only, 1 = bitmap + vector, 2 = vector only
 	public bool enablePostProcessing = true;
 	public int particleQuality = 0;
 	public bool enableMapSprites = true;
@@ -125,8 +125,8 @@ public class Options {
 				if (Global.debug) {
 					_main.axlAimMode = Global.overrideAimMode ?? _main.axlAimMode;
 					_main.fullScreen = Global.overrideFullscreen ?? _main.fullScreen;
-					_main.maxFPS = MathInt.Clamp(_main.maxFPS, 30, Global.fpsCap);
-					_main.fontType = Global.fontTypeOverride ?? _main.fontType;
+					//_main.maxFPS = MathInt.Clamp(_main.maxFPS, 30, Global.fpsCap);
+					//_main.fontType = Global.fontTypeOverride ?? _main.fontType;
 				}
 			}
 

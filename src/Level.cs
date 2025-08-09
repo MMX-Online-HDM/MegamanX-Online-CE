@@ -1301,12 +1301,12 @@ public partial class Level {
 				continue;
 			}
 			if (isTimeSlowed(go, out float slowAmount)) {
-				Global.speedMul = slowAmount;
-				go.speedMul = slowAmount;
+				Global.speedMul = slowAmount * Global.gameSpeed;
+				go.speedMul = slowAmount * Global.gameSpeed;
 			}
 			go.preUpdate();
 			go.statePreUpdate();
-			Global.speedMul = 1;
+			Global.speedMul = Global.gameSpeed;
 		}
 
 		// Preupdate RPCs.
@@ -1324,8 +1324,8 @@ public partial class Level {
 				continue;
 			}
 			if (isTimeSlowed(go, out float slowAmount)) {
-				Global.speedMul = slowAmount;
-				go.speedMul = slowAmount;
+				Global.speedMul = slowAmount * Global.gameSpeed;
+				go.speedMul = slowAmount * Global.gameSpeed;
 			}
 			go.update();
 			go.stateUpdate();
@@ -1350,12 +1350,12 @@ public partial class Level {
 							actor.playSound("hit");
 							actor.addRenderEffect(RenderEffectType.Hit, 3, 6);
 							damagable.applyDamage(2, null, null, null, null);
-							damagable.projectileCooldown["sigmavirus"] = 1;
+							damagable.projectileCooldown["sigmavirus"] = 60;
 						}
 					}
 				}
 			}
-			Global.speedMul = 1;
+			Global.speedMul = Global.gameSpeed;
 		}
 
 		// Normal update RPCs.
@@ -1430,20 +1430,20 @@ public partial class Level {
 						currentGrid[i], currentGrid[j]
 					);
 					if (iDatas.Count > 0) {
-						Global.speedMul = currentGrid[i].speedMul;
+						Global.speedMul = currentGrid[i].speedMul * Global.gameSpeed;
 						iDatas = organizeTriggers(iDatas);
 						foreach (CollideData collideDataI in iDatas) {
 							currentGrid[i].registerCollision(collideDataI);
 						}
-						Global.speedMul = 1;
+						Global.speedMul = Global.gameSpeed;
 					}
 					if (jDatas.Count > 0) {
-						Global.speedMul = currentGrid[j].speedMul;
+						Global.speedMul = currentGrid[j].speedMul * Global.gameSpeed;
 						jDatas = organizeTriggers(jDatas);
 						foreach (CollideData collideDataJ in jDatas) {
 							currentGrid[j].registerCollision(collideDataJ);
 						}
-						Global.speedMul = 1;
+						Global.speedMul = Global.gameSpeed;
 					}
 				}
 				// Continue if we get destroyed.
@@ -1471,18 +1471,18 @@ public partial class Level {
 						actor, geometry
 					);
 					if (iData != null) {
-						Global.speedMul = currentGrid[i].speedMul;
+						Global.speedMul = currentGrid[i].speedMul * Global.gameSpeed;
 						currentGrid[i].registerCollision(iData);
-						Global.speedMul = 1;
+						Global.speedMul = Global.gameSpeed;
 					}
 					if (jData != null) {
 						Global.speedMul = wallObj.speedMul;
 						wallObj.registerCollision(jData);
-						Global.speedMul = 1;
+						Global.speedMul = Global.gameSpeed;
 					}
 				}
 			}
-			Global.speedMul = 1;
+			Global.speedMul = Global.gameSpeed;
 		}
 
 		// Collision RPCs.
@@ -1514,12 +1514,12 @@ public partial class Level {
 				continue;
 			}
 			if (isTimeSlowed(go, out float slowAmount)) {
-				Global.speedMul = slowAmount;
-				go.speedMul = slowAmount;
+				Global.speedMul = slowAmount * Global.gameSpeed;
+				go.speedMul = slowAmount * Global.gameSpeed;
 			}
 			go.postUpdate();
 			go.statePostUpdate();
-			Global.speedMul = 1;
+			Global.speedMul = Global.gameSpeed;
 			go.netUpdate();
 		}
 

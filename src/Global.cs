@@ -156,7 +156,7 @@ public partial class Global {
 	public static bool debugDNACores = false;
 	// Generic global that can be used for quick conditional breakpoints in low-level physics methods
 	public static bool breakpoint = false;
-	public static int? overrideFPS = 60;
+	//public static int? overrideFPS = 60;
 	public static bool disableShaderOverride = false;
 	public static bool? useOptimizedAssetsOverride = false;
 	public static bool useLocalIp = false;
@@ -190,7 +190,7 @@ public partial class Global {
 			overrideFullscreen = null;
 			overrideAimMode = null;
 			autoFire = null;
-			overrideFPS = null;
+			//overrideFPS = null;
 			quickStartMechNum = null;
 			quickStartVileMK2 = null;
 			spawnTrainingHealth = true;
@@ -502,6 +502,8 @@ public partial class Global {
 	}
 	public static float time;
 	public static int frameCount = 0;
+	public static float fFrameCount => frameCount * gameSpeed;
+
 	public static int normalizeFrames(int frames) {
 		/*
 		float fpsRatio = 1;

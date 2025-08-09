@@ -99,11 +99,11 @@ public partial class Global {
 		DrawWrappers.hudView.Viewport = viewPort;
 
 		window.SetView(view);
-		if (Global.overrideFPS != null) {
+		/*if (Global.overrideFPS != null) {
 			window.SetFramerateLimit((uint)Global.overrideFPS);
 		} else {
 			window.SetFramerateLimit((uint)options.maxFPS);
-		}
+		}*/
 
 		window.SetActive();
 	}

@@ -1236,8 +1236,12 @@ class Program {
 		decimal deltaTime = 0;
 		decimal deltaTimeAlt = 0;
 		decimal lastAltUpdateTime = 0;
-		decimal fpsLimit = (TimeSpan.TicksPerSecond / 60m);
-		decimal fpsLimitAlt = (TimeSpan.TicksPerSecond / 240m);
+		// Set FPS cap.
+		decimal targetFps = 60m / (decimal)Global.gameSpeed;
+		decimal fpsLimit = TimeSpan.TicksPerSecond / targetFps;
+		Global.speedMul = Global.gameSpeed;
+		decimal fpsLimitAlt = TimeSpan.TicksPerSecond / 240m;
+		// Other frame data.
 		long lastSecondFPS = 0;
 		int videoUpdatesThisSecond = 0;
 		int framesUpdatesThisSecond = 0;
