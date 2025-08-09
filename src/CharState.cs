@@ -892,7 +892,7 @@ public class Dash : CharState {
 			shootSprite = "dash_end_shoot";
 			character.changeSpriteFromName(character.shootAnimTime > 0 ? shootSprite : sprite, true);
 		}
-		if (dashTime <= 3 || stop) {
+		if (dashTime < 4 || stop) {
 			if (inputXDir != 0 && inputXDir != dashDir) {
 				character.xDir = (int)inputXDir;
 				dashDir = character.xDir;
@@ -1015,14 +1015,14 @@ public class AirDash : CharState {
 				exitOnLanding = true;
 			}
 		}
-		if (dashTime <= 3 || stop) {
+		if (dashTime < 4 || stop) {
 			if (inputXDir != 0 && inputXDir != dashDir) {
 				character.xDir = (int)inputXDir;
 				dashDir = character.xDir;
 			}
 		}
 		// Dash regular speed.
-		if (dashTime > 3 && !stop) {
+		if (dashTime >= 4 && !stop) {
 			character.move(new Point(character.getDashSpeed() * dashDir, 0));
 		}
 		// End move.

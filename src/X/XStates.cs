@@ -121,14 +121,14 @@ public class LightDash : CharState {
 			shootSprite = "dash_end_shoot";
 			character.changeSpriteFromName(character.shootAnimTime > 0 ? shootSprite : sprite, true);
 		}
-		if (dashTime <= 3 || stop) {
+		if (dashTime < 4 || stop) {
 			if (inputXDir != 0 && inputXDir != dashDir) {
 				character.xDir = (int)inputXDir;
 				dashDir = character.xDir;
 			}
 		}
 		// Dash regular speed.
-		if (dashTime > 3 && !stop) {
+		if (dashTime >= 4 && !stop) {
 			character.move(new Point(character.getDashSpeed() * 1.15f * dashDir, 0));
 		}
 		// End move.
@@ -231,14 +231,14 @@ public class GigaAirDash : CharState {
 			shootSprite = "dash_end_shoot";
 			character.changeSpriteFromName(character.shootAnimTime > 0 ? shootSprite : sprite, true);
 		}
-		if (dashTime <= 3 || stop) {
+		if (dashTime < 4 || stop) {
 			if (inputXDir != 0 && inputXDir != dashDir) {
 				character.xDir = (int)inputXDir;
 				dashDir = character.xDir;
 			}
 		}
 		// Dash regular speed.
-		if (dashTime > 3 && !stop || stop && dashHeld) {
+		if (dashTime >= 4 && !stop || stop && dashHeld) {
 			character.move(new Point(character.getDashSpeed() * 1.15f * dashDir, 0));
 		}
 		// Dash start and end while hold.
