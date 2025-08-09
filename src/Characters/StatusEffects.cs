@@ -254,7 +254,7 @@ public class GenericStun : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.stopMovingWeak();
+		character.stopMoving();
 		hurtDir = -character.xDir;
 		// To continue the flinch if was flinched before the stun.
 		if (oldState is Hurt hurtState) {

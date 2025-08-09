@@ -354,7 +354,7 @@ public class FallSaber : CharState {
 		if (limboVehicleCheckTime == 0 && character.limboRACheckCooldown == 0) {
 			this.limboVehicle = limboVehicle;
 			limboVehicleCheckTime = 1;
-			character.stopMoving();
+			character.stopMovingS();
 			character.useGravity = false;
 			if (limboVehicle is RideArmor ra) {
 				RPC.checkRAEnter.sendRpc(player.id, ra.netId, ra.neutralId, ra.raNum);

@@ -296,7 +296,7 @@ public class SparkMClimbState : MaverickState {
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 		maverick.useGravity = false;
-		maverick.stopMoving();
+		maverick.stopMovingS();
 		maverick.changePos(new Point(maverick.pos.x, hitPoint.y + maverick.height));
 	}
 

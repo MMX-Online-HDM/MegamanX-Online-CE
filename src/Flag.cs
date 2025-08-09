@@ -105,7 +105,7 @@ public class Flag : Actor {
 
 	public void removeUpdraft() {
 		gravityModifier = 1;
-		stopMoving();
+		stopMovingS();
 		updraftY = null;
 	}
 

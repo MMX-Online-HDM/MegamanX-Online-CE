@@ -616,7 +616,7 @@ public class WSpongeClingState : MaverickState {
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 		maverick.useGravity = false;
-		maverick.stopMoving();
+		maverick.stopMovingS();
 	}
 
 	public override void onExit(MaverickState newState) {
@@ -887,7 +887,7 @@ public class WSpongeUpChainHangState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		maverick.stopMoving();
+		maverick.stopMovingS();
 	}
 
 	public override void onExit(MaverickState newState) {

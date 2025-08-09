@@ -364,7 +364,7 @@ public class StingCClimb : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		maverick.stopMoving();
+		maverick.stopMovingS();
 		maverick.useGravity = false;
 	}
 
@@ -376,7 +376,7 @@ public class StingCClimb : MaverickState {
 
 	public override void update() {
 		base.update();
-		maverick.stopMoving();
+		maverick.stopMovingS();
 		if (inTransition()) {
 			return;
 		}
@@ -446,7 +446,7 @@ public class StingCTongueState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		maverick.stopMoving();
+		maverick.stopMovingS();
 	}
 
 	public override void update() {
@@ -486,7 +486,7 @@ public class StingCClimbTongueState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		maverick.stopMoving();
+		maverick.stopMovingS();
 		maverick.useGravity = false;
 		this.oldState = oldState;
 	}
@@ -554,7 +554,7 @@ public class StingCHangState : StingCMState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		maverick.stopMoving();
+		maverick.stopMovingS();
 		maverick.useGravity = false;
 		maverick.changePos(getTargetPos(maverick));
 		maverick.frameSpeed = 0;

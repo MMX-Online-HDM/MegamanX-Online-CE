@@ -583,7 +583,7 @@ public class ChillPBlizzardState : PenguinMState {
 					maverick.changePos(new Point(maverick.pos.x, switchPos.Value.y + switchSpriteHeight));
 				}
 				maverick.useGravity = false;
-				maverick.stopMoving();
+				maverick.stopMovingS();
 				if (!once && maverick.frameIndex == 3) {
 					once = true;
 					float topY = Global.level.getTopScreenY(maverick.pos.y);

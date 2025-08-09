@@ -1106,7 +1106,7 @@ public partial class Character : Actor, IDamagable {
 
 		if (pos.y > Global.level.killY && !isWarpIn() && charState is not WarpOut) {
 			if (charState is WolfSigmaRevive wsr) {
-				stopMoving();
+				stopMovingS();
 				useGravity = false;
 				wsr.groundStart = true;
 			} else {

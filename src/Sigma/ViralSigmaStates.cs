@@ -29,7 +29,7 @@ public class ViralSigmaIdle : CharState {
 
 	public override void update() {
 		stateTime += Global.spf;
-		character.stopMoving();
+		character.stopMovingS();
 
 		var inputDir = player.input.getInputDir(player);
 		var moveAmount = inputDir.times(125);
@@ -510,7 +510,7 @@ public class ViralSigmaRevive : CharState {
 				character.invulnTime = 0.5f;
 				character.useGravity = false;
 				character.angle = 0;
-				character.stopMoving();
+				character.stopMovingS();
 				character.grounded = false;
 				character.canBeGrounded = false;
 

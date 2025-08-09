@@ -435,7 +435,7 @@ public class KaiserSigmaVirusState : CharState {
 		base.update();
 
 		stateTime += Global.spf;
-		character.stopMoving();
+		character.stopMovingS();
 
 		if (!startAnimOver) {
 			character.xScale += Global.spf * 2.5f;
@@ -969,7 +969,7 @@ public class KaiserSigmaRevive : CharState {
 			if (player.health >= player.maxHealth) {
 				character.invulnTime = 0.5f;
 				character.useGravity = true;
-				character.stopMoving();
+				character.stopMovingS();
 				character.grounded = false;
 				character.canBeGrounded = false;
 

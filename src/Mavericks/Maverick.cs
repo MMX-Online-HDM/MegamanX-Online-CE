@@ -427,7 +427,7 @@ public class Maverick : Actor, IDamagable {
 
 	public virtual bool normalCtrl() {
 		if (input.isPressed(Control.Up, player) && canFly && state is not MFly && !state.wasFlying) {
-			stopMovingWeak();
+			stopMoving();
 			incPos(new Point(0, -4));
 			grounded = false;
 			changeState(new MFly());

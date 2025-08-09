@@ -15,7 +15,7 @@ public class WolfSigmaHeadState : CharState {
 	}
 
 	public override void update() {
-		character.stopMoving();
+		character.stopMovingS();
 		character.changePos(startPos);
 		stateTime += Global.spf;
 		if (Global.level.gameMode.isOver && Global.level.gameMode.playerWon(player)) {
@@ -39,7 +39,7 @@ public class WolfSigmaHeadState : CharState {
 		base.onEnter(oldState);
 		sigma = character as WolfSigma;
 		character.invulnTime = 0.5f;
-		character.stopMoving();
+		character.stopMovingS();
 		startPos = character.pos;
 	}
 
@@ -165,7 +165,7 @@ public class WolfSigmaHead : Actor, IDamagable {
 	public override void update() {
 		base.update();
 
-		stopMoving();
+		stopMovingS();
 		changePos(startPos);
 
 		if (explodeTime > 0) {
@@ -902,7 +902,7 @@ public class WolfSigmaRevive : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		sigma = character as WolfSigma;
-		character.stopMoving();
+		character.stopMovingS();
 		character.visible = false;
 		character.useGravity = false;
 		character.frameSpeed = 0;

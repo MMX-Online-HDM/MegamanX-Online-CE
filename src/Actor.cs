@@ -556,7 +556,7 @@ public partial class Actor : GameObject {
 
 	public virtual void update() {
 		if (immuneToKnockback) {
-			stopMoving();
+			stopMovingS();
 		}
 
 		foreach (var key in netSounds.Keys.ToList()) {
@@ -1602,7 +1602,7 @@ public partial class Actor : GameObject {
 		}
 	}
 
-	public void stopMoving() {
+	public void stopMovingS() {
 		xIceVel = 0;
 		xPushVel = 0;
 		xSwingVel = 0;
@@ -1610,7 +1610,7 @@ public partial class Actor : GameObject {
 		vel.y = 0;
 	}
 
-	public void stopMovingWeak() {
+	public void stopMoving() {
 		vel.x = 0;
 		vel.y = 0;
 	}

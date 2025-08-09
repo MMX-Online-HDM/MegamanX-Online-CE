@@ -651,7 +651,7 @@ public class MorphMCThreadState : MothMState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		maverick.stopMoving();
+		maverick.stopMovingS();
 		proj = new MorphMCThreadProj(
 			maverick.getFirstPOIOrDefault(), 1, MetamorMothmeanos, 
 			player, player.getNextActorNetId(), rpc: true
@@ -684,7 +684,7 @@ public class MorphMCLatchState : MothMState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		maverick.stopMoving();
+		maverick.stopMovingS();
 		maverick.useGravity = false;
 		maverick.grounded = false;
 		maverick.canBeGrounded = false;
@@ -847,7 +847,7 @@ public class MorphMCHangState : MothMState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		maverick.stopMoving();
+		maverick.stopMovingS();
 		maverick.angle = 0;
 		if (maverick.controlMode == MaverickModeId.Striker) {
 			if (stateAI >= 0) {

@@ -731,7 +731,7 @@ public class InRideChaser : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.stopMoving();
+		character.stopMovingS();
 		character.useGravity = false;
 		character.setGlobalColliderTrigger(true);
 		var mechWeapon = player.weapons.FirstOrDefault(m => m is MechMenuWeapon) as MechMenuWeapon;

@@ -459,7 +459,7 @@ public class WarpIn : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.stopMoving();
+		character.stopMovingS();
 		character.useGravity = false;
 		character.visible = false;
 		character.frameSpeed = 0;
@@ -531,7 +531,7 @@ public class WarpIdle : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.stopMoving();
+		character.stopMovingS();
 		character.useGravity = false;
 		specialId = SpecialStateIds.WarpIdle;
 		character.invulnTime = firstSpawn ? 5 : 0;
@@ -584,7 +584,7 @@ public class WarpOut : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.stopMoving();
+		character.stopMovingS();
 		character.useGravity = false;
 		character.visible = false;
 		destY = character.pos.y - yOffset;
@@ -845,7 +845,7 @@ public class Fall : CharState {
 		if (limboVehicleCheckTime == 0 && character.limboRACheckCooldown == 0) {
 			this.limboVehicle = limboVehicle;
 			limboVehicleCheckTime = 1;
-			character.stopMoving();
+			character.stopMovingS();
 			character.useGravity = false;
 			if (limboVehicle is RideArmor ra) {
 				RPC.checkRAEnter.sendRpc(player.id, ra.netId, ra.neutralId, ra.raNum);
@@ -1257,7 +1257,7 @@ public class LadderClimb : CharState {
 		if (character.player == Global.level.mainPlayer) {
 			Global.level.lerpCamTime = 0.25f;
 		}
-		character.stopMoving();
+		character.stopMovingS();
 		character.useGravity = false;
 		character.dashedInAir = 0;
 	}
@@ -1345,7 +1345,7 @@ public class LadderEnd : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.useGravity = false;
-		character.stopMoving();
+		character.stopMovingS();
 	}
 
 	public override void onExit(CharState? newState) {
@@ -1392,7 +1392,7 @@ public class Die : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.useGravity = false;
-		character.stopMoving();
+		character.stopMovingS();
 		character.stopCharge();
 		new Anim(character.pos.addxy(0, -12), "die_sparks", 1, null, true);
 
@@ -1602,7 +1602,7 @@ public class GenericGrabbedState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.stopMoving();
+		character.stopMovingS();
 		//character.stopCharge();
 		character.useGravity = false;
 		character.grounded = false;

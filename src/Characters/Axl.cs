@@ -385,7 +385,7 @@ public class Axl : Character {
 			if (zoomCharge > 1) zoomCharge = 1;
 		}
 		if (assassinTime > 0) {
-			stopMoving();
+			stopMovingS();
 			useGravity = false;
 			Helpers.decrementFrames(ref assassinTime);
 			if (assassinTime <= 0) {

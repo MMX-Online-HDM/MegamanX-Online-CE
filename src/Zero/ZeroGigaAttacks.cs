@@ -847,7 +847,7 @@ public class DarkHoldState : CharState {
 
 	public override void update() {
 		base.update();
-		character.stopMoving();
+		character.stopMovingS();
 		if (stunTime <= 0) {
 			stunTime = 0;
 			character.changeToIdleOrFall();
@@ -868,7 +868,7 @@ public class DarkHoldState : CharState {
 		character.useGravity = false;
 		character.frameSpeed = 0;
 		character.frameIndex = frameIndex;
-		character.stopMoving();
+		character.stopMovingS();
 		character.isDarkHoldState = true;
 		invincible = oldState.invincible;
 		specialId = oldState.specialId;

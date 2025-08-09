@@ -426,7 +426,7 @@ public class MorphMHatchState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		maverick.stopMoving();
+		maverick.stopMovingS();
 		maverick.useGravity = false;
 	}
 }

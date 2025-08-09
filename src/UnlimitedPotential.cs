@@ -427,7 +427,7 @@ public class UPGrabbed : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.stopMoving();
+		character.stopMovingS();
 		character.stopCharge();
 		savedZIndex = character.zIndex;
 		character.setzIndex(grabber.zIndex - 100);

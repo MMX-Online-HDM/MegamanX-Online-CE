@@ -70,7 +70,7 @@ public class XHover : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.stopMovingWeak();
+		character.stopMoving();
 		startXDir = character.xDir;
 		if (stateTime <= 0.1f) {
 			sound = character.playSound("uahover", forcePlay: false, sendRpc: true);

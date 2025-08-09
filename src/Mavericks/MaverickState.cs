@@ -151,7 +151,7 @@ public class MaverickState {
 		if (oldState is MFly) wasFlying = true;
 		if (enterSound != "") maverick.playSound(enterSound, sendRpc: true);
 		if (!useGravity) maverick.useGravity = false;
-		if (stopMoving) maverick.stopMovingWeak();
+		if (stopMoving) maverick.stopMoving();
 	}
 
 	public virtual void onExit(MaverickState newState) {
@@ -1019,7 +1019,7 @@ public class MDie : MaverickState {
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 		maverick.useGravity = false;
-		maverick.stopMoving();
+		maverick.stopMovingS();
 		maverick.globalCollider = null;
 		deathPos = maverick.pos;
 		if (maverick is Velguarder) {
@@ -1166,7 +1166,7 @@ public class MWallSlide : MaverickState {
 			if (maverick is not NeonTiger) {
 				maverick.move(new Point(0, 100));
 			} else {
-				maverick.stopMoving();
+				maverick.stopMovingS();
 			}
 		}
 
@@ -1187,7 +1187,7 @@ public class MWallSlide : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		maverick.stopMoving();
+		maverick.stopMovingS();
 		if (leftOff) {
 			maverick.frameIndex = maverick.sprite.totalFrameNum - 1;
 			maverick.useGravity = false;

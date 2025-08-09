@@ -206,14 +206,14 @@ public class PZeroDiveKickState : PZeroState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.stopMovingWeak();
+		character.stopMoving();
 		character.useGravity = false;
 	}
 
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
-		character.stopMovingWeak();
+		character.stopMoving();
 		zero.diveKickCooldown = 60;
 	}
 }

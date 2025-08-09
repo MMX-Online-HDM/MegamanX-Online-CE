@@ -201,7 +201,7 @@ public class FlamethrowerState : VileState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.stopMovingWeak();
+		character.stopMoving();
 		character.useGravity = false;
 		character.vel = new Point();
 		if (character.grounded && character.vel.y >= 0) {
