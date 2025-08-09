@@ -373,7 +373,7 @@ public class Weapon {
 			weaponHealTime = 0;
 			return;
 		}
-		weaponHealTime += 1;
+		weaponHealTime += Global.gameSpeed;
 		if (weaponHealTime >= 4) {
 			weaponHealCount += ammoDisplayScale;
 			weaponHealTime = 0;
