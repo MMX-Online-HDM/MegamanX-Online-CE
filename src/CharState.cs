@@ -899,7 +899,7 @@ public class Dash : CharState {
 			}
 		}
 		// Dash regular speed.
-		if (dashTime > 3 && !stop) {
+		if (dashTime >= 4 && !stop) {
 			character.move(new Point(character.getDashSpeed() * dashDir, 0));
 		}
 		// End move.
