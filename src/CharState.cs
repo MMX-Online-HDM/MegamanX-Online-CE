@@ -513,7 +513,7 @@ public class WarpIdle : CharState {
 
 	public void refillNormal() {
 		fullAlt = true;
-		healTime++;
+		healTime += Global.gameSpeed;
 		if (fullHP || healTime < 3) {
 			return;
 		}
