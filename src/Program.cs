@@ -1237,6 +1237,7 @@ class Program {
 		decimal deltaTimeAlt = 0;
 		decimal lastAltUpdateTime = 0;
 		// Set FPS cap.
+		float lastGameSpeed = Global.gameSpeed;
 		decimal targetFps = 60m / (decimal)Global.gameSpeed;
 		decimal fpsLimit = TimeSpan.TicksPerSecond / targetFps;
 		Global.speedMul = Global.gameSpeed;
@@ -1251,6 +1252,7 @@ class Program {
 		bool continueNextFrameStep = false;
 		bool f5Released = true;
 		bool f6Released = true;
+		bool f7Released = true;
 		// WARNING DISABLE THIS FOR NON-DEBUG BUILDS
 		bool frameStepEnabled = true;
 		var clearColor = Color.Black;
@@ -1287,11 +1289,28 @@ class Program {
 					} else {
 						f6Released = true;
 					}
+					// Framerate shenanigans.
+					if (Keyboard.IsKeyPressed(Key.F7)) {
+						if (f7Released) {
+							Global.gameSpeed = Global.gameSpeed == 1 ? 0.5f : 1;
+							f7Released = false;
+						}
+					} else {
+						f7Released = true;
+					}
 				}
 			}
 			if (!(deltaTime >= 1)) {
 				continue;
 			}
+			// In case we chage the target framerate.
+			// We should disable this on release builds... maybe.
+			if (lastGameSpeed != Global.gameSpeed) {
+				lastGameSpeed = Global.gameSpeed;
+				targetFps = 60m / (decimal)Global.gameSpeed;
+				fpsLimit = TimeSpan.TicksPerSecond / targetFps;
+			}
+
 			long timeSecondsNow = (long)Math.Floor(timeSpam.TotalSeconds);
 			if (timeSecondsNow > lastSecondFPS) {
 				Global.currentFPS = videoUpdatesThisSecond;
