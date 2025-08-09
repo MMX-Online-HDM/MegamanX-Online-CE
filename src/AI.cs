@@ -236,7 +236,7 @@ public class AI {
 		if (target != null && target.destroyed) {
 			target = null;
 		}
-		if (Global.level.frameCount % 60 == targetUpdateFrame) {
+		if (Global.flFrameCount % 60 == targetUpdateFrame) {
 			if (target != null && (
 					target.destroyed ||
 					character.pos.distanceTo(target.pos) > 400 ||

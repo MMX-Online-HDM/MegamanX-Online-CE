@@ -77,10 +77,10 @@ public class CmdSigma : BaseSigma {
 		if (player.weapon is not AssassinBulletChar) {
 			if (player.input.isPressed(Control.Shoot, player)) {
 				attackPressed = true;
-				lastAttackFrame = Global.level.frameCount;
+				lastAttackFrame = Global.floorFrameCount;
 			}
 		}
-		framesSinceLastAttack = Global.level.frameCount - lastAttackFrame;
+		framesSinceLastAttack = Global.floorFrameCount - lastAttackFrame;
 		bool lenientAttackPressed = (attackPressed || framesSinceLastAttack < 5);
 
 		if (charState is Dash dashState) {

@@ -2120,7 +2120,7 @@ public partial class Character : Actor, IDamagable {
 		float? savedAlpha = null;
 		if (invulnTime > 0) {
 			savedAlpha = alpha;
-			if (Global.level.frameCount % 4 < 2) {
+			if (Global.flFrameCount % 4 < 2) {
 				alpha *= 0.15f;
 			} else {
 				alpha *= 0.85f;

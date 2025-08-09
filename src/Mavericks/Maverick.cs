@@ -1296,7 +1296,7 @@ public class Maverick : Actor, IDamagable {
 
 	public override bool shouldDraw() {
 		if (invulnTime > 0) {
-			if (Global.level.frameCount % 4 < 2) return false;
+			if (Global.flFrameCount % 4 < 2) return false;
 		}
 		return base.shouldDraw();
 	}
