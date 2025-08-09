@@ -1237,10 +1237,15 @@ class Program {
 		decimal deltaTimeAlt = 0;
 		decimal lastAltUpdateTime = 0;
 		// Set FPS cap.
+		Global.gameSpeed = Options.main.fpsMode switch {
+			1 => 0.05f,
+			2 => 0.25f,
+			_ => 1
+		};
+		Global.speedMul = Global.gameSpeed;
 		float lastGameSpeed = Global.gameSpeed;
 		decimal targetFps = 60m / (decimal)Global.gameSpeed;
 		decimal fpsLimit = TimeSpan.TicksPerSecond / targetFps;
-		Global.speedMul = Global.gameSpeed;
 		decimal fpsLimitAlt = TimeSpan.TicksPerSecond / 240m;
 		// Other frame data.
 		long lastSecondFPS = 0;
@@ -1292,7 +1297,11 @@ class Program {
 					// Framerate shenanigans.
 					if (Keyboard.IsKeyPressed(Key.F7)) {
 						if (f7Released) {
-							Global.gameSpeed = Global.gameSpeed == 1 ? 0.5f : 1;
+							Global.gameSpeed = Global.gameSpeed switch {
+								1 => 0.5f,
+								0.5f => 0.25f,
+								_ => 1
+							};
 							f7Released = false;
 						}
 					} else {

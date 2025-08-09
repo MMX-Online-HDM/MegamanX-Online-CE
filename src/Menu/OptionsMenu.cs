@@ -26,7 +26,7 @@ public class OptionsMenu : IMainMenu {
 
 	public bool oldFullscreen;
 	public uint oldWindowScale;
-	public int oldMaxFPS;
+	public int oldFpsMode;
 	public bool oldDisableShaders;
 	public bool oldEnablePostprocessing;
 	public bool oldUseOptimizedAssets;
@@ -52,7 +52,6 @@ public class OptionsMenu : IMainMenu {
 		oldFullscreen = Options.main.fullScreen;
 		oldWindowScale = Options.main.windowScale;
 		oldDisableShaders = Options.main.disableShaders;
-		oldMaxFPS = Options.main.maxFPS;
 		oldEnablePostprocessing = Options.main.enablePostProcessing;
 		oldUseOptimizedAssets = Options.main.useOptimizedAssets;
 		oldParticleQuality = Options.main.particleQuality;
@@ -150,24 +149,26 @@ public class OptionsMenu : IMainMenu {
 				new MenuOption(
 					30, startY,
 					() => {
-						if (inGame) return;
-						if (Global.input.isHeldMenu(Control.MenuLeft)) {
-							Options.main.maxFPS = 30;
-						} else if (Global.input.isHeldMenu(Control.MenuRight)) {
-							Options.main.maxFPS = Global.fpsCap;
-						}
+						Helpers.menuLeftRightInc(ref Options.main.fpsMode, 0, 2);
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
 							optionFontText, "Max FPS:",
 							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
+						string fpsDraw = Options.main.fpsMode switch {
+							0 => "60",
+							1 => "120",
+							2 => "240",
+							_ => "ERROR"
+						};
 						Fonts.drawText(
-							optionFontValue, Options.main.maxFPS.ToString(),
+							optionFontValue, fpsDraw,
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Controls the max framerate the game can run.\nLower values are more choppy but use less GPU."
+					"Controls the max framerate the game can run.\n" +
+					"Higher framerates can use more CPU. (Default: 60)"
 				),
 				// VSYNC
 				new MenuOption(
@@ -1427,10 +1428,16 @@ public class OptionsMenu : IMainMenu {
 			if (oldWindowScale != Options.main.windowScale) {
 				Global.changeWindowSize(Options.main.windowScale);
 			}
-
+			if (oldFpsMode != Options.main.fpsMode) {
+				Global.gameSpeed = Options.main.fpsMode switch {
+					1 => 0.05f,
+					2 => 0.25f,
+					_ => 1
+				};
+			}
 			if (oldFullscreen != Options.main.fullScreen ||
 				//oldWindowScale != Options.main.windowScale ||
-				oldMaxFPS != Options.main.maxFPS ||
+				//oldMaxFPS != Options.main.maxFPS ||
 				oldDisableShaders != Options.main.disableShaders ||
 				oldEnablePostprocessing != Options.main.enablePostProcessing ||
 				oldUseOptimizedAssets != Options.main.useOptimizedAssets ||
