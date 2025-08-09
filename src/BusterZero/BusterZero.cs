@@ -43,7 +43,7 @@ public class BusterZero : Character {
 		Helpers.decrementFrames(ref aiAttackCooldown);
 		// For the shooting animation.
 		if (shootAnimTime > 0) {
-			shootAnimTime -= Global.speedMul;
+			shootAnimTime -= speedMul;
 			if (shootAnimTime <= 0) {
 				shootAnimTime = 0;
 				if (sprite.name == getSprite(charState.shootSpriteEx)) {

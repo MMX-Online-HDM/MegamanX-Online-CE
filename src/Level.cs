@@ -1300,10 +1300,11 @@ public partial class Level {
 			if (go.iDestroyed) {
 				continue;
 			}
-			if (isTimeSlowed(go, out float slowAmount)) {
-				Global.speedMul = slowAmount * Global.gameSpeed;
-				go.speedMul = slowAmount * Global.gameSpeed;
+			if (!isTimeSlowed(go, out float slowAmount)) {
+				slowAmount = 1;
 			}
+			Global.speedMul = slowAmount * Global.gameSpeed;
+			go.speedMul = slowAmount * Global.gameSpeed;
 			go.preUpdate();
 			go.statePreUpdate();
 			Global.speedMul = Global.gameSpeed;
@@ -1324,9 +1325,10 @@ public partial class Level {
 				continue;
 			}
 			if (isTimeSlowed(go, out float slowAmount)) {
-				Global.speedMul = slowAmount * Global.gameSpeed;
-				go.speedMul = slowAmount * Global.gameSpeed;
+				slowAmount = 1;
 			}
+			Global.speedMul = slowAmount * Global.gameSpeed;
+			go.speedMul = slowAmount * Global.gameSpeed;
 			go.update();
 			go.stateUpdate();
 			if (isNon1v1Elimination() &&
@@ -1514,9 +1516,10 @@ public partial class Level {
 				continue;
 			}
 			if (isTimeSlowed(go, out float slowAmount)) {
-				Global.speedMul = slowAmount * Global.gameSpeed;
-				go.speedMul = slowAmount * Global.gameSpeed;
+				slowAmount = 1;
 			}
+			Global.speedMul = slowAmount * Global.gameSpeed;
+			go.speedMul = slowAmount * Global.gameSpeed;
 			go.postUpdate();
 			go.statePostUpdate();
 			Global.speedMul = Global.gameSpeed;
