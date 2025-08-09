@@ -1308,6 +1308,7 @@ public partial class Level {
 			go.preUpdate();
 			go.statePreUpdate();
 			Global.speedMul = Global.gameSpeed;
+			go.speedMul = Global.gameSpeed;
 		}
 
 		// Preupdate RPCs.
@@ -1324,7 +1325,7 @@ public partial class Level {
 			if (go.iDestroyed) {
 				continue;
 			}
-			if (isTimeSlowed(go, out float slowAmount)) {
+			if (!isTimeSlowed(go, out float slowAmount)) {
 				slowAmount = 1;
 			}
 			Global.speedMul = slowAmount * Global.gameSpeed;
@@ -1358,6 +1359,7 @@ public partial class Level {
 				}
 			}
 			Global.speedMul = Global.gameSpeed;
+			go.speedMul = Global.gameSpeed;
 		}
 
 		// Normal update RPCs.
@@ -1515,7 +1517,7 @@ public partial class Level {
 			if (go.iDestroyed) {
 				continue;
 			}
-			if (isTimeSlowed(go, out float slowAmount)) {
+			if (!isTimeSlowed(go, out float slowAmount)) {
 				slowAmount = 1;
 			}
 			Global.speedMul = slowAmount * Global.gameSpeed;
@@ -1523,6 +1525,7 @@ public partial class Level {
 			go.postUpdate();
 			go.statePostUpdate();
 			Global.speedMul = Global.gameSpeed;
+			go.speedMul = Global.gameSpeed;
 			go.netUpdate();
 		}
 
