@@ -168,6 +168,10 @@ public class NovaStrikeStateEX : CharState {
 			character.changeToIdleOrFall();
 		}
 	}
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
 }
 public class NovaStrikeStateUpEX : CharState {
 	public NovaStrikeStateUpEX() : base("nova_strike_up") {
@@ -201,6 +205,10 @@ public class NovaStrikeStateUpEX : CharState {
 			character.changeToIdleOrFall();
 		}
 	}
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
 }
 public class NovaStrikeStateDownEX : CharState {
 	public NovaStrikeStateDownEX() : base("nova_strike_down") {
@@ -233,5 +241,9 @@ public class NovaStrikeStateDownEX : CharState {
 		if (stateTime > 36f / 60f) {
 			character.changeToIdleOrFall();
 		}
+	}
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity = true;
 	}
 }
