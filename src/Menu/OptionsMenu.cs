@@ -809,6 +809,60 @@ public class OptionsMenu : IMainMenu {
 					"Allows to perform Nova Strike by pressing SPC,\n" +
 					"but you lose the ability to switch to Nova Strike."
 				),
+				// Should Nova on side walls.
+				new MenuOption(
+					30, startY,
+					() => {
+						Helpers.menuLeftRightBool(ref Options.main.novaStrikeWall);
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							optionFontText, "N.Strike on a Side Wall:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.novaStrikeWall),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"Disables performing Nova Strike if a side wall is close by."
+				),
+				// Should Nova on ceiling walls.
+				new MenuOption(
+					30, startY,
+					() => {
+						Helpers.menuLeftRightBool(ref Options.main.novaStrikeCeiling);
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							optionFontText, "N.Strike on Ceiling:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.novaStrikeCeiling),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"Disables performing Nova Strike if a Ceiling is close by."
+				),
+				// Should Nova on floor walls.
+				new MenuOption(
+					30, startY,
+					() => {
+						Helpers.menuLeftRightBool(ref Options.main.novaStrikeFloor);
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							optionFontText, "N.Strike on Floor:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.novaStrikeFloor),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"Disables performing Nova Strike if a Floor is close by."
+				),
 				/*
 				new MenuOption(
 					30, startY,
