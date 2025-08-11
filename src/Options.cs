@@ -205,4 +205,12 @@ public class Options {
 			return enableDeveloperConsole;
 		}
 	}
+	
+	public void updateFpsMode() {
+		Global.gameSpeed = fpsMode switch {
+			1 => 0.5f,
+			2 => 0.25f,
+			_ => 1
+		};
+	}
 }

@@ -327,13 +327,13 @@ public class Helpers {
 	}
 
 	public static float to360(float angle) {
-		if (angle < 0) angle += 360;
-		if (angle > 360) angle -= 360;
+		angle %= 360;
+		if (angle < 0) { angle += 360; }
 		return angle;
 	}
 	public static float to256(float angle) {
-		if (angle < 0) angle += 256;
-		if (angle > 256) angle -= 256;
+		angle %= 256;
+		if (angle < 0) { angle += 256; }
 		return angle;
 	}
 

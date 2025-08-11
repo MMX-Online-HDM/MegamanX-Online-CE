@@ -2732,7 +2732,7 @@ public partial class Level {
 	public void clearOldActors() {
 		Dictionary<ushort, Actor> destroyedActorsByIdClone = new(destroyedActorsById);
 		foreach ((ushort actorId, Actor actor) in destroyedActorsByIdClone) {
-			long framesDestroyed = frameCount - actor.destroyedOnFrame;
+			long framesDestroyed = Global.floorFrameCount - actor.destroyedOnFrame;
 			if (framesDestroyed >= 240) {
 				destroyedActorsById.Remove(actorId);
 			}

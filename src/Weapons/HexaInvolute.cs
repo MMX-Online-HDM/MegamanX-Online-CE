@@ -5,6 +5,8 @@ using SFML.Graphics;
 namespace MMXOnline;
 
 public class HexaInvoluteWeapon : Weapon {
+	public static HexaInvoluteWeapon netWeapon = new();
+
 	public HexaInvoluteWeapon() {
 		index = (int)WeaponIds.HexaInvolute;
 		killFeedIndex = 179;
@@ -12,9 +14,11 @@ public class HexaInvoluteWeapon : Weapon {
 }
 
 public class HexaInvoluteState : VileState {
-	HexaInvoluteProj proj;
-	bool startGrounded;
-	float ammoTime;
+	public HexaInvoluteProj? proj;
+	public bool startGrounded;
+	public float moveTime;
+	public float ammoTime;
+	public bool shot;
 
 	public HexaInvoluteState() : base("super") {
 		superArmor = true;
@@ -25,13 +29,18 @@ public class HexaInvoluteState : VileState {
 	public override void update() {
 		base.update();
 
-		if (startGrounded && !once) {
-			//character.move(new Point(0, -100));
+		if (startGrounded && moveTime <= 16) {
+			character.moveXY(0, -2);
+			moveTime += character.speedMul;
 		}
 
-		if (!once && character.frameIndex >= 2) {
-			once = true;
-			proj = new HexaInvoluteProj(new HexaInvoluteWeapon(), character.getFirstPOIOrDefault(), 1, player, player.getNextActorNetId(), rpc: true);
+		if (!shot && character.frameIndex >= 2) {
+			shot = true;
+			proj = new HexaInvoluteProj(
+				character.getCenterPos(),
+				character.xDir, character, player.getNextActorNetId(),
+				sendRpc: true
+			);
 		}
 
 		if (proj != null) {
@@ -43,7 +52,7 @@ public class HexaInvoluteState : VileState {
 			}
 		}
 
-		if (vile.energy.ammo <= 0 || (player.input.isPressed(Control.Special1, player) && stateTime > 1)) {
+		if (vile.energy.ammo <= 0 || (player.input.isPressed(Control.Special1, player) && stateFrames >= 60)) {
 			character.changeToIdleOrFall();
 		}
 	}
@@ -53,17 +62,16 @@ public class HexaInvoluteState : VileState {
 		if (character.grounded) {
 			startGrounded = true;
 		}
-		character.useGravity = false;
-		character.grounded = false;
-		character.stopMoving();
+		character.stopMovingS();
 		vile.vileHoverTime = vile.vileMaxHoverTime;
 		vile.getOffMK5Platform();
+		vile.useGravity = false;
 	}
 
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		proj?.destroySelf();
-		character.useGravity = true;
+		vile.useGravity = true;
 	}
 }
 
@@ -99,110 +107,142 @@ public class HexaInvolutePart {
 }
 
 public class HexaInvoluteProj : Projectile {
-	public Point destPos;
-	public float sinDampTime = 1;
-	public Anim muzzle;
-	float radius = 120;
-	public float ang;
-	SoundWrapper sound;
-	float soundCooldown;
-	public List<HexaInvolutePart> parts = new List<HexaInvolutePart>();
-	public HexaInvoluteProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 1, player, "empty", Global.defFlinch, 0.15f, netProjId, player.ownedByLocalPlayer) {
-		projId = (int)ProjIds.HexaInvolute;
-		setIndestructableProperties();
-		sprite.hitboxes = new Collider[6];
+	public Anim? muzzle;
+	public int hitboxNum = 10;
+	public float radius = 128;
+	public SoundWrapper? sound;
+	public float soundCooldown;
+	public List<HexaInvolutePart> particles = [];
+	public float partCooldown;
+	public Point[] beamDest = new Point[6];
 
-		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+	public HexaInvoluteProj(
+		Point pos, int xDir, Actor owner, ushort? netId,
+		bool sendRpc = false, Player? altPlayer = null
+	) : base(
+		pos, xDir, owner, "empty", netId, altPlayer
+	) {
+		damager.damage = 1;
+		damager.flinch = Global.defFlinch;
+		damager.hitCooldown = 9;
+		projId = (int)ProjIds.HexaInvolute;
+		zIndex = ZIndex.Backwall;
+		setIndestructableProperties();
+		sprite.hitboxes = popullateHitboxes();
+		for (int i = 0; i < beamDest.Length; i++) {
+			beamDest[i] = pos;
 		}
-		canBeLocal = false;
+
+		if (sendRpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+		}
+	}
+	
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new HexaInvoluteProj(
+			args.pos, args.xDir, args.owner, args.netId, altPlayer: args.player
+		);
 	}
 
 	public override void update() {
 		base.update();
 
-		if (ownedByLocalPlayer && owner.character != null) {
-			incPos(owner.character.deltaPos);
+		if (owningActor != null) {
+			changePos(owningActor.getCenterPos());
 		}
 
-		for (int i = parts.Count - 1; i >= 0; i--) {
-			parts[i].time += Global.spf;
-			if (parts[i].time > parts[i].maxTime) {
-				parts.RemoveAt(i);
+		for (int i = particles.Count - 1; i >= 0; i--) {
+			particles[i].time += Global.spf;
+			if (particles[i].time > particles[i].maxTime) {
+				particles.RemoveAt(i);
 			}
 		}
 
-		Helpers.decrementTime(ref soundCooldown);
+		if (partCooldown == 0) {
+			partCooldown = 2;
+		}
+		Helpers.decrementFrames(ref soundCooldown);
+		Helpers.decrementFrames(ref partCooldown);
 		if (soundCooldown == 0) {
 			sound = owner.character?.playSound("hexaInvolute");
-			soundCooldown = 2.1f;
+			soundCooldown = 126;
 		}
 
-		if (ownedByLocalPlayer) {
-			ang += Global.spf * 45;
-			ang = Helpers.to360(ang);
-		}
+		byteAngle += speedMul * 0.6f * xDir;
+		updateBeams();
 	}
 
-	float partCooldown;
-	public override void render(float x, float y) {
-		base.render(x, y);
-		Helpers.decrementTime(ref partCooldown);
-		for (int i = 0; i < 6; i++) {
-			Point origin = pos;
+	public void updateBeams() {
+		float drawAngle = angle ?? 0;
 
-			Point dest = pos.addxy(Helpers.cosd(ang + (i * 60)) * radius, Helpers.sind(ang + (i * 60)) * radius);
+		for (int i = 0; i < beamDest.Length; i++) {
+			float offset = i * 60;
+			Point dest = pos.addxy(
+				Helpers.cosd(drawAngle + offset) * radius, Helpers.sind(drawAngle + offset) * radius
+			);
 			var hitPoint = Global.level.raycast(pos, dest, Helpers.wallTypeList);
-			if (hitPoint != null) dest = hitPoint.getHitPointSafe();
-
-			drawLine(origin, dest);
-			var hitbox = getHitbox(origin, dest);
-			if (sprite.hitboxes.InRange(i)) {
-				sprite.hitboxes[i] = hitbox;
+			if (hitPoint != null) {
+				dest = hitPoint.getHitPointSafe();
 			}
+			beamDest[i] = dest;
+			updateHitboxes(i, dest - pos);
+
 			if (partCooldown == 0) {
 				if (!Options.main.lowQualityParticles()) {
-					parts.Add(new HexaInvolutePart(dest));
+					particles.Add(new HexaInvolutePart(dest));
 				}
 			}
 		}
 		if (partCooldown == 0) {
 			if (!Options.main.lowQualityParticles()) {
-				parts.Add(new HexaInvolutePart(pos));
-			}
-		}
-
-		foreach (var part in parts) {
-			Point partPos = part.getPos();
-			float partSize = part.getRadius();
-			if (Global.level.gameMode.isTeamMode && damager.owner.alliance == GameMode.redAlliance) {
-				Global.sprites["vilemk5_super_part2"].draw(0, partPos.x, partPos.y, 1, 1, null, part.getAlpha(), partSize, partSize, zIndex + 1);
-			} else {
-				Global.sprites["vilemk5_super_part"].draw(0, partPos.x, partPos.y, 1, 1, null, part.getAlpha(), partSize, partSize, zIndex + 1);
+				particles.Add(new HexaInvolutePart(pos));
 			}
 		}
 	}
 
-	public Collider getHitbox(Point origin, Point dest) {
-		Point dirTo = origin.directionTo(dest);
-		Point dest1 = dest.add(dirTo.leftNormal().normalize().times(5));
-		Point dest2 = dest.subtract(dirTo);
-		List<Point> points = [
-			origin,
-			dest,
-			dest1,
-			dest2
-		];
+	public override void render(float x, float y) {
+		base.render(x, y);
+		for (int i = 0; i < beamDest.Length; i++) {
+			drawLine(pos, beamDest[i]);
+		}
+		foreach (HexaInvolutePart part in particles) {
+			Point partPos = part.getPos();
+			float partSize = part.getRadius();
+			Global.sprites["vilemk5_super_part"].draw(
+				0, partPos.x, partPos.y, 1, 1, null, part.getAlpha(), partSize, partSize, zIndex + 1
+			);
+		}
+	}
 
-		return new Collider(
-			points, false, this,
-			false, false, HitboxFlag.Hitbox, Point.zero
-		);
+	public Collider[] popullateHitboxes() {
+		Collider[] retCol = new Collider[(6 * hitboxNum) + 1];
+		for (int i = 0; i < retCol.Length; i++) {
+			retCol[i] = new Collider(
+				new Rect(0f, 0f, 16, 16).getPoints(),
+				false, this, false, false,
+				HitboxFlag.Hitbox, Point.zero
+			);
+		}
+		return retCol;
+	}
+
+
+	public void updateHitboxes(int num, Point dest) {
+		int start = num * hitboxNum;
+		int end = start + hitboxNum;
+		float xOff = dest.x / hitboxNum;
+		float yOff = dest.y / hitboxNum;
+		int j = 1;
+		for (int i = start; i < end; i++) {
+			Collider hitbox = sprite.hitboxes[i];
+			hitbox.offset.x = xOff * j;
+			hitbox.offset.y = yOff * j;
+			j++;
+		}
 	}
 
 	public List<Point> getNodes(Point origin, Point dest) {
-		List<Point> nodes = new List<Point>();
+		List<Point> nodes = [];
 		int nodeCount = 8;
 		Point dirTo = origin.directionTo(dest).normalize();
 		float len = origin.distanceTo(dest);
@@ -221,11 +261,6 @@ public class HexaInvoluteProj : Projectile {
 		var col1 = new Color(74, 78, 221);
 		var col2 = new Color(61, 113, 255);
 		var col3 = new Color(245, 252, 255);
-		if (Global.level.gameMode.isTeamMode && damager.owner.alliance == GameMode.redAlliance) {
-			col1 = new Color(221, 78, 74);
-			col2 = new Color(255, 113, 61);
-			col3 = new Color(255, 245, 240);
-		}
 
 		float sin = MathF.Sin(Global.time * 30);
 		var nodes = getNodes(origin, dest);
@@ -234,11 +269,11 @@ public class HexaInvoluteProj : Projectile {
 			Point startPos = nodes[i - 1];
 			Point endPos = nodes[i];
 			if (Options.main.lowQualityParticles()) {
-				DrawWrappers.DrawLine(startPos.x, startPos.y, endPos.x, endPos.y, col3, 2 + sin, 0, true);
+				DrawWrappers.DrawLine(startPos.x, startPos.y, endPos.x, endPos.y, col3, 2 + sin, zIndex, true);
 			} else {
-				DrawWrappers.DrawLine(startPos.x, startPos.y, endPos.x, endPos.y, col1, 4 + sin, 0, true);
-				DrawWrappers.DrawLine(startPos.x, startPos.y, endPos.x, endPos.y, col2, 3 + sin, 0, true);
-				DrawWrappers.DrawLine(startPos.x, startPos.y, endPos.x, endPos.y, col3, 2 + sin, 0, true);
+				DrawWrappers.DrawLine(startPos.x, startPos.y, endPos.x, endPos.y, col1, 4 + sin, zIndex, true);
+				DrawWrappers.DrawLine(startPos.x, startPos.y, endPos.x, endPos.y, col2, 3 + sin, zIndex, true);
+				DrawWrappers.DrawLine(startPos.x, startPos.y, endPos.x, endPos.y, col3, 2 + sin, zIndex, true);
 			}
 		}
 	}
@@ -252,16 +287,5 @@ public class HexaInvoluteProj : Projectile {
 			Global.sounds.Remove(sound);
 			sound = null;
 		}
-	}
-
-	public override List<byte> getCustomActorNetData() {
-		List<byte> customData = new();
-		customData.AddRange(BitConverter.GetBytes(ang));
-
-		return customData;
-	}
-
-	public override void updateCustomActorNetData(byte[] data) {
-		ang = BitConverter.ToSingle(data, 0);
 	}
 }
