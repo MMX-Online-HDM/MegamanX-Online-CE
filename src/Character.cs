@@ -228,6 +228,7 @@ public partial class Character : Actor, IDamagable {
 		null!, new Point(x, y), netId, ownedByLocalPlayer, addToLevel: true
 	) {
 		//hasStateMachine = true;
+		slideOnIce = true;
 		this.isATrans = isATrans;
 		this.player = player;
 		netOwner = player;

@@ -747,9 +747,9 @@ public partial class RPCCreateProj : RPC {
 			//case (int)ProjIds.DarkHold:
 			//	proj = new DarkHoldProj(new DarkHoldWeapon(), pos, xDir, player, netProjByte);
 			//	break;
-			case (int)ProjIds.HexaInvolute:
-				proj = new HexaInvoluteProj(new HexaInvoluteWeapon(), pos, xDir, player, netProjByte);
-				break;
+			//case (int)ProjIds.HexaInvolute:
+			//	proj = new HexaInvoluteProj(, pos, xDir, player, netProjByte);
+			//	break;
 			default:
 				proj = null;
 				break;

@@ -62,6 +62,7 @@ public partial class Actor : GameObject {
 	public float landingVelY;
 	public bool immuneToKnockback;
 	public bool isPlatform;
+	public bool slideOnIce;
 	public bool cachedUndewater;
 	public Point cachedUndewaterPos = new Point(float.MinValue, float.MinValue);
 
@@ -166,6 +167,7 @@ public partial class Actor : GameObject {
 	public float timeStopTime;
 	public bool highPiority;
 	public bool lowPiority;
+	public bool movedUpOnFrame;
 
 	public Actor(
 		string spriteName, Point pos, ushort? netId, bool ownedByLocalPlayer, bool addToLevel
@@ -411,6 +413,9 @@ public partial class Actor : GameObject {
 			}
 			angleSet = true;
 			_byteAngle = (value / 1.40625f) % 256;
+			if (_byteAngle < 0) {
+				_byteAngle += 256;
+			}
 		}
 	}
 
@@ -422,6 +427,9 @@ public partial class Actor : GameObject {
 		set {
 			angleSet = true;
 			_byteAngle = value % 256;
+			if (_byteAngle < 0) {
+				_byteAngle += 256;
+			}
 		}
 	}
 
@@ -812,9 +820,9 @@ public partial class Actor : GameObject {
 		if (chr?.charState is VileMK2Grabbed) {
 			grounded = false;
 		} else if (physicsCollider != null && !isStatic && (canBeGrounded || useGravity)) {
-			float yDist = 1;
-			if (grounded && vel.y * yMod >= 0) {
-				yDist = 4;
+			float yDist = 1 * Global.gameSpeed;
+			if (grounded && vel.y * yMod >= 0 && !movedUpOnFrame) {
+				yDist = 4 * Global.gameSpeed;
 			}
 			yDist *= yMod;
 
@@ -890,6 +898,7 @@ public partial class Actor : GameObject {
 				groundedIce = false;
 			}
 		}
+		movedUpOnFrame = false;
 	}
 
 	public float getTopY() {
@@ -1049,7 +1058,7 @@ public partial class Actor : GameObject {
 				return;
 			}
 
-			float frameSmooth = Global.frameCount - lastNetFrame + 1;
+			float frameSmooth = Global.floorFrameCount - lastNetFrame + 1;
 			if (frameSmooth < 1) { frameSmooth = 1; }
 
 			if (frameSmooth > 1 && interplorateNetPos) {
@@ -1357,7 +1366,7 @@ public partial class Actor : GameObject {
 
 		if (!destroyed) {
 			destroyed = true;
-			destroyedOnFrame = Global.frameCount;
+			destroyedOnFrame = Global.floorFrameCount;
 			if (Global.serverClient != null &&
 				netId is not null &&
 				Global.level.actorsById.ContainsKey(netId.Value)
@@ -1750,6 +1759,7 @@ public partial class Actor : GameObject {
 	public const int labelNameOffY = 10;
 
 	public float currentLabelY;
+
 	public void deductLabelY(float amount) {
 		currentLabelY -= amount;
 		// DrawWrappers.DrawLine(pos.x - 10, pos.y + currentLabelY, pos.x + 10, pos.y + currentLabelY, Color.Red, 1, ZIndex.HUD);

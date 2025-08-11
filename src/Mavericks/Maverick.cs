@@ -171,6 +171,7 @@ public class Maverick : Actor, IDamagable {
 	) : base(
 		"", pos, netId, ownedByLocalPlayer, true
 	) {
+		slideOnIce = true;
 		this.player = player;
 		this.xDir = xDir;
 

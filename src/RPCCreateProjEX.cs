@@ -138,7 +138,7 @@ public partial class RPCCreateProj : RPC {
 		{ (int)ProjIds.Vulcan, VulcanCherryBlast.rpcInvoke },
 		{ (int)ProjIds.DistanceNeedler, VulcanDistanceNeedler.rpcInvoke },
 		{ (int)ProjIds.BuckshotDance, VulcanBuckshotDance.rpcInvoke },
-
+		{ (int)ProjIds.HexaInvolute, HexaInvoluteProj.rpcInvoke },
 
 		// Zero
 		{ (int)ProjIds.SuiretsusanProj, SuiretsusenProj.rpcInvoke },

@@ -433,6 +433,7 @@ class Program {
 		bool isPaused = false; //(Global.menu != null || Global.dialogBox != null);
 		if (!isPaused) {
 			Global.frameCount++;
+			Global.flFrameCount += Global.gameSpeed;
 			Global.time += Global.spf;
 			Global.calledPerFrame = 0;
 
@@ -1237,11 +1238,7 @@ class Program {
 		decimal deltaTimeAlt = 0;
 		decimal lastAltUpdateTime = 0;
 		// Set FPS cap.
-		Global.gameSpeed = Options.main.fpsMode switch {
-			1 => 0.05f,
-			2 => 0.25f,
-			_ => 1
-		};
+		Options.main.updateFpsMode();
 		Global.speedMul = Global.gameSpeed;
 		float lastGameSpeed = Global.gameSpeed;
 		decimal targetFps = 60m / (decimal)Global.gameSpeed;
@@ -1297,11 +1294,12 @@ class Program {
 					// Framerate shenanigans.
 					if (Keyboard.IsKeyPressed(Key.F7)) {
 						if (f7Released) {
-							Global.gameSpeed = Global.gameSpeed switch {
-								1 => 0.5f,
-								0.5f => 0.25f,
-								_ => 1
+							Options.main.fpsMode = Options.main.fpsMode switch {
+								0 => 1,
+								1 => 2,
+								_ => 0
 							};
+							Options.main.updateFpsMode();
 							f7Released = false;
 						}
 					} else {
@@ -1315,9 +1313,17 @@ class Program {
 			// In case we chage the target framerate.
 			// We should disable this on release builds... maybe.
 			if (lastGameSpeed != Global.gameSpeed) {
-				lastGameSpeed = Global.gameSpeed;
 				targetFps = 60m / (decimal)Global.gameSpeed;
 				fpsLimit = TimeSpan.TicksPerSecond / targetFps;
+				Global.speedMul = Global.gameSpeed;
+				if (Global.gameSpeed == 1) {
+					Global.flFrameCount = MathF.Ceiling(Global.flFrameCount);
+				} else {
+					Global.flFrameCount = (
+						MathF.Ceiling(Global.flFrameCount / Global.gameSpeed) * Global.gameSpeed					
+					);
+				}
+				lastGameSpeed = Global.gameSpeed;
 			}
 
 			long timeSecondsNow = (long)Math.Floor(timeSpam.TotalSeconds);

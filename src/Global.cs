@@ -502,8 +502,8 @@ public partial class Global {
 	}
 	public static float time;
 	public static int frameCount = 0;
-	public static float flFrameCount => frameCount * gameSpeed;
-	public static int floorFrameCount => MathInt.Floor(frameCount * gameSpeed);
+	public static float flFrameCount = 0;
+	public static int floorFrameCount => MathInt.Floor(flFrameCount);
 
 	public static int normalizeFrames(int frames) {
 		frames = MathInt.Round(frames * gameSpeed);

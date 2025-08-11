@@ -51,6 +51,7 @@ public class OptionsMenu : IMainMenu {
 		oldIntegerFullscreen = Options.main.integerFullscreen;
 		oldFullscreen = Options.main.fullScreen;
 		oldWindowScale = Options.main.windowScale;
+		oldFpsMode = Options.main.fpsMode;
 		oldDisableShaders = Options.main.disableShaders;
 		oldEnablePostprocessing = Options.main.enablePostProcessing;
 		oldUseOptimizedAssets = Options.main.useOptimizedAssets;
@@ -1429,11 +1430,8 @@ public class OptionsMenu : IMainMenu {
 				Global.changeWindowSize(Options.main.windowScale);
 			}
 			if (oldFpsMode != Options.main.fpsMode) {
-				Global.gameSpeed = Options.main.fpsMode switch {
-					1 => 0.05f,
-					2 => 0.25f,
-					_ => 1
-				};
+				Options.main.updateFpsMode();
+				oldFpsMode = Options.main.fpsMode;
 			}
 			if (oldFullscreen != Options.main.fullScreen ||
 				//oldWindowScale != Options.main.windowScale ||

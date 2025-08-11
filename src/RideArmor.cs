@@ -76,6 +76,7 @@ public class RideArmor : Actor, IDamagable {
 			setColorShaders();
 		}
 
+		slideOnIce = true;
 		useFrameProjs = true;
 		splashable = true;
 		Global.level.addGameObject(this);
