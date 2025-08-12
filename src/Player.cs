@@ -344,18 +344,23 @@ public partial class Player {
 	public bool speedDevil;
 
 	public Disguise? disguise;
-
-	public int newAlliance;     // Not sure what this is useful for, seems like a pointless clone of alliance that needs to be kept in sync
+	
+	// Not sure what this is useful for,
+	// seems like a pointless clone of alliance that needs to be kept in sync.
+	public int newAlliance;
 
 	// Things that ServerPlayer already has
 	public string name;
 	public int id;
-	public int alliance;    // Only set on spawn with data read from ServerPlayer alliance. The ServerPlayer alliance changes earlier on team change/autobalance
 	public int charNum;
+	// Only set on spawn with data read from ServerPlayer alliance.
+	// The ServerPlayer alliance changes earlier on team change/autobalance.
+	public int alliance;
 
 	public int newCharNum;
 	public int? delayedNewCharNum;
 	public int? ping;
+
 	public void syncFromServerPlayer(ServerPlayer serverPlayer) {
 		if (!this.serverPlayer.isHost && serverPlayer.isHost) {
 			promoteToHost();
@@ -374,10 +379,14 @@ public partial class Player {
 				new ChatEntry(
 					name + " was autobalanced to " +
 					GameMode.getTeamName(serverPlayer.autobalanceAlliance.Value), "", null, true
-				), true);
+				), true
+			);
 			forceKill();
-			currency += 5;
-			Global.serverClient?.rpc(RPC.switchTeam, RPCSwitchTeam.getSendMessage(id, serverPlayer.autobalanceAlliance.Value));
+			currency += 5 * Global.customSettings?.currencyGain ?? 1;
+			Global.serverClient?.rpc(
+				RPC.switchTeam,
+				RPCSwitchTeam.getSendMessage(id, serverPlayer.autobalanceAlliance.Value)
+			);
 			newAlliance = serverPlayer.autobalanceAlliance.Value;
 		}
 	}
