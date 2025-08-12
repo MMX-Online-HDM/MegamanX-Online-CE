@@ -120,7 +120,7 @@ public class MatchOptionsMenu : IMainMenu {
 				}
 				if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 					if (canChangeToTeam()) {
-						int team = enemyTeam();
+						int team = selectedTeam;
 						Global.serverClient?.rpc(
 							RPC.switchTeam, RPCSwitchTeam.getSendMessage(Global.level.mainPlayer.id, team)
 						);
