@@ -787,7 +787,12 @@ public partial class Character : Actor, IDamagable {
 		changedStateInFrame = false;
 		pushedByTornadoInFrame = false;
 		debuffGfx();
-		if (!ownedByLocalPlayer) { return; }
+		// Other timers.
+		Helpers.decrementTime(ref limboRACheckCooldown);
+		Helpers.decrementTime(ref dropFlagCooldown);
+		if (!ownedByLocalPlayer) {
+			return;
+		}
 		// Local only starts here.
 		debuffCooldowns();
 		genericPuppetControl();
@@ -879,9 +884,6 @@ public partial class Character : Actor, IDamagable {
 
 	public void debuffCooldowns() {
 		Helpers.decrementFrames(ref undisguiseTime);
-		Helpers.decrementTime(ref limboRACheckCooldown);
-		Helpers.decrementTime(ref dropFlagCooldown);
-
 		if (Global.level.mainPlayer.readyTextOver) {
 			Helpers.decrementTime(ref invulnTime);
 		}

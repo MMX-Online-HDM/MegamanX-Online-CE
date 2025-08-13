@@ -250,9 +250,8 @@ public class Server {
 	}
 
 	public void periodicPing(NetServer s_server, ServerPlayer? prioritizedAutobalancePlayer = null) {
-		NetOutgoingMessage om = s_server.CreateMessage();
-
-		foreach (var player in players) {
+		//NetOutgoingMessage om = s_server.CreateMessage();
+		foreach (ServerPlayer player in players) {
 			if (player.connection != null) {
 				player.ping = (int)MathF.Round(player.connection.AverageRoundtripTime * 1000);
 			}
@@ -265,7 +264,7 @@ public class Server {
 			int biggerTeam = teamSizes.Max();
 			int smallerTeam = teamSizes.Min();
 			// Check if a team has +2 characters than other team to move 1.
-			bool areTeamsUnbalanced = (biggerTeam - 1 >= smallerTeam);
+			bool areTeamsUnbalanced = biggerTeam - 1 >= smallerTeam;
 
 			if (playerToAutobalance != null) {
 				// Player left match
@@ -758,10 +757,13 @@ public class Server {
 		} else if (s_server.Connections.Count > 0) {
 			NetOutgoingMessage om;
 			if (host != null && host.connection == im.SenderConnection) {
-				// Host promotion: find the first non-bot player and promote them to host
-				host = players.FirstOrDefault(p => !p.isBot);
+				// Host promotion: find the first non-bot player and promote them to host.
+				// Only do if server is P2P tho.
+				if (!isP2P) {
+					host = players.FirstOrDefault(p => !p.isBot);
+				}
+				// Host found: send this message to clients and make all bot share the host's connection.
 				if (host != null) {
-					// Host found: send this message to clients and make all bot share the host's connection.
 					host.isHost = true;
 					foreach (var player in players) {
 						if (player.isBot) {
@@ -778,7 +780,7 @@ public class Server {
 					}
 					periodicPing(s_server);
 				} else {
-					// No host found: shut down server, everyone left
+					// No host found: shut down server, everyone left or was P2P.
 					shutdown("All players left, shutting down server.");
 					return;
 				}

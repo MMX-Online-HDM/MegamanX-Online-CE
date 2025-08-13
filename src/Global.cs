@@ -541,6 +541,7 @@ public partial class Global {
 	public static Character.CurrentState currentState;
 	public static ServerClient? serverClient;
 	public static Server? localServer;
+	public static CustomMatchSettings? customSettings => level?.server?.customMatchSettings;
 	public static bool isOffline { get { return serverClient == null; } }
 	public static bool isHost { get { return level != null && level.isHost; } }
 	public static bool canControlKillscore { get { return level != null && (isOffline || level.isHost); } }

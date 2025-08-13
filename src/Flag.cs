@@ -111,12 +111,10 @@ public class Flag : Actor {
 
 	// Only humans can take flags from bots
 	public bool canTakeFlag(Character taker, Character holder) {
-		/*
-		if (taker == null || holder == null) return false;
-		if (taker == holder) return false;
+		if (taker == null || holder == null || taker == holder) {
+			return false;
+		}
 		return !taker.player.isBot && holder.player.isBot;
-		*/
-		return false;
 	}
 
 	public override void onCollision(CollideData other) {
@@ -125,10 +123,14 @@ public class Flag : Actor {
 		if (other.otherCollider?.flag == (int)HitboxFlag.Hitbox) return;
 		if (pickupCooldown > 0) return;
 
-		var chr = other.gameObject as Character;
-		if (this.chr != null && !canTakeFlag(chr, this.chr)) return;
-		if (chr != null && chr.player.alliance != alliance && chr.canPickupFlag()) {
-			pickupFlag(chr);
+		if (other.gameObject is not Character newChar) {
+			return;
+		}
+		if (chr != null && !canTakeFlag(newChar, chr)) {
+			return;
+		}
+		if (newChar.player.alliance != alliance && newChar.canPickupFlag()) {
+			pickupFlag(newChar);
 		}
 	}
 
