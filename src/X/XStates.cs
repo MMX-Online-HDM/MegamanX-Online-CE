@@ -579,7 +579,7 @@ public class X3ChargeShot : CharState {
 				sprite = "cross_air_shot";
 			}
 			character.changeSpriteFromName(sprite, true);
-		} else {
+		} else if (mmx.stockedMaxBusterLv >= 1) { //might not be correct
 			state = 1;
 			sprite = "cross_shot2";
 			defaultSprite = sprite;
