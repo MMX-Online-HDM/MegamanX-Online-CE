@@ -454,7 +454,7 @@ public class HostMenu : IMainMenu {
 				},
 				(Point pos, int index) => {
 					Fonts.drawText(
-						FontType.Blue, "Map: " + (isMapSelected ? selectedLevel.displayName : "[Select]"),
+						FontType.Blue, "Stage: " + (isMapSelected ? selectedLevel.displayName : "[Select]"),
 						pos.x, pos.y, selected: index == selectArrowPosY
 					);
 				},
