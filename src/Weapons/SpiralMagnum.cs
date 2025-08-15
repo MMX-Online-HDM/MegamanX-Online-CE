@@ -564,35 +564,30 @@ public class SniperMissileExplosionProj : Projectile {
 	}
 
 	public override DamagerMessage? onDamage(IDamagable damagable, Player attacker) {
-		Character? character = damagable as Character;
+		if (damagable is not Character character) {
+			return null;
+		}
+		bool directHit = this.directHit == character;
 
-		if (character != null) {
-			bool directHit = this.directHit == character;
-			int directHitXDir = this.directHitXDir;
-			float ownAxlFactor = 1;
+		Point victimCenter = character.getCenterPos();
+		Point bombCenter = pos;
+		if (directHit) {
+			bombCenter.x = victimCenter.x - (directHitXDir * 5);
+		}
+		Point dirTo = bombCenter.directionTo(victimCenter);
+		float distFactor = Helpers.clamp01(1 - (bombCenter.distanceTo(victimCenter) / 60f));
 
-			var victimCenter = character.getCenterPos();
-			var bombCenter = pos;
-			if (directHit) {
-				bombCenter.x = victimCenter.x - (directHitXDir * 5);
+		character.pushEffect(new Point(0.6f, 0.4f) * dirTo * distFactor);
+
+		if (character == attacker.character) {
+			float damage = damager.damage;
+			if (axl?.isWhiteAxl() == true) {
+				damage = 0;
 			}
-			var dirTo = bombCenter.directionTo(victimCenter);
-			var distFactor = Helpers.clamp01(1 - (bombCenter.distanceTo(victimCenter) / 60f));
-
-			character.vel.y = dirTo.y * 25 * distFactor * ownAxlFactor;
-			if (character == attacker.character) {
-				character.xSwingVel = dirTo.x * 12 * distFactor * ownAxlFactor;
-				float damage = damager.damage;
-				if (axl?.isWhiteAxl() == true) {
-					damage = 0;
-				}
-				return new DamagerMessage() {
-					damage = damage,
-					flinch = 0
-				};
-			} else {
-				character.xPushVel = dirTo.x * 25 * distFactor * ownAxlFactor;
-			}
+			return new DamagerMessage() {
+				damage = damage,
+				flinch = 0
+			};
 		}
 
 		return null;

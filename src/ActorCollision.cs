@@ -383,11 +383,11 @@ public partial class Actor {
 		if (grounded && groundedIce && useIce && slideOnIce) {
 			if (amount.x > 0) {
 				if (xIceVel < amount.x) {
-					xIceVel += amount.x * 5;
+					xIceVel += amount.x / 12f;
 				}
 			} else {
 				if (xIceVel > amount.x) {
-					xIceVel += amount.x * 5;
+					xIceVel += amount.x / 12f;
 				}
 			}
 			return;

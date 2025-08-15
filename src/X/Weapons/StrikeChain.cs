@@ -245,21 +245,23 @@ public class StrikeChainProj : Projectile {
 			hookWaitTime += Global.speedMul;
 			if (hookWaitTime < 12) return;
 		}
-		
+
 		//If pulled towards a wall
 		if (toWall) {
 			mmx.move(toWallVel);
-			var collision = Global.level.checkTerrainCollisionOnce(mmx, (toWallVel.x * Global.spf), (toWallVel.y * Global.spf));
+			var collision = Global.level.checkTerrainCollisionOnce(
+				mmx, toWallVel.x * Global.spf, toWallVel.y * Global.spf
+			);
 			if (collision?.gameObject is Wall) {
 				destroySelf();
 				float momentum = 0.25f * (distRetracted / maxDist);
-				mmx.xSwingVel = toWallVel.x * (0.25f + momentum) * 0.5f;
+				mmx.xSwingVel = toWallVel.x * (0.25f + momentum) * 0.5f / 60f;
+				//Yes, X2 Boots increase it.
 				if (mmx.isDashing && mmx.legArmor == ArmorId.Giga && mmx.flag == null) {
 					mmx.xSwingVel *= 1.1f;
 				}
 				mmx.vel.y = toWallVel.y;
-				//Yes, X2 Boots increase it.
-			}	
+			}
 		} 
 		//Actor hooked
 		//This only runs if hookedActor is a Pickup.

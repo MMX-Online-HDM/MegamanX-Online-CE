@@ -142,9 +142,8 @@ public class FlameBurnerAltProj : Projectile {
 		if (!ownedByLocalPlayer) return;
 		Character chr = owner.character;
 		if (chr is Axl axl) {
-			Point moveVel = axl.getAxlBulletDir().times(-250);
-			chr.vel.y = moveVel.y;
-			chr.xSwingVel = moveVel.x * 0.66f;
+			Point moveVel = axl.getAxlBulletDir() * -250 / new Point(60, 1.5f);
+			chr.pushEffect(moveVel);
 		}
 	}
 
