@@ -553,14 +553,14 @@ public class Damager {
 			// Disallow flinch stack for non-BZ.
 			else if (flinch > 0 && !Global.canFlinchCombo) {
 				int fkey = owner.id;
-				float fmod = 1.25f;
-				if (character.globalFlinchCooldown.ContainsKey(fkey)) {
+				float fmod = 6;
+				if (!character.globalFlinchCooldown.ContainsKey(fkey)) {
 					character.globalFlinchCooldown[fkey] = 0;
 				}
 				if (character.globalFlinchCooldown[fkey] > 0) {
 					flinch = 0;
 				}
-				character.globalFlinchCooldown[fkey] = MathF.Ceiling(flinch * fmod);
+				character.globalFlinchCooldown[fkey] = MathF.Ceiling(flinch + fmod);
 			}
 
 			if (flinchCooldown > 0 && flinch > 0) {
@@ -575,7 +575,7 @@ public class Damager {
 				}
 			}
 
-			if ((character as Vile)?.isVileMK2 == true && damage > 0 && !isArmorPiercing(projId)) {
+			if (character is Vile { isVileMK2: true } && damage > 0 && !isArmorPiercing(projId)) {
 				if (hitFromBehind(character, damagingActor, owner, projId)) {
 					damage--;
 
