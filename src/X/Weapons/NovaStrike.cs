@@ -102,7 +102,7 @@ public class NovaStrikeState : CharState {
 				}
 			}
 		}
-		if ((character.frameIndex >= 4)) {
+		if (character.frameIndex >= 4) {
 			if (!character.tryMove(new Point(character.xDir * 350 * leftOrRight, 350 * upOrDown), out _) ||
 				character.flag != null || stateTime > 0.6f
 			) {
