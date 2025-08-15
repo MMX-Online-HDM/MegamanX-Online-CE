@@ -1041,10 +1041,18 @@ public partial class Character : Actor, IDamagable {
 		}
 
 		if (flag != null) {
-			if (MathF.Abs(xPushVel) > 75) xPushVel = 75 * MathF.Sign(xPushVel);
-			if (MathF.Abs(xSwingVel) > 75) xSwingVel = 75 * MathF.Sign(xSwingVel);
-			if (vel.y < -350) vel.y = -350;
-
+			if (MathF.Abs(xPushVel) > 1.25f) {
+				xPushVel = 1.25f * MathF.Sign(xPushVel);
+			}
+			if (MathF.Abs(xFlinchPushVel) > 1.25f) {
+				xPushVel = 1.25f * MathF.Sign(xPushVel);
+			}
+			if (MathF.Abs(xSwingVel) > 1.25f) {
+				xSwingVel = 1.25f * MathF.Sign(xSwingVel);
+			}
+			if (vel.y * gravityModifier < -350) {
+				vel.y = -350 * gravityModifier;
+			}
 			// Used to prevent holding dash before taking flag from activating which is bad player experience
 			if (!player.input.isHeld(Control.Dash, player)) {
 				dropFlagUnlocked = true;
@@ -3094,6 +3102,19 @@ public partial class Character : Actor, IDamagable {
 		}
 		dropFlagProgress = 0;
 		this.flag = flag;
+	}
+
+	/// <summary> Pushes the player in a direction, if pushed aganist a jump does disable the jump. </summary>
+	public void pushEffect(Point speed) {
+		if (MathF.Sign(vel.y) != MathF.Sign(speed.y) || MathF.Abs(speed.y * 60) > MathF.Abs(vel.y)) {
+			vel.y = speed.y * 60f;
+		}
+		if (MathF.Abs(speed.x) > MathF.Abs(xFlinchPushVel)) {
+			xFlinchPushVel = speed.x;
+		}
+		if (speed.y * gravityModifier < 0) {
+			charState.canStopJump = false;
+		}
 	}
 
 	public void setHurt(int dir, int flinchFrames, bool spiked) {

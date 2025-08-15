@@ -510,7 +510,7 @@ public partial class Level {
 				if (levelData.name != "giantdam" || enableGiantDamPropellers()) {
 					var moveZone = new MoveZone(
 						instanceName, points,
-						(float)instance.properties.moveX, (float)instance.properties.moveY
+						(float)instance.properties.moveX / 60f, (float)instance.properties.moveY / 60f
 					);
 					addGameObject(moveZone);
 				}

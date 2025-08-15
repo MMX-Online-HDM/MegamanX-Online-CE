@@ -653,10 +653,10 @@ public class Damager {
 			// Ride armor flinch push system.
 			float tempPush = 0;
 			if (flinch > 0 && rideArmor.ownedByLocalPlayer) {
-				tempPush = 240f * (flinch / 26f);
+				tempPush = 4f * (flinch / 26f);
 			}
 			// Apply push only if the new push is stronger than the current one.
-			if (tempPush > System.Math.Abs(rideArmor.xFlinchPushVel)) {
+			if (tempPush > Math.Abs(rideArmor.xFlinchPushVel)) {
 				float pushDirection = -victim.xDir;
 				if (owner.character != null) {
 					if (victim.pos.x > owner.character.pos.x) pushDirection = 1;

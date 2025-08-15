@@ -277,35 +277,30 @@ public class GrenadeExplosionProj : Projectile {
 	}
 
 	public override DamagerMessage? onDamage(IDamagable damagable, Player attacker) {
-		Character? character = damagable as Character;
+		if (damagable is not Character character) {
+			return null;
+		}
+		bool directHit = this.directHit == character;
 
-		if (character != null) {
-			bool directHit = this.directHit == character;
-			int directHitXDir = this.directHitXDir;
-			bool isSelf = (character == attacker.character);
+		Point victimCenter = character.getCenterPos();
+		Point bombCenter = pos;
+		if (directHit) {
+			bombCenter.x = victimCenter.x - (directHitXDir * 5);
+		}
+		Point dirTo = bombCenter.directionTo(victimCenter);
+		float distFactor = Helpers.clamp01(1 - (bombCenter.distanceTo(victimCenter) / 60f));
 
-			var victimCenter = character.getCenterPos();
-			var bombCenter = pos;
-			if (directHit) {
-				bombCenter.x = victimCenter.x - (directHitXDir * 5);
+		character.pushEffect(new Point(0.4f, 0.3f) * dirTo * distFactor);
+
+		if (character == attacker.character) {
+			float damage = damager.damage;
+			if ((character as Axl)?.isWhiteAxl() == true) {
+				damage = 0;
 			}
-			var dirTo = bombCenter.directionTo(victimCenter);
-			var distFactor = Helpers.clamp01(1 - (bombCenter.distanceTo(victimCenter) / 60f));
-
-			if (isSelf) character.vel.y += dirTo.y * 10 * distFactor;
-			else character.vel.y = dirTo.y * 10 * distFactor;
-
-			if (character == attacker.character) {
-				character.xSwingVel += dirTo.x * 10 * distFactor;
-				float damage = damager.damage;
-				if ((character as Axl)?.isWhiteAxl() == true) { damage = 0; }
-				return new DamagerMessage() {
-					damage = damage,
-					flinch = 0
-				};
-			} else {
-				character.xPushVel = dirTo.x * 10 * distFactor;
-			}
+			return new DamagerMessage() {
+				damage = damage,
+				flinch = 0
+			};
 		}
 
 		return null;
@@ -394,36 +389,33 @@ public class GreenSpinnerExplosionProj : Projectile {
 	}
 
 	public override DamagerMessage? onDamage(IDamagable damagable, Player attacker) {
-		Character? character = damagable as Character;
+		if (damagable is not Character character) {
+			return null;
+		}
+		bool directHit = this.directHit == character;
+		int directHitXDir = this.directHitXDir;
+		float ownAxlFactor = 1f;
+		if (character == attacker.character) {
+			ownAxlFactor = 1.5f;
+		}
 
-		if (character != null) {
-			bool directHit = this.directHit == character;
-			int directHitXDir = this.directHitXDir;
-			float ownAxlFactor = 1f;
-			if (character == attacker.character && !character.grounded) {
-				ownAxlFactor = 1.5f;
-			}
+		var victimCenter = character.getCenterPos();
+		var bombCenter = pos;
+		if (directHit) {
+			bombCenter.x = victimCenter.x - (directHitXDir * 5);
+		}
+		Point dirTo = bombCenter.directionTo(victimCenter);
+		float distFactor = Helpers.clamp01(1 - (bombCenter.distanceTo(victimCenter) / 60f));
 
-			var victimCenter = character.getCenterPos();
-			var bombCenter = pos;
-			if (directHit) {
-				bombCenter.x = victimCenter.x - (directHitXDir * 5);
-			}
-			var dirTo = bombCenter.directionTo(victimCenter);
-			var distFactor = Helpers.clamp01(1 - (bombCenter.distanceTo(victimCenter) / 60f));
+		character.pushEffect(new Point(0.6f, 0.4f) * dirTo * distFactor * ownAxlFactor);
 
-			character.vel.y = dirTo.y * 25 * distFactor * ownAxlFactor;
-			if (character == attacker.character) {
-				character.xSwingVel = dirTo.x * 12 * distFactor * ownAxlFactor;
-				float damage = damager.damage;
-				if ((character as Axl)?.isWhiteAxl() == true) damage = 0;
-				return new DamagerMessage() {
-					damage = damage,
-					flinch = 0
-				};
-			} else {
-				character.xPushVel = dirTo.x * 12 * distFactor * ownAxlFactor;
-			}
+		if (character == attacker.character) {
+			float damage = damager.damage;
+			if ((character as Axl)?.isWhiteAxl() != true) damage = 0;
+			return new DamagerMessage() {
+				damage = damage,
+				flinch = 0
+			};
 		}
 
 		return null;

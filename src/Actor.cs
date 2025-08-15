@@ -735,10 +735,10 @@ public partial class Actor : GameObject {
 			}
 		}
 
-		if (Math.Abs(xPushVel) > 5) {
+		if (Math.Abs(xPushVel) > 0.01f) {
 			xPushVel = Helpers.lerp(xPushVel, 0, Global.spf * 5);
 
-			var wall = Global.level.checkTerrainCollisionOnce(this, xPushVel * Global.spf, 0);
+			var wall = Global.level.checkTerrainCollisionOnce(this, xPushVel * speedMul, 0);
 			if (wall != null && wall.gameObject is Wall) {
 				xPushVel = 0;
 			}
@@ -747,48 +747,27 @@ public partial class Actor : GameObject {
 		}
 
 		// Heavy Flinch Push
-		if (Math.Abs(xFlinchPushVel) > 5) {
+		if (Math.Abs(xFlinchPushVel) > 0.01f) {
 			xFlinchPushVel = Helpers.lerp(xFlinchPushVel, 0f, Global.spf * 5);
 		} else if (xFlinchPushVel != 0f) {
 			xFlinchPushVel = 0f;
 		}
 
-		if (Math.Abs(yPushVel) > 5) {
+		if (Math.Abs(yPushVel) > 0.01f) {
 			yPushVel = Helpers.lerp(yPushVel, 0f, Global.spf * 5);
-		} else if (yPushVel != 0f) {
+		}
+		else if (yPushVel != 0f) {
 			yPushVel = 0f;
 		}
 
-		if (Math.Abs(xSwingVel) > 0) {
-			if (chr != null) {
-				if (chr is MegamanX) {
-					if (!chr.player.input.isHeld(Control.Dash, chr.player) || chr.flag != null) {
-						xSwingVel = Helpers.lerp(xSwingVel, 0, Global.spf * 5);
-						if (MathF.Abs(xSwingVel) < 20) xSwingVel = 0;
-					}
-				}
-
-				if (chr.player.input.isHeld(Control.Left, chr.player) && xSwingVel > 0) {
-					xSwingVel -= Global.spf * 1000;
-					if (xSwingVel < 0) xSwingVel = 0;
-				} else if (chr.player.input.isHeld(Control.Right, chr.player) && xSwingVel < 0) {
-					xSwingVel += Global.spf * 1000;
-					if (xSwingVel > 0) xSwingVel = 0;
-				}
+		if (Math.Abs(xSwingVel) > 0.01f) {
+			if (grounded ||
+				Global.level.checkTerrainCollisionOnce(this, xSwingVel * speedMul, 0)?.gameObject is Wall
+			) {
+				xSwingVel = 0;
 			}
-
-			var wall = Global.level.checkTerrainCollisionOnce(this, xSwingVel * Global.spf, 0);
-			if (wall != null && wall.gameObject is Wall) xSwingVel = 0;
-			if (grounded) xSwingVel = 0;
-			if (Math.Abs(xSwingVel) < 5) xSwingVel = 0;
-
-			if (chr != null) {
-				if (chr.charState is UpDash || chr.charState is Hover) xSwingVel = 0;
-				if (chr.charState is Dash || chr.charState is AirDash) {
-					//if (MathF.Sign(chr.xDir) != MathF.Sign(xSwingVel)) xSwingVel = 0;
-					xSwingVel = 0;
-				}
-			}
+		} else if (xSwingVel != 0f) {
+			xSwingVel = 0f;
 		}
 
 		if (!grounded) {
@@ -796,14 +775,14 @@ public partial class Actor : GameObject {
 		}
 		if (xIceVel != 0f) {
 			xIceVel = Helpers.lerp(xIceVel, 0f, Global.spf);
-			if (MathF.Abs(xIceVel) < 1f) {
+			if (MathF.Abs(xIceVel) < 1 / 32f) {
 				xIceVel = 0f;
 			} else {
 				// Gacel's notes:
 				// There must be a better way to do this, really.
 				Point oldPos = pos;
 				Point oldDeltaPos = deltaPos;
-				move(new Point(xIceVel, 0), useDeltaTime: true, useIce: false);
+				moveXY(xIceVel, 0, useIce: false);
 				if (oldPos.x == pos.x && oldPos.y == pos.y) {
 					xIceVel = 0f;
 				}
@@ -818,15 +797,11 @@ public partial class Actor : GameObject {
 			if (vel.y > 0) vel.y = 0;
 		}
 
-		if (this is Character) {
-			move(vel.addxy(xFlinchPushVel + xIceVel + xPushVel + xSwingVel, 0), true, true, false);
+		if (!isStatic) {
+			float xExtraSpeed = xFlinchPushVel + xIceVel + xPushVel + xSwingVel;
+			movePoint((vel / 60f).addxy(xExtraSpeed, 0), true, true, false);
 			if (yPushVel != 0) {
-				move(new Point(0, yPushVel), true, false, false);
-			}
-		} else if (!isStatic) {
-			move(vel.addxy(xFlinchPushVel + xIceVel + xPushVel + xSwingVel, 0), true, true, false);
-			if (yPushVel != 0) {
-				move(new Point(0, yPushVel), true, false, false);
+				moveXY(0, yPushVel, true, false, false);
 			}
 		}
 
@@ -1627,6 +1602,7 @@ public partial class Actor : GameObject {
 	public void stopMovingS() {
 		xIceVel = 0;
 		xPushVel = 0;
+		yPushVel = 0;
 		xSwingVel = 0;
 		vel.x = 0;
 		vel.y = 0;

@@ -541,7 +541,7 @@ public class MorphMCSpinState : MothMState {
 
 
 		maverick.move(new Point(xPushVel, 0));
-		if (stateAI != -1 && !input.isHeld(Control.Dash, player) && !input.isHeld(Control.Shoot, player)) {
+		if (stateAI == -1 && !input.isHeld(Control.Dash, player) && !input.isHeld(Control.Shoot, player)) {
 			maverick.changeToIdleOrFall();
 		}
 	}
@@ -796,9 +796,15 @@ public class MorphMCHangState : MothMState {
 		}
 		if (inputDir.x != 0) {
 			swingVel.x += inputDir.x * 150 * swingMod * Global.spf;
+		}
+		else if (stateAI != -1) {
+			swingVel.x = Helpers.lerp(velXAI, 0, Global.spf / swingMod);
 		} else {
-			if (swingMod == 0) swingVel.x = 0;
-			else swingVel.x = Helpers.lerp(stateAI != 1 ? velXAI : swingVel.x, 0, Global.spf / swingMod);
+			if (swingMod == 0) {
+				swingVel.x = 0;
+			} else {
+				swingVel.x = Helpers.lerp(swingVel.x, 0, Global.spf / swingMod);
+			}
 		}
 
 		swingVel = swingVel.project(norm);
@@ -832,7 +838,7 @@ public class MorphMCHangState : MothMState {
 		if (input.isPressed(Control.Jump, player)) {
 			snapPosOnExit(destPos);
 			maverick.changeToIdleOrFall();
-			maverick.xSwingVel = swingVel.x;
+			maverick.xSwingVel = swingVel.x / 60f;
 			maverick.vel.y = swingVel.y;
 		}
 	}
