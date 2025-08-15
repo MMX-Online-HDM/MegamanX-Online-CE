@@ -700,24 +700,38 @@ public partial class Actor : GameObject {
 	public void localUpdate(bool underwater) {
 		Character? chr = this as Character;
 		float grav = getGravity();
-		float terminalVelUp = Physics.MaxFallSpeed;
 		float terminalVelDown = Physics.MaxFallSpeed;
-		if (underwater) terminalVelDown = Physics.MaxUnderwaterFallSpeed;
-
+		if (underwater) {
+			terminalVelDown = Physics.MaxUnderwaterFallSpeed;
+		}
 		if (useGravity && !grounded) {
+			// Water slowing down the fall.
 			if (underwater) {
 				grav *= 0.5f;
 			}
+			// Apply gravity only if bellow terminal vel.
+			// This allows some attacks to go beyond it.
 			if (grav > 0 && vel.y < terminalVelDown) {
 				vel.y += grav * Global.speedMul;
 				if (vel.y > terminalVelDown) {
 					vel.y = terminalVelDown;
 				}
-			} else if (grav < 0) {
+			}
+			// Reverse gravity stuff.
+			else if (grav < 0 && vel.y > -terminalVelDown) {
 				vel.y += grav * Global.speedMul;
-				if (vel.y < -terminalVelUp) {
-					vel.y = -terminalVelUp;
+				if (vel.y < -terminalVelDown) {
+					vel.y = -terminalVelDown;
 				}
+			}
+			// Celling bump mechanic.
+			int gravDir = MathF.Sign(grav);
+			if (gravDir != 0 && vel.y * gravDir < 0 &&
+				Global.level.checkTerrainCollisionOnce(
+					this, 0, -gravDir, checkPlatforms: false
+				) != null
+			) {
+				vel.y = 0;
 			}
 		}
 
