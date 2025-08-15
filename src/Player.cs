@@ -1843,12 +1843,14 @@ public partial class Player {
 			if (backupNetId == null) {
 				throw new Exception("Error: Missing NetID on Axl trasform RPC.");
 			}
-			character.linkedATransChar = new Axl(
+			newChar = new Axl(
 				this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir, true, backupNetId, ownedByLocalPlayer, false
 			);
-		} else if (newChar == null) {
+		}
+		else if (newChar == null) {
 			throw new Exception("Error: Null newChar on atrans tranform..");
-		} else {
+		}
+		else {
 			Global.level.addGameObject(newChar);
 		}
 		newChar.pos = oldChar.pos;
