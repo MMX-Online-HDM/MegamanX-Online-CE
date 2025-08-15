@@ -219,7 +219,9 @@ public class Server {
 		if (isBot) {
 			serverPlayer = serverPlayer.clone();
 			serverPlayer.isHost = false;
-			serverPlayer.charNum = overrideCharNum ?? Helpers.randomRange((int)CharIds.X, (int)CharIds.BusterZero);
+			serverPlayer.charNum = overrideCharNum ?? Helpers.randomRange(
+				(int)CharIds.X, (int)CharIds.BusterZero
+			);
 			serverPlayer.preferredAlliance = overrideAlliance;
 		}
 

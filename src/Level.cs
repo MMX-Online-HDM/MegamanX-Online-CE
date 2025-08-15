@@ -995,22 +995,21 @@ public partial class Level {
 				int targetCharNum = hostPlayer.currentCharNum.Value;
 				LoadoutData currentLoadout = player.loadout;
 				if (player.atransLoadout != null) {
-					player.loadout = player.atransLoadout;
+					currentLoadout = player.atransLoadout;
 				}
 				player.spawnCharAtPoint(
 					targetCharNum, player.getCharSpawnData(targetCharNum, false, currentLoadout),
 					new Point(hostPlayer.charXPos, hostPlayer.charYPos),
 					hostPlayer.charXDir, (ushort)hostPlayer.charNetId, false
 				);
-				if (hostPlayer.charRollingShieldNetId != null) {
-					new RollingShieldProjCharged(
+				if (hostPlayer.charRollingShieldNetId != null && player.character is MegamanX mmx) {
+					mmx.chargedRollingShieldProj = new RollingShieldProjCharged(
 						player.character.pos,
 						player.character.xDir,
 						player.character, player,
 						hostPlayer.charRollingShieldNetId.Value
 					);
 				}
-				player.loadout = currentLoadout;
 			} else {
 				player.atransLoadout = null;
 			}

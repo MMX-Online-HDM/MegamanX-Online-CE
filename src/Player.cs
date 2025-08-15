@@ -207,64 +207,42 @@ public partial class Player {
 
 	public bool isMuted;
 
-	// Subtanks
-	private Dictionary<int, List<SubTank>> charSubTanks = new Dictionary<int, List<SubTank>>() {
-		{ -1, new() },
-		{ (int)CharIds.X, new() },
-		{ (int)CharIds.Zero, new() },
-		{ (int)CharIds.Vile, new() },
-		{ (int)CharIds.Axl, new() },
-		{ (int)CharIds.Sigma, new() },
-		{ (int)CharIds.PunchyZero, new() },
-		{ (int)CharIds.BusterZero, new() },
-		{ (int)CharIds.Rock, new() },
-	};
-
-	// Heart tanks
-	public Dictionary<int, ProtectedInt> charHeartTanks = new Dictionary<int, ProtectedInt>(){
-		{ -1, new() },
-		{ (int)CharIds.X, new() },
-		{ (int)CharIds.Zero, new() },
-		{ (int)CharIds.Vile, new() },
-		{ (int)CharIds.Axl, new() },
-		{ (int)CharIds.Sigma, new() },
-		{ (int)CharIds.PunchyZero, new() },
-		{ (int)CharIds.BusterZero, new() },
-		{ (int)CharIds.Rock, new() },
-	};
+	// Subtanks and heart tanks internal lists.
+	public Dictionary<int, List<SubTank>> subTanksMap = [];
+	private ProtectedIntMap<int> heartTanksMap = [];
 
 	// Getter functions.
 	public List<SubTank> subtanks {
-		get { return charSubTanks[isDisguisedAxl ? 3 : charNum]; }
-		set { charSubTanks[isDisguisedAxl ? 3 : charNum] = value; }
+		get { return subTanksMap[charNum]; }
+		set { subTanksMap[charNum] = value; }
 	}
 
 	public int getHeartTanks(int charId) {
 		if (Global.level.mainPlayer != this || Global.serverClient == null) {
-			return charHeartTanks[charId].unsafeVal;
+			return heartTanksMap.quickVal(charId);
 		}
-		return charHeartTanks[charId].value;
+		return heartTanksMap[charId];
 	}
 
 	public int heartTanks {
-		get => getHeartTanks(isDisguisedAxl ? 3 : charNum);
-		set => charHeartTanks[isDisguisedAxl ? 3 : charNum].value = value;
+		get => getHeartTanks(charNum);
+		set => heartTanksMap[charNum] = value;
 	}
 
 	// Currency
 	public const int maxCharCurrencyId = 12;
 	public static int curMul = Helpers.randomRange(2, 8);
 
-	public ProtectedArrayInt charCurrency = new ProtectedArrayInt(maxCharCurrencyId);
+	public ProtectedIntMap<int> charCurrency = [];
 	public int currency {
 		get {
-			if (!ownedByLocalPlayer) {
-				return charCurrency.unsafeVal(isDisguisedAxl ? 3 : charNum);
+			if (Global.level.mainPlayer != this || Global.serverClient == null) {
+				return charCurrency.quickVal(charNum);
 			}
-			return charCurrency[isDisguisedAxl ? 3 : charNum];
+			return charCurrency[charNum];
 		}
 		set {
-			charCurrency[isDisguisedAxl ? 3 : charNum] = value;
+			charCurrency[charNum] = value;
 		}
 	}
 
@@ -561,6 +539,12 @@ public partial class Player {
 		newAlliance = alliance;
 		this.isAI = isAI;
 
+		// Iterate over each charID and populate.
+		foreach (CharIds i in Enum.GetValues(typeof(CharIds)).Cast<CharIds>()) {
+			heartTanksMap[(int)i] = new();
+			subTanksMap[(int)i] = new();
+		}
+
 		if (getSameCharNum() != -1) {
 			charNum = getSameCharNum();
 		}
@@ -587,21 +571,21 @@ public partial class Player {
 			armArmorNum = xArmor1v1;
 		}
 
-		for (int i = 0; i < charCurrency.Length; i++) {
-			charCurrency[i] = getStartCurrency();
+		foreach (int key in charCurrency.Keys) {
+			charCurrency[key] = getStartCurrency();
 		}
-		foreach (var key in charHeartTanks.Keys) {
+		foreach (int key in heartTanksMap.Keys) {
 			int htCount = getStartHeartTanksForChar();
 			int altHtCount = getStartHeartTanks();
 			if (altHtCount > htCount) {
 				htCount = altHtCount;
 			}
-			charHeartTanks[key].value = htCount;
+			heartTanksMap[key] = htCount;
 		}
-		foreach (var key in charSubTanks.Keys) {
+		foreach (int key in subTanksMap.Keys) {
 			int stCount = key == charNum ? getStartSubTanksForChar() : getStartSubTanks();
 			for (int i = 0; i < stCount; i++) {
-				charSubTanks[key].Add(new SubTank());
+				subTanksMap[key].Add(new SubTank());
 			}
 		}
 		_maxHealth = getMaxHealth();

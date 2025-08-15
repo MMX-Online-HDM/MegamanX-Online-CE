@@ -24,7 +24,10 @@ public class PlayerCharData {
 }
 
 public enum CharIds {
-	X,
+	// Null stage char.
+	Stage = -1,
+	// Real char.
+	X = 0,
 	Zero,
 	Vile,
 	Axl,

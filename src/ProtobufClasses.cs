@@ -85,24 +85,25 @@ public class PlayerPB {
 	[ProtoMember(1)] public int newAlliance;
 	[ProtoMember(2)] public int weaponIndex;
 	[ProtoMember(3)] public bool isAI;
-	[ProtoMember(6)] public int newCharNum;
-	[ProtoMember(7)] public ushort curMaxNetId;
-	[ProtoMember(8)] public bool warpedIn = false;
-	[ProtoMember(9)] public float readyTime;
-	[ProtoMember(10)] public bool spawnChar = false;
-	[ProtoMember(11)] public ushort armorFlag;
-	[ProtoMember(12)] public LoadoutData loadoutData;
-	[ProtoMember(13)] public Disguise disguise;
+	[ProtoMember(4)] public int newCharNum;
+	[ProtoMember(5)] public ushort curMaxNetId;
+	[ProtoMember(6)] public bool warpedIn = false;
+	[ProtoMember(7)] public float readyTime;
+	[ProtoMember(8)] public bool spawnChar = false;
+	[ProtoMember(9)] public ushort armorFlag;
+	[ProtoMember(10)] public LoadoutData loadoutData;
+	[ProtoMember(11)] public Disguise disguise;
 
-	[ProtoMember(14)] public ushort? charNetId;
-	[ProtoMember(15)] public ushort? charRollingShieldNetId;
-	[ProtoMember(16)] public float charXPos;
-	[ProtoMember(17)] public float charYPos;
-	[ProtoMember(18)] public int charXDir;
-	[ProtoMember(19)] public LoadoutData atransLoadout;
-	[ProtoMember(20)] public int? currentCharNum;
+	[ProtoMember(12)] public ushort? charNetId;
+	[ProtoMember(13)] public ushort? charRollingShieldNetId;
+	[ProtoMember(14)] public float charXPos;
+	[ProtoMember(15)] public float charYPos;
+	[ProtoMember(16)] public int charXDir;
+	[ProtoMember(17)] public LoadoutData atransLoadout;
+	[ProtoMember(18)] public int? currentCharNum;
+	[ProtoMember(19)] public int? preAtransCharId;
 
-	[ProtoMember(21)] public ServerPlayer serverPlayer;
+	[ProtoMember(20)] public ServerPlayer serverPlayer;
 
 	public PlayerPB() { }
 
@@ -114,6 +115,9 @@ public class PlayerPB {
 		newCharNum = player.newCharNum;
 		if (player.character != null) {
 			currentCharNum = (int)player.character.charId;
+		}
+		if (player.preTransformedChar != null) {
+			preAtransCharId = (int)player.preTransformedChar.charId;
 		}
 		curMaxNetId = player.curMaxNetId;
 		warpedIn = player.warpedIn;

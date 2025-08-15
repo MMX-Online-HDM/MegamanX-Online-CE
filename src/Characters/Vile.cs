@@ -375,7 +375,7 @@ public class Vile : Character {
 		return player.input.isHeld(Control.Special1, player);
 	}
 	public override bool canCharge() {
-		return !isInvulnerableAttack() && charState is not Die && invulnTime == 0;
+		return !isInvulnerable(true) && charState is not Die && invulnTime == 0;
 	}
 	public override int getMaxChargeLevel() {
 		return isVileMK5 ? 4 : 3;
