@@ -540,9 +540,10 @@ public partial class Player {
 		this.isAI = isAI;
 
 		// Iterate over each charID and populate.
-		foreach (CharIds i in Enum.GetValues(typeof(CharIds)).Cast<CharIds>()) {
-			heartTanksMap[(int)i] = new();
-			subTanksMap[(int)i] = new();
+		foreach (int i in Enum.GetValues(typeof(CharIds)).Cast<int>()) {
+			heartTanksMap[i] = 0;
+			charCurrency[i] = 0;
+			subTanksMap[i] = [];
 		}
 
 		if (getSameCharNum() != -1) {
