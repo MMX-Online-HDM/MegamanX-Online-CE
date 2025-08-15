@@ -33,8 +33,8 @@ public class CustomMatchSettings {
 	[ProtoMember(24)] public bool axlBackwardsDebuff;
 	[ProtoMember(25)] public float axlDodgerollCooldown;
 	[ProtoMember(26)] public bool axlCustomReload;
-	[ProtoMember(26)] public bool axlFtaDodgeroll;
 	[ProtoMember(27)] public bool oldATrans;
+	[ProtoMember(28)] public bool flinchairDashReset;
 
 
 	public CustomMatchSettings() {
@@ -70,8 +70,8 @@ public class CustomMatchSettings {
 			axlBackwardsDebuff = true,
 			axlDodgerollCooldown = 1.25f,
 			axlCustomReload = false,
-			axlFtaDodgeroll = false,
 			oldATrans = false,
+			flinchairDashReset = false,
 		};
 	}
 }
@@ -547,22 +547,6 @@ public class CustomMatchSettingsMenu : IMainMenu {
 			new MenuOption(
 				startX3, currentY3 += lineH3,
 				() => {
-					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.axlFtaDodgeroll, true);
-				},
-				(Point pos, int index) => {
-					Fonts.drawText(
-						FontType.Purple,
-						"Axl FTA Dodge Roll : " +
-						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.axlFtaDodgeroll),
-						pos.x, pos.y, selected: selectArrowPosY3 == 4
-					);
-				}
-			)
-		);
-		menuOptions3.Add(
-			new MenuOption(
-				startX3, currentY3 += lineH3,
-				() => {
 					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.axlCustomReload, true);
 				},
 				(Point pos, int index) => {
@@ -570,7 +554,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 						FontType.Purple,
 						"Axl Weapons Capable to Reload: " +
 						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.axlCustomReload),
-						pos.x, pos.y, selected: selectArrowPosY3 == 5
+						pos.x, pos.y, selected: selectArrowPosY3 == 4
 					);
 				}
 			)
@@ -586,6 +570,22 @@ public class CustomMatchSettingsMenu : IMainMenu {
 						FontType.Purple,
 						"Axl Vanilla DNA: " +
 						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.oldATrans),
+						pos.x, pos.y, selected: selectArrowPosY3 == 5
+					);
+				}
+			)
+		);
+		menuOptions3.Add(
+			new MenuOption(
+				startX3, currentY3 += lineH3,
+				() => {
+					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.flinchairDashReset, true);
+				},
+				(Point pos, int index) => {
+					Fonts.drawText(
+						FontType.Purple,
+						"Flinch resets Air Dash: " +
+						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.flinchairDashReset),
 						pos.x, pos.y, selected: selectArrowPosY3 == 6
 					);
 				}

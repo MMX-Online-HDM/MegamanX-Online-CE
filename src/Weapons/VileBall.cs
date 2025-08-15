@@ -121,15 +121,15 @@ public class VileBombProj : Projectile {
 		pos, xDir, owner, "vile_bomb_air", netId, player
 	) {
 		weapon = VileBall.netWeaponER;
-		damager.damage = 1;
+		damager.damage = 2;
 		damager.hitCooldown = 12;
 		this.type = type;
 		if (type == 0) {
-			vel = new Point(100*xDir, 0);
+			vel = new Point(100 * xDir, 0);
 			maxTime = 0.45f;
 		}
 		if (type == 1) {
-			vel = new Point (100*xDir, -200);
+			vel = new Point(100 * xDir, -200);
 			maxTime = 0.7f;
 		}
 		projId = (int)ProjIds.VileBomb;
@@ -140,6 +140,7 @@ public class VileBombProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)type);
 		}
+		projId = (int)ProjIds.VileBombSplit;
 	}
 	public static Projectile rpcInvoke(ProjParameters args) {
 		return new VileBombProj(
@@ -179,7 +180,7 @@ public class VileBombSplitProj : Projectile {
 		pos, xDir, owner, "vile_bomb_ground", netId, player
 	) {
 		weapon = VileBall.netWeaponER;
-		damager.damage = 1;
+		damager.damage = 2;
 		damager.hitCooldown = 12;
 	    maxTime = 0.3f;
 		projId = (int)ProjIds.VileBombSplit;
@@ -209,16 +210,16 @@ public class PeaceOutRollerProj : Projectile {
 		pos, xDir, owner, "ball_por_proj", netId, player
 	) {
 		weapon = VileBall.netWeaponPR;
-		damager.damage = 1.5f;
+		damager.damage = 3f;
 		damager.flinch = Global.miniFlinch;
 		damager.hitCooldown = 30;
 		this.type = type;
 		if (type == 0) {
-			vel = new Point (75*xDir, 50);
+			vel = new Point(75 * xDir, 50);
 			maxTime = 0.5f;
 		}
 		if (type == 1) {
-			vel = new Point (100*xDir, -150);
+			vel = new Point(100 * xDir, -150);
 			maxTime = 1;
 			zIndex = ZIndex.Character;
 		}
@@ -231,6 +232,7 @@ public class PeaceOutRollerProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)type);
 		}
+		projId = (int)ProjIds.PeaceOutRollerSplit;
 	}
 
 	public static Projectile rpcInvoke(ProjParameters args) {
@@ -265,7 +267,7 @@ public class PeaceOutRollerSplitProj : Projectile {
 		pos, xDir, owner, "ball_por_proj", netId, player
 	) {
 		weapon = VileBall.netWeaponPR;
-		damager.damage = 1.5f;
+		damager.damage = 3f;
 		damager.flinch = Global.miniFlinch;
 		damager.hitCooldown = 30;
 	    maxTime = 0.4f;

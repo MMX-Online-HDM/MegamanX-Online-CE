@@ -92,6 +92,13 @@ public class Hurt : CharState {
 			character.changeToLandingOrFall(false);
 		}
 	}
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		//Came back from the death as Custom Setting
+		if (Global.level.server?.customMatchSettings?.flinchairDashReset == true) {
+			character.dashedInAir = 0;
+		}
+	}
 }
 
 // Applies to freeze, stun, other effects.
