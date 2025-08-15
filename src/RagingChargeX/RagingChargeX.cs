@@ -71,7 +71,7 @@ public class RagingChargeX : Character {
 	}
 
 	public override void postUpdate() {
-		base.preUpdate();
+		base.postUpdate();
 		if (!isDecayImmune() && selfDamageCooldown < selfDamageMaxCooldown) {
 			selfDamageCooldown = selfDamageMaxCooldown;
 		}

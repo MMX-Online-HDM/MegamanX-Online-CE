@@ -1049,7 +1049,13 @@ public partial class Player {
 
 		// ONRESPAWN, SPAWN, RESPAWN, ON RESPAWN, ON SPAWN LOGIC, SPAWNLOGIC
 		if (isMainChar) {
-			charNum = spawnCharNum;
+			charNum = (CharIds)spawnCharNum switch {
+				CharIds.RagingChargeX => (int)CharIds.X,
+				CharIds.WolfSigma => (int)CharIds.Sigma,
+				CharIds.ViralSigma => (int)CharIds.Sigma,
+				CharIds.KaiserSigma => (int)CharIds.Sigma,
+				_ => spawnCharNum
+			};
 			if (isMainPlayer) {
 				previousLoadout = loadout;
 				applyLoadoutChange();
