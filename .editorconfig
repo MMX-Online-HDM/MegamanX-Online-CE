@@ -15,6 +15,7 @@ charset = utf-8-bom
 dotnet_diagnostic.IDE1006.severity = none
 # Disable "can be simplifed" on "new" use
 dotnet_diagnostic.IDE0090.severity = none
+dotnet_diagnostic.IDE0047.severity = none
 ###############################
 # C# Coding Conventions       #
 ###############################
