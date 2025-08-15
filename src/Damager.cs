@@ -546,7 +546,9 @@ public class Damager {
 				} else {
 					flinch = Global.superFlinch;
 				}
-				flinchCooldown = 60;
+				if (flinchCooldown == 0) {
+					flinchCooldown = 60;
+				}
 				damage = MathF.Ceiling(damage * 1.5f);
 			}
 			// Disallow flinch stack for non-BZ.
