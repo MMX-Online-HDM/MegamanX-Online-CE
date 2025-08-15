@@ -467,9 +467,11 @@ public class MegamanX : Character {
 		}
 		// Calls the weapon shoot function.
 		bool useCrossShotAnim = false;
+		bool isStockActive = busterStock;
 		if (chargeLevel >= 3 && armArmor == ArmorId.Giga || busterStock) {
 			if (!busterStock) {
 				stockedBusterLv = 2;
+				isStockActive = true;
 			}
 			if (!weapon.hasCustomChargeAnim && charState.normalCtrl && charState.attackCtrl) {
 				useCrossShotAnim = true;
@@ -493,6 +495,9 @@ public class MegamanX : Character {
 			return;
 		} else {
 			weapon.shoot(this, [chargeLevel, busterStock ? 1 : 0]);
+			if (isStockActive && stockedBusterLv > 0) {
+				stockedBusterLv--;
+			}
 		}
 		// Sets up global shoot cooldown to the weapon shootCooldown.
 		float baseCooldown = weapon.getFireRate(this, chargeLevel, [busterStock ? 1 : 0]);
