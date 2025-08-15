@@ -551,21 +551,20 @@ public class Damager {
 				damage = MathF.Ceiling(damage * 1.5f);
 			}
 			// Disallow flinch stack for non-BZ.
-			else if (!Global.canFlinchCombo) {
-				if (character.charState is Hurt hurtState &&
-					hurtState.stateFrames < hurtState.flinchTime - 4
-				) {
-					flinchCooldown = 0;
+			else if (flinch > 0 && !Global.canFlinchCombo) {
+				int fkey = owner.id;
+				float fmod = 1.25f;
+				if (character.globalFlinchCooldown.ContainsKey(fkey)) {
+					character.globalFlinchCooldown[fkey] = 0;
 				}
-				if (maverick != null && maverick.state is MHurt mHurtState &&
-					mHurtState.stateFrame < mHurtState.flinchTime - 4
-				) {
-					flinchCooldown = 0;
+				if (character.globalFlinchCooldown[fkey] > 0) {
+					flinch = 0;
 				}
+				character.globalFlinchCooldown[fkey] = MathF.Ceiling(flinch * fmod);
 			}
 
 			if (flinchCooldown > 0 && flinch > 0) {
-				int flinchKey = getFlinchKeyFromProjId(projId);
+				string flinchKey = $"{getFlinchKeyFromProjId(projId)}_{owner.id}";
 				if (!character.flinchCooldown.ContainsKey(flinchKey)) {
 					character.flinchCooldown[flinchKey] = 0;
 				}
@@ -696,7 +695,7 @@ public class Damager {
 			// Get flinch cooldown index.
 			bool isOnFlinchCooldown = false;
 			float flinchCooldownTime = 0;
-			int flinchKey = getFlinchKeyFromProjId(projId);
+			string flinchKey = $"{getFlinchKeyFromProjId(projId)}_{owner.id}";
 			if (projectileFlinchCooldowns.ContainsKey(projId)) {
 				flinchCooldownTime = projectileFlinchCooldowns[projId];
 			}
@@ -945,7 +944,7 @@ public class Damager {
 		if (projId == (int)ProjIds.TriadThunder || projId == (int)ProjIds.TriadThunderBall || projId == (int)ProjIds.TriadThunderBeam) {
 			projId = (int)ProjIds.TriadThunder;
 		}
-		return 1000 + projId;
+		return projId;
 	}
 
 	public static bool hitFromBehind(Actor actor, Actor? damager, Player? projOwner, int projId) {

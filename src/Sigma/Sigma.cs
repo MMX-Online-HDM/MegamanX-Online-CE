@@ -54,7 +54,8 @@ public class BaseSigma : Character {
 				intialCharState = getIdleState();
 			}
 		} else {
-			intialCharState = getIdleState();
+			intialCharState = new NetLimbo();
+			useGravity = false;
 		}
 		changeState(intialCharState);
 	}

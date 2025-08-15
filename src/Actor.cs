@@ -100,7 +100,8 @@ public partial class Actor : GameObject {
 	public bool reversedGravity;
 	public float gravityWellModifier = 1;
 	public Dictionary<string, float> projectileCooldown { get; set; } = new Dictionary<string, float>();
-	public Dictionary<int, float> flinchCooldown { get; set; } = new Dictionary<int, float>();
+	public Dictionary<string, float> flinchCooldown { get; set; } = new Dictionary<string, float>();
+	public Dictionary<int, float> globalFlinchCooldown { get; set; } = new Dictionary<int, float>();
 
 	public MusicWrapper? musicSource;
 	public bool checkLadderDown = false;
