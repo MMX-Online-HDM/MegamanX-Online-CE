@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace MMXOnline;
 
@@ -23,9 +24,23 @@ public class HyperNovaStrike : Weapon {
 	}
 
 	public override void shoot(Character character, int[] args) {
+		var hitWall = Global.level.raycast(character.pos,character.pos.addxy(35*character.xDir, 0),new List<Type>() { typeof(Wall) });
+		var hitCeiling = Global.level.raycast(character.pos,character.pos.addxy(0, -40),new List<Type>() { typeof(Wall) });
+		var hitFloor = Global.level.raycast(character.pos,character.pos.addxy(0, 25),new List<Type>() { typeof(Wall) });
+		if (character.flag != null) return;
+		if (hitWall != null && Options.main.novaStrikeWall) return;
+		if (hitCeiling != null && Options.main.novaStrikeCeiling) return;
+		if (hitFloor != null && Options.main.novaStrikeFloor && character.player.input.isHeld(Control.Down, character.player)) return;
+
 		if (character.ownedByLocalPlayer) {
-			Point inputDir = character.player.input.getInputDir(character.player);
-			character.changeState(new NovaStrikeState(inputDir), true);
+			if (character.player.input.isHeld(Control.Up, character.player)) {
+				character.changeState(new NovaStrikeStateUpEX(), true);
+			} else if (character.player.input.isHeld(Control.Down, character.player)) {
+				character.changeState(new NovaStrikeStateDownEX(), true);
+			} else {
+				character.changeState(new NovaStrikeStateEX(), true);
+			}
+			character.currentWeapon?.addAmmo(-ammoUsage, character.player);
 		}
 	}
 
@@ -33,7 +48,7 @@ public class HyperNovaStrike : Weapon {
 		if (Global.level?.isHyper1v1() == true) {
 			return 0;
 		}
-		return ammoUsage;
+		return 0;
 	}
 
 	public override bool canShoot(int chargeLevel, Player player) {
@@ -118,4 +133,117 @@ public class NovaStrikeState : CharState {
 		Nova?.destroySelf();
 	}
 
+}
+
+public class NovaStrikeStateEX : CharState {
+	public NovaStrikeStateEX() : base("nova_strike") {
+		immuneToWind = true;
+		invincible = true;
+		useDashJumpSpeed = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (!once && character.frameIndex >= 4) {
+			once = true;
+			if (Helpers.randomRange(0, 10) < 10) {
+				character.playSound("novaStrikeX4", forcePlay: false, sendRpc: true);
+			} else {
+				character.playSound("novaStrikeX6", forcePlay: false, sendRpc: true);
+			}
+		}
+		if (character.frameIndex <= 2) {
+			character.move(new Point(125 * character.xDir, -95));
+			character.unstickFromGround();
+		}
+		if (character.frameIndex >= 4) {
+			character.move(new Point(350 * character.xDir, 0));
+		}
+		CollideData? collideData = Global.level.checkTerrainCollisionOnce(character, character.xDir, 0);
+		if (collideData != null && collideData.isSideWallHit() && character.ownedByLocalPlayer) {
+			character.changeToIdleOrFall();
+		}
+		if (stateTime > 36f / 60f) {
+			character.changeToIdleOrFall();
+		}
+	}
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+}
+public class NovaStrikeStateUpEX : CharState {
+	public NovaStrikeStateUpEX() : base("nova_strike_up") {
+		immuneToWind = true;
+		invincible = true;
+		useDashJumpSpeed = true;
+	}
+
+	public override void update() {
+		base.update();
+		if (!once && character.frameIndex >= 4) {
+			once = true;
+			if (Helpers.randomRange(0, 10) < 10) {
+				character.playSound("novaStrikeX4", forcePlay: false, sendRpc: true);
+			} else {
+				character.playSound("novaStrikeX6", forcePlay: false, sendRpc: true);
+			}
+		}
+		if (character.frameIndex <= 3) {
+			character.move(new Point(0, -25));
+			character.unstickFromGround();
+		}
+		if (character.frameIndex >= 4) {
+			character.move(new Point(0, -350));
+		}
+		var hitWall = Global.level.raycast(character.pos, character.pos.addxy(0, -40), new List<Type>() { typeof(Wall) });
+		if (hitWall != null) {
+			character.changeToIdleOrFall();
+		}
+		if (stateTime > 36f / 60f) {
+			character.changeToIdleOrFall();
+		}
+	}
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+}
+public class NovaStrikeStateDownEX : CharState {
+	public NovaStrikeStateDownEX() : base("nova_strike_down") {
+		immuneToWind = true;
+		invincible = true;
+		useDashJumpSpeed = true;
+	}
+
+	public override void update() {
+		base.update();
+		if (!once && character.frameIndex >= 4) {
+			once = true;
+			if (Helpers.randomRange(0, 10) < 10) {
+				character.playSound("novaStrikeX4", forcePlay: false, sendRpc: true);
+			} else {
+				character.playSound("novaStrikeX6", forcePlay: false, sendRpc: true);
+			}
+		}
+		if (character.frameIndex <= 3) {
+			character.move(new Point(0, 25));
+			character.unstickFromGround();
+		}
+		if (character.frameIndex >= 4) {
+			character.move(new Point(0, 350));
+		}
+		var hitWall = Global.level.raycast(character.pos,character.pos.addxy(0, 10),new List<Type>() { typeof(Wall) });
+		if (hitWall != null) {
+			character.changeToIdleOrFall();
+		}
+		if (stateTime > 36f / 60f) {
+			character.changeToIdleOrFall();
+		}
+	}
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
 }

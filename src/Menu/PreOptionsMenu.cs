@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MMXOnline;
 
@@ -242,5 +244,119 @@ public class PreOptionsMenuCharacter : IMainMenu {
 		Fonts.drawText(menuFont, "Sigma settings", startX, optionPos[4], Alignment.Center, selected: selectY == 4);
 
 		Fonts.drawTextEX(FontType.Grey, "[OK]: Choose, [BACK]: Back", Global.halfScreenW, 198, Alignment.Center);
+	}
+}
+public class PreCPUMenu : IMainMenu {
+	public int selArrowPosY;
+	public Point optionPos1 = new Point(Global.halfScreenW, 70);
+	public MainMenu prevMenu;
+	public int selectY;
+	public bool inGame;
+	public float startX = Global.halfScreenW;
+	public int[] optionPos = new int[2];
+	public int lineH = 24;
+	public int[] cursorHandler = {
+		(int)Global.halfScreenW - 50,
+		(int)Global.halfScreenW - 70,
+	};
+	public int[] cursorHandler2 = {
+		(int)Global.halfScreenW + 50,
+		(int)Global.halfScreenW + 70,
+	};
+	public float Time = 1, Time2;
+	public bool Confirm = false, Confirm2 = false;
+	public PreCPUMenu(MainMenu prevMenu, bool inGame) {
+		this.prevMenu = prevMenu;
+		this.inGame = inGame;
+		for (int i = 0; i < optionPos.Length; i++) {
+			optionPos[i] = 95 + lineH * i;
+		}
+
+	}
+
+	public void update() {
+		Helpers.menuUpDown(ref selectY, 0, 1);
+		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
+			switch (selectY) {
+				case 0:
+					Menu.change(new HostMenu(this, null, true, true, false));
+					break;
+				case 1:
+					enterTraining();
+					break;
+			}
+		}
+		if (Options.main.blackFade) {
+			TimeUpdate();
+			if (Time2 >= 1) {
+				Menu.change(prevMenu);
+				prevMenu.Time = 0;
+				prevMenu.Time2 = 1;
+				prevMenu.Confirm = false;
+				prevMenu.Confirm2 = false;
+			}
+		} else {
+			if (Global.input.isPressedMenu(Control.MenuBack))
+				Menu.change(prevMenu);
+		}
+	}
+	public void enterTraining() {
+		var selectedLevel = Global.levelDatas.FirstOrDefault(ld => ld.Key == Global.quickStartMap).Value;
+		var scm = new SelectCharacterMenu(Global.quickStartCharNum);
+		int spawnAsX = (int)CharIds.X;
+		var me = new ServerPlayer(Options.main.playerName, 0, true, spawnAsX, Global.quickStartTeam, Global.deviceId, null, 0);
+		if (selectedLevel.name == "training" && GameMode.isStringTeamMode(Global.quickStartTrainingGameMode)) me.alliance = Global.quickStartTeam;
+		if (selectedLevel.name != "training" && GameMode.isStringTeamMode(Global.quickStartGameMode)) me.alliance = Global.quickStartTeam;
+		string gameMode = selectedLevel.name == "training" ? Global.quickStartTrainingGameMode : Global.quickStartGameMode;
+		int botCount = selectedLevel.name == "training" ? Global.quickStartTrainingBotCount : Global.quickStartBotCount;
+		bool disableVehicles = selectedLevel.name == "training" ? Global.quickStartDisableVehiclesTraining : Global.quickStartDisableVehicles;
+		var localServer = new Server(
+			Global.version, null, null, selectedLevel.name, selectedLevel.shortName,
+			gameMode, Global.quickStartPlayTo, botCount, selectedLevel.maxPlayers, 0, false, false,
+			NetcodeModel.FavorAttacker, 200, true, Global.quickStartMirrored,
+			Global.quickStartTrainingLoadout, Global.checksum, selectedLevel.checksum,
+			selectedLevel.customMapUrl, SavedMatchSettings.mainOffline.extraCpuCharData, null,
+			Global.quickStartDisableHtSt, disableVehicles,
+			2
+		);
+		localServer.players = new List<ServerPlayer>() { me };
+		Global.level = new Level(localServer.getLevelData(), SelectCharacterMenu.playerData, localServer.extraCpuCharData, false);
+		Global.level.teamNum = localServer.teamNum;
+		Global.level.startLevel(localServer, false);
+	}
+	public void TimeUpdate() {
+		if (Confirm == false) Time -= Global.spf * 2;
+		if (Time <= 0) {
+			Confirm = true;
+			Time = 0;
+		}
+		if (Global.input.isPressedMenu(Control.MenuBack)) Confirm2 = true;
+		if (Confirm2 == true) Time2 += Global.spf * 2;
+	}
+	public void render() {
+		DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0);
+		FontType menuFont = FontType.DarkBlue;
+		if (Global.flFrameCount % 60 < 30) {
+			for (int i = 0; i < 2; i++) {
+				if (selectY == i) {
+					Fonts.drawText(FontType.Blue, "<", cursorHandler[i], optionPos[i], Alignment.Center, selected: selectY == i,
+					selectedFont: inGame ? FontType.Orange : FontType.DarkOrange);
+					Fonts.drawText(FontType.Blue, ">", cursorHandler2[i] - 1, optionPos[i], Alignment.Center, selected: selectY == i,
+					selectedFont: inGame ? FontType.Orange : FontType.DarkOrange);
+				}
+			}
+		}
+		string Name = "Select Stage";
+		Fonts.drawText(menuFont, Name, startX, optionPos[0], Alignment.Center, selected: selectY == 0);
+		Fonts.drawText(menuFont, "Enter Fast Training", startX, optionPos[1], Alignment.Center, selected: selectY == 1);
+		if (selectY == 1) {
+			Fonts.drawText(menuFont, "You can enter through \n" + Name + "\nand customize your settings",
+			 startX, optionPos[1] + 40, Alignment.Center, selected: selectY == 1, selectedFont: menuFont, alpha: 100);
+		}
+		Fonts.drawTextEX(FontType.Grey, "[OK]: Choose, [BACK]: Back", Global.screenW / 2, Global.screenH - 9, Alignment.Center);
+		if (Options.main.blackFade) {
+			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, Time);
+			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, Time2);
+		}
 	}
 }

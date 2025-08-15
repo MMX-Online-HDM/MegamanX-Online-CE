@@ -718,30 +718,30 @@ public class LevelData {
 		var nameMappings = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
 			{
 			#region Large-Collosal
-			{ "doppler's lab", "Doppler Stage A" },
-			{ "safari park", "Safari Park Stage" },
-			{ "quarry", "Quarry Stage" },
-			{ "power control center", "Hydroelectric Power Plant Stage" },
-			{ "shipyard", "Shipyard Stage" },
-			{ "airborne aircraft carrier", "Airborne Aircraft Carrier Stage" },
-			{ "weapons factory", "Weapons Factory Stage" },
-			{ "giant dam", "Giant Dam Stage" },
-			{ "giant dam 2", "Giant Dam Stage 2" },
-			{ "frozen town", "Frozen Town Stage" },
+			{ "doppler's lab", "Doppler A" },
+			{ "safari park", "Safari Park" },
+			{ "quarry", "Quarry" },
+			{ "power control center", "Hydroelectric Power Plant" },
+			{ "shipyard", "Shipyard" },
+			{ "airborne aircraft carrier", "Airborne Aircraft Carrier" },
+			{ "weapons factory", "Weapons Factory" },
+			{ "giant dam", "Giant Dam" },
+			{ "giant dam 2", "Giant Dam 2" },
+			{ "frozen town", "Frozen Town" },
 			{ "hunter base", "Hunter Base" },
 			{ "hunterbase 2", "Credits Scenario X3" },
 			{ "dinosaur tank", "Dinosaur Type Terrestrial"},
-			{ "x-hunter stage 2", "Counter Hunter Stage 2"},
-			{ "x-hunter stage 1", "Counter Hunter Stage 1"},
-			{ "central computer", "Giant Computer Interior Stage"},
-			{ "energen crystal", "Energen Crystal Stage"},
-			{ "desert base", "Missile Launch Base Stage"},
+			{ "x-hunter stage 2", "Counter Hunter 2"},
+			{ "x-hunter stage 1", "Counter Hunter 1"},
+			{ "central computer", "Giant Computer Interior"},
+			{ "energen crystal", "Energen Crystal"},
+			{ "desert base", "Missile Launch Base"},
 			{ "desert base 2", "Credits Scenario X2"},
-			{ "weather control", "Weather Control Center Stage"},
-			{ "robot junkyard", "Scrap Processing Plant Stage"},
-			{ "volcanic zone", "Volcanic Zone Stage"},
-			{ "deep-sea base", "Deep-Sea Base Stage"},
-			{ "maverick factory", "Maverick Factory Stage"},
+			{ "weather control", "Weather Control Center"},
+			{ "robot junkyard", "Scrap Processing Plant"},
+			{ "volcanic zone", "Volcanic Zone"},
+			{ "deep-sea base", "Deep-Sea Base"},
+			{ "maverick factory", "Maverick Factory"},
 			{ "highway", "Central Highway"},
 			{ "highway 2", "Credits Scenario X1"},
 			{ "powerplant", "Electromagnetic Power Plant"},
@@ -774,13 +774,13 @@ public class LevelData {
 			#region small
 			{ "sigma1_1v1", "Sigma Palace 1 VS. 1 "},
 			{ "airport 1v1", "New-type Airport 1 VS. 1"},
-			{ "doppler lab 1v1", "Doppler Stage B 1 VS. 1" },
+			{ "doppler lab 1v1", "Doppler B 1 VS. 1" },
 			{ "sigma stage 4 1v1", "Sigma Palace 4 1 VS. 1"},
 			{ "factory 1v1", "Prototype Weapons"},
 			{ "hunterbase 1v1", "Hunter Base 1 VS. 1" },
 			{ "forest 1v1", "Recon Base Ruins 1 VS. 1"},
 			{ "highway 1v1", "Central Highway 1 VS. 1"},
-			{ "zero virus 1v1", "Zero Space Stage 3: "},
+			{ "zero virus 1v1", "Zero Space 3: "},
 			{ "central computer 1v1", "Central Computer Stage 1 VS. 1"},
 			{ "jape tribute 1v1", "Jape Tribute 1 VS. 1"},
 			{ "ocean 1v1", "Subterranean Base 1 VS. 1"},
@@ -793,9 +793,9 @@ public class LevelData {
 			displayName = newName;
 		if (displayName == "Dinosaur Type Terrestrial") {
 			twoDisplayNames = true;
-			displayName2 = "Aircraft Carrier Stage";
+			displayName2 = "Aircraft Carrier";
 		}
-		if (displayName == "Zero Space Stage 3: ") {
+		if (displayName == "Zero Space 3: ") {
 			twoDisplayNames = true;
 			displayName2 = "Awakening 1 VS. 1";
 		}

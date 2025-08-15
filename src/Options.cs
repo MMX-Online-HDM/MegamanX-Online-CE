@@ -64,6 +64,9 @@ public class Options {
 	public int gridModeX;
 	public int hyperChargeSlot;
 	public bool novaStrikeSpecial;
+	public bool novaStrikeWall;
+	public bool novaStrikeCeiling;
+	public bool novaStrikeFloor;
 	public bool gigaCrushSpecial;
 	public XLoadout xLoadout = XLoadout.getDefault();
 
