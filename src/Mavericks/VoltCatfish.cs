@@ -211,7 +211,7 @@ public class VoltCTriadThunderProj : Projectile {
 		}
 		destroyOnHit = false;
 		shouldShieldBlock = false;
-		maxTime = ElectroNamazuros.isAI ? 2 : 1.75f;
+		maxTime = 1.75f;
 		this.ElectroNamazuros = ElectroNamazuros;
 		this.type = type;
 		this.num = num;
