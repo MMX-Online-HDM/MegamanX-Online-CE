@@ -28,7 +28,6 @@ public class Damager {
 		{ (int)ProjIds.PlasmaGunBeamProj, 60 },
 		{ (int)ProjIds.VoltTornado, 60 },
 		{ (int)ProjIds.TornadoCharged, 60 },
-		//{ (int)ProjIds.KKnuckle, 60 },
 		{ (int)ProjIds.PZeroPunch2, 60 },
 		{ (int)ProjIds.PZeroSenpuukyaku, 60 },
 		{ (int)ProjIds.PZeroAirKick, 60 },
@@ -88,9 +87,7 @@ public class Damager {
 		var newDamage = (overrideDamage != null ? (float)overrideDamage : damage);
 		var newFlinch = (overrideFlinch != null ? (int)overrideFlinch : flinch);
 
-		var chr = victim as Character;
-
-		if (chr != null) {
+		if (victim is Character chr) {
 			if (chr.isStatusImmune()) {
 				newFlinch = 0;
 				weakness = false;
@@ -154,21 +151,18 @@ public class Damager {
 			key += "_" + damagingActor?.netId?.ToString();
 		}
 
-		IDamagable? damagable = victim as IDamagable;
+		if (victim is not IDamagable damagable) {
+			return false;
+		}
 		Character? preCharacter = victim as Character;
 		CharState? charState = preCharacter?.charState;
-		RideArmor? rideArmor = victim as RideArmor;
-		Maverick? maverick = victim as Maverick;
 
-		if (damagable == null) return false;
 		if (!damagable.projectileCooldown.ContainsKey(key)) {
 			damagable.projectileCooldown[key] = 0;
 		}
-
 		if (damagable.projectileCooldown[key] != 0) {
 			return false;
 		}
-
 		damagable.projectileCooldown[key] = hitCooldown;
 
 		// Run the RPC on all clients first, before it can modify the parameters, so clients can act accordingly
@@ -234,7 +228,9 @@ public class Damager {
 			return true;
 		}
 
-		// Would only get reached due to lag. Otherwise, the owner that initiates the applyDamage call would have already considered it and avoided entering the method
+		// Would only get reached due to lag.
+		// Otherwise, the owner that initiates the applyDamage call
+		// would have already considered it and avoided entering the method
 		// This allows dodge abilities to "favor the defender"
 		if (!damagable.canBeDamaged(owner.alliance, owner.id, projId)) {
 			return true;
@@ -256,8 +252,7 @@ public class Damager {
 		if (damagable != null) {
 			DamagerMessage? damagerMessage = null;
 
-			var proj = damagingActor as Projectile;
-			if (proj != null) {
+			if (damagingActor is Projectile proj) {
 				damagerMessage = proj.onDamage(damagable, owner);
 				if (damagerMessage?.flinch != null) flinch = damagerMessage.flinch.Value;
 				if (damagerMessage?.damage != null) damage = damagerMessage.damage.Value;
@@ -346,10 +341,10 @@ public class Damager {
 			if (character.ownedByLocalPlayer && character.isFlinchImmune()) {
 				flinch = 0;
 			}
-			if ((owner.character as Zero)?.isViral == true) {
+			if (owner.character is Zero { isViral: true }) {
 				character.addVirusTime(owner, damage);
 			}
-			if ((owner.character as PunchyZero)?.isViral == true) {
+			if (owner.character is PunchyZero { isViral: true }) {
 				character.addVirusTime(owner, damage);
 			}
 
@@ -468,7 +463,11 @@ public class Damager {
 				case (int)ProjIds.FlameMStompShockwave:
 				case (int)ProjIds.TBreakerProj:
 					if (character.grounded && character.ownedByLocalPlayer) {
-						character.changeState(new KnockedDown(character.pos.x < damagingActor?.pos.x ? -1 : 1), true);
+						character.changeState(
+							new KnockedDown(
+								character.pos.x < damagingActor?.pos.x ? -1 : 1
+							), true
+						);
 					}
 					break;
 				case (int)ProjIds.MechFrogGroundPound:
@@ -553,7 +552,7 @@ public class Damager {
 			// Disallow flinch stack for non-BZ.
 			else if (flinch > 0 && !Global.canFlinchCombo) {
 				int fkey = owner.id;
-				float fmod = 6;
+				float fmod = 8;
 				if (!character.globalFlinchCooldown.ContainsKey(fkey)) {
 					character.globalFlinchCooldown[fkey] = 0;
 				}
@@ -585,9 +584,9 @@ public class Damager {
 					}
 				}
 			}
-			//Damage above 0
+			// Damage above 0.
 			if (damage > 0) {
-				//bool if the character is frozen
+				// Bool if the character is frozen
 				bool isShotgunIceAndFrozen = (
 					character.sprite.name.Contains("frozen") == true && weaponKillFeedIndex == 8
 				);
@@ -644,7 +643,7 @@ public class Damager {
 			}
 		}
 		// Ride armor section
-		else if (rideArmor != null) {
+		else if (victim is RideArmor rideArmor) {
 			// Beast Killer damage amp
 			if (projId == (int)ProjIds.BeastKiller || projId == (int)ProjIds.AncientGun) {
 				damage *= 2;
@@ -671,7 +670,7 @@ public class Damager {
 			}
 		}
 		// Maverick section
-		else if (maverick != null) {
+		else if (victim is Maverick maverick) {
 			if (projId == (int)ProjIds.BeastKiller || projId == (int)ProjIds.AncientGun) {
 				damage *= 1.25f;
 			}
@@ -679,7 +678,9 @@ public class Damager {
 			weakness = maverick.checkWeakness(
 				(WeaponIds)weaponIndex, (ProjIds)projId, out MaverickState? newState, owner.isSigma
 			);
-			if (weakness && damage < 1 && projId is (int)ProjIds.CrystalHunter or (int)ProjIds.CSnailCrystalHunter) {
+			if (weakness && damage < 1 &&
+				projId is (int)ProjIds.CrystalHunter or (int)ProjIds.CSnailCrystalHunter
+			) {
 				damage = 1;
 			}
 			if (weakness && damage < 1 && (
