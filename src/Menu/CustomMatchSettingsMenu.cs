@@ -35,6 +35,7 @@ public class CustomMatchSettings {
 	[ProtoMember(26)] public bool axlCustomReload;
 	[ProtoMember(27)] public bool oldATrans;
 	[ProtoMember(28)] public bool flinchairDashReset;
+	[ProtoMember(29)] public bool ComboFlinch;
 
 
 	public CustomMatchSettings() {
@@ -72,6 +73,7 @@ public class CustomMatchSettings {
 			axlCustomReload = false,
 			oldATrans = false,
 			flinchairDashReset = false,
+			ComboFlinch = true,
 		};
 	}
 }
@@ -587,6 +589,22 @@ public class CustomMatchSettingsMenu : IMainMenu {
 						"Flinch resets Air Dash: " +
 						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.flinchairDashReset),
 						pos.x, pos.y, selected: selectArrowPosY3 == 6
+					);
+				}
+			)
+		);
+		menuOptions3.Add(
+			new MenuOption(
+				startX3, currentY3 += lineH3,
+				() => {
+					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.ComboFlinch, true);
+				},
+				(Point pos, int index) => {
+					Fonts.drawText(
+						FontType.Purple,
+						"Flinch stack: " +
+						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.ComboFlinch),
+						pos.x, pos.y, selected: selectArrowPosY3 == 7
 					);
 				}
 			)
