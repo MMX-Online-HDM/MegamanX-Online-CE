@@ -18,7 +18,7 @@ public class RagingChargeX : Character {
 	public Projectile? absorbedProj;
 	public RagingChargeBuster ragingBuster;
 	bool shootPressed => player.input.isPressed(Control.Shoot, player);
-	bool downHeld => player.input.isHeld(Control.Down, player);
+	bool upHeld => player.input.isHeld(Control.Up, player);
 	bool specialPressed => player.input.isPressed(Control.Special1, player);
 
 	public RagingChargeX(
@@ -80,6 +80,7 @@ public class RagingChargeX : Character {
 		ragingBuster.charLinkedUpdate(this, true);
 		chargeBusterSound();
 		chargeLogic(null);
+		player.changeWeaponControls();
 	}
 
 	public override void postUpdate() {
@@ -121,16 +122,22 @@ public class RagingChargeX : Character {
 		}
 		if (punchCooldown <= 0 &&
 			(shootPressed && ragingBuster.ammo < ragingBuster.getAmmoUsage(0) ||
-			specialPressed && downHeld)
+			specialPressed && upHeld)
 		) {
 			punchCooldown = 30;
 			changeState(new XUPPunchState(grounded), true);
 			return true;
 		}
-		if (specialPressed && saberCooldown <= 0) {
-			saberCooldown = 60;
-			changeState(new X6SaberState(grounded), true);
-			return true;
+		if (saberCooldown <= 0) {
+			if (specialPressed) {
+				saberCooldown = 60;
+				if (charState is Crouch) {
+					changeState(new XSaberCrouchState(), true);
+					return true;
+				}
+				changeState(new X6SaberState(grounded), true);
+				return true;
+			}
 		}
 		return base.attackCtrl();
 	}
@@ -247,7 +254,7 @@ public class RagingChargeX : Character {
 	// This can run on both owners and non-owners. So data used must be in sync.
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
-			"mmx_beam_saber2" or "mmx_beam_saber_air2" => MeleeIds.ZSaber,
+			"mmx_beam_saber2" or "mmx_beam_saber_air2" or "mmx_beam_saber_crouch" => MeleeIds.ZSaber,
 			"mmx_unpo_grab_dash" => MeleeIds.DashGrab,
 			"mmx_unpo_punch" or "mmx_unpo_air_punch" => MeleeIds.Punch,
 			"mmx_unpo_parry_start" => MeleeIds.ParryBlock,

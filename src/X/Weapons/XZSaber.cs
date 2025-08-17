@@ -101,3 +101,24 @@ public class X6SaberState : CharState {
 		}
 	}
 }
+public class XSaberCrouchState : CharState {
+	bool fired;
+	public XSaberCrouchState() : base("beam_saber_crouch") {
+	}
+
+	public override void update() {
+		base.update();
+		int frameSound = 3;
+		if (character.frameIndex >= frameSound && !fired) {
+			fired = true;
+			character.playSound("saber1");
+		}
+		if (character.frameIndex >= 7) {
+			normalCtrl = true;
+			attackCtrl = true;
+		}
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+}
