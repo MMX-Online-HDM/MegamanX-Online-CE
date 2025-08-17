@@ -13,7 +13,6 @@ public class RagingChargeX : Character {
 	public float maxParryCooldown = 30;
 	public float selfDamageCooldown;
 	public float selfDamageMaxCooldown = 120;
-	public float secondSoundCooldown;
 	public Projectile? absorbedProj;
 	public RagingChargeBuster ragingBuster;
 
