@@ -704,6 +704,7 @@ public class MJump : MaverickState {
 
 		if (maverick.vel.y * maverick.getYMod() > 0) {
 			int lastFrameIndex = maverick.frameIndex;
+			float lastFrameTime = maverick.frameTime;
 			//float lastFrameTime = maverick.frameTime;
 			maverick.changeState(followUpAiState ?? new MFall());
 			if (maverick.state is MFall && maverick is Velguarder) {
