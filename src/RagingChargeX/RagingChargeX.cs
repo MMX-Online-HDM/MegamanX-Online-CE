@@ -156,7 +156,7 @@ public class RagingChargeX : Character {
 	public override void increaseCharge() {
 		chargeTime += Global.speedMul;
 		if (isCharging()) {
-			ragingBuster.addAmmo(ragingBuster.getAmmoUsage(0) * 0.625f * Global.spf, player);
+			ragingBuster.addAmmo(ragingBuster.getAmmoUsage(0) * 0.9f * Global.spf, player);
 		}
 	}
 
