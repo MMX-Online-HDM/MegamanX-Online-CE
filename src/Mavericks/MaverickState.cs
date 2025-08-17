@@ -703,7 +703,13 @@ public class MJump : MaverickState {
 		base.update();
 
 		if (maverick.vel.y * maverick.getYMod() > 0) {
+			int lastFrameIndex = maverick.frameIndex;
+			//float lastFrameTime = maverick.frameTime;
 			maverick.changeState(followUpAiState ?? new MFall());
+			if (maverick.state is MFall && maverick is Velguarder) {
+				maverick.frameIndex = lastFrameIndex;
+				maverick.frameTime = lastFrameTime;
+			}
 			return;
 		}
 	}
