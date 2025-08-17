@@ -11,13 +11,11 @@ public class RagingChargeX : Character {
 	public float parryCooldown;
 	public float shootCooldown;
 	public float maxParryCooldown = 30;
-	public bool doSelfDamage;
 	public float selfDamageCooldown;
 	public float selfDamageMaxCooldown = 120;
+	public float secondSoundCooldown;
 	public Projectile? absorbedProj;
 	public RagingChargeBuster ragingBuster;
-	public float[] chargeTimes = { 30, 105, 180, 255 };
-	public const int ragingAmmo = 3;
 
 	public RagingChargeX(
 		Player player, float x, float y, int xDir,
@@ -39,9 +37,12 @@ public class RagingChargeX : Character {
 
 	public override void preUpdate() {
 		base.preUpdate();
-		if (selfDamageCooldown <= 0) {
-			selfDamageCooldown = selfDamageMaxCooldown;
-		}
+		if (!ownedByLocalPlayer) { return; }
+		// Cooldowns.
+		Helpers.decrementFrames(ref saberCooldown);
+		Helpers.decrementFrames(ref punchCooldown);
+		Helpers.decrementFrames(ref parryCooldown);
+		Helpers.decrementFrames(ref shootCooldown);
 		// For the shooting animation.
 		if (shootAnimTime > 0) {
 			shootAnimTime -= speedMul;
@@ -62,17 +63,8 @@ public class RagingChargeX : Character {
 		if (musicSource == null) {
 			addMusicSource("introStageBreisX4_JX", getCenterPos(), true);
 		}
+		// Local-only starts here.
 		if (!ownedByLocalPlayer) { return; }
-		if (!isDecayImmune()) {
-			Helpers.decrementFrames(ref selfDamageCooldown);
-		}
-		if (isDecayImmune() && selfDamageCooldown <= selfDamageMaxCooldown) {
-			selfDamageCooldown = selfDamageMaxCooldown;
-		}
-		Helpers.decrementFrames(ref saberCooldown);
-		Helpers.decrementFrames(ref punchCooldown);
-		Helpers.decrementFrames(ref parryCooldown);
-		Helpers.decrementFrames(ref shootCooldown);
 		// Allow cancel normals into parry.
 		if (player.input.isWeaponLeftOrRightPressed(player) &&
 			parryCooldown == 0 &&
@@ -80,19 +72,33 @@ public class RagingChargeX : Character {
 		) {
 			enterParry();
 		}
-		if (selfDamageCooldown == selfDamageMaxCooldown - 1) {
-			applyDamage(1, player, this, null, (int)ProjIds.SelfDmg);
-			playSound("hit", true, true);
-		}
-		ragingChargeLogic();
+		chargeLogic(null);
 	}
 
 	public override void postUpdate() {
 		base.postUpdate();
+		// Local-only starts here.
+		if (!ownedByLocalPlayer) { return; }
+		// Decay damage.
+		if (!isDecayImmune() && invulnTime == 0) {
+			if (selfDamageCooldown <= 0) {
+				applyDamage(1, player, this, null, (int)ProjIds.SelfDmg);
+				selfDamageCooldown = selfDamageMaxCooldown;
+				secondSoundCooldown = 60;
+				playSound("hit", true, true);
+			} else {
+				Helpers.decrementFrames(ref selfDamageCooldown);
+			}
+		} else {
+			selfDamageCooldown = selfDamageMaxCooldown;
+		}
 	}
 
 	public override bool normalCtrl() {
-		if (player.input.isPressed(Control.Special1, player) && charState is Dash or AirDash) {
+		if (!charState.isGrabbing &&
+			player.input.isPressed(Control.Special1, player) &&
+			charState is Dash or AirDash
+		) {
 			charState.isGrabbing = true;
 			changeSpriteFromName("unpo_grab_dash", true);
 		}
@@ -102,15 +108,15 @@ public class RagingChargeX : Character {
 	public override bool attackCtrl() {
 		bool shootPressed = player.input.isPressed(Control.Shoot, player);
 		bool specialPressed = player.input.isPressed(Control.Special1, player);
-		if (shootPressed && currentWeapon?.ammo > 0 && shootCooldown <= 0) {
-			shoot(0);
-			return true;
-		}
 		if (player.input.isWeaponLeftOrRightPressed(player) && parryCooldown == 0) {
 			enterParry();
 			return true;
 		}
-		if (shootPressed && punchCooldown <= 0 && currentWeapon?.ammo <= 0) {
+		if (shootPressed && ragingBuster.ammo >= ragingBuster.getAmmoUsage(0) && shootCooldown <= 0) {
+			shoot();
+			return true;
+		}
+		if (shootPressed && punchCooldown <= 0 && ragingBuster.ammo < ragingBuster.getAmmoUsage(0)) {
 			punchCooldown = 30;
 			changeState(new XUPPunchState(grounded), true);
 			return true;
@@ -123,10 +129,11 @@ public class RagingChargeX : Character {
 		return base.attackCtrl();
 	}
 
-	public void shoot(int chargeLevel) {
+	// Shoot and set animation if posible.
+	public void shoot() {
 		string shootSprite = getSprite(charState.shootSpriteEx);
 		if (!Global.sprites.ContainsKey(shootSprite)) {
-			if (grounded) { shootSprite = "shoot"; } else { shootSprite = "fall_shoot"; }
+			shootSprite = grounded ? getSprite("shoot") : getSprite("fall_shoot");
 		}
 		if (shootAnimTime == 0) {
 			changeSprite(shootSprite, false);
@@ -134,35 +141,25 @@ public class RagingChargeX : Character {
 			frameIndex = 0;
 			frameTime = 0;
 		}
-		if (charState is LadderClimb) {
-			if (player.input.isHeld(Control.Left, player)) {
-				this.xDir = -1;
-			} else if (player.input.isHeld(Control.Right, player)) {
-				this.xDir = 1;
-			}
-		}
-		Point shootPos = getShootPos();
-		int xDir = getShootXDir();
-		if (chargeLevel >= 0) {
-			playSound("stockBuster", sendRpc: true);
-			new RagingBusterProj(
-				ragingBuster, shootPos, xDir, player,
-				player.getNextActorNetId(), rpc: true
-			);
-			shootCooldown = 22;
-			shootAnimTime = DefaultShootAnimTime;
-			weaponAmmoadd(true);
-		}
+		shootAnimTime = 20;
+
+		ragingBuster.shoot(this, []);
+		ragingBuster.addAmmo(-ragingBuster.getAmmoUsage(0), player);
+		playSound(ragingBuster.shootSounds[0]);
+		shootCooldown = ragingBuster.fireRate;
 	}
-	public void weaponAmmoadd(bool decrease) {
-		currentWeapon?.addAmmo(decrease ? -ragingAmmo : ragingAmmo, player);
-	}
+
 	public override bool chargeButtonHeld() {
 		return player.input.isHeld(Control.Shoot, player);
 	}
-	public override int getMaxChargeLevel() {
-		return 4;
+
+	public override void increaseCharge() {
+		chargeTime += Global.speedMul;
+		if (isCharging()) {
+			ragingBuster.addAmmo(ragingBuster.getAmmoUsage(0) * 0.625f * Global.spf, player);
+		}
 	}
+
 	public override float getDashSpeed() {
 		if (sprite.name == "mmx_unpo_grab_dash") {
 			return 1.25f * base.getDashSpeed();
@@ -172,22 +169,6 @@ public class RagingChargeX : Character {
 
 	public override string getSprite(string spriteName) {
 		return "mmx_" + spriteName;
-	}
-	public void ragingChargeLogic() {
-		if (player.input.isHeld(Control.Shoot, player)) {
-			increaseCharge();
-			chargeGfx();
-			if (chargeTimes.Contains(chargeTime)) {
-				weaponAmmoadd(false);
-				if (chargeTime < 255 && currentWeapon?.ammo < currentWeapon?.maxAmmo) {
-					playSound("gigaCrushAmmoRecharge");
-				} else {
-					playSound("gigaCrushAmmoFull");
-				}
-			}
-		} else {
-			stopCharge();
-		}
 	}
 
 	public void enterParry() {
@@ -199,15 +180,9 @@ public class RagingChargeX : Character {
 		changeState(new XUPParryStartState(), true);
 		return;
 	}
-	public override void chargeGfx() {
-		if (ownedByLocalPlayer) {
-			chargeEffect.stop();
-		}
-		if (isCharging()) {
-			chargeSound.play();
-			int chargeType = 0;
-			chargeEffect.update(getChargeLevel(), chargeType);
-		}
+
+	public override int getDisplayChargeLevel() {
+		return Helpers.clamp(MathInt.Ceiling(ragingBuster.ammo / ragingBuster.getAmmoUsage(0)), 1, 4);
 	}
 
 	public override bool isNonDamageStatusImmune() {

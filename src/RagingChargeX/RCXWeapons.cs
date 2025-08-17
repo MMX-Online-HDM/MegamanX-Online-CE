@@ -13,7 +13,7 @@ public class RagingChargeBuster : Weapon {
 		weaponBarIndex = 59;
 		weaponSlotIndex = 121;
 		shootSounds = new string[] { "buster2", "buster2", "buster2", "buster2" };
-		fireRate = 45;
+		fireRate = 20;
 		canHealAmmo = true;
 		drawAmmo = true;
 		drawCooldown = true;
@@ -21,6 +21,8 @@ public class RagingChargeBuster : Weapon {
 		ammoGainMultiplier = 2;
 		maxAmmo = 12;
 		ammo = maxAmmo;
+		drawRoundedDown = true;
+		drawGrayOnLowAmmo = true;
 	}
 
 	public override float getAmmoUsage(int chargeLevel) { return 3; }

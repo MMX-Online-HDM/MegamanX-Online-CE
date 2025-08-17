@@ -1619,7 +1619,7 @@ public partial class Character : Actor, IDamagable {
 			chargeSound.play();
 			int chargeType = 0;
 			if (!sprite.name.Contains("ra_hide")) {
-				int level = getChargeLevel();
+				int level = getDisplayChargeLevel();
 				var renderGfx = RenderEffectType.ChargeBlue;
 				renderGfx = level switch {
 					1 => RenderEffectType.ChargeBlue,
@@ -1631,7 +1631,7 @@ public partial class Character : Actor, IDamagable {
 				};
 				addRenderEffect(renderGfx, 3, 5);
 			}
-			chargeEffect.update(getChargeLevel(), chargeType);
+			chargeEffect.update(getDisplayChargeLevel(), chargeType);
 		}
 	}
 
@@ -1918,6 +1918,10 @@ public partial class Character : Actor, IDamagable {
 			chargeLevel = 4;
 		}
 		return Helpers.clampMax(chargeLevel, maxCharge);
+	}
+
+	public virtual int getDisplayChargeLevel() {
+		return getChargeLevel();
 	}
 
 	public virtual void changeToIdleOrFall(
@@ -3477,7 +3481,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 
-	public virtual void chargeLogic(Action<int> shootFunct) {
+	public virtual void chargeLogic(Action<int>? shootFunct) {
 		// Charge shoot logic.
 		// We test if we are holding charge and not inside a vehicle.
 		if (chargeButtonHeld() && flag == null && rideChaser == null && rideArmor == null) {
@@ -3490,7 +3494,7 @@ public partial class Character : Actor, IDamagable {
 		// This to prevent from losing charge.
 		else if (canShootCharge()) {
 			int chargeLevel = getChargeLevel();
-			if (isCharging() && chargeLevel >= 1) {
+			if (isCharging() && chargeLevel >= 1 && shootFunct != null) {
 				shootFunct(chargeLevel);
 			}
 			stopCharge();
