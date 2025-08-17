@@ -17,6 +17,9 @@ public class RagingChargeX : Character {
 	public int lastAmmoSound = -1; 
 	public Projectile? absorbedProj;
 	public RagingChargeBuster ragingBuster;
+	bool shootPressed => player.input.isPressed(Control.Shoot, player);
+	bool downHeld => player.input.isHeld(Control.Down, player);
+	bool specialPressed => player.input.isPressed(Control.Special1, player);
 
 	public RagingChargeX(
 		Player player, float x, float y, int xDir,
@@ -99,20 +102,10 @@ public class RagingChargeX : Character {
 	}
 
 	public override bool normalCtrl() {
-		if (!charState.isGrabbing &&
-			player.input.isPressed(Control.Special1, player) &&
-			charState is Dash or AirDash
-		) {
-			charState.isGrabbing = true;
-			changeSpriteFromName("unpo_grab_dash", true);
-		}
 		return base.normalCtrl();
 	}
 
 	public override bool attackCtrl() {
-		bool shootPressed = player.input.isPressed(Control.Shoot, player);
-		bool upPressed = player.input.isPressed(Control.Up, player);
-		bool downPressed = player.input.isPressed(Control.Down, player);
 		if (player.input.isWeaponLeftOrRightPressed(player) && parryCooldown == 0) {
 			enterParry();
 			return true;
@@ -121,12 +114,20 @@ public class RagingChargeX : Character {
 			shoot();
 			return true;
 		}
-		if (punchCooldown <= 0 && (shootPressed && ragingBuster.ammo < ragingBuster.getAmmoUsage(0) || downPressed)) {
+		if (specialPressed && charState is Dash or AirDash) {
+			charState.isGrabbing = true;
+			changeSpriteFromName("unpo_grab_dash", true);
+			return true;
+		}
+		if (punchCooldown <= 0 &&
+			(shootPressed && ragingBuster.ammo < ragingBuster.getAmmoUsage(0) ||
+			specialPressed && downHeld)
+		) {
 			punchCooldown = 30;
 			changeState(new XUPPunchState(grounded), true);
 			return true;
 		}
-		if (upPressed && saberCooldown <= 0) {
+		if (specialPressed && saberCooldown <= 0) {
 			saberCooldown = 60;
 			changeState(new X6SaberState(grounded), true);
 			return true;
