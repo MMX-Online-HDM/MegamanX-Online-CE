@@ -1190,7 +1190,7 @@ public partial class Character : Actor, IDamagable {
 		) {
 			Damager.applyDamage(
 				lastGravityWellDamager,
-				4, 30, Global.halfFlinch, this,
+				4, 120, Global.halfFlinch, this,
 				false, (int)WeaponIds.GravityWell, 45, this,
 				(int)ProjIds.GravityWellCharged
 			);
