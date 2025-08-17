@@ -223,6 +223,8 @@ public class RagingChargeX : Character {
 			or GenericStun
 			or VileMK2Grabbed
 			or GenericGrabbedState
+			or XRevive
+			or Die
 		);
 	}
 	
