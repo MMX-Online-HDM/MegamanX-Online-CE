@@ -633,13 +633,20 @@ public class GameMode {
 					"x" + drawPlayer.currency.ToString(), 16, 140, Alignment.Left
 				);
 			}
-			if (drawPlayer.character is RagingChargeX mmx && mmx.shotCount > 0) {
+			if (drawPlayer.character is RagingChargeX mmx) {
+				/*
 				int x = 10, y = 156;
 				int count = mmx.shotCount;
 				if (count >= 1) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x, y);
 				if (count >= 2) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x + 13, y);
 				if (count >= 3) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x, y + 11);
 				if (count >= 4) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x + 13, y + 11);
+				*/
+				Global.sprites["hud_killfeed_weapon"].drawToHUD(175, Global.halfScreenW/18, 160);
+				Fonts.drawText(
+					FontType.Red,
+					mmx.selfDamageCooldown.ToString(), Global.halfScreenW/10, 157, Alignment.Left
+				);
 			}
 			if (drawPlayer.character is Zero zero) {
 				int yStart = 159;

@@ -552,7 +552,7 @@ public class Damager {
 				damage = MathF.Ceiling(damage * 1.5f);
 			}
 			// Disallow flinch stack for non-BZ.
-			else if (flinch > 0 && !Global.canFlinchCombo) {
+			else if (flinch > 0 && Global.customSettings?.ComboFlinch == false) {
 				int fkey = owner.id;
 				float fmod = 8;
 				if (!character.globalFlinchCooldown.ContainsKey(fkey)) {
