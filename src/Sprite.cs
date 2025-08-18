@@ -273,8 +273,8 @@ public class Sprite {
 		float extraXOff = 0;
 
 		if (isUltX) {
-			extraYOff = 3;
-			extraY = 3;
+			//extraYOff = 3;
+			//extraY = 3;
 			armors[0] = 4;
 			armors[1] = 4;
 			armors[2] = 4;
@@ -299,8 +299,8 @@ public class Sprite {
 				}
 			} */
 			if (armors[2] == 2) {
-				extraYOff = 0;
-				extraY = 2;
+				//extraYOff = 0;
+				//extraY = 2;
 			}
 			var x3ArmShaders = new List<ShaderWrapper>(shaders);
 			if (hyperBusterReady) {
@@ -341,8 +341,8 @@ public class Sprite {
 				}
 			} */
 			if (armors[2] == 2 || drawXSaber) {
-				extraYOff = 0;
-				extraY = 2;
+				//extraYOff = 0;
+				//extraY = 2;
 			}
 			if (drawXSaber) {
 				flippedExtraW += 1;
