@@ -379,6 +379,8 @@ public partial class Actor {
 		if (amount.y < 0) {
 			movedUpOnFrame = true;
 		}
+		// Add to Move Delta.
+		moveDelta += amount;
 		// Ice physics shenanigans.
 		if (grounded && groundedIce && useIce && slideOnIce) {
 			if (amount.x > 0) {

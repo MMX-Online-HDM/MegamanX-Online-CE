@@ -1532,9 +1532,9 @@ public partial class Level {
 				Point camPos = camPlayer.character.getCamCenterPos();
 				Actor? followActor = camPlayer.character?.getFollowActor();
 
-				float extraPos = 0;//MathF.Floor(MathF.Abs(followActor.deltaPos.x));
+				float extraPos = MathF.Floor(MathF.Abs(followActor.moveDelta.x));
 				if (extraPos >= 4) {
-					extraPos = extraPos * 16 * MathF.Sign(followActor.deltaPos.x);
+					extraPos = extraPos * 16 * MathF.Sign(followActor.moveDelta.x);
 					if (lastCameraXDelta == 0 ||
 						extraPos > 0 && extraPos * 100 > lastCameraXDelta ||
 						extraPos < 0 && extraPos * 100 < lastCameraXDelta

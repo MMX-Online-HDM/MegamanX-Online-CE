@@ -51,6 +51,7 @@ public class StingChameleon : Maverick {
 		maxAmmo = 32;
 		grayAmmoLevel = 8;
 		barIndexes = (57, 46);
+		height = 32;
 	}
 
 	public bool isCloakTransition() {

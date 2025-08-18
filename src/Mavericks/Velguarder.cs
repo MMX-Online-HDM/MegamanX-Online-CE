@@ -30,6 +30,7 @@ public class Velguarder : Maverick {
 		}
 
 		armorClass = ArmorClass.Light;
+		height = 24;
 	}
 
 	public override void update() {

@@ -83,7 +83,6 @@ public class RagingChargeX : Character {
 			if (selfDamageCooldown <= 0) {
 				applyDamage(1, player, this, null, (int)ProjIds.SelfDmg);
 				selfDamageCooldown = selfDamageMaxCooldown;
-				secondSoundCooldown = 60;
 				playSound("hit", true, true);
 			} else {
 				Helpers.decrementFrames(ref selfDamageCooldown);

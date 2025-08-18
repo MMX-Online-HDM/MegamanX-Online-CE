@@ -724,7 +724,9 @@ public class BaseSigma : Character {
 	public List<Weapon> configureWeapons(SigmaLoadout sigmaLoadout) {
 		List<Weapon> retWeapons = [];
 		if (Global.level.isTraining() && !Global.level.server.useLoadout) {
-			retWeapons = Weapon.getAllSigmaWeapons(player).Select(w => w.clone()).ToList();
+			retWeapons = Weapon.getAllSigmaWeapons(
+				player, commandMode: sigmaLoadout.commandMode
+			).Select(w => w.clone()).ToList();
 		} else if (Global.level.is1v1()) {
 			if (player.maverick1v1 != null) {
 				retWeapons = [

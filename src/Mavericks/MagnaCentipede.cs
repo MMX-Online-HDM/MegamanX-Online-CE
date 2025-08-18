@@ -48,6 +48,7 @@ public class MagnaCentipede : Maverick {
 		grayAmmoLevel = 8;
 		barIndexes = (59, 48);
 		gameMavs = GameMavs.X2;
+		height = 38;
 	}
 
 	public override void preUpdate() {

@@ -40,6 +40,7 @@ public class LaunchOctopus : Maverick {
 		maxAmmo = 32;
 		grayAmmoLevel = 8;
 		barIndexes = (71, 60);
+		height = 46;
 	}
 
 	float timeBeforeRecharge;

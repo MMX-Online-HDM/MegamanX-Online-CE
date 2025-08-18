@@ -44,6 +44,7 @@ public class CrystalSnail : Maverick {
 
 		armorClass = ArmorClass.Light;
 		gameMavs = GameMavs.X2;
+		height = 32;
 	}
 
 	public override void update() {

@@ -38,6 +38,7 @@ public class StormEagle : Maverick {
 		flyBarIndexes = (44, 38);
 		maxFlyBar = 960;
 		flyBar = 960;
+		height = 44;
 	}
 
 	public override void update() {

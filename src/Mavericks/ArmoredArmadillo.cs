@@ -42,6 +42,7 @@ public class ArmoredArmadillo : Maverick {
 		maxAmmo = 32;
 		grayAmmoLevel = 2;
 		barIndexes = (56, 45);
+		height = 34;
 	}
 
 	public override void setHealth(float lastHealth) {

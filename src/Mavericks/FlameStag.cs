@@ -43,6 +43,7 @@ public class FlameStag : Maverick {
 			createActorRpc(player.id);
 		}
 		gameMavs = GameMavs.X2;
+		height = 44;
 	}
 
 	public override void update() {

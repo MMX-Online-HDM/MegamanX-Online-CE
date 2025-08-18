@@ -36,6 +36,7 @@ public class NeonTiger : Maverick {
 			createActorRpc(player.id);
 		}
 		gameMavs = GameMavs.X3;
+		height = 38;
 	}
 
 	public override void update() {

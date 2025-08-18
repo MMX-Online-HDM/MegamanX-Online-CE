@@ -44,6 +44,7 @@ public class BubbleCrab : Maverick {
 
 		armorClass = ArmorClass.Light;
 		gameMavs = GameMavs.X2;
+		height = 28;
 	}
 
 	public override void update() {

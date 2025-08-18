@@ -48,6 +48,7 @@ public class VoltCatfish : Maverick {
 		grayAmmoLevel = 8;
 		barIndexes = (65, 54);
 		gameMavs = GameMavs.X3;
+		height = 32;
 	}
 
 	public override void update() {

@@ -406,7 +406,7 @@ public class Maverick : Actor, IDamagable {
 		if (state.normalCtrl && canClimb) {
 			state.climbIfCheckClimbTrue();
 		}
-		if (state.normalCtrl && canClimbWall) {
+		if (state.normalCtrl && canClimbWall && !grounded) {
 			state.wallClimbCode();
 		}
 		if (state.canJump && grounded && player.input.isPressed(Control.Jump, player)) {
@@ -416,6 +416,13 @@ public class Maverick : Actor, IDamagable {
 			}
 			vel.y = -getJumpPower();
 			playSound("jump", sendRpc: true);
+		}
+		if (state.airMove && !grounded) {
+			int inputDir =  input.getXDir(player);
+			if (inputDir != 0) {
+				xDir = inputDir;
+				move(new Point(inputDir * getRunSpeed() * getDashSpeed() * getAirSpeed(), 0));
+			}
 		}
 		if (state.normalCtrl) {
 			normalCtrl();
@@ -471,13 +478,6 @@ public class Maverick : Actor, IDamagable {
 				checkLadderDown = false;
 			}
 			return false;
-		}
-		if (state.airMove) {
-			int inputDir =  input.getXDir(player);
-			if (inputDir != 0 && (state is not MWallKick wallKick || wallKick.kickSpeed == 0)) {
-				xDir = inputDir;
-				move(new Point(inputDir * getRunSpeed() * getDashSpeed() * getAirSpeed(), 0));
-			}
 		}
 		return false;
 	}
@@ -774,7 +774,7 @@ public class Maverick : Actor, IDamagable {
 		if (physicsCollider == null) {
 			return null;
 		}
-		float hSize = Math.Min(height, 30);
+		float hSize = Math.Min(height, 28);
 		float wSize = width;
 		Rect? physicsRect = physicsCollider?.shape.getRect();
 		if (physicsRect != null) {
@@ -918,13 +918,10 @@ public class Maverick : Actor, IDamagable {
 	}
 
 	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
-		if (this is FakeZero fz && fz.state is FakeZeroGuardState) {
-			ammo += damage;
-			if (ammo > 32) ammo = 32;
-			if (controlMode == MaverickModeId.Summoner)
-				damage *= 0.5f;
-			else
-			damage *= 0.75f;
+		if (this is FakeZero fz && fz.state is FakeZeroGuardState && damage > 0) {
+			ammo += MathF.Ceiling(damage * 1.5f);
+			if (ammo > 32) { ammo = 32; }
+			damage = MathF.Floor(damage * 0.5f);
 		}
 
 		health -= damage;

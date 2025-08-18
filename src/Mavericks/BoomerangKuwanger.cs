@@ -44,6 +44,7 @@ public class BoomerangKuwanger : Maverick {
 		maxAmmo = 32;
 		grayAmmoLevel = 8;
 		barIndexes = (58, 47);
+		height = 40;
 	}
 
 	public override void preUpdate() {

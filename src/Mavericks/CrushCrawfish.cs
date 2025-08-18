@@ -32,6 +32,7 @@ public class CrushCrawfish : Maverick {
 			createActorRpc(player.id);
 		}
 		gameMavs = GameMavs.X3;
+		height = 32;
 	}
 
 	public override void update() {

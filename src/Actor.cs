@@ -55,6 +55,8 @@ public partial class Actor : GameObject {
 	public Point pos; //Current location
 	public Point prevPos;
 	public Point deltaPos;
+	public Point stackedMoveDelta;
+	public Point moveDelta;
 	public Point vel;
 	public float xPushVel;
 	public float xIceVel;
@@ -460,6 +462,7 @@ public partial class Actor : GameObject {
 	public virtual void preUpdate() {
 		collidedInFrame.Clear();
 		deltaPos = pos.subtract(prevPos);
+		moveDelta = stackedMoveDelta;
 		prevPos = pos;
 
 		if (locallyControlled && sprite.name != "null") {
@@ -736,7 +739,7 @@ public partial class Actor : GameObject {
 			}
 		}
 
-		if (Math.Abs(xPushVel) > 0.01f) {
+		if (Math.Abs(xPushVel) > 0.1f) {
 			xPushVel = Helpers.lerp(xPushVel, 0, Global.spf * 5);
 
 			var wall = Global.level.checkTerrainCollisionOnce(this, xPushVel * speedMul, 0);
@@ -748,20 +751,20 @@ public partial class Actor : GameObject {
 		}
 
 		// Heavy Flinch Push
-		if (Math.Abs(xFlinchPushVel) > 0.01f) {
+		if (Math.Abs(xFlinchPushVel) > 0.1f) {
 			xFlinchPushVel = Helpers.lerp(xFlinchPushVel, 0f, Global.spf * 5);
 		} else if (xFlinchPushVel != 0f) {
 			xFlinchPushVel = 0f;
 		}
 
-		if (Math.Abs(yPushVel) > 0.01f) {
+		if (Math.Abs(yPushVel) > 0.1f) {
 			yPushVel = Helpers.lerp(yPushVel, 0f, Global.spf * 5);
 		}
 		else if (yPushVel != 0f) {
 			yPushVel = 0f;
 		}
 
-		if (Math.Abs(xSwingVel) > 0.01f) {
+		if (Math.Abs(xSwingVel) > 0.1f) {
 			if (grounded ||
 				Global.level.checkTerrainCollisionOnce(this, xSwingVel * speedMul, 0)?.gameObject is Wall
 			) {
