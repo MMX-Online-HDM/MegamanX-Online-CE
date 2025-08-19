@@ -186,10 +186,10 @@ public class DNACore : AxlWeapon {
 		}
 
 		player.lastDNACore = this;
-		player.lastDNACoreIndex = player.weaponSlot;
+		player.lastDNACoreIndex = axl.weaponSlot;
 		player.savedDNACoreWeapons.Remove(this);
 		if (oldATrans) {
-			player.weapons.RemoveAt(player.weaponSlot);
+			axl.weapons.RemoveAt(player.weaponSlot);
 		}
 		player.preTransformedChar = player.character;
 		player.startAtransMain(this, player.getNextATransNetId());

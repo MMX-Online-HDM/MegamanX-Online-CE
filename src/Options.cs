@@ -53,6 +53,7 @@ public class Options {
 	public bool enableMapSprites = true;
 	public bool enableSmallBars;
 	public bool smallBarsEx;
+	public bool fastShaders;
 
 	public bool lowQualityParticles() { return particleQuality == 0; }
 
@@ -159,15 +160,6 @@ public class Options {
 		if (!LANIPPrefix.EndsWith(".")) return false;
 		string fullIP = LANIPPrefix + "1";
 		return IPAddress.TryParse(fullIP, out _);
-	}
-
-	public string getSpecialAirAttack() {
-		return !swapAirAttacks ? "zero_attack_air2" : "zero_attack_air";
-	}
-
-	public string getAirAttack() {
-		if (Global.level?.mainPlayer?.isSigma == true) return "attack_air";
-		return swapAirAttacks ? "attack_air2" : "attack_air";
 	}
 
 	public bool useMouseAim {

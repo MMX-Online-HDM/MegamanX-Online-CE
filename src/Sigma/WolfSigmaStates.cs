@@ -881,12 +881,12 @@ public class WolfSigmaRevive : CharState {
 				character.frameSpeed = 1;
 			}
 			if (stateTime > 4.5f) {
-				player.health = 1;
-				character.addHealth(player.maxHealth);
+				character.health = 1;
+				character.addHealth(character.maxHealth);
 				state = 5;
 			}
 		} else if (state == 5) {
-			if (player.health >= player.maxHealth) {
+			if (character.health >= character.maxHealth) {
 				character.weapons.Add(new WolfSigmaHandWeapon(player, sigma.leftHand));
 				character.weapons.Add(new WolfSigmaHeadWeapon());
 				character.weapons.Add(new WolfSigmaHandWeapon(player, sigma.rightHand));

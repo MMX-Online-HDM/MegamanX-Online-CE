@@ -159,7 +159,7 @@ public class ViralSigma : Character {
 		List<ShaderWrapper> shaders = base.getShaders();
 		ShaderWrapper? palette = null;
 
-		int paletteNum = 6 - MathInt.Ceiling((player.health / player.maxHealth) * 6);
+		int paletteNum = 6 - MathInt.Ceiling(health / maxHealth * 6);
 		if (sprite.name.Contains("_enter")) {
 			paletteNum = 0;
 		}

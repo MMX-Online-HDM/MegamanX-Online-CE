@@ -1015,22 +1015,26 @@ public class GameMode {
 
 	void drawRadar() {
 		List<Point> revealedSpots = new List<Point>();
-		float revealedRadius;
-
-		if (level.mainPlayer.isX) {
-			revealedSpots.Add(new Point(level.camX + Global.viewScreenW / 2, level.camY + Global.viewScreenH / 2));
-			revealedRadius = Global.viewScreenW * 1.5f;
-		} else if (level.mainPlayer.isSigma) {
+		float revealedRadius = Global.viewScreenW * 0.5f;
+		
+		if (level.mainPlayer.mavericks.Count > 0) {
 			foreach (var maverick in level.mainPlayer.mavericks) {
-				if (maverick == level.mainPlayer.currentMaverick && !level.mainPlayer.isAlivePuppeteer()) continue;
+				if (maverick == level.mainPlayer.currentMaverick) {
+					continue;
+				}
 				revealedSpots.Add(maverick.pos);
 			}
 			revealedRadius = Global.viewScreenW * 0.5f;
-		} else {
+		} 
+		if (level.boundBlasterAltProjs.Count > 0) {
 			foreach (var bbAltProj in level.boundBlasterAltProjs) {
 				revealedSpots.Add(bbAltProj.pos);
 			}
 			revealedRadius = Global.viewScreenW;
+		}
+		if (level.mainPlayer.isX || level.mainPlayer.character is MegamanX) {
+			revealedSpots.Add(new Point(level.camX + Global.viewScreenW / 2, level.camY + Global.viewScreenH / 2));
+			revealedRadius = Global.viewScreenW * 1.5f;
 		}
 
 		//float borderThickness = 1;
@@ -1149,7 +1153,7 @@ public class GameMode {
 		sprite.Dispose();
 		sprite2.Dispose();
 
-		if (level.mainPlayer.isSigma) {
+		if (level.mainPlayer.mavericks.Count > 0) {
 			foreach (Maverick maverick in level.mainPlayer.mavericks) {
 				if (maverick == level.mainPlayer.currentMaverick && !level.mainPlayer.isAlivePuppeteer()) continue;
 				float xPos = maverick.pos.x * scaleW;

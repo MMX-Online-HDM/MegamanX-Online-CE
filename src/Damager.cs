@@ -103,7 +103,7 @@ public class Damager {
 				}
 			}
 			// Tough Guy.
-			if (chr.player.isSigma || chr.isToughGuyHyperMode()) {
+			else if (chr is BaseSigma && !chr.isATrans || chr.isToughGuyHyperMode()) {
 				if (newFlinch >= Global.superFlinch) {
 					newFlinch = Global.halfFlinch;
 				} else if (newFlinch > Global.miniFlinch) {

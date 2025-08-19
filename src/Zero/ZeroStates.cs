@@ -327,7 +327,7 @@ public class FallSaber : CharState {
 	public float limboVehicleCheckTime;
 	public Actor? limboVehicle;
 
-	public FallSaber() : base("fall_saber", "fall_shoot", Options.main.getAirAttack(), "fall_start_saber", "fall_start_shoot") {
+	public FallSaber() : base("fall_saber", "fall_shoot", "attack_air", "fall_start_saber", "fall_start_shoot") {
 		accuracy = 5;
 		exitOnLanding = true;
 		useDashJumpSpeed = true;

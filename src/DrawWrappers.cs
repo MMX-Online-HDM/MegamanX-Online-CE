@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using SFML.Graphics;
 using SFML.System;
 
@@ -122,7 +123,7 @@ public class DrawLayer : Transformable, Drawable {
 				}
 			}
 			// One shader.
-			else if (oneOff.shaders.Count == 1 && oneOff.color == Color.White || oneOff.size == null) {
+			else if (Options.main.fastShaders || oneOff.size == null) {
 				RenderStates renderStates = new RenderStates(states);
 				renderStates.Shader = oneOff.shaders[0].getShader();
 				target.Draw(oneOff.drawable, renderStates);
@@ -130,7 +131,7 @@ public class DrawLayer : Transformable, Drawable {
 					sprite.Dispose();
 				}
 			}
-			// Multi-shader.
+			/// Multi-shader.
 			else {
 				var sprite = oneOff.drawable as SFML.Graphics.Sprite;
 				if (sprite == null) {
@@ -165,11 +166,10 @@ public class DrawLayer : Transformable, Drawable {
 				// Create a clear texture first.
 				back.Clear(new Color(0, 0, 0, 0));
 				back.Display();
-				renderStates.Shader = oneOff.shaders[0].getShader();
 				back.Draw(sprite, renderStates);
 				sprite.Dispose();
 				// Iterate shaders.
-				for (int num = 1; num < oneOff.shaders.Count; num++) {
+				for (int num = 0; num < oneOff.shaders.Count; num++) {
 					// Clear image.
 					renderStates = new RenderStates(states);
 					front.Clear(new Color(0, 0, 0, 0));
@@ -330,7 +330,7 @@ public partial class DrawWrappers {
 
 		if (isWorldPos) {
 			DrawLayer drawLayer = getDrawLayer(depth);
-			drawLayer.oneOffs.Add(new DrawableWrapper(null, line));
+			drawLayer.oneOffs.Add(new DrawableWrapper(null, line, Color.White));
 		} else {
 			drawToHUD(line);
 		}
@@ -370,7 +370,7 @@ public partial class DrawWrappers {
 
 		if (isWorldPos) {
 			DrawLayer drawLayer = getDrawLayer(depth);
-			drawLayer.oneOffs.Add(new DrawableWrapper(null, circle));
+			drawLayer.oneOffs.Add(new DrawableWrapper(null, circle, Color.White));
 		} else {
 			drawToHUD(circle);
 		}
@@ -390,7 +390,7 @@ public partial class DrawWrappers {
 
 		if (isWorldPos) {
 			DrawLayer drawLayer = getDrawLayer(depth);
-			drawLayer.oneOffs.Add(new DrawableWrapper(null, pixelSprite));
+			drawLayer.oneOffs.Add(new DrawableWrapper(null, pixelSprite, Color.White));
 		} else {
 			drawToHUD(pixelSprite);
 		}
@@ -420,7 +420,7 @@ public partial class DrawWrappers {
 
 		if (isWorldPos) {
 			DrawLayer drawLayer = getDrawLayer(depth);
-			drawLayer.oneOffs.Add(new DrawableWrapper(null, rect));
+			drawLayer.oneOffs.Add(new DrawableWrapper(null, rect, Color.White));
 		} else {
 			drawToHUD(rect);
 		}
@@ -456,7 +456,7 @@ public partial class DrawWrappers {
 		}
 		if (isWorldPos) {
 			DrawLayer drawLayer = getDrawLayer(depth);
-			drawLayer.oneOffs.Add(new DrawableWrapper(null, shape));
+			drawLayer.oneOffs.Add(new DrawableWrapper(null, shape, Color.White));
 		} else {
 			drawToHUD(shape);
 		}
@@ -480,6 +480,7 @@ public partial class DrawWrappers {
 		dy = MathF.Round(dy);
 		cx = MathF.Floor(cx);
 		cy = MathF.Floor(cy);
+
 
 		var sprite = new SFML.Graphics.Sprite(texture, new IntRect((int)sx, (int)sy, (int)sw, (int)sh));
 		sprite.Position = new Vector2f(dx, dy);
