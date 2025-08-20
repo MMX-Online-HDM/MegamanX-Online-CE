@@ -15,7 +15,7 @@ public class HyperAxlStart : CharState {
 	public override void update() {
 		base.update();
 
-		foreach (var weapon in player.weapons) {
+		foreach (var weapon in character.weapons) {
 			for (int i = 0; i < 10; i++) weapon.rechargeAmmo(0.1f);
 		}
 

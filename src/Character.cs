@@ -2152,7 +2152,7 @@ public partial class Character : Actor, IDamagable {
 		if (isCrystalized) {
 			float yOff = 0;
 			if (sprite.name.Contains("ra_idle")) yOff = 12;
-			if (player.isSigma) yOff = -7;
+			if (this is BaseSigma) yOff = -7;
 			Global.sprites["crystalhunter_crystal"].draw(
 				0, pos.x + x, pos.y + y + yOff, xDir, 1, null, 1, 1, 1, zIndex + 1
 			);
@@ -3061,13 +3061,21 @@ public partial class Character : Actor, IDamagable {
 			}
 		}
 	}
+	
+	public void addHealth(int amount, bool fillSubtank = true) {
+		addHealth((decimal)amount, fillSubtank);
+	}
 
 	public void addHealth(float amount, bool fillSubtank = true) {
+		addHealth((decimal)amount, fillSubtank);
+	}
+
+	public void addHealth(decimal amount, bool fillSubtank = true) {
 		if (health >= maxHealth && fillSubtank) {
-			player.fillSubtank(amount);
+			player.fillSubtank((float)amount);
 		}
-		healAmount += amount;
-		onHealing((decimal)amount);
+		healAmount += (float)amount;
+		onHealing(amount);
 	}
 
 	public void fillHealthToMax() {
@@ -3126,7 +3134,7 @@ public partial class Character : Actor, IDamagable {
 			return;
 		}
 		// Tough Guy.
-		if (player.isSigma || isToughGuyHyperMode()) {
+		if (this is BaseSigma || isToughGuyHyperMode()) {
 			if (flinchFrames >= Global.superFlinch) {
 				flinchFrames = Global.halfFlinch;
 			} else {

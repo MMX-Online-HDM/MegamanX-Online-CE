@@ -181,8 +181,8 @@ public class Sprite {
 			if (character.flattenedTime > 0) {
 				scaleY = 0.5f;
 			}
-			if (character.player.isAxl && character.player.axlWeapon != null) {
-				drawAxlArms = !character.player.axlWeapon.isTwoHanded(true);
+			if (character is Axl axl && axl.axlWeapon != null) {
+				drawAxlArms = !axl.axlWeapon.isTwoHanded(true);
 			}
 			isUPX = character is RagingChargeX;
 			isUltX = character is MegamanX { hasUltimateArmor: true };
@@ -381,10 +381,14 @@ public class Sprite {
 		}
 
 		if (renderEffects != null && !renderEffects.Contains(RenderEffectType.Invisible)) {
-			if (alpha >= 1 && (
+			if (!Options.main.fastShaders &&
+				alpha >= 1 && (
 				renderEffects.Contains(RenderEffectType.BlueShadow) ||
 				renderEffects.Contains(RenderEffectType.RedShadow) ||
-				renderEffects.Contains(RenderEffectType.GreenShadow)
+				renderEffects.Contains(RenderEffectType.GreenShadow) ||
+				renderEffects.Contains(RenderEffectType.PurpleShadow) ||
+				renderEffects.Contains(RenderEffectType.OrangeShadow) ||
+				renderEffects.Contains(RenderEffectType.YellowShadow)
 			)) {
 				ShaderWrapper? outlineShader = null;
 				if (renderEffects.Contains(RenderEffectType.BlueShadow)) {
@@ -393,6 +397,12 @@ public class Sprite {
 					outlineShader = Helpers.cloneShaderSafe("outline_red");
 				} else if (renderEffects.Contains(RenderEffectType.GreenShadow)) {
 					outlineShader = Helpers.cloneShaderSafe("outline_green");
+				} else if (renderEffects.Contains(RenderEffectType.OrangeShadow)) {
+					outlineShader = Helpers.cloneShaderSafe("outline_orange");
+				} else if (renderEffects.Contains(RenderEffectType.PurpleShadow)) {
+					outlineShader = Helpers.cloneShaderSafe("outline_purple");
+				} else if (renderEffects.Contains(RenderEffectType.YellowShadow)) {
+					outlineShader = Helpers.cloneShaderSafe("outline_yellow");
 				}
 				if (outlineShader != null) {
 					outlineShader.SetUniform(
@@ -409,18 +419,6 @@ public class Sprite {
 						xDirArg, yDirArg, angle, alpha,
 						[outlineShader], true
 					);
-					if (animData.isAxlSprite && drawAxlArms) {
-						DrawWrappers.DrawTexture(
-							axlArmBitmap,
-							currentFrame.rect.x1 - 1, currentFrame.rect.y1 - 1,
-							currentFrame.rect.w() + 2, currentFrame.rect.h() + 2,
-							x, y, zIndex - 10,
-							cx - (frameOffsetX - (1 * xDirArg)) * xDirArg,
-							cy - (frameOffsetY - (1 * yDirArg)) * yDirArg,
-							xDirArg, yDirArg, angle, alpha,
-							[outlineShader], true
-						);
-					}
 				}
 			}
 		
@@ -1028,36 +1026,45 @@ public class AnimData {
 
 		Texture bitmap = this.bitmap;
 
-		if (renderEffects != null && !renderEffects.Contains(RenderEffectType.Invisible)) {
-			if (alpha >= 1 && (
+		if (!Options.main.fastShaders && renderEffects != null &&
+			!renderEffects.Contains(RenderEffectType.Invisible) &&
+			alpha >= 1 && (
 				renderEffects.Contains(RenderEffectType.BlueShadow) ||
 				renderEffects.Contains(RenderEffectType.RedShadow) ||
-				renderEffects.Contains(RenderEffectType.GreenShadow)
-			)) {
-				ShaderWrapper? outlineShader = null;
-				if (renderEffects.Contains(RenderEffectType.BlueShadow)) {
-					outlineShader = Helpers.cloneShaderSafe("outline_blue");
-				} else if (renderEffects.Contains(RenderEffectType.RedShadow)) {
-					outlineShader = Helpers.cloneShaderSafe("outline_red");
-				} else if (renderEffects.Contains(RenderEffectType.GreenShadow)) {
-					outlineShader = Helpers.cloneShaderSafe("outline_green");
-				}
-				if (outlineShader != null) {
-					outlineShader.SetUniform(
-						"textureSize",
-						new SFML.Graphics.Glsl.Vec2(currentFrame.rect.w() + 2, currentFrame.rect.h() + 2)
-					);
-					DrawWrappers.DrawTexture(
-						bitmap,
-						currentFrame.rect.x1 - 1, currentFrame.rect.y1 - 1,
-						currentFrame.rect.w() + 2, currentFrame.rect.h() + 2,
-						x, y, zIndex - 10,
-						cx - (frameOffsetX - (1 * xDirArg)) * xDirArg,
-						cy - (frameOffsetY - (1 * yDirArg)) * yDirArg,
-						xDirArg, yDirArg, angle, alpha,
-						[outlineShader], true
-					);
-				}
+				renderEffects.Contains(RenderEffectType.GreenShadow) ||
+				renderEffects.Contains(RenderEffectType.PurpleShadow) ||
+				renderEffects.Contains(RenderEffectType.OrangeShadow) ||
+				renderEffects.Contains(RenderEffectType.YellowShadow)
+		)) {
+			ShaderWrapper? outlineShader = null;
+			if (renderEffects.Contains(RenderEffectType.BlueShadow)) {
+				outlineShader = Helpers.cloneShaderSafe("outline_blue");
+			} else if (renderEffects.Contains(RenderEffectType.RedShadow)) {
+				outlineShader = Helpers.cloneShaderSafe("outline_red");
+			} else if (renderEffects.Contains(RenderEffectType.GreenShadow)) {
+				outlineShader = Helpers.cloneShaderSafe("outline_green");
+			} else if (renderEffects.Contains(RenderEffectType.OrangeShadow)) {
+				outlineShader = Helpers.cloneShaderSafe("outline_orange");
+			} else if (renderEffects.Contains(RenderEffectType.PurpleShadow)) {
+				outlineShader = Helpers.cloneShaderSafe("outline_purple");
+			} else if (renderEffects.Contains(RenderEffectType.YellowShadow)) {
+				outlineShader = Helpers.cloneShaderSafe("outline_yellow");
+			}
+			if (outlineShader != null) {
+				outlineShader.SetUniform(
+					"textureSize",
+					new SFML.Graphics.Glsl.Vec2(currentFrame.rect.w() + 2, currentFrame.rect.h() + 2)
+				);
+				DrawWrappers.DrawTexture(
+					bitmap,
+					currentFrame.rect.x1 - 1, currentFrame.rect.y1 - 1,
+					currentFrame.rect.w() + 2, currentFrame.rect.h() + 2,
+					x, y, zIndex - 10,
+					cx - (frameOffsetX - (1 * xDirArg)) * xDirArg,
+					cy - (frameOffsetY - (1 * yDirArg)) * yDirArg,
+					xDirArg, yDirArg, angle, alpha,
+					[outlineShader], true
+				);
 			}
 		}
 

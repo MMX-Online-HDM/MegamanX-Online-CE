@@ -401,21 +401,21 @@ public class MegamanX : Character {
 		if (Options.main.gigaCrushSpecial &&
 			player.input.isPressed(Control.Special1, player) &&
 			player.input.isHeld(Control.Down, player) &&
-			player.weapons.Any(w => w is GigaCrush)
+			weapons.Any(w => w is GigaCrush)
 		) {
-			oldSlot = player.weaponSlot;
-			newSlot = player.weapons.FindIndex(w => w is GigaCrush);
+			oldSlot = weaponSlot;
+			newSlot = weapons.FindIndex(w => w is GigaCrush);
 			player.changeWeaponSlot(newSlot);
 			shoot(getChargeLevel());
 			player.changeWeaponSlot(oldSlot);
 			return true;
 		} else if (Options.main.novaStrikeSpecial &&
 			  player.input.isPressed(Control.Special1, player) &&
-			  player.weapons.Any(w => w is HyperNovaStrike) &&
+			  weapons.Any(w => w is HyperNovaStrike) &&
 			  !inputDir.isZero()
 		  ) {
-			oldSlot = player.weaponSlot;
-			newSlot = player.weapons.FindIndex(w => w is HyperNovaStrike);
+			oldSlot = weaponSlot;
+			newSlot = weapons.FindIndex(w => w is HyperNovaStrike);
 			player.changeWeaponSlot(newSlot);
 			shoot(getChargeLevel());
 			player.changeWeaponSlot(oldSlot);
@@ -528,7 +528,7 @@ public class MegamanX : Character {
 			hyperProgress = 0;
 			return;
 		}
-		if (player.health <= 0 || hasUltimateArmor) {
+		if (health <= 0 || hasUltimateArmor) {
 			hyperProgress = 0;
 			return;
 		}
@@ -1133,7 +1133,7 @@ public class MegamanX : Character {
 			index = 0;
 		}
 		if (index == (int)WeaponIds.HyperCharge && ownedByLocalPlayer) {
-			index = player.weapons[player.hyperChargeSlot].index;
+			index = weapons[player.hyperChargeSlot].index;
 		}
 		if (hasFullHyperMaxArmor) {
 			index = 25;
@@ -1334,9 +1334,9 @@ public class MegamanX : Character {
 			enemyDist = MathF.Abs(target.pos.x - pos.x);
 			enemyDistY = MathF.Abs(target.pos.y - pos.y);
 		}
-		int novaStrikeSlot = player.weapons.FindIndex(w => w is HyperNovaStrike);
-		int gCrushSlot = player.weapons.FindIndex(w => w is GigaCrush);
-		int hyperbuster = player.weapons.FindIndex(w => w is HyperCharge);
+		int novaStrikeSlot = weapons.FindIndex(w => w is HyperNovaStrike);
+		int gCrushSlot = weapons.FindIndex(w => w is GigaCrush);
+		int hyperbuster = weapons.FindIndex(w => w is HyperCharge);
 		bool isTargetClose = enemyDist <= 40;
 		bool isTargetInAir = enemyDistY >= 20;
 		bool isFacingTarget = (pos.x < target?.pos.x && xDir == 1) || (pos.x >= target?.pos.x && xDir == -1);
@@ -1433,7 +1433,7 @@ public class MegamanX : Character {
 					player.aiArmorUpgradeIndex++;
 				}
 			}
-			if (player.health >= player.maxHealth) {
+			if (health >= maxHealth) {
 				if (!hasUltimateArmor && player.currency >= Player.ultimateArmorCost) {
 					player.currency -= Player.ultimateArmorCost;
 					hasUltimateArmor = true;

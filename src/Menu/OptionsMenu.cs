@@ -32,6 +32,7 @@ public class OptionsMenu : IMainMenu {
 	public bool oldUseOptimizedAssets;
 	private int oldParticleQuality;
 	public bool oldIntegerFullscreen;
+	public bool oldFastShaders;
 	public bool oldVsync;
 
 	public FontType optionFontText = FontType.Blue;
@@ -49,6 +50,7 @@ public class OptionsMenu : IMainMenu {
 		}
 
 		oldIntegerFullscreen = Options.main.integerFullscreen;
+		oldFastShaders = Options.main.fastShaders;
 		oldFullscreen = Options.main.fullScreen;
 		oldWindowScale = Options.main.windowScale;
 		oldFpsMode = Options.main.fpsMode;
@@ -229,6 +231,28 @@ public class OptionsMenu : IMainMenu {
 					},
 					"Rounds down fullscreen pixels to the nearest integer.\n" +
 					"Reduces distortion when going fullscreen."
+				),
+				// Shaders
+				new MenuOption(40, startY,
+					() => {
+						if (Global.input.isPressedMenu(Control.MenuLeft)) {
+							Options.main.fastShaders = false;
+						} else if (Global.input.isPressedMenu(Control.MenuRight)) {
+							Options.main.fastShaders = true;
+						}
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							optionFontValue, "FAST SHADERS:",
+							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.fastShaders),
+							pos.x + 200, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"Uses a faster shader system for better performance,\n" +
+					"disables special effects like team mode outlines."
 				),
 				// Small Bars
 				new MenuOption(
@@ -1345,10 +1369,9 @@ public class OptionsMenu : IMainMenu {
 	public static void setPresetQuality(int graphicsPreset) {
 		if (graphicsPreset >= 3) return;
 		Options.main.graphicsPreset = graphicsPreset;
-		//Options.main.fontType = 0; //(graphicsPreset == 0 ? 0 : 1);
 		Options.main.particleQuality = graphicsPreset;
 		Options.main.enablePostProcessing = (graphicsPreset > 0);
-		Options.main.disableShaders = (graphicsPreset == 0);
+		Options.main.fastShaders = graphicsPreset == 0;
 		Options.main.useOptimizedAssets = (graphicsPreset <= 1);
 		Options.main.enableMapSprites = (graphicsPreset > 0);
 		Options.main.saveToFile();
@@ -1488,6 +1511,7 @@ public class OptionsMenu : IMainMenu {
 				oldFpsMode = Options.main.fpsMode;
 			}
 			if (oldFullscreen != Options.main.fullScreen ||
+				oldFastShaders != Options.main.fastShaders ||
 				//oldWindowScale != Options.main.windowScale ||
 				//oldMaxFPS != Options.main.maxFPS ||
 				oldDisableShaders != Options.main.disableShaders ||

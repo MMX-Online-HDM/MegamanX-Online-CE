@@ -126,7 +126,6 @@ public partial class Player {
 	public MaverickAIBehavior currentMaverickCommand;
 
 	public bool isX { get { return charNum == (int)CharIds.X; } }
-	public bool isVile { get { return charNum == (int)CharIds.Vile; } }
 	public bool isAxl { get { return charNum == (int)CharIds.Axl; } }
 	public bool isSigma { get { return charNum == (int)CharIds.Sigma; } }
 
@@ -156,7 +155,7 @@ public partial class Player {
 
 	public bool isDead {
 		get {
-			if (isSigma && currentMaverick != null) {
+			if (currentMaverick != null) {
 				return false;
 			}
 			if (character == null) return true;
@@ -448,10 +447,6 @@ public partial class Player {
 
 	public float lastMashAmount;
 	public int lastMashAmountSetFrame;
-
-	public bool isNon1v1MaverickSigma() {
-		return isSigma && maverick1v1 == null;
-	}
 
 	public bool is1v1MaverickX1() {
 		return maverick1v1 <= 8;

@@ -591,10 +591,6 @@ public class XReviveStart : CharState {
 			"drlight", -character.xDir, player.getNextActorNetId(), false, sendRpc: true
 		);
 		drLightAnim.blink = true;
-		int busterIndex = player.weapons.FindIndex(w => w is XBuster);
-		if (busterIndex >= 0) {
-			player.changeWeaponSlot(busterIndex);
-		}
 		mmx = character as RagingChargeX;
 	}
 
@@ -619,8 +615,8 @@ public class XRevive : CharState {
 		base.update();
 		if (!once && character.frameIndex >= 1 && sprite == "revive") {
 			character.playSound("ching", sendRpc: true);
-			player.health = 1;
-			character.addHealth(player.maxHealth);
+			character.health = 1;
+			character.addHealth(character.maxHealth);
 			once = true;
 			var flash = new Anim(
 				character.pos.addxy(0, -33), "up_flash",

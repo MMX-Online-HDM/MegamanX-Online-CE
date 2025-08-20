@@ -792,7 +792,7 @@ public class ZeroClang : CharState {
 }
 
 public class Jump : CharState {
-	public Jump() : base("jump", "jump_shoot", Options.main.getAirAttack()) {
+	public Jump() : base("jump", "jump_shoot", "attack_air") {
 		accuracy = 5;
 		exitOnLanding = true;
 		useDashJumpSpeed = true;
@@ -818,7 +818,7 @@ public class Jump : CharState {
 public class Fall : CharState {
 	public float limboVehicleCheckTime;
 	public Actor? limboVehicle;
-	public Fall() : base("fall", "fall_shoot", Options.main.getAirAttack(), "fall_start", "fall_start_shoot") {
+	public Fall() : base("fall", "fall_shoot", "attack_air", "fall_start", "fall_start_shoot") {
 		accuracy = 5;
 		exitOnLanding = true;
 		useDashJumpSpeed = true;
@@ -1429,7 +1429,7 @@ public class Die : CharState {
 				character.visible = false;
 				player.explodeDieStart();
 				if (character is BaseSigma sigma && sigma.loadout.commandMode != (int)MaverickModeId.TagTeam) {
-					foreach (var weapon in new List<Weapon>(player.weapons)) {
+					foreach (var weapon in new List<Weapon>(character.weapons)) {
 						if (weapon is MaverickWeapon mw && mw.maverick != null) {
 							mw.maverick.changeState(new MExit(mw.maverick.pos, true), true);
 						}

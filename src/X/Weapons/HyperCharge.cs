@@ -83,7 +83,7 @@ public class HyperCharge : Weapon {
 	public override void shoot(Character character, int[] args) {
 		Player player = character.player;
 		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
-		Weapon wep = player.weapons[player.hyperChargeSlot];
+		Weapon wep = character.weapons[player.hyperChargeSlot];
 
 		if (wep is XBuster) {
 			character.changeState(new X3ChargeShot(this), true);

@@ -301,7 +301,7 @@ public class GenericStun : CharState {
 	}
 
 	public float getTimerFalloff() {
-		float healthPercent = 1 * (player.health / player.maxHealth);
+		float healthPercent = (float)(character.health / character.maxHealth);
 		return (Global.speedMul * (2 + healthPercent));
 	}
 }
