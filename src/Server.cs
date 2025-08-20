@@ -260,7 +260,7 @@ public class Server {
 		}
 
 		if ((!hidden || isP2P) && GameMode.isStringTeamMode(gameMode) &&
-			gameMode != GameMode.TeamElimination && level != "training"
+			gameMode != GameMode.TeamElimination && (level != "training" || level != "training2")
 		) {
 			int[] teamSizes = GameMode.getAllianceCounts(players, teamNum);
 			int biggerTeam = teamSizes.Max();

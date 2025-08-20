@@ -12,7 +12,7 @@ public class RagingChargeBuster : Weapon {
 		weaponBarBaseIndex = 70;
 		weaponBarIndex = 59;
 		weaponSlotIndex = 121;
-		shootSounds = new string[] { "stockBuster", "stockBuster", "stockBuster", "stockBuster" };
+		shootSounds = new string[] { "stockBuster", "stockBuster", "stockBuster", "stockBuster", "stockBuster" };
 		fireRate = 20;
 		canHealAmmo = true;
 		drawAmmo = true;
@@ -26,12 +26,15 @@ public class RagingChargeBuster : Weapon {
 	}
 
 	public override float getAmmoUsage(int chargeLevel) { return 3; }
+	public override bool canShoot(int chargeLevel, Character character) {
+		if (ammo < 3) return false;
+		return base.canShoot(chargeLevel, character);
+	}
 
 	public override void shoot(Character character, int[] args) {
 		Point pos = character.getShootPos();
 		int xDir = character.getShootXDir();
 		Player player = character.player;
-
 		new RagingBusterProj(this, pos, xDir, player, player.getNextActorNetId(), true);
 		new Anim(pos, "buster_unpo_muzzle", xDir, null, true);
 	}
@@ -70,10 +73,42 @@ public class AbsorbWeapon : Weapon {
 	public Projectile absorbedProj;
 	public AbsorbWeapon(Projectile otherProj) {
 		index = (int)WeaponIds.UPParry;
+		shootSounds = new string[] { "", "", "", "", "" };
 		weaponSlotIndex = 118;
 		killFeedIndex = 168;
 		this.absorbedProj = otherProj;
+		fireRate = 0;
 		drawAmmo = false;
+	}
+	public override void shoot(Character character, int[] args) {
+		if (character is not RagingChargeX rcx) return;	
+		Player player = character.player;
+		character.changeState(new XUPParryProjState(absorbedProj, true, true), true);
+		rcx.absorbedProj = null;
+		player.weapons.RemoveAll(w => w is AbsorbWeapon);
+		int busterIndex = player.weapons.FindIndex(w => w is RagingChargeBuster);
+		player.changeWeaponSlot(busterIndex);
+	}
+}
+public class RCXZSaber : Weapon {
+
+	public RCXZSaber() : base() {
+		shootSounds = new string[] { "", "", "", "", "" };
+		index = (int)WeaponIds.ZSaber;
+		weaponBarBaseIndex = 21;
+		weaponBarIndex = weaponBarBaseIndex;
+		weaponSlotIndex = 48;
+		killFeedIndex = 9;
+		drawAmmo = false;
+		drawCooldown = false;
+	}
+	public override void shoot(Character character, int[] args) {
+		if (character is not RagingChargeX rcx) return;
+		Player player = character.player;
+		rcx.changeState(new RCXMaxWaveSaberState(), true);
+		player.weapons.RemoveAll(w => w is RCXZSaber);
+		int busterIndex = player.weapons.FindIndex(w => w is RagingChargeBuster);
+		player.changeWeaponSlot(busterIndex);
 	}
 }
 

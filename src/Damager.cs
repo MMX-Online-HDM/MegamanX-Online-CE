@@ -914,6 +914,7 @@ public class Damager {
 		return projId switch {
 			(int)ProjIds.AcidBurstPoison => true,
 			(int)ProjIds.Burn => true,
+			(int)ProjIds.SelfDmg => true,
 			_ => false
 		};
 	}

@@ -513,7 +513,6 @@ public class HostMenu : IMainMenu {
 				);
 			}
 		// Mode
-		if (!isTraining) {
 			menuOptions.Add(
 				new MenuOption(startX, startY,
 					() => {
@@ -536,7 +535,6 @@ public class HostMenu : IMainMenu {
 					}
 				)
 			);
-		}
 		// Team number.
 		if (GameMode.isStringTeamMode(selectedGameMode)) {
 			menuOptions.Add(
@@ -1079,7 +1077,7 @@ public class HostMenu : IMainMenu {
 		string gameMode = selectedGameMode;
 		if (selectedLevel.isTraining()) {
 			playTo = 9999;
-			gameMode = GameMode.Deathmatch;
+			//gameMode = GameMode.Deathmatch;
 		}
 
 		var localServer = new Server(
@@ -1108,7 +1106,7 @@ public class HostMenu : IMainMenu {
 		string gameMode = selectedGameMode;
 		if (selectedLevel.isTraining()) {
 			playTo = 9999;
-			gameMode = GameMode.Deathmatch;
+			//gameMode = GameMode.Deathmatch;
 		}
 		if (Global.localServer != null && Global.localServer.s_server.Status == NetPeerStatus.Running) {
 			Global.localServer.shutdown("Host left the match.");

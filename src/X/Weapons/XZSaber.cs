@@ -122,3 +122,36 @@ public class XSaberCrouchState : CharState {
 		}
 	}
 }
+public class RCXMaxWaveSaberState : CharState {
+	bool fired;
+	public RCXMaxWaveSaberState() : base("beam_saber") {
+		landSprite = "beam_saber";
+		airSprite = "beam_saber_air";
+		airMove = true;
+		useDashJumpSpeed = true;
+		canStopJump = true;
+		canJump = true;
+	}
+
+	public override void update() {
+		base.update();
+		if (character.frameIndex >= 7 && !fired) {
+			fired = true;
+			character.playSound("zerosaberx3");
+			new XSaberProj(
+				character.pos.addxy(28 * character.xDir, -17), character.xDir,
+				character, player, player.getNextActorNetId(), rpc: true
+			);
+		}
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (!character.grounded) {
+			sprite = airSprite;
+			character.changeSpriteFromName(airSprite, true);
+		}
+	}
+}

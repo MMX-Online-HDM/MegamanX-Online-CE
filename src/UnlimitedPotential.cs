@@ -13,9 +13,9 @@ public class XUPParryStartState : CharState {
 	public override void update() {
 		base.update();
 
-		if (stateTime < 0.1f) {
+		//if (stateTime < 0.1f) {
 			character.turnToInput(player.input, player);
-		}
+		//}
 
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
@@ -25,11 +25,11 @@ public class XUPParryStartState : CharState {
 	public void counterAttack(Player? damagingPlayer, Actor? damagingActor, float damage) {
 		Actor? counterAttackTarget = null;
 		Projectile? absorbedProj = null;
-		
+		/*
 		if (player.weapon is XBuster { isUnpoBuster: true }) {
 			player.weapon.ammo = player.weapon.maxAmmo;
-		}
-		
+		}*/
+		mmx.addPercentAmmo(100);
 		if (damagingActor is Projectile proj) {
 			if (proj.owningActor != null) {
 				counterAttackTarget = proj.owningActor;
@@ -47,7 +47,7 @@ public class XUPParryStartState : CharState {
 				character.playSound("upParryAbsorb", sendRpc: true);
 				if (!player.input.isWeaponLeftOrRightHeld(player)) {
 					mmx.absorbedProj = absorbedProj;
-					//character.player.weapons.Add(new AbsorbWeapon(absorbedProj));
+					character.player.weapons.Add(new AbsorbWeapon(absorbedProj));
 				} else {
 					shootProj = true;
 					absorbThenShoot = true;
@@ -70,7 +70,6 @@ public class XUPParryStartState : CharState {
 				chr.changeState(new ParriedState(), true);
 			}
 		}
-		mmx.addPercentAmmo(100);
 		character.playSound("upParry", sendRpc: true);
 		character.changeState(new XUPParryMeleeState(counterAttackTarget, damage), true);
 	}

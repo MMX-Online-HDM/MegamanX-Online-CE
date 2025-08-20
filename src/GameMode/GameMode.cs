@@ -642,11 +642,12 @@ public class GameMode {
 				if (count >= 3) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x, y + 11);
 				if (count >= 4) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x + 13, y + 11);
 				*/
-				Global.sprites["hud_killfeed_weapon"].drawToHUD(175, Global.halfScreenW/18, 160);
-				Fonts.drawText(
-					FontType.Red,
-					mmx.selfDamageCooldown.ToString(), Global.halfScreenW/10, 157, Alignment.Left
-				);
+				float decayCooldown = 1 - Helpers.progress(mmx.selfDamageCooldown, mmx.selfDamageMaxCooldown);
+				drawGigaWeaponCooldown(122, decayCooldown, (int)Global.halfScreenW / 17, 160);
+				if (mmx.parryCooldown > 0) {
+					float cooldown = 1 - Helpers.progress(mmx.parryCooldown, 30);
+					drawGigaWeaponCooldown(51, cooldown, (int)Global.halfScreenW / 17, 178);
+				}
 			}
 			if (drawPlayer.character is Zero zero) {
 				int yStart = 159;

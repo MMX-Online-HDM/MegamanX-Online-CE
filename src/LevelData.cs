@@ -513,7 +513,7 @@ public class LevelData {
 		if (customSize != -1) {
 			return customSize == 0;
 		}
-		return name == "training" || name.EndsWith("_training");
+		return name == "training" || name == "training2" || name.EndsWith("_training");
 	}
 
 	public bool is1v1() {
@@ -606,6 +606,7 @@ public class LevelData {
 		{ "japetribute", "variableX" },
 		{ "nodetest", "credits_X1" },
 		{ "training", "training_vodaz" },
+		{ "training2", "training_vodaz" },
 	};
 
 	public string getMusicKey(List<Player> players) {

@@ -100,7 +100,7 @@ public class PunchyZero : Character {
 		if (!Global.level.isHyper1v1()) {
 			if (isBlack) {
 				if (musicSource == null) {
-					addMusicSource("zero_X1", getCenterPos(), true);
+					addMusicSource("themeOfZeroMMZ_OldGsU", getCenterPos(), true);
 				}
 			} else if (isAwakened) {
 				if (musicSource == null) {
