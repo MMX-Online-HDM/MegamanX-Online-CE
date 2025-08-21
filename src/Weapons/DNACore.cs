@@ -116,6 +116,8 @@ public class DNACore : AxlWeapon {
 			loadout.vileLoadout = vile.loadout.clone();;
 			frozenCastle = vile.hasFrozenCastle;
 			speedDevil = vile.hasSpeedDevil;
+		} else if (character is RagingChargeX rcx) {
+			altCharAmmo = rcx.ragingBuster.ammo;
 		}
 		// For any hyper modes added here.
 		// be sure to de-apply them if "preserve undisguise" is used in: axl.updateDisguisedAxl()

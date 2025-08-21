@@ -1659,6 +1659,7 @@ public partial class Player {
 			else if (isVileMK2) vile.vileForm = 1;
 		}
 		retChar.addTransformAnim();
+		retChar.linkedDna = dnaCore;
 
 		if (spawnCharNum == (int)CharIds.Zero) {
 			retChar.weapons.Add(new ZSaber());
@@ -1782,6 +1783,8 @@ public partial class Player {
 			sigma.ballWeapon.ammo = dnaCore.altCharAmmo;
 		} else if (retChar is NeoSigma neoSigma) {
 			neoSigma.gigaAttack.ammo = dnaCore.altCharAmmo;
+		} else if (retChar is RagingChargeX rcx) {
+			rcx.ragingBuster.ammo = dnaCore.altCharAmmo;
 		}
 		if (oldATrans) {
 			dnaCore.ultimateArmor = false;
@@ -1838,6 +1841,8 @@ public partial class Player {
 					oldChar.linkedDna.altCharAmmo = sigma.ballWeapon.ammo;
 				} else if (oldChar is NeoSigma neoSigma) {
 					oldChar.linkedDna.altCharAmmo = neoSigma.gigaAttack.ammo;
+				} else if (oldChar is RagingChargeX rcx) {
+					oldChar.linkedDna.altCharAmmo = rcx.ragingBuster.ammo;
 				}
 			}
 		}
