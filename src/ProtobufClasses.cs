@@ -127,11 +127,13 @@ public class PlayerPB {
 		loadoutData = player.loadout;
 		disguise = player.disguise;
 		atransLoadout = player.atransLoadout;
-		charNetId = player.character?.netId;
-		charRollingShieldNetId = player.charRollingShieldNetId;
-		charXPos = player.charXPos;
-		charYPos = player.charYPos;
-		charXDir = player.charXDir;
+		if (player.character != null) {
+			charNetId = player.character.netId;
+			charRollingShieldNetId = (player.character as MegamanX)?.chargedRollingShieldProj?.netId;
+			charXPos = player.character.pos.x;
+			charYPos = player.character.pos.y;
+			charXDir = player.character.xDir;
+		}
 	}
 }
 

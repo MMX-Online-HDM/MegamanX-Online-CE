@@ -17,6 +17,8 @@ public class RagingChargeX : Character {
 	public int lastAmmoSound = -1;
 	public Projectile? absorbedProj;
 	public RagingChargeBuster ragingBuster;
+	public float chargePalleteTime;
+
 	bool shootPressed => player.input.isPressed(Control.Shoot, player);
 	bool upHeld => player.input.isHeld(Control.Up, player);
 	bool specialPressed => player.input.isPressed(Control.Special1, player);
@@ -41,6 +43,12 @@ public class RagingChargeX : Character {
 
 	public override void preUpdate() {
 		base.preUpdate();
+		// Charge timers.
+		if (getChargeShaders().Count != 0) {
+			chargePalleteTime += Global.gameSpeed;
+		} else {
+			chargePalleteTime = 0;
+		}
 		if (!ownedByLocalPlayer) { return; }
 		// Cooldowns.
 		Helpers.decrementFrames(ref saberCooldown);
@@ -79,12 +87,17 @@ public class RagingChargeX : Character {
 		ragingBuster.update();
 		ragingBuster.charLinkedUpdate(this, true);
 		chargeBusterSound();
-		chargeLogic(shoot);
+		chargeLogic(null);
 		player.changeWeaponControls();
 	}
 
 	public override void postUpdate() {
 		base.postUpdate();
+		if (getChargeShaders().Count != 0) {
+			chargePalleteTime += Global.gameSpeed;
+		} else {
+			chargePalleteTime = 0;
+		}
 		// Local-only starts here.
 		if (!ownedByLocalPlayer) { return; }
 		// Decay damage.
@@ -94,7 +107,12 @@ public class RagingChargeX : Character {
 				selfDamageCooldown = selfDamageMaxCooldown;
 				playSound("hit", true, true);
 			} else {
-				Helpers.decrementFrames(ref selfDamageCooldown);
+				if (inCombatTime > 0) {
+					selfDamageCooldown -= speedMul;
+				} else {
+					selfDamageCooldown -= speedMul * 0.5f;
+				}
+				if (selfDamageCooldown < 0) { selfDamageCooldown = 0;  }
 			}
 		} else if (isDecayImmune() && selfDamageCooldown < selfDamageMaxCooldown) {
 			selfDamageCooldown = selfDamageMaxCooldown;
@@ -110,69 +128,52 @@ public class RagingChargeX : Character {
 			enterParry();
 			return true;
 		}
-		if (currentWeapon != null && (shootPressed && !isCharging())) {
-			if (shootCooldown <= 0) {
-				shoot(0);
-				return true;
-			}
+		if (shootPressed && ragingBuster.ammo >= ragingBuster.getAmmoUsage(0) && shootCooldown <= 0) {
+			shoot();
+			return true;
 		}
 		if (specialPressed && charState is Dash or AirDash) {
 			charState.isGrabbing = true;
 			changeSpriteFromName("unpo_grab_dash", true);
 			return true;
 		}
-		if (punchCooldown <= 0 &&
-			(shootPressed && ragingBuster.ammo < ragingBuster.getAmmoUsage(0) ||
-			specialPressed && upHeld)
-		) {
+		if (punchCooldown <= 0 && shootPressed && ragingBuster.ammo < ragingBuster.getAmmoUsage(0)) {
 			punchCooldown = 30;
 			changeState(new XUPPunchState(grounded), true);
 			return true;
 		}
-		if (saberCooldown <= 0) {
-			if (specialPressed) {
-				saberCooldown = 60;
-				if (charState is Crouch) {
-					changeState(new XSaberCrouchState(), true);
-					return true;
-				}
-				changeState(new X6SaberState(grounded), true);
+		if (saberCooldown <= 0 && specialPressed) {
+			saberCooldown = 60;
+			if (charState is Crouch) {
+				changeState(new XSaberCrouchState(), true);
 				return true;
 			}
+			changeState(new X6SaberState(grounded), true);
+			return true;
 		}
 		return base.attackCtrl();
 	}
-	public void shoot(int chargeLevel) {
-		shoot(chargeLevel, currentWeapon);
-	}
+
 	// Shoot and set animation if posible.
-	public void shoot(int chargeLevel, Weapon weapon) {
-		// Check if can shoot.
-		if (!weapon.canShoot(chargeLevel, this) || weapon.shootCooldown > 0) {
-			return;
+	public void shoot() {
+		string shootSprite = getSprite(charState.shootSpriteEx);
+		if (!Global.sprites.ContainsKey(shootSprite)) {
+			shootSprite = grounded ? getSprite("shoot") : getSprite("fall_shoot");
 		}
-		// Changes to shoot animation and gets sound.
-		if ((chargeLevel <= 4)) {
-			setShootAnim();
-			shootAnimTime = DefaultShootAnimTime;
+		if (shootAnimTime == 0) {
+			changeSprite(shootSprite, false);
+		} else if (charState is Idle && !charState.inTransition()) {
+			frameIndex = 0;
+			frameTime = 0;
 		}
-		string shootSound = weapon.shootSounds[chargeLevel];
-		// Shoot.
-		weapon.shoot(this, [chargeLevel, 0]);
-		// Sets up global shoot cooldown to the weapon shootCooldown.
-		float baseCooldown = weapon.getFireRate(this, chargeLevel, [0]);
-		shootCooldown = baseCooldown;
-		// Add ammo.
-		weapon.addAmmo(-weapon.getAmmoUsageEX(chargeLevel, this), player);
-		// Play sound if any.
-		if (shootSound != "") {
-			playSound(shootSound, sendRpc: true);
-		}
-		// Stop charge if this was a charge shot.
-		if (chargeLevel >= 1) {
-			stopCharge();
-		}
+		shootAnimTime = 20;
+
+		ragingBuster.shoot(this, []);
+		ragingBuster.addAmmo(-ragingBuster.getAmmoUsage(0), player);
+		playSound(ragingBuster.shootSounds[0]);
+		shootCooldown = ragingBuster.fireRate;
 	}
+
 	// Attack related stuff.
 	public void setShootAnim() {
 		string shootSprite = getSprite(charState.shootSpriteEx);
@@ -232,9 +233,7 @@ public class RagingChargeX : Character {
 		changeState(new XUPParryStartState(), true);
 		return;
 	}
-	public override int getMaxChargeLevel() {
-		return 4;
-	}
+
 	public override void chargeGfx() {
 		if (ownedByLocalPlayer) {
 			chargeEffect.stop();
@@ -242,9 +241,10 @@ public class RagingChargeX : Character {
 		if (isCharging()) {
 			chargeSound.play();
 			int chargeType = 0;
-			chargeEffect.update(getChargeLevel(), chargeType);
+			chargeEffect.update(getDisplayChargeLevel(), chargeType);
 		}
 	}
+
 	public override void addAmmo(float amount) {
 		weaponHealAmount += amount;
 		ragingBuster.addAmmoHeal(amount);
@@ -325,24 +325,20 @@ public class RagingChargeX : Character {
 		};
 		return proj;
 	}
+
 	public override List<ShaderWrapper> getShaders() {
 		List<ShaderWrapper> baseShaders = base.getShaders();
-		List<ShaderWrapper> shaders = new();
+		List<ShaderWrapper> shaders = [];
 		ShaderWrapper? palette = null;
-		if (Global.isOnFrameCycle(4)) {
-			switch (getChargeLevel()) {
-				case 1:
-					palette = Player.XBlueC;
-					break;
-				case 2:
-					palette = Player.XYellowC;
-					break;
-				case 3:
-					palette = Player.XPinkC;
-					break;
-				case 4:
-					palette = Player.XGreenC;
-					break;
+
+		List<ShaderWrapper?> chargePalletes = getChargeShaders() as List<ShaderWrapper?>;
+		if (chargePalletes.Count > 0) {
+			chargePalletes.Add(null);
+			ShaderWrapper? targetChargePallete = chargePalletes[MathInt.Floor(
+				(chargePalleteTime % (chargePalletes.Count * 2)) / 2f
+			)];
+			if (targetChargePallete != null) {
+				palette = targetChargePallete;
 			}
 		}
 		if (palette != null) {
@@ -354,12 +350,31 @@ public class RagingChargeX : Character {
 		shaders.AddRange(baseShaders);
 		return shaders;
 	}
+
+	public List<ShaderWrapper> getChargeShaders() {
+		if (!isCharging()) {
+			return [];
+		}
+		List<ShaderWrapper> chargePalletes = new();
+		int chargeLevel = getDisplayChargeLevel();
+		if (chargeLevel > 0) {
+			chargePalletes.Add(getDisplayChargeLevel() switch {
+				1 => Player.XBlueC,
+				2 => Player.XYellowC,
+				3 => Player.XPinkC,
+				_ => Player.XGreenC,
+			});
+		}
+		return chargePalletes;
+	}
+
+	public override int getDisplayChargeLevel() {
+		return Helpers.clamp(MathInt.Ceiling(ragingBuster.ammo / ragingBuster.getAmmoUsage(0)), 1, 4);
+	}
+
 	public override List<byte> getCustomActorNetData() {
 		List<byte> customData = base.getCustomActorNetData();
-		int weaponIndex = currentWeapon?.index ?? 255;
-		byte ammo = (byte)MathF.Ceiling(currentWeapon?.ammo ?? 0);
-		customData.Add((byte)weaponIndex);
-		customData.Add(ammo);
+		customData.Add((byte)MathF.Floor(ragingBuster.ammo));
 		return customData;
 	}
 
@@ -368,10 +383,6 @@ public class RagingChargeX : Character {
 		base.updateCustomActorNetData(data);
 		data = data[data[0]..];
 		// Per-player data.
-		Weapon? targetWeapon = weapons.Find(w => w.index == data[0]);
-		if (targetWeapon != null) {
-			weaponSlot = weapons.IndexOf(targetWeapon);
-			targetWeapon.ammo = data[1];
-		}
+		ragingBuster.ammo = data[0];
 	}
 }

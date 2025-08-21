@@ -126,6 +126,7 @@ public class CharState {
 		}
 		if (invincible) {
 			player.delaySubtank();
+			character.enterCombat();
 		}
 		character.onExitState(this, newState);
 	}

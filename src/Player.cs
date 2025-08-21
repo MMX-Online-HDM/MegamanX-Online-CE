@@ -414,11 +414,11 @@ public partial class Player {
 
 
 	// Character specific data populated on RPC request
-	public ushort? charNetId;
-	public ushort? charRollingShieldNetId;
-	public float charXPos;
-	public float charYPos;
-	public int charXDir;
+	//public ushort? charNetId;
+	//public ushort? charRollingShieldNetId;
+	//public float charXPos;
+	//public float charYPos;
+	//public int charXDir;
 	public Dictionary<int, int> charNumToKills = new Dictionary<int, int>() {
 	};
 
@@ -1169,15 +1169,15 @@ public partial class Player {
 			);
 		}
 		// Kaiser Sigma (Hypermode)
-		else if  (spawnCharNum == (int)CharIds.KaiserSigma) {
+		else if (spawnCharNum == (int)CharIds.KaiserSigma) {
 			newChar = new KaiserSigma(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer,
-				isWarpIn: isWarpIn
+				isRevive: true, isWarpIn: isWarpIn, heartTanks: htCount
 			);
 		}
 		// Raging Charge X.
-		else if  (spawnCharNum == (int)CharIds.RagingChargeX) {
+		else if (spawnCharNum == (int)CharIds.RagingChargeX) {
 			newChar = new RagingChargeX(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer,
@@ -1641,13 +1641,14 @@ public partial class Player {
 		} else if  (spawnCharNum == (int)CharIds.KaiserSigma) {
 			retChar = new KaiserSigma(
 				this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir,
-				false, charNetId, ownedByLocalPlayer, isRevive: false,
+				true, dnaNetId, ownedByLocalPlayer,
+				isRevive: false, isWarpIn: false,
 				heartTanks: oldChar.heartTanks, isATrans: true
 			);
 		} else if (spawnCharNum == (int)CharIds.RagingChargeX) {
 			retChar = new RagingChargeX(
 				this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir,
-				true, charNetId, ownedByLocalPlayer, isWarpIn: false,
+				true, dnaNetId, true, isWarpIn: false,
 				heartTanks: oldChar.heartTanks, isATrans: true
 			);
 		} else {

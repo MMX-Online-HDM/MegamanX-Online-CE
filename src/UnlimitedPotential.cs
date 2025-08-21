@@ -639,6 +639,7 @@ public class XRevive : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		character.visible = true;
 		reviveAnim = new XReviveAnim(character.getCenterPos(), player.getNextActorNetId(), sendRpc: true);
 		rcx = character as RagingChargeX ?? throw new NullReferenceException();
 	}

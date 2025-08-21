@@ -90,10 +90,10 @@ public class AbsorbWeapon : Weapon {
 		player.changeWeaponSlot(busterIndex);
 	}
 }
-public class RCXZSaber : Weapon {
 
+public class RCXZSaber : Weapon {
 	public RCXZSaber() : base() {
-		shootSounds = new string[] { "", "", "", "", "" };
+		shootSounds = ["", "", "", "", ""];
 		index = (int)WeaponIds.ZSaber;
 		weaponBarBaseIndex = 21;
 		weaponBarIndex = weaponBarBaseIndex;
@@ -102,8 +102,11 @@ public class RCXZSaber : Weapon {
 		drawAmmo = false;
 		drawCooldown = false;
 	}
+
 	public override void shoot(Character character, int[] args) {
-		if (character is not RagingChargeX rcx) return;
+		if (character is not RagingChargeX rcx) {
+			return;
+		}
 		Player player = character.player;
 		rcx.changeState(new RCXMaxWaveSaberState(), true);
 		player.weapons.RemoveAll(w => w is RCXZSaber);

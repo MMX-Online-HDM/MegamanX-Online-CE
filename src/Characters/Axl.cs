@@ -361,6 +361,7 @@ public class Axl : Character {
 
 			if (stingChargeTime <= 0) {
 				player.delaySubtank();
+				enterCombat();
 				stingChargeTime = 0;
 			}
 		}

@@ -931,7 +931,7 @@ public class Maverick : Actor, IDamagable {
 		}
 
 		if (ownedByLocalPlayer && damage > 0 && owner != null) {
-			netOwner.delaySubtank();
+			netOwner?.delaySubtank();
 			addDamageTextHelper(owner, damage, maxHealth, true);
 		}
 

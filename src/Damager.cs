@@ -236,8 +236,15 @@ public class Damager {
 			return true;
 		}
 
-		if (damagable != null && damagable is not CrackedWall && owner.isMainPlayer && !isDot(projId)) {
-			owner.delaySubtank();
+		if (damagable != null && damagable is not CrackedWall && owner.ownedByLocalPlayer && !isDot(projId)) {
+			if (owner.isMainPlayer) {
+				owner.delaySubtank();
+			}
+			if (damagingActor is Projectile proj && proj.owningActor is Character chara) {
+				chara.enterCombat();
+			} else {
+				owner.character?.enterCombat();
+			}
 		}
 
 		if (damagable is CrackedWall cw) {

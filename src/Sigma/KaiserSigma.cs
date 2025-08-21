@@ -52,16 +52,16 @@ public partial class KaiserSigma : Character {
 		}
 		if (!ownedByLocalPlayer) {
 			visible = true;
-			return;
-		}
-		if (isRevive) {
-			useGravity = false;
-			changeSprite("kaisersigma_enter", true);
-			changeState(new KaiserSigmaRevive(player.explodeDieEffect), true);
 		} else {
-			visible = true;
-			changeSprite("kaisersigma_idle", true);
-			changeState(new KaiserSigmaIdleState(), true);
+			if (isRevive) {
+				useGravity = false;
+				changeSprite("kaisersigma_enter", true);
+				changeState(new KaiserSigmaRevive(player.explodeDieEffect), true);
+			} else {
+				visible = true;
+				changeSprite("kaisersigma_idle", true);
+				changeState(new KaiserSigmaIdleState(), true);
+			}
 		}
 		grounded = false;
 		canBeGrounded = false;

@@ -242,6 +242,7 @@ public class MegamanX : Character {
 				stingActiveTime = 0;
 			}
 			player.delaySubtank();
+			enterCombat();
 		}
 
 		if (hyperHelmetArmor == ArmorId.Max && alive) {
@@ -1181,9 +1182,9 @@ public class MegamanX : Character {
 	public List<ShaderWrapper> getChargeShaders() {
 		List<ShaderWrapper> chargePalletes = new();
 		ShaderWrapper? defaultChargePallete = null;
-		int chargeLevel = getChargeLevel();
+		int chargeLevel = getDisplayChargeLevel();
 		if (chargeLevel > 0) {
-			defaultChargePallete = getChargeLevel() switch {
+			defaultChargePallete = getDisplayChargeLevel() switch {
 				1 => Player.XBlueC,
 				2 => Player.XYellowC,
 				3 when hasFullHyperMaxArmor => Player.XGreenC,
