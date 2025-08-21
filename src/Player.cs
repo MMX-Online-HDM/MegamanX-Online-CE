@@ -20,6 +20,17 @@ public partial class Player {
 			-1, GameMode.neutralAlliance, "NULL", null, 0
 		)
 	);
+	public static Player errorPlayer = new Player(
+		"Error", 255, -1,
+		new PlayerCharData() { charNum = -1 },
+		false, false, GameMode.neutralAlliance,
+		new Input(false),
+		new ServerPlayer(
+			"Error", 255, false,
+			-1, GameMode.neutralAlliance, "NULL", null, 0
+		)
+	);
+	
 	
 	public SpawnPoint? firstSpawn;
 	public Input input;
@@ -439,7 +450,6 @@ public partial class Player {
 	public ExplodeDieEffect? explodeDieEffect;
 	public bool suicided;
 
-	ushort savedArmorFlag;
 	public bool[] headArmorsPurchased = new bool[] { false, false, false };
 	public bool[] bodyArmorsPurchased = new bool[] { false, false, false };
 	public bool[] armArmorsPurchased = new bool[] { false, false, false };
@@ -1823,6 +1833,9 @@ public partial class Player {
 		if (oldChar == null) {
 			return null;
 		}
+		if (newChar?.netId == null) {
+			throw new Exception("Cannot use ATrans on objects without netID");
+		}
 		// Flag to enable vanilla A-Trans behaviour.
 		bool oldATrans = Global.level.server?.customMatchSettings?.oldATrans == true;
 
@@ -1922,6 +1935,9 @@ public partial class Player {
 		atransLoadout = null;
 		if (character == null) {
 			return;
+		}
+		if (character.netId == null) {
+			throw new Exception("Cannot use ATrans on objects without netID");
 		}
 		if (ownedByLocalPlayer) {
 			string json = JsonConvert.SerializeObject(
@@ -2045,7 +2061,7 @@ public partial class Player {
 				return false;
 			}
 			if (character != null && currentMaverick == null) {
-				InRideArmor inRideArmor = character.charState as InRideArmor;
+				InRideArmor? inRideArmor = character.charState as InRideArmor;
 				if (inRideArmor != null &&
 					(inRideArmor.frozenTime > 0 || inRideArmor.stunTime > 0 || inRideArmor.crystalizeTime > 0)
 				) {

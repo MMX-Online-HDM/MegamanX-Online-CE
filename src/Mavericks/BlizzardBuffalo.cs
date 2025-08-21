@@ -273,11 +273,11 @@ public class BBuffaloIceProjGround : Projectile, IDamagable {
 	public override void update() {
 		base.update();
 		moveWithMovingPlatform();
-		updateHitboxes();
+		updateNewHitboxes();
 	}
 
-	public void updateHitboxes() {
-		if (angle == null || collider?._shape == null) return;
+	public void updateNewHitboxes() {
+		if (!angleSet || collider?._shape == null) return;
 
 		float angle360 = Helpers.to256(byteAngle);
 		if (angle360 >= 0 && angle360 <= 32) {

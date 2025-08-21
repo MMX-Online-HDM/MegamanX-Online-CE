@@ -288,10 +288,8 @@ public class MagnaCShurikenProj : Projectile {
 			var angInc = (-xDir * turnDir) * Global.spf * 200;
 			angle += angInc;
 			angleDist += MathF.Abs(angInc);
-			if (angle != null) {
-				vel.x = Helpers.cosd((float)angle) * maxSpeed;
-				vel.y = Helpers.sind((float)angle) * maxSpeed;
-			}
+			vel.x = Helpers.cosd(angle) * maxSpeed;
+			vel.y = Helpers.sind(angle) * maxSpeed;
 		}
 	}
 }

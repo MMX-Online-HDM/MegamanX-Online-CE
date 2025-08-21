@@ -142,15 +142,15 @@ public class BoomerangProj : Projectile {
 				var angInc = (-xDir * turnDir) * Global.spf * 300;
 				angle += angInc;
 				angleDist += MathF.Abs(angInc);
-				vel.x = Helpers.cosd((float)angle!) * maxSpeed;
-				vel.y = Helpers.sind((float)angle) * maxSpeed;
+				vel.x = Helpers.cosd(angle!) * maxSpeed;
+				vel.y = Helpers.sind(angle) * maxSpeed;
 			} else if (damager.owner.character != null) {
 				var dTo = pos.directionTo(damager.owner.character.getCenterPos()).normalize();
 				var destAngle = MathF.Atan2(dTo.y, dTo.x) * 180 / MathF.PI;
 				destAngle = Helpers.to360(destAngle);
-				angle = Helpers.lerpAngle((float)angle!, destAngle, Global.spf * 10);
-				vel.x = Helpers.cosd((float)angle) * maxSpeed;
-				vel.y = Helpers.sind((float)angle) * maxSpeed;
+				angle = Helpers.lerpAngle(angle!, destAngle, Global.spf * 10);
+				vel.x = Helpers.cosd(angle) * maxSpeed;
+				vel.y = Helpers.sind(angle) * maxSpeed;
 			} else {
 				destroySelf();
 			}
@@ -222,8 +222,8 @@ public class BoomerangProjCharged : Projectile {
 			incPos(lerpOffset.times(Global.spf * 15));
 			lerpTime += Global.spf * 15;
 		}
-		vel.x = Helpers.cosd((float)angle!) * maxSpeed;
-		vel.y = Helpers.sind((float)angle) * maxSpeed;
+		vel.x = Helpers.cosd(angle!) * maxSpeed;
+		vel.y = Helpers.sind(angle) * maxSpeed;
 		if (type == 0) {
 			if (time > 0.1 && time < 0.72) {
 				angle += Global.spf * 500;

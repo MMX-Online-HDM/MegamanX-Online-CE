@@ -832,7 +832,7 @@ public class InJumpZone : AIState {
 
 		//Check if out of zone
 		if (character != null && character.abstractedActor().collider != null) {
-			if (!character.abstractedActor().collider!.isCollidingWith(jumpZone.collider)) {
+			if (!character.abstractedActor().collider.isCollidingWith(jumpZone.collider)) {
 				ai.changeState(new FindPlayer(character));
 			}
 		}

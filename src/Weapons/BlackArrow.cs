@@ -100,9 +100,9 @@ public class BlackArrowProj : Projectile {
 					var destAngle = MathF.Atan2(dTo.y, dTo.x) * 180 / MathF.PI;
 					destAngle = Helpers.to360(destAngle);
 					float distFactor = pos.distanceTo(target.getCenterPos()) / 100;
-					angle = Helpers.moveAngle((float)angle.Value, destAngle, Global.spf * 200 * distFactor);
-					vel.x = Helpers.cosd((float)angle) * speed;
-					vel.y = Helpers.sind((float)angle) * speed;
+					angle = Helpers.moveAngle(angle, destAngle, Global.spf * 200 * distFactor);
+					vel.x = Helpers.cosd(angle) * speed;
+					vel.y = Helpers.sind(angle) * speed;
 				} else {
 					useGravity = true;
 					updateAngle();
@@ -253,11 +253,11 @@ public class WindCutterProj : Projectile {
 			var destAngle = MathF.Atan2(dTo.y, dTo.x) * 180 / MathF.PI;
 			destAngle = Helpers.to360(destAngle);
 			float distFactor = pos.distanceTo(target.getCenterPos()) / 100;
-			if (MathF.Abs(angle.Value - destAngle) > 5) {
-				angle = Helpers.moveAngle((float)angle, destAngle, Global.spf * 400 * distFactor);
+			if (MathF.Abs(angle - destAngle) > 5) {
+				angle = Helpers.moveAngle(angle, destAngle, Global.spf * 400 * distFactor);
 			}
-			vel.x = Helpers.cosd((float)angle) * speed;
-			vel.y = Helpers.sind((float)angle) * speed;
+			vel.x = Helpers.cosd(angle) * speed;
+			vel.y = Helpers.sind(angle) * speed;
 		} else {
 			returnToSelf();
 			updateAngle();
@@ -272,16 +272,16 @@ public class WindCutterProj : Projectile {
 				var angInc = turnDir * Global.spf * 500;
 				angle += angInc;
 				angleDist += MathF.Abs(angInc);
-				vel.x = Helpers.cosd((float)angle.Value) * speed;
-				vel.y = Helpers.sind((float)angle.Value) * speed;
+				vel.x = Helpers.cosd(angle) * speed;
+				vel.y = Helpers.sind(angle) * speed;
 			} else if (owner.character != null) {
 				Point destPos = owner.character.getCenterPos();
 				var dTo = pos.directionTo(destPos).normalize();
 				var destAngle = MathF.Atan2(dTo.y, dTo.x) * 180 / MathF.PI;
 				destAngle = Helpers.to360(destAngle);
-				angle = Helpers.lerpAngle((float)angle.Value, destAngle, Global.spf * 10);
-				vel.x = Helpers.cosd((float)angle) * speed;
-				vel.y = Helpers.sind((float)angle) * speed;
+				angle = Helpers.lerpAngle(angle, destAngle, Global.spf * 10);
+				vel.x = Helpers.cosd(angle) * speed;
+				vel.y = Helpers.sind(angle) * speed;
 				if (pos.distanceTo(destPos) < 15) {
 					onReturn();
 				}

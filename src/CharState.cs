@@ -293,9 +293,9 @@ public class CharState {
 				ladders[0].gameObject is Ladder ladder &&
 				ladders[0].otherCollider != null
 			) {
-				var midX = ladders[0].otherCollider!.shape.getRect().center().x;
+				var midX = ladders[0].otherCollider.shape.getRect().center().x;
 				if (Math.Abs(character.pos.x - midX) < 12) {
-					var rect = ladders[0].otherCollider!.shape.getRect();
+					var rect = ladders[0].otherCollider.shape.getRect();
 					var snapX = (rect.x1 + rect.x2) / 2;
 					if (Global.level.checkTerrainCollisionOnce(character, snapX - character.pos.x, 0) == null) {
 						float? incY = null;
@@ -311,11 +311,11 @@ public class CharState {
 			if (ladders.Count > 0 && ladders[0].gameObject is Ladder ladder &&
 				ladders[0].otherCollider != null
 			) {
-				var rect = ladders[0].otherCollider!.shape.getRect();
+				var rect = ladders[0].otherCollider.shape.getRect();
 				var snapX = (rect.x1 + rect.x2) / 2;
 				float xDist = snapX - character.pos.x;
 				if (MathF.Abs(xDist) < 10 && Global.level.checkTerrainCollisionOnce(character, xDist, 30) == null) {
-					var midX = ladders[0].otherCollider!.shape.getRect().center().x;
+					var midX = ladders[0].otherCollider.shape.getRect().center().x;
 					character.changeState(new LadderClimb(ladder, midX, 30));
 					character.stopCamUpdate = true;
 				}

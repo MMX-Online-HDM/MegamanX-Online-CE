@@ -19,7 +19,7 @@ public class Elimination : GameMode {
 	public override void checkIfWinLogic() {
 		if (level.time < 10) return;
 
-		Player winningPlayer = null;
+		Player? winningPlayer = null;
 
 		var playersStillAlive = level.players.Where(p => !p.isSpectator && p.deaths < playingTo).ToList();
 

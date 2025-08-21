@@ -232,7 +232,7 @@ public class SpinningBladeProjCharged : Projectile {
 
 	public override void render(float x, float y) {
 		base.render(x, y);
-		Point sPos = mmx.getShootPos();
+		Point sPos = mmx?.getShootPos() ?? pos;
 		DrawWrappers.DrawLine(sPos.x, sPos.y, pos.x, pos.y, new Color(0, 224, 0), 3, zIndex - 100);
 		DrawWrappers.DrawLine(sPos.x, sPos.y, pos.x, pos.y, new Color(224, 224, 96), 1, zIndex - 100);
 		Global.sprites["spinningblade_base"].draw(MathInt.Round(Global.flFrameCount * 0.25f) % 3, sPos.x, sPos.y, 1, 1, null, 1, 1, 1, zIndex);
@@ -241,7 +241,7 @@ public class SpinningBladeProjCharged : Projectile {
 	public override void onDestroy() {
 		base.onDestroy();
 		if (!ownedByLocalPlayer) return;
-		if (mmx.chargedSpinningBlade == this) {
+		if (mmx?.chargedSpinningBlade == this) {
 			mmx.chargedSpinningBlade = null;
 		}
 	}

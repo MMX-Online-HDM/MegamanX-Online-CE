@@ -128,13 +128,13 @@ public class BoundBlasterProj : Projectile {
 				return;
 			}
 
-			vel.x = Helpers.cosd(angle.Value);
-			vel.y = Helpers.sind(angle.Value);
-			if (angle.Value != lastAngle) {
+			vel.x = Helpers.cosd(angle);
+			vel.y = Helpers.sind(angle);
+			if (angle != lastAngle) {
 				len = 0;
 				lenDelay = 0;
 			}
-			lastAngle = angle.Value;
+			lastAngle = angle;
 		}
 
 		if (lenDelay > 0.01f) {

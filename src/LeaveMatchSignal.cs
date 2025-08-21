@@ -94,7 +94,7 @@ public class LeaveMatchSignal {
 		joinMenu.requestServerDetails(newServerData.uniqueID);
 		joinMenu.netClient.FlushSendQueue();
 
-		NetIncomingMessage msg;
+		NetIncomingMessage? msg;
 		// Respond to connection messages.
 		for (int i = 0; i <= 50; i++) {
 			while ((msg = joinMenu.netClient.ReadMessage()) != null) {

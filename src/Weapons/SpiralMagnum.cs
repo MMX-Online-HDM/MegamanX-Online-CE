@@ -97,9 +97,9 @@ public class SpiralMagnumShell : Anim {
 				stopped = true;
 			}
 		}
-		if (!stopped && angle != null) {
+		if (!stopped) {
 			angle += angularVel * Global.spf;
-			angle = Helpers.to360(angle.Value);
+			angle = Helpers.to360(angle);
 		} else {
 			angle = 0;
 		}
@@ -408,10 +408,8 @@ public class SniperMissileProj : Projectile, IDamagable {
 	}
 
 	public void updateVel() {
-		if (angle != null) {
-			vel.x = Helpers.cosd(angle.Value) * speed;
-			vel.y = Helpers.sind(angle.Value) * speed;
-		}
+		vel.x = Helpers.cosd(angle) * speed;
+		vel.y = Helpers.sind(angle) * speed;
 	}
 
 	public override void preUpdate() {
@@ -439,31 +437,29 @@ public class SniperMissileProj : Projectile, IDamagable {
 					//vel = Point.lerp(vel, pos.directionToNorm(owner.axlCursorWorldPos).times(speed), Global.spf * 2.5f);
 
 					float destAngle = pos.directionToNorm(axl.axlCursorWorldPos).angle;
-					if (angle != null) {
-						if (MathF.Abs(angle.Value - destAngle) > 3) {
-							angle = Helpers.moveAngle(angle.Value, destAngle, Global.spf * 200 * turnSpeed);
-						}
+					if (MathF.Abs(angle - destAngle) > 3) {
+						angle = Helpers.moveAngle(angle, destAngle, Global.spf * 200 * turnSpeed);
 					}
 				}
 				updateVel();
 			} else {
-				if (owner.input.isHeld(Control.Up, owner) && angle != null) {
+				if (owner.input.isHeld(Control.Up, owner)) {
 					int sign = -1;
 					if (holdStartAngle == null) holdStartAngle = angle;
 					if (holdStartAngle < 90 || holdStartAngle > 270) {
 						sign = 1;
 					}
 					angle -= sign * Global.spf * 150 * turnSpeed;
-					angle = Helpers.to360(angle.Value);
+					angle = Helpers.to360(angle);
 					updateVel();
-				} else if (owner.input.isHeld(Control.Down, owner) && angle != null) {
+				} else if (owner.input.isHeld(Control.Down, owner)) {
 					int sign = -1;
 					if (holdStartAngle == null) holdStartAngle = angle;
 					if (holdStartAngle < 90 || holdStartAngle > 270) {
 						sign = 1;
 					}
 					angle += sign * Global.spf * 150 * turnSpeed;
-					angle = Helpers.to360(angle.Value);
+					angle = Helpers.to360(angle);
 					updateVel();
 				} else {
 					holdStartAngle = null;

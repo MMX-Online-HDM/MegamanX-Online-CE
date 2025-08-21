@@ -1030,7 +1030,7 @@ public class RPCJoinLateResponse : RPC {
 	}
 
 	public override void invoke(params byte[] arguments) {
-		JoinLateResponseModel joinLateResponseModel = null;
+		JoinLateResponseModel? joinLateResponseModel = null;
 		try {
 			joinLateResponseModel = Helpers.deserialize<JoinLateResponseModel>(arguments);
 		} catch {
@@ -1167,7 +1167,10 @@ public class RPCSendKillFeedEntry : RPC {
 
 	public override void invoke(string message) {
 		var response = JsonConvert.DeserializeObject<RPCKillFeedEntryResponse>(message);
-		Player player = null;
+		if (response == null) {
+			return;
+		}
+		Player? player = null;
 		if (response.playerId != null) {
 			player = Global.level.getPlayerById(response.playerId.Value);
 		}

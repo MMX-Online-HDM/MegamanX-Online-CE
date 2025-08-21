@@ -63,7 +63,7 @@ public class HostMenu : IMainMenu {
 	}
 	public int mapIndex {
 		get {
-			return savedMatchSettings.hostMenuSettings.mapIndex.Value;
+			return savedMatchSettings.hostMenuSettings.mapIndex ?? 0;
 		}
 		set {
 			savedMatchSettings.hostMenuSettings.mapIndex = value;

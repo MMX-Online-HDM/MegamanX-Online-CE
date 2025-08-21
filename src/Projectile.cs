@@ -116,12 +116,14 @@ public class Projectile : Actor {
 	) : base(
 		sprite, pos, netId,
 		ownedByLocalPlayer ?? player?.ownedByLocalPlayer ?? owner?.ownedByLocalPlayer ??
-		(netId == null || Global.level.getPlayerById(netId.Value).ownedByLocalPlayer),
+		(netId == null || Global.level.getPlayerByIdSafe(netId.Value).ownedByLocalPlayer),
 		!addToLevel
 	) {
 		weapon = Weapon.baseNetWeapon;
 		useGravity = false;
-		ownerPlayer = player ?? owner?.netOwner ?? Global.level.getPlayerById(netId!.Value);
+		ownerPlayer = (
+			player ?? owner?.netOwner ?? Global.level.getPlayerByIdSafe(netId)
+		);
 		damager = new Damager(ownerPlayer, 0, 0, 0);
 		owningActor = owner;
 		this.xDir = xDir;
@@ -152,11 +154,6 @@ public class Projectile : Actor {
 
 	public float getSpeed() {
 		return vel.magnitude;
-	}
-
-	public int getRpcAngle() {
-		if (angle == null) return 0;
-		return (int)(Helpers.to360(angle.Value) * 0.5f);
 	}
 
 	public override void update() {
@@ -283,11 +280,11 @@ public class Projectile : Actor {
 		float velAngle = vel.angle;
 		if ((velAngle > 45 && velAngle < 135) || (velAngle > 225 && velAngle < 315)) {
 			angle = Helpers.to360(velAngle + Helpers.SignOr1(vel.x) * 135);
-			vel = Point.createFromAngle(angle.Value).times(vel.magnitude);
+			vel = Point.createFromAngle(angle).times(vel.magnitude);
 			xDir = 1;
 		} else {
 			angle = Helpers.to360(velAngle - Helpers.SignOr1(vel.x) * 135);
-			vel = Point.createFromAngle(angle.Value).times(vel.magnitude);
+			vel = Point.createFromAngle(angle).times(vel.magnitude);
 			xDir = 1;
 		}
 		time = 0;

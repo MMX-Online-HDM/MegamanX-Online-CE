@@ -28,7 +28,7 @@ public class ItemSpawner {
 		if (!Global.isHost) return;
 
 		// Check if the vehicle still exists
-		RideArmor myRideArmor = null;
+		RideArmor? myRideArmor = null;
 		foreach (var actor in Global.level.gameObjects) {
 			if (actor is RideArmor ra2 && ra2.neutralId == id) {
 				myRideArmor = ra2;
@@ -53,7 +53,7 @@ public class ItemSpawner {
 		if (!Global.isHost) return;
 
 		// Check if the vehicle still exists
-		RideChaser myRideChaser = null;
+		RideChaser? myRideChaser = null;
 		foreach (var actor in Global.level.gameObjects) {
 			if (actor is RideChaser rc && rc.neutralId == id) {
 				myRideChaser = rc;

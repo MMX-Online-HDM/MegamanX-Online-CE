@@ -16,8 +16,8 @@ public class GenericMeleeProj : Projectile {
 		shouldVortexSuck = false;
 		shouldShieldBlock = false;
 		this.projId = (int)projId;
-		damager.damage = damage ?? weapon.damager.damage;
-		damager.flinch = flinch ?? weapon.damager.flinch;
+		damager.damage = damage ?? weapon.damager?.damage ?? 0;
+		damager.flinch = flinch ?? weapon.damager?.flinch ?? 0;
 		if (hitCooldown != null) {
 			damager.hitCooldown = hitCooldown.Value;
 		}

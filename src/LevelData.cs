@@ -146,7 +146,7 @@ public class LevelData {
 		defaultLargeCam = levelJson.defaultLargeCam ?? false;
 		shortName = levelJson.shortName ?? name;
 		displayName = levelJson.displayName ?? name;
-		string bgColorHex = levelJson.bgColorHex ?? null;
+		string bgColorHex = levelJson.bgColorHex ?? "";
 		if (!string.IsNullOrEmpty(bgColorHex)) {
 			bgColorHex = bgColorHex + "FF";
 			uint argb = UInt32.Parse(bgColorHex.Replace("#", ""), NumberStyles.HexNumber);
@@ -347,7 +347,7 @@ public class LevelData {
 
 	public void populateMirrorMetadata() {
 		if (isMirrored) return;
-		LevelData mirroredVersion = Global.levelDatas.GetValueOrDefault(name + "_mirrored");
+		LevelData? mirroredVersion = Global.levelDatas.GetValueOrDefault(name + "_mirrored");
 		if (mirroredVersion == null) return;
 
 		foreach (var otherGameMode in mirroredVersion.supportedGameModes) {

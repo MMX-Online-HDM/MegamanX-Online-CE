@@ -579,7 +579,7 @@ public partial class DrawWrappers {
 					}
 
 					RenderStates? renderStates = null;
-					Shader shader = shaderWrapper?.getShader();
+					Shader? shader = shaderWrapper?.getShader();
 					if (shader != null) {
 						renderStates = new RenderStates(shader);
 					}

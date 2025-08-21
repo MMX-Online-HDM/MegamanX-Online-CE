@@ -19,7 +19,7 @@ public class KingOfTheHill : GameMode {
 	public override void drawTopHUD() {
 		int hudcpY = 0;
 
-		ControlPoint hill = level?.hill;
+		ControlPoint? hill = level?.hill;
 		if (hill == null) return;
 
 		string hillText;
