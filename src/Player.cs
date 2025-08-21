@@ -1461,6 +1461,13 @@ public partial class Player {
 				true, data.dnaNetId, false, isWarpIn: false,
 				heartTanks: oldChar.heartTanks, isATrans: true
 			);
+		}
+		else if (data.charNum == (int)CharIds.RagingChargeX) {
+			retChar = new RagingChargeX(
+				this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir,
+				true, data.dnaNetId, false, isWarpIn: false,
+				heartTanks: oldChar.heartTanks, isATrans: true
+			);
 		} else {
 			throw new Exception("Error: Non-valid char ID: " + data.charNum);
 		}
@@ -1637,10 +1644,10 @@ public partial class Player {
 				false, charNetId, ownedByLocalPlayer, isRevive: false,
 				heartTanks: oldChar.heartTanks, isATrans: true
 			);
-		} else if  (spawnCharNum == (int)CharIds.RagingChargeX) {
+		} else if (spawnCharNum == (int)CharIds.RagingChargeX) {
 			retChar = new RagingChargeX(
 				this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir,
-				false, charNetId, ownedByLocalPlayer, isWarpIn: false,
+				true, charNetId, ownedByLocalPlayer, isWarpIn: false,
 				heartTanks: oldChar.heartTanks, isATrans: true
 			);
 		} else {
