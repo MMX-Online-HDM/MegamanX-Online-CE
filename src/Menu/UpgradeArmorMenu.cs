@@ -1085,7 +1085,7 @@ public class UpgradeArmorMenuEX : IMainMenu {
 	public UpgradeArmorMenuEX(IMainMenu prevMenu) {
 		this.prevMenu = prevMenu;
 		menu = Global.sprites["menu_xdefault"];
-		cursor = Global.sprites["axl_cursor"]; ;
+		cursor = Global.sprites["axl_cursor2"]; ;
 		icon = Global.sprites["hud_upgradearmor"];
 	}
 	public int frame;
