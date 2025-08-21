@@ -102,14 +102,17 @@ public class MusicWrapper {
 	}
 
 	public void updateMusicSource() {
-		if (musicSourceActor != null && moveWithActor) {
+		if (musicSourceActor != null && moveWithActor && musicSourcePos != null) {
 			musicSourcePos = musicSourcePos.Value.add(musicSourceActor.deltaPos);
 		}
 	}
 
 	public void updateMusicSourceVolume(Point listenerPos) {
-		float dist = (listenerPos.distanceTo(musicSourcePos.Value) - 75) / (Global.screenW - 75);
-		dist = Helpers.clamp01(dist);
+		float dist = 1;
+		if (musicSourcePos != null) {
+			dist = (listenerPos.distanceTo(musicSourcePos.Value) - 75) / (Global.screenW - 75);
+			dist = Helpers.clamp01(dist);
+		}
 		volume = (1 - MathF.Pow(dist, 2)) * 100;
 	}
 

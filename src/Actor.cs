@@ -134,13 +134,6 @@ public partial class Actor : GameObject {
 	public Point? targetNetPos;
 	public bool interplorateNetPos = true;
 
-	private Point? lastPos;
-	private int? lastSpriteIndex;
-	private int? lastFrameIndex;
-	private int? lastXDir;
-	private int? lastYDir;
-	private float? lastAngle;
-	private bool? lastVisible;
 	public float lastNetUpdate;
 	public int lastNetFrame;
 

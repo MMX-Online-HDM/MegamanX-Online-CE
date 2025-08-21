@@ -304,7 +304,7 @@ public class OptionsMenu : IMainMenu {
 							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
-							optionFontText, qualityToString(Options.main.graphicsPreset.Value),
+							optionFontText, qualityToString(Options.main.graphicsPreset ?? 0),
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},

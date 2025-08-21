@@ -32,9 +32,13 @@ public class Flag : Actor {
 	}
 
 	public override void onStart() {
-		var hit = Global.level.raycast(pos.addxy(0, -10), pos.addxy(0, 60), new List<Type>() { typeof(Wall), typeof(Ladder) });
-		pos = (Point)hit.hitData.hitPoint;
-		pedestal = new FlagPedestal(alliance, (Point)hit.hitData.hitPoint, null, ownedByLocalPlayer);
+		CollideData? hit = Global.level.raycast(
+			pos.addxy(0, -10), pos.addxy(0, 60), new List<Type>() { typeof(Wall), typeof(Ladder) }
+		);
+		if (hit?.hitData?.hitPoint != null) {
+			pos = hit.hitData.hitPoint.Value;
+		}
+		pedestal = new FlagPedestal(alliance, pos, null, ownedByLocalPlayer);
 		pedestalPos = pedestal.pos;
 	}
 
