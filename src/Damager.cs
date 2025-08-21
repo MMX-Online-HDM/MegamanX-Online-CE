@@ -890,34 +890,41 @@ public class Damager {
 	}
 
 	public static bool isArmorPiercing(int? projId) {
-		if (projId == null) return false;
-		return projId switch {
-			(int)ProjIds.PlasmaGunProj => true,
-			(int)ProjIds.SpiralMagnum => true,
-			(int)ProjIds.AssassinBullet => true,
-			(int)ProjIds.AssassinBulletQuick => true,
-			(int)ProjIds.VileMK2Grab => true,
-			(int)ProjIds.UPGrab => true,
-			(int)ProjIds.LaunchODrain => true,
-			(int)ProjIds.DistanceNeedler => true,
-			(int)ProjIds.Raijingeki => true,
-			(int)ProjIds.Raijingeki2 => true,
-			(int)ProjIds.CFlasher => true,
-			(int)ProjIds.MetteurCrash => true,
-			(int)ProjIds.AcidBurstPoison => true,
+		if (projId == null) {
+			return false;
+		}
+		return (ProjIds)projId switch {
+			ProjIds.PlasmaGunProj => true,
+			ProjIds.SpiralMagnum => true,
+			ProjIds.AssassinBullet => true,
+			ProjIds.AssassinBulletQuick => true,
+			ProjIds.VileMK2Grab => true,
+			ProjIds.UPGrab => true,
+			ProjIds.LaunchODrain => true,
+			ProjIds.DistanceNeedler => true,
+			ProjIds.Raijingeki => true,
+			ProjIds.Raijingeki2 => true,
+			ProjIds.CFlasher => true,
+			ProjIds.MetteurCrash => true,
+			ProjIds.AcidBurstPoison => true,
+			ProjIds.SelfTrueDmg => true,
 			_ => false
 		};
 	}
 
 	public static bool isDot(int? projId) {
-		if (projId == null) return false;
-		return projId switch {
-			(int)ProjIds.AcidBurstPoison => true,
-			(int)ProjIds.Burn => true,
-			(int)ProjIds.SelfDmg => true,
+		if (projId == null) {
+			return false;
+		}
+		return (ProjIds)projId switch {
+			ProjIds.Burn => true,
+			ProjIds.AcidBurstPoison => true,
+			ProjIds.FlameRoundFlameProj => true,
+			ProjIds.SelfDmg => true,
 			_ => false
 		};
 	}
+
 	public static bool isElectric(int? projId) {
 		return projId switch {
 			(int)ProjIds.ElectricSpark => true,
@@ -1081,11 +1088,12 @@ public class Damager {
 		}
 		// Never assist in any mode as they are DOT or self-damage. (Also Volt Tornado)
 		bool alwaysNotAssist = (ProjIds)projId switch {
+			// DOT stuff.
 			ProjIds.Burn => true,
 			ProjIds.AcidBurstPoison => true,
-			ProjIds.SelfDmg => true,
 			ProjIds.FlameRoundFlameProj => true,
-			ProjIds.BoundBlasterRadar => true, 
+			ProjIds.SelfDmg => true,
+			// Per-frame damage stuff.
 			ProjIds.RayGunChargeBeam => true,
 			ProjIds.PlasmaGunBeamProj => true,
 			ProjIds.PlasmaGunBeamProjHyper => true,
@@ -1102,23 +1110,24 @@ public class Damager {
 		if (Global.level.gameMode is not FFADeathMatch) {
 			return false;
 		}
-		return projId switch {
-			(int)ProjIds.Tornado => true,
-			(int)ProjIds.BoomerangCharged => true,
-			(int)ProjIds.TornadoFang => true,
-			(int)ProjIds.TornadoFang2 => true,
-			(int)ProjIds.GravityWell => true,
-			(int)ProjIds.SpinWheel => true,
-			(int)ProjIds.TriadThunder => true,
-			(int)ProjIds.TriadThunderBeam => true,
-			(int)ProjIds.DistanceNeedler => true,
-			(int)ProjIds.RumblingBangProj => true,
-			(int)ProjIds.FlameRoundWallProj => true,
-			(int)ProjIds.SplashHitProj => true,
-			(int)ProjIds.CircleBlaze => true,
-			(int)ProjIds.CircleBlazeExplosion => true,
-			(int)ProjIds.BlastLauncherGrenadeSplash => true,
-			(int)ProjIds.BlastLauncherMineGrenadeProj => true, 
+		return (ProjIds)projId switch {
+			ProjIds.Tornado => true,
+			ProjIds.BoomerangCharged => true,
+			ProjIds.TornadoFang => true,
+			ProjIds.TornadoFang2 => true,
+			ProjIds.GravityWell => true,
+			ProjIds.SpinWheel => true,
+			ProjIds.TriadThunder => true,
+			ProjIds.TriadThunderBeam => true,
+			ProjIds.DistanceNeedler => true,
+			ProjIds.RumblingBangProj => true,
+			ProjIds.FlameRoundWallProj => true,
+			ProjIds.SplashHitProj => true,
+			ProjIds.CircleBlaze => true,
+			ProjIds.CircleBlazeExplosion => true,
+			ProjIds.BlastLauncherGrenadeSplash => true,
+			ProjIds.BlastLauncherMineGrenadeProj => true,
+			ProjIds.BoundBlasterRadar => true,
 			_ => false
 		};
 	}

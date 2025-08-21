@@ -739,6 +739,7 @@ public enum ProjIds {
 
 	// Special damage types.
 	SelfDmg = 30000,
+	SelfTrueDmg,
 
 	// Enviroment effect shenanigans.
 	KillZone = 32000,
