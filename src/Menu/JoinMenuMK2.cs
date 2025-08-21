@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading;
@@ -172,7 +172,7 @@ public class JoinMenuP2P : IMainMenu {
 		long severId = msg.ReadInt64();
 		string jsonString = msg.ReadString();
 		IPEndPoint ipEndPoint = msg.ReadIPEndPoint();
-		IPEndPoint radminEndpoint = null;
+		IPEndPoint? radminEndpoint = null;
 		if (msg.Position < msg.LengthBits - 2) {
 			radminEndpoint = msg.ReadIPEndPoint();
 		}

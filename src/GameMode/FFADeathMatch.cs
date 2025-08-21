@@ -12,7 +12,7 @@ public class FFADeathMatch : GameMode {
 	}
 
 	public override void checkIfWinLogic() {
-		Player winningPlayer = null;
+		Player? winningPlayer = null;
 
 		if (remainingTime <= 0) {
 			winningPlayer = level.players[0];

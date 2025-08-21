@@ -2503,7 +2503,7 @@ public class GameMode {
 
 		float startY = Global.screenH - 12;
 		float height = 15;
-		Vile vile = level.mainPlayer?.character as Vile;
+		Vile? vile = level.mainPlayer?.character as Vile;
 		bool isMK2 = vile?.isVileMK2 == true;
 		bool isMK5 = vile?.isVileMK5 == true;
 		bool isMK2Or5 = isMK2 || isMK5;

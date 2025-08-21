@@ -605,8 +605,7 @@ public class LaunchOWhirlpoolState : OctopusMState {
 	public override void update() {
 		base.update();
 		if (LauncherOctopuld == null) return;
-
-		if (!maverick.tryMove(new Point(0, 100 * initYDir), out CollideData hit)) {
+		if (!maverick.tryMove(new Point(0, 100 * initYDir), out _)) {
 			if (initYDir == 1) {
 				maverick.unstickFromGround();
 			}

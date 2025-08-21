@@ -447,8 +447,9 @@ public class Sprite {
 				if (lastTwoBkTrailDraws.Count > 10) {
 					lastTwoBkTrailDraws.PopFirst();
 				}
-				lastTwoBkTrailDraws.Add(new Trail() {
-					action = (float time) => {
+				lastTwoBkTrailDraws.Add(new Trail(
+					0.25f,
+					(float time) => {
 						DrawWrappers.DrawTexture(
 							bitmap,
 							animData.frames[1].rect.x1,
@@ -462,9 +463,8 @@ public class Sprite {
 							angle, alpha,
 							shaderList, true
 						);
-					},
-					time = 0.25f
-				});
+					}
+				));
 			} else {
 				lastTwoBkTrailDraws.Clear();
 			}
@@ -480,8 +480,9 @@ public class Sprite {
 				if (Global.shaderWrappers.ContainsKey("trail")) shaderList.Add(Global.shaderWrappers["trail"]);
 
 				if (lastFiveTrailDraws.Count > 5) lastFiveTrailDraws.PopFirst();
-				lastFiveTrailDraws.Add(new Trail() {
-					action = (float time) => {
+				lastFiveTrailDraws.Add(new Trail(
+					0.25f,
+					(float time) => {
 						DrawWrappers.DrawTexture(
 							bitmap,
 							currentFrame.rect.x1, currentFrame.rect.y1,
@@ -491,9 +492,8 @@ public class Sprite {
 							cy - frameOffsetY * yDirArg,
 							xDirArg, yDirArg, angle, alpha, shaderList, true
 						);
-					},
-					time = 0.25f
-				});
+					}
+				));
 			}
 			if (renderEffects.Contains(RenderEffectType.SpeedDevilTrail) && character != null && Global.shaderWrappers.ContainsKey("speedDevilTrail")) {
 				for (int i = character.lastFiveTrailDraws.Count - 1; i >= 0; i--) {
@@ -512,8 +512,9 @@ public class Sprite {
 
 				if (character.lastFiveTrailDraws.Count > 1) character.lastFiveTrailDraws.PopFirst();
 
-				character.lastFiveTrailDraws.Add(new Trail() {
-					action = (float time) => {
+				character.lastFiveTrailDraws.Add(new Trail(
+					0.125f,
+					(float time) => {
 						speedDevilShader?.SetUniform("alpha", time * 2);
 						DrawWrappers.DrawTexture(
 							bitmap,
@@ -524,9 +525,8 @@ public class Sprite {
 							cy - frameOffsetY * yDirArg,
 							xDirArg, yDirArg, angle, alpha, shaderList, true
 						);
-					},
-					time = 0.125f
-				});
+					}
+				));
 			}
 		}
 		if (!isCompositeSprite) {
@@ -723,6 +723,11 @@ public class Sprite {
 public class Trail {
 	public Action<float> action;
 	public float time;
+
+	public Trail(float time, Action<float> action) {
+		this.time = time;
+		this.action = action;
+	}
 }
 
 public class AnimData {

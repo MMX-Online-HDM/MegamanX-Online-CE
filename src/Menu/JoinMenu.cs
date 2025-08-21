@@ -165,7 +165,7 @@ public class JoinMenu : IMainMenu {
 		} else if (Global.input.isPressedMenu(Control.MenuPause)) {
 			if (!isLAN) {
 				Menu.change(new EnterTextMenu("Enter private server name", 10, (string text) => {
-					Server server = allServers.Where(s => s.hidden && s.name == text).FirstOrDefault();
+					Server? server = allServers.Where(s => s.hidden && s.name == text).FirstOrDefault();
 					if (server != null) {
 						Menu.change(new SelectCharacterMenu(this, server.level.EndsWith("1v1"), false, false, false, GameMode.isStringTeamMode(server.gameMode), false, () => joinServer(server)));
 						return;

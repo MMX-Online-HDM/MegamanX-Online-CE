@@ -1030,7 +1030,7 @@ public class RPCJoinLateResponse : RPC {
 	}
 
 	public override void invoke(params byte[] arguments) {
-		JoinLateResponseModel joinLateResponseModel = null;
+		JoinLateResponseModel? joinLateResponseModel = null;
 		try {
 			joinLateResponseModel = Helpers.deserialize<JoinLateResponseModel>(arguments);
 		} catch {
