@@ -227,7 +227,7 @@ public class ViralSigmaShoot : CharState {
 		base.onEnter(oldState);		
 		sigma = character as ViralSigma;
 		character.xDir = xDir;
-		character.angle = null;
+		character.angle = 0;
 	}
 
 	public override void onExit(CharState? newState) {

@@ -213,7 +213,7 @@ public class FlameMFireballProj : Projectile {
 		if (other.gameObject is FlameMOilSpillProj oilSpill && oilSpill.ownedByLocalPlayer) {
 			playSound("flamemOilBurn", sendRpc: true);
 			new FlameMBigFireProj(
-				oilSpill.pos, oilSpill.xDir, oilSpill.angle ?? 0,
+				oilSpill.pos, oilSpill.xDir, oilSpill.angle,
 				this, owner, owner.getNextActorNetId(), rpc: true
 			);
 			// oilSpill.time = 0;
@@ -376,7 +376,7 @@ public class FlameMBigFireProj : Projectile {
 			playSound("flamemOilBurn", sendRpc: true);
 			new FlameMBigFireProj(
 				oilSpill.pos, oilSpill.xDir,
-				oilSpill.angle ?? 0, this,
+				oilSpill.angle, this,
 				owner, owner.getNextActorNetId(), rpc: true
 			);
 			// oilSpill.time = 0;

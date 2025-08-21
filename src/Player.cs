@@ -20,6 +20,17 @@ public partial class Player {
 			-1, GameMode.neutralAlliance, "NULL", null, 0
 		)
 	);
+	public static Player errorPlayer = new Player(
+		"Error", 255, -1,
+		new PlayerCharData() { charNum = -1 },
+		false, false, GameMode.neutralAlliance,
+		new Input(false),
+		new ServerPlayer(
+			"Error", 255, false,
+			-1, GameMode.neutralAlliance, "NULL", null, 0
+		)
+	);
+	
 	
 	public SpawnPoint? firstSpawn;
 	public Input input;

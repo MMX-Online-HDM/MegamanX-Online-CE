@@ -286,26 +286,24 @@ public class BoomerangKBoomerangProj : Projectile {
 			pickup.changePos(pos);
 		}
 
-		if (time > returnTime && angle != null) {
+		if (time > returnTime) {
 			if (angleDist < 180) {
 				var angInc = (-xDir * turnDir) * Global.spf * maxSpeed;
 				angle += angInc;
 				angleDist += MathF.Abs(angInc);
-				vel.x = Helpers.cosd((float)angle) * maxSpeed;
-				vel.y = Helpers.sind((float)angle) * maxSpeed;
+				vel.x = Helpers.cosd(angle) * maxSpeed;
+				vel.y = Helpers.sind(angle) * maxSpeed;
 			} else if (BoomerangKuwanger != null && !BoomerangKuwanger.destroyed) {
 				var dTo = pos.directionTo(BoomerangKuwanger.getCenterPos()).normalize();
 				var destAngle = MathF.Atan2(dTo.y, dTo.x) * 180 / MathF.PI;
 				destAngle = Helpers.to360(destAngle);
-				angle = Helpers.lerpAngle((float)angle, destAngle, Global.spf * 10);
+				angle = Helpers.lerpAngle(angle, destAngle, Global.spf * 10);
 			} else {
 				destroySelf();
 			}
 		}
-		if (angle != null) {
-			vel.x = Helpers.cosd((float)angle) * maxSpeed;
-			vel.y = Helpers.sind((float)angle) * maxSpeed;
-		}
+		vel.x = Helpers.cosd(angle) * maxSpeed;
+		vel.y = Helpers.sind(angle) * maxSpeed;
 	}
 
 	public override void onDestroy() {

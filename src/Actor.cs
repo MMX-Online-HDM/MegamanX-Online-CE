@@ -78,7 +78,7 @@ public partial class Actor : GameObject {
 	public bool startMethodCalled;
 	// Angle stuff.
 	// We a 256 for a full turn to make easier to send over netcode.
-	public float? _byteAngle;
+	public float _byteAngle;
 	public bool customAngleRendering;
 	public bool useGravity;
 	public bool gravityWellable { get { return this is Character || this is RideArmor || this is Maverick || this is RideChaser; } }
@@ -399,14 +399,11 @@ public partial class Actor : GameObject {
 	}
 
 	
-	public float? angle {
+	public float angle {
 		get {
 			return _byteAngle * 1.40625f;
 		}
 		set {
-			if (value == null) {
-				return;
-			}
 			angleSet = true;
 			_byteAngle = (value / 1.40625f) % 256;
 			if (_byteAngle < 0) {
@@ -418,7 +415,7 @@ public partial class Actor : GameObject {
 	public bool angleSet;
 	public float byteAngle {
 		get {
-			return _byteAngle ?? 0;
+			return _byteAngle;
 		}
 		set {
 			angleSet = true;
@@ -1167,7 +1164,7 @@ public partial class Actor : GameObject {
 			sprite.draw(
 				frameIndex, drawX, drawY, xDir, yDir,
 				getRenderEffectSet(), alpha, xScale, yScale, zIndex,
-				getShaders(), angle: angle ?? 0, actor: this, useFrameOffsets: true
+				getShaders(), angle: angle, actor: this, useFrameOffsets: true
 			);
 		}
 
@@ -1368,11 +1365,8 @@ public partial class Actor : GameObject {
 		if (!String.IsNullOrEmpty(spriteName)) {
 			var anim = new Anim(getCenterPos(), spriteName, xDir, null, true);
 			// TODO: Fix this. WTF GM19.
-			if (spriteName != "explosion") {
+			if (angleSet) {
 				anim.byteAngle = byteAngle;
-				if (anim.angle != null) {
-					anim.xDir = 1;
-				}
 			}
 
 			anim.xScale = xScale;

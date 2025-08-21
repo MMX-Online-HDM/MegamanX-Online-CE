@@ -1079,11 +1079,18 @@ public partial class Level {
 		return dump;
 	}
 
-	public Player getPlayerById(int id) {
+	public Player? getPlayerById(int? id) {
 		return players.Find(p => p.id == id);
 	}
 
-	public Player getPlayerByName(string name) {
+	public Player getPlayerByIdSafe(int? id) {
+		if (id == null) {
+			return Player.stagePlayer;
+		}
+		return players.Find(p => p.id == id) ?? Player.errorPlayer;
+	}
+
+	public Player? getPlayerByName(string name) {
 		return players.Find(p => p.name == name);
 	}
 

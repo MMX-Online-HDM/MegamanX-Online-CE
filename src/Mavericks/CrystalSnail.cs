@@ -496,7 +496,7 @@ public class CSnailShellSpinDashState : SnailMState {
 				maverick.deductAmmo(8);
 			}
 		} else if (state == 1) {
-			Point chargeDir = Point.createFromAngle(shell!.angle!.Value - 90);
+			Point chargeDir = Point.createFromAngle(shell.angle - 90);
 			float chargeSpeed = 350;
 
 			Point chargeDirReversed = chargeDir.times(-1);
@@ -533,7 +533,7 @@ public class CSnailShellSpinDashState : SnailMState {
 		}
 
 		/*
-		if (!input.isHeld(Control.Dash, player))// && MathF.Abs(shell.angle.Value) < angleSpeed * Global.spf * 2)
+		if (!input.isHeld(Control.Dash, player))// && MathF.Abs(shell.angle) < angleSpeed * Global.spf * 2)
 		{
 			maverick.changeToIdleOrFall("shell_exit");
 		}
@@ -599,10 +599,10 @@ public class CSnailShellSpinSlowState : SnailMState {
 				} else if (!input.isHeld(Control.Special1, player) || spinDist > 360 * 4 || maverick.ammo <= 0) {
 					state = 1;
 				}
-			} else if (state == 1 && shell.angle != null) {
+			} else if (state == 1) {
 				shell.angle += angleSpeed * Global.spf;
 				spinDist += angleSpeed * Global.spf;
-				if (MathF.Abs(shell.angle.Value) < angleSpeed * Global.spf * 2) {
+				if (MathF.Abs(shell.angle) < angleSpeed * Global.spf * 2) {
 					maverick.changeState(new CSnailTimeStopState(spinDist / 360f));
 				}
 			}

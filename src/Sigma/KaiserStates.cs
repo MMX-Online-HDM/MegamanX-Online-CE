@@ -765,17 +765,17 @@ public class KaiserSigmaMissileProj : Projectile {
 					var dTo = pos.directionTo(target.getCenterPos()).normalize();
 					var destAngle = MathF.Atan2(dTo.y, dTo.x) * 180 / MathF.PI;
 					destAngle = Helpers.to360(destAngle);
-					if (angle != null) angle = Helpers.lerpAngle((float)angle, destAngle, Global.spf * 3);
+					angle = Helpers.lerpAngle(angle, destAngle, Global.spf * 3);
 				}
 			}
 			if (time >= 0.1 && target == null) {
 				target = Global.level.getClosestTarget(pos, damager.owner.alliance, false, aMaxDist: Global.screenW);
 			}
 
-			if (angle != null) {
+			if (angleSet) {
 				forceNetUpdateNextFrame = true;
-				vel.x = Helpers.cosd((float)angle) * maxSpeed;
-				vel.y = Helpers.sind((float)angle) * maxSpeed;
+				vel.x = Helpers.cosd(angle) * maxSpeed;
+				vel.y = Helpers.sind(angle) * maxSpeed;
 			}
 
 		}

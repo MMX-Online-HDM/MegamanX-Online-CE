@@ -354,8 +354,7 @@ public class GreenSpinnerProj : Projectile {
 		if (!ownedByLocalPlayer) return;
 		if (time >= maxTime) return;
 		var netId = owner.getNextActorNetId();
-		if (angle != null)
-		new GreenSpinnerExplosionProj(weapon, pos, xDir, owner, angle.Value, target, Math.Sign(vel.x), netId);
+		new GreenSpinnerExplosionProj(weapon, pos, xDir, owner, angle, target, Math.Sign(vel.x), netId);
 	}
 }
 

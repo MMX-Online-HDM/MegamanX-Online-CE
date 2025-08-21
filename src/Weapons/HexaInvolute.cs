@@ -173,7 +173,7 @@ public class HexaInvoluteProj : Projectile {
 	}
 
 	public void updateBeams() {
-		float drawAngle = angle ?? 0;
+		float drawAngle = angle;
 
 		for (int i = 0; i < beamDest.Length; i++) {
 			float offset = i * 60;

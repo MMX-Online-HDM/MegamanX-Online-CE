@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using SFML.Graphics;
@@ -66,7 +66,7 @@ public class ViralSigma : Character {
 		if (charState is not Die) {
 			lastViralSprite = sprite.name;
 			lastViralFrameIndex = frameIndex;
-			lastViralAngle = angle ?? 0;
+			lastViralAngle = angle;
 
 			var inputDir = player.input.getInputDir(player);
 			if (inputDir.x != 0) lastViralXDir = MathF.Sign(inputDir.x);
@@ -77,7 +77,7 @@ public class ViralSigma : Character {
 			}
 
 			if (charState is not ViralSigmaRevive) {
-				angle = Helpers.moveAngle(angle ?? 0, viralAngle, Global.spf * 500, snap: true);
+				angle = Helpers.moveAngle(angle, viralAngle, Global.spf * 500, snap: true);
 			}
 			if (player.weapons.Count >= 3) {
 				if (isWading()) {
