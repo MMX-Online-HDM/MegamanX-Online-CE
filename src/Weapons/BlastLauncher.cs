@@ -395,7 +395,7 @@ public class GreenSpinnerExplosionProj : Projectile {
 		int directHitXDir = this.directHitXDir;
 		float ownAxlFactor = 1f;
 		if (character == attacker.character) {
-			ownAxlFactor = 1.5f;
+			ownAxlFactor = 3f;
 		}
 
 		var victimCenter = character.getCenterPos();
@@ -406,11 +406,11 @@ public class GreenSpinnerExplosionProj : Projectile {
 		Point dirTo = bombCenter.directionTo(victimCenter);
 		float distFactor = Helpers.clamp01(1 - (bombCenter.distanceTo(victimCenter) / 60f));
 
-		character.pushEffect(new Point(0.6f, 0.4f) * dirTo * distFactor * ownAxlFactor);
+		character.pushEffect(new Point(0.3f, 0.2f) * dirTo * distFactor * ownAxlFactor);
 
 		if (character == attacker.character) {
 			float damage = damager.damage;
-			if ((character as Axl)?.isWhiteAxl() != true) damage = 0;
+			if ((character as Axl)?.isWhiteAxl() == true) damage = 0;
 			return new DamagerMessage() {
 				damage = damage,
 				flinch = 0
