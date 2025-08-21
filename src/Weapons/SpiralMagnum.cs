@@ -181,9 +181,6 @@ public class SpiralMagnumProj : Projectile {
 			maxDist = player.adjustedZoomRange;
 			dist = jumpDist;
 			damager.damage += MathF.Round(6 * (axl?.zoomCharge ?? 0));
-			if (axl?.hasScopedTarget() != true) {
-				damager.damage = 0;
-			}
 		}
 		canBeLocal = false;
 	}
