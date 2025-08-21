@@ -66,7 +66,7 @@ public class BusterZeroMeleeWall : BusterZeroState {
 	public BusterZeroMeleeWall(int wallDir, Collider wallCollider) : base("wall_slide_attack") {
 		this.wallDir = wallDir;
 		this.wallCollider = wallCollider;
-		useGravity = false;
+		
 	}
 
 	public override void update() {
@@ -84,11 +84,12 @@ public class BusterZeroMeleeWall : BusterZeroState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		zero.zSaberCooldown = 56;
+		character.useGravity = false;
 	}
 
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
-		useGravity = true;
+		character.useGravity = true;
 	}
 }
 
@@ -289,11 +290,12 @@ public class BusterZeroHadangekiWall : BusterZeroState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		zero.zSaberCooldown = 56;
+		character.useGravity = false;
 	}
 
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
-		useGravity = true;
+		character.useGravity = true;
 	}
 }
 
