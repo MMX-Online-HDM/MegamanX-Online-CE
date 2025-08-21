@@ -517,7 +517,7 @@ public partial class Character : Actor, IDamagable {
 			float modifier = 1;
 			if (grounded) modifier = 0.5f;
 			if (charState is Crouch) modifier = 0.25f;
-			var pushVel = splashDeltaPos.normalize().times(200 * modifier);
+			var pushVel = splashDeltaPos.normalize().times(4 * modifier);
 			xPushVel = pushVel.x;
 			vel.y = pushVel.y;
 		}
