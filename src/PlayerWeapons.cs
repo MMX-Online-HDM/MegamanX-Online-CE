@@ -236,12 +236,8 @@ label:
 
 	public void configureWeapons(Character character) {
 		// Save weapons for cross-life maverick HP if not an Axl.
-		List<Weapon> weapons = character.weapons;
 		if (!character.isATrans) {
 			oldWeapons = character.weapons;
-		}
-		if (ownedByLocalPlayer && character is BaseSigma && weapons.Count == 3) {
-			character.weaponSlot = Options.main.sigmaWeaponSlot;
 		}
 	}
 

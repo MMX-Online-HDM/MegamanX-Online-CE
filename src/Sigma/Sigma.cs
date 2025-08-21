@@ -42,7 +42,9 @@ public class BaseSigma : Character {
 		sigmaLoadout ??= player.loadout.sigmaLoadout.clone();
 		loadout = sigmaLoadout;
 		weapons = configureWeapons(sigmaLoadout);
-
+		if (ownedByLocalPlayer && weapons.Count == 3 && !isATrans) {
+			weaponSlot = Options.main.sigmaWeaponSlot;
+		}
 		// For 1v1 mavericks.
 		CharState intialCharState;
 		if (ownedByLocalPlayer) {
@@ -768,16 +770,19 @@ public class BaseSigma : Character {
 			weaponSlot = sigmaWeaponSlot;
 		}
 		// Preserve HP on death so can summon for free until they die.
-		if (player.oldWeapons != null && sigmaLoadout.commandMode is 0 or 1 or 3 &&
-			player.character == this &&
-			(sigmaLoadout.commandMode != 3 ||
-			player.previousLoadout?.sigmaLoadout?.commandMode == sigmaLoadout.commandMode
-		)) {
+		if (!isATrans &&
+			player.oldWeapons != null &&
+			sigmaLoadout.commandMode != (int)MaverickModeId.Striker &&
+			player.previousLoadout?.sigmaLoadout.commandMode == sigmaLoadout.commandMode
+		) {
 			foreach (var weapon in retWeapons) {
-				if (weapon is not MaverickWeapon mw) continue;
+				if (weapon is not MaverickWeapon mw) {
+					continue;
+				}
 				if (player.oldWeapons.FirstOrDefault(
-					w => w is MaverickWeapon && w.GetType() == weapon.GetType()
-				) is not MaverickWeapon matchingOldWeapon) {
+						w => w is MaverickWeapon && w.GetType() == weapon.GetType()
+					) is not MaverickWeapon matchingOldWeapon
+				) {
 					continue;
 				}
 				if (matchingOldWeapon.lastHealth > 0 && matchingOldWeapon.summonedOnce) {
@@ -785,12 +790,7 @@ public class BaseSigma : Character {
 					mw.lastHealth = matchingOldWeapon.lastHealth;
 					mw.isMoth = matchingOldWeapon.isMoth;
 				}
-
 			}
-		}
-		weaponSlot = 0;
-		if (retWeapons.Count == 3) {
-			weaponSlot = Options.main.sigmaWeaponSlot;
 		}
 		return retWeapons;
 	}

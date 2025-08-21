@@ -43,12 +43,6 @@ public class RagingChargeX : Character {
 
 	public override void preUpdate() {
 		base.preUpdate();
-		// Charge timers.
-		if (getChargeShaders().Count != 0) {
-			chargePalleteTime += Global.gameSpeed;
-		} else {
-			chargePalleteTime = 0;
-		}
 		if (!ownedByLocalPlayer) { return; }
 		// Cooldowns.
 		Helpers.decrementFrames(ref saberCooldown);
@@ -93,11 +87,6 @@ public class RagingChargeX : Character {
 
 	public override void postUpdate() {
 		base.postUpdate();
-		if (getChargeShaders().Count != 0) {
-			chargePalleteTime += Global.gameSpeed;
-		} else {
-			chargePalleteTime = 0;
-		}
 		// Local-only starts here.
 		if (!ownedByLocalPlayer) { return; }
 		// Decay damage.
@@ -324,6 +313,16 @@ public class RagingChargeX : Character {
 			_ => null
 		};
 		return proj;
+	}
+
+	public override void render(float x, float y) {
+		// Charge timers
+		if (isCharging()) {
+			chargePalleteTime += Global.gameSpeed;
+		} else {
+			chargePalleteTime = 0;
+		}
+		base.render(x, y);
 	}
 
 	public override List<ShaderWrapper> getShaders() {
