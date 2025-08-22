@@ -517,7 +517,7 @@ public partial class Character : Actor, IDamagable {
 			float modifier = 1;
 			if (grounded) modifier = 0.5f;
 			if (charState is Crouch) modifier = 0.25f;
-			var pushVel = splashDeltaPos.normalize().times(200 * modifier);
+			var pushVel = splashDeltaPos.normalize().times(4 * modifier);
 			xPushVel = pushVel.x;
 			vel.y = pushVel.y;
 		}
@@ -2376,7 +2376,7 @@ public partial class Character : Actor, IDamagable {
 			}
 		}
 
-		/*if (Global.showHitboxes) {
+		if (Global.showHitboxes) {
 			Point? headPos = getHeadPos();
 			if (headPos != null) {
 				//DrawWrappers.DrawCircle(headPos.Value.x, headPos.Value.y, headshotRadius, true, new Color(255, 0, 255, 128), 1, ZIndex.HUD);
@@ -2390,7 +2390,7 @@ public partial class Character : Actor, IDamagable {
 					new Color(255, 0, 0, 128)
 				);
 			}
-		}*/
+		}
 	}
 
 	public void drawSpinner(float progress) {

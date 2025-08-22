@@ -2508,7 +2508,23 @@ public class GameMode {
 		bool isMK5 = vile?.isVileMK5 == true;
 		bool isMK2Or5 = isMK2 || isMK5;
 		int maxIndex = isMK2Or5 ? 5 : 4;
+		int selected = level.mainPlayer.selectedRAIndex;
 
+		// B, K, H, F
+		List<int> baseIcons = new List<int> { 0, 1, 2, 3 };
+		if (isMK2) baseIcons.Add(4); // G
+		if (isMK5) baseIcons.Add(5); // D
+
+		int count = baseIcons.Count;
+		int current = selected % count;
+		int previous = (current - 1 + count) % count;
+		int next = (current + 1) % count;
+
+		DrawWrappers.DrawTextureHUD(Global.textures["vileRidesHUD2"], Global.halfScreenW - 189, startY-26);
+		Global.sprites["hud_vile_rides"].drawToHUD(baseIcons[current], startX + 25, startY-6);
+		Global.sprites["hud_vile_rides_off"].drawToHUD(baseIcons[previous], startX + 9, startY-6);
+		Global.sprites["hud_vile_rides_off"].drawToHUD(baseIcons[next], startX + 41, startY-6);
+		/*
 		for (int i = 0; i < maxIndex; i++) {
 			float x = startX;
 			float y = startY - (i * height);
@@ -2532,6 +2548,7 @@ public class GameMode {
 				DrawWrappers.DrawRectWH(x - 7, y - 7, 14, 14, false, new Color(0, 224, 0), 1, ZIndex.HUD, false);
 			}
 		}
+		*/
 	}
 
 	public Color getPingColor(Player player) {

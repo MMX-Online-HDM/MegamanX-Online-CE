@@ -157,6 +157,7 @@ public partial class RPCCreateProj : RPC {
 		{ (int)ProjIds.DarkHold, DarkHoldProj.rpcInvoke },
 		{ (int)ProjIds.QuakeBlazer, DanchienExplosionProj.rpcInvoke },
 		{ (int)ProjIds.QuakeBlazerFlame, QuakeBlazerFlamePart.rpcInvoke },
+		{ (int)ProjIds.HyorogaProj, HyorogaProj.rpcInvoke },
 
 		//Punchy Zero
 		{ (int)ProjIds.PZeroHadangeki, PZeroHadangeki.rpcInvoke },

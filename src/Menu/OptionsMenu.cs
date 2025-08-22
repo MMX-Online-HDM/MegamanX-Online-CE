@@ -243,38 +243,16 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontValue, "FAST SHADERS:",
+							optionFontValue, "Fast Shaders:",
 							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
 							optionFontValue, Helpers.boolYesNo(Options.main.fastShaders),
-							pos.x + 200, pos.y, selected: selectedArrowPosY == index
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"Uses a faster shader system for better performance,\n" +
 					"disables special effects like team mode outlines."
-				),
-				// Small Bars
-				new MenuOption(
-					30, startY,
-					() => {
-						if (Global.input.isPressedMenu(Control.MenuLeft)) {
-							Options.main.enableSmallBars = false;
-						} else if (Global.input.isPressedMenu(Control.MenuRight)) {
-							Options.main.enableSmallBars = true;
-						}
-					},
-					(Point pos, int index) => {
-						Fonts.drawText(
-							optionFontText, "Enable small bars:",
-							pos.x, pos.y, selected: selectedArrowPosY == index
-						);
-						Fonts.drawText(
-							optionFontValue, Helpers.boolYesNo(Options.main.enableSmallBars),
-							pos.x + 166, pos.y, selected: selectedArrowPosY == index
-						);
-					},
-					"Makes some of the energy bars smaller."
 				),
 				// Preset
 				new MenuOption(
@@ -493,6 +471,28 @@ public class OptionsMenu : IMainMenu {
 					},
 					"If Yes, will instantly die on character change.\n" +
 					"If No, on next death character change will apply."
+				),
+				// Small Bars
+				new MenuOption(
+					30, startY,
+					() => {
+						if (Global.input.isPressedMenu(Control.MenuLeft)) {
+							Options.main.enableSmallBars = false;
+						} else if (Global.input.isPressedMenu(Control.MenuRight)) {
+							Options.main.enableSmallBars = true;
+						}
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							optionFontText, "Enable small bars:",
+							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.enableSmallBars),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"Makes some of the energy bars smaller."
 				),
 
 			};
@@ -850,7 +850,7 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Disables performing Nova Strike if a side wall is close by."
+					"Disables performing Nova Strike\n if a side wall is close by."
 				),
 				// Should Nova on ceiling walls.
 				new MenuOption(
@@ -868,7 +868,7 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Disables performing Nova Strike if a Ceiling is close by."
+					"Disables performing Nova Strike\n if a Ceiling is close by."
 				),
 				// Should Nova on floor walls.
 				new MenuOption(
@@ -886,7 +886,25 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Disables performing Nova Strike if a Floor is close by."
+					"Disables performing Nova Strike\n if a Floor is close by."
+				),
+				// Should Nova on floor walls.
+				new MenuOption(
+					30, startY,
+					() => {
+						Helpers.menuLeftRightBool(ref Options.main.oldUpgradeMenuX);
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							optionFontText, "Old Upgrade Menu:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.oldUpgradeMenuX),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"Activates the old upgrade armor menu."
 				),
 				/*
 				new MenuOption(
