@@ -294,6 +294,7 @@ public partial class Level {
 
 		InGameMainMenu.selectY = 0;
 		UpgradeMenu.onUpgradeMenu = true;
+		UpgradeArmorMenu.xGame = 1;
 		UpgradeArmorMenuEX.xGame = 1;
 
 		Menu.exit();
@@ -1539,7 +1540,7 @@ public partial class Level {
 				Point camPos = camPlayer.character.getCamCenterPos();
 				Actor? followActor = camPlayer.character?.getFollowActor();
 
-				float extraPos = MathF.Floor(MathF.Abs(followActor.moveDelta.x));
+				float extraPos = 0; //MathF.Floor(MathF.Abs(followActor.moveDelta.x));
 				if (extraPos >= 4) {
 					extraPos = extraPos * 16 * MathF.Sign(followActor.moveDelta.x);
 					if (lastCameraXDelta == 0 ||
