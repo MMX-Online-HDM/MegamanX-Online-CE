@@ -409,7 +409,7 @@ public class GravityWellChargedState : CharState {
 
 	public override void update() {
 		base.update();
-		if (character.frameIndex >= 4 && !fired) {
+		if (character.frameIndex >= 5 && !fired) {
 			fired = true;
 			stateTime = 0;
 			if (mmx != null) {
