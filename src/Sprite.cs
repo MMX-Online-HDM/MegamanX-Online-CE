@@ -22,14 +22,15 @@ public class Sprite {
 	public static Texture axlArmBitmap = null!;
 
 	public float time;
-	private int _frameIndex;
-	public int frameIndex {
-		get => _frameIndex;
+
+	public int frameIndex;
+	public int frameIndexSafe {
+		get => frameIndex;
 		set {
-			if (value > totalFrameNum) {
+			if (value >= totalFrameNum) {
 				throw new Exception("Error: Frameindex is longer than anim size.");
 			}
-			_frameIndex = value;
+			frameIndex = value;
 		}
 	}
 	public float frameSpeed = 1;

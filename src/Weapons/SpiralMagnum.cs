@@ -561,10 +561,6 @@ public class SniperMissileExplosionProj : Projectile {
 			return null;
 		}
 		bool directHit = this.directHit == character;
-		float ownAxlFactor = 1f;
-		if (character == attacker.character) {
-			ownAxlFactor = 2f;
-		}
 		Point victimCenter = character.getCenterPos();
 		Point bombCenter = pos;
 		if (directHit) {
@@ -573,7 +569,11 @@ public class SniperMissileExplosionProj : Projectile {
 		Point dirTo = bombCenter.directionTo(victimCenter);
 		float distFactor = Helpers.clamp01(1 - (bombCenter.distanceTo(victimCenter) / 60f));
 
-		character.pushEffect(new Point(0.3f, 0.2f) * dirTo * distFactor * ownAxlFactor);
+		if (character == attacker.character) {
+			character.pushEffect(new Point(0.6f, 0.3f) * dirTo * distFactor);
+		} else {
+			character.pushEffect(new Point(0.3f, 0.4f) * dirTo * distFactor);
+		}
 
 		if (character == attacker.character) {
 			float damage = damager.damage;
