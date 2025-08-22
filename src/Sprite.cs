@@ -22,7 +22,16 @@ public class Sprite {
 	public static Texture axlArmBitmap = null!;
 
 	public float time;
-	public int frameIndex;
+	private int _frameIndex;
+	public int frameIndex {
+		get => _frameIndex;
+		set {
+			if (value > totalFrameNum) {
+				throw new Exception("Error: Frameindex is longer than anim size.");
+			}
+			_frameIndex = value;
+		}
+	}
 	public float frameSpeed = 1;
 	public int loopStartFrame;
 	public bool doesLoop;
