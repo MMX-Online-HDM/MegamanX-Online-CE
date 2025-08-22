@@ -290,11 +290,7 @@ public class GrenadeExplosionProj : Projectile {
 		Point dirTo = bombCenter.directionTo(victimCenter);
 		float distFactor = Helpers.clamp01(1 - (bombCenter.distanceTo(victimCenter) / 60f));
 
-		if (character == attacker.character) {
-			character.pushEffect(new Point(0.3f, 0.3f) * dirTo * distFactor);
-		} else {
-			character.pushEffect(new Point(0.6f, 0.3f) * dirTo * distFactor);
-		}
+		character.pushEffect(new Point(0.3f, 0.3f) * dirTo * distFactor);
 
 		if (character == attacker.character) {
 			float damage = damager.damage;
