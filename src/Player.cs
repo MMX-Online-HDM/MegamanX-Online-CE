@@ -641,8 +641,9 @@ public partial class Player {
 			float retHp = getBaseHealth();
 			float extraHP = health - 16;
 
-			float hpMulitiplier = MathF.Ceiling(getBaseHealth() / 16);
-			retHp += MathF.Ceiling(extraHP * hpMulitiplier);
+			//float hpMulitiplier = MathF.Ceiling(getBaseHealth() / 16);
+			//retHp += MathF.Ceiling(extraHP + hpMulitiplier);
+			retHp += MathF.Ceiling(extraHP);
 
 			if (retHp < 1) {
 				retHp = 1;
