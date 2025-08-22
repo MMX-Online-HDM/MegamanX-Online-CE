@@ -381,7 +381,7 @@ public class RaySplasherChargedState : CharState {
 	public override void update() {
 		base.update();
 
-		if (character.frameIndex >= 4 && !fired) {
+		if (character.frameIndex >= 5 && !fired) {
 			fired = true;
 			var turret = new RaySplasherTurret(
 				character.getShootPos(), player, character.xDir, 
