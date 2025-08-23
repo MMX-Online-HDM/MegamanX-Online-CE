@@ -50,7 +50,7 @@ public class DenjinWeapon : Weapon {
 		damage = "3";
 		hitcooldown = "0.1";
 		flinch = "26";
-		effect = "None.";
+		effect = "";
 	}
 }
 

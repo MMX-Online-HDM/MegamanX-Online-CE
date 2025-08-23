@@ -853,7 +853,7 @@ public class DarkHoldState : CharState {
 			character.changeToIdleOrFall();
 		}
 		// Does not stack with other time stops.
-		stunTime -= 1;
+		stunTime -= player.mashValue() * 60f;
 	}
 
 	public override bool canEnter(Character character) {
@@ -874,7 +874,7 @@ public class DarkHoldState : CharState {
 		specialId = oldState.specialId;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 		character.frameSpeed = 1;

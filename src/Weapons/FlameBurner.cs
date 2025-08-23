@@ -114,6 +114,8 @@ public class FlameBurnerProj : Projectile {
 }
 
 public class FlameBurnerAltProj : Projectile {
+	public IDamagable? directHit;
+	public int directHitXDir;
 	public float maxSpeed = 400;
 	public FlameBurnerAltProj(Weapon weapon, Point pos, int xDir, Player player, Point bulletDir, ushort netProjId, bool sendRpc = false) :
 		base(weapon, pos, xDir, 100, 0, player, "airblast_proj", 0, 0.15f, netProjId, player.ownedByLocalPlayer) {
@@ -142,8 +144,10 @@ public class FlameBurnerAltProj : Projectile {
 		if (!ownedByLocalPlayer) return;
 		Character chr = owner.character;
 		if (chr is Axl axl) {
-			Point moveVel = axl.getAxlBulletDir() * -250 / new Point(60, 1.5f);
-			chr.pushEffect(moveVel);
+			Point bombCenter = pos;
+			Point dirTo = bombCenter.directionTo(axl.getCenterPos());
+			Point moveVel = axl.getAxlBulletDir() * -10 / new Point(300, 1.5f);
+			chr.pushEffect(new Point(0.1f, 0.1f) * dirTo);
 		}
 	}
 
@@ -173,38 +177,23 @@ public class FlameBurnerAltProj : Projectile {
 	}
 
 	public override void onHitDamagable(IDamagable damagable) {
-		if (!damagable.isPlayableDamagable()) { return; }
-		if (damagable is not Actor actor || !actor.ownedByLocalPlayer) {
+		if (damagable is not Character character) {
 			return;
 		}
-		if (damagable is Character char1 && char1.isPushImmune()) {
-			return;
+		bool directHit = this.directHit == character;
+		Point victimCenter = character.getCenterPos();
+		Point bombCenter = pos;
+		if (directHit) {
+			bombCenter.x = victimCenter.x - (directHitXDir * 5);
 		}
-
-		//character.damageHistory.Add(new DamageEvent(damager.owner, weapon.killFeedIndex, true, Global.frameCount));
-		float modifier = 1.33f;
-		Point pushVel = getPushVel();
-		if (actor.useGravity) {
-			if (MathF.Sign(actor.vel.y) != MathF.Sign(pushVel.y)) {
-				actor.vel.y = 0;
-			}
-			actor.vel.y += pushVel.y * modifier;
-			if (damagable is Character character) {
-				if (character.charState.normalCtrl && character.charState is not Fall or Jump) {
-					character.changeState(character.getFallState());
-				}
-				else if (character.charState.canStopJump) {
-					character.charState.stoppedJump = true;
-				}
-			}
-		} else {
-			actor.yPushVel = pushVel.y * modifier;
-		}
-		actor.xPushVel = pushVel.x * modifier;
+		Point dirTo = bombCenter.directionTo(victimCenter);
+		float distFactor = Helpers.clamp01(1 - (bombCenter.distanceTo(victimCenter) / 60f));
+		character.grounded = false;
+		character.pushEffect(new Point(0.5f, -0.3f) * dirTo * distFactor);
 	}
 
 	public Point getPushVel() {
-		return deltaPos.normalize().times(300);
+		return deltaPos.normalize().times(5);
 	}
 }
 

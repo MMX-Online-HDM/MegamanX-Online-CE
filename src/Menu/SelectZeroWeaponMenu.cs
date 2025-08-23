@@ -220,12 +220,11 @@ public class SelectZeroWeaponMenu : IMainMenu {
 				);
 				posY += 9;
 			}
-			Fonts.drawText(FontType.DarkPurple, "Effect: ", 27, 173);
-			Fonts.drawText(FontType.Red, "Damage: ", 27.5f, 186);
+			Fonts.drawText(FontType.Red, "Damage: ", 27f, 186);
 			Fonts.drawText(FontType.Red, "Flinch: ", 126, 186);
 			Fonts.drawText(FontType.Red, "Hit CD: ", 219, 186);
 			var wep1 = zeroWeaponCategories[selCursorIndex].Item2[cursors[selCursorIndex].index];
-			Fonts.drawText(FontType.DarkPurple, wep1.effect, 72, 173);
+			Fonts.drawText(FontType.DarkPurple, wep1.effect, 27, 173);
 			Fonts.drawText(FontType.Red, wep1.damage, 73, 186);
 			Fonts.drawText(FontType.Red, wep1.flinch, 170, 186);
 			Fonts.drawText(FontType.Red, wep1.hitcooldown, 268, 186);

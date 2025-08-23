@@ -181,6 +181,9 @@ public class SpiralMagnumProj : Projectile {
 			maxDist = player.adjustedZoomRange;
 			dist = jumpDist;
 			damager.damage += MathF.Round(6 * (axl?.zoomCharge ?? 0));
+			if (axl?.hasScopedTarget() != true && target == null) { // i have so many questions
+				damager.damage = 0;
+			}
 		}
 		canBeLocal = false;
 	}
@@ -572,7 +575,7 @@ public class SniperMissileExplosionProj : Projectile {
 		if (character == attacker.character) {
 			character.pushEffect(new Point(0.6f, 0.4f) * dirTo * distFactor);
 		} else {
-			character.pushEffect(new Point(0.3f, 0.4f) * dirTo * distFactor);
+			character.pushEffect(new Point(0.3f, -0.3f) * dirTo * distFactor);
 		}
 
 		if (character == attacker.character) {

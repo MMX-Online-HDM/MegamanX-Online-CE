@@ -741,7 +741,7 @@ public class SNESArmorHandler : IMenuHandler {
 				if (player.armArmorsPurchased[0] == false)
 					player.currency += MegamanX.armArmorCost;
 			},
-			description = "Powers up your Spiral Crush Buster.\nby charging shots 50% Faster.",
+			description = "Powers up your Spiral Crush Buster\nby charging shots 50% Faster.",
 			price = MegamanX.armArmorCost.ToString(),
 		};
 		menu[(1, 4)] = new Skill {

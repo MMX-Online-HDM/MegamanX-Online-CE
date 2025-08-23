@@ -105,7 +105,10 @@ public class Axl : Character {
 	public bool stealthActive;
 
 	public int axlHyperMode;
-
+	bool whiteAxlLoadout => axlHyperMode == 0;
+	bool jumpPressed => player.input.isPressed(Control.Jump, player);
+	bool dashPressed => player.input.isPressed(Control.Dash, player);
+	bool commandHeld => player.input.isHeld(Control.Special2, player);
 	public Axl(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
@@ -369,6 +372,7 @@ public class Axl : Character {
 		isRevving = false;
 		bool altRayGunHeld = false;
 		bool altPlasmaGunHeld = false;
+		bool gaeaHeld = false;
 
 		if (isStealthMode()) {
 			updateStealthMode();
@@ -499,81 +503,26 @@ public class Axl : Character {
 			currentWeapon is MettaurCrash || currentWeapon is BeastKiller || currentWeapon is MachineBullets ||
 			currentWeapon is RevolverBarrel || currentWeapon is AncientGun) && invulnTime == 0 && flag == null) {
 				increaseCharge();
-			} else {
-				/* if (isCharging() && getChargeLevel() >= 3 && player.scrap >= 10 && !isWhiteAxl() && !hyperAxlUsed && (player.axlHyperMode > 0 || player.axlBulletType == 0)) {
-					if (player.axlHyperMode == 0) {
-						changeState(new HyperAxlStart(grounded), true);
+			} else if (isCharging()) {
+				if (currentWeapon is AxlBullet || currentWeapon is DoubleBullet ||
+					currentWeapon is MettaurCrash || currentWeapon is BeastKiller || currentWeapon is MachineBullets ||
+					currentWeapon is RevolverBarrel || currentWeapon is AncientGun) {
+					recoilTime = 0.2f;
+					if (!isWhiteAxl()) {
+						axlWeapon?.axlShoot(player, AxlBulletType.AltFire);
 					} else {
-						if (!hyperAxlUsed) {
-							hyperAxlUsed = true;
-							//addHealth(player.maxHealth);
-							foreach (var weapon in weapons) {
-								weapon.ammo = weapon.maxAmmo;
-							}
-							stingChargeTime = 12;
-							playSound("stingCharge", sendRpc: true);
-						}
-					}
-				} */
-				if (isCharging() && getChargeLevel() >= 3 && isStealthMode()) {
-					stingChargeTime = 0;
-					playSound("stingCharge", sendRpc: true);
-					hyperAxlFix = true;
-				} else if (isCharging()) {
-					if (currentWeapon is AxlBullet || currentWeapon is DoubleBullet ||
-						currentWeapon is MettaurCrash || currentWeapon is BeastKiller || currentWeapon is MachineBullets ||
-						currentWeapon is RevolverBarrel || currentWeapon is AncientGun) {
-						recoilTime = 0.2f;
-						if (!isWhiteAxl()) {
-							axlWeapon?.axlShoot(player, AxlBulletType.AltFire);
-						} else {
-							axlWeapon?.axlShoot(player, AxlBulletType.WhiteAxlCopyShot2);
-						}
+						axlWeapon?.axlShoot(player, AxlBulletType.WhiteAxlCopyShot2);
 					}
 				}
 				stopCharge();
-
-				// Handles Hyper activation.
-				if (isStealthMode() || isWhiteAxl()) {
-					hyperAxlUsed = true;
+				if (shootHeld) {
+					increaseCharge();
 				} else {
-					hyperAxlUsed = false;
-				}
-				if (player.input.isHeld(Control.Special2, player) &&
-					player.currency >= Player.AxlHyperCost &&
-					charState is not HyperAxlStart and not WarpIn &&
-					(!hyperAxlUsed)
-				) {
-					hyperProgress += Global.spf;
-				} else {
-					hyperProgress = 0;
-				}
-				if (hyperProgress >= 1 && player.currency >= Player.AxlHyperCost) {
-					hyperProgress = 0;
-					if (axlHyperMode == 0) {
-						changeState(new HyperAxlStart(grounded), true);
-					} else {
-						if (!hyperAxlUsed) {
-							hyperAxlUsed = true;
-							//addHealth(player.maxHealth);
-							if (!hyperAxlFix) {
-								foreach (var weapon in weapons)
-									weapon.ammo = weapon.maxAmmo;
-							}
-							stingChargeTime = 12;
-							playSound("stingCharge", sendRpc: true);
-						}
+					if (isCharging()) {
+						shootAssassinShot();
 					}
+					stopCharge();
 				}
-			}
-		} else {
-			if (shootHeld) {
-				increaseCharge();
-			} else {
-				if (isCharging()) {
-					shootAssassinShot();
-				}
-				stopCharge();
 			}
 		}
 		chargeGfx();
@@ -735,7 +684,7 @@ public class Axl : Character {
 						recoilTime = 0.2f;
 						axlWeapon.axlShoot(player, AxlBulletType.AltFire);
 					}
-
+					gaeaHeld = true;
 					bool isAltRev = (altShootHeld && loadout.iceGattlingAlt == 1);
 					if (shootHeld || isAltRev) {
 						isRevving = true;
@@ -813,24 +762,55 @@ public class Axl : Character {
 			plasmaGunAltProj?.destroySelf();
 			plasmaGunAltProj = null;
 		}
+		if (!gaeaHeld) {
+			gaeaShield?.destroySelf();
+			gaeaShield = null;
+		}
 	}
 
 	public override bool normalCtrl() {
-		if (player.input.isPressed(Control.Jump, player) &&
-			canJump() && !grounded && !isDashing && canAirDash() && flag == null
+		if (jumpPressed && canJump() && !grounded &&
+		 	!isDashing && canAirDash() && flag == null
 		) {
 			dashedInAir++;
 			changeState(new Hover(), true);
 			return true;
 		}
 		if (dodgeRollCooldown == 0 && player.canControl && grounded) {
-			if (charState is Crouch && player.input.isPressed(Control.Dash, player)) {
+			if (charState is Crouch && dashPressed) {
 				changeState(new DodgeRoll(), true);
 				return true;
-			} else if (player.input.isPressed(Control.Dash, player) && player.input.checkDoubleTap(Control.Dash)) {
+			} else if (dashPressed && player.input.checkDoubleTap(Control.Dash)) {
 				changeState(new DodgeRoll(), true);
 				return true;
 			}
+		}
+		int cost = Player.AxlHyperCost;
+		if (commandHeld && player.currency >= cost && !isWhiteAxl() &&
+			charState is not HyperAxlStart and not WarpIn)
+		{
+			hyperProgress += Global.spf;
+		} else {
+			hyperProgress = 0;
+		}
+		if (hyperProgress >= 1 && player.currency >= cost && !isHypermodeAxl()) {
+			hyperProgress = 0;
+			if (whiteAxlLoadout) {
+				changeState(new HyperAxlStart(grounded), true);
+			} else {
+				if (!hyperAxlFix) {
+					foreach (var weapon in weapons)
+					weapon.ammo = weapon.maxAmmo;
+				}
+				hyperAxlFix = true;
+				stingChargeTime = 12;
+				playSound("stingCharge", sendRpc: true);
+			}
+		}
+		if (isStealthMode() && hyperProgress >= 1) {
+			hyperProgress = 0;
+			stingChargeTime = 0;
+			playSound("stingCharge", sendRpc: true);
 		}
 		return base.normalCtrl();
 	}
@@ -1676,6 +1656,9 @@ public class Axl : Character {
 	public bool isStealthMode() {
 		return isInvisible();
 	}
+	public bool isHypermodeAxl() {
+		return isWhiteAxl() || isInvisible();
+	}
 
 	float stealthCurrencyTime;
 
@@ -1738,7 +1721,7 @@ public class Axl : Character {
 	}
 
 	public override bool canChangeWeapons() {
-		if (gaeaShield != null) return false;
+		//if (gaeaShield != null) return false;
 		if (sniperMissileProj != null) return false;
 		if (revTime > 0.5f) return false;
 
@@ -2061,7 +2044,7 @@ public class Axl : Character {
 		netAxlArmSpriteIndex = BitConverter.ToUInt16(data[5..7]);
 	}
 	public override void aiAttack(Actor? target) {
-		if (axlHyperMode == 0 && player.currency >= 10 && !player.isDead && !isInvulnerable() 
+		if (whiteAxlLoadout && player.currency >= 10 && !player.isDead && !isInvulnerable() 
 			&& !(isWhiteAxl() || isStealthMode()) && charState.attackCtrl) {
 			changeState(new HyperAxlStart(grounded), true);
 		}

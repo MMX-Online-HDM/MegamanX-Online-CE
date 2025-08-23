@@ -19,7 +19,7 @@ public class FireWave : Weapon {
 		isStream = true;
 		switchCooldown = 15;
 		damage = "1/1";
-		effect = "Inflicts burn to enemies. DOT: 0.5/2 seconds.\nBurn won't give assists.";
+		effect = "Both:Inflicts burn to enemies.\nBurn won't give assists.\nDOT: 0.5/2 seconds.";
 		hitcooldown = "12/20";
 
 		ammoDisplayScale = 7;

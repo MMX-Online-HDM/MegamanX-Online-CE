@@ -16,7 +16,7 @@ public class GravityWell : Weapon {
 		killFeedIndex = 45;
 		weaknessIndex = (int)WeaponIds.RaySplasher;
 		damage = "2/4";
-		effect = "Disables Gravity to the enemy. C: Super Armor.\nUncharged won't give assists.";
+		effect = "U:Disables Gravity to the enemy.\nProjectile won't give assists\nC:Grants Flinch Immunity.";
 		hitcooldown = "30";
 		flinch = "0/26";
 		maxAmmo = 16;

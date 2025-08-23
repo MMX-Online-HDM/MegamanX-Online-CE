@@ -483,6 +483,13 @@ public class Damager {
 						spiked = true;
 					}
 					break;
+				case (int)ProjIds.GreenSpinnerSplash:
+				case (int)ProjIds.SniperMissileBlast:
+						spiked = true;
+					break;
+				case (int)ProjIds.AirBlastProj:
+					character.vel.y = -character.getJumpPower()/2;
+					break;
 				case (int)ProjIds.FlameMOil:
 					character.addOilTime(owner, 8);
 					character.playSound("flamemOil");

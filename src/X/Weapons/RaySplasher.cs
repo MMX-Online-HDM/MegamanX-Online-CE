@@ -19,7 +19,7 @@ public class RaySplasher : Weapon {
 		killFeedIndex = 44;
 		weaknessIndex = (int)WeaponIds.SpinningBlade;
 		damage = "1/1";
-		effect = "Charged: Grants Super Armor.";
+		effect = "C:Grants Flinch Immunity.";
 		hitcooldown = "5";
 		hasCustomChargeAnim = true;
 	}

@@ -828,9 +828,9 @@ public class GameMode {
 				FontType.BlueMenu, hudErrorMsg,
 				Global.halfScreenW, 50, Alignment.Center
 			);
-		} else if (mainPlayer.character is KaiserSigma) {
+		} else if (mainPlayer?.character is KaiserSigma) {
 			string msg = "";
-			if (KaiserSigma.canKaiserSpawn(mainPlayer.character, out _)) msg += "[JUMP]: Relocate";
+			if (KaiserSigma.canKaiserSpawn(mainPlayer.character, out _)) msg += "[DASH]: Relocate";
 			if (msg != "") {
 				Fonts.drawText(
 					FontType.BlueMenu, Helpers.controlText(msg),
@@ -1021,15 +1021,14 @@ public class GameMode {
 		List<Point> revealedSpots = new List<Point>();
 		float revealedRadius = Global.viewScreenW * 0.5f;
 		
-		if (level.mainPlayer.mavericks.Count > 0) {
-			foreach (var maverick in level.mainPlayer.mavericks) {
-				if (maverick == level.mainPlayer.currentMaverick) {
-					continue;
-				}
+		if (level.mainPlayer.character is BaseSigma) {
+			foreach (var maverick in level.mainPlayer.mavericks)
+			{
+				if (maverick == level.mainPlayer.currentMaverick && !level.mainPlayer.isAlivePuppeteer()) continue;
 				revealedSpots.Add(maverick.pos);
 			}
 			revealedRadius = Global.viewScreenW * 0.5f;
-		} 
+		}
 		if (level.boundBlasterAltProjs.Count > 0) {
 			foreach (var bbAltProj in level.boundBlasterAltProjs) {
 				revealedSpots.Add(bbAltProj.pos);

@@ -289,7 +289,6 @@ public class SigmaUpDownSlashState : CharState {
 	public SigmaUpDownSlashState(bool isUp) : base(isUp ? "upslash" : "downslash") {
 		this.isUp = isUp;
 		enterSound = "sigma2slash";
-		exitOnLanding = true;
 	}
 
 	public override void update() {

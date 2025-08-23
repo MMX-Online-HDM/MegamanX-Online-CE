@@ -53,7 +53,7 @@ public class VileLaser : Weapon {
 			damage = "6";
 			hitcooldown = "0.5";
 			flinch = "26";
-			effect = "No DMG inside Ride.";
+			effect = "";
 		} else if (vileLaserType == VileLaserType.StraightNightmare) {
 			index = (int)WeaponIds.StraightNightmare;
 			displayName = "Straight Nightmare";

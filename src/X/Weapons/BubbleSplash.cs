@@ -25,8 +25,7 @@ public class BubbleSplash : Weapon {
 		switchCooldown = 15;
 		damage = "1/1*6";
 		ammousage = 0.5;
-		//effect = "Shoot a Stream up to 7 bubbles. C:Jump Boost.";
-		effect = "Charged: Grants Jump Boost.";
+		effect = "U:Bubbles have less gravity underwater.\nC:Grants Jump boost.\nBoth:Will destroy Speed Burner uncharged on contact.";
 		maxAmmo = 28;
 		ammo = maxAmmo;
 	}

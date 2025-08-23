@@ -493,7 +493,7 @@ public class KaiserSigmaVirusState : CharState {
 		clampViralSigmaPos();
 
 		bool canSpawnAtPos = KaiserSigma.canKaiserSpawn(kaiserSigma, out var spawnPoint);
-		if (player.input.isPressed(Control.Shoot, player) || player.input.isPressed(Control.Jump, player)) {
+		if (player.input.isPressed(Control.Shoot, player) || player.input.isPressed(Control.Dash, player)) {
 			if (canSpawnAtPos) {
 				lerpBack(spawnPoint, true);
 				return;
@@ -876,20 +876,20 @@ public class KaiserSigmaMineProj : Projectile, IDamagable {
 		if (!firstHit && type == 0) {
 			firstHit = true;
 			vel.x *= -1;
-			vel.y = -speed;
-			vel = vel.normalize().times(speed);
+			vel.y = -100;
+			vel = vel.normalize().times(100);
 			didHit = true;
 		} else if (other.isSideWallHit()) {
 			vel.x *= -1;
-			vel = vel.normalize().times(speed);
+			vel = vel.normalize().times(100);
 			didHit = true;
 		} else if (other.isCeilingHit() || other.isGroundHit()) {
 			vel.y *= -1;
-			vel = vel.normalize().times(speed);
+			vel = vel.normalize().times(100);
 			didHit = true;
 		}
 		if (didHit) {
-			//playSound("gbeetleProjBounce", sendRpc: true);
+			playSound("gbeetleProjBounce", sendRpc: true);
 			hitWallCooldown = 0.1f;
 		}
 	}

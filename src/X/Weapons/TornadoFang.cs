@@ -19,7 +19,7 @@ public class TornadoFang : Weapon {
 		killFeedIndex = 47;
 		weaknessIndex = (int)WeaponIds.AcidBurst;
 		damage = "1/1";
-		effect = "Inflicts Slowdown. Doesn't destroy on hit.\nUncharged won't give assists.";
+		effect = "U:Inflicts Slowdown. Loses speed on enemy contact.\nProjectile won't destroy on hit nor give assists.";
 		hitcooldown = "15/8";
 		flinch = "0/26";
 		flinchCD = "0/1";
@@ -120,21 +120,23 @@ public class TornadoFangProj : Projectile {
 		exhaust.xDir = xDir;
 		if (state == 0) {
 			if (type == 0) {
-				if (stateTime > 9) {
+				if (stateTime > 0.15f) {
 					vel.x = 0;
 				}
-			} else if (type == 1 || type == 2) {
-				if (stateTime > 9) {
+			}
+			else if (type == 1 || type == 2) {
+				if (stateTime > 0.15f) {
 					vel.y = 0;
 				}
-				if (stateTime > 9 && stateTime < 18) vel.x = 100 * xDir;
+				if (stateTime > 0.15f && stateTime < 0.3f) vel.x = 100 * xDir;
 				else vel.x = 0;
 			}
-			stateTime += Global.speedMul;
-			if (stateTime >= 45) {
+			stateTime += Global.spf;
+			if (stateTime >= 0.75f) {
 				state = 1;
 			}
-		} else if (state == 1) {
+		}
+		else if (state == 1) {
 			vel.x += Global.spf * 500 * xDir;
 			if (MathF.Abs(vel.x) > 350) vel.x = 350 * xDir;
 		}

@@ -18,7 +18,7 @@ public class ShotgunIce : Weapon {
 		shootSounds = new string[] { "shotgunIce", "shotgunIce", "shotgunIce", "icyWind" };
 		fireRate = 30;
 		damage = "2/1-2";
-		effect = "U:Can Split.\nC: Insta Freeze enemies. Ice sled up to 12 DMG.";
+		effect = "U:Splits on contact on enemies or walls.\nC:Insta Freeze enemies. Ice sled up to 12 DMG.";
 		hitcooldown = "0/30";
 		flinch = "0";
 		hasCustomChargeAnim = true;
