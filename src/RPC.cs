@@ -15,6 +15,7 @@ public class RPC {
 	public bool isPreUpdate;
 	public bool isCollision;
 	public bool levelless;
+	public bool allowBreakMtuLimit;
 	public int index;
 
 	// Need templates? Use these:
@@ -1027,6 +1028,7 @@ public class RPCJoinLateResponse : RPC {
 	public RPCJoinLateResponse() {
 		netDeliveryMethod = NetDeliveryMethod.ReliableOrdered;
 		levelless = true;
+		allowBreakMtuLimit = true;
 	}
 
 	public override void invoke(params byte[] arguments) {
