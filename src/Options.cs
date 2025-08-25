@@ -68,7 +68,6 @@ public class Options {
 	public bool novaStrikeWall;
 	public bool novaStrikeCeiling;
 	public bool novaStrikeFloor;
-	public bool oldUpgradeMenuX;
 	public bool gigaCrushSpecial;
 	public XLoadout xLoadout = XLoadout.getDefault();
 
