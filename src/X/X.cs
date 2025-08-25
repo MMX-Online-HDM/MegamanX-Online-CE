@@ -32,6 +32,13 @@ public class MegamanX : Character {
 		: 0
 	);
 
+	public bool anyFullArmor => (
+		chestArmor > 0 &&
+		armArmor > 0 &&
+		legArmor > 0 &&
+		helmetArmor > 0
+	);
+
 	public bool hyperChestActive;
 	public bool hyperArmActive;
 	public bool hyperLegActive;
@@ -542,7 +549,7 @@ public class MegamanX : Character {
 			hyperProgress = 0;
 			return;
 		}
-		if (charState is not WarpIn && fullArmor != ArmorId.None) {
+		if (charState is not WarpIn && anyFullArmor) {
 			hyperProgress += Global.spf;
 		}
 		if (hyperProgress < 1) {
