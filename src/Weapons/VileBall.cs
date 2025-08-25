@@ -79,7 +79,7 @@ public class VileBall : Weapon {
 			damage = "3";
 			hitcooldown = "0.5";
 			flinch = "6";
-			effect = "Splits,no destroy on hit.";
+			effect = "Splits on ground.";
 		}
 	}
 
@@ -417,22 +417,20 @@ public class AirBombNapalm : NapalmAttackTypes {
 		base.update();
 		if (!shot && character.sprite.frameIndex == 2) {
 			shot = true;
-			var poi = character.sprite.getCurrentFrame().POIs[0];
-			poi.x *= character.xDir;
 			if (vile.napalmWeapon.type == (int)NapalmType.RumblingBang) {
 				vile.setVileShootTime(vile.napalmWeapon);
 				new NapalmGrenadeProj(
-					character.pos.add(poi), character.xDir, vile, character.player,
+					character.pos, character.xDir, vile, character.player,
 					character.player.getNextActorNetId(), rpc: true
 				);
 			} else if (vile.napalmWeapon.type == (int)NapalmType.FireGrenade) {
 				new MK2NapalmGrenadeProj(
-					character.pos.add(poi), character.xDir, vile, character.player,
+					character.pos, character.xDir, vile, character.player,
 					character.player.getNextActorNetId(), rpc: true
 				);
 			} else if (vile.napalmWeapon.type == (int)NapalmType.SplashHit) {
 				new SplashHitGrenadeProj(
-					character.pos.add(poi), character.xDir, vile, character.player,
+					character.pos, character.xDir, vile, character.player,
 					character.player.getNextActorNetId(), rpc: true
 				);
 			}
