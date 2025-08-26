@@ -94,7 +94,7 @@ public class UpgradeMenu : IMainMenu {
 
 		if (!subtankTargets.InRange(subtankTargetIndex)) subtankTargetIndex = 0;
 
-		if (Global.input.isPressedMenu(Control.MenuLeft)) {
+		if (Global.input.isPressedMenu(Control.MenuLeft) || Global.input.isPressedMenu(Control.WeaponLeft)) {
 			if (mainPlayer.realCharNum == 0) {
 				if (mainPlayer.canUpgradeXArmor()) {
 					if (Options.main.oldUpgradeMenuX) {
@@ -110,7 +110,7 @@ public class UpgradeMenu : IMainMenu {
 			}
 		}
 
-		if (Global.input.isPressedMenu(Control.MenuRight)) {
+		if (Global.input.isPressedMenu(Control.MenuRight) || Global.input.isPressedMenu(Control.WeaponRight)) {
 			if (mainPlayer.realCharNum == 0) {
 				if (mainPlayer.canUpgradeXArmor()) {
 					if (Options.main.oldUpgradeMenuX) {
@@ -326,6 +326,10 @@ public class UpgradeMenu : IMainMenu {
 
 		//UpgradeArmorMenu.drawHyperArmorUpgrades(mainPlayer, 20);
 
+		Fonts.drawTextEX(
+			FontType.Grey, "[WeaponL]/[WeaponR]: Change Menu",
+			Global.halfScreenW, Global.screenH - 38, Alignment.Center
+		);
 		Fonts.drawTextEX(
 			FontType.Grey, "[MUP]/[MDOWN]: Select Item",
 			Global.halfScreenW, Global.screenH - 28, Alignment.Center

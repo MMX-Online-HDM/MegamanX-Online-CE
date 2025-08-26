@@ -967,7 +967,7 @@ public class SNESArmorHandler : IMenuHandler {
 			name = "Body",
 			isUnlocked = player => player.character is MegamanX mmx && mmx.hyperChestActive,
 			canUnlock = player => player.character is MegamanX mmx && player.hasAllX3Armor() && !mmx.hasAnyHyperArmor,
-			canLock = player => player.character is MegamanX mmx && player.hasAllX3Armor() && !mmx.hyperChestActive,
+			canLock = player => player.character is MegamanX mmx  && mmx.hyperChestActive,
 			unlock = (player) => { if (player.character is MegamanX mmx) mmx.hyperChestActive = true; },
 			lockit = (player) => { if (player.character is MegamanX mmx) mmx.hyperChestActive = false; },
 			description = "ENHANCEMENT CHIP\nForcefield Defense: 50%",
@@ -1001,12 +1001,121 @@ public class SNESArmorHandler : IMenuHandler {
 		bool met = skill.canUnlock(p);
 		FontType font = met ? FontType.Blue : FontType.Grey;
 		DrawWrappers.DrawRect(20, 158, 364, 180, true, new Color(0, 0, 0, 100), 1, ZIndex.HUD, false, outlineColor: Color.White);
-		Fonts.drawTextEX(font, "Price: " + skill.price, ghw + 120, ghh + 64, Alignment.Left);
+		Fonts.drawTextEX(font, "Price: " + skill.price, ghw + 169, ghh + 64, Alignment.Right);
 		Fonts.drawTextEX(font, skill.description, ghw - 170, ghh + 54, Alignment.Left);
+	}
+
+	public void renderNoPurchasedArmors(Player player) {
+		for (int i = 0; i < 4; i++) {
+			float xStartPos = 34;
+			float[] xPos = [xStartPos + 0, xStartPos + 20, xStartPos + 40, xStartPos + 60];
+			float yPos = 50 + (i * 20);
+			float xSize = 16;
+			float ySize = 16;
+			Color color = new Color(0, 0, 0, 150);
+
+			if (i == 3) {
+				//Golden Armor.
+				if (player.character is MegamanX mmx) {
+					if (!mmx.hyperHelmetActive) {
+						DrawWrappers.DrawRect(xPos[0], yPos, xPos[0] + xSize, yPos + ySize, true, color, 1,
+						ZIndex.HUD, false);
+					}
+					if (!mmx.hyperChestActive) {
+						DrawWrappers.DrawRect(xPos[1], yPos, xPos[1] + xSize, yPos + ySize, true, color, 1,
+						ZIndex.HUD, false);
+					}
+					//Busters.
+					if (!mmx.hyperArmActive) {
+						DrawWrappers.DrawRect(xPos[2], yPos, xPos[2] + xSize, yPos + ySize, true, color, 1,
+						ZIndex.HUD, false);
+					}
+					//Boots.
+					if (!mmx.hyperLegActive) {
+						DrawWrappers.DrawRect(xPos[3], yPos, xPos[3] + xSize, yPos + ySize, true, color, 1,
+						ZIndex.HUD, false);
+					}
+				}
+			} else {
+				//Other armors.
+				//Helmets.
+				if (!player.isHeadArmorPurchased(i + 1)) {
+					DrawWrappers.DrawRect(xPos[0], yPos, xPos[0] + xSize, yPos + ySize, true, color, 1,
+					ZIndex.HUD, false);
+				}
+				//Chests.
+				if (!player.isBodyArmorPurchased(i + 1)) {
+					DrawWrappers.DrawRect(xPos[1], yPos, xPos[1] + xSize, yPos + ySize, true, color, 1,
+					ZIndex.HUD, false);
+				}
+				//Busters.
+				if (!player.isArmArmorPurchased(i + 1)) {
+					DrawWrappers.DrawRect(xPos[2], yPos, xPos[2] + xSize, yPos + ySize, true, color, 1,
+					ZIndex.HUD, false);
+				}
+				//Boots.
+				if (!player.isBootsArmorPurchased(i + 1)) {
+					DrawWrappers.DrawRect(xPos[3], yPos, xPos[3] + xSize, yPos + ySize, true, color, 1,
+					ZIndex.HUD, false);
+				}
+			}
+		}
+	}
+
+	public void renderEquippedArmors(Player player) {
+		if (player.character is not MegamanX mmx) return;
+
+		for (int i = 0; i < 4; i++) {
+			float xStartPos = 34;
+			float[] xPos = [xStartPos + 0, xStartPos + 20, xStartPos + 40, xStartPos + 60];
+			float yPos = 50 + (i * 20);
+			float xSize = 16;
+			float ySize = 16;
+			Color color = new Color(0, 224, 0);
+
+			if (i == 3) {
+				//Golden Armor.
+				if (mmx.hyperHelmetActive) {
+					DrawWrappers.DrawRect(xPos[0], yPos, xPos[0] + xSize, yPos + ySize, false, color, 1,
+					ZIndex.HUD, false);
+				}
+				if (mmx.hyperChestActive) {
+					DrawWrappers.DrawRect(xPos[1], yPos, xPos[1] + xSize, yPos + ySize, false, color, 1,
+					ZIndex.HUD, false);
+				}
+				if (mmx.hyperArmActive) {
+					DrawWrappers.DrawRect(xPos[2], yPos, xPos[2] + xSize, yPos + ySize, false, color, 1,
+					ZIndex.HUD, false);
+				}
+				if (mmx.hyperLegActive) {
+					DrawWrappers.DrawRect(xPos[3], yPos, xPos[3] + xSize, yPos + ySize, false, color, 1,
+					ZIndex.HUD, false);
+				}
+			} else if (!mmx.hasFullHyperMaxArmor) {
+				//Other armors.
+				if ((int)mmx.helmetArmor == i + 1) {
+					DrawWrappers.DrawRect(xPos[0], yPos, xPos[0] + xSize, yPos + ySize, false, color, 1,
+					ZIndex.HUD, false);
+				}
+				if ((int)mmx.chestArmor == i + 1) {
+					DrawWrappers.DrawRect(xPos[1], yPos, xPos[1] + xSize, yPos + ySize, false, color, 1,
+					ZIndex.HUD, false);
+				}
+				if ((int)mmx.armArmor == i + 1) {
+					DrawWrappers.DrawRect(xPos[2], yPos, xPos[2] + xSize, yPos + ySize, false, color, 1,
+					ZIndex.HUD, false);
+				}
+				if ((int)mmx.legArmor == i + 1) {
+					DrawWrappers.DrawRect(xPos[3], yPos, xPos[3] + xSize, yPos + ySize, false, color, 1,
+					ZIndex.HUD, false);
+				}
+			}
+		}
 	}
 
 	public void handleInput(Player? player, int ud, int lr) {
 		if (!menu.TryGetValue((ud, lr), out var skill)) return;
+		if (player?.character is MegamanX mmx && mmx.hasUltimateArmor) return;
 		if (Global.input.isPressedMenu(Control.MenuConfirm) && skill.canUnlock(player)) {
 			skill.unlock(player);
 			Global.playSound("ching");
@@ -1101,6 +1210,7 @@ public class UpgradeArmorMenuEX : IMainMenu {
 
 	public void update() {
 		if (mainP.character is MegamanX mmx && mmx != null) {
+
 			if (mmx.hasAnyHyperArmor && mmx.fullArmor != ArmorId.Max) {
 				mmx.hyperHelmetActive = false;
 				mmx.hyperChestActive = false;
@@ -1133,8 +1243,10 @@ public class UpgradeArmorMenuEX : IMainMenu {
 			snesArmorHandler.renderIcons(frame, icon, ghw, ghh, 1);
 			snesArmorHandler.renderCursor(snesUD, snesLR, cursor, ghw, ghh);
 			snesArmorHandler.renderDescription(mainP, snesUD, snesLR, ghw, ghh);
+			snesArmorHandler.renderNoPurchasedArmors(mainP);
+			snesArmorHandler.renderEquippedArmors(mainP);	
 		}
-		Fonts.drawText(FontType.Blue, "Metals: " + mainP.currency.ToString(), 294, 160, Alignment.Left);
+		Fonts.drawText(FontType.Blue, "Metals: " + mainP.currency.ToString(), 361, 160, Alignment.Right);
 	}
 	public void xGameV() {
 		if (Global.input.isPressedMenu(Control.WeaponLeft)) {
@@ -1220,6 +1332,10 @@ public class UpgradeArmorMenuEX : IMainMenu {
 		);
 	}
 	public void menuX() {
+		if (mainP.character is MegamanX { hasFullHyperMaxArmor: true }) {
+			Global.sprites["menu_xgolden"].drawToHUD(0, ghw, ghh, 0.5f);
+			return;
+		}
 		switch (mainP.helmetArmorNum) {
 			case 1: Global.sprites["menu_xhelmet"].drawToHUD(0, ghw, ghh, 0.5f); break;
 			case 2: Global.sprites["menu_xhelmet2"].drawToHUD(0, ghw, ghh, 0.5f); break;
