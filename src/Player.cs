@@ -1831,16 +1831,16 @@ public partial class Player {
 
 	[return: NotNullIfNotNull(nameof(oldChar))]
 	public Character? revertAtrans(Character? oldChar, Character? newChar, ushort? backupNetId = null) {
-		if (oldChar == null) {
-			return null;
-		}
-		if (newChar?.netId == null) {
+		if (oldChar?.netId == null) {
 			throw new Exception("Cannot use ATrans on objects without netID");
 		}
 		// Flag to enable vanilla A-Trans behaviour.
 		bool oldATrans = Global.level.server?.customMatchSettings?.oldATrans == true;
 
 		if (ownedByLocalPlayer) {
+			if (newChar?.netId == null) {
+				throw new Exception("Error: Null newChar.netId on atrans tranform.");
+			}
 			string json = JsonConvert.SerializeObject(
 				new RPCAxlDisguiseJson(id, "", -1, loadout, newChar.netId.Value)
 			);
@@ -1866,11 +1866,12 @@ public partial class Player {
 				throw new Exception("Error: Missing NetID on Axl trasform RPC.");
 			}
 			newChar = new Axl(
-				this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir, true, backupNetId, ownedByLocalPlayer, false
+				this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir,
+				true, backupNetId, ownedByLocalPlayer, false
 			);
 		}
 		else if (newChar == null) {
-			throw new Exception("Error: Null newChar on atrans tranform..");
+			throw new Exception("Error: Null newChar on ATrans tranform.");
 		}
 		else {
 			Global.level.addGameObject(newChar);
@@ -1937,7 +1938,7 @@ public partial class Player {
 		if (character == null) {
 			return;
 		}
-		if (character.netId == null) {
+		if (character?.netId == null) {
 			throw new Exception("Cannot use ATrans on objects without netID");
 		}
 		if (ownedByLocalPlayer) {
