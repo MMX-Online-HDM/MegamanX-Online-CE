@@ -255,11 +255,7 @@ public class NecroBurstAttack : VileState {
 		if (!shot) {
 			shot = true;
 			shoot(vile);
-			if (vile.hasFrozenCastle) {
-				character.applyDamage(4, player, character, (int)WeaponIds.NecroBurst, (int)ProjIds.NecroBurst);			
-			} else {
-				character.applyDamage(6, player, character, (int)WeaponIds.NecroBurst, (int)ProjIds.NecroBurst);
-			}
+			character.applyDamage(8, player, character, (int)WeaponIds.NecroBurst, (int)ProjIds.NecroBurst);
 		}
 		if (character.sprite.isAnimOver()) {
 			character.changeToIdleOrFall();
