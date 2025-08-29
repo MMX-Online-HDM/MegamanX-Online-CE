@@ -55,7 +55,7 @@ public class BlizzardBuffalo : Maverick {
 	}
 
 	public override float getRunSpeed() {
-		return Physics.WalkSpeed;
+		return Physics.WalkSpeedSec * getRunDebuffs();
 	}
 
 	public override string getMaverickPrefix() {

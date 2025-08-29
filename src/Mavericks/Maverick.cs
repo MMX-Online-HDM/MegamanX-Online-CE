@@ -47,7 +47,7 @@ public class Maverick : Actor, IDamagable {
 	// HP stuff.
 	public float health;
 	public float maxHealth;
-	public bool alive;
+	public bool alive = true;
 	private float healAmount = 0;
 	public float healTime = 0;
 
@@ -143,6 +143,25 @@ public class Maverick : Actor, IDamagable {
 	}
 	public bool isAI => aiBehavior != MaverickAIBehavior.Control && !player.isAI;
 
+	public float ammoRechargeTime;
+	public float ammoDrainTime;
+
+	// DOT.
+	public float burnTime;
+	public float burnHurtCooldown;
+	public float burnEffectTime = 6;
+	public Damager? burnDamager;
+	public float acidTime;
+	public float acidHurtCooldown;
+	public Damager? acidDamager;
+
+	// Debuffs.
+	public float freezeSlowCooldown;
+	public float freezeSlowTime;
+	public float oilTime;
+	public float virusTime;
+	public float slowdownTime;
+
 	public bool maverickCanControl() {
 		if (this is StingChameleon sc && sc.isCloakTransition()) {
 			return false;
@@ -227,7 +246,6 @@ public class Maverick : Actor, IDamagable {
 		aiBehavior = player.currentMaverickCommand;
 	}
 
-	float ammoRechargeTime;
 	public void rechargeAmmo(float amountPerSecond) {
 		float ammoRechargeCooldown = 1 / amountPerSecond;
 		ammoRechargeTime -= Global.spf;
@@ -238,7 +256,7 @@ public class Maverick : Actor, IDamagable {
 		}
 	}
 
-	float ammoDrainTime;
+
 	public void drainAmmo(float amountPerSecond) {
 		float ammoDrainCooldown = 1 / amountPerSecond;
 		ammoDrainTime -= Global.spf;
@@ -269,17 +287,93 @@ public class Maverick : Actor, IDamagable {
 		if (ammo < 0) ammo = 0;
 	}
 
+	
+	public void debuffGfx() {
+		if (burnTime > 0) {
+			burnEffectTime += Global.speedMul;
+			if (burnEffectTime >= 6) {
+				burnEffectTime = 0;
+				Point burnPos = pos.addxy(0, -10);
+				new Anim(burnPos.addRand(5, 10), "burn_flame", 1, null, true, host: this);
+				if (burnTime > 2 * 60) {
+					new Anim(burnPos.addRand(5, 10), "burn_flame", 1, null, true, host: this);
+				}
+				if (burnTime > 4 * 60) {
+					new Anim(burnPos.addRand(5, 10), "burn_flame", 1, null, true, host: this);
+				}
+				if (burnTime > 6 * 60) {
+					new Anim(burnPos.addRand(5, 10), "burn_flame", 1, null, true, host: this);
+				}
+			}
+		}
+	}
+
+	public void debuffCooldowns() {
+		if (Global.level.mainPlayer.readyTextOver) {
+			Helpers.decrementTime(ref invulnTime);
+		}
+
+		if (acidTime > 0) {
+			acidTime -= Global.speedMul;
+			acidHurtCooldown += Global.speedMul;
+			if (acidHurtCooldown >= 60) {
+				acidHurtCooldown -= 60;
+				if (acidHurtCooldown <= 0) {
+					acidHurtCooldown = 0;
+				}
+				acidDamager?.applyDamage(
+					this, false, AcidBurst.netWeapon, this,
+					(int)ProjIds.AcidBurstPoison, overrideDamage: 1f
+				);
+				new Anim(
+					getCenterPos().addxy(Helpers.randomRange(-6, 6), -20),
+					"torpedo_smoke", 1, player.getNextActorNetId(), true, true
+				) {
+					vel = new Point(0, -50)
+				};
+			}
+			if (acidTime <= 0) {
+				acidTime = 0;
+				acidHurtCooldown = 0;
+			}
+		}
+		if (burnTime > 0) {
+			burnTime -= Global.speedMul;
+			burnHurtCooldown += Global.speedMul;
+			if (burnHurtCooldown >= 60) {
+				burnHurtCooldown -= 60;
+				if (burnHurtCooldown <= 0) {
+					burnHurtCooldown = 0;
+				}
+				burnDamager?.applyDamage(
+					this, false, FireWave.netWeapon, this, (int)ProjIds.Burn, overrideDamage: 1f
+				);
+			}
+			if (burnTime <= 0) {
+				burnTime = 0;
+				burnHurtCooldown = 0;
+				burnEffectTime = 0;
+			}
+		}
+		freezeSlowCooldown += speedMul;
+		if (freezeSlowCooldown > 12) {
+			freezeSlowCooldown = 0;
+			freezeSlowTime = Helpers.clampMin0(freezeSlowTime - 1);
+		}
+		Helpers.decrementFrames(ref weaknessCooldown);
+		Helpers.decrementFrames(ref virusTime);
+		Helpers.decrementFrames(ref oilTime);
+	}
+
 	public override void preUpdate() {
 		base.preUpdate();
 		updateProjectileCooldown();
-
+		debuffGfx();
 		if (!ownedByLocalPlayer) {
 			return;
 		}
-
-		Helpers.decrementTime(ref invulnTime);
-		Helpers.decrementFrames(ref weaknessCooldown);
-
+		// Local only starts here.
+		debuffCooldowns();
 		foreach (var key in stateCooldowns.Keys) {
 			Helpers.decrementFrames(ref stateCooldowns[key].cooldown);
 		}
@@ -935,8 +1029,9 @@ public class Maverick : Actor, IDamagable {
 			addDamageTextHelper(owner, damage, maxHealth, true);
 		}
 
-		if (health <= 0 && ownedByLocalPlayer) {
+		if (health <= 0 && alive && ownedByLocalPlayer) {
 			health = 0;
+			alive = false;
 			if (state is not MDie) {
 				changeState(new MDie(damage == Damager.envKillDamage));
 				int? assisterProjId = null;
@@ -948,6 +1043,169 @@ public class Maverick : Actor, IDamagable {
 			}
 		}
 	}
+
+	public virtual bool isInvulnerable() {
+		return invulnTime > 0;
+	}
+
+	public virtual bool isDebuffImmune() {
+		return isStatusImmune() || isNonDamageStatusImmune();
+	}
+
+	public virtual bool isDotImmune() {
+		return isStatusImmune();
+	}
+
+	public virtual bool isSlowImmune() {
+		return isStatusImmune() || isNonDamageStatusImmune() || state.slowImmune;
+	}
+
+	public virtual bool isStunImmune() {
+		return (
+			isStatusImmune() || isInvulnerable() || isNonDamageStatusImmune() ||
+			state.invincible || state.stunResistant || controlMode != MaverickModeId.TagTeam
+		);
+	}
+
+	public virtual bool isFlinchImmune() {
+		return (
+			isStatusImmune() || isInvulnerable() || isNonDamageStatusImmune() ||
+			state.superArmor || state.invincible || controlMode != MaverickModeId.TagTeam
+		);
+	}
+
+	public virtual bool isPushImmune() {
+		return isTrueStatusImmune() || state.pushResistant || immuneToKnockback;
+	}
+
+	public virtual bool isTimeImmune() {
+		return isTrueStatusImmune();
+	}
+
+	public virtual bool isGrabImmune() {
+		return (
+			isStatusImmune() || isInvulnerable() || isNonDamageStatusImmune() ||
+			state.superArmor || state.invincible
+		);
+	}
+
+	public virtual bool isStatusImmune() {
+		return isTrueStatusImmune();
+	}
+
+	public virtual bool isNonDamageStatusImmune() {
+		return false;
+	}
+
+	public virtual bool isTrueStatusImmune() {
+		return !alive || isInvulnerable();
+	}
+
+	public void addFreezeSlow(float time) {
+		if (!ownedByLocalPlayer || isSlowImmune()) {
+			return;
+		}
+		freezeSlowCooldown = 0;
+		freezeSlowTime += time;
+		if (freezeSlowTime >= 4 * 60) {
+			freezeSlowTime = 4 * 60;
+		}
+	}
+
+	public void addBurnDot(Player? attacker, float time) {
+		if (!ownedByLocalPlayer || isDotImmune()) {
+			return;
+		}
+		// If attacker is null use the same, else use self.
+		Player newAttacker = attacker ?? burnDamager?.owner ?? player;
+		if (burnDamager == null) {
+			burnDamager = new Damager(newAttacker, 0, 0, 0);
+		} else {
+			burnDamager.owner = newAttacker;
+		}
+		// Reset timer if it's 0.
+		if (burnTime == 0) {
+			burnHurtCooldown = 0;
+		}
+		// Apply time if we do not go over 8.
+		if (burnTime + time <= 8 * 60) {
+			burnTime += time;
+		}
+		// Oil explosion.
+		if (oilTime > 0) {
+			playSound("flamemOilBurn", sendRpc: true);
+			burnDamager.applyDamage(
+				this, false, weapon, this, (int)ProjIds.Burn,
+				overrideDamage: 2, overrideFlinch: Global.defFlinch
+			);
+			// Apply burn damage instantly.
+			burnTime += oilTime;
+			oilTime = 0;
+			burnHurtCooldown = 0;
+			// Double check again in case oil increased over 8.
+			if (burnTime >= 8 * 60) {
+				burnTime = 8 * 60;
+			}
+		}
+	}
+
+	public void addAcidDot(Player? attacker, float time) {
+		if (!ownedByLocalPlayer || isDotImmune()) {
+			return;
+		}
+		// If attacker is null use the same, else use self.
+		Player newAttacker = attacker ?? burnDamager?.owner ?? player;
+		if (acidDamager == null) {
+			acidDamager = new Damager(newAttacker, 0, 0, 0);
+		} else {
+			acidDamager.owner = newAttacker;
+		}
+		// Reset timer if it's 0.
+		if (acidTime == 0) {
+			acidHurtCooldown = 0;
+		}
+		// Apply time if we do not go over 8.
+		if (acidTime + time <= 8 * 60) {
+			acidTime += time;
+		}
+	}
+
+	public void addOilTime(Player? attacker, float time) {
+		if (!ownedByLocalPlayer || isDebuffImmune()) {
+			return;
+		}
+		// Apply time and limit to 4.
+		oilTime += time;
+		if (oilTime >= 4 * 60) {
+			oilTime = 4 * 60;
+		}
+		// Activate burn if burning.
+		if (burnTime > 0) {
+			addBurnDot(attacker,  120);
+			return;
+		}
+	}
+
+	public void addVirusTime(Player attacker, float time) {
+		if (!ownedByLocalPlayer || isTimeImmune()) {
+			return;
+		}
+		virusTime += time;
+		if (virusTime > 8 * 60) {
+			virusTime = 8 * 60;
+		}
+	}
+
+	public void addSlowdownTime(float time) {
+		if (!ownedByLocalPlayer || isSlowImmune()) {
+			return;
+		}
+		slowdownTime += time;
+		if (slowdownTime > 4 * 60) {
+			slowdownTime = 4 * 60;
+		}
+	}
+
 
 	public void creditMaverickKill(Player killer, Player assister, int? weaponIndex) {
 		if (killer != null && killer != player) {
@@ -974,7 +1232,10 @@ public class Maverick : Actor, IDamagable {
 		}
 
 		int maverickKillFeedIndex = getMaverickKillFeedIndex();
-		Global.level.gameMode.addKillFeedEntry(new KillFeedEntry(killer, assister, player, weaponIndex, maverickKillFeedIndex: maverickKillFeedIndex));
+		Global.level.gameMode.addKillFeedEntry(
+			new KillFeedEntry(killer, assister, player, weaponIndex,
+			maverickKillFeedIndex: maverickKillFeedIndex)
+		);
 
 		if (ownedByLocalPlayer) {
 			RPC.creditPlayerKillMaverick.sendRpc(killer, assister, this, weaponIndex);
@@ -1198,11 +1459,24 @@ public class Maverick : Actor, IDamagable {
 	}
 
 	public virtual float getDashSpeed() {
-		return dashSpeed;
+		return dashSpeed * getRunDebuffs();
 	}
 
 	public virtual float getRunSpeed() {
-		return 100;
+		return 100 * getRunDebuffs();
+	}
+
+	public float getRunDebuffs() {
+		if (isSlowImmune()) {
+			return 1;
+		}
+		float runSpeed = 1;
+		if (slowdownTime > 0) runSpeed *= 0.5f;
+		if (freezeSlowTime >= 180) runSpeed *= 0.25f;
+		else if (freezeSlowTime >= 120) runSpeed *= 0.75f;
+		else if (freezeSlowTime >= 60) runSpeed *= 0.5f;
+
+		return runSpeed;
 	}
 
 	public virtual float getJumpPower() {
@@ -1372,7 +1646,27 @@ public class Maverick : Actor, IDamagable {
 				return [Player.darkHoldShader];
 			}
 		}
-		return null;
+		List<ShaderWrapper> shaders = [];
+		if (acidTime > 0 && player.acidShader != null) {
+			player.acidShader.SetUniform("acidFactor", 0.25f + (acidTime / 8f) * 0.75f);
+			shaders.Add(player.acidShader);
+		}
+		if (oilTime > 0 && player.oilShader != null) {
+			player.oilShader.SetUniform("oilFactor", 0.25f + (oilTime / 8f) * 0.75f);
+			shaders.Add(player.oilShader);
+		}
+		if (slowdownTime > 0 && player.frozenCastleShader != null) {
+			shaders.Add(player.frozenCastleShader);
+		}
+		if (freezeSlowTime > 0 && !sprite.name.Contains("frozen") && player.igShader != null) {
+			player.mvIgShader.SetUniform("igFreezeProgress", freezeSlowTime / 4);
+			shaders.Add(player.igShader);
+		}
+		if (virusTime > 0 && player.mvInfectedShader != null) {
+			player.mvInfectedShader.SetUniform("infectedFactor", virusTime / 8f);
+			shaders.Add(player.mvInfectedShader);
+		}
+		return shaders;
 	}
 
 	public const int CustomNetDataLength = 3;

@@ -422,7 +422,7 @@ public partial class Level {
 				Wall wall = new Wall(instanceName, points);
 
 				float moveX = instance?.properties?.moveX ?? 0;
-				wall.moveX = moveX;
+				wall.moveX = moveX / 60f;
 
 				if (instance?.properties?.slippery != null && instance.properties.slippery == true) {
 					wall.slippery = true;

@@ -104,7 +104,7 @@ public class BoomerangKuwanger : Maverick {
 	}
 
 	public override float getRunSpeed() {
-		return 175;
+		return 175 * getRunDebuffs();
 	}
 
 	public override string getMaverickPrefix() {

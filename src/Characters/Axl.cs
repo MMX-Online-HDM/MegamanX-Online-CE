@@ -1746,7 +1746,7 @@ public class Axl : Character {
 	}
 
 	public override float getRunSpeed() {
-		float runSpeed = 90;
+		float runSpeed = Physics.WalkSpeed;
 		if (shootTime > 0) {
 			runSpeed = 90 - getAimBackwardsAmount() * 25;
 		}
@@ -1754,12 +1754,12 @@ public class Axl : Character {
 	}
 
 	public override float getDashSpeed() {
-		float dashSpeed = 3.45f * 60f;;
+		float dashSpeed = 3.45f;
 		if (axlWeapon != null && axlWeapon.isTwoHanded(false)) {
 			dashSpeed *= 0.875f;
 		}
 		if (shootTime > 0) {
-			dashSpeed = dashSpeed - getAimBackwardsAmount() * 50;
+			dashSpeed -= getAimBackwardsAmount() * 50;
 		}
 		return dashSpeed * getRunDebuffs();
 	}

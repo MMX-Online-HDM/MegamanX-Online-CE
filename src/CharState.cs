@@ -662,10 +662,10 @@ public class Run : CharState {
 
 	public override void update() {
 		base.update();
-		var move = new Point(0, 0);
+		Point move = new Point(0, 0);
 		float runSpeed = character.getRunSpeed();
 		if (stateFrames <= 4) {
-			runSpeed = 60 * character.getRunDebuffs();
+			runSpeed = 1 * character.getRunDebuffs();
 		}
 		if (player.input.isHeld(Control.Left, player)) {
 			character.xDir = -1;
@@ -675,7 +675,7 @@ public class Run : CharState {
 			if (character.canMove()) move.x = runSpeed;
 		}
 		if (move.magnitude > 0) {
-			character.move(move);
+			character.movePoint(move);
 		} else {
 			character.changeToIdleOrFall();
 		}
@@ -901,17 +901,17 @@ public class Dash : CharState {
 		}
 		// Dash regular speed.
 		if (dashTime >= 4 && !stop) {
-			character.move(new Point(character.getDashSpeed() * dashDir, 0));
+			character.moveXY(character.getDashSpeed() * dashDir, 0);
 		}
 		// End move.
 		else if (stop && inputXDir != 0) {
-			character.move(new Point(character.getRunSpeed() * inputXDir, 0));
+			character.moveXY(character.getRunSpeed() * inputXDir, 0);
 			character.changeState(character.getRunState(true), true);
 			return;
 		}
 		// Speed at start and end.
 		else if (!stop || dashHeld) {
-			character.move(new Point(Physics.DashStartSpeed * character.getRunDebuffs() * dashDir, 0));
+			character.moveXY(Physics.DashStartSpeed * character.getRunDebuffs() * dashDir, 0);
 		}
 		// Dust effect.
 		if (dustTime >= 6 && !character.isUnderwater()) {

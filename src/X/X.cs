@@ -616,17 +616,9 @@ public class MegamanX : Character {
 	// Movement related stuff.
 	public override float getRunSpeed() {
 		if (charState is XHover) {
-			return 2 * 60 * getRunDebuffs(); ;
+			return 2 * getRunDebuffs();
 		}
 		return base.getRunSpeed();
-	}
-
-	public override float getDashSpeed() {
-		if (flag != null || !isDashing) {
-			return getRunSpeed();
-		}
-		float dashSpeed = 3.5f * 60;
-		return dashSpeed * getRunDebuffs();
 	}
 
 	public override bool canAirDash() {

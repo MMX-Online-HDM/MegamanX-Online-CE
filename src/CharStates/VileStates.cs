@@ -268,7 +268,7 @@ public class VileHover : VileState {
 
 		float flyVelX = 0;
 		if (character.deltaPos.x != 0) {
-			flyVelX = character.xDir * character.getDashOrRunSpeed() * 0.5f;
+			flyVelX = character.xDir * character.getDashOrRunSpeed() * 0.5f * 60;
 		}
 
 		float flyVelY = 0;

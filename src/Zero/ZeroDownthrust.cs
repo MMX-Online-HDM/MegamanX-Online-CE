@@ -116,7 +116,7 @@ public class ZeroDownthrust : ZeroState {
 			int xDir = player.input.getXDir(player);
 			if (xDir != 0) {
 				character.xDir = xDir;
-				character.move(new Point(100 * xDir, 0));
+				character.moveXY(1.65f * xDir, 0);
 			}
 		}
 		if (character.grounded) {

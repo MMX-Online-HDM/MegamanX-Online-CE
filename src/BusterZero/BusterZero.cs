@@ -297,7 +297,7 @@ public class BusterZero : Character {
 	}
 
 	public override float getRunSpeed() {
-		float runSpeed = 90;
+		float runSpeed = Physics.WalkSpeed;
 		if (isBlackZero) {
 			runSpeed *= 1.15f;
 		}
@@ -305,7 +305,7 @@ public class BusterZero : Character {
 	}
 
 	public override float getDashSpeed() {
-		float dashSpeed = 3.45f * 60f;
+		float dashSpeed = 3.45f;
 		if (isBlackZero) {
 			dashSpeed *= 1.15f;
 		}

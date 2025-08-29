@@ -394,7 +394,9 @@ public partial class Player {
 	public ShaderWrapper acidShader = Helpers.cloneShaderSafe("acid");
 	public ShaderWrapper oilShader = Helpers.cloneShaderSafe("oil");
 	public ShaderWrapper igShader = Helpers.cloneShaderSafe("igIce");
+	public ShaderWrapper mvIgShader = Helpers.cloneShaderSafe("igIce");
 	public ShaderWrapper infectedShader = Helpers.cloneShaderSafe("infected");
+	public ShaderWrapper mvInfectedShader = Helpers.cloneShaderSafe("infected");
 	public ShaderWrapper frozenCastleShader = Helpers.cloneShaderSafe("frozenCastle");
 	public ShaderWrapper possessedShader = Helpers.cloneShaderSafe("possessed");
 	public ShaderWrapper vaccineShader = Helpers.cloneShaderSafe("vaccine");

@@ -317,11 +317,9 @@ public partial class Character : Actor, IDamagable {
 	public bool isVaccinated() { return vaccineTime > 0; }
 
 	public void addVirusTime(Player attacker, float time) {
-		if (!ownedByLocalPlayer) return;
-		if (isInvulnerable()) return;
-		if (isVaccinated()) return;
-		if (charState.invincible) return;
-
+		if (!ownedByLocalPlayer || isTimeImmune() || isVaccinated()) {
+			return;
+		}
 		//Damager damager = new Damager(attacker, 0, 0, 0);
 		virusTime += time;
 		if (virusTime > 8) virusTime = 8;
@@ -691,7 +689,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual float getDashSpeed() {
-		return (3.45f * 60f) * getRunDebuffs();
+		return 3.45f * getRunDebuffs();
 	}
 
 	public virtual float getDashOrRunSpeed() {
@@ -955,9 +953,6 @@ public partial class Character : Actor, IDamagable {
 				}
 				burnDamager?.applyDamage(this, false, burnWeapon, this, (int)ProjIds.Burn, overrideDamage: 1f);
 			}
-			if (isUnderwater()) {
-				burnTime = 0;
-			}
 			if (burnTime <= 0) {
 				removeBurn();
 			}
@@ -1198,8 +1193,8 @@ public partial class Character : Actor, IDamagable {
 		}
 
 		if (slideVel != 0) {
-			slideVel = Helpers.toZero(slideVel, Global.spf * 350, Math.Sign(slideVel));
-			move(new Point(slideVel, 0), true);
+			slideVel = Helpers.toZero(slideVel, speedMul * 0.1f, Math.Sign(slideVel));
+			moveXY(slideVel, 0);
 		}
 		base.update();
 
@@ -1487,7 +1482,7 @@ public partial class Character : Actor, IDamagable {
 			Point moveSpeed = new Point();
 			if (canMove()) { moveSpeed.x = getDashOrRunSpeed() * xDpadDir; }
 			if (canTurn()) { xDir = xDpadDir; }
-			if (moveSpeed.magnitude > 0) { move(moveSpeed); }
+			if (moveSpeed.x != 0) { movePoint(moveSpeed); }
 		}
 	}
 

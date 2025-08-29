@@ -52,6 +52,10 @@ public class MaverickState {
 	public bool canEnterSelf = true;
 	public bool useGravity = true;
 	public bool superArmor;
+	public bool invincible;
+	public bool stunResistant;
+	public bool pushResistant;
+	public bool slowImmune;
 	public float consecutiveWaitTime;
 	public bool stopMoving;
 	public bool exitOnAnimEnd;
@@ -672,7 +676,7 @@ public class MJumpStart : MaverickState {
 		int inputDir = input.getXDir(player);
 		if (inputDir != 0) {
 			maverick.xDir = inputDir;
-			maverick.move(new Point(Physics.WalkSpeed * inputDir, 0));
+			maverick.move(new Point(Physics.WalkSpeedSec * inputDir, 0));
 		}
 
 		if (maverick is BoomerangKuwanger ||

@@ -680,6 +680,7 @@ public class Damager {
 		}
 		// Maverick section
 		else if (victim is Maverick maverick) {
+			// Beast killer damage buff.
 			if (projId == (int)ProjIds.BeastKiller || projId == (int)ProjIds.AncientGun) {
 				damage *= 1.25f;
 			}
@@ -701,6 +702,90 @@ public class Damager {
 			}
 			if (weakness && damage < 1 && projId == (int)ProjIds.ParasiticBomb) {
 				damage = 1;
+			}
+			// Burn [to the ground] section.
+			switch ((ProjIds)projId) {
+				case ProjIds.FireWave:
+				case ProjIds.FlameRoundFlameProj:
+				case ProjIds.FlameBurner:
+				case ProjIds.QuakeBlazer:
+				case ProjIds.QuakeBlazerFlame:
+				case ProjIds.VelGFire:
+				case ProjIds.WildHorseKick:
+					maverick.addBurnDot(owner, 30);
+					break;
+				case ProjIds.SpeedBurner:
+				case ProjIds.SpeedBurnerCharged:
+				case ProjIds.FlameRoundWallProj:
+				case ProjIds.FlameRoundProj:
+				case ProjIds.CircleBlazeExplosion:
+				case ProjIds.FlameMFireball:
+				case ProjIds.FStagFireball:
+				case ProjIds.DrDopplerDash:
+				case ProjIds.Sigma3Fire:
+					maverick.addBurnDot(owner, 60);
+					break;
+				case ProjIds.FireWaveCharged:
+				case ProjIds.Ryuenjin:
+				case ProjIds.FlameBurnerHyper:
+				case ProjIds.FlameMOilFire:
+				case ProjIds.FStagDash:
+					maverick.addBurnDot(owner, 120);
+					break;
+				// Acid.
+				case ProjIds.AcidBurstSmall:
+					maverick.addAcidDot(owner, 1);
+					break;
+				case ProjIds.AcidBurst:
+				case ProjIds.TSeahorseAcid1:
+				case ProjIds.TSeahorseAcid2:
+				case ProjIds.TSeahorseAcid3:
+					maverick.addAcidDot(owner, 2);
+					break;
+				case ProjIds.AcidBurstCharged:
+					maverick.addAcidDot(owner, 3);
+					break;
+				// Freeze effects	
+				case ProjIds.IceGattling:
+				case ProjIds.SeaDragonRage:
+					maverick.addFreezeSlow(1 * 60);
+					break;
+				case ProjIds.HyorogaProj:
+					maverick.addFreezeSlow(1.5f * 60);
+					break;
+				case ProjIds.IceGattlingHeadshot:
+				case ProjIds.IceGattlingHyper:
+				case ProjIds.Hyouretsuzan2:
+				case ProjIds.VelGIce:
+					maverick.addFreezeSlow(2 * 60);
+					break;
+				case ProjIds.Hyouretsuzan:
+					maverick.addFreezeSlow(3 * 60);
+					break;
+				case ProjIds.BBuffaloBeam:
+				case ProjIds.ShotgunIceCharged:
+				case ProjIds.ChillPIceBlow:
+				case ProjIds.HyorogaSwing:
+					maverick.addFreezeSlow(4 * 60);
+					break;
+				// Oil.
+				case ProjIds.FlameMOil:
+					maverick.addOilTime(owner, 8 * 60);
+					maverick.playSound("flamemOil");
+					break;
+				// Virus.
+				case ProjIds.MagnaCTail:
+					maverick.addVirusTime(owner, 4 * 60);
+					break;
+				// Would-be stuns converted to slows.
+				case ProjIds.CrystalHunter:
+				case ProjIds.CSnailCrystalHunter:
+				case ProjIds.SpreadShot:
+				case ProjIds.ElectricShock:
+				case ProjIds.MK2StunShot:
+				case ProjIds.MorphMPowder:
+					maverick.addSlowdownTime(4);
+					break;
 			}
 			// Get flinch cooldown index.
 			bool isOnFlinchCooldown = false;

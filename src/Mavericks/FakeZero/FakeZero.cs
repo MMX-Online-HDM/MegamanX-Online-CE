@@ -141,10 +141,10 @@ public class FakeZero : Maverick {
 
 	public override float getRunSpeed() {
 		float retSpeed = baseSpeed + accSpeed;
-		if (retSpeed > Physics.WalkSpeed) {
-			return retSpeed;
+		if (retSpeed > Physics.WalkSpeedSec) {
+			return retSpeed * getRunDebuffs();
 		}
-		return Physics.WalkSpeed;
+		return Physics.WalkSpeedSec * getRunDebuffs();
 	}
 
 	public override string getMaverickPrefix() {

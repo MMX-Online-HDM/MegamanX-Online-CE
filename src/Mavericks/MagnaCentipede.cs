@@ -127,7 +127,7 @@ public class MagnaCentipede : Maverick {
 	}
 
 	public override float getRunSpeed() {
-		return 200;
+		return 200 * getRunDebuffs();
 	}
 
 	public override string getMaverickPrefix() {

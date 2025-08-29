@@ -818,12 +818,10 @@ public class Vile : Character {
 	}
 
 	public override float getDashSpeed() {
-		float dashSpeed = 3.45f * 60f;
-
+		float dashSpeed = 3.45f;
 		if (hasSpeedDevil) {
 			dashSpeed *= 1.1f;
 		}
-	
 		return dashSpeed * getRunDebuffs();
 	}
 

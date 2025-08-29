@@ -145,7 +145,7 @@ public class PZeroSpinKick : PZeroGenericMeleeState {
 			character.changeToIdleOrFall();
 			return;
 		}
-		character.move(new Point(character.getDashSpeed() * character.xDir, 0));
+		character.moveXY(character.getDashSpeed() * character.xDir, 0);
 	}
 
 	public override void onEnter(CharState oldState) {

@@ -656,10 +656,7 @@ public class Zero : Character {
 	}
 
 	public override float getDashSpeed() {
-		if (flag != null || !isDashing) {
-			return getRunSpeed();
-		}
-		float dashSpeed = 210;
+		float dashSpeed = 3.45f;
 		if (isBlack) {
 			dashSpeed *= 1.15f;
 		}

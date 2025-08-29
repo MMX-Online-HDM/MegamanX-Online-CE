@@ -102,7 +102,7 @@ public class CrystalSnail : Maverick {
 	}
 
 	public override float getRunSpeed() {
-		return noShell ? 100 : 75;
+		return (noShell ? 100 : 75) * getRunDebuffs();
 	}
 
 	public override MaverickState[] strikerStates() {
