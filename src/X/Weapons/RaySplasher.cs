@@ -45,7 +45,7 @@ public class RaySplasher : Weapon {
 					//Stop when invincible
 					if (mmx.charState.invincible) return;
 					if (mmx.invulnTime > 0) return;
-
+					if (!mmx.charState.attackCtrl) return;
 					if (mmx.raySplasherCooldown >= 4) {
 						addAmmo(-0.15f, mmx.player);
 						mmx.raySplasherCooldown = 1;
