@@ -865,23 +865,24 @@ public class AnimData {
 				durationFrames,
 				new Point(offsetX, offsetY)
 			);
-
-			int encodeKey = (sprWidth * 397) ^ sprHeight;
-			if (Global.isLoading) {
-				if (!Global.renderTextureQueueKeys.Contains(encodeKey)) {
-					lock (Global.renderTextureQueueKeys) {
-						Global.renderTextureQueueKeys.Add(encodeKey);
+			// Rendertexture creation.
+			if (!Options.main.fastShaders && !Options.main.disableShaders) {
+				int encodeKey = (sprWidth * 397) ^ sprHeight;
+				if (Global.isLoading) {
+					if (!Global.renderTextureQueueKeys.Contains(encodeKey)) {
+						lock (Global.renderTextureQueueKeys) {
+							Global.renderTextureQueueKeys.Add(encodeKey);
+						}
+						lock (Global.renderTextureQueue) {
+							Global.renderTextureQueue.Add(((uint)sprWidth, (uint)sprHeight));
+						}
 					}
-					lock (Global.renderTextureQueue) {
-						Global.renderTextureQueue.Add(((uint)sprWidth, (uint)sprHeight));
-					}
+				} else if (!Global.renderTextures.ContainsKey(encodeKey)) {
+					Global.renderTextures[encodeKey] = (
+						new RenderTexture((uint)sprWidth, (uint)sprHeight),
+						new RenderTexture((uint)sprWidth, (uint)sprHeight)
+					);
 				}
-			}
-			else if (!Global.renderTextures.ContainsKey(encodeKey)) {
-				Global.renderTextures[encodeKey] = (
-					new RenderTexture((uint)sprWidth, (uint)sprHeight),
-					new RenderTexture((uint)sprWidth, (uint)sprHeight)
-				);
 			}
 			if (frameJson["POIs"] != null) {
 				List<Point> framePOIs = new();
