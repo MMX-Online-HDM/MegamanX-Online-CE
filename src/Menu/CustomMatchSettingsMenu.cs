@@ -36,7 +36,7 @@ public class CustomMatchSettings {
 	[ProtoMember(27)] public bool oldATrans;
 	[ProtoMember(28)] public bool flinchairDashReset;
 	[ProtoMember(29)] public bool ComboFlinch;
-
+	[ProtoMember(30)] public bool quakeBlazerDownwards;
 
 	public CustomMatchSettings() {
 	}
@@ -74,6 +74,7 @@ public class CustomMatchSettings {
 			oldATrans = false,
 			flinchairDashReset = false,
 			ComboFlinch = true,
+			quakeBlazerDownwards = false,
 		};
 	}
 }
@@ -605,6 +606,22 @@ public class CustomMatchSettingsMenu : IMainMenu {
 						"Flinch stack: " +
 						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.ComboFlinch),
 						pos.x, pos.y, selected: selectArrowPosY3 == 7
+					);
+				}
+			)
+		);
+		menuOptions3.Add(
+			new MenuOption(
+				startX3, currentY3 += lineH3,
+				() => {
+					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.quakeBlazerDownwards, true);
+				},
+				(Point pos, int index) => {
+					Fonts.drawText(
+						FontType.Purple,
+						"Quake Blazer knocks downwards: " +
+						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.quakeBlazerDownwards),
+						pos.x, pos.y, selected: selectArrowPosY3 == 8
 					);
 				}
 			)

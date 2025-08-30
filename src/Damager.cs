@@ -390,6 +390,9 @@ public class Damager {
 					character.addBurnTime(owner, new FlameBurner(0), 2);
 					break;
 				case (int)ProjIds.QuakeBlazer:
+					if (!character.grounded && Global.customSettings?.quakeBlazerDownwards == true) {
+						character.vel.y += character.getJumpPower();
+					}
 					character.addBurnTime(owner, DanchienWeapon.staticWeapon, 0.5f);
 					break;
 				case (int)ProjIds.QuakeBlazerFlame:
@@ -488,7 +491,7 @@ public class Damager {
 						spiked = true;
 					break;
 				case (int)ProjIds.AirBlastProj:
-					character.vel.y = -character.getJumpPower()/2;
+					character.vel.y -= character.getJumpPower()/2;
 					break;
 				case (int)ProjIds.FlameMOil:
 					character.addOilTime(owner, 8);
