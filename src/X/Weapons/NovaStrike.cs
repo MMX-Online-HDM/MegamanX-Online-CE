@@ -65,7 +65,7 @@ public class NovaStrikeState : CharState {
 	int leftOrRight;
 	Anim? Nova;
 	public NovaStrikeState(Point inputDir) : base("nova_strike") {
-		immuneToWind = true;
+		pushImmune = true;
 		invincible = true;
 		normalCtrl = false;
 		attackCtrl = false;
@@ -137,7 +137,7 @@ public class NovaStrikeState : CharState {
 
 public class NovaStrikeStateEX : CharState {
 	public NovaStrikeStateEX() : base("nova_strike") {
-		immuneToWind = true;
+		pushImmune = true;
 		invincible = true;
 		useDashJumpSpeed = true;
 	}
@@ -175,7 +175,7 @@ public class NovaStrikeStateEX : CharState {
 }
 public class NovaStrikeStateUpEX : CharState {
 	public NovaStrikeStateUpEX() : base("nova_strike_up") {
-		immuneToWind = true;
+		pushImmune = true;
 		invincible = true;
 		useDashJumpSpeed = true;
 	}
@@ -212,7 +212,7 @@ public class NovaStrikeStateUpEX : CharState {
 }
 public class NovaStrikeStateDownEX : CharState {
 	public NovaStrikeStateDownEX() : base("nova_strike_down") {
-		immuneToWind = true;
+		pushImmune = true;
 		invincible = true;
 		useDashJumpSpeed = true;
 	}

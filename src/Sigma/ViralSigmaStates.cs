@@ -24,7 +24,7 @@ public class ViralSigmaIdle : CharState {
 	public ViralSigma sigma;
 
 	public ViralSigmaIdle() : base("viral_idle") {
-		immuneToWind = true;
+		pushImmune = true;
 	}
 
 	public override void update() {
@@ -80,7 +80,7 @@ public class ViralSigmaTaunt : CharState {
 	float lastFrameTime;
 	bool isWin;
 	public ViralSigmaTaunt(bool isWin) : base("viral_taunt") {
-		immuneToWind = true;
+		pushImmune = true;
 		this.isWin = isWin;
 	}
 
@@ -104,7 +104,7 @@ public class ViralSigmaPossessStart : CharState {
 	public ViralSigma sigma;
 
 	public ViralSigmaPossessStart(Character target) : base("viral_possess") {
-		immuneToWind = true;
+		pushImmune = true;
 		this.target = target;
 	}
 
@@ -145,7 +145,7 @@ public class ViralSigmaPossess : CharState {
 	public ViralSigma sigma;
 
 	public ViralSigmaPossess(Character target) : base("viral_exit") {
-		immuneToWind = true;
+		pushImmune = true;
 		this.target = target;
 	}
 
@@ -197,7 +197,7 @@ public class ViralSigmaShoot : CharState {
 	ViralSigmaShootProj proj;
 
 	public ViralSigmaShoot(float xDir) : base("viral_spit") {
-		immuneToWind = true;
+		pushImmune = true;
 		this.xDir = MathF.Sign(xDir);
 		if (this.xDir == 0) this.xDir = 1;
 	}
@@ -283,7 +283,7 @@ public class ViralSigmaTackle : CharState {
 	public ViralSigma sigma;
 
 	public ViralSigmaTackle(Point tackleDir) : base("viral_tackle") {
-		immuneToWind = true;
+		pushImmune = true;
 		this.tackleDir = tackleDir;
 	}
 
@@ -321,7 +321,7 @@ public class ViralSigmaBeamState : CharState {
 	public ViralSigma sigma;
 
 	public ViralSigmaBeamState() : base("viral_shoot") {
-		immuneToWind = true;
+		pushImmune = true;
 	}
 
 	public override void update() {

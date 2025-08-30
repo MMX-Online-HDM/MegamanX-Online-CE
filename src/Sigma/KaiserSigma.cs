@@ -46,7 +46,7 @@ public partial class KaiserSigma : Character {
 		) {
 			visible = false
 		};
-		maxHealth = (decimal)Player.getModifiedHealth(32);
+		maxHealth = getMaxHealth();
 		if (!ownedByLocalPlayer || isRevive) {
 			health = maxHealth;
 		}
@@ -72,7 +72,7 @@ public partial class KaiserSigma : Character {
 		if (isATrans) {
 			return base.getMaxHealth();
 		}
-		return Player.getModifiedHealth(32);
+		return MathInt.Ceiling(Player.getModifiedHealth(32) * Player.getHpMod());
 	}
 
 	public override void update() {

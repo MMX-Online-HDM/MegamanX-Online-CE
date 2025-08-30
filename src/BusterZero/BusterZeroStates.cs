@@ -306,6 +306,7 @@ public class HyperBusterZeroStart : BusterZeroState {
 
 	public HyperBusterZeroStart() : base("hyper_start") {
 		invincible = true;
+		statusEffectImmune = true;
 	}
 
 	public override void update() {
@@ -330,6 +331,7 @@ public class HyperBusterZeroStart : BusterZeroState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		character.clenaseAllDebuffs();
 		character.useGravity = false;
 		character.vel = new Point();
 		LightX3 = new Anim(

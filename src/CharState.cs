@@ -36,9 +36,11 @@ public class CharState {
 	public bool useGravity = true;
 
 	public bool invincible;
-	public bool stunResistant;
+	public bool stunImmune;
 	public bool superArmor;
-	public bool immuneToWind;
+	public bool pushImmune;
+	public bool slowImmune;
+	public bool statusEffectImmune;
 	public int accuracy;
 	public bool isGrabbedState;
 
@@ -368,6 +370,7 @@ public class WarpIn : CharState {
 		this.addInvulnFrames = addInvulnFrames;
 		this.refillHP = refillHP;
 		invincible = true;
+		statusEffectImmune = true;
 	}
 
 	public override void update() {
@@ -471,6 +474,9 @@ public class WarpIn : CharState {
 		if (player.warpedInOnce || Global.debug) {
 			sigmaRounds = 10;
 		}
+		if (refillHP && character.ownedByLocalPlayer && !player.warpedInOnce) {
+			character.health = 0;
+		}
 	}
 
 	public override void onExit(CharState? newState) {
@@ -484,9 +490,6 @@ public class WarpIn : CharState {
 		if (addInvulnFrames && character.ownedByLocalPlayer) {
 			character.invulnTime = (player.warpedInOnce || Global.level.joinedLate) ? 2 : 0;
 		}
-		if (refillHP && character.ownedByLocalPlayer && newState is not WarpIdle) {
-			character.spawnHealthToAdd = MathInt.Ceiling(character.maxHealth);
-		}
 		player.warpedInOnce = true;
 	}
 }
@@ -498,8 +501,9 @@ public class WarpIdle : CharState {
 	float healTime = -4;
 
 	public WarpIdle(bool firstSpawn = false) : base("win") {
-		invincible = true;
 		this.firstSpawn = firstSpawn;
+		invincible = true;
+		statusEffectImmune = true;
 	}
 
 	public override void update() {
@@ -520,7 +524,11 @@ public class WarpIdle : CharState {
 		}
 		// Health.
 		if (character.health < character.maxHealth) {
-			character.health = Helpers.clampMax(character.health + 1, character.maxHealth);
+			decimal hpMod = Player.getHpDMod();
+			if (hpMod < 1) { hpMod = 1; }
+			character.health = Helpers.clampMax(
+				character.health + hpMod, character.maxHealth
+			);
 		} else {
 			fullHP = true;
 		}
@@ -737,8 +745,8 @@ public class SwordBlock : CharState {
 		exitOnAirborne = true;
 		attackCtrl = true;
 		normalCtrl = true;
-		stunResistant = true;
-		immuneToWind = true;
+		stunImmune = true;
+		pushImmune = true;
 	}
 
 	public override void update() {
@@ -1244,7 +1252,7 @@ public class LadderClimb : CharState {
 		this.snapX = MathF.Round(snapX);
 		this.incY = incY;
 		attackCtrl = true;
-		immuneToWind = true;
+		pushImmune = true;
 	}
 
 	public override void onEnter(CharState oldState) {

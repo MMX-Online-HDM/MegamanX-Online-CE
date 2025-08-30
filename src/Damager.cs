@@ -559,7 +559,7 @@ public class Damager {
 				damage = MathF.Ceiling(damage * 1.5f);
 			}
 			// Disallow flinch stack for non-BZ.
-			else if (flinch > 0 && Global.customSettings?.ComboFlinch == false) {
+			else if (flinch > 0 && Global.customSettings?.comboFlinch == false) {
 				int fkey = owner.id;
 				float fmod = 8;
 				if (!character.globalFlinchCooldown.ContainsKey(fkey)) {
@@ -1175,9 +1175,6 @@ public class Damager {
 		if (projId == null) {
 			return false;
 		}
-		if (Global.level.server?.customMatchSettings?.assistable == false) {
-			return false;		
-		}
 		// Never assist in any mode as they are DOT or self-damage. (Also Volt Tornado)
 		bool alwaysNotAssist = (ProjIds)projId switch {
 			// DOT stuff.
@@ -1201,6 +1198,10 @@ public class Damager {
 		// The GM19 list now only counts for FFA mode.
 		if (Global.level.gameMode is not FFADeathMatch) {
 			return false;
+		}
+		// Can also be overdrive by custom setting.
+		if (Global.level.server?.customMatchSettings?.assistBanlist == false) {
+			return false;		
 		}
 		return (ProjIds)projId switch {
 			ProjIds.Tornado => true,

@@ -53,8 +53,8 @@ public class MaverickState {
 	public bool useGravity = true;
 	public bool superArmor;
 	public bool invincible;
-	public bool stunResistant;
-	public bool pushResistant;
+	public bool stunImmune;
+	public bool pushImmune;
 	public bool slowImmune;
 	public float consecutiveWaitTime;
 	public bool stopMoving;
@@ -662,6 +662,7 @@ public class MJumpStart : MaverickState {
 	public float maxJumpFrames = 12;
 	public float additionalJumpPower;
 	public bool isChargeJump;
+	public bool skipCharge;
 
 	public MJumpStart(float additionalJumpPower = 1) : base("jump_start") {
 		this.additionalJumpPower = additionalJumpPower;
@@ -673,15 +674,16 @@ public class MJumpStart : MaverickState {
 
 	public override void update() {
 		base.update();
-		int inputDir = input.getXDir(player);
+		/*int inputDir = input.getXDir(player);
 		if (inputDir != 0) {
 			maverick.xDir = inputDir;
 			maverick.move(new Point(Physics.WalkSpeedSec * inputDir, 0));
-		}
+		}*/
 
-		if (maverick is BoomerangKuwanger ||
-			(maverick is OverdriveOstrich oo && oo.deltaPos.magnitude > 100 * Global.spf)
-		) {
+		if (!skipCharge && (
+			maverick is BoomerangKuwanger ||
+			(maverick is OverdriveOstrich oo && oo.moveDelta.magnitude > 100 * Global.spf)
+		)) {
 			maverick.vel.y = -maverick.getJumpPower() * maverick.getYMod() * (MathF.Abs(maverick.deltaPos.x / 10f) + 1);
 			maverick.changeState(new MJump());
 			return;
@@ -700,9 +702,9 @@ public class MJumpStart : MaverickState {
 			return;
 		}
 
-		if (!maverick.useChargeJump) {
+		if (!isChargeJump) {
 			if (stateFrame > 2) {
-				maverick.vel.y = -maverick.getJumpPower() * maverick.getYMod() * additionalJumpPower;;
+				maverick.vel.y = -maverick.getJumpPower() * maverick.getYMod() * additionalJumpPower;
 				maverick.changeState(new MJump());
 			}
 			return;
@@ -712,7 +714,7 @@ public class MJumpStart : MaverickState {
 		if (maverick.aiBehavior != MaverickAIBehavior.Control) {
 			jumpHeld = true;
 		}
-		if (!jumpHeld) {
+		if (!jumpHeld && !skipCharge) {
 			maverick.vel.y = -maverick.getJumpPower() * getJumpModifier() * maverick.getYMod() * additionalJumpPower;
 			maverick.changeState(new MJump());
 			return;
@@ -721,7 +723,7 @@ public class MJumpStart : MaverickState {
 			jumpFramesHeld += maverick.speedMul;
 			if (jumpFramesHeld > maxJumpFrames) { jumpFramesHeld = maxJumpFrames; }
 		}
-		if (maverick.isAnimOver() && stateFrame >= 10) {
+		if (maverick.isAnimOver() && stateFrame >= 10 || skipCharge && stateFrame > maxPreJumpFrames) {
 			maverick.vel.y = -maverick.getJumpPower() * getJumpModifier() * maverick.getYMod() * additionalJumpPower;
 			maverick.changeState(new MJump());
 		}
@@ -732,7 +734,7 @@ public class MJumpStart : MaverickState {
 			return 1;
 		}
 		float minHeight = 0.75f;
-		float maxHeight = 1.5f;
+		float maxHeight = 1.4f;
 
 		return minHeight + (maxHeight - minHeight) * (jumpFramesHeld / maxJumpFrames);
 	}
@@ -740,12 +742,69 @@ public class MJumpStart : MaverickState {
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 		isChargeJump = maverick.useChargeJump;
+		if (maverick.storedJumpCharge >= 8) {
+			isChargeJump = true;
+			skipCharge = true;
+			jumpFramesHeld = maverick.storedJumpCharge;
+		}
 	}
 
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
 		if (isChargeJump) {
-			maverick.dashSpeed = 1 + (jumpFramesHeld / maxJumpFrames);
+			maverick.dashSpeed = 1 + ((jumpFramesHeld / maxJumpFrames) * 0.75f);
+			newState.canStopJump = false;
+		}
+	}
+}
+
+public class MJumpCharge : MaverickState {
+	public bool soundPlayed;
+	public float jumpFramesHeld;
+	public float maxPreJumpFrames = 2;
+	public float maxJumpFrames = 24;
+
+	public MJumpCharge() : base("jump_start") {
+		normalCtrl = true;
+		attackCtrl = true;
+		aiAttackCtrl = true;
+		canBeCanceled = false;
+	}
+
+	public override void update() {
+		base.update();
+		bool jumpHeld = player.input.isHeld(Control.Down, player);
+		if (!jumpHeld) {
+			maverick.changeToIdleOrFall();
+			return;
+		}
+		else if (stateFrame > maxPreJumpFrames) {
+			jumpFramesHeld += maverick.speedMul;
+			if (jumpFramesHeld > maxJumpFrames) { jumpFramesHeld = maxJumpFrames; }
+		}
+		if (jumpFramesHeld >= maxJumpFrames) {
+			maverick.addRenderEffect(RenderEffectType.Hit, 2, 4);
+		}
+		if (!soundPlayed && jumpFramesHeld >= maxJumpFrames) {
+			soundPlayed = true;
+			maverick.playSound("chargeJumpSMB2");
+		}
+	}
+
+	public override void onEnter(MaverickState newState) {
+		base.onExit(newState);
+		if (maverick.storedJumpCharge >= 8) {
+			jumpFramesHeld = maverick.storedJumpCharge * 2;
+			if (jumpFramesHeld >= maxJumpFrames) {
+				soundPlayed = true;
+			}
+		}
+	}
+
+	public override void onExit(MaverickState newState) {
+		base.onExit(newState);
+		if (maverick.grounded && jumpFramesHeld >= 16) {
+			maverick.storedJumpCharge = MathF.Floor(jumpFramesHeld / 2f);
 		}
 	}
 }

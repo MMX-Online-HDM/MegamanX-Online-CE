@@ -253,8 +253,11 @@ public partial class Character : Actor, IDamagable {
 		CharState initialCharState;
 
 		if (ownedByLocalPlayer) {
-			if (isWarpIn) { initialCharState = new WarpIn(true, true); ; }
-			else { initialCharState = getIdleState(); }
+			if (isWarpIn) {
+				initialCharState = new WarpIn(true, true);
+			} else {
+				initialCharState = getIdleState();
+			}
 		} else {
 			initialCharState = new NetLimbo();
 			useGravity = false;
@@ -293,7 +296,7 @@ public partial class Character : Actor, IDamagable {
 		lastGravityWellDamager = player;
 		this.heartTanks = heartTanks ?? player.getHeartTanks((int)charId);
 		maxHealth = getMaxHealth();
-		if (!ownedByLocalPlayer || !isWarpIn) {
+		if (ownedByLocalPlayer && (!isWarpIn || player.warpedInOnce)) {
 			health = maxHealth;
 		}
 	}
@@ -1574,7 +1577,7 @@ public partial class Character : Actor, IDamagable {
 		return (
 			charState is not Die &&
 			!isStunImmune() &&
-			!charState.stunResistant &&
+			!charState.stunImmune &&
 			!charState.invincible &&
 			invulnTime == 0 &&
 			freezeInvulnTime <= 0 &&
@@ -1590,7 +1593,7 @@ public partial class Character : Actor, IDamagable {
 			isVaccinated() ||
 			isStatusImmune() ||
 			charState.invincible ||
-			charState.stunResistant ||
+			charState.stunImmune ||
 			(charState is Die or VileMK2Grabbed) ||
 			isStunImmune() ||
 		 	stunInvulnTime > 0
@@ -1610,7 +1613,7 @@ public partial class Character : Actor, IDamagable {
 			isVaccinated() ||
 			isStatusImmune() ||
 			charState.invincible ||
-			charState.stunResistant ||
+			charState.stunImmune ||
 			isCrystalized ||
 			(charState is Die) ||
 			isStunImmune() ||
@@ -1665,7 +1668,7 @@ public partial class Character : Actor, IDamagable {
 	public virtual bool isStunImmune() {
 		return (
 			isStatusImmune() || isInvulnerable() || isNonDamageStatusImmune() ||
-			charState.invincible || charState.stunResistant
+			charState.invincible || charState.stunImmune
 		);
 	}
 
@@ -1677,7 +1680,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool isPushImmune() {
-		return isTrueStatusImmune() || charState.immuneToWind == true || immuneToKnockback || isClimbingLadder();
+		return isTrueStatusImmune() || charState.pushImmune == true || immuneToKnockback || isClimbingLadder();
 	}
 
 	public virtual bool isTimeImmune() {
@@ -1702,6 +1705,27 @@ public partial class Character : Actor, IDamagable {
 
 	public virtual bool isToughGuyHyperMode() {
 		return false;
+	}
+
+	public virtual void clenaseDmgDebuffs() {
+		removeBurn();
+		removeAcid();
+		oilTime = 0;
+		parasiteTime = 0;
+		parasiteMashTime = 0;
+		parasiteDamager = null;
+	}
+
+	public virtual void clenaseAllDebuffs() {
+		removeBurn();
+		removeAcid();
+		oilTime = 0;
+		parasiteTime = 0;
+		parasiteMashTime = 0;
+		parasiteDamager = null;
+		igFreezeProgress = 0;
+		virusTime = 0;
+		slowdownTime = 0;
 	}
 
 	// If factorHyperMode = true, then invuln frames in a hyper mode won't count as "invulnerable".
@@ -2674,9 +2698,13 @@ public partial class Character : Actor, IDamagable {
 
 	public virtual int getMaxHealth() {
 		if (Global.level.is1v1()) {
-			return Player.getModifiedHealth(28);
+			return MathInt.Ceiling(Player.getModifiedHealth(28) * Player.getHpMod());
 		}
-		return Player.getModifiedHealth(baselineMaxHealth() + (heartTanks * Player.getHeartTankModifier()));
+		return MathInt.Ceiling(
+			(Player.getModifiedHealth(baselineMaxHealth()) +
+				heartTanks * Player.getHeartTankModifier()
+			) * Player.getHpMod()
+		);
 	}
 
 	public virtual bool canBeHealed(int healerAlliance) {
@@ -3616,8 +3644,8 @@ public partial class Character : Actor, IDamagable {
 			invulnTime > 0,
 			isDarkHoldState,
 			isStrikeChainState,
-			charState.immuneToWind,
-			charState.stunResistant,
+			charState.pushImmune,
+			charState.stunImmune,
 		]);
 
 		customData.Add(netHP);
@@ -3699,8 +3727,8 @@ public partial class Character : Actor, IDamagable {
 		invulnTime = boolData[2] ? 10 : 0;
 		isDarkHoldState = boolData[3];
 		isStrikeChainState = boolData[4];
-		charState.immuneToWind = boolData[5];
-		charState.stunResistant = boolData[6];
+		charState.pushImmune = boolData[5];
+		charState.stunImmune = boolData[6];
 
 		// Optional statuses.
 		bool[] boolMask = Helpers.byteToBoolArray(data[6]);

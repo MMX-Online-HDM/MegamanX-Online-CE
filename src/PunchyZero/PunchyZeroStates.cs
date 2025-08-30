@@ -453,6 +453,7 @@ public class HyperPunchyZeroStart : PZeroState {
 
 	public HyperPunchyZeroStart() : base("hyper_start") {
 		invincible = true;
+		statusEffectImmune = true;
 	}
 
 	public override void update() {
@@ -805,7 +806,9 @@ public class PunchyZeroRekkohaState : PunchyZeroGigaAttack {
 	public RekkohaEffect? effect;
 	public PunchyZeroRekkohaState(Weapon weapon) : base(weapon, "rekkoha") {
 		this.weapon = weapon;
-		immuneToWind = true;
+		pushImmune = true;
+		stunImmune = true;
+		slowImmune = true;
 	}
 
 	public override void update() {
@@ -842,6 +845,7 @@ public class PunchyZeroRekkohaState : PunchyZeroGigaAttack {
 	}
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		zero.clenaseDmgDebuffs();
 		if (player.isMainPlayer) {
 			effect = new RekkohaEffect();
 		}

@@ -123,7 +123,13 @@ public class FakeZero : Maverick {
 			return true;
 		}
 		if (grounded) {
-			if (input.isHeld(Control.Down, player) && state is not FakeZeroGuardState) {
+			bool holdGuard;
+			if (useChargeJump) {
+				holdGuard = input.isHeld(Control.Down, player);
+			} else {
+				holdGuard = input.isHeld(Control.Up, player);
+			}
+			if (holdGuard &&state is not FakeZeroGuardState) {
 				changeState(new FakeZeroGuardState());
 				return true;
 			}

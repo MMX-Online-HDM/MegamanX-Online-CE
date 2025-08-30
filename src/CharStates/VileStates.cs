@@ -70,6 +70,7 @@ public class VileRevive : VileState {
 
 	public VileRevive(bool isMK5) : base(isMK5 ? "revive_to5" : "revive") {
 		invincible = true;
+		statusEffectImmune = true;
 		this.isMK5 = isMK5;
 	}
 

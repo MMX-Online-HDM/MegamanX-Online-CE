@@ -73,6 +73,7 @@ public class Maverick : Actor, IDamagable {
 
 	// Movement.
 	public bool useChargeJump;
+	public float storedJumpCharge;
 	public bool canStomp;
 	public float dashSpeed = 1;
 	public bool canClimb;
@@ -135,7 +136,9 @@ public class Maverick : Actor, IDamagable {
 	private Input _input;
 	public Input input {
 		get {
-			if (aiBehavior == MaverickAIBehavior.Control && !isPuppeteerTooFar() && maverickCanControl()) {
+			if (aiBehavior == MaverickAIBehavior.Control &&
+				!isPuppeteerTooFar() && maverickCanControl()
+			) {
 				return player.input;
 			}
 			return _input;
@@ -207,14 +210,15 @@ public class Maverick : Actor, IDamagable {
 		int heightInt = (int)height;
 
 		if (ownedByLocalPlayer) {
-			// Sort mavericks by their height. Unless the maverick height is >= sigma height it should go above sigma
+			// Sort mavericks by their height.
+			// Unless the maverick height is >= sigma height
+			// it should go above sigma
 			zIndex = ZIndex.MainPlayer - (heightInt - (int)BaseSigma.sigmaHeight);
 			if (zIndex == ZIndex.MainPlayer) zIndex = ZIndex.Character - 100;
 		} else {
 			zIndex = ZIndex.Character - (heightInt - (int)BaseSigma.sigmaHeight);
 			if (zIndex == ZIndex.Character) zIndex = ZIndex.Character - 100;
 		}
-
 		useFrameProjs = true;
 		maxHealth = player.getMaverickMaxHp(controlMode);
 		health = maxHealth;
@@ -382,6 +386,15 @@ public class Maverick : Actor, IDamagable {
 		}
 
 		useChargeJump = controlMode == MaverickModeId.Puppeteer;
+
+		if (storedJumpCharge > 0) {
+			if (!grounded || state is MRun or BoomerKDashState || !state.normalCtrl) {
+				storedJumpCharge = 0;
+			}
+			if (storedJumpCharge >= 12 && state is not MJumpCharge) {
+				addRenderEffect(RenderEffectType.Hit, 2, 4);
+			}
+		}
 
 		// Striker auto-exit for some states.
 		if (maxStrikerTime != null) {
@@ -561,15 +574,25 @@ public class Maverick : Actor, IDamagable {
 						} else {
 							changeState(new StingCClimb());
 							move(new Point(0, 30), false);
-							player.character.stopCamUpdate = true;
+							if (ownerChar != null) {
+								ownerChar.stopCamUpdate = true;
+							}
 							changePos(new Point(snapX, pos.y));
 							if (player == Global.level.mainPlayer) {
 								Global.level.lerpCamTime = 0.25f;
 							}
+							return true;
 						}
 					}
 				}
 				checkLadderDown = false;
+			}
+			if (!useChargeJump &&
+				player.input.isHeld(Control.Down, player) &&
+				state is not MJumpCharge and not MJumpStart
+			) {
+				changeState(new MJumpCharge());
+				return true;
 			}
 			return false;
 		}
@@ -1063,7 +1086,7 @@ public class Maverick : Actor, IDamagable {
 	public virtual bool isStunImmune() {
 		return (
 			isStatusImmune() || isInvulnerable() || isNonDamageStatusImmune() ||
-			state.invincible || state.stunResistant || controlMode != MaverickModeId.TagTeam
+			state.invincible || state.stunImmune || controlMode != MaverickModeId.TagTeam
 		);
 	}
 
@@ -1075,7 +1098,7 @@ public class Maverick : Actor, IDamagable {
 	}
 
 	public virtual bool isPushImmune() {
-		return isTrueStatusImmune() || state.pushResistant || immuneToKnockback;
+		return isTrueStatusImmune() || state.pushImmune || immuneToKnockback;
 	}
 
 	public virtual bool isTimeImmune() {
