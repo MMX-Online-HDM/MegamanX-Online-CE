@@ -286,7 +286,7 @@ public partial class Actor {
 	}
 
 	public CollideData? sweepTest(Point offset) {
-		Point inc = offset.clone();
+		Point inc = offset;
 		var collideData = Global.level.checkTerrainCollisionOnce(this, inc.x, inc.y);
 		if (collideData != null) {
 			return collideData;

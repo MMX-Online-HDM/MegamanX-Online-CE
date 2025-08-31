@@ -613,17 +613,24 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool canPickupFlag() {
-		if (player.isPossessed()) return false;
-		if (dropFlagCooldown > 0) return false;
-		if (isInvulnerable()) return false;
-		if (isATrans && !disguiseCoverBlown) return false;
-		if (charState is Die || charState is VileRevive || charState is XReviveStart || charState is XRevive) return false;
-		if (isWarpOut()) return false;
-		if (Global.serverClient != null) {
-			if (Global.serverClient.isLagging() == true) return false;
-			if (player.serverPlayer.connection?.AverageRoundtripTime >= 1000) return false;
+		if (player.isPossessed() ||
+			dropFlagCooldown > 0 ||
+			isInvulnerable() ||
+			isATrans && !disguiseCoverBlown ||
+			charState is Die or VileRevive or XReviveStart or
+				XRevive or KaiserSigmaRevive or
+				WolfSigmaRevive or ViralSigmaRevive ||
+			isWarpOut()
+		) {
+			return false;
 		}
-		if (charState is KaiserSigmaRevive || charState is WolfSigmaRevive || charState is ViralSigmaRevive) return false;
+		if (Global.serverClient != null) {
+			if (Global.serverClient.isLagging() ||
+				player.serverPlayer.connection?.AverageRoundtripTime >= 1000
+			) {
+				return false;
+			}
+		}
 		return true;
 	}
 

@@ -7,7 +7,7 @@ namespace MMXOnline;
 public class Flag : Actor {
 	public int alliance = 0;
 	public Point pedestalPos;
-	public Character chr;
+	public Character? chr;
 	public float timeDropped = 0;
 	public bool pickedUpOnce;
 	public FlagPedestal pedestal;
@@ -101,7 +101,9 @@ public class Flag : Actor {
 			return Global.level.killY - 175;
 		}
 		var hitKillZones = Global.level.getTerrainTriggerList(this, new Point(0, 0), typeof(KillZone));
-		if (hitKillZones.Count > 0 && hitKillZones[0].otherCollider != null && hitKillZones[0].gameObject is KillZone kz && kz.killInvuln) {
+		if (hitKillZones.Count > 0 && hitKillZones[0].otherCollider != null &&
+			hitKillZones[0].gameObject is KillZone kz && kz.killInvuln
+		) {
 			return hitKillZones[0].otherCollider.shape.minY - 175;
 		}
 		return null;
@@ -123,14 +125,12 @@ public class Flag : Actor {
 
 	public override void onCollision(CollideData other) {
 		base.onCollision(other);
-		if (!ownedByLocalPlayer) return;
-		if (other.otherCollider?.flag == (int)HitboxFlag.Hitbox) return;
-		if (pickupCooldown > 0) return;
-
-		if (other.gameObject is not Character newChar) {
-			return;
-		}
-		if (chr != null && !canTakeFlag(newChar, chr)) {
+		if (!ownedByLocalPlayer ||
+			other.otherCollider?.flag == (int)HitboxFlag.Hitbox ||
+			pickupCooldown > 0 ||
+			other.gameObject is not Character newChar ||
+			chr != null && !canTakeFlag(newChar, chr)
+		) {
 			return;
 		}
 		if (newChar.player.alliance != alliance && newChar.canPickupFlag()) {
@@ -138,26 +138,27 @@ public class Flag : Actor {
 		}
 	}
 
-	public void pickupFlag(Character chr) {
+	public void pickupFlag(Character newChar) {
 		removeUpdraft();
-		chr.onFlagPickup(this);
+		newChar.onFlagPickup(this);
 		timeDropped = 0;
-		this.chr = chr;
+		chr = newChar;
 		useGravity = false;
 		pickedUpOnce = true;
 		Global.level.gameMode.addKillFeedEntry(
 			new KillFeedEntry(chr.player.name + " took flag", chr.player.alliance, chr.player), true
 		);
-
-		if (chr.ai != null && chr.ai.aiState is FindPlayer) {
-			(chr.ai.aiState as FindPlayer).setDestNodePos();
+		if (chr.ai?.aiState is FindPlayer fplayer) {
+			fplayer.setDestNodePos();
 		}
 	}
 
 	public void dropFlag() {
 		if (chr != null) {
 			removeUpdraft();
-			Global.level.gameMode.addKillFeedEntry(new KillFeedEntry(chr.player.name + " dropped flag", chr.player.alliance, chr.player), true);
+			Global.level.gameMode.addKillFeedEntry(
+				new KillFeedEntry(chr.player.name + " dropped flag", chr.player.alliance, chr.player), true
+			);
 			useGravity = true;
 			chr = null;
 		}
@@ -167,19 +168,23 @@ public class Flag : Actor {
 		removeUpdraft();
 		timeDropped = 0;
 		pickedUpOnce = false;
-		var team = alliance == GameMode.blueAlliance ? "Blue " : "Red ";
+		string team = alliance == GameMode.blueAlliance ? "Blue " : "Red ";
 		if (killFeedThrottleTime == 0) {
 			killFeedThrottleTime += Global.spf;
 			Global.level.gameMode.addKillFeedEntry(new KillFeedEntry(team + "flag returned", alliance), true);
 		}
 		useGravity = true;
-		if (chr != null) chr.flag = null;
+		if (chr != null) {
+			chr.flag = null;
+		}
 		chr = null;
-		pos = pedestalPos.clone();
+		pos = pedestalPos;
 	}
 
 	public UpdraftParticle getRandomParticle(float time) {
-		return new UpdraftParticle(new Point(pos.x + Helpers.randomRange(-20, 20), pos.y + Helpers.randomRange(50, 100)), time);
+		return new UpdraftParticle(
+			new Point(pos.x + Helpers.randomRange(-20, 20), pos.y + Helpers.randomRange(50, 100)), time
+		);
 	}
 
 	public bool hasUpdraft() {
@@ -201,7 +206,10 @@ public class Flag : Actor {
 				}
 				Point pos = particles[i].pos;
 				//DrawWrappers.DrawLine(pos.x, pos.y, pos.x, pos.y - 20, Color.White, 1, ZIndex.Foreground, true);
-				DrawWrappers.DrawCircle(pos.x, pos.y, 1, true, new Color(255, 255, 255, (byte)(255 * (particles[i].time / UpdraftParticle.maxTime))), 1, ZIndex.Foreground, true);
+				DrawWrappers.DrawCircle(
+					pos.x, pos.y, 1, true, new Color(255, 255, 255,
+					(byte)(255 * (particles[i].time / UpdraftParticle.maxTime))), 1, ZIndex.Foreground, true
+				);
 			}
 		}
 
@@ -245,7 +253,10 @@ public class Flag : Actor {
 			DrawWrappers.deferredTextDraws.Add(() => DrawWrappers.DrawCircle(
 				(-Global.level.camX + cx + Helpers.cosd(angCopy) * radius) / Global.viewSize,
 				(-Global.level.camY + cy + Helpers.sind(angCopy) * radius) / Global.viewSize,
-				(thickness - 0.5f) / Global.viewSize, true, alliance == GameMode.redAlliance ? Color.Red : Color.Blue, 1, ZIndex.HUD, isWorldPos: false));
+				(thickness - 0.5f) / Global.viewSize, true,
+				alliance == GameMode.redAlliance ? Color.Red : Color.Blue,
+				1, ZIndex.HUD, isWorldPos: false)
+			);
 			ang += (360f / count);
 		}
 	}
@@ -300,7 +311,11 @@ public class UpdraftParticle {
 
 public class FlagPedestal : Actor {
 	public int alliance = 0;
-	public FlagPedestal(int alliance, Point pos, ushort? netId, bool ownedByLocalPlayer) : base("flag_pedastal", pos, netId, ownedByLocalPlayer, false) {
+	public FlagPedestal(
+		int alliance, Point pos, ushort? netId, bool ownedByLocalPlayer
+	) : base(
+		"flag_pedastal", pos, netId, ownedByLocalPlayer, false
+	) {
 		this.alliance = alliance;
 		useGravity = false;
 		setzIndex(ZIndex.Character - 1);
@@ -327,7 +342,9 @@ public class FlagPedestal : Actor {
 			RPC.actorToggle.sendRpc(chr.netId, RPCActorToggleType.AwardCurrency);
 
 			var msg = chr.player.name + " scored";
-			Global.level.gameMode.addKillFeedEntry(new KillFeedEntry(msg, chr.player.alliance, chr.player), true);
+			Global.level.gameMode.addKillFeedEntry(
+				new KillFeedEntry(msg, chr.player.alliance, chr.player), true
+			);
 			var ctf = Global.level.gameMode as CTF;
 			if (Global.isHost) {
 				if (alliance != GameMode.neutralAlliance) {

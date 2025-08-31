@@ -112,11 +112,11 @@ public class ElectricSparkProj : Projectile {
             normal2.multiply(150 * 3);
 
 			new ElectricSparkProj(
-				pos.clone(), xDir, this , damager.owner, 1,
+				pos, xDir, this , damager.owner, 1,
 				Global.level.mainPlayer.getNextActorNetId(), ((int)normal2.x, (int)normal2.y), true
 			);
 			new ElectricSparkProj(
-				pos.clone(), xDir, this, damager.owner, 2,
+				pos, xDir, this, damager.owner, 2,
 				Global.level.mainPlayer.getNextActorNetId(), ((int)normal2.x * -1, (int)normal2.y * -1), rpc: true
 			);
 		}

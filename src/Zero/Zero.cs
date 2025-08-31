@@ -274,8 +274,6 @@ public class Zero : Character {
 	}
 
 	public override bool chargeButtonHeld() {
-		if (charState.normalCtrl && player.currency > 0 && !player.isMainPlayer &&
-		ai?.aiState.randomlyChargeWeapon == true && getChargeLevel() <= getMaxChargeLevel()) return true;
 		return player.input.isHeld(Control.Shoot, player);
 	}
 

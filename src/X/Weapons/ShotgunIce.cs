@@ -109,23 +109,23 @@ public class ShotgunIceProj : Projectile {
 			destroySelf(disableRpc: true);
 			Character? chr = null;
 			new ShotgunIceProj(
-				pos.clone(), xDir, this, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
+				pos, xDir, this, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
 				((-1 * xDir), -2), chr, rpc: true
 			);
 			new ShotgunIceProj(
-				pos.clone(), xDir, this, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
+				pos, xDir, this, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
 				((-1 * xDir), -1), chr, rpc: true
 			);
 			new ShotgunIceProj(
-				pos.clone(), xDir, this, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
+				pos, xDir, this, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
 				((-1 * xDir), 0), chr, rpc: true
 			);
 			new ShotgunIceProj(
-				pos.clone(), xDir, this, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
+				pos, xDir, this, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
 				((-1 * xDir), 1), chr, rpc: true
 			);
 			new ShotgunIceProj(
-				pos.clone(), xDir, this, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
+				pos, xDir, this, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
 				((-1 * xDir), 2), chr, rpc: true
 			);
 		}

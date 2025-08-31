@@ -242,9 +242,12 @@ public class Vile : Character {
 		);
 
 		if (specialPressed) {
-			dashGrabSpecial();
-			normalAttacks();
-			airDownAttacks();
+			if (dashGrabSpecial() ||
+				airDownAttacks() ||
+				normalAttacks()
+			) {
+				return true;
+			}
 		}
 		if (shootHeld && cannonWeapon.type > -1) {
 			if (cannonWeapon.shootCooldown < cannonWeapon.fireRate * 0.75f) 

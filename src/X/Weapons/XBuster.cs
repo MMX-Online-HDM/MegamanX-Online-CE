@@ -112,7 +112,7 @@ public class XBuster : Weapon {
 		}
 
 		if (mmx.hasUltimateArmor && chargeLevel >= 3 && !isStock && mmx.armArmor != ArmorId.Max) {
-			new Anim(pos.clone(), "buster4_muzzle_flash", xDir, null, true);
+			new Anim(pos, "buster4_muzzle_flash", xDir, null, true);
 			new BusterPlasmaProj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 			character.playSound("plasmaShot", sendRpc: true);	
 			return;
@@ -206,7 +206,7 @@ public class XBuster : Weapon {
 
 	public void shootLightBuster4(MegamanX mmx, Point pos, int xDir) {
 		Player player = mmx.player;
-		new Anim(pos.clone(), "buster4_muzzle_flash", xDir, null, true);
+		new Anim(pos, "buster4_muzzle_flash", xDir, null, true);
 		//Create the buster effect
 		int xOff = xDir * -5;
 		player.setNextActorNetId(player.getNextActorNetId());
