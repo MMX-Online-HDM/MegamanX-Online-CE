@@ -308,6 +308,10 @@ public partial class KaiserSigma : Character {
 		return false;
 	}
 
+	public override bool canKeepFlag() {
+		return false;
+	}
+
 	public override List<byte> getCustomActorNetData() {
 		List<byte> customData = base.getCustomActorNetData();
 		customData.Add(Helpers.boolArrayToByte([

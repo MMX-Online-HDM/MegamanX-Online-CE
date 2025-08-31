@@ -630,11 +630,12 @@ public class MegamanX : Character {
 	}
 
 	public override void onFlagPickup(Flag flag) {
-		if (chargedRollingShieldProj != null)
-		 chargedRollingShieldProj.destroySelf();
-		if (chargedParasiticBomb != null)
-             chargedParasiticBomb.destroy();
-
+		if (chargedRollingShieldProj != null) {
+			chargedRollingShieldProj.destroySelf();
+		}
+		if (chargedParasiticBomb != null) {
+			chargedParasiticBomb.destroy();
+		}
 		stingActiveTime = 0;
 		popAllBubbles();
 		base.onFlagPickup(flag);
@@ -643,11 +644,6 @@ public class MegamanX : Character {
 	public override bool isStunImmune() {
 		if (chargedRollingShieldProj != null) return true;
 		return base.isStunImmune();
-	}
-
-	public override bool isDebuffImmune() {
-		if (chargedRollingShieldProj != null) return true;
-		return base.isDebuffImmune();
 	}
 
 	public override bool canAirDash() {

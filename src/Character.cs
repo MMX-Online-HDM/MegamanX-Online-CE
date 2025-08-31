@@ -320,7 +320,7 @@ public partial class Character : Actor, IDamagable {
 	public bool isVaccinated() { return vaccineTime > 0; }
 
 	public void addVirusTime(Player attacker, float time) {
-		if (!ownedByLocalPlayer || isTimeImmune() || isVaccinated()) {
+		if (!ownedByLocalPlayer || isTimeImmune()) {
 			return;
 		}
 		//Damager damager = new Damager(attacker, 0, 0, 0);
@@ -329,20 +329,14 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public void addDarkHoldTime(float darkHoldTime, Player attacker) {
-		if (!ownedByLocalPlayer) return;
-		if (isInvulnerable()) return;
-		if (isVaccinated()) return;
-		if (charState.invincible) return;
-
+		if (!ownedByLocalPlayer || isStunImmune() || isTimeImmune()) {
+			return;
+		}
 		changeState(new DarkHoldState(this, darkHoldTime), true);
 	}
 
 	public void addAcidTime(Player attacker, float time) {
-		if (!ownedByLocalPlayer ||
-			isDotImmune() ||
-			isInvulnerable() ||
-			isVaccinated() || charState.invincible
-		) {
+		if (!ownedByLocalPlayer || isDotImmune()) {
 			return;
 		}
 		// If attacker is null use the same, else use self.
@@ -363,11 +357,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public void addOilTime(Player attacker, float time) {
-		if (!ownedByLocalPlayer ||
-			isDebuffImmune() ||
-			isInvulnerable() ||
-			isVaccinated() || charState.invincible
-		) {
+		if (!ownedByLocalPlayer || isDebuffImmune()) {
 			return;
 		}
 		// If attacker is null use the same, else use self.
@@ -383,18 +373,14 @@ public partial class Character : Actor, IDamagable {
 			oilTime = 8;
 		}
 		// Activate burn if burning.
-		if (burnTime > 0) {
+		if (burnTime > 0 && !isDotImmune()) {
 			addBurnTime(attacker, new FlameMOilWeapon(), 2);
 			return;
 		}
 	}
 
 	public void addBurnTime(Player? attacker, Weapon weapon, float time) {
-		if (!ownedByLocalPlayer ||
-			isDotImmune() ||
-			isInvulnerable() ||
-			isVaccinated() || charState.invincible
-		) {
+		if (!ownedByLocalPlayer || isDotImmune()) {
 			return;
 		}
 		// If attacker is null use the same, else use self.
@@ -433,13 +419,9 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public void addIgFreezeProgress(float amount, int freezeTime = 120) {
-		if (freezeInvulnTime > 0) return;
-		if (frozenTime > 0) return;
-		if (isStatusImmune()) return;
-		if (isInvulnerable()) return;
-		if (isVaccinated()) return;
-		if (charState.invincible) return;
-
+		if (freezeInvulnTime > 0 || frozenTime > 0 || isSlowImmune()) {
+			return;
+		}
 		igFreezeProgress += amount;
 		igFreezeRecoveryCooldown = 0;
 		if (igFreezeProgress >= 4) {
@@ -635,7 +617,6 @@ public partial class Character : Actor, IDamagable {
 		if (dropFlagCooldown > 0) return false;
 		if (isInvulnerable()) return false;
 		if (isATrans && !disguiseCoverBlown) return false;
-		if (isNonDamageStatusImmune()) return false;
 		if (charState is Die || charState is VileRevive || charState is XReviveStart || charState is XRevive) return false;
 		if (isWarpOut()) return false;
 		if (Global.serverClient != null) {
@@ -650,7 +631,6 @@ public partial class Character : Actor, IDamagable {
 		if (player.isPossessed()) return false;
 		if (health <= 0) return false;
 		if (isInvulnerable()) return false;
-		if (isNonDamageStatusImmune()) return false;
 		if (charState is Die) return false;
 		if (isWarpOut()) return false;
 		if (Global.serverClient != null) {
@@ -1574,30 +1554,11 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public bool canFreeze() {
-		return (
-			charState is not Die &&
-			!isStunImmune() &&
-			!charState.stunImmune &&
-			!charState.invincible &&
-			invulnTime == 0 &&
-			freezeInvulnTime <= 0 &&
-			!isInvulnerable() &&
-			!isVaccinated() &&
-			!isStatusImmune()
-		);
+		return (!isStunImmune() && freezeInvulnTime <= 0);
 	}
 
 	public void paralize(float timeToParalize = 120) {
-		if (!ownedByLocalPlayer ||
-			isInvulnerable() ||
-			isVaccinated() ||
-			isStatusImmune() ||
-			charState.invincible ||
-			charState.stunImmune ||
-			(charState is Die or VileMK2Grabbed) ||
-			isStunImmune() ||
-		 	stunInvulnTime > 0
-		) {
+		if (!ownedByLocalPlayer || isStunImmune() || stunInvulnTime > 0) {
 			return;
 		}
 		paralyzedMaxTime = timeToParalize;
@@ -1608,17 +1569,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public void crystalize(float timeToCrystalize = 120) {
-		if (!ownedByLocalPlayer ||
-			isInvulnerable() ||
-			isVaccinated() ||
-			isStatusImmune() ||
-			charState.invincible ||
-			charState.stunImmune ||
-			isCrystalized ||
-			(charState is Die) ||
-			isStunImmune() ||
-			crystalizeInvulnTime > 0
-		) {
+		if (!ownedByLocalPlayer || isStunImmune() || isCrystalized || crystalizeInvulnTime > 0) {
 			return;
 		}
 		vel.y = 0;
@@ -1654,33 +1605,37 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool isDebuffImmune() {
-		return isStatusImmune() || isNonDamageStatusImmune();
+		return isStatusImmune() || isNonDamageStatusImmune() || isVaccinated();
 	}
 
 	public virtual bool isDotImmune() {
-		return isStatusImmune();
+		return isStatusImmune() || isVaccinated();
 	}
 
 	public virtual bool isSlowImmune() {
-		return isStatusImmune() || isNonDamageStatusImmune() || isPushImmune();
+		return isStatusImmune() || isNonDamageStatusImmune() || isPushImmune() || isVaccinated();
 	}
 
 	public virtual bool isStunImmune() {
 		return (
 			isStatusImmune() || isInvulnerable() || isNonDamageStatusImmune() ||
-			charState.invincible || charState.stunImmune
+			charState.invincible || charState.stunImmune || isVaccinated()
 		);
 	}
 
 	public virtual bool isFlinchImmune() {
 		return (
 			isStatusImmune() || isInvulnerable() || isNonDamageStatusImmune() ||
-			charState.superArmor || charState.invincible
+			charState.superArmor || charState.invincible ||
+			isVaccinated()
 		);
 	}
 
 	public virtual bool isPushImmune() {
-		return isTrueStatusImmune() || charState.pushImmune == true || immuneToKnockback || isClimbingLadder();
+		return (
+			isTrueStatusImmune() || charState.pushImmune == true ||
+			immuneToKnockback || isClimbingLadder()
+		);
 	}
 
 	public virtual bool isTimeImmune() {
@@ -1688,11 +1643,15 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool isGrabImmune() {
-		return isStatusImmune() || isInvulnerable() || charState.invincible || isNonDamageStatusImmune();
+		return (
+			isStatusImmune() || isInvulnerable() ||
+			charState.invincible || isNonDamageStatusImmune() ||
+			isDarkHoldState
+		);
 	}
 
 	public virtual bool isStatusImmune() {
-		return isTrueStatusImmune() || isVaccinated();
+		return isTrueStatusImmune();
 	}
 
 	public virtual bool isTrueStatusImmune() {
@@ -1776,8 +1735,7 @@ public partial class Character : Actor, IDamagable {
 
 	public bool canBeGrabbed() {
 		return (
-			grabInvulnTime == 0 && !charState.invincible &&
-			!isInvulnerable() && !isGrabImmune() && !isDarkHoldState
+			grabInvulnTime == 0 && !isGrabImmune()
 		);
 	}
 
@@ -3289,26 +3247,37 @@ public partial class Character : Actor, IDamagable {
 
 	// PARASITE SECTION
 	public void addParasite(Player attacker) {
-		if (!ownedByLocalPlayer) return;
-		if (charState.invincible || isInvulnerable()) return;
+		if (!ownedByLocalPlayer || isDebuffImmune() || isStunImmune()) {
+			return;
+		}
 		Damager damager = new Damager(attacker, 4, Global.defFlinch, 0);
 		parasiteTime = Global.spf;
 		parasiteDamager = damager;
-		parasiteAnim = new ParasiteAnim(getCenterPos(), "parasitebomb_latch_start", player.getNextActorNetId(), true, true);
+		parasiteAnim = new ParasiteAnim(
+			getCenterPos(), "parasitebomb_latch_start",
+			player.getNextActorNetId(), true, true
+		);
 	}
 
 	public void updateParasite() {
-		if (parasiteTime <= 0) return;
+		if (parasiteTime <= 0) {
+			return;
+		}
 		slowdownTime = Math.Max(slowdownTime, 0.05f);
 
-		if (!(charState is ParasiteCarry) && parasiteTime > 1.5f) {
+		if (charState is not ParasiteCarry && parasiteTime > 1.5f) {
 			foreach (var otherPlayer in Global.level.players) {
-				if (otherPlayer.character == null) continue;
-				if (otherPlayer == player) continue;
-				if (otherPlayer == parasiteDamager?.owner) continue;
-				if (otherPlayer.character.isInvulnerable()) continue;
-				if (Global.level.gameMode.isTeamMode && otherPlayer.alliance != player.alliance) continue;
-				if (otherPlayer.character.getCenterPos().distanceTo(getCenterPos()) > ParasiticBomb.carryRange) continue;
+				if (otherPlayer.character == null ||
+					otherPlayer == player ||
+					otherPlayer == parasiteDamager?.owner ||
+					otherPlayer.character.isDebuffImmune() ||
+					Global.level.gameMode.isTeamMode &&
+					otherPlayer.alliance != player.alliance ||
+					otherPlayer.character.getCenterPos().distanceTo(getCenterPos()) >
+					ParasiticBomb.carryRange
+				) {
+					continue;
+				}
 				Character target = otherPlayer.character;
 				changeState(new ParasiteCarry(target, true));
 				break;
@@ -3327,7 +3296,9 @@ public partial class Character : Actor, IDamagable {
 		if (mashValue > Global.spf) {
 			parasiteMashTime += mashValue;
 		}
-		if (parasiteMashTime > 5) {
+		if (isDebuffImmune() || isStunImmune()) {
+			removeParasite(true, false);
+		} else if (parasiteMashTime > 5) {
 			removeParasite(true, false);
 		} else if (parasiteTime > 2 && charState is not ParasiteCarry) {
 			removeParasite(false, false);
