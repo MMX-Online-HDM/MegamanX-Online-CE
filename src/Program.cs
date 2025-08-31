@@ -155,21 +155,18 @@ class Program {
 		Fonts.loadFontSizes();
 		Fonts.loadFontSprites();
 
-		List<string> loadText = new();
-		loadText.Add("NOM BIOS v" + Global.version + ", An Energy Sunstar Ally");
-		loadText.Add("Copyright ©2114, NOM Corporation");
-		loadText.Add("");
-		loadText.Add("MMXOD " + Global.shortForkName + " " + Global.versionName + " " + Global.subVersionName);
-		loadText.Add("");
-		if (String.IsNullOrEmpty(Options.main.playerName)) {
-			loadText.Add("User: Dr. Cain");
-		} else {
-			loadText.Add("User: " + Options.main.playerName);
-		}
-		// Get CPU name here.
-		loadText.Add("CPU : " + getCpuName());
-		loadText.Add("Memory: " + (GC.GetGCMemoryInfo().TotalAvailableMemoryBytes / 1024) + "kb");
-		loadText.Add("");
+		List<string> loadText = [
+			"NOM BIOS v" + Global.version + ", An Energy Sunstar Ally",
+			"Copyright ©2114, NOM Corporation",
+			"",
+			"MMXOD " + Global.shortForkName + " " + Global.versionName + " " + Global.subVersionName,
+			"",
+			string.IsNullOrEmpty(Options.main.playerName) ? "User: Dr. Cain" : "User: " + Options.main.playerName,
+			// Get CPU name here.
+			"CPU : " + getCpuName(),
+			"Memory: " + (GC.GetGCMemoryInfo().TotalAvailableMemoryBytes / 1024) + "kb",
+			"",
+		];
 
 		// Input
 		Global.input = new Input(false);
@@ -192,45 +189,52 @@ class Program {
 			urlText = "All IPs OK.";
 			hasServerOnlineUrl = true;
 		}
-		loadText[loadText.Count - 1] = "Getting local IPs...";
+		loadText[^1] = "Getting local IPs...";
 		loadMultiThread(loadText, window, getRadminIP);
 		if (Global.radminIP != "" && hasServerOnlineUrl) {
 			urlText += " Radmin detected.";
 		}
-		loadText[loadText.Count - 1] = urlText;
+		loadText[^1] = urlText;
 
 		loadText.Add("Loading Sprites...");
 		loadMultiThread(loadText, window, loadImages);
-		loadText[loadText.Count - 1] = $"Loaded {Global.textures.Count} Sprites.";
+		loadText[^1] = $"Loaded {Global.textures.Count} Sprites.";
 
 		loadText.Add("Loading Sprite JSONS...");
 		loadMultiThread(loadText, window, loadSprites);
-		loadText[loadText.Count - 1] = $"Loaded {Global.realSpriteCount} Sprite JSONs.";
+		loadText[^1] = $"Loaded {Global.realSpriteCount} Sprite JSONs.";
 
 		loadText.Add("Loading Maps...");
 		loadMultiThread(loadText, window, loadLevels);
-		loadText[loadText.Count - 1] = $"Loaded {Global.levelDatas.Count} Maps.";
+		loadText[^1] = $"Loaded {Global.levelDatas.Count} Maps.";
 
 		loadText.Add("Loading SFX...");
 		loadMultiThread(loadText, window, loadSounds);
-		loadText[loadText.Count - 1] = $"Loaded {Global.soundCount} SFX files.";
+		loadText[^1] = $"Loaded {Global.soundCount} SFX files.";
 
 		loadText.Add("Loading Music...");
 		loadMultiThread(loadText, window, loadMusics);
-		loadText[loadText.Count - 1] = $"Loaded {Global.musics.Count} Songs.";
+		loadText[^1] = $"Loaded {Global.musics.Count} Songs.";
 
-		if (Global.renderTextureQueue.Count > 0) {
-			loadText.Add("Creating render textures...");
+		// Create render texture only if precise shaders are used.
+		if (Global.renderTextureQueue.Count > 0 && !Options.main.fastShaders && !Options.main.disableShaders) {
 			int textureCount = Global.renderTextureQueue.Count;
+			loadText.Add($"Creating render textures, 0 of {textureCount}...");
 			loadLoopRTexture(loadText, window, Global.renderTextureQueue.ToArray());
 			Global.renderTextureQueue.Clear();
 			Global.renderTextureQueueKeys.Clear();
-			loadText[loadText.Count - 1] = $"Created {textureCount} render textures.";
+			loadText[^1] = $"Created {textureCount} render textures.";
+		}
+		// Ohterwise we skip this process
+		else {
+			loadText.Add("Render textures disabled, skipping creation.");
+			Global.renderTextureQueue.Clear();
+			Global.renderTextureQueueKeys.Clear();
 		}
 
 		loadText.Add("Calculating checksum...");
 		loadMultiThread(loadText, window, Global.computeChecksum);
-		loadText[loadText.Count - 1] = "Checksum OK.";
+		loadText[^1] = "Checksum OK.";
 
 		/*if (!Helpers.FileExists("region.json")) {
 			Helpers.WriteToFile("region.json", regionJson);
@@ -247,13 +251,17 @@ class Program {
 
 		drawLoadST(loadText, window);
 
-		GC.Collect();
+		// Force to clean all memory.
+		// Also compacts all objects too.
+		// As it as manual call this freeze the program and takes a while.
+		// PS: Do not execute this in other parts of code besides loading screens endings as is not fast.
+		GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, true);
 		GC.WaitForPendingFinalizers();
 
 		// Force startup config to be fetched
 		Menu.change(new MainMenu());
 		//Global.changeMusic(Global.level.levelData.getTitleTheme());
-		switch(Helpers.randomRange(1, 15)) {
+		switch (Helpers.randomRange(1, 15)) {
 			// Stage Selects
 			case 1:
 				Global.changeMusic("stageSelect_X1");
@@ -306,7 +314,7 @@ class Program {
 				Global.changeMusic("stageSelect_X1");
 				break;
 		}
-		
+
 		if (mode == 1) {
 			HostMenu menu = new HostMenu(new MainMenu(), null, false, false, true);
 			Menu.change(menu);
@@ -1505,6 +1513,7 @@ class Program {
 		Color clearColor = Color.Black;
 		Stopwatch watch = new Stopwatch();
 		int pos = textures.Length - 1;
+		int count = 0;
 
 		// Main loop itself.
 		while (window.IsOpen && pos > 0) {
@@ -1535,18 +1544,23 @@ class Program {
 			window.Display();
 			watch.Restart();
 
+			if (Options.main.fastShaders || Options.main.disableShaders) {
+				return;
+			}
 			for (; pos >= 0; pos--) {
 				int encodeKey = ((int)textures[pos].width * 397) ^ (int)textures[pos].height;
 				if (!Global.renderTextures.ContainsKey(encodeKey)) {
 					Global.renderTextures[encodeKey] = (
-						new RenderTexture((uint)textures[pos].width, (uint)textures[pos].height),
-						new RenderTexture((uint)textures[pos].width, (uint)textures[pos].height)
+						new RenderTexture(textures[pos].width, textures[pos].height),
+						new RenderTexture(textures[pos].width, textures[pos].height)
 					);
 				}
+				count++;
 				if (watch.ElapsedTicks >= fpsLimit) {
 					break;
 				}
 			}
+			loadText[^1] = $"Creating render textures, {count} of {textures.Length}...";
 		}
 	}
 
