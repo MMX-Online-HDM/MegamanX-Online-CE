@@ -68,8 +68,8 @@ public class BoomerangKuwanger : Maverick {
 		if (aiBehavior != MaverickAIBehavior.Control || !state.attackCtrl) {
 			return;
 		}
-		if (grounded) {
-			if (state is not BoomerKDashState) {
+		if (grounded && state.attackCtrl) {
+			if (state is not BoomerKDashState && state is MIdle or MRun) {
 				if (input.isHeld(Control.Left, player)) {
 					xDir = -1;
 					changeState(new BoomerKDashState(Control.Left));
@@ -104,7 +104,7 @@ public class BoomerangKuwanger : Maverick {
 	}
 
 	public override float getRunSpeed() {
-		return 175;
+		return 175 * getRunDebuffs();
 	}
 
 	public override string getMaverickPrefix() {

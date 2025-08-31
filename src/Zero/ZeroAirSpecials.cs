@@ -124,7 +124,9 @@ public class FSplasherState : ZeroState {
 		if (ProjVisible != null) {
 			ProjVisible.changePos(character.pos);
 		}
-		CollideData? collideData = Global.level.checkTerrainCollisionOnce(character, character.xDir, upSpeed);
+		CollideData? collideData = Global.level.checkTerrainCollisionOnce(
+			character, character.xDir, upSpeed
+		);
 		if (collideData != null) {
 			character.changeState(character.getFallState(), true);
 			return;
@@ -139,8 +141,8 @@ public class FSplasherState : ZeroState {
 
 		var move = new Point(0, 0);
 		move.x = character.getDashSpeed() * character.xDir * modifier;
-		move.y = upSpeed * 100;
-		character.move(move);
+		move.y = upSpeed * 1.65f;
+		character.movePoint(move);
 		if (stateTime > 0.1) {
 			stateTime = 0;
 		}

@@ -8,8 +8,8 @@ namespace MMXOnline;
 public class RCXParryStartState : CharState {
 	public RCXParryStartState() : base("unpo_parry_start") {
 		superArmor = true;
-		stunResistant = true;
-		immuneToWind = true;
+		stunImmune = true;
+		pushImmune = true;
 		invincible = true;
 	}
 

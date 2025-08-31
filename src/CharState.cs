@@ -36,9 +36,11 @@ public class CharState {
 	public bool useGravity = true;
 
 	public bool invincible;
-	public bool stunResistant;
+	public bool stunImmune;
 	public bool superArmor;
-	public bool immuneToWind;
+	public bool pushImmune;
+	public bool slowImmune;
+	public bool statusEffectImmune;
 	public int accuracy;
 	public bool isGrabbedState;
 
@@ -368,6 +370,7 @@ public class WarpIn : CharState {
 		this.addInvulnFrames = addInvulnFrames;
 		this.refillHP = refillHP;
 		invincible = true;
+		statusEffectImmune = true;
 	}
 
 	public override void update() {
@@ -471,6 +474,9 @@ public class WarpIn : CharState {
 		if (player.warpedInOnce || Global.debug) {
 			sigmaRounds = 10;
 		}
+		if (refillHP && character.ownedByLocalPlayer && !player.warpedInOnce) {
+			character.health = 0;
+		}
 	}
 
 	public override void onExit(CharState? newState) {
@@ -484,9 +490,6 @@ public class WarpIn : CharState {
 		if (addInvulnFrames && character.ownedByLocalPlayer) {
 			character.invulnTime = (player.warpedInOnce || Global.level.joinedLate) ? 2 : 0;
 		}
-		if (refillHP && character.ownedByLocalPlayer && newState is not WarpIdle) {
-			character.spawnHealthToAdd = MathInt.Ceiling(character.maxHealth);
-		}
 		player.warpedInOnce = true;
 	}
 }
@@ -498,8 +501,9 @@ public class WarpIdle : CharState {
 	float healTime = -4;
 
 	public WarpIdle(bool firstSpawn = false) : base("win") {
-		invincible = true;
 		this.firstSpawn = firstSpawn;
+		invincible = true;
+		statusEffectImmune = true;
 	}
 
 	public override void update() {
@@ -520,7 +524,11 @@ public class WarpIdle : CharState {
 		}
 		// Health.
 		if (character.health < character.maxHealth) {
-			character.health = Helpers.clampMax(character.health + 1, character.maxHealth);
+			decimal hpMod = Player.getHpDMod();
+			if (hpMod < 1) { hpMod = 1; }
+			character.health = Helpers.clampMax(
+				character.health + hpMod, character.maxHealth
+			);
 		} else {
 			fullHP = true;
 		}
@@ -662,10 +670,10 @@ public class Run : CharState {
 
 	public override void update() {
 		base.update();
-		var move = new Point(0, 0);
+		Point move = new Point(0, 0);
 		float runSpeed = character.getRunSpeed();
 		if (stateFrames <= 4) {
-			runSpeed = 60 * character.getRunDebuffs();
+			runSpeed = 1 * character.getRunDebuffs();
 		}
 		if (player.input.isHeld(Control.Left, player)) {
 			character.xDir = -1;
@@ -675,7 +683,7 @@ public class Run : CharState {
 			if (character.canMove()) move.x = runSpeed;
 		}
 		if (move.magnitude > 0) {
-			character.move(move);
+			character.movePoint(move);
 		} else {
 			character.changeToIdleOrFall();
 		}
@@ -737,8 +745,8 @@ public class SwordBlock : CharState {
 		exitOnAirborne = true;
 		attackCtrl = true;
 		normalCtrl = true;
-		stunResistant = true;
-		immuneToWind = true;
+		stunImmune = true;
+		pushImmune = true;
 	}
 
 	public override void update() {
@@ -901,17 +909,17 @@ public class Dash : CharState {
 		}
 		// Dash regular speed.
 		if (dashTime >= 4 && !stop) {
-			character.move(new Point(character.getDashSpeed() * dashDir, 0));
+			character.moveXY(character.getDashSpeed() * dashDir, 0);
 		}
 		// End move.
 		else if (stop && inputXDir != 0) {
-			character.move(new Point(character.getRunSpeed() * inputXDir, 0));
+			character.moveXY(character.getRunSpeed() * inputXDir, 0);
 			character.changeState(character.getRunState(true), true);
 			return;
 		}
 		// Speed at start and end.
 		else if (!stop || dashHeld) {
-			character.move(new Point(Physics.DashStartSpeed * character.getRunDebuffs() * dashDir, 0));
+			character.moveXY(Physics.DashStartSpeed * character.getRunDebuffs() * dashDir, 0);
 		}
 		// Dust effect.
 		if (dustTime >= 6 && !character.isUnderwater()) {
@@ -1244,7 +1252,7 @@ public class LadderClimb : CharState {
 		this.snapX = MathF.Round(snapX);
 		this.incY = incY;
 		attackCtrl = true;
-		immuneToWind = true;
+		pushImmune = true;
 	}
 
 	public override void onEnter(CharState oldState) {

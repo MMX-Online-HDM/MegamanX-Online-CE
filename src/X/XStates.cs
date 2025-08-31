@@ -129,17 +129,17 @@ public class LightDash : CharState {
 		}
 		// Dash regular speed.
 		if (dashTime >= 4 && !stop) {
-			character.move(new Point(character.getDashSpeed() * 1.15f * dashDir, 0));
+			character.moveXY(character.getDashSpeed() * 1.15f * dashDir, 0);
 		}
 		// End move.
 		else if (stop && inputXDir != 0) {
-			character.move(new Point(character.getRunSpeed() * inputXDir * 1.15f, 0));
+			character.moveXY(character.getRunSpeed() * inputXDir * 1.15f, 0);
 			character.changeState(character.getRunState(), true);
 			return;
 		}
 		// Speed at start and end.
 		else if (!stop || dashHeld) {
-			character.move(new Point(character.getRunSpeed() * dashDir * 1.15f, 0));
+			character.moveXY(character.getRunSpeed() * dashDir * 1.15f, 0);
 		}
 		if (exaust == null && dashTime > 3 && !stop) {
 			exaust = new Anim(
@@ -239,15 +239,15 @@ public class GigaAirDash : CharState {
 		}
 		// Dash regular speed.
 		if (dashTime >= 4 && !stop || stop && dashHeld) {
-			character.move(new Point(character.getDashSpeed() * 1.15f * dashDir, 0));
+			character.moveXY(character.getDashSpeed() * 1.15f * dashDir, 0);
 		}
 		// Dash start and end while hold.
 		else if (!stop) {
-			character.move(new Point(character.getRunSpeed() * dashDir * 1.15f, 0));
+			character.moveXY(character.getDashSpeed() * dashDir * 1.15f, 0);
 		}
 		// Air move.
 		else if (inputXDir != 0) {
-			character.move(new Point(character.getDashSpeed() * inputXDir, 0));
+			character.moveXY(character.getDashSpeed() * inputXDir, 0);
 		}
 		if (exaust == null && dashTime > 3 && !stop) {
 			exaust = new Anim(
@@ -305,7 +305,7 @@ public class UpDash : CharState {
 		int xDir = player.input.getXDir(player);
 		if (xDir != 0) {
 			character.xDir = xDir;
-			character.move(new Point(xDir * 60 * character.getRunDebuffs(), 0));
+			character.moveXY(xDir * character.getRunDebuffs(), 0);
 		}
 
 		if (!once) {

@@ -616,7 +616,7 @@ public class MegamanX : Character {
 	// Movement related stuff.
 	public override float getRunSpeed() {
 		if (charState is XHover) {
-			return 2 * 60 * getRunDebuffs(); ;
+			return 2 * getRunDebuffs();
 		}
 		return base.getRunSpeed();
 	}
@@ -628,27 +628,22 @@ public class MegamanX : Character {
 		float dashSpeed = 3.5f * 60;
 		return dashSpeed * getRunDebuffs();
 	}
-	public override void onFlagPickup(Flag flag) {
-		if (chargedRollingShieldProj != null)
-		 chargedRollingShieldProj.destroySelf();
-		if (chargedParasiticBomb != null)
-             chargedParasiticBomb.destroy();
 
+	public override void onFlagPickup(Flag flag) {
+		if (chargedRollingShieldProj != null) {
+			chargedRollingShieldProj.destroySelf();
+		}
+		if (chargedParasiticBomb != null) {
+			chargedParasiticBomb.destroy();
+		}
 		stingActiveTime = 0;
 		popAllBubbles();
 		base.onFlagPickup(flag);
 	}
+
 	public override bool isStunImmune() {
 		if (chargedRollingShieldProj != null) return true;
 		return base.isStunImmune();
-	}
-	public override bool isDotImmune() {
-		if (chargedRollingShieldProj != null) return true;
-		return base.isDotImmune();
-	}
-	public override bool isDebuffImmune() {
-		if (chargedRollingShieldProj != null) return true;
-		return base.isDebuffImmune();
 	}
 
 	public override bool canAirDash() {

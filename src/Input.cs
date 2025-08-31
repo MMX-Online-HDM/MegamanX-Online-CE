@@ -388,6 +388,13 @@ public class Input {
 		return isHeld(inputName, null);
 	}
 
+	public int getMenuXDir() {
+		int dir = 0;
+		if (isPressedMenu(Control.MenuLeft)) { dir--; }
+		if (isPressedMenu(Control.MenuRight)) { dir++; }
+		return dir;
+	}
+
 	public Dictionary<string, int> heldFrames = new Dictionary<string, int>();
 	public bool isPressedOrHeldMenu(string inputName) {
 		if (!heldFrames.ContainsKey(inputName)) heldFrames[inputName] = 0;

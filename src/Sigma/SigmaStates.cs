@@ -84,8 +84,8 @@ public class CallDownMaverick : CharState {
 public class SigmaBlock : CharState {
 	public SigmaBlock() : base("block") {
 		superArmor = true;
-		stunResistant = true;
-		immuneToWind = true;
+		stunImmune = true;
+		pushImmune = true;
 		exitOnAirborne = true;
 		attackCtrl = true;
 		normalCtrl = true;
@@ -101,7 +101,9 @@ public class SigmaBlock : CharState {
 		if ((!isHoldingGuard || Global.level.gameMode.isOver) && !player.isAI) {
 			character.changeToIdleOrFall();
 			return;
-		} else if (player.isAI && stateTime >= 32f/60f) {
+		} else if (player.isAI && stateTime >= 32f/60f &&
+			character.ai?.localTrainBehavior != AITrainingBehavior.Guard
+		) {
 			character.changeToIdleOrFall();
 		}
 	}
@@ -110,7 +112,7 @@ public class SigmaBlock : CharState {
 public class SigmaAutoBlock : CharState {
 	public SigmaAutoBlock() : base("block_auto") {
 		superArmor = true;
-		immuneToWind = true;
+		pushImmune = true;
 		exitOnAirborne = true;
 	}
 

@@ -253,6 +253,14 @@ public class RagingChargeX : Character {
 		return true;
 	}
 
+	public override bool canPickupFlag() {
+		return false;
+	}
+
+	public override bool canKeepFlag() {
+		return false;
+	}
+
 	public bool isDecayImmune() {
 		return (
 			charState is XUPGrabState

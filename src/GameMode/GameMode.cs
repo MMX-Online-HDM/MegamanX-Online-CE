@@ -1360,7 +1360,10 @@ public class GameMode {
 		//Health
 		Point pos = getHUDHealthPosition(position, true);
 		int dir = 1;
-		if (position is HUDHealthPosition.Right or HUDHealthPosition.TopRight or HUDHealthPosition.BotRight) {
+		if (position is HUDHealthPosition.Right or
+			HUDHealthPosition.TopRight or
+			HUDHealthPosition.BotRight
+		) {
 			dir = -1;
 		}
 		renderHealth(player, pos, false, false);
@@ -1474,6 +1477,7 @@ public class GameMode {
 		Global.sprites[healthBaseSprite].drawToHUD(frameIndex, baseX, baseY);
 		baseY -= 16;
 		int barIndex = 0;
+		int sBarIndex = 4;
 
 		if (player?.character is RagingChargeX mmx) {
 			float hpPercent = MathF.Floor(player.health / player.maxHealth * 100f);
@@ -1481,25 +1485,46 @@ public class GameMode {
 			else if (hpPercent >= 50) barIndex = 3;
 			else if (hpPercent >= 25) barIndex = 4;
 			else barIndex = 5;
+			sBarIndex = 1;
 		}
 
-		for (var i = 0; i < MathF.Ceiling(maxHealth); i++) {
+		float modifier = Player.getHpMod();
+		if (modifier < 1) {
+			modifier = 1;
+		}
+		float maxHP = MathF.Ceiling(maxHealth / modifier);
+		float curHP = MathF.Floor(health / modifier);
+		float ceilCurHP = MathF.Ceiling(health / modifier);
+		float floatCurHP = health / modifier;
+		float fhpAlpha = floatCurHP - curHP;
+		float savings = 0;
+		float svCeil = 0;
+		float svFloat = 0;
+		float svAlpha = 0;
+		if (damageSavings >= 1) {
+			savings = curHP + MathF.Floor(damageSavings / modifier);
+			svCeil = ceilCurHP + MathF.Ceiling(damageSavings / modifier);
+			svFloat = curHP + damageSavings / modifier;
+			svAlpha = svFloat - savings;
+		}
+
+		for (var i = 0; i < Math.Ceiling(maxHP); i++) {
 			// Draw HP
-			if (i < MathF.Ceiling(health)) {
+			if (i < curHP) {
 				Global.sprites["hud_health_full"].drawToHUD(barIndex, baseX, baseY);
-			} else if (i < MathInt.Ceiling(health) + damageSavings) {
-				Global.sprites["hud_health_full"].drawToHUD(4, baseX, baseY);
-			} else if (i < MathInt.Ceiling(greyHp)) {
-				Global.sprites["hud_weapon_full"].drawToHUD(30, baseX, baseY);
-			} else {
+			}
+			else if (i < savings) {
+				Global.sprites["hud_health_full"].drawToHUD(sBarIndex, baseX, baseY);
+			}
+			else {
 				Global.sprites["hud_health_empty"].drawToHUD(0, baseX, baseY);
+				if (i < ceilCurHP) {
+					Global.sprites["hud_health_full"].drawToHUD(barIndex, baseX, baseY, fhpAlpha);
+				}
+				else if (i < svCeil) {
+					Global.sprites["hud_health_full"].drawToHUD(sBarIndex, baseX, baseY, svAlpha);
+				}
 			}
-
-			// 2-layer health
-			if (twoLayerHealth > 0 && i < MathF.Ceiling(twoLayerHealth)) {
-				Global.sprites["hud_health_full"].drawToHUD(2, baseX, baseY);
-			}
-
 			baseY -= 2;
 		}
 		Global.sprites["hud_health_top"].drawToHUD(0, baseX, baseY);

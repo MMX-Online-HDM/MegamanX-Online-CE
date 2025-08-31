@@ -847,16 +847,16 @@ public partial class Actor : GameObject {
 
 				var hitWall = collideData.gameObject as Wall;
 				if (hitWall?.isMoving == true) {
-					move(hitWall.deltaMove, useDeltaTime: false);
+					movePoint(hitWall.deltaMove, useDeltaTime: false);
 				} else if (hitWall != null && hitWall.moveX != 0) {
 					if (this is RideChaser rc) {
-						rc.addXMomentum(hitWall.moveX);
+						rc.addXMomentum(hitWall.moveX * 60);
 					} else {
-						move(new Point(hitWall.moveX, 0));
+						moveXY(hitWall.moveX, 0);
 					}
 				}
 				if (isPlatform && hitActor != null) {
-					move(hitActor.deltaPos, useDeltaTime: false);
+					movePoint(hitActor.deltaPos, useDeltaTime: false);
 				}
 
 				groundedIce = false;
@@ -1722,7 +1722,7 @@ public partial class Actor : GameObject {
 		foreach (var collideData in collideDatas) {
 			var hitWall = collideData?.gameObject as Wall;
 			if (hitWall != null && hitWall.isMoving) {
-				move(hitWall.deltaMove, useDeltaTime: false);
+				movePoint(hitWall.deltaMove, useDeltaTime: false);
 				break;
 			}
 		}

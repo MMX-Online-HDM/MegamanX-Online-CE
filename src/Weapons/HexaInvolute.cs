@@ -22,7 +22,7 @@ public class HexaInvoluteState : VileState {
 
 	public HexaInvoluteState() : base("super") {
 		superArmor = true;
-		immuneToWind = true;
+		pushImmune = true;
 		invincible = true;
 	}
 

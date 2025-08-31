@@ -70,6 +70,7 @@ public class VileRevive : VileState {
 
 	public VileRevive(bool isMK5) : base(isMK5 ? "revive_to5" : "revive") {
 		invincible = true;
+		statusEffectImmune = true;
 		this.isMK5 = isMK5;
 	}
 
@@ -268,7 +269,7 @@ public class VileHover : VileState {
 
 		float flyVelX = 0;
 		if (character.deltaPos.x != 0) {
-			flyVelX = character.xDir * character.getDashOrRunSpeed() * 0.5f;
+			flyVelX = character.xDir * character.getDashOrRunSpeed() * 0.5f * 60;
 		}
 
 		float flyVelY = 0;

@@ -167,7 +167,7 @@ public class FireWaveProjCharged : Projectile {
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 		this.timesReversed = timesReversed;
-		new Anim(this.pos.clone(), "fire_wave_charge_flash", 1, null, true);
+		new Anim(this.pos, "fire_wave_charge_flash", 1, null, true);
 
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);

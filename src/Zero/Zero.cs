@@ -274,8 +274,6 @@ public class Zero : Character {
 	}
 
 	public override bool chargeButtonHeld() {
-		if (charState.normalCtrl && player.currency > 0 && !player.isMainPlayer &&
-		ai?.aiState.randomlyChargeWeapon == true && getChargeLevel() <= getMaxChargeLevel()) return true;
 		return player.input.isHeld(Control.Shoot, player);
 	}
 
@@ -656,10 +654,7 @@ public class Zero : Character {
 	}
 
 	public override float getDashSpeed() {
-		if (flag != null || !isDashing) {
-			return getRunSpeed();
-		}
-		float dashSpeed = 210;
+		float dashSpeed = 3.45f;
 		if (isBlack) {
 			dashSpeed *= 1.15f;
 		}

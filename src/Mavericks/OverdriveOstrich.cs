@@ -101,8 +101,10 @@ public class OverdriveOstrich : Maverick {
 
 	public override float getRunSpeed() {
 		float speed = baseSpeed + accSpeed;
-		if (state is MRun || state is OverdriveOSkidState || state is OverdriveOShootState || state is OverdriveOShoot2State) return speed;
-		else return Math.Max(100, speed);
+		if (state is MRun or OverdriveOSkidState or OverdriveOShootState or OverdriveOShoot2State)
+		return speed * getRunDebuffs();
+		else
+		return Math.Max(100, speed) * getRunDebuffs();
 	}
 
 	public override string getMaverickPrefix() {

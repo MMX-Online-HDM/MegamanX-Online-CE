@@ -242,9 +242,12 @@ public class Vile : Character {
 		);
 
 		if (specialPressed) {
-			dashGrabSpecial();
-			normalAttacks();
-			airDownAttacks();
+			if (dashGrabSpecial() ||
+				airDownAttacks() ||
+				normalAttacks()
+			) {
+				return true;
+			}
 		}
 		if (shootHeld && cannonWeapon.type > -1) {
 			if (cannonWeapon.shootCooldown < cannonWeapon.fireRate * 0.75f) 
@@ -818,12 +821,10 @@ public class Vile : Character {
 	}
 
 	public override float getDashSpeed() {
-		float dashSpeed = 3.45f * 60f;
-
+		float dashSpeed = 3.45f;
 		if (hasSpeedDevil) {
 			dashSpeed *= 1.1f;
 		}
-	
 		return dashSpeed * getRunDebuffs();
 	}
 

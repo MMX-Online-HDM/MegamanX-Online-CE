@@ -569,7 +569,7 @@ public class Damager {
 				damage = MathF.Ceiling(damage * 1.5f);
 			}
 			// Disallow flinch stack for non-BZ.
-			else if (flinch > 0 && Global.customSettings?.ComboFlinch == false) {
+			else if (flinch > 0 && Global.customSettings?.comboFlinch == false) {
 				int fkey = owner.id;
 				float fmod = 8;
 				if (!character.globalFlinchCooldown.ContainsKey(fkey)) {
@@ -690,6 +690,7 @@ public class Damager {
 		}
 		// Maverick section
 		else if (victim is Maverick maverick) {
+			// Beast killer damage buff.
 			if (projId == (int)ProjIds.BeastKiller || projId == (int)ProjIds.AncientGun) {
 				damage *= 1.25f;
 			}
@@ -711,6 +712,90 @@ public class Damager {
 			}
 			if (weakness && damage < 1 && projId == (int)ProjIds.ParasiticBomb) {
 				damage = 1;
+			}
+			// Burn [to the ground] section.
+			switch ((ProjIds)projId) {
+				case ProjIds.FireWave:
+				case ProjIds.FlameRoundFlameProj:
+				case ProjIds.FlameBurner:
+				case ProjIds.QuakeBlazer:
+				case ProjIds.QuakeBlazerFlame:
+				case ProjIds.VelGFire:
+				case ProjIds.WildHorseKick:
+					maverick.addBurnDot(owner, 30);
+					break;
+				case ProjIds.SpeedBurner:
+				case ProjIds.SpeedBurnerCharged:
+				case ProjIds.FlameRoundWallProj:
+				case ProjIds.FlameRoundProj:
+				case ProjIds.CircleBlazeExplosion:
+				case ProjIds.FlameMFireball:
+				case ProjIds.FStagFireball:
+				case ProjIds.DrDopplerDash:
+				case ProjIds.Sigma3Fire:
+					maverick.addBurnDot(owner, 60);
+					break;
+				case ProjIds.FireWaveCharged:
+				case ProjIds.Ryuenjin:
+				case ProjIds.FlameBurnerHyper:
+				case ProjIds.FlameMOilFire:
+				case ProjIds.FStagDash:
+					maverick.addBurnDot(owner, 120);
+					break;
+				// Acid.
+				case ProjIds.AcidBurstSmall:
+					maverick.addAcidDot(owner, 1);
+					break;
+				case ProjIds.AcidBurst:
+				case ProjIds.TSeahorseAcid1:
+				case ProjIds.TSeahorseAcid2:
+				case ProjIds.TSeahorseAcid3:
+					maverick.addAcidDot(owner, 2);
+					break;
+				case ProjIds.AcidBurstCharged:
+					maverick.addAcidDot(owner, 3);
+					break;
+				// Freeze effects	
+				case ProjIds.IceGattling:
+				case ProjIds.SeaDragonRage:
+					maverick.addFreezeSlow(1 * 60);
+					break;
+				case ProjIds.HyorogaProj:
+					maverick.addFreezeSlow(1.5f * 60);
+					break;
+				case ProjIds.IceGattlingHeadshot:
+				case ProjIds.IceGattlingHyper:
+				case ProjIds.Hyouretsuzan2:
+				case ProjIds.VelGIce:
+					maverick.addFreezeSlow(2 * 60);
+					break;
+				case ProjIds.Hyouretsuzan:
+					maverick.addFreezeSlow(3 * 60);
+					break;
+				case ProjIds.BBuffaloBeam:
+				case ProjIds.ShotgunIceCharged:
+				case ProjIds.ChillPIceBlow:
+				case ProjIds.HyorogaSwing:
+					maverick.addFreezeSlow(4 * 60);
+					break;
+				// Oil.
+				case ProjIds.FlameMOil:
+					maverick.addOilTime(owner, 8 * 60);
+					maverick.playSound("flamemOil");
+					break;
+				// Virus.
+				case ProjIds.MagnaCTail:
+					maverick.addVirusTime(owner, 4 * 60);
+					break;
+				// Would-be stuns converted to slows.
+				case ProjIds.CrystalHunter:
+				case ProjIds.CSnailCrystalHunter:
+				case ProjIds.SpreadShot:
+				case ProjIds.ElectricShock:
+				case ProjIds.MK2StunShot:
+				case ProjIds.MorphMPowder:
+					maverick.addSlowdownTime(4);
+					break;
 			}
 			// Get flinch cooldown index.
 			bool isOnFlinchCooldown = false;
@@ -1100,9 +1185,6 @@ public class Damager {
 		if (projId == null) {
 			return false;
 		}
-		if (Global.level.server?.customMatchSettings?.assistable == false) {
-			return false;		
-		}
 		// Never assist in any mode as they are DOT or self-damage. (Also Volt Tornado)
 		bool alwaysNotAssist = (ProjIds)projId switch {
 			// DOT stuff.
@@ -1126,6 +1208,10 @@ public class Damager {
 		// The GM19 list now only counts for FFA mode.
 		if (Global.level.gameMode is not FFADeathMatch) {
 			return false;
+		}
+		// Can also be overdrive by custom setting.
+		if (Global.level.server?.customMatchSettings?.assistBanlist == false) {
+			return false;		
 		}
 		return (ProjIds)projId switch {
 			ProjIds.Tornado => true,

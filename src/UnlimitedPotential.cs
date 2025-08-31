@@ -238,9 +238,9 @@ public class XUPParryProjState : CharState {
 	public RagingChargeX mmx = null!;
 	public XUPParryProjState(Projectile otherProj, bool shootProj, bool absorbThenShoot) : base("unpo_parry_attack") {
 		this.otherProj = otherProj;
-		invincible = true;
 		this.shootProj = shootProj;
 		this.absorbThenShoot = absorbThenShoot;
+		invincible = true;
 	}
 
 	public override void update() {
@@ -470,6 +470,7 @@ public class XReviveStart : CharState {
 
 	public XReviveStart() : base("revive_start") {
 		invincible = true;
+		statusEffectImmune = true;
 	}
 
 	public bool cancellable() {
@@ -607,7 +608,7 @@ public class XRevive : CharState {
 
 	public XRevive() : base("revive_shake") {
 		invincible = true;
-		immuneToWind = true;
+		statusEffectImmune = true;
 		enterSound = "xRevive";
 	}
 
