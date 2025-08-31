@@ -385,7 +385,7 @@ public class Maverick : Actor, IDamagable {
 			lastGroundedPos = pos;
 		}
 
-		useChargeJump = controlMode == MaverickModeId.Puppeteer;
+		useChargeJump = controlMode != MaverickModeId.TagTeam;
 
 		if (storedJumpCharge > 0) {
 			if (!grounded || state is MRun or BoomerKDashState || !state.normalCtrl) {
