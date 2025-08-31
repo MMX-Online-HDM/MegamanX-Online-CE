@@ -641,7 +641,7 @@ public class HostMenu : IMainMenu {
 			)
 		);
 		// Time limit
-		if (!isTraining && !isRace) {
+		if (!isRace) {
 			menuOptions.Add(
 				new MenuOption(startX, startY,
 					() => {
@@ -1076,7 +1076,7 @@ public class HostMenu : IMainMenu {
 
 		string gameMode = selectedGameMode;
 		if (selectedLevel.isTraining()) {
-			playTo = 9999;
+			//playTo = 9999;
 			//gameMode = GameMode.Deathmatch;
 		}
 
@@ -1105,7 +1105,7 @@ public class HostMenu : IMainMenu {
 		}
 		string gameMode = selectedGameMode;
 		if (selectedLevel.isTraining()) {
-			playTo = 9999;
+			//playTo = 9999;
 			//gameMode = GameMode.Deathmatch;
 		}
 		if (Global.localServer != null && Global.localServer.s_server.Status == NetPeerStatus.Running) {
@@ -1377,7 +1377,7 @@ public class HostMenu : IMainMenu {
 	}
 
 	bool playToSupported() {
-		return selectedGameMode != GameMode.ControlPoint && selectedGameMode != GameMode.KingOfTheHill && !isTraining && !isRace;
+		return selectedGameMode != GameMode.ControlPoint && selectedGameMode != GameMode.KingOfTheHill && !isRace;
 	}
 
 	public void render() {

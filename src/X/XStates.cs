@@ -310,7 +310,7 @@ public class UpDash : CharState {
 
 		if (!once) {
 			once = true;
-			character.vel = new Point(0, -character.getJumpPower() * 1.125f);
+			character.vel = new Point(0, -character.getJumpPower());
 			new Anim(
 				character.pos.addxy(0, -10), "dash_sparks_up",
 				character.xDir, player.getNextActorNetId(), true, sendRpc: true
@@ -320,7 +320,8 @@ public class UpDash : CharState {
 
 		dashTime += Global.spf;
 		float maxDashTime = 0.4f;
-		if (dashTime > maxDashTime || character.vel.y > -1) {
+		if (character.isUnderwater()) maxDashTime *= 1.5f;
+		if (dashTime > maxDashTime) {
 			changeToFall();
 			return;
 		}
@@ -328,9 +329,19 @@ public class UpDash : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		character.isDashing = true;
+		character.gravityModifier = 0.5f;
 		character.vel = new Point(0, -4);
 		character.dashedInAir++;
 		character.frameSpeed = 1;
+	}
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.gravityModifier = 1;
+	}
+	public override bool canEnter(Character character) {
+		if (character.grounded) return false;
+		return base.canEnter(character);
 	}
 
 	public void changeToFall() {
@@ -338,6 +349,8 @@ public class UpDash : CharState {
 			character.vel.y *= 0.4f;
 			if (character.vel.y > -1) { character.vel.y = -1; }
 		}
+		character.gravityModifier = 1;
+		character.isDashing = true;
 		bool animOver = character.isAnimOver();
 		string fullSpriteName = character.sprite.name;
 		string spriteName = character.sprite.name.RemovePrefix("mmx_");

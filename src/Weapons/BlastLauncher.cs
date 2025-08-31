@@ -405,7 +405,7 @@ public class GreenSpinnerExplosionProj : Projectile {
 		if (character == attacker.character) {
 			character.pushEffect(new Point(0.6f, 0.6f) * dirTo * distFactor);
 		} else {
-			character.pushEffect(new Point(0.3f, 0.5f) * dirTo * distFactor);
+			character.pushEffect(new Point(0.3f, -0.25f) * dirTo * distFactor);
 		}
 
 		if (character == attacker.character) {

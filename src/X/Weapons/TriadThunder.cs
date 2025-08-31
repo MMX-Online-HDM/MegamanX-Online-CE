@@ -18,7 +18,7 @@ public class TriadThunder : Weapon {
 		killFeedIndex = 42;
 		weaknessIndex = (int)WeaponIds.TornadoFang;
 		damage = "2/4+3";
-		effect = "Charged: Grants Super Armor.\nUncharged won't give assists.";
+		effect = "U:Projectile won't destroy on hit nor give assists.\nC:Grants Flinch Immunity.";
 		hitcooldown = "30";
 		flinch = "6/26";
 		flinchCD = "2.25/0";

@@ -17,7 +17,7 @@ public class ElectricSpark : Weapon {
 		shootSounds = new string[] { "electricSpark", "electricSpark", "electricSpark", "electricSpark" };
 		fireRate = 30;
 		damage = "2/4";
-		effect =  "Can Split. Charged: Doesn't destroy on hit.";
+		effect =  "U:Splits on contact on enemies or walls.\nC:Projectile won't destroy on hit.";
 		hitcooldown = "0/0.5";
 		flinch = "6/26";
 		flinchCD = "1/0";

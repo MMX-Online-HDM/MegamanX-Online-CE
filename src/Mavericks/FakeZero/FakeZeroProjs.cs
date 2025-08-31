@@ -48,7 +48,6 @@ public class FakeZeroBuster2Proj : Projectile {
 	) {
 		weapon = FakeZero.getWeapon();
 		damager.damage = 2;
-		damager.damage = Global.miniFlinch;
 		vel.x = 350 * xDir;
 		projId = (int)ProjIds.FakeZeroBuster2;
 		reflectable = true;

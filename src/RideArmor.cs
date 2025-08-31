@@ -270,6 +270,14 @@ public class RideArmor : Actor, IDamagable {
 				character = mk5Rider;
 			}
 		}
+		if (character is Vile vile) {
+			if (vile.chargeButtonHeld()) {
+				vile.increaseCharge();
+			}
+			if (vile.getChargeLevel() >= 3 && !vile.chargeButtonHeld()) {
+				vile.laserWeapon.vileShoot(WeaponIds.VileLaser, vile);
+			}
+		}
 	}
 
 	public Point getMK5Pos() {

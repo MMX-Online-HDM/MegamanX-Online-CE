@@ -20,7 +20,7 @@ public class ParasiticBomb : Weapon {
 		killFeedIndex = 41;
 		weaknessIndex = (int)WeaponIds.GravityWell;
 		damage = "4/4";
-		effect = "Slows enemies and slams them if detonated \nunless mashed off. Homing bees.";
+		effect = "U:Slows down enemies and slams them\nif detonated unless mashed off.\nC:Homing bees.";
 		hitcooldown = "0";
 		flinch = "26/26";
 		flinchCD = "0";

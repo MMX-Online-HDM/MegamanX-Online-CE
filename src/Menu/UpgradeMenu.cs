@@ -96,14 +96,9 @@ public class UpgradeMenu : IMainMenu {
 
 		if (Global.input.isPressedMenu(Control.MenuLeft) || Global.input.isPressedMenu(Control.WeaponLeft)) {
 			if (mainPlayer.realCharNum == 0) {
-				if (mainPlayer.canUpgradeXArmor()) {
-					if (Options.main.oldUpgradeMenuX) {
-						UpgradeArmorMenu.xGame = 3;
-						Menu.change(new UpgradeArmorMenu(this));
-					} else if (!Options.main.oldUpgradeMenuX) {
-						UpgradeArmorMenuEX.xGame = 1;
-						Menu.change(new UpgradeArmorMenuEX(this));
-					}
+				if (mainPlayer.canUpgradeXArmor()) {		
+					UpgradeArmorMenuEX.xGame = 1;
+					Menu.change(new UpgradeArmorMenuEX(this));
 					onUpgradeMenu = false;
 					return;
 				}
@@ -113,13 +108,8 @@ public class UpgradeMenu : IMainMenu {
 		if (Global.input.isPressedMenu(Control.MenuRight) || Global.input.isPressedMenu(Control.WeaponRight)) {
 			if (mainPlayer.realCharNum == 0) {
 				if (mainPlayer.canUpgradeXArmor()) {
-					if (Options.main.oldUpgradeMenuX) {
-						UpgradeArmorMenu.xGame = 1;
-						Menu.change(new UpgradeArmorMenu(this));
-					} else if (!Options.main.oldUpgradeMenuX) {
-						UpgradeArmorMenuEX.xGame = 1;
-						Menu.change(new UpgradeArmorMenuEX(this));
-					}
+					UpgradeArmorMenuEX.xGame = 1;
+					Menu.change(new UpgradeArmorMenuEX(this));
 					onUpgradeMenu = false;
 					return;
 				}

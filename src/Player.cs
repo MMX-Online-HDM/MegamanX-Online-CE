@@ -2121,7 +2121,10 @@ public partial class Player {
 		if (Global.level?.server?.customMatchSettings != null) {
 			fillSubtank(Global.level.server.customMatchSettings.subtankGain);
 		} else {
-			fillSubtank(4);
+			if (character is Zero or PunchyZero or BusterZero) fillSubtank(2);
+			if (character is Vile) fillSubtank(2);
+            if (character is Axl) fillSubtank(3);
+            if (character is MegamanX or BaseSigma) fillSubtank(4);
 		}
 		if (character is Zero zero && zero.isViral) {
 			zero.freeBusterShots++;

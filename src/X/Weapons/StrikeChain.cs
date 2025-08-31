@@ -20,7 +20,7 @@ public class StrikeChain : Weapon {
 		weaknessIndex = (int)WeaponIds.SonicSlicer;
 		switchCooldown = 20;
 		damage = "2/4";
-		effect = "Hooks enemies and items. Be Spider-Man.";
+		effect = "Both:Hooks enemies and items.\nPull yourself towards walls.\nBe Spider-Man.";
 		hitcooldown = "30";
 		flinch = "Hooked Time";
 		flinchCD = "0";

@@ -888,24 +888,6 @@ public class OptionsMenu : IMainMenu {
 					},
 					"Disables performing Nova Strike\n if a Floor is close by."
 				),
-				// Should Nova on floor walls.
-				new MenuOption(
-					30, startY,
-					() => {
-						Helpers.menuLeftRightBool(ref Options.main.oldUpgradeMenuX);
-					},
-					(Point pos, int index) => {
-						Fonts.drawText(
-							optionFontText, "Old Upgrade Menu:",
- 							pos.x, pos.y, selected: selectedArrowPosY == index
-						);
-						Fonts.drawText(
-							optionFontValue, Helpers.boolYesNo(Options.main.oldUpgradeMenuX),
-							pos.x + 166, pos.y, selected: selectedArrowPosY == index
-						);
-					},
-					"Activates the old upgrade armor menu."
-				),
 				/*
 				new MenuOption(
 					30, startY,

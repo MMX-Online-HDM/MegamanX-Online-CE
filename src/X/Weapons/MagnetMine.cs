@@ -18,7 +18,7 @@ public class MagnetMine : Weapon {
 		weaponSlotIndex = 15;
 		killFeedIndex = 20 + (index - 9);
 		weaknessIndex = (int)WeaponIds.SilkShot;
-		effect = "C: Can absorb projectiles and grow it's size.\nSize growth depends on the damage of the projectile.";
+		effect = "U:Planted mines have a limit of 10.\nC:Can absorb projectiles and grow its size.\nGrowth depends on the damage absorbed.";
 		hitcooldown = "0/12";
 		damage = "2,4/1,2,4";
 		flinch = "0/26";

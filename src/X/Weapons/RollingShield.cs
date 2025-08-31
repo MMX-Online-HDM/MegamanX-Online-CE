@@ -18,7 +18,7 @@ public class RollingShield : Weapon {
 		shootSounds = new string[] { "rollingShield", "rollingShield", "rollingShield", "" };
 		fireRate = 45;
 		damage = "2/1";
-		effect = "Mobile Shield That Deletes Projectiles.";
+		effect = "U:Mobile Shield That Deletes Projectiles.\nC:Immune to Stuns, DOT and Debuffs.";
 		hitcooldown = "0/20";	
 	}
 

@@ -70,7 +70,7 @@ public class DanchienWeapon : Weapon {
 		damage = "2";
 		hitcooldown = "0.5";
 		flinch = "0";
-		effect = "Burn DOT: 1 Second.Bounce on enemy by jumping.";
+		effect = "Burn DOT: 1 Second. Bounce on enemies by jumping.";
 	}
 }
 

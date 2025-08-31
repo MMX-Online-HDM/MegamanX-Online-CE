@@ -227,7 +227,7 @@ public class Sigma3FireProj : Projectile {
 			if (spriteXDir == -1) {
 				byteAngle -= 128;
 			}
-		} else if (upDownDir != 0) {
+		} else {
 			if (owner.input.isHeld(Control.Down, owner)) {
 				vel.y = 250;
 			} else if (owner.input.isHeld(Control.Up, owner)) {

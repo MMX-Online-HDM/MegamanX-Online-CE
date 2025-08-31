@@ -621,6 +621,35 @@ public class MegamanX : Character {
 		return base.getRunSpeed();
 	}
 
+	public override float getDashSpeed() {
+		if (flag != null || !isDashing) {
+			return getRunSpeed();
+		}
+		float dashSpeed = 3.5f * 60;
+		return dashSpeed * getRunDebuffs();
+	}
+
+	public override void onFlagPickup(Flag flag) {
+		if (chargedRollingShieldProj != null)
+		 chargedRollingShieldProj.destroySelf();
+		if (chargedParasiticBomb != null)
+             chargedParasiticBomb.destroy();
+
+		stingActiveTime = 0;
+		popAllBubbles();
+		base.onFlagPickup(flag);
+	}
+
+	public override bool isStunImmune() {
+		if (chargedRollingShieldProj != null) return true;
+		return base.isStunImmune();
+	}
+
+	public override bool isDebuffImmune() {
+		if (chargedRollingShieldProj != null) return true;
+		return base.isDebuffImmune();
+	}
+
 	public override bool canAirDash() {
 		return dashedInAir == 0 || (dashedInAir < 2 && hyperLegArmor == ArmorId.Max);
 	}
