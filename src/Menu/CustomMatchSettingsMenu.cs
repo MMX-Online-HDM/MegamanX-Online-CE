@@ -656,14 +656,14 @@ public class CustomMatchSettingsMenu : IMainMenu {
 			new MenuOption(
 				startX3, currentY3 += lineH3,
 				() => {
-					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.quakeBlazerDownwards, true);
+					Helpers.menuLeftRightBool(ref cSettings.quakeBlazerDownwards, true);
 				},
 				(Point pos, int index) => {
 					Fonts.drawText(
 						FontType.Purple,
 						"Quake Blazer knocks downwards: " +
-						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.quakeBlazerDownwards),
-						pos.x, pos.y, selected: selectArrowPosY3 == 8
+						Helpers.boolYesNo(cSettings.quakeBlazerDownwards),
+						pos.x, pos.y, selected: selectArrowPosY3 == index
 					);
 				}
 			)
