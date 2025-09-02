@@ -88,6 +88,7 @@ public class Vile : Character {
 			-1 => new NoneFlamethrower(),
 			1 => new SeaDragonRage(),
 			2 => new DragonsWrath(),
+			3 => new NoneNapalmFlamethrower(),
 			_ => new WildHorseKick()
 		};
 		laserWeapon = new VileLaser((VileLaserType)loadout.laser);
@@ -157,7 +158,7 @@ public class Vile : Character {
 		}
 		if (!ownedByLocalPlayer) {
 			return;
-		} 
+		}
 		if ((grounded || charState is LadderClimb || charState is LadderEnd || charState is WallSlide) && vileHoverTime > 0) {
 			vileHoverTime -= Global.spf * 6;
 			if (vileHoverTime < 0) vileHoverTime = 0;
@@ -221,14 +222,14 @@ public class Vile : Character {
 
 
 		if (charState is InRideChaser) {
-			return;
+			//return;
 		}
 		RideArmorAttacks();
 		RideLinkMK5();
 		// GMTODO: Consider a better way here instead of a hard-coded deny list
 		// Gacel: Done, now it uses attackCtrl
 		if (!charState.attackCtrl || charState is VileMK2GrabState) {
-			return;
+			//return;
 		}
 		chargeLogic(shoot);
 	}
@@ -378,7 +379,7 @@ public class Vile : Character {
 		return player.input.isHeld(Control.Special1, player);
 	}
 	public override bool canCharge() {
-		return !isInvulnerable(true) && charState is not Die && invulnTime == 0;
+		return !isInvulnerable(true) && charState is not Die && invulnTime == 0 && energy.ammo >= laserWeapon.getAmmoUsage(0);
 	}
 	public override int getMaxChargeLevel() {
 		return isVileMK5 ? 4 : 3;
@@ -389,26 +390,7 @@ public class Vile : Character {
 		if (!player.canControl) return false;
 		return base.canShoot();
 	}
-	public override void chargeLogic(Action<int> shootFunct) {
-		if (flag == null && chargeButtonHeld() &&
-			(energy.ammo >= laserWeapon.getAmmoUsage(0) || 
-			currentWeapon is AssassinBulletChar)
-		) {
-			if (canCharge()) {
-				increaseCharge();
-			}
-		}
-		else if (canShoot()) {
-			int chargeLevel = getChargeLevel();
-			if (isCharging()) {
-				if (chargeLevel >= 1) {
-					shootFunct(chargeLevel);
-				}
-			}
-			stopCharge();
-		}
-		chargeGfx();
-	}
+
 	public void RideLinkMK5() {
 		if (isVileMK5 && linkedRideArmor != null &&
 			player.input.isPressed(Control.Special2, player) &&
@@ -435,7 +417,7 @@ public class Vile : Character {
 				onMechSlotSelect(rideMenuWeapon);
 				return;
 			}
-		// Ride Menu
+			// Ride Menu
 		} else if (!oldATrans &&
 			player.input.isPressed(Control.Special2, player) &&
 			!player.input.isHeld(Control.Down, player)

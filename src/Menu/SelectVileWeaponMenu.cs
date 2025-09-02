@@ -64,7 +64,9 @@ public class SelectVileWeaponMenu : IMainMenu {
 				NoneFlamethrower.netWeapon,
 				WildHorseKick.netWeapon,
 				SeaDragonRage.netWeapon,
-				DragonsWrath.netWeapon
+				DragonsWrath.netWeapon,
+				NoneNapalmFlamethrower.netWeapon,
+
 			]),
 			("Laser", [
 				new VileLaser(VileLaserType.None),
