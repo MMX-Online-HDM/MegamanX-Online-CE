@@ -856,10 +856,10 @@ public partial class Player {
 		if (character is Vile vile) {
 			if (isSelectingRA()) {
 				int maxRAIndex = vile.isVileMK1 ? 3 : 4;
-				if (input.isPressedMenu(Control.MenuDown)) {
+				if (input.isPressedMenu(Control.MenuLeft)) {
 					selectedRAIndex--;
 					if (selectedRAIndex < 0) selectedRAIndex = maxRAIndex;
-				} else if (input.isPressedMenu(Control.MenuUp)) {
+				} else if (input.isPressedMenu(Control.MenuRight)) {
 					selectedRAIndex++;
 					if (selectedRAIndex > maxRAIndex) selectedRAIndex = 0;
 				}
