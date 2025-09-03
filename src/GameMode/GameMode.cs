@@ -744,22 +744,60 @@ public class GameMode {
 					drawGigaWeaponCooldown(102, cooldown);
 				}
 			}
-			if (drawPlayer.character is Vile vilePilot &&
-			vilePilot.rideArmor != null &&
-			vilePilot.rideArmor == vilePilot.linkedRideArmor
-			&& vilePilot.rideArmor.raNum == 2
-			) {
-				int x = 13, y = 155;
-				int napalmNum = drawPlayer.loadout.vileLoadout.napalm;
-				if (napalmNum < 0) napalmNum = 0;
-				if (napalmNum > 2) napalmNum = 0;
-				Global.sprites["hud_hawk_bombs"].drawToHUD(
-					napalmNum, x, y, alpha: vilePilot.napalmWeapon.shootCooldown == 0 ? 1 : 0.5f
-				);
-				Fonts.drawText(
-					FontType.Grey, "x" + vilePilot.rideArmor.hawkBombCount.ToString(), x + 10, y - 4
-				);
+			if (drawPlayer.character is Vile vava) {
+				int xStart = (int)Global.halfScreenW / 17;
+				int yStart = 160;
+				if (vava.cannonWeapon.shootCooldown > 0) {
+					float Ccooldown = 1 - Helpers.progress(vava.cannonWeapon.shootCooldown, vava.cannonWeapon.fireRate);
+					drawGigaWeaponCooldown(43, Ccooldown, xStart, yStart);
+					yStart += 15;
+				}
+				if (vava.rocketPunchWeapon.shootCooldown > 0) {
+					float Ccooldown = 1 - Helpers.progress(vava.rocketPunchWeapon.shootCooldown, vava.rocketPunchWeapon.fireRate);
+					drawGigaWeaponCooldown(45, Ccooldown, xStart, yStart);
+					yStart += 15;
+				}
+				if (vava.missileWeapon.shootCooldown > 0) {
+					float Ccooldown = 1 - Helpers.progress(vava.missileWeapon.shootCooldown, vava.missileWeapon.fireRate);
+					drawGigaWeaponCooldown(17, Ccooldown, xStart, yStart, isKillFeed: true, xStart, yStart);
+					yStart += 15;
+				}
+				if (vava.napalmWeapon.shootCooldown > 0) {
+					float Ccooldown = 1 - Helpers.progress(vava.napalmWeapon.shootCooldown, vava.napalmWeapon.fireRate);
+					drawGigaWeaponCooldown(30, Ccooldown, xStart, yStart, isKillFeed: true, xStart, yStart);
+					yStart += 15;
+				}
+				if (vava.cutterWeapon.shootCooldown > 0) {
+					float Ccooldown = 1 - Helpers.progress(vava.cutterWeapon.shootCooldown, vava.cutterWeapon.fireRate);
+					drawGigaWeaponCooldown(114, Ccooldown, xStart, yStart, isKillFeed: true, xStart - 1, yStart);
+					yStart += 15;
+				}
+				if (vava.flamethrowerWeapon.shootCooldown > 0) {
+					float Ccooldown = 1 - Helpers.progress(vava.flamethrowerWeapon.shootCooldown, vava.flamethrowerWeapon.fireRate);
+					drawGigaWeaponCooldown(118, Ccooldown, xStart, yStart, isKillFeed: true, xStart, yStart);
+					yStart += 15;
+				}
+				if (vava.grenadeWeapon.shootCooldown > 0) {
+					float Ccooldown = 1 - Helpers.progress(vava.grenadeWeapon.shootCooldown, vava.grenadeWeapon.fireRate);
+					drawGigaWeaponCooldown(15, Ccooldown, xStart, yStart, isKillFeed: true, xStart, yStart);
+				}
 			}
+			if (drawPlayer.character is Vile vilePilot &&
+				vilePilot.rideArmor != null &&
+				vilePilot.rideArmor == vilePilot.linkedRideArmor
+				&& vilePilot.rideArmor.raNum == 2
+				) {
+					int x = 13, y = 155;
+					int napalmNum = drawPlayer.loadout.vileLoadout.napalm;
+					if (napalmNum < 0) napalmNum = 0;
+					if (napalmNum > 2) napalmNum = 0;
+					Global.sprites["hud_hawk_bombs"].drawToHUD(
+						napalmNum, x, y, alpha: vilePilot.napalmWeapon.shootCooldown == 0 ? 1 : 0.5f
+					);
+					Fonts.drawText(
+						FontType.Grey, "x" + vilePilot.rideArmor.hawkBombCount.ToString(), x + 10, y - 4
+					);
+				}
 			if (drawPlayer.weapons == null) {
 				return;
 			}
@@ -2073,8 +2111,13 @@ public class GameMode {
 		drawGigaWeaponCooldown(weapon.weaponSlotIndex, 1 - cooldown, x, y);
 	}
 
-	public void drawGigaWeaponCooldown(int slotIndex, float cooldown, int x = 11, int y = 159) {
-		Global.sprites["hud_weapon_icon"].drawToHUD(slotIndex, x, y);
+	public void drawGigaWeaponCooldown(int slotIndex, float cooldown, int x = 11, int y = 159, bool isKillFeed = false, int xKF = 11, int yKF = 159) {
+		if (isKillFeed) {
+			Global.sprites["hud_weapon_icon"].drawToHUD(118, x, y);
+			Global.sprites["hud_killfeed_weapon"].drawToHUD(slotIndex, xKF, yKF);
+		} else {
+			Global.sprites["hud_weapon_icon"].drawToHUD(slotIndex, x, y);
+		}
 		drawWeaponSlotCooldown(x, y, cooldown);
 	}
 
