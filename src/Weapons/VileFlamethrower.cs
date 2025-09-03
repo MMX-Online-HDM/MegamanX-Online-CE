@@ -31,7 +31,7 @@ public abstract class VileFlamethrower : Weapon {
 	}
 
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
-		if (shootCooldown < 0) return;
+		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < 0) return;
 		if (vile.flamethrowerWeapon.type == (int)VileFlamethrowerType.None) return;
 	}
@@ -102,6 +102,7 @@ public class WildHorseKick : VileFlamethrower {
 	}
 
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+		if (shootCooldown > 0) return;
 		vile.setVileShootTime(this);
 		vile.changeState(new FlamethrowerState(), true);
 		base.vileShoot(weaponInput, vile);
@@ -134,6 +135,7 @@ public class SeaDragonRage : VileFlamethrower {
 	}
 
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+		if (shootCooldown > 0) return;
 		vile.setVileShootTime(this);
 		vile.changeState(new FlamethrowerState(), true);
 		base.vileShoot(weaponInput, vile);
@@ -165,6 +167,7 @@ public class DragonsWrath : VileFlamethrower {
 	}
 
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+		if (shootCooldown > 0) return;
 		vile.setVileShootTime(this);
 		vile.changeState(new FlamethrowerState(), true);
 		base.vileShoot(weaponInput, vile);
