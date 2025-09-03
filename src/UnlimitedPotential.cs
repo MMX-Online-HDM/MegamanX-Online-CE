@@ -181,6 +181,7 @@ public class XUPParryMeleeState : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		mmx = player.character as RagingChargeX ?? throw new NullReferenceException();
+		character.clenaseDmgDebuffs();
 		//character.frameIndex = 2;
 	}
 
@@ -283,9 +284,10 @@ public class XUPParryProjState : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		mmx = player.character as RagingChargeX ?? throw new NullReferenceException();
+		character.clenaseDmgDebuffs();
 		if (!shootProj || absorbThenShoot) {
 			absorbAnim = new Anim(
-				otherProj.pos, otherProj.sprite.name, otherProj.xDir, 
+				otherProj.pos, otherProj.sprite.name, otherProj.xDir,
 				player.getNextActorNetId(), false, sendRpc: true
 			);
 			absorbAnim.syncScale = true;

@@ -62,6 +62,7 @@ public class HexaInvoluteState : VileState {
 		if (character.grounded) {
 			startGrounded = true;
 		}
+		character.clenaseDmgDebuffs();
 		character.stopMovingS();
 		vile.vileHoverTime = vile.vileMaxHoverTime;
 		vile.getOffMK5Platform();

@@ -118,6 +118,7 @@ public class VileRevive : VileState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		//character.setzIndex(ZIndex.Foreground);
+		character.clenaseDmgDebuffs();
 		character.alive = true;
 		character.playSound("revive");
 		character.addMusicSource("demo_X3", character.getCenterPos(), false, loop: false);

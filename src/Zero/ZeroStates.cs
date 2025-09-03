@@ -90,6 +90,7 @@ public class HyperZeroStart : ZeroState {
 		character.useGravity = false;
 		character.vel = new Point();
 		character.player.currency -= 10;
+		character.clenaseDmgDebuffs();
 		if (zero.hyperMode == 2) {
 			zero.changeSpriteFromName("hyper_viral", true);
 			virusAnimName = "sigmavirushead";
