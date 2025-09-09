@@ -180,7 +180,7 @@ public class VileLoadout {
 		if (!inRange(ball, -2, 3)) { ball = 0; }
 		if (!inRange(laser, -1, 2)) { laser = 0; }
 		if (!inRange(cutter, -1, 2)) { cutter = 0; }
-		if (!inRange(flamethrower, -1, 3)) { flamethrower = 0; }
+		if (!inRange(flamethrower, -1, 4)) { flamethrower = 0; }
 
 		if (getTotalWeight() > maxWeight) {
 			cannon = 0;

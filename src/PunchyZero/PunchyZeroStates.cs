@@ -369,6 +369,7 @@ public class PZeroParryCounter : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.useGravity = false;
+		character.clenaseDmgDebuffs();
 		if (counterAttackTarget != null) {
 			currentPos = character.pos;
 			counterAttackPos = counterAttackTarget.pos;
@@ -513,6 +514,7 @@ public class HyperPunchyZeroStart : PZeroState {
 		base.onEnter(oldState);
 		character.useGravity = false;
 		character.vel = new Point();
+		character.clenaseDmgDebuffs();
 		if (zero == null) {
 			throw new NullReferenceException();
 		}
@@ -726,7 +728,10 @@ public abstract class PunchyZeroGigaAttack : PZeroState {
 	public void playSound(string sound) {
 		character.playSound(sound, forcePlay: false, sendRpc: true);
 	}
-
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.clenaseDmgDebuffs();
+	}
 	public override void onExit(CharState? newState) {
 		weapon.shootCooldown = weapon.fireRate;
 		if (Anim != null) {

@@ -756,7 +756,7 @@ public class HostMenu : IMainMenu {
 				)
 			);
 		}
-		/*
+		
 		// Private match
 		if (!isOffline && !isLAN) {
 			menuOptions.Add(
@@ -781,7 +781,7 @@ public class HostMenu : IMainMenu {
 				)
 			);
 		}
-		*/
+		
 		// Netcode model
 		if (!isOffline) {
 			menuOptions.Add(

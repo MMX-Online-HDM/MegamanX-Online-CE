@@ -621,6 +621,7 @@ public abstract class ZeroGigaAttack : CharState {
 	}
 	
 	public override void onEnter(CharState oldState) {
+		character.clenaseDmgDebuffs();
 		base.onEnter(oldState);
 	}
 
