@@ -2678,7 +2678,7 @@ public partial class Level {
 			dump += "NetId: " + redFlag.netId + "\n";
 			dump += "Owned By Local Player: " + redFlag.ownedByLocalPlayer + "\n";
 			dump += "Position: " + redFlag.pos.ToString() + "\n";
-			dump += "Carrier: " + redFlag.chr?.player?.name + "\n";
+			dump += "Carrier: " + redFlag.linkedChar?.player?.name + "\n";
 			if (redFlag.destroyed) dump += "DESTROYED\n";
 		}
 		dump += "\nBlue Flag:\n";
@@ -2686,7 +2686,7 @@ public partial class Level {
 			dump += "NetId: " + blueFlag.netId + "\n"; ;
 			dump += "Owned By Local Player: " + blueFlag.ownedByLocalPlayer + "\n"; ;
 			dump += "Position: " + blueFlag.pos.ToString() + "\n"; ;
-			dump += "Carrier: " + blueFlag.chr?.player?.name + "\n";
+			dump += "Carrier: " + blueFlag.linkedChar?.player?.name + "\n";
 			if (blueFlag.destroyed) dump += "DESTROYED\n";
 		}
 

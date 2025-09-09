@@ -243,7 +243,7 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontValue, "Fast Shaders:",
+							optionFontValue, "Legacy Shaders:",
 							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
@@ -251,7 +251,7 @@ public class OptionsMenu : IMainMenu {
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Uses a faster shader system for better performance,\n" +
+					"Uses an old shader system for better performance on old hardware,\n" +
 					"disables special effects like team mode outlines."
 				),
 				// Preset

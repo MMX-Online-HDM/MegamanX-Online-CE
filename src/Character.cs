@@ -1683,15 +1683,24 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual void clenaseAllDebuffs() {
+		// Remove all DOT.
 		removeBurn();
 		removeAcid();
+		// Remove debuffs.
 		oilTime = 0;
 		parasiteTime = 0;
 		parasiteMashTime = 0;
 		parasiteDamager = null;
+		// Remove slows.
 		igFreezeProgress = 0;
 		virusTime = 0;
 		slowdownTime = 0;
+		xFlinchPushVel = 0;
+		// Remove stuns & grabs.
+		if (charState is Hurt or GenericStun or VileMK2Grabbed or GenericGrabbedState) {
+			changeToIdleOrFall();
+			return;
+		}
 	}
 
 	// If factorHyperMode = true, then invuln frames in a hyper mode won't count as "invulnerable".

@@ -13,11 +13,11 @@ public partial class Player {
 	public static Player stagePlayer = new Player(
 		"Stage", 255, -1,
 		new PlayerCharData() { charNum = -1 },
-		false, true, GameMode.neutralAlliance,
+		false, true, GameMode.stageAlliance,
 		new Input(false),
 		new ServerPlayer(
 			"Stage", 255, false,
-			-1, GameMode.neutralAlliance, "NULL", null, 0
+			-1, GameMode.stageAlliance, "NULL", null, 0
 		)
 	);
 	public static Player errorPlayer = new Player(

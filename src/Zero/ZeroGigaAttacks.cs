@@ -625,7 +625,7 @@ public abstract class ZeroGigaAttack : CharState {
 		base.onEnter(oldState);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		weapon.shootCooldown = weapon.fireRate;
 		base.onExit(newState);
 	}
@@ -752,7 +752,7 @@ public class RekkohaState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.clenaseDmgDebuffs();
+		character.clenaseAllDebuffs();
 		if (player.isMainPlayer) {
 			effect = new RekkohaEffect();
 		}
@@ -821,6 +821,11 @@ public class DarkHoldShootState : CharState {
 			character.changeToIdleOrFall();
 			return;
 		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.clenaseDmgDebuffs();
 	}
 
 	public override void onExit(CharState? newState) {

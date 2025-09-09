@@ -24,7 +24,7 @@ public class HyperZeroStart : ZeroState {
 	public float radius = 200;
 	public float time;
 	Anim? virusEffectParts;
-	Anim[] virusAnim = new Anim[3];
+	Anim?[] virusAnim = new Anim?[3];
 	float[] delayedVirusTimer = { 0, 7, 14 };
 	string virusAnimName = "";
 
@@ -37,23 +37,25 @@ public class HyperZeroStart : ZeroState {
 		if (virusAnimName != "") {
 			int animCount = 0;
 			for (int i = 0; i < virusAnim.Length; i++) {
-				if (virusAnim[i] != null) {
-					if (virusAnim[i].pos == character.getCenterPos()) {
-						virusAnim[i].destroySelf();
+				Anim? targetAnim = virusAnim[i];
+				if (targetAnim != null) {
+					if (targetAnim.pos == character.getCenterPos()) {
+						targetAnim.destroySelf();
 					}
-					if (virusAnim[i].destroyed) {
+					if (targetAnim.destroyed) {
 						character.playSound("shingetsurinx5", true);
 						if (stateFrames > 55) {
 							virusAnim[i] = null;
 							continue;
 						}
-						virusAnim[i] = virusAnim[i] = createVirusAnim();
+						targetAnim = createVirusAnim();
+						virusAnim[i] = targetAnim;
 					} else {
 						animCount++;
 					}
-					virusAnim[i].moveToPos(character.getCenterPos(), 300);
-					if (virusAnim[i].pos.distanceTo(character.getCenterPos()) < 10) {
-						virusAnim[i].destroySelf();
+					targetAnim.moveToPos(character.getCenterPos(), 300);
+					if (targetAnim.pos.distanceTo(character.getCenterPos()) < 10) {
+						targetAnim.destroySelf();
 					}
 				} else if (delayedVirusTimer[i] > 0) {
 					delayedVirusTimer[i] -= Global.speedMul;
@@ -90,7 +92,7 @@ public class HyperZeroStart : ZeroState {
 		character.useGravity = false;
 		character.vel = new Point();
 		character.player.currency -= 10;
-		character.clenaseDmgDebuffs();
+		character.clenaseAllDebuffs();
 		if (zero.hyperMode == 2) {
 			zero.changeSpriteFromName("hyper_viral", true);
 			virusAnimName = "sigmavirushead";

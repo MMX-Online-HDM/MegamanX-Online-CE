@@ -185,7 +185,7 @@ public class GigaCrushCharState : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		mmx = character as MegamanX ?? throw new NullReferenceException();
-		mmx.clenaseDmgDebuffs();
+		mmx.clenaseAllDebuffs();
 		mmx.useGravity = false;
 		mmx.vel.y = 0;
 		if (character.ownedByLocalPlayer && player == Global.level.mainPlayer) {

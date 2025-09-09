@@ -23,7 +23,9 @@ public class GameMode {
 
 	public const int blueAlliance = 0;
 	public const int redAlliance = 1;
-	public const int neutralAlliance = 10;
+	public const int neutralAlliance = 50;
+	public const int stageAlliance = 52;
+	public const int freelanceAlliance = 60;
 
 	public bool isTeamMode = false;
 	public float overTime = 0;
