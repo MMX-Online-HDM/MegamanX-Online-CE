@@ -905,10 +905,10 @@ public class MegamanX : Character {
 			"mmx_nova_strike" or "mmx_nova_strike_down" or "mmx_nova_strike_up" => MeleeIds.NovaStrike,
 			// Light  Helmet.
 			"mmx_jump" or "mmx_jump_shoot" or "mmx_wall_kick" or "mmx_wall_kick_shoot"
-			when helmetArmor == ArmorId.Light && stingActiveTime == 0 => MeleeIds.LightHeadbutt,
+			when helmetArmor == ArmorId.Light && stingActiveTime == 0 && invulnTime == 0 => MeleeIds.LightHeadbutt,
 			// Light Helmet when it up-dashes.
 			"mmx_up_dash" or "mmx_up_dash_shoot"
-			when helmetArmor == ArmorId.Light && stingActiveTime == 0 => MeleeIds.LightHeadbuttEX,
+			when helmetArmor == ArmorId.Light && stingActiveTime == 0 && invulnTime == 0 => MeleeIds.LightHeadbuttEX,
 			// Nothing.
 			_ => MeleeIds.None
 		});
