@@ -655,6 +655,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual CharState getIdleState() => new Idle();
+	public virtual CharState getCrouchState() => new Crouch();
 	public virtual CharState getRunState(bool skipInto = false) => new Run(skipInto);
 	public virtual CharState getJumpState() => new Jump();
 	public virtual CharState getAirJumpState() => new Jump();
@@ -1385,7 +1386,7 @@ public partial class Character : Actor, IDamagable {
 				return true;
 			}
 			if (player.isCrouchHeld() && canCrouch() && charState is not Crouch) {
-				changeState(new Crouch());
+				changeState(getCrouchState());
 				return true;
 			}
 			if (player.input.isPressed(Control.Taunt, player)) {
@@ -1978,7 +1979,7 @@ public partial class Character : Actor, IDamagable {
 
 	public virtual void changeToCrouchOrFall() {
 		if (grounded) {
-			changeState(new Crouch(), true);
+			changeState(getCrouchState());
 		} else {
 			if (vel.y * gravityModifier < 0 && charState.canStopJump && !charState.stoppedJump) {
 				CharState jumpState = getJumpState();
@@ -2003,7 +2004,7 @@ public partial class Character : Actor, IDamagable {
 					stateFrames = wallSlide.stateFrames
 				}
 			),
-			Crouch when canCrouch() => new Crouch(),
+			Crouch when canCrouch() => getCrouchState(),
 			Run => getRunState(true),
 			_ => null
 		};

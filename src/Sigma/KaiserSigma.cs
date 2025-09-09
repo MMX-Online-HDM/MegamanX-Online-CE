@@ -68,6 +68,13 @@ public partial class KaiserSigma : Character {
 		altSoundId = AltSoundIds.X3;
 	}
 
+	public override CharState getIdleState() => new KaiserSigmaIdleState();
+	public override CharState getRunState(bool skipInto = false) => new KaiserSigmaWalkState();
+	public override CharState getJumpState() => new KaiserSigmaJumpState();
+	public override CharState getAirJumpState() => new KaiserSigmaJumpState();
+	public override CharState getFallState() => new KaiserSigmaFallState();
+	public override CharState getTauntState() => new KaiserSigmaTauntState();
+
 	public override int getMaxHealth() {
 		if (isATrans) {
 			return base.getMaxHealth();
