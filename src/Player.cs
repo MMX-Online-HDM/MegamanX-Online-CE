@@ -2103,8 +2103,7 @@ public partial class Player {
 				return false;
 			}
 			/*
-			if (character?.charState?.isGrabbedState == true)
-			{
+			if (character?.charState?.isGrabbedState == true) {
 				return false;
 			}
 			*/

@@ -776,7 +776,7 @@ public class Axl : Character {
 			changeState(new Hover(), true);
 			return true;
 		}
-		if (dodgeRollCooldown == 0 && player.canControl && grounded) {
+		if (dodgeRollCooldown == 0) {
 			if (charState is Crouch && dashPressed) {
 				changeState(new DodgeRoll(), true);
 				return true;

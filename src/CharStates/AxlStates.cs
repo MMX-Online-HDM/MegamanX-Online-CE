@@ -148,7 +148,6 @@ public class DodgeRoll : CharState {
 		if (character.burnTime < 0) {
 			character.burnTime = 0;
 		}
-
 		initialDashDir = character.xDir;
 		if (player.input.isHeld(Control.Left, player)) initialDashDir = -1;
 		else if (player.input.isHeld(Control.Right, player)) initialDashDir = 1;
@@ -156,13 +155,12 @@ public class DodgeRoll : CharState {
 
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
-		if (Global.level.server?.customMatchSettings != null)
-			 axl.dodgeRollCooldown = Global.level.server.customMatchSettings.axlDodgerollCooldown;
-		else axl.dodgeRollCooldown = Axl.maxDodgeRollCooldown;
+		axl.dodgeRollCooldown = Global.customSettings?.axlDodgerollCooldown ?? Axl.maxDodgeRollCooldown;
 	}
 
 	public override void update() {
 		base.update();
+		axl.dodgeRollCooldown = Global.customSettings?.axlDodgerollCooldown ?? Axl.maxDodgeRollCooldown;
 
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();

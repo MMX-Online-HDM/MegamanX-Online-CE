@@ -286,6 +286,7 @@ public class ProtectedIntMap<TKey> : Dictionary<TKey, (int valMul, int val)> whe
 	public new int this[TKey key] {
 		get {
 			(int valMul, int val) = base[key];
+			if ()
 			if (val * mul != valMul) {
 				throw new Exception("Error on modified protected value");
 			}

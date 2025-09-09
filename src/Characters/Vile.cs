@@ -386,7 +386,6 @@ public class Vile : Character {
 	public override bool canShoot() {
 		if (isInvulnerableAttack()) return false;
 		if (invulnTime > 0) return false;
-		if (!player.canControl) return false;
 		return base.canShoot();
 	}
 	public override void chargeLogic(Action<int> shootFunct) {
