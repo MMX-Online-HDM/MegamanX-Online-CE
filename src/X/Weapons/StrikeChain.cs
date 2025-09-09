@@ -368,7 +368,7 @@ public class StrikeChainProj : Projectile {
 				return;
 			}
 			//Character specific code.
-			if (chr != null) {
+			if (chr != null && !chr.isGrabImmune() && !chr.isPushImmune()) {
 				if (!chr.canBeDamaged(player.alliance, player.id, projId)) return;
 				hookActor(actor);
 
