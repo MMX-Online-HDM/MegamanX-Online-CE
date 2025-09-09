@@ -102,6 +102,10 @@ public class LevelData {
 	public string parallaxShaderImage;
 	public string backgroundShader;
 	public string backgroundShaderImage;
+	public string backwallShader;
+	public string backwallShaderImage;
+	public string foregroundShader;
+	public string foregroundShaderImage;
 	public bool supportsVehicles;
 	public bool raceOnly;
 	public int customSize = -1;
@@ -300,6 +304,7 @@ public class LevelData {
 		}
 		correctMapNames();
 		validate();
+		mapShadersStuff();
 	}
 
 	public string loadCustomMapSprites() {
@@ -799,6 +804,70 @@ public class LevelData {
 		if (displayName == "Zero Space 3: ") {
 			twoDisplayNames = true;
 			displayName2 = "Awakening 1 VS. 1";
+		}
+	}
+	public void mapShadersStuff() {
+		switch (displayName) {
+			case "Counter Hunter 1":
+				backwallShader = "xhunterBGBW";
+				backwallShaderImage = "paletteXhunter1backwall";
+				break;
+			case "Energen Crystal":
+				backwallShader = "energenCrystalBW";
+				backwallShaderImage = "paletteEnergenCrystalBackWall";
+				break;
+			case "Factory":
+				backwallShader = "FactoryBW";
+				backwallShaderImage = "paletteFactoryBackWall";
+				break;
+			case "Maverick Factory":
+				backwallShader = "MFactoryBW";
+				backwallShaderImage = "paletteMFactoryBW";
+				foregroundShader = "MFactoryBG";
+				foregroundShaderImage = "paletteMFactoryFG";
+				break;
+			case "Hunter Base":
+				backwallShader = "hunterBaseBg";
+				backwallShaderImage = "paletteHunterBaseBackwall";
+				break;
+			case "Weapons Factory":
+				backwallShader = "weaponsFactory";
+				backwallShaderImage = "paletteWeaponsFactory";
+				foregroundShader = "weaponsFactory";
+				foregroundShaderImage = "paletteWeaponsFactory";
+				break;
+			case "Frozen Town":
+				backwallShader = "frozenTown";
+				backwallShaderImage = "paletteFrozenTown";
+				foregroundShader = "frozenTown";
+				foregroundShaderImage = "paletteFrozenTown";
+				break;
+			case "Airborne Aircraft Carrier":
+				backwallShader = "aircraftCarrierBG";
+				backwallShaderImage = "paletteaircraftcarrierBW";
+				break;
+			case "Power Control Center":
+				backwallShader = "powerCenterBW";
+				backwallShaderImage = "palettepowercenterBW";
+				break;
+			case "Quarry":
+				backwallShader = "quarry";
+				backwallShaderImage = "paletteQuarry";
+				break;
+			case "Safari Park":
+				backwallShader = "safariParkBW";
+				backwallShaderImage = "paletteSafariParkBW";
+				foregroundShader = "safariParkBG";
+				foregroundShaderImage = "paletteSafariParkBG";
+				break;
+			case "Doppler A":
+				backwallShader = "dopplerA";
+				backwallShaderImage = "paletteDopplerABW";
+				break;
+			case "Volcanic Zone":
+				backwallShader = "volcanicZoneBW";
+				backwallShaderImage = "palettevolcanicZoneBW";
+				break;
 		}
 	}
 	

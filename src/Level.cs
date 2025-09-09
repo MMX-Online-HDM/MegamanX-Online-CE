@@ -133,6 +133,10 @@ public partial class Level {
 	public Texture backgroundShaderImage;
 	public ShaderWrapper parallaxShader;
 	public Texture parallaxShaderImage;
+	public ShaderWrapper backwallShader;
+	public Texture backwallShaderImage;
+	public ShaderWrapper foregroundShader;
+	public Texture foregroundShaderImage;
 
 	public List<Player> players = new List<Player>();
 	public Player mainPlayer;
@@ -263,6 +267,18 @@ public partial class Level {
 		}
 		if (!string.IsNullOrEmpty(levelData.backgroundShaderImage)) {
 			backgroundShaderImage = Global.textures.GetValueOrDefault(levelData.backgroundShaderImage);
+		}
+		if (!string.IsNullOrEmpty(levelData.backwallShader)) {
+			backwallShader = Helpers.cloneShaderSafe(levelData.backwallShader);
+		}
+		if (!string.IsNullOrEmpty(levelData.backwallShaderImage)) {
+			backwallShaderImage = Global.textures.GetValueOrDefault(levelData.backwallShaderImage);
+		}
+		if (!string.IsNullOrEmpty(levelData.foregroundShader)) {
+			foregroundShader = Helpers.cloneShaderSafe(levelData.foregroundShader);
+		}
+		if (!string.IsNullOrEmpty(levelData.foregroundShaderImage)) {
+			foregroundShaderImage = Global.textures.GetValueOrDefault(levelData.foregroundShaderImage);
 		}
 		if (!string.IsNullOrEmpty(levelData.parallaxShader)) {
 			parallaxShader = Helpers.cloneShaderSafe(levelData.parallaxShader);
@@ -1219,6 +1235,22 @@ public partial class Level {
 				backgroundShader.SetUniform("imageH", (int)backgroundShaderImage.Size.Y);
 			}
 		}
+		if (backwallShader != null) {
+			backwallShader.SetUniform("t", time);
+			if (backwallShaderImage != null) {
+				backwallShader.SetUniform("image", backwallShaderImage);
+				backwallShader.SetUniform("imageW", (int)backwallShaderImage.Size.X);
+				backwallShader.SetUniform("imageH", (int)backwallShaderImage.Size.Y);
+			}
+		}
+		if (foregroundShader != null) {
+			foregroundShader.SetUniform("t", time);
+			if (foregroundShaderImage != null) {
+				foregroundShader.SetUniform("image", foregroundShaderImage);
+				foregroundShader.SetUniform("imageW", (int)foregroundShaderImage.Size.X);
+				foregroundShader.SetUniform("imageH", (int)foregroundShaderImage.Size.Y);
+			}
+		}
 		if (parallaxShader != null) {
 			parallaxShader.SetUniform("t", time);
 			if (parallaxShaderImage != null) {
@@ -1950,12 +1982,13 @@ public partial class Level {
 
 		// If a backwall wasn't set, the background becomes the backwall.
 		if (level.backwallSprites != null) {
+			DrawWrappers.DrawMapTiles(level.backwallSprites, 0, 0, srt, level.backwallShader);
 			DrawWrappers.DrawMapTiles(level.backgroundSprites, 0, 0, srt, level.backgroundShader);
 		}
 
-		level.drawKeyRange(keys, ZIndex.Background, ZIndex.Foreground, srt, walDrawObjects);;
+		level.drawKeyRange(keys, ZIndex.Background, ZIndex.Foreground, srt, walDrawObjects);
 
-		DrawWrappers.DrawMapTiles(level.foregroundSprites, 0, 0, srt, level.backgroundShader);
+		DrawWrappers.DrawMapTiles(level.foregroundSprites, 0, 0, srt, level.foregroundShader);
 
 		level.drawKeyRange(keys, ZIndex.Foreground, long.MaxValue, srt, walDrawObjects);
 
