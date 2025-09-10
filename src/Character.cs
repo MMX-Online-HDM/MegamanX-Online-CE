@@ -2367,6 +2367,11 @@ public partial class Character : Actor, IDamagable {
 						);
 					}
 				}
+			} else {
+				Fonts.drawText(
+					FontType.Grey, charState.GetType().ToString().RemovePrefix("MMXOnline."),
+					textPosX, textPosY -= 10, Alignment.Center, true, depth: ZIndex.HUD
+				);
 			}
 		}
 

@@ -625,8 +625,7 @@ public class MegamanX : Character {
 		if (flag != null || !isDashing) {
 			return getRunSpeed();
 		}
-		float dashSpeed = 3.5f * 60;
-		return dashSpeed * getRunDebuffs();
+		return 3.5f * getRunDebuffs();
 	}
 
 	public override void onFlagPickup(Flag flag) {

@@ -252,6 +252,7 @@ public class CrackedWall : Actor, IDamagable {
 		Global.level.crackedWallAutoIncId++;
 
 		useGravity = false;
+		useActorGrid = true;
 
 		collider.flag = (int)HitboxFlag.Hurtbox;
 		var rect = collider.shape.getRect().getPoints();

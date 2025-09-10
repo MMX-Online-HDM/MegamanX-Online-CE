@@ -678,7 +678,7 @@ public partial class Level {
 				var spriteHeight = Global.sprites[spriteName].frames[0].rect.h();
 
 				if (!enabledInLargeCam && server.fixedCamera) {
-					// Do not add the map sprite
+				// Do not add the map sprite
 				} else if (rawParallaxIndex != null) {
 					if (Options.main.enableMapSprites) {
 						int parallaxIndex = rawParallaxIndex.Value - 1;
@@ -1407,24 +1407,35 @@ public partial class Level {
 
 		// Collision shenanigans.
 		collidedGObjs.Clear();
-		(int x, int y)[] arrayGrid = populatedGrids.ToArray();
+		(int x, int y)[] arrayGrid = populatedGrids.Order().ToArray();
 		foreach ((int x, int y)gridData in arrayGrid) {
 			// Initalize data.
 			List<GameObject> currentGrid = new(grid[gridData.x, gridData.y]);
 			// Give piority to some objects.
 			currentGrid = currentGrid.OrderBy(gameObj => {
+				// Terrain at very last.
+				// This is used for optimization reasons.
+				if (gameObj is Geometry or CrackedWall) {
+					return 5;
+				}
+				// Other non-actor stuff.
 				if (gameObj is not Actor actor) {
 					return 4;
 				}
+				// High piorty stuff, like shields.
 				if (actor.highPiority) {
 					return 0;
 				}
-				if (actor is IDamagable) {
-					return 3;
-				}
+				// Low piority stuff.
+				// Like Kaiser body.
 				if (actor.lowPiority) {
 					return 2;
 				}
+				// Random non-actor stuff.
+				if (actor is IDamagable) {
+					return 3;
+				}
+				// Default.
 				return 1;
 			}).ToList();
 			// Get the terrain.
@@ -1435,8 +1446,9 @@ public partial class Level {
 			// Iterate trough populated grids.
 			for (int i = 0; i < currentGrid.Count; i++) {
 				// Skip terrain.
+				// As terrain is last this just skips terrain coliding with eachother.
 				if (currentGrid[i] is Geometry or CrackedWall) {
-					continue;
+					break;
 				}
 				// Skip destroyed stuff.
 				if (currentGrid[i].iDestroyed) {
@@ -1446,10 +1458,6 @@ public partial class Level {
 					// Exit if we get destroyed.
 					if (currentGrid[i].iDestroyed) {
 						break;
-					}
-					// Skip terrain coliding with eachother.
-					if (currentGrid[j] is Geometry or CrackedWall) {
-						continue;
 					}
 					// Get order independent hash.
 					int hash = currentGrid[i].GetHashCode() ^ currentGrid[j].GetHashCode();
