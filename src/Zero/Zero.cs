@@ -1173,7 +1173,7 @@ public class Zero : Character {
 						break;
 					case 4 when charState is Dash && isTargetDistant:
 						changeState(new ZeroShippuugaState(), true);
-						slideVel = xDir * getDashSpeed() * 2f;
+						slideVel = xDir * getDashSpeed();
 						break;
 					case 5 when grounded && isTargetDistant:
 						if (gigaAttack.shootCooldown <= 0 && gigaAttack.ammo >= gigaAttack.getAmmoUsage(0)) {
@@ -1194,7 +1194,7 @@ public class Zero : Character {
 						break;
 					case 10 when charState is Dash && isTargetDistant && !isBlocking:
 						changeState(new ZeroDashSlashState(), true);
-						slideVel = xDir * getDashSpeed() * 2f;
+						slideVel = xDir * getDashSpeed();
 						break;
 					case 11 when grounded && isTargetDistant:
 						groundSpecial.attack(this);
@@ -1273,11 +1273,11 @@ public class Zero : Character {
 								break;
 							case 4:
 								changeState(new ZeroShippuugaState(), true);
-								slideVel = xDir * getDashSpeed() * 2f;
+								slideVel = xDir * getDashSpeed();
 								break;
 							case 5:
 								changeState(new ZeroDashSlashState(), true);
-								slideVel = xDir * getDashSpeed() * 2f;
+								slideVel = xDir * getDashSpeed();
 								break;
 						}
 						break;
@@ -1323,11 +1323,11 @@ public class Zero : Character {
 				switch (Helpers.randomRange(1, 3)) {
 					case 1:
 						changeState(new ZeroDashSlashState(), true);
-						slideVel = xDir * getDashSpeed() * 2f;
+						slideVel = xDir * getDashSpeed();
 						break;
 					case 2:
 						changeState(new ZeroShippuugaState(), true);
-						slideVel = xDir * getDashSpeed() * 2f;
+						slideVel = xDir * getDashSpeed();
 						break;
 					case 3:
 						changeState(new FSplasherState(), true);
@@ -1339,11 +1339,11 @@ public class Zero : Character {
 				switch (Helpers.randomRange(1, 3)) {
 					case 1:
 						changeState(new ZeroDashSlashState(), true);
-						slideVel = xDir * getDashSpeed() * 2f;
+						slideVel = xDir * getDashSpeed();
 						break;
 					case 2:
 						changeState(new ZeroShippuugaState(), true);
-						slideVel = xDir * getDashSpeed() * 2f;
+						slideVel = xDir * getDashSpeed();
 						break;
 					case 3:
 						changeState(new FSplasherState(), true);
@@ -1390,7 +1390,7 @@ public class Zero : Character {
 	public void WildDanceMove() {
 		if (charState.attackCtrl && !isInvulnerableAttack() && charState.attackCtrl) {
 			changeState(new ZeroShippuugaState(), true);
-			slideVel = xDir * getDashSpeed() * 2f;
+			slideVel = xDir * getDashSpeed();
 		}
 		if (!charState.attackCtrl) {
 			if (sprite.name == "zero_attack_dash2" && sprite.frameIndex >= 7) {
@@ -1399,7 +1399,7 @@ public class Zero : Character {
 			}
 			if (sprite.name == "zero_attack3" && sprite.frameIndex >= 6) {
 				changeState(new ZeroDashSlashState(), true);
-				slideVel = xDir * getDashSpeed() * 2f;
+				slideVel = xDir * getDashSpeed();
 			}
 			if (sprite.name == "zero_attack_dash" && sprite.frameIndex >= 3) {
 				playSound("gigaCrushAmmoFull");
