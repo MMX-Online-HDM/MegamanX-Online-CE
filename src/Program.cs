@@ -261,7 +261,7 @@ class Program {
 		// Force startup config to be fetched
 		Menu.change(new MainMenu());
 		//Global.changeMusic(Global.level.levelData.getTitleTheme());
-		switch (Helpers.randomRange(1, 15)) {
+		switch (Helpers.randomRange(1, 20)) {
 			// Stage Selects
 			case 1:
 				Global.changeMusic("stageSelect_X1");
@@ -308,7 +308,22 @@ class Program {
 				Global.changeMusic("demo_X3");
 				break;
 			case 15:
-				Global.changeMusic("laboratory_X2");
+				Global.changeMusic("laboratory_X3");
+				break;
+			case 16:
+				Global.changeMusic("sigmaFortress4");
+				break;
+			case 17:
+				Global.changeMusic("variableX");
+				break;
+			case 18:
+				Global.changeMusic("credits_X2");
+				break;
+			case 19:
+				Global.changeMusic("drLight_X1");
+				break;
+			case 20:
+				Global.changeMusic("drLight_X2");
 				break;
 			default:
 				Global.changeMusic("stageSelect_X1");
