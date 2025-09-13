@@ -70,7 +70,7 @@ public class LaunchOctopus : Maverick {
 					if (ammo > 0) {
 						changeState(new LaunchOShoot(grounded));
 					}
-				} else if (input.isPressed(Control.Dash, player) && getDistFromGround() > 75) {
+				} else if (input.isPressed(Control.Dash, player)) {
 					changeState(new LaunchOWhirlpoolState());
 				}
 			}

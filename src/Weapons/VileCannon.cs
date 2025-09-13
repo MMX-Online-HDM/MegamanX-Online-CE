@@ -281,20 +281,11 @@ public class CannonAttack : CharState {
 		base.onEnter(oldState);
 		vile = character as Vile ?? throw new NullReferenceException();
 		shootLogic(vile);
-		if (!isGizmo && (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player))) {
-			exitOnAirborne = true;
-		} else {
-			exitOnAirborne = false;
-			character.useGravity = false;
-			character.stopMoving();
-		}
-		
 	}
 
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		vile.isShootingLongshotGizmo = false;
-		character.useGravity = true;
 		if (isGizmo) {
 			vile.gizmoCooldown = 0.5f;
 		}

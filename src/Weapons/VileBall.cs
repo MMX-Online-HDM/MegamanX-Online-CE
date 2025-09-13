@@ -308,6 +308,8 @@ public class AirBombAttack : VileState {
 	) {
 		this.isNapalm = isNapalm;
 		useDashJumpSpeed = true;
+		useGravity = false;
+		exitOnLanding = true;
 	}
 
 	public override void update() {
@@ -378,13 +380,10 @@ public class AirBombAttack : VileState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.useGravity = false;
-		character.vel = new Point();
 	}
 
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
-		character.useGravity = true;
 		if (vile.napalmWeapon.type == (int)NapalmType.NoneBall) {
 			if (vile.grenadeWeapon.type == (int)VileBallType.PeaceOutRoller) {
 				vile.grenadeWeapon.shootCooldown = 75;

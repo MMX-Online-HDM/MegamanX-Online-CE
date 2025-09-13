@@ -88,16 +88,7 @@ public class Napalm : Weapon {
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.napalmWeapon.type == (int)NapalmType.None) return;
-		if (vile.napalmWeapon.type != (int)NapalmType.NoneBall && vile.napalmWeapon.type != (int)NapalmType.NoneFlamethrower) {
-			if (vile.tryUseVileAmmo(vileAmmoUsage)) {
-				vile.setVileShootTime(vile.napalmWeapon);
-				vile.changeState(new NapalmAttackNapalm(), true);
-			}
-		} else if (vile.napalmWeapon.type == (int)NapalmType.NoneBall) {
-			vile.changeState(new NapalmAttackBombs(), true);
-		} else if (vile.napalmWeapon.type == (int)NapalmType.NoneFlamethrower) {
-			vile.changeState(new NapalmAttackFlamethrower(), true);
-		}
+		vile.changeState(new NapalmAttackNapalm(), true);
 	}
 }
 

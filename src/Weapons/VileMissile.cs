@@ -75,55 +75,89 @@ public class VileMissile : Weapon {
 	}
 
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
-		if (shootCooldown > 0) return;
-		if (vile.missileWeapon.type == (int)VileMissileType.None) return;
-		Point shootVel = vile.getVileShootVel(true);
-		bool isMK2 = vile.isVileMK2;
-		int xDir = vile.xDir;
-		
-		if (vile.tryUseVileAmmo(vileAmmo)) {
-			vile.setVileShootTime(this);
-			if (!vile.grounded) {
-				vile.changeState(new MissileAttack(grounded: false), true);
-			} else {
-				vile.changeState(new MissileAttack(grounded: true), true);
+		if (vile.missileWeapon.type == (int)VileMissileType.None ||
+			shootCooldown > 0) {
+			return;
+		}
+		vile.changeState(new MissileAttack(vile.grounded));
+	}
+
+	public override void shoot(Character character, int[] args) {
+		Point shootVel = new Point(1, 0);
+		Point shootPos = character.getFirstPOIOrDefault();
+		bool isMK2 = false;
+		int xDir = character.getShootXDir();
+
+		if (character is Vile vile) {
+			isMK2 = vile.isVileMK2;
+			if (type == (int)VileMissileType.ElectricShock) {
+				shootVel = vile.getVileShootVel(true);
+			}
+			shootPos = vile.setCannonAim(new Point(shootVel.x, shootVel.y));
+			if (isMK2 || vile.isVileMK5) {
+				shootPos = vile.getVileMK2StunShotPos() ?? shootPos;
 			}
 		}
-		
-		if (vile.charState is InRideArmor) {
-			if (vile.getShootXDir() == -1) {
-				shootVel = new Point(shootVel.x * vile.getShootXDir(), shootVel.y);
-			}
-			vile.setVileShootTime(this);
-			if (vile.missileWeapon.type == ((int)VileMissileType.ElectricShock)) {
-				if (isMK2) {
-					vile.playSound("mk2stunshot", sendRpc: true);
-					new Anim(vile.getFirstPOIOrDefault(), "dust", 1, vile.player.getNextActorNetId(), true, true);
-					new VileMK2StunShotProj(
-						vile.getFirstPOIOrDefault(), xDir, MathF.Round(shootVel.byteAngle), vile,
-						vile.player, vile.player.getNextActorNetId(), rpc: true
-					);
-				} else {
-					new StunShotProj(
-						vile.getFirstPOIOrDefault(), xDir, MathF.Round(shootVel.byteAngle), vile, 
-						vile.player, vile.player.getNextActorNetId(), rpc: true
-					);
-				}
+		if (xDir == -1) {
+			shootVel.x *= -1;
+		}
+		if (type == ((int)VileMissileType.ElectricShock)) {
+			if (isMK2) {
+				character.playSound("mk2stunshot", sendRpc: true);
+				new Anim(shootPos, "dust", 1, character.player.getNextActorNetId(), true, true);
+				new VileMK2StunShotProj(
+					shootPos, xDir, MathF.Round(shootVel.byteAngle), character,
+					character.player, character.player.getNextActorNetId(), rpc: true
+				);
 			} else {
-				vile.playSound("vileMissile", sendRpc: true);
-				if (vile.missileWeapon.type == ((int)VileMissileType.HumerusCrush)) {
-					new VileMissileProj(
-						vile.getFirstPOIOrDefault(), xDir, 1, MathF.Round(shootVel.byteAngle),  vile.missileWeapon.projSprite,
-						vile, vile.player, vile.player.getNextActorNetId(), rpc: true
-					);
-				}
-				if (vile.missileWeapon.type == ((int)VileMissileType.PopcornDemon)) {
-					new VileMissileProj(
-						vile.getFirstPOIOrDefault(), xDir, 2 , MathF.Round(shootVel.byteAngle), vile.missileWeapon.projSprite,
-						vile, vile.player, vile.player.getNextActorNetId(), rpc: true
-					);
-				}
+				new StunShotProj(
+					shootPos, xDir, MathF.Round(shootVel.byteAngle), character, 
+					character.player, character.player.getNextActorNetId(), rpc: true
+				);
 			}
+		} else {
+			character.playSound("vileMissile", sendRpc: true);
+			if (type == ((int)VileMissileType.HumerusCrush)) {
+				new VileMissileProj(
+					shootPos, xDir, 1, MathF.Round(shootVel.byteAngle),   projSprite,
+					character, character.player, character.player.getNextActorNetId(), rpc: true
+				);	
+			}
+			if (type == ((int)VileMissileType.PopcornDemon)) {
+				new VileMissileProj(
+					shootPos, xDir, 2 , MathF.Round(shootVel.byteAngle), projSprite,
+					character, character.player, character.player.getNextActorNetId(), rpc: true
+				);	
+			}
+		}
+	}
+}
+
+public class MissileAttack : VileState {
+	public bool shoot;
+
+	public MissileAttack(bool grounded) : base(getSprite(grounded)) {
+		useDashJumpSpeed = true;
+		airMove = true;
+		canJump = true;
+		canStopJump = true;
+		airSprite = "cannon_air";
+		landSprite = "idle_shoot";
+	}
+	public static string getSprite(bool grounded) {
+		return grounded ? "idle_shoot" : "cannon_air";
+	}
+
+	public override void update() {
+		base.update();
+		if (vile.getFirstPOI() != null && !shoot) {
+			vile.missileWeapon.shoot(vile, []);
+			vile.addAmmo(-vile.missileWeapon.vileAmmo);
+			vile.missileWeapon.shootCooldown = vile.missileWeapon.fireRate;
+			shoot = true;
+		}
+		if (vile.isAnimOver()) {
+			vile.changeToIdleOrFall();
 		}
 	}
 }
@@ -331,76 +365,5 @@ public class VileMK2StunShotProj : Projectile {
 		return new VileMK2StunShotProj(
 			args.pos, args.xDir, args.byteAngle, args.owner, args.player, args.netId
 		);
-	}
-}
-
-public class MissileAttack : VileState {
-	public MissileAttack(bool grounded) : base(getSprite(grounded)) {
-		useDashJumpSpeed = true;
-		airMove = true;
-		canJump = true;
-		canStopJump = true;
-		airSprite = "cannon_air";
-		landSprite = "idle_shoot";
-	}
-	public static string getSprite(bool grounded) {
-		return grounded ? "idle_shoot" : "cannon_air";
-	}
-
-	public override void update() {
-		base.update();
-		if (character.sprite.isAnimOver()) {
-			character.changeToIdleOrFall();
-		}
-	}
-
-	public static void shootLogic(Vile vile) {
-		if (vile.sprite.getCurrentFrame().POIs.IsNullOrEmpty()) return;
-		bool isMK2 = vile.isVileMK2;
-		Point shootVel = vile.getVileShootVel(true);
-		Point shootPos = vile.setCannonAim(new Point(shootVel.x, shootVel.y));
-		Point? headPosNullable = vile.getVileMK2StunShotPos() ?? shootPos;
-		int xDir = vile.xDir;
-		if (vile.getShootXDir() == -1) {
-			shootVel = new Point(shootVel.x * vile.getShootXDir(), shootVel.y);
-		}
-
-		if (vile.missileWeapon.type == ((int)VileMissileType.ElectricShock)) {
-			if (isMK2) {
-				vile.playSound("mk2stunshot", sendRpc: true);
-				new Anim(headPosNullable.Value, "dust", 1, vile.player.getNextActorNetId(), true, true);
-				new VileMK2StunShotProj(
-					headPosNullable.Value, xDir, MathF.Round(shootVel.byteAngle), vile,
-					vile.player, vile.player.getNextActorNetId(), rpc: true
-				);
-			} else {
-				new StunShotProj(
-					shootPos, xDir, MathF.Round(shootVel.byteAngle), vile, 
-					vile.player, vile.player.getNextActorNetId(), rpc: true
-				);
-			}
-		} else {
-			vile.playSound("vileMissile", sendRpc: true);
-			if (vile.missileWeapon.type == ((int)VileMissileType.HumerusCrush)) {
-				new VileMissileProj(
-					shootPos, xDir, 1, MathF.Round(shootVel.byteAngle),   vile.missileWeapon.projSprite,
-					vile, vile.player, vile.player.getNextActorNetId(), rpc: true
-				);	
-			}
-			if (vile.missileWeapon.type == ((int)VileMissileType.PopcornDemon)) {
-				new VileMissileProj(
-					shootPos, xDir, 2 , MathF.Round(shootVel.byteAngle), vile.missileWeapon.projSprite,
-					vile, vile.player, vile.player.getNextActorNetId(), rpc: true
-				);	
-			}
-		}
-	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		shootLogic(vile);
-		if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
-			exitOnAirborne = true;
-		}
 	}
 }

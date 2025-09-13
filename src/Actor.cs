@@ -1653,7 +1653,7 @@ public partial class Actor : GameObject {
 	}
 
 	public Point? getFirstPOI(int index = 0) {
-		if (sprite.getCurrentFrame().POIs.Length > 0) {
+		if (sprite.getCurrentFrame().POIs.Length > index) {
 			Point poi = sprite.getCurrentFrame().POIs[index];
 			return getPoiOrigin().addxy(poi.x * xDir * xScale, poi.y * yScale);
 		}

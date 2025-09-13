@@ -16,6 +16,7 @@ public class VileState : CharState {
 	
 	public override void onEnter(CharState oldState) {
 		vile = character as Vile ?? throw new NullReferenceException();
+		base.onEnter(oldState);
 	}
 }
 
