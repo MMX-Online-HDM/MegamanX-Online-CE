@@ -97,32 +97,44 @@ public class Vile : Character {
 		hasSpeedDevil = player.speedDevil;
 	}
 
-	public Sprite? getCannonSprite(out Point poiPos, out int zIndexDir) {
-		poiPos = getNullableShootPos() ?? getCenterPos();
-		zIndexDir = 0;
-
+	public (Sprite? spr, Point drawPos, Point shootPos) getCannonSprite() {
 		string vilePrefix = "vile_";
-		if (isVileMK2) vilePrefix = "vilemk2_";
-		if (isVileMK5) vilePrefix = "vilemk5_";
+		if (isVileMK2) { vilePrefix = "vilemk2_"; }
+		if (isVileMK5) { vilePrefix = "vilemk5_"; }
 		string cannonSprite = vilePrefix + "cannon";
+
 		for (int i = 0; i < currentFrame.POIs.Length; i++) {
-			var poi = currentFrame.POIs[i];
-			var tag = currentFrame.POITags[i] ?? "";
-			zIndexDir = tag.EndsWith("b") ? -1 : 1;
-			int? frameIndexToDraw = null;
-			if (tag.StartsWith("cannon1") && cannonAimNum == 0) frameIndexToDraw = 0;
-			if (tag.StartsWith("cannon2") && cannonAimNum == 1) frameIndexToDraw = 1;
-			if (tag.StartsWith("cannon3") && cannonAimNum == 2) frameIndexToDraw = 2;
-			if (tag.StartsWith("cannon4") && cannonAimNum == 3) frameIndexToDraw = 3;
-			if (tag.StartsWith("cannon5") && cannonAimNum == 4) frameIndexToDraw = 4;
-			if (frameIndexToDraw != null) {
-				Sprite? retSprite = new Sprite(cannonSprite);
-				Point? altPOI = retSprite.animData.frames.ElementAtOrDefault(cannonAimNum)?.POIs?.FirstOrDefault();
-				poiPos = altPOI ?? new Point(pos.x + (poi.x * getShootXDirSynced()), pos.y + poi.y);
-				return retSprite;
+			string tag = currentFrame.POITags[i] ?? "";
+			if (tag == "") {
+				continue;
 			}
+			int frameIndexToDraw = tag.ToLower() switch {
+				"cannon1" or "cannon1b" => 0,
+				"cannon2" or "cannon2b" => 1,
+				"cannon3" or "cannon3b" => 2,
+				"cannon4" or "cannon4b" => 3,
+				"cannon5" or "cannon5b" => 4,
+				"cannon" => cannonAimNum,
+				_ => -1
+			};
+			if (frameIndexToDraw != cannonAimNum) {
+				continue;
+			}
+			Point poi = currentFrame.POIs[i];
+			Sprite retSprite = new Sprite(cannonSprite);
+			int dir = getShootXDirSynced();
+			Point altPOI = (
+				retSprite.animData.frames.ElementAtOrDefault(cannonAimNum)?.POIs?.FirstOrDefault() ??
+				Point.zero
+			);
+			altPOI.x *= dir;
+
+			Point drawPos = new Point(poi.x * dir + pos.x, poi.y + pos.y);
+			Point shootPos = drawPos + altPOI;
+
+			return (retSprite, drawPos, shootPos);
 		}
-		return null;
+		return (null, pos, getCenterPos());
 	}
 
 	public Point setCannonAim(Point shootDir) {
@@ -135,31 +147,26 @@ public class Vile : Character {
 		else if (ratio <= 0.25f && ratio > -0.25f) cannonAimNum = 0;
 		else cannonAimNum = 4;
 
-		getCannonSprite(out Point poiPos, out _);
-		return poiPos;
+		return getCannonSprite().shootPos;
 	}
 
 	public override void preUpdate() {
 		base.preUpdate();
-		if (!ownedByLocalPlayer) {
-			return;
-		}
-		if (weapons.Count == 1 && currentWeapon == energy) {
-			energy.charLinkedUpdate(this, true);
-		}
-	}
-
-	public override void update() {
-		base.update();
 		if (isVileMK1) {
 			altSoundId = AltSoundIds.X1;
 		} else if (isVileMK2 || isVileMK5) {
 			altSoundId = AltSoundIds.X3;
 		}
+	}
+
+	public override void update() {
+		base.update();
 		if (!ownedByLocalPlayer) {
 			return;
 		}
-		if ((grounded || charState is LadderClimb || charState is LadderEnd || charState is WallSlide) && vileHoverTime > 0) {
+		if ((grounded || charState is LadderClimb || charState is LadderEnd || charState is WallSlide) &&
+			vileHoverTime > 0
+		) {
 			vileHoverTime -= Global.spf * 6;
 			if (vileHoverTime < 0) vileHoverTime = 0;
 		}
@@ -221,105 +228,115 @@ public class Vile : Character {
 		Helpers.decrementFrames(ref aiAttackCooldown);
 
 
-		if (charState is InRideChaser) {
+		//if (charState is InRideChaser) {
 			//return;
-		}
+		//}
 		RideArmorAttacks();
 		RideLinkMK5();
 		// GMTODO: Consider a better way here instead of a hard-coded deny list
 		// Gacel: Done, now it uses attackCtrl
 		if (!charState.attackCtrl || charState is VileMK2GrabState) {
-			//return;
+			chargeLogic(null);
+		} else {
+			chargeLogic(shoot);
 		}
-		chargeLogic(shoot);
 	}
+
 	public override bool attackCtrl() {
 		bool specialPressed = player.input.isPressed(Control.Special1, player);
 		bool shootHeld = player.input.isHeld(Control.Shoot, player);
 
-		bool WeaponRightHeld = (
+		bool weaponRightHeld = (
 			player.input.isHeld(Control.WeaponRight, player) && 
 			(!isATrans || !player.input.isHeld(Control.Up, player))
 		);
 
-		if (specialPressed) {
-			if (dashGrabSpecial() ||
-				airDownAttacks() ||
-				normalAttacks()
-			) {
+		if (dashGrabSpecial() ||
+			airDownAttacks() ||
+			normalAttacks()
+		) {
+			return true;
+		}
+		if (shootHeld && cannonWeapon.type > -1) {
+			if (cannonWeapon.shootCooldown < cannonWeapon.fireRate * 0.75f) {
+				cannonWeapon.vileShoot(0, this);
 				return true;
 			}
 		}
-		if (shootHeld && cannonWeapon.type > -1) {
-			if (cannonWeapon.shootCooldown < cannonWeapon.fireRate * 0.75f) 
-				cannonWeapon.vileShoot(0, this);
-		}
-		if (WeaponRightHeld && vulcanWeapon.type > -3) {
+		if (weaponRightHeld && vulcanWeapon.type > -3) {
 			vulcanWeapon.vileShoot(0, this);
+			return true;
 		}
 		return base.attackCtrl();
 	}
+
 	public bool normalAttacks() {
-		bool LeftorRightHeld = player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player);
-		bool UpHeld = player.input.isHeld(Control.Up, player);
+		if (!grounded) {
+			return false;
+		}
+		if (!player.input.isPressed(Control.Special1, player)) {
+			return false;
+		}
+		bool leftorRightHeld = player.input.getXDir(player) != 0;
+		bool upHeld = player.input.getYDir(player) == -1;
 		if (charState is Crouch) {
 			napalmWeapon.vileShoot(WeaponIds.Napalm, this);
 			return true;
 		}
-		if (LeftorRightHeld && !UpHeld && grounded) {
-			if (rocketPunchWeapon.type > -1) {
-				rocketPunchWeapon.vileShoot(WeaponIds.RocketPunch, this);
-			}
+		if (upHeld && cutterWeapon.type > -1) {
+			cutterWeapon.vileShoot(WeaponIds.VileCutter, this);
 			return true;
 		}
-		if (!UpHeld && missileWeapon.type > -1)
-		 {
-			if (!grounded &&
-			grenadeWeapon.type == (int)VileBallType.None &&
-			flamethrowerWeapon.type == (int)VileFlamethrowerType.None
-			) {
-				missileWeapon.vileShoot(WeaponIds.ElectricShock, this);
-			} if (grounded) {
-				missileWeapon.vileShoot(WeaponIds.ElectricShock, this);
-			}
-			return true;			
+		if (leftorRightHeld && rocketPunchWeapon.type > -1) {
+			rocketPunchWeapon.vileShoot(WeaponIds.RocketPunch, this);
+			return true;
 		}
-		if (UpHeld && cutterWeapon.type > -1) {
-			if (!grounded &&
-			grenadeWeapon.type == (int)VileBallType.None &&
-			flamethrowerWeapon.type == (int)VileFlamethrowerType.None
-			) {
-				cutterWeapon.vileShoot(WeaponIds.VileCutter, this);
-			} if (grounded) {
-				cutterWeapon.vileShoot(WeaponIds.VileCutter, this);
-			}
+		if (missileWeapon.type > -1) {
+			missileWeapon.vileShoot(WeaponIds.ElectricShock, this);
 			return true;
 		}
 		return false;
 	}
+
 	public bool airDownAttacks() {
-		bool HeldDown = player.input.isHeld(Control.Down, player);
-		bool dashorairdash = charState is Dash || charState is AirDash;
-		if (!grounded && !dashorairdash) {
-			if (!HeldDown && grenadeWeapon.type > -2) 
-				grenadeWeapon.vileShoot(WeaponIds.VileBomb, this);
-			 else if (HeldDown && flamethrowerWeapon.type > -1)
-				flamethrowerWeapon.vileShoot(WeaponIds.VileFlamethrower, this);
+		if (grounded) {
+			return false;
+		}
+		if (!player.input.isPressed(Control.Special1, player)) {
+			return false;
+		}
+		bool heldDown = player.input.getYDir(player) == 1;
+
+		if (heldDown && flamethrowerWeapon.type >= 0) {
+			flamethrowerWeapon.vileShoot(WeaponIds.VileFlamethrower, this);
+			return true;
+		}
+		if (napalmWeapon.type >= 0) {
+			if (heldDown || grenadeWeapon.type < 0) {
+				napalmWeapon.vileShoot(0, this);
+				return true;
+			}
+		}
+		if (grenadeWeapon.type >= 0) {
+			grenadeWeapon.vileShoot(WeaponIds.VileBomb, this);
 			return true;
 		}
 		return false;
 	}
+
 	public bool dashGrabSpecial() {
-		if (charState is Dash || charState is AirDash) {
-			if (isVileMK2) {
-				charState.isGrabbing = true;
-				charState.superArmor = true; //peakbalance
-				changeSpriteFromName("dash_grab", true);
-			}
+		if (!player.input.isPressed(Control.Special1, player)) {
+			return false;
+		}
+		if (charState is Dash or AirDash && isVileMK2) {
+			charState.isGrabbing = true;
+			charState.superArmor = true; //peakbalance
+			changeSpriteFromName("dash_grab", true);
 			return true;
 		}
 		return false;
-	} 
+	}
+
 	public bool RideArmorAttacks() {
 		var raState = charState as InRideArmor;
 		bool Goliath = rideArmor?.raNum == 4;
@@ -736,10 +753,10 @@ public class Vile : Character {
 			removeRenderEffect(RenderEffectType.SpeedDevilTrail);
 		}
 		if (currentFrame.POIs.Length > 0) {
-			Sprite? cannonSprite = getCannonSprite(out Point poiPos, out int zIndexDir);
+			(Sprite? cannonSprite, Point drawPos, _) = getCannonSprite();
 			cannonSprite?.draw(
-				cannonAimNum, poiPos.x, poiPos.y, getShootXDirSynced(),
-				1, getRenderEffectSet(), alpha, 1, 1, zIndex + zIndexDir,
+				cannonAimNum, drawPos.x, drawPos.y, getShootXDirSynced(),
+				1, getRenderEffectSet(), alpha, 1, 1, zIndex + 1,
 				getShaders(), actor: this
 			);
 		}

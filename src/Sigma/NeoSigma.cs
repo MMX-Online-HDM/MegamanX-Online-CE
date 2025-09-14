@@ -76,7 +76,7 @@ public class NeoSigma : BaseSigma {
 					changeState(new SigmaUpDownSlashState(true), true);
 				}
 				return true;
-			} else if (player.input.isHeld(Control.Down, player) && !grounded && getDistFromGround() > 25) {
+			} else if (player.input.isHeld(Control.Down, player)) {
 				if (sigmaDownSlashCooldown == 0) {
 					sigmaUpSlashCooldown += 0.5f;
 					sigmaDownSlashCooldown = 1f;
