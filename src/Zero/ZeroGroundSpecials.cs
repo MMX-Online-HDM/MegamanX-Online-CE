@@ -87,7 +87,7 @@ public class SuiretsusenProj : Projectile {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 		if (ownerPlayer?.character != null) {
-			owningActor = ownerPlayer.character;
+			ownerActor = ownerPlayer.character;
 		}
 	}
 

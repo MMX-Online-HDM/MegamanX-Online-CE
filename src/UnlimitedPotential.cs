@@ -31,8 +31,8 @@ public class XUPParryStartState : CharState {
 		}*/
 		mmx.addPercentAmmo(100);
 		if (damagingActor is Projectile proj) {
-			if (proj.owningActor != null) {
-				counterAttackTarget = proj.owningActor;
+			if (proj.ownerActor != null) {
+				counterAttackTarget = proj.ownerActor;
 			}
 			if (!proj.isMelee && proj.shouldVortexSuck) {
 				absorbedProj = proj;

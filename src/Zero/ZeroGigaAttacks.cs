@@ -291,7 +291,7 @@ public class RekkohaProj : Projectile {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 		if (ownerPlayer?.character != null) {
-			owningActor = ownerPlayer.character;
+			ownerActor = ownerPlayer.character;
 		}
 	}
 	public static Projectile rpcInvoke(ProjParameters args) {

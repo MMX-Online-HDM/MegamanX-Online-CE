@@ -452,7 +452,7 @@ public class MEnter : MaverickState {
 		base.onEnter(oldState);
 		maverick.useGravity = false;
 		maverick.alpha = 0;
-		maverick.pos.y = destY - 32;
+		maverick.changePosY(destY - 32);
 		if (maverick.controlMode != MaverickModeId.TagTeam && !once) {
 			maverick.playSound("warpIn", sendRpc: true);
 			once = true;

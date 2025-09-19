@@ -208,7 +208,7 @@ public class BubbleSplashProjCharged : Projectile {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir, new byte[] { (byte)type });
 		}
 		if (ownerPlayer?.character != null) {
-			owningActor = ownerPlayer.character;
+			ownerActor = ownerPlayer.character;
 		} 
 		canBeLocal = false;
 	}

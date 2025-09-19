@@ -2891,7 +2891,7 @@ public partial class Character : Actor, IDamagable {
 				player.delaySubtank();
 				enterCombat();
 			}
-			if (actor is Projectile proj && proj.owningActor != null) {
+			if (actor is Projectile proj && proj.ownerActor != null) {
 
 			}
 			else if (player.character != null) {

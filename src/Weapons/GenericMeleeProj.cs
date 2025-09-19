@@ -30,7 +30,7 @@ public class GenericMeleeProj : Projectile {
 		if (hitCooldownSeconds == null && damager.hitCooldown <= 0) {
 			damager.hitCooldown = 30;
 		}
-		this.owningActor = owningActor;
+		this.ownerActor = owningActor;
 		this.xDir = owningActor?.xDir ?? player.character?.xDir ?? 1;
 		this.isShield = isShield;
 		this.isDeflectShield = isDeflectShield;
@@ -117,28 +117,28 @@ public class GenericMeleeProj : Projectile {
 			case (int)ProjIds.VileMK2Grab:
 				charGrabCode(CommandGrabScenario.MK2Grab, grabberChar, damagable, new VileMK2GrabState(grabbedChar), new VileMK2Grabbed(grabberChar));
 				break;
-			case (int)ProjIds.LaunchODrain when owningActor is LaunchOctopus lo:
+			case (int)ProjIds.LaunchODrain when ownerActor is LaunchOctopus lo:
 				maverickGrabCode(CommandGrabScenario.WhirlpoolGrab, lo, damagable, new WhirlpoolGrabbed(lo));
 				break;
-			case (int)ProjIds.FStagUppercut when owningActor is FlameStag fs:
+			case (int)ProjIds.FStagUppercut when ownerActor is FlameStag fs:
 				maverickGrabCode(CommandGrabScenario.FStagGrab, fs, damagable, new FStagGrabbed(fs));
 				break;
-			case (int)ProjIds.WheelGGrab when owningActor is WheelGator wg:
+			case (int)ProjIds.WheelGGrab when ownerActor is WheelGator wg:
 				maverickGrabCode(CommandGrabScenario.WheelGGrab, wg, damagable, new WheelGGrabbed(wg));
 				break;
-			case (int)ProjIds.MagnaCTail when owningActor is MagnaCentipede ms:
+			case (int)ProjIds.MagnaCTail when ownerActor is MagnaCentipede ms:
 				maverickGrabCode(CommandGrabScenario.MagnaCGrab, ms, damagable, new MagnaCDrainGrabbed(ms));
 				break;
-			case (int)ProjIds.BoomerangKDeadLift when owningActor is BoomerangKuwanger bk:
+			case (int)ProjIds.BoomerangKDeadLift when ownerActor is BoomerangKuwanger bk:
 				maverickGrabCode(CommandGrabScenario.DeadLiftGrab, bk, damagable, new DeadLiftGrabbed(bk));
 				break;
-			case (int)ProjIds.GBeetleLift when owningActor is GravityBeetle gb:
+			case (int)ProjIds.GBeetleLift when ownerActor is GravityBeetle gb:
 				maverickGrabCode(CommandGrabScenario.BeetleLiftGrab, gb, damagable, new BeetleGrabbedState(gb));
 				break;
-			case (int)ProjIds.CrushCGrab when owningActor is CrushCrawfish cc:
+			case (int)ProjIds.CrushCGrab when ownerActor is CrushCrawfish cc:
 				maverickGrabCode(CommandGrabScenario.CrushCGrab, cc, damagable, new CrushCGrabbed(cc));
 				break;
-			case (int)ProjIds.BBuffaloDrag when owningActor is BlizzardBuffalo bb:
+			case (int)ProjIds.BBuffaloDrag when ownerActor is BlizzardBuffalo bb:
 				maverickGrabCode(CommandGrabScenario.BBuffaloGrab, bb, damagable, new BBuffaloDragged(bb));
 				break;
 		}

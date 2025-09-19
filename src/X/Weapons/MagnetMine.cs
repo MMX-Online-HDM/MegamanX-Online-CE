@@ -233,11 +233,11 @@ public class MagnetMineProjCharged : Projectile {
 			}
 
 			if (pos.y > startY + maxY) {
-				pos.y = startY + maxY;
+				changePosY(startY + maxY);
 				vel.y = 0;
 			}
 			if (pos.y < startY - maxY) {
-				pos.y = startY - maxY;
+				changePosY(startY - maxY);
 				vel.y = 0;
 			}
 			soundTime += Global.spf;

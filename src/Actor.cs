@@ -1746,6 +1746,7 @@ public partial class Actor : GameObject {
 	public const int labelNameOffY = 10;
 
 	public float currentLabelY;
+	public Point lastGroundedPos;
 
 	public void deductLabelY(float amount) {
 		currentLabelY -= amount;

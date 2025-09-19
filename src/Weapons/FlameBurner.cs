@@ -69,7 +69,7 @@ public class FlameBurnerProj : Projectile {
 		collider.wallOnly = true;
 		isOwnerLinked = true;
 		if (player?.character != null) {
-			owningActor = player.character;
+			ownerActor = player.character;
 		}
 		if (isUnderwater()) {
 			destroySelf();

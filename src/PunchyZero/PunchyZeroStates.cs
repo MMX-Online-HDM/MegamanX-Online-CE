@@ -260,8 +260,8 @@ public class PZeroParry : PZeroState {
 			if (proj.damager != null) {
 				zero.gigaAttack.addAmmo(proj.damager.damage, player);
 			}
-			if (proj.isMelee && proj.owningActor != null) {
-				counterAttackTarget = proj.owningActor;
+			if (proj.isMelee && proj.ownerActor != null) {
+				counterAttackTarget = proj.ownerActor;
 				isMelee = true;
 			}
 		}
