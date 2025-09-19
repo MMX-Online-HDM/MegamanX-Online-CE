@@ -281,7 +281,7 @@ public partial class Actor {
 			return;
 		}
 		Global.level.removeFromGrid(this);
-		pos = newPos;
+		unsafePos = newPos;
 		Global.level.addToGrid(this);
 	}
 

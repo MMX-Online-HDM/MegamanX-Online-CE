@@ -132,7 +132,9 @@ public class Assassinate : CharState {
 			//player.character.axlCursorTarget = null;
 			//player.character.axlHeadshotTarget = null;
 			//player.character.updateAxlAim();
-			(new AssassinBullet()).axlShoot(player, AxlBulletType.Assassin);
+			AssassinBullet assassinBullet = new() { shootCooldown = 60 };
+			assassinBullet.axlShoot(player, AxlBulletType.Assassin);
+			axl?.afterAxlShoot(assassinBullet);
 		}
 		if (time > 0.5f) {
 			character.changeToIdleOrFall();

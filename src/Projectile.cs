@@ -124,6 +124,7 @@ public class Projectile : Actor {
 		ownerPlayer = (
 			player ?? owner?.netOwner ?? Global.level.getPlayerByIdSafe(netId)
 		);
+		ownerActor = owner;
 		damager = new Damager(ownerPlayer, 0, 0, 0);
 		owningActor = owner;
 		this.xDir = xDir;

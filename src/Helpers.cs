@@ -94,7 +94,7 @@ public class Helpers {
 	}
 
 	public static float clamp01(float val) {
-		return clamp(val, 0, 1);
+		return Math.Clamp(val, 0, 1);
 	}
 
 	public static Color getAllianceColor(Player player) {
