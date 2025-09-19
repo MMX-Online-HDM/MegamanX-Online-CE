@@ -666,7 +666,7 @@ public partial class Character : Actor, IDamagable {
 		return Physics.WalkSpeed * getRunDebuffs();
 	}
 
-	public float getRunDebuffs() {
+	public virtual float getRunDebuffs() {
 		if (isSlowImmune()) {
 			return 1;
 		}

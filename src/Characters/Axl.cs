@@ -109,6 +109,10 @@ public class Axl : Character {
 	bool jumpPressed => player.input.isPressed(Control.Jump, player);
 	bool dashPressed => player.input.isPressed(Control.Dash, player);
 	bool commandHeld => player.input.isHeld(Control.Special2, player);
+
+	public float[] rshootDebuffTime = [0, 0, 0];
+	public float[] rshootDebuffAmmount = [0, 0, 0];
+
 	public Axl(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
@@ -510,8 +514,14 @@ public class Axl : Character {
 					recoilTime = 0.2f;
 					if (!isWhiteAxl()) {
 						axlWeapon?.axlShoot(player, AxlBulletType.AltFire);
+						if (axlWeapon != null) {
+							afterAxlShoot(axlWeapon);
+						}
 					} else {
 						axlWeapon?.axlShoot(player, AxlBulletType.WhiteAxlCopyShot2);
+						if (axlWeapon != null) {
+							afterAxlShoot(axlWeapon);
+						}
 					}
 				}
 				stopCharge();
@@ -534,9 +544,11 @@ public class Axl : Character {
 					if (shootHeld && shootTime == 0 && currentWeapon.altShotCooldown == 0) {
 						recoilTime = 0.2f;
 						axlWeapon.axlShoot(player);
+						afterAxlShoot(axlWeapon);
 					} else if ((altShootPressed || altShootRecentlyPressed) && shootTime == 0 && currentWeapon.altShotCooldown == 0 && currentWeapon.ammo >= 4) {
 						recoilTime = 0.2f;
 						axlWeapon.axlShoot(player, AxlBulletType.AltFire);
+						afterAxlShoot(axlWeapon);
 					}
 				}
 				switch (currentWeapon) {
@@ -549,9 +561,11 @@ public class Axl : Character {
 							if (shootHeld && shootTime == 0 && currentWeapon.altShotCooldown == 0) {
 								recoilTime = 0.2f;
 								axlWeapon.axlShoot(player);
+								afterAxlShoot(axlWeapon);
 							} else if ((altShootPressed || altShootRecentlyPressed) && shootTime == 0 && currentWeapon.altShotCooldown == 0 && currentWeapon.ammo >= 4) {
 								recoilTime = 0.2f;
 								axlWeapon.axlShoot(player, AxlBulletType.AltFire);
+								afterAxlShoot(axlWeapon);
 							}
 						}
 						break;
@@ -561,15 +575,18 @@ public class Axl : Character {
 					if (shootHeld && shootTime == 0) {
 						recoilTime = 0.2f;
 						axlWeapon.axlShoot(player);
+						afterAxlShoot(axlWeapon);
 						if (bothHeld) axlWeapon.shootCooldown *= 2f;
 					}
 					if (bothHeld && currentWeapon.altShotCooldown == 0) {
 						recoilTime = 0.2f;
 						axlWeapon.axlShoot(player, AxlBulletType.AltFire);
+						afterAxlShoot(axlWeapon);
 						if (bothHeld) axlWeapon.altShotCooldown *= 2f;
 					} else if ((altShootPressed || altShootRecentlyPressed) && shootTime == 0 && currentWeapon.altShotCooldown == 0 && currentWeapon.ammo >= 4) {
 						recoilTime = 0.2f;
 						axlWeapon.axlShoot(player, AxlBulletType.AltFire);
+						afterAxlShoot(axlWeapon);
 					}
 				}
 
@@ -577,12 +594,14 @@ public class Axl : Character {
 					if (shootHeld && shootTime == 0 && currentWeapon.ammo >= 1) {
 						recoilTime = 0.2f;
 						axlWeapon.axlShoot(player);
+						afterAxlShoot(axlWeapon);
 					}
 
 					if (loadout.blastLauncherAlt == 0) {
 						if (altShootPressed && shootTime == 0 && currentWeapon.altShotCooldown == 0 && currentWeapon.ammo >= 1) {
 							recoilTime = 0.2f;
 							axlWeapon.axlShoot(player, AxlBulletType.AltFire);
+							afterAxlShoot(axlWeapon);
 						}
 					} else {
 						if (altShootPressed && player.grenades.Count > 0) {
@@ -598,10 +617,12 @@ public class Axl : Character {
 					if (shootHeld && shootTime == 0) {
 						recoilTime = 0.2f;
 						axlWeapon.axlShoot(player);
+						afterAxlShoot(axlWeapon);
 					} else if (altShootHeld) {
 						if (shootTime == 0) {
 							recoilTime = 0.2f;
 							axlWeapon.axlShoot(player, AxlBulletType.AltFire);
+							afterAxlShoot(axlWeapon);
 						}
 						altRayGunHeld = axlWeapon.ammo > 0;
 
@@ -617,9 +638,11 @@ public class Axl : Character {
 					if (shootHeld && shootTime == 0) {
 						recoilTime = 0.2f;
 						axlWeapon.axlShoot(player);
+						afterAxlShoot(axlWeapon);
 					} else if (altShootHeld && shootTime == 0 && currentWeapon.altShotCooldown == 0) {
 						recoilTime = 0.2f;
 						axlWeapon.axlShoot(player, AxlBulletType.AltFire);
+						afterAxlShoot(axlWeapon);
 					}
 				}
 
@@ -628,12 +651,14 @@ public class Axl : Character {
 						if (!currentWeapon.noAmmo()) {
 							recoilTime = 0.2f;
 							axlWeapon.axlShoot(player);
+							afterAxlShoot(axlWeapon);
 						}
 					} else {
 						if (loadout.spiralMagnumAlt == 0) {
 							if (altShootPressed && axlWeapon.ammo > 0 && shootTime == 0 && currentWeapon.altShotCooldown == 0) {
 								recoilTime = 0.2f;
 								axlWeapon.axlShoot(player, AxlBulletType.AltFire);
+								afterAxlShoot(axlWeapon);
 							}
 						} else {
 							if (altShootPressed && (charState is Idle || charState is Crouch)) {
@@ -651,9 +676,11 @@ public class Axl : Character {
 					if (shootHeld && shootTime == 0) {
 						recoilTime = 0.2f;
 						axlWeapon.axlShoot(player);
+						afterAxlShoot(axlWeapon);
 					} else if (altShootHeld && shootTime == 0 && currentWeapon.altShotCooldown == 0) {
 						recoilTime = 0.2f;
 						axlWeapon.axlShoot(player, AxlBulletType.AltFire);
+						afterAxlShoot(axlWeapon);
 					}
 				}
 
@@ -662,17 +689,20 @@ public class Axl : Character {
 						recoilTime = 0.2f;
 						axlWeapon.altShotCooldown = axlWeapon.altFireCooldown;
 						axlWeapon.axlShoot(player);
+						afterAxlShoot(axlWeapon);
 					} else if (altShootHeld) {
 						if (loadout.plasmaGunAlt == 0) {
 							if (axlWeapon.altShotCooldown == 0 && grounded) {
 								recoilTime = 0.2f;
 								voltTornadoTime = 0.2f;
 								axlWeapon.axlShoot(player, AxlBulletType.AltFire);
+								afterAxlShoot(axlWeapon);
 							}
 						} else {
 							if (axlWeapon.altShotCooldown == 0) {
 								recoilTime = 0.2f;
 								axlWeapon.axlShoot(player, AxlBulletType.AltFire);
+								afterAxlShoot(axlWeapon);
 							}
 							altPlasmaGunHeld = axlWeapon.ammo > 0;
 						}
@@ -683,6 +713,7 @@ public class Axl : Character {
 					if (altShootPressed && loadout.iceGattlingAlt == 0 && gaeaShield == null) {
 						recoilTime = 0.2f;
 						axlWeapon.axlShoot(player, AxlBulletType.AltFire);
+						afterAxlShoot(axlWeapon);
 					}
 					gaeaHeld = true;
 					bool isAltRev = (altShootHeld && loadout.iceGattlingAlt == 1);
@@ -697,6 +728,7 @@ public class Axl : Character {
 					if (shootHeld && shootTime == 0 && revTime >= 1) {
 						recoilTime = 0.2f;
 						axlWeapon.axlShoot(player);
+						afterAxlShoot(axlWeapon);
 					}
 				}
 
@@ -704,6 +736,7 @@ public class Axl : Character {
 					if (shootHeld && shootTime == 0) {
 						recoilTime = 0.05f;
 						axlWeapon.axlShoot(player);
+						afterAxlShoot(axlWeapon);
 					}
 
 					if (loadout.flameBurnerAlt == 0) {
@@ -711,12 +744,14 @@ public class Axl : Character {
 							recoilTime = 0.2f;
 							axlWeapon.axlShoot(player, AxlBulletType.AltFire);
 							axlWeapon.shootCooldown = 30;
+							afterAxlShoot(axlWeapon);
 						}
 					} else {
 						if (altShootHeld) {
 							if (shootTime == 0 && currentWeapon.altShotCooldown == 0) {
 								recoilTime = 0.2f;
 								axlWeapon.axlShoot(player, AxlBulletType.AltFire);
+								afterAxlShoot(axlWeapon);
 							}
 						}
 					}
@@ -816,18 +851,28 @@ public class Axl : Character {
 	}
 
 	public float getAimBackwardsAmount() {
-		Point bulletDir = getAxlBulletDir();
-
-		float forwardAngle = getShootXDir() == 1 ? 0 : 180;
-		float bulletAngle = bulletDir.angle;
-		if (bulletAngle > 180) bulletAngle = 360 - bulletAngle;
-
-		float dist = MathF.Abs(forwardAngle - bulletAngle);
-		dist = Helpers.clampMin0(dist - 90);
-		if (Global.level.server?.customMatchSettings?.axlBackwardsDebuff == false) {
-			dist = 0;
+		// Skip if disabled.
+		if (Global.customSettings?.axlBackwardsDebuff == false) {
+			return 0;
 		}
-		return Helpers.clamp01(dist / 90f);
+		// Get angles.
+		float forwardAngle = getShootXDir() == 1 ? 0 : 128;
+		float bulletAngle = getAxlBulletDir().byteAngle;
+		// Calculate angle diference.
+		float dist = MathF.Abs(bulletAngle - forwardAngle);
+		// Reduce dist by 64 byeangle (90 degrees) and clamp.
+		dist -= 128;
+		if (dist < 0) { dist = 0; }
+
+		return dist / 128;
+	}
+
+	public float getBackwardMoveDebuff() {
+		return Helpers.clamp01(getAimBackwardsAmount() * 4);
+	}
+
+	public float getShootBackwardsDebuff() {
+		return Helpers.clamp01(getAimBackwardsAmount() * 2);
 	}
 
 	public void updateAxlAim() {
@@ -1728,23 +1773,29 @@ public class Axl : Character {
 		return base.canChangeWeapons();
 	}
 
-	public override float getRunSpeed() {
-		float runSpeed = Physics.WalkSpeed;
-		if (shootTime > 0) {
-			runSpeed = 90 - getAimBackwardsAmount() * 25;
-		}
-		return runSpeed * getRunDebuffs();
-	}
-
 	public override float getDashSpeed() {
 		float dashSpeed = 3.45f;
 		if (axlWeapon != null && axlWeapon.isTwoHanded(false)) {
 			dashSpeed *= 0.875f;
 		}
-		if (shootTime > 0) {
-			dashSpeed -= getAimBackwardsAmount() * 50;
-		}
 		return dashSpeed * getRunDebuffs();
+	}
+
+	public override float getRunDebuffs() {
+		float speed = getRunDebuffs();
+		if (rshootDebuffTime[axlXDir + 1] > 0) {
+			speed *= (1 - 0.60f * rshootDebuffAmmount[axlXDir + 1]);
+		}
+		return speed;
+	}
+
+	public void afterAxlShoot(Weapon axlWeapon) {
+		float debuffTime = axlWeapon.shootCooldown + 6;
+		if (debuffTime < 15) {
+			debuffTime = 15;
+		}
+		rshootDebuffTime[axlXDir + 1] = debuffTime;
+		rshootDebuffAmmount[axlXDir + 1] = getBackwardMoveDebuff();
 	}
 
 	public override bool canShoot() {
