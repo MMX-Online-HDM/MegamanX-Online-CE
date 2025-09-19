@@ -1790,7 +1790,7 @@ public class Axl : Character {
 	}
 
 	public void afterAxlShoot(Weapon axlWeapon) {
-		float debuffTime = axlWeapon.shootCooldown;
+		float debuffTime = axlWeapon.shootCooldown + 6;
 		if (debuffTime < 15) {
 			debuffTime = 15;
 		}
