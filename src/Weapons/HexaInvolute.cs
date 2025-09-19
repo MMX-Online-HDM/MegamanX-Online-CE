@@ -148,8 +148,8 @@ public class HexaInvoluteProj : Projectile {
 	public override void update() {
 		base.update();
 
-		if (owningActor != null) {
-			changePos(owningActor.getCenterPos());
+		if (ownerActor != null) {
+			changePos(ownerActor.getCenterPos());
 		}
 
 		for (int i = particles.Count - 1; i >= 0; i--) {

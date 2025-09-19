@@ -673,7 +673,7 @@ public class PunchyZero : Character {
 							HitboxFlag.Hitbox, Point.zero
 						),
 						meleeId = (int)MeleeIds.AwakenedAura,
-						owningActor = this
+						ownerActor = this
 					};
 					return proj;
 				}

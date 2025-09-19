@@ -249,7 +249,7 @@ public partial class Actor {
 		Projectile? proj = getMeleeProjById(meleeId, centerPoint);
 		if (proj != null) {
 			proj.meleeId = meleeId;
-			proj.owningActor = this;
+			proj.ownerActor = this;
 			updateProjFromHitbox(proj);
 		}
 		return proj;
@@ -276,6 +276,10 @@ public partial class Actor {
 		Global.level.addToGrid(this);
 	}
 
+	public void incPos(float x, float y) {
+		incPos(new Point(x, y));
+	}
+
 	public void changePos(Point newPos) {
 		if (newPos == pos) {
 			return;
@@ -283,6 +287,16 @@ public partial class Actor {
 		Global.level.removeFromGrid(this);
 		unsafePos = newPos;
 		Global.level.addToGrid(this);
+	}
+
+	public void changePos(float x, float y) {
+		changePos(new Point(x, y));
+	}
+	public void changePosX(float x) {
+		changePos(new Point(x, pos.y));
+	}
+	public void changePosY(float y) {
+		changePos(new Point(pos.x, y));
 	}
 
 	public CollideData? sweepTest(Point offset) {

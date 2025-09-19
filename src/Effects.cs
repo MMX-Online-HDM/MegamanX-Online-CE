@@ -77,8 +77,10 @@ public class ChargeEffect {
 		for (int i = 0; i < chargeParts.Count; i++) {
 			var part = chargeParts[i];
 			if (part.time > 0) {
-				part.pos.x = Helpers.moveTo(part.pos.x, 0, Global.spf * 70);
-				part.pos.y = Helpers.moveTo(part.pos.y, 0, Global.spf * 70);
+				part.changePos(
+					Helpers.moveTo(part.pos.x, 0, Global.spf * 70),
+					Helpers.moveTo(part.pos.y, 0, Global.spf * 70)
+				);
 			}
 			if (chargeType == 3 && chargeLevel >= 3) {
 				chargePart = "charge_part_4";
@@ -92,8 +94,10 @@ public class ChargeEffect {
 			part.time += Global.spf * 20;
 			if (part.time > 3) {
 				part.time = -3;
-				part.pos.x = origPoints[i].x;
-				part.pos.y = origPoints[i].y;
+				part.changePos(
+					origPoints[i].x,
+					origPoints[i].y
+				);
 			}
 		}
 

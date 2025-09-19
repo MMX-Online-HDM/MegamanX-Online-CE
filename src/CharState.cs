@@ -408,8 +408,7 @@ public class WarpIn : CharState {
 
 			if (character.isAnimOver()) {
 				character.grounded = true;
-				character.pos.y = destY;
-				character.pos.x = destX;
+				character.changePos(destX, destY);
 				if (refillHP && !player.warpedInOnce) {
 					character.changeState(new WarpIdle(player.warpedInOnce));
 				} else {
@@ -583,7 +582,7 @@ public class WarpOut : CharState {
 			character.playSound("warpOut", forcePlay: true, sendRpc: true);
 		}
 
-		warpAnim.pos.y -= Global.spf * 1000;
+		warpAnim.incPos(0, -16 * character.speedMul);
 
 		if (character.pos.y <= destY) {
 			warpAnim.destroySelf();
