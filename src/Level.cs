@@ -1407,7 +1407,9 @@ public partial class Level {
 
 		// Collision shenanigans.
 		collidedGObjs.Clear();
-		(int x, int y)[] arrayGrid = populatedGrids.Order().ToArray();
+		(int x, int y)[] arrayGrid = populatedGrids.OrderBy(
+			grid => grid.x + grid.y * 4096
+		).ToArray();
 		foreach ((int x, int y)gridData in arrayGrid) {
 			// Initalize data.
 			List<GameObject> currentGrid = new(grid[gridData.x, gridData.y]);
