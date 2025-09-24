@@ -272,7 +272,7 @@ public partial class Actor {
 			return;
 		}
 		Global.level.removeFromGrid(this);
-		pos.inc(amount);
+		unsafePos.inc(amount);
 		Global.level.addToGrid(this);
 	}
 
