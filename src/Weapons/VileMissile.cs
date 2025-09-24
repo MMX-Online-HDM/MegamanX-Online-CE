@@ -80,6 +80,11 @@ public class VileMissile : Weapon {
 			return;
 		}
 		vile.changeState(new MissileAttack(vile.grounded));
+		if (vile.charState is InRideArmor) {
+			vile.missileWeapon.shoot(vile, []);
+			vile.missileWeapon.shootCooldown = vile.missileWeapon.fireRate;
+		}
+				
 	}
 
 	public override void shoot(Character character, int[] args) {
@@ -90,7 +95,7 @@ public class VileMissile : Weapon {
 
 		if (character is Vile vile) {
 			isMK2 = vile.isVileMK2;
-			if (type == (int)VileMissileType.ElectricShock) {
+			if (type == (int)VileMissileType.ElectricShock || vile.charState is InRideArmor) {
 				shootVel = vile.getVileShootVel(true);
 			}
 			shootPos = vile.setCannonAim(new Point(shootVel.x, shootVel.y));
