@@ -307,6 +307,19 @@ public class Axl : Character {
 	public override void preUpdate() {
 		lastXDir = xDir;
 		base.preUpdate();
+
+		if (!ownedByLocalPlayer) {
+			return;
+		}
+		for (int i = 0; i < rshootDebuffTime.Length; i++) {
+			if (rshootDebuffTime[i] > 0) {
+				rshootDebuffTime[i] -= speedMul;
+				if (rshootDebuffTime[i] <= 0) {
+					rshootDebuffTime[i] = 0;
+					rshootDebuffAmmount[i] = 0;
+				}
+			}
+		}
 	}
 
 	public override void update() {
@@ -848,31 +861,6 @@ public class Axl : Character {
 			playSound("stingCharge", sendRpc: true);
 		}
 		return base.normalCtrl();
-	}
-
-	public float getAimBackwardsAmount() {
-		// Skip if disabled.
-		if (Global.customSettings?.axlBackwardsDebuff == false) {
-			return 0;
-		}
-		// Get angles.
-		float forwardAngle = getShootXDir() == 1 ? 0 : 128;
-		float bulletAngle = getAxlBulletDir().byteAngle;
-		// Calculate angle diference.
-		float dist = MathF.Abs(bulletAngle - forwardAngle);
-		// Reduce dist by 64 byeangle (90 degrees) and clamp.
-		dist -= 128;
-		if (dist < 0) { dist = 0; }
-
-		return dist / 128;
-	}
-
-	public float getBackwardMoveDebuff() {
-		return Helpers.clamp01(getAimBackwardsAmount() * 4);
-	}
-
-	public float getShootBackwardsDebuff() {
-		return Helpers.clamp01(getAimBackwardsAmount() * 2);
 	}
 
 	public void updateAxlAim() {
@@ -1782,20 +1770,70 @@ public class Axl : Character {
 	}
 
 	public override float getRunDebuffs() {
-		float speed = getRunDebuffs();
-		if (rshootDebuffTime[axlXDir + 1] > 0) {
-			speed *= (1 - 0.60f * rshootDebuffAmmount[axlXDir + 1]);
+		float speed = base.getRunDebuffs();
+		int dir = xDir == 1 ? 1 : 0;
+		if (rshootDebuffTime[dir] > 0) {
+			speed *= (1 - 0.4f * rshootDebuffAmmount[dir]);
 		}
 		return speed;
 	}
 
 	public void afterAxlShoot(Weapon axlWeapon) {
-		float debuffTime = axlWeapon.shootCooldown + 6;
+		float debuffTime = axlWeapon.shootCooldown + 4;
 		if (debuffTime < 15) {
 			debuffTime = 15;
 		}
-		rshootDebuffTime[axlXDir + 1] = debuffTime;
-		rshootDebuffAmmount[axlXDir + 1] = getBackwardMoveDebuff();
+		if (debuffTime > 60) {
+			debuffTime = 60;
+		}
+		float debuff = getFowardMoveDebuff();
+		if (debuff > 0) {
+			int dir = getShootXDir() == 1 ? 1 : 0;
+			if (rshootDebuffTime[dir] < debuffTime) {
+				rshootDebuffTime[dir] = debuffTime;
+			}
+			if (rshootDebuffAmmount[dir] < debuff) {
+				rshootDebuffAmmount[dir] = debuff;
+			}
+		}
+	}
+	
+	public float getAimBackwardsAmount() {
+		// Get angles.
+		float forwardAngle = getShootXDir() == 1 ? 0 : 128;
+		float bulletAngle = getAxlBulletDir().byteAngle;
+		// Calculate angle diference.
+		float dist = Helpers.btAngleDist(bulletAngle, forwardAngle);
+		// Reduce dist by 64 byteangle (90 degrees) and clamp.
+		dist -= 64;
+		if (dist < 0) { dist = 0; }
+
+		return dist / 128;
+	}
+
+	public float getAimFowardAmount() {
+		// Get angles.
+		float forwardAngle = getShootXDir() == -1 ? 0 : 128;
+		float bulletAngle = getAxlBulletDir().byteAngle;
+		// Calculate angle diference.
+		float dist = Helpers.btAngleDist(bulletAngle, forwardAngle);
+		// Reduce dist by 64 byteangle (90 degrees) and clamp.
+		dist -= 64;
+		if (dist < 0) { dist = 0; }
+
+		return dist / 128;
+	}
+
+	public float getFowardMoveDebuff() {
+		return Helpers.clamp01(getAimBackwardsAmount() * 4);
+	}
+
+	public float getBackwardMoveDebuff() {
+		return Helpers.clamp01(getAimFowardAmount() * 4);
+	}
+
+	public float getShootBackwardsDebuff() {
+		return Helpers.clamp01(getAimBackwardsAmount() * 2);
 	}
 
 	public override bool canShoot() {
@@ -2117,9 +2155,10 @@ public class Axl : Character {
 		}
 		base.aiAttack(target);
 	}
+
 	public override void aiDodge(Actor? target) {
 		foreach (GameObject gameObject in getCloseActors(32, true, false, false)) {
-			if (gameObject is Projectile proj && proj.damager.owner.alliance != player?.alliance) {
+			if (gameObject is Projectile proj && proj.damager.owner.alliance != player.alliance) {
 				if (grounded && canDash() && charState is not DodgeRoll && dodgeRollCooldown <= 0 && charState.normalCtrl) {
 					changeState(new DodgeRoll());
 					dodgeRollCooldown = maxDodgeRollCooldown;

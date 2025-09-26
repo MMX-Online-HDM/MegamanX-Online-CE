@@ -347,7 +347,20 @@ public class Helpers {
 		if (diff > 180) {
 			return 360 - diff;
 		}
-		return diff;
+		return MathF.Abs(diff);;
+	}
+
+	public static float btAngleDist(float angle1, float angle2) {
+		// Put angles in-range.
+		angle1 = to256(angle1);
+		angle2 = to256(angle2);
+		// Get diference.
+		float diff = Math.Abs(angle2 - angle1);
+		// Adjust the difference to be within 128 degrees.
+		if (diff > 128) {
+			diff -= 256;
+		}
+		return MathF.Abs(diff);
 	}
 
 	public static int incrementRange(int num, int min, int max) {
