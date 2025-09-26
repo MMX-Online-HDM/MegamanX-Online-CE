@@ -138,6 +138,8 @@ public partial class Level {
 	public ShaderWrapper foregroundShader;
 	public Texture foregroundShaderImage;
 
+	public float mapVersion;
+
 	public List<Player> players = new List<Player>();
 	public Player mainPlayer;
 	public Player? otherPlayer {
@@ -438,7 +440,10 @@ public partial class Level {
 				Wall wall = new Wall(instanceName, points);
 
 				float moveX = instance?.properties?.moveX ?? 0;
-				wall.moveX = moveX / 60f;
+				if (mapVersion == 0) {
+					moveX /= 60;
+				}
+				wall.moveX = moveX;
 
 				if (instance?.properties?.slippery != null && instance.properties.slippery == true) {
 					wall.slippery = true;
@@ -520,14 +525,24 @@ public partial class Level {
 				float? damage = instance.properties.damage;
 				bool flinch = instance.properties.flinch ?? false;
 				float hitCooldown = instance.properties.hitCooldown ?? 1;
+				if (mapVersion == 0) {
+					hitCooldown *= 60;
+				}
 
 				var killZone = new KillZone(instanceName, points, killInvuln, damage, flinch, hitCooldown);
 				addGameObject(killZone);
 			} else if (objectName == "Move Zone") {
 				if (levelData.name != "giantdam" || enableGiantDamPropellers()) {
+					float moveX = (float?)instance.properties.moveX ?? 0;
+					float moveY = (float?)instance.properties.moveY ?? 0;
+
+					if (mapVersion == 0) {
+						moveX /= 60;
+						moveY /= 60;
+					}
 					var moveZone = new MoveZone(
 						instanceName, points,
-						(float)instance.properties.moveX / 60f, (float)instance.properties.moveY / 60f
+						moveX, moveY
 					);
 					addGameObject(moveZone);
 				}

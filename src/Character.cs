@@ -948,10 +948,7 @@ public partial class Character : Actor, IDamagable {
 				removeBurn();
 			}
 		}
-		if (flattenedTime > 0 && !(charState is Die)) {
-			flattenedTime -= Global.spf;
-			if (flattenedTime < 0) flattenedTime = 0;
-		}
+		Helpers.decrementFrames(ref flattenedTime);
 		Helpers.decrementTime(ref slowdownTime);
 		igFreezeRecoveryCooldown += speedMul;
 		if (igFreezeRecoveryCooldown > 12) {

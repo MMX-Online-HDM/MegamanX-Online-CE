@@ -335,7 +335,7 @@ public class Damager {
 			}
 			// Ride armor stomp
 			if (isStompWeapon) {
-				character.flattenedTime = 0.5f;
+				character.flattenedTime = 30;
 			}
 
 			if (character.charState is SwordBlock || character.charState is SigmaBlock) {
