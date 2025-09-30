@@ -63,4 +63,8 @@ public struct Rect {
 	public bool containsPoint(Point point) {
 		return point.x > x1 && point.x < x2 && point.y > y1 && point.y < y2;
 	}
+
+	public Rect round() {
+		return new Rect(MathF.Round(x1), MathF.Round(y1), MathF.Round(x2), MathF.Round(y2));
+	}
 }

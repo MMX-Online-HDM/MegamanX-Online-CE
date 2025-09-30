@@ -431,10 +431,10 @@ public partial class Level {
 			int yDir = flipY ? -1 : 1;
 			if (instance.points != null) {
 				foreach (var point in instance.points) {
-					points.Add(new Point((float)point.x, (float)point.y));
+					points.Add(new Point((float)point.x, (float)point.y).round());
 				}
 			}
-			Point pos = new Point((float)(instance.pos?.x ?? 0), (float)(instance.pos?.y ?? 0));
+			Point pos = new Point((float)(instance.pos?.x ?? 0), (float)(instance.pos?.y ?? 0)).round();
 
 			if (objectName == "Collision Shape") {
 				Wall wall = new Wall(instanceName, points);
@@ -457,14 +457,14 @@ public partial class Level {
 				if (instance?.properties?.pitWall != null && instance.properties.pitWall == true) {
 					isPitWall = true;
 					wall.collider._shape.points[2] = (
-						new Point(wall.collider._shape.points[2].x, Global.level.height + 45)
+						new Point(wall.collider._shape.points[2].x, Global.level.height + 45).round()
 					);
 					wall.collider._shape.points[3] = (
-						new Point(wall.collider._shape.points[3].x, Global.level.height + 45)
+						new Point(wall.collider._shape.points[3].x, Global.level.height + 45).round()
 					);
-					var rect = wall.collider.shape.getRect();
-					var newRect = new Rect(rect.x1, rect.y2, rect.x2, rect.y2 + 1000);
-					var pitWall = new Wall(wall.name + "Pit", newRect.getPoints());
+					Rect rect = wall.collider.shape.getRect();
+					Rect newRect = new Rect(rect.x1, rect.y2, rect.x2, rect.y2 + 1000);
+					Wall pitWall = new Wall(wall.name + "Pit", newRect.getPoints());
 					pitWall.collider.isClimbable = false;
 					addGameObject(pitWall); 
 				}
