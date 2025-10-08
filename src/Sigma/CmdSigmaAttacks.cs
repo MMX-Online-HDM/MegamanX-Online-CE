@@ -289,19 +289,35 @@ public class SigmaBallShoot : CmdSigmaState {
 	}
 
 	public void angleShoot() {
+		bool isRight = player.input.isHeld(Control.Right, player);
+		bool isUp = player.input.isHeld(Control.Up, player);
+		bool isDown = player.input.isHeld(Control.Down, player);
+		bool isLeft = player.input.isHeld(Control.Left, player);
 		if (character.xDir == 1) {
-			if (player.input.isHeld(Control.Down, player)) {
+			if (isRight && isUp) {
+				angle = 240;
+			} else if (isDown && isRight) {
+				angle = 22;
+			} else if (isRight) {
+				angle = 0;
+			}  else if (isDown) {
 				angle = 42;
-			} else if (player.input.isHeld(Control.Up, player)) {
+			} else if (isUp) {
 				angle = 216;
 			} else {
 				angle = 8;
 			}
 		} else if (character.xDir == -1) {
-			if (player.input.isHeld(Control.Down, player)) {
-				angle = 94;
-			} else if (player.input.isHeld(Control.Up, player)) {
-				angle = 164;
+			if (isLeft && isUp) {
+				angle = 145;
+			} else if (isDown && isLeft) {
+				angle = 102;
+			} else if (isLeft) {
+				angle = 128;
+			}  else if (isDown) {
+				angle = 82;
+			} else if (isUp) {
+				angle = 168;
 			} else {
 				angle = 120;
 			}

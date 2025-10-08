@@ -372,10 +372,10 @@ public class Damager {
 					break;
 				case (int)ProjIds.FlameRoundWallProj:
 				case (int)ProjIds.FlameRoundProj:
-					character.addBurnTime(owner, new Napalm(NapalmType.FireGrenade), 1); ;
+					character.addBurnTime(owner, FireGrenade.netWeapon, 1); ;
 					break;
 				case (int)ProjIds.FlameRoundFlameProj:
-					character.addBurnTime(owner, new Napalm(NapalmType.FireGrenade), 0.5f);
+					character.addBurnTime(owner, FireGrenade.netWeapon, 0.5f);
 					break;
 				case (int)ProjIds.Ryuenjin:
 					character.addBurnTime(owner, RyuenjinWeapon.staticWeapon, 2);

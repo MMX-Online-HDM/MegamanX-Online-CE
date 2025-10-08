@@ -191,11 +191,11 @@ public class SigmaElectricBall2Proj : Projectile {
 		weapon = NeoSigmaGigaAttackWeapon.netWeapon;
 		damager.damage = 6;
 		damager.flinch = Global.defFlinch;
-		damager.hitCooldown = 12;
+		damager.hitCooldown = 16;
 		projId = (int)ProjIds.Sigma2Ball2;
 		destroyOnHit = false;
 		maxTime = 0.4f;
-		vel = new Point(300*xDir,0);
+		vel = new Point(300 * xDir,0);
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
@@ -329,5 +329,18 @@ public class SigmaUpDownSlashState : CharState {
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
+	}
+}
+public class Sigma2DashSlashState : CharState {
+	public NeoSigma neoSigma = null!;
+	public Sigma2DashSlashState() : base("attack_dash") {
+		enterSound = "sigma2slash";
+	}
+
+	public override void update() {
+		base.update();
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
 	}
 }

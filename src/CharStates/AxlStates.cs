@@ -173,7 +173,7 @@ public class DodgeRoll : CharState {
 
 		var move = new Point(0, 0);
 		move.x = character.getDashSpeed() * initialDashDir;
-		character.move(move);
+		character.moveXY(move.x ,0);
 		if (stateTime > 0.1) {
 			stateTime = 0;
 			//new Anim(this.character.pos.addxy(0, -4), "dust", this.character.xDir, null, true);

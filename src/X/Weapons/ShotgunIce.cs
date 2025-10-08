@@ -325,7 +325,8 @@ public class ShotgunIceChargedShot : CharState {
 			}
 		}
 		States();
-		if (stateTime > 60f/60f) {
+		mmx.stopCharge();
+		if (stateTime > 60f / 60f) {
 			character.changeToIdleOrFall();
 		}
 	}

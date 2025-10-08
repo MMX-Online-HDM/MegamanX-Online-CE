@@ -39,20 +39,14 @@ public class SelectVileWeaponMenu : IMainMenu {
 				new RocketPunch(RocketPunchType.InfinityGig),
 			]),
 			("Napalm", [
-				new Napalm(NapalmType.None),
-				new Napalm(NapalmType.NoneBall),
-				new Napalm(NapalmType.RumblingBang),
-				new Napalm(NapalmType.FireGrenade),
-				new Napalm(NapalmType.SplashHit),
-				new Napalm(NapalmType.NoneFlamethrower)
+				RumblingBang.netWeapon,
+				FireGrenade.netWeapon,
+				SplashHit.netWeapon
 			]),
 			("Grenade", [
-				new VileBall(VileBallType.None),
-				new VileBall(VileBallType.NoneNapalm),
-				new VileBall(VileBallType.ExplosiveRound),
-				new VileBall(VileBallType.SpreadShot),
-				new VileBall(VileBallType.PeaceOutRoller),
-				new VileBall(VileBallType.NoneFlamethrower)
+				ExplosiveRound.netWeapon,
+				SpreadShot.netWeapon,
+				PeaceOutRoller.netWeapon
 			]),
 			("Cutter", [
 				new VileCutter(VileCutterType.None),
@@ -61,12 +55,9 @@ public class SelectVileWeaponMenu : IMainMenu {
 				new VileCutter(VileCutterType.MaroonedTomahawk)
 			]),
 			("Flamethrower", [
-				NoneFlamethrower.netWeapon,
 				WildHorseKick.netWeapon,
 				SeaDragonRage.netWeapon,
 				DragonsWrath.netWeapon,
-				NoneNapalmFlamethrower.netWeapon,
-
 			]),
 			("Laser", [
 				new VileLaser(VileLaserType.None),

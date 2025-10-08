@@ -352,16 +352,20 @@ public class AwakenedZeroHadangeki : ZeroState {
 	}
 }
 
-public class AwakenedZeroHadangekiWall : ZeroState {
+public class AwakenedZeroHadangekiWall : WallSlideAttack {
 	bool fired;
-	public int wallDir;
-	public Collider wallCollider;
+	Zero zero = null!;
 
-	public AwakenedZeroHadangekiWall(int wallDir, Collider wallCollider) : base("wall_slide_attack") {
+	public AwakenedZeroHadangekiWall(
+		int wallDir, Collider wallCollider
+	) : base(
+		"wall_slide_attack", wallDir, wallCollider
+	) {
 		this.wallDir = wallDir;
 		this.wallCollider = wallCollider;
 		superArmor = true;
-		useGravity = false;
+		exitOnAnimEnd = true;
+		canCancel = true;
 	}
 
 	public override void update() {
@@ -384,6 +388,11 @@ public class AwakenedZeroHadangekiWall : ZeroState {
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		useGravity = true;
+	}
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		zero = character as Zero ?? throw new NullReferenceException();
+		useGravity = false;
 	}
 }
 

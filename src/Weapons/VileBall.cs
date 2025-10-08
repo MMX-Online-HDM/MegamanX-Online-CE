@@ -4,14 +4,377 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public enum VileBallType {
-	None = -2,
-	NoneNapalm = -1,
 	ExplosiveRound,
 	SpreadShot,
 	PeaceOutRoller,
-	NoneFlamethrower,
 }
+public class VileBall : Weapon {
+	public float vileAmmoUsage;
+	public VileBall() : base() {
+		index = (int)WeaponIds.VileBomb;
+		weaponBarBaseIndex = 27;
+		weaponBarIndex = weaponBarBaseIndex;
+		killFeedIndex = 15;
+	}
+}
+public class ExplosiveRound : VileBall {
+	public static ExplosiveRound netWeapon = new();
+	public ExplosiveRound() : base() {
+		type = (int)VileBallType.ExplosiveRound;
+		displayName = "Explosive Round";
+		fireRate = 60;
+		vileAmmoUsage = 8;
+		vileWeight = 3;
+		ammousage = vileAmmoUsage;
+		damage = "2";
+		hitcooldown = "0.2";
+		effect = "Splits on ground.";
+	}
+	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+		if (shootCooldown > 0) return;
+		if (vile.energy.ammo < vileAmmoUsage) return;
+		vile.changeState(new BallAttacks(this), true);
+	}
+	public override void shoot(Character character, int[] args) {
+		if (character is not Vile vava) return;
+		vava.setVileShootTime(this);
+		vava.tryUseVileAmmo(vileAmmoUsage);
+		new VileBombProj(
+			character.pos, character.xDir, 0, character, character.player,
+			character.player.getNextActorNetId(), rpc: true
+		);
+	}
+}
+public class SpreadShot : VileBall {
+	public static SpreadShot netWeapon = new();
+	public SpreadShot() : base() {
+		type = (int)VileBallType.SpreadShot;
+		displayName = "Spread Shot";
+		vileAmmoUsage = 5;
+		fireRate = 60;
+		killFeedIndex = 55;
+		vileWeight = 3;
+		ammousage = vileAmmoUsage;
+		damage = "1";
+		effect = "Stuns Enemies. CD: 2";
+	}
+	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+		if (shootCooldown > 0) return;
+		if (vile.energy.ammo < vileAmmoUsage) return;
+		vile.changeState(new BallAttacks(this), true);
+	}
+	public override void shoot(Character character, int[] args) {
+		if (character is not Vile vava) return;
+		vava.setVileShootTime(this);
+		vava.tryUseVileAmmo(vileAmmoUsage);
+		int num = args[0];
+		new StunShotProj2(
+			character.pos, character.xDir, num,
+			0, character, character.player,
+			character.player.getNextActorNetId(), rpc: true
+		);
+	}
+}
+public class PeaceOutRoller : VileBall {
+	public static PeaceOutRoller netWeapon = new();
+	public PeaceOutRoller() : base() {
+		type = (int)VileBallType.PeaceOutRoller;
+		displayName = "Peace Out Roller";
+		vileAmmoUsage = 16;
+		fireRate = 75;
+		killFeedIndex = 80;
+		vileWeight = 3;
+		ammousage = vileAmmoUsage;
+		damage = "3";
+		hitcooldown = "0.5";
+		flinch = "6";
+		effect = "Splits on ground.";
+	}
+	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+		if (shootCooldown > 0) return;
+		if (vile.energy.ammo < vileAmmoUsage) return;
+		vile.changeState(new BallAttacks(this), true);
+	}
+	public override void shoot(Character character, int[] args) {
+		if (character is not Vile vava) return;
+		vava.setVileShootTime(this);
+		vava.tryUseVileAmmo(vileAmmoUsage);
+		new PeaceOutRollerProj(
+			character.pos, character.xDir, 0, character, character.player,
+			character.player.getNextActorNetId(), rpc: true
+		);
+	}
+}
+#region States
+public class BallAttacks : VileState {
+	public string sound = "FireNappalmMK2";
+	public bool soundPlayed;
+	public int soundFrame = 2;
+	public bool shot;
+	public int shootFrame = 2;
+	public VileBall weapon;
+	public int bombNum;
+	public BallAttacks(VileBall weapon) : base("crouch_nade") {
+		airSprite = "air_bomb_attack";
+		useDashJumpSpeed = true;
+		this.weapon = weapon;
+	}
 
+	public override void update() {
+		base.update();
+		if (vile.energy.ammo < weapon.vileAmmoUsage) {
+			character.changeToCrouchOrFall();
+			return;
+		}
+
+		if (character.sprite.frameIndex >= soundFrame && !soundPlayed) {
+			character.playSound(sound, forcePlay: false, sendRpc: true);
+			soundPlayed = true;
+		}
+
+		if (character.frameIndex >= shootFrame) {
+			character.turnToInput(player.input, player);
+			if (weapon is ExplosiveRound) {
+				float[] shootTimes = { 7f / 60f, 20f / 60f, 34f / 60f };
+				if (bombNum < shootTimes.Length && stateTime > shootTimes[bombNum]) {
+					weapon.shoot(vile, []);
+					bombNum++;
+				}
+				if (stateTime > 44f / 60f) character.changeToCrouchOrFall();
+			} else if (weapon is SpreadShot) {
+				for (int i = 0; i < 7; i++) {
+					if (stateTime > i * 0.1f && bombNum == i) {
+						bombNum++;
+						weapon.shoot(vile, [i+1]);
+					}
+				}
+			} else if (weapon is PeaceOutRoller && !shot) {
+				weapon.shoot(vile, []);
+				shot = true;
+			}
+		}
+
+		if (shot && stateTime > 14f / 60f) {
+			character.changeToCrouchOrFall();
+		}
+
+		if (stateTime > 60f/60f) character.changeToCrouchOrFall();
+		
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.turnToInput(player.input, player);
+		if (!character.grounded) {
+			sprite = "air_bomb_attack";
+			character.changeSpriteFromName(sprite, true);
+			character.useGravity = false;
+			character.vel = new Point();
+		}
+	}
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+}
+#endregion
+public class VileElectricBomb : Weapon {
+	public static VileElectricBomb netWeapon = new();
+	public VileElectricBomb() : base() {
+		fireRate = 60;
+		index = (int)WeaponIds.VileBomb;
+		weaponBarBaseIndex = 55;
+		weaponBarIndex = 55;
+		killFeedIndex = 55;
+	}
+}
+#region Projectiles
+public class VileBombProj : Projectile {
+	public int type = 0;
+	bool splitOnce;
+	public VileBombProj(
+		Point pos, int xDir, int type, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "vile_bomb_air", netId, player
+	) {
+		weapon = ExplosiveRound.netWeapon;
+		damager.damage = 2;
+		damager.hitCooldown = 12;
+		this.type = type;
+		if (type == 0) {
+			vel = new Point(100 * xDir, 0);
+			maxTime = 0.45f;
+		}
+		if (type == 1) {
+			vel = new Point(100 * xDir, -200);
+			maxTime = 0.7f;
+		}
+		projId = (int)ProjIds.VileBomb;
+		destroyOnHit = true;
+		useGravity = true;
+		fadeSprite = "explosion";
+		fadeSound = "explosion";
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)type);
+		}
+		projId = (int)ProjIds.VileBombSplit;
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new VileBombProj(
+			args.pos, args.xDir, args.extraData[0], args.owner, args.player, args.netId
+		);
+	}
+	public override void onHitWall(CollideData other) {
+		destroySelf(disableRpc: true);
+		if (!ownedByLocalPlayer) return;
+		split();
+	}
+
+	public override void onHitDamagable(IDamagable damagable) {
+		if (ownedByLocalPlayer) {
+			split();
+		}
+		base.onHitDamagable(damagable);
+	}
+
+	public void split() {
+		if (!ownedByLocalPlayer) return;
+		if (!splitOnce) splitOnce = true;
+		else return;
+		new VileBombSplitProj(
+			pos, xDir, 0, this, owner,
+			owner.getNextActorNetId(), rpc: true);
+		new VileBombSplitProj(
+			pos, xDir, 1, this, owner,
+			owner.getNextActorNetId(),  rpc: true);
+	}
+}
+public class VileBombSplitProj : Projectile {
+	public int type = 0;
+	public VileBombSplitProj(
+		Point pos, int xDir, int type, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "vile_bomb_ground", netId, player
+	) {
+		weapon = ExplosiveRound.netWeapon;
+		damager.damage = 2;
+		damager.hitCooldown = 12;
+	    maxTime = 0.3f;
+		projId = (int)ProjIds.VileBombSplit;
+		fadeSprite = "vile_stun_shot_fade";
+		fadeSound = "explosion";
+		destroyOnHit = true;
+		useGravity = false;
+		this.type = type;
+		if (type == 0) vel = new Point(250 , 0);
+		if (type == 1) vel = new Point(-250 , 0);
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)type);
+		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new VileBombSplitProj(
+			args.pos, args.xDir, args.extraData[0], args.owner, args.player, args.netId
+		);
+	}
+}
+public class PeaceOutRollerProj : Projectile {
+	public int type = 0;
+	bool splitOnce;
+	public PeaceOutRollerProj(
+		Point pos, int xDir, int type, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "ball_por_proj", netId, player
+	) {
+		weapon = PeaceOutRoller.netWeapon;
+		damager.damage = 3f;
+		damager.flinch = Global.miniFlinch;
+		damager.hitCooldown = 30;
+		this.type = type;
+		if (type == 0) {
+			vel = new Point(75 * xDir, 50);
+			maxTime = 0.5f;
+		}
+		if (type == 1) {
+			vel = new Point(100 * xDir, -150);
+			maxTime = 1;
+			zIndex = ZIndex.Character;
+		}
+		gravityModifier = 0.5f;
+		projId = (int)ProjIds.PeaceOutRoller;
+		destroyOnHit = false;
+		useGravity = true;
+		xScale = 0.75f;
+		yScale = 0.75f;
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)type);
+		}
+		projId = (int)ProjIds.PeaceOutRollerSplit;
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new PeaceOutRollerProj(
+			args.pos, args.xDir, args.extraData[0], args.owner, args.player, args.netId
+		);
+	}
+	public override void onHitWall(CollideData other) {
+		destroySelf(disableRpc: true);
+		if (!ownedByLocalPlayer) return;
+		split();
+	}
+	public void split() {
+		if (!ownedByLocalPlayer) return;
+		if (!splitOnce) splitOnce = true;
+		else return;
+		playSound("ballPOR", sendRpc: true);
+		new PeaceOutRollerSplitProj(
+			pos, xDir, 0, this, owner,
+			owner.getNextActorNetId(), rpc: true);
+		new PeaceOutRollerSplitProj(
+			pos, xDir, 1, this, owner,
+			owner.getNextActorNetId(),  rpc: true);
+	}
+
+}
+public class PeaceOutRollerSplitProj : Projectile {
+	public int type = 0;
+	public PeaceOutRollerSplitProj(
+		Point pos, int xDir, int type, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "ball_por_proj", netId, player
+	) {
+		weapon = PeaceOutRoller.netWeapon;
+		damager.damage = 3f;
+		damager.flinch = Global.miniFlinch;
+		damager.hitCooldown = 30;
+	    maxTime = 0.4f;
+		projId = (int)ProjIds.PeaceOutRollerSplit;
+		destroyOnHit = false;
+		useGravity = false;
+		this.type = type;
+		xScale = 0.75f;
+		yScale = 0.75f;
+		if (type == 0) {
+			setupWallCrawl(new Point(250, 250));
+		} else if (type == 1) {
+			setupWallCrawl(new Point(-250, -250));
+		}
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)type);
+		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new PeaceOutRollerSplitProj(
+			args.pos, args.xDir, args.extraData[0], args.owner, args.player, args.netId
+		);
+	}
+	public override void update() {
+		base.update();
+		updateWallCrawl();
+	}
+}
+#endregion
+/*
 public class VileBall : Weapon {
 	public float vileAmmoUsage;
 	public static VileBall netWeaponER = new VileBall(VileBallType.ExplosiveRound);
@@ -95,9 +458,8 @@ public class VileBall : Weapon {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < 8) return;
 		if (vile.grenadeWeapon.type == (int)VileBallType.None) return;
-		if (isGrenadeType(vile) && vile.tryUseVileAmmo(vileAmmoUsage)) {
-			vile.setVileShootTime(this);
-			vile.changeState(new AirBombAttack(true), true);
+		if (isGrenadeType(vile)) {
+			vile.changeState(new AirBombAttack(), true);
 		} else if (vile.grenadeWeapon.type == (int)VileBallType.NoneFlamethrower) {
 			if (vile.flamethrowerWeapon.type != (int)VileFlamethrowerType.None)
 				if (vile.tryUseVileAmmo(vileAmmoUsage)) {
@@ -106,207 +468,20 @@ public class VileBall : Weapon {
 		} else if (vile.grenadeWeapon.type == (int)VileBallType.NoneNapalm) {
 			if (vile.napalmWeapon.type > -1)
 				if (vile.tryUseVileAmmo(vileAmmoUsage)) {
-					vile.changeState(new AirBombNapalm(), true);
+					//vile.changeState(new AirBombNapalm(), true);
 				}
 		}
 	}
 }
 
-public class VileBombProj : Projectile {
-	public int type = 0;
-	bool splitOnce;
-	public VileBombProj(
-		Point pos, int xDir, int type, Actor owner, Player player, ushort? netId, bool rpc = false
-	) : base(
-		pos, xDir, owner, "vile_bomb_air", netId, player
-	) {
-		weapon = VileBall.netWeaponER;
-		damager.damage = 2;
-		damager.hitCooldown = 12;
-		this.type = type;
-		if (type == 0) {
-			vel = new Point(100 * xDir, 0);
-			maxTime = 0.45f;
-		}
-		if (type == 1) {
-			vel = new Point(100 * xDir, -200);
-			maxTime = 0.7f;
-		}
-		projId = (int)ProjIds.VileBomb;
-		destroyOnHit = true;
-		useGravity = true;
-		fadeSprite = "explosion";
-		fadeSound = "explosion";
-		if (rpc) {
-			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)type);
-		}
-		projId = (int)ProjIds.VileBombSplit;
-	}
-	public static Projectile rpcInvoke(ProjParameters args) {
-		return new VileBombProj(
-			args.pos, args.xDir, args.extraData[0], args.owner, args.player, args.netId
-		);
-	}
-	public override void onHitWall(CollideData other) {
-		destroySelf(disableRpc: true);
-		if (!ownedByLocalPlayer) return;
-		split();
-	}
-
-	public override void onHitDamagable(IDamagable damagable) {
-		if (ownedByLocalPlayer) {
-			split();
-		}
-		base.onHitDamagable(damagable);
-	}
-
-	public void split() {
-		if (!ownedByLocalPlayer) return;
-		if (!splitOnce) splitOnce = true;
-		else return;
-		new VileBombSplitProj(
-			pos, xDir, 0, this, owner,
-			owner.getNextActorNetId(), rpc: true);
-		new VileBombSplitProj(
-			pos, xDir, 1, this, owner,
-			owner.getNextActorNetId(),  rpc: true);
-	}
-}
-public class VileBombSplitProj : Projectile {
-	public int type = 0;
-	public VileBombSplitProj(
-		Point pos, int xDir, int type, Actor owner, Player player, ushort? netId, bool rpc = false
-	) : base(
-		pos, xDir, owner, "vile_bomb_ground", netId, player
-	) {
-		weapon = VileBall.netWeaponER;
-		damager.damage = 2;
-		damager.hitCooldown = 12;
-	    maxTime = 0.3f;
-		projId = (int)ProjIds.VileBombSplit;
-		fadeSprite = "vile_stun_shot_fade";
-		fadeSound = "explosion";
-		destroyOnHit = true;
-		useGravity = false;
-		this.type = type;
-		if (type == 0) vel = new Point(250 , 0);
-		if (type == 1) vel = new Point(-250 , 0);
-		if (rpc) {
-			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)type);
-		}
-	}
-	public static Projectile rpcInvoke(ProjParameters args) {
-		return new VileBombSplitProj(
-			args.pos, args.xDir, args.extraData[0], args.owner, args.player, args.netId
-		);
-	}
-}
-public class PeaceOutRollerProj : Projectile {
-	public int type = 0;
-	bool splitOnce;
-	public PeaceOutRollerProj(
-		Point pos, int xDir, int type, Actor owner, Player player, ushort? netId, bool rpc = false
-	) : base(
-		pos, xDir, owner, "ball_por_proj", netId, player
-	) {
-		weapon = VileBall.netWeaponPR;
-		damager.damage = 3f;
-		damager.flinch = Global.miniFlinch;
-		damager.hitCooldown = 30;
-		this.type = type;
-		if (type == 0) {
-			vel = new Point(75 * xDir, 50);
-			maxTime = 0.5f;
-		}
-		if (type == 1) {
-			vel = new Point(100 * xDir, -150);
-			maxTime = 1;
-			zIndex = ZIndex.Character;
-		}
-		gravityModifier = 0.5f;
-		projId = (int)ProjIds.PeaceOutRoller;
-		destroyOnHit = false;
-		useGravity = true;
-		xScale = 0.75f;
-		yScale = 0.75f;
-		if (rpc) {
-			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)type);
-		}
-		projId = (int)ProjIds.PeaceOutRollerSplit;
-	}
-
-	public static Projectile rpcInvoke(ProjParameters args) {
-		return new PeaceOutRollerProj(
-			args.pos, args.xDir, args.extraData[0], args.owner, args.player, args.netId
-		);
-	}
-	public override void onHitWall(CollideData other) {
-		destroySelf(disableRpc: true);
-		if (!ownedByLocalPlayer) return;
-		split();
-	}
-	public void split() {
-		if (!ownedByLocalPlayer) return;
-		if (!splitOnce) splitOnce = true;
-		else return;
-		playSound("ballPOR", sendRpc: true);
-		new PeaceOutRollerSplitProj(
-			pos, xDir, 0, this, owner,
-			owner.getNextActorNetId(), rpc: true);
-		new PeaceOutRollerSplitProj(
-			pos, xDir, 1, this, owner,
-			owner.getNextActorNetId(),  rpc: true);
-	}
-
-}
-public class PeaceOutRollerSplitProj : Projectile {
-	public int type = 0;
-	public PeaceOutRollerSplitProj(
-		Point pos, int xDir, int type, Actor owner, Player player, ushort? netId, bool rpc = false
-	) : base(
-		pos, xDir, owner, "ball_por_proj", netId, player
-	) {
-		weapon = VileBall.netWeaponPR;
-		damager.damage = 3f;
-		damager.flinch = Global.miniFlinch;
-		damager.hitCooldown = 30;
-	    maxTime = 0.4f;
-		projId = (int)ProjIds.PeaceOutRollerSplit;
-		destroyOnHit = false;
-		useGravity = false;
-		this.type = type;
-		xScale = 0.75f;
-		yScale = 0.75f;
-		if (type == 0) {
-			setupWallCrawl(new Point(250, 250));
-		} else if (type == 1) {
-			setupWallCrawl(new Point(-250, -250));
-		}
-		if (rpc) {
-			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)type);
-		}
-	}
-	public static Projectile rpcInvoke(ProjParameters args) {
-		return new PeaceOutRollerSplitProj(
-			args.pos, args.xDir, args.extraData[0], args.owner, args.player, args.netId
-		);
-	}
-	public override void update() {
-		base.update();
-		updateWallCrawl();
-	}
-}
 
 public class AirBombAttack : VileState {
 	int bombNum;
-	bool isNapalm;
-
 	public AirBombAttack(
-		bool isNapalm, string transitionSprite = ""
+		string transitionSprite = ""
 	) : base(
 		"air_bomb_attack", "", "", transitionSprite
 	) {
-		this.isNapalm = isNapalm;
 		useDashJumpSpeed = true;
 		useGravity = false;
 		exitOnLanding = true;
@@ -342,9 +517,10 @@ public class AirBombAttack : VileState {
 					}
 					bombNum++;
 					new StunShotProj2(
-						character.pos, character.xDir, i + 1, 0, vile, 
+						character.pos, character.xDir, i + 1, 0, vile,
 						character.player, character.player.getNextActorNetId(), rpc: true
 					);
+					vile.setVileShootTime(vile.grenadeWeapon);
 				}
 			}
 			if (stateTime > 0.66f) {
@@ -354,9 +530,10 @@ public class AirBombAttack : VileState {
 			if (stateTime > 0f && bombNum == 0) {
 				bombNum++;
 				new PeaceOutRollerProj(
-					character.pos, character.xDir, 0, vile, player, 
+					character.pos, character.xDir, 0, vile, player,
 					character.player.getNextActorNetId(), rpc: true
 				);
+				vile.setVileShootTime(vile.grenadeWeapon);
 			}
 
 			if (stateTime > 0.25f) {
@@ -376,6 +553,7 @@ public class AirBombAttack : VileState {
 			character.pos, (int)inputDir.x, 0, vile, player,
 			character.player.getNextActorNetId(), rpc: true
 		);
+		vile.setVileShootTime(vile.grenadeWeapon);
 	}
 
 	public override void onEnter(CharState oldState) {
@@ -384,28 +562,10 @@ public class AirBombAttack : VileState {
 
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
-		if (vile.napalmWeapon.type == (int)NapalmType.NoneBall) {
-			if (vile.grenadeWeapon.type == (int)VileBallType.PeaceOutRoller) {
-				vile.grenadeWeapon.shootCooldown = 75;
-				vile.napalmWeapon.shootCooldown = 75;
-			} else {
-				vile.grenadeWeapon.shootCooldown = 60;
-				vile.napalmWeapon.shootCooldown = 60;
-			}
-		}
 	}
 }
 
-public class VileElectricBomb : Weapon {
-	public static VileElectricBomb netWeapon = new();
-	public VileElectricBomb() : base() {
-		fireRate = 60;
-		index = (int)WeaponIds.VileBomb;
-		weaponBarBaseIndex = 55;
-		weaponBarIndex = 55;
-		killFeedIndex = 55;
-	}
-}
+/*
 public class AirBombNapalm : NapalmAttackTypes {
 	public AirBombNapalm() : base("air_bomb_attack") {
 		sound = "FireNappalmMK2";
@@ -416,8 +576,8 @@ public class AirBombNapalm : NapalmAttackTypes {
 		base.update();
 		if (!shot && character.sprite.frameIndex == 2) {
 			shot = true;
+			vile.setVileShootTime(vile.napalmWeapon);
 			if (vile.napalmWeapon.type == (int)NapalmType.RumblingBang) {
-				vile.setVileShootTime(vile.napalmWeapon);
 				new NapalmGrenadeProj(
 					character.pos, character.xDir, vile, character.player,
 					character.player.getNextActorNetId(), rpc: true
@@ -437,9 +597,6 @@ public class AirBombNapalm : NapalmAttackTypes {
 		if (stateTime > 0.25f) {
 			character.changeToIdleOrFall();
 		}
-		if (vile.grenadeWeapon.type == (int)VileBallType.None) {
-			character.changeToIdleOrFall();			
-		}
 
 	}
 	public override void onEnter(CharState oldState) {
@@ -454,17 +611,6 @@ public class AirBombNapalm : NapalmAttackTypes {
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
-		if (vile.grenadeWeapon.type != (int)VileBallType.NoneNapalm && vile.grenadeWeapon.type != (int)VileBallType.NoneFlamethrower) {
-			if (vile.napalmWeapon.type == (int)NapalmType.RumblingBang) {
-				vile.napalmWeapon.shootCooldown = 120;
-				vile.grenadeWeapon.shootCooldown = 120;
-			} else if (vile.napalmWeapon.type == (int)NapalmType.FireGrenade) {
-				vile.napalmWeapon.shootCooldown = 240;
-				vile.grenadeWeapon.shootCooldown = 240;
-			} else if (vile.napalmWeapon.type == (int)NapalmType.SplashHit) {
-				vile.napalmWeapon.shootCooldown = 180;
-				vile.grenadeWeapon.shootCooldown = 180;
-			}
-		}
 	}
 }
+*/
