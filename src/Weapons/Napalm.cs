@@ -34,7 +34,7 @@ public class RumblingBang : VileNapalm {
 	}
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
 		if (shootCooldown > 0) return;
-		if (vile.energy.ammo < 8) return;
+		if (vile.energy.ammo < vileAmmoUsage) return;
 		vile.changeState(new NapalmAttacks(this), true);
 	}
 	public override void shoot(Character character, int[] args) {
@@ -60,7 +60,7 @@ public class FireGrenade : VileNapalm {
 	}
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
 		if (shootCooldown > 0) return;
-		if (vile.energy.ammo < 16) return;
+		if (vile.energy.ammo < vileAmmoUsage) return;
 		vile.changeState(new NapalmAttacks(this), true);
 	}
 	public override void shoot(Character character, int[] args) {
@@ -86,7 +86,7 @@ public class SplashHit : VileNapalm {
 	}
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
 		if (shootCooldown > 0) return;
-		if (vile.energy.ammo < 16) return;
+		if (vile.energy.ammo < vileAmmoUsage) return;
 		vile.changeState(new NapalmAttacks(this), true);
 	}
 	public override void shoot(Character character, int[] args) {
@@ -576,6 +576,10 @@ public class NapalmAttacks : VileState {
 			character.useGravity = false;
 			character.vel = new Point();
 		}
+	}
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity = true;
 	}
 }
 #endregion
