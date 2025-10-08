@@ -44,12 +44,9 @@ public class SelectVileWeaponMenu : IMainMenu {
 				SplashHit.netWeapon
 			]),
 			("Grenade", [
-				new VileBall(VileBallType.None),
-				new VileBall(VileBallType.NoneNapalm),
-				new VileBall(VileBallType.ExplosiveRound),
-				new VileBall(VileBallType.SpreadShot),
-				new VileBall(VileBallType.PeaceOutRoller),
-				new VileBall(VileBallType.NoneFlamethrower)
+				ExplosiveRound.netWeapon,
+				SpreadShot.netWeapon,
+				PeaceOutRoller.netWeapon
 			]),
 			("Cutter", [
 				new VileCutter(VileCutterType.None),
