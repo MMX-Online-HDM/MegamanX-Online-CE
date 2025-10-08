@@ -39,12 +39,9 @@ public class SelectVileWeaponMenu : IMainMenu {
 				new RocketPunch(RocketPunchType.InfinityGig),
 			]),
 			("Napalm", [
-				new Napalm(NapalmType.None),
-				new Napalm(NapalmType.NoneBall),
-				new Napalm(NapalmType.RumblingBang),
-				new Napalm(NapalmType.FireGrenade),
-				new Napalm(NapalmType.SplashHit),
-				new Napalm(NapalmType.NoneFlamethrower)
+				RumblingBang.netWeapon,
+				FireGrenade.netWeapon,
+				SplashHit.netWeapon
 			]),
 			("Grenade", [
 				new VileBall(VileBallType.None),

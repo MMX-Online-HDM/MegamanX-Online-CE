@@ -44,7 +44,7 @@ public class Vile : Character {
 	public Vulcan vulcanWeapon;
 	public VileMissile missileWeapon;
 	public RocketPunch rocketPunchWeapon;
-	public Napalm napalmWeapon;
+	public VileNapalm napalmWeapon;
 	public VileBall grenadeWeapon;
 	public VileCutter cutterWeapon;
 	public VileFlamethrower flamethrowerWeapon;
@@ -81,8 +81,16 @@ public class Vile : Character {
 		cannonWeapon = new VileCannon((VileCannonType)loadout.cannon);
 		missileWeapon = new VileMissile((VileMissileType)loadout.missile);
 		rocketPunchWeapon = new RocketPunch((RocketPunchType)loadout.rocketPunch);
-		napalmWeapon = new Napalm((NapalmType)loadout.napalm);
-		grenadeWeapon = new VileBall((VileBallType)loadout.ball);
+		napalmWeapon = loadout.napalm switch {
+			1 => new FireGrenade(),
+			2 => new SplashHit(),
+			_ => new RumblingBang()
+		};
+		grenadeWeapon = loadout.ball switch {
+			1 => new SpreadShot(),
+			2 => new PeaceOutRoller(),
+			_ => new ExplosiveRound()
+		};
 		cutterWeapon = new VileCutter((VileCutterType)loadout.cutter);
 		flamethrowerWeapon = loadout.flamethrower switch {
 			-1 => new NoneFlamethrower(),
@@ -280,7 +288,7 @@ public class Vile : Character {
 		bool leftorRightHeld = player.input.getXDir(player) != 0;
 		bool upHeld = player.input.getYDir(player) == -1;
 		if (charState is Crouch) {
-			napalmWeapon.vileShoot(WeaponIds.Napalm, this);
+			napalmWeapon.vileShoot(0, this);
 			return true;
 		}
 		if (upHeld && cutterWeapon.type > -1) {

@@ -15,6 +15,7 @@ public abstract class VileFlamethrower : Weapon {
 	public string projSprite = "";
 	public string projFadeSprite = "";
 	public int projId;
+	public float vileAmmoUsage;
 
 	public VileFlamethrower() : base() {
 		fireRate = 60;
@@ -66,12 +67,9 @@ public class NoneNapalmFlamethrower : VileFlamethrower {
 		return 0;
 	}
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
-		if (vile.napalmWeapon.type == (int)NapalmType.None) return;
-		if (vile.napalmWeapon.type == (int)NapalmType.NoneFlamethrower) return;
 		if (vile.napalmWeapon.shootCooldown > 0) return;
-		vile.setVileShootTime(vile.napalmWeapon);
 		if (vile.tryUseVileAmmo((float)vile.napalmWeapon.ammousage)) {
-			vile.changeState(new AirBombNapalm(), false);
+			//vile.changeState(new AirBombNapalm(), false);
 		}
 		base.vileShoot(weaponInput, vile);
 	}
@@ -84,7 +82,7 @@ public class WildHorseKick : VileFlamethrower {
 		fireRate = 60;
 		index = (int)WeaponIds.VileFlamethrower;
 		type = (int)VileFlamethrowerType.WildHorseKick;
-	
+
 		displayName = "Wild Horse Kick";
 		projSprite = "flamethrower_whk";
 		projFadeSprite = "flamethrower_whk_fade";
@@ -95,6 +93,7 @@ public class WildHorseKick : VileFlamethrower {
 		damage = "1";
 		hitcooldown = "0.1";
 		effect = "Fire DOT: 0.5";
+		vileAmmoUsage = 2;
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
@@ -117,7 +116,7 @@ public class SeaDragonRage : VileFlamethrower {
 		fireRate = 60;
 		index = (int)WeaponIds.VileFlamethrower;
 		type = (int)VileFlamethrowerType.SeaDragonRage;
-	
+		vileAmmoUsage = 2;
 		displayName = "Sea Dragon's Rage";
 		projSprite = "flamethrower_sdr";
 		projFadeSprite = "flamethrower_sdr_fade";
@@ -149,7 +148,7 @@ public class DragonsWrath : VileFlamethrower {
 		fireRate = 60;
 		index = (int)WeaponIds.VileFlamethrower;
 		type = (int)VileFlamethrowerType.DragonsWrath;
-	
+		vileAmmoUsage = 2;
 		displayName = "Dragon's Wrath";
 		projSprite = "flamethrower_dw";
 		projFadeSprite = "flamethrower_dw_fade";

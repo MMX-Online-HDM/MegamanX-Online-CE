@@ -2,96 +2,102 @@
 using System.Collections.Generic;
 
 namespace MMXOnline;
-
+#region Weapons
 public enum NapalmType {
-	None = -3,
-	NoneFlamethrower = -2,
-	NoneBall = -1,
 	RumblingBang,
 	FireGrenade,
 	SplashHit,
 }
-
-public class Napalm : Weapon {
+public class VileNapalm : Weapon {
 	public float vileAmmoUsage;
-	public static Napalm netWeaponRB = new Napalm(NapalmType.RumblingBang);
-	public static Napalm netWeaponFG = new Napalm(NapalmType.FireGrenade);
-	public static Napalm netWeaponSH = new Napalm(NapalmType.SplashHit);
-	public Napalm(NapalmType napalmType) : base() {
+	public VileNapalm() : base() {
 		index = (int)WeaponIds.Napalm;
 		weaponBarBaseIndex = 0;
 		weaponBarIndex = weaponBarBaseIndex;
 		killFeedIndex = 30;
-		type = (int)napalmType;
-		if (napalmType == NapalmType.None) {
-			displayName = "None";
-			killFeedIndex = 126;
-			ammousage = 0;
-			vileAmmoUsage = 0;
-			fireRate = 0;
-			vileWeight = 0;
-		} else if (napalmType == NapalmType.NoneBall) {
-			displayName = "None(GRENADE)";
-			description = new string[] { "Do not equip a Napalm.", "GRENADE will be used instead." };
-			killFeedIndex = 126;
-			ammousage = 0;
-			vileAmmoUsage = 0;
-			fireRate = 0;
-			vileWeight = 0;
-			effect = "Equip Grenade.";
-		} else if (napalmType == NapalmType.NoneFlamethrower) {
-			displayName = "None(FLAMETHROWER)";
-			description = new string[] { "Do not equip a Napalm.", "FLAMETHROWER will be used instead." };
-			killFeedIndex = 126;
-			ammousage = 0;
-			vileAmmoUsage = 0;
-			fireRate = 0;
-			vileWeight = 0;
-			effect = "Equip Flamethrower.";
-		} else if (napalmType == NapalmType.RumblingBang) {
-			displayName = "Rumbling Bang";
-			vileAmmoUsage = 8;
-			fireRate = 60 * 2;
-			description = new string[] { "This napalm sports a wide horizontal", "range but cannot attack upward." };
-			vileWeight = 3;
-			ammousage = vileAmmoUsage;
-			damage = "2/1";
-			hitcooldown = "0.5";
-			effect = "None.";
-		}
-		if (napalmType == NapalmType.FireGrenade) {
-			displayName = "Flame Round";
-			vileAmmoUsage = 16;
-			fireRate = 60 * 4;
-			description = new string[] { "This napalm travels along the", "ground, laying a path of fire." };
-			killFeedIndex = 54;
-			vileWeight = 3;
-			ammousage = vileAmmoUsage;
-			damage = "1/2";
-			hitcooldown = "1/0.5";
-			effect = "Fire DOT: 0.5/1";
-		}
-		if (napalmType == NapalmType.SplashHit) {
-			displayName = "Splash Hit";
-			vileAmmoUsage = 16;
-			fireRate = 60 * 3;
-			description = new string[] { "This napalm can attack foes above,", "but has a narrow horizontal range." };
-			killFeedIndex = 79;
-			vileWeight = 3;
-			ammousage = vileAmmoUsage;
-			damage = "2/1";
-			hitcooldown = "0.5";
-			effect = "Pushes towards it.";
-		}
-	}
-
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
-		if (shootCooldown > 0) return;
-		if (vile.napalmWeapon.type == (int)NapalmType.None) return;
-		vile.changeState(new NapalmAttackNapalm(), true);
+		vileWeight = 0;
 	}
 }
 
+public class RumblingBang : VileNapalm {
+	public static RumblingBang netWeapon = new();
+	public RumblingBang() : base() {
+		type = (int)NapalmType.RumblingBang;
+		displayName = "Rumbling Bang";
+		vileAmmoUsage = 8;
+		fireRate = 60 * 2;
+		vileWeight = 3;
+		ammousage = vileAmmoUsage;
+		damage = "2/1";
+		hitcooldown = "0.5";
+		effect = "None.";
+	}
+	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+		if (shootCooldown > 0) return;
+		if (vile.energy.ammo < 8) return;
+		vile.changeState(new NapalmAttacks(this), true);
+	}
+	public override void shoot(Character character, int[] args) {
+		new NapalmGrenadeProj(
+			character.getCenterPos(), character.xDir, character, character.player,
+			character.player.getNextActorNetId(), rpc: true
+		);
+	}
+}
+public class FireGrenade : VileNapalm {
+	public static FireGrenade netWeapon = new();
+	public FireGrenade() : base() {
+		type = (int)NapalmType.FireGrenade;
+		displayName = "Flame Round";
+		vileAmmoUsage = 16;
+		fireRate = 60 * 4;
+		killFeedIndex = 54;
+		vileWeight = 3;
+		ammousage = vileAmmoUsage;
+		damage = "1/2";
+		hitcooldown = "1/0.5";
+		effect = "Fire DOT: 0.5/1";
+	}
+	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+		if (shootCooldown > 0) return;
+		if (vile.energy.ammo < 16) return;
+		vile.changeState(new NapalmAttacks(this), true);
+	}
+	public override void shoot(Character character, int[] args) {
+		new MK2NapalmGrenadeProj(
+			character.getCenterPos(), character.xDir, character, character.player,
+			character.player.getNextActorNetId(), rpc: true
+		);
+	}
+}
+public class SplashHit : VileNapalm {
+	public static SplashHit netWeapon = new();
+	public SplashHit() : base() {
+		type = (int)NapalmType.SplashHit;
+		displayName = "Splash Hit";
+		vileAmmoUsage = 16;
+		fireRate = 60 * 3;
+		killFeedIndex = 79;
+		vileWeight = 3;
+		ammousage = vileAmmoUsage;
+		damage = "2/1";
+		hitcooldown = "0.5";
+		effect = "Pushes towards it.";
+	}
+	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+		if (shootCooldown > 0) return;
+		if (vile.energy.ammo < 16) return;
+		vile.changeState(new NapalmAttacks(this), true);
+	}
+	public override void shoot(Character character, int[] args) {
+		new SplashHitGrenadeProj(
+			character.getCenterPos(), character.xDir, character, character.player,
+			character.player.getNextActorNetId(), rpc: true
+		);
+	}
+}
+#endregion
+#region Projectiles
 public class NapalmGrenadeProj : Projectile {
 	bool exploded;
 	public NapalmGrenadeProj(
@@ -99,7 +105,7 @@ public class NapalmGrenadeProj : Projectile {
 	) : base(
 		pos, xDir, owner, "napalm_grenade", netId, player
 	) {
-		weapon = Napalm.netWeaponRB;
+		weapon = RumblingBang.netWeapon;
 		projId = (int)ProjIds.RumblingBangGrenade;
 		damager.damage = 2;
 		damager.hitCooldown = 12;
@@ -169,7 +175,7 @@ public class NapalmPartProj : Projectile {
 	) : base(
 		pos, xDir, owner, "napalm_part", netId, player
 	) {
-		weapon = Napalm.netWeaponRB;
+		weapon = RumblingBang.netWeapon;
 		damager.damage = 1;
 		damager.hitCooldown = 30;
 		projId = (int)ProjIds.RumblingBangProj;
@@ -269,7 +275,7 @@ public class MK2NapalmGrenadeProj : Projectile {
 	) : base(
 		pos, xDir, owner, "napalm_grenade2", netId, player
 	) {
-		weapon = Napalm.netWeaponFG;
+		weapon = FireGrenade.netWeapon;
 		damager.damage = 1;
 		damager.hitCooldown = 12;
 		projId = (int)ProjIds.FlameRoundGrenade;
@@ -315,7 +321,7 @@ public class MK2NapalmProj : Projectile {
 	) : base(
 		pos, xDir, owner, "napalm2_proj", netId, player
 	) {
-		weapon = Napalm.netWeaponFG;
+		weapon = FireGrenade.netWeapon;
 		damager.damage = 1;
 		damager.hitCooldown = 60;
 		vel = new Point(100 * xDir, 0);
@@ -362,7 +368,7 @@ public class MK2NapalmFlame : Projectile {
 	) : base(
 		pos, xDir, owner, "napalm2_flame", netId, player
 	) {
-		weapon = Napalm.netWeaponFG;
+		weapon = FireGrenade.netWeapon;
 		damager.damage = 1;
 		damager.hitCooldown = 60;
 		projId = (int)ProjIds.FlameRoundFlameProj;
@@ -398,7 +404,7 @@ public class MK2NapalmWallProj : Projectile {
 	) : base(
 		pos, xDir, owner, "napalm2_wall", netId, player
 	) {
-		weapon = Napalm.netWeaponFG;
+		weapon = FireGrenade.netWeapon;
 		damager.damage = 2;
 		damager.hitCooldown = 30;
 		maxTime = 1f;
@@ -431,7 +437,7 @@ public class SplashHitGrenadeProj : Projectile {
 	) : base(
 		pos, xDir, owner, "napalm_sh_grenade", netId, player
 	) {
-		weapon = Napalm.netWeaponSH;
+		weapon = SplashHit.netWeapon;
 		damager.damage = 2;
 		damager.hitCooldown = 12;
 		projId = (int)ProjIds.SplashHitGrenade;
@@ -481,7 +487,7 @@ public class SplashHitProj : Projectile {
 	) : base(
 		pos, xDir, owner, "napalm_sh_proj", netId, player
 	) {
-		weapon = Napalm.netWeaponSH;
+		weapon = SplashHit.netWeapon;
 		damager.damage = 1;
 		damager.hitCooldown = 30;
 		vel = new Point(0, 0);
@@ -528,6 +534,130 @@ public class SplashHitProj : Projectile {
 		if (actor.isUnderwater()) { modifier = 2; }
 		float xMoveVel = MathF.Sign(pos.x - actor.pos.x);
 		actor.move(new Point(xMoveVel * 50 * modifier, 0));
+	}
+}
+#endregion
+#region States
+public class NapalmAttacks : VileState {
+	public string sound = "FireNappalmMK2";
+	public bool soundPlayed;
+	public int soundFrame = 2;
+	public bool shot;
+	public int shootFrame = 2;
+	public VileNapalm weapon;
+	public NapalmAttacks(VileNapalm weapon) : base("crouch_nade") {
+		airSprite = "air_bomb_attack";
+		useDashJumpSpeed = true;
+		this.weapon = weapon;
+	}
+
+	public override void update() {
+		base.update();
+		if (character.sprite.frameIndex >= soundFrame && !soundPlayed) {	
+			character.playSound(sound, forcePlay: false, sendRpc: true);
+			soundPlayed = true;
+		}
+		if (character.frameIndex >= shootFrame && !shot && vile.tryUseVileAmmo(weapon.vileAmmoUsage)) {
+			shot = true;
+			weapon.shoot(vile, []);
+			vile.setVileShootTime(weapon);
+		}
+		if (character.isAnimOver()) {
+			character.changeToCrouchOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.turnToInput(player.input, player);
+		if (!character.grounded) {
+			sprite = "air_bomb_attack";
+			character.changeSpriteFromName(sprite, true);
+			character.useGravity = false;
+			character.vel = new Point();
+		}
+	}
+}
+#endregion
+#region OldStuff
+/*
+public class Napalm : Weapon {
+	public float vileAmmoUsage;
+	public static Napalm netWeaponRB = new Napalm(NapalmType.RumblingBang);
+	public static Napalm netWeaponFG = new Napalm(NapalmType.FireGrenade);
+	public static Napalm netWeaponSH = new Napalm(NapalmType.SplashHit);
+	public Napalm(NapalmType napalmType) : base() {
+		index = (int)WeaponIds.Napalm;
+		weaponBarBaseIndex = 0;
+		weaponBarIndex = weaponBarBaseIndex;
+		killFeedIndex = 30;
+		type = (int)napalmType;
+		if (napalmType == NapalmType.None) {
+			displayName = "None";
+			killFeedIndex = 126;
+			ammousage = 0;
+			vileAmmoUsage = 0;
+			fireRate = 0;
+			vileWeight = 0;
+		} else if (napalmType == NapalmType.NoneBall) {
+			displayName = "None(GRENADE)";
+			description = new string[] { "Do not equip a Napalm.", "GRENADE will be used instead." };
+			killFeedIndex = 126;
+			ammousage = 0;
+			vileAmmoUsage = 0;
+			fireRate = 0;
+			vileWeight = 0;
+			effect = "Equip Grenade.";
+		} else if (napalmType == NapalmType.NoneFlamethrower) {
+			displayName = "None(FLAMETHROWER)";
+			description = new string[] { "Do not equip a Napalm.", "FLAMETHROWER will be used instead." };
+			killFeedIndex = 126;
+			ammousage = 0;
+			vileAmmoUsage = 0;
+			fireRate = 0;
+			vileWeight = 0;
+			effect = "Equip Flamethrower.";
+		} else if (napalmType == NapalmType.RumblingBang) {
+			displayName = "Rumbling Bang";
+			vileAmmoUsage = 8;
+			fireRate = 60 * 2;
+			description = new string[] { "This napalm sports a wide horizontal", "range but cannot attack upward." };
+			vileWeight = 3;
+			ammousage = vileAmmoUsage;
+			damage = "2/1";
+			hitcooldown = "0.5";
+			effect = "None.";
+		}
+		if (napalmType == NapalmType.FireGrenade) {
+			displayName = "Flame Round";
+			vileAmmoUsage = 16;
+			fireRate = 60 * 4;
+			description = new string[] { "This napalm travels along the", "ground, laying a path of fire." };
+			killFeedIndex = 54;
+			vileWeight = 3;
+			ammousage = vileAmmoUsage;
+			damage = "1/2";
+			hitcooldown = "1/0.5";
+			effect = "Fire DOT: 0.5/1";
+		}
+		if (napalmType == NapalmType.SplashHit) {
+			displayName = "Splash Hit";
+			vileAmmoUsage = 16;
+			fireRate = 60 * 3;
+			description = new string[] { "This napalm can attack foes above,", "but has a narrow horizontal range." };
+			killFeedIndex = 79;
+			vileWeight = 3;
+			ammousage = vileAmmoUsage;
+			damage = "2/1";
+			hitcooldown = "0.5";
+			effect = "Pushes towards it.";
+		}
+	}
+
+	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+		if (shootCooldown > 0) return;
+		if (vile.napalmWeapon.type == (int)NapalmType.None) return;
+		vile.changeState(new NapalmAttackNapalm(), true);
 	}
 }
 
@@ -858,3 +988,4 @@ public class NapalmAttack : VileState {
 		}
 	}
 } */
+#endregion
