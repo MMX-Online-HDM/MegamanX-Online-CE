@@ -32,10 +32,13 @@ public class ExplosiveRound : VileBall {
 	}
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
 		if (shootCooldown > 0) return;
-		if (vile.energy.ammo < 8) return;
+		if (vile.energy.ammo < vileAmmoUsage) return;
 		vile.changeState(new BallAttacks(this), true);
 	}
 	public override void shoot(Character character, int[] args) {
+		if (character is not Vile vava) return;
+		vava.setVileShootTime(this);
+		vava.tryUseVileAmmo(vileAmmoUsage);
 		new VileBombProj(
 			character.pos, character.xDir, 0, character, character.player,
 			character.player.getNextActorNetId(), rpc: true
@@ -57,13 +60,18 @@ public class SpreadShot : VileBall {
 	}
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
 		if (shootCooldown > 0) return;
-		if (vile.energy.ammo < 5) return;
+		if (vile.energy.ammo < vileAmmoUsage) return;
 		vile.changeState(new BallAttacks(this), true);
 	}
 	public override void shoot(Character character, int[] args) {
+		if (character is not Vile vava) return;
+		vava.setVileShootTime(this);
+		vava.tryUseVileAmmo(vileAmmoUsage);
+		int num = args[0];
 		new StunShotProj2(
-			character.pos, character.xDir, 0, 0, character,
-			character.player, character.player.getNextActorNetId(), rpc: true
+			character.pos, character.xDir, num,
+			0, character, character.player,
+			character.player.getNextActorNetId(), rpc: true
 		);
 	}
 }
@@ -71,22 +79,26 @@ public class PeaceOutRoller : VileBall {
 	public static PeaceOutRoller netWeapon = new();
 	public PeaceOutRoller() : base() {
 		type = (int)VileBallType.PeaceOutRoller;
-		displayName = "Splash Hit";
+		displayName = "Peace Out Roller";
 		vileAmmoUsage = 16;
-		fireRate = 60 * 3;
-		killFeedIndex = 79;
+		fireRate = 75;
+		killFeedIndex = 80;
 		vileWeight = 3;
 		ammousage = vileAmmoUsage;
-		damage = "2/1";
+		damage = "3";
 		hitcooldown = "0.5";
-		effect = "Pushes towards it.";
+		flinch = "6";
+		effect = "Splits on ground.";
 	}
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
 		if (shootCooldown > 0) return;
-		if (vile.energy.ammo < 16) return;
+		if (vile.energy.ammo < vileAmmoUsage) return;
 		vile.changeState(new BallAttacks(this), true);
 	}
 	public override void shoot(Character character, int[] args) {
+		if (character is not Vile vava) return;
+		vava.setVileShootTime(this);
+		vava.tryUseVileAmmo(vileAmmoUsage);
 		new PeaceOutRollerProj(
 			character.pos, character.xDir, 0, character, character.player,
 			character.player.getNextActorNetId(), rpc: true
@@ -110,36 +122,43 @@ public class BallAttacks : VileState {
 
 	public override void update() {
 		base.update();
-		if (!vile.tryUseVileAmmo(weapon.vileAmmoUsage)) return;
+		if (vile.energy.ammo < weapon.vileAmmoUsage) {
+			character.changeToCrouchOrFall();
+			return;
+		}
 
 		if (character.sprite.frameIndex >= soundFrame && !soundPlayed) {
 			character.playSound(sound, forcePlay: false, sendRpc: true);
 			soundPlayed = true;
 		}
 
-		if (weapon is ExplosiveRound) {
-			float[] shootTimes = { 0f, 0.23f, 0.45f };
-			if (bombNum < shootTimes.Length && stateTime > shootTimes[bombNum]) {
+		if (character.frameIndex >= shootFrame) {
+			if (weapon is ExplosiveRound) {
+				float[] shootTimes = { 7f / 60f, 20f / 60f, 34f / 60f };
+				if (bombNum < shootTimes.Length && stateTime > shootTimes[bombNum]) {
+					weapon.shoot(vile, []);
+					bombNum++;
+				}
+				if (stateTime > 44f / 60f) character.changeToCrouchOrFall();
+			} else if (weapon is SpreadShot) {
+				for (int i = 0; i < 7; i++) {
+					if (stateTime > i * 0.1f && bombNum == i) {
+						bombNum++;
+						weapon.shoot(vile, [i+1]);
+					}
+				}
+			} else if (weapon is PeaceOutRoller && !shot) {
 				weapon.shoot(vile, []);
-				vile.setVileShootTime(weapon);
-				bombNum++;
+				shot = true;
 			}
-			if (stateTime > 0.68f) character.changeToIdleOrFall();
-		} else if (weapon is SpreadShot) {
-			float interval = 0.1f;
-			int maxShots = 7;
-			if (bombNum < maxShots && stateTime > bombNum * interval) {
-				weapon.shoot(vile, []);
-				vile.setVileShootTime(weapon);
-				bombNum++;
-			}
-		} else if (weapon is PeaceOutRoller) {
-			weapon.shoot(vile, []);
-			vile.setVileShootTime(weapon);
 		}
-		if (character.isAnimOver()) {
+
+		if (shot && stateTime > 14f / 60f) {
 			character.changeToCrouchOrFall();
 		}
+
+		if (stateTime > 60f/60f) character.changeToCrouchOrFall();
+		
 	}
 
 	public override void onEnter(CharState oldState) {
@@ -151,6 +170,10 @@ public class BallAttacks : VileState {
 			character.useGravity = false;
 			character.vel = new Point();
 		}
+	}
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity = true;
 	}
 }
 #endregion
