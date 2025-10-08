@@ -11,7 +11,7 @@ public class Vile : Character {
 	public bool vulcanActive;
 	public float vulcanLingerTime;
 	public const int callNewMechCost = 5;
-	float mechBusterCooldown;
+	public float mechBusterCooldown;
 	public bool usedAmmoLastFrame;
 	public int buckshotDanceNum;
 	public float vileAmmoRechargeCooldown;
@@ -51,11 +51,15 @@ public class Vile : Character {
 	public VileLaser laserWeapon;
 	public MechMenuWeapon rideMenuWeapon;
 
+	public Weapon downAirSpWeapon;
+	public Weapon airSpWeapon;
+	public Weapon downSpWeapon;
+
 	public Vile(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
 		bool isWarpIn = true, bool mk2VileOverride = false, bool mk5VileOverride = false,
-		VileLoadout loadout = null,
+		VileLoadout? loadout = null,
 		int? heartTanks = null, bool isATrans = false
 	) : base(
 		player, x, y, xDir, isVisible,
@@ -98,6 +102,24 @@ public class Vile : Character {
 			2 => new DragonsWrath(),
 			3 => new NoneNapalmFlamethrower(),
 			_ => new WildHorseKick()
+		};
+		downSpWeapon = loadout.downSpWeapon switch {
+			0 => napalmWeapon,
+			1 => grenadeWeapon,
+			2 => flamethrowerWeapon,
+			_ => napalmWeapon,
+		};
+		airSpWeapon = loadout.airSpWeapon switch {
+			0 => napalmWeapon,
+			1 => grenadeWeapon,
+			2 => flamethrowerWeapon,
+			_ => napalmWeapon,
+		};
+		downAirSpWeapon = loadout.downAirSpWeapon switch {
+			0 => napalmWeapon,
+			1 => grenadeWeapon,
+			2 => flamethrowerWeapon,
+			_ => napalmWeapon,
 		};
 		laserWeapon = new VileLaser((VileLaserType)loadout.laser);
 		rideMenuWeapon = new MechMenuWeapon(VileMechMenuType.All);
@@ -251,20 +273,20 @@ public class Vile : Character {
 	}
 
 	public override bool attackCtrl() {
-		bool specialPressed = player.input.isPressed(Control.Special1, player);
-		bool shootHeld = player.input.isHeld(Control.Shoot, player);
-
-		bool weaponRightHeld = (
-			player.input.isHeld(Control.WeaponRight, player) && 
-			(!isATrans || !player.input.isHeld(Control.Up, player))
-		);
-
+		// First test the special weapons.
 		if (dashGrabSpecial() ||
 			airDownAttacks() ||
 			normalAttacks()
 		) {
 			return true;
 		}
+		// Get input.
+		bool shootHeld = player.input.isHeld(Control.Shoot, player);
+		bool weaponRightHeld = (
+			player.input.isHeld(Control.WeaponRight, player) && 
+			(!isATrans || !player.input.isHeld(Control.Up, player))
+		);
+
 		if (shootHeld && cannonWeapon.type > -1) {
 			if (cannonWeapon.shootCooldown < cannonWeapon.fireRate * 0.75f) {
 				cannonWeapon.vileShoot(0, this);
@@ -287,23 +309,21 @@ public class Vile : Character {
 		}
 		bool leftorRightHeld = player.input.getXDir(player) != 0;
 		bool upHeld = player.input.getYDir(player) == -1;
-		if (charState is Crouch) {
-			napalmWeapon.vileShoot(0, this);
+		bool downHeld = player.input.getYDir(player) == 1;
+		if (downHeld) {
+			downSpWeapon.vileShoot(WeaponIds.Napalm, this);
 			return true;
 		}
-		if (upHeld && cutterWeapon.type > -1) {
+		if (upHeld) {
 			cutterWeapon.vileShoot(WeaponIds.VileCutter, this);
 			return true;
 		}
-		if (leftorRightHeld && rocketPunchWeapon.type > -1) {
+		if (leftorRightHeld) {
 			rocketPunchWeapon.vileShoot(WeaponIds.RocketPunch, this);
 			return true;
 		}
-		if (missileWeapon.type > -1) {
-			missileWeapon.vileShoot(WeaponIds.ElectricShock, this);
-			return true;
-		}
-		return false;
+		missileWeapon.vileShoot(WeaponIds.ElectricShock, this);
+		return true;
 	}
 
 	public bool airDownAttacks() {
@@ -314,22 +334,12 @@ public class Vile : Character {
 			return false;
 		}
 		bool heldDown = player.input.getYDir(player) == 1;
-
-		if (heldDown && flamethrowerWeapon.type >= 0) {
-			flamethrowerWeapon.vileShoot(WeaponIds.VileFlamethrower, this);
+		if (heldDown) {
+			downAirSpWeapon.vileShoot(WeaponIds.VileFlamethrower, this);
 			return true;
 		}
-		if (napalmWeapon.type >= 0) {
-			if (heldDown || grenadeWeapon.type < 0) {
-				napalmWeapon.vileShoot(0, this);
-				return true;
-			}
-		}
-		if (grenadeWeapon.type >= 0) {
-			grenadeWeapon.vileShoot(WeaponIds.VileBomb, this);
-			return true;
-		}
-		return false;
+		airSpWeapon.vileShoot(WeaponIds.VileBomb, this);
+		return true;
 	}
 
 	public bool dashGrabSpecial() {
