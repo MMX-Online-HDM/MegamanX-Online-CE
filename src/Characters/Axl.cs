@@ -642,7 +642,9 @@ public class Axl : Character {
 						if (loadout.rayGunAlt == 0) {
 							Point bulletDir = getAxlBulletDir();
 							float whiteAxlMod = isWhiteAxl() ? 2 : 1;
-							move(bulletDir.times(-50 * whiteAxlMod));
+							// Because GM19 collision is flawed to the core we apply X then Y.
+							moveXY(-bulletDir.x, 0);
+							moveXY(0, -bulletDir.y);
 						}
 					}
 				}
@@ -1796,6 +1798,18 @@ public class Axl : Character {
 				rshootDebuffAmmount[dir] = debuff;
 			}
 		}
+		/*
+		debuff = getBackwardMoveDebuff();
+		if (debuff > 0) {
+			int dir = getShootXDir() == 1 ? 0 : 1;
+			if (rshootDebuffTime[dir] < debuffTime) {
+				rshootDebuffTime[dir] = debuffTime / 2f;
+			}
+			if (rshootDebuffAmmount[dir] < debuff) {
+				rshootDebuffAmmount[dir] = debuff;
+			}
+		}
+		*/
 	}
 	
 	public float getAimBackwardsAmount() {
