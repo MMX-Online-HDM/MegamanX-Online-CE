@@ -148,6 +148,10 @@ public class VileLoadout {
 	[ProtoMember(8)] public int cutter;
 	[ProtoMember(9)] public int flamethrower;
 
+	[ProtoMember(10)] public int downSpWeapon = 0;
+	[ProtoMember(11)] public int airSpWeapon = 1;
+	[ProtoMember(10)] public int downAirSpWeapon = 2;
+
 	public const int maxWeight = 1000;
 
 	public List<Weapon> getWeaponsFromLoadout(bool includeMech) {
