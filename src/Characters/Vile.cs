@@ -95,7 +95,11 @@ public class Vile : Character {
 			2 => new PeaceOutRoller(),
 			_ => new ExplosiveRound()
 		};
-		cutterWeapon = new VileCutter((VileCutterType)loadout.cutter);
+		cutterWeapon = loadout.cutter switch {
+			1 => new ParasiteSword(),
+			2 => new MaroonedTomahawk(),
+			_ => new QuickHomesick()
+		};
 		flamethrowerWeapon = loadout.flamethrower switch {
 			1 => new SeaDragonRage(),
 			2 => new DragonsWrath(),

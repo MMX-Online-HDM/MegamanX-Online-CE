@@ -49,10 +49,9 @@ public class SelectVileWeaponMenu : IMainMenu {
 				PeaceOutRoller.netWeapon
 			]),
 			("Cutter", [
-				new VileCutter(VileCutterType.None),
-				new VileCutter(VileCutterType.QuickHomesick),
-				new VileCutter(VileCutterType.ParasiteSword),
-				new VileCutter(VileCutterType.MaroonedTomahawk)
+				QuickHomesick.netWeapon,
+				MaroonedTomahawk.netWeapon,
+				ParasiteSword.netWeapon,
 			]),
 			("Flamethrower", [
 				WildHorseKick.netWeapon,

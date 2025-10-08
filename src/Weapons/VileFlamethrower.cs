@@ -132,7 +132,6 @@ public class FlamethrowerAttacks : VileState {
 			shootTime = 0;
 			character.playSound("flamethrower");
 			weapon.shoot(vile, []);
-			vile.setVileShootTime(weapon);
 		}
 
 		if (character.loopCount >= 5 || !player.input.isHeld(Control.Special1, player)) {
