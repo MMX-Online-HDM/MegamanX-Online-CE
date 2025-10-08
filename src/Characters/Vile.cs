@@ -97,10 +97,8 @@ public class Vile : Character {
 		};
 		cutterWeapon = new VileCutter((VileCutterType)loadout.cutter);
 		flamethrowerWeapon = loadout.flamethrower switch {
-			-1 => new NoneFlamethrower(),
 			1 => new SeaDragonRage(),
 			2 => new DragonsWrath(),
-			3 => new NoneNapalmFlamethrower(),
 			_ => new WildHorseKick()
 		};
 		downSpWeapon = loadout.downSpWeapon switch {

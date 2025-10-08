@@ -133,6 +133,7 @@ public class BallAttacks : VileState {
 		}
 
 		if (character.frameIndex >= shootFrame) {
+			character.turnToInput(player.input, player);
 			if (weapon is ExplosiveRound) {
 				float[] shootTimes = { 7f / 60f, 20f / 60f, 34f / 60f };
 				if (bombNum < shootTimes.Length && stateTime > shootTimes[bombNum]) {

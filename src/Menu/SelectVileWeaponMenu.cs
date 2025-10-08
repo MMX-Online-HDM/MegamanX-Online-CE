@@ -55,12 +55,9 @@ public class SelectVileWeaponMenu : IMainMenu {
 				new VileCutter(VileCutterType.MaroonedTomahawk)
 			]),
 			("Flamethrower", [
-				NoneFlamethrower.netWeapon,
 				WildHorseKick.netWeapon,
 				SeaDragonRage.netWeapon,
 				DragonsWrath.netWeapon,
-				NoneNapalmFlamethrower.netWeapon,
-
 			]),
 			("Laser", [
 				new VileLaser(VileLaserType.None),

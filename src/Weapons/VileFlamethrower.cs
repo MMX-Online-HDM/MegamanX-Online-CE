@@ -4,77 +4,19 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public enum VileFlamethrowerType {
-	None = -1,
 	WildHorseKick,
 	SeaDragonRage,
 	DragonsWrath,
-	NoneNapalm,
 }
 
 public abstract class VileFlamethrower : Weapon {
-	public string projSprite = "";
-	public string projFadeSprite = "";
-	public int projId;
 	public float vileAmmoUsage;
 
 	public VileFlamethrower() : base() {
 		fireRate = 60;
 		index = (int)WeaponIds.VileFlamethrower;
 	}
-
-	public override float getAmmoUsage(int chargeLevel) {
-		return 0;
-	}
-	public static bool isFlameType(Vile vile) {
-		if (vile.flamethrowerWeapon.type == (int)VileFlamethrowerType.DragonsWrath) return true;		
-		if (vile.flamethrowerWeapon.type == (int)VileFlamethrowerType.WildHorseKick) return true;		
-		return (vile.flamethrowerWeapon.type == (int)VileFlamethrowerType.SeaDragonRage);
-	}
-
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
-		if (shootCooldown > 0) return;
-		if (vile.energy.ammo < 0) return;
-		if (vile.flamethrowerWeapon.type == (int)VileFlamethrowerType.None) return;
-	}
 }
-public class NoneFlamethrower : VileFlamethrower {
-	public static NoneFlamethrower netWeapon = new();
-	public NoneFlamethrower() : base() {
-		fireRate = 0;
-		index = (int)WeaponIds.VileFlamethrower;
-		type = (int)VileFlamethrowerType.None;
-		displayName = "None";
-		killFeedIndex = 126;
-		vileWeight = 0;
-		damage = "0";
-		hitcooldown = "0";
-		ammousage = 0;
-		fireRate = 0;
-		vileWeight = 0;
-	}
-}
-public class NoneNapalmFlamethrower : VileFlamethrower {
-	public static NoneNapalmFlamethrower netWeapon = new();
-	public NoneNapalmFlamethrower() : base() {
-		fireRate = 60;
-		index = (int)WeaponIds.VileFlamethrower;
-		type = (int)VileFlamethrowerType.NoneNapalm;
-		displayName = "None(NAPALM)";
-		description = new string[] { "Shoot jets of flame from your leg.", "Strong, but not energy efficient." };
-		killFeedIndex = 126;
-	}
-	public override float getAmmoUsage(int chargeLevel) {
-		return 0;
-	}
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
-		if (vile.napalmWeapon.shootCooldown > 0) return;
-		if (vile.tryUseVileAmmo((float)vile.napalmWeapon.ammousage)) {
-			//vile.changeState(new AirBombNapalm(), false);
-		}
-		base.vileShoot(weaponInput, vile);
-	}
-}
-
 public class WildHorseKick : VileFlamethrower {
 	public static WildHorseKick netWeapon = new();
 
@@ -82,12 +24,7 @@ public class WildHorseKick : VileFlamethrower {
 		fireRate = 60;
 		index = (int)WeaponIds.VileFlamethrower;
 		type = (int)VileFlamethrowerType.WildHorseKick;
-
 		displayName = "Wild Horse Kick";
-		projSprite = "flamethrower_whk";
-		projFadeSprite = "flamethrower_whk_fade";
-		projId = (int)ProjIds.WildHorseKick;
-		description = new string[] { "Shoot jets of flame from your leg.", "Strong, but not energy efficient." };
 		killFeedIndex = 117;
 		vileWeight = 2;
 		damage = "1";
@@ -95,16 +32,19 @@ public class WildHorseKick : VileFlamethrower {
 		effect = "Fire DOT: 0.5";
 		vileAmmoUsage = 2;
 	}
-
-	public override float getAmmoUsage(int chargeLevel) {
-		return 8;
-	}
-
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
 		if (shootCooldown > 0) return;
-		vile.setVileShootTime(this);
-		vile.changeState(new FlamethrowerState(), true);
-		base.vileShoot(weaponInput, vile);
+		if (vile.energy.ammo < vileAmmoUsage) return;
+		vile.changeState(new FlamethrowerAttacks(this), true);
+	}
+	public override void shoot(Character character, int[] args) {
+		if (character is not Vile vava) return;
+		vava.setVileShootTime(this);
+		vava.tryUseVileAmmo(vileAmmoUsage);
+		new FlamethrowerWildHorseKick(
+			character.pos, character.xDir, character.grounded, character,
+			character.player, character.player.getNextActorNetId(), rpc: true
+		);
 	}
 }
 
@@ -118,26 +58,25 @@ public class SeaDragonRage : VileFlamethrower {
 		type = (int)VileFlamethrowerType.SeaDragonRage;
 		vileAmmoUsage = 2;
 		displayName = "Sea Dragon's Rage";
-		projSprite = "flamethrower_sdr";
-		projFadeSprite = "flamethrower_sdr_fade";
-		projId = (int)ProjIds.SeaDragonRage;
-		description = new string[] { "This powerful flamethrower can freeze", "enemies and even be used underwater." };
 		killFeedIndex = 119;
 		vileWeight = 4;
 		damage = "1";
 		hitcooldown = "0.1";
 		effect = "Stack hits to freeze.";
 	}
-
-	public override float getAmmoUsage(int chargeLevel) {
-		return 5;
-	}
-
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
 		if (shootCooldown > 0) return;
-		vile.setVileShootTime(this);
-		vile.changeState(new FlamethrowerState(), true);
-		base.vileShoot(weaponInput, vile);
+		if (vile.energy.ammo < vileAmmoUsage) return;
+		vile.changeState(new FlamethrowerAttacks(this), true);
+	}
+	public override void shoot(Character character, int[] args) {
+		if (character is not Vile vava) return;
+		vava.setVileShootTime(this);
+		vava.tryUseVileAmmo(vileAmmoUsage);
+		new FlamethrowerSeaDragonRage(
+			character.pos, character.xDir, character.grounded, character,
+			character.player, character.player.getNextActorNetId(), rpc: true
+		);
 	}
 }
 
@@ -150,94 +89,73 @@ public class DragonsWrath : VileFlamethrower {
 		type = (int)VileFlamethrowerType.DragonsWrath;
 		vileAmmoUsage = 2;
 		displayName = "Dragon's Wrath";
-		projSprite = "flamethrower_dw";
-		projFadeSprite = "flamethrower_dw_fade";
-		description = new string[] { "A long arching flamethrower,", "useful against faraway enemies." };
 		killFeedIndex = 118;
-		projId = (int)ProjIds.DragonsWrath;
 		vileWeight = 3;
 		damage = "1";
 		hitcooldown = "0.1";
 		effect = "None.";
 	}
-
-	public override float getAmmoUsage(int chargeLevel) {
-		return 24;
-	}
-
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
 		if (shootCooldown > 0) return;
-		vile.setVileShootTime(this);
-		vile.changeState(new FlamethrowerState(), true);
-		base.vileShoot(weaponInput, vile);
+		if (vile.energy.ammo < vileAmmoUsage) return;
+		vile.changeState(new FlamethrowerAttacks(this), true);
+	}
+	public override void shoot(Character character, int[] args) {
+		if (character is not Vile vava) return;
+		vava.setVileShootTime(this);
+		vava.tryUseVileAmmo(vileAmmoUsage);
+		new FlamethrowerDragonsWrath(
+			character.pos, character.xDir, character.grounded, character,
+			character.player, character.player.getNextActorNetId(), rpc: true
+		);
 	}
 }
-
-public class FlamethrowerState : VileState {
-	bool isGrounded;
+#region States
+public class FlamethrowerAttacks : VileState {
+	public VileFlamethrower weapon;
 	public float shootTime;
-	public Point shootPOI = new Point(-1, -1);
-	public Point groundShotPOI = new Point(12, -11);
-
-	public FlamethrowerState() : base("flamethrower") {
-		useGravity = false;
+	public FlamethrowerAttacks(VileFlamethrower weapon) : base("crouch_flamethrower") {
+		airSprite = "flamethrower";
 		useDashJumpSpeed = true;
+		this.weapon = weapon;
 	}
 
 	public override void update() {
 		base.update();
-		character.turnToInput(player.input, player);
-		bool isDragonsWrath = vile.flamethrowerWeapon.type == (int)VileFlamethrowerType.DragonsWrath;
-		bool isWildHorseKick = vile.flamethrowerWeapon.type == (int)VileFlamethrowerType.WildHorseKick;
-		bool isSeaDragonRage = vile.flamethrowerWeapon.type == (int)VileFlamethrowerType.SeaDragonRage;
+		if (vile.energy.ammo < weapon.vileAmmoUsage) {
+			character.changeToCrouchOrFall();
+			return;
+		}
 		shootTime += Global.speedMul;
 		if (shootTime >= 4) {
-			if (!vile.tryUseVileAmmo(2)) {
-				character.changeToIdleOrFall();
-				return;
-			}
+			character.turnToInput(player.input, player);
 			shootTime = 0;
 			character.playSound("flamethrower");
-			Point poiPos;
-			if (!isGrounded) {
-				poiPos = character.getPOIPos(shootPOI);
-			} else {
-				poiPos = (character.getFirstPOI() ?? character.getPOIPos(groundShotPOI));
-			}
-			if (isDragonsWrath) {
-				new FlamethrowerDragonsWrath(
-					poiPos, character.xDir, isGrounded, vile, player,
-					player.getNextActorNetId(), rpc: true
-				);
-			} else if (isWildHorseKick) {
-				new FlamethrowerWildHorseKick(
-					poiPos, character.xDir, isGrounded, vile, player,
-					player.getNextActorNetId(), rpc: true
-				);
-			} else if (isSeaDragonRage) {
-				new FlamethrowerSeaDragonRage(
-					poiPos, character.xDir, isGrounded, vile, player,
-					player.getNextActorNetId(), rpc: true
-				);
-			}
+			weapon.shoot(vile, []);
+			vile.setVileShootTime(weapon);
 		}
 
 		if (character.loopCount >= 5 || !player.input.isHeld(Control.Special1, player)) {
 			character.changeToIdleOrFall();
 		}
 	}
-
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.stopMoving();
-		character.useGravity = false;
-		character.vel = new Point();
-		if (character.grounded && character.vel.y >= 0) {
-			character.changeSpriteFromName("crouch_flamethrower", true);
-			isGrounded = true;
+		character.turnToInput(player.input, player);
+		if (!character.grounded) {
+			sprite = "flamethrower";
+			character.changeSpriteFromName(sprite, true);
+			character.stopMoving();
+			character.useGravity = false;
+			character.vel = new Point();
 		}
 	}
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
 }
+#endregion
 public class FlamethrowerWildHorseKick : Projectile {
 	public bool groundedVariant;
 	public FlamethrowerWildHorseKick(
@@ -374,6 +292,72 @@ public class FlamethrowerSeaDragonRage : Projectile {
 	}	
 }
 /*
+public class FlamethrowerState : VileState {
+	bool isGrounded;
+	public float shootTime;
+	public Point shootPOI = new Point(-1, -1);
+	public Point groundShotPOI = new Point(12, -11);
+
+	public FlamethrowerState() : base("flamethrower") {
+		useGravity = false;
+		useDashJumpSpeed = true;
+	}
+
+	public override void update() {
+		base.update();
+		character.turnToInput(player.input, player);
+		bool isDragonsWrath = vile.flamethrowerWeapon.type == (int)VileFlamethrowerType.DragonsWrath;
+		bool isWildHorseKick = vile.flamethrowerWeapon.type == (int)VileFlamethrowerType.WildHorseKick;
+		bool isSeaDragonRage = vile.flamethrowerWeapon.type == (int)VileFlamethrowerType.SeaDragonRage;
+		shootTime += Global.speedMul;
+		if (shootTime >= 4) {
+			if (!vile.tryUseVileAmmo(2)) {
+				character.changeToIdleOrFall();
+				return;
+			}
+			shootTime = 0;
+			character.playSound("flamethrower");
+			Point poiPos;
+			if (!isGrounded) {
+				poiPos = character.getPOIPos(shootPOI);
+			} else {
+				poiPos = (character.getFirstPOI() ?? character.getPOIPos(groundShotPOI));
+			}
+			if (isDragonsWrath) {
+				new FlamethrowerDragonsWrath(
+					poiPos, character.xDir, isGrounded, vile, player,
+					player.getNextActorNetId(), rpc: true
+				);
+			} else if (isWildHorseKick) {
+				new FlamethrowerWildHorseKick(
+					poiPos, character.xDir, isGrounded, vile, player,
+					player.getNextActorNetId(), rpc: true
+				);
+			} else if (isSeaDragonRage) {
+				new FlamethrowerSeaDragonRage(
+					poiPos, character.xDir, isGrounded, vile, player,
+					player.getNextActorNetId(), rpc: true
+				);
+			}
+		}
+
+		if (character.loopCount >= 5 || !player.input.isHeld(Control.Special1, player)) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.stopMoving();
+		character.useGravity = false;
+		character.vel = new Point();
+		if (character.grounded && character.vel.y >= 0) {
+			character.changeSpriteFromName("crouch_flamethrower", true);
+			isGrounded = true;
+		}
+	}
+}
+
 public class FlamethrowerProj : Projectile {
 	bool groundedVariant;
 
