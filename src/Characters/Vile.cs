@@ -41,7 +41,7 @@ public class Vile : Character {
 	public VileAmmoWeapon energy = new();
 	public VileCannon cannonWeapon;
 	public VileLoadout loadout;
-	public Vulcan vulcanWeapon;
+	public VileVulcan vulcanWeapon;
 	public VileMissile missileWeapon;
 	public RocketPunch rocketPunchWeapon;
 	public VileNapalm napalmWeapon;
@@ -81,13 +81,21 @@ public class Vile : Character {
 		loadout ??= player.loadout.vileLoadout.clone();
 		this.loadout = loadout;
 
-		vulcanWeapon = new Vulcan((VulcanType)loadout.vulcan);
+		vulcanWeapon = loadout.vulcan switch {
+			1 => new DistanceNeedler(),
+			2 => new BuckshotDance(),
+			_ => new CherryBlast()
+		};
 		cannonWeapon = loadout.cannon switch {
 			1 => new FatBoy(),
 			2 => new LongShotGizmo(),
 			_ => new FrontRunner()
 		};
-		missileWeapon = new VileMissile((VileMissileType)loadout.missile);
+		missileWeapon = loadout.missile switch {
+			1 => new HumerusCrush(),
+			2 => new PopcornDemon(),
+			_ => new ElectricShock()
+		};
 		rocketPunchWeapon = new RocketPunch((RocketPunchType)loadout.rocketPunch);
 		napalmWeapon = loadout.napalm switch {
 			1 => new FireGrenade(),
@@ -376,7 +384,7 @@ public class Vile : Character {
 					goliathShotPressed = oldStunShotPressed;
 				}
 				if (stunShotPressed && !HeldDown && missileWeapon.shootCooldown <= 0) {
-					if (tryUseVileAmmo(missileWeapon.vileAmmo)) {
+					if (tryUseVileAmmo(missileWeapon.vileAmmoUsage)) {
 						missileWeapon.vileShoot(WeaponIds.ElectricShock, this);
 					}
 				}

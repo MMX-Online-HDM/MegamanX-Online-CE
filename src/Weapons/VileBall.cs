@@ -122,7 +122,13 @@ public class BallAttacks : VileState {
 
 	public override void update() {
 		base.update();
+
 		if (vile.energy.ammo < weapon.vileAmmoUsage) {
+			character.changeToCrouchOrFall();
+			return;
+		}
+
+		if (bombNum > 0 && player.input.isPressed(Control.Special1, player)) {
 			character.changeToCrouchOrFall();
 			return;
 		}
@@ -157,7 +163,7 @@ public class BallAttacks : VileState {
 		if (shot && stateTime > 14f / 60f) {
 			character.changeToCrouchOrFall();
 		}
-
+		
 		if (stateTime > 60f/60f) character.changeToCrouchOrFall();
 		
 	}

@@ -94,9 +94,9 @@ public class Weapon {
 			new HyperNovaStrike(),
 			new DoubleBullet(),
 			new DNACore(),
-			new VileMissile(VileMissileType.ElectricShock),
+			new VileMissile(),
 			new VileCannon(),
-			new Vulcan(VulcanType.CherryBlast),
+			new VileVulcan(),
 		};
 		weaponList.AddRange(getAllXWeapons());
 		weaponList.AddRange(getAllAxlWeapons(axlLoadout));

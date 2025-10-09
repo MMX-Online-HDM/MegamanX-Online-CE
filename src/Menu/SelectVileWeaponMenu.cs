@@ -18,18 +18,14 @@ public class SelectVileWeaponMenu : IMainMenu {
 				LongShotGizmo.netWeapon
 			]),
 			("Vulcan", [
-				new Vulcan(VulcanType.None),
-				new Vulcan(VulcanType.NoneCutter),
-				new Vulcan(VulcanType.NoneMissile),
-				new Vulcan(VulcanType.CherryBlast),
-				new Vulcan(VulcanType.DistanceNeedler),
-				new Vulcan(VulcanType.BuckshotDance)
+				CherryBlast.netWeapon,
+				DistanceNeedler.netWeapon,
+				BuckshotDance.netWeapon,
 			]),
 			("Missile", [
-				new VileMissile(VileMissileType.None),
-				new VileMissile(VileMissileType.ElectricShock),
-				new VileMissile(VileMissileType.HumerusCrush),
-				new VileMissile(VileMissileType.PopcornDemon)
+				HumerusCrush.netWeapon,
+				PopcornDemon.netWeapon,
+				ElectricShock.netWeapon,
 			]),
 			("R.Punch", [
 				new RocketPunch(RocketPunchType.None),
