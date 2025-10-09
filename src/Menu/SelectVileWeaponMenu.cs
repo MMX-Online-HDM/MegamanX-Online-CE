@@ -13,10 +13,9 @@ public class SelectVileWeaponMenu : IMainMenu {
 
 	public static (string name, Weapon[] weapons)[] vileWeaponCategories = {
 			("Cannon", [
-				new VileCannon(VileCannonType.None),
-				new VileCannon(VileCannonType.FrontRunner),
-				new VileCannon(VileCannonType.LongshotGizmo),
-				new VileCannon(VileCannonType.FatBoy)
+				FrontRunner.netWeapon,
+				FatBoy.netWeapon,
+				LongShotGizmo.netWeapon
 			]),
 			("Vulcan", [
 				new Vulcan(VulcanType.None),

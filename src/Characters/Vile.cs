@@ -82,7 +82,11 @@ public class Vile : Character {
 		this.loadout = loadout;
 
 		vulcanWeapon = new Vulcan((VulcanType)loadout.vulcan);
-		cannonWeapon = new VileCannon((VileCannonType)loadout.cannon);
+		cannonWeapon = loadout.cannon switch {
+			1 => new FatBoy(),
+			2 => new LongShotGizmo(),
+			_ => new FrontRunner()
+		};
 		missileWeapon = new VileMissile((VileMissileType)loadout.missile);
 		rocketPunchWeapon = new RocketPunch((RocketPunchType)loadout.rocketPunch);
 		napalmWeapon = loadout.napalm switch {

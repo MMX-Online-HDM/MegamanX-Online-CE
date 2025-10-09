@@ -156,7 +156,7 @@ public class VileLoadout {
 
 	public List<Weapon> getWeaponsFromLoadout(bool includeMech) {
 		var weapons = new List<Weapon>();
-		weapons.Add(new VileCannon((VileCannonType)cannon));
+		weapons.Add(new VileCannon());
 
 		return weapons;
 	}

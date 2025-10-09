@@ -101,9 +101,9 @@ public partial class RPCCreateProj : RPC {
 		{ (int)ProjIds.UPParryProj, UPParryRangedProj.rpcInvoke },
 		
 		// Vile
-		{ (int)ProjIds.FrontRunner, VileCannonProj.rpcInvoke },
-		{ (int)ProjIds.FatBoy, VileCannonProj.rpcInvoke },
-		{ (int)ProjIds.LongshotGizmo, VileCannonProj.rpcInvoke },
+		{ (int)ProjIds.FrontRunner, FrontRunnerProj.rpcInvoke },
+		{ (int)ProjIds.FatBoy, FatBoyProj.rpcInvoke },
+		{ (int)ProjIds.LongshotGizmo, LongshotGizmoProj.rpcInvoke },
 		{ (int)ProjIds.RocketPunch, RocketPunchProj.rpcInvoke },
 		{ (int)ProjIds.SpoiledBrat, RocketPunchProj.rpcInvoke },
 		{ (int)ProjIds.InfinityGig, RocketPunchProj.rpcInvoke },

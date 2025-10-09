@@ -150,7 +150,7 @@ public class CutterAttacks : VileState {
 		base.onEnter(oldState);
 		character.turnToInput(player.input, player);
 		if (!character.grounded) {
-			sprite = "air_bomb_attack";
+			sprite = "cannon_air";
 			character.changeSpriteFromName(sprite, true);
 			character.useGravity = false;
 			character.vel = new Point();
