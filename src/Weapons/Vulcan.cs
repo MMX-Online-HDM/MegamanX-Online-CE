@@ -32,7 +32,7 @@ public class CherryBlast : VileVulcan {
 		type = (int)VulcanType.CherryBlast;
 		fireRate = 6;
 		displayName = "Cherry Blast";
-		vileAmmoUsage = 0.5f;
+		vileAmmoUsage = 1f;
 		vileWeight = 2;
 		ammousage = vileAmmoUsage;
 		damage = "1";
