@@ -28,10 +28,9 @@ public class SelectVileWeaponMenu : IMainMenu {
 				ElectricShock.netWeapon,
 			]),
 			("R.Punch", [
-				new RocketPunch(RocketPunchType.None),
-				new RocketPunch(RocketPunchType.GoGetterRight),
-				new RocketPunch(RocketPunchType.SpoiledBrat),
-				new RocketPunch(RocketPunchType.InfinityGig),
+				GoGetterRight.netWeapon,
+				SpoiledBrat.netWeapon,
+				InfinityGig.netWeapon,
 			]),
 			("Napalm", [
 				RumblingBang.netWeapon,

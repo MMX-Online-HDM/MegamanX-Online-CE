@@ -757,9 +757,9 @@ public class RPCActorToggle : RPC {
 		} else if (toggleId == RPCActorToggleType.ShakeCamera) {
 			actor.shakeCamera();
 		} else if (toggleId == RPCActorToggleType.ReverseRocketPunch) {
-			if (actor is RocketPunchProj rpp) {
-				rpp.reversed = true;
-			}
+			if (actor is GoGetterRightProj rpp) rpp.reversed = true;
+			else if (actor is SpoiledBratProj rpp1) rpp1.reversed = true;
+			else if (actor is InfinityGigProj rpp2) rpp2.reversed = true;
 		} else if (toggleId == RPCActorToggleType.DropFlagManual) {
 			if (Global.isHost && actor is Character chr) {
 				chr.dropFlag();

@@ -39,7 +39,10 @@ public class ElectricShock : VileMissile {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		vile.changeState(new MissileAttack(this), true);
-		if (vile.charState is InRideArmor) shoot(vile, []);	
+		if (vile.charState is InRideArmor) {
+			shoot(vile, []);
+			shootCooldown = fireRate;
+		}
 	}
 	public override void shoot(Character character, int[] args) {
 		if (character is not Vile vava) return;
@@ -105,7 +108,10 @@ public class HumerusCrush : VileMissile {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		vile.changeState(new MissileAttack(this), true);
-		if (vile.charState is InRideArmor) shoot(vile, []);	
+		if (vile.charState is InRideArmor) {
+			shoot(vile, []);
+			shootCooldown = fireRate;
+		}
 	}
 	public override void shoot(Character character, int[] args) {
 		if (character is not Vile vava) return;
@@ -142,7 +148,10 @@ public class PopcornDemon : VileMissile {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		vile.changeState(new MissileAttack(this), true);
-		if (vile.charState is InRideArmor) shoot(vile, []);	
+		if (vile.charState is InRideArmor) {
+			shoot(vile, []);
+			shootCooldown = fireRate;
+		}
 	}
 	public override void shoot(Character character, int[] args) {
 		if (character is not Vile vava) return;

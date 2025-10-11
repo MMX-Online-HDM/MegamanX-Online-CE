@@ -12,7 +12,431 @@ public enum RocketPunchType {
 	SpoiledBrat,
 	InfinityGig,
 }
+public class RocketPunch : Weapon {
+	public float vileAmmoUsage;
+	public Projectile? proj;
 
+	public RocketPunch() : base() {
+		index = (int)WeaponIds.RocketPunch;
+		weaponBarBaseIndex = 0;
+		weaponBarIndex = weaponBarBaseIndex;
+		killFeedIndex = 31;
+		weaponSlotIndex = 45;
+	}
+}
+public class GoGetterRight : RocketPunch {
+	public static GoGetterRight netWeapon = new();
+	public GoGetterRight() : base() {
+		type = (int)RocketPunchType.GoGetterRight;
+		fireRate = 60;
+		displayName = "Go-Getter Right";
+		vileAmmoUsage = 8;
+		vileWeight = 3;
+		ammousage = vileAmmoUsage;
+		damage = "3";
+		hitcooldown = "0.5";
+		flinch = "13";
+		flinchCD = "1";
+		effect = "Won't destroy on hit.";
+	}
+	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+		if (shootCooldown > 0) return;
+		if (vile.energy.ammo < vileAmmoUsage) return;
+		if (vile.charState is RocketPunchAttack) return;
+		vile.changeState(new RocketPunchAttack(this), true);
+	}
+	public override void shoot(Character character, int[] args) {
+		if (character is not Vile vava) return;
+		vava.setVileShootTime(this);
+		vava.tryUseVileAmmo(vileAmmoUsage);
+		var poi = character.sprite.getCurrentFrame().POIs[0];
+		poi.x *= character.xDir;
+		proj = new GoGetterRightProj(
+			character.pos.add(poi), character.xDir,
+			vava, character.player, character.player.getNextActorNetId(), rpc: true
+		);
+	}
+}
+public class SpoiledBrat : RocketPunch {
+	public static SpoiledBrat netWeapon = new();
+	public SpoiledBrat() : base() {
+		type = (int)RocketPunchType.SpoiledBrat;
+		fireRate = 14;
+		displayName = "Spoiled Brat";
+		vileAmmoUsage = 8;
+		killFeedIndex = 77;
+		vileWeight = 3;
+		ammousage = vileAmmoUsage;
+		damage = "2";
+		hitcooldown = "0.1";
+		flinch = "13";
+		flinchCD = "1";
+		effect = "Destroys on hit.";
+	}
+	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+		if (shootCooldown > 0) return;
+		if (vile.energy.ammo < vileAmmoUsage) return;
+		vile.changeState(new RocketPunchAttack(this), true);
+	}
+	public override void shoot(Character character, int[] args) {
+		if (character is not Vile vava) return;
+		vava.setVileShootTime(this);
+		vava.tryUseVileAmmo(vileAmmoUsage);
+		var poi = character.sprite.getCurrentFrame().POIs[0];
+		poi.x *= character.xDir;
+		proj = new SpoiledBratProj(
+			character.pos.add(poi), character.xDir,
+			vava, character.player, character.player.getNextActorNetId(), rpc: true
+		);
+	}
+}
+public class InfinityGig : RocketPunch {
+	public static InfinityGig netWeapon = new();
+	public InfinityGig() : base() {
+		type = (int)RocketPunchType.InfinityGig;
+		fireRate = 60;
+		displayName = "Infinity Gig";
+		vileAmmoUsage = 16;
+		killFeedIndex = 78;
+		vileWeight = 3;
+		ammousage = vileAmmoUsage;
+		damage = "3";
+		hitcooldown = "0.5";
+		flinch = "13";
+		flinchCD = "1";
+		effect = "Homing,Travels further.";
+	}
+	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+		if (shootCooldown > 0) return;
+		if (vile.energy.ammo < vileAmmoUsage) return;
+		if (vile.charState is RocketPunchAttack) return;
+		vile.changeState(new RocketPunchAttack(this), true);
+	}
+	public override void shoot(Character character, int[] args) {
+		if (character is not Vile vava) return;
+		vava.setVileShootTime(this);
+		vava.tryUseVileAmmo(vileAmmoUsage);
+		var poi = character.sprite.getCurrentFrame().POIs[0];
+		poi.x *= character.xDir;
+		proj = new InfinityGigProj(
+			character.pos.add(poi), character.xDir,
+			vava, character.player, character.player.getNextActorNetId(), rpc: true
+		);
+	}
+}
+#region States
+public class RocketPunchAttack : VileState {
+	public string sound = "rocketPunch";
+	public bool soundPlayed;
+	public int soundFrame = 1;
+	public bool shot;
+	public int shootFrame = 1;
+	public float specialPressTime;
+	public RocketPunch weapon;
+	public RocketPunchAttack(RocketPunch weapon) : base("rocket_punch") {
+		this.weapon = weapon;
+	}
+
+	public override void update() {
+		base.update();
+		bool LeftHeld = player.input.isHeld(Control.Left, player);
+		bool RightHeld = player.input.isHeld(Control.Right, player);
+		Helpers.decrementFrames(ref specialPressTime);
+		character.turnToInput(player.input, player);
+
+		if (vile.energy.ammo < weapon.vileAmmoUsage && weapon is SpoiledBrat) {
+			character.changeToIdleOrFall();
+			return;
+		}
+		
+		if (character.sprite.frameIndex >= soundFrame && !soundPlayed) {
+			character.playSound(sound, forcePlay: false, sendRpc: true);
+			soundPlayed = true;
+		}
+		
+		if (character.sprite.frameIndex >= shootFrame && !shot && weapon.shootCooldown <= 0) {
+			shot = true;
+			weapon.shoot(vile, []);
+			character.sprite.frameIndex = 1;
+			character.sprite.frameTime = 0;
+		}
+		
+		if (weapon.proj != null) {
+            if (weapon.proj is SpoiledBratProj) {
+				if (player.input.isPressed(Control.Special1, player)) {
+					specialPressTime = 15;
+					shot = false;
+				}
+				if (specialPressTime > 0 && (LeftHeld || RightHeld)) {
+					character.sprite.frameIndex = 1;
+					character.sprite.frameTime = 0;
+				} else if (character.isAnimOver()) {
+					character.changeToIdleOrFall();
+					return;
+				}
+			} else {
+				if ((weapon.proj is GoGetterRightProj goGetterRight && goGetterRight.returned ||
+					weapon.proj is InfinityGigProj InfinityGig && InfinityGig.returned ||
+					weapon.proj.destroyed) && shot
+				) {
+					character.changeToIdleOrFall();
+					return;
+				}
+			}
+        }
+	}
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.turnToInput(player.input, player);
+	}
+	public override bool canEnter(Character character) {
+		if (character.charState is Jump) return false;
+		return base.canEnter(character);	
+	}
+}
+#endregion
+#region Projectiles
+public class GoGetterRightProj : Projectile {
+	public bool reversed;
+	public bool returned;
+	public float maxReverseTime;
+	public float minTime;
+	public float smokeTime;
+	public GoGetterRightProj(
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "rocket_punch_proj", netId, player
+	) {
+		weapon = GoGetterRight.netWeapon;
+		damager.damage = 3;
+		damager.flinch = Global.halfFlinch;
+		damager.hitCooldown = 30;
+		vel = new Point(500 * xDir, 0);
+		projId = (int)ProjIds.RocketPunch;
+		destroyOnHit = false;
+		shouldShieldBlock = false;
+		minTime = 0.2f;
+		maxReverseTime = 0.3f;
+		if (ownerPlayer.character != null) setzIndex(ownerPlayer.character.zIndex - 100);
+		if (rpc) rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+		canBeLocal = false;
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new GoGetterRightProj(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
+	}
+	public bool ownerExists => (owner.character?.destroyed == false);
+	public override void update() {
+		base.update();
+		if (ownedByLocalPlayer && !ownerExists) {
+			destroySelf("explosion", "explosion");
+			return;
+		}
+		smokeTime += Global.spf;
+		if (smokeTime > 0.08f) {
+			smokeTime = 0;
+			var smoke = new Anim(pos, "torpedo_smoke", xDir, null, true);
+			smoke.setzIndex(zIndex - 100);
+		}
+		if (!reversed && damager.owner?.character is Vile vile) {
+			if (vile.player.input.isHeld(Control.Up, vile.player)) {
+				incPos(new Point(0, -300 * Global.spf));
+			} else if (vile.player.input.isHeld(Control.Down, vile.player)) {
+				incPos(new Point(0, 300 * Global.spf));
+			}
+		}
+		if (!reversed && time > maxReverseTime) {
+			reversed = true;
+			vel.x = 500 * -xDir;
+		}
+		if (reversed && owner.character != null) {
+			vel = new Point(0, 0);
+			if (pos.x > owner.character.pos.x) xDir = -1;
+			else xDir = 1;		
+			Point returnPos = owner.character.getCenterPos();
+			move(pos.directionToNorm(returnPos).times(500));
+			if (pos.distanceTo(returnPos) < 10) {
+				returned = true;
+				destroySelf();
+			}
+		}
+	}
+	public override void onHitDamagable(IDamagable damagable) {
+		base.onHitDamagable(damagable);
+		if (locallyControlled) {
+			reversed = true;
+		}
+		if (isRunByLocalPlayer()) {
+			reversed = true;
+			RPC.actorToggle.sendRpc(netId, RPCActorToggleType.ReverseRocketPunch);
+		}
+	}
+}
+public class InfinityGigProj : Projectile {
+	public bool reversed;
+	public bool returned;
+	public float maxReverseTime;
+	public float minTime;
+	public float smokeTime;
+	public Actor? target;
+	public InfinityGigProj(
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "rocket_punch_ig_proj", netId, player
+	) {
+		weapon = GoGetterRight.netWeapon;
+		damager.damage = 3;
+		damager.flinch = Global.halfFlinch;
+		damager.hitCooldown = 30;
+		vel = new Point(500 * xDir, 0);
+		projId = (int)ProjIds.InfinityGig;
+		destroyOnHit = false;
+		shouldShieldBlock = false;
+		minTime = 0.2f;
+		maxReverseTime = 0.4f;
+		if (ownerPlayer.character != null) setzIndex(ownerPlayer.character.zIndex - 100);
+		if (rpc) rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+		canBeLocal = false;
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new InfinityGigProj(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
+	}
+	public bool ownerExists => (owner.character?.destroyed == false);
+	public override void update() {
+		base.update();
+		if (ownedByLocalPlayer && !ownerExists) {
+			destroySelf("explosion", "explosion");
+			return;
+		}
+		smokeTime += Global.spf;
+		if (smokeTime > 0.08f) {
+			smokeTime = 0;
+			var smoke = new Anim(pos, "torpedo_smoke", xDir, null, true);
+			smoke.setzIndex(zIndex - 100);
+		}
+
+		if (ownedByLocalPlayer && !reversed && reflectCount == 0) {
+			if (target == null && owner.character != null) {
+				var targets = Global.level.getTargets(owner.character.pos, damager.owner.alliance, true);
+				foreach (var t in targets) {
+					if (isFacing(t) && MathF.Abs(t.pos.y - owner.character.pos.y) < 120) {
+						target = t;
+						break;
+					}
+				}
+			} else if (target != null && target.destroyed) {
+				vel.x = 500 * xDir;
+			} else if (target != null) {
+				vel = new Point(0, 0);
+				Point targetPos = target.getCenterPos();
+				move(pos.directionToNorm(targetPos).times(500));
+				if (pos.distanceTo(targetPos) < 5) {
+					reversed = true;
+				}
+				forceNetUpdateNextFrame = true;
+			}
+		}
+		if (!reversed && time > maxReverseTime) {
+			reversed = true;
+			vel.x = 500 * -xDir;
+		}
+		if (reversed && owner.character != null) {
+			vel = new Point(0, 0);
+			if (pos.x > owner.character.pos.x) xDir = -1;
+			else xDir = 1;		
+			Point returnPos = owner.character.getCenterPos();
+			move(pos.directionToNorm(returnPos).times(500));
+			if (pos.distanceTo(returnPos) < 10) {
+				returned = true;
+				destroySelf();
+			}
+		}
+	}
+	public override void onHitDamagable(IDamagable damagable) {
+		base.onHitDamagable(damagable);
+		if (locallyControlled) {
+			reversed = true;
+		}
+		if (isRunByLocalPlayer()) {
+			reversed = true;
+			RPC.actorToggle.sendRpc(netId, RPCActorToggleType.ReverseRocketPunch);
+		}
+	}
+}
+public class SpoiledBratProj : Projectile {
+	public bool reversed;
+	public bool returned;
+	public float maxReverseTime;
+	public float minTime;
+	public float smokeTime;
+	public SpoiledBratProj(
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "rocket_punch_sb_proj", netId, player
+	) {
+		weapon = SpoiledBrat.netWeapon;
+		damager.damage = 2;
+		damager.flinch = Global.halfFlinch;
+		damager.hitCooldown = 6;
+		vel = new Point(600 * xDir, 0);
+		projId = (int)ProjIds.SpoiledBrat;
+		destroyOnHit = true;
+		shouldShieldBlock = false;
+		maxTime = 0.25f;
+		minTime = 0.2f;
+		maxReverseTime = 0.4f;
+		if (ownerPlayer.character != null) setzIndex(ownerPlayer.character.zIndex - 100);
+		if (rpc) rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+		canBeLocal = false;
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new SpoiledBratProj(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
+	}
+	public bool ownerExists => (owner.character?.destroyed == false);
+	public override void update() {
+		base.update();
+		if (ownedByLocalPlayer && !ownerExists) {
+			destroySelf("explosion", "explosion");
+			return;
+		}
+		smokeTime += Global.spf;
+		if (smokeTime > 0.08f) {
+			smokeTime = 0;
+			var smoke = new Anim(pos, "torpedo_smoke", xDir, null, true);
+			smoke.setzIndex(zIndex - 100);
+		}
+		if (!reversed && time > maxReverseTime) {
+			reversed = true;
+			vel.x = 500 * -xDir;
+		}
+		if (reversed && owner.character != null) {
+			vel = new Point(0, 0);
+			if (pos.x > owner.character.pos.x) xDir = -1;
+			else xDir = 1;
+			Point returnPos = owner.character.getCenterPos();
+			move(pos.directionToNorm(returnPos).times(500));
+			if (pos.distanceTo(returnPos) < 10) {
+				returned = true;
+				destroySelf();
+			}
+		}
+	}
+	public override void onHitDamagable(IDamagable damagable) {
+		base.onHitDamagable(damagable);
+		if (locallyControlled) reversed = true;
+		if (isRunByLocalPlayer()) {
+			reversed = true;
+			RPC.actorToggle.sendRpc(netId, RPCActorToggleType.ReverseRocketPunch);
+		}
+	}
+}
+#endregion
+/*
 public class RocketPunch : Weapon {
 	public float vileAmmoUsage;
 	public string projSprite;
@@ -233,7 +657,7 @@ public class RocketPunchProj : Projectile {
 		if (!ownedByLocalPlayer) return;
 		reversed = true;
 	}
-	*/
+	
 
 	public static float getSpeed(int type) {
 		return type switch {
@@ -309,14 +733,12 @@ public class RocketPunchAttack : VileState {
 				character.pos.add(poi), character.xDir, 0, vile.rocketPunchWeapon.projSprite,
 				vile, character.player, character.player.getNextActorNetId(), rpc: true
 			);
-		}
-		else if (vile.rocketPunchWeapon.type == (int)RocketPunchType.SpoiledBrat) {
+		} else if (vile.rocketPunchWeapon.type == (int)RocketPunchType.SpoiledBrat) {
 			proj = new RocketPunchProj(
 				character.pos.add(poi), character.xDir, 1, vile.rocketPunchWeapon.projSprite,
 				vile, character.player, character.player.getNextActorNetId(), rpc: true
 			);
-		}
-		else if (vile.rocketPunchWeapon.type == (int)RocketPunchType.InfinityGig) {
+		} else if (vile.rocketPunchWeapon.type == (int)RocketPunchType.InfinityGig) {
 			proj = new RocketPunchProj(
 				character.pos.add(poi), character.xDir, 2, vile.rocketPunchWeapon.projSprite,
 				vile, character.player, character.player.getNextActorNetId(), rpc: true
@@ -330,3 +752,4 @@ public class RocketPunchAttack : VileState {
 		shot = false;
 	}
 }
+*/
