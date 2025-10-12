@@ -212,7 +212,7 @@ public class Vile : Character {
 		if (!ownedByLocalPlayer) {
 			return;
 		}
-		if ((grounded || charState is LadderClimb || charState is LadderEnd || charState is WallSlide) &&
+		if ((grounded || charState is LadderClimb or LadderEnd or WallSlide) &&
 			vileHoverTime > 0
 		) {
 			vileHoverTime -= Global.spf * 6;
@@ -376,7 +376,7 @@ public class Vile : Character {
 		bool stunShotPressed = player.input.isPressed(Control.Special1, player);
 		bool HeldDown = player.input.isHeld(Control.Down, player);
 		bool goliathShotPressed = player.input.isPressed(Control.WeaponLeft, player) || player.input.isPressed(Control.WeaponRight, player);
-		bool raStates = rideArmor?.rideArmorState is RAIdle || rideArmor?.rideArmorState is RAJump || rideArmor?.rideArmorState is RAFall || rideArmor?.rideArmorState is RADash;
+		bool raStates = rideArmor?.rideArmorState is RAIdle or RAJump or RAFall or RADash;
 		if (rideArmor != null && raState != null && !raState.isHiding) {
 			if (raStates) {
 				if (Goliath && Options.main.swapGoliathInputs) {
