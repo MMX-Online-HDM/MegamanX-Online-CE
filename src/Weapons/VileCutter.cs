@@ -48,7 +48,7 @@ public class QuickHomesick : VileCutter {
 		var player = vava.player;
 		int xDir = vava.xDir;
 		Point muzzlePos = vava.pos.add(poi).addxy(14*xDir,2);
-		new VileParasiteSword(
+		new VileQuickHomesick(
 			muzzlePos, xDir, vava, player,
 			player.getNextActorNetId(), rpc: true
 		);
@@ -112,7 +112,7 @@ public class MaroonedTomahawk : VileCutter {
 		var player = vava.player;
 		int xDir = vava.xDir;
 		Point muzzlePos = vava.pos.add(poi).addxy(14 * xDir, 2);
-		new VileParasiteSword(
+		new VileMaroonedTomahawk(
 			muzzlePos, xDir, vava, player,
 			player.getNextActorNetId(), rpc: true
 		);
@@ -135,6 +135,7 @@ public class CutterAttacks : VileState {
 
 	public override void update() {
 		base.update();
+		character.turnToInput(player.input, player);
 		if (character.frameIndex >= shootFrame && !shot && vile.tryUseVileAmmo(weapon.vileAmmoUsage)) {
 			shot = true;
 			weapon.shoot(vile, []);

@@ -96,7 +96,11 @@ public class Vile : Character {
 			2 => new PopcornDemon(),
 			_ => new ElectricShock()
 		};
-		rocketPunchWeapon = new RocketPunch((RocketPunchType)loadout.rocketPunch);
+		rocketPunchWeapon = loadout.rocketPunch switch {
+			1 => new SpoiledBrat(),
+			2 => new InfinityGig(),
+			_ => new GoGetterRight()
+		};
 		napalmWeapon = loadout.napalm switch {
 			1 => new FireGrenade(),
 			2 => new SplashHit(),
@@ -333,7 +337,7 @@ public class Vile : Character {
 			return true;
 		}
 		if (leftorRightHeld) {
-			rocketPunchWeapon.vileShoot(WeaponIds.RocketPunch, this);
+			rocketPunchWeapon.vileShoot(0, this);
 			return true;
 		}
 		missileWeapon.vileShoot(WeaponIds.ElectricShock, this);
@@ -384,9 +388,7 @@ public class Vile : Character {
 					goliathShotPressed = oldStunShotPressed;
 				}
 				if (stunShotPressed && !HeldDown && missileWeapon.shootCooldown <= 0) {
-					if (tryUseVileAmmo(missileWeapon.vileAmmoUsage)) {
-						missileWeapon.vileShoot(WeaponIds.ElectricShock, this);
-					}
+					missileWeapon.vileShoot(WeaponIds.ElectricShock, this);
 				}
 				if (goliathShotPressed) {
 					if (Goliath && !rideArmor.isAttacking() && mechBusterCooldown == 0) {

@@ -38,8 +38,7 @@ public class FrontRunner : VileCannon {
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
-		if (vile.charState is MissileAttack) return;
-		if (vile.charState is RocketPunchAttack) return;
+		if (!vile.missileWeapon.isCooldownPercentDone(0.8f)) return;
 		vile.changeState(new CannonAttack(this), true);
 	}
 	public override void shoot(Character character, int[] args) {
@@ -74,8 +73,7 @@ public class FatBoy : VileCannon {
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
-		if (vile.charState is MissileAttack) return;
-		if (vile.charState is RocketPunchAttack) return;
+		if (!vile.missileWeapon.isCooldownPercentDone(0.8f)) return;
 		vile.changeState(new CannonAttack(this), true);
 	}
 	public override void shoot(Character character, int[] args) {
@@ -109,8 +107,7 @@ public class LongShotGizmo : VileCannon {
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
-		if (vile.charState is MissileAttack) return;
-		if (vile.charState is RocketPunchAttack) return;
+		if (!vile.missileWeapon.isCooldownPercentDone(0.8f)) return;
 		vile.changeState(new CannonAttack(this), true);
 	}
 	public override void shoot(Character character, int[] args) {
