@@ -17,6 +17,7 @@ public class VileMK2GrabState : CharState {
 	public VileMK2GrabState(Character? victim) : base("grab") {
 		this.victim = victim;
 		grabTime = VileMK2Grabbed.maxGrabTime;
+		attackCtrl = true;
 	}
 
 	public override void update() {
@@ -24,12 +25,12 @@ public class VileMK2GrabState : CharState {
 		grabTime -= Global.spf;
 		leechTime += Global.spf;
 
-		if (victimWasGrabbedSpriteOnce && !victim.sprite.name.EndsWith("_grabbed")) {
+		if (victimWasGrabbedSpriteOnce && !victim?.sprite.name.EndsWith("_grabbed") == true) {
 			character.changeToIdleOrFall();
 			return;
 		}
 
-		if (victim.sprite.name.EndsWith("_grabbed") || victim.sprite.name.EndsWith("_die")) {
+		if (victim?.sprite.name.EndsWith("_grabbed") == true|| victim?.sprite.name.EndsWith("_die") == true) {
 			victimWasGrabbedSpriteOnce = true;
 		}
 		if (!victimWasGrabbedSpriteOnce) {

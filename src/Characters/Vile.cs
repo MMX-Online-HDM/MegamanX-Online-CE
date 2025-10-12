@@ -266,10 +266,7 @@ public class Vile : Character {
 		laserWeapon.update();
 		flamethrowerWeapon.update();
 
-		if (calldownMechCooldown > 0) {
-			calldownMechCooldown -= Global.spf;
-			if (calldownMechCooldown < 0) calldownMechCooldown = 0;
-		}
+		Helpers.decrementTime(ref calldownMechCooldown);
 		Helpers.decrementTime(ref grabCooldown);
 		Helpers.decrementTime(ref mechBusterCooldown);
 		Helpers.decrementTime(ref gizmoCooldown);
@@ -634,10 +631,30 @@ public class Vile : Character {
 
 	public Point getVileShootVel(bool aimable) {
 		Point vel = new Point(1, 0);
-		if (!aimable) {
-			return vel;
-		}
+		if (!aimable) return vel;
+		bool isHeldUp = player.input.isHeld(Control.Up, player);
+		bool isHeldDown = player.input.isHeld(Control.Down, player);
+		bool isLeftOrRightHeld = player.input.isLeftOrRightHeld(player);
+		bool isRideArmor = rideArmor != null;
+		bool isCrouchState = charState is Crouch;
+		if (isRideArmor) {
+			if (isHeldUp) vel = new Point(1, -0.5f);
+			else vel = new Point(1, 0.5f);
+		} else if (!isCrouchState) {
+			if (!canVileAim60Degrees()) return vel;
+			if (isHeldUp) {
+				if (isLeftOrRightHeld) vel = new Point(1, -0.75f);
+				else vel = new Point(1, -3);
+			} else if (isHeldDown) {
+				if (isLeftOrRightHeld) vel = new Point(1, 0.75f);
+				else vel = new Point(1, 3);
+			}
+		} else if (isCrouchState) {
+			if (isHeldUp) vel = new Point(1, -0.5f);
+			if (isLeftOrRightHeld) vel = new Point(1, 0.5f);
+        }
 
+		/*
 		if (rideArmor != null) {
 			if (player.input.isHeld(Control.Up, player)) {
 				vel = new Point(1, -0.5f);
@@ -645,7 +662,7 @@ public class Vile : Character {
 				vel = new Point(1, 0.5f);
 			}
 		} else if (charState is VileMK2GrabState) {
-			vel = new Point(1, -0.75f);
+			vel = new Point(1, -0.75f); //This code was from old times when you could shoot cannon on GrabState
 		} else if (player.input.isHeld(Control.Up, player)) {
 			if (!canVileAim60Degrees() || (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player))) {
 				vel = new Point(1, -0.75f);

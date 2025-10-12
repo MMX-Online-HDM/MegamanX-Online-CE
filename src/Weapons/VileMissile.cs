@@ -41,7 +41,6 @@ public class ElectricShock : VileMissile {
 		vile.changeState(new MissileAttack(this), true);
 		if (vile.charState is InRideArmor) {
 			shoot(vile, []);
-			shootCooldown = fireRate;
 		}
 	}
 	public override void shoot(Character character, int[] args) {
@@ -110,7 +109,6 @@ public class HumerusCrush : VileMissile {
 		vile.changeState(new MissileAttack(this), true);
 		if (vile.charState is InRideArmor) {
 			shoot(vile, []);
-			shootCooldown = fireRate;
 		}
 	}
 	public override void shoot(Character character, int[] args) {
@@ -150,7 +148,6 @@ public class PopcornDemon : VileMissile {
 		vile.changeState(new MissileAttack(this), true);
 		if (vile.charState is InRideArmor) {
 			shoot(vile, []);
-			shootCooldown = fireRate;
 		}
 	}
 	public override void shoot(Character character, int[] args) {
@@ -185,6 +182,7 @@ public class MissileAttack : VileState {
 
 	public override void update() {
 		base.update();
+		character.turnToInput(player.input, player);
 		if (character.sprite.frameIndex >= shootFrame && !shot) {
 			shot = true;
 			weapon.shoot(vile, []);
