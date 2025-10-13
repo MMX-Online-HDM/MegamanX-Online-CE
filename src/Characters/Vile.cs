@@ -8,16 +8,13 @@ namespace MMXOnline;
 public class Vile : Character {
 	public const float maxCalldownMechCooldown = 2;
 	public float grabCooldown = 1;
-	public bool vulcanActive;
 	public float vulcanLingerTime;
 	public const int callNewMechCost = 5;
 	public float mechBusterCooldown;
 	public bool usedAmmoLastFrame;
 	public int buckshotDanceNum;
-	public float vileAmmoRechargeCooldown;
-	public bool isShootingLongshotGizmo;
-	public int longshotGizmoCount;
-	public float gizmoCooldown;
+	public bool isShootingGizmo;
+	public bool isShootingVulcan => vulcanLingerTime > 0;
 	public bool hasFrozenCastle;
 	public bool hasSpeedDevil;
 	public bool summonedGoliath;
@@ -27,7 +24,6 @@ public class Vile : Character {
 	public bool isVileMK5 { get { return vileForm == 2; } }
 	public float vileHoverTime;
 	public float vileMaxHoverTime = 6;
-
 	public const decimal frozenCastlePercent = 0.125m;
 	public const float speedDevilRunSpeed = 110;
 	public const int frozenCastleCost = 3;
@@ -35,9 +31,7 @@ public class Vile : Character {
 	public bool lastFrameWeaponLeftHeld;
 	public bool lastFrameWeaponRightHeld;
 	public int cannonAimNum;
-	
 	public float calldownMechCooldown;
-
 	public VileAmmoWeapon energy = new();
 	public VileCannon cannonWeapon;
 	public VileLoadout loadout;
@@ -200,62 +194,35 @@ public class Vile : Character {
 
 	public override void preUpdate() {
 		base.preUpdate();
-		if (isVileMK1) {
-			altSoundId = AltSoundIds.X1;
-		} else if (isVileMK2 || isVileMK5) {
-			altSoundId = AltSoundIds.X3;
+
+		if (isVileMK1) altSoundId = AltSoundIds.X1;
+		else if (isVileMK2 || isVileMK5) altSoundId = AltSoundIds.X3;
+
+		if (!ownedByLocalPlayer) return;
+		
+		if (!isShootingGizmo && isShootingVulcan) energy.addAmmo(0.25f * speedMul, player);
+		if (isShootingVulcan && sprite.name.EndsWith("shoot"))
+			changeSpriteFromName(charState.shootSpriteEx, false);
+		else changeSpriteFromName(charState.sprite, resetFrame: false);
+
+		Helpers.decrementTime(ref calldownMechCooldown);
+		Helpers.decrementTime(ref grabCooldown);
+		Helpers.decrementTime(ref mechBusterCooldown);
+		Helpers.decrementFrames(ref aiAttackCooldown);
+		Helpers.decrementFrames(ref vulcanLingerTime);
+		addWeaponHealAmmo();
+
+		if ((grounded || charState is LadderClimb or LadderEnd or WallSlide) && vileHoverTime > 0) {
+			vileHoverTime -= Global.spf * 6;
+			if (vileHoverTime < 0) vileHoverTime = 0;
 		}
 	}
 
 	public override void update() {
 		base.update();
-		if (!ownedByLocalPlayer) {
-			return;
-		}
-		if ((grounded || charState is LadderClimb or LadderEnd or WallSlide) &&
-			vileHoverTime > 0
-		) {
-			vileHoverTime -= Global.spf * 6;
-			if (vileHoverTime < 0) vileHoverTime = 0;
-		}
 
-		bool isShootingVulcan = vulcanLingerTime <= 0.1;
-		if (isShootingVulcan) {
-			vileAmmoRechargeCooldown = 0.15f;
-		}
-
-		if (vileAmmoRechargeCooldown > 0) {
-			Helpers.decrementTime(ref vileAmmoRechargeCooldown);
-		} else if (usedAmmoLastFrame) {
-			usedAmmoLastFrame = false;
-		} else if (!isShootingLongshotGizmo && !isShootingVulcan) {
-			energy.addAmmo(0.25f * speedMul, player);
-		}
-
-
-		if (energy.ammo >= energy.maxAmmo) {
-			weaponHealAmount = 0;
-		}
-		if (weaponHealAmount > 0 && alive) {
-			weaponHealTime += Global.spf;
-			if (weaponHealTime > 0.05) {
-				weaponHealTime = 0;
-				weaponHealAmount--;
-				energy.addAmmo(1, player);
-				if (isVileMK1) {
-					playSound("heal", forcePlay: true, true);
-				} else {
-					playSound("healX3", forcePlay: true, true);
-				}
-			}
-		}
-
-		if (vulcanLingerTime <= 0.1f && vulcanWeapon.shootCooldown == 0f) {
-			vulcanLingerTime += Global.spf;
-			if (vulcanLingerTime > 0.1f && sprite.name.EndsWith("shoot")) {
-				changeSpriteFromName(charState.sprite, resetFrame: false);
-			}
-		}
+		if (!ownedByLocalPlayer) return;
+		
 		cannonWeapon.update();
 		vulcanWeapon.update();
 		missileWeapon.update();
@@ -266,20 +233,12 @@ public class Vile : Character {
 		laserWeapon.update();
 		flamethrowerWeapon.update();
 
-		Helpers.decrementTime(ref calldownMechCooldown);
-		Helpers.decrementTime(ref grabCooldown);
-		Helpers.decrementTime(ref mechBusterCooldown);
-		Helpers.decrementTime(ref gizmoCooldown);
-		Helpers.decrementFrames(ref aiAttackCooldown);
-
-
-		//if (charState is InRideChaser) {
-			//return;
-		//}
 		RideArmorAttacks();
 		RideLinkMK5();
+
 		// GMTODO: Consider a better way here instead of a hard-coded deny list
 		// Gacel: Done, now it uses attackCtrl
+		
 		if (!charState.attackCtrl || charState is VileMK2GrabState) {
 			chargeLogic(null);
 		} else {
@@ -618,6 +577,24 @@ public class Vile : Character {
 	public override bool canAddAmmo() {
 		return energy.ammo < energy.maxAmmo;
 	}
+	public void addWeaponHealAmmo() {
+        if (energy.ammo >= energy.maxAmmo) {
+			weaponHealAmount = 0;
+		}
+		if (weaponHealAmount > 0 && alive) {
+			weaponHealTime += Global.spf;
+			if (weaponHealTime > 0.05) {
+				weaponHealTime = 0;
+				weaponHealAmount--;
+				energy.addAmmo(1, player);
+				if (isVileMK1) {
+					playSound("heal", forcePlay: true, true);
+				} else {
+					playSound("healX3", forcePlay: true, true);
+				}
+			}
+		}
+    }
 
 	private void cantAffordRideArmorMessage() {
 		if (Global.level.is1v1()) {
@@ -741,7 +718,7 @@ public class Vile : Character {
 	}
 
 	public override bool isSoftLocked() {
-		if (isShootingLongshotGizmo) {
+		if (isShootingGizmo) {
 			return true;
 		}
 		if (isVileMK5 && linkedRideArmor != null && player.input.isHeld(Control.WeaponLeft, player)) {
@@ -754,7 +731,7 @@ public class Vile : Character {
 	}
 
 	public override bool canChangeWeapons() {
-		if (isShootingLongshotGizmo) {
+		if (isShootingGizmo) {
 			return false;
 		}
 		return base.canChangeWeapons();

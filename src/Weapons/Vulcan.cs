@@ -45,10 +45,10 @@ public class CherryBlast : VileVulcan {
 	}
 	public override void shoot(Character character, int[] args) {
 		if (character is not Vile vava) return;
-		vava.vulcanLingerTime = 0f;
+		vava.vulcanLingerTime = fireRate;
+		vava.changeSpriteFromName(vava.charState.shootSpriteEx, false);
 		ladderVoid(vava);
 		vava.playSound("vulcan", sendRpc: true);
-		vava.changeSpriteFromName(vava.charState.shootSpriteEx, false);
 		vava.setVileShootTime(this);
 		vava.tryUseVileAmmo(vileAmmoUsage, true);
 		new VulcanCherryBlast(
@@ -79,10 +79,10 @@ public class DistanceNeedler : VileVulcan {
 	}
 	public override void shoot(Character character, int[] args) {
 		if (character is not Vile vava) return;
-		vava.vulcanLingerTime = 0f;
+		vava.vulcanLingerTime = fireRate;
+		vava.changeSpriteFromName(vava.charState.shootSpriteEx, false);
 		ladderVoid(vava);
 		vava.playSound("vulcan", sendRpc: true);
-		vava.changeSpriteFromName(vava.charState.shootSpriteEx, false);
 		vava.setVileShootTime(this);
 		vava.tryUseVileAmmo(vileAmmoUsage, true);
 		new VulcanDistanceNeedler(
@@ -112,12 +112,12 @@ public class BuckshotDance : VileVulcan {
 	}
 	public override void shoot(Character character, int[] args) {
 		if (character is not Vile vava) return;
-		vava.vulcanLingerTime = 0f;
+		vava.vulcanLingerTime = fireRate;
 		ladderVoid(vava);
 		vava.playSound("vulcan", sendRpc: true);
-		vava.changeSpriteFromName(vava.charState.shootSpriteEx, false);
 		vava.setVileShootTime(this);
 		vava.tryUseVileAmmo(vileAmmoUsage, true);
+		vava.changeSpriteFromName(vava.charState.shootSpriteEx, false);
 		new VulcanBuckshotDance(
 			vava.getShootPos(), vava.getShootXDir(), vava,
 			vava.player, character.player.getNextActorNetId(), rpc: true

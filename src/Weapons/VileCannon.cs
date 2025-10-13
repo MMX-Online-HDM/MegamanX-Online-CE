@@ -130,6 +130,7 @@ public class LongShotGizmo : VileCannon {
 		vava.setVileShootTime(this);
 		vava.playSound("frontrunner", sendRpc: true);
 		vava.tryUseVileAmmo(vileAmmoUsage);
+		vava.isShootingGizmo = true;
 	}
 }
 
@@ -197,6 +198,7 @@ public class CannonAttack : VileState {
 		base.onExit(newState);
 		character.useGravity = true;
 		if (weapon is LongShotGizmo) {
+			vile.isShootingGizmo = false;
 			weapon.fireRate = 30;
         }
 	}
@@ -380,7 +382,7 @@ public class VileCannon : Weapon {
 		} else if (!vile.tryUseVileAmmo(overrideAmmoUsage)) return;
 
 		if (isLongshotGizmo) {
-			vile.isShootingLongshotGizmo = true;
+			vile.isShootingGizmo = true;
 		}
 
 		bool gizmoStart = (isLongshotGizmo && vile.charState is not CannonAttack);
@@ -415,7 +417,7 @@ public class VileCannon : Weapon {
 			vile.longshotGizmoCount++;
 			if (vile.longshotGizmoCount >= 5 || vile.energy.ammo <= 3) {
 				vile.longshotGizmoCount = 0;
-				vile.isShootingLongshotGizmo = false;
+				vile.isShootingGizmo = false;
 			}
 		}
 	}
@@ -439,12 +441,12 @@ public class CannonAttack : CharState {
 	public override void update() {
 		base.update();
 
-		if (vile.isShootingLongshotGizmo) {
+		if (vile.isShootingGizmo) {
 			if (vile.cannonWeapon.shootCooldown == 0) {
 				vile.cannonWeapon.vileShoot(0, vile);
 			}
 			if (vile.energy.ammo <= 0) {
-				vile.isShootingLongshotGizmo = false;
+				vile.isShootingGizmo = false;
 			}
 			return;
 		}
@@ -508,7 +510,7 @@ public class CannonAttack : CharState {
 
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
-		vile.isShootingLongshotGizmo = false;
+		vile.isShootingGizmo = false;
 		if (isGizmo) {
 			vile.gizmoCooldown = 0.5f;
 		}
