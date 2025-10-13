@@ -197,7 +197,7 @@ public class Vile : Character {
 
 		if (!ownedByLocalPlayer) return;
 		
-		if (!isShootingGizmo && isShootingVulcan) energy.addAmmo(0.25f * speedMul, player);
+		if (!isShootingGizmo && !isShootingVulcan) energy.addAmmo(0.25f * speedMul, player);
 		if (isShootingVulcan && sprite.name.EndsWith("shoot"))
 			changeSpriteFromName(charState.shootSpriteEx, false);
 		else changeSpriteFromName(charState.sprite, resetFrame: false);
