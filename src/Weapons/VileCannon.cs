@@ -183,6 +183,11 @@ public class CannonAttack : VileState {
 		if (!character.grounded) {
 			sprite = "cannon_air";
 			character.changeSpriteFromName(sprite, true);
+			if (Options.main.lockInAirCannon) {
+                character.useGravity = false;
+				character.stopMoving();
+				character.vel = new Point();
+            }
 		}
 		if (weapon is LongShotGizmo) {
 			airMove = false;	
