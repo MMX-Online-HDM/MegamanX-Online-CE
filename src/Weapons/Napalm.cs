@@ -38,8 +38,10 @@ public class RumblingBang : VileNapalm {
 		vile.changeState(new NapalmAttacks(this), true);
 	}
 	public override void shoot(Character character, int[] args) {
+		var poi = character.sprite.getCurrentFrame().POIs[0];
+		poi.x *= character.xDir;
 		new NapalmGrenadeProj(
-			character.getCenterPos(), character.xDir, character, character.player,
+			character.pos.add(poi), character.xDir, character, character.player,
 			character.player.getNextActorNetId(), rpc: true
 		);
 	}
@@ -64,8 +66,10 @@ public class FireGrenade : VileNapalm {
 		vile.changeState(new NapalmAttacks(this), true);
 	}
 	public override void shoot(Character character, int[] args) {
+		var poi = character.sprite.getCurrentFrame().POIs[0];
+		poi.x *= character.xDir;
 		new MK2NapalmGrenadeProj(
-			character.getCenterPos(), character.xDir, character, character.player,
+			character.pos.add(poi), character.xDir, character, character.player,
 			character.player.getNextActorNetId(), rpc: true
 		);
 	}
@@ -90,8 +94,10 @@ public class SplashHit : VileNapalm {
 		vile.changeState(new NapalmAttacks(this), true);
 	}
 	public override void shoot(Character character, int[] args) {
+		var poi = character.sprite.getCurrentFrame().POIs[0];
+		poi.x *= character.xDir;
 		new SplashHitGrenadeProj(
-			character.getCenterPos(), character.xDir, character, character.player,
+			character.pos.add(poi), character.xDir, character, character.player,
 			character.player.getNextActorNetId(), rpc: true
 		);
 	}
