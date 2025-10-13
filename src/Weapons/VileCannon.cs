@@ -187,6 +187,7 @@ public class CannonAttack : VileState {
                 character.useGravity = false;
 				character.stopMoving();
 				character.vel = new Point();
+				airMove = false;
             }
 		}
 		if (weapon is LongShotGizmo) {
