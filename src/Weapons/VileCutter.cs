@@ -118,6 +118,14 @@ public class MaroonedTomahawk : VileCutter {
 		);
 	}
 }
+public class NoneCutter : VileCutter {
+	public static NoneCutter netWeapon = new();
+	public NoneCutter() : base() {
+		type = (int)VileCutterType.None;
+		displayName = "None";
+		killFeedIndex = 126;
+	}
+}
 #region States
 public class CutterAttacks : VileState {
 	public bool shot;

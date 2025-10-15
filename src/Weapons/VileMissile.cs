@@ -165,6 +165,14 @@ public class PopcornDemon : VileMissile {
 		);
 	}
 }
+public class NoneMissile : VileMissile {
+	public static NoneMissile netWeapon = new();
+	public NoneMissile() : base() {
+		type = (int)VileMissileType.None;
+		displayName = "None";
+		killFeedIndex = 126;
+	}
+}
 
 public class MissileAttack : VileState {
 	public bool shot;

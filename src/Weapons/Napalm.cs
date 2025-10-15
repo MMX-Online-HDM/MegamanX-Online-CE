@@ -4,6 +4,7 @@ using System.Collections.Generic;
 namespace MMXOnline;
 #region Weapons
 public enum NapalmType {
+	None = -1,
 	RumblingBang,
 	FireGrenade,
 	SplashHit,
@@ -100,6 +101,14 @@ public class SplashHit : VileNapalm {
 			character.pos.add(poi), character.xDir, character, character.player,
 			character.player.getNextActorNetId(), rpc: true
 		);
+	}
+}
+public class NoneNapalm : VileNapalm {
+	public static NoneNapalm netWeapon = new();
+	public NoneNapalm() : base() {
+		type = (int)NapalmType.None;
+		displayName = "None";
+		killFeedIndex = 126;
 	}
 }
 #endregion

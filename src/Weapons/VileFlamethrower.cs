@@ -4,6 +4,7 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public enum VileFlamethrowerType {
+	None = -1,
 	WildHorseKick,
 	SeaDragonRage,
 	DragonsWrath,
@@ -108,6 +109,14 @@ public class DragonsWrath : VileFlamethrower {
 			character.pos, character.xDir, character.grounded, character,
 			character.player, character.player.getNextActorNetId(), rpc: true
 		);
+	}
+}
+public class NoneFlamethrower : VileFlamethrower {
+	public static NoneFlamethrower netWeapon = new();
+	public NoneFlamethrower() : base() {
+		type = (int)VileFlamethrowerType.None;
+		displayName = "None";
+		killFeedIndex = 126;
 	}
 }
 #region States

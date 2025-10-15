@@ -124,6 +124,14 @@ public class InfinityGig : RocketPunch {
 		);
 	}
 }
+public class NoneRocketPunch : RocketPunch {
+	public static NoneRocketPunch netWeapon = new();
+	public NoneRocketPunch() : base() {
+		type = (int)RocketPunchType.None;
+		displayName = "None";
+		killFeedIndex = 126;
+	}
+}
 #region States
 public class RocketPunchAttack : VileState {
 	public string sound = "rocketPunch";

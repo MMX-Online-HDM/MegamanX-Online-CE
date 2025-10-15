@@ -133,6 +133,14 @@ public class LongShotGizmo : VileCannon {
 		vava.isShootingGizmo = true;
 	}
 }
+public class NoneCannon : VileCannon {
+	public static NoneCannon netWeapon = new();
+	public NoneCannon() : base() {
+		type = (int)VileCannonType.None;
+		displayName = "None";
+		killFeedIndex = 126;
+	}
+}
 
 #region States
 public class CannonAttack : VileState {

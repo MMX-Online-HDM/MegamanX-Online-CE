@@ -1,7 +1,7 @@
 ﻿namespace MMXOnline;
 
 public enum VulcanType {
-
+	None = -1,
 	CherryBlast,
 	DistanceNeedler,
 	BuckshotDance
@@ -128,6 +128,14 @@ public class BuckshotDance : VileVulcan {
 				vava.player, character.player.getNextActorNetId(), rpc: true
 			);
 		}
+	}
+}
+public class NoneVulcan : VileVulcan {
+	public static NoneVulcan netWeapon = new();
+	public NoneVulcan() : base() {
+		type = (int)VulcanType.None;
+		displayName = "None";
+		killFeedIndex = 126;
 	}
 }
 public class VulcanCherryBlast : Projectile {

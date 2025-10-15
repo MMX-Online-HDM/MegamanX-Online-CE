@@ -34,7 +34,6 @@ public class RisingSpecter : VileLaser {
 		effect = "Insane Hitbox.";
 	}
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
-		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		vile.changeState(new LaserAttack(this), true);
 	}
@@ -68,7 +67,6 @@ public class NecroBurst : VileLaser {
 		effect = "Self Damages.";
 	}
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
-		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		vile.changeState(new LaserAttack(this), true);
 	}
@@ -80,6 +78,7 @@ public class NecroBurst : VileLaser {
 			shootPos, vava.xDir, vava, vava.player,
 			vava.player.getNextActorNetId(), rpc: true
 		);
+		vava.applyDamage(8, vava.player, character, (int)WeaponIds.NecroBurst, (int)ProjIds.NecroBurst);
 		vava.playSound("necroburst", sendRpc: true);
 		vava.setVileShootTime(this);
 		vava.tryUseVileAmmo(vileAmmoUsage);
@@ -100,21 +99,28 @@ public class StraightNightmare : VileLaser {
 		effect = "Won't destroy on hit.";
 	}
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
-		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		vile.changeState(new LaserAttack(this), true);
 	}
-	
+
 	public override void shoot(Character character, int[] args) {
 		if (character is not Vile vava) return;
 		Point shootPos = vava.setCannonAim(new Point(1, 0));
 		new StraightNightmareProj(
-			shootPos.addxy(-8 * vava.xDir, 0), vava.xDir, vava, 
+			shootPos.addxy(-8 * vava.xDir, 0), vava.xDir, vava,
 			vava.player, vava.player.getNextActorNetId(), rpc: true
 		);
 		vava.playSound("straightNightmareShoot", sendRpc: true);
 		vava.setVileShootTime(this);
 		vava.tryUseVileAmmo(vileAmmoUsage);
+	}
+}
+public class NoneLaser : VileLaser {
+	public static NoneLaser netWeapon = new();
+	public NoneLaser() : base() {
+		type = (int)VileLaserType.None;
+		displayName = "None";
+		killFeedIndex = 126;
 	}
 }
 #region States
