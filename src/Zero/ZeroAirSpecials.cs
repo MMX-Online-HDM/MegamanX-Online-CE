@@ -71,7 +71,6 @@ public class FSplasherState : ZeroState {
 	public Anim? ProjVisible;
 
 	public FSplasherState() : base("dash") {
-		attackCtrl = true;
 	}
 
 	public override void onEnter(CharState oldState) {
