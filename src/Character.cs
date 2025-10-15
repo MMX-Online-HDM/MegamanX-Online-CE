@@ -2962,12 +2962,14 @@ public partial class Character : Actor, IDamagable {
 					}
 				}
 				if (mmx != null) {
+					/* what is this doing here?
 					if (mmx.fullArmor == ArmorId.Light) {
 						player.hadoukenAmmo += (float)(originalDamage * 32);
 					}
 					if (mmx.fullArmor == ArmorId.Giga) {
 						player.shoryukenAmmo += (float)(originalDamage * 32);
 					}
+					*/
 				}
 			}
 			if (this is NeoSigma neoSigma) {
