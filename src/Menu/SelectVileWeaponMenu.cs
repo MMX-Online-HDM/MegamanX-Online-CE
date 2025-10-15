@@ -53,10 +53,9 @@ public class SelectVileWeaponMenu : IMainMenu {
 				DragonsWrath.netWeapon,
 			]),
 			("Laser", [
-				new VileLaser(VileLaserType.None),
-				new VileLaser(VileLaserType.RisingSpecter),
-				new VileLaser(VileLaserType.NecroBurst),
-				new VileLaser(VileLaserType.StraightNightmare)
+				NecroBurst.netWeapon,
+				StraightNightmare.netWeapon,
+				RisingSpecter.netWeapon,
 			]),
 		};
 

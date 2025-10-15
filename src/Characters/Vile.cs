@@ -130,7 +130,11 @@ public class Vile : Character {
 			2 => flamethrowerWeapon,
 			_ => napalmWeapon,
 		};
-		laserWeapon = new VileLaser((VileLaserType)loadout.laser);
+		laserWeapon = loadout.laser switch {
+			1 => new NecroBurst(),
+			2 => new StraightNightmare(),
+			_ => new RisingSpecter()
+		};
 		rideMenuWeapon = new MechMenuWeapon(VileMechMenuType.All);
 		hasFrozenCastle = player.frozenCastle;
 		hasSpeedDevil = player.speedDevil;
@@ -893,8 +897,7 @@ public class Vile : Character {
 		int Vattack = Helpers.randomRange(1, 7);
 		bool isFacingTarget = (pos.x < target?.pos.x && xDir == 1) || (pos.x >= target?.pos.x && xDir == -1);
 		if (!charState.isGrabbedState && !player.isDead && !isInvulnerableAttack()
-			&& !(charState is VileRevive or HexaInvoluteState or NecroBurstAttack
-			or StraightNightmareAttack or RisingSpecterState or VileMK2GrabState 
+			&& !(charState is VileRevive or HexaInvoluteState or LaserAttack or VileMK2GrabState 
 			or GenericStun or Hurt or Die) && aiAttackCooldown <= 0) {
 			if (isVileMK2 && charState is Dash or AirDash && isFacingTarget) {
 				player.press(Control.Special1);
