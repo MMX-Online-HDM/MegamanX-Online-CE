@@ -69,15 +69,17 @@ public class CustomMatchSettings {
 			largeAmmoPickup = 50,
 			smallAmmoPickup = 25,
 			subTankCost = 4,
+			oldATrans = false,
+			flinchairDashReset = false,
+			comboFlinch = true,
+			/*
 			frostShieldNerf = true,
 			frostShieldChargedNerf = false,
 			axlBackwardsDebuff = true,
 			axlDodgerollCooldown = Axl.maxDodgeRollCooldown,
 			axlCustomReload = false,
-			oldATrans = false,
-			flinchairDashReset = false,
-			comboFlinch = true,
 			quakeBlazerDownwards = false,
+			*/
 		};
 	}
 }
@@ -391,9 +393,9 @@ public class CustomMatchSettingsMenu : IMainMenu {
 			)
 		);
 		*/
-		#endregion
-		#region  Page 2
-		menuOptions2.Add(
+#endregion
+			#region  Page 2
+			menuOptions2.Add(
 			new MenuOption(
 				startX2, currentY2,
 				() => {
@@ -409,8 +411,8 @@ public class CustomMatchSettingsMenu : IMainMenu {
 				}
 			)
 		);
-		//Respawn Time Custom Setting
-		menuOptions2.Add(
+			//Respawn Time Custom Setting
+			menuOptions2.Add(
 			new MenuOption(
 				startX2, currentY2 += lineH2,
 				() => {
@@ -426,7 +428,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 				}
 			)
 		);
-		menuOptions2.Add(
+			menuOptions2.Add(
 			new MenuOption(
 				startX2, currentY2 += lineH2,
 				() => {
@@ -442,7 +444,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 				}
 			)
 		);
-		menuOptions2.Add(
+			menuOptions2.Add(
 			new MenuOption(
 				startX2, currentY2 += lineH2,
 				() => {
@@ -458,7 +460,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 				}
 			)
 		);
-		menuOptions2.Add(
+			menuOptions2.Add(
 			new MenuOption(
 				startX2, currentY2 += lineH2,
 				() => {
@@ -474,7 +476,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 				}
 			)
 		);
-		menuOptions2.Add(
+			menuOptions2.Add(
 			new MenuOption(
 				startX2, currentY2 += lineH2,
 				() => {
@@ -490,7 +492,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 				}
 			)
 		);
-		menuOptions2.Add(
+			menuOptions2.Add(
 			new MenuOption(
 				startX2, currentY2 += lineH2,
 				() => {
@@ -507,24 +509,73 @@ public class CustomMatchSettingsMenu : IMainMenu {
 			)
 		);
 		menuOptions2.Add(
+		new MenuOption(
+			startX2, currentY2 += lineH2,
+			() => {
+				Helpers.menuLeftRightInc(ref cSettings.smallAmmoPickup, 0, 100, true);
+			},
+			(Point pos, int index) => {
+				Fonts.drawText(
+					FontType.Blue,
+					"Small Ammo Recovery: " +
+					cSettings.smallAmmoPickup.ToString(),
+					pos.x, pos.y, selected: selectArrowPosY2 == index
+						);
+					}
+				)
+			);
+			#endregion
+				menuOptions3.Add(
+				new MenuOption(
+					startX3, currentY3 += lineH3,
+					() => {
+						Helpers.menuLeftRightBool(ref cSettings.flinchairDashReset, true);
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							FontType.Purple,
+							"Flinch resets Air Dash: " +
+							Helpers.boolYesNo(cSettings.flinchairDashReset),
+							pos.x, pos.y, selected: selectArrowPosY3 == index
+						);
+					}
+				)
+			);
+			menuOptions3.Add(
 			new MenuOption(
-				startX2, currentY2 += lineH2,
+				startX3, currentY3 += lineH3,
 				() => {
-					Helpers.menuLeftRightInc(ref cSettings.smallAmmoPickup, 0, 100, true);
+					Helpers.menuLeftRightBool(ref cSettings.comboFlinch, true);
 				},
 				(Point pos, int index) => {
 					Fonts.drawText(
-						FontType.Blue,
-						"Small Ammo Recovery: " +
-						cSettings.smallAmmoPickup.ToString(),
-						pos.x, pos.y, selected: selectArrowPosY2 == index
-					);
-				}
-			)
-		);
-		#endregion
-		#region Page 3
-		menuOptions3.Add(
+						FontType.Purple,
+						"Flinch stack: " +
+						Helpers.boolYesNo(cSettings.comboFlinch),
+						pos.x, pos.y, selected: selectArrowPosY3 == index
+						);
+					}
+				)
+			);
+			menuOptions3.Add(
+				new MenuOption(
+					startX3, currentY3 += lineH3,
+					() => {
+						Helpers.menuLeftRightBool(ref cSettings.oldATrans, true);
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							FontType.Purple,
+							"Axl Vanilla DNA: " +
+							Helpers.boolYesNo(cSettings.oldATrans),
+							pos.x, pos.y, selected: selectArrowPosY3 == index
+						);
+					}
+				)
+			);
+			/*
+			#region Page 3
+			menuOptions3.Add(
 			new MenuOption(
 				startX3, currentY3,
 				() => {
@@ -540,7 +591,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 				}
 			)
 		);
-		menuOptions3.Add(
+			menuOptions3.Add(
 			new MenuOption(
 				startX3, currentY3 += lineH3,
 				() => {
@@ -556,7 +607,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 				}
 			)
 		);
-		menuOptions3.Add(
+			menuOptions3.Add(
 			new MenuOption(
 				startX3, currentY3 += lineH3,
 				() => {
@@ -572,7 +623,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 				}
 			)
 		);
-		menuOptions3.Add(
+			menuOptions3.Add(
 			new MenuOption(
 				startX3, currentY3 += lineH3,
 				() => {
@@ -588,7 +639,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 				}
 			)
 		);
-		menuOptions3.Add(
+			menuOptions3.Add(
 			new MenuOption(
 				startX3, currentY3 += lineH3,
 				() => {
@@ -604,7 +655,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 				}
 			)
 		);
-		menuOptions3.Add(
+			menuOptions3.Add(
 			new MenuOption(
 				startX3, currentY3 += lineH3,
 				() => {
@@ -620,7 +671,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 				}
 			)
 		);
-		menuOptions3.Add(
+			menuOptions3.Add(
 			new MenuOption(
 				startX3, currentY3 += lineH3,
 				() => {
@@ -636,7 +687,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 				}
 			)
 		);
-		menuOptions3.Add(
+			menuOptions3.Add(
 			new MenuOption(
 				startX3, currentY3 += lineH3,
 				() => {
@@ -652,7 +703,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 				}
 			)
 		);
-		menuOptions3.Add(
+			menuOptions3.Add(
 			new MenuOption(
 				startX3, currentY3 += lineH3,
 				() => {
@@ -668,8 +719,9 @@ public class CustomMatchSettingsMenu : IMainMenu {
 				}
 			)
 		);
-		#endregion
-	}
+			#endregion
+			*/
+		}
 
 	public string getSameCharString(int charNum) {
 		if (charNum == -1) return "No";
