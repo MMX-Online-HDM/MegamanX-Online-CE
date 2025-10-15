@@ -2188,18 +2188,14 @@ public partial class Player {
 		) {
 			return false;
 		}
-		if (character.isATrans) {
-			return false;
-		}
-		if (character?.charState is not Die) {
-			return false;
-		}
-		if (character is Vile vile2 && vile2.isVileMK5) {
-			return false;
-		}
-		if (character is not Vile vile || vile.summonedGoliath) {
-			return false;
-		}
+		if (character?.isATrans == true) return false;	
+		if (character?.charState is not Die) return false;
+		if (character is not Vile) return false;
+		if (character is Vile vava) {
+			if (vava.isVileMK5) return false;
+			if (vava.summonedGoliath) return false;
+			if (vava.deadCooldown > 0) return false;
+        }
 		return true;
 	}
 

@@ -45,6 +45,8 @@ public class Vile : Character {
 	public Weapon downAirSpWeapon;
 	public Weapon airSpWeapon;
 	public Weapon downSpWeapon;
+	public float deadCooldown;
+	public const float maxdeadCooldown = 60;
 
 	public Vile(
 		Player player, float x, float y, int xDir,
@@ -220,8 +222,8 @@ public class Vile : Character {
 		Helpers.decrementTime(ref mechBusterCooldown);
 		Helpers.decrementFrames(ref aiAttackCooldown);
 		Helpers.decrementFrames(ref vulcanLingerTime);
+		Helpers.decrementFrames(ref deadCooldown);
 		addWeaponHealAmmo();
-
 		if ((grounded || charState is LadderClimb or LadderEnd or WallSlide) && vileHoverTime > 0) {
 			vileHoverTime -= Global.spf * 6;
 			if (vileHoverTime < 0) vileHoverTime = 0;
@@ -878,6 +880,7 @@ public class Vile : Character {
 		base.onDeath();
 		player.lastDeathWasVileMK2 = isVileMK2;
 		player.lastDeathWasVileV = isVileMK5;
+		deadCooldown = maxdeadCooldown;
 	}
 
 	public override List<byte> getCustomActorNetData() {

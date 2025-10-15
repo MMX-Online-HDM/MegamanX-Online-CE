@@ -783,6 +783,10 @@ public class GameMode {
 					float Ccooldown = 1 - Helpers.progress(vava.grenadeWeapon.shootCooldown, vava.grenadeWeapon.fireRate);
 					drawGigaWeaponCooldown(15, Ccooldown, xStart, yStart, isKillFeed: true, xStart, yStart);
 				}
+				if (vava.deadCooldown > 0) {
+					float Ccooldown = 1 - Helpers.progress(vava.deadCooldown, Vile.maxdeadCooldown);
+					drawGigaWeaponCooldown(175, Ccooldown, xStart, yStart, isKillFeed: true, xStart, yStart);
+				}
 			}
 			if (drawPlayer.character is Vile vilePilot &&
 				vilePilot.rideArmor != null &&
