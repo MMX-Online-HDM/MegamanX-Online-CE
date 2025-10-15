@@ -59,8 +59,10 @@ public class FSplasherWeapon : Weapon {
 		}
 		if (zero.fSplasherCooldown > 0) return;
 		if (zero.fSplasherUses > 0) return;
+		if (zero.airRisingUses > 0) return;
 		zero.fSplasherCooldown = 50;
 		zero.fSplasherUses++;
+		zero.airRisingUses++;
 		character.changeState(new FSplasherState(), true);
 	}
 }
