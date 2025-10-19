@@ -850,12 +850,13 @@ public class Axl : Character {
 			} else {
 				if (!hyperAxlFix) {
 					foreach (var weapon in weapons)
-					weapon.ammo = weapon.maxAmmo;
+						weapon.ammo = weapon.maxAmmo;
 				}
 				hyperAxlFix = true;
 				stingChargeTime = 12;
 				playSound("stingCharge", sendRpc: true);
 			}
+			return true;
 		}
 		if (isStealthMode() && hyperProgress >= 1) {
 			hyperProgress = 0;
