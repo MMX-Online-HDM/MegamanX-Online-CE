@@ -17,6 +17,7 @@ public class RayGun : AxlWeapon {
 		weaponBarIndex = 28;
 		weaponSlotIndex = 34;
 		killFeedIndex = 33;
+		altFireCooldown = 6;
 		fireRate = 6;
 		rechargeAmmoCooldown = 120;
 		altRechargeAmmoCooldown = 120;
@@ -47,13 +48,12 @@ public class RayGun : AxlWeapon {
 		}
 	}
 	public override void axlShoot(Character character, int[] args) {
-		if (shootCooldown > 0) return;
+		if (altShotCooldown > 0) return;
 		base.axlShoot(character, args);
 	}
 	public override void axlAltShoot(Character character, int[] args) {
 		if (character is not Axl axl) return;
 		if (shootCooldown > 0) return;
-		if (axl.loadout.rayGunAlt == 0) fireRate = 6;
 		base.axlAltShoot(character, args);
 	}
 	public override void axlGetAltProjectile(
