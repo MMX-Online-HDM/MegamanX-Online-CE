@@ -193,16 +193,6 @@ public partial class Player {
 				
 			}
 		} */
-
-		if (character is Axl axl) {
-			if (oldWeapon is AxlWeapon) {
-				axl.axlSwapTime = axl.switchTime;
-				axl.axlAltSwapTime = axl.altSwitchTime;
-			}
-			if (axl.isZooming()) {
-				axl.zoomOut();
-			}
-		}
 	}
 
 	public void weaponLeft() {

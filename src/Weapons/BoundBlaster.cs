@@ -32,7 +32,22 @@ public class BoundBlaster : AxlWeapon {
 		}
 		return 4;
 	}
+	public override void axlAltShoot(Character character, int[] args) {
+		if (shootCooldown > 0) return;
+		base.axlAltShoot(character, args);
+	}
+	public override void axlGetAltProjectile(
+		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
+		 IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
+	) {
+		if (!player.ownedByLocalPlayer) return;
+		Point bulletDir = Point.createFromAngle(angle);
 
+		if (altFire == 0) new MovingWheelProj(weapon, bulletPos, bulletDir.x > 0 ? 1 : -1, player, netId, rpc: true);
+		else new BoundBlasterAltProj(weapon, bulletPos, xDir, player, bulletDir, netId, rpc: true);
+		
+		RPC.playSound.sendRpc(shootSounds[3], player.character?.netId);
+    }
 	public override void axlGetProjectile(
 		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
 		IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
@@ -41,7 +56,6 @@ public class BoundBlaster : AxlWeapon {
 		Point bulletDir = Point.createFromAngle(angle);
 		Projectile? bullet = null;
 		var hit = Global.level.checkCollisionPoint(bulletPos, new List<GameObject>() { });
-
 		if (hit?.gameObject is Wall wall && player.character != null) {
 			float distToCenter = bulletPos.distanceTo(player.character.getCenterPos());
 			Point rayOrigin = bulletPos.add(bulletDir.times(-distToCenter));
@@ -52,19 +66,8 @@ public class BoundBlaster : AxlWeapon {
 				bulletPos = intersectPoint.Value.add(bulletDir.times(-3));
 			}
 		}
-
-		if (chargeLevel < 3) {
-			bullet = new BoundBlasterProj(weapon, bulletPos, angle, player, netId, rpc: true);
-			RPC.playSound.sendRpc(shootSounds[0], player.character?.netId);
-		} else {
-			if (altFire == 0) {
-				bullet = new MovingWheelProj(weapon, bulletPos, bulletDir.x > 0 ? 1 : -1, player, netId, rpc: true);
-				RPC.playSound.sendRpc(shootSounds[3], player.character?.netId);
-			} else {
-				bullet = new BoundBlasterAltProj(weapon, bulletPos, xDir, player, bulletDir, netId, rpc: true);
-				RPC.playSound.sendRpc(shootSounds[3], player.character?.netId);
-			}
-		}
+		bullet = new BoundBlasterProj(weapon, bulletPos, angle, player, netId, rpc: true);
+		RPC.playSound.sendRpc(shootSounds[0], player.character?.netId);
 	}
 }
 

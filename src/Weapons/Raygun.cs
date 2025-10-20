@@ -46,37 +46,48 @@ public class RayGun : AxlWeapon {
 			}
 		}
 	}
+	public override void axlShoot(Character character, int[] args) {
+		if (shootCooldown > 0) return;
+		base.axlShoot(character, args);
+	}
+	public override void axlAltShoot(Character character, int[] args) {
+		if (character is not Axl axl) return;
+		if (shootCooldown > 0) return;
+		if (axl.loadout.rayGunAlt == 0) fireRate = 6;
+		base.axlAltShoot(character, args);
+	}
+	public override void axlGetAltProjectile(
+		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
+		IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
+	) {
+		if (player.character is not Axl axl) return;
+		Point bulletDir = Point.createFromAngle(angle);
+		Projectile bullet;
+		if (altFire == 0) {
+			bullet = new SplashLaserProj(weapon, bulletPos, player, bulletDir, netId, sendRpc: true);
+			bullet = new SplashLaserProj(weapon, bulletPos.add(bulletDir.times(22)), player, bulletDir, player.getNextActorNetId(), sendRpc: true);
+			if (player.character != null) RPC.playSound.sendRpc(shootSounds[3], player.character.netId);
+		} else {
+			if (axl.rayGunAltProj == null) axl.rayGunAltProj = new RayGunAltProj(weapon, bulletPos, cursorPos, 1, player, netId);
+			else netId = axl.rayGunAltProj.netId.Value;
+			bullet = axl.rayGunAltProj;
+			laserChargeLevel = axl.rayGunAltProj.getChargeLevel();
+		}
+		if (player.ownedByLocalPlayer) {
+			RPC.axlShoot.sendRpc(player.id, bullet.projId, netId, bulletPos, xDir, angle);
+		}
+	}
 
 	public override void axlGetProjectile(
 	    Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
 	 	IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
 	) {
-		if (player.character is not Axl axl) {
-			return;
-		}
+		if (player.character is not Axl axl) return;
 		Point bulletDir = Point.createFromAngle(angle);
-		Projectile? bullet = null;
-		if (chargeLevel < 3) {
-			bullet = new RayGunProj(weapon, bulletPos, xDir, player, bulletDir, netId);
-		} else {
-			if (altFire == 0) {
-				bullet = new SplashLaserProj(weapon, bulletPos, player, bulletDir, netId, sendRpc: true);
-				bullet = new SplashLaserProj(weapon, bulletPos.add(bulletDir.times(22)), player, bulletDir, player.getNextActorNetId(), sendRpc: true);
-				if (player.character != null) {
-					RPC.playSound.sendRpc(shootSounds[3], player.character.netId);
-				}
-				return;
-			} else {
-				if (axl.rayGunAltProj == null) {
-					axl.rayGunAltProj = new RayGunAltProj(weapon, bulletPos, cursorPos, 1, player, netId);
-				} else {
-					netId = axl.rayGunAltProj.netId.Value;
-				}
-				bullet = axl.rayGunAltProj;
-				laserChargeLevel = axl.rayGunAltProj.getChargeLevel();
-			}
-		}
-
+		Projectile? bullet;
+		fireRate = 6;
+		altFireCooldown = 6;
+		bullet = new RayGunProj(weapon, bulletPos, xDir, player, bulletDir, netId);
 		if (player.ownedByLocalPlayer) {
 			RPC.axlShoot.sendRpc(player.id, bullet.projId, netId, bulletPos, xDir, angle);
 		}

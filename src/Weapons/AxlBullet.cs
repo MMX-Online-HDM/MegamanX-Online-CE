@@ -22,9 +22,11 @@ public class AxlBullet : AxlWeapon {
 		sprite = "axl_arm_pistol";
 		flashSprite = "axl_pistol_flash";
 		chargedFlashSprite = "axl_pistol_flash_charged";
+		fireRate = 9;
 		altFireCooldown = 18;
 		displayName = "Axl Bullets";
-		canHealAmmo = true;		
+		canHealAmmo = true;
+		isAxlBullets = true;
 	}
 	public override float getAmmoUsage(int chargeLevel) {
 		switch (chargeLevel) {
@@ -38,21 +40,39 @@ public class AxlBullet : AxlWeapon {
 				return 1;
 		}
 	}
+	public override void axlShoot(Character character, int[] args) {
+		if (altShotCooldown > 0) return;
+		base.axlShoot(character, args);
+	}
+	public override void axlAltShoot(Character character, int[] args) {
+		if (shootCooldown > 0) return;
+		if (character.currentWeapon?.ammo < 4) return;
+		base.axlAltShoot(character, args);
+	}
+	public override void axlGetAltProjectile(
+		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
+		IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
+	) {
+		Point bulletDir = Point.createFromAngle(angle);
+		Projectile bullet;
+		bullet = new CopyShotProj(weapon, bulletPos, chargeLevel, player, bulletDir, netId);
+		if (player.ownedByLocalPlayer) {
+			RPC.axlShoot.sendRpc(player.id, bullet.projId, netId, bulletPos, xDir, angle);
+		}
+	}
+
 	public override void axlGetProjectile(
 		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
 		IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
 	) {
-		Point? bulletDir = Point.createFromAngle(angle);
-		Projectile? bullet = null;
-		if (chargeLevel == 0) {			
-			bullet = new AxlBulletProj(weapon, bulletPos, player, bulletDir.Value, netId);
-		} else {
-			bullet = new CopyShotProj(weapon, bulletPos, chargeLevel, player, bulletDir.Value, netId);
-		}
-		if (player.ownedByLocalPlayer && bullet != null) {
+		Point bulletDir = Point.createFromAngle(angle);
+		Projectile bullet;
+		bullet = new AxlBulletProj(weapon, bulletPos, player, bulletDir, netId);
+		if (player.ownedByLocalPlayer) {
 			RPC.axlShoot.sendRpc(player.id, bullet.projId, netId, bulletPos, xDir, angle);
 		}
 	}
+
 }
 public class DoubleBullet : AxlWeapon {
 	public DoubleBullet() : base(0) {
@@ -69,6 +89,7 @@ public class DoubleBullet : AxlWeapon {
 		fireRate = 6;
 		displayName = "Double Bullets";
 		type = (int)AxlBulletWeaponType.DoubleBullets;
+		isAxlBullets = true;
 	}
 	public override float getAmmoUsage(int chargeLevel) {
 		switch (chargeLevel) {
@@ -82,19 +103,31 @@ public class DoubleBullet : AxlWeapon {
 				return 1;
 		}
 	}
+	public override void axlAltShoot(Character character, int[] args) {
+		if (shootCooldown > 0) return;
+		if (character.currentWeapon?.ammo > 4) return;
+		base.axlAltShoot(character, args);
+	}
+
+	public override void axlGetAltProjectile(
+		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
+		IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
+	) {
+		Point bulletDir = Point.createFromAngle(angle);
+		Projectile bullet;
+		bullet = new CopyShotProj(weapon, bulletPos, chargeLevel, player, bulletDir, netId);
+		if (player.ownedByLocalPlayer) {
+			RPC.axlShoot.sendRpc(player.id, bullet.projId, netId, bulletPos, xDir, angle);
+		}
+	}
+
 	public override void axlGetProjectile(
 		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
 		IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
 	) {
 		Point bulletDir = Point.createFromAngle(angle);
-		Projectile? bullet = null;
-		if (chargeLevel == 0) {
-			bullet = new AxlBulletProj(weapon, bulletPos, player, bulletDir, netId);
-
-		} else {
-			bullet = new CopyShotProj(weapon, bulletPos, chargeLevel, player, bulletDir, netId);
-		}
-
+		Projectile bullet;
+		bullet = new AxlBulletProj(weapon, bulletPos, player, bulletDir, netId);
 		if (player.ownedByLocalPlayer) {
 			RPC.axlShoot.sendRpc(player.id, bullet.projId, netId, bulletPos, xDir, angle);
 		}
@@ -114,6 +147,7 @@ public class MettaurCrash : AxlWeapon {
 		displayName = "Mettaur Crash";
 		shootSounds = new string[] { "mettaurCrash", "axlBullet", "axlBullet", "axlBulletCharged" };
 		type = (int)AxlBulletWeaponType.MetteurCrash;
+		isAxlBullets = true;
 	}
 	public override float getAmmoUsage(int chargeLevel) {
 		switch (chargeLevel) {
@@ -127,17 +161,34 @@ public class MettaurCrash : AxlWeapon {
 				return 1;
 		}
 	}
+	public override void axlShoot(Character character, int[] args) {
+		if (altShotCooldown > 0) return;
+		base.axlShoot(character, args);
+	}
+	public override void axlAltShoot(Character character, int[] args) {
+		if (shootCooldown > 0) return;
+		if (character.currentWeapon?.ammo > 4) return;
+		base.axlAltShoot(character, args);
+	}
+	public override void axlGetAltProjectile(
+		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
+		IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
+	) {
+		Point bulletDir = Point.createFromAngle(angle);
+		Projectile bullet;
+		bullet = new CopyShotProj(weapon, bulletPos, chargeLevel, player, bulletDir, netId);
+		if (player.ownedByLocalPlayer) {
+			RPC.axlShoot.sendRpc(player.id, bullet.projId, netId, bulletPos, xDir, angle);
+		}
+	}
+
 	public override void axlGetProjectile(
 		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
 		IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
 	) {
 		Point bulletDir = Point.createFromAngle(angle);
-		Projectile? bullet = null;
-		if (chargeLevel == 0) {
-			bullet = new MettaurCrashProj(weapon, bulletPos, player, bulletDir, netId, sendRpc: true);
-		} else {
-			bullet = new CopyShotProj(weapon, bulletPos, chargeLevel, player, bulletDir, netId);
-		}
+		Projectile bullet;
+		bullet = new MettaurCrashProj(weapon, bulletPos, player, bulletDir, netId);
 		if (player.ownedByLocalPlayer) {
 			RPC.axlShoot.sendRpc(player.id, bullet.projId, netId, bulletPos, xDir, angle);
 		}
@@ -158,25 +209,44 @@ public class BeastKiller : AxlWeapon {
 		displayName = "Beast Killer";
 		shootSounds = new string[] { "beastKiller", "axlBullet", "axlBullet", "axlBulletCharged" };
 		type = (int)AxlBulletWeaponType.BeastKiller;
+		isAxlBullets = true;
 	}
 	public override float getAmmoUsage(int chargeLevel) {
 		return 3;
 	}
+	public override void axlShoot(Character character, int[] args) {
+		if (altShotCooldown > 0) return;
+		base.axlShoot(character, args);
+	}
+	public override void axlAltShoot(Character character, int[] args) {
+		if (shootCooldown > 0) return;
+		if (character.currentWeapon?.ammo > 4) return;
+		base.axlAltShoot(character, args);
+	}
+
+	public override void axlGetAltProjectile(
+		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
+		IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
+	) {
+		Point bulletDir = Point.createFromAngle(angle);
+		Projectile bullet;
+		bullet = new CopyShotProj(weapon, bulletPos, chargeLevel, player, bulletDir, netId);
+		if (player.ownedByLocalPlayer) {
+			RPC.axlShoot.sendRpc(player.id, bullet.projId, netId, bulletPos, xDir, angle);
+		}
+	}
+
 	public override void axlGetProjectile(
 		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
 		IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
 	) {
 		Point bulletDir = Point.createFromAngle(angle);
-		Projectile? bullet = null;
-		if (chargeLevel == 0) {
-			bullet = new BeastKillerProj(weapon, bulletPos, player, Point.createFromAngle(angle - 45), player.getNextActorNetId(), sendRpc: true);
-			bullet = new BeastKillerProj(weapon, bulletPos, player, Point.createFromAngle(angle - 22.5f), player.getNextActorNetId(), sendRpc: true);
-			bullet = new BeastKillerProj(weapon, bulletPos, player, bulletDir, player.getNextActorNetId(), sendRpc: true);
-			bullet = new BeastKillerProj(weapon, bulletPos, player, Point.createFromAngle(angle + 22.5f), player.getNextActorNetId(), sendRpc: true);
-			bullet = new BeastKillerProj(weapon, bulletPos, player, Point.createFromAngle(angle + 45), player.getNextActorNetId(), sendRpc: true);		
-		} else {
-			bullet = new CopyShotProj(weapon, bulletPos, chargeLevel, player, bulletDir, netId);
-		}
+		Projectile bullet;
+		bullet = new BeastKillerProj(weapon, bulletPos, player, Point.createFromAngle(angle - 45), player.getNextActorNetId(), sendRpc: true);
+		bullet = new BeastKillerProj(weapon, bulletPos, player, Point.createFromAngle(angle - 22.5f), player.getNextActorNetId(), sendRpc: true);
+		bullet = new BeastKillerProj(weapon, bulletPos, player, bulletDir, player.getNextActorNetId(), sendRpc: true);
+		bullet = new BeastKillerProj(weapon, bulletPos, player, Point.createFromAngle(angle + 22.5f), player.getNextActorNetId(), sendRpc: true);
+		bullet = new BeastKillerProj(weapon, bulletPos, player, Point.createFromAngle(angle + 45), player.getNextActorNetId(), sendRpc: true);
 		if (player.ownedByLocalPlayer) {
 			RPC.axlShoot.sendRpc(player.id, bullet.projId, netId, bulletPos, xDir, angle);
 		}
@@ -197,9 +267,19 @@ public class MachineBullets : AxlWeapon {
 		displayName = "Machine Bullets";
 		shootSounds = new string[] { "machineBullets", "axlBullet", "axlBullet", "axlBulletCharged" };
 		type = (int)AxlBulletWeaponType.MachineBullets;
+		isAxlBullets = true;
 	}
 	public override float getAmmoUsage(int chargeLevel) {
 		return 2;
+	}
+	public override void axlShoot(Character character, int[] args) {
+		if (altShotCooldown > 0) return;
+		base.axlShoot(character, args);
+	}
+	public override void axlAltShoot(Character character, int[] args) {
+		if (shootCooldown > 0) return;
+		if (character.currentWeapon?.ammo > 4) return;
+		base.axlAltShoot(character, args);
 	}
 	public override void axlGetProjectile(
 		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
@@ -232,6 +312,7 @@ public class RevolverBarrel : AxlWeapon {
 		displayName = "Revolver Barrel";
 		shootSounds = new string[] { "revolverBarrel", "axlBullet", "axlBullet", "axlBulletCharged" };
 		type = (int)AxlBulletWeaponType.RevolverBarrel;
+		isAxlBullets = true;
 	}
 	public override float getAmmoUsage(int chargeLevel) {
 		switch (chargeLevel) {
@@ -245,21 +326,40 @@ public class RevolverBarrel : AxlWeapon {
 				return 1;
 		}
 	}
+	public override void axlShoot(Character character, int[] args) {
+		if (altShotCooldown > 0) return;
+		base.axlShoot(character, args);
+	}
+	public override void axlAltShoot(Character character, int[] args) {
+		if (shootCooldown > 0) return;
+		if (character.currentWeapon?.ammo > 4) return;
+		base.axlAltShoot(character, args);
+	}
+
+	public override void axlGetAltProjectile(
+		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
+		IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
+	) {
+		Point bulletDir = Point.createFromAngle(angle);
+		Projectile bullet;
+		bullet = new CopyShotProj(weapon, bulletPos, chargeLevel, player, bulletDir, netId);
+		if (player.ownedByLocalPlayer) {
+			RPC.axlShoot.sendRpc(player.id, bullet.projId, netId, bulletPos, xDir, angle);
+		}
+	}
+
 	public override void axlGetProjectile(
 		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
 		IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
 	) {
 		Point bulletDir = Point.createFromAngle(angle);
-		Projectile? bullet = null;
-		if (chargeLevel == 0) {
-			bullet = new RevolverBarrelProj(weapon, bulletPos, player, bulletDir, netId, sendRpc: true);
-		} else {
-			bullet = new CopyShotProj(weapon, bulletPos, chargeLevel, player, bulletDir, netId);
-		}
+		Projectile bullet;
+		bullet = new RevolverBarrelProj(weapon, bulletPos, player, bulletDir, netId);
 		if (player.ownedByLocalPlayer) {
 			RPC.axlShoot.sendRpc(player.id, bullet.projId, netId, bulletPos, xDir, angle);
 		}
 	}
+
 }
 public class AncientGun : AxlWeapon {
 	public AncientGun(AxlBulletWeaponType type = AxlBulletWeaponType.AncientGun) : base(0) {
@@ -276,6 +376,7 @@ public class AncientGun : AxlWeapon {
 		fireRate = 6;
 		displayName = "Ancient Gun";
 		shootSounds = new string[] { "ancientGun3", "axlBullet", "axlBullet", "axlBulletCharged" };
+		isAxlBullets = true;
 	}
 	public override float getAmmoUsage(int chargeLevel) {
 		switch (chargeLevel) {
@@ -289,18 +390,34 @@ public class AncientGun : AxlWeapon {
 				return 1;
 		}
 	}
+	public override void axlShoot(Character character, int[] args) {
+		if (altShotCooldown > 0) return;
+		base.axlShoot(character, args);
+	}
+	public override void axlAltShoot(Character character, int[] args) {
+		if (shootCooldown > 0) return;
+		if (character.currentWeapon?.ammo > 4) return;
+		base.axlAltShoot(character, args);
+	}
+	public override void axlGetAltProjectile(
+		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
+		IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
+	) {
+		Point bulletDir = Point.createFromAngle(angle);
+		Projectile bullet;
+		bullet = new CopyShotProj(weapon, bulletPos, chargeLevel, player, bulletDir, netId);
+		if (player.ownedByLocalPlayer) {
+			RPC.axlShoot.sendRpc(player.id, bullet.projId, netId, bulletPos, xDir, angle);
+		}
+	}
 	public override void axlGetProjectile(
 		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
 		IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
 	) {
 		Point bulletDir = Point.createFromAngle(angle);
-		Projectile? bullet = null;
-		if (chargeLevel == 0) {
-			bullet = new AncientGunProj(weapon, bulletPos, player, bulletDir, player.getNextActorNetId(), sendRpc: true);
-			bullet = new AncientGunProj(weapon, bulletPos, player, Point.createFromAngle(angle + Helpers.randomRange(-25, 25)), player.getNextActorNetId(), sendRpc: true);
-		} else {
-			bullet = new CopyShotProj(weapon, bulletPos, chargeLevel, player, bulletDir, netId);
-		}
+		Projectile bullet;
+		bullet = new AncientGunProj(weapon, bulletPos, player, bulletDir, player.getNextActorNetId(), sendRpc: true);
+		bullet = new AncientGunProj(weapon, bulletPos, player, Point.createFromAngle(angle + Helpers.randomRange(-25, 25)), player.getNextActorNetId(), sendRpc: true);
 		if (player.ownedByLocalPlayer) {
 			RPC.axlShoot.sendRpc(player.id, bullet.projId, netId, bulletPos, xDir, angle);
 		}

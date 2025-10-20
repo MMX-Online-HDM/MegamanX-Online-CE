@@ -31,26 +31,40 @@ public class FlameBurner : AxlWeapon {
 		}
 		return 0.5f;
 	}
-
-	public override void axlGetProjectile(Weapon weapon, Point bulletPos, int xDir, Player player, float angle, IDamagable target, Character headshotTarget, Point cursorPos, int chargeLevel, ushort netId) {
+	public override void axlShoot(Character character, int[] args) {
+		base.axlShoot(character, args);
+	}
+	public override void axlAltShoot(Character character, int[] args) {
+		if (character is not Axl axl) return;
+		if (shootCooldown > 0) return;
+		if (axl.loadout.flameBurnerAlt == 0) {
+			shootCooldown = 30;
+		}
+		base.axlAltShoot(character, args);
+	}
+	public override void axlGetAltProjectile(
+		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
+		 IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
+	) {
 		if (!player.ownedByLocalPlayer) return;
 		Point bulletDir = Point.createFromAngle(angle);
-		if (chargeLevel < 3) {
-			if (player.character?.isUnderwater() == false) {
-				new FlameBurnerProj(weapon, bulletPos, xDir, player, bulletDir, netId, sendRpc: true);
-				new FlameBurnerProj(weapon, bulletPos.add(bulletDir.times(5)), xDir, player, Point.createFromAngle(angle + Helpers.randomRange(-10, 10)), player.getNextActorNetId(), sendRpc: true);
-				new FlameBurnerProj(weapon, bulletPos.add(bulletDir.times(10)), xDir, player, Point.createFromAngle(angle + Helpers.randomRange(-10, 10)), player.getNextActorNetId(), sendRpc: true);
-			}
-			RPC.playSound.sendRpc(shootSounds[0], player.character?.netId);
-		} else {
-			if (altFire == 0) {
-				new CircleBlazeProj(weapon, bulletPos, xDir, player, bulletDir, netId, sendRpc: true);
-				RPC.playSound.sendRpc(shootSounds[3], player.character?.netId);
-			} else {
-				new FlameBurnerAltProj(weapon, bulletPos, xDir, player, bulletDir, netId, sendRpc: true);
-				RPC.playSound.sendRpc(shootSounds[3], player.character?.netId);
-			}
+		if (altFire == 0) new CircleBlazeProj(weapon, bulletPos, xDir, player, bulletDir, netId, sendRpc: true);
+		else new FlameBurnerAltProj(weapon, bulletPos, xDir, player, bulletDir, netId, sendRpc: true);
+		RPC.playSound.sendRpc(shootSounds[3], player.character?.netId);		
+    }
+
+	public override void axlGetProjectile(
+		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
+	 	IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
+	) {
+		if (!player.ownedByLocalPlayer) return;
+		Point bulletDir = Point.createFromAngle(angle);
+		if (player.character?.isUnderwater() == false) {
+			new FlameBurnerProj(weapon, bulletPos, xDir, player, bulletDir, netId, sendRpc: true);
+			new FlameBurnerProj(weapon, bulletPos.add(bulletDir.times(5)), xDir, player, Point.createFromAngle(angle + Helpers.randomRange(-10, 10)), player.getNextActorNetId(), sendRpc: true);
+			new FlameBurnerProj(weapon, bulletPos.add(bulletDir.times(10)), xDir, player, Point.createFromAngle(angle + Helpers.randomRange(-10, 10)), player.getNextActorNetId(), sendRpc: true);
 		}
+		RPC.playSound.sendRpc(shootSounds[0], player.character?.netId);
 	}
 }
 

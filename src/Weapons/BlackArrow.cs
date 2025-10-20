@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using SFML.Graphics;
 using System.Linq;
+using SFML.Graphics;
+using SFML.Window;
 
 namespace MMXOnline;
 
@@ -36,30 +37,38 @@ public class BlackArrow : AxlWeapon {
 	public override float whiteAxlFireRateMod() {
 		return 2f;
 	}
-
+	public override void axlShoot(Character character, int[] args) {
+		if (altShotCooldown > 0) return;
+		base.axlShoot(character, args);
+	}
+	public override void axlAltShoot(Character character, int[] args) {
+		if (shootCooldown > 0) return;
+		base.axlAltShoot(character, args);
+	}
+	public override void axlGetAltProjectile(
+		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
+		IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
+	) {
+		if (!player.ownedByLocalPlayer) return;
+		Point bulletDir = Point.createFromAngle(angle);
+		if (altFire == 0) {
+			new WindCutterProj(weapon, bulletPos, player, bulletDir, netId, rpc: true);
+		} else {
+			new BlackArrowProj2(weapon, bulletPos, player, bulletDir, netId, rpc: true);
+			new BlackArrowProj2(weapon, bulletPos, player, Point.createFromAngle(angle - 30), player.getNextActorNetId(), rpc: true);
+			new BlackArrowProj2(weapon, bulletPos, player, Point.createFromAngle(angle + 30), player.getNextActorNetId(), rpc: true);
+		}
+		if (player.character != null) RPC.playSound.sendRpc(shootSounds[0], player.character.netId);
+		
+	}
 	public override void axlGetProjectile(
 		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
 		IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
 	) {
 		if (!player.ownedByLocalPlayer) return;
-
-		Point bulletDir = Point.createFromAngle(angle);
-		Projectile? bullet = null;
-		if (chargeLevel < 3) {
-			bullet = new BlackArrowProj(weapon, bulletPos, player, bulletDir, netId, rpc: true);
-		} else {
-			if (altFire == 0) {
-				new WindCutterProj(weapon, bulletPos, player, bulletDir, netId, rpc: true);
-			} else {
-				new BlackArrowProj2(weapon, bulletPos, player, bulletDir, netId, rpc: true);
-				new BlackArrowProj2(weapon, bulletPos, player, Point.createFromAngle(angle - 30), player.getNextActorNetId(), rpc: true);
-				new BlackArrowProj2(weapon, bulletPos, player, Point.createFromAngle(angle + 30), player.getNextActorNetId(), rpc: true);
-			}
-		}
-
-		if (player.character != null) {
-			RPC.playSound.sendRpc(shootSounds[0], player.character.netId);
-		}
+		Point bulletDir = Point.createFromAngle(angle);	
+		new BlackArrowProj(weapon, bulletPos, player, bulletDir, netId, rpc: true);
+		if (player.character != null) RPC.playSound.sendRpc(shootSounds[0], player.character.netId);
 	}
 }
 

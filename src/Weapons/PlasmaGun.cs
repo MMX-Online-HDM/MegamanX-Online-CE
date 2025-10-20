@@ -28,7 +28,7 @@ public class PlasmaGun : AxlWeapon {
 			if (altFire == 0) {
 				return 8;
 			}
-			return 0.5f;
+			return 0.1f;
 		}
 		return 4;
 	}
@@ -36,34 +36,67 @@ public class PlasmaGun : AxlWeapon {
 	public override float whiteAxlFireRateMod() {
 		return 2;
 	}
+	public override void axlShoot(Character character, int[] args) {
+		if (character is not Axl axl) return;
+		if (shootCooldown > 0) return;
+		if (axl.plasmaGunAltProj != null) return;
+		altShotCooldown = altFireCooldown;
+		base.axlShoot(character, args);
+	}
+	public override void axlAltShoot(Character character, int[] args) {
+		if (character is not Axl axl) return;
+		if (altShotCooldown > 0) return;
+		if (axl.loadout.plasmaGunAlt == 0) {
+			if (!axl.grounded) return;
+			axl.voltTornadoTime = 0.2f;
+			base.axlAltShoot(character, args);
+			return;
+		} else {
+			if (!axl.canShoot()) return;
+			Point bulletPos = axl.getAxlBulletPos();
+			Point cursorPos = axl.getCorrectedCursorPos();
+			float rateOfFireMode = (axl.isWhiteAxl() ? whiteAxlFireRateMod() : 1);
+			if (shootCooldown < 89) shootCooldown = fireRate / rateOfFireMode;
+			axl.altPlasmaGunHeld = true;
+			if (axl.plasmaGunAltProj == null) {
+				axl.plasmaGunAltProj = new PlasmaGunAltProj(
+					this, bulletPos, cursorPos, 1, character.player,
+					character.player.getNextActorNetId(true), sendRpc: true
+				);
+			}
+			if (ammo > 0) ammo -= getAmmoUsage(3);
+		}
+	}
+	public override void axlGetAltProjectile(
+		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
+		IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
+	) {
+		if (!player.ownedByLocalPlayer) return;
+		if (player?.character is not Axl axl) return;
+
+		if (altFire == 0) {
+			new VoltTornadoProj(weapon, player.character.pos, xDir, player, netId, sendRpc: true);
+			RPC.playSound.sendRpc(shootSounds[3], player.character?.netId);
+		} else {
+			if (axl.plasmaGunAltProj == null) {
+				axl.plasmaGunAltProj = new PlasmaGunAltProj(weapon, bulletPos, cursorPos, 1, player, netId, sendRpc: true);
+			}
+			return;
+		}
+	}
 
 	public override void axlGetProjectile(
 		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
 	 	IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
 	) {
 		if (!player.ownedByLocalPlayer) return;
-		if (player?.character is not Axl axl) return;
-
 		Point? bulletDir = Point.createFromAngle(angle);
-		Projectile? bullet = null;
-		if (chargeLevel < 3) {
-			new Anim(bulletPos, "plasmagun_effect", 1, player.getNextActorNetId(), true, sendRpc: true) {
-				angle = angle,
-				host = player.character
-			};
-			bullet = new PlasmaGunProj(weapon, bulletPos, xDir, player, bulletDir.Value, netId, sendRpc: true);
-			RPC.playSound.sendRpc(shootSounds[0], player.character?.netId);
-		} else {
-			if (altFire == 0) {
-				new VoltTornadoProj(weapon, player.character.pos, xDir, player, netId, sendRpc: true);
-				RPC.playSound.sendRpc(shootSounds[3], player.character?.netId);
-			} else {
-				if (axl.plasmaGunAltProj == null) {
-					axl.plasmaGunAltProj = new PlasmaGunAltProj(weapon, bulletPos, cursorPos, 1, player, netId, sendRpc: true);
-				}
-				return;
-			}
-		}
+		new Anim(bulletPos, "plasmagun_effect", 1, player.getNextActorNetId(), true, sendRpc: true) {
+			angle = angle,
+			host = player.character
+		};
+		new PlasmaGunProj(weapon, bulletPos, xDir, player, bulletDir.Value, netId, sendRpc: true);
+		RPC.playSound.sendRpc(shootSounds[0], player.character?.netId);	
 	}
 }
 

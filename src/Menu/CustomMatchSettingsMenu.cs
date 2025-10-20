@@ -32,7 +32,6 @@ public class CustomMatchSettings {
 	[ProtoMember(25)] public bool frostShieldNerf;
 	[ProtoMember(26)] public bool frostShieldChargedNerf;
 	[ProtoMember(27)] public bool axlBackwardsDebuff;
-	[ProtoMember(28)] public float axlDodgerollCooldown;
 	[ProtoMember(29)] public bool axlCustomReload;
 	[ProtoMember(30)] public bool oldATrans;
 	[ProtoMember(31)] public bool flinchairDashReset;
@@ -76,7 +75,6 @@ public class CustomMatchSettings {
 			frostShieldNerf = true,
 			frostShieldChargedNerf = false,
 			axlBackwardsDebuff = true,
-			axlDodgerollCooldown = Axl.maxDodgeRollCooldown,
 			axlCustomReload = false,
 			quakeBlazerDownwards = false,
 			*/
@@ -618,22 +616,6 @@ public class CustomMatchSettingsMenu : IMainMenu {
 						FontType.Purple,
 						"Axl Shooting Backwards Debuff: " +
 						Helpers.boolYesNo(cSettings.axlBackwardsDebuff),
-						pos.x, pos.y, selected: selectArrowPosY3 == index
-					);
-				}
-			)
-		);
-			menuOptions3.Add(
-			new MenuOption(
-				startX3, currentY3 += lineH3,
-				() => {
-					Helpers.menuLeftRightIncFloat(ref cSettings.axlDodgerollCooldown, 1.25f, 3, true, true);
-				},
-				(Point pos, int index) => {
-					Fonts.drawText(
-						FontType.Purple,
-						"Axl Dodge Roll Cooldown: " +
-						cSettings.axlDodgerollCooldown.ToString(),
 						pos.x, pos.y, selected: selectArrowPosY3 == index
 					);
 				}

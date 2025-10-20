@@ -32,6 +32,35 @@ public class SpiralMagnum : AxlWeapon {
 		}
 		return 4;
 	}
+	public override void axlAltShoot(Character character, int[] args) {
+		if (character is not Axl axl) return;
+		if (axl.loadout.spiralMagnumAlt == 0) {
+			if (shootCooldown > 0) return;
+			if (altShotCooldown > 0) return;
+			base.axlAltShoot(character, args);
+			return;
+		} else {
+            if (!axl._zoom) {
+				axl.zoomIn();
+			} else if (!axl.isZoomingIn && !axl.isZoomingOut) {
+				axl.zoomOut();
+			}
+        }
+	}
+	public override void axlGetAltProjectile(
+		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
+		IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
+	) {
+		if (!player.ownedByLocalPlayer) return;
+		if (player.character == null) return;
+		if (player.character is not Axl axl) return;
+		Point? bulletDir = Point.createFromAngle(angle);
+		if (axl.loadout.spiralMagnumAlt == 0) {
+			axl.sniperMissileProj = new SniperMissileProj(weapon, bulletPos, player, bulletDir.Value, netId, rpc: true);
+			RPC.playSound.sendRpc(shootSounds[3], axl.netId);
+			return;
+		}
+	}
 
 	public override void axlGetProjectile(
 		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
@@ -43,15 +72,8 @@ public class SpiralMagnum : AxlWeapon {
 		Point? bulletDir = Point.createFromAngle(angle);
 		Projectile? bullet = null;
 		Point? origPos = bulletPos;
-
-		if (chargeLevel == 3 && altFire == 0) {
-			axl.sniperMissileProj = new SniperMissileProj(weapon, bulletPos, player, bulletDir.Value, netId, rpc: true);
-			RPC.playSound.sendRpc(shootSounds[3], axl.netId);
-			return;
-		}
-
 		Point shellPos = bulletPos.add(axl.getAxlBulletDir().times(-20));
-		var spiralMagnumShell = new SpiralMagnumShell(shellPos, -axl.xDir, player.getNextActorNetId(), sendRpc: true);
+		new SpiralMagnumShell(shellPos, -axl.xDir, player.getNextActorNetId(), sendRpc: true);
 
 		if (axl.isZooming() == false) {
 			bullet = new SpiralMagnumProj(weapon, bulletPos, 0, 0, player, bulletDir.Value, target, headshotTarget, netId);

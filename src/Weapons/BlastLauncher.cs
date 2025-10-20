@@ -34,6 +34,26 @@ public class BlastLauncher : AxlWeapon {
 	public override float whiteAxlAmmoMod() {
 		return 1f;
 	}
+	public override void axlAltShoot(Character character, int[] args) {
+		if (character is not Axl axl) return;
+		if (axl.loadout.blastLauncherAlt == 0) {
+			if (shootCooldown > 0) return;
+		} else return;
+		base.axlAltShoot(character, args);
+	}
+
+	public override void axlGetAltProjectile(
+		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
+		IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
+	) {
+		if (player.character is not Axl axl) return;
+		Point bulletDir = Point.createFromAngle(angle);
+		Projectile grenade;
+		grenade = new GreenSpinnerProj(weapon, bulletPos, xDir, player, bulletDir, target, netId);
+		if (player.ownedByLocalPlayer) {
+			RPC.axlShoot.sendRpc(player.id, grenade.projId, netId, bulletPos, xDir, angle);
+		}
+	}
 
 	public override void axlGetProjectile(
 		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
@@ -41,17 +61,12 @@ public class BlastLauncher : AxlWeapon {
 	) {
 		Point bulletDir = Point.createFromAngle(angle);
 		Projectile grenade;
-		if (chargeLevel < 3) {
-			grenade = new GrenadeProj(weapon, bulletPos, xDir, player, bulletDir, target, cursorPos, chargeLevel, netId);
-			player.grenades.Add(grenade as GrenadeProj);
-			if (player.grenades.Count > 8) {
-				player.grenades[0].destroySelf();
-				player.grenades.RemoveAt(0);
-			}
-		} else {
-			grenade = new GreenSpinnerProj(weapon, bulletPos, xDir, player, bulletDir, target, netId);
+		grenade = new GrenadeProj(weapon, bulletPos, xDir, player, bulletDir, target, cursorPos, 0, netId);
+		player.grenades.Add(grenade as GrenadeProj);
+		if (player.grenades.Count > 8) {
+			player.grenades[0].destroySelf();
+			player.grenades.RemoveAt(0);
 		}
-
 		if (player.ownedByLocalPlayer) {
 			RPC.axlShoot.sendRpc(player.id, grenade.projId, netId, bulletPos, xDir, angle);
 		}

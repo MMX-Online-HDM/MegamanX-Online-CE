@@ -162,40 +162,37 @@ public class DNACore : AxlWeapon {
 		sprite = "axl_arm_pistol";
 	}
 
-	public override void axlShoot(
-		Player player, AxlBulletType axlBulletType = AxlBulletType.Normal,
-		int? overrideChargeLevel = null
-	) {
-		if (!player.ownedByLocalPlayer || player.character is not Axl axl) {
+	public override void axlShoot(Character character, int[] args) {
+		if (!character.ownedByLocalPlayer || character is not Axl axl) {
 			return;
 		}
 		bool oldATrans = Global.level.server?.customMatchSettings?.oldATrans == true;
 
 		if (axl.flag != null) {
-			Global.level.gameMode.setHUDErrorMessage(player, "Cannot transform with flag");
+			Global.level.gameMode.setHUDErrorMessage(character.player, "Cannot transform with flag");
 			return;
 		}
 		if (!oldATrans && (!Global.level.isHyperMatch() && (axl.isWhiteAxl() || axl.isStealthMode()))) {
-			Global.level.gameMode.setHUDErrorMessage(player, "Cannot transform as Hyper Axl");
+			Global.level.gameMode.setHUDErrorMessage(character.player, "Cannot transform as Hyper Axl");
 			return;
 		}
 		if (oldATrans || !usedOnce) {
-			if (player.currency < 1) {
-				Global.level.gameMode.setHUDErrorMessage(player, "Transformation requires 1 Metal");
+			if (character.currency < 1) {
+				Global.level.gameMode.setHUDErrorMessage(character.player, "Transformation requires 1 Metal");
 				return;
 			}
-			player.currency--;
+			character.currency--;
 		}
 
-		player.lastDNACore = this;
-		player.lastDNACoreIndex = axl.weaponSlot;
-		player.savedDNACoreWeapons.Remove(this);
+		character.player.lastDNACore = this;
+		character.player.lastDNACoreIndex = axl.weaponSlot;
+		character.player.savedDNACoreWeapons.Remove(this);
 		if (oldATrans) {
-			axl.weapons.RemoveAt(player.weaponSlot);
+			axl.weapons.RemoveAt(character.player.weaponSlot);
 		}
-		player.preTransformedChar = player.character;
-		player.startAtransMain(this, player.getNextATransNetId());
-		player.character.playSound("transform", sendRpc: true);
-		player.character.undisguiseTime = 6;
+		character.player.preTransformedChar = character.player.character;
+		character.player.startAtransMain(this, character.player.getNextATransNetId());
+		character.player.character.playSound("transform", sendRpc: true);
+		character.player.character.undisguiseTime = 6;
 	}
 }

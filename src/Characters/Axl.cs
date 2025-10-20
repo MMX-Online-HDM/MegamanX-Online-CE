@@ -13,7 +13,6 @@ public class RaycastHitData {
 }
 
 public class Axl : Character {
-	public float stingChargeTime;
 	public int lastXDir;
 	public float shootTime {
 		get { return currentWeapon?.shootCooldown ?? 0; }
@@ -23,16 +22,9 @@ public class Axl : Character {
 	public IDamagable? axlCursorTarget = null;
 	public Character? axlHeadshotTarget = null;
 	public Anim muzzleFlash;
-	public float recoilTime;
-	public float axlSwapTime;
-	public float axlAltSwapTime;
-	public float switchTime;
-	public float altSwitchTime;
 	public float netArmAngle;
 	float targetSoundCooldown;
 	public Point nonOwnerAxlBulletPos;
-	public float stealthRevealTime;
-
 	public bool aimBackwardsToggle;
 	public bool positionLockToggle;
 	public bool cursorLockToggle;
@@ -41,41 +33,22 @@ public class Axl : Character {
 		positionLockToggle = false;
 		cursorLockToggle = false;
 	}
-
+	// Zoom Stuff
 	public bool isNonOwnerZoom;
 	public Point nonOwnerScopeStartPos;
 	public Point nonOwnerScopeEndPos;
 	public Point? netNonOwnerScopeEndPos;
-	private bool _zoom;
+	public bool _zoom;
 	public bool isZoomingIn;
 	public bool isZoomingOut;
 	public bool isZoomOutPhase1Done;
 	public float zoomCharge;
 	public float savedCamX;
 	public float savedCamY;
-	public bool hyperAxlStillZoomed;
-
-	public float revTime;
-	public float revIndex;
 	public bool aimingBackwards;
-	public LoopingSound? iceGattlingLoop;
-	public bool isRevving;
 	public bool isNonOwnerRev;
-	public SniperMissileProj? sniperMissileProj;
 	public AxlLoadout loadout;
-	public LoopingSound iceGattlingSound;
-	public float whiteAxlTime;
-	public float dodgeRollCooldown;
-	public const float maxDodgeRollCooldown = 1.5f;
-	public bool hyperAxlUsed;
-	public bool hyperAxlFix;
-	//public ShaderWrapper axlPaletteShader;
-	public float maxHyperAxlTime = 30;
 	public List<int> ammoUsages = new List<int>();
-
-	public RayGunAltProj? rayGunAltProj;
-	public GaeaShieldProj? gaeaShield;
-
 	// Cursor stuff.
 	public Point axlCursorPos;
 	public Point? assassinCursorPos;
@@ -92,24 +65,57 @@ public class Axl : Character {
 			return axlScopeCursorWorldPos;
 		}
 	}
-	public AxlWeapon? axlWeapon => currentWeapon as AxlWeapon;
-
-	// Used to be 0.5, 100
-	public const float maxStealthRevealTime = 0.5f;
-	// The ping divided by this number indicates stealth reveal time in online
-	public const float stealthRevealPingDenom = 100;
-
-	public PlasmaGunAltProj? plasmaGunAltProj;
-
 	public bool shouldDrawArmNet;
+	//Dodge Roll
+	public float dodgeRollCooldown;
+	public const float maxDodgeRollCooldown = 90;
+	// Hypermode
+	public const float maxStealthRevealTime = 0.5f;
+	// Used to be 0.5, 100
+	public const float stealthRevealPingDenom = 100;
+	// The ping divided by this number indicates stealth reveal time in online
+	public float stealthRevealTime;
+	public float stingChargeTime;
 	public bool stealthActive;
-
+	public float whiteAxlTime;
+	public float maxHyperAxlTime = 30;
+	public bool hyperAxlUsed;
+	public bool hyperAxlFix;
 	public int axlHyperMode;
-	bool whiteAxlLoadout => axlHyperMode == 0;
-	bool jumpPressed => player.input.isPressed(Control.Jump, player);
-	bool dashPressed => player.input.isPressed(Control.Dash, player);
-	bool commandHeld => player.input.isHeld(Control.Special2, player);
-
+	public bool whiteAxlLoadout => axlHyperMode == 0;
+	public bool hyperAxlStillZoomed;
+	// Input
+	public bool jumpPressed => player.input.isPressed(Control.Jump, player);
+	public bool dashPressed => player.input.isPressed(Control.Dash, player);
+	public bool commandHeld => player.input.isHeld(Control.Special2, player);
+	public bool shootPressed => player.input.isPressed(Control.Shoot, player) || Input.isMousePressed(Mouse.Button.Left, player.canControl);
+	public bool shootHeld => player.input.isHeld(Control.Shoot, player) || Input.isMouseHeld(Mouse.Button.Left, player.canControl);
+	public bool altShootPressed => player.input.isPressed(Control.Special1, player) || Input.isMousePressed(Mouse.Button.Right, player.canControl);
+	public bool altShootHeld => player.input.isHeld(Control.Special1, player) || Input.isMouseHeld(Mouse.Button.Right, player.canControl);
+	public bool bothHeld => shootHeld && altShootHeld;
+	public bool altShootRecentlyPressed;
+	public float lastAltShootPressedTime;
+	// Axl Weapon
+	public AxlWeapon? axlWeapon => currentWeapon as AxlWeapon;
+	public bool isAxlBulletsType => axlWeapon?.isAxlBullets == true;
+	public bool isCMBulletsType => axlWeapon?.isCMWeapons == true;
+	public SniperMissileProj? sniperMissileProj;
+	public PlasmaGunAltProj? plasmaGunAltProj;
+	public IceGattling? iceGattling = new(0);
+	public RayGunAltProj? rayGunAltProj;
+	public GaeaShieldProj? gaeaShield;
+	public LoopingSound iceGattlingSound;
+	public bool isRevving;
+	public float revTime;
+	public float revIndex;
+	public float voltTornadoTime;
+	public bool altRayGunHeld;
+	public bool altPlasmaGunHeld;
+	public bool gaeaHeld;
+	public float switchTime;
+	public float altSwitchTime;
+	public float recoilTime;
+	// Backwards Debuff
 	public float[] rshootDebuffTime = [0, 0, 0];
 	public float[] rshootDebuffAmmount = [0, 0, 0];
 
@@ -131,7 +137,6 @@ public class Axl : Character {
 			visible = false
 		};
 		axlHyperMode = loadout.hyperMode;
-
 		configureWeapons(loadout);
 		altSoundId = AltSoundIds.X3;
 	}
@@ -300,47 +305,11 @@ public class Axl : Character {
 		return !(charState is InRideArmor) && !(charState is Die) && !(charState is GenericStun);
 	}
 
-	float lastAltShootPressedTime;
-	float voltTornadoTime;
-
-
 	public override void preUpdate() {
-		lastXDir = xDir;
 		base.preUpdate();
-
-		if (!ownedByLocalPlayer) {
-			return;
-		}
-		for (int i = 0; i < rshootDebuffTime.Length; i++) {
-			if (rshootDebuffTime[i] > 0) {
-				rshootDebuffTime[i] -= speedMul;
-				if (rshootDebuffTime[i] <= 0) {
-					rshootDebuffTime[i] = 0;
-					rshootDebuffAmmount[i] = 0;
-				}
-			}
-		}
-	}
-
-	public override void update() {
-		base.update();
-
-		if (whiteAxlTime > 0) {
-			whiteAxlTime -= Global.spf;
-			if (whiteAxlTime < 0) {
-				whiteAxlTime = 0;
-				if (ownedByLocalPlayer) {
-					weapons[0] = new AxlBullet();
-				}
-			}
-		}
-
-		if (stealthActive) {
-			addRenderEffect(RenderEffectType.StealthModeBlue);
-		} else {
-			removeRenderEffect(RenderEffectType.StealthModeBlue);
-		}
-
+		lastXDir = xDir;
+		if (stealthActive) addRenderEffect(RenderEffectType.StealthModeBlue);
+		else removeRenderEffect(RenderEffectType.StealthModeBlue);
 		// Cutoff point for things not controlled by the local player.
 		if (!ownedByLocalPlayer) {
 			if (isNonOwnerRev) {
@@ -367,65 +336,30 @@ public class Axl : Character {
 			return;
 		}
 
-		if (linkedRideArmor != null &&
-			player.input.isHeld(Control.Down, player) &&
-			player.input.isHeld(Control.Special2, player) &&
-			linkedRideArmor.rideArmorState is not RACalldown
-		) {
-			linkedRideArmor.changeState(new RACalldown(pos, false), true);
-			linkedRideArmor.xDir = xDir;
-		}
-
-		if (stingChargeTime > 0) {
-			stingChargeTime -= Global.spf;
-
-			if (stingChargeTime <= 0) {
-				player.delaySubtank();
-				enterCombat();
-				stingChargeTime = 0;
+		for (int i = 0; i < rshootDebuffTime.Length; i++) {
+			if (rshootDebuffTime[i] > 0) {
+				rshootDebuffTime[i] -= speedMul;
+				if (rshootDebuffTime[i] <= 0) {
+					rshootDebuffTime[i] = 0;
+					rshootDebuffAmmount[i] = 0;
+				}
 			}
 		}
 
-		isRevving = false;
-		bool altRayGunHeld = false;
-		bool altPlasmaGunHeld = false;
-		bool gaeaHeld = false;
+		//Reload Axl Bullets
+		if (isAxlBulletsType)  axlWeapon?.rechargeAxlBulletAmmo(player, this, shootHeld, 1);
+        //customSettingReloadWeapon();
 
-		if (isStealthMode()) {
-			updateStealthMode();
-			stealthActive = true;
-		} else {
-			stealthActive = false;
-		}
-
-		if (isZooming() && deltaPos.magnitude > 1) {
-			zoomOut();
-		}
-
-		if (isZooming() && !isZoomingIn && !isZoomingOut) {
-			zoomCharge += Global.spf * 0.5f;
-			if (isWhiteAxl()) zoomCharge = 1;
-			if (zoomCharge > 1) zoomCharge = 1;
-		}
-		if (assassinTime > 0) {
-			stopMovingS();
-			useGravity = false;
-			Helpers.decrementFrames(ref assassinTime);
-			if (assassinTime <= 0) {
-				useGravity = true;
-				return;
-			}
-		}
-		if (targetSoundCooldown > 0) targetSoundCooldown += Global.spf;
-		if (targetSoundCooldown >= 1) targetSoundCooldown = 0;
-		Helpers.decrementTime(ref dodgeRollCooldown);
-		Helpers.decrementTime(ref axlSwapTime);
-		Helpers.decrementTime(ref axlAltSwapTime);
-		Helpers.decrementTime(ref switchTime);
-		Helpers.decrementTime(ref altSwitchTime);
-		Helpers.decrementTime(ref revTime);
+		Helpers.decrementFrames(ref dodgeRollCooldown);
+		Helpers.decrementFrames(ref switchTime);
+		Helpers.decrementFrames(ref altSwitchTime);
 		Helpers.decrementTime(ref voltTornadoTime);
 		Helpers.decrementTime(ref stealthRevealTime);
+		Helpers.decrementTime(ref recoilTime);
+		Helpers.decrementTime(ref whiteAxlTime);
+		if (!shootHeld || axlWeapon is not IceGattling) {
+			Helpers.decrementTime(ref revTime);
+		}
 
 		if (currentWeapon != null && currentWeapon.ammo >= currentWeapon.maxAmmo) {
 			weaponHealAmount = 0;
@@ -440,367 +374,88 @@ public class Axl : Character {
 			}
 		}
 
-		player.changeWeaponControls();
-		updateAxlAim();
+		if (stingChargeTime > 0) {
+			stingChargeTime -= Global.spf;
+			if (stingChargeTime <= 0) {
+				player.delaySubtank();
+				enterCombat();
+				stingChargeTime = 0;
+			}
+		}
+
+		if (assassinTime > 0) {
+			stopMovingS();
+			useGravity = false;
+			Helpers.decrementFrames(ref assassinTime);
+			if (assassinTime <= 0) {
+				useGravity = true;
+				return;
+			}
+		}
+
+		if (isZooming() && !isZoomingIn && !isZoomingOut) {
+			zoomCharge += Global.spf * 0.5f;
+			if (isWhiteAxl()) zoomCharge = 1;
+			if (zoomCharge > 1) zoomCharge = 1;
+		}
+		if (isStealthMode()) {
+			updateStealthMode();
+			stealthActive = true;
+		} else {
+			stealthActive = false;
+		}
+
+		if (targetSoundCooldown > 0) targetSoundCooldown += Global.spf;
+		if (targetSoundCooldown >= 1) targetSoundCooldown = 0;
+
+		if (altShootPressed) lastAltShootPressedTime = Global.time;
+		else altShootRecentlyPressed = Global.time - lastAltShootPressedTime < 0.1f;
+
+	}
+
+	public override void update() {
+		base.update();
+
+		if (stealthActive) addRenderEffect(RenderEffectType.StealthModeBlue);
+		else removeRenderEffect(RenderEffectType.StealthModeBlue);
+
+		// Cutoff point for things not controlled by the local player.
+		if (!ownedByLocalPlayer) return;
+
+		if (linkedRideArmor != null &&
+			player.input.isHeld(Control.Down, player) &&
+			player.input.isHeld(Control.Special2, player) &&
+			linkedRideArmor.rideArmorState is not RACalldown
+		) {
+			linkedRideArmor.changeState(new RACalldown(pos, false), true);
+			linkedRideArmor.xDir = xDir;
+		}
+
+		if (isZooming() && deltaPos.magnitude > 1) zoomOut();
 
 		sprite.reversed = false;
 		if (axlWeapon != null && (axlWeapon.isTwoHanded(false) || isZooming()) && canChangeDir() && charState is not WallSlide) {
 			int newXDir = (pos.x > axlGenericCursorWorldPos.x ? -1 : 1);
-			if (charState is Run && xDir != newXDir) {
-				sprite.reversed = true;
-			}
+			if (charState is Run && xDir != newXDir) sprite.reversed = true;
 			xDir = newXDir;
 		}
 
-		var axlBullet = weapons.FirstOrDefault(w => w is AxlBullet) as AxlBullet;
-
-		bool shootPressed = player.input.isPressed(Control.Shoot, player);
-		bool shootHeld = player.input.isHeld(Control.Shoot, player);
-		bool altShootPressed = player.input.isPressed(Control.Special1, player);
-		bool altShootHeld = player.input.isHeld(Control.Special1, player);
-		bool altShootRecentlyPressed = false;
-
-		if (!player.isAI) {
-			shootPressed = shootPressed || Input.isMousePressed(Mouse.Button.Left, player.canControl);
-			shootHeld = shootHeld || Input.isMouseHeld(Mouse.Button.Left, player.canControl);
-			altShootPressed = altShootPressed || Input.isMousePressed(Mouse.Button.Right, player.canControl);
-			altShootHeld = altShootHeld || Input.isMouseHeld(Mouse.Button.Right, player.canControl);
-		}
-
-		if (altShootPressed) {
-			lastAltShootPressedTime = Global.time;
-		} else {
-			altShootRecentlyPressed = Global.time - lastAltShootPressedTime < 0.1f;
-		}
-
-		if (isInvulnerableAttack() || isWarpIn()) {
-			if (charState is not DodgeRoll) {
-				shootPressed = false;
-				shootHeld = false;
-				altShootPressed = false;
-				altShootHeld = false;
-				altShootRecentlyPressed = false;
-			}
-		}
-
-		if (axlSwapTime > 0) {
-			shootPressed = false;
-			shootHeld = false;
-		}
-		if (axlAltSwapTime > 0) {
-			altShootPressed = false;
-			altShootHeld = false;
-			altShootRecentlyPressed = false;
-		}
 		if (currentWeapon is DoubleBullet && Global.level.isHyperMatch() && player.axlBulletTypeAmmo[4] < 99) {
 			player.axlBulletTypeAmmo[4] += 1;
 		}
-		bool bothHeld = shootHeld && altShootHeld;
 
-		if (currentWeapon is AxlBullet || currentWeapon is DoubleBullet ||
-			currentWeapon is MettaurCrash || currentWeapon is BeastKiller || currentWeapon is MachineBullets ||
-			currentWeapon is RevolverBarrel || currentWeapon is AncientGun) {
-			(currentWeapon as AxlWeapon)?.rechargeAxlBulletAmmo(player, this, shootHeld, 1);
-		} else {
-			foreach (var weapon in weapons) {
-				if (weapon is AxlBullet || weapon is DoubleBullet ||
-					weapon is MettaurCrash || weapon is BeastKiller || weapon is MachineBullets ||
-					weapon is RevolverBarrel || weapon is AncientGun) {
-					(weapon as AxlWeapon)?.rechargeAxlBulletAmmo(player, this, shootHeld, 2);
-				}
-			}
-		}
-		customSettingReloadWeapon();
 		if (weapons.Count > 0 && weapons[0].type > 0) {
 			player.axlBulletTypeLastAmmo[weapons[0].type] = weapons[0].ammo;
 		}
-
-		if (currentWeapon is not AssassinBulletChar) {
-			if (altShootHeld && !bothHeld && (currentWeapon is AxlBullet || currentWeapon is DoubleBullet ||
-			currentWeapon is MettaurCrash || currentWeapon is BeastKiller || currentWeapon is MachineBullets ||
-			currentWeapon is RevolverBarrel || currentWeapon is AncientGun) && invulnTime == 0 && flag == null) {
-				increaseCharge();
-			} else if (isCharging()) {
-				if (currentWeapon is AxlBullet || currentWeapon is DoubleBullet ||
-					currentWeapon is MettaurCrash || currentWeapon is BeastKiller || currentWeapon is MachineBullets ||
-					currentWeapon is RevolverBarrel || currentWeapon is AncientGun) {
-					recoilTime = 0.2f;
-					if (!isWhiteAxl()) {
-						axlWeapon?.axlShoot(player, AxlBulletType.AltFire);
-						if (axlWeapon != null) {
-							afterAxlShoot(axlWeapon);
-						}
-					} else {
-						axlWeapon?.axlShoot(player, AxlBulletType.WhiteAxlCopyShot2);
-						if (axlWeapon != null) {
-							afterAxlShoot(axlWeapon);
-						}
-					}
-				}
-				stopCharge();
-				if (shootHeld) {
-					increaseCharge();
-				} else {
-					if (isCharging()) {
-						shootAssassinShot();
-					}
-					stopCharge();
-				}
-			}
-		}
-		chargeGfx();
-		bool weCanShoot = (undisguiseTime == 0 && assassinTime == 0);
-		if (weCanShoot) {
-			// Axl bullet
-			if (!isCharging() && axlWeapon != null) {
-				if (currentWeapon is AxlBullet && canShoot() && !currentWeapon.noAmmo()) {
-					if (shootHeld && shootTime == 0 && currentWeapon.altShotCooldown == 0) {
-						recoilTime = 0.2f;
-						axlWeapon.axlShoot(player);
-						afterAxlShoot(axlWeapon);
-					} else if ((altShootPressed || altShootRecentlyPressed) && shootTime == 0 && currentWeapon.altShotCooldown == 0 && currentWeapon.ammo >= 4) {
-						recoilTime = 0.2f;
-						axlWeapon.axlShoot(player, AxlBulletType.AltFire);
-						afterAxlShoot(axlWeapon);
-					}
-				}
-				switch (currentWeapon) {
-					case MettaurCrash:
-					case BeastKiller:
-					case MachineBullets:
-					case RevolverBarrel:
-					case AncientGun:
-						if (canShoot() && !currentWeapon.noAmmo()) {
-							if (shootHeld && shootTime == 0 && currentWeapon.altShotCooldown == 0) {
-								recoilTime = 0.2f;
-								axlWeapon.axlShoot(player);
-								afterAxlShoot(axlWeapon);
-							} else if ((altShootPressed || altShootRecentlyPressed) && shootTime == 0 && currentWeapon.altShotCooldown == 0 && currentWeapon.ammo >= 4) {
-								recoilTime = 0.2f;
-								axlWeapon.axlShoot(player, AxlBulletType.AltFire);
-								afterAxlShoot(axlWeapon);
-							}
-						}
-						break;
-				}
-				// Double bullet
-				if (currentWeapon is DoubleBullet && canShoot() && !currentWeapon.noAmmo()) {
-					if (shootHeld && shootTime == 0) {
-						recoilTime = 0.2f;
-						axlWeapon.axlShoot(player);
-						afterAxlShoot(axlWeapon);
-						if (bothHeld) axlWeapon.shootCooldown *= 2f;
-					}
-					if (bothHeld && currentWeapon.altShotCooldown == 0) {
-						recoilTime = 0.2f;
-						axlWeapon.axlShoot(player, AxlBulletType.AltFire);
-						afterAxlShoot(axlWeapon);
-						if (bothHeld) axlWeapon.altShotCooldown *= 2f;
-					} else if ((altShootPressed || altShootRecentlyPressed) && shootTime == 0 && currentWeapon.altShotCooldown == 0 && currentWeapon.ammo >= 4) {
-						recoilTime = 0.2f;
-						axlWeapon.axlShoot(player, AxlBulletType.AltFire);
-						afterAxlShoot(axlWeapon);
-					}
-				}
-
-				if (currentWeapon is BlastLauncher && canShoot()) {
-					if (shootHeld && shootTime == 0 && currentWeapon.ammo >= 1) {
-						recoilTime = 0.2f;
-						axlWeapon.axlShoot(player);
-						afterAxlShoot(axlWeapon);
-					}
-
-					if (loadout.blastLauncherAlt == 0) {
-						if (altShootPressed && shootTime == 0 && currentWeapon.altShotCooldown == 0 && currentWeapon.ammo >= 1) {
-							recoilTime = 0.2f;
-							axlWeapon.axlShoot(player, AxlBulletType.AltFire);
-							afterAxlShoot(axlWeapon);
-						}
-					} else {
-						if (altShootPressed && player.grenades.Count > 0) {
-							foreach (var grenade in player.grenades) {
-								grenade.detonate();
-							}
-							player.grenades.Clear();
-						}
-					}
-				}
-
-				if (currentWeapon is RayGun && canShoot() && !currentWeapon.noAmmo()) {
-					if (shootHeld && shootTime == 0) {
-						recoilTime = 0.2f;
-						axlWeapon.axlShoot(player);
-						afterAxlShoot(axlWeapon);
-					} else if (altShootHeld) {
-						if (shootTime == 0) {
-							recoilTime = 0.2f;
-							axlWeapon.axlShoot(player, AxlBulletType.AltFire);
-							afterAxlShoot(axlWeapon);
-						}
-						altRayGunHeld = axlWeapon.ammo > 0;
-
-						if (loadout.rayGunAlt == 0) {
-							Point bulletDir = getAxlBulletDir();
-							float whiteAxlMod = isWhiteAxl() ? 2 : 1;
-							// Because GM19 collision is flawed to the core we apply X then Y.
-							moveXY(-bulletDir.x, 0);
-							moveXY(0, -bulletDir.y);
-						}
-					}
-				}
-
-				if (currentWeapon is BlackArrow && canShoot() && !currentWeapon.noAmmo()) {
-					if (shootHeld && shootTime == 0) {
-						recoilTime = 0.2f;
-						axlWeapon.axlShoot(player);
-						afterAxlShoot(axlWeapon);
-					} else if (altShootHeld && shootTime == 0 && currentWeapon.altShotCooldown == 0) {
-						recoilTime = 0.2f;
-						axlWeapon.axlShoot(player, AxlBulletType.AltFire);
-						afterAxlShoot(axlWeapon);
-					}
-				}
-
-				if (currentWeapon is SpiralMagnum && canShoot()) {
-					if (shootHeld && shootTime == 0) {
-						if (!currentWeapon.noAmmo()) {
-							recoilTime = 0.2f;
-							axlWeapon.axlShoot(player);
-							afterAxlShoot(axlWeapon);
-						}
-					} else {
-						if (loadout.spiralMagnumAlt == 0) {
-							if (altShootPressed && axlWeapon.ammo > 0 && shootTime == 0 && currentWeapon.altShotCooldown == 0) {
-								recoilTime = 0.2f;
-								axlWeapon.axlShoot(player, AxlBulletType.AltFire);
-								afterAxlShoot(axlWeapon);
-							}
-						} else {
-							if (altShootPressed && (charState is Idle || charState is Crouch)) {
-								if (!_zoom) {
-									zoomIn();
-								} else if (!isZoomingIn && !isZoomingOut) {
-									zoomOut();
-								}
-							}
-						}
-					}
-				}
-
-				if (currentWeapon is BoundBlaster && canShoot() && !currentWeapon.noAmmo()) {
-					if (shootHeld && shootTime == 0) {
-						recoilTime = 0.2f;
-						axlWeapon.axlShoot(player);
-						afterAxlShoot(axlWeapon);
-					} else if (altShootHeld && shootTime == 0 && currentWeapon.altShotCooldown == 0) {
-						recoilTime = 0.2f;
-						axlWeapon.axlShoot(player, AxlBulletType.AltFire);
-						afterAxlShoot(axlWeapon);
-					}
-				}
-
-				if (currentWeapon is PlasmaGun && canShoot() && !currentWeapon.noAmmo()) {
-					if (shootHeld && shootTime == 0) {
-						recoilTime = 0.2f;
-						axlWeapon.altShotCooldown = axlWeapon.altFireCooldown;
-						axlWeapon.axlShoot(player);
-						afterAxlShoot(axlWeapon);
-					} else if (altShootHeld) {
-						if (loadout.plasmaGunAlt == 0) {
-							if (axlWeapon.altShotCooldown == 0 && grounded) {
-								recoilTime = 0.2f;
-								voltTornadoTime = 0.2f;
-								axlWeapon.axlShoot(player, AxlBulletType.AltFire);
-								afterAxlShoot(axlWeapon);
-							}
-						} else {
-							if (axlWeapon.altShotCooldown == 0) {
-								recoilTime = 0.2f;
-								axlWeapon.axlShoot(player, AxlBulletType.AltFire);
-								afterAxlShoot(axlWeapon);
-							}
-							altPlasmaGunHeld = axlWeapon.ammo > 0;
-						}
-					}
-				}
-
-				if (currentWeapon is IceGattling && canShoot() && currentWeapon.ammo > 0) {
-					if (altShootPressed && loadout.iceGattlingAlt == 0 && gaeaShield == null) {
-						recoilTime = 0.2f;
-						axlWeapon.axlShoot(player, AxlBulletType.AltFire);
-						afterAxlShoot(axlWeapon);
-					}
-					gaeaHeld = true;
-					bool isAltRev = (altShootHeld && loadout.iceGattlingAlt == 1);
-					if (shootHeld || isAltRev) {
-						isRevving = true;
-						revTime += Global.spf * 2 * (isWhiteAxl() ? 10 : (isAltRev ? 2 : 1));
-						if (revTime > 1) {
-							revTime = 1;
-						}
-					}
-
-					if (shootHeld && shootTime == 0 && revTime >= 1) {
-						recoilTime = 0.2f;
-						axlWeapon.axlShoot(player);
-						afterAxlShoot(axlWeapon);
-					}
-				}
-
-				if (currentWeapon is FlameBurner && canShoot() && currentWeapon.ammo > 0) {
-					if (shootHeld && shootTime == 0) {
-						recoilTime = 0.05f;
-						axlWeapon.axlShoot(player);
-						afterAxlShoot(axlWeapon);
-					}
-
-					if (loadout.flameBurnerAlt == 0) {
-						if (altShootHeld && shootTime == 0 && currentWeapon.altShotCooldown == 0) {
-							recoilTime = 0.2f;
-							axlWeapon.axlShoot(player, AxlBulletType.AltFire);
-							axlWeapon.shootCooldown = 30;
-							afterAxlShoot(axlWeapon);
-						}
-					} else {
-						if (altShootHeld) {
-							if (shootTime == 0 && currentWeapon.altShotCooldown == 0) {
-								recoilTime = 0.2f;
-								axlWeapon.axlShoot(player, AxlBulletType.AltFire);
-								afterAxlShoot(axlWeapon);
-							}
-						}
-					}
-				}
-
-				// DNA Core
-				if (currentWeapon is DNACore && canShoot()) {
-					if (currentWeapon is AxlWeapon realWeapon) {
-						if (shootPressed && shootTime == 0) {
-							realWeapon.axlShoot(player);
-						}
-					}
-				}
-			}
-		}
-
-		Helpers.decrementTime(ref recoilTime);
-
-		if (!isRevving && !iceGattlingSound.destroyed) {
-			iceGattlingSound.stopRev(revTime);
-		} else {
-			iceGattlingSound.play();
-		}
+		
+		if (!isRevving && !iceGattlingSound.destroyed) iceGattlingSound.stopRev(revTime);
+		else iceGattlingSound.play();
 
 		if (axlWeapon is IceGattling) {
-			if (isRevving) {
-				RPC.playerToggle.sendRpc(player.id, RPCToggleType.StartRev);
-			} else {
-				RPC.playerToggle.sendRpc(player.id, RPCToggleType.StopRev);
-			}
+			if (isRevving) RPC.playerToggle.sendRpc(player.id, RPCToggleType.StartRev);
+			else RPC.playerToggle.sendRpc(player.id, RPCToggleType.StopRev);
 		} else {
-			if (revTime > 0) {
-				RPC.playerToggle.sendRpc(player.id, RPCToggleType.StopRev);
-			}
+			if (revTime > 0) RPC.playerToggle.sendRpc(player.id, RPCToggleType.StopRev);
 		}
 
 		if (!altRayGunHeld) {
@@ -808,14 +463,46 @@ public class Axl : Character {
 			rayGunAltProj = null;
 		}
 
+		if (!altShootHeld && plasmaGunAltProj != null || !canShoot()) {
+            plasmaGunAltProj?.destroySelf();
+			plasmaGunAltProj = null;
+        }
 		if (!altPlasmaGunHeld) {
 			plasmaGunAltProj?.destroySelf();
 			plasmaGunAltProj = null;
 		}
+
 		if (!gaeaHeld) {
 			gaeaShield?.destroySelf();
 			gaeaShield = null;
 		}
+		if (altShootPressed && loadout.blastLauncherAlt == 1) {
+			foreach (var grenade in player.grenades) grenade.detonate();
+			player.grenades.Clear();
+		}
+
+		iceGattling?.shootLogic(this);
+		chargeLogic(shoot);
+
+		bool isCustomShoot = currentWeapon is IceGattling;
+		if (axlWeapon != null && canShoot() && !isCharging() && !isCustomShoot) {
+			if (shootHeld) {
+				axlWeapon.axlShoot(this, [getChargeLevel()]);
+			} else if ((isAxlBulletsType && altShootPressed) || (altShootHeld && !isAxlBulletsType)) {
+				axlWeapon.axlAltShoot(this, [getChargeLevel()]);
+			}
+		}
+
+		player.changeWeaponControls();
+		updateAxlAim();
+	}
+	public void shoot(int chargeLevel) {
+		shoot(chargeLevel, axlWeapon);
+	}
+	public void shoot(int chargeLevel, AxlWeapon? axlWeapon) {
+		if (isAxlBulletsType) {
+            axlWeapon?.axlAltShoot(this, [chargeLevel]);
+        }
 	}
 
 	public override bool normalCtrl() {
@@ -1852,32 +1539,56 @@ public class Axl : Character {
 	}
 
 	public override bool canShoot() {
-		if (sniperMissileProj != null) { return false; }
+		if (sniperMissileProj != null) return false;
 		if (invulnTime > 0) return false;
+		if (undisguiseTime > 0) return false;
+		if (assassinTime > 0) return false;
+		if (currentWeapon?.noAmmo() == true) return false;
+		if (switchTime > 0 || altSwitchTime > 0) return false;
 		return base.canShoot();
 	}
 
-	public override bool isToughGuyHyperMode() {
-		if (isWhiteAxl()) { return true; }
+	public override bool canCharge() {
+		if (invulnTime > 0) return false;
+		if (flag != null) return false;
+		if (isWarpIn()) return false;
+		if (isInvulnerableAttack()) return false;
+		if (bothHeld) return false;
+		return charState is not Die;
+	}
+	public override void onWeaponChange(Weapon oldWeapon, Weapon newWeapon) {
+		if (switchTime > 0 || altSwitchTime > 0) return;
+		if (oldWeapon.shootCooldown > 0 || oldWeapon.altShotCooldown > 0) {
+			switchTime = 18 - oldWeapon.shootCooldown;
+			altSwitchTime = 18;
+		}
+		if (oldWeapon.shootCooldown > 15 || oldWeapon.altShotCooldown > 15) {
+			switchTime = 36;
+			altSwitchTime = 36;
+		}
+		if (isZooming()) zoomOut();	
+		plasmaGunAltProj?.destroySelf();
+		plasmaGunAltProj = null;
+		gaeaShield?.destroySelf();
+		gaeaShield = null;
+	}
+	public override bool chargeButtonHeld() {
+		return altShootHeld && isAxlBulletsType;
+	}
 
-		return base.isToughGuyHyperMode();
+	public override bool isToughGuyHyperMode() {
+		return isWhiteAxl();
 	}
 
 	public override Point getCamCenterPos(bool ignoreZoom = false) {
-		if (sniperMissileProj != null) {
-			return sniperMissileProj.getCenterPos();
-		}
-		if (isZooming() && !ignoreZoom) {
-			return axlScopeCursorWorldPos;
-		}
+		if (sniperMissileProj != null) return sniperMissileProj.getCenterPos();
+		if (isZooming() && !ignoreZoom) return axlScopeCursorWorldPos;
 		return base.getCamCenterPos(ignoreZoom);
 	}
 
 	public override bool changeState(CharState newState, bool forceChange = true) {
 		bool hasChanged = base.changeState(newState, forceChange);
-		if (!hasChanged) {
-			return false;
-		}
+		if (!hasChanged) return false;
 		if (gaeaShield != null && shouldDrawArm() == false) {
 			gaeaShield.destroySelf();
 			gaeaShield = null;
@@ -1985,29 +1696,14 @@ public class Axl : Character {
 	public override bool isNonDamageStatusImmune() {
 		return isStealthMode();
 	}
-
-
-	public override bool isInvulnerable(bool ignoreRideArmorHide = false, bool factorHyperMode = false) {
-		bool invul = base.isInvulnerable(ignoreRideArmorHide, factorHyperMode);
-		/*if (stealthActive) {
-			return true;
-		}*/
-		return invul;
-	}
-
 	public override void onFlagPickup(Flag flag) {
 		stingChargeTime = 0;
 		base.onFlagPickup(flag);
 	}
 
 	public override bool canMove() {
-		// TODO: Move this to axl.cs
-		if (isAimLocked()) {
-			return false;
-		}
-		if (isSoftLocked()) {
-			return false;
-		}
+		if (isAimLocked()) return false;		
+		if (isSoftLocked()) return false;	
 		return base.canMove();
 	}
 
@@ -2072,7 +1768,6 @@ public class Axl : Character {
 	}
 	public void customSettingReloadWeapon() {
 		//Reload Weapon Custom Setting
-		bool shootHeld = player.input.isHeld(Control.Shoot, player);
 		switch (currentWeapon) {
 			case RayGun:
 				(currentWeapon as RayGun)?.rechargeAmmoCustomSetting(player, this, shootHeld, 1, 1);
