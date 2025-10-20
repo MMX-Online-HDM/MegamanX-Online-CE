@@ -1559,7 +1559,7 @@ public class Axl : Character {
 	public override void onWeaponChange(Weapon oldWeapon, Weapon newWeapon) {
 		if (switchTime > 0 || altSwitchTime > 0) return;
 		if (oldWeapon.shootCooldown > 0 || oldWeapon.altShotCooldown > 0) {
-			switchTime = 18 - oldWeapon.shootCooldown;
+			switchTime = 18;
 			altSwitchTime = 18;
 		}
 		if (oldWeapon.shootCooldown > 15 || oldWeapon.altShotCooldown > 15) {
