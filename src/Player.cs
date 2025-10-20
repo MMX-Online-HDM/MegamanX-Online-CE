@@ -1806,7 +1806,6 @@ public partial class Player {
 			if (dnaCore.hyperMode == DNACoreHyperMode.WhiteAxl) {
 				axl.whiteAxlTime = axl.maxHyperAxlTime;
 			}
-			axl.axlSwapTime = 0.25f;
 		} else if (retChar is CmdSigma sigma) {
 			sigma.ballWeapon.ammo = dnaCore.altCharAmmo;
 		} else if (retChar is NeoSigma neoSigma) {
