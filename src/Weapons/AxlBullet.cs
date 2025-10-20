@@ -105,7 +105,7 @@ public class DoubleBullet : AxlWeapon {
 	}
 	public override void axlAltShoot(Character character, int[] args) {
 		if (shootCooldown > 0) return;
-		if (character.currentWeapon?.ammo > 4) return;
+		if (character.currentWeapon?.ammo < 4) return;
 		base.axlAltShoot(character, args);
 	}
 
@@ -167,7 +167,7 @@ public class MettaurCrash : AxlWeapon {
 	}
 	public override void axlAltShoot(Character character, int[] args) {
 		if (shootCooldown > 0) return;
-		if (character.currentWeapon?.ammo > 4) return;
+		if (character.currentWeapon?.ammo < 4) return;
 		base.axlAltShoot(character, args);
 	}
 	public override void axlGetAltProjectile(
@@ -220,7 +220,7 @@ public class BeastKiller : AxlWeapon {
 	}
 	public override void axlAltShoot(Character character, int[] args) {
 		if (shootCooldown > 0) return;
-		if (character.currentWeapon?.ammo > 4) return;
+		if (character.currentWeapon?.ammo < 4) return;
 		base.axlAltShoot(character, args);
 	}
 
@@ -278,7 +278,7 @@ public class MachineBullets : AxlWeapon {
 	}
 	public override void axlAltShoot(Character character, int[] args) {
 		if (shootCooldown > 0) return;
-		if (character.currentWeapon?.ammo > 4) return;
+		if (character.currentWeapon?.ammo < 4) return;
 		base.axlAltShoot(character, args);
 	}
 	public override void axlGetProjectile(
@@ -332,7 +332,7 @@ public class RevolverBarrel : AxlWeapon {
 	}
 	public override void axlAltShoot(Character character, int[] args) {
 		if (shootCooldown > 0) return;
-		if (character.currentWeapon?.ammo > 4) return;
+		if (character.currentWeapon?.ammo < 4) return;
 		base.axlAltShoot(character, args);
 	}
 
@@ -396,7 +396,7 @@ public class AncientGun : AxlWeapon {
 	}
 	public override void axlAltShoot(Character character, int[] args) {
 		if (shootCooldown > 0) return;
-		if (character.currentWeapon?.ammo > 4) return;
+		if (character.currentWeapon?.ammo < 4) return;
 		base.axlAltShoot(character, args);
 	}
 	public override void axlGetAltProjectile(
