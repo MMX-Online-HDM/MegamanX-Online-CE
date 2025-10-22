@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,6 +27,8 @@ class Program {
 	[STAThread]
 	#endif
 	static void Main(string[] args) {
+		setDefaultCulture();
+
 		if (args.Length > 0 && args[0] == "-relay") {
 		#if WINDOWS
 			AllocConsole();
@@ -1080,16 +1083,16 @@ class Program {
 		float startPos = 0;
 		float endPos = 0;
 		if (iniData.ContainsKey("loopData") && iniData["loopData"] is Dictionary<string, object> loopData) {
-			if (loopData.ContainsKey("loopStart") && loopData["loopStart"] is Decimal loopStart) {
+			if (loopData.ContainsKey("loopStart") && loopData["loopStart"] is decimal loopStart) {
 				startPos = float.Parse(loopStart.ToString());
 			}
-			if (loopData.ContainsKey("loopEnd") && loopData["loopEnd"] is Decimal loopEnd) {
+			if (loopData.ContainsKey("loopEnd") && loopData["loopEnd"] is decimal loopEnd) {
 				endPos = float.Parse(loopEnd.ToString());
 			}
 		}
 		MusicWrapper musicWrapper = new MusicWrapper(file, startPos, endPos, true);
 		if (endPos == 0) {
-			musicWrapper.endPos =  musicWrapper.music.Duration.AsSeconds();
+			musicWrapper.endPos = musicWrapper.music.Duration.AsSeconds();
 		}
 		Global.musics[name] = musicWrapper;
 	}
@@ -1221,6 +1224,32 @@ class Program {
 
 		return true;
 	}
+
+	public static void setDefaultCulture() {
+		CultureInfo cultureInfo = CultureInfo.CreateSpecificCulture("");
+		cultureInfo.NumberFormat.CurrencySymbol = "$";
+		cultureInfo.NumberFormat.NumberDecimalSeparator = ".";
+		cultureInfo.NumberFormat.NumberGroupSeparator = ",";
+		Thread.CurrentThread.CurrentCulture = cultureInfo;
+		Thread.CurrentThread.CurrentUICulture = cultureInfo;
+		CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+		CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
+		Type type = typeof(CultureInfo);
+		type.InvokeMember("s_userDefaultCulture",
+			BindingFlags.SetField | BindingFlags.NonPublic | BindingFlags.Static,
+			null,
+			cultureInfo,
+			[cultureInfo]
+		);
+		type.InvokeMember("s_userDefaultUICulture",
+			BindingFlags.SetField | BindingFlags.NonPublic | BindingFlags.Static,
+			null,
+			cultureInfo,
+			[cultureInfo]
+		);
+	}
+
 
 	public static void getRadminIP() {
 		var local = NetworkInterface.GetAllNetworkInterfaces();
