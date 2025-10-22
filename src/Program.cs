@@ -23,9 +23,6 @@ namespace MMXOnline;
 class Program {
 	public static string exceptionExtraData = "";
 
-	#if WINDOWS
-	[STAThread]
-	#endif
 	static void Main(string[] args) {
 		setDefaultCulture();
 
