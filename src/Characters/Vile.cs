@@ -6,8 +6,7 @@ using System.Reflection;
 namespace MMXOnline;
 
 public class Vile : Character {
-	public const float maxCalldownMechCooldown = 2;
-	public float grabCooldown = 1;
+	public const float maxCalldownMechCooldown = 120;
 	public float vulcanLingerTime;
 	public const int callNewMechCost = 5;
 	public float mechBusterCooldown;
@@ -217,9 +216,8 @@ public class Vile : Character {
 			changeSpriteFromName(charState.shootSpriteEx, false);
 		else changeSpriteFromName(charState.sprite, resetFrame: false);
 
-		Helpers.decrementTime(ref calldownMechCooldown);
-		Helpers.decrementTime(ref grabCooldown);
-		Helpers.decrementTime(ref mechBusterCooldown);
+		Helpers.decrementFrames(ref calldownMechCooldown);
+		Helpers.decrementFrames(ref mechBusterCooldown);
 		Helpers.decrementFrames(ref aiAttackCooldown);
 		Helpers.decrementFrames(ref vulcanLingerTime);
 		Helpers.decrementFrames(ref deadCooldown);
@@ -360,9 +358,9 @@ public class Vile : Character {
 					missileWeapon.vileShoot(WeaponIds.ElectricShock, this);
 				}
 				if (goliathShotPressed) {
-					if (Goliath && !rideArmor.isAttacking() && mechBusterCooldown == 0) {
+					if (Goliath && !rideArmor.isAttacking() && mechBusterCooldown <= 0) {
 						rideArmor.changeState(new RAGoliathShoot(rideArmor.grounded), true);
-						mechBusterCooldown = 1;
+						mechBusterCooldown = 60;
 					}
 				}
 			}
