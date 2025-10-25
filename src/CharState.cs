@@ -978,6 +978,10 @@ public class Dash : CharState {
 			}
 		}
 	}
+	public override bool canEnter(Character character) {
+		if (character.charState is WallSlide) return false;
+		return base.canEnter(character);	
+	}
 }
 public class DashEnd : CharState {
 	public DashEnd() : base("dash_end", "dash_end_shoot") {
@@ -1092,6 +1096,10 @@ public class AirDash : CharState {
 			dashSpark?.destroySelf();
 		}
 		base.onExit(newState);
+	}
+	public override bool canEnter(Character character) {
+		if (character.charState is WallSlide) return false;
+		return base.canEnter(character);	
 	}
 }
 
