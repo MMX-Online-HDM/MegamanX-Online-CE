@@ -38,7 +38,10 @@ public class BlastLauncher : AxlWeapon {
 		if (character is not Axl axl) return;
 		if (axl.loadout.blastLauncherAlt == 0) {
 			if (shootCooldown > 0) return;
-		} else return;
+			shootCooldown = fireRate;
+		} else {
+			return;
+		}
 		base.axlAltShoot(character, args);
 	}
 
