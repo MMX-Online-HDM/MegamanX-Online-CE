@@ -328,7 +328,7 @@ public class Vile : Character {
 	}
 
 	public bool dashGrabSpecial() {
-		if (!player.input.isPressed(Control.Special1, player)) {
+		if (!player.input.isHeld(Control.Special1, player)) {
 			return false;
 		}
 		if (charState is Dash or AirDash && isVileMK2) {
