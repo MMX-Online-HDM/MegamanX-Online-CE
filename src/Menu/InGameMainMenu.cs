@@ -122,16 +122,6 @@ public class InGameMainMenu : IMainMenu {
 	public bool isSelCharDisabled() {
 		if (Global.level.isElimination()) return true;
 
-		if (Global.level.server?.customMatchSettings?.redSameCharNum > -1) {
-			if (Global.level.gameMode.isTeamMode && Global.level.mainPlayer.alliance == GameMode.redAlliance) {
-				return true;
-			}
-		}
-		if (Global.level.server?.customMatchSettings?.sameCharNum > -1) {
-			if (!Global.level.gameMode.isTeamMode || Global.level.mainPlayer.alliance == GameMode.blueAlliance) {
-				return true;
-			}
-		}
 
 		return false;
 	}

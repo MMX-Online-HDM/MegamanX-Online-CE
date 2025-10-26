@@ -211,6 +211,7 @@ public class CannonAttack : VileState {
 			character.useGravity = false;
 			character.stopMoving();
 			character.vel = new Point();
+			canJump = false;
         }
 	}
 	public override void onExit(CharState? newState) {
