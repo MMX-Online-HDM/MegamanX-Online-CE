@@ -210,8 +210,9 @@ public class Vile : Character {
 		else if (isVileMK2 || isVileMK5) altSoundId = AltSoundIds.X3;
 
 		if (!ownedByLocalPlayer) return;
-		
+
 		if (!isShootingGizmo && !isShootingVulcan) energy.addAmmo(0.25f * speedMul, player);
+
 		if (isShootingVulcan && sprite.name.EndsWith("shoot"))
 			changeSpriteFromName(charState.shootSpriteEx, false);
 		else changeSpriteFromName(charState.sprite, resetFrame: false);
