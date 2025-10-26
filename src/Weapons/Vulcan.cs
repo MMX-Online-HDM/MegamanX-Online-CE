@@ -50,7 +50,7 @@ public class CherryBlast : VileVulcan {
 		ladderVoid(vava);
 		vava.playSound("vulcan", sendRpc: true);
 		vava.setVileShootTime(this);
-		vava.tryUseVileAmmo(vileAmmoUsage, true);
+		vava.tryUseVileAmmo(vileAmmoUsage);
 		new VulcanCherryBlast(
 			vava.getShootPos(), vava.getShootXDir(), vava,
 			vava.player, character.player.getNextActorNetId(), rpc: true
@@ -84,7 +84,7 @@ public class DistanceNeedler : VileVulcan {
 		ladderVoid(vava);
 		vava.playSound("vulcan", sendRpc: true);
 		vava.setVileShootTime(this);
-		vava.tryUseVileAmmo(vileAmmoUsage, true);
+		vava.tryUseVileAmmo(vileAmmoUsage);
 		new VulcanDistanceNeedler(
 			vava.getShootPos(), vava.getShootXDir(), vava,
 			vava.player, character.player.getNextActorNetId(), rpc: true
@@ -116,7 +116,7 @@ public class BuckshotDance : VileVulcan {
 		ladderVoid(vava);
 		vava.playSound("vulcan", sendRpc: true);
 		vava.setVileShootTime(this);
-		vava.tryUseVileAmmo(vileAmmoUsage, true);
+		vava.tryUseVileAmmo(vileAmmoUsage);
 		vava.changeSpriteFromName(vava.charState.shootSpriteEx, false);
 		new VulcanBuckshotDance(
 			vava.getShootPos(), vava.getShootXDir(), vava,

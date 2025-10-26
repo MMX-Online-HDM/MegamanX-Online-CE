@@ -73,6 +73,7 @@ public class HexaInvoluteState : VileState {
 		base.onExit(newState);
 		proj?.destroySelf();
 		vile.useGravity = true;
+		vile.usedAmmoLastFrame = false;
 	}
 }
 
