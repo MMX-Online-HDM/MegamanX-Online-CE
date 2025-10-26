@@ -878,6 +878,7 @@ public class Dash : CharState {
 	public int dashDir;
 	public bool stop;
 	public Anim? dashSpark;
+	public bool changeDirection;
 
 	public Dash(string initialDashButton) : base("dash", "dash_shoot", "attack_dash") {
 		attackCtrl = true;
@@ -897,18 +898,25 @@ public class Dash : CharState {
 
 		var hitWall = Global.level.raycast(character.pos, character.pos.addxy(10 * character.xDir, 0), new List<Type>() { typeof(Wall) });
 		if (hitWall != null) {
-            character.changeState(new DashEnd(), true);
-        }
+			character.changeState(new DashEnd(false), true);
+			return;
+		}
+
+		if (changeDirection) {
+			character.changeState(new DashEnd(true), true);
+			return;
+		}
 
 		if (dashTime > 32 && !stop) {
 			dashTime = 0;
 			stop = true;
-			character.changeState(new DashEnd(), true);
+			character.changeState(new DashEnd(false), true);
 		}
-		if (dashTime < 4 || stop) {
+
+		if (!changeDirection) {
 			if (inputXDir != 0 && inputXDir != dashDir) {
-				character.xDir = (int)inputXDir;
 				dashDir = character.xDir;
+				changeDirection = true;
 			}
 		}
 		// Dash regular speed.
@@ -918,7 +926,7 @@ public class Dash : CharState {
 		// End move.
 		else if (stop && inputXDir != 0) {
 			character.moveXY(character.getRunSpeed() * inputXDir, 0);
-			character.changeState(character.getRunState(true), true);
+			character.changeState(new DashEnd(true), true);
 			return;
 		}
 		// Speed at start and end.
@@ -985,10 +993,24 @@ public class Dash : CharState {
 	}
 }
 public class DashEnd : CharState {
-	public DashEnd() : base("dash_end", "dash_end_shoot") {
+	public bool moveOnStart;
+	public DashEnd(bool moveOnStart) : base("dash_end", "dash_end_shoot") {
+		this.moveOnStart = moveOnStart;
 		attackCtrl = true;
 		normalCtrl = true;
 		useDashJumpSpeed = true;
+	}
+	public override void update() {
+		base.update();
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+		if (moveOnStart && stateTime >= 1f / 60f) {
+			character.changeState(character.getRunState(true), true);
+		}
+		if (!character.grounded) {
+			exitOnLanding = true;
+		}
 	}
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
@@ -998,13 +1020,6 @@ public class DashEnd : CharState {
 			exitOnAirborne = false;
 		}
 	}
-	public override void update() {
-		base.update();
-		if (character.isAnimOver()) {
-			character.changeToIdleOrFall();
-		}
-		if (!character.grounded) exitOnLanding = true;
-	}
 }
 
 public class AirDash : CharState {
@@ -1013,6 +1028,7 @@ public class AirDash : CharState {
 	public int dashDir;
 	public bool stop;
 	public Anim? dashSpark;
+	public bool changeDirection;
 
 	public AirDash(string initialDashButton) : base("dash", "dash_shoot", "attack_dash") {
 		accuracy = 10;
@@ -1034,7 +1050,12 @@ public class AirDash : CharState {
 
 		var hitWall = Global.level.raycast(character.pos, character.pos.addxy(10 * character.xDir, 0), new List<Type>() { typeof(Wall) });
 		if (hitWall != null) {
-			character.changeState(new DashEnd(), true);
+			character.changeState(new DashEnd(false), true);
+		}
+
+		if (changeDirection) {
+			character.changeState(new DashEnd(false), true);
+			return;
 		}
 
 		if (dashTime > 28 && !stop) {
@@ -1042,7 +1063,7 @@ public class AirDash : CharState {
 			dashTime = 0;
 			stop = true;
 			if (character is not Doppma or CmdSigma) {
-				character.changeState(new DashEnd(), true);
+				character.changeState(new DashEnd(false), true);
 			}
 			else if (character is Doppma) {
 				character.changeSpriteFromName("fall", false);
@@ -1053,10 +1074,10 @@ public class AirDash : CharState {
 				exitOnLanding = true;
 			}
 		}
-		if (dashTime < 4 || stop) {
+		if (!changeDirection) {
 			if (inputXDir != 0 && inputXDir != dashDir) {
-				character.xDir = (int)inputXDir;
 				dashDir = character.xDir;
+				changeDirection = true;
 			}
 		}
 		// Dash regular speed.

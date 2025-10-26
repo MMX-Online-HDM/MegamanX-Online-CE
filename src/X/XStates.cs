@@ -94,6 +94,7 @@ public class LightDash : CharState {
 	public bool stop;
 	public Anim? dashSpark;
 	public Anim? exaust;
+	public bool changeDirection;
 
 	public LightDash(string initialDashButton) : base("dash", "dash_shoot", "attack_dash") {
 		attackCtrl = true;
@@ -111,18 +112,29 @@ public class LightDash : CharState {
 		int inputXDir = player.input.getXDir(player);
 		bool dashHeld = player.input.isHeld(initialDashButton, player);
 
+		var hitWall = Global.level.raycast(character.pos, character.pos.addxy(10 * character.xDir, 0), new List<Type>() { typeof(Wall) });
+		if (hitWall != null) {
+			character.changeState(new DashEnd(false), true);
+			return;
+		}
+
+		if (changeDirection) {
+			character.changeState(new DashEnd(true), true);
+			return;
+		}
+
 		if (dashTime > 32 && !stop) {
 			if (exaust?.destroyed == false) {
 				exaust.destroySelf();
 			}
 			dashTime = 0;
 			stop = true;
-			character.changeState(new DashEnd(), true);
+			character.changeState(new DashEnd(false), true);
 		}
-		if (dashTime < 4 || stop) {
+		if (!changeDirection) {
 			if (inputXDir != 0 && inputXDir != dashDir) {
-				character.xDir = (int)inputXDir;
 				dashDir = character.xDir;
+				changeDirection = true;
 			}
 		}
 		// Dash regular speed.
@@ -132,7 +144,7 @@ public class LightDash : CharState {
 		// End move.
 		else if (stop && inputXDir != 0) {
 			character.moveXY(character.getRunSpeed() * inputXDir * 1.15f, 0);
-			character.changeState(character.getRunState(), true);
+			character.changeState(new DashEnd(true), true);
 			return;
 		}
 		// Speed at start and end.
@@ -200,6 +212,7 @@ public class GigaAirDash : CharState {
 	public bool stop;
 	public Anim? dashSpark;
 	public Anim? exaust = null!;
+	public bool changeDirection;
 
 	public GigaAirDash(string initialDashButton) : base("dash", "dash_shoot", "attack_dash") {
 		attackCtrl = true;
@@ -218,6 +231,16 @@ public class GigaAirDash : CharState {
 		int inputXDir = player.input.getXDir(player);
 		bool dashHeld = player.input.isHeld(initialDashButton, player);
 
+		var hitWall = Global.level.raycast(character.pos, character.pos.addxy(10 * character.xDir, 0), new List<Type>() { typeof(Wall) });
+		if (hitWall != null) {
+			character.changeState(new DashEnd(false), true);
+		}
+
+		if (changeDirection) {
+			character.changeState(new DashEnd(false), true);
+			return;
+		}
+
 		if (dashTime > 28 && !stop) {
 			if (exaust?.destroyed == false) {
 				exaust.destroySelf();
@@ -225,12 +248,12 @@ public class GigaAirDash : CharState {
 			character.useGravity = true;
 			dashTime = 0;
 			stop = true;
-			character.changeState(new DashEnd(), true);
+			character.changeState(new DashEnd(false), true);
 		}
-		if (dashTime < 4 || stop) {
+		if (!changeDirection) {
 			if (inputXDir != 0 && inputXDir != dashDir) {
-				character.xDir = (int)inputXDir;
 				dashDir = character.xDir;
+				changeDirection = true;
 			}
 		}
 		// Dash regular speed.
