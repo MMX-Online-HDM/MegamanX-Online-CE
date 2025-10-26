@@ -531,6 +531,9 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool canDash() {
+		//Check if a Wall is close by, this should simulate the behavior of SNES
+		var isWallClose = Global.level.raycast(pos, pos.addxy(10 * xDir, 0), new List<Type>() { typeof(Wall) });
+		if (isWallClose != null) return false;
 		if (player.isAI && charState is Dash) return false;
 		if (rideArmorPlatform != null) return false;
 		if (charState is WallKick wallKick && wallKick.stateTime < 0.25f) return false;

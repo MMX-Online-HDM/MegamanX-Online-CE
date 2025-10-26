@@ -895,6 +895,11 @@ public class Dash : CharState {
 		int inputXDir = player.input.getXDir(player);
 		bool dashHeld = player.input.isHeld(initialDashButton, player);
 
+		var hitWall = Global.level.raycast(character.pos, character.pos.addxy(10 * character.xDir, 0), new List<Type>() { typeof(Wall) });
+		if (hitWall != null) {
+            character.changeState(new DashEnd(), true);
+        }
+
 		if (dashTime > 32 && !stop) {
 			dashTime = 0;
 			stop = true;
@@ -978,10 +983,6 @@ public class Dash : CharState {
 			}
 		}
 	}
-	public override bool canEnter(Character character) {
-		if (character.charState is WallSlide) return false;
-		return base.canEnter(character);	
-	}
 }
 public class DashEnd : CharState {
 	public DashEnd() : base("dash_end", "dash_end_shoot") {
@@ -1030,6 +1031,11 @@ public class AirDash : CharState {
 		}
 		int inputXDir = player.input.getXDir(player);
 		bool dashHeld = player.input.isHeld(initialDashButton, player);
+
+		var hitWall = Global.level.raycast(character.pos, character.pos.addxy(10 * character.xDir, 0), new List<Type>() { typeof(Wall) });
+		if (hitWall != null) {
+			character.changeState(new DashEnd(), true);
+		}
 
 		if (dashTime > 28 && !stop) {
 			character.useGravity = true;
@@ -1096,10 +1102,6 @@ public class AirDash : CharState {
 			dashSpark?.destroySelf();
 		}
 		base.onExit(newState);
-	}
-	public override bool canEnter(Character character) {
-		if (character.charState is WallSlide) return false;
-		return base.canEnter(character);	
 	}
 }
 
