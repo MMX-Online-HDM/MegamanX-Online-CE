@@ -255,11 +255,7 @@ public class FrostShieldProjCharged : Projectile {
 		destroyOnHit = false;
 		shouldVortexSuck = false;
 		character = player.character;
-		if (Global.level.server?.customMatchSettings?.frostShieldChargedNerf == false) {
-			isShield = true;	
-		} else if (Global.level.server?.customMatchSettings?.frostShieldChargedNerf == true) {
-			isShield = false;
-		}
+		isShield = true;	
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
@@ -335,11 +331,7 @@ public class FrostShieldProjChargedGround : Projectile {
 		shouldVortexSuck = false;
 		character = player.character;
 		useGravity = true;
-		if (Global.level.server?.customMatchSettings?.frostShieldChargedNerf == false) {
-			isShield = true;	
-		} else if (Global.level.server?.customMatchSettings?.frostShieldChargedNerf == true) {
-			isShield = false;
-		}
+		isShield = true;	
 		vel = new Point(xDir * 150, -100);
 		if (collider != null) { collider.wallOnly = true; }
 		slideAnim = new Anim(pos, "frostshield_charged_slide", xDir, null, false);

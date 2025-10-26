@@ -11,32 +11,27 @@ public class CustomMatchSettings {
 	[ProtoMember(4)] public int startSubTanks;
 	[ProtoMember(5)] public float healthModifier;
 	[ProtoMember(6)] public int baseHp;
-	[ProtoMember(7)] public int damageModifier;
-	[ProtoMember(8)] public int sameCharNum;
-	[ProtoMember(9)] public int redSameCharNum;
-	[ProtoMember(10)] public int maxHeartTanks;
-	[ProtoMember(11)] public int maxSubTanks;
-	[ProtoMember(12)] public int heartTankHp;
-	[ProtoMember(13)] public int heartTankCost;
-	[ProtoMember(14)] public int currencyGain;
-	[ProtoMember(15)] public int respawnTime;
-	[ProtoMember(16)] public bool pickupItems;
-	[ProtoMember(17)] public int subtankGain;
-	[ProtoMember(18)] public int assistTime;
-	[ProtoMember(19)] public bool assistBanlist;
-	[ProtoMember(20)] public int largeHealthPickup;
-	[ProtoMember(21)] public int smallHealthPickup;
-	[ProtoMember(22)] public int largeAmmoPickup;
-	[ProtoMember(23)] public int smallAmmoPickup;
-	[ProtoMember(24)] public int subTankCost;
-	[ProtoMember(25)] public bool frostShieldNerf;
-	[ProtoMember(26)] public bool frostShieldChargedNerf;
-	[ProtoMember(27)] public bool axlBackwardsDebuff;
-	[ProtoMember(29)] public bool axlCustomReload;
-	[ProtoMember(30)] public bool oldATrans;
-	[ProtoMember(31)] public bool flinchairDashReset;
-	[ProtoMember(32)] public bool comboFlinch;
-	[ProtoMember(33)] public bool quakeBlazerDownwards;
+	[ProtoMember(7)] public int maxHeartTanks;
+	[ProtoMember(8)] public int maxSubTanks;
+	[ProtoMember(9)] public int heartTankHp;
+	[ProtoMember(10)] public int heartTankCost;
+	[ProtoMember(11)] public int currencyGain;
+	[ProtoMember(12)] public int respawnTime;
+	[ProtoMember(13)] public bool pickupItems;
+	[ProtoMember(14)] public int subtankGain;
+	[ProtoMember(15)] public int assistTime;
+	[ProtoMember(16)] public bool assistBanlist;
+	[ProtoMember(17)] public int largeHealthPickup;
+	[ProtoMember(18)] public int smallHealthPickup;
+	[ProtoMember(19)] public int largeAmmoPickup;
+	[ProtoMember(20)] public int smallAmmoPickup;
+	[ProtoMember(21)] public int subTankCost;
+	[ProtoMember(22)] public bool frostShieldNerf;
+	[ProtoMember(23)] public bool axlCustomReload;
+	[ProtoMember(24)] public bool oldATrans;
+	[ProtoMember(25)] public bool flinchairDashReset;
+	[ProtoMember(26)] public bool comboFlinch;
+	[ProtoMember(27)] public bool quakeBlazerDownwards;
 
 
 	public CustomMatchSettings() {
@@ -50,9 +45,6 @@ public class CustomMatchSettings {
 			startSubTanks = 0,
 			healthModifier = 1,
 			baseHp = 16,
-			damageModifier = 1,
-			sameCharNum = -1,
-			redSameCharNum = -1,
 			maxHeartTanks = 8,
 			maxSubTanks = 2,
 			heartTankHp = 1,
@@ -71,13 +63,9 @@ public class CustomMatchSettings {
 			oldATrans = false,
 			flinchairDashReset = false,
 			comboFlinch = true,
-			/*
-			frostShieldNerf = true,
-			frostShieldChargedNerf = false,
-			axlBackwardsDebuff = true,
+			frostShieldNerf = false,
 			axlCustomReload = false,
 			quakeBlazerDownwards = false,
-			*/
 		};
 	}
 }
@@ -343,54 +331,6 @@ public class CustomMatchSettingsMenu : IMainMenu {
 				}
 			)
 		);
-		/*
-			menuOptions.Add(
-			new MenuOption(startX, currentY += lineH,
-				() => {
-					Helpers.menuLeftRightInc(ref cSettings.damageModifier, 1, 4, true);
-				},
-				(Point pos, int index) => {
-					Fonts.drawText(
-						FontType.Blue,
-						"Damage modifier: " +
-						(cSettings.damageModifier * 100).ToString() + "%",
-						pos.x, pos.y, selected: selectArrowPosY == index
-					);
-				}
-			)
-		);
-		menuOptions.Add(
-			new MenuOption(startX, currentY += lineH,
-				() => {
-					Helpers.menuLeftRightInc(ref cSettings.sameCharNum, -1, 4);
-				},
-				(Point pos, int index) => {
-					Fonts.drawText(
-						FontType.Blue,
-						"Mono character: " +
-						getSameCharString(cSettings.sameCharNum),
-						pos.x, pos.y, selected: selectArrowPosY == index
-					);
-				}
-			)
-		);
-
-		menuOptions.Add(
-			new MenuOption(startX, currentY += lineH,
-				() => {
-					Helpers.menuLeftRightInc(ref cSettings.redSameCharNum, -1, 4);
-				},
-				(Point pos, int index) => {
-					Fonts.drawText(
-						FontType.Blue,
-						"Red mono character: " +
-						getSameCharString(cSettings.redSameCharNum),
-						pos.x, pos.y, selected: selectArrowPosY == index
-					);
-				}
-			)
-		);
-		*/
 #endregion
 			#region  Page 2
 			menuOptions2.Add(
@@ -584,38 +524,6 @@ public class CustomMatchSettingsMenu : IMainMenu {
 						FontType.Purple,
 						"Frost Shield Uncharged 'Shield' Nerf: " +
 						Helpers.boolYesNo(cSettings.frostShieldNerf),
-						pos.x, pos.y, selected: selectArrowPosY3 == index
-					);
-				}
-			)
-		);
-			menuOptions3.Add(
-			new MenuOption(
-				startX3, currentY3 += lineH3,
-				() => {
-					Helpers.menuLeftRightBool(ref cSettings.frostShieldChargedNerf, true);
-				},
-				(Point pos, int index) => {
-					Fonts.drawText(
-						FontType.Purple,
-						"Frost Shield Charged 'Shield' Nerf: " +
-						Helpers.boolYesNo(cSettings.frostShieldChargedNerf),
-						pos.x, pos.y, selected: selectArrowPosY3 == index
-					);
-				}
-			)
-		);
-			menuOptions3.Add(
-			new MenuOption(
-				startX3, currentY3 += lineH3,
-				() => {
-					Helpers.menuLeftRightBool(ref cSettings.axlBackwardsDebuff, true);
-				},
-				(Point pos, int index) => {
-					Fonts.drawText(
-						FontType.Purple,
-						"Axl Shooting Backwards Debuff: " +
-						Helpers.boolYesNo(cSettings.axlBackwardsDebuff),
 						pos.x, pos.y, selected: selectArrowPosY3 == index
 					);
 				}

@@ -805,10 +805,10 @@ public class GameMode {
 					string scopeSprite = "scope";
 					if (axl.hasScopedTarget()) scopeSprite = "scope2";
 					Global.sprites[scopeSprite].drawToHUD(0, cursorPos.x, cursorPos.y);
-					float w = 298;
-					float h = 224;
-					float hw = 149;
-					float hh = 112;
+					float w = Global.screenW;
+					float h = Global.screenH;
+					float hw = Global.halfScreenW-100;
+					float hh = Global.halfScreenH;
 					DrawWrappers.DrawRect(cursorPos.x - w, cursorPos.y - h, cursorPos.x + w, cursorPos.y - hh, true, Color.Black, 1, ZIndex.HUD, false, outlineColor: Color.Black);
 					DrawWrappers.DrawRect(cursorPos.x - w, cursorPos.y + hh, cursorPos.x + w, cursorPos.y + h, true, Color.Black, 1, ZIndex.HUD, false, outlineColor: Color.Black);
 					DrawWrappers.DrawRect(cursorPos.x - w, cursorPos.y - hh, cursorPos.x - hw, cursorPos.y + hh, true, Color.Black, 1, ZIndex.HUD, false, outlineColor: Color.Black);
@@ -843,6 +843,7 @@ public class GameMode {
 						RPC.syncAxlScopePos.sendRpc(level.mainPlayer.id, false, new Point(), new Point());
 					}
 				}
+				/*
 				if (Global.level.server?.customMatchSettings?.axlCustomReload == true) {
 					if (drawPlayer.weapon?.rechargeAmmoCustomSettingAxl > 0 ||
 						drawPlayer.weapon?.rechargeAmmoCustomSettingAxl2 > 0) {
@@ -864,6 +865,7 @@ public class GameMode {
 						);
 					}
 				}
+				*/
 			}
 			#endregion
 
