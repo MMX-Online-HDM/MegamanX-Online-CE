@@ -1025,7 +1025,7 @@ public class GameMode {
 		if (shouldDrawRadar() && !Menu.inMenu) {
 			drawRadar();
 		}
-
+		/*
 		if (level.mainPlayer.isX && level.mainPlayer.character?.charState is XReviveStart xrs) {
 			Character chr = level.mainPlayer.character;
 
@@ -1060,6 +1060,7 @@ public class GameMode {
 				Global.sprites["drlight_portrait"].drawToHUD(index, 15, boxStartY + boxHeight * 0.5f);
 			}
 		}
+		*/
 	}
 
 	public void setHUDErrorMessage(
