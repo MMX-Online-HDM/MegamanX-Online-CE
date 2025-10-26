@@ -896,8 +896,7 @@ public class Dash : CharState {
 		int inputXDir = player.input.getXDir(player);
 		bool dashHeld = player.input.isHeld(initialDashButton, player);
 
-		var hitWall = Global.level.raycast(character.pos, character.pos.addxy(10 * character.xDir, 0), new List<Type>() { typeof(Wall) });
-		if (hitWall != null) {
+		if (character.isWallClose != null) {
 			character.changeState(new DashEnd(false), true);
 			return;
 		}
@@ -1048,8 +1047,7 @@ public class AirDash : CharState {
 		int inputXDir = player.input.getXDir(player);
 		bool dashHeld = player.input.isHeld(initialDashButton, player);
 
-		var hitWall = Global.level.raycast(character.pos, character.pos.addxy(10 * character.xDir, 0), new List<Type>() { typeof(Wall) });
-		if (hitWall != null) {
+		if (character.isWallClose != null) {
 			character.changeState(new DashEnd(false), true);
 		}
 
