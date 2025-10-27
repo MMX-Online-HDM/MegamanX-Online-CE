@@ -601,6 +601,10 @@ public class X3ChargeShot : CharState {
 		if (mmx == null) {
 			throw new NullReferenceException();
 		}
+		if (!character.grounded) {
+			sprite = "cross_air_shot";
+            character.changeSpriteFromName(sprite, true);
+        }
 		if (mmx.stockedMaxBusterLv >= 2) {
 			sprite = "cross_shot";
 			defaultSprite = sprite;
