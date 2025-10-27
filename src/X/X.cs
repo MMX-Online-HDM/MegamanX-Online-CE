@@ -1264,18 +1264,14 @@ public class MegamanX : Character {
 			hCAnimT8 += Global.speedMul;
 			int frameIndex6 = (int)((hCAnimT8 / maxHyperChargeAnimTime) * fatCharge.totalFrameNum);
 			int offsetIndex8 = (int)(hCAnimT8 % 12);
+			float[] yOffset8 = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
 
-			float[] yOffset8 = {
-				0, 1, 2, 3, 4, 5,
-				6, 7, 8, 9, 10, 11
-			};
 			fatCharge.draw(
 				frameIndex6,
 				baseX + (2 * baseXDir),
 				baseY - yOffset8[offsetIndex8] - 16,
 				1, 1, null, 1, 1, 1, zIndex + 1
 			);
-
 			fatCharge.draw(
 				frameIndex6,
 				baseX + (4 * baseXDir),
