@@ -1253,7 +1253,7 @@ public class MegamanX : Character {
 			);
 			fatCharge.draw(
 				frameIndex6,
-				baseX - (11 * baseXDir) -	 (xOffset7[offsetIndex7] * baseXDir),
+				baseX - (11 * baseXDir) - (xOffset7[offsetIndex7] * baseXDir),
 				baseY - 1,
 				1, 1, null, 1, 1, 1, zIndex + 1
 			);
