@@ -8,7 +8,7 @@ public class MegamanX : Character {
 	// Shoot variables.
 	public float shootCooldown;
 	public float lastShootPressed;
-	public bool bufferedShotPressed => lastShootPressed <= 5 || player.input.isPressed(Control.Shoot, player);
+	public bool bufferedShotPressed => lastShootPressed <= 3 || player.input.isPressed(Control.Shoot, player);
 	public float specialSaberCooldown;
 	public XBuster specialBuster;
 	public int specialButtonMode;
@@ -134,11 +134,13 @@ public class MegamanX : Character {
 	public float jumpTimeAI;
 	public float stockedTime;
 	public XLoadout loadout;
-	float hyperChargeAnimTime;
-	float hyperChargeAnimTime2 = 0.125f;
-	const float maxHyperChargeAnimTime = 0.25f;
+	public float fullHyperChargeAnimTime;
+	public float hCAnimT1, hCAnimT2, hCAnimT3;
+	public float hCAnimT4, hCAnimT5, hCAnimT6;
+	public float hCAnimT7, hCAnimT8;
+	public const float maxHyperChargeAnimTime = 12;
 	public Sprite hyperChargePartSprite = new Sprite("hypercharge_part_1");
-	public Sprite hyperChargePart2Sprite = new Sprite("hypercharge_part_1");
+	public Sprite hyperChargePart2Sprite = new Sprite("charge_part_3");
 
 	// Creation code.
 	public MegamanX(
@@ -1066,41 +1068,221 @@ public class MegamanX : Character {
 				alpha *= 0.3f;
 			}
 		}
-		if (hyperChargeActive) {
+		if (hyperChargeActive && currentWeapon?.ammo > 0) {
 			drawHyperCharge(x, y);
-		}
+		} else if (!hyperChargeActive) {
+			fullHyperChargeAnimTime = 0;
+			hCAnimT1 = 0;
+			hCAnimT2 = 0;
+			hCAnimT4 = 0;
+			hCAnimT5 = 0;
+			hCAnimT6 = 0;
+			hCAnimT7 = 0;
+			hCAnimT8 = 0;
+        }
 		base.render(x, y);
 		alpha = backupAlpha;
 	}
 	public void drawHyperCharge(float x, float y) {
-		hyperChargeAnimTime += Global.spf;
-		if (hyperChargeAnimTime >= maxHyperChargeAnimTime) hyperChargeAnimTime = 0;
-		float sx = pos.x + x + 2;
-		float sy = pos.y + y - 18;
+		var fatCharge = hyperChargePartSprite; //sprite
+		var thinCharge = hyperChargePart2Sprite; //sprite
 
-		var sprite1 = hyperChargePartSprite;
-		float distFromCenter = 12;
-		float posOffset = hyperChargeAnimTime * 50;
-		int hyperChargeAnimFrame = MathInt.Floor((hyperChargeAnimTime / maxHyperChargeAnimTime) * sprite1.totalFrameNum);
-		sprite1.draw(hyperChargeAnimFrame, sx + distFromCenter + posOffset, sy, 1, 1, null, 1, 1, 1, zIndex + 1);
-		sprite1.draw(hyperChargeAnimFrame, sx - distFromCenter - posOffset, sy, 1, 1, null, 1, 1, 1, zIndex + 1);
-		sprite1.draw(hyperChargeAnimFrame, sx, sy + distFromCenter + posOffset, 1, 1, null, 1, 1, 1, zIndex + 1);
-		sprite1.draw(hyperChargeAnimFrame, sx, sy - distFromCenter - posOffset, 1, 1, null, 1, 1, 1, zIndex + 1);
+		float baseXDir = (xDir == 1) ? 1 : -1;
+		float baseX = getCenterPos().x + x;
+		float baseY = getCenterPos().y + y;
 
-		hyperChargeAnimTime2 += Global.spf;
-		if (hyperChargeAnimTime2 >= maxHyperChargeAnimTime) hyperChargeAnimTime2 = 0;
-		var sprite2 = hyperChargePart2Sprite;
-		float distFromCenter2 = 12;
-		float posOffset2 = hyperChargeAnimTime2 * 50;
-		int hyperChargeAnimFrame2 = MathInt.Floor(
-			(hyperChargeAnimTime2 / maxHyperChargeAnimTime) * sprite2.totalFrameNum
-		);
-		float xOff = Helpers.cosd(45) * (distFromCenter2 + posOffset2);
-		float yOff = Helpers.sind(45) * (distFromCenter2 + posOffset2);
-		sprite2.draw(hyperChargeAnimFrame2, sx - xOff, sy + yOff, 1, 1, null, 1, 1, 1, zIndex + 1);
-		sprite2.draw(hyperChargeAnimFrame2, sx + xOff, sy - yOff, 1, 1, null, 1, 1, 1, zIndex + 1);
-		sprite2.draw(hyperChargeAnimFrame2, sx + xOff, sy + yOff, 1, 1, null, 1, 1, 1, zIndex + 1);
-		sprite2.draw(hyperChargeAnimFrame2, sx - xOff, sy - yOff, 1, 1, null, 1, 1, 1, zIndex + 1);
+		fullHyperChargeAnimTime += Global.speedMul;
+		if (fullHyperChargeAnimTime >= 26) {
+			hCAnimT1 = 0;
+			hCAnimT2 = 0;
+			hCAnimT3 = 0;
+			hCAnimT4 = 0;
+			hCAnimT5 = 0;
+			hCAnimT6 = 0;
+			hCAnimT7 = 0;
+			hCAnimT8 = 0;
+			fullHyperChargeAnimTime = 0;
+		}
+
+		//1th two diagonals
+		if (fullHyperChargeAnimTime > 0 && fullHyperChargeAnimTime < 12) {
+			hCAnimT1 += Global.speedMul;
+			int frameIndex = (int)((hCAnimT1 / maxHyperChargeAnimTime) * fatCharge.totalFrameNum);
+			int offsetIndex = (int)(hCAnimT1 % 12);
+			float[] yOffset = { 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5 };
+			float[] xOffset = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+
+			fatCharge.draw(
+				frameIndex,
+				baseX + (14 * baseXDir) + (xOffset[offsetIndex] * baseXDir),
+				baseY - yOffset[offsetIndex] - 7,
+				1, 1, null, 1, 1, 1, zIndex + 1
+			);
+			fatCharge.draw(
+				frameIndex,
+				baseX - (10 * baseXDir) - (xOffset[offsetIndex] * baseXDir),
+				baseY + yOffset[offsetIndex] + 5,
+				1, 1, null, 1, 1, 1, zIndex + 1
+			);
+		}
+
+		//2th two diagonals
+		if (fullHyperChargeAnimTime > 2 && fullHyperChargeAnimTime < 14) {
+			hCAnimT2 += Global.speedMul;
+			int frameIndex2 = (int)((hCAnimT2 / maxHyperChargeAnimTime) * fatCharge.totalFrameNum);
+			int offsetIndex2 = (int)(hCAnimT2 % 12);
+			float[] yOffset2 = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+			float[] xOffset2 = { 0, 0, 1, 1, 2, 1, 1, 1, 2, 2, 3, 3 };
+
+			fatCharge.draw(
+				frameIndex2,
+				baseX - (1 * baseXDir) - (xOffset2[offsetIndex2] * baseXDir),
+				baseY - yOffset2[offsetIndex2] - 14,
+				1, 1, null, 1, 1, 1, zIndex + 1
+			);
+			fatCharge.draw(
+				frameIndex2,
+				baseX + (5 * baseXDir) + (xOffset2[offsetIndex2] * baseXDir),
+				baseY + yOffset2[offsetIndex2] + 13,
+				1, 1, null, 1, 1, 1, zIndex + 1
+			);
+		}
+
+		//3th two diagonals
+		if (fullHyperChargeAnimTime > 4 && fullHyperChargeAnimTime < 16) {
+			hCAnimT3 += Global.speedMul;
+			int frameIndex3 = (int)((hCAnimT3 / maxHyperChargeAnimTime) * thinCharge.totalFrameNum);
+			int offsetIndex3 = (int)(hCAnimT3 % 12);
+			float[] yOffset3 = { 0, 1, 1, 2, 3, 4, 5, 6, 6, 7, 7, 8 };
+			float[] xOffset3 = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 9, 10 };
+
+			thinCharge.draw(
+				frameIndex3,
+				baseX + (15 * baseXDir) + (xOffset3[offsetIndex3] * baseXDir),
+				baseY + yOffset3[offsetIndex3] + 3,
+				1, 1, null, 1, 1, 1, zIndex + 1
+			);
+			thinCharge.draw(
+				frameIndex3,
+				baseX - (10 * baseXDir) - (xOffset3[offsetIndex3] * baseXDir),
+				baseY - yOffset3[offsetIndex3] - 5,
+				1, 1, null, 1, 1, 1, zIndex + 1
+			);
+		}
+
+		//4th two diagonals
+		if (fullHyperChargeAnimTime > 6 && fullHyperChargeAnimTime < 18) {
+			hCAnimT4 += Global.speedMul;
+			int frameIndex4 = (int)((hCAnimT4 / maxHyperChargeAnimTime) * fatCharge.totalFrameNum);
+			int offsetIndex4 = (int)(hCAnimT4 % 12);
+			float[] yOffset4 = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+			float[] xOffset4 = { 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5 };
+
+			fatCharge.draw(
+				frameIndex4,
+				baseX + (7 * baseXDir) + (xOffset4[offsetIndex4] * baseXDir),
+				baseY - yOffset4[offsetIndex4] - 13,
+				1, 1, null, 1, 1, 1, zIndex + 1
+			);
+			fatCharge.draw(
+				frameIndex4,
+				baseX - (2 * baseXDir) - (xOffset4[offsetIndex4] * baseXDir),
+				baseY + yOffset4[offsetIndex4] + 12,
+				1, 1, null, 1, 1, 1, zIndex + 1
+			);
+
+		}
+
+		//5th two diagonals
+		if (fullHyperChargeAnimTime > 8 && fullHyperChargeAnimTime < 20) {
+			hCAnimT5 += Global.speedMul;
+			int frameIndex5 = (int)((hCAnimT5 / maxHyperChargeAnimTime) * fatCharge.totalFrameNum);
+			int offsetIndex5 = (int)(hCAnimT5 % 12);
+			float[] yOffset5 = { 0, 1, 2, 3, 3, 4, 5, 6, 7, 8, 9, 10 };
+			float[] xOffset5 = { 0, 1, 2, 3, 3, 4, 5, 6, 7, 8, 9, 10 };
+
+			fatCharge.draw(
+				frameIndex5,
+				baseX - (6 * baseXDir) - (xOffset5[offsetIndex5] * baseXDir),
+				baseY - yOffset5[offsetIndex5] - 9,
+				1, 1, null, 1, 1, 1, zIndex + 1
+			);
+			fatCharge.draw(
+				frameIndex5,
+				baseX + (10 * baseXDir) + (xOffset5[offsetIndex5] * baseXDir),
+				baseY + yOffset5[offsetIndex5] + 8,
+				1, 1, null, 1, 1, 1, zIndex + 1
+			);
+		}
+
+		//6th two diagonals
+		if (fullHyperChargeAnimTime > 10 && fullHyperChargeAnimTime < 22) {
+			hCAnimT6 += Global.speedMul;
+			int frameIndex6 = (int)((hCAnimT6 / maxHyperChargeAnimTime) * fatCharge.totalFrameNum);
+			int offsetIndex6 = (int)(hCAnimT6 % 12);
+			float[] yOffset6 = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+			float[] xOffset6 = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+
+			fatCharge.draw(
+				frameIndex6,
+				baseX + (12 * baseXDir) + (xOffset6[offsetIndex6] * baseXDir),
+				baseY - yOffset6[offsetIndex6] - 9,
+				1, 1, null, 1, 1, 1, zIndex + 1
+			);
+			fatCharge.draw(
+				frameIndex6,
+				baseX - (5 * baseXDir) - (xOffset6[offsetIndex6] * baseXDir),
+				baseY + yOffset6[offsetIndex6] + 8,
+				1, 1, null, 1, 1, 1, zIndex + 1
+			);
+
+		}
+
+		//7th two Horizontals
+		if (fullHyperChargeAnimTime > 12 && fullHyperChargeAnimTime < 24) {
+			hCAnimT7 += Global.speedMul;
+			int frameIndex6 = (int)((hCAnimT7 / maxHyperChargeAnimTime) * fatCharge.totalFrameNum);
+			int offsetIndex7 = (int)(hCAnimT7 % 12);
+			float[] xOffset7 = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+
+			fatCharge.draw(
+				frameIndex6,
+				baseX + (16 * baseXDir) + (xOffset7[offsetIndex7] * baseXDir),
+				baseY - 1,
+				1, 1, null, 1, 1, 1, zIndex + 1
+			);
+			fatCharge.draw(
+				frameIndex6,
+				baseX - (11 * baseXDir) -	 (xOffset7[offsetIndex7] * baseXDir),
+				baseY - 1,
+				1, 1, null, 1, 1, 1, zIndex + 1
+			);
+		}
+
+		//8th two verticals
+		if (fullHyperChargeAnimTime > 14 && fullHyperChargeAnimTime <= 25) {
+			hCAnimT8 += Global.speedMul;
+			int frameIndex6 = (int)((hCAnimT8 / maxHyperChargeAnimTime) * fatCharge.totalFrameNum);
+			int offsetIndex8 = (int)(hCAnimT8 % 12);
+
+			float[] yOffset8 = {
+				0, 1, 2, 3, 4, 5,
+				6, 7, 8, 9, 10, 11
+			};
+			fatCharge.draw(
+				frameIndex6,
+				baseX + (2 * baseXDir),
+				baseY - yOffset8[offsetIndex8] - 16,
+				1, 1, null, 1, 1, 1, zIndex + 1
+			);
+
+			fatCharge.draw(
+				frameIndex6,
+				baseX + (4 * baseXDir),
+				baseY + yOffset8[offsetIndex8] + 14,
+				1, 1, null, 1, 1, 1, zIndex + 1
+			);
+		}
 	}
 
 	public override void chargeGfx() {
@@ -1172,11 +1354,7 @@ public class MegamanX : Character {
 		List<ShaderWrapper?> chargePalletes = getChargeShaders() as List<ShaderWrapper?>;
 		if (chargePalletes.Count > 0) {
 			if (chargePalletes.Count == 1) {
-				if (!hyperChargeActive) {
-					chargePalletes.Add(null);
-				} else if (!chargePalletes.Contains(Player.XYellowC)) {
-					chargePalletes.Add(Player.XYellowC);
-				}
+				chargePalletes.Add(null);
 			}
 			ShaderWrapper? targetChargePallete = chargePalletes[MathInt.Floor(
 				(chargePalleteTime % (chargePalletes.Count * 2)) / 2f
@@ -1237,14 +1415,11 @@ public class MegamanX : Character {
 				chargePalletes.Add(Player.XOrangeC);
 			}
 		}
-		if (hyperChargeActive) {
-			if (!hasFullHyperMaxArmor && stockedMaxBusterLv == 0 &&
-				!chargePalletes.Contains(Player.XOrangeC)
-			) {
+		if (hyperChargeActive && currentWeapon?.ammo > 0) {
+			if (!chargePalletes.Contains(Player.XOrangeC)) {
 				chargePalletes.Add(Player.XOrangeC);
-			} else if (!stockedSaber && !chargePalletes.Contains(Player.XPinkC)) {
-				chargePalletes.Add(Player.XPinkC);
 			}
+			
 		}
 		return chargePalletes;
 	}
