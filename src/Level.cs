@@ -1385,6 +1385,7 @@ public partial class Level {
 			go.speedMul = slowAmount * Global.gameSpeed;
 			go.update();
 			go.stateUpdate();
+			go.physicsUpdate();
 			if (isNon1v1Elimination() &&
 				gameMode.virusStarted > 0 && go is Actor actor &&
 				actor.ownedByLocalPlayer && go is IDamagable damagable

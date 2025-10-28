@@ -561,10 +561,6 @@ public partial class Actor : GameObject {
 	}
 
 	public virtual void update() {
-		if (immuneToKnockback) {
-			stopMovingS();
-		}
-
 		foreach (var key in netSounds.Keys.ToList()) {
 			if (!Global.sounds.Contains(netSounds[key])) {
 				netSounds.Remove(key);
@@ -600,6 +596,7 @@ public partial class Actor : GameObject {
 			timeStopTime = 0;
 			sprite.time += Global.spf;
 		}
+
 		if (timeStopTime > 0) {
 			timeStopTime--;
 			if (timeStopTime <= 0) {
@@ -607,22 +604,39 @@ public partial class Actor : GameObject {
 			}
 		};
 
+		if (gravityWellable) {
+			Helpers.decrementTime(ref gravityWellTime);
+			if (gravityWellTime <= 0) {
+				gravityWellModifier = 1;
+			}
+		}
+
+		for (int i = 0; i < damageHistory.Count - 1; i++) {
+			if (Global.time - damageHistory[i].time > 15f &&
+				(damageHistory.Count > 1 || Global.level.isTraining())
+			) {
+				damageHistory.RemoveAt(i);
+				i--;
+			}
+		}
+	}
+
+	public virtual void physicsUpdate() {
+		Character chr = this as Character;
+
 		bool wading = isWading();
 		bool underwater = isUnderwater();
-
-		var chr = this as Character;
-		var ra = this as RideArmor;
 
 		if (locallyControlled) {
 			localUpdate(underwater);
 		}
 
-		if (this is RideChaser && isWading()) {
+		if (this is RideChaser && wading) {
 			grounded = true;
 			if (vel.y > 0) vel.y = 0;
 		}
 
-		bool isRaSpawning = (ra != null && ra.isSpawning());
+		bool isRaSpawning = (this is RideArmor ra && ra.isSpawning());
 		bool isChrSpawning = (chr != null && chr.isSpawning());
 		if (splashable && !isChrSpawning && !isRaSpawning) {
 			if (wading || underwater) {
@@ -675,20 +689,6 @@ public partial class Actor : GameObject {
 				}
 			} else {
 				underwaterTime = 0;
-			}
-		}
-
-		if (gravityWellable) {
-			Helpers.decrementTime(ref gravityWellTime);
-			if (gravityWellTime <= 0) {
-				gravityWellModifier = 1;
-			}
-		}
-
-		for (int i = 0; i < damageHistory.Count - 1; i++) {
-			if (Global.time - damageHistory[i].time > 15f && (damageHistory.Count > 1 || Global.level.isTraining())) {
-				damageHistory.RemoveAt(i);
-				i--;
 			}
 		}
 	}

@@ -1222,13 +1222,18 @@ public partial class Character : Actor, IDamagable {
 		updateCtrl();
 	}
 
+	
+	public override void statePreUpdate() {
+		charState.stateFrames += 1f * Global.speedMul;
+		charState.preUpdate();
+	}
+
 	public override void stateUpdate() {
 		charState.update();
 	}
 
 	public override void statePostUpdate() {
-		base.statePostUpdate();
-		charState.stateFrames += 1f * Global.speedMul;
+		charState.postUpdate();
 	}
 
 	public virtual bool updateCtrl() {
