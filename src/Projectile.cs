@@ -802,7 +802,7 @@ public class Projectile : Actor {
 		Point pos, Actor owner, Player player, ushort? netProjId,
 		float angle, params byte[] extraData
 	) {
-		int byteAngle = MathInt.Round(angle % 256f);
+		int byteAngle = MathInt.Round(Helpers.to256(angle));
 		rpcCreateHelper(pos, player, netProjId, byteAngle, true, owner, extraData);
 	}
 	public virtual void rpcCreateAngle(
