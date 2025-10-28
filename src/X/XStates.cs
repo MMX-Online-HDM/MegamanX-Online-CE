@@ -112,11 +112,6 @@ public class LightDash : CharState {
 		int inputXDir = player.input.getXDir(player);
 		bool dashHeld = player.input.isHeld(initialDashButton, player);
 
-		if (character.isWallClose != null) {
-			character.changeState(new DashEnd(false), true);
-			return;
-		}
-
 		if (changeDirection) {
 			character.changeState(new DashEnd(true), true);
 			return;
@@ -230,7 +225,7 @@ public class GigaAirDash : CharState {
 		int inputXDir = player.input.getXDir(player);
 		bool dashHeld = player.input.isHeld(initialDashButton, player);
 
-		if (character.isWallClose != null) {
+		if (character.canWallClimb() && character.isCWallClose != null) {
 			character.changeState(new DashEnd(false), true);
 		}
 

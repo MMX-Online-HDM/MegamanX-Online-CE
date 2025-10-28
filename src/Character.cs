@@ -226,11 +226,12 @@ public partial class Character : Actor, IDamagable {
 		X2,
 		X3,
 	}
-	public CollideData? isWallClose =>
-		Global.level.raycast(
+	public CollideData? isCWallClose => (
+		Global.level.raycastCond(
 			pos, pos.addxy(10 * xDir, 0),
-			new List<Type>() { typeof(Wall) }
-		);
+			[typeof(Wall)], (go) => go is Wall { slippery: false }
+		)
+	);
 
 	// Main character class starts here.
 	public Character(
@@ -534,8 +535,6 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool canDash() {
-		//Check if a Wall is close by, this should simulate the behavior of SNES
-		if (isWallClose != null) return false;
 		if (player.isAI && charState is Dash) return false;
 		if (rideArmorPlatform != null) return false;
 		if (charState is WallKick wallKick && wallKick.stateTime < 0.25f) return false;

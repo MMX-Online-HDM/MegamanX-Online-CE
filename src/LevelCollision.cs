@@ -673,7 +673,26 @@ public partial class Level {
 		foreach (var collideData in hits) {
 			float? dist = collideData.hitData.hitPoint?.distanceTo(pos1);
 			if (dist == null) continue;
-			if (dist.Value < minDist) {
+			if (dist.Value <= minDist) {
+				minDist = dist.Value;
+				best = collideData;
+			}
+		}
+
+		return best;
+	}
+
+	public CollideData? raycastCond(
+		Point pos1, Point pos2, List<Type> classNames, Func<GameObject, bool> action
+	) {
+		List<CollideData> hits = raycastAll(pos1, pos2, classNames);
+
+		float minDist = float.MaxValue;
+		CollideData? best = null;
+		foreach (CollideData collideData in hits) {
+			float? dist = collideData.hitData.hitPoint?.distanceTo(pos1);
+			if (dist == null || dist.Value > minDist) { continue; }
+			if (action(collideData.gameObject)) {
 				minDist = dist.Value;
 				best = collideData;
 			}
