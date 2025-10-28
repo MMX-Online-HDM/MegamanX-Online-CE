@@ -214,6 +214,7 @@ public class Vile : Character {
 		if (!isShootingGizmo && !isShootingVulcan && !usedAmmoLastFrame) {
 			energy.addAmmo(0.25f * speedMul, player);
 		}
+		usedAmmoLastFrame = false;
 
 		if (isShootingVulcan && sprite.name.EndsWith("shoot"))
 			changeSpriteFromName(charState.shootSpriteEx, false);
@@ -567,12 +568,21 @@ public class Vile : Character {
 	}
 
 	public bool tryUseVileAmmo(float ammo, bool isVulcan = false) {
+		// Do not drain if negative, use ammo regen for that.
+		if (ammo < 0) {
+			return true;
+		}
+		if (isVulcan) {
+			usedAmmoLastFrame = true;
+		}
 		if (energy.ammo >= ammo) {
+			usedAmmoLastFrame = true;
 			energy.addAmmo(-ammo, player);
 			return true;
 		}
 		return false;
 	}
+
 	public override void addAmmo(float amount) {
 		if (amount < 0) {
 			energy.addAmmo(amount, player);

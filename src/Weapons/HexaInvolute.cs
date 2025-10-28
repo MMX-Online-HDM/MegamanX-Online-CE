@@ -44,7 +44,6 @@ public class HexaInvoluteState : VileState {
 		}
 
 		if (proj != null) {
-			vile.usedAmmoLastFrame = true;
 			Helpers.decrementTime(ref ammoTime);
 			if (ammoTime == 0) {
 				ammoTime = 0.125f;
@@ -73,7 +72,6 @@ public class HexaInvoluteState : VileState {
 		base.onExit(newState);
 		proj?.destroySelf();
 		vile.useGravity = true;
-		vile.usedAmmoLastFrame = false;
 	}
 }
 
