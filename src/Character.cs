@@ -1236,6 +1236,26 @@ public partial class Character : Actor, IDamagable {
 		charState.postUpdate();
 	}
 
+	public override void postUpdate() {
+		base.postUpdate();
+		postUpdateCtrl();
+	}
+
+	public virtual bool postUpdateCtrl() {
+		if (!ownedByLocalPlayer) {
+			return false;
+		}
+		if (charState.exitOnLanding && grounded) {
+			landingCode();
+			return true;
+		}
+		if (charState.exitOnAirborne && !grounded) {
+			changeState(getFallState());
+			return true;
+		}
+		return false;
+	}
+
 	public virtual bool updateCtrl() {
 		if (!ownedByLocalPlayer) {
 			return false;

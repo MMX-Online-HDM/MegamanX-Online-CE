@@ -446,8 +446,10 @@ public class PunchyZero : Character {
 			return true;
 		}
 		int yDir = player.input.getYDir(player);
+		bool altAttack = player.input.getYDir(player) == (Options.main.altZeroSpinCtrl ? 1 : 0);
+
 		if (isDashing && dashAttackCooldown == 0 &&
-			player.input.getYDir(player) == 0 && shootPressTime > 0
+			altAttack && shootPressTime > 0
 		) {
 			changeState(new PZeroSpinKick(), true);
 			return true;

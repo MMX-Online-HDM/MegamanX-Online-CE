@@ -18,7 +18,7 @@ public class CharState {
 	);
 	public string landSprite = "";
 	public string airSprite = "";
-	public bool wasGrounded = true;
+	public bool? wasGrounded = null;
 	public Point busterOffset;
 	public Character character = null!;
 	public Collider? lastLeftWallCollider;
@@ -144,7 +144,6 @@ public class CharState {
 			character.useGravity = false;
 			character.stopMoving();
 		}
-		wasGrounded = character.grounded;
 		if (this is not Jump and not WallKick && (!oldState.canStopJump || oldState.stoppedJump)) {
 			stoppedJump = true;
 		}
@@ -183,11 +182,8 @@ public class CharState {
 	public virtual void render(float x, float y) {
 	}
 
-	
 	public virtual void preUpdate() {
-	}
-
-	public virtual void postUpdate() {
+		wasGrounded = character.grounded;
 	}
 
 	public virtual void update() {
@@ -250,13 +246,14 @@ public class CharState {
 		} else if (rightWallPlat?.gameObject is Actor rightActor && rightActor.isPlatform && rightActor.pos.x > character.pos.x) {
 			lastRightWallCollider = rightActor.collider;
 		}
+	}
 
+	public virtual void postUpdate() {
 		airTrasition();
-		wasGrounded = character.grounded;
 	}
 
 	public virtual void airTrasition() {
-		if (airSprite != "" && !character.grounded && wasGrounded && sprite == landSprite) {
+		if (airSprite != "" && !character.grounded && wasGrounded != false && sprite == landSprite) {
 			sprite = airSprite;
 			int oldFrameIndex = character.sprite.frameIndex;
 			float oldFrameTime = character.sprite.frameTime;
@@ -268,7 +265,7 @@ public class CharState {
 				character.sprite.frameIndex = character.sprite.totalFrameNum - 1;
 				character.sprite.frameTime = character.sprite.getCurrentFrame().duration;
 			}
-		} else if (landSprite != "" && character.grounded && !wasGrounded && sprite == airSprite) {
+		} else if (landSprite != "" && character.grounded && wasGrounded != true && sprite == airSprite) {
 			character.playAltSound("land", sendRpc: true, altParams: "larmor");
 			sprite = landSprite;
 			int oldFrameIndex = character.sprite.frameIndex;

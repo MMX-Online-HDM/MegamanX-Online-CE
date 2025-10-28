@@ -75,6 +75,7 @@ public class Options {
 	public bool swapAirAttacks;
 	public bool showGigaAttackCooldown;
 	public ZeroLoadout zeroLoadout = new ZeroLoadout();
+	public bool altZeroSpinCtrl;
 
 	// Vile
 	public int weaponOrderingVile;
