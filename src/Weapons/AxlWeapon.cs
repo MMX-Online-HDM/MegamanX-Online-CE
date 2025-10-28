@@ -109,7 +109,7 @@ public class AxlWeapon : Weapon {
 		float rateOfFireMode = (axl.isWhiteAxl() ? whiteAxlFireRateMod() : 1);
 		altShotCooldown = altFireCooldown / rateOfFireMode;
 
-		float ammoUsage = getAmmoUsage(3);
+		float ammoUsage = getAmmoUsage(isAxlBullets ? axl.getChargeLevel() + 1 : 3);
 		ammo -= ammoUsage;
 		if (ammo < 0) ammo = 0;
 

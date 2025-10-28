@@ -149,6 +149,7 @@ public class CannonAttack : VileState {
 	public VileCannon weapon;
 	public float shootTime;
 	public int loopNum;
+	public bool lockAir => Options.main.lockInAirCannon;
 	public CannonAttack(VileCannon weapon) : base("idle_shoot") {
 		useDashJumpSpeed = true;
 		airMove = true;
@@ -162,7 +163,7 @@ public class CannonAttack : VileState {
 	public override void update() {
 		base.update();
 		character.turnToInput(player.input, player);
-		if (vile.energy.ammo < weapon.vileAmmoUsage) {
+		if (vile.energy.ammo < weapon.vileAmmoUsage && !lockAir && !character.grounded) {
 			character.changeToCrouchOrFall();
 			return;
 		}
@@ -180,6 +181,10 @@ public class CannonAttack : VileState {
 			if (loopNum >= 4) {
 				character.changeToIdleOrFall();
 			}
+			if (vile.energy.ammo < weapon.vileAmmoUsage) {
+				character.changeToIdleOrFall();
+				return;
+            }
         }
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
@@ -191,7 +196,7 @@ public class CannonAttack : VileState {
 		if (!character.grounded) {
 			sprite = "cannon_air";
 			character.changeSpriteFromName(sprite, true);
-			if (Options.main.lockInAirCannon) {
+			if (lockAir) {
                 character.useGravity = false;
 				character.stopMoving();
 				character.vel = new Point();
@@ -206,6 +211,7 @@ public class CannonAttack : VileState {
 			character.useGravity = false;
 			character.stopMoving();
 			character.vel = new Point();
+			canJump = false;
         }
 	}
 	public override void onExit(CharState? newState) {

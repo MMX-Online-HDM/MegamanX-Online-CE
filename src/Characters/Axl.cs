@@ -114,6 +114,8 @@ public class Axl : Character {
 	public bool gaeaHeld;
 	public float switchTime;
 	public float altSwitchTime;
+	public const float lowSwitchTime = 18;
+	public const float highSwitchTime = 36;
 	public float recoilTime;
 	// Backwards Debuff
 	public float[] rshootDebuffTime = [0, 0, 0];
@@ -1559,12 +1561,12 @@ public class Axl : Character {
 	public override void onWeaponChange(Weapon oldWeapon, Weapon newWeapon) {
 		if (switchTime > 0 || altSwitchTime > 0) return;
 		if (oldWeapon.shootCooldown > 0 || oldWeapon.altShotCooldown > 0) {
-			switchTime = 18;
-			altSwitchTime = 18;
+			switchTime = lowSwitchTime;
+			altSwitchTime = lowSwitchTime;
 		}
 		if (oldWeapon.shootCooldown > 15 || oldWeapon.altShotCooldown > 15) {
-			switchTime = 36;
-			altSwitchTime = 36;
+			switchTime = highSwitchTime;
+			altSwitchTime = highSwitchTime;
 		}
 		if (isZooming()) zoomOut();	
 		plasmaGunAltProj?.destroySelf();

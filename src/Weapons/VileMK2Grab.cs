@@ -67,9 +67,6 @@ public class VileMK2GrabState : CharState {
 
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
-		if (character is Vile vile) {
-			vile.grabCooldown = 1;
-		}
 		if (newState is not VileMK2GrabState && victim != null) {
 			victim.grabInvulnTime = 2;
 			victim.stunInvulnTime = 1;

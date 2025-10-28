@@ -177,11 +177,11 @@ public class DNACore : AxlWeapon {
 			return;
 		}
 		if (oldATrans || !usedOnce) {
-			if (character.currency < 1) {
+			if (character.player.currency < 1) {
 				Global.level.gameMode.setHUDErrorMessage(character.player, "Transformation requires 1 Metal");
 				return;
 			}
-			character.currency--;
+			character.player.currency--;
 		}
 
 		character.player.lastDNACore = this;
@@ -192,7 +192,7 @@ public class DNACore : AxlWeapon {
 		}
 		character.player.preTransformedChar = character.player.character;
 		character.player.startAtransMain(this, character.player.getNextATransNetId());
-		character.player.character.playSound("transform", sendRpc: true);
-		character.player.character.undisguiseTime = 6;
+		character.playSound("transform", sendRpc: true);
+		character.undisguiseTime = 6;
 	}
 }

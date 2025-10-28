@@ -132,7 +132,7 @@ public class BallAttacks : VileState {
 	public override void update() {
 		base.update();
 
-		if (vile.energy.ammo < weapon.vileAmmoUsage) {
+		if (vile.energy.ammo < weapon.vileAmmoUsage && character.isAnimOver()) {
 			character.changeToCrouchOrFall();
 			return;
 		}

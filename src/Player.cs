@@ -526,12 +526,6 @@ public partial class Player {
 	}
 
 	public int getSameCharNum() {
-		if (Global.level?.server?.customMatchSettings != null) {
-			if (Global.level.gameMode.isTeamMode && alliance == GameMode.redAlliance) {
-				return Global.level.server.customMatchSettings.redSameCharNum;
-			}
-			return Global.level.server.customMatchSettings.sameCharNum;
-		}
 		return -1;
 	}
 

@@ -6,8 +6,7 @@ using System.Reflection;
 namespace MMXOnline;
 
 public class Vile : Character {
-	public const float maxCalldownMechCooldown = 2;
-	public float grabCooldown = 1;
+	public const float maxCalldownMechCooldown = 120;
 	public float vulcanLingerTime;
 	public const int callNewMechCost = 5;
 	public float mechBusterCooldown;
@@ -211,15 +210,17 @@ public class Vile : Character {
 		else if (isVileMK2 || isVileMK5) altSoundId = AltSoundIds.X3;
 
 		if (!ownedByLocalPlayer) return;
-		
-		if (!isShootingGizmo && !isShootingVulcan) energy.addAmmo(0.25f * speedMul, player);
+
+		if (!isShootingGizmo && !isShootingVulcan && !usedAmmoLastFrame) {
+			energy.addAmmo(0.25f * speedMul, player);
+		}
+
 		if (isShootingVulcan && sprite.name.EndsWith("shoot"))
 			changeSpriteFromName(charState.shootSpriteEx, false);
 		else changeSpriteFromName(charState.sprite, resetFrame: false);
 
-		Helpers.decrementTime(ref calldownMechCooldown);
-		Helpers.decrementTime(ref grabCooldown);
-		Helpers.decrementTime(ref mechBusterCooldown);
+		Helpers.decrementFrames(ref calldownMechCooldown);
+		Helpers.decrementFrames(ref mechBusterCooldown);
 		Helpers.decrementFrames(ref aiAttackCooldown);
 		Helpers.decrementFrames(ref vulcanLingerTime);
 		Helpers.decrementFrames(ref deadCooldown);
@@ -329,7 +330,7 @@ public class Vile : Character {
 	}
 
 	public bool dashGrabSpecial() {
-		if (!player.input.isPressed(Control.Special1, player)) {
+		if (!player.input.isHeld(Control.Special1, player)) {
 			return false;
 		}
 		if (charState is Dash or AirDash && isVileMK2) {
@@ -359,9 +360,9 @@ public class Vile : Character {
 					missileWeapon.vileShoot(WeaponIds.ElectricShock, this);
 				}
 				if (goliathShotPressed) {
-					if (Goliath && !rideArmor.isAttacking() && mechBusterCooldown == 0) {
+					if (Goliath && !rideArmor.isAttacking() && mechBusterCooldown <= 0) {
 						rideArmor.changeState(new RAGoliathShoot(rideArmor.grounded), true);
-						mechBusterCooldown = 1;
+						mechBusterCooldown = 60;
 					}
 				}
 			}
@@ -566,11 +567,7 @@ public class Vile : Character {
 	}
 
 	public bool tryUseVileAmmo(float ammo, bool isVulcan = false) {
-		if (isVulcan) {
-			usedAmmoLastFrame = true;
-		}
 		if (energy.ammo >= ammo) {
-			usedAmmoLastFrame = true;
 			energy.addAmmo(-ammo, player);
 			return true;
 		}
