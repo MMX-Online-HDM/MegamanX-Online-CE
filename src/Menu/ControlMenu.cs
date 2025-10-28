@@ -36,20 +36,20 @@ public class ControlMenu : IMainMenu {
 			mappingClone = new Dictionary<string, int?>(Control.getKeyboardMapping(charNum, axlAimMode, true));
 		}
 
-		bindableControls = new List<string[]>() {
-				new string[] { Control.Up, "Up" },
-				new string[] { Control.Down, "Down" },
-				new string[] { Control.Left, "Left" },
-				new string[] { Control.Right, "Right" },
-				new string[] { Control.Jump, "Jump" },
-				new string[] { Control.Shoot, "Shoot" },
-				new string[] { Control.Dash, "Dash" },
-				new string[] { Control.Special1, "Special" },
-				new string[] { Control.WeaponLeft, "WeaponL" },
-				new string[] { Control.WeaponRight, "WeaponR" },
-				new string[] { Control.Special2, "Command"},
-				new string[] { Control.Taunt, "Taunt" }
-			};
+		bindableControls = [
+			[Control.Up, "Up"],
+			[Control.Down, "Down"],
+			[Control.Left, "Left"],
+			[Control.Right, "Right"],
+			[Control.Jump, "Jump"],
+			[Control.Dash, "Dash"],
+			[Control.Shoot, "Attack"],
+			[Control.Special1, "Special"],
+			[Control.WeaponLeft, "Alt L"],
+			[Control.WeaponRight, "Alt R"],
+			[Control.Special2, "Command"],
+			[Control.Taunt, "Taunt"]
+		];
 
 		// General menu controls not to be overridden on characters
 		if (charNum == -2) {

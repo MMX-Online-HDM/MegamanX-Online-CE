@@ -201,15 +201,15 @@ public class VileLoadout {
 
 	public int getTotalWeight() {
 		int totalWeight =
-			SelectVileWeaponMenu.vileWeaponCategories[0].weapons.FirstOrDefault(w => w.type == cannon).vileWeight +
-			SelectVileWeaponMenu.vileWeaponCategories[1].weapons.FirstOrDefault(w => w.type == vulcan).vileWeight +
-			SelectVileWeaponMenu.vileWeaponCategories[2].weapons.FirstOrDefault(w => w.type == missile).vileWeight +
-			SelectVileWeaponMenu.vileWeaponCategories[3].weapons.FirstOrDefault(w => w.type == rocketPunch).vileWeight +
-			SelectVileWeaponMenu.vileWeaponCategories[4].weapons.FirstOrDefault(w => w.type == napalm).vileWeight +
-			SelectVileWeaponMenu.vileWeaponCategories[5].weapons.FirstOrDefault(w => w.type == ball).vileWeight +
-			SelectVileWeaponMenu.vileWeaponCategories[6].weapons.FirstOrDefault(w => w.type == cutter).vileWeight +
-			SelectVileWeaponMenu.vileWeaponCategories[7].weapons.FirstOrDefault(w => w.type == flamethrower).vileWeight +
-			SelectVileWeaponMenu.vileWeaponCategories[8].weapons.FirstOrDefault(w => w.type == laser).vileWeight;
+			SelectVileWeaponMenu.vileWeaponCategories[0].weapons.FirstOrDefault(w => w.type == cannon)?.vileWeight ?? 0 +
+			SelectVileWeaponMenu.vileWeaponCategories[1].weapons.FirstOrDefault(w => w.type == vulcan)?.vileWeight ?? 0 +
+			SelectVileWeaponMenu.vileWeaponCategories[2].weapons.FirstOrDefault(w => w.type == missile)?.vileWeight ?? 0 +
+			SelectVileWeaponMenu.vileWeaponCategories[3].weapons.FirstOrDefault(w => w.type == rocketPunch)?.vileWeight ?? 0 +
+			SelectVileWeaponMenu.vileWeaponCategories[4].weapons.FirstOrDefault(w => w.type == napalm)?.vileWeight ?? 0 +
+			SelectVileWeaponMenu.vileWeaponCategories[5].weapons.FirstOrDefault(w => w.type == ball)?.vileWeight ?? 0 +
+			SelectVileWeaponMenu.vileWeaponCategories[6].weapons.FirstOrDefault(w => w.type == cutter)?.vileWeight ?? 0 +
+			SelectVileWeaponMenu.vileWeaponCategories[7].weapons.FirstOrDefault(w => w.type == flamethrower)?.vileWeight ?? 0 +
+			SelectVileWeaponMenu.vileWeaponCategories[8].weapons.FirstOrDefault(w => w.type == laser)?.vileWeight ?? 0;
 		return totalWeight;
 	}
 

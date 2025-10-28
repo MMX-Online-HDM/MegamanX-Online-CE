@@ -4,24 +4,38 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class Weapon {
-	public static Weapon baseNetWeapon = new();
+	/// <summary> Default nullable weapon, do not change. </summary>
+	public static readonly Weapon baseNetWeapon = new();
+	/// <summary> On fire sounds, skipped if empty. </summary>
 	public string[] shootSounds = ["", "", "", ""];
+	/// <summary> Display ammo. </summary>
 	public float ammo;
+	/// <summary> Display max posible ammo. </summary>
 	public float maxAmmo;
+	/// <summary> Default shoot cooldown. </summary>
 	public float fireRate;
+	/// <summary> Active shoot cooldown. </summary>
 	public float shootCooldown;
+	/// <summary> For alt shoot modes. </summary>
 	public float altShotCooldown;
+	/// <summary> Used only if lower than shoot cooldown. </summary>
 	public float switchCooldown = float.MaxValue;
-	public float soundTime = 0;
+	/// <summary> For X's stream weapons. </summary>
 	public bool isStream = false;
-	public string displayName = "";
-	public string[] description = {""};
+	/// <summary> Holds damage values, optional. </summary>
 	public Damager? damager;
-	public int type; // For "swappable category" weapons, like techniques, vile weapon sections, etc.
+	/// <summary> For "swappable category" weapons, like techniques, vile weapon sections, etc. </summary>
+	public int type;
+	
+	// Hud display stuff.
+	public string displayName = "";
+	public string[] description = [""];
 
 	public int streams;
 
+	/// <summary> Weapon ID. </summary>
 	public int index;
+	/// <summary> Killfeed icon ID. </summary>
 	public int killFeedIndex;
 	public int weaponBarBaseIndex;
 	public int weaponBarIndex;
@@ -355,7 +369,6 @@ public class Weapon {
 	}
 	
 	public virtual void update() {
-		Helpers.decrementFrames(ref soundTime);
 		Helpers.decrementFrames(ref shootCooldown);
 		Helpers.decrementFrames(ref altShotCooldown);
 		if (Global.level.server?.customMatchSettings?.axlCustomReload == true) {

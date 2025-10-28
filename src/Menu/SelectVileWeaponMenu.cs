@@ -13,13 +13,11 @@ public class SelectVileWeaponMenu : IMainMenu {
 
 	public static (string name, Weapon[] weapons)[] vileWeaponCategories = {
 			("Cannon", [
-				NoneCannon.netWeapon,
 				FrontRunner.netWeapon,
 				FatBoy.netWeapon,
 				LongShotGizmo.netWeapon
 			]),
 			("Vulcan", [
-				NoneVulcan.netWeapon,
 				CherryBlast.netWeapon,
 				DistanceNeedler.netWeapon,
 				BuckshotDance.netWeapon,
@@ -31,37 +29,31 @@ public class SelectVileWeaponMenu : IMainMenu {
 				ElectricShock.netWeapon,
 			]),
 			("R.Punch", [
-				NoneRocketPunch.netWeapon,
 				GoGetterRight.netWeapon,
 				SpoiledBrat.netWeapon,
 				InfinityGig.netWeapon,
 			]),
 			("Napalm", [
-				NoneNapalm.netWeapon,
 				RumblingBang.netWeapon,
 				FireGrenade.netWeapon,
 				SplashHit.netWeapon
 			]),
 			("Grenade", [
-				NoneBall.netWeapon,
 				ExplosiveRound.netWeapon,
 				SpreadShot.netWeapon,
 				PeaceOutRoller.netWeapon
 			]),
 			("Cutter", [
-				NoneCutter.netWeapon,
 				QuickHomesick.netWeapon,
 				MaroonedTomahawk.netWeapon,
 				ParasiteSword.netWeapon,
 			]),
 			("Flamethrower", [
-				NoneFlamethrower.netWeapon,
 				WildHorseKick.netWeapon,
 				SeaDragonRage.netWeapon,
 				DragonsWrath.netWeapon,
 			]),
 			("Laser", [
-				NoneLaser.netWeapon,
 				NecroBurst.netWeapon,
 				StraightNightmare.netWeapon,
 				RisingSpecter.netWeapon,

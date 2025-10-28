@@ -269,18 +269,22 @@ public class Vile : Character {
 		}
 		// Get input.
 		bool shootHeld = player.input.isHeld(Control.Shoot, player);
+		bool upHeld = player.input.getYDir(player) == -1;
 		bool weaponRightHeld = (
 			player.input.isHeld(Control.WeaponRight, player) && 
-			(!isATrans || !player.input.isHeld(Control.Up, player))
+			(!isATrans || !player.input.isHeld(Control.Down, player))
 		);
-
-		if (shootHeld && cannonWeapon.type > -1) {
+		if (shootHeld) {
 			if (cannonWeapon.shootCooldown < cannonWeapon.fireRate * 0.75f) {
 				cannonWeapon.vileShoot(0, this);
 				return true;
 			}
 		}
-		if (weaponRightHeld && vulcanWeapon.type > -3) {
+		if (weaponRightHeld && upHeld) {
+			cutterWeapon.vileShoot(WeaponIds.VileCutter, this);
+			return true;
+		}
+		if (weaponRightHeld) {
 			vulcanWeapon.vileShoot(0, this);
 			return true;
 		}
@@ -295,14 +299,9 @@ public class Vile : Character {
 			return false;
 		}
 		bool leftorRightHeld = player.input.getXDir(player) != 0;
-		bool upHeld = player.input.getYDir(player) == -1;
 		bool downHeld = player.input.getYDir(player) == 1;
 		if (downHeld) {
 			downSpWeapon.vileShoot(WeaponIds.Napalm, this);
-			return true;
-		}
-		if (upHeld) {
-			cutterWeapon.vileShoot(WeaponIds.VileCutter, this);
 			return true;
 		}
 		if (leftorRightHeld) {
