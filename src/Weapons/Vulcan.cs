@@ -15,6 +15,19 @@ public class VileVulcan : Weapon {
 		killFeedIndex = 62;
 		weaponSlotIndex = 44;
 	}
+
+	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+		if (shootCooldown > 0 || vile.energy.ammo < vileAmmoUsage) {
+			return;
+		}
+		vile.vulcanLingerTime = fireRate > 9 ? fireRate : 9;
+		vile.changeSpriteFromName(vile.charState.shootSpriteEx, false);
+		ladderVoid(vile);
+		vile.setVileShootTime(this);
+		vile.tryUseVileAmmo(vileAmmoUsage, true);
+		shoot(vile, []);
+	}
+
 	public void ladderVoid(Vile vava) {
         if (vava.charState is LadderClimb) {
 			if (vava.player.input.isHeld(Control.Left, vava.player)) {
@@ -38,22 +51,12 @@ public class CherryBlast : VileVulcan {
 		damage = "1";
 		effect = "None.";
 	}
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
-		if (shootCooldown > 0) return;
-		if (vile.energy.ammo < vileAmmoUsage) return;
-		shoot(vile, []);
-	}
+	
 	public override void shoot(Character character, int[] args) {
-		if (character is not Vile vava) return;
-		vava.vulcanLingerTime = fireRate;
-		vava.changeSpriteFromName(vava.charState.shootSpriteEx, false);
-		ladderVoid(vava);
-		vava.playSound("vulcan", sendRpc: true);
-		vava.setVileShootTime(this);
-		vava.tryUseVileAmmo(vileAmmoUsage, true);
+		character.playSound("vulcan", sendRpc: true);
 		new VulcanCherryBlast(
-			vava.getShootPos(), vava.getShootXDir(), vava,
-			vava.player, character.player.getNextActorNetId(), rpc: true
+			character.getShootPos(), character.getShootXDir(), character,
+			character.player, character.player.getNextActorNetId(), rpc: true
 		);
 	}
 }
@@ -72,27 +75,20 @@ public class DistanceNeedler : VileVulcan {
 		hitcooldown = "0.2";
 		effect = "Won't destroy on hit.";
 	}
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
-		if (shootCooldown > 0) return;
-		if (vile.energy.ammo < vileAmmoUsage) return;
-		shoot(vile, []);
-	}
+
 	public override void shoot(Character character, int[] args) {
-		if (character is not Vile vava) return;
-		vava.vulcanLingerTime = fireRate;
-		vava.changeSpriteFromName(vava.charState.shootSpriteEx, false);
-		ladderVoid(vava);
-		vava.playSound("vulcan", sendRpc: true);
-		vava.setVileShootTime(this);
-		vava.tryUseVileAmmo(vileAmmoUsage, true);
+		character.playSound("vulcan", sendRpc: true);
 		new VulcanDistanceNeedler(
-			vava.getShootPos(), vava.getShootXDir(), vava,
-			vava.player, character.player.getNextActorNetId(), rpc: true
+			character.getShootPos(), character.getShootXDir(), character,
+			character.player, character.player.getNextActorNetId(), rpc: true
 		);
 	}
 }
 public class BuckshotDance : VileVulcan {
 	public static BuckshotDance netWeapon = new();
+	public static int critRange = 0;
+	public static int shootNum = 0;
+
 	public BuckshotDance() : base() {
 		type = (int)VulcanType.BuckshotDance;
 		fireRate = 8;
@@ -105,29 +101,36 @@ public class BuckshotDance : VileVulcan {
 		damage = "1";
 		effect = "Splits.";
 	}
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
-		if (shootCooldown > 0) return;
-		if (vile.energy.ammo < vileAmmoUsage) return;
-		shoot(vile, []);
-	}
+
 	public override void shoot(Character character, int[] args) {
-		if (character is not Vile vava) return;
-		vava.vulcanLingerTime = fireRate;
-		ladderVoid(vava);
-		vava.playSound("vulcan", sendRpc: true);
-		vava.setVileShootTime(this);
-		vava.tryUseVileAmmo(vileAmmoUsage, true);
-		vava.changeSpriteFromName(vava.charState.shootSpriteEx, false);
+		character.playSound("vulcan", sendRpc: true);
 		new VulcanBuckshotDance(
-			vava.getShootPos(), vava.getShootXDir(), vava,
-			vava.player, character.player.getNextActorNetId(), rpc: true
+			character.getShootPos(), getAngle(character.xDir), character,
+			character.player.getNextActorNetId(), sendRpc: true
 		);
-		if (Global.isOnFrame(3)) {
+		if (critRange >= 2f || Helpers.randomRange(0, 6) == 4) {
+			critRange -= 2;
 			new VulcanBuckshotDance(
-				vava.getShootPos(), vava.getShootXDir(), vava,
-				vava.player, character.player.getNextActorNetId(), rpc: true
+				character.getShootPos(), getAngle(character.xDir), character,
+				character.player.getNextActorNetId(), sendRpc: true
 			);
+		} else {
+			critRange++;
 		}
+	}
+
+	public float getAngle(int xDir) {
+		float angle = shootNum switch {
+			1 => 256 - 14,
+			2 => 14,
+			_ => 0
+		};
+		if (xDir == -1) {
+			angle += 128;
+		}
+		shootNum = (shootNum + 1) % 3;
+
+		return angle % 256;
 	}
 }
 public class NoneVulcan : VileVulcan {
@@ -189,36 +192,27 @@ public class VulcanDistanceNeedler : Projectile {
 }
 public class VulcanBuckshotDance : Projectile {
 	public VulcanBuckshotDance(
-		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
-	) : base(
-		pos, xDir, owner, "vulcan_bd_proj", netId, player
+		Point pos, float byteAngle, Actor owner, ushort? netId,
+		bool sendRpc = false, Player? altPlayer = null
+	) :	base(
+		pos, 1, owner, "vulcan_bd_proj", netId, altPlayer
 	) {
+		projId = (int)ProjIds.BuckshotDance;
 		weapon = BuckshotDance.netWeapon;
 		damager.damage = 1;
 		destroyOnHit = true;
 		reflectable = true;
-		maxTime = 0.25f;
-		projId = (int)ProjIds.BuckshotDance;
-		int rand = 0;
-		if (player.character is Vile vile) {
-			rand = vile.buckshotDanceNum % 3;
-			vile.buckshotDanceNum++;
-		}
-		float angle = 0;
-		if (rand == 0) angle = 0;
-		if (rand == 1) angle = -20;
-		if (rand == 2) angle = 20;
-		if (xDir == -1) angle += 180;
-		vel = Point.createFromAngle(angle).times(500);
-		projId = (int)ProjIds.BuckshotDance;
-		if (rpc) {
-			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+		maxTime = 15f / 60;
+		vel = Point.createFromByteAngle(byteAngle).times(8.4f * 60);
+
+		if (sendRpc) {
+			rpcCreateByteAngle(pos, owner, ownerPlayer, netId, byteAngle);
 		}
 	}
 
 	public static Projectile rpcInvoke(ProjParameters args) {
 		return new VulcanBuckshotDance(
-			args.pos, args.xDir, args.owner, args.player, args.netId
+			args.pos, args.byteAngle, args.owner, args.netId, altPlayer: args.player
 		);
 	}
 }
