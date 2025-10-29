@@ -691,14 +691,11 @@ public class Vile : Character {
 		return charState is MissileAttack || charState is Idle || charState is CannonAttack;
 	}
 
-	public Point? getVileMK2StunShotPos() {
+	public Point getVileMK2StunShotPos() {
 		if (charState is InRideArmor) {
 			return pos.addxy(xDir * -8, -12);
 		}
-
-		var headPos = getHeadPos();
-		if (headPos == null) return null;
-		return headPos.Value.addxy(-xDir * 5, 3);
+		return pos.addxy(-xDir * 5, -32);
 	}
 
 	public void setVileShootTime(Weapon weapon, float modifier = 1f, Weapon? targetCooldownWeapon = null) {

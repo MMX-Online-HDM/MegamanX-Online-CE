@@ -38,9 +38,10 @@ public class ElectricShock : VileMissile {
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
-		vile.changeState(new MissileAttack(this), true);
 		if (vile.charState is InRideArmor) {
 			shoot(vile, []);
+		} else {
+			vile.changeState(new MissileAttack(this), true);
 		}
 	}
 	public override void shoot(Character character, int[] args) {
@@ -48,12 +49,16 @@ public class ElectricShock : VileMissile {
 		vava.setVileShootTime(this);
 		vava.tryUseVileAmmo(vileAmmoUsage);
 		Point shootVel = vava.getVileShootVel(true);
-		Point shootPos = vava.setCannonAim(new Point(shootVel.x, shootVel.y));
 		if (vava.getShootXDir() == -1) shootVel = new Point(shootVel.x * vava.getShootXDir(), shootVel.y);
 		bool isMK2 = false;
 		isMK2 = vava.isVileMK2;
-		if (isMK2 || vava.isVileMK5) shootPos = vava.getVileMK2StunShotPos() ?? shootPos;
-			
+		Point shootPos;
+		if (isMK2) {
+			shootPos = vava.getVileMK2StunShotPos();
+		} else {
+			shootPos = vava.setCannonAim(new Point(shootVel.x, shootVel.y));
+		}
+
 		int xDir = character.getShootXDir();
 		if (isMK2) {
 			character.playSound("mk2stunshot", sendRpc: true);
@@ -117,7 +122,12 @@ public class HumerusCrush : VileMissile {
 		vava.tryUseVileAmmo(vileAmmoUsage);
 		character.playSound("vileMissile", sendRpc: true);
 		Point shootVel = vava.getVileShootVel(true);
-		Point shootPos = vava.setCannonAim(new Point(shootVel.x, shootVel.y));
+		Point shootPos;
+		if (vava.isVileMK2 || vava.isVileMK5) {
+			shootPos = vava.getVileMK2StunShotPos();
+		} else {
+			shootPos = vava.setCannonAim(new Point(shootVel.x, shootVel.y));
+		}
 		if (vava.getShootXDir() == -1) shootVel = new Point(shootVel.x * vava.getShootXDir(), shootVel.y);
 		int xDir = character.getShootXDir();
 		new VileMissileProj(
@@ -156,7 +166,12 @@ public class PopcornDemon : VileMissile {
 		vava.tryUseVileAmmo(vileAmmoUsage);
 		character.playSound("vileMissile", sendRpc: true);
 		Point shootVel = vava.getVileShootVel(true);
-		Point shootPos = vava.setCannonAim(new Point(shootVel.x, shootVel.y));
+		Point shootPos;
+		if (vava.isVileMK2 || vava.isVileMK5) {
+			shootPos = vava.getVileMK2StunShotPos();
+		} else {
+			shootPos = vava.setCannonAim(new Point(shootVel.x, shootVel.y));
+		}
 		if (vava.getShootXDir() == -1) shootVel = new Point(shootVel.x * vava.getShootXDir(), shootVel.y);
 		int xDir = character.getShootXDir();
 		new VileMissileProj(
@@ -195,7 +210,7 @@ public class MissileAttack : VileState {
 			shot = true;
 			weapon.shoot(vile, []);
 		}
-		if (character.isAnimOver()) {
+		if (character.isAnimOver() || character.loopCount >= 1) {
 			character.changeToCrouchOrFall();
 		}
 	}
