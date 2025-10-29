@@ -537,7 +537,7 @@ public partial class Character : Actor, IDamagable {
 	public virtual bool canDash() {
 		if (player.isAI && charState is Dash) return false;
 		if (rideArmorPlatform != null) return false;
-		if (charState is WallKick wallKick && wallKick.stateTime < 0.25f) return false;
+		if (charState is WallKick wallKick && wallKick.stateTime < wallKick.dashThreshold) return false;
 		if (isSoftLocked()) return false;
 		return flag == null;
 	}

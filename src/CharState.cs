@@ -1228,6 +1228,8 @@ public class WallSlideAttack : CharState {
 }
 
 public class WallKick : CharState {
+	public float dashThreshold = 0.2f;
+
 	public WallKick() : base("wall_kick", "wall_kick_shoot") {
 		accuracy = 5;
 		exitOnLanding = true;
@@ -1244,6 +1246,10 @@ public class WallKick : CharState {
 		base.update();
 		if (character.vel.y > 0) {
 			character.changeState(character.getFallState());
+		}
+		if (!character.isDashing && stateTime < dashThreshold && player.input.isHeld(Control.Dash, player)) {
+			character.dashedInAir++;
+			character.isDashing = true;
 		}
 	}
 }
