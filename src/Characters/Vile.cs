@@ -334,7 +334,9 @@ public class Vile : Character {
 		if (!player.input.isHeld(Control.Special1, player)) {
 			return false;
 		}
-		if (charState is Dash or AirDash && isVileMK2) {
+		if (isDashing && isVileMK2 &&
+			charState is Dash or AirDash { stop: false }
+		) {
 			charState.isGrabbing = true;
 			charState.superArmor = true; //peakbalance
 			changeSpriteFromName("dash_grab", true);
