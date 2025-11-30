@@ -24,6 +24,7 @@ public class HexaInvoluteState : VileState {
 		superArmor = true;
 		pushImmune = true;
 		invincible = true;
+		useGravity = false;
 	}
 
 	public override void update() {
@@ -47,11 +48,15 @@ public class HexaInvoluteState : VileState {
 			Helpers.decrementTime(ref ammoTime);
 			if (ammoTime == 0) {
 				ammoTime = 0.125f;
-				vile.addAmmo(-1);
+				vile.tryUseVileAmmo(1);
 			}
+			vile.usedAmmoLastFrame = true;
 		}
 
-		if (vile.energy.ammo <= 0 || (player.input.isPressed(Control.Special1, player) && stateFrames >= 60)) {
+		if (vile.energy.ammo <= 0 ||
+			(player.input.isPressed(Control.Special1, player) && stateFrames >= 60) ||
+			(shot && proj == null)
+		) {
 			character.changeToIdleOrFall();
 		}
 	}
@@ -65,13 +70,12 @@ public class HexaInvoluteState : VileState {
 		character.stopMovingS();
 		vile.vileHoverTime = vile.vileMaxHoverTime;
 		vile.getOffMK5Platform();
-		vile.useGravity = false;
 	}
 
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		proj?.destroySelf();
-		vile.useGravity = true;
+		vile.usedAmmoLastFrame = false;
 	}
 }
 
