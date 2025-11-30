@@ -2008,7 +2008,6 @@ public partial class Level {
 
 		// If a backwall wasn't set, the background becomes the backwall.
 		if (level.backwallSprites != null) {
-			DrawWrappers.DrawMapTiles(level.backwallSprites, 0, 0, srt, level.backwallShader);
 			DrawWrappers.DrawMapTiles(level.backgroundSprites, 0, 0, srt, level.backgroundShader);
 		}
 
