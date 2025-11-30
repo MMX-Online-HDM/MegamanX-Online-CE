@@ -358,7 +358,7 @@ public class BHornetHomingBeeProj : Projectile, IDamagable {
 	public bool isPlayableDamagable() { return false; }
 }
 public class HornetMState : MaverickState {
-	public BlastHornet ExploseHorneck = null!;
+	public BlastHornet axploseHorneck = null!;
 	public HornetMState(
 		string sprite, string transitionSprite = ""
 	) : base(
@@ -368,7 +368,7 @@ public class HornetMState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		ExploseHorneck = maverick as BlastHornet ?? throw new NullReferenceException();
+		axploseHorneck = maverick as BlastHornet ?? throw new NullReferenceException();
 
 	}
 }
@@ -397,14 +397,14 @@ public class BHornetShootState : HornetMState {
 		Point? shootPos = maverick.getFirstPOI("s");
 		if (shootPos != null) {
 			new BHornetBeeProj(
-				shootPos.Value, maverick.xDir, type, ExploseHorneck,
+				shootPos.Value, maverick.xDir, type, axploseHorneck,
 				player, player.getNextActorNetId(), rpc: true);
 		}
 	}
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		ExploseHorneck = maverick as BlastHornet ?? throw new NullReferenceException();
+		axploseHorneck = maverick as BlastHornet ?? throw new NullReferenceException();
 		if (wasFlying) maverick.useGravity = false;
 	}
 
@@ -448,9 +448,9 @@ public class BHornetShootCursorState : HornetMState {
 	public void CursorProj(int type) {
 		Point? shootPos = maverick.getFirstPOI("s");
 		if (shootPos != null) {
-			ExploseHorneck.cursor = new BHornetCursorProj(
+			axploseHorneck.cursor = new BHornetCursorProj(
 				shootPos.Value, maverick.xDir, type,
-				ExploseHorneck, ExploseHorneck, player,
+				axploseHorneck, axploseHorneck, player,
 				player.getNextActorNetId(), rpc: true
 			);
 		}
@@ -597,7 +597,7 @@ public class BHornetShoot2State : HornetMState {
 			shotOnce = true;
 			new BHornetHomingBeeProj(
 				shootPos.Value, maverick.xDir, target,
-				ExploseHorneck, player, player.getNextActorNetId(), rpc: true
+				axploseHorneck, player, player.getNextActorNetId(), rpc: true
 			);
 		}
 

@@ -504,7 +504,7 @@ public partial class DrawWrappers {
 		float cx = 0, float cy = 0,
 		float xScale = 1, float yScale = 1,
 		float angle = 0, float alpha = 1,
-		List<ShaderWrapper> shaders = null!, bool isWorldPos = true
+		List<ShaderWrapper>? shaders = null, bool isWorldPos = true
 	) {
 		if (shaders == null) {
 			shaders = new();

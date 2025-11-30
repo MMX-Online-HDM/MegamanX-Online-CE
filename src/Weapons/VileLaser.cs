@@ -231,7 +231,7 @@ public class RisingSpecterProj : Projectile {
 			points.Add(new Point(poi.x - sideX, poi.y + sideY));
 		}
 
-		globalCollider = new Collider(points, true, null!, false, false, 0, Point.zero);
+		globalCollider = new Collider(points, true, this, false, false, 0, Point.zero);
 
 		if (rpc) {
 			rpcCreate(poi, owner, ownerPlayer, netId, xDir);

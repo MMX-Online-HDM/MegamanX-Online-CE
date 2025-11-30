@@ -404,7 +404,8 @@ public class MorphMCScrapProj : Projectile {
 	}
 }
 public class MothMState : MaverickState {
-	public MorphMothCocoon MetamorMothmeanos = null!;
+	public MorphMothCocoon metamorMothmeanos = null!;
+
 	public MothMState(
 		string sprite, string transitionSprite = ""
 	) : base(
@@ -414,7 +415,7 @@ public class MothMState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		MetamorMothmeanos = maverick as MorphMothCocoon ?? throw new NullReferenceException();
+		metamorMothmeanos = maverick as MorphMothCocoon ?? throw new NullReferenceException();
 
 	}
 }
@@ -474,16 +475,16 @@ public class MorphMCSpinState : MothMState {
 		}
 
 		Helpers.decrementTime(ref shootTime);
-		if ((isAI || input.isHeld(Control.Shoot, player)) && MetamorMothmeanos.ammo > 0) {
+		if ((isAI || input.isHeld(Control.Shoot, player)) && metamorMothmeanos.ammo > 0) {
 			if (shootTime == 0) {
 				shootTime = 0.15f;
 				Point vel = new Point(Helpers.randomRange(-75, 75), Helpers.randomRange(-300, -250));
 				new MorphMCScrapProj(
-					MetamorMothmeanos.weapon, maverick.getFirstPOIOrDefault(),
-					MathF.Sign(vel.x), vel, 0.75f, false, MetamorMothmeanos, player, player.getNextActorNetId(), rpc: true
+					metamorMothmeanos.weapon, maverick.getFirstPOIOrDefault(),
+					MathF.Sign(vel.x), vel, 0.75f, false, metamorMothmeanos, player, player.getNextActorNetId(), rpc: true
 				);
-				MetamorMothmeanos.ammo--;
-				MetamorMothmeanos.currencyRegenTime = 0;
+				metamorMothmeanos.ammo--;
+				metamorMothmeanos.currencyRegenTime = 0;
 			}
 		}
 
@@ -518,7 +519,7 @@ public class MorphMCSpinState : MothMState {
 			maverick.controlMode == MaverickModeId.Summoner) {
 			if (isAI) {
 				if (wall != null) {
-					MetamorMothmeanos.crash();
+					metamorMothmeanos.crash();
 					hit = true;
 					hit2 = 60;
 					maverick.xDir *= -1;
@@ -643,7 +644,7 @@ public class MorphMCThreadState : MothMState {
 
 		if (proj != null && proj.hitCeiling) {
 			var latchPos = new Point(maverick.pos.x, proj.pos.y);
-			MetamorMothmeanos.setLatchPos(latchPos);
+			metamorMothmeanos.setLatchPos(latchPos);
 			float latchDestY = ((maverick.getFirstPOIOrDefault().y + latchPos.y) / 2) + 10;
 			maverick.changeState(new MorphMCLatchState(latchDestY, stateAI));
 		}
@@ -653,7 +654,7 @@ public class MorphMCThreadState : MothMState {
 		base.onEnter(oldState);
 		maverick.stopMovingS();
 		proj = new MorphMCThreadProj(
-			maverick.getFirstPOIOrDefault(), 1, MetamorMothmeanos, 
+			maverick.getFirstPOIOrDefault(), 1, metamorMothmeanos, 
 			player, player.getNextActorNetId(), rpc: true
 		);
 	}
@@ -677,7 +678,7 @@ public class MorphMCLatchState : MothMState {
 		maverick.move(new Point(0, -100));
 		if (maverick.pos.y < latchDestY) {
 			maverick.incPos(new Point(0, -14 * maverick.yScale));
-			MetamorMothmeanos.setLatchLen();
+			metamorMothmeanos.setLatchLen();
 			maverick.changeState(new MorphMCHangState(stateAI));
 		}
 	}
@@ -724,7 +725,7 @@ public class MorphMCHangState : MothMState {
 
 		Helpers.decrementTime(ref shootTime);
 		Helpers.decrementTime(ref suckSoundTime);
-		if ((isAI && stateAI == 1) || input.isHeld(Control.Shoot, player) && MetamorMothmeanos.ammo > 0) {
+		if ((isAI && stateAI == 1) || input.isHeld(Control.Shoot, player) && metamorMothmeanos.ammo > 0) {
 			if (shootTime == 0) {
 				shootTime = 0.15f;
 				Point vel = new Point(Helpers.randomRange(-75, 75), Helpers.randomRange(-300, -250));
@@ -732,15 +733,15 @@ public class MorphMCHangState : MothMState {
 					maverick.weapon, maverick.getFirstPOIOrDefault(),
 					MathF.Sign(vel.x), vel, 1.5f, false, null, player, player.getNextActorNetId(), rpc: true
 				);
-				MetamorMothmeanos.ammo--;
-				MetamorMothmeanos.currencyRegenTime = 0;
+				metamorMothmeanos.ammo--;
+				metamorMothmeanos.currencyRegenTime = 0;
 			}
 		} else if ((isAI && stateAI == 2) || input.isHeld(Control.Special1, player)) {
 			suckAngle += Global.spf * 100;
 			if (suckAngle >= 360) suckAngle = 0;
 			if (suckSoundTime <= 0) {
 				suckSoundTime = 0.269f;
-				MetamorMothmeanos.playSound("morphmVacuum", sendRpc: true);
+				metamorMothmeanos.playSound("morphmVacuum", sendRpc: true);
 			}
 			if (shootTime == 0) {
 				shootTime = 0.1f;
@@ -748,26 +749,26 @@ public class MorphMCHangState : MothMState {
 				Point vel = suckPos.directionToNorm(maverick.getCenterPos()).times(350);
 				new MorphMCScrapProj(
 					maverick.weapon, suckPos, MathF.Sign(vel.x),
-					vel, 0.5f, true, MetamorMothmeanos, player, player.getNextActorNetId(), rpc: true
+					vel, 0.5f, true, metamorMothmeanos, player, player.getNextActorNetId(), rpc: true
 				);
-				MetamorMothmeanos.currencyRegenTime = 0;
+				metamorMothmeanos.currencyRegenTime = 0;
 			}
 		}
 
 		var inputDir = input.getInputDir(player);
 		if (inputDir.y != 0) {
-			float oldLatchLen = MetamorMothmeanos.latchLen;
-			MetamorMothmeanos.latchLen += inputDir.y * Global.spf * 100;
-			MetamorMothmeanos.latchLen = Helpers.clamp(MetamorMothmeanos.latchLen, 10, 200);
+			float oldLatchLen = metamorMothmeanos.latchLen;
+			metamorMothmeanos.latchLen += inputDir.y * Global.spf * 100;
+			metamorMothmeanos.latchLen = Helpers.clamp(metamorMothmeanos.latchLen, 10, 200);
 
-			float angle = MetamorMothmeanos.latchPos.directionToNorm(maverick.pos).angle;
-			if (Global.level.checkTerrainCollisionOnce(MetamorMothmeanos, Helpers.cosd(angle) * 5, Helpers.sind(angle) * 5) != null) {
-				MetamorMothmeanos.latchLen = oldLatchLen;
+			float angle = metamorMothmeanos.latchPos.directionToNorm(maverick.pos).angle;
+			if (Global.level.checkTerrainCollisionOnce(metamorMothmeanos, Helpers.cosd(angle) * 5, Helpers.sind(angle) * 5) != null) {
+				metamorMothmeanos.latchLen = oldLatchLen;
 			}
 		}
 
-		latchPos = MetamorMothmeanos.latchPos;
-		len = MetamorMothmeanos.latchLen;
+		latchPos = metamorMothmeanos.latchPos;
+		len = metamorMothmeanos.latchLen;
 		origin = latchPos.addxy(0, len);
 
 		float swingMod = Helpers.clamp01(len / 75);
@@ -846,9 +847,9 @@ public class MorphMCHangState : MothMState {
 	public void snapPosOnExit(Point destPos) {
 		float newAngle = latchPos.directionToNorm(destPos).angle;
 		Point snapPos = new Point();
-		snapPos.x = latchPos.x + Helpers.cosd(newAngle) * (len + (14 * MetamorMothmeanos.xScale));
-		snapPos.y = latchPos.y + Helpers.sind(newAngle) * (len + (14 * MetamorMothmeanos.yScale));
-		MetamorMothmeanos.changePos(snapPos);
+		snapPos.x = latchPos.x + Helpers.cosd(newAngle) * (len + (14 * metamorMothmeanos.xScale));
+		snapPos.y = latchPos.y + Helpers.sind(newAngle) * (len + (14 * metamorMothmeanos.yScale));
+		metamorMothmeanos.changePos(snapPos);
 	}
 
 	public override void onEnter(MaverickState oldState) {

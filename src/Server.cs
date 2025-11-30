@@ -18,8 +18,7 @@ public enum NetcodeModel {
 [ProtoContract]
 public class Server {
 	// Must be a thread safe list
-	[JsonIgnore]
-	public static ConcurrentDictionary<Server, bool> servers = new ConcurrentDictionary<Server, bool>();
+	[JsonIgnore] public static ConcurrentDictionary<Server, bool> servers = new();
 
 	[ProtoMember(1)] public string name;
 	[ProtoMember(2)] public string level;
@@ -63,34 +62,22 @@ public class Server {
 	[ProtoMember(34)] public byte teamNum = 2;
 	[ProtoMember(35)] public int altPlayTo;
 
-	[JsonIgnore]
-	public bool favorHost = true;
-
-	[JsonIgnore]
-	public int redScore;
-	[JsonIgnore]
-	public int blueScore;
-	[JsonIgnore]
-	public int nonSpecPlayerCountOnStart;
-	[JsonIgnore]
-	public ServerPlayer? host;
-	[JsonIgnore]
-	public int framesZeroPlayers;
-	[JsonIgnore]
-	public ServerPlayer? playerToAutobalance;
-	[JsonIgnore]
-	public NetServer s_server = null!;
-	[JsonIgnore]
-	public bool killServer;
-	[JsonIgnore]
-	public Dictionary<string, int> weaponKillStats = new Dictionary<string, int>();
-	[JsonIgnore]
-	public long uniqueID = 0;
+	[JsonIgnore] public bool favorHost = true;
+	[JsonIgnore] public int redScore;
+	[JsonIgnore] public int blueScore;
+	[JsonIgnore] public int nonSpecPlayerCountOnStart;
+	[JsonIgnore] public ServerPlayer? host;
+	[JsonIgnore] public int framesZeroPlayers;
+	[JsonIgnore] public ServerPlayer? playerToAutobalance;
+	[JsonIgnore] public NetServer s_server = null!;
+	[JsonIgnore] public bool killServer;
+	[JsonIgnore] public Dictionary<string, int> weaponKillStats = new();
+	[JsonIgnore] public long uniqueID = 0;
 
 	private bool shutdownVar;
 	private long iterations = 0;
 	private long lastUpdateTime = 0L;
-	private long fpsLimit = TimeSpan.TicksPerSecond / 240;
+	private readonly long fpsLimit = TimeSpan.TicksPerSecond / 240;
 	private bool loggedOnce = false;
 
 	public bool isCustomMap() {

@@ -319,10 +319,11 @@ public class MorphMPowderProj : Projectile {
 
 public class MorphMSweepState : MaverickState {
 	public bool isStriker;
+
 	public MorphMSweepState(bool isStriker) : base("sweep", "sweep_start") {
 		this.isStriker = isStriker;
 	}
-	public MorphMoth Moth = null!;
+	public MorphMoth? Moth = null;
 	float shootTime;
 	float xVel;
 	float yVel;

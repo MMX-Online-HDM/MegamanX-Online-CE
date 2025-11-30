@@ -8,8 +8,8 @@ public partial class KaiserSigma : Character {
 	public bool isVirus => sprite.name.StartsWith("kaisersigma_virus");
 	public bool kaiserWinTauntOnce;
 	public float kaiserMissileShootTime;
-	public Anim kaiserExhaustL = null!;
-	public Anim kaiserExhaustR = null!;
+	public Anim kaiserExhaustL;
+	public Anim kaiserExhaustR;
 	public float kaiserHoverCooldown;
 	public float kaiserLeftMineShootTime;
 	public float kaiserRightMineShootTime;

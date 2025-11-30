@@ -144,7 +144,7 @@ public class DrDoppler : Maverick {
 				player, player.getNextActorNetId(), rpc: true
 			);
 
-		}, null!);
+		}, "");
 		if (isAI) {
 			mshoot.consecutiveData = new MaverickStateConsecutiveData(0, 5, 0f);
 		}

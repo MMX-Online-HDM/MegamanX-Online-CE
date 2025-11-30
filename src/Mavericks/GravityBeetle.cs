@@ -210,7 +210,8 @@ public class GBeetleBallProj : Projectile {
 }
 
 public class BeetleMState : MaverickState {
-	public GravityBeetle GravityBeetbood = null!;
+	public GravityBeetle gravityBeetbood = null!;
+
 	public BeetleMState(
 		string sprite, string transitionSprite = ""
 	) : base(
@@ -220,7 +221,7 @@ public class BeetleMState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		GravityBeetbood = maverick as GravityBeetle ?? throw new NullReferenceException();
+		gravityBeetbood = maverick as GravityBeetle ?? throw new NullReferenceException();
 	}
 }
 public class GBeetleShoot : BeetleMState {
@@ -240,7 +241,7 @@ public class GBeetleShoot : BeetleMState {
 			shotOnce = true;
 			new GBeetleBallProj(
 				shootPos.Value, maverick.xDir, isSecond,
-				GravityBeetbood, player, player.getNextActorNetId(), rpc: true
+				gravityBeetbood, player, player.getNextActorNetId(), rpc: true
 			);
 		}
 
@@ -568,9 +569,9 @@ public class GBeetleGravityWellState : BeetleMState {
 			Point? shootPos = maverick.getFirstPOI();
 			if (!once && shootPos != null) {
 				once = true;
-				GravityBeetbood.well = new GBeetleGravityWellProj(
+				gravityBeetbood.well = new GBeetleGravityWellProj(
 					shootPos.Value, maverick.xDir, (int)chargeTime,
-					GravityBeetbood, player, player.getNextActorNetId(), sendRpc: true
+					gravityBeetbood, player, player.getNextActorNetId(), sendRpc: true
 				);
 			}
 			if (maverick.isAnimOver()) {

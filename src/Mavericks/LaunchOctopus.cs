@@ -443,7 +443,8 @@ public class TorpedoProjChargedOcto : Projectile, IDamagable {
 
 #region states
 public class OctopusMState : MaverickState {
-	public LaunchOctopus LauncherOctopuld = null!;
+	public LaunchOctopus launcherOctopuld = null!;
+
 	public OctopusMState(
 		string sprite, string transitionSprite = ""
 	) : base(
@@ -453,7 +454,7 @@ public class OctopusMState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		LauncherOctopuld = maverick as LaunchOctopus ?? throw new NullReferenceException();
+		launcherOctopuld = maverick as LaunchOctopus ?? throw new NullReferenceException();
 	}
 }
 public class LaunchOShoot : OctopusMState {
@@ -469,7 +470,7 @@ public class LaunchOShoot : OctopusMState {
 
 	public override void update() {
 		base.update();
-		if (LauncherOctopuld == null) return;
+		if (launcherOctopuld == null) return;
 
 		if (isGrounded && !maverick.grounded) {
 			sprite = "air_shoot";
@@ -480,22 +481,22 @@ public class LaunchOShoot : OctopusMState {
 			return;
 		}
 
-		Point? shootPos = LauncherOctopuld.getFirstPOI();
-		int xDir = LauncherOctopuld.xDir;
+		Point? shootPos = launcherOctopuld.getFirstPOI();
+		int xDir = launcherOctopuld.xDir;
 		if (shootState == 0 && shootPos != null) {
 			shootState = 1;
 			maverick.playSound("torpedo", sendRpc: true);
 
 			if (maverick.ammo >= 1) new LaunchOMissile(
-				shootPos.Value.addxy(0, -3), xDir, LauncherOctopuld,
+				shootPos.Value.addxy(0, -3), xDir, launcherOctopuld,
 				player, 0, player.getNextActorNetId(), rpc: true
 			);
 			if (maverick.ammo >= 2) new LaunchOMissile(
-				shootPos.Value.addxy(0, 0), xDir, LauncherOctopuld,
+				shootPos.Value.addxy(0, 0), xDir, launcherOctopuld,
 				player, 1, player.getNextActorNetId(), rpc: true
 			);
 			if (maverick.ammo >= 3) new LaunchOMissile(
-				shootPos.Value.addxy(0, 5), xDir, LauncherOctopuld,
+				shootPos.Value.addxy(0, 5), xDir, launcherOctopuld,
 				player, 2, player.getNextActorNetId(), rpc: true
 			);
 
@@ -517,15 +518,15 @@ public class LaunchOShoot : OctopusMState {
 				maverick.changeSpriteFromName(sprite, true);
 				maverick.playSound("torpedo", sendRpc: true);
 				if (maverick.ammo >= 1) new LaunchOMissile(
-					shootPos.Value.addxy(0, -3), xDir, LauncherOctopuld,
+					shootPos.Value.addxy(0, -3), xDir, launcherOctopuld,
 					player, 0, player.getNextActorNetId(), rpc: true
 				);
 				if (maverick.ammo >= 2) new LaunchOMissile(
-					shootPos.Value.addxy(0, 0), xDir, LauncherOctopuld,
+					shootPos.Value.addxy(0, 0), xDir, launcherOctopuld,
 					player, 1, player.getNextActorNetId(), rpc: true
 				);
 				if (maverick.ammo >= 3) new LaunchOMissile(
-					shootPos.Value.addxy(0, 5), xDir, LauncherOctopuld,
+					shootPos.Value.addxy(0, 5), xDir, launcherOctopuld,
 					player, 2, player.getNextActorNetId(), rpc: true
 				);
 				maverick.ammo -= 3;
@@ -533,9 +534,9 @@ public class LaunchOShoot : OctopusMState {
 			}
 		}
 
-		if (maverick.ammo == 0 || LauncherOctopuld.isAnimOver()) {
-			if (maverick.grounded) LauncherOctopuld.changeState(new MIdle());
-			else LauncherOctopuld.changeState(new MFall());
+		if (maverick.ammo == 0 || launcherOctopuld.isAnimOver()) {
+			if (maverick.grounded) launcherOctopuld.changeState(new MIdle());
+			else launcherOctopuld.changeState(new MFall());
 		}
 	}
 }
@@ -551,26 +552,26 @@ public class LaunchOHomingTorpedoState : OctopusMState {
 
 	public override void update() {
 		base.update();
-		if (LauncherOctopuld == null) return;
+		if (launcherOctopuld == null) return;
 
 		if (maverick.frameIndex == 3 && !shootOnce) {
 			shootOnce = true;
 			maverick.playSound("torpedo", sendRpc: true);
 			var pois = maverick.currentFrame.POIs;
 			new TorpedoProjChargedOcto(
-				LauncherOctopuld.pos.add(pois[0]), 1, LauncherOctopuld, 
+				launcherOctopuld.pos.add(pois[0]), 1, launcherOctopuld, 
 				player, player.getNextActorNetId(), 0, rpc: true
 			);
 			new TorpedoProjChargedOcto(
-				LauncherOctopuld.pos.add(pois[1]), 1, LauncherOctopuld, 
+				launcherOctopuld.pos.add(pois[1]), 1, launcherOctopuld, 
 				player, player.getNextActorNetId(), 0, rpc: true
 			);
 			new TorpedoProjChargedOcto(
-				LauncherOctopuld.pos.add(pois[2]), 1, LauncherOctopuld,
+				launcherOctopuld.pos.add(pois[2]), 1, launcherOctopuld,
 				player, player.getNextActorNetId(), 180, rpc: true
 			);
 			new TorpedoProjChargedOcto(
-				LauncherOctopuld.pos.add(pois[3]), 1, LauncherOctopuld,
+				launcherOctopuld.pos.add(pois[3]), 1, launcherOctopuld,
 				player, player.getNextActorNetId(), 180, rpc: true
 			);
 		}
@@ -595,14 +596,14 @@ public class LaunchOWhirlpoolState : OctopusMState {
 		maverick.useGravity = false;
 		whirlpool = new LaunchOWhirlpoolProj(
 			maverick.pos.addxy(0, isAI ? -100 : 25), 1,
-			LauncherOctopuld ,player, player.getNextActorNetId(), rpc: true
+			launcherOctopuld ,player, player.getNextActorNetId(), rpc: true
 		);
 		maverick.playSound("launchoWhirlpool", sendRpc: true);
 	}
 
 	public override void update() {
 		base.update();
-		if (LauncherOctopuld == null) return;
+		if (launcherOctopuld == null) return;
 		if (!maverick.tryMove(new Point(0, 100 * initYDir), out _)) {
 			if (initYDir == 1) {
 				maverick.unstickFromGround();

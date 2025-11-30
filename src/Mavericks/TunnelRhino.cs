@@ -219,7 +219,8 @@ public class TunnelRTornadoFang : Projectile {
 	}
 }
 public class TunnelRMState : MaverickState {
-	public TunnelRhino ScrewMasaider = null!;
+	public TunnelRhino screwMasaider = null!;
+
 	public TunnelRMState(
 		string sprite, string transitionSprite = ""
 	) : base(
@@ -229,7 +230,7 @@ public class TunnelRMState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		ScrewMasaider = maverick as TunnelRhino ?? throw new NullReferenceException();
+		screwMasaider = maverick as TunnelRhino ?? throw new NullReferenceException();
 	}
 }
 
@@ -251,15 +252,15 @@ public class TunnelRShootState : TunnelRMState {
 			maverick.playSound("tunnelrShoot", sendRpc: true);
 			if (!isSecond) {
 				new TunnelRTornadoFang(
-					shootPos.Value, maverick.xDir, 0, ScrewMasaider,
+					shootPos.Value, maverick.xDir, 0, screwMasaider,
 					player, player.getNextActorNetId(), rpc: true
 				);
 			} else {
 				new TunnelRTornadoFang(
-					shootPos.Value, maverick.xDir, 1, ScrewMasaider,
+					shootPos.Value, maverick.xDir, 1, screwMasaider,
 					 player, player.getNextActorNetId(), rpc: true);
 				new TunnelRTornadoFang(
-					shootPos.Value, maverick.xDir, 2, ScrewMasaider,
+					shootPos.Value, maverick.xDir, 2, screwMasaider,
 					 player, player.getNextActorNetId(), rpc: true);
 			}
 		}
@@ -314,7 +315,7 @@ public class TunnelRShoot2State : TunnelRMState {
 			shotOnce = true;
 			new TunnelRTornadoFang(
 				shootPos.Value, maverick.xDir, 0,
-				ScrewMasaider, player, player.getNextActorNetId(), rpc: true
+				screwMasaider, player, player.getNextActorNetId(), rpc: true
 			);
 			maverick.playSound("tunnelrShoot", sendRpc: true);
 		}
@@ -324,7 +325,7 @@ public class TunnelRShoot2State : TunnelRMState {
 			shotOnce2 = true;
 			new TunnelRTornadoFangDiag(
 				shootPos2.Value, maverick.xDir * -1,
-				ScrewMasaider, player, player.getNextActorNetId(), rpc: true);
+				screwMasaider, player, player.getNextActorNetId(), rpc: true);
 		}
 
 		Point? shootPos3 = maverick.getFirstPOI("drillback");
@@ -332,7 +333,7 @@ public class TunnelRShoot2State : TunnelRMState {
 			shotOnce3 = true;
 			new TunnelRTornadoFangDiag(
 				shootPos3.Value, maverick.xDir,
-				ScrewMasaider, player, player.getNextActorNetId(), rpc: true
+				screwMasaider, player, player.getNextActorNetId(), rpc: true
 			);
 		}
 	}

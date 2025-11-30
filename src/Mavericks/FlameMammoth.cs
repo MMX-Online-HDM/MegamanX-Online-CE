@@ -429,7 +429,8 @@ public class FlameMStompShockwave : Projectile {
 
 #region states
 public class MammothMState : MaverickState {
-	public FlameMammoth BurninNoumander = null!;
+	public FlameMammoth burningNoumander = null!;
+
 	public MammothMState(
 		string sprite, string transitionSprite = ""
 	) : base(
@@ -439,7 +440,7 @@ public class MammothMState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		BurninNoumander = maverick as FlameMammoth ?? throw new NullReferenceException();
+		burningNoumander = maverick as FlameMammoth ?? throw new NullReferenceException();
 	}
 }
 
@@ -458,13 +459,13 @@ public class FlameMOilState : MammothMState {
 
 	public override void update() {
 		base.update();
-		if (BurninNoumander == null) return;
+		if (burningNoumander == null) return;
 
 		if (maverick.frameIndex == 6 && !once) {
 			once = true;
 			new FlameMOilProj(
-			BurninNoumander.getFirstPOI() ?? BurninNoumander.getCenterPos(), maverick.xDir, 
-			BurninNoumander, player, player.getNextActorNetId(), rpc: true);
+			burningNoumander.getFirstPOI() ?? burningNoumander.getCenterPos(), maverick.xDir, 
+			burningNoumander, player, player.getNextActorNetId(), rpc: true);
 		}
 
 		if (maverick.isAnimOver()) {

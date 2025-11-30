@@ -5,8 +5,26 @@ using SFML.Graphics;
 
 namespace MMXOnline;
 
-public class XUPParryStartState : CharState {
+
+public class RcxState : CharState {
 	public RagingChargeX mmx = null!;
+
+	public RcxState(
+		string sprite, string shootSprite = "", string attackSprite = "",
+		string transitionSprite = "", string transShootSprite = ""
+	) : base(
+		sprite, shootSprite, attackSprite,
+		transitionSprite, transShootSprite
+	) {
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		mmx = player.character as RagingChargeX ?? throw new NullReferenceException();
+	}
+}
+
+public class XUPParryStartState : RcxState {
 	public XUPParryStartState() : base("unpo_parry_start") {
 	}
 
@@ -29,7 +47,7 @@ public class XUPParryStartState : CharState {
 		if (player.weapon is XBuster { isUnpoBuster: true }) {
 			player.weapon.ammo = player.weapon.maxAmmo;
 		}*/
-		mmx.addPercentAmmo(100);
+		character.addPercentAmmo(100);
 		if (damagingActor is Projectile proj) {
 			if (proj.ownerActor != null) {
 				counterAttackTarget = proj.ownerActor;
@@ -76,11 +94,6 @@ public class XUPParryStartState : CharState {
 
 	public bool canParry() {
 		return character.frameIndex == 0;
-	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		mmx = player.character as RagingChargeX ?? throw new NullReferenceException();
 	}
 
 	public override void onExit(CharState? newState) {
@@ -142,10 +155,10 @@ public class UPParryMeleeProj : Projectile {
 	}
 }
 
-public class XUPParryMeleeState : CharState {
-	Actor counterAttackTarget;
-	float damage;
-	public RagingChargeX mmx = null!;
+public class XUPParryMeleeState : RcxState {
+	public Actor counterAttackTarget;
+	public float damage;
+
 	public XUPParryMeleeState(Actor counterAttackTarget, float damage) : base("unpo_parry_attack") {
 		invincible = true;
 		this.counterAttackTarget = counterAttackTarget;
@@ -180,7 +193,6 @@ public class XUPParryMeleeState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		mmx = player.character as RagingChargeX ?? throw new NullReferenceException();
 		character.clenaseDmgDebuffs();
 		//character.frameIndex = 2;
 	}
@@ -231,12 +243,12 @@ public class UPParryRangedProj : Projectile {
 	}
 }
 
-public class XUPParryProjState : CharState {
+public class XUPParryProjState : RcxState {
 	Projectile? otherProj;
 	Anim? absorbAnim;
 	bool shootProj;
 	bool absorbThenShoot;
-	public RagingChargeX mmx = null!;
+
 	public XUPParryProjState(Projectile otherProj, bool shootProj, bool absorbThenShoot) : base("unpo_parry_attack") {
 		this.otherProj = otherProj;
 		this.shootProj = shootProj;
@@ -283,7 +295,7 @@ public class XUPParryProjState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		mmx = player.character as RagingChargeX ?? throw new NullReferenceException();
+
 		character.clenaseDmgDebuffs();
 		if (!shootProj || absorbThenShoot) {
 			absorbAnim = new Anim(
@@ -605,8 +617,7 @@ public class XReviveStart : CharState {
 
 public class XRevive : CharState {
 	public float radius = 200;
-	XReviveAnim reviveAnim = null!;
-	RagingChargeX rcx = null!;
+	public XReviveAnim? reviveAnim;
 
 	public XRevive() : base("revive_shake") {
 		invincible = true;
@@ -644,13 +655,12 @@ public class XRevive : CharState {
 		base.onEnter(oldState);
 		character.visible = true;
 		reviveAnim = new XReviveAnim(character.getCenterPos(), player.getNextActorNetId(), sendRpc: true);
-		rcx = character as RagingChargeX ?? throw new NullReferenceException();
 	}
 
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
-		rcx.invulnTime = 2;
+		character.invulnTime = 2;
 	}
 }
 

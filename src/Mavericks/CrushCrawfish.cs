@@ -250,7 +250,8 @@ public class CrushCArmProj : Projectile {
 	}
 }
 public class CrawfishMState : MaverickState {
-	public CrushCrawfish ScissorsShrimper = null!;
+	public CrushCrawfish scissorsShrimper = null!;
+
 	public CrawfishMState(
 		string sprite, string transitionSprite = ""
 	) : base(
@@ -260,7 +261,7 @@ public class CrawfishMState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		ScissorsShrimper = maverick as CrushCrawfish ?? throw new NullReferenceException();
+		scissorsShrimper = maverick as CrushCrawfish ?? throw new NullReferenceException();
 	}
 }
 public class CrushCShootArmState : CrawfishMState {
@@ -295,8 +296,8 @@ public class CrushCShootArmState : CrawfishMState {
 		Point? shootPos = maverick.getFirstPOI();
 		if (shootPos != null) {
 			proj = new CrushCArmProj(
-				shootPos.Value, maverick.xDir, type, ScissorsShrimper,
-				ScissorsShrimper, player, player.getNextActorNetId(), rpc: true
+				shootPos.Value, maverick.xDir, type, scissorsShrimper,
+				scissorsShrimper, player, player.getNextActorNetId(), rpc: true
 			);
 		}
 	}
@@ -379,7 +380,7 @@ public class CrushCGrabState : CrawfishMState {
 				Helpers.decrementTime(ref hurtTime);
 				if (hurtTime == 0) {
 					hurtTime = 0.16666f;
-					ScissorsShrimper.meleeWeapon.applyDamage(victim, false, maverick, (int)ProjIds.CrushCGrabAttack);
+					scissorsShrimper.meleeWeapon.applyDamage(victim, false, maverick, (int)ProjIds.CrushCGrabAttack);
 				}
 			}
 		}

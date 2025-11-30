@@ -414,7 +414,7 @@ public class BBuffaloBeamProj : Projectile {
 
 	public void setStartPos(Point startPos) {
 		this.startPos = startPos;
-		globalCollider = new Collider(getPoints(), true, null!, false, false, 0, Point.zero);
+		globalCollider = new Collider(getPoints(), true, null, false, false, 0, Point.zero);
 	}
 
 	public List<Point> getPoints() {
@@ -461,7 +461,7 @@ public class BBuffaloBeamProj : Projectile {
 }
 #region states
 public class BuffaloMState : MaverickState {
-	public BlizzardBuffalo FrozenBuffalio = null!;
+	public BlizzardBuffalo frozenBuffalio = null!;
 	public BuffaloMState(
 		string sprite, string transitionSprite = ""
 	) : base(
@@ -471,7 +471,7 @@ public class BuffaloMState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		FrozenBuffalio = maverick as BlizzardBuffalo ?? throw new NullReferenceException();
+		frozenBuffalio = maverick as BlizzardBuffalo ?? throw new NullReferenceException();
 
 	}
 }
@@ -503,7 +503,7 @@ public class BBuffaloShootBeamState : BuffaloMState {
 		if (muzzle?.destroyed == true && proj == null && shootPos != null) {
 			proj = new BBuffaloBeamProj(
 				shootPos.Value.addxy(maverick.xDir * 20, 0), maverick.xDir, 
-				FrozenBuffalio, FrozenBuffalio, player, player.getNextActorNetId(), rpc: true
+				frozenBuffalio, frozenBuffalio, player, player.getNextActorNetId(), rpc: true
 			);
 		}
 
@@ -583,7 +583,7 @@ public class BBuffaloDashState : BuffaloMState {
 		*/
 
 		new BBuffaloCrashProj(
-			maverick.pos, maverick.xDir, FrozenBuffalio,
+			maverick.pos, maverick.xDir, frozenBuffalio,
 			player, player.getNextActorNetId(), rpc: true
 		);
 		maverick.playSound("crashX3", sendRpc: true);
@@ -652,11 +652,11 @@ public class BBuffaloShootAI : BuffaloMState {
 			once = true;
 			new BBuffaloIceProjAI(
 				shootPos.Value, maverick.xDir, 0,
-				FrozenBuffalio, player.getNextActorNetId(), sendRpc: true
+				frozenBuffalio, player.getNextActorNetId(), sendRpc: true
 			);
 			new BBuffaloIceProjAI(
 				shootPos.Value, maverick.xDir, 1,
-				FrozenBuffalio, player.getNextActorNetId(), sendRpc: true
+				frozenBuffalio, player.getNextActorNetId(), sendRpc: true
 			);
 			maverick.playSound("bbuffaloShoot", sendRpc: true);
 		}
@@ -664,15 +664,15 @@ public class BBuffaloShootAI : BuffaloMState {
 			once = true;
 			new BBuffaloIceProjAIStriker(
 				shootPos.Value, maverick.xDir, 0,
-				FrozenBuffalio, player.getNextActorNetId(), sendRpc: true
+				frozenBuffalio, player.getNextActorNetId(), sendRpc: true
 			);
 			new BBuffaloIceProjAIStriker(
 				shootPos.Value, maverick.xDir, 1,
-				FrozenBuffalio, player.getNextActorNetId(), sendRpc: true
+				frozenBuffalio, player.getNextActorNetId(), sendRpc: true
 			);
 			new BBuffaloIceProjAIStriker(
 				shootPos.Value, maverick.xDir, 2,
-				FrozenBuffalio, player.getNextActorNetId(), sendRpc: true
+				frozenBuffalio, player.getNextActorNetId(), sendRpc: true
 			);
 			maverick.playSound("bbuffaloShoot", sendRpc: true);
 		}

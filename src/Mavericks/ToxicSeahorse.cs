@@ -100,7 +100,7 @@ public class ToxicSeahorse : Maverick {
 		var mshoot = new MShoot((Point pos, int xDir) => {
 			// playSound("zbuster2", sendRpc: true);
 			new TSeahorseAcidProj(pos, xDir, this, player, player.getNextActorNetId(), rpc: true);
-		}, null!);
+		}, "");
 		if (isAI) {
 			// mshoot.consecutiveData = new MaverickStateConsecutiveData(0, 4, 0.75f);
 		}
@@ -314,7 +314,8 @@ public class TSeahorseAcid2Proj : Projectile {
 
 }
 public class TSeahorseMState : MaverickState {
-	public ToxicSeahorse AcidSeaforce = null!;
+	public ToxicSeahorse acidSeaforce = null!;
+
 	public TSeahorseMState(
 		string sprite, string transitionSprite = ""
 	) : base(
@@ -324,7 +325,7 @@ public class TSeahorseMState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		AcidSeaforce = maverick as ToxicSeahorse ?? throw new NullReferenceException();
+		acidSeaforce = maverick as ToxicSeahorse ?? throw new NullReferenceException();
 	}
 }
 public class TSeahorseShoot2State : TSeahorseMState {
@@ -342,11 +343,11 @@ public class TSeahorseShoot2State : TSeahorseMState {
 			maverick.playSound("acidBurst", sendRpc: true);
 			new TSeahorseAcid2Proj(
 				shootPos.Value, maverick.xDir, 0, 
-				AcidSeaforce, player, player.getNextActorNetId(), rpc: true
+				acidSeaforce, player, player.getNextActorNetId(), rpc: true
 			);
 			new TSeahorseAcid2Proj(
 				shootPos.Value, maverick.xDir, 1,
-				AcidSeaforce, player, player.getNextActorNetId(), rpc: true
+				acidSeaforce, player, player.getNextActorNetId(), rpc: true
 			);
 		}
 	}

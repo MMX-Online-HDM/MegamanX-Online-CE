@@ -24,10 +24,10 @@ public enum SpecialStateIds {
 }
 
 public static class ArmorParts {
-	public static readonly string[] name = {
+	public static readonly string[] name = [
 		"Leg",
 		"Body",
 		"Helm",
 		"Arm"
-	};
+	];
 }

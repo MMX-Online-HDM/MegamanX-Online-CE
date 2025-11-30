@@ -122,14 +122,14 @@ public class BubbleCrab : Maverick {
 		lastFrameWasUnderwater = isUnderwater() && shield != null;
 	}
 
-	public MaverickState getSpecialState() {
+	public MaverickState? getSpecialState() {
 		if (shield == null && ammo >= 8) {
 			return new BCrabShieldStartState();
 		} else if (crabs.Count <= 3) {
 			removeCrabs();
 			return new BCrabSummonState();
 		} else {
-			return null!;
+			return null;
 		}
 	}
 	public void removeCrabs() {
@@ -275,7 +275,7 @@ public class BCrabBubbleSplashProj : Projectile {
 	}
 }
 public class BCrablosMState : MaverickState {
-	public BubbleCrab BubblyCrablos = null!;
+	public BubbleCrab bubblyCrablos = null!;
 	public BCrablosMState(
 		string sprite, string transitionSprite = ""
 	) : base(
@@ -285,7 +285,7 @@ public class BCrablosMState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		BubblyCrablos = maverick as BubbleCrab ?? throw new NullReferenceException();
+		bubblyCrablos = maverick as BubbleCrab ?? throw new NullReferenceException();
 
 	}
 }
@@ -299,7 +299,7 @@ public class BCrabShootState : BCrablosMState {
 
 	public override void update() {
 		base.update();
-		if (BubblyCrablos == null) return;
+		if (bubblyCrablos == null) return;
 
 		if (maverick.frameIndex == 0) {
 			maverick.turnToInput(input, player);
@@ -314,7 +314,7 @@ public class BCrabShootState : BCrablosMState {
 			int type = input.isHeld(Control.Up, player) ? 1 : 0;
 			new BCrabBubbleSplashProj(
 				shootPos.Value, maverick.xDir, num, type,
-				BubblyCrablos, player, player.getNextActorNetId(), rpc: true
+				bubblyCrablos, player, player.getNextActorNetId(), rpc: true
 			);
 		}
 
@@ -487,19 +487,19 @@ public class BCrabShieldStartState : BCrablosMState {
 	}
 	public override void update() {
 		base.update();
-		if (BubblyCrablos == null) return;
+		if (bubblyCrablos == null) return;
 
 		if (!once) {
-			Point? shootPos = BubblyCrablos.getFirstPOI("shield");
+			Point? shootPos = bubblyCrablos.getFirstPOI("shield");
 			if (!once && shootPos != null) {
 				once = true;
-				BubblyCrablos.deductAmmo(8);
-				BubblyCrablos.playSound("bcrabShield", sendRpc: true);
+				bubblyCrablos.deductAmmo(8);
+				bubblyCrablos.playSound("bcrabShield", sendRpc: true);
 				var shield = new BCrabShieldProj(
-					shootPos.Value, maverick.xDir, BubblyCrablos,
+					shootPos.Value, maverick.xDir, bubblyCrablos,
 					player, player.getNextActorNetId(), rpc: true
 				);
-				BubblyCrablos.shield = shield;
+				bubblyCrablos.shield = shield;
 			}
 		}
 
@@ -747,25 +747,25 @@ public class BCrabSummonState : BCrablosMState {
 	}
 	public override void update() {
 		base.update();
-		if (BubblyCrablos == null) return;
+		if (bubblyCrablos == null) return;
 
-		Point? shootPos = BubblyCrablos.getFirstPOI("summon_crab");
+		Point? shootPos = bubblyCrablos.getFirstPOI("summon_crab");
 		if (!once && shootPos != null) {
 			once = true;
-			if (BubblyCrablos.crabs.Count < 3) BubblyCrablos.crabs.Add(
+			if (bubblyCrablos.crabs.Count < 3) bubblyCrablos.crabs.Add(
 				new BCrabSummonCrabProj(
 					maverick.weapon, shootPos.Value, new Point(-50, -300),
-					BubblyCrablos, player, player.getNextActorNetId(), rpc: true)
+					bubblyCrablos, player, player.getNextActorNetId(), rpc: true)
 				);
-			if (BubblyCrablos.crabs.Count < 3) BubblyCrablos.crabs.Add(
+			if (bubblyCrablos.crabs.Count < 3) bubblyCrablos.crabs.Add(
 				new BCrabSummonCrabProj(
 					maverick.weapon, shootPos.Value, new Point(0, -300),
-					BubblyCrablos, player, player.getNextActorNetId(), rpc: true)
+					bubblyCrablos, player, player.getNextActorNetId(), rpc: true)
 				);
-			if (BubblyCrablos.crabs.Count < 3) BubblyCrablos.crabs.Add(
+			if (bubblyCrablos.crabs.Count < 3) bubblyCrablos.crabs.Add(
 				new BCrabSummonCrabProj(
 					maverick.weapon, shootPos.Value, new Point(50, -300),
-					BubblyCrablos, player, player.getNextActorNetId(), rpc: true)
+					bubblyCrablos, player, player.getNextActorNetId(), rpc: true)
 				);
 		}
 

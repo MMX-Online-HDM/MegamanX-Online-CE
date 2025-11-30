@@ -174,9 +174,8 @@ public class WSpongeChainSpinProj : Projectile {
 	}
 }
 
-public class WSpongeChainSpinState : MaverickState {
+public class WSpongeChainSpinState : WSpongeMState {
 	WSpongeChainSpinProj? proj;
-	public WireSponge WireHetimarl = null!;
 	Anim? spinShield;
 
 	public WSpongeChainSpinState() : base("vine_spin") {
@@ -184,9 +183,9 @@ public class WSpongeChainSpinState : MaverickState {
 
 	public override void update() {
 		base.update();
-		WireHetimarl.turnToInput(input, player);
-		proj?.changePos(WireHetimarl.getFirstPOIOrDefault());
-		spinShield?.changePos(WireHetimarl.getFirstPOIOrDefault());
+		wireHetimarl.turnToInput(input, player);
+		proj?.changePos(wireHetimarl.getFirstPOIOrDefault());
+		spinShield?.changePos(wireHetimarl.getFirstPOIOrDefault());
 		if (isAI) {
 			if (stateTime > 1) {
 				maverick.changeState(new WSpongeSideChainState(stateTime));
@@ -198,15 +197,14 @@ public class WSpongeChainSpinState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		WireHetimarl = maverick as WireSponge ?? throw new NullReferenceException();
-		WireHetimarl.stopMoving();
+		wireHetimarl.stopMoving();
 		spinShield = new Anim(
-			WireHetimarl.getFirstPOIOrDefault(), "wsponge_vine_spin_shield2", WireHetimarl.xDir,
+			wireHetimarl.getFirstPOIOrDefault(), "wsponge_vine_spin_shield2", wireHetimarl.xDir,
 			player.getNextActorNetId(), false, sendRpc: true
 		);
 		proj = new WSpongeChainSpinProj(
 			maverick.getFirstPOIOrDefault(), maverick.xDir,
-			WireHetimarl, player, player.getNextActorNetId(), rpc: true
+			wireHetimarl, player, player.getNextActorNetId(), rpc: true
 		);
 	}
 
@@ -272,7 +270,7 @@ public class WSpongeSideChainProj : Projectile {
 	}
 	public static Projectile rpcInvoke(ProjParameters args) {
 		return new WSpongeSideChainProj(
-			args.pos, args.xDir, null!, 0, args.owner, args.player, args.netId
+			args.pos, args.xDir, args.owner, 0, args.owner, args.player, args.netId
 		);
 	}
 
@@ -480,20 +478,15 @@ public class WSpongeSideChainProj : Projectile {
 	}
 }
 
-public class WSpongeSideChainState : MaverickState {
+public class WSpongeSideChainState : WSpongeMState {
 	WSpongeSideChainProj? proj;
-	public WireSponge WireHetimarl = null!;
-	new int jumpFramesHeld;
-	new const int maxJumpFrames = 10;
+	int jumpFramesHeld;
+	const int maxJumpFrames = 10;
 	bool jumpedOnce;
 	float spinTime;
 
 	public WSpongeSideChainState(float spinTime) : base("vine_throw") {
 		this.spinTime = spinTime;
-	}
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		WireHetimarl = maverick as WireSponge ?? throw new NullReferenceException();
 	}
 
 	public override void update() {
@@ -533,7 +526,7 @@ public class WSpongeSideChainState : MaverickState {
 		if (proj == null && maverick.getFirstPOI() != null) {
 			proj = new WSpongeSideChainProj(
 				maverick.getFirstPOIOrDefault(), maverick.xDir, maverick,
-				spinTime, WireHetimarl, player, player.getNextActorNetId(), rpc: true
+				spinTime, wireHetimarl, player, player.getNextActorNetId(), rpc: true
 			);
 			maverick.playSound("wspongeChain", sendRpc: true);
 		} else if (proj != null) {
@@ -676,7 +669,7 @@ public class WSpongeUpChainProj : Projectile {
 	}
 	public static Projectile rpcInvoke(ProjParameters args) {
 		return new WSpongeUpChainProj(
-			args.pos, args.xDir, null!, 0, args.owner, args.player, args.netId
+			args.pos, args.xDir, args.owner, 0, args.owner, args.player, args.netId
 		);
 	}
 
@@ -743,14 +736,9 @@ public class WSpongeUpChainProj : Projectile {
 	}
 }
 
-public class WSpongeUpChainStartState : MaverickState {
+public class WSpongeUpChainStartState : WSpongeMState {
 	public WSpongeUpChainProj? proj;
-	public WireSponge WireHetimarl = null!;
 	public WSpongeUpChainStartState() : base("vine_up_start") {
-	}
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		WireHetimarl = maverick as WireSponge ?? throw new NullReferenceException();
 	}
 
 	public override void update() {
@@ -759,7 +747,7 @@ public class WSpongeUpChainStartState : MaverickState {
 		if (proj == null && maverick.getFirstPOI() != null) {
 			proj = new WSpongeUpChainProj(
 				maverick.getFirstPOIOrDefault(), maverick.xDir, maverick, 1,
-				WireHetimarl, player, player.getNextActorNetId(), rpc: true
+				wireHetimarl, player, player.getNextActorNetId(), rpc: true
 			);
 			maverick.playSound("wspongeChain", sendRpc: true);
 		}
@@ -1063,7 +1051,8 @@ public class WSpongeSpike : Projectile, IDamagable {
 	public bool isPlayableDamagable() { return false; }
 }
 public class WSpongeMState : MaverickState {
-	public WireSponge WireHetimarl = null!;
+	public WireSponge wireHetimarl = null!;
+
 	public WSpongeMState(
 		string sprite, string transitionSprite = ""
 	) : base(
@@ -1073,7 +1062,7 @@ public class WSpongeMState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		WireHetimarl = maverick as WireSponge ?? throw new NullReferenceException();
+		wireHetimarl = maverick as WireSponge ?? throw new NullReferenceException();
 	}
 }
 public class WSpongeSeedThrowState : WSpongeMState {
@@ -1099,16 +1088,16 @@ public class WSpongeSeedThrowState : WSpongeMState {
 		var inputDir = input.getInputDir(player);
 		if (!inputDirUpOnce) inputDirUpOnce = inputDir.y < 0;
 
-		if (!once && WireHetimarl.getFirstPOI() != null) {
+		if (!once && wireHetimarl.getFirstPOI() != null) {
 			once = true;
-			Point unitDir = new Point(WireHetimarl.xDir, -1);
+			Point unitDir = new Point(wireHetimarl.xDir, -1);
 			if (inputDir.y == -1) unitDir.y = -2;
 			if (inputDir.y == 1) unitDir.y = 0;
-			if (inputDir.x == WireHetimarl.xDir) unitDir.x = WireHetimarl.xDir * 2;
+			if (inputDir.x == wireHetimarl.xDir) unitDir.x = wireHetimarl.xDir * 2;
 	
-			new WSpongeSeedProj(WireHetimarl.getFirstPOIOrDefault(), WireHetimarl.xDir,
+			new WSpongeSeedProj(wireHetimarl.getFirstPOIOrDefault(), wireHetimarl.xDir,
 			 (int)unitDir.x,  (int)unitDir.y, framesShootHeld,
-			  WireHetimarl, player, player.getNextActorNetId(), sendRpc: true);
+			  wireHetimarl, player, player.getNextActorNetId(), sendRpc: true);
 		}
 
 		if (isAI) {
@@ -1181,20 +1170,20 @@ public class WSpongeHangSeedThrowState : WSpongeMState {
 			Point unitDir = new Point(maverick.xDir, -1);
 			if (inputDir.y == -1) unitDir.y = -2;
 			if (inputDir.y == 1) unitDir.y = 0;
-			if (inputDir.x == WireHetimarl.xDir) unitDir.x = WireHetimarl.xDir * 2;
-			int xDirM = WireHetimarl.xDir;
+			if (inputDir.x == wireHetimarl.xDir) unitDir.x = wireHetimarl.xDir * 2;
+			int xDirM = wireHetimarl.xDir;
 
-			new WSpongeSeedProj(WireHetimarl.getFirstPOIOrDefault().addxy(30*xDirM, 0), xDirM,
+			new WSpongeSeedProj(wireHetimarl.getFirstPOIOrDefault().addxy(30*xDirM, 0), xDirM,
 			 (int)unitDir.x,  (int)unitDir.y, framesShootHeld,
-			  WireHetimarl, player, player.getNextActorNetId(), sendRpc: true);
+			  wireHetimarl, player, player.getNextActorNetId(), sendRpc: true);
 
-			new WSpongeSeedProj(WireHetimarl.getFirstPOIOrDefault().addxy(15*xDirM, 0), xDirM,
+			new WSpongeSeedProj(wireHetimarl.getFirstPOIOrDefault().addxy(15*xDirM, 0), xDirM,
 			(int)unitDir.x,  (int)unitDir.y, framesShootHeld,
-			WireHetimarl, player, player.getNextActorNetId(), sendRpc: true);
+			wireHetimarl, player, player.getNextActorNetId(), sendRpc: true);
 
-			new WSpongeSeedProj(WireHetimarl.getFirstPOIOrDefault(), xDirM,
+			new WSpongeSeedProj(wireHetimarl.getFirstPOIOrDefault(), xDirM,
 			(int)unitDir.x,  (int)unitDir.y, framesShootHeld,
-			WireHetimarl, player, player.getNextActorNetId(), sendRpc: true);
+			wireHetimarl, player, player.getNextActorNetId(), sendRpc: true);
 		}
 
 		if (maverick.isAnimOver()) {
@@ -1222,14 +1211,14 @@ public class WSpongeChargeState : WSpongeMState {
 
 	public override void update() {
 		base.update();
-		if (WireHetimarl == null) return;
+		if (wireHetimarl == null) return;
 
 		if (state == 0) {
 			if (!isAI && !input.isHeld(Control.Dash, player)) {
 				maverick.changeToIdleOrFall();
 			}
 
-			WireHetimarl.chargeTime = stateTime;
+			wireHetimarl.chargeTime = stateTime;
 			if (stateTime > maxChargeTime) {
 				state = 1;
 				stateTime = 0;
@@ -1254,7 +1243,7 @@ public class WSpongeChargeState : WSpongeMState {
 
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
-		WireHetimarl.chargeTime = 0;
+		wireHetimarl.chargeTime = 0;
 		if (chargeSound != null && !chargeSound.deleted) {
 			chargeSound.sound.Stop();
 		}
@@ -1315,11 +1304,11 @@ public class WSpongeSeedThrowStateAI : WSpongeMState {
 			once = true;
 			new WSpongeSeedProjAI(
 				shootPos.Value, maverick.xDir, 0,
-				WireHetimarl, player.getNextActorNetId(), sendRpc: true
+				wireHetimarl, player.getNextActorNetId(), sendRpc: true
 			);
 			new WSpongeSeedProjAI(
 				shootPos.Value, maverick.xDir, 1,
-				WireHetimarl, player.getNextActorNetId(), sendRpc: true
+				wireHetimarl, player.getNextActorNetId(), sendRpc: true
 			);
 			maverick.playSound("wspongeSeed", sendRpc: true);
 		}
@@ -1327,15 +1316,15 @@ public class WSpongeSeedThrowStateAI : WSpongeMState {
 			once = true;
 			new WSpongeSeedProjAIStriker(
 				shootPos.Value, maverick.xDir, 0,
-				WireHetimarl, player.getNextActorNetId(), sendRpc: true
+				wireHetimarl, player.getNextActorNetId(), sendRpc: true
 			);
 			new WSpongeSeedProjAIStriker(
 				shootPos.Value, maverick.xDir, 1,
-				WireHetimarl, player.getNextActorNetId(), sendRpc: true
+				wireHetimarl, player.getNextActorNetId(), sendRpc: true
 			);
 			new WSpongeSeedProjAIStriker(
 				shootPos.Value, maverick.xDir, 2,
-				WireHetimarl, player.getNextActorNetId(), sendRpc: true
+				wireHetimarl, player.getNextActorNetId(), sendRpc: true
 			);
 			maverick.playSound("wspongeSeed", sendRpc: true);
 		}

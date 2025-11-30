@@ -227,7 +227,8 @@ public class FStagFireballProj : Projectile {
 
 }
 public class StagMState : MaverickState {
-	public FlameStag FlameStagger = null!;
+	public FlameStag flameStagger = null!;
+
 	public StagMState(
 		string sprite, string transitionSprite = ""
 	) : base(
@@ -237,7 +238,7 @@ public class StagMState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		FlameStagger = maverick as FlameStag ?? throw new NullReferenceException();
+		flameStagger = maverick as FlameStag ?? throw new NullReferenceException();
 	}
 }
 
@@ -252,19 +253,19 @@ public class FStagShoot : StagMState {
 	public override void update() {
 		base.update();
 
-		Point shootPos = FlameStagger.getCenterPos();
+		Point shootPos = flameStagger.getCenterPos();
 			if (maverick.frameIndex >= 7 && !shotOnce && !isSecond) {
 				shotOnce = true;
-				FlameStagger.playSound("fstagShoot", sendRpc: true);
+				flameStagger.playSound("fstagShoot", sendRpc: true);
 				fireball = new FStagFireballProj(
-					shootPos, maverick.xDir, 0, FlameStagger, player, 
+					shootPos, maverick.xDir, 0, flameStagger, player, 
 					player.getNextActorNetId(), rpc: true);
 			}
 			if (isSecond && maverick.frameIndex >= 4 && !once) {
-				FlameStagger.playSound("fstagShoot", sendRpc: true);
+				flameStagger.playSound("fstagShoot", sendRpc: true);
 				once = true;
 				fireball = new FStagFireballProj(
-					shootPos, maverick.xDir, 1, FlameStagger, player, 
+					shootPos, maverick.xDir, 1, flameStagger, player, 
 					player.getNextActorNetId(), rpc: true);
 			}
 
@@ -369,7 +370,7 @@ public class FStagDashChargeState : StagMState {
 
 	public override void update() {
 		base.update();
-		if (FlameStagger == null) return;
+		if (flameStagger == null) return;
 
 		proj?.incPos(maverick.deltaPos);
 		maverick.turnToInput(input, player);
@@ -388,7 +389,7 @@ public class FStagDashChargeState : StagMState {
 		maverick.stopMoving();
 		proj = new FStagDashChargeProj(
 			maverick.getFirstPOIOrDefault("fire_body"), maverick.xDir,
-			FlameStagger, player, player.getNextActorNetId(), rpc: true
+			flameStagger, player, player.getNextActorNetId(), rpc: true
 		);
 	}
 
@@ -440,7 +441,7 @@ public class FStagDashState : StagMState {
 
 	public override void update() {
 		base.update();
-		if (FlameStagger == null) return;
+		if (flameStagger == null) return;
 
 		if (input.isPressed(Control.Special1, player)) {
 			maverick.changeState(new FStagGrabState(true));
@@ -454,7 +455,7 @@ public class FStagDashState : StagMState {
 			trailTime = 0.04f;
 			new FStagTrailProj(
 			 	maverick.getFirstPOIOrDefault("fire_trail"), maverick.xDir,
-				FlameStagger ,player, player.getNextActorNetId(), rpc: true
+				flameStagger ,player, player.getNextActorNetId(), rpc: true
 			);
 		}
 		if (input.isPressed(Control.Dash, player) || stateTime > chargeTime) {
@@ -472,7 +473,7 @@ public class FStagDashState : StagMState {
 		);
 		proj = new FStagDashProj(
 			maverick.getFirstPOIOrDefault("fire_dash"), maverick.xDir, 0,
-			FlameStagger, player, player.getNextActorNetId(), rpc: true
+			flameStagger, player, player.getNextActorNetId(), rpc: true
 		);
 	}
 
@@ -543,7 +544,7 @@ public class FStagUppercutState : StagMState {
 
 	public override void update() {
 		base.update();
-		if (FlameStagger == null) return;
+		if (flameStagger == null) return;
 
 		proj?.changePos(maverick.pos);
 		ProjVisible?.changePos(maverick.pos);
@@ -612,8 +613,8 @@ public class FStagUppercutState : StagMState {
 
 	public void crashAndDamage(bool isCeiling) {
 		if (getVictim() != null) {
-			FlameStagger.uppercutWeapon.applyDamage(
-				victim, false, FlameStagger, (int)ProjIds.FStagUppercut,
+			flameStagger.uppercutWeapon.applyDamage(
+				victim, false, flameStagger, (int)ProjIds.FStagUppercut,
 				overrideDamage: isCeiling ? 3 : 5, overrideFlinch: isCeiling ? 0 : Global.defFlinch,
 				sendRpc: true
 			);
@@ -626,7 +627,7 @@ public class FStagUppercutState : StagMState {
 		if (state == 0) {
 			state = 1;
 			proj?.changeSprite("fstag_fire_downdash", true);
-			FlameStagger.changeSpriteFromName("downdash", true);
+			flameStagger.changeSpriteFromName("downdash", true);
 			ProjVisible?.changeSprite("fstag_fire_downdash", true);
 		}
 	}
@@ -635,17 +636,17 @@ public class FStagUppercutState : StagMState {
 		base.onEnter(oldState);
 		maverick.unstickFromGround();
 		ProjVisible = new Anim(
-			FlameStagger.pos, "fstag_fire_updash", maverick.xDir,
+			flameStagger.pos, "fstag_fire_updash", maverick.xDir,
 			player.getNextActorNetId(), false, sendRpc: true
 		);
 		proj = new FStagDashProj(
-			FlameStagger.pos, FlameStagger.xDir, 1, FlameStagger,
+			flameStagger.pos, flameStagger.xDir, 1, flameStagger,
 			player, player.getNextActorNetId(), rpc: true);
 	}
 
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
-		FlameStagger.useGravity = true;
+		flameStagger.useGravity = true;
 		proj?.destroySelf();
 		ProjVisible?.destroySelf();
 		if (getVictim() != null) {

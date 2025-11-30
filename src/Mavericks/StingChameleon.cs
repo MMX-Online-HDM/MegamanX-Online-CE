@@ -344,7 +344,8 @@ public class StingCSpikeProj : Projectile {
 
 #region states
 public class StingCMState : MaverickState {
-	public StingChameleon StingChameleao = null!;
+	public StingChameleon stingChameleao = null!;
+
 	public StingCMState(
 		string sprite, string transitionSprite = ""
 	) : base(
@@ -354,7 +355,7 @@ public class StingCMState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		StingChameleao = maverick as StingChameleon ?? throw new NullReferenceException();
+		stingChameleao = maverick as StingChameleon ?? throw new NullReferenceException();
 	}
 }
 public class StingCClimb : MaverickState {
@@ -501,7 +502,7 @@ public class StingCClingShootState : StingCMState {
 
 	public override void update() {
 		base.update();
-		if (StingChameleao == null) return;
+		if (stingChameleao == null) return;
 
 		Point? shootPos = maverick.getFirstPOI();
 		if (!shotOnce && shootPos != null) {
@@ -521,7 +522,7 @@ public class StingCClingShootState : StingCMState {
 		Point? shootPos = maverick.getFirstPOI();
 		if (shootPos != null) {
 			new StingCStingProj(
-				shootPos.Value, maverick.xDir, type, StingChameleao, 
+				shootPos.Value, maverick.xDir, type, stingChameleao, 
 				player, player.getNextActorNetId(), rpc: true
 				);
 		}
@@ -578,7 +579,7 @@ public class StingCHangState : StingCMState {
 
 	public override void update() {
 		base.update();
-		if (StingChameleao == null) return;
+		if (stingChameleao == null) return;
 
 		if (state == 0) {
 			if (stateTime > 0.25f) {
@@ -593,7 +594,7 @@ public class StingCHangState : StingCMState {
 				Point pos = new Point(maverick.pos.x + randX, ceilingY);
 
 				new StingCSpikeProj(
-					pos, 1, StingChameleao, player,
+					pos, 1, stingChameleao, player,
 					player.getNextActorNetId(), rpc: true
 				);
 

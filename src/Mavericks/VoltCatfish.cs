@@ -294,7 +294,8 @@ public class VoltCTriadThunderProj : Projectile {
 	}
 }
 public class VoltCMState : MaverickState {
-	public VoltCatfish ElectroNamazuros = null!;
+	public VoltCatfish electroNamazuros = null!;
+
 	public VoltCMState(
 		string sprite, string transitionSprite = ""
 	) : base(
@@ -304,7 +305,7 @@ public class VoltCMState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		ElectroNamazuros = maverick as VoltCatfish ?? throw new NullReferenceException();
+		electroNamazuros = maverick as VoltCatfish ?? throw new NullReferenceException();
 	}
 }
 public class VoltCTriadThunderState : VoltCMState {
@@ -317,26 +318,26 @@ public class VoltCTriadThunderState : VoltCMState {
 		if (!once && maverick.frameIndex >= 1) {
 			maverick.playSound("voltcTriadThunder", sendRpc: true);
 			once = true;
-			int type = (ElectroNamazuros.mines.Count == 0 ? 0 : 1);
+			int type = (electroNamazuros.mines.Count == 0 ? 0 : 1);
 			var proj1 = new VoltCTriadThunderProj(
-					ElectroNamazuros.getCenterPos().addxy(18*xDir,-23), xDir, type, 
-					0, ElectroNamazuros, ElectroNamazuros,
+					electroNamazuros.getCenterPos().addxy(18*xDir,-23), xDir, type, 
+					0, electroNamazuros, electroNamazuros,
 					player, player.getNextActorNetId(), rpc: true
 				);
 			var proj2 = new VoltCTriadThunderProj(
-					ElectroNamazuros.getCenterPos().addxy(18*xDir,-23), xDir, type,
-					1, ElectroNamazuros, ElectroNamazuros, player,
+					electroNamazuros.getCenterPos().addxy(18*xDir,-23), xDir, type,
+					1, electroNamazuros, electroNamazuros, player,
 					player.getNextActorNetId(), rpc: true
 				);
 			var proj3 = new VoltCTriadThunderProj(
-					ElectroNamazuros.getCenterPos().addxy(18*xDir,-31), xDir, type,
-					2, ElectroNamazuros, ElectroNamazuros, player,
+					electroNamazuros.getCenterPos().addxy(18*xDir,-31), xDir, type,
+					2, electroNamazuros, electroNamazuros, player,
 					player.getNextActorNetId(), rpc: true
 				);
 			if (type == 0) {
-				ElectroNamazuros.mines.Add(proj1);
-				ElectroNamazuros.mines.Add(proj2);
-				ElectroNamazuros.mines.Add(proj3);
+				electroNamazuros.mines.Add(proj1);
+				electroNamazuros.mines.Add(proj2);
+				electroNamazuros.mines.Add(proj3);
 			}
 		}
 	}
@@ -431,7 +432,7 @@ public class VoltCSuckState : VoltCMState {
 		base.onEnter(oldState);
 		suckProj = new VoltCSuckProj(
 			maverick.pos.addxy(maverick.xDir * 75, 0), maverick.xDir,
-			ElectroNamazuros, ElectroNamazuros, player, player.getNextActorNetId(), rpc: true);
+			electroNamazuros, electroNamazuros, player, player.getNextActorNetId(), rpc: true);
 	}
 
 	public override void onExit(MaverickState newState) {
@@ -496,16 +497,16 @@ public class VoltCUpBeamState : VoltCMState {
 			once = true;
 			maverick.playSound("voltcWeakBolt", sendRpc: true);
 			if (isAI || maverick.ammo >= 8) {
-				if (!isAI) ElectroNamazuros.deductAmmo(8);
+				if (!isAI) electroNamazuros.deductAmmo(8);
 				new VoltCUpBeamProj(
-					shootPos.Value, maverick.xDir, 0, ElectroNamazuros,
+					shootPos.Value, maverick.xDir, 0, electroNamazuros,
 					player, player.getNextActorNetId(), rpc: true
 				);
 			}
 			if (isAI || maverick.ammo >= 8) {
-				if (!isAI) ElectroNamazuros.deductAmmo(8);
+				if (!isAI) electroNamazuros.deductAmmo(8);
 				new VoltCUpBeamProj(
-					shootPos2.Value, maverick.xDir, 0, ElectroNamazuros,
+					shootPos2.Value, maverick.xDir, 0, electroNamazuros,
 					player, player.getNextActorNetId(), rpc: true
 				);
 			}
@@ -609,7 +610,7 @@ public class VoltCSpecialState : VoltCMState {
 			maverick.ammo -= 8;
 			var beamPos = maverick.pos.addxy(0, -150);
 			upBeamProj = new VoltCUpBeamProj(
-				beamPos, maverick.xDir, 1, ElectroNamazuros,
+				beamPos, maverick.xDir, 1, electroNamazuros,
 				player, player.getNextActorNetId(), rpc: true
 			);
 			maverick.playSound("voltcStrongBolt", sendRpc: true);
@@ -619,11 +620,11 @@ public class VoltCSpecialState : VoltCMState {
 			if (upBeamProj?.destroyed == true) {
 				upBeamProj = null;
 				chargeProj2 = new VoltCChargeProj(
-					maverick.getFirstPOIOrDefault(1), maverick.xDir, ElectroNamazuros,
+					maverick.getFirstPOIOrDefault(1), maverick.xDir, electroNamazuros,
 					player, player.getNextActorNetId(), rpc: true
 				);
 				chargeProj1 = new VoltCChargeProj(
-					maverick.getFirstPOIOrDefault(0), maverick.xDir, ElectroNamazuros, 
+					maverick.getFirstPOIOrDefault(0), maverick.xDir, electroNamazuros, 
 					player, player.getNextActorNetId(), rpc: true
 				);
 				stateTime = 0;
@@ -638,11 +639,11 @@ public class VoltCSpecialState : VoltCMState {
 				stateTime = 0;
 				state = 3;
 				barrierProj1 = new VoltCBarrierProj(
-					maverick.getFirstPOIOrDefault(2), maverick.xDir, ElectroNamazuros,
+					maverick.getFirstPOIOrDefault(2), maverick.xDir, electroNamazuros,
 					player, player.getNextActorNetId(), rpc: true
 				);
 				barrierProj2 = new VoltCBarrierProj(
-					maverick.getFirstPOIOrDefault(3), maverick.xDir, ElectroNamazuros,
+					maverick.getFirstPOIOrDefault(3), maverick.xDir, electroNamazuros,
 					player, player.getNextActorNetId(), rpc: true
 				);
 			}
@@ -667,7 +668,7 @@ public class VoltCSpecialState : VoltCMState {
 			partTime = 0;
 			new VoltCSparkleProj(
 				maverick.getFirstPOIOrDefault(0), maverick.xDir, type,
-				ElectroNamazuros, player, player.getNextActorNetId(), rpc: true
+				electroNamazuros, player, player.getNextActorNetId(), rpc: true
 			);
 		}
 		Helpers.decrementTime(ref partSoundTime);
