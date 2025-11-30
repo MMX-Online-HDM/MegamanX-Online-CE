@@ -101,6 +101,7 @@ public class X6SaberState : CharState {
 		}
 	}
 }
+
 public class XSaberCrouchState : CharState {
 	bool fired;
 	public XSaberCrouchState() : base("beam_saber_crouch") {
