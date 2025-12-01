@@ -129,13 +129,15 @@ public partial class Level {
 	public const ushort cp1NetId = 14;
 	public const ushort cp2NetId = 15;
 
-	public ShaderWrapper backgroundShader;
+	public ShaderWrapper? backgroundShader;
 	public Texture backgroundShaderImage;
-	public ShaderWrapper parallaxShader;
+	public ShaderWrapper? parallaxShader;
 	public Texture parallaxShaderImage;
-	public ShaderWrapper backwallShader;
+	public ShaderWrapper? altBackwallShader => backwallShader ?? backgroundShader;
+	public ShaderWrapper? backwallShader;
 	public Texture backwallShaderImage;
-	public ShaderWrapper foregroundShader;
+	public ShaderWrapper? altForegroundShader => foregroundShader ?? backgroundShader;
+	public ShaderWrapper? foregroundShader;
 	public Texture foregroundShaderImage;
 
 	public float mapVersion;
@@ -1999,7 +2001,7 @@ public partial class Level {
 
 		// If a backwall wasn't set, the background becomes the backwall.
 		if (level.backwallSprites != null) {
-			DrawWrappers.DrawMapTiles(level.backwallSprites, 0, 0, srt, level.backgroundShader);
+			DrawWrappers.DrawMapTiles(level.backwallSprites, 0, 0, srt, level.altBackwallShader);
 		} else {
 			DrawWrappers.DrawMapTiles(level.backgroundSprites, 0, 0, srt, level.backgroundShader);
 		}
@@ -2013,7 +2015,7 @@ public partial class Level {
 
 		level.drawKeyRange(keys, ZIndex.Background, ZIndex.Foreground, srt, walDrawObjects);
 
-		DrawWrappers.DrawMapTiles(level.foregroundSprites, 0, 0, srt, level.foregroundShader);
+		DrawWrappers.DrawMapTiles(level.foregroundSprites, 0, 0, srt, level.altForegroundShader);
 
 		level.drawKeyRange(keys, ZIndex.Foreground, long.MaxValue, srt, walDrawObjects);
 

@@ -542,7 +542,7 @@ public partial class DrawWrappers {
 		));
 	}
 
-	public static void DrawMapTiles(Texture[,] textureMDA, float x, float y, RenderTexture screenRenderTexture = null, ShaderWrapper shaderWrapper = null) {
+	public static void DrawMapTiles(Texture[,] textureMDA, float x, float y, RenderTexture? screenRenderTexture = null, ShaderWrapper? shaderWrapper = null) {
 		float origX = x;
 		float origY = y;
 		if (textureMDA == null) return;
