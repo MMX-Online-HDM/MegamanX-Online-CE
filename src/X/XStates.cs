@@ -4,6 +4,23 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MMXOnline;
 
+public class XState : CharState {
+	public MegamanX mmx = null!;
+
+	public XState(
+		string sprite, string shootSprite = "", string attackSprite = "",
+		string transitionSprite = "", string transShootSprite = ""
+	) : base(
+		sprite, shootSprite, attackSprite, transitionSprite, transShootSprite
+	) {
+	}
+
+	public override void onEnter(CharState oldState) {
+		mmx = character as MegamanX ?? throw new NullReferenceException();
+	}
+}
+
+
 public class XHover : CharState {
 	public SoundWrapper? sound;
 	float hoverTime;
@@ -203,7 +220,7 @@ public class GigaAirDash : CharState {
 	public int dashDir;
 	public bool stop;
 	public Anim? dashSpark;
-	public Anim? exaust = null!;
+	public Anim? exaust = null;
 
 	public GigaAirDash(string initialDashButton) : base("dash", "dash_shoot", "attack_dash") {
 		attackCtrl = true;
@@ -295,7 +312,7 @@ public class GigaAirDash : CharState {
 	}
 }
 
-public class UpDash : CharState {
+public class UpDash : XState {
 	public float dashTime = 0;
 	public string initialDashButton;
 
@@ -382,13 +399,12 @@ public class UpDash : CharState {
 	}
 }
 
-public class X2ChargeShot : CharState {
+public class X2ChargeShot : XState {
 	bool fired;
 	int shootNum;
 	bool pressFire;
 	Weapon? weaponOverride;
 	Weapon weapon => (weaponOverride ?? mmx.currentWeapon ?? mmx.specialBuster);
-	MegamanX mmx = null!;
 
 	public X2ChargeShot(Weapon? weaponOverride, int shootNum) : base("cross_shot") {
 		this.shootNum = shootNum % 2;
@@ -479,11 +495,10 @@ public class X2ChargeShot : CharState {
 	}
 }
 
-public class X3ChargeShot : CharState {
+public class X3ChargeShot : XState {
 	bool fired;
 	public int state = 0;
 	bool pressFire;
-	MegamanX mmx = null!;
 	public HyperCharge? hyperBusterWeapon;
 
 	public X3ChargeShot(HyperCharge? hyperBusterWeapon) : base("cross_shot") {

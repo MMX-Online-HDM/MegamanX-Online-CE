@@ -91,7 +91,7 @@ public class ChillPenguin : Maverick {
 				pos, xDir, this, player,
 				input.isHeld(Control.Down, player) ? 1 : 0, player.getNextActorNetId(), rpc: true
 			);
-		}, null!);
+		}, "");
 		if (isAI) {
 			mshoot.consecutiveData = new MaverickStateConsecutiveData(0, 4, 0.5f);
 		}
@@ -450,7 +450,8 @@ public class ChillPBlizzardProj : Projectile {
 
 #region states
 public class PenguinMState : MaverickState {
-	public ChillPenguin IcyPenguigo = null!;
+	public ChillPenguin icyPenguigo = null!;
+
 	public PenguinMState(
 		string sprite, string transitionSprite = ""
 	) : base(
@@ -460,7 +461,7 @@ public class PenguinMState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		IcyPenguigo = maverick as ChillPenguin ?? throw new NullReferenceException();
+		icyPenguigo = maverick as ChillPenguin ?? throw new NullReferenceException();
 
 	}
 }
@@ -473,7 +474,7 @@ public class ChillPIceBlowState : PenguinMState {
 
 	public override void update() {
 		base.update();
-		if (IcyPenguigo == null) return;
+		if (icyPenguigo == null) return;
 
 		Helpers.decrementTime(ref shootTime);
 
@@ -482,7 +483,7 @@ public class ChillPIceBlowState : PenguinMState {
 			if (shootPos != null) {
 				shootTime = 0.1f;
 				new ShotgunIceProjCharged(
-					shootPos.Value, maverick.xDir, IcyPenguigo,
+					shootPos.Value, maverick.xDir, icyPenguigo,
 					player, 1, true, player.getNextActorNetId(), rpc: true
 				);
 				if (!soundOnce) {
@@ -517,7 +518,7 @@ public class ChillPIceBlowState : PenguinMState {
 
 	public void addIceStatueIfSpace(Point pos) {
 		player.iceStatues.Add(new ChillPIceStatueProj(
-				pos, maverick.xDir, IcyPenguigo,
+				pos, maverick.xDir, icyPenguigo,
 				player, player.getNextActorNetId(), rpc: true
 			)
 		);
@@ -571,7 +572,7 @@ public class ChillPBlizzardState : PenguinMState {
 
 	public override void update() {
 		base.update();
-		if (IcyPenguigo == null) return;
+		if (icyPenguigo == null) return;
 		if (switchPos != null) {
 			if (state == 0) {
 				if (maverick.pos.y - switchSpriteHeight <= switchPos.Value.y + 5) {
@@ -591,7 +592,7 @@ public class ChillPBlizzardState : PenguinMState {
 						topY = maverick.pos.y - 80;
 					}
 					new ChillPBlizzardProj(
-						new Point(maverick.pos.x, topY), maverick.xDir, IcyPenguigo,
+						new Point(maverick.pos.x, topY), maverick.xDir, icyPenguigo,
 						player, player.getNextActorNetId(), rpc: true
 					);
 					

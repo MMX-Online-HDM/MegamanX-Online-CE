@@ -195,7 +195,8 @@ public class NeonTRaySplasherProj : Projectile {
 	}
 }
 public class NeonTMState : MaverickState {
-	public NeonTiger ShiningTigerd = null!;
+	public NeonTiger shiningTigerd = null!;
+
 	public NeonTMState(
 		string sprite, string transitionSprite = ""
 	) : base(
@@ -205,7 +206,7 @@ public class NeonTMState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		ShiningTigerd = maverick as NeonTiger ?? throw new NullReferenceException();
+		shiningTigerd = maverick as NeonTiger ?? throw new NullReferenceException();
 	}
 }
 public class NeonTShootState : NeonTMState {
@@ -229,11 +230,11 @@ public class NeonTShootState : NeonTMState {
 					shotProj();
 				}
 			}
-			if (isAI && ShiningTigerd.shootTimes < 4 && stateTime > 16f / 60f) {
+			if (isAI && shiningTigerd.shootTimes < 4 && stateTime > 16f / 60f) {
 				shotProj();
 				maverick.playSound("neontRaySplasher", sendRpc: true);
 				maverick.changeState(new NeonTShootState(), true);
-				ShiningTigerd.shootTimes++;
+				shiningTigerd.shootTimes++;
 			}
 		}
 		if (maverick.isAnimOver()) {
@@ -255,7 +256,7 @@ public class NeonTShootState : NeonTMState {
 		Point? shootPos = maverick.getFirstPOI();
 		if (shootPos != null) {
 			new NeonTRaySplasherProj(
-				shootPos.Value, maverick.xDir, type, ShiningTigerd,
+				shootPos.Value, maverick.xDir, type, shiningTigerd,
 				player, player.getNextActorNetId(), rpc: true
 			);
 		}
@@ -301,7 +302,7 @@ public class NeonTWallShootState : NeonTMState {
 		Point? shootPos = maverick.getFirstPOI();
 		if (shootPos != null) {
 			new NeonTRaySplasherProj(
-				shootPos.Value, maverick.xDir*-1, type, ShiningTigerd,
+				shootPos.Value, maverick.xDir*-1, type, shiningTigerd,
 				player, player.getNextActorNetId(), rpc: true
 			);
 		}
@@ -372,7 +373,7 @@ public class NeonTAirClawState : NeonTMState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		if (oldState is NeonTPounceState || ShiningTigerd.isDashing) {
+		if (oldState is NeonTPounceState || shiningTigerd.isDashing) {
 			wasPounce = true;
 			canStopJump = false;
 			airMove = false;

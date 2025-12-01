@@ -20,7 +20,7 @@ public class NeutralEnemy : Actor, IDamagable {
 		int alliance = GameMode.freelanceAlliance,
 		bool addToLevel = true
 	) : base(
-		null!, pos, netId, isLocal, !addToLevel
+		"", pos, netId, isLocal, !addToLevel
 	) {
 		// Forcefull change sprite to something before we crash.
 		sprite = new Sprite("empty");

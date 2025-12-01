@@ -331,7 +331,7 @@ public class ParasiticBombProjCharged : Projectile, IDamagable {
 	public Point lastMoveAmount;
 	const float maxSpeed = 150;
 	public ParasiticBombProjCharged(
-		Point pos, int xDir, Actor owner, Player player, ushort? netId, Actor host, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, Actor? host, bool rpc = false
 	) : base(
 		pos, xDir, owner, "parasitebomb_bee", netId, player	
 	) {
@@ -355,7 +355,7 @@ public class ParasiticBombProjCharged : Projectile, IDamagable {
 
 	public static Projectile rpcInvoke(ProjParameters args) {
 		return new ParasiticBombProjCharged(
-			args.pos, args.xDir, args.owner, args.player, args.netId, null!
+			args.pos, args.xDir, args.owner, args.player, args.netId, null
 		);
 	}
 

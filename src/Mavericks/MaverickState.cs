@@ -1357,7 +1357,6 @@ public class MWallKick : MaverickState {
 		base.update();
 		if (kickSpeed != 0) {
 			kickSpeed = Helpers.toZero(kickSpeed, 800 * Global.spf, kickDir);
-			bool stopMove = false;
 			if (player.input.isHeld(Control.Left, player) && kickSpeed < 0 ||
 				player.input.isHeld(Control.Right, player) && kickSpeed > 0
 			) {

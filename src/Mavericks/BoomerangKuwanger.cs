@@ -319,7 +319,7 @@ public class BoomerangKBoomerangProj : Projectile {
 
 #region states
 public class BoomerMState : MaverickState {
-	public BoomerangKuwanger BoomerKuwanger = null!;
+	public BoomerangKuwanger boomeruKuwanger = null!;
 	public BoomerMState(
 		string sprite, string transitionSprite = ""
 	) : base(
@@ -329,7 +329,7 @@ public class BoomerMState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		BoomerKuwanger = maverick as BoomerangKuwanger ?? throw new NullReferenceException();
+		boomeruKuwanger = maverick as BoomerangKuwanger ?? throw new NullReferenceException();
 
 	}
 }

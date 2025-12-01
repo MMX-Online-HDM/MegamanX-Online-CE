@@ -312,7 +312,7 @@ public class ShotgunIceProjSled : Projectile {
 public class ShotgunIceChargedShot : CharState {
 	public float[] StateTime = { 2/60f, 10/60f, 18/60f, 26/60f, 34/60f, 42/60f, 50/60f, 58/60f};
 	public bool[] fired = { false, false, false, false, false, false, false, false };
-	MegamanX mmx = null!;
+	MegamanX? mmx = null;
 	public float time;
 	public ShotgunIceChargedShot() : base("shoot") {
 	}

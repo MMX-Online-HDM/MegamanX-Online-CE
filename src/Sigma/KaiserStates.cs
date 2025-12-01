@@ -659,7 +659,7 @@ public class KaiserSigmaBeamProj : Projectile {
 		base.update();
 
 		if (globalCollider == null) {
-			globalCollider = new Collider(getPoints(), true, null!, false, false, 0, new Point(0, 0));
+			globalCollider = new Collider(getPoints(), true, this, false, false, 0, new Point(0, 0));
 		} else {
 			changeGlobalCollider(getPoints());
 		}

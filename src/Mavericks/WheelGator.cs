@@ -303,7 +303,8 @@ public class WheelGSpinWheelProj : Projectile {
 	}
 }
 public class WheelGMState : MaverickState {
-	public WheelGator WheelAlligates = null!;
+	public WheelGator wheelAlligates = null!;
+	
 	public WheelGMState(
 		string sprite, string transitionSprite = ""
 	) : base(
@@ -313,7 +314,7 @@ public class WheelGMState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		WheelAlligates = maverick as WheelGator ?? throw new NullReferenceException();
+		wheelAlligates = maverick as WheelGator ?? throw new NullReferenceException();
 	}
 }
 
@@ -336,7 +337,7 @@ public class WheelGShootState : WheelGMState {
 				shotOnce = true;
 				maverick.playSound("wheelgSpinWheel", sendRpc: true);
 				new WheelGSpinWheelProj(
-					shootPos.Value, maverick.xDir, WheelAlligates,
+					shootPos.Value, maverick.xDir, wheelAlligates,
 					player, player.getNextActorNetId(), rpc: true
 				);
 			}
@@ -352,7 +353,7 @@ public class WheelGShootState : WheelGMState {
 				shotOnce = true;
 				maverick.playSound("wheelgSpinWheel", sendRpc: true);
 				new WheelGSpinWheelProj(
-					shootPos.Value, maverick.xDir, WheelAlligates,
+					shootPos.Value, maverick.xDir, wheelAlligates,
 					player, player.getNextActorNetId(), rpc: true
 				);
 			}
@@ -481,7 +482,7 @@ public class WheelGSpitState : WheelGMState {
 		if (!shotOnce && SpecialPressed) {
 			shotOnce = true;
 			maverick.frameIndex = 4;
-			WheelAlligates.playSound("wheelgSpit", sendRpc: true);
+			wheelAlligates.playSound("wheelgSpit", sendRpc: true);
 
 			if (downHeld && LeftOrRightHeld) {
 				Proj(3);
@@ -509,8 +510,8 @@ public class WheelGSpitState : WheelGMState {
 	public void Proj(int type) {
 		int xDir = maverick.xDir;
 		new WheelGSpitProj(
-			WheelAlligates.getCenterPos().addxy(32 * xDir, 1), xDir,
-			type, WheelAlligates, player, player.getNextActorNetId(), rpc: true
+			wheelAlligates.getCenterPos().addxy(32 * xDir, 1), xDir,
+			type, wheelAlligates, player, player.getNextActorNetId(), rpc: true
 		);
 	}
 
@@ -612,7 +613,7 @@ public class WheelGUpBiteState : WheelGMState {
 		if (victim == null) {
 			victim = grabbed;
 			if (maverick.ownedByLocalPlayer) {
-				WheelAlligates.upBiteWeapon.applyDamage(victim, false, WheelAlligates, (int)ProjIds.WheelGUpBite, sendRpc: true);
+				wheelAlligates.upBiteWeapon.applyDamage(victim, false, wheelAlligates, (int)ProjIds.WheelGUpBite, sendRpc: true);
 				maverick.playSound("wheelgBite", sendRpc: true);
 			}
 			return true;

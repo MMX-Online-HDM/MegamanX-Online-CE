@@ -213,7 +213,8 @@ public class OverdriveOSonicSlicerProj : Projectile {
 	}
 }
 public class OOstrichMState : MaverickState {
-	public OverdriveOstrich SonicOstreague = null!;
+	public OverdriveOstrich sonicOstreague = null!;
+
 	public OOstrichMState(
 		string sprite, string transitionSprite = ""
 	) : base(
@@ -223,7 +224,7 @@ public class OOstrichMState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		SonicOstreague = maverick as OverdriveOstrich ?? throw new NullReferenceException();
+		sonicOstreague = maverick as OverdriveOstrich ?? throw new NullReferenceException();
 	}
 }
 
@@ -242,7 +243,7 @@ public class OverdriveOShootState : OOstrichMState {
 			shotOnce = true;
 			maverick.playSound("overdriveoShoot", sendRpc: true);
 			new OverdriveOSonicSlicerProj(
-				shootPos.Value, maverick.xDir, SonicOstreague,
+				shootPos.Value, maverick.xDir, sonicOstreague,
 				player, player.getNextActorNetId(), rpc: true
 			);
 			//proj.vel.x += maverick.getRunSpeed() * 3 * proj.xDir;
@@ -324,7 +325,7 @@ public class OverdriveOShoot2State : OOstrichMState {
 			maverick.playSound("overdriveoShoot2", sendRpc: true);
 			for (int i = 0; i < 5; i++) {
 				new OverdriveOSonicSlicerUpProj(
-					shootPos.Value, 1, i, SonicOstreague, player,
+					shootPos.Value, 1, i, sonicOstreague, player,
 					player.getNextActorNetId(), rpc: true
 				);
 			}
@@ -373,7 +374,7 @@ public class OverdriveOSkidState : OOstrichMState {
 	public override void update() {
 		base.update();
 
-		SonicOstreague.accSpeed = Helpers.lerp(SonicOstreague.accSpeed, 0, Global.spf * 5);
+		sonicOstreague.accSpeed = Helpers.lerp(sonicOstreague.accSpeed, 0, Global.spf * 5);
 
 		Helpers.decrementTime(ref dustTime);
 		if (dustTime == 0) {
@@ -382,7 +383,7 @@ public class OverdriveOSkidState : OOstrichMState {
 		}
 
 		var inputDir = input.getInputDir(player);
-		if (inputDir.x == -SonicOstreague.xDir) maverick.frameSpeed = 1.5f;
+		if (inputDir.x == -sonicOstreague.xDir) maverick.frameSpeed = 1.5f;
 		else maverick.frameSpeed = 1;
 
 		var move = new Point(maverick.getRunSpeed() * maverick.xDir, 0);
@@ -403,7 +404,7 @@ public class OverdriveOSkidState : OOstrichMState {
 	}
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
-		SonicOstreague.accSpeed = 0;
+		sonicOstreague.accSpeed = 0;
 	}
 }
 
@@ -430,6 +431,6 @@ public class OverdriveOCrystalizedState : OOstrichMState {
 
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
-		SonicOstreague.crystalizeCooldown = 2;
+		sonicOstreague.crystalizeCooldown = 2;
 	}
 }
