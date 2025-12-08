@@ -1588,11 +1588,9 @@ public class GenericGrabbedState : CharState {
 		}
 
 		grabTime -= player.mashValue();
+		
 		if (grabTime <= 0) {
 			character.changeToIdleOrFall();
-		}
-		if (character is Axl axl) {
-			axl.stealthRevealTime = Axl.maxStealthRevealTime;
 		}
 	}
 
