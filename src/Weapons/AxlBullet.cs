@@ -86,7 +86,7 @@ public class DoubleBullet : AxlWeapon {
 		weaponSlotIndex = 35;
 		killFeedIndex = 34;
 		altFireCooldown = 14;
-		fireRate = 6;
+		fireRate = 7;
 		displayName = "Double Bullets";
 		type = (int)AxlBulletWeaponType.DoubleBullets;
 		isAxlBullets = true;

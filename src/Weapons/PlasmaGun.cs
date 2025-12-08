@@ -49,6 +49,7 @@ public class PlasmaGun : AxlWeapon {
 		if (axl.loadout.plasmaGunAlt == 0) {
 			if (!axl.grounded) return;
 			axl.voltTornadoTime = 0.2f;
+			shootCooldown = fireRate;
 			base.axlAltShoot(character, args);
 			return;
 		} else {

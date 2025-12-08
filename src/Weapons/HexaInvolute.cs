@@ -130,7 +130,7 @@ public class HexaInvoluteProj : Projectile {
 		damager.flinch = Global.defFlinch;
 		damager.hitCooldown = 9;
 		projId = (int)ProjIds.HexaInvolute;
-		zIndex = ZIndex.Backwall;
+		zIndex = ZIndex.Background;
 		setIndestructableProperties();
 		sprite.hitboxes = popullateHitboxes();
 		for (int i = 0; i < beamDest.Length; i++) {
