@@ -197,7 +197,7 @@ public class RisingSpecterProj : Projectile {
 		weapon = RisingSpecter.netWeapon;
 		damager.damage = 6;
 		damager.flinch = Global.defFlinch;
-		damager.hitCooldown = 30;
+		damager.hitCooldown = 60;
 		maxTime = 0.5f;
 		destroyOnHit = false;
 		shouldShieldBlock = false;
