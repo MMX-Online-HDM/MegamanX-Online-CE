@@ -1477,7 +1477,22 @@ class Program {
 			) as String ?? "Windows";
 		#endif
 		#if LINUX
-			cpuName = "Linux";
+			if (!File.Exists("/proc/cpuinfo")) {
+				return "Unix;"
+			}
+			// Read all lines from /proc/cpuinfo
+			string[] lines = File.ReadAllLines("/proc/cpuinfo");
+			// Find the line containing "model name"
+			string? modelNameLine = lines.FirstOrDefault(
+				line => line.StartsWith("model name", StringComparison.OrdinalIgnoreCase)
+			);
+			if (modelNameLine != null) {
+				// Extract the model name part after the colon and trim whitespace
+				lines = modelNameLine.Split(':');
+				if (lines.Length >= 2) {
+					cpuName = lines[1];
+				}
+			}
 		#endif
 		#if MACOS
 			cpuName = "Darwin";

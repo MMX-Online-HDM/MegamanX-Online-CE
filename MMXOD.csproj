@@ -34,9 +34,14 @@
 	</PropertyGroup>
 
 	<!--Win 7 only builds-->
-	<PropertyGroup Condition="'$(RuntimeIdentifier)' == 'win7-x64' Or '$(RuntimeIdentifier)' == 'win7-x86'">
+	<PropertyGroup Condition="'$(RuntimeIdentifier)' == 'win7-x86'">
 		<TargetFramework>net6.0-windows</TargetFramework>
 		<LangVersion>14</LangVersion>
+	</PropertyGroup>
+
+	<!--Win 7 only builds-->
+	<PropertyGroup Condition="'$(RuntimeIdentifier)' == 'linux-x64'">
+		<TargetFramework>net10.0</TargetFramework>
 	</PropertyGroup>
 
 	<!--Dependencies-->

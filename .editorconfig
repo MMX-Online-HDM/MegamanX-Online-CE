@@ -22,6 +22,8 @@ dotnet_diagnostic.IDE0047.severity = none
 [*.cs]
 # Disable "can be static" on Linter.
 dotnet_diagnostic.CA1822.severity = none
+# Disable "can be readonly" on Linter.
+dotnet_diagnostic.IDE0251.severity = none
 # Allow folder difer from namespace.
 dotnet_style_namespace_match_folder = false
 # Allow visible non-constant fields.
@@ -40,6 +42,33 @@ csharp_new_line_between_query_expression_clauses = false
 csharp_indent_case_contents = true
 csharp_indent_switch_labels = true
 csharp_indent_labels = flush_left
+# Allow to use "toArray()" without warning.
+dotnet_diagnostic.IDE0305.severity = none
+# Allow to use non-primary constructors.
+dotnet_diagnostic.IDE0290.severity = none
 # Wrapping preferences
 csharp_preserve_single_line_statements = true
 csharp_preserve_single_line_blocks = true
+
+# Naming rules.
+dotnet_naming_rule.interface_rule.severity = suggestion
+dotnet_naming_rule.interface_rule.symbols = interface
+dotnet_naming_rule.interface_rule.style = begins_with_i
+dotnet_naming_rule.types_rule.severity = suggestion
+dotnet_naming_rule.types_rule.symbols = main_types
+dotnet_naming_rule.types_rule.style = pascal_case
+dotnet_naming_rule.nontypes_rule.severity = suggestion
+dotnet_naming_rule.nontypes_rule.symbols = non_types
+dotnet_naming_rule.nontypes_rule.style = camel_case
+# Symbol spec.
+dotnet_naming_symbols.interface.applicable_kinds = interface
+dotnet_naming_symbols.interface.applicable_accessibilities = public, internal, private, protected, protected_internal, private_protected
+dotnet_naming_symbols.main_types.applicable_kinds = class, struct, interface, enum, method, event
+dotnet_naming_symbols.main_types.applicable_accessibilities = public, internal, private, protected, protected_internal, private_protected
+dotnet_naming_symbols.non_types.applicable_kinds = property, field
+dotnet_naming_symbols.non_types.applicable_accessibilities = public, internal, private, protected, protected_internal, private_protected
+# Naming style
+dotnet_naming_style.begins_with_i.required_prefix = I
+dotnet_naming_style.begins_with_i.capitalization = pascal_case
+dotnet_naming_style.pascal_case.capitalization = pascal_case
+dotnet_naming_style.camel_case.capitalization = camel_case

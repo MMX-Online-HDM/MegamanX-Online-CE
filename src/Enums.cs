@@ -295,7 +295,8 @@ public enum WeaponIds {
 	Sigma3KaiserStomp,
 	RideChaserGun,
 	RideChaserHit,
-	DNACore = 250
+	VileWeaponSystem,
+	DNACore = 250,
 }
 
 public enum ProjIds {
