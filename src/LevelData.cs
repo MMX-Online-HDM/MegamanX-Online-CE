@@ -592,6 +592,7 @@ public class LevelData {
 		{ "dopplerlab", "dopplerLab" },
 		{ "protoDopplerB", "psx_dopplerLab" },
 		{ "protoDopplerC", "psx_dopplerLab2" },
+		{ "protoDopplerD", "psx_dopplerLab2" },
 		{ "frozentown", "blizzardBuffalo" },
 		{ "giantdam", "toxicSeahorse" },
 		{ "giantdam2", "toxicSeahorse" },
