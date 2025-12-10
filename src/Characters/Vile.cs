@@ -238,15 +238,15 @@ public class Vile : Character {
 
 		if (!ownedByLocalPlayer) return;
 		
-		cannonWeapon?.update();
-		vulcanWeapon?.update();
-		missileWeapon?.update();
-		rocketPunchWeapon?.update();
-		napalmWeapon?.update();
-		grenadeWeapon?.update();
-		cutterWeapon?.update();
-		laserWeapon?.update();
-		flamethrowerWeapon?.update();
+		cannonWeapon.update();
+		vulcanWeapon.update();
+		missileWeapon.update();
+		rocketPunchWeapon.update();
+		napalmWeapon.update();
+		grenadeWeapon.update();
+		cutterWeapon.update();
+		laserWeapon.update();
+		flamethrowerWeapon.update();
 
 		RideArmorAttacks();
 		RideLinkMK5();
@@ -282,7 +282,7 @@ public class Vile : Character {
 				return true;
 			}
 		}
-		if (weaponRightHeld) {
+		if (weaponRightHeld && upHeld) {
 			cutterWeapon.vileShoot(WeaponIds.VileCutter, this);
 			return true;
 		}
