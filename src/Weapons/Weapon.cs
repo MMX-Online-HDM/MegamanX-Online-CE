@@ -437,4 +437,8 @@ public class Weapon {
 	public virtual float getFireRate(Character character, int chargeLevel, int[] args) {
 		return fireRate;
 	}
+
+	public virtual bool customShootCondition(Character character) {
+		return false;
+	}
 }

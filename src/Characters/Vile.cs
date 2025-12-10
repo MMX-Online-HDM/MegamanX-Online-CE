@@ -11,7 +11,6 @@ public class Vile : Character {
 	public const int callNewMechCost = 5;
 	public float mechBusterCooldown;
 	public bool usedAmmoLastFrame;
-	public int buckshotDanceNum;
 	public bool isShootingGizmo;
 	public bool isShootingVulcan => vulcanLingerTime > 0;
 	public bool hasFrozenCastle;
@@ -46,6 +45,7 @@ public class Vile : Character {
 	public Weapon downSpWeapon;
 	public float deadCooldown;
 	public const float maxdeadCooldown = 60;
+	public float[] chargeTimeEx = new float[3];
 
 	public Vile(
 		Player player, float x, float y, int xDir,
