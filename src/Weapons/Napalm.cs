@@ -367,7 +367,7 @@ public class MK2NapalmProj : Projectile {
 			new MK2NapalmFlame(pos, xDir, this, owner, owner.getNextActorNetId(), rpc: true);
 		}
 		var hit = Global.level.checkTerrainCollisionOnce(this, vel.x * Global.spf, 0, null);
-		if (hit?.gameObject is Wall && hit?.hitData?.normal != null && !(hit.hitData.normal.Value.isAngled())) {
+		if (hit?.gameObject is Wall && hit.hitData?.normal != null && hit.hitData.normal.Value.isSideways()) {
 			new MK2NapalmWallProj(pos, xDir, this, owner, owner.getNextActorNetId(), rpc: true);
 			destroySelf();
 		}
