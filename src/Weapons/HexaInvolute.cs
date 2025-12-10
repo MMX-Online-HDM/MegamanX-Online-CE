@@ -174,6 +174,8 @@ public class HexaInvoluteProj : Projectile {
 
 		byteAngle += speedMul * 0.6f * xDir;
 		updateBeams();
+
+		Global.level.addToGrid(this);
 	}
 
 	public void updateBeams() {
@@ -239,8 +241,8 @@ public class HexaInvoluteProj : Projectile {
 		int j = 1;
 		for (int i = start; i < end; i++) {
 			Collider hitbox = sprite.hitboxes[i];
-			hitbox.offset.x = xOff * j;
-			hitbox.offset.y = yOff * j;
+			hitbox.offset.x = xOff * j * xDir;
+			hitbox.offset.y = yOff * j * yDir;
 			j++;
 		}
 	}
