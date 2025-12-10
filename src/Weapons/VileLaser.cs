@@ -167,6 +167,7 @@ public class LaserAttack : VileState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		character.stopCharge();
 		if (!character.grounded) {
 			sprite = "cannon_air";
 			character.changeSpriteFromName(sprite, true);

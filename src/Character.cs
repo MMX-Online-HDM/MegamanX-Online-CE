@@ -818,7 +818,8 @@ public partial class Character : Actor, IDamagable {
 		}
 
 		// Crystal break.
-		if ((charState is Dash || charState is AirDash) &&
+		if (((charState is Dash or AirDash or LightDash or GigaAirDash)
+			|| (charState.useDashJumpSpeed || isDashing) && !(charState is Fall or Jump)) &&
 			other.gameObject is Character character && character.isCrystalized &&
 			character.player.alliance != player.alliance
 		) {
