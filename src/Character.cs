@@ -2862,7 +2862,7 @@ public partial class Character : Actor, IDamagable {
 					damageSavings += (originalDamage * 0.125m);
 				}
 			}
-			if (vile != null && vile.hasFrozenCastle && charState is not Die or VileRevive) {
+			if (vile != null && vile.hasFrozenCastle) {
 				damageSavings += originalDamage * Vile.frozenCastlePercent;
 			}
 		}
