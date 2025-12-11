@@ -2786,8 +2786,15 @@ public partial class Character : Actor, IDamagable {
 		) {
 			damage = 0;
 		}
-
+		// Get armor penetration flag.
 		bool isArmorPiercing = Damager.isArmorPiercing(projId);
+		// Instakills and hits while dead also ignore armor.
+		if (originalDamage == (decimal)Damager.forceKillDamage ||
+			originalDamage != (decimal)Damager.ohkoDamage ||
+			originalDamage != (decimal)Damager.envKillDamage
+		) {
+			isArmorPiercing = true;
+		}
 
 		if (projId == (int)ProjIds.CrystalHunterDash &&
 			charState is GenericStun && crystalizedTime > 0 &&
@@ -2800,7 +2807,6 @@ public partial class Character : Actor, IDamagable {
 			if (weaponIndex == 20 && damage > 0) inRideArmor.crystalizeTime = 0;   //Dash to destroy crystal
 			inRideArmor.checkCrystalizeTime();
 		}
-
 		// For fractional damage shenanigans.
 		if (damage % 1 != 0) {
 			decimal decDamage = damage % 1;
@@ -2829,41 +2835,44 @@ public partial class Character : Actor, IDamagable {
 			damage -= 1;
 		}
 		// Damage increase/reduction section
-		if (!isArmorPiercing && (
-			originalDamage != (decimal)Damager.forceKillDamage &&
-			originalDamage != (decimal)Damager.ohkoDamage &&
-			originalDamage != (decimal)Damager.envKillDamage)
-		) {
+		if (!isArmorPiercing && damageSavings < maxHealth) {
+			// Limit calculation damage to our max HP.
+			decimal calcDamage = Math.Max(originalDamage, maxHealth);
+			// Apply savings.
 			if (charState is SwordBlock) {
-				damageSavings += (originalDamage * 0.5m);
+				damageSavings += (calcDamage * 0.5m);
 			}
 			if (charState is SigmaAutoBlock) {
-				damageSavings += (originalDamage * 0.25m);
+				damageSavings += (calcDamage * 0.25m);
 			}
 			if (charState is SigmaBlock) {
-				damageSavings += (originalDamage * 0.5m);
+				damageSavings += (calcDamage * 0.5m);
 			}
 			if (acidTime > 0) {
 				decimal extraDamage = 0.25m + (0.25m * ((decimal)acidTime / 8.0m));
-				damageDebt += (originalDamage * extraDamage);
+				damageDebt += (calcDamage * extraDamage);
 			}
 			if (mmx != null) {
 				if (mmx.barrierActiveTime > 0) {
 					if (mmx.hyperChestArmor == ArmorId.Max) {
-						damageSavings += (originalDamage * 0.5m);
+						damageSavings += (calcDamage * 0.5m);
 					} else {
-						damageSavings += (originalDamage * 0.25m);
+						damageSavings += (calcDamage * 0.25m);
 					}
 				}
 				if (mmx.chestArmor == ArmorId.Light) {
-					damageSavings += (originalDamage * 0.125m);
+					damageSavings += (calcDamage * 0.125m);
 				}
 				if (mmx.chestArmor == ArmorId.Giga) {
-					damageSavings += (originalDamage * 0.125m);
+					damageSavings += (calcDamage * 0.125m);
 				}
 			}
 			if (vile != null && vile.hasFrozenCastle) {
-				damageSavings += originalDamage * Vile.frozenCastlePercent;
+				damageSavings += calcDamage * Vile.frozenCastlePercent;
+			}
+			// Limit to max HP.
+			if (damageSavings > maxHealth) {
+				damageSavings = maxHealth;
 			}
 		}
 		// This is to defend from overkill damage.
