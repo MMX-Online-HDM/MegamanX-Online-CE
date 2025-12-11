@@ -39,16 +39,15 @@ public class RisingSpecter : VileLaser {
 	}
 	
 	public override void shoot(Character character, int[] args) {
-		if (character is not Vile vava) return;
-		if (!vava.grounded) return;
-		Point shootPos = vava.setCannonAim(new Point(1.5f, -1));
+		if (character is not Vile vile) return;
+		Point shootPos = vile.setCannonAim(new Point(1.5f, -1));
 		new RisingSpecterProj(
-			shootPos, vava.xDir, vava, vava.player,
-			vava.player.getNextActorNetId(), rpc: true
+			shootPos, vile.xDir, vile, vile.player,
+			vile.player.getNextActorNetId(), rpc: true
 		);
-		vava.playSound("risingSpecter", sendRpc: true);
-		vava.setVileShootTime(this);
-		vava.tryUseVileAmmo(vileAmmoUsage);
+		vile.playSound("risingSpecter", sendRpc: true);
+		vile.setVileShootTime(this);
+		vile.tryUseVileAmmo(vileAmmoUsage);
 	}
 }
 public class NecroBurst : VileLaser {
@@ -130,6 +129,8 @@ public class LaserAttack : VileState {
 	public VileLaser weapon;
 	public float shootTime;
 	public int loopNum;
+	public float airTimer;
+
 	public LaserAttack(VileLaser weapon) : base("idle_shoot") {
 		useDashJumpSpeed = true;
 		airMove = true;
@@ -143,26 +144,30 @@ public class LaserAttack : VileState {
 	public override void update() {
 		base.update();
 		if (weapon is RisingSpecter) {
-			if (!vile.grounded) {
-				stateTime = 0;
+			if (!vile.grounded && !shot && airTimer < 30) {
+				stateFrames = 0;
+				airTimer += vile.speedMul;
 			} else {
-				if (vile.grounded && !shot) {
+				vile.cannonAimNum = 1;
+				if (!shot) {
 					shot = true;
 					weapon.shoot(vile, []);
 				}
-				if (shot && stateTime > 12f / 60f)
+				if (shot && stateFrames > 12) {
 					character.changeToIdleOrFall();
+				}
+				
 			}
-		} else {
-			character.turnToInput(player.input, player);
-			if (character.frameIndex >= shootFrame && !shot) {
-				shot = true;
-				weapon.shoot(vile, []);
-			}
-			if (character.isAnimOver())
-				character.changeToIdleOrFall();
+			return;
 		}
-		if (stateTime > 30f / 60f) character.changeToIdleOrFall();
+		character.turnToInput(player.input, player);
+		if (character.frameIndex >= shootFrame && !shot) {
+			shot = true;
+			weapon.shoot(vile, []);
+		}
+		if (stateFrames > 30) {
+			character.changeToIdleOrFall();
+		}
 	}
 
 	public override void onEnter(CharState oldState) {
