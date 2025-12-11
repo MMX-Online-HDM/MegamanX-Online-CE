@@ -133,6 +133,7 @@ public class HexaInvoluteProj : Projectile {
 		zIndex = ZIndex.Background;
 		setIndestructableProperties();
 		sprite.hitboxes = popullateHitboxes();
+		Global.level.addToGrid(this);
 		for (int i = 0; i < beamDest.Length; i++) {
 			beamDest[i] = pos;
 		}

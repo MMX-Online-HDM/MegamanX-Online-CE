@@ -190,9 +190,9 @@ public class RisingSpecterProj : Projectile {
 	public float sinDampTime = 1;
 	public Anim muzzle;
 	public RisingSpecterProj(
-		Point poi, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		poi, xDir, owner, "empty", netId, player
+		pos, xDir, owner, "empty", netId, player
 	) {
 		weapon = RisingSpecter.netWeapon;
 		damager.damage = 6;
@@ -204,44 +204,41 @@ public class RisingSpecterProj : Projectile {
 		vel = new Point();
 		projId = (int)ProjIds.RisingSpecter;
 		shouldVortexSuck = false;
-		float destX = xDir * 150;
-		float destY = -100;
-		Point toDestPos = new Point(destX, destY);
-		pos = poi.addxy(destX * 0.0225f, destY * 0.0225f);
-		destPos = pos.add(toDestPos);
+		//float destX = xDir * 150;
+		//float destY = -100;
+		//this.pos = pos.addxy(destX * 0.0225f, destY * 0.0225f);
+		destPos = new Point(150 * xDir, -100);
 
-		muzzle = new Anim(poi, "risingspecter_muzzle", xDir, null, false, host: player.character) {
-			angle = xDir == 1 ? toDestPos.angle : toDestPos.angle + 180
+		muzzle = new Anim(pos, "risingspecter_muzzle", xDir, null, false, host: player.character) {
+			angle = xDir == 1 ? destPos.angle : destPos.angle + 180
 		};
-
-		float ang = poi.directionTo(destPos).angle;
-		var points = new List<Point>();
-		if (xDir == 1) {
-			float sideY = 30 * Helpers.cosd(ang);
-			float sideX = -30 * Helpers.sind(ang);
-			points.Add(new Point(poi.x - sideX, poi.y - sideY));
-			points.Add(new Point(destPos.x - sideX, destPos.y - sideY));
-			points.Add(new Point(destPos.x + sideX, destPos.y + sideY));
-			points.Add(new Point(poi.x + sideX, poi.y + sideY));
-		} else {
-			float sideY = 30 * Helpers.cosd(ang);
-			float sideX = 30 * Helpers.sind(ang);
-			points.Add(new Point(destPos.x - sideX, destPos.y + sideY));
-			points.Add(new Point(destPos.x + sideX, destPos.y - sideY));
-			points.Add(new Point(poi.x + sideX, poi.y - sideY));
-			points.Add(new Point(poi.x - sideX, poi.y + sideY));
-		}
-
-		globalCollider = new Collider(points, true, this, false, false, 0, Point.zero);
+		sprite.hitboxes = popullateHitboxes();
+		Global.level.addToGrid(this);
 
 		if (rpc) {
-			rpcCreate(poi, owner, ownerPlayer, netId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 	}
+
 	public static Projectile rpcInvoke(ProjParameters args) {
 		return new RisingSpecterProj(
 			args.pos, args.xDir, args.owner, args.player, args.netId
 		);
+	}
+
+	private Collider[] popullateHitboxes() {
+		Collider[] retCol = new Collider[7];
+		Point jumps = destPos.normalize() * 24;
+		Point offset = destPos.normalize() * 18;
+		for (int i = 0; i < retCol.Length; i++) {
+			retCol[i] = new Collider(
+				new Rect(0 + offset.x, 0 + offset.y, 40 + offset.x, 40 + offset.y).getPoints(),
+				false, this, false, false,
+				HitboxFlag.Hitbox, Point.zero
+			);
+			offset += jumps;
+		}
+		return retCol;
 	}
 
 	public override void onDestroy() {
@@ -251,13 +248,10 @@ public class RisingSpecterProj : Projectile {
 
 	public override void update() {
 		base.update();
-		/*
-		if (muzzle != null)
-		{
-			incPos(muzzle.deltaPos);
-			destPos = destPos.add(muzzle.deltaPos);
+		if (ownerActor != null) {
+			incPos(ownerActor.deltaPos);
 		}
-		*/
+		muzzle?.changePos(pos);
 	}
 
 	public override void render(float x, float y) {
@@ -270,19 +264,23 @@ public class RisingSpecterProj : Projectile {
 		float sin = MathF.Sin(Global.time * 100);
 		float sinDamp = Helpers.clamp01(1 - (time / maxTime));
 
-		var dirTo = pos.directionToNorm(destPos);
+		Point dirTo = destPos.normalize();
+		Point basePos = pos + dirTo * 5;
 		float jutX = dirTo.x;
 		float jutY = dirTo.y;
 
-		DrawWrappers.DrawLine(pos.x, pos.y, destPos.x, destPos.y, col1, (30 + sin * 15) * sinDamp, 0, true);
 		DrawWrappers.DrawLine(
-			pos.x - jutX * 2, pos.y - jutY * 2,
-			destPos.x + jutX * 2, destPos.y + jutY * 2,
+			basePos.x, basePos.y, pos.x + destPos.x, pos.y + destPos.y,
+			col1, (30 + sin * 15) * sinDamp, 0, true
+		);
+		DrawWrappers.DrawLine(
+			basePos.x - jutX * 2, basePos.y - jutY * 2,
+			pos.x + destPos.x + jutX * 2, pos.y + destPos.y + jutY * 2,
 			col2, (20 + sin * 10) * sinDamp, 0, true
 		);
 		DrawWrappers.DrawLine(
-			pos.x - jutX * 4, pos.y - jutY * 4,
-			destPos.x + jutX * 4, destPos.y + jutY * 4,
+			basePos.x - jutX * 4, basePos.y - jutY * 4,
+			pos.x + destPos.x + jutX * 4, pos.y + destPos.y + jutY * 4,
 			col3, (10 + sin * 5) * sinDamp, 0, true
 		);
 	}
