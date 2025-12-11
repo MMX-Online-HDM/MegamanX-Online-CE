@@ -150,6 +150,7 @@ public class FlamethrowerAttacks : VileState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.turnToInput(player.input, player);
+		vile.setVileShootTime(weapon);
 		if (!character.grounded) {
 			sprite = "flamethrower";
 			character.changeSpriteFromName(sprite, true);
