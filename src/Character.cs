@@ -818,8 +818,8 @@ public partial class Character : Actor, IDamagable {
 		}
 
 		// Crystal break.
-		if (((charState is Dash or AirDash or LightDash or GigaAirDash)
-			|| (charState.useDashJumpSpeed || isDashing) && !(charState is Fall or Jump)) &&
+		if (((charState is Dash or AirDash or LightDash or GigaAirDash) || 
+			(charState.useDashJumpSpeed || isDashing) && !(charState is Fall or Jump)) &&
 			other.gameObject is Character character && character.isCrystalized &&
 			character.player.alliance != player.alliance
 		) {
@@ -2830,10 +2830,10 @@ public partial class Character : Actor, IDamagable {
 		}
 		// Damage increase/reduction section
 		if (!isArmorPiercing && (
-			damage != (decimal)Damager.forceKillDamage &&
-			damage != (decimal)Damager.ohkoDamage &&
-			damage != (decimal)Damager.envKillDamage
-		)) {
+			originalDamage != (decimal)Damager.forceKillDamage &&
+			originalDamage != (decimal)Damager.ohkoDamage &&
+			originalDamage != (decimal)Damager.envKillDamage)
+		) {
 			if (charState is SwordBlock) {
 				damageSavings += (originalDamage * 0.5m);
 			}
