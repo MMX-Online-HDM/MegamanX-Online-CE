@@ -2790,8 +2790,8 @@ public partial class Character : Actor, IDamagable {
 		bool isArmorPiercing = Damager.isArmorPiercing(projId);
 		// Instakills and hits while dead also ignore armor.
 		if (originalDamage == (decimal)Damager.forceKillDamage ||
-			originalDamage != (decimal)Damager.ohkoDamage ||
-			originalDamage != (decimal)Damager.envKillDamage
+			originalDamage == (decimal)Damager.ohkoDamage ||
+			originalDamage == (decimal)Damager.envKillDamage
 		) {
 			isArmorPiercing = true;
 		}
