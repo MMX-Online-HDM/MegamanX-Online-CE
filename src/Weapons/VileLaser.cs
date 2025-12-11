@@ -253,7 +253,7 @@ public class RisingSpecterProj : Projectile {
 
 	public override void update() {
 		base.update();
-		if (ownerActor != null) {
+		if (ownerActor != null && time < 4f/60f) {
 			incPos(ownerActor.deltaPos);
 		}
 		muzzle?.changePos(pos);

@@ -325,7 +325,7 @@ public class ShotgunIceChargedShot : CharState {
 			}
 		}
 		States();
-		mmx.stopCharge();
+		mmx?.stopCharge();
 		if (stateTime > 60f / 60f) {
 			character.changeToIdleOrFall();
 		}
@@ -347,10 +347,12 @@ public class ShotgunIceChargedShot : CharState {
 	}
 	public void ShotProjectile() {
 		int xDir = character.xDir;
-		new ShotgunIceProjCharged(
-			mmx.getShootPos(), xDir, mmx, player, 1,
-			false, player.getNextActorNetId(), true
-		);
+		if (mmx != null) {
+			new ShotgunIceProjCharged(
+				mmx.getShootPos(), xDir, mmx, player, 1,
+				false, player.getNextActorNetId(), true
+			);
+		}
 	}
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
