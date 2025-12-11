@@ -2837,7 +2837,7 @@ public partial class Character : Actor, IDamagable {
 		// Damage increase/reduction section
 		if (!isArmorPiercing && damageSavings < maxHealth) {
 			// Limit calculation damage to our max HP.
-			decimal calcDamage = Math.Max(originalDamage, maxHealth);
+			decimal calcDamage = Math.Min(originalDamage, maxHealth);
 			// Apply savings.
 			if (charState is SwordBlock) {
 				damageSavings += (calcDamage * 0.5m);
