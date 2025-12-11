@@ -327,7 +327,7 @@ public class BeeCursorAnim : Anim {
 }
 
 public class ParasiticBombProjCharged : Projectile, IDamagable {
-	public Actor host;
+	public Actor? host;
 	public Point lastMoveAmount;
 	const float maxSpeed = 150;
 	public ParasiticBombProjCharged(
@@ -368,8 +368,8 @@ public class ParasiticBombProjCharged : Projectile, IDamagable {
 		base.update();
 		if (!ownedByLocalPlayer) return;
 
-		if (!host.destroyed) {
-			Point amount = pos.directionToNorm(host.getCenterPos()).times(150);
+		if (!host?.destroyed == true) {
+			Point amount = pos.directionToNorm(host?.getCenterPos() ?? new Point (0,0)).times(150);
 			vel = Point.lerp(vel, amount, Global.spf * 4);
 			if (vel.magnitude > maxSpeed) vel = vel.normalize().times(maxSpeed);
 		} else {

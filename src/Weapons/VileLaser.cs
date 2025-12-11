@@ -143,7 +143,7 @@ public class LaserAttack : VileState {
 	public override void update() {
 		base.update();
 		if (weapon is RisingSpecter) {
-			if (!vile.grounded) {
+			if (!vile.grounded && !shot) {
 				stateTime = 0;
 			} else {
 				if (vile.grounded && !shot) {
@@ -248,7 +248,7 @@ public class RisingSpecterProj : Projectile {
 
 	public override void update() {
 		base.update();
-		if (ownerActor != null) {
+		if (ownerActor != null && time < 4f/60f) {
 			incPos(ownerActor.deltaPos);
 		}
 		muzzle?.changePos(pos);
