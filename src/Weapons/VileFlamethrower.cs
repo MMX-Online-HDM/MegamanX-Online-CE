@@ -123,6 +123,7 @@ public class NoneFlamethrower : VileFlamethrower {
 public class FlamethrowerAttacks : VileState {
 	public VileFlamethrower weapon;
 	public float shootTime;
+	public bool shotProj;
 	public FlamethrowerAttacks(VileFlamethrower weapon) : base("crouch_flamethrower") {
 		airSprite = "flamethrower";
 		useDashJumpSpeed = true;
@@ -138,11 +139,16 @@ public class FlamethrowerAttacks : VileState {
 		shootTime += Global.speedMul;
 		if (shootTime >= 4) {
 			character.turnToInput(player.input, player);
+			shotProj = true;
 			shootTime = 0;
 			character.playSound("flamethrower");
 			weapon.shoot(vile, []);
 		}
-
+		if (shotProj) {
+			character.stopMoving();
+			character.useGravity = false;
+			character.vel = new Point();
+		}
 		if (character.loopCount >= 5 || !player.input.isHeld(Control.Special1, player)) {
 			character.changeToIdleOrFall();
 		}
@@ -153,9 +159,6 @@ public class FlamethrowerAttacks : VileState {
 		if (!character.grounded) {
 			sprite = "flamethrower";
 			character.changeSpriteFromName(sprite, true);
-			character.stopMoving();
-			character.useGravity = false;
-			character.vel = new Point();
 		}
 	}
 	public override void onExit(CharState? newState) {
