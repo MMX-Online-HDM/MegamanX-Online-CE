@@ -12,6 +12,7 @@ public class MegamanX : Character {
 	public float specialSaberCooldown;
 	public XBuster specialBuster;
 	public int specialButtonMode;
+	public bool isSpecialButtonCharge;
 
 	// Armor variables.
 	public ArmorId chestArmor;
@@ -290,8 +291,12 @@ public class MegamanX : Character {
 		itemTracer?.update();
 		shootingRaySplasher?.burstLogic(this);
 
+		if (!weapons.Contains(specialBuster)) {
+			specialBuster.update();
+		}
+
 		// Charge and release charge logic.
-		chargeLogic(shoot);
+		chargeLogic(shootCharge);
 		player.changeWeaponControls();
 	}
 
@@ -467,6 +472,14 @@ public class MegamanX : Character {
 	// Shoots stuff.
 	public void shoot(int chargeLevel) {
 		shoot(chargeLevel, currentWeapon ?? specialBuster, false);
+	}
+
+	public void shootCharge(int chargeLevel) {
+		Weapon targetWeapon = currentWeapon ?? specialBuster;
+		if (isSpecialButtonCharge) {
+			targetWeapon = specialBuster;
+		}
+		shoot(chargeLevel, targetWeapon, false);
 	}
 
 	public void shoot(int chargeLevel, Weapon weapon, bool busterStock) {
@@ -738,10 +751,17 @@ public class MegamanX : Character {
 	}
 
 	public override bool chargeButtonHeld() {
-		if (specialButtonMode == 0 && player.input.isHeld(Control.Special1, player)) {
+		if (specialButtonMode == 0 && !hasAnyArmor &&
+			player.input.isHeld(Control.Special1, player)
+		) {
+			isSpecialButtonCharge = true;
 			return true;
 		}
-		return player.input.isHeld(Control.Shoot, player);
+		if (player.input.isHeld(Control.Shoot, player)) {
+			isSpecialButtonCharge = false;
+			return true;
+		}
+		return false;
 	}
 
 	public override void onWeaponChange(Weapon oldWeapon, Weapon newWeapon) {

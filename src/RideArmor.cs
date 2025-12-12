@@ -2235,21 +2235,20 @@ public class InRideArmor : CharState {
 		}
 
 		if (!isHiding) {
-			if (character.sprite.name.Contains("ra_show") && character.sprite.isAnimOver()) {
-				character.changeSpriteFromName("ra_idle", true);
-			}
-			else if (character.rideArmor != null && character.rideArmor.isAttacking()) {
+			if (character.rideArmor != null && character.rideArmor.isAttacking()) {
 				character.changeSpriteFromName("ra_attack", true);
 				character.frameSpeed = 0;
 				var mapping = new List<int>() { 0, 1, 1, 1, 0 };
 
-				//if (mapping.Count >= character.rideArmor.sprite.frameIndex) character.frameIndex = mapping[4];
-				//else
-				{
-					if (mapping.InRange(character.rideArmor.sprite.frameIndex)) {
-						character.frameIndex = mapping[character.rideArmor.sprite.frameIndex];
-					}
+				if (mapping.InRange(character.rideArmor.sprite.frameIndex)) {
+					character.frameIndex = mapping[character.rideArmor.sprite.frameIndex];
 				}
+			} else if (
+				!character.sprite.name.Contains("ra_hide") &&
+				character.sprite.isAnimOver() ||
+				character.sprite.name.Contains("ra_attack")
+			) {
+				character.changeSpriteFromName("ra_idle", true);
 			}
 		} else {
 			if (character is Vile vile && player.input.isPressed(Control.Special1, player)) {
