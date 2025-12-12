@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -62,6 +62,7 @@ public class VileWeaponSystem : Weapon {
 			if (slots.shoot.weaponSystemShoot(vile, Control.Shoot)) { return; }
 		}
 		if (vile.player.input.isHeld(Control.Special1, vile.player) && !vile.isCharging()) {
+			vile.stopCharge();
 			if (slots.special.weaponSystemShoot(vile, Control.Special1)) { return; }
 		}
 		if (vile.player.input.isHeld(Control.WeaponRight, vile.player)) {
