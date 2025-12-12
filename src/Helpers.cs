@@ -122,8 +122,11 @@ public class Helpers {
 		return str;
 	}
 
-	public static void drawWeaponSlotSymbol(float topLeftSlotX, float topLeftSlotY, string symbol) {
-		Fonts.drawText(FontType.Yellow, symbol, topLeftSlotX + 16, topLeftSlotY + 11, Alignment.Right);
+	public static void drawWeaponSlotSymbol(
+		float topLeftSlotX, float topLeftSlotY, string symbol, FontType? font = null
+	) {
+		font ??= FontType.Yellow;
+		Fonts.drawText(font.Value, symbol, topLeftSlotX + 16, topLeftSlotY + 11, Alignment.Right);
 	}
 
 	static Random rnd = new Random();
