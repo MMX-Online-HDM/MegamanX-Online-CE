@@ -502,6 +502,10 @@ public class MegamanX : Character {
 				chargeLevel = 3;
 			}
 		}
+		if (charState is LadderClimb) {
+			useCrossShotAnim = false;
+			turnToInput(player.input, player);
+		}
 		if (!busterStock && chargeLevel >= 3 && hasFullHyperMaxArmor) {
 			stockedSaber = true;
 		}
