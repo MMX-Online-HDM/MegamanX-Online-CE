@@ -613,6 +613,8 @@ public class Zero : Character {
 					changeState(new ZeroAirSlashState(), true);
 				} else if (kuuenzanCooldown <= 0) {
 					changeState(new ZeroRollingSlashtate(), true);
+				} else {
+					changeState(new ZeroAirSlashState(), true);
 				}
 			}
 			return true;
