@@ -217,11 +217,22 @@ public class Vile : Character {
 		}
 		usedAmmoLastFrame = false;
 
-		if (isShootingVulcan && !sprite.name.EndsWith("shoot")) {
-			changeSpriteFromName(charState.shootSpriteEx, false);
-		} else if (wasShootingVulcan) {
-			changeSpriteFromName(charState.sprite, resetFrame: false);
+		if (isShootingVulcan) {
+			string targeSprite = charState.shootSpriteEx;
+			if (targeSprite == "") {
+				targeSprite = grounded ? "shoot" : "shoot_fall";
+			}
+			if (getSprite(sprite.name) != charState.shootSpriteEx) {
+				changeSpriteFromName(charState.shootSpriteEx, false);
+			}
+			wasShootingVulcan = true;
 		}
+		else if (wasShootingVulcan) {
+			changeSpriteFromName(charState.sprite, resetFrame: false);
+			wasShootingVulcan = false;
+		}
+		shootAnimTime = vulcanLingerTime;
+
 		Helpers.decrementFrames(ref calldownMechCooldown);
 		Helpers.decrementFrames(ref mechBusterCooldown);
 		Helpers.decrementFrames(ref aiAttackCooldown);
@@ -233,7 +244,6 @@ public class Vile : Character {
 			vileHoverTime -= Global.spf * 6;
 			if (vileHoverTime < 0) vileHoverTime = 0;
 		}
-		wasShootingVulcan = isShootingVulcan;
 	}
 
 	public override void update() {
