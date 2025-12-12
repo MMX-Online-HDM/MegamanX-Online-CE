@@ -2324,6 +2324,7 @@ public class GameMode {
 			*/
 		}
 
+
 		if (mw != null) {
 			if (mw.currencyHUDAnimTime > 0) {
 				float animProgress = mw.currencyHUDAnimTime / MaverickWeapon.currencyHUDMaxAnimTime;
@@ -2335,6 +2336,15 @@ public class GameMode {
 					Fonts.drawText(FontType.RedishOrange, "+5", x - 4, y - yOff - 15, Alignment.Left);	
 				} else 
 				Fonts.drawText(FontType.RedishOrange, "+1", x - 4, y - yOff - 15, Alignment.Left);
+			}
+
+			if (mw.trueControlMode == MaverickModeId.Summoner && mw.maverick != null) {
+				if (mw.maverick.aiBehavior == MaverickAIBehavior.Attack) {
+					Helpers.drawWeaponSlotSymbol(x - 8, y - 8, "²", FontType.Pink);
+				}
+				else if (mw.maverick.aiBehavior == MaverickAIBehavior.Follow) {
+					Helpers.drawWeaponSlotSymbol(x - 8, y - 8, "ª");
+				}
 			}
 		}
 
