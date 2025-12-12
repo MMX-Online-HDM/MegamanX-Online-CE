@@ -417,6 +417,11 @@ public class Vile : Character {
 	}
 
 	public void RideLinkMK5() {
+		//Do not use if dead
+		if (!alive) { 
+			rideMenuWeapon.isMenuOpened = false;
+			return;
+		}
 		if (isVileMK5 && linkedRideArmor != null &&
 			player.input.isPressed(Control.Special2, player) &&
 			player.input.isHeld(Control.Down, player)
@@ -510,6 +515,8 @@ public class Vile : Character {
 	}
 
 	public override void onMechSlotSelect(MechMenuWeapon mmw) {
+		//Do not use if dead
+		if (!alive) return;	
 		if (linkedRideArmor == null) {
 			if (!mmw.isMenuOpened) {
 				mmw.isMenuOpened = true;
