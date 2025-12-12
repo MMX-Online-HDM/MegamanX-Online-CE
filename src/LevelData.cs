@@ -532,7 +532,7 @@ public class LevelData {
 		if (customSize != -1) {
 			return customSize == 2;
 		}
-		if (name is "nodetest" or "airport_1v1" or "sigma1_1v1") {
+		if (name is "nodetest") {
 			return true;
 		}
 		return name.EndsWith("_small");

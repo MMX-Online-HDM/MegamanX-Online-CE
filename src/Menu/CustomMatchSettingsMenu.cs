@@ -465,7 +465,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 			#endregion
 				menuOptions3.Add(
 				new MenuOption(
-					startX3, currentY3 += lineH3,
+					startX3, currentY3,
 					() => {
 						Helpers.menuLeftRightBool(ref cSettings.flinchairDashReset, true);
 					},
