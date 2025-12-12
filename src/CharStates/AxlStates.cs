@@ -2,12 +2,26 @@ using System.Linq;
 using System;
 
 namespace MMXOnline;
-
-public class HyperAxlStart : CharState {
-	public float radius = 200;
-	public float time;
+public class AxlState : CharState {
 	public Axl axl = null!;
 
+	public AxlState(
+		string sprite, string shootSprite = "", string attackSprite = "",
+		string transitionSprite = "", string transShootSprite = ""
+	) : base(
+		sprite, shootSprite, attackSprite,
+		transitionSprite, transShootSprite
+	) {
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		axl = player.character as Axl ?? throw new NullReferenceException();
+	}
+}
+public class HyperAxlStart : AxlState {
+	public float radius = 200;
+	public float time;
 	public HyperAxlStart(bool isGrounded) : base(isGrounded ? "hyper_start" : "hyper_start_air") {
 		invincible = true;
 		statusEffectImmune = true;
@@ -54,12 +68,10 @@ public class HyperAxlStart : CharState {
 	}
 }
 
-public class Hover : CharState {
+public class Hover : AxlState {
 	public SoundWrapper? sound;
 	float hoverTime;
 	Anim? hoverExhaust;
-	public Axl axl = null!;
-
 	public Hover() : base("hover", "hover", "hover", "hover") {
 		exitOnLanding = true;
 		airMove = true;
@@ -129,11 +141,9 @@ public class Hover : CharState {
 	}
 }
 
-public class DodgeRoll : CharState {
+public class DodgeRoll : AxlState {
 	public float dashTime = 0;
 	public int initialDashDir;
-	public Axl axl = null!;
-
 	public DodgeRoll() : base("roll") {
 		normalCtrl = true;
 		specialId = SpecialStateIds.AxlRoll;
@@ -165,8 +175,7 @@ public class DodgeRoll : CharState {
 	}
 }
 
-public class SniperAimAxl : CharState {
-	public Axl axl = null!;
+public class SniperAimAxl : AxlState {
 
 	public SniperAimAxl() : base("crouch") {
 

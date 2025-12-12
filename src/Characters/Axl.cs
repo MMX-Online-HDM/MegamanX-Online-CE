@@ -511,7 +511,8 @@ public class Axl : Character {
 
 	public override bool normalCtrl() {
 		if (jumpPressed && canJump() && !grounded &&
-		 	!isDashing && canAirDash() && flag == null
+		 	!isDashing && canAirDash() && flag == null &&
+			!player.isAI
 		) {
 			dashedInAir++;
 			changeState(new Hover(), true);
