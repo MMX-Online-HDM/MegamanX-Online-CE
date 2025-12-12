@@ -2391,6 +2391,10 @@ public partial class Character : Actor, IDamagable {
 					FontType.Grey, charState.GetType().ToString().RemovePrefix("MMXOnline."),
 					textPosX, textPosY -= 10, Alignment.Center, true, depth: ZIndex.HUD
 				);
+				Fonts.drawText(
+					FontType.Grey, sprite.name,
+					textPosX, textPosY -= 10, Alignment.Center, true, depth: ZIndex.HUD
+				);
 			}
 		}
 

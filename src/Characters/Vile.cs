@@ -12,6 +12,7 @@ public class Vile : Character {
 	public float mechBusterCooldown;
 	public bool usedAmmoLastFrame;
 	public bool isShootingGizmo;
+	public bool wasShootingVulcan;
 	public bool isShootingVulcan => vulcanLingerTime > 0;
 	public bool hasFrozenCastle;
 	public bool hasSpeedDevil;
@@ -216,10 +217,11 @@ public class Vile : Character {
 		}
 		usedAmmoLastFrame = false;
 
-		if (isShootingVulcan && sprite.name.EndsWith("shoot"))
+		if (isShootingVulcan && !sprite.name.EndsWith("shoot")) {
 			changeSpriteFromName(charState.shootSpriteEx, false);
-		else changeSpriteFromName(charState.sprite, resetFrame: false);
-
+		} else if (wasShootingVulcan) {
+			changeSpriteFromName(charState.sprite, resetFrame: false);
+		}
 		Helpers.decrementFrames(ref calldownMechCooldown);
 		Helpers.decrementFrames(ref mechBusterCooldown);
 		Helpers.decrementFrames(ref aiAttackCooldown);
@@ -231,6 +233,7 @@ public class Vile : Character {
 			vileHoverTime -= Global.spf * 6;
 			if (vileHoverTime < 0) vileHoverTime = 0;
 		}
+		wasShootingVulcan = isShootingVulcan;
 	}
 
 	public override void update() {
