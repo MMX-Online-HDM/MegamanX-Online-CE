@@ -1,46 +1,95 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 
 namespace MMXOnline;
 
-
+// Vile weapon systen.
+// This controls all sub weapons is a free from way.
+// Originally created for HDM form Vile nicknamed "Lego Vile",
+// but helps lot for regular XOD Vile too.
 public class VileWeaponSystem : Weapon {
+	// Unlike HDM, XOD Vile splits ground and air so we use 2 systems.
 	public (VileWeaponSystemSub alt, VileWeaponSystemSub shoot, VileWeaponSystemSub special) slots;
 	public (VileWeaponSystemSub alt, VileWeaponSystemSub shoot, VileWeaponSystemSub special) airSlots;
+	// Weapons that have unique activation conditions.
 	public Weapon[] extraWeapons;
+	// This list contain 1 copy of each weapon.
 	public Weapon[] weaponList;
+	public Weapon[] airWeaponList;
+	public Weapon[] groundWeaponList;
+	// Some things we need to quick-acces.
+	public Weapon chargeWeapon;
+	public Weapon rideWeapon;
 
+	// Creation function.
 	public VileWeaponSystem(
 		Weapon?[] altWps, Weapon?[] shootWps,
-		Weapon?[] specialWps, Weapon[] extraWeapons
+		Weapon?[] specialWps, Weapon?[] airAltWps, Weapon?[] airShootWps,
+		Weapon?[] airSpecialWps, Weapon[] extraWeapons
 	) : base() {
+		// Set up sub systems.
 		slots.alt = new VileWeaponSystemSub(altWps, this);
 		slots.shoot = new VileWeaponSystemSub(shootWps, this);
 		slots.special = new VileWeaponSystemSub(specialWps, this);
+		airSlots.alt = new VileWeaponSystemSub(airAltWps, this);
+		airSlots.shoot = new VileWeaponSystemSub(airShootWps, this);
+		airSlots.special = new VileWeaponSystemSub(airSpecialWps, this);
 		this.extraWeapons = extraWeapons;
 
+		// Create an HashSet of each weapon.
+		// HashSet cannot contain duplicates so helps to create
+		// and list of non-repeated elements.
 		HashSet<Weapon> uniqueWeapons = [];
-		Weapon?[][] iterationArray = [altWps, shootWps, specialWps, extraWeapons];
+		HashSet<Weapon> uniqueGroundWeapons = [];
+		HashSet<Weapon> uniqueAirWeapons = [];
+		Weapon?[][] iterationArray = [
+			altWps, shootWps, specialWps,
+			airAltWps, airShootWps, airSpecialWps,
+			extraWeapons
+		];
+
+		// Populate unique weapon list.
+		int i = 0;
 		foreach (Weapon?[] weaponArray in iterationArray) {
 			foreach (Weapon? weapon in weaponArray) {
-				if (weapon != null) { uniqueWeapons.Add(weapon); }
+				if (weapon != null) {
+					uniqueWeapons.Add(weapon);
+					if (i <= 2) { uniqueGroundWeapons.Add(weapon); }
+					if (i >= 3 && i <= 5) { uniqueAirWeapons.Add(weapon); }
+				}
 			}
 		}
 		weaponList = uniqueWeapons.ToArray();
+		groundWeaponList = uniqueGroundWeapons.ToArray();
+		airWeaponList = uniqueAirWeapons.ToArray();
 
+		// Fixed slot weapons.
+		chargeWeapon = extraWeapons[0];
+		rideWeapon = extraWeapons[1];
+
+		// Generic weapon stuff.
 		index = (int)WeaponIds.VileWeaponSystem;
 		weaponSlotIndex = 32;
+		weaponSlotIndex = 32;
+		weaponBarBaseIndex = 39;
+		weaponBarIndex = 32;
+		drawCooldown = false;
+		drawAmmo = false;
 	}
 
+	// Unused, but better be safe than sorry.
 	public override float getAmmoUsage(int chargeLevel) {
 		return 0;
 	}
 
+	// Call update function of each one.
 	public override void update() {
 		foreach (Weapon weapon in weaponList) {
 			weapon.update();
 		}
+		base.update();
 	}
 
 	public void setAllWeaponsToCooldown(float cooldown) {
@@ -55,18 +104,20 @@ public class VileWeaponSystem : Weapon {
 		}
 	}
 
-	public override void vileShoot(WeaponIds id, Vile vile) {
+	public bool shootLogic(Vile vile) {
 		vile.usedAmmoLastFrame = false;
 
 		if (vile.player.input.isHeld(Control.Shoot, vile.player)) {
-			if (slots.shoot.weaponSystemShoot(vile, Control.Shoot)) { return; }
+			if (slots.shoot.weaponSystemShoot(vile, Control.Shoot)) { return true; }
 		}
 		if (vile.player.input.isHeld(Control.Special1, vile.player) && !vile.isCharging()) {
-			if (slots.special.weaponSystemShoot(vile, Control.Special1)) { return; }
+			vile.stopCharge();
+			if (slots.special.weaponSystemShoot(vile, Control.Special1)) { return true; }
 		}
 		if (vile.player.input.isHeld(Control.WeaponRight, vile.player)) {
-			if (slots.alt.weaponSystemShoot(vile, Control.WeaponRight)) { return; }
+			if (slots.alt.weaponSystemShoot(vile, Control.WeaponRight)) { return true; }
 		}
+		return false;
 	}
 
 	public void extraWeaponShoot(Vile vile) {
@@ -75,6 +126,26 @@ public class VileWeaponSystem : Weapon {
 				weapon.vileShoot(0, vile);
 			}
 		}
+	}
+
+	public bool shootRandomWeapon(Vile vile) {
+		// Get target list.
+		Weapon[] targetWeapons = vile.grounded ? groundWeaponList : airWeaponList;
+		float ammoLeft = vile.energy.ammo;
+
+		// Get all off-cooldown ones.
+		Weapon[] offCooldownWeapons = targetWeapons.Where(
+			w => w.shootCooldown == 0 && w.getAmmoUsage(0) >= ammoLeft
+		).ToArray();
+
+		// If list is emtpty. Return.
+		if (offCooldownWeapons.Length > 0) {
+			return false;
+		}
+		Weapon target = offCooldownWeapons[Helpers.randomRange(0, offCooldownWeapons.Length - 1)];
+		target.vileShoot(0, vile);
+
+		return true;
 	}
 }
 
