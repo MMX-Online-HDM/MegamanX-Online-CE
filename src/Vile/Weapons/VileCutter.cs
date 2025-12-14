@@ -130,6 +130,7 @@ public class NoneCutter : VileCutter {
 public class CutterAttacks : VileState {
 	public bool shot;
 	public int shootFrame = 0;
+	public bool lockAir => Options.main.lockInAirCutter;
 	public VileCutter weapon;
 	public CutterAttacks(VileCutter weapon) : base("idle_shoot") {
 		useDashJumpSpeed = true;
@@ -161,8 +162,12 @@ public class CutterAttacks : VileState {
 		if (!character.grounded) {
 			sprite = "cannon_air";
 			character.changeSpriteFromName(sprite, true);
-			character.useGravity = false;
-			character.vel = new Point();
+			if (lockAir) {
+                character.useGravity = false;
+				character.stopMoving();
+				character.vel = new Point();
+				airMove = false;
+            }
 		}
 	}
 	public override void onExit(CharState? newState) {

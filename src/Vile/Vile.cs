@@ -12,6 +12,7 @@ public class Vile : Character {
 	public float mechBusterCooldown;
 	public bool usedAmmoLastFrame;
 	public bool isShootingGizmo;
+	public bool wasShootingVulcan;
 	public bool isShootingVulcan => vulcanLingerTime > 0;
 	public bool hasFrozenCastle;
 	public bool hasSpeedDevil;
@@ -136,9 +137,21 @@ public class Vile : Character {
 		}
 		usedAmmoLastFrame = false;
 
-		if (isShootingVulcan && sprite.name.EndsWith("shoot"))
-			changeSpriteFromName(charState.shootSpriteEx, false);
-		else changeSpriteFromName(charState.sprite, resetFrame: false);
+		if (isShootingVulcan) {
+			string targeSprite = charState.shootSpriteEx;
+			if (targeSprite == "") {
+				targeSprite = grounded ? "shoot" : "shoot_fall";
+			}
+			if (getSprite(sprite.name) != charState.shootSpriteEx) {
+				changeSpriteFromName(charState.shootSpriteEx, false);
+			}
+			wasShootingVulcan = true;
+		}
+		else if (wasShootingVulcan) {
+			changeSpriteFromName(charState.sprite, resetFrame: false);
+			wasShootingVulcan = false;
+		}
+		shootAnimTime = vulcanLingerTime;
 
 		Helpers.decrementFrames(ref calldownMechCooldown);
 		Helpers.decrementFrames(ref mechBusterCooldown);
@@ -277,6 +290,11 @@ public class Vile : Character {
 	}
 
 	public void rideLinkPenta() {
+		//Do not use if dead
+		if (!alive) { 
+			rideMenuWeapon.isMenuOpened = false;
+			return;
+		}
 		// Deactivation code.
 		if (isVileMK5 && linkedRideArmor != null &&
 			player.input.isPressed(Control.Special2, player) &&
@@ -374,6 +392,8 @@ public class Vile : Character {
 	}
 
 	public override void onMechSlotSelect(MechMenuWeapon mmw) {
+		//Do not use if dead
+		if (!alive) return;	
 		if (linkedRideArmor == null) {
 			if (!mmw.isMenuOpened) {
 				mmw.isMenuOpened = true;

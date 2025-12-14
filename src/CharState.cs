@@ -909,6 +909,7 @@ public class Dash : CharState {
 			character.isDashing = false;
 			dashTime = 0;
 			stop = true;
+			defaultSprite = "dash_end";
 			sprite = "dash_end";
 			shootSprite = "dash_end_shoot";
 			character.changeSpriteFromName(character.shootAnimTime > 0 ? shootSprite : sprite, true);
@@ -1588,11 +1589,9 @@ public class GenericGrabbedState : CharState {
 		}
 
 		grabTime -= player.mashValue();
+		
 		if (grabTime <= 0) {
 			character.changeToIdleOrFall();
-		}
-		if (character is Axl axl) {
-			axl.stealthRevealTime = Axl.maxStealthRevealTime;
 		}
 	}
 

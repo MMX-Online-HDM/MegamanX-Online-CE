@@ -745,9 +745,13 @@ public class Maverick : Actor, IDamagable {
 				float dist = chr.pos.x - pos.x;
 				float assignedDist = 40;
 
+				int j = 0;
 				for (int i = 0; i < player.mavericks.Count; i++) {
 					if (player.mavericks[i] == this) {
-						assignedDist = 40 * (i + 1);
+						assignedDist = 40 * (j + 1);
+					}
+					if (player.mavericks[i].aiBehavior == MaverickAIBehavior.Follow) {
+						j++;
 					}
 				}
 				if (!grounded) {

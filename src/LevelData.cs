@@ -549,7 +549,7 @@ public class LevelData {
 		if (customSize != -1) {
 			return customSize == 5;
 		}
-		if (name is "sigma1" or "shipyard" or "giantdam" or "gallery") {
+		if (name is "giantdam" or "gallery") {
 			return true;
 		}
 		return name.EndsWith("_collosal") || name.EndsWith("_xl");
@@ -590,6 +590,9 @@ public class LevelData {
 		// X3 stuff.
 		{ "aircraftcarrier", "gravityBeetle" },
 		{ "dopplerlab", "dopplerLab" },
+		{ "protoDopplerB", "psx_dopplerLab" },
+		{ "protoDopplerC", "psx_dopplerLab2" },
+		{ "protoDopplerD", "psx_dopplerLab2" },
 		{ "frozentown", "blizzardBuffalo" },
 		{ "giantdam", "toxicSeahorse" },
 		{ "giantdam2", "toxicSeahorse" },
@@ -867,6 +870,14 @@ public class LevelData {
 			case "Volcanic Zone":
 				backwallShader = "volcanicZoneBW";
 				backwallShaderImage = "palettevolcanicZoneBW";
+				break;
+			case "Prototype Doppler B":
+				backwallShader = "PrototypeDopplerB";
+				backwallShaderImage = "palettePDopplerBBW";
+				break;
+			case "Prototype Doppler C":
+				backwallShader = "PrototypeDopplerC";
+				backwallShaderImage = "palettePDopplerCBW";
 				break;
 		}
 	}

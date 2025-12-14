@@ -413,6 +413,8 @@ public class Axl : Character {
 		if (altShootPressed) lastAltShootPressedTime = Global.time;
 		else altShootRecentlyPressed = Global.time - lastAltShootPressedTime < 0.1f;
 
+		stealthReveal();
+
 	}
 
 	public override void update() {
@@ -509,7 +511,8 @@ public class Axl : Character {
 
 	public override bool normalCtrl() {
 		if (jumpPressed && canJump() && !grounded &&
-		 	!isDashing && canAirDash() && flag == null
+		 	!isDashing && canAirDash() && flag == null &&
+			!player.isAI
 		) {
 			dashedInAir++;
 			changeState(new Hover(), true);
@@ -1384,7 +1387,11 @@ public class Axl : Character {
 	public bool isHypermodeAxl() {
 		return isWhiteAxl() || isInvisible();
 	}
-
+	public void stealthReveal() {
+		if (charState is GenericGrabbedState or Hurt or GenericStun or KnockedDown) {
+			stealthRevealTime = maxStealthRevealTime;
+		}
+	}
 	float stealthCurrencyTime;
 
 	public void updateStealthMode() {

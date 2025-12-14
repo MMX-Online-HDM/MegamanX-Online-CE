@@ -214,8 +214,8 @@ public class DevConsole {
 	}
 
 	public static void aiDebug(bool changeToSpec) {
-		Global.showAIDebug = true;
-		if (changeToSpec) {
+		Global.showAIDebug = !Global.showAIDebug;
+		if (Global.showAIDebug && changeToSpec) {
 			Global.level.setMainPlayerSpectate();
 		}
 	}

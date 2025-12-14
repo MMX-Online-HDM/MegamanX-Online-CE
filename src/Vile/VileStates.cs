@@ -141,7 +141,7 @@ public class VileRevive : VileState {
 		setFlags();
 		character.removeRenderEffect(RenderEffectType.Flash);
 		Global.level.delayedActions.Add(new DelayedAction(() => { character.destroyMusicSource(); }, 0.75f));
-
+		character.alive = true;
 		drDopplerAnim?.destroySelf();
 		if (character != null) {
 			character.invulnTime = 0.5f;

@@ -751,6 +751,9 @@ public class RideArmor : Actor, IDamagable {
 
 	bool healedOnEnter;
 	public void putCharInRideArmor(Character chr) {
+		if (chr.rideArmor == this || character == chr) {
+			return;
+		}
 		addCharacter(chr);
 		chr.rideArmor = this;
 		chr.changeState(new InRideArmor(), true);
@@ -1422,7 +1425,9 @@ public class RAIdle : RideArmorState {
 
 		Helpers.decrementTime(ref attackCooldown);
 
-		if (player != null && rideArmor.raNum == 1 && player.input.isHeld(Control.Shoot, player) && !rideArmor.isAttacking()) {
+		if (player != null && rideArmor.raNum == 1 &&
+			player.input.isHeld(Control.Shoot, player) && !rideArmor.isAttacking()
+		) {
 			shootHeldTime += Global.spf;
 			if (shootHeldTime > 0.5f) {
 				shootHeldTime = 0;
@@ -1432,17 +1437,17 @@ public class RAIdle : RideArmorState {
 		}
 		if (rideArmor.isAttacking()) shootHeldTime = 0;
 
-		if (character.flag == null) {
-			if (character is Vile && player.input.isHeld(Control.Down, player)) {
-				(character.charState as InRideArmor)?.setHiding(true);
+		if (character.flag == null && character.charState is InRideArmor iraState) {
+			if (character is Vile vile && vile.player.input.isHeld(Control.Down, player)) {
+				iraState.setHiding(true);
 				if (!rideArmor.isAttacking()) {
-					if (player.input.isHeld(Control.Left, player)) rideArmor.xDir = -1;
-					if (player.input.isHeld(Control.Right, player)) rideArmor.xDir = 1;
+					if (vile.player.input.isHeld(Control.Left, player)) rideArmor.xDir = -1;
+					if (vile.player.input.isHeld(Control.Right, player)) rideArmor.xDir = 1;
 				}
 				commonGroundCode();
 				return;
 			} else {
-				(character.charState as InRideArmor)?.setHiding(false);
+				iraState.setHiding(false);
 			}
 		}
 		if (player != null) {
@@ -2190,9 +2195,6 @@ public class InRideArmor : CharState {
 
 	public override void update() {
 		base.update();
-
-		if (!character.ownedByLocalPlayer) return;
-
 		Helpers.decrementTime(ref innerCooldown);
 
 		float healthPercent = (float)(character.health / character.maxHealth);
@@ -2238,14 +2240,14 @@ public class InRideArmor : CharState {
 				character.frameSpeed = 0;
 				var mapping = new List<int>() { 0, 1, 1, 1, 0 };
 
-				//if (mapping.Count >= character.rideArmor.sprite.frameIndex) character.frameIndex = mapping[4];
-				//else
-				{
-					if (mapping.InRange(character.rideArmor.sprite.frameIndex)) {
-						character.frameIndex = mapping[character.rideArmor.sprite.frameIndex];
-					}
+				if (mapping.InRange(character.rideArmor.sprite.frameIndex)) {
+					character.frameIndex = mapping[character.rideArmor.sprite.frameIndex];
 				}
-			} else if (!character.sprite.name.Contains("ra_show") || character.sprite.isAnimOver()) {
+			} else if (
+				!character.sprite.name.Contains("ra_hide") &&
+				character.sprite.isAnimOver() ||
+				character.sprite.name.Contains("ra_attack")
+			) {
 				character.changeSpriteFromName("ra_idle", true);
 			}
 		} else {
@@ -2363,8 +2365,12 @@ public class InRideArmor : CharState {
 	}
 
 	public void setHiding(bool isHiding) {
-		if (character.sprite.name.Contains("ra_show")) return;
-		if (this.isHiding == isHiding) return;
+		if (character.sprite.name.Contains("ra_show")) {
+			return;
+		}
+		if (this.isHiding == isHiding) {
+			return;
+		}
 		this.isHiding = isHiding;
 		if (isHiding) {
 			character.changeSpriteFromName("ra_hide", true);

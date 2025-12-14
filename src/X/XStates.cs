@@ -136,6 +136,7 @@ public class LightDash : CharState {
 			character.isDashing = false;
 			dashTime = 0;
 			stop = true;
+			defaultSprite = "dash_end";
 			sprite = "dash_end";
 			shootSprite = "dash_end_shoot";
 			character.changeSpriteFromName(character.shootAnimTime > 0 ? shootSprite : sprite, true);
@@ -252,6 +253,7 @@ public class GigaAirDash : CharState {
 			character.useGravity = true;
 			dashTime = 0;
 			stop = true;
+			defaultSprite = "dash_end";
 			sprite = "dash_end";
 			shootSprite = "dash_end_shoot";
 			character.changeSpriteFromName(character.shootAnimTime > 0 ? shootSprite : sprite, true);

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
@@ -106,16 +106,17 @@ public class VileWeaponSystem : Weapon {
 
 	public bool shootLogic(Vile vile) {
 		vile.usedAmmoLastFrame = false;
+		var tartgetSlot = vile.grounded ? slots : airSlots;
 
 		if (vile.player.input.isHeld(Control.Shoot, vile.player)) {
-			if (slots.shoot.weaponSystemShoot(vile, Control.Shoot)) { return true; }
+			if (tartgetSlot.shoot.weaponSystemShoot(vile, Control.Shoot)) { return true; }
 		}
 		if (vile.player.input.isHeld(Control.Special1, vile.player) && !vile.isCharging()) {
 			vile.stopCharge();
-			if (slots.special.weaponSystemShoot(vile, Control.Special1)) { return true; }
+			if (tartgetSlot.special.weaponSystemShoot(vile, Control.Special1)) { return true; }
 		}
 		if (vile.player.input.isHeld(Control.WeaponRight, vile.player)) {
-			if (slots.alt.weaponSystemShoot(vile, Control.WeaponRight)) { return true; }
+			if (tartgetSlot.alt.weaponSystemShoot(vile, Control.WeaponRight)) { return true; }
 		}
 		return false;
 	}
