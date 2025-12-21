@@ -951,6 +951,24 @@ public class OptionsMenu : IMainMenu {
 					},
 					"Shows a cooldown circle for giga attacks."
 				),
+				new MenuOption(
+					30, startY,
+					() => {
+						Helpers.menuLeftRightBool(ref Options.main.slashGroundSprite);
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							optionFontText, "Show land slash on ground:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.slashGroundSprite),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"Shows the land slash sprite after stepping on the ground" +
+					"\n if off the state will be canceled"
+				),
 			};
 		} else if (charNum == 2) {
 			menuOptions = new List<MenuOption>() {

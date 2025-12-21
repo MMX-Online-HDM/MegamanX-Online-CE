@@ -609,13 +609,7 @@ public class Zero : Character {
 			if (charState is WallSlide wallSlide) {
 				changeState(new ZeroMeleeWall(wallSlide.wallDir, wallSlide.wallCollider), true);
 			} else {
-				if (Options.main.swapAirAttacks == false) {
-					changeState(new ZeroAirSlashState(), true);
-				} else if (kuuenzanCooldown <= 0) {
-					changeState(new ZeroRollingSlashtate(), true);
-				} else {
-					changeState(new ZeroAirSlashState(), true);
-				}
+				changeState(new ZeroAirSlashState(), true);
 			}
 			return true;
 		}
