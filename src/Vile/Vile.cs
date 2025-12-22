@@ -49,7 +49,6 @@ public class Vile : Character {
 		netId, ownedByLocalPlayer, isWarpIn, heartTanks, isATrans
 	) {
 		charId = CharIds.Vile;
-		vileForm = 1;
 		if (isWarpIn) {
 			if (mk5VileOverride) {
 				vileForm = 2;
