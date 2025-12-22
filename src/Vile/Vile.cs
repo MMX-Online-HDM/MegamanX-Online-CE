@@ -462,6 +462,9 @@ public class Vile : Character {
 		if (ammo < 0) {
 			return true;
 		}
+		if (weaponHealAmount > 0) {
+			return true;
+		}
 		if (isVulcan) {
 			usedAmmoLastFrame = true;
 		}
@@ -845,10 +848,10 @@ public class Vile : Character {
 			_ => napalmWeapon,
 		};
 		Weapon? laserWeapon = loadout.laser switch {
-			0 => new NoneLaser(),
+			0 => new RisingSpecter(),
 			1 => new NecroBurst(),
 			2 => new StraightNightmare(),
-			_ => new RisingSpecter()
+			_ => null
 		};
 		// Assing weapons to specific slots.
 		Weapon?[] shootWps = [cannonWeapon, null, null, null];

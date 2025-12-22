@@ -18,6 +18,7 @@ public class VileCannon : Weapon {
 		weaponBarIndex = 56;
 		killFeedIndex = 56;
 		weaponSlotIndex = 43;
+		isStream = true;
 	}
 
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
@@ -217,7 +218,7 @@ public class VileGizmoState : VileState {
 			loopNum++;
 			weapon.shoot(vile, []);
 
-			if (loopNum >= 4) {
+			if (loopNum >= 5) {
 				character.changeToIdleOrFall();
 				return;
 			}
@@ -316,7 +317,7 @@ public class LongshotGizmoProj : Projectile {
 		fadeOnAutoDestroy = true;
 		damager.damage = 1;
 		projId = (int)ProjIds.LongshotGizmo;
-		maxTime = 0.5f;
+		maxTime = 35 / 60f;
 		byteAngle = Helpers.to256(byteAngle);
 		this.byteAngle = byteAngle;
 		vel = 5 * 60 * Point.createFromByteAngle(byteAngle);

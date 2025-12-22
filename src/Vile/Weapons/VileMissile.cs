@@ -121,7 +121,7 @@ public class HumerusCrush : VileMissile {
 		vava.setVileShootTime(this);
 		vava.tryUseVileAmmo(vileAmmoUsage);
 		character.playSound("vileMissile", sendRpc: true);
-		Point shootVel = vava.getVileShootVel(true);
+		Point shootVel = vava.getVileShootVel(false);
 		Point shootPos;
 		if (vava.isVileMK2 || vava.isVileMK5) {
 			shootPos = vava.getVileMK2StunShotPos();
@@ -165,7 +165,7 @@ public class PopcornDemon : VileMissile {
 		vava.setVileShootTime(this);
 		vava.tryUseVileAmmo(vileAmmoUsage);
 		character.playSound("vileMissile", sendRpc: true);
-		Point shootVel = vava.getVileShootVel(true);
+		Point shootVel = vava.getVileShootVel(false);
 		Point shootPos;
 		if (vava.isVileMK2 || vava.isVileMK5) {
 			shootPos = vava.getVileMK2StunShotPos();

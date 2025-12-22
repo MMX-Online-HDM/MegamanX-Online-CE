@@ -14,6 +14,7 @@ public class VileVulcan : Weapon {
 		weaponBarIndex = weaponBarBaseIndex;
 		killFeedIndex = 62;
 		weaponSlotIndex = 44;
+		isStream = true;
 	}
 
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
