@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
-using System.Text;
-using SFML.Graphics;
 namespace MMXOnline;
 
 public enum VileCannonType {
@@ -23,9 +21,9 @@ public class VileCannon : Weapon {
 	}
 
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
-		if (shootCooldown > 0) return;
-		if (vile.energy.ammo < vileAmmoUsage) return;
-		if (!vile.missileWeapon.isCooldownPercentDone(0.8f)) return;
+		if (shootCooldown > 0 || vile.energy.ammo < vileAmmoUsage) {
+			return;
+		}
 		if (!vile.charState.attackCtrl) {
 			shoot(vile, []);
 			return;
@@ -49,17 +47,21 @@ public class FrontRunner : VileCannon {
 	}
 
 	public override void shoot(Character character, int[] args) {
-		if (character is not Vile vava) return;
-		Point shootVel = vava.getVileShootVel(true);
-		Point shootPos = vava.setCannonAim(new Point(shootVel.x, shootVel.y));
-		if (vava.getShootXDir() == -1) shootVel = new Point(shootVel.x * vava.getShootXDir(), shootVel.y);
+		if (character is not Vile vile) return;
+		Point shootVel = vile.getVileShootVel(true);
+		Point shootPos = vile.setCannonAim(new Point(shootVel.x, shootVel.y));
+
+		if (vile.getShootXDir() == -1) {
+			shootVel.x *= -1;
+		}
 		new FrontRunnerProj(
-			shootPos, character.xDir, MathF.Round(shootVel.byteAngle), character, character.player,
-			character.player.getNextActorNetId(), rpc: true
+			shootPos, MathF.Round(shootVel.byteAngle), vile,
+			vile.player.getNextActorNetId(), sendRpc: true
 		);
-		vava.setVileShootTime(this);
-		vava.playSound("frontrunner", sendRpc: true);
-		vava.tryUseVileAmmo(vileAmmoUsage);
+
+		vile.setVileShootTime(this);
+		vile.playSound("frontrunner", sendRpc: true);
+		vile.tryUseVileAmmo(vileAmmoUsage);
 	}
 }
 
@@ -80,19 +82,23 @@ public class FatBoy : VileCannon {
 	}
 
 	public override void shoot(Character character, int[] args) {
-		if (character is not Vile vava) return;
-		Point shootVel = vava.getVileShootVel(true);
-		Point shootPos = vava.setCannonAim(new Point(shootVel.x, shootVel.y));
-		if (vava.getShootXDir() == -1) shootVel = new Point(shootVel.x * vava.getShootXDir(), shootVel.y);
+		if (character is not Vile vile) { return; }
+		Point shootVel = vile.getVileShootVel(true);
+		Point shootPos = vile.setCannonAim(new Point(shootVel.x, shootVel.y));
+		if (vile.getShootXDir() == -1) {
+			shootVel.x *= -1;
+		}
 		new FatBoyProj(
-			shootPos, character.xDir, MathF.Round(shootVel.byteAngle), character, character.player,
-			character.player.getNextActorNetId(), rpc: true
+			shootPos, MathF.Round(shootVel.byteAngle), vile,
+			vile.player.getNextActorNetId(), sendRpc: true
 		);
-		vava.setVileShootTime(this);
-		vava.playSound("frontrunner", sendRpc: true);
-		vava.tryUseVileAmmo(vileAmmoUsage);
+
+		vile.setVileShootTime(this);
+		vile.playSound("frontrunner", sendRpc: true);
+		vile.tryUseVileAmmo(vileAmmoUsage);
 	}
 }
+
 public class LongShotGizmo : VileCannon {
 	public static LongShotGizmo netWeapon = new();
 	public LongShotGizmo() : base() {
@@ -108,19 +114,31 @@ public class LongShotGizmo : VileCannon {
 		effect = "Burst of 5 shots.";
 	}
 
+	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+		if (shootCooldown > 0 || vile.energy.ammo < vileAmmoUsage) {
+			return;
+		}
+		// Aim to were you are facing in if wall or stair.
+		vile.xDir = vile.getShootXDir();
+		// Always drop off no matter what.
+		vile.changeState(new VileGizmoState(this), true);
+	}
+
 	public override void shoot(Character character, int[] args) {
-		if (character is not Vile vava) return;
-		Point shootVel = vava.getVileShootVel(true);
-		Point shootPos = vava.setCannonAim(new Point(shootVel.x, shootVel.y));
-		if (vava.getShootXDir() == -1) shootVel = new Point(shootVel.x * vava.getShootXDir(), shootVel.y);
+		if (character is not Vile vile) { return; }
+		Point shootVel = vile.getVileShootVel(true);
+		Point shootPos = vile.setCannonAim(new Point(shootVel.x, shootVel.y));
+		if (vile.getShootXDir() == -1) {
+			shootVel.x *= -1;
+		}
 		new LongshotGizmoProj(
-			shootPos, character.xDir, MathF.Round(shootVel.byteAngle), character, character.player,
-			character.player.getNextActorNetId(), rpc: true
+			shootPos, MathF.Round(shootVel.byteAngle), 0, vile,
+			vile.player.getNextActorNetId(), sendRpc: true
 		);
-		vava.setVileShootTime(this);
-		vava.playSound("frontrunner", sendRpc: true);
-		vava.tryUseVileAmmo(vileAmmoUsage);
-		vava.isShootingGizmo = true;
+
+		vile.setVileShootTime(this);
+		vile.playSound("frontrunner", sendRpc: true);
+		vile.tryUseVileAmmo(vileAmmoUsage);
 	}
 }
 
@@ -175,7 +193,6 @@ public class CannonAttack : VileState {
 		character.useGravity = true;
 	}
 }
-
 
 public class VileGizmoState : VileState {
 	public bool shot;
@@ -288,7 +305,7 @@ public class FatBoyProj : Projectile {
 
 public class LongshotGizmoProj : Projectile {
 	public LongshotGizmoProj(
-		Point pos, float byteAngle, int type, Actor owner, ushort? netId
+		Point pos, float byteAngle, int type, Actor owner, ushort? netId,
 		bool sendRpc = false, Player? altPlayer = null
 	) : base(
 		pos, 1, owner, "vile_mk2_lg_proj", netId, altPlayer

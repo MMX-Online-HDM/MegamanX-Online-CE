@@ -677,50 +677,6 @@ public class GameMode {
 				}
 			}
 			#endregion
-			#region Vile
-			if (drawPlayer.character is Vile vava) {
-				int xStart = (int)Global.halfScreenW / 17;
-				int yStart = 160;
-				//This looks so bad LOL
-				if (vava.cannonWeapon.shootCooldown > 0) {
-					float Ccooldown = 1 - Helpers.progress(vava.cannonWeapon.shootCooldown, vava.cannonWeapon.fireRate);
-					drawGigaWeaponCooldown(43, Ccooldown, xStart, yStart);
-					yStart += 15;
-				}
-				if (vava.rocketPunchWeapon.shootCooldown > 0) {
-					float Ccooldown = 1 - Helpers.progress(vava.rocketPunchWeapon.shootCooldown, vava.rocketPunchWeapon.fireRate);
-					drawGigaWeaponCooldown(45, Ccooldown, xStart, yStart);
-					yStart += 15;
-				}
-				if (vava.missileWeapon.shootCooldown > 0) {
-					float Ccooldown = 1 - Helpers.progress(vava.missileWeapon.shootCooldown, vava.missileWeapon.fireRate);
-					drawGigaWeaponCooldown(17, Ccooldown, xStart, yStart, isKillFeed: true, xStart, yStart);
-					yStart += 15;
-				}
-				if (vava.napalmWeapon.shootCooldown > 0) {
-					float Ccooldown = 1 - Helpers.progress(vava.napalmWeapon.shootCooldown, vava.napalmWeapon.fireRate);
-					drawGigaWeaponCooldown(30, Ccooldown, xStart, yStart, isKillFeed: true, xStart, yStart);
-					yStart += 15;
-				}
-				if (vava.cutterWeapon.shootCooldown > 0) {
-					float Ccooldown = 1 - Helpers.progress(vava.cutterWeapon.shootCooldown, vava.cutterWeapon.fireRate);
-					drawGigaWeaponCooldown(114, Ccooldown, xStart, yStart, isKillFeed: true, xStart - 1, yStart);
-					yStart += 15;
-				}
-				if (vava.flamethrowerWeapon.shootCooldown > 0) {
-					float Ccooldown = 1 - Helpers.progress(vava.flamethrowerWeapon.shootCooldown, vava.flamethrowerWeapon.fireRate);
-					drawGigaWeaponCooldown(118, Ccooldown, xStart, yStart, isKillFeed: true, xStart, yStart);
-					yStart += 15;
-				}
-				if (vava.grenadeWeapon.shootCooldown > 0) {
-					float Ccooldown = 1 - Helpers.progress(vava.grenadeWeapon.shootCooldown, vava.grenadeWeapon.fireRate);
-					drawGigaWeaponCooldown(15, Ccooldown, xStart, yStart, isKillFeed: true, xStart, yStart);
-				}
-				if (vava.deadCooldown > 0) {
-					float Ccooldown = 1 - Helpers.progress(vava.deadCooldown, Vile.maxdeadCooldown);
-					drawGigaWeaponCooldown(175, Ccooldown, xStart, yStart, isKillFeed: true, xStart, yStart);
-				}
-			}
 			if (drawPlayer.character is Vile vilePilot &&
 				vilePilot.rideArmor != null &&
 				vilePilot.rideArmor == vilePilot.linkedRideArmor
@@ -731,13 +687,12 @@ public class GameMode {
 				if (napalmNum < 0) napalmNum = 0;
 				if (napalmNum > 2) napalmNum = 0;
 				Global.sprites["hud_hawk_bombs"].drawToHUD(
-					napalmNum, x, y, alpha: vilePilot.napalmWeapon.shootCooldown == 0 ? 1 : 0.5f
+					napalmNum, x, y, alpha: vilePilot.weaponSystem.rideGrenade.shootCooldown == 0 ? 1 : 0.5f
 				);
 				Fonts.drawText(
 					FontType.Grey, "x" + vilePilot.rideArmor.hawkBombCount.ToString(), x + 10, y - 4
 				);
 			}
-			#endregion
 			#region Axl
 			if (level.mainPlayer.character is Axl axl) {
 				int xStart = (int)Global.halfScreenW / 17;

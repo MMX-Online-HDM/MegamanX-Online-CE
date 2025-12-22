@@ -111,14 +111,7 @@ public class DragonsWrath : VileFlamethrower {
 		);
 	}
 }
-public class NoneFlamethrower : VileFlamethrower {
-	public static NoneFlamethrower netWeapon = new();
-	public NoneFlamethrower() : base() {
-		type = (int)VileFlamethrowerType.None;
-		displayName = "None";
-		killFeedIndex = 126;
-	}
-}
+
 #region States
 public class FlamethrowerAttacks : VileState {
 	public VileFlamethrower weapon;

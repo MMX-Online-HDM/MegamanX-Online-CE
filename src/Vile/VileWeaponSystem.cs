@@ -21,6 +21,7 @@ public class VileWeaponSystem : Weapon {
 	// Some things we need to quick-acces.
 	public Weapon chargeWeapon;
 	public Weapon rideWeapon;
+	public Weapon rideGrenade;
 
 	// Creation function.
 	public VileWeaponSystem(
@@ -67,6 +68,7 @@ public class VileWeaponSystem : Weapon {
 		// Fixed slot weapons.
 		chargeWeapon = extraWeapons[0];
 		rideWeapon = extraWeapons[1];
+		rideGrenade = extraWeapons[1];
 
 		// Generic weapon stuff.
 		index = (int)WeaponIds.VileWeaponSystem;

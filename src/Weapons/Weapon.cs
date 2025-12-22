@@ -442,3 +442,15 @@ public class Weapon {
 		return false;
 	}
 }
+
+public class EmptyWeapon : Weapon {
+	public EmptyWeapon() {
+		displayName = "Null Driver";
+		drawCooldown = false;
+		drawAmmo = false;
+	}
+
+	public override float getAmmoUsage(int chargeLevel) {
+		return 0;
+	}
+}
