@@ -21,6 +21,12 @@ public class VileWeaponSystem : Weapon {
 	// Some things we need to quick-acces.
 	public Weapon chargeWeapon;
 	public Weapon rideWeapon;
+	public Weapon rideGrenade;
+	public Dictionary<string, float> bufferedInputs = new() {
+		{Control.Shoot, 0},
+		{Control.Special1, 0},
+		{Control.WeaponRight, 0},
+	};
 
 	// Creation function.
 	public VileWeaponSystem(
@@ -67,6 +73,7 @@ public class VileWeaponSystem : Weapon {
 		// Fixed slot weapons.
 		chargeWeapon = extraWeapons[0];
 		rideWeapon = extraWeapons[1];
+		rideGrenade = extraWeapons[1];
 
 		// Generic weapon stuff.
 		index = (int)WeaponIds.VileWeaponSystem;
@@ -84,11 +91,19 @@ public class VileWeaponSystem : Weapon {
 	}
 
 	// Call update function of each one.
-	public override void update() {
+	public override void charLinkedUpdate(Character chara, bool isAlwaysOn) {
 		foreach (Weapon weapon in weaponList) {
 			weapon.update();
 		}
-		base.update();
+		foreach (var kvp in bufferedInputs) {
+			if (chara.player.input.isPressed(kvp.Key, chara.player)) {
+				bufferedInputs[kvp.Key] = 12;
+			} else {
+				bufferedInputs[kvp.Key] -= Global.gameSpeed;
+				if (bufferedInputs[kvp.Key] < 0) { bufferedInputs[kvp.Key] = 0; }
+			}
+		}
+		base.charLinkedUpdate(chara, isAlwaysOn);
 	}
 
 	public void setAllWeaponsToCooldown(float cooldown) {
@@ -106,16 +121,30 @@ public class VileWeaponSystem : Weapon {
 	public bool shootLogic(Vile vile) {
 		vile.usedAmmoLastFrame = false;
 		var tartgetSlot = vile.grounded ? slots : airSlots;
+		string[] keys = [Control.Shoot, Control.Special1, Control.WeaponRight];
+		bool[] helds = new bool[3];
+		for (int i = 0; i < keys.Length; i++) {
+			helds[i] = vile.player.input.isHeld(keys[i], vile.player) || bufferedInputs[keys[i]] > 0;
+		}
 
-		if (vile.player.input.isHeld(Control.Shoot, vile.player)) {
-			if (tartgetSlot.shoot.weaponSystemShoot(vile, Control.Shoot)) { return true; }
+		if (helds[0]) {
+			if (tartgetSlot.shoot.weaponSystemShoot(vile, keys[0])) {
+				bufferedInputs[keys[0]] = 0;
+				return true;
+			}
 		}
-		if (vile.player.input.isHeld(Control.Special1, vile.player) && !vile.isCharging()) {
-			vile.stopCharge();
-			if (tartgetSlot.special.weaponSystemShoot(vile, Control.Special1)) { return true; }
+		if (helds[1] && !vile.isCharging()) {
+			if (tartgetSlot.special.weaponSystemShoot(vile, keys[1])) {
+				bufferedInputs[keys[1]] = 0;
+				vile.stopCharge();
+				return true;
+			}
 		}
-		if (vile.player.input.isHeld(Control.WeaponRight, vile.player)) {
-			if (tartgetSlot.alt.weaponSystemShoot(vile, Control.WeaponRight)) { return true; }
+		if (helds[2]) {
+			if (tartgetSlot.alt.weaponSystemShoot(vile, keys[2])) {
+				bufferedInputs[keys[2]] = 0;
+				return true;
+			}
 		}
 		return false;
 	}
@@ -203,10 +232,12 @@ public class VileWeaponSystemSub {
 
 	// Esentially. A IsStream check.
 	public bool checkShootAble(Character character, Weapon weapon, string button) {
-		if (weapon.isStream) {
-			return character.player.input.isHeld(button, character.player);
-		} else {
-			return character.player.input.isPressed(button, character.player);
+		if (weapon.isStream && character.player.input.isHeld(button, character.player)) {
+			return true;
 		}
+		return (
+			character.player.input.isPressed(button, character.player) ||
+			parentSystem.bufferedInputs[button] > 0
+		);
 	}
 }

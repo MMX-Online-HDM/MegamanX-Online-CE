@@ -461,6 +461,9 @@ public class Vile : Character {
 		if (ammo < 0) {
 			return true;
 		}
+		if (weaponHealAmount > 0) {
+			return true;
+		}
 		if (isVulcan) {
 			usedAmmoLastFrame = true;
 		}
@@ -587,9 +590,9 @@ public class Vile : Character {
 
 	public void setVileShootTime(Weapon weapon, float modifier = 1f, Weapon? targetCooldownWeapon = null) {
 		targetCooldownWeapon ??= weapon;
-		if (isVileMK2) {
+		if (isVileMK2 || isVileMK5) {
 			float innerModifier = 1f;
-			if (weapon is VileMissile) innerModifier = 0.3333f;
+			if (weapon is VileMissile) innerModifier = isVileMK2 ? 0.3333f : 0.6666f;
 			weapon.shootCooldown = MathF.Ceiling(targetCooldownWeapon.fireRate * innerModifier * modifier);
 		} else {
 			weapon.shootCooldown = MathF.Ceiling(targetCooldownWeapon.fireRate * modifier);
@@ -777,88 +780,91 @@ public class Vile : Character {
 	}
 
 	public VileWeaponSystem setupWeaponSystem() {	
-		Weapon vulcanWeapon = loadout.vulcan switch {
+		Weapon? vulcanWeapon = loadout.vulcan switch {
+			0 => new CherryBlast(),
 			1 => new DistanceNeedler(),
 			2 => new BuckshotDance(),
-			3 => new NoneVulcan(),
-			_ => new CherryBlast()
+			_ => null
 		};
-		Weapon cannonWeapon = loadout.cannon switch {
+		Weapon? cannonWeapon = loadout.cannon switch {
 			1 => new FatBoy(),
 			2 => new LongShotGizmo(),
-			3 => new NoneCannon(),
-			_ => new FrontRunner()
+			0 => new FrontRunner(),
+			_ => null
 		};
-		Weapon missileWeapon = loadout.missile switch {
+		Weapon? missileWeapon = loadout.missile switch {
+			0 => new ElectricShock(),
 			1 => new HumerusCrush(),
 			2 => new PopcornDemon(),
-			3 => new NoneMissile(),
-			_ => new ElectricShock()
+			_ => null
 		};
-		Weapon rocketPunchWeapon = loadout.rocketPunch switch {
+		Weapon? rocketPunchWeapon = loadout.rocketPunch switch {
+			0 => new GoGetterRight(),
 			1 => new SpoiledBrat(),
 			2 => new InfinityGig(),
-			3 => new NoneRocketPunch(),
-			_ => new GoGetterRight()
+			_ => null
 		};
-		Weapon napalmWeapon = loadout.napalm switch {
+		Weapon? napalmWeapon = loadout.napalm switch {
+			0 => new RumblingBang(),
 			1 => new FireGrenade(),
 			2 => new SplashHit(),
-			3 => new NoneNapalm(),
-			_ => new RumblingBang()
+			_ => null
 		};
-		Weapon grenadeWeapon = loadout.ball switch {
+		Weapon? grenadeWeapon = loadout.ball switch {
+			0 => new ExplosiveRound(),
 			1 => new SpreadShot(),
 			2 => new PeaceOutRoller(),
-			3 => new NoneBall(),
-			_ => new ExplosiveRound()
+			_ => null
 		};
-		Weapon cutterWeapon = loadout.cutter switch {
+		Weapon? cutterWeapon = loadout.cutter switch {
+			0 => new QuickHomesick(),
 			1 => new ParasiteSword(),
 			2 => new MaroonedTomahawk(),
-			3 => new NoneCutter(),
-			_ => new QuickHomesick()
+			_ => null
 		};
-		Weapon flamethrowerWeapon = loadout.flamethrower switch {
+		Weapon? flamethrowerWeapon = loadout.flamethrower switch {
+			0 => new WildHorseKick(),
 			1 => new SeaDragonRage(),
 			2 => new DragonsWrath(),
-			3 => new NoneFlamethrower(),
-			_ => new WildHorseKick()
+			_ => null
 		};
-		Weapon downSpWeapon = loadout.downSpWeapon switch {
+		Weapon? downSpWeapon = loadout.downSpWeapon switch {
 			0 => napalmWeapon,
 			1 => grenadeWeapon,
 			2 => flamethrowerWeapon,
 			_ => napalmWeapon,
 		};
-		Weapon airSpWeapon = loadout.airSpWeapon switch {
+		Weapon? airSpWeapon = loadout.airSpWeapon switch {
 			0 => napalmWeapon,
 			1 => grenadeWeapon,
 			2 => flamethrowerWeapon,
 			_ => napalmWeapon,
 		};
-		Weapon downAirSpWeapon = loadout.downAirSpWeapon switch {
+		Weapon? downAirSpWeapon = loadout.downAirSpWeapon switch {
 			0 => napalmWeapon,
 			1 => grenadeWeapon,
 			2 => flamethrowerWeapon,
 			_ => napalmWeapon,
 		};
-		Weapon laserWeapon = loadout.laser switch {
+		Weapon? laserWeapon = loadout.laser switch {
+			0 => new RisingSpecter(),
 			1 => new NecroBurst(),
 			2 => new StraightNightmare(),
-			3 => new NoneLaser(),
-			_ => new RisingSpecter()
+			_ => null
 		};
 		// Assing weapons to specific slots.
 		Weapon?[] shootWps = [cannonWeapon, null, null, null];
-		Weapon?[] specialWps = [missileWeapon, null, null, downSpWeapon];
-		Weapon?[] airSpecialWps = [airSpWeapon, rocketPunchWeapon, null, downAirSpWeapon];
-		Weapon?[] altWps = [vulcanWeapon, cutterWeapon, null, null];
+		Weapon?[] specialWps = [missileWeapon, rocketPunchWeapon, null, downSpWeapon];
+		Weapon?[] airSpecialWps = [airSpWeapon, null, null, downAirSpWeapon];
+		Weapon?[] altWps = [vulcanWeapon, null, cutterWeapon, null];
 
 		return new VileWeaponSystem(
 			altWps, shootWps, specialWps,
-			altWps, shootWps, airSpecialWps,
-			[laserWeapon, missileWeapon]
+			altWps, shootWps, airSpecialWps, [
+				laserWeapon ?? new EmptyWeapon(),
+				missileWeapon ?? new ElectricShock(),
+				napalmWeapon ?? new RumblingBang()
+			]
 		);
 	}
 

@@ -380,7 +380,7 @@ public class Weapon {
 			}
 	}
 
-	public void charLinkedUpdate(Character character, bool isAlwaysOn) {
+	public virtual void charLinkedUpdate(Character character, bool isAlwaysOn) {
 		if (ammo >= maxAmmo || weaponHealAmount <= 0) {
 			weaponHealAmount = 0f;
 			weaponHealTime = 0;
@@ -440,5 +440,17 @@ public class Weapon {
 
 	public virtual bool customShootCondition(Character character) {
 		return false;
+	}
+}
+
+public class EmptyWeapon : Weapon {
+	public EmptyWeapon() {
+		displayName = "Null Driver";
+		drawCooldown = false;
+		drawAmmo = false;
+	}
+
+	public override float getAmmoUsage(int chargeLevel) {
+		return 0;
 	}
 }
