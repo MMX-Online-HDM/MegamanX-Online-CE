@@ -612,6 +612,15 @@ public class MRun : MaverickState {
 			move.x = maverick.getRunSpeed();
 		}
 		if (move.magnitude > 0) {
+			if (maverick.grounded && maverick.aiBehavior == MaverickAIBehavior.Follow &&
+				player.character != null &&
+				MathF.Abs(player.character.pos.x - maverick.pos.x) <= maverick.lastAssignedDist
+			) {
+				float dist = MathF.Abs(player.character.pos.x - maverick.pos.x);
+				float tempSpeed = Math.Max(dist - maverick.lastAssignedDist, 0.1f) * 60f;
+				float speed = Math.Min(tempSpeed, MathF.Abs(move.x));
+				move.x = speed * xDir;
+			}
 			maverick.move(move);
 		} else {
 			if (oo != null && oo.getRunSpeed() >= 100) {

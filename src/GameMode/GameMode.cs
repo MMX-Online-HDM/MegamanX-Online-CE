@@ -892,9 +892,11 @@ public class GameMode {
 				FontType.BlueMenu, hudErrorMsg,
 				Global.halfScreenW, 50, Alignment.Center
 			);
-		} else if (mainPlayer?.character is KaiserSigma) {
+		} else if (mainPlayer?.character is KaiserSigma kaiser) {
 			string msg = "";
-			if (KaiserSigma.canKaiserSpawn(mainPlayer.character, out _)) msg += "[DASH]: Relocate";
+			if (kaiser.isVirus && KaiserSigma.canKaiserSpawn(mainPlayer.character, out _)) {
+				msg += "[DASH]: Relocate";
+			}
 			if (msg != "") {
 				Fonts.drawText(
 					FontType.BlueMenu, Helpers.controlText(msg),

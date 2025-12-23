@@ -967,7 +967,7 @@ public partial class Character : Actor, IDamagable {
 
 	public void genericPuppetControl() {
 		// Return if Sigma or if weapon is the same.
-		if (this is BaseSigma || currentWeapon == lastMaverickWeapon) {
+		if (this is BaseSigma || currentWeapon == lastMaverickWeapon && currentMaverick != null) {
 			return;
 		}
 		// Set all mavericks to follow mode.
@@ -994,7 +994,7 @@ public partial class Character : Actor, IDamagable {
 		}
 		// Summon if maverick is not spawned.
 		else if (player.input.isPressed(Control.Shoot, player)) {
-			mw.summon(player, pos.addxy(0, -112), pos, xDir);
+			mw.summon(player, pos, pos, xDir);
 		}
 	}
 

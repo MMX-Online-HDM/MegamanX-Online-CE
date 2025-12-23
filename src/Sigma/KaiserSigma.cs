@@ -26,6 +26,14 @@ public partial class KaiserSigma : Character {
 	public bool showExhaust;
 	public int exaustDir;
 
+	public int beamState;
+	public float beamCooldown;
+	public float beamPartTime;
+	public bool isUpBeam;
+	public KaiserSigmaBeamProj beamProj;
+	public SoundWrapper? beamChargeSound;
+	public SoundWrapper? beamSound;
+
 	public KaiserSigma(
 		Player player, float x, float y, int xDir, bool isVisible,
 		ushort? netId, bool ownedByLocalPlayer, bool isWarpIn = false,
@@ -64,7 +72,6 @@ public partial class KaiserSigma : Character {
 			}
 		}
 		grounded = false;
-		canBeGrounded = false;
 		altSoundId = AltSoundIds.X3;
 	}
 
@@ -97,6 +104,7 @@ public partial class KaiserSigma : Character {
 			if (ksState != null) {
 				exaustDir = ksState.exhaustMoveDir;
 			};
+			beamCode();
 		}
 
 		if (showExhaust) {
@@ -123,7 +131,25 @@ public partial class KaiserSigma : Character {
 		}
 	}
 
+	public override float getRunSpeed() {
+		return getRunDebuffs();
+	}
+
 	public override bool normalCtrl() {
+		return false;
+	}
+
+	public override bool attackCtrl() {
+		if (charState is not KaiserSigmaBaseState kaiserState) {
+			return false;
+		}
+		if (kaiserState.canShootBallistics) {
+			ballisticAttackLogic();
+			if (beamState == 0 && beamCooldown <= 0 && player.input.isPressed(Control.Shoot, player)) {
+				beamState = 1;
+				isUpBeam = !player.input.isHeld(Control.Down, player);
+			}
+		}
 		return false;
 	}
 
@@ -221,7 +247,7 @@ public partial class KaiserSigma : Character {
 		kaiserBodySprite = sprite.name + "_body";
 		if (Global.sprites.ContainsKey(kaiserBodySprite)) {
 			Global.sprites[kaiserBodySprite].draw(
-				0, pos.x + x, pos.y + y,
+				frameIndex, pos.x + x, pos.y + y,
 				xDir, 1, null, 1, 1, 1, zIndex - 10, useFrameOffsets: true
 			);
 		}
@@ -317,6 +343,148 @@ public partial class KaiserSigma : Character {
 
 	public override bool canKeepFlag() {
 		return false;
+	}
+
+	public void beamCode() {
+		if (beamState == 0) {
+			Helpers.decrementFrames(ref beamCooldown);
+			return;
+		}
+		if (beamState == 3 || !alive || beamProj?.destroyed == true) {
+			beamProj?.destroySelf();
+			beamProj = null;
+			if (beamChargeSound?.deleted == false) {
+				beamChargeSound.sound.Stop();
+				beamChargeSound = null;
+			}
+			if (beamSound?.deleted == false) {
+				beamSound?.sound.Stop();
+				beamSound = null;
+			}
+			beamState = 0;
+			chargeTime = 0;
+			beamCooldown = 30;
+			beamPartTime = 0;
+			return;
+		}
+		if (beamState == 2) {
+			return;
+		}
+		if (chargeTime == 0) {
+			beamChargeSound = playSound("kaiserSigmaCharge", sendRpc: true);
+		}
+		chargeTime += Global.speedMul;
+		string poiName = isUpBeam ? "laserU" :"laserD";
+		Point shootPos = getFirstPOIOrDefault(poiName);
+
+		beamPartTime += Global.speedMul;
+		if (beamPartTime >= 2) {
+			beamPartTime = 0;
+			var partSpawnAngle = Helpers.randomRange(0, 360);
+			float spawnRadius = 20;
+			float spawnSpeed = 150;
+			var partSpawnPos = shootPos.addxy(
+				Helpers.cosd(partSpawnAngle) * spawnRadius, Helpers.sind(partSpawnAngle) * spawnRadius
+			);
+			var partVel = partSpawnPos.directionToNorm(shootPos).times(spawnSpeed);
+			new Anim(partSpawnPos, "kaisersigma_charge",
+				1, player.getNextActorNetId(), false, sendRpc: true
+			) {
+				vel = partVel,
+				ttl = ((spawnRadius - 2) / spawnSpeed),
+			};
+		}
+
+		if (chargeTime >= 60) {
+			beamState = 2;
+			beamProj = new KaiserSigmaBeamProj(
+				shootPos, xDir, isUpBeam, this,
+				player.getNextActorNetId(), sendRpc: true
+			);
+			beamSound = playSound("kaiserSigmaBeam", sendRpc: true);
+		}
+	}
+
+	public void ballisticAttackLogic() {
+		bool weaponL = player.input.isPressed(Control.WeaponLeft, player);
+		bool weaponR = player.input.isPressed(Control.WeaponRight, player);
+		if (player.input.isPressed(Control.Special1, player) && isKaiserSigmaGrounded()) {
+			if (kaiserMissileShootTime == 0) {
+				kaiserMissileShootTime = 0.5f;
+				var posL = getFirstPOIOrDefault("missileL");
+				var posR = getFirstPOIOrDefault("missileR");
+
+				Global.level.delayedActions.Add(
+					new DelayedAction(() => {
+						new KaiserSigmaMissileProj(
+						posL.addxy(-8 * xDir, 0),
+						1, this, player, player.getNextActorNetId(),
+						rpc: true
+					);
+					},
+					0f
+				));
+				Global.level.delayedActions.Add(
+					new DelayedAction(() => {
+						new KaiserSigmaMissileProj(
+						posL, 1, this, player, player.getNextActorNetId(),
+						rpc: true
+					);
+					},
+					0.15f
+				));
+				Global.level.delayedActions.Add(new DelayedAction(() => {
+					new KaiserSigmaMissileProj(
+					posR, 1, this, player, player.getNextActorNetId(),
+					rpc: true
+				);
+				},
+					0.3f
+				));
+				Global.level.delayedActions.Add(
+					new DelayedAction(() => {
+						new KaiserSigmaMissileProj(
+						posR.addxy(8 * xDir, 0),
+						1, this, player, player.getNextActorNetId(),
+						rpc: true
+					);
+					},
+					0.45f
+				));
+			}
+		} else if (weaponL || weaponR) {
+			if ((weaponR && xDir == 1) || (weaponL && xDir == -1)) {
+				if (kaiserRightMineShootTime == 0) {
+					kaiserRightMineShootTime = 1;
+					if (rightMineMod % 2 == 0) 
+						new KaiserSigmaMineProj(
+							getFirstPOIOrDefault("mineR1"), xDir,
+							0, this, player.getNextActorNetId(), sendRpc: true
+						);
+					else 
+						new KaiserSigmaMineProj(
+							getFirstPOIOrDefault("mineR2"), xDir,
+							1, this, player.getNextActorNetId(), sendRpc: true
+						);
+					rightMineMod++;
+				}
+			} else if ((weaponR && xDir == -1) || (weaponL && xDir == 1)) {
+				if (kaiserRightMineShootTime == 0) {
+					kaiserRightMineShootTime = 0.5f;
+					if (leftMineMod % 2 == 0) 
+						new KaiserSigmaMineProj(
+							getFirstPOIOrDefault("mineL1"), -xDir,
+							0, this, player.getNextActorNetId(), sendRpc: true
+						);
+					else 
+						new KaiserSigmaMineProj(
+							getFirstPOIOrDefault("mineL2"), -xDir,
+							1, this, player.getNextActorNetId(), sendRpc: true
+						);
+					leftMineMod++;
+				}
+			}
+		}
 	}
 
 	public override List<byte> getCustomActorNetData() {
