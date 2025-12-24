@@ -17,10 +17,7 @@ public class KaiserSigmaBaseState : CharState {
 	public override void update() {
 		base.update();
 
-		if (this is not KaiserSigmaHoverState &&
-			this is not KaiserSigmaFallState &&
-			kaiserSigma.kaiserHoverCooldown == 0
-		) {
+		if (this is not KaiserSigmaHoverState && kaiserSigma.kaiserHoverCooldown == 0) {
 			Helpers.decrementTime(ref kaiserSigma.kaiserHoverTime);
 		}
 
@@ -41,10 +38,6 @@ public class KaiserSigmaBaseState : CharState {
 				character.changeState(new KaiserSigmaTauntState(), true);
 			}
 		}
-
-		if (canShootBallistics) {
-			ballisticAttackLogic();
-		}
 	}
 
 	public override void onEnter(CharState oldState) {
@@ -61,108 +54,28 @@ public class KaiserSigmaBaseState : CharState {
 	public bool isKaiserSigmaTouchingGround() {
 		return character.checkCollision(0, 1) != null;
 	}
-
-	public void ballisticAttackLogic() {
-		bool weaponL = player.input.isPressed(Control.WeaponLeft, player);
-		bool weaponR = player.input.isPressed(Control.WeaponRight, player);
-		if (player.input.isPressed(Control.Special1, player) && kaiserSigma.isKaiserSigmaGrounded()) {
-			if (kaiserSigma.kaiserMissileShootTime == 0) {
-				kaiserSigma.kaiserMissileShootTime = 2f;
-				var posL = character.getFirstPOIOrDefault("missileL");
-				var posR = character.getFirstPOIOrDefault("missileR");
-
-				Global.level.delayedActions.Add(
-					new DelayedAction(() => {
-						new KaiserSigmaMissileProj(
-						posL.addxy(-8 * character.xDir, 0),
-						1, kaiserSigma, player, player.getNextActorNetId(),
-						rpc: true
-					);
-					},
-					0f
-				));
-				Global.level.delayedActions.Add(
-					new DelayedAction(() => {
-						new KaiserSigmaMissileProj(
-						posL, 1, kaiserSigma, player, player.getNextActorNetId(),
-						rpc: true
-					);
-					},
-					0.15f
-				));
-				Global.level.delayedActions.Add(new DelayedAction(() => {
-					new KaiserSigmaMissileProj(
-					posR, 1, kaiserSigma, player, player.getNextActorNetId(),
-					rpc: true
-				);
-				},
-					0.3f
-				));
-				Global.level.delayedActions.Add(
-					new DelayedAction(() => {
-						new KaiserSigmaMissileProj(
-						posR.addxy(8 * character.xDir, 0),
-						1, kaiserSigma, player, player.getNextActorNetId(),
-						rpc: true
-					);
-					},
-					0.45f
-				));
-			}
-		} else if (weaponL || weaponR) {
-			if ((weaponR && character.xDir == 1) || (weaponL && character.xDir == -1)) {
-				if (kaiserSigma.kaiserRightMineShootTime == 0) {
-					kaiserSigma.kaiserRightMineShootTime = 1;
-					if (kaiserSigma.rightMineMod % 2 == 0) 
-						new KaiserSigmaMineProj(
-							character.getFirstPOIOrDefault("mineR1"), character.xDir,
-							0, kaiserSigma, player, player.getNextActorNetId(), rpc: true
-						);
-					else 
-						new KaiserSigmaMineProj(
-							character.getFirstPOIOrDefault("mineR2"), character.xDir,
-							1, kaiserSigma, player, player.getNextActorNetId(), rpc: true
-						);
-					kaiserSigma.rightMineMod++;
-				}
-			} else if ((weaponR && character.xDir == -1) || (weaponL && character.xDir == 1)) {
-				if (kaiserSigma.kaiserRightMineShootTime == 0) {
-					kaiserSigma.kaiserRightMineShootTime = 1;
-					if (kaiserSigma.leftMineMod % 2 == 0) 
-						new KaiserSigmaMineProj(
-							character.getFirstPOIOrDefault("mineL1"), -character.xDir,
-							0, kaiserSigma, player, player.getNextActorNetId(), rpc: true
-						);
-					else 
-						new KaiserSigmaMineProj(
-							character.getFirstPOIOrDefault("mineL2"), -character.xDir,
-							1, kaiserSigma, player, player.getNextActorNetId(), rpc: true
-						);
-					kaiserSigma.leftMineMod++;
-				}
-			}
-		}
-	}
 }
 
 public class KaiserSigmaIdleState : KaiserSigmaBaseState {
 	public KaiserSigmaIdleState() : base("idle") {
 		canShootBallistics = true;
 		pushImmune = true;
+		exitOnAirborne = true;
+		normalCtrl = true;
+		attackCtrl = true;
 	}
 
 	public override void update() {
 		base.update();
 
-		if (player.input.isPressed(Control.Shoot, player)) {
-			character.changeState(new KaiserSigmaBeamState(player.input.isHeld(Control.Down, player)));
-		}
 		// Jump
-		else if (player.input.isPressed(Control.Jump, player)) {
+		if (character.isSoftLocked()) {
+			return;
+		} else if (player.input.isPressed(Control.Jump, player)) {
 			if (kaiserSigma.kaiserHoverCooldown == 0 &&
 				kaiserSigma.kaiserHoverTime < kaiserSigma.kaiserMaxHoverTime - 0.25f
 			) {
-				character.vel.y -= 3f * 60f;
+				character.vel.y -= 4f * 60f;
 				character.changeState(new KaiserSigmaJumpState(), true);
 				return;
 			}
@@ -191,26 +104,34 @@ public class KaiserSigmaIdleState : KaiserSigmaBaseState {
 			character.changeState(new KaiserSigmaTauntState(), true);
 			return;
 		}
-
-		ballisticAttackLogic();
 	}
 }
 
 public class KaiserSigmaWalkState : KaiserSigmaBaseState {
 	public bool once2, once3;
 	public KaiserSigmaWalkState() : base("run") {
-		canShootBallistics = false;
+		canShootBallistics = true;
 		pushImmune = true;
+		exitOnAirborne = true;
+		normalCtrl = true;
+		attackCtrl = true;
 	}
 
 	public override void update() {
 		base.update();
 
-		if (player.input.isPressed(Control.Shoot, player)) {
-			character.changeState(new KaiserSigmaBeamState(player.input.isHeld(Control.Down, player)));
-		} else if (
-			player.input.isHeld(Control.Up, player)
-		) {
+		// Jump
+		if (player.input.isPressed(Control.Jump, player)) {
+			if (kaiserSigma.kaiserHoverCooldown == 0 &&
+				kaiserSigma.kaiserHoverTime < kaiserSigma.kaiserMaxHoverTime - 0.25f
+			) {
+				character.vel.y -= 4f * 60f;
+				character.changeState(new KaiserSigmaJumpState(), true);
+				return;
+			}
+		}
+		// Hover
+		else if (player.input.isHeld(Control.Up, player)) {
 			if (kaiserSigma.kaiserHoverCooldown == 0 &&
 				kaiserSigma.kaiserHoverTime < kaiserSigma.kaiserMaxHoverTime - 0.25f
 			) {
@@ -229,13 +150,12 @@ public class KaiserSigmaWalkState : KaiserSigmaBaseState {
 			return;
 		}
 
-		//ballisticAttackLogic();
-		if (character.frameIndex == 5 && !once) {
+		if (character.frameIndex == 4 && !once) {
 			character.playSound("crashX3");
 			character.shakeCamera(sendRpc: true);
 			once = true;
 		}
-		if (character.frameIndex == 11 && !once2) {
+		if (character.frameIndex == 10 && !once2) {
 			character.playSound("crashX3");
 			character.shakeCamera(sendRpc: true);
 			once2 = true;
@@ -247,11 +167,11 @@ public class KaiserSigmaWalkState : KaiserSigmaBaseState {
 		int inputDir = player.input.getXDir(player);
 		if (inputDir != 0) {
 			character.xDir = inputDir;
-			if (character.frameIndex != 5 && character.frameIndex != 11 && character.frameIndex != 0 && character.frameIndex != 6)
-				character.move(new Point(40 * inputDir, 0));
+			if (character.frameIndex is not 4 and not 10) {
+				character.moveXY(character.getRunSpeed() * inputDir, 0);
+			}
 		} else {
 			character.changeState(new KaiserSigmaIdleState(), true);
-			return;
 		}
 	}
 }
@@ -260,7 +180,8 @@ public class KaiserSigmaJumpState : KaiserSigmaBaseState {
 	public KaiserSigmaJumpState() : base("fall") {
 		canShootBallistics = true;
 		pushImmune = true;
-		useGravity = true;
+		normalCtrl = true;
+		attackCtrl = true;
 	}
 
 	public override void update() {
@@ -282,11 +203,9 @@ public class KaiserSigmaJumpState : KaiserSigmaBaseState {
 			return;
 		}
 
-		ballisticAttackLogic();
-
 		int inputDir = player.input.getXDir(player);
 		if (inputDir != 0) {
-			character.move(new Point(40 * inputDir, 0));
+			character.moveXY(character.getRunSpeed() * inputDir, 0);
 			character.xDir = inputDir;
 		}
 		if (isKaiserSigmaTouchingGround()) {
@@ -302,6 +221,9 @@ public class KaiserSigmaJumpState : KaiserSigmaBaseState {
 public class KaiserSigmaTauntState : KaiserSigmaBaseState {
 	public KaiserSigmaTauntState() : base("taunt") {
 		pushImmune = true;
+		exitOnAirborne = true;
+		normalCtrl = true;
+		attackCtrl = true;
 	}
 
 	public override void update() {
@@ -319,6 +241,8 @@ public class KaiserSigmaHoverState : KaiserSigmaBaseState {
 		showExhaust = true;
 		canShootBallistics = true;
 		useGravity = false;
+		normalCtrl = true;
+		attackCtrl = true;
 	}
 
 	public override void update() {
@@ -369,36 +293,46 @@ public class KaiserSigmaHoverState : KaiserSigmaBaseState {
 public class KaiserSigmaFallState : KaiserSigmaBaseState {
 	public float velY;
 	public KaiserSigmaFallState() : base("fall") {
+		canShootBallistics = true;
 		pushImmune = true;
+		normalCtrl = true;
+		attackCtrl = true;
 	}
 
 	public override void update() {
 		base.update();
-		/*
-		if (!character.tryMove(moveAmount, out var hitData))
-		{
-			character.playSound("crash", sendRpc: true);
-			character.shakeCamera(sendRpc: true);
-			float snapY = hitData.getHitPointSafe().y;
-			if (snapY > character.pos.y)
-			{
-				character.changePos(new Point(character.pos.x, snapY));
-			}
-			character.changeToKaiserIdleOrFall();
-		}
-		*/
 
-		if (character.checkCollision(0, 1) != null) {
-			kaiserSigma.changeToKaiserIdleOrFall();
+		if (player.input.isHeld(Control.Up, player)) {
+			if (kaiserSigma.kaiserHoverCooldown == 0 &&
+				kaiserSigma.kaiserHoverTime < kaiserSigma.kaiserMaxHoverTime - 0.25f
+			) {
+				character.changeState(new KaiserSigmaHoverState(), true);
+				return;
+			}
+		} else if (player.input.isPressed(Control.Dash, player)) {
+			if (UpgradeMenu.subtankDelay > 0) {
+				Global.level.gameMode.setHUDErrorMessage(player, "Cannot become Virus in battle");
+			} else {
+				character.changeState(new KaiserSigmaVirusState(), true);
+			}
+			return;
+		}
+
+		int inputDir = player.input.getXDir(player);
+		if (inputDir != 0) {
+			character.moveXY(character.getRunSpeed() * inputDir, 0);
+			character.xDir = inputDir;
+		}
+		if (isKaiserSigmaTouchingGround()) {
 			character.playSound("crashX3", sendRpc: true);
 			character.shakeCamera(sendRpc: true);
+			character.changeState(new KaiserSigmaIdleState(), true);
 			return;
 		}
 	}
 
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
-		kaiserSigma.kaiserHoverCooldown = 0.75f;
 	}
 }
 
@@ -522,6 +456,9 @@ public class KaiserSigmaVirusState : CharState {
 		character.addMusicSource("demo_X3", character.getCenterPos(), true, loop: false);
 
 		kaiserSigma = character as KaiserSigma ?? throw new NullReferenceException();
+		if (kaiserSigma.beamState == 2) {
+			kaiserSigma.beamState = 3;
+		}
 	}
 
 	public override void onExit(CharState? newState) {
@@ -589,7 +526,7 @@ public class KaiserSigmaBeamState : KaiserSigmaBaseState {
 				state = 1;
 				proj = new KaiserSigmaBeamProj(
 					shootPos, character.xDir, !isDown,
-					kaiserSigma, player, player.getNextActorNetId(), rpc: true
+					kaiserSigma, player.getNextActorNetId(), sendRpc: true
 				);
 				beamSound = character.playSound("kaiserSigmaBeam", sendRpc: true);
 			}
@@ -628,10 +565,13 @@ public class KaiserSigmaBeamProj : Projectile {
 	public float beamWidth;
 	const float beamLen = 150;
 	const float maxBeamTime = 2;
+	public bool isUp;
+
 	public KaiserSigmaBeamProj(
-		Point pos, int xDir, bool isUp, Actor owner, Player player, ushort? netId, bool rpc = false
+		Point pos, int xDir, bool isUp, Actor owner, ushort? netId,
+		bool sendRpc = false, Player? altPlayer = null
 	) : base(
-		pos, xDir, owner, "empty", netId, player	
+		pos, xDir, owner, "empty", netId, altPlayer
 	) {
 		weapon = KaiserBeamWeapon.netWeapon;
 		damager.damage = 1;
@@ -639,19 +579,20 @@ public class KaiserSigmaBeamProj : Projectile {
 		damager.flinch = Global.miniFlinch;
 		projId = (int)ProjIds.Sigma3KaiserBeam;
 		setIndestructableProperties();
+		this.isUp = isUp;
 
 		if (xDir == 1 && !isUp) beamAngle = 45;
 		if (xDir == -1 && !isUp) beamAngle = 135;
 		if (xDir == -1 && isUp) beamAngle = 225;
 		if (xDir == 1 && isUp) beamAngle = 315;
 
-		if (rpc) {
+		if (sendRpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)(isUp ? 1 : 0));
 		}
 	}
 	public static Projectile rpcInvoke(ProjParameters args) {
 		return new KaiserSigmaBeamProj(
-			args.pos, args.xDir, args.extraData[0] == 1, args.owner, args.player, args.netId
+			args.pos, args.xDir, args.extraData[0] == 1, args.owner, args.netId, altPlayer: args.player
 		);
 	}
 
@@ -659,9 +600,26 @@ public class KaiserSigmaBeamProj : Projectile {
 		base.update();
 
 		if (globalCollider == null) {
-			globalCollider = new Collider(getPoints(), true, this, false, false, 0, new Point(0, 0));
+			globalCollider = new Collider(getPoints(), true, null, false, false, 0, new Point(0, 0));
 		} else {
 			changeGlobalCollider(getPoints());
+		}
+
+		if (ownerActor != null) {
+			moveXY(ownerActor.deltaPos.x, ownerActor.deltaPos.y);
+			if (ownerActor.xDir != xDir) {
+				xDir = ownerActor.xDir;
+				if (xDir == 1 && !isUp) beamAngle = 45;
+				if (xDir == -1 && !isUp) beamAngle = 135;
+				if (xDir == -1 && isUp) beamAngle = 225;
+				if (xDir == 1 && isUp) beamAngle = 315;
+			}
+			string poiName = isUp ? "laserU" :"laserD";
+			Point? shootPos = ownerActor.getFirstPOI(poiName);
+		
+			if (shootPos != null) {
+				changePos(shootPos.Value);
+			}
 		}
 
 		if (time < 1) {
@@ -716,7 +674,7 @@ public class KaiserSigmaMissileProj : Projectile {
 	public KaiserSigmaMissileProj(
 		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		pos, xDir, owner, "kaisersigma_missile", netId, player	
+		pos, xDir, owner, "kaisersigma_missile", netId, player
 	) {
 		weapon = KaiserMissileWeapon.netWeapon;
 		damager.damage = 2;
@@ -815,9 +773,10 @@ public class KaiserSigmaMineProj : Projectile, IDamagable {
 	int type;
 	bool startWall;
 	public KaiserSigmaMineProj(
-		Point pos, int xDir, int type, Actor owner, Player player, ushort? netId, bool rpc = false
+		Point pos, int xDir, int type, Actor owner, ushort? netId,
+		bool sendRpc = false, Player? altPlayer = null
 	) : base(
-		pos, xDir, owner, "kaisersigma_mine", netId, player	
+		pos, xDir, owner, "kaisersigma_mine", netId, altPlayer
 	) {
 		weapon = KaiserMineWeapon.netWeapon;
 		damager.damage = 4;
@@ -834,13 +793,13 @@ public class KaiserSigmaMineProj : Projectile, IDamagable {
 			vel = new Point(100 * xDir, 100);
 		}
 
-		if (rpc) {
+		if (sendRpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)type);
 		}
 	}
 	public static Projectile rpcInvoke(ProjParameters args) {
 		return new KaiserSigmaMineProj(
-			args.pos, args.xDir, args.extraData[0], args.owner, args.player, args.netId
+			args.pos, args.xDir, args.extraData[0], args.owner, args.netId, altPlayer: args.player
 		);
 	}
 

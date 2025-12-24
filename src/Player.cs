@@ -2467,11 +2467,11 @@ public partial class Player {
 
 		if (currentMaverick != null && currentMaverick.controlMode == MaverickModeId.TagTeam) {
 			destroyCharacter(true);
-		} else {
-			character?.applyDamage(Damager.forceKillDamage, this, character, null, null);
 		}
-		foreach (var maverick in mavericks) {
-			maverick.applyDamage(Damager.forceKillDamage, this, character, null, null);
+		character?.applyDamage(Damager.forceKillDamage, this, character, null, null);
+		
+		foreach (Maverick maverick in mavericks) {
+			maverick.changeState(new MExit(maverick.pos, false));
 		}
 	}
 
