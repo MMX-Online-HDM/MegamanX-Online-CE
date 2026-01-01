@@ -51,8 +51,30 @@ public class CharSelection {
 	public string sprite;
 	public int frameIndex;
 	public Point offset = new Point(0, 45);
+	public Point offset1v1 = new Point(0, 28);
 
 	public static int sigmaIndex => Options.main?.sigmaLoadout?.sigmaForm ?? 0;
+	public static string sigmaNames => Options.main?.sigmaLoadout?.sigmaForm switch
+	{
+		0 => "Commander Sigma",
+		1 => "Neo Sigma",
+		2 => "Dopple Sigma",
+		_ => "Error"
+	};
+	public static string sigmaSprites => Options.main?.sigmaLoadout?.sigmaForm switch
+	{
+		0 => "sigma_warp_in",
+		1 => "sigma2_warp_in",
+		2 => "sigma3_warp_in",
+		_ => "sigma_warp_in"
+	};
+	public static Point sigmaOffSet => Options.main?.sigmaLoadout?.sigmaForm switch
+	{
+		0 => new Point(4, 44),
+		1 => new Point(0, 45),
+		2 => new Point(0, 45),
+		_ => new Point(0, 44),
+	};
 
 	public static CharSelection[] selections => [
 		new CharSelection("X", 0, 1, 0, "menu_mmx", 0),
@@ -69,50 +91,108 @@ public class CharSelection {
 		new CharSelection("Sigma", 4, 1, 0, "menu_ssigma", sigmaIndex),
 		//new CharSelection("Rock", 10, 1, 0, "rock_idle", 0),
 	];
-
 	public static CharSelection[] selections1v1 => [
-		new CharSelection("X(X1)", 0, 1, 0, "menu_megaman", 1),
-		new CharSelection("X(X2)", 0, 2, 0, "menu_megaman", 2),
-		new CharSelection("X(X3)", 0, 3, 0, "menu_megaman", 3),
-		new CharSelection("Zero", 1, 1, 0, "menu_zero", 0),
-		new CharSelection("Vile", 2, 1, 0, "menu_vile", 0),
-		new CharSelection("Axl", 3, 1, 0, "menu_axl", 0),
-		new CharSelection("Sigma", 4, 1, 0, "menu_sigma", sigmaIndex),
-		new CharSelection("Kaiser Zero", 5, 1, 0, "zero_megapunch", 5) {
-			offset = new Point(0, 22)
+		new CharSelection("X (X1)", 0, 1, 0, "menu_megaman", 1),
+		new CharSelection("X (X2)", 0, 2, 0, "menu_megaman", 2),
+		new CharSelection("X (X3)", 0, 3, 0, "menu_megaman", 3),
+		new CharSelection("Zero", 1, 1, 0, "menu_zero", 0) {
+			offset1v1 = new Point(-1, 23),
+		}, 
+		new CharSelection("Kaiser Zero", 5, 1, 0, "zero_parry_start", 1) {
+			offset1v1 = new Point(0, 45)
 		},
 		new CharSelection("Buster Zero", 6, 1, 0, "zero_shoot", 0) {
-			offset = new Point(-4, 22)
+			offset1v1 = new Point(0, 45)
 		},
-		new CharSelection("C.Penguin", 210, 1, 0, "chillp_idle", 0),
-		new CharSelection("S.Mandrill", 212, 1, 1, "sparkm_idle", 0),
-		new CharSelection("A.Armadillo", 213, 1, 2, "armoreda_idle", 0),
-		new CharSelection("L.Octopus", 214, 1, 3, "launcho_idle", 0),
-		new CharSelection("B.Kuwanger", 215, 1, 4, "boomerk_idle", 0),
-		new CharSelection("S.Chameleon", 216, 1, 5, "stingc_idle", 0),
-		new CharSelection("S.Eagle", 217, 1, 6, "storme_idle", 0),
-		new CharSelection("F.Mammoth", 218, 1, 7, "flamem_idle", 0),
-		new CharSelection("Velguarder", 219, 1, 8, "velg_idle", 0),
-		new CharSelection("W.Sponge", 220, 1, 9, "wsponge_idle", 0),
-		new CharSelection("W.Gator", 221, 1, 10, "wheelg_idle", 0),
-		new CharSelection("B.Crab", 222, 1, 11, "bcrab_idle", 0),
-		new CharSelection("F.Stag", 223, 1, 12, "fstag_idle", 0),
-		new CharSelection("M.Moth", 224, 1, 13, "morphm_idle", 0),
-		new CharSelection("M.Centipede", 225, 1, 14, "magnac_idle", 0),
-		new CharSelection("C.Snail", 226, 1, 15, "csnail_idle", 0),
-		new CharSelection("O.Ostrich", 227, 1, 16, "overdriveo_idle", 0),
-		new CharSelection("Fake Zero", 228, 1, 17, "fakezero_idle", 0),
-		new CharSelection("B.Buffalo", 229, 1, 18, "bbuffalo_idle", 0),
-		new CharSelection("T.Seahorse", 230, 1, 19, "tseahorse_idle", 0),
-		new CharSelection("T.Rhino", 231, 1, 20, "tunnelr_idle", 0),
-		new CharSelection("V.Catfish", 232, 1, 21, "voltc_idle", 0),
-		new CharSelection("C.Crawfish", 233, 1, 22, "crushc_idle", 0),
-		new CharSelection("N.Tiger", 234, 1, 23, "neont_idle", 0),
-		new CharSelection("G.Beetle", 235, 1, 24, "gbeetle_idle", 0),
-		new CharSelection("B.Hornet", 236, 1, 25, "bhornet_idle", 0),
-		new CharSelection("Dr.Doppler", 237, 1, 26, "drdoppler_idle", 0),
+		new CharSelection("Vile", 2, 1, 0, "menu_vile", 0) {
+			offset1v1 = new Point(0, 23),
+		},
+		new CharSelection("Axl", 3, 1, 0, "menu_axl", 0) {
+			offset1v1 = new Point(-1, 26),
+		},
+		new CharSelection(sigmaNames, 4, 1, 0, sigmaSprites, sigmaIndex) {
+			offset1v1 = sigmaOffSet,
+		},
+		new CharSelection("Chill Penguin", 210, 1, 0, "chillp_idle", 0),
+		new CharSelection("Spark Mandrill", 212, 1, 1, "sparkm_idle", 0) {
+			offset1v1 = new Point(-1, 14),
+		},
+		new CharSelection("Armored Armadillo", 213, 1, 2, "armoreda_idle", 0) {
+			offset1v1 = new Point(0, 24),
+		},
+		new CharSelection("Launch Octopus", 214, 1, 3, "launcho_idle", 0) {
+			offset1v1 = new Point(0, 18),
+		},
+		new CharSelection("Boomer Kuwanger", 215, 1, 4, "boomerk_idle", 0) {
+			offset1v1 = new Point(0, 20),
+		},
+		new CharSelection("Sting Chameleon", 216, 1, 5, "stingc_idle", 0) {
+			offset1v1 = new Point(0, 24),
+		},
+		new CharSelection("Storm Eagle", 217, 1, 6, "storme_idle", 0) {
+			offset1v1 = new Point(0, 17),
+		},
+		new CharSelection("Flame Mammoth", 218, 1, 7, "flamem_idle", 0){
+			offset1v1 = new Point(0, 11),
+		},
+		new CharSelection("Velguarder", 219, 1, 8, "velg_idle", 0){
+			offset1v1 = new Point(0, 30),
+		},
+		new CharSelection("Wire Sponge", 220, 1, 9, "wsponge_idle", 0){
+			offset1v1 = new Point(0, 17),
+		},
+		new CharSelection("Wheel Gator", 221, 1, 10, "wheelg_idle", 0){
+			offset1v1 = new Point(0, 23),
+		},
+		new CharSelection("Bubble Crab", 222, 1, 11, "bcrab_idle", 0){
+			offset1v1 = new Point(0, 27),
+		},
+		new CharSelection("Flame Stag", 223, 1, 12, "fstag_idle", 0){
+			offset1v1 = new Point(0, 20),
+		},
+		new CharSelection("Morph Moth", 224, 1, 13, "morphm_idle", 0){
+			offset1v1 = new Point(0, 16),
+		},
+		new CharSelection("Magna Centipede", 225, 1, 14, "magnac_idle", 0){
+			offset1v1 = new Point(0, 13),
+		},
+		new CharSelection("Crystal Snail", 226, 1, 15, "csnail_idle", 0){
+			offset1v1 = new Point(0, 23),
+		},
+		new CharSelection("Overdrive Ostrich", 227, 1, 16, "overdriveo_idle", 0){
+			offset1v1 = new Point(0, 15),
+		},
+		new CharSelection("Fake Zero", 228, 1, 17, "fakezero_idle", 0){
+			offset1v1 = new Point(0, 24),
+		},
+		new CharSelection("Blizzard Buffalo", 229, 1, 18, "bbuffalo_idle", 0){
+			offset1v1 = new Point(1, 12),
+		},
+		new CharSelection("Toxic Seahorse", 230, 1, 19, "tseahorse_idle", 0){
+			offset1v1 = new Point(0, 20),
+		},
+		new CharSelection("Tunnel Rhino", 231, 1, 20, "tunnelr_idle", 0){
+			offset1v1 = new Point(0, 15),
+		},
+		new CharSelection("Volt Catfish", 232, 1, 21, "voltc_idle", 0){
+			offset1v1 = new Point(0, 22),
+		},
+		new CharSelection("Crush Crawfish", 233, 1, 22, "crushc_idle", 0){
+			offset1v1 = new Point(0, 19),
+		},
+		new CharSelection("Neon Tiger", 234, 1, 23, "neont_idle", 0){
+			offset1v1 = new Point(0, 17),
+		},
+		new CharSelection("Gravity Beetle", 235, 1, 24, "gbeetle_idle", 0){
+			offset1v1 = new Point(0, 14),
+		},
+		new CharSelection("Blast Hornet", 236, 1, 25, "bhornet_fall", 0){
+			offset1v1 = new Point(0, 45),
+		},
+		new CharSelection("Dr. Doppler", 237, 1, 26, "drdoppler_idle", 0){
+			offset1v1 = new Point(0, 16),
+		},
 	];
-
 	public CharSelection(
 		string name, int mappedCharNum, int mappedCharArmor,
 		int mappedCharMaverick, string sprite, int frameIndex
@@ -291,11 +371,19 @@ public class SelectCharacterMenu : IMainMenu {
 		string sprite = charSelection.sprite;
 		int frameIndex = charSelection.frameIndex;
 		float yOff = sprite.EndsWith("_idle") ? (Global.sprites[sprite].frames[0].rect.h() * 0.5f) : 0;
-		Global.sprites[sprite].drawToHUD(
+		if (is1v1) {
+			Global.sprites[sprite].drawToHUD(
+			frameIndex,
+			charPosX1 + charSelection.offset1v1.x,
+			charPosY1 + yOff + charSelection.offset1v1.y
+			);
+		} else {
+			Global.sprites[sprite].drawToHUD(
 			frameIndex,
 			charPosX1 + charSelection.offset.x,
 			charPosY1 + yOff + charSelection.offset.y
-		);
+			);
+		}
 
 		// Draw text
 
