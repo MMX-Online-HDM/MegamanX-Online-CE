@@ -112,7 +112,7 @@ public class ZeroAirSlashState : ZeroGenericMeleeState {
 
 		airMove = true;
 		canJump = true;
-		exitOnLanding = false;
+		exitOnLanding = !Options.main.slashGroundSprite;
 		useDashJumpSpeed = true;
 		canStopJump = true;
 	}

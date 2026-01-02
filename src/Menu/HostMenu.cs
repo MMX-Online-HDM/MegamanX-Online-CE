@@ -1386,13 +1386,13 @@ public class HostMenu : IMainMenu {
 			DrawWrappers.DrawTextureHUD(
 				Global.textures["cursor"],
 				menuOptions[selectArrowPosY].pos.x,
-				menuOptions[selectArrowPosY].pos.y + 3
+				menuOptions[selectArrowPosY].pos.y -2
 			);
 		} else {
 			DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
 			Global.sprites["cursor"].drawToHUD(
 				0, menuOptions[selectArrowPosY].pos.x,
-				menuOptions[selectArrowPosY].pos.y + 3
+				menuOptions[selectArrowPosY].pos.y -2
 			);
 		}
 		DrawWrappers.DrawTextureHUD(selectedLevel.getMapThumbnail(), 254, 38);

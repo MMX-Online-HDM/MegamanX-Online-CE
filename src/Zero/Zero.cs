@@ -512,7 +512,7 @@ public class Zero : Character {
 		int yDir = player.input.getYDir(player);
 		// Giga attacks.
 		if (yDir == 1 && specialPressed) {
-			if (flag != null && gigaAttack.shootCooldown <= 0 &&
+			if (flag == null && gigaAttack.shootCooldown <= 0 &&
 				gigaAttack.ammo >= gigaAttack.getAmmoUsage(0)
 			) {
 				gigaAttack.shoot(this, []);
@@ -611,11 +611,7 @@ public class Zero : Character {
 			if (charState is WallSlide wallSlide) {
 				changeState(new ZeroMeleeWall(wallSlide.wallDir, wallSlide.wallCollider), true);
 			} else {
-				if (Options.main.swapAirAttacks == false) {
-					changeState(new ZeroAirSlashState(), true);
-				} else if (kuuenzanCooldown <= 0) {
-					changeState(new ZeroRollingSlashtate(), true);
-				}
+				changeState(new ZeroAirSlashState(), true);
 			}
 			return true;
 		}
