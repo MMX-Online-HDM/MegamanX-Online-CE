@@ -490,7 +490,10 @@ public class PunchyZero : Character {
 			return true;
 		}
 		if (yDir == 1) {
-			if (gigaAttack.shootCooldown > 0 || gigaAttack.ammo < gigaAttack.getAmmoUsage(0)) {
+			if (flag == null ||
+				gigaAttack.shootCooldown > 0 ||
+				gigaAttack.ammo < gigaAttack.getAmmoUsage(0)
+			) {
 				return false;
 			}
 			gigaAttack.shoot(this, []);
