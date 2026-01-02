@@ -423,8 +423,8 @@ public class MIdle : MaverickState {
 
 public class MEnter : MaverickState {
 	public float destY;
-	public MEnter(Point destPos) : base("enter") {
-		destY = destPos.y;
+
+	public MEnter() : base("enter") {
 		aiAttackCtrl = true;
 		canBeCanceled = false;
 	}
@@ -452,6 +452,7 @@ public class MEnter : MaverickState {
 		base.onEnter(oldState);
 		maverick.useGravity = false;
 		maverick.alpha = 0;
+		destY = maverick.pos.y;
 		maverick.changePosY(destY - 32);
 		if (maverick.controlMode != MaverickModeId.TagTeam && !once) {
 			maverick.playSound("warpIn", sendRpc: true);
@@ -491,7 +492,7 @@ public class MExit : MaverickState {
 		if ((maverick.getYMod() == 1 && maverick.pos.y < destY) || (maverick.getYMod() == -1 && maverick.pos.y > destY)) {
 			maverick.changePos(destPos.addxy(0, -yPos * maverick.getYMod()));
 			if (!isRecall) {
-				maverick.changeState(new MEnter(destPos));
+				maverick.changeState(new MEnter());
 			} else {
 				maverick.destroySelf();
 			}

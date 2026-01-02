@@ -9,10 +9,10 @@ public class DrDoppler : Maverick {
 	public int ballType;
 	public float targetTime;
 	public DrDoppler(
-		Player player, Point pos, Point destPos, int xDir,
-		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+		Player player, Point pos, int xDir, ushort? netId,
+		bool ownedByLocalPlayer, bool sendRpc = false
 	) : base(
-		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+		player, pos, xDir, netId, ownedByLocalPlayer
 	) {
 		stateCooldowns = new() {
 			{ typeof(MShoot), new(45, true) },
@@ -113,7 +113,7 @@ public class DrDoppler : Maverick {
 	public override void aiUpdate() {
 		base.aiUpdate();
 		if (controlMode == MaverickModeId.Summoner && Helpers.randomRange(0, 10) == 1 &&
-			ammo >= 8 && state is not DrDopplerAbsorbState or DrDopplerDashState && health < maxHealth) {
+			ammo >= 8 && state is not DrDopplerAbsorbState and not DrDopplerDashState && health < maxHealth) {
 			foreach (GameObject gameObject in getCloseActors(64, true, false, false)) {
 				if (gameObject is Projectile proj &&
 					proj.damager.owner.alliance != player.alliance &&

@@ -11,10 +11,10 @@ public class ArmoredArmadillo : Maverick {
 	public bool noArmor;
 
 	public ArmoredArmadillo(
-		Player player, Point pos, Point destPos, int xDir,
-		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+		Player player, Point pos, int xDir, ushort? netId,
+		bool ownedByLocalPlayer, bool sendRpc = false
 	) : base(
-		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+		player, pos, xDir, netId, ownedByLocalPlayer
 	) {
 		/*stateCooldowns = new() {
 			typeof(MShoot), new(36, true),
@@ -74,7 +74,7 @@ public class ArmoredArmadillo : Maverick {
 			drainAmmo(4);
 		} else if (state is ArmoredAGuardState) {
 			drainAmmo(1);
-		} else if (state is not ArmoredARollExitState or ArmoredAGuardState) {
+		} else {
 			rechargeAmmo(3);
 		}
 

@@ -620,7 +620,7 @@ public partial class Actor : GameObject {
 	}
 
 	public virtual void physicsUpdate() {
-		Character chr = this as Character;
+		Character? chr = this as Character;
 
 		bool wading = isWading();
 		bool underwater = isUnderwater();

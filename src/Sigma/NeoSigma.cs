@@ -229,7 +229,7 @@ public class NeoSigma : BaseSigma {
 			if (mw.maverick != null) {
 				changeState(new CallDownMaverick(mw.maverick, true, false), true);
 			}
-			mw.summon(player, pos.addxy(0, -112), pos, xDir);
+			mw.summon(player, pos, xDir);
 			player.changeToSigmaSlot();
 		}
 		if (charState is not LadderClimb) {

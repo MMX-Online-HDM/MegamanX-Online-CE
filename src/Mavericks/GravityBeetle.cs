@@ -12,10 +12,10 @@ public class GravityBeetle : Maverick {
 	public GBeetleGravityWellProj? well;
 
 	public GravityBeetle(
-		Player player, Point pos, Point destPos, int xDir,
-		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+		Player player, Point pos, int xDir, ushort? netId,
+		bool ownedByLocalPlayer, bool sendRpc = false
 	) : base(
-		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+		player, pos, xDir, netId, ownedByLocalPlayer
 	) {
 		stateCooldowns = new() {
 			{ typeof(GBeetleShoot), new(60) },

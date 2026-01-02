@@ -17,7 +17,7 @@ public class VileVulcan : Weapon {
 		isStream = true;
 	}
 
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+	public override void vileShoot(Vile vile) {
 		if (shootCooldown > 0 || vile.energy.ammo < vileAmmoUsage) return;
 		if (vile.charState is VileMK2GrabState) return;
 		vile.vulcanLingerTime = fireRate > 9 ? fireRate : 9;

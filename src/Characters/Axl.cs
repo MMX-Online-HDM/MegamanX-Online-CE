@@ -1867,7 +1867,7 @@ public class Axl : Character {
 				case 0:
 					player.press(Control.Shoot);
 					break;
-				case 1 when currentWeapon is not IceGattling or PlasmaGun:
+				case 1 when currentWeapon is not IceGattling and not PlasmaGun:
 					player.press(Control.Special1);
 					break;
 			}

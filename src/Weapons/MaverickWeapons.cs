@@ -83,71 +83,71 @@ public class MaverickWeapon : Weapon {
 		}
 	}
 
-	public Maverick summon(Player player, Point pos, Point destPos, int xDir, bool isMothHatch = false) {
+	public Maverick summon(Player player, Point destPos, int xDir, bool isMothHatch = false) {
 		// X1
 		if (this is ChillPenguinWeapon) {
-			maverick = new ChillPenguin(player, pos, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
+			maverick = new ChillPenguin(player, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
 		} else if (this is SparkMandrillWeapon) {
-			maverick = new SparkMandrill(player, pos, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
+			maverick = new SparkMandrill(player, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
 		} else if (this is ArmoredArmadilloWeapon) {
-			maverick = new ArmoredArmadillo(player, pos, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
+			maverick = new ArmoredArmadillo(player, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
 		} else if (this is LaunchOctopusWeapon) {
-			maverick = new LaunchOctopus(player, pos, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
+			maverick = new LaunchOctopus(player, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
 		} else if (this is BoomerangKuwangerWeapon) {
-			maverick = new BoomerangKuwanger(player, pos, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
+			maverick = new BoomerangKuwanger(player, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
 		} else if (this is StingChameleonWeapon) {
-			maverick = new StingChameleon(player, pos, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
+			maverick = new StingChameleon(player, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
 		} else if (this is StormEagleWeapon) {
-			maverick = new StormEagle(player, pos, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
+			maverick = new StormEagle(player, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
 		} else if (this is FlameMammothWeapon) {
-			maverick = new FlameMammoth(player, pos, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
+			maverick = new FlameMammoth(player, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
 		} else if (this is VelguarderWeapon) {
-			maverick = new Velguarder(player, pos, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
+			maverick = new Velguarder(player, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
 		}
 		  // X2
 		  else if (this is WireSpongeWeapon) {
-			maverick = new WireSponge(player, pos, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
+			maverick = new WireSponge(player, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
 		} else if (this is WheelGatorWeapon) {
-			maverick = new WheelGator(player, pos, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
+			maverick = new WheelGator(player, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
 		} else if (this is BubbleCrabWeapon) {
-			maverick = new BubbleCrab(player, pos, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
+			maverick = new BubbleCrab(player, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
 		} else if (this is FlameStagWeapon) {
-			maverick = new FlameStag(player, pos, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
+			maverick = new FlameStag(player, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
 		} else if (this is MorphMothWeapon mmw) {
 			if (mmw.isMoth) {
-				maverick = new MorphMoth(player, pos, destPos, xDir, player.getNextActorNetId(), true, isMothHatch, sendRpc: true);
+				maverick = new MorphMoth(player, destPos, xDir, player.getNextActorNetId(), true, isMothHatch, sendRpc: true);
 			} else {
-				maverick = new MorphMothCocoon(player, pos, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
+				maverick = new MorphMothCocoon(player, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
 			}
 		} else if (this is MagnaCentipedeWeapon) {
-			maverick = new MagnaCentipede(player, pos, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
+			maverick = new MagnaCentipede(player, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
 		} else if (this is CrystalSnailWeapon) {
-			maverick = new CrystalSnail(player, pos, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
+			maverick = new CrystalSnail(player, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
 		} else if (this is OverdriveOstrichWeapon) {
-			maverick = new OverdriveOstrich(player, pos, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
+			maverick = new OverdriveOstrich(player, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
 		} else if (this is FakeZeroWeapon) {
-			maverick = new FakeZero(player, pos, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
+			maverick = new FakeZero(player, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
 		}
 		  // X3
 		  else if (this is BlizzardBuffaloWeapon) {
-			maverick = new BlizzardBuffalo(player, pos, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
+			maverick = new BlizzardBuffalo(player, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
 		} else if (this is ToxicSeahorseWeapon) {
-			maverick = new ToxicSeahorse(player, pos, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
+			maverick = new ToxicSeahorse(player, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
 		} else if (this is TunnelRhinoWeapon) {
-			maverick = new TunnelRhino(player, pos, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
+			maverick = new TunnelRhino(player, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
 		} else if (this is VoltCatfishWeapon) {
-			maverick = new VoltCatfish(player, pos, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
+			maverick = new VoltCatfish(player, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
 		} else if (this is CrushCrawfishWeapon) {
-			maverick = new CrushCrawfish(player, pos, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
+			maverick = new CrushCrawfish(player, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
 		} else if (this is NeonTigerWeapon) {
-			maverick = new NeonTiger(player, pos, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
+			maverick = new NeonTiger(player, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
 		} else if (this is GravityBeetleWeapon) {
-			maverick = new GravityBeetle(player, pos, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
+			maverick = new GravityBeetle(player, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
 		} else if (this is BlastHornetWeapon) {
-			maverick = new BlastHornet(player, pos, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
+			maverick = new BlastHornet(player, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true);
 		} else if (this is DrDopplerWeapon ddw) {
 			var drDoppler = new DrDoppler(
-				player, pos, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true
+				player, destPos, xDir, player.getNextActorNetId(), true, sendRpc: true
 			);
 			drDoppler.ballType = ddw.ballType;
 			maverick = drDoppler;

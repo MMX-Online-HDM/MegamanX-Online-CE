@@ -36,7 +36,7 @@ public class QuickHomesick : VileCutter {
 		hitcooldown = "0.5";
 		effect = "Can carry items.";
 	}
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+	public override void vileShoot(Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		vile.changeState(new CutterAttacks(this), true);
@@ -68,7 +68,7 @@ public class ParasiteSword : VileCutter {
 		hitcooldown = "0.5";
 		effect = "Won't Destroy on hit.";
 	}
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+	public override void vileShoot(Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		vile.changeState(new CutterAttacks(this), true);
@@ -100,7 +100,7 @@ public class MaroonedTomahawk : VileCutter {
 		hitcooldown = "0.33";
 		effect = "Won't Destroy on hit.";
 	}
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+	public override void vileShoot(Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		vile.changeState(new CutterAttacks(this), true);

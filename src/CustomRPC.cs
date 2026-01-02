@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Lidgren.Network;
 
 namespace MMXOnline;
@@ -79,7 +79,7 @@ public class RpcChangeOwnership : RPC {
 	public override void invoke(byte[] arguments) {
 		ushort netId = BitConverter.ToUInt16(new byte[] { arguments[1], arguments[2] }, 0);
 		Actor? actor = Global.level.getActorByNetId(netId, true);
-		Player player = Global.level.getPlayerById(arguments[0]);
+		Player? player = Global.level.getPlayerById(arguments[0]);
 		if (actor is not Projectile proj) {
 			return;
 		}

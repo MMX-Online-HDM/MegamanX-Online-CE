@@ -16,6 +16,7 @@ public class BaseSigma : Character {
 	public long framesSinceLastAttack = 1000;
 	public bool isTrueAI;
 	public bool tempAiSummoner;
+	public bool is1v1mode;
 
 	public SigmaLoadout loadout;
 	public MaverickAIBehavior currentMaverickCommand;
@@ -48,6 +49,7 @@ public class BaseSigma : Character {
 		CharState intialCharState;
 		if (ownedByLocalPlayer) {
 			if (player.maverick1v1 != null) {
+				is1v1mode = true;
 				intialCharState = new WarpOut(true);
 			} else if (isWarpIn) {
 				intialCharState = new WarpIn(true, true);
@@ -89,7 +91,7 @@ public class BaseSigma : Character {
 	public override void preUpdate() {
 		base.preUpdate();
 
-		if (!ownedByLocalPlayer) {
+		if (!ownedByLocalPlayer || is1v1mode) {
 			return;
 		}
 
@@ -161,7 +163,7 @@ public class BaseSigma : Character {
 				}
 			}
 		}
-		if (weapons.Count > 3 || isATrans) {
+		if (weapons.Count > 3 || isATrans || !weapons.Any(w => w is SigmaMenuWeapon)) {
 			isTruePuppeter = false;
 			isTrueStriker = false;
 			isTrueSummoner = false;
@@ -191,10 +193,10 @@ public class BaseSigma : Character {
 			foreach (Weapon weapon in weapons) {
 				if (weapon is MaverickWeapon mw && mw.maverick == null) {
 					if (mw.summonedOnce) {
-						mw.summon(player, pos.addxy(0, -112), pos, xDir);
+						mw.summon(player, pos, xDir);
 					} else if (canAffordMaverick(mw)) {
 						buyMaverick(mw);
-						mw.summon(player, pos.addxy(0, -112), pos, xDir);
+						mw.summon(player, pos, xDir);
 						mw.summonedOnce = true;
 					}
 				}
@@ -324,7 +326,7 @@ public class BaseSigma : Character {
 						return;
 					}
 					buyMaverick(mWeapon);
-					Maverick maverick = mWeapon.summon(player, pos.addxy(0, -112), pos, xDir);
+					Maverick maverick = mWeapon.summon(player, pos, xDir);
 					if (mWeapon.controlMode == MaverickModeId.Striker) {
 						Point inputDir = player.input.getInputDir(player);
 						if (inputDir.y == -1) {
@@ -443,7 +445,7 @@ public class BaseSigma : Character {
 							currentMaverick.changeState(new MExit(currentPos, true));
 						}
 
-						mw.summon(player, currentPos.addxy(0, -112), currentPos, xDir);
+						mw.summon(player, currentPos, xDir);
 						mw.maverick!.health = mw.lastHealth;
 						becomeMaverick(mw.maverick);
 					}
@@ -465,7 +467,7 @@ public class BaseSigma : Character {
 			player.maverick1v1Spawned = true;
 			var mw = weapons[0] as MaverickWeapon;
 			if (mw != null) {
-				mw.summon(player, pos.addxy(0, -112), pos, xDir);
+				mw.summon(player, pos, xDir);
 				mw.maverick!.health = mw.lastHealth;
 				becomeMaverick(mw.maverick);
 			}
@@ -765,12 +767,11 @@ public class BaseSigma : Character {
 			).Select(w => w.clone()).ToList();
 		} else if (Global.level.is1v1()) {
 			if (player.maverick1v1 != null) {
+				sigmaLoadout.commandMode = (int)MaverickModeId.TagTeam;
 				retWeapons = [
-					Weapon.getAllSigmaWeapons(
-						player, sigmaLoadout.sigmaForm
-					).Select(
+					Weapon.getAllSigmaWeapons(player).Select(
 						w => w.clone()
-					).ToList()[player.maverick1v1.Value + 1]
+					).ToList()[player.maverick1v1.Value]
 				];
 			} else if (!Global.level.isHyper1v1()) {
 				int sigmaForm = sigmaLoadout.sigmaForm;

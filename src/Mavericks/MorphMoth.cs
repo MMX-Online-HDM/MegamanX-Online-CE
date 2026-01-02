@@ -9,10 +9,10 @@ public class MorphMoth : Maverick {
 	public static Weapon getWeapon() { return new Weapon(WeaponIds.MorphMGeneric, 146); }
 
 	public MorphMoth(
-		Player player, Point pos, Point destPos, int xDir,
-		ushort? netId, bool ownedByLocalPlayer, bool isHatch, bool sendRpc = false
+		Player player, Point pos, int xDir, ushort? netId,
+		bool ownedByLocalPlayer, bool isHatch, bool sendRpc = false
 	) : base(
-		player, pos, destPos, xDir, netId, ownedByLocalPlayer,
+		player, pos, xDir, netId, ownedByLocalPlayer,
 		overrideState: isHatch ? new MorphMHatchState() : null
 	) {
 		stateCooldowns = new() {

@@ -13,10 +13,10 @@ public class OverdriveOstrich : Maverick {
 	public float crystalizeCooldown;
 
 	public OverdriveOstrich(
-		Player player, Point pos, Point destPos, int xDir,
-		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+		Player player, Point pos, int xDir, ushort? netId,
+		bool ownedByLocalPlayer, bool sendRpc = false
 	) : base(
-		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+		player, pos, xDir, netId, ownedByLocalPlayer
 	) {
 		stateCooldowns = new() {
 			{ typeof(OverdriveOShootState), new(45, true) },

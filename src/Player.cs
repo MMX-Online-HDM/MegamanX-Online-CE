@@ -2460,18 +2460,23 @@ public partial class Player {
 
 	public void forceKill() {
 		if (maverick1v1 != null && Global.level.is1v1()) {
-			//character?.applyDamage(null, null, 1000, null);
 			currentMaverick?.applyDamage(Damager.forceKillDamage, this, character, null, null);
+			character?.applyDamage(Damager.forceKillDamage, this, character, null, null);
 			return;
 		}
-
 		if (currentMaverick != null && currentMaverick.controlMode == MaverickModeId.TagTeam) {
-			destroyCharacter(true);
+			Point newPos = currentMaverick.pos;
+			currentMaverick.changeState(new MExit(currentMaverick.pos, false));
+			character?.changeState(new Idle());
+			character?.visible = true;
+			character?.changePos(newPos);
 		}
 		character?.applyDamage(Damager.forceKillDamage, this, character, null, null);
 		
 		foreach (Maverick maverick in mavericks) {
-			maverick.changeState(new MExit(maverick.pos, false));
+			if (maverick.state is not MExit && !maverick.destroyed) {
+				maverick.changeState(new MExit(maverick.pos, false));
+			}
 		}
 	}
 

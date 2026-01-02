@@ -10,10 +10,10 @@ public class SparkMandrill : Maverick {
 	public static Weapon netWeapon = new Weapon(WeaponIds.SparkMGeneric, 94);
 
 	public SparkMandrill(
-		Player player, Point pos, Point destPos, int xDir,
-		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+		Player player, Point pos, int xDir, ushort? netId,
+		bool ownedByLocalPlayer, bool sendRpc = false
 	) : base(
-		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+		player, pos, xDir, netId, ownedByLocalPlayer
 	) {
 		stateCooldowns = new() {
 			{ typeof(SparkMPunchState), new(60, true, true) },

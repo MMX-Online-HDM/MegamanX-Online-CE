@@ -75,7 +75,7 @@ public class CallDownMaverick : CharState {
 			if (maverick.state is not MExit) {
 				maverick.changeState(new MExit(character.pos, isRecall));
 			} else {
-				maverick.changeState(new MEnter(character.pos));
+				maverick.changeState(new MEnter());
 			}
 		}
 	}

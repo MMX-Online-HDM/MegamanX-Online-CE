@@ -13,10 +13,10 @@ public class ChillPenguin : Maverick {
 	public ChillPSlideWeapon slideWeapon = new();
 
 	public ChillPenguin(
-		Player player, Point pos, Point destPos,
-		int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+		Player player, Point destPos, int xDir,
+		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
 	) : base(
-		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+		player, destPos, xDir, netId, ownedByLocalPlayer
 	) {
 		stateCooldowns = new() {
 			{ typeof(ChillPIceBlowState), new(2 * 60, false, true) },

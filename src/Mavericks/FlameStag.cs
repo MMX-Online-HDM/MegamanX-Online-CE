@@ -12,10 +12,10 @@ public class FlameStag : Maverick {
 	public Sprite antlerSide;
 
 	public FlameStag(
-		Player player, Point pos, Point destPos, int xDir, ushort? netId,
-		bool ownedByLocalPlayer, bool sendRpc = false
+		Player player, Point pos, int xDir, ushort? netId, bool ownedByLocalPlayer,
+		bool sendRpc = false
 	) : base(
-		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+		player, pos, xDir, netId, ownedByLocalPlayer
 	) {
 		weapon = getWeapon();
 		uppercutWeapon = new Weapon(WeaponIds.FStagGeneric, 144, new Damager(player, 0, 0, 0));

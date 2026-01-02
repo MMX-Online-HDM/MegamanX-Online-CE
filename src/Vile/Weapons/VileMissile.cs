@@ -35,7 +35,7 @@ public class ElectricShock : VileMissile {
 		hitcooldown = "0.15";
 		effect = "Stuns Enemies. CD: 2";
 	}
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+	public override void vileShoot(Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		if (vile.charState is InRideArmor) {
@@ -83,7 +83,7 @@ public class VileMK2StunShot : VileMissile {
 		index = (int)WeaponIds.MK2StunShot;
 		killFeedIndex = 67;
 	}
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+	public override void vileShoot(Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		//vile.changeState(new MissileAttack(vile.grounded), true);
@@ -108,7 +108,7 @@ public class HumerusCrush : VileMissile {
 		hitcooldown = "0.15";
 		effect = "None.";
 	}
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+	public override void vileShoot(Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		vile.changeState(new MissileAttack(this), true);
@@ -152,7 +152,7 @@ public class PopcornDemon : VileMissile {
 		hitcooldown = "0.15/0";
 		effect = "Can Split.";
 	}
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+	public override void vileShoot(Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		vile.changeState(new MissileAttack(this), true);

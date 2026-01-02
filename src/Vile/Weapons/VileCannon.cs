@@ -21,7 +21,7 @@ public class VileCannon : Weapon {
 		isStream = true;
 	}
 
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+	public override void vileShoot(Vile vile) {
 		if (shootCooldown > 0 || vile.energy.ammo < vileAmmoUsage) {
 			return;
 		}
@@ -115,7 +115,7 @@ public class LongShotGizmo : VileCannon {
 		effect = "Burst of 5 shots.";
 	}
 
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+	public override void vileShoot(Vile vile) {
 		if (shootCooldown > 0 || vile.energy.ammo < vileAmmoUsage) {
 			return;
 		}

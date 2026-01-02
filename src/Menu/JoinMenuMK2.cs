@@ -350,7 +350,7 @@ public static class MasterServerData {
 				string contents;
 				using (var wc = new System.Net.WebClient()) {
 					contents = wc.DownloadString(
-						"http://mmx-online-hdm.github.io/serverinfo/serverurl.txt"
+						"https://mmx-online-hdm.github.io/serverinfo/serverurl.txt"
 					);
 				}
 				portUrl = contents.Split(":");

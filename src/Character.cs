@@ -994,7 +994,7 @@ public partial class Character : Actor, IDamagable {
 		}
 		// Summon if maverick is not spawned.
 		else if (player.input.isPressed(Control.Shoot, player)) {
-			mw.summon(player, pos, pos, xDir);
+			mw.summon(player, pos, xDir);
 		}
 	}
 

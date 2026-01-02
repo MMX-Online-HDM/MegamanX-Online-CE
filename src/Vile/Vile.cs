@@ -48,6 +48,7 @@ public class Vile : Character {
 		player, x, y, xDir, isVisible,
 		netId, ownedByLocalPlayer, isWarpIn, heartTanks, isATrans
 	) {
+		mk2VileOverride = true;
 		charId = CharIds.Vile;
 		if (isWarpIn) {
 			if (mk5VileOverride) {
@@ -225,7 +226,7 @@ public class Vile : Character {
 				}
 				Weapon rideWeapon = weaponSystem.rideWeapon;
 				if (stunShotPressed && !HeldDown && rideWeapon.shootCooldown <= 0) {
-					rideWeapon.vileShoot(WeaponIds.ElectricShock, this);
+					rideWeapon.vileShoot(this);
 				}
 				if (goliathShotPressed) {
 					if (goliath && !rideArmor.isAttacking() && mechBusterCooldown <= 0) {
@@ -259,7 +260,7 @@ public class Vile : Character {
 			changeState(new HexaInvoluteState(), true);
 		}
 		else if (chargeLevel >= 3) {
-			weaponSystem.chargeWeapon.vileShoot(WeaponIds.VileLaser, this);
+			weaponSystem.chargeWeapon.vileShoot(this);
 		}
 	}
 
@@ -893,6 +894,9 @@ public class Vile : Character {
 	public override void aiAttack(Actor? target) {
 		int vattack = Helpers.randomRange(1, 7);
 		bool isFacingTarget = (pos.x * xDir < target?.pos.x * xDir);
+		if (isFacingTarget && charState is Dash or AirDash && charState.isGrabbing == true) {
+			return;
+		}
 
 		if (canShoot() && charState.attackCtrl && aiAttackCooldown <= 0) {
 			if (isVileMK2 && charState is Dash or AirDash && isFacingTarget) {
@@ -900,7 +904,7 @@ public class Vile : Character {
 				aiAttackCooldown = 20;
 				return;
 			}
-			if (isFacingTarget && canTurn() && charState.normalCtrl) {
+			if (!isFacingTarget && canTurn() && charState.normalCtrl) {
 				if (xDir == 1) {
 					player.press(Control.Left);
 				} else {

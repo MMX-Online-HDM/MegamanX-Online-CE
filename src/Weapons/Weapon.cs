@@ -278,7 +278,7 @@ public class Weapon {
 	) {
 	}
 
-	public virtual void vileShoot(WeaponIds weaponInput, Vile vile) {
+	public virtual void vileShoot(Vile vile) {
 	}
 
 	// For melee / zero weapons, etc.

@@ -15,10 +15,10 @@ public class MorphMothCocoon : Maverick {
 	public bool isBurned { get { return sprite.name.Contains("_burn"); } }
 	public float smokeTime;
 	public MorphMothCocoon(
-		Player player, Point pos, Point destPos, int xDir,
-		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+		Player player, Point pos, int xDir, ushort? netId,
+		bool ownedByLocalPlayer, bool sendRpc = false
 	) : base(
-		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+		player, pos, xDir, netId, ownedByLocalPlayer
 	) {
 		stateCooldowns = new() {
 			{ typeof(MShoot), new(45, true) },
@@ -122,7 +122,7 @@ public class MorphMothCocoon : Maverick {
 					mmw.isMoth = true;
 					//Point spawnPos = getCenterPos().addxy(0, 27 * yScale);
 					Point spawnPos = getCenterPos().addxy(0, 0);
-					mmw.summon(player, spawnPos, spawnPos, xDir, isMothHatch: true);
+					mmw.summon(player, spawnPos, xDir, isMothHatch: true);
 					mmw.maverick!.invulnTime = 0.5f;
 					mmw.maverick.health = health;
 

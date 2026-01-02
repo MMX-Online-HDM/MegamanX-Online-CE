@@ -110,8 +110,8 @@ public class RollingShieldProj : Projectile {
 	}
 
 	public override void onHitDamagable(IDamagable damagable) {
-		if (damagable is not TorpedoProjX or TorpedoProjChargedX or 
-			TorpedoProjChargedOcto or TorpedoProjMech
+		if (damagable is not TorpedoProjX and not TorpedoProjChargedX and not
+			TorpedoProjChargedOcto and not TorpedoProjMech
 		) {
 			base.onHitDamagable(damagable);
 		}

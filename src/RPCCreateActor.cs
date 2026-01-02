@@ -78,31 +78,31 @@ public class RPCCreateActor : RPC {
 				new RideArmor(player, pos, 0, 0, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.ChillPenguin:
-				new ChillPenguin(player, pos, pos, xDir, netProjByte, false);
+				new ChillPenguin(player, pos, xDir, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.SparkMandrill:
-				new SparkMandrill(player, pos, pos, xDir, netProjByte, false);
+				new SparkMandrill(player, pos, xDir, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.ArmoredArmadillo:
-				new ArmoredArmadillo(player, pos, pos, xDir, netProjByte, false);
+				new ArmoredArmadillo(player, pos, xDir, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.LaunchOctopus:
-				new LaunchOctopus(player, pos, pos, xDir, netProjByte, false);
+				new LaunchOctopus(player, pos, xDir, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.BoomerangKuwanger:
-				new BoomerangKuwanger(player, pos, pos, xDir, netProjByte, false);
+				new BoomerangKuwanger(player, pos, xDir, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.StingChameleon:
-				new StingChameleon(player, pos, pos, xDir, netProjByte, false);
+				new StingChameleon(player, pos, xDir, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.StormEagle:
-				new StormEagle(player, pos, pos, xDir, netProjByte, false);
+				new StormEagle(player, pos, xDir, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.FlameMammoth:
-				new FlameMammoth(player, pos, pos, xDir, netProjByte, false);
+				new FlameMammoth(player, pos, xDir, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.Velguarder:
-				new Velguarder(player, pos, pos, xDir, netProjByte, false);
+				new Velguarder(player, pos, xDir, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.WolfSigmaHead:
 				new WolfSigmaHead(pos, player, netProjByte, false);
@@ -123,34 +123,34 @@ public class RPCCreateActor : RPC {
 				new SmallAmmoPickup(player, pos, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.WireSponge:
-				new WireSponge(player, pos, pos, xDir, netProjByte, false);
+				new WireSponge(player, pos, xDir, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.WheelGator:
-				new WheelGator(player, pos, pos, xDir, netProjByte, false);
+				new WheelGator(player, pos, xDir, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.BubbleCrab:
-				new BubbleCrab(player, pos, pos, xDir, netProjByte, false);
+				new BubbleCrab(player, pos, xDir, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.FlameStag:
-				new FlameStag(player, pos, pos, xDir, netProjByte, false);
+				new FlameStag(player, pos, xDir, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.MorphMoth:
-				new MorphMoth(player, pos, pos, xDir, netProjByte, false, false);
+				new MorphMoth(player, pos, xDir, netProjByte, false, false);
 				break;
 			case (int)NetActorCreateId.MorphMothCocoon:
-				new MorphMothCocoon(player, pos, pos, xDir, netProjByte, false);
+				new MorphMothCocoon(player, pos, xDir, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.MagnaCentipede:
-				new MagnaCentipede(player, pos, pos, xDir, netProjByte, false);
+				new MagnaCentipede(player, pos, xDir, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.CrystalSnail:
-				new CrystalSnail(player, pos, pos, xDir, netProjByte, false);
+				new CrystalSnail(player, pos, xDir, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.OverdriveOstrich:
-				new OverdriveOstrich(player, pos, pos, xDir, netProjByte, false);
+				new OverdriveOstrich(player, pos, xDir, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.FakeZero:
-				new FakeZero(player, pos, pos, xDir, netProjByte, false);
+				new FakeZero(player, pos, xDir, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.CrystalSnailShell:
 				new CrystalSnailShell(pos, xDir, null, player, netProjByte, false, false);
@@ -168,31 +168,31 @@ public class RPCCreateActor : RPC {
 				new Mechaniloid(pos, player, xDir, new MechaniloidWeapon(player, MechaniloidType.Fish), MechaniloidType.Fish, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.BlizzardBuffalo:
-				new BlizzardBuffalo(player, pos, pos, xDir, netProjByte, false);
+				new BlizzardBuffalo(player, pos, xDir, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.ToxicSeahorse:
-				new ToxicSeahorse(player, pos, pos, xDir, netProjByte, false);
+				new ToxicSeahorse(player, pos, xDir, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.TunnelRhino:
-				new TunnelRhino(player, pos, pos, xDir, netProjByte, false);
+				new TunnelRhino(player, pos, xDir, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.VoltCatfish:
-				new VoltCatfish(player, pos, pos, xDir, netProjByte, false);
+				new VoltCatfish(player, pos, xDir, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.CrushCrawfish:
-				new CrushCrawfish(player, pos, pos, xDir, netProjByte, false);
+				new CrushCrawfish(player, pos, xDir, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.NeonTiger:
-				new NeonTiger(player, pos, pos, xDir, netProjByte, false);
+				new NeonTiger(player, pos, xDir, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.GravityBeetle:
-				new GravityBeetle(player, pos, pos, xDir, netProjByte, false);
+				new GravityBeetle(player, pos, xDir, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.BlastHornet:
-				new BlastHornet(player, pos, pos, xDir, netProjByte, false);
+				new BlastHornet(player, pos, xDir, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.DrDoppler:
-				new DrDoppler(player, pos, pos, xDir, netProjByte, false);
+				new DrDoppler(player, pos, xDir, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.RideChaser:
 				new RideChaser(player, pos, 0, netProjByte, false);

@@ -1163,7 +1163,7 @@ public class Zero : Character {
 		ComboAttacks(target);
 		WildDance(target);
 		if (charState.attackCtrl && !player.isDead && sprite.name != null && !isWildDance && !isInvulnerable() &&
-		 	aiAttackCooldown <= 0 && isFacingTarget && charState is not SwordBlock or ZeroGigaAttack or RekkohaState) {
+		 	aiAttackCooldown <= 0 && isFacingTarget && charState is not SwordBlock and not ZeroGigaAttack and not RekkohaState) {
 			int ZSattack = Helpers.randomRange(0, 11);
 			if (!(sprite.name == "zero_attack" || sprite.name == "zero_attack3" || sprite.name == "zero_attack2")) {
 				switch (ZSattack) {

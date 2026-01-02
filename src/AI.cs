@@ -374,8 +374,8 @@ public class AI {
 	}
 	public int getRandomWeaponIndex() {
 		if (player.weapons.Count == 0) return 0;
-		List<Weapon> weapons = player.weapons.FindAll(w => w is not DNACore or IceGattling or BlastLauncher).ToList();
-		return weapons.IndexOf(weapons.GetRandomItem());                                         // removing IceGattling until know the bug
+		List<Weapon> weapons = player.weapons.FindAll(w => w is not DNACore).ToList();
+		return weapons.IndexOf(weapons.GetRandomItem());
 	}
 	public void changeState(AIState newState, bool forceChange = false) {
 		if (aiState is FindPlayer && newState is not FindPlayer && character.flag != null) {
@@ -449,7 +449,7 @@ public class AI {
 	public void randomlyChangeStuff() {
 		float stuckTime = (aiState as FindPlayer)?.stuckTime ?? 0;
 		bool inNodeTransition = (aiState as FindPlayer)?.nodeTransition != null;
-		if (player.weapon != null && player.weapon.ammo <= 0 && player.weapon is not XBuster or AxlBullet) {
+		if (player.weapon != null && player.weapon.ammo <= 0 && player.weapon is not XBuster and not AxlBullet) {
 			player.changeWeaponSlot(getRandomWeaponIndex());
 		}
 		if (aiState.randomlyChangeState && character != null) {
@@ -465,7 +465,7 @@ public class AI {
 			stopDashSpam <= 0 &&
 			!inNodeTransition && stuckTime == 0 &&
 			character.charState.normalCtrl &&
-			character.charState is not Dash or AirDash or UpDash
+			character.charState is not Dash and not AirDash and not UpDash
 		) {
 			if (Helpers.randomRange(0, 75) < 5) {
 				dashTime = Helpers.randomRange(0.3f, 0.5f);

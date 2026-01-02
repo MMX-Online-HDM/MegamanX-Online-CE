@@ -54,6 +54,9 @@ public class VileWeaponSystem : Weapon {
 			airAltWps, airShootWps, airSpecialWps,
 			extraWeapons
 		];
+		Weapon?[] groundArray = [..altWps, ..shootWps, ..specialWps];
+		Weapon?[] airArray = [..airAltWps,..airShootWps,..airSpecialWps];
+
 
 		// Populate unique weapon list.
 		int i = 0;
@@ -61,8 +64,8 @@ public class VileWeaponSystem : Weapon {
 			foreach (Weapon? weapon in weaponArray) {
 				if (weapon != null) {
 					uniqueWeapons.Add(weapon);
-					if (i <= 2) { uniqueGroundWeapons.Add(weapon); }
-					if (i >= 3 && i <= 5) { uniqueAirWeapons.Add(weapon); }
+					if (groundArray.Contains(weapon)) { uniqueGroundWeapons.Add(weapon); }
+					if (airArray.Contains(weapon)) { uniqueAirWeapons.Add(weapon); }
 				}
 			}
 		}
@@ -152,7 +155,7 @@ public class VileWeaponSystem : Weapon {
 	public void extraWeaponShoot(Vile vile) {
 		foreach (Weapon weapon in extraWeapons) {
 			if (weapon.customShootCondition(vile)) {
-				weapon.vileShoot(0, vile);
+				weapon.vileShoot(vile);
 			}
 		}
 	}
@@ -164,15 +167,16 @@ public class VileWeaponSystem : Weapon {
 
 		// Get all off-cooldown ones.
 		Weapon[] offCooldownWeapons = targetWeapons.Where(
-			w => w.shootCooldown == 0 && w.getAmmoUsage(0) >= ammoLeft
+			w => w.shootCooldown <= 0 && w.getAmmoUsage(0) <= ammoLeft
 		).ToArray();
 
 		// If list is emtpty. Return.
-		if (offCooldownWeapons.Length > 0) {
+		if (offCooldownWeapons.Length == 0) {
 			return false;
 		}
-		Weapon target = offCooldownWeapons[Helpers.randomRange(0, offCooldownWeapons.Length - 1)];
-		target.vileShoot(0, vile);
+		int targetWeapon = Helpers.randomRange(0, offCooldownWeapons.Length - 1);
+		Weapon target = offCooldownWeapons[targetWeapon];
+		target.vileShoot(vile);
 
 		return true;
 	}
@@ -224,7 +228,7 @@ public class VileWeaponSystemSub {
 			targetWeapon.canShoot(0, vile.player) &&
 			checkShootAble(vile, targetWeapon, button)
 		) {
-			targetWeapon.vileShoot(0, vile);
+			targetWeapon.vileShoot(vile);
 			return true;
 		}
 		return false;

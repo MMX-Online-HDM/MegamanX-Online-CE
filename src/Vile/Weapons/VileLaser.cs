@@ -33,7 +33,7 @@ public class RisingSpecter : VileLaser {
 		flinch = "26";
 		effect = "Insane Hitbox.";
 	}
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+	public override void vileShoot(Vile vile) {
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		vile.changeState(new LaserAttack(this), true);
 	}
@@ -65,7 +65,7 @@ public class NecroBurst : VileLaser {
 		flinch = "26";
 		effect = "Self Damages.";
 	}
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+	public override void vileShoot(Vile vile) {
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		vile.changeState(new LaserAttack(this), true);
 	}
@@ -97,7 +97,7 @@ public class StraightNightmare : VileLaser {
 		hitcooldown = "0.15";
 		effect = "Won't destroy on hit.";
 	}
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+	public override void vileShoot(Vile vile) {
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		vile.changeState(new LaserAttack(this), true);
 	}

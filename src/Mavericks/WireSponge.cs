@@ -14,10 +14,10 @@ public class WireSponge : Maverick {
 	//public ShaderWrapper chargeShader;
 	public float chargeTime;
 
-	public WireSponge(Player player, Point pos, Point destPos, int xDir,
-		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+	public WireSponge(Player player, Point pos, int xDir, ushort? netId,
+		bool ownedByLocalPlayer, bool sendRpc = false
 	) : base(
-		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+		player, pos, xDir, netId, ownedByLocalPlayer
 	) {
 		stateCooldowns = new() {
 			{ typeof(WSpongeSeedThrowState), new MaverickStateCooldown(45, true) },

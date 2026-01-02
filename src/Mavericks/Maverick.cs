@@ -188,9 +188,8 @@ public class Maverick : Actor, IDamagable {
 	}
 
 	public Maverick(
-		Player player, Point pos, Point destPos, int xDir,
-		ushort? netId, bool ownedByLocalPlayer,
-		MaverickState? overrideState = null
+		Player player, Point pos, int xDir, ushort? netId,
+		bool ownedByLocalPlayer, MaverickState? overrideState = null
 	) : base(
 		"", pos, netId, ownedByLocalPlayer, true
 	) {
@@ -227,7 +226,7 @@ public class Maverick : Actor, IDamagable {
 		state = new MLimboState();
 		state.maverick = this;
 		if (ownedByLocalPlayer) {
-			changeState(overrideState ?? new MEnter(destPos));
+			changeState(overrideState ?? new MEnter());
 		}
 		_input = new Input(true);
 

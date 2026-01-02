@@ -33,7 +33,7 @@ public class WildHorseKick : VileFlamethrower {
 		effect = "Fire DOT: 0.5";
 		vileAmmoUsage = 2;
 	}
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+	public override void vileShoot(Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		vile.changeState(new FlamethrowerAttacks(this), true);
@@ -65,7 +65,7 @@ public class SeaDragonRage : VileFlamethrower {
 		hitcooldown = "0.1";
 		effect = "Stack hits to freeze.";
 	}
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+	public override void vileShoot(Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		vile.changeState(new FlamethrowerAttacks(this), true);
@@ -96,7 +96,7 @@ public class DragonsWrath : VileFlamethrower {
 		hitcooldown = "0.1";
 		effect = "None.";
 	}
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+	public override void vileShoot(Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		vile.changeState(new FlamethrowerAttacks(this), true);

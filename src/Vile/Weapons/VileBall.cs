@@ -31,7 +31,7 @@ public class ExplosiveRound : VileBall {
 		hitcooldown = "0.2";
 		effect = "Splits on ground.";
 	}
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+	public override void vileShoot(Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		vile.changeState(new BallAttacks(this), true);
@@ -59,7 +59,7 @@ public class SpreadShot : VileBall {
 		damage = "1";
 		effect = "Stuns Enemies. CD: 2";
 	}
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+	public override void vileShoot(Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		vile.changeState(new BallAttacks(this), true);
@@ -91,7 +91,7 @@ public class PeaceOutRoller : VileBall {
 		flinch = "6";
 		effect = "Splits on ground.";
 	}
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+	public override void vileShoot(Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		vile.changeState(new BallAttacks(this), true);

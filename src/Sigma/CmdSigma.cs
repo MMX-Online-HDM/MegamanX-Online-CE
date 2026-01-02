@@ -56,8 +56,8 @@ public class CmdSigma : BaseSigma {
 		}
 		// For ladder and slide attacks.
 		if (isAttacking() && charState is WallSlide or LadderClimb && !isSigmaShooting()) {
-			if (isAnimOver() && charState != null && charState is not SigmaSlashStateGround 
-			or SigmaSlashStateDash or SigmaSlashStateAir
+			if (isAnimOver() && charState != null && charState is not SigmaSlashStateGround
+			and not SigmaSlashStateDash and not SigmaSlashStateAir
 			) {
 				changeSprite(getSprite(charState.defaultSprite), true);
 				if (charState is WallSlide && sprite != null) {
@@ -217,7 +217,7 @@ public class CmdSigma : BaseSigma {
 			if (mw.maverick != null) {
 				changeState(new CallDownMaverick(mw.maverick, true, false), true);
 			}
-			mw.summon(player, pos.addxy(0, -112), pos, xDir);
+			mw.summon(player, pos, xDir);
 			player.changeToSigmaSlot();
 		}
 		if (charState is not LadderClimb) {

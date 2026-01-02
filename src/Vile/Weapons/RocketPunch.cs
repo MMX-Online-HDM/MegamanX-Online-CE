@@ -39,7 +39,7 @@ public class GoGetterRight : RocketPunch {
 		flinchCD = "1";
 		effect = "Won't destroy on hit.";
 	}
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+	public override void vileShoot(Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		if (vile.charState is RocketPunchAttack) return;
@@ -73,7 +73,7 @@ public class SpoiledBrat : RocketPunch {
 		flinchCD = "1";
 		effect = "Destroys on hit.";
 	}
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+	public override void vileShoot(Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		vile.changeState(new RocketPunchAttack(this), true);
@@ -106,7 +106,7 @@ public class InfinityGig : RocketPunch {
 		flinchCD = "1";
 		effect = "Homing,Travels further.";
 	}
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+	public override void vileShoot(Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		if (vile.charState is RocketPunchAttack) return;
