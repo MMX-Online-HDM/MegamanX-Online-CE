@@ -512,7 +512,7 @@ public class Zero : Character {
 		int yDir = player.input.getYDir(player);
 		// Giga attacks.
 		if (yDir == 1 && specialPressed) {
-			if (flag != null && gigaAttack.shootCooldown <= 0 &&
+			if (flag == null && gigaAttack.shootCooldown <= 0 &&
 				gigaAttack.ammo >= gigaAttack.getAmmoUsage(0)
 			) {
 				gigaAttack.shoot(this, []);
