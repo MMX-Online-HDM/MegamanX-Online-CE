@@ -1201,6 +1201,16 @@ public partial class Character : Actor, IDamagable {
 			vel.y = 0;
 		}
 
+		if (isATrans) {
+			updateDisguisedAxl();
+		}
+
+		updateCtrl();
+	}
+
+	public override void physicsUpdate() {
+		base.physicsUpdate();
+		
 		// This overrides the ground checks made by Actor.update();
 		if (rideArmorPlatform != null) {
 			changePos(rideArmorPlatform.getMK5Pos().addxy(0, 1));
@@ -1211,12 +1221,6 @@ public partial class Character : Actor, IDamagable {
 				rideArmorPlatform = null;
 			}
 		}
-
-		if (isATrans) {
-			updateDisguisedAxl();
-		}
-
-		updateCtrl();
 	}
 
 	
