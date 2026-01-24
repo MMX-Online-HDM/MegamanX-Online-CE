@@ -33,10 +33,10 @@ public class Flag : Actor {
 	}
 
 	public override void onStart() {
-		CollideData hit = Global.level.raycast(
-			pos.addxy(0, -10), pos.addxy(0, 60), new List<Type>() { typeof(Wall), typeof(Ladder) }
+		CollideData? hit = Global.level.raycast(
+			pos.addxy(0, -10), pos.addxy(0, 60), [typeof(Wall), typeof(Ladder)]
 		);
-		if (hit.hitData?.hitPoint != null) {
+		if (hit?.hitData?.hitPoint != null) {
 			changePos(hit.hitData.hitPoint.Value);
 		}
 		pedestal = new FlagPedestal(alliance, pos, null, ownedByLocalPlayer);
@@ -46,8 +46,9 @@ public class Flag : Actor {
 	public override void update() {
 		base.update();
 		Helpers.decrementTime(ref pickupCooldown);
-		if (!ownedByLocalPlayer) return;
-
+		if (!ownedByLocalPlayer) {
+			return;
+		}
 		if (killFeedThrottleTime > 0) {
 			killFeedThrottleTime += Global.spf;
 			if (killFeedThrottleTime > 1) killFeedThrottleTime = 0;
@@ -145,13 +146,12 @@ public class Flag : Actor {
 	}
 
 	public void pickupFlag(Character newChar) {
-		removeUpdraft();
 		newChar.onFlagPickup(this);
-		timeDropped = 0;
 		linkedChar = newChar;
-		useGravity = false;
-		pickedUpOnce = true;
 		if (newChar != linkedChar) {
+			if (linkedChar != null) {
+				linkedChar.flag = null;
+			}
 			Global.level.gameMode.addKillFeedEntry(
 				new KillFeedEntry(
 					newChar.player.name + " took flag", newChar.player.alliance, newChar.player
@@ -164,18 +164,29 @@ public class Flag : Actor {
 		if (newChar.ai != null && newChar.ai.aiState is FindPlayer) {
 			(newChar.ai.aiState as FindPlayer)?.setDestNodePos();
 		}
+		removeUpdraft();
+		useGravity = false;
+		pickedUpOnce = true;
+		timeDropped = 0;
 	}
 
 	public void dropFlag() {
-		if (linkedChar != null) {
-			removeUpdraft();
-			Global.level.gameMode.addKillFeedEntry(
-				new KillFeedEntry(linkedChar.player.name + " dropped flag",
-				linkedChar.player.alliance, linkedChar.player), true
-			);
-			useGravity = true;
-			linkedChar = null;
+		if (linkedChar == null) {
+			return;
 		}
+		Player oldPlayer = linkedChar.player;
+		linkedChar = null;
+		if (!ownedByLocalPlayer) {
+			return;
+		}
+		Global.level.gameMode.addKillFeedEntry(
+			new KillFeedEntry(
+				$"{oldPlayer.name} dropped flag",
+				oldPlayer.alliance, oldPlayer
+			), true
+		);
+		removeUpdraft();
+		useGravity = true;
 	}
 
 	public void returnFlag() {
@@ -244,10 +255,8 @@ public class Flag : Actor {
 
 		// To avoid latency of flag not sticking to character in online
 		if (linkedChar != null && !linkedChar.destroyed) {
-			Point centerPos = linkedChar.getCenterPos();
-			Point renderPos = new Point(
-				centerPos.x - MathF.Round(pos.x), centerPos.y - MathF.Round(pos.y)
-			);
+			Point centerPos = linkedChar.pos.addxy(-10 * linkedChar.xDir, -10);
+			Point renderPos = new Point(centerPos.x - MathF.Round(pos.x), centerPos.y - MathF.Round(pos.y));
 			base.render(renderPos.x, renderPos.y);
 			return;
 		}
@@ -294,41 +303,37 @@ public class Flag : Actor {
 			.. BitConverter.GetBytes(linkedChar?.netId ?? ushort.MaxValue),
 			(byte)(hasUpdraft() ? 1 : 0),
 			(byte)(pickedUpOnce ? 1 : 0),
-			(byte)MathF.Floor(timeDropped * 8),
+			(byte)MathF.Min(MathF.Floor(timeDropped * 8), 255),
 		];
 		return customData;
 	}
 
 	public override void updateCustomActorNetData(byte[] data) {
-		ushort chrNetId = BitConverter.ToUInt16(data[0..2]);
+		ushort chrNetId = BitConverter.ToUInt16(data.AsSpan()[0..2]);
 		nonOwnerHasUpdraft = data[2] == 1;
 		pickedUpOnce = data[3] == 1;
 		timeDropped = data[4] / 8f;
 
-		bool wasActive = isPickedUpNet;
+		bool wasActive = isPickedUpNet || linkedChar != null;
 		if (chrNetId != ushort.MaxValue) {
 			if (Global.level.getActorByNetId(chrNetId) is Character chara) {
 				if (chara.flag != this) {
-					if (chara.flag != null) {
-						chara.dropFlag();
-					}
 					pickupFlag(chara);
 				}
 				xDir = -chara.xDir;
 				linkedChar = chara;
 			}
 		}
-		else if (wasActive || linkedChar != null) {
-			if (linkedChar == null) {
-				foreach (Player player in Global.level.players) {
-					if (player?.character != null && player.character.flag == this) {
-						player.character.dropFlag();
-						player.character.flag = null;
-					}
+		else if (wasActive) {
+			foreach (Player player in Global.level.players) {
+				if (player?.character != null && player.character.flag == this) {
+					player.character.flag = null;
 				}
-			} else {
-				dropFlag();
 			}
+			if (linkedChar != null) {
+				linkedChar.flag = null;
+			}
+			dropFlag();
 			linkedChar = null;
 		}
 		isPickedUpNet = linkedChar != null;
