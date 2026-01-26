@@ -576,6 +576,7 @@ public class LevelData {
 		{ "tower", "boomerangKuwanger" },
 		// X2 stuff.
 		{ "centralcomputer", "magnetCentipede" },
+		{ "centralcomputer2", "magnetCentipede-OldGsU" },
 		{ "crystalmine", "crystalSnail" },
 		{ "deepseabase", "bubbleCrab" },
 		{ "desertbase", "overdriveOstrich" },
@@ -878,6 +879,36 @@ public class LevelData {
 			case "Prototype Doppler C":
 				backwallShader = "PrototypeDopplerC";
 				backwallShaderImage = "palettePDopplerCBW";
+				break;
+			case "Weather Control Center":
+				backwallShader = "WeatherControlCenterBW";
+				backwallShaderImage = "paletteBWweatherControl";
+				break;
+			case "Dinosaur Type Terrestrial":
+				backwallShader = "DinosaurTankBW";
+				backwallShaderImage = "paletteBWdinosaurTank";
+				foregroundShader = "DinosaurTankFG";
+				foregroundShaderImage = "paletteFGdinosaurTank";
+				break;
+			case "Desert Base":
+				backwallShader = "DesertBaseBG";
+				backwallShaderImage = "paletteBWdessertBase";
+				break;
+			case "Central Computer":
+				backwallShader = "CentralComputerBG";
+				backwallShaderImage = "paletteBWcentralComputer";
+				break;
+			case "Sigma 1":
+				backwallShader = "Sigma1PX";
+				backwallShaderImage = "paletteSigma1BW";
+				break;
+			case "Tower":
+				backwallShader = "TowerBGBW";
+				backwallShaderImage = "paletteTowerBW";
+				break;
+			case "Central Computer 2":
+				backwallShader = "CentralComputer2BW";
+				backwallShaderImage = "paletteCentralComputer2BW";
 				break;
 		}
 	}
