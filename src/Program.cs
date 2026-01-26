@@ -1341,6 +1341,7 @@ class Program {
 						f6Released = true;
 					}
 					// Framerate shenanigans.
+					/*
 					if (Keyboard.IsKeyPressed(Key.F7)) {
 						if (f7Released) {
 							Options.main.fpsMode = Options.main.fpsMode switch {
@@ -1353,7 +1354,7 @@ class Program {
 						}
 					} else {
 						f7Released = true;
-					}
+					} */
 				}
 			}
 			if (!(deltaTime >= 1)) {
