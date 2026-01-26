@@ -677,6 +677,17 @@ public class GameMode {
 				}
 			}
 			#endregion
+			#region Vile
+			if (drawPlayer.character is Vile vava) {
+				int xStart = (int)Global.halfScreenW / 17;
+				int yStart = 160;
+				if (vava.deadCooldown > 0) {
+					float Ccooldown = 1 - Helpers.progress(vava.deadCooldown, Vile.maxdeadCooldown);
+					drawGigaWeaponCooldown(175, Ccooldown, xStart, yStart, isKillFeed: true, xStart, yStart);
+				}
+			}
+
+
 			if (drawPlayer.character is Vile vilePilot &&
 				vilePilot.rideArmor != null &&
 				vilePilot.rideArmor == vilePilot.linkedRideArmor
@@ -693,6 +704,7 @@ public class GameMode {
 					FontType.Grey, "x" + vilePilot.rideArmor.hawkBombCount.ToString(), x + 10, y - 4
 				);
 			}
+			#endregion
 			#region Axl
 			if (level.mainPlayer.character is Axl axl) {
 				int xStart = (int)Global.halfScreenW / 17;
