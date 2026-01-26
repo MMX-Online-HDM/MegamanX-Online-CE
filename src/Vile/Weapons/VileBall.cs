@@ -132,7 +132,7 @@ public class BallAttacks : VileState {
 	public override void update() {
 		base.update();
 
-		if (vile.energy.ammo < weapon.vileAmmoUsage && character.isAnimOver()) {
+		if (vile.energy.ammo < weapon.vileAmmoUsage) {
 			character.changeToCrouchOrFall();
 			return;
 		}
@@ -163,6 +163,7 @@ public class BallAttacks : VileState {
 						weapon.shoot(vile, [i + 1]);
 					}
 				}
+				if (stateTime > 44f / 60f) character.changeToCrouchOrFall();
 			} else if (weapon is PeaceOutRoller && !shot) {
 				weapon.shoot(vile, []);
 				shot = true;

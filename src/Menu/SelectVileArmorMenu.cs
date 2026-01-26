@@ -59,7 +59,7 @@ public class SelectVileArmorMenu : IMainMenu {
 		var gameMode = Global.level.gameMode;
 		DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
 		DrawWrappers.DrawTextureHUD(
-			Global.textures[CVile?.isVileMK2 == true ? "vileNewMenuMK2" : "vileNewMenuDefault"],
+			Global.textures[CVile?.isVileMK5 == true ? "vileVNewMenu" : CVile?.isVileMK2 == true ? "vileNewMenuMK2" : "vileNewMenuDefault"],
 			Global.halfScreenW + 60, Global.halfScreenH - 103
 		);
 

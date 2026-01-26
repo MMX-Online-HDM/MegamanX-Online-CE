@@ -36,6 +36,9 @@ public class Vile : Character {
 	public VileLoadout loadout;
 	public MechMenuWeapon rideMenuWeapon;
 	public VileWeaponSystem weaponSystem;
+	public float missileCannonCooldown; 
+	
+	// When firing missile, you can't shoot cannon until it reaches 0
 	public float aiAttackCooldown;
 
 	public Vile(
@@ -48,7 +51,7 @@ public class Vile : Character {
 		player, x, y, xDir, isVisible,
 		netId, ownedByLocalPlayer, isWarpIn, heartTanks, isATrans
 	) {
-		mk2VileOverride = true;
+		mk2VileOverride = false;
 		charId = CharIds.Vile;
 		if (isWarpIn) {
 			if (mk5VileOverride) {
@@ -159,6 +162,7 @@ public class Vile : Character {
 		Helpers.decrementFrames(ref aiAttackCooldown);
 		Helpers.decrementFrames(ref vulcanLingerTime);
 		Helpers.decrementFrames(ref deadCooldown);
+		Helpers.decrementFrames(ref missileCannonCooldown);
 		addWeaponHealAmmo();
 
 		if ((grounded || charState is LadderClimb or LadderEnd or WallSlide) && vileHoverTime > 0) {

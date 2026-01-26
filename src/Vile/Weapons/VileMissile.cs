@@ -46,6 +46,7 @@ public class ElectricShock : VileMissile {
 	}
 	public override void shoot(Character character, int[] args) {
 		if (character is not Vile vava) return;
+		vava.missileCannonCooldown = 36;
 		vava.setVileShootTime(this);
 		vava.tryUseVileAmmo(vileAmmoUsage);
 		Point shootVel = vava.getVileShootVel(true);
@@ -118,10 +119,11 @@ public class HumerusCrush : VileMissile {
 	}
 	public override void shoot(Character character, int[] args) {
 		if (character is not Vile vava) return;
+		vava.missileCannonCooldown = 36;
 		vava.setVileShootTime(this);
 		vava.tryUseVileAmmo(vileAmmoUsage);
 		character.playSound("vileMissile", sendRpc: true);
-		Point shootVel = vava.getVileShootVel(false);
+		Point shootVel = vava.getVileShootVel(true);
 		Point shootPos;
 		if (vava.isVileMK2 || vava.isVileMK5) {
 			shootPos = vava.getVileMK2StunShotPos();
@@ -162,10 +164,11 @@ public class PopcornDemon : VileMissile {
 	}
 	public override void shoot(Character character, int[] args) {
 		if (character is not Vile vava) return;
+		vava.missileCannonCooldown = 36;
 		vava.setVileShootTime(this);
 		vava.tryUseVileAmmo(vileAmmoUsage);
 		character.playSound("vileMissile", sendRpc: true);
-		Point shootVel = vava.getVileShootVel(false);
+		Point shootVel = vava.getVileShootVel(true);
 		Point shootPos;
 		if (vava.isVileMK2 || vava.isVileMK5) {
 			shootPos = vava.getVileMK2StunShotPos();
