@@ -620,10 +620,12 @@ public abstract class ZeroGigaAttack : CharState {
 		}
 	}
 	
+	/*
 	public override void onEnter(CharState oldState) {
 		character.clenaseDmgDebuffs();
 		base.onEnter(oldState);
 	}
+	*/
 
 	public override void onExit(CharState? newState) {
 		weapon.shootCooldown = weapon.fireRate;
@@ -649,6 +651,11 @@ public class RakuhouhaState : ZeroGigaAttack {
 		character.shakeCamera(sendRpc: true);
 		character.playSound("rakuhouha", sendRpc: true);
 		character.playSound("crashX2", sendRpc: true);
+	}
+
+	public override void onEnter(CharState oldState) {
+		character.clenaseDmgDebuffs();
+		base.onEnter(oldState);
 	}
 }
 
