@@ -798,12 +798,16 @@ public class BaseSigma : Character {
 			// Push the generic Sigma slot.
 			int sigmaWeaponSlot = 1;
 			// Always put the AI and enemies slot in the center.
+			//yo fix your logic here
+			/*
 			if (Global.level.mainPlayer == player &&
 				commandMode != (int)MaverickModeId.Summoner &&
 				commandMode != (int)MaverickModeId.Puppeteer
 			) {
 				sigmaWeaponSlot = Helpers.clamp(Options.main.sigmaWeaponSlot, 0, 2);
 			}
+			*/
+			sigmaWeaponSlot = Helpers.clamp(Options.main.sigmaWeaponSlot, 0, 2);
 			retWeapons.Insert(sigmaWeaponSlot, new SigmaMenuWeapon());
 			weaponSlot = sigmaWeaponSlot;
 			this.sigmaWeaponSlot = sigmaWeaponSlot;
