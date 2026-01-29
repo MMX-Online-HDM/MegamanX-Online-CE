@@ -144,9 +144,9 @@ public class ZeroUppercut : ZeroState {
 					character.frameIndex = 8;
 				}
 			}
-			if (character.sprite.frameIndex >= 9) {
+			if (character.sprite.frameIndex >= 8) {
 				if (!isHeld) {
-					character.vel.y = character.vel.y/1.25f;
+					character.vel.y = character.vel.y/1.35f;
 					character.changeToIdleOrFall();
 				}
 			}
