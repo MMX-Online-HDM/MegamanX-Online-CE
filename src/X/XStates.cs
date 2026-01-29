@@ -236,7 +236,6 @@ public class GigaAirDash : CharState {
 		base.update();
 		if (!player.isAI && !player.input.isHeld(initialDashButton, player) && !stop) {
 			dashTime = 900;
-			character.isDashing = false;
 		}
 		int inputXDir = player.input.getXDir(player);
 		bool dashHeld = player.input.isHeld(initialDashButton, player);
@@ -427,6 +426,7 @@ public class X2ChargeShot : XState {
 
 	public override void update() {
 		base.update();
+		character.turnToInput(player.input, player);
 		if (!fired && character.currentFrame.getBusterOffset() != null) {
 			fired = true;
 			if (shootNum == 0) {
@@ -515,9 +515,7 @@ public class X3ChargeShot : XState {
 
 	public override void update() {
 		base.update();
-		if (character.grounded) {
-			character.turnToInput(player.input, player);
-		}
+		character.turnToInput(player.input, player);
 		if (!fired && character.currentFrame.getBusterOffset() != null && player.ownedByLocalPlayer) {
 			fired = true;
 			if (state == 0) {
