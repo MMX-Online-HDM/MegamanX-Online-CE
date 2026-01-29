@@ -156,7 +156,7 @@ public class SigmaElectricBallState : CharState {
 	}
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.clenaseDmgDebuffs();
+		//character.clenaseDmgDebuffs();
 		neoSigma = character as NeoSigma ?? throw new NullReferenceException();
 	}
 }
