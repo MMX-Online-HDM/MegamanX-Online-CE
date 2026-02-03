@@ -84,6 +84,7 @@ public class Options {
 	public bool blockMechSlotScroll;
 	public bool mk5PuppeteerHoldOrToggle;
 	public bool lockInAirCannon = true;
+	public bool shootDiagonalMissile = false;
 	public VileLoadout vileLoadout = new VileLoadout();
 
 	// Axl
