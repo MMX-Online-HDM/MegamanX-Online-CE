@@ -349,8 +349,10 @@ public class Axl : Character {
 		}
 
 		//Reload Axl Bullets
-		if (isAxlBulletsType)  axlWeapon?.rechargeAxlBulletAmmo(player, this, shootHeld, 1);
-        customSettingReloadWeapon(); //Fix DNA
+		if (isAxlBulletsType) {
+			axlWeapon?.rechargeAxlBulletAmmo(player, this, shootHeld, 1);
+		}
+		customSettingReloadWeapon(); //Fix DNA
 
 		Helpers.decrementFrames(ref dodgeRollCooldown);
 		Helpers.decrementFrames(ref switchTime);
