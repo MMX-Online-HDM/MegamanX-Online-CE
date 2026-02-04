@@ -80,7 +80,7 @@ public class GigaCrushProj : Projectile {
 
 	public override void update() {
 		base.update();
-		foreach (var gameObject in Global.level.getGameObjectArray()) {
+		foreach (var gameObject in getCloseActors(350)) {
 			if (gameObject is Actor actor &&
 				actor.ownedByLocalPlayer &&
 				gameObject is IDamagable damagable &&
