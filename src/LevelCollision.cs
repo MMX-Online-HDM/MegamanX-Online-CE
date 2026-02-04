@@ -266,11 +266,6 @@ public partial class Level {
 		}
 	}
 
-
-	public List<GameObject> getGameObjectArray() {
-		return new List<GameObject>(gameObjects);
-	}
-
 	//Should actor collide with gameobject?
 	//Note: return true to indicate NOT to collide, and instead only trigger
 	public bool shouldTrigger(
