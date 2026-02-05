@@ -823,7 +823,7 @@ public partial class Level {
 
 		controlPoints.Sort((cp1, cp2) => cp1.num - cp2.num);
 		foreach (var navMeshNode in navMeshNodes) {
-			navMeshNode.setNeighbors(navMeshNodes, gameObjects.ToArray());
+			navMeshNode.setNeighbors(navMeshNodes, gameObjects.ToList());
 		}
 
 		// Dynamically assign nodes based on their proximity
