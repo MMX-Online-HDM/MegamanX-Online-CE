@@ -46,6 +46,7 @@ public class ElectricShock : VileMissile {
 	}
 	public override void shoot(Character character, int[] args) {
 		if (character is not Vile vava) return;
+		vava.missileCannonCooldown = 36;
 		vava.setVileShootTime(this);
 		vava.tryUseVileAmmo(vileAmmoUsage);
 		Point shootVel = vava.getVileShootVel(true);
@@ -118,6 +119,7 @@ public class HumerusCrush : VileMissile {
 	}
 	public override void shoot(Character character, int[] args) {
 		if (character is not Vile vava) return;
+		vava.missileCannonCooldown = 36;
 		vava.setVileShootTime(this);
 		vava.tryUseVileAmmo(vileAmmoUsage);
 		character.playSound("vileMissile", sendRpc: true);
@@ -162,6 +164,7 @@ public class PopcornDemon : VileMissile {
 	}
 	public override void shoot(Character character, int[] args) {
 		if (character is not Vile vava) return;
+		vava.missileCannonCooldown = 36;
 		vava.setVileShootTime(this);
 		vava.tryUseVileAmmo(vileAmmoUsage);
 		character.playSound("vileMissile", sendRpc: true);
