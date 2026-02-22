@@ -41,9 +41,12 @@ public class CharState {
 	public bool pushImmune;
 	public bool slowImmune;
 	public bool statusEffectImmune;
-	public int accuracy;
 	public bool isGrabbedState;
+	public bool immuneToAll;
+	public bool invulnerable;
+	public bool immortal;
 
+	public int accuracy;
 	public bool wasVileHovering;
 
 	// For grab states (I am grabber)
