@@ -50,7 +50,7 @@ public class VileMK2GrabState : CharState {
 		if (leechTime > 0.5f) {
 			leechTime = 0;
 			character.addHealth(1);
-			var damager = new Damager(player, 1, 0, 0);
+			var damager = new Damager(player, 1, 0, 30);
 			damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.VileMK2Grab);
 		}
 
@@ -80,6 +80,6 @@ public class VileMK2GrabState : CharState {
 
 public class VileMK2Grabbed : GenericGrabbedState {
 	public const float maxGrabTime = 4;
-	public VileMK2Grabbed(Character? grabber) : base(grabber, maxGrabTime, "vilemk2_grab") {
+	public VileMK2Grabbed(Character? grabber) : base(grabber, maxGrabTime, "grab") {
 	}
 }

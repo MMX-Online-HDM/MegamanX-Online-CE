@@ -671,7 +671,7 @@ public class Idle : CharState {
 		}
 
 		if (Global.level.server?.customMatchSettings?.magicPlus == true) {
-			if (character is not Zero){
+			if (character is not Zero and not BaseSigma ){
 				if (player.input.isHeld(Control.Up, player) && !player.input.isLeftOrRightHeld(player)) {
 				string block = "block";
 				attackCtrl = false;

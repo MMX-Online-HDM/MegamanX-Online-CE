@@ -888,6 +888,7 @@ public class WolfSigmaRevive : CharState {
 				character.frameSpeed = 1;
 			}
 			if (stateTime > 4.5f) {
+				character.destroyMusicSource();
 				state = 5;
 			}
 		} else if (state == 5) {

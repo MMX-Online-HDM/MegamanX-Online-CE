@@ -186,6 +186,30 @@ public class ViralSigma : Character {
 		return 43;
 	}
 
+	
+	public override bool normalCtrl() {
+		return false;
+	}
+
+
+	public override bool canPickupFlag() {
+		return false;
+	}
+
+	public override bool canKeepFlag() {
+		return false;
+	}
+
+
+	public override bool isNonDamageStatusImmune() {
+		return true;
+	}
+
+	public override bool isPushImmune() {
+		return true;
+	}
+	
+
 
 	public override string getSprite(string spriteName) {
 		if (Global.sprites.ContainsKey("viralsigma_" + spriteName)) {

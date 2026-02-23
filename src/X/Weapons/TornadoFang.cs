@@ -225,7 +225,7 @@ public class TornadoFangProjCharged : Projectile {
 				unlink();
 				return;
 			}
-			if (mmx == null || mmx.destroyed) {
+			if (mmx == null || mmx.destroyed || mmx.sprite.name.Contains("lose") || mmx.sprite.name.Contains("grabbed")) {
 				destroySelf();
 				return;
 			}

@@ -112,6 +112,19 @@ public class WolfSigma : Character {
 		return pos.round().addxy(camOffsetX, 0);
 	}
 
+	public override bool isNonDamageStatusImmune() {
+		return true;
+	}
+
+	public override bool normalCtrl() {
+		return false;
+	}
+	
+	public override bool isPushImmune() {
+		return true;
+	}
+	
+
 	public override void onDeath() {
 		base.onDeath();
 		player.lastDeathWasSigmaHyper = true;
