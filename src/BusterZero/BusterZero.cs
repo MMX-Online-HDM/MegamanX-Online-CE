@@ -67,7 +67,7 @@ public class BusterZero : Character {
 		loadout ??= player.loadout.pzeroLoadout.clone();
 		this.loadout = loadout;
 		altSoundId = AltSoundIds.X3;
-		if (Global.level.server?.customMatchSettings?.magicPlus == true) {
+		
 		
 		
 		gigaAttackSelected = loadout.gigaAttack;
@@ -77,7 +77,7 @@ public class BusterZero : Character {
 			_ => new RakuhouhaWeapon(),
 		};
 		hyperMode = loadout.hyperMode;
-		}
+		
 		
 	}
 	public override CharState getTauntState() {
@@ -85,7 +85,7 @@ public class BusterZero : Character {
 	}
 
 	public override void addAmmo(float amount) {
-		gigaAttack.addAmmoHeal(amount);
+		gigaAttack.addAmmo(amount, player);
 	}
 
 	public override void addPercentAmmo(float amount) {
@@ -565,11 +565,11 @@ public class BusterZero : Character {
 	public override List<byte> getCustomActorNetData() {
 		List<byte> customData = base.getCustomActorNetData();
 		customData.Add(Helpers.boolArrayToByte([
-				hypermodeBlink > 0,
+			isBlackZero,
+			hypermodeBlink > 0,
 			isAwakened,
 			isGenmuZero,
 			isViral,
-			isBlackZero,
 			stockedSaber
 		]));
 		if (hypermodeBlink > 0) {
@@ -585,10 +585,10 @@ public class BusterZero : Character {
 		data = data[data[0]..];
 		bool[] flags = Helpers.byteToBoolArray(data[0]);
 		isBlackZero = flags[0];
+		isViral = flags[4];
 		stockedSaber = flags[1];
 		stockedBusterLv = data[1];
-		awakenedPhase = (flags[5] ? 4 : (flags[3] ? 3 : 2));
-		isViral = flags[6];
+		awakenedPhase = (flags[2] ? 2 : (flags[1] ? 1 : 0));
 	}
 
 	public override void aiAttack(Actor? target) {

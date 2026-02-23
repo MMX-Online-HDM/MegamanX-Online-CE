@@ -1306,21 +1306,21 @@ public partial class Player {
 		input.possessedControlHeld[Control.Down] = Global.input.isHeld(Control.Down, Global.level.mainPlayer);
 		input.possessedControlHeld[Control.Jump] = Global.input.isHeld(Control.Jump, Global.level.mainPlayer);
 		input.possessedControlHeld[Control.Dash] = Global.input.isHeld(Control.Dash, Global.level.mainPlayer);
-		input.possessedControlHeld[Control.Taunt] = Global.input.isHeld(Control.Taunt, Global.level.mainPlayer);
 		input.possessedControlHeld[Control.Shoot] = Global.input.isHeld(Control.Shoot, Global.level.mainPlayer);
 		input.possessedControlHeld[Control.Special1] = Global.input.isHeld(Control.Special1, Global.level.mainPlayer);
-
+		input.possessedControlHeld[Control.Taunt] = Global.input.isHeld(Control.Taunt, Global.level.mainPlayer);
+		
 		byte inputHeldByte = Helpers.boolArrayToByte(new bool[] {
 				input.possessedControlHeld[Control.Left],
 				input.possessedControlHeld[Control.Right],
-				//input.possessedControlHeld[Control.Up],
+				input.possessedControlHeld[Control.Up],
 				input.possessedControlHeld[Control.Down],
 				input.possessedControlHeld[Control.Jump],
 				input.possessedControlHeld[Control.Dash],
 				input.possessedControlHeld[Control.Shoot],
 				input.possessedControlHeld[Control.Special1],
 				//input.possessedControlHeld[Control.Taunt],
-				false,
+				//false,
 		});
 
 		// Pressed section
@@ -1338,14 +1338,14 @@ public partial class Player {
 		byte inputPressedByte = Helpers.boolArrayToByte(new bool[] {
 				input.possessedControlPressed[Control.Left],
 				input.possessedControlPressed[Control.Right],
-				//input.possessedControlPressed[Control.Up],
+				input.possessedControlPressed[Control.Up],
 				input.possessedControlPressed[Control.Down],
 				input.possessedControlPressed[Control.Jump],
 				input.possessedControlPressed[Control.Dash],
 				input.possessedControlPressed[Control.Shoot],
 				input.possessedControlPressed[Control.Special1],
 				//input.possessedControlPressed[Control.Taunt],
-				false,
+				//false,
 		});
 
 		RPC.syncPossessInput.sendRpc(id, inputHeldByte, inputPressedByte);

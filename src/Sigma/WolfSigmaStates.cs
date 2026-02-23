@@ -430,16 +430,7 @@ public class WolfSigmaHand : Actor, IDamagable {
 		isPlatform = true;
 		collider.isClimbable = true;
 		collider.wallOnly = false;
-		var rect = collider.shape.getRect().getPoints();
-		wall = new Wall("Collision Shape", new List<Point>()
-		{
-				rect[0].add(new Point(0, 0)),
-				rect[1].add(new Point(0, 0)),
-				rect[2].add(new Point(0, 0)),
-				rect[3].add(new Point(0, 0)),
-			});
-
-		Global.level.addGameObject(wall);
+		
 
 		netOwner = player;
 		netActorCreateId = NetActorCreateId.WolfSigmaHand;
@@ -455,9 +446,11 @@ public class WolfSigmaHand : Actor, IDamagable {
 		updateProjectileCooldown();
 	}
 
+
 	public override void update() {
 		base.update();
 		fadeinShader.update();
+		
 
 		if (beamMuzzle1 != null && beamMuzzle1.destroyed) beamMuzzle1 = null;
 		if (beamMuzzle2 != null && beamMuzzle2.destroyed) beamMuzzle2 = null;
@@ -611,17 +604,15 @@ public class WolfSigmaHand : Actor, IDamagable {
 	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (hitbox.flag == (int)HitboxFlag.Hitbox) {
 			Weapon handWeapon = weapon ?? new WolfSigmaHandWeapon(owner, this);
-			return new GenericMeleeProj(handWeapon, centerPoint, ProjIds.SigmaHand, owner);
+			return new GenericMeleeProj(handWeapon, centerPoint, ProjIds.SigmaHand, owner, 4,20,10, isShield: true);
 		}
 		return null;
 	}
 
 	public override void updateProjFromHitbox(Projectile proj) {
-		if (canHandDamage()) {
+		
 			proj.damager.damage = weapon.damager.damage;
-		} else {
-			proj.damager.damage = 0;
-		}
+		
 	}
 
 	public bool canHandDamage() {

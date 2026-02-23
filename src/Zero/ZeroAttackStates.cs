@@ -174,10 +174,11 @@ public class ZeroDashSlashState : ZeroGenericMeleeState {
 
 	public override void update() {
 		base.update();
-		if (Global.level.server.customMatchSettings != null || Global.level.server?.customMatchSettings?.removeZeroSpeedGlitch == true) {
+		if (Global.level.server.customMatchSettings != null ||
+		Global.level.server?.customMatchSettings?.removeZeroSpeedGlitch == true) {
 			if (!SlideOnce && stateTime > 0.2f){
-				if (player.input.isHeld(Control.Dash,player)){
-				character.slideVel = character.xDir * character.getDashSpeed();
+				if (player.input.isHeld(Control.Dash,player) && player.input.isPressed(Control.Shoot,player) ){
+				character.slideVel = character.xDir * character.getDashSpeed() * 1.3f;
 				SlideOnce = true;
 				}
 			}

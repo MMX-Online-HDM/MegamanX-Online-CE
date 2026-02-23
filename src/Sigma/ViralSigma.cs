@@ -55,7 +55,7 @@ public class ViralSigma : Character {
 		base.update();
 		if (!ownedByLocalPlayer) {
 			base.update();
-
+			player.changeWeaponControls();
 			if (sprite.name.Contains("sigma2_viral")) {
 				if (!viralOnce) {
 					viralOnce = true;
@@ -254,7 +254,7 @@ public class ViralSigma : Character {
 	public override void onDeath() {
 		base.onDeath();
 		player.lastDeathWasSigmaHyper = true;
-
+		destroyMusicSource();
 		visible = false;
 		Anim anim = new Anim(
 			pos, "sigma2_die" ,  1, player.getNextActorNetId(), false, sendRpc: true

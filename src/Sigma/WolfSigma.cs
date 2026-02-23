@@ -58,7 +58,7 @@ public class WolfSigma : Character {
 		head?.explode();
 		leftHand?.destroySelf();
 		rightHand?.destroySelf();
-
+		destroyMusicSource();
 		base.destroySelf(spriteName, fadeSound, disableRpc, doRpcEvenIfNotOwned, favorDefenderProjDestroy);
 	}
 	
