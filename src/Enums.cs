@@ -486,6 +486,7 @@ public enum ProjIds {
 	FlameRoundWallProj,
 	FlameRoundFlameProj,
 	VileMK2Grab,
+	VileMK2GrabStart,
 	NecroBurst,
 	NecroBurstShrapnel,
 	RisingSpecter,
@@ -737,6 +738,8 @@ public enum ProjIds {
 	DZBuster4,
 	DZMelee,
 	DZHadangeki,
+
+	ViralPosession,
 
 	// Special damage types.
 	SelfDmg = 30000,

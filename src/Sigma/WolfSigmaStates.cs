@@ -408,6 +408,7 @@ public class WolfSigmaHand : Actor, IDamagable {
 	}
 	public WolfSigmaHandWeapon weapon;
 	public Anim beamMuzzle1;
+	Wall wall;
 	public Anim beamMuzzle2;
 
 	public WolfSigmaHand(Point pos, Player player, bool isLeft, ushort netId, bool ownedByLocalPlayer, bool rpc = false) :
@@ -427,6 +428,18 @@ public class WolfSigmaHand : Actor, IDamagable {
 		startMoving = true;
 		useFrameProjs = true;
 		isPlatform = true;
+		collider.isClimbable = true;
+		collider.wallOnly = false;
+		var rect = collider.shape.getRect().getPoints();
+		wall = new Wall("Collision Shape", new List<Point>()
+		{
+				rect[0].add(new Point(0, 0)),
+				rect[1].add(new Point(0, 0)),
+				rect[2].add(new Point(0, 0)),
+				rect[3].add(new Point(0, 0)),
+			});
+
+		Global.level.addGameObject(wall);
 
 		netOwner = player;
 		netActorCreateId = NetActorCreateId.WolfSigmaHand;
@@ -434,6 +447,8 @@ public class WolfSigmaHand : Actor, IDamagable {
 			createActorRpc(player.id);
 		}
 	}
+
+	
 
 	public override void preUpdate() {
 		base.preUpdate();
@@ -610,11 +625,12 @@ public class WolfSigmaHand : Actor, IDamagable {
 	}
 
 	public bool canHandDamage() {
-		return (frameIndex >= 1 && deltaPos.magnitude > 1);
+		return (frameIndex >= 1);
 	}
 
 	public override void onDestroy() {
 		base.onDestroy();
+		if (wall != null) Global.level.removeGameObject(wall);
 	}
 
 	public override List<ShaderWrapper> getShaders() {
@@ -881,22 +897,25 @@ public class WolfSigmaRevive : CharState {
 				character.frameSpeed = 1;
 			}
 			if (stateTime > 4.5f) {
-				character.health = 1;
-				character.addHealth(character.maxHealth);
 				state = 5;
 			}
 		} else if (state == 5) {
-			if (character.health >= character.maxHealth) {
+			
 				character.weapons.Add(new WolfSigmaHandWeapon(player, sigma.leftHand));
 				character.weapons.Add(new WolfSigmaHeadWeapon());
 				character.weapons.Add(new WolfSigmaHandWeapon(player, sigma.rightHand));
 				character.weaponSlot = 1;
 
 				character.changeState(new WolfSigmaHeadState(), true);
-				character.addMusicSource("wolfSigmaIntro", character.pos.addxy(0, -75), false, loop: false);
+				character.addMusicSource("wolfSigma", character.pos.addxy(0, -75), false, loop: false);
 				RPC.actorToggle.sendRpc(character.netId, RPCActorToggleType.AddWolfSigmaMusicSource);
-			}
+			
 		}
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.health = character.maxHealth;
 	}
 
 	public override void onEnter(CharState oldState) {
@@ -906,6 +925,7 @@ public class WolfSigmaRevive : CharState {
 		character.visible = false;
 		character.useGravity = false;
 		character.frameSpeed = 0;
+		character.health = 1;
 		character.immuneToKnockback = true;
 
 		Global.level.addToGrid(character);

@@ -141,6 +141,8 @@ public class RocketPunchAttack : VileState {
 	public int shootFrame = 1;
 	public float specialPressTime;
 	public RocketPunch weapon;
+
+	public bool jumped;
 	public RocketPunchAttack(RocketPunch weapon) : base("rocket_punch") {
 		this.weapon = weapon;
 	}
@@ -150,8 +152,35 @@ public class RocketPunchAttack : VileState {
 		bool LeftHeld = player.input.isHeld(Control.Left, player);
 		bool RightHeld = player.input.isHeld(Control.Right, player);
 		Helpers.decrementFrames(ref specialPressTime);
-		character.turnToInput(player.input, player);
+	
+		if (stateTime < 0.2f && !jumped) {
+			
+		// This is vanilla's Air Grounded moves Glitch Exploit recreated	
+		if (Global.level.server.customMatchSettings != null ||
+		 Global.level.server?.customMatchSettings?.disableJumpMoveGlitch == true) {
+			if (player.input.isPressed(Control.Jump, player)) {
+			character.vel.y = -character.getJumpPower();
+			character.playSound("airdashupX3", sendRpc: true);
+			new Anim(
+				character.pos.addxy(0, -10), "dash_sparks_up",
+				character.xDir, player.getNextActorNetId(), true, sendRpc: true
+			);
+			jumped = true;
+			}
+		
+			}
+		}
 
+		if (Global.level.server.customMatchSettings != null ||
+		 Global.level.server?.customMatchSettings?.removeVileRocketPunchCancel == true) {
+		if (player.input.isHeld(Control.Up, player) && 
+		(player.input.isPressed(Control.Special1, player) || 
+		player.input.isPressed(Control.Shoot, player) ||
+		player.input.isPressed(Control.WeaponRight, player))) {
+				character.changeToIdleOrFall();
+			}
+
+		}
 		if (vile.energy.ammo < weapon.vileAmmoUsage && weapon is SpoiledBrat) {
 			character.changeToIdleOrFall();
 			return;
@@ -196,6 +225,8 @@ public class RocketPunchAttack : VileState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.turnToInput(player.input, player);
+
+		
 	}
 	public override bool canEnter(Character character) {
 		if (character.charState is Jump) return false;
@@ -253,6 +284,11 @@ public class GoGetterRightProj : Projectile {
 			} else if (vile.player.input.isHeld(Control.Down, vile.player)) {
 				incPos(new Point(0, 300 * Global.spf));
 			}
+		}
+
+		if (!reversed && !owner.input.isHeld(Control.Special1, owner)) {
+		reversed = true;
+		vel.x = 500 * -xDir;
 		}
 		if (!reversed && time > maxReverseTime) {
 			reversed = true;
@@ -350,6 +386,10 @@ public class InfinityGigProj : Projectile {
 		if (!reversed && time > maxReverseTime) {
 			reversed = true;
 			vel.x = 500 * -xDir;
+		}
+		if (!reversed && !owner.input.isHeld(Control.Special1, owner)) {
+		reversed = true;
+		vel.x = 500 * -xDir;
 		}
 		if (reversed && owner.character != null) {
 			vel = new Point(0, 0);

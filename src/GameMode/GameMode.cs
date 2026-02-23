@@ -666,6 +666,25 @@ public class GameMode {
 				}
 			}
 			#endregion
+			#region Buster Zero
+			if (Global.level.server?.customMatchSettings?.magicPlus == true) {
+			if (drawPlayer.character is BusterZero bZero) {
+				int xStart = 11;
+				int yStart = 159;
+				
+				if (bZero.gigaAttack.shootCooldown > 0) {
+					drawZeroGigaCooldown(bZero.gigaAttack, xStart, yStart);
+					xStart += 15;
+				}
+				if (bZero.hadangekiCooldown > 0) {
+					float cooldown = 1 - Helpers.progress(bZero.hadangekiCooldown, 60);
+					drawGigaWeaponCooldown(102, cooldown, xStart, yStart);
+					xStart += 15;
+				}
+				
+				}
+			}
+			#endregion
 			#region CmdSigma
 			if (drawPlayer.character is CmdSigma cmdSigma) {
 				//int xStart = 11;
@@ -1643,7 +1662,22 @@ public class GameMode {
 
 		// This runs once per character.
 		Weapon? weapon = player.lastHudWeapon;
+		if (Global.level.server?.customMatchSettings?.magicPlus == true) {
 		if (player.character != null) {
+			weapon = player.character switch {
+				Zero zero => zero.gigaAttack,
+				Vile vile => vile.energy,
+				CmdSigma sigma => sigma.ballWeapon,
+				NeoSigma neoSigma => neoSigma.gigaAttack,
+				PunchyZero punchyZero => punchyZero.gigaAttack,
+				BusterZero busterZero => busterZero.gigaAttack,
+				ViralSigma viralSigma => viralSigma.mainWeapon,
+				_ => player.character?.currentWeapon ?? player.weapon,
+			};
+			player.lastHudWeapon = weapon;
+		}
+		} else {
+			if (player.character != null) {
 			weapon = player.character switch {
 				Zero zero => zero.gigaAttack,
 				Vile vile => vile.energy,
@@ -1654,6 +1688,7 @@ public class GameMode {
 				_ => player.character?.currentWeapon ?? player.weapon,
 			};
 			player.lastHudWeapon = weapon;
+			}
 		}
 		// Small Bars option.
 		float ammoDisplayMultiplier = 1;

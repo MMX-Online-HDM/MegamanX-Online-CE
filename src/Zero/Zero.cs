@@ -541,6 +541,7 @@ public class Zero : Character {
 			}
 			dashAttackCooldown = 60;
 			slideVel = xDir * getDashSpeed();
+			
 			if (specialPressTime > shootPressTime) {
 				changeState(new ZeroShippuugaState(), true);
 				return true;

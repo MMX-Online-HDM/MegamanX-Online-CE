@@ -156,6 +156,11 @@ public class ZeroCrouchSlashState : ZeroGenericMeleeState {
 		sound = "saber1";
 		soundFrame = 1;
 	}
+
+
+
+
+	
 }
 
 public class ZeroDashSlashState : ZeroGenericMeleeState {
@@ -163,6 +168,22 @@ public class ZeroDashSlashState : ZeroGenericMeleeState {
 		sound = "saber1";
 		soundFrame = 1;
 	}
+
+	public bool SlideOnce;
+
+
+	public override void update() {
+		base.update();
+		if (Global.level.server.customMatchSettings != null || Global.level.server?.customMatchSettings?.removeZeroSpeedGlitch == true) {
+			if (!SlideOnce && stateTime > 0.2f){
+				if (player.input.isHeld(Control.Dash,player)){
+				character.slideVel = character.xDir * character.getDashSpeed();
+				SlideOnce = true;
+				}
+			}
+		}
+	}
+
 }
 
 public class ZeroShippuugaState : ZeroGenericMeleeState {

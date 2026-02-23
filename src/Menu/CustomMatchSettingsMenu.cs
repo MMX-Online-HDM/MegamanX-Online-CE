@@ -33,6 +33,18 @@ public class CustomMatchSettings {
 	[ProtoMember(26)] public bool comboFlinch;
 	[ProtoMember(27)] public bool quakeBlazerDownwards;
 
+	[ProtoMember(28)] public bool removeVileAirDashReset;
+
+	[ProtoMember(29)] public bool removeZeroSpeedGlitch;
+
+	[ProtoMember(30)] public bool removeVileRocketPunchCancel;
+
+	[ProtoMember(31)] public bool disableVanillaDash;
+
+	[ProtoMember(32)] public bool disableJumpMoveGlitch;
+
+	[ProtoMember(33)] public bool magicPlus;
+
 
 	public CustomMatchSettings() {
 	}
@@ -61,7 +73,12 @@ public class CustomMatchSettings {
 			smallAmmoPickup = 25,
 			subTankCost = 4,
 			oldATrans = false,
-			flinchairDashReset = false,
+			flinchairDashReset = true,
+			removeVileAirDashReset = true,
+			removeZeroSpeedGlitch = true,
+			removeVileRocketPunchCancel = true,
+			disableVanillaDash = true,
+			disableJumpMoveGlitch = true,
 			comboFlinch = true,
 			frostShieldNerf = false,
 			axlCustomReload = false,
@@ -479,6 +496,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 					}
 				)
 			);
+			
 			menuOptions3.Add(
 			new MenuOption(
 				startX3, currentY3 += lineH3,
@@ -511,6 +529,104 @@ public class CustomMatchSettingsMenu : IMainMenu {
 					}
 				)
 			);
+			menuOptions3.Add(
+				new MenuOption(
+					startX3,  currentY3  += lineH3,
+					() => {
+						Helpers.menuLeftRightBool(ref cSettings.disableVanillaDash, true);
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							FontType.Purple,
+							"Vanila Dash: " +
+							Helpers.boolYesNo(cSettings.disableVanillaDash),
+							pos.x, pos.y, selected: selectArrowPosY3 == index
+						);
+					}
+				)
+			);
+			menuOptions3.Add(
+				new MenuOption(
+					startX3,  currentY3  += lineH3,
+					() => {
+						Helpers.menuLeftRightBool(ref cSettings.removeVileAirDashReset, true);
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							FontType.Purple,
+							"Vile Air Dash Reset: " +
+							Helpers.boolYesNo(cSettings.removeVileAirDashReset),
+							pos.x, pos.y, selected: selectArrowPosY3 == index
+						);
+					}
+				)
+			);
+			menuOptions3.Add(
+				new MenuOption(
+					startX3,  currentY3  += lineH3,
+					() => {
+						Helpers.menuLeftRightBool(ref cSettings.removeVileRocketPunchCancel, true);
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							FontType.Purple,
+							"Vile RocketPunch Cancel: " +
+							Helpers.boolYesNo(cSettings.removeVileRocketPunchCancel),
+							pos.x, pos.y, selected: selectArrowPosY3 == index
+						);
+					}
+				)
+			);
+			menuOptions3.Add(
+				new MenuOption(
+					startX3, currentY3  += lineH3,
+					() => {
+						Helpers.menuLeftRightBool(ref cSettings.removeZeroSpeedGlitch, true);
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							FontType.Purple,
+							"Zero Speed Glitch: " +
+							Helpers.boolYesNo(cSettings.removeZeroSpeedGlitch),
+							pos.x, pos.y, selected: selectArrowPosY3 == index
+						);
+					}
+				)
+			);
+			menuOptions3.Add(
+				new MenuOption(
+					startX3,  currentY3  += lineH3,
+					() => {
+						Helpers.menuLeftRightBool(ref cSettings.disableJumpMoveGlitch, true);
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							FontType.Purple,
+							"Vanila Jump Tech: " +
+							Helpers.boolYesNo(cSettings.disableJumpMoveGlitch),
+							pos.x, pos.y, selected: selectArrowPosY3 == index
+						);
+					}
+				)
+			);
+			menuOptions3.Add(
+				new MenuOption(
+					startX3,  currentY3  += lineH3,
+					() => {
+						Helpers.menuLeftRightBool(ref cSettings.magicPlus, true);
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							FontType.Purple,
+							"Magic Plus: " +
+							Helpers.boolYesNo(cSettings.magicPlus),
+							pos.x, pos.y, selected: selectArrowPosY3 == index
+						);
+					}
+				)
+			);
+
+			
 			/*
 			#region Page 3
 			menuOptions3.Add(

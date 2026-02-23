@@ -5,6 +5,12 @@ using System.Runtime.InteropServices;
 namespace MMXOnline;
 
 public class BusterZero : Character {
+
+	public bool isViral;
+	public int awakenedPhase;
+	public bool isAwakened => (awakenedPhase != 0);
+	public bool isGenmuZero => (awakenedPhase >= 2);
+	
 	public float zSaberCooldown;
 	public float lemonCooldown;
 	public bool isBlackZero;
@@ -17,21 +23,80 @@ public class BusterZero : Character {
 	public float aiAttackCooldown;
 	public float jumpTimeAI;
 
+	public AwakenedAura awakenedAuraWeapon = new();
+
+	public Weapon gigaAttack;
+	public int gigaAttackSelected;
+
+	public int hyperMode;
+
+	// Hypermode effects stuff.
+	public int awakenedAuraFrame;
+	public float awakenedAuraAnimTime;
+	public byte hypermodeBlink;
+
+	public static readonly float maxBlackZeroTime = 20 * 60;
+
+	public float hyperModeTimer;
+	public float scrapDrainCounter = 120;
+	public bool hyperOvertimeActive;
+	
+	public float hadangekiCooldown;
+	public float genmureiCooldown;
+	public float tauntCooldown;
+
+	// Hypermode stuff.
+	public float donutTimer = 0;
+	public int donutsPending = 0;
+	public int freeBusterShots = 0;
+
+	public PZeroLoadout loadout;
+
+
 	public BusterZero(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
-		bool isWarpIn = true, int? heartTanks = null, bool isATrans = false
+		bool isWarpIn = true, PZeroLoadout? loadout = null,int? heartTanks = null, bool isATrans = false
 	) : base(
 		player, x, y, xDir, isVisible,
 		netId, ownedByLocalPlayer,
 		isWarpIn, heartTanks, isATrans
 	) {
 		charId = CharIds.BusterZero;
+		
+		loadout ??= player.loadout.pzeroLoadout.clone();
+		this.loadout = loadout;
 		altSoundId = AltSoundIds.X3;
+		if (Global.level.server?.customMatchSettings?.magicPlus == true) {
+		
+		
+		gigaAttackSelected = loadout.gigaAttack;
+		gigaAttack = loadout.gigaAttack switch {
+			1 => new Messenkou(),
+			2 => new RekkohaWeapon(),
+			_ => new RakuhouhaWeapon(),
+		};
+		hyperMode = loadout.hyperMode;
+		}
+		
 	}
 	public override CharState getTauntState() {
 		return new BZeroTaunt();
 	}
+
+	public override void addAmmo(float amount) {
+		gigaAttack.addAmmoHeal(amount);
+	}
+
+	public override void addPercentAmmo(float amount) {
+		gigaAttack.addAmmoPercentHeal(amount);
+	}
+
+	public override bool canAddAmmo() {
+		return (gigaAttack.ammo < gigaAttack.maxAmmo);
+	}
+
+	
 	public override void preUpdate() {
 		base.preUpdate();
 		if (!ownedByLocalPlayer) {
@@ -67,6 +132,9 @@ public class BusterZero : Character {
 		if (!ownedByLocalPlayer) {
 			return;
 		}
+		if (isAwakened) {
+			updateAwakenedAura();
+		}
 		// Hypermode music.
 		if (!Global.level.isHyper1v1()) {
 			if (isBlackZero && ownedByLocalPlayer) {
@@ -80,6 +148,20 @@ public class BusterZero : Character {
 		// Charge and release charge logic.
 		chargeLogic(shoot);
 	}
+
+
+	
+	public void updateAwakenedAura() {
+		awakenedAuraAnimTime += Global.speedMul;
+		if (awakenedAuraAnimTime > 4) {
+			awakenedAuraAnimTime = 0;
+			awakenedAuraFrame++;
+			if (awakenedAuraFrame > 3) {
+				awakenedAuraFrame = 0;
+			}
+		}
+	}
+
 
 	public override void chargeGfx() {
 		if (ownedByLocalPlayer) {
@@ -109,7 +191,11 @@ public class BusterZero : Character {
 		}
 		if (hyperProgress >= 1 && player.currency >= Player.zBusterZeroHyperCost) {
 			hyperProgress = 0;
+			if (Global.level.server?.customMatchSettings?.magicPlus == true) {
+			changeState(new HyperBusterZeroStart2(), true);
+			} else {
 			changeState(new HyperBusterZeroStart(), true);
+			}
 			return true;
 		}
 		return base.normalCtrl();
@@ -118,8 +204,20 @@ public class BusterZero : Character {
 	public override bool attackCtrl() {
 		bool shootPressed = player.input.isPressed(Control.Shoot, player);
 		bool specialPressed = player.input.isPressed(Control.Special1, player);
+		int yDir = player.input.getYDir(player);
 		if (specialPressed) {
-			if (zSaberCooldown == 0) {
+		if (Global.level.server?.customMatchSettings?.magicPlus == true) {
+			if (yDir == 1) {
+				if (flag != null ||
+					gigaAttack.ammo < gigaAttack.getAmmoUsage(0)
+				) {
+					return false;
+				}
+				gigaAttack.shoot(this, []);
+				return true;
+			}
+		}
+		if (zSaberCooldown == 0 && yDir == 0) {
 				if (stockedSaber) {
 					changeState(new BusterZeroHadangeki(), true);
 					return true;
@@ -172,6 +270,90 @@ public class BusterZero : Character {
 		return base.attackCtrl();
 	}
 
+
+
+
+	public override void render(float x, float y) {
+		if (isViral && visible) {
+			addRenderEffect(RenderEffectType.Trail);
+		} else {
+			removeRenderEffect(RenderEffectType.Trail);
+		}
+		float auraAlpha = 1;
+		if (isAwakened && visible && hypermodeBlink > 0) {
+			float blinkRate = MathInt.Ceiling(hypermodeBlink / 2f);
+			bool blinkActive = Global.floorFrameCount % (blinkRate * 2) >= blinkRate;
+			if (!blinkActive) {
+				auraAlpha = 0.5f;
+			}
+		}
+		if (isAwakened && visible) {
+			float xOff = 0;
+			int auraXDir = 1;
+			float yOff = 5;
+			string auraSprite = "zero_awakened_aura";
+			if (sprite.name.Contains("dash")) {
+				auraSprite = "zero_awakened_aura2";
+				auraXDir = xDir;
+				yOff = 8;
+			}
+			var shaders = new List<ShaderWrapper>();
+			if (isGenmuZero &&
+				Global.flFrameCount % 6 > 3 &&
+				Global.shaderWrappers.ContainsKey("awakened")
+			) {
+				shaders.Add(Global.shaderWrappers["awakened"]);
+			}
+			Global.sprites[auraSprite].draw(
+				awakenedAuraFrame,
+				pos.x + x + (xOff * auraXDir),
+				pos.y + y + yOff, auraXDir,
+				1, null, auraAlpha, 1, 1,
+				zIndex - 1, shaders: shaders
+			);
+		}
+		base.render(x, y);
+	}
+
+
+	public void setShootAnim() {
+		string shootSprite = getSprite(charState.shootSpriteEx);
+		if (!Global.sprites.ContainsKey(shootSprite)) {
+			if (grounded) { shootSprite = "zero_shoot"; }
+			else { shootSprite = "zero_fall_shoot"; }
+		}
+		if (shootAnimTime == 0) {
+			changeSprite(shootSprite, false);
+		} else if (charState is Idle && !charState.inTransition()) {
+			frameIndex = 0;
+			frameTime = 0;
+		}
+		if (charState is LadderClimb) {
+			if (player.input.isHeld(Control.Left, player)) {
+				this.xDir = -1;
+			} else if (player.input.isHeld(Control.Right, player)) {
+				this.xDir = 1;
+			}
+		}
+		shootAnimTime = DefaultShootAnimTime;
+	}
+
+	public void shootDonutProj(int time) {
+		setShootAnim();
+		Point shootPos = getShootPos();
+		int xDir = getShootXDir();
+
+		new ShingetsurinProj(
+			shootPos, xDir,
+			time / 60f, this, player, player.getNextActorNetId(), rpc: true
+		);
+		playSound("shingetsurinx5", forcePlay: false, sendRpc: true);
+		shootAnimTime = DefaultShootAnimTime;
+	}
+
+
+
+
 	// Shoots stuff.
 	public void shoot(int chargeLevel) {
 		if (chargeLevel == 0) {
@@ -217,10 +399,15 @@ public class BusterZero : Character {
 			);
 			lemonCooldown = 22;
 		} else if (chargeLevel == 2) {
+			if (isAwakened) {
+			shootDonutProj(0);
+			
+			} else {
 			playSound("buster3X3", sendRpc: true);
 			new DZBuster3Proj(
 				shootPos, xDir, this, player, player.getNextActorNetId(), rpc: true
 			);
+			}
 			lemonCooldown = 22;
 		} else if (chargeLevel == 3) {
 			if (charState is WallSlide) {
@@ -337,6 +524,12 @@ public class BusterZero : Character {
 			palette?.SetUniform("palette", 1);
 			palette?.SetUniform("paletteTexture", Global.textures["hyperBusterZeroPalette"]);
 		}
+		if (isAwakened) {
+			palette = player.zeroAzPaletteShader;
+		}
+		if (isViral) {
+			palette = player.nightmareZeroShader;
+		}
 		if (Global.isOnFrameCycle(4)) {
 			switch (getChargeLevel()) {
 				case 1:
@@ -372,9 +565,16 @@ public class BusterZero : Character {
 	public override List<byte> getCustomActorNetData() {
 		List<byte> customData = base.getCustomActorNetData();
 		customData.Add(Helpers.boolArrayToByte([
+				hypermodeBlink > 0,
+			isAwakened,
+			isGenmuZero,
+			isViral,
 			isBlackZero,
 			stockedSaber
 		]));
+		if (hypermodeBlink > 0) {
+			customData.Add(hypermodeBlink);
+		}
 		customData.Add((byte)stockedBusterLv);
 		return customData;
 	}
@@ -387,6 +587,8 @@ public class BusterZero : Character {
 		isBlackZero = flags[0];
 		stockedSaber = flags[1];
 		stockedBusterLv = data[1];
+		awakenedPhase = (flags[5] ? 4 : (flags[3] ? 3 : 2));
+		isViral = flags[6];
 	}
 
 	public override void aiAttack(Actor? target) {
