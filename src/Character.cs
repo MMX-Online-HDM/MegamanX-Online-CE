@@ -1149,7 +1149,9 @@ public partial class Character : Actor, IDamagable {
 				health = Helpers.clampMax(health + 1, maxHealth);
 				if (acidTime > 0) {
 					acidTime--;
-					if (acidTime < 0) removeAcid();
+					if (acidTime < 0) {
+						removeAcid();
+					}
 				}
 				if (player == Global.level.mainPlayer || playHealSound) {
 					playAltSound("heal", sendRpc: true, altParams: "harmor");
@@ -1689,7 +1691,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool isTrueStatusImmune() {
-		return !alive || isInvulnerable(true);
+		return !alive || charState.immortal || charState.immuneToAll || isInvulnerable(true);
 	}
 
 	public virtual bool isNonDamageStatusImmune() {
@@ -1703,7 +1705,6 @@ public partial class Character : Actor, IDamagable {
 	public virtual void clenaseDmgDebuffs() {
 		removeBurn();
 		removeAcid();
-		oilTime = 0;
 		parasiteTime = 0;
 		parasiteMashTime = 0;
 		parasiteDamager = null;
@@ -1720,7 +1721,6 @@ public partial class Character : Actor, IDamagable {
 		parasiteDamager = null;
 		// Remove slows.
 		igFreezeProgress = 0;
-		virusTime = 0;
 		slowdownTime = 0;
 		xFlinchPushVel = 0;
 		// Remove stuns & grabs.
@@ -1728,6 +1728,18 @@ public partial class Character : Actor, IDamagable {
 			changeToIdleOrFall();
 			return;
 		}
+	}
+
+	public virtual void clenaseEverithing() {
+		// Remove other stuff.
+		clenaseAllDebuffs();
+		// Remove Dark Hold.
+		if (charState is DarkHoldState) {
+			changeToIdleOrFall();
+			return;
+		}
+		// Remove time effects.
+		virusTime = 0;
 	}
 
 	// If factorHyperMode = true, then invuln frames in a hyper mode won't count as "invulnerable".

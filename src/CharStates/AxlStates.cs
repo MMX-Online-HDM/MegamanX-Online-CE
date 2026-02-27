@@ -48,7 +48,7 @@ public class HyperAxlStart : AxlState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.clenaseAllDebuffs();
+		character.clenaseEverithing();
 		axl = character as Axl ?? throw new NullReferenceException();
 		if (!axl.hyperAxlUsed) {
 			axl.hyperAxlUsed = true;

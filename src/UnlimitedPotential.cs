@@ -295,7 +295,6 @@ public class XUPParryProjState : RcxState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-
 		character.clenaseDmgDebuffs();
 		if (!shootProj || absorbThenShoot) {
 			absorbAnim = new Anim(

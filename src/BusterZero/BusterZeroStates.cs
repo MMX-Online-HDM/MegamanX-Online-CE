@@ -331,7 +331,7 @@ public class HyperBusterZeroStart : BusterZeroState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.clenaseAllDebuffs();
+		character.clenaseEverithing();
 		character.useGravity = false;
 		character.vel = new Point();
 		LightX3 = new Anim(

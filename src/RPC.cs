@@ -961,7 +961,6 @@ public class RPCJoinLateRequest : RPC {
 		var serverPlayer = Helpers.deserialize<ServerPlayer>(arguments);
 
 		Global.level.addPlayer(serverPlayer, true);
-
 		/*
 		foreach (var player in Global.level.players) {
 			player.charNetId = null;
