@@ -88,9 +88,11 @@ public class Fonts {
 
 				var textSprite = new SFML.Graphics.Sprite(
 					bitmapFontTexture, new IntRect(
-						(rx * fontTextureSize) + ((rx + 1) * fontGridSpacing),
-						(ry * fontTextureSize) + ((ry + 1) * fontGridSpacing),
-						fontTextureSize, fontTextureSize
+						(
+							(rx * fontTextureSize) + ((rx + 1) * fontGridSpacing),
+							(ry * fontTextureSize) + ((ry + 1) * fontGridSpacing)
+						),
+						(fontTextureSize, fontTextureSize)
 					)
 				);
 				if (alpha != null) {

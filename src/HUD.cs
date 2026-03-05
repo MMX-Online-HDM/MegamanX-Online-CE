@@ -5,17 +5,17 @@ using SFML.System;
 
 namespace MMXOnline;
 
-public class BatchDrawable : Transformable, Drawable {
+public class BatchDrawable : Transformable, IDrawable {
 	public VertexArray vertices;
 	public Texture texture;
 
 	public BatchDrawable(Texture texture) {
 		vertices = new VertexArray();
-		vertices.PrimitiveType = PrimitiveType.Quads;
+		vertices.PrimitiveType = PrimitiveType.Triangles;
 		this.texture = texture;
 	}
 
-	public void Draw(RenderTarget target, RenderStates states) {
+	public void Draw(IRenderTarget target, RenderStates states) {
 		states.Transform *= Transform;
 		states.Texture = texture;
 		target.Draw(vertices, states);
@@ -32,7 +32,7 @@ public partial class DrawWrappers {
 			new Vector2f(Global.screenW, Global.screenH)
 		);
 	}
-	public static void drawToHUD(Drawable drawable) {
+	public static void drawToHUD(IDrawable drawable) {
 		Global.window.SetView(hudView);
 		Global.window.Draw(drawable);
 		Global.window.SetView(Global.view);
@@ -42,7 +42,7 @@ public partial class DrawWrappers {
 		Texture texture, float sx, float sy, float sw, float sh, float dx, float dy, float alpha = 1
 	) {
 		if (texture == null) return;
-		var sprite = new SFML.Graphics.Sprite(texture, new IntRect((int)sx, (int)sy, (int)sw, (int)sh));
+		var sprite = new SFML.Graphics.Sprite(texture, new IntRect(((int)sx, (int)sy), ((int)sw, (int)sh)));
 		sprite.Position = new Vector2f(dx, dy);
 		sprite.Color = new Color(255, 255, 255, (byte)(int)(alpha * 255));
 		drawToHUD(sprite);
@@ -68,19 +68,22 @@ public partial class DrawWrappers {
 		float width = sw * scale;
 		float height = sh * scale;
 
-		Vertex vertex1 = new Vertex(new Vector2f(dx, dy), color);
-		Vertex vertex2 = new Vertex(new Vector2f(dx, dy + height), color);
-		Vertex vertex3 = new Vertex(new Vector2f(dx + width, dy + height), color);
-		Vertex vertex4 = new Vertex(new Vector2f(dx + width, dy), color);
+		Vertex vertexTL = new Vertex(new Vector2f(dx, dy), color);
+		Vertex vertexBL = new Vertex(new Vector2f(dx, dy + height), color);
+		Vertex vertexBR = new Vertex(new Vector2f(dx + width, dy + height), color);
+		Vertex vertexTR = new Vertex(new Vector2f(dx + width, dy), color);
 
-		vertex1.TexCoords = new Vector2f(sx, sy);
-		vertex2.TexCoords = new Vector2f(sx, sy + sh);
-		vertex3.TexCoords = new Vector2f(sx + sw, sy + sh);
-		vertex4.TexCoords = new Vector2f(sx + sw, sy);
-
-		bd.vertices.Append(vertex1);
-		bd.vertices.Append(vertex2);
-		bd.vertices.Append(vertex3);
-		bd.vertices.Append(vertex4);
+		vertexTL.TexCoords = new Vector2f(sx, sy);
+		vertexBL.TexCoords = new Vector2f(sx, sy + sh);
+		vertexBR.TexCoords = new Vector2f(sx + sw, sy + sh);
+		vertexTR.TexCoords = new Vector2f(sx + sw, sy);
+		// Top left.
+		bd.vertices.Append(vertexTL);
+		bd.vertices.Append(vertexBL);
+		bd.vertices.Append(vertexBR);
+		// Bottom rigth.
+		bd.vertices.Append(vertexTR);
+		bd.vertices.Append(vertexTL);
+		bd.vertices.Append(vertexBR);
 	}
 }

@@ -10,12 +10,12 @@ public class DrawableWrapper {
 	public List<ShaderWrapper>? shaders;
 	public DrawableSprite[]? subSprites;
 	public CompositeSpriteData? compositeData;
-	public Drawable drawable;
+	public IDrawable drawable;
 	public Color color;
 	public int[]? size;
 
 	public DrawableWrapper(
-		List<ShaderWrapper> shaders, Drawable drawable,
+		List<ShaderWrapper> shaders, IDrawable drawable,
 		Color? color = null, int[]? size = null
 	) {
 		shaders?.RemoveAll(s => s == null);
@@ -50,8 +50,8 @@ public class DrawableWrapper {
 		this.color = color;
 	}
 
-	public (Drawable, RenderStates) GetComposeDrawable(RenderTarget target, RenderStates states) {
-		Drawable[] sprites = new Drawable[subSprites.Length];
+	public (IDrawable, RenderStates) GetComposeDrawable(IRenderTarget target, RenderStates states) {
+		IDrawable[] sprites = new IDrawable[subSprites.Length];
 
 		for (int i = 0; i < subSprites.Length; i++) {
 			sprites[i] = subSprites[i].GetDrawable(target, states).Item1;
@@ -59,14 +59,14 @@ public class DrawableWrapper {
 		return ComposeSprite(sprites, target, states);
 	}
 
-	public (Drawable, RenderStates) ComposeSprite(Drawable[] spriteParts, RenderTarget target, RenderStates states) {
+	public (IDrawable, RenderStates) ComposeSprite(IDrawable[] spriteParts, IRenderTarget target, RenderStates states) {
 		// Get textures.
 		int encodeKey = (size[0] * 397) ^ size[1];
 		// If something goes off.
 		if (!Global.renderTextures.ContainsKey(encodeKey)) {
 			Global.renderTextures[encodeKey] = (
-				new RenderTexture((uint)size[0], (uint)size[1]),
-				new RenderTexture((uint)size[0], (uint)size[1])
+				new RenderTexture(((uint)size[0], (uint)size[1])),
+				new RenderTexture(((uint)size[0], (uint)size[1]))
 			);
 		}
 		RenderTexture renderTexture = Global.renderTextures[encodeKey].Item1;
@@ -97,20 +97,20 @@ public class CompositeSpriteData {
 	public Vector2f origin;
 }
 
-public class DrawLayer : Transformable, Drawable {
+public class DrawLayer : Transformable, IDrawable {
 	public List<DrawableWrapper> oneOffs = new List<DrawableWrapper>();
 
 	public DrawLayer() {
 
 	}
 
-	public void Draw(RenderTarget target, RenderStates states) {
+	public void Draw(IRenderTarget target, RenderStates states) {
 		for (int i = 0; i < oneOffs.Count; i++) {
 			var oneOff = oneOffs[i];
 			Global.window.SetView(Global.view);
 			// Composite sprite.
 			if (oneOff.compositeData != null && oneOff.subSprites != null) {
-				Drawable localDrawable;
+				IDrawable localDrawable;
 				RenderStates localState;
 				(localDrawable, localState) = oneOff.GetComposeDrawable(target, states);
 				target.Draw(localDrawable, localState);
@@ -156,8 +156,8 @@ public class DrawLayer : Transformable, Drawable {
 				// If something goes off.
 				if (!Global.renderTextures.ContainsKey(encodeKey)) {
 					Global.renderTextures[encodeKey] = (
-						new RenderTexture((uint)oneOff.size[0], (uint)oneOff.size[1]),
-						new RenderTexture((uint)oneOff.size[0], (uint)oneOff.size[1])
+						new RenderTexture(((uint)oneOff.size[0], (uint)oneOff.size[1])),
+						new RenderTexture(((uint)oneOff.size[0], (uint)oneOff.size[1]))
 					);
 				}
 				RenderTexture front;
@@ -207,14 +207,14 @@ public class DrawLayer : Transformable, Drawable {
 }
 
 public class DrawableSprite {
-	public Drawable drawable;
+	public IDrawable drawable;
 	public List<ShaderWrapper> shaders;
 	public Color color;
 	public int[] size;
 
 	public DrawableSprite(
 		List<ShaderWrapper> shaders,
-		Drawable drawable,
+		IDrawable drawable,
 		Color color, int[] size
 	) {
 		shaders.RemoveAll(s => s == null);
@@ -224,14 +224,14 @@ public class DrawableSprite {
 		this.size = size;
 	}
 
-	public (Drawable, RenderStates) GetDrawable(RenderTarget target, RenderStates states) {
+	public (IDrawable, RenderStates) GetDrawable(IRenderTarget target, RenderStates states) {
 		return GetBaseDrawable(drawable, shaders, color, size, target, states);
 	}
 
-	public static (Drawable, RenderStates) GetBaseDrawable(
-		Drawable drawable, List<ShaderWrapper> shaders,
+	public static (IDrawable, RenderStates) GetBaseDrawable(
+		IDrawable drawable, List<ShaderWrapper> shaders,
 		Color color, int[] size,
-		RenderTarget target, RenderStates states
+		IRenderTarget target, RenderStates states
 	) {
 		Global.window.SetView(Global.view);
 		// No shaders.
@@ -260,8 +260,8 @@ public class DrawableSprite {
 			// If something goes off.
 			if (!Global.renderTextures.ContainsKey(encodeKey)) {
 				Global.renderTextures[encodeKey] = (
-					new RenderTexture((uint)size[0], (uint)size[1]),
-					new RenderTexture((uint)size[0], (uint)size[1])
+					new RenderTexture(((uint)size[0], (uint)size[1])),
+					new RenderTexture(((uint)size[0], (uint)size[1]))
 				);
 			}
 			RenderTexture front;
@@ -376,7 +376,7 @@ public partial class DrawWrappers {
 		}
 	}
 
-	public static RenderTexture pixel = new RenderTexture(1, 1);
+	public static RenderTexture pixel = new RenderTexture((1, 1));
 	public static void DrawPixel(float x, float y, Color color, long depth, bool isWorldPos = true) {
 		if (isWorldPos && Options.main.enablePostProcessing) {
 			x -= Global.level.camX;
@@ -482,7 +482,7 @@ public partial class DrawWrappers {
 		cy = MathF.Floor(cy);
 
 
-		var sprite = new SFML.Graphics.Sprite(texture, new IntRect((int)sx, (int)sy, (int)sw, (int)sh));
+		var sprite = new SFML.Graphics.Sprite(texture, new IntRect(((int)sx, (int)sy), ((int)sw, (int)sh)));
 		sprite.Position = new Vector2f(dx, dy);
 		sprite.Origin = new Vector2f(cx, cy);
 		sprite.Scale = new Vector2f(xScale, yScale);
@@ -521,7 +521,10 @@ public partial class DrawWrappers {
 
 		var drawables = new DrawableSprite[texture.Length];
 		for (int i = 0; i < texture.Length; i++) {
-			var sprite = new SFML.Graphics.Sprite(texture[i], new IntRect((int)sx, (int)sy, (int)sw, (int)sh));
+			SFML.Graphics.Sprite sprite = new(
+				texture[i], new IntRect(
+				((int)sx, (int)sy), ((int)sw, (int)sh))
+			);
 			sprite.Position = new Vector2f(0, 0);
 			sprite.Origin = new Vector2f(0, 0);
 			sprite.Scale = new Vector2f(1, 1);
