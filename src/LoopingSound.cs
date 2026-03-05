@@ -19,7 +19,7 @@ public class LoopingSound {
 		loopClipStr = loopClipStr.ToLowerInvariant();
 		startClip = new Sound(Global.soundBuffers[startClipStr].soundBuffer);
 		loopClip = new Sound(Global.soundBuffers[loopClipStr].soundBuffer);
-		loopClip.Loop = true;
+		loopClip.IsLooping = true;
 		this.actor = actor;
 		Global.level.loopingSounds.Add(this);
 	}

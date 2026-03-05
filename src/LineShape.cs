@@ -4,7 +4,7 @@ using SFML.System;
 
 namespace MMXOnline;
 
-public class LineShape : Drawable {
+public class LineShape : IDrawable {
 	public Vertex[] vertices = new Vertex[4];
 	public float thickness = 1;
 	public Color color = Color.Black;
@@ -28,7 +28,7 @@ public class LineShape : Drawable {
 			vertices[i].Color = color;
 	}
 
-	public void Draw(RenderTarget target, RenderStates states) {
-		target.Draw(vertices, PrimitiveType.Quads);
+	public void Draw(IRenderTarget target, RenderStates states) {
+		target.Draw(vertices, PrimitiveType.LineStrip);
 	}
 }

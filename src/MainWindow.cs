@@ -63,24 +63,29 @@ public partial class Global {
 
 		changeWindowSize(options.windowScale);
 
-		screenRenderTextureS = new RenderTexture(screenW, screenH);
-		srtBuffer1S = new RenderTexture(screenW, screenH);
-		srtBuffer2S = new RenderTexture(screenW, screenH);
+		screenRenderTextureS = new RenderTexture((screenW, screenH));
+		srtBuffer1S = new RenderTexture((screenW, screenH));
+		srtBuffer2S = new RenderTexture((screenW, screenH));
 
-		screenRenderTextureL = new RenderTexture(screenW * 2, screenH * 2);
-		srtBuffer1L = new RenderTexture(screenW * 2, screenH * 2);
-		srtBuffer2L = new RenderTexture(screenW * 2, screenH * 2);
+		screenRenderTextureL = new RenderTexture((screenW * 2, screenH * 2));
+		srtBuffer1L = new RenderTexture((screenW * 2, screenH * 2));
+		srtBuffer2L = new RenderTexture((screenW * 2, screenH * 2));
 
-		var viewPort = new FloatRect(0, 0, 1, 1);
+		var viewPort = new FloatRect((0, 0), (1, 1));
 
 		if (!fullscreen) {
-			window = new RenderWindow(new VideoMode(windowW, windowH), "MMX Online Deathmatch");
+			window = new RenderWindow(
+				new VideoMode((windowW, windowH)), "MMX Online Deathmatch"
+			);
 			window.SetVerticalSyncEnabled(options.vsync);
 			if (Global.hideMouse) window.SetMouseCursorVisible(false);
 		} else {
-			var desktopWidth = VideoMode.DesktopMode.Width;
-			var desktopHeight = VideoMode.DesktopMode.Height;
-			window = new RenderWindow(new VideoMode(desktopWidth, desktopHeight), "MMX Online Deathmatch", Styles.Fullscreen);
+			var desktopWidth = VideoMode.DesktopMode.Size.X;
+			var desktopHeight = VideoMode.DesktopMode.Size.Y;
+			window = new RenderWindow(
+				new VideoMode((desktopWidth, desktopHeight)),
+				"MMX Online Deathmatch", Styles.None, State.Windowed
+			);
 			window.SetMouseCursorVisible(false);
 			viewPort = getFullScreenViewPort();
 		}
@@ -90,7 +95,7 @@ public partial class Global {
 		}
 
 		var image = new Image(Global.assetPath + "assets/menu/icon.png");
-		window.SetIcon(image.Size.X, image.Size.Y, image.Pixels);
+		window.SetIcon((image.Size.X, image.Size.Y), image.Pixels);
 
 		view = new View(new Vector2f(0, 0), new Vector2f(screenW, screenH));
 		view.Viewport = viewPort;
@@ -109,16 +114,19 @@ public partial class Global {
 	}
 
 	public static FloatRect getFullScreenViewPort() {
-		float desktopWidth = VideoMode.DesktopMode.Width;
-		float desktopHeight = VideoMode.DesktopMode.Height;
-		float heightMultiple = VideoMode.DesktopMode.Height / (float)screenH;
+		float desktopWidth = VideoMode.DesktopMode.Size.X;
+		float desktopHeight = VideoMode.DesktopMode.Size.Y;
+		float heightMultiple = VideoMode.DesktopMode.Size.Y / (float)screenH;
 
 		if (Options.main.integerFullscreen) {
-			heightMultiple = MathF.Floor(VideoMode.DesktopMode.Height / (float)screenH);
+			heightMultiple = MathF.Floor(VideoMode.DesktopMode.Size.Y / (float)screenH);
 		}
 		float extraWidthPercent = (desktopWidth - screenW * heightMultiple) / desktopWidth;
 		float extraHeightPercent = (desktopHeight - screenH * heightMultiple) / desktopHeight;
 
-		return new FloatRect(extraWidthPercent / 2f, extraHeightPercent / 2f, 1f - extraWidthPercent, 1f - extraHeightPercent);
+		return new FloatRect(
+			(extraWidthPercent / 2f, extraHeightPercent / 2f),
+			(1f - extraWidthPercent, 1f - extraHeightPercent)
+		);
 	}
 }

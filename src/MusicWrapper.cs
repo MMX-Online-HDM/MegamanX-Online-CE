@@ -39,7 +39,7 @@ public class MusicWrapper {
 		this.musicPath = musicPath;
 		this.loop = loop;
 		music = new Music(musicPath);
-		music.Loop = loop;
+		music.IsLooping = loop;
 		name = Path.GetFileNameWithoutExtension(musicPath);
 		this.startPos = (float)(startPos);
 		this.endPos = (float)(endPos);
@@ -49,7 +49,7 @@ public class MusicWrapper {
 		this.musicPath = musicPath;
 		this.loop = loop;
 		music = new Music(musicPath);
-		music.Loop = loop;
+		music.IsLooping = loop;
 		name = Path.GetFileNameWithoutExtension(musicPath);
 		this.startPos = startPos;
 		this.endPos = endPos;
@@ -70,7 +70,7 @@ public class MusicWrapper {
 	public void update() {
 		if (music == null) return;
 		float offset = music.PlayingOffset.AsSeconds();
-		if (music.Loop && music.PlayingOffset.AsSeconds() > endPos) {
+		if (music.IsLooping && music.PlayingOffset.AsSeconds() > endPos) {
 			music.PlayingOffset = SFML.System.Time.FromSeconds(startPos);
 		}
 		if (debugLoop) {

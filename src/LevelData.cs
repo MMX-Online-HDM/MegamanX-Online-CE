@@ -455,8 +455,8 @@ public class LevelData {
 		var image = new Image(fullImagePath);
 
 		if (isMirrored && mirrorX != 0 && mirrorMapImages) {
-			var image2 = new Image((uint)(1 + (mirrorX * 2)), image.Size.Y);
-			image2.Copy(image, 0, 0, new IntRect(0, 0, mirrorX, height));
+			var image2 = new Image(((uint)(1 + (mirrorX * 2)), image.Size.Y));
+			image2.Copy(image, (0, 0), new IntRect((0, 0), (mirrorX, height)));
 			image.FlipHorizontally();
 			var a = (int)image.Size.X - mirrorX;
 			uint b = 0;
@@ -464,7 +464,7 @@ public class LevelData {
 				b = (uint)Math.Abs(a);
 				a = 0;
 			}
-			image2.Copy(image, (uint)mirrorX + b, 0, new IntRect(a, 0, mirrorX, height));
+			image2.Copy(image, ((uint)mirrorX + b, 0), new IntRect((a, 0), (mirrorX, height)));
 
 			image.Dispose();
 			image = image2;
@@ -477,8 +477,8 @@ public class LevelData {
 
 				if (width == 0 || height == 0) continue;
 
-				var tile = new Image((uint)width, (uint)height);
-				tile.Copy(image, 0, 0, new IntRect(j * size, i * size, width, height));
+				var tile = new Image(((uint)width, (uint)height));
+				tile.Copy(image, (0, 0), new IntRect((j * size, i * size), (width, height)));
 
 				Texture texture = new Texture(tile);
 				tempTextureMDA[i, j] = texture;

@@ -358,10 +358,10 @@ public partial class Level {
 		scaledH = levelData.height * scaleH;
 
 		Global.radarRenderTexture = new RenderTexture(
-			(uint)Math.Ceiling(scaledW), (uint)Math.Ceiling(scaledH)
+			((uint)Math.Ceiling(scaledW), (uint)Math.Ceiling(scaledH))
 		);
 		Global.radarRenderTextureB = new RenderTexture(
-			(uint)Math.Ceiling(scaledW), (uint)Math.Ceiling(scaledH)
+			((uint)Math.Ceiling(scaledW), (uint)Math.Ceiling(scaledH))
 		);
 		Global.input.lastUpdateTime = 0;
 

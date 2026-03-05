@@ -562,8 +562,8 @@ class Program {
 			sizeY = windowRatio / viewRatio;
 			posY = (1f - sizeY) / 2f;
 		}
-		Global.view.Viewport = new FloatRect(posX, posY, sizeX, sizeY);
-		DrawWrappers.hudView.Viewport = new FloatRect(posX, posY, sizeX, sizeY);
+		Global.view.Viewport = new FloatRect((posX, posY), (sizeX, sizeY));
+		DrawWrappers.hudView.Viewport = new FloatRect((posX, posY), (sizeX, sizeY));
 	}
 
 	/// <summary>
@@ -623,15 +623,17 @@ class Program {
 	}
 
 	static void onMouseMove(object? sender, MouseMoveEventArgs e) {
-		Input.mouseDeltaX = e.X - Global.halfScreenW;
-		Input.mouseDeltaY = e.Y - Global.halfScreenH;
+		Input.mouseDeltaX = e.Position.X - Global.halfScreenW;
+		Input.mouseDeltaY = e.Position.Y - Global.halfScreenH;
 		Global.input.setLastUpdateTime();
 	}
 
 	static void onMousePressed(object? sender, MouseButtonEventArgs e) {
 		if (Global.debug && Global.level == null) {
 			if (e.Button == Mouse.Button.Middle) {
-				Global.debugString1 = (e.X / Options.main.windowScale) + "," + (e.Y / Options.main.windowScale);
+				Global.debugString1 = (
+					$"{e.Position.X / Options.main.windowScale}, {e.Position.Y / Options.main.windowScale}"
+				);
 			} else {
 				Global.debugString1 = "";
 			}
@@ -1608,8 +1610,8 @@ class Program {
 				int encodeKey = ((int)textures[pos].width * 397) ^ (int)textures[pos].height;
 				if (!Global.renderTextures.ContainsKey(encodeKey)) {
 					Global.renderTextures[encodeKey] = (
-						new RenderTexture(textures[pos].width, textures[pos].height),
-						new RenderTexture(textures[pos].width, textures[pos].height)
+						new RenderTexture((textures[pos].width, textures[pos].height)),
+						new RenderTexture((textures[pos].width, textures[pos].height))
 					);
 				}
 				count++;
