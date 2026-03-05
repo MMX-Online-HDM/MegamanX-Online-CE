@@ -316,8 +316,7 @@ public partial class Global {
 	public static int soundCount = 0;
 
 	// First: existing, second: new cloned sprite
-	public static Dictionary<string, string> spriteAliases = new Dictionary<string, string>()
-	{
+	public static Dictionary<string, string> spriteAliases = new Dictionary<string, string>() {
 			{ "chillp_fall", "chillp_enter" },
 			{ "chillp_jump", "chillp_exit" },
 			{ "chillp_die", "chillp_hurt" },
@@ -356,7 +355,7 @@ public partial class Global {
 			{ "velg_jump", "velg_exit" },
 			{ "velg_die", "velg_hurt" },
 
-			{ "sigma2_viral_enter", "sigma2_viral_possess,sigma2_viral_exit" },
+			{ "viralsigma_enter", "viralsigma_possess, viralsigma_exit, viralsigma_die" },
 
 			{ "wsponge_fall", "wsponge_enter" },
 			{ "wsponge_jump", "wsponge_exit" },

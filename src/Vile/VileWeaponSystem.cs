@@ -137,7 +137,6 @@ public class VileWeaponSystem : Weapon {
 				bufferedInputs[keys[i]] = bufferTime;
 			}
 		}
-
 		if (helds[0]) {
 			if (tartgetSlot.shoot.weaponSystemShoot(vile, keys[0])) {
 				bufferedInputs[keys[0]] = 0;
@@ -175,7 +174,7 @@ public class VileWeaponSystem : Weapon {
 
 		// Get all off-cooldown ones.
 		Weapon[] offCooldownWeapons = targetWeapons.Where(
-			w => w.shootCooldown <= 0 && w.getAmmoUsage(0) <= ammoLeft
+			w => w.shootCooldown <= 0 && w.getAmmoUsage(0) <= ammoLeft && w.canShoot(0, vile)
 		).ToArray();
 
 		// If list is emtpty. Return.

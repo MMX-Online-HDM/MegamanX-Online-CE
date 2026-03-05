@@ -2319,15 +2319,16 @@ public partial class Player {
 	public void reviveSigma(int form, Point spawnPoint) {
 		currency -= reviveSigmaCost;
 		hyperSigmaRespawn = true;
-		respawnTime = 0;
+		respawnTime = 2;
 		if (character is not BaseSigma sigma) {
 			return;
 		}
+		explodeDieEnd();
 		if (character?.destroyed == false) {
 			destroyCharacter(true);
 		}
-		explodeDieEnd();
 		ushort newNetId = getNextATransNetId();
+
 		if (form == 0) {
 			WolfSigma wolfSigma = new WolfSigma(
 				this, spawnPoint.x, spawnPoint.y, sigma.xDir, true,
@@ -2336,7 +2337,7 @@ public partial class Player {
 			character = wolfSigma;
 		} else if (form == 1) {
 			ViralSigma viralSigma = new ViralSigma(
-				this, spawnPoint.x, spawnPoint.y, sigma.xDir, true,
+				this, spawnPoint.x, spawnPoint.y - 16, sigma.xDir, true,
 				newNetId, true
 			);
 			character = viralSigma;
@@ -2357,17 +2358,14 @@ public partial class Player {
 				sigmaNetId, false
 			);
 			character = WolfSigma;
-
 			character.changeSprite("sigma_wolf_head", true);
 		}
-
 		if (form == 1) {
 			ViralSigma ViralSigma = new ViralSigma(
-				this, spawnPoint.x, spawnPoint.y, character?.xDir ?? 1, true,
+				this, spawnPoint.x, spawnPoint.y - 16, character?.xDir ?? 1, true,
 				sigmaNetId, false
 			);
 			character = ViralSigma;
-
 			character.changeSprite("viralsigma_enter", true);
 		}
 		
@@ -2377,7 +2375,6 @@ public partial class Player {
 				sigmaNetId, false
 			);
 			character = kaiserSigma;
-
 			character.changeSprite("kaisersigma_enter", true);
 		}
 	}
@@ -2412,6 +2409,9 @@ public partial class Player {
 	}
 
 	public void explodeDieEnd() {
+		if (explodeDieEffect?.destroyed == false) {
+			explodeDieEffect.destroySelf();
+		}
 		explodeDieEffect = null;
 	}
 

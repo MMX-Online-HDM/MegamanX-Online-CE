@@ -239,7 +239,7 @@ public partial class Actor : GameObject {
 		else colliderHeight = globalCollider.shape.maxY - globalCollider.shape.minY;
 
 		// May need a new overridable method to get "visual" height for situations like these
-		if (sprite?.name?.StartsWith("sigma2_viral_") == true) {
+		if (this is ViralSigma) {
 			colliderHeight = 50;
 		}
 

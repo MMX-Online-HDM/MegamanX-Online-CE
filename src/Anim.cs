@@ -239,12 +239,12 @@ public class Anim : Actor {
 			}
 			return new List<ShaderWrapper>() { fadeBlackShader };
 		}
-		if (sprite.name.Contains("sigma2_viral_") &&
+		if (sprite.name.Contains("viralsigma_") &&
 			Global.shaderWrappers.ContainsKey("viralsigma") &&
-			host is Character chara
+			host is ViralSigma neoViral
 		) {
 			if (viralSigmaShader == null) {
-				viralSigmaShader = chara.player.viralSigmaShader2;
+				viralSigmaShader = neoViral.player.viralSigmaShader2;
 			}
 			if (viralSigmaShader != null) {
 				viralSigmaShader.SetUniform("palette", 6);

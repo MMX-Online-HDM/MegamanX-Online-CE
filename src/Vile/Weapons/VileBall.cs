@@ -34,7 +34,6 @@ public class ExplosiveRound : VileBall {
 	public override void vileShoot(Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
-		if (vile.charState is Jump && vile.charState.stateTime >0.1f)  return;
 		vile.changeState(new BallAttacks(this), true);
 	}
 	public override void shoot(Character character, int[] args) {
@@ -65,7 +64,6 @@ public class SpreadShot : VileBall {
 	public override void vileShoot(Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
-		if (vile.charState is Jump && vile.charState.stateTime >0.1f)  return;
 		vile.changeState(new BallAttacks(this), true);
 	}
 	public override void shoot(Character character, int[] args) {
@@ -99,7 +97,6 @@ public class PeaceOutRoller : VileBall {
 	public override void vileShoot(Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
-		if (vile.charState is Jump && vile.charState.stateTime >0.1f)  return;
 		vile.changeState(new BallAttacks(this), true);
 	}
 	public override void shoot(Character character, int[] args) {
@@ -199,7 +196,7 @@ public class BallAttacks : VileState {
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
-		if (Global.level.server.customMatchSettings != null || Global.level.server?.customMatchSettings?.removeVileAirDashReset == true) {
+		if (Global.level.server.customMatchSettings != null || Global.level.server?.customMatchSettings?.vileAirDashReset == true) {
 			if (vile.canAirDashReset){
 			vile.dashedInAir = 0;
 			vile.airDashReset = 0;

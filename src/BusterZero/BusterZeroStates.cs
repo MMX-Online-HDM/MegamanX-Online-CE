@@ -14,7 +14,7 @@ public class BusterZeroState : CharState {
 		sprite, shootSprite, attackSprite, transitionSprite, transShootSprite
 	) {
 	}
-	
+
 	public override void onEnter(CharState oldState) {
 		zero = character as BusterZero ?? throw new NullReferenceException();
 	}
@@ -66,7 +66,7 @@ public class BusterZeroMeleeWall : BusterZeroState {
 	public BusterZeroMeleeWall(int wallDir, Collider wallCollider) : base("wall_slide_attack") {
 		this.wallDir = wallDir;
 		this.wallCollider = wallCollider;
-		
+
 	}
 
 	public override void update() {
@@ -121,10 +121,7 @@ public class BusterZeroDoubleBuster : BusterZeroState {
 		if (!fired1 && character.frameIndex == 3) {
 			fired1 = true;
 			character.playSound("buster3X3", sendRpc: true);
-			new DZBuster3Proj(
-				character.getShootPos(), character.getShootXDir(),
-				zero, player, player.getNextActorNetId(), rpc: true
-			);
+			zero.shootSub(2);
 			zero.stockedTime = 0;
 		}
 		if (!fired2 && character.frameIndex == 7) {
@@ -132,17 +129,11 @@ public class BusterZeroDoubleBuster : BusterZeroState {
 			if (!isPinkCharge) {
 				zero.stockedBusterLv = 0;
 				character.playSound("buster3X3", sendRpc: true);
-				new DZBuster3Proj(
-					character.getShootPos(), character.getShootXDir(),
-					zero, player, player.getNextActorNetId(), rpc: true
-				);
+				zero.shootSub(2);
 			} else {
 				zero.stockedBusterLv = 0;
 				character.playSound("buster2X3", sendRpc: true);
-				new DZBuster2Proj(
-					character.getShootPos(), character.getShootXDir(),
-					zero, player, player.getNextActorNetId(), rpc: true
-				);
+				zero.shootSub(1);
 			}
 			zero.stockedTime = 0;
 		}
@@ -210,7 +201,6 @@ public class BusterZeroHadangeki : BusterZeroState {
 	public bool fired;
 	public bool sound;
 
-
 	public BusterZeroHadangeki() : base("projswing") {
 		landSprite = "projswing";
 		airSprite = "projswing_air";
@@ -223,18 +213,15 @@ public class BusterZeroHadangeki : BusterZeroState {
 
 	public override void update() {
 		base.update();
-		
+
 		if (character.frameIndex >= 3 && !sound) {
 			sound = true;
 			character.playSound("zerosaberx3", sendRpc: true);
 		}
 		if (character.frameIndex >= 6 && !fired) {
 			zero.stockedSaber = false;
+			zero.shootHadangeki();
 			fired = true;
-			new DZHadangekiProj(
-				character.pos.addxy(46 * character.xDir, -20), character.xDir,
-				zero.isBlackZero, zero, player, player.getNextActorNetId(), rpc: true
-			);
 		}
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
@@ -275,11 +262,8 @@ public class BusterZeroHadangekiWall : BusterZeroState {
 		if (character.frameIndex >= 2 && !fired) {
 			character.playSound("zerosaberx3", sendRpc: true);
 			zero.stockedSaber = false;
+			zero.shootHadangeki();
 			fired = true;
-			new DZHadangekiProj(
-				character.pos.addxy(30 * -wallDir, -20), -wallDir,
-				zero.isBlackZero, zero, player, player.getNextActorNetId(), rpc: true
-			);
 		}
 		if (character.isAnimOver()) {
 			character.changeState(new WallSlide(wallDir, wallCollider) { enterSound = "" });
@@ -299,7 +283,117 @@ public class BusterZeroHadangekiWall : BusterZeroState {
 	}
 }
 
+public class BZeroTaunt : CharState {
+	public BZeroTaunt() : base("win") {
 
+	}
+	public override void update() {
+		base.update();
+		if (character.isAnimOver() && !Global.level.gameMode.playerWon(player)) {
+			character.changeToIdleOrFall();
+		}
+		if (character.frameIndex == 1 && !once) {
+			once = true;
+			character.playSound("ching", sendRpc: true);
+			new Anim(
+				character.pos.addxy(character.xDir, -25f),
+				"zero_ching", -character.xDir,
+				player.getNextActorNetId(),
+				destroyOnEnd: true, sendRpc: true
+			);
+		}
+	}
+}
+
+public class HyperBusterZeroStart : BusterZeroState {
+	public float radius = 200;
+	public float time;
+	Anim? LightX3;
+
+	public HyperBusterZeroStart() : base("hyper_start") {
+		invincible = true;
+		immortal = true;
+		statusEffectImmune = true;
+	}
+
+	public override void update() {
+		base.update();
+		if (time == 0) {
+			if (radius >= 0) {
+				radius -= Global.spf * 200;
+			} else {
+				time = Global.spf;
+				radius = 0;
+				HyperBusterZeroStart.activateHypermode(zero);
+				character.playSound("ching");
+				character.fillHealthToMax();
+			}
+		} else {
+			time += Global.spf;
+			if (time >= 1) {
+				character.changeToLandingOrFall();
+			}
+		}
+	}
+
+	public static void activateHypermode(BusterZero zero) {
+		if (zero.hyperMode == 1) {
+			zero.isAwakened = true;
+			if (zero.gigaAttack != null) {
+				ShinMessenkou newWeapon = new ShinMessenkou();
+				newWeapon.ammo = zero.gigaAttack?.ammo ?? MathF.Ceiling(newWeapon.maxAmmo / 2);
+				zero.gigaAttack = newWeapon;
+			}
+		} else if (zero.hyperMode == 2) {
+			zero.isViral = true;
+			if (zero.gigaAttack != null) {
+				DarkHoldWeapon newWeapon = new DarkHoldWeapon();
+				newWeapon.ammo = zero.gigaAttack?.ammo ?? MathF.Ceiling(newWeapon.maxAmmo / 2);
+				zero.gigaAttack = newWeapon;
+			}
+		} else {
+			zero.isBlackZero = true;
+			if (zero.gigaAttack != null) {
+				RekkohaWeapon newWeapon = new RekkohaWeapon();
+				newWeapon.ammo = zero.gigaAttack?.ammo ?? MathF.Ceiling(newWeapon.maxAmmo / 2);
+				newWeapon.ammoCost = 14;
+				zero.gigaAttack = newWeapon;
+			}
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.clenaseEverithing();
+		character.useGravity = false;
+		character.vel = new Point();
+		LightX3 = new Anim(
+				character.pos.addxy(50 * character.xDir, 0f),
+				"LightX3", -character.xDir,
+				player.getNextActorNetId(),
+				destroyOnEnd: false, sendRpc: true, fadeIn: true
+			);
+		character.player.currency -= Player.zBusterZeroHyperCost;
+		character.playSound("blackzeroentry", forcePlay: false, sendRpc: true);
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		LightX3?.destroySelf();
+		character.useGravity = true;
+		if (character != null) {
+			character.invulnTime = 0.5f;
+		}
+	}
+
+	public override void render(float x, float y) {
+		base.render(x, y);
+		Point pos = character.getCenterPos();
+		DrawWrappers.DrawCircle(
+			pos.x + x, pos.y + y, radius, false, Color.White, 5, character.zIndex + 1, true, Color.White
+		);
+	}
+}
 
 public class HyperBusterZeroStart2 : BusterZeroState {
 	public float radius = 200;
@@ -311,6 +405,7 @@ public class HyperBusterZeroStart2 : BusterZeroState {
 
 	public HyperBusterZeroStart2() : base("hyper_start") {
 		invincible = true;
+		immortal = true;
 		statusEffectImmune = true;
 	}
 
@@ -355,7 +450,7 @@ public class HyperBusterZeroStart2 : BusterZeroState {
 			} else {
 				time = Global.spf;
 				radius = 0;
-				activateHypermode();
+				HyperBusterZeroStart.activateHypermode(zero);
 				character.playSound("ching");
 				character.fillHealthToMax();
 			}
@@ -375,7 +470,7 @@ public class HyperBusterZeroStart2 : BusterZeroState {
 		if (zero == null) {
 			throw new NullReferenceException();
 		}
-		character.player.currency -= 10;
+		character.player.currency -= Player.zBusterZeroHyperCost;
 		if (zero.hyperMode == 2) {
 			zero.changeSpriteFromName("hyper_viral", true);
 			virusAnimName = "sigmavirushead";
@@ -398,12 +493,6 @@ public class HyperBusterZeroStart2 : BusterZeroState {
 		character.useGravity = true;
 		if (character != null) {
 			character.invulnTime = 0.5f;
-		}
-		if (zero.isAwakened ) {
-			zero.hyperModeTimer = BusterZero.maxBlackZeroTime + 30;
-		}
-		if (zero.isBlackZero ) {
-			zero.isBlackZero = true;
 		}
 		virusEffectParts?.destroySelf();
 		bool playedHitSound = false;
@@ -439,23 +528,6 @@ public class HyperBusterZeroStart2 : BusterZeroState {
 		};
 	}
 
-	public void activateHypermode() {
-		if (zero.hyperMode == 1) {
-			zero.awakenedPhase = 1;
-			float storedAmmo = zero.gigaAttack.ammo;
-			zero.gigaAttack = new ShinMessenkou();
-			zero.gigaAttack.ammo = storedAmmo;
-		} else if (zero.hyperMode == 2) {
-			zero.isViral = true;
-			float storedAmmo = zero.gigaAttack.ammo;
-			zero.gigaAttack = new DarkHoldWeapon();
-			zero.gigaAttack.ammo = storedAmmo;
-			zero.freeBusterShots = 10;
-		} else {
-			zero.isBlackZero = true;
-		}
-	}
-
 	public override void render(float x, float y) {
 		base.render(x, y);
 		Point pos = character.getCenterPos();
@@ -466,91 +538,3 @@ public class HyperBusterZeroStart2 : BusterZeroState {
 		}
 	}
 }
-
-
-
-
-public class HyperBusterZeroStart : BusterZeroState {
-	public float radius = 200;
-	public float time;
-	Anim? LightX3;
-
-	public HyperBusterZeroStart() : base("hyper_start") {
-		invincible = true;
-		statusEffectImmune = true;
-	}
-
-	public override void update() {
-		base.update();
-		if (time == 0) {
-			if (radius >= 0) {
-				radius -= Global.spf * 200;
-			} else {
-				time = Global.spf;
-				radius = 0;
-				zero.isBlackZero = true;
-				character.playSound("ching");
-				character.fillHealthToMax();
-			}
-		} else {
-			time += Global.spf;
-			if (time >= 1) {
-				character.changeToLandingOrFall();
-			}
-		}
-	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		character.clenaseEverithing();
-		character.useGravity = false;
-		character.vel = new Point();
-		LightX3 = new Anim(
-				character.pos.addxy(50 * character.xDir, 0f),
-				"LightX3", -character.xDir,
-				player.getNextActorNetId(),
-				destroyOnEnd: false, sendRpc: true, fadeIn: true
-			);
-		character.player.currency -= Player.zBusterZeroHyperCost;
-		character.playSound("blackzeroentry", forcePlay: false, sendRpc: true);
-	}
-
-	public override void onExit(CharState? newState) {
-		base.onExit(newState);
-		LightX3?.destroySelf();
-		character.useGravity = true;
-		if (character != null) {
-			character.invulnTime = 0.5f;
-		}
-	}
-
-	public override void render(float x, float y) {
-		base.render(x, y);
-		Point pos = character.getCenterPos();
-		DrawWrappers.DrawCircle(
-			pos.x + x, pos.y + y, radius, false, Color.White, 5, character.zIndex + 1, true, Color.White
-		);
-	}
-}
-public class BZeroTaunt : CharState {
-	public BZeroTaunt() : base("win") {
-
-	}
-	public override void update() {
-		base.update();
-		if (character.isAnimOver() && !Global.level.gameMode.playerWon(player)) {
-			character.changeToIdleOrFall();
-		}
-		if (character.frameIndex == 1 && !once) {
-			once = true;
-			character.playSound("ching", sendRpc: true);
-			new Anim(
-				character.pos.addxy(character.xDir, -25f),
-				"zero_ching", -character.xDir,
-				player.getNextActorNetId(),
-				destroyOnEnd: true, sendRpc: true
-			);
-		}
-	}
-}
-

@@ -400,16 +400,17 @@ public class WolfSigmaHand : Actor, IDamagable {
 	public static float maxDistFromHeadY = Global.screenW * 2;
 	public float offScreenTime;
 	public float maxOffscreenTime = 16;
+	
+	public WolfSigmaHandWeapon weapon;
+	public Anim beamMuzzle1;
+	public Anim beamMuzzle2;
+	public Wall wall;
 
 	public bool isControlling {
 		get {
 			return owner.weapon is WolfSigmaHandWeapon w && w.hand == this;
 		}
 	}
-	public WolfSigmaHandWeapon weapon;
-	public Anim beamMuzzle1;
-	Wall wall;
-	public Anim beamMuzzle2;
 
 	public WolfSigmaHand(Point pos, Player player, bool isLeft, ushort netId, bool ownedByLocalPlayer, bool rpc = false) :
 		base("sigma_wolf_hand", pos, netId, ownedByLocalPlayer, false) {

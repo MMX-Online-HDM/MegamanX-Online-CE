@@ -352,7 +352,6 @@ public class Axl : Character {
 		if (isAxlBulletsType) {
 			axlWeapon?.rechargeAxlBulletAmmo(player, this, shootHeld, 1);
 		}
-		customSettingReloadWeapon(); //Fix DNA
 
 		Helpers.decrementFrames(ref dodgeRollCooldown);
 		Helpers.decrementFrames(ref switchTime);
@@ -1775,40 +1774,6 @@ public class Axl : Character {
 			return new DoubleBullet();
 		} else {
 			return new AxlBullet((AxlBulletWeaponType)type);
-		}
-	}
-	public void customSettingReloadWeapon() {
-		//Reload Weapon Custom Setting
-		switch (currentWeapon) {
-			case RayGun:
-				(currentWeapon as RayGun)?.rechargeAmmoCustomSetting(player, this, shootHeld, 1, 1);
-				break;
-			case BlastLauncher:
-				(currentWeapon as BlastLauncher)?.rechargeAmmoCustomSetting(player, this, shootHeld, 1, 4);
-				break;
-			case BlackArrow:
-				(currentWeapon as BlackArrow)?.rechargeAmmoCustomSetting(player, this, shootHeld, 1, 1);
-				break;
-			case SpiralMagnum:
-				(currentWeapon as SpiralMagnum)?.rechargeAmmoCustomSetting(player, this, shootHeld, 1, 1);
-				break;
-			case BoundBlaster:
-				(currentWeapon as BoundBlaster)?.rechargeAmmoCustomSetting(player, this, shootHeld, 1, 1);
-				break;
-			case PlasmaGun:
-				(currentWeapon as PlasmaGun)?.rechargeAmmoCustomSetting(player, this, shootHeld, 1, 1);
-				break;
-			case IceGattling:
-				(currentWeapon as IceGattling)?.rechargeAmmoCustomSetting(player, this, shootHeld, 1, 4);
-				break;
-			case FlameBurner:
-				(currentWeapon as FlameBurner)?.rechargeAmmoCustomSetting(player, this, shootHeld, 1, 4);
-				break;
-		}
-		if (axlWeapon != null) {
-			if (isAnyZoom()) {
-				axlWeapon.rechargeAmmoCustomSettingAxl2 = 200;
-			}
 		}
 	}
 

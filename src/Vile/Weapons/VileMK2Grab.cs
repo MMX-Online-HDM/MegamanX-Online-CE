@@ -73,7 +73,7 @@ public class VileMK2GrabState : CharState {
 			victim?.releaseGrab(character, true);
 		}
 		if (character != null && character is Vile vile){
-		vile.mk2GrabCooldown = 1.5f;
+			vile.mk2GrabCooldown = 1.5f;
 		}
 	}
 }

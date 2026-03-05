@@ -168,6 +168,10 @@ public partial class RPCCreateProj : RPC {
 		{ (int)ProjIds.DZBuster3, DZBuster3Proj.rpcInvoke },
 		{ (int)ProjIds.DZHadangeki, DZHadangekiProj.rpcInvoke },
 
+		{ (int)ProjIds.DZShinBuster, DZShinBusterProj.rpcInvoke },
+		{ (int)ProjIds.DZShinHadangeki, DZShinHadangekiProj.rpcInvoke },
+		{ (int)ProjIds.DZShinGetsurin, DZShinGetsurinProj.rpcInvoke },
+
 		//Sigma	
 		{ (int)ProjIds.SigmaSlash, SigmaSlashProj.rpcInvoke },
 		{ (int)ProjIds.SigmaBall, SigmaBallProj.rpcInvoke },

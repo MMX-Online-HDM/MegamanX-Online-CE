@@ -92,7 +92,7 @@ public class Hurt : CharState {
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		//Came back from the death as Custom Setting
-		if (Global.level.server?.customMatchSettings?.flinchairDashReset == true) {
+		if (Global.customSettings?.flinchAirDashReset == true) {
 			character.dashedInAir = 0;
 		}
 	}

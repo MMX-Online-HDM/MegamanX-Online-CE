@@ -52,8 +52,11 @@ public class InGameMainMenu : IMainMenu {
 				}
 
 				if (isSelWepDisabled()) return;
-				if (selectedCharNum == (int)CharIds.PunchyZero || selectedCharNum == (int)CharIds.BusterZero) {
+
+				if (selectedCharNum == (int)CharIds.PunchyZero) {
 					Menu.change(new SelectPunchyZeroWeaponMenu(this, true));
+				} else if (selectedCharNum == (int)CharIds.BusterZero) {
+					Menu.change(new SelectBusterZeroWeaponMenu(this, true));
 				} else if (selectedCharNum == 4) {
 					Menu.change(new SelectSigmaWeaponMenu(this, true));
 				} else if (selectedCharNum == 3) {

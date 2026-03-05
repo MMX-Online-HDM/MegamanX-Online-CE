@@ -912,29 +912,48 @@ class Program {
 			string fileChecksum = loadSpritesSub(spriteFilePaths);
 			Global.fileChecksumBlob += "-" + fileChecksum;
 		}
-		// Override sprite mods
+
+		// Set up aliases here.
+		foreach (var kvp in Global.spriteAliases) {
+			if (Global.sprites.ContainsKey(kvp.Key)) {
+				string[] pieces = kvp.Value.Split(',');
+				foreach (string piece in pieces) {
+					string tpiece = piece.Trim();
+					if (!Global.sprites.ContainsKey(tpiece)) {
+						Global.sprites[tpiece] = Global.sprites[kvp.Key].cloneAnimSlow();
+						Global.sprites[tpiece].name = tpiece;
+					}
+				}
+			}
+		}
+
+		// Override sprite mods.
 		string overrideSpriteSource = "assets/sprites_visualmods";
 		if (Options.main.shouldUseOptimizedAssets()) overrideSpriteSource = "assets/sprites_optimized";
 
 		List<string> overrideSpritePaths = Helpers.getFiles(Global.assetPath + overrideSpriteSource, false, "json");
+		List<string> visualMods = new();
 		foreach (string overrideSpritePath in overrideSpritePaths) {
 			string name = Path.GetFileNameWithoutExtension(overrideSpritePath);
 			string json = File.ReadAllText(overrideSpritePath);
 
 			AnimData sprite = new AnimData(json, name, null);
 			if (Global.sprites.ContainsKey(sprite.name)) {
+				visualMods.Add(sprite.name);
 				Global.sprites[sprite.name].overrideAnim(sprite);
 			}
 		}
-
-		// Set up aliases here
-		foreach (var spriteName in Global.sprites.Keys.ToList()) {
-			string alias = Global.spriteAliases.GetValueOrDefault(spriteName);
-			if (!string.IsNullOrEmpty(alias)) {
-				var pieces = alias.Split(',');
-				foreach (var piece in pieces) {
-					Global.sprites[piece] = Global.sprites[spriteName].cloneAnimSlow();
-					Global.sprites[piece].name = piece;
+		
+		// Set up aliases again for visualmods.
+		foreach (var kvp in Global.spriteAliases) {
+			if (visualMods.Contains(kvp.Key)) {
+				string[] pieces = kvp.Value.Split(',');
+				foreach (string piece in pieces) {
+					string tpiece = piece.Trim();
+					if (!visualMods.Contains(tpiece)) {
+						Global.sprites[tpiece] = Global.sprites[kvp.Key].cloneAnimSlow();
+						Global.sprites[tpiece].name = tpiece;
+					}
 				}
 			}
 		}

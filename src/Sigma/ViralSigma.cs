@@ -8,29 +8,28 @@ namespace MMXOnline;
 public class ViralSigma : Character {
 	public Weapon mainWeapon = new ViralSigmaWeapon();
 	public long originalZIndex;
-	public bool viralOnce;
 
-	public float viralSigmaTackleCooldown;
-	public float viralSigmaTackleMaxCooldown = 1;
+	public float tackleCooldown;
+	public float tackleMaxCooldown = 1;
 
-	public string lastViralSprite = "empty";
-	public int lastViralFrameIndex;
+	public string lastSprite = "empty";
+	public int lastFrameIndex;
 	public float lastViralAngle;
 	public float viralAngle;
 
-	public float viralSigmaBeamLength;
 	public int lastViralXDir = 1;
 	public Character? possessTarget;
 	public float possessEnemyTime;
 	public float maxPossessEnemyTime;
 	public int numPossesses;
+	public float beamLength;
 
 	public ViralSigma(
 		Player player, float x, float y, int xDir, bool isVisible,
 		ushort? netId, bool ownedByLocalPlayer, bool isWarpIn = false
 	) : base(
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn
-	) { 
+	) {
 		charId = CharIds.WolfSigma;
 		altSoundId = AltSoundIds.X2;
 		bool isRevive = true;
@@ -40,48 +39,44 @@ public class ViralSigma : Character {
 		} else {
 			if (isRevive) {
 				useGravity = false;
-				changeSprite("viralsigma_enter", true);
 				changeState(new ViralSigmaRevive(player.explodeDieEffect), true);
 			} else {
 				visible = true;
-				changeSprite("viralsigma_idle", true);
 				changeState(new ViralSigmaIdle(), true);
 			}
 		}
 		grounded = false;
 	}
 
+	public override CharState getIdleState() => new ViralSigmaIdle();
+	public override CharState getRunState(bool skipInto = false) => new ViralSigmaIdle();
+	public override CharState getJumpState() => new ViralSigmaIdle();
+	public override CharState getAirJumpState() => new ViralSigmaIdle();
+	public override CharState getFallState() => new ViralSigmaIdle();
+	public override CharState getTauntState() => new ViralSigmaTaunt(false);
+
 	public override void update() {
 		base.update();
 		if (!ownedByLocalPlayer) {
-			base.update();
-			player.changeWeaponControls();
-			if (sprite.name.Contains("sigma2_viral")) {
-				if (!viralOnce) {
-					viralOnce = true;
-					xScale = 0;
-					yScale = 0;
-					originalZIndex = zIndex;
-				}
-
-				if (sprite.name.Contains("sigma2_viral_possess")) {
-					setzIndex(ZIndex.Actor);
-				} else {
-					setzIndex(originalZIndex);
-				}
+			if (sprite.name.Contains("viralsigma_possess")) {
+				setzIndex(ZIndex.Actor);
+			} else {
+				setzIndex(originalZIndex);
 			}
 			return;
 		}
-
-		Helpers.decrementTime(ref viralSigmaTackleCooldown);
-		if (viralSigmaBeamLength < 1 && charState is not ViralSigmaBeamState) {
-			viralSigmaBeamLength += Global.spf * 0.1f;
-			if (viralSigmaBeamLength > 1) viralSigmaBeamLength = 1;
+		player.changeWeaponControls();
+		Helpers.decrementTime(ref tackleCooldown);
+		if (beamLength < 1 && charState is not ViralSigmaBeamState) {
+			beamLength += Global.spf * 0.1f;
+			if (beamLength > 1) {
+				beamLength = 1;
+			}
 		}
 
 		if (charState is not Die) {
-			lastViralSprite = sprite.name;
-			lastViralFrameIndex = frameIndex;
+			lastSprite = sprite.name;
+			lastFrameIndex = frameIndex;
 			lastViralAngle = angle;
 
 			var inputDir = player.input.getInputDir(player);
@@ -109,6 +104,18 @@ public class ViralSigma : Character {
 		}
 	}
 
+	public override void addAmmo(float amount) {
+		mainWeapon?.addAmmo(amount, player);
+	}
+
+	public override void addPercentAmmo(float amount) {
+		mainWeapon?.addAmmoPercentHeal(amount);
+	}
+
+	public override bool canAddAmmo() {
+		return (mainWeapon.ammo < mainWeapon.maxAmmo);
+	}
+
 	public void getViralSigmaPossessTarget() {
 		var collideDatas = Global.level.getTriggerList(this, 0, 0);
 		foreach (var collideData in collideDatas) {
@@ -122,7 +129,7 @@ public class ViralSigma : Character {
 			}
 		}
 	}
-	
+
 	public bool canPossess(Character target) {
 		if (target == null || target.destroyed) return false;
 		if (!target.player.canBePossessed()) return false;
@@ -139,7 +146,7 @@ public class ViralSigma : Character {
 		return false;
 	}
 
-		public override Dictionary<int, Func<Projectile>> getGlobalProjs() {
+	public override Dictionary<int, Func<Projectile>> getGlobalProjs() {
 		var retProjs = new Dictionary<int, Func<Projectile>>();
 
 		// TODO: Move this to viral Sigma class.
@@ -186,7 +193,6 @@ public class ViralSigma : Character {
 		return 43;
 	}
 
-	
 	public override bool normalCtrl() {
 		return false;
 	}
@@ -200,7 +206,6 @@ public class ViralSigma : Character {
 		return false;
 	}
 
-
 	public override bool isNonDamageStatusImmune() {
 		return true;
 	}
@@ -208,18 +213,19 @@ public class ViralSigma : Character {
 	public override bool isPushImmune() {
 		return true;
 	}
-	
 
-
-	public override string getSprite(string spriteName) {
-		if (Global.sprites.ContainsKey("viralsigma_" + spriteName)) {
-			return "viralsigma_" + spriteName;
+	public override bool isInvulnerable(bool ignoreRideArmorHide = false, bool factorHyperMode = false) {
+		if (sprite.name == "viralsigma_exit") {
+			return true;
 		}
-		return "sigma2_" + spriteName;
-		// Do not Remove this bc it basically prevents shenanigans that would softlock him
+		return base.isInvulnerable(ignoreRideArmorHide, factorHyperMode);
 	}
 
-		public override int getMaxHealth() {
+	public override string getSprite(string spriteName) {
+		return "viralsigma_" + spriteName;
+	}
+
+	public override int getMaxHealth() {
 		if (isATrans) {
 			return base.getMaxHealth();
 		}
@@ -281,7 +287,7 @@ public class ViralSigma : Character {
 		destroyMusicSource();
 		visible = false;
 		Anim anim = new Anim(
-			pos, "sigma2_die" ,  1, player.getNextActorNetId(), false, sendRpc: true
+			pos, "sigma2_die", 1, player.getNextActorNetId(), false, sendRpc: true
 		);
 		anim.ttl = 3;
 		anim.blink = true;

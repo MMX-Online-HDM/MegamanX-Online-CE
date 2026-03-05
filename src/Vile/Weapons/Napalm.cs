@@ -591,12 +591,10 @@ public class NapalmAttacks : VileState {
 			character.useGravity = false;
 			character.vel = new Point();
 		}
-		if (Global.level.server.customMatchSettings != null ||Global.level.server?.customMatchSettings?.removeVileAirDashReset == true) {
-			if (vile.canAirDashReset){
+		if (Global.customSettings?.vileAirDashReset == true && vile.canAirDashReset) {
 			vile.dashedInAir = 0;
 			vile.airDashReset = 0;
-			vile.canAirDashReset = false;
-			}
+			useDashJumpSpeed = false;
 		}
 	}
 	public override void onExit(CharState? newState) {
