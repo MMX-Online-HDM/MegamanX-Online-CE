@@ -355,6 +355,14 @@ public class Damager {
 				character.addVirusTime(owner, damage);
 			}
 
+			// mk2 Grab Fix
+			if (owner.character is Vile vile && !character.isGrabImmune()) {
+				if (vile.sprite.name.Contains("dash_grab") && projId ==  (int)ProjIds.VileMK2GrabStart){
+				character.changeState(new VileMK2Grabbed(vile), true);
+					vile.changeState(new VileMK2GrabState(character));
+				}
+			}
+
 			switch (projId) {
 				//burn [to the ground] section
 				case (int)ProjIds.FireWave:
@@ -591,6 +599,20 @@ public class Damager {
 				} else {
 					character.flinchCooldown[flinchKey] = flinchCooldown;
 				}
+			}
+
+			if (Global.level.server?.customMatchSettings?.magicPlus == true) {
+		
+			if ( damage > 0 && !isArmorPiercing(projId) && character.sprite.name.Contains("block")) {
+				if (!hitFromBehind(character, damagingActor, owner, projId)) {
+					damage--;
+
+					if (damage < 4) {
+						damage = 0;
+						character.playSound("m10ding");
+					}
+				}
+			}
 			}
 
 			if (character is Vile { isVileMK2: true } && damage > 0 && !isArmorPiercing(projId)) {

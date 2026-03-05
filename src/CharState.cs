@@ -150,6 +150,23 @@ public class CharState {
 		if (this is not Jump and not WallKick && (!oldState.canStopJump || oldState.stoppedJump)) {
 			stoppedJump = true;
 		}
+
+
+		if (character.grounded && !normalCtrl && !attackCtrl) {
+		// This is vanilla's Air Grounded moves Glitch Exploit recreated	
+		if (Global.level.server.customMatchSettings != null ||
+		 Global.level.server?.customMatchSettings?.disableJumpMoveGlitch == true) {
+		
+				if (player.input.isPressed(Control.Jump, player)) {
+				character.vel.y = -character.getJumpPower();
+				character.playSound("airdashupX3", sendRpc: true);
+				new Anim(
+					character.pos.addxy(0, -10), "dash_sparks_up",
+					character.xDir, player.getNextActorNetId(), true, sendRpc: true
+				);
+				}
+			}
+		}
 	}
 
 	public virtual bool canEnter(Character character) {
@@ -653,6 +670,15 @@ public class Idle : CharState {
 			}
 		}
 
+		if (Global.level.server?.customMatchSettings?.magicPlus == true) {
+			if (character is not Zero and not BaseSigma ){
+				if (player.input.isHeld(Control.Up, player) && !player.input.isLeftOrRightHeld(player)) {
+				string block = "block";
+				attackCtrl = false;
+				character.changeSpriteFromName(block, true);
+				} 
+			}
+		}
 		if (Global.level.gameMode.isOver) {
 			if (Global.level.gameMode.playerWon(player)) {
 				character.changeState(character.getTauntState());
@@ -879,6 +905,9 @@ public class Fall : CharState {
 	}
 }
 
+
+
+
 public class Dash : CharState {
 	public float dashTime;
 	public float dustTime;
@@ -887,12 +916,15 @@ public class Dash : CharState {
 	public bool stop;
 	public Anim? dashSpark;
 
+	public int initialDashDir;
+
 	public Dash(string initialDashButton) : base("dash", "dash_shoot", "attack_dash") {
 		attackCtrl = true;
 		normalCtrl = true;
 		this.initialDashButton = initialDashButton;
 		enterSound = "dash";
 		enterSoundArgs = "larmor";
+		
 	}
 
 	public override void preUpdate() {
@@ -902,7 +934,9 @@ public class Dash : CharState {
 
 	public override void update() {
 		base.update();
-
+		if (Global.level.server.customMatchSettings != null || Global.level.server?.customMatchSettings?.disableVanillaDash == true) {
+		dashBackwardsCode(character, initialDashDir);
+		}
 		if (!player.isAI && !stop && !player.input.isHeld(initialDashButton, player)) {
 			dashTime = 900;
 		}
@@ -918,6 +952,7 @@ public class Dash : CharState {
 			shootSprite = "dash_end_shoot";
 			character.changeSpriteFromName(character.shootAnimTime > 0 ? shootSprite : sprite, true);
 		}
+		
 		if (dashTime < 4 || stop) {
 			if (inputXDir != 0 && inputXDir != dashDir) {
 				character.xDir = inputXDir;
@@ -926,17 +961,21 @@ public class Dash : CharState {
 		}
 		// Dash regular speed.
 		if (dashTime >= 4 && !stop) {
-			character.moveXY(character.getDashSpeed() * dashDir, 0);
+			character.moveXY(character.getDashSpeed() * character.getRunDebuffs() * dashDir, 0);
 		}
 		// End move.
 		else if (stop && inputXDir != 0) {
-			character.moveXY(character.getRunSpeed() * inputXDir, 0);
+			character.moveXY(character.getRunSpeed() * character.getRunDebuffs() * inputXDir, 0);
 			character.changeState(character.getRunState(true), true);
 			return;
 		}
 		// Speed at start and end.
 		else if (!stop || dashHeld) {
+			if (Global.level.server?.customMatchSettings?.disableVanillaDash == true) {
 			character.moveXY(Physics.DashStartSpeed * character.getRunDebuffs() * dashDir, 0);
+			} else {
+			character.moveXY(character.getRunSpeed() * character.getRunDebuffs() * dashDir, 0);
+			}
 		}
 		// Dust effect.
 		if (dustTime >= 6 && !character.isUnderwater()) {
@@ -963,12 +1002,21 @@ public class Dash : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		dashDir = character.xDir;
+		initialDashDir = character.xDir;
 		character.isDashing = true;
 		dashSpark = new Anim(
 			character.getDashSparkEffectPos(dashDir),
 			"dash_sparks", dashDir, player.getNextActorNetId(),
 			true, sendRpc: true
 		);
+		if (player.input.isHeld("left", base.player))
+				{
+					dashDir = -1;
+				}
+		else if (player.input.isHeld("right", base.player))
+				{
+					dashDir = 1;
+		}
 	}
 
 	public override void onExit(CharState? newState) {
@@ -1000,6 +1048,8 @@ public class AirDash : CharState {
 	public bool stop;
 	public Anim? dashSpark;
 
+	public int initialDashDir;
+
 	public AirDash(string initialDashButton) : base("dash", "dash_shoot", "attack_dash") {
 		accuracy = 10;
 		attackCtrl = true;
@@ -1008,6 +1058,7 @@ public class AirDash : CharState {
 		this.initialDashButton = initialDashButton;
 		enterSound = "airdash";
 		enterSoundArgs = "larmor";
+	
 	}
 
 	public override void preUpdate() {
@@ -1015,8 +1066,22 @@ public class AirDash : CharState {
 		dashTime += character.speedMul;
 	}
 
+	public bool backDashedOnce;
 	public override void update() {
 		base.update();
+		if (stateTime < 0.15f) {
+			if (player.input.isHeld("left", base.player))
+				{
+					dashDir = -1;
+				}
+		else if (player.input.isHeld("right", base.player))
+				{
+					dashDir = 1;
+		}
+		}
+		if (Global.level.server.customMatchSettings != null || Global.level.server?.customMatchSettings?.disableVanillaDash == true) {
+		dashBackwardsCode(character, initialDashDir);
+		}
 		if (!player.isAI && !player.input.isHeld(initialDashButton, player) && !stop) {
 			dashTime = 900;
 		}
@@ -1075,7 +1140,33 @@ public class AirDash : CharState {
 		if (character is CmdSigma or Doppma) {
 			character.frameIndex = 1;
 		}
+		initialDashDir = character.xDir;
+		
+		
 	}
+
+
+
+
+	public static void dashBackwardsCode(Character character, int initialDashDir)
+	{
+		if (!character.player.isAxl)
+		{
+			return;
+		}
+		if (character.xDir != initialDashDir)
+		{
+			if (!character.sprite.name.EndsWith("backwards"))
+			{
+				character.changeSpriteFromName("dash_backwards", resetFrame: false);
+			}
+		}
+		else if (character.sprite.name.EndsWith("backwards"))
+		{
+			character.changeSpriteFromName("dash", resetFrame: false);
+		}
+	}
+
 
 	public override void onExit(CharState? newState) {
 		if (!dashSpark?.destroyed == true) {

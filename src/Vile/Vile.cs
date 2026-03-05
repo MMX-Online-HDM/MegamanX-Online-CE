@@ -9,6 +9,8 @@ public class Vile : Character {
 	public const float maxCalldownMechCooldown = 120;
 	public float vulcanLingerTime;
 	public const int callNewMechCost = 5;
+
+	public const int mk5AltCost = 2;
 	public float mechBusterCooldown;
 	public bool usedAmmoLastFrame;
 	public bool isShootingGizmo;
@@ -40,6 +42,8 @@ public class Vile : Character {
 	
 	// When firing missile, you can't shoot cannon until it reaches 0
 	public float aiAttackCooldown;
+
+	public bool canAirDashReset;
 
 	public Vile(
 		Player player, float x, float y, int xDir,
@@ -172,16 +176,17 @@ public class Vile : Character {
 
 	public override void update() {
 		base.update();
+		
 		if (!ownedByLocalPlayer) return;
 		
 		// Update the weapon system.
 		// And subweapons by extension.
 		weaponSystem.update();
 		weaponSystem.charLinkedUpdate(this, false);
-
+		Helpers.decrementTime(ref mk2GrabCooldown);
 		rideArmorAttacks();
 		rideLinkPenta();
-
+		if (isVileMK2)mk2Buffs = true;
 		// GMTODO: Consider a better way here instead of a hard-coded deny list
 		// Gacel: Done, now it uses attackCtrl
 		if (!charState.attackCtrl || charState is VileMK2GrabState) {
@@ -189,18 +194,40 @@ public class Vile : Character {
 		} else {
 			chargeLogic(shoot);
 		}
+
+		if (charState is Idle or WallSlide || grounded) {
+			canAirDashReset = true;
+		}
 	}
 
 	public override bool attackCtrl() {
 		if (dashGrabSpecial()) {
 			return true;
 		}
-		return weaponSystem.shootLogic(this);
+		if (  !sprite.name.Contains("grab") ){
+		return  weaponSystem.shootLogic(this);
+		}
+		return false;
 	}
 
+	public bool mk2Buffs = false;
+
+	public float mk2GrabCooldown;
 	public bool dashGrabSpecial() {
 		if (!player.input.isHeld(Control.Special1, player)) {
 			return false;
+		}
+		if (mk2GrabCooldown > 0)return false;
+
+		if (Global.level.server?.customMatchSettings?.magicPlus == true) {
+		if (isDashing && mk2Buffs &&
+			charState is Dash or AirDash { stop: false }
+		) {
+			charState.isGrabbing = true;
+			charState.superArmor = true; //peakbalance
+			changeSpriteFromName("dash_grab", true);
+			return true;
+		}
 		}
 		if (isDashing && isVileMK2 &&
 			charState is Dash or AirDash { stop: false }
@@ -244,7 +271,17 @@ public class Vile : Character {
 		}
 		return false;
 	}
+
+	public int airDashReset = 1; 
 	public override bool normalCtrl() {
+		
+		if (player.dashPressed(out string dashControl) && flag == null &&
+		!grounded && airDashReset == 0) {
+				changeState(new AirDash(dashControl));
+				airDashReset = 1;
+				return true;
+			}
+
 		if (sprite.name.EndsWith("cannon_air") && isAnimOver()) {
 			changeSpriteFromName("fall", true);
 		}
@@ -394,6 +431,31 @@ public class Vile : Character {
 		float dashXPos = -30;
 		return pos.addxy(dashXPos * xDir + (5 * xDir), -4);
 	}
+
+
+	public override bool canAffordRideArmor() {
+		if (Global.level.server?.customMatchSettings?.magicPlus == true && isVileMK5 && !mk2Buffs) {
+			return  player.currency >= Vile.mk5AltCost;
+		}
+		if (Global.level.is1v1()) {
+			return health > Math.Floor(maxHealth / 2);
+		}
+		return player.currency >= Vile.callNewMechCost;
+	}
+
+	public override void buyRideArmor() {
+		
+		if (Global.level.is1v1()) {
+			health -= Math.Floor(maxHealth / 2);
+			return;
+		}
+		if (Global.level.server?.customMatchSettings?.magicPlus == true && isVileMK5 && !mk2Buffs) {
+			player.currency  -= Vile.mk5AltCost * (player.selectedRAIndex >= 4 ? 2 : 1);
+			return;
+		}
+		player.currency -= Vile.callNewMechCost * (player.selectedRAIndex >= 4 ? 2 : 1);
+	}
+
 
 	public override void onMechSlotSelect(MechMenuWeapon mmw) {
 		//Do not use if dead
@@ -621,8 +683,8 @@ public class Vile : Character {
 	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
 		return (MeleeIds)id switch {
 			MeleeIds.Grab => new GenericMeleeProj(
-				new VileMK2Grab(), pos, ProjIds.VileMK2Grab, player,
-				0, 0, 0,
+				new VileMK2Grab(), pos, ProjIds.VileMK2GrabStart, player,
+				0, 0, 3f,
 				addToLevel: true
 			),
 			_ => null

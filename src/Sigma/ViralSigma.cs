@@ -13,7 +13,7 @@ public class ViralSigma : Character {
 	public float viralSigmaTackleCooldown;
 	public float viralSigmaTackleMaxCooldown = 1;
 
-	public string lastViralSprite = "";
+	public string lastViralSprite = "empty";
 	public int lastViralFrameIndex;
 	public float lastViralAngle;
 	public float viralAngle;
@@ -33,13 +33,29 @@ public class ViralSigma : Character {
 	) { 
 		charId = CharIds.WolfSigma;
 		altSoundId = AltSoundIds.X2;
+		bool isRevive = true;
+
+		if (!ownedByLocalPlayer) {
+			visible = true;
+		} else {
+			if (isRevive) {
+				useGravity = false;
+				changeSprite("viralsigma_enter", true);
+				changeState(new ViralSigmaRevive(player.explodeDieEffect), true);
+			} else {
+				visible = true;
+				changeSprite("viralsigma_idle", true);
+				changeState(new ViralSigmaIdle(), true);
+			}
+		}
+		grounded = false;
 	}
 
 	public override void update() {
 		base.update();
 		if (!ownedByLocalPlayer) {
 			base.update();
-
+			player.changeWeaponControls();
 			if (sprite.name.Contains("sigma2_viral")) {
 				if (!viralOnce) {
 					viralOnce = true;
@@ -140,6 +156,21 @@ public class ViralSigma : Character {
 				return proj;
 			};
 		}
+
+		if (sprite.name.Contains("viral_exit") && sprite.time > 0.15f) {
+			retProjs[(int)ProjIds.Sigma2ViralTackle] = () => {
+				var damageCollider = getAllColliders().FirstOrDefault(c => c.isAttack());
+				Point centerPoint = damageCollider.shape.getRect().center();
+				Projectile proj = new GenericMeleeProj(
+					new ViralSigmaTackleWeapon(player), centerPoint,
+					ProjIds.ViralPosession, player, damage: 0.1f,
+					addToLevel: true
+				);
+				proj.globalCollider = damageCollider.clone();
+				return proj;
+			};
+		}
+
 		return retProjs;
 	}
 
@@ -153,6 +184,46 @@ public class ViralSigma : Character {
 
 	public override float getLabelOffY() {
 		return 43;
+	}
+
+	
+	public override bool normalCtrl() {
+		return false;
+	}
+
+
+	public override bool canPickupFlag() {
+		return false;
+	}
+
+	public override bool canKeepFlag() {
+		return false;
+	}
+
+
+	public override bool isNonDamageStatusImmune() {
+		return true;
+	}
+
+	public override bool isPushImmune() {
+		return true;
+	}
+	
+
+
+	public override string getSprite(string spriteName) {
+		if (Global.sprites.ContainsKey("viralsigma_" + spriteName)) {
+			return "viralsigma_" + spriteName;
+		}
+		return "sigma2_" + spriteName;
+		// Do not Remove this bc it basically prevents shenanigans that would softlock him
+	}
+
+		public override int getMaxHealth() {
+		if (isATrans) {
+			return base.getMaxHealth();
+		}
+		return MathInt.Ceiling(Player.getModifiedHealth(32) * Player.getHpMod());
 	}
 
 	public override List<ShaderWrapper> getShaders() {
@@ -207,16 +278,16 @@ public class ViralSigma : Character {
 	public override void onDeath() {
 		base.onDeath();
 		player.lastDeathWasSigmaHyper = true;
-
+		destroyMusicSource();
 		visible = false;
 		Anim anim = new Anim(
-			pos, lastViralSprite, 1, player.getNextActorNetId(), false, sendRpc: true
+			pos, "sigma2_die" ,  1, player.getNextActorNetId(), false, sendRpc: true
 		);
 		anim.ttl = 3;
 		anim.blink = true;
-		anim.frameIndex = lastViralFrameIndex;
-		anim.frameSpeed = 0;
-		anim.angle = lastViralAngle;
+		//anim.frameIndex = lastViralFrameIndex;
+		//anim.frameSpeed = 0;
+		//anim.angle = lastViralAngle;
 		var ede = new ExplodeDieEffect(
 			player, pos, pos, "empty", 1, zIndex, false, 20, 3, false
 		);

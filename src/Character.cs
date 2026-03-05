@@ -996,9 +996,37 @@ public partial class Character : Actor, IDamagable {
 		else if (player.input.isPressed(Control.Shoot, player)) {
 			mw.summon(player, pos, xDir);
 		}
+
 	}
 
+	// DO NOT REMOVE THIS
+	// Don't be autistic if it isn't broke don't fix it for the love
+	// of God Gacel don't be autistic
+	// The way it was before made it so
+	/*
+	░░░░░░▄▄▄▄▄▄▄▄▄░░░
+	░░░░░█░░░░░░░░░█░░
+	░░░░█░░░░░░░█░█░█░
+	░░░█░░░░░░░░░█░░█░
+	░░████▀██████████░
+	░░█░░█▄▄░░░░██░░█░
+	░░░███░░█░░░██░░█░
+	░░░░░██░░█░░██░░█░
+	░░░░░░█▒▒▒█░██░█░░
+	░░░░░░░▀▀▀▀████░░░
+	░░░░░░░░░░░░░░░░░░
+	- W
+	*/
+	public float viralSigmaBeamLength;
 	public override void update() {
+
+
+		if (viralSigmaBeamLength < 1 && charState is not ViralSigmaBeamState) {
+			viralSigmaBeamLength += Global.spf * 0.1f;
+			if (viralSigmaBeamLength > 1) viralSigmaBeamLength = 1;
+		}
+
+
 		if (charState is not InRideChaser) {
 			camOffsetX = MathInt.Round(Helpers.lerp(camOffsetX, 0, 10));
 		}
@@ -1790,7 +1818,7 @@ public partial class Character : Actor, IDamagable {
 
 	public bool canBeGrabbed() {
 		return (
-			grabInvulnTime == 0 && !isGrabImmune()
+			grabInvulnTime < 1 && !isGrabImmune()
 		);
 	}
 
@@ -2751,6 +2779,7 @@ public partial class Character : Actor, IDamagable {
 	public virtual bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
 		if (isInvulnerable()) return false;
 		if (isDeathOrReviveSprite()) return false;
+		if (charState is ViralSigmaPossess) return false;
 		if (Global.level.gameMode.setupTime > 0) return false;
 		if (Global.level.isRace()) {
 			bool isAxlSelfDamage = player.isAxl && damagerAlliance == player.alliance;
@@ -2976,6 +3005,19 @@ public partial class Character : Actor, IDamagable {
 					);
 				}
 			}
+			if (Global.level.server?.customMatchSettings?.magicPlus == true) {
+			if (this is BusterZero busterZero) {
+				float currentAmmo = busterZero.gigaAttack.ammo;
+				busterZero.gigaAttack.addAmmo(gigaAmmoToAdd, player);
+				if (player.isMainPlayer) {
+					Weapon.gigaAttackSoundLogic(
+						this, currentAmmo, busterZero.gigaAttack.ammo,
+						busterZero.gigaAttack.getAmmoUsage(0), busterZero.gigaAttack.maxAmmo
+					);
+				}
+			}
+			}
+
 			if (this is MegamanX) {
 				var gigaCrush = weapons.FirstOrDefault(w => w is GigaCrush);
 				if (gigaCrush != null) {
@@ -3083,7 +3125,11 @@ public partial class Character : Actor, IDamagable {
 			}
 
 			if (killer != null && killer != player && killer != Player.stagePlayer) {
+				
 				killer.addKill();
+				if (killer.possessedTime > 0) {
+					killer.possesser.addKill();
+				}
 				if (Global.level.gameMode is TeamDeathMatch) {
 					if (Global.isHost) {
 						if (killer.alliance != player.alliance) {
@@ -3442,14 +3488,14 @@ public partial class Character : Actor, IDamagable {
 		}
 	}
 
-	public bool canAffordRideArmor() {
+	public virtual bool canAffordRideArmor() {
 		if (Global.level.is1v1()) {
 			return health > Math.Floor(maxHealth / 2);
 		}
 		return player.currency >= Vile.callNewMechCost;
 	}
 
-	public void buyRideArmor() {
+	public virtual void buyRideArmor() {
 		if (Global.level.is1v1()) {
 			health -= Math.Floor(maxHealth / 2);
 			return;
@@ -3654,6 +3700,17 @@ public partial class Character : Actor, IDamagable {
 		}
 	}
 
+	public override Projectile? getMeleeProjById(int id, Point projPos, bool addToLevel = true) {
+		if (sprite.name.Contains("block")){
+		return new GenericMeleeProj(
+				new XBuster(), pos, ProjIds.SigmaSwordBlock, player,
+				0, 0, 0, isShield : true, isDeflectShield: true, addToLevel: true
+			) {
+				highPiority = true
+			};
+		}
+		return null;
+	}
 	public virtual void aiAttack(Actor? target) { }
 
 	public virtual void aiDodge(Actor? target) { }
@@ -3832,6 +3889,10 @@ public partial class Character : Actor, IDamagable {
 			rideChaser = null;
 		}
 	}
+
+
+
+	
 }
 
 public struct DamageEvent {

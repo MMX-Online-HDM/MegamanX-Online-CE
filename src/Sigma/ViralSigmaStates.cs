@@ -156,7 +156,7 @@ public class ViralSigmaPossess : CharState {
 			if (character.xScale < 0) character.xScale = 0;
 			character.yScale = character.xScale;
 			character.changePos(target.pos.addxy(0, -20));
-			bool unpossessButtonPressed = player.input.isPressed(Control.Shoot, player) || player.input.isPressed(Control.Special1, player);
+			bool unpossessButtonPressed = player.input.isPressed(Control.Special2, player);
 			if (target.player.possessedTime == 0 || target.destroyed || unpossessButtonPressed) {
 				unpossess();
 			} else {
@@ -366,6 +366,8 @@ public class ViralSigmaBeamProj : Projectile {
 	float explosionTime;
 	public ViralSigma sigma;
 
+	public float viralSigmaBeamLength;
+
 	public ViralSigmaBeamProj(
 		Weapon weapon, Point pos, Player player, ushort netProjId, bool rpc = false
 	) : base(
@@ -383,12 +385,13 @@ public class ViralSigmaBeamProj : Projectile {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
 
-		sigma = owner?.character as ViralSigma;
+	
 	}
 
 	public void getBottomY() {
 		if (ownedByLocalPlayer) {
-			float beamLength = sigma != null ? 150 : sigma.viralSigmaBeamLength * 150;
+			float beamLength = ((owner?.character == null) ? 150f : (owner.character.viralSigmaBeamLength * 150f));
+			
 			var hit = Global.level.raycast(
 				pos.addxy(0, -10), pos.addxy(0, beamLength), new List<Type>() { typeof(Wall) }
 			);
@@ -415,6 +418,9 @@ public class ViralSigmaBeamProj : Projectile {
 	public override void update() {
 		base.update();
 		getBottomY();
+		
+
+
 		Helpers.decrementTime(ref soundTime);
 		Helpers.decrementTime(ref explosionTime);
 		if (soundTime == 0) {
@@ -444,6 +450,10 @@ public class ViralSigmaBeamProj : Projectile {
 		bottomY = BitConverter.ToSingle(data, 0);
 	}
 }
+
+
+
+
 
 public class ViralSigmaRevive : CharState {
 	int state = 0;
@@ -527,8 +537,9 @@ public class ViralSigmaRevive : CharState {
 		character.frameIndex = 0;
 		character.xScale = 0;
 		character.yScale = 0;
-		character.incPos(new Point(0, -33));
+		//character.incPos(new Point(0, -33));
 		character.immuneToKnockback = true;
 		sigma.mainWeapon.ammo = sigma.mainWeapon.maxAmmo;
+		character.useGravity = false;
 	}
 }
