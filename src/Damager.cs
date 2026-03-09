@@ -354,6 +354,23 @@ public class Damager {
 			if (owner.character is PunchyZero { isViral: true }) {
 				character.addVirusTime(owner, damage);
 			}
+			if (owner.character is BusterZero { isViral: true }) {
+				character.addVirusTime(owner, damage);
+			}
+			if (victim is BusterZero { isViral: true }) {
+				if (damagingActor is Projectile proj && proj.ownerActor is Character damagerChara) {
+					damagerChara.addVirusTime(owner, damage / 2f);
+				}
+			}
+			
+
+			// MK2 Grab Fix
+			if (owner.character is Vile vile && !character.isGrabImmune()) {
+				if (vile.sprite.name.Contains("dash_grab") && projId == (int)ProjIds.VileMK2GrabStart){
+					character.changeState(new VileMK2Grabbed(vile), true);
+					vile.changeState(new VileMK2GrabState(character));
+				}
+			}
 
 			switch (projId) {
 				//burn [to the ground] section
@@ -390,9 +407,7 @@ public class Damager {
 					character.addBurnTime(owner, new FlameBurner(0), 2);
 					break;
 				case (int)ProjIds.QuakeBlazer:
-					if (!character.grounded && Global.customSettings?.quakeBlazerDownwards == true) {
-						character.vel.y += character.getJumpPower();
-					}
+					character.vel.y += Physics.JumpSpeed;
 					character.addBurnTime(owner, DanchienWeapon.staticWeapon, 0.5f);
 					break;
 				case (int)ProjIds.QuakeBlazerFlame:
@@ -1211,7 +1226,7 @@ public class Damager {
 		}
 		// Can also be overdrive by custom setting.
 		if (Global.level.server?.customMatchSettings?.assistBanlist == false) {
-			return false;		
+			return false;
 		}
 		return (ProjIds)projId switch {
 			ProjIds.Tornado => true,
@@ -1243,40 +1258,6 @@ public class Damager {
 		}
 
 		return null;
-	}
-
-
-	public static bool canDamageFrostShield(int projId) {
-		if (CrackedWall.canDamageCrackedWall(projId, null) != 0) {
-			return true;
-		}
-		if (Global.level.server.customMatchSettings?.frostShieldNerf != false) {
-			return true;
-		}
-		return projId switch {
-			(int)ProjIds.FireWave => true,
-			(int)ProjIds.FireWaveCharged => true,
-			(int)ProjIds.SpeedBurner => true,
-			(int)ProjIds.SpeedBurnerCharged => true,
-			(int)ProjIds.FlameRoundProj => true,
-			(int)ProjIds.FlameRoundFlameProj => true,
-			(int)ProjIds.Ryuenjin => true,
-			(int)ProjIds.FlameBurner => true,
-			(int)ProjIds.FlameBurnerHyper => true,
-			(int)ProjIds.CircleBlazeExplosion => true,
-			(int)ProjIds.QuakeBlazer => true,
-			(int)ProjIds.QuakeBlazerFlame => true,
-			(int)ProjIds.FlameMFireball => true,
-			(int)ProjIds.FlameMOilFire => true,
-			(int)ProjIds.VelGFire => true,
-			(int)ProjIds.SigmaWolfHeadFlameProj => true,
-			(int)ProjIds.WildHorseKick => true,
-			(int)ProjIds.Sigma3Fire => true,
-			(int)ProjIds.FStagDashCharge => true,
-			(int)ProjIds.FStagDash => true,
-			(int)ProjIds.FStagFireball => true,
-			_ => false
-		};
 	}
 
 	public static bool isBoomerang(int? projId) {

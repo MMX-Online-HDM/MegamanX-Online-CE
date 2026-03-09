@@ -666,6 +666,16 @@ public class GameMode {
 				}
 			}
 			#endregion
+			#region Buster Zero
+			if (drawPlayer.character is BusterZero bZero) {
+				int xStart = 11;
+				int yStart = 159;
+				
+				if (bZero.gigaAttack != null && bZero.gigaAttack.shootCooldown > 0) {
+					drawZeroGigaCooldown(bZero.gigaAttack, xStart, yStart);
+				}
+			}
+			#endregion
 			#region CmdSigma
 			if (drawPlayer.character is CmdSigma cmdSigma) {
 				//int xStart = 11;
@@ -1439,6 +1449,14 @@ public class GameMode {
 
 		//Weapon
 		renderWeapon(player, pos);
+
+		if (player.character is ViralSigma viral) {
+			renderAmmo(
+				pos.x + 16 * dir, ref pos.y, 58, 39,
+				MathF.Floor(viral.beamLength * 28),
+				maxAmmo: 28, allowSmall: true
+			);
+		}
 	}
 
 	public Point getHUDHealthPosition(HUDHealthPosition position, bool isHealth) {
@@ -1650,6 +1668,7 @@ public class GameMode {
 				CmdSigma sigma => sigma.ballWeapon,
 				NeoSigma neoSigma => neoSigma.gigaAttack,
 				PunchyZero punchyZero => punchyZero.gigaAttack,
+				BusterZero busterZero => busterZero.gigaAttack,
 				ViralSigma viralSigma => viralSigma.mainWeapon,
 				_ => player.character?.currentWeapon ?? player.weapon,
 			};

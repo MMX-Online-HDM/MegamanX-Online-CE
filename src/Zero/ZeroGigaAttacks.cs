@@ -58,6 +58,7 @@ public class RakuhouhaWeapon : Weapon {
 
 public class RekkohaWeapon : Weapon {
 	public static RekkohaWeapon netWeapon = new();
+	public float ammoCost = 28;
 
 	public RekkohaWeapon() : base() {
 		//damager = new Damager(player, 4, Global.defFlinch, 0.5f);
@@ -82,7 +83,7 @@ public class RekkohaWeapon : Weapon {
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
-		return 28;
+		return ammoCost;
 	}
 
 	public override void shoot(Character character, int[] args) {

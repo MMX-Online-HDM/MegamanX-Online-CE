@@ -5,9 +5,14 @@ using System.Runtime.InteropServices;
 namespace MMXOnline;
 
 public class BusterZero : Character {
+	// Hypermode stuff.
+	public bool isBlackZero;
+	public bool isAwakened;
+	public bool isViral;
+	public bool isHyperMode => (isBlackZero || isAwakened || isViral);
+	
 	public float zSaberCooldown;
 	public float lemonCooldown;
-	public bool isBlackZero;
 	public int stockedBusterLv;
 	public bool stockedSaber;
 	public float stockedTime;
@@ -17,21 +22,61 @@ public class BusterZero : Character {
 	public float aiAttackCooldown;
 	public float jumpTimeAI;
 
+	public AwakenedAura awakenedAuraWeapon = new();
+
+
+	public int hyperMode;
+
+	// Hypermode effects stuff.
+	public int awakenedAuraFrame;
+	public float awakenedAuraAnimTime;
+
+	// Hypermode attacks.
+	public Weapon? gigaAttack;
+	public int gigaAttackSelected;
+
+	public float donutTimer;
+	public int donutsPending;
+
+	public PZeroLoadout loadout;
+
 	public BusterZero(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
-		bool isWarpIn = true, int? heartTanks = null, bool isATrans = false
+		bool isWarpIn = true, PZeroLoadout? loadout = null,
+		int? heartTanks = null, bool isATrans = false
 	) : base(
 		player, x, y, xDir, isVisible,
 		netId, ownedByLocalPlayer,
 		isWarpIn, heartTanks, isATrans
 	) {
 		charId = CharIds.BusterZero;
+		// Loadout stuff.
+		loadout ??= player.loadout.pzeroLoadout.clone();
+		this.loadout = loadout;
 		altSoundId = AltSoundIds.X3;
+		hyperMode = loadout.hyperMode;
+		
+		if (Global.customSettings?.busterZeroGiga == true) {
+			gigaAttackSelected = loadout.gigaAttack;
+			gigaAttack = new RekkohaWeapon();
+		}
 	}
-	public override CharState getTauntState() {
-		return new BZeroTaunt();
+
+	public override CharState getTauntState() => new BZeroTaunt();
+
+	public override void addAmmo(float amount) {
+		gigaAttack?.addAmmo(amount, player);
 	}
+
+	public override void addPercentAmmo(float amount) {
+		gigaAttack?.addAmmoPercentHeal(amount);
+	}
+
+	public override bool canAddAmmo() {
+		return (gigaAttack != null && gigaAttack.ammo < gigaAttack.maxAmmo);
+	}
+	
 	public override void preUpdate() {
 		base.preUpdate();
 		if (!ownedByLocalPlayer) {
@@ -67,11 +112,20 @@ public class BusterZero : Character {
 		if (!ownedByLocalPlayer) {
 			return;
 		}
+		if (isAwakened) {
+			updateAwakenedAura();
+		}
 		// Hypermode music.
 		if (!Global.level.isHyper1v1()) {
-			if (isBlackZero && ownedByLocalPlayer) {
+			if (isHyperMode && Global.level.mainPlayer == player) {
 				if (musicSource == null) {
-					addMusicSource("zero_X3", getCenterPos(), true);
+					if (isAwakened) {
+						addMusicSource("XvsZeroV2_megasfc", getCenterPos(), true);
+					} else if (isViral) {
+						addMusicSource("introStageZeroX5_megasfc", getCenterPos(), true);
+					} else if (isBlackZero) {
+						addMusicSource("zero_X3", getCenterPos(), true);
+					}
 				}
 			} else {
 				destroyMusicSource();
@@ -79,6 +133,17 @@ public class BusterZero : Character {
 		}
 		// Charge and release charge logic.
 		chargeLogic(shoot);
+	}
+
+	public void updateAwakenedAura() {
+		awakenedAuraAnimTime += Global.speedMul;
+		if (awakenedAuraAnimTime > 4) {
+			awakenedAuraAnimTime = 0;
+			awakenedAuraFrame++;
+			if (awakenedAuraFrame > 3) {
+				awakenedAuraFrame = 0;
+			}
+		}
 	}
 
 	public override void chargeGfx() {
@@ -98,8 +163,8 @@ public class BusterZero : Character {
 
 	public override bool normalCtrl() {
 		// Handles Standard Hypermode Activations.
-		if (player.currency >= Player.zBusterZeroHyperCost &&
-			!isBlackZero &&
+		if (!isHyperMode &&
+			player.currency >= Player.zBusterZeroHyperCost &&
 			player.input.isHeld(Control.Special2, player) &&
 			charState is not HyperZeroStart and not WarpIn
 		) {
@@ -109,7 +174,11 @@ public class BusterZero : Character {
 		}
 		if (hyperProgress >= 1 && player.currency >= Player.zBusterZeroHyperCost) {
 			hyperProgress = 0;
-			changeState(new HyperBusterZeroStart(), true);
+			if (hyperMode >= 1) {
+				changeState(new HyperBusterZeroStart2(), true);
+			} else {
+				changeState(new HyperBusterZeroStart(), true);
+			}
 			return true;
 		}
 		return base.normalCtrl();
@@ -118,7 +187,17 @@ public class BusterZero : Character {
 	public override bool attackCtrl() {
 		bool shootPressed = player.input.isPressed(Control.Shoot, player);
 		bool specialPressed = player.input.isPressed(Control.Special1, player);
+		int yDir = player.input.getYDir(player);
 		if (specialPressed) {
+			if (gigaAttack != null && yDir == 1) {
+				if (flag != null ||
+					gigaAttack.ammo < gigaAttack.getAmmoUsage(0)
+				) {
+					return false;
+				}
+				gigaAttack.shoot(this, []);
+				return true;
+			}
 			if (zSaberCooldown == 0) {
 				if (stockedSaber) {
 					changeState(new BusterZeroHadangeki(), true);
@@ -172,6 +251,41 @@ public class BusterZero : Character {
 		return base.attackCtrl();
 	}
 
+	public void setShootAnim() {
+		string shootSprite = getSprite(charState.shootSpriteEx);
+		if (!Global.sprites.ContainsKey(shootSprite)) {
+			if (grounded) { shootSprite = "zero_shoot"; }
+			else { shootSprite = "zero_fall_shoot"; }
+		}
+		if (shootAnimTime == 0) {
+			changeSprite(shootSprite, false);
+		} else if (charState is Idle && !charState.inTransition()) {
+			frameIndex = 0;
+			frameTime = 0;
+		}
+		if (charState is LadderClimb) {
+			if (player.input.isHeld(Control.Left, player)) {
+				this.xDir = -1;
+			} else if (player.input.isHeld(Control.Right, player)) {
+				this.xDir = 1;
+			}
+		}
+		shootAnimTime = DefaultShootAnimTime;
+	}
+
+	public void shootDonutProj(int time) {
+		setShootAnim();
+		Point shootPos = getShootPos();
+		int xDir = getShootXDir();
+
+		new ShingetsurinProj(
+			shootPos, xDir,
+			time / 60f, this, player, player.getNextActorNetId(), rpc: true
+		);
+		playSound("shingetsurinx5", forcePlay: false, sendRpc: true);
+		shootAnimTime = DefaultShootAnimTime;
+	}
+
 	// Shoots stuff.
 	public void shoot(int chargeLevel) {
 		if (chargeLevel == 0) {
@@ -200,34 +314,48 @@ public class BusterZero : Character {
 			}
 		}
 		shootAnimTime = DefaultShootAnimTime;
+
+		shootSub(chargeLevel);
+	}
+	
+	public void shootSub(int chargeLevel, bool sfx = true, bool cd = true) {
+		if (isAwakened && chargeLevel >= 1) {
+			shootAwakened(chargeLevel, sfx, cd);
+		} else {
+			shootNormal(chargeLevel, sfx, cd);
+		}
+	}
+
+	public void shootNormal(int chargeLevel, bool sfx = true, bool cd = true) {
 		Point shootPos = getShootPos();
 		int xDir = getShootXDir();
+		string targetSound = "";
+		int? targetCooldown = null;
 
 		if (chargeLevel == 0) {
-			playSound("busterX3", sendRpc: true);
+			targetSound = "busterX3";
 			var lemon = new DZBusterProj(
 				shootPos, xDir, this, player, player.getNextActorNetId(), rpc: true
 			);
 			zeroLemonsOnField.Add(lemon);
-			lemonCooldown = 9;
+			targetCooldown = 9;
 		} else if (chargeLevel == 1) {
-			playSound("buster2X3", sendRpc: true);
+			targetSound = "buster2X3";
 			new DZBuster2Proj(
 				shootPos, xDir, this, player, player.getNextActorNetId(), rpc: true
 			);
-			lemonCooldown = 22;
+			targetCooldown = 22;
 		} else if (chargeLevel == 2) {
-			playSound("buster3X3", sendRpc: true);
+			targetSound = "buster3X3";
 			new DZBuster3Proj(
 				shootPos, xDir, this, player, player.getNextActorNetId(), rpc: true
 			);
-			lemonCooldown = 22;
+			targetCooldown = 22;
 		} else if (chargeLevel == 3) {
 			if (charState is WallSlide) {
 				shoot(2);
 				stockedBusterLv = 1;
-				lemonCooldown = 22;
-				return;
+				targetCooldown = 22;
 			} else {
 				shootAnimTime = 0;
 				changeState(new BusterZeroDoubleBuster(false, 3), true);
@@ -237,15 +365,82 @@ public class BusterZero : Character {
 				shoot(2);
 				stockedBusterLv = 2;
 				stockedSaber = true;
-				lemonCooldown = 22;
-				return;
+				targetCooldown = 22;
 			} else {
 				shootAnimTime = 0;
 				changeState(new BusterZeroDoubleBuster(false, 4), true);
 			}
 		}
+		if (targetSound != "") {
+			playSound(targetSound, sendRpc: true);
+		}
+		if (targetCooldown != null && cd) {
+			lemonCooldown = targetCooldown.Value;
+		}
 		if (chargeLevel >= 1) {
 			stopCharge();
+		}
+	}
+
+	public void shootAwakened(int chargeLevel, bool sfx = true, bool cd = true) {
+		Point shootPos = getShootPos();
+		int xDir = getShootXDir();
+		string targetSound = "";
+		int? targetCooldown = null;
+
+		if (chargeLevel == 1) {
+			targetSound = "buster3X3";
+			new DZShinBusterProj(
+				shootPos, xDir, this, player.getNextActorNetId(), sendRpc: true
+			);
+			targetCooldown = 22;
+		} else if (chargeLevel == 2) {
+			targetSound = "shingetsurinX5";
+			new DZShinGetsurinProj(
+				shootPos, xDir, 0, this, player.getNextActorNetId(), sendRpc: true
+			);
+			targetCooldown = 22;
+		} else if (chargeLevel == 3) {
+			if (charState is WallSlide) {
+				shoot(2);
+				stockedBusterLv = 1;
+				targetCooldown = 22;
+			} else {
+				shootAnimTime = 0;
+				changeState(new BusterZeroDoubleBuster(false, 3), true);
+			}
+		} else if (chargeLevel >= 4) {
+			if (charState is WallSlide) {
+				shoot(2);
+				stockedBusterLv = 2;
+				stockedSaber = true;
+				targetCooldown = 22;
+			} else {
+				shootAnimTime = 0;
+				changeState(new BusterZeroDoubleBuster(false, 4), true);
+			}
+		}
+		if (targetSound != "") {
+			playSound(targetSound, sendRpc: true);
+		}
+		if (targetCooldown != null && cd) {
+			lemonCooldown = targetCooldown.Value;
+		}
+		if (chargeLevel >= 1) {
+			stopCharge();
+		}
+	}
+
+	public void shootHadangeki() {
+		Point shootPos = pos.addxy(46 * xDir, -20);
+		
+		if (isAwakened) {
+			new DZShinHadangekiProj(shootPos, xDir, this, player.getNextActorNetId());
+		} else {
+			int type = 0;
+			if (isViral) { type = 1; }
+			if (isBlackZero) { type = 2; }
+			new DZHadangekiProj(shootPos, xDir, type, this, player.getNextActorNetId());
 		}
 	}
 
@@ -292,7 +487,9 @@ public class BusterZero : Character {
 
 	public override void increaseCharge() {
 		float factor = 1;
-		if (isBlackZero) factor = 1.5f;
+		if (isBlackZero) {
+			factor = 1.5f;
+		}
 		chargeTime += Global.speedMul * factor;
 	}
 
@@ -320,6 +517,33 @@ public class BusterZero : Character {
 		return dashedInAir == 0 || (dashedInAir == 1 && isBlackZero);
 	}
 
+	public override void render(float x, float y) {
+		if (isViral && visible) {
+			addRenderEffect(RenderEffectType.Trail);
+		} else {
+			removeRenderEffect(RenderEffectType.Trail);
+		}
+		if (isAwakened && visible) {
+			float xOff = 0;
+			int auraXDir = 1;
+			float yOff = 5;
+			string auraSprite = "zero_awakened_aura";
+			if (sprite.name == getSprite("dash") && frameIndex >= 2) {
+				auraSprite = "zero_awakened_aura2";
+				auraXDir = xDir;
+				yOff = 8;
+			}
+			Global.sprites[auraSprite].draw(
+				awakenedAuraFrame,
+				pos.x + x + (xOff * auraXDir),
+				pos.y + y + yOff, auraXDir,
+				1, null, 1, 1, 1,
+				zIndex - 1
+			);
+		}
+		base.render(x, y);
+	}
+
 	public override float getLabelOffY() {
 		if (sprite.name.Contains("_ra_")) {
 			return 25;
@@ -336,6 +560,12 @@ public class BusterZero : Character {
 			palette = player.zeroPaletteShader;
 			palette?.SetUniform("palette", 1);
 			palette?.SetUniform("paletteTexture", Global.textures["hyperBusterZeroPalette"]);
+		}
+		if (isAwakened) {
+			palette = player.zeroAzPaletteShader;
+		}
+		if (isViral) {
+			palette = player.nightmareZeroShader;
 		}
 		if (Global.isOnFrameCycle(4)) {
 			switch (getChargeLevel()) {
@@ -373,6 +603,8 @@ public class BusterZero : Character {
 		List<byte> customData = base.getCustomActorNetData();
 		customData.Add(Helpers.boolArrayToByte([
 			isBlackZero,
+			isAwakened,
+			isViral,
 			stockedSaber
 		]));
 		customData.Add((byte)stockedBusterLv);
@@ -383,9 +615,13 @@ public class BusterZero : Character {
 		// Update base arguments.
 		base.updateCustomActorNetData(data);
 		data = data[data[0]..];
+
 		bool[] flags = Helpers.byteToBoolArray(data[0]);
 		isBlackZero = flags[0];
-		stockedSaber = flags[1];
+		isAwakened = flags[1];
+		isViral = flags[2];
+		stockedSaber = flags[3];
+
 		stockedBusterLv = data[1];
 	}
 
@@ -395,9 +631,14 @@ public class BusterZero : Character {
 			player.press(Control.Shoot);
 		}
 		// Go hypermode 
-		if (player.currency >= 10 && !isBlackZero && !isInvulnerable()
-			&& charState is not HyperBusterZeroStart and not WarpIn) {
-			changeState(new HyperBusterZeroStart(), true);
+		if (player.currency >= Player.zBusterZeroHyperCost && !isBlackZero && !isInvulnerable()
+			&& charState is not HyperBusterZeroStart and not WarpIn
+		) {
+			if (hyperMode == 0) {
+				changeState(new HyperBusterZeroStart(), true);
+			} else {
+				changeState(new HyperBusterZeroStart2(), true);
+			}
 		}
 		float enemyDist = 300;
 		float enemyDistY = 30;

@@ -159,10 +159,25 @@ public class ZeroCrouchSlashState : ZeroGenericMeleeState {
 }
 
 public class ZeroDashSlashState : ZeroGenericMeleeState {
+	public bool SlideOnce;
+
 	public ZeroDashSlashState() : base("attack_dash") {
 		sound = "saber1";
 		soundFrame = 1;
 	}
+
+	public override void update() {
+		base.update();
+		if (Global.customSettings?.zeroSpeedGlitch == true) {
+			if (!SlideOnce && stateTime > 0.2f){
+				if (player.input.isHeld(Control.Dash,player) && player.input.isPressed(Control.Shoot,player) ){
+					character.slideVel = character.xDir * character.getDashSpeed() * 1.3f;
+					SlideOnce = true;
+				}
+			}
+		}
+	}
+
 }
 
 public class ZeroShippuugaState : ZeroGenericMeleeState {

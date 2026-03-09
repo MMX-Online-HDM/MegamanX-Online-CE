@@ -14,7 +14,7 @@ public class BusterZeroState : CharState {
 		sprite, shootSprite, attackSprite, transitionSprite, transShootSprite
 	) {
 	}
-	
+
 	public override void onEnter(CharState oldState) {
 		zero = character as BusterZero ?? throw new NullReferenceException();
 	}
@@ -66,7 +66,7 @@ public class BusterZeroMeleeWall : BusterZeroState {
 	public BusterZeroMeleeWall(int wallDir, Collider wallCollider) : base("wall_slide_attack") {
 		this.wallDir = wallDir;
 		this.wallCollider = wallCollider;
-		
+
 	}
 
 	public override void update() {
@@ -121,10 +121,7 @@ public class BusterZeroDoubleBuster : BusterZeroState {
 		if (!fired1 && character.frameIndex == 3) {
 			fired1 = true;
 			character.playSound("buster3X3", sendRpc: true);
-			new DZBuster3Proj(
-				character.getShootPos(), character.getShootXDir(),
-				zero, player, player.getNextActorNetId(), rpc: true
-			);
+			zero.shootSub(2);
 			zero.stockedTime = 0;
 		}
 		if (!fired2 && character.frameIndex == 7) {
@@ -132,17 +129,11 @@ public class BusterZeroDoubleBuster : BusterZeroState {
 			if (!isPinkCharge) {
 				zero.stockedBusterLv = 0;
 				character.playSound("buster3X3", sendRpc: true);
-				new DZBuster3Proj(
-					character.getShootPos(), character.getShootXDir(),
-					zero, player, player.getNextActorNetId(), rpc: true
-				);
+				zero.shootSub(2);
 			} else {
 				zero.stockedBusterLv = 0;
 				character.playSound("buster2X3", sendRpc: true);
-				new DZBuster2Proj(
-					character.getShootPos(), character.getShootXDir(),
-					zero, player, player.getNextActorNetId(), rpc: true
-				);
+				zero.shootSub(1);
 			}
 			zero.stockedTime = 0;
 		}
@@ -210,7 +201,6 @@ public class BusterZeroHadangeki : BusterZeroState {
 	public bool fired;
 	public bool sound;
 
-
 	public BusterZeroHadangeki() : base("projswing") {
 		landSprite = "projswing";
 		airSprite = "projswing_air";
@@ -223,18 +213,15 @@ public class BusterZeroHadangeki : BusterZeroState {
 
 	public override void update() {
 		base.update();
-		
+
 		if (character.frameIndex >= 3 && !sound) {
 			sound = true;
 			character.playSound("zerosaberx3", sendRpc: true);
 		}
 		if (character.frameIndex >= 6 && !fired) {
 			zero.stockedSaber = false;
+			zero.shootHadangeki();
 			fired = true;
-			new DZHadangekiProj(
-				character.pos.addxy(46 * character.xDir, -20), character.xDir,
-				zero.isBlackZero, zero, player, player.getNextActorNetId(), rpc: true
-			);
 		}
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
@@ -275,11 +262,8 @@ public class BusterZeroHadangekiWall : BusterZeroState {
 		if (character.frameIndex >= 2 && !fired) {
 			character.playSound("zerosaberx3", sendRpc: true);
 			zero.stockedSaber = false;
+			zero.shootHadangeki();
 			fired = true;
-			new DZHadangekiProj(
-				character.pos.addxy(30 * -wallDir, -20), -wallDir,
-				zero.isBlackZero, zero, player, player.getNextActorNetId(), rpc: true
-			);
 		}
 		if (character.isAnimOver()) {
 			character.changeState(new WallSlide(wallDir, wallCollider) { enterSound = "" });
@@ -299,6 +283,28 @@ public class BusterZeroHadangekiWall : BusterZeroState {
 	}
 }
 
+public class BZeroTaunt : CharState {
+	public BZeroTaunt() : base("win") {
+
+	}
+	public override void update() {
+		base.update();
+		if (character.isAnimOver() && !Global.level.gameMode.playerWon(player)) {
+			character.changeToIdleOrFall();
+		}
+		if (character.frameIndex == 1 && !once) {
+			once = true;
+			character.playSound("ching", sendRpc: true);
+			new Anim(
+				character.pos.addxy(character.xDir, -25f),
+				"zero_ching", -character.xDir,
+				player.getNextActorNetId(),
+				destroyOnEnd: true, sendRpc: true
+			);
+		}
+	}
+}
+
 public class HyperBusterZeroStart : BusterZeroState {
 	public float radius = 200;
 	public float time;
@@ -306,6 +312,7 @@ public class HyperBusterZeroStart : BusterZeroState {
 
 	public HyperBusterZeroStart() : base("hyper_start") {
 		invincible = true;
+		immortal = true;
 		statusEffectImmune = true;
 	}
 
@@ -317,7 +324,7 @@ public class HyperBusterZeroStart : BusterZeroState {
 			} else {
 				time = Global.spf;
 				radius = 0;
-				zero.isBlackZero = true;
+				HyperBusterZeroStart.activateHypermode(zero);
 				character.playSound("ching");
 				character.fillHealthToMax();
 			}
@@ -325,6 +332,32 @@ public class HyperBusterZeroStart : BusterZeroState {
 			time += Global.spf;
 			if (time >= 1) {
 				character.changeToLandingOrFall();
+			}
+		}
+	}
+
+	public static void activateHypermode(BusterZero zero) {
+		if (zero.hyperMode == 1) {
+			zero.isAwakened = true;
+			if (zero.gigaAttack != null) {
+				ShinMessenkou newWeapon = new ShinMessenkou();
+				newWeapon.ammo = zero.gigaAttack?.ammo ?? MathF.Ceiling(newWeapon.maxAmmo / 2);
+				zero.gigaAttack = newWeapon;
+			}
+		} else if (zero.hyperMode == 2) {
+			zero.isViral = true;
+			if (zero.gigaAttack != null) {
+				DarkHoldWeapon newWeapon = new DarkHoldWeapon();
+				newWeapon.ammo = zero.gigaAttack?.ammo ?? MathF.Ceiling(newWeapon.maxAmmo / 2);
+				zero.gigaAttack = newWeapon;
+			}
+		} else {
+			zero.isBlackZero = true;
+			if (zero.gigaAttack != null) {
+				RekkohaWeapon newWeapon = new RekkohaWeapon();
+				newWeapon.ammo = zero.gigaAttack?.ammo ?? MathF.Ceiling(newWeapon.maxAmmo / 2);
+				newWeapon.ammoCost = 14;
+				zero.gigaAttack = newWeapon;
 			}
 		}
 	}
@@ -361,25 +394,147 @@ public class HyperBusterZeroStart : BusterZeroState {
 		);
 	}
 }
-public class BZeroTaunt : CharState {
-	public BZeroTaunt() : base("win") {
 
+public class HyperBusterZeroStart2 : BusterZeroState {
+	public float radius = 200;
+	public float time;
+	Anim? virusEffectParts;
+	Anim[] virusAnim = new Anim[3];
+	float[] delayedVirusTimer = { 0, 7, 14 };
+	string virusAnimName = "";
+
+	public HyperBusterZeroStart2() : base("hyper_start") {
+		invincible = true;
+		immortal = true;
+		statusEffectImmune = true;
 	}
+
 	public override void update() {
 		base.update();
-		if (character.isAnimOver() && !Global.level.gameMode.playerWon(player)) {
-			character.changeToIdleOrFall();
+		if (virusAnimName != "") {
+			int animCount = 0;
+			for (int i = 0; i < virusAnim.Length; i++) {
+				if (virusAnim[i] != null) {
+					if (virusAnim[i].pos == character.getCenterPos()) {
+						virusAnim[i].destroySelf();
+					}
+					if (virusAnim[i].destroyed) {
+						character.playSound("shingetsurinx5", true);
+						if (stateFrames > 55) {
+							virusAnim[i] = null!;
+							continue;
+						}
+						virusAnim[i] = virusAnim[i] = createVirusAnim();
+					} else {
+						animCount++;
+					}
+					virusAnim[i].moveToPos(character.getCenterPos(), 300);
+					if (virusAnim[i].pos.distanceTo(character.getCenterPos()) < 10) {
+						virusAnim[i].destroySelf();
+					}
+				} else if (delayedVirusTimer[i] > 0) {
+					delayedVirusTimer[i] -= Global.speedMul;
+					if (delayedVirusTimer[i] <= 0) {
+						delayedVirusTimer[i] = 0;
+						virusAnim[i] = createVirusAnim();
+					}
+				}
+				if (animCount == 0 && stateFrames > 55 && virusEffectParts != null) {
+					virusEffectParts.destroySelf();
+				}
+			}
 		}
-		if (character.frameIndex == 1 && !once) {
-			once = true;
-			character.playSound("ching", sendRpc: true);
-			new Anim(
-				character.pos.addxy(character.xDir, -25f),
-				"zero_ching", -character.xDir,
-				player.getNextActorNetId(),
-				destroyOnEnd: true, sendRpc: true
+		if (time == 0) {
+			if (radius >= 0) {
+				radius -= Global.spf * 200;
+			} else {
+				time = Global.spf;
+				radius = 0;
+				HyperBusterZeroStart.activateHypermode(zero);
+				character.playSound("ching");
+				character.fillHealthToMax();
+			}
+		} else {
+			time += Global.spf;
+			if (time >= 1) {
+				character.changeToIdleOrFall();
+			}
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+		character.vel = new Point();
+		character.clenaseEverithing();
+		if (zero == null) {
+			throw new NullReferenceException();
+		}
+		character.player.currency -= Player.zBusterZeroHyperCost;
+		if (zero.hyperMode == 2) {
+			zero.changeSpriteFromName("hyper_viral", true);
+			virusAnimName = "sigmavirushead";
+			virusAnim[0] = createVirusAnim();
+		}
+		if (zero.hyperMode == 1) {
+			zero.changeSpriteFromName("hyper_awakened", true);
+			virusAnimName = "zerovirus";
+			virusAnim[0] = createVirusAnim();
+			virusEffectParts = new Anim(character.pos.addxy(0, 4), "viruseffect", -character.xDir, null, false);
+			virusEffectParts.blink = true;
+		}
+		if (zero.hyperMode == 0) {
+			character.playSound("blackzeroentry", forcePlay: false, sendRpc: true);
+		}
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+		if (character != null) {
+			character.invulnTime = 0.5f;
+		}
+		virusEffectParts?.destroySelf();
+		bool playedHitSound = false;
+		for (int i = 0; i < virusAnim.Length; i++) {
+			if (virusAnim[i]?.destroyed == false) {
+				if (!playedHitSound) {
+					character?.playSound("shingetsurinx5", true);
+					playedHitSound = true;
+				}
+				virusAnim[i]?.destroySelf();
+			}
+		}
+	}
+
+	public Anim createVirusAnim() {
+		float newAngle = Helpers.randomRange(0, 359);
+		Point newPos = new(Helpers.cosd(newAngle) * 100, Helpers.sind(newAngle) * 100);
+		float diplayAngle = newAngle;
+		int xDir = -1;
+		if (virusAnimName == "sigmavirushead") {
+			xDir = 1;
+		}
+		if (diplayAngle > 90 && diplayAngle < 270) {
+			diplayAngle = (diplayAngle + 180f) % 360f;
+			xDir *= -1;
+		}
+		return new Anim(
+			character.getCenterPos() + newPos,
+			virusAnimName, xDir,
+			player.getNextActorNetId(), false, sendRpc: true
+		) {
+			angle = diplayAngle
+		};
+	}
+
+	public override void render(float x, float y) {
+		base.render(x, y);
+		Point pos = character.getCenterPos();
+		if (zero.hyperMode == 0) {
+			DrawWrappers.DrawCircle(
+				pos.x + x, pos.y + y, radius, false, Color.White, 5, character.zIndex + 1, true, Color.White
 			);
 		}
 	}
 }
-

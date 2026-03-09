@@ -16,8 +16,29 @@ public class WolfSigma : Character {
 	) {
 		charId = CharIds.WolfSigma;
 		altSoundId = AltSoundIds.X1;
+
+		bool isRevive = true;
+
+		if (!ownedByLocalPlayer) {
+			visible = true;
+		} else {
+			if (isRevive) {
+				useGravity = false;
+				changeSprite("sigma_wolf_head", true);
+				changeState(new WolfSigmaRevive(player.explodeDieEffect), true);
+			} else {
+				visible = true;
+				changeSprite("sigma_wolf_head", true);
+				changeState(new WolfSigmaHeadState(), true);
+			}
+		}
 	}
 
+
+	public override void update() {
+		player.changeWeaponControls();
+
+	}
 	public override bool isSoundCentered() {
 		return false;
 	}
@@ -37,8 +58,24 @@ public class WolfSigma : Character {
 		head?.explode();
 		leftHand?.destroySelf();
 		rightHand?.destroySelf();
-
+		destroyMusicSource();
 		base.destroySelf(spriteName, fadeSound, disableRpc, doRpcEvenIfNotOwned, favorDefenderProjDestroy);
+	}
+	
+
+		public override int getMaxHealth() {
+		if (isATrans) {
+			return base.getMaxHealth();
+		}
+		return MathInt.Ceiling(Player.getModifiedHealth(32) * Player.getHpMod());
+	}
+
+	public override string getSprite(string spriteName) {
+		if (Global.sprites.ContainsKey("sigma_wolf_" + spriteName)) {
+			return "sigma_wolf_" + spriteName;
+		}
+		return "sigma_" + spriteName;
+		// Do not Remove this bc it basically prevents shenanigans that would softlock him
 	}
 
 	public override Point getCamCenterPos(bool ignoreZoom = false) {
@@ -74,6 +111,19 @@ public class WolfSigma : Character {
 		}
 		return pos.round().addxy(camOffsetX, 0);
 	}
+
+	public override bool isNonDamageStatusImmune() {
+		return true;
+	}
+
+	public override bool normalCtrl() {
+		return false;
+	}
+	
+	public override bool isPushImmune() {
+		return true;
+	}
+	
 
 	public override void onDeath() {
 		base.onDeath();

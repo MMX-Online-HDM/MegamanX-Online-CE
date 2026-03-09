@@ -23,7 +23,7 @@ public class ViralSigmaIdle : CharState {
 	bool winTauntOnce;
 	public ViralSigma sigma;
 
-	public ViralSigmaIdle() : base("viral_idle") {
+	public ViralSigmaIdle() : base("idle") {
 		pushImmune = true;
 	}
 
@@ -38,8 +38,8 @@ public class ViralSigmaIdle : CharState {
 		clampViralSigmaPos();
 
 		if (character.angle == 0) {
-			if (player.input.isPressed(Control.Dash, player) && sigma.viralSigmaTackleCooldown == 0) {
-				sigma.viralSigmaTackleCooldown = sigma.viralSigmaTackleMaxCooldown;
+			if (player.input.isPressed(Control.Dash, player) && sigma.tackleCooldown == 0) {
+				sigma.tackleCooldown = sigma.tackleMaxCooldown;
 				character.changeState(new ViralSigmaTackle(inputDir), true);
 				return;
 			}
@@ -79,7 +79,7 @@ public class ViralSigmaIdle : CharState {
 public class ViralSigmaTaunt : CharState {
 	float lastFrameTime;
 	bool isWin;
-	public ViralSigmaTaunt(bool isWin) : base("viral_taunt") {
+	public ViralSigmaTaunt(bool isWin) : base("taunt") {
 		pushImmune = true;
 		this.isWin = isWin;
 	}
@@ -103,7 +103,7 @@ public class ViralSigmaPossessStart : CharState {
 	Character target;
 	public ViralSigma sigma;
 
-	public ViralSigmaPossessStart(Character target) : base("viral_possess") {
+	public ViralSigmaPossessStart(Character target) : base("possess") {
 		pushImmune = true;
 		this.target = target;
 	}
@@ -144,7 +144,7 @@ public class ViralSigmaPossess : CharState {
 	int state;
 	public ViralSigma sigma;
 
-	public ViralSigmaPossess(Character target) : base("viral_exit") {
+	public ViralSigmaPossess(Character target) : base("exit") {
 		pushImmune = true;
 		this.target = target;
 	}
@@ -156,7 +156,7 @@ public class ViralSigmaPossess : CharState {
 			if (character.xScale < 0) character.xScale = 0;
 			character.yScale = character.xScale;
 			character.changePos(target.pos.addxy(0, -20));
-			bool unpossessButtonPressed = player.input.isPressed(Control.Shoot, player) || player.input.isPressed(Control.Special1, player);
+			bool unpossessButtonPressed = player.input.isPressed(Control.Special2, player);
 			if (target.player.possessedTime == 0 || target.destroyed || unpossessButtonPressed) {
 				unpossess();
 			} else {
@@ -196,7 +196,7 @@ public class ViralSigmaShoot : CharState {
 	int xDir;
 	ViralSigmaShootProj proj;
 
-	public ViralSigmaShoot(float xDir) : base("viral_spit") {
+	public ViralSigmaShoot(float xDir) : base("spit") {
 		pushImmune = true;
 		this.xDir = MathF.Sign(xDir);
 		if (this.xDir == 0) this.xDir = 1;
@@ -239,7 +239,7 @@ public class ViralSigmaShoot : CharState {
 public class ViralSigmaShootProj : Projectile {
 	MechaniloidWeapon mechaniloidWeapon;
 	public ViralSigmaShootProj(MechaniloidWeapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 0, player, "sigma2_viral_proj", 0, 0.1f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 0, 0, player, "viralsigma_proj", 0, 0.1f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.Sigma2ViralProj;
 		destroyOnHit = true;
 		vel = new Point(150 * xDir, 250);
@@ -282,7 +282,7 @@ public class ViralSigmaTackle : CharState {
 	Point tackleDir;
 	public ViralSigma sigma;
 
-	public ViralSigmaTackle(Point tackleDir) : base("viral_tackle") {
+	public ViralSigmaTackle(Point tackleDir) : base("tackle") {
 		pushImmune = true;
 		this.tackleDir = tackleDir;
 	}
@@ -320,7 +320,7 @@ public class ViralSigmaBeamState : CharState {
 	ViralSigmaBeamProj proj;
 	public ViralSigma sigma;
 
-	public ViralSigmaBeamState() : base("viral_shoot") {
+	public ViralSigmaBeamState() : base("shoot") {
 		pushImmune = true;
 	}
 
@@ -332,9 +332,9 @@ public class ViralSigmaBeamState : CharState {
 		character.move(inputDir.times(125));
 		clampViralSigmaPos();
 
-		sigma.viralSigmaBeamLength -= Global.spf * 0.1f;
-		if (sigma.viralSigmaBeamLength <= 0) {
-			sigma.viralSigmaBeamLength = 0;
+		sigma.beamLength -= Global.spf * 0.1f;
+		if (sigma.beamLength <= 0) {
+			sigma.beamLength = 0;
 			character.changeState(new ViralSigmaIdle(), true);
 			return;
 		}
@@ -383,12 +383,15 @@ public class ViralSigmaBeamProj : Projectile {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
 
-		sigma = owner?.character as ViralSigma;
+	
 	}
 
 	public void getBottomY() {
 		if (ownedByLocalPlayer) {
-			float beamLength = sigma != null ? 150 : sigma.viralSigmaBeamLength * 150;
+			float beamLength = 150f;			
+			if (owner?.character is ViralSigma viral) {
+				beamLength = viral.beamLength * 150;
+			}
 			var hit = Global.level.raycast(
 				pos.addxy(0, -10), pos.addxy(0, beamLength), new List<Type>() { typeof(Wall) }
 			);
@@ -415,6 +418,7 @@ public class ViralSigmaBeamProj : Projectile {
 	public override void update() {
 		base.update();
 		getBottomY();
+
 		Helpers.decrementTime(ref soundTime);
 		Helpers.decrementTime(ref explosionTime);
 		if (soundTime == 0) {
@@ -450,7 +454,7 @@ public class ViralSigmaRevive : CharState {
 	public ExplodeDieEffect explodeDieEffect;
 	public ViralSigma sigma;
 
-	public ViralSigmaRevive(ExplodeDieEffect explodeDieEffect) : base("viral_enter") {
+	public ViralSigmaRevive(ExplodeDieEffect explodeDieEffect) : base("enter") {
 		this.explodeDieEffect = explodeDieEffect;
 	}
 
@@ -527,8 +531,9 @@ public class ViralSigmaRevive : CharState {
 		character.frameIndex = 0;
 		character.xScale = 0;
 		character.yScale = 0;
-		character.incPos(new Point(0, -33));
+		//character.incPos(new Point(0, -33));
 		character.immuneToKnockback = true;
 		sigma.mainWeapon.ammo = sigma.mainWeapon.maxAmmo;
+		character.useGravity = false;
 	}
 }

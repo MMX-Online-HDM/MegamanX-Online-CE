@@ -996,6 +996,7 @@ public partial class Character : Actor, IDamagable {
 		else if (player.input.isPressed(Control.Shoot, player)) {
 			mw.summon(player, pos, xDir);
 		}
+
 	}
 
 	public override void update() {
@@ -1762,9 +1763,6 @@ public partial class Character : Actor, IDamagable {
 				return true;
 			}
 		}
-		if (sprite.name == "sigma2_viral_exit") {
-			return true;
-		}
 		if (ownedByLocalPlayer && charState is WarpOut or WolfSigmaRevive or ViralSigmaRevive or KaiserSigmaRevive) {
 			return true;
 		}
@@ -1790,7 +1788,7 @@ public partial class Character : Actor, IDamagable {
 
 	public bool canBeGrabbed() {
 		return (
-			grabInvulnTime == 0 && !isGrabImmune()
+			grabInvulnTime <= 0 && !isGrabImmune()
 		);
 	}
 
@@ -2751,6 +2749,7 @@ public partial class Character : Actor, IDamagable {
 	public virtual bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
 		if (isInvulnerable()) return false;
 		if (isDeathOrReviveSprite()) return false;
+		if (charState is ViralSigmaPossess) return false;
 		if (Global.level.gameMode.setupTime > 0) return false;
 		if (Global.level.isRace()) {
 			bool isAxlSelfDamage = player.isAxl && damagerAlliance == player.alliance;
@@ -2862,12 +2861,17 @@ public partial class Character : Actor, IDamagable {
 			if (charState is SwordBlock) {
 				damageSavings += (calcDamage * 0.5m);
 			}
-			if (charState is SigmaAutoBlock) {
+			else if (charState is SigmaAutoBlock) {
 				damageSavings += (calcDamage * 0.25m);
 			}
-			if (charState is SigmaBlock) {
+			else if (charState is SigmaBlock) {
 				damageSavings += (calcDamage * 0.5m);
 			}
+			// Universal block.
+			else if (Global.customSettings?.universalGuard == true && sprite.name.Contains("block")) {
+				damageSavings += (calcDamage * 0.5m);
+			}
+			
 			if (acidTime > 0) {
 				decimal extraDamage = 0.25m + (0.25m * ((decimal)acidTime / 8.0m));
 				damageDebt += (calcDamage * extraDamage);
@@ -2973,6 +2977,16 @@ public partial class Character : Actor, IDamagable {
 					Weapon.gigaAttackSoundLogic(
 						this, currentAmmo, punchyZero.gigaAttack.ammo,
 						punchyZero.gigaAttack.getAmmoUsage(0), punchyZero.gigaAttack.maxAmmo
+					);
+				}
+			}
+			if (this is BusterZero busterZero && busterZero.gigaAttack != null) {
+				float currentAmmo = busterZero.gigaAttack.ammo;
+				busterZero.gigaAttack.addAmmo(gigaAmmoToAdd, player);
+				if (player.isMainPlayer) {
+					Weapon.gigaAttackSoundLogic(
+						this, currentAmmo, busterZero.gigaAttack.ammo,
+						busterZero.gigaAttack.getAmmoUsage(0), busterZero.gigaAttack.maxAmmo
 					);
 				}
 			}
@@ -3084,6 +3098,9 @@ public partial class Character : Actor, IDamagable {
 
 			if (killer != null && killer != player && killer != Player.stagePlayer) {
 				killer.addKill();
+				if (killer.possessedTime > 0) {
+					killer.possesser.addKill();
+				}
 				if (Global.level.gameMode is TeamDeathMatch) {
 					if (Global.isHost) {
 						if (killer.alliance != player.alliance) {
@@ -3442,14 +3459,14 @@ public partial class Character : Actor, IDamagable {
 		}
 	}
 
-	public bool canAffordRideArmor() {
+	public virtual bool canAffordRideArmor() {
 		if (Global.level.is1v1()) {
 			return health > Math.Floor(maxHealth / 2);
 		}
 		return player.currency >= Vile.callNewMechCost;
 	}
 
-	public void buyRideArmor() {
+	public virtual void buyRideArmor() {
 		if (Global.level.is1v1()) {
 			health -= Math.Floor(maxHealth / 2);
 			return;

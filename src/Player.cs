@@ -899,13 +899,14 @@ public partial class Player {
 				}
 			}
 			*/
+			
 			if (canReviveSigma(out var spawnPoint, 2) &&
 				(input.isPressed(Control.Special2, this) ||
 				Global.level.isHyper1v1() ||
 				Global.shouldAiAutoRevive
 			)
 			) {
-				reviveSigma(2, spawnPoint);
+				reviveSigma(loadout.sigmaLoadout.sigmaForm , spawnPoint);
 			}
 		} else if (character is MegamanX) {
 			if (canReviveX() && (input.isPressed(Control.Special2, this) || Global.shouldAiAutoRevive)) {
@@ -1305,8 +1306,10 @@ public partial class Player {
 		input.possessedControlHeld[Control.Down] = Global.input.isHeld(Control.Down, Global.level.mainPlayer);
 		input.possessedControlHeld[Control.Jump] = Global.input.isHeld(Control.Jump, Global.level.mainPlayer);
 		input.possessedControlHeld[Control.Dash] = Global.input.isHeld(Control.Dash, Global.level.mainPlayer);
+		input.possessedControlHeld[Control.Shoot] = Global.input.isHeld(Control.Shoot, Global.level.mainPlayer);
+		input.possessedControlHeld[Control.Special1] = Global.input.isHeld(Control.Special1, Global.level.mainPlayer);
 		input.possessedControlHeld[Control.Taunt] = Global.input.isHeld(Control.Taunt, Global.level.mainPlayer);
-
+		
 		byte inputHeldByte = Helpers.boolArrayToByte(new bool[] {
 				input.possessedControlHeld[Control.Left],
 				input.possessedControlHeld[Control.Right],
@@ -1314,8 +1317,10 @@ public partial class Player {
 				input.possessedControlHeld[Control.Down],
 				input.possessedControlHeld[Control.Jump],
 				input.possessedControlHeld[Control.Dash],
-				input.possessedControlHeld[Control.Taunt],
-				false,
+				input.possessedControlHeld[Control.Shoot],
+				input.possessedControlHeld[Control.Special1],
+				//input.possessedControlHeld[Control.Taunt],
+				//false,
 		});
 
 		// Pressed section
@@ -1326,6 +1331,9 @@ public partial class Player {
 		input.possessedControlPressed[Control.Jump] = Global.input.isPressed(Control.Jump, Global.level.mainPlayer);
 		input.possessedControlPressed[Control.Dash] = Global.input.isPressed(Control.Dash, Global.level.mainPlayer);
 		input.possessedControlPressed[Control.Taunt] = Global.input.isPressed(Control.Taunt, Global.level.mainPlayer);
+		input.possessedControlPressed[Control.Taunt] = Global.input.isPressed(Control.Taunt, Global.level.mainPlayer);
+		input.possessedControlPressed[Control.Shoot] = Global.input.isPressed(Control.Shoot, Global.level.mainPlayer);
+		input.possessedControlPressed[Control.Special1] = Global.input.isPressed(Control.Special1, Global.level.mainPlayer);
 
 		byte inputPressedByte = Helpers.boolArrayToByte(new bool[] {
 				input.possessedControlPressed[Control.Left],
@@ -1334,8 +1342,10 @@ public partial class Player {
 				input.possessedControlPressed[Control.Down],
 				input.possessedControlPressed[Control.Jump],
 				input.possessedControlPressed[Control.Dash],
-				input.possessedControlPressed[Control.Taunt],
-				false,
+				input.possessedControlPressed[Control.Shoot],
+				input.possessedControlPressed[Control.Special1],
+				//input.possessedControlPressed[Control.Taunt],
+				//false,
 		});
 
 		RPC.syncPossessInput.sendRpc(id, inputHeldByte, inputPressedByte);
@@ -2309,15 +2319,16 @@ public partial class Player {
 	public void reviveSigma(int form, Point spawnPoint) {
 		currency -= reviveSigmaCost;
 		hyperSigmaRespawn = true;
-		respawnTime = 0;
+		respawnTime = 2;
 		if (character is not BaseSigma sigma) {
 			return;
 		}
+		explodeDieEnd();
 		if (character?.destroyed == false) {
 			destroyCharacter(true);
 		}
-		explodeDieEnd();
 		ushort newNetId = getNextATransNetId();
+
 		if (form == 0) {
 			WolfSigma wolfSigma = new WolfSigma(
 				this, spawnPoint.x, spawnPoint.y, sigma.xDir, true,
@@ -2326,7 +2337,7 @@ public partial class Player {
 			character = wolfSigma;
 		} else if (form == 1) {
 			ViralSigma viralSigma = new ViralSigma(
-				this, spawnPoint.x, spawnPoint.y, sigma.xDir, true,
+				this, spawnPoint.x, spawnPoint.y - 16, sigma.xDir, true,
 				newNetId, true
 			);
 			character = viralSigma;
@@ -2341,13 +2352,29 @@ public partial class Player {
 	}
 
 	public void reviveSigmaNonOwner(int form, Point spawnPoint, ushort sigmaNetId) {
+		if (form == 0) {
+			WolfSigma WolfSigma = new WolfSigma(
+				this, spawnPoint.x, spawnPoint.y, character?.xDir ?? 1, true,
+				sigmaNetId, false
+			);
+			character = WolfSigma;
+			character.changeSprite("sigma_wolf_head", true);
+		}
+		if (form == 1) {
+			ViralSigma ViralSigma = new ViralSigma(
+				this, spawnPoint.x, spawnPoint.y - 16, character?.xDir ?? 1, true,
+				sigmaNetId, false
+			);
+			character = ViralSigma;
+			character.changeSprite("viralsigma_enter", true);
+		}
+		
 		if (form >= 2) {
 			KaiserSigma kaiserSigma = new KaiserSigma(
 				this, spawnPoint.x, spawnPoint.y, character?.xDir ?? 1, true,
 				sigmaNetId, false
 			);
 			character = kaiserSigma;
-
 			character.changeSprite("kaisersigma_enter", true);
 		}
 	}
@@ -2382,6 +2409,9 @@ public partial class Player {
 	}
 
 	public void explodeDieEnd() {
+		if (explodeDieEffect?.destroyed == false) {
+			explodeDieEffect.destroySelf();
+		}
 		explodeDieEffect = null;
 	}
 

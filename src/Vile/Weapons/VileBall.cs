@@ -59,6 +59,8 @@ public class SpreadShot : VileBall {
 		damage = "1";
 		effect = "Stuns Enemies. CD: 2";
 	}
+
+	
 	public override void vileShoot(Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
@@ -66,6 +68,7 @@ public class SpreadShot : VileBall {
 	}
 	public override void shoot(Character character, int[] args) {
 		if (character is not Vile vava) return;
+
 		vava.setVileShootTime(this);
 		vava.tryUseVileAmmo(vileAmmoUsage);
 		int num = args[0];
@@ -186,11 +189,20 @@ public class BallAttacks : VileState {
 			character.changeSpriteFromName(sprite, true);
 			character.useGravity = false;
 			character.vel = new Point();
+			
 		}
+		
 	}
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
+		if (Global.level.server.customMatchSettings != null || Global.level.server?.customMatchSettings?.vileAirDashReset == true) {
+			if (vile.canAirDashReset){
+			vile.dashedInAir = 0;
+			vile.airDashReset = 0;
+			vile.canAirDashReset = false;
+			}
+		}
 	}
 }
 #endregion

@@ -23,6 +23,11 @@ public class RocketPunch : Weapon {
 		killFeedIndex = 31;
 		weaponSlotIndex = 45;
 	}
+
+	// Disable shooting again if the rocket punch is mid-air.
+	public override bool canShoot(int chargeLevel, Character character) {
+		return proj?.destroyed != false;
+	}
 }
 public class GoGetterRight : RocketPunch {
 	public static GoGetterRight netWeapon = new();
@@ -141,6 +146,8 @@ public class RocketPunchAttack : VileState {
 	public int shootFrame = 1;
 	public float specialPressTime;
 	public RocketPunch weapon;
+	public bool jumped;
+
 	public RocketPunchAttack(RocketPunch weapon) : base("rocket_punch") {
 		this.weapon = weapon;
 	}
@@ -150,27 +157,45 @@ public class RocketPunchAttack : VileState {
 		bool LeftHeld = player.input.isHeld(Control.Left, player);
 		bool RightHeld = player.input.isHeld(Control.Right, player);
 		Helpers.decrementFrames(ref specialPressTime);
-		character.turnToInput(player.input, player);
+
+		// This is vanilla's Air Grounded moves Glitch Exploit recreated	
+		if (Global.customSettings?.jumpMoveGlitch == true &&
+			stateTime < 0.2f && !jumped &&
+			player.input.isPressed(Control.Jump, player)
+		) {
+			character.vel.y = -character.getJumpPower();
+			character.playSound("airdashupX3", sendRpc: true);
+			new Anim(
+				character.pos.addxy(0, -10), "dash_sparks_up",
+				character.xDir, player.getNextActorNetId(), true, sendRpc: true
+			);
+			jumped = true;	
+		}
+		// Allow to cancel the state by stopping holding special.
+		// This mostly simulates a easier-to-do version of a vanilla bug.
+		if (stateFrames > 6 && !player.input.isHeld(Control.Special1, player)) {
+			character.changeToIdleOrFall();
+		}
 
 		if (vile.energy.ammo < weapon.vileAmmoUsage && weapon is SpoiledBrat) {
 			character.changeToIdleOrFall();
 			return;
 		}
-		
+
 		if (character.sprite.frameIndex >= soundFrame && !soundPlayed) {
 			character.playSound(sound, forcePlay: false, sendRpc: true);
 			soundPlayed = true;
 		}
-		
+
 		if (character.sprite.frameIndex >= shootFrame && !shot && weapon.shootCooldown <= 0) {
 			shot = true;
 			weapon.shoot(vile, []);
 			character.sprite.frameIndex = 1;
 			character.sprite.frameTime = 0;
 		}
-		
+
 		if (weapon.proj != null) {
-            if (weapon.proj is SpoiledBratProj) {
+			if (weapon.proj is SpoiledBratProj) {
 				if (player.input.isPressed(Control.Special1, player)) {
 					specialPressTime = 15;
 					shot = false;
@@ -191,15 +216,17 @@ public class RocketPunchAttack : VileState {
 					return;
 				}
 			}
-        }
+		}
 	}
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.turnToInput(player.input, player);
+
+
 	}
 	public override bool canEnter(Character character) {
 		if (character.charState is Jump) return false;
-		return base.canEnter(character);	
+		return base.canEnter(character);
 	}
 }
 #endregion
@@ -254,6 +281,11 @@ public class GoGetterRightProj : Projectile {
 				incPos(new Point(0, 300 * Global.spf));
 			}
 		}
+
+		if (!reversed && !owner.input.isHeld(Control.Special1, owner)) {
+			reversed = true;
+			vel.x = 500 * -xDir;
+		}
 		if (!reversed && time > maxReverseTime) {
 			reversed = true;
 			vel.x = 500 * -xDir;
@@ -261,7 +293,7 @@ public class GoGetterRightProj : Projectile {
 		if (reversed && owner.character != null) {
 			vel = new Point(0, 0);
 			if (pos.x > owner.character.pos.x) xDir = -1;
-			else xDir = 1;		
+			else xDir = 1;
 			Point returnPos = owner.character.getCenterPos();
 			move(pos.directionToNorm(returnPos).times(500));
 			if (pos.distanceTo(returnPos) < 10) {
@@ -351,10 +383,14 @@ public class InfinityGigProj : Projectile {
 			reversed = true;
 			vel.x = 500 * -xDir;
 		}
+		if (!reversed && !owner.input.isHeld(Control.Special1, owner)) {
+			reversed = true;
+			vel.x = 500 * -xDir;
+		}
 		if (reversed && owner.character != null) {
 			vel = new Point(0, 0);
 			if (pos.x > owner.character.pos.x) xDir = -1;
-			else xDir = 1;		
+			else xDir = 1;
 			Point returnPos = owner.character.getCenterPos();
 			move(pos.directionToNorm(returnPos).times(500));
 			if (pos.distanceTo(returnPos) < 10) {

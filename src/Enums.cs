@@ -486,6 +486,7 @@ public enum ProjIds {
 	FlameRoundWallProj,
 	FlameRoundFlameProj,
 	VileMK2Grab,
+	VileMK2GrabStart,
 	NecroBurst,
 	NecroBurstShrapnel,
 	RisingSpecter,
@@ -730,17 +731,21 @@ public enum ProjIds {
 	PZeroParryAttack,
 	PZeroHadangeki,
 
-	// Dark Zero buster.
+	// Buster Zero buster.
 	DZBuster,
 	DZBuster2,
 	DZBuster3,
 	DZBuster4,
 	DZMelee,
 	DZHadangeki,
+	DZShinHadangeki,
+	DZShinBuster,
+	DZShinGetsurin,
 
 	// Special damage types.
 	SelfDmg = 30000,
 	SelfTrueDmg,
+	ViralPosession,
 
 	// Enviroment effect shenanigans.
 	KillZone = 32000,

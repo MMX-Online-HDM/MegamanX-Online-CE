@@ -52,8 +52,11 @@ public class InGameMainMenu : IMainMenu {
 				}
 
 				if (isSelWepDisabled()) return;
+
 				if (selectedCharNum == (int)CharIds.PunchyZero) {
 					Menu.change(new SelectPunchyZeroWeaponMenu(this, true));
+				} else if (selectedCharNum == (int)CharIds.BusterZero) {
+					Menu.change(new SelectBusterZeroWeaponMenu(this, true));
 				} else if (selectedCharNum == 4) {
 					Menu.change(new SelectSigmaWeaponMenu(this, true));
 				} else if (selectedCharNum == 3) {
@@ -102,7 +105,7 @@ public class InGameMainMenu : IMainMenu {
 	}
 
 	public bool isSelWepDisabled() {
-		return Global.level.is1v1() || mainPlayer?.realCharNum == (int)CharIds.BusterZero;
+		return Global.level.is1v1();
 	}
 
 	public bool isSelArmorDisabled() {

@@ -116,9 +116,10 @@ public class DZBuster3Proj : Projectile {
 
 public class DZHadangekiProj : Projectile {
 	public DZHadangekiProj(
-		Point pos, int xDir, bool isBZ, Actor owner, Player player, ushort? netId, bool rpc = false
+		Point pos, int xDir, int type, Actor owner, ushort? netId,
+		bool sendRpc = false, Player? altPlayer = null
 	) : base(
-		pos, xDir, owner, "zsaber_shot", netId, player
+		pos, xDir, owner, "zsaber_shot", netId, altPlayer
 	) {
 		weapon = ZeroBuster.netWeapon;
 		damager.damage = 3;
@@ -128,18 +129,158 @@ public class DZHadangekiProj : Projectile {
 		reflectable = true;
 		projId = (int)ProjIds.DZHadangeki;
 		maxTime = 0.5f;
-		if (isBZ) {
-			damager.damage = 4;
-			genericShader = player.zeroPaletteShader;
+		if (type == 1) {
+			damager.flinch = Global.miniFlinch;
+			genericShader = ownerPlayer.nightmareZeroShader;
 		}
-		if (rpc) {
-			rpcCreate(pos, owner, ownerPlayer, netId, xDir, isBZ ? (byte)1 : (byte)0);
+		if (type == 2) {
+			damager.damage = 4;
+			damager.flinch = Global.miniFlinch;
+			genericShader = ownerPlayer.zeroPaletteShader;
+		}
+		if (sendRpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)type);
 		}
 	}
 
 	public static Projectile rpcInvoke(ProjParameters args) {
 		return new DZHadangekiProj(
-			args.pos, args.xDir, args.extraData[0] == 1, args.owner, args.player, args.netId
+			args.pos, args.xDir, args.extraData[0], args.owner, args.netId, altPlayer: args.player
+		);
+	}
+}
+
+public class DZShinBusterProj : Projectile {
+	public DZShinBusterProj(
+		Point pos, int xDir, Actor owner, ushort? netId,
+		bool sendRpc = false, Player? altPlayer = null
+	) : base(
+		pos, xDir, owner, "zbuster3", netId, altPlayer
+	) {
+		weapon = ZeroBuster.netWeapon;
+		damager.damage = 2;
+		damager.flinch = Global.halfFlinch;
+		vel = new Point(350 * xDir, 0);
+		fadeOnAutoDestroy = true;
+		fadeSprite = "buster3_fade";
+		reflectable = true;
+		maxTime = 0.5f;
+		projId = (int)ProjIds.DZShinBuster;
+
+		if (sendRpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new DZShinBusterProj(
+			args.pos, args.xDir, args.owner, args.netId, altPlayer: args.player
+		);
+	}
+}
+
+public class DZShinGetsurinProj : Projectile {	
+	public Point? direction;
+	public bool phase2;
+
+	public DZShinGetsurinProj(
+		Point pos, int xDir, float startTime, Actor owner, ushort? netId,
+		bool sendRpc = false, Player? altPlayer = null
+	) : base(
+		pos, xDir, owner, "shingetsurin_proj", netId, altPlayer
+
+	) {
+		weapon = Shingetsurin.netWeapon;
+		damager.damage = 2;
+		damager.hitCooldown = 30;
+		damager.flinch = Global.defFlinch;
+		vel = new Point(250 * xDir, 0);
+		fadeOnAutoDestroy = true;
+		fadeSprite = "buster3_fade";
+		maxTime = 1.5f;
+		destroyOnHit = false;
+		time = startTime;
+		projId = (int)ProjIds.DZShinGetsurin;
+		ZBuster2Proj.hyorogaCode(this, ownerPlayer);
+		canBeLocal = false;
+
+		if (sendRpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)startTime);
+		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new DZShinGetsurinProj(
+			args.pos, args.xDir, args.extraData[0], args.owner, args.netId, altPlayer: args.player
+		);
+	}
+
+	public override void update() {
+		base.update();
+		if (!ownedByLocalPlayer) {
+			return;
+		}
+		if (!phase2 && time >= 0.5f) {
+			if (time < 1) {
+				vel.x = 0;
+			} else {
+				Actor? target = Global.level.getClosestTarget(pos, damager.owner.alliance, true);
+				if (target != null) {
+					vel = pos.directionToNorm(target.getCenterPos()).times(250);
+					phase2 = true;
+				} else {
+					vel.x = 250 * xDir;
+				}
+			}
+		}
+	}
+}
+
+public class DZShinHadangekiProj : Projectile {
+	public DZShinHadangekiProj(
+		Point pos, int xDir, Actor owner, ushort? netId,
+		bool sendRpc = false, Player? altPlayer = null
+	) : base(
+		pos, xDir, owner, "zsaber_shot", netId, altPlayer
+	) {
+		weapon = ZeroBuster.netWeapon;
+		damager.damage = 3;
+		damager.flinch = Global.defFlinch;
+		damager.hitCooldown = 30;
+		vel = new Point(350 * xDir, 0);
+		destroyOnHit = false;
+		fadeOnAutoDestroy = true;
+		fadeSprite = "zsaber_shot_fade";
+		projId = (int)ProjIds.DZShinHadangeki;
+		genericShader = ownerPlayer.zeroAzPaletteShader;
+		maxTime = 0.55f;
+		
+		if (sendRpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+		}
+	}
+
+	public override void update() {
+		base.update();
+		Actor? closestEnemy = Global.level.getClosestTarget(
+			new Point (pos.x + (40 * xDir), pos.y),
+			damager.owner.alliance, false, 120
+		);
+		if (closestEnemy == null) {
+			return;
+		}
+		Point enemyPos = closestEnemy.getCenterPos();
+
+		if (enemyPos.y + 1 < pos.y) {
+			moveXY(0, -0.5f);
+		}
+		if (enemyPos.y - 1 > pos.y) {
+			moveXY(0, 0.5f);
+		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new DZShinHadangekiProj(
+			args.pos, args.xDir, args.owner, args.netId, altPlayer: args.player
 		);
 	}
 }

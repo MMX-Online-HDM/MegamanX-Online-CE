@@ -2190,7 +2190,8 @@ public class RPCSyncPossessInput : RPC {
 		player.input.possessedControlHeld[Control.Down] = inputHeldArray[3];
 		player.input.possessedControlHeld[Control.Jump] = inputHeldArray[4];
 		player.input.possessedControlHeld[Control.Dash] = inputHeldArray[5];
-		player.input.possessedControlHeld[Control.Taunt] = inputHeldArray[6];
+		player.input.possessedControlHeld[Control.Shoot] = inputHeldArray[6];
+		player.input.possessedControlHeld[Control.Special1] = inputHeldArray[7];
 
 		player.input.possessedControlPressed[Control.Left] = inputPressedArray[0];
 		player.input.possessedControlPressed[Control.Right] = inputPressedArray[1];
@@ -2198,7 +2199,8 @@ public class RPCSyncPossessInput : RPC {
 		player.input.possessedControlPressed[Control.Down] = inputPressedArray[3];
 		player.input.possessedControlPressed[Control.Jump] = inputPressedArray[4];
 		player.input.possessedControlPressed[Control.Dash] = inputPressedArray[5];
-		player.input.possessedControlPressed[Control.Taunt] = inputPressedArray[6];
+		player.input.possessedControlPressed[Control.Shoot] = inputPressedArray[6];
+		player.input.possessedControlPressed[Control.Special1] = inputPressedArray[7];
 	}
 
 	public void sendRpc(int playerId, byte inputHeldByte, byte inputPressedByte) {

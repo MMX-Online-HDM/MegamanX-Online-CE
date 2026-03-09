@@ -400,15 +400,17 @@ public class WolfSigmaHand : Actor, IDamagable {
 	public static float maxDistFromHeadY = Global.screenW * 2;
 	public float offScreenTime;
 	public float maxOffscreenTime = 16;
+	
+	public WolfSigmaHandWeapon weapon;
+	public Anim beamMuzzle1;
+	public Anim beamMuzzle2;
+	public Wall wall;
 
 	public bool isControlling {
 		get {
 			return owner.weapon is WolfSigmaHandWeapon w && w.hand == this;
 		}
 	}
-	public WolfSigmaHandWeapon weapon;
-	public Anim beamMuzzle1;
-	public Anim beamMuzzle2;
 
 	public WolfSigmaHand(Point pos, Player player, bool isLeft, ushort netId, bool ownedByLocalPlayer, bool rpc = false) :
 		base("sigma_wolf_hand", pos, netId, ownedByLocalPlayer, false) {
@@ -427,6 +429,9 @@ public class WolfSigmaHand : Actor, IDamagable {
 		startMoving = true;
 		useFrameProjs = true;
 		isPlatform = true;
+		collider.isClimbable = true;
+		collider.wallOnly = false;
+		
 
 		netOwner = player;
 		netActorCreateId = NetActorCreateId.WolfSigmaHand;
@@ -435,14 +440,18 @@ public class WolfSigmaHand : Actor, IDamagable {
 		}
 	}
 
+	
+
 	public override void preUpdate() {
 		base.preUpdate();
 		updateProjectileCooldown();
 	}
 
+
 	public override void update() {
 		base.update();
 		fadeinShader.update();
+		
 
 		if (beamMuzzle1 != null && beamMuzzle1.destroyed) beamMuzzle1 = null;
 		if (beamMuzzle2 != null && beamMuzzle2.destroyed) beamMuzzle2 = null;
@@ -596,25 +605,24 @@ public class WolfSigmaHand : Actor, IDamagable {
 	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (hitbox.flag == (int)HitboxFlag.Hitbox) {
 			Weapon handWeapon = weapon ?? new WolfSigmaHandWeapon(owner, this);
-			return new GenericMeleeProj(handWeapon, centerPoint, ProjIds.SigmaHand, owner);
+			return new GenericMeleeProj(handWeapon, centerPoint, ProjIds.SigmaHand, owner, 4,20,10, isShield: true);
 		}
 		return null;
 	}
 
 	public override void updateProjFromHitbox(Projectile proj) {
-		if (canHandDamage()) {
+		
 			proj.damager.damage = weapon.damager.damage;
-		} else {
-			proj.damager.damage = 0;
-		}
+		
 	}
 
 	public bool canHandDamage() {
-		return (frameIndex >= 1 && deltaPos.magnitude > 1);
+		return (frameIndex >= 1);
 	}
 
 	public override void onDestroy() {
 		base.onDestroy();
+		if (wall != null) Global.level.removeGameObject(wall);
 	}
 
 	public override List<ShaderWrapper> getShaders() {
@@ -881,22 +889,26 @@ public class WolfSigmaRevive : CharState {
 				character.frameSpeed = 1;
 			}
 			if (stateTime > 4.5f) {
-				character.health = 1;
-				character.addHealth(character.maxHealth);
+				character.destroyMusicSource();
 				state = 5;
 			}
 		} else if (state == 5) {
-			if (character.health >= character.maxHealth) {
+			
 				character.weapons.Add(new WolfSigmaHandWeapon(player, sigma.leftHand));
 				character.weapons.Add(new WolfSigmaHeadWeapon());
 				character.weapons.Add(new WolfSigmaHandWeapon(player, sigma.rightHand));
 				character.weaponSlot = 1;
 
 				character.changeState(new WolfSigmaHeadState(), true);
-				character.addMusicSource("wolfSigmaIntro", character.pos.addxy(0, -75), false, loop: false);
+				character.addMusicSource("wolfSigma", character.pos.addxy(0, -75), false, loop: false);
 				RPC.actorToggle.sendRpc(character.netId, RPCActorToggleType.AddWolfSigmaMusicSource);
-			}
+			
 		}
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.health = character.maxHealth;
 	}
 
 	public override void onEnter(CharState oldState) {
@@ -906,6 +918,7 @@ public class WolfSigmaRevive : CharState {
 		character.visible = false;
 		character.useGravity = false;
 		character.frameSpeed = 0;
+		character.health = 1;
 		character.immuneToKnockback = true;
 
 		Global.level.addToGrid(character);

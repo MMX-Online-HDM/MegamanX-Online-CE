@@ -323,18 +323,13 @@ public class BBuffaloIceProjGround : Projectile, IDamagable {
 		}
 	}
 
-	public bool canBeHealed(int healerAlliance) { return false; }
-	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) { }
 	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
 		return damagerAlliance != owner.alliance;
 	}
-	public bool isInvincible(Player attacker, int? projId) {
-		if (projId == null) {
-			return true;
-		}
-		return !Damager.canDamageFrostShield(projId.Value);
-	}
-	public bool isPlayableDamagable() { return false; }
+	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) { }
+	public bool canBeHealed(int healerAlliance) => false;
+	public bool isInvincible(Player attacker, int? projId) => false;
+	public bool isPlayableDamagable() => false;
 
 	public override void onDestroy() {
 		base.onDestroy();

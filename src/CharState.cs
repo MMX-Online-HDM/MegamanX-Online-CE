@@ -150,6 +150,20 @@ public class CharState {
 		if (this is not Jump and not WallKick && (!oldState.canStopJump || oldState.stoppedJump)) {
 			stoppedJump = true;
 		}
+
+
+		// This is vanilla's Air Grounded moves Glitch Exploit recreated	
+		if (character.grounded && !normalCtrl && !attackCtrl && !canJump &&
+			Global.customSettings?.jumpMoveGlitch == true &&
+			player.input.isPressed(Control.Jump, player)
+		) {
+			character.vel.y = -character.getJumpPower();
+			character.playSound("airdashupX3", sendRpc: true);
+			new Anim(
+				character.pos.addxy(0, -10), "dash_sparks_up",
+				character.xDir, player.getNextActorNetId(), true, sendRpc: true
+			);
+		}
 	}
 
 	public virtual bool canEnter(Character character) {
@@ -353,7 +367,7 @@ public class CharState {
 			character.changePos(lerpPos);
 		}
 	}
- }
+}
 
 public class WarpIn : CharState {
 	public bool warpSoundPlayed;
@@ -653,6 +667,19 @@ public class Idle : CharState {
 			}
 		}
 
+		if (Global.customSettings?.universalGuard == true) {
+			if (character is not Zero and not BaseSigma) {
+				if (!player.input.isLeftOrRightHeld(player)) {
+					if (player.input.isHeld(Control.Up, player)) {
+						attackCtrl = false;
+						character.changeSpriteFromName("block", true);
+					}
+					else if (character.sprite.name == character.getSprite("block")) {
+						character.changeToIdleOrFall();
+					}
+				}
+			}
+		}
 		if (Global.level.gameMode.isOver) {
 			if (Global.level.gameMode.playerWon(player)) {
 				character.changeState(character.getTauntState());
@@ -768,7 +795,7 @@ public class SwordBlock : CharState {
 		if (!isHoldingGuard && !player.isAI) {
 			character.changeToIdleOrFall();
 			return;
-		} else if (player.isAI && stateTime >= 32f/60f) {
+		} else if (player.isAI && stateTime >= 32f / 60f) {
 			character.changeToIdleOrFall();
 		}
 		if (Global.level.gameMode.isOver) {
@@ -886,6 +913,7 @@ public class Dash : CharState {
 	public int dashDir;
 	public bool stop;
 	public Anim? dashSpark;
+	public int initialDashDir;
 
 	public Dash(string initialDashButton) : base("dash", "dash_shoot", "attack_dash") {
 		attackCtrl = true;
@@ -893,6 +921,7 @@ public class Dash : CharState {
 		this.initialDashButton = initialDashButton;
 		enterSound = "dash";
 		enterSoundArgs = "larmor";
+
 	}
 
 	public override void preUpdate() {
@@ -902,7 +931,9 @@ public class Dash : CharState {
 
 	public override void update() {
 		base.update();
-
+		if (Global.customSettings?.instantDash == true) {
+			dashBackwardsCode(character, initialDashDir);
+		}
 		if (!player.isAI && !stop && !player.input.isHeld(initialDashButton, player)) {
 			dashTime = 900;
 		}
@@ -918,6 +949,7 @@ public class Dash : CharState {
 			shootSprite = "dash_end_shoot";
 			character.changeSpriteFromName(character.shootAnimTime > 0 ? shootSprite : sprite, true);
 		}
+
 		if (dashTime < 4 || stop) {
 			if (inputXDir != 0 && inputXDir != dashDir) {
 				character.xDir = inputXDir;
@@ -936,7 +968,11 @@ public class Dash : CharState {
 		}
 		// Speed at start and end.
 		else if (!stop || dashHeld) {
-			character.moveXY(Physics.DashStartSpeed * character.getRunDebuffs() * dashDir, 0);
+			float targetSpeed = Physics.DashStartSpeed * character.getRunDebuffs();
+			if (Global.customSettings?.instantDash == true) {
+				targetSpeed = character.getDashSpeed();
+			}
+			character.moveXY(targetSpeed * dashDir, 0);
 		}
 		// Dust effect.
 		if (dustTime >= 6 && !character.isUnderwater()) {
@@ -963,6 +999,7 @@ public class Dash : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		dashDir = character.xDir;
+		initialDashDir = character.xDir;
 		character.isDashing = true;
 		dashSpark = new Anim(
 			character.getDashSparkEffectPos(dashDir),
@@ -1000,6 +1037,8 @@ public class AirDash : CharState {
 	public bool stop;
 	public Anim? dashSpark;
 
+	public int initialDashDir;
+
 	public AirDash(string initialDashButton) : base("dash", "dash_shoot", "attack_dash") {
 		accuracy = 10;
 		attackCtrl = true;
@@ -1008,6 +1047,7 @@ public class AirDash : CharState {
 		this.initialDashButton = initialDashButton;
 		enterSound = "airdash";
 		enterSoundArgs = "larmor";
+
 	}
 
 	public override void preUpdate() {
@@ -1015,8 +1055,19 @@ public class AirDash : CharState {
 		dashTime += character.speedMul;
 	}
 
+	public bool backDashedOnce;
 	public override void update() {
 		base.update();
+		if (stateTime < 0.15f) {
+			if (player.input.isHeld("left", base.player)) {
+				dashDir = -1;
+			} else if (player.input.isHeld("right", base.player)) {
+				dashDir = 1;
+			}
+		}
+		if (Global.level.server.customMatchSettings != null || Global.level.server?.customMatchSettings?.instantDash == true) {
+			dashBackwardsCode(character, initialDashDir);
+		}
 		if (!player.isAI && !player.input.isHeld(initialDashButton, player) && !stop) {
 			dashTime = 900;
 		}
@@ -1075,7 +1126,27 @@ public class AirDash : CharState {
 		if (character is CmdSigma or Doppma) {
 			character.frameIndex = 1;
 		}
+		initialDashDir = character.xDir;
+
+
 	}
+
+
+
+
+	public static void dashBackwardsCode(Character character, int initialDashDir) {
+		if (!character.player.isAxl) {
+			return;
+		}
+		if (character.xDir != initialDashDir) {
+			if (!character.sprite.name.EndsWith("backwards")) {
+				character.changeSpriteFromName("dash_backwards", resetFrame: false);
+			}
+		} else if (character.sprite.name.EndsWith("backwards")) {
+			character.changeSpriteFromName("dash", resetFrame: false);
+		}
+	}
+
 
 	public override void onExit(CharState? newState) {
 		if (!dashSpark?.destroyed == true) {
@@ -1345,7 +1416,7 @@ public class LadderClimb : CharState {
 		if (character is Axl axl) {
 			if (axl.isAxlLadderShooting()) {
 				axl.changeSprite("axl_ladder_shoot", true);
-			} else if (character.sprite.name != "axl_ladder_end" && character.sprite.name != "axl_fall_start"){
+			} else if (character.sprite.name != "axl_ladder_end" && character.sprite.name != "axl_fall_start") {
 				axl.changeSprite("axl_ladder_climb", true);
 			}
 		}
@@ -1443,12 +1514,13 @@ public class Die : CharState {
 		character.vel.y = 0;
 		character.stopCharge();
 		base.update();
+
 		if (!character.ownedByLocalPlayer) {
 			return;
 		}
 		if (character is Vile or BaseSigma) {
 			if (stateTime >= 1 && !once) {
-				player.respawnTime = player.getRespawnTime(); 
+				player.respawnTime = player.getRespawnTime();
 				player.randomTip = Tips.getRandomTip(player.charNum);
 				once = true;
 				character.visible = false;
@@ -1468,7 +1540,7 @@ public class Die : CharState {
 			}
 		} else if (character is KaiserSigma) {
 			if (stateTime >= 1 && !once) {
-				player.respawnTime = player.getRespawnTime(); 
+				player.respawnTime = player.getRespawnTime();
 				player.randomTip = Tips.getRandomTip(player.charNum);
 				once = true;
 			}
@@ -1479,7 +1551,7 @@ public class Die : CharState {
 			}
 		} else {
 			if (stateTime >= 1 && !once) {
-				player.respawnTime = player.getRespawnTime(); 
+				player.respawnTime = player.getRespawnTime();
 				player.randomTip = Tips.getRandomTip(player.charNum);
 				once = true;
 				destroyRideArmor();
@@ -1494,23 +1566,23 @@ public class Die : CharState {
 			}
 		}
 		spawnTime += Global.spf;
-		if (stateTime > 32f/60f) {
+		if (stateTime > 32f / 60f) {
 			if (spawnTime >= 0.125f) {
 				spawnTime = 0;
 				int randX = Helpers.randomRange(-radius, radius);
 				int randY = Helpers.randomRange(-radius, radius);
 				var randomPos = character.getCenterPos().addxy(randX, randY);
 				if (character is Vile vile && vile.isVileMK2 || character is Doppma or KaiserSigma) {
-					new Anim(randomPos, "explosionx2", 1, player.getNextActorNetId(), true, sendRpc: true);	
+					new Anim(randomPos, "explosionx2", 1, player.getNextActorNetId(), true, sendRpc: true);
 					character.playSound("explosionX3", sendRpc: true);
 				}
-				if (character is NeoSigma or ViralSigma) {
-					new Anim(randomPos, "explosionx2", 1, player.getNextActorNetId(), true, sendRpc: true);	
+				if (character is NeoSigma) {
+					new Anim(randomPos, "explosionx2", 1, player.getNextActorNetId(), true, sendRpc: true);
 					character.playSound("explosionX2", sendRpc: true);
-				} 
+				}
 				if (character is Vile vile1 && (vile1.isVileMK1 || vile1.isVileMK5) || character is CmdSigma or WolfSigma) {
-					new Anim(randomPos, "explosion", 1, player.getNextActorNetId(), true, sendRpc: true);	
-					character.playSound("explosion", sendRpc: true);	
+					new Anim(randomPos, "explosion", 1, player.getNextActorNetId(), true, sendRpc: true);
+					character.playSound("explosion", sendRpc: true);
 				}
 			}
 		}
@@ -1593,7 +1665,7 @@ public class GenericGrabbedState : CharState {
 		}
 
 		grabTime -= player.mashValue();
-		
+
 		if (grabTime <= 0) {
 			character.changeToIdleOrFall();
 		}
