@@ -959,15 +959,16 @@ public class MegamanX : Character {
 			),
 			(int)MeleeIds.MaxZSaber => new GenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.XSaber, player,
-				4, Global.defFlinch, 30, addToLevel: addToLevel, isZSaberEffect: true
+				4, Global.defFlinch, 30, addToLevel: addToLevel, isZSaberEffect: true,
+				clashTier: ClashTier.Strong
 			),
 			(int)MeleeIds.ZSaber => new GenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.X6Saber, player,
-				3, 0, 30, addToLevel: addToLevel, isZSaberEffect: true
+				3, 0, 30, addToLevel: addToLevel, isZSaberEffect: true, clashTier: ClashTier.Weak
 			),
 			(int)MeleeIds.ZSaberAir => new GenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.X6Saber, player,
-				2, 0, 30, addToLevel: addToLevel, isZSaberEffect: true
+				2, 0, 30, addToLevel: addToLevel, isZSaberEffect: true, clashTier: ClashTier.Weak
 			),
 			(int)MeleeIds.NovaStrike => new GenericMeleeProj(
 				HyperNovaStrike.netWeapon, projPos, ProjIds.NovaStrike, player,

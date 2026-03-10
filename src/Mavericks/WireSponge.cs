@@ -911,7 +911,7 @@ public class WSpongeSeedProj : Projectile {
 		destroyOnHit = true;
 		useGravity = true;
 		startSound = "wspongeSeed";
-		if (collider != null) { collider.wallOnly = true; }
+		collider?.wallOnly = true;
 		if (shootFramesHeld >= 255) {
 			shootFramesHeld = 255;
 		}
@@ -1355,7 +1355,7 @@ public class WSpongeSeedProjAI : Projectile {
 		maxTime = 2f;
 		destroyOnHit = true;
 		useGravity = true;
-		if (collider != null) { collider.wallOnly = true; }
+		collider?.wallOnly = true;
 		this.type = type;
 		if (type == 0) vel = new Point(Helpers.randomRange(150, 210) * owner.xDir, -Helpers.randomRange(250, 300));
 		else if (type == 1) vel = new Point(Helpers.randomRange(210, 250) * owner.xDir, -Helpers.randomRange(300, 350));
@@ -1423,7 +1423,7 @@ public class WSpongeSeedProjAIStriker : Projectile {
 		maxTime = 2f;
 		destroyOnHit = true;
 		useGravity = true;
-		if (collider != null) { collider.wallOnly = true; }
+		collider?.wallOnly = true;
 		this.type = type;
 		if (type == 0) vel = new Point(Helpers.randomRange(50, 90), -Helpers.randomRange(270, 300));
 		else if (type == 1) vel = new Point(Helpers.randomRange(140, 180), -Helpers.randomRange(300, 350));

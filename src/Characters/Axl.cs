@@ -213,8 +213,15 @@ public class Axl : Character {
 			Line testLine = new Line(startTestPoint, endTestPoint);
 			Shape headShape = headRect.getShape();
 			List<CollideData> lineIntersections = headShape.getLineIntersectCollisions(testLine);
-			if (lineIntersections.Count > 0) {
-				hits.Add(new CollideData(null, p.character.globalCollider, bulletDir, false, p.character, new HitData(null, new List<Point>() { lineIntersections[0].getHitPointSafe() })));
+			if (lineIntersections.Count > 0 && p.character.globalCollider != null) {
+				hits.Add(new CollideData(
+					null, p.character.globalCollider, bulletDir,
+					false, p.character, new HitData(
+						null, new List<Point>() {
+							lineIntersections[0].getHitPointSafe()
+						}
+					)
+				));
 			}
 		}
 

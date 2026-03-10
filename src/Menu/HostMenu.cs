@@ -649,16 +649,29 @@ public class HostMenu : IMainMenu {
 							timeLimitDirty = true;
 							timeLimit--;
 							int minimumTimeLimit = 0;
-							if (selectedGameMode == GameMode.ControlPoint || selectedGameMode == GameMode.KingOfTheHill || selectedGameMode == GameMode.Elimination || selectedGameMode == GameMode.TeamElimination) {
+							if (selectedGameMode == GameMode.ControlPoint ||
+								selectedGameMode == GameMode.KingOfTheHill ||
+								selectedGameMode == GameMode.Elimination ||
+								selectedGameMode == GameMode.TeamElimination
+							) {
 								if (!is1v1) {
 									minimumTimeLimit = 1;
 								}
 							}
-							if (timeLimit < minimumTimeLimit) timeLimit = minimumTimeLimit;
+							if (!is1v1 && selectedGameMode == GameMode.TeamElimAlt) {
+								if (!is1v1) {
+									minimumTimeLimit = 2;
+								}
+							}
+							if (timeLimit < minimumTimeLimit) {
+								timeLimit = minimumTimeLimit;
+							}
 						} else if (Global.input.isPressedOrHeldMenu(Control.MenuRight)) {
 							timeLimitDirty = true;
 							timeLimit++;
-							if (timeLimit > 30) timeLimit = 30;
+							if (timeLimit > 30) {
+								timeLimit = 30;
+							}
 						}
 					},
 					(Point pos, int index) => {
@@ -1337,6 +1350,11 @@ public class HostMenu : IMainMenu {
 			timeLimit = 7;
 		} else if (selectedGameMode == GameMode.KingOfTheHill) {
 			timeLimit = 5;
+		} else if (selectedGameMode == GameMode.TeamElimAlt) {
+			if (!playToDirty) {
+				playTo = 3;
+			}
+			timeLimit = 2;
 		}
 	}
 

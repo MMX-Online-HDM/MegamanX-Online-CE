@@ -1122,7 +1122,9 @@ public class RPCSyncGameTime : RPC {
 
 		int time = BitConverter.ToUInt16(new byte[] { arguments[0], arguments[1] }, 0);
 		Global.level.gameMode.remainingTime = time;
-		if (Global.level.gameMode.remainingTime.Value <= 10 && Global.level.gameMode.remainingTime.Value > 0) Global.playSound("text");
+		if (Global.level.gameMode.remainingTime.Value <= 10 && Global.level.gameMode.remainingTime.Value > 0) {
+			Global.playSound("text");
+		}
 		if (arguments.Length >= 4) {
 			int elimTime = BitConverter.ToUInt16(new byte[] { arguments[2], arguments[3] }, 0);
 			Global.level.gameMode.eliminationTime = elimTime;

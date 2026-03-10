@@ -68,8 +68,12 @@ public class RayGun : AxlWeapon {
 			bullet = new SplashLaserProj(weapon, bulletPos.add(bulletDir.times(22)), player, bulletDir, player.getNextActorNetId(), sendRpc: true);
 			if (player.character != null) RPC.playSound.sendRpc(shootSounds[3], player.character.netId);
 		} else {
-			if (axl.rayGunAltProj == null) axl.rayGunAltProj = new RayGunAltProj(weapon, bulletPos, cursorPos, 1, player, netId);
-			else netId = axl.rayGunAltProj.netId.Value;
+			if (axl.rayGunAltProj == null) {
+				axl.rayGunAltProj = new RayGunAltProj(weapon, bulletPos, cursorPos, 1, player, netId);
+			}
+			else if (axl.rayGunAltProj.netId != null) {
+				netId = axl.rayGunAltProj.netId.Value;
+			}
 			bullet = axl.rayGunAltProj;
 			laserChargeLevel = axl.rayGunAltProj.getChargeLevel();
 		}

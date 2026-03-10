@@ -461,9 +461,6 @@ class Program {
 			Global.calledPerFrame = 0;
 
 			if (!Global.paused) {
-				if (Global.debug) {
-					Global.cheats();
-				}
 				if (Options.main.isDeveloperConsoleEnabled() && Menu.chatMenu != null) {
 					if (Global.input.isPressed(Key.F10)) {
 						DevConsole.toggleShow();
@@ -888,23 +885,37 @@ class Program {
 				spriteFilePaths[(fileSplit*4)..(fileSplit*5)],
 				spriteFilePaths[(fileSplit*5)..],
 			};
-			string[] fileChecksums = new string[6];
+			// List of multithread tasks.
+			// And start a list of blobs so checksum is deterministic .
 			List<Task> tasks = new();
+			string[] fileChecksums = new string[6];
+			// Start loading sprites in parallel.
 			for (int i = 0; i < treadedFilePaths.Length; i++) {
 				int j = i;
-				Task tempTask = new Task(() => { fileChecksums[j] = loadSpritesSub(treadedFilePaths[j]); });
+				// Start a task with the following function.
+				Task tempTask = new Task(() => {
+					var blob = loadSpritesSub(treadedFilePaths[j]);
+					lock (fileChecksums) { fileChecksums[j] = blob; }
+				});
+				// Add task to list.
 				tasks.Add(tempTask);
+				// Set up error handler for the task.
 				tempTask.ContinueWith(loadExceptionHandler, TaskContinuationOptions.OnlyOnFaulted);
+				// Run new thread.
 				tempTask.Start();
 			}
+			// Wait for the task to finish and if so remove from the list.
+			// If we are at 0 tasks we continue the main thread.
 			while (tasks.Count > 0) {
 				for (int i = 0; i < tasks.Count; i++) {
+					// If ran to completion or crashed we remove it.
 					if (tasks[i].Status >= TaskStatus.RanToCompletion) {
 						tasks.Remove(tasks[i]);
 						i = 0;
 					}
 				}
 			}
+			// Update the checksum blob.
 			foreach (string fileChecksum in fileChecksums) {
 				Global.fileChecksumBlob += "-" + fileChecksum;
 			}

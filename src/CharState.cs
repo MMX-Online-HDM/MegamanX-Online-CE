@@ -811,28 +811,34 @@ public class SwordBlock : CharState {
 }
 
 public class ZeroClang : CharState {
+	public bool once;
 	public int hurtDir;
-	public float hurtSpeed;
 
-	public ZeroClang(int dir) : base("clang") {
+	public ZeroClang(int dir) : base("") {
 		hurtDir = dir;
-		hurtSpeed = dir * 100;
 	}
 
 	public override void update() {
 		base.update();
-		if (hurtSpeed != 0) {
-			hurtSpeed = Helpers.toZero(hurtSpeed, 400 * Global.spf, hurtDir);
-			character.move(new Point(hurtSpeed, 0));
+		if (!once && stateFrames >= 6) {
+			once = true;
+			character.changeSpriteFromName(sprite, true);
 		}
-		/*
-		if (this.character.isAnimOver()) {
-			this.character.changeToIdleOrFall();
-		}
-		*/
-		if (hurtSpeed == 0) {
+		if (stateFrames >= 20) {
 			character.changeToIdleOrFall();
 		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.xFlinchPushVel = 1.5f * hurtDir;
+
+		if (!Global.sprites.ContainsKey(character.getSprite("clang"))) {
+			defaultSprite = "dash_end";
+		} else {
+			defaultSprite = "clang";
+		}
+		sprite = defaultSprite;
 	}
 }
 
@@ -931,9 +937,6 @@ public class Dash : CharState {
 
 	public override void update() {
 		base.update();
-		if (Global.customSettings?.instantDash == true) {
-			dashBackwardsCode(character, initialDashDir);
-		}
 		if (!player.isAI && !stop && !player.input.isHeld(initialDashButton, player)) {
 			dashTime = 900;
 		}
@@ -999,7 +1002,7 @@ public class Dash : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		dashDir = character.xDir;
-		initialDashDir = character.xDir;
+		initialDashDir = dashDir;
 		character.isDashing = true;
 		dashSpark = new Anim(
 			character.getDashSparkEffectPos(dashDir),
@@ -1014,20 +1017,6 @@ public class Dash : CharState {
 			dashSpark.destroySelf();
 		}
 	}
-
-	public static void dashBackwardsCode(Character character, int initialDashDir) {
-		if (character is Axl) {
-			if (character.xDir != initialDashDir) {
-				if (!character.sprite.name.EndsWith("backwards")) {
-					character.changeSpriteFromName("dash_backwards", false);
-				}
-			} else {
-				if (character.sprite.name.EndsWith("backwards")) {
-					character.changeSpriteFromName("dash", false);
-				}
-			}
-		}
-	}
 }
 
 public class AirDash : CharState {
@@ -1037,8 +1026,6 @@ public class AirDash : CharState {
 	public bool stop;
 	public Anim? dashSpark;
 
-	public int initialDashDir;
-
 	public AirDash(string initialDashButton) : base("dash", "dash_shoot", "attack_dash") {
 		accuracy = 10;
 		attackCtrl = true;
@@ -1047,7 +1034,6 @@ public class AirDash : CharState {
 		this.initialDashButton = initialDashButton;
 		enterSound = "airdash";
 		enterSoundArgs = "larmor";
-
 	}
 
 	public override void preUpdate() {
@@ -1055,19 +1041,8 @@ public class AirDash : CharState {
 		dashTime += character.speedMul;
 	}
 
-	public bool backDashedOnce;
 	public override void update() {
 		base.update();
-		if (stateTime < 0.15f) {
-			if (player.input.isHeld("left", base.player)) {
-				dashDir = -1;
-			} else if (player.input.isHeld("right", base.player)) {
-				dashDir = 1;
-			}
-		}
-		if (Global.level.server.customMatchSettings != null || Global.level.server?.customMatchSettings?.instantDash == true) {
-			dashBackwardsCode(character, initialDashDir);
-		}
 		if (!player.isAI && !player.input.isHeld(initialDashButton, player) && !stop) {
 			dashTime = 900;
 		}
@@ -1089,7 +1064,7 @@ public class AirDash : CharState {
 		}
 		if (dashTime < 4 || stop) {
 			if (inputXDir != 0 && inputXDir != dashDir) {
-				character.xDir = (int)inputXDir;
+				character.xDir = inputXDir;
 				dashDir = character.xDir;
 			}
 		}
@@ -1099,7 +1074,11 @@ public class AirDash : CharState {
 		}
 		// Dash start.
 		else if (!stop) {
-			character.moveXY(Physics.DashStartSpeed * character.getRunDebuffs() * dashDir, 0);
+			float targetSpeed = Physics.DashStartSpeed * character.getRunDebuffs();
+			if (Global.customSettings?.instantDash == true) {
+				targetSpeed = character.getDashSpeed();
+			}
+			character.moveXY(targetSpeed * dashDir, 0);
 		}
 		// Air move.
 		else if (stop && inputXDir != 0) {
@@ -1126,27 +1105,7 @@ public class AirDash : CharState {
 		if (character is CmdSigma or Doppma) {
 			character.frameIndex = 1;
 		}
-		initialDashDir = character.xDir;
-
-
 	}
-
-
-
-
-	public static void dashBackwardsCode(Character character, int initialDashDir) {
-		if (!character.player.isAxl) {
-			return;
-		}
-		if (character.xDir != initialDashDir) {
-			if (!character.sprite.name.EndsWith("backwards")) {
-				character.changeSpriteFromName("dash_backwards", resetFrame: false);
-			}
-		} else if (character.sprite.name.EndsWith("backwards")) {
-			character.changeSpriteFromName("dash", resetFrame: false);
-		}
-	}
-
 
 	public override void onExit(CharState? newState) {
 		if (!dashSpark?.destroyed == true) {
@@ -1518,14 +1477,14 @@ public class Die : CharState {
 		if (!character.ownedByLocalPlayer) {
 			return;
 		}
-		if (character is Vile or BaseSigma) {
+		if (character is BaseSigma sigma) {
 			if (stateTime >= 1 && !once) {
 				player.respawnTime = player.getRespawnTime();
 				player.randomTip = Tips.getRandomTip(player.charNum);
 				once = true;
 				character.visible = false;
 				player.explodeDieStart();
-				if (character is BaseSigma sigma && sigma.loadout.commandMode != (int)MaverickModeId.TagTeam) {
+				if (sigma.loadout.commandMode != (int)MaverickModeId.TagTeam) {
 					foreach (var weapon in new List<Weapon>(character.weapons)) {
 						if (weapon is MaverickWeapon mw && mw.maverick != null) {
 							mw.maverick.changeState(new MExit(mw.maverick.pos, true), true);
@@ -1538,7 +1497,7 @@ public class Die : CharState {
 				player.explodeDieEnd();
 				player.destroyCharacter(character, true);
 			}
-		} else if (character is KaiserSigma) {
+		} else if (character is KaiserSigma or ViralSigma or Vile) {
 			if (stateTime >= 1 && !once) {
 				player.respawnTime = player.getRespawnTime();
 				player.randomTip = Tips.getRandomTip(player.charNum);
@@ -1572,15 +1531,17 @@ public class Die : CharState {
 				int randX = Helpers.randomRange(-radius, radius);
 				int randY = Helpers.randomRange(-radius, radius);
 				var randomPos = character.getCenterPos().addxy(randX, randY);
-				if (character is Vile vile && vile.isVileMK2 || character is Doppma or KaiserSigma) {
+				if (character is Vile { isVileMK2: true } || character is Doppma or KaiserSigma) {
 					new Anim(randomPos, "explosionx2", 1, player.getNextActorNetId(), true, sendRpc: true);
 					character.playSound("explosionX3", sendRpc: true);
 				}
-				if (character is NeoSigma) {
+				if (character is NeoSigma or ViralSigma) {
 					new Anim(randomPos, "explosionx2", 1, player.getNextActorNetId(), true, sendRpc: true);
 					character.playSound("explosionX2", sendRpc: true);
 				}
-				if (character is Vile vile1 && (vile1.isVileMK1 || vile1.isVileMK5) || character is CmdSigma or WolfSigma) {
+				if (character is Vile vile && (vile.isVileMK1 || vile.isVileMK5) ||
+					character is CmdSigma or WolfSigma
+				) {
 					new Anim(randomPos, "explosion", 1, player.getNextActorNetId(), true, sendRpc: true);
 					character.playSound("explosion", sendRpc: true);
 				}

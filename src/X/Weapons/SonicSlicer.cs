@@ -93,7 +93,7 @@ public class SonicSlicerProj : Projectile {
 		maxTime = 0.75f;
 		this.type = type;
 		if (collider != null) {
-			collider.wallOnly = true;
+			collider?.wallOnly = true;
 		}
 		projId = (int)ProjIds.SonicSlicer;
 

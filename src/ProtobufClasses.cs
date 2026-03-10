@@ -7,11 +7,11 @@ namespace MMXOnline;
 
 [ProtoContract]
 public class RPCMatchOverResponse {
-	[ProtoMember(1)] public HashSet<int> winningAlliances;
-	[ProtoMember(2)] public string winMessage;
-	[ProtoMember(3)] public string loseMessage;
-	[ProtoMember(4)] public string loseMessage2;
-	[ProtoMember(5)] public string winMessage2;
+	[ProtoMember(1)] public HashSet<int> winningAlliances = [];
+	[ProtoMember(2)] public string winMessage = "";
+	[ProtoMember(3)] public string loseMessage = "";
+	[ProtoMember(4)] public string loseMessage2 = "";
+	[ProtoMember(5)] public string winMessage2 = "";
 
 	public RPCMatchOverResponse() { }
 }

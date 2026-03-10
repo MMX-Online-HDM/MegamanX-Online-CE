@@ -285,20 +285,6 @@ public class ViralSigma : Character {
 		base.onDeath();
 		player.lastDeathWasSigmaHyper = true;
 		destroyMusicSource();
-		visible = false;
-		Anim anim = new Anim(
-			pos, "sigma2_die", 1, player.getNextActorNetId(), false, sendRpc: true
-		);
-		anim.ttl = 3;
-		anim.blink = true;
-		//anim.frameIndex = lastViralFrameIndex;
-		//anim.frameSpeed = 0;
-		//anim.angle = lastViralAngle;
-		var ede = new ExplodeDieEffect(
-			player, pos, pos, "empty", 1, zIndex, false, 20, 3, false
-		);
-		ede.host = anim;
-		Global.level.addEffect(ede);
 	}
 }
 

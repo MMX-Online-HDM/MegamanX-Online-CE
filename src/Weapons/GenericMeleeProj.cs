@@ -8,7 +8,8 @@ public class GenericMeleeProj : Projectile {
 		float? damage = null, int? flinch = null, float? hitCooldown = null,
 		Actor? owningActor = null, bool isShield = false, bool isDeflectShield = false, bool isReflectShield = false,
 		bool addToLevel = false, float? hitCooldownSeconds = null,
-		bool isZSaberEffect = false, bool isZSaberEffect2 = false, bool isZSaberEffect2B = false, bool isZSaberClang = false
+		bool isZSaberEffect = false, bool isZSaberEffect2 = false, bool isZSaberEffect2B = false,
+		ClashTier clashTier = ClashTier.None
 	) : base(
 		weapon, pos, 1, 0, 2, player, "empty", 0, 0.5f, null, player.ownedByLocalPlayer, addToLevel: addToLevel
 	) {
@@ -38,7 +39,7 @@ public class GenericMeleeProj : Projectile {
 		this.isZSaberEffect = isZSaberEffect;
 		this.isZSaberEffect2 = isZSaberEffect2;
 		this.isZSaberEffect2B = isZSaberEffect2B;
-		this.isZSaberClang = isZSaberClang;
+		this.clashTier = clashTier;
 		isMelee = true;
 	}
 
@@ -50,6 +51,7 @@ public class GenericMeleeProj : Projectile {
 		if (isEffect2B) return isZSaberEffect2B;
 		return isZSaberEffect;
 	}
+
 	public void charGrabCode(
 		CommandGrabScenario scenario, Character? grabber,
 		IDamagable? damagable, CharState grabState, CharState grabbedState
@@ -57,7 +59,7 @@ public class GenericMeleeProj : Projectile {
 		if (grabber != null && damagable is Character grabbedChar && grabbedChar.canBeGrabbed()) {
 			if (!owner.isDefenderFavored) {
 				if (ownedByLocalPlayer && !Helpers.isOfClass(grabber.charState, grabState.GetType())) {
-					owner.character.changeState(grabState, true);
+					(ownerActor as Character)?.changeState(grabState, true);
 					if (Global.isOffline) {
 						grabbedChar.changeState(grabbedState, true);
 					} else {
@@ -100,16 +102,17 @@ public class GenericMeleeProj : Projectile {
 
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
+		
+		// Command grab section
+		Character? grabberChar = ownerActor as Character;
+		Character? grabbedChar = damagable as Character;
 
 		if (projId == (int)ProjIds.QuakeBlazer) {
-			if (owner.character?.charState is ZeroDownthrust hyouretsuzanState) {
+			if (grabberChar?.charState is ZeroDownthrust hyouretsuzanState) {
 				hyouretsuzanState.quakeBlazerExplode(false);
 			}
 		}
 
-		// Command grab section
-		Character? grabberChar = owner.character;
-		Character? grabbedChar = damagable as Character;
 		switch (projId) {
 			case (int)ProjIds.UPGrab:
 				charGrabCode(CommandGrabScenario.UPGrab, grabberChar, damagable, new XUPGrabState(grabbedChar), new UPGrabbed(grabberChar));
@@ -174,4 +177,12 @@ public class GenericMeleeProj : Projectile {
 	public override void onDestroy() {
 		base.onDestroy();
 	}
+}
+
+public enum ClashTier {
+	None,
+	Shield,
+	Weak,
+	Medium,
+	Strong
 }

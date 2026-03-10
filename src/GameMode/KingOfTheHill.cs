@@ -53,35 +53,36 @@ public class KingOfTheHill : GameMode {
 	}
 
 	public override void checkIfWinLogic() {
-		if (remainingTime > 0) return;
-
+		// If we have a response we just continue.
+		if (matchOverResponse != null) {
+			return;
+		}
+		if (remainingTime > 0) {
+			return;
+		}
 		ControlPoint hill = Global.level.hill;
-		if (hill.captureTime > 0 || hill.blueCaptureTime > 0 || hill.redCaptureTime > 0) return;
-		if (hill.contested()) return;
-
-		if (hill.alliance == blueAlliance) {
+		if (hill.captureTime > 0 || hill.blueCaptureTime > 0 || hill.redCaptureTime > 0) {
+			return;
+		}
+		if (hill.contested()) {
+			return;
+		}
+		if (hill.alliance == stageAlliance) {
 			matchOverResponse = new RPCMatchOverResponse() {
-				winningAlliances = new HashSet<int>() { blueAlliance },
-				winMessage = "Victory!",
-				winMessage2 = "Blue team wins",
-				loseMessage = "You lost!",
-				loseMessage2 = "Blue team wins"
-			};
-		} else if (hill.alliance == redAlliance) {
-			matchOverResponse = new RPCMatchOverResponse() {
-				winningAlliances = new HashSet<int>() { redAlliance },
-				winMessage = "Victory!",
-				winMessage2 = "Red team wins",
-				loseMessage = "You lost!",
-				loseMessage2 = "Red team wins"
-			};
-		} else {
-			matchOverResponse = new RPCMatchOverResponse() {
-				winningAlliances = new HashSet<int>() { },
+				winningAlliances = [],
 				winMessage = "Stalemate!",
 				loseMessage = "Stalemate!"
 			};
 		}
+		string message2 = $"{teamNames[hill.alliance]} team wins";
+		matchOverResponse = new RPCMatchOverResponse() {
+			winningAlliances = [hill.alliance],
+			winMessage = "Victory!",
+			winMessage2 = message2,
+			loseMessage = "You lost!",
+			loseMessage2 = message2,
+		};
+		
 	}
 
 	public override void drawScoreboard() {

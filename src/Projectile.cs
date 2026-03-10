@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace MMXOnline;
@@ -37,7 +38,7 @@ public class Projectile : Actor {
 	public bool isZSaberEffect2;
 	public bool isZSaberEffect2B;
 	//Clang for Zero (or could be in all characters in general)
-	public bool isZSaberClang;
+	public ClashTier clashTier;
 	public bool shouldVortexSuck = true;
 	bool damagedOnce;
 	//public int? destroyFrames;
@@ -54,6 +55,7 @@ public class Projectile : Actor {
 	public bool wallCrawlUpdateAngle;
 
 	bool clangedOnce;
+	bool strongClanged;
 	bool acidFadeOnce;
 	
 	public float shieldBounceTimeX = 0;
@@ -328,7 +330,11 @@ public class Projectile : Actor {
 		forceNetUpdateNextFrame = true;
 	}
 
-	public bool getHeadshotVictim(Player player, out IDamagable? victim, out Point? hitPoint) {
+	public bool getHeadshotVictim(
+		Player player,
+		[NotNullWhen(true)] out IDamagable? victim,
+		[NotNullWhen(true)] out Point? hitPoint
+	) {
 		victim = null;
 		hitPoint = null;
 		float w = collider?.shape.getRect().w() ?? 2;
@@ -375,29 +381,60 @@ public class Projectile : Actor {
 		base.destroySelf("", "", disableRpc, doRpcEvenIfNotOwned);
 	}
 
-	public static bool charsCanClang(Character attacker, Character defender) {
-		if (attacker == null || defender == null) return false;
-		if (attacker.player.alliance == defender.player.alliance) return false;
-		if (!defender.sprite.name.Contains("attack") && !defender.sprite.name.Contains("block")) return false;
-		if (defender.sprite.name.Contains("sigma2")) return false;
-		if ((attacker as Zero)?.hypermodeActive() == true) return false;
-		if ((attacker as BusterZero)?.isBlackZero == true) return false;
-
-
+	public bool checkClang(Projectile enemy) {
+		// Actors are not null and clash tier is active.
+		if (ownerActor == null || enemy.ownerActor == null || clashTier == 0) {
+			return false;
+		}
+		// Cast other actor 
+		Actor defender = enemy.ownerActor;
+		int selfAlliance = ownerActor switch {
+			Character c => c.player.alliance,
+			Maverick m => m.player.alliance,
+			Projectile p => p.ownerPlayer.alliance,
+			NeutralEnemy ne => ne.alliance,
+			_ => -2
+		};
+		int enemyAlliance = defender switch {
+			Character c => c.player.alliance,
+			Maverick m => m.player.alliance,
+			Projectile p => p.ownerPlayer.alliance,
+			NeutralEnemy ne => ne.alliance,
+			_ => -1
+		};
+		if (selfAlliance == enemyAlliance) {
+			return false;
+		}
+		// Enemy tier. Shields are considered weaker than weak.
+		ClashTier enemyTier = enemy.clashTier;
+		if (enemy.clashTier == 0 && (enemy.isShield || enemy.isDeflectShield || enemy.isReflectShield)) {
+			enemyTier = ClashTier.Shield;
+		}
+		// Clash tier must be the same or worse than enemy.
+		if (clashTier - 1 > enemy.clashTier) {
+			return false;
+		}
 		// Not facing each other
-		if (attacker.pos.x >= defender.pos.x && (attacker.xDir != -1 || defender.xDir != 1)) return false;
-		if (attacker.pos.x < defender.pos.x && (attacker.xDir != 1 || defender.xDir != -1)) return false;
-
+		if (ownerActor.pos.x - 10 > defender.pos.x && (ownerActor.xDir != -1 || defender.xDir != 1)) {
+			return false;
+		}
+		if (ownerActor.pos.x + 10 < defender.pos.x && (ownerActor.xDir != 1 || defender.xDir != -1)) {
+			return false;
+		}
 		return true;
 	}
 
 	public bool canClangChar() {
-		return isShield || isDeflectShield || isReflectShield;
+		return clashTier > 0 || isShield || isDeflectShield || isReflectShield;
 	}
 
 	public bool canBeParried() {
 		return isMelee;
 	}
+
+	public void startClash() {
+		
+	} 
 
 	public override void onCollision(CollideData other) {
 		if (weapon == null) return;
@@ -415,35 +452,36 @@ public class Projectile : Actor {
 			}
 		}
 
-		//var isSaber = GenericMeleeProj.isZSaberClangBool(otherProj);
-		if (isZSaberClang && owner.character?.isStunImmune() == false) {
+		// Check if we can clash.
+		if (clashTier > 0 && ownerActor is Character clangChar && !clangChar.isFlinchImmune()) {
 			// Case 1: hitting a clangable projectile.
-			if (ownedByLocalPlayer && owner.character != null &&
-				otherProj != null && otherProj.owner.alliance != owner.alliance
+			if (ownedByLocalPlayer && clangChar.charState is not ZeroClang &&
+				otherProj?.ownerActor != null && otherProj.owner.alliance != owner.alliance
 			 ) {
-				if ((otherProj.canClangChar() && charsCanClang(owner.character, otherProj.owner.character)) || otherProj.isShield) {
-					if (!clangedOnce) clangedOnce = true;
-					else return;
-
-					owner.character.changeState(new ZeroClang(-owner.character.xDir), true);
-					owner.character.playSound("m10ding", sendRpc: true);
+				if (otherProj.canClangChar() && checkClang(otherProj)) {
+					clangedOnce = true;
+					if (otherProj.isShield) {
+						strongClanged = true;
+					}
+					clangChar.changeState(new ZeroClang(-clangChar.xDir), true);
+					clangChar.playSound("m10ding", sendRpc: true);
 					if (Helpers.randomRange(0, 10) == 5) {
-						otherProj.owner.character.addDamageText("Clang!", 3);
+						otherProj.ownerActor?.addDamageText("Clang!", 3);
 					}
-
 					if (other.hitData.hitPoint != null) {
-						new Anim(other.hitData.hitPoint.Value, "buster4_x3_muzzle", 1, owner.getNextActorNetId(), true, sendRpc: true);
+						new Anim(
+							other.hitData.hitPoint.Value, "buster4_x3_muzzle", 1,
+							owner.getNextActorNetId(), true, sendRpc: true
+						);
 					}
-
-					destroySelf();
-					return;
 				}
 			}
-
-			// Case 2: hitting a zero that's in swordblock state. Projectile should not run any damage code
-			// This logic could have also lived in "canBeDamaged" but since it's related to the clang code above, it's put here
-			if (owner.character != null && other.gameObject is Character chr) {
-				if (charsCanClang(owner.character, chr)) {
+			// Case 2: hitting a zero that's in swordblock state.
+			// Projectile should not run any damage code.
+			// This logic could have also lived in "canBeDamaged" but since
+			// it's related to the clang code above, it's put here
+			if (clangChar != null && otherProj != null && other.gameObject is Character chr) {
+				if (checkClang(otherProj) && clangedOnce && strongClanged) {
 					return;
 				}
 			}
@@ -608,7 +646,7 @@ public class Projectile : Actor {
 
 				bool weakness = false;
 				if (character is MegamanX) {
-					int wi = character.player.weapon.weaknessIndex;
+					int wi = character.currentWeapon?.weaknessIndex ?? 0;
 					if (wi > 0 && wi == weapon.index) weakness = true;
 				}
 

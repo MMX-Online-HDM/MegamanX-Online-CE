@@ -108,7 +108,7 @@ public class GrenadeProj : Projectile, IDamagable {
 
 		projId = (int)ProjIds.BlastLauncherGrenadeProj;
 		useGravity = true;
-		collider.wallOnly = true;
+		collider?.wallOnly = true;
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 		reflectableFBurner = true;
@@ -335,7 +335,7 @@ public class GreenSpinnerProj : Projectile {
 		this.target = target;
 		vel.x = speed * bulletDir.x;
 		vel.y = speed * bulletDir.y;
-		collider.wallOnly = true;
+		collider?.wallOnly = true;
 		destroyOnHit = false;
 		this.xDir = xDir;
 		angle = MathF.Atan2(vel.y, vel.x) * 180 / MathF.PI;

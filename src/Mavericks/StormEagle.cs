@@ -205,7 +205,7 @@ public class StormEEggProj : Projectile {
 		maxTime = 0.675f;
 		useGravity = true;
 		vel.y = -100;
-		collider.wallOnly = true;
+		collider?.wallOnly = true;
 		fadeSound = "explosion";
 		fadeSprite = "explosion";
 

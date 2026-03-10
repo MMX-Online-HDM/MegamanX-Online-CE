@@ -19,7 +19,7 @@ public class Pickup : Actor {
 		base(sprite, pos, netId, ownedByLocalPlayer, false) {
 		netOwner = owner;
 		if (collider != null) {
-			collider.wallOnly = true;
+			collider?.wallOnly = true;
 			collider.isTrigger = false;
 		}
 

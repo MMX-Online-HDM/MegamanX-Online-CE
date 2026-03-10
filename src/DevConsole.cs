@@ -59,7 +59,7 @@ public class DevConsole {
 
 	public static void aiSwitch(string[] args) {
 		int slot = int.Parse(args[0]);
-		Global.level.otherPlayer.changeWeaponSlot(slot - 1);
+		Global.level.otherPlayer?.changeWeaponSlot(slot - 1);
 		if (args.Contains("a")) {
 			AI.trainingBehavior = AITrainingBehavior.Attack;
 		}
@@ -161,7 +161,7 @@ public class DevConsole {
 
 	public static void lose() {
 		if (Global.level.gameMode is FFADeathMatch) {
-			Global.level.otherPlayer.kills = Global.level.gameMode.playingTo;
+			Global.level.otherPlayer?.kills = Global.level.gameMode.playingTo;
 		} else if (Global.level.gameMode is TeamDeathMatch) {
 			Global.level.gameMode.teamPoints[1] = (byte)Global.level.gameMode.playingTo;
 		}
@@ -170,7 +170,7 @@ public class DevConsole {
 	public static void aiRevive() {
 		if (Global.debug) {
 			Global.shouldAiAutoRevive = true;
-			Global.level.otherPlayer.character?.applyDamage(
+			Global.level.otherPlayer?.character?.applyDamage(
 				Damager.envKillDamage, Global.level.otherPlayer, Global.level.otherPlayer.character, null, null
 			);
 		}
@@ -182,12 +182,14 @@ public class DevConsole {
 			mashType = int.Parse(args[0]);
 		}
 		mashType = Helpers.clamp(mashType, 0, 2);
-		Global.level.otherPlayer.character.ai.mashType = mashType;
+		Global.level.otherPlayer?.character?.ai?.mashType = mashType;
 	}
 
 	public static void spawnRideChaser() {
 		var mp = Global.level.mainPlayer;
-		if (mp != null) new RideChaser(mp, mp.character.pos, 0, null, true);
+		if (mp?.character != null) {
+			new RideChaser(mp, mp.character.pos, 0, null, true);
+		}
 	}
 
 	public static void toggleFTD() {
@@ -200,7 +202,7 @@ public class DevConsole {
 
 	public static void toggleInvulnFrames(int time) {
 		var mc = Global.level.mainPlayer.character;
-		mc.invulnTime = time;
+		mc?.invulnTime = time;
 	}
 
 	public static void changeTeam() {
@@ -221,8 +223,8 @@ public class DevConsole {
 	}
 
 	public static void aiGiga() {
-		Global.level.otherPlayer.weapons.Add(new GigaCrush());
-		Global.level.otherPlayer.character.changeState(new GigaCrushCharState(), true);
+		Global.level.otherPlayer?.weapons.Add(new GigaCrush());
+		Global.level.otherPlayer?.character?.changeState(new GigaCrushCharState(), true);
 	}
 
 	public static List<Command> commands = new List<Command>() {
@@ -249,7 +251,7 @@ public class DevConsole {
 			),
 			false
 		),
-		new Command("invuln", (args) => Global.level.mainPlayer.character.invulnTime = 60),
+		new Command("invuln", (args) => Global.level.mainPlayer.character?.invulnTime = 60),
 		new Command("ult", (args) => {
 			if (Global.level.mainPlayer.character is MegamanX mmx) {
 				mmx.hasUltimateArmor = true;
@@ -257,8 +259,8 @@ public class DevConsole {
 		}),
 		new Command("hp", (args) => setHealth(args)),
 		new Command("dmg", (args) => selfDMG(args)),
-		new Command("freeze", (args) => Global.level.mainPlayer.character.freeze()),
-		new Command("hurt", (args) => Global.level.mainPlayer.character.setHurt(-1, Global.defFlinch, false)),
+		new Command("freeze", (args) => Global.level.mainPlayer.character?.freeze()),
+		new Command("hurt", (args) => Global.level.mainPlayer.character?.setHurt(-1, Global.defFlinch, false)),
 		new Command("trhealth", (args) => Global.spawnTrainingHealth = !Global.spawnTrainingHealth),
 		new Command("checksum", (args) => printChecksum(), false),
 		new Command("dna", (args) => addDnaCore(args)),

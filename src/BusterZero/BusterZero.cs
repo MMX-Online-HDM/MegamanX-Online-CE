@@ -461,7 +461,7 @@ public class BusterZero : Character {
 			(int)MeleeIds.SaberSwing => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.DZMelee, player,
 				isBlackZero ? 4 : 3, Global.defFlinch, isReflectShield: true,
-				isZSaberClang: true, isZSaberEffect: true,
+				clashTier: ClashTier.Weak, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
 			_ => null

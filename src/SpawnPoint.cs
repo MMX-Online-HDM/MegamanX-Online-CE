@@ -28,7 +28,7 @@ public class SpawnPoint {
 		foreach (var go in Global.level.gameObjects) {
 			var chr = go as Character;
 			if (chr != null) {
-				if (chr.abstractedActor().pos.distanceTo(pos) < radius) {
+				if (chr.abstractedActor.pos.distanceTo(pos) < radius) {
 					actors.Add(chr);
 				}
 			}

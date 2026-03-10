@@ -89,7 +89,7 @@ public class SpinWheelProj : Projectile {
 		}
 		if (collider != null) {
 			collider.isTrigger = false;
-			collider.wallOnly = true;
+			collider?.wallOnly = true;
 		}
 		if (started == 0 && sprite.isAnimOver()) {
 			started = 1;
@@ -97,7 +97,7 @@ public class SpinWheelProj : Projectile {
 			useGravity = true;
 			if (collider != null) {
 				collider.isTrigger = false;
-				collider.wallOnly = true;
+				collider?.wallOnly = true;
 			}
 		}
 		if (started == 1) {

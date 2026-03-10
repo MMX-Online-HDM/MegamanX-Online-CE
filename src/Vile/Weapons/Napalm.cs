@@ -126,7 +126,7 @@ public class NapalmGrenadeProj : Projectile {
 		damager.hitCooldown = 12;
 		vel = new Point(150 * xDir, -200);
 		useGravity = true;
-		collider.wallOnly = true;
+		collider?.wallOnly = true;
 		fadeSound = "explosionX3";
 		fadeSprite = "explosion";
 		shouldShieldBlock = false;
@@ -196,7 +196,7 @@ public class NapalmPartProj : Projectile {
 		projId = (int)ProjIds.RumblingBangProj;
 		vel.y = -40;
 		useGravity = true;
-		collider.wallOnly = true;
+		collider?.wallOnly = true;
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 		gravityModifier = 0.25f;
@@ -296,7 +296,7 @@ public class MK2NapalmGrenadeProj : Projectile {
 		projId = (int)ProjIds.FlameRoundGrenade;
 		this.vel = new Point(150 * xDir, -200);
 		useGravity = true;
-		collider.wallOnly = true;
+		collider?.wallOnly = true;
 		fadeSound = "explosionX3";
 		fadeSprite = "explosion";
 		if (rpc) {
@@ -343,7 +343,7 @@ public class MK2NapalmProj : Projectile {
 		maxTime = 2;
 		projId = (int)ProjIds.FlameRoundProj;
 		useGravity = true;
-		collider.wallOnly = true;
+		collider?.wallOnly = true;
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 
@@ -388,7 +388,7 @@ public class MK2NapalmFlame : Projectile {
 		damager.hitCooldown = 60;
 		projId = (int)ProjIds.FlameRoundFlameProj;
 		useGravity = true;
-		collider.wallOnly = true;
+		collider?.wallOnly = true;
 		destroyOnHit = true;
 		shouldShieldBlock = false;
 		gravityModifier = 0.25f;
@@ -460,7 +460,7 @@ public class SplashHitGrenadeProj : Projectile {
 		fadeSound = "explosionX3";
 		fadeSprite = "explosion";
 		useGravity = true;
-		collider.wallOnly = true;
+		collider?.wallOnly = true;
 		shouldShieldBlock = false;
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
