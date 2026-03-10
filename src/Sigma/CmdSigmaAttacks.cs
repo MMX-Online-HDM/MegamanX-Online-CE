@@ -39,8 +39,8 @@ public class SigmaSlashStateGround : CmdSigmaState {
 			character.playSound("sigmaSaber", sendRpc: true);
 			Point off = new Point(30, -20);
 			new SigmaSlashProj(
-				character.pos.addxy(off.x * character.xDir, off.y), character.xDir,
-				sigma, player, player.getNextActorNetId(), 4, 26, rpc: true
+				character.pos.addxy(off.x * character.xDir, off.y), character.xDir, 0,
+				sigma, player.getNextActorNetId(), sendRpc: true
 			);
 		}
 		if (character.isAnimOver()) {
@@ -65,8 +65,8 @@ public class SigmaSlashStateAir : CmdSigmaState {
 			character.playSound("sigmaSaber", sendRpc: true);
 			Point off = new Point(24, -22);
 			new SigmaSlashProj(
-				character.pos.addxy(off.x * character.xDir, off.y), character.xDir,
-				sigma, player, player.getNextActorNetId(), 3, 13, rpc: true
+				character.pos.addxy(off.x * character.xDir, off.y), character.xDir, 1,
+				sigma, player.getNextActorNetId(), sendRpc: true
 			);
 		}
 		if (character.isAnimOver()) {
@@ -90,8 +90,8 @@ public class SigmaSlashStateDash : CmdSigmaState {
 			character.playSound("sigmaSaber", sendRpc: true);
 			Point off = new Point(26, -22);
 			new SigmaSlashProj(
-				character.pos.addxy(off.x * character.xDir, off.y), character.xDir,
-				sigma, player, player.getNextActorNetId(), 4, 26, rpc: true
+				character.pos.addxy(off.x * character.xDir, off.y), character.xDir, 0,
+				sigma, player.getNextActorNetId(), sendRpc: true
 			);
 		}
 		if (character.isAnimOver()) {
@@ -151,34 +151,39 @@ public class SigmaSlashState : CmdSigmaState {
 }
 */
 
-
 public class SigmaSlashProj : Projectile {
 	public SigmaSlashProj(
-		Point pos, int xDir, Actor owner, Player player, ushort? netId,
-		float damage = 6, int flinch = 26, bool rpc = false
+		Point pos, int xDir, int type, Actor owner,
+		ushort? netId, bool sendRpc = false, Player? altPlayer = null
 	) : base(
-		pos, xDir, owner, "sigma_proj_slash", netId, player
+		pos, xDir, owner, "sigma_proj_slash", netId, altPlayer
 	) {
 		weapon = SigmaSlashWeapon.netWeapon;
-		damager.damage = damage;
-		damager.flinch = flinch;
+		damager.damage = 4;
+		damager.flinch = Global.defFlinch;
 		damager.hitCooldown = 30;
 		clashTier = ClashTier.Strong;
+		if (type == 1) {
+			damager.damage = 3;
+			damager.flinch = Global.halfFlinch;
+		}
+		if (type == 2) {
+			damager.damage = 6;
+			clashTier = ClashTier.None;
+		}
 		reflectable = false;
 		setIndestructableProperties();
 		maxTime = 10f / 60f;
 		projId = (int)ProjIds.SigmaSlash;
 		isMelee = true;
-		if (rpc) {
-			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
-		}
-		if (ownerPlayer?.character != null) {
-			ownerActor = ownerPlayer.character;
+
+		if (sendRpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, [(byte)type]);
 		}
 	}
 	public static Projectile rpcInvoke(ProjParameters args) {
 		return new SigmaSlashProj(
-			args.pos, args.xDir, args.owner, args.player, args.netId
+			args.pos, args.xDir, args.extraData[0], args.owner, args.netId, altPlayer: args.player
 		);
 	}
 
@@ -398,8 +403,8 @@ public class SigmaWallDashState : CmdSigmaState {
 			character.changeSpriteFromName("wall_dash_attack", true);
 			Point off = new Point(30, -20);
 			new SigmaSlashProj(
-				character.pos.addxy(off.x * character.xDir, off.y), character.xDir,
-				sigma, player, player.getNextActorNetId(), damage: 4, rpc: true
+				character.pos.addxy(off.x * character.xDir, off.y), character.xDir, 2,
+				sigma, player.getNextActorNetId(), sendRpc: true
 			);
 		}
 	}
