@@ -119,7 +119,9 @@ public class RevolverBarrelProj : Projectile {
 
 	public override void update() {
 		if (ownedByLocalPlayer && getHeadshotVictim(owner, out IDamagable? victim, out Point? hitPoint)) {
-			if (hitPoint != null) changePos(hitPoint.Value);
+			if (hitPoint != null) {
+				changePos(hitPoint.Value);
+			}
 			damager.applyDamage(victim, false, weapon, this, projId, overrideDamage: damager.damage * 3f);
 			damager.damage = 0;
 			playSound("hurt");

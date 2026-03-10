@@ -177,7 +177,7 @@ public class FlameMFireballProj : Projectile {
 		maxTime = 0.75f;
 		useGravity = true;
 		gravityModifier = 0.5f;
-		if (collider != null) { collider.wallOnly = true; }
+		collider?.wallOnly = true;
 		if (isShort) {
 			vel.x *= 0.5f;
 		}
@@ -236,7 +236,7 @@ public class FlameMOilProj : Projectile {
 		maxTime = 0.75f;
 		useGravity = true;
 		vel.y = -150;
-		if (collider != null) { collider.wallOnly = true; }
+		collider?.wallOnly = true;
 
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);

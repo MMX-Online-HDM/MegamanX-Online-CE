@@ -185,7 +185,7 @@ public class BBuffaloIceProj : Projectile {
 		float speedModifier = Helpers.clamp((shootFramesHeld + 3) / 10f, 0.5f, 1.5f);
 		vel = new Point(unitDir.x * 200 * speedModifier, unitDir.y * 250 * speedModifier);
 
-		if (collider != null) { collider.wallOnly = true; }
+		collider?.wallOnly = true;
 		destroyOnHit = true;
 
 		if (sendRpc) {
@@ -694,7 +694,7 @@ public class BBuffaloIceProjAI : Projectile {
 		this.type = type;
 		if (type == 0) vel = new Point(Helpers.randomRange(150,210) * owner.xDir, -Helpers.randomRange(250,300));
 		else if (type == 1) vel = new Point(Helpers.randomRange(210,250) * owner.xDir, -Helpers.randomRange(300,350));
-		if (collider != null) { collider.wallOnly = true; }
+		collider?.wallOnly = true;
 		destroyOnHit = true;
 
 		if (sendRpc) {
@@ -775,7 +775,7 @@ public class BBuffaloIceProjAIStriker : Projectile {
 		if (type == 0) vel = new Point(Helpers.randomRange(50,90), -Helpers.randomRange(270,300));
 		else if (type == 1) vel = new Point(Helpers.randomRange(140,180), -Helpers.randomRange(300,350));
 		else if (type == 2) vel = new Point(Helpers.randomRange(230,270), -Helpers.randomRange(300,350));
-		if (collider != null) { collider.wallOnly = true; }
+		collider?.wallOnly = true;
 		destroyOnHit = true;
 
 		if (sendRpc) {

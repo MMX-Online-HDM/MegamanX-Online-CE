@@ -239,6 +239,7 @@ public class BoundBlasterParticle : Anim {
 	}
 
 	public override void render(float x, float y) {
+		ttl ??= 0.25f;
 		float radiusProgress = 1 - (time / (ttl.Value * 4));
 		float alphaProgress = 1 - (time / ttl.Value);
 		Color col = new Color(167, 195, 255, (byte)(alphaProgress * 255));
@@ -366,7 +367,7 @@ public class MovingWheelProj : Projectile {
 		maxTime = startMaxTime;
 		useGravity = true;
 		collider.isTrigger = false;
-		collider.wallOnly = true;
+		collider?.wallOnly = true;
 		damager.damage = 2;
 		damager.flinch = 0;
 		destroyOnHit = true;
@@ -417,7 +418,8 @@ public class MovingWheelProj : Projectile {
 			angle += xDir * speed * 3 * Global.spf;
 			if (Global.level.checkTerrainCollisionOnce(this, 0, -1) == null) {
 				var collideData = Global.level.checkTerrainCollisionOnce(this, xDir, 0, vel);
-				if (collideData != null && collideData.hitData != null && !((Point)collideData.hitData.normal).isAngled()) {
+				if (collideData != null && collideData.hitData.normal != null &&
+					!((Point)collideData.hitData.normal).isAngled()) {
 					xDir *= -1;
 					maxTime = startMaxTime;
 					startMaxTime -= 0.2f;

@@ -81,7 +81,7 @@ public class MainMenu : IMainMenu {
 				if (selectY == 0 || selectY == 1) {
 					Menu.change(new PreJoinOrHostMenu(this, selectY == 0));
 				} else if (selectY == 2) {
-					Menu.change(new PreCPUMenu(this, false));
+					Menu.change(new HostMenu(this, null, true, true));
 				} else if (selectY == 3) {
 					Menu.change(new PreLoadoutMenu(this));
 					//} else if (selectY == 4) {
@@ -98,7 +98,7 @@ public class MainMenu : IMainMenu {
 				if (selectY == 0 || selectY == 1) {
 					Menu.change(new PreJoinOrHostMenu(this, selectY == 0));
 				} else if (selectY == 2) {
-					Menu.change(new PreCPUMenu(this, false));
+					Menu.change(new HostMenu(this, null, true, true));
 				} else if (selectY == 3) {
 					Menu.change(new PreLoadoutMenu(this));
 					//} else if (selectY == 4) {

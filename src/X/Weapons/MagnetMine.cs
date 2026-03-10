@@ -278,11 +278,10 @@ public class MagnetMineProjCharged : Projectile {
 		}
 	}
 
-	public override List<byte>? getCustomActorNetData() {
-		List<byte>? customData = base.getCustomActorNetData();
-		customData?.Add((byte)MathF.Floor(size));
-
-		return customData;
+	public override List<byte> getCustomActorNetData() {
+		return [
+			(byte)MathF.Floor(size)
+		];;
 	}
 
 	public override void updateCustomActorNetData(byte[] data) {

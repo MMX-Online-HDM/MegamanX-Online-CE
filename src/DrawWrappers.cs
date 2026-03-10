@@ -7,10 +7,10 @@ using SFML.System;
 namespace MMXOnline;
 
 public class DrawableWrapper {
-	public List<ShaderWrapper>? shaders;
+	public List<ShaderWrapper> shaders;
 	public DrawableSprite[]? subSprites;
 	public CompositeSpriteData? compositeData;
-	public IDrawable drawable;
+	public IDrawable? drawable;
 	public Color color;
 	public int[]? size;
 
@@ -18,8 +18,10 @@ public class DrawableWrapper {
 		List<ShaderWrapper> shaders, IDrawable drawable,
 		Color? color = null, int[]? size = null
 	) {
-		shaders?.RemoveAll(s => s == null);
+		shaders ??= [];
+		shaders.RemoveAll(s => s == null);
 		this.shaders = shaders;
+
 		this.drawable = drawable;
 		this.color = color ?? Color.White;
 		this.size = size;
@@ -35,10 +37,8 @@ public class DrawableWrapper {
 		Vector2f origin,
 		Color color
 	) {
-		if (shaders == null) {
-			shaders = new();
-		}
-		shaders?.RemoveAll(s => s == null);
+		shaders ??= [];
+		shaders.RemoveAll(s => s == null);
 		this.shaders = shaders;
 		this.subSprites = subSprites;
 		this.size = size;
@@ -51,6 +51,9 @@ public class DrawableWrapper {
 	}
 
 	public (IDrawable, RenderStates) GetComposeDrawable(IRenderTarget target, RenderStates states) {
+		if (subSprites == null) {
+			throw new Exception("Error, subSprites cannot be null on a composite sprite");
+		}
 		IDrawable[] sprites = new IDrawable[subSprites.Length];
 
 		for (int i = 0; i < subSprites.Length; i++) {
@@ -59,7 +62,15 @@ public class DrawableWrapper {
 		return ComposeSprite(sprites, target, states);
 	}
 
-	public (IDrawable, RenderStates) ComposeSprite(IDrawable[] spriteParts, IRenderTarget target, RenderStates states) {
+	public (IDrawable, RenderStates) ComposeSprite(
+		IDrawable[] spriteParts, IRenderTarget target, RenderStates states
+	) {
+		if (size == null) {
+			throw new Exception("Error, size cannot be null on a composite sprite");
+		}
+		if (compositeData == null) {
+			throw new Exception("Error, compositeData cannot be null on a composite sprite");
+		}
 		// Get textures.
 		int encodeKey = (size[0] * 397) ^ size[1];
 		// If something goes off.
@@ -114,6 +125,10 @@ public class DrawLayer : Transformable, IDrawable {
 				RenderStates localState;
 				(localDrawable, localState) = oneOff.GetComposeDrawable(target, states);
 				target.Draw(localDrawable, localState);
+			}
+			// Null draw.
+			else if (oneOff.drawable == null) {
+				return;
 			}
 			// No shaders.
 			else if (oneOff.shaders == null || oneOff.shaders.Count == 0) {
@@ -330,7 +345,7 @@ public partial class DrawWrappers {
 
 		if (isWorldPos) {
 			DrawLayer drawLayer = getDrawLayer(depth);
-			drawLayer.oneOffs.Add(new DrawableWrapper(null, line, Color.White));
+			drawLayer.oneOffs.Add(new DrawableWrapper([], line, Color.White));
 		} else {
 			drawToHUD(line);
 		}
@@ -370,7 +385,7 @@ public partial class DrawWrappers {
 
 		if (isWorldPos) {
 			DrawLayer drawLayer = getDrawLayer(depth);
-			drawLayer.oneOffs.Add(new DrawableWrapper(null, circle, Color.White));
+			drawLayer.oneOffs.Add(new DrawableWrapper([], circle, Color.White));
 		} else {
 			drawToHUD(circle);
 		}
@@ -390,7 +405,7 @@ public partial class DrawWrappers {
 
 		if (isWorldPos) {
 			DrawLayer drawLayer = getDrawLayer(depth);
-			drawLayer.oneOffs.Add(new DrawableWrapper(null, pixelSprite, Color.White));
+			drawLayer.oneOffs.Add(new DrawableWrapper([], pixelSprite, Color.White));
 		} else {
 			drawToHUD(pixelSprite);
 		}
@@ -420,7 +435,7 @@ public partial class DrawWrappers {
 
 		if (isWorldPos) {
 			DrawLayer drawLayer = getDrawLayer(depth);
-			drawLayer.oneOffs.Add(new DrawableWrapper(null, rect, Color.White));
+			drawLayer.oneOffs.Add(new DrawableWrapper([], rect, Color.White));
 		} else {
 			drawToHUD(rect);
 		}
@@ -456,7 +471,7 @@ public partial class DrawWrappers {
 		}
 		if (isWorldPos) {
 			DrawLayer drawLayer = getDrawLayer(depth);
-			drawLayer.oneOffs.Add(new DrawableWrapper(null, shape, Color.White));
+			drawLayer.oneOffs.Add(new DrawableWrapper([], shape, Color.White));
 		} else {
 			drawToHUD(shape);
 		}
@@ -468,9 +483,10 @@ public partial class DrawWrappers {
 		float cx = 0, float cy = 0,
 		float xScale = 1, float yScale = 1,
 		float angle = 0, float alpha = 1,
-		List<ShaderWrapper> shaders = null, bool isWorldPos = true
+		List<ShaderWrapper> shaders = null!, bool isWorldPos = true
 	) {
 		if (texture == null) return;
+		shaders ??= [];
 
 		if (isWorldPos && Options.main.enablePostProcessing) {
 			dx -= Global.level.camX;
@@ -556,7 +572,7 @@ public partial class DrawWrappers {
 			y = y - Global.level.camY;
 
 			// High speed scrolling may look better with this code. Might cause issues elsewhere so limiting to race
-			if (Global.level?.gameMode is Race) {
+			if (Global.level.gameMode is Race) {
 				x = MathInt.Round(x);
 				y = MathInt.Round(y);
 			}
@@ -576,7 +592,11 @@ public partial class DrawWrappers {
 
 					// Don't draw tiles out of the screen for optimization
 					var rect = Rect.createFromWH(origX + xOffset, origY + yOffset, tileW, tileH);
-					var camRect = new Rect(Global.level.camX, Global.level.camY, Global.level.camX + Global.viewScreenW, Global.level.camY + Global.viewScreenH);
+					var camRect = new Rect(
+						Global.level.camX, Global.level.camY,
+						Global.level.camX + Global.viewScreenW,
+						Global.level.camY + Global.viewScreenH
+					);
 					if (!rect.overlaps(camRect)) {
 						continue;
 					}

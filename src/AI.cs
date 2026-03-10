@@ -138,7 +138,7 @@ public class AI {
 			}
 
 			var brakeZones = Global.level.getTerrainTriggerList(
-				character.abstractedActor(), Point.zero, typeof(BrakeZone)
+				character.abstractedActor, Point.zero, typeof(BrakeZone)
 			);
 			if ((Global.level.gameMode as Race)?.getPlace(character.player) > 1) {
 				dashTime = 100;
@@ -153,7 +153,7 @@ public class AI {
 			}
 
 			var turnZones = Global.level.getTerrainTriggerList(
-				character.abstractedActor(), Point.zero, typeof(TurnZone)
+				character.abstractedActor, Point.zero, typeof(TurnZone)
 			);
 			if (turnZones.FirstOrDefault()?.gameObject is TurnZone turnZone && turnZone.xDir != character.xDir) {
 				if (turnZone.xDir == -1) {
@@ -167,7 +167,7 @@ public class AI {
 
 			if (jumpTime == 0) {
 				var jumpZones = Global.level.getTerrainTriggerList(
-					character.abstractedActor(), Point.zero, typeof(JumpZone)
+					character.abstractedActor, Point.zero, typeof(JumpZone)
 				);
 				int jumpTurnZoneCount = turnZones.Count(turnZone => turnZone.gameObject is TurnZone tz && tz.jumpAfterTurn && tz.xDir == character.xDir);
 
@@ -269,7 +269,7 @@ public class AI {
 
 		if (aiState is not InJumpZone) {
 			var jumpZones = Global.level.getTerrainTriggerList(
-				character.abstractedActor(), Point.zero, typeof(JumpZone)
+				character.abstractedActor, Point.zero, typeof(JumpZone)
 			);
 			var neighbor = (aiState as FindPlayer)?.neighbor;
 			if (neighbor != null) {
@@ -673,7 +673,7 @@ public class FindPlayer : AIState {
 			// States where it's possible to move to the next node. As more special situations are added this may need to grow
 			bool isValidTransitionState = character.grounded || neighbor?.isDestNodeInAir == true || character.charState is LadderClimb;
 
-			if (Math.Abs(character.abstractedActor().pos.y - nextNode.pos.y) < 30 && isValidTransitionState) {
+			if (Math.Abs(character.abstractedActor.pos.y - nextNode.pos.y) < 30 && isValidTransitionState) {
 				goToNextNode();
 			} else {
 				stuckTime += Global.spf;
@@ -831,8 +831,8 @@ public class InJumpZone : AIState {
 		}
 
 		//Check if out of zone
-		if (character != null && character.abstractedActor().collider != null) {
-			if (!character.abstractedActor().collider.isCollidingWith(jumpZone.collider)) {
+		if (character != null && character.abstractedActor.collider != null) {
+			if (!character.abstractedActor.collider.isCollidingWith(jumpZone.collider)) {
 				ai.changeState(new FindPlayer(character));
 			}
 		}

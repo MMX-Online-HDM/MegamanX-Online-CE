@@ -61,7 +61,9 @@ public static class Extensions {
 	}
 
 	public static string RemovePrefix(this string s, string prefix) {
-		if (s == null || s.Length < prefix.Length) return s;
+		if (s == null || s.Length < prefix.Length) {
+			return s ?? "";
+		}
 		return s.Substring(prefix.Length);
 	}
 

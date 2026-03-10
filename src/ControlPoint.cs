@@ -5,7 +5,7 @@ using System.Linq;
 namespace MMXOnline;
 
 public class ControlPoint : Actor {
-	public int alliance = 0;
+	public int alliance = GameMode.stageAlliance;
 	public int num;
 	public bool isInit = false;
 	public bool locked = false;
@@ -20,7 +20,7 @@ public class ControlPoint : Actor {
 	public List<Character> chrsOnPoint = new List<Character>();
 	public List<Character> defenders = new List<Character>();
 	public List<Character> attackers = new List<Character>();
-	public NavMeshNode navMeshNode;
+	public NavMeshNode navMeshNode = null!;
 	public bool isHill;
 	const float captureSpeed = 1;
 	public float yOff;
@@ -45,8 +45,10 @@ public class ControlPoint : Actor {
 
 	public override void onStart() {
 		isInit = true;
-		var hit = Global.level.raycast(pos.addxy(0, -10), pos.addxy(0, 60), new List<Type>() { typeof(Wall) });
-		if (hit.hitData.hitPoint != null) {
+		CollideData? hit = Global.level.raycast(
+			pos.addxy(0, -10), pos.addxy(0, 60), new List<Type>() { typeof(Wall) }
+		);
+		if (hit?.hitData.hitPoint != null) {
 			pos = hit.hitData.hitPoint.Value.addxy(0, 2 + yOff);
 		}
 	}

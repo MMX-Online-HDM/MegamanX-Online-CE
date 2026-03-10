@@ -132,7 +132,7 @@ public class Fonts {
 				DrawWrappers.walDrawObjects[depth] = new DrawLayer();
 			}
 			drawLayer = DrawWrappers.walDrawObjects[depth];
-			drawLayer.oneOffs.Add(new DrawableWrapper(null, batchDrawable, color.Value));
+			drawLayer.oneOffs.Add(new DrawableWrapper([], batchDrawable, color.Value));
 		} else {
 			if (!deferred) {
 				DrawWrappers.drawToHUD(batchDrawable);

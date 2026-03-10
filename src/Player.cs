@@ -30,8 +30,7 @@ public partial class Player {
 			-1, GameMode.neutralAlliance, "NULL", null, 0
 		)
 	);
-	
-	
+
 	public SpawnPoint? firstSpawn;
 	public Input input;
 	public Character? character;
@@ -41,6 +40,7 @@ public partial class Player {
 	public float shoryukenAmmo = 1920;
 	public float fgMoveMaxAmmo = 1920;
 	public bool isDefenderFavoredNonOwner;
+	public bool elimAlive => character?.alive == true && spawnedOnce;
 
 	public bool isDefenderFavored {
 		get {
@@ -266,6 +266,9 @@ public partial class Player {
 			else serverPlayer.isSpectator = value;
 		}
 	}
+	public bool altSpectator => (
+		!elimAlive && !Global.level.gameMode.canRespawn() && respawnTime <= 0 && character == null
+	);
 	private bool isOfflineSpectator;
 	public bool is1v1Combatant;
 
@@ -977,18 +980,25 @@ public partial class Player {
 	}
 
 	public bool shouldRespawn() {
-		if (character != null) return false;
-		if (respawnTime > 0) return false;
-		if (!ownedByLocalPlayer) return false;
-		if (isSpectator) return false;
-		if (eliminated()) return false;
-		if (isAI) return true;
-		if (Global.level.is1v1()) return true;
-		if (!readyTextOver) return false;
+		if (character != null ||
+			!ownedByLocalPlayer || isSpectator ||
+			eliminated() || !readyTextOver ||
+			!Global.level.gameMode.canRespawn()
+		) {
+			return false;
+		}
 		if (!spawnedOnce) {
 			spawnedOnce = true;
 			return true;
 		}
+		if (Global.level.gameMode.forceRespawn()) { return true; }
+		if (respawnTime > 0) {
+			return false;
+		}
+		if (isAI) { return true; }
+		if (Global.level.is1v1()) { return true; }
+		
+
 		if (!Menu.inMenu && input.isPressedMenu(Control.MenuConfirm)) {
 			return true;
 		}
@@ -2169,6 +2179,9 @@ public partial class Player {
 	public int getRespawnTime() {
 		if (Global.level.isTraining() || Global.level.isRace()) {
 			return 2;
+		}
+		if (Global.level.gameMode is TeamElimAlt) {
+			return 4;
 		}
 		if (Global.level?.server?.customMatchSettings != null) {
 			return Global.level.server.customMatchSettings.respawnTime;

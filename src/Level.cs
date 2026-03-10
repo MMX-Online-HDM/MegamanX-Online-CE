@@ -164,7 +164,7 @@ public partial class Level {
 	}
 	public Player camPlayer {
 		get {
-			if (mainPlayer.isSpectator) {
+			if (mainPlayer.isSpectator || mainPlayer.altSpectator) {
 				if (!Global.level.players.Contains(specPlayer)) {
 					// Player left match: immediately get next spectate target, and if none, return null
 					specPlayer = getNextSpecPlayer(1);
@@ -191,7 +191,9 @@ public partial class Level {
 	}
 
 	public List<Player> spectatablePlayers() {
-		return players.Where(p => p != mainPlayer && !p.isSpectator).OrderBy(p => p.name).ToList();
+		return players.Where(
+			p => p != mainPlayer && !p.isSpectator && p.elimAlive
+		).OrderBy(p => p.name).ToList();
 	}
 
 	public List<Player> nonSpecPlayers() {
@@ -337,7 +339,9 @@ public partial class Level {
 			gameMode = new KingOfTheHill(this, server.timeLimit);
 		} else if (server.gameMode == GameMode.Race) {
 			gameMode = new Race(this);
-		}
+		} else if (server.gameMode == GameMode.TeamElimAlt) {
+			gameMode = new TeamElimAlt(this, server.playTo, server.timeLimit);
+		} 
 
 		// Radar dimensions
 		float maxDim = 50f;
@@ -1388,8 +1392,7 @@ public partial class Level {
 			go.update();
 			go.stateUpdate();
 			go.physicsUpdate();
-			if (isNon1v1Elimination() &&
-				gameMode.virusStarted > 0 && go is Actor actor &&
+			if (gameMode.virusStarted > 0 && go is Actor actor &&
 				actor.ownedByLocalPlayer && go is IDamagable damagable
 			) {
 				var szRect = gameMode.safeZoneRect;
@@ -1926,7 +1929,7 @@ public partial class Level {
 			drawPowerplant2();
 		}
 
-		if (isNon1v1Elimination() && gameMode.virusStarted > 0) {
+		if (gameMode.virusStarted > 0) {
 			drawSigmaVirus();
 		}
 
@@ -2571,7 +2574,7 @@ public partial class Level {
 			}
 		}
 
-		if (isNon1v1Elimination() && gameMode.virusStarted > 0) {
+		if (gameMode.virusStarted > 0) {
 			return spawnPoints[gameMode.safeZoneSpawnIndex];
 		}
 
@@ -2695,7 +2698,12 @@ public partial class Level {
 			originPoint = mainChar.pos;
 		} else if (mainMaverick != null) {
 			originPoint = mainMaverick.pos;
-		} else if (mainChar == null && Global.level.mainPlayer != null && Global.level.mainPlayer.lastDeathPos != null && !Global.level.mainPlayer.isSpectator) {
+		} else if (
+			mainChar == null && Global.level.mainPlayer != null &&
+			Global.level.mainPlayer.lastDeathPos != null &&
+			!Global.level.mainPlayer.isSpectator &&
+			!Global.level.mainPlayer.altSpectator
+		) {
 			originPoint = Global.level.mainPlayer.lastDeathPos.Value;
 		}
 

@@ -209,6 +209,8 @@ public partial class Character : Actor, IDamagable {
 			return (mw as MaverickWeapon)?.maverick;
 		}
 	}
+	public Actor abstractedActor => rideArmor != null ? rideArmor : this;
+
 	public bool isControllingPuppet() {
 		return currentMaverick?.controlMode == MaverickModeId.Puppeteer;
 	}
@@ -885,7 +887,13 @@ public partial class Character : Actor, IDamagable {
 
 	public void debuffCooldowns() {
 		Helpers.decrementFrames(ref undisguiseTime);
-		if (Global.level.mainPlayer.readyTextOver) {
+		bool matchOn = true;
+		if (Global.level.gameMode is TeamElimAlt tea) {
+			if (tea.resultTime > 0) {
+				matchOn = false;
+			}
+		}
+		if (Global.level.mainPlayer.readyTextOver && matchOn) {
 			Helpers.decrementTime(ref invulnTime);
 		}
 
@@ -1892,11 +1900,6 @@ public partial class Character : Actor, IDamagable {
 		);
 	}
 
-	public Actor abstractedActor() {
-		if (rideArmor != null) return rideArmor;
-		return this;
-	}
-
 	public bool isClimbingLadder() {
 		return charState is LadderClimb;
 	}
@@ -2166,20 +2169,7 @@ public partial class Character : Actor, IDamagable {
 			return;
 		}
 		currentLabelY = -getLabelOffY();
-		(float x, float y) drawOffset = (x, y);
 
-		if (rideArmorPlatform != null) {
-			var rideArmorPos = rideArmorPlatform.pos;
-			var charPos = getMK5RideArmorPos().addxy(0, 1);
-			drawOffset = (rideArmorPos.x + charPos.x - pos.x, rideArmorPos.y + charPos.y - pos.y);
-		} else if (rideArmor != null) {
-			var rideArmorPos = rideArmor.pos;
-			var charPos = getCharRideArmorPos();
-			drawOffset = (rideArmorPos.x + charPos.x - pos.x, rideArmorPos.y + charPos.y - pos.y);
-		} else if (rideChaser != null) {
-			var rideChaserPos = rideChaser.pos;
-			drawOffset = (rideChaserPos.x - pos.x, rideChaserPos.y - pos.y);
-		}
 		float? savedAlpha = null;
 		if (invulnTime > 0) {
 			savedAlpha = alpha;
@@ -2194,7 +2184,7 @@ public partial class Character : Actor, IDamagable {
 			alpha = savedAlpha.Value;
 		}
 
-		charState?.render(x, y);
+		charState.render(x, y);
 		chargeEffect?.render(getParasitePos().add(new Point(x, y)));
 
 		if (isCrystalized) {

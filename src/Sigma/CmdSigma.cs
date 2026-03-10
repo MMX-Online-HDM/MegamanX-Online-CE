@@ -171,7 +171,7 @@ public class CmdSigma : BaseSigma {
 			},
 			MeleeIds.GenericSlash => new GenericMeleeProj(
 				SigmaSlashWeapon.netWeapon, pos, ProjIds.SigmaSlash, player, 3, 0,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, clashTier: ClashTier.Strong
 			),
 			_ => null
 		};

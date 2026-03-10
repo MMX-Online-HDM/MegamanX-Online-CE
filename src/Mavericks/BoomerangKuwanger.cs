@@ -146,12 +146,13 @@ public class BoomerangKuwanger : Maverick {
 		if (!bald && enemyDist >= 40) {
 			aiStates.Add(getShootState());
 		}
-		if (!bald && (
+		if (!bald && teleportCooldown <= 0 && ammo >= 4 && (
 			enemyDist >= 26 && canGrabTarget ||
 			enemyDist <= 80 && !canGrabTarget ||
 			enemyDist <= 40 ||
 			Helpers.randomRange(0, 1) == 1
 		)) {
+			deductAmmo(4);
 			aiStates.Add(new BoomerKTeleportState());
 		}
 		return aiStates.ToArray();

@@ -25,7 +25,7 @@ public class ItemTracer : Weapon {
 
 		Character? target = null;
 		character.playSound("itemTracer", sendRpc: true);
-		CollideData hit = Global.level.raycast(
+		CollideData? hit = Global.level.raycast(
 			character.pos, character.pos.addxy(150 * character.xDir, 0), new List<Type>() { typeof(Actor) }
 		);
 		if (hit?.gameObject is Character chr && chr.player.alliance != player.alliance && !chr.player.scanned) {

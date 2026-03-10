@@ -916,13 +916,10 @@ public class Damager {
 						flinch = 0;
 						damage = 0;
 						maverick.playSound("m10ding");
-						if (owner.ownedByLocalPlayer == true &&
-							owner.character is Zero zero &&
-							!zero.hypermodeActive()
-						) {
-							//What in the..
-							if (damagingActor is Projectile proj1 && proj1.isZSaberClang) {
-								owner.character.changeState(new ZeroClang(-owner.character.xDir));
+						//What in the.
+						if (owner.ownedByLocalPlayer == true) {
+							if (damagingActor is Projectile proj1 && proj1.clashTier == ClashTier.Weak) {
+								proj1.startClash();
 							}
 						}
 					}

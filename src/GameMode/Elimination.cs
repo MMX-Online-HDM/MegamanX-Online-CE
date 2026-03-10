@@ -17,34 +17,63 @@ public class Elimination : GameMode {
 	}
 
 	public override void checkIfWinLogic() {
-		if (level.time < 10) return;
-
-		Player? winningPlayer = null;
-
-		var playersStillAlive = level.players.Where(p => !p.isSpectator && p.deaths < playingTo).ToList();
-
-		if (playersStillAlive.Count == 1) {
-			winningPlayer = playersStillAlive[0];
+		// If we have a response we just continue.
+		if (matchOverResponse != null) {
+			return;
 		}
-
-		if (remainingTime <= 0 && (virusStarted >= 3 || level.is1v1()) && winningPlayer == null) {
+		// 15s join window.
+		if (level.time < 15) {
+			return;
+		}
+		// Stalemate if we go over the theshold.
+		// Entering draw time disables stalemate.
+		if (remainingTime <= 0 && virusStarted >= 3 && drawTime == 0) {
 			matchOverResponse = new RPCMatchOverResponse() {
-				winningAlliances = new HashSet<int>() { },
+				winningAlliances = [nullAlliance],
 				winMessage = "Stalemate!",
 				loseMessage = "Stalemate!"
 			};
-		} else if (winningPlayer != null) {
-			string winMessage = "You won!";
-			string loseMessage = "You lost!";
-			string loseMessage2 = winningPlayer.name + " wins";
-
-			matchOverResponse = new RPCMatchOverResponse() {
-				winningAlliances = new HashSet<int>() { winningPlayer.alliance },
-				winMessage = winMessage,
-				loseMessage = loseMessage,
-				loseMessage2 = loseMessage2
-			};
+			return;
 		}
+		// Check what is alive.
+		List<Player> playersAlive = [];
+		foreach (Player player in level.players) {
+			if (!player.isSpectator && player.deaths < playingTo) {
+				playersAlive.Add(player);
+			}
+		}
+		// If somehow everyone died during draw time then we go into draw.
+		if (playersAlive.Count == 0 && drawTime > 0) {
+			matchOverResponse = new RPCMatchOverResponse() {
+				winningAlliances = [nullAlliance],
+				winMessage = "Draw!",
+				loseMessage = "Draw!"
+			};
+			return;
+		}
+		// Return if more than 1 team is alive.
+		if (playersAlive.Count > 1) {
+			drawTime = 0;
+			return;
+		}
+		// Give 1 second a frame window for draws.
+		// This means a kill-sucide will not give you a win.
+		drawTime += Global.speedMul;
+		if (drawTime < drawMaxTime) {
+			return;
+		}
+		drawTime = 0;
+		// Get winning team id.
+		int winningAlliance = playersAlive[0].alliance;
+		string message2 = $"{playersAlive[0].name} wins";
+		// Generate the standart response.
+		matchOverResponse = new RPCMatchOverResponse() {
+			winningAlliances = [winningAlliance],
+			winMessage = "Victory!",
+			winMessage2 = message2,
+			loseMessage = "You lost!",
+			loseMessage2 = message2
+		};
 	}
 
 	public override void drawTopHUD() {

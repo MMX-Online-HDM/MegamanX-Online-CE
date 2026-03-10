@@ -247,7 +247,7 @@ public class WheelGSpinWheelProj : Projectile {
 		destroyOnHit = false;
 		vel = new Point(xDir * 200, -200);
 		useGravity = true;
-		collider.wallOnly = true;
+		collider?.wallOnly = true;
 
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);

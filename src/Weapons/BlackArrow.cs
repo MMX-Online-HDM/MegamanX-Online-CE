@@ -7,9 +7,10 @@ using SFML.Window;
 namespace MMXOnline;
 
 public class BlackArrow : AxlWeapon {
-	public static BlackArrow netWeapon;
+	public static BlackArrow netWeapon = new(0);
+
 	public BlackArrow(int altFire) : base(altFire) {
-		shootSounds = new string[] { "blackArrow", "blackArrow", "blackArrow", "blackArrow" };
+		shootSounds = ["blackArrow", "blackArrow", "blackArrow", "blackArrow"];
 		fireRate = 24;
 		altFireCooldown = 48;
 		index = (int)WeaponIds.BlackArrow;

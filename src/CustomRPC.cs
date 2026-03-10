@@ -110,8 +110,8 @@ public class RpcReflect : RPC {
 	public override void invoke(byte[] arguments) {
 		ushort netId = BitConverter.ToUInt16(new byte[] { arguments[1], arguments[2] }, 0);
 		Actor? actor = Global.level.getActorByNetId(netId);
-		Player player = Global.level.getPlayerById(arguments[0]);
-		if (actor is not Projectile proj) {
+		Player? player = Global.level.getPlayerById(arguments[0]);
+		if (actor is not Projectile proj || player == null) {
 			return;
 		}
 		proj.reflect(player);
@@ -139,8 +139,8 @@ public class RpcDeflect : RPC {
 	public override void invoke(byte[] arguments) {
 		ushort netId = BitConverter.ToUInt16(new byte[] { arguments[1], arguments[2] }, 0);
 		Actor? actor = Global.level.getActorByNetId(netId);
-		Player player = Global.level.getPlayerById(arguments[0]);
-		if (actor is not Projectile proj) {
+		Player? player = Global.level.getPlayerById(arguments[0]);
+		if (actor is not Projectile proj || player == null) {
 			return;
 		}
 		proj.deflect(player);
@@ -202,12 +202,12 @@ public class RpcReviveSigma : RPC {
 	}
 
 	public override void invoke(byte[] arguments) {
-		Player player = Global.level.getPlayerById(arguments[0]);
+		Player? player = Global.level.getPlayerById(arguments[0]);
 		ushort netId = BitConverter.ToUInt16(arguments[2..4]);
 		float posX = BitConverter.ToSingle(arguments[4..8]);
 		float posY = BitConverter.ToSingle(arguments[8..12]);
 	
-		player.reviveSigmaNonOwner(arguments[1], new Point(posX, posY), netId);
+		player?.reviveSigmaNonOwner(arguments[1], new Point(posX, posY), netId);
 	}
 
 	public void sendRpc( 

@@ -65,7 +65,7 @@ public class Anim : Actor {
 			}
 			if (spriteName == "spiralmagnum_shell") {
 				if (collider != null) {
-					collider.wallOnly = true;
+					collider?.wallOnly = true;
 				}
 			}
 		}

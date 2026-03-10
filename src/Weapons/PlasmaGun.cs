@@ -198,8 +198,10 @@ public class PlasmaGunAltProj : Projectile {
 		float closestAngle = float.MaxValue;
 		Character? closestEnemy = null;
 		foreach (var player in Global.level.players) {
-			Character enemy = player.character;
-			if (enemy == null) continue;
+			Character? enemy = player.character;
+			if (enemy == null) {
+				continue;
+			}
 			if (!enemy.canBeDamaged(owner.alliance, owner.id, projId)) continue;
 			if (enemy.isStealthy(owner.alliance)) continue;
 			if (bulletPos.distanceTo(enemy.getCenterPos()) > range) continue;
@@ -258,6 +260,9 @@ public class PlasmaGunAltProj : Projectile {
 
 	public List<Point> getNodes() {
 		List<Point> nodes = new List<Point>();
+		if (player.character == null) {
+			return nodes;
+		}
 		int nodeCount = 8;
 		Point origin = player.character.getCenterPos();
 		if (player.character is Axl axl) {

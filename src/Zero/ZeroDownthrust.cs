@@ -267,7 +267,7 @@ public class QuakeBlazerFlamePart : Projectile {
 		damager.hitCooldown = 60;
 		projId = (int)ProjIds.QuakeBlazerFlame;
 		useGravity = true;
-		if (collider != null) { collider.wallOnly = true; }
+		collider?.wallOnly = true;
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 		vel.x = speedDir * 75;

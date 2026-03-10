@@ -163,6 +163,7 @@ public class SigmaSlashProj : Projectile {
 		damager.damage = damage;
 		damager.flinch = flinch;
 		damager.hitCooldown = 30;
+		clashTier = ClashTier.Strong;
 		reflectable = false;
 		setIndestructableProperties();
 		maxTime = 10f / 60f;

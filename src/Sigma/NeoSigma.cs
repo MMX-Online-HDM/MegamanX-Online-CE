@@ -165,15 +165,15 @@ public class NeoSigma : BaseSigma {
 		return (MeleeIds)id switch {
 			MeleeIds.Slash1 => new GenericMeleeProj(
 				SigmaClawWeapon.netWeapon, pos, ProjIds.Sigma2Claw, player,
-				2, 0, 12, addToLevel: addToLevel
+				2, 0, 12, addToLevel: addToLevel, clashTier: ClashTier.Medium
 			),
 			MeleeIds.Slash2 => new GenericMeleeProj(
 				SigmaClawWeapon.netWeapon, pos, ProjIds.Sigma2Claw2, player,
-				2, Global.halfFlinch, 30, addToLevel: addToLevel
+				2, Global.halfFlinch, 30, addToLevel: addToLevel, clashTier: ClashTier.Medium
 			),
 			MeleeIds.AirSlash or MeleeIds.DashSlash => new GenericMeleeProj(
 				SigmaClawWeapon.netWeapon, pos, ProjIds.Sigma2Claw, player,
-				3, 0, 22, addToLevel: addToLevel
+				3, 0, 22, addToLevel: addToLevel, clashTier: ClashTier.Medium
 			),
 			MeleeIds.UpSlash or MeleeIds.DownSlash => new GenericMeleeProj(
 				SigmaClawWeapon.netWeapon, pos, ProjIds.Sigma2UpDownClaw, player,
@@ -219,10 +219,16 @@ public class NeoSigma : BaseSigma {
 		gigaAttack.ammo = data[0];
 	}
 	public float aiAttackCooldown;
+
 	public override void aiAttack(Actor? target) {
+		base.aiAttack(target);
+		if (charState is LadderClimb || !charState.attackCtrl || isInvulnerable()) {
+			return;
+		}
 		bool isTargetInAir = pos.y < target?.pos.y - 20;
-		bool isTargetClose = pos.x < target?.pos.x - 10;
-		if (currentWeapon is MaverickWeapon mw &&
+		bool isTargetClose = pos.x < target?.pos.x - 40;
+		if (false &&
+			currentWeapon is MaverickWeapon mw &&
 			mw.maverick == null && canAffordMaverick(mw)
 		) {
 			buyMaverick(mw);
@@ -232,37 +238,27 @@ public class NeoSigma : BaseSigma {
 			mw.summon(player, pos, xDir);
 			player.changeToSigmaSlot();
 		}
-		if (charState is not LadderClimb) {
-				int Neoattack = Helpers.randomRange(0, 5);
-				if (charState?.isGrabbedState == false && !player.isDead
-				    && !isInvulnerable() && aiAttackCooldown <= 0
-					&& !(charState is CallDownMaverick or SigmaElectricBall2StateEX or SigmaElectricBallState)) {
-					switch (Neoattack) {
-						case 0 when isTargetClose:
-							player.press(Control.Shoot);
-							break;
-						case 1 when sigmaDownSlashCooldown <= 0 && grounded && isTargetInAir:
-							changeState(new SigmaUpDownSlashState(true), true);
-							sigmaDownSlashCooldown = 1f;						
-							break;
-						case 2 when sigmaUpSlashCooldown <= 0 && !grounded:
-							changeState(new SigmaUpDownSlashState(false), true);
-							sigmaUpSlashCooldown = 0.75f;
-							break;
-						case 3:
-							player.changeWeaponSlot(1);
-							break;
-						case 4:
-							player.changeWeaponSlot(2);						
-							break;
-						case 5:
-							player.changeWeaponSlot(0);
-							break;
-					}
-					aiAttackCooldown = 14;
-				}
-			}
-		base.aiAttack(target);
+		if (!isTargetClose) {
+			return;
+		}
+		aiAttackCooldown = 14;
+		int neoattack = Helpers.randomRange(0, 3);
+		switch (neoattack) {
+			case 1 when sigmaDownSlashCooldown <= 0 && grounded && isTargetInAir:
+				changeState(new SigmaUpDownSlashState(true), true);
+				sigmaDownSlashCooldown = 1f;						
+				break;
+			case 2 when sigmaUpSlashCooldown <= 0 && !grounded:
+				changeState(new SigmaUpDownSlashState(false), true);
+				sigmaUpSlashCooldown = 0.75f;
+				break;
+			default:
+				player.press(Control.Shoot);
+				if (isTargetClose) { aiAttackCooldown = 0; }
+				break;
+			
+				
+		}
 	}
 	public override void aiDodge(Actor? target) {
 		foreach (GameObject gameObject in getCloseActors(32, true, false, false)) {

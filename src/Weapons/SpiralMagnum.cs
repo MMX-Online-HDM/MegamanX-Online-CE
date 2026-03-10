@@ -101,7 +101,7 @@ public class SpiralMagnumShell : Anim {
 	public SpiralMagnumShell(Point pos, int xDir, ushort? netId = null, bool sendRpc = false, bool ownedByLocalPlayer = true) :
 		base(pos, "spiralmagnum_shell", 1, netId, false, sendRpc, ownedByLocalPlayer) {
 		vel = new Point(xDir * 75, -150);
-		collider.wallOnly = true;
+		collider?.wallOnly = true;
 		useGravity = true;
 		angle = 0;
 		if (xDir == -1) angularVel = -300;
@@ -249,10 +249,10 @@ public class SpiralMagnumProj : Projectile {
 			damager.damage = 0;
 		}
 
-		var col = Global.level.checkCollisionPoint(pos, new List<GameObject>() { player.character });
+		//CollideData? col = Global.level.checkCollisionPoint(pos, new List<GameObject>() { player.character });
 
-		float velXDist = vel.x * Global.spf;
-		float velYDist = vel.y * Global.spf;
+		//float velXDist = vel.x * Global.spf;
+		//float velYDist = vel.y * Global.spf;
 
 		weakness = false;
 		IDamagable? victim = null;

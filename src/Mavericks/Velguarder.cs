@@ -354,7 +354,7 @@ public class VelGDeathAnim : Anim {
 		vel = new Point(-xDir * 150, -150);
 		ttl = 0.5f;
 		useGravity = true;
-		collider.wallOnly = true;
+		collider?.wallOnly = true;
 		this.player = player;
 	}
 
