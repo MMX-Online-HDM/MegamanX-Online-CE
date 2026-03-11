@@ -1070,24 +1070,6 @@ public class OptionsMenu : IMainMenu {
 					},
 					"If No, Front Runner and Fat Boy cannons will not\nroot Vile in the air when shot."
 				),
-				// Diagonal Missiles
-				new MenuOption(
-					30, startY,
-					() => {
-						Helpers.menuLeftRightBool(ref Options.main.shootDiagonalMissile);
-					},
-					(Point pos, int index) => {
-						Fonts.drawText(
-							optionFontText, "Diagonal Missiles:",
- 							pos.x, pos.y, selected: selectedArrowPosY == index
-						);
-						Fonts.drawText(
-							optionFontValue, (Options.main.shootDiagonalMissile ? "Yes" : "No"),
-							pos.x + 166, pos.y, selected: selectedArrowPosY == index
-						);
-					},
-					"If No, Missiles can't be shot diagonally."
-				),
 			};
 		} else if (charNum == 3) {
 			menuOptions = new List<MenuOption>() {
