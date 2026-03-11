@@ -91,7 +91,7 @@ public class HyperCharge : Weapon {
 			character.playSound("buster3X3");
 		} else {
 			if (changeToWeaponSlot(wep)) player.changeWeaponSlot(player.hyperChargeSlot);
-			wep.shoot(character, [3]);
+			wep.shoot(character, [3, 0]);
 			wep.addAmmo(-wep.getAmmoUsage(3), player);
 			if (!string.IsNullOrEmpty(wep.shootSounds[3])) {
 				character.playSound(wep.shootSounds[3]);
