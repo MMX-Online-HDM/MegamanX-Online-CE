@@ -21,7 +21,7 @@ public class VileCannon : Weapon {
 		isStream = true;
 	}
 	public override void vileShoot(Vile vile) {
-		if (shootCooldown > 0 || vile.energy.ammo < vileAmmoUsage) {
+		if (shootCooldown > 0 || vile.energy.ammo < vileAmmoUsage || vile.missileCannonCooldown > 0) {
 			return;
 		}
 		if (vile.charState is Crouch) {
@@ -114,7 +114,7 @@ public class LongShotGizmo : VileCannon {
 		effect = "Burst of 5 shots.";
 	}
 	public override void vileShoot(Vile vile) {
-		if (shootCooldown > 0 || vile.energy.ammo < vileAmmoUsage) {
+		if (shootCooldown > 0 || vile.energy.ammo < vileAmmoUsage || vile.missileCannonCooldown > 0) {
 			return;
 		}
 		vile.changeState(new CannonAttack(this), true);

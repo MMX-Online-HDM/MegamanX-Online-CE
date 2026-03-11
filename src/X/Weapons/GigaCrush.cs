@@ -66,10 +66,21 @@ public class GigaCrushProj : Projectile {
 			args.pos, args.xDir, args.owner, args.player, args.netId
 		);
 	}
+	public override void preUpdate() {
+		base.preUpdate();
+		radius += Global.spf * 400;
+		if (time > maxActiveTime) {
+			destroySelf(disableRpc: false);
+		}
+		if (!pilarCreated && time > maxActiveTime - 0.2) {
+			new GigaCrushPilar(pos, ZIndex.Character + 10);
+			pilarCreated = true;
+		}
+	}
 
 	public override void update() {
 		base.update();
-		foreach (var gameObject in getCloseActors(MathInt.Ceiling(radius + 50))) {
+		foreach (var gameObject in getCloseActors(350)) {
 			if (gameObject is Actor actor &&
 				actor.ownedByLocalPlayer &&
 				gameObject is IDamagable damagable &&
@@ -78,15 +89,6 @@ public class GigaCrushProj : Projectile {
 			) {
 				damager.applyDamage(damagable, false, weapon, this, projId);
 			}
-		}
-		radius += Global.spf * 400;
-
-		if (!pilarCreated && time > maxActiveTime - 0.2) {
-			new GigaCrushPilar(pos, ZIndex.Character + 10);
-			pilarCreated = true;
-		}
-		if (time > maxActiveTime) {
-			destroySelf(disableRpc: false);
 		}
 	}
 
