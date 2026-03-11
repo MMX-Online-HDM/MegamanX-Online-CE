@@ -166,7 +166,6 @@ public class GaeaShieldProj : Projectile {
 		destroyOnHit = false;
 		shouldVortexSuck = false;
 		isReflectShield = true;
-		isShield = true;
 		shouldShieldBlock = false;
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);

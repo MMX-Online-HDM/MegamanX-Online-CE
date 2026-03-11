@@ -159,7 +159,8 @@ public class CmdSigma : BaseSigma {
 		return (MeleeIds)id switch {
 			MeleeIds.Guard => new GenericMeleeProj(
 				SigmaSlashWeapon.netWeapon, pos, ProjIds.SigmaSwordBlock, player,
-				0, 0, 0, isDeflectShield: true, addToLevel: addToLevel
+				0, 0, 0, isDeflectShield: true, isShield: true,
+				addToLevel: addToLevel
 			) {
 				highPiority = true
 			},

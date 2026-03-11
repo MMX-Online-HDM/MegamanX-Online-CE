@@ -897,7 +897,8 @@ public class Zero : Character {
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Gokumonken => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.SwordBlock, player, 0, 0, 0, isDeflectShield: true,
+				meleeWeapon, projPos, ProjIds.SwordBlock, player, 0, 0, 0,
+				isDeflectShield: true, isShield: true,
 				addToLevel: addToLevel
 			) {
 				highPiority = true

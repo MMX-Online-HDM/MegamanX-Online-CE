@@ -2849,7 +2849,11 @@ public partial class Character : Actor, IDamagable {
 			decimal calcDamage = Math.Min(originalDamage, maxHealth);
 			// Apply savings.
 			if (charState is SwordBlock) {
-				damageSavings += (calcDamage * 0.5m);
+				if (this is NeoSigma) {
+					damageSavings += (calcDamage * 0.75m);
+				} else {
+					damageSavings += (calcDamage * 0.5m);
+				}
 			}
 			else if (charState is SigmaAutoBlock) {
 				damageSavings += (calcDamage * 0.25m);

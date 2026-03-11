@@ -6,7 +6,8 @@ public class GenericMeleeProj : Projectile {
 	public GenericMeleeProj(
 		Weapon weapon, Point pos, ProjIds projId, Player player,
 		float? damage = null, int? flinch = null, float? hitCooldown = null,
-		Actor? owningActor = null, bool isShield = false, bool isDeflectShield = false, bool isReflectShield = false,
+		Actor? owningActor = null, bool isShield = false,
+		bool isDeflectShield = false, bool isReflectShield = false,
 		bool addToLevel = false, float? hitCooldownSeconds = null,
 		bool isZSaberEffect = false, bool isZSaberEffect2 = false, bool isZSaberEffect2B = false,
 		ClashTier clashTier = ClashTier.None

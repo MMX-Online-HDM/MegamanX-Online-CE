@@ -326,7 +326,7 @@ public class FrostShieldProjChargedGround : Projectile {
 		shouldVortexSuck = false;
 		character = player.character;
 		useGravity = true;
-		isShield = true;	
+		isShield = true;
 		vel = new Point(xDir * 150, -100);
 		collider?.wallOnly = true;
 		slideAnim = new Anim(pos, "frostshield_charged_slide", xDir, null, false);

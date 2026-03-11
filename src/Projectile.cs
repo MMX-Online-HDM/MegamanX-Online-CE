@@ -407,11 +407,11 @@ public class Projectile : Actor {
 		}
 		// Enemy tier. Shields are considered weaker than weak.
 		ClashTier enemyTier = enemy.clashTier;
-		if (enemy.clashTier == 0 && (enemy.isShield || enemy.isDeflectShield || enemy.isReflectShield)) {
+		if (enemy.clashTier == 0 && enemy.isShield) {
 			enemyTier = ClashTier.Shield;
 		}
 		// Clash tier must be the same or worse than enemy.
-		if (clashTier - 1 > enemy.clashTier) {
+		if (clashTier - 1 > enemyTier) {
 			return false;
 		}
 		// Not facing each other
