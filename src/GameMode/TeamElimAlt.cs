@@ -19,12 +19,14 @@ public class TeamElimAlt : GameMode {
 		this.playingTo = playingTo;
 		isTeamMode = true;
 		// Time stuff.
-		timeLimit ??= 2;
+		finalZoneMaxTime2 = 60;
+		timeLimit ??= 1;
 		float timeLimitF = timeLimit.Value * 60;
 
-		roundTime = timeLimitF + 180;
-		startTimeLimit = timeLimitF;
-		finalZoneTime = timeLimitF;
+		this.roundMaxTime = timeLimitF;
+		roundTime = roundMaxTime + finalZoneMaxTime1 + finalZoneMaxTime2;
+		finalZoneTime = roundMaxTime;
+		startTimeLimit = roundTime;
 	}
 
 	public override bool canRespawn() => respawnWindow > 0 && resultTime < resultMaxTime - 60 * 2;
@@ -162,8 +164,10 @@ public class TeamElimAlt : GameMode {
 		}
 		// Vars.
 		bool[] teamsAlive = new bool[level.teamNum];
+		bool[] teamsActive = new bool[level.teamNum];
 		HashSet<int> teamsAliveHash = [];
 		int teamNumAlive = 0;
+		int teamNumActive = 0;
 		// Check what is alive.
 		foreach (Player player in level.players) {
 			if (player.teamAlliance != null &&
@@ -175,7 +179,15 @@ public class TeamElimAlt : GameMode {
 					teamsAliveHash.Add(player.teamAlliance.Value);
 					teamNumAlive++;
 				}
+				if (teamsActive[player.teamAlliance.Value] != true) {
+					teamsActive[player.teamAlliance.Value] = true;
+					teamNumActive++;
+				}
 			}
+		}
+		// We wait if we are at 1 or less total teams.
+		if (teamNumActive < 2) {
+			return;
 		}
 		// If somehow everyone died during draw time then we go into draw.
 		if (teamNumAlive == 0 && roundDrawTime > 0) {
@@ -231,8 +243,8 @@ public class TeamElimAlt : GameMode {
 		respawnWindow = respawnMaxWindow;
 		last2Teams[0] = nullAlliance;
 		last2Teams[1] = nullAlliance;
+		roundTime = roundMaxTime + finalZoneMaxTime1 + finalZoneMaxTime2;
 		finalZoneTime = roundMaxTime;
-		roundTime = roundMaxTime + 180;
 		eliminationTime = 0;
 		virusStarted = 0;
 

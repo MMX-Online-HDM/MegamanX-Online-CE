@@ -71,6 +71,8 @@ public class GameMode {
 	public float localElimTimeInc;  // Used to "client side predict" the elimination time increase.
 	public byte virusStarted;
 	public float? finalZoneTime;
+	public float finalZoneMaxTime1 = 60;
+	public float finalZoneMaxTime2 = 300;
 	public byte safeZoneSpawnIndex;
 
 	bool loggedStatsOnce = true;
@@ -132,28 +134,22 @@ public class GameMode {
 			if (virusStarted == 0) {
 				return new Rect(0, 0, level.width, level.height);
 			} else if (virusStarted == 1) {
-				float t = eliminationTime - (startTimeLimit ?? eliminationTime);
+				float t = finalZoneTime ?? 0;
 				if (t < 0) t = 0;
-				float timePct = t / 60;
+				float timePct = 1 - (t / finalZoneMaxTime1);
 				return new Rect(
-					timePct * (safeZonePoint.x - 150),
-					timePct * (safeZonePoint.y - 112),
-					level.width - (timePct * (level.width - (safeZonePoint.x + 150))),
-					level.height - (timePct * (level.height - (safeZonePoint.y + 112)))
+					timePct * (safeZonePoint.x - 192),
+					timePct * (safeZonePoint.y - 128),
+					level.width - (timePct * (level.width - (safeZonePoint.x + 192))),
+					level.height - (timePct * (level.height - (safeZonePoint.y + 128)))
 				);
-			} else if (virusStarted == 2) {
-				float t = eliminationTime - (startTimeLimit ?? eliminationTime) - 60;
-				if (t < 0) t = 0;
-				float timePct = t / 300;
-				return new Rect(
-					(safeZonePoint.x - 150) + (timePct * 150),
-					(safeZonePoint.y - 112) + (timePct * 112),
-					(safeZonePoint.x + 150) - (timePct * 150),
-					(safeZonePoint.y + 112) - (timePct * 112)
-				);
-			} else {
-				return new Rect(safeZonePoint.x, safeZonePoint.y, safeZonePoint.x, safeZonePoint.y);
 			}
+			return new Rect(
+				safeZonePoint.x - 192,
+				safeZonePoint.y - 128,
+				safeZonePoint.x + 192,
+				safeZonePoint.y + 128
+			);
 		}
 	}
 
@@ -260,8 +256,12 @@ public class GameMode {
 			if (finalZoneTime != null && finalZoneTime.Value <= 0) {
 				if (virusStarted < 3) {
 					virusStarted++;
-					if (virusStarted == 1) finalZoneTime = 60;
-					else if (virusStarted == 2) finalZoneTime = 300;
+					if (virusStarted == 1) {
+						finalZoneTime = finalZoneMaxTime1;
+					}
+					else if (virusStarted == 2) {
+						finalZoneTime = finalZoneMaxTime2;
+					}
 				}
 			}
 		} else {
@@ -272,7 +272,7 @@ public class GameMode {
 				}
 
 				float phase1Time = (startTimeLimit ?? 0);
-				float phase2Time = (startTimeLimit ?? 0) + 60;
+				float phase2Time = (startTimeLimit ?? 0) + finalZoneMaxTime1;
 
 				if (eliminationTime <= phase1Time) virusStarted = 0;
 				else if (eliminationTime >= phase1Time && eliminationTime < phase2Time) virusStarted = 1;

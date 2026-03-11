@@ -659,9 +659,7 @@ public class HostMenu : IMainMenu {
 								}
 							}
 							if (!is1v1 && selectedGameMode == GameMode.TeamElimAlt) {
-								if (!is1v1) {
-									minimumTimeLimit = 2;
-								}
+								minimumTimeLimit = 1;
 							}
 							if (timeLimit < minimumTimeLimit) {
 								timeLimit = minimumTimeLimit;

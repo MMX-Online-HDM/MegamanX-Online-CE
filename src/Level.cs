@@ -814,7 +814,7 @@ public partial class Level {
 			addGameObject(actor);
 		}
 
-		if (Global.isHost && isNon1v1Elimination()) {
+		if (Global.isHost) {
 			var neutralSpawns = spawnPoints.Where((spawnPoint) => {
 				return spawnPoint.alliance == -1;
 			}).ToList();
@@ -1408,10 +1408,10 @@ public partial class Level {
 						if (!damagable.projectileCooldown.ContainsKey("sigmavirus")) {
 							damagable.projectileCooldown["sigmavirus"] = 0;
 						}
-						if (damagable.projectileCooldown["sigmavirus"] == 0) {
+						if (damagable.projectileCooldown["sigmavirus"] <= 0) {
 							actor.playSound("hit");
 							actor.addRenderEffect(RenderEffectType.Hit, 3, 6);
-							damagable.applyDamage(2, null, null, null, null);
+							damagable.applyDamage(1, Player.stagePlayer, null, null, null);
 							damagable.projectileCooldown["sigmavirus"] = 60;
 						}
 					}
