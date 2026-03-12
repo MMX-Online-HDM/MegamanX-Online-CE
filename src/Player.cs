@@ -40,7 +40,7 @@ public partial class Player {
 	public float shoryukenAmmo = 1920;
 	public float fgMoveMaxAmmo = 1920;
 	public bool isDefenderFavoredNonOwner;
-	public bool elimAlive => character?.alive == true && spawnedOnce;
+	public bool elimAlive => character?.alive == true;
 
 	public bool isDefenderFavored {
 		get {
