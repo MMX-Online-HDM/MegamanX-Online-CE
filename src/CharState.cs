@@ -1451,7 +1451,7 @@ public class Die : CharState {
 		character.stopCharge();
 		new Anim(character.pos.addxy(0, -12), "die_sparks", 1, null, true);
 
-		if (character.ownedByLocalPlayer && character.isATrans) {
+		if (character.ownedByLocalPlayer && player.character == character && character.isATrans) {
 			character.player.revertAtransDeath();
 			character.changeSpriteFromName("die", true);
 		}

@@ -83,56 +83,64 @@ public class PeriodicHostSyncModel {
 [ProtoContract]
 public class PlayerPB {
 	[ProtoMember(1)] public int newAlliance;
-	[ProtoMember(2)] public int weaponIndex;
-	[ProtoMember(3)] public bool isAI;
-	[ProtoMember(4)] public int newCharNum;
-	[ProtoMember(5)] public ushort curMaxNetId;
-	[ProtoMember(6)] public bool warpedIn = false;
-	[ProtoMember(7)] public float readyTime;
-	[ProtoMember(8)] public bool spawnChar = false;
-	[ProtoMember(9)] public ushort armorFlag;
-	[ProtoMember(10)] public LoadoutData loadoutData;
-	[ProtoMember(11)] public Disguise disguise;
+	[ProtoMember(2)] public int newCharNum;
+	[ProtoMember(3)] public ushort curMaxNetId;
+	[ProtoMember(4)] public bool warpedIn;
+	[ProtoMember(5)] public float readyTime;
+	[ProtoMember(6)] public bool readyTextOver;
+	[ProtoMember(7)] public ushort armorFlag;
+	[ProtoMember(8)] public LoadoutData loadoutData;
+	[ProtoMember(9)] public Disguise disguise;
+	[ProtoMember(10)] public ushort charNetId;
+	[ProtoMember(11)] public bool isATrans;
+	[ProtoMember(12)] public ushort charRollingShieldNetId;
+	[ProtoMember(13)] public float charXPos;
+	[ProtoMember(14)] public float charYPos;
+	[ProtoMember(15)] public int charXDir;
+	[ProtoMember(16)] public LoadoutData atransLoadout;
+	[ProtoMember(17)] public int currentCharNum;
+	[ProtoMember(18)] public int preAtransCharId;
 
-	[ProtoMember(12)] public ushort? charNetId;
-	[ProtoMember(13)] public ushort? charRollingShieldNetId;
-	[ProtoMember(14)] public float charXPos;
-	[ProtoMember(15)] public float charYPos;
-	[ProtoMember(16)] public int charXDir;
-	[ProtoMember(17)] public LoadoutData atransLoadout;
-	[ProtoMember(18)] public int? currentCharNum;
-	[ProtoMember(19)] public int? preAtransCharId;
-
-	[ProtoMember(20)] public ServerPlayer serverPlayer;
+	[ProtoMember(19)] public ServerPlayer serverPlayer;
 
 	public PlayerPB() { }
 
 	public PlayerPB(Player player) {
+		// Initliazlize "null" data.
+		currentCharNum = -1;
+		preAtransCharId = -1;
+		charNetId = ushort.MaxValue;
+		charRollingShieldNetId = ushort.MaxValue;
+		charXDir = 1;
+		// Populate data.
 		serverPlayer = player.serverPlayer;
 
 		newAlliance = player.newAlliance;
-		// weaponIndex = player.weaponIndex;
 		newCharNum = player.newCharNum;
-		if (player.character != null) {
-			currentCharNum = (int)player.character.charId;
-		}
-		if (player.preTransformedChar != null) {
-			preAtransCharId = (int)player.preTransformedChar.charId;
-		}
+
 		curMaxNetId = player.curMaxNetId;
 		warpedIn = player.warpedIn;
 		readyTime = player.readyTime;
-		spawnChar = player.readyTextOver;
+		readyTextOver = player.readyTextOver;
 		armorFlag = player.armorFlag;
 		loadoutData = player.loadout;
 		disguise = player.disguise;
 		atransLoadout = player.atransLoadout;
-		if (player.character != null) {
-			charNetId = player.character.netId;
-			charRollingShieldNetId = (player.character as MegamanX)?.chargedRollingShieldProj?.netId;
+
+		if (player.character?.netId != null) {
+			currentCharNum = (int)player.character.charId;
+			charNetId = player.character.netId.Value;
+			charRollingShieldNetId = (
+				(player.character as MegamanX)?.chargedRollingShieldProj?.netId ?? ushort.MaxValue
+			);
 			charXPos = player.character.pos.x;
 			charYPos = player.character.pos.y;
 			charXDir = player.character.xDir;
+			isATrans = player.character.isATrans;
+
+			if (player.character.linkedATransChar != null) {
+				preAtransCharId = (int)player.character.linkedATransChar.charId;
+			}
 		}
 	}
 }

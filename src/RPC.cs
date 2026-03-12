@@ -1236,6 +1236,8 @@ public class RPCSyncControlPoints : RPC {
 
 
 public class RPCAxlDisguiseJson {
+	public int type;
+	public bool isMain;
 	public int playerId;
 	public ushort dnaNetId;
 	public string targetName;
@@ -1246,10 +1248,14 @@ public class RPCAxlDisguiseJson {
 	public RPCAxlDisguiseJson() { }
 
 	public RPCAxlDisguiseJson(
-		int playerId, string targetName, int charNum,
+		int type, bool isMain,
+		int playerId, string targetName,
+		int charNum,
 		LoadoutData loadout,
 		ushort dnaNetId, byte[]? extraData = null
 	) {
+		this.type = type;
+		this.isMain = isMain;
 		this.playerId = playerId;
 		this.targetName = targetName;
 		this.charNum = charNum;
@@ -1270,16 +1276,16 @@ public class RPCAxlDisguise : RPC {
 			JsonConvert.DeserializeObject<RPCAxlDisguiseJson>(json) ?? throw new NullReferenceException()
 		);
 		var player = Global.level.getPlayerById(axlDisguiseData.playerId);
-		if (player.character == null) {
+		if (player?.character == null) {
 			return;
 		}
-		if (axlDisguiseData.charNum == -1) {
+		if (axlDisguiseData.type == 1) {
 			if (player.character == null) {
 				player.atransLoadout = null;
 			} else {
-				player.revertAtransMain(axlDisguiseData.dnaNetId);
+				player.revertAtransMain(axlDisguiseData);
 			}
-		} else if (axlDisguiseData.charNum == -2) {
+		} else if (axlDisguiseData.type == 2) {
 			player.revertAtransDeath();
 		} else {
 			player.character = player.startAtransNet(player.character, axlDisguiseData);

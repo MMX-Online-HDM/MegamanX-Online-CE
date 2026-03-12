@@ -1021,16 +1021,17 @@ public partial class Level {
 			player.curMaxNetId = hostPlayer.curMaxNetId;
 			player.warpedIn = hostPlayer.warpedIn;
 			player.readyTime = hostPlayer.readyTime;
-			player.readyTextOver = hostPlayer.spawnChar;
+			player.readyTextOver = hostPlayer.readyTextOver;
 			player.armorFlag = hostPlayer.armorFlag;
 			player.loadout = hostPlayer.loadoutData;
 			player.disguise = hostPlayer.disguise;
 			player.atransLoadout = hostPlayer.atransLoadout;
 
-			if (hostPlayer.currentCharNum != null && hostPlayer.charNetId != null &&
-				hostPlayer.charNetId != 0 && player.character == null
+			if (hostPlayer.currentCharNum != -1 &&
+				hostPlayer.charNetId != ushort.MaxValue &&
+				player.character == null
 			) {
-				int targetCharNum = hostPlayer.currentCharNum.Value;
+				int targetCharNum = hostPlayer.currentCharNum;
 				LoadoutData currentLoadout = player.loadout;
 				if (player.atransLoadout != null) {
 					currentLoadout = player.atransLoadout;
@@ -1038,14 +1039,16 @@ public partial class Level {
 				player.spawnCharAtPoint(
 					targetCharNum, player.getCharSpawnData(targetCharNum, false, currentLoadout),
 					new Point(hostPlayer.charXPos, hostPlayer.charYPos),
-					hostPlayer.charXDir, (ushort)hostPlayer.charNetId, false
+					hostPlayer.charXDir, hostPlayer.charNetId, false, hostPlayer.isATrans
 				);
-				if (hostPlayer.charRollingShieldNetId != null && player.character is MegamanX mmx) {
+				if (hostPlayer.charRollingShieldNetId != ushort.MaxValue &&
+					player.character is MegamanX mmx
+				) {
 					mmx.chargedRollingShieldProj = new RollingShieldProjCharged(
 						player.character.pos,
 						player.character.xDir,
 						player.character, player,
-						hostPlayer.charRollingShieldNetId.Value
+						hostPlayer.charRollingShieldNetId
 					);
 				}
 			} else {

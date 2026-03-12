@@ -190,7 +190,6 @@ public class DNACore : AxlWeapon {
 		if (oldATrans) {
 			axl.weapons.RemoveAt(character.player.weaponSlot);
 		}
-		character.player.preTransformedChar = character.player.character;
 		character.player.startAtransMain(this, character.player.getNextATransNetId());
 		character.playSound("transform", sendRpc: true);
 		character.undisguiseTime = 6;
