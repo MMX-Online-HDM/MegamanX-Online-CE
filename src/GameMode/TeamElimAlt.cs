@@ -119,7 +119,7 @@ public class TeamElimAlt : GameMode {
 		int leaderScore = -1;
 		bool moreThanOneLeader = false;
 		for (int i = 0; i < Global.level.teamNum; i++) {
-			if (teamPoints[0] >= leaderScore) {
+			if (teamPoints[i] >= leaderScore) {
 				leaderTeam = i;
 				if (leaderScore == teamPoints[i]) {
 					moreThanOneLeader = true;
@@ -172,9 +172,9 @@ public class TeamElimAlt : GameMode {
 		foreach (Player player in level.players) {
 			if (player.teamAlliance != null &&
 				player.teamAlliance >= 0 && player.teamAlliance < level.teamNum &&
-				!player.isSpectator && player.elimAlive
+				!player.isSpectator 
 			) {
-				if (teamsAlive[player.teamAlliance.Value] != true) {
+				if (player.elimAlive && teamsAlive[player.teamAlliance.Value] != true) {
 					teamsAlive[player.teamAlliance.Value] = true;
 					teamsAliveHash.Add(player.teamAlliance.Value);
 					teamNumAlive++;
