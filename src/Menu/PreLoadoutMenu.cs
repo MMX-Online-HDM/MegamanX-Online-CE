@@ -10,7 +10,8 @@ public class PreLoadoutMenu : IMainMenu {
 		90,
 		110,
 		130,
-		150
+		150,
+		170
 	};
 	public int[] optionPos2 = {
 		(int)Global.halfScreenW - 40,
@@ -52,7 +53,7 @@ public class PreLoadoutMenu : IMainMenu {
 		if (Confirm2 == true) Time2 += Global.spf * 2;
 	}
 	public void update() {
-		Helpers.menuUpDown(ref selectY, 0, 5);
+		Helpers.menuUpDown(ref selectY, 0, 6);
 
 		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 			if (selectY == 0) {
@@ -65,12 +66,15 @@ public class PreLoadoutMenu : IMainMenu {
 				Menu.change(new SelectPunchyZeroWeaponMenu(this, false));
 			}
 			if (selectY == 3) {
-				Menu.change(new SelectVileWeaponMenu(this, false));
+				Menu.change(new SelectBusterZeroWeaponMenu(this, false));
 			}
 			if (selectY == 4) {
-				Menu.change(new SelectAxlWeaponMenu(this, false));
+				Menu.change(new SelectVileWeaponMenu(this, false));
 			}
 			if (selectY == 5) {
+				Menu.change(new SelectAxlWeaponMenu(this, false));
+			}
+			if (selectY == 6) {
 				Menu.change(new SelectSigmaWeaponMenu(this, false));
 			}
 		}
@@ -110,9 +114,10 @@ public class PreLoadoutMenu : IMainMenu {
 		Fonts.drawText(FontType.DarkBlue, "X Loadout", startX, optionPos[0], Alignment.Center, selected: selectY == 0);
 		Fonts.drawText(FontType.DarkBlue, "Zero Loadout", startX, optionPos[1], Alignment.Center, selected: selectY == 1);
 		Fonts.drawText(FontType.DarkBlue, "K.Zero Loadout", startX, optionPos[2], Alignment.Center, selected: selectY == 2);
-		Fonts.drawText(FontType.DarkBlue, "Vile Loadout", startX, optionPos[3], Alignment.Center, selected: selectY == 3);
-		Fonts.drawText(FontType.DarkBlue, "Axl Loadout", startX, optionPos[4], Alignment.Center, selected: selectY == 4);
-		Fonts.drawText(FontType.DarkBlue, "Sigma Loadout", startX, optionPos[5], Alignment.Center, selected: selectY == 5);
+		Fonts.drawText(FontType.DarkBlue, "B.Zero Loadout", startX, optionPos[3], Alignment.Center, selected: selectY == 3);
+		Fonts.drawText(FontType.DarkBlue, "Vile Loadout", startX, optionPos[4], Alignment.Center, selected: selectY == 4);
+		Fonts.drawText(FontType.DarkBlue, "Axl Loadout", startX, optionPos[5], Alignment.Center, selected: selectY == 5);
+		Fonts.drawText(FontType.DarkBlue, "Sigma Loadout", startX, optionPos[6], Alignment.Center, selected: selectY == 6);
 		Fonts.drawTextEX(FontType.Grey, "[OK]: Choose, [BACK]: Back", Global.halfScreenW, 200, Alignment.Center);
 		if (Options.main.blackFade) {
 			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, Time);

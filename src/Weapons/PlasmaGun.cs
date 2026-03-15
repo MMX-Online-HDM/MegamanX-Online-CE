@@ -46,6 +46,7 @@ public class PlasmaGun : AxlWeapon {
 	public override void axlAltShoot(Character character, int[] args) {
 		if (character is not Axl axl) return;
 		if (altShotCooldown > 0) return;
+		rechargeAmmoCustomSettingAxl2 = altRechargeAmmoCooldown;
 		if (axl.loadout.plasmaGunAlt == 0) {
 			if (!axl.grounded) return;
 			axl.voltTornadoTime = 0.2f;

@@ -860,29 +860,25 @@ public class GameMode {
 						RPC.syncAxlScopePos.sendRpc(level.mainPlayer.id, false, new Point(), new Point());
 					}
 				}
-				/*
-				if (Global.level.server?.customMatchSettings?.axlCustomReload == true) {
-					if (drawPlayer.weapon?.rechargeAmmoCustomSettingAxl > 0 ||
-						drawPlayer.weapon?.rechargeAmmoCustomSettingAxl2 > 0) {
-						Fonts.drawText(
-							FontType.RedishOrange, "Reloading :",
-							Global.halfScreenW - 157, 5, Alignment.Center
-						);
-					}
-					if (drawPlayer.weapon?.rechargeAmmoCustomSettingAxl2 <= 0 && drawPlayer.weapon?.rechargeAmmoCustomSettingAxl > 0) {
-						Fonts.drawText(
-								FontType.RedishOrange, drawPlayer.weapon.rechargeAmmoCustomSettingAxl.ToString(),
-								Global.halfScreenW - 120, 5, Alignment.Left
-							);
-					}
-					if (drawPlayer.weapon?.rechargeAmmoCustomSettingAxl2 > 0) {
-						Fonts.drawText(
-							FontType.RedishOrange, drawPlayer.weapon.rechargeAmmoCustomSettingAxl2.ToString(),
+
+				if (drawPlayer.weapon?.rechargeAmmoCustomSettingAxl > 0 || drawPlayer.weapon?.rechargeAmmoCustomSettingAxl2 > 0) {
+					Fonts.drawText(
+						FontType.RedishOrange, "Reloading :",
+						Global.halfScreenW - 157, 5, Alignment.Center
+					);
+				}
+				if (drawPlayer.weapon?.rechargeAmmoCustomSettingAxl2 <= 0 && drawPlayer.weapon?.rechargeAmmoCustomSettingAxl > 0) {
+					Fonts.drawText(
+							FontType.RedishOrange, drawPlayer.weapon.rechargeAmmoCustomSettingAxl.ToString(),
 							Global.halfScreenW - 120, 5, Alignment.Left
 						);
-					}
 				}
-				*/
+				if (drawPlayer.weapon?.rechargeAmmoCustomSettingAxl2 > 0) {
+					Fonts.drawText(
+						FontType.RedishOrange, drawPlayer.weapon.rechargeAmmoCustomSettingAxl2.ToString(),
+						Global.halfScreenW - 120, 5, Alignment.Left
+					);
+				}			
 			}
 			#endregion
 
