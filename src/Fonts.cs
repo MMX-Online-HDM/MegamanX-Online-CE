@@ -162,9 +162,9 @@ public class Fonts {
 					fontWidth = fontSizes[fontStr][charInt];
 					fontSpaceWidth = fontWidth;
 				}
-				if (Char.IsWhiteSpace(letter) ||
+				if (char.IsWhiteSpace(letter) ||
 					pos >= textLines[line].Length - 1 ||
-					Char.IsWhiteSpace(textLines[line][pos + 1])
+					char.IsWhiteSpace(textLines[line][pos + 1])
 				) {
 					tempSize += fontSpaceWidth;
 				} else {
