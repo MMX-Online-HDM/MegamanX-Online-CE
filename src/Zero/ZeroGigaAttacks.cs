@@ -14,6 +14,7 @@ public enum ZeroGigaType {
 
 public class RakuhouhaWeapon : Weapon {
 	public static RakuhouhaWeapon netWeapon = new();
+	public float ammoCost = 14;
 
 	public RakuhouhaWeapon() : base() {
 		//damager = new Damager(player, 4, Global.defFlinch, 0.5f);
@@ -38,7 +39,7 @@ public class RakuhouhaWeapon : Weapon {
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
-		return 14;
+		return ammoCost;
 	}
 
 	public static Weapon getWeaponFromIndex(int index) {
