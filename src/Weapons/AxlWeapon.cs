@@ -95,6 +95,7 @@ public class AxlWeapon : Weapon {
 		float aimBackwardsAmount = axl.getShootBackwardsDebuff();
 		shootCooldown *= (1 + aimBackwardsAmount * 0.25f);
 
+		rechargeAmmoCustomSettingAxl = rechargeAmmoCooldown;
 		stealthReveal(character);
 		axl.afterAxlShoot(this);
 		axl.recoilTime = 0.2f;
@@ -137,6 +138,7 @@ public class AxlWeapon : Weapon {
 		float aimBackwardsAmount = axl.getShootBackwardsDebuff();
 		altShotCooldown *= (1 + aimBackwardsAmount * 0.25f);
 
+		rechargeAmmoCustomSettingAxl2 = altRechargeAmmoCooldown;
 		stealthReveal(character);
 		axl.afterAxlShoot(this);
 		axl.recoilTime = 0.2f;
@@ -178,6 +180,31 @@ public class AxlWeapon : Weapon {
 				}
 				if (canAddAmmo) {
 					addAmmo(1, player);
+				}
+			}
+		}
+	}
+	public virtual void rechargeAmmoCustomSetting(Player player, Axl axl, bool shootHeld, float modifier, float ammo) {
+		if (rechargeAmmoCustomSettingAxl <= 0 && rechargeAmmoCustomSettingAxl2 <= 0 && axl.shootAnimTime == 0 && !shootHeld && ammo < maxAmmo) {
+			float waMod = axl.isWhiteAxl() ? 0 : 1;
+			axlRechargeTime += Global.spf;
+			if (axlRechargeTime > 0.1f * modifier * waMod) {
+				axlRechargeTime = 0;
+				bool canAddAmmo = true;
+				if (type > 0) {
+					int lastAmmoUsage = 1;
+					if (axl.ammoUsages.Count > 0) {
+						lastAmmoUsage = axl.ammoUsages.Pop();
+					}
+					if (lastAmmoUsage > 0) {
+						float maxAmmo = player.axlBulletTypeAmmo[type];
+						maxAmmo = Helpers.clampMin0(maxAmmo - 1);
+						player.axlBulletTypeAmmo[type] = maxAmmo;
+						if (maxAmmo <= 0) canAddAmmo = false;
+					}
+				}
+				if (canAddAmmo) {
+					addAmmo(ammo, player);
 				}
 			}
 		}

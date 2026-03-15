@@ -86,7 +86,7 @@ public class SelectBusterZeroWeaponMenu : IMainMenu {
 		} else {
 			DrawWrappers.DrawTextureHUD(Global.textures["pausemenuload"], 0, 0);
 		}
-		Fonts.drawText(FontType.Yellow, "Knuckle Zero Loadout", Global.screenW * 0.5f, 24, Alignment.Center);
+		Fonts.drawText(FontType.Yellow, "Buster Zero Loadout", Global.screenW * 0.5f, 24, Alignment.Center);
 
 		int startY = 55;
 		int startX = 30;

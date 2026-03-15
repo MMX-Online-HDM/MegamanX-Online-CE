@@ -63,7 +63,8 @@ public class IceGattling : AxlWeapon {
 				this, bulletPos, axl.axlXDir, axl.player, aimAngle, axl.axlCursorTarget,
 				axl.axlHeadshotTarget, cursorPos, 0, axl.player.getNextActorNetId()
 			);
-			axl.axlWeapon.shootCooldown = fireRate;
+			axl?.axlWeapon?.shootCooldown = fireRate;
+			axl?.axlWeapon?.rechargeAmmoCustomSettingAxl = axl.axlWeapon.rechargeAmmoCooldown;
 			useAmmo(axl, 0);
 		}
 
@@ -74,6 +75,7 @@ public class IceGattling : AxlWeapon {
 				axl.axlHeadshotTarget, cursorPos, 0, axl.player.getNextActorNetId()
 			);
 			useAmmo(axl, 3);
+			axl.axlWeapon?.rechargeAmmoCustomSettingAxl2 = axl.axlWeapon.altRechargeAmmoCooldown;
 		} else if (axl.altShootPressed && axl.gaeaShield != null) {
 			axl.gaeaHeld = false;
 		}
@@ -167,6 +169,7 @@ public class GaeaShieldProj : Projectile {
 		shouldVortexSuck = false;
 		isReflectShield = true;
 		shouldShieldBlock = false;
+		isShield = true;
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}

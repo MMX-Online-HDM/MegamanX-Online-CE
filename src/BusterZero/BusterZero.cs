@@ -38,12 +38,12 @@ public class BusterZero : Character {
 	public float donutTimer;
 	public int donutsPending;
 
-	public PZeroLoadout loadout;
+	public BZeroLoadout loadout;
 
 	public BusterZero(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
-		bool isWarpIn = true, PZeroLoadout? loadout = null,
+		bool isWarpIn = true, BZeroLoadout? loadout = null,
 		int? heartTanks = null, bool isATrans = false
 	) : base(
 		player, x, y, xDir, isVisible,
@@ -52,7 +52,7 @@ public class BusterZero : Character {
 	) {
 		charId = CharIds.BusterZero;
 		// Loadout stuff.
-		loadout ??= player.loadout.pzeroLoadout.clone();
+		loadout ??= player.loadout.bzeroLoadout.clone();
 		this.loadout = loadout;
 		altSoundId = AltSoundIds.X3;
 		hyperMode = loadout.hyperMode;
@@ -464,14 +464,48 @@ public class BusterZero : Character {
 				clashTier: ClashTier.Weak, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
+			(int)MeleeIds.AwakenedAura => (new GenericMeleeProj(
+				awakenedAuraWeapon, projPos, ProjIds.AwakenedAura, player, 2, 0,
+				addToLevel: addToLevel
+			) {
+				netcodeOverride = NetcodeModel.FavorDefender
+			}),
 			_ => null
 		};
 		return proj;
+	}
+	public override Dictionary<int, Func<Projectile>> getGlobalProjs() {
+		if (isAwakened && globalCollider != null) {
+			Dictionary<int, Func<Projectile>> retProjs = new() {
+				[(int)ProjIds.AwakenedAura] = () => {
+					playSound("awakenedaura", forcePlay: true, sendRpc: true); 
+					float damage = 2;
+					int flinch = 0;
+					Projectile proj = new GenericMeleeProj(
+						awakenedAuraWeapon, pos,
+						ProjIds.AwakenedAura, player, damage, flinch, 30,
+						addToLevel: true
+					) {
+						globalCollider = new Collider(
+							new Rect(0f, 0f, 30, 40).getPoints(),
+							false, this, false, false,
+							HitboxFlag.Hitbox, Point.zero
+						),
+						meleeId = (int)MeleeIds.AwakenedAura,
+						ownerActor = this
+					};
+					return proj;
+				}
+			};
+			return retProjs;
+		}
+		return base.getGlobalProjs();
 	}
 
 	public enum MeleeIds {
 		None = -1,
 		SaberSwing,
+		AwakenedAura
 	}
 
 	public override string getSprite(string spriteName) {
