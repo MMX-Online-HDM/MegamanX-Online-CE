@@ -239,7 +239,7 @@ public class DZShinGetsurinProj : Projectile {
 		damager.flinch = Global.defFlinch;
 		vel = new Point(250 * xDir, 0);
 		fadeOnAutoDestroy = true;
-		fadeSprite = "buster3_fade";
+		fadeSprite = "shinbuster_large_fade";
 		maxTime = 1.5f;
 		destroyOnHit = false;
 		time = startTime;
