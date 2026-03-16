@@ -16,7 +16,7 @@ public class BusterProj : Projectile {
 		vel = new Point(250 * xDir, 0);
 		fadeSprite = "buster1_fade";
 		reflectable = true;
-		maxTime = 0.5175f;
+		maxTime = 30 / 60f;
 		projId = (int)ProjIds.Buster;
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);

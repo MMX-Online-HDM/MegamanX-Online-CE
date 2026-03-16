@@ -1,7 +1,7 @@
 namespace MMXOnline;
 
 public class DZBusterProj : Projectile {
-	bool deflected;
+	public bool deflected;
 
 	public DZBusterProj(
 		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
@@ -13,7 +13,7 @@ public class DZBusterProj : Projectile {
 		vel = new Point(240 * xDir, 0);
 		fadeSprite = "buster1_fade";
 		reflectable = true;
-		maxTime = 0.5175f;
+		maxTime = 30 / 60f;
 		projId = (int)ProjIds.DZBuster;
 
 		if (rpc) {
@@ -150,21 +150,64 @@ public class DZHadangekiProj : Projectile {
 	}
 }
 
+public class DZShinLemonProj : Projectile {
+	public bool deflected;
+
+	public DZShinLemonProj(
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "shinbuster_lemon", netId, player	
+	) {
+		weapon = ZeroBuster.netWeapon;
+		damager.damage = 1;
+		vel = new Point(240 * xDir, 0);
+		fadeSprite = "shinbuster_lemon_fade";
+		reflectable = true;
+		maxTime = 34 / 60f;
+		projId = (int)ProjIds.DZBuster;
+
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+		}
+	}
+
+	public override void update() {
+		base.update();
+		if (!deflected && System.MathF.Abs(vel.x) < 360) {
+			vel.x += Global.spf * xDir * 900f;
+			if (System.MathF.Abs(vel.x) >= 360) {
+				vel.x = (float)xDir * 360;
+			}
+		}
+	}
+
+	public override void onDeflect() {
+		base.onDeflect();
+		deflected = true;
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new DZShinLemonProj(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
+	}
+}
+
 public class DZShinBusterProj : Projectile {
 	public DZShinBusterProj(
 		Point pos, int xDir, Actor owner, ushort? netId,
 		bool sendRpc = false, Player? altPlayer = null
 	) : base(
-		pos, xDir, owner, "zbuster3", netId, altPlayer
+		pos, xDir, owner, "shinbuster_large", netId, altPlayer
 	) {
 		weapon = ZeroBuster.netWeapon;
 		damager.damage = 2;
 		damager.flinch = Global.halfFlinch;
 		vel = new Point(350 * xDir, 0);
 		fadeOnAutoDestroy = true;
-		fadeSprite = "buster3_fade";
+		fadeSprite = "shinbuster_large_fade";
 		reflectable = true;
-		maxTime = 0.5f;
+		maxTime = 38 / 60f;
 		projId = (int)ProjIds.DZShinBuster;
 
 		if (sendRpc) {
@@ -252,8 +295,8 @@ public class DZShinHadangekiProj : Projectile {
 		fadeSprite = "zsaber_shot_fade";
 		projId = (int)ProjIds.DZShinHadangeki;
 		genericShader = ownerPlayer.zeroAzPaletteShader;
-		maxTime = 0.55f;
-		
+		maxTime = 37 / 60f;
+
 		if (sendRpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}

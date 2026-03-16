@@ -16,7 +16,7 @@ public class BusterZero : Character {
 	public int stockedBusterLv;
 	public bool stockedSaber;
 	public float stockedTime;
-	public List<DZBusterProj> zeroLemonsOnField = new();
+	public List<Projectile> zeroLemonsOnField = new();
 	public ZBusterSaber meleeWeapon = new();
 	public int lastShootPressed;
 	public float aiAttackCooldown;
@@ -273,19 +273,6 @@ public class BusterZero : Character {
 		shootAnimTime = DefaultShootAnimTime;
 	}
 
-	public void shootDonutProj(int time) {
-		setShootAnim();
-		Point shootPos = getShootPos();
-		int xDir = getShootXDir();
-
-		new ShingetsurinProj(
-			shootPos, xDir,
-			time / 60f, this, player, player.getNextActorNetId(), rpc: true
-		);
-		playSound("shingetsurinx5", forcePlay: false, sendRpc: true);
-		shootAnimTime = DefaultShootAnimTime;
-	}
-
 	// Shoots stuff.
 	public void shoot(int chargeLevel) {
 		if (chargeLevel == 0) {
@@ -319,7 +306,7 @@ public class BusterZero : Character {
 	}
 	
 	public void shootSub(int chargeLevel, bool sfx = true, bool cd = true) {
-		if (isAwakened && chargeLevel >= 1) {
+		if (isAwakened) {
 			shootAwakened(chargeLevel, sfx, cd);
 		} else {
 			shootNormal(chargeLevel, sfx, cd);
@@ -388,7 +375,14 @@ public class BusterZero : Character {
 		string targetSound = "";
 		int? targetCooldown = null;
 
-		if (chargeLevel == 1) {
+		if (chargeLevel < 1) {
+			targetSound = "busterX3";
+			var lemon = new DZShinLemonProj(
+				shootPos, xDir, this, player, player.getNextActorNetId(), rpc: true
+			);
+			zeroLemonsOnField.Add(lemon);
+			targetCooldown = 9;
+		} else if (chargeLevel == 1) {
 			targetSound = "buster3X3";
 			new DZShinBusterProj(
 				shootPos, xDir, this, player.getNextActorNetId(), sendRpc: true

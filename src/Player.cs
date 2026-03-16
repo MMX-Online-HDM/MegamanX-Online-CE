@@ -1104,6 +1104,7 @@ public partial class Player {
 		assassinHitPos = null;
 
 		Character newChar;
+		bool isNonMain = !isMainChar;
 		int htCount = getHeartTanks(spawnCharNum);
 		// X.
 		if (spawnCharNum == (int)CharIds.X) {
@@ -1121,7 +1122,7 @@ public partial class Player {
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer,
 				loadout: xLoadout, isWarpIn: isWarpIn,
-				heartTanks: htCount, isATrans: isMainChar
+				heartTanks: htCount, isATrans: isNonMain
 			);
 		}
 		// Saber Zero.
@@ -1130,7 +1131,7 @@ public partial class Player {
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer,
 				isWarpIn: isWarpIn, heartTanks: htCount,
-				isATrans: isMainChar
+				isATrans: isNonMain
 			);
 		}
 		// Vile.
@@ -1141,7 +1142,7 @@ public partial class Player {
 				this, pos.x, pos.y, xDir, false, charNetId,
 				ownedByLocalPlayer, mk2VileOverride: mk2VileOverride,
 				isWarpIn: isWarpIn, heartTanks: htCount,
-				isATrans: isMainChar
+				isATrans: isNonMain
 			);
 		}
 		// GM19 Axl.
@@ -1158,7 +1159,7 @@ public partial class Player {
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer,
 				isWarpIn: isWarpIn, loadout: axlLoadout,
-				heartTanks: htCount, isATrans: isMainChar
+				heartTanks: htCount, isATrans: isNonMain
 			);
 		}
 		// Sigma.
@@ -1179,21 +1180,21 @@ public partial class Player {
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer,
 					isWarpIn: isWarpIn, loadout: sigmaLoadout,
-					heartTanks: htCount, isATrans: isMainChar
+					heartTanks: htCount, isATrans: isNonMain
 				);
 			} else if (sigmaForm == 1) {
 				newChar = new NeoSigma(
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer,
 					isWarpIn: isWarpIn, loadout: sigmaLoadout,
-					heartTanks: htCount, isATrans: isMainChar
+					heartTanks: htCount, isATrans: isNonMain
 				);
 			} else {
 				newChar = new CmdSigma(
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer,
 					isWarpIn: isWarpIn, loadout: sigmaLoadout,
-					heartTanks: htCount, isATrans: isMainChar
+					heartTanks: htCount, isATrans: isNonMain
 				);
 			}
 		}
@@ -1203,7 +1204,7 @@ public partial class Player {
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer,
 				isWarpIn: isWarpIn,
-				heartTanks: htCount, isATrans: isMainChar
+				heartTanks: htCount, isATrans: isNonMain
 			);
 		}
 		// Punchy Zero.
@@ -1212,7 +1213,7 @@ public partial class Player {
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer,
 				isWarpIn: isWarpIn, heartTanks: htCount,
-				isATrans: isMainChar
+				isATrans: isNonMain
 			);
 		}
 		// Kaiser Sigma (Hypermode)
@@ -1221,7 +1222,7 @@ public partial class Player {
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer,
 				isRevive: true, isWarpIn: isWarpIn, heartTanks: htCount,
-				isATrans: isMainChar
+				isATrans: isNonMain
 			);
 		}
 		// Raging Charge X.
@@ -1230,7 +1231,7 @@ public partial class Player {
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer,
 				isWarpIn: isWarpIn, heartTanks: htCount,
-				isATrans: isMainChar
+				isATrans: isNonMain
 			);
 		}
 		// Error out if invalid id.
@@ -1922,7 +1923,7 @@ public partial class Player {
 			}
 			newChar = spawnCharAtPoint(
 				backupData.charNum, getCharSpawnData(backupData.charNum, false, backupData.loadout),
-				oldChar.pos, oldChar.xDir, backupData.dnaNetId, false, forceSpawn: true
+				oldChar.pos, oldChar.xDir, backupData.dnaNetId, sendRpc: false, forceSpawn: true
 			);
 			if (newChar == null) {
 				throw new Exception("Error: Null spawnChar on ATrans tranform.");
@@ -2432,7 +2433,7 @@ public partial class Player {
 		character = spawnCharAtPoint(
 			(int)CharIds.RagingChargeX, [],
 			oldChar.pos, oldChar.xDir,
-			getNextATransNetId(), true,
+			getNextATransNetId(), sendRpc: true,
 			forceSpawn: true
 		) ?? throw new Exception("Error spawning RCX.");
 		// Set the inital state.
