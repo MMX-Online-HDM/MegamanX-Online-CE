@@ -581,7 +581,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 					);
 				}
 			)
-		);
+		);/*
 		menuOptions3.Add(
 			new MenuOption(
 				startX3, currentY3 += lineH3,
@@ -597,7 +597,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 					);
 				}
 			)
-		);
+		);*/
 		menuOptions3.Add(
 			new MenuOption(
 				startX3, currentY3 += lineH3,
