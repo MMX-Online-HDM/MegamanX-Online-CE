@@ -1678,7 +1678,7 @@ public partial class Character : Actor, IDamagable {
 
 	public virtual bool isPushImmune() {
 		return (
-			isTrueStatusImmune() || charState.pushImmune == true ||
+			isTrueStatusImmune() || charState.pushImmune ||
 			immuneToKnockback || isClimbingLadder()
 		);
 	}
@@ -1704,7 +1704,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool isNonDamageStatusImmune() {
-		return false;
+		return charState.statusEffectImmune;
 	}
 
 	public virtual bool isToughGuyHyperMode() {
