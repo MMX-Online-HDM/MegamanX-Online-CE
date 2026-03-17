@@ -112,12 +112,14 @@ public class BusterZero : Character {
 		if (!ownedByLocalPlayer) {
 			return;
 		}
+		gigaAttack?.update();
+		gigaAttack?.charLinkedUpdate(this, true);
 		if (isAwakened) {
 			updateAwakenedAura();
 		}
 		// Hypermode music.
 		if (!Global.level.isHyper1v1()) {
-			if (isHyperMode && Global.level.mainPlayer == player) {
+			if (isHyperMode) {
 				if (musicSource == null) {
 					if (isAwakened) {
 						addMusicSource("XvsZeroV2_megasfc", getCenterPos(), true);

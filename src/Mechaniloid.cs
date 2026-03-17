@@ -92,8 +92,10 @@ public class BirdMechaniloidProj : Projectile, IDamagable {
 	public override void onHitWall(CollideData other) {
 		base.onHitWall(other);
 		if (!ownedByLocalPlayer) return;
-
-		destroySelf();
+		if (time > 30f/60f)
+		{
+			destroySelf();
+		}
 	}
 
 	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
@@ -124,7 +126,7 @@ public class Mechaniloid : Actor, IDamagable {
 	Actor target;
 	float health = 8;
 	float maxHealth = 8;
-	const float sightRange = 130;
+	const float sightRange = 250;
 	float attackRange;
 	string baseSprite;
 	public MechaniloidType type;

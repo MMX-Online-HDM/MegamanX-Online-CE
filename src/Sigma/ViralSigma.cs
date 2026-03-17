@@ -6,7 +6,7 @@ using SFML.Graphics;
 namespace MMXOnline;
 
 public class ViralSigma : Character {
-	public Weapon mainWeapon = new ViralSigmaWeapon();
+	public Weapon? mainWeapon = new ViralSigmaWeapon();
 	public long originalZIndex;
 
 	public float tackleCooldown;
@@ -65,6 +65,8 @@ public class ViralSigma : Character {
 			}
 			return;
 		}
+		mainWeapon?.update();
+		mainWeapon?.charLinkedUpdate(this, true);
 		player.changeWeaponControls();
 		Helpers.decrementTime(ref tackleCooldown);
 		if (beamLength < 1 && charState is not ViralSigmaBeamState) {
@@ -113,7 +115,7 @@ public class ViralSigma : Character {
 	}
 
 	public override bool canAddAmmo() {
-		return (mainWeapon.ammo < mainWeapon.maxAmmo);
+		return (mainWeapon != null && mainWeapon.ammo < mainWeapon.maxAmmo);
 	}
 
 	public void getViralSigmaPossessTarget() {
