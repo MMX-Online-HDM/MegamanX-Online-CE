@@ -399,7 +399,12 @@ public class WarpIn : CharState {
 
 		if (warpAnim == null && !warpAnimOnce) {
 			warpAnimOnce = true;
-			warpAnim = new Anim(character.pos.addxy(0, -yOffset), character.getSprite("warp_beam"), character.xDir, player.getNextActorNetId(), false, sendRpc: true);
+			warpAnim = new Anim(
+				character.pos.addxy(0, -yOffset),
+				character.getSprite("warp_beam"),
+				character.xDir, player.getNextActorNetId(), false,
+				sendRpc: true
+			);
 			warpAnim.splashable = false;
 		}
 
@@ -408,14 +413,20 @@ public class WarpIn : CharState {
 			character.frameSpeed = 1;
 			if (character is CmdSigma && character.sprite.frameIndex >= 2 && !decloaked) {
 				decloaked = true;
-				var cloakAnim = new Anim(character.getFirstPOI() ?? character.getCenterPos(), "sigma_cloak", character.xDir, player.getNextActorNetId(), true);
+				var cloakAnim = new Anim(
+					character.getFirstPOI() ?? character.getCenterPos(),
+					"sigma_cloak", character.xDir, player.getNextActorNetId(), true
+				);
 				cloakAnim.vel = new Point(-25 * character.xDir, -10);
 				cloakAnim.blink = true;
 				cloakAnim.setzIndex(character.zIndex - 1);
 			}
 			if (character is NeoSigma && character.sprite.frameIndex >= 5 && !decloaked) {
 				decloaked = true;
-				var cloakAnim2 = new Anim(character.getFirstPOI() ?? character.getCenterPos(), "sigma2_cloak", character.xDir, player.getNextActorNetId(), true);
+				var cloakAnim2 = new Anim(
+					character.getFirstPOI() ?? character.getCenterPos(),
+					"sigma2_cloak", character.xDir, player.getNextActorNetId(), true
+				);
 				cloakAnim2.vel = new Point(-25 * character.xDir, -10);
 				cloakAnim2.blink = true;
 				cloakAnim2.setzIndex(character.zIndex - 1);
@@ -462,22 +473,22 @@ public class WarpIn : CharState {
 			} else {
 				sigmaRounds++;
 				landOnce = false;
-				warpAnim.changePos(new Point(warpAnim.pos.x, destY - getSigmaYOffset(sigmaRounds)));
+				warpAnim.changePos(new Point(warpAnim.pos.x, destY - yOffset));
 			}
 		}
 	}
 
 	float getSigmaRoundsMod(int aSigmaRounds) {
-		return character is BaseSigma ? 2 : 1;
+		return MathF.Max((aSigmaRounds + 1) / 2f + 0.5f, 1);
 	}
 
 	float getSigmaYOffset(int aSigmaRounds) {
 		if (aSigmaRounds == 0) return yOffset;
 		if (aSigmaRounds == 1) return yOffset;
 		if (aSigmaRounds == 2) return yOffset;
-		if (aSigmaRounds == 3) return yOffset * 0.75f;
-		if (aSigmaRounds == 4) return yOffset * 0.5f;
-		return yOffset * 0.25f;
+		if (aSigmaRounds == 3) return yOffset;
+		if (aSigmaRounds == 4) return yOffset;
+		return yOffset;
 	}
 
 	public override void onEnter(CharState oldState) {
@@ -491,7 +502,7 @@ public class WarpIn : CharState {
 		startY = character.pos.y;
 
 		if (player.warpedInOnce || Global.debug) {
-			sigmaRounds = 10;
+			sigmaRounds = 4;
 		}
 		if (refillHP && character.ownedByLocalPlayer && !player.warpedInOnce) {
 			character.health = 0;
