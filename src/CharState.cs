@@ -683,9 +683,10 @@ public class Idle : CharState {
 				if (!player.input.isLeftOrRightHeld(player)) {
 					if (player.input.isHeld(Control.Up, player)) {
 						attackCtrl = false;
-						character.changeSpriteFromName("block", true);
+						character.changeSpriteFromName("jump", true);
+						character.frameIndex = 0;
 					}
-					else if (character.sprite.name == character.getSprite("block")) {
+					else if (character.sprite.name == character.getSprite("jump")) {
 						character.changeToIdleOrFall();
 					}
 				}
