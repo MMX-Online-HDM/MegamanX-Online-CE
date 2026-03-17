@@ -2862,7 +2862,7 @@ public partial class Character : Actor, IDamagable {
 				damageSavings += (calcDamage * 0.5m);
 			}
 			// Universal block.
-			else if (Global.customSettings?.universalGuard == true && sprite.name.Contains("block")) {
+			else if (charState.specialId == SpecialStateIds.CsJkUBlock) {
 				damageSavings += (calcDamage * 0.5m);
 			}
 			

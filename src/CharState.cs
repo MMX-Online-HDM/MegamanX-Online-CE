@@ -677,20 +677,6 @@ public class Idle : CharState {
 				if (character.canMove()) character.changeState(character.getRunState());
 			}
 		}
-
-		if (Global.customSettings?.universalGuard == true) {
-			if (character is not Zero and not BaseSigma) {
-				if (!player.input.isLeftOrRightHeld(player)) {
-					if (player.input.isHeld(Control.Up, player)) {
-						attackCtrl = false;
-						character.changeSpriteFromName("block", true);
-					}
-					else if (character.sprite.name == character.getSprite("block")) {
-						character.changeToIdleOrFall();
-					}
-				}
-			}
-		}
 		if (Global.level.gameMode.isOver) {
 			if (Global.level.gameMode.playerWon(player)) {
 				character.changeState(character.getTauntState());
@@ -703,6 +689,38 @@ public class Idle : CharState {
 		}
 	}
 }
+
+
+
+public class CsJkUBlock : CharState {
+	public CsJkUBlock() : base("block") {
+		exitOnAirborne = true;
+		attackCtrl = true;
+		normalCtrl = true;
+		specialId = SpecialStateIds.CsJkUBlock;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (player.input.getYDir(player) != -1) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+
+		if (!Global.sprites.ContainsKey(character.getSprite("block"))) {
+			defaultSprite = "land";
+			sprite = defaultSprite;
+			character.changeSpriteFromName(sprite, true);
+			character.frameIndex = character.sprite.totalFrameNum - 1;
+		}
+	}
+}
+
+
 
 public class Run : CharState {
 	public bool skipIntro;

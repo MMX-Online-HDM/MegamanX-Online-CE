@@ -20,7 +20,9 @@ public enum SpecialStateIds {
 	HyorogaStart,
 	XTeleport,
 	PZeroParry,
-	WarpIdle
+	WarpIdle,
+	Block,
+	CsJkUBlock,
 }
 
 public static class ArmorParts {
