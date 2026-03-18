@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using WindowsAPI;
 
 namespace MMXOnline;
 
@@ -15,11 +16,7 @@ public class TextExportMenu : IMainMenu {
 	string fileError = "";
 	float fileTime;
 	float clipboardTime;
-#if WINDOWS
-	bool canCopyToClipboard = true;
-#else
-	bool canCopyToClipboard = false;
-#endif
+	bool canCopyToClipboard = NativeApi.Main.currentOS == NativeApi.OS.Windows;
 
 	public TextExportMenu(string[] lines, string textFileName, string text, IMainMenu prevMenu, bool inGame = false, uint textSize = 24) {
 		this.lines = new List<string>(lines);
@@ -65,10 +62,8 @@ public class TextExportMenu : IMainMenu {
 		} else if (Global.input.isPressedMenu(Control.MenuConfirm) &&
 			canCopyToClipboard && clipboardTime == 0
 		) {
-#if WINDOWS
 			SetClipboard(text);
 			clipboardTime = 2;
-#endif
 		} else if (Global.input.isPressedMenu(Control.MenuAlt) && fileTime == 0) {
 			fileError = Helpers.WriteToFile(textFileName + ".txt", text);
 			fileTime = 2;

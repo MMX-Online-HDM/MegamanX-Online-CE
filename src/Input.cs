@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using SFML.Window;
+using WindowsAPI;
 using static SFML.Window.Keyboard;
 
 namespace MMXOnline;
@@ -229,7 +230,7 @@ public class Input {
 		return completed;
 	}
 
-	public Dictionary<Key, char> capsLockMapping = new Dictionary<Key, char>() {
+	public static Dictionary<Key, char> capsLockMapping = new Dictionary<Key, char>() {
 		{ Key.A, 'A' },
 		{ Key.B, 'B' },
 		{ Key.C, 'C' },
@@ -715,28 +716,18 @@ public class Input {
 		return yDir;
 	}
 
-#if WINDOWS
-	[DllImport(
-		"user32.dll", CharSet = CharSet.Auto,
-		ExactSpelling = true,
-		CallingConvention = CallingConvention.Winapi)
-	]
-	public static extern short GetKeyState(int keyCode);
-	enum LockKeys {
+	public enum LockKeys {
 		CapsLock = 0x14,
 		NumLock = 0x90,
 		ScrollLock = 0x91
 	}
-#endif
 
 	public char? getKeyCharPressed() {
 		foreach (var kvp in keyToCharMapping) {
 			if (keyPressed.ContainsKey(kvp.Key) && keyPressed[kvp.Key]) {
-#if WINDOWS
-				if (((ushort)GetKeyState((int)LockKeys.CapsLock) & 0xffff) != 0) {
+				if (NativeApi.Main.KeyState((int)LockKeys.CapsLock)) {
 					if (capsLockMapping.ContainsKey(kvp.Key)) return capsLockMapping[kvp.Key];
 				}
-#endif
 				if (keyHeld.ContainsKey(Key.LShift) && keyHeld[Key.LShift]) {
 					if (keyToCharMappingShift.ContainsKey(kvp.Key)) return keyToCharMappingShift[kvp.Key];
 					else return null;

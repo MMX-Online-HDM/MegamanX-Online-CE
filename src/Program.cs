@@ -16,6 +16,7 @@ using SFML.Audio;
 using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
+using WindowsAPI;
 using static SFML.Window.Keyboard;
 
 namespace MMXOnline;
@@ -24,12 +25,19 @@ class Program {
 	public static string exceptionExtraData = "";
 
 	static void Main(string[] args) {
+		// For formatting purposes.
 		setDefaultCulture();
-
+		// Set API hooks
+		NativeApi.OS targetOS = NativeApi.GetOS();
+		NativeApi.Main = targetOS switch {
+			NativeApi.OS.Windows => new WinApi(),
+			NativeApi.OS.Linux => new NativeApi(),
+			NativeApi.OS.OSX => new NativeApi(),
+			_ => new NativeApi()
+		};
+		// Continue.
 		if (args.Length > 0 && args[0] == "-relay") {
-		#if WINDOWS
-			AllocConsole();
-		#endif
+			NativeApi.Main.AllocNewConsole();
 			RelayServer.ServerMain(args);
 		} else {
 			int mode = 0;
@@ -53,12 +61,6 @@ class Program {
 		}
 		Environment.Exit(0);
 	}
-
-#if WINDOWS
-	[DllImport("kernel32.dll", SetLastError = true)]
-	[return: MarshalAs(UnmanagedType.Bool)]
-	static extern bool AllocConsole();
-#endif
 
 	static void GameMain(string[] args, int mode) {
 		if (Debugger.IsAttached) {
@@ -163,7 +165,7 @@ class Program {
 			"",
 			string.IsNullOrEmpty(Options.main.playerName) ? "User: Dr. Cain" : "User: " + Options.main.playerName,
 			// Get CPU name here.
-			"CPU : " + getCpuName(),
+			"CPU : " + NativeApi.Main.GetCpuName(),
 			"Memory: " + (GC.GetGCMemoryInfo().TotalAvailableMemoryBytes / 1024) + "kb",
 			"",
 		];
@@ -1497,44 +1499,6 @@ class Program {
 			}
 			*/
 		}
-	}
-
-	public static string getCpuName() {
-		string cpuName = "Unknown";
-		#if WINDOWS
-			// For Windows OS.
-			cpuName = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(
-				@"HARDWARE\DESCRIPTION\System\CentralProcessor\0\"
-			)?.GetValue(
-				"ProcessorNameString"
-			) as String ?? "Windows";
-		#endif
-		#if LINUX
-			if (!File.Exists("/proc/cpuinfo")) {
-				return "Unix;"
-			}
-			// Read all lines from /proc/cpuinfo
-			string[] lines = File.ReadAllLines("/proc/cpuinfo");
-			// Find the line containing "model name"
-			string? modelNameLine = lines.FirstOrDefault(
-				line => line.StartsWith("model name", StringComparison.OrdinalIgnoreCase)
-			);
-			if (modelNameLine != null) {
-				// Extract the model name part after the colon and trim whitespace
-				lines = modelNameLine.Split(':');
-				if (lines.Length >= 2) {
-					cpuName = lines[1];
-				}
-			}
-		#endif
-		#if MACOS
-			cpuName = "Darwin";
-		#endif
-		// Fix simbols.
-		cpuName = cpuName.Replace("(R)", "®");
-		cpuName = cpuName.Replace("(C)", "©");
-		cpuName = cpuName.Replace("(TM)", "©"); //Todo, implement proper trademark simbol.
-		return cpuName;
 	}
 
 	public static void loadMultiThread(List<String> loadText, RenderWindow window, Action loadFunct) {

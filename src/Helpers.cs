@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using ProtoBuf;
 using SFML.Graphics;
+using WindowsAPI;
 
 namespace MMXOnline;
 
@@ -223,6 +224,9 @@ public class Helpers {
 	}
 
 	public static ShaderWrapper cloneGenericPaletteShader(string textureName) {
+		if (!Global.textures.ContainsKey(textureName)) {
+			return null;
+		}
 		var texture = Global.textures[textureName];
 		var genericPaletteShader = cloneShaderSafe("genericPalette");
 		genericPaletteShader?.SetUniform("paletteTexture", texture);
@@ -401,6 +405,10 @@ public class Helpers {
 	public static float byteToDegree(byte angleByte) {
 		return angleByte * 1.40625f % 360;
 	}
+	
+	public static float byteToDegree(float angleByte) {
+		return angleByte * 1.40625f % 360;
+	}
 
 	public static byte dirToByte(int dir) {
 		return (byte)(dir + 128);
@@ -446,43 +454,12 @@ public class Helpers {
 		return x << 16 | y;
 	}
 
-#if WINDOWS
-	[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-	public static extern int MessageBox(IntPtr hWnd, String text, String caption, uint type);
-#endif
-
 	public static void showMessageBox(string message, string caption) {
-#if WINDOWS
-		if (Global.window != null) {
-			Global.window.SetMouseCursorVisible(true);
-		}
-		MessageBox(IntPtr.Zero, message, caption, 0);
-		if (Global.window != null && Options.main != null) {
-			Global.window.SetMouseCursorVisible(!Options.main.fullScreen);
-		}
-#else
-			Console.WriteLine(caption + Environment.NewLine + message);
-#endif
+		NativeApi.Main.ShowMessageBox(message, caption);
 	}
 
 	public static bool showMessageBoxYesNo(string message, string caption) {
-#if WINDOWS
-		if (Global.window != null) {
-			Global.window.SetMouseCursorVisible(true);
-		}
-		int dialogResult = MessageBox(IntPtr.Zero, message, caption, 4);
-		if (Global.window != null && Options.main != null) {
-			Global.window.SetMouseCursorVisible(!Options.main.fullScreen);
-		}
-		if (dialogResult == 6) {
-			return true;
-		} else {
-			return false;
-		}
-#else
-       		Console.WriteLine(caption + Environment.NewLine + message);
-    		return true;
-#endif
+		return NativeApi.Main.ShowMessageBoxYesNo(message, caption);
 	}
 
 	public static void menuUpDown(ref int val, int minVal, int maxVal, bool wrap = true, bool playSound = true) {
@@ -517,23 +494,44 @@ public class Helpers {
 		}
 	}
 
-	public static void menuLeftRightInc(ref int val, int min, int max, bool wrap = false, bool playSound = false) {
+	public static void menuLeftRight(ref int val, int min, int max, bool wrap = false, bool playSound = false, int valueToAdd = 1) {
 		if (min == max) return;
 		if (Global.input.isPressedMenu(Control.MenuLeft)) {
-			val--;
+			val -= valueToAdd;
 			if (val < min) {
 				val = wrap ? max : min;
-				if (wrap && playSound) Global.playSound("menuX2");
+				if (wrap && playSound) Global.playSound("menu");
 			} else {
-				if (playSound) Global.playSound("menuX2");
+				if (playSound) Global.playSound("menu");
 			}
 		} else if (Global.input.isPressedMenu(Control.MenuRight)) {
-			val++;
+			val += valueToAdd;
 			if (val > max) {
 				val = wrap ? min : max;
-				if (wrap && playSound) Global.playSound("menuX2");
+				if (wrap && playSound) Global.playSound("menu");
 			} else {
-				if (playSound) Global.playSound("menuX2");
+				if (playSound) Global.playSound("menu");
+			}
+		}
+	}
+
+	public static void menuLeftRightInc(ref int val, int min, int max, bool wrap = false, bool playSound = false, int valueToAdd = 1) {
+		if (min == max) return;
+		if (Global.input.isPressedOrHeldMenu(Control.MenuLeft)) {
+			val -= valueToAdd;
+			if (val < min) {
+				val = wrap ? max : min;
+				if (wrap && playSound) Global.playSound("menu");
+			} else {
+				if (playSound) Global.playSound("menu");
+			}
+		} else if (Global.input.isPressedOrHeldMenu(Control.MenuRight)) {
+			val += valueToAdd;
+			if (val > max) {
+				val = wrap ? min : max;
+				if (wrap && playSound) Global.playSound("menu");
+			} else {
+				if (playSound) Global.playSound("menu");
 			}
 		}
 	}
@@ -660,7 +658,7 @@ public class Helpers {
 		return text;
 	}
 
-	public static string WriteToFile(string filePath, string text) {
+	public static string? WriteToFile(string filePath, string text) {
 		filePath = Global.writePath + filePath;
 		try {
 			if (File.Exists(filePath)) {
@@ -900,5 +898,10 @@ public class Helpers {
 		if (rightOfDotNumA < rightOfDotNumB) return -1;
 		else if (rightOfDotNumA > rightOfDotNumB) return 1;
 		else return 0;
+	}
+
+	// Get the percentage of a value
+	public static double getValueOfPercentage(float value, float percentage) {
+		return MathF.Floor(value * percentage / 100);
 	}
 }
