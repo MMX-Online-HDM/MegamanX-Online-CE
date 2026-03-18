@@ -174,7 +174,7 @@ public class FrostShieldProjAir : Projectile {
 }
 
 public class FrostShieldProjGround : Projectile, IDamagable {
-	float health = 6;
+	float health = 3;
 	
 	public FrostShieldProjGround(
 		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
