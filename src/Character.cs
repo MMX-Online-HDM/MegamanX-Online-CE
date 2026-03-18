@@ -3583,6 +3583,9 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public void addTransformAnim() {
+		if (!ownedByLocalPlayer) {
+			return;
+		}
 		transformAnim = new Anim(
 			pos, "axl_transform", xDir, player.getNextActorNetId(), true, true
 		);

@@ -1988,7 +1988,6 @@ public partial class Player {
 
 		oldChar.destroySelf();
 		newChar.addTransformAnim();
-
 		return newChar;
 	}
 

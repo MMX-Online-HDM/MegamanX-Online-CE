@@ -776,10 +776,9 @@ class Program {
 
 	static string getFileBlobMD5(Dictionary<string, string> fileNamesToContents) {
 		string entireBlob = "";
-		var keys = fileNamesToContents.Keys.ToList();
+		List<string> keys = fileNamesToContents.Keys.ToList();
 		keys.Sort(Helpers.invariantStringCompare);
-
-		foreach (var key in keys) {
+		foreach (string key in keys) {
 			entireBlob += key.ToLowerInvariant() + " " + fileNamesToContents[key];
 		}
 		var md5 = System.Security.Cryptography.MD5.Create();
@@ -866,27 +865,47 @@ class Program {
 	}
 
 	static void loadSprites() {
+		// Check load location.
 		string spritePath = "assets/sprites";
 
-		string[] spriteFilePaths = Helpers.getFiles(Global.assetPath + spritePath, false, "json").ToArray();
+		// Get files, in Linux they are out of order so we need to fix this later.
+		string[] spriteFilePaths = Helpers.getFiles(Global.assetPath + spritePath, true, "json").ToArray();
 		if (spriteFilePaths.Length > 65536) {
 			throw new Exception(
 				"Exceeded max sprite limit of 65536. Fix actor.cs netUpdate() to support more sprites."
 			);
 		}
 
+		// Sort the JSONS by name. So the result is deterministic.
+		Dictionary<string, string> nameToPath = []; 
+		List<string> orderedPaths = [];
+		foreach (string fullPath in spriteFilePaths) {
+			string filename = Path.GetFileName(fullPath).ToLowerInvariant();
+			nameToPath[filename] = fullPath;
+			orderedPaths.Add(filename);
+		}
+		orderedPaths.Sort(Helpers.invariantStringCompare);
+
+		// Now we order the full paths based on this.
+		List<string> orderedSpriteFilePaths = [];
+		foreach (string shortPath in orderedPaths) {
+			orderedSpriteFilePaths.Add(nameToPath[shortPath]);
+		}
+		spriteFilePaths = orderedSpriteFilePaths.ToArray();
+
+		// Split if needed.
 		int fileSplit = MathInt.Floor(spriteFilePaths.Count() / 6.0);
 		string[][] treadedFilePaths;
 		// Use multitread if loading 20 or more sprites.
 		if (spriteFilePaths.Length >= 20) {
-			treadedFilePaths = new string[][] {
+			treadedFilePaths = [
 				spriteFilePaths[..fileSplit],
 				spriteFilePaths[(fileSplit)..(fileSplit*2)],
 				spriteFilePaths[(fileSplit*2)..(fileSplit*3)],
 				spriteFilePaths[(fileSplit*3)..(fileSplit*4)],
 				spriteFilePaths[(fileSplit*4)..(fileSplit*5)],
 				spriteFilePaths[(fileSplit*5)..],
-			};
+			];
 			// List of multithread tasks.
 			// And start a list of blobs so checksum is deterministic .
 			List<Task> tasks = new();
