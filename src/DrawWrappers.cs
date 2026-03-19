@@ -13,6 +13,7 @@ public class DrawableWrapper {
 	public IDrawable? drawable;
 	public Color color;
 	public int[]? size;
+	public ParticleSystem? particle;
 
 	public DrawableWrapper(
 		List<ShaderWrapper> shaders, IDrawable drawable,
@@ -119,8 +120,13 @@ public class DrawLayer : Transformable, IDrawable {
 		for (int i = 0; i < oneOffs.Count; i++) {
 			var oneOff = oneOffs[i];
 			Global.window.SetView(Global.view);
+			// Particle.
+			if (oneOff.particle != null) {
+				RenderStates renderStates = new RenderStates(states);
+				target.Draw(oneOff.particle, states);
+			}
 			// Composite sprite.
-			if (oneOff.compositeData != null && oneOff.subSprites != null) {
+			else if (oneOff.compositeData != null && oneOff.subSprites != null) {
 				IDrawable localDrawable;
 				RenderStates localState;
 				(localDrawable, localState) = oneOff.GetComposeDrawable(target, states);
@@ -324,7 +330,7 @@ public class DrawableSprite {
 public partial class DrawWrappers {
 	public static Dictionary<long, DrawLayer> walDrawObjects = new Dictionary<long, DrawLayer>();
 
-	private static DrawLayer getDrawLayer(long depth) {
+	public static DrawLayer getDrawLayer(long depth) {
 		DrawLayer drawLayer;
 		if (!walDrawObjects.ContainsKey(depth)) {
 			walDrawObjects[depth] = new DrawLayer();

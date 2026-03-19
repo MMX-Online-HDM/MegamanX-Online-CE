@@ -86,6 +86,7 @@ public partial class Global {
 				new VideoMode((desktopWidth, desktopHeight)),
 				"MMX Online Deathmatch", Styles.None, State.Windowed
 			);
+			window.SetVerticalSyncEnabled(options.vsync);
 			window.SetMouseCursorVisible(false);
 			viewPort = getFullScreenViewPort();
 		}
