@@ -77,7 +77,6 @@ public class Projectile : Actor {
 	List<Point> dests = new();
 	int? destIndex;
 	float initWallCooldown;
-	
 
 	public Projectile(
 		Weapon weapon, Point pos, int xDir, float speed, float damage,

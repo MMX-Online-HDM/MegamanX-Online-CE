@@ -22,9 +22,11 @@ public class LANIPHelper {
 	public static string GetLocalIPAddress() {
 		string? localIP;
 		using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, 0)) {
-			socket.Connect("8.8.8.8", 65530);
+			socket.Connect("8.8.8.8", 0);
 			IPEndPoint? endPoint = socket.LocalEndPoint as IPEndPoint;
 			localIP = endPoint?.Address.ToString();
+			socket.Disconnect(true);
+			socket.Dispose();
 		}
 		return localIP ?? "127.0.0.1";
 	}

@@ -940,7 +940,7 @@ public class HostMenu : IMainMenu {
 				return;
 			}*/
 
-			if (isLAN) {
+			if (isLAN && !isOffline) {
 				localIPAddress = LANIPHelper.GetLocalIPAddress();
 				if (string.IsNullOrEmpty(localIPAddress)) {
 					errorMessage = "Couldn't get LAN IP address.";
