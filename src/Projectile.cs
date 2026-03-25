@@ -407,7 +407,7 @@ public class Projectile : Actor {
 		// Enemy tier. Shields are considered weaker than weak.
 		ClashTier enemyTier = enemy.clashTier;
 		// Only Zero clangs aganist shields because screw him I guess.
-		if (enemy.clashTier == 0 && enemy.isShield && ownerActor is Zero) {
+		if (enemy.clashTier == 0 && enemy.isShield && ownerActor is Zero or BusterZero) {
 			enemyTier = ClashTier.Shield;
 		}
 		// Clash tier must be the same or worse than enemy.
