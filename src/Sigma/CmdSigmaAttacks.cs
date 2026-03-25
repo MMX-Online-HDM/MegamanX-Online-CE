@@ -168,7 +168,7 @@ public class SigmaSlashProj : Projectile {
 			damager.flinch = Global.halfFlinch;
 		}
 		if (type == 2) {
-			damager.damage = 6;
+			damager.damage = 4;
 			clashTier = ClashTier.None;
 		}
 		reflectable = false;
