@@ -65,7 +65,7 @@ public class Anim : Actor {
 			}
 			if (spriteName == "spiralmagnum_shell") {
 				if (collider != null) {
-					collider?.wallOnly = true;
+					collider.wallOnly = true;
 				}
 			}
 		}
@@ -255,10 +255,17 @@ public class Anim : Actor {
 		return base.getShaders();
 	}
 
-	public static void createGibEffect(string spriteName, Point centerPos, Player player, GibPattern gibPattern = GibPattern.Radial, float randVelStart = 100, float randVelEnd = 200, float randDistStart = 0, float randDistEnd = 25, bool sendRpc = false) {
+	public static void createGibEffect(
+		string spriteName, Point centerPos,
+		Player player, GibPattern gibPattern = GibPattern.Radial,
+		float randVelStart = 100, float randVelEnd = 200,
+		float randDistStart = 0, float randDistEnd = 25, bool sendRpc = false,
+		long? zIndex= null, int pieceOverdive = 0, bool blink = false, float alpha = 1f
+	) {
 		AnimData sprite = Global.sprites[spriteName];
 		float startAngle = 0;
-		for (int i = 0; i < sprite.frames.Length; i++) {
+		for (int i = 0; i < pieceOverdive || i < sprite.frames.Length; i++) {
+			int frame = i % sprite.frames.Length;
 			float angle = Helpers.randomRange(0, 360);
 			if (gibPattern == GibPattern.Radial || gibPattern == GibPattern.SemiCircle) {
 				angle = startAngle;
@@ -269,13 +276,19 @@ public class Anim : Actor {
 			float randDist = Helpers.randomRange(randDistStart, randDistEnd);
 			float compX = Helpers.cosd(angle);
 			float compY = Helpers.sind(angle);
-			var anim = new Anim(centerPos.addxy(compX * randDist, compY * randDist), spriteName, 1, sendRpc ? player.getNextActorNetId() : null, false, sendRpc: sendRpc);
+			var anim = new Anim(
+				centerPos.addxy(compX * randDist, compY * randDist), spriteName,
+				1, sendRpc && player != null ? player.getNextActorNetId() : null, false, sendRpc: sendRpc,
+				zIndex: zIndex
+			);
 
 			anim.useGravity = true;
 			anim.ttl = 0.75f;
 			anim.vel = new Point(compX * randVel, compY * randVel * 1.25f);
 			anim.frameSpeed = 0;
-			anim.frameIndex = i;
+			anim.frameIndex = frame;
+			anim.blink = blink;
+			anim.alpha = alpha;
 
 			if (gibPattern == GibPattern.Radial) {
 				startAngle -= 360 / sprite.frames.Length;

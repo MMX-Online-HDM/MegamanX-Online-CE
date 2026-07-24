@@ -37,10 +37,10 @@ public class WireSponge : Maverick {
 
 		//chargeShader = Helpers.cloneShaderSafe("wspongeCharge");
 
-		netActorCreateId = NetActorCreateId.WireSponge;
 		netOwner = player;
+		cActorId = CActorIds.SigmaWireSponge;
 		if (sendRpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, player, player.character, getSerialExtra());
 		}
 		gameMavs = GameMavs.X2;
 	}

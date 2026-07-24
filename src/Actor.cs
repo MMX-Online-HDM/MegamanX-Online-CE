@@ -10,7 +10,10 @@ public partial class Actor : GameObject {
 	public Sprite sprite; //Current sprite
 	public bool useTerrainGrid { get; set; } = false;
 	public bool useActorGrid { get; set; } = true;
+	public bool hasStateMachine { get; set; } = false;
 	public bool iDestroyed => destroyed;
+	public bool disabled;
+	public bool iDisabled => disabled;
 
 	public int frameIndex {
 		get => sprite.frameIndex;
@@ -62,15 +65,26 @@ public partial class Actor : GameObject {
 	public Point stackedMoveDelta;
 	public Point moveDelta;
 	public Point vel;
+	public Point lastGroundedPos;
+	public Point lastSafeGroundedPos;
+	public Point lastSafeGroundedPosAlt;
 	public float xPushVel;
 	public float xIceVel;
 	public float xSwingVel;
+	public float xTenguPushVel;
 	public float landingVelY;
 	public bool immuneToKnockback;
 	public bool isPlatform;
+	public bool isSolidWall;
+	public Func<GameObject, bool>? selectiveSolididyFunc;
 	public bool slideOnIce;
 	public bool cachedUndewater;
 	public Point cachedUndewaterPos = new Point(float.MinValue, float.MinValue);
+	public int cachedGzHits;
+	public Point cachedGzPos = new Point(float.MinValue, float.MinValue);
+	public float? cachedGzMul = null;
+	public float? cachedGzVelX = null;
+	public float? cachedGzVelY = null;
 
 	public float xFlinchPushVel = 0;
 
@@ -85,6 +99,8 @@ public partial class Actor : GameObject {
 	public float _byteAngle;
 	public bool customAngleRendering;
 	public bool useGravity;
+	public bool? gravityOverride;
+	public bool movedUp;
 	public bool gravityWellable { get { return this is Character || this is RideArmor || this is Maverick || this is RideChaser; } }
 	public float gravityWellTime;
 	public bool canBeGrounded = true;
@@ -98,15 +114,17 @@ public partial class Actor : GameObject {
 	public bool destroyed;
 	public long destroyedOnFrame;
 	public ShaderWrapper? genericShader;
-	public virtual List<ShaderWrapper>? getShaders() { return genericShader != null ? new List<ShaderWrapper> { genericShader } : null; }
+	public virtual List<ShaderWrapper>? getShaders() {
+		return genericShader != null ? new List<ShaderWrapper> { genericShader } : null;
+	}
 	public float alpha = 1;
 	public float xScale = 1;
 	public float yScale = 1;
 	public float gravityModifier = 1;
 	public bool reversedGravity;
 	public float gravityWellModifier = 1;
-	public Dictionary<string, float> projectileCooldown { get; set; } = new Dictionary<string, float>();
-	public Dictionary<string, float> flinchCooldown { get; set; } = new Dictionary<string, float>();
+	public Dictionary<string, float> projectileCooldown { get; set; } = new();
+	public Dictionary<string, float> flinchCooldown { get; set; } = new();
 	public Dictionary<int, float> globalFlinchCooldown { get; set; } = new Dictionary<int, float>();
 
 	public MusicWrapper? musicSource;
@@ -133,19 +151,23 @@ public partial class Actor : GameObject {
 	public int? netXDir;
 	public int? netYDir;
 	public float? netAngle;
+
+	
 	public bool stopSyncingNetPos;
 	public bool syncScale;
 	public Point? targetNetPos;
 	public bool interplorateNetPos = true;
 
 	public float lastNetUpdate;
-	public int lastNetFrame;
+	public int lastNetFrame = Global.frameCount;
 
 	public NetActorCreateId netActorCreateId;
+	public CActorIds cActorId;
 	public Player? netOwner;
-	float createRpcTime;
+	public bool syncOnLateJoin;
 
 	public bool splashable;
+	// TODO: Use lazy initiation instead.
 	private Anim? _waterWade = null;
 	public Anim waterWade {
 		get {
@@ -166,6 +188,71 @@ public partial class Actor : GameObject {
 	public bool highPiority;
 	public bool lowPiority;
 	public bool movedUpOnFrame;
+	
+
+	public bool useAngleOnFade;
+	public float angle {
+		get {
+			return _byteAngle * 1.40625f;
+		}
+		set {
+			angleSet = true;
+			_byteAngle = (value / 1.40625f) % 256;
+			if (_byteAngle < 0) {
+				_byteAngle += 256;
+			}
+		}
+	}
+
+	public bool angleSet;
+	public bool destroyPosSet;
+	public float destroyPosTime;
+	public float maxDestroyTime;
+
+	public const int labelCursorOffY = 5;
+	public const int labelWeaponIconOffY = 18;
+	public const int labelKillFeedIconOffY = 9;
+	public const int labelAxlAimModeIconOffY = 15;
+	public const int labelCooldownOffY = 15;
+	public const int labelSubtankOffY = 17;
+	public const int labelStatusOffY = 20;
+	public const int labelHealthOffY = 6;
+	public const int labelNameOffY = 10;
+
+	public float currentLabelY;
+	public Color? spriteColor;
+
+	public Actor getActor => this;
+	public Frame currentFrame => sprite.getCurrentFrame();
+
+
+	public float byteAngle {
+		get {
+			return _byteAngle;
+		}
+		set {
+			angleSet = true;
+			_byteAngle = value % 256;
+			if (_byteAngle < 0) {
+				_byteAngle += 256;
+			}
+		}
+	}
+
+
+	public void setzIndex(long val) {
+		this.zIndex = val;
+	}
+
+	public float framePercent {
+		get {
+			float entireDuration = 0;
+			foreach (var frame in sprite.animData.frames) {
+				entireDuration += frame.duration;
+			}
+			return animSeconds / entireDuration;
+		}
+	}
 
 	public Actor(
 		string spriteName, Point pos, ushort? netId, bool ownedByLocalPlayer, bool addToLevel
@@ -175,7 +262,7 @@ public partial class Actor : GameObject {
 			initalizeSprite(spriteName);
 			// Crash if spriteName was provided but does not exist.
 			if (sprite == null) {
-				string typeName = GetType().ToString().Replace("MMXOnline.", "");
+				string typeName = getActorTypeName();
 				throw new Exception(
 					"Null sprite at object" + typeName +
 					"with spritename variable \"" + spriteName + "\""
@@ -202,6 +289,9 @@ public partial class Actor : GameObject {
 		*/
 		this.netId = netId;
 		this.ownedByLocalPlayer = ownedByLocalPlayer;
+		lastGroundedPos = pos;
+		lastSafeGroundedPos = pos;
+		lastSafeGroundedPosAlt = pos;
 		vel = new Point(0, 0);
 		useGravity = true;
 		frameIndex = 0;
@@ -214,7 +304,7 @@ public partial class Actor : GameObject {
 		zIndex = ++Global.level.autoIncActorZIndex;
 		lastNetUpdate = Global.time;
 
-		if (netId is not null) {
+		if (netId != null) {
 			Global.level.actorsById[netId.Value] = this;
 		}
 
@@ -258,6 +348,56 @@ public partial class Actor : GameObject {
 		//if (Global.level.levelData.name == "forest2" && pos.x > 1415 && pos.x < 1888 && pos.y < 527) return false;
 	}
 
+	public (int hit, float? mul, float? velX, float? velY) getGravityZoneData() {
+		if (cachedGzPos == pos) {
+			return (cachedGzHits, cachedGzMul, cachedGzVelX, cachedGzVelX);
+		}
+		if (physicsCollider == null) {
+			return (0, null, null, null);
+		}
+		Rect colRect = physicsCollider.shape.getRect();
+
+		int hit = 0;
+		float? gzMul = null;
+		float? gzVelX = null;
+		float? gzVelY = null;
+		bool nonZeroX = false;
+		bool nonZeroY = false;
+
+		foreach (GravityZone gravityZone in Global.level.gravityZones) {
+			if (colRect.overlaps(gravityZone.rect)) {
+				hit++;
+				if (gravityZone.mul != null) {
+					gzMul ??= 1;
+					gzMul *= gravityZone.mul;
+				}
+				if (gravityZone.velX != null) {
+					gzVelX ??= 0;
+					if (gravityZone.velY != 0) { nonZeroY = true; }
+					gzVelX += gravityZone.velX;
+				}
+				if (gravityZone.velY != null) {
+					gzVelY ??= 0;
+					if (gravityZone.velY != 0) { nonZeroY = true; }
+					gzVelY += gravityZone.velY;
+				}
+			}
+		}
+		// Edge case were if the merge of zones ends up at 0.
+		// This would mean 2 zones with oposing gravity would get the player stuck.
+		// We want to avoid so we just resort to whatever is cached.
+		// Not needed with mul as is multiplicative.
+		if (nonZeroX && gzVelX == 0) {
+			gzVelX = cachedGzVelX;
+		}
+		if (nonZeroY && gzVelY == 0) {
+			gzVelY = cachedGzVelY;
+		}
+		cachedGzPos = pos;
+		(cachedGzHits, cachedGzMul, cachedGzVelX, cachedGzVelY) = (hit, gzMul, gzVelX, gzVelY);
+		return (hit, gzMul, gzVelX, gzVelY);
+	}
+
 	public bool isWading() {
 		foreach (var waterRect in Global.level.waterRects) {
 			if (pos.x > waterRect.x1 && pos.x < waterRect.x2 && pos.y > waterRect.y1 && pos.y < waterRect.y2) {
@@ -268,25 +408,32 @@ public partial class Actor : GameObject {
 		return false;
 	}
 
-	public void createActorRpc(int playerId) {
-		if (netId == null) return;
-		if (!ownedByLocalPlayer) return;
+	public virtual int getSerialCID() => (int)cActorId;
+	public virtual int getSerialPlayerID() => netOwner?.id ?? int.MaxValue;
+	public virtual ushort? getSerialOnwerID() => null;
+	public virtual byte[] getSerialExtra() => [];
 
-		byte[] xBytes = BitConverter.GetBytes(pos.x);
-		byte[] yBytes = BitConverter.GetBytes(pos.y);
-		byte[] netProjIdByte = BitConverter.GetBytes(netId.Value);
-
-		var bytes = new List<byte>()
-			{
-					(byte)netActorCreateId,
-					xBytes[0], xBytes[1], xBytes[2], xBytes[3],
-					yBytes[0], yBytes[1], yBytes[2], yBytes[3],
-					(byte)playerId,
-					netProjIdByte[0], netProjIdByte[1],
-					(byte)(xDir + 128)
-				};
-
-		Global.serverClient?.rpc(RPC.createActor, bytes.ToArray());
+	public virtual ActorRpcResponse? getSerialData(ushort? customNetId = null) {
+		ushort? ownerId = getSerialOnwerID();
+		int playerId = getSerialPlayerID();
+		int creationId = getSerialCID();
+		ushort? newNetId = customNetId ?? netId;
+		// We just throw null if cannot be serialized.
+		if (newNetId == null || creationId == 0 || playerId == int.MaxValue) {
+			return null;
+		}
+		return new ActorRpcResponse() {
+			isProj = false,
+			actorId = creationId,
+			posX = pos.x,
+			posY = pos.y,
+			xDir = xDir,
+			playerId = playerId,
+			netId = newNetId.Value,
+			byteAngle = byteAngle,
+			ownerId = ownerId,
+			extraData = getSerialExtra()
+		};
 	}
 
 	public void changeSpriteIfDifferent(string spriteName, bool resetFrame) {
@@ -300,7 +447,7 @@ public partial class Actor : GameObject {
 			return;
 		}
 		if (sprite.name == spriteName) {
-			if (this is not Character && resetFrame) {
+			if (resetFrame) {
 				sprite.restart();
 			}
 			return;
@@ -335,7 +482,6 @@ public partial class Actor : GameObject {
 			frameSeconds = oldFrameTime;
 			animSeconds = oldAnimTime;
 		}
-
 		if (frameIndex >= sprite.totalFrameNum) {
 			frameIndex = 0;
 			frameTime = 0;
@@ -399,52 +545,6 @@ public partial class Actor : GameObject {
 			playSound(matchingVoice);
 		}
 	}
-
-	public bool useAngleOnFade;
-	public float angle {
-		get {
-			return _byteAngle * 1.40625f;
-		}
-		set {
-			angleSet = true;
-			_byteAngle = (value / 1.40625f) % 256;
-			if (_byteAngle < 0) {
-				_byteAngle += 256;
-			}
-		}
-	}
-
-	public bool angleSet;
-	public float byteAngle {
-		get {
-			return _byteAngle;
-		}
-		set {
-			angleSet = true;
-			_byteAngle = value % 256;
-			if (_byteAngle < 0) {
-				_byteAngle += 256;
-			}
-		}
-	}
-
-
-	public void setzIndex(long val) {
-		this.zIndex = val;
-	}
-
-	public Frame currentFrame => sprite.getCurrentFrame();
-
-	public float framePercent {
-		get {
-			float entireDuration = 0;
-			foreach (var frame in sprite.animData.frames) {
-				entireDuration += frame.duration;
-			}
-			return animSeconds / entireDuration;
-		}
-	}
-
 	public virtual void onStart() {
 		if (!string.IsNullOrEmpty(startSound)) {
 			playSound(startSound);
@@ -454,8 +554,9 @@ public partial class Actor : GameObject {
 	public virtual void preUpdate() {
 		collidedInFrame.Clear();
 		deltaPos = pos.subtract(prevPos);
-		moveDelta = stackedMoveDelta;
 		prevPos = pos;
+		moveDelta = stackedMoveDelta;
+		stackedMoveDelta = Point.zero;
 
 		if (locallyControlled && sprite.name != "null") {
 			int oldFrameIndex = sprite.frameIndex;
@@ -469,6 +570,17 @@ public partial class Actor : GameObject {
 			}
 		}
 
+		// Iterate and remove render effects.
+		HashSet<RenderEffectType> renderEffectsToRemove = new();
+		foreach (var kvp in renderEffects) {
+			kvp.Value.time += speedMul;
+			if (kvp.Value.time >= kvp.Value.maxTime) {
+				renderEffectsToRemove.Add(kvp.Key);
+			}
+		}
+		foreach (var renderEffect in renderEffectsToRemove) {
+			renderEffects.Remove(renderEffect);
+		}
 		updateHitboxes();
 	}
 
@@ -546,16 +658,19 @@ public partial class Actor : GameObject {
 	}
 
 	public void addGravity(ref float yVar) {
-		float maxVelY = Physics.MaxFallSpeed;
+		float maxVelY = getFallSpeed();
 		float gravity = getGravity();
+		reversedGravity = gravity < 0;
 
 		if (isUnderwater()) {
 			maxVelY = Physics.MaxUnderwaterFallSpeed;
 			gravity *= 0.5f;
 		}
 
-		yVar += Global.speedMul * gravity;
-		if (yVar > maxVelY) yVar = maxVelY;
+		if (yVar < maxVelY) {
+			yVar += Global.speedMul * gravity;
+			if (yVar > maxVelY) yVar = maxVelY;
+		}
 	}
 
 	public virtual void update() {
@@ -568,25 +683,6 @@ public partial class Actor : GameObject {
 		if (!startMethodCalled) {
 			onStart();
 			startMethodCalled = true;
-		}
-
-		if (ownedByLocalPlayer && netOwner != null) {
-			createRpcTime += Global.spf;
-			if (createRpcTime > 1) {
-				createRpcTime = 0;
-				createActorRpc(netOwner.id);
-			}
-		}
-
-		var renderEffectsToRemove = new HashSet<RenderEffectType>();
-		foreach (var kvp in renderEffects) {
-			kvp.Value.time -= Global.speedMul;
-			if (kvp.Value.time <= 0) {
-				renderEffectsToRemove.Add(kvp.Key);
-			}
-		}
-		foreach (var renderEffect in renderEffectsToRemove) {
-			renderEffects.Remove(renderEffect);
 		}
 
 		if (!locallyControlled) {
@@ -602,13 +698,6 @@ public partial class Actor : GameObject {
 			}
 		};
 
-		if (gravityWellable) {
-			Helpers.decrementTime(ref gravityWellTime);
-			if (gravityWellTime <= 0) {
-				gravityWellModifier = 1;
-			}
-		}
-
 		for (int i = 0; i < damageHistory.Count - 1; i++) {
 			if (Global.time - damageHistory[i].time > 15f &&
 				(damageHistory.Count > 1 || Global.level.isTraining())
@@ -617,10 +706,19 @@ public partial class Actor : GameObject {
 				i--;
 			}
 		}
+
+		if (gravityWellable) {
+			Helpers.decrementTime(ref gravityWellTime);
+			if (gravityWellTime <= 0) {
+				gravityWellModifier = 1;
+			}
+		}
 	}
 
 	public virtual void physicsUpdate() {
-		Character? chr = this as Character;
+		if (!locallyControlled) {
+			return;
+		}
 
 		bool wading = isWading();
 		bool underwater = isUnderwater();
@@ -634,79 +732,23 @@ public partial class Actor : GameObject {
 			if (vel.y > 0) vel.y = 0;
 		}
 
-		bool isRaSpawning = (this is RideArmor ra && ra.isSpawning());
-		bool isChrSpawning = (chr != null && chr.isSpawning());
-		if (splashable && !isChrSpawning && !isRaSpawning) {
-			if (wading || underwater) {
-				if (waterTime == 0) {
-					new Anim(new Point(pos.x, lastWaterY), "splash", 1, null, true);
-					playSound("splash");
-					vel.y = 0;
-				}
-				waterTime += Global.spf;
-			} else {
-				if (waterTime > 0) {
-					new Anim(new Point(pos.x, lastWaterY), "splash", 1, null, true);
-					playSound("splash");
-				}
-				waterTime = 0;
-			}
-
-			if (wading && !underwater) {
-				waterWade.visible = true;
-				if (waterWade.pos.x != pos.x) {
-					waterWade.changeSprite("wade_move", false);
-				} else {
-					waterWade.changeSprite("wade", false);
-				}
-				waterWade.pos = new Point(pos.x, lastWaterY);
-			} else {
-				waterWade.visible = false;
-			}
-
-			if (underwater) {
-				underwaterTime += Global.spf;
-				if (chr != null) {
-					bubbleTime += Global.spf;
-					if (bubbleTime > 1) {
-						bubbleTime = 0;
-						new BubbleAnim(chr.getHeadPos() ?? chr.getCenterPos(), "bubbles");
-					}
-				}
-				if (underwaterTime < 0.5f) {
-					bigBubbleTime -= Global.spf;
-					if (bigBubbleTime <= 0) {
-						bigBubbleTime = 0.08f;
-						var points = globalCollider?.shape.points;
-						if (points != null && points.Count >= 1) {
-							new BubbleAnim(
-								new Point(pos.x, points[0].y), "bigbubble" + ((Global.floorFrameCount % 3) + 1)
-							);
-						}
-					}
-				}
-			} else {
-				underwaterTime = 0;
-			}
-		}
+		splashEffects();
 	}
 
 	// This code is horrible awfull confusing ugly and slow.
 	// Also why the game lags so much. We need to optimize it ASAP.
 	public void localUpdate(bool underwater) {
-		Character? chr = this as Character;
 		float grav = getGravity();
-		float terminalVelDown = Physics.MaxFallSpeed;
-		if (underwater) {
-			terminalVelDown = Physics.MaxUnderwaterFallSpeed;
-		}
-		if (useGravity && !grounded) {
+		float terminalVelDown = getFallSpeed();
+		reversedGravity = grav < 0;
+
+		if (gravityOverride ?? useGravity && !grounded) {
 			// Water slowing down the fall.
 			if (underwater) {
 				grav *= 0.5f;
 			}
 			// Apply gravity only if bellow terminal vel.
-			// This allows some attacks to go beyond it.
+			// Clamp only if applied. This allows some attacks to go beyond it.
 			if (grav > 0 && vel.y < terminalVelDown) {
 				vel.y += grav * Global.speedMul;
 				if (vel.y > terminalVelDown) {
@@ -756,6 +798,20 @@ public partial class Actor : GameObject {
 			yPushVel = 0f;
 		}
 
+		if (xTenguPushVel != 0 && Math.Sign(xTenguPushVel) != xDir) {
+			xTenguPushVel = 0;
+		}
+		if (Math.Abs(xTenguPushVel) != 0) {
+			xTenguPushVel = Helpers.lerp(xTenguPushVel, 0, Global.spf * 7);
+
+			var wall = Global.level.checkTerrainCollisionOnce(this, xTenguPushVel * Global.spf, 0);
+			if (wall != null && wall.gameObject is Wall) {
+				xTenguPushVel = 0;
+			}
+		} else if (xTenguPushVel != 0) {
+			xTenguPushVel = 0;
+		}
+
 		if (Math.Abs(xSwingVel) > 0.1f) {
 			if (grounded ||
 				Global.level.checkTerrainCollisionOnce(this, xSwingVel * speedMul, 0)?.gameObject is Wall
@@ -771,19 +827,21 @@ public partial class Actor : GameObject {
 		}
 		if (xIceVel != 0f) {
 			xIceVel = Helpers.lerp(xIceVel, 0f, Global.spf);
-			if (MathF.Abs(xIceVel) < 1 / 32f) {
+			if (MathF.Abs(xIceVel) < 1 / 64f) {
 				xIceVel = 0f;
 			} else {
 				// Gacel's notes:
 				// There must be a better way to do this, really.
 				Point oldPos = pos;
 				Point oldDeltaPos = deltaPos;
+				Point oldMoveDelta = stackedMoveDelta;
 				moveXY(xIceVel, 0, useIce: false);
 				if (oldPos.x == pos.x && oldPos.y == pos.y) {
 					xIceVel = 0f;
 				}
-				unsafePos = oldPos;
+				changePos(oldPos);
 				deltaPos = oldDeltaPos;
+				stackedMoveDelta = oldMoveDelta;
 			}
 		}
 
@@ -794,42 +852,42 @@ public partial class Actor : GameObject {
 		}
 
 		if (!isStatic) {
-			float xExtraSpeed = xFlinchPushVel + xIceVel + xPushVel + xSwingVel;
+			float xExtraSpeed = xFlinchPushVel + xIceVel + xPushVel + xSwingVel + xTenguPushVel;
 			movePoint((vel / 60f).addxy(xExtraSpeed, 0), true, true, false);
 			if (yPushVel != 0) {
 				moveXY(0, yPushVel, true, false, false);
 			}
 		}
 
+		// Fallback to gravity flag.
 		float yMod = reversedGravity ? -1 : 1;
-		if (chr?.charState is VileMK2Grabbed) {
-			grounded = false;
-		} else if (physicsCollider != null && !isStatic && (canBeGrounded || useGravity)) {
+		// Grounded checks.
+		if (physicsCollider != null && !isStatic && (canBeGrounded || (gravityOverride ?? useGravity))) {
 			float yDist = 1 * Global.gameSpeed;
 			if (grounded && vel.y * yMod >= 0 && prevPos.y >= pos.y && !movedUpOnFrame) {
 				yDist = 4 * Global.gameSpeed;
 			}
 			yDist *= yMod;
+			CollideData? collideData = Global.level.checkTerrainCollisionOnce(
+				this, 0, yDist, checkPlatforms: true, checkQuicksand: true
+			);
 
-			CollideData? collideData = Global.level.checkTerrainCollisionOnce(this, 0, yDist, checkPlatforms: true);
+			bool isSand = false;
+			if (collideData?.gameObject is SandZone) {
+				move(new Point(0, 0.25f * 60));
+				if (collideData.gameObject.collider?.shape.minY <= pos.y) {
+					isSand = true;
+				}
+			}
 
-			var hitActor = collideData?.gameObject as Actor;
+			Actor? hitActor = collideData?.gameObject as Actor;
 			bool isPlatform = false;
 			bool tooLowOnPlatform = false;
 			if (hitActor?.isPlatform == true) {
-				bool dropThruWolfPaw = (
-					hitActor is WolfSigmaHand &&
-					chr != null && !chr.grounded &&
-					chr.player.input.isHeld(Control.Down, chr.player)
-				);
-				if (!dropThruWolfPaw) {
-					isPlatform = true;
-					if (pos.y > hitActor.getTopY() + 10) {
-						tooLowOnPlatform = true;
-						isPlatform = false;
-					}
-				} else {
-					collideData = null;
+				isPlatform = true;
+				if (pos.y > hitActor.getTopY() + 10) {
+					tooLowOnPlatform = true;
+					isPlatform = false;
 				}
 			}
 
@@ -847,16 +905,7 @@ public partial class Actor : GameObject {
 				landingVelY = vel.y;
 				vel.y = 0;
 
-				var hitWall = collideData.gameObject as Wall;
-				if (hitWall?.isMoving == true) {
-					movePoint(hitWall.deltaMove, useDeltaTime: false);
-				} else if (hitWall != null && hitWall.moveX != 0) {
-					if (this is RideChaser rc) {
-						rc.addXMomentum(hitWall.moveX * 60);
-					} else {
-						moveXY(hitWall.moveX, 0);
-					}
-				}
+				Wall? hitWall = collideData.gameObject as Wall;
 				if (isPlatform && hitActor != null) {
 					movePoint(hitActor.deltaPos, useDeltaTime: false);
 				}
@@ -867,8 +916,10 @@ public partial class Actor : GameObject {
 				}
 
 				//If already grounded, snap to ground further
-				CollideData? collideDataCloseCheck = Global.level.checkTerrainCollisionOnce(this, 0, 0.05f * yMod);
-				if (collideDataCloseCheck == null) {
+				CollideData? collideDataCloseCheck = Global.level.checkTerrainCollisionOnce(
+					this, 0, 0.05f * yMod
+				);
+				if (!isSand && collideDataCloseCheck == null) {
 					var yVel = new Point(0, yDist);
 					var mtv = Global.level.getMtvDir(
 						this, 0, yDist, yVel, false, new List<CollideData>() { collideData }
@@ -882,26 +933,99 @@ public partial class Actor : GameObject {
 				grounded = false;
 				groundedIce = false;
 			}
+
+			moveWithMovingPlatform();
 		}
 		if (grounded) {
 			lastGroundedPos = pos;
+			if (Global.level.getGroundPosNoKillzone(
+				lastGroundedPos, incMove: false, incPlat: false
+			)?.x == lastGroundedPos.x) {
+				lastSafeGroundedPos = pos;
+			}
+			if (Global.level.getGroundPosNoKillzone(
+				lastGroundedPos, incMove: false
+			)?.x == lastGroundedPos.x) {
+				lastSafeGroundedPosAlt = pos;
+			}
 		}
 		movedUpOnFrame = false;
 	}
 
+	public void splashEffects() {
+		if (!splashable) {
+			return;
+		}
+		if ((this as Character)?.isSpawning() == true) {
+			return;
+		}
+		if ((this as RideArmor)?.isSpawning() == true) {
+			return;
+		}
+		bool wading = isWading();
+		bool underwater = isUnderwater();
+
+		if (wading || underwater) {
+			if (waterTime == 0) {
+				new Anim(new Point(pos.x, lastWaterY), "splash", 1, null, true);
+				playSound("splash");
+				vel.y = 0;
+			}
+			waterTime += Global.spf;
+		} else {
+			if (waterTime > 0) {
+				new Anim(new Point(pos.x, lastWaterY), "splash", 1, null, true);
+				playSound("splash");
+			}
+			waterTime = 0;
+		}
+		if (wading && !underwater) {
+			waterWade.visible = true;
+			if (waterWade.pos.x != pos.x) {
+				waterWade.changeSprite("wade_move", false);
+			} else {
+				waterWade.changeSprite("wade", false);
+			}
+			waterWade.pos = new Point(pos.x, lastWaterY);
+		} else {
+			waterWade.visible = false;
+		}
+		if (underwater) {
+			underwaterTime += Global.spf;
+			if (this is Character chara) {
+				bubbleTime += Global.spf;
+				if (bubbleTime > 2) {
+					bubbleTime = 0;
+					new BubbleAnim(chara.getHeadPos() ?? chara.getCenterPos(), "bubbles");
+				}
+			}
+			if (underwaterTime < 0.5f) {
+				bigBubbleTime -= Global.spf;
+				if (bigBubbleTime <= 0) {
+					bigBubbleTime = 0.08f;
+					var points = globalCollider?.shape.points;
+					if (points != null && points.Count >= 1) {
+						new BubbleAnim(
+							new Point(pos.x, points[0].y),
+							"bigbubble" + ((Global.frameCount % 3) + 1)
+						);
+					}
+				}
+			}
+		} else {
+			underwaterTime = 0;
+		}
+	}
+
 	public float getTopY() {
-		var collider = this.standartCollider;
-
-		float cx = sprite.animData.baseAlignmentX;
-		float cy = sprite.animData.baseAlignmentY;
-		
-		cx = cx * currentFrame.rect.w();
-		cy = cy * currentFrame.rect.h();
-
+		Collider? collider = standartCollider;
 		if (collider == null) {
 			return pos.y;
 		}
-		return pos.y - (collider.shape.getRect().h() * cy);
+		float cy = sprite.animData.baseAlignmentY;
+		cy = cy * collider.shape.getRect().h();
+
+		return pos.y - cy;
 	}
 
 	public float getYMod() {
@@ -927,37 +1051,52 @@ public partial class Actor : GameObject {
 	) {
 		if (damageHistory.Count > 0) {
 			for (int i = damageHistory.Count - 1; i >= 0; i--) {
-				var lastAttacker = damageHistory[i];
-				if (lastAttacker.envKillOnly && weaponIndex != null) continue;
-				if (Global.time - lastAttacker.time > 10) continue;
-				killer = lastAttacker.attacker;
-				weaponIndex = lastAttacker.weapon;
-				break;
-			}
-		}
-		if (damageHistory.Count > 0) {
-			for (int i = damageHistory.Count - 1; i >= 0; i--) {
-				var secondLastAttacker = damageHistory[i];
-				if (secondLastAttacker.attacker == killer) continue;
-
-				// Non-suicide case: prevent assists aggressively
-				if (killer != ownPlayer && (
-						secondLastAttacker.envKillOnly && weaponIndex != null ||
-						Global.time - secondLastAttacker.time > (Global.level?.server?.customMatchSettings?.assistTime ?? 2) ||	
-						Damager.unassistable(secondLastAttacker.projId)
-					)
+				DamageEvent lastAttacker = damageHistory[i];
+				if (// Enviroment kill weapons.
+					lastAttacker.envKillOnly && weaponIndex != null ||
+					// Suicide.
+					killer != null && lastAttacker.attacker == ownPlayer ||
+					// Stage kill.
+					killer != null && killer != ownPlayer && lastAttacker.attacker == Player.stagePlayer
 				) {
 					continue;
 				}
-				// Suicide case: grant assists liberally to "punish" suicider more
-				else if (Global.time - secondLastAttacker.time > 10) {
+				killer = lastAttacker.attacker;
+				weaponIndex = lastAttacker.weapon;
+				// If a suicide or stage kill. Search for anyone else.
+				if (killer == Player.stagePlayer || killer == ownPlayer) {
 					continue;
 				}
+				break;
+			}
+		}
+		// Seach for assist.
+		// If out kill is ourself or the stage means we did not got a kill.
+		// In that case we do an alternate search.
+		if (damageHistory.Count > 0 && killer != Player.stagePlayer && killer != ownPlayer) {
+			for (int i = damageHistory.Count - 1; i >= 0; i--) {
+				var secondLastAttacker = damageHistory[i];
+				// Avoid the killer.
+				if (secondLastAttacker.attacker == killer) continue;
+				// Avoid self.
+				if (secondLastAttacker.attacker == ownPlayer) continue;
 
+				// Non-suicide case: prevent assists aggressively
+				if (secondLastAttacker.envKillOnly && weaponIndex != null ||
+					Global.time - secondLastAttacker.time > 4 ||
+					Damager.unassistable(secondLastAttacker.projId)
+				) {
+					continue;
+				}
 				assister = secondLastAttacker.attacker;
 				assisterProjId = secondLastAttacker.projId;
 				assisterWeaponId = secondLastAttacker.weapon;
 			}
+		}
+		// Use last damaged target if we have not a kill.
+		else if (ownPlayer?.lastDamagedCharacter != null) {
+			killer = ownPlayer.lastDamagedCharacter.player;
+			weaponIndex = 0;
 		}
 	}
 
@@ -969,7 +1108,9 @@ public partial class Actor : GameObject {
 			return false;
 		}
 		if (netcodeOverride != null) {
-			if (netcodeOverride == NetcodeModel.FavorDefender) {
+			if (netcodeOverride == NetcodeModel.FavorDefender ||
+				netcodeOverride == NetcodeModel.FavorServer
+			) {
 				return true;
 			} else {
 				return false;
@@ -991,6 +1132,57 @@ public partial class Actor : GameObject {
 		return isDefenderFavored() && ownedByLocalPlayer;
 	}
 
+	public bool isFTD() {
+		if (Global.isOffline) {
+			return false;
+		}
+		if (netcodeOverride != null) {
+			if (netcodeOverride == NetcodeModel.FavorDefender) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+		if (!Global.level.server.favorHost) {
+			if (this is Character chr) {
+				return chr.player?.isDefenderFavored == true;
+			}
+			if (netOwner != null) {
+				return netOwner.isDefenderFavored;
+			}
+			if (this is Projectile proj) {
+				return proj.owner?.isDefenderFavored == true;
+			}
+		}
+		return false;
+	}
+
+	public bool isFTS() {
+		if (Global.isOffline) {
+			return false;
+		}
+		if (netcodeOverride != null) {
+			if (netcodeOverride == NetcodeModel.FavorServer) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+		if (Global.level.server.favorHost) {
+			if (this is Character chr) {
+				return chr.player?.isDefenderFavored == true;
+			}
+			if (netOwner != null) {
+				return netOwner.isDefenderFavored;
+			}
+			if (this is Projectile proj) {
+				return proj.owner?.isDefenderFavored == true;
+			}
+		}
+		return false;
+	}
+
+
 	// This can be used if a certain effect should be done by only the attacker or defender (if defender favor is on)
 	public bool isRunByLocalPlayer() {
 		if (Global.isOffline) return true;
@@ -1006,9 +1198,6 @@ public partial class Actor : GameObject {
 
 	}
 
-	public bool destroyPosSet;
-	public float destroyPosTime;
-	public float maxDestroyTime;
 	public void moveToPosThenDestroy(Point destroyPos, float speed) {
 		destroyPosSet = true;
 		vel = pos.directionToNorm(destroyPos).times(speed);
@@ -1089,7 +1278,6 @@ public partial class Actor : GameObject {
 				}
 			}
 
-			
 			int spriteIndex = -1;
 			if (Global.spriteIndexByName.ContainsKey(sprite.name)) {
 				spriteIndex = Global.spriteIndexByName[sprite.name];
@@ -1157,19 +1345,22 @@ public partial class Actor : GameObject {
 		if (!shouldRender(x, y)) {
 			return;
 		}
-
 		//console.log(this.pos.x + "," + this.pos.y);
+		if (yDirMod() == -1 && reversedGravity) {
+			y += yDirOffset();
+		}
 
-		float drawX = MathF.Round(pos.x);
-		float drawY = MathF.Round(pos.y);
+		float drawX = MathF.Round(pos.x) + MathF.Round(x);
+		float drawY = MathF.Round(pos.y) + MathF.Round(y);
 
 		if (customAngleRendering) {
 			renderFromAngle(x, y);
 		} else {
 			sprite.draw(
-				frameIndex, drawX, drawY, xDir, yDir,
+				frameIndex, drawX, drawY, xDir, yDirMod(),
 				getRenderEffectSet(), alpha, xScale, yScale, zIndex,
-				getShaders(), angle: angle, actor: this, useFrameOffsets: true
+				getShaders(), angle: angle, actor: this, useFrameOffsets: true,
+				spriteColor
 			);
 		}
 
@@ -1180,18 +1371,25 @@ public partial class Actor : GameObject {
 		commonHealLogic(healer, (decimal)healAmount, (decimal)currentHealth, (decimal)maxHealth, drawHealText);
 	}
 
-	public void commonHealLogic(Player healer, decimal healAmount, decimal currentHealth, decimal maxHealth, bool drawHealText) {
-		if (drawHealText && ownedByLocalPlayer) {
-			float reportAmount = (float)Helpers.clampMax(healAmount, maxHealth - currentHealth);
-			if (reportAmount == 0) {
-				bool hasSubtankCapacity = false;
-				if (this is Character chr && chr.player.hasSubtankCapacity()) hasSubtankCapacity = true;
-				if (this is Maverick maverick && maverick.player.hasSubtankCapacity()) hasSubtankCapacity = true;
-				if (hasSubtankCapacity) {
-					RPC.playSound.sendRpc("subtankFill", netId);
-				}
-			} else {
-				healer.creditHealing(reportAmount);
+	public void commonHealLogic(
+		Player healer, decimal healAmount,
+		decimal currentHealth, decimal maxHealth,
+		bool drawHealText
+	) {
+		if (!ownedByLocalPlayer) {
+			return;
+		}
+		float reportAmount = (float)Helpers.clampMax(healAmount, maxHealth - currentHealth);
+		if (reportAmount == 0) {
+			bool hasSubtankCapacity = false;
+			if (this is Character chr && chr.player.hasSubtankCapacity()) hasSubtankCapacity = true;
+			if (this is Maverick maverick && maverick.player.hasSubtankCapacity()) hasSubtankCapacity = true;
+			if (hasSubtankCapacity) {
+				RPC.playSound.sendRpc("subtankFill", netId);
+			}
+		} else {
+			healer.creditHealing(reportAmount);
+			if (drawHealText) {
 				addDamageTextHelper(healer, -reportAmount, 16, sendRpc: true);
 			}
 		}
@@ -1204,9 +1402,9 @@ public partial class Actor : GameObject {
 
 		if (damage >= Damager.ohkoDamage && damage >= maxHealth) {
 			if (Helpers.randomRange(0, 20) != 10) {
-				addDamageText("Instakill!", (int)FontType.RedishOrange);
+				addDamageText("Instakill!", (int)FontType.OrangeSmall);
 			} else {
-				addDamageText("Fatality!", (int)FontType.RedishOrange);
+				addDamageText(damage);
 			}
 		} else if (attacker.isMainPlayer) {
 			addDamageText(damage);
@@ -1216,7 +1414,7 @@ public partial class Actor : GameObject {
 		}
 	}
 
-	public void addDamageText(float damage) {
+	public void addDamageText(float damage, int? color = null) {
 		int xOff = 0;
 		int yOff = 0;
 		for (int i = damageTexts.Count - 1; i >= 0; i--) {
@@ -1225,10 +1423,12 @@ public partial class Actor : GameObject {
 			}
 		}
 		string text = damage.ToString();
-		FontType color = FontType.Red;
-		if (damage < 0) {
-			text = (damage * -1).ToString();
-			color = FontType.Green;
+		if (color == null) {
+			color = (int)FontType.RedSmall;
+			if (damage < 0) {
+				text = (damage * -1).ToString();
+				color = (int)FontType.GreenSmall;
+			}
 		}
 		if (damage != 0 && damage < 1 && damage > -1) {
 			text = text[1..];
@@ -1302,17 +1502,25 @@ public partial class Actor : GameObject {
 		frameSpeed = 1;
 	}
 
-	public void addRenderEffect(
+	public RenderEffect addRenderEffect(
 		RenderEffectType type, float flashTime = 0,
 		float time = float.MaxValue, float cycleTime = -1
 	) {
-		if (renderEffects.ContainsKey(type)) return;
-		renderEffects[type] = new RenderEffect(type, flashTime, time, cycleTime);
+		if (renderEffects.TryGetValue(type, out RenderEffect? value)) {
+			return value;
+		}
+		RenderEffect effect = new RenderEffect(type, flashTime, time, cycleTime);
+		renderEffects[type] = effect;
+		return effect;
 	}
 
-	public void addRenderEffect(RenderEffectType type) {
-		if (renderEffects.ContainsKey(type)) return;
-		renderEffects[type] = new RenderEffect(type, 0, float.MaxValue);
+	public RenderEffect addRenderEffect(RenderEffectType type) {
+		if (renderEffects.TryGetValue(type, out RenderEffect? value)) {
+			return value;
+		}
+		RenderEffect effect = new RenderEffect(type, 0, float.MaxValue);
+		renderEffects[type] = effect;
+		return effect;
 	}
 
 
@@ -1327,7 +1535,9 @@ public partial class Actor : GameObject {
 
 	// These are ones that should be cleaned up when the player leaves, but too important to be deleted if no response in 5 seconds
 	public bool cleanUpOnPlayerLeave() {
-		return this is Maverick || this is RideArmor || this is WolfSigmaHand || this is WolfSigmaHead;
+		return (
+			this is Character or Maverick or RideArmor or WolfSigmaHand or WolfSigmaHead
+		);
 	}
 
 	public virtual void onDestroy() {
@@ -1354,10 +1564,8 @@ public partial class Actor : GameObject {
 				netId is not null &&
 				Global.level.actorsById.ContainsKey(netId.Value)
 			) {
-				if (Global.level.actorsById[netId.Value] == this) {
-					Global.level.actorsById.Remove(netId.Value);
-					Global.level.destroyedActorsById[netId.Value] = this;
-				}
+				Global.level.actorsById.Remove(netId.Value);
+				Global.level.destroyedActorsById[netId.Value] = this;
 			}
 			onDestroy();
 		} else {
@@ -1369,7 +1577,6 @@ public partial class Actor : GameObject {
 		ushort spriteNameIndex = ushort.MaxValue;
 		if (!String.IsNullOrEmpty(spriteName)) {
 			var anim = new Anim(getCenterPos(), spriteName, xDir, null, true);
-			// TODO: Fix this. WTF GM19.
 			if (angleSet) {
 				if (useAngleOnFade) {
 					anim.byteAngle = byteAngle;
@@ -1378,7 +1585,6 @@ public partial class Actor : GameObject {
 					anim.xDir *= -1;
 				}
 			}
-
 			anim.xScale = xScale;
 			anim.yScale = yScale;
 			spriteNameIndex = Global.spriteIndexByName[spriteName];
@@ -1480,6 +1686,7 @@ public partial class Actor : GameObject {
 				BusterZero => "dzero",
 				Vile => "vile",
 				Axl => "axl",
+				Rock => "rock",
 				CmdSigma => "sigma",
 				NeoSigma => "neosigma",
 				Doppma => "doppma",
@@ -1513,17 +1720,17 @@ public partial class Actor : GameObject {
 			return null;
 		}
 
-		int? charNum = null;
+		int? charSoundNum = null;
 		if (this is Character || this is Maverick) {
-			charNum = this is Character chr ? chr.player.charNum : 4;
+			charSoundNum = this is Character chr ? chr.player.charNum : 4;
 		}
 
 		SoundWrapper sound = createSoundWrapper(soundBuffer);
 		sound.play();
 
-		if (charNum != null && soundBuffer.soundPool != SoundPool.Voice) {
+		if (charSoundNum != null && soundBuffer.soundPool != SoundPool.Voice) {
 			var matchingVoice = Helpers.getRandomMatchingVoice(
-				Global.voiceBuffers, soundBuffer.soundKey, charNum.Value
+				Global.voiceBuffers, soundBuffer.soundKey, charSoundNum.Value
 			);
 			if (matchingVoice != null) {
 				playSound(matchingVoice);
@@ -1569,9 +1776,12 @@ public partial class Actor : GameObject {
 		if (pos == null) pos = getCenterPos();
 		if (!player.ownedByLocalPlayer) sendRpc = false;
 
-		Anim.createGibEffect("shotgun_ice_break", pos.Value, player, sendRpc: sendRpc);
+		Anim.createGibEffect(
+			"freeze_cracker_sparkles", pos.Value, player, sendRpc: sendRpc,
+			pieceOverdive: 6, gibPattern: GibPattern.Random
+		);
 
-		playSound("iceBreak", sendRpc: sendRpc);
+		playSound("freezebreak2", sendRpc: sendRpc);
 	}
 
 	public void updateProjectileCooldown() {
@@ -1585,12 +1795,6 @@ public partial class Actor : GameObject {
 			float cooldown = flinchCooldown[key];
 			if (cooldown > 0) {
 				flinchCooldown[key] = Helpers.clampMin(cooldown - Global.gameSpeed, 0);
-			}
-		}
-		foreach (int key in globalFlinchCooldown.Keys.ToList()) {
-			float cooldown = globalFlinchCooldown[key];
-			if (cooldown > 0) {
-				globalFlinchCooldown[key] = Helpers.clampMin(cooldown - Global.gameSpeed, 0);
 			}
 		}
 	}
@@ -1612,6 +1816,7 @@ public partial class Actor : GameObject {
 		xPushVel = 0;
 		yPushVel = 0;
 		xSwingVel = 0;
+		xTenguPushVel = 0;
 		vel.x = 0;
 		vel.y = 0;
 	}
@@ -1635,14 +1840,17 @@ public partial class Actor : GameObject {
 		return false;
 	}
 
+	public Point getPoiDir() {
+		return new Point(xDir * xScale, yDirMod() * yScale);
+	}
+
 	public Point getPoiOrigin() {
-		if (!reversedGravity) return pos;
 		if (this is MagnaCentipede ms) return pos.addxy(0, -ms.height);
-		return pos;
+		return pos.addxy(0, yDirOffset());
 	}
 
 	public Point getPOIPos(Point poi) {
-		return getPoiOrigin().addxy(poi.x * xDir * xScale, poi.y * yScale);
+		return getPoiOrigin() + poi * getPoiDir();
 	}
 
 	public Point getFirstPOIOrDefault(int index = 0) {
@@ -1699,16 +1907,22 @@ public partial class Actor : GameObject {
 		return pos.add(deltaPos.times(pingSeconds / Global.spf));
 	}
 
-	public void addMusicSource(string musicName, Point worldPos, bool moveWithActor, bool loop = true) {
+	public MusicWrapper addMusicSource(
+		string musicName, Point worldPos, bool moveWithActor,
+		bool loop = true, bool autoStart = true
+	) {
 		var ms = Global.musics[musicName].clone();
 		ms.musicSourcePos = worldPos;
 		ms.musicSourceActor = this;
 		ms.volume = 0;
 		ms.moveWithActor = moveWithActor;
 		ms.loop = loop;
-		ms.play();
+		if (autoStart) {
+			ms.play();
+		}
 		Global.level.musicSources.Add(ms);
 		musicSource = ms;
+		return ms;
 	}
 
 	public void destroyMusicSource() {
@@ -1727,32 +1941,45 @@ public partial class Actor : GameObject {
 		return -1;
 	}
 
-	public void moveWithMovingPlatform() {
-		if (!Global.level.hasMovingPlatforms) isStatic = true;
-		var collideDatas = Global.level.getTerrainTriggerList(
-			this, new Point(0, 1), typeof(Wall), typeof(MovingPlatform)
+	public void moveWithMovingPlatform(Point? overrideCollider = null) {
+		/* if (!Global.level.hasMovingPlatforms) {
+			return;
+		} */ //TODO: Add a proper exception for ice wall.
+		Point collideDir = overrideCollider ?? new Point(0, 1);
+		List<CollideData> collideDatas =  Global.level.checkTerrainCollision(
+			this, collideDir.x, collideDir.y, checkPlatforms: true, checkQuicksand: true
 		);
-		foreach (var collideData in collideDatas) {
-			var hitWall = collideData?.gameObject as Wall;
-			if (hitWall != null && hitWall.isMoving) {
-				movePoint(hitWall.deltaMove, useDeltaTime: false);
-				break;
+		foreach (CollideData collideData in collideDatas) {
+			if (collideData.gameObject is Wall wall) {
+				if (wall.isMoving) {
+					move(wall.deltaMove, useIce: false, useDeltaTime: false);
+				}
+				if (wall.moveX != 0) {
+					moveXY(wall.moveX, 0, useIce: false);
+				}
+				if (wall.moveY != 0 && this is IDamagable damagable &&
+					damagable.isPlayableDamagable()
+				) {
+					damagable.actor().yPushVel = wall.moveY;
+				}
+				continue;
+			}
+			if (collideData.gameObject is MovingPlatform platform && platform.deltaMove != Point.zero) {
+				move(platform.deltaMove, useDeltaTime: false);
+				continue;
+			}
+			if (collideData.gameObject is Actor actor &&
+				(actor.isSolidWall || actor.isPlatform && actor.canBePlatform(this)) &&
+				(actor.selectiveSolididyFunc == null || actor.selectiveSolididyFunc(this))
+			) {
+				move(actor.deltaPos, useDeltaTime: false, useIce: false);
 			}
 		}
 	}
 
-	public const int labelCursorOffY = 5;
-	public const int labelWeaponIconOffY = 18;
-	public const int labelKillFeedIconOffY = 9;
-	public const int labelAxlAimModeIconOffY = 15;
-	public const int labelCooldownOffY = 15;
-	public const int labelSubtankOffY = 17;
-	public const int labelStatusOffY = 20;
-	public const int labelHealthOffY = 6;
-	public const int labelNameOffY = 10;
-
-	public float currentLabelY;
-	public Point lastGroundedPos;
+	public virtual bool canBePlatform(GameObject other) {
+		return true;
+	}
 
 	public void deductLabelY(float amount) {
 		currentLabelY -= amount;
@@ -1769,6 +1996,86 @@ public partial class Actor : GameObject {
 
 		DrawWrappers.DrawRect(pos.x - 47 + sx, pos.y - 16 + sy, pos.x - 42 + sx, pos.y + 16 + sy, true, Color.Black, 0, ZIndex.HUD - 1, outlineColor: Color.White);
 		DrawWrappers.DrawRect(pos.x - 46 + sx, pos.y + 15 - width + sy, pos.x - 43 + sx, pos.y + 15 + sy, true, color, 0, ZIndex.HUD - 1);
+	}
+
+	public void drawBarV(decimal length, decimal maxLength, int colorIndex, Point barPos, bool drawFullBar = true) {
+		Point bp = barPos;
+		decimal lengthFloor = Math.Floor(length);
+		decimal lengthCeiling = Math.Ceiling(length);
+		float alpha = (float)length - (float)lengthFloor;
+		for (int i = 0; i < maxLength; i++) {
+			if (i < lengthFloor) {
+				Global.sprites["hud_bar_small_v"].draw(colorIndex, bp.x, bp.y, 1, 1, null, 1, 1, 1, ZIndex.HUD - 1);
+			} else {
+				Global.sprites["hud_bar_small_v"].draw(0, bp.x, bp.y, 1, 1, null, 1, 1, 1, ZIndex.HUD - 1);
+				if (i < lengthCeiling) {
+					Global.sprites["hud_bar_small_v"].draw(colorIndex, bp.x, bp.y,  1, 1, null, alpha, 1, 1, ZIndex.HUD - 1);
+				} else if (drawFullBar) {
+					Global.sprites["hud_bar_small_v"].draw(0, bp.x, bp.y, 1, 1, null, 1, 1, 1, ZIndex.HUD - 1);
+				}
+			}
+			bp.y -= 2;
+		}
+	}
+
+	public void drawBarH(decimal length, decimal maxLength, int colorIndex, Point barPos, bool drawFullBar = true) {
+		Point bp = barPos;
+		decimal lengthFloor = Math.Floor(length);
+		decimal lengthCeiling = Math.Ceiling(length);
+		float alpha = (float)length - (float)lengthFloor;
+		for (int i = 0; i < maxLength; i++) {
+			if (i < lengthFloor) {
+				Global.sprites["hud_bar_small_h"].draw(colorIndex, bp.x, bp.y, 1, 1, null, 1, 1, 1, ZIndex.HUD - 1);
+			} else {
+				Global.sprites["hud_bar_small_h"].draw(0, bp.x, bp.y, 1, 1, null, 1, 1, 1, ZIndex.HUD - 1);
+				if (i < lengthCeiling) {
+					Global.sprites["hud_bar_small_h"].draw(colorIndex, bp.x, bp.y,  1, 1, null, alpha, 1, 1, ZIndex.HUD - 1);
+				} else if (drawFullBar) {
+					Global.sprites["hud_bar_small_h"].draw(0, bp.x, bp.y, 1, 1, null, 1, 1, 1, ZIndex.HUD - 1);
+				}
+			}
+			bp.x += 2;
+		}
+	}
+
+	public void drawBarVHUD(decimal length, decimal maxLength, int colorIndex, Point barPos, bool drawFullBar = true) {
+		Point bp = barPos.substractxy(Global.level.camX, Global.level.camY);
+		decimal lengthFloor = Math.Floor(length);
+		decimal lengthCeiling = Math.Ceiling(length);
+		float alpha = (float)length - (float)lengthFloor;
+		for (int i = 0; i < maxLength; i++) {
+			if (i < lengthFloor) {
+				Global.sprites["hud_bar_small_v"].drawToHUD(colorIndex, bp.x, bp.y);
+			} else {
+				Global.sprites["hud_bar_small_v"].drawToHUD(0, bp.x, bp.y);
+				if (i < lengthCeiling) {
+					Global.sprites["hud_bar_small_v"].drawToHUD(colorIndex, bp.x, bp.y, alpha);
+				} else if (drawFullBar) {
+					Global.sprites["hud_bar_small_v"].drawToHUD(0, bp.x, bp.y);
+				}
+			}
+			bp.y -= 2;
+		}
+	}
+
+	public void drawBarHHUD(decimal length, decimal maxLength, int colorIndex, Point barPos, bool drawFullBar = true) {
+		Point bp = barPos.substractxy(Global.level.camX, Global.level.camY);
+		decimal lengthFloor = Math.Floor(length);
+		decimal lengthCeiling = Math.Ceiling(length);
+		float alpha = (float)length - (float)lengthFloor;
+		for (int i = 0; i < maxLength; i++) {
+			if (i < lengthFloor) {
+				Global.sprites["hud_bar_small_h"].drawToHUD(colorIndex, bp.x, bp.y);
+			} else {
+				Global.sprites["hud_bar_small_h"].drawToHUD(0, bp.x, bp.y);
+				if (i < lengthCeiling) {
+					Global.sprites["hud_bar_small_h"].drawToHUD(colorIndex, bp.x, bp.y, alpha);
+				} else if (drawFullBar) {
+					Global.sprites["hud_bar_small_h"].drawToHUD(0, bp.x, bp.y);
+				}
+			}
+			bp.x += 2;
+		}
 	}
 
 	public CollideData? getHitWall(float x, float y) {
@@ -1802,7 +2109,45 @@ public partial class Actor : GameObject {
 	}
 
 	public virtual float getGravity() {
-		return Global.level.gravity * gravityModifier * gravityWellModifier;
+		float grav = Global.level.gravity * gravityModifier;
+		var gzData = getGravityZoneData();
+
+		// TODO: Add sideways gravity.
+		if (gzData.hit > 0) {
+			if (gzData.velY != null) { grav = gzData.velY.Value; }
+			if (gzData.mul != null) { grav *= gzData.mul.Value; }
+		}
+		return grav;
+	}
+
+	public virtual float gravityMod() {
+		float grav = 1;
+		var gzData = getGravityZoneData();
+
+		// TODO: Add sideways gravity.
+		if (gzData.hit > 0) {
+			if (gzData.velY != null) { grav = MathF.Sign(gzData.velY.Value); }
+			if (gzData.mul != null) { grav *= gzData.mul.Value; }
+		}
+		return grav * gravityModifier;
+	}
+
+	public int gravitySign() {
+		int gsign = Math.Sign(gravityMod());
+		return gsign != 0 ? gsign : 1;
+	}
+
+	public int yDirMod() {
+		int tempYDir = yDir;
+		tempYDir *= gravitySign();
+		return tempYDir;
+	}
+
+	public virtual int yDirOffset() => 0;
+
+	public virtual float getFallSpeed(bool checkUnderwater = true) {
+		if (isUnderwater() && checkUnderwater) return Physics.MaxUnderwaterFallSpeed;
+		return Physics.MaxFallSpeed;
 	}
 
 	public Actor[] getCloseActors(
@@ -1814,15 +2159,16 @@ public partial class Actor : GameObject {
 
 		Point checkPos = new Point(MathF.Round(pos.x), MathF.Round(pos.y));
 		Shape shape = Rect.createFromWH(
-			pos.x - halfDist, pos.y - halfDist,
+			MathInt.Round(pos.x) - halfDist, MathInt.Round(pos.y) - halfDist,
 			distance, distance
 		).getShape();
-		var hits = Global.level.checkCollisionsShape(shape, null);
+		List<CollideData> hits = Global.level.checkCollisionsShape(shape, null);
+
 		int alliance = -1;
 		if (!includeAllies) {
 			alliance = this switch {
 				Character selfChar => selfChar.player.alliance,
-				Projectile selfProj => selfProj.damager.owner.alliance,
+				Projectile selfProj => selfProj.damager.alliance,
 				Maverick selfMvrk => selfMvrk.player.alliance,
 				_ => -1
 			};
@@ -1848,6 +2194,6 @@ public partial class Actor : GameObject {
 	}
 
 	public string getActorTypeName() {
-		return GetType().ToString().RemovePrefix("MMXOnline.");
+		return GetType().Name.ToString();
 	}
 }

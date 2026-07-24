@@ -288,5 +288,5 @@ public enum FontType {
 	FBlue,
 	FOrange,
 	BlueMenu,
-	OrangeMenu
+	OrangeMenu,
 }

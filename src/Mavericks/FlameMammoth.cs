@@ -23,10 +23,9 @@ public class FlameMammoth : Maverick {
 
 		weapon = new Weapon(WeaponIds.FlameMGeneric, 100);
 
-		netActorCreateId = NetActorCreateId.FlameMammoth;
-		netOwner = player;
+		cActorId = CActorIds.SigmaFlameMammoth;
 		if (sendRpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, player, player.character, getSerialExtra());
 		}
 
 		armorClass = ArmorClass.Heavy;

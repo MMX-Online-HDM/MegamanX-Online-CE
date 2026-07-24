@@ -195,6 +195,7 @@ public class Maverick : Actor, IDamagable {
 	) {
 		slideOnIce = true;
 		this.player = player;
+		netOwner = player;
 		this.xDir = xDir;
 
 		spriteToCollider["enter"] = null;

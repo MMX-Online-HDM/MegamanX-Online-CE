@@ -14,20 +14,40 @@ public class ControlPoints : GameMode {
 
 	public override void render() {
 		base.render();
-		var currentControlPoint = level.getCurrentControlPoint();
+
+		foreach (ControlPoint controlPoint in level.controlPoints) {
+			int index = 0;
+			if (!controlPoint.locked) {
+				if (controlPoint.captured) {
+					index = 2;
+				} else {
+					index = 1;
+				}
+			}
+			addMapNavpoint(controlPoint.pos, ("hud_minimap_hill", index));
+		}
+
+		if (level.mainPlayer.alliance > redAlliance) {
+			return;
+		}
+		ControlPoint? currentControlPoint = level.getCurrentControlPoint();
 		if (currentControlPoint != null) {
-			drawObjectiveNavpoint(Global.level.mainPlayer.alliance == redAlliance ? "Defend" : "Attack", currentControlPoint.pos);
+			drawObjectiveNavpoint(
+				Global.level.mainPlayer.alliance == redAlliance ? "Defend" : "Attack",
+				currentControlPoint.pos
+			);
 		}
 	}
 
 	public override void drawTopHUD() {
 		//var redText = "CP " + bluePoints.ToString() + "%";
 
-		int hudcpY = 0;
+		int hudcpY = 4;
+		int hudcpX = (int)Global.screenW - 111;
 		foreach (var controlPoint in level.controlPoints) {
 			var redText = "";
 
-			FontType textColor = FontType.RedishOrange;
+			FontType textColor = FontType.Red;
 			if (controlPoint.captureTime == controlPoint.maxCaptureTime) {
 				redText = "Lock";
 				textColor = FontType.Blue;
@@ -44,20 +64,18 @@ public class ControlPoints : GameMode {
 					textColor = FontType.Grey;
 				}
 			}
-
 			int allianceFactor = (controlPoint.alliance == GameMode.redAlliance ? 0 : 2);
-			controlPointSprite.drawToHUD((controlPoint.num - 1) + allianceFactor, 5, 5 + hudcpY);
+			controlPointSprite.drawToHUD((controlPoint.num - 1) + allianceFactor, hudcpX, hudcpY);
 			float perc = controlPoint.captureTime / controlPoint.maxCaptureTime;
 			int barsFull = MathInt.Round(perc * 16f);
 			for (int i = 0; i < barsFull; i++) {
-				controlPointBarSprite.drawToHUD(1, 5 + 17 + (i * 2), 5 + 3 + hudcpY);
+				controlPointBarSprite.drawToHUD(1, hudcpX + 17 + (i * 2), 3 + hudcpY);
 			}
-
-			Fonts.drawText(textColor, redText, 38, 9 + hudcpY, Alignment.Center);
-			hudcpY += 16;
+			Fonts.drawText(textColor, redText, 33 + hudcpX, 2 + hudcpY, Alignment.Center);
+			hudcpY += 14;
 		}
 
-		drawTimeIfSet(4 + hudcpY);
+		drawTimeIfSet(37);
 	}
 
 	public override void checkIfWinLogic() {

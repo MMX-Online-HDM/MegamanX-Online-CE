@@ -85,6 +85,7 @@ public partial class Character : Actor, IDamagable {
 	public bool isCrystalized;
 	public bool insideCharacter;
 	public float invulnTime = 0;
+	public float maxInvulnTime = 0;
 
 	public List<Trail> lastFiveTrailDraws = new List<Trail>();
 	public LoopingSound chargeSound;
@@ -219,6 +220,8 @@ public partial class Character : Actor, IDamagable {
 	// Etc.
 	public int camOffsetX;
 	public int secondBarOffset;
+	public List<Buff> buffList = new();
+
 	public bool isQuickAssassinate;
 	public bool disguiseCoverBlown;
 	public AltSoundIds altSoundId = AltSoundIds.None;
@@ -2619,12 +2622,11 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public bool hideHealthAndName() {
-		if (isWarpIn()) return true;
-		if (sprite.name.EndsWith("warp_beam")) return true;
-		if (!player.readyTextOver) return true;
-		if (isDeathOrReviveSprite()) return true;
-		if (Global.level.is1v1() && !Global.level.gameMode.isTeamMode && !Global.level.mainPlayer.isSpectator) return true;
-		if (Global.showAIDebug) return true;
+		if (!visible || isWarpIn() || sprite.name.EndsWith("warp_beam") ||
+			!player.readyTextOver || isDeathOrReviveSprite() || !player.spawnedOnceAlt
+		) {
+			return true;
+		}
 		return false;
 	}
 
@@ -2716,6 +2718,10 @@ public partial class Character : Actor, IDamagable {
 
 	public virtual bool canBeHealed(int healerAlliance) {
 		return player.alliance == healerAlliance && alive && health < maxHealth;
+	}
+	
+	public virtual bool canBeHealed() {
+		return alive && health < maxHealth;
 	}
 
 	public virtual void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
@@ -3661,9 +3667,347 @@ public partial class Character : Actor, IDamagable {
 		}
 	}
 
-	public virtual void aiAttack(Actor? target) { }
+	public virtual void aiAttack(Actor target) { }
 
 	public virtual void aiDodge(Actor? target) { }
+
+	public virtual void renderHUD(Point offset, GameMode.HUDHealthPosition position) {
+		secondBarOffset = 0;
+		renderLifebar(offset, position);
+		renderAmmo(offset, position);
+		renderBuffs(offset, position);
+	}
+
+	public virtual void renderBuffs(Point offset, GameMode.HUDHealthPosition position) {
+		int drawDir = 1;
+		if (position == GameMode.HUDHealthPosition.Right) {
+			drawDir = -1;
+		}
+		Point drawPos = GameMode.getHUDBuffPosition(position) + offset;
+		drawPos.x += secondBarOffset;
+
+		// Spawn invul.
+		if (invulnTime > 0) {
+			drawBuff(drawPos, invulnTime / maxInvulnTime, "hud_buffs", 1);
+			secondBarOffset += 18 * drawDir;
+			drawPos.x += 18 * drawDir;
+		}
+		foreach (Buff buff in buffList) {
+			float percent = buff.time / buff.maxTime;
+			drawBuff(drawPos, buff);
+			secondBarOffset += 18 * drawDir;
+			drawPos.x += 18 * drawDir;
+		}
+	}
+
+	public void drawBuff(Point pos, float cooldown, string sprite, int index) {
+		Global.sprites[sprite].drawToHUD(index, pos.x, pos.y);
+		GameMode.drawWeaponSlotCooldownR(pos.x, pos.y, cooldown);
+	}
+	public void drawDebuff(Point pos, float cooldown, string sprite, int index) {
+		Global.sprites[sprite].drawToHUD(index, pos.x, pos.y);
+		GameMode.drawWeaponSlotCooldown(pos.x, pos.y, cooldown);
+	}
+	public void drawBuffAlt(Point pos, float cooldown, string sprite, int index) {
+		Global.sprites[sprite].drawToHUD(index, pos.x, pos.y);
+		GameMode.drawWeaponSlotAmmo(pos.x, pos.y, cooldown);
+	}
+
+	public void drawBuff(Point drawPos, Buff buff) {
+		Global.sprites[buff.iconName].drawToHUD(buff.iconIndex, drawPos.x, drawPos.y);
+		float maxTime = buff.stackData.time ?? buff.maxTime;
+		float cooldown = Math.Clamp(buff.time / maxTime, 0, 1);
+
+		if (buff.stackData.time != null) {
+			float stack = Math.Clamp(buff.stackProgress / buff.stackData.time.Value, 0, 1);
+			int stackP = MathInt.Round((1 - stack) * 14);
+			Point drawPostA = drawPos.addxy(-7, -7);
+			Point drawPostB = drawPos.addxy(+6, -7);
+			Point drawPostC = drawPos.addxy(+7, +6);
+			if (stackP >= 14) {
+				DrawWrappers.DrawRect(
+					drawPostA.x, drawPostC.y, drawPostB.x, drawPostC.y + 1,
+					true, Color.Yellow, 0,
+					ZIndex.HUD, false
+				);
+			}
+			DrawWrappers.DrawRect(
+				drawPostA.x, drawPostA.y, drawPostA.x + 1, drawPostA.y + stackP,
+				true, Color.Yellow, 0,
+				ZIndex.HUD, false
+			);
+			DrawWrappers.DrawRect(
+				drawPostB.x, drawPostA.y, drawPostB.x + 1, drawPostB.y + stackP,
+				true, Color.Yellow, 0,
+				ZIndex.HUD, false
+			);
+			if (stackP > 0) {
+				DrawWrappers.DrawRect(
+					drawPostA.x, drawPostA.y, drawPostB.x, drawPostA.y + 1,
+					true, Color.Yellow, 0,
+					ZIndex.HUD, false
+				);
+			}
+		}
+		if (buff.stackData.max != buff.stackData.min && buff.stacks > buff.stackData.min) {
+			Fonts.drawText(
+				FontType.RedSmall, buff.stacks.ToString(),
+				drawPos.x + 8, drawPos.y, Alignment.Right
+			);
+		}
+		if (buff.isBuff) {
+			GameMode.drawWeaponSlotCooldownR(drawPos.x, drawPos.y, cooldown);
+		} else {
+			GameMode.drawWeaponSlotCooldown(drawPos.x, drawPos.y, cooldown);
+		}
+	}
+
+	public virtual (string, int) getBaseHpSprite() {
+		return ("hud_health_base", 0);
+	}
+
+	public virtual (string, int) getTopHpSprite() {
+		return ("hud_health_top", 0);
+	}
+
+	public virtual void renderLifebar(Point offset, GameMode.HUDHealthPosition position) {
+		decimal damageSavings = 0;
+		if (health > 0 && health < maxHealth) {
+			damageSavings = MathInt.Floor(this.damageSavings);
+		}
+
+		Point hudHealthPosition = GameMode.getHUDHealthPosition(position, true);
+		float baseX = hudHealthPosition.x + offset.x;
+		float baseY = hudHealthPosition.y + offset.y;
+
+		(string healthBaseSprite, int baseSpriteIndex) = getBaseHpSprite();
+		Global.sprites[healthBaseSprite].drawToHUD(baseSpriteIndex, baseX, baseY);
+		baseY -= 16;
+		decimal modifier = (decimal)Player.getHealthModifier();
+		decimal maxHP = Math.Ceiling(maxHealth / modifier);
+		decimal curHP = Math.Floor(health / modifier);
+		decimal ceilCurHP = Math.Ceiling(health / modifier);
+		decimal floatCurHP = health / modifier;
+		float fhpAlpha = (float)(floatCurHP - curHP);
+		decimal greyHp = Math.Ceiling(0 / modifier);
+		decimal savings = curHP + (damageSavings / modifier);
+		decimal ceilSavings = curHP + Math.Ceiling(Math.Floor(damageSavings) / modifier);
+
+		// Default bar index.
+		int barIndex = 0;
+		int rBarIndex = 1;
+		int sBarIndex = 2;
+		// Custom UPX logic.
+		// TODO: Move this to a function.
+		if (player?.character is RagingChargeX) {
+			float hpPercent = MathF.Floor(player.health / player.maxHealth * 100f);
+			barIndex = hpPercent switch {
+				>= 75 => 1,
+				>= 50 => 3,
+				>= 25 => 4,
+				_ => 5,
+			};
+			sBarIndex = 0;
+			rBarIndex = 2;
+		}
+
+		for (var i = 0; i < Math.Ceiling(maxHP); i++) {
+			// Draw HP
+			if (i < curHP) {
+				Global.sprites["hud_health_full"].drawToHUD(barIndex, baseX, baseY);
+			} else if (i < savings) {
+				Global.sprites["hud_health_full"].drawToHUD(rBarIndex, baseX, baseY);
+			} else {
+				if (i < greyHp) {
+					Global.sprites["hud_health_full"].drawToHUD(GameMode.grayAmmoIndex, baseX, baseY);
+				} else {
+					Global.sprites["hud_health_empty"].drawToHUD(0, baseX, baseY);
+				}
+				if (i < ceilCurHP) {
+					Global.sprites["hud_health_full"].drawToHUD(0, baseX, baseY, fhpAlpha);
+				}
+				else if (i < ceilSavings) {
+					float alpha = (float)(savings % 1);
+					Global.sprites["hud_health_full"].drawToHUD(rBarIndex, baseX, baseY, alpha);
+				}
+				else if (i < ceilSavings) {
+
+				}
+			}
+			baseY -= 2;
+		}
+		(string healthTopSprite, int baseTopIndex) = getTopHpSprite();
+		Global.sprites[healthTopSprite].drawToHUD(baseTopIndex, baseX, baseY);
+	}
+
+	public virtual void renderAmmo(
+		Point offset, GameMode.HUDHealthPosition position,
+		Weapon? weaponOverride = null
+	) {
+		if (weaponOverride == null && currentWeapon == null) {
+			return;
+		}
+		Weapon renderWeapon = (weaponOverride ?? currentWeapon)!;
+		if (!renderWeapon.drawAmmo) {
+			return;
+		}
+
+		Point hudHealthPosition = GameMode.getHUDHealthPosition(position, false);
+		float baseX = hudHealthPosition.x + offset.x;
+		float baseY = hudHealthPosition.y + offset.y;
+
+		string baseBarName = "hud_weapon_base";
+		string fullBarName = "hud_weapon_full";
+
+		float ammo = renderWeapon.ammo;
+		float maxAmmo = renderWeapon.maxAmmo;
+
+		GameMode.renderAmmo(
+			baseX, baseY, renderWeapon.weaponBarBaseIndex, renderWeapon.weaponBarIndex,
+			ammo, 0, maxAmmo, false, fullBarName, baseBarName,
+			ammoDisplayScale: renderWeapon.ammoDisplayScale
+		);
+	}
+
+	public virtual Point renderMiniHUD(Point offset) {
+		// Values.
+		long zPos = ZIndex.HUD - 200 + player.id * 5;
+		float scale = getMiniHudScale();
+		int maxBarAmmo = getMiniWeaponLength();
+		float hp = (float)health / scale;
+		float rhp = (float)Math.Floor(damageSavings) / scale;
+		float mHp = (float)maxHealth / scale;
+		Color? color = Color.White;
+		if (Global.level.gameMode.isTeamMode &&
+			player.alliance < Global.level.teamNum &&
+			player.alliance < Global.level.gameMode.teamColors.Length
+		) {
+			color = Global.level.gameMode.teamColors[player.alliance];
+		}
+		// Weapon.
+		if (maxBarAmmo > 0) {
+			// Border.
+			DrawWrappers.DrawRect(
+				offset.x + 1, offset.y - 4, offset.x + maxBarAmmo * 2, offset.y - 1,
+				true, new Color(49, 49, 49), 1, zPos, outlineColor: new Color(0, 0, 0)
+			);
+			// Weapon.
+			var wep = getMiniHudAmmo();
+			if (wep.maxAmmo != 0) {
+				renderMiniHudBorder(offset, color, maxBarAmmo);
+				offset = renderMiniBar(offset, 2, wep.ammo / scale, wep.maxAmmo / scale);
+			} else {
+				renderMiniHudBorder(offset, color, maxBarAmmo);
+				offset = renderMiniBar(offset, 3, maxBarAmmo, maxBarAmmo);
+			}
+		}
+		// Health.
+		renderMiniHudBorder(offset, color, mHp);
+		renderMiniBar(offset, 1, hp, mHp);
+		offset = renderMiniBar(offset, 2, rhp, rhp);
+		// Return offset.
+		return new Point(offset.x, offset.y);
+	}
+	
+	public virtual void renderMiniHudBorder(Point offset, Color? color, float ammo) {
+		if (color == null) {
+			return;
+		}
+		long zPos = ZIndex.HUD - 200 + player.id * 5;
+		DrawWrappers.DrawRect(
+			offset.x, offset.y - 5, offset.x + 1 + ammo * 2, offset.y,
+			false, color.Value, 1, zPos - 1
+		);
+		DrawWrappers.DrawRect(
+			offset.x - 1, offset.y - 6, offset.x + 2 + ammo * 2, offset.y + 1,
+			false, Color.Black, 1, zPos - 2
+		);
+	}
+
+	public virtual Point renderMiniBar(Point offset, int color, float ammo, float maxAmmo) {
+		float cAmmo = MathF.Ceiling(ammo);
+		float fAmmo = MathF.Floor(ammo);
+		float aAlpha = ammo - fAmmo;
+		float mAmmo = MathF.Floor(maxAmmo);
+		long zPos = ZIndex.HUD - 200 + player.id * 5;
+		if (ammo == maxAmmo) {
+			fAmmo = mAmmo;
+		}
+		Point lpos = offset.addxy(0, -5);
+		for (int i = 0; i < mAmmo; i++) {
+			int id = i < fAmmo ? color : 0;
+			Global.sprites["hud_bar_small_h"].draw(
+				id, lpos.x + i, lpos.y, 1, 1, null, 1, 1, 1, zPos
+			);
+			if (i >= fAmmo && i < cAmmo) {
+				Global.sprites["hud_bar_small_h"].draw(
+					color, lpos.x + i, lpos.y, 1, 1, null, aAlpha, 1, 1, zPos
+				);
+			}
+			lpos.x += 1;
+		}
+
+		return offset.addxy(0, -4);
+	}
+
+	public virtual int getMiniLifebarLength() {
+		int max = MathInt.Ceiling(maxHealth / (decimal)getMiniHudScale());
+		return Math.Max(getMiniWeaponLength(), max);
+	}
+
+	public virtual (float ammo, float maxAmmo) getMiniHudAmmo() {
+		if (currentWeapon == null || !currentWeapon.drawAmmo) {
+			return (0, 0);
+		}
+		return (
+			currentWeapon.ammo / currentWeapon.ammoDisplayScale,
+			currentWeapon.maxAmmo / currentWeapon.ammoDisplayScale
+		);
+	}
+
+	public virtual int getMiniWeaponLength() {
+		int max = 0;
+		foreach(Weapon weapon in weapons) {
+			if (weapon.drawAmmo) {
+				max = Math.Max(
+					MathInt.Ceiling(weapon.maxAmmo / weapon.ammoDisplayScale), max
+				);
+			}
+		}
+		return MathInt.Ceiling(max / getMiniHudScale());
+	}
+
+	public virtual float getMiniHudScale() {
+		float scale = 2;
+		if (Global.customSettings != null) {
+			float mod = Global.customSettings.healthModifier / 8f;
+			if (mod > 1) {
+				return scale * (Global.customSettings.healthModifier / 8f);
+			}
+		}
+		return scale;
+	}
+
+	public virtual Point renderPlayerName(Point offset, bool useColor = false) {
+		string playerName = player.name;
+		Color nameColor = Color.White;
+		long zPos = ZIndex.HUD - 200 + player.id * 5;
+
+		if (useColor &&
+			Global.level.gameMode.isTeamMode &&
+			player.alliance < Global.level.teamNum &&
+			player.alliance < Global.level.gameMode.teamColors.Length
+		) {
+			nameColor = Global.level.gameMode.teamColors[player.alliance];
+		}
+		Point textPos = offset.addxy(0, -7);
+
+		Fonts.drawText(
+			FontType.Grey, playerName, textPos.x, textPos.y,
+			Alignment.Left, true, depth: zPos, color: nameColor
+		);
+		return offset.addxy(0, -12);
+	}
 
 	public int getRandomWeaponIndex() {
 		if (weapons.Count == 0) return 0;
@@ -3854,5 +4198,93 @@ public struct DamageEvent {
 		this.projId = projId;
 		this.envKillOnly = envKillOnly;
 		this.time = time;
+	}
+}
+
+public class Buff {
+	public bool isBuff;
+	public float maxTime;
+	public float time;
+	public string iconName;
+	public int iconIndex;
+	public int stacks;
+	public float stackProgress;
+	public (float? time, int min, int max) stackData;
+	public Action<Buff, Character>? update;
+	public bool isStatic;
+
+	public Buff(
+		string iconName, int iconIndex, bool isBuff,
+		float time, float maxTime, int? stacks = null,
+		(float? time, int min, int max)? stackData = null,
+		bool isStatic = false
+	) {
+		this.iconName = (iconName ?? "");
+		this.iconIndex = iconIndex;
+		this.time = time;
+		this.maxTime = maxTime;
+		this.isBuff = isBuff;
+		this.stackData = stackData ?? (null, 1, 1);
+		this.stacks = stacks ?? this.stackData.min;
+		this.isStatic = isStatic;
+	}
+
+	public void updateCooldown(Actor actor) {
+		if (time < 0 && stacks <= stackData.min) {
+			return;
+		}
+		time -= actor.speedMul;
+		if (time <= 0) {
+			if (stacks > stackData.min + 1 && stackData.min != stackData.max) {
+				if (stackData.time != null) {
+					maxTime = stackData.time.Value;
+				}
+				time = maxTime;
+				stacks--;
+			} else {
+				time = 0;
+				stackProgress = 0;
+				stacks = stackData.min;
+			}
+		}
+	}
+
+	public void setTime(float frames, bool allowLess = false) {
+		if (allowLess || frames > time) {
+			time = frames;
+			maxTime = frames;
+		}
+	}
+
+	public void addTime(float frames) {
+		if (stackData.time != null) {
+			stackProgress += frames;
+			time = maxTime;
+			calcStacks();
+		} else {
+			time += frames;
+		}
+		maxTime = time;
+		if (time > 0 && stacks <= stackData.min) {
+			stacks = Math.Min(stackData.min + 1, stackData.max);
+		}
+	}
+
+	public void calcStacks() {
+		if (stackData.time == null) {
+			return;
+		}
+		float stackTime = stackData.time.Value;
+		if (stackProgress < stackTime) {
+			return;
+		}
+		stacks += MathInt.Floor(stackProgress / stackTime);
+		stacks = Math.Min(stackData.max, stacks);
+		stackProgress = stackProgress % stackTime;
+	}
+
+	public void zeroOut() {
+		time = 0;
+		stacks = stackData.min;
 	}
 }

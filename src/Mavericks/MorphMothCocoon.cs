@@ -34,10 +34,9 @@ public class MorphMothCocoon : Maverick {
 		weakWeaponId = WeaponIds.SpeedBurner;
 		weakMaverickWeaponId = WeaponIds.FlameStag;
 
-		netActorCreateId = NetActorCreateId.MorphMothCocoon;
-		netOwner = player;
+		cActorId = CActorIds.SigmaMorphMothCocoon;
 		if (sendRpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, player, player.character, getSerialExtra());
 		}
 
 		usesAmmo = true;

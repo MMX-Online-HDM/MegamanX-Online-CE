@@ -39,10 +39,9 @@ public class StingChameleon : Maverick {
 		weakWeaponId = WeaponIds.BoomerangCutter;
 		weakMaverickWeaponId = WeaponIds.BoomerangKuwanger;
 
-		netActorCreateId = NetActorCreateId.StingChameleon;
-		netOwner = player;
+		cActorId = CActorIds.SigmaStingChameleon;
 		if (sendRpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, player, player.character, getSerialExtra());
 		}
 
 		usesAmmo = true;

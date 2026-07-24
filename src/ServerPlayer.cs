@@ -9,19 +9,20 @@ public class ServerPlayer {
 	[ProtoMember(1)] public string name;
 	[ProtoMember(2)] public int id;
 	[ProtoMember(3)] public bool isHost;
-	[ProtoMember(4)] public int charNum;
+	[ProtoMember(4)] public int spawnCharNum;
 	[ProtoMember(5)] public int alliance;
 	[ProtoMember(6)] public int? preferredAlliance;
 	[ProtoMember(7)] public bool joinedLate;
 	[ProtoMember(8)] public string deviceId;
-	[ProtoMember(9)] public int kills;
-	[ProtoMember(10)] public int deaths;
-	[ProtoMember(11)] public int ping;
-	[ProtoMember(12)] public bool isBot;
-	[ProtoMember(13)] public bool isSpectator;
-	[ProtoMember(14)] public int? autobalanceAlliance;
-	[ProtoMember(15)] public int? startPing;
-	[ProtoMember(16)] public int charNumSub;
+	[ProtoMember(9)] public int score;
+	[ProtoMember(10)] public int kills;
+	[ProtoMember(11)] public int deaths;
+	[ProtoMember(12)] public int assists;
+	[ProtoMember(13)] public int ping;
+	[ProtoMember(14)] public bool isBot;
+	[ProtoMember(15)] public bool isSpectator;
+	[ProtoMember(16)] public int? autobalanceAlliance;
+	[ProtoMember(17)] public int? startPing;
 
 	[JsonIgnore]
 	public NetConnection? connection;
@@ -38,7 +39,7 @@ public class ServerPlayer {
 		this.name = name;
 		this.id = id;
 		this.isHost = isHost;
-		this.charNum = charNum;
+		this.spawnCharNum = charNum;
 		this.preferredAlliance = preferredAlliance;
 		this.connection = connection;
 		this.deviceId = deviceId;

@@ -302,3 +302,24 @@ public class ProtectedIntMap<TKey> : Dictionary<TKey, (int valMul, int val)> whe
 		return base[key].val;
 	}
 }
+
+public class NullDir<TKey, TValue> : Dictionary<TKey, TValue>
+	where TKey : notnull
+	where TValue : struct
+{
+	public new TValue? this[TKey key] {
+		get {
+			if (!ContainsKey(key)) {
+				return null;
+			}
+			return base[key];
+		}
+		set {
+			if (value == null) {
+				if (ContainsKey(key)) { Remove(key); }
+				return;
+			}
+			base[key] = value.Value;
+		}
+	}
+}

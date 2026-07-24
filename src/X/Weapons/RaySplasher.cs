@@ -179,9 +179,9 @@ public class RaySplasherTurret : Actor, IDamagable {
 		}
 
 		netOwner = player;
-		netActorCreateId = NetActorCreateId.RaySplasherTurret;
+		cActorId = CActorIds.RaySplasherTurret;
 		if (rpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, netOwner, null, getSerialExtra());
 		}
 	}
 

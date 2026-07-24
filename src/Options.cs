@@ -38,9 +38,11 @@ public class Options {
 	// Video settings
 	public bool fullScreen = false;
 	public bool integerFullscreen = true;
+	public int? detectedGraphicsPreset = null;
 	public int? graphicsPreset = null;  // 0 = low, 1 = medium, 2 = high, 3 = custom
 	public uint windowScale = 2;
 	public bool disableShaders;
+	public bool multithreadMode;
 	public bool vsync;
 	public bool areShadersDisabled() {
 		if (Global.disableShaderOverride) return true;
@@ -54,6 +56,7 @@ public class Options {
 	public bool enableSmallBars;
 	public bool smallBarsEx;
 	public bool fastShaders;
+	public bool fullScreenIntelCompat;
 
 	public bool lowQualityParticles() { return particleQuality == 0; }
 

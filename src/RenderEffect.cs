@@ -30,13 +30,14 @@ public enum RenderEffectType {
 public class RenderEffect {
 	public RenderEffectType type;
 	public float time;
+	public float maxTime;
 	public float flashTime;
 	public float cycleTime;
 
 	public RenderEffect(RenderEffectType type, float flashTime = 0, float time = float.MaxValue, float cycleTime = -1) {
 		this.type = type;
 		this.flashTime = flashTime;
-		this.time = time;
+		this.maxTime = time;
 
 		if (cycleTime >= flashTime) {
 			this.cycleTime = cycleTime;
@@ -46,6 +47,6 @@ public class RenderEffect {
 	}
 
 	public bool isFlashing() {
-		return time % (flashTime * 2) > cycleTime;
+		return time % (flashTime * 2) >= cycleTime;
 	}
 }

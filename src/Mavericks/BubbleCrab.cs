@@ -29,10 +29,10 @@ public class BubbleCrab : Maverick {
 		weakWeaponId = WeaponIds.SpinWheel;
 		weakMaverickWeaponId = WeaponIds.WheelGator;
 
-		netActorCreateId = NetActorCreateId.BubbleCrab;
 		netOwner = player;
+		cActorId = CActorIds.SigmaBubbleCrab;
 		if (sendRpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, player, player.character, getSerialExtra());
 		}
 
 		usesAmmo = true;

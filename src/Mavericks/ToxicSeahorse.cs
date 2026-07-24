@@ -28,10 +28,10 @@ public class ToxicSeahorse : Maverick {
 
 		spriteToCollider["teleport"] = getDashCollider(1, 0.25f);
 
-		netActorCreateId = NetActorCreateId.ToxicSeahorse;
 		netOwner = player;
+		cActorId = CActorIds.SigmaToxicSeahorse;
 		if (sendRpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, player, player.character, getSerialExtra());
 		}
 
 		usesAmmo = true;

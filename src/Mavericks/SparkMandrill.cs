@@ -28,10 +28,9 @@ public class SparkMandrill : Maverick {
 		weakWeaponId = WeaponIds.ShotgunIce;
 		weakMaverickWeaponId = WeaponIds.ChillPenguin;
 
-		netActorCreateId = NetActorCreateId.SparkMandrill;
-		netOwner = player;
+		cActorId = CActorIds.SigmaSparkMandrill;
 		if (sendRpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, player, player.character, getSerialExtra());
 		}
 
 		usesAmmo = false;

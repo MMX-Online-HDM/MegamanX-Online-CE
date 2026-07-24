@@ -139,9 +139,9 @@ public class WolfSigmaHead : Actor, IDamagable {
 		frameIndex = 0;
 
 		netOwner = player;
-		netActorCreateId = NetActorCreateId.WolfSigmaHead;
+		cActorId = CActorIds.WolfSigmaHead;
 		if (rpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, player, null, getSerialExtra());
 		}
 	}
 
@@ -433,12 +433,11 @@ public class WolfSigmaHand : Actor, IDamagable {
 		isPlatform = true;
 		collider.isClimbable = true;
 		collider.wallOnly = false;
-		
 
 		netOwner = player;
-		netActorCreateId = NetActorCreateId.WolfSigmaHand;
+		cActorId = CActorIds.WolfSigmaHand;
 		if (rpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, player, null, getSerialExtra());
 		}
 	}
 

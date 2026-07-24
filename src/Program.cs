@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Runtime.ExceptionServices;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -16,13 +17,14 @@ using SFML.Audio;
 using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
-using WindowsAPI;
 using static SFML.Window.Keyboard;
+using WindowsAPI;
 
 namespace MMXOnline;
 
 class Program {
 	public static string exceptionExtraData = "";
+	//public static List<string> debugLogs = [];
 
 	static void Main(string[] args) {
 		// For formatting purposes.
@@ -63,29 +65,19 @@ class Program {
 	}
 
 	static void GameMain(string[] args, int mode) {
-		if (Debugger.IsAttached) {
-			Run(args, mode);
-		} else {
-			try {
-				Run(args, mode);
-			} catch (Exception e) {
-				/*
-				string crashDump = e.Message + "\n\n" +
-					e.StackTrace + "\n\nInner exception: " +
-					e.InnerException?.Message + "\n\n" +
-					e.InnerException?.StackTrace;
-				Helpers.showMessageBox(crashDump.Truncate(1000), "Fatal Error!");
-				throw;
-				*/
-				Logger.LogFatalException(e);
-				Logger.logException(e, false, "Fatal exception", true);
-				Thread.Sleep(1000);
-				throw;
+		try {
+			if (Options.main.multithreadMode) {
+				RunMT(args, mode);
+			} else {
+				RunST(args, mode);
 			}
+		} catch (Exception exception) {
+			Logger.LogFatalException(exception);
+			throw;
 		}
 	}
 
-	static void Run(string[] args, int mode) {
+	static RenderWindow Initialize(string[] args, int mode) {
 #if MAC
 		Global.assetPath = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName) + "/";
 		Global.writePath = Global.assetPath;
@@ -137,7 +129,7 @@ class Program {
 		*/
 
 		if (!checkSystemRequirements()) {
-			return;
+			throw new Exception("System Requeriments not met.");
 		}
 
 		Global.initMainWindow(Options.main);
@@ -253,6 +245,8 @@ class Program {
 
 		drawLoadST(loadText, window);
 
+		parseAttribs();
+
 		// Force to clean all memory.
 		// Also compacts all objects too.
 		// As it as manual call this freeze the program and takes a while.
@@ -262,75 +256,34 @@ class Program {
 
 		// Force startup config to be fetched
 		Menu.change(new MainMenu());
-		//Global.changeMusic(Global.level.levelData.getTitleTheme());
-		switch (Helpers.randomRange(1, 20)) {
+
+		string titleMusic = Helpers.randomRange(1, 20) switch {
 			// Stage Selects
-			case 1:
-				Global.changeMusic("stageSelect_X1");
-				break;
-			case 2:
-				Global.changeMusic("stageSelect2_X1");
-				break;
-			case 3:
-				Global.changeMusic("stageSelect_X2");
-				break;
-			case 4:
-				Global.changeMusic("stageSelect2_X2");
-				break;
-			case 5:
-				Global.changeMusic("stageSelect_X3");
-				break;
-			case 6:
-				Global.changeMusic("stageSelect2_X3");
-				break;
+			1 => "stageSelect_X1",
+			2 => "stageSelect2_X1",
+			3 => "stageSelect_X2",
+			4 => "stageSelect2_X2",
+			5 => "stageSelect_X3",
+			6 => "stageSelect2_X3",
 			// Introduction
-			case 7:
-				Global.changeMusic("opening_X3");
-				break;
-			case 8:
-				Global.changeMusic("opening_X2");
-				break;
+			7 => "opening_X3",
+			8 => "opening_X2",
 			// Extra
-			case 9:
-				Global.changeMusic("ending_X3");
-				break;
-			case 10:
-				Global.changeMusic("ending_X2");
-				break;
-			case 11:
-				Global.changeMusic("ending_X1");
-				break;
-			case 12:
-				Global.changeMusic("credits_X1");
-				break;
-			case 13:
-				Global.changeMusic("demo_X2");
-				break;
-			case 14:
-				Global.changeMusic("demo_X3");
-				break;
-			case 15:
-				Global.changeMusic("laboratory_X3");
-				break;
-			case 16:
-				Global.changeMusic("sigmaFortress4");
-				break;
-			case 17:
-				Global.changeMusic("variableX");
-				break;
-			case 18:
-				Global.changeMusic("credits_X2");
-				break;
-			case 19:
-				Global.changeMusic("drLight_X1");
-				break;
-			case 20:
-				Global.changeMusic("drLight_X2");
-				break;
-			default:
-				Global.changeMusic("stageSelect_X1");
-				break;
-		}
+			9 => "ending_X3",
+			10 => "ending_X2",
+			11 => "ending_X1",
+			12 => "credits_X1",
+			13 => "demo_X2",
+			14 => "demo_X3",
+			15 => "laboratory_X3",
+			16 => "sigmaFortress4",
+			17 => "variableX",
+			18 => "credits_X2",
+			19 => "drLight_X1",
+			20 => "drLight_X2",
+			_ => "stageSelect_X1",
+		};
+		Global.changeMusic(titleMusic);
 
 		if (mode == 1) {
 			HostMenu menu = new HostMenu(new MainMenu(), null, false, false, true);
@@ -354,9 +307,7 @@ class Program {
 				Menu.change(new ErrorMenu(error, new MainMenu()));
 			}
 		}
-		while (window.IsOpen) {
-			mainLoop(window);
-		}
+		return window;
 	}
 
 	static long getPacketsReceived() {
@@ -383,7 +334,6 @@ class Program {
 		if (Joystick.IsConnected(0)) {
 			joystickConnectedHelper(0);
 		}
-
 	}
 
 	private static void update() {
@@ -487,8 +437,19 @@ class Program {
 		if (Global.levelStarted()) {
 			Global.level.render();
 		} else {
-			Menu.render();
+			if (isMultiThread) {
+				renderAction = () => {
+					clearHudTexture();
+					Menu.render();
+					renderHudTexture();
+				};
+			} else {
+				clearHudTexture();
+				Menu.render();
+				renderHudTexture();
+			}
 		}
+
 		// TODO: Make this work for errors.
 		//if (Global.debug) {
 			//Draw debug strings
@@ -502,6 +463,20 @@ class Program {
 			Fonts.drawText(FontType.Red, Global.debugString3, 20, 40);
 			*/
 		//}
+	}
+
+	public static void clearHudTexture() {
+		DrawWrappers.renderTexture.Clear(Color.Transparent);
+		DrawWrappers.renderTexture.Display();
+	}
+
+	public static void renderHudTexture() {
+		// Render.
+		Global.window.SetView(DrawWrappers.hudView);
+		SFML.Graphics.Sprite sprite = new(DrawWrappers.renderTexture.Texture);
+		Global.window.Draw(sprite);
+		sprite.Dispose();
+		Global.window.SetView(Global.view);
 	}
 
 	/// <summary>
@@ -539,6 +514,12 @@ class Program {
 	}
 
 	private static void onWindowResized(object? sender, SizeEventArgs e) {
+		if (Options.main.integerFullscreen && Options.main.fullScreen) {
+			FloatRect fviewRect = Global.getIntegerViewPort();
+			Global.view.Viewport = fviewRect;
+			DrawWrappers.hudView.Viewport = fviewRect;
+			return;
+		}
 		// Compares the aspect ratio of the window to the aspect ratio of the view,
 		// and sets the view's viewport accordingly in order to archieve a letterbox effect.
 		float windowRatio = Global.window.Size.X / (float)Global.window.Size.Y;
@@ -762,9 +743,23 @@ class Program {
 			Global.textures[Path.GetFileNameWithoutExtension(path)] = texture;
 		}
 
-		var mapSpriteImages = Helpers.getFiles(Global.assetPath + "assets/maps_custom", true, "png", "psd");
-		foreach (var mapSpriteImage in mapSpriteImages) {
-			var pieces = mapSpriteImage.Split("/sprites/");
+		List<string> mapSpriteImages = Helpers.getFiles(
+			Global.assetPath + "assets/maps", true, "png", "psd"
+		);
+		foreach (string mapSpriteImage in mapSpriteImages) {
+			string[] pieces = mapSpriteImage.Split("/sprites/");
+			if (pieces.Length == 2 && pieces[1].EndsWith(".png")) {
+				string spriteImageName = pieces[1].Replace(".png", "");
+				Texture texture = new Texture(mapSpriteImage);
+				string mapName = mapSpriteImage.Replace("/sprites/" + pieces[1], "").Split("/").ToList().Pop();
+				Global.textures[mapName + ":" + spriteImageName] = texture;
+			}
+		}
+ 		mapSpriteImages = Helpers.getFiles(
+			Global.assetPath + "assets/maps_custom", true, "png", "psd"
+		);
+		foreach (string mapSpriteImage in mapSpriteImages) {
+			string[] pieces = mapSpriteImage.Split("/sprites/");
 			if (pieces.Length == 2 && pieces[1].EndsWith(".png")) {
 				string spriteImageName = pieces[1].Replace(".png", "");
 				Texture texture = new Texture(mapSpriteImage);
@@ -808,6 +803,8 @@ class Program {
 		var fileChecksumDict = new Dictionary<string, string>();
 		var invertedMaps = new HashSet<string>();
 		foreach (string levelPath in levelPaths) {
+			if (levelPath.Contains("/sprites/")) continue;
+
 			string levelText = File.ReadAllText(levelPath);
 			string levelIniText = "";
 			string levelIniLocation = Path.GetDirectoryName(levelPath) + "/mapData.ini";
@@ -1132,6 +1129,7 @@ class Program {
 
 		float startPos = 0;
 		float endPos = 0;
+		bool loop = true;
 		if (iniData.ContainsKey("loopData") && iniData["loopData"] is Dictionary<string, object> loopData) {
 			if (loopData.ContainsKey("loopStart") && loopData["loopStart"] is decimal loopStart) {
 				startPos = float.Parse(loopStart.ToString());
@@ -1139,8 +1137,11 @@ class Program {
 			if (loopData.ContainsKey("loopEnd") && loopData["loopEnd"] is decimal loopEnd) {
 				endPos = float.Parse(loopEnd.ToString());
 			}
+			if (loopData.ContainsKey("loop") && loopData["loop"] as string == "false") {
+				loop = false;
+			}
 		}
-		MusicWrapper musicWrapper = new MusicWrapper(file, startPos, endPos, true);
+		MusicWrapper musicWrapper = new MusicWrapper(file, startPos, endPos, loop);
 		if (endPos == 0) {
 			musicWrapper.endPos = musicWrapper.music.Duration.AsSeconds();
 		}
@@ -1248,7 +1249,7 @@ class Program {
 			return result;
 		}
 
-		if (Options.main.graphicsPreset == null) {
+		if (Options.main.detectedGraphicsPreset == null) {
 			OptionsMenu.inferPresetQuality(maxTextureSize);
 		}
 
@@ -1320,9 +1321,69 @@ class Program {
 		}
 	}
 
+	// Parse atribute tasks.
+	// THis is done at runtime to help support dynamic content.
+	public static void parseAttribs() {
+		RPCCreateProjAttribute.populateInvokeList();
+	}
+
 	// Main loop stuff.
+	public static bool isMultiThread;
 	public static decimal deltaTimeSavings = 0;
 	public static decimal lastUpdateTime = 0;
+	public static Exception? logicThreadException;
+	public static Action? renderAction;
+	public static bool triggerDispatch;
+	public static Action? loadAction;
+
+	static void RunST(string[] args, int mode) {
+		isMultiThread = false;
+		RenderWindow window = Initialize(args, mode);
+		Task? mainLoopTask = new Task(() => {
+			while (window.IsOpen) {
+				mainLoop(window);
+			}
+		});
+
+		while (window.IsOpen) {
+			mainLoop(window);
+		}
+	}
+
+	static void RunMT(string[] args, int mode) {
+		isMultiThread = true;
+		RenderWindow window = Initialize(args, mode);
+		Task? mainLoopTask = new Task(() => {
+			while (window.IsOpen) {
+				mainLoop(window);
+			}
+		});
+		mainLoopTask.ContinueWith(Program.mainLoopExceptionHandler, TaskContinuationOptions.OnlyOnFaulted);
+		mainLoopTask.Start();
+
+		while (window.IsOpen) {
+			if (logicThreadException != null) {
+				if (logicThreadException.InnerException != null) {
+					ExceptionDispatchInfo.Capture(logicThreadException.InnerException).Throw();
+				} else {
+					throw logicThreadException;
+				}
+			}
+			if (triggerDispatch) {
+				triggerDispatch = false;
+				window.DispatchEvents();
+			}
+			if (renderAction != null) {
+				renderAction();
+				window.Display();
+				renderAction = null;
+			}
+			if (loadAction != null) {
+				loadAction();
+				loadAction = null;
+			}
+		}
+	}
 
 	public static void setLastUpdateTimeAsNow() {
 		deltaTimeSavings = 0;
@@ -1354,15 +1415,11 @@ class Program {
 		// Debug stuff.
 		bool isFrameStep = false;
 		bool continueNextFrameStep = false;
+		bool f12Released = true;
 		bool f5Released = true;
 		bool f6Released = true;
 		bool f7Released = true;
-		// WARNING DISABLE THIS FOR NON-DEBUG BUILDS
 		bool frameStepEnabled = true;
-		var clearColor = Color.Black;
-		//if (Global.level?.levelData?.bgColor != null) {
-		//	clearColor = Global.level.levelData.bgColor;
-		//}
 
 		// Main loop itself.
 		while (window.IsOpen) {
@@ -1373,7 +1430,11 @@ class Program {
 			deltaTime = deltaTimeSavings + ((timeNow - lastUpdateTime) / fpsLimit);
 			deltaTimeAlt = ((timeNow - lastAltUpdateTime) / fpsLimitAlt);
 			if (deltaTime >= 1 || deltaTimeAlt >= 1) {
-				window.DispatchEvents();
+				if (isMultiThread) {
+					triggerDispatch = true;
+				} else {
+					window.DispatchEvents();
+				}
 				lastAltUpdateTime = timeNow;
 				// Framestep works always, but offline only.
 				if (frameStepEnabled && Global.serverClient == null) {
@@ -1403,11 +1464,30 @@ class Program {
 								_ => 0
 							};
 							Options.main.updateFpsMode();
+							Options.main.showFPS = true;
 							f7Released = false;
 						}
 					} else {
 						f7Released = true;
-					} */
+					}
+					*/
+				}
+				// Reload levels. And mess checksum.
+				if (Global.level == null) {
+					if (IsKeyPressed(Key.F2) && IsKeyPressed(Key.F1)) {
+						if (f12Released) {
+							Global.destroyChecksum();
+							Global.levelDatas.Clear();
+							loadLevels();
+							loadImages();
+							loadSprites();
+							f12Released = false;
+						}
+					} else {
+						f12Released = true;
+					}
+				} else {
+					f12Released = true;
 				}
 			}
 			if (!(deltaTime >= 1)) {
@@ -1440,16 +1520,14 @@ class Program {
 			// For debug framestep.
 			if (isFrameStep && !continueNextFrameStep) {
 				lastUpdateTime = timeNow;
+				deltaTimeSavings = 0;
 				continue;
 			}
 			// Disable frameskip in the menu.
 			if (Global.level != null) {
 				useFrameSkip = false;
 			} else {
-				useFrameSkip = false;
-			}
-			if (Global.isMouseLocked) {
-				Mouse.SetPosition(new Vector2i((int)Global.halfScreenW, (int)Global.halfScreenH), Global.window);
+				useFrameSkip = true;
 			}
 			if (!useFrameSkip || isFrameStep) {
 				update();
@@ -1483,40 +1561,17 @@ class Program {
 			Global.isSkippingFrames = false;
 			Global.input.clearInput();
 			lastUpdateTime = timeNow;
-			videoUpdatesThisSecond++;
-			window.Clear(clearColor);
-			render();
-			window.Display();
-			/*
-			long prevPackets = 0;
-			if (Global.showDiagnostics) {
-				diagnosticsClock.Restart();
-				prevPackets = getBytesPerFrame();
+			if (isMultiThread) {
+				if (renderAction == null) {
+					videoUpdatesThisSecond++;
+					render();
+				}
+			} else {
+				videoUpdatesThisSecond++;
+				window.Clear(Color.Black);
+				render();
+				window.Display();
 			}
-			if (Global.showDiagnostics) {
-				Global.lastFrameProcessTime = diagnosticsClock.ElapsedTime.AsMilliseconds();
-				Global.lastFrameProcessTimes.Add(Global.lastFrameProcessTime);
-				if (Global.lastFrameProcessTimes.Count > 120) Global.lastFrameProcessTimes.RemoveAt(0);
-
-				long packetIncrease = getBytesPerFrame() - prevPackets;
-				Global.lastFramePacketIncreases.Add(packetIncrease);
-				if (Global.lastFramePacketIncreases.Count > 120) {
-					Global.lastFramePacketIncreases.RemoveAt(0);
-				}
-				if (!packetDiagStopwatch.IsRunning) {
-					packetDiagStopwatch.Start();
-				}
-				if (packetDiagStopwatch.ElapsedMilliseconds > 1000) {
-					long packetTotalDelta = getPacketsReceived() - Global.packetTotal1SecondAgo;
-					Global.packetTotal1SecondAgo = getPacketsReceived();
-					packetDiagStopwatch.Restart();
-					Global.last10SecondsPacketsReceived.Add(packetTotalDelta);
-					if (Global.last10SecondsPacketsReceived.Count > 10) {
-						Global.last10SecondsPacketsReceived.RemoveAt(0);
-					}
-				}
-			}
-			*/
 		}
 	}
 
@@ -1531,11 +1586,16 @@ class Program {
 	}
 
 	public static void loadExceptionHandler(Task task) {
-        if (task.Exception != null) {
+		if (task.Exception != null) {
 			Logger.LogFatalException(task.Exception);
 		}
-    }
+	}
 
+	public static void mainLoopExceptionHandler(Task task) {
+		if (task.Exception != null) {
+			logicThreadException = task.Exception;
+		}
+	}
 
 	public static void loadLoop(List<String> loadText, RenderWindow window, Task loadTread) {
 		// Variables for stuff.
@@ -1558,6 +1618,7 @@ class Program {
 				continue;
 			}
 			window.Clear(clearColor);
+			clearHudTexture();
 
 			for (int i = 0; i < loadText.Count; i++) {
 				Fonts.drawText(FontType.Grey, loadText[i], 8, 8 + (10 * i), isLoading: true);
@@ -1571,6 +1632,7 @@ class Program {
 
 			lastUpdateTime = timeNow;
 			window.DispatchEvents();
+			renderHudTexture();
 			window.Display();
 
 			exit = (loadTread.Status >= TaskStatus.RanToCompletion);
@@ -1600,6 +1662,7 @@ class Program {
 				continue;
 			}
 			window.Clear(clearColor);
+			clearHudTexture();
 
 			for (int i = 0; i < loadText.Count; i++) {
 				Fonts.drawText(FontType.Grey, loadText[i], 8, 8 + (10 * i), isLoading: true);
@@ -1613,6 +1676,7 @@ class Program {
 
 			lastUpdateTime = timeNow;
 			window.DispatchEvents();
+			renderHudTexture();
 			window.Display();
 			watch.Restart();
 
@@ -1640,6 +1704,7 @@ class Program {
 		DateTimeOffset UtcNow = DateTimeOffset.UtcNow;
 		Color clearColor = Color.Black;
 		window.Clear(clearColor);
+		clearHudTexture();
 
 		for (int i = 0; i < loadText.Count; i++) {
 			Fonts.drawText(FontType.Grey, loadText[i], 8, 8 + (10 * i), isLoading: true);
@@ -1652,6 +1717,7 @@ class Program {
 		);
 
 		window.DispatchEvents();
+		renderHudTexture();
 		window.Display();
 	}
 }

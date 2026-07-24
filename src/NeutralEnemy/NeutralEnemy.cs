@@ -7,21 +7,26 @@ public class NeutralEnemy : Actor, IDamagable {
 	public int alliance;
 	public decimal health = 8;
 	public decimal maxHealth = 8;
+	public float damageSavings;
 	public bool invincibleFlag;
 	public int enemyId;
 	public float wSize = 12;
 	public float hSize = 12;
 	public Action<Point>[] killDrops = new Action<Point>[0];
+	public Player ownerPlayer;
 
 	public NeutralEnemyState state;
 
 	public NeutralEnemy(
-		Point pos, ushort netId, bool isLocal,
-		int alliance = GameMode.freelanceAlliance,
-		bool addToLevel = true
+		Point pos, int xDir, Player ownerPlayer, ushort netId,
+		int alliance = GameMode.freelanceAlliance, bool addToLevel = true
 	) : base(
-		"", pos, netId, isLocal, !addToLevel
+		"", pos, netId, ownerPlayer.ownedByLocalPlayer, !addToLevel
 	) {
+		// Get player data.
+		this.ownerPlayer = ownerPlayer;
+		netOwner = ownerPlayer;
+		this.xDir = xDir;
 		// Forcefull change sprite to something before we crash.
 		sprite = new Sprite("empty");
 		// We do this to manually call the state change.
@@ -35,12 +40,33 @@ public class NeutralEnemy : Actor, IDamagable {
 		}
 
 		this.alliance = alliance;
+		hasStateMachine = true;
+		syncOnLateJoin = true;
 	}
 
 	public override void preUpdate() {
 		base.preUpdate();
 		updateProjectileCooldown();
 	}
+	public override void postUpdate() {
+		base.postUpdate();
+
+		if (Global.level.gameMode.isTeamMode) {
+			RenderEffectType? allianceEffect = alliance switch {
+				0 => RenderEffectType.BlueShadow,
+				1 => RenderEffectType.RedShadow,
+				2 => RenderEffectType.GreenShadow,
+				3 => RenderEffectType.PurpleShadow,
+				4 => RenderEffectType.YellowShadow,
+				5 => RenderEffectType.OrangeShadow,
+				_ => null
+			};
+			if (allianceEffect != null) {
+				addRenderEffect(allianceEffect.Value);
+			}
+		}
+	}
+
 	// For state update.
 	public override void statePreUpdate() {
 		state.stateTime += Global.speedMul;
@@ -66,9 +92,12 @@ public class NeutralEnemy : Actor, IDamagable {
 		newState.chara = this;
 		// Sprites.
 		string oldSprite = sprite.name;
-		string newSprite = getSprite(sprite.name);
+		string newSprite = getSprite(newState.sprite);
 		if (newSprite != "" && Global.sprites.ContainsKey(newSprite)) {
-			changeSprite(getSprite(newState.sprite), true);
+			changeSprite(newSprite, true);
+		}
+		if (oldSprite == newState.sprite) {
+			sprite.restart();
 		}
 		// Exit/Enter shenanigans.
 		NeutralEnemyState oldState = state;
@@ -99,8 +128,16 @@ public class NeutralEnemy : Actor, IDamagable {
 	}
 
 	// IDamagable interface bello.
-	public void applyDamage(float damage, Player owner, Actor actor, int? weaponIndex, int? projId) {
-		health -= (decimal)damage;
+	public void applyDamage(float damage, Player owner, Actor? actor, int? weaponIndex, int? projId) {
+		int damageFloor = MathInt.Floor(damage);
+		float dmgFl = damage - damageFloor;
+		damageSavings += dmgFl;
+		if (damageSavings >= 1) {
+			damageSavings--;
+			damageFloor++;
+		}
+		addDamageText(damageFloor);
+		health -= damageFloor;
 		if (health <= 0) {
 			health = 0;
 			if (ownedByLocalPlayer) {
@@ -132,6 +169,16 @@ public class NeutralEnemy : Actor, IDamagable {
 	public bool isPlayableDamagable() {
 		return true;
 	}
+
+	// Render.
+	public override void render(float x, float y) {
+		base.render(x, y);
+		renderDamageText(16 - y);
+	}
+
+	// Net data.
+	public override int getSerialPlayerID() => ownerPlayer.id;
+	public override int getSerialCID() => (int)cActorId;
 
 	// Sends net data to update.
 	public override List<byte> getCustomActorNetData() {

@@ -37,9 +37,9 @@ public class RideChaser : Actor, IDamagable {
 
 		Global.level.addGameObject(this);
 
-		netActorCreateId = NetActorCreateId.RideChaser;
+		cActorId = CActorIds.RideChaser;
 		if (sendRpc) {
-			createActorRpc(owner.id);
+			RPC.createActor.sendRpc(this, owner, null, getSerialExtra());
 		}
 	}
 

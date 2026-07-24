@@ -27,10 +27,10 @@ public class BlizzardBuffalo : Maverick {
 		weakWeaponId = WeaponIds.ParasiticBomb;
 		weakMaverickWeaponId = WeaponIds.BlastHornet;
 
-		netActorCreateId = NetActorCreateId.BlizzardBuffalo;
 		netOwner = player;
+		cActorId = CActorIds.SigmaBlizzardBuffalo;
 		if (sendRpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, player, player.character, getSerialExtra());
 		}
 
 		armorClass = ArmorClass.Heavy;

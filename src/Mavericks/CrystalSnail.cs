@@ -30,10 +30,10 @@ public class CrystalSnail : Maverick {
 		weakWeaponId = WeaponIds.MagnetMine;
 		weakMaverickWeaponId = WeaponIds.MagnetMine;
 
-		netActorCreateId = NetActorCreateId.CrystalSnail;
 		netOwner = player;
+		cActorId = CActorIds.SigmaCrystalSnail;
 		if (sendRpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, player, player.character, getSerialExtra());
 		}
 
 		usesAmmo = true;
@@ -214,9 +214,9 @@ public class CrystalSnailShell : Actor {
 		frameSpeed = 0;
 
 		netOwner = owner;
-		netActorCreateId = NetActorCreateId.CrystalSnailShell;
+		cActorId = CActorIds.SigmaCrystalSnailShell;
 		if (sendRpc) {
-			createActorRpc(owner.id);
+			RPC.createActor.sendRpc(this, owner, cs, getSerialExtra());
 		}
 	}
 

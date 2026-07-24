@@ -29,10 +29,9 @@ public class LaunchOctopus : Maverick {
 		weakWeaponId = WeaponIds.RollingShield;
 		weakMaverickWeaponId = WeaponIds.ArmoredArmadillo;
 
-		netActorCreateId = NetActorCreateId.LaunchOctopus;
-		netOwner = player;
+		cActorId = CActorIds.SigmaLaunchOctopus;
 		if (sendRpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, player, player.character, getSerialExtra());
 		}
 
 		usesAmmo = true;

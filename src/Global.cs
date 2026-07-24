@@ -368,6 +368,9 @@ public partial class Global {
 
 	public static string fileChecksumBlob = checksumKey;
 	private static string _checksum;
+	public static void destroyChecksum() {
+		_checksum = "ERROR: Reload used. " + Helpers.randomRange(10000000, 99999999).ToString();
+	}
 	public static string checksum {
 		get {
 			return checksumPrefix + " " + _checksum;

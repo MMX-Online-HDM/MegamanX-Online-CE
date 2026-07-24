@@ -32,13 +32,12 @@ public class VoltCatfish : Maverick {
 		awardWeaponId = WeaponIds.TriadThunder;
 		weakWeaponId = WeaponIds.TornadoFang;
 		weakMaverickWeaponId = WeaponIds.TunnelRhino;
-
-		netActorCreateId = NetActorCreateId.VoltCatfish;
 		bouncedOnce = true;
 
 		netOwner = player;
+		cActorId = CActorIds.SigmaVoltCatfish;
 		if (sendRpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, player, player.character, getSerialExtra());
 		}
 
 		usesAmmo = true;

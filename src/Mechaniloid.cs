@@ -141,8 +141,13 @@ public class Mechaniloid : Actor, IDamagable {
 		return "sigma2_fish";
 	}
 
-	public Mechaniloid(Point pos, Player player, int xDir, MechaniloidWeapon weapon, MechaniloidType type, ushort netId, bool ownedByLocalPlayer, bool rpc = false) :
-		base(getSpriteFromType(type), pos, netId, ownedByLocalPlayer, false) {
+	public Mechaniloid(
+		Point pos, Player player, int xDir,
+		MechaniloidWeapon weapon, MechaniloidType type,
+		ushort netId, bool ownedByLocalPlayer, bool rpc = false
+	) : base(
+		getSpriteFromType(type), pos, netId, ownedByLocalPlayer, false
+	) {
 		this.xDir = xDir;
 		this.baseSprite = sprite.name;
 		this.type = type;
@@ -190,8 +195,9 @@ public class Mechaniloid : Actor, IDamagable {
 		rightPatrolX = pos.x + 150;
 
 		netOwner = player;
+		cActorId = CActorIds.ViralSigmaMechaniloidPlaceholder;
 		if (rpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, player, player.character, getSerialExtra());
 		}
 	}
 

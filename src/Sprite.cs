@@ -175,9 +175,8 @@ public class Sprite {
 		HashSet<RenderEffectType>? renderEffects, float alpha,
 		float scaleX, float scaleY, long zIndex,
 		List<ShaderWrapper>? shaders = null,
-		float angle = 0,
-		Actor? actor = null,
-		bool useFrameOffsets = false
+		float angle = 0, Actor? actor = null,
+		bool useFrameOffsets = false, Color? color = null
 	) {
 		if (!visible) return;
 		if (actor != null) {
@@ -568,7 +567,7 @@ public class Sprite {
 				cx - frameOffsetX * xDirArg,
 				cy - (frameOffsetY - extraYOff) * yDirArg,
 				xDirArg, yDirArg,
-				angle, alpha, shaders, true
+				angle, alpha, shaders, true, color
 			);
 		} else {
 			DrawWrappers.DrawCompositeTexture(
@@ -581,7 +580,7 @@ public class Sprite {
 				cx - (frameOffsetX - extraXOff) * xDirArg,
 				cy - (frameOffsetY - extraYOff) * yDirArg,
 				xDirArg, yDirArg,
-				angle, alpha, shaders, true
+				angle, alpha, shaders, true, color
 			);
 		}
 		// Old X armor draw for fast shaders.
@@ -602,7 +601,7 @@ public class Sprite {
 				x, y, zIndex,
 				cx - frameOffsetX * xDirArg,
 				cy - frameOffsetY * yDirArg,
-				xDirArg, yDirArg, angle, alpha, upShaders, true
+				xDirArg, yDirArg, angle, alpha, upShaders, true, color
 			);
 		}
 		if (animData.isAxlSprite && drawAxlArms) {
@@ -614,7 +613,7 @@ public class Sprite {
 				x, y, zIndex,
 				cx - frameOffsetX * xDirArg,
 				cy - frameOffsetY * yDirArg,
-				xDirArg, yDirArg, 0, alpha, shaders, true
+				xDirArg, yDirArg, 0, alpha, shaders, true, color
 			);
 		}
 	}

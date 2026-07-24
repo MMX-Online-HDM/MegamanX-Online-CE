@@ -89,9 +89,9 @@ public class RideArmor : Actor, IDamagable {
 		maxHawkBombCount = 3;
 		hawkBombCount = maxHawkBombCount;
 
-		netActorCreateId = NetActorCreateId.RideArmor;
+		cActorId = CActorIds.RideArmor;
 		if (sendRpc) {
-			createActorRpc(owner.id);
+			RPC.createActor.sendRpc(this, player, player.character, getSerialExtra());
 		}
 	}
 

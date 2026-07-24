@@ -29,10 +29,9 @@ public class MorphMoth : Maverick {
 		weakWeaponId = WeaponIds.SpeedBurner;
 		weakMaverickWeaponId = WeaponIds.FlameStag;
 
-		netActorCreateId = NetActorCreateId.MorphMoth;
-		netOwner = player;
+		cActorId = CActorIds.SigmaMorphMoth;
 		if (sendRpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, player, player.character, getSerialExtra());
 		}
 
 		canFly = true;
