@@ -117,7 +117,7 @@ public class TeamElimAlt : GameMode {
 			teamFontsSmall[teamSide], teamText,
 			Global.screenW - 56 + mapOffset, 7, Alignment.Right
 		);
-		int textSize = Fonts.measureText(FontType.WhiteSmall, teamText);
+		int textSize = Fonts.measureText(FontType.Blue, teamText);
 
 		int leaderTeam = 0;
 		int leaderScore = -1;
@@ -138,7 +138,7 @@ public class TeamElimAlt : GameMode {
 			);
 		} else {
 			Fonts.drawText(
-				FontType.WhiteSmall, $"L: {leaderScore} ",
+				FontType.Blue, $"L: {leaderScore} ",
 				Global.screenW - 56 + mapOffset - textSize, 7, Alignment.Right
 			);
 		}
@@ -147,7 +147,7 @@ public class TeamElimAlt : GameMode {
 		Player[] alliesAlive = playersAlive.Where(p => p.alliance == mainPlayer.alliance).ToArray();
 
 		Fonts.drawText(
-			FontType.WhiteSmall, $"Alive: {alliesAlive.Length} / {playersAlive.Length}",
+			FontType.Blue, $"Alive: {alliesAlive.Length} / {playersAlive.Length}",
 			Global.screenW - 56 + mapOffset, 17, Alignment.Right
 		);
 

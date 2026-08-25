@@ -7,6 +7,7 @@ public class KingOfTheHill : GameMode {
 	public KingOfTheHill(Level level, int? timeLimit) : base(level, timeLimit ?? 1) {
 		isTeamMode = true;
 		playingTo = 100;
+		useTeamSpawns = true;
 	}
 
 	public override void render() {

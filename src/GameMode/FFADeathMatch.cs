@@ -17,16 +17,17 @@ public class FFADeathMatch : GameMode {
 
 	public override void drawTopHUD() {
 		List<Player> playerList = getOrderedPlayerList();
+		int place = playerList.IndexOf(level.mainPlayer) + 1;
+		string placeStr = Helpers.getNthString(place);
 		string topText = "Leader: 0";
 		if (playerList.Count > 0) {
-			topText = "Leader:" + playerList[0].score.ToString().PadLeft(2 ,' ');
+			topText = "Leader: " + playerList[0].score.ToString();
 		}
-		string botText = "Kills:" + level.mainPlayer.score.ToString().PadLeft(2 ,' ');
-		float mapOffset = shouldDrawRadar() ? 0 : 48;
-		Fonts.drawText(FontType.WhiteSmall, botText, Global.screenW - 56 + mapOffset, 7, Alignment.Right);
-		Fonts.drawText(FontType.WhiteSmall, topText, Global.screenW - 56 + mapOffset, 17, Alignment.Right);
+		string botText = $"Kills: {level.mainPlayer.score} [{placeStr}]";
+		Fonts.drawText(FontType.BlueMenu, topText, 5, 5, Alignment.Left);
+		Fonts.drawText(FontType.BlueMenu, botText, 5, 15, Alignment.Left);
 
-		drawTimeIfSet(37);
+		drawTimeIfSet(25);
 	}
 
 	public override void drawScoreboard() {

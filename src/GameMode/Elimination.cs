@@ -78,20 +78,19 @@ public class Elimination : GameMode {
 	}
 
 	public override void drawTopHUD() {
-		Player[] playersStillAlive = level.players.Where(p => !p.isSpectator && p.score < playingTo).ToArray();
-		int lives = playingTo - level.mainPlayer.score;
-		string topText = "Lives:" + lives.ToString().PadLeft(2 ,' ');
-		string botText = "Alive:" + (playersStillAlive.Length).ToString().PadLeft(2 ,' ');
-		float mapOffset = shouldDrawRadar() ? 0 : 48;
-		Fonts.drawText(FontType.WhiteSmall, botText,  Global.screenW - 56 + mapOffset, 7, Alignment.Right);
-		Fonts.drawText(FontType.WhiteSmall, topText,  Global.screenW - 56 + mapOffset, 17, Alignment.Right);
+		var playersStillAlive = level.players.Where(p => !p.isSpectator && p.deaths < playingTo).ToList();
+		int lives = playingTo - level.mainPlayer.deaths;
+		var topText = "Lives: " + lives.ToString();
+		var botText = "Alive: " + (playersStillAlive.Count).ToString();
+		Fonts.drawText(FontType.BlueMenu, topText, 5, 5, Alignment.Left);
 
 		if (virusStarted != 1) {
-			drawTimeIfSet(37);
+			drawTimeIfSet(30);
 		} else {
-			drawVirusTime(37);
+			drawVirusTime(30);
 		}
 	}
+
 
 	public override void drawScoreboard() {
 		base.drawScoreboard();

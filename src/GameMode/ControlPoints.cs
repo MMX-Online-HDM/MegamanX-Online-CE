@@ -9,6 +9,7 @@ public class ControlPoints : GameMode {
 
 	public ControlPoints(Level level, int? timeLimit) : base(level, timeLimit) {
 		isTeamMode = true;
+		useTeamSpawns = true;
 		playingTo = 100;
 	}
 
@@ -42,12 +43,11 @@ public class ControlPoints : GameMode {
 	public override void drawTopHUD() {
 		//var redText = "CP " + bluePoints.ToString() + "%";
 
-		int hudcpY = 4;
-		int hudcpX = (int)Global.screenW - 111;
+		int hudcpY = 0;
 		foreach (var controlPoint in level.controlPoints) {
 			var redText = "";
 
-			FontType textColor = FontType.Red;
+			FontType textColor = FontType.RedishOrange;
 			if (controlPoint.captureTime == controlPoint.maxCaptureTime) {
 				redText = "Lock";
 				textColor = FontType.Blue;
@@ -64,18 +64,20 @@ public class ControlPoints : GameMode {
 					textColor = FontType.Grey;
 				}
 			}
+
 			int allianceFactor = (controlPoint.alliance == GameMode.redAlliance ? 0 : 2);
-			controlPointSprite.drawToHUD((controlPoint.num - 1) + allianceFactor, hudcpX, hudcpY);
+			controlPointSprite.drawToHUD((controlPoint.num - 1) + allianceFactor, 5, 5 + hudcpY);
 			float perc = controlPoint.captureTime / controlPoint.maxCaptureTime;
 			int barsFull = MathInt.Round(perc * 16f);
 			for (int i = 0; i < barsFull; i++) {
-				controlPointBarSprite.drawToHUD(1, hudcpX + 17 + (i * 2), 3 + hudcpY);
+				controlPointBarSprite.drawToHUD(1, 5 + 17 + (i * 2), 5 + 3 + hudcpY);
 			}
-			Fonts.drawText(textColor, redText, 33 + hudcpX, 2 + hudcpY, Alignment.Center);
-			hudcpY += 14;
+
+			Fonts.drawText(textColor, redText, 38, 9 + hudcpY, Alignment.Center);
+			hudcpY += 16;
 		}
 
-		drawTimeIfSet(37);
+		drawTimeIfSet(4 + hudcpY);
 	}
 
 	public override void checkIfWinLogic() {

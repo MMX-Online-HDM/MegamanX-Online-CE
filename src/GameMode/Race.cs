@@ -37,7 +37,7 @@ public class Race : GameMode {
 		int place = getPlace(Global.level.mainPlayer);
 		string placeStr = Helpers.getNthString(place);
 		var topText = "Place: " + placeStr + "/" + level.nonSpecPlayers().Count;
-		Fonts.drawText(FontType.WhiteSmall, topText, Global.screenW - 56, 17, Alignment.Right);
-		drawTimeIfSet(37);
+		Fonts.drawText(FontType.BlueMenu, topText, 5, 5, Alignment.Left);
+		drawTimeIfSet(15);
 	}
 }

@@ -3751,7 +3751,7 @@ public partial class Character : Actor, IDamagable {
 		}
 		if (buff.stackData.max != buff.stackData.min && buff.stacks > buff.stackData.min) {
 			Fonts.drawText(
-				FontType.RedSmall, buff.stacks.ToString(),
+				FontType.Red, buff.stacks.ToString(),
 				drawPos.x + 8, drawPos.y, Alignment.Right
 			);
 		}

@@ -10,6 +10,7 @@ public class CTF : GameMode {
 		this.playingTo = playingTo;
 		this.neutralKillLimit = neutralKillLimit;
 		isTeamMode = true;
+		useTeamSpawns = true;
 	}
 
 	public override void render() {

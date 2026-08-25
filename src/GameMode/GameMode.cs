@@ -145,6 +145,7 @@ public class GameMode {
 	public Player? hudBotRightPlayer;
 
 	public bool spawnOnAlly;
+	public bool useTeamSpawns;
 	public const int grayAmmoIndex = 30;
 
 	bool hudPositionsAssigned;
@@ -211,22 +212,6 @@ public class GameMode {
 		else if (mode == ElimAlt) return "a.elim";
 		else if (mode == TeamElimAlt) return "ta.elim";
 		else return "dm";
-	}
-
-	public bool useTeamSpawns() {
-		return (this is CTF) || (this is ControlPoints) || (this is KingOfTheHill);
-	}
-
-	public float getAmmoModifier() {
-		/*
-		if (level.is1v1())
-		{
-			if (Global.level.server.playTo == 1) return 0.25f;
-			if (Global.level.server.playTo == 2) return 0.5f;
-		}
-		return 1;
-		*/
-		return 1;
 	}
 
 	public static int[] getAllianceCounts(List<Player> players, int teamNum) {
@@ -1116,7 +1101,7 @@ public class GameMode {
 		});
 		string spectatorStr = string.Join(",", spectatorNames);
 		if (!string.IsNullOrEmpty(spectatorStr)) {
-			Fonts.drawText(FontType.Black, "SPECTATORS: " + spectatorStr, 15, 200);
+			Fonts.drawText(FontType.BlueMenu, "Spectators: " + spectatorStr, 15, 200);
 		}
 	}
 
@@ -2003,52 +1988,45 @@ public class GameMode {
 
 	public void drawNetcodeData() {
 		int top2 = -3;
+		string netcodePingStr = "";
+		int iconXPos = 280;
+		if (level.server.netcodeModel == NetcodeModel.FavorAttacker) {
+			netcodePingStr = " < " + level.server.netcodeModelPing.ToString();
+			if (level.server.netcodeModelPing < 100) iconXPos = 260;
+			else iconXPos = 253;
+		}
+
 		if (!Global.level.server.isP2P) {
 			Fonts.drawText(
-				FontType.WhiteSmall, Global.level.server.region.name,
-				Global.screenW - 12, top2 + 14, Alignment.Right
+				FontType.DarkPurple, Global.level.server.region?.name ?? "???",
+				Global.screenW - 12, top2 + 12, Alignment.Right
 			);
 		} else {
 			Fonts.drawText(
-				FontType.WhiteSmall, "P2P Server",
-				Global.screenW - 12, top2 + 14, Alignment.Right
+				FontType.DarkPurple,
+				"P2P Server on" + Global.level.server.port + netcodePingStr,
+				261, top2 + 14, Alignment.Left
 			);
 		}
-
-		string netcodePingStr = "";
-		if (level.server.netcodeModel == NetcodeModel.FavorAttacker) {
-			netcodePingStr = "<" + level.server.netcodeModelPing.ToString();
-		}
-		Fonts.drawText(
-			FontType.WhiteSmall, netcodePingStr,
-			Global.screenW - 12, top2 + 22, Alignment.Right
-		);
-		Global.sprites["hud_netcode"].drawToHUD((int)level.server.netcodeModel, Global.screenW - 50, top2 + 29);
+		Global.sprites["hud_netcode"].drawToHUD((int)level.server.netcodeModel, 364, top2 + 30);
 		if (Global.level.server.isLAN) {
 			Fonts.drawText(
-				FontType.WhiteSmall, "IP: " + Global.level.server.ip,
+				FontType.DarkPurple, "IP: " + Global.level.server.ip,
 				Global.screenW - 12, top2 + 32, Alignment.Right
 			);
 		}
 	}
 
-	public virtual FontType getPingFont(int? ping) {
-		if (ping < level.server.netcodeModelPing) return FontType.White;
-		return FontType.Red;
-	}
-
 	public virtual void drawScoreboard() {
 		int padding = 16;
 		int top = 16;
-		int[] col = [
-			padding,
-			padding + 76,
-			padding + 76 * 2,
-			padding + 76 * 3,
-			padding + 76 * 4,
-		];
+		int col1x = padding;
+		int col2x = (int)Math.Floor(Global.screenW * 0.33);
+		int col3x = (int)Math.Floor(Global.screenW * 0.475);
+		int col4x = (int)Math.Floor(Global.screenW * 0.65);
+		int col5x = (int)Math.Floor(Global.screenW * 0.85);
 		int lineY = padding + 20;
-		var labelTextY = 48;
+		var labelTextY = lineY + 2;
 		int line2Y = lineY + 12;
 		int topPlayerY = line2Y + 2;
 		DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
@@ -2057,39 +2035,30 @@ public class GameMode {
 			MMXOnline.FFADeathMatch => $"FFA (to {playingTo})",
 			MMXOnline.Elimination => "Elimination",
 			MMXOnline.Race => "Race",
-			MMXOnline.ElimAlt => $"Elimination (to {playingTo})",
-			MMXOnline.TeamElimAlt => $"Team Elimination (to {playingTo})",
 			_ => Global.level.server.gameMode
 		};
-		Fonts.drawText(FontType.BlueMenu, modeText, padding, 12);
+		Fonts.drawText(FontType.BlueMenu, modeText, padding, top);
 		drawMapName(padding, top + 10);
 		if (Global.serverClient != null) {
 			Fonts.drawText(
-				FontType.OrangeMenu, "Match: " + Global.level.server.name, padding + 100, 12
+				FontType.BlueMenu, "Match: " + Global.level.server.name, padding + 245, top + 10
 			);
 			drawNetcodeData();
 		}
 
 		DrawWrappers.DrawLine(
-			padding - 2, labelTextY - 2,
-			Global.screenW - padding + 2, labelTextY - 2,
-			new Color(232, 232, 232, 224), 1, ZIndex.HUD, false
+			padding - 2, lineY, Global.screenW - padding + 2, lineY, new Color(232, 232, 232, 224), 1, ZIndex.HUD, false
 		);
-		Fonts.drawText(FontType.OrangeMenu, "PLAYER", col[0] + 6, labelTextY, Alignment.Left);
-			Fonts.drawText(
-			FontType.OrangeMenu, this is Elimination ? "LIVES" : "SCORE",
-			col[1] + 6, labelTextY, Alignment.Left
-		);
-		Fonts.drawText(FontType.OrangeMenu, "KDA", col[2] + 6, labelTextY, Alignment.Left);
-		Fonts.drawText(FontType.OrangeMenu, "RANK", col[3] + 6, labelTextY, Alignment.Left);
+		Fonts.drawText(FontType.OrangeMenu, "Player", col1x, labelTextY, Alignment.Left);
+		Fonts.drawText(FontType.OrangeMenu, "Char", col2x, labelTextY, Alignment.Left);
+		Fonts.drawText(FontType.OrangeMenu, "Kills", col3x, labelTextY, Alignment.Left);
+		Fonts.drawText(FontType.OrangeMenu, this is Elimination ? "Lives" : "Deaths", col4x, labelTextY, Alignment.Left);
 
-		if (Global.serverClient != null || true) {
-			Fonts.drawText(FontType.OrangeMenu, "PING",
-			col[4] + 6, labelTextY, Alignment.Left);
+		if (Global.serverClient != null) {
+			Fonts.drawText(FontType.OrangeMenu, "Ping", col5x, labelTextY, Alignment.Left);
 		}
 		DrawWrappers.DrawLine(
-			padding - 2, labelTextY + 15, Global.screenW - padding + 2,
-			labelTextY + 15, Color.White, 1, ZIndex.HUD, false
+			padding - 2, line2Y, Global.screenW - padding + 2, line2Y, Color.White, 1, ZIndex.HUD, false
 		);
 		var rowH = 10;
 		var players = getOrderedPlayerList();
@@ -2099,36 +2068,30 @@ public class GameMode {
 		for (var i = 0; i < players.Count && i <= 14; i++) {
 			var player = players[i];
 			var color = getCharFont(player);
-			var pingColor = getPingFont(player.getPingOrStartPing());
 
 			if (Global.serverClient != null && player.serverPlayer.isHost) {
 				Fonts.drawText(
-					FontType.WhiteMini, "H", col[0] - 4, labelTextY + 18 + i * rowH,
-					color: Color.Yellow
+					FontType.Yellow, "H", col1x - 8, 1 + topPlayerY + i * rowH
 				);
 			} else if (Global.serverClient != null && player.serverPlayer.isBot) {
 				Fonts.drawText(
-					FontType.WhiteMini, "B", col[0] - 4, labelTextY + 18 + i * rowH
+					FontType.Grey, "B", col1x - 8, 3 + topPlayerY + i * rowH
 				);
 			}
 
+			Fonts.drawText(color, player.name, col1x, topPlayerY + (i) * rowH, Alignment.Left);
+			Fonts.drawText(FontType.Blue, player.kills.ToString(), col3x, topPlayerY + (i) * rowH, Alignment.Left);
 			Fonts.drawText(
-				color, player.name, col[0] + 6, labelTextY + 18 + (i) * rowH
-			);
-			Fonts.drawText(
-				FontType.Yellow, $"{player.score}", col[1] + 6, labelTextY + 18 + (i) * rowH
-			);
-			Fonts.drawText(
-				FontType.White, $"{player.kills} {player.deaths} {player.assists}",
-				col[2] + 6, labelTextY + 18 + (i) * rowH
+				FontType.Blue, player.getDeathScore().ToString(),
+				col4x, topPlayerY + (i) * rowH, Alignment.Left
 			);
 
 			if (Global.serverClient != null) {
-				Fonts.drawText(
-					pingColor, player.getDisplayPing(), col[4] + 6,
-					labelTextY + 18 + (i) * rowH
-				);
+				Fonts.drawText(FontType.Blue, player.getDisplayPing(), col5x, topPlayerY + (i) * rowH, Alignment.Left);
 			}
+			if (player.charNum == (int)CharIds.PunchyZero || player.charNum == (int)CharIds.BusterZero) {
+				Global.sprites[getCharIcon(player)].drawToHUD(1, col2x + 4, topPlayerY + i * rowH);
+			} else Global.sprites[getCharIcon(player)].drawToHUD(player.realCharNum, col2x + 4, topPlayerY + i * rowH);
 		}
 		drawSpectators();
 	}
@@ -2157,12 +2120,12 @@ public class GameMode {
 			MMXOnline.TeamElimination => "Team Elimination",
 			_ => Global.level.server.gameMode
 		};
-		Fonts.drawText(FontType.BlueMenu, textMode, padding, 12);
+		Fonts.drawText(FontType.BlueMenu, textMode, padding, top);
 		drawMapName(padding, top + 10);
 
 		if (Global.serverClient != null) {
 			Fonts.drawText(
-				FontType.OrangeMenu, Global.level.server.name, 198, 12
+				FontType.BlueMenu, "Match: " + Global.level.server.name, padding + 245, top + 10
 			);
 			drawNetcodeData();
 		}
@@ -2170,12 +2133,12 @@ public class GameMode {
 		int redPlayersStillAlive = 0;
 		int bluePlayersStillAlive = 0;
 		if (this is TeamElimination) {
-			redPlayersStillAlive = level.players.Count(
+			redPlayersStillAlive = level.players.Where(
 				p => !p.isSpectator && p.deaths < playingTo && p.alliance == redAlliance
-			);
-			bluePlayersStillAlive = level.players.Count(
+			).Count();
+			bluePlayersStillAlive = level.players.Where(
 				p => !p.isSpectator && p.deaths < playingTo && p.alliance == blueAlliance
-			);
+			).Count();
 		}
 
 		//Blue
@@ -2183,28 +2146,28 @@ public class GameMode {
 			ControlPoints => "Blue: Attack",
 			MMXOnline.KingOfTheHill => "Blue",
 			MMXOnline.TeamElimination => $"Alive: {bluePlayersStillAlive}",
-			_ => $"Blue: {teamPoints[0]}"
+			_ => $"Blue: {Global.level.gameMode.teamPoints[0]}"
 		};
 		string redText = this switch {
 			ControlPoints => "Red: Defend",
 			MMXOnline.KingOfTheHill => "Red",
 			MMXOnline.TeamElimination => $"Alive: {bluePlayersStillAlive}",
-			_ => $"Red: {teamPoints[1]}"
+			_ => $"Red: {Global.level.gameMode.teamPoints[1]}"
 		};
 		(int x, int y)[] positions = {
-			(4, 46),
-			(248, 46),
-			(126, 46),
-			(4, 130),
-			(248, 130),
-			(126, 130),
+			(padding - 6, top + 32),
+			(padding + 238, top + 32),
+			(padding + 116, top + 32),
+			(padding - 6, top + 116),
+			(padding + 238, top + 116),
+			(padding + 116, top + 116),
 		};
 		drawTeamMiniScore(positions[0], 0, FontType.Blue, blueText);
 		drawTeamMiniScore(positions[1], 1, FontType.Red, redText);
 		for (int i = 2; i < Global.level.teamNum; i++) {
 			drawTeamMiniScore(
 				positions[i], i,
-				teamFonts[i], $"{teamNames[i]}: {teamPoints[i]}"
+				teamFonts[i], $"{teamNames[i]}: {Global.level.gameMode.teamPoints[i]}"
 			);
 		}
 		drawSpectators();
@@ -2215,57 +2178,44 @@ public class GameMode {
 		bool isTE = false;
 		if (this is TeamElimination) {
 			isTE = true;
-			playersStillAlive = level.players.Count(
+			playersStillAlive = level.players.Where(
 				p => !p.isSpectator && p.deaths < playingTo && p.alliance == alliance
-			);
+			).Count();
 		}
-		int[] rows = [pos.y, pos.y + 10, pos.y + 20];
-		int baseX = pos.x + 10;
-		int[] cols = [
-			baseX,
-			baseX + 4 * 9,
-			baseX + 4 * 11,
-			baseX + 4 * 13,
-			baseX + 4 * 15,
-			baseX + 4 * 17,
-			baseX + 4 * 25,
-		];
+		int[] rows = new int[] { pos.y, pos.y + 10, pos.y + 24 };
+		int[] cols = new int[] { pos.x, pos.x + 72, pos.x + 88, pos.x + 104 };
 		DrawWrappers.DrawRect(
-			pos.x + 8, rows[1] + 8, pos.x + 124, rows[1] + 9, true,
+			pos.x - 1, pos.y + 19, pos.x + 120, pos.y + 20, true,
 			new Color(255, 255, 255, 128), 0, ZIndex.HUD, false
 		);
 
-		Fonts.drawText(color, title, cols[0], rows[0]);
-		Fonts.drawText(FontType.WhiteMini, "Player", cols[0], rows[1], color: teamColors[5]);
-		Fonts.drawText(FontType.WhiteMini, "S", cols[1], rows[1], color: teamColors[5]);
-		Fonts.drawText(FontType.WhiteMini, "K", cols[2], rows[1], color: teamColors[5]);
-		Fonts.drawText(FontType.WhiteMini, isTE ? "L" : "D", cols[3], rows[1], color: teamColors[5]);
-		Fonts.drawText(FontType.WhiteMini, "A", cols[4], rows[1], color: teamColors[5]);
-		Fonts.drawText(FontType.WhiteMini, "RANK", cols[5], rows[1], color: teamColors[5]);
-		Fonts.drawText(FontType.WhiteMini, "P", cols[6], rows[1], color: teamColors[5]);
-
+		Fonts.drawText(color, title, cols[0] + 12, rows[0]);
+		Fonts.drawText(FontType.Orange, "Player", cols[0] + 12, rows[1]);
+		Fonts.drawText(FontType.Orange, "K", cols[1], rows[1]);
+		Fonts.drawText(FontType.Orange, isTE ? "L" : "D", cols[2], rows[1]);
+		if (Global.serverClient != null) {
+			Fonts.drawText(FontType.Orange, "P", cols[3], rows[1]);
+		}
 		// Player draw
 		Player[] players = level.players.Where(p => p.alliance == alliance && !p.isSpectator).ToArray();
 		for (var i = 0; i < players.Length && i <= 14; i++) {
 			Player player = players[i];
 			int posY = rows[2] + i * 10;
-			Color charColor = getCharColor(player);
+			FontType charColor = getCharFont(player);
 
 			if (Global.serverClient != null && player.serverPlayer.isHost) {
-				Fonts.drawText(FontType.WhiteMini, "h", cols[0] - 6, posY, alpha: 128);
+				Fonts.drawText(FontType.Yellow, "H", cols[0] - 8, posY);
 			} else if (Global.serverClient != null && player.serverPlayer.isBot) {
-				Fonts.drawText(FontType.WhiteMini, "b", cols[0] - 6, posY, alpha: 128);
+				Fonts.drawText(FontType.Grey, "B", cols[0] - 8, posY);
 			}
-			Color nameColor = getCharColor(player);
 
-			Fonts.drawText(FontType.WhiteMini, player.name, cols[0], posY, color: nameColor);
-			Fonts.drawText(FontType.WhiteMini, $"{player.score}", cols[1], posY, color: teamColors[4]);
-			Fonts.drawText(FontType.WhiteMini, $"{player.kills}", cols[2], posY);
-			Fonts.drawText(FontType.WhiteMini, $"{player.deaths}", cols[3], posY);
-			Fonts.drawText(FontType.WhiteMini, $"{player.assists}", cols[4], posY);
+			Global.sprites[getCharIcon(player)].drawToHUD(player.realCharNum, cols[0] + 5, posY - 2);
+			Fonts.drawText(charColor, player.name, cols[0] + 12, posY);
+			Fonts.drawText(FontType.Blue, player.kills.ToString(), cols[1], posY);
+			Fonts.drawText(FontType.Red, player.getDeathScore().ToString(), cols[2], posY);
 
 			if (Global.serverClient != null) {
-				Fonts.drawText(FontType.WhiteMini, player.getTeamDisplayPing(), cols[6], posY);
+				Fonts.drawText(FontType.Grey, player.getTeamDisplayPing(), cols[3], posY);
 			}
 		}
 	}
@@ -2335,29 +2285,21 @@ public class GameMode {
 		};
 	}
 
-	public Color getTimeColor(float? altTime = null) {
-		altTime ??= finalZoneTime ?? remainingTime;
-		if (remainingTime <= 10) {
-			return Color.Red;
-		}
-		return Color.White;
-	}
-
 	public void drawTimeIfSet(int yPos, float? altTime = null) {
 		altTime ??= finalZoneTime ?? remainingTime;
-		FontType fontColor = FontType.WhiteSmall;
+		FontType fontColor = FontType.Grey;
 		string timeStr = "";
 		if (setupTime > 0) {
 			var timespan = new TimeSpan(0, 0, MathInt.Ceiling(setupTime.Value));
 			timeStr = timespan.ToString(@"m\:ss");
-			fontColor = FontType.OrangeSmall;
+			fontColor = FontType.OrangeMenu;
 		} else if (setupTime == 0 && goTime < 1) {
 			goTime += Global.spf;
 			timeStr = "GO!";
-			fontColor = FontType.RedSmall;
+			fontColor = FontType.RedishOrange;
 		} else if (altTime != null) {
 			if (altTime <= 10) {
-				fontColor = FontType.OrangeSmall;
+				fontColor = FontType.OrangeMenu;
 			}
 			var timespan = new TimeSpan(0, 0, MathInt.Ceiling(altTime.Value));
 			timeStr = timespan.ToString(@"m\:ss");
@@ -2366,12 +2308,12 @@ public class GameMode {
 			}
 			if (isOvertime()) {
 				timeStr = "Overtime!";
-				fontColor = FontType.RedSmall;
+				fontColor = FontType.Red;
 			}
 		} else {
 			return;
 		}
-		Fonts.drawText(fontColor, timeStr, Global.screenW - 8, yPos, Alignment.Right);
+		Fonts.drawText(fontColor, timeStr, 5, yPos, Alignment.Left);
 	}
 
 	public bool isOvertime() {
@@ -2388,8 +2330,8 @@ public class GameMode {
 
 	public void drawVirusTime(int yPos) {
 		var timespan = new TimeSpan(0, 0, MathInt.Ceiling(finalZoneTime ?? 0));
-		string timeStr = "Roboenza: " + timespan.ToString(@"m\:ss");
-		Fonts.drawText(FontType.PurpleSmall, timeStr, 5, yPos, Alignment.Left);
+		string timeStr = "Nightmare Virus: " + timespan.ToString(@"m\:ss");
+		Fonts.drawText(FontType.Purple, timeStr, 5, yPos, Alignment.Left);
 	}
 
 	public void drawWinScreen() {
@@ -2726,54 +2668,36 @@ public class GameMode {
 			return;
 		}
 		int maxTeams = Global.level.teamNum;
-		float mapOffset = shouldDrawRadar() ? 0 : 48;
 
-		string teamText = $"{teamNames[teamSide]}: {teamPoints[teamSide].ToString().PadLeft(2, ' ')}";
-		Fonts.drawText(
-			teamFontsSmall[teamSide], teamText,
-			Global.screenW - 56 + mapOffset, 17, Alignment.Right
-		);
+		string teamText = $"{teamNames[teamSide]}: {teamPoints[teamSide]}";
+		Fonts.drawText(teamFonts[teamSide], teamText, 5, 5);
 
 		int leaderTeam = 0;
 		int leaderScore = -1;
 		bool moreThanOneLeader = false;
-		int leaderCount = 0;
-		//First we check the current highest team score.
 		for (int i = 0; i < Global.level.teamNum; i++) {
-			if (teamPoints[i] >= leaderScore) {
+			if (teamPoints[0] >= leaderScore) {
 				leaderTeam = i;
+				if (leaderScore == teamPoints[i]) {
+					moreThanOneLeader = true;
+				}
 				leaderScore = teamPoints[i];
 			}
 		}
-		//Then we check if there is more than one team with said highest score.
-		for (int i = 0; i < Global.level.teamNum; i++) {
-			if (leaderScore == teamPoints[i]) {
-				leaderCount++;
-			}
-		}
-		moreThanOneLeader = leaderCount > 1;
-
 		if (!moreThanOneLeader) {
-			Fonts.drawText(
-				teamFontsSmall[leaderTeam], $"Leader: {leaderScore.ToString().PadLeft(2, ' ')}",
-				Global.screenW - 56 + mapOffset, 7, Alignment.Right
-			);
+			Fonts.drawText(teamFonts[leaderTeam], $"Leader: {leaderScore}", 5, 15);
 		} else {
-			Fonts.drawText(
-				FontType.WhiteSmall, $"Leader:{leaderScore.ToString().PadLeft(2, ' ')}",
-				Global.screenW - 56 + mapOffset, 7, Alignment.Right
-			);
+			Fonts.drawText(FontType.Grey, $"Leader: {leaderScore}", 5, 15);
 		}
-		drawTimeIfSet(37);
+		drawTimeIfSet(25);
 	}
 
 	public void drawAllTeamsHUD() {
 		for (int i = 0; i < Global.level.teamNum; i++) {
-			Fonts.drawText(teamFontsSmall[i], $"{teamNames[i]}: {teamPoints[i]}", 5, 5 + i * 10);
+			Fonts.drawText(teamFonts[i], $"{teamNames[i]}: {teamPoints[i]}", 5, 5 + i * 10);
 		}
 		drawTimeIfSet(5 + 10 * (Global.level.teamNum + 1));
 	}
-
 
 	public void addMapNavpoint(Point objPos, (string name, int index)? spr = null) {
 		navPoints.Add((objPos.round(), spr?.name ?? "hud_minimap_arrow", spr?.index ?? 0));
@@ -2836,10 +2760,10 @@ public class GameMode {
 			Helpers.getAllianceColor(), 2, ZIndex.HUD, false
 		);
 
-		decimal distInMeters = Math.Floor(Math.Abs((decimal)objPos.distanceTo(playerPos) / 32m));
+		decimal distInMeters = Math.Floor(Math.Abs((decimal)objPos.distanceTo(playerPos) / 24m));
 		bool isLeft = posX < Global.viewScreenW / 2;
 		Fonts.drawText(
-			FontType.WhiteMini, $"{label} {distInMeters}m",
+			FontType.BlueMenu, $"{label} {distInMeters}m",
 			posX, posY - 4, isLeft ? Alignment.Left : Alignment.Right
 		);
 	}

@@ -29,7 +29,7 @@ public class TeamElimination : GameMode {
 		string botText = "Lives:" + lives.ToString().PadLeft(2 ,' ');
 		float mapOffset = shouldDrawRadar() ? 0 : 48;
 		Fonts.drawText(fontColor, topText,  Global.screenW - 56 + mapOffset, 7, Alignment.Right);
-		Fonts.drawText(FontType.WhiteSmall, botText,  Global.screenW - 56 + mapOffset, 17, Alignment.Right);
+		Fonts.drawText(FontType.Blue, botText,  Global.screenW - 56 + mapOffset, 17, Alignment.Right);
 
 		if (virusStarted != 1) {
 			drawTimeIfSet(37);

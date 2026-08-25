@@ -1350,17 +1350,17 @@ public partial class Actor : GameObject {
 			y += yDirOffset();
 		}
 
-		float drawX = MathF.Round(pos.x) + MathF.Round(x);
-		float drawY = MathF.Round(pos.y) + MathF.Round(y);
-
 		if (customAngleRendering) {
 			renderFromAngle(x, y);
 		} else {
+			float drawX = MathF.Round(pos.x) + MathF.Round(x);
+			float drawY = MathF.Round(pos.y) + MathF.Round(y);
+
 			sprite.draw(
 				frameIndex, drawX, drawY, xDir, yDirMod(),
 				getRenderEffectSet(), alpha, xScale, yScale, zIndex,
-				getShaders(), angle: angle, actor: this, useFrameOffsets: true,
-				spriteColor
+				getShaders(), angle: angle, actor: this,
+				useFrameOffsets: true, color: spriteColor
 			);
 		}
 
@@ -1371,25 +1371,18 @@ public partial class Actor : GameObject {
 		commonHealLogic(healer, (decimal)healAmount, (decimal)currentHealth, (decimal)maxHealth, drawHealText);
 	}
 
-	public void commonHealLogic(
-		Player healer, decimal healAmount,
-		decimal currentHealth, decimal maxHealth,
-		bool drawHealText
-	) {
-		if (!ownedByLocalPlayer) {
-			return;
-		}
-		float reportAmount = (float)Helpers.clampMax(healAmount, maxHealth - currentHealth);
-		if (reportAmount == 0) {
-			bool hasSubtankCapacity = false;
-			if (this is Character chr && chr.player.hasSubtankCapacity()) hasSubtankCapacity = true;
-			if (this is Maverick maverick && maverick.player.hasSubtankCapacity()) hasSubtankCapacity = true;
-			if (hasSubtankCapacity) {
-				RPC.playSound.sendRpc("subtankFill", netId);
-			}
-		} else {
-			healer.creditHealing(reportAmount);
-			if (drawHealText) {
+	public void commonHealLogic(Player healer, decimal healAmount, decimal currentHealth, decimal maxHealth, bool drawHealText) {
+		if (drawHealText && ownedByLocalPlayer) {
+			float reportAmount = (float)Helpers.clampMax(healAmount, maxHealth - currentHealth);
+			if (reportAmount == 0) {
+				bool hasSubtankCapacity = false;
+				if (this is Character chr && chr.player.hasSubtankCapacity()) hasSubtankCapacity = true;
+				if (this is Maverick maverick && maverick.player.hasSubtankCapacity()) hasSubtankCapacity = true;
+				if (hasSubtankCapacity) {
+					RPC.playSound.sendRpc("subtankFill", netId);
+				}
+			} else {
+				healer.creditHealing(reportAmount);
 				addDamageTextHelper(healer, -reportAmount, 16, sendRpc: true);
 			}
 		}
@@ -1402,9 +1395,9 @@ public partial class Actor : GameObject {
 
 		if (damage >= Damager.ohkoDamage && damage >= maxHealth) {
 			if (Helpers.randomRange(0, 20) != 10) {
-				addDamageText("Instakill!", (int)FontType.OrangeSmall);
+				addDamageText("Instakill!", (int)FontType.RedishOrange);
 			} else {
-				addDamageText(damage);
+				addDamageText("Fatality!", (int)FontType.RedishOrange);
 			}
 		} else if (attacker.isMainPlayer) {
 			addDamageText(damage);
@@ -1414,7 +1407,7 @@ public partial class Actor : GameObject {
 		}
 	}
 
-	public void addDamageText(float damage, int? color = null) {
+	public void addDamageText(float damage) {
 		int xOff = 0;
 		int yOff = 0;
 		for (int i = damageTexts.Count - 1; i >= 0; i--) {
@@ -1423,12 +1416,10 @@ public partial class Actor : GameObject {
 			}
 		}
 		string text = damage.ToString();
-		if (color == null) {
-			color = (int)FontType.RedSmall;
-			if (damage < 0) {
-				text = (damage * -1).ToString();
-				color = (int)FontType.GreenSmall;
-			}
+		FontType color = FontType.Red;
+		if (damage < 0) {
+			text = (damage * -1).ToString();
+			color = FontType.Green;
 		}
 		if (damage != 0 && damage < 1 && damage > -1) {
 			text = text[1..];

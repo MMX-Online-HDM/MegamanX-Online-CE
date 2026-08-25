@@ -3005,7 +3005,7 @@ public partial class Level {
 			return spawnPoints[Global.quickStartSpawn.Value];
 		}
 		SpawnPoint[] availableSpawns;
-		if (!gameMode.useTeamSpawns() || player.newAlliance < 0 || player.newAlliance > 1) {
+		if (!gameMode.useTeamSpawns || player.newAlliance < 0 || player.newAlliance > 1) {
 			availableSpawns = spawnPoints.Where(
 				(spawnPoint) => {
 					return (
@@ -3052,7 +3052,7 @@ public partial class Level {
 			return spawnPoints[Global.quickStartSpawn.Value];
 		}
 		SpawnPoint[] availableSpawns;
-		if (!gameMode.useTeamSpawns() || player.newAlliance < 0 || player.newAlliance > 1) {
+		if (!gameMode.useTeamSpawns || player.newAlliance < 0 || player.newAlliance > 1) {
 			availableSpawns = spawnPoints.Where(
 				(spawnPoint) => {
 					return (
