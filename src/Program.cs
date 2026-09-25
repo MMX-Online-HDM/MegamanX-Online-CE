@@ -1577,7 +1577,6 @@ class Program {
 				render();
 				window.Display();
 			}
-			*/
 		}
 	}
 
