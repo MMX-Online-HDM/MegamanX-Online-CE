@@ -12,6 +12,7 @@ public class Wall : Geometry {
 	public bool isCracked;
 	public bool topWall;
 	public float moveX; // i.e. conveyer belts
+	public float moveY;
 
 	public Wall() : base("", new List<Point>()) {
 	}
@@ -55,7 +56,7 @@ public class Gate : Wall {
 
 public class MovingPlatform : Wall {
 	public Sprite sprite;
-	public Sprite idleSprite;
+	public Sprite? idleSprite;
 	public Point origin;
 	public float moveSpeed;
 	public float timeOffset;
@@ -72,18 +73,25 @@ public class MovingPlatform : Wall {
 	public long zIndex;
 	public bool flipXOnMoveLeft;
 	public bool flipYOnMoveUp;
+	public Point? onewayDir;
 	int xDirToUse = 1;
 	int yDirToUse = 1;
 
-	public MovingPlatform(string spriteName, string idleSpriteName, Point origin, string moveData, float moveSpeed, float timeOffset, string nodeName, string killZoneName, string crackedWallName, long zIndex,
-		bool flipXOnMoveLeft, bool flipYOnMoveUp) {
+	public MovingPlatform(
+		string spriteName, string idleSpriteName, Point origin,
+		string moveData, float moveSpeed, float timeOffset,
+		string nodeName, string killZoneName,
+		string crackedWallName, long zIndex,
+		bool flipXOnMoveLeft, bool flipYOnMoveUp,
+		Point? oneWay = null
+	) {
 		name = "MovingPlatform";
 		isMoving = true;
 
 		sprite = new Sprite(spriteName);
 		idleSprite = !string.IsNullOrEmpty(idleSpriteName) ? new Sprite(idleSpriteName) : null;
 
-		var rect = sprite.hitboxes[0].shape.getRect();
+		Rect rect = sprite.hitboxes[0].shape.getRect();
 		origin = origin.addxy(-rect.w() / 2f, -rect.h() / 2f);
 		this.origin = origin;
 
@@ -97,6 +105,7 @@ public class MovingPlatform : Wall {
 		this.zIndex = zIndex;
 		this.flipXOnMoveLeft = flipXOnMoveLeft;
 		this.flipYOnMoveUp = flipYOnMoveUp;
+		this.onewayDir = oneWay;
 
 		var lines = moveData.Split('\n');
 		foreach (var line in lines) {
@@ -159,7 +168,10 @@ public class MovingPlatform : Wall {
 		foreach (var point in sprite.hitboxes[0].shape.points) {
 			points.Add(pos.add(point));
 		}
-		collider = new Collider(points, sprite.hitboxes[0].isTrigger, null, true, false, HitboxFlag.None, new Point(0, 0));
+		collider = new Collider(
+			points, sprite.hitboxes[0].isTrigger, null,
+			true, false, HitboxFlag.None, new Point(0, 0)
+		);
 	}
 
 	public float getPeriod() {
@@ -234,9 +246,22 @@ public class CrackedWall : Actor, IDamagable {
 	public bool destroySilently;
 	public int flag;
 	public string gibSprite;
+	public bool isGlass;
+	public float glassMaxTime = 90;
+	public float glassCounter;
+	public bool glassCrackOnFrame;
+	public float? respawnTime;
+	public float respawnTimer;
+	public float damageReduction;
+	public float respawnAlpha = 100;
+	public Dictionary<string, float> damageCollisionCooldown = [];
 
-	public CrackedWall(Point pos, string crackedWallSprite, string gibSprite, int xDir, int yDir, int flag, int health, string destroyInstanceName, bool ownedByLocalPlayer) :
-		base(crackedWallSprite, pos, null, ownedByLocalPlayer, false) {
+	public CrackedWall(
+		Point pos, string crackedWallSprite, string gibSprite,
+		int xDir, int yDir, int flag, int health, string destroyInstanceName, bool ownedByLocalPlayer
+	) : base(
+		crackedWallSprite, pos, null, ownedByLocalPlayer, false
+	) {
 		this.health = health;
 		maxHealth = health;
 		isStatic = true;
@@ -254,29 +279,70 @@ public class CrackedWall : Actor, IDamagable {
 		useGravity = false;
 		useActorGrid = true;
 
+		if (collider == null) {
+			throw new Exception("Cannot create cracked wall without collider");
+		}
+
+		List<Point> rect = collider.shape.getRect().getPoints();
 		collider.flag = (int)HitboxFlag.Hurtbox;
-		var rect = collider.shape.getRect().getPoints();
-		wall = new Wall("crackedwall", new List<Point>()
-		{
-				rect[0].addxy(1, 1),
-				rect[1].addxy(-1, 1),
-				rect[2].addxy(-1, -1),
-				rect[3].addxy(1, -1),
-			});
+		wall = new Wall("crackedwall", [
+			rect[0].addxy(1, 1),
+			rect[1].addxy(-1, 1),
+			rect[2].addxy(-1, -1),
+			rect[3].addxy(1, -1),
+		]);
 
 		wall.isCracked = true;
 		Global.level.addGameObject(wall);
 
 		this.destroyInstanceName = destroyInstanceName;
+		Global.level.modifyObjectGridGroups(this, isActor: true, isTerrain: true);
 	}
 
 	public override void preUpdate() {
 		base.preUpdate();
 		updateProjectileCooldown();
+		if (respawnTimer > 0) {
+			respawnTimer--;
+			if (respawnTimer <= 0) {
+				if (disabled) {
+					respawnAlpha = 0;
+					playSound("icewall");
+				}
+				respawnTimer = 0;
+				wall.disabled = false;
+				disabled = false;
+				visible = true;
+				health = maxHealth;
+				glassCounter = 0;
+				enableLinkedActors();
+			}
+		}
+		if (respawnAlpha < 100) {
+			alpha = respawnAlpha / 100f;
+			respawnAlpha += 10;
+			if (respawnAlpha >= 100) {
+				alpha = 1;
+				respawnAlpha = 100;
+			}
+		}
 	}
 
 	public override void update() {
 		base.update();
+
+		if (isGlass && !disabled) {
+			if (!glassCrackOnFrame) {
+				glassCounter -= speedMul / 4;
+				if (glassCounter < 0) { glassCounter = 0; }
+			}
+			else if (glassCounter >= glassMaxTime) {
+				health = 0;
+				wallDestroy();
+				RPC.actorToggle.sendRpcDestroyCw(id);
+			}
+			glassCrackOnFrame = false;
+		}
 	}
 
 	public void move(Point deltaPos) {
@@ -288,60 +354,77 @@ public class CrackedWall : Actor, IDamagable {
 		Global.level.addToGrid(this);
 
 		Global.level.removeFromGrid(wall);
-		List<Point> rect = collider.shape.getRect().getPoints();
-		wall.collider._shape.points = new List<Point>() {
-			rect[0].addxy(1, 1),
-			rect[1].addxy(-1, 1),
-			rect[2].addxy(-1, -1),
-			rect[3].addxy(1, -1),
-		};
+		if (collider != null) {
+			List<Point> rect = collider.shape.getRect().getPoints();
+			wall.collider._shape.points = [
+				rect[0].addxy(1, 1),
+				rect[1].addxy(-1, 1),
+				rect[2].addxy(-1, -1),
+				rect[3].addxy(1, -1),
+			];
+		}
 		Global.level.addToGrid(wall);
 	}
 
 	// Only if 0 is returned, it can't damage it. Even if null, it still can
-	public static float? canDamageCrackedWall(int projId, CrackedWall? cw) {
-		if (cw?.flag == 3) return null;
-
-		if (projId == (int)ProjIds.GigaCrush) return 12;
-		if (projId == (int)ProjIds.Rakuhouha) return 12;
-		if (projId == (int)ProjIds.Rekkoha) return 12;
-		if (projId == (int)ProjIds.MechPunch || projId == (int)ProjIds.MechKangarooPunch || projId == (int)ProjIds.MechGoliathPunch || projId == (int)ProjIds.MechDevilBearPunch) return null;
-		if (projId == (int)ProjIds.MechStomp) return null;
-		if (projId == (int)ProjIds.MechChain) return null;
-		if (projId == (int)ProjIds.MechMissile) return null;
-		if (projId == (int)ProjIds.Torpedo) return null;
-		if (projId == (int)ProjIds.TorpedoCharged) return null;
-		if (projId == (int)ProjIds.MechTorpedo) return null;
-		if (projId == (int)ProjIds.MagnetMine) return null;
-		if (projId == (int)ProjIds.GreenSpinnerSplash) return null;
-		if (projId == (int)ProjIds.GreenSpinner) return null;
-		if (projId == (int)ProjIds.BlastLauncherGrenadeProj) return null;
-		if (projId == (int)ProjIds.BlastLauncherGrenadeSplash) return null;
-		if (projId == (int)ProjIds.SpinWheel) return 1;
-		if (projId == (int)ProjIds.TornadoFang) return null;
-		if (projId == (int)ProjIds.TornadoFang2) return null;
-		if (projId == (int)ProjIds.TornadoFangCharged) return null;
-		if (projId == (int)ProjIds.TriadThunderQuake) return null;
-		if (projId == (int)ProjIds.Headbutt && cw?.flag == 1) return 12;
-		if (projId == (int)ProjIds.VileMissile) return null;
-		if (projId == (int)ProjIds.PopcornDemon) return null;
-		if (projId == (int)ProjIds.PopcornDemonSplit) return null;
-		if (projId == (int)ProjIds.LaunchOMissle) return null;
-		if (projId == (int)ProjIds.LaunchOTorpedo) return null;
-		if (projId == (int)ProjIds.NecroBurst) return 12;
-		if (projId == (int)ProjIds.SparkMPunch) return 12;
-		if (projId == (int)ProjIds.TBreaker) return 12;
-		if (projId == (int)ProjIds.TBreakerProj) return 12;
-		if (projId == (int)ProjIds.PZeroPunch || projId == (int)ProjIds.PZeroPunch2) return null;
-		if (projId == (int)ProjIds.PZeroYoudantotsu) return null;
-		if (projId == (int)ProjIds.WheelGSpinWheel) return 3;
-		if (projId == (int)ProjIds.WheelGSpin) return 3;
-		if (projId == (int)ProjIds.TunnelRTornadoFang) return null;
-		if (projId == (int)ProjIds.TunnelRTornadoFang2) return null;
-		if (projId == (int)ProjIds.TunnelRTornadoFangDiag) return null;
-		if (projId == (int)ProjIds.TunnelRDash) return null;
-
-		return 0;
+	public static float? canDamageCrackedWall(float damage, CrackedWall? cw, Actor? actor, int? projId) {
+		if (cw == null || Damager.isArmorPiercing(projId)) {
+			return null;
+		}
+		float finalDamage = (ProjIds?)projId switch {
+			// Headbutt instadestroy.
+			ProjIds.Headbutt when cw.flag == 1 => 120,
+			// Regular damage.
+			ProjIds.MechPunch
+			or ProjIds.MechKangarooPunch
+			or ProjIds.MechGoliathPunch
+			or ProjIds.MechDevilBearPunch
+			or ProjIds.MechStomp
+			or ProjIds.MechChain
+			or ProjIds.MechMissile
+			or ProjIds.Torpedo
+			or ProjIds.TorpedoCharged
+			or ProjIds.MechTorpedo
+			or ProjIds.MagnetMine
+			or ProjIds.GreenSpinnerSplash
+			or ProjIds.GreenSpinner
+			or ProjIds.BlastLauncherGrenadeProj
+			or ProjIds.BlastLauncherGrenadeSplash
+			or ProjIds.TornadoFang
+			or ProjIds.TornadoFang2
+			or ProjIds.TornadoFangCharged
+			or ProjIds.TriadThunderQuake
+			or ProjIds.VileMissile
+			or ProjIds.PopcornDemon
+			or ProjIds.PopcornDemonSplit
+			or ProjIds.LaunchOMissle
+			or ProjIds.LaunchOTorpedo
+			or ProjIds.PZeroPunch or ProjIds.PZeroPunch2
+			or ProjIds.PZeroYoudantotsu
+			or ProjIds.TunnelRTornadoFang
+			or ProjIds.TunnelRTornadoFang2
+			or ProjIds.TunnelRTornadoFangDiag
+			or ProjIds.TunnelRDash => damage,
+			// 12 damage.
+			ProjIds.GigaCrush
+			or ProjIds.Rakuhouha
+			or ProjIds.Rekkoha => 12,
+			ProjIds.NecroBurst => 12,
+			ProjIds.SparkMPunch => 12,
+			ProjIds.TBreaker => 12,
+			ProjIds.TBreakerProj => 12,
+			// 3 damage.
+			ProjIds.WheelGSpinWheel => 3,
+			ProjIds.WheelGSpin => 3,
+			// 1 Damage.
+			ProjIds.SpinWheel => 1,
+			// Default.
+			_ => 0
+		};
+		if (finalDamage == 0 && cw.flag >= 3) {
+			finalDamage = damage;
+		}
+		return finalDamage * (1 - cw.damageReduction);
 	}
 
 	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
@@ -349,56 +432,174 @@ public class CrackedWall : Actor, IDamagable {
 			RPC.actorToggle.sendRpcDamageCw(id, (byte)(int)damage);
 			return;
 		}
-
 		health -= damage;
+		if (damage > 0) {
+			resetTimer();
+		}
 		if (health <= 0) {
 			health = 0;
-			destroySelf();
+			wallDestroy();
+			disableLinkedActors();
 			RPC.actorToggle.sendRpcDestroyCw(id);
 		}
+	}
+
+	public void resetTimer() {
+		if (isGlass) {
+			respawnTimer = respawnTime ?? 60 * 10;
+		}
+		else if (respawnTime != null) {
+			respawnTimer = respawnTime.Value;
+		}
+	}
+
+	public void wallDestroy() {
+		if (isGlass || respawnTime != null) {
+			disabled = true;
+			visible = false;
+			wall.disabled = true;
+			resetTimer();
+		} else {
+			destroySelf();
+		}
+		onDestroy();
 	}
 
 	public bool isPlayableDamagable() {
 		return false;
 	}
 
+	public override void onCollision(CollideData other) {
+		base.onCollision(other);
+		if (!isGlass || collider == null) {
+			return;
+		}
+		if (other.gameObject is IDamagable damagable && damagable.isPlayableDamagable() &&
+			other.gameObject is Actor actor && actor.pos.y <= collider.shape.minY + 1
+		) {
+			glassCrackOnFrame = true;
+			glassCounter += speedMul;
+		}
+	}
+
 	public override void onDestroy() {
 		base.onDestroy();
-		Global.level.removeGameObject(wall);
+		if (destroyed) {
+			wall.destroySelf();
+		}
 		if (!string.IsNullOrEmpty(destroyInstanceName)) {
 			if (destroyInstanceName.StartsWith("No Scroll")) {
 				Global.level.noScrolls.RemoveAll(ns => ns.name == destroyInstanceName);
 			} else {
-				var toRemove = Global.level.gameObjects.FirstOrDefault(go => go.name == destroyInstanceName);
+				var toRemove = Global.level.gameObjects.FirstOrDefault(
+					go => go.name == destroyInstanceName
+				);
 				if (toRemove != null) {
 					Global.level.removeGameObject(toRemove);
 				}
 			}
 		}
 
-		if (destroySilently) return;
-
+		if (destroySilently) {
+			return;
+		}
 		// Animation section
 		foreach (var poi in sprite.animData.frames[0].POIs) {
 			new Anim(pos.addxy(poi.x, poi.y), "explosion", 1, null, true);
 		}
-		playSound("explosion");
-
+		if (!isGlass) {
+			playSound("hurt");
+		} else {
+			playSound("freezebreak2");
+		}
 		if (!string.IsNullOrEmpty(gibSprite)) {
-			Point centerPos = pos.add(Point.average(sprite.animData.frames[0].POIs));
-			Anim.createGibEffect(gibSprite, centerPos, Global.level.mainPlayer, gibPattern: GibPattern.SemiCircle, randVelStart: 200, randVelEnd: 300);
+			Point centerPos = pos.add(
+				Point.average(sprite.animData.frames[0].POIs)
+			);
+			Anim.createGibEffect(
+				gibSprite, centerPos, Global.level.mainPlayer,
+				gibPattern: GibPattern.Random, randVelStart: 200, randVelEnd: 300,
+				pieceOverdive: 8
+			);
 		}
 	}
 
-	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) { return true; }
-	public bool isInvincible(Player attacker, int? projId) { return false; }
-	public bool canBeHealed(int healerAlliance) { return false; }
+	public void disableLinkedActors() {
+		if (string.IsNullOrEmpty(destroyInstanceName)) {
+			return;
+		}
+		string linkTarget = destroyInstanceName.ToLowerInvariant().Trim();
+		if (destroyInstanceName.StartsWith("No Scroll")) {
+			return;
+		}
+		bool isDestroy = !isGlass && respawnTime == null;
+
+		var tartgetFunct = (GameObject go) => go.name.ToLowerInvariant().Trim() == linkTarget;
+		GameObject? toRemove = Global.level.gameObjects.FirstOrDefault(tartgetFunct);
+		toRemove ??= Global.level.mapSprites.FirstOrDefault(tartgetFunct);
+		if (toRemove is Actor rActor) {
+			if (!isDestroy) {
+				rActor.disabled = true;
+				rActor.visible = false;
+			} else {
+				rActor.destroySelf();
+			}
+		}
+		if (toRemove is Geometry rGeomery) {
+			if (!isDestroy) {
+				rGeomery.disabled = true;
+			} else {
+				rGeomery.destroySelf();
+			}
+		}
+	}
+
+	public void enableLinkedActors() {
+		if (string.IsNullOrEmpty(destroyInstanceName)) {
+			return;
+		}
+		string linkTarget = destroyInstanceName.ToLowerInvariant().Trim();
+		if (destroyInstanceName.StartsWith("No Scroll")) {
+			return;
+		}
+		var tartgetFunct = (GameObject go) => go.name.ToLowerInvariant().Trim() == linkTarget;
+		GameObject? toRemove = Global.level.gameObjects.FirstOrDefault(tartgetFunct);
+		toRemove ??= Global.level.mapSprites.FirstOrDefault(tartgetFunct);
+		if (toRemove is Actor rActor) {
+			rActor.disabled = false;
+			rActor.visible = true;
+		}
+		if (toRemove is Geometry rGeomery) {
+			rGeomery.disabled = false;
+		}
+	}
+
+	public override void render(float x, float y) {
+		if (isGlass && glassCounter > 0 && glassCrackOnFrame) {
+			x += Helpers.randomRange(-1, 1);
+			y += Helpers.randomRange(-1, 1);
+		}
+		base.render(x, y);
+	}
+
+	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) => true;
+	public bool isInvincible(Player attacker, int? projId) => false;
+	public bool canBeHealed(int healerAlliance) => false;
 	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) { }
 }
 
 public class Ladder : Geometry {
 	public Ladder(string name, List<Point> points) : base(name, points) {
 		collider.isTrigger = true;
+	}
+}
+
+public class OneWay : Geometry {
+	public Point lockDir;
+
+	public OneWay(string name, List<Point> points, Point lockDir) : base(name, points) {
+		collider.isTrigger = true;
+		this.lockDir = lockDir;
 	}
 }
 
@@ -416,12 +617,9 @@ public class KillZone : Geometry {
 	}
 
 	public void applyDamage(IDamagable damagable) {
-		if (!damagable.actor().ownedByLocalPlayer) return;
-		if (damage == Damager.envKillDamage) {
-			damagable.applyDamage(damage, null, null, null, null);
+		if (!damagable.actor().ownedByLocalPlayer) {
 			return;
 		}
-
 		if (damagable.projectileCooldown.ContainsKey("killzone") &&
 			damagable.projectileCooldown["killzone"] > 0) {
 			return;
@@ -463,13 +661,23 @@ public class MoveZone : Geometry {
 	}
 }
 
+public class SandZone : Geometry {
+	public SandZone(string name, List<Point> points) : base(name, points) {
+		collider.isTrigger = true;
+	}
+}
+
 public class JumpZone : Geometry {
-	public string targetNode;
+	public string[] targetNodes;
 	public int forceDir;
 	public float jumpTime;
-	public JumpZone(string name, List<Point> points, string targetNode, int forceDir, float jumpTime) : base(name, points) {
+	public JumpZone(
+		string name, List<Point> points, string[] targetNodes, int forceDir, float jumpTime
+	) : base(
+		name, points
+	) {
 		collider.isTrigger = true;
-		this.targetNode = targetNode;
+		this.targetNodes = targetNodes;
 		this.forceDir = forceDir;
 		this.jumpTime = jumpTime;
 	}
@@ -490,10 +698,34 @@ public class BrakeZone : Geometry {
 		collider.isTrigger = true;
 	}
 }
+
 public class BackwallZone : Geometry {
 	public bool isExclusion;
 	public BackwallZone(string name, List<Point> points, bool isExclusion) : base(name, points) {
 		collider.isTrigger = true;
 		this.isExclusion = isExclusion;
+	}
+}
+
+public struct GravityZone {
+	public string name;
+	public Rect rect;
+	public float? mul;
+	public float? velX;
+	public float? velY;
+
+	public GravityZone(string name, Rect rect, float? mul, float? velX, float? velY) {
+		this.name = name;
+		this.rect = rect;
+		this.mul = mul;
+		this.velY = velX;
+		this.velX = velY;
+	}
+}
+
+public class FreezemanZone : Geometry {
+	public bool isExclusion;
+	public FreezemanZone(string name, List<Point> points) : base(name, points) {
+		collider.isTrigger = true;
 	}
 }

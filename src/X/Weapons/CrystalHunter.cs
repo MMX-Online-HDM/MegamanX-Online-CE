@@ -111,13 +111,12 @@ public class CrystalHunterCharged : Actor {
 		if (isSnails) {
 			maxTime = overrideTime!.Value;
 		}
-
 		netOwner = owner;
-		netActorCreateId = NetActorCreateId.CrystalHunterCharged;
-		if (sendRpc) {
-			createActorRpc(owner.id);
-		}
+		cActorId = CActorIds.CrystalHunterCharged;
 
+		if (sendRpc) {
+			RPC.createActor.sendRpc(this, netOwner, null, getSerialExtra());
+		}
 		canBeLocal = false;
 	}
 

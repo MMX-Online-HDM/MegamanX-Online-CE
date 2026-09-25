@@ -34,10 +34,10 @@ public class BlastHornet : Maverick {
 		weakWeaponId = WeaponIds.GravityWell;
 		weakMaverickWeaponId = WeaponIds.GravityBeetle;
 
-		netActorCreateId = NetActorCreateId.BlastHornet;
 		netOwner = player;
+		cActorId = CActorIds.SigmaBlastHornet;
 		if (sendRpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, player, player.character, getSerialExtra());
 		}
 
 		canFly = true;

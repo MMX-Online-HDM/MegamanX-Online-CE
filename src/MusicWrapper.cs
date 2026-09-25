@@ -67,6 +67,14 @@ public class MusicWrapper {
 		music?.Stop();
 	}
 
+	public void pause() {
+		music?.Pause();
+	}
+
+	public bool isPlaying() {
+		return music?.Status == SoundStatus.Playing;
+	}
+
 	public void update() {
 		if (music == null) return;
 		float offset = music.PlayingOffset.AsSeconds();

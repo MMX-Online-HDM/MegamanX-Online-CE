@@ -73,6 +73,7 @@ public class CharState {
 	public bool exitOnLanding;
 	public bool exitOnAirborne;
 	public bool useDashJumpSpeed;
+	public bool forceAirborne;
 	public SpecialStateIds specialId;
 
 	public CharState(

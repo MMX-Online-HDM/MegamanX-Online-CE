@@ -742,6 +742,9 @@ public enum ProjIds {
 	DZShinBuster,
 	DZShinGetsurin,
 
+	// Neutral stuff.
+	NeutralMetLemon,
+
 	// Special damage types.
 	SelfDmg = 30000,
 	SelfTrueDmg,

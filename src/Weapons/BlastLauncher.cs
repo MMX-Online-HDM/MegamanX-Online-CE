@@ -112,6 +112,7 @@ public class GrenadeProj : Projectile, IDamagable {
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 		reflectableFBurner = true;
+		cleanUpOnPlayerLeave = true;
 		this.player = player;
 		updateAngle();
 	}

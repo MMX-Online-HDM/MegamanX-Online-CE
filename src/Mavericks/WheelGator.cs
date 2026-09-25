@@ -37,10 +37,10 @@ public class WheelGator : Maverick {
 		//eatenShader = Helpers.cloneShaderSafe("wheelgEaten");
 		player.gatorArmorShader?.SetUniform("paletteTexture", Global.textures["paletteWheelGator"]);
 
-		netActorCreateId = NetActorCreateId.WheelGator;
 		netOwner = player;
+		cActorId = CActorIds.SigmaWheelGator;
 		if (sendRpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, player, player.character, getSerialExtra());
 		}
 
 		armorClass = ArmorClass.Heavy;

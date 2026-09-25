@@ -29,10 +29,10 @@ public class DrDoppler : Maverick {
 		weakWeaponId = WeaponIds.AcidBurst;
 		weakMaverickWeaponId = WeaponIds.ToxicSeahorse;
 
-		netActorCreateId = NetActorCreateId.DrDoppler;
 		netOwner = player;
+		cActorId = CActorIds.SigmaPuppetDoppler;
 		if (sendRpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, player, player.character, getSerialExtra());
 		}
 
 		usesAmmo = true;

@@ -128,8 +128,12 @@ public class WolfSigmaHead : Actor, IDamagable {
 		}
 	}
 
-	public WolfSigmaHead(Point pos, Player player, ushort netId, bool ownedByLocalPlayer, bool rpc = false) :
-		base("sigma_wolf_head", pos, netId, ownedByLocalPlayer, false) {
+	public WolfSigmaHead(
+		Point pos, Player player, ushort netId, bool ownedByLocalPlayer, bool rpc = false
+	) : base(
+		"sigma_wolf_head", pos, netId, ownedByLocalPlayer, false
+	) {
+		cleanUpOnPlayerLeave = true;
 		useGravity = false;
 		this.owner = player;
 		xDir = 1;
@@ -139,9 +143,9 @@ public class WolfSigmaHead : Actor, IDamagable {
 		frameIndex = 0;
 
 		netOwner = player;
-		netActorCreateId = NetActorCreateId.WolfSigmaHead;
+		cActorId = CActorIds.WolfSigmaHead;
 		if (rpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, player, null, getSerialExtra());
 		}
 	}
 
@@ -414,8 +418,12 @@ public class WolfSigmaHand : Actor, IDamagable {
 		}
 	}
 
-	public WolfSigmaHand(Point pos, Player player, bool isLeft, ushort netId, bool ownedByLocalPlayer, bool rpc = false) :
-		base("sigma_wolf_hand", pos, netId, ownedByLocalPlayer, false) {
+	public WolfSigmaHand(
+		Point pos, Player player, bool isLeft, ushort netId, bool ownedByLocalPlayer, bool rpc = false
+	) : base(
+		"sigma_wolf_hand", pos, netId, ownedByLocalPlayer, false
+	) {
+		cleanUpOnPlayerLeave = true;
 		useGravity = false;
 		owner = player;
 		xDir = 1;
@@ -433,12 +441,11 @@ public class WolfSigmaHand : Actor, IDamagable {
 		isPlatform = true;
 		collider.isClimbable = true;
 		collider.wallOnly = false;
-		
 
 		netOwner = player;
-		netActorCreateId = NetActorCreateId.WolfSigmaHand;
+		cActorId = CActorIds.WolfSigmaHand;
 		if (rpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, player, null, getSerialExtra());
 		}
 	}
 

@@ -23,10 +23,10 @@ public class Velguarder : Maverick {
 
 		weapon = new Weapon(WeaponIds.VelGGeneric, 101);
 
-		netActorCreateId = NetActorCreateId.Velguarder;
 		netOwner = player;
+		cActorId = CActorIds.SigmaVelguarder;
 		if (sendRpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, player, player.character, getSerialExtra());
 		}
 
 		armorClass = ArmorClass.Light;

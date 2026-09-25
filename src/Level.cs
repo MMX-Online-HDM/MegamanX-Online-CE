@@ -54,10 +54,14 @@ public partial class Level {
 	public List<SpawnPoint> spawnPoints = new List<SpawnPoint>();
 	public List<SpawnPoint> raceStartSpawnPoints = new List<SpawnPoint>();
 	public List<NoScroll> noScrolls = new List<NoScroll>();
+	public List<CameraZone> camZone = new List<CameraZone>();
 	public List<Rect> waterRects = new List<Rect>();
+	public List<GravityZone> gravityZones = new();
 	public List<NavMeshNode> navMeshNodes = new List<NavMeshNode>();
 	public List<ItemSpawner> itemSpawners = new List<ItemSpawner>();
 	public List<Gate> gates = new List<Gate>();
+	public List<ActorSpawner> enemySpawners = new List<ActorSpawner>();
+	public List<PickupSpawner> pickupSpawners = new List<PickupSpawner>();
 
 	public Flag blueFlag;
 	public Flag redFlag;
@@ -83,6 +87,7 @@ public partial class Level {
 	public string debugString2;
 	public float lerpCamTime = 0;
 	public GameMode gameMode;
+	public HUD hud;
 	public float cellWidth;
 	public LevelData levelData;
 	public int mirrorX;
@@ -149,8 +154,8 @@ public partial class Level {
 			return players.FirstOrDefault(p => !p.isMainPlayer);
 		}
 	}
-	private Player _specPlayer;
-	public Player specPlayer {
+	private Player? _specPlayer;
+	public Player? specPlayer {
 		get { return _specPlayer; }
 		set {
 			if (_specPlayer == value) return;
@@ -221,6 +226,7 @@ public partial class Level {
 	public PlayerCharData playerData;
 	public List<PlayerCharData> cpuDatas;
 	public List<BackloggedDamage> backloggedDamages = new();
+	public float backloggedDamageTimer = 0;
 
 	// Radar dimensions
 	public float scaleW;
@@ -230,13 +236,16 @@ public partial class Level {
 	public int teamNum;
 
 	// Random stage stuff.
-	float powerplant2DarkTime = -1;
-	int powerplant2State = 0;   //0 = light, 1 = fade to black, 2 = black, 3 = fade to light
+	public int camNotSetFrames;
 	public float blackJoinTime;
-	public int camNotSetFrames;	int virusColorState = 0;
+	int virusColorState = 0;
 	float virusColorTime;
 	Color virusColor1 = new Color(99, 20, 99, 128);
 	Color virusColor2 = new Color(66, 20, 99, 128);
+
+	//0 = light, 1 = fade to black, 2 = black, 3 = fade to light
+	int powerplant2State = 0;   
+	float powerplant2DarkTime = -1;
 
 	// Camera.
 	public float camCenterX { get { return camX + Global.halfScreenW * Global.viewSize; } }
@@ -294,6 +303,7 @@ public partial class Level {
 		}
 
 		updateLevelShaders();
+		hud = new HUD(this);
 	}
 
 	public Server server;
@@ -302,7 +312,21 @@ public partial class Level {
 	public int equalCharDistributerBlue;
 
 	public void startLevel(Server server, bool joinedLate) {
-		startLevelAction(server, joinedLate);
+		// Multi thread mode shenanigans.
+		if (Program.isMultiThread) {
+			// Load stuff on the main thread to prevent RenderTexture errors.
+			Program.loadAction = () => {
+				startLevelAction(server, joinedLate);
+			};
+			// Wait for load to end.
+			while (Program.loadAction != null) {
+				Thread.Sleep(10);
+			}
+		}
+		// Single thread mode... just load.
+		else {
+			startLevelAction(server, joinedLate);
+		}
 	}
 
 	public void startLevelAction(Server server, bool joinedLate) {
@@ -339,9 +363,12 @@ public partial class Level {
 			gameMode = new KingOfTheHill(this, server.timeLimit);
 		} else if (server.gameMode == GameMode.Race) {
 			gameMode = new Race(this);
+		} else if (server.gameMode == GameMode.ElimAlt) {
+			gameMode = new ElimAlt(this, server.playTo, server.timeLimit);
 		} else if (server.gameMode == GameMode.TeamElimAlt) {
 			gameMode = new TeamElimAlt(this, server.playTo, server.timeLimit);
-		} 
+		}
+		hud.gameMode =  gameMode;
 
 		// Radar dimensions
 		float maxDim = 50f;
@@ -358,13 +385,16 @@ public partial class Level {
 			}
 		}
 
-		scaledW = levelData.width * scaleW;
-		scaledH = levelData.height * scaleH;
+		scaledW = 42;
+		scaledH = 26;
 
 		Global.radarRenderTexture = new RenderTexture(
 			((uint)Math.Ceiling(scaledW), (uint)Math.Ceiling(scaledH))
 		);
 		Global.radarRenderTextureB = new RenderTexture(
+			((uint)Math.Ceiling(scaledW), (uint)Math.Ceiling(scaledH))
+		);
+		Global.radarRenderTextureC = new RenderTexture(
 			((uint)Math.Ceiling(scaledW), (uint)Math.Ceiling(scaledH))
 		);
 		Global.input.lastUpdateTime = 0;
@@ -419,16 +449,31 @@ public partial class Level {
 
 		setupGrid(gridSize);
 		foreach (var instance in levelData.levelJson.instances) {
+			var mirrorType = new {
+				All = 0,
+				DefaultOnly = 1,
+				MirrorOnly = 2,
+				KeepUnmirror = 3,
+				KeepMirror = 4,
+				KeepOG = 5
+			};
 			// 0 = both, 1 = non mirrored only, 2 = mirrored only
-			if (instance.mirrorEnabled == 1 && levelData.isMirrored) {
+			if (levelData.isMirrored && (instance.mirrorEnabled == mirrorType.DefaultOnly)) {
 				continue;
 			}
-			if (instance.mirrorEnabled == 2 && !levelData.isMirrored) {
+			if (!levelData.isMirrored && (
+				instance.mirrorEnabled == mirrorType.MirrorOnly ||
+				instance.mirrorEnabled == mirrorType.KeepUnmirror ||
+				instance.mirrorEnabled == mirrorType.KeepMirror
+			)) {
+				continue;
+			}
+			if (otherRestricted(instance)) {
 				continue;
 			}
 
 			string instanceName = instance.name;
-			string objectName = instance.objectName;
+			string objectName = instance.objectName.ToLower();
 			var points = new List<Point>();
 			bool? nullableFlipX = instance.properties?.flipX;
 			bool flipX = nullableFlipX ?? false;
@@ -442,25 +487,28 @@ public partial class Level {
 			}
 			Point pos = new Point((float)(instance.pos?.x ?? 0), (float)(instance.pos?.y ?? 0)).round();
 
-			if (objectName == "Collision Shape") {
+			if (objectName == "collision shape") {
 				Wall wall = new Wall(instanceName, points);
 
-				float moveX = instance?.properties?.moveX ?? 0;
+				float moveX = instance.properties?.moveX ?? 0;
+				float moveY = instance.properties?.moveY ?? 0;
 				if (mapVersion == 0) {
 					moveX /= 60;
+					moveY /= 60;
 				}
 				wall.moveX = moveX;
+				wall.moveY = moveY;
 
-				if (instance?.properties?.slippery != null && instance.properties.slippery == true) {
+				if (instance.properties?.slippery != null && instance.properties.slippery == true) {
 					wall.slippery = true;
 				}
 
-				if (instance?.properties?.topWall != null && instance.properties.topWall == true) {
+				if (instance.properties?.topWall != null && instance.properties.topWall == true) {
 					wall.topWall = true;
 				}
 
 				bool isPitWall = false;
-				if (instance?.properties?.pitWall != null && instance.properties.pitWall == true) {
+				if (instance.properties?.pitWall != null && instance.properties.pitWall == true) {
 					isPitWall = true;
 					wall.collider._shape.points[2] = (
 						new Point(wall.collider._shape.points[2].x, Global.level.height + 45).round()
@@ -472,16 +520,16 @@ public partial class Level {
 					Rect newRect = new Rect(rect.x1, rect.y2, rect.x2, rect.y2 + 1000);
 					Wall pitWall = new Wall(wall.name + "Pit", newRect.getPoints());
 					pitWall.collider.isClimbable = false;
-					addGameObject(pitWall); 
+					addGameObject(pitWall);
 				}
 
-				if (instance?.properties?.unclimbable != null && instance.properties.unclimbable == true) {
+				if (instance.properties?.unclimbable != null && instance.properties.unclimbable == true) {
 					wall.collider.isClimbable = false;
 				} else {
 					wall.collider.isClimbable = true;
 				}
 
-				if (instance?.properties?.boundary == true && !isPitWall) {
+				if (instance.properties?.boundary == true && !isPitWall) {
 					wall.collider.isClimbable = false;
 					var rect = wall.collider.shape.getRect();
 					var newRect = new Rect(rect.x1, rect.y1 - 1000, rect.x2, rect.y1);
@@ -490,21 +538,29 @@ public partial class Level {
 					addGameObject(unclimbableWall);
 				}
 				addGameObject(wall);
-			} else if (objectName == "Water Zone") {
-				var waterRect = new Rect(points[0], points[2]);
+			} else if (objectName == "water zone") {
+				Rect waterRect = new Rect(points[0], points[2]);
 				waterRects.Add(waterRect);
-			} else if (objectName == "Ladder") {
+			} else if (objectName == "gravity zone") {
+				gravityZones.Add(new GravityZone(
+					instanceName,
+					new Rect(points[0], points[2]),
+					(float?)instance.properties?.mul,
+					(float?)instance.properties?.velX,
+					(float?)instance.properties?.velY
+				));
+			} else if (objectName == "ladder") {
 				Ladder ladder = new Ladder(instanceName, points);
 				addGameObject(ladder);
-			} else if (objectName == "Backwall Zone") {
+			} else if (objectName == "backwall zone") {
 				addGameObject(
 					new BackwallZone(instanceName, points, (bool?)instance.properties.isExclusion ?? false)
 				);
-			} else if (objectName == "Gate") {
+			} else if (objectName == "gate") {
 				if (isRace()) {
 					var gate = new Gate(instanceName, points);
 
-					if (instance?.properties?.unclimbable != null && instance.properties.unclimbable == true) {
+					if (instance.properties?.unclimbable != null && instance.properties.unclimbable == true) {
 						gate.collider.isClimbable = false;
 					} else {
 						gate.collider.isClimbable = true;
@@ -512,7 +568,7 @@ public partial class Level {
 					addGameObject(gate);
 					gates.Add(gate);
 				}
-			} else if (objectName == "No Scroll") {
+			} else if (objectName == "no scroll") {
 				if (!server.fixedCamera) {
 					var shape = new Shape(points);
 					ScrollFreeDir dir = ScrollFreeDir.None;
@@ -526,7 +582,7 @@ public partial class Level {
 					}
 					noScrolls.Add(new NoScroll(instanceName, shape, dir, snap));
 				}
-			} else if (objectName == "Kill Zone") {
+			} else if (objectName == "kill zone") {
 				bool killInvuln = instance.properties.killInvuln ?? false;
 				float? damage = instance.properties.damage;
 				bool flinch = instance.properties.flinch ?? false;
@@ -537,40 +593,53 @@ public partial class Level {
 
 				var killZone = new KillZone(instanceName, points, killInvuln, damage, flinch, hitCooldown);
 				addGameObject(killZone);
-			} else if (objectName == "Move Zone") {
-				if (levelData.name != "giantdam" || enableGiantDamPropellers()) {
-					float moveX = (float?)instance.properties.moveX ?? 0;
-					float moveY = (float?)instance.properties.moveY ?? 0;
+			} else if (instanceName.StartsWith("Sand Zone")) {
+				SandZone sandZone = new SandZone(
+					instanceName, points
+				);
+				addGameObject(sandZone);
+			} else if (objectName == "move zone") {
+				float moveX = (float?)instance.properties.moveX ?? 0;
+				float moveY = (float?)instance.properties.moveY ?? 0;
 
-					if (mapVersion == 0) {
-						moveX /= 60;
-						moveY /= 60;
-					}
-					var moveZone = new MoveZone(
-						instanceName, points,
-						moveX, moveY
-					);
-					addGameObject(moveZone);
+				if (mapVersion == 0) {
+					moveX /= 60;
+					moveY /= 60;
 				}
-			} else if (objectName == "Jump Zone") {
-				float jumpTime = instance.properties.jumpTime ?? 1;
-				var jumpZone = new JumpZone(
+				var moveZone = new MoveZone(
 					instanceName, points,
-					(string)instance.properties.targetNode,
+					moveX, moveY
+				);
+				addGameObject(moveZone);
+			} else if (objectName == "jump zone") {
+				float jumpTime = instance.properties.jumpTime ?? 1;
+				string targetNode = instance.properties.targetNode as string ?? "";
+				List<string> targetNodes = [];
+				if (targetNode != "") {
+					string[] tempNodes = targetNode.Split(",");
+					foreach (string target in tempNodes) {
+						string finalStr = target.Trim();
+						if (finalStr.Length > 0) {
+							targetNodes.Add(finalStr);
+						}
+					}
+				}
+				var jumpZone = new JumpZone(
+					instanceName, points, targetNodes.ToArray(),
 					Helpers.convertDynamicToDir(instance.properties.forceDir), jumpTime
 				);
 				addGameObject(jumpZone);
-			} else if (objectName == "Turn Zone") {
+			} else if (objectName == "turn zone") {
 				bool jumpAfterTurn = instance.properties.jumpAfterTurn ?? false;
 				string turnDirStr = instance.properties.turnDir ?? "";
 				int turnDir = turnDirStr == "right" ? 1 : -1;
 
 				var turnZone = new TurnZone(instanceName, points, turnDir, jumpAfterTurn);
 				addGameObject(turnZone);
-			} else if (objectName == "Brake Zone") {
+			} else if (objectName == "brake Zone") {
 				var brakeZone = new BrakeZone(instanceName, points);
 				addGameObject(brakeZone);
-			} else if (objectName == "Spawn Point") {
+			} else if (objectName == "spawn point") {
 				var properties = instance.properties;
 				var sp = new SpawnPoint(instanceName, pos, xDir, -1);
 				if (properties?.raceStartSpawn == true) {
@@ -581,7 +650,7 @@ public partial class Level {
 				} else {
 					spawnPoints.Add(sp);
 				}
-			} else if (objectName == "Red Spawn") {
+			} else if (objectName == "red spawn") {
 				var properties = instance.properties;
 				float xOff = 0;
 				if (levelData.name == "centralcomputer" && gameMode is ControlPoints) {
@@ -596,25 +665,30 @@ public partial class Level {
 				spawnPoints.Add(new SpawnPoint(
 					instanceName, pos.addxy(xOff, 0), redSpawnXDir, GameMode.redAlliance)
 				);
-			} else if (objectName == "Blue Spawn") {
+			} else if (objectName == "blue spawn") {
 				var properties = instance.properties;
 				spawnPoints.Add(new SpawnPoint(instanceName, pos, xDir, GameMode.blueAlliance));
-			} else if (objectName == "Red Flag") {
+			} else if (objectName == "red flag") {
 				if (gameMode is CTF) {
 					redFlag = new Flag(GameMode.redAlliance, pos, redFlagNetId, isHost);
 				}
-			} else if (objectName == "Blue Flag") {
+			} else if (objectName == "blue flag") {
 				if (gameMode is CTF) {
 					blueFlag = new Flag(GameMode.blueAlliance, pos, blueFlagNetId, isHost);
 				}
-			} else if (objectName == "Control Point") {
+			} else if (objectName == "control point") {
 				if (gameMode is ControlPoints) {
 					int num = (int)instance.properties.num;
 					ushort netId;
 					float offsetY = 0;
+					if (num < 0) {
+						continue;
+					}
 					if (num == 1) {
 						netId = cp1NetId;
-					} else netId = cp2NetId;
+					} else {
+						netId = cp2NetId;
+					}
 					int captureTime = instance.properties.captureTime != null ? (int)instance.properties.captureTime : 30;
 					int awardTime = instance.properties.awardTime != null ? (int)instance.properties.awardTime : 0;
 					controlPoints.Add(new ControlPoint(GameMode.redAlliance, pos, num, false, captureTime, awardTime, netId, isHost) { yOff = offsetY });
@@ -633,26 +707,26 @@ public partial class Level {
 						};
 					}
 				}
-			} else if (objectName == "Node") {
+			} else if (objectName == "node") {
 				var node = new NavMeshNode(instanceName, pos, instance.properties);
 				navMeshNodes.Add(node);
-			} else if (objectName == "Large Health") {
+			} else if (objectName == "large health") {
 				if (!pickupRestricted(instance)) {
 					itemSpawners.Add(new ItemSpawner(pos, typeof(LargeHealthPickup), 0, 15, xDir));
 				}
-			} else if (objectName == "Small Health") {
+			} else if (objectName == "small health") {
 				if (!pickupRestricted(instance)) {
 					itemSpawners.Add(new ItemSpawner(pos, typeof(SmallHealthPickup), 0, 15, xDir));
 				}
-			} else if (objectName == "Large Ammo") {
+			} else if (objectName == "large ammo") {
 				if (!pickupRestricted(instance)) {
 					itemSpawners.Add(new ItemSpawner(pos, typeof(LargeAmmoPickup), 0, 15, xDir));
 				}
-			} else if (objectName == "Small Ammo") {
+			} else if (objectName == "small ammo") {
 				if (!pickupRestricted(instance)) {
 					itemSpawners.Add(new ItemSpawner(pos, typeof(SmallAmmoPickup), 0, 15, xDir));
 				}
-			} else if (objectName == "Ride Armor") {
+			} else if (objectName == "ride armor") {
 				if (!pickupRestricted(instance) && !server.disableVehicles) {
 					int rideArmorType = 0;
 					if (instance.properties?.raType == "k") rideArmorType = 1;
@@ -660,7 +734,7 @@ public partial class Level {
 					if (instance.properties?.raType == "f") rideArmorType = 3;
 					itemSpawners.Add(new ItemSpawner(pos, typeof(RideArmor), rideArmorType, 60, xDir));
 				}
-			} else if (objectName == "Ride Chaser") {
+			} else if (objectName == "ride chaser") {
 				supportsRideChasers = true;
 				bool isCheckpoint = instance.properties?.isCheckpoint ?? false;
 				if (!pickupRestricted(instance) && !server.disableVehicles) {
@@ -678,7 +752,66 @@ public partial class Level {
 						}
 					}
 				}
-			} else if (objectName.StartsWith("Map Sprite")) {
+			} else if (objectName == "enemy spawner") {
+				// Partse team number. Default to -1 if null.
+				int teamNum = instance.properties.teamNum ?? -1;
+				int? respawnTime = (int?)instance.properties.respawnTime;
+				// Make the team be neutral if not on a team match.
+				if (!gameMode.isTeamMode && teamNum >= 0) {
+					teamNum = -1;
+				}
+				// Parse types, default to empty if null.
+				string[] types = [""];
+				if (instance.properties.type is string[] typeArr) {
+					types = typeArr;
+				}
+				// Then initalize the spawner.
+				enemySpawners.Add(new ActorSpawner(types, pos, xDir, teamNum, respawnTime));
+			} else if (objectName == "pickup spawner") {
+				// Parse ID, we default to that.
+				string id = (string?)instance.properties.id ?? "";
+				id = id.Trim();
+				// Skip if ID is null.
+				// Means it was not set up correctly.
+				if (id == "") { continue; }
+				// Parse types, default to empty if null.
+				string[] types = [id];
+				if (instance.properties.type is string[] typeArr) {
+					types = [id, .. typeArr];
+				}
+				for (int i = 0; i < types.Length; i++) {
+					types[i] = types[i].Trim().ToLowerInvariant();
+				}
+				// Load other stuff.
+				int? respawnTime = (int?)instance.properties.respawnTime;
+				// Then initalize the spawner.
+				pickupSpawners.Add(new PickupSpawner(types, pos, xDir, respawnTime));
+			}
+			// One way platforms.
+			else if (objectName == "one way") {
+				// Parse direction.
+				// If both are null we default to (-1, 0)
+				int? xgDir = instance.properties?.xDir;
+				int? ygDir = instance.properties?.yDir;
+				if (xgDir == null && ygDir == null) {
+					xgDir = 0;
+					ygDir = -1;
+				}
+				// Otherwise we default it to 0.
+				xgDir ??= 0;
+				ygDir ??= 0;
+				// Then we create a normal based on it.
+				Point lockDir = new(Math.Sign(xgDir.Value), Math.Sign(ygDir.Value));
+				// And initalize the object.
+				OneWay oneWay = new OneWay(instanceName, points, lockDir);
+				addGameObject(oneWay);
+			}
+			// Camera Zones.
+			else if (objectName == "camera zone") {
+				camZone.Add(new CameraZone(instanceName, points));
+			}
+			// Map sprites.
+			else if (objectName.StartsWith("map sprite")) {
 				bool enabledInLargeCam = instance.properties.enabledInLargeCam ?? true;
 				int destructableFlag = instance.properties?.destructableFlag ?? 0;
 				int repeatX = instance.properties.repeatX ?? 1;
@@ -699,8 +832,10 @@ public partial class Level {
 				var spriteHeight = Global.sprites[spriteName].frames[0].rect.h();
 
 				if (!enabledInLargeCam && server.fixedCamera) {
-				// Do not add the map sprite
-				} else if (rawParallaxIndex != null) {
+					// Do not add the map sprite if disabled in large cam.
+				}
+				// Add as parallax.
+				else if (rawParallaxIndex != null) {
 					if (Options.main.enableMapSprites) {
 						int parallaxIndex = rawParallaxIndex.Value - 1;
 						if (parallaxSprites.InRange(parallaxIndex)) {
@@ -717,7 +852,9 @@ public partial class Level {
 							}
 						}
 					}
-				} else if (destructableFlag > 0) {
+				}
+				// Add as solid wall.
+				else if (destructableFlag > 0) {
 					for (int i = 0; i < repeatY; i++) {
 						for (int j = 0; j < repeatX; j++) {
 							Point mapSpritePos = new Point
@@ -725,11 +862,34 @@ public partial class Level {
 								pos.x + (j * xDir * (repeatXPadding + spriteWidth)),
 								pos.y + (i * yDir * (repeatYPadding + spriteHeight))
 							);
-							var crackedWall = new CrackedWall(mapSpritePos, spriteName, gibSpriteName, xDir, yDir, destructableFlag, health, destroyInstanceName, true);
+							CrackedWall crackedWall = new CrackedWall(
+								mapSpritePos, spriteName, gibSpriteName,
+								xDir, yDir, destructableFlag, health, destroyInstanceName, true
+							);
+							crackedWall.name = instanceName;
+							crackedWall.isGlass = instance.properties.isGlass ?? false;
+							float? tempTime = (float?)instance.properties.glassTimer;
+							if (crackedWall.isGlass && tempTime != null) {
+								float tempTime2 = MathF.Ceiling(tempTime.Value * 60);
+								if (tempTime > 1) {
+									crackedWall.glassMaxTime = tempTime2;
+								}
+							}
+							crackedWall.respawnTime = instance.properties.respawnTime ?? null;
+							if (crackedWall.respawnTime != null) {
+								crackedWall.respawnTime *= 60;
+							}
 							crackedWall.setzIndex(zIndex);
+
+							float damageReduction =  instance.properties.damageReduction ?? 0;
+							damageReduction = damageReduction / 100f;
+							damageReduction = Helpers.clamp(damageReduction, 0, 1);
+							crackedWall.damageReduction = damageReduction;
 						}
 					}
-				} else if (Options.main.enableMapSprites) {
+				}
+				// Add as sprite.
+				else if (Options.main.enableMapSprites) {
 					for (int i = 0; i < repeatY; i++) {
 						for (int j = 0; j < repeatX; j++) {
 							Point mapSpritePos = new Point
@@ -740,10 +900,8 @@ public partial class Level {
 							var anim = new Actor(spriteName, mapSpritePos, null, true, true);
 							anim.xDir = xDir;
 							anim.yDir = yDir;
+							anim.name = instanceName;
 							anim.setzIndex(zIndex);
-							if (spriteName == "ms_dam_propeller" && !enableGiantDamPropellers()) {
-								anim.frameSpeed = 0;
-							}
 							mapSprites.Add(anim);
 						}
 					}
@@ -753,7 +911,7 @@ public partial class Level {
 					var japeMemorial = new Anim(pos, "jape_memorial", 1, null, false);
 					japeMemorial.zIndex = ZIndex.Background + 100;
 				}
-			} else if (objectName.StartsWith("Goal")) {
+			} else if (objectName.StartsWith("goal")) {
 				if (isRace()) {
 					if (goal != null) {
 						throw new Exception("Multiple goals not allowed in race mode.");
@@ -763,7 +921,7 @@ public partial class Level {
 					goal = actor;
 					addGameObject(actor);
 				}
-			} else if (objectName.StartsWith("Moving Platform")) {
+			} else if (objectName.StartsWith("moving platform")) {
 				string spriteName = instance.properties.spriteName ?? "";
 				string idleSpriteName = instance.properties.idleSpriteName ?? "";
 				string moveData = instance.properties.moveData ?? "";
@@ -779,10 +937,26 @@ public partial class Level {
 
 				long zIndex = getZIndexFromProperty(instance.properties.zIndex, ZIndex.Default);
 
-				var platform = new MovingPlatform(spriteName, idleSpriteName, pos, moveData, moveSpeed, timeOffset, nodeName, killZoneName, crackedWallName, zIndex, flipXOnMoveLeft, flipYOnMoveUp);
+				float? onewayX = instance.properties.onewayX ?? null;
+				float? onewayY = instance.properties.onewayY ?? null;
+				Point? oneway = null;
+				if (onewayX != null && onewayX != 0 || onewayY != null && onewayY != 0) {
+					oneway = new Point(
+						Math.Sign(onewayX ?? 0),
+						Math.Sign(onewayY ?? 0)
+					);
+				}
+				var platform = new MovingPlatform(
+					spriteName, idleSpriteName,
+					pos, moveData, moveSpeed,
+					timeOffset,
+					nodeName, killZoneName, crackedWallName,
+					zIndex, flipXOnMoveLeft, flipYOnMoveUp,
+					oneway
+				);
 				movingPlatforms.Add(platform);
 				addGameObject(platform);
-			} else if (objectName.StartsWith("Music Source")) {
+			} else if (objectName.StartsWith("music source")) {
 				string musicName = instance.properties.musicName ?? "";
 				if (musicName != "") {
 					if (!Global.musics.ContainsKey(musicName)) {
@@ -805,13 +979,6 @@ public partial class Level {
 				actor.name = instanceName;
 				addGameObject(actor);
 			}
-		}
-
-		if (isTraining() && isRace()) {
-			var actor = new VictoryPoint(new Point(151, 177));
-			actor.name = "Victory Point1";
-			goal = actor;
-			addGameObject(actor);
 		}
 
 		if (Global.isHost) {
@@ -884,14 +1051,16 @@ public partial class Level {
 						}
 					}
 				} else {
-					charNum = charList[Helpers.randomRange(0, 3)];
+					charNum = charList[Helpers.randomRange(0, charList.Length)];
 				}
 
 				PlayerCharData playerData = null;
 
 				// Overrides from 1v1 select character menu
 				if (i < cpuDatas.Count) {
-					if (!cpuDatas[i].isRandom) charNum = cpuDatas[i].charNum;
+					if (!cpuDatas[i].isRandom) {
+						charNum = cpuDatas[i].charNum;
+					}
 					if (gameMode.isTeamMode && cpuDatas[i].alliance >= 0) {
 						alliance = cpuDatas[i].alliance;
 					}
@@ -925,7 +1094,9 @@ public partial class Level {
 		}
 
 		if (joinedLate) {
-			Global.serverClient?.rpc(RPC.joinLateRequest, Helpers.serialize(Global.serverClient.serverPlayer));
+			Global.serverClient?.rpc(
+				RPC.joinLateRequest, Helpers.serialize(Global.serverClient.serverPlayer)
+			);
 		}
 
 		startGoCount = gameObjects.Count;
@@ -947,7 +1118,7 @@ public partial class Level {
 	private long getZIndexFromProperty(dynamic property, long defaultZIndex) {
 		string zIndexString = property;
 		long zIndex;
-		if (zIndexString == "aboveForeground") zIndex = ZIndex.Foreground + 100;
+		if (zIndexString == "aboveForeground") zIndex = ZIndex.Foreground + 5;
 		else if (zIndexString == "aboveInstances") zIndex = ZIndex.Default - 5;
 		else if (zIndexString == "aboveBackground") zIndex = ZIndex.Background + 5;
 		else if (zIndexString == "aboveBackwall") zIndex = ZIndex.Backwall + 5;
@@ -979,10 +1150,6 @@ public partial class Level {
 		return null;
 	}
 
-	private bool enableGiantDamPropellers() {
-		return levelData.name == "giantdam" && !levelData.isMirrored && gameMode is CTF;
-	}
-
 	/*public void addFailedSpawn(int playerId, Point point, int xDir, ushort netId) {
 		if (!failedSpawns.ContainsKey(playerId)) {
 			failedSpawns[playerId] = new FailedSpawn(point, xDir, netId);
@@ -992,40 +1159,67 @@ public partial class Level {
 	}*/
 
 	public bool pickupRestricted(dynamic instance) {
-		if (isNon1v1Elimination()) return true;
-		if (instance.properties.nonDmOnly == true && Global.level.server.gameMode.Contains(GameMode.Deathmatch)) return true;
-		if (instance.properties.nonCpOnly == true && Global.level.server.gameMode.Contains(GameMode.ControlPoint)) return true;
-		if (instance.properties.nonCtfOnly == true && Global.level.server.gameMode.Contains(GameMode.CTF)) return true;
-		if (instance.properties.nonKothOnly == true && Global.level.server.gameMode.Contains(GameMode.KingOfTheHill)) return true;
-		if (instance.properties.dmOnly == true && !Global.level.server.gameMode.Contains(GameMode.Deathmatch)) return true;
-		if (Global.level.server?.customMatchSettings?.pickupItems == false) return true;
+		if (Global.level.server?.customMatchSettings?.pickupItems == false) {
+			return true;
+		}
+		return otherRestricted(instance);
+	}
+	public bool otherRestricted(dynamic instance) {
+		if (instance.properties.nonDmOnly == true && (
+			Global.level.server.gameMode.Contains(GameMode.Deathmatch) ||
+			Global.level.server.gameMode.Contains(GameMode.Elimination) ||
+			Global.level.server.gameMode.Contains(GameMode.ElimAlt)
+		)) {
+			return true;
+		}
+		if (instance.properties.nonCpOnly == true &&
+			Global.level.server.gameMode.Contains(GameMode.ControlPoint)
+		) {
+			return true;
+		}
+		if (instance.properties.nonCtfOnly == true &&
+			Global.level.server.gameMode.Contains(GameMode.CTF)
+		) {
+			return true;
+		}
+		if (instance.properties.nonKothOnly == true &&
+			Global.level.server.gameMode.Contains(GameMode.KingOfTheHill)
+		) {
+			return true;
+		}
+		if (instance.properties.dmOnly == true &&
+			!Global.level.server.gameMode.Contains(GameMode.Deathmatch) &&
+			!Global.level.server.gameMode.Contains(GameMode.Elimination) &&
+			!Global.level.server.gameMode.Contains(GameMode.ElimAlt)
+		) {
+			return true;
+		}
 		return false;
 	}
 
-	public void joinedLateSyncPlayers(List<PlayerPB> hostPlayers) {
+	public void joinedLateSyncPlayers(PlayerPB[] hostPlayers) {
 		if (hostPlayers == null) {
 			return;
 		}
-		foreach (var hostPlayer in hostPlayers) {
+		foreach (PlayerPB hostPlayer in hostPlayers) {
 			if (hostPlayer.serverPlayer.id == mainPlayer.id) continue;
-			var player = players.Find(p => p.id == hostPlayer.serverPlayer.id);
+			Player? player = players.Find(p => p.id == hostPlayer.serverPlayer.id);
 			if (player == null) continue;
 			if (player.ownedByLocalPlayer) continue;
 
-			player.alliance = hostPlayer.serverPlayer.alliance;
+			player.alliance = hostPlayer.alliance;
 			player.newAlliance = hostPlayer.newAlliance;
+			player.score = hostPlayer.serverPlayer.score;
 			player.kills = hostPlayer.serverPlayer.kills;
 			player.deaths = hostPlayer.serverPlayer.deaths;
-			player.charNum = hostPlayer.serverPlayer.charNum;
+			player.assists = hostPlayer.serverPlayer.assists;
 			player.newCharNum = hostPlayer.newCharNum;
+			player.charNum = hostPlayer.currentCharNum != -1 ? hostPlayer.currentCharNum : player.newCharNum;
 			player.curMaxNetId = hostPlayer.curMaxNetId;
-			player.warpedIn = hostPlayer.warpedIn;
+			player.warpedInOnce = hostPlayer.warpedIn;
 			player.readyTime = hostPlayer.readyTime;
-			player.readyTextOver = hostPlayer.readyTextOver;
-			player.armorFlag = hostPlayer.armorFlag;
+			player.readyTextOver = true;
 			player.loadout = hostPlayer.loadoutData;
-			player.disguise = hostPlayer.disguise;
-			player.atransLoadout = hostPlayer.atransLoadout;
 
 			if (hostPlayer.currentCharNum != -1 &&
 				hostPlayer.charNetId != ushort.MaxValue &&
@@ -1033,35 +1227,29 @@ public partial class Level {
 			) {
 				int targetCharNum = hostPlayer.currentCharNum;
 				LoadoutData currentLoadout = player.loadout;
-				if (player.atransLoadout != null) {
-					currentLoadout = player.atransLoadout;
+				if (hostPlayer.atransLoadout != null) {
+					currentLoadout = hostPlayer.atransLoadout;
 				}
 				player.spawnCharAtPoint(
-					targetCharNum, player.getCharSpawnData(targetCharNum, false, currentLoadout),
+					targetCharNum, player.getCharSpawnData(targetCharNum, loadout: currentLoadout),
 					new Point(hostPlayer.charXPos, hostPlayer.charYPos),
-					hostPlayer.charXDir, hostPlayer.charNetId, false, hostPlayer.isATrans
+					hostPlayer.charXDir, hostPlayer.charNetId,
+					sendRpc: false
 				);
-				if (hostPlayer.charRollingShieldNetId != ushort.MaxValue &&
-					player.character is MegamanX mmx
-				) {
-					mmx.chargedRollingShieldProj = new RollingShieldProjCharged(
-						player.character.pos,
-						player.character.xDir,
-						player.character, player,
-						hostPlayer.charRollingShieldNetId
-					);
-				}
-			} else {
-				player.atransLoadout = null;
 			}
 		}
 	}
 
-	public void joinedLateSyncControlPoints(List<ControlPointResponseModel> controlPointResponseModels) {
+	public void joinedLateSyncControlPoints(ControlPointResponseModel[] controlPointResponseModels) {
 		if (controlPointResponseModels == null) return;
 
 		foreach (var controlPointResponseModel in controlPointResponseModels) {
-			var controlPoint = controlPoints.Where(c => c.num == controlPointResponseModel.num).FirstOrDefault();
+			ControlPoint? controlPoint = controlPoints.FirstOrDefault(
+				c => c.num == controlPointResponseModel.num
+			);
+			if (controlPoint == null) {
+				continue;
+			}
 			controlPoint.alliance = controlPointResponseModel.alliance;
 			controlPoint.num = controlPointResponseModel.num;
 			controlPoint.locked = controlPointResponseModel.locked;
@@ -1070,23 +1258,76 @@ public partial class Level {
 		}
 	}
 
-	public void joinedLateSyncMagnetMines(List<MagnetMineResponseModel> magnetMines) {
-		if (magnetMines == null) return;
-
-		foreach (var magnetMine in magnetMines) {
-			var player = getPlayerById(magnetMine.playerId);
-			if (player == null) continue;
-			new MagnetMineProj(new Point(magnetMine.x, magnetMine.y), 1, player.character, player, magnetMine.netId);
+	public void joinedLateSyncActors(ActorRpcResponse[] responses) {
+		// Return if it's 0.
+		if (responses.Length == 0) {
+			return;
 		}
-	}
-
-	public void joinedLateSyncTurrets(List<TurretResponseModel> turrets) {
-		if (turrets == null) return;
-
-		foreach (var turret in turrets) {
-			var player = getPlayerById(turret.playerId);
-			if (player == null) continue;
-			new RaySplasherTurret(new Point(turret.x, turret.y), player, 1, turret.netId, false, false);
+		// First we order them by their netIDs.
+		// Then we order the responses by reverse ownerIDs, so we create the owner first.
+		responses = (responses
+			.OrderBy(r => r.netId)
+			.OrderBy(r => r.ownerId ?? 0)
+			.ToArray()
+		);
+		// Iterate over the whole list.
+		int i = 0;
+		foreach (ActorRpcResponse response in responses) {
+			// Ignore actors that already exist.
+			if (getActorByNetId(response.netId) != null) {
+				i++;
+				continue;
+			}
+			// Skip if the owner playeris not there anymore.
+			// As would be no one to update them if they are localOnly.
+			Player? player = getPlayerById(response.playerId);
+			if (player == null) {
+				i++;
+				continue;
+			}
+			// Set up vars.
+			Point pos = new(response.posX, response.posY);
+			Actor? owner = null;
+			if (response.ownerId != null) {
+				owner = getActorByNetId(response.ownerId.Value);
+			}
+			// Because Protobuff just plain sucks.
+			if (responses[i].extraData == null) {
+				responses[i].extraData = [];
+			}
+			// When is projectile.
+			if (response.isProj) {
+				ProjParameters args = new() {
+					projId = response.actorId,
+					pos = pos,
+					xDir = response.xDir,
+					player = player,
+					netId = response.netId,
+					angle = Helpers.byteToDegree(response.byteAngle),
+					byteAngle = response.byteAngle,
+					extraData = response.extraData,
+					owner = owner!,
+				};
+				byte[] byteArgs = RPC.createProj.getSendBytes(args);
+				RPC.createProj.invoke(byteArgs);
+			}
+			// When is not a projectile.
+			else {
+				ActorRpcParameters args = new() {
+					actorId = response.actorId,
+					pos = pos,
+					xDir = response.xDir,
+					player = player,
+					netId = response.netId,
+					angle = Helpers.byteToDegree(response.byteAngle),
+					byteAngle = response.byteAngle,
+					extraData = response.extraData,
+					owner = owner!,
+				};
+				byte[] byteArgs = RPC.createActor.getSendBytes(args);
+				RPC.createActor.invoke(byteArgs);
+			}
+			i++;
 		}
 	}
 
@@ -1121,11 +1362,14 @@ public partial class Level {
 	}
 
 	public Player? getPlayerById(int? id) {
+		if (id == byte.MaxValue) {
+			return Player.stagePlayer;
+		}
 		return players.Find(p => p.id == id);
 	}
 
 	public Player getPlayerByIdSafe(int? id) {
-		if (id == null) {
+		if (id == null || id == byte.MaxValue) {
 			return Player.stagePlayer;
 		}
 		return players.Find(p => p.id == id) ?? Player.errorPlayer;
@@ -1155,11 +1399,11 @@ public partial class Level {
 
 		var player = new Player(
 			serverPlayer.name, serverPlayer.id,
-			serverPlayer.charNum, playerData, isBot,
+			serverPlayer.spawnCharNum, playerData, isBot,
 			ownedByLocalPlayer, serverPlayer.alliance, input, serverPlayer
 		);
 		if (joinedLate) {
-			player.warpedIn = true;
+			player.warpedInOnce = true;
 			player.readyTime = 10;
 		}
 		players.Add(player);
@@ -1181,17 +1425,26 @@ public partial class Level {
 		}
 	}
 
-	public void removePlayer(Player player) {
+	public void removePlayer(Player player, int mode = -1) {
 		if (!Global.level.players.Contains(player)) return;
 
-		string leaveMsg = player.name + " left match.";
-		if (player.isBot) leaveMsg = player.name + " removed from match.";
+		string reason = mode switch {
+			0 => " (Disconected)",
+			1 => " (Bot removed)",
+			2 => " (Sync)",
+			_ => ""
+		};
+
+		string leaveMsg = $"{player.name} left match.{reason}";
+		if (player.isBot) {
+			leaveMsg = player.name + " removed from match.";
+		}
 		gameMode.chatMenu.addChatEntry(new ChatEntry(leaveMsg, null, null, true));
 		player.destroy();
 		players.Remove(player);
 		var nsps = nonSpecPlayers();
 		if (nsps.Count == 1 && is1v1()) {
-			nsps[0].kills = server.playTo;
+			nsps[0].score = server.playTo;
 		}
 	}
 
@@ -1314,18 +1567,13 @@ public partial class Level {
 
 				Point size = Helpers.getTextureArraySize(parallaxTextures);
 
-				if (MathF.Abs(parallaxOffsets[i].x) > size.x) parallaxOffsets[i] = new Point(0, parallaxOffsets[i].y);
-				if (MathF.Abs(parallaxOffsets[i].y) > size.y) parallaxOffsets[i] = new Point(parallaxOffsets[i].x, 0);
+				if (MathF.Abs(parallaxOffsets[i].x) > size.x) {
+					parallaxOffsets[i] = new Point(0, parallaxOffsets[i].y);
+				}
+				if (MathF.Abs(parallaxOffsets[i].y) > size.y) {
+					parallaxOffsets[i] = new Point(parallaxOffsets[i].x, 0);
+				}
 			}
-		}
-
-		if (enableGiantDamPropellers()) {
-			if (Global.flFrameCount % 30 == 0) new Anim(new Point(1728, 576 + 20), "bubbles", 1, null, false) { vel = new Point(-100, 0), ttl = 4 };
-			else if (Global.flFrameCount % 20 == 0) new Anim(new Point(1728, 600 + 20), "bubbles", 1, null, false) { vel = new Point(-100, 0), ttl = 4 };
-			else if (Global.flFrameCount % 40 == 0) new Anim(new Point(1728, 625 + 20), "bubbles", 1, null, false) { vel = new Point(-100, 0), ttl = 4 };
-			else if (Global.flFrameCount % 30 == 15) new Anim(new Point(1728, 650 + 10), "bubbles", 1, null, false) { vel = new Point(-100, 0), ttl = 4 };
-			else if (Global.flFrameCount % 20 == 10) new Anim(new Point(1728, 675 + 10), "bubbles", 1, null, false) { vel = new Point(-100, 0), ttl = 4 };
-			else if (Global.flFrameCount % 40 == 20) new Anim(new Point(1728, 690 + 10), "bubbles", 1, null, false) { vel = new Point(-100, 0), ttl = 4 };
 		}
 
 		foreach (string key in recentClipCount.Keys.ToList()) {
@@ -1346,7 +1594,7 @@ public partial class Level {
 				delayedActions.RemoveAt(i);
 			}
 		}
-		
+
 		// Call net update before the frame starts.
 		netUpdate();
 
@@ -1354,10 +1602,17 @@ public partial class Level {
 		float playerY = 0;
 		if (camPlayer.character != null) {
 			camPlayer.character.stopCamUpdate = false;
-			playerX = camPlayer.character.getCamCenterPos().x;
-			playerY = camPlayer.character.getCamCenterPos().y;
+			Actor followActor = camPlayer.character.getFollowActor();
+			if (followActor != camPlayer.character) {
+				playerX = followActor.getCenterPos().round().x;
+				playerY = followActor.getCenterPos().round().y;
+			} else {
+				playerX = camPlayer.character.getCamCenterPos().round().x;
+				playerY = camPlayer.character.getCamCenterPos().round().y;
+			}
 		}
 
+		// Pre Update stuff.
 		List<GameObject> gos = gameObjects.ToList();
 		foreach (GameObject go in gos) {
 			if (go.iDestroyed) {
@@ -1369,8 +1624,8 @@ public partial class Level {
 			Global.speedMul = slowAmount * Global.gameSpeed;
 			go.speedMul = slowAmount * Global.gameSpeed;
 			go.preUpdate();
-			go.statePreUpdate();
-			Global.speedMul = Global.gameSpeed;
+			if (go.hasStateMachine) { go.statePreUpdate(); }
+			Global.speedMul = Global.gameSpeed;;
 		}
 
 		// Preupdate RPCs.
@@ -1393,7 +1648,7 @@ public partial class Level {
 			Global.speedMul = slowAmount * Global.gameSpeed;
 			go.speedMul = slowAmount * Global.gameSpeed;
 			go.update();
-			go.stateUpdate();
+			if (go.hasStateMachine) { go.stateUpdate(); }
 			go.physicsUpdate();
 			if (gameMode.virusStarted > 0 && go is Actor actor &&
 				actor.ownedByLocalPlayer && go is IDamagable damagable
@@ -1477,12 +1732,12 @@ public partial class Level {
 					break;
 				}
 				// Skip destroyed stuff.
-				if (currentGrid[i].iDestroyed) {
+				if (currentGrid[i].iDestroyed || currentGrid[i].iDisabled) {
 					continue;
 				}
-				for (int j = i; j < currentGrid.Count; j++) {
+				for (int j = i+1; j < currentGrid.Count; j++) {
 					// Exit if we get destroyed.
-					if (currentGrid[i].iDestroyed) {
+					if (currentGrid[i].iDestroyed || currentGrid[i].iDisabled) {
 						break;
 					}
 					// Get order independent hash.
@@ -1494,7 +1749,7 @@ public partial class Level {
 					// Add to hash as we check.
 					collidedGObjs.Add(hash);
 					// Skip destroyed stuff.
-					if (currentGrid[j].iDestroyed) {
+					if (currentGrid[j].iDestroyed || currentGrid[j].iDisabled) {
 						continue;
 					}
 					// Do preliminary collision checks and skip if we do not instersect.
@@ -1522,14 +1777,14 @@ public partial class Level {
 					}
 				}
 				// Continue if we get destroyed.
-				if (currentTerrainGrid == null || currentGrid[i].iDestroyed) {
+				if (currentTerrainGrid == null || currentGrid[i].iDestroyed || currentGrid[i].iDisabled) {
 					continue;
 				}
 				foreach (GameObject wallObj in currentTerrainGrid) {
 					// Get order independent hash.
 					int hash = currentGrid[i].GetHashCode() ^ wallObj.GetHashCode();
 
-					if (currentGrid[i] is not Actor actor || wallObj is not Geometry geometry) {
+					if (currentGrid[i] is not Actor actor || wallObj.iDestroyed || wallObj.iDisabled) {
 						continue;
 					}
 					// Skip checked objects.
@@ -1543,7 +1798,7 @@ public partial class Level {
 						continue;
 					}
 					(CollideData? iData, CollideData? jData) = getTriggerTerrain(
-						actor, geometry
+						actor, wallObj
 					);
 					if (iData != null) {
 						Global.speedMul = currentGrid[i].speedMul * Global.gameSpeed;
@@ -1560,29 +1815,26 @@ public partial class Level {
 			Global.speedMul = Global.gameSpeed;
 		}
 
-		// Collision RPCs.
-		foreach (PendingRPC pendingRpc in pendingCollisionRpcs) {
-			pendingRpc.invoke();
-		}
-		pendingCollisionRpcs.Clear();
-
+		// Pending damage RPCs.
+		// Excute before the other collsion RPCs as this is delayed already.
 		for (int i = backloggedDamages.Count - 1; i >= 0; i--) {
 			BackloggedDamage bd = backloggedDamages[i];
-			// Do not run on frame 0.
-			if (bd.time <= 0) {
-				bd.time++;
-				continue;
-			}
 			// Search for actor;
-			Actor? damagerActor =  Global.level.getActorByNetId(bd.actorId, true);
+			Actor? damagerActor = Global.level.getActorByNetId(bd.netId, true);
 			// Run if we find an actor.
-			// Or Run anyway if more than 1s.
-			if (damagerActor != null || bd.time > 60) {
+			// Or run anyway if more than 20 frames.
+			if (damagerActor != null || bd.time >= 20) {
 				bd.damageAction(damagerActor, bd.meleeId);
 				backloggedDamages.RemoveAt(i);
 			}
 			bd.time++;
 		}
+
+		// Collision RPCs.
+		foreach (PendingRPC pendingRpc in pendingCollisionRpcs) {
+			pendingRpc.invoke();
+		}
+		pendingCollisionRpcs.Clear();
 
 		foreach (GameObject go in gos) {
 			if (go.iDestroyed) {
@@ -1594,7 +1846,7 @@ public partial class Level {
 			Global.speedMul = slowAmount * Global.gameSpeed;
 			go.speedMul = slowAmount * Global.gameSpeed;
 			go.postUpdate();
-			go.statePostUpdate();
+			if (go.hasStateMachine) { go.statePostUpdate(); }
 			Global.speedMul = Global.gameSpeed;
 			go.speedMul = Global.gameSpeed;
 			go.netUpdate();
@@ -1603,10 +1855,15 @@ public partial class Level {
 
 		if (camPlayer.character != null) {
 			if (!camPlayer.character.stopCamUpdate) {
-				Point camPos = camPlayer.character.getCamCenterPos();
-				Actor? followActor = camPlayer.character?.getFollowActor();
+				Point camPos = camPlayer.character.getCamCenterPos().round();
+				Actor followActor = camPlayer.character.getFollowActor();
 
-				float extraPos = 0; //MathF.Floor(MathF.Abs(followActor.moveDelta.x));
+				if (followActor != camPlayer.character) {
+					camPos = followActor.getCenterPos().round();
+				}
+
+				float extraPos = MathF.Floor(MathF.Abs(followActor.moveDelta.x));
+
 				if (extraPos >= 4) {
 					extraPos = extraPos * 16 * MathF.Sign(followActor.moveDelta.x);
 					if (lastCameraXDelta == 0 ||
@@ -1631,13 +1888,18 @@ public partial class Level {
 				extraPos = MathF.Round(lastCameraXDelta / 100f);
 
 				Point expectedCamPos = computeCamPos(camPos, new Point(playerX + extraPos, playerY));
+				float camOffsetY = MathF.Round(camPos.y - camPlayer.character.pos.y);
 				float fullDeltaX = MathF.Round(expectedCamPos.x + extraPos) - camX;
 				float fullDeltaY = MathF.Round(expectedCamPos.y) - camY;
+				float altDeltaY = fullDeltaY - camOffsetY;
 
 				if (followActor != null && followActor.grounded == false) {
-					if (fullDeltaY > -54 && fullDeltaY < 20 &&
+					if (followActor is not IDamagable) {
+						unlockfollow = true;
+					}
+					else if (altDeltaY > -46 && altDeltaY < 46 &&
 						camPlayer.character?.charState is
-							(not WallKick and not WallSlide and not LadderClimb) or InRideChaser
+						(not WallKick and not WallSlide and not LadderClimb) or InRideChaser
 					) {
 						if (!unlockfollow) {
 							fullDeltaY = 0;
@@ -1655,15 +1917,21 @@ public partial class Level {
 				if (camPlayer.character?.charState is not InRideChaser &&
 					(camPlayer.character as Axl)?.isZooming() != true
 				) {
+					// Base speed of 4.
+					// If changed also change the equation bellow.
+					// This is NOT max speed but base speed and multipled.
 					int camSpeedX = 4;
 					int camSpeedY = 4;
 					float diference;
+					// Delta equation for X.
+					// Camera can break the base speed if far away.
 					if (MathF.Abs(deltaX) > camSpeedX) {
 						diference = MathF.Floor(MathF.Abs((camSpeedX - MathF.Abs(deltaX)) / 24f));
 						deltaX = (camSpeedX + diference) * MathF.Sign(fullDeltaX);
 					}
+					// Delta for Y.
 					if (MathF.Abs(deltaY) > camSpeedY) {
-						diference = MathF.Floor(MathF.Abs((camSpeedY - MathF.Abs(deltaY)) / 24f));
+						diference = MathF.Floor(MathF.Abs((camSpeedY - MathF.Abs(altDeltaY)) / 24f));
 						deltaY = (camSpeedY + diference) * MathF.Sign(fullDeltaY);
 					}
 				}
@@ -1692,18 +1960,17 @@ public partial class Level {
 		}
 
 		foreach (var player in players.ToList()) {
-			if (player.isAI && AI.trainingBehavior != AITrainingBehavior.Idle) {
-				player.clearAiInput();
-			}
-			player.input.clearMashCount();
-		}
-
-		foreach (var player in players.ToList()) {
 			player.update();
 		}
 
-		foreach (var pickupSpawner in itemSpawners) {
+		foreach (ItemSpawner itemSpawner in itemSpawners) {
+			itemSpawner.update();
+		}
+		foreach (PickupSpawner pickupSpawner in pickupSpawners) {
 			pickupSpawner.update();
+		}
+		foreach (ActorSpawner enemySpawner in enemySpawners) {
+			enemySpawner.update();
 		}
 
 		// This would mostly be reliable to sync based on time.
@@ -1723,8 +1990,15 @@ public partial class Level {
 		updateMusicSources();
 
 		// Send RPCs.
-		if (Global.serverClient != null) {
+		if (Global.serverClient != null && isSendMessageFrame()) {
 			Global.serverClient.flush();
+		}
+
+		foreach (var player in players.ToList()) {
+			if (player.isAI && AI.trainingBehavior != AITrainingBehavior.Idle) {
+				player.clearAiInput();
+			}
+			player.input.clearMashCount();
 		}
 	}
 
@@ -1740,7 +2014,7 @@ public partial class Level {
 		foreach (var message in messages) {
 			if (message.StartsWith("hostdisconnect:")) {
 				string reason = message.Split(':')[1];
-				if (reason == "RecreateMS" &&
+				if (reason == "RecreateMS" && 
 					Global.serverClient.serverId != null
 				) {
 					server.uniqueID = Global.serverClient.serverId.Value;
@@ -1763,7 +2037,7 @@ public partial class Level {
 				if (playerLeft != null) {
 					var player = Global.level.getPlayerById(playerLeft.id);
 					if (player != null) {
-						removePlayer(player);
+						removePlayer(player, 0);
 					}
 				}
 			}
@@ -1791,7 +2065,7 @@ public partial class Level {
 			}
 		}
 
-		var keysToRemove = new List<int>();
+		//var keysToRemove = new List<int>();
 		/*foreach (var kvp in failedSpawns) {
 			var player = getPlayerById(kvp.Key);
 			if (player == null || player.character != null) {
@@ -1826,7 +2100,7 @@ public partial class Level {
 		bool found = false;
 		float foundVolume = 0;
 		for (int i = musicSources.Count - 1; i >= 0; i--) {
-			var musicWrapper = musicSources[i];
+			MusicWrapper musicWrapper = musicSources[i];
 			musicWrapper.update();
 			musicWrapper.updateMusicSource();
 			if (found) {
@@ -1834,7 +2108,7 @@ public partial class Level {
 				continue;
 			}
 			musicWrapper.updateMusicSourceVolume(listenerPos);
-			if (musicWrapper.volume > 0) {
+			if (musicWrapper.volume > 0 && musicWrapper.isPlaying()) {
 				found = true;
 				foundVolume = musicWrapper.volume;
 			}
@@ -1908,7 +2182,7 @@ public partial class Level {
 	public void render() {
 		if (Global.level.mainPlayer == null) return;
 
-		if (Global.level.joinedLate && !Global.level.mainPlayer.warpedIn && Global.level.mainPlayer.character == null && blackJoinTime < 3) {
+		if (Global.level.joinedLate && !Global.level.mainPlayer.warpedInOnce && Global.level.mainPlayer.character == null && blackJoinTime < 3) {
 			blackJoinTime += Global.spf;
 			return;
 		}
@@ -1938,6 +2212,14 @@ public partial class Level {
 
 		foreach (var go in gameObjects) {
 			if (go.iDestroyed) {
+				if (go is Character chara) {
+					DrawWrappers.DrawRect(
+						chara.pos.x - 1, chara.pos.y - 2,
+						chara.pos.x + 1, chara.pos.y,
+						true, new Color(255, 0, 0, 64), 1,
+						ZIndex.HUD, true, new Color(255, 0, 0, 125)
+					);
+				}
 				continue;
 			}
 			go.render(0, 0);
@@ -1951,7 +2233,13 @@ public partial class Level {
 		Dictionary<long, DrawLayer> drawObjCopy = new(DrawWrappers.walDrawObjects);
 		DrawWrappers.walDrawObjects.Clear();
 
-		renderResult(this, srt, drawObjCopy);
+		if (Program.isMultiThread) {
+			Program.renderAction = () => {
+				renderResult(this, srt, drawObjCopy);
+			};
+		} else {
+			renderResult(this, srt, drawObjCopy);
+		}
 	}
 
 	public static void renderResult(
@@ -2080,11 +2368,11 @@ public partial class Level {
 		DrawWrappers.deferredTextDraws.Clear();
 
 		// At this point all drawing should be HUD/menu elements only
-		level.gameMode.render();
+		level.hud.render();
 
 		if (level.mainPlayer.readyTime > 0) {
 			if (level.mainPlayer.readyTime < 0.4) {
-				int frameIndex = (int)Math.Round((level.mainPlayer.readyTime / 0.4) * 9);
+				int frameIndex = (int)Math.Round((level.mainPlayer.readyTime / 0.4) * 13);
 				Global.sprites["ready"].drawToHUD(frameIndex, (Global.screenW / 2) - 21, Global.screenH / 2);
 			} else if (level.mainPlayer.readyTime < 1.75) {
 				if ((int)Math.Round(level.mainPlayer.readyTime * 7.5) % 2 == 0) {
@@ -2100,9 +2388,6 @@ public partial class Level {
 			int vfps = MathInt.Round(Global.currentFPS);
 			int fps = MathInt.Round(Global.logicFPS);
 			float yPos = 200;
-			if (Global.level.gameMode.shouldDrawRadar()) {
-				yPos = 219;
-			}
 			Fonts.drawText(
 				FontType.BlueMenu, "VFPS:" + vfps.ToString(), Global.screenW - 5, yPos - 10,
 				Alignment.Right
@@ -2112,13 +2397,28 @@ public partial class Level {
 				Alignment.Right
 			);
 		}
+		if (Global.level != null) {
+			Global.level.backloggedDamageTimer--;
+			if (Global.level.backloggedDamages.Where(bd => (bd.time >= 2)).Count() > 0) {
+				Global.level.backloggedDamageTimer = 120;
+			}
+			if (Global.level.backloggedDamageTimer > 0) {
+				Fonts.drawText(
+					FontType.BlueMenu,
+					"BDMG:" + Global.level.backloggedDamages.Count.ToString(),
+					Global.screenW - 5, 200 - 30,
+					Alignment.Right
+				);
+			}
+		}
 
 		DevConsole.drawConsole();
+		Program.renderHudTexture();
 	}
 
 	public void drawKeyRange(
-		List<long> keys, long minVal, long maxVal, RenderTexture srt,
-		Dictionary<long, DrawLayer> walDrawObjects
+	List<long> keys, long minVal, long maxVal, RenderTexture srt,
+	Dictionary<long, DrawLayer> walDrawObjects
 	) {
 		foreach (long key in keys) {
 			if (key >= minVal && key < maxVal) {
@@ -2164,6 +2464,19 @@ public partial class Level {
 	}
 
 	public void drawDebug() {
+		/*if (Program.debugLogs.Count > 0) {
+			float maxNum = MathInt.Ceiling(18 / Global.getDebugFontScale());
+			int currentOff = MathInt.Floor((Global.screenH - 10) / Global.getDebugFontScale());
+			int j = 0;
+			for (int i = Program.debugLogs.Count - 1; i >= 0 && j <= maxNum; i--) {
+				currentOff -= Fonts.drawDebug(Program.debugLogs[i], currentOff);
+				j++;
+			}
+
+			if (Program.debugLogs.Count > 50) {
+				Program.debugLogs.RemoveRange(0, Program.debugLogs.Count - 50);
+			}
+		}*/
 		if (Global.showGridHitboxes) {
 			int gridItemCount = 0;
 			int offset = 0;
@@ -2223,8 +2536,7 @@ public partial class Level {
 				}
 			}
 			Global.debugString2 = "Grid item count: " + gridItemCount.ToString();
-		}
-		else if (Global.showTerrainGridHitboxes) {
+		} else if (Global.showTerrainGridHitboxes) {
 			int gridItemCount = 0;
 			int offset = 0;
 			int startGridX = MathInt.Floor(camX / cellWidth);
@@ -2289,7 +2601,12 @@ public partial class Level {
 			foreach (var navMeshNode in navMeshNodes) {
 				float textPosX = navMeshNode.pos.x - Global.level.camX / Global.viewSize;
 				float textPosY = (navMeshNode.pos.y - 20 - Global.level.camY) / Global.viewSize;
-				DrawWrappers.DrawRect(navMeshNode.pos.x - 10, navMeshNode.pos.y - 10, navMeshNode.pos.x + 10, navMeshNode.pos.y + 10, true, new Color(0, 255, 0, 128), 1, ZIndex.HUD + 100, true);
+				DrawWrappers.DrawRect(
+					navMeshNode.pos.x - 7, navMeshNode.pos.y - 15, 
+					navMeshNode.pos.x + 7, navMeshNode.pos.y + 15,
+					true, new Color(0, 255, 0, 64), 1, ZIndex.HUD + 100,
+					true, new Color(0, 255, 0, 128)
+				);
 				Fonts.drawText(
 					FontType.Grey, navMeshNode.name, navMeshNode.pos.x, navMeshNode.pos.y - 20,
 					Alignment.Center, true, depth: ZIndex.HUD
@@ -2379,6 +2696,75 @@ public partial class Level {
 
 		float prevCamX = camX;
 		float prevCamY = camY;
+
+		if (!ignoreNoScrolls()) {
+			Actor? followActor = camPlayer.character.getFollowActor();
+			List<CameraZone> activeCamZones = [];
+
+			if (followActor != null && followActor.physicsCollider != null) {
+				Shape camCollider = followActor.physicsCollider.shape;
+				foreach (CameraZone cameraZone in camZone) {
+					Shape other = cameraZone.collider.shape;
+					if (camCollider.minX <= other.maxX &&
+						camCollider.maxX >= other.minX &&
+						camCollider.minY <= other.maxY &&
+						camCollider.maxY >= other.minY
+					) {
+						activeCamZones.Add(cameraZone);
+					}
+				}
+			}
+			float lCamX = width - scaledCanvasW;
+			float rCamX = 0;
+			float uCamY = height - scaledCanvasH;
+			float dCamY = 0;
+
+			foreach (CameraZone cameraZone in activeCamZones) {
+				Shape colShape = cameraZone.collider.shape;
+				lCamX = MathF.Min(colShape.minX, lCamX);
+				rCamX = MathF.Max(colShape.maxX, rCamX + scaledCanvasW) - scaledCanvasW;
+				uCamY = MathF.Min(colShape.minY, uCamY);
+				dCamY = MathF.Max(colShape.maxY, dCamY + scaledCanvasH) - scaledCanvasH;
+			}
+			// Check if we are not out of bounds.
+			if (activeCamZones.Count > 0) {
+				bool ajustX = false;
+				bool ajustY = false;
+				if (camX + deltaX < lCamX && deltaX <= 0 ||
+					camX + deltaX > rCamX && deltaX >= 0
+				) {
+					if (deltaX != 0 && camX > lCamX && camX < rCamX) {
+						deltaX = MathF.Sign(deltaX);
+					} else {
+						deltaX = 0;
+					}
+					ajustX = true;
+				}
+				if (camY + deltaY < uCamY && deltaY <= 0 ||
+					camY + deltaY > dCamY && deltaY >= 0
+				) {
+					if (deltaY != 0 && camY > uCamY && camY < dCamY) {
+						deltaY = MathF.Sign(deltaY);
+					} else {
+						deltaY = 0;
+					}
+					ajustY = true;
+				}
+
+				if (ajustX) {
+					int cDelta = 0;
+					if (camX < lCamX) { cDelta += MathF.Abs(camX - lCamX) >= 2 ? 2 : 1; }
+					if (camX > rCamX) { cDelta -= MathF.Abs(camX - rCamX) >= 2 ? 2 : 1; }
+					camX += cDelta;
+				}
+				if (ajustY) {
+					int cDelta = 0;
+					if (camY < uCamY) { cDelta += MathF.Abs(camY - uCamY) >= 2 ? 2 : 1; }
+					if (camY > dCamY) { cDelta -= MathF.Abs(camY - dCamY) >= 2 ? 2 : 1; }
+					camY += cDelta;
+				}
+			}
+		}
 
 		if (!dontMoveX) {
 			camX += deltaX;
@@ -2589,7 +2975,7 @@ public partial class Level {
 			return spawnPoints[Global.quickStartSpawn.Value];
 		}
 		SpawnPoint[] availableSpawns;
-		if (!gameMode.useTeamSpawns() || player.newAlliance < 0 || player.newAlliance > 1) {
+		if (!gameMode.useTeamSpawns || player.newAlliance < 0 || player.newAlliance > 1) {
 			availableSpawns = spawnPoints.Where(
 				(spawnPoint) => {
 					return (
@@ -2614,8 +3000,11 @@ public partial class Level {
 		SpawnPoint[] unoccupied = availableSpawns.Where((spawnPoint) => {
 			return !spawnPoint.occupied();
 		}).ToArray();
+		if (unoccupied.Length > 0) {
+			unoccupied.GetRandomItem();
+		}
 
-		return unoccupied.GetRandomItem();
+		return availableSpawns.GetRandomItem();
 	}
 
 	public SpawnPoint getFirstSpawnPoint(Player player) {
@@ -2633,7 +3022,7 @@ public partial class Level {
 			return spawnPoints[Global.quickStartSpawn.Value];
 		}
 		SpawnPoint[] availableSpawns;
-		if (!gameMode.useTeamSpawns() || player.newAlliance < 0 || player.newAlliance > 1) {
+		if (!gameMode.useTeamSpawns || player.newAlliance < 0 || player.newAlliance > 1) {
 			availableSpawns = spawnPoints.Where(
 				(spawnPoint) => {
 					return (
@@ -2657,7 +3046,7 @@ public partial class Level {
 		return gameMode is Race;
 	}
 
-	public ControlPoint getCurrentControlPoint() {
+	public ControlPoint? getCurrentControlPoint() {
 		foreach (var controlPoint in controlPoints) {
 			if (!controlPoint.locked && !controlPoint.captured) return controlPoint;
 		}
@@ -2695,8 +3084,8 @@ public partial class Level {
 
 		Point originPoint = new Point(Global.level.camCenterX, Global.level.camCenterY);
 
-		Character mainChar = Global.level.mainPlayer?.character;
-		Maverick mainMaverick = Global.level.mainPlayer?.currentMaverick;
+		Character? mainChar = Global.level.mainPlayer?.character;
+		Maverick? mainMaverick = Global.level.mainPlayer?.currentMaverick;
 		if (mainChar != null && mainChar.isSoundCentered()) {
 			originPoint = mainChar.pos;
 		} else if (mainMaverick != null) {
@@ -2776,17 +3165,17 @@ public partial class Level {
 
 		if (Global.level.redFlag == null || Global.level.blueFlag == null) {
 			Logger.logException(new Exception("Host tried to reset flag but they were null"), false);
-			Global.level.gameMode.chatMenu.addChatEntry(new ChatEntry("Could not reset flags. Error: flags null", null, null, true), sendRpc: true);
+			Global.level.gameMode.chatMenu.addChatEntry(new ChatEntry("Could not reset flags. Error: flags null", "", null, true), sendRpc: true);
 			return;
 		}
 		if (Global.level.redFlag.destroyed || Global.level.blueFlag.destroyed) {
 			Logger.logException(new Exception("Host tried to reset flag but they were destroyed"), false);
-			Global.level.gameMode.chatMenu.addChatEntry(new ChatEntry("Flags were reset. Error: flags destroyed", null, null, true), sendRpc: true);
+			Global.level.gameMode.chatMenu.addChatEntry(new ChatEntry("Flags were reset. Error: flags destroyed", "", null, true), sendRpc: true);
 			return;
 		}
 		if (!Global.level.gameObjects.Contains(Global.level.redFlag) || !Global.level.gameObjects.Contains(Global.level.blueFlag)) {
 			Logger.logException(new Exception("Host tried to reset flag but they were not in gameobject set"), false);
-			Global.level.gameMode.chatMenu.addChatEntry(new ChatEntry("Flags were reset. Error: flags missing", null, null, true), sendRpc: true);
+			Global.level.gameMode.chatMenu.addChatEntry(new ChatEntry("Flags were reset. Error: flags missing", "", null, true), sendRpc: true);
 			return;
 		}
 
@@ -2805,7 +3194,7 @@ public partial class Level {
 		Global.level.redFlag.pickupCooldown = 1;
 		Global.level.blueFlag.pickupCooldown = 1;
 
-		Global.level.gameMode.chatMenu.addChatEntry(new ChatEntry("Flags were reset.", null, null, true), sendRpc: true);
+		Global.level.gameMode.chatMenu.addChatEntry(new ChatEntry("Flags were reset.", "", null, true), sendRpc: true);
 	}
 
 	public int getLeaderKills() {
@@ -2816,10 +3205,10 @@ public partial class Level {
 
 	public void clearOldActors() {
 		Dictionary<ushort, Actor> destroyedActorsByIdClone = new(destroyedActorsById);
-		foreach ((ushort actorId, Actor actor) in destroyedActorsByIdClone) {
+		foreach ((ushort netId, Actor actor) in destroyedActorsByIdClone) {
 			long framesDestroyed = Global.floorFrameCount - actor.destroyedOnFrame;
 			if (framesDestroyed >= 240) {
-				destroyedActorsById.Remove(actorId);
+				destroyedActorsById.Remove(netId);
 			}
 		}
 	}

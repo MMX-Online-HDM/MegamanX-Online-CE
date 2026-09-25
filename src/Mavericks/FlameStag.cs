@@ -37,10 +37,10 @@ public class FlameStag : Maverick {
 		weakWeaponId = WeaponIds.BubbleSplash;
 		weakMaverickWeaponId = WeaponIds.BubbleCrab;
 
-		netActorCreateId = NetActorCreateId.FlameStag;
 		netOwner = player;
+		cActorId = CActorIds.SigmaFlameStag;
 		if (sendRpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, player, player.character, getSerialExtra());
 		}
 		gameMavs = GameMavs.X2;
 		height = 44;

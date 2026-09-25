@@ -30,10 +30,10 @@ public class OverdriveOstrich : Maverick {
 		weakWeaponId = WeaponIds.CrystalHunter;
 		weakMaverickWeaponId = WeaponIds.CrystalSnail;
 
-		netActorCreateId = NetActorCreateId.OverdriveOstrich;
 		netOwner = player;
+		cActorId = CActorIds.SigmaOverdriveOstrich;
 		if (sendRpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, player, player.character, getSerialExtra());
 		}
 		gameMavs = GameMavs.X2;
 	}

@@ -36,10 +36,9 @@ public class FakeZero : Maverick {
 		canClimbWall = true;
 		canClimb = true;
 
-		netActorCreateId = NetActorCreateId.FakeZero;
-		netOwner = player;
+		cActorId = CActorIds.SigmaDarkZero;
 		if (sendRpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, player, player.character, getSerialExtra());
 		}
 
 		exhaust = new Anim(

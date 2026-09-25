@@ -30,10 +30,9 @@ public class GravityBeetle : Maverick {
 		weakWeaponId = WeaponIds.RaySplasher;
 		weakMaverickWeaponId = WeaponIds.NeonTGeneric;
 
-		netActorCreateId = NetActorCreateId.GravityBeetle;
-		netOwner = player;
+		cActorId = CActorIds.SigmaGravityBeetle;
 		if (sendRpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, player, player.character, getSerialExtra());
 		}
 
 		armorClass = ArmorClass.Heavy;

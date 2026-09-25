@@ -28,10 +28,10 @@ public class StormEagle : Maverick {
 		weakWeaponId = WeaponIds.ChameleonSting;
 		weakMaverickWeaponId = WeaponIds.StingChameleon;
 
-		netActorCreateId = NetActorCreateId.StormEagle;
 		netOwner = player;
+		cActorId = CActorIds.RideArmor;
 		if (sendRpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, player, player.character, getSerialExtra());
 		}
 
 		canFly = true;

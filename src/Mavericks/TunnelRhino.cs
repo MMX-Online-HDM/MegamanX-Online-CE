@@ -30,10 +30,10 @@ public class TunnelRhino : Maverick {
 		weakWeaponId = WeaponIds.AcidBurst;
 		weakMaverickWeaponId = WeaponIds.ToxicSeahorse;
 
-		netActorCreateId = NetActorCreateId.TunnelRhino;
 		netOwner = player;
+		cActorId = CActorIds.SigmaTunnelRhino;
 		if (sendRpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, player, player.character, getSerialExtra());
 		}
 
 		armorClass = ArmorClass.Heavy;

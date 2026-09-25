@@ -9,14 +9,34 @@ public class ControlPoints : GameMode {
 
 	public ControlPoints(Level level, int? timeLimit) : base(level, timeLimit) {
 		isTeamMode = true;
+		useTeamSpawns = true;
 		playingTo = 100;
 	}
 
 	public override void render() {
 		base.render();
-		var currentControlPoint = level.getCurrentControlPoint();
+
+		foreach (ControlPoint controlPoint in level.controlPoints) {
+			int index = 0;
+			if (!controlPoint.locked) {
+				if (controlPoint.captured) {
+					index = 2;
+				} else {
+					index = 1;
+				}
+			}
+			addMapNavpoint(controlPoint.pos, ("hud_minimap_hill", index));
+		}
+
+		if (level.mainPlayer.alliance > redAlliance) {
+			return;
+		}
+		ControlPoint? currentControlPoint = level.getCurrentControlPoint();
 		if (currentControlPoint != null) {
-			drawObjectiveNavpoint(Global.level.mainPlayer.alliance == redAlliance ? "Defend" : "Attack", currentControlPoint.pos);
+			drawObjectiveNavpoint(
+				Global.level.mainPlayer.alliance == redAlliance ? "Defend" : "Attack",
+				currentControlPoint.pos
+			);
 		}
 	}
 

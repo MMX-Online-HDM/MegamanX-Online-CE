@@ -37,10 +37,10 @@ public class WireSponge : Maverick {
 
 		//chargeShader = Helpers.cloneShaderSafe("wspongeCharge");
 
-		netActorCreateId = NetActorCreateId.WireSponge;
 		netOwner = player;
+		cActorId = CActorIds.SigmaWireSponge;
 		if (sendRpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, player, player.character, getSerialExtra());
 		}
 		gameMavs = GameMavs.X2;
 	}
@@ -993,6 +993,7 @@ public class WSpongeSpike : Projectile, IDamagable {
 		destroyOnHit = true;
 		fadeSprite = "explosion";
 		fadeSound = "explosionX2";
+		cleanUpOnPlayerLeave = true;
 		this.type = type;
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)type);

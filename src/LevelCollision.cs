@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 
 namespace MMXOnline;
 
@@ -108,7 +109,7 @@ public partial class Level {
 		foreach (Cell cell in cells) {
 			if (cell.gameobjects == null) continue;
 			foreach (GameObject go in cell.gameobjects) {
-				if (!retGameobjects.Contains(go)) {
+				if (!retGameobjects.Contains(go) && !go.iDestroyed && !go.iDisabled) {
 					retGameobjects.Add(go);
 				}
 			}
@@ -167,25 +168,60 @@ public partial class Level {
 	}
 
 	public Point getGroundPos(Point pos, float depth = 60) {
-		var hit = Global.level.raycast(pos, pos.addxy(0, depth), new List<Type> { typeof(Wall) });
-		if (hit == null) return pos;
-		return hit.hitData.hitPoint.Value.addxy(0, -1);
-	}
-
-	public Point? getGroundPosNoKillzone(Point pos, float depth = 60) {
-		var kzHit = Global.level.raycast(pos, pos.addxy(0, depth), new List<Type> { typeof(KillZone) });
-		if (kzHit != null) return null;
-
-		var hit = Global.level.raycast(pos, pos.addxy(0, depth), new List<Type> { typeof(Wall) });
-		if (hit == null) return null;
-
-		return hit.hitData.hitPoint.Value.addxy(0, -1);
+		return getGroundPosWithNull(pos, depth) ?? pos;
 	}
 
 	public Point? getGroundPosWithNull(Point pos, float depth = 60) {
-		var hit = Global.level.raycast(pos, pos.addxy(0, depth), new List<Type> { typeof(Wall) });
-		if (hit == null) return null;
-		return hit.hitData.hitPoint.Value.addxy(0, -1);
+		CollideData? hit = Global.level.raycast(pos, pos.addxy(0, depth), [
+			typeof(Wall), typeof(Ladder), typeof(SandZone), typeof(OneWay)
+		]);
+		return hit?.hitData.hitPoint?.addxy(0, -1);
+	}
+
+	public Point? getGroundPosNoKillzone(
+		Point pos, float depth = 60,
+		bool incMove = true, bool incPlat = true
+	) {
+		Type[] typeList = incPlat ? [
+			typeof(Wall), typeof(Ladder), typeof(SandZone),
+			typeof(KillZone), typeof(OneWay), typeof(MovingPlatform), typeof(CrackedWall)
+		] : [
+			typeof(Wall), typeof(Ladder), typeof(SandZone),
+			typeof(KillZone), typeof(OneWay), typeof(CrackedWall)
+		];
+		CollideData? hit = Global.level.raycast(pos, pos.addxy(0, depth), [
+			typeof(Wall), typeof(Ladder), typeof(SandZone), typeof(KillZone), typeof(OneWay)
+		]);
+		if (hit?.gameObject is not KillZone) {
+			if (!incMove && hit?.gameObject is Wall wall && wall.moveX != 0) {
+				return null;
+			}
+			return hit?.hitData.hitPoint?.addxy(0, -1);
+		}
+		return null;
+	}
+
+	public bool checkKillZone(Point pos) {
+		float depth = 160;
+		CollideData? collideData = Global.level.raycast(pos.addxy(0, -1), pos.addxy(0, depth), [
+			typeof(Wall), typeof(Ladder), typeof(SandZone), typeof(KillZone), typeof(OneWay)
+		]);
+		if (collideData != null && collideData.gameObject is not KillZone) {
+			return false;
+		}
+		collideData = Global.level.raycast(pos.addxy(-10, -1), pos.addxy(-8, depth), [
+			typeof(Wall), typeof(Ladder), typeof(SandZone), typeof(KillZone), typeof(OneWay)
+		]);
+		if (collideData != null && collideData.gameObject is not KillZone) {
+			return false;
+		}
+		collideData = Global.level.raycast(pos.addxy(10, -1), pos.addxy(8, depth), [
+			typeof(Wall), typeof(Ladder), typeof(SandZone), typeof(KillZone), typeof(OneWay)
+		]);
+		if (collideData != null && collideData.gameObject is not KillZone) {
+			return false;
+		}
+		return true;
 	}
 
 	public int getGridCount() {
@@ -272,28 +308,84 @@ public partial class Level {
 		Actor actor, GameObject gameObject, Collider actorCollider, Collider gameObjectCollider,
 		Point intersection, bool otherway = false
 	) {
+		// Straigh up not do checks if disabled.
+		if (actor.disabled || gameObject.iDisabled ||
+			actorCollider.disabled || gameObjectCollider.disabled
+		) {
+			return false;
+		}
 		if (actor is Character && gameObject is Character) {
 			var actorChar = actor as Character;
 			var goChar = gameObject as Character;
 
-			if (actorChar.isCrystalized || goChar.isCrystalized) return true;
-			//if (actorChar.sprite.name.Contains("frozen") || goChar.sprite.name.Contains("frozen")) return false;
+			if (actorChar?.isCrystalized == true || goChar?.isCrystalized == true) {
+				return true;
+			}
 			return true;
 		}
 
-		/*if (actor is Character chr3 && (chr3.player.isViralSigma() || chr3.player.isKaiserViralSigma()) && gameObject is Ladder) {
-			return true;
-		}*/
-
-		if (actorCollider.isTrigger == false && gameObject is Ladder) {
-			if (actor.pos.y < gameObject.collider.shape.getRect().y1 && intersection.y > 0) {
+		if (actorCollider.isTrigger == false && gameObject is Ladder && gameObject.collider != null) {
+			if (actor.pos.y <= gameObject.collider.shape.minY && intersection.y > 0) {
 				if (!actor.checkLadderDown) {
 					return false;
 				}
 			}
 		}
+		// One way platform collison.
+		(int x, int y)? oneWayDir = null;
+		(float x, float y) oneWayDelta = (0, 0);
+		if (gameObject is OneWay oneWay) {
+			oneWayDir = (Math.Sign(oneWay.lockDir.x), Math.Sign(oneWay.lockDir.y));
+		}
+		else if (gameObject is MovingPlatform movingPlatform && movingPlatform.onewayDir != null) {
+			oneWayDir = (
+				Math.Sign(movingPlatform.onewayDir.Value.x),
+				Math.Sign(movingPlatform.onewayDir.Value.y)
+			);
+			oneWayDelta = (MathF.Abs(movingPlatform.deltaMove.x), MathF.Abs(movingPlatform.deltaMove.y));
+		}
+		if (actorCollider.isTrigger == false &&
+			oneWayDir != null &&
+			gameObject.collider != null
+		) {
+			if (oneWayDir.Value.y == -1) {
+				if (actor.pos.y <= gameObject.collider.shape.minY + oneWayDelta.y &&
+					intersection.y > -oneWayDelta.y
+				) {
+					return false;
+				}
+			}
+			else if (oneWayDir.Value.y == 1) {
+				if (actor.pos.y >= gameObject.collider.shape.maxY - oneWayDelta.y &&
+					intersection.y < oneWayDelta.y
+				) {
+					return false;
+				}
+			}
+			if (oneWayDir.Value.x == -1) {
+				if (actor.pos.x <= gameObject.collider.shape.minX + oneWayDelta.x &&
+					intersection.x > -oneWayDelta.x
+				) {
+					return false;
+				}
+			}
+			else if (oneWayDir.Value.x == 1) {
+				if (actor.pos.x >= gameObject.collider.shape.maxX - oneWayDelta.x &&
+					intersection.x < oneWayDelta.x
+				) {
+					return false;
+				}
+			}
+			return true;
+		}
 
-		if (actorCollider.disabled || gameObjectCollider.disabled) return false;
+		if (gameObject is Actor wallActor && wallActor.isSolidWall && !gameObjectCollider.isTrigger) {
+			if (wallActor.selectiveSolididyFunc != null) {
+				return !wallActor.selectiveSolididyFunc(actor);
+			}
+			return false;
+		}
+
 		if (actorCollider.isTrigger || gameObjectCollider.isTrigger) return true;
 
 		if (actor is ShotgunIceProjSled sled && gameObject is Character chr && sled.damager.owner == chr.player) {
@@ -304,7 +396,7 @@ public partial class Level {
 			return false;
 		}
 
-		if (actorCollider.wallOnly && gameObject is not Wall) return true;
+		if (actorCollider.wallOnly && gameObject is not Wall and not OneWay and not Ladder) return true;
 
 		if (gameObject is Actor) {
 			if (gameObjectCollider.wallOnly) return true;
@@ -485,7 +577,7 @@ public partial class Level {
 			if (go == actor) continue;
 			if (go.collider == null) continue;
 			var isTrigger = shouldTrigger(actor, go, actor.collider, go.collider, new Point(incX, incY));
-			if (go is Actor goActor && goActor.isPlatform && checkPlatforms) {
+			if (go is Actor goActor && !goActor.isSolidWall && goActor.isPlatform && checkPlatforms) {
 				isTrigger = false;
 			}
 			if (isTrigger) continue;
@@ -576,7 +668,7 @@ public partial class Level {
 		Actor actor, Point posIncrease, params Type[] classTypes
 	) {
 		List<CollideData> triggers = new();
-		Collider? collider = actor.getTerrainCollider();
+		Collider? collider = actor.getTerrainCollider() ?? actor.physicsCollider ?? actor.collider;
 		if (collider == null) {
 			return triggers;
 		}
@@ -596,6 +688,14 @@ public partial class Level {
 			}
 			foreach (Collider otherCollider in otherColliders) {
 				var isTrigger = shouldTrigger(actor, go, collider, otherCollider, posIncrease);
+				if (go is Actor goActor) {
+					if (goActor.isSolidWall || goActor.isPlatform) {
+						isTrigger = true;
+					}
+				}
+				if (go is SandZone) {
+					isTrigger = true;
+				}
 				if (!isTrigger) { continue; }
 				var hitData = shape.intersectsShape(otherCollider.shape, posIncrease);
 				if (hitData != null) {
@@ -828,14 +928,18 @@ public partial class Level {
 
 	public CollideData? checkTerrainCollisionOnce(
 		Actor actor, float incX, float incY, Point? vel = null, bool autoVel = false,
-		bool checkPlatforms = false
+		bool checkPlatforms = false, bool checkQuicksand = false,
+		Func<GameObject, bool>? condition = null
 	) {
-		return checkTerrainCollision(actor, incX, incY, vel, autoVel, true, checkPlatforms).FirstOrDefault();
+		return checkTerrainCollision(
+			actor, incX, incY, vel, autoVel, true, checkPlatforms, checkQuicksand, condition
+		).FirstOrDefault();
 	}
 
 	public List<CollideData> checkTerrainCollision(
 		Actor actor, float incX, float incY, Point? vel = null, bool autoVel = false,
-		bool returnOne = false, bool checkPlatforms = false
+		bool returnOne = false, bool checkPlatforms = false, bool checkQuicksand = false,
+		Func<GameObject, bool>? condition = null
 	) {
 		List<CollideData> collideDatas = new List<CollideData>();
 		// Use custom terrain collider by default.
@@ -853,16 +957,25 @@ public partial class Level {
 			if (go == actor) continue;
 			if (go.collider == null) continue;
 			bool isTrigger = shouldTrigger(actor, go, terrainCollider, go.collider, new Point(incX, incY));
-			if (go is Actor goActor && goActor.isPlatform && checkPlatforms) {
-				isTrigger = false;
+			if (go is Actor goActor) {
+				if (!goActor.isSolidWall && goActor.isPlatform && checkPlatforms) {
+					isTrigger = false;
+				}
+			}
+			if (go is SandZone) {
+				isTrigger = !checkQuicksand;
 			}
 			if (isTrigger) continue;
 			HitData? hitData = actorShape.intersectsShape(go.collider.shape, vel);
-			if (hitData != null) {
-				collideDatas.Add(new CollideData(terrainCollider, go.collider, vel, isTrigger, go, hitData));
-				if (returnOne) {
-					return collideDatas;
-				}
+			if (hitData == null) {
+				continue;
+			}
+			if (condition != null && !condition(go)) {
+				continue;
+			}
+			collideDatas.Add(new CollideData(terrainCollider, go.collider, vel, isTrigger, go, hitData));
+			if (returnOne) {
+				return collideDatas;
 			}
 		}
 
@@ -876,7 +989,7 @@ public partial class Level {
 		foreach (Cell cell in cells) {
 			if (cell.gameobjects == null) continue;
 			foreach (GameObject go in cell.gameobjects) {
-				if (!gameobjectsChecked.Contains(go)) {
+				if (!gameobjectsChecked.Contains(go) && !go.iDestroyed && !go.iDisabled) {
 					gameobjectsChecked.Add(go);
 					retGameobjects.Add(go);
 				}
@@ -990,14 +1103,14 @@ public partial class Level {
 		return (triggers1, triggers2);;
 	}
 
-	public (CollideData?, CollideData?) getTriggerTerrain(Actor actor, Geometry geometry) {
+	public (CollideData?, CollideData?) getTriggerTerrain(Actor actor, GameObject geometry) {
 		CollideData? triggerActor = null;
 		CollideData? triggerTerrain = null;
 		Collider? actorCollider = actor.getTerrainCollider() ?? actor.physicsCollider ?? actor.collider;
 		if (actorCollider == null) {
 			return (triggerActor, triggerTerrain);
 		}
-		Collider geometryCollider = geometry.collider;
+		Collider? geometryCollider = geometry.collider;
 		if (geometryCollider == null) {
 			return (triggerActor, triggerTerrain);
 		}

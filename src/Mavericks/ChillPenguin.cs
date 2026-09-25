@@ -32,10 +32,10 @@ public class ChillPenguin : Maverick {
 		weakWeaponId = WeaponIds.FireWave;
 		weakMaverickWeaponId = WeaponIds.FlameMammoth;
 
-		netActorCreateId = NetActorCreateId.ChillPenguin;
 		netOwner = player;
+		cActorId = CActorIds.SigmaChillPenguin;
 		if (sendRpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, player, player.character, getSerialExtra());
 		}
 
 		armorClass = ArmorClass.Light;

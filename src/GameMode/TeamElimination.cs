@@ -7,37 +7,34 @@ public class TeamElimination : GameMode {
 	public TeamElimination(Level level, int playingTo, int? timeLimit) : base(level, timeLimit) {
 		this.playingTo = playingTo;
 		isTeamMode = true;
+		isElim = true;
+		spawnOnAlly = true;
+
 		if (remainingTime == null) {
 			remainingTime = 300;
 			startTimeLimit = remainingTime;
 		}
 	}
+
 	public override void drawTopHUD() {
-		if (level.is1v1()) {
-			draw1v1TopHUD();
-			return;
-		}
-		var redPlayersAlive = (
-			level.players.Where(
-				p => !p.isSpectator && p.deaths < playingTo && p.alliance == redAlliance
-			).ToList()
-		);
-		var bluePlayersAlive = (
-			level.players.Where(
-				p => !p.isSpectator && p.deaths < playingTo && p.alliance == blueAlliance
-			).ToList()
-		);
-		int lives = playingTo - level.mainPlayer.deaths;
-		Fonts.drawText(FontType.BlueMenu, "Lives: " + lives.ToString(), 5, 5, Alignment.Left);
-		Fonts.drawText(
-			FontType.BlueMenu,
-			"Alive: " + (redPlayersAlive.Count).ToString() + "/" + (bluePlayersAlive.Count).ToString(),
-			5, 15, Alignment.Left
-		);
+		/*Player[] enemyPlayersAlive = level.players.Where(
+			p => !p.isSpectator && p.deaths < playingTo && p.alliance != Global.level.mainPlayer.alliance
+		).ToArray();*/
+		Player[] allyPlayersAlive = level.players.Where(
+			p => !p.isSpectator && p.score < playingTo && p.alliance == Global.level.mainPlayer.alliance
+		).ToArray();
+		FontType fontColor = teamFontsSmall[mainPlayer.alliance];
+		int lives = playingTo - level.mainPlayer.score;
+		string topText = "Allies:" + (allyPlayersAlive.Length).ToString().PadLeft(2 ,' ');
+		string botText = "Lives:" + lives.ToString().PadLeft(2 ,' ');
+		float mapOffset = shouldDrawRadar() ? 0 : 48;
+		Fonts.drawText(fontColor, topText,  Global.screenW - 56 + mapOffset, 7, Alignment.Right);
+		Fonts.drawText(FontType.Blue, botText,  Global.screenW - 56 + mapOffset, 17, Alignment.Right);
+
 		if (virusStarted != 1) {
-			drawTimeIfSet(25);
+			drawTimeIfSet(37);
 		} else {
-			drawVirusTime(25);
+			drawVirusTime(37);
 		}
 	}
 
@@ -67,7 +64,7 @@ public class TeamElimination : GameMode {
 		foreach (Player player in level.players) {
 			if (player.teamAlliance != null &&
 				player.teamAlliance >= 0 && player.teamAlliance < level.teamNum &&
-				!player.isSpectator && player.deaths < playingTo
+				!player.isSpectator && player.score < playingTo
 			) {
 				if (teamsAlive[player.teamAlliance.Value] != true) {
 					teamsAlive[player.teamAlliance.Value] = true;

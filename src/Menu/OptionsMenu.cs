@@ -1402,14 +1402,23 @@ public class OptionsMenu : IMainMenu {
 			"You can change this in the Settings menu."
 		);
 		if (textureSize <= 1024) {
+			Options.main.detectedGraphicsPreset = 0;
 			setPresetQuality(0);
-			Helpers.showMessageBox(string.Format(presetMessage, textureSize, "Low"), "Graphics settings preset");
+			Helpers.showMessageBox(
+				string.Format(presetMessage, textureSize, "Low"), "Graphics settings preset"
+			);
 		} else if (textureSize <= 2048) {
+			Options.main.detectedGraphicsPreset = 1;
 			setPresetQuality(1);
-			Helpers.showMessageBox(string.Format(presetMessage, textureSize, "Medium"), "Graphics settings preset");
+			Helpers.showMessageBox(
+				string.Format(presetMessage, textureSize, "Medium"), "Graphics settings preset"
+			);
 		} else {
+			Options.main.detectedGraphicsPreset = 2;
 			setPresetQuality(2);
-			Helpers.showMessageBox(string.Format(presetMessage, textureSize, "High"), "Graphics settings preset");
+			Helpers.showMessageBox(
+				string.Format(presetMessage, textureSize, "High"), "Graphics settings preset"
+			);
 		}
 	}
 

@@ -5,6 +5,11 @@ namespace MMXOnline;
 
 public class Damager {
 	public Player owner;
+	public int? _alliance;
+	public int alliance {
+		set => _alliance = value;
+		get => _alliance ?? owner?.alliance ?? -100;
+	}
 	public float damage;
 	public float hitCooldownSeconds {
 		set => hitCooldown = MathF.Ceiling(value * 60f);
@@ -248,7 +253,7 @@ public class Damager {
 		}
 
 		if (damagable is CrackedWall cw) {
-			float? overrideDamage = CrackedWall.canDamageCrackedWall(projId, cw);
+			float? overrideDamage = CrackedWall.canDamageCrackedWall(damage, cw, damagingActor, projId);
 			if (overrideDamage != null && overrideDamage == 0 && damage > 0) {
 				cw.playSound("m10ding");
 				return true;

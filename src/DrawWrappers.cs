@@ -479,7 +479,6 @@ public partial class DrawWrappers {
 			shape.OutlineColor = outlineColor.Value;
 			shape.OutlineThickness = thickness;
 		}
-
 		if (isWorldPos) {
 			DrawLayer drawLayer = getDrawLayer(depth);
 			drawLayer.oneOffs.Add(new DrawableWrapper([], shape, Color.White));
@@ -494,7 +493,8 @@ public partial class DrawWrappers {
 		float cx = 0, float cy = 0,
 		float xScale = 1, float yScale = 1,
 		float angle = 0, float alpha = 1,
-		List<ShaderWrapper> shaders = null!, bool isWorldPos = true
+		List<ShaderWrapper> shaders = null!, bool isWorldPos = true,
+		Color? color = null
 	) {
 		if (texture == null) return;
 		shaders ??= [];
@@ -513,7 +513,9 @@ public partial class DrawWrappers {
 		sprite.Position = new Vector2f(dx, dy);
 		sprite.Origin = new Vector2f(cx, cy);
 		sprite.Scale = new Vector2f(xScale, yScale);
-		sprite.Color = new Color(sprite.Color.R, sprite.Color.G, sprite.Color.B, (byte)(int)(alpha * 255));
+		Color finalColor = color ?? new Color(sprite.Color.R, sprite.Color.G, sprite.Color.B);
+		finalColor.A = (byte)(int)(alpha * 255);
+		sprite.Color = finalColor;
 		sprite.Rotation = angle;
 
 		if (isWorldPos) {
@@ -531,7 +533,7 @@ public partial class DrawWrappers {
 		float cx = 0, float cy = 0,
 		float xScale = 1, float yScale = 1,
 		float angle = 0, float alpha = 1,
-		List<ShaderWrapper>? shaders = null, bool isWorldPos = true
+		List<ShaderWrapper>? shaders = null, bool isWorldPos = true, Color? color = null
 	) {
 		if (shaders == null) {
 			shaders = new();
@@ -556,7 +558,7 @@ public partial class DrawWrappers {
 			sprite.Origin = new Vector2f(0, 0);
 			sprite.Scale = new Vector2f(1, 1);
 			sprite.Rotation = 0;
-			sprite.Color = Color.White;
+			sprite.Color = color ?? Color.White;
 			drawables[i] = new DrawableSprite([], sprite, sprite.Color, size);
 		}
 
@@ -629,5 +631,43 @@ public partial class DrawWrappers {
 				}
 			}
 		}
+	}
+}
+
+public struct Color15b {
+	public byte r;
+	public byte g;
+	public byte b;
+	public byte a;
+
+	public static readonly Color black = new Color(0, 0, 0);
+	public static readonly Color white = new Color(31, 31, 31);
+	public static readonly Color red = new Color(31, 0, 0);
+	public static readonly Color green = new Color(0, 31, 0);
+	public static readonly Color blue = new Color(0, 0, 31);
+	public static readonly Color yellow = new Color(31, 31, 0);
+	public static readonly Color cyan = new Color(0, 31, 31);
+	public static readonly Color magenta = new Color(0, 0, 0);
+
+	public Color15b(byte r, byte g, byte b, byte a = 31) {
+		this.r = r;
+		this.g = g;
+		this.b = b;
+		this.a = a;
+	}
+
+	public Color15b(int r, int g, int b, int a = 31) {
+		this.r = (byte)Math.Clamp(r, 0, 31);
+		this.g = (byte)Math.Clamp(g, 0, 31);
+		this.b = (byte)Math.Clamp(b, 0, 31);
+		this.a = (byte)Math.Clamp(a, 0, 31);
+	}
+
+	public static byte to24Bit(byte col) {
+		return (byte)(col << 3 | col >> 2);
+	}
+
+	public static implicit operator SFML.Graphics.Color(Color15b c) {
+		return new SFML.Graphics.Color(to24Bit(c.r), to24Bit(c.g), to24Bit(c.b), to24Bit(c.a));
 	}
 }

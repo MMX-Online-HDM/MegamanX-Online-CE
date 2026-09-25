@@ -26,10 +26,10 @@ public class CrushCrawfish : Maverick {
 		weakWeaponId = WeaponIds.TriadThunder;
 		weakMaverickWeaponId = WeaponIds.VoltCatfish;
 
-		netActorCreateId = NetActorCreateId.CrushCrawfish;
 		netOwner = player;
+		cActorId = CActorIds.SigmaCrushCrawfish;
 		if (sendRpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, player, player.character, getSerialExtra());
 		}
 		gameMavs = GameMavs.X3;
 		height = 32;

@@ -56,12 +56,27 @@ public class TurretResponseModel {
 
 [ProtoContract]
 public class JoinLateResponseModel {
-	[ProtoMember(1)] public List<PlayerPB> players;
-	[ProtoMember(2)] public ServerPlayer newPlayer;
-	[ProtoMember(3)] public List<ControlPointResponseModel> controlPoints;
-	[ProtoMember(4)] public List<MagnetMineResponseModel> magnetMines;
-	[ProtoMember(5)] public List<TurretResponseModel> turrets;
+	[ProtoMember(1)] public ServerPlayer newPlayer;
+	[ProtoMember(2)] public PlayerPB[] players;
+	[ProtoMember(3)] public ControlPointResponseModel[] controlPoints;
+	[ProtoMember(4)] public ActorRpcResponse[] lateActors;
 	public JoinLateResponseModel() { }
+}
+
+[ProtoContract]
+public struct ActorRpcResponse {
+	[ProtoMember(1)] public bool isProj;
+	[ProtoMember(2)] public int playerId;
+	[ProtoMember(3)] public int actorId;
+	[ProtoMember(4)] public ushort? ownerId;
+	[ProtoMember(5)] public float posX;
+	[ProtoMember(6)] public float posY;
+	[ProtoMember(7)] public int xDir;
+	[ProtoMember(8)] public ushort netId;
+	[ProtoMember(9)] public float byteAngle;
+	[ProtoMember(10)] public byte[] extraData;
+
+	public ActorRpcResponse() { }
 }
 
 [ProtoContract]
@@ -100,8 +115,9 @@ public class PlayerPB {
 	[ProtoMember(16)] public LoadoutData atransLoadout;
 	[ProtoMember(17)] public int currentCharNum;
 	[ProtoMember(18)] public int preAtransCharId;
+	[ProtoMember(19)] public int alliance;
 
-	[ProtoMember(19)] public ServerPlayer serverPlayer;
+	[ProtoMember(20)] public ServerPlayer serverPlayer;
 
 	public PlayerPB() { }
 
@@ -114,12 +130,11 @@ public class PlayerPB {
 		charXDir = 1;
 		// Populate data.
 		serverPlayer = player.serverPlayer;
-
+		alliance = player.alliance;
 		newAlliance = player.newAlliance;
 		newCharNum = player.newCharNum;
-
 		curMaxNetId = player.curMaxNetId;
-		warpedIn = player.warpedIn;
+		warpedIn = player.warpedInOnce;
 		readyTime = player.readyTime;
 		readyTextOver = player.readyTextOver;
 		armorFlag = player.armorFlag;
@@ -141,6 +156,7 @@ public class PlayerPB {
 			if (player.character.linkedATransChar != null) {
 				preAtransCharId = (int)player.character.linkedATransChar.charId;
 			}
+			
 		}
 	}
 }

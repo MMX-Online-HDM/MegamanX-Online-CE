@@ -30,10 +30,10 @@ public class NeonTiger : Maverick {
 		weakWeaponId = WeaponIds.SpinningBlade;
 		weakMaverickWeaponId = WeaponIds.CrushCrawfish;
 
-		netActorCreateId = NetActorCreateId.NeonTiger;
 		netOwner = player;
+		cActorId = CActorIds.SigmaNeonTiger;
 		if (sendRpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, player, player.character, getSerialExtra());
 		}
 		gameMavs = GameMavs.X3;
 		height = 38;

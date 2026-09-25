@@ -85,6 +85,7 @@ public class Projectile : Actor {
 	) : base(
 		sprite, pos, netId, ownedByLocalPlayer, !addToLevel
 	) {
+		cleanUpOnNoResponse = true;
 		this.weapon = weapon;
 		this.speed = speed;
 		vel = new Point(speed * xDir, 0);
@@ -107,7 +108,8 @@ public class Projectile : Actor {
 				addRenderEffect(allianceEffect.Value);
 			}
 		}
-		this.ownerPlayer = player;
+		ownerPlayer = player;
+		netOwner ??= ownerPlayer;
 		canBeLocal = true;
 	}
 
@@ -125,6 +127,7 @@ public class Projectile : Actor {
 		ownerPlayer = (
 			player ?? owner?.netOwner ?? Global.level.getPlayerByIdSafe(netId)
 		);
+		netOwner ??= ownerPlayer;
 		ownerActor = owner;
 		damager = new Damager(ownerPlayer, 0, 0, 0);
 		ownerActor = owner;
@@ -708,13 +711,10 @@ public class Projectile : Actor {
 		if (Global.serverClient == null) {
 			return true;
 		}
-		if (Global.level.server.favorHost && Global.level.server.isP2P) {
-			if (isDefenderFavored()) {
-				return Global.serverClient.isHost;
-			}
-			return ownedByLocalPlayer;
+		if (isFTS()) {
+			return Global.serverClient.isHost;
 		}
-		if (isDefenderFavored()) {
+		if (isFTD()) {
 			return enemyActor.ownedByLocalPlayer;
 		}
 		return ownedByLocalPlayer;

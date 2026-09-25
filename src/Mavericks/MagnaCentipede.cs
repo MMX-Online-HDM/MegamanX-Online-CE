@@ -35,10 +35,9 @@ public class MagnaCentipede : Maverick {
 		weakWeaponId = WeaponIds.SilkShot;
 		weakMaverickWeaponId = WeaponIds.MorphMoth;
 
-		netActorCreateId = NetActorCreateId.MagnaCentipede;
-		netOwner = player;
+		cActorId = CActorIds.SigmaMagnaCentipede;
 		if (sendRpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, player, player.character, getSerialExtra());
 		}
 
 		usesAmmo = true;

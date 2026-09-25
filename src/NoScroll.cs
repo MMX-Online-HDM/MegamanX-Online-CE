@@ -1,4 +1,6 @@
-﻿namespace MMXOnline;
+﻿using System.Collections.Generic;
+
+namespace MMXOnline;
 
 public enum ScrollFreeDir {
 	None,
@@ -18,5 +20,10 @@ public class NoScroll {
 		this.shape = shape;
 		freeDir = dir;
 		this.snap = snap;
+	}
+}
+
+public class CameraZone : Geometry {
+	public CameraZone(string name, List<Point> points) : base(name, points) {
 	}
 }

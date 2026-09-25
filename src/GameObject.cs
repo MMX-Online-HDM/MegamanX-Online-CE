@@ -4,10 +4,12 @@ namespace MMXOnline;
 
 public interface GameObject {
 	bool iDestroyed { get; }
+	bool iDisabled { get; }
 	string name { get; set; }
 	float speedMul { get; set; }
 	bool useTerrainGrid { get; set; }
 	bool useActorGrid { get; set; }
+	bool hasStateMachine { get; }
 	void onStart();
 	void preUpdate();
 	void update();
@@ -24,4 +26,3 @@ public interface GameObject {
 	void statePostUpdate();
 	void registerCollision(CollideData collideData);
 }
-

@@ -18,6 +18,8 @@ public class TeamElimAlt : GameMode {
 	public TeamElimAlt(Level level, int playingTo, int? timeLimit) : base(level, null) {
 		this.playingTo = playingTo;
 		isTeamMode = true;
+		isElim = true;
+		spawnOnAlly = true;
 		// Time stuff.
 		finalZoneMaxTime2 = 60;
 		timeLimit ??= 1;
@@ -38,14 +40,11 @@ public class TeamElimAlt : GameMode {
 		Helpers.decrementFrames(ref respawnWindow);
 		Helpers.decrementFrames(ref resultTime);
 		Helpers.decrementTime(ref roundTime);
-		if (matchOverResponse != null) {
+		if (isOver) {
 			resultTime = 0;
-		} 
+		}
 
 		base.update();
-		if (Global.isHost) {
-			roundWinLogic();
-		}
 	}
 
 
@@ -55,7 +54,7 @@ public class TeamElimAlt : GameMode {
 	}
 
 	public void drawResult() {
-		if (resultTime <= 0 || roundResult == null) {
+		if (resultTime <= 0 || roundResult == null || isOver) {
 			return;
 		}
 		Player mainPlayer = Global.level.mainPlayer;
@@ -111,9 +110,14 @@ public class TeamElimAlt : GameMode {
 		}
 		int maxTeams = Global.level.teamNum;
 		Player mainPlayer = Global.level.mainPlayer;
+		float mapOffset = shouldDrawRadar() ? 0 : 48;
 
-		string teamText = $"{teamNames[teamSide]}: {teamPoints[teamSide]}";
-		Fonts.drawText(teamFonts[teamSide], teamText, 5, 5);
+		string teamText = $"{teamInitals[teamSide]}: {teamPoints[teamSide]}";
+		Fonts.drawText(
+			teamFontsSmall[teamSide], teamText,
+			Global.screenW - 56 + mapOffset, 7, Alignment.Right
+		);
+		int textSize = Fonts.measureText(FontType.Blue, teamText);
 
 		int leaderTeam = 0;
 		int leaderScore = -1;
@@ -128,38 +132,36 @@ public class TeamElimAlt : GameMode {
 			}
 		}
 		if (!moreThanOneLeader) {
-			Fonts.drawText(teamFonts[leaderTeam], $"Leader: {leaderScore}", 5, 15);
+			Fonts.drawText(
+				teamFontsSmall[leaderTeam], $"L: {leaderScore} ",
+				Global.screenW - 56 + mapOffset - textSize, 7, Alignment.Right
+			);
 		} else {
-			Fonts.drawText(FontType.Grey, $"Leader: {leaderScore}", 5, 15);
+			Fonts.drawText(
+				FontType.Blue, $"L: {leaderScore} ",
+				Global.screenW - 56 + mapOffset - textSize, 7, Alignment.Right
+			);
 		}
 		// Draw lives.
 		Player[] playersAlive = level.players.Where(p => !p.isSpectator && p.elimAlive).ToArray();
 		Player[] alliesAlive = playersAlive.Where(p => p.alliance == mainPlayer.alliance).ToArray();
 
 		Fonts.drawText(
-			FontType.RedishOrange, $"Alive: {alliesAlive.Length} / {playersAlive.Length}", 5, 25
+			FontType.Blue, $"Alive: {alliesAlive.Length} / {playersAlive.Length}",
+			Global.screenW - 56 + mapOffset, 17, Alignment.Right
 		);
 
-		drawTimeIfSet(35, finalZoneTime);
+		drawTimeIfSet(37, finalZoneTime);
 	}
 
 	public override void checkIfWinLogic() {
+		roundWinLogic();
 		checkIfWinLogicTeams();
 	}
 
 	public void roundWinLogic() {
 		// If we are respawning then we just continue.
-		if (respawnWindow > 0) {
-			return;
-		}
-		// Stalemate if we go over the theshold.
-		// Entering draw time disables stalemate.
-		if (remainingTime <= 0 && virusStarted >= 3 && roundDrawTime == 0) {
-			addResult(new RPCMatchOverResponse() {
-				winningAlliances = [nullAlliance],
-				winMessage = "Stalemate!",
-				loseMessage = "Stalemate!"
-			});
+		if (respawnWindow > 0 && resultTime > 0 && Global.level.time >= 10 || isOver) {
 			return;
 		}
 		// Vars.
@@ -172,7 +174,7 @@ public class TeamElimAlt : GameMode {
 		foreach (Player player in level.players) {
 			if (player.teamAlliance != null &&
 				player.teamAlliance >= 0 && player.teamAlliance < level.teamNum &&
-				!player.isSpectator 
+				!player.isSpectator && player.spawnedOnceAlt
 			) {
 				if (player.elimAlive && teamsAlive[player.teamAlliance.Value] != true) {
 					teamsAlive[player.teamAlliance.Value] = true;
@@ -189,6 +191,16 @@ public class TeamElimAlt : GameMode {
 		if (teamNumActive < 2) {
 			return;
 		}
+		// Stalemate if we go over the theshold.
+		// Entering draw time disables stalemate.
+		if (remainingTime <= 0 && virusStarted >= 3 && roundDrawTime == 0) {
+			addResult(new RPCMatchOverResponse() {
+				winningAlliances = [nullAlliance],
+				winMessage = "Stalemate!",
+				loseMessage = "Stalemate!"
+			}, true);
+			return;
+		}
 		// If somehow everyone died during draw time then we go into draw.
 		if (teamNumAlive == 0 && roundDrawTime > 0) {
 			string messageSub = "No one won the round";
@@ -203,7 +215,7 @@ public class TeamElimAlt : GameMode {
 				loseMessage = "Draw!",
 				winMessage2 = messageSub,
 				loseMessage2 = messageSub
-			});
+			}, true);
 			return;
 		}
 		// Save the last 2 teams for draw conditions.
@@ -234,10 +246,10 @@ public class TeamElimAlt : GameMode {
 			winMessage2 = message2,
 			loseMessage = "Defeat!",
 			loseMessage2 = message2
-		});
+		}, true);
 	}
 
-	public void addResult(RPCMatchOverResponse result) {
+	public void addResult(RPCMatchOverResponse result, bool sendRpc = false) {
 		roundResult = result;
 		resultTime = resultMaxTime;
 		respawnWindow = respawnMaxWindow;
@@ -255,17 +267,21 @@ public class TeamElimAlt : GameMode {
 		}
 
 		foreach (Player player in Global.level.players) {
-			if (player.isSpectator || !result.winningAlliances.Contains(player.alliance)) {
+			if (player.character == null) {
+				player.spawnedOnceAlt = false;
+			}
+			if (player.isSpectator) {
+				continue;
+			}
+			if (!result.winningAlliances.Contains(player.alliance)) {
+				player.awardCurrency();
 				continue;
 			}
 			player.awardCurrency();
 			player.awardCurrency();
-			player.awardCurrency();
-			player.awardCurrency();
-			player.awardCurrency();
 
 			if (player.character != null) {
-				player.character.addHealth(player.character.maxHealth, false);
+				player.character.addHealth(player.character.maxHealth);
 				player.character.addPercentAmmo(100);
 			}
 		}
@@ -274,6 +290,9 @@ public class TeamElimAlt : GameMode {
 			Global.playSound("ching");
 		} else {
 			Global.playSound("error");
+		}
+		if (sendRpc) {
+			RPC.syncEAltRound.sendRpc(result);
 		}
 	}
 

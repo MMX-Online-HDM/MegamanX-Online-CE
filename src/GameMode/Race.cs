@@ -14,7 +14,7 @@ public class Race : GameMode {
 		base.render();
 		if (level?.goal == null) return;
 
-		drawObjectiveNavpoint("Goal", level.goal.pos);
+		addMapNavpoint(level.goal.pos, ("hud_minimap_flag", 4));
 	}
 
 	public List<Player> getSortedPlayers() {

@@ -82,4 +82,14 @@ public class VileMK2Grabbed : GenericGrabbedState {
 	public const float maxGrabTime = 4;
 	public VileMK2Grabbed(Character? grabber) : base(grabber, maxGrabTime, "grab") {
 	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.canBeGrounded = false;
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.canBeGrounded = true;
+	}
 }

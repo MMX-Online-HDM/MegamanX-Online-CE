@@ -148,9 +148,12 @@ public class RaySplasherTurret : Actor, IDamagable {
 	ShaderWrapper? replaceColorShader;
 
 	public RaySplasherTurret(
-		Point pos, Player player, int xDir, ushort netId, bool ownedByLocalPlayer, bool rpc = false, MegamanX? mmx = null
-	) : base("raysplasher_turret_start", pos, netId, ownedByLocalPlayer, false
+		Point pos, Player player, int xDir, ushort netId,
+		bool ownedByLocalPlayer, bool rpc = false, MegamanX? mmx = null
+	) : base(
+		"raysplasher_turret_start", pos, netId, ownedByLocalPlayer, false
 	) {
+		cleanUpOnNoResponse = true;
 		this.mmx = mmx;
 		useGravity = false;
 		velY = -50;
@@ -179,9 +182,9 @@ public class RaySplasherTurret : Actor, IDamagable {
 		}
 
 		netOwner = player;
-		netActorCreateId = NetActorCreateId.RaySplasherTurret;
+		cActorId = CActorIds.RaySplasherTurret;
 		if (rpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, netOwner, null, getSerialExtra());
 		}
 	}
 

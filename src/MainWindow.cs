@@ -4,6 +4,7 @@ using System.IO;
 using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
+using WindowsAPI;
 
 namespace MMXOnline;
 
@@ -17,6 +18,7 @@ public partial class Global {
 	public static RenderTexture srtBuffer2 = null!;
 	public static RenderTexture radarRenderTexture = null!;
 	public static RenderTexture radarRenderTextureB = null!;
+	public static RenderTexture radarRenderTextureC = null!;
 
 	// Normal (small) camera
 	public static RenderTexture screenRenderTextureS = null!;
@@ -67,6 +69,9 @@ public partial class Global {
 		srtBuffer1S = new RenderTexture((screenW, screenH));
 		srtBuffer2S = new RenderTexture((screenW, screenH));
 
+		DrawWrappers.renderTexture = new RenderTexture((screenW, screenH));
+		DrawWrappers.renderTexture = new RenderTexture((screenW, screenH));
+
 		screenRenderTextureL = new RenderTexture((screenW * 2, screenH * 2));
 		srtBuffer1L = new RenderTexture((screenW * 2, screenH * 2));
 		srtBuffer2L = new RenderTexture((screenW * 2, screenH * 2));
@@ -75,20 +80,40 @@ public partial class Global {
 
 		if (!fullscreen) {
 			window = new RenderWindow(
-				new VideoMode((windowW, windowH)), "MMX Online Deathmatch"
+				new VideoMode((windowW, windowH)), "MM7 Online Deathmatch"
 			);
 			window.SetVerticalSyncEnabled(options.vsync);
-			if (Global.hideMouse) window.SetMouseCursorVisible(false);
+			if (hideMouse) {
+				window.SetMouseCursorVisible(false);
+			}
 		} else {
 			var desktopWidth = VideoMode.DesktopMode.Size.X;
 			var desktopHeight = VideoMode.DesktopMode.Size.Y;
 			window = new RenderWindow(
 				new VideoMode((desktopWidth, desktopHeight)),
-				"MMX Online Deathmatch", Styles.None, State.Windowed
+				"MM7 Online: Deathmatch", Styles.None, State.Windowed
 			);
+			window.Position = new Vector2i(0, 0);
+			#if !NOTWINDOWS
+			if (NativeApi.Main is WinApi winApi) {
+				// Fixes bordeless on AMD and NVidia cards.
+				// Intels are f-ed up OpenGL. So this does not work on them.
+				// TODO: To fix this render final render result in GDI... maybe.
+				// Or check how the hell Snes9x OpenGL render avoids this bug.
+				winApi.ReplaceWindowStyle(
+					window, WinApi.WS.VISIBLE | WinApi.WS.SYSMENU
+				);
+				winApi.SetWindowExStyle(window, WinApi.WSEX.APPWINDOW, true);
+				winApi.SetPosClientArea(window, (0, 0), (desktopWidth, desktopHeight));
+			}
+			#endif
 			window.SetVerticalSyncEnabled(options.vsync);
-			window.SetMouseCursorVisible(false);
-			viewPort = getFullScreenViewPort();
+			if (Options.main.integerFullscreen) {
+				if (Options.main.fullScreenIntelCompat) {
+					window.Size = new Vector2u(desktopWidth, desktopHeight + 1);
+				}
+				viewPort = getIntegerViewPort();
+			}
 		}
 
 		if (!File.Exists(Global.assetPath + "assets/menu/icon.png")) {
@@ -105,23 +130,21 @@ public partial class Global {
 		DrawWrappers.hudView.Viewport = viewPort;
 
 		window.SetView(view);
-		/*if (Global.overrideFPS != null) {
+		/* This is unneeded as frameskip exists.
+		if (Global.overrideFPS != null) {
 			window.SetFramerateLimit((uint)Global.overrideFPS);
 		} else {
 			window.SetFramerateLimit((uint)options.maxFPS);
-		}*/
-
+		}
+		*/
 		window.SetActive();
 	}
 
-	public static FloatRect getFullScreenViewPort() {
-		float desktopWidth = VideoMode.DesktopMode.Size.X;
-		float desktopHeight = VideoMode.DesktopMode.Size.Y;
-		float heightMultiple = VideoMode.DesktopMode.Size.Y / (float)screenH;
+	public static FloatRect getIntegerViewPort() {
+		float desktopWidth = window.Size.X;
+		float desktopHeight = window.Size.Y;
+		float heightMultiple = MathF.Floor(window.Size.Y / (float)screenH);
 
-		if (Options.main.integerFullscreen) {
-			heightMultiple = MathF.Floor(VideoMode.DesktopMode.Size.Y / (float)screenH);
-		}
 		float extraWidthPercent = (desktopWidth - screenW * heightMultiple) / desktopWidth;
 		float extraHeightPercent = (desktopHeight - screenH * heightMultiple) / desktopHeight;
 
@@ -129,5 +152,21 @@ public partial class Global {
 			(extraWidthPercent / 2f, extraHeightPercent / 2f),
 			(1f - extraWidthPercent, 1f - extraHeightPercent)
 		);
+	}
+
+	public static float getDebugFontScale() {
+		if (fullscreen) {
+			return (float)screenH / getIntegerViewPort().Height;
+		}
+		if (window != null) {
+			float xSize = (float)screenH / window.Size.Y;
+			float ySize = (float)screenW / window.Size.X;
+
+			if (xSize > ySize) {
+				return xSize;
+			}
+			return ySize;
+		}
+		return 1;
 	}
 }

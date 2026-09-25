@@ -99,6 +99,7 @@ public class RPC {
 	public static RpcDeflect deflect = new();
 	public static RpcUpdateMaxTime updateMaxTime = new();
 	public static RpcReviveSigma reviveSigma = new();
+	public static RPCSyncEAltRound syncEAltRound = new();
 
 	public static RPC[] templates = {
 		// Strings.
@@ -160,6 +161,7 @@ public class RPC {
 		resetFlags,
 		sendKillFeedEntry,
 		syncControlPoints,
+		syncEAltRound,
 		// XOD Only stuff.
 		decShieldAmmo,
 		axlShoot,
@@ -457,12 +459,12 @@ public class RPCApplyDamage : RPC {
 }
 
 public class BackloggedDamage {
-	public ushort actorId;
+	public ushort netId;
 	public int meleeId;
 	public Action<Actor?, int> damageAction;
 	public float time;
 	public BackloggedDamage(ushort actorId, int meleeId, Action<Actor?, int> damageAction) {
-		this.actorId = actorId;
+		this.netId = actorId;
 		this.meleeId = meleeId;
 		this.damageAction = damageAction;
 
@@ -950,115 +952,6 @@ public class RPCReflectProj : RPC {
 	}
 }
 
-public class RPCJoinLateRequest : RPC {
-	public RPCJoinLateRequest() {
-		netDeliveryMethod = NetDeliveryMethod.ReliableOrdered;
-		isPreUpdate = true;
-		toHostOnly = true;
-	}
-
-	public override void invoke(params byte[] arguments) {
-		var serverPlayer = Helpers.deserialize<ServerPlayer>(arguments);
-
-		Global.level.addPlayer(serverPlayer, true);
-		/*
-		foreach (var player in Global.level.players) {
-			player.charNetId = null;
-			if (player.character != null) {
-				//player.charNetId = player.character.netId;
-				player.charXPos = player.character.pos.x;
-				player.charYPos = player.character.pos.y;
-				player.charXDir = player.character.xDir;
-				//player.charRollingShieldNetId = player.character.chargedRollingShieldProj?.netId;
-			}
-		}
-		*/
-
-		var controlPoints = new List<ControlPointResponseModel>();
-		foreach (var cp in Global.level.controlPoints) {
-			controlPoints.Add(new ControlPointResponseModel() {
-				alliance = cp.alliance,
-				num = cp.num,
-				locked = cp.locked,
-				captured = cp.captured,
-				captureTime = cp.captureTime
-			});
-		}
-
-		var magnetMines = new List<MagnetMineResponseModel>();
-		foreach (var go in Global.level.gameObjects) {
-			var magnetMine = go as MagnetMineProj;
-			if (magnetMine != null && magnetMine.netId != null && magnetMine.player != null) {
-				magnetMines.Add(new MagnetMineResponseModel() {
-					x = magnetMine.pos.x,
-					y = magnetMine.pos.y,
-					netId = magnetMine.netId.Value,
-					playerId = magnetMine.player.id
-				});
-			}
-		}
-
-		var turrets = new List<TurretResponseModel>();
-		foreach (var go in Global.level.gameObjects) {
-			var turret = go as RaySplasherTurret;
-			if (turret != null && turret.netId != null && turret.netOwner != null) {
-				turrets.Add(new TurretResponseModel() {
-					x = turret.pos.x,
-					y = turret.pos.y,
-					netId = turret.netId.Value,
-					playerId = turret.netOwner.id
-				});
-			}
-		}
-
-		var joinLateResponseModel = new JoinLateResponseModel() {
-			players = Global.level.players.Select(p => new PlayerPB(p)).ToList(),
-			newPlayer = serverPlayer,
-			controlPoints = controlPoints,
-			magnetMines = magnetMines,
-			turrets = turrets
-		};
-
-		Global.serverClient?.rpc(RPC.joinLateResponse, Helpers.serialize(joinLateResponseModel));
-	}
-}
-
-public class RPCJoinLateResponse : RPC {
-	public RPCJoinLateResponse() {
-		netDeliveryMethod = NetDeliveryMethod.ReliableOrdered;
-		levelless = true;
-		allowBreakMtuLimit = true;
-	}
-
-	public override void invoke(params byte[] arguments) {
-		JoinLateResponseModel? joinLateResponseModel = null;
-		try {
-			joinLateResponseModel = Helpers.deserialize<JoinLateResponseModel>(arguments);
-		} catch {
-			try {
-				Logger.logEvent(
-					"error",
-					"Bad joinLateResponseModel bytes. name: " +
-					Options.main.playerName + ", match: " + Global.level?.server?.name +
-					", bytes: " + arguments.ToString()
-				);
-				//Console.Write(message); 
-			} catch { }
-			throw;
-		}
-
-		// Original requester
-		if (Global.serverClient.serverPlayer.id == joinLateResponseModel.newPlayer.id) {
-			Global.level.joinedLateSyncPlayers(joinLateResponseModel.players);
-			Global.level.joinedLateSyncControlPoints(joinLateResponseModel.controlPoints);
-			Global.level.joinedLateSyncMagnetMines(joinLateResponseModel.magnetMines);
-			Global.level.joinedLateSyncTurrets(joinLateResponseModel.turrets);
-		} else {
-			Global.level.addPlayer(joinLateResponseModel.newPlayer, true);
-		}
-	}
-}
-
 public class RPCUpdateStarted : RPC {
 	public RPCUpdateStarted() {
 		netDeliveryMethod = NetDeliveryMethod.ReliableOrdered;
@@ -1496,16 +1389,41 @@ public class RPCPeriodicHostSync : RPC {
 	}
 }
 
+
 public class RPCUpdatePlayer : RPC {
 	public RPCUpdatePlayer() {
 		netDeliveryMethod = NetDeliveryMethod.Unreliable;
 		isServerMessage = true;
 	}
 
-	public void sendRpc(int playerId, int kills, int deaths) {
-		byte[] killsBytes = BitConverter.GetBytes((ushort)kills);
-		byte[] deathBytes = BitConverter.GetBytes((ushort)deaths);
-		Global.serverClient?.rpc(this, (byte)playerId, killsBytes[0], killsBytes[1], deathBytes[0], deathBytes[1]);
+	public void altInvoke(Server server, byte[] args) {
+		int playerId = args[0];
+		int score = args[1];
+		int kills = args[2];
+		int deaths = args[3];
+		int assists = args[4];
+		ServerPlayer? serverPlayer = server.players.FirstOrDefault(p => p.id == playerId);
+		if (serverPlayer == null) {
+			return;
+		}
+		serverPlayer.score = score;
+		serverPlayer.kills = kills;
+		serverPlayer.deaths = deaths;
+		serverPlayer.assists = assists;
+	}
+
+	public void sendRpc(Player player) {
+		if (Global.serverClient == null) {
+			return;
+		}
+		byte[] data = [
+			(byte)player.id,
+			(byte)player.score,
+			(byte)player.kills,
+			(byte)player.deaths,
+			(byte)player.assists,
+		];
+		Global.serverClient.rpc(this, data);
 	}
 }
 
@@ -2238,6 +2156,36 @@ public class RPCResetFlag : RPC {
 
 	public void sendRpc() {
 		Global.serverClient?.rpc(RPC.resetFlags);
+	}
+}
+
+public class RPCSyncEAltRound : RPC {
+	public RPCSyncEAltRound() {
+		netDeliveryMethod = NetDeliveryMethod.ReliableOrdered;
+		isString = true;
+	}
+
+	public override void invoke(string message) {
+		var response = JsonConvert.DeserializeObject<RPCMatchOverResponse>(message);
+		if (response == null) {
+			return;
+		}
+		if (Global.level.gameMode is TeamElimAlt tealt) {
+			tealt.addResult(response);
+			return;
+		}
+		if (Global.level.gameMode is ElimAlt ealt) {
+			ealt.addResult(response);
+			return;
+		}
+	}
+
+	public void sendRpc(RPCMatchOverResponse response) {
+		if (Global.serverClient == null) {
+			return;
+		}
+		string msg = JsonConvert.SerializeObject(response);
+		Global.serverClient.rpc(this, msg);
 	}
 }
 

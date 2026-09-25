@@ -193,8 +193,11 @@ public class Maverick : Actor, IDamagable {
 	) : base(
 		"", pos, netId, ownedByLocalPlayer, true
 	) {
+		hasStateMachine = true;
+		cleanUpOnPlayerLeave = true;
 		slideOnIce = true;
 		this.player = player;
+		netOwner = player;
 		this.xDir = xDir;
 
 		spriteToCollider["enter"] = null;

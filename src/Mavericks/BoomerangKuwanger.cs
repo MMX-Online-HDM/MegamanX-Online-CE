@@ -32,10 +32,10 @@ public class BoomerangKuwanger : Maverick {
 		weakWeaponId = WeaponIds.HomingTorpedo;
 		weakMaverickWeaponId = WeaponIds.LaunchOctopus;
 
-		netActorCreateId = NetActorCreateId.BoomerangKuwanger;
 		netOwner = player;
+		cActorId = CActorIds.SigmaBoomerangKuwanger;
 		if (sendRpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, player, player.character, getSerialExtra());
 		}
 
 		usesAmmo = true;

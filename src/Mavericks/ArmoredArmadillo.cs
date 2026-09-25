@@ -30,11 +30,12 @@ public class ArmoredArmadillo : Maverick {
 		weakWeaponId = WeaponIds.ElectricSpark;
 		weakMaverickWeaponId = WeaponIds.SparkMandrill;
 
-		netActorCreateId = NetActorCreateId.ArmoredArmadillo;
 		netOwner = player;
+		cActorId = CActorIds.SigmaArmoredArmadillo;
 		if (sendRpc) {
-			createActorRpc(player.id);
+			RPC.createActor.sendRpc(this, player, player.character, getSerialExtra());
 		}
+
 		// Ammo.
 		usesAmmo = true;
 		canHealAmmo = true;
