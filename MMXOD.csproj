@@ -39,12 +39,6 @@
 		<LangVersion>14</LangVersion>
 	</PropertyGroup>
 
-	<!--Linux only builds-->
-	<PropertyGroup Condition="'$(RuntimeIdentifier)' == 'linux-x64'">
-		<TargetFramework>net10.0</TargetFramework>
-		<DefineConstants>$(DefineConstants);NOTWINDOWS</DefineConstants>
-	</PropertyGroup>
-
 	<!--Dependencies-->
 	<ItemGroup>
 		<PackageReference Include="protobuf-net" Version="3.2.56" />

@@ -9,7 +9,6 @@ using SFML.Window;
 namespace WindowsAPI;
 
 public class WinApi : NativeApi {
-#if !NOTWINDOWS
 	public enum GWL : int {
 		EXSTYLE = -20,
 		HINSTANCE = -6,
@@ -219,5 +218,4 @@ public class WinApi : NativeApi {
 
 	[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
 	private static extern int MessageBox(IntPtr hWnd, String text, String caption, uint type);
-#endif
 }

@@ -78,10 +78,11 @@ class Program {
 	}
 
 	static RenderWindow Initialize(string[] args, int mode) {
-#if MAC
-		Global.assetPath = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName) + "/";
-		Global.writePath = Global.assetPath;
-#endif
+		// ToDo: Test if this is really required on OSX.
+		if (NativeApi.GetOS() == NativeApi.OS.OSX) {
+			Global.assetPath = Path.GetDirectoryName(Environment.ProcessPath) + "/";
+			Global.writePath = Global.assetPath;
+		}
 		Global.Init();
 		if (Enum.GetNames(typeof(WeaponIds)).Length > 256) {
 			throw new Exception("Too many weapon ids, max 256");

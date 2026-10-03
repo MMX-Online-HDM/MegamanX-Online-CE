@@ -94,7 +94,6 @@ public partial class Global {
 				"MM7 Online: Deathmatch", Styles.None, State.Windowed
 			);
 			window.Position = new Vector2i(0, 0);
-			#if !NOTWINDOWS
 			if (NativeApi.Main is WinApi winApi) {
 				// Fixes bordeless on AMD and NVidia cards.
 				// Intels are f-ed up OpenGL. So this does not work on them.
@@ -106,7 +105,6 @@ public partial class Global {
 				winApi.SetWindowExStyle(window, WinApi.WSEX.APPWINDOW, true);
 				winApi.SetPosClientArea(window, (0, 0), (desktopWidth, desktopHeight));
 			}
-			#endif
 			window.SetVerticalSyncEnabled(options.vsync);
 			if (Options.main.integerFullscreen) {
 				if (Options.main.fullScreenIntelCompat) {

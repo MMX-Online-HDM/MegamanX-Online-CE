@@ -491,9 +491,6 @@ public partial class Global {
 	private static string _deviceId;
 	public static string deviceId {
 		get {
-#if RELAYSERVER
-			return "";
-#endif
 			if (_deviceId == null) {
 				try {
 					_deviceId = new DeviceIdBuilder()
