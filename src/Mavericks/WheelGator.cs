@@ -411,6 +411,7 @@ public class WheelGBiteState : MaverickState {
 public class WheelGEatState : MaverickState {
 	float soundTime;
 	public WheelGEatState() : base("eat_loop") {
+		invincible = true;
 	}
 
 	public override void update() {

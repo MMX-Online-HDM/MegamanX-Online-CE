@@ -463,10 +463,10 @@ public class BCrabShieldProj : Projectile, IDamagable {
 	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
 		return damagerAlliance != owner.alliance;
 	}
-	public bool canBeHealed(int healerAlliance) {
-		return (health < maxHealth);
-	}
-	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
+	public bool canBeHealed() => health < maxHealth;
+	public bool canBeHealed(int healerAlliance) => canBeHealed() && healerAlliance == ownerPlayer.alliance;
+
+	public void heal(Player healer, float healAmount, bool drawHealText = true) {
 		commonHealLogic(healer, healAmount, health, maxHealth, drawHealText);
 		health += healAmount;
 		if (health > maxHealth) {
@@ -570,10 +570,10 @@ public class BCrabSummonBubbleProj : Projectile, IDamagable {
 	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
 		return false;
 	}
-	public bool canBeHealed(int healerAlliance) {
-		return false;
-	}
-	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
+	public bool canBeHealed() => false;
+	public bool canBeHealed(int healerAlliance) => false;
+
+	public void heal(Player healer, float healAmount, bool drawHealText = true) {
 		commonHealLogic(healer, healAmount, health, maxHealth, drawHealText);
 		health += healAmount;
 		if (health > maxHealth) {
@@ -724,10 +724,10 @@ public class BCrabSummonCrabProj : Projectile, IDamagable {
 	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
 		return damagerAlliance != owner.alliance;
 	}
-	public bool canBeHealed(int healerAlliance) {
-		return (health < maxHealth);
-	}
-	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
+	public bool canBeHealed() => health < maxHealth;
+	public bool canBeHealed(int healerAlliance) => canBeHealed() && healerAlliance == ownerPlayer.alliance;
+
+	public void heal(Player healer, float healAmount, bool drawHealText = true) {
 		commonHealLogic(healer, healAmount, health, maxHealth, drawHealText);
 		health += healAmount;
 		if (health > maxHealth) {

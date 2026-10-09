@@ -242,21 +242,10 @@ public class LaunchOMissile : Projectile, IDamagable {
 	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
 		return owner.alliance != damagerAlliance;
 	}
-	public bool canBeHealed(int healerAlliance) {
-		return false;
-	}
-	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
-	}
-	public bool isInvincible(Player attacker, int? projId) {
-		return false;
-	}
 	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
 		if (damage > 0) {
 			destroySelf();
 		}
-	}
-	public bool isPlayableDamagable() {
-		return false;
 	}
 }
 
@@ -431,17 +420,6 @@ public class TorpedoProjChargedOcto : Projectile, IDamagable {
 	}
 	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
 		return damager.owner.alliance != damagerAlliance;
-	}
-	public bool isInvincible(Player attacker, int? projId) {
-		return false;
-	}
-	public bool canBeHealed(int healerAlliance) {
-		return false;
-	}
-	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
-	}
-	public bool isPlayableDamagable() {
-		return false;
 	}
 }
 #endregion

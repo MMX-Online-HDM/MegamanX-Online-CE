@@ -225,21 +225,6 @@ public class MechMissileProj : Projectile, IDamagable {
 	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
 		return damager.owner.alliance != damagerAlliance;
 	}
-
-	public bool isInvincible(Player attacker, int? projId) {
-		return false;
-	}
-
-	public bool canBeHealed(int healerAlliance) {
-		return false;
-	}
-
-	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
-	}
-
-	public bool isPlayableDamagable() {
-		return false;
-	}
 }
 
 public class MechTorpedoWeapon : Weapon {
@@ -442,16 +427,5 @@ public class TorpedoProjMech : Projectile, IDamagable {
 	}
 	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
 		return damager.owner.alliance != damagerAlliance;
-	}
-	public bool isInvincible(Player attacker, int? projId) {
-		return false;
-	}
-	public bool canBeHealed(int healerAlliance) {
-		return false;
-	}
-	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
-	}
-	public bool isPlayableDamagable() {
-		return false;
 	}
 }

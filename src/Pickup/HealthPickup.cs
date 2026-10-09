@@ -7,19 +7,25 @@ public abstract class BaselineHealthPickup : Pickup {
 		bool sendRpc = false, bool teamOnly = false, bool spawnUp = false, bool isRushPickup = false
 	) : base(
 		owner, pos, sprite, netId, ownedByLocalPlayer,
-		cActorId, sendRpc: sendRpc, teamOnly: teamOnly, spawnUp: spawnUp, isRushPickup: isRushPickup
+		cActorId, sendRpc: sendRpc, teamOnly: teamOnly, spawnUp: spawnUp
 	) {
 		pickupType = PickupType.Health;
 		healAmount = 8;
 	}
 
-	public override bool canUse(int alliance, Character chr) {
-		return base.canUse(alliance, chr) && chr.canBeHealed();
+	public override bool canUse(int alliance, Actor actor) {
+		if (actor is not IDamagable idmg) {
+			return false;
+		}
+		return base.canUse(alliance, actor) && idmg.canBeHealed();
 	}
 
-	public override void use(Character chr) {
-		chr.addHealth(healAmount);
-		base.use(chr);
+	public override void use(Actor actor) {
+		if (actor is not IDamagable idmg) {
+			return;
+		}
+		idmg.heal(Player.stagePlayer, healAmount);
+		base.use(actor);
 	}
 }
 
@@ -29,7 +35,7 @@ public class LargeHealthPickup : BaselineHealthPickup {
 		bool sendRpc = false, bool teamOnly = false, bool isRushPickup = false
 	) : base(
 		owner, pos, "pickup_health_large", netId, ownedByLocalPlayer, 
-		CActorIds.LargeHealthPickup, sendRpc: sendRpc, teamOnly: teamOnly, isRushPickup: isRushPickup
+		CActorIds.LargeHealthPickup, sendRpc: sendRpc, teamOnly: teamOnly
 	) {
 		healAmount = 8;
 		syncOnLateJoin = true;
@@ -55,7 +61,7 @@ public class SmallHealthPickup : BaselineHealthPickup {
 		bool sendRpc = false, bool teamOnly = false, bool isRushPickup = false
 	) : base(
 		owner, pos, "pickup_health_small", netId, ownedByLocalPlayer,
-		CActorIds.SmallHealthPickup, sendRpc: sendRpc, teamOnly: teamOnly, isRushPickup: isRushPickup
+		CActorIds.SmallHealthPickup, sendRpc: sendRpc, teamOnly: teamOnly
 	) {
 		healAmount = 4;
 	}

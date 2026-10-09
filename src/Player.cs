@@ -656,13 +656,7 @@ public partial class Player {
 	}
 
 	public static float getHealthModifier() {
-		if (Global.customSettings != null) {
-			float modifier = Global.customSettings.healthModifier / 8f;
-			if (modifier > 0) {
-				return modifier;
-			}
-		}
-		return 1;
+		return Global.customSettings?.healthModifier ?? 1;
 	}
 
 	public static int getModifiedHealth(float health) {
@@ -697,7 +691,6 @@ public partial class Player {
 		return MathF.Ceiling(
 			(getModifiedHealth(16 + bonus) + heartTanks * getHeartTankModifier()) * getHpMod()
 		);
-
 	}
 
 	public void creditHealing(float healAmount) {
@@ -2568,7 +2561,7 @@ public partial class Player {
 
 	public bool isGridModeEnabled() {
 		if (isAxl || isDisguisedAxl) {
-			if (character is not Axl or MegamanX) {
+			if (character is not Axl and not MegamanX) {
 				return false;
 			}
 			if (Options.main.useMouseAim) return false;

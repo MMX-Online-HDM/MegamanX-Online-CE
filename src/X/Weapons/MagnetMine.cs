@@ -142,21 +142,6 @@ public class MagnetMineProj : Projectile, IDamagable {
 		}
 	}
 
-	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
-		return player.alliance != damagerAlliance;
-	}
-
-	public bool isInvincible(Player attacker, int? projId) {
-		return false;
-	}
-
-	public bool canBeHealed(int healerAlliance) {
-		return false;
-	}
-
-	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
-	}
-
 	public override void onDestroy() {
 		if (!ownedByLocalPlayer) {
 			return;
@@ -168,10 +153,10 @@ public class MagnetMineProj : Projectile, IDamagable {
 		if (player.alliance == alliance) return false;
 		return true;
 	}
-
-	public bool isPlayableDamagable() {
-		return false;
+	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
+		return player.alliance != damagerAlliance;
 	}
+
 }
 
 public class MagnetMineProjCharged : Projectile {

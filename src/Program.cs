@@ -1421,7 +1421,6 @@ class Program {
 		bool f12Released = true;
 		bool f5Released = true;
 		bool f6Released = true;
-		bool f7Released = true;
 		bool frameStepEnabled = true;
 
 		// Main loop itself.

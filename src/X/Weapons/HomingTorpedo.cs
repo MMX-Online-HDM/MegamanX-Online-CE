@@ -163,17 +163,6 @@ public class TorpedoProjX : Projectile, IDamagable {
 	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
 		return damager.owner.alliance != damagerAlliance;
 	}
-	public bool isInvincible(Player attacker, int? projId) {
-		return false;
-	}
-	public bool canBeHealed(int healerAlliance) {
-		return false;
-	}
-	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
-	}
-	public bool isPlayableDamagable() {
-		return false;
-	}
 } 
 public class TorpedoProjChargedX : Projectile, IDamagable {
 	public Actor? target;
@@ -289,16 +278,5 @@ public class TorpedoProjChargedX : Projectile, IDamagable {
 	}
 	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
 		return damager.owner.alliance != damagerAlliance;
-	}
-	public bool isInvincible(Player attacker, int? projId) {
-		return false;
-	}
-	public bool canBeHealed(int healerAlliance) {
-		return false;
-	}
-	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
-	}
-	public bool isPlayableDamagable() {
-		return false;
 	}
 }

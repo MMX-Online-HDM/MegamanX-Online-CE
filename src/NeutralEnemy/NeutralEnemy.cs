@@ -150,11 +150,10 @@ public class NeutralEnemy : Actor, IDamagable {
 		return (damagerAlliance != alliance && health > 0);
 	}
 
-	public bool canBeHealed(int healerAlliance) {
-		return (healerAlliance == alliance && health < maxHealth);
-	}
+	public bool canBeHealed() => health < maxHealth;
+	public bool canBeHealed(int healerAlliance) => canBeHealed() && healerAlliance == alliance;
 
-	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = true) {
+	public void heal(Player healer, float healAmount, bool drawHealText = true) {
 		commonHealLogic(healer, healAmount, (float)health, (float)maxHealth, drawHealText);
 		health += (decimal)healAmount;
 		if (health > maxHealth) {

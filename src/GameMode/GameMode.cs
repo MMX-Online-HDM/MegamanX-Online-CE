@@ -692,11 +692,11 @@ public class GameMode {
 		if (!Global.level.is1v1()) {
 			drawKillFeed();
 		}
-		if (Global.level.isTraining()) {
-			drawDpsIfSet(5);
-		} else {
+		//if (Global.level.isTraining()) {
+		//	drawDpsIfSet(5);
+		//} else {
 			drawTopHUD();
-		}
+		//}
 		if (isOver) {
 			drawWinScreen();
 		} else {
@@ -908,11 +908,11 @@ public class GameMode {
 	public static Point getHUDHealthPosition(HUDHealthPosition position, bool isHealth) {
 		float x = 0;
 		if (position is HUDHealthPosition.Left) {
-			x = isHealth ? 16 : 32;
+			x = isHealth ? 12 : 12 + 16;
 		} else {
 			x = isHealth ? Global.screenW - 17 : Global.screenW - 33;
 		}
-		return new Point(x, 88);
+		return new Point(x, 126 + 8);
 	}
 
 	public static Point getHUDBuffPosition(HUDHealthPosition position) {
@@ -1989,11 +1989,11 @@ public class GameMode {
 	public void drawNetcodeData() {
 		int top2 = -3;
 		string netcodePingStr = "";
-		int iconXPos = 280;
+		//int iconXPos = 280;
 		if (level.server.netcodeModel == NetcodeModel.FavorAttacker) {
 			netcodePingStr = " < " + level.server.netcodeModelPing.ToString();
-			if (level.server.netcodeModelPing < 100) iconXPos = 260;
-			else iconXPos = 253;
+			//if (level.server.netcodeModelPing < 100) iconXPos = 260;
+			//else iconXPos = 253;
 		}
 
 		if (!Global.level.server.isP2P) {

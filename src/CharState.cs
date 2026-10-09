@@ -502,7 +502,7 @@ public class WarpIn : CharState {
 		destX = character.pos.x;
 		startY = character.pos.y;
 
-		if (player.warpedInOnce || Global.debug) {
+		if (player.warpedInOnce && character is BaseSigma or Vile) {
 			sigmaRounds = 4;
 		}
 		if (refillHP && character.ownedByLocalPlayer && !player.warpedInOnce) {

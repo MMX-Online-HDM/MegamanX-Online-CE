@@ -211,11 +211,6 @@ public class GrenadeProj : Projectile, IDamagable {
 	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
 		return sprite.name == "axl_grenade_mine" && owner.alliance != damagerAlliance;
 	}
-
-	public bool isInvincible(Player attacker, int? projId) { return false; }
-	public bool canBeHealed(int healerAlliance) { return false; }
-	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) { }
-
 	public void detonate() {
 		playSound("detonate", sendRpc: true);
 		if (player != null)
@@ -223,10 +218,6 @@ public class GrenadeProj : Projectile, IDamagable {
 			weapon, pos, xDir, player, type, target, Math.Sign(vel.x), player.getNextActorNetId()
 		);
 		destroySelfNoEffect();
-	}
-
-	public bool isPlayableDamagable() {
-		return false;
 	}
 }
 

@@ -306,9 +306,7 @@ public partial class Character : Actor, IDamagable {
 		lastGravityWellDamager = player;
 		this.heartTanks = heartTanks ?? player.getHeartTanks((int)charId);
 		maxHealth = getMaxHealth();
-		if (ownedByLocalPlayer && (!isWarpIn || player.warpedInOnce)) {
-			health = maxHealth;
-		}
+		health = maxHealth;
 	}
 
 	public override void onStart() {
@@ -2716,31 +2714,34 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual int getMaxHealth() {
+		// 1v1 is the only mode without possible heart tanks/sub tanks
 		if (Global.level.is1v1()) {
 			return MathInt.Ceiling(Player.getModifiedHealth(28) * Player.getHpMod());
 		}
-		return MathInt.Ceiling(
-			(Player.getModifiedHealth(baselineMaxHealth()) +
-				heartTanks * Player.getHeartTankModifier()
+		int bonus = 0;
+		if (this is BaseSigma) {
+			bonus = 4;
+		}
+		return MathInt.Ceiling((
+			Player.getModifiedHealth(16 + bonus) + heartTanks *
+			Player.getHeartTankModifier()
 			) * Player.getHpMod()
 		);
 	}
 
 	public virtual bool canBeHealed(int healerAlliance) {
-		return player.alliance == healerAlliance && alive && health < maxHealth;
+		return player.alliance == healerAlliance && canBeHealed();
 	}
-	
 	public virtual bool canBeHealed() {
-		return alive && health < maxHealth;
+		return alive && (health < maxHealth || player.hasSubtankCapacity());
 	}
 
-	public virtual void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
-		if (!allowStacking && this.healAmount > 0) return;
+	public virtual void heal(Player healer, float healAmount, bool drawHealText = true) {
 		if (health < maxHealth) {
 			playHealSound = true;
 		}
 		commonHealLogic(healer, (decimal)healAmount, health, maxHealth, drawHealText);
-		addHealth(healAmount, fillSubtank: false);
+		addHealth(healAmount);
 	}
 
 
@@ -3693,7 +3694,7 @@ public partial class Character : Actor, IDamagable {
 
 		// Spawn invul.
 		if (invulnTime > 0) {
-			drawBuff(drawPos, invulnTime / maxInvulnTime, "hud_buffs", 1);
+			//drawBuff(drawPos, invulnTime / maxInvulnTime, "hud_buffs", 1);
 			secondBarOffset += 18 * drawDir;
 			drawPos.x += 18 * drawDir;
 		}
@@ -3789,6 +3790,7 @@ public partial class Character : Actor, IDamagable {
 		Global.sprites[healthBaseSprite].drawToHUD(baseSpriteIndex, baseX, baseY);
 		baseY -= 16;
 		decimal modifier = (decimal)Player.getHealthModifier();
+		if (modifier < 1) { modifier = 1; }
 		decimal maxHP = Math.Ceiling(maxHealth / modifier);
 		decimal curHP = Math.Floor(health / modifier);
 		decimal ceilCurHP = Math.Ceiling(health / modifier);

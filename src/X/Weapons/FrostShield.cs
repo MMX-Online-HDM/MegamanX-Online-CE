@@ -127,10 +127,6 @@ public class FrostShieldProj : Projectile, IDamagable {
 	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
 		return damager.owner.alliance != damagerAlliance;
 	}
-	public bool isInvincible(Player attacker, int? projId) => false;
-	public bool canBeHealed(int healerAlliance) => false;
-	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = true) { }
-	public bool isPlayableDamagable() => false;
 }
 
 public class FrostShieldProjAir : Projectile {
@@ -221,11 +217,6 @@ public class FrostShieldProjGround : Projectile, IDamagable {
 	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
 		return damagerAlliance != owner.alliance;
 	}
-
-	public bool canBeHealed(int healerAlliance)  => false;
-	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) { }
-	public bool isInvincible(Player attacker, int? projId) => false;
-	public bool isPlayableDamagable() => false;
 
 	public override void onDestroy() {
 		base.onDestroy();

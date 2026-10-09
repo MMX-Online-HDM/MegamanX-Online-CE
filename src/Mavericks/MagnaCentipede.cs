@@ -590,6 +590,7 @@ public class MagnaCTeleportState : CentipedeMState {
 	Actor? clone;
 	bool inverted;
 	public int aiPosOffset = Helpers.randomRange(-24, 48);
+	public float altframes;
 
 	public MagnaCTeleportState() : base("teleport_out") {
 		enterSound = "magnacTeleportOut";
@@ -603,7 +604,14 @@ public class MagnaCTeleportState : CentipedeMState {
 			if (maverick.isAnimOver()) {
 				maverick.changeToIdleOrFall();
 			}
+			altframes += maverick.speedMul;
+			if (stateFrame >= 35) {
+				invulnerable = false;
+			}
 			return;
+		}
+		if (stateFrame >= 15) {
+			invulnerable = true;
 		}
 		Point dir = input.getInputDir(player);
 		if (maverick.controlMode == MaverickModeId.Summoner &&

@@ -1368,19 +1368,26 @@ public partial class Actor : GameObject {
 	}
 
 	public void commonHealLogic(Player healer, decimal healAmount, decimal currentHealth, decimal maxHealth, bool drawHealText) {
-		if (drawHealText && ownedByLocalPlayer) {
-			float reportAmount = (float)Helpers.clampMax(healAmount, maxHealth - currentHealth);
-			if (reportAmount == 0) {
-				bool hasSubtankCapacity = false;
-				if (this is Character chr && chr.player.hasSubtankCapacity()) hasSubtankCapacity = true;
-				if (this is Maverick maverick && maverick.player.hasSubtankCapacity()) hasSubtankCapacity = true;
-				if (hasSubtankCapacity) {
-					RPC.playSound.sendRpc("subtankFill", netId);
-				}
-			} else {
-				healer.creditHealing(reportAmount);
-				addDamageTextHelper(healer, -reportAmount, 16, sendRpc: true);
+		if (!ownedByLocalPlayer) {
+			return;
+		}
+		float reportAmount = (float)Helpers.clampMax(healAmount, maxHealth - currentHealth);
+		if (reportAmount == 0) {
+			bool hasSubtankCapacity = false;
+			if (this is Character chr && chr.player.hasSubtankCapacity()) {
+				hasSubtankCapacity = true;
 			}
+			if (this is Maverick maverick && maverick.player.hasSubtankCapacity()) {
+				hasSubtankCapacity = true;
+			}
+			if (hasSubtankCapacity) {
+				RPC.playSound.sendRpc("subtankFill", netId);
+			}
+		} else {
+			addDamageTextHelper(healer, -reportAmount, 16, sendRpc: true);
+		}
+		if (healer != null) {
+			healer.creditHealing((float)healAmount);
 		}
 	}
 

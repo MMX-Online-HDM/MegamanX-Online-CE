@@ -128,23 +128,9 @@ public class HUD {
 			renderHealthAndWeapon(player, GameMode.HUDHealthPosition.Left);
 		}
 		// Currency
-		Point basePos = new(Global.screenW - 96, 27);
-		if (level.levelData.isTraining()) {
-			basePos = new Point(10, 106);
-		}
-		else if (!shouldDrawRadar()) {
-			basePos.x += 48;
-		}
-		Fonts.drawText(
-			FontType.Blue,
-			"x", basePos.x + 9, basePos.y, Alignment.Left
-		);
-		Fonts.drawText(
-			FontType.Blue,
-			" " + player.currency.ToString(), basePos.x + 40, basePos.y, Alignment.Right
-		);
-		Global.sprites["hud_scrap"].drawToHUD(0, basePos.x, basePos.y);
-
+		Point basePos = GameMode.getHUDHealthPosition(GameMode.HUDHealthPosition.Left, true).addxy(-7, 6);
+		Global.sprites["hud_scrap"].drawToHUD(0, basePos.x, basePos.y - 2);
+		Fonts.drawText(FontType.Blue, $"x{player.currency}", basePos.x + 9 + 3, basePos.y, Alignment.Left);
 		if (player.weapons?.Count > 1) {
 			gameMode.drawWeaponSwitchHUD(player);
 		}

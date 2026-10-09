@@ -80,7 +80,7 @@ public partial class Global {
 
 		if (!fullscreen) {
 			window = new RenderWindow(
-				new VideoMode((windowW, windowH)), "MM7 Online Deathmatch"
+				new VideoMode((windowW, windowH)), "MMX: Online Deathmatch"
 			);
 			window.SetVerticalSyncEnabled(options.vsync);
 			if (hideMouse) {
@@ -91,7 +91,7 @@ public partial class Global {
 			var desktopHeight = VideoMode.DesktopMode.Size.Y;
 			window = new RenderWindow(
 				new VideoMode((desktopWidth, desktopHeight)),
-				"MM7 Online: Deathmatch", Styles.None, State.Windowed
+				"MMX: Online Deathmatch", Styles.None, State.Windowed
 			);
 			window.Position = new Vector2i(0, 0);
 			if (NativeApi.Main is WinApi winApi) {

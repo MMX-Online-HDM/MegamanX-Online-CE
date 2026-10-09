@@ -68,7 +68,7 @@ public class BoomerangKuwanger : Maverick {
 		if (aiBehavior != MaverickAIBehavior.Control || !state.attackCtrl) {
 			return;
 		}
-		if (grounded && state.attackCtrl) {
+		if (state.attackCtrl) {
 			if (state is not BoomerKDashState && state is MIdle or MRun) {
 				if (input.isHeld(Control.Left, player)) {
 					xDir = -1;
@@ -358,7 +358,11 @@ public class BoomerKTeleportState : BoomerMState {
 			clone.xDir = maverick.xDir;
 			clone.visible = false;
 			clone.useGravity = false;
-			maverick.useGravity = false;
+		}
+		if (stateTime >= 0.2 && isInvisible) {
+			invincible = true;
+		} else {
+			invincible = false;
 		}
 		if (isInvisible && stateTime > 0.4f && clone != null) {
 			isInvisible = false;
@@ -440,7 +444,6 @@ public class BoomerKTeleportState : BoomerMState {
 						clone.changePos(hit.getHitPointSafe());
 					}
 				}
-				
 
 				if (!canChangePos()) {
 					var redXPos = clone.getCenterPos();
@@ -463,19 +466,22 @@ public class BoomerKTeleportState : BoomerMState {
 		}
 
 		if (stateTime > 0.8f) {
-			maverick.changeState(new MIdle());
+			maverick.stopMoving();
+			maverick.changeToIdleOrFall();
 		}
 	}
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
+		maverick.useGravity = false;
+		maverick.stopMoving();
 		maverick.playSound("boomerkTeleport", sendRpc: true);
 	}
 
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
-		maverick.visible = true;
 		maverick.useGravity = true;
+		maverick.visible = true;
 		if (maverick is BoomerangKuwanger bk) {
 			bk.setTeleportCooldown();
 		}

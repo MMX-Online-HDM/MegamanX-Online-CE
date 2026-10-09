@@ -290,11 +290,10 @@ public class RaySplasherTurret : Actor, IDamagable {
 		return false;
 	}
 
-	public bool canBeHealed(int healerAlliance) {
-		return netOwner?.alliance == healerAlliance && health < maxHealth;
-	}
+	public bool canBeHealed() => health < maxHealth;
+	public bool canBeHealed(int healerAlliance) => netOwner?.alliance == healerAlliance && canBeHealed();
 
-	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
+	public void heal(Player healer, float healAmount, bool drawHealText = true) {
 		health += healAmount;
 		if (drawHealText && healer != netOwner && ownedByLocalPlayer) {
 			addDamageTextHelper(netOwner, -healAmount, 16, sendRpc: true);
@@ -334,10 +333,6 @@ public class RaySplasherTurret : Actor, IDamagable {
 		}
 
 		renderDamageText(10);
-	}
-
-	public bool isPlayableDamagable() {
-		return false;
 	}
 }
 

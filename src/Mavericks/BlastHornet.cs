@@ -263,11 +263,9 @@ public class BHornetBeeProj : Projectile, IDamagable {
 			destroySelf();
 		}
 	}
-	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) { return damager.owner.alliance != damagerAlliance; }
-	public bool isInvincible(Player attacker, int? projId) { return false; }
-	public bool canBeHealed(int healerAlliance) { return false; }
-	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) { }
-	public bool isPlayableDamagable() { return false; }
+	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
+		return damager.owner.alliance != damagerAlliance;
+	}
 
 	public override List<byte> getCustomActorNetData() {
 		List<byte> customData = new();
@@ -351,11 +349,9 @@ public class BHornetHomingBeeProj : Projectile, IDamagable {
 			destroySelf();
 		}
 	}
-	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) { return damager.owner.alliance != damagerAlliance; }
-	public bool isInvincible(Player attacker, int? projId) { return false; }
-	public bool canBeHealed(int healerAlliance) { return false; }
-	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) { }
-	public bool isPlayableDamagable() { return false; }
+	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
+		return damager.owner.alliance != damagerAlliance;
+	}
 }
 public class HornetMState : MaverickState {
 	public BlastHornet axploseHorneck = null!;

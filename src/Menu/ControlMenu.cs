@@ -186,7 +186,7 @@ public class ControlMenu : IMainMenu {
 	public void render() {
 		var topLeft = new Point(startX + 86, 34);
 		int startYOff = 8;
-		int cursorYOff = 6;
+		//int cursorYOff = 6;
 
 		if (!inGame) {
 			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0);

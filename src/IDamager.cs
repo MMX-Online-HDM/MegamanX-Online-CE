@@ -6,10 +6,11 @@ public interface IDamagable {
 	void applyDamage(float damage, Player owner, Actor? actor, int? weaponIndex, int? projId);
 	Dictionary<string, float> projectileCooldown { get; set; }
 	bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId);
-	bool isInvincible(Player attacker, int? projId);
-	bool canBeHealed(int healerAlliance);
-	void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = true);
-	bool isPlayableDamagable();
+	bool isInvincible(Player attacker, int? projId) => false;
+	bool canBeHealed(int healerAlliance) => canBeHealed();
+	bool canBeHealed() => false;
+	void heal(Player healer, float healAmount, bool drawHealText = true) {}
+	bool isPlayableDamagable() => false;
 }
 
 public class DamageText {

@@ -262,17 +262,6 @@ public class WolfSigmaHead : Actor, IDamagable {
 		return owner.alliance != damagerAlliance;
 	}
 
-	public bool isInvincible(Player attacker, int? projId) {
-		return true;
-	}
-
-	public bool canBeHealed(int healerAlliance) {
-		return false;
-	}
-
-	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
-	}
-
 	public override void render(float x, float y) {
 		base.render(x, y);
 		if (!visible) return;
@@ -286,10 +275,6 @@ public class WolfSigmaHead : Actor, IDamagable {
 		if (explodeTime == 0) {
 			explodeTime = Global.spf;
 		}
-	}
-
-	public bool isPlayableDamagable() {
-		return false;
 	}
 }
 
@@ -644,20 +629,8 @@ public class WolfSigmaHand : Actor, IDamagable {
 
 	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
 	}
-
 	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
 		return owner.alliance != damagerAlliance;
-	}
-
-	public bool isInvincible(Player attacker, int? projId) {
-		return true;
-	}
-
-	public bool canBeHealed(int healerAlliance) {
-		return false;
-	}
-
-	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
 	}
 
 	public override void render(float x, float y) {
@@ -676,10 +649,6 @@ public class WolfSigmaHand : Actor, IDamagable {
 			DrawWrappers.DrawRect(topLeft.x, topLeft.y, botRight.x, botRight.y, true, Color.Black, 0, ZIndex.HUD - 1, outlineColor: Color.White);
 			DrawWrappers.DrawRect(topLeft.x + 1, topLeft.y + 1, topLeft.x + 1 + width, botRight.y - 1, true, Color.Yellow, 0, ZIndex.HUD - 1);
 		}
-	}
-
-	public bool isPlayableDamagable() {
-		return false;
 	}
 }
 

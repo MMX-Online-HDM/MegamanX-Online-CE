@@ -106,7 +106,6 @@ public class Maverick : Actor, IDamagable {
 	public Player player;
 	public bool changedStateInFrame;
 	public Dictionary<Type, MaverickStateCooldown> stateCooldowns = new();
-	public Point? lastGroundedPos;
 	public bool autoExit;
 	public float autoExitTime;
 	public float strikerTime;
@@ -526,7 +525,7 @@ public class Maverick : Actor, IDamagable {
 		if (state.normalCtrl && canClimb) {
 			state.climbIfCheckClimbTrue();
 		}
-		if (state.normalCtrl && canClimbWall && !grounded) {
+		if (state.normalCtrl && !grounded) {
 			state.wallClimbCode();
 		}
 		if (state.canJump && grounded && player.input.isPressed(Control.Jump, player)) {
@@ -1447,9 +1446,9 @@ public class Maverick : Actor, IDamagable {
 	}
 
 	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
-		if (Global.level.isRace()) return false;
+		if (Global.level.isRace()) { return false; }
 
-		if (this is BoomerangKuwanger bk && bk.sprite.name.Contains("teleport")) {
+		if (state.invulnerable || state.immortal) {
 			return false;
 		}
 		if (this is StingChameleon sc && sc.isInvisible && !Damager.isBoomerang(projId)) {
@@ -1461,13 +1460,7 @@ public class Maverick : Actor, IDamagable {
 		if (sprite.name.EndsWith("enter") || sprite.name.EndsWith("exit")) {
 			return false;
 		}
-		if (this is MagnaCentipede ms && ms.sprite.name.Contains("teleport")) {
-			return false;
-		}
 		if (this is ToxicSeahorse ts && ts.sprite.name.Contains("teleport")) {
-			return false;
-		}
-		if (sprite.name == "drdoppler_uncoat") {
 			return false;
 		}
 		if (invulnTime > 0) {
@@ -1478,19 +1471,17 @@ public class Maverick : Actor, IDamagable {
 	}
 
 	public bool isInvincible(Player attacker, int? projId) {
-		return sprite.name == "armoreda_charge" || sprite.name.Contains("_shell") || sprite.name.EndsWith("eat_loop");
+		return state.invincible || sprite.name.Contains("_shell");
 	}
 
-	public bool canBeHealed(int healerAlliance) {
-		return healerAlliance == player.alliance && health > 0 && health < maxHealth;
-	}
+	public bool canBeHealed() => health < maxHealth;
+	public bool canBeHealed(int healerAlliance) => canBeHealed() && healerAlliance == player.alliance;
 
-	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
-		if (!allowStacking && this.healAmount > 0) return;
+	public void heal(Player healer, float healAmount, bool drawHealText = true) {
+		commonHealLogic(healer, healAmount, health, maxHealth, drawHealText);
 		if (health < maxHealth) {
 			playHealSound = true;
 		}
-		commonHealLogic(healer, healAmount, health, maxHealth, drawHealText);
 		this.healAmount = healAmount;
 	}
 

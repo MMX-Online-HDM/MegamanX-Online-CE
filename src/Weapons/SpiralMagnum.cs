@@ -532,23 +532,6 @@ public class SniperMissileProj : Projectile, IDamagable {
 	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
 		return owner.alliance != damagerAlliance;
 	}
-
-	public bool isInvincible(Player attacker, int? projId) {
-		return false;
-	}
-
-	public bool canBeHealed(int healerAlliance) {
-		return owner.alliance == healerAlliance;
-	}
-
-	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
-		health += healAmount;
-		if (health > maxHealth) health = maxHealth;
-	}
-
-	public bool isPlayableDamagable() {
-		return false;
-	}
 }
 
 public class SniperMissileExplosionProj : Projectile {

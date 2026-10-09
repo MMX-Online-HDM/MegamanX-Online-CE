@@ -137,10 +137,7 @@ public partial class Global {
 }";
 
 	// Feature switches
-	public static bool maverickWallClimb = false;
-
 	public static bool debug = false;
-
 	public static bool consoleDebugLogging = false;
 
 	public static bool showHitboxes = false;

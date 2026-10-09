@@ -397,6 +397,7 @@ public class ArmoredAGuardChargeState : ArmadilloMState {
 	public ArmoredAGuardChargeState(float damage) : base("charge") {
 		this.damage = damage;
 		aiAttackCtrl = true;
+		invincible = true;
 	}
 
 	public override void onEnter(MaverickState oldState) {

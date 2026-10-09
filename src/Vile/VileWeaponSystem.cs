@@ -62,7 +62,6 @@ public class VileWeaponSystem : Weapon {
 
 
 		// Populate unique weapon list.
-		int i = 0;
 		foreach (Weapon?[] weaponArray in iterationArray) {
 			foreach (Weapon? weapon in weaponArray) {
 				if (weapon != null) {

@@ -51,15 +51,23 @@ public class MaverickState {
 	public string enterSound = "";
 	public bool canEnterSelf = true;
 	public bool useGravity = true;
-	public bool superArmor;
-	public bool invincible;
-	public bool stunImmune;
-	public bool pushImmune;
-	public bool slowImmune;
 	public float consecutiveWaitTime;
 	public bool stopMoving;
 	public bool exitOnAnimEnd;
 	public bool wasFlying;
+
+	// Immunities.
+	public bool invincible;
+	public bool stunImmune;
+	public bool superArmor;
+	public bool pushImmune;
+	public bool slowImmune;
+	public bool statusEffectImmune;
+	public bool isGrabbedState;
+	public bool immuneToAll;
+	public bool invulnerable;
+	public bool immortal;
+
 
 	public Collider? lastLeftWallCollider;
 	public Collider? lastRightWallCollider;
@@ -306,7 +314,7 @@ public class MaverickState {
 					return;
 				}
 			} else {
-				if (lastLeftWallCollider != null && input.isPressed(Control.Jump, player) && Global.maverickWallClimb) {
+				if (lastLeftWallCollider != null && input.isPressed(Control.Jump, player)) {
 					maverick.vel.y = -maverick.getJumpPower() * maverick.getYMod();
 					maverick.changeState(new MWallKick(1, "jump"));
 				}
@@ -318,7 +326,7 @@ public class MaverickState {
 					return;
 				}
 			} else {
-				if (lastRightWallCollider != null && input.isPressed(Control.Jump, player) && Global.maverickWallClimb) {
+				if (lastRightWallCollider != null && input.isPressed(Control.Jump, player)) {
 					maverick.vel.y = -maverick.getJumpPower() * maverick.getYMod();
 					maverick.changeState(new MWallKick(-1, "jump"));
 				}
@@ -669,7 +677,7 @@ public class MJumpStart : MaverickState {
 	public float jumpFramesHeld;
 	public float preJumpFramesHeld;
 	public float maxPreJumpFrames = 2;
-	public float maxJumpFrames = 12;
+	public float maxJumpFrames = 10;
 	public float additionalJumpPower;
 	public bool isChargeJump;
 	public bool skipCharge;
@@ -733,7 +741,9 @@ public class MJumpStart : MaverickState {
 			jumpFramesHeld += maverick.speedMul;
 			if (jumpFramesHeld > maxJumpFrames) { jumpFramesHeld = maxJumpFrames; }
 		}
-		if (maverick.isAnimOver() && stateFrame >= 10 || skipCharge && stateFrame > maxPreJumpFrames) {
+		if (maverick.isAnimOver() && stateFrame >= maxPreJumpFrames + maxJumpFrames ||
+			skipCharge && stateFrame > maxPreJumpFrames
+		) {
 			maverick.vel.y = -maverick.getJumpPower() * getJumpModifier() * maverick.getYMod() * additionalJumpPower;
 			maverick.changeState(new MJump());
 		}
@@ -743,10 +753,9 @@ public class MJumpStart : MaverickState {
 		if (!isChargeJump) {
 			return 1;
 		}
-		float minHeight = 0.75f;
-		float maxHeight = 1.4f;
-
-		return minHeight + (maxHeight - minHeight) * (jumpFramesHeld / maxJumpFrames);
+		float minHeight = 0.25f;
+		float maxHeight = 1.75f;
+		return MathF.Sqrt(minHeight + (maxHeight - minHeight) * (jumpFramesHeld / maxJumpFrames));
 	}
 
 	public override void onEnter(MaverickState oldState) {
@@ -1180,9 +1189,6 @@ public class MDie : MaverickState {
 			Anim.createGibEffect("fakezero_piece", maverick.getCenterPos(), player, gibPattern: GibPattern.SemiCircle, sendRpc: true);
 			maverick.playSound("explosion", sendRpc: true);
 		}
-		if (isEnvDeath) {
-			maverick.lastGroundedPos = null;
-		}
 	}
 
 	public override void update() {
@@ -1211,22 +1217,13 @@ public class MDie : MaverickState {
 				if (player.character != null && player.character.charState is not Die) {
 					Point spawnPos;
 					Point closestSpawnPoint = Global.level.getClosestSpawnPoint(deathPos).pos;
-					if (isEnvDeath) {
-						if (maverick.lastGroundedPos == null) {
-							spawnPos = closestSpawnPoint;
-						} else {
-							spawnPos = deathPos.distanceTo(closestSpawnPoint) < deathPos.distanceTo(maverick.lastGroundedPos.Value) ?
-								closestSpawnPoint :
-								maverick.lastGroundedPos.Value;
-						}
-					} else if (maverick.lastGroundedPos != null) {
-						spawnPos = deathPos.distanceTo(closestSpawnPoint) < deathPos.distanceTo(maverick.lastGroundedPos.Value) ?
-								closestSpawnPoint :
-								maverick.lastGroundedPos.Value;
-					} else {
+					if (deathPos.distanceTo(closestSpawnPoint) <
+						deathPos.distanceTo(maverick.lastGroundedPos)
+					) {
 						spawnPos = closestSpawnPoint;
+					} else {
+						spawnPos = maverick.lastGroundedPos;
 					}
-
 					(player.character as BaseSigma)?.becomeSigma(spawnPos, maverick.xDir);
 					player.removeWeaponSlot(player.weapons.FindIndex(w => w is MaverickWeapon mw && mw.maverick == maverick));
 					player.changeWeaponSlot(player.weapons.FindIndex(w => w is SigmaMenuWeapon));

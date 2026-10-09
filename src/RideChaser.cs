@@ -559,13 +559,14 @@ public class RideChaser : Actor, IDamagable {
 		return false;
 	}
 
+	
+	public bool canBeHealed() => character == null && health > 0 && health < maxHealth;
 	public bool canBeHealed(int healerAlliance) {
 		if (character == null) return false;
 		return character.player.alliance == healerAlliance && health > 0 && health < maxHealth;
 	}
 
-	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
-		if (!allowStacking && this.healAmount > 0) return;
+	public void heal(Player healer, float healAmount, bool drawHealText = true) {
 		commonHealLogic(healer, healAmount, health, maxHealth, drawHealText);
 		this.healAmount = healAmount;
 	}

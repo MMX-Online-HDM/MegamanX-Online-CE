@@ -473,7 +473,8 @@ public partial class Level {
 			}
 
 			string instanceName = instance.name;
-			string objectName = instance.objectName.ToLower();
+			string objectName = instance.objectName;
+			objectName = objectName.ToLower();
 			var points = new List<Point>();
 			bool? nullableFlipX = instance.properties?.flipX;
 			bool flipX = nullableFlipX ?? false;

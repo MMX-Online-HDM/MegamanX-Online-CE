@@ -46,10 +46,10 @@ public class ChillPenguin : Maverick {
 		if (aiBehavior == MaverickAIBehavior.Control) {
 			if (state is MTaunt && input.isHeld(Control.Taunt, player)) {
 				if (input.isPressed(Control.Down, player) || input.isPressed(Control.Up, player)) {
-					player.removeOwnedIceStatues();
+					//player.removeOwnedIceStatues();
 				} else if (input.isPressed(Control.Left, player) || input.isPressed(Control.Right, player)) {
 					if (player.iceStatues.Count <= 1) {
-						player.removeOwnedIceStatues();
+						//player.removeOwnedIceStatues();
 					} else {
 						var sortedStatues = player.iceStatues.OrderBy(ic => ic.pos.x).ToList();
 						var leftStatue = sortedStatues[0];
@@ -376,21 +376,6 @@ public class ChillPIceStatueProj : Projectile, IDamagable {
 
 	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
 		return owner.alliance != damagerAlliance;
-	}
-
-	public bool isInvincible(Player attacker, int? projId) {
-		return false;
-	}
-
-	public bool canBeHealed(int healerAlliance) {
-		return false;
-	}
-
-	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
-	}
-
-	public bool isPlayableDamagable() {
-		return false;
 	}
 }
 

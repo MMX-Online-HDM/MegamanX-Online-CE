@@ -255,13 +255,9 @@ public class GravityWellProj : Projectile, IDamagable {
 		actor.move(velVector, true);
 	}
 
-	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) { return owner.alliance != damagerAlliance; }
-	public bool canBeHealed(int healerAlliance) { return false; }
-	public void heal(float healAmount, bool allowStacking = true) { }
-	public bool isInvincible(Player attacker, int? projId) { return false; }
-	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) { }
-
-	public bool isPlayableDamagable() { return false; }
+	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
+		return owner.alliance != damagerAlliance;
+	}
 }
 
 public class GravityWellProjCharged : Projectile, IDamagable {
@@ -389,11 +385,9 @@ public class GravityWellProjCharged : Projectile, IDamagable {
 		}
 	}
 
-	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) { return owner.alliance != damagerAlliance; }
-	public bool isInvincible(Player attacker, int? projId) { return false; }
-	public bool canBeHealed(int healerAlliance) { return false; }
-	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) { }
-	public bool isPlayableDamagable() { return false; }
+	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
+		return owner.alliance != damagerAlliance;
+	}
 }
 
 public class GravityWellChargedState : CharState {

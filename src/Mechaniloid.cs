@@ -109,10 +109,6 @@ public class BirdMechaniloidProj : Projectile, IDamagable {
 	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
 		return damager.owner.alliance != damagerAlliance;
 	}
-
-	public bool isInvincible(Player attacker, int? projId) { return false; }
-	public bool canBeHealed(int healerAlliance) { return false; }
-	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) { }
 	public bool isPlayableDamagable() { return true; }
 
 	public override void onDestroy() {
@@ -416,11 +412,12 @@ public class Mechaniloid : Actor, IDamagable {
 		return false;
 	}
 
+	public bool canBeHealed() => health < maxHealth;
 	public bool canBeHealed(int healerAlliance) {
 		return netOwner.alliance == healerAlliance && health < maxHealth;
 	}
 
-	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
+	public void heal(Player healer, float healAmount, bool drawHealText = true) {
 		health += healAmount;
 		if (drawHealText && healer != netOwner && ownedByLocalPlayer) {
 			addDamageTextHelper(netOwner, -healAmount, 16, sendRpc: true);

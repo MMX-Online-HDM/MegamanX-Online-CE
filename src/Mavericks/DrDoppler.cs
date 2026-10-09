@@ -432,6 +432,7 @@ public class DrDopplerUncoatState : DrDopplerMState {
 		exitOnAnimEnd = true;
 		enterSound = "transform";
 		aiAttackCtrl = true;
+		invulnerable = true;
 	}
 
 	public override void update() {

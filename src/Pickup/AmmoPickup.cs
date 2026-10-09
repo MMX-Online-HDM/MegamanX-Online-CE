@@ -7,7 +7,7 @@ public abstract class BaselineAmmoPickup : Pickup {
 		bool sendRpc = false, bool teamOnly = false, bool spawnUp = false, bool isRushPickup = false
 	) : base(
 		owner, pos, sprite, netId, ownedByLocalPlayer,
-		cActorId, sendRpc: sendRpc, teamOnly: teamOnly, spawnUp: spawnUp, isRushPickup: isRushPickup
+		cActorId, sendRpc: sendRpc, teamOnly: teamOnly, spawnUp: spawnUp
 	) {
 		pickupType = PickupType.Ammo;
 		healAmount = 50;
@@ -15,13 +15,28 @@ public abstract class BaselineAmmoPickup : Pickup {
 		syncOnLateJoin = true;
 	}
 
-	public override bool canUse(int alliance, Character chr) {
-		return base.canUse(alliance, chr) && chr.canAddAmmo();
+	public override bool canUse(int alliance, Actor actor) {
+		if (!base.canUse(alliance, actor)) {
+			return false;
+		}
+		if (actor is Character chara && chara.canAddAmmo()) {
+			return true;
+		}
+		if (actor is Maverick mvk && mvk.ammo < mvk.maxAmmo) {
+			return true;
+		}
+		return false;
 	}
 
-	public override void use(Character chr) {
-		chr.addPercentAmmo(healAmount);
-		base.use(chr);
+	public override void use(Actor actor) {
+		if (actor is Character chara) {
+			chara.addPercentAmmo(healAmount);
+		} else if (actor is Maverick maverick) {
+			maverick.addAmmo(altHealAmount);
+		} else {
+			return;
+		}
+		base.use(actor);
 	}
 }
 
@@ -31,7 +46,7 @@ public class LargeAmmoPickup : BaselineAmmoPickup {
 		bool sendRpc = false, bool teamOnly = false, bool isRushPickup = false
 	) : base(
 		owner, pos, "pickup_ammo_large", netId, ownedByLocalPlayer, 
-		CActorIds.LargeAmmoPickup, sendRpc: sendRpc, teamOnly: teamOnly, isRushPickup: isRushPickup
+		CActorIds.LargeAmmoPickup, sendRpc: sendRpc, teamOnly: teamOnly
 	) {
 		healAmount = 50;
 		altHealAmount = 8;
@@ -57,7 +72,7 @@ public class SmallAmmoPickup : BaselineAmmoPickup {
 		bool sendRpc = false, bool teamOnly = false, bool isRushPickup = false
 	) : base(
 		owner, pos, "pickup_ammo_small", netId, ownedByLocalPlayer, 
-		CActorIds.SmallAmmoPickup, sendRpc: sendRpc, teamOnly: teamOnly, isRushPickup: isRushPickup
+		CActorIds.SmallAmmoPickup, sendRpc: sendRpc, teamOnly: teamOnly
 	) {
 		healAmount = 25;
 		altHealAmount = 4;

@@ -1498,7 +1498,7 @@ public class RPCHeal : RPC {
 		IDamagable? damagable = actor as IDamagable;
 		if (damagable != null) {
 			if (actor.ownedByLocalPlayer) {
-				damagable.heal(player, healAmount, allowStacking: true, drawHealText: true);
+				damagable.heal(player, healAmount);
 			}
 		}
 	}

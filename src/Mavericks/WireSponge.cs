@@ -541,7 +541,7 @@ public class WSpongeSideChainState : WSpongeMState {
 		}
 	}
 
-	public new float getJumpModifier() {
+	public float getJumpModifier() {
 		if (jumpFramesHeld == 1) return 1f;
 		if (jumpFramesHeld == 2) return 1f;
 		if (jumpFramesHeld == 3) return 1.01f;
@@ -563,8 +563,8 @@ public class WSpongeSideChainState : WSpongeMState {
 }
 
 public class WSpongeClingState : MaverickState {
-	new int jumpFramesHeld;
-	new int maxJumpFrames = 1;
+	int jumpFramesHeld;
+	int maxJumpFrames = 1;
 	bool jumpedOnce;
 	public WSpongeClingState() : base("cling") {
 	}
@@ -617,7 +617,7 @@ public class WSpongeClingState : MaverickState {
 		maverick.useGravity = true;
 	}
 
-	public new float getJumpModifier() {
+	public float getJumpModifier() {
 		if (jumpFramesHeld == 1) return 1f;
 		if (jumpFramesHeld == 2) return 1f;
 		if (jumpFramesHeld == 3) return 1.01f;
@@ -1034,22 +1034,10 @@ public class WSpongeSpike : Projectile, IDamagable {
 		return damagerAlliance != owner.alliance;
 	}
 
-	public bool canBeHealed(int healerAlliance) {
-		return false;
-	}
-
-	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
-	}
-
-	public bool isInvincible(Player attacker, int? projId) {
-		return false;
-	}
-
 	public override void onDestroy() {
 		base.onDestroy();
 		owner.seeds.Remove(this);
 	}
-	public bool isPlayableDamagable() { return false; }
 }
 public class WSpongeMState : MaverickState {
 	public WireSponge wireHetimarl = null!;
