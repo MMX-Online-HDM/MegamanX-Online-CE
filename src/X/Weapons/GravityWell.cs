@@ -390,9 +390,8 @@ public class GravityWellProjCharged : Projectile, IDamagable {
 	}
 }
 
-public class GravityWellChargedState : CharState {
+public class GravityWellChargedState : XState {
 	bool fired = false;
-	MegamanX mmx = null!;
 
 	public GravityWellChargedState() : base("point_up") {
 		superArmor = true;
@@ -421,7 +420,6 @@ public class GravityWellChargedState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		mmx = character as MegamanX ?? throw new NullReferenceException();
 		character.useGravity = false;
 		character.vel = new Point();
 		if (!character.grounded) {

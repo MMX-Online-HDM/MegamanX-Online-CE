@@ -1030,6 +1030,8 @@ class Program {
 		Sprite.xSaberBitmap[0] = Global.textures["MaxSaber"];
 		Sprite.xSaberBitmap[1] = Global.textures["MaxSaberFront"];
 
+		// Unload the placeholder and load the main texture.
+		Sprite.axlArmBitmap.Dispose();
 		Sprite.axlArmBitmap = Global.textures["axlArm"];
 	}
 

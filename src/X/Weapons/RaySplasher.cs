@@ -370,9 +370,9 @@ public class RaySplasherTurretProj : Projectile {
 }
 
 
-public class RaySplasherChargedState : CharState {
-	MegamanX mmx = null!;
+public class RaySplasherChargedState : XState {
 	bool fired = false;
+
 	public RaySplasherChargedState() : base("point_up") {
 		superArmor = true;
 		landSprite = "point_up";
@@ -405,7 +405,6 @@ public class RaySplasherChargedState : CharState {
 		base.onEnter(oldState);
 		character.useGravity = false;
 		character.vel = new Point();
-		mmx = character as MegamanX ?? throw new NullReferenceException();
 		if (!character.grounded) {
 			sprite = airSprite;
 			character.changeSpriteFromName(sprite, true);

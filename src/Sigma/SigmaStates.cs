@@ -1,4 +1,23 @@
-﻿namespace MMXOnline;
+﻿using System;
+
+namespace MMXOnline;
+
+public class BaseSigmaState : CharState {
+	public BaseSigma sigma = null!;
+
+	public BaseSigmaState(
+		string sprite, string shootSprite = "", string attackSprite = "",
+		string transitionSprite = "", string transShootSprite = ""
+	) : base(
+		sprite, shootSprite, attackSprite, transitionSprite, transShootSprite
+	) {
+	}
+
+	public override void onEnter(CharState oldState) {
+		sigma = character as BaseSigma ?? throw new NullReferenceException();
+	}
+}
+
 
 public class IssueGlobalCommand : CharState {
 	public bool isAutoGuarding;

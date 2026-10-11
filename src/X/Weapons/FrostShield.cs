@@ -226,6 +226,7 @@ public class FrostShieldProjGround : Projectile, IDamagable {
 
 public class FrostShieldProjCharged : Projectile {
 	public Character? character;
+
 	public FrostShieldProjCharged(
 		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(

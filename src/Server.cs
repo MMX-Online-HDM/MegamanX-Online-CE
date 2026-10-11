@@ -458,9 +458,11 @@ public class Server {
 				detailedInfoMsg.Write(jsonString);
 
 				// Then Send all of these in a row.
-				s_server.SendUnconnectedMessage(basicInfoMsg, masterServerLocation);
-				s_server.SendUnconnectedMessage(listInfoMsg, masterServerLocation);
-				s_server.SendUnconnectedMessage(detailedInfoMsg, masterServerLocation);
+				if (masterServerLocation != null) {
+					s_server.SendUnconnectedMessage(basicInfoMsg, masterServerLocation);
+					s_server.SendUnconnectedMessage(listInfoMsg, masterServerLocation);
+					s_server.SendUnconnectedMessage(detailedInfoMsg, masterServerLocation);
+				}
 			}
 		} catch (Exception ex) {
 			if (Global.debug) {

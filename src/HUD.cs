@@ -136,7 +136,6 @@ public class HUD {
 		}
 	}
 
-	
 	public void renderHealthAndWeapons() {
 		bool is1v1OrTraining = level.is1v1() || level.levelData.isTraining();
 		if (!is1v1OrTraining) {

@@ -39,9 +39,8 @@ public class XSaberProj : Projectile {
 	}
 }
 
-public class XMaxWaveSaberState : CharState {
+public class XMaxWaveSaberState : XState {
 	bool fired;
-	MegamanX mmx = null!;
 
 	public XMaxWaveSaberState() : base("beam_saber") {
 		landSprite = "beam_saber";
@@ -68,7 +67,6 @@ public class XMaxWaveSaberState : CharState {
 		}
 	}
 	public override void onEnter(CharState oldState) {
-		mmx = player.character as MegamanX ?? throw new NullReferenceException();
 		base.onEnter(oldState);
 		if (!character.grounded) {
 			sprite = airSprite;

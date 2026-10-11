@@ -424,34 +424,25 @@ public class Input {
 		);
 	}
 
-	public bool isAimingBackwards(Player player) {
-		if (player.character is not Axl axl) {
-			return false;
-		}
+	public bool isAimingBackwards(Axl axl) {
 		if (axl.aimBackwardsToggle == true) {
 			return true;
 		}
-		return Options.main.aimKeyFunction == 0 && isHeld(Control.AxlAimBackwards, player);
+		return Options.main.aimKeyFunction == 0 && isHeld(Control.AxlAimBackwards, axl.player);
 	}
 
-	public bool isPositionLocked(Player player) {
-		if (player.character is not Axl axl) {
-			return false;
-		}
+	public bool isPositionLocked(Axl axl) {
 		if (axl.positionLockToggle == true) {
 			return true;
 		}
-		return Options.main.aimKeyFunction == 1 && isHeld(Control.AxlAimBackwards, player);
+		return Options.main.aimKeyFunction == 1 && isHeld(Control.AxlAimBackwards, axl.player);
 	}
 
-	public bool isCursorLocked(Player player) {
-		if (player.character is not Axl axl) {
-			return false;
-		}
+	public bool isCursorLocked(Axl axl) {
 		if (axl.cursorLockToggle == true) {
 			return true;
 		}
-		return Options.main.aimKeyFunction == 2 && isHeld(Control.AxlAimBackwards, player);
+		return Options.main.aimKeyFunction == 2 && isHeld(Control.AxlAimBackwards, axl.player);
 	}
 
 	public void updateAimToggle(Player player) {

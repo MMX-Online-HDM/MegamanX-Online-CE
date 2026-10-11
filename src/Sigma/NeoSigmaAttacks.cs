@@ -11,11 +11,26 @@ public class SigmaClawWeapon : Weapon {
 	}
 }
 
-public class SigmaClawState : CharState {
+public class NeoSigmaState : CharState {
+	public NeoSigma sigma = null!;
+
+	public NeoSigmaState(
+		string sprite, string shootSprite = "", string attackSprite = "",
+		string transitionSprite = "", string transShootSprite = ""
+	) : base(
+		sprite, shootSprite, attackSprite, transitionSprite, transShootSprite
+	) {
+	}
+
+	public override void onEnter(CharState oldState) {
+		sigma = character as NeoSigma ?? throw new NullReferenceException();
+	}
+}
+
+public class SigmaClawState : NeoSigmaState {
 	CharState prevCharState;
 	float slideVel;
 	bool isAir;
-	public NeoSigma neoSigma = null!;
 
 	public SigmaClawState(CharState prevCharState, bool isAir) : base("attack") {
 		this.prevCharState = prevCharState;
@@ -61,7 +76,7 @@ public class SigmaClawState : CharState {
 			once = true;
 			sprite = "attack2";
 			defaultSprite = sprite;
-			neoSigma.normalAttackCooldown = neoSigma.sigmaSaberMaxCooldown;
+			sigma.normalAttackCooldown = sigma.sigmaSaberMaxCooldown;
 			character.changeSpriteFromName(sprite, true);
 			character.playSound("sigma2slash", sendRpc: true);
 			return;
@@ -74,7 +89,6 @@ public class SigmaClawState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		neoSigma = character as NeoSigma ?? throw new NullReferenceException();
 		if (oldState is Dash) {
 			slideVel = character.xDir * character.getDashSpeed();
 		}
@@ -128,9 +142,9 @@ public class SigmaElectricBallProj : Projectile {
 	}
 }
 
-public class SigmaElectricBallState : CharState {
+public class SigmaElectricBallState : NeoSigmaState {
 	bool fired;
-	public NeoSigma neoSigma = null!;
+
 	public SigmaElectricBallState() : base("shoot") {
 		enterSound = "sigma2shoot";
 		invincible = true;
@@ -145,7 +159,7 @@ public class SigmaElectricBallState : CharState {
 			Point pos = character.pos.addxy(0, -20);
 			for (int i = 256; i >= 128; i -= 32) {
 				new SigmaElectricBallProj(
-					pos, 1, i, neoSigma, player, 
+					pos, 1, i, sigma, player, 
 					player.getNextActorNetId(), rpc: true
 				);
 			}
@@ -157,7 +171,6 @@ public class SigmaElectricBallState : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.clenaseDmgDebuffs();
-		neoSigma = character as NeoSigma ?? throw new NullReferenceException();
 	}
 }
 
@@ -206,10 +219,9 @@ public class SigmaElectricBall2Proj : Projectile {
 		);
 	}
 }
-public class SigmaElectricBall2StateEX : CharState {
+public class SigmaElectricBall2StateEX : NeoSigmaState {
 	public bool fired, soundFired;
 	public SigmaElectricBall2Proj? SigmaBalls;
-	public NeoSigma neoSigma = null!;
 	public SigmaElectricBall2StateEX() : base("shoot2") {
 		invincible = true;
 	}
@@ -225,7 +237,7 @@ public class SigmaElectricBall2StateEX : CharState {
 		if (character.frameIndex >= 17 && !fired) {
 			fired = true;
 			SigmaBalls = new SigmaElectricBall2Proj(
-				shootPos, character.xDir, neoSigma, player, player.getNextActorNetId(), rpc: true
+				shootPos, character.xDir, sigma, player, player.getNextActorNetId(), rpc: true
 			);
 		}
 
@@ -237,7 +249,6 @@ public class SigmaElectricBall2StateEX : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.clenaseAllDebuffs();
-		neoSigma = character as NeoSigma ?? throw new NullReferenceException();
 	}
 }
 
@@ -332,7 +343,6 @@ public class SigmaUpDownSlashState : CharState {
 	}
 }
 public class Sigma2DashSlashState : CharState {
-	public NeoSigma neoSigma = null!;
 	public Sigma2DashSlashState() : base("attack_dash") {
 		enterSound = "sigma2slash";
 	}

@@ -372,9 +372,8 @@ public class RPCHealDoppler : RPC {
 		float damage = BitConverter.ToSingle(new byte[] { arguments[2], arguments[3], arguments[4], arguments[5] }, 0);
 		int attackerPlayerId = arguments[6];
 
-		var player = Global.level.getPlayerById(attackerPlayerId);
-		var drDoppler = Global.level.getActorByNetId(netId) as DrDoppler;
-		if (drDoppler != null) {
+		Player? player = Global.level.getPlayerByIdSafe(attackerPlayerId);
+		if (Global.level.getActorByNetId(netId) is DrDoppler drDoppler) {
 			drDoppler.healDrDoppler(player, damage);
 		}
 	}

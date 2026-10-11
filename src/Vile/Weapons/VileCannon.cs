@@ -442,7 +442,7 @@ public class VileCannon : Weapon {
 
 public class CannonAttack : CharState {
 	bool isGizmo;
-	public Vile vile = null!;
+	public Vile vile = null;
 	public CannonAttack(bool isGizmo, bool grounded) : base(getSprite(isGizmo, grounded)) {
 		useDashJumpSpeed = true;
 		this.isGizmo = isGizmo;

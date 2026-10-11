@@ -2952,12 +2952,13 @@ public partial class Character : Actor, IDamagable {
 			if (!Damager.isDot(projId)) {
 				player.delaySubtank();
 				enterCombat();
-			}
-			if (actor is Projectile proj && proj.ownerActor != null) {
 
-			}
-			else if (player.character != null) {
-
+				// This is mostly for offline stuff.
+				attacker.delaySubtank();
+				if (actor is Projectile proj && proj.ownerActor is Character enemyChar) {
+					enemyChar.enterCombat();
+					enemyChar.player.delaySubtank();
+				}
 			}
 		}
 		if (originalHP > 0 && (originalDamage > 0 || damage > 0)) {

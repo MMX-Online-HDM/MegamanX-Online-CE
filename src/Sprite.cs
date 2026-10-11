@@ -19,7 +19,7 @@ public class Sprite {
 	public static Texture[] xArmorHelmetBitmap = new Texture[4];
 	public static Texture[] xArmorArmBitmap = new Texture[4];
 	public static Texture[] xSaberBitmap = new Texture[2];
-	public static Texture axlArmBitmap = null!;
+	public static Texture axlArmBitmap = new Texture((32, 32));
 
 	public float time;
 	public int frameIndex;

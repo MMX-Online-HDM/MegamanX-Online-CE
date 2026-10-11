@@ -447,7 +447,7 @@ public class HyperPunchyZeroStart : PZeroState {
 	public float radius = 200;
 	public float time;
 	Anim? virusEffectParts;
-	Anim[] virusAnim = new Anim[3];
+	Anim?[] virusAnim = new Anim?[3];
 	float[] delayedVirusTimer = { 0, 7, 14 };
 	string virusAnimName = "";
 
@@ -461,23 +461,23 @@ public class HyperPunchyZeroStart : PZeroState {
 		if (virusAnimName != "") {
 			int animCount = 0;
 			for (int i = 0; i < virusAnim.Length; i++) {
-				if (virusAnim[i] != null) {
-					if (virusAnim[i].pos == character.getCenterPos()) {
-						virusAnim[i].destroySelf();
+				if (virusAnim[i] is Anim anim) {
+					if (anim.pos == character.getCenterPos()) {
+						anim.destroySelf();
 					}
-					if (virusAnim[i].destroyed) {
+					if (anim.destroyed) {
 						character.playSound("shingetsurinx5", true);
 						if (stateFrames > 55) {
-							virusAnim[i] = null!;
+							virusAnim[i] = null;
 							continue;
 						}
-						virusAnim[i] = virusAnim[i] = createVirusAnim();
+						anim = createVirusAnim();
 					} else {
 						animCount++;
 					}
-					virusAnim[i].moveToPos(character.getCenterPos(), 300);
-					if (virusAnim[i].pos.distanceTo(character.getCenterPos()) < 10) {
-						virusAnim[i].destroySelf();
+					anim.moveToPos(character.getCenterPos(), 300);
+					if (anim.pos.distanceTo(character.getCenterPos()) < 10) {
+						anim.destroySelf();
 					}
 				} else if (delayedVirusTimer[i] > 0) {
 					delayedVirusTimer[i] -= Global.speedMul;

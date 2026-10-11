@@ -613,7 +613,7 @@ public class Axl : Character {
 	}
 
 	public void updateAxlDirectionalAim() {
-		if (player.input.isCursorLocked(player)) {
+		if (player.input.isCursorLocked(this)) {
 			Point worldCursorPos = pos.add(lastDirToCursor);
 			axlCursorPos = worldCursorPos.addxy(-Global.level.camX, -Global.level.camY);
 			lockOn(out _);
@@ -651,7 +651,7 @@ public class Axl : Character {
 			}
 		}
 
-		aimingBackwards = player.input.isAimingBackwards(player);
+		aimingBackwards = player.input.isAimingBackwards(this);
 
 		int aimBackwardsMod = 1;
 		if (aimingBackwards && charState is not LadderClimb) {
@@ -754,7 +754,7 @@ public class Axl : Character {
 		//This sht was bugging assassin time, i was like +2 hours trying to see whats wrong with it
 		//if (player.isDisguisedAxl && !player.isAxl && currentWeapon is not AssassinBulletChar) return;
 		if (player.isDisguisedAxl && axlWeapon is UndisguiseWeapon) return;
-		if (player.input.isCursorLocked(player)) return;
+		if (player.input.isCursorLocked(this)) return;
 
 		axlCursorTarget = getLockOnTarget();
 
@@ -1052,12 +1052,12 @@ public class Axl : Character {
 
 		if (player.isMainPlayer && !player.isDead) {
 			if (Options.main.aimKeyToggle) {
-				if (player.input.isAimingBackwards(player)) {
+				if (player.input.isAimingBackwards(this)) {
 					Global.sprites["hud_axl_aim"].draw(
 						0, pos.x, pos.y + currentLabelY, xDir, 1, null, 1, 1, 1, ZIndex.HUD
 					);
 					deductLabelY(labelAxlAimModeIconOffY);
-				} else if (player.input.isPositionLocked(player)) {
+				} else if (player.input.isPositionLocked(this)) {
 					Global.sprites["hud_axl_aim"].draw(
 						1, pos.x, pos.y + currentLabelY, 1, 1, null, 1, 1, 1, ZIndex.HUD
 					);
@@ -1102,7 +1102,7 @@ public class Axl : Character {
 			}
 		}
 		if (!Options.main.useMouseAim) {
-			if (axlWeapon != null && (currentWeapon is AssassinBulletChar || player.input.isCursorLocked(player))) {
+			if (axlWeapon != null && (currentWeapon is AssassinBulletChar || player.input.isCursorLocked(this))) {
 				Point bulletPos = getAxlBulletPos();
 				float radius = 120;
 				float ang = getShootAngle();
@@ -1763,7 +1763,7 @@ public class Axl : Character {
 
 	
 	public bool isAimLocked() {
-		if (player.input.isPositionLocked(player) && Options.main.axlAimMode == 0) {
+		if (player.input.isPositionLocked(this) && Options.main.axlAimMode == 0) {
 			return true;
 		}
 		if (Options.main.axlAimMode == 0 && !Options.main.moveInDiagAim && !isDashing &&

@@ -310,6 +310,9 @@ public partial class Actor : GameObject {
 		lastNetUpdate = Global.time;
 
 		if (netId != null) {
+			if (Global.level.destroyedActorsById.ContainsKey(netId.Value)) {
+				Global.level.destroyedActorsById.Remove(netId.Value);
+			}
 			Global.level.actorsById[netId.Value] = this;
 		}
 

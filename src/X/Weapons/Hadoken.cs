@@ -2,10 +2,12 @@
 namespace MMXOnline;
 
 public class HadoukenWeapon : Weapon {
-	public static HadoukenWeapon netWeapon = new(null!);
+	public static HadoukenWeapon netWeapon = new HadoukenWeapon(null);
 
-	public HadoukenWeapon(Player player) : base() {
-		damager = new Damager(player, Damager.ohkoDamage, Global.defFlinch, 0.5f);
+	public HadoukenWeapon(Player? player) : base() {
+		if (player != null) {
+			damager = new Damager(player, Damager.ohkoDamage, Global.defFlinch, 0.5f);
+		}
 		ammo = 0;
 		index = (int)WeaponIds.Hadouken;
 		weaponBarBaseIndex = 19;
@@ -43,9 +45,8 @@ public class HadoukenProj : Projectile {
 	}
 }
 
-public class Hadouken : CharState {
+public class Hadouken : XState {
 	bool fired = false;
-	public MegamanX mmx = null!;
 
 	public Hadouken() : base("hadouken") {
 		superArmor = true;
@@ -72,7 +73,6 @@ public class Hadouken : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		mmx = character as MegamanX ?? throw new NullReferenceException();
 		character.stopCharge();
 	}
 

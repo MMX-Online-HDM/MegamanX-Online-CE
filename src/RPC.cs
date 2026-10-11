@@ -1847,8 +1847,8 @@ public class RPCCreditPlayerKillVehicle : RPC {
 		int? weaponIndex = null;
 		if (arguments.Length >= 5) weaponIndex = arguments[4];
 
-		Player killer = Global.level.getPlayerById(killerId);
-		Player assister = Global.level.getPlayerById(assisterId);
+		Player? killer = Global.level.getPlayerById(killerId);
+		Player? assister = Global.level.getPlayerById(assisterId);
 		Actor? victim = Global.level.getActorByNetId(victimNetId, true);
 
 		if (victim is RideArmor ra) {
@@ -1921,7 +1921,7 @@ public class RPCCheckRAEnter : RPC {
 		int neutralId = arguments[3];
 		int raNum = arguments[4];
 
-		Player player = Global.level.getPlayerById(playerId);
+		Player? player = Global.level.getPlayerById(playerId);
 		if (player == null) {
 			return;
 		}
@@ -1991,8 +1991,10 @@ public class RPCCheckRCEnter : RPC {
 		ushort rcNetId = BitConverter.ToUInt16(new byte[] { arguments[1], arguments[2] }, 0);
 		int neutralId = arguments[3];
 
-		Player player = Global.level.getPlayerById(playerId);
-		if (player == null) return;
+		Player? player = Global.level.getPlayerById(playerId);
+		if (player == null) {
+			return;
+		}
 		RideChaser? rc = Global.level.getActorByNetId(rcNetId) as RideChaser;
 		if (rc == null) {
 			return;
@@ -2019,9 +2021,10 @@ public class RPCRCEnter : RPC {
 	public override void invoke(params byte[] arguments) {
 		int playerId = arguments[0];
 
-		Player player = Global.level.getPlayerById(playerId);
-		if (player == null) return;
-
+		Player? player = Global.level.getPlayerById(playerId);
+		if (player == null) {
+			return;
+		}
 		ushort oldRcNetId = BitConverter.ToUInt16(new byte[] { arguments[1], arguments[2] }, 0);
 		int neutralId = arguments[3];
 

@@ -30,7 +30,7 @@ public static class Extensions {
 
 	public static T PopFirst<T>(this List<T> list) {
 		if (list.Count == 0) {
-			return default(T);
+			return default(T)!;
 		}
 		T item = list[0];
 		list.RemoveAt(0);
@@ -39,7 +39,7 @@ public static class Extensions {
 
 	public static T Pop<T>(this List<T> list) {
 		if (list.Count == 0) {
-			return default(T);
+			return default(T)!;
 		}
 		T item = list[list.Count - 1];
 		list.RemoveAt(list.Count - 1);

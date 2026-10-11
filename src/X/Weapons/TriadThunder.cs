@@ -373,10 +373,9 @@ public class TriadThunderQuake : Projectile {
 	}
 }
 
-public class TriadThunderChargedState : CharState {
+public class TriadThunderChargedState : XState {
 	bool fired = false;
 	bool groundedOnce;
-	public MegamanX mmx = null!;
 	public TriadThunderChargedState(bool grounded) : base(!grounded ? "fall" : "punch_ground") {
 		superArmor = true;
 	}
@@ -414,7 +413,8 @@ public class TriadThunderChargedState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		mmx = character as MegamanX ?? throw new NullReferenceException();
-		if (character.vel.y < 0) character.vel.y = 0;
+		if (character.vel.y < 0) {
+			character.vel.y *= 0.125f;
+		}
 	}
 }
