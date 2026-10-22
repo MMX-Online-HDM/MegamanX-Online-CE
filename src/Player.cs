@@ -34,7 +34,8 @@ public partial class Player {
 	public SpawnPoint? firstSpawn;
 	public Input input;
 	public Character? character;
-	public Character lastCharacter;
+	public Character? lastCharacter;
+	public IHudDrawable? lastHudChar;
 	public bool ownedByLocalPlayer;
 	public float hadoukenAmmo = 1920;
 	public float shoryukenAmmo = 1920;
@@ -2901,6 +2902,13 @@ public partial class Player {
 			index = 0;
 		}
 		return index;
+	}
+
+	public IHudDrawable? getHudTarget() {
+		if (lastCharacter != null) {
+			return lastCharacter;
+		}
+		return null;
 	}
 }
 

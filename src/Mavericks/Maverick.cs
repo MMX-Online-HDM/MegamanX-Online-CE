@@ -104,19 +104,18 @@ public class Maverick : Actor, IDamagable {
 	public const float maxWidth = 26;
 	public MaverickState state;
 	public Player player;
-	public bool changedStateInFrame;
 	public Dictionary<Type, MaverickStateCooldown> stateCooldowns = new();
 	public bool autoExit;
 	public float autoExitTime;
 	public float strikerTime;
 	public float? maxStrikerTime;
 	public int attackDir;
-	public SubTank usedSubtank;
+	public SubTank? usedSubtank;
 	public float netSubtankHealAmount;
 	public float invulnTime = 0;
 
 	public MaverickAIBehavior aiBehavior;
-	public Actor target;
+	public Actor? target;
 	public float subtractTargetDistance = 0;
 	public float aiCooldown;
 	public float maxAICooldown = 75;
@@ -132,11 +131,12 @@ public class Maverick : Actor, IDamagable {
 	public Sprite subtankBarSprite = new Sprite("menu_subtank_bar");
 	public Sprite cursorSprite = new Sprite("cursorchar");
 
+	// Input stuff.
 	private Input _input;
 	public Input input {
 		get {
 			if (aiBehavior == MaverickAIBehavior.Control &&
-				!isPuppeteerTooFar() && maverickCanControl()
+				maverickCanControl() && !isPuppeteerTooFar()
 			) {
 				return player.input;
 			}
@@ -489,7 +489,7 @@ public class Maverick : Actor, IDamagable {
 			applyDamage(Damager.envKillDamage, player, this, null, null);
 		}
 
-		if (autoExit) {
+		if (autoExit && maxStrikerTime == null) {
 			autoExitTime += speedMul;
 			if (autoExitTime > 10 && state is not MExit) {
 				changeState(new MExit(pos, true));
@@ -993,8 +993,6 @@ public class Maverick : Actor, IDamagable {
 		if (newStateCooldown != null && !ignoreCooldown) {
 			if (newStateCooldown.cooldown > 0) return;
 		}
-
-		changedStateInFrame = true;
 		newState.maverick = this;
 
 		if (Global.sprites.ContainsKey($"{getMaverickPrefix()}_{newState.sprite}")) {
@@ -1506,7 +1504,7 @@ public class Maverick : Actor, IDamagable {
 			return 1;
 		}
 		float runSpeed = 1;
-		if (slowdownTime > 0) runSpeed *= 0.5f;
+		if (slowdownTime > 0) runSpeed *= 0.375f;
 		if (freezeSlowTime >= 180) runSpeed *= 0.25f;
 		else if (freezeSlowTime >= 120) runSpeed *= 0.75f;
 		else if (freezeSlowTime >= 60) runSpeed *= 0.5f;
@@ -1515,7 +1513,26 @@ public class Maverick : Actor, IDamagable {
 	}
 
 	public virtual float getJumpPower() {
-		return Physics.JumpSpeed;
+		return Physics.JumpSpeed * getJumpModifier();
+	}
+
+	public virtual float getJumpModifier() {
+		float jp = 1;
+
+		if (slowdownTime > 0) {
+			jp *= 0.625f;
+		}
+		jp *= freezeSlowTime switch {
+			>180 => 0.5f,
+			120 => 0.66666f,
+			60 => 0.83333f,
+			_ => 1,
+		};
+		// Skip square root if 1 or <0.
+		if (jp == 1 || jp <= 0) {
+			return gravitySign();;
+		}
+		return MathF.Sqrt(jp) * gravitySign();
 	}
 
 	public bool canDash() {
@@ -1673,6 +1690,52 @@ public class Maverick : Actor, IDamagable {
 		}
 	}
 
+	// Hud stuff.
+	public virtual void rednerHud(Point offset, HUDHealthPosition position) {
+		renderLifebar(offset, position);
+		renderAmmo(offset, position);
+	}
+	
+	public virtual void renderLifebar(Point offset, HUDHealthPosition position) {
+		Point hpPos = GameMode.getHUDHealthPosition(position, true) + offset;
+		(string healthBaseSprite, int baseSpriteIndex) = getBaseHpSprite();
+		(string healthTopSprite, int baseTopIndex) = getTopHpSprite();
+
+		HudDraw.renderLifebar(
+			hpPos, position, alive,
+			(decimal)health, (decimal)maxHealth,
+			0, 0,
+			healthBaseSprite, baseSpriteIndex,
+			healthTopSprite, baseTopIndex
+		);
+	}
+
+	public virtual (string, int) getBaseHpSprite() => ("hud_health_base", 0);
+	public virtual (string, int) getTopHpSprite() => ("hud_health_top", 0);
+
+	public virtual void renderAmmo(Point offset, HUDHealthPosition position) {
+		Point ammoPosition = GameMode.getHUDHealthPosition(position, false) + offset;
+		//HudDraw.renderAmmo(ammoPosition, position, currentWeapon);
+	}
+
+	public virtual Point renderMiniHUD(Point offset) {
+		// Values.
+		long zPos = ZIndex.HUD - 200 + player.id * 5;
+		// Actual render.
+		return HudDraw.renderMiniHUD(
+			offset, zPos,
+			health, maxHealth,
+			ammo, maxAmmo,
+			player.alliance
+		);
+	}
+
+	public virtual Point renderName(Point offset) {
+		long zPos = ZIndex.HUD - 200 + player.id * 5;
+		return HudDraw.renderName(offset, player.name, zPos);
+	}
+
+	// Drawing stuff.
 	public override List<ShaderWrapper>? getShaders() {
 		if (timeStopTime > timeStopThreshold) {
 			if (!Global.level.darkHoldProjs.Any(

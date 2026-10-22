@@ -16,7 +16,7 @@ public class SparkMandrill : Maverick {
 		player, pos, xDir, netId, ownedByLocalPlayer
 	) {
 		stateCooldowns = new() {
-			{ typeof(SparkMPunchState), new(60, true, true) },
+			{ typeof(SparkMPunchState), new(30, true, true) },
 			{ typeof(SparkMDashPunchState), new(45, false, true) },
 			{ typeof(MShoot), new(2 * 60, true, true) }
 		};
@@ -47,30 +47,33 @@ public class SparkMandrill : Maverick {
 
 	public override void update() {
 		base.update();
-
 		//rechargeAmmo(8);
 		subtractTargetDistance = 70;
-		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand) {
-				if (specialPressed()) {
-					//if (ammo >= 32)
-					{
-						changeState(getShootState());
-					}
-				} else if (input.isPressed(Control.Dash, player)) {
-					changeState(new SparkMDashPunchState());
-				} else if (shootPressed()) {
-					changeState(new SparkMPunchState());
-				}
-			} else if (state is MJump || state is MFall) {
-				if (input.isHeld(Control.Up, player)) {
-					var hit = Global.level.checkTerrainCollisionOnce(this, 0, -15);
-					if (vel.y < 0 && hit?.gameObject is Wall wall && !wall.topWall) {
-						changeState(new SparkMClimbState(hit.getHitPointSafe()));
-					}
-				}
+	}
+
+	public override bool attackCtrl() {
+		if (input.isPressed(Control.Dash, player)) {
+			changeState(new SparkMDashPunchState());
+			return true;
+		}
+		if (shootPressed()) {
+			changeState(new SparkMPunchState());
+			return true;
+		}
+		if (specialPressed() && grounded) {
+			//if (ammo >= 32) {
+				changeState(getShootState());
+				return true;
+			//}
+			//return false;
+		}
+		if (!grounded && input.isHeld(Control.Up, player)) {
+			CollideData? hit = Global.level.checkTerrainCollisionOnce(this, 0, -28);
+			if (vel.y < 0 && hit?.gameObject is Wall) {
+				changeState(new SparkMClimbState(hit.getHitPointSafe()));
 			}
 		}
+		return base.attackCtrl();
 	}
 
 	public override string getMaverickPrefix() {
@@ -185,12 +188,19 @@ public class SparkMPunchWeapon : Weapon {
 #region states
 public class SparkMPunchState : MaverickState {
 	public float dustTime;
+	public bool soundPlayed;
+
 	public SparkMPunchState() : base("punch") {
 	}
 
 	public override void update() {
 		base.update();
 		if (player == null) return;
+
+		if (maverick.frameIndex >= 1 && !soundPlayed) {
+			maverick.playSound("punch2", sendRpc: true);
+			soundPlayed = true;
+		}
 
 		if (maverick.isAnimOver()) {
 			maverick.changeState(new MIdle());
@@ -201,6 +211,7 @@ public class SparkMPunchState : MaverickState {
 public class SparkMDashPunchState : MaverickState {
 	public float dustTime;
 	public SparkMDashPunchState() : base("dash_punch") {
+		enterSound = "dash";
 	}
 
 	public override void update() {
@@ -208,12 +219,6 @@ public class SparkMDashPunchState : MaverickState {
 		if (player == null) return;
 
 		var move = new Point(250 * maverick.xDir, 0);
-
-		var hitGround = Global.level.checkTerrainCollisionOnce(maverick, move.x * Global.spf * 5, 20);
-		if (hitGround == null) {
-			maverick.changeState(new MIdle());
-			return;
-		}
 
 		var hitWall = Global.level.checkTerrainCollisionOnce(maverick, move.x * Global.spf * 2, -5);
 		if (hitWall?.isSideWallHit() == true) {
@@ -233,7 +238,13 @@ public class SparkMDashPunchState : MaverickState {
 		dustTime += Global.spf;
 		if (dustTime > 0.1) {
 			dustTime = 0;
-			new Anim(maverick.pos.addxy(0, -4), "dust", maverick.xDir, player.getNextActorNetId(), true, sendRpc: true);
+			if (maverick.grounded) {
+				new Anim(
+					maverick.pos.addxy(0, -4),
+					"dust", maverick.xDir, player.getNextActorNetId(),
+					true, sendRpc: true
+				);
+			}
 		}
 	}
 }
@@ -243,6 +254,7 @@ public class SparkMClimbState : MaverickState {
 	float climbSpeed = 100;
 	public SparkMClimbState(Point hitPoint) : base("climb") {
 		this.hitPoint = hitPoint;
+		attackCtrl = true;
 		aiAttackCtrl = true;
 		canBeCanceled = false;
 	}

@@ -831,7 +831,7 @@ public class Damager {
 				maverick.flinchCooldown[flinchKey] = 0;
 			}
 			// Weakness flinch.
-			if (weakness) {
+			if (newState == null && weakness && maverick.weaknessCooldown == 0) {
 				if (flinch <= 0) {
 					flinchCooldownTime = 45;
 					flinch = Global.miniFlinch;
@@ -842,9 +842,10 @@ public class Damager {
 				} else if (flinch < Global.defFlinch) {
 					flinch = Global.superFlinch;
 				}
+				maverick.weaknessCooldown = 60 * 3;
 			}
 			// Weakness states and flinch weakness.
-			if (newState != null && maverick.weaknessCooldown == 0) {
+			else if (newState != null && maverick.weaknessCooldown == 0) {
 				maverick.weaknessCooldown = 60 * 3;
 				flinch = 0;
 				if (maverick.ownedByLocalPlayer) {
@@ -869,15 +870,17 @@ public class Damager {
 			if (!weakness) {
 				// Flinch reduction.
 				if (flinch > 0) {
-					if (maverick.controlMode != MaverickModeId.TagTeam) {
+					if (maverick.controlMode != MaverickModeId.Puppeteer) {
 						flinch = 0;
 					}
 					// Large mavericks
 					if (maverick.armorClass == Maverick.ArmorClass.Heavy) {
 						if (flinch <= Global.miniFlinch) {
 							flinch = 0;
-						} else {
+						} else if (flinch <= Global.defFlinch) {
 							flinch = Global.miniFlinch;
+						} else {
+							flinch = Global.halfFlinch;
 						}
 					}
 					// Medium mavericks
@@ -886,8 +889,10 @@ public class Damager {
 							flinch = 0;
 						} else if (flinch <= Global.halfFlinch) {
 							flinch = Global.miniFlinch;
-						} else {
+						} else if (flinch <= Global.defFlinch) {
 							flinch = Global.halfFlinch;
+						} else {
+							flinch = Global.defFlinch;
 						}
 					}
 				}

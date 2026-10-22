@@ -188,11 +188,11 @@ public class MaverickState {
 			}
 		}
 		if (maverick.controlMode == MaverickModeId.Striker) {
-			if (!aiAttackCtrl && this is not MEnter && (newState is MIdle || newState is MFall)) {
-				maverick.aiCooldown = maverick.maxAICooldown;
+			if (this is not MEnter && !aiAttackCtrl && newState.aiAttackCtrl) {
+				maverick.aiCooldown = float.MaxValue / 2;
 				maverick.autoExit = true;
 			}
-		} else if (!newState.aiAttackCtrl) {
+		} else if (this is not MEnter && aiAttackCtrl && !newState.aiAttackCtrl) {
 			maverick.aiCooldown = maverick.maxAICooldown;
 		}
 		if (!useGravity) {
@@ -754,7 +754,7 @@ public class MJumpStart : MaverickState {
 			return 1;
 		}
 		float minHeight = 0.25f;
-		float maxHeight = 1.75f;
+		float maxHeight = 1.875f;
 		return MathF.Sqrt(minHeight + (maxHeight - minHeight) * (jumpFramesHeld / maxJumpFrames));
 	}
 
@@ -1366,6 +1366,7 @@ public class MWallKick : MaverickState {
 		this.kickDir = kickDir;
 		kickSpeed = kickDir * 150;
 		enterSound = "jump";
+		attackCtrl = true;
 		aiAttackCtrl = true;
 		canBeCanceled = false;
 	}

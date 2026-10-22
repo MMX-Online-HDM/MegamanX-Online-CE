@@ -153,11 +153,6 @@ public class GameMode {
 
 	public List<(Point pos, string sprite, int index)> navPoints = new();
 
-	public enum HUDHealthPosition {
-		Left,
-		Right,
-	}
-
 	public Point safeZonePoint {
 		get {
 			return level.spawnPoints[safeZoneSpawnIndex].pos;
@@ -917,7 +912,7 @@ public class GameMode {
 
 	public static Point getHUDBuffPosition(HUDHealthPosition position) {
 		int offset = 2;
-		if (position == GameMode.HUDHealthPosition.Right) {
+		if (position == HUDHealthPosition.Right) {
 			offset = -1;
 		}
 		return getHUDHealthPosition(position, true).addxy(offset, 9);

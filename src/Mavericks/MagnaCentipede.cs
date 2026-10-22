@@ -25,8 +25,8 @@ public class MagnaCentipede : Maverick {
 	) {
 		stateCooldowns = new() {
 			{ typeof(MagnaCShootState), new(30, true) },
-			{ typeof(MagnaCMagnetPullState), new(2 * 60, false, true) },
-			{ typeof(MagnaCDrainState), new(2 * 60, false, true) }
+			{ typeof(MagnaCMagnetPullState), new(60, false, true) },
+			{ typeof(MagnaCDrainState), new(60, false, true) }
 		};
 
 		weapon = getWeapon();
@@ -112,7 +112,7 @@ public class MagnaCentipede : Maverick {
 			}
 		}
 
-		if (state is MIdle or MRun or MLand) {
+		if (state.attackCtrl) {
 			shootHeldLastFrame = input.isHeld(Control.Shoot, player);
 			if (shootHeldLastFrame) {
 				shootHeldTime += Global.spf;
@@ -333,6 +333,7 @@ public class MagnaCShootState : MaverickState {
 public class MagnaCMagnetMineProj : Projectile {
 	public float spinAngle;
 	public Point originalOffset;
+
 	public MagnaCMagnetMineProj(
 		Weapon weapon, Point pos, Point originalOffset,
 		float spinAngle, Player player, ushort netProjId, bool rpc = false
@@ -344,6 +345,8 @@ public class MagnaCMagnetMineProj : Projectile {
 		setIndestructableProperties();
 		this.spinAngle = spinAngle;
 		this.originalOffset = originalOffset;
+		zIndex = ZIndex.Background + 100 + (int)spinAngle;
+		frameIndex = 5;
 
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
@@ -364,12 +367,12 @@ public class MagnaCMagnetMineParent : Actor {
 	public Actor? target;
 	public float range = 60;
 	public bool controlled;
-
 	public float stabTime;
 	public float stabInvert = 1;  //-1 to 1
 	public float stabInvertTime;
 	public bool isStabInverting;
 	public float stabInvertDest;
+
 	public MagnaCMagnetMineParent(
 		Point pos, MagnaCentipede maverick, bool ownedByLocalPlayer
 	) : base(
@@ -378,27 +381,30 @@ public class MagnaCMagnetMineParent : Actor {
 		this.maverick = maverick;
 		useGravity = false;
 		originOffset = pos.subtract(maverick.pos);
+		xDir = maverick.xDir;
 
-		var player = maverick.player;
-		pieces.Add(new MagnaCMagnetMineProj(
-			maverick.weapon, pos, new Point(-5 * maverick.xDir, -5), 0,
-			player, player.getNextActorNetId(), rpc: true));
-		pieces.Add(new MagnaCMagnetMineProj(
-			maverick.weapon, pos, new Point(0, 0), 90,
-			player, player.getNextActorNetId(), rpc: true));
-		pieces.Add(new MagnaCMagnetMineProj(
-			maverick.weapon, pos, new Point(5 * maverick.xDir, 5), 180,
-			player, player.getNextActorNetId(), rpc: true));
-		pieces.Add(new MagnaCMagnetMineProj(
-			maverick.weapon, pos, new Point(10 * maverick.xDir, 10), 270,
-			player, player.getNextActorNetId(), rpc: true)
-		);
+		netOwner = maverick.player;
+		Point[] offsets = [
+			new(10 * xDir, 10),
+			new Point(5 * xDir, 5),
+			new(0, 0),
+			new(-5 * xDir, -5)
+		];
+		int i = 0;
+		foreach (Point offset in offsets) {
+			var mine = new MagnaCMagnetMineProj(
+				maverick.weapon, pos + offset, offset, i * 90,
+				netOwner, netOwner.getNextActorNetId(), rpc: true
+			);
+			mine.xDir = -xDir;
+			pieces.Add(mine);
+			i++;
+		}
 	}
 
 	public void enableDamager(bool enable) {
 		/*
-		foreach (var piece in pieces)
-		{
+		foreach (var piece in pieces) {
 			piece.updateDamager(enable ? 4 : 0);
 		}
 		*/
@@ -437,7 +443,7 @@ public class MagnaCMagnetMineParent : Actor {
 			}
 		}
 
-		foreach (var piece in pieces) {
+		foreach (MagnaCMagnetMineProj piece in pieces) {
 			//piece.incPos(deltaPos);
 			float radiusInvert = radius * stabInvert;
 			float xOff = Helpers.cosd(piece.spinAngle) * radiusInvert;
@@ -526,7 +532,7 @@ public class MagnaCMagnetMineState : CentipedeMState {
 		if (!shotOnce && shootPos != null) {
 			shotOnce = true;
 			centipede.magnetMineParent = new MagnaCMagnetMineParent(
-				shootPos.Value, centipede, true
+				shootPos.Value.addxy(0, 36), centipede, true
 			);
 			sound = maverick.playSound("magnacMagnetMine", sendRpc: true);
 		}
