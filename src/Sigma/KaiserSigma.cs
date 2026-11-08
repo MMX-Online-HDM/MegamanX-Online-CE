@@ -5,7 +5,11 @@ using System.Linq;
 namespace MMXOnline;
 
 public partial class KaiserSigma : Character {
-	public bool isVirus => sprite.name.StartsWith("kaisersigma_virus");
+	public bool isVirus => (
+		sprite.name.StartsWith("kaisersigma_virus") ||
+		sprite.name.StartsWith("kaisersigma_ra")
+	);
+	public bool isVirusTest;
 	public bool kaiserWinTauntOnce;
 	public float kaiserMissileShootTime;
 	public Anim kaiserExhaustL;
@@ -75,12 +79,18 @@ public partial class KaiserSigma : Character {
 		altSoundId = AltSoundIds.X3;
 	}
 
-	public override CharState getIdleState() => new KaiserSigmaIdleState();
-	public override CharState getRunState(bool skipInto = false) => new KaiserSigmaWalkState();
-	public override CharState getJumpState() => new KaiserSigmaJumpState();
-	public override CharState getAirJumpState() => new KaiserSigmaJumpState();
-	public override CharState getFallState() => new KaiserSigmaFallState();
-	public override CharState getTauntState() => new KaiserSigmaTauntState();
+	public override CharState getIdleState() =>
+		isVirusTest ? new KaiserVirusState() : new KaiserSigmaIdleState();
+	public override CharState getRunState(bool skipInto = false) =>
+		isVirusTest ? new KaiserVirusState() : new KaiserSigmaWalkState();
+	public override CharState getJumpState() =>
+		isVirusTest ? new KaiserVirusState() : new KaiserSigmaJumpState();
+	public override CharState getAirJumpState() =>
+		isVirusTest ? new KaiserVirusState() : new KaiserSigmaJumpState();
+	public override CharState getFallState() =>
+		isVirusTest ? new KaiserVirusState() : new KaiserSigmaFallState();
+	public override CharState getTauntState() =>
+		isVirusTest ? new KaiserVirusState() : new KaiserSigmaTauntState();
 
 	public override int getMaxHealth() {
 		if (isATrans) {
@@ -129,6 +139,10 @@ public partial class KaiserSigma : Character {
 		if (weapons.Count > 0 && player.input.isHeld(Control.Down, player)) {
 			player.changeWeaponControls();
 		}
+
+		if (isVirusTest) {
+			checkLadderDown = true;
+		}
 	}
 
 	public override float getRunSpeed() {
@@ -154,7 +168,7 @@ public partial class KaiserSigma : Character {
 	}
 
 	public override Collider? getGlobalCollider() {
-		if (isVirus) {
+		if (isVirusTest) {
 			if (sprite.name == "kaisersigma_virus_return") {
 				return null;
 			}
@@ -166,13 +180,16 @@ public partial class KaiserSigma : Character {
 		}
 	}
 
-	public void changeToKaiserIdleOrFall() {
-		changeState(new KaiserSigmaIdleState(), true);
+	public override bool canEnterRideArmor() {
+		if (rideArmor != null || rideChaser != null) {
+			return false;
+		}
+		if (isVirusTest && deltaPos.y > 1.5f) {
+			return true;
+		}
+		return false;
 	}
 
-	public bool isKaiserSigmaGrounded() {
-		return charState is not KaiserSigmaHoverState && charState is not KaiserSigmaFallState;
-	}
 
 	public static bool canKaiserSpawn(Character character, out Point spawnPos) {
 		// Get ground snapping pos
@@ -235,7 +252,7 @@ public partial class KaiserSigma : Character {
 	}
 
 	public override float getLabelOffY() {
-		if (isVirus) {
+		if (isVirusTest) {
 			return 60;
 		}
 		return 125;
@@ -252,7 +269,7 @@ public partial class KaiserSigma : Character {
 			);
 		}
 
-		if (player.isMainPlayer && kaiserHoverTime > 0) {
+		if (player.isMainPlayer && !isVirusTest && kaiserHoverTime > 0) {
 			float healthPct = Helpers.clamp01((kaiserMaxHoverTime - kaiserHoverTime) / kaiserMaxHoverTime);
 			float sy = -70;
 			float sx = 0;
@@ -270,7 +287,7 @@ public partial class KaiserSigma : Character {
 	}
 
 	public override Point getAimCenterPos() {
-		if (isVirus) {
+		if (isVirusTest) {
 			return pos.addxy(13 * xDir, -95);
 		}
 		return getCenterPos();
@@ -408,7 +425,7 @@ public partial class KaiserSigma : Character {
 	public void ballisticAttackLogic() {
 		bool weaponL = player.input.isPressed(Control.WeaponLeft, player);
 		bool weaponR = player.input.isPressed(Control.WeaponRight, player);
-		if (player.input.isPressed(Control.Special1, player) && isKaiserSigmaGrounded()) {
+		if (player.input.isPressed(Control.Special1, player)) {
 			if (kaiserMissileShootTime == 0) {
 				kaiserMissileShootTime = 0.5f;
 				var posL = getFirstPOIOrDefault("missileL");
@@ -518,12 +535,18 @@ public partial class KaiserSigma : Character {
 	}
 
 	public override Collider? getTerrainCollider() {
+		if (isVirusTest) {
+			return base.getTerrainCollider();
+		}
 		return null;
 	}
 
-	public override Point getCamCenterPos(bool ignoreZoom = false) {
-		if (sprite.name.StartsWith("kaisersigma_virus")) {
-			return pos.addxy(camOffsetX, -12);
+	public override Point getCamCenterPos() {
+		if (rideArmor != null) {
+			return base.getCamCenterPos();
+		}
+		if (isVirusTest) {
+			return pos.round().addxy(camOffsetX, -12);
 		}
 		return pos.round().addxy(camOffsetX, -55);
 	}

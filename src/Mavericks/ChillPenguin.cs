@@ -41,44 +41,54 @@ public class ChillPenguin : Maverick {
 		armorClass = ArmorClass.Light;
 	}
 
-	public override void update() {
-		base.update();
-		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MTaunt && input.isHeld(Control.Taunt, player)) {
-				if (input.isPressed(Control.Down, player) || input.isPressed(Control.Up, player)) {
+	//public override void update() {
+		//base.update();
+		// Yeah... not much to do here.
+	//}
+
+	public override bool attackCtrl() {
+		if (state is MTaunt && input.isHeld(Control.Taunt, player)) {
+			if (input.isPressed(Control.Down, player) || input.isPressed(Control.Up, player)) {
+				//player.removeOwnedIceStatues();
+			} else if (input.isPressed(Control.Left, player) || input.isPressed(Control.Right, player)) {
+				if (player.iceStatues.Count <= 1) {
 					//player.removeOwnedIceStatues();
-				} else if (input.isPressed(Control.Left, player) || input.isPressed(Control.Right, player)) {
-					if (player.iceStatues.Count <= 1) {
-						//player.removeOwnedIceStatues();
+				} else {
+					var sortedStatues = player.iceStatues.OrderBy(ic => ic.pos.x).ToList();
+					var leftStatue = sortedStatues[0];
+					var rightStatue = sortedStatues[1];
+					if (input.isPressed(Control.Left, player)) {
+						leftStatue.destroySelf();
 					} else {
-						var sortedStatues = player.iceStatues.OrderBy(ic => ic.pos.x).ToList();
-						var leftStatue = sortedStatues[0];
-						var rightStatue = sortedStatues[1];
-						if (input.isPressed(Control.Left, player)) {
-							leftStatue.destroySelf();
-						} else {
-							rightStatue.destroySelf();
-						}
-					}
-				}
-			}
-			if (state is MIdle or MRun or MLand) {
-				if (shootPressed()) {
-					changeState(getShootState(false));
-				} else if (specialPressed()) {
-					changeState(new ChillPIceBlowState());
-				} else if (input.isPressed(Control.Dash, player)) {
-					changeState(new ChillPSlideState());
-				}
-			} else if (state is MJump || state is MFall) {
-				if (input.isHeld(Control.Special1, player)) {
-					var hit = Global.level.checkTerrainCollisionOnce(this, 0, -ChillPBlizzardState.switchSpriteHeight - 5);
-					if (vel.y < 0 && hit?.gameObject is Wall wall && !wall.topWall) {
-						changeState(new ChillPBlizzardState(false));
+						rightStatue.destroySelf();
 					}
 				}
 			}
 		}
+		if (!grounded) {
+			if (input.isHeld(Control.Special1, player)) {
+				CollideData? hit = Global.level.checkTerrainCollisionOnce(
+					this, 0, -ChillPBlizzardState.switchSpriteHeight - 10
+				);
+				if (vel.y < 0 && hit?.gameObject is Wall wall && !wall.topWall) {
+					changeState(new ChillPBlizzardState(false));
+					return true;
+				}
+			}
+		}
+		if (shootPressed()) {
+			changeState(getShootState(false));
+			return true;
+		}
+		if (specialPressed() && (grounded || !input.isHeld(Control.Up, player))) {
+			changeState(new ChillPIceBlowState());
+			return true;
+		}
+		if (input.isPressed(Control.Dash, player)) {
+			changeState(new ChillPSlideState());
+			return true;
+		}
+		return base.attackCtrl();
 	}
 
 	public override string getMaverickPrefix() {

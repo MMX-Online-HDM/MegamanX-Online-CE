@@ -75,11 +75,6 @@ public partial class Level {
 
 	public float gravity;
 	public bool camSetFirstTime;
-	public float camX;
-	public float camY;
-	float lastCameraXDelta;
-	float lastCameraXDeltaTimer;
-	public float zoomScale;
 	public long frameCount;
 	public int nonSkippedframeCount;
 	public float twoFrameCycle;
@@ -88,6 +83,7 @@ public partial class Level {
 	public float lerpCamTime = 0;
 	public GameMode gameMode;
 	public HUD hud;
+	public LevelCamera camera;
 	public float cellWidth;
 	public LevelData levelData;
 	public int mirrorX;
@@ -159,18 +155,18 @@ public partial class Level {
 		get { return _specPlayer; }
 		set {
 			if (_specPlayer == value) return;
-			Point? prevCamPos = _specPlayer?.character?.getCamCenterPos();
+			//Point? prevCamPos = _specPlayer?.character?.getCamCenterPos();
 			_specPlayer = value;
 			if (_specPlayer?.character != null) {
 				// Every time a spectate target is set, snap to their char position first
-				snapCamPos(_specPlayer.character.getCamCenterPos(), prevCamPos);
+				camera.changeCenter(_specPlayer.character.getCamCenterPos());
 			}
 		}
 	}
 	public Player camPlayer {
 		get {
 			if (mainPlayer.isSpectator || mainPlayer.altSpectator) {
-				if (!Global.level.players.Contains(specPlayer)) {
+				if (!players.Contains(specPlayer)) {
 					// Player left match: immediately get next spectate target, and if none, return null
 					specPlayer = getNextSpecPlayer(1);
 					if (specPlayer == null) return mainPlayer;
@@ -247,12 +243,6 @@ public partial class Level {
 	int powerplant2State = 0;   
 	float powerplant2DarkTime = -1;
 
-	// Camera.
-	public float camCenterX { get { return camX + Global.halfScreenW * Global.viewSize; } }
-	public float camCenterY { get { return camY + Global.halfScreenH * Global.viewSize; } }
-	public float shakeX;
-	public float shakeY;
-
 	// Netcode.
 	public List<PendingRPC> pendingPreUpdateRpcs = new();
 	public List<PendingRPC> pendingUpdateRpcs = new();
@@ -269,7 +259,6 @@ public partial class Level {
 
 	public Level(LevelData levelData, PlayerCharData playerData, ExtraCpuCharData extraCpuCharData, bool joinedLate) {
 		this.levelData = levelData;
-		zoomScale = 3;
 		gravity = Physics.Gravity;
 		frameCount = 0;
 		this.joinedLate = joinedLate;
@@ -304,6 +293,7 @@ public partial class Level {
 
 		updateLevelShaders();
 		hud = new HUD(this);
+		camera = new LevelCamera(this);
 	}
 
 	public Server server;
@@ -410,7 +400,7 @@ public partial class Level {
 		}
 
 		if (Global.anyQuickStart) {
-			Global.level.mainPlayer.readyTime = 10;
+			mainPlayer.readyTime = 10;
 		}
 
 		if (levelData.isMirrored) {
@@ -512,10 +502,10 @@ public partial class Level {
 				if (instance.properties?.pitWall != null && instance.properties.pitWall == true) {
 					isPitWall = true;
 					wall.collider._shape.points[2] = (
-						new Point(wall.collider._shape.points[2].x, Global.level.height + 45).round()
+						new Point(wall.collider._shape.points[2].x, height + 45).round()
 					);
 					wall.collider._shape.points[3] = (
-						new Point(wall.collider._shape.points[3].x, Global.level.height + 45).round()
+						new Point(wall.collider._shape.points[3].x, height + 45).round()
 					);
 					Rect rect = wall.collider.shape.getRect();
 					Rect newRect = new Rect(rect.x1, rect.y2, rect.x2, rect.y2 + 1000);
@@ -729,11 +719,22 @@ public partial class Level {
 				}
 			} else if (objectName == "ride armor") {
 				if (!pickupRestricted(instance) && !server.disableVehicles) {
-					int rideArmorType = 0;
-					if (instance.properties?.raType == "k") rideArmorType = 1;
-					if (instance.properties?.raType == "h") rideArmorType = 2;
-					if (instance.properties?.raType == "f") rideArmorType = 3;
-					itemSpawners.Add(new ItemSpawner(pos, typeof(RideArmor), rideArmorType, 60, xDir));
+					string raType = instance.properties?.raType ?? "n";
+					bool isPlat = instance.properties?.isPlat ?? false;
+					(int rideArmorType, int altRide) = raType.ToLower() switch {
+						"n" => (0, 0),
+						"k" => (1, 0),
+						"h" => (2, 0),
+						"f" => (3, 0),
+						"g" => (4, 0),
+						"d" => (5, 0),
+						"b" => (6, 2),
+						_ => (0, 0)
+					};
+					var spawner = new ItemSpawner(pos, typeof(RideArmor), rideArmorType, 60, xDir);
+					spawner.isPlat = isPlat;
+					spawner.altRide = altRide;
+					itemSpawners.Add(spawner);
 				}
 			} else if (objectName == "ride chaser") {
 				supportsRideChasers = true;
@@ -975,7 +976,7 @@ public partial class Level {
 				}
 			} else {
 				var actor = new Actor(
-					instance.spriteName, pos, Global.level.mainPlayer.getNextActorNetId(), isHost, false
+					instance.spriteName, pos, mainPlayer.getNextActorNetId(), isHost, false
 				);
 				actor.name = instanceName;
 				addGameObject(actor);
@@ -1039,7 +1040,7 @@ public partial class Level {
 				}
 				int[] charList = {0, 1, 2, 4, 5, 6};
 				if (equalCharDistribution) {
-					if (!Global.level.gameMode.isTeamMode) {
+					if (!gameMode.isTeamMode) {
 						charNum = charList[equalCharDistributer % charList.Length];
 						equalCharDistributer++;
 					} else {
@@ -1104,7 +1105,7 @@ public partial class Level {
 		startGridCount = getGridCount();
 		startTGridCount = getTGridCount();
 
-		//var p = Global.level.mainPlayer;
+		//var p = mainPlayer;
 		//new Mechaniloid(new Point(128, 128), p, 1, new MechaniloidWeapon(p, MechaniloidType.Hopper), MechaniloidType.Hopper, p.getNextActorNetId(), true);
 	}
 
@@ -1133,9 +1134,9 @@ public partial class Level {
 	}
 
 	public float getTopScreenY(float charY) {
-		float topScreenY = Global.level.camY;
-		if (Global.level.server.fixedCamera) {
-			float charYDistToTop = Helpers.clampMin0(charY - (Global.level.camY + Global.screenH / 2));
+		float topScreenY = camera.fpY;
+		if (server.fixedCamera) {
+			float charYDistToTop = Helpers.clampMin0(charY - (camera.fpY + Global.screenH / 2));
 			float incAmount = Math.Min(charYDistToTop, Global.screenH / 2);
 			topScreenY += incAmount;
 		}
@@ -1160,38 +1161,38 @@ public partial class Level {
 	}*/
 
 	public bool pickupRestricted(dynamic instance) {
-		if (Global.level.server?.customMatchSettings?.pickupItems == false) {
+		if (server?.customMatchSettings?.pickupItems == false) {
 			return true;
 		}
 		return otherRestricted(instance);
 	}
 	public bool otherRestricted(dynamic instance) {
 		if (instance.properties.nonDmOnly == true && (
-			Global.level.server.gameMode.Contains(GameMode.Deathmatch) ||
-			Global.level.server.gameMode.Contains(GameMode.Elimination) ||
-			Global.level.server.gameMode.Contains(GameMode.ElimAlt)
+			server.gameMode.Contains(GameMode.Deathmatch) ||
+			server.gameMode.Contains(GameMode.Elimination) ||
+			server.gameMode.Contains(GameMode.ElimAlt)
 		)) {
 			return true;
 		}
 		if (instance.properties.nonCpOnly == true &&
-			Global.level.server.gameMode.Contains(GameMode.ControlPoint)
+			server.gameMode.Contains(GameMode.ControlPoint)
 		) {
 			return true;
 		}
 		if (instance.properties.nonCtfOnly == true &&
-			Global.level.server.gameMode.Contains(GameMode.CTF)
+			server.gameMode.Contains(GameMode.CTF)
 		) {
 			return true;
 		}
 		if (instance.properties.nonKothOnly == true &&
-			Global.level.server.gameMode.Contains(GameMode.KingOfTheHill)
+			server.gameMode.Contains(GameMode.KingOfTheHill)
 		) {
 			return true;
 		}
 		if (instance.properties.dmOnly == true &&
-			!Global.level.server.gameMode.Contains(GameMode.Deathmatch) &&
-			!Global.level.server.gameMode.Contains(GameMode.Elimination) &&
-			!Global.level.server.gameMode.Contains(GameMode.ElimAlt)
+			!server.gameMode.Contains(GameMode.Deathmatch) &&
+			!server.gameMode.Contains(GameMode.Elimination) &&
+			!server.gameMode.Contains(GameMode.ElimAlt)
 		) {
 			return true;
 		}
@@ -1342,11 +1343,11 @@ public partial class Level {
 		}
 		return null;
 		*/
-		if (Global.level.actorsById.ContainsKey(netId)) {
-			return Global.level.actorsById[netId];
+		if (actorsById.ContainsKey(netId)) {
+			return actorsById[netId];
 		}
-		if (getDestroyed && Global.level.destroyedActorsById.ContainsKey(netId)) {
-			return Global.level.destroyedActorsById[netId];
+		if (getDestroyed && destroyedActorsById.ContainsKey(netId)) {
+			return destroyedActorsById[netId];
 		}
 		return null;
 	}
@@ -1427,7 +1428,7 @@ public partial class Level {
 	}
 
 	public void removePlayer(Player player, int mode = -1) {
-		if (!Global.level.players.Contains(player)) return;
+		if (!players.Contains(player)) return;
 
 		string reason = mode switch {
 			0 => " (Disconected)",
@@ -1453,7 +1454,7 @@ public partial class Level {
 		return (
 			!Global.isSkippingFrames && (
 				Global.tickRate <= 1 ||
-				Global.level.nonSkippedframeCount % Global.tickRate == 0
+				nonSkippedframeCount % Global.tickRate == 0
 			)
 		);
 	}
@@ -1464,7 +1465,7 @@ public partial class Level {
 			Global.debug ||
 			gameMode.isOver ||
 			Global.isHost ||
-			Global.level.mainPlayer.isSpectator
+			mainPlayer.isSpectator
 		) {
 			return false;
 		}
@@ -1482,7 +1483,7 @@ public partial class Level {
 			Global.debug ||
 			gameMode.isOver ||
 			Global.isHost ||
-			Global.level.mainPlayer.isSpectator
+			mainPlayer.isSpectator
 
 		) {
 			return false;
@@ -1492,16 +1493,16 @@ public partial class Level {
 
 	public void checkAfk() {
 		if (isAfk()) {
-			if (!Global.level.mainPlayer.isSpectator) {
+			if (!mainPlayer.isSpectator) {
 				Global.leaveMatchSignal = new LeaveMatchSignal(LeaveMatchScenario.Kicked, null, "Automatic AFK Kick");
 			}
 		}
 	}
 
 	public void setMainPlayerSpectate() {
-		Global.level.mainPlayer.setSpectate(!Global.level.mainPlayer.isSpectator);
-		Global.level.mainPlayer.forceKill();
-		Global.level.specPlayer = Global.level.getNextSpecPlayer(1);
+		mainPlayer.setSpectate(!mainPlayer.isSpectator);
+		mainPlayer.forceKill();
+		specPlayer = getNextSpecPlayer(1);
 	}
 
 	public void updateLevelShaders() {
@@ -1598,20 +1599,6 @@ public partial class Level {
 
 		// Call net update before the frame starts.
 		netUpdate();
-
-		float playerX = 0;
-		float playerY = 0;
-		if (camPlayer.character != null) {
-			camPlayer.character.stopCamUpdate = false;
-			Actor followActor = camPlayer.character.getFollowActor();
-			if (followActor != camPlayer.character) {
-				playerX = followActor.getCenterPos().round().x;
-				playerY = followActor.getCenterPos().round().y;
-			} else {
-				playerX = camPlayer.character.getCamCenterPos().round().x;
-				playerY = camPlayer.character.getCamCenterPos().round().y;
-			}
-		}
 
 		// Pre Update stuff.
 		List<GameObject> gos = gameObjects.ToList();
@@ -1821,7 +1808,7 @@ public partial class Level {
 		for (int i = backloggedDamages.Count - 1; i >= 0; i--) {
 			BackloggedDamage bd = backloggedDamages[i];
 			// Search for actor;
-			Actor? damagerActor = Global.level.getActorByNetId(bd.netId, true);
+			Actor? damagerActor = getActorByNetId(bd.netId, true);
 			// Run if we find an actor.
 			// Or run anyway if more than 20 frames.
 			if (damagerActor != null || bd.time >= 20) {
@@ -1854,107 +1841,9 @@ public partial class Level {
 			go.speedMul = slowAmount * Global.gameSpeed;
 		}
 
-		if (camPlayer.character != null) {
-			if (!camPlayer.character.stopCamUpdate) {
-				Point camPos = camPlayer.character.getCamCenterPos().round();
-				Actor followActor = camPlayer.character.getFollowActor();
-
-				if (followActor != camPlayer.character) {
-					camPos = followActor.getCenterPos().round();
-				}
-
-				float extraPos = MathF.Floor(MathF.Abs(followActor.moveDelta.x));
-
-				if (extraPos >= 4) {
-					extraPos = extraPos * 16 * MathF.Sign(followActor.moveDelta.x);
-					if (lastCameraXDelta == 0 ||
-						extraPos > 0 && extraPos * 100 > lastCameraXDelta ||
-						extraPos < 0 && extraPos * 100 < lastCameraXDelta
-					) {
-						float speed = 100;
-						if (MathF.Sign(lastCameraXDelta) != MathF.Sign(extraPos)) {
-							speed = 600;
-						}
-						lastCameraXDelta = Helpers.moveTo(lastCameraXDelta, extraPos * 100, speed, true);
-					}
-					lastCameraXDeltaTimer = 30;
-				} else {
-					if (lastCameraXDeltaTimer <= 0) {
-						lastCameraXDelta = Helpers.moveTo(lastCameraXDelta, 0, 350, true);
-						extraPos = 0;
-					} else {
-						lastCameraXDeltaTimer--;
-					}
-				}
-				extraPos = MathF.Round(lastCameraXDelta / 100f);
-
-				Point expectedCamPos = computeCamPos(camPos, new Point(playerX + extraPos, playerY));
-				float camOffsetY = MathF.Round(camPos.y - camPlayer.character.pos.y);
-				float fullDeltaX = MathF.Round(expectedCamPos.x + extraPos) - camX;
-				float fullDeltaY = MathF.Round(expectedCamPos.y) - camY;
-				float altDeltaY = fullDeltaY - camOffsetY;
-
-				if (followActor != null && followActor.grounded == false) {
-					if (followActor is not IDamagable) {
-						unlockfollow = true;
-					}
-					else if (altDeltaY > -46 && altDeltaY < 46 &&
-						camPlayer.character?.charState is
-						(not WallKick and not WallSlide and not LadderClimb) or InRideChaser
-					) {
-						if (!unlockfollow) {
-							fullDeltaY = 0;
-						}
-					} else {
-						unlockfollow = true;
-					}
-				} else {
-					unlockfollow = false;
-				}
-
-				float deltaX = fullDeltaX;
-				float deltaY = fullDeltaY;
-
-				if (camPlayer.character?.charState is not InRideChaser &&
-					(camPlayer.character as Axl)?.isZooming() != true
-				) {
-					// Base speed of 4.
-					// If changed also change the equation bellow.
-					// This is NOT max speed but base speed and multipled.
-					int camSpeedX = 4;
-					int camSpeedY = 4;
-					float diference;
-					// Delta equation for X.
-					// Camera can break the base speed if far away.
-					if (MathF.Abs(deltaX) > camSpeedX) {
-						diference = MathF.Floor(MathF.Abs((camSpeedX - MathF.Abs(deltaX)) / 24f));
-						deltaX = (camSpeedX + diference) * MathF.Sign(fullDeltaX);
-					}
-					// Delta for Y.
-					if (MathF.Abs(deltaY) > camSpeedY) {
-						diference = MathF.Floor(MathF.Abs((camSpeedY - MathF.Abs(altDeltaY)) / 24f));
-						deltaY = (camSpeedY + diference) * MathF.Sign(fullDeltaY);
-					}
-				}
-
-				updateCamPos(deltaX, deltaY, playerX + extraPos, playerY);
-			} else {
-				shakeX = 0;
-				shakeY = 0;
-			}
-
-			if (camPlayer.character is Axl axl && axl.isZooming()) {
-				Player p = camPlayer.character.player;
-
-				axl.axlScopeCursorWorldPos.x = Helpers.clamp(axl.axlScopeCursorWorldPos.x, camCenterX - Global.halfViewScreenW, camCenterX + Global.halfViewScreenW);
-				axl.axlScopeCursorWorldPos.y = Helpers.clamp(axl.axlScopeCursorWorldPos.y, camCenterY - Global.halfViewScreenH, camCenterY + Global.halfViewScreenH);
-			}
-		} else {
-			shakeX = 0;
-			shakeY = 0;
-		}
-		lastCamPos.x = camX;
-		lastCamPos.y = camY;
+		// Camera update. 
+		// Mostly after everithing but before render.
+		camera.update();
 
 		foreach (var effect in effects.ToList()) {
 			effect.update();
@@ -2036,7 +1925,7 @@ public partial class Level {
 					message.RemovePrefix("clientdisconnect:")
 				);
 				if (playerLeft != null) {
-					var player = Global.level.getPlayerById(playerLeft.id);
+					var player = getPlayerById(playerLeft.id);
 					if (player != null) {
 						removePlayer(player, 0);
 					}
@@ -2094,7 +1983,7 @@ public partial class Level {
 	}
 
 	private void updateMusicSources() {
-		Point listenerPos = new Point(camCenterX, camCenterY);
+		Point listenerPos = new Point(camera.centerX, camera.centerY);
 		if ((is1v1() || isTraining()) && mainPlayer.character != null) {
 			listenerPos = mainPlayer.character.getCenterPos();
 		}
@@ -2181,9 +2070,9 @@ public partial class Level {
 	}
 
 	public void render() {
-		if (Global.level.mainPlayer == null) return;
+		if (mainPlayer == null) return;
 
-		if (Global.level.joinedLate && !Global.level.mainPlayer.warpedInOnce && Global.level.mainPlayer.character == null && blackJoinTime < 3) {
+		if (joinedLate && !mainPlayer.warpedInOnce && mainPlayer.character == null && blackJoinTime < 3) {
 			blackJoinTime += Global.spf;
 			return;
 		}
@@ -2192,7 +2081,7 @@ public partial class Level {
 			camNotSetFrames++;
 			if (camNotSetFrames > 10) {
 				camSetFirstTime = true;
-				Global.view.Center = new Vector2f(camCenterX, camCenterY);
+				Global.view.Center = new Vector2f(camera.centerX, camera.centerY);
 				Global.window.SetView(Global.view);
 			}
 
@@ -2236,29 +2125,26 @@ public partial class Level {
 
 		if (Program.isMultiThread) {
 			Program.renderAction = () => {
-				renderResult(this, srt, drawObjCopy);
+				renderResult(srt, drawObjCopy);
 			};
 		} else {
-			renderResult(this, srt, drawObjCopy);
+			renderResult(srt, drawObjCopy);
 		}
 	}
 
-	public static void renderResult(
-		Level level, RenderTexture srt,
-		Dictionary<long, DrawLayer> walDrawObjects
-	) {
-		for (int i = 0; i < level.parallaxes.Count; i++) {
-			Parallax parallax = level.parallaxes[i];
-			var parallaxTextures = level.levelData.getParallaxTextures(level.parallaxes[i].path);
+	public void renderResult(RenderTexture srt, Dictionary<long, DrawLayer> walDrawObjects) {
+		for (int i = 0; i < parallaxes.Count; i++) {
+			Parallax parallax = parallaxes[i];
+			var parallaxTextures = levelData.getParallaxTextures(parallaxes[i].path);
 			if (parallaxTextures == null) continue;
 
-			Point parallaxOffset = level.parallaxOffsets[i];
+			Point parallaxOffset = parallaxOffsets[i];
 
-			float px = parallax.startX + (parallax.speedX * level.camX);
-			float py = parallax.startY + (parallax.speedY * level.camY);
+			float px = parallax.startX + (parallax.speedX * camera.fpX);
+			float py = parallax.startY + (parallax.speedY * camera.fpY);
 
 			DrawWrappers.DrawMapTiles(
-				parallaxTextures, parallaxOffset.x + px, parallaxOffset.y + py, srt, level.parallaxShader
+				parallaxTextures, parallaxOffset.x + px, parallaxOffset.y + py, srt, parallaxShader
 			);
 			Point size = Helpers.getTextureArraySize(parallaxTextures);
 
@@ -2268,64 +2154,64 @@ public partial class Level {
 			if (parallax.scrollSpeedX != 0) {
 				DrawWrappers.DrawMapTiles(
 					parallaxTextures, parallaxOffset.x + px - (size.x * signX),
-					parallaxOffset.y + py, srt, level.parallaxShader
+					parallaxOffset.y + py, srt, parallaxShader
 				);
 			}
 
 			if (parallax.scrollSpeedY != 0) {
 				DrawWrappers.DrawMapTiles(
 					parallaxTextures, parallaxOffset.x + px,
-					parallaxOffset.y + py - (size.y * signY), srt, level.parallaxShader
+					parallaxOffset.y + py - (size.y * signY), srt, parallaxShader
 				);
 				DrawWrappers.DrawMapTiles(
 					parallaxTextures, parallaxOffset.x + px - (size.x * signX),
-					parallaxOffset.y + py - (size.y * signY), srt, level.parallaxShader
+					parallaxOffset.y + py - (size.y * signY), srt, parallaxShader
 				);
 			}
 
-			foreach (ParallaxSprite parallaxSprite in level.parallaxSprites[i]) {
-				float ppx = (parallax.speedX * level.camX);
-				float ppy = (parallax.speedY * level.camY);
+			foreach (ParallaxSprite parallaxSprite in parallaxSprites[i]) {
+				float ppx = (parallax.speedX * camera.fpX);
+				float ppy = (parallax.speedY * camera.fpY);
 				parallaxSprite.render(ppx, ppy);
 			}
 		}
 		List<long> keys = walDrawObjects.Keys.ToList();
 		keys.Sort();
 
-		level.drawKeyRange(keys, long.MinValue, ZIndex.Backwall, srt, walDrawObjects);
+		drawKeyRange(keys, long.MinValue, ZIndex.Backwall, srt, walDrawObjects);
 
 		// If a backwall wasn't set, the background becomes the backwall.
-		if (level.backwallSprites != null) {
-			DrawWrappers.DrawMapTiles(level.backwallSprites, 0, 0, srt, level.altBackwallShader);
+		if (backwallSprites != null) {
+			DrawWrappers.DrawMapTiles(backwallSprites, 0, 0, srt, altBackwallShader);
 		} else {
-			DrawWrappers.DrawMapTiles(level.backgroundSprites, 0, 0, srt, level.backgroundShader);
+			DrawWrappers.DrawMapTiles(backgroundSprites, 0, 0, srt, backgroundShader);
 		}
 
-		level.drawKeyRange(keys, ZIndex.Backwall, ZIndex.Background, srt, walDrawObjects);
+		drawKeyRange(keys, ZIndex.Backwall, ZIndex.Background, srt, walDrawObjects);
 
 		// If a backwall wasn't set, the background becomes the backwall.
-		if (level.backwallSprites != null) {
-			DrawWrappers.DrawMapTiles(level.backgroundSprites, 0, 0, srt, level.backgroundShader);
+		if (backwallSprites != null) {
+			DrawWrappers.DrawMapTiles(backgroundSprites, 0, 0, srt, backgroundShader);
 		}
 
-		level.drawKeyRange(keys, ZIndex.Background, ZIndex.Foreground, srt, walDrawObjects);
+		drawKeyRange(keys, ZIndex.Background, ZIndex.Foreground, srt, walDrawObjects);
 
-		DrawWrappers.DrawMapTiles(level.foregroundSprites, 0, 0, srt, level.altForegroundShader);
+		DrawWrappers.DrawMapTiles(foregroundSprites, 0, 0, srt, altForegroundShader);
 
-		level.drawKeyRange(keys, ZIndex.Foreground, long.MaxValue, srt, walDrawObjects);
+		drawKeyRange(keys, ZIndex.Foreground, long.MaxValue, srt, walDrawObjects);
 
 		// Draw the screen render texture with any post processing applied
 		if (srt != null) {
 			var screenSprite = new SFML.Graphics.Sprite(srt.Texture);
-			screenSprite.Position = new Vector2f(level.camX, level.camY);
+			screenSprite.Position = new Vector2f(camera.fpX, camera.fpY);
 
 			var ppShaders = new List<ShaderWrapper>();
-			foreach (var cch in level.chargedCrystalHunters) {
+			foreach (var cch in chargedCrystalHunters) {
 				if (cch.timeSlowShader != null) {
 					ppShaders.Add(cch.timeSlowShader);
 				}
 			}
-			foreach (var dhp in level.darkHoldProjs) {
+			foreach (var dhp in darkHoldProjs) {
 				if (dhp.screenShader != null) {
 					ppShaders.Add(dhp.screenShader);
 				}
@@ -2353,7 +2239,7 @@ public partial class Level {
 				}
 
 				var sprite2 = new SFML.Graphics.Sprite(currentRT.Texture);
-				sprite2.Position = new Vector2f(level.camX, level.camY);
+				sprite2.Position = new Vector2f(camera.fpX, camera.fpY);
 
 				Global.window.Draw(sprite2);
 			} else {
@@ -2369,23 +2255,23 @@ public partial class Level {
 		DrawWrappers.deferredTextDraws.Clear();
 
 		// At this point all drawing should be HUD/menu elements only
-		level.hud.render();
+		hud.render();
 
-		if (level.mainPlayer.readyTime > 0) {
-			if (level.mainPlayer.readyTime < 0.4) {
-				int frameIndex = (int)Math.Round((level.mainPlayer.readyTime / 0.4) * 13);
+		if (mainPlayer.readyTime > 0) {
+			if (mainPlayer.readyTime < 0.4) {
+				int frameIndex = (int)Math.Round((mainPlayer.readyTime / 0.4) * 13);
 				Global.sprites["ready"].drawToHUD(frameIndex, (Global.screenW / 2) - 21, Global.screenH / 2);
-			} else if (level.mainPlayer.readyTime < 1.75) {
-				if ((int)Math.Round(level.mainPlayer.readyTime * 7.5) % 2 == 0) {
+			} else if (mainPlayer.readyTime < 1.75) {
+				if ((int)Math.Round(mainPlayer.readyTime * 7.5) % 2 == 0) {
 					Global.sprites["ready"].drawToHUD(9, (Global.screenW / 2) - 21, Global.screenH / 2);
 				}
 			}
 		}
-		level.drawDebug();
+		drawDebug();
 
 		Menu.render();
 
-		if (Options.main.showFPS && Global.level != null && Global.level.started) {
+		if (Options.main.showFPS && started) {
 			int vfps = MathInt.Round(Global.currentFPS);
 			int fps = MathInt.Round(Global.logicFPS);
 			float yPos = 200;
@@ -2398,20 +2284,19 @@ public partial class Level {
 				Alignment.Right
 			);
 		}
-		if (Global.level != null) {
-			Global.level.backloggedDamageTimer--;
-			if (Global.level.backloggedDamages.Where(bd => (bd.time >= 2)).Count() > 0) {
-				Global.level.backloggedDamageTimer = 120;
-			}
-			if (Global.level.backloggedDamageTimer > 0) {
-				Fonts.drawText(
-					FontType.BlueMenu,
-					"BDMG:" + Global.level.backloggedDamages.Count.ToString(),
-					Global.screenW - 5, 200 - 30,
-					Alignment.Right
-				);
-			}
+		backloggedDamageTimer--;
+		if (backloggedDamages.Where(bd => (bd.time >= 2)).Count() > 0) {
+			backloggedDamageTimer = 120;
 		}
+		if (backloggedDamageTimer > 0) {
+			Fonts.drawText(
+				FontType.BlueMenu,
+				"BDMG:" + backloggedDamages.Count.ToString(),
+				Global.screenW - 5, 200 - 30,
+				Alignment.Right
+			);
+		}
+		
 
 		DevConsole.drawConsole();
 		Program.renderHudTexture();
@@ -2481,10 +2366,10 @@ public partial class Level {
 		if (Global.showGridHitboxes) {
 			int gridItemCount = 0;
 			int offset = 0;
-			int startGridX = MathInt.Floor(camX / cellWidth);
-			int endGridX = MathInt.Ceiling((camX + Global.screenW) / cellWidth);
-			int startGridY = MathInt.Floor(camY / cellWidth);
-			int endGridY = MathInt.Ceiling((camY + Global.screenH) / cellWidth);
+			int startGridX = MathInt.Floor(camera.fpX / cellWidth);
+			int endGridX = MathInt.Ceiling((camera.fpX + Global.screenW) / cellWidth);
+			int startGridY = MathInt.Floor(camera.fpY / cellWidth);
+			int endGridY = MathInt.Ceiling((camera.fpY + Global.screenH) / cellWidth);
 
 			bool drawPos = (cellWidth >= 32);
 			int firstRowSize = 10;
@@ -2540,10 +2425,10 @@ public partial class Level {
 		} else if (Global.showTerrainGridHitboxes) {
 			int gridItemCount = 0;
 			int offset = 0;
-			int startGridX = MathInt.Floor(camX / cellWidth);
-			int endGridX = MathInt.Ceiling((camX + Global.screenW) / cellWidth);
-			int startGridY = MathInt.Floor(camY / cellWidth);
-			int endGridY = MathInt.Ceiling((camY + Global.screenH) / cellWidth);
+			int startGridX = MathInt.Floor(camera.fpX / cellWidth);
+			int endGridX = MathInt.Ceiling((camera.fpX + Global.screenW) / cellWidth);
+			int startGridY = MathInt.Floor(camera.fpY / cellWidth);
+			int endGridY = MathInt.Ceiling((camera.fpY + Global.screenH) / cellWidth);
 
 			bool drawPos = (cellWidth >= 32);
 			int firstRowSize = 10;
@@ -2597,11 +2482,9 @@ public partial class Level {
 			}
 			Global.debugString2 = "Grid item count: " + gridItemCount.ToString();
 		}
-
+	
 		if (Global.showAIDebug) {
 			foreach (var navMeshNode in navMeshNodes) {
-				float textPosX = navMeshNode.pos.x - Global.level.camX / Global.viewSize;
-				float textPosY = (navMeshNode.pos.y - 20 - Global.level.camY) / Global.viewSize;
 				DrawWrappers.DrawRect(
 					navMeshNode.pos.x - 7, navMeshNode.pos.y - 15, 
 					navMeshNode.pos.x + 7, navMeshNode.pos.y + 15,
@@ -2664,185 +2547,11 @@ public partial class Level {
 		new Color(0, 0, 0, alpha2), 1, ZIndex.AboveFont, isWorldPos: true);
 
 		DrawWrappers.DrawRect(0, 0, width, height, true, new Color(0, 0, 0, alpha), 1,
-		Global.level.mainPlayer?.character?.zIndex ?? ZIndex.HUD, isWorldPos: true);
+		mainPlayer?.character?.zIndex ?? ZIndex.HUD, isWorldPos: true);
 	}
 
 	public bool ignoreNoScrolls() {
 		return mainPlayer.weapon is WolfSigmaHandWeapon || (mainPlayer.character as Axl)?.isAnyZoom() == true;
-	}
-
-	public void updateCamPos(float deltaX, float deltaY, float playerX, float playerY) {
-		bool dontMoveX = false;
-		bool dontMoveY = false;
-
-		uint scaledCanvasW = Global.viewScreenW;
-		uint scaledCanvasH = Global.viewScreenH;
-
-		var halfScaledCanvasW = Global.halfScreenW * Global.viewSize;
-		var halfScaledCanvasH = Global.halfScreenH * Global.viewSize;
-
-		var maxX = width - halfScaledCanvasW;
-		var maxY = height - halfScaledCanvasH;
-
-		if (playerX < halfScaledCanvasW && camX <= 0) dontMoveX = true;
-		if (playerY < halfScaledCanvasH && camY <= 0) dontMoveY = true;
-
-		if (playerX > maxX && camX >= width - scaledCanvasW) dontMoveX = true;
-		if (playerY > maxY && camY >= height - scaledCanvasH) dontMoveY = true;
-
-		if (playerX > camX + halfScaledCanvasW && deltaX < 0) dontMoveX = true;
-		if (playerX < camX + halfScaledCanvasW && deltaX > 0) dontMoveX = true;
-		if (playerY > camY + halfScaledCanvasH && deltaY < 0) dontMoveY = true;
-		if (playerY < camY + halfScaledCanvasH && deltaY > 0) dontMoveY = true;
-
-		float prevCamX = camX;
-		float prevCamY = camY;
-
-		if (!ignoreNoScrolls()) {
-			Actor? followActor = camPlayer.character.getFollowActor();
-			List<CameraZone> activeCamZones = [];
-
-			if (followActor != null && followActor.physicsCollider != null) {
-				Shape camCollider = followActor.physicsCollider.shape;
-				foreach (CameraZone cameraZone in camZone) {
-					Shape other = cameraZone.collider.shape;
-					if (camCollider.minX <= other.maxX &&
-						camCollider.maxX >= other.minX &&
-						camCollider.minY <= other.maxY &&
-						camCollider.maxY >= other.minY
-					) {
-						activeCamZones.Add(cameraZone);
-					}
-				}
-			}
-			float lCamX = width - scaledCanvasW;
-			float rCamX = 0;
-			float uCamY = height - scaledCanvasH;
-			float dCamY = 0;
-
-			foreach (CameraZone cameraZone in activeCamZones) {
-				Shape colShape = cameraZone.collider.shape;
-				lCamX = MathF.Min(colShape.minX, lCamX);
-				rCamX = MathF.Max(colShape.maxX, rCamX + scaledCanvasW) - scaledCanvasW;
-				uCamY = MathF.Min(colShape.minY, uCamY);
-				dCamY = MathF.Max(colShape.maxY, dCamY + scaledCanvasH) - scaledCanvasH;
-			}
-			// Check if we are not out of bounds.
-			if (activeCamZones.Count > 0) {
-				bool ajustX = false;
-				bool ajustY = false;
-				if (camX + deltaX < lCamX && deltaX <= 0 ||
-					camX + deltaX > rCamX && deltaX >= 0
-				) {
-					if (deltaX != 0 && camX > lCamX && camX < rCamX) {
-						deltaX = MathF.Sign(deltaX);
-					} else {
-						deltaX = 0;
-					}
-					ajustX = true;
-				}
-				if (camY + deltaY < uCamY && deltaY <= 0 ||
-					camY + deltaY > dCamY && deltaY >= 0
-				) {
-					if (deltaY != 0 && camY > uCamY && camY < dCamY) {
-						deltaY = MathF.Sign(deltaY);
-					} else {
-						deltaY = 0;
-					}
-					ajustY = true;
-				}
-
-				if (ajustX) {
-					int cDelta = 0;
-					if (camX < lCamX) { cDelta += MathF.Abs(camX - lCamX) >= 2 ? 2 : 1; }
-					if (camX > rCamX) { cDelta -= MathF.Abs(camX - rCamX) >= 2 ? 2 : 1; }
-					camX += cDelta;
-				}
-				if (ajustY) {
-					int cDelta = 0;
-					if (camY < uCamY) { cDelta += MathF.Abs(camY - uCamY) >= 2 ? 2 : 1; }
-					if (camY > dCamY) { cDelta -= MathF.Abs(camY - dCamY) >= 2 ? 2 : 1; }
-					camY += cDelta;
-				}
-			}
-		}
-
-		if (!dontMoveX) {
-			camX += deltaX;
-		}
-		if (!dontMoveY) {
-			camY += deltaY;
-		}
-
-		var camRect = new Rect(camX, camY, camX + scaledCanvasW, camY + scaledCanvasH);
-		var camRectShape = camRect.getShape();
-
-		if (!ignoreNoScrolls()) {
-			foreach (var noScroll in noScrolls) {
-				if (!noScroll.snap) {
-					if (camRectShape.maxY > noScroll.shape.minY && camRectShape.minY < noScroll.shape.maxY) {
-						if ((noScroll.freeDir == ScrollFreeDir.Left || noScroll.freeDir == ScrollFreeDir.None) &&
-							prevCamX + Global.screenW <= noScroll.shape.minX && camX + Global.screenW > noScroll.shape.minX) {
-							camX = noScroll.shape.minX - Global.screenW;
-						}
-						if ((noScroll.freeDir == ScrollFreeDir.Right || noScroll.freeDir == ScrollFreeDir.None) &&
-							prevCamX >= noScroll.shape.maxX && camX < noScroll.shape.maxX) {
-							camX = noScroll.shape.maxX;
-						}
-					}
-					if (camRectShape.maxX > noScroll.shape.minX && camRectShape.minX < noScroll.shape.maxX) {
-						if ((noScroll.freeDir == ScrollFreeDir.Up || noScroll.freeDir == ScrollFreeDir.None) &&
-							prevCamY + Global.screenH <= noScroll.shape.minY && camY + Global.screenH > noScroll.shape.minY) {
-							camY = noScroll.shape.minY - Global.screenH;
-						}
-						if ((noScroll.freeDir == ScrollFreeDir.Down || noScroll.freeDir == ScrollFreeDir.None) &&
-							prevCamY >= noScroll.shape.maxY && camY < noScroll.shape.maxY) {
-							camY = noScroll.shape.maxY;
-						}
-					}
-				} else if (noScroll.shape.intersectsShape(camRectShape) != null) {
-					if (noScroll.freeDir == ScrollFreeDir.Left) {
-						var mtv = camRectShape.getMinTransVectorDir(noScroll.shape, new Point(-1, 0));
-						if (mtv != null) camX += ((Point)mtv).x;
-					} else if (noScroll.freeDir == ScrollFreeDir.Right) {
-						var mtv = camRectShape.getMinTransVectorDir(noScroll.shape, new Point(1, 0));
-						if (mtv != null) camX += ((Point)mtv).x;
-					}
-					if (noScroll.freeDir == ScrollFreeDir.Up) {
-						var mtv = camRectShape.getMinTransVectorDir(noScroll.shape, new Point(0, -1));
-						if (mtv != null) camY += ((Point)mtv).y;
-					} else if (noScroll.freeDir == ScrollFreeDir.Down) {
-						var mtv = camRectShape.getMinTransVectorDir(noScroll.shape, new Point(0, 1));
-						if (mtv != null) camY += ((Point)mtv).y;
-					}
-				}
-			}
-		}
-
-		camX = MathInt.Round(Helpers.clamp(camX, 0, width - scaledCanvasW));
-		camY = MathInt.Round(Helpers.clamp(camY, 0, height - scaledCanvasH));
-
-		float offsetX = 0;
-		float offsetY = 0;
-		if (shakeX > 0 || shakeY > 0) {
-			float shakePower = 4 + (shakeY / 12);
-			float piMul = 55f / MathF.PI;
-			offsetX = shakePower * MathF.Sin(shakeX * piMul);
-			offsetY = MathF.Round(shakePower * MathF.Sin(shakeY * piMul));
-			shakeX = Helpers.clampMin(shakeX - 1, 0);
-			shakeY = Helpers.clampMin(shakeY - 1, 0);
-		}
-
-		float yOff = 0;
-		if (Global.level.isRace() && server.fixedCamera && Global.level.height < 448) {
-			yOff = (448 - Global.level.height) / 2;
-		}
-		Global.view.Center = new Vector2f(
-			MathInt.Round(camCenterX + offsetX),
-			MathInt.Round(camCenterY + offsetY + yOff)
-		);
-		Global.window.SetView(Global.view);
-		camSetFirstTime = true;
 	}
 
 	public HashSet<byte> getCrackedWallBytes() {
@@ -2862,55 +2571,6 @@ public partial class Level {
 				cw.destroySelf();
 			}
 		}
-	}
-
-	public void snapCamPos(Point point, Point? prevCamPos) {
-		var camPos = computeCamPos(point, prevCamPos);
-		camX = camPos.x;
-		camY = camPos.y;
-	}
-
-	public Point computeCamPos(Point point, Point? prevCamPos) {
-		var camX = point.x - Global.halfScreenW * Global.viewSize;
-		var camY = point.y - Global.halfScreenH * Global.viewSize;
-
-		var camRect = new Rect(camX, camY, camX + Global.viewScreenW, camY + Global.viewScreenH);
-		var camRectShape = camRect.getShape();
-
-		if (!ignoreNoScrolls()) {
-			foreach (var noScroll in noScrolls) {
-				if (!noScroll.snap && prevCamPos != null) {
-					continue;
-				}
-
-				if (noScroll.shape.intersectsShape(camRectShape) != null) {
-					if (noScroll.freeDir == ScrollFreeDir.Left) {
-						var mtv = camRectShape.getMinTransVectorDir(noScroll.shape, new Point(-1, 0));
-						if (mtv != null) camX += ((Point)mtv).x;
-					} else if (noScroll.freeDir == ScrollFreeDir.Right) {
-						var mtv = camRectShape.getMinTransVectorDir(noScroll.shape, new Point(1, 0));
-						if (mtv != null) camX += ((Point)mtv).x;
-					} else if (noScroll.freeDir == ScrollFreeDir.Up) {
-						var mtv = camRectShape.getMinTransVectorDir(noScroll.shape, new Point(0, -1));
-						if (mtv != null) camY += ((Point)mtv).y;
-					} else if (noScroll.freeDir == ScrollFreeDir.Down) {
-						var mtv = camRectShape.getMinTransVectorDir(noScroll.shape, new Point(0, 1));
-						if (mtv != null) camY += ((Point)mtv).y;
-					}
-				}
-			}
-		}
-
-		if (camX < 0) camX = 0;
-		if (camY < 0) camY = 0;
-
-		var maxX = width - Global.viewScreenW;
-		var maxY = height - Global.viewScreenH;
-
-		if (camX > maxX) camX = maxX;
-		if (camY > maxY) camY = maxY;
-
-		return new Point(camX, camY);
 	}
 
 	public NavMeshNode getClosestNodeInSight(Point pos) {
@@ -3079,25 +2739,21 @@ public partial class Level {
 	}
 
 	public Point getSoundListenerOrigin() {
-		if (Global.level == null) {
-			return new Point();
-		}
+		Point originPoint = new Point(camera.centerX, camera.centerY);
 
-		Point originPoint = new Point(Global.level.camCenterX, Global.level.camCenterY);
-
-		Character? mainChar = Global.level.mainPlayer?.character;
-		Maverick? mainMaverick = Global.level.mainPlayer?.currentMaverick;
+		Character? mainChar = mainPlayer?.character;
+		Maverick? mainMaverick = mainPlayer?.currentMaverick;
 		if (mainChar != null && mainChar.isSoundCentered()) {
 			originPoint = mainChar.pos;
 		} else if (mainMaverick != null) {
 			originPoint = mainMaverick.pos;
 		} else if (
-			mainChar == null && Global.level.mainPlayer != null &&
-			Global.level.mainPlayer.lastDeathPos != null &&
-			!Global.level.mainPlayer.isSpectator &&
-			!Global.level.mainPlayer.altSpectator
+			mainChar == null && mainPlayer != null &&
+			mainPlayer.lastDeathPos != null &&
+			!mainPlayer.isSpectator &&
+			!mainPlayer.altSpectator
 		) {
-			originPoint = Global.level.mainPlayer.lastDeathPos.Value;
+			originPoint = mainPlayer.lastDeathPos.Value;
 		}
 
 		return originPoint;
@@ -3112,7 +2768,7 @@ public partial class Level {
 			musicSources[i].destroy();
 		}
 
-		Global.level.levelData.unloadLevelImages();
+		levelData.unloadLevelImages();
 		Global.level = null;
 		Global.serverClient = null;
 
@@ -3164,38 +2820,38 @@ public partial class Level {
 	public void resetFlags() {
 		if (!Global.isHost) return;
 
-		if (Global.level.redFlag == null || Global.level.blueFlag == null) {
+		if (redFlag == null || blueFlag == null) {
 			Logger.logException(new Exception("Host tried to reset flag but they were null"), false);
-			Global.level.gameMode.chatMenu.addChatEntry(new ChatEntry("Could not reset flags. Error: flags null", "", null, true), sendRpc: true);
+			gameMode.chatMenu.addChatEntry(new ChatEntry("Could not reset flags. Error: flags null", "", null, true), sendRpc: true);
 			return;
 		}
-		if (Global.level.redFlag.destroyed || Global.level.blueFlag.destroyed) {
+		if (redFlag.destroyed || blueFlag.destroyed) {
 			Logger.logException(new Exception("Host tried to reset flag but they were destroyed"), false);
-			Global.level.gameMode.chatMenu.addChatEntry(new ChatEntry("Flags were reset. Error: flags destroyed", "", null, true), sendRpc: true);
+			gameMode.chatMenu.addChatEntry(new ChatEntry("Flags were reset. Error: flags destroyed", "", null, true), sendRpc: true);
 			return;
 		}
-		if (!Global.level.gameObjects.Contains(Global.level.redFlag) || !Global.level.gameObjects.Contains(Global.level.blueFlag)) {
+		if (!gameObjects.Contains(redFlag) || !gameObjects.Contains(blueFlag)) {
 			Logger.logException(new Exception("Host tried to reset flag but they were not in gameobject set"), false);
-			Global.level.gameMode.chatMenu.addChatEntry(new ChatEntry("Flags were reset. Error: flags missing", "", null, true), sendRpc: true);
+			gameMode.chatMenu.addChatEntry(new ChatEntry("Flags were reset. Error: flags missing", "", null, true), sendRpc: true);
 			return;
 		}
 
-		if (!Global.level.redFlag.ownedByLocalPlayer) {
-			Global.level.redFlag.takeOwnership();
-			Global.level.redFlag.pedestal?.takeOwnership();
+		if (!redFlag.ownedByLocalPlayer) {
+			redFlag.takeOwnership();
+			redFlag.pedestal?.takeOwnership();
 		}
-		if (!Global.level.blueFlag.ownedByLocalPlayer) {
-			Global.level.blueFlag.takeOwnership();
-			Global.level.blueFlag.pedestal?.takeOwnership();
+		if (!blueFlag.ownedByLocalPlayer) {
+			blueFlag.takeOwnership();
+			blueFlag.pedestal?.takeOwnership();
 		}
 
-		Global.level.redFlag.returnFlag();
-		Global.level.blueFlag.returnFlag();
+		redFlag.returnFlag();
+		blueFlag.returnFlag();
 
-		Global.level.redFlag.pickupCooldown = 1;
-		Global.level.blueFlag.pickupCooldown = 1;
+		redFlag.pickupCooldown = 1;
+		blueFlag.pickupCooldown = 1;
 
-		Global.level.gameMode.chatMenu.addChatEntry(new ChatEntry("Flags were reset.", "", null, true), sendRpc: true);
+		gameMode.chatMenu.addChatEntry(new ChatEntry("Flags were reset.", "", null, true), sendRpc: true);
 	}
 
 	public int getLeaderKills() {

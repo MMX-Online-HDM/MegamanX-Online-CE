@@ -119,6 +119,7 @@ public class HUD {
 			drawPlayer(targetPlayer);
 		}
 		drawRadar();
+		gameMode.chatMenu.render();
 		gameMode.render();
 	}
 
@@ -153,9 +154,10 @@ public class HUD {
 	}
 
 	public void renderHealthAndWeapon(Player? player, HUDHealthPosition position) {
-		if (player == null || level.is1v1() && player.deaths >= gameMode.playingTo) { return; }
-
-		player.lastCharacter?.renderHUD(new Point(), position);
+		if (player == null || level.is1v1() && player.deaths >= gameMode.playingTo) {
+			return;
+		}
+		player.getHudTarget()?.renderHud(new Point(), position);
 	}
 
 	public bool shouldDrawRadar() {
@@ -169,9 +171,9 @@ public class HUD {
 
 // Interface for HUD stuff.
 public interface IHudDrawable {
-	void renderHUD(Point offset, HUDHealthPosition position);
+	void renderHud(Point offset, HUDHealthPosition position);
 	void renderLifebar(Point offset, HUDHealthPosition position);
-	void renderAmmo(Point offset, HUDHealthPosition position);
+	bool renderAmmo(Point offset, HUDHealthPosition position);
 	Point renderName(Point offset);
 	Point renderMiniHUD(Point offset);
 }
@@ -251,12 +253,9 @@ public class HudDraw {
 		Global.sprites[healthTopSprite].drawToHUD(baseTopIndex, baseX, baseY);
 	}
 
-	public static void renderAmmo(Point pos, HUDHealthPosition position, Weapon? weapon) {
-		if (weapon == null) {
-			return;
-		}
-		if (!weapon.drawAmmo) {
-			return;
+	public static bool renderAmmo(Point pos, HUDHealthPosition position, Weapon? weapon) {
+		if (weapon == null || !weapon.drawAmmo) {
+			return false;
 		}
 
 		Point hudHealthPosition = GameMode.getHUDHealthPosition(position, false);
@@ -274,6 +273,7 @@ public class HudDraw {
 			ammo, 0, maxAmmo, false, fullBarName, baseBarName,
 			ammoDisplayScale: weapon.ammoDisplayScale
 		);
+		return true;
 	}
 
 	// General buff bar drawing functions.
@@ -459,7 +459,7 @@ public class HudDraw {
 		Point textPos = pos.addxy(0, -7);
 
 		Fonts.drawText(
-			FontType.Grey, name, textPos.x, textPos.y,
+			FontType.WhiteMini, name, textPos.x, textPos.y,
 			Alignment.Left, true, depth: zIndex, color: nameColor
 		);
 		return pos.addxy(0, -12);
@@ -469,4 +469,318 @@ public class HudDraw {
 public enum HUDHealthPosition {
 	Left,
 	Right,
+}
+
+// Main HUD render functions.
+public class LevelCamera {
+	// Main variables.
+	public Level level;
+	public int posX;
+	public int posY;
+	public int lastPosX;
+	public int lastPosY;
+	public float shakeX;
+	public float shakeY;
+	public float shakeXOff;
+	public float shakeYOff;
+	public bool freeFromGround;
+
+	// Getters
+	public int centerX => posX + MathInt.Round(Global.halfScreenW * Global.viewSize);
+	public int centerY => posY + MathInt.Round(Global.halfScreenH * Global.viewSize);
+	public int fpX => posX + MathInt.Round(shakeXOff);
+	public int fpY => posY + MathInt.Round(shakeYOff);
+	public int fcpX => centerX + MathInt.Round(shakeXOff);
+	public int fcpY => centerY + MathInt.Round(shakeYOff);
+
+	// Init code.
+	public LevelCamera(Level level) {
+		this.level = level;
+	}
+
+	// Runs once each logic frame.
+	public void update() {
+		// Always update shake.
+		if (shakeX > 0 || shakeY > 0) {
+			float shakePower = 4 + (shakeY / 12);
+			float piMul = 55f / MathF.PI;
+			shakeXOff = shakePower * MathF.Sin(shakeX * piMul);
+			shakeYOff = MathF.Round(shakePower * MathF.Sin(shakeY * piMul));
+			shakeX = Helpers.clampMin(shakeX - 1, 0);
+			shakeY = Helpers.clampMin(shakeY - 1, 0);
+		} else {
+			shakeXOff = 0;
+			shakeYOff = 0;
+		}
+		// Get target player.
+		Player? player = Global.level.mainPlayer;
+		if (Global.level.mainPlayer.isSpectator || Global.level.mainPlayer.altSpectator) {
+			player = level.specPlayer;
+		}
+		if (player == null) { return; }
+		// Get target entity.
+		Actor? actor = player.lastHudChar as Actor;
+		if (actor == null) { return; }
+		Point newPos = actor.getCamCenterPos().round();
+		if (actor is Character chara) {
+			actor = chara.getFollowActor();
+		}
+		// Update begins.
+		int deltaX = MathInt.Round(newPos.x) - centerX;
+		int deltaY = MathInt.Round(newPos.y) - centerY;
+
+		// Ground snap thing.
+		if (actor.canBeGrounded) {
+			if (!actor.grounded) {
+				if (deltaY < -60 || deltaY > 20) {
+					freeFromGround = true;
+				}
+				if (!freeFromGround) {
+					deltaY = 0;
+				}
+			} else {
+				freeFromGround = false;
+			}
+		} else {
+			freeFromGround = true;
+		}
+
+		// Base speed of 4.
+		// If changed also change the equation bellow.
+		// This is NOT max speed but base speed and multipled.
+		int camSpeed = 4;
+		// Delta equation for X.
+		// Camera can break the base speed if far away.
+		if (Math.Abs(deltaX) > camSpeed) {
+			deltaX = MathF.Sign(deltaX) * camSpeed;
+		}
+		// Delta for Y.
+		if (Math.Abs(deltaY) > camSpeed) {
+			deltaY = Math.Sign(deltaY) * camSpeed;
+		}
+		// Change the cam pos based on the delta.
+		move(deltaX, deltaY);
+
+		// Save this for next frame.
+		lastPosX = posX;
+		lastPosY = posY;
+	}
+
+	public (int x, int y) updatePos(int x, int y, int newX, int newY) {
+		// Return if we are ignoring them.
+		if (level.ignoreNoScrolls()) {
+			return snapToStageBounds(newX, newY);
+		}
+		// Snap;
+		(x, y) = snapToStageBounds(x, y);
+		(newX, newY) = snapToStageBounds(newX, newY);
+		// Get delta.
+		int deltaX = newX - x;
+		int deltaY = newY - y;
+		// Get target player.
+		Player? player = Global.level.mainPlayer;
+		if (Global.level.mainPlayer.isSpectator || Global.level.mainPlayer.altSpectator) {
+			player = level.specPlayer;
+		}
+		// Get target entity.
+		Actor? followActor = player?.lastHudChar as Actor;
+		if (followActor is Character chara) {
+			followActor = chara.getFollowActor();
+		}
+		// Camera sizes.
+		uint scaledCanvasW = Global.viewScreenW;
+		uint scaledCanvasH = Global.viewScreenH;
+		// Camera zones.
+		List<CameraZone> activeCamZones = [];
+		if (followActor != null && followActor.physicsCollider != null) {
+			Shape camCollider = followActor.physicsCollider.shape;
+			foreach (CameraZone cameraZone in level.camZone) {
+				Shape other = cameraZone.collider.shape;
+				if (camCollider.minX <= other.maxX &&
+					camCollider.maxX >= other.minX &&
+					camCollider.minY <= other.maxY &&
+					camCollider.maxY >= other.minY
+				) {
+					activeCamZones.Add(cameraZone);
+				}
+			}
+		}
+		float lCamX = level.width - scaledCanvasW;
+		float rCamX = 0;
+		float uCamY = level.height - scaledCanvasH;
+		float dCamY = 0;
+		// Get bounds.
+		foreach (CameraZone cameraZone in activeCamZones) {
+			Shape colShape = cameraZone.collider.shape;
+			lCamX = MathF.Min(colShape.minX, lCamX);
+			rCamX = MathF.Max(colShape.maxX - scaledCanvasW, rCamX);
+			uCamY = MathF.Min(colShape.minY, uCamY);
+			dCamY = MathF.Max(colShape.maxY - scaledCanvasH, dCamY);
+		}
+		// Round stuff.
+		lCamX = MathF.Floor(lCamX);
+		rCamX = MathF.Ceiling(rCamX);
+		uCamY = MathF.Floor(uCamY);
+		dCamY = MathF.Ceiling(dCamY);
+		// Check if we are not out of bounds.
+		if (activeCamZones.Count > 0) {
+			bool ajustX = false;
+			bool ajustY = false;
+			if (x + deltaX < lCamX && deltaX <= 0 ||
+				x + deltaX > rCamX && deltaX >= 0
+			) {
+				if (deltaX != 0 && x > lCamX && x < rCamX) {
+					deltaX = MathF.Sign(deltaX);
+				} else {
+					deltaX = 0;
+				}
+				ajustX = true;
+			}
+			if (y + deltaY < uCamY && deltaY <= 0 ||
+				y + deltaY > dCamY && deltaY >= 0
+			) {
+				if (deltaY != 0 && y > uCamY && y < dCamY) {
+					deltaY = MathF.Sign(deltaY);
+				} else {
+					deltaY = 0;
+				}
+				ajustY = true;
+			}
+
+			if (ajustX) {
+				int cDelta = 0;
+				if (x < lCamX) { cDelta += MathF.Abs(x - lCamX) >= 2 ? 2 : 1; }
+				if (x > rCamX) { cDelta -= MathF.Abs(x - rCamX) >= 2 ? 2 : 1; }
+				x += cDelta;
+			}
+			if (ajustY) {
+				int cDelta = 0;
+				if (y < uCamY) { cDelta += MathF.Abs(y - uCamY) >= 2 ? 2 : 1; }
+				if (y > dCamY) { cDelta -= MathF.Abs(y - dCamY) >= 2 ? 2 : 1; }
+				y += cDelta;
+			}
+		}
+		// Apply speed.
+		x += deltaX;
+		y += deltaY;
+		// Snap.
+		(x, y) = snapToStageBounds(x, y);
+		// GM19 NoScroll time.
+		(x, y) = gm19NoScroll(x, y);
+		// Snap again
+		return snapToStageBounds(x, y);
+	}
+
+	// Because GM19 no scroll are weird as heck we need to use floats temporally here.
+	public (int x, int y) gm19NoScroll(float x, float y) {
+		// Because it can become a bouncy mess.
+		// We limit it to 1 X/Y noscroll per frame.
+		bool xNoScroll = false;
+		bool yNoScroll = false;
+		// Camera sizes.
+		uint scaledCanvasW = Global.viewScreenW;
+		uint scaledCanvasH = Global.viewScreenH;
+		// Rect and stuff.
+		Rect camRect = new Rect(x, y, x + scaledCanvasW, y + scaledCanvasH);
+		Shape camRectShape = camRect.getShape();
+		foreach (NoScroll noScroll in level.noScrolls) {
+			if (!noScroll.snap) {
+				if (camRectShape.maxY > noScroll.shape.minY && camRectShape.minY < noScroll.shape.maxY) {
+					if ((noScroll.freeDir == ScrollFreeDir.Left || 
+						noScroll.freeDir == ScrollFreeDir.None) &&
+						lastPosX + Global.screenW <= noScroll.shape.minX &&
+						x + Global.screenW > noScroll.shape.minX
+					) {
+						x = noScroll.shape.minX - Global.screenW;
+					}
+					if ((noScroll.freeDir == ScrollFreeDir.Right || noScroll.freeDir == ScrollFreeDir.None) &&
+						lastPosX >= noScroll.shape.maxX && x < noScroll.shape.maxX
+					) {
+						x = noScroll.shape.maxX;
+					}
+				}
+				if (camRectShape.maxX > noScroll.shape.minX && camRectShape.minX < noScroll.shape.maxX) {
+					if ((noScroll.freeDir == ScrollFreeDir.Up || noScroll.freeDir == ScrollFreeDir.None) &&
+						lastPosY + Global.screenH <= noScroll.shape.minY &&
+						y + Global.screenH > noScroll.shape.minY
+					) {
+						y = noScroll.shape.minY - Global.screenH;
+					}
+					if ((noScroll.freeDir == ScrollFreeDir.Down || noScroll.freeDir == ScrollFreeDir.None) &&
+						lastPosY >= noScroll.shape.maxY && y < noScroll.shape.maxY) {
+						y = noScroll.shape.maxY;
+					}
+				}
+			} else if (noScroll.shape.intersectsShape(camRectShape) != null) {
+				if (noScroll.freeDir == ScrollFreeDir.Left) {
+					Point? mtv = camRectShape.getMinTransVectorDir(noScroll.shape, new Point(-1, 0));
+					if (mtv != null) {
+						x += mtv.Value.x;
+					}
+				} else if (noScroll.freeDir == ScrollFreeDir.Right) {
+					Point? mtv = camRectShape.getMinTransVectorDir(noScroll.shape, new Point(1, 0));
+					if (mtv != null) {
+						x += mtv.Value.x;
+					}
+				}
+				if (noScroll.freeDir == ScrollFreeDir.Up) {
+					Point? mtv = camRectShape.getMinTransVectorDir(noScroll.shape, new Point(0, -1));
+					if (mtv != null) {
+						y += mtv.Value.y;
+					}
+				} else if (noScroll.freeDir == ScrollFreeDir.Down) {
+					Point? mtv = camRectShape.getMinTransVectorDir(noScroll.shape, new Point(0, 1));
+					if (mtv != null) {
+						y += mtv.Value.y;
+					}
+				}
+			}
+		}
+		// Round and return.
+		return (MathInt.Round(x), MathInt.Round(y));
+	}
+
+	public (int x, int y) snapToStageBounds(int x, int y) {
+		int maxX = level.width - MathInt.Ceiling(Global.screenW * Global.viewSize);
+		int maxY = level.height - MathInt.Ceiling(Global.screenH * Global.viewSize);
+		if (x > maxX) { x = maxX; }
+		if (y > maxY) { y = maxY; }
+		if (x < 0) { x = 0; }
+		if (y < 0) { y = 0; }
+		return (x, y);
+	}
+
+	// Various pos change functions.
+	public void move(int deltaX, int deltaY) {
+		(posX, posY) = updatePos(
+			posX, posY,
+			posX + deltaX,
+			posY + deltaY
+		);
+		Global.view.Center = (fcpX, fcpY);
+	}
+	public void changePos(Point point) {
+		(posX, posY) = updatePos(
+			posX, posY,
+			MathInt.Round(point.x),
+			MathInt.Round(point.y)
+		);
+		Global.view.Center = (fcpX, fcpY);
+	}
+	public void changeCenter(Point point) {
+		(posX, posY) = updatePos(
+			posX, posY,
+			posX = MathInt.Round(point.x) - MathInt.Ceiling(Global.halfScreenW * Global.viewSize),
+			posY = MathInt.Round(point.y) - MathInt.Ceiling(Global.halfScreenH * Global.viewSize)
+		);
+		Global.view.Center = (fcpX, fcpY);
+	}
+	public void changeCenter(int x, int y) {
+		(posX, posY) = updatePos(
+			posX, posY,
+			x - MathInt.Ceiling(Global.halfScreenW * Global.viewSize),
+			y - MathInt.Ceiling(Global.halfScreenH * Global.viewSize)
+		);
+		Global.view.Center = (fcpX, fcpY);
+	}
 }

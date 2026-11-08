@@ -24,7 +24,7 @@ public class KuuenzanWeapon : Weapon {
 		damage = "1";
 		hitcooldown = "0.125";
 		flinch = "0";
-		effect = "";
+		effect = "Usually confused with Kuuenbu.";
 	}
 
 	public static Weapon getWeaponFromIndex(int index) {

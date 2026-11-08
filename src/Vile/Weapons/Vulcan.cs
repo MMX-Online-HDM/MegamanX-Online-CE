@@ -30,11 +30,9 @@ public class VileVulcan : Weapon {
 
 	public void ladderVoid(Vile vava) {
         if (vava.charState is LadderClimb) {
-			if (vava.player.input.isHeld(Control.Left, vava.player)) {
-				vava.xDir = -1;
-			}
-			if (vava.player.input.isHeld(Control.Right, vava.player)) {
-				vava.xDir = 1;
+			int ixDir = vava.player.input.getXDir(vava.player);
+			if (ixDir != 0) {
+				vava.xDir = ixDir;
 			}
 		}
     }

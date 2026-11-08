@@ -404,7 +404,15 @@ public class CrackedWall : Actor, IDamagable {
 			or ProjIds.TunnelRTornadoFang
 			or ProjIds.TunnelRTornadoFang2
 			or ProjIds.TunnelRTornadoFangDiag
-			or ProjIds.TunnelRDash => damage,
+			or ProjIds.TunnelRDash
+			or ProjIds.GBeetleStomp
+			or ProjIds.BBuffaloStomp
+			or ProjIds.SparkMStomp
+			or ProjIds.MechFrogStompShockwave
+			or ProjIds.Sigma3KaiserStomp
+			or ProjIds.Sigma3KaiserBeam
+			or ProjIds.Sigma3KaiserMissile
+			=> damage,
 			// 12 damage.
 			ProjIds.GigaCrush
 			or ProjIds.Rakuhouha

@@ -5,7 +5,7 @@ using SFML.Graphics;
 
 namespace MMXOnline;
 
-public class RideArmor : Actor, IDamagable {
+public class RideArmor : Actor, IDamagable, IHudDrawable {
 	public float health = 32;
 	public float maxHealth = 32;
 	public float goliathHealth = 0;
@@ -27,6 +27,7 @@ public class RideArmor : Actor, IDamagable {
 	public float selfDestructTime;
 	public const float maxSelfDestructTime = 10;
 	public int raNum;
+	public int altSprite;
 	public bool isSwimming;
 	public bool isNeutral { get { return neutralId != 0; } }
 	public int neutralId;
@@ -40,13 +41,28 @@ public class RideArmor : Actor, IDamagable {
 	public int consecutiveJump;
 	public bool manualDisabled = false;
 
+	float lastCrashSoundTime;
+	public float flyTime;
+
 	public static ShaderWrapper? paletteEG01 = Helpers.cloneGenericPaletteShader("paletteEG01");
 	public static ShaderWrapper? paletteKangaroo = Helpers.cloneGenericPaletteShader("paletteKangaroo");
 	public static ShaderWrapper? paletteHawk = Helpers.cloneGenericPaletteShader("paletteHawk");
 	public static ShaderWrapper? paletteFrog = Helpers.cloneGenericPaletteShader("paletteFrog");
 
 	bool netColorShadersSet;
+	bool colorShadersSet;
 	public static Weapon netWeapon = new Weapon(WeaponIds.MechGenericWeapon, 0);
+
+	float dashOffsetTime;
+	int dashOffset;
+
+	//float soundTime;
+	float punchCooldown;
+	float missileCooldown;
+	public float chainSoundTime;
+	public float chainTotalSoundTime;
+	public Anim? hawkElec;
+	bool healedOnEnter;
 
 	public RideArmor(
 		Player owner, Point pos, int raNum, int neutralId,
@@ -94,28 +110,27 @@ public class RideArmor : Actor, IDamagable {
 
 		cActorId = CActorIds.RideArmor;
 		if (sendRpc) {
-			RPC.createActor.sendRpc(this, player, player.character, getSerialExtra());
+			RPC.createActor.sendRpc(this, owner, owner.character, getSerialExtra());
 		}
 	}
 
-	bool colorShadersSet;
 	public void setColorShaders() {
 		if (!colorShadersSet) colorShadersSet = true;
 		else return;
 
 		// If adding a palette here it must be added to RPCActorToggleType.ChangeRAPieceColor check to sync
-		if (raNum == 0 && isNeutral) {
+		if (raNum == 0 && isNeutral && altSprite == 1) {
 			if (neutralId % 2 == 1) {
 				colorShader = paletteEG01;
 				colorShader?.SetUniform("palette", 1);
 			}
-		} else if (raNum == 1 && isNeutral) {
+		} else if (raNum == 1 && isNeutral && altSprite == 1) {
 			colorShader = paletteKangaroo;
 			colorShader?.SetUniform("palette", 1);
-		} else if (raNum == 2 && !isNeutral) {
+		} else if (raNum == 2 && !isNeutral && altSprite == 1) {
 			colorShader = paletteHawk;
 			colorShader?.SetUniform("palette", 1);
-		} else if (raNum == 3 && !isNeutral) {
+		} else if (raNum == 3 && !isNeutral && altSprite == 1) {
 			colorShader = paletteFrog;
 			colorShader?.SetUniform("palette", 1);
 		}
@@ -142,13 +157,12 @@ public class RideArmor : Actor, IDamagable {
 		setMaxHealth();
 	}
 
-	float dashOffsetTime;
-	int dashOffset;
 	public override void render(float x, float y) {
 		base.render(x, y);
 
 		renderDamageText(35);
-
+		bool isVileMk5 = ownedByMK5 && character != null && character is Vile vile && vile.isVileMK5;
+		/*
 		if (player != null && player.isMainPlayer) {
 			if (flyTime > 0) {
 				float healthPct = Helpers.clamp01((6 - flyTime) / 6);
@@ -162,9 +176,6 @@ public class RideArmor : Actor, IDamagable {
 				drawFuelMeter(healthPct, sx, sy);
 			}
 		}
-
-		bool isVileMk5 = ownedByMK5 && character != null && character is Vile vile && vile.isVileMK5;
-
 		// Health bar
 		if (ownedByLocalPlayer && isVileMk5 && !isInvincible(null, null)) {
 			float healthBarInnerWidth = 30;
@@ -180,7 +191,7 @@ public class RideArmor : Actor, IDamagable {
 			DrawWrappers.DrawRect(pos.x - 16, botY - 5, pos.x + 16, botY, true, Color.Black, 0, ZIndex.HUD - 1, outlineColor: Color.White);
 			DrawWrappers.DrawRect(pos.x - 15, botY - 4, pos.x - 15 + width, botY - 1, true, color, 0, ZIndex.HUD - 1);
 		}
-
+		*/
 		// Tether
 		if (isVileMk5 && character != null) {
 			Point charPos = character.getCenterPos().addxy(0, -10);
@@ -227,12 +238,16 @@ public class RideArmor : Actor, IDamagable {
 			if (!ownedByLocalPlayer) {
 				zIndex = ZIndex.Character - 100;
 			} else if (!isNeutral) {
-				if (netOwner?.character != null) zIndex = netOwner.character.zIndex - 1;
-				else zIndex = ZIndex.Character - 100;
+				if (netOwner?.character != null) {
+					zIndex = netOwner.character.zIndex - 1;
+				}
+				else {
+					zIndex = ZIndex.Character - 100;
+				}
 			}
 		}
 
-		if (raNum == 4 && character != null && musicSource == null) {
+		if (raNum == 4 && !isNeutral && character != null && musicSource == null) {
 			addMusicSource("vile_X3", getCenterPos(), true);
 		}
 		if (character == null && musicSource != null) {
@@ -282,13 +297,6 @@ public class RideArmor : Actor, IDamagable {
 		return raNum == 0 && !isNeutral;
 	}
 
-	//float soundTime;
-	float punchCooldown;
-	float missileCooldown;
-	public float chainSoundTime;
-	public float chainTotalSoundTime;
-	public Anim? hawkElec;
-
 	public override void postUpdate() {
 		Player? player = this.player ?? netOwner;
 		RagingChargeX? rcx = character as RagingChargeX;
@@ -321,13 +329,6 @@ public class RideArmor : Actor, IDamagable {
 				explode();
 				return;
 			}
-		}
-
-		if (raNum == 2 && isUnderwater() && character != null && character.isUnderwater() && selfDestructTime == 0) {
-			if (hawkElec == null) {
-				hawkElec = new Anim(pos.addxy(0, -20), "hawk_elec", 1, null, false);
-			}
-			selfDestructTime = Global.spf;
 		}
 
 		if (hawkElec != null) {
@@ -455,66 +456,67 @@ public class RideArmor : Actor, IDamagable {
 				playSound("frogShootX3", forcePlay: false, sendRpc: true);
 			}
 		}
-			bool attackConditionMet = character != null && canAttack() && character.player.input.isPressed(Control.Shoot, character.player) && punchCooldown == 0;
-			if (raNum == 5) attackConditionMet = canAttack() && character != null && character.player.input.isHeld(Control.Shoot, character.player);
-			if (attackConditionMet) {
-				if (rideArmorState is RARun) changeState(new RAIdle(), true);
-				if (rideArmorState is RAJump) changeState(new RAFall(), true);
-				if (raNum == 1) punchCooldown = 0.8f;
-				else punchCooldown = 0.56f;
-				string? attackSprite = rideArmorState?.attackSprite;
-				if (raNum == 2 && character != null && rideArmorState != null && character.player.input.isHeld(Control.Down, character.player) && !rideArmorState.inTransition()) {
-					attackSprite = "hawk_attack_air_down";
-				}
-				changeSprite(attackSprite, false);
-			} else if (rideArmorState != null && player != null &&
-				hawkBombCount > 0 &&
-				canAttack() &&
-				character is Vile vile &&
-				punchCooldown == 0 &&
-				raNum == 2 &&
-				vile.weaponSystem.rideWeapon.shootCooldown == 0 &&
-				player.input.isPressed(Control.Special1, player) &&
-				player.input.isHeld(Control.Down, player) &&
-				!rideArmorState.inTransition()
-			) {
-				hawkBombCount--;
-				Weapon targetCooldownWeapon = vile.weaponSystem.rideGrenade;
-				vile.setVileShootTime(vile.weaponSystem.rideGrenade, 2, targetCooldownWeapon);
-				punchCooldown = 0.56f;
-				changeSprite("hawk_attack_air_down2", false);
+		bool attackConditionMet = character != null && canAttack() && character.player.input.isPressed(Control.Shoot, character.player) && punchCooldown == 0;
+		if (raNum == 5) {
+			attackConditionMet = canAttack() && character != null && character.player.input.isHeld(Control.Shoot, character.player);
+		}
+		if (attackConditionMet) {
+			if (rideArmorState is RARun) changeState(new RAIdle(), true);
+			if (rideArmorState is RAJump) changeState(new RAFall(), true);
+			if (raNum == 1) punchCooldown = 0.8f;
+			else punchCooldown = 0.56f;
+			string? attackSprite = rideArmorState?.attackSprite;
+			if (raNum == 2 && character != null && rideArmorState != null && character.player.input.isHeld(Control.Down, character.player) && !rideArmorState.inTransition()) {
+				attackSprite = "hawk_attack_air_down";
 			}
+			changeSprite(attackSprite, false);
+		} else if (rideArmorState != null && player != null &&
+			hawkBombCount > 0 &&
+			canAttack() &&
+			character is Vile vile &&
+			punchCooldown == 0 &&
+			raNum == 2 &&
+			vile.weaponSystem.rideWeapon.shootCooldown == 0 &&
+			player.input.isPressed(Control.Special1, player) &&
+			player.input.isHeld(Control.Down, player) &&
+			!rideArmorState.inTransition()
+		) {
+			hawkBombCount--;
+			Weapon targetCooldownWeapon = vile.weaponSystem.rideGrenade;
+			vile.setVileShootTime(vile.weaponSystem.rideGrenade, 2, targetCooldownWeapon);
+			punchCooldown = 0.56f;
+			changeSprite("hawk_attack_air_down2", false);
+		}
 
-			if (isAttacking()) {
-				if (isAnimOver()) {
-					changeSprite(rideArmorState?.defaultSprite, true);
-				}
+		if (isAttacking()) {
+			if (isAnimOver()) {
+				changeSprite(rideArmorState?.defaultSprite, true);
 			}
+		}
 
-			if (character != null &&
-				!ownedByMK5 &&
-				(character.destroyed || character.charState is not InRideArmor)
-			) {
-				enterCooldown = 0.5f;
-				character.rideArmor = null;
-				removeCharacter();
-				changeState(new RADeactive(), true);
-			} else if (character != null &&
-				ownedByMK5 &&
-				(character.destroyed || character is Vile vile && !vile.canLinkMK5()
-			)) {
-				enterCooldown = 0.5f;
-				unlinkMK5();
-			} else {
-				rideArmorState?.update();
-			}
+		if (character != null &&
+			!ownedByMK5 &&
+			(character.destroyed || character.charState is not InRideArmor)
+		) {
+			enterCooldown = 0.5f;
+			character.rideArmor = null;
+			removeCharacter();
+			changeState(new RADeactive(), true);
+		} else if (character != null &&
+			ownedByMK5 &&
+			(character.destroyed || character is Vile vile && !vile.canLinkMK5()
+		)) {
+			enterCooldown = 0.5f;
+			unlinkMK5();
+		} else {
+			rideArmorState?.update();
+		}
 
-			if (character != null && !ownedByMK5) {
-				var charPos = character.getCharRideArmorPos();
-				character.xDir = xDir;
-				character.changePos(pos.add(charPos));
-			}
-		
+		if (character != null && !ownedByMK5) {
+			Point charPos = character.getCharRideArmorPos();
+			character.xDir = xDir;
+			character.changePos(pos.add(charPos));
+		}
 	}
 
 	public void addCharacter(Character character) {
@@ -590,18 +592,20 @@ public class RideArmor : Actor, IDamagable {
 
 		if (canBeEntered()) {
 			var chr = other.otherCollider.actor as Character;
-			if (chr != null && chr.canEnterRideArmor() && chr.charState is Fall fallState && MathF.Abs(chr.pos.x - pos.x) < 10) {
+			if (chr != null && chr.canEnterRideArmor() && MathF.Abs(chr.pos.x - pos.x) < 10) {
 				if (Global.serverClient != null) {
 					if (isNeutral) {
 						if (claimed) {
 							return;
 						} else if (!ownedByLocalPlayer && chr.ownedByLocalPlayer) {
-							fallState.setLimboVehicleCheck(this);
+							if (chr.charState is Fall fallState) {
+								fallState.setLimboVehicleCheck(this);
+							}
 							return;
-						} else if (!(ownedByLocalPlayer && chr.ownedByLocalPlayer)) {
+						} else if (!ownedByLocalPlayer || !chr.ownedByLocalPlayer) {
 							return;
 						}
-					} else if (chr?.linkedRideArmor != this || selfDestructTime > 0) {
+					} else if (netOwner != chr.player) {
 						return;
 					}
 				} else {
@@ -724,7 +728,6 @@ public class RideArmor : Actor, IDamagable {
 	}
 	
 
-	bool healedOnEnter;
 	public void putCharInRideArmor(Character chr) {
 		if (chr.rideArmor == this || character == chr) {
 			return;
@@ -733,11 +736,11 @@ public class RideArmor : Actor, IDamagable {
 		chr.rideArmor = this;
 		chr.changeState(new InRideArmor(), true);
 		changeState(new RAIdle("ridearmor_activating"), true);
-		if (character != null) {
-			if (!healedOnEnter && raNum == 4 && character.ownedByLocalPlayer && character.linkedRideArmor == this) {
-				healedOnEnter = true;
-				character.fillHealthToMax();
-			}
+		if (character != null && !isNeutral && !healedOnEnter && raNum == 4 &&
+			character.ownedByLocalPlayer && character.linkedRideArmor == this
+		) {
+			healedOnEnter = true;
+			character.fillHealthToMax();
 		}
 	}
 
@@ -776,6 +779,10 @@ public class RideArmor : Actor, IDamagable {
 
 		if (damage > 0 && owner != null) {
 			addDamageTextHelper(owner, damage, maxHealth, true);
+		}
+
+		if (hawkElec == null) {
+			hawkElec = new Anim(pos.addxy(0, -20), "hawk_elec", 1, null, false);
 		}
 
 		if (goliathHealth > 0) {
@@ -988,8 +995,6 @@ public class RideArmor : Actor, IDamagable {
 		}
 	}
 
-	float lastCrashSoundTime;
-	public float flyTime;
 
 	public void playCrashSound() {
 		if (Global.time - lastCrashSoundTime > 0.33f) {
@@ -999,16 +1004,15 @@ public class RideArmor : Actor, IDamagable {
 	}
 
 	public string getRaTypeName() {
-		if (raNum == 1) {
-			return "kangaroo";
-		} else if (raNum == 2) return "hawk";
-		else if (raNum == 3) return "frog";
-		else if (raNum == 4) return "goliath";
-		else if (raNum == 5) return "devilbear";
-		else {
-			if (!isNeutral) return "ridearmor";
-			else return "neutralra";
-		}
+		return raNum switch {
+			1 => "kangaroo",
+			2 => "hawk",
+			3 => "frog",
+			4 => "goliath",
+			5 => "devilbear",
+			0 when (!isNeutral && altSprite == 1) => "neutralra",
+			_ => "ridearmor"
+		};
 	}
 
 	public string getRaTypeFriendlyName() {
@@ -1120,6 +1124,46 @@ public class RideArmor : Actor, IDamagable {
 			setColorShaders();
 			netColorShadersSet = true;
 		}
+	}
+
+	public void renderHud(Point offset, HUDHealthPosition position) {
+		renderLifebar(offset, position);
+	}
+	public void renderLifebar(Point offset, HUDHealthPosition position) {
+		(string healthBaseSprite, int baseSpriteIndex) = ("hud_health_base_mech", raNum);
+		(string healthTopSprite, int baseTopIndex) = ("hud_health_top", 0);
+
+		HudDraw.renderLifebar(
+			offset, position, health > 0,
+			(decimal)health, (decimal)maxHealth,
+			0, 0,
+			healthBaseSprite, baseSpriteIndex,
+			healthTopSprite, baseTopIndex
+		);
+	}
+	// Usually the fly bar. Skip otherwise.
+	public bool renderAmmo(Point offset, HUDHealthPosition position) {
+		if (raNum != 2) {
+			return false;
+		}
+		Point ammoPosition = GameMode.getHUDHealthPosition(position, false) + offset;
+		float scale = 6f / 16f;
+		GameMode.renderAmmo(
+			ammoPosition.x, ammoPosition.y,
+			59, 57, 6 - flyTime, 0, 6, false,
+			"hud_weapon_full", "hud_weapon_base",
+			ammoDisplayScale: scale
+		);
+		return true;
+	}
+	// We do not want to render this for the most part.
+	// Only if the character is not null.
+	public Point renderName(Point offset) {
+		return offset;
+	}
+	// Here we render the character HP as "ammo".
+	public Point renderMiniHUD(Point offset) {
+		return offset;
 	}
 }
 
@@ -1253,12 +1297,10 @@ public class RideArmorState {
 
 		var move = new Point(0, 0);
 		if (rideArmor != null) {
-			if (player.input.isHeld(Control.Left, player)) {
-				move.x = -rideArmor.getRunSpeed() * rideArmor.getDashSpeed();
-				rideArmor.xDir = -1;
-			} else if (player.input.isHeld(Control.Right, player)) {
-				move.x = rideArmor.getRunSpeed() * rideArmor.getDashSpeed();
-				rideArmor.xDir = 1;
+			int ixDir = player.input.getXDir(player);
+			if (ixDir != 0) {
+				rideArmor.xDir = ixDir;
+				move.x = ixDir * rideArmor.getRunSpeed() * rideArmor.getDashSpeed();
 			}
 
 			if (move.magnitude > 0) {
@@ -1416,8 +1458,10 @@ public class RAIdle : RideArmorState {
 			if (character is Vile vile && vile.player.input.isHeld(Control.Down, player)) {
 				iraState.setHiding(true);
 				if (!rideArmor.isAttacking()) {
-					if (vile.player.input.isHeld(Control.Left, player)) rideArmor.xDir = -1;
-					if (vile.player.input.isHeld(Control.Right, player)) rideArmor.xDir = 1;
+					int ixDir = vile.player.input.getXDir(vile.player);
+					if (ixDir != 0) {
+						rideArmor.xDir = ixDir;
+					}
 				}
 				commonGroundCode();
 				return;
@@ -1452,20 +1496,18 @@ public class RAIdle : RideArmorState {
 				return;
 			}
 
-			if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
-				if (!rideArmor.isAttacking()) {
-					if (player.input.isHeld(Control.Left, player)) rideArmor.xDir = -1;
-					if (player.input.isHeld(Control.Right, player)) rideArmor.xDir = 1;
-					if (rideArmor.raNum != 3) {
-						rideArmor.changeState(new RARun());
-					} else {
-						rideArmor.playSound("ridejumpX3");
-						dashHeld = player.input.isHeld(Control.Dash, player) && character.flag == null;
-						float modifier = dashHeld ? 0.75f : 1f;
-						rideArmor.vel.y = -rideArmor.getJumpPower() * modifier;
-						rideArmor.changeState(new RAJump(isLeapFrog: true, isDash: dashHeld));
-						return;
-					}
+			int ixDir = player.input.getXDir(player);
+			if (ixDir != 0 && !rideArmor.isAttacking()) {
+				rideArmor.xDir = ixDir;
+				if (rideArmor.raNum != 3) {
+					rideArmor.changeState(new RARun());
+				} else {
+					rideArmor.playSound("ridejumpX3");
+					dashHeld = player.input.isHeld(Control.Dash, player) && character.flag == null;
+					float modifier = dashHeld ? 0.75f : 1f;
+					rideArmor.vel.y = -rideArmor.getJumpPower() * modifier;
+					rideArmor.changeState(new RAJump(isLeapFrog: true, isDash: dashHeld));
+					return;
 				}
 			}
 			groundCode();
@@ -1530,12 +1572,10 @@ public class RARun : RideArmorState {
 		base.update();
 		var move = new Point(0, 0);
 		if (player != null) {
-			if (player.input.isHeld(Control.Left, player)) {
-				rideArmor.xDir = -1;
-				move.x = -rideArmor.getRunSpeed();
-			} else if (player.input.isHeld(Control.Right, player)) {
-				rideArmor.xDir = 1;
-				move.x = rideArmor.getRunSpeed();
+			int ixDir = player.input.getXDir(player);
+			if (ixDir != 0) {
+				rideArmor.xDir = ixDir;
+				move.x = ixDir * rideArmor.getRunSpeed();
 			}
 			if (move.magnitude > 0) {
 				rideArmor.move(move);
@@ -2328,9 +2368,9 @@ public class InRideArmor : CharState {
 		character.setGlobalColliderTrigger(false);
 		if (stunAnim != null) stunAnim.destroySelf();
 		if (freezeAnim != null) freezeAnim.destroySelf();
-		if (character.player.isCamPlayer) {
+		//if (character.player.isCamPlayer) {
 			//Global.level.snapCamPos(character.getCamCenterPos());
-		}
+		//}
 		if (character.isCrystalized) {
 			character.crystalizeEnd();
 			Global.serverClient?.rpc(RPC.playerToggle, (byte)player.id, (byte)RPCToggleType.StopCrystalize);

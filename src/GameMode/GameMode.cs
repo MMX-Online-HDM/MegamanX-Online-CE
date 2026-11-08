@@ -687,11 +687,11 @@ public class GameMode {
 		if (!Global.level.is1v1()) {
 			drawKillFeed();
 		}
-		//if (Global.level.isTraining()) {
-		//	drawDpsIfSet(5);
-		//} else {
+		if (Global.level.isTraining()) {
+			drawDpsIfSet(5);
+		} else {
 			drawTopHUD();
-		//}
+		}
 		if (isOver) {
 			drawWinScreen();
 		} else {
@@ -732,9 +732,6 @@ public class GameMode {
 			hudDebugMsg = "";
 		} else if (mainPlayer?.character is KaiserSigma kaiser) {
 			string msg = "";
-			if (kaiser.isVirus && KaiserSigma.canKaiserSpawn(mainPlayer.character, out _)) {
-				msg += "[DASH]: Relocate";
-			}
 			if (msg != "") {
 				Fonts.drawText(
 					FontType.BlueMenu, Helpers.controlText(msg),
@@ -903,11 +900,11 @@ public class GameMode {
 	public static Point getHUDHealthPosition(HUDHealthPosition position, bool isHealth) {
 		float x = 0;
 		if (position is HUDHealthPosition.Left) {
-			x = isHealth ? 12 : 12 + 16;
+			x = isHealth ? 16 : 16 + 16;
 		} else {
 			x = isHealth ? Global.screenW - 17 : Global.screenW - 33;
 		}
-		return new Point(x, 126 + 8);
+		return new Point(x, 96 + 8 * 3);
 	}
 
 	public static Point getHUDBuffPosition(HUDHealthPosition position) {
@@ -925,9 +922,10 @@ public class GameMode {
 		string baseSprite = "hud_weapon_base",
 		int eeStacks = 0, float ammoDisplayScale = 1
 	) {
-		if (baseIndex >= 0) {
-			Global.sprites[baseSprite].drawToHUD(baseIndex, baseX, baseY);
-		}
+		// Draw the base first.
+		Global.sprites[baseSprite].drawToHUD(baseIndex, baseX, baseY);
+		// Prevent division by 0 infinite loop.
+		if (ammoDisplayScale == 0) { ammoDisplayScale = 1; }
 		// Puppeteer small energy bars.
 		bool forceSmallBarsOff = false;
 		if (!Options.main.smallBarsEx || !allowSmall && maxAmmo > 16) {
@@ -1245,7 +1243,6 @@ public class GameMode {
 		if (player.isSelectingRA()) {
 			drawRideArmorIcons();
 		}
-
 
 		if (player.character?.rideArmor != null || player.character?.rideChaser != null) {
 			return;
@@ -1610,8 +1607,8 @@ public class GameMode {
 			float scaleX = Helpers.clampMax(10f / w, 1);
 			float scaleY = Helpers.clampMax(10f / h, 1);
 
-			Global.sprites["hud_weapon_icon"].draw(weapon.weaponSlotIndex, Global.level.camX + x, Global.level.camY + y, 1, 1, null, 1, 1, 1, ZIndex.HUD);
-			Global.sprites[aw.absorbedProj.sprite.name].draw(0, Global.level.camX + x, Global.level.camY + y, 1, 1, null, 1, scaleX, scaleY, ZIndex.HUD);
+			Global.sprites["hud_weapon_icon"].draw(weapon.weaponSlotIndex, Global.level.camera.fpX + x, Global.level.camera.fpY + y, 1, 1, null, 1, 1, 1, ZIndex.HUD);
+			Global.sprites[aw.absorbedProj.sprite.name].draw(0, Global.level.camera.fpX + x, Global.level.camera.fpY + y, 1, 1, null, 1, scaleX, scaleY, ZIndex.HUD);
 		}
 	}
 
@@ -2706,7 +2703,7 @@ public class GameMode {
 
 		var line = new Line(playerPos, objPos);
 		var camRect = new Rect(
-			level.camX, level.camY, level.camX + Global.viewScreenW, level.camY + Global.viewScreenH
+			level.camera.fpX, level.camera.fpY, level.camera.fpX + Global.viewScreenW, level.camera.fpY + Global.viewScreenH
 		);
 
 		var intersectionPoints = camRect.getShape().getLineIntersectCollisions(line);
@@ -2728,8 +2725,8 @@ public class GameMode {
 		float alm4 = 5 / Global.viewSize;
 
 		intersectPoint.inc(dirTo.times(-10));
-		var posX = intersectPoint.x - Global.level.camX;
-		var posY = intersectPoint.y - Global.level.camY;
+		var posX = intersectPoint.x - Global.level.camera.fpX;
+		var posY = intersectPoint.y - Global.level.camera.fpY;
 
 		posX /= Global.viewSize;
 		posY /= Global.viewSize;

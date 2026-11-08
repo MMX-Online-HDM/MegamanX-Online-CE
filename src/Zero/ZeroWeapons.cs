@@ -173,7 +173,7 @@ public class SuiretsusenWeapon : Weapon {
 		description = new string[] { "Water element glaive with good reach." };
 		damage = "6";
 		hitcooldown = "0.75";
-		effect = "None.";
+		effect = "The longest range melee attack in the game.";
 	}
 
 	public override void attack(Character character) {

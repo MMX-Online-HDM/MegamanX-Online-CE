@@ -7,7 +7,6 @@ namespace MMXOnline;
 
 public class BaseSigma : Character {
 	public const float sigmaHeight = 50;
-	public float sigmaSaberMaxCooldown = 1f;
 	public float noBlockTime = 0;
 	public const float maxLeapSlashCooldown = 2;
 	public float tagTeamSwapProgress;
@@ -347,7 +346,7 @@ public class BaseSigma : Character {
 					if (mWeapon.controlMode == MaverickModeId.Summoner) {
 						maverick.aiBehavior = currentMaverickCommand;
 					}
-					if (mWeapon.controlMode != MaverickModeId.Puppeteer) {
+					if (mWeapon.controlMode != MaverickModeId.Puppeteer && weapons.Count <= 3) {
 						player.changeToSigmaSlot();
 					}
 				} else {
@@ -546,7 +545,6 @@ public class BaseSigma : Character {
 		changePos(warpInPos.Value);
 		this.xDir = xDir;
 		changeState(new WarpIn(false), true);
-		Global.level.snapCamPos(getCamCenterPos(), prevCamPos);
 	}
 
 	public void becomeMaverick(Maverick maverick) {
@@ -737,6 +735,8 @@ public class BaseSigma : Character {
 		}
 	}
 
+	public override (string, int) getBaseHpSprite() => ("hud_health_base", 4);
+
 	public bool isAttacking() {
 		if (isSigmaShooting() || sprite.name.Contains("attack")) {
 			return true;
@@ -744,7 +744,7 @@ public class BaseSigma : Character {
 		return false;
 	}
 
-	public override Point getCamCenterPos(bool ignoreZoom = false) {
+	public override Point getCamCenterPos() {
 		Maverick? maverick = currentMaverick;
 		if (maverick != null && maverick.controlMode == MaverickModeId.TagTeam) {
 			if (maverick.state is MEnter me) {
@@ -755,7 +755,7 @@ public class BaseSigma : Character {
 			}
 			return maverick.pos.round().addxy(camOffsetX, -24);
 		}
-		return base.getCamCenterPos(ignoreZoom);
+		return base.getCamCenterPos();
 	}
 
 	public List<Weapon> configureWeapons(SigmaLoadout sigmaLoadout) {
@@ -794,19 +794,12 @@ public class BaseSigma : Character {
 					SigmaLoadout.getWeaponById(player, sigmaLoadout.maverick2, sigmaLoadout.commandMode)
 				];
 			}
-			// Push the generic Sigma slot.
-			int sigmaWeaponSlot = 1;
 			// Always put the AI and enemies slot in the center.
-			//yo fix your logic here
-			/*
-			if (Global.level.mainPlayer == player &&
-				commandMode != (int)MaverickModeId.Summoner &&
-				commandMode != (int)MaverickModeId.Puppeteer
-			) {
-				sigmaWeaponSlot = Helpers.clamp(Options.main.sigmaWeaponSlot, 0, 2);
+			int sigmaWeaponSlot = 1;
+			// Push the generic Sigma slot.
+			if (commandMode == (int)MaverickModeId.Puppeteer) {
+				sigmaWeaponSlot = Helpers.clamp(Options.main.sigmaWeaponSlot, 0, retWeapons.Count);
 			}
-			*/
-			sigmaWeaponSlot = Helpers.clamp(Options.main.sigmaWeaponSlot, 0, 2);
 			retWeapons.Insert(sigmaWeaponSlot, new SigmaMenuWeapon());
 			weaponSlot = sigmaWeaponSlot;
 			this.sigmaWeaponSlot = sigmaWeaponSlot;

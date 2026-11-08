@@ -341,10 +341,10 @@ public partial class DrawWrappers {
 
 	public static void DrawLine(float x1, float y1, float x2, float y2, Color color, float thickness, long depth, bool isWorldPos = true) {
 		if (isWorldPos && Options.main.enablePostProcessing) {
-			x1 -= Global.level.camX;
-			x2 -= Global.level.camX;
-			y1 -= Global.level.camY;
-			y2 -= Global.level.camY;
+			x1 -= Global.level.camera.fpX;
+			x2 -= Global.level.camera.fpX;
+			y1 -= Global.level.camera.fpY;
+			y2 -= Global.level.camera.fpY;
 		}
 
 		LineShape line = new LineShape(new Vector2f(x1, y1), new Vector2f(x2, y2), color, thickness);
@@ -367,8 +367,8 @@ public partial class DrawWrappers {
 
 	public static void DrawCircle(float x, float y, float radius, bool filled, Color color, float thickness, long depth, bool isWorldPos = true, Color? outlineColor = null, uint? pointCount = null) {
 		if (isWorldPos && Options.main.enablePostProcessing) {
-			x -= Global.level.camX;
-			y -= Global.level.camY;
+			x -= Global.level.camera.fpX;
+			y -= Global.level.camera.fpY;
 		}
 
 		CircleShape circle = new CircleShape(radius);
@@ -400,8 +400,8 @@ public partial class DrawWrappers {
 	public static RenderTexture pixel = new RenderTexture((1, 1));
 	public static void DrawPixel(float x, float y, Color color, long depth, bool isWorldPos = true) {
 		if (isWorldPos && Options.main.enablePostProcessing) {
-			x -= Global.level.camX;
-			y -= Global.level.camY;
+			x -= Global.level.camera.fpX;
+			y -= Global.level.camera.fpY;
 		}
 
 		pixel.Clear(color);
@@ -419,10 +419,10 @@ public partial class DrawWrappers {
 
 	public static void DrawRect(float x1, float y1, float x2, float y2, bool filled, Color color, float thickness, long depth, bool isWorldPos = true, Color? outlineColor = null) {
 		if (isWorldPos && Options.main.enablePostProcessing) {
-			x1 -= Global.level.camX;
-			x2 -= Global.level.camX;
-			y1 -= Global.level.camY;
-			y2 -= Global.level.camY;
+			x1 -= Global.level.camera.fpX;
+			x2 -= Global.level.camera.fpX;
+			y1 -= Global.level.camera.fpY;
+			y2 -= Global.level.camera.fpY;
 		}
 
 		RectangleShape rect = new RectangleShape(new Vector2f(x2 - x1, y2 - y1));
@@ -460,7 +460,7 @@ public partial class DrawWrappers {
 		}
 		if (isWorldPos && Options.main.enablePostProcessing) {
 			for (int i = 0; i < points.Count; i++) {
-				points[i] = new Point(points[i].x - Global.level.camX, points[i].y - Global.level.camY);
+				points[i] = new Point(points[i].x - Global.level.camera.fpX, points[i].y - Global.level.camera.fpY);
 			}
 		}
 		ConvexShape shape = new ConvexShape((uint)points.Count);
@@ -500,8 +500,8 @@ public partial class DrawWrappers {
 		shaders ??= [];
 
 		if (isWorldPos && Options.main.enablePostProcessing) {
-			dx -= Global.level.camX;
-			dy -= Global.level.camY;
+			dx -= Global.level.camera.fpX;
+			dy -= Global.level.camera.fpY;
 		}
 		dx = MathF.Round(dx);
 		dy = MathF.Round(dy);
@@ -539,8 +539,8 @@ public partial class DrawWrappers {
 			shaders = new();
 		}
 		if (isWorldPos && Options.main.enablePostProcessing) {
-			dx -= Global.level.camX;
-			dy -= Global.level.camY;
+			dx -= Global.level.camera.fpX;
+			dy -= Global.level.camera.fpY;
 		}
 		dx = MathF.Round(dx);
 		dy = MathF.Round(dy);
@@ -581,8 +581,8 @@ public partial class DrawWrappers {
 		if (screenRenderTexture == null) {
 			Global.window.SetView(Global.view);
 		} else {
-			x = x - Global.level.camX;
-			y = y - Global.level.camY;
+			x = x - Global.level.camera.fpX;
+			y = y - Global.level.camera.fpY;
 
 			// High speed scrolling may look better with this code. Might cause issues elsewhere so limiting to race
 			if (Global.level.gameMode is Race) {
@@ -606,9 +606,9 @@ public partial class DrawWrappers {
 					// Don't draw tiles out of the screen for optimization
 					var rect = Rect.createFromWH(origX + xOffset, origY + yOffset, tileW, tileH);
 					var camRect = new Rect(
-						Global.level.camX, Global.level.camY,
-						Global.level.camX + Global.viewScreenW,
-						Global.level.camY + Global.viewScreenH
+						Global.level.camera.fpX, Global.level.camera.fpY,
+						Global.level.camera.fpX + Global.viewScreenW,
+						Global.level.camera.fpY + Global.viewScreenH
 					);
 					if (!rect.overlaps(camRect)) {
 						continue;

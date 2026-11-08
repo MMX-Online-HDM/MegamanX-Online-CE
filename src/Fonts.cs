@@ -61,8 +61,8 @@ public class Fonts {
 		BatchDrawable batchDrawable = new BatchDrawable(bitmapFontTexture);
 		// For in-stage drawing.
 		if (isWorldPos) {
-			x = (x - Global.level.camX) / Global.viewSize;
-			y = (y - Global.level.camY) / Global.viewSize;
+			x = (x - Global.level.camera.fpX) / Global.viewSize;
+			y = (y - Global.level.camera.fpY) / Global.viewSize;
 		}
 		// Draw every character.
 		for (int line = 0; line < textLines.Length; line++) {
@@ -252,6 +252,7 @@ public class Fonts {
 			FontType.FOrange => "FixedOrange",
 			FontType.BlueMenu => "BlueMenu",
 			FontType.OrangeMenu => "OrangeMenu",
+			FontType.WhiteMini => "WhiteMiniOut",
 			_ => "Blue"
 		};
 	}
@@ -264,6 +265,7 @@ public class Fonts {
 			FontType.BlueMenu => FontType.OrangeMenu,
 			FontType.OrangeMenu => FontType.BlueMenu,
 			FontType.DarkBlue => FontType.DarkOrange,
+			FontType.WhiteMini => FontType.WhiteMini,
 			_ => FontType.Orange
 		};
 	}
@@ -289,4 +291,5 @@ public enum FontType {
 	FOrange,
 	BlueMenu,
 	OrangeMenu,
+	WhiteMini,
 }

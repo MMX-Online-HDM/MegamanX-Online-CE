@@ -31,25 +31,31 @@ public class CrushCrawfish : Maverick {
 		if (sendRpc) {
 			RPC.createActor.sendRpc(this, player, player.character, getSerialExtra());
 		}
+
 		gameMavs = GameMavs.X3;
+		canSwim = true;
 		height = 32;
+		subtractTargetDistance = 50;
 	}
 
-	public override void update() {
-		base.update();
-		subtractTargetDistance = 50;
-		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand) {
-				if (input.isPressed(Control.Shoot, player)) {
-					changeState(new CrushCShootArmState());
-				} else if (input.isPressed(Control.Special1, player)) {
-					changeState(getShootState(false));
-				} else if (input.isPressed(Control.Dash, player)) {
-					changeState(new CrushCDashState());
-				}
-			} else if (state is MJump || state is MFall) {
-			}
+	//public override void update() {
+	//	base.update();
+	//}
+
+	public override bool attackCtrl() {
+		if (input.isPressed(Control.Shoot, player)) {
+			changeState(new CrushCShootArmState());
+			return true;
 		}
+		if (input.isPressed(Control.Special1, player)) {
+			changeState(getShootState(false));
+			return true;
+		}
+		if (input.isPressed(Control.Dash, player)) {
+			changeState(new CrushCDashState());
+			return true;
+		}
+		return base.attackCtrl();
 	}
 
 	public override string getMaverickPrefix() {

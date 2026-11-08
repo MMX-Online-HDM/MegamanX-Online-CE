@@ -361,13 +361,13 @@ public class RekkohaProj : Projectile {
 }
 
 public class RekkohaEffect : Effect {
-	public RekkohaEffect() : base(new Point(Global.level.camX, Global.level.camY)) {
+	public RekkohaEffect() : base(new Point(Global.level.camera.fpX, Global.level.camera.fpY)) {
 	}
 
 	public override void update() {
 		base.update();
-		pos.x = Global.level.camX;
-		pos.y = Global.level.camY;
+		pos.x = Global.level.camera.fpX;
+		pos.y = Global.level.camera.fpY;
 
 		if (effectTime > 2) {
 			destroySelf();
@@ -538,8 +538,8 @@ public class DarkHoldProj : Projectile {
 	public void updateShader() {
 		if (screenShader != null) {
 			var screenCoords = new Point(
-				pos.x - Global.level.camX,
-				pos.y - Global.level.camY
+				pos.x - Global.level.camera.fpX,
+				pos.y - Global.level.camera.fpY
 			);
 			var normalizedCoords = new Point(
 				screenCoords.x / Global.viewScreenW,

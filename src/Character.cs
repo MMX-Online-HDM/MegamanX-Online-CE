@@ -1231,7 +1231,7 @@ public partial class Character : Actor, IDamagable, IHudDrawable {
 
 	public override void physicsUpdate() {
 		base.physicsUpdate();
-		
+
 		// This overrides the ground checks made by Actor.update();
 		if (rideArmorPlatform != null) {
 			changePos(rideArmorPlatform.getMK5Pos().addxy(0, 1));
@@ -1261,6 +1261,11 @@ public partial class Character : Actor, IDamagable, IHudDrawable {
 	public override void postUpdate() {
 		base.postUpdate();
 		postUpdateCtrl();
+
+		// Update again to prevent jittering.
+		if (rideArmorPlatform != null) {
+			changePos(rideArmorPlatform.getMK5Pos().addxy(-4 * xDir, 1));
+		}
 	}
 
 	public virtual bool postUpdateCtrl() {
@@ -1427,7 +1432,7 @@ public partial class Character : Actor, IDamagable, IHudDrawable {
 				player.input.isPressed(Control.Jump, player) &&
 				player.input.isHeld(Control.Up, player) &&
 				canEjectFromRideArmor()
-			  ) {
+			) {
 				getOffMK5Platform();
 				changeState(getJumpState());
 				vel.y = -getJumpPower();
@@ -1873,7 +1878,7 @@ public partial class Character : Actor, IDamagable, IHudDrawable {
 		return this;
 	}
 
-	public virtual Point getCamCenterPos(bool ignoreZoom = false) {
+	public override Point getCamCenterPos() {
 		if (rideArmorPlatform != null) {
 			return rideArmorPlatform.pos.round().addxy(0, -70);
 		}
@@ -2282,12 +2287,17 @@ public partial class Character : Actor, IDamagable, IHudDrawable {
 				shouldDrawHealthBar = true;
 			}
 		}
+		Point barOffset = pos.round().addxy(-getMiniHudLength(), -44);
 
-		if (shouldDrawHealthBar || Global.overrideDrawHealth) {
-			drawHealthBar();
+		if ((shouldDrawHealthBar || Global.overrideDrawHealth) &&
+			visible && !sprite.name.EndsWith("die") 
+		) {
+			renderMiniHUD(barOffset);
 		}
-		if (shouldDrawName || Global.overrideDrawName && overrideName != "") {
-			drawName(overrideName, overrideColor);
+		if ((shouldDrawName || Global.overrideDrawName || overrideName != "") &&
+			visible && !sprite.name.EndsWith("die") 
+		) {
+			renderName(barOffset);
 		}
 
 		if (!hideNoShaderIcon()) {
@@ -2351,7 +2361,7 @@ public partial class Character : Actor, IDamagable, IHudDrawable {
 				deductLabelY(labelCooldownOffY);
 			}
 		}
-		if (this is KaiserSigma { isVirus: false }) {
+		if (this is KaiserSigma { isVirusTest: false }) {
 			renderDamageText(100);
 		} else {
 			renderDamageText(35);
@@ -2372,6 +2382,10 @@ public partial class Character : Actor, IDamagable, IHudDrawable {
 				Alignment.Center, true, depth: ZIndex.HUD
 			);
 			if (ai != null) {
+				Fonts.drawText(
+					FontType.Grey, charState.GetType().Name,
+					textPosX, textPosY -= 10, Alignment.Center, true, depth: ZIndex.HUD
+				);
 				Fonts.drawText(
 					FontType.Grey, "dest:" + ai.aiState.getDestNodeName(),
 					textPosX, textPosY -= 10, Alignment.Center, true, depth: ZIndex.HUD
@@ -2402,7 +2416,7 @@ public partial class Character : Actor, IDamagable, IHudDrawable {
 				}
 			} else {
 				Fonts.drawText(
-					FontType.Grey, charState.GetType().ToString().RemovePrefix("MMXOnline."),
+					FontType.Grey, charState.GetType().Name,
 					textPosX, textPosY -= 10, Alignment.Center, true, depth: ZIndex.HUD
 				);
 				Fonts.drawText(
@@ -2440,8 +2454,8 @@ public partial class Character : Actor, IDamagable, IHudDrawable {
 		for (int i = 0; i < count; i++) {
 			float angCopy = ang;
 			DrawWrappers.deferredTextDraws.Add(() => DrawWrappers.DrawCircle(
-				(-Global.level.camX + cx + Helpers.cosd(angCopy) * radius) / Global.viewSize,
-				(-Global.level.camY + cy + Helpers.sind(angCopy) * radius) / Global.viewSize,
+				(-Global.level.camera.fpX + cx + Helpers.cosd(angCopy) * radius) / Global.viewSize,
+				(-Global.level.camera.fpY + cy + Helpers.sind(angCopy) * radius) / Global.viewSize,
 				thickness / Global.viewSize, true, Color.Black, 1, ZIndex.HUD, isWorldPos: false));
 			ang += (360f / count);
 		}
@@ -2449,8 +2463,8 @@ public partial class Character : Actor, IDamagable, IHudDrawable {
 		for (int i = 0; i < count * progress; i++) {
 			float angCopy = ang;
 			DrawWrappers.deferredTextDraws.Add(() => DrawWrappers.DrawCircle(
-				(-Global.level.camX + cx + Helpers.cosd(angCopy) * radius) / Global.viewSize,
-				(-Global.level.camY + cy + Helpers.sind(angCopy) * radius) / Global.viewSize,
+				(-Global.level.camera.fpX + cx + Helpers.cosd(angCopy) * radius) / Global.viewSize,
+				(-Global.level.camera.fpY + cy + Helpers.sind(angCopy) * radius) / Global.viewSize,
 				(thickness - 0.5f) / Global.viewSize, true, Color.Yellow, 1, ZIndex.HUD, isWorldPos: false));
 			ang += (360f / count);
 		}
@@ -3677,9 +3691,32 @@ public partial class Character : Actor, IDamagable, IHudDrawable {
 
 	public virtual void aiDodge(Actor? target) { }
 
-	public virtual void renderHUD(Point offset, HUDHealthPosition position) {
+	public float lifebarSecondRenderOff;
+
+	public virtual void renderHud(Point offset, HUDHealthPosition position) {
 		renderLifebar(offset, position);
-		renderAmmo(offset, position);
+		renderAmmo(offset.addxy(-lifebarSecondRenderOff, 0), position);
+		bool drawExtra = false;
+		RideArmor? ride = rideArmorPlatform ?? rideArmor;
+		if (ride != null) {
+			drawExtra = true;
+			offset.x += 16;
+			ride.renderLifebar(offset, position);
+			ride.renderAmmo(offset, position);
+		}
+		if (currentMaverick != null) {
+			drawExtra = true;
+			offset.x += 16;
+			currentMaverick.renderLifebar(offset, position);
+			currentMaverick.renderAmmo(offset, position);
+		}
+		if (drawExtra) {
+			lifebarSecondRenderOff += 2;
+			if (lifebarSecondRenderOff >= 8) { lifebarSecondRenderOff = 8; }
+		} else {
+			lifebarSecondRenderOff -= 2;
+			if (lifebarSecondRenderOff <= 0) { lifebarSecondRenderOff = 0; }
+		}
 		renderBuffs(offset, position);
 	}
 
@@ -3706,12 +3743,11 @@ public partial class Character : Actor, IDamagable, IHudDrawable {
 	}
 
 	public virtual void renderLifebar(Point offset, HUDHealthPosition position) {
-		Point hpPos = GameMode.getHUDHealthPosition(position, true) + offset;
 		(string healthBaseSprite, int baseSpriteIndex) = getBaseHpSprite();
 		(string healthTopSprite, int baseTopIndex) = getTopHpSprite();
 
 		HudDraw.renderLifebar(
-			hpPos, position, alive,
+			offset, position, alive,
 			health, maxHealth,
 			0, damageSavings,
 			healthBaseSprite, baseSpriteIndex,
@@ -3719,10 +3755,12 @@ public partial class Character : Actor, IDamagable, IHudDrawable {
 		);
 	}
 
-	public virtual void renderAmmo(Point offset, HUDHealthPosition position) {
-		Point ammoPosition = GameMode.getHUDHealthPosition(position, false) + offset;
-		HudDraw.renderAmmo(ammoPosition, position, currentWeapon);
+	public virtual bool renderAmmo(Point offset, HUDHealthPosition position) {
+		return HudDraw.renderAmmo(offset, position, getHudWeapon());
 	}
+
+	public virtual Weapon? getHudWeapon() => currentWeapon;
+
 
 	public virtual Point renderMiniHUD(Point offset) {
 		// Values.
@@ -3745,6 +3783,11 @@ public partial class Character : Actor, IDamagable, IHudDrawable {
 	public virtual Point renderName(Point offset) {
 		long zPos = ZIndex.HUD - 200 + player.id * 5;
 		return HudDraw.renderName(offset, player.name, zPos);
+	}
+
+	public int getMiniHudLength() {
+		int max = MathInt.Ceiling(maxHealth);
+		return Math.Max(getMiniHudWeaponLength(), max);
 	}
 
 	public virtual int getMiniHudWeaponLength() {

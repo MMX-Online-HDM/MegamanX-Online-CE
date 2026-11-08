@@ -455,10 +455,10 @@ public class MorphMCSpinState : MothMState {
 			}
 
 			if (input.isHeld(Control.Left, player)) {
-				airMove.x = -maverick.getRunSpeed() * maverick.getDashSpeed();
+				airMove.x = -maverick.getDashOrRunSpeed();
 				maverick.xDir = -1;
 			} else if (input.isHeld(Control.Right, player)) {
-				airMove.x = maverick.getRunSpeed() * maverick.getDashSpeed();
+				airMove.x = maverick.getDashOrRunSpeed();
 				maverick.xDir = 1;
 			}
 

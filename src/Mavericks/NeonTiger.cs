@@ -8,7 +8,6 @@ public class NeonTiger : Maverick {
 	public const float pounceSpeed = 275;
 	public const float wallPounceSpeed = 325;
 	public int shootNum;
-	public bool isDashing;
 	public int shootTimes;
 	public float dashAICooldown;
 	public NeonTiger(

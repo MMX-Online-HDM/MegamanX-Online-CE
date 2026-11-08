@@ -415,22 +415,20 @@ public class HyperBusterZeroStart2 : BusterZeroState {
 			int animCount = 0;
 			for (int i = 0; i < virusAnim.Length; i++) {
 				if (virusAnim[i] is Anim anim) {
-					if (anim.pos == character.getCenterPos()) {
-						anim.destroySelf();
-					}
 					if (anim.destroyed) {
-						character.playSound("shingetsurinx5", true);
 						if (stateFrames > 55) {
 							virusAnim[i] = null;
 							continue;
 						}
 						anim = createVirusAnim();
+						virusAnim[i] = anim;
 					} else {
 						animCount++;
 					}
 					anim.moveToPos(character.getCenterPos(), 300);
 					if (anim.pos.distanceTo(character.getCenterPos()) < 10) {
 						anim.destroySelf();
+						character.playSound("shingetsurinx5", true);
 					}
 				} else if (delayedVirusTimer[i] > 0) {
 					delayedVirusTimer[i] -= Global.speedMul;

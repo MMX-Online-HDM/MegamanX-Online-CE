@@ -279,8 +279,8 @@ public class Flag : Actor {
 		for (int i = 0; i < count; i++) {
 			float angCopy = ang;
 			DrawWrappers.deferredTextDraws.Add(() => DrawWrappers.DrawCircle(
-				(-Global.level.camX + cx + Helpers.cosd(angCopy) * radius) / Global.viewSize,
-				(-Global.level.camY + cy + Helpers.sind(angCopy) * radius) / Global.viewSize,
+				(-Global.level.camera.fpX + cx + Helpers.cosd(angCopy) * radius) / Global.viewSize,
+				(-Global.level.camera.fpY + cy + Helpers.sind(angCopy) * radius) / Global.viewSize,
 				thickness / Global.viewSize, true, Color.Black, 1, ZIndex.HUD, isWorldPos: false));
 			ang += (360f / count);
 		}
@@ -288,8 +288,8 @@ public class Flag : Actor {
 		for (int i = 0; i < count * progress; i++) {
 			float angCopy = ang;
 			DrawWrappers.deferredTextDraws.Add(() => DrawWrappers.DrawCircle(
-				(-Global.level.camX + cx + Helpers.cosd(angCopy) * radius) / Global.viewSize,
-				(-Global.level.camY + cy + Helpers.sind(angCopy) * radius) / Global.viewSize,
+				(-Global.level.camera.fpX + cx + Helpers.cosd(angCopy) * radius) / Global.viewSize,
+				(-Global.level.camera.fpY + cy + Helpers.sind(angCopy) * radius) / Global.viewSize,
 				(thickness - 0.5f) / Global.viewSize, true,
 				alliance == GameMode.redAlliance ? Color.Red : Color.Blue,
 				1, ZIndex.HUD, isWorldPos: false)

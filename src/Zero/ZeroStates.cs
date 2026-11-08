@@ -37,25 +37,21 @@ public class HyperZeroStart : ZeroState {
 		if (virusAnimName != "") {
 			int animCount = 0;
 			for (int i = 0; i < virusAnim.Length; i++) {
-				Anim? targetAnim = virusAnim[i];
-				if (targetAnim != null) {
-					if (targetAnim.pos == character.getCenterPos()) {
-						targetAnim.destroySelf();
-					}
-					if (targetAnim.destroyed) {
-						character.playSound("shingetsurinx5", true);
+				if (virusAnim[i] is Anim anim) {
+					if (anim.destroyed) {
 						if (stateFrames > 55) {
 							virusAnim[i] = null;
 							continue;
 						}
-						targetAnim = createVirusAnim();
-						virusAnim[i] = targetAnim;
+						anim = createVirusAnim();
+						virusAnim[i] = anim;
 					} else {
 						animCount++;
 					}
-					targetAnim.moveToPos(character.getCenterPos(), 300);
-					if (targetAnim.pos.distanceTo(character.getCenterPos()) < 10) {
-						targetAnim.destroySelf();
+					anim.moveToPos(character.getCenterPos(), 300);
+					if (anim.pos.distanceTo(character.getCenterPos()) < 10) {
+						anim.destroySelf();
+						character.playSound("shingetsurinx5", true);
 					}
 				} else if (delayedVirusTimer[i] > 0) {
 					delayedVirusTimer[i] -= Global.speedMul;

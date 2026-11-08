@@ -795,6 +795,9 @@ public class PunchyZero : Character {
 		base.render(x, y);
 	}
 
+	public override (string, int) getBaseHpSprite() => ("hud_health_base", 1);
+	public override Weapon? getHudWeapon() => gigaAttack;
+
 	public override List<byte> getCustomActorNetData() {
 		List<byte> customData = base.getCustomActorNetData();
 		customData.Add((byte)MathF.Floor(gigaAttack.ammo));

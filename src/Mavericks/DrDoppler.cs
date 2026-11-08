@@ -46,6 +46,7 @@ public class DrDoppler : Maverick {
 
 	public override void update() {
 		base.update();
+		if (!ownedByLocalPlayer) { return; }
 
 		if (state is not DrDopplerAbsorbState) {
 			rechargeAmmo(1);
@@ -57,33 +58,45 @@ public class DrDoppler : Maverick {
 			if (input.isPressed(Control.Special2, player)) {
 				if (state is not StingCClimb && grounded) {
 					ballType++;
-					if (ballType == 2) ballType = 0;
+					if (ballType == 2) {
+						ballType = 0;
+					}
 					if (ballType == 1) {
-						Global.level.gameMode.setHUDErrorMessage(player, "Switched to Neurocomputer Vaccine.", false, true);
+						Global.level.gameMode.setHUDErrorMessage(
+							player, "Switched to Neurocomputer Vaccine.", false, true
+						);
 						if (player.weapon is DrDopplerWeapon ddw) {
 							ddw.ballType = 1;
 						}
 					} else {
-						Global.level.gameMode.setHUDErrorMessage(player, "Switched to Neurocomputer Shock Gun.", false, true);
+						Global.level.gameMode.setHUDErrorMessage(
+							player, "Switched to Neurocomputer Shock Gun.", false, true
+						);
 						if (player.weapon is DrDopplerWeapon ddw) {
 							ddw.ballType = 0;
 						}
 					}
 				}
 			}
-
-			if (state is MIdle or MRun or MLand) {
-				if (input.isPressed(Control.Shoot, player)) {
-					changeState(new DrDopplerShootState());
-				} else if (input.isPressed(Control.Special1, player) && ammo >= 8) {
-					deductAmmo(8);
-					changeState(new DrDopplerAbsorbState());
-				} else if (input.isPressed(Control.Dash, player)) {
-					changeState(new DrDopplerDashStartState());
-				}
-			} else if (state is MJump || state is MFall) {
-			}
 		}
+	}
+	
+
+	public override bool attackCtrl() {
+		if (input.isPressed(Control.Shoot, player)) {
+			return changeState(new DrDopplerShootState());
+		}
+		if (input.isPressed(Control.Special1, player) && ammo >= 8) {
+			if (changeState(new DrDopplerAbsorbState())) {
+				deductAmmo(8);
+				return true;
+			}
+			return false;
+		}
+		if (input.isPressed(Control.Dash, player)) {
+			return changeState(new DrDopplerDashStartState());
+		}
+		return base.attackCtrl();
 	}
 
 	public override string getMaverickPrefix() {

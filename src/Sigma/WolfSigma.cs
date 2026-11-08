@@ -83,7 +83,7 @@ public class WolfSigma : Character {
 		// Do not Remove this bc it basically prevents shenanigans that would softlock him
 	}
 
-	public override Point getCamCenterPos(bool ignoreZoom = false) {
+	public override Point getCamCenterPos() {
 		if (player.weapon is WolfSigmaHandWeapon handWeapon && handWeapon.hand.isControlling) {
 			var hand = handWeapon.hand;
 			Point camCenter = sigmaHeadGroundCamCenterPos ?? getCenterPos();

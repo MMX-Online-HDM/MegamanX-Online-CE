@@ -27,7 +27,7 @@ public class ParallaxSprite {
 		var rx = pos.x + x + offsetX + alignOffset.x;
 		var ry = pos.y + y + offsetY + alignOffset.y;
 		var rect = new Rect(rx, ry, rx + currentFrame.rect.w(), ry + currentFrame.rect.h());
-		var camRect = new Rect(Global.level.camX, Global.level.camY, Global.level.camX + Global.viewScreenW, Global.level.camY + Global.viewScreenH);
+		var camRect = new Rect(Global.level.camera.fpX, Global.level.camera.fpY, Global.level.camera.fpX + Global.viewScreenW, Global.level.camera.fpY + Global.viewScreenH);
 		if (rect.overlaps(camRect)) {
 			sprite.draw(sprite.frameIndex, pos.x + x, pos.y + y, xDir, yDir, null, 1, 1, 1, ZIndex.Parallax + 100);
 		}

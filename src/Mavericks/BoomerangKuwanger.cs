@@ -57,54 +57,51 @@ public class BoomerangKuwanger : Maverick {
 		Helpers.decrementTime(ref dashSoundCooldown);
 		Helpers.decrementTime(ref teleportCooldown);
 
+		if (!ownedByLocalPlayer) {
+			return;
+		}
 		if (state is not BoomerKTeleportState) {
 			rechargeAmmo(4);
 		}
-
 		if (sprite.name == "boomerk_catch" && sprite.isAnimOver()) {
 			changeSpriteFromName(state.sprite, true);
 		}
+	}
 
-		if (aiBehavior != MaverickAIBehavior.Control || !state.attackCtrl) {
-			return;
-		}
-		if (state.attackCtrl) {
-			if (state is not BoomerKDashState && state is MIdle or MRun) {
-				if (input.isHeld(Control.Left, player)) {
-					xDir = -1;
-					changeState(new BoomerKDashState(Control.Left));
-					return;
-				} else if (input.isHeld(Control.Right, player)) {
-					xDir = 1;
-					changeState(new BoomerKDashState(Control.Right));
-					return;
-				}
-			}
-			if (bald) {
-				return;
-			}
-
-			if (shootPressed()) {
-				changeState(getShootState());
-			}
-			else if (specialPressed()) {
-				changeState(new BoomerKDeadLiftState());
-			}
-			else if (player.dashPressed(out _) && teleportCooldown == 0) {
-				if (ammo >= 8) {
-					deductAmmo(8);
-					changeState(new BoomerKTeleportState());
-				}
-			}
-		} else if (state is BoomerKTeleportState teleportState && teleportState.onceTeleportInSound) {
-			if (specialPressed() && !bald) {
-				changeState(new BoomerKDeadLiftState());
+	public override bool normalCtrl() {
+		if (player.dashPressed(out _) && teleportCooldown == 0) {
+			if (ammo >= 8) {
+				deductAmmo(8);
+				changeState(new BoomerKTeleportState());
+				return true;
 			}
 		}
+		if (state is not BoomerKDashState && state is MIdle or MRun) {
+			int ixDir = input.getXDir(player);
+			if (ixDir != 0) {
+				xDir = ixDir;
+				string dashBt = ixDir > 0 ? Control.Right : Control.Left;
+				changeState(new BoomerKDashState(dashBt));
+			}
+		}
+		return base.normalCtrl();
+	}
+
+	public override bool attackCtrl() {
+		if (!bald && shootPressed()) {
+			changeState(getShootState());
+		}
+		if (!bald && specialPressed()) {
+			changeState(new BoomerKDeadLiftState());
+		}
+		return base.attackCtrl();
 	}
 
 	public override float getRunSpeed() {
-		return 175 * getRunDebuffs();
+		return 3 * 60 * getRunDebuffs();
+	}
+	public override float getDashSpeed() {
+		return 5 * 60 * getRunDebuffs();
 	}
 
 	public override string getMaverickPrefix() {
@@ -373,9 +370,6 @@ public class BoomerKTeleportState : BoomerMState {
 					player.character.stopCamUpdate = true;
 				}
 				maverick.changePos(clone.pos);
-				if (prevCamPos != null && maverick.controlMode == MaverickModeId.TagTeam) {
-					Global.level.snapCamPos(player.character?.getCamCenterPos() ?? new Point(0,0), prevCamPos);
-				}
 			}
 			clone?.destroySelf();
 			clone = null;
@@ -468,6 +462,11 @@ public class BoomerKTeleportState : BoomerMState {
 		if (stateTime > 0.8f) {
 			maverick.stopMoving();
 			maverick.changeToIdleOrFall();
+			return;
+		}
+
+		if (onceTeleportInSound && maverick.specialPressed() && !boomeruKuwanger.bald) {
+			maverick.changeState(new BoomerKDeadLiftState());
 		}
 	}
 
@@ -511,6 +510,7 @@ public class BoomerKDashState : BoomerMState {
 		attackCtrl = true;
 		aiAttackCtrl = true;
 		canBeCanceled = false;
+		exitOnAirborne = true;
 	}
 
 	public override void onEnter(MaverickState oldState) {
@@ -527,17 +527,15 @@ public class BoomerKDashState : BoomerMState {
 
 	public override void update() {
 		base.update();
-
 		dashTime += Global.spf;
-		float modifier = 1;
 
 		if (!input.isHeld(initialDashButton, player)) {
-			maverick.changeState(new MIdle());
+			maverick.changeToIdleOrFall();
 			return;
 		}
 
 		var move = new Point(0, 0);
-		move.x = 300 * maverick.xDir * modifier;
+		move.x = maverick.getDashSpeed() * maverick.xDir;
 		maverick.move(move);
 	}
 }

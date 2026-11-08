@@ -6,6 +6,7 @@ namespace MMXOnline;
 public class NeoSigma : BaseSigma {
 	public Weapon gigaAttack;
 	public float normalAttackCooldown;
+	public float normalAtkMaxCooldown = 30;
 	public float sigmaUpSlashCooldown;
 	public float sigmaDownSlashCooldown;
 
@@ -20,7 +21,6 @@ public class NeoSigma : BaseSigma {
 		netId, ownedByLocalPlayer, isWarpIn,
 		loadout, heartTanks, isATrans
 	) {
-		sigmaSaberMaxCooldown = 0.5f;
 		altSoundId = AltSoundIds.X2;
 		gigaAttack = new NeoSigmaGigaAttackWeapon();
 	}
@@ -32,9 +32,9 @@ public class NeoSigma : BaseSigma {
 			return;
 		}
 		// Cooldowns.
-		Helpers.decrementTime(ref normalAttackCooldown);
-		Helpers.decrementTime(ref sigmaUpSlashCooldown);
-		Helpers.decrementTime(ref sigmaDownSlashCooldown);
+		Helpers.decrementFrames(ref normalAttackCooldown);
+		Helpers.decrementFrames(ref sigmaUpSlashCooldown);
+		Helpers.decrementFrames(ref sigmaDownSlashCooldown);
 		Helpers.decrementFrames(ref aiAttackCooldown);
 		gigaAttack.update();
 		gigaAttack.charLinkedUpdate(this, true);
@@ -69,22 +69,22 @@ public class NeoSigma : BaseSigma {
 		bool lenientAttackPressed = (attackPressed || framesSinceLastAttack < 5);
 
 		// Shoot button attacks.
-		if (lenientAttackPressed && normalAttackCooldown == 0) {
+		if (lenientAttackPressed) {
 			if (player.input.isHeld(Control.Up, player) && flag == null && grounded) {
 				if (sigmaUpSlashCooldown == 0) {
-					sigmaUpSlashCooldown = 0.75f;
+					sigmaUpSlashCooldown = 45;
 					changeState(new SigmaUpDownSlashState(true), true);
 				}
 				return true;
 			} else if (player.input.isHeld(Control.Down, player)) {
 				if (sigmaDownSlashCooldown == 0) {
-					sigmaUpSlashCooldown += 0.5f;
-					sigmaDownSlashCooldown = 1f;
+					if (sigmaUpSlashCooldown > 25) { sigmaUpSlashCooldown = 25; }
+					sigmaDownSlashCooldown = 45;
 					changeState(new SigmaUpDownSlashState(false), true);
 				}
 				return true;
 			}
-			normalAttackCooldown = sigmaSaberMaxCooldown;
+			normalAttackCooldown = normalAtkMaxCooldown;
 
 			if (charState is WallSlide || charState is LadderClimb) {
 				if (charState is LadderClimb) {
@@ -203,6 +203,9 @@ public class NeoSigma : BaseSigma {
 		return gigaAttack.ammo < gigaAttack.maxAmmo;
 	}
 
+	public override Weapon? getHudWeapon() => gigaAttack;
+
+
 	public override List<byte> getCustomActorNetData() {
 		List<byte> customData = base.getCustomActorNetData();
 		customData.Add((byte)MathF.Floor(gigaAttack.ammo));
@@ -246,11 +249,11 @@ public class NeoSigma : BaseSigma {
 		switch (neoattack) {
 			case 1 when sigmaDownSlashCooldown <= 0 && grounded && isTargetInAir:
 				changeState(new SigmaUpDownSlashState(true), true);
-				sigmaDownSlashCooldown = 1f;						
+				sigmaDownSlashCooldown = 45;
 				break;
 			case 2 when sigmaUpSlashCooldown <= 0 && !grounded:
 				changeState(new SigmaUpDownSlashState(false), true);
-				sigmaUpSlashCooldown = 0.75f;
+				sigmaUpSlashCooldown = 45;
 				break;
 			default:
 				player.press(Control.Shoot);

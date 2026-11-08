@@ -40,18 +40,27 @@ public class BlizzardBuffalo : Maverick {
 
 	public override void update() {
 		base.update();
-		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand) {
-				if (input.isPressed(Control.Shoot, player)) {
-					changeState(getShootState(false));
-				} else if (input.isPressed(Control.Special1, player)) {
-					changeState(new BBuffaloShootBeamState());
-				} else if (input.isPressed(Control.Dash, player)) {
-					changeState(new BBuffaloDashState());
-				}
-			} else if (state is MJump || state is MFall) {
-			}
+		// Nothing here either.
+	}
+
+	public override bool normalCtrl() {
+		if (input.isPressed(Control.Dash, player)) {
+			changeState(new BBuffaloDashState());
+			return true;
 		}
+		return base.normalCtrl();
+	}
+
+	public override bool attackCtrl() {
+		if (input.isPressed(Control.Shoot, player)) {
+			changeState(getShootState(false));
+			return true;
+		}
+		if (input.isPressed(Control.Special1, player)) {
+			changeState(new BBuffaloShootBeamState());
+			return true;
+		}
+		return base.attackCtrl();
 	}
 
 	public override float getRunSpeed() {
@@ -64,7 +73,7 @@ public class BlizzardBuffalo : Maverick {
 
 	public override MaverickState[] strikerStates() {
 		return [
-			new BBuffaloShootAI(isStriker: true),
+			new BBuffaloShootAI(true),
 			new BBuffaloShootBeamState(),
 			new BBuffaloDashState(),
 		];

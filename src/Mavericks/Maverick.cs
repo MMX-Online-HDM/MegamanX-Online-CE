@@ -43,7 +43,7 @@ public class SavedMaverickData {
 	}
 }
 
-public class Maverick : Actor, IDamagable {
+public class Maverick : Actor, IDamagable, IHudDrawable {
 	// HP stuff.
 	public float health;
 	public float maxHealth;
@@ -65,6 +65,7 @@ public class Maverick : Actor, IDamagable {
 	public float ammo = 32;
 	public float maxAmmo = 32;
 	public float grayAmmoLevel = 0;
+	public float ammoDisplayScale = 1;
 	public bool usesAmmo = false;
 	public bool canHealAmmo = false;
 	public float? ammoHealScale = null;
@@ -75,12 +76,16 @@ public class Maverick : Actor, IDamagable {
 	public bool useChargeJump;
 	public float storedJumpCharge;
 	public bool canStomp;
-	public float dashSpeed = 1;
+	public float jumpChargeSpeed = 1;
+	public bool isDashing;
 	public bool canClimb;
 	public bool canClimbWall;
+	public bool canSwim;
+	// Fly.
 	public bool canFly;
-	public float maxFlyBar = 16;
-	public float flyBar = 16;
+	public bool useInsectFly;
+	public float maxFlyBar = 16 * 60;
+	public float flyBar = 16 * 60;
 	public (int icon, int units) flyBarIndexes = (0, 0);
 
 	// Defense.
@@ -423,7 +428,7 @@ public class Maverick : Actor, IDamagable {
 		if (grounded) {
 			lastGroundedPos = pos;
 			if (canFly && flyBar < maxFlyBar) {
-				flyBar += 1 * Global.speedMul;
+				flyBar += 1 * speedMul;
 				if (flyBar > maxFlyBar) { flyBar = maxFlyBar; }
 			}
 		}
@@ -540,7 +545,7 @@ public class Maverick : Actor, IDamagable {
 			int inputDir =  input.getXDir(player);
 			if (inputDir != 0) {
 				xDir = inputDir;
-				move(new Point(inputDir * getRunSpeed() * getDashSpeed() * getAirSpeed(), 0));
+				move(new Point(inputDir * getDashOrRunSpeed(), 0));
 			}
 		}
 		if (state.normalCtrl) {
@@ -555,8 +560,10 @@ public class Maverick : Actor, IDamagable {
 	public virtual bool normalCtrl() {
 		if (input.isPressed(Control.Up, player) && canFly && state is not MFly && !state.wasFlying) {
 			stopMoving();
-			incPos(new Point(0, -4));
-			grounded = false;
+			if (grounded) {
+				incPos(new Point(0, -4));
+				grounded = false;
+			}
 			changeState(new MFly());
 			return true;
 		}
@@ -718,8 +725,9 @@ public class Maverick : Actor, IDamagable {
 			target = mmc.getHealTarget();
 		} else if (controlMode is not MaverickModeId.Puppeteer and not MaverickModeId.TagTeam) {
 			target = Global.level.getClosestTarget(
-				getCenterPos().substractxy(subtractTargetDistance * xDir, 0),
-				player.alliance, true, isRequesterAI: true, aMaxDist: 300
+				getCenterPos(),
+				player.alliance, true, isRequesterAI: true,
+				aMaxDist: 300 - (subtractTargetDistance / 4)
 			);
 		}
 
@@ -877,6 +885,10 @@ public class Maverick : Actor, IDamagable {
 		input.keyHeld[key] = true;
 	}
 
+	public virtual string getSprite(string spriteName) {
+		return $"{getMaverickPrefix()}_{spriteName}";
+	}
+
 	public virtual string getMaverickPrefix() {
 		return "";
 	}
@@ -977,21 +989,21 @@ public class Maverick : Actor, IDamagable {
 		}
 	}
 
-	public void changeState(MaverickState newState, bool ignoreCooldown = false) {
+	public bool changeState(MaverickState newState, bool ignoreCooldown = false) {
 		if (!newState.canEnterSelf && state.GetType() == newState.GetType()) {
-			return;
+			return false;
 		}
 		if (state is MDie) {
-			return;
+			return false;
 		}
 		if (!newState.canEnter(this)) {
-			return;
+			return false;
 		}
 		MaverickStateCooldown? oldStateCooldown = stateCooldowns.GetValueOrDefault(state.GetType());
 		MaverickStateCooldown? newStateCooldown = stateCooldowns.GetValueOrDefault(newState.GetType());
 
 		if (newStateCooldown != null && !ignoreCooldown) {
-			if (newStateCooldown.cooldown > 0) return;
+			if (newStateCooldown.cooldown > 0) return false;
 		}
 		newState.maverick = this;
 
@@ -1024,6 +1036,7 @@ public class Maverick : Actor, IDamagable {
 				maxOutGlobalCooldowns(newStateCooldown.maxCooldown);
 			}
 		}
+		return true;
 	}
 
 	public void changeSpriteFromName(string spriteBaseName, bool resetFrame) {
@@ -1487,16 +1500,23 @@ public class Maverick : Actor, IDamagable {
 		return true;
 	}
 
-	public virtual float getAirSpeed() {
-		return 1;
-	}
-
 	public virtual float getDashSpeed() {
-		return dashSpeed * getRunDebuffs();
+		return 3.25f * 60 * getRunDebuffs() * getRunBuffs();
 	}
 
 	public virtual float getRunSpeed() {
-		return 100 * getRunDebuffs();
+		return Physics.WalkSpeedSec * getRunDebuffs() * getRunBuffs();
+	}
+
+	public virtual float getDashOrRunSpeed() {
+		if (!isDashing) {
+			return getRunSpeed();
+		}
+		return getDashSpeed();
+	}
+
+	public float getRunBuffs() {
+		return jumpChargeSpeed;
 	}
 
 	public float getRunDebuffs() {
@@ -1629,7 +1649,7 @@ public class Maverick : Actor, IDamagable {
 		base.render(x, y);
 		currentLabelY = -getLabelOffY();
 
-		if (ownerChar?.currentMaverick != this &&
+		/*if (ownerChar?.currentMaverick != this &&
 			!sprite.name.EndsWith("exit") &&
 			!sprite.name.EndsWith("enter") &&
 			controlMode != MaverickModeId.Striker &&
@@ -1643,7 +1663,7 @@ public class Maverick : Actor, IDamagable {
 				drawHealthBar();
 				drawName();
 			}
-		}
+		}*/
 
 		drawSubtankHealing();
 
@@ -1691,18 +1711,17 @@ public class Maverick : Actor, IDamagable {
 	}
 
 	// Hud stuff.
-	public virtual void rednerHud(Point offset, HUDHealthPosition position) {
+	public virtual void renderHud(Point offset, HUDHealthPosition position) {
 		renderLifebar(offset, position);
 		renderAmmo(offset, position);
 	}
-	
+
 	public virtual void renderLifebar(Point offset, HUDHealthPosition position) {
-		Point hpPos = GameMode.getHUDHealthPosition(position, true) + offset;
 		(string healthBaseSprite, int baseSpriteIndex) = getBaseHpSprite();
 		(string healthTopSprite, int baseTopIndex) = getTopHpSprite();
 
 		HudDraw.renderLifebar(
-			hpPos, position, alive,
+			offset, position, alive,
 			(decimal)health, (decimal)maxHealth,
 			0, 0,
 			healthBaseSprite, baseSpriteIndex,
@@ -1710,12 +1729,34 @@ public class Maverick : Actor, IDamagable {
 		);
 	}
 
-	public virtual (string, int) getBaseHpSprite() => ("hud_health_base", 0);
+	public virtual (string, int) getBaseHpSprite() => ("hud_health_base", 4);
 	public virtual (string, int) getTopHpSprite() => ("hud_health_top", 0);
 
-	public virtual void renderAmmo(Point offset, HUDHealthPosition position) {
+	public virtual bool renderAmmo(Point offset, HUDHealthPosition position) {
+		bool didDraw = false;
 		Point ammoPosition = GameMode.getHUDHealthPosition(position, false) + offset;
-		//HudDraw.renderAmmo(ammoPosition, position, currentWeapon);
+		if (usesAmmo) {
+			GameMode.renderAmmo(
+				ammoPosition.x, ammoPosition.y,
+				barIndexes.icon, barIndexes.units,
+				ammo, grayAmmoLevel, maxAmmo, false,
+				"hud_weapon_full", "hud_weapon_base",
+				ammoDisplayScale: ammoDisplayScale
+			);
+			didDraw = true;
+		}
+		if (canFly) {
+			float scale = maxFlyBar / 28;
+			GameMode.renderAmmo(
+				ammoPosition.x, ammoPosition.y,
+				flyBarIndexes.icon, flyBarIndexes.units,
+				flyBar, 0, maxFlyBar, false,
+				"hud_weapon_full", "hud_weapon_base",
+				ammoDisplayScale: scale
+			);
+			didDraw = true;
+		}
+		return didDraw;
 	}
 
 	public virtual Point renderMiniHUD(Point offset) {

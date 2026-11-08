@@ -116,7 +116,7 @@ public class ChargeEffect {
 				float halfWidth = 10;
 
 				var rect = new Rect(x - halfWidth, y - halfWidth, x + halfWidth, y + halfWidth);
-				var camRect = new Rect(Global.level.camX, Global.level.camY, Global.level.camX + Global.viewScreenW, Global.level.camY + Global.viewScreenH);
+				var camRect = new Rect(Global.level.camera.fpX, Global.level.camera.fpY, Global.level.camera.fpX + Global.viewScreenW, Global.level.camera.fpY + Global.viewScreenH);
 				if (rect.overlaps(camRect)) {
 					part.sprite.draw((int)Math.Round(part.time), x, y, 1, 1, null, 1, 1, 1, ZIndex.Foreground);
 				}
@@ -173,7 +173,7 @@ public class DieEffectParticles {
 			float halfWidth = 10;
 
 			var rect = new Rect(x - halfWidth, y - halfWidth, x + halfWidth, y + halfWidth);
-			var camRect = new Rect(Global.level.camX, Global.level.camY, Global.level.camX + Global.viewScreenW, Global.level.camY + Global.viewScreenH);
+			var camRect = new Rect(Global.level.camera.fpX, Global.level.camera.fpY, Global.level.camera.fpX + Global.viewScreenW, Global.level.camera.fpY + Global.viewScreenH);
 			if (rect.overlaps(camRect)) {
 				int frameIndex = (int)MathF.Round(time * 20) % diePart.sprite.totalFrameNum;
 				diePart.sprite.draw(frameIndex, x + offsetX, y + offsetY, 1, 1, null, alpha, 1, 1, ZIndex.Foreground);

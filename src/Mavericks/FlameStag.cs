@@ -143,7 +143,7 @@ public class FlameStag : Maverick {
 	}
 
 	public override float getDashSpeed() {
-		return MathF.Max(1.5f, dashSpeed) * getRunDebuffs();
+		return MathF.Max(1.5f, jumpChargeSpeed) * getRunDebuffs();
 	}
 
 	public Point? getAttackPOI() {

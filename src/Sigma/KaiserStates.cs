@@ -26,7 +26,7 @@ public class KaiserSigmaBaseState : CharState {
 		Helpers.decrementTime(ref kaiserSigma.kaiserRightMineShootTime);
 		Helpers.decrementTime(ref kaiserSigma.kaiserHoverCooldown);
 
-		if (!isKaiserSigmaTouchingGround() && character.charState is not KaiserSigmaJumpState) {
+		if (!kaiserSigma.grounded && character.charState is not KaiserSigmaJumpState) {
 			if (character.charState is KaiserSigmaIdleState || character.charState is KaiserSigmaBeamState) {
 				character.changeState(new KaiserSigmaHoverState(), true);
 			}
@@ -50,10 +50,6 @@ public class KaiserSigmaBaseState : CharState {
 			character.changeState(new ViralSigmaTaunt(false), true);
 		}
 	}
-
-	public bool isKaiserSigmaTouchingGround() {
-		return character.checkCollision(0, 1) != null;
-	}
 }
 
 public class KaiserSigmaIdleState : KaiserSigmaBaseState {
@@ -71,7 +67,7 @@ public class KaiserSigmaIdleState : KaiserSigmaBaseState {
 		// Jump
 		if (character.isSoftLocked()) {
 			return;
-		} else if (player.input.isPressed(Control.Jump, player)) {
+		} else if (character.canJump() && player.input.isPressed(Control.Jump, player)) {
 			if (kaiserSigma.kaiserHoverCooldown == 0 &&
 				kaiserSigma.kaiserHoverTime < kaiserSigma.kaiserMaxHoverTime - 0.25f
 			) {
@@ -81,7 +77,7 @@ public class KaiserSigmaIdleState : KaiserSigmaBaseState {
 			}
 		}
 		// Hover
-		else if (player.input.isHeld(Control.Up, player)) {
+		else if (character.canJump() && player.input.isHeld(Control.Up, player)) {
 			if (kaiserSigma.kaiserHoverCooldown == 0 &&
 				kaiserSigma.kaiserHoverTime < kaiserSigma.kaiserMaxHoverTime - 0.25f
 			) {
@@ -89,15 +85,17 @@ public class KaiserSigmaIdleState : KaiserSigmaBaseState {
 				return;
 			}
 		} else if (
-				player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)
-			) {
+			character.canMove() &&
+			(player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player))
+		) {
 			character.changeState(new KaiserSigmaWalkState(), true);
 			return;
-		} else if (player.input.isPressed(Control.Dash, player)) {
+		} else if (character.canMove() && player.input.isPressed(Control.Dash, player)) {
 			if (UpgradeMenu.subtankDelay > 0) {
 				Global.level.gameMode.setHUDErrorMessage(player, "Cannot become Virus in battle");
 			} else {
-				character.changeState(new KaiserSigmaVirusState(), true);
+				kaiserSigma.isVirusTest = true;
+				character.changeState(new KaiserVirusState(), true);
 			}
 			return;
 		} else if (player.input.isPressed(Control.Taunt, player)) {
@@ -142,7 +140,8 @@ public class KaiserSigmaWalkState : KaiserSigmaBaseState {
 			if (UpgradeMenu.subtankDelay > 0) {
 				Global.level.gameMode.setHUDErrorMessage(player, "Cannot become Virus in battle");
 			} else {
-				character.changeState(new KaiserSigmaVirusState(), true);
+				kaiserSigma.isVirusTest = true;
+				character.changeState(new KaiserVirusState(), true);
 			}
 			return;
 		} else if (player.input.isPressed(Control.Taunt, player)) {
@@ -198,7 +197,8 @@ public class KaiserSigmaJumpState : KaiserSigmaBaseState {
 			if (UpgradeMenu.subtankDelay > 0) {
 				Global.level.gameMode.setHUDErrorMessage(player, "Cannot become Virus in battle");
 			} else {
-				character.changeState(new KaiserSigmaVirusState(), true);
+				kaiserSigma.isVirusTest = true;
+				character.changeState(new KaiserVirusState(), true);
 			}
 			return;
 		}
@@ -208,7 +208,7 @@ public class KaiserSigmaJumpState : KaiserSigmaBaseState {
 			character.moveXY(character.getRunSpeed() * inputDir, 0);
 			character.xDir = inputDir;
 		}
-		if (isKaiserSigmaTouchingGround()) {
+		if (kaiserSigma.grounded) {
 			character.playSound("crashX3", sendRpc: true);
 			character.shakeCamera(sendRpc: true);
 			character.changeState(new KaiserSigmaIdleState(), true);
@@ -230,7 +230,7 @@ public class KaiserSigmaTauntState : KaiserSigmaBaseState {
 		base.update();
 
 		if (character.isAnimOver()) {
-			kaiserSigma.changeToKaiserIdleOrFall();
+			kaiserSigma.changeToIdleOrFall();
 		}
 	}
 }
@@ -270,8 +270,8 @@ public class KaiserSigmaHoverState : KaiserSigmaBaseState {
 		exhaustMoveDir = 0;
 		if (!moveAmount.isZero()) {
 			CollideData? collideData = character.checkCollision(0, moveAmount.y * Global.spf);
-			if (moveAmount.y > 0 && collideData?.isGroundHit() == true && isKaiserSigmaTouchingGround()) {
-				kaiserSigma.changeToKaiserIdleOrFall();
+			if (moveAmount.y > 0 && kaiserSigma.grounded && collideData?.isGroundHit() == true) {
+				kaiserSigma.changeToIdleOrFall();
 				character.playSound("crashX3", sendRpc: true);
 				character.shakeCamera(sendRpc: true);
 				return;
@@ -313,7 +313,9 @@ public class KaiserSigmaFallState : KaiserSigmaBaseState {
 			if (UpgradeMenu.subtankDelay > 0) {
 				Global.level.gameMode.setHUDErrorMessage(player, "Cannot become Virus in battle");
 			} else {
-				character.changeState(new KaiserSigmaVirusState(), true);
+				kaiserSigma.isVirusTest = true;
+				character.changeState(new KaiserVirusState(), true);
+				character.updateHitboxes();
 			}
 			return;
 		}
@@ -323,7 +325,7 @@ public class KaiserSigmaFallState : KaiserSigmaBaseState {
 			character.moveXY(character.getRunSpeed() * inputDir, 0);
 			character.xDir = inputDir;
 		}
-		if (isKaiserSigmaTouchingGround()) {
+		if (kaiserSigma.grounded) {
 			character.playSound("crashX3", sendRpc: true);
 			character.shakeCamera(sendRpc: true);
 			character.changeState(new KaiserSigmaIdleState(), true);
@@ -336,7 +338,7 @@ public class KaiserSigmaFallState : KaiserSigmaBaseState {
 	}
 }
 
-public class KaiserSigmaVirusState : CharState {
+public class KaiserVirusState : CharState {
 	public Anim? kaiserShell;
 	public Anim? relocatedKaiserShell;
 	public Anim? viralSigmaHeadReturn;
@@ -349,8 +351,9 @@ public class KaiserSigmaVirusState : CharState {
 
 	public KaiserSigma kaiserSigma = null!;
 
-	public KaiserSigmaVirusState() : base("virus") {
+	public KaiserVirusState() : base("virus") {
 		pushImmune = true;
+		useGravity = false;
 	}
 
 	public void lerpBack(Point destPos, bool isRelocating) {
@@ -396,21 +399,28 @@ public class KaiserSigmaVirusState : CharState {
 				};
 				character.visible = false;
 				character.changePos(kaiserSigmaDestPos);
+				kaiserSigma.isVirusTest = false;
 				character.changeSpriteFromName("idle", true);
 			}
 
 			// Note: Code to shrink is in Anim.cs
 			if (isRelocating && relocatedKaiserShell == null) {
-				relocatedKaiserShell = new Anim(kaiserSigmaDestPos, "kaisersigma_empty", character.xDir, player.getNextActorNetId(), false, sendRpc: true, fadeIn: true);
+				relocatedKaiserShell = new Anim(
+					kaiserSigmaDestPos, "kaisersigma_empty",
+					character.xDir, player.getNextActorNetId(),
+					false, sendRpc: true, fadeIn: true
+				);
 			}
 
 			Point lerpDestPos = kaiserSigmaDestPos.addxy(12 * character.xDir, -94);
 			viralSigmaHeadReturn.changePos(Point.lerp(viralSigmaHeadReturn.pos, lerpDestPos, Global.spf * 10));
 			if (viralSigmaHeadReturn.pos.distanceTo(lerpDestPos) < 10 && viralSigmaHeadReturn.xScale == 0) {
-				kaiserSigma.changeToKaiserIdleOrFall();
+				kaiserSigma.grounded = true;
+				character.canBeGrounded = true;
+				kaiserSigma.changeToIdleOrFall();
 
 				character.destroyMusicSource();
-				character.addMusicSource("kaiserSigma", character.getCenterPos(), true);
+				//character.addMusicSource("kaiserSigma", character.getCenterPos(), true);
 				RPC.actorToggle.sendRpc(character.netId, RPCActorToggleType.AddKaiserSigmaMusicSource);
 
 				character.xScale = 1;
@@ -443,22 +453,30 @@ public class KaiserSigmaVirusState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		kaiserShell = new Anim(character.pos, "kaisersigma_empty_fadeout", character.xDir, player.getNextActorNetId(), false, sendRpc: true) { zIndex = character.zIndex - 10 };
-
-		character.changePos(character.pos.addxy(12 * character.xDir, -94));
+		if (oldState is not InRideArmor) {
+			kaiserShell = new Anim(
+				character.pos, "kaisersigma_empty_fadeout",
+				character.xDir, player.getNextActorNetId(),
+				false, sendRpc: true) { zIndex = character.zIndex - 10 }
+			;
+			character.changePos(character.pos.addxy(12 * character.xDir, -94));
+			character.xScale = 0;
+			character.yScale = 0;
+		}
 		origXDir = character.xDir;
-
-		character.xScale = 0;
-		character.yScale = 0;
-
+	
 		RPC.actorToggle.sendRpc(character.netId, RPCActorToggleType.AddKaiserViralSigmaMusicSource);
 		character.destroyMusicSource();
-		character.addMusicSource("demo_X3", character.getCenterPos(), true, loop: false);
+		//character.addMusicSource("demo_X3", character.getCenterPos(), true, loop: false);
+		character.stopMovingS();
 
 		kaiserSigma = character as KaiserSigma ?? throw new NullReferenceException();
 		if (kaiserSigma.beamState == 2) {
 			kaiserSigma.beamState = 3;
 		}
+		kaiserSigma.isVirusTest = true;
+		character.grounded = false;
+		character.canBeGrounded = false;
 	}
 
 	public override void onExit(CharState? newState) {
@@ -532,7 +550,7 @@ public class KaiserSigmaBeamState : KaiserSigmaBaseState {
 			}
 		} else if (state == 1) {
 			if (proj?.destroyed == true) {
-				kaiserSigma.changeToKaiserIdleOrFall();
+				kaiserSigma.changeToIdleOrFall();
 			}
 		}
 	}
@@ -886,7 +904,7 @@ public class KaiserSigmaRevive : CharState {
 		if (state == 0) {
 			if (explodeDieEffect == null || explodeDieEffect.destroyed) {
 				state = 1;
-				character.addMusicSource("kaiserSigma", character.pos, true);
+				//character.addMusicSource("kaiserSigma", character.pos, true);
 				RPC.actorToggle.sendRpc(character.netId, RPCActorToggleType.AddKaiserSigmaMusicSource);
 				character.visible = true;
 				character.changePos(spawnPoint);
@@ -926,9 +944,6 @@ public class KaiserSigmaRevive : CharState {
 				character.invulnTime = 0.5f;
 				character.useGravity = true;
 				character.stopMovingS();
-				character.grounded = false;
-				character.canBeGrounded = false;
-
 				character.changeState(new KaiserSigmaIdleState(), true);
 			}
 		}

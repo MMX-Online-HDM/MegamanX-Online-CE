@@ -44,8 +44,8 @@ public class DevConsole {
 
 	public static void drawConsole() {
 		if (showConsole || showLogOnly) {
-			int posX = MathInt.Round(Global.level.camX);
-			int posY = MathInt.Round(Global.level.camY);
+			int posX = Global.level.camera.fpX;
+			int posY = Global.level.camera.fpY;
 			DrawWrappers.DrawTexture(
 				Global.textures["pausemenuload"],
 				0, 0, 384, 216, posX, posY, ZIndex.HUD

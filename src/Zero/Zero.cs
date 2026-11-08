@@ -289,26 +289,26 @@ public class Zero : Character {
 		// Shoot anim and vars.
 		setShootAnim();
 		Point shootPos = getShootPos();
-		int xDir = getShootXDir();
+		int sxDir = getShootXDir();
 
 		// Shoot stuff.
 		if (chargeLevel == 1) {
 			currencyUse = 1;
 			playSound("buster2", sendRpc: true);
 			new ZBuster2Proj(
-				shootPos, xDir, this, player, player.getNextActorNetId(), rpc: true
+				shootPos, sxDir, this, player, player.getNextActorNetId(), rpc: true
 			);
 		} else if (chargeLevel == 2) {
 			currencyUse = 1;
 			playSound("buster2X3", sendRpc: true);
 			new ZBuster3Proj(
-				shootPos, xDir, this, player, player.getNextActorNetId(), rpc: true
+				shootPos, sxDir, this, player, player.getNextActorNetId(), rpc: true
 			);
 		} else if (chargeLevel == 3 || chargeLevel >= 4) {
 			currencyUse = 1;
 			playSound("buster3X3", sendRpc: true);
 			new ZBuster4Proj(
-				shootPos, xDir, this, player, player.getNextActorNetId(), rpc: true
+				shootPos, sxDir, this, player, player.getNextActorNetId(), rpc: true
 			);
 		}
 		if (currencyUse > 0) {
@@ -332,10 +332,9 @@ public class Zero : Character {
 			frameTime = 0;
 		}
 		if (charState is LadderClimb) {
-			if (player.input.isHeld(Control.Left, player)) {
-				this.xDir = -1;
-			} else if (player.input.isHeld(Control.Right, player)) {
-				this.xDir = 1;
+			int ixDir = player.input.getXDir(player);
+			if (ixDir != 0) {
+				xDir = ixDir;
 			}
 		}
 		shootAnimTime = DefaultShootAnimTime;
@@ -577,7 +576,6 @@ public class Zero : Character {
 		if (Options.main.swapAirAttacks) {
 			(altSpecialPressed, altShootPressed) = (altShootPressed, altSpecialPressed);
 		}
-
 		if (altSpecialPressed) {
 			if (airSpecial.type == 0 && charState is not ZeroRollingSlashtate) {
 				if (kuuenzanCooldown <= 0) {
@@ -593,7 +591,18 @@ public class Zero : Character {
 		}
 		// Air attack.
 		if (altShootPressed) {
-			if (charState is WallSlide wallSlide) {
+			if (charState is LadderClimb lc) {
+				if (lc.isAttacking) {
+					return false;
+				}
+				int ixDir = player.input.getXDir(player);
+				if (ixDir != 0 && canTurn()) {
+					xDir = ixDir;
+				}
+				changeSpriteFromName("ladder_attack", true);
+				playSound("saber1", sendRpc: true);
+			}
+			else if (charState is WallSlide wallSlide) {
 				changeState(new ZeroMeleeWall(wallSlide.wallDir, wallSlide.wallCollider), true);
 			} else {
 				changeState(new ZeroAirSlashState(), true);
@@ -958,10 +967,9 @@ public class Zero : Character {
 		if (useSound) {
 			playAltSound("land", sendRpc: true, altParams: "larmor");
 		}
-		if (grounded && (
-			player.input.isHeld(Control.Left, player) ||
-			player.input.isHeld(Control.Right, player)
-		)) {
+		int ixDir = player.input.getXDir(player);
+		if (grounded && ixDir != 0) {
+			if (canTurn()) { xDir = ixDir; }
 			changeState(getRunState(true));
 			return;
 		}
@@ -1037,7 +1045,7 @@ public class Zero : Character {
 	}
 
 	public override void render(float x, float y) {
-		if (isViral && visible) {
+		if ((isViral || isBlack) && visible) {
 			addRenderEffect(RenderEffectType.Trail);
 		} else {
 			removeRenderEffect(RenderEffectType.Trail);
@@ -1077,6 +1085,9 @@ public class Zero : Character {
 		}
 		base.render(x, y);
 	}
+
+	public override (string, int) getBaseHpSprite() => ("hud_health_base", 1);
+	public override Weapon? getHudWeapon() => gigaAttack;
 
 	public override List<byte> getCustomActorNetData() {
 		List<byte> customData = base.getCustomActorNetData();
@@ -1126,7 +1137,9 @@ public class Zero : Character {
 		bool isTargetInAir = enemyDistY >= 20;
 		bool isFacingTarget = (pos.x < target?.pos.x && xDir == 1) || (pos.x >= target?.pos.x && xDir == -1);
 		if (player.currency >= Player.zeroHyperCost && !isInvulnerable() &&
-		   charState is not (HyperZeroStart or LadderClimb) && !hypermodeActive() && !player.isMainPlayer
+			charState.normalCtrl &&
+			charState is not (HyperZeroStart or LadderClimb) &&
+			!hypermodeActive() && !player.isMainPlayer
 		) {
 			changeState(new HyperZeroStart(), true);
 		}

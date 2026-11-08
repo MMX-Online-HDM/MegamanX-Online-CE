@@ -217,7 +217,7 @@ public class SpiralMagnumProj : Projectile {
 
 	public bool playZing() {
 		if (playedSoundOnce) return false;
-		var mainCharPos = new Point(Global.level.camCenterX, Global.level.camCenterY);
+		var mainCharPos = new Point(Global.level.camera.centerX, Global.level.camera.centerY);
 		var ownerChar = owner?.character;
 		if (Global.level.mainPlayer?.character != null && Global.level.mainPlayer.character == ownerChar) return false;
 		if (ownerChar != null && ownerChar.getCenterPos().distanceTo(mainCharPos) < Global.screenW / 2) return false;

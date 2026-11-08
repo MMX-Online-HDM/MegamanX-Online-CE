@@ -80,58 +80,65 @@ public class BubbleCrab : Maverick {
 		if (shield == null) {
 			rechargeAmmo(1);
 		}
-
-		bool floating = false;
-		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand) {
-				if (input.isPressed(Control.Shoot, player)) {
-					changeState(new BCrabShootState());
-				} else if (input.isPressed(Control.Special1, player)) {
-					changeState(getSpecialState());
-				} else if (input.isPressed(Control.Dash, player)) {
-					changeState(new BCrabClawState());
-				}
-			} else if (state is MJump || state is MFall) {
-				if (input.isPressed(Control.Dash, player)) {
-					changeState(new BCrabClawJumpState());
-				}
-			}
-
-			float floatY = -150;
-			if ((state is MJump || state is MFall) && !grounded) {
-				if (isUnderwater() && shield != null) {
-					if (input.isHeld(Control.Jump, player) && vel.y > floatY) {
-						vel.y = floatY;
-						if (state is MFall) {
-							floating = true;
-							changeSpriteFromName("jump", true);
-						}
-					}
-				} else {
-					if (lastFrameWasUnderwater && input.isHeld(Control.Jump, player) && input.isHeld(Control.Up, player)) {
-						vel.y = -425;
-					}
-				}
-			}
-		}
-
-		if (!floating && state is MFall && vel.y > 0) {
-			changeSpriteFromName("fall", true);
-		}
-
 		lastFrameWasUnderwater = isUnderwater() && shield != null;
 	}
 
-	public MaverickState? getSpecialState() {
+	public override bool normalCtrl() {
+		bool floating = false;
+		float floatY = -2.5f * 60;
+
+		if (!grounded) {
+			if (isUnderwater() && shield != null) {
+				if (input.isHeld(Control.Jump, player) && vel.y > floatY) {
+					vel.y = floatY;
+					changeState(new MJump());
+					return true;
+				}
+			} else {
+				if (lastFrameWasUnderwater &&
+					input.isHeld(Control.Jump, player) &&
+					input.isHeld(Control.Up, player)
+				) {
+					vel.y = -7 * 60;
+				}
+			}
+		}
+		if (!floating && state is MFall && vel.y > 0 && sprite.name == getSprite("fall")) {
+			changeSpriteFromName("fall", true);
+		}
+		return base.normalCtrl();
+	}
+
+	public override bool attackCtrl() {
+		if (input.isPressed(Control.Shoot, player)) {
+			changeState(new BCrabShootState());
+			return true;
+		} else if (input.isPressed(Control.Special1, player)) {
+			if (input.isHeld(Control.Down, player)) {
+				changeState(new BCrabSummonState());
+				return true;
+			}
+			changeState(getSpecialState());
+			return true;
+		} else if (input.isPressed(Control.Dash, player)) {
+			if (grounded) {
+				changeState(new BCrabClawState());
+			} else {
+				changeState(new BCrabClawJumpState());
+			}
+			return true;
+		}
+		return base.attackCtrl();
+	}
+
+	public MaverickState getSpecialState() {
 		if (shield == null && ammo >= 8) {
 			return new BCrabShieldStartState();
-		} else if (crabs.Count <= 3) {
-			removeCrabs();
-			return new BCrabSummonState();
 		} else {
-			return null;
+			return new BCrabSummonState();
 		}
 	}
+
 	public void removeCrabs() {
 		if (crabs.Count >= 1) {
 			for (int i = crabs.Count - 1; i >= 0; i--) {
@@ -148,8 +155,8 @@ public class BubbleCrab : Maverick {
 	public override MaverickState[] strikerStates() {
 		return [
 			new BCrabShootState(),
-			//new BCrabSummonState(),
-			new BCrabClawState()
+			new BCrabClawState(),
+			new BCrabSummonState(),
 		];
 	}
 
@@ -163,15 +170,14 @@ public class BubbleCrab : Maverick {
 				new BCrabShieldStartState()
 			];
 		}
-		if (enemyDist <= 30) {
-			return [
-				new BCrabShootState(),
-				new BCrabClawState()
-			];
+		List<MaverickState> aiStates = [new BCrabShootState()];
+		if (enemyDist <= 60 && crabs.Count < 3) {
+			aiStates.Add(new BCrabSummonState());
 		}
-		return [
-			new BCrabShootState(),
-		];
+		if (enemyDist <= 30) {
+			aiStates.Add(new BCrabClawState());
+		}
+		return aiStates.ToArray();
 	}
 
 	// Melee IDs for attacks.
@@ -238,13 +244,13 @@ public class BCrabBubbleSplashProj : Projectile {
 		destroyOnHit = false;
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir,
-			 new byte[] { (byte)num, (byte)type}
+			 new byte[] { (byte)num, (byte)type }
 			);
 		}
 	}
 	public static Projectile rpcInvoke(ProjParameters args) {
 		return new BCrabBubbleSplashProj(
-			args.pos, args.xDir, args.extraData[0], args.extraData[1], 
+			args.pos, args.xDir, args.extraData[0], args.extraData[1],
 			args.owner, args.player, args.netId
 		);
 	}
@@ -751,6 +757,7 @@ public class BCrabSummonState : BCrablosMState {
 
 		Point? shootPos = bubblyCrablos.getFirstPOI("summon_crab");
 		if (!once && shootPos != null) {
+			bubblyCrablos.removeCrabs();
 			once = true;
 			if (bubblyCrablos.crabs.Count < 3) bubblyCrablos.crabs.Add(
 				new BCrabSummonCrabProj(

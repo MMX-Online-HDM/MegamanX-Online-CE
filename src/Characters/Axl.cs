@@ -52,7 +52,7 @@ public class Axl : Character {
 	// Cursor stuff.
 	public Point axlCursorPos;
 	public Point? assassinCursorPos;
-	public Point axlCursorWorldPos => axlCursorPos.addxy(Global.level.camX, Global.level.camY);
+	public Point axlCursorWorldPos => axlCursorPos.addxy(Global.level.camera.posX, Global.level.camera.posY);
 	public Point axlScopeCursorWorldPos;
 	public Point axlScopeCursorWorldLerpPos;
 	public Point axlZoomOutCursorDestPos;
@@ -153,9 +153,9 @@ public class Axl : Character {
 		if (isWhiteAxl()) hyperAxlStillZoomed = true;
 		axlCursorPos.x = Helpers.clamp(axlCursorPos.x, 0, Global.viewScreenW);
 		axlCursorPos.y = Helpers.clamp(axlCursorPos.y, 0, Global.viewScreenH);
-		savedCamX = Global.level.camX;
-		savedCamY = Global.level.camY;
-		axlScopeCursorWorldPos = getCamCenterPos(ignoreZoom: true);
+		savedCamX = Global.level.camera.posX;
+		savedCamY = Global.level.camera.posY;
+		axlScopeCursorWorldPos = getCamCenterPos();
 		axlScopeCursorWorldLerpPos = axlCursorWorldPos;
 		isZoomingIn = true;
 		isZoomingOut = false;
@@ -166,7 +166,7 @@ public class Axl : Character {
 		if (!_zoom) return;
 
 		zoomCharge = 0;
-		axlZoomOutCursorDestPos = getCamCenterPos(ignoreZoom: true);
+		axlZoomOutCursorDestPos = getCamCenterPos();
 		axlCursorPos = getAxlBulletPos().add(getAxlBulletDir().times(50)).addxy(-savedCamX, -savedCamY);
 
 		isZoomingOut = true;
@@ -615,7 +615,7 @@ public class Axl : Character {
 	public void updateAxlDirectionalAim() {
 		if (player.input.isCursorLocked(this)) {
 			Point worldCursorPos = pos.add(lastDirToCursor);
-			axlCursorPos = worldCursorPos.addxy(-Global.level.camX, -Global.level.camY);
+			axlCursorPos = worldCursorPos.addxy(-Global.level.camera.posX, -Global.level.camera.posY);
 			lockOn(out _);
 			return;
 		}
@@ -688,7 +688,7 @@ public class Axl : Character {
 		if (charState is Crouch) yOff = -16;
 
 		//axlCursorPos = pos.addxy(xOff * xDir, yOff).addxy(aimDir.x, aimDir.y).addxy(-Global.level.camX, -Global.level.camY);
-		Point destCursorPos = pos.addxy(xOff * xDir, yOff).addxy(aimDir.x, aimDir.y).addxy(-Global.level.camX, -Global.level.camY);
+		Point destCursorPos = pos.addxy(xOff * xDir, yOff).addxy(aimDir.x, aimDir.y).addxy(-Global.level.camera.posX, -Global.level.camera.posY);
 
 		if (charState is Dash || charState is AirDash) {
 			destCursorPos = destCursorPos.addxy(15 * xDir, 0);
@@ -765,7 +765,7 @@ public class Axl : Character {
 
 		if (axlCursorTarget is Character chara) {
 			axlLockOnCursorPos = chara.getAimCenterPos();
-			lockOnPoint = axlLockOnCursorPos.addxy(-Global.level.camX, -Global.level.camY);
+			lockOnPoint = axlLockOnCursorPos.addxy(-Global.level.camera.posX, -Global.level.camera.posY);
 			// axlCursorPos = (axlCursorTarget as Character).getAimCenterPos().addxy(-Global.level.camX, -Global.level.camY);
 
 			
@@ -949,7 +949,7 @@ public class Axl : Character {
 		}
 
 		if (isWarpIn()) {
-			axlCursorPos = getCenterPos().addxy(-Global.level.camX + 50 * xDir, -Global.level.camY);
+			axlCursorPos = getCenterPos().addxy(-Global.level.camera.posX + 50 * xDir, -Global.level.camera.posY);
 		}
 
 		// aimbot
@@ -957,8 +957,8 @@ public class Axl : Character {
 			var target = Global.level.getClosestTarget(pos, player.alliance, true);
 			if (target != null) {
 				axlCursorPos = target.pos.addxy(
-					-Global.level.camX,
-					-Global.level.camY - ((target as Character)?.charState is InRideArmor ? 0 : 16)
+					-Global.level.camera.posX,
+					-Global.level.camera.posY - ((target as Character)?.charState is InRideArmor ? 0 : 16)
 				);
 			};
 		}
@@ -1086,6 +1086,8 @@ public class Axl : Character {
 		Global.debugString2 = axlWeapon.shootAngleOffset.ToString();
 		*/
 	}
+
+	public override (string, int) getBaseHpSprite() => ("hud_health_base", 2);
 
 	float axlCursorAngle;
 	public void drawAxlCursor() {
@@ -1599,10 +1601,10 @@ public class Axl : Character {
 		return isWhiteAxl();
 	}
 
-	public override Point getCamCenterPos(bool ignoreZoom = false) {
+	public override Point getCamCenterPos() {
 		if (sniperMissileProj != null) return sniperMissileProj.getCenterPos();
-		if (isZooming() && !ignoreZoom) return axlScopeCursorWorldPos;
-		return base.getCamCenterPos(ignoreZoom);
+		if (isZooming()) return axlScopeCursorWorldPos;
+		return base.getCamCenterPos();
 	}
 
 	public override bool changeState(CharState newState, bool forceChange = true) {

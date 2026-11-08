@@ -59,9 +59,9 @@ public class Server {
 	[ProtoMember(31)] public bool disableVehicles;
 	[ProtoMember(32)] public bool isP2P;
 	[ProtoMember(33)] public byte extraOptions;
-	[ProtoMember(33)] public byte[] teamScore;
-	[ProtoMember(34)] public byte teamNum = 2;
-	[ProtoMember(35)] public int altPlayTo;
+	[ProtoMember(34)] public byte[] teamScore;
+	[ProtoMember(35)] public byte teamNum = 2;
+	[ProtoMember(36)] public int altPlayTo;
 
 	[JsonIgnore] public bool favorHost = true;
 	[JsonIgnore] public int redScore;
@@ -94,6 +94,8 @@ public class Server {
 	public const byte getServerQueryByte = 1;
 
 	public const int maxPlayerCap = 25;
+
+	public Server() {}
 
 	public Server(
 		decimal gameVersion, Region? region,

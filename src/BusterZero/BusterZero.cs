@@ -428,15 +428,16 @@ public class BusterZero : Character {
 	}
 
 	public void shootHadangeki() {
-		Point shootPos = pos.addxy(46 * xDir, -20);
-		
+		int shootDir = charState is BusterZeroHadangekiWall ? -xDir : xDir;
+		Point shootPos = pos.addxy(46 * shootDir, -20);
+
 		if (isAwakened) {
-			new DZShinHadangekiProj(shootPos, xDir, this, player.getNextActorNetId());
+			new DZShinHadangekiProj(shootPos, shootDir, this, player.getNextActorNetId());
 		} else {
 			int type = 0;
 			if (isViral) { type = 1; }
 			if (isBlackZero) { type = 2; }
-			new DZHadangekiProj(shootPos, xDir, type, this, player.getNextActorNetId());
+			new DZHadangekiProj(shootPos, shootDir, type, this, player.getNextActorNetId());
 		}
 	}
 
@@ -540,6 +541,8 @@ public class BusterZero : Character {
 		base.render(x, y);
 	}
 
+	public override (string, int) getBaseHpSprite() => ("hud_health_base", 1);
+
 	public override float getLabelOffY() {
 		if (sprite.name.Contains("_ra_")) {
 			return 25;
@@ -627,8 +630,9 @@ public class BusterZero : Character {
 			player.press(Control.Shoot);
 		}
 		// Go hypermode 
-		if (player.currency >= Player.zBusterZeroHyperCost && !isBlackZero && !isInvulnerable()
-			&& charState is not HyperBusterZeroStart and not WarpIn
+		if (player.currency >= Player.zBusterZeroHyperCost &&
+			!isBlackZero && !isAwakened && !isViral &&
+			!isInvulnerable() && charState.normalCtrl
 		) {
 			if (hyperMode == 0) {
 				changeState(new HyperBusterZeroStart(), true);

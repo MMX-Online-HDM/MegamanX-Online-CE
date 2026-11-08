@@ -107,6 +107,8 @@ public class SuiretsusenProj : Projectile {
 public class TBreakerState : ZeroState {
 	public float dashTime = 0;
 	public bool isAlt;
+	public bool soundPlayed;
+
 	public TBreakerState(bool isAlt) : base("tbreaker") {
 		this.isAlt = isAlt;
 	}
@@ -124,11 +126,14 @@ public class TBreakerState : ZeroState {
 			var rect = new Rect(poi.x - 10, poi.y - 5, poi.x + 10, poi.y + 5);
 			Shape shape = rect.getShape();
 			var hit = Global.level.checkCollisionShape(shape, null);
-			if (hit != null && hit.gameObject is Wall) {
+			if (hit != null && hit.gameObject is Wall || true) {
 				new TBreakerProj(
 					poi, character.xDir, zero,
 					player, player.getNextActorNetId(), rpc: true
 				);
+			} else if (!soundPlayed) {
+				character.playSound("crashX3", sendRpc: true);
+				soundPlayed = true;
 			}
 		}
 		if (character.isAnimOver()) {

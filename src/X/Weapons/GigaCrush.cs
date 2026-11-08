@@ -304,8 +304,8 @@ public class GigaCrushBackwall : Effect {
 		}
 
 		DrawWrappers.DrawRect(
-			Global.level.camX, Global.level.camY,
-			Global.level.camX + 1000, Global.level.camY + 1000,
+			Global.level.camera.fpX, Global.level.camera.fpY,
+			Global.level.camera.fpX + 1000, Global.level.camera.fpY + 1000,
 			true, new Color(0, 0, 0, (byte)System.MathF.Round(transparecy)), 1, ZIndex.Backwall
 		);
 	}

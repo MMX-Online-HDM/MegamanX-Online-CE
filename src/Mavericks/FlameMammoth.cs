@@ -30,29 +30,29 @@ public class FlameMammoth : Maverick {
 
 		armorClass = ArmorClass.Heavy;
 		canStomp = true;
+		subtractTargetDistance = 70;
 	}
 
 	public override void update() {
 		base.update();
-		subtractTargetDistance = 70;
-		if (state is MJump or MFall) {
+		if (!grounded) {
 			jumpTime++;
 		} else {
 			Helpers.decrementFrames(ref jumpTime);
 		}
-		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand) {
-				if (shootPressed()) {
-					changeState(getShootState(false));
-				} else if (specialPressed()) {
-					changeState(new FlameMOilState());
-				}
-			} else if (state is MJump || state is MFall) {
-				if (jumpTime > 24 && input.isPressed(Control.Dash, player)) {
-					changeState(new FlameMJumpPressState());
-				}
-			}
+	}
+
+	public override bool attackCtrl() {
+		if (!grounded && jumpTime > 24 && input.isPressed(Control.Dash, player)) {
+			return changeState(new FlameMJumpPressState());
 		}
+		if (shootPressed()) {
+			return changeState(getShootState(false));
+		}
+		if (specialPressed()) {
+			return changeState(new FlameMOilState());
+		}
+		return base.attackCtrl();
 	}
 
 	public override string getMaverickPrefix() {

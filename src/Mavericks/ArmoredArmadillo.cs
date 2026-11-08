@@ -44,6 +44,7 @@ public class ArmoredArmadillo : Maverick {
 		grayAmmoLevel = 2;
 		barIndexes = (56, 45);
 		height = 34;
+		subtractTargetDistance = 50;
 	}
 
 	public override void setHealth(float lastHealth) {
@@ -69,8 +70,9 @@ public class ArmoredArmadillo : Maverick {
 
 	public override void update() {
 		base.update();
-		if (!ownedByLocalPlayer) return;
-		subtractTargetDistance = 50;
+		if (!ownedByLocalPlayer) {
+			return;
+		}
 		if (state is ArmoredARollState) {
 			drainAmmo(4);
 		} else if (state is ArmoredAGuardState) {
@@ -79,52 +81,48 @@ public class ArmoredArmadillo : Maverick {
 			rechargeAmmo(3);
 		}
 
-		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (grounded && state.attackCtrl) {
-				if (shootPressed()) {
-					changeState(new ArmoredAShootState());
-				} else if (specialPressed() && !noArmor && state is not ArmoredAGuardState) {
-					if (ammo > 0) {
-						changeState(new ArmoredAGuardState());
-					}
-				} else if (input.isPressed(Control.Dash, player)) {
-					if (ammo >= 2) {
-						deductAmmo(2);
-						changeState(new ArmoredARollEnterState());
-					}
+		if (aiBehavior != MaverickAIBehavior.Control &&
+			state.attackCtrl && collider != null
+		) {
+			bool shouldGuard = false;
+			Rect rect = collider.shape.getRect();
+			if (xDir == -1) {
+				rect.x1 -= rect.w() * 3;
+			} else {
+				rect.x2 += rect.w() * 3;
+			}
+			var hits = Global.level.checkCollisionsShape(rect.getShape(), null);
+			foreach (var hit in hits) {
+				if (hit.gameObject is Projectile proj && proj.owner.alliance != player.alliance &&
+					MathF.Sign(proj.deltaPos.x) != xDir
+				) {
+					shouldGuard = true;
+					break;
 				}
 			}
-		} else {
-			if (state is MIdle or MRun or MLand or MShoot && collider != null) {
-				bool shouldGuard = false;
-				Rect rect = collider.shape.getRect();
-				if (xDir == -1) {
-					rect.x1 -= rect.w() * 3;
-				} else {
-					rect.x2 += rect.w() * 3;
-				}
-				var hits = Global.level.checkCollisionsShape(rect.getShape(), null);
-				foreach (var hit in hits) {
-					if (hit.gameObject is Projectile proj && proj.owner.alliance != player.alliance &&
-						MathF.Sign(proj.deltaPos.x) != xDir
-					) {
-						shouldGuard = true;
-						break;
-					}
-				}
-
-				if (shouldGuard) {
-					changeState(new ArmoredAGuardState());
-				}
+			if (shouldGuard) {
+				changeState(new ArmoredAGuardState());
 			}
 		}
+	}
 
-		/*
-		if (state is not ArmoredAZappedState && state is not MDie && !noArmor && health < maxHealth * 0.5f)
-		{
-			removeArmor(true);
+	public override bool attackCtrl() {
+		if (shootPressed()) {
+			changeState(new ArmoredAShootState());
+			return true;
+		} else if (specialPressed() && !noArmor && state is not ArmoredAGuardState) {
+			if (ammo > 0) {
+				changeState(new ArmoredAGuardState());
+				return true;
+			}
+		} else if (input.isPressed(Control.Dash, player)) {
+			if (ammo >= 2) {
+				deductAmmo(2);
+				changeState(new ArmoredARollEnterState());
+				return true;
+			}
 		}
-		*/
+		return base.attackCtrl();
 	}
 
 	public override string getMaverickPrefix() {
@@ -155,6 +153,7 @@ public class ArmoredArmadillo : Maverick {
 		];
 		return aiStates.ToArray();
 	}
+
 	public override void aiUpdate() {
 		base.aiUpdate();
 		if (controlMode == MaverickModeId.Summoner && Helpers.randomRange(0, 10) == 1 &&

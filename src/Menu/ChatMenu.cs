@@ -20,12 +20,7 @@ public class ChatMenu : IMainMenu {
 	public List<ChatEntry> chatFeed = new List<ChatEntry>();
 
 	public ChatMenu() {
-		if (Global.serverClient != null) {
-			chatEnabled = true;
-		}
-		if (Global.debug) {
-			chatEnabled = true;
-		}
+		chatEnabled = true;
 	}
 
 	public bool isChatEnabled() {

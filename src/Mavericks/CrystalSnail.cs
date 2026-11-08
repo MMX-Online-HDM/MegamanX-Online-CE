@@ -45,12 +45,12 @@ public class CrystalSnail : Maverick {
 		armorClass = ArmorClass.Light;
 		gameMavs = GameMavs.X2;
 		height = 32;
+		subtractTargetDistance = 70;
 	}
 
 	public override void update() {
 		base.update();
-		if (!ownedByLocalPlayer) return;
-		subtractTargetDistance = 70;
+		if (!ownedByLocalPlayer) { return; }
 		if (chargedCrystalHunter != null) {
 			if (chargedCrystalHunter.destroyed) {
 				chargedCrystalHunter = null;

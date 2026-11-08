@@ -757,6 +757,9 @@ public class Vile : Character {
 		base.render(x, y);
 	}
 
+	public override (string, int) getBaseHpSprite() => ("hud_health_base", 3);
+	public override Weapon? getHudWeapon() => energy;
+
 	public override Point getAimCenterPos() {
 		if (sprite.name.Contains("_ra_")) {
 			return pos.addxy(0, -10);

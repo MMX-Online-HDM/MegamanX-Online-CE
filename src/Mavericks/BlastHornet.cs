@@ -41,58 +41,50 @@ public class BlastHornet : Maverick {
 		}
 
 		canFly = true;
+		useInsectFly = true;
 		maxFlyBar = 960;
 		flyBar = 960;
 		flyBarIndexes = (68, 57);
 		gameMavs = GameMavs.X3;
+		subtractTargetDistance = 50;
 	}
 
 	public override void update() {
 		base.update();
 		wings.update();
-		if (!ownedByLocalPlayer) return;
-		subtractTargetDistance = 50;
-
+		if (!ownedByLocalPlayer) {
+			return;
+		}
 		if (cursor != null && cursor.destroyed) {
 			cursor = null;
 		}
+	}
 
-		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand) {
-				if (input.isPressed(Control.Shoot, player)) {
-					changeState(new BHornetShootState(true));
-				} else if (input.isPressed(Control.Special1, player)) {
-					if (cursor == null) {
-						changeState(new BHornetShootCursorState(true));
-					}
-				}
-			} else if (state is MJump || state is MFall || state is MFly) {
-				if (input.isPressed(Control.Shoot, player)) {
-					changeState(new BHornetShootState(false));
-				} else if (input.isPressed(Control.Special1, player)) {
-					var specialState = getSpecialState();
-					if (specialState != null) changeState(specialState);
-				} else if (input.isPressed(Control.Dash, player)) {
-					changeState(new BHornetStingState());
-				}
-			}
+	public override bool attackCtrl() {
+		if (!grounded && input.isPressed(Control.Dash, player)) {
+			changeState(new BHornetStingState());
+			return true;
 		}
+		if (input.isPressed(Control.Shoot, player)) {
+			changeState(new BHornetShootState(grounded));
+			return true;
+		} 
+		if (input.isPressed(Control.Special1, player)) {
+			changeState(getSpecialState());
+			return true;
+		}
+		return base.attackCtrl();
 	}
 
 	public override string getMaverickPrefix() {
 		return "bhornet";
 	}
 
-	public MaverickState? getSpecialState() {
-		if (cursor != null) {
-			if (cursor.target != null) {
-				return new BHornetShoot2State(cursor.target);
-			} else {
-				return null;
-			}
-		} else {
-			return new BHornetShootCursorState(false);
+	public MaverickState getSpecialState() {
+		if (cursor?.target != null) {
+			return new BHornetShoot2State(cursor.target);
 		}
+		return new BHornetShootCursorState(grounded);
 	}
 
 	public override MaverickState[] strikerStates() {

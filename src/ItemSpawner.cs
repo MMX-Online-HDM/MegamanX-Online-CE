@@ -14,6 +14,9 @@ public class ItemSpawner {
 	public int xDir;
 	public bool isStacked;
 	public int stackAssignedPlayerId;
+	public bool isPlat;
+	public int altRide;
+
 	public ItemSpawner(Point pos, Type itemType, int rideArmorType, float respawnTime, int xDir) {
 		this.pos = pos;
 		this.itemType = itemType;
@@ -44,8 +47,14 @@ public class ItemSpawner {
 		if (Global.level.levelData.isTraining()) respawnTime = 1;
 		if (time > respawnTime) {
 			time = 0;
-			var ra = new RideArmor(Global.level.mainPlayer, pos, rideArmorType, id, Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
+			var ra = new RideArmor(
+				Global.level.mainPlayer, pos,
+				rideArmorType, id, Global.level.mainPlayer.getNextActorNetId(),
+				true, sendRpc: true
+			);
 			ra.xDir = xDir;
+			ra.altSprite = altRide;
+			ra.ownedByMK5 = isPlat;
 		}
 	}
 

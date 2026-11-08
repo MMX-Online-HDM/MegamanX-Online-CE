@@ -634,6 +634,9 @@ public partial class Player {
 				(getModifiedHealth(20) + heartTanks * getHeartTankModifier()) * getHpMod()
 			);
 		}
+		if (controlMode == MaverickModeId.Striker) {
+			return MathF.Ceiling(getModifiedHealth(16) * getHpMod());
+		}
 		return MathF.Ceiling(getModifiedHealth(24) * getHpMod());
 	}
 
@@ -801,6 +804,9 @@ public partial class Player {
 		if (character == null) {
 			return false;
 		}
+		if (character.rideArmorPlatform != null) {
+			return true;
+		}
 		if (character is not Axl || Options.main.axlAimMode == 2) {
 			return input.isHeld(Control.Down, this);
 		}
@@ -900,18 +906,9 @@ public partial class Player {
 		if (character == null && ownedByLocalPlayer) {
 			if (!warpedInOnce && firstSpawn == null) {
 				firstSpawn = Global.level.getSpawnPoint(this, true);
-				Global.level.camX = MathF.Round(firstSpawn.pos.x) - Global.halfScreenW * Global.viewSize;
-				Global.level.camY = MathF.Round(firstSpawn.getGroundY()) - Global.halfScreenH * Global.viewSize - 30;
-
-				Global.level.camX = Helpers.clamp(Global.level.camX, 0, Global.level.width - Global.viewScreenW);
-				Global.level.camY = Helpers.clamp(Global.level.camY, 0, Global.level.height - Global.viewScreenH);
-
-				Global.level.computeCamPos(
-					new Point(
-						Global.level.camX + Global.halfScreenW * Global.viewSize,
-						Global.level.camY + Global.halfScreenH * Global.viewSize
-					),
-					null
+				Global.level.camera.changeCenter(
+					MathInt.Round(firstSpawn.pos.x),
+					MathInt.Round(firstSpawn.getGroundY())
 				);
 			}
 			if (shouldRespawn()) {
@@ -1236,6 +1233,7 @@ public partial class Player {
 			configureWeapons(newChar);
 			character = newChar;
 			lastCharacter = newChar;
+			lastHudChar = newChar;
 			if (!ownedByLocalPlayer) {
 				warpedInOnce = true;
 			}
@@ -1290,7 +1288,7 @@ public partial class Player {
 		}
 		if (isMainChar && ownedByLocalPlayer) {
 			if (isMainPlayer && isCamPlayer) {
-				Global.level.snapCamPos(newChar.getCamCenterPos(), null);
+				Global.level.camera.changeCenter(newChar.getCamCenterPos());
 				//console.log(Global.level.camX + "," + Global.level.camY);
 			}
 			warpedInOnce = true;
@@ -2396,6 +2394,8 @@ public partial class Player {
 			);
 			character = kaiserSigma;
 		}
+		lastCharacter = character;
+		lastHudChar = character;
 		RPC.reviveSigma.sendRpc(form, spawnPoint, id, newNetId);
 	}
 
@@ -2905,10 +2905,15 @@ public partial class Player {
 	}
 
 	public IHudDrawable? getHudTarget() {
-		if (lastCharacter != null) {
-			return lastCharacter;
+		if (lastHudChar == null) {
+			return null;
 		}
-		return null;
+		if (lastHudChar is Character chara &&
+			chara.currentMaverick != null
+		) {
+			return chara.currentMaverick;
+		}
+		return lastHudChar;
 	}
 }
 

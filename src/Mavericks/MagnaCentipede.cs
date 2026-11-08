@@ -727,9 +727,6 @@ public class MagnaCTeleportState : CentipedeMState {
 				var prevCamPos = player!.character!.getCamCenterPos();
 				player.character.stopCamUpdate = true;
 				maverick.changePos(clone.pos);
-				if (maverick.controlMode == MaverickModeId.TagTeam) {
-					Global.level.snapCamPos(player.character.getCamCenterPos(), prevCamPos);
-				}
 				maverick.xDir = clone.xDir;
 			}
 			maverick.playSound("magnacTeleportIn", sendRpc: true);

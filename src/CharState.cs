@@ -168,13 +168,16 @@ public class CharState {
 	}
 
 	public virtual bool canEnter(Character character) {
-		if (character.charState is InRideArmor &&
-			!(this is Die || this is Idle || this is Jump || this is Fall || this is StrikeChainHooked || this is ParasiteCarry || this is VileMK2Grabbed || this is DarkHoldState ||
-			  this is UPGrabbed || this is WhirlpoolGrabbed || this is DeadLiftGrabbed || Helpers.isOfClass(this, typeof(GenericGrabbedState)))
+		/*if (character.charState is InRideArmor &&
+			!(this is Die || this is Idle || this is Jump || this is Fall ||
+				this is StrikeChainHooked || this is ParasiteCarry ||
+				this is VileMK2Grabbed || this is DarkHoldState ||
+				this is UPGrabbed || this is WhirlpoolGrabbed ||
+				this is DeadLiftGrabbed || Helpers.isOfClass(this, typeof(GenericGrabbedState)))
 		) {
 			//if (character.currentWeapon is NecroBurst && character.charState is LaserAttack) return false;
 			return false;
-		}
+		}*/
 		if (character.charState is DarkHoldState dhs && dhs.stunTime > 0) {
 			if (this is not Die && this is not Hurt) {
 				return false;
@@ -292,16 +295,6 @@ public class CharState {
 			} else {
 				character.sprite.frameIndex = character.sprite.totalFrameNum - 1;
 				character.sprite.frameTime = character.sprite.getCurrentFrame().duration;
-			}
-		}
-	}
-
-	public void groundCodeWithMove() {
-		if (character.canTurn()) {
-			if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
-				if (player.input.isHeld(Control.Left, player)) character.xDir = -1;
-				if (player.input.isHeld(Control.Right, player)) character.xDir = 1;
-				if (character.canMove()) character.changeState(character.getRunState());
 			}
 		}
 	}
@@ -671,12 +664,10 @@ public class Idle : CharState {
 	public override void update() {
 		base.update();
 
-		if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
-			if (!character.isSoftLocked() && character.canTurn()) {
-				if (player.input.isHeld(Control.Left, player)) character.xDir = -1;
-				if (player.input.isHeld(Control.Right, player)) character.xDir = 1;
-				if (character.canMove()) character.changeState(character.getRunState());
-			}
+		int ixDir = player.input.getXDir(player);
+		if (ixDir != 0 && !character.isSoftLocked() && character.canTurn()) {
+			if (character.canTurn()) { character.xDir = ixDir; }
+			if (character.canMove()) { character.changeState(character.getRunState()); }
 		}
 		if (Global.level.gameMode.isOver) {
 			if (Global.level.gameMode.playerWon(player)) {
@@ -741,12 +732,10 @@ public class Run : CharState {
 		if (stateFrames <= 4) {
 			runSpeed = 1 * character.getRunDebuffs();
 		}
-		if (player.input.isHeld(Control.Left, player)) {
-			character.xDir = -1;
-			if (character.canMove()) move.x = -runSpeed;
-		} else if (player.input.isHeld(Control.Right, player)) {
-			character.xDir = 1;
-			if (character.canMove()) move.x = runSpeed;
+		int ixDir = player.input.getXDir(player);
+		if (ixDir != 0) {
+			if (character.canTurn()) { character.xDir = ixDir; }
+			if (character.canMove()) { move.x = runSpeed * ixDir; }
 		}
 		if (move.magnitude > 0) {
 			character.movePoint(move);
@@ -786,7 +775,7 @@ public class Crouch : CharState {
 
 		var dpadXDir = player.input.getXDir(player);
 		if (dpadXDir != 0) {
-			character.xDir = dpadXDir;
+			if (character.canTurn()) { character.xDir = dpadXDir; }
 		}
 
 		if (!character.grounded || !player.isCrouchHeld()) {
@@ -984,7 +973,7 @@ public class Dash : CharState {
 		}
 
 		if (dashTime < 4 || stop) {
-			if (inputXDir != 0 && inputXDir != dashDir) {
+			if (inputXDir != 0 && inputXDir != dashDir && character.canTurn()) {
 				character.xDir = inputXDir;
 				dashDir = character.xDir;
 			}
@@ -1093,7 +1082,7 @@ public class AirDash : CharState {
 			character.changeSpriteFromName(character.shootAnimTime > 0 ? shootSprite : sprite, true);
 		}
 		if (dashTime < 4 || stop) {
-			if (inputXDir != 0 && inputXDir != dashDir) {
+			if (inputXDir != 0 && inputXDir != dashDir && character.canTurn()) {
 				character.xDir = inputXDir;
 				dashDir = character.xDir;
 			}
@@ -1323,6 +1312,8 @@ public class LadderClimb : CharState {
 	public Ladder ladder;
 	public float snapX;
 	public float? incY;
+	public bool isAttacking;
+
 	public LadderClimb(Ladder ladder, float snapX, float? incY = null) : base("ladder_climb", "ladder_shoot", "ladder_attack", "ladder_start") {
 		this.ladder = ladder;
 		this.snapX = MathF.Round(snapX);
@@ -1362,16 +1353,23 @@ public class LadderClimb : CharState {
 		if (inTransition()) {
 			return;
 		}
-		bool isAttacking = (
-			character.sprite.name != character.getSprite("ladder_climb")
+		bool isTransition = inTransition();
+		bool isShooting = (
+			character.sprite.name == character.getSprite(shootSprite)
 		);
-
-		if (isAttacking) {
+		isAttacking = (
+			!isShooting && character.sprite.name != character.getSprite("ladder_climb") && !isTransition
+		);
+		if (isAttacking && character.isAnimOver()) {
+			isAttacking = false;
+			character.changeSpriteFromName("ladder_climb", true);
+		}
+		if (isAttacking || isShooting) {
 			character.frameSpeed = 1;
 		} else {
 			character.frameSpeed = 0;
 		}
-		if (!isAttacking && character.canClimbLadder()) {
+		if (!isAttacking && !isShooting && character.canClimbLadder()) {
 			if (player.input.isHeld(Control.Up, player)) {
 				character.move(new Point(0, -75));
 				character.frameSpeed = 1;

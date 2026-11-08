@@ -5,12 +5,12 @@
 		<OutputType>WinExe</OutputType>
 		<!--Nullable>annotations</Nullable-->
 		<Nullable>enable</Nullable>
-		<Version>20</Version>
+		<Version>20.0</Version>
 		<AssemblyVersion>20.0</AssemblyVersion>
 		<ApplicationIcon>app.ico</ApplicationIcon>
 		<TargetFramework>net10.0-windows</TargetFramework>
 		<ImplicitUsings>false</ImplicitUsings>
-		<SelfContained>false</SelfContained>
+		<!--SelfContained>false</SelfContained-->
 		<OutputPath>./bin/</OutputPath>
 		<RunWorkingDirectory>./bin/runenv/</RunWorkingDirectory>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
@@ -18,7 +18,6 @@
 		<Deterministic>true</Deterministic>
 		<NeutralLanguage>en</NeutralLanguage>
 		<FileVersion>20.0</FileVersion>
-		<SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
 		<Configurations>Debug;Release;Debug2</Configurations>
 	</PropertyGroup>
 
@@ -41,16 +40,16 @@
 
 	<!--Dependencies-->
 	<ItemGroup>
-		<PackageReference Include="protobuf-net" Version="3.2.56" />
-		<PackageReference Include="protobuf-net.Core" Version="3.2.56" />
+		<PackageReference Include="protobuf-net" Version="3.4.40" />
+		<PackageReference Include="protobuf-net.Core" Version="3.4.40" />
 		<PackageReference Include="SFML.Graphics" Version="3.0.0" />
 		<PackageReference Include="SFML.Window" Version="3.0.0" />
 		<PackageReference Include="SFML.System" Version="3.0.0" />
 		<PackageReference Include="SFML.Audio" Version="3.0.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-		<PackageReference Include="DeviceId" Version="6.10.0" />
+		<PackageReference Include="DeviceId" Version="6.11.0" />
 		<PackageReference Include="Profanity.Detector" Version="0.1.8" />
 		<PackageReference Include="SpaceWizards.Lidgren.Network" Version="0.3.1" />
-		<PackageReference Include="System.IO.Hashing" Version="10.0.3" />
+		<PackageReference Include="System.IO.Hashing" Version="10.0.14" />
 	</ItemGroup>
 </Project>

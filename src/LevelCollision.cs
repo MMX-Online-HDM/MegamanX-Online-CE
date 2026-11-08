@@ -721,7 +721,7 @@ public partial class Level {
 			var goCollider = go.collider;
 
 			// Fix a one-off case where charge beam wouldn't lock onto Kaiser's head
-			if (isChargeBeam && go is KaiserSigma { isVirus: false }) {
+			if (isChargeBeam && go is KaiserSigma { isVirusTest: false }) {
 				goCollider = go.getAllColliders().FirstOrDefault(c => c.name == "head");
 				if (goCollider == null) continue;
 			}

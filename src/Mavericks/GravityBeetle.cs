@@ -7,9 +7,9 @@ namespace MMXOnline;
 public class GravityBeetle : Maverick {
 	public static Weapon getWeapon() { return new Weapon(WeaponIds.GravityBeetle, 157); }
 	public static Weapon getMeleeWeapon(Player player) { return new Weapon(WeaponIds.GravityBeetle, 157, new Damager(player, 6, Global.defFlinch, 0.5f)); }
-
 	public Weapon meleeWeapon;
 	public GBeetleGravityWellProj? well;
+	public Sprite wings;
 
 	public GravityBeetle(
 		Player player, Point pos, int xDir, ushort? netId,
@@ -17,14 +17,16 @@ public class GravityBeetle : Maverick {
 	) : base(
 		player, pos, xDir, netId, ownedByLocalPlayer
 	) {
+		/* He does not need these, also why always 1s on everithing?
 		stateCooldowns = new() {
 			{ typeof(GBeetleShoot), new(60) },
 			{ typeof(GBeetleGravityWellState), new(60) },
-			{ typeof(GBeetleDashState), new(90) }
-		};
+			{ typeof(GBeetleDashState), new(60) }
+		};*/
 
 		weapon = getWeapon();
 		meleeWeapon = getMeleeWeapon(player);
+		wings = new Sprite("gbeetle_wings");
 
 		awardWeaponId = WeaponIds.GravityWell;
 		weakWeaponId = WeaponIds.RaySplasher;
@@ -36,33 +38,49 @@ public class GravityBeetle : Maverick {
 		}
 
 		armorClass = ArmorClass.Heavy;
-		canStomp = true;
+		//canStomp = true;
 		gameMavs = GameMavs.X3;
 		height = 40;
+		canFly = true;
+		useInsectFly = true;
+		flyBarIndexes = (68, 57);
+		maxFlyBar = 480;
+		flyBar = 480;
 	}
 
 	public override void update() {
 		base.update();
+		wings.update();
+		if (!ownedByLocalPlayer) {
+			return;
+		}
 		if (well?.destroyed == true) {
 			well = null;
 		}
 		subtractTargetDistance = 20;
-		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand) {
-				if (input.isPressed(Control.Shoot, player)) {
-					changeState(new GBeetleShoot(false));
-				} else if (input.isPressed(Control.Special1, player) && well == null) {
-					changeState(new GBeetleGravityWellState());
-				} else if (input.isPressed(Control.Dash, player)) {
-					changeState(new GBeetleDashState());
-				}
-			} else if (state is MJump || state is MFall) {
-			}
+	}
+
+	// Regular stuff.
+	public override bool normalCtrl() {
+		return base.normalCtrl();
+	}
+
+	// Attack states.
+	public override bool attackCtrl() {
+		if (input.isPressed(Control.Shoot, player)) {
+			return changeState(new GBeetleShoot(false));
 		}
+		if (input.isPressed(Control.Special1, player) && well == null) {
+			return changeState(new GBeetleGravityWellState());
+		}
+		if (input.isPressed(Control.Dash, player)) {
+			return changeState(new GBeetleDashState());
+		}
+		return base.attackCtrl();
 	}
 
 	public override float getRunSpeed() {
-		return 80 * getRunDebuffs();
+		return 1.5f * 60 * getRunDebuffs();
 	}
 
 	public override string getMaverickPrefix() {
@@ -106,6 +124,18 @@ public class GravityBeetle : Maverick {
 			"gbeetle_fall" => MeleeIds.Fall,
 			_ => MeleeIds.None
 		});
+	}
+
+	// Used to render wings.
+	public override void render(float x, float y) {
+		base.render(x, y);
+
+		Point? wingsPOI = getFirstPOI("wings");
+		if (wingsPOI != null) {
+			wings.drawSimple(
+				wingsPOI.Value, xDir, zIndex - 1
+			);
+		}
 	}
 
 	// This can be called from a RPC, so make sure there is no character conditionals here.
@@ -238,6 +268,7 @@ public class GBeetleShoot : BeetleMState {
 		Point? shootPos = maverick.getFirstPOI();
 		if (!shotOnce && shootPos != null) {
 			shotOnce = true;
+			maverick.playSound("gbeetleProjBounce", sendRpc: true);
 			new GBeetleBallProj(
 				shootPos.Value, maverick.xDir, isSecond,
 				gravityBeetbood, player, player.getNextActorNetId(), rpc: true

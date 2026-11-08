@@ -6,9 +6,9 @@ namespace MMXOnline;
 public class Doppma : BaseSigma {
 	public float fireballCooldown;
 	public Weapon fireballWeapon = new Sigma3FireWeapon();
-	public float maxFireballCooldown = 0.39f;
+	public float maxFireballCooldown = 20;
 	public float shieldCooldown;
-	public float maxShieldCooldown = 1.125f;
+	public float maxShieldCooldown = 65;
 	public bool shootOnce;
 
 	public Doppma(
@@ -22,7 +22,6 @@ public class Doppma : BaseSigma {
 		netId, ownedByLocalPlayer, isWarpIn,
 		loadout, heartTanks, isATrans
 	) {
-		sigmaSaberMaxCooldown = 0.5f;
 		altSoundId = AltSoundIds.X3;
 	}
 
@@ -32,8 +31,8 @@ public class Doppma : BaseSigma {
 			return;
 		}
 		fireballWeapon.update();
-		Helpers.decrementTime(ref fireballCooldown);
-		Helpers.decrementTime(ref shieldCooldown);
+		Helpers.decrementFrames(ref fireballCooldown);
+		Helpers.decrementFrames(ref shieldCooldown);
 		Helpers.decrementFrames(ref aiAttackCooldown);
 		if (sprite.name.EndsWith(charState.shootSpriteEx) == false) {
 			shootOnce = false;

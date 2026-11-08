@@ -214,7 +214,7 @@ public class MaverickState {
 
 	public void landingCode(bool exitMLand = true) {
 		if (maverick.canStomp) {
-			maverick.shakeCamera(sendRpc: true);
+			//maverick.shakeCamera(sendRpc: true);
 			maverick.playSound("crash", sendRpc: true);
 		}
 		if (maverick is FlameMammoth fm) {
@@ -229,7 +229,8 @@ public class MaverickState {
 				vc.bouncedOnce = false;
 			}
 		}
-		maverick.dashSpeed = 1;
+		maverick.isDashing = false;
+		maverick.jumpChargeSpeed = 0;
 		if (exitMLand) maverick.changeState(new MLand(maverick.landingVelY));
 		else maverick.changeToIdleFallOrFly();
 	}
@@ -771,7 +772,7 @@ public class MJumpStart : MaverickState {
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
 		if (isChargeJump) {
-			maverick.dashSpeed = 1 + ((jumpFramesHeld / maxJumpFrames) * 0.75f);
+			maverick.jumpChargeSpeed = 1 + ((jumpFramesHeld / maxJumpFrames) * 0.75f);
 			newState.canStopJump = false;
 		}
 	}
@@ -829,7 +830,6 @@ public class MJumpCharge : MaverickState {
 }
 
 public class MJump : MaverickState {
-	public int jumpFramesHeld = 0;
 	public bool fromCling;
 	public MaverickState? followUpAiState;
 
@@ -894,12 +894,14 @@ public class MFly : MaverickState {
 		if (player == null) return;
 		Helpers.decrementFrames(ref maverick.flyBar);
 
-		if (Global.level.checkTerrainCollisionOnce(maverick, 0, -maverick.getYMod()) != null && maverick.vel.y * maverick.getYMod() < 0) {
+		if (Global.level.checkTerrainCollisionOnce(
+			maverick, 0, -maverick.getYMod()) != null && maverick.vel.y * maverick.getYMod() < 0
+		) {
 			maverick.vel.y = 0;
 		}
 
 		Point move;
-		if (maverick is BlastHornet) {
+		if (maverick.useInsectFly) {
 			move = getHornetMove();
 		} else {
 			move = getMove();
@@ -951,10 +953,10 @@ public class MFly : MaverickState {
 		Point move = new Point();
 
 		if (input.isHeld(Control.Left, player)) {
-			move.x = -maverick.getRunSpeed() * maverick.getAirSpeed();
+			move.x = -maverick.getRunSpeed();
 			maverick.xDir = -1;
 		} else if (input.isHeld(Control.Right, player)) {
-			move.x = maverick.getRunSpeed() * maverick.getAirSpeed();
+			move.x = maverick.getRunSpeed();
 			maverick.xDir = 1;
 		}
 
@@ -998,14 +1000,15 @@ public class MFly : MaverickState {
 		maverick.useGravity = false;
 
 		float flyVelX = 0;
-		if (maverick.dashSpeed > 1) {
+		if (maverick.isDashing) {
 			flyVelX = maverick.deltaPos.normalize().times(flyVelMaxSpeed).x;
 		}
 		float flyVelY = maverick.vel.y;
 		flyVel = new Point(flyVelX, flyVelY);
 		if (flyVel.magnitude > flyVelMaxSpeed) flyVel = flyVel.normalize().times(flyVelMaxSpeed);
 
-		maverick.dashSpeed = 1;
+		maverick.isDashing = false;
+		maverick.jumpChargeSpeed = 0;
 		maverick.stopMoving();
 	}
 
@@ -1064,17 +1067,13 @@ public class MLand : MaverickState {
 			}
 		} else {
 			if (maverick.isAnimOver()) {
-				if (inputDir == 0) {
-					maverick.changeToIdleRunOrFall();
-					return;
-				}
-				maverick.changeState(new MRun());
+				maverick.changeToIdleRunOrFall();
 				return;
 			}
 		}
 		if (inputDir != 0) {
 			maverick.xDir = inputDir;
-			maverick.move(new(maverick.getRunSpeed() * inputDir, 0));
+			maverick.changeToIdleRunOrFall();
 		}
 	}
 }

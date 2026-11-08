@@ -122,7 +122,7 @@ public class CrystalHunterCharged : Actor {
 
 	public override void update() {
 		base.update();
-		var screenCoords = new Point(pos.x - Global.level.camX, pos.y - Global.level.camY);
+		var screenCoords = new Point(pos.x - Global.level.camera.fpX, pos.y - Global.level.camera.fpY);
 		var normalizedCoords = new Point(screenCoords.x / Global.viewScreenW, 1 - screenCoords.y / Global.viewScreenH);
 
 		//if (isSnails) {

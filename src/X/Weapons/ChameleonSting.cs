@@ -25,14 +25,10 @@ public class ChameleonSting : Weapon {
 	public override float getAmmoUsageEX(int chargeLevel, Character character) {
 		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
 
-		if (chargeLevel < 3 && mmx.stingActiveTime > 0) {
-			return 4;
-		}
-		if (chargeLevel >= 3 && freeAmmoNextCharge) {
-			freeAmmoNextCharge = false;
+		if (chargeLevel >= 3) {
 			return 0;
 		}
-		return getAmmoUsage(chargeLevel);
+		return 1;
 	}
 
 	public override void shoot(Character character, int[] args) {

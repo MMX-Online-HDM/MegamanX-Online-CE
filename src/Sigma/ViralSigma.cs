@@ -279,7 +279,7 @@ public class ViralSigma : Character {
 		}
 	}
 
-	public override Point getCamCenterPos(bool ignoreZoom = false) {
+	public override Point getCamCenterPos() {
 		return pos.round().addxy(camOffsetX, 25);
 	}
 

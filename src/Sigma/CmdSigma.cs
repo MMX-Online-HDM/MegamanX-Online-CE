@@ -6,6 +6,7 @@ namespace MMXOnline;
 public class CmdSigma : BaseSigma {
 	public Weapon ballWeapon;
 	public float saberCooldown;
+	public float sigmaSaberMaxCooldown = 60;
 	public float leapSlashCooldown;
 	public float sigmaAmmoRechargeCooldown = 0;
 	public float sigmaAmmoRechargeTime;
@@ -25,7 +26,6 @@ public class CmdSigma : BaseSigma {
 		netId, ownedByLocalPlayer, isWarpIn,
 		loadout, heartTanks, isATrans
 	) {
-		sigmaSaberMaxCooldown = 1;
 		altSoundId = AltSoundIds.X1;
 		ballWeapon = new SigmaBallWeapon();
 	}
@@ -37,7 +37,7 @@ public class CmdSigma : BaseSigma {
 			return;
 		}
 		// Cooldowns.
-		Helpers.decrementTime(ref saberCooldown);
+		Helpers.decrementFrames(ref saberCooldown);
 		Helpers.decrementFrames(ref dashSlashCooldown);
 		Helpers.decrementTime(ref leapSlashCooldown);
 		Helpers.decrementFrames(ref sigmaAmmoRechargeCooldown);
@@ -191,6 +191,8 @@ public class CmdSigma : BaseSigma {
 	public override bool canAddAmmo() {
 		return ballWeapon.ammo < ballWeapon.maxAmmo;
 	}
+
+	public override Weapon? getHudWeapon() => ballWeapon;
 
 	public override List<byte> getCustomActorNetData() {
 		List<byte> customData = base.getCustomActorNetData();

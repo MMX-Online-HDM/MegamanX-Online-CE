@@ -968,7 +968,10 @@ public partial class Actor : GameObject {
 			if (waterTime == 0) {
 				new Anim(new Point(pos.x, lastWaterY), "splash", 1, null, true);
 				playSound("splash");
-				vel.y = 0;
+				float yMod = reversedGravity ? -1 : 1;
+				if (vel.y * yMod > Physics.MaxUnderwaterFallSpeed) {
+					vel.y = Physics.MaxUnderwaterFallSpeed * yMod;
+				}
 			}
 			waterTime += Global.spf;
 		} else {
@@ -1329,9 +1332,9 @@ public partial class Actor : GameObject {
 			ry + currentFrame.rect.h()
 		);
 		var camRect = new Rect(
-			Global.level.camX - 50, Global.level.camY - 50,
-			Global.level.camX + Global.viewScreenW + 50,
-			Global.level.camY + Global.viewScreenH + 50
+			Global.level.camera.fpX - 50, Global.level.camera.fpY - 50,
+			Global.level.camera.fpX + Global.viewScreenW + 50,
+			Global.level.camera.fpY + Global.viewScreenH + 50
 		);
 		if (!rect.overlaps(camRect)) {
 			return false;
@@ -1467,10 +1470,6 @@ public partial class Actor : GameObject {
 				Alignment.Center, isWorldPos: true, depth: ZIndex.HUD
 			);
 		}
-	}
-
-	public virtual void renderHUD() {
-
 	}
 
 	public HashSet<RenderEffectType> getRenderEffectSet() {
@@ -1616,7 +1615,7 @@ public partial class Actor : GameObject {
 		var dist = originPoint.distanceTo(pos);
 		float distFactor = ownedByLocalPlayer ? Global.screenW : Global.screenW * 0.5f;
 		var percent = Helpers.clamp01(1 - (dist / (distFactor)));
-		Global.level.shakeY = percent * 24f;
+		Global.level.camera.shakeY = percent * 24f;
 		if (sendRpc) {
 			RPC.actorToggle.sendRpc(netId, RPCActorToggleType.ShakeCamera);
 		}
@@ -1756,6 +1755,10 @@ public partial class Actor : GameObject {
 			return pos.addxy(0, -rect.Value.h() / 2);
 		}
 		return pos;
+	}
+	
+	public virtual Point getCamCenterPos() {
+		return getCenterPos();
 	}
 
 	public void breakFreeze(Player player, Point? pos = null, bool sendRpc = false) {
@@ -2025,7 +2028,7 @@ public partial class Actor : GameObject {
 	}
 
 	public void drawBarVHUD(decimal length, decimal maxLength, int colorIndex, Point barPos, bool drawFullBar = true) {
-		Point bp = barPos.substractxy(Global.level.camX, Global.level.camY);
+		Point bp = barPos.substractxy(Global.level.camera.fpX, Global.level.camera.fpY);
 		decimal lengthFloor = Math.Floor(length);
 		decimal lengthCeiling = Math.Ceiling(length);
 		float alpha = (float)length - (float)lengthFloor;
@@ -2045,7 +2048,7 @@ public partial class Actor : GameObject {
 	}
 
 	public void drawBarHHUD(decimal length, decimal maxLength, int colorIndex, Point barPos, bool drawFullBar = true) {
-		Point bp = barPos.substractxy(Global.level.camX, Global.level.camY);
+		Point bp = barPos.substractxy(Global.level.camera.fpX, Global.level.camera.fpY);
 		decimal lengthFloor = Math.Floor(length);
 		decimal lengthCeiling = Math.Ceiling(length);
 		float alpha = (float)length - (float)lengthFloor;
